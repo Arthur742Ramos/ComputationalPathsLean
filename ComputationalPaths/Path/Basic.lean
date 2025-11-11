@@ -31,7 +31,7 @@ variable {A : Type u} {B : Type v}
 
 /-- Map a rewrite step through a function. -/
 @[simp] def map (f : A → B) (s : Step A) : Step B :=
-  ⟨f s.src, f s.tgt, congrArg f s.proof⟩
+  ⟨f s.src, f s.tgt, _root_.congrArg f s.proof⟩
 
 @[simp] theorem symm_symm (s : Step A) : symm (symm s) = s := by
   cases s
@@ -156,6 +156,53 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
   | mk steps proof =>
       cases proof
       rfl
+
+/-- Congruence of unary functions along paths. -/
+@[simp] def congrArg (f : A → B) (p : Path a b) : Path (f a) (f b) :=
+  ⟨p.steps.map (Step.map f), _root_.congrArg f p.proof⟩
+
+@[simp] theorem congrArg_id (p : Path a b) :
+    congrArg (fun x : A => x) p = p := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      have :
+          List.map (Step.map (fun x : A => x)) steps = steps := by
+        induction steps with
+        | nil => simp
+        | cons s tail ih =>
+            cases s
+            simp [Step.map, ih]
+      simp [congrArg, this]
+
+/-- Congruence in the first argument of a binary function. -/
+@[simp] def mapLeft (f : A → B → C) {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
+    Path (f a₁ b) (f a₂ b) :=
+  ⟨p.steps.map (Step.map fun x => f x b), _root_.congrArg (fun x => f x b) p.proof⟩
+
+/-- Congruence in the second argument of a binary function. -/
+@[simp] def mapRight (f : A → B → C) (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
+    Path (f a b₁) (f a b₂) :=
+  ⟨p.steps.map (Step.map (f a)), _root_.congrArg (f a) p.proof⟩
+
+/-- Congruence in both arguments of a binary function. -/
+@[simp] def map₂ (f : A → B → C)
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    Path (f a₁ b₁) (f a₂ b₂) :=
+  Path.trans (mapLeft f p b₁) (mapRight f a₂ q)
+
+@[simp] theorem mapLeft_refl (f : A → B → C) (a : A) (b : B) :
+    mapLeft f (Path.refl a) b = Path.refl (f a b) := by
+  simp [mapLeft]
+
+@[simp] theorem mapRight_refl (f : A → B → C) (a : A) (b : B) :
+    mapRight f a (Path.refl b) = Path.refl (f a b) := by
+  simp [mapRight]
+
+@[simp] theorem map₂_refl (f : A → B → C) (a : A) (b : B) :
+    map₂ f (Path.refl a) (Path.refl b) = Path.refl (f a b) := by
+  simp [map₂]
 
 end Path
 
