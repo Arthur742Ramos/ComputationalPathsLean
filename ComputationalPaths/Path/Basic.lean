@@ -171,6 +171,29 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
 @[simp] def congrArg (f : A → B) (p : Path a b) : Path (f a) (f b) :=
   ⟨p.steps.map (Step.map f), _root_.congrArg f p.proof⟩
 
+/-- Unary congruence preserves concatenation. -/
+@[simp] theorem congrArg_trans (f : A → B)
+    (p : Path a b) (q : Path b c) :
+    congrArg f (Path.trans p q) =
+      Path.trans (congrArg f p) (congrArg f q) := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₁
+          cases proof₂
+          simp [congrArg, Path.trans, List.map_append]
+
+/-- Unary congruence commutes with symmetry. -/
+@[simp] theorem congrArg_symm (f : A → B)
+    (p : Path a b) :
+    congrArg f (Path.symm p) =
+      Path.symm (congrArg f p) := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      simp [congrArg, Path.symm, List.map_map, List.map_reverse]
+
 @[simp] theorem congrArg_id (p : Path a b) :
     congrArg (fun x : A => x) p = p := by
   cases p with
