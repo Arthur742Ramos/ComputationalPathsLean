@@ -180,10 +180,56 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
     Path (f a₁ b) (f a₂ b) :=
   ⟨p.steps.map (Step.map fun x => f x b), _root_.congrArg (fun x => f x b) p.proof⟩
 
+/-- `mapLeft` preserves concatenation of paths. -/
+@[simp] theorem mapLeft_trans (f : A → B → C)
+    {a₁ a₂ a₃ : A} (p : Path a₁ a₂) (q : Path a₂ a₃) (b : B) :
+    mapLeft f (Path.trans p q) b =
+      Path.trans (mapLeft f p b) (mapLeft f q b) := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₁
+          cases proof₂
+          simp [mapLeft, Path.trans, List.map_append]
+
+/-- `mapLeft` commutes with symmetry. -/
+@[simp] theorem mapLeft_symm (f : A → B → C)
+    {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
+    mapLeft f (Path.symm p) b =
+      Path.symm (mapLeft f p b) := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      simp [mapLeft, Path.symm, List.map_map, List.map_reverse]
+
 /-- Congruence in the second argument of a binary function. -/
 @[simp] def mapRight (f : A → B → C) (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
     Path (f a b₁) (f a b₂) :=
   ⟨p.steps.map (Step.map (f a)), _root_.congrArg (f a) p.proof⟩
+
+/-- `mapRight` preserves concatenation of paths. -/
+@[simp] theorem mapRight_trans (f : A → B → C)
+    (a : A) {b₁ b₂ b₃ : B} (p : Path b₁ b₂) (q : Path b₂ b₃) :
+    mapRight f a (Path.trans p q) =
+      Path.trans (mapRight f a p) (mapRight f a q) := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₁
+          cases proof₂
+          simp [mapRight, Path.trans, List.map_append]
+
+/-- `mapRight` commutes with symmetry. -/
+@[simp] theorem mapRight_symm (f : A → B → C)
+    (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
+    mapRight f a (Path.symm p) =
+      Path.symm (mapRight f a p) := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      simp [mapRight, Path.symm, List.map_map, List.map_reverse]
 
 /-- Congruence in both arguments of a binary function. -/
 @[simp] def map₂ (f : A → B → C)
@@ -191,6 +237,34 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (f a₁ b₁) (f a₂ b₂) :=
   Path.trans (mapLeft f p b₁) (mapRight f a₂ q)
+
+/-- `map₂` preserves concatenation of paths in both arguments. -/
+@[simp] theorem map₂_trans (f : A → B → C)
+    {a₁ a₂ a₃ : A} {b₁ b₂ b₃ : B}
+    (p₁ : Path a₁ a₂) (p₂ : Path a₂ a₃)
+    (q₁ : Path b₁ b₂) (q₂ : Path b₂ b₃) :
+    map₂ f (Path.trans p₁ p₂) (Path.trans q₁ q₂) =
+      Path.trans
+        (mapLeft f p₁ b₁)
+        (Path.trans
+          (mapLeft f p₂ b₁)
+          (Path.trans
+            (mapRight f a₃ q₁)
+            (mapRight f a₃ q₂))) := by
+  cases p₁ with
+  | mk steps₁ proof₁ =>
+      cases p₂ with
+      | mk steps₂ proof₂ =>
+          cases q₁ with
+          | mk steps₃ proof₃ =>
+              cases q₂ with
+              | mk steps₄ proof₄ =>
+                  cases proof₁
+                  cases proof₂
+                  cases proof₃
+                  cases proof₄
+                  simp [map₂, mapLeft, mapRight, Path.trans,
+                    List.map_append, List.append_assoc]
 
 @[simp] theorem mapLeft_refl (f : A → B → C) (a : A) (b : B) :
     mapLeft f (Path.refl a) b = Path.refl (f a b) := by
