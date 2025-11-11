@@ -14,7 +14,7 @@ namespace ComputationalPaths.Path
 universe u
 
 /-- Weak groupoid structure whose laws hold up to `Rw` steps. -/
-structure WeakGroupoid (A : Sort u) where
+structure WeakGroupoid (A : Type u) where
   /-- composition of paths -/
   comp : {a b c : A} → Path a b → Path b c → Path a c
   /-- inverse (symmetry) -/
@@ -35,10 +35,10 @@ structure WeakGroupoid (A : Sort u) where
 
 namespace WeakGroupoid
 
-variable {A : Sort u}
+variable {A : Type u}
 
 /-- The canonical weak groupoid carried by any type via computational paths. -/
-def identity (A : Sort u) : WeakGroupoid A where
+def identity (A : Type u) : WeakGroupoid A where
   comp := fun p q => Path.trans p q
   inv := fun p => Path.symm p
   id := fun {a} => Path.refl a

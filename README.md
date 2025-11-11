@@ -15,6 +15,9 @@ Lean formalisation of *Propositional Equality, Identity Types, and Computational
    elan toolchain install leanprover/lean4:v4.24.0
    elan default leanprover/lean4:v4.24.0
    ```
+   The repository contains a small `lake.cmd` shim that forwards to the tool
+   installed by `elan`, so `lake` commands can be invoked as `.\lake …` even if
+   the `.elan\bin` directory is not on your `PATH`.
 2. Clone the repository and move into it:
    ```powershell
    git clone https://github.com/<your-org>/computational-paths.git
@@ -22,11 +25,11 @@ Lean formalisation of *Propositional Equality, Identity Types, and Computational
    ```
 3. Build the project:
    ```powershell
-   lake build
+   .\lake build
    ```
 4. Run the demo executable:
    ```powershell
-   lake exe computational_paths
+   .\lake exe computational_paths
    ```
 
 If `lake build` completes without errors, all Lean proofs have been checked by the

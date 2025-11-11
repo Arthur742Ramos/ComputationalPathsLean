@@ -1,107 +1,161 @@
 /-
 # Basic combinators for computational paths
 
-This module introduces the primitive notion of a computational path as an
-inductive presentation of propositional equality together with the standard
-operations of symmetry, transitivity, transport, and functional congruence.
-The definitions mirror those in *Propositional Equality, Identity Types, and
-Computational Paths* while staying close to Lean's builtin equality so that we
-can reuse existing reasoning infrastructure.
+We refine the notion of a computational path so that, in addition to the
+underlying propositional equality, each path records an explicit sequence of
+rewrite steps.  This mirrors the presentation in
+*Propositional Equality, Identity Types, and Computational Paths* where a proof
+of equality is witnessed by a concrete list of rewrites.
 -/
 
 namespace ComputationalPaths
 
-universe u v
+open List Function
 
-/-- Path a b represents a computational path (proof witnessing equality)
-between elements a and b. It parallels Lean's propositional equality but is
-developed separately so we can model the rewrite system described in the paper. -/
-inductive Path {A : Sort u} : A → A → Type u
-  | refl (a : A) : Path a a
+universe u v w
+
+/-- An elementary rewrite step between two elements of `A`.  The fields record
+the source, the target, and the propositional equality justifying the step. -/
+structure Step (A : Type u) where
+  src : A
+  tgt : A
+  proof : src = tgt
+
+namespace Step
+
+variable {A : Type u} {B : Type v}
+
+/-- Reverse the direction of a rewrite step. -/
+@[simp] def symm (s : Step A) : Step A :=
+  ⟨s.tgt, s.src, s.proof.symm⟩
+
+/-- Map a rewrite step through a function. -/
+@[simp] def map (f : A → B) (s : Step A) : Step B :=
+  ⟨f s.src, f s.tgt, congrArg f s.proof⟩
+
+@[simp] theorem symm_symm (s : Step A) : symm (symm s) = s := by
+  cases s
+  rfl
+
+@[simp] theorem map_symm (f : A → B) (s : Step A) :
+    map f (symm s) = symm (map f s) := by
+  cases s
+  rfl
+
+@[simp] theorem map_id (s : Step A) :
+    map (fun x : A => x) s = s := by
+  cases s
+  rfl
+
+end Step
+
+/-- A computational path from `a` to `b`.  Besides the derived equality proof,
+we store the explicit list of rewrite steps.  When composing paths we append
+these lists, and when inverting a path we reverse the list and take the symmetric
+of each step. -/
+structure Path {A : Type u} (a b : A) where
+  steps : List (Step A)
+  proof : a = b
 
 namespace Path
 
-variable {A : Sort u} {B : Sort v}
+variable {A : Type u} {B : Type v} {C : Type w}
 variable {a b c d : A}
+variable {a₁ a₂ a₃ : A} {b₁ b₂ b₃ : B}
 
-@[simp] def toEq : Path a b → a = b
-  | Path.refl _ => rfl
+/-- Extract the propositional equality witnessed by a path. -/
+@[simp] def toEq (p : Path a b) : a = b :=
+  p.proof
 
-@[simp] def ofEq : a = b → Path a b
-  | rfl => Path.refl _
+/-- Reflexive path (empty sequence of rewrites). -/
+@[simp] def refl (a : A) : Path a a :=
+  ⟨[], rfl⟩
 
-@[simp] theorem toEq_ofEq (h : a = b) : toEq (ofEq h) = h := by
-  cases h
-  rfl
+/-- Path consisting of a single rewrite step. -/
+@[simp] def ofEq (h : a = b) : Path a b :=
+  ⟨[⟨a, b, h⟩], h⟩
 
-@[simp] theorem ofEq_toEq (p : Path a b) : ofEq (toEq p) = p := by
+/-- Compose two paths, concatenating their step lists. -/
+@[simp] def trans (p : Path a b) (q : Path b c) : Path a c :=
+  ⟨p.steps ++ q.steps, p.proof.trans q.proof⟩
+
+/-- Reverse a path by reversing and inverting each step. -/
+@[simp] def symm (p : Path a b) : Path b a :=
+  ⟨p.steps.reverse.map Step.symm, p.proof.symm⟩
+
+@[simp] theorem trans_steps (p : Path a b) (q : Path b c) :
+    (trans p q).steps = p.steps ++ q.steps := rfl
+
+@[simp] theorem symm_steps (p : Path a b) :
+    (symm p).steps = p.steps.reverse.map Step.symm := rfl
+
+@[simp] theorem trans_refl_left (p : Path a b) : trans (refl a) p = p := by
   cases p
-  rfl
+  simp
 
-@[simp] theorem toEq_refl (a : A) : toEq (Path.refl a) = rfl := rfl
-
-/-- Symmetry of computational paths. -/
-def symm (p : Path a b) : Path b a :=
-  ofEq (Eq.symm (toEq p))
-
-/-- Transitivity/composition of computational paths. -/
-def trans (p : Path a b) (q : Path b c) : Path a c :=
-  ofEq (Eq.trans (toEq p) (toEq q))
-
-@[simp] theorem symm_refl (a : A) : symm (Path.refl a) = Path.refl a := rfl
-
-@[simp] theorem symm_symm (p : Path a b) : symm (symm p) = p := by
+@[simp] theorem trans_refl_right (p : Path a b) : trans p (refl b) = p := by
   cases p
-  rfl
+  simp
 
-@[simp] theorem trans_refl_left (p : Path a b) : trans (Path.refl a) p = p := by
-  cases p
-  rfl
-
-@[simp] theorem trans_refl_right (p : Path a b) : trans p (Path.refl b) = p := by
-  cases p
-  rfl
-
-@[simp] theorem trans_symm (p : Path a b) : trans p (symm p) = Path.refl a := by
-  cases p
-  rfl
-
-@[simp] theorem symm_trans (p : Path a b) : trans (symm p) p = Path.refl b := by
-  cases p
-  rfl
-
-@[simp] theorem trans_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
-    trans (trans p q) r = trans p (trans q r) := by
-  cases p
-  cases q
-  cases r
-  rfl
-
-@[simp] theorem toEq_symm (p : Path a b) : toEq (symm p) = (toEq p).symm := by
-  cases p
-  rfl
+@[simp] theorem symm_refl (a : A) : symm (refl a) = refl a := by
+  simp
 
 @[simp] theorem toEq_trans (p : Path a b) (q : Path b c) :
-    toEq (trans p q) = (toEq p).trans (toEq q) := by
+    toEq (trans p q) = (toEq p).trans (toEq q) := rfl
+
+@[simp] theorem toEq_symm (p : Path a b) : toEq (symm p) = (toEq p).symm := rfl
+
+@[simp] theorem toEq_trans_symm (p : Path a b) :
+    toEq (trans p (symm p)) = rfl := by
   cases p
-  cases q
-  rfl
+  simp
 
-/-- Transport/dependent substitution along a computational path. -/
-def transport {C : A → Sort v} (p : Path a b) : C a → C b :=
-  match p with
-  | Path.refl _ => fun x => x
-
-@[simp] theorem transport_refl {C : A → Sort v} (x : C a) :
-    transport (a := a) (C := C) (Path.refl a) x = x := rfl
-
-/-- Congruence of unary functions along computational paths. -/
-def congrArg (f : A → B) (p : Path a b) : Path (f a) (f b) :=
-  ofEq (_root_.congrArg f (toEq p))
-
-@[simp] theorem congrArg_id (p : Path a b) : congrArg (fun x => x) p = p := by
+@[simp] theorem toEq_symm_trans (p : Path a b) :
+    toEq (trans (symm p) p) = rfl := by
   cases p
-  rfl
+  simp
+
+/-- Transport along a path. -/
+def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
+  p.proof ▸ x
+
+@[simp] theorem transport_refl {D : A → Sort v} (x : D a) :
+    transport (refl a) x = x := rfl
+
+@[simp] theorem transport_trans {D : A → Sort v}
+    (p : Path a b) (q : Path b c) (x : D a) :
+    transport (trans p q) x =
+      transport q (transport p x) := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₁
+          cases proof₂
+          rfl
+
+@[simp] theorem transport_symm_left {D : A → Sort v}
+    (p : Path a b) (x : D a) :
+    transport (symm p) (transport p x) = x := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      rfl
+
+@[simp] theorem transport_symm_right {D : A → Sort v}
+    (p : Path a b) (y : D b) :
+    transport p (transport (symm p) y) = y := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      rfl
+
+@[simp] theorem transport_const {D : Type v} (p : Path a b) (x : D) :
+    transport (a := a) (b := b) (D := fun _ => D) p x = x := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      rfl
 
 end Path
 
