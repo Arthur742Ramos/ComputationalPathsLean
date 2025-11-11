@@ -1,0 +1,10 @@
+name = "computational_paths"
+version = "0.1.0"
+defaultTargets = ["computational_paths"]
+
+[[lean_lib]]
+name = "ComputationalPaths"
+
+[[lean_exe]]
+name = "computational_paths"
+root = "Main"
