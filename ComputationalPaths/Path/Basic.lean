@@ -89,6 +89,16 @@ variable {a₁ a₂ a₃ : A} {b₁ b₂ b₃ : B}
 @[simp] theorem symm_steps (p : Path a b) :
     (symm p).steps = p.steps.reverse.map Step.symm := rfl
 
+@[simp] theorem symm_trans (p : Path a b) (q : Path b c) :
+    symm (trans p q) = trans (symm q) (symm p) := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₁
+          cases proof₂
+          simp [symm, trans, List.reverse_append, List.map_append]
+
 @[simp] theorem trans_refl_left (p : Path a b) : trans (refl a) p = p := by
   cases p
   simp
@@ -180,6 +190,11 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
     Path (f a₁ b) (f a₂ b) :=
   ⟨p.steps.map (Step.map fun x => f x b), _root_.congrArg (fun x => f x b) p.proof⟩
 
+/-- `mapLeft` is the unary congruence for the partial application `fun a => f a b`. -/
+@[simp] theorem mapLeft_eq_congrArg (f : A → B → C) {a₁ a₂ : A}
+    (p : Path a₁ a₂) (b : B) :
+    mapLeft f p b = congrArg (fun x => f x b) p := rfl
+
 /-- `mapLeft` preserves concatenation of paths. -/
 @[simp] theorem mapLeft_trans (f : A → B → C)
     {a₁ a₂ a₃ : A} (p : Path a₁ a₂) (q : Path a₂ a₃) (b : B) :
@@ -207,6 +222,11 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
 @[simp] def mapRight (f : A → B → C) (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
     Path (f a b₁) (f a b₂) :=
   ⟨p.steps.map (Step.map (f a)), _root_.congrArg (f a) p.proof⟩
+
+/-- `mapRight` is the unary congruence for the partial application `f a`. -/
+@[simp] theorem mapRight_eq_congrArg (f : A → B → C) (a : A)
+    {b₁ b₂ : B} (p : Path b₁ b₂) :
+    mapRight f a p = congrArg (f a) p := rfl
 
 /-- `mapRight` preserves concatenation of paths. -/
 @[simp] theorem mapRight_trans (f : A → B → C)
