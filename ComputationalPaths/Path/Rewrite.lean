@@ -684,12 +684,19 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
   apply Quot.sound
   exact rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r))
 
-@[simp] theorem canon_reduce {a b : A}
+theorem canon_reduce {a b : A}
     (x : PathRwQuot A a b) :
     x = Quot.mk _ (Path.ofEq (toEq x)) := by
   refine _root_.Quot.inductionOn x (fun p => ?_)
   have := mk_canon (A := A) (p := p)
   simpa [toEq] using this
+
+theorem ofEq_toEq {a b : A}
+    (x : PathRwQuot A a b) :
+    ofEq (A := A) (toEq x) = x := by
+  simpa using (canon_reduce (A := A) (x := x)).symm
+
+-- TODO: establish explicit equivalence with propositional equality
 
 end PathRwQuot
 
