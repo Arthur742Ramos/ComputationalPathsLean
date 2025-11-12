@@ -696,6 +696,19 @@ theorem ofEq_toEq {a b : A}
     ofEq (A := A) (toEq x) = x :=
   (canon_reduce (A := A) (x := x)).symm
 
+instance rwQuot_subsingleton (A : Type u) (a b : A) :
+    Subsingleton (PathRwQuot A a b) := by
+  classical
+  refine ⟨?_⟩
+  intro x y
+  have hxEq : toEq (A := A) x = toEq (A := A) y := Subsingleton.elim _ _
+  have hx : ofEq (A := A) (a := a) (b := b) (toEq (A := A) x) =
+      ofEq (A := A) (a := a) (b := b) (toEq (A := A) y) := by
+    cases hxEq
+    rfl
+  exact (canon_reduce (A := A) (x := x)).trans
+    (hx.trans (canon_reduce (A := A) (x := y)).symm)
+
 end PathRwQuot
 
 @[simp] theorem rweq_congrArg_trans {B : Type v}
