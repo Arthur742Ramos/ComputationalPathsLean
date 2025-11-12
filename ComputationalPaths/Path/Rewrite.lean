@@ -546,6 +546,39 @@ def trans {a b c : A} :
           (rweq_trans_congr_left (A := A) (a := a) (b := b) (c := c)
             (p := p₁) (q := p₂) (r := q) hp))
 
+/-- Coerce a propositional equality to the path quotient. -/
+@[simp] def ofEq {a b : A} (h : a = b) : PathRwQuot A a b :=
+  Quot.mk _ (Path.ofEq h)
+
+/-- Forget the rewrite trace and recover the underlying equality. -/
+def toEq {a b : A} : PathRwQuot A a b → a = b :=
+  Quot.lift (fun p : Path a b => p.toEq)
+    (by
+      intro p q h
+      exact rweq_toEq h)
+
+@[simp] theorem toEq_mk {a b : A} (p : Path a b) :
+    toEq (A := A) (Quot.mk _ p) = p.toEq := rfl
+
+@[simp] theorem toEq_refl (a : A) :
+    toEq (A := A) (refl (A := A) a) = rfl := rfl
+
+@[simp] theorem toEq_ofEq {a b : A} (h : a = b) :
+    toEq (A := A) (ofEq (A := A) h) = h := rfl
+
+@[simp] theorem toEq_symm {a b : A} (x : PathRwQuot A a b) :
+    toEq (A := A) (symm (A := A) x) = (toEq (A := A) x).symm := by
+  refine Quot.inductionOn x (fun p => ?_)
+  simp
+
+@[simp] theorem toEq_trans {a b c : A}
+    (x : PathRwQuot A a b) (y : PathRwQuot A b c) :
+    toEq (A := A) (trans (A := A) x y) =
+      (toEq (A := A) x).trans (toEq (A := A) y) := by
+  refine Quot.inductionOn x (fun p => ?_)
+  refine Quot.inductionOn y (fun q => ?_)
+  simp
+
 @[simp] theorem symm_mk {a b : A} (p : Path a b) :
     symm (A := A) (Quot.mk _ p) = Quot.mk _ (Path.symm p) := rfl
 

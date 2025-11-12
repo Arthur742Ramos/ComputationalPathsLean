@@ -215,6 +215,39 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
       cases proof
       rfl
 
+/-- Substitution along a path, following the paper's notation. -/
+def subst {D : A → Sort v} (x : D a) (p : Path a b) : D b :=
+  transport p x
+
+@[simp] theorem subst_refl {D : A → Sort v} (x : D a) :
+    subst (D := D) x (Path.refl a) = x := rfl
+
+@[simp] theorem subst_trans {D : A → Sort v}
+    (x : D a) (p : Path a b) (q : Path b c) :
+    subst (D := D) x (Path.trans p q) =
+      subst (D := D) (subst (D := D) x p) q :=
+  transport_trans (D := D) p q x
+
+@[simp] theorem subst_symm_left {D : A → Sort v}
+    (x : D a) (p : Path a b) :
+    subst (D := D) (subst (D := D) x p) (Path.symm p) = x :=
+  transport_symm_left (D := D) p x
+
+@[simp] theorem subst_symm_right {D : A → Sort v}
+    (y : D b) (p : Path a b) :
+    subst (D := D) (subst (D := D) y (Path.symm p)) p = y :=
+  transport_symm_right (D := D) p y
+
+@[simp] theorem subst_const {D : Type v} (x : D) (p : Path a b) :
+    subst (D := fun _ => D) x p = x :=
+  transport_const (D := D) p x
+
+@[simp] theorem subst_ofEq {D : A → Sort v} (x : D a) (h : a = b) :
+    subst (D := D) x (Path.ofEq h) = h ▸ x := rfl
+
+@[simp] theorem subst_symm_ofEq {D : A → Sort v} (y : D b) (h : a = b) :
+    subst (D := D) y (Path.symm (Path.ofEq h)) = h.symm ▸ y := rfl
+
 /-- Congruence of unary functions along paths. -/
 @[simp] def congrArg (f : A → B) (p : Path a b) : Path (f a) (f b) :=
   ⟨p.steps.map (Step.map f), _root_.congrArg f p.proof⟩
@@ -390,6 +423,17 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
     map2 f (Path.refl a) (Path.refl b) = Path.refl (f a b) := by
   simp [map2]
 
+@[simp] theorem steps_refl (a : A) : (Path.refl a).steps = [] := rfl
+
+@[simp] theorem steps_ofEq (h : a = b) :
+    (Path.ofEq h).steps = [⟨a, b, h⟩] := rfl
+
+theorem refl_ne_ofEq (a : A) :
+    Path.refl a ≠ Path.ofEq (rfl : a = a) := by
+  intro h
+  have : False := by simpa [Path.refl, Path.ofEq] using h
+  exact this
+
 section Prod
 
 variable {A : Type u} {B : Type v}
@@ -477,5 +521,19 @@ variable {f g h : A → B}
 end Function
 
 end Path
+
+/-- Uniqueness of identity proofs for computational paths. -/
+def UIP (A : Type u) : Prop :=
+  ∀ ⦃a b : A⦄, ∀ p q : Path a b, p = q
+
+theorem not_uip_of_inhabited {A : Type u} (a : A) : ¬ UIP A := by
+  intro h
+  have := h (p := Path.refl a) (q := Path.ofEq (rfl : a = a))
+  exact Path.refl_ne_ofEq (A := A) a this
+
+theorem not_uip_of_nonempty {A : Type u} (hA : Nonempty A) : ¬ UIP A := by
+  classical
+  rcases hA with ⟨a⟩
+  exact not_uip_of_inhabited (A := A) a
 
 end ComputationalPaths
