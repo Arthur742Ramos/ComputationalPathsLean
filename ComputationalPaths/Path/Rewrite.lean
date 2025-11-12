@@ -148,12 +148,22 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
       (Path.symm (Path.mapLeft f p b)) :=
   rw_of_eq (Path.mapLeft_symm (f := f) (p := p) (b := b))
 
+@[simp] theorem rw_mapLeft_refl {B : Type v} {C : Type w}
+    (f : A → B → C) (a : A) (b : B) :
+    Rw (Path.mapLeft f (Path.refl a) b) (Path.refl (f a b)) :=
+  rw_of_eq (Path.mapLeft_refl (f := f) (a := a) (b := b))
+
 @[simp] theorem rw_mapRight_trans {B : Type v} {C : Type w}
     {b1 b2 b3 : B} (f : A → B → C)
     (a : A) (p : Path b1 b2) (q : Path b2 b3) :
     Rw (Path.mapRight f a (Path.trans p q))
       (Path.trans (Path.mapRight f a p) (Path.mapRight f a q)) :=
   rw_of_eq (Path.mapRight_trans (f := f) (a := a) (p := p) (q := q))
+
+@[simp] theorem rw_mapRight_refl {B : Type v} {C : Type w}
+    (f : A → B → C) (a : A) (b : B) :
+    Rw (Path.mapRight f a (Path.refl b)) (Path.refl (f a b)) :=
+  rw_of_eq (Path.mapRight_refl (f := f) (a := a) (b := b))
 
 @[simp] theorem rw_map2_trans
     {A₁ : Type u} {B : Type u}
@@ -335,12 +345,22 @@ theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
       (Path.symm (Path.mapLeft f p b)) :=
   rweq_of_eq (Path.mapLeft_symm (f := f) (p := p) (b := b))
 
+@[simp] theorem rweq_mapLeft_refl {B : Type v} {C : Type w}
+    (f : A → B → C) (a : A) (b : B) :
+    RwEq (Path.mapLeft f (Path.refl a) b) (Path.refl (f a b)) :=
+  rweq_of_eq (Path.mapLeft_refl (f := f) (a := a) (b := b))
+
 @[simp] theorem rweq_mapRight_trans {B : Type v} {C : Type w}
     {b1 b2 b3 : B} (f : A → B → C)
     (a : A) (p : Path b1 b2) (q : Path b2 b3) :
     RwEq (Path.mapRight f a (Path.trans p q))
       (Path.trans (Path.mapRight f a p) (Path.mapRight f a q)) :=
   rweq_of_eq (Path.mapRight_trans (f := f) (a := a) (p := p) (q := q))
+
+@[simp] theorem rweq_mapRight_refl {B : Type v} {C : Type w}
+    (f : A → B → C) (a : A) (b : B) :
+    RwEq (Path.mapRight f a (Path.refl b)) (Path.refl (f a b)) :=
+  rweq_of_eq (Path.mapRight_refl (f := f) (a := a) (b := b))
 
 @[simp] theorem rweq_map2_trans
     {A₁ : Type u} {B : Type u}
