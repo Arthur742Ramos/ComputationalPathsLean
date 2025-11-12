@@ -109,6 +109,21 @@ inductive Step {A : Type u} :
       Step p q →
         Step (Path.mapRight (A := A) (B := A) (C := A) f a p)
           (Path.mapRight (A := A) (B := A) (C := A) f a q)
+  | mapLeft_ofEq
+      {B : Type u}
+      (f : A → B → A) {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
+      Step
+        (Path.mapLeft (A := A) (B := B) (C := A) f
+          (Path.ofEq (A := A) (a := a₁) (b := a₂) h) b)
+        (Path.ofEq (A := A) (a := f a₁ b) (b := f a₂ b)
+          (_root_.congrArg (fun x => f x b) h))
+  | mapRight_ofEq
+      (f : A → A → A) (a : A) {b₁ b₂ : A} (h : b₁ = b₂) :
+      Step
+        (Path.mapRight (A := A) (B := A) (C := A) f a
+          (Path.ofEq (A := A) (a := b₁) (b := b₂) h))
+        (Path.ofEq (A := A) (a := f a b₁) (b := f a b₂)
+          (_root_.congrArg (f a) h))
   | canon {a b : A} (p : Path a b) :
       Step p (Path.ofEq p.toEq)
   | symm_congr {a b : A} {p q : Path a b} :
@@ -125,7 +140,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
     Step.prod_rec_beta
     Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta
-    Step.mapLeft_congr Step.mapRight_congr Step.canon
+    Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq Step.canon
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
 
 @[simp] theorem step_toEq {A : Type u} {a b : A}
@@ -152,6 +167,10 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
       simp
   | mapRight_congr _ _ _ ih =>
       cases ih
+      simp
+  | mapLeft_ofEq _ _ _ =>
+      simp
+  | mapRight_ofEq _ _ _ =>
       simp
   | symm_congr _ ih =>
       cases ih
@@ -227,6 +246,14 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
     Rw (Path.mapLeft f (Path.refl a) b) (Path.refl (f a b)) :=
   rw_of_eq (Path.mapLeft_refl (f := f) (a := a) (b := b))
 
+@[simp] theorem rw_mapLeft_ofEq {B : Type u}
+    (f : A → B → A) {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
+    Rw (Path.mapLeft (A := A) (B := B) (C := A) f
+          (Path.ofEq (A := A) (a := a₁) (b := a₂) h) b)
+      (Path.ofEq (A := A) (a := f a₁ b) (b := f a₂ b)
+        (_root_.congrArg (fun x => f x b) h)) :=
+  rw_of_step (Step.mapLeft_ofEq (A := A) (B := B) (f := f) (h := h) (b := b))
+
 @[simp] theorem rw_mapRight_trans {B : Type v} {C : Type w}
     {b1 b2 b3 : B} (f : A → B → C)
     (a : A) (p : Path b1 b2) (q : Path b2 b3) :
@@ -238,6 +265,14 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
     (f : A → B → C) (a : A) (b : B) :
     Rw (Path.mapRight f a (Path.refl b)) (Path.refl (f a b)) :=
   rw_of_eq (Path.mapRight_refl (f := f) (a := a) (b := b))
+
+@[simp] theorem rw_mapRight_ofEq
+    (f : A → A → A) (a : A) {b₁ b₂ : A} (h : b₁ = b₂) :
+    Rw (Path.mapRight (A := A) (B := A) (C := A) f a
+          (Path.ofEq (A := A) (a := b₁) (b := b₂) h))
+      (Path.ofEq (A := A) (a := f a b₁) (b := f a b₂)
+        (_root_.congrArg (f a) h)) :=
+  rw_of_step (Step.mapRight_ofEq (A := A) (f := f) (a := a) (h := h))
 
 @[simp] theorem rw_map2_trans
     {A₁ : Type u} {B : Type u}
@@ -677,6 +712,14 @@ end PathRwQuot
     RwEq (Path.mapLeft f (Path.refl a) b) (Path.refl (f a b)) :=
   rweq_of_eq (Path.mapLeft_refl (f := f) (a := a) (b := b))
 
+@[simp] theorem rweq_mapLeft_ofEq {B : Type u}
+    (f : A → B → A) {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
+    RwEq (Path.mapLeft (A := A) (B := B) (C := A) f
+            (Path.ofEq (A := A) (a := a₁) (b := a₂) h) b)
+      (Path.ofEq (A := A) (a := f a₁ b) (b := f a₂ b)
+        (_root_.congrArg (fun x => f x b) h)) :=
+  rweq_of_step (Step.mapLeft_ofEq (A := A) (B := B) (f := f) (h := h) (b := b))
+
 @[simp] theorem rweq_mapRight_trans {B : Type v} {C : Type w}
     {b1 b2 b3 : B} (f : A → B → C)
     (a : A) (p : Path b1 b2) (q : Path b2 b3) :
@@ -688,6 +731,14 @@ end PathRwQuot
     (f : A → B → C) (a : A) (b : B) :
     RwEq (Path.mapRight f a (Path.refl b)) (Path.refl (f a b)) :=
   rweq_of_eq (Path.mapRight_refl (f := f) (a := a) (b := b))
+
+@[simp] theorem rweq_mapRight_ofEq
+    (f : A → A → A) (a : A) {b₁ b₂ : A} (h : b₁ = b₂) :
+    RwEq (Path.mapRight (A := A) (B := A) (C := A) f a
+            (Path.ofEq (A := A) (a := b₁) (b := b₂) h))
+      (Path.ofEq (A := A) (a := f a b₁) (b := f a b₂)
+        (_root_.congrArg (f a) h)) :=
+  rweq_of_step (Step.mapRight_ofEq (A := A) (f := f) (a := a) (h := h))
 
 @[simp] theorem rweq_map2_trans
     {A₁ : Type u} {B : Type u}
