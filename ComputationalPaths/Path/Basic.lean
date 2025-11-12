@@ -363,6 +363,58 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
     map2 f (Path.refl a) (Path.refl b) = Path.refl (f a b) := by
   simp [map2]
 
+section Prod
+
+variable {A : Type u} {B : Type v}
+variable {a₁ a₂ : A} {b₁ b₂ : B}
+
+/-- Path on product values built componentwise. -/
+@[simp] def prodMk (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    Path (Prod.mk a₁ b₁) (Prod.mk a₂ b₂) :=
+  Path.map2 Prod.mk p q
+
+/-- Project a path on pairs to a path on the first component. -/
+@[simp] def fst (p : Path (a₁, b₁) (a₂, b₂)) : Path a₁ a₂ :=
+  Path.congrArg Prod.fst p
+
+/-- Project a path on pairs to a path on the second component. -/
+@[simp] def snd (p : Path (a₁, b₁) (a₂, b₂)) : Path b₁ b₂ :=
+  Path.congrArg Prod.snd p
+
+@[simp] theorem prodMk_refl_refl (a : A) (b : B) :
+    prodMk (Path.refl a) (Path.refl b) = Path.refl (a, b) := by
+  simp [prodMk]
+
+end Prod
+
+section Sum
+
+variable {A : Type u} {B : Type v}
+variable {a₁ a₂ : A} {b₁ b₂ : B}
+
+/-- Lift a path on the left summand to a path on the coproduct. -/
+@[simp] def inlCongr (p : Path a₁ a₂) :
+    Path (Sum.inl a₁ : Sum A B) (Sum.inl a₂) :=
+  Path.congrArg Sum.inl p
+
+/-- Lift a path on the right summand to a path on the coproduct. -/
+@[simp] def inrCongr (p : Path b₁ b₂) :
+    Path (Sum.inr b₁ : Sum A B) (Sum.inr b₂) :=
+  Path.congrArg Sum.inr p
+
+end Sum
+
+section Function
+
+variable {A : Type u} {B : Type v}
+variable {f g : A → B}
+
+/-- Package pointwise paths into a path between functions. -/
+@[simp] def lamCongr (p : ∀ x : A, Path (f x) (g x)) : Path f g :=
+  ⟨[], funext (fun x => (p x).proof)⟩
+
+end Function
+
 end Path
 
 end ComputationalPaths

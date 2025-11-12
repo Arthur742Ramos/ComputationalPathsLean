@@ -11,8 +11,6 @@ agent/tool is responsible for and when to invoke it.
   `apply_patch` for single files), and finish with a build or relevant checks.
 - **When to use:** any time you need new definitions, proofs, documentation, or
   review feedback inside the repository.
-- **Limitations:** no network access, and commands are sandboxed—prefer the
-  provided `lake.cmd` shim when running Lean tooling.
 
 ## Build agent (`.\lake.cmd build`)
 - **Purpose:** type-check the project and ensure the Lean kernel accepts every
