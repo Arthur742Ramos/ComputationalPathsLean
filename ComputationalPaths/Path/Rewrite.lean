@@ -113,13 +113,13 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | symm_trans _ => simp
   | symm_trans_congr _ _ => simp
   | trans_assoc _ _ _ => simp
-  | map2_subst _ _ _ => simp [Path.map2, Path.mapLeft, Path.mapRight, Path.trans]
-  | prod_fst_beta _ _ => simp [Path.map2, Path.mapLeft, Path.mapRight, Path.trans]
-  | prod_snd_beta _ _ => simp [Path.map2, Path.mapLeft, Path.mapRight, Path.trans]
-  | prod_rec_beta _ _ _ => simp [Path.map2]
+  | map2_subst _ _ _ => simp
+  | prod_fst_beta _ _ => simp
+  | prod_snd_beta _ _ => simp
+  | prod_rec_beta _ _ _ => simp
   | sum_rec_inl_beta _ _ _ => simp
   | sum_rec_inr_beta _ _ _ => simp
-  | fun_app_beta _ _ => simp [Path.app, Path.lamCongr]
+  | fun_app_beta _ _ => simp
 
 /-- Reflexive/transitive closure of rewrite steps (`rw`-reduction). -/
 inductive Rw {A : Type u} {a b : A} : Path a b → Path a b → Prop
@@ -324,14 +324,15 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
     (h : ∀ x : A, Rw (p x) (q x)) :
     Rw (Path.lamCongr p) (Path.lamCongr q) := by
   classical
-  have hxFun :
-      (fun x => (p x).toEq) = fun x => (q x).toEq := by
-    funext x
-    simpa using rw_toEq (h x)
-  have hx :
-      Path.lamCongr p = Path.lamCongr q := by
-    simp [Path.lamCongr] at hxFun
-    simpa [Path.lamCongr] using hxFun
+  have hxProof :
+      ∀ x, (p x).proof = (q x).proof := fun x => by
+        have hx := rw_toEq (h x)
+        cases hx
+        simp
+  have hx : Path.lamCongr p = Path.lamCongr q := by
+    have hxFun := funext hxProof
+    cases hxFun
+    simp [Path.lamCongr]
   exact rw_of_eq hx
 
 /-- Eta-style reduction rebuilding a function path from pointwise applications. -/
@@ -543,14 +544,15 @@ theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
     (h : ∀ x : A, RwEq (p x) (q x)) :
     RwEq (Path.lamCongr p) (Path.lamCongr q) := by
   classical
-  have hxFun :
-      (fun x => (p x).toEq) = fun x => (q x).toEq := by
-    funext x
-    simpa using rweq_toEq (h x)
-  have hx :
-      Path.lamCongr p = Path.lamCongr q := by
-    simp [Path.lamCongr] at hxFun
-    simpa [Path.lamCongr] using hxFun
+  have hxProof :
+      ∀ x, (p x).proof = (q x).proof := fun x => by
+        have hx := rweq_toEq (h x)
+        cases hx
+        simp
+  have hx : Path.lamCongr p = Path.lamCongr q := by
+    have hxFun := funext hxProof
+    cases hxFun
+    simp [Path.lamCongr]
   cases hx
   exact RwEq.refl _
 
