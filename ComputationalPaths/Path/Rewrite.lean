@@ -96,6 +96,19 @@ inductive Step {A : Type u} :
         (Path.congrArg (fun h : α → A => h a)
           (Path.lamCongr (f := f) (g := g) p))
         (p a)
+  | mapLeft_congr
+      {B : Type u}
+      (f : A → B → A) {a₁ a₂ : A} (b : B)
+      {p q : Path a₁ a₂} :
+      Step p q →
+        Step (Path.mapLeft (A := A) (B := B) (C := A) f p b)
+          (Path.mapLeft (A := A) (B := B) (C := A) f q b)
+  | mapRight_congr
+      (f : A → A → A) (a : A) {b₁ b₂ : A}
+      {p q : Path b₁ b₂} :
+      Step p q →
+        Step (Path.mapRight (A := A) (B := A) (C := A) f a p)
+          (Path.mapRight (A := A) (B := A) (C := A) f a q)
   | symm_congr {a b : A} {p q : Path a b} :
       Step p q → Step (Path.symm p) (Path.symm q)
   | trans_congr_left {a b c : A}
@@ -110,6 +123,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
   Step.prod_rec_beta
   Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta
+  Step.mapLeft_congr Step.mapRight_congr
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
 
 @[simp] theorem step_toEq {A : Type u} {a b : A}
@@ -131,6 +145,12 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | sum_rec_inl_beta _ _ _ => simp
   | sum_rec_inr_beta _ _ _ => simp
   | fun_app_beta _ _ => simp
+  | mapLeft_congr _ _ _ ih =>
+      cases ih
+      simp
+  | mapRight_congr _ _ _ ih =>
+      cases ih
+      simp
   | symm_congr _ ih =>
       cases ih
       simp
@@ -456,6 +476,37 @@ end Setoid
     (rweq_trans_congr_right (a := a) (b := b) (c := c)
       (p := p₂) (q := q₁) (r := q₂) hq)
 
+
+@[simp] theorem rweq_mapLeft_congr
+    {B : Type u} (f : A → B → A)
+    {a₁ a₂ : A} (b : B)
+    {p q : Path a₁ a₂} (h : RwEq p q) :
+    RwEq (Path.mapLeft f p b) (Path.mapLeft f q b) :=
+  match h with
+  | RwEq.refl _ => RwEq.refl _
+  | RwEq.step s =>
+      RwEq.step (Step.mapLeft_congr (f := f) (b := b) s)
+  | RwEq.symm h =>
+      RwEq.symm (rweq_mapLeft_congr (f := f) (b := b) h)
+  | RwEq.trans h₁ h₂ =>
+      RwEq.trans
+        (rweq_mapLeft_congr (f := f) (b := b) h₁)
+        (rweq_mapLeft_congr (f := f) (b := b) h₂)
+
+@[simp] theorem rweq_mapRight_congr
+    (f : A → A → A) (a : A) {b₁ b₂ : A}
+    {p q : Path b₁ b₂} (h : RwEq p q) :
+    RwEq (Path.mapRight f a p) (Path.mapRight f a q) :=
+  match h with
+  | RwEq.refl _ => RwEq.refl _
+  | RwEq.step s =>
+      RwEq.step (Step.mapRight_congr (f := f) (a := a) s)
+  | RwEq.symm h =>
+      RwEq.symm (rweq_mapRight_congr (f := f) (a := a) h)
+  | RwEq.trans h₁ h₂ =>
+      RwEq.trans
+        (rweq_mapRight_congr (f := f) (a := a) h₁)
+        (rweq_mapRight_congr (f := f) (a := a) h₂)
 
 namespace PathRwQuot
 
