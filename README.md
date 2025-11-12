@@ -7,11 +7,40 @@ Lean formalisation of *Propositional Equality, Identity Types, and Computational
 - The rewrite system (`ComputationalPaths/Path/Rewrite.lean`) now covers the reflexive/transitive/symmetric closures together with additional `mapLeft`/`mapRight` reflexivity reductions, bringing the development closer to the full LNDEQ suite.
 - A weak groupoid structure (`ComputationalPaths/Path/Groupoid.lean`) packages composition, inverses, and identities up to rewrite, serving as a foundation for later algebraic structure.
 
+## Using the library from another project
+Add this repository as a Lake dependency (Lean 4.24+):
+
+```toml
+[package]
+name = "your_project"
+version = "0.1.0"
+
+[[require]]
+name = "computational_paths"
+git = "https://github.com/Arthur742Ramos/ComputationalPathsLean.git"
+rev = "main" # or a tagged release once available
+```
+
+Then run:
+
+```bash
+lake update computational_paths
+lake build
+```
+
+Downstream modules can import the umbrella entry point:
+
+```lean
+import ComputationalPaths
+```
+
+The convenience constant `ComputationalPaths.libraryVersion` (currently `"0.1.0"`) tracks API releases; bump it when cutting new tags so dependants can guard against breaking changes.
+
 ## Project structure
-- `ComputationalPaths/Path/Basic.lean` – inductive definition of computational paths, equivalence with Lean equality, symmetry/transitivity operations, transport, and congruence lemmas.
-- `ComputationalPaths/Path/Rewrite.lean` – basic rewrite steps (including the associativity rule) together with their reflexive/transitive closure `Rw` and the symmetric closure `RwEq`.
-- `ComputationalPaths/Path/Groupoid.lean` – weak groupoid structure coming from computational paths, using the rewrite relation.
-- `ComputationalPaths/Basic.lean` – convenience entry point re-exporting the core modules.
+- `ComputationalPaths/Path/Basic.lean` - inductive definition of computational paths, equivalence with Lean equality, symmetry/transitivity operations, transport, and congruence lemmas.
+- `ComputationalPaths/Path/Rewrite.lean` - basic rewrite steps (including the associativity rule) together with their reflexive/transitive closure `Rw` and the symmetric closure `RwEq`.
+- `ComputationalPaths/Path/Groupoid.lean` - weak groupoid structure coming from computational paths, using the rewrite relation.
+- `ComputationalPaths/Basic.lean` - convenience entry point re-exporting the core modules.
 - `ComputationalPaths/Path.lean` – umbrella import for path-specific modules.
 - `agents.md` – overview of the automated agents and guidance on when to invoke them.
 
