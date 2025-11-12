@@ -632,6 +632,11 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
     trans (A := A) (Quot.mk _ p) (Quot.mk _ q) =
       Quot.mk _ (Path.trans p q) := rfl
 
+@[simp] theorem mk_canon {a b : A} (p : Path a b) :
+    (Quot.mk _ p : PathRwQuot A a b) = Quot.mk _ (Path.ofEq p.toEq) := by
+  apply Quot.sound
+  simpa using rweq_canon (A := A) (p := p)
+
 @[simp] theorem symm_symm {a b : A}
     (x : PathRwQuot A a b) :
     symm (A := A) (symm x) = x := by
@@ -678,6 +683,13 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
   refine _root_.Quot.inductionOn z (fun r => ?_)
   apply Quot.sound
   exact rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r))
+
+@[simp] theorem canon_reduce {a b : A}
+    (x : PathRwQuot A a b) :
+    x = Quot.mk _ (Path.ofEq (toEq x)) := by
+  refine _root_.Quot.inductionOn x (fun p => ?_)
+  have := mk_canon (A := A) (p := p)
+  simpa [toEq] using this
 
 end PathRwQuot
 
