@@ -109,6 +109,8 @@ inductive Step {A : Type u} :
       Step p q →
         Step (Path.mapRight (A := A) (B := A) (C := A) f a p)
           (Path.mapRight (A := A) (B := A) (C := A) f a q)
+  | canon {a b : A} (p : Path a b) :
+      Step p (Path.ofEq p.toEq)
   | symm_congr {a b : A} {p q : Path a b} :
       Step p q → Step (Path.symm p) (Path.symm q)
   | trans_congr_left {a b c : A}
@@ -123,7 +125,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
     Step.prod_rec_beta
     Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta
-    Step.mapLeft_congr Step.mapRight_congr
+    Step.mapLeft_congr Step.mapRight_congr Step.canon
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
 
 @[simp] theorem step_toEq {A : Type u} {a b : A}
@@ -160,6 +162,8 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | trans_congr_right _ _ ih =>
       cases ih
       simp
+  | canon _ =>
+      simp
 
 /-- Reflexive/transitive closure of rewrite steps (`rw`-reduction). -/
 inductive Rw {A : Type u} {a b : A} : Path a b → Path a b → Prop
@@ -180,6 +184,9 @@ variable {A : Type u} {a b c : A}
 
 theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
   Rw.tail (Rw.refl p) h
+
+@[simp] theorem rw_canon (p : Path a b) : Rw p (Path.ofEq p.toEq) :=
+  rw_of_step (Step.canon p)
 
 @[simp] theorem rw_symm_trans_congr {p : Path a b} {q : Path b c} :
     Rw (symm (trans p q)) (trans (symm q) (symm p)) :=
@@ -388,6 +395,9 @@ inductive RwEq {A : Type u} {a b : A} : Path a b → Path a b → Prop
 
 theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
   RwEq.step h
+
+@[simp] theorem rweq_canon (p : Path a b) : RwEq p (Path.ofEq p.toEq) :=
+  rweq_of_step (Step.canon p)
 
 @[simp] theorem rweq_toEq {p q : Path a b} (h : RwEq p q) :
     p.toEq = q.toEq := by
