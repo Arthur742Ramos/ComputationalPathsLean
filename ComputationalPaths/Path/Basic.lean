@@ -413,6 +413,9 @@ variable {f g : A → B}
 @[simp] def lamCongr (p : ∀ x : A, Path (f x) (g x)) : Path f g :=
   ⟨[], funext (fun x => (p x).proof)⟩
 
+@[simp] def app (p : Path f g) (a : A) : Path (f a) (g a) :=
+  Path.congrArg (fun h => h a) p
+
 end Function
 
 end Path
