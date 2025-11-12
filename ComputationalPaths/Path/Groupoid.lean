@@ -22,16 +22,22 @@ structure WeakGroupoid (A : Type u) where
   /-- identity path -/
   id : {a : A} → Path a a
   /-- associativity up to rewrite -/
-  assoc : {a b c d : A} → (p : Path a b) → (q : Path b c) → (r : Path c d) →
-    Rw (comp (comp p q) r) (comp p (comp q r))
+  assoc :
+    {a b c d : A} →
+      (p : Path a b) → (q : Path b c) → (r : Path c d) →
+      Rw (comp (comp p q) r) (comp p (comp q r))
   /-- left identity up to rewrite -/
-  left_id : {a b : A} → (p : Path a b) → Rw (comp (id) p) p
+  left_id :
+    {a b : A} → (p : Path a b) → Rw (comp (id) p) p
   /-- right identity up to rewrite -/
-  right_id : {a b : A} → (p : Path a b) → Rw (comp p (id)) p
+  right_id :
+    {a b : A} → (p : Path a b) → Rw (comp p (id)) p
   /-- left inverse up to rewrite -/
-  left_inv : {a b : A} → (p : Path a b) → Rw (comp (inv p) p) (id)
+  left_inv :
+    {a b : A} → (p : Path a b) → Rw (comp (inv p) p) (id)
   /-- right inverse up to rewrite -/
-  right_inv : {a b : A} → (p : Path a b) → Rw (comp p (inv p)) (id)
+  right_inv :
+    {a b : A} → (p : Path a b) → Rw (comp p (inv p)) (id)
 
 namespace WeakGroupoid
 

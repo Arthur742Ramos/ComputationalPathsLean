@@ -2,12 +2,18 @@
 
 Lean formalisation of *Propositional Equality, Identity Types, and Computational Paths*.
 
+## Current status
+- Core path operations (`ComputationalPaths/Path/Basic.lean`) are fully implemented via explicit rewrite-step lists, giving transport, symmetry, and congruence lemmas without placeholders.
+- The rewrite system (`ComputationalPaths/Path/Rewrite.lean`) provides the reflexive/transitive/symmetric closures used in the paper, ready for reasoning about reductions.
+- A weak groupoid structure (`ComputationalPaths/Path/Groupoid.lean`) packages composition, inverses, and identities up to rewrite, serving as a foundation for later algebraic structure.
+
 ## Project structure
 - `ComputationalPaths/Path/Basic.lean` – inductive definition of computational paths, equivalence with Lean equality, symmetry/transitivity operations, transport, and congruence lemmas.
 - `ComputationalPaths/Path/Rewrite.lean` – basic rewrite steps (including the associativity rule) together with their reflexive/transitive closure `Rw` and the symmetric closure `RwEq`.
 - `ComputationalPaths/Path/Groupoid.lean` – weak groupoid structure coming from computational paths, using the rewrite relation.
 - `ComputationalPaths/Basic.lean` – convenience entry point re-exporting the core modules.
 - `ComputationalPaths/Path.lean` – umbrella import for path-specific modules.
+- `agents.md` – overview of the automated agents and guidance on when to invoke them.
 
 ## Getting started
 1. Install Lean 4 via [`elan`](https://github.com/leanprover/elan):
@@ -38,5 +44,5 @@ kernel.
 ## Roadmap
 - Extend the rewrite system with the full LNDEQ rules (substitution, products, sums, ...).
 - Prove normalisation / confluence for the extended system.
-- Connect computational paths with Lean''s identity type tooling (UIP counterexamples, rewriting tactics).
+- Connect computational paths with Lean's identity type tooling (UIP counterexamples, rewriting tactics).
 - Develop illustrative formal proofs using the new infrastructure.

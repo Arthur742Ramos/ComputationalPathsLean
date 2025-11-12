@@ -8,6 +8,18 @@ rewrite steps.  This mirrors the presentation in
 of equality is witnessed by a concrete list of rewrites.
 -/
 
+namespace List
+
+@[simp] theorem map_reverse_eq_reverse_map {α β : Type _}
+    (f : α → β) (xs : List α) :
+    xs.reverse.map f = (xs.map f).reverse := by
+  induction xs with
+  | nil => simp
+  | cons x xs ih =>
+      simp [List.reverse_cons, ih, List.map_append, List.map_cons]
+
+end List
+
 namespace ComputationalPaths
 
 open List Function
@@ -31,7 +43,7 @@ variable {A : Type u} {B : Type v}
 
 /-- Map a rewrite step through a function. -/
 @[simp] def map (f : A → B) (s : Step A) : Step B :=
-  ⟨f s.src, f s.tgt, _root_.congrArg f s.proof⟩
+  ⟨f s.src, f s.tgt, congrArg f s.proof⟩
 
 @[simp] theorem symm_symm (s : Step A) : symm (symm s) = s := by
   cases s
@@ -45,7 +57,7 @@ variable {A : Type u} {B : Type v}
 @[simp] theorem map_id (s : Step A) :
     map (fun x : A => x) s = s := by
   cases s
-  rfl
+  simp [map]
 
 end Step
 
@@ -61,7 +73,16 @@ namespace Path
 
 variable {A : Type u} {B : Type v} {C : Type w}
 variable {a b c d : A}
-variable {a₁ a₂ a₃ : A} {b₁ b₂ b₃ : B}
+variable {a1 a2 a3 : A} {b1 b2 b3 : B}
+
+/-- Helper showing that mapping the identity over step lists is a no-op. -/
+@[simp] theorem steps_map_id (steps : List (Step A)) :
+    steps.map (Step.map fun x : A => x) = steps := by
+  induction steps with
+  | nil => simp
+  | cons s tail ih =>
+      cases s
+      simp [Step.map, ih]
 
 /-- Extract the propositional equality witnessed by a path. -/
 @[simp] def toEq (p : Path a b) : a = b :=
@@ -92,11 +113,11 @@ variable {a₁ a₂ a₃ : A} {b₁ b₂ b₃ : B}
 @[simp] theorem symm_trans (p : Path a b) (q : Path b c) :
     symm (trans p q) = trans (symm q) (symm p) := by
   cases p with
-  | mk steps₁ proof₁ =>
+  | mk steps1 proof1 =>
       cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₁
-          cases proof₂
+      | mk steps2 proof2 =>
+          cases proof1
+          cases proof2
           simp [symm, trans, List.reverse_append, List.map_append]
 
 @[simp] theorem trans_refl_left (p : Path a b) : trans (refl a) p = p := by
@@ -108,7 +129,7 @@ variable {a₁ a₂ a₃ : A} {b₁ b₂ b₃ : B}
   simp
 
 @[simp] theorem symm_refl (a : A) : symm (refl a) = refl a := by
-  simp
+  simp [symm, refl]
 
 @[simp] theorem toEq_trans (p : Path a b) (q : Path b c) :
     toEq (trans p q) = (toEq p).trans (toEq q) := rfl
@@ -137,11 +158,11 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
     transport (trans p q) x =
       transport q (transport p x) := by
   cases p with
-  | mk steps₁ proof₁ =>
+  | mk steps1 proof1 =>
       cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₁
-          cases proof₂
+      | mk steps2 proof2 =>
+          cases proof1
+          cases proof2
           rfl
 
 @[simp] theorem transport_symm_left {D : A → Sort v}
@@ -177,11 +198,11 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
     congrArg f (Path.trans p q) =
       Path.trans (congrArg f p) (congrArg f q) := by
   cases p with
-  | mk steps₁ proof₁ =>
+  | mk steps1 proof1 =>
       cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₁
-          cases proof₂
+      | mk steps2 proof2 =>
+          cases proof1
+          cases proof2
           simp [congrArg, Path.trans, List.map_append]
 
 /-- Unary congruence commutes with symmetry. -/
@@ -192,147 +213,143 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
   cases p with
   | mk steps proof =>
       cases proof
-      simp [congrArg, Path.symm, List.map_map, List.map_reverse]
+      simp [congrArg, Path.symm]
 
 @[simp] theorem congrArg_id (p : Path a b) :
     congrArg (fun x : A => x) p = p := by
   cases p with
   | mk steps proof =>
       cases proof
-      have :
-          List.map (Step.map (fun x : A => x)) steps = steps := by
-        induction steps with
-        | nil => simp
-        | cons s tail ih =>
-            cases s
-            simp [Step.map, ih]
-      simp [congrArg, this]
+      have h := steps_map_id (A := A) steps
+      simp [congrArg, h]
 
 /-- Congruence in the first argument of a binary function. -/
-@[simp] def mapLeft (f : A → B → C) {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
-    Path (f a₁ b) (f a₂ b) :=
+@[simp] def mapLeft (f : A → B → C) {a1 a2 : A} (p : Path a1 a2) (b : B) :
+    Path (f a1 b) (f a2 b) :=
   ⟨p.steps.map (Step.map fun x => f x b), _root_.congrArg (fun x => f x b) p.proof⟩
 
 /-- `mapLeft` is the unary congruence for the partial application `fun a => f a b`. -/
-@[simp] theorem mapLeft_eq_congrArg (f : A → B → C) {a₁ a₂ : A}
-    (p : Path a₁ a₂) (b : B) :
+@[simp] theorem mapLeft_eq_congrArg (f : A → B → C) {a1 a2 : A}
+    (p : Path a1 a2) (b : B) :
     mapLeft f p b = congrArg (fun x => f x b) p := rfl
 
 /-- `mapLeft` preserves concatenation of paths. -/
 @[simp] theorem mapLeft_trans (f : A → B → C)
-    {a₁ a₂ a₃ : A} (p : Path a₁ a₂) (q : Path a₂ a₃) (b : B) :
+    {a1 a2 a3 : A} (p : Path a1 a2) (q : Path a2 a3) (b : B) :
     mapLeft f (Path.trans p q) b =
       Path.trans (mapLeft f p b) (mapLeft f q b) := by
   cases p with
-  | mk steps₁ proof₁ =>
+  | mk steps1 proof1 =>
       cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₁
-          cases proof₂
+      | mk steps2 proof2 =>
+          cases proof1
+          cases proof2
           simp [mapLeft, Path.trans, List.map_append]
 
 /-- `mapLeft` commutes with symmetry. -/
 @[simp] theorem mapLeft_symm (f : A → B → C)
-    {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
+    {a1 a2 : A} (p : Path a1 a2) (b : B) :
     mapLeft f (Path.symm p) b =
       Path.symm (mapLeft f p b) := by
   cases p with
   | mk steps proof =>
       cases proof
-      simp [mapLeft, Path.symm, List.map_map, List.map_reverse]
+      simp [mapLeft, Path.symm]
 
 /-- Congruence in the second argument of a binary function. -/
-@[simp] def mapRight (f : A → B → C) (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
-    Path (f a b₁) (f a b₂) :=
+@[simp] def mapRight (f : A → B → C) (a : A) {b1 b2 : B} (p : Path b1 b2) :
+    Path (f a b1) (f a b2) :=
   ⟨p.steps.map (Step.map (f a)), _root_.congrArg (f a) p.proof⟩
 
 /-- `mapRight` is the unary congruence for the partial application `f a`. -/
 @[simp] theorem mapRight_eq_congrArg (f : A → B → C) (a : A)
-    {b₁ b₂ : B} (p : Path b₁ b₂) :
+    {b1 b2 : B} (p : Path b1 b2) :
     mapRight f a p = congrArg (f a) p := rfl
 
 /-- `mapRight` preserves concatenation of paths. -/
 @[simp] theorem mapRight_trans (f : A → B → C)
-    (a : A) {b₁ b₂ b₃ : B} (p : Path b₁ b₂) (q : Path b₂ b₃) :
+    (a : A) {b1 b2 b3 : B} (p : Path b1 b2) (q : Path b2 b3) :
     mapRight f a (Path.trans p q) =
       Path.trans (mapRight f a p) (mapRight f a q) := by
   cases p with
-  | mk steps₁ proof₁ =>
+  | mk steps1 proof1 =>
       cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₁
-          cases proof₂
+      | mk steps2 proof2 =>
+          cases proof1
+          cases proof2
           simp [mapRight, Path.trans, List.map_append]
 
 /-- `mapRight` commutes with symmetry. -/
 @[simp] theorem mapRight_symm (f : A → B → C)
-    (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
+    (a : A) {b1 b2 : B} (p : Path b1 b2) :
     mapRight f a (Path.symm p) =
       Path.symm (mapRight f a p) := by
   cases p with
   | mk steps proof =>
       cases proof
-      simp [mapRight, Path.symm, List.map_map, List.map_reverse]
+      simp [mapRight, Path.symm]
 
 /-- Congruence in both arguments of a binary function. -/
-@[simp] def map₂ (f : A → B → C)
-    {a₁ a₂ : A} {b₁ b₂ : B}
-    (p : Path a₁ a₂) (q : Path b₁ b₂) :
-    Path (f a₁ b₁) (f a₂ b₂) :=
-  Path.trans (mapLeft f p b₁) (mapRight f a₂ q)
+@[simp] def map2 (f : A → B → C)
+    {a1 a2 : A} {b1 b2 : B}
+    (p : Path a1 a2) (q : Path b1 b2) :
+    Path (f a1 b1) (f a2 b2) :=
+  Path.trans (mapLeft f p b1) (mapRight f a2 q)
 
-/-- `map₂` preserves concatenation of paths in both arguments. -/
-@[simp] theorem map₂_trans (f : A → B → C)
-    {a₁ a₂ a₃ : A} {b₁ b₂ b₃ : B}
-    (p₁ : Path a₁ a₂) (p₂ : Path a₂ a₃)
-    (q₁ : Path b₁ b₂) (q₂ : Path b₂ b₃) :
-    map₂ f (Path.trans p₁ p₂) (Path.trans q₁ q₂) =
+/-- `map2` preserves concatenation of paths in both arguments. -/
+@[simp] theorem map2_trans (f : A → B → C)
+    {a1 a2 a3 : A} {b1 b2 b3 : B}
+    (p1 : Path a1 a2) (p2 : Path a2 a3)
+    (q1 : Path b1 b2) (q2 : Path b2 b3) :
+    map2 f (Path.trans p1 p2) (Path.trans q1 q2) =
       Path.trans
-        (mapLeft f p₁ b₁)
+        (mapLeft f p1 b1)
         (Path.trans
-          (mapLeft f p₂ b₁)
+          (mapLeft f p2 b1)
           (Path.trans
-            (mapRight f a₃ q₁)
-            (mapRight f a₃ q₂))) := by
-  cases p₁ with
-  | mk steps₁ proof₁ =>
-      cases p₂ with
-      | mk steps₂ proof₂ =>
-          cases q₁ with
-          | mk steps₃ proof₃ =>
-              cases q₂ with
-              | mk steps₄ proof₄ =>
-                  cases proof₁
-                  cases proof₂
-                  cases proof₃
-                  cases proof₄
-                  simp [map₂, mapLeft, mapRight, Path.trans,
+            (mapRight f a3 q1)
+            (mapRight f a3 q2))) := by
+  cases p1 with
+  | mk steps1 proof1 =>
+      cases p2 with
+      | mk steps2 proof2 =>
+          cases q1 with
+          | mk steps3 proof3 =>
+              cases q2 with
+              | mk steps4 proof4 =>
+                  cases proof1
+                  cases proof2
+                  cases proof3
+                  cases proof4
+                  simp [map2, mapLeft, mapRight, Path.trans,
                     List.map_append, List.append_assoc]
 
-/-- `map₂` commutes with symmetry. -/
-@[simp] theorem map₂_symm (f : A → B → C)
-    {a₁ a₂ : A} {b₁ b₂ : B}
-    (p : Path a₁ a₂) (q : Path b₁ b₂) :
-    Path.symm (map₂ f p q) =
+/-- `map2` commutes with symmetry. -/
+@[simp] theorem map2_symm (f : A → B → C)
+    {a1 a2 : A} {b1 b2 : B}
+    (p : Path a1 a2) (q : Path b1 b2) :
+    Path.symm (map2 f p q) =
       Path.trans
-        (mapRight f a₂ (Path.symm q))
-        (mapLeft f (Path.symm p) b₁) := by
+        (mapRight f a2 (Path.symm q))
+        (mapLeft f (Path.symm p) b1) := by
   cases p with
-  | mk steps₁ proof₁ =>
+  | mk steps1 proof1 =>
       cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₁
-          cases proof₂
-          have hfun₁ : Step.symm ∘ Step.map (f a₁) = Step.map (f a₁) ∘ Step.symm := by
+      | mk steps2 proof2 =>
+          cases proof1
+          cases proof2
+          have hfun1 :
+              Function.comp Step.symm (Step.map (f a1)) =
+                Function.comp (Step.map (f a1)) Step.symm := by
             funext s
-            exact (Step.map_symm (f := f a₁) (s := s)).symm
-          have hfun₂ : Step.symm ∘ Step.map (fun x => f x b₁) =
-              Step.map (fun x => f x b₁) ∘ Step.symm := by
+            exact (Step.map_symm (f := f a1) (s := s)).symm
+          have hfun2 :
+              Function.comp Step.symm (Step.map fun x => f x b1) =
+                Function.comp (Step.map fun x => f x b1) Step.symm := by
             funext s
-            exact (Step.map_symm (f := fun x => f x b₁) (s := s)).symm
-          simp [map₂, mapLeft, mapRight, Path.symm, Path.trans,
-            List.reverse_append, List.map_append, List.map_map, List.map_reverse,
-            hfun₁, hfun₂]
+            exact (Step.map_symm (f := fun x => f x b1) (s := s)).symm
+          simp [map2, mapLeft, mapRight, Path.symm, Path.trans,
+            List.reverse_append, List.map_append, hfun1, hfun2]
 
 @[simp] theorem mapLeft_refl (f : A → B → C) (a : A) (b : B) :
     mapLeft f (Path.refl a) b = Path.refl (f a b) := by
@@ -342,9 +359,9 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
     mapRight f a (Path.refl b) = Path.refl (f a b) := by
   simp [mapRight]
 
-@[simp] theorem map₂_refl (f : A → B → C) (a : A) (b : B) :
-    map₂ f (Path.refl a) (Path.refl b) = Path.refl (f a b) := by
-  simp [map₂]
+@[simp] theorem map2_refl (f : A → B → C) (a : A) (b : B) :
+    map2 f (Path.refl a) (Path.refl b) = Path.refl (f a b) := by
+  simp [map2]
 
 end Path
 

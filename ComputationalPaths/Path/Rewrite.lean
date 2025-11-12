@@ -14,9 +14,10 @@ namespace ComputationalPaths.Path
 universe u v w
 
 /-- A single rewrite step between computational paths. -/
-inductive Step {A : Type u} : {a b : A} → Path a b → Path a b → Prop
+inductive Step {A : Type u} :
+    {a b : A} → Path a b → Path a b → Prop
   | symm_refl (a : A) :
-      Step (a := a) (b := a) (symm (Path.refl a)) (Path.refl a)
+      Step (symm (Path.refl a)) (Path.refl a)
   | symm_symm {a b : A} (p : Path a b) :
       Step (symm (symm p)) p
   | trans_refl_left {a b : A} (p : Path a b) :
@@ -31,34 +32,33 @@ inductive Step {A : Type u} : {a b : A} → Path a b → Path a b → Prop
       Step (symm (trans p q)) (trans (symm q) (symm p))
   | trans_assoc {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
       Step (trans (trans p q) r) (trans p (trans q r))
-  | map₂_subst
+  | map2_subst
       {A₁ : Type u} {B : Type u}
-      {a₁ a₂ : A₁} {b₁ b₂ : B}
+      {a1 a2 : A₁} {b1 b2 : B}
       (f : A₁ → B → A)
-      (p : Path (A := A₁) a₁ a₂)
-      (q : Path (A := B) b₁ b₂) :
+      (p : Path (A := A₁) a1 a2)
+      (q : Path (A := B) b1 b2) :
       Step
-        (a := f a₁ b₁) (b := f a₂ b₂)
-        (Path.map₂ (A := A₁) (B := B) (C := A) f p q)
+        (Path.map2 (A := A₁) (B := B) (C := A) f p q)
         (Path.trans
-          (Path.mapRight (A := A₁) (B := B) (C := A) f a₁ q)
-          (Path.mapLeft (A := A₁) (B := B) (C := A) f p b₂))
+          (Path.mapRight (A := A₁) (B := B) (C := A) f a1 q)
+          (Path.mapLeft (A := A₁) (B := B) (C := A) f p b2))
 
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
-  Step.trans_assoc Step.map₂_subst
+  Step.trans_assoc Step.map2_subst
 
 /-- Reflexive/transitive closure of rewrite steps (`rw`-reduction). -/
 inductive Rw {A : Type u} {a b : A} : Path a b → Path a b → Prop
   | refl (p : Path a b) : Rw p p
-  | tail {p q r : Path a b} : Rw p q → Step (a := a) (b := b) q r → Rw p r
+  | tail {p q r : Path a b} : Rw p q → Step q r → Rw p r
 
 variable {A : Type u} {a b c : A}
 
 @[simp] theorem rw_refl (p : Path a b) : Rw p p :=
   Rw.refl p
 
-theorem rw_of_step {p q : Path a b} (h : Step (a := a) (b := b) p q) : Rw p q :=
+theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
   Rw.tail (Rw.refl p) h
 
 @[simp] theorem rw_symm_trans_congr {p : Path a b} {q : Path b c} :
@@ -82,111 +82,108 @@ theorem rw_of_step {p q : Path a b} (h : Step (a := a) (b := b) p q) : Rw p q :=
   rw_of_eq (Path.congrArg_symm (f := f) (p := p))
 
 @[simp] theorem rw_mapLeft_trans {B : Type v} {C : Type w}
-    {a₁ a₂ a₃ : A} (f : A → B → C)
-    (p : Path a₁ a₂) (q : Path a₂ a₃) (b : B) :
+    {a1 a2 a3 : A} (f : A → B → C)
+    (p : Path a1 a2) (q : Path a2 a3) (b : B) :
     Rw (Path.mapLeft f (Path.trans p q) b)
       (Path.trans (Path.mapLeft f p b) (Path.mapLeft f q b)) :=
   rw_of_eq (Path.mapLeft_trans (f := f) (p := p) (q := q) (b := b))
 
 @[simp] theorem rw_mapLeft_symm {B : Type v} {C : Type w}
-    {a₁ a₂ : A} (f : A → B → C)
-    (p : Path a₁ a₂) (b : B) :
+    {a1 a2 : A} (f : A → B → C)
+    (p : Path a1 a2) (b : B) :
     Rw (Path.mapLeft f (Path.symm p) b)
       (Path.symm (Path.mapLeft f p b)) :=
   rw_of_eq (Path.mapLeft_symm (f := f) (p := p) (b := b))
 
 @[simp] theorem rw_mapRight_trans {B : Type v} {C : Type w}
-    {b₁ b₂ b₃ : B} (f : A → B → C)
-    (a : A) (p : Path b₁ b₂) (q : Path b₂ b₃) :
+    {b1 b2 b3 : B} (f : A → B → C)
+    (a : A) (p : Path b1 b2) (q : Path b2 b3) :
     Rw (Path.mapRight f a (Path.trans p q))
       (Path.trans (Path.mapRight f a p) (Path.mapRight f a q)) :=
   rw_of_eq (Path.mapRight_trans (f := f) (a := a) (p := p) (q := q))
 
-@[simp] theorem rw_map₂_trans
+@[simp] theorem rw_map2_trans
     {A₁ : Type u} {B : Type u}
-    {a₁ a₂ a₃ : A₁} {b₁ b₂ b₃ : B}
+    {a1 a2 a3 : A₁} {b1 b2 b3 : B}
     (f : A₁ → B → A)
-    (p₁ : Path (A := A₁) a₁ a₂) (p₂ : Path (A := A₁) a₂ a₃)
-    (q₁ : Path (A := B) b₁ b₂) (q₂ : Path (A := B) b₂ b₃) :
+    (p1 : Path (A := A₁) a1 a2) (p2 : Path (A := A₁) a2 a3)
+    (q1 : Path (A := B) b1 b2) (q2 : Path (A := B) b2 b3) :
     Rw
-      (Path.map₂ (A := A₁) (B := B) (C := A) f
-        (Path.trans p₁ p₂) (Path.trans q₁ q₂))
+      (Path.map2 (A := A₁) (B := B) (C := A) f
+        (Path.trans p1 p2) (Path.trans q1 q2))
       (Path.trans
-        (Path.mapLeft (A := A₁) (B := B) (C := A) f p₁ b₁)
+        (Path.mapLeft (A := A₁) (B := B) (C := A) f p1 b1)
         (Path.trans
-          (Path.mapLeft (A := A₁) (B := B) (C := A) f p₂ b₁)
+          (Path.mapLeft (A := A₁) (B := B) (C := A) f p2 b1)
           (Path.trans
-            (Path.mapRight (A := A₁) (B := B) (C := A) f a₃ q₁)
-            (Path.mapRight (A := A₁) (B := B) (C := A) f a₃ q₂)))) :=
+            (Path.mapRight (A := A₁) (B := B) (C := A) f a3 q1)
+            (Path.mapRight (A := A₁) (B := B) (C := A) f a3 q2)))) :=
   rw_of_eq
-    (Path.map₂_trans (A := A₁) (B := B) (C := A) (f := f)
-      (p₁ := p₁) (p₂ := p₂) (q₁ := q₁) (q₂ := q₂))
+    (Path.map2_trans (A := A₁) (B := B) (C := A) (f := f)
+      (p1 := p1) (p2 := p2) (q1 := q1) (q2 := q2))
 
-@[simp] theorem rw_map₂_refl
+@[simp] theorem rw_map2_refl
     {A₁ : Type u} {B : Type u} (f : A₁ → B → A) (a : A₁) (b : B) :
-    Rw (Path.map₂ (A := A₁) (B := B) (C := A) f (Path.refl a) (Path.refl b))
+    Rw (Path.map2 (A := A₁) (B := B) (C := A) f (Path.refl a) (Path.refl b))
       (Path.refl (f a b)) :=
-  rw_of_eq (Path.map₂_refl (A := A₁) (B := B) (C := A) (f := f) (a := a) (b := b))
+  rw_of_eq (Path.map2_refl (A := A₁) (B := B) (C := A) (f := f) (a := a) (b := b))
 
 @[simp] theorem rw_mapRight_symm {B : Type v} {C : Type w}
-    {b₁ b₂ : B} (f : A → B → C)
-    (a : A) (p : Path b₁ b₂) :
+    {b1 b2 : B} (f : A → B → C)
+    (a : A) (p : Path b1 b2) :
     Rw (Path.mapRight f a (Path.symm p))
       (Path.symm (Path.mapRight f a p)) :=
   rw_of_eq (Path.mapRight_symm (f := f) (a := a) (p := p))
 
-/-- Subterm substitution for `map₂`. -/
-@[simp] theorem rw_map₂_subst
+/-- Subterm substitution for `map2`. -/
+@[simp] theorem rw_map2_subst
     {A₁ : Type u} {B : Type u}
-    {a₁ a₂ : A₁} {b₁ b₂ : B}
+    {a1 a2 : A₁} {b1 b2 : B}
     (f : A₁ → B → A)
-    (p : Path (A := A₁) a₁ a₂)
-    (q : Path (A := B) b₁ b₂) :
+    (p : Path (A := A₁) a1 a2)
+    (q : Path (A := B) b1 b2) :
     Rw
-      (Path.map₂ (A := A₁) (B := B) (C := A) f p q)
+      (Path.map2 (A := A₁) (B := B) (C := A) f p q)
       (Path.trans
-        (Path.mapRight (A := A₁) (B := B) (C := A) f a₁ q)
-        (Path.mapLeft (A := A₁) (B := B) (C := A) f p b₂)) :=
-  rw_of_step (Step.map₂_subst (A₁ := A₁) (B := B) (f := f) p q)
-
-/-- Helper used to prove transitivity of `Rw`. -/
-def Rw.comp {p q : Path a b} (h₁ : Rw p q) : ∀ {r : Path a b}, Rw q r → Rw p r
-  | _, Rw.refl _ => h₁
-  | _, Rw.tail h₂ step => Rw.tail (Rw.comp h₁ h₂) step
+        (Path.mapRight (A := A₁) (B := B) (C := A) f a1 q)
+        (Path.mapLeft (A := A₁) (B := B) (C := A) f p b2)) :=
+  rw_of_step (Step.map2_subst (A₁ := A₁) (B := B) (f := f) p q)
 
 @[simp] theorem rw_trans {p q r : Path a b}
-    (h₁ : Rw p q) (h₂ : Rw q r) : Rw p r :=
-  Rw.comp h₁ h₂
+    (h1 : Rw p q) (h2 : Rw q r) : Rw p r :=
+  match h2 with
+  | Rw.refl _ => h1
+  | Rw.tail h2 step => Rw.tail (rw_trans h1 h2) step
 
-/-- Symmetry for `map₂` paths. -/
-@[simp] theorem rw_map₂_symm
+/-- Symmetry for `map2` paths. -/
+@[simp] theorem rw_map2_symm
     {A₁ : Type u} {B : Type u}
-    {a₁ a₂ : A₁} {b₁ b₂ : B}
+    {a1 a2 : A₁} {b1 b2 : B}
     (f : A₁ → B → A)
-    (p : Path (A := A₁) a₁ a₂)
-    (q : Path (A := B) b₁ b₂) :
+    (p : Path (A := A₁) a1 a2)
+    (q : Path (A := B) b1 b2) :
     Rw
-      (Path.map₂ (A := A₁) (B := B) (C := A) f (Path.symm p) (Path.symm q))
-      (Path.symm (Path.map₂ (A := A₁) (B := B) (C := A) f p q)) := by
+      (Path.map2 (A := A₁) (B := B) (C := A) f (Path.symm p) (Path.symm q))
+      (Path.symm (Path.map2 (A := A₁) (B := B) (C := A) f p q)) := by
   have h :=
     rw_of_step
-      (Step.map₂_subst (A₁ := A₁) (B := B) (f := f)
+      (Step.map2_subst (A₁ := A₁) (B := B) (f := f)
         (p := Path.symm p) (q := Path.symm q))
-  have h₂ :=
-    Path.map₂_symm (A := A₁) (B := B) (C := A) f p q
-  exact rw_trans h (rw_of_eq h₂.symm)
+  have h2 :=
+    Path.map2_symm (A := A₁) (B := B) (C := A) f p q
+  exact rw_trans h (rw_of_eq h2.symm)
 
 /-- Symmetric reflexive/transitive closure generated by rewrite steps. -/
 inductive RwEq {A : Type u} {a b : A} : Path a b → Path a b → Prop
   | refl (p : Path a b) : RwEq p p
-  | step {p q : Path a b} : Step (a := a) (b := b) p q → RwEq p q
+  | step {p q : Path a b} : Step p q → RwEq p q
   | symm {p q : Path a b} : RwEq p q → RwEq q p
   | trans {p q r : Path a b} : RwEq p q → RwEq q r → RwEq p r
 
 @[simp] theorem rweq_refl (p : Path a b) : RwEq p p :=
   RwEq.refl p
 
-theorem rweq_of_step {p q : Path a b} (h : Step (a := a) (b := b) p q) : RwEq p q :=
+theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
   RwEq.step h
 
 @[simp] theorem rweq_symm {p q : Path a b} (h : RwEq p q) : RwEq q p :=
@@ -194,10 +191,11 @@ theorem rweq_of_step {p q : Path a b} (h : Step (a := a) (b := b) p q) : RwEq p 
   | RwEq.refl _ => RwEq.refl _
   | RwEq.step h => RwEq.symm (RwEq.step h)
   | RwEq.symm h => h
-  | RwEq.trans h₁ h₂ => RwEq.trans (rweq_symm h₂) (rweq_symm h₁)
+  | RwEq.trans h1 h2 => RwEq.trans (rweq_symm h2) (rweq_symm h1)
 
-@[simp] theorem rweq_trans {p q r : Path a b} (h₁ : RwEq p q) (h₂ : RwEq q r) : RwEq p r :=
-  RwEq.trans h₁ h₂
+@[simp] theorem rweq_trans {p q r : Path a b} (h1 : RwEq p q) (h2 : RwEq q r) :
+    RwEq p r :=
+  RwEq.trans h1 h2
 
 @[simp] theorem rweq_of_eq {p q : Path a b} (h : p = q) : RwEq p q := by
   cases h
@@ -216,98 +214,101 @@ theorem rweq_of_step {p q : Path a b} (h : Step (a := a) (b := b) p q) : RwEq p 
   rweq_of_eq (Path.congrArg_symm (f := f) (p := p))
 
 @[simp] theorem rweq_mapLeft_trans {B : Type v} {C : Type w}
-    {a₁ a₂ a₃ : A} (f : A → B → C)
-    (p : Path a₁ a₂) (q : Path a₂ a₃) (b : B) :
+    {a1 a2 a3 : A} (f : A → B → C)
+    (p : Path a1 a2) (q : Path a2 a3) (b : B) :
     RwEq (Path.mapLeft f (Path.trans p q) b)
       (Path.trans (Path.mapLeft f p b) (Path.mapLeft f q b)) :=
   rweq_of_eq (Path.mapLeft_trans (f := f) (p := p) (q := q) (b := b))
 
 @[simp] theorem rweq_mapLeft_symm {B : Type v} {C : Type w}
-    {a₁ a₂ : A} (f : A → B → C)
-    (p : Path a₁ a₂) (b : B) :
+    {a1 a2 : A} (f : A → B → C)
+    (p : Path a1 a2) (b : B) :
     RwEq (Path.mapLeft f (Path.symm p) b)
       (Path.symm (Path.mapLeft f p b)) :=
   rweq_of_eq (Path.mapLeft_symm (f := f) (p := p) (b := b))
 
 @[simp] theorem rweq_mapRight_trans {B : Type v} {C : Type w}
-    {b₁ b₂ b₃ : B} (f : A → B → C)
-    (a : A) (p : Path b₁ b₂) (q : Path b₂ b₃) :
+    {b1 b2 b3 : B} (f : A → B → C)
+    (a : A) (p : Path b1 b2) (q : Path b2 b3) :
     RwEq (Path.mapRight f a (Path.trans p q))
       (Path.trans (Path.mapRight f a p) (Path.mapRight f a q)) :=
   rweq_of_eq (Path.mapRight_trans (f := f) (a := a) (p := p) (q := q))
 
-@[simp] theorem rweq_map₂_trans
+@[simp] theorem rweq_map2_trans
     {A₁ : Type u} {B : Type u}
-    {a₁ a₂ a₃ : A₁} {b₁ b₂ b₃ : B}
+    {a1 a2 a3 : A₁} {b1 b2 b3 : B}
     (f : A₁ → B → A)
-    (p₁ : Path (A := A₁) a₁ a₂) (p₂ : Path (A := A₁) a₂ a₃)
-    (q₁ : Path (A := B) b₁ b₂) (q₂ : Path (A := B) b₂ b₃) :
+    (p1 : Path (A := A₁) a1 a2) (p2 : Path (A := A₁) a2 a3)
+    (q1 : Path (A := B) b1 b2) (q2 : Path (A := B) b2 b3) :
     RwEq
-      (Path.map₂ (A := A₁) (B := B) (C := A) f
-        (Path.trans p₁ p₂) (Path.trans q₁ q₂))
+      (Path.map2 (A := A₁) (B := B) (C := A) f
+        (Path.trans p1 p2) (Path.trans q1 q2))
       (Path.trans
-        (Path.mapLeft (A := A₁) (B := B) (C := A) f p₁ b₁)
+        (Path.mapLeft (A := A₁) (B := B) (C := A) f p1 b1)
         (Path.trans
-          (Path.mapLeft (A := A₁) (B := B) (C := A) f p₂ b₁)
+          (Path.mapLeft (A := A₁) (B := B) (C := A) f p2 b1)
           (Path.trans
-            (Path.mapRight (A := A₁) (B := B) (C := A) f a₃ q₁)
-            (Path.mapRight (A := A₁) (B := B) (C := A) f a₃ q₂)))) :=
+            (Path.mapRight (A := A₁) (B := B) (C := A) f a3 q1)
+            (Path.mapRight (A := A₁) (B := B) (C := A) f a3 q2)))) :=
   rweq_of_eq
-    (Path.map₂_trans (A := A₁) (B := B) (C := A) (f := f)
-      (p₁ := p₁) (p₂ := p₂) (q₁ := q₁) (q₂ := q₂))
+    (Path.map2_trans (A := A₁) (B := B) (C := A) (f := f)
+      (p1 := p1) (p2 := p2) (q1 := q1) (q2 := q2))
 
-@[simp] theorem rweq_map₂_refl
+@[simp] theorem rweq_map2_refl
     {A₁ : Type u} {B : Type u} (f : A₁ → B → A) (a : A₁) (b : B) :
-    RwEq (Path.map₂ (A := A₁) (B := B) (C := A) f
+    RwEq (Path.map2 (A := A₁) (B := B) (C := A) f
         (Path.refl a) (Path.refl b)) (Path.refl (f a b)) :=
-  rweq_of_eq (Path.map₂_refl (A := A₁) (B := B) (C := A) (f := f) (a := a) (b := b))
+  rweq_of_eq (Path.map2_refl (A := A₁) (B := B) (C := A) (f := f) (a := a) (b := b))
 
 @[simp] theorem rweq_mapRight_symm {B : Type v} {C : Type w}
-    {b₁ b₂ : B} (f : A → B → C)
-    (a : A) (p : Path b₁ b₂) :
+    {b1 b2 : B} (f : A → B → C)
+    (a : A) (p : Path b1 b2) :
     RwEq (Path.mapRight f a (Path.symm p))
       (Path.symm (Path.mapRight f a p)) :=
   rweq_of_eq (Path.mapRight_symm (f := f) (a := a) (p := p))
 
 /-- Subterm substitution lifted to `RwEq`. -/
-@[simp] theorem rweq_map₂_subst
+@[simp] theorem rweq_map2_subst
     {A₁ : Type u} {B : Type u}
-    {a₁ a₂ : A₁} {b₁ b₂ : B}
+    {a1 a2 : A₁} {b1 b2 : B}
     (f : A₁ → B → A)
-    (p : Path (A := A₁) a₁ a₂)
-    (q : Path (A := B) b₁ b₂) :
+    (p : Path (A := A₁) a1 a2)
+    (q : Path (A := B) b1 b2) :
     RwEq
-      (Path.map₂ (A := A₁) (B := B) (C := A) f p q)
+      (Path.map2 (A := A₁) (B := B) (C := A) f p q)
       (Path.trans
-        (Path.mapRight (A := A₁) (B := B) (C := A) f a₁ q)
-        (Path.mapLeft (A := A₁) (B := B) (C := A) f p b₂)) :=
-  rweq_of_step (Step.map₂_subst (A₁ := A₁) (B := B) (f := f) p q)
+        (Path.mapRight (A := A₁) (B := B) (C := A) f a1 q)
+        (Path.mapLeft (A := A₁) (B := B) (C := A) f p b2)) :=
+  rweq_of_step (Step.map2_subst (A₁ := A₁) (B := B) (f := f) p q)
 
-@[simp] theorem rweq_map₂_symm
+@[simp] theorem rweq_map2_symm
     {A₁ : Type u} {B : Type u}
-    {a₁ a₂ : A₁} {b₁ b₂ : B}
+    {a1 a2 : A₁} {b1 b2 : B}
     (f : A₁ → B → A)
-    (p : Path (A := A₁) a₁ a₂)
-    (q : Path (A := B) b₁ b₂) :
+    (p : Path (A := A₁) a1 a2)
+    (q : Path (A := B) b1 b2) :
     RwEq
-      (Path.map₂ (A := A₁) (B := B) (C := A) f (Path.symm p) (Path.symm q))
-      (Path.symm (Path.map₂ (A := A₁) (B := B) (C := A) f p q)) := by
+      (Path.map2 (A := A₁) (B := B) (C := A) f (Path.symm p) (Path.symm q))
+      (Path.symm (Path.map2 (A := A₁) (B := B) (C := A) f p q)) := by
   have h :=
     rweq_of_step
-      (Step.map₂_subst (A₁ := A₁) (B := B) (f := f)
+      (Step.map2_subst (A₁ := A₁) (B := B) (f := f)
         (p := Path.symm p) (q := Path.symm q))
-  have h₂ :=
-    Path.map₂_symm (A := A₁) (B := B) (C := A) f p q
-  exact rweq_trans h (rweq_of_eq h₂.symm)
+  have h2 :=
+    Path.map2_symm (A := A₁) (B := B) (C := A) f p q
+  exact rweq_trans h (rweq_of_eq h2.symm)
+
 @[simp] theorem rweq_of_rw {p q : Path a b} (h : Rw p q) : RwEq p q :=
   match h with
   | Rw.refl _ => RwEq.refl _
   | Rw.tail h step => RwEq.trans (rweq_of_rw h) (RwEq.step step)
 
-@[simp] theorem rw_congr_rweq {p q r : Path a b} (hpq : Rw p q) (hqr : RwEq q r) : RwEq p r :=
+@[simp] theorem rw_congr_rweq {p q r : Path a b}
+    (hpq : Rw p q) (hqr : RwEq q r) : RwEq p r :=
   rweq_trans (rweq_of_rw hpq) hqr
 
-@[simp] theorem rweq_congr_rw {p q r : Path a b} (hpq : RwEq p q) (hqr : Rw q r) : RwEq p r :=
+@[simp] theorem rweq_congr_rw {p q r : Path a b}
+    (hpq : RwEq p q) (hqr : Rw q r) : RwEq p r :=
   rweq_trans hpq (rweq_of_rw hqr)
 
 @[simp] theorem rweq_symm_trans_congr {p : Path a b} {q : Path b c} :

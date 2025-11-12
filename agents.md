@@ -1,0 +1,43 @@
+# Automation & Agents
+
+This repository is set up for interactive development with the Codex CLI and a
+handful of lightweight build helpers.  The sections below summarise what each
+agent/tool is responsible for and when to invoke it.
+
+## Coding agent (Codex CLI)
+- **Purpose:** interactive code editing, documentation updates, refactors, and
+  exploratory formalisation work in Lean.
+- **Typical flow:** outline a plan, perform targeted edits (prefer
+  `apply_patch` for single files), and finish with a build or relevant checks.
+- **When to use:** any time you need new definitions, proofs, documentation, or
+  review feedback inside the repository.
+- **Limitations:** no network access, and commands are sandboxed—prefer the
+  provided `lake.cmd` shim when running Lean tooling.
+
+## Build agent (`.\lake.cmd build`)
+- **Purpose:** type-check the project and ensure the Lean kernel accepts every
+  proof.
+- **How to run:** invoke `.\lake.cmd build` from the repository root.  The shim
+  forwards to the toolchain selected via `elan`, so no additional PATH changes
+  are required.
+- **When to use:** after non-trivial edits, before submitting a PR, or whenever
+  you need assurance that the current state compiles.
+
+## Executable runner (`.\lake.cmd exe computational_paths`)
+- **Purpose:** sanity-check the demo executable, which prints the library
+  version marker.
+- **When to use:** optional verification after bumping `libraryVersion` or
+  wiring the library into downstream tooling.
+
+## Formatting / linting
+- Lean's formatter (`lake fmt`) is not currently enforced, but running it before
+  large changes helps minimise incidental diffs.
+- The simplifier linter will warn about unused simp arguments during builds;
+  prefer trimming those hints when they appear.
+
+## Tips for new contributors
+- Skim `README.md` for the latest project status and roadmap.
+- Keep doc updates (like this file) in sync with code changes when adding new
+  capabilities.
+- Reference Lean files via `import ComputationalPaths` in downstream projects to
+  pick up the bundled modules.
