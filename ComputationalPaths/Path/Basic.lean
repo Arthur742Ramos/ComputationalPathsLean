@@ -309,6 +309,31 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
                   simp [map₂, mapLeft, mapRight, Path.trans,
                     List.map_append, List.append_assoc]
 
+/-- `map₂` commutes with symmetry. -/
+@[simp] theorem map₂_symm (f : A → B → C)
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    Path.symm (map₂ f p q) =
+      Path.trans
+        (mapRight f a₂ (Path.symm q))
+        (mapLeft f (Path.symm p) b₁) := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₁
+          cases proof₂
+          have hfun₁ : Step.symm ∘ Step.map (f a₁) = Step.map (f a₁) ∘ Step.symm := by
+            funext s
+            exact (Step.map_symm (f := f a₁) (s := s)).symm
+          have hfun₂ : Step.symm ∘ Step.map (fun x => f x b₁) =
+              Step.map (fun x => f x b₁) ∘ Step.symm := by
+            funext s
+            exact (Step.map_symm (f := fun x => f x b₁) (s := s)).symm
+          simp [map₂, mapLeft, mapRight, Path.symm, Path.trans,
+            List.reverse_append, List.map_append, List.map_map, List.map_reverse,
+            hfun₁, hfun₂]
+
 @[simp] theorem mapLeft_refl (f : A → B → C) (a : A) (b : B) :
     mapLeft f (Path.refl a) b = Path.refl (f a b) := by
   simp [mapLeft]
