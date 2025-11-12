@@ -4,7 +4,7 @@ Lean formalisation of *Propositional Equality, Identity Types, and Computational
 
 ## Current status
 - Core path operations (`ComputationalPaths/Path/Basic.lean`) are fully implemented via explicit rewrite-step lists, giving transport, symmetry, and congruence lemmas without placeholders.
-- The rewrite system (`ComputationalPaths/Path/Rewrite.lean`) now covers the reflexive/transitive/symmetric closures together with additional `mapLeft`/`mapRight` reflexivity reductions, bringing the development closer to the full LNDEQ suite.
+- The rewrite system (`ComputationalPaths/Path/Rewrite.lean`) now covers the reflexive/transitive/symmetric closures together with additional `mapLeft`/`mapRight` reflexivity reductions, bringing the development closer to the full LNDEQ suite.  The new `rwEqSetoid`/`PathRwQuot` constructions package rewrite equality as a `Setoid` and quotient, and provide `refl`/`symm`/`trans` operations directly on the quotient.
 - A weak groupoid structure (`ComputationalPaths/Path/Groupoid.lean`) packages composition, inverses, and identities up to rewrite, serving as a foundation for later algebraic structure.
 
 ## Using the library from another project

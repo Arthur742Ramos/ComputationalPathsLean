@@ -11,6 +11,8 @@ import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths.Path
 
+open scoped Quot
+
 universe u v w
 
 /-- A single rewrite step between computational paths. -/
@@ -94,17 +96,26 @@ inductive Step {A : Type u} :
         (Path.congrArg (fun h : α → A => h a)
           (Path.lamCongr (f := f) (g := g) p))
         (p a)
+  | symm_congr {a b : A} {p q : Path a b} :
+      Step p q → Step (Path.symm p) (Path.symm q)
+  | trans_congr_left {a b c : A}
+      {p q : Path a b} (r : Path b c) :
+      Step p q → Step (Path.trans p r) (Path.trans q r)
+  | trans_congr_right {a b c : A}
+      (p : Path a b) {q r : Path b c} :
+      Step q r → Step (Path.trans p q) (Path.trans p r)
 
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
   Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
   Step.prod_rec_beta
   Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta
+  Step.symm_congr Step.trans_congr_left Step.trans_congr_right
 
 @[simp] theorem step_toEq {A : Type u} {a b : A}
     {p q : Path a b} (h : Step p q) :
     p.toEq = q.toEq := by
-  cases h with
+  induction h with
   | symm_refl _ => simp
   | symm_symm _ => simp
   | trans_refl_left _ => simp
@@ -120,6 +131,15 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | sum_rec_inl_beta _ _ _ => simp
   | sum_rec_inr_beta _ _ _ => simp
   | fun_app_beta _ _ => simp
+  | symm_congr _ ih =>
+      cases ih
+      simp
+  | trans_congr_left _ _ ih =>
+      cases ih
+      simp
+  | trans_congr_right _ _ ih =>
+      cases ih
+      simp
 
 /-- Reflexive/transitive closure of rewrite steps (`rw`-reduction). -/
 inductive Rw {A : Type u} {a b : A} : Path a b → Path a b → Prop
@@ -368,9 +388,169 @@ theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
     RwEq p r :=
   RwEq.trans h1 h2
 
+section Setoid
+
+/-- Rewrite equality induces a setoid on computational paths. -/
+def rwEqSetoid (A : Type u) (a b : A) : Setoid (Path a b) where
+  r := RwEq
+  iseqv :=
+    { refl := fun p => rweq_refl (p := p)
+      symm := fun {_ _} h => rweq_symm h
+      trans := fun {_ _ _} h₁ h₂ => rweq_trans h₁ h₂ }
+
+@[simp] theorem rwEqSetoid_r {A : Type u} {a b : A} :
+    (rwEqSetoid A a b).r = RwEq :=
+  rfl
+
+instance pathRwEqSetoid (A : Type u) (a b : A) :
+    Setoid (Path a b) :=
+  rwEqSetoid A a b
+
+/-- Paths modulo rewrite equality, mirroring the paper's notion of canonical proofs. -/
+abbrev PathRwQuot (A : Type u) (a b : A) :=
+  Quot (rwEqSetoid A a b).r
+
+end Setoid
+
 @[simp] theorem rweq_of_eq {p q : Path a b} (h : p = q) : RwEq p q := by
   cases h
   exact RwEq.refl _
+
+@[simp] theorem rweq_symm_congr {p q : Path a b}
+    (h : RwEq p q) : RwEq (Path.symm p) (Path.symm q) :=
+  match h with
+  | RwEq.refl _ => RwEq.refl _
+  | RwEq.step s => RwEq.step (Step.symm_congr s)
+  | RwEq.symm h => RwEq.symm (rweq_symm_congr h)
+  | RwEq.trans h₁ h₂ =>
+      RwEq.trans (rweq_symm_congr h₁) (rweq_symm_congr h₂)
+
+@[simp] theorem rweq_trans_congr_left {a b c : A}
+    {p q : Path a b} (r : Path b c) (h : RwEq p q) :
+    RwEq (Path.trans p r) (Path.trans q r) :=
+  match h with
+  | RwEq.refl _ => RwEq.refl _
+  | RwEq.step s => RwEq.step (Step.trans_congr_left r s)
+  | RwEq.symm h => RwEq.symm (rweq_trans_congr_left r h)
+  | RwEq.trans h₁ h₂ =>
+      RwEq.trans (rweq_trans_congr_left r h₁)
+        (rweq_trans_congr_left r h₂)
+
+@[simp] theorem rweq_trans_congr_right {a b c : A}
+    (p : Path a b) {q r : Path b c} (h : RwEq q r) :
+    RwEq (Path.trans p q) (Path.trans p r) :=
+  match h with
+  | RwEq.refl _ => RwEq.refl _
+  | RwEq.step s => RwEq.step (Step.trans_congr_right p s)
+  | RwEq.symm h => RwEq.symm (rweq_trans_congr_right p h)
+  | RwEq.trans h₁ h₂ =>
+      RwEq.trans (rweq_trans_congr_right p h₁)
+        (rweq_trans_congr_right p h₂)
+
+@[simp] theorem rweq_trans_congr {a b c : A}
+    {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+    (hp : RwEq p₁ p₂) (hq : RwEq q₁ q₂) :
+    RwEq (Path.trans p₁ q₁) (Path.trans p₂ q₂) :=
+  rweq_trans (rweq_trans_congr_left (a := a) (b := b) (c := c)
+      (p := p₁) (q := p₂) (r := q₁) hp)
+    (rweq_trans_congr_right (a := a) (b := b) (c := c)
+      (p := p₂) (q := q₁) (r := q₂) hq)
+
+
+namespace PathRwQuot
+
+variable {A : Type u}
+
+open Quot
+
+/-- Reflexive element in the quotient. -/
+def refl (a : A) : PathRwQuot A a a :=
+  Quot.mk _ (Path.refl a)
+
+/-- Symmetry descends to the quotient. -/
+def symm {a b : A} :
+    PathRwQuot A a b → PathRwQuot A b a := fun x =>
+  Quot.liftOn x (fun p => Quot.mk _ (Path.symm p))
+    (by
+      intro p q h
+      exact Quot.sound (rweq_symm_congr (A := A) h))
+
+/-- Composition descends to the quotient. -/
+def trans {a b c : A} :
+    PathRwQuot A a b → PathRwQuot A b c → PathRwQuot A a c :=
+  fun x y =>
+    Quot.liftOn x
+      (fun p : Path a b =>
+        Quot.liftOn y
+          (fun q : Path b c => Quot.mk _ (Path.trans p q))
+          (by
+            intro q₁ q₂ hq
+            exact Quot.sound
+              (rweq_trans_congr_right (A := A) (a := a) (b := b) (c := c)
+                (p := p) (q := q₁) (r := q₂) hq)) )
+      (by
+        intro p₁ p₂ hp
+        refine _root_.Quot.inductionOn y (fun q => ?_)
+        exact Quot.sound
+          (rweq_trans_congr_left (A := A) (a := a) (b := b) (c := c)
+            (p := p₁) (q := p₂) (r := q) hp))
+
+@[simp] theorem symm_mk {a b : A} (p : Path a b) :
+    symm (A := A) (Quot.mk _ p) = Quot.mk _ (Path.symm p) := rfl
+
+@[simp] theorem trans_mk {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    trans (A := A) (Quot.mk _ p) (Quot.mk _ q) =
+      Quot.mk _ (Path.trans p q) := rfl
+
+@[simp] theorem symm_symm {a b : A}
+    (x : PathRwQuot A a b) :
+    symm (A := A) (symm x) = x := by
+  refine _root_.Quot.inductionOn x (fun p => ?_)
+  apply Quot.sound
+  exact rweq_of_step (Step.symm_symm (A := A) p)
+
+@[simp] theorem trans_refl_left {a b : A}
+    (x : PathRwQuot A a b) :
+    trans (A := A) (refl a) x = x := by
+  refine _root_.Quot.inductionOn x (fun p => ?_)
+  apply Quot.sound
+  exact rweq_of_step (Step.trans_refl_left (A := A) p)
+
+@[simp] theorem trans_refl_right {a b : A}
+    (x : PathRwQuot A a b) :
+    trans (A := A) x (refl b) = x := by
+  refine _root_.Quot.inductionOn x (fun p => ?_)
+  apply Quot.sound
+  exact rweq_of_step (Step.trans_refl_right (A := A) p)
+
+@[simp] theorem trans_symm {a b : A}
+    (x : PathRwQuot A a b) :
+    trans (A := A) x (symm x) = refl a := by
+  refine _root_.Quot.inductionOn x (fun p => ?_)
+  apply Quot.sound
+  exact rweq_of_step (Step.trans_symm (A := A) p)
+
+@[simp] theorem symm_trans {a b : A}
+    (x : PathRwQuot A a b) :
+    trans (A := A) (symm x) x = refl b := by
+  refine _root_.Quot.inductionOn x (fun p => ?_)
+  apply Quot.sound
+  exact rweq_of_step (Step.symm_trans (A := A) p)
+
+@[simp] theorem trans_assoc {a b c d : A}
+    (x : PathRwQuot A a b)
+    (y : PathRwQuot A b c)
+    (z : PathRwQuot A c d) :
+    trans (A := A) (trans x y) z =
+      trans x (trans y z) := by
+  refine _root_.Quot.inductionOn x (fun p => ?_)
+  refine _root_.Quot.inductionOn y (fun q => ?_)
+  refine _root_.Quot.inductionOn z (fun r => ?_)
+  apply Quot.sound
+  exact rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r))
+
+end PathRwQuot
 
 @[simp] theorem rweq_congrArg_trans {B : Type v}
     {a b c : A} (f : A → B) (p : Path a b) (q : Path b c) :
@@ -578,3 +758,4 @@ theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
   rweq_of_rw (rw_symm_trans_congr (p := p) (q := q))
 
 end ComputationalPaths.Path
+

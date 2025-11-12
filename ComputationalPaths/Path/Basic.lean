@@ -130,8 +130,33 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
   cases p
   simp
 
+/-- Associativity of path composition. -/
+@[simp] theorem trans_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
+    trans (trans p q) r = trans p (trans q r) := by
+  cases p with
+  | mk steps1 proof1 =>
+      cases q with
+      | mk steps2 proof2 =>
+          cases r with
+          | mk steps3 proof3 =>
+              cases proof1
+              cases proof2
+              cases proof3
+              simp [trans, List.append_assoc]
+
 @[simp] theorem symm_refl (a : A) : symm (refl a) = refl a := by
   simp [symm, refl]
+
+/-- Taking symmetry twice yields the original path. -/
+@[simp] theorem symm_symm (p : Path a b) : symm (symm p) = p := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      have hcomp :
+          Step.symm ∘ Step.symm = fun s : Step A => s := by
+            funext s
+            simp [Function.comp]
+      simp [symm, List.reverse_reverse, List.map_map, hcomp]
 
 @[simp] theorem toEq_trans (p : Path a b) (q : Path b c) :
     toEq (trans p q) = (toEq p).trans (toEq q) := rfl
