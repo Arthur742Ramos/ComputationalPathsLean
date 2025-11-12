@@ -119,11 +119,11 @@ inductive Step {A : Type u} :
       Step q r → Step (Path.trans p q) (Path.trans p r)
 
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
-  Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
-  Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
-  Step.prod_rec_beta
-  Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta
-  Step.mapLeft_congr Step.mapRight_congr
+    Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
+    Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
+    Step.prod_rec_beta
+    Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta
+    Step.mapLeft_congr Step.mapRight_congr
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
 
 @[simp] theorem step_toEq {A : Type u} {a b : A}
