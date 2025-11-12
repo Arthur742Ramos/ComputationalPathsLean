@@ -96,6 +96,8 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
 @[simp] def ofEq (h : a = b) : Path a b :=
   ⟨[⟨a, b, h⟩], h⟩
 
+@[simp] theorem toEq_ofEq (h : a = b) : toEq (ofEq h) = h := rfl
+
 /-- Compose two paths, concatenating their step lists. -/
 @[simp] def trans (p : Path a b) (q : Path b c) : Path a c :=
   ⟨p.steps ++ q.steps, p.proof.trans q.proof⟩
@@ -407,7 +409,7 @@ end Sum
 section Function
 
 variable {A : Type u} {B : Type v}
-variable {f g : A → B}
+variable {f g h : A → B}
 
 /-- Package pointwise paths into a path between functions. -/
 @[simp] def lamCongr (p : ∀ x : A, Path (f x) (g x)) : Path f g :=
@@ -415,6 +417,37 @@ variable {f g : A → B}
 
 @[simp] def app (p : Path f g) (a : A) : Path (f a) (g a) :=
   Path.congrArg (fun h => h a) p
+
+@[simp] theorem lamCongr_refl (f : A → B) :
+    lamCongr (fun x => Path.refl (f x)) = Path.refl f := rfl
+
+@[simp] theorem lamCongr_trans
+    (p : ∀ x : A, Path (f x) (g x))
+    (q : ∀ x : A, Path (g x) (h x)) :
+    Path.trans (lamCongr (f := f) (g := g) p) (lamCongr (f := g) (g := h) q) =
+      lamCongr (f := f) (g := h) (fun x => Path.trans (p x) (q x)) := by
+  classical
+  simp [lamCongr, Path.trans]
+
+@[simp] theorem lamCongr_symm
+    (p : ∀ x : A, Path (f x) (g x)) :
+    Path.symm (lamCongr (f := f) (g := g) p) =
+      lamCongr (f := g) (g := f) (fun x => Path.symm (p x)) := by
+  classical
+  simp [lamCongr, Path.symm]
+
+@[simp] theorem app_refl (f : A → B) (a : A) :
+    app (Path.refl f) a = Path.refl (f a) := by
+  simp [app]
+
+@[simp] theorem app_trans (p : Path f g) (q : Path g h) (a : A) :
+    app (Path.trans p q) a =
+      Path.trans (app p a) (app q a) := by
+  simp [app]
+
+@[simp] theorem app_symm (p : Path f g) (a : A) :
+    app (Path.symm p) a = Path.symm (app p a) := by
+  simp [app]
 
 end Function
 
