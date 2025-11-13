@@ -109,6 +109,49 @@ def identity (A : Type u) : WeakGroupoid A where
 
 end WeakGroupoid
 
+/-- Strict category structure whose laws hold as definitional equalities. -/
+structure StrictCategory (A : Type u) where
+  /-- Composition of quotient paths. -/
+  comp :
+    {a b c : A} -> PathRwQuot A a b -> PathRwQuot A b c -> PathRwQuot A a c
+  /-- Identity element at a point. -/
+  id : {a : A} -> PathRwQuot A a a
+  /-- Associativity holds definitionally. -/
+  assoc :
+    {a b c d : A} ->
+      (p : PathRwQuot A a b) ->
+      (q : PathRwQuot A b c) ->
+      (r : PathRwQuot A c d) ->
+      comp (comp p q) r = comp p (comp q r)
+  /-- Left identity holds definitionally. -/
+  left_id :
+    {a b : A} -> (p : PathRwQuot A a b) -> comp (id) p = p
+  /-- Right identity holds definitionally. -/
+  right_id :
+    {a b : A} -> (p : PathRwQuot A a b) -> comp p (id) = p
+
+namespace StrictCategory
+
+variable {A : Type u}
+
+/-- The quotient of computational paths by rewrite equality forms a strict category. -/
+def quotient (A : Type u) : StrictCategory A where
+  comp := fun p q => PathRwQuot.trans (A := A) p q
+  id := fun {a} => PathRwQuot.refl (A := A) a
+  assoc := by
+    intro a b c d p q r
+    exact
+      PathRwQuot.trans_assoc (A := A) (a := a) (b := b)
+        (c := c) (d := d) p q r
+  left_id := by
+    intro a b p
+    exact PathRwQuot.trans_refl_left (A := A) (a := a) (b := b) p
+  right_id := by
+    intro a b p
+    exact PathRwQuot.trans_refl_right (A := A) (a := a) (b := b) p
+
+end StrictCategory
+
 /-- Strict groupoid structure whose laws hold as definitional equalities. -/
 structure StrictGroupoid (A : Type u) where
   /-- Composition of quotient paths. -/
@@ -142,22 +185,22 @@ namespace StrictGroupoid
 
 variable {A : Type u}
 
+/-- Forget the inverse operations and retain the strict category structure. -/
+def toStrictCategory (G : StrictGroupoid A) : StrictCategory A where
+  comp := G.comp
+  id := G.id
+  assoc := G.assoc
+  left_id := G.left_id
+  right_id := G.right_id
+
 /-- The quotient of computational paths by rewrite equality forms a strict groupoid. -/
 def quotient (A : Type u) : StrictGroupoid A where
-  comp := fun p q => PathRwQuot.trans (A := A) p q
+  comp := (StrictCategory.quotient A).comp
   inv := fun p => PathRwQuot.symm (A := A) p
-  id := fun {a} => PathRwQuot.refl (A := A) a
-  assoc := by
-    intro a b c d p q r
-    exact
-      PathRwQuot.trans_assoc (A := A) (a := a) (b := b)
-        (c := c) (d := d) p q r
-  left_id := by
-    intro a b p
-    exact PathRwQuot.trans_refl_left (A := A) (a := a) (b := b) p
-  right_id := by
-    intro a b p
-    exact PathRwQuot.trans_refl_right (A := A) (a := a) (b := b) p
+  id := (StrictCategory.quotient A).id
+  assoc := (StrictCategory.quotient A).assoc
+  left_id := (StrictCategory.quotient A).left_id
+  right_id := (StrictCategory.quotient A).right_id
   left_inv := by
     intro a b p
     exact PathRwQuot.symm_trans (A := A) (a := a) (b := b) p
