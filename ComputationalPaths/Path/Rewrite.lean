@@ -515,6 +515,24 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
   | Rw.refl _ => h1
   | Rw.tail h2 step => Rw.tail (rw_trans h1 h2) step
 
+@[simp] theorem rw_to_canonical_of_rw {p q : Path a b} (h : Rw p q) :
+    Rw q (Path.ofEq (A := A) (a := a) (b := b) p.toEq) := by
+  have hcanon := rw_canon (p := q)
+  have hforms : p.toEq = q.toEq := rw_toEq h
+  have hforms' :
+      Rw (Path.ofEq (A := A) (a := a) (b := b) q.toEq)
+        (Path.ofEq (A := A) (a := a) (b := b) p.toEq) :=
+    rw_of_eq <|
+      by
+        cases hforms
+        rfl
+  exact rw_trans hcanon hforms'
+
+theorem rw_confluent {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
+    ∃ s, Rw q s ∧ Rw r s :=
+  ⟨Path.ofEq (A := A) (a := a) (b := b) p.toEq,
+    rw_to_canonical_of_rw hq, rw_to_canonical_of_rw hr⟩
+
 /-- Symmetry for `map2` paths. -/
 @[simp] theorem rw_map2_symm
     {A₁ : Type u} {B : Type u}

@@ -96,6 +96,13 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
 
 @[simp] theorem toEq_ofEq (h : a = b) : toEq (ofEq h) = h := rfl
 
+/-- Paths built from two equality witnesses are definitionally equal. -/
+@[simp] theorem ofEq_eq_ofEq (h₁ h₂ : a = b) :
+    ofEq h₁ = ofEq h₂ := by
+  cases h₁
+  cases h₂
+  simp [ofEq]
+
 /-- Compose two paths, concatenating their step lists. -/
 @[simp] def trans (p : Path a b) (q : Path b c) : Path a c :=
   Path.mk (p.steps ++ q.steps) (p.proof.trans q.proof)
@@ -458,6 +465,33 @@ along the `B`-component. -/
     (x : D) (p : Path a₁ a₂) (q : Path b₁ b₂) :
     subst₂ (D := fun _ _ => D) x p q = x :=
   transport₂_const (D := D) p q x
+
+/-- Transport along a dependent sigma path by splitting it into the
+base path `p` and the fibre path `q`. -/
+@[simp] def transportSigma {A : Type u} {B : A → Type v}
+    {D : ∀ a, B a → Sort w}
+    {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+    (p : Path a₁ a₂)
+  (q : Path (transport (D := fun a => B a) p b₁) b₂)
+    (x : D a₁ b₁) : D a₂ b₂ := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases proof₁
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₂
+          exact x
+
+/-- Substitution along a dependent sigma path splits into base and fibre
+components. -/
+@[simp] def substSigma {A : Type u} {B : A → Type v}
+    {D : ∀ a, B a → Sort w}
+    {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+    (x : D a₁ b₁)
+    (p : Path a₁ a₂)
+    (q : Path (transport (D := fun a => B a) p b₁) b₂) :
+    D a₂ b₂ :=
+  transportSigma (A := A) (B := B) (D := D) p q x
 
 /-- Congruence of unary functions along paths. -/
 @[simp] def congrArg (f : A → B) (p : Path a b) :
