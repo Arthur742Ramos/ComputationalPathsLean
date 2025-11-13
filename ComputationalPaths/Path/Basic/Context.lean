@@ -135,6 +135,65 @@ variable {A : Type u} {B : Type v} {C : Type w}
           cases proof₂
           simp [mapRight, Path.trans, List.map_append]
 
+/-- Substitute through both holes of a binary context simultaneously. -/
+@[simp] def map2 (K : BiContext A B C)
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    Path (K.fill a₁ b₁) (K.fill a₂ b₂) :=
+  Path.trans (mapLeft K p b₁) (mapRight K a₂ q)
+
+@[simp] theorem map2_refl (K : BiContext A B C) (a : A) (b : B) :
+    map2 K (Path.refl a) (Path.refl b) =
+      Path.refl (K.fill a b) := by
+  simp [map2]
+
+@[simp] theorem map2_symm (K : BiContext A B C)
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    Path.symm (map2 K p q) =
+      Path.trans
+        (mapRight K a₂ (Path.symm q))
+        (mapLeft K (Path.symm p) b₁) := by
+  classical
+  have hRight :
+      Path.symm (mapRight K a₂ q) = mapRight K a₂ (Path.symm q) :=
+    (mapRight_symm (A := A) (B := B) (C := C) (K := K)
+      (a := a₂) (p := q)).symm
+  have hLeft :
+      Path.symm (mapLeft K p b₁) = mapLeft K (Path.symm p) b₁ :=
+    (mapLeft_symm (A := A) (B := B) (C := C) (K := K)
+      (p := p) (b := b₁)).symm
+  calc
+    Path.symm (map2 K p q)
+        = Path.trans (Path.symm (mapRight K a₂ q))
+            (Path.symm (mapLeft K p b₁)) := by
+                simp [map2]
+    _ = Path.trans (mapRight K a₂ (Path.symm q))
+            (Path.symm (mapLeft K p b₁)) := by
+                exact
+                  _root_.congrArg
+                    (fun x => Path.trans x (Path.symm (mapLeft K p b₁))) hRight
+    _ = Path.trans (mapRight K a₂ (Path.symm q))
+            (mapLeft K (Path.symm p) b₁) := by
+                exact
+                  _root_.congrArg
+                    (fun x => Path.trans (mapRight K a₂ (Path.symm q)) x) hLeft
+
+@[simp] theorem map2_trans (K : BiContext A B C)
+    {a₁ a₂ a₃ : A} {b₁ b₂ b₃ : B}
+    (p₁ : Path a₁ a₂) (p₂ : Path a₂ a₃)
+    (q₁ : Path b₁ b₂) (q₂ : Path b₂ b₃) :
+    map2 K (Path.trans p₁ p₂) (Path.trans q₁ q₂) =
+      Path.trans
+        (mapLeft K p₁ b₁)
+        (Path.trans
+          (mapLeft K p₂ b₁)
+          (Path.trans
+            (mapRight K a₃ q₁)
+            (mapRight K a₃ q₂))) := by
+  classical
+  simp [map2]
+
 end BiContext
 
 end Path
