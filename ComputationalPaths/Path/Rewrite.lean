@@ -102,6 +102,31 @@ instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
   cases g
   rfl
 
+@[simp] theorem apply_symm_apply (e : SimpleEquiv α β) (y : β) :
+    e (e.symm y) = y := by
+  change e.toFun (e.invFun y) = y
+  exact e.right_inv y
+
+@[simp] theorem symm_apply_apply (e : SimpleEquiv α β) (x : α) :
+    e.symm (e x) = x := by
+  change e.invFun (e.toFun x) = x
+  exact e.left_inv x
+
+@[ext] theorem ext {e₁ e₂ : SimpleEquiv α β}
+    (h₁ : ∀ x : α, e₁ x = e₂ x)
+    (h₂ : ∀ y : β, e₁.invFun y = e₂.invFun y) :
+    e₁ = e₂ := by
+  classical
+  cases e₁ with
+  | mk toFun₁ invFun₁ left_inv₁ right_inv₁ =>
+      cases e₂ with
+      | mk toFun₂ invFun₂ left_inv₂ right_inv₂ =>
+          have h_toFun : toFun₁ = toFun₂ := funext h₁
+          have h_invFun : invFun₁ = invFun₂ := funext h₂
+          subst h_toFun
+          subst h_invFun
+          simp
+
 end SimpleEquiv
 
 /-- A single rewrite step between computational paths. -/
