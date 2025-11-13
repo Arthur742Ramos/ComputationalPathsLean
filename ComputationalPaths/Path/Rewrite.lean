@@ -151,26 +151,26 @@ end SimpleEquiv
 
 /-- A single rewrite step between computational paths. -/
 inductive Step :
-    {A : Type u} → {a b : A} → Path a b → Path a b → Prop
-  | symm_refl {A : Type u} (a : A) :
+    {A : Type _} → {a b : A} → Path a b → Path a b → Prop
+  | symm_refl {A : Type _} (a : A) :
       Step (A := A) (symm (Path.refl a)) (Path.refl a)
-  | symm_symm {A : Type u} {a b : A} (p : Path a b) :
+  | symm_symm {A : Type _} {a b : A} (p : Path a b) :
       Step (A := A) (symm (symm p)) p
-  | trans_refl_left {A : Type u} {a b : A} (p : Path a b) :
+  | trans_refl_left {A : Type _} {a b : A} (p : Path a b) :
       Step (A := A) (trans (Path.refl a) p) p
-  | trans_refl_right {A : Type u} {a b : A} (p : Path a b) :
+  | trans_refl_right {A : Type _} {a b : A} (p : Path a b) :
       Step (A := A) (trans p (Path.refl b)) p
-  | trans_symm {A : Type u} {a b : A} (p : Path a b) :
+  | trans_symm {A : Type _} {a b : A} (p : Path a b) :
       Step (A := A) (trans p (symm p)) (Path.refl a)
-  | symm_trans {A : Type u} {a b : A} (p : Path a b) :
+  | symm_trans {A : Type _} {a b : A} (p : Path a b) :
       Step (A := A) (trans (symm p) p) (Path.refl b)
-  | symm_trans_congr {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+  | symm_trans_congr {A : Type _} {a b c : A} (p : Path a b) (q : Path b c) :
       Step (A := A) (symm (trans p q)) (trans (symm q) (symm p))
-  | trans_assoc {A : Type u} {a b c d : A}
+  | trans_assoc {A : Type _} {a b c d : A}
       (p : Path a b) (q : Path b c) (r : Path c d) :
       Step (A := A) (trans (trans p q) r) (trans p (trans q r))
   | map2_subst
-      {A : Type u} {A₁ : Type u} {B : Type u}
+      {A : Type _} {A₁ : Type u} {B : Type u}
       {a1 a2 : A₁} {b1 b2 : B}
       (f : A₁ → B → A)
       (p : Path (A := A₁) a1 a2)
@@ -181,7 +181,7 @@ inductive Step :
           (Path.mapRight (A := A₁) (B := B) (C := A) f a1 q)
           (Path.mapLeft (A := A₁) (B := B) (C := A) f p b2))
   | prod_fst_beta
-      {A : Type u} {B : Type u}
+      {A : Type _} {B : Type u}
       {a1 a2 : A} {b1 b2 : B}
       (p : Path a1 a2) (q : Path b1 b2) :
       Step (A := A)
@@ -189,7 +189,7 @@ inductive Step :
           (Path.map2 (A := A) (B := B) (C := Prod A B) Prod.mk p q))
         p
   | prod_snd_beta
-      {A : Type u} {B : Type u}
+      {A : Type _} {B : Type u}
       {a1 a2 : B} {b1 b2 : A}
       (p : Path a1 a2) (q : Path b1 b2) :
       Step (A := A)
@@ -197,7 +197,7 @@ inductive Step :
           (Path.map2 (A := B) (B := A) (C := Prod B A) Prod.mk p q))
         q
   | prod_rec_beta
-      {A : Type u} {α β : Type u}
+      {A : Type _} {α β : Type u}
       {a1 a2 : α} {b1 b2 : β}
       (f : α → β → A)
       (p : Path a1 a2) (q : Path b1 b2) :
@@ -206,7 +206,7 @@ inductive Step :
           (Path.map2 (A := α) (B := β) (C := Prod α β) Prod.mk p q))
         (Path.map2 (A := α) (B := β) (C := A) f p q)
   | sigma_fst_beta
-      {A : Type u} {B : A → Type u}
+      {A : Type _} {B : A → Type u}
       {a1 a2 : A} {b1 : B a1} {b2 : B a2}
       (p : Path a1 a2)
       (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
@@ -228,7 +228,7 @@ inductive Step :
                 (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q)) b1)
           (b := b2) q.toEq)
   | sum_rec_inl_beta
-      {A : Type u} {α β : Type u}
+      {A : Type _} {α β : Type u}
       {a1 a2 : α}
       (f : α → A) (g : β → A)
       (p : Path a1 a2) :
@@ -237,7 +237,7 @@ inductive Step :
           (Path.congrArg Sum.inl p))
         (Path.congrArg f p)
   | sum_rec_inr_beta
-      {A : Type u} {α β : Type u}
+      {A : Type _} {α β : Type u}
       {b1 b2 : β}
       (f : α → A) (g : β → A)
       (p : Path b1 b2) :
@@ -246,28 +246,33 @@ inductive Step :
           (Path.congrArg Sum.inr p))
         (Path.congrArg g p)
   | fun_app_beta
-      {A : Type u} {α : Type u}
+      {A : Type _} {α : Type u}
       {f g : α → A}
       (p : ∀ x : α, Path (f x) (g x)) (a : α) :
       Step (A := A)
         (Path.congrArg (fun h : α → A => h a)
           (Path.lamCongr (f := f) (g := g) p))
         (p a)
+  | fun_eta
+      {α β : Type u}
+      {f g : α → β} (p : Path f g) :
+      Step (A := α → β)
+        (Path.lamCongr (fun x => Path.app p x)) p
   | mapLeft_congr
-      {A : Type u} {B : Type u}
+      {A : Type _} {B : Type u}
       (f : A → B → A) {a₁ a₂ : A} (b : B)
       {p q : Path a₁ a₂} :
       Step (A := A) p q →
         Step (A := A) (Path.mapLeft (A := A) (B := B) (C := A) f p b)
           (Path.mapLeft (A := A) (B := B) (C := A) f q b)
   | mapRight_congr
-      {A : Type u} (f : A → A → A) (a : A) {b₁ b₂ : A}
+      {A : Type _} (f : A → A → A) (a : A) {b₁ b₂ : A}
       {p q : Path b₁ b₂} :
       Step (A := A) p q →
         Step (A := A) (Path.mapRight (A := A) (B := A) (C := A) f a p)
           (Path.mapRight (A := A) (B := A) (C := A) f a q)
   | mapLeft_ofEq
-      {A : Type u} {B : Type u}
+      {A : Type _} {B : Type u}
       (f : A → B → A) {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
       Step (A := A)
         (Path.mapLeft (A := A) (B := B) (C := A) f
@@ -275,20 +280,20 @@ inductive Step :
         (Path.ofEq (A := A) (a := f a₁ b) (b := f a₂ b)
           (_root_.congrArg (fun x => f x b) h))
   | mapRight_ofEq
-      {A : Type u} (f : A → A → A) (a : A) {b₁ b₂ : A} (h : b₁ = b₂) :
+      {A : Type _} (f : A → A → A) (a : A) {b₁ b₂ : A} (h : b₁ = b₂) :
       Step (A := A)
         (Path.mapRight (A := A) (B := A) (C := A) f a
           (Path.ofEq (A := A) (a := b₁) (b := b₂) h))
         (Path.ofEq (A := A) (a := f a b₁) (b := f a b₂)
           (_root_.congrArg (f a) h))
-  | canon {A : Type u} {a b : A} (p : Path a b) :
+  | canon {A : Type _} {a b : A} (p : Path a b) :
       Step (A := A) p (Path.ofEq p.toEq)
-  | symm_congr {A : Type u} {a b : A} {p q : Path a b} :
+  | symm_congr {A : Type _} {a b : A} {p q : Path a b} :
       Step (A := A) p q → Step (A := A) (Path.symm p) (Path.symm q)
-  | trans_congr_left {A : Type u} {a b c : A}
+  | trans_congr_left {A : Type _} {a b c : A}
       {p q : Path a b} (r : Path b c) :
       Step (A := A) p q → Step (A := A) (Path.trans p r) (Path.trans q r)
-  | trans_congr_right {A : Type u} {a b c : A}
+  | trans_congr_right {A : Type _} {a b c : A}
       (p : Path a b) {q r : Path b c} :
       Step (A := A) q r → Step (A := A) (Path.trans p q) (Path.trans p r)
 
@@ -296,7 +301,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
     Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
     Step.prod_rec_beta Step.sigma_fst_beta Step.sigma_snd_beta
-    Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta
+    Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta
     Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq Step.canon
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
 
@@ -321,6 +326,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | sum_rec_inl_beta _ _ _ => simp
   | sum_rec_inr_beta _ _ _ => simp
   | fun_app_beta _ _ => simp
+  | fun_eta _ => simp
   | mapLeft_congr _ _ _ ih =>
       cases ih
       simp
@@ -586,7 +592,15 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
       (Path.congrArg (fun h : α → A => h a)
         (Path.lamCongr (f := f) (g := g) p))
       (p a) :=
-  rw_of_step (Step.fun_app_beta (α := α) p a)
+  rw_of_step (Step.fun_app_beta (A := A) (α := α) p a)
+
+/-- Eta-style reduction rebuilding a function path from pointwise applications. -/
+@[simp] theorem rw_fun_eta {α β : Type u}
+    {f g : α → β} (p : Path f g) :
+    Rw
+      (Path.lamCongr (fun x => Path.app p x))
+      p :=
+  rw_of_step (Step.fun_eta (α := α) (β := β) (p := p))
 
 /-- Pointwise `Rw` hypotheses lift to a path between functions. -/
 @[simp] theorem rw_lamCongr_of_rw {A : Type u} {B : Type v}
@@ -1289,24 +1303,11 @@ end PathRwQuot
       (rweq_symm hcanon₂))
 
 /-- Eta-style reduction in `RwEq` rebuilding a function path from its pointwise applications. -/
-@[simp] theorem rweq_fun_eta {α : Type u} {β : Type v}
+@[simp] theorem rweq_fun_eta {α β : Type u}
     {f g : α → β} (p : Path f g) :
     RwEq (Path.lamCongr (fun x => Path.app p x)) p := by
   classical
-  have hcanon₁ := rweq_of_rw
-      (A := (α → β)) (a := f) (b := g)
-      (rw_canon (A := (α → β)) (p := Path.lamCongr (fun x => Path.app p x)))
-  have hcanon₂ := rweq_of_rw
-      (A := (α → β)) (a := f) (b := g)
-      (rw_canon (A := (α → β)) (p := p))
-  have hproof :
-      Path.ofEq (A := (α → β)) (a := f) (b := g)
-        (Path.lamCongr (fun x => Path.app p x)).toEq =
-        Path.ofEq (A := (α → β)) (a := f) (b := g) p.toEq := by
-    simp
-  exact rweq_trans hcanon₁
-    (rweq_trans (rweq_of_eq hproof)
-      (rweq_symm hcanon₂))
+  exact rweq_of_rw (rw_fun_eta (α := α) (β := β) (p := p))
 
 /-- Eta-style reduction in `RwEq` rebuilding a dependent pair path from its projections. -/
 @[simp] theorem rweq_sigma_eta {A : Type u} {B : A → Type u}
@@ -1421,7 +1422,7 @@ namespace PathRwQuot
   exact
     rweq_sigmaMk_refl (A := A) (B := B) (a := a) (b := b)
 
-@[simp] theorem fun_eta {α : Type u} {β : Type v}
+@[simp] theorem fun_eta {α β : Type u}
     {f g : α → β} (p : Path f g) :
     (Quot.mk _ (Path.lamCongr (fun x => Path.app p x)) :
         PathRwQuot (α → β) f g) = Quot.mk _ p := by
