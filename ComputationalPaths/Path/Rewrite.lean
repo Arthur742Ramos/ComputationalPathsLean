@@ -1042,6 +1042,17 @@ end PathRwQuot
     (hpq : RwEq p q) (hqr : Rw q r) : RwEq p r :=
   rweq_trans hpq (rweq_of_rw hqr)
 
+@[simp] theorem rweq_sigmaSnd_sigmaMk {A : Type u} {B : A → Type u}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    RwEq
+      (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
+      q :=
+  rweq_trans
+    (rweq_of_rw (rw_sigma_snd_beta (A := A) (B := B) (p := p) (q := q)))
+    (rweq_symm (rweq_of_rw (rw_canon (p := q))))
+
 @[simp] theorem rweq_symm_trans_congr {p : Path a b} {q : Path b c} :
     RwEq (symm (trans p q)) (trans (symm q) (symm p)) :=
   rweq_of_rw (rw_symm_trans_congr (p := p) (q := q))
