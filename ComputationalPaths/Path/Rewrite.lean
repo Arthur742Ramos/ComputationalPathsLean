@@ -936,6 +936,7 @@ end PathRwQuot
     {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
     RwEq (Path.prodMk (Path.fst p) (Path.snd p)) p := by
+  classical
   have hcanon₁ := rweq_of_rw
       (A := Prod α β) (a := (a₁, b₁)) (b := (a₂, b₂))
       (rw_canon (A := Prod α β) (p := Path.prodMk (Path.fst p) (Path.snd p)))
@@ -944,11 +945,10 @@ end PathRwQuot
       (rw_canon (A := Prod α β) (p := p))
   have hproof :
       Path.ofEq (A := Prod α β)
-          (a := (a₁, b₁)) (b := (a₂, b₂))
-          (toEq (A := Prod α β)
-            (Path.prodMk (Path.fst p) (Path.snd p))) =
+        (a := (a₁, b₁)) (b := (a₂, b₂))
+        (Path.prodMk (Path.fst p) (Path.snd p)).toEq =
         Path.ofEq (A := Prod α β) (a := (a₁, b₁)) (b := (a₂, b₂)) p.toEq := by
-    simp
+    simp [toEq_prodMk]
   exact rweq_trans hcanon₁
     (rweq_trans (rweq_of_eq hproof)
       (rweq_symm hcanon₂))
@@ -956,6 +956,7 @@ end PathRwQuot
 @[simp] theorem rweq_fun_eta {α : Type u} {β : Type v}
     {f g : α → β} (p : Path f g) :
     RwEq (Path.lamCongr (fun x => Path.app p x)) p := by
+  classical
   have hcanon₁ := rweq_of_rw
       (A := (α → β)) (a := f) (b := g)
       (rw_canon (A := (α → β)) (p := Path.lamCongr (fun x => Path.app p x)))
@@ -964,12 +965,11 @@ end PathRwQuot
       (rw_canon (A := (α → β)) (p := p))
   have hproof :
       Path.ofEq (A := (α → β)) (a := f) (b := g)
-          (toEq (A := (α → β)) (Path.lamCongr (fun x => Path.app p x))) =
+        (Path.lamCongr (fun x => Path.app p x)).toEq =
         Path.ofEq (A := (α → β)) (a := f) (b := g) p.toEq := by
-    simp
+    simp [toEq_lam_app]
   exact rweq_trans hcanon₁
     (rweq_trans (rweq_of_eq hproof)
       (rweq_symm hcanon₂))
 
 end ComputationalPaths.Path
-

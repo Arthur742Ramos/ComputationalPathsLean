@@ -456,6 +456,13 @@ variable {a₁ a₂ : A} {b₁ b₂ : B}
     prodMk (Path.refl a) (Path.refl b) = Path.refl (a, b) := by
   simp [prodMk]
 
+@[simp] theorem toEq_prodMk {A : Type u} {B : Type v}
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path (A := Prod A B) (a₁, b₁) (a₂, b₂)) :
+    (prodMk (fst p) (snd p)).toEq = p.toEq := by
+  cases p
+  simp [prodMk, fst, snd, map2, mapLeft, mapRight, Path.trans]
+
 end Prod
 
 section Sum
@@ -517,6 +524,12 @@ variable {f g h : A → B}
 @[simp] theorem app_symm (p : Path f g) (a : A) :
     app (Path.symm p) a = Path.symm (app p a) := by
   simp [app]
+
+@[simp] theorem toEq_lam_app {A : Type u} {B : Type v}
+    {f g : A → B} (p : Path f g) :
+    (lamCongr (fun x => app p x)).toEq = p.toEq := by
+  cases p
+  simp [lamCongr, app]
 
 end Function
 
