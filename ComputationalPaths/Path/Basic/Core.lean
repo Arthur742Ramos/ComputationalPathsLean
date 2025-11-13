@@ -104,6 +104,14 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
 @[simp] def symm (p : Path a b) : Path b a :=
   Path.mk (p.steps.reverse.map Step.symm) p.proof.symm
 
+/-- Paper notation `invA` for symmetry of computational paths. -/
+@[simp] def invA (p : Path a b) : Path b a :=
+  symm p
+
+/-- Paper notation `cmpA` for path composition. -/
+@[simp] def cmpA (p : Path a b) (q : Path b c) : Path a c :=
+  trans p q
+
 @[simp] theorem trans_steps (p : Path a b) (q : Path b c) :
     (trans p q).steps = p.steps ++ q.steps := rfl
 
@@ -179,6 +187,27 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
 @[simp] theorem toEq_symm_trans (p : Path a b) :
     toEq (trans (symm p) p) = rfl := by
   cases p
+  simp
+
+@[simp] theorem cmpA_refl_left (p : Path a b) :
+    cmpA (refl a) p = p :=
+  trans_refl_left p
+
+@[simp] theorem cmpA_refl_right (p : Path a b) :
+    cmpA p (refl b) = p :=
+  trans_refl_right p
+
+@[simp] theorem cmpA_assoc (p : Path a b) (q : Path b c)
+    (r : Path c d) :
+    cmpA (cmpA p q) r = cmpA p (cmpA q r) :=
+  trans_assoc p q r
+
+@[simp] theorem cmpA_inv_right_toEq (p : Path a b) :
+    toEq (cmpA p (invA p)) = rfl := by
+  simp
+
+@[simp] theorem cmpA_inv_left_toEq (p : Path a b) :
+    toEq (cmpA (invA p) p) = rfl := by
   simp
 
 /-- Transport along a path. -/

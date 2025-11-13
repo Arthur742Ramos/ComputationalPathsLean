@@ -551,6 +551,26 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
   rw_of_step (Step.trans_assoc (A := A) (a := a) (b := b)
     (c := c) (d := d) p q r)
 
+@[simp] theorem rw_cmpA_refl_left {A : Type u} {a b : A}
+    (p : Path a b) :
+    Rw (Path.trans (Path.refl a) p) p :=
+  rw_of_step (Step.trans_refl_left (A := A) (a := a) (b := b) p)
+
+@[simp] theorem rw_cmpA_refl_right {A : Type u} {a b : A}
+    (p : Path a b) :
+    Rw (Path.trans p (Path.refl b)) p :=
+  rw_of_step (Step.trans_refl_right (A := A) (a := a) (b := b) p)
+
+@[simp] theorem rw_cmpA_inv_right {A : Type u} {a b : A}
+    (p : Path a b) :
+    Rw (Path.trans p (Path.symm p)) (Path.refl a) :=
+  rw_of_step (Step.trans_symm (A := A) (a := a) (b := b) p)
+
+@[simp] theorem rw_cmpA_inv_left {A : Type u} {a b : A}
+    (p : Path a b) :
+    Rw (Path.trans (Path.symm p) p) (Path.refl b) :=
+  rw_of_step (Step.symm_trans (A := A) (a := a) (b := b) p)
+
 /-- Beta-style reduction for `Prod.fst` applied to a path produced from component paths. -/
 @[simp] theorem rw_prod_fst_beta {A : Type u} {B : Type u}
     {a1 a2 : A} {b1 b2 : B}
@@ -725,6 +745,26 @@ theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
       (Path.trans p (Path.trans q r)) :=
   rweq_of_step (Step.trans_assoc (A := A) (a := a) (b := b)
     (c := c) (d := d) p q r)
+
+@[simp] theorem rweq_cmpA_refl_left {A : Type u} {a b : A}
+    (p : Path a b) :
+    RwEq (Path.trans (Path.refl a) p) p :=
+  rweq_of_step (Step.trans_refl_left (A := A) (a := a) (b := b) p)
+
+@[simp] theorem rweq_cmpA_refl_right {A : Type u} {a b : A}
+    (p : Path a b) :
+    RwEq (Path.trans p (Path.refl b)) p :=
+  rweq_of_step (Step.trans_refl_right (A := A) (a := a) (b := b) p)
+
+@[simp] theorem rweq_cmpA_inv_right {A : Type u} {a b : A}
+    (p : Path a b) :
+    RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
+  rweq_of_step (Step.trans_symm (A := A) (a := a) (b := b) p)
+
+@[simp] theorem rweq_cmpA_inv_left {A : Type u} {a b : A}
+    (p : Path a b) :
+    RwEq (Path.trans (Path.symm p) p) (Path.refl b) :=
+  rweq_of_step (Step.symm_trans (A := A) (a := a) (b := b) p)
 
 section Setoid
 
