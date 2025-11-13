@@ -110,6 +110,24 @@ variable {A : Type u} {B : Type v} {C : Type w}
           cases proof₂
           simp [mapLeft, Path.trans, List.map_append]
 
+/-- Freeze the right hole of a binary context to obtain a unary context. -/
+@[simp] def fixRight (K : BiContext A B C) (b : B) : Context A C :=
+  ⟨fun a => K.fill a b⟩
+
+/-- Freeze the left hole of a binary context to obtain a unary context. -/
+@[simp] def fixLeft (K : BiContext A B C) (a : A) : Context B C :=
+  ⟨fun b => K.fill a b⟩
+
+@[simp] theorem map_fixRight (K : BiContext A B C) (b : B)
+    {a₁ a₂ : A} (p : Path a₁ a₂) :
+    Context.map (fixRight (A := A) (B := B) (C := C) K b) p =
+      mapLeft K p b := rfl
+
+@[simp] theorem map_fixLeft (K : BiContext A B C) (a : A)
+    {b₁ b₂ : B} (p : Path b₁ b₂) :
+    Context.map (fixLeft (A := A) (B := B) (C := C) K a) p =
+      mapRight K a p := rfl
+
 @[simp] theorem mapRight_refl (K : BiContext A B C) (a : A) (b : B) :
     mapRight K a (Path.refl b) = Path.refl (K.fill a b) := by
   simp [mapRight]
