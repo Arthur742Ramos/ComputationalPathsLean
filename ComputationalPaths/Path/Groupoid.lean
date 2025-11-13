@@ -401,6 +401,23 @@ def comp (F : EqFunctor A B) (G : EqFunctor B C) : EqFunctor A C where
     comp (ofFunction f) (ofFunction g) = ofFunction (fun a => g (f a)) := by
   simp [comp, ofFunction]
 
+@[simp] theorem ofFunction_comp_symm (e : SimpleEquiv A B) :
+    comp (ofFunction (A := A) (B := B) e)
+      (ofFunction (A := B) (B := A) e.symm) =
+        id A := by
+  -- coerce `SimpleEquiv` to its underlying functions on both sides
+  simpa [EqFunctor.id, ofFunction, SimpleEquiv.left_inv] using
+    (ofFunction_comp (A := A) (B := B) (C := A)
+      (f := fun a => e a) (g := fun b => e.symm b))
+
+@[simp] theorem ofFunction_symm_comp (e : SimpleEquiv A B) :
+    comp (ofFunction (A := B) (B := A) e.symm)
+      (ofFunction (A := A) (B := B) e) =
+        id B := by
+  simpa [EqFunctor.id, ofFunction, SimpleEquiv.right_inv] using
+    (ofFunction_comp (A := B) (B := A) (C := B)
+      (f := fun b => e.symm b) (g := fun a => e a))
+
 end EqFunctor
 
 end ComputationalPaths.Path
