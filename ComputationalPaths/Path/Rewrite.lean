@@ -127,6 +127,26 @@ instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
           subst h_invFun
           simp
 
+@[simp] theorem symm_comp (e : SimpleEquiv α β) :
+    comp (symm e) e = refl β := by
+  apply SimpleEquiv.ext
+  · intro y
+    simpa [SimpleEquiv.comp, SimpleEquiv.symm, SimpleEquiv.refl]
+      using e.right_inv y
+  · intro x
+    simpa [SimpleEquiv.comp, SimpleEquiv.symm, SimpleEquiv.refl]
+      using e.right_inv x
+
+@[simp] theorem comp_symm (e : SimpleEquiv α β) :
+    comp e (symm e) = refl α := by
+  apply SimpleEquiv.ext
+  · intro x
+    simpa [SimpleEquiv.comp, SimpleEquiv.symm, SimpleEquiv.refl]
+      using e.left_inv x
+  · intro y
+    simpa [SimpleEquiv.comp, SimpleEquiv.symm, SimpleEquiv.refl]
+      using e.left_inv y
+
 end SimpleEquiv
 
 /-- A single rewrite step between computational paths. -/
