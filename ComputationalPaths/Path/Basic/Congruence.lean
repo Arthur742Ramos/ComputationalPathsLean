@@ -178,6 +178,54 @@ variable {a1 a2 : A} {b1 b2 : B}
     prodMk (refl a) (refl b) = refl (a, b) := by
   simp [prodMk]
 
+@[simp] theorem transport_prodMk_fst
+    {D : A → Sort w}
+    {a1 a2 : A} {b1 b2 : B}
+    (p : Path a1 a2) (q : Path b1 b2) (x : D a1) :
+    transport (D := fun ab : Prod A B => D ab.fst) (prodMk p q) x =
+      transport (D := D) p x := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases proof₁
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₂
+          simp [transport]
+
+@[simp] theorem subst_prodMk_fst
+    {D : A → Sort w}
+    {a1 a2 : A} {b1 b2 : B}
+    (p : Path a1 a2) (q : Path b1 b2) (x : D a1) :
+    subst (D := fun ab : Prod A B => D ab.fst) x (prodMk p q) =
+      subst (D := D) x p := by
+  simpa [subst] using
+    transport_prodMk_fst (A := A) (B := B) (D := D)
+      (p := p) (q := q) (x := x)
+
+@[simp] theorem transport_prodMk_snd
+    {D : B → Sort w}
+    {a1 a2 : A} {b1 b2 : B}
+    (p : Path a1 a2) (q : Path b1 b2) (x : D b1) :
+    transport (D := fun ab : Prod A B => D ab.snd) (prodMk p q) x =
+      transport (D := D) q x := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases proof₁
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₂
+          simp [transport]
+
+@[simp] theorem subst_prodMk_snd
+    {D : B → Sort w}
+    {a1 a2 : A} {b1 b2 : B}
+    (p : Path a1 a2) (q : Path b1 b2) (x : D b1) :
+    subst (D := fun ab : Prod A B => D ab.snd) x (prodMk p q) =
+      subst (D := D) x q := by
+  simpa [subst] using
+    transport_prodMk_snd (A := A) (B := B) (D := D)
+      (p := p) (q := q) (x := x)
+
 @[simp] theorem toEq_prodMk
     {p : Path (Prod.mk a1 b1) (Prod.mk a2 b2)} :
     (prodMk (fst p) (snd p)).toEq = p.toEq := by
@@ -258,6 +306,34 @@ variable {b1 : B a1} {b2 : B a2}
           cases h2
           simp [sigmaSnd, sigmaMk, sigmaFst, Path.ofEq, transport]
 
+@[simp] theorem transport_sigmaMk_fst
+    {D : A → Sort w}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2)
+    (x : D a1) :
+    transport (D := fun z : Sigma B => D z.fst) (sigmaMk p q) x =
+      transport (D := D) p x := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases proof₁
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₂
+          simp [transport]
+
+@[simp] theorem subst_sigmaMk_fst
+    {D : A → Sort w}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2)
+    (x : D a1) :
+    subst (D := fun z : Sigma B => D z.fst) x (sigmaMk p q) =
+      subst (D := D) x p := by
+  simpa [subst] using
+    transport_sigmaMk_fst (A := A) (B := B) (D := D)
+      (p := p) (q := q) (x := x)
+
 end Sigma
 
 section Dependent
@@ -333,4 +409,3 @@ end Function
 end Path
 
 end ComputationalPaths
-

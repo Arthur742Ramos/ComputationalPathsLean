@@ -83,6 +83,37 @@ variable {β : Type u}
   cases h
   rfl
 
+private theorem trans_assoc_left_eq (p q r : GlobularCell β)
+    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
+    (trans p q h₁).tgt = r.src := by
+  cases p
+  cases q
+  cases r
+  cases h₁
+  cases h₂
+  simp [trans]
+
+private theorem trans_assoc_right_eq (p q r : GlobularCell β)
+    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
+    p.tgt = (trans q r h₂).src := by
+  cases p
+  cases q
+  cases r
+  cases h₁
+  cases h₂
+  simp [trans]
+
+@[simp] theorem trans_assoc (p q r : GlobularCell β)
+    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
+    trans (trans p q h₁) r (trans_assoc_left_eq p q r h₁ h₂) =
+      trans p (trans q r h₂) (trans_assoc_right_eq p q r h₁ h₂) := by
+  cases p
+  cases q
+  cases r
+  cases h₁
+  cases h₂
+  simp [trans]
+
 
 end GlobularCell
 
@@ -162,6 +193,30 @@ variable {A : Type u}
     (trans (A := A) p q h).tgt = q.tgt := by
   simpa [trans] using
     (GlobularCell.trans_tgt (β := GlobularLevel A n) p q h)
+
+private theorem globular_trans_assoc_left_eq {n : Nat}
+    (p q r : GlobularLevel A (n + 1))
+    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
+    (trans (A := A) p q h₁).tgt = r.src := by
+  simpa [trans] using
+    (GlobularCell.trans_assoc_left_eq (β := GlobularLevel A n) p q r h₁ h₂)
+
+private theorem globular_trans_assoc_right_eq {n : Nat}
+    (p q r : GlobularLevel A (n + 1))
+    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
+    p.tgt = (trans (A := A) q r h₂).src := by
+  simpa [trans] using
+    (GlobularCell.trans_assoc_right_eq (β := GlobularLevel A n) p q r h₁ h₂)
+
+@[simp] theorem trans_assoc {n : Nat}
+    (p q r : GlobularLevel A (n + 1))
+    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
+    trans (A := A) (trans (A := A) p q h₁) r
+        (globular_trans_assoc_left_eq p q r h₁ h₂) =
+      trans (A := A) p (trans (A := A) q r h₂)
+        (globular_trans_assoc_right_eq p q r h₁ h₂) := by
+  simpa [trans] using
+    (GlobularCell.trans_assoc (β := GlobularLevel A n) p q r h₁ h₂)
 
 /-- Underlying computational path of a higher cell. -/
 @[simp] def toPath {n : Nat} (c : GlobularLevel A (n + 1)) :
