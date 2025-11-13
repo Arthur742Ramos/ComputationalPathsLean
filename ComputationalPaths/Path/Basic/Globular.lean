@@ -65,6 +65,24 @@ variable {β : Type u}
   cases c
   simp [refl]
 
+@[simp] theorem symm_src (c : GlobularCell β) :
+    (symm c).src = c.tgt := rfl
+
+@[simp] theorem symm_tgt (c : GlobularCell β) :
+    (symm c).tgt = c.src := rfl
+
+@[simp] theorem trans_src (p q : GlobularCell β) (h : p.tgt = q.src) :
+    (trans p q h).src = p.src := by
+  cases q
+  cases h
+  rfl
+
+@[simp] theorem trans_tgt (p q : GlobularCell β) (h : p.tgt = q.src) :
+    (trans p q h).tgt = q.tgt := by
+  cases q
+  cases h
+  rfl
+
 
 end GlobularCell
 
@@ -122,6 +140,28 @@ variable {A : Type u}
     trans (A := A) c (refl c.tgt) rfl = c := by
   cases c
   simp [refl, trans]
+
+@[simp] theorem symm_src {n : Nat}
+    (c : GlobularLevel A (n + 1)) :
+    (symm (A := A) c).src = c.tgt := by
+  simp [symm]
+
+@[simp] theorem symm_tgt {n : Nat}
+    (c : GlobularLevel A (n + 1)) :
+    (symm (A := A) c).tgt = c.src := by
+  simp [symm]
+
+@[simp] theorem trans_src {n : Nat}
+    (p q : GlobularLevel A (n + 1)) (h : p.tgt = q.src) :
+    (trans (A := A) p q h).src = p.src := by
+  simpa [trans] using
+    (GlobularCell.trans_src (β := GlobularLevel A n) p q h)
+
+@[simp] theorem trans_tgt {n : Nat}
+    (p q : GlobularLevel A (n + 1)) (h : p.tgt = q.src) :
+    (trans (A := A) p q h).tgt = q.tgt := by
+  simpa [trans] using
+    (GlobularCell.trans_tgt (β := GlobularLevel A n) p q h)
 
 /-- Underlying computational path of a higher cell. -/
 @[simp] def toPath {n : Nat} (c : GlobularLevel A (n + 1)) :
