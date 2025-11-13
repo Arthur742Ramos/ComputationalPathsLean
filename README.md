@@ -5,6 +5,7 @@ Lean formalisation of *Propositional Equality, Identity Types, and Computational
 ## Current status
 - Core path operations (`ComputationalPaths/Path/Basic.lean`) are fully implemented via explicit rewrite-step lists, giving transport, symmetry, and congruence lemmas without placeholders.
 - The rewrite system (`ComputationalPaths/Path/Rewrite.lean`) now covers the reflexive/transitive/symmetric closures together with additional `mapLeft`/`mapRight` congruence reductions, bringing the development closer to the full LNDEQ suite.  The new `rwEqSetoid`/`PathRwQuot` constructions package rewrite equality as a `Setoid` and quotient, and provide `refl`/`symm`/`trans` operations directly on the quotient.
+- Dependent pairs are supported via `sigmaMk`/`sigmaFst`/`sigmaSnd`, and the rewrite system exposes the corresponding β/η behaviour (e.g. `sigma_fst_beta`, `rweq_sigma_eta`) so LNDEQ’s Σ-fragment reduces canonically.
 - A weak groupoid structure (`ComputationalPaths/Path/Groupoid.lean`) packages composition, inverses, and identities up to rewrite, serving as a foundation for later algebraic structure.
 
 ## Using the library from another project
@@ -38,7 +39,7 @@ The convenience constant `ComputationalPaths.libraryVersion` (currently `"0.1.0"
 
 ## Project structure
 - `ComputationalPaths/Path/Basic.lean` - inductive definition of computational paths, equivalence with Lean equality, symmetry/transitivity operations, transport, and congruence lemmas.
-- `ComputationalPaths/Path/Rewrite.lean` - basic rewrite steps (including the associativity rule) together with their reflexive/transitive closure `Rw` and the symmetric closure `RwEq`.
+- `ComputationalPaths/Path/Rewrite.lean` - basic rewrite steps (including the associativity rule) together with their reflexive/transitive closure `Rw` and the symmetric closure `RwEq`; includes β/η rules for products, sums, functions, and dependent pairs.
 - `ComputationalPaths/Path/Groupoid.lean` - weak groupoid structure coming from computational paths, using the rewrite relation.
 - `ComputationalPaths/Basic.lean` - convenience entry point re-exporting the core modules.
 - `ComputationalPaths/Path.lean` – umbrella import for path-specific modules.
