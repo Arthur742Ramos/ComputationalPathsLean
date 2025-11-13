@@ -1053,6 +1053,17 @@ end PathRwQuot
     (rweq_of_rw (rw_sigma_snd_beta (A := A) (B := B) (p := p) (q := q)))
     (rweq_symm (rweq_of_rw (rw_canon (p := q))))
 
+@[simp] theorem rweq_sigmaFst_sigmaMk {A : Type u} {B : A → Type u}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    RwEq
+      (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q))
+      p :=
+  rweq_trans
+    (rweq_of_rw (rw_sigma_fst_beta (A := A) (B := B) (p := p) (q := q)))
+    (rweq_symm (rweq_of_rw (rw_canon (p := p))))
+
 @[simp] theorem rweq_symm_trans_congr {p : Path a b} {q : Path b c} :
     RwEq (symm (trans p q)) (trans (symm q) (symm p)) :=
   rweq_of_rw (rw_symm_trans_congr (p := p) (q := q))
@@ -1125,6 +1136,28 @@ end PathRwQuot
     (rweq_trans (rweq_of_eq hproof)
       (rweq_symm hcanon₂))
 
+@[simp] theorem rweq_sigmaMk_refl {A : Type u} {B : A → Type u}
+    (a : A) (b : B a) :
+    RwEq
+      (Path.sigmaMk (B := B) (Path.refl a)
+        (Path.ofEq (A := B a) (a := b) (b := b) rfl))
+      (Path.refl (Sigma.mk a b)) := by
+  classical
+  have hfst :
+      Path.sigmaFst (B := B) (Path.refl (Sigma.mk a b)) =
+        Path.refl a := by
+    unfold Path.sigmaFst
+    simp [Path.congrArg, Path.refl]
+  have hsnd :
+      Path.sigmaSnd (B := B) (Path.refl (Sigma.mk a b)) =
+        Path.ofEq (A := B a) (a := b) (b := b) rfl := by
+    unfold Path.sigmaSnd
+    simp [transport, Path.refl]
+  have h :=
+    rweq_sigma_eta (A := A) (B := B)
+      (p := Path.refl (Sigma.mk a b))
+  simpa [hfst, hsnd] using h
+
 namespace PathRwQuot
 
 @[simp] theorem prod_eta {α : Type u} {β : Type v}
@@ -1164,20 +1197,9 @@ namespace PathRwQuot
           (Path.ofEq (A := B a) (a := b) (b := b) rfl)) :
         PathRwQuot (Sigma B) (Sigma.mk a b) (Sigma.mk a b)) =
       PathRwQuot.refl (A := Sigma B) (Sigma.mk a b) := by
-  have hfst :
-      Path.sigmaFst (B := B) (Path.refl (Sigma.mk a b)) = Path.refl a := by
-    simp [Path.sigmaFst]
-  have hsnd :
-      Path.sigmaSnd (B := B) (Path.refl (Sigma.mk a b)) =
-        Path.ofEq (A := B a) (a := b) (b := b) rfl := by
-    classical
-    unfold Path.sigmaSnd
-    simp [transport]
-  cases hfst
-  cases hsnd
+  apply Quot.sound
   exact
-    (sigma_eta (A := A) (B := B)
-      (p := Path.refl (Sigma.mk a b)))
+    rweq_sigmaMk_refl (A := A) (B := B) (a := a) (b := b)
 
 @[simp] theorem fun_eta {α : Type u} {β : Type v}
     {f g : α → β} (p : Path f g) :
