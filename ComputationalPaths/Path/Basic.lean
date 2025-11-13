@@ -461,7 +461,7 @@ variable {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path (A := Prod A B) (a₁, b₁) (a₂, b₂)) :
     (prodMk (fst p) (snd p)).toEq = p.toEq := by
   cases p
-  simp [prodMk, fst, snd, map2, mapLeft, mapRight, Path.trans]
+  simp
 
 end Prod
 
@@ -529,7 +529,7 @@ variable {f g h : A → B}
     {f g : A → B} (p : Path f g) :
     (lamCongr (fun x => app p x)).toEq = p.toEq := by
   cases p
-  simp [lamCongr, app]
+  simp
 
 end Function
 

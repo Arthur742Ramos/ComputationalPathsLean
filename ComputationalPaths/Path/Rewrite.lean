@@ -932,6 +932,7 @@ end PathRwQuot
     RwEq (symm (trans p q)) (trans (symm q) (symm p)) :=
   rweq_of_rw (rw_symm_trans_congr (p := p) (q := q))
 
+/-- Eta-style reduction in `RwEq` rebuilding a product path from its projections. -/
 @[simp] theorem rweq_prod_eta {α : Type u} {β : Type v}
     {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
@@ -948,11 +949,12 @@ end PathRwQuot
         (a := (a₁, b₁)) (b := (a₂, b₂))
         (Path.prodMk (Path.fst p) (Path.snd p)).toEq =
         Path.ofEq (A := Prod α β) (a := (a₁, b₁)) (b := (a₂, b₂)) p.toEq := by
-    simp [toEq_prodMk]
+    simp
   exact rweq_trans hcanon₁
     (rweq_trans (rweq_of_eq hproof)
       (rweq_symm hcanon₂))
 
+/-- Eta-style reduction in `RwEq` rebuilding a function path from its pointwise applications. -/
 @[simp] theorem rweq_fun_eta {α : Type u} {β : Type v}
     {f g : α → β} (p : Path f g) :
     RwEq (Path.lamCongr (fun x => Path.app p x)) p := by
@@ -967,7 +969,7 @@ end PathRwQuot
       Path.ofEq (A := (α → β)) (a := f) (b := g)
         (Path.lamCongr (fun x => Path.app p x)).toEq =
         Path.ofEq (A := (α → β)) (a := f) (b := g) p.toEq := by
-    simp [toEq_lam_app]
+    simp
   exact rweq_trans hcanon₁
     (rweq_trans (rweq_of_eq hproof)
       (rweq_symm hcanon₂))
