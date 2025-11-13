@@ -150,6 +150,22 @@ def quotient (A : Type u) : StrictCategory A where
     intro a b p
     exact PathRwQuot.trans_refl_right (A := A) (a := a) (b := b) p
 
+structure IsIso (C : StrictCategory A) {a b : A}
+    (f : PathRwQuot A a b) where
+  /-- Candidate inverse morphism. -/
+  inv : PathRwQuot A b a
+  /-- Left inverse law. -/
+  left_inv :
+    C.comp inv f = C.id (a := b)
+  /-- Right inverse law. -/
+  right_inv :
+    C.comp f inv = C.id (a := a)
+
+/-- A strict category is a groupoid when every morphism admits an inverse. -/
+def IsGroupoid (C : StrictCategory A) : Prop :=
+  ∀ {a b : A} (f : PathRwQuot A a b),
+    Nonempty (IsIso (A := A) C f)
+
 end StrictCategory
 
 /-- Strict groupoid structure whose laws hold as definitional equalities. -/
@@ -193,6 +209,19 @@ def toStrictCategory (G : StrictGroupoid A) : StrictCategory A where
   left_id := G.left_id
   right_id := G.right_id
 
+/-- Every morphism in a strict groupoid admits a strict inverse. -/
+def isIso (G : StrictGroupoid A) {a b : A} (p : PathRwQuot A a b) :
+    StrictCategory.IsIso (A := A) (toStrictCategory G) p where
+  inv := G.inv p
+  left_inv := G.left_inv (A := A) (a := a) (b := b) (p := p)
+  right_inv := G.right_inv (A := A) (a := a) (b := b) (p := p)
+
+/-- The underlying strict category of a strict groupoid is categorically a groupoid. -/
+theorem toStrictCategory_isGroupoid (G : StrictGroupoid A) :
+    StrictCategory.IsGroupoid (A := A) (toStrictCategory G) := by
+  intro a b p
+  exact ⟨isIso (A := A) (G := G) (a := a) (b := b) p⟩
+
 /-- The quotient of computational paths by rewrite equality forms a strict groupoid. -/
 def quotient (A : Type u) : StrictGroupoid A where
   comp := (StrictCategory.quotient A).comp
@@ -207,6 +236,11 @@ def quotient (A : Type u) : StrictGroupoid A where
   right_inv := by
     intro a b p
     exact PathRwQuot.trans_symm (A := A) (a := a) (b := b) p
+
+theorem quotient_isGroupoid (A : Type u) :
+    StrictCategory.IsGroupoid (A := A)
+      (toStrictCategory (A := A) (quotient A)) :=
+  toStrictCategory_isGroupoid (A := A) (G := quotient A)
 
 end StrictGroupoid
 
