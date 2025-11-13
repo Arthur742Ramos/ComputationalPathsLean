@@ -710,7 +710,7 @@ end Setoid
 
 namespace PathRwQuot
 
-variable {A : Type u}
+variable {A : Type u} {a b : A}
 
 open Quot
 
@@ -892,46 +892,25 @@ theorem ofEq_toEq {a b : A}
     ofEq (A := A) (toEq x) = x :=
   (canon_reduce (A := A) (x := x)).symm
 
-instance rwQuot_subsingleton (A : Type u) (a b : A) :
-    Subsingleton (PathRwQuot A a b) := by
-  classical
-  constructor
-  intro x y
-  have hxEq : toEq (A := A) x = toEq (A := A) y := Subsingleton.elim _ _
-  have hx : ofEq (A := A) (a := a) (b := b) (toEq (A := A) x) =
-      ofEq (A := A) (a := a) (b := b) (toEq (A := A) y) := by
-    cases hxEq
-    rfl
-  exact (canon_reduce (A := A) (x := x)).trans
-    (hx.trans (canon_reduce (A := A) (x := y)).symm)
-
-end PathRwQuot
-
 /-- `PathRwQuot` is definitionally equivalent to propositional equality. -/
-def pathRwQuotEquivEq (A : Type u) (a b : A) :
+def equivEq (A : Type u) (a b : A) :
     SimpleEquiv (PathRwQuot A a b) (a = b) where
-  toFun := PathRwQuot.toEq (A := A)
-  invFun := fun h => PathRwQuot.ofEq (A := A) (a := a) (b := b) h
+  toFun := toEq (A := A)
+  invFun := fun h => ofEq (A := A) (a := a) (b := b) h
   left_inv := by
     intro x
-    exact PathRwQuot.ofEq_toEq (A := A) (a := a) (b := b) x
+    exact ofEq_toEq (A := A) (a := a) (b := b) x
   right_inv := by
     intro h
-    exact PathRwQuot.toEq_ofEq (A := A) (a := a) (b := b) h
+    exact toEq_ofEq (A := A) (a := a) (b := b) h
 
-@[simp] theorem pathRwQuotEquivEq_apply
-    (x : PathRwQuot A a b) :
-    (pathRwQuotEquivEq (A := A) (a := a) (b := b)).toFun x =
-      PathRwQuot.toEq (A := A) x := rfl
+@[simp] theorem equivEq_apply (x : PathRwQuot A a b) :
+    (equivEq (A := A) (a := a) (b := b)).toFun x =
+      toEq (A := A) x := rfl
 
-@[simp] theorem pathRwQuotEquivEq_symm_apply
-    (h : a = b) :
-    (pathRwQuotEquivEq (A := A) (a := a) (b := b)).invFun h =
-      PathRwQuot.ofEq (A := A) (a := a) (b := b) h := rfl
-
-namespace PathRwQuot
-
-variable {A : Type u} {a b : A}
+@[simp] theorem equivEq_symm_apply (h : a = b) :
+    (equivEq (A := A) (a := a) (b := b)).invFun h =
+      ofEq (A := A) (a := a) (b := b) h := rfl
 
 /-- The map `PathRwQuot.toEq` is injective; two quotient paths coincide when
 their induced propositional equalities do. -/
@@ -940,7 +919,7 @@ their induced propositional equalities do. -/
     (h : toEq (A := A) x = toEq (A := A) y) :
     x = y := by
   classical
-  let e := pathRwQuotEquivEq (A := A) (a := a) (b := b)
+  let e := equivEq (A := A) (a := a) (b := b)
   have hx : e.invFun (e.toFun x) = x := e.left_inv x
   have hy : e.invFun (e.toFun y) = y := e.left_inv y
   have hxEq : e.toFun x = toEq (A := A) x := by
@@ -965,6 +944,16 @@ their induced propositional equalities do. -/
   constructor
   · intro h; cases h; rfl
   · exact eq_of_toEq_eq
+
+instance rwQuot_subsingleton (A : Type u) (a b : A) :
+    Subsingleton (PathRwQuot A a b) := by
+  classical
+  constructor
+  intro x y
+  have hxEq :
+      PathRwQuot.toEq (A := A) x = PathRwQuot.toEq (A := A) y :=
+    Subsingleton.elim _ _
+  exact PathRwQuot.eq_of_toEq_eq (A := A) (a := a) (b := b) hxEq
 
 end PathRwQuot
 
