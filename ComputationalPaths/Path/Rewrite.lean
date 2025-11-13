@@ -258,6 +258,12 @@ inductive Step :
       {f g : α → β} (p : Path f g) :
       Step (A := α → β)
         (Path.lamCongr (fun x => Path.app p x)) p
+  | apd_refl
+      {A : Type u} {B : A → Type u}
+      (f : ∀ x : A, B x) (a : A) :
+      Step (A := B a)
+        (Path.apd (A := A) (B := B) f (Path.refl a))
+        (Path.refl (f a))
   | mapLeft_congr
       {A : Type _} {B : Type u}
       (f : A → B → A) {a₁ a₂ : A} (b : B)
@@ -301,7 +307,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
     Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
     Step.prod_rec_beta Step.sigma_fst_beta Step.sigma_snd_beta
-    Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta
+    Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta Step.apd_refl
     Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq Step.canon
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
 
@@ -327,6 +333,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | sum_rec_inr_beta _ _ _ => simp
   | fun_app_beta _ _ => simp
   | fun_eta _ => simp
+  | apd_refl _ _ => simp
   | mapLeft_congr _ _ _ ih =>
       cases ih
       simp
@@ -565,7 +572,7 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
     Rw
       (Path.apd (A := A) (B := B) f (Path.refl a))
       (Path.refl (f a)) :=
-  rw_of_eq (apd_refl (f := f) (a := a))
+  rw_of_step (Step.apd_refl (A := A) (B := B) f a)
 
 /-- Beta-style reduction for `Sum.rec` applied to a left injection. -/
 @[simp] theorem rw_sum_rec_inl_beta {α β : Type u} {A : Type u}
@@ -1183,7 +1190,7 @@ end PathRwQuot
     RwEq
       (Path.apd (A := A) (B := B) f (Path.refl a))
       (Path.refl (f a)) :=
-  rweq_of_eq (apd_refl (f := f) (a := a))
+  RwEq.step (Step.apd_refl (A := A) (B := B) f a)
 
 /-- Beta-style reduction in `RwEq` for `Sum.rec` applied to a left injection. -/
 @[simp] theorem rweq_sum_rec_inl_beta {α β : Type u} {A : Type u}
