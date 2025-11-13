@@ -624,6 +624,49 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
   refine Quot.inductionOn y (fun q => ?_)
   simp
 
+@[simp] theorem ofEq_refl (a : A) :
+    ofEq (A := A) (a := a) (b := a) (rfl : a = a) =
+      refl (A := A) a := by
+  change Quot.mk _ (Path.ofEq (A := A) (a := a) (b := a) (rfl : a = a)) =
+    Quot.mk _ (Path.refl a)
+  apply Quot.sound
+  have h := rweq_canon (A := A) (p := Path.refl a)
+  exact rweq_symm h
+
+@[simp] theorem ofEq_symm {a b : A} (h : a = b) :
+    ofEq (A := A) (a := b) (b := a) h.symm =
+      symm (A := A) (ofEq (A := A) (a := a) (b := b) h) := by
+  change Quot.mk _
+      (Path.ofEq (A := A) (a := b) (b := a) h.symm) =
+    Quot.mk _
+      (Path.symm (Path.ofEq (A := A) (a := a) (b := b) h))
+  apply Quot.sound
+  have hcanon :=
+    rweq_canon (A := A)
+      (p :=
+        Path.symm (Path.ofEq (A := A) (a := a) (b := b) h))
+  exact rweq_symm hcanon
+
+@[simp] theorem ofEq_trans {a b c : A} (h : a = b) (k : b = c) :
+    ofEq (A := A) (a := a) (b := c) (h.trans k) =
+      trans (A := A)
+        (ofEq (A := A) (a := a) (b := b) h)
+        (ofEq (A := A) (a := b) (b := c) k) := by
+  change Quot.mk _
+      (Path.ofEq (A := A) (a := a) (b := c) (h.trans k)) =
+    Quot.mk _
+      (Path.trans
+        (Path.ofEq (A := A) (a := a) (b := b) h)
+        (Path.ofEq (A := A) (a := b) (b := c) k))
+  apply Quot.sound
+  have hcanon :=
+    rweq_canon (A := A)
+      (p :=
+        Path.trans
+          (Path.ofEq (A := A) (a := a) (b := b) h)
+          (Path.ofEq (A := A) (a := b) (b := c) k))
+  exact rweq_symm hcanon
+
 @[simp] theorem symm_mk {a b : A} (p : Path a b) :
     symm (A := A) (Quot.mk _ p) = Quot.mk _ (Path.symm p) := rfl
 

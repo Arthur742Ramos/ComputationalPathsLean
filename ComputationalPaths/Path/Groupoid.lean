@@ -12,7 +12,7 @@ import ComputationalPaths.Path.Rewrite
 
 namespace ComputationalPaths.Path
 
-universe u
+universe u v w x
 
 /-- Weak groupoid structure whose laws hold up to `Rw` steps. -/
 structure WeakGroupoid (A : Type u) where
@@ -144,7 +144,7 @@ structure EqFunctor (A : Type u) (B : Type v) where
 
 namespace EqFunctor
 
-variable {A : Type u} {B : Type v} {C : Type w}
+variable {A : Type u} {B : Type v} {C : Type w} {D : Type x}
 
 /-- Identity functor landing in equality. -/
 def id (A : Type u) : EqFunctor A A where
@@ -174,6 +174,81 @@ def ofFunction (f : A → B) : EqFunctor A B where
     intro a b p
     cases PathRwQuot.toEq (A := A) p
     simp
+
+/-- Compose equality-valued functors. The resulting functor first applies `F`
+to a path and then feeds the induced equality into `G`. -/
+def comp (F : EqFunctor A B) (G : EqFunctor B C) : EqFunctor A C where
+  obj := fun a => G.obj (F.obj a)
+  map := fun p =>
+    G.map (PathRwQuot.ofEq (A := B) (F.map p))
+  map_refl := by
+    intro a
+    have hF := F.map_refl (A := A) (a := a)
+    calc
+      G.map (PathRwQuot.ofEq (A := B)
+        (F.map (PathRwQuot.refl (A := A) a)))
+          = G.map (PathRwQuot.ofEq (A := B)
+              (rfl : F.obj a = F.obj a)) := by
+                rw [hF]
+      _ = G.map (PathRwQuot.refl (A := B) (F.obj a)) := by
+            simp
+      _ = rfl := G.map_refl (A := B) (a := F.obj a)
+  map_trans := by
+    intro a b c p q
+    have hF := F.map_trans (A := A) (p := p) (q := q)
+    calc
+      G.map (PathRwQuot.ofEq (A := B)
+        (F.map (PathRwQuot.trans (A := A) p q)))
+          = G.map (PathRwQuot.ofEq (A := B)
+              ((F.map p).trans (F.map q))) := by
+                rw [hF]
+      _ = G.map (PathRwQuot.trans
+              (PathRwQuot.ofEq (A := B) (F.map p))
+              (PathRwQuot.ofEq (A := B) (F.map q))) := by
+                simp
+      _ = (G.map (PathRwQuot.ofEq (A := B) (F.map p))).trans
+          (G.map (PathRwQuot.ofEq (A := B) (F.map q))) :=
+        G.map_trans (A := B)
+          (p := PathRwQuot.ofEq (A := B) (F.map p))
+          (q := PathRwQuot.ofEq (A := B) (F.map q))
+  map_symm := by
+    intro a b p
+    have hF := F.map_symm (A := A) (p := p)
+    calc
+      G.map (PathRwQuot.ofEq (A := B)
+        (F.map (PathRwQuot.symm (A := A) p)))
+          = G.map (PathRwQuot.ofEq (A := B)
+              ((F.map p).symm)) := by
+                rw [hF]
+      _ = G.map (PathRwQuot.symm
+              (PathRwQuot.ofEq (A := B) (F.map p))) := by
+                simp
+      _ = (G.map (PathRwQuot.ofEq (A := B) (F.map p))).symm :=
+        G.map_symm (A := B)
+          (p := PathRwQuot.ofEq (A := B) (F.map p))
+
+@[simp] theorem comp_id (F : EqFunctor A B) :
+    comp F (EqFunctor.id B) = F := by
+  cases F with
+  | mk obj map map_refl map_trans map_symm =>
+      simp [comp, EqFunctor.id]
+
+@[simp] theorem id_comp (F : EqFunctor A B) :
+    comp (EqFunctor.id A) F = F := by
+  cases F with
+  | mk obj map map_refl map_trans map_symm =>
+      simp [comp, EqFunctor.id]
+
+@[simp] theorem comp_assoc (F : EqFunctor A B)
+    (G : EqFunctor B C) (H : EqFunctor C D) :
+    comp (comp F G) H = comp F (comp G H) := by
+  cases F <;> cases G <;> cases H <;> simp [comp]
+
+@[simp] theorem ofFunction_comp
+    (f : A → B) (g : B → C) :
+    comp (ofFunction f) (ofFunction g) = ofFunction (fun a => g (f a)) := by
+  simp [comp, ofFunction]
+
 end EqFunctor
 
 end ComputationalPaths.Path
