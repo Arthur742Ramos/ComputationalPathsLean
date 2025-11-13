@@ -929,6 +929,45 @@ def pathRwQuotEquivEq (A : Type u) (a b : A) :
     (pathRwQuotEquivEq (A := A) (a := a) (b := b)).invFun h =
       PathRwQuot.ofEq (A := A) (a := a) (b := b) h := rfl
 
+namespace PathRwQuot
+
+variable {A : Type u} {a b : A}
+
+/-- The map `PathRwQuot.toEq` is injective; two quotient paths coincide when
+their induced propositional equalities do. -/
+@[simp] theorem eq_of_toEq_eq
+    {x y : PathRwQuot A a b}
+    (h : toEq (A := A) x = toEq (A := A) y) :
+    x = y := by
+  classical
+  let e := pathRwQuotEquivEq (A := A) (a := a) (b := b)
+  have hx : e.invFun (e.toFun x) = x := e.left_inv x
+  have hy : e.invFun (e.toFun y) = y := e.left_inv y
+  have hxEq : e.toFun x = toEq (A := A) x := by
+    change e x = toEq (A := A) x
+    simp
+  have hyEq : e.toFun y = toEq (A := A) y := by
+    change e y = toEq (A := A) y
+    simp
+  have h' : e.toFun x = e.toFun y := by
+    calc
+      e.toFun x = toEq (A := A) x := hxEq
+      _ = toEq (A := A) y := h
+      _ = e.toFun y := hyEq.symm
+  have hx' : e.invFun (e.toFun x) = e.invFun (e.toFun y) :=
+    _root_.congrArg e.invFun h'
+  exact hx.symm.trans <| hx'.trans hy
+
+/-- Equality of quotient paths iff their induced propositional equalities agree. -/
+@[simp] theorem eq_iff_toEq_eq
+    (x y : PathRwQuot A a b) :
+    x = y ↔ toEq (A := A) x = toEq (A := A) y := by
+  constructor
+  · intro h; cases h; rfl
+  · exact eq_of_toEq_eq
+
+end PathRwQuot
+
 @[simp] theorem rweq_congrArg_trans {B : Type v}
     {a b c : A} (f : A → B) (p : Path a b) (q : Path b c) :
     RwEq (Path.congrArg f (Path.trans p q))
