@@ -974,4 +974,24 @@ end PathRwQuot
     (rweq_trans (rweq_of_eq hproof)
       (rweq_symm hcanon₂))
 
+namespace PathRwQuot
+
+@[simp] theorem prod_eta {α : Type u} {β : Type v}
+    {a₁ a₂ : α} {b₁ b₂ : β}
+    (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
+    (Quot.mk _ (Path.prodMk (Path.fst p) (Path.snd p)) :
+        PathRwQuot (Prod α β) (a₁, b₁) (a₂, b₂))
+      = Quot.mk _ p := by
+  apply Quot.sound
+  exact rweq_prod_eta (α := α) (β := β) (p := p)
+
+@[simp] theorem fun_eta {α : Type u} {β : Type v}
+    {f g : α → β} (p : Path f g) :
+    (Quot.mk _ (Path.lamCongr (fun x => Path.app p x)) :
+        PathRwQuot (α → β) f g) = Quot.mk _ p := by
+  apply Quot.sound
+  exact rweq_fun_eta (α := α) (β := β) (p := p)
+
+end PathRwQuot
+
 end ComputationalPaths.Path
