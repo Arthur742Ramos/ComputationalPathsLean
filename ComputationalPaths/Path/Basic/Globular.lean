@@ -177,6 +177,16 @@ variable {A : Type u}
     toPath (A := A) (symm c) = Path.symm (toPath (A := A) c) := by
   simp [toPath, symm, GlobularCell.symm]
 
+@[simp] theorem toPath_trans {n : Nat}
+    (p q : GlobularLevel A (n + 1)) (h : p.tgt = q.src) :
+    toPath (A := A) (trans (A := A) p q h) =
+      (trans_tgt (A := A) (n := n) p q h).symm ▸
+        ((trans_src (A := A) (n := n) p q h).symm ▸
+          Path.trans (toPath (A := A) p) (h ▸ toPath (A := A) q)) := by
+  cases q
+  cases h
+  simp [toPath, trans, GlobularCell.trans]
+
 end GlobularLevel
 
 end Path
