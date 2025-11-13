@@ -226,6 +226,32 @@ variable {a1 a2 : A} {b1 b2 : B}
     transport_prodMk_snd (A := A) (B := B) (D := D)
       (p := p) (q := q) (x := x)
 
+@[simp] theorem transport_prodMk
+    {D : A → B → Sort w}
+    {a1 a2 : A} {b1 b2 : B}
+    (p : Path a1 a2) (q : Path b1 b2) (x : D a1 b1) :
+    transport (D := fun ab : Prod A B => D ab.fst ab.snd)
+        (prodMk p q) x =
+      transport₂ (D := D) p q x := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases proof₁
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₂
+          simp [transport, transport₂]
+
+@[simp] theorem subst_prodMk
+    {D : A → B → Sort w}
+    {a1 a2 : A} {b1 b2 : B}
+    (p : Path a1 a2) (q : Path b1 b2) (x : D a1 b1) :
+    subst (D := fun ab : Prod A B => D ab.fst ab.snd)
+        x (prodMk p q) =
+      subst₂ (D := D) x p q := by
+  simpa [subst, subst₂] using
+    transport_prodMk (A := A) (B := B) (D := D)
+      (p := p) (q := q) (x := x)
+
 @[simp] theorem toEq_prodMk
     {p : Path (Prod.mk a1 b1) (Prod.mk a2 b2)} :
     (prodMk (fst p) (snd p)).toEq = p.toEq := by
