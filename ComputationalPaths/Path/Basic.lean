@@ -482,6 +482,47 @@ variable {a₁ a₂ : A} {b₁ b₂ : B}
 
 end Sum
 
+section Sigma
+
+variable {A : Type u} {B : A → Type u}
+variable {a1 a2 : A}
+variable {b1 : B a1} {b2 : B a2}
+
+/-- Build a path between dependent pairs from a base path and a fibre path. -/
+@[simp] def sigmaMk (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    Path (Sigma.mk a1 b1) (Sigma.mk a2 b2) :=
+  Path.ofEq <|
+    by
+      classical
+      cases p with
+      | mk steps₁ h₁ =>
+          cases h₁
+          cases q with
+          | mk steps₂ h₂ =>
+              cases h₂
+              simp [transport]
+
+/-- Project a path on dependent pairs to the path on the first component. -/
+@[simp] def sigmaFst (p : Path (Sigma.mk a1 b1) (Sigma.mk a2 b2)) :
+    Path a1 a2 :=
+  Path.congrArg Sigma.fst p
+
+/-- Project a path on dependent pairs to a path in the fibre of the second component. -/
+@[simp] def sigmaSnd (p : Path (Sigma.mk a1 b1) (Sigma.mk a2 b2)) :
+    Path
+      (transport (A := A) (D := fun a => B a) (sigmaFst (B := B) p) b1)
+      b2 :=
+  Path.ofEq <|
+    by
+      classical
+      cases p with
+      | mk steps h =>
+          cases h
+          simp [transport]
+
+end Sigma
+
 section Function
 
 variable {A : Type u} {B : Type v}

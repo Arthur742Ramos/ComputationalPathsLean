@@ -70,6 +70,15 @@ inductive Step {A : Type u} :
         (Path.congrArg (Prod.rec f)
           (Path.map2 (A := α) (B := β) (C := Prod α β) Prod.mk p q))
         (Path.map2 (A := α) (B := β) (C := A) f p q)
+  | sigma_fst_beta
+      {B : A → Type u}
+      {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+      (p : Path a1 a2)
+      (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+      Step
+        (Path.congrArg Sigma.fst
+          (Path.sigmaMk (B := B) p q))
+        (Path.ofEq (A := A) p.toEq)
   | sum_rec_inl_beta
       {α β : Type u}
       {a1 a2 : α}
@@ -138,7 +147,7 @@ inductive Step {A : Type u} :
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
     Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
-    Step.prod_rec_beta
+    Step.prod_rec_beta Step.sigma_fst_beta
     Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta
     Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq Step.canon
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
@@ -159,6 +168,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | prod_fst_beta _ _ => simp
   | prod_snd_beta _ _ => simp
   | prod_rec_beta _ _ _ => simp
+  | sigma_fst_beta _ _ => simp
   | sum_rec_inl_beta _ _ _ => simp
   | sum_rec_inr_beta _ _ _ => simp
   | fun_app_beta _ _ => simp
@@ -371,6 +381,16 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
         (Path.map2 (A := α) (B := β) (C := Prod α β) Prod.mk p q))
       (Path.map2 (A := α) (B := β) (C := A) f p q) :=
   rw_of_step (Step.prod_rec_beta (α := α) (β := β) (f := f) p q)
+
+@[simp] theorem rw_sigma_fst_beta {A : Type u} {B : A → Type u}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    Rw
+      (Path.congrArg Sigma.fst
+        (Path.sigmaMk (B := B) p q))
+      (Path.ofEq (A := A) p.toEq) :=
+  rw_of_step (Step.sigma_fst_beta (A := A) (B := B) p q)
 
 /-- Beta-style reduction for `Sum.rec` applied to a left injection. -/
 @[simp] theorem rw_sum_rec_inl_beta {α β : Type u} {A : Type u}
@@ -901,6 +921,16 @@ end PathRwQuot
         (Path.map2 (A := α) (B := β) (C := Prod α β) Prod.mk p q))
       (Path.map2 (A := α) (B := β) (C := A) f p q) :=
   rweq_of_step (Step.prod_rec_beta (α := α) (β := β) (f := f) p q)
+
+@[simp] theorem rweq_sigma_fst_beta {A : Type u} {B : A → Type u}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    RwEq
+      (Path.congrArg Sigma.fst
+        (Path.sigmaMk (B := B) p q))
+      (Path.ofEq (A := A) p.toEq) :=
+  rweq_of_step (Step.sigma_fst_beta (A := A) (B := B) p q)
 
 /-- Beta-style reduction in `RwEq` for `Sum.rec` applied to a left injection. -/
 @[simp] theorem rweq_sum_rec_inl_beta {α β : Type u} {A : Type u}
