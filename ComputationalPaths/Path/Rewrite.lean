@@ -1324,6 +1324,28 @@ end PathRwQuot
 
 namespace PathRwQuot
 
+@[simp] theorem sum_rec_inl_beta {α β : Type u} {A : Type u}
+    {a1 a2 : α} (f : α → A) (g : β → A) (p : Path a1 a2) :
+    (Quot.mk _
+        (Path.congrArg (Sum.rec f g)
+          (Path.congrArg Sum.inl p)) :
+        PathRwQuot A (f a1) (f a2)) =
+      Quot.mk _ (Path.congrArg f p) := by
+  apply Quot.sound
+  exact rweq_sum_rec_inl_beta (α := α) (β := β) (A := A)
+    (f := f) (g := g) (p := p)
+
+@[simp] theorem sum_rec_inr_beta {α β : Type u} {A : Type u}
+    {b1 b2 : β} (f : α → A) (g : β → A) (p : Path b1 b2) :
+    (Quot.mk _
+        (Path.congrArg (Sum.rec f g)
+          (Path.congrArg Sum.inr p)) :
+        PathRwQuot A (g b1) (g b2)) =
+      Quot.mk _ (Path.congrArg g p) := by
+  apply Quot.sound
+  exact rweq_sum_rec_inr_beta (α := α) (β := β) (A := A)
+    (f := f) (g := g) (p := p)
+
 @[simp] theorem prod_eta {α : Type u} {β : Type v}
     {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
