@@ -523,6 +523,28 @@ variable {b1 : B a1} {b2 : B a2}
 
 end Sigma
 
+section Dependent
+
+variable {A : Type u} {B : A → Type u}
+variable (f : ∀ x : A, B x)
+variable {a b c : A}
+
+/-- Apply a dependent function to a path, yielding the transported result. -/
+@[simp] def apd (p : Path a b) :
+    Path (transport (A := A) (D := fun x => B x) p (f a)) (f b) :=
+  by
+    cases p with
+    | mk steps h =>
+        cases h
+        exact Path.refl (f a)
+
+@[simp] theorem apd_refl (a : A) :
+    apd (f := f) (Path.refl a) = Path.refl (f a) := by
+  unfold apd
+  simp [transport]
+
+end Dependent
+
 section Function
 
 variable {A : Type u} {B : Type v}

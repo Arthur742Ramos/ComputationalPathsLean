@@ -392,6 +392,13 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
       (Path.ofEq (A := A) p.toEq) :=
   rw_of_step (Step.sigma_fst_beta (A := A) (B := B) p q)
 
+@[simp] theorem rw_apd_refl {A : Type u} {B : A → Type u}
+    (f : ∀ x : A, B x) (a : A) :
+    Rw
+      (Path.apd (A := A) (B := B) f (Path.refl a))
+      (Path.refl (f a)) :=
+  rw_of_eq (apd_refl (f := f) (a := a))
+
 /-- Beta-style reduction for `Sum.rec` applied to a left injection. -/
 @[simp] theorem rw_sum_rec_inl_beta {α β : Type u} {A : Type u}
     {a1 a2 : α} (f : α → A) (g : β → A) (p : Path a1 a2) :
@@ -931,6 +938,13 @@ end PathRwQuot
         (Path.sigmaMk (B := B) p q))
       (Path.ofEq (A := A) p.toEq) :=
   rweq_of_step (Step.sigma_fst_beta (A := A) (B := B) p q)
+
+@[simp] theorem rweq_apd_refl {A : Type u} {B : A → Type u}
+    (f : ∀ x : A, B x) (a : A) :
+    RwEq
+      (Path.apd (A := A) (B := B) f (Path.refl a))
+      (Path.refl (f a)) :=
+  rweq_of_eq (apd_refl (f := f) (a := a))
 
 /-- Beta-style reduction in `RwEq` for `Sum.rec` applied to a left injection. -/
 @[simp] theorem rweq_sum_rec_inl_beta {α β : Type u} {A : Type u}
