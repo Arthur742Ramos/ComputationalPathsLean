@@ -1047,6 +1047,32 @@ end PathRwQuot
     (rweq_trans (rweq_of_eq hproof)
       (rweq_symm hcanon₂))
 
+/-- Eta-style reduction in `RwEq` rebuilding a dependent pair path from its projections. -/
+@[simp] theorem rweq_sigma_eta {A : Type u} {B : A → Type u}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path (A := Sigma B) ⟨a1, b1⟩ ⟨a2, b2⟩) :
+    RwEq (Path.sigmaMk (Path.sigmaFst p) (Path.sigmaSnd p)) p := by
+  classical
+  have hcanon₁ :=
+    rweq_of_rw
+      (rw_canon (A := Sigma B)
+        (p := Path.sigmaMk (Path.sigmaFst p) (Path.sigmaSnd p)))
+  have hcanon₂ := rweq_of_rw
+      (rw_canon (A := Sigma B) (p := p))
+  have hproof :
+      Path.ofEq (A := Sigma B)
+        (a := ⟨a1, b1⟩) (b := ⟨a2, b2⟩)
+        (Path.sigmaMk (Path.sigmaFst p) (Path.sigmaSnd p)).toEq =
+        Path.ofEq (A := Sigma B)
+          (a := ⟨a1, b1⟩) (b := ⟨a2, b2⟩) p.toEq := by
+    cases p with
+    | mk steps proof =>
+        cases proof
+        simp
+  exact rweq_trans hcanon₁
+    (rweq_trans (rweq_of_eq hproof)
+      (rweq_symm hcanon₂))
+
 namespace PathRwQuot
 
 @[simp] theorem prod_eta {α : Type u} {β : Type v}
@@ -1057,6 +1083,15 @@ namespace PathRwQuot
       = Quot.mk _ p := by
   apply Quot.sound
   exact rweq_prod_eta (α := α) (β := β) (p := p)
+
+@[simp] theorem sigma_eta {A : Type u} {B : A → Type u}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path (A := Sigma B) ⟨a1, b1⟩ ⟨a2, b2⟩) :
+    (Quot.mk _ (Path.sigmaMk (Path.sigmaFst p) (Path.sigmaSnd p)) :
+        PathRwQuot (Sigma B) ⟨a1, b1⟩ ⟨a2, b2⟩) =
+      Quot.mk _ p := by
+  apply Quot.sound
+  exact rweq_sigma_eta (A := A) (B := B) (p := p)
 
 @[simp] theorem fun_eta {α : Type u} {β : Type v}
     {f g : α → β} (p : Path f g) :
