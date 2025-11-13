@@ -13,7 +13,7 @@ namespace ComputationalPaths.Path
 
 open scoped Quot
 
-universe u v w
+universe u v w x
 
 /-- Lightweight equivalence structure used to package mutually inverse maps
 without pulling in additional dependencies. -/
@@ -26,6 +26,83 @@ structure SimpleEquiv (α : Sort u) (β : Sort v) where
   left_inv : ∀ x : α, invFun (toFun x) = x
   /-- Forward map applied after the inverse is the identity. -/
   right_inv : ∀ y : β, toFun (invFun y) = y
+
+namespace SimpleEquiv
+
+variable {α : Sort u} {β : Sort v} {γ : Sort w} {δ : Sort x}
+
+instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
+  ⟨SimpleEquiv.toFun⟩
+
+@[simp] theorem coe_apply (e : SimpleEquiv α β) (x : α) :
+    e x = e.toFun x := rfl
+
+/-- Equivalence in the opposite direction. -/
+@[simp] def symm (e : SimpleEquiv α β) : SimpleEquiv β α where
+  toFun := e.invFun
+  invFun := e.toFun
+  left_inv := e.right_inv
+  right_inv := e.left_inv
+
+@[simp] theorem symm_apply (e : SimpleEquiv α β) (y : β) :
+    e.symm y = e.invFun y := rfl
+
+@[simp] theorem symm_inv_apply (e : SimpleEquiv α β) (x : α) :
+    e.symm.invFun x = e x := rfl
+
+/-- Identity equivalence. -/
+@[simp] def refl (α : Sort u) : SimpleEquiv α α where
+  toFun := id
+  invFun := id
+  left_inv := by intro x; rfl
+  right_inv := by intro x; rfl
+
+/-- Composition of equivalences. -/
+@[simp] def comp (e : SimpleEquiv α β) (f : SimpleEquiv β γ) :
+    SimpleEquiv α γ where
+  toFun := fun x => f.toFun (e.toFun x)
+  invFun := fun z => e.invFun (f.invFun z)
+  left_inv := by
+    intro x
+    have hf := f.left_inv (e.toFun x)
+    have he := e.left_inv x
+    simpa [hf]
+  right_inv := by
+    intro z
+    have he := e.right_inv (f.invFun z)
+    have hf := f.right_inv z
+    simpa [he]
+
+@[simp] theorem symm_symm (e : SimpleEquiv α β) :
+    e.symm.symm = e := rfl
+
+@[simp] theorem comp_apply (e : SimpleEquiv α β)
+    (f : SimpleEquiv β γ) (x : α) :
+    comp e f x = f (e x) := rfl
+
+@[simp] theorem comp_inv_apply (e : SimpleEquiv α β)
+    (f : SimpleEquiv β γ) (z : γ) :
+    (comp e f).invFun z = e.invFun (f.invFun z) := rfl
+
+@[simp] theorem comp_refl (e : SimpleEquiv α β) :
+    comp e (refl β) = e := by
+  cases e
+  rfl
+
+@[simp] theorem refl_comp (e : SimpleEquiv α β) :
+    comp (refl α) e = e := by
+  cases e
+  rfl
+
+@[simp] theorem comp_assoc (e : SimpleEquiv α β)
+    (f : SimpleEquiv β γ) (g : SimpleEquiv γ δ) :
+    comp (comp e f) g = comp e (comp f g) := by
+  cases e
+  cases f
+  cases g
+  rfl
+
+end SimpleEquiv
 
 /-- A single rewrite step between computational paths. -/
 inductive Step {A : Type u} :
