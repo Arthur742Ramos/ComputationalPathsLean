@@ -275,6 +275,58 @@ variable {a1 a2 : A} {b1 b2 : B}
     Path (Sum.inr b1 : Sum A B) (Sum.inr b2) :=
   congrArg Sum.inr p
 
+@[simp] theorem transport_inlCongr
+    {DL : A → Sort w} {DR : B → Sort w}
+    {a1 a2 : A} (p : Path a1 a2) (x : DL a1) :
+    transport (D := fun s : Sum A B => Sum.elim DL DR s)
+        (inlCongr (A := A) (B := B) p) x =
+      transport (D := DL) p x := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      rfl
+
+@[simp] theorem subst_inlCongr
+    {DL : A → Sort w} {DR : B → Sort w}
+    {a1 a2 : A} (p : Path a1 a2)
+    (x : (fun s : Sum A B => Sum.elim DL DR s) (Sum.inl a1)) :
+    subst (D := fun s : Sum A B => Sum.elim DL DR s)
+        x (inlCongr (A := A) (B := B) p) =
+      subst (D := DL) (by simpa using x) p := by
+  change
+    transport (D := fun s : Sum A B => Sum.elim DL DR s)
+        (inlCongr (A := A) (B := B) p) x =
+      transport (D := DL) p (by simpa using x)
+  simpa [subst] using
+    transport_inlCongr (A := A) (B := B)
+      (DL := DL) (DR := DR) (p := p) (x := by simpa using x)
+
+@[simp] theorem transport_inrCongr
+    {DL : A → Sort w} {DR : B → Sort w}
+    {b1 b2 : B} (p : Path b1 b2) (x : DR b1) :
+    transport (D := fun s : Sum A B => Sum.elim DL DR s)
+        (inrCongr (A := A) (B := B) p) x =
+      transport (D := DR) p x := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      rfl
+
+@[simp] theorem subst_inrCongr
+    {DL : A → Sort w} {DR : B → Sort w}
+    {b1 b2 : B} (p : Path b1 b2)
+    (x : (fun s : Sum A B => Sum.elim DL DR s) (Sum.inr b1)) :
+    subst (D := fun s : Sum A B => Sum.elim DL DR s)
+        x (inrCongr (A := A) (B := B) p) =
+      subst (D := DR) (by simpa using x) p := by
+  change
+    transport (D := fun s : Sum A B => Sum.elim DL DR s)
+        (inrCongr (A := A) (B := B) p) x =
+      transport (D := DR) p (by simpa using x)
+  simpa [subst] using
+    transport_inrCongr (A := A) (B := B)
+      (DL := DL) (DR := DR) (p := p) (x := by simpa using x)
+
 end Sum
 
 section Sigma
