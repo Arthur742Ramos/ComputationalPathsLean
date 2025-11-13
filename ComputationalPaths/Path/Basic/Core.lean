@@ -286,6 +286,179 @@ def subst {D : A → Sort v} (x : D a) (p : Path a b) : D b :=
     (y : D b) (h : a = b) :
     subst (D := D) y (symm (ofEq h)) = Eq.recOn h.symm y := rfl
 
+/-- Transport across two independent path arguments.  The value is first
+carried along the `A`-component, and the resulting element is transported
+along the `B`-component. -/
+@[simp] def transport₂ {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) (x : D a₁ b₁) : D a₂ b₂ :=
+  transport (D := fun b => D a₂ b) q
+    (transport (D := fun a => D a b₁) p x)
+
+@[simp] theorem transport₂_refl_left {A : Type u} {B : Type v}
+    {D : A → B → Sort w} {a : A} {b₁ b₂ : B}
+    (q : Path b₁ b₂) (x : D a b₁) :
+    transport₂ (D := D) (refl a) q x =
+      transport (D := fun b => D a b) q x := by
+  cases q with
+  | mk steps proof =>
+      cases proof
+      simp [transport₂, transport]
+
+@[simp] theorem transport₂_refl_right {A : Type u} {B : Type v}
+    {D : A → B → Sort w} {a₁ a₂ : A} {b : B}
+    (p : Path a₁ a₂) (x : D a₁ b) :
+    transport₂ (D := D) p (refl b) x =
+      transport (D := fun a => D a b) p x := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      simp [transport₂, transport]
+
+@[simp] theorem transport₂_refl {A : Type u} {B : Type v}
+    {D : A → B → Sort w} {a : A} {b : B} (x : D a b) :
+    transport₂ (D := D) (refl a) (refl b) x = x := by
+  simp [transport₂, transport]
+
+@[simp] theorem transport₂_trans_left {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ a₃ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path a₂ a₃)
+    (r : Path b₁ b₂) (x : D a₁ b₁) :
+    transport₂ (D := D) (trans p q) r x =
+      transport₂ (D := D) q r (transport₂ (D := D) p (refl b₁) x) := by
+  cases p with
+  | mk steps₁ proof₁ =>
+    cases proof₁
+    cases q with
+    | mk steps₂ proof₂ =>
+      cases proof₂
+      cases r with
+      | mk steps₃ proof₃ =>
+        simp [transport₂, transport]
+
+@[simp] theorem transport₂_trans_right {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ : A} {b₁ b₂ b₃ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) (r : Path b₂ b₃)
+    (x : D a₁ b₁) :
+    transport₂ (D := D) p (trans q r) x =
+      transport₂ (D := D) p r (transport₂ (D := D) (refl a₁) q x) := by
+  cases p with
+  | mk steps₁ proof₁ =>
+    cases proof₁
+    cases q with
+    | mk steps₂ proof₂ =>
+      cases proof₂
+      cases r with
+      | mk steps₃ proof₃ =>
+        simp [transport₂, transport]
+
+@[simp] theorem transport₂_symm_left {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂)
+    (x : D a₁ b₁) :
+    transport₂ (D := D) (symm p) q (transport₂ (D := D) p (refl b₁) x) =
+      transport (D := fun b => D a₁ b) q x := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases proof₁
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₂
+          simp [transport₂, transport]
+
+@[simp] theorem transport₂_symm_right {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂)
+    (x : D a₁ b₁) :
+    transport₂ (D := D) p (symm q) (transport₂ (D := D) (refl a₁) q x) =
+      transport (D := fun a => D a b₁) p x := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases proof₁
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₂
+          simp [transport₂, transport]
+
+@[simp] theorem transport₂_const {A : Type u} {B : Type v}
+    {D : Type w}
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) (x : D) :
+    transport₂ (D := fun _ _ => D) p q x = x := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases proof₁
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₂
+          simp [transport₂, transport]
+
+/-- Substitution across two arguments, mirroring the binary transport. -/
+@[simp] def subst₂ {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (x : D a₁ b₁) (p : Path a₁ a₂) (q : Path b₁ b₂) : D a₂ b₂ :=
+  transport₂ (D := D) p q x
+
+@[simp] theorem subst₂_refl_left {A : Type u} {B : Type v}
+    {D : A → B → Sort w} {a : A} {b₁ b₂ : B}
+    (q : Path b₁ b₂) (x : D a b₁) :
+    subst₂ (D := D) x (refl a) q =
+      subst (D := fun b => D a b) x q :=
+  transport₂_refl_left (D := D) q x
+
+@[simp] theorem subst₂_refl_right {A : Type u} {B : Type v}
+    {D : A → B → Sort w} {a₁ a₂ : A} {b : B}
+    (p : Path a₁ a₂) (x : D a₁ b) :
+    subst₂ (D := D) x p (refl b) =
+      subst (D := fun a => D a b) x p :=
+  transport₂_refl_right (D := D) p x
+
+@[simp] theorem subst₂_trans_left {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ a₃ : A} {b₁ b₂ : B}
+    (x : D a₁ b₁) (p : Path a₁ a₂)
+    (q : Path a₂ a₃) (r : Path b₁ b₂) :
+    subst₂ (D := D) x (trans p q) r =
+      subst₂ (D := D) (subst₂ (D := D) x p (refl b₁)) q r :=
+  transport₂_trans_left (D := D) p q r x
+
+@[simp] theorem subst₂_trans_right {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ : A} {b₁ b₂ b₃ : B}
+    (x : D a₁ b₁) (p : Path a₁ a₂)
+    (q : Path b₁ b₂) (r : Path b₂ b₃) :
+    subst₂ (D := D) x p (trans q r) =
+      subst₂ (D := D) (subst₂ (D := D) x (refl a₁) q) p r :=
+  transport₂_trans_right (D := D) p q r x
+
+@[simp] theorem subst₂_symm_left {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (x : D a₁ b₁) (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    subst₂ (D := D) (subst₂ (D := D) x p (refl b₁)) (symm p) q =
+      subst (D := fun b => D a₁ b) x q :=
+  transport₂_symm_left (D := D) p q x
+
+@[simp] theorem subst₂_symm_right {A : Type u} {B : Type v}
+    {D : A → B → Sort w}
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (x : D a₁ b₁) (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    subst₂ (D := D) (subst₂ (D := D) x (refl a₁) q) p (symm q) =
+      subst (D := fun a => D a b₁) x p :=
+  transport₂_symm_right (D := D) p q x
+
+@[simp] theorem subst₂_const {A : Type u} {B : Type v}
+    {D : Type w} {a₁ a₂ : A} {b₁ b₂ : B}
+    (x : D) (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    subst₂ (D := fun _ _ => D) x p q = x :=
+  transport₂_const (D := D) p q x
+
 /-- Congruence of unary functions along paths. -/
 @[simp] def congrArg (f : A → B) (p : Path a b) :
     Path (f a) (f b) :=
