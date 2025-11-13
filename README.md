@@ -4,7 +4,7 @@ Lean formalisation of *Propositional Equality, Identity Types, and Computational
 
 ## Current status
 - Core path operations (`ComputationalPaths/Path/Basic.lean`) are fully implemented via explicit rewrite-step lists, giving transport, symmetry, and congruence lemmas without placeholders.
-- The rewrite system (`ComputationalPaths/Path/Rewrite.lean`) now covers the reflexive/transitive/symmetric closures together with additional `mapLeft`/`mapRight` congruence reductions, bringing the development closer to the full LNDEQ suite.  The new `rwEqSetoid`/`PathRwQuot` constructions package rewrite equality as a `Setoid` and quotient, and provide `refl`/`symm`/`trans` operations directly on the quotient.
+- The rewrite system (`ComputationalPaths/Path/Rewrite.lean`) now covers the reflexive/transitive/symmetric closures together with additional `mapLeft`/`mapRight` congruence reductions, bringing the development closer to the full LNDEQ suite.  The new `rwEqSetoid`/`PathRwQuot` constructions package rewrite equality as a `Setoid` and quotient, and provide `refl`/`symm`/`trans` operations directly on the quotient.  Dependent substitution is handled via the `Path.apd` combinator together with `rw_apd_refl`/`rweq_apd_refl`.
 - Dependent pairs are supported via `sigmaMk`/`sigmaFst`/`sigmaSnd`, and the rewrite system exposes the corresponding β/η behaviour (e.g. `sigma_fst_beta`, `rweq_sigma_eta`) so LNDEQ’s Σ-fragment reduces canonically.
 - A weak groupoid structure (`ComputationalPaths/Path/Groupoid.lean`) packages composition, inverses, and identities up to rewrite, serving as a foundation for later algebraic structure.
 
