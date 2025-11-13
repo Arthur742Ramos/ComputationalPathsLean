@@ -613,10 +613,10 @@ def trans {a b c : A} :
                 (p := p) (q := q₁) (r := q₂) hq)) )
       (by
         intro p₁ p₂ hp
-        refine _root_.Quot.inductionOn y (fun q => ?_)
-        exact Quot.sound
-          (rweq_trans_congr_left (A := A) (a := a) (b := b) (c := c)
-            (p := p₁) (q := p₂) (r := q) hp))
+        refine Quot.inductionOn y (fun q =>
+          Quot.sound
+            (rweq_trans_congr_left (A := A) (a := a) (b := b) (c := c)
+              (p := p₁) (q := p₂) (r := q) hp)))
 
 /-- Coerce a propositional equality to the path quotient. -/
 @[simp] def ofEq {a b : A} (h : a = b) : PathRwQuot A a b :=
@@ -640,16 +640,14 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
 
 @[simp] theorem toEq_symm {a b : A} (x : PathRwQuot A a b) :
     toEq (A := A) (symm (A := A) x) = (toEq (A := A) x).symm := by
-  refine Quot.inductionOn x (fun p => ?_)
-  simp
+  refine Quot.inductionOn x (fun p => by simp)
 
 @[simp] theorem toEq_trans {a b c : A}
     (x : PathRwQuot A a b) (y : PathRwQuot A b c) :
     toEq (A := A) (trans (A := A) x y) =
       (toEq (A := A) x).trans (toEq (A := A) y) := by
-  refine Quot.inductionOn x (fun p => ?_)
-  refine Quot.inductionOn y (fun q => ?_)
-  simp
+  refine Quot.inductionOn x (fun p =>
+    Quot.inductionOn y (fun q => by simp))
 
 @[simp] theorem ofEq_refl (a : A) :
     ofEq (A := A) (a := a) (b := a) (rfl : a = a) =
@@ -710,37 +708,37 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
 @[simp] theorem symm_symm {a b : A}
     (x : PathRwQuot A a b) :
     symm (A := A) (symm x) = x := by
-  refine _root_.Quot.inductionOn x (fun p => ?_)
-  apply Quot.sound
-  exact rweq_of_step (Step.symm_symm (A := A) p)
+  refine Quot.inductionOn x (fun p => by
+    apply Quot.sound
+    exact rweq_of_step (Step.symm_symm (A := A) p))
 
 @[simp] theorem trans_refl_left {a b : A}
     (x : PathRwQuot A a b) :
     trans (A := A) (refl a) x = x := by
-  refine _root_.Quot.inductionOn x (fun p => ?_)
-  apply Quot.sound
-  exact rweq_of_step (Step.trans_refl_left (A := A) p)
+  refine Quot.inductionOn x (fun p => by
+    apply Quot.sound
+    exact rweq_of_step (Step.trans_refl_left (A := A) p))
 
 @[simp] theorem trans_refl_right {a b : A}
     (x : PathRwQuot A a b) :
     trans (A := A) x (refl b) = x := by
-  refine _root_.Quot.inductionOn x (fun p => ?_)
-  apply Quot.sound
-  exact rweq_of_step (Step.trans_refl_right (A := A) p)
+  refine Quot.inductionOn x (fun p => by
+    apply Quot.sound
+    exact rweq_of_step (Step.trans_refl_right (A := A) p))
 
 @[simp] theorem trans_symm {a b : A}
     (x : PathRwQuot A a b) :
     trans (A := A) x (symm x) = refl a := by
-  refine _root_.Quot.inductionOn x (fun p => ?_)
-  apply Quot.sound
-  exact rweq_of_step (Step.trans_symm (A := A) p)
+  refine Quot.inductionOn x (fun p => by
+    apply Quot.sound
+    exact rweq_of_step (Step.trans_symm (A := A) p))
 
 @[simp] theorem symm_trans {a b : A}
     (x : PathRwQuot A a b) :
     trans (A := A) (symm x) x = refl b := by
-  refine _root_.Quot.inductionOn x (fun p => ?_)
-  apply Quot.sound
-  exact rweq_of_step (Step.symm_trans (A := A) p)
+  refine Quot.inductionOn x (fun p => by
+    apply Quot.sound
+    exact rweq_of_step (Step.symm_trans (A := A) p))
 
 @[simp] theorem trans_assoc {a b c d : A}
     (x : PathRwQuot A a b)
@@ -748,18 +746,18 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
     (z : PathRwQuot A c d) :
     trans (A := A) (trans x y) z =
       trans x (trans y z) := by
-  refine _root_.Quot.inductionOn x (fun p => ?_)
-  refine _root_.Quot.inductionOn y (fun q => ?_)
-  refine _root_.Quot.inductionOn z (fun r => ?_)
-  apply Quot.sound
-  exact rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r))
+  refine Quot.inductionOn x (fun p =>
+    Quot.inductionOn y (fun q =>
+      Quot.inductionOn z (fun r => by
+        apply Quot.sound
+        exact rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r)))))
 
 @[simp] theorem canon_reduce {a b : A}
     (x : PathRwQuot A a b) :
     x = Quot.mk _ (Path.ofEq (toEq x)) := by
-  refine _root_.Quot.inductionOn x (fun p => ?_)
-  have := mk_canon (A := A) (p := p)
-  simpa [toEq] using this
+  refine Quot.inductionOn x (fun p => by
+    have := mk_canon (A := A) (p := p)
+    simpa [toEq] using this)
 
 theorem ofEq_toEq {a b : A}
     (x : PathRwQuot A a b) :
@@ -769,7 +767,7 @@ theorem ofEq_toEq {a b : A}
 instance rwQuot_subsingleton (A : Type u) (a b : A) :
     Subsingleton (PathRwQuot A a b) := by
   classical
-  refine ⟨?_⟩
+  constructor
   intro x y
   have hxEq : toEq (A := A) x = toEq (A := A) y := Subsingleton.elim _ _
   have hx : ofEq (A := A) (a := a) (b := b) (toEq (A := A) x) =
