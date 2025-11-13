@@ -52,6 +52,20 @@ def identity (A : Type u) : WeakCategory A where
     intro a b p
     exact rw_of_step (Step.trans_refl_right p)
 
+structure IsIso (C : WeakCategory A) {a b : A} (f : Path a b) where
+  /-- Candidate inverse path. -/
+  inv : Path b a
+  /-- Left inverse holds up to rewrite. -/
+  left_inv :
+    Rw (C.comp inv f) (C.id)
+  /-- Right inverse holds up to rewrite. -/
+  right_inv :
+    Rw (C.comp f inv) (C.id)
+
+/-- A weak category is a weak groupoid when every morphism has a rewrite inverse. -/
+def IsGroupoid (C : WeakCategory A) : Prop :=
+  ∀ {a b : A} (f : Path a b), Nonempty (IsIso (A := A) C f)
+
 end WeakCategory
 
 /-- Weak groupoid structure whose laws hold up to `Rw` steps. -/
@@ -106,6 +120,25 @@ def identity (A : Type u) : WeakGroupoid A where
   right_inv := by
     intro a b p
     exact rw_of_step (Step.trans_symm p)
+
+/-- Every morphism in a weak groupoid has a rewrite inverse. -/
+def isIso (G : WeakGroupoid A) {a b : A} (p : Path a b) :
+    WeakCategory.IsIso (A := A) (toWeakCategory G) p where
+  inv := G.inv p
+  left_inv := G.left_inv (A := A) (a := a) (b := b) (p := p)
+  right_inv := G.right_inv (A := A) (a := a) (b := b) (p := p)
+
+/-- The underlying weak category of a weak groupoid is a weak groupoid in the categorical sense. -/
+theorem toWeakCategory_isGroupoid (G : WeakGroupoid A) :
+    WeakCategory.IsGroupoid (A := A) (toWeakCategory G) := by
+  intro a b p
+  exact ⟨isIso (A := A) (G := G) (a := a) (b := b) p⟩
+
+/-- Computational paths form a weak groupoid under rewrite. -/
+theorem identity_isGroupoid (A : Type u) :
+    WeakCategory.IsGroupoid (A := A)
+      (toWeakCategory (identity (A := A))) :=
+  toWeakCategory_isGroupoid (A := A) (G := identity (A := A))
 
 end WeakGroupoid
 
