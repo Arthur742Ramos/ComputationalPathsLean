@@ -2,9 +2,11 @@
 # Groupoid structure induced by computational paths
 
 Using the rewrite system developed in `Rewrite`, we package the operations on
-computational paths into a weak groupoid structure: all groupoid laws hold up
-to `Rw`-reduction.  We also record the strict groupoid obtained by passing to
-the rewrite quotient `PathRwQuot` so that the laws hold definitionally.
+computational paths into weak categorical structures.  We first exhibit a weak
+category whose laws hold up to `Rw`-reduction, then enrich it with inverses to
+obtain a weak groupoid.  Finally we record the strict groupoid obtained by
+passing to the rewrite quotient `PathRwQuot` so that the laws hold
+definitionally.
 -/
 
 import ComputationalPaths.Path.Basic
@@ -13,6 +15,44 @@ import ComputationalPaths.Path.Rewrite
 namespace ComputationalPaths.Path
 
 universe u v w x
+
+/-- Weak category structure whose laws hold up to `Rw` steps. -/
+structure WeakCategory (A : Type u) where
+  /-- composition of paths -/
+  comp : {a b c : A} -> Path a b -> Path b c -> Path a c
+  /-- identity path -/
+  id : {a : A} -> Path a a
+  /-- associativity up to rewrite -/
+  assoc :
+    {a b c d : A} ->
+      (p : Path a b) -> (q : Path b c) -> (r : Path c d) ->
+      Rw (comp (comp p q) r) (comp p (comp q r))
+  /-- left identity up to rewrite -/
+  left_id :
+    {a b : A} -> (p : Path a b) -> Rw (comp (id) p) p
+  /-- right identity up to rewrite -/
+  right_id :
+    {a b : A} -> (p : Path a b) -> Rw (comp p (id)) p
+
+namespace WeakCategory
+
+variable {A : Type u}
+
+/-- The canonical weak category carried by any type via computational paths. -/
+def identity (A : Type u) : WeakCategory A where
+  comp := fun p q => Path.trans p q
+  id := fun {a} => Path.refl a
+  assoc := by
+    intro a b c d p q r
+    exact rw_of_step (Step.trans_assoc p q r)
+  left_id := by
+    intro a b p
+    exact rw_of_step (Step.trans_refl_left p)
+  right_id := by
+    intro a b p
+    exact rw_of_step (Step.trans_refl_right p)
+
+end WeakCategory
 
 /-- Weak groupoid structure whose laws hold up to `Rw` steps. -/
 structure WeakGroupoid (A : Type u) where
@@ -44,20 +84,22 @@ namespace WeakGroupoid
 
 variable {A : Type u}
 
+/-- Forget the inverse operations and retain the weak category structure. -/
+def toWeakCategory (G : WeakGroupoid A) : WeakCategory A where
+  comp := G.comp
+  id := G.id
+  assoc := G.assoc
+  left_id := G.left_id
+  right_id := G.right_id
+
 /-- The canonical weak groupoid carried by any type via computational paths. -/
 def identity (A : Type u) : WeakGroupoid A where
-  comp := fun p q => Path.trans p q
+  comp := (WeakCategory.identity A).comp
   inv := fun p => Path.symm p
-  id := fun {a} => Path.refl a
-  assoc := by
-    intro a b c d p q r
-    exact rw_of_step (Step.trans_assoc p q r)
-  left_id := by
-    intro a b p
-    exact rw_of_step (Step.trans_refl_left p)
-  right_id := by
-    intro a b p
-    exact rw_of_step (Step.trans_refl_right p)
+  id := (WeakCategory.identity A).id
+  assoc := (WeakCategory.identity A).assoc
+  left_id := (WeakCategory.identity A).left_id
+  right_id := (WeakCategory.identity A).right_id
   left_inv := by
     intro a b p
     exact rw_of_step (Step.symm_trans p)
