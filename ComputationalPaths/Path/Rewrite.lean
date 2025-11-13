@@ -533,6 +533,24 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
     Path.map2_symm (A := A₁) (B := B) (C := A) f p q
   exact rw_trans h (rw_of_eq h2.symm)
 
+/-- The paper's `sr` reduction: `symm (refl a)` collapses to `refl a`. -/
+@[simp] theorem rw_sr {A : Type u} (a : A) :
+    Rw (Path.symm (Path.refl a)) (Path.refl a) :=
+  rw_of_step (Step.symm_refl (A := A) a)
+
+/-- The paper's `ss` reduction: applying symmetry twice is a no-op. -/
+@[simp] theorem rw_ss {A : Type u} {a b : A} (p : Path a b) :
+    Rw (Path.symm (Path.symm p)) p :=
+  rw_of_step (Step.symm_symm (A := A) (p := p))
+
+/-- The paper's `tt` reduction: reassociate triple compositions. -/
+@[simp] theorem rw_tt {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    Rw (Path.trans (Path.trans p q) r)
+      (Path.trans p (Path.trans q r)) :=
+  rw_of_step (Step.trans_assoc (A := A) (a := a) (b := b)
+    (c := c) (d := d) p q r)
+
 /-- Beta-style reduction for `Prod.fst` applied to a path produced from component paths. -/
 @[simp] theorem rw_prod_fst_beta {A : Type u} {B : Type u}
     {a1 a2 : A} {b1 b2 : B}
@@ -692,6 +710,21 @@ theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
 @[simp] theorem rweq_trans {p q r : Path a b} (h1 : RwEq p q) (h2 : RwEq q r) :
     RwEq p r :=
   RwEq.trans h1 h2
+
+@[simp] theorem rweq_sr {A : Type u} (a : A) :
+    RwEq (Path.symm (Path.refl a)) (Path.refl a) :=
+  rweq_of_step (Step.symm_refl (A := A) a)
+
+@[simp] theorem rweq_ss {A : Type u} {a b : A} (p : Path a b) :
+    RwEq (Path.symm (Path.symm p)) p :=
+  rweq_of_step (Step.symm_symm (A := A) (p := p))
+
+@[simp] theorem rweq_tt {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    RwEq (Path.trans (Path.trans p q) r)
+      (Path.trans p (Path.trans q r)) :=
+  rweq_of_step (Step.trans_assoc (A := A) (a := a) (b := b)
+    (c := c) (d := d) p q r)
 
 section Setoid
 
