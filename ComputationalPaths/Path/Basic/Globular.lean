@@ -123,6 +123,20 @@ variable {A : Type u}
   cases c
   simp [refl, trans]
 
+/-- Underlying computational path of a higher cell. -/
+@[simp] def toPath {n : Nat} (c : GlobularLevel A (n + 1)) :
+    Path c.src c.tgt :=
+  c.path
+
+@[simp] theorem toPath_refl {n : Nat} (x : GlobularLevel A n) :
+    toPath (A := A) (refl x) = Path.refl x := by
+  simp [toPath, refl]
+
+@[simp] theorem toPath_symm {n : Nat}
+    (c : GlobularLevel A (n + 1)) :
+    toPath (A := A) (symm c) = Path.symm (toPath (A := A) c) := by
+  simp [toPath, symm, GlobularCell.symm]
+
 end GlobularLevel
 
 end Path
