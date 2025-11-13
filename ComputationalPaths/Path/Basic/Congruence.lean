@@ -412,6 +412,37 @@ variable {b1 : B a1} {b2 : B a2}
     transport_sigmaMk_fst (A := A) (B := B) (D := D)
       (p := p) (q := q) (x := x)
 
+@[simp] theorem transport_sigmaMk_dep
+    {D : ∀ a, B a → Sort w}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2)
+    (x : D a1 b1) :
+    transport (D := fun z : Sigma B => D z.fst z.snd)
+        (sigmaMk p q) x =
+      transportSigma (A := A) (B := B) (D := D) p q x := by
+  cases p with
+  | mk steps₁ proof₁ =>
+    cases proof₁
+    cases q with
+    | mk steps₂ proof₂ =>
+      cases proof₂
+      rfl
+
+@[simp] theorem subst_sigmaMk_dep
+    {D : ∀ a, B a → Sort w}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2)
+    (x : D a1 b1) :
+    subst (D := fun z : Sigma B => D z.fst z.snd)
+        x (sigmaMk p q) =
+      substSigma (A := A) (B := B) (D := D) x p q := by
+  simpa [substSigma, subst]
+    using
+      transport_sigmaMk_dep (A := A) (B := B) (D := D)
+        (p := p) (q := q) (x := x)
+
 end Sigma
 
 section Dependent
