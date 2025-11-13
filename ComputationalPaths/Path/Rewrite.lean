@@ -392,6 +392,20 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
       (Path.ofEq (A := A) p.toEq) :=
   rw_of_step (Step.sigma_fst_beta (A := A) (B := B) p q)
 
+@[simp] theorem rw_sigma_snd_beta {A : Type u} {B : A → Type u}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    Rw
+      (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
+      (Path.ofEq
+        (A := B a2)
+        (a := transport (A := A) (D := fun a => B a)
+              (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q)) b1)
+        (b := b2) q.toEq) :=
+  rw_of_eq (Path.sigmaSnd_sigmaMk_eq_ofEq
+    (B := B) (p := p) (q := q))
+
 @[simp] theorem rw_apd_refl {A : Type u} {B : A → Type u}
     (f : ∀ x : A, B x) (a : A) :
     Rw
@@ -936,6 +950,21 @@ end PathRwQuot
         (Path.sigmaMk (B := B) p q))
       (Path.ofEq (A := A) p.toEq) :=
   rweq_of_step (Step.sigma_fst_beta (A := A) (B := B) p q)
+
+@[simp] theorem rweq_sigma_snd_beta {A : Type u} {B : A → Type u}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    RwEq
+      (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
+      (Path.ofEq
+        (A := B a2)
+        (a := transport (A := A) (D := fun a => B a)
+              (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q)) b1)
+        (b := b2) q.toEq) :=
+  rweq_of_eq
+    (Path.sigmaSnd_sigmaMk_eq_ofEq
+      (B := B) (p := p) (q := q))
 
 @[simp] theorem rweq_apd_refl {A : Type u} {B : A → Type u}
     (f : ∀ x : A, B x) (a : A) :

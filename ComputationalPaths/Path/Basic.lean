@@ -531,6 +531,24 @@ variable {b1 : B a1} {b2 : B a2}
         cases h
         simp [transport]
 
+@[simp] theorem sigmaSnd_sigmaMk_eq_ofEq
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    sigmaSnd (B := B) (sigmaMk (B := B) p q) =
+      Path.ofEq
+        (A := B a2)
+        (a := transport (A := A) (D := fun a => B a)
+              (sigmaFst (B := B) (sigmaMk (B := B) p q)) b1)
+        (b := b2) q.toEq := by
+  classical
+  cases p with
+  | mk steps1 h1 =>
+      cases h1
+      cases q with
+      | mk steps2 h2 =>
+          cases h2
+          simp [sigmaSnd, sigmaMk, sigmaFst, Path.ofEq, transport]
+
 end Sigma
 
 section Dependent
