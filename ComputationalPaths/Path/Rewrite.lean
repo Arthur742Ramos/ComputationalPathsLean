@@ -1145,6 +1145,40 @@ namespace PathRwQuot
   apply Quot.sound
   exact rweq_sigma_eta (A := A) (B := B) (p := p)
 
+@[simp] theorem sigma_snd_beta {A : Type u} {B : A → Type u}
+    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    (Quot.mk _
+        (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q)) :
+        PathRwQuot (B a2)
+          (transport (A := A) (D := fun a => B a) p b1) b2) =
+      Quot.mk _ q := by
+  apply Quot.sound
+  exact rweq_sigmaSnd_sigmaMk (A := A) (B := B) (p := p) (q := q)
+
+@[simp] theorem sigma_refl_ofEq {A : Type u} {B : A → Type u}
+    (a : A) (b : B a) :
+    (Quot.mk _
+        (Path.sigmaMk (B := B) (Path.refl a)
+          (Path.ofEq (A := B a) (a := b) (b := b) rfl)) :
+        PathRwQuot (Sigma B) (Sigma.mk a b) (Sigma.mk a b)) =
+      PathRwQuot.refl (A := Sigma B) (Sigma.mk a b) := by
+  have hfst :
+      Path.sigmaFst (B := B) (Path.refl (Sigma.mk a b)) = Path.refl a := by
+    simp [Path.sigmaFst]
+  have hsnd :
+      Path.sigmaSnd (B := B) (Path.refl (Sigma.mk a b)) =
+        Path.ofEq (A := B a) (a := b) (b := b) rfl := by
+    classical
+    unfold Path.sigmaSnd
+    simp [transport]
+  cases hfst
+  cases hsnd
+  exact
+    (sigma_eta (A := A) (B := B)
+      (p := Path.refl (Sigma.mk a b)))
+
 @[simp] theorem fun_eta {α : Type u} {β : Type v}
     {f g : α → β} (p : Path f g) :
     (Quot.mk _ (Path.lamCongr (fun x => Path.app p x)) :
