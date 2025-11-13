@@ -205,6 +205,12 @@ inductive Step :
         (Path.congrArg (Prod.rec f)
           (Path.map2 (A := α) (B := β) (C := Prod α β) Prod.mk p q))
         (Path.map2 (A := α) (B := β) (C := A) f p q)
+  | prod_eta
+      {α β : Type u}
+      {a₁ a₂ : α} {b₁ b₂ : β}
+      (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
+      Step (A := Prod α β)
+        (Path.prodMk (Path.fst p) (Path.snd p)) p
   | sigma_fst_beta
       {A : Type _} {B : A → Type u}
       {a1 a2 : A} {b1 : B a1} {b2 : B a2}
@@ -312,7 +318,7 @@ inductive Step :
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
     Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
-    Step.prod_rec_beta Step.sigma_fst_beta Step.sigma_snd_beta Step.sigma_eta
+    Step.prod_rec_beta Step.prod_eta Step.sigma_fst_beta Step.sigma_snd_beta Step.sigma_eta
     Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta Step.apd_refl
     Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq Step.canon
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
@@ -332,6 +338,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | map2_subst _ _ _ => simp
   | prod_fst_beta _ _ => simp
   | prod_snd_beta _ _ => simp
+  | prod_eta _ => simp
   | prod_rec_beta _ _ _ => simp
   | sigma_fst_beta _ _ => simp
   | sigma_snd_beta _ _ => simp
@@ -550,6 +557,13 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
         (Path.map2 (A := α) (B := β) (C := Prod α β) Prod.mk p q))
       (Path.map2 (A := α) (B := β) (C := A) f p q) :=
   rw_of_step (Step.prod_rec_beta (α := α) (β := β) (f := f) p q)
+
+/-- Eta-style reduction for product paths built from their projections. -/
+@[simp] theorem rw_prod_eta {α β : Type u}
+    {a₁ a₂ : α} {b₁ b₂ : β}
+    (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
+    Rw (Path.prodMk (Path.fst p) (Path.snd p)) p :=
+  rw_of_step (Step.prod_eta (α := α) (β := β) p)
 
 @[simp] theorem rw_sigma_fst_beta {A : Type u} {B : A → Type u}
     {a1 a2 : A} {b1 : B a1} {b2 : B a2}
@@ -1302,26 +1316,12 @@ end PathRwQuot
   rweq_of_rw (rw_symm_trans_congr (p := p) (q := q))
 
 /-- Eta-style reduction in `RwEq` rebuilding a product path from its projections. -/
-@[simp] theorem rweq_prod_eta {α : Type u} {β : Type v}
+@[simp] theorem rweq_prod_eta {α β : Type u}
     {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
     RwEq (Path.prodMk (Path.fst p) (Path.snd p)) p := by
   classical
-  have hcanon₁ := rweq_of_rw
-      (A := Prod α β) (a := (a₁, b₁)) (b := (a₂, b₂))
-      (rw_canon (A := Prod α β) (p := Path.prodMk (Path.fst p) (Path.snd p)))
-  have hcanon₂ := rweq_of_rw
-      (A := Prod α β) (a := (a₁, b₁)) (b := (a₂, b₂))
-      (rw_canon (A := Prod α β) (p := p))
-  have hproof :
-      Path.ofEq (A := Prod α β)
-        (a := (a₁, b₁)) (b := (a₂, b₂))
-        (Path.prodMk (Path.fst p) (Path.snd p)).toEq =
-        Path.ofEq (A := Prod α β) (a := (a₁, b₁)) (b := (a₂, b₂)) p.toEq := by
-    simp
-  exact rweq_trans hcanon₁
-    (rweq_trans (rweq_of_eq hproof)
-      (rweq_symm hcanon₂))
+  exact rweq_of_rw (rw_prod_eta (α := α) (β := β) (p := p))
 
 /-- Eta-style reduction in `RwEq` rebuilding a function path from its pointwise applications. -/
 @[simp] theorem rweq_fun_eta {α β : Type u}
@@ -1384,7 +1384,7 @@ namespace PathRwQuot
   exact rweq_sum_rec_inr_beta (α := α) (β := β) (A := A)
     (f := f) (g := g) (p := p)
 
-@[simp] theorem prod_eta {α : Type u} {β : Type v}
+@[simp] theorem prod_eta {α β : Type u}
     {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
     (Quot.mk _ (Path.prodMk (Path.fst p) (Path.snd p)) :
