@@ -15,6 +15,18 @@ open scoped Quot
 
 universe u v w
 
+/-- Lightweight equivalence structure used to package mutually inverse maps
+without pulling in additional dependencies. -/
+structure SimpleEquiv (α : Sort u) (β : Sort v) where
+  /-- Forward map. -/
+  toFun : α → β
+  /-- Inverse map. -/
+  invFun : β → α
+  /-- Inverse applied after the forward map is the identity. -/
+  left_inv : ∀ x : α, invFun (toFun x) = x
+  /-- Forward map applied after the inverse is the identity. -/
+  right_inv : ∀ y : β, toFun (invFun y) = y
+
 /-- A single rewrite step between computational paths. -/
 inductive Step {A : Type u} :
     {a b : A} → Path a b → Path a b → Prop
@@ -792,6 +804,28 @@ instance rwQuot_subsingleton (A : Type u) (a b : A) :
     (hx.trans (canon_reduce (A := A) (x := y)).symm)
 
 end PathRwQuot
+
+/-- `PathRwQuot` is definitionally equivalent to propositional equality. -/
+def pathRwQuotEquivEq (A : Type u) (a b : A) :
+    SimpleEquiv (PathRwQuot A a b) (a = b) where
+  toFun := PathRwQuot.toEq (A := A)
+  invFun := fun h => PathRwQuot.ofEq (A := A) (a := a) (b := b) h
+  left_inv := by
+    intro x
+    exact PathRwQuot.ofEq_toEq (A := A) (a := a) (b := b) x
+  right_inv := by
+    intro h
+    exact PathRwQuot.toEq_ofEq (A := A) (a := a) (b := b) h
+
+@[simp] theorem pathRwQuotEquivEq_apply
+    (x : PathRwQuot A a b) :
+    (pathRwQuotEquivEq (A := A) (a := a) (b := b)).toFun x =
+      PathRwQuot.toEq (A := A) x := rfl
+
+@[simp] theorem pathRwQuotEquivEq_symm_apply
+    (h : a = b) :
+    (pathRwQuotEquivEq (A := A) (a := a) (b := b)).invFun h =
+      PathRwQuot.ofEq (A := A) (a := a) (b := b) h := rfl
 
 @[simp] theorem rweq_congrArg_trans {B : Type v}
     {a b c : A} (f : A → B) (p : Path a b) (q : Path b c) :
