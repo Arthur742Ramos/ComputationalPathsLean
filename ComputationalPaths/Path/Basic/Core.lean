@@ -521,6 +521,15 @@ components. -/
       cases proof
       simp [congrArg, symm]
 
+@[simp] theorem congrArg_comp (f : B → C) (g : A → B)
+  (p : Path a b) :
+  congrArg (fun x => f (g x)) p =
+    congrArg f (congrArg g p) := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      simp [congrArg]
+
 @[simp] theorem congrArg_id (p : Path a b) :
     congrArg (fun x : A => x) p = p := by
   cases p with

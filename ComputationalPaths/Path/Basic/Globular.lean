@@ -218,6 +218,56 @@ private theorem globular_trans_assoc_right_eq {n : Nat}
   simpa [trans] using
     (GlobularCell.trans_assoc (β := GlobularLevel A n) p q r h₁ h₂)
 
+section Functoriality
+
+variable {B : Type v}
+
+/-- Level-wise action of a function on globular cells.  At the base level this
+is just function application, while higher cells are mapped by applying the
+function to the endpoints and functorially transporting the underlying
+computational path. -/
+@[simp] def map : {n : Nat} → (A → B) → GlobularLevel A n → GlobularLevel B n
+  | 0, f, a => f a
+  | Nat.succ n, f, c =>
+      { src := map (n := n) f c.src
+        tgt := map (n := n) f c.tgt
+        path := Path.congrArg (map (n := n) f) c.path }
+
+@[simp] theorem map_src {n : Nat} (f : A → B)
+    (c : GlobularLevel A (n + 1)) :
+    (map (n := n + 1) f c).src = map (n := n) f c.src := rfl
+
+@[simp] theorem map_tgt {n : Nat} (f : A → B)
+    (c : GlobularLevel A (n + 1)) :
+    (map (n := n + 1) f c).tgt = map (n := n) f c.tgt := rfl
+
+@[simp] theorem map_refl {n : Nat} (f : A → B)
+    (x : GlobularLevel A n) :
+    map (n := n + 1) f (refl x) =
+      refl (map (n := n) f x) := by
+  simp [refl, map]
+
+@[simp] theorem map_symm {n : Nat} (f : A → B)
+    (c : GlobularLevel A (n + 1)) :
+    map (n := n + 1) f (symm c) =
+      symm (map (n := n + 1) f c) := by
+  cases c
+  simp [symm, map]
+
+@[simp] theorem map_trans {n : Nat} (f : A → B)
+    (p q : GlobularLevel A (n + 1)) (h : p.tgt = q.src) :
+    map (n := n + 1) f (trans (A := A) p q h) =
+      trans (map (n := n + 1) f p) (map (n := n + 1) f q)
+        (by
+          have := _root_.congrArg (map (n := n) f) h
+          simpa [map_src, map_tgt] using this) := by
+  cases q
+  cases h
+  cases p
+  simp [map, trans]
+
+end Functoriality
+
 /-- Underlying computational path of a higher cell. -/
 @[simp] def toPath {n : Nat} (c : GlobularLevel A (n + 1)) :
     Path c.src c.tgt :=
@@ -241,6 +291,19 @@ private theorem globular_trans_assoc_right_eq {n : Nat}
   cases q
   cases h
   simp [toPath, trans, GlobularCell.trans]
+
+section Functoriality
+
+variable {B : Type v}
+
+@[simp] theorem map_toPath {n : Nat} (f : A → B)
+    (c : GlobularLevel A (n + 1)) :
+    toPath (map (n := n + 1) f c) =
+      Path.congrArg (map (n := n) f) (toPath c) := by
+  cases c
+  simp [GlobularLevel.map, toPath]
+
+end Functoriality
 
 end GlobularLevel
 
