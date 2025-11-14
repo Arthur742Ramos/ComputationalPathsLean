@@ -8,6 +8,7 @@ contexts.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Basic.Congruence
 
 namespace ComputationalPaths
 namespace Path
@@ -232,6 +233,111 @@ variable {A : Type u} {B : Type v} {C : Type w}
   simp [map2]
 
 end BiContext
+
+/-- A unary context whose result type depends on the element inserted in the hole. -/
+structure DepContext (A : Type u) (B : A → Type v) where
+  fill : (a : A) → B a
+
+namespace DepContext
+
+variable {A : Type u} {B : A → Type v}
+
+/-- View transport along a base path as a unary context between fibres. -/
+@[simp] def transportContext {a₁ a₂ : A} (p : Path a₁ a₂) :
+    Context (B a₁) (B a₂) :=
+  ⟨fun y =>
+    Path.transport (A := A) (D := fun a => B a) p y⟩
+
+/-- Map a base path through a dependent context, transporting the source witness. -/
+@[simp] def map (C : DepContext A B)
+    {a₁ a₂ : A} (p : Path a₁ a₂) :
+    Path (A := B a₂)
+      (Path.transport (A := A) (D := fun a => B a) p (C.fill a₁))
+      (C.fill a₂) :=
+  Path.apd (A := A) (B := fun a => B a) (f := C.fill) p
+
+/-- Dependent substitution on the left: transport the proof across the base path
+before reapplying the context. -/
+@[simp] def substLeft (C : DepContext A B)
+    {a₁ a₂ : A} {x : B a₁}
+    (r : Path (A := B a₁) x (C.fill a₁))
+    (p : Path a₁ a₂) :
+    Path (A := B a₂)
+      (Path.transport (A := A) (D := fun a => B a) p x)
+      (C.fill a₂) :=
+  Path.trans
+    (Context.map (A := B a₁) (B := B a₂)
+      (transportContext (A := A) (B := B) p) r)
+    (map (A := A) (B := B) C p)
+
+/-- Dependent substitution on the right: apply the context and continue with a
+path in the target fibre. -/
+@[simp] def substRight (C : DepContext A B)
+    {a₁ a₂ : A} {y : B a₂}
+    (p : Path a₁ a₂) (t : Path (A := B a₂) (C.fill a₂) y) :
+    Path (A := B a₂)
+      (Path.transport (A := A) (D := fun a => B a) p (C.fill a₁))
+      y :=
+  Path.trans (map (A := A) (B := B) C p) t
+
+end DepContext
+
+/-- A binary context whose codomain may depend on the left hole. -/
+structure DepBiContext (A : Type u) (B : Type v)
+    (C : A → B → Type w) where
+  fill : (a : A) → (b : B) → C a b
+
+namespace DepBiContext
+
+variable {A : Type u} {B : Type v} {C : A → B → Type w}
+
+/-- Freeze the right hole to obtain a dependent unary context. -/
+@[simp] def fixRight (K : DepBiContext A B C) (b : B) :
+    DepContext A (fun a => C a b) :=
+  ⟨fun a => K.fill a b⟩
+
+/-- Freeze the left hole to obtain a dependent unary context on `B`. -/
+@[simp] def fixLeft (K : DepBiContext A B C) (a : A) :
+    DepContext B (fun b => C a b) :=
+  ⟨fun b => K.fill a b⟩
+
+/-- Map a path through the left hole of a dependent binary context. -/
+@[simp] def mapLeft (K : DepBiContext A B C)
+    {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
+    Path (A := C a₂ b)
+      (Path.transport (A := A) (D := fun a => C a b) p (K.fill a₁ b))
+      (K.fill a₂ b) :=
+  DepContext.map (A := A) (B := fun a => C a b) (fixRight (A := A) (B := B) (C := C) K b) p
+
+/-- Map a path through the right hole of a dependent binary context. -/
+@[simp] def mapRight (K : DepBiContext A B C)
+    (a : A) {b₁ b₂ : B} (q : Path b₁ b₂) :
+    Path (A := C a b₂)
+      (Path.transport (A := B) (D := fun b => C a b) q (K.fill a b₁))
+      (K.fill a b₂) :=
+  DepContext.map (A := B) (B := fun b => C a b) (fixLeft (A := A) (B := B) (C := C) K a) q
+
+/-- Transport along the right hole, viewed as a unary context. -/
+@[simp] def transportRightContext (a : A)
+    {b₁ b₂ : B} (q : Path b₁ b₂) :
+    Context (C a b₁) (C a b₂) :=
+  ⟨fun z => Path.transport (A := B) (D := fun b => C a b) q z⟩
+
+/-- Simultaneously substitute through both holes of a dependent binary context. -/
+@[simp] def map2 (K : DepBiContext A B C)
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    Path (A := C a₂ b₂)
+      (Path.transport (A := B) (D := fun b => C a₂ b) q
+        (Path.transport (A := A) (D := fun a => C a b₁) p (K.fill a₁ b₁)))
+      (K.fill a₂ b₂) :=
+  Path.trans
+    (Context.map
+      (transportRightContext (A := A) (B := B) (C := C) a₂ q)
+      (mapLeft (A := A) (B := B) (C := C) K p b₁))
+    (mapRight (A := A) (B := B) (C := C) K a₂ q)
+
+end DepBiContext
 
 end Path
 end ComputationalPaths

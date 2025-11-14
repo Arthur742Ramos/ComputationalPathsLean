@@ -447,7 +447,7 @@ end Sigma
 
 section Dependent
 
-variable {A : Type u} {B : A → Type u}
+variable {A : Type u} {B : A → Type v}
 variable (f : ∀ x : A, B x)
 variable {a b : A}
 

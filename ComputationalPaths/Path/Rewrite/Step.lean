@@ -154,6 +154,74 @@ inductive Step :
           (transport_refl (A := A) (D := fun t => B t)
             (a := a) (x := x)))
         (Path.refl x)
+    | transport_trans_beta
+      {A : Type u} {B : A → Type u}
+        {a₁ a₂ a₃ : A}
+        (p : Path a₁ a₂) (q : Path a₂ a₃) (x : B a₁) :
+        Step (A := B a₃)
+          (Path.ofEq (A := B a₃)
+            (a := Path.transport (A := A) (D := fun t => B t)
+                    (Path.trans p q) x)
+            (b := Path.transport (A := A) (D := fun t => B t) q
+                    (Path.transport (A := A) (D := fun t => B t) p x))
+            (Path.transport_trans (A := A) (D := fun t => B t)
+              (p := p) (q := q) (x := x)))
+          (Eq.ndrec
+            (motive := fun y =>
+              Path (A := B a₃)
+                (Path.transport (A := A) (D := fun t => B t)
+                  (Path.trans p q) x) y)
+            (Path.refl
+              (Path.transport (A := A) (D := fun t => B t)
+                (Path.trans p q) x))
+            (Path.transport_trans (A := A) (D := fun t => B t)
+              (p := p) (q := q) (x := x)))
+    | transport_symm_left_beta
+      {A : Type u} {B : A → Type u}
+        {a₁ a₂ : A} (p : Path a₁ a₂) (x : B a₁) :
+        Step (A := B a₁)
+          (Path.ofEq (A := B a₁)
+            (a := Path.transport (A := A) (D := fun t => B t)
+                    (Path.symm p)
+                    (Path.transport (A := A) (D := fun t => B t) p x))
+            (b := x)
+            (Path.transport_symm_left (A := A) (D := fun t => B t)
+              (p := p) (x := x)))
+          (Eq.ndrec
+            (motive := fun y =>
+              Path (A := B a₁)
+                (Path.transport (A := A) (D := fun t => B t)
+                  (Path.symm p)
+                  (Path.transport (A := A) (D := fun t => B t) p x)) y)
+            (Path.refl
+              (Path.transport (A := A) (D := fun t => B t)
+                (Path.symm p)
+                (Path.transport (A := A) (D := fun t => B t) p x)))
+            (Path.transport_symm_left (A := A) (D := fun t => B t)
+              (p := p) (x := x)))
+    | transport_symm_right_beta
+      {A : Type u} {B : A → Type u}
+        {a₁ a₂ : A} (p : Path a₁ a₂) (y : B a₂) :
+        Step (A := B a₂)
+          (Path.ofEq (A := B a₂)
+            (a := Path.transport (A := A) (D := fun t => B t) p
+                    (Path.transport (A := A) (D := fun t => B t)
+                      (Path.symm p) y))
+            (b := y)
+            (Path.transport_symm_right (A := A) (D := fun t => B t)
+              (p := p) (y := y)))
+          (Eq.ndrec
+            (motive := fun y' =>
+              Path (A := B a₂)
+                (Path.transport (A := A) (D := fun t => B t) p
+                  (Path.transport (A := A) (D := fun t => B t)
+                    (Path.symm p) y)) y')
+            (Path.refl
+              (Path.transport (A := A) (D := fun t => B t) p
+                (Path.transport (A := A) (D := fun t => B t)
+                  (Path.symm p) y)))
+            (Path.transport_symm_right (A := A) (D := fun t => B t)
+              (p := p) (y := y)))
   | context_congr
     {A : Type u} {B : Type u}
       (C : Context A B) {a₁ a₂ : A}
@@ -187,6 +255,13 @@ inductive Step :
         (Path.trans (Context.substLeft (A := A) (B := B) C r p) t)
         (Path.trans r
           (Context.substRight (A := A) (B := B) C p t))
+  | context_subst_right_beta
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a₁ a₂ : A} {y : B}
+      (p : Path a₁ a₂) (t : Path (C.fill a₂) y) :
+      Step (A := B)
+        (Path.trans (Context.map (A := A) (B := B) C p) t)
+        (Context.substRight (A := A) (B := B) C p t)
   | context_subst_right_assoc
     {A : Type u} {B : Type u}
       (C : Context A B) {a₁ a₂ : A} {y z : B}
@@ -197,6 +272,197 @@ inductive Step :
           (Context.substRight (A := A) (B := B) C p t) u)
         (Context.substRight (A := A) (B := B) C p
           (Path.trans t u))
+  | context_subst_left_refl_right
+    {A : Type u} {B : Type u}
+      (C : Context A B) {x : B} {a : A}
+      (r : Path x (C.fill a)) :
+      Step (A := B)
+        (Context.substLeft C r (Path.refl a)) r
+  | context_subst_left_refl_left
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a₁ a₂ : A}
+      (p : Path a₁ a₂) :
+      Step (A := B)
+        (Context.substLeft C (Path.refl (C.fill a₁)) p)
+        (Context.map C p)
+  | context_subst_right_refl_left
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a : A} {y : B}
+      (r : Path (C.fill a) y) :
+      Step (A := B)
+        (Context.substRight C (Path.refl a) r) r
+  | context_subst_right_refl_right
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a₁ a₂ : A}
+      (p : Path a₁ a₂) :
+      Step (A := B)
+        (Context.substRight C p (Path.refl (C.fill a₂)))
+        (Context.map C p)
+  | context_subst_left_idempotent
+    {A : Type u} {B : Type u}
+      (C : Context A B) {x : B} {a₁ a₂ : A}
+      (r : Path x (C.fill a₁)) (p : Path a₁ a₂) :
+      Step (A := B)
+        (Context.substLeft C
+          (Context.substLeft C r (Path.refl a₁)) p)
+        (Context.substLeft C r p)
+  | context_subst_right_cancel_inner
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a₁ a₂ : A} {y : B}
+      (p : Path a₁ a₂) (t : Path (C.fill a₂) y) :
+      Step (A := B)
+        (Context.substRight C p
+          (Context.substRight C (Path.refl a₂) t))
+        (Context.substRight C p t)
+  | context_subst_right_cancel_outer
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a₁ a₂ : A} {y : B}
+      (p : Path a₁ a₂) (t : Path (C.fill a₂) y) :
+      Step (A := B)
+        (Context.substRight C (Path.refl a₁)
+          (Context.substRight C p t))
+        (Context.substRight C p t)
+  | depContext_congr
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A}
+      {p q : Path a₁ a₂} :
+      Step (A := A) p q →
+        Step (A := B a₂)
+          (DepContext.map (A := A) (B := B) C p)
+          (DepContext.map (A := A) (B := B) C q)
+  | depContext_subst_left_beta
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A} {x : B a₁}
+      (r : Path (A := B a₁) x (C.fill a₁)) (p : Path a₁ a₂) :
+      Step (A := B a₂)
+        (Path.trans
+          (Context.map (A := B a₁) (B := B a₂)
+            (DepContext.transportContext (A := A) (B := B) p) r)
+          (DepContext.map (A := A) (B := B) C p))
+        (DepContext.substLeft (A := A) (B := B) C r p)
+  | depContext_subst_left_assoc
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A} {x : B a₁} {y : B a₂}
+      (r : Path (A := B a₁) x (C.fill a₁)) (p : Path a₁ a₂)
+      (t : Path (A := B a₂) (C.fill a₂) y) :
+      Step (A := B a₂)
+        (Path.trans
+          (DepContext.substLeft (A := A) (B := B) C r p) t)
+        (Path.trans
+          (Context.map (A := B a₁) (B := B a₂)
+            (DepContext.transportContext (A := A) (B := B) p) r)
+          (DepContext.substRight (A := A) (B := B) C p t))
+  | depContext_subst_right_beta
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A} {y : B a₂}
+      (p : Path a₁ a₂)
+      (t : Path (A := B a₂) (C.fill a₂) y) :
+      Step (A := B a₂)
+        (Path.trans
+          (DepContext.map (A := A) (B := B) C p) t)
+        (DepContext.substRight (A := A) (B := B) C p t)
+  | depContext_subst_right_assoc
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A} {y z : B a₂}
+      (p : Path a₁ a₂)
+      (t : Path (A := B a₂) (C.fill a₂) y)
+      (u : Path (A := B a₂) y z) :
+      Step (A := B a₂)
+        (Path.trans
+          (DepContext.substRight (A := A) (B := B) C p t) u)
+        (DepContext.substRight (A := A) (B := B) C p
+          (Path.trans t u))
+  | depContext_subst_left_refl_right
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a : A} {x : B a}
+      (r : Path (A := B a) x (C.fill a)) :
+      Step (A := B a)
+        (DepContext.substLeft (A := A) (B := B) C r (Path.refl a)) r
+  | depContext_subst_left_refl_left
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A}
+      (p : Path a₁ a₂) :
+      Step (A := B a₂)
+        (DepContext.substLeft (A := A) (B := B) C
+          (Path.refl (C.fill a₁)) p)
+        (DepContext.map (A := A) (B := B) C p)
+  | depContext_subst_right_refl_left
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a : A} {y : B a}
+      (r : Path (A := B a) (C.fill a) y) :
+      Step (A := B a)
+        (DepContext.substRight (A := A) (B := B) C
+          (Path.refl a) r) r
+  | depContext_subst_right_refl_right
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A}
+      (p : Path a₁ a₂) :
+      Step (A := B a₂)
+        (DepContext.substRight (A := A) (B := B) C p
+          (Path.refl (C.fill a₂)))
+        (DepContext.map (A := A) (B := B) C p)
+  | depContext_subst_left_idempotent
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A} {x : B a₁}
+      (r : Path (A := B a₁) x (C.fill a₁))
+      (p : Path a₁ a₂) :
+      Step (A := B a₂)
+        (DepContext.substLeft (A := A) (B := B) C
+          (DepContext.substLeft (A := A) (B := B) C r (Path.refl a₁)) p)
+        (DepContext.substLeft (A := A) (B := B) C r p)
+  | depContext_subst_right_cancel_inner
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A} {y : B a₂}
+      (p : Path a₁ a₂)
+      (t : Path (A := B a₂) (C.fill a₂) y) :
+      Step (A := B a₂)
+        (DepContext.substRight (A := A) (B := B) C p
+          (DepContext.substRight (A := A) (B := B) C (Path.refl a₂) t))
+        (DepContext.substRight (A := A) (B := B) C p t)
+  | depBiContext_mapLeft_congr
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+      (K : _root_.ComputationalPaths.Path.DepBiContext A B C)
+      {a₁ a₂ : A} (b : B)
+      {p q : Path a₁ a₂} :
+      Step (A := A) p q →
+        Step (A := C a₂ b)
+          (_root_.ComputationalPaths.Path.DepBiContext.mapLeft
+            (A := A) (B := B) (C := C) K p b)
+          (_root_.ComputationalPaths.Path.DepBiContext.mapLeft
+            (A := A) (B := B) (C := C) K q b)
+  | depBiContext_mapRight_congr
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+      (K : _root_.ComputationalPaths.Path.DepBiContext A B C)
+      (a : A) {b₁ b₂ : B}
+      {p q : Path b₁ b₂} :
+      Step (A := B) p q →
+        Step (A := C a b₂)
+          (_root_.ComputationalPaths.Path.DepBiContext.mapRight
+            (A := A) (B := B) (C := C) K a p)
+          (_root_.ComputationalPaths.Path.DepBiContext.mapRight
+            (A := A) (B := B) (C := C) K a q)
+  | depBiContext_map2_congr_left
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+      (K : _root_.ComputationalPaths.Path.DepBiContext A B C)
+      {a₁ a₂ : A} {b₁ b₂ : B}
+      {p q : Path a₁ a₂} (r : Path b₁ b₂) :
+      Step (A := A) p q →
+        Step (A := C a₂ b₂)
+          (_root_.ComputationalPaths.Path.DepBiContext.map2
+            (A := A) (B := B) (C := C) K p r)
+          (_root_.ComputationalPaths.Path.DepBiContext.map2
+            (A := A) (B := B) (C := C) K q r)
+  | depBiContext_map2_congr_right
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+      (K : _root_.ComputationalPaths.Path.DepBiContext A B C)
+      {a₁ a₂ : A} {b₁ b₂ : B}
+      (p : Path a₁ a₂) {q r : Path b₁ b₂} :
+      Step (A := B) q r →
+        Step (A := C a₂ b₂)
+          (_root_.ComputationalPaths.Path.DepBiContext.map2
+            (A := A) (B := B) (C := C) K p q)
+          (_root_.ComputationalPaths.Path.DepBiContext.map2
+            (A := A) (B := B) (C := C) K p r)
   | biContext_mapLeft_congr
     {A : Type u} {B : Type u} {C : Type u}
       (K : BiContext A B C) {a₁ a₂ : A} (b : B)
@@ -273,9 +539,22 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
   Step.prod_rec_beta Step.prod_eta Step.sigma_fst_beta Step.sigma_snd_beta Step.sigma_eta
   Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta Step.apd_refl
-  Step.transport_refl_beta
+  Step.transport_refl_beta Step.transport_trans_beta Step.transport_symm_left_beta
+  Step.transport_symm_right_beta
   Step.context_congr Step.context_subst_left_beta Step.context_subst_left_of_right
-  Step.context_subst_left_assoc Step.context_subst_right_assoc
+  Step.context_subst_left_assoc Step.context_subst_right_beta Step.context_subst_right_assoc
+  Step.context_subst_left_refl_right Step.context_subst_left_refl_left
+  Step.context_subst_right_refl_left Step.context_subst_right_refl_right
+  Step.context_subst_left_idempotent Step.context_subst_right_cancel_inner
+  Step.context_subst_right_cancel_outer
+  Step.depContext_congr Step.depContext_subst_left_beta
+  Step.depContext_subst_left_assoc Step.depContext_subst_right_beta
+  Step.depContext_subst_right_assoc Step.depContext_subst_left_refl_right
+  Step.depContext_subst_left_refl_left Step.depContext_subst_right_refl_left
+  Step.depContext_subst_right_refl_right Step.depContext_subst_left_idempotent
+  Step.depContext_subst_right_cancel_inner
+  Step.depBiContext_mapLeft_congr Step.depBiContext_mapRight_congr
+  Step.depBiContext_map2_congr_left Step.depBiContext_map2_congr_right
   Step.biContext_mapLeft_congr Step.biContext_mapRight_congr
   Step.biContext_map2_congr_left Step.biContext_map2_congr_right
   Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq Step.canon
@@ -307,7 +586,13 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | fun_eta _ => simp
   | apd_refl _ _ => simp
   | transport_refl_beta _ =>
-      simp
+    simp
+  | transport_trans_beta _ _ _ =>
+    simp
+  | transport_symm_left_beta _ _ =>
+    simp
+  | transport_symm_right_beta _ _ =>
+    simp
   | context_congr _ _ ih =>
     cases ih
     rfl
@@ -317,8 +602,59 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     simp
   | context_subst_left_assoc _ _ _ _ =>
     simp
+  | context_subst_right_beta _ _ _ =>
+    simp
   | context_subst_right_assoc _ _ _ _ =>
     simp
+  | context_subst_left_refl_right _ _ =>
+    simp
+  | context_subst_left_refl_left _ _ =>
+    simp
+  | context_subst_right_refl_left _ _ =>
+    simp
+  | context_subst_right_refl_right _ _ =>
+    simp
+  | context_subst_left_idempotent _ _ _ =>
+    simp
+  | context_subst_right_cancel_inner _ _ _ =>
+    simp
+  | context_subst_right_cancel_outer _ _ _ =>
+    simp
+  | depContext_congr _ _ ih =>
+    cases ih
+    rfl
+  | depContext_subst_left_beta _ _ _ =>
+    simp
+  | depContext_subst_left_assoc _ _ _ _ =>
+    simp
+  | depContext_subst_right_beta _ _ _ =>
+    simp
+  | depContext_subst_right_assoc _ _ _ _ =>
+    simp
+  | depContext_subst_left_refl_right _ _ =>
+    simp
+  | depContext_subst_left_refl_left _ _ =>
+    simp
+  | depContext_subst_right_refl_left _ _ =>
+    simp
+  | depContext_subst_right_refl_right _ _ =>
+    simp
+  | depContext_subst_left_idempotent _ _ _ =>
+    simp
+  | depContext_subst_right_cancel_inner _ _ _ =>
+    simp
+  | depBiContext_mapLeft_congr _ _ _ ih =>
+    cases ih
+    rfl
+  | depBiContext_mapRight_congr _ _ _ ih =>
+    cases ih
+    rfl
+  | depBiContext_map2_congr_left _ _ _ ih =>
+    cases ih
+    rfl
+  | depBiContext_map2_congr_right _ _ _ ih =>
+    cases ih
+    rfl
   | biContext_mapLeft_congr _ _ _ ih =>
     cases ih
     rfl
