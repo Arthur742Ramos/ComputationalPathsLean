@@ -137,6 +137,13 @@ inductive Step :
       {f g : α → β} (p : Path f g) :
       Step (A := α → β)
         (Path.lamCongr (fun x => Path.app p x)) p
+  | lam_congr_symm
+    {α β : Type u}
+      {f g : α → β}
+      (p : ∀ x : α, Path (f x) (g x)) :
+      Step (A := α → β)
+        (Path.symm (Path.lamCongr (f := f) (g := g) p))
+        (Path.lamCongr (f := g) (g := f) (fun x => Path.symm (p x)))
   | apd_refl
     {A : Type u} {B : A → Type u}
       (f : ∀ x : A, B x) (a : A) :
@@ -230,6 +237,13 @@ inductive Step :
         Step (A := B)
           (Context.map (A := A) (B := B) C p)
           (Context.map (A := A) (B := B) C q)
+  | context_map_symm
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a₁ a₂ : A}
+      (p : Path a₁ a₂) :
+      Step (A := B)
+        (Path.symm (Context.map (A := A) (B := B) C p))
+        (Context.map (A := A) (B := B) C (Path.symm p))
   | context_subst_left_beta
     {A : Type u} {B : Type u}
       (C : Context A B) {x : B} {a₁ a₂ : A}
@@ -584,6 +598,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | sum_rec_inr_beta _ _ _ => simp
   | fun_app_beta _ _ => simp
   | fun_eta _ => simp
+  | lam_congr_symm _ => simp
   | apd_refl _ _ => simp
   | transport_refl_beta _ =>
     simp
@@ -596,6 +611,8 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | context_congr _ _ ih =>
     cases ih
     rfl
+  | context_map_symm _ _ =>
+    simp
   | context_subst_left_beta _ _ _ =>
     simp
   | context_subst_left_of_right _ _ _ =>
