@@ -121,6 +121,7 @@ parameters abstract so it applies uniformly across contexts.
 | `tsbll` / `slr` | `trans (refl (C.fill a₁)) (Context.map C p)` | `Confluence.CriticalPairs.tsbll_slr` |
 | `tsbrl` / `srr` | `trans (Context.map C p) (refl (C.fill a₂))` | `Confluence.CriticalPairs.tsbrl_srr` |
 | `stss` / `ssbl` | `symm (trans r (Context.map C p))` | `Confluence.CriticalPairs.stss_ssbl` |
+| `stss` / `ssbr` | `symm (trans (Context.map C p) t)` | `Confluence.CriticalPairs.stss_ssbr` |
 
 The join proof for each entry is obtained by invoking `Instantiation.join` on the two
 relevant instantiations (after matching their sources), so the resulting witnesses are

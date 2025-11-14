@@ -288,6 +288,23 @@ arguments the two reductions share a source, giving a critical-pair join. -/
       (r := r) (p := p))
     rfl
 
+@[simp] def stss_ssbr
+    {a₁ a₂ : A} {y : B}
+    (p : Path a₁ a₂) (t : Path (C.fill a₂) y) :
+    Join (A := B) (a := y) (b := C.fill a₁)
+      (Builder.instStss (A := B)
+        (p := Context.map (A := A) (B := B) C p)
+        (q := t)).q
+      (Builder.instSsbr (A := A) (B := B) (C := C)
+        (p := p) (t := t)).q := by
+  refine LNDEQ.Instantiation.join
+    (i := Builder.instStss (A := B)
+      (p := Context.map (A := A) (B := B) C p)
+      (q := t))
+    (j := Builder.instSsbr (A := A) (B := B) (C := C)
+      (p := p) (t := t))
+    rfl
+
 end SymmetricCancellation
 
 end CriticalPairs
