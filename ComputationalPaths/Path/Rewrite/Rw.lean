@@ -228,7 +228,7 @@ variable {A : Type u} {a b c : A}
         (Step.depContext_congr (A := A) (B := B) (C := C) step)
 
 @[simp] theorem rw_depContext_subst_left_beta
-    {A : Type u} {B : A → Type u}
+  {A : Type u} {B : A → Type u}
     (C : DepContext A B) {a₁ a₂ : A} {x : B a₁}
     (r : Path (A := B a₁) x (C.fill a₁)) (p : Path a₁ a₂) :
     Rw (Path.trans
@@ -240,7 +240,7 @@ variable {A : Type u} {a b c : A}
     (Step.depContext_subst_left_beta (A := A) (B := B) C r p)
 
 @[simp] theorem rw_depContext_subst_left_assoc
-    {A : Type u} {B : A → Type u}
+  {A : Type u} {B : A → Type u}
     (C : DepContext A B) {a₁ a₂ : A} {x : B a₁} {y : B a₂}
     (r : Path (A := B a₁) x (C.fill a₁)) (p : Path a₁ a₂)
     (t : Path (A := B a₂) (C.fill a₂) y) :
@@ -254,7 +254,7 @@ variable {A : Type u} {a b c : A}
     (Step.depContext_subst_left_assoc (A := A) (B := B) C r p t)
 
 @[simp] theorem rw_depContext_subst_right_beta
-    {A : Type u} {B : A → Type u}
+  {A : Type u} {B : A → Type u}
     (C : DepContext A B) {a₁ a₂ : A} {y : B a₂}
     (p : Path a₁ a₂)
     (t : Path (A := B a₂) (C.fill a₂) y) :

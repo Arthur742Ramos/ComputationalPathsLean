@@ -629,5 +629,122 @@ variable {C}
 
 end Context
 
+set_option linter.unnecessarySimpa false
+
+namespace DepContext
+
+variable {A : Type u} {B : A → Type u}
+variable (C : DepContext A B)
+
+/-- Lift a dependent context to rewrite-quotiented paths. -/
+@[simp] def mapQuot {a₁ a₂ : A} (x : PathRwQuot A a₁ a₂) :
+    PathRwQuot (B a₂)
+      (Path.transport (A := A) (D := fun a => B a)
+        (PathRwQuot.normalPath (A := A) (x := x)) (C.fill a₁))
+      (C.fill a₂) :=
+  Quot.mk _
+    (DepContext.map (A := A) (B := B) C
+      (PathRwQuot.normalPath (A := A) (x := x)))
+
+variable {C}
+
+@[simp] theorem mapQuot_mk {a₁ a₂ : A} (p : Path a₁ a₂) :
+    mapQuot (A := A) (B := B) C (Quot.mk _ p) =
+      Quot.mk _ (DepContext.map (A := A) (B := B) C p) := by
+  have hstart :
+      Path.transport (A := A) (D := fun a => B a)
+          (PathRwQuot.normalPath (A := A) (x := Quot.mk _ p))
+          (C.fill a₁) =
+        Path.transport (A := A) (D := fun a => B a) p (C.fill a₁) := by
+    have htoEq' :
+        (PathRwQuot.normalPath (A := A) (x := Quot.mk _ p)).toEq =
+          p.toEq := by
+      simpa [PathRwQuot.toEq_mk] using
+        (PathRwQuot.normalPath_toEq (A := A) (x := Quot.mk _ p))
+    exact
+      Path.transport_of_toEq_eq
+        (A := A) (D := fun a => B a)
+        (p := PathRwQuot.normalPath (A := A) (x := Quot.mk _ p))
+        (q := p) (x := C.fill a₁) htoEq'
+  cases hstart
+  apply Quot.sound
+  have hcanon' :
+      Rw (DepContext.map (A := A) (B := B) C p)
+        (DepContext.map (A := A) (B := B) C
+          (PathRwQuot.normalPath (A := A) (x := Quot.mk _ p))) := by
+    simpa [PathRwQuot.normalPath_mk, normalize] using
+      (rw_depContext_map_of_rw (A := A) (B := B) (C := C)
+        (p := p) (q := normalize (A := A) (a := a₁) (b := a₂) p)
+        (rw_canon (A := A) (a := a₁) (b := a₂) (p := p)))
+  exact rweq_symm (rweq_of_rw hcanon')
+
+@[simp] theorem toEq_mapQuot {a₁ a₂ : A}
+    (x : PathRwQuot A a₁ a₂) :
+    PathRwQuot.toEq (A := B a₂)
+        (mapQuot (A := A) (B := B) C x) =
+      (DepContext.map (A := A) (B := B) C
+        (PathRwQuot.normalPath (A := A) (x := x))).toEq := rfl
+
+@[simp] theorem mapQuot_refl (a : A) :
+    mapQuot (A := A) (B := B) C (PathRwQuot.refl (A := A) a) =
+      PathRwQuot.refl (A := B a) (C.fill a) := by
+  change
+    Quot.mk _
+        (DepContext.map (A := A) (B := B) C
+          (PathRwQuot.normalPath (A := A) (x := PathRwQuot.refl (A := A) a))) =
+      Quot.mk _ (Path.refl (C.fill a))
+  apply Quot.sound
+  have hmap :
+      DepContext.map (A := A) (B := B) C (Path.refl a) =
+        Path.refl (C.fill a) := by
+    simp [DepContext.map]
+  have hnorm :
+      DepContext.map (A := A) (B := B) C
+          (PathRwQuot.normalPath (A := A) (x := PathRwQuot.refl (A := A) a)) =
+        Path.refl (C.fill a) := by
+    simpa [PathRwQuot.normalPath] using hmap
+  exact rweq_of_eq hnorm
+
+@[simp] theorem mapQuot_ofEq {a₁ a₂ : A} (h : a₁ = a₂) :
+    mapQuot (A := A) (B := B) C
+        (PathRwQuot.ofEq (A := A) (a := a₁) (b := a₂) h) =
+      PathRwQuot.ofEq (A := B a₂)
+        (a :=
+          Path.transport (A := A) (D := fun a => B a)
+            (Path.ofEq (A := A) (a := a₁) (b := a₂) h)
+            (C.fill a₁))
+        (b := C.fill a₂)
+        (by
+          cases h
+          rfl) := by
+  cases h
+  have htransport :
+      Path.transport (A := A) (D := fun a => B a)
+          (Path.ofEq (A := A) (a := a₁) (b := a₁) rfl)
+          (C.fill a₁) =
+        C.fill a₁ := by
+    have htransportEq :=
+      Path.transport_of_toEq_eq
+        (A := A) (D := fun a => B a)
+        (p := Path.ofEq (A := A) (a := a₁) (b := a₁) rfl)
+        (q := Path.refl a₁) (x := C.fill a₁)
+        (by simp)
+    calc
+      Path.transport (A := A) (D := fun a => B a)
+          (Path.ofEq (A := A) (a := a₁) (b := a₁) rfl)
+          (C.fill a₁)
+          =
+        Path.transport (A := A) (D := fun a => B a)
+          (Path.refl a₁) (C.fill a₁) := htransportEq
+      _ = C.fill a₁ :=
+        Path.transport_refl (A := A) (D := fun a => B a)
+          (a := a₁) (x := C.fill a₁)
+  cases htransport
+  simpa only [PathRwQuot.ofEq_refl]
+    using
+      (mapQuot_refl (A := A) (B := B) (C := C) (a := a₁))
+
+end DepContext
+
 end Path
 end ComputationalPaths

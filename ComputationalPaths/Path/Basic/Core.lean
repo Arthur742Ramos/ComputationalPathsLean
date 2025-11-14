@@ -252,6 +252,18 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
       cases proof
       rfl
 
+@[simp] theorem transport_of_toEq_eq {D : A → Sort v}
+    {p q : Path a b} (h : p.toEq = q.toEq) (x : D a) :
+    transport (D := D) p x = transport (D := D) q x := by
+  cases p with
+  | mk steps₁ proof₁ =>
+      cases q with
+      | mk steps₂ proof₂ =>
+          cases proof₁
+          cases proof₂
+          cases h
+          rfl
+
 @[simp] theorem transport_const {D : Type v} (p : Path a b) (x : D) :
     transport (D := fun _ => D) p x = x := by
   cases p with

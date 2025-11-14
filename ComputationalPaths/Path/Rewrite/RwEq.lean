@@ -390,6 +390,129 @@ end RewriteLift
   rweq_of_step
     (Step.context_subst_right_assoc (A := A) (B := B) C p t u)
 
+@[simp] theorem rweq_depContext_map_of_rweq
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A}
+    {p q : Path a₁ a₂} (h : RwEq p q) :
+    RwEq (DepContext.map (A := A) (B := B) C p)
+      (DepContext.map (A := A) (B := B) C q) := by
+  induction h with
+  | refl _ => exact RwEq.refl _
+  | step step =>
+      exact RwEq.step
+        (Step.depContext_congr (A := A) (B := B) (C := C) step)
+  | symm _ ih => exact RwEq.symm ih
+  | trans _ _ ih₁ ih₂ => exact RwEq.trans ih₁ ih₂
+
+@[simp] theorem rweq_depContext_subst_left_beta
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {x : B a₁}
+    (r : Path (A := B a₁) x (C.fill a₁)) (p : Path a₁ a₂) :
+    RwEq (Path.trans
+          (Context.map (A := B a₁) (B := B a₂)
+            (DepContext.transportContext (A := A) (B := B) p) r)
+          (DepContext.map (A := A) (B := B) C p))
+      (DepContext.substLeft (A := A) (B := B) C r p) :=
+  rweq_of_step
+    (Step.depContext_subst_left_beta (A := A) (B := B) C r p)
+
+@[simp] theorem rweq_depContext_subst_left_assoc
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {x : B a₁} {y : B a₂}
+    (r : Path (A := B a₁) x (C.fill a₁)) (p : Path a₁ a₂)
+    (t : Path (A := B a₂) (C.fill a₂) y) :
+    RwEq (Path.trans
+        (DepContext.substLeft (A := A) (B := B) C r p) t)
+      (Path.trans
+        (Context.map (A := B a₁) (B := B a₂)
+          (DepContext.transportContext (A := A) (B := B) p) r)
+        (DepContext.substRight (A := A) (B := B) C p t)) :=
+  rweq_of_step
+    (Step.depContext_subst_left_assoc (A := A) (B := B) C r p t)
+
+@[simp] theorem rweq_depContext_subst_right_beta
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {y : B a₂}
+    (p : Path a₁ a₂)
+    (t : Path (A := B a₂) (C.fill a₂) y) :
+    RwEq (Path.trans
+        (DepContext.map (A := A) (B := B) C p) t)
+      (DepContext.substRight (A := A) (B := B) C p t) :=
+  rweq_of_step
+    (Step.depContext_subst_right_beta (A := A) (B := B) C p t)
+
+@[simp] theorem rweq_depContext_subst_right_assoc
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {y z : B a₂}
+    (p : Path a₁ a₂)
+    (t : Path (A := B a₂) (C.fill a₂) y)
+    (u : Path (A := B a₂) y z) :
+    RwEq (Path.trans
+        (DepContext.substRight (A := A) (B := B) C p t) u)
+      (DepContext.substRight (A := A) (B := B) C p
+        (Path.trans t u)) :=
+  rweq_of_step
+    (Step.depContext_subst_right_assoc (A := A) (B := B) C p t u)
+
+@[simp] theorem rweq_depContext_subst_left_refl_right
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a : A} {x : B a}
+    (r : Path (A := B a) x (C.fill a)) :
+    RwEq (DepContext.substLeft (A := A) (B := B) C r (Path.refl a))
+      r :=
+  rweq_of_step
+    (Step.depContext_subst_left_refl_right (A := A) (B := B) C r)
+
+@[simp] theorem rweq_depContext_subst_left_refl_left
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A}
+    (p : Path a₁ a₂) :
+    RwEq (DepContext.substLeft (A := A) (B := B) C
+        (Path.refl (C.fill a₁)) p)
+      (DepContext.map (A := A) (B := B) C p) :=
+  rweq_of_step
+    (Step.depContext_subst_left_refl_left (A := A) (B := B) C p)
+
+@[simp] theorem rweq_depContext_subst_right_refl_left
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a : A} {y : B a}
+    (r : Path (A := B a) (C.fill a) y) :
+    RwEq (DepContext.substRight (A := A) (B := B) C
+        (Path.refl a) r) r :=
+  rweq_of_step
+    (Step.depContext_subst_right_refl_left (A := A) (B := B) C r)
+
+@[simp] theorem rweq_depContext_subst_right_refl_right
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A}
+    (p : Path a₁ a₂) :
+    RwEq (DepContext.substRight (A := A) (B := B) C p
+        (Path.refl (C.fill a₂)))
+      (DepContext.map (A := A) (B := B) C p) :=
+  rweq_of_step
+    (Step.depContext_subst_right_refl_right (A := A) (B := B) C p)
+
+@[simp] theorem rweq_depContext_subst_left_idempotent
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {x : B a₁}
+    (r : Path (A := B a₁) x (C.fill a₁)) (p : Path a₁ a₂) :
+    RwEq (DepContext.substLeft (A := A) (B := B) C
+        (DepContext.substLeft (A := A) (B := B) C r (Path.refl a₁)) p)
+      (DepContext.substLeft (A := A) (B := B) C r p) :=
+  rweq_of_step
+    (Step.depContext_subst_left_idempotent (A := A) (B := B) C r p)
+
+@[simp] theorem rweq_depContext_subst_right_cancel_inner
+    {A : Type u} {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {y : B a₂}
+    (p : Path a₁ a₂)
+    (t : Path (A := B a₂) (C.fill a₂) y) :
+    RwEq (DepContext.substRight (A := A) (B := B) C p
+        (DepContext.substRight (A := A) (B := B) C (Path.refl a₂) t))
+      (DepContext.substRight (A := A) (B := B) C p t) :=
+  rweq_of_step
+    (Step.depContext_subst_right_cancel_inner (A := A) (B := B) C p t)
+
 @[simp] theorem rweq_transport_refl_beta
     {A : Type u} {B : A → Type u}
     {a : A} (x : B a) :
