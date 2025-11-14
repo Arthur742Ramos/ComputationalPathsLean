@@ -27,6 +27,9 @@ variable {A : Type u} {B : Type v}
     Path (C.fill a) (C.fill b) :=
   congrArg C.fill p
 
+@[simp] theorem map_toEq (C : Context A B) {a b : A} (p : Path a b) :
+  (map C p).toEq = _root_.congrArg C.fill p.toEq := rfl
+
 @[simp] theorem map_refl (C : Context A B) (a : A) :
     map C (Path.refl a) = Path.refl (C.fill a) := by
   simp [map]

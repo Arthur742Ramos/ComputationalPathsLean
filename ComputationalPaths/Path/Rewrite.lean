@@ -509,6 +509,28 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
         (Path.mapLeft (A := A₁) (B := B) (C := A) f p b2)) :=
   rw_of_step (Step.map2_subst (A₁ := A₁) (B := B) (f := f) p q)
 
+@[simp] theorem rw_mapLeft_of_rw {B : Type u}
+  (f : A → B → A) {a₁ a₂ : A} (b : B)
+  {p q : Path a₁ a₂} (h : Rw p q) :
+  Rw (Path.mapLeft f p b) (Path.mapLeft f q b) := by
+  induction h with
+  | refl =>
+    exact Rw.refl (Path.mapLeft f p b)
+  | tail _ step ih =>
+      exact Rw.tail ih
+        (Step.mapLeft_congr (A := A) (B := B) (f := f) (b := b) step)
+
+@[simp] theorem rw_mapRight_of_rw
+  (f : A → A → A) (a : A) {b₁ b₂ : A}
+  {p q : Path b₁ b₂} (h : Rw p q) :
+  Rw (Path.mapRight f a p) (Path.mapRight f a q) := by
+  induction h with
+  | refl =>
+    exact Rw.refl (Path.mapRight f a p)
+  | tail _ step ih =>
+      exact Rw.tail ih
+        (Step.mapRight_congr (A := A) (f := f) (a := a) step)
+
 @[simp] theorem rw_trans {p q r : Path a b}
     (h1 : Rw p q) (h2 : Rw q r) : Rw p r :=
   match h2 with
