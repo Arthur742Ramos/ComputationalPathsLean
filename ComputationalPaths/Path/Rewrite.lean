@@ -151,26 +151,26 @@ end SimpleEquiv
 
 /-- A single rewrite step between computational paths. -/
 inductive Step :
-    {A : Type _} → {a b : A} → Path a b → Path a b → Prop
-  | symm_refl {A : Type _} (a : A) :
+  {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+  | symm_refl {A : Type u} (a : A) :
       Step (A := A) (symm (Path.refl a)) (Path.refl a)
-  | symm_symm {A : Type _} {a b : A} (p : Path a b) :
+  | symm_symm {A : Type u} {a b : A} (p : Path a b) :
       Step (A := A) (symm (symm p)) p
-  | trans_refl_left {A : Type _} {a b : A} (p : Path a b) :
+  | trans_refl_left {A : Type u} {a b : A} (p : Path a b) :
       Step (A := A) (trans (Path.refl a) p) p
-  | trans_refl_right {A : Type _} {a b : A} (p : Path a b) :
+  | trans_refl_right {A : Type u} {a b : A} (p : Path a b) :
       Step (A := A) (trans p (Path.refl b)) p
-  | trans_symm {A : Type _} {a b : A} (p : Path a b) :
+  | trans_symm {A : Type u} {a b : A} (p : Path a b) :
       Step (A := A) (trans p (symm p)) (Path.refl a)
-  | symm_trans {A : Type _} {a b : A} (p : Path a b) :
+  | symm_trans {A : Type u} {a b : A} (p : Path a b) :
       Step (A := A) (trans (symm p) p) (Path.refl b)
-  | symm_trans_congr {A : Type _} {a b c : A} (p : Path a b) (q : Path b c) :
+  | symm_trans_congr {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
       Step (A := A) (symm (trans p q)) (trans (symm q) (symm p))
-  | trans_assoc {A : Type _} {a b c d : A}
+  | trans_assoc {A : Type u} {a b c d : A}
       (p : Path a b) (q : Path b c) (r : Path c d) :
       Step (A := A) (trans (trans p q) r) (trans p (trans q r))
   | map2_subst
-      {A : Type _} {A₁ : Type u} {B : Type u}
+    {A : Type u} {A₁ : Type u} {B : Type u}
       {a1 a2 : A₁} {b1 b2 : B}
       (f : A₁ → B → A)
       (p : Path (A := A₁) a1 a2)
@@ -181,7 +181,7 @@ inductive Step :
           (Path.mapRight (A := A₁) (B := B) (C := A) f a1 q)
           (Path.mapLeft (A := A₁) (B := B) (C := A) f p b2))
   | prod_fst_beta
-      {A : Type _} {B : Type u}
+    {A : Type u} {B : Type u}
       {a1 a2 : A} {b1 b2 : B}
       (p : Path a1 a2) (q : Path b1 b2) :
       Step (A := A)
@@ -189,7 +189,7 @@ inductive Step :
           (Path.map2 (A := A) (B := B) (C := Prod A B) Prod.mk p q))
         p
   | prod_snd_beta
-      {A : Type _} {B : Type u}
+    {A : Type u} {B : Type u}
       {a1 a2 : B} {b1 b2 : A}
       (p : Path a1 a2) (q : Path b1 b2) :
       Step (A := A)
@@ -197,7 +197,7 @@ inductive Step :
           (Path.map2 (A := B) (B := A) (C := Prod B A) Prod.mk p q))
         q
   | prod_rec_beta
-      {A : Type _} {α β : Type u}
+    {A : Type u} {α β : Type u}
       {a1 a2 : α} {b1 b2 : β}
       (f : α → β → A)
       (p : Path a1 a2) (q : Path b1 b2) :
@@ -206,13 +206,13 @@ inductive Step :
           (Path.map2 (A := α) (B := β) (C := Prod α β) Prod.mk p q))
         (Path.map2 (A := α) (B := β) (C := A) f p q)
   | prod_eta
-      {α β : Type u}
+    {α β : Type u}
       {a₁ a₂ : α} {b₁ b₂ : β}
       (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
       Step (A := Prod α β)
         (Path.prodMk (Path.fst p) (Path.snd p)) p
   | sigma_fst_beta
-      {A : Type _} {B : A → Type u}
+    {A : Type u} {B : A → Type u}
       {a1 a2 : A} {b1 : B a1} {b2 : B a2}
       (p : Path a1 a2)
       (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
@@ -221,7 +221,7 @@ inductive Step :
         (Path.sigmaMk (B := B) p q))
         (Path.ofEq (A := A) p.toEq)
   | sigma_snd_beta
-      {A₀ : Type u} {B : A₀ → Type u}
+    {A₀ : Type u} {B : A₀ → Type u}
       {a1 a2 : A₀} {b1 : B a1} {b2 : B a2}
       (p : Path a1 a2)
       (q :
@@ -234,13 +234,13 @@ inductive Step :
                 (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q)) b1)
           (b := b2) q.toEq)
   | sigma_eta
-      {A : Type u} {B : A → Type u}
+    {A : Type u} {B : A → Type u}
       {a1 a2 : A} {b1 : B a1} {b2 : B a2}
       (p : Path (A := Sigma B) ⟨a1, b1⟩ ⟨a2, b2⟩) :
       Step (A := Sigma B)
         (Path.sigmaMk (Path.sigmaFst p) (Path.sigmaSnd p)) p
   | sum_rec_inl_beta
-      {A : Type _} {α β : Type u}
+    {A : Type u} {α β : Type u}
       {a1 a2 : α}
       (f : α → A) (g : β → A)
       (p : Path a1 a2) :
@@ -249,7 +249,7 @@ inductive Step :
           (Path.congrArg Sum.inl p))
         (Path.congrArg f p)
   | sum_rec_inr_beta
-      {A : Type _} {α β : Type u}
+    {A : Type u} {α β : Type u}
       {b1 b2 : β}
       (f : α → A) (g : β → A)
       (p : Path b1 b2) :
@@ -258,7 +258,7 @@ inductive Step :
           (Path.congrArg Sum.inr p))
         (Path.congrArg g p)
   | fun_app_beta
-      {A : Type _} {α : Type u}
+    {A : Type u} {α : Type u}
       {f g : α → A}
       (p : ∀ x : α, Path (f x) (g x)) (a : α) :
       Step (A := A)
@@ -266,31 +266,71 @@ inductive Step :
           (Path.lamCongr (f := f) (g := g) p))
         (p a)
   | fun_eta
-      {α β : Type u}
+    {α β : Type u}
       {f g : α → β} (p : Path f g) :
       Step (A := α → β)
         (Path.lamCongr (fun x => Path.app p x)) p
   | apd_refl
-      {A : Type u} {B : A → Type u}
+    {A : Type u} {B : A → Type u}
       (f : ∀ x : A, B x) (a : A) :
       Step (A := B a)
         (Path.apd (A := A) (B := B) f (Path.refl a))
         (Path.refl (f a))
+  | context_congr
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a₁ a₂ : A}
+      {p q : Path a₁ a₂} :
+      Step (A := A) p q →
+        Step (A := B)
+          (Context.map (A := A) (B := B) C p)
+          (Context.map (A := A) (B := B) C q)
+  | biContext_mapLeft_congr
+    {A : Type u} {B : Type u} {C : Type u}
+      (K : BiContext A B C) {a₁ a₂ : A} (b : B)
+      {p q : Path a₁ a₂} :
+      Step (A := A) p q →
+        Step (A := C)
+          (BiContext.mapLeft (A := A) (B := B) (C := C) K p b)
+          (BiContext.mapLeft (A := A) (B := B) (C := C) K q b)
+  | biContext_mapRight_congr
+    {A : Type u} {B : Type u} {C : Type u}
+      (K : BiContext A B C) (a : A) {b₁ b₂ : B}
+      {p q : Path b₁ b₂} :
+      Step (A := B) p q →
+        Step (A := C)
+          (BiContext.mapRight (A := A) (B := B) (C := C) K a p)
+          (BiContext.mapRight (A := A) (B := B) (C := C) K a q)
+  | biContext_map2_congr_left
+    {A : Type u} {B : Type u} {C : Type u}
+      (K : BiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+      {p q : Path a₁ a₂} (r : Path b₁ b₂) :
+      Step (A := A) p q →
+        Step (A := C)
+          (BiContext.map2 (A := A) (B := B) (C := C) K p r)
+          (BiContext.map2 (A := A) (B := B) (C := C) K q r)
+  | biContext_map2_congr_right
+    {A : Type u} {B : Type u} {C : Type u}
+      (K : BiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+      (p : Path a₁ a₂) {q r : Path b₁ b₂} :
+      Step (A := B) q r →
+        Step (A := C)
+          (BiContext.map2 (A := A) (B := B) (C := C) K p q)
+          (BiContext.map2 (A := A) (B := B) (C := C) K p r)
   | mapLeft_congr
-      {A : Type _} {B : Type u}
+    {A : Type u} {B : Type u}
       (f : A → B → A) {a₁ a₂ : A} (b : B)
       {p q : Path a₁ a₂} :
       Step (A := A) p q →
         Step (A := A) (Path.mapLeft (A := A) (B := B) (C := A) f p b)
           (Path.mapLeft (A := A) (B := B) (C := A) f q b)
   | mapRight_congr
-      {A : Type _} (f : A → A → A) (a : A) {b₁ b₂ : A}
+    {A : Type u} (f : A → A → A) (a : A) {b₁ b₂ : A}
       {p q : Path b₁ b₂} :
       Step (A := A) p q →
         Step (A := A) (Path.mapRight (A := A) (B := A) (C := A) f a p)
           (Path.mapRight (A := A) (B := A) (C := A) f a q)
   | mapLeft_ofEq
-      {A : Type _} {B : Type u}
+    {A : Type u} {B : Type u}
       (f : A → B → A) {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
       Step (A := A)
         (Path.mapLeft (A := A) (B := B) (C := A) f
@@ -298,20 +338,20 @@ inductive Step :
         (Path.ofEq (A := A) (a := f a₁ b) (b := f a₂ b)
           (_root_.congrArg (fun x => f x b) h))
   | mapRight_ofEq
-      {A : Type _} (f : A → A → A) (a : A) {b₁ b₂ : A} (h : b₁ = b₂) :
+    {A : Type u} (f : A → A → A) (a : A) {b₁ b₂ : A} (h : b₁ = b₂) :
       Step (A := A)
         (Path.mapRight (A := A) (B := A) (C := A) f a
           (Path.ofEq (A := A) (a := b₁) (b := b₂) h))
         (Path.ofEq (A := A) (a := f a b₁) (b := f a b₂)
           (_root_.congrArg (f a) h))
-  | canon {A : Type _} {a b : A} (p : Path a b) :
+  | canon {A : Type u} {a b : A} (p : Path a b) :
       Step (A := A) p (Path.ofEq p.toEq)
-  | symm_congr {A : Type _} {a b : A} {p q : Path a b} :
+  | symm_congr {A : Type u} {a b : A} {p q : Path a b} :
       Step (A := A) p q → Step (A := A) (Path.symm p) (Path.symm q)
-  | trans_congr_left {A : Type _} {a b c : A}
+  | trans_congr_left {A : Type u} {a b c : A}
       {p q : Path a b} (r : Path b c) :
       Step (A := A) p q → Step (A := A) (Path.trans p r) (Path.trans q r)
-  | trans_congr_right {A : Type _} {a b c : A}
+  | trans_congr_right {A : Type u} {a b c : A}
       (p : Path a b) {q r : Path b c} :
       Step (A := A) q r → Step (A := A) (Path.trans p q) (Path.trans p r)
 
@@ -320,6 +360,8 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
     Step.prod_rec_beta Step.prod_eta Step.sigma_fst_beta Step.sigma_snd_beta Step.sigma_eta
     Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta Step.apd_refl
+    Step.context_congr Step.biContext_mapLeft_congr Step.biContext_mapRight_congr
+    Step.biContext_map2_congr_left Step.biContext_map2_congr_right
     Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq Step.canon
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
 
@@ -348,6 +390,21 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | fun_app_beta _ _ => simp
   | fun_eta _ => simp
   | apd_refl _ _ => simp
+  | context_congr _ _ ih =>
+    cases ih
+    rfl
+  | biContext_mapLeft_congr _ _ _ ih =>
+    cases ih
+    rfl
+  | biContext_mapRight_congr _ _ _ ih =>
+    cases ih
+    rfl
+  | biContext_map2_congr_left _ _ _ ih =>
+    cases ih
+    rfl
+  | biContext_map2_congr_right _ _ _ ih =>
+    cases ih
+    rfl
   | mapLeft_congr _ _ _ ih =>
       cases ih
       simp
@@ -373,7 +430,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
 /-- Reflexive/transitive closure of rewrite steps (`rw`-reduction). -/
 inductive Rw {A : Type u} {a b : A} : Path a b → Path a b → Prop
   | refl (p : Path a b) : Rw p p
-  | tail {p q r : Path a b} : Rw p q → Step q r → Rw p r
+  | tail {p q r : Path a b} : Rw p q → Step (A := A) q r → Rw p r
 
 variable {A : Type u} {a b c : A}
 
@@ -526,6 +583,70 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
     exact Rw.refl (Path.trans p q)
   | tail _ step ih =>
     exact Rw.tail ih (Step.trans_congr_right p step)
+
+@[simp] theorem rw_context_map_of_rw {A : Type u} {B : Type u}
+  (Ctx : Context A B) {a₁ a₂ : A}
+  {p q : Path a₁ a₂} (h : Rw (A := A) p q) :
+  Rw (Context.map (A := A) (B := B) Ctx p)
+    (Context.map (A := A) (B := B) Ctx q) := by
+  induction h with
+  | refl =>
+      exact Rw.refl (Context.map (A := A) (B := B) Ctx p)
+  | tail _ step ih =>
+      exact Rw.tail ih
+        (Step.context_congr (A := A) (B := B) Ctx step)
+
+@[simp] theorem rw_biContext_mapLeft_of_rw {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) {a₁ a₂ : A} (b : B)
+  {p q : Path a₁ a₂} (h : Rw (A := A) p q) :
+  Rw (BiContext.mapLeft (A := A) (B := B) (C := C) K p b)
+    (BiContext.mapLeft (A := A) (B := B) (C := C) K q b) := by
+  induction h with
+  | refl =>
+      exact Rw.refl (BiContext.mapLeft (A := A) (B := B) (C := C) K p b)
+  | tail _ step ih =>
+      exact Rw.tail ih
+        (Step.biContext_mapLeft_congr (A := A) (B := B) (C := C)
+          (K := K) (b := b) step)
+
+@[simp] theorem rw_biContext_mapRight_of_rw {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) (a : A) {b₁ b₂ : B}
+  {p q : Path b₁ b₂} (h : Rw (A := B) p q) :
+  Rw (BiContext.mapRight (A := A) (B := B) (C := C) K a p)
+    (BiContext.mapRight (A := A) (B := B) (C := C) K a q) := by
+  induction h with
+  | refl =>
+      exact Rw.refl (BiContext.mapRight (A := A) (B := B) (C := C) K a p)
+  | tail _ step ih =>
+      exact Rw.tail ih
+        (Step.biContext_mapRight_congr (A := A) (B := B) (C := C)
+          (K := K) (a := a) step)
+
+@[simp] theorem rw_biContext_map2_left_of_rw {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+  {p q : Path a₁ a₂} (r : Path b₁ b₂) (h : Rw (A := A) p q) :
+  Rw (BiContext.map2 (A := A) (B := B) (C := C) K p r)
+    (BiContext.map2 (A := A) (B := B) (C := C) K q r) := by
+  induction h with
+  | refl =>
+      exact Rw.refl (BiContext.map2 (A := A) (B := B) (C := C) K p r)
+  | tail _ step ih =>
+      exact Rw.tail ih
+        (Step.biContext_map2_congr_left (A := A) (B := B) (C := C)
+          (K := K) (r := r) step)
+
+@[simp] theorem rw_biContext_map2_right_of_rw {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+  (p : Path a₁ a₂) {q r : Path b₁ b₂} (h : Rw (A := B) q r) :
+  Rw (BiContext.map2 (A := A) (B := B) (C := C) K p q)
+    (BiContext.map2 (A := A) (B := B) (C := C) K p r) := by
+  induction h with
+  | refl =>
+      exact Rw.refl (BiContext.map2 (A := A) (B := B) (C := C) K p q)
+  | tail _ step ih =>
+      exact Rw.tail ih
+        (Step.biContext_map2_congr_right (A := A) (B := B) (C := C)
+          (K := K) (p := p) step)
 
 @[simp] theorem rw_mapLeft_of_rw {B : Type u}
   (f : A → B → A) {a₁ a₂ : A} (b : B)
