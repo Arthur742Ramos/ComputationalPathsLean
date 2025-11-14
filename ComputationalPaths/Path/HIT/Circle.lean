@@ -142,27 +142,37 @@ def circleLoopZPow (z : Int) : CircleLoopQuot :=
     circleLoopZPow (Int.ofNat m + Int.ofNat n) =
       LoopQuot.comp (circleLoopZPow (Int.ofNat m))
         (circleLoopZPow (Int.ofNat n)) := by
-  have hsum : (m : Int) + (n : Int) = ((m + n : Nat) : Int) :=
-    (Int.natCast_add m n).symm
-  have hrewrite :
-      circleLoopZPow (Int.ofNat m + Int.ofNat n) =
-        circleLoopZPow (Int.ofNat (m + n)) :=
-    _root_.congrArg circleLoopZPow hsum
-  have hsumPow :
-      circleLoopZPow (Int.ofNat (m + n)) = circleLoopPow (m + n) :=
-    circleLoopZPow_ofNat (n := m + n)
-  have hpowAdd := circleLoopPow_add (m := m) (n := n)
-  calc
-    circleLoopZPow (Int.ofNat m + Int.ofNat n)
-        = circleLoopZPow (Int.ofNat (m + n)) := hrewrite
-    _ = circleLoopPow (m + n) := hsumPow
-    _ = LoopQuot.comp (circleLoopPow m) (circleLoopPow n) := hpowAdd
-    _ = LoopQuot.comp (circleLoopZPow m) (circleLoopPow n) := by
-      rw [← circleLoopZPow_ofNat (n := m)]
-    _ = LoopQuot.comp (circleLoopZPow m) (circleLoopZPow n) := by
-      rw [← circleLoopZPow_ofNat (n := n)]
-    _ = LoopQuot.comp (circleLoopZPow (Int.ofNat m))
-        (circleLoopZPow (Int.ofNat n)) := rfl
+  exact
+    LoopQuot.zpow_ofNat_add (A := Circle) (a := circleBase)
+      (x := circleLoopClass) m n
+
+  /-- Concrete candidate for the decode map ℤ → π₁(S¹), built by
+  iterating the fundamental loop according to the given integer.  Later we
+  will show that this satisfies the planned decode axioms. -/
+  def circleDecodeConcrete : Int → CircleLoopQuot :=
+    circleLoopZPow
+
+  @[simp] theorem circleDecodeConcrete_ofNat (n : Nat) :
+      circleDecodeConcrete (Int.ofNat n) = circleLoopPow n := rfl
+
+  @[simp] theorem circleDecodeConcrete_zero :
+      circleDecodeConcrete 0 = LoopQuot.id :=
+    circleLoopZPow_zero
+
+  @[simp] theorem circleDecodeConcrete_one :
+      circleDecodeConcrete 1 = circleLoopClass :=
+    circleLoopZPow_one
+
+  @[simp] theorem circleDecodeConcrete_neg (z : Int) :
+      circleDecodeConcrete (-z) =
+        LoopQuot.inv (circleDecodeConcrete z) :=
+    circleLoopZPow_neg (z := z)
+
+  theorem circleDecodeConcrete_ofNat_add (m n : Nat) :
+      circleDecodeConcrete (Int.ofNat m + Int.ofNat n) =
+        LoopQuot.comp (circleDecodeConcrete (Int.ofNat m))
+          (circleDecodeConcrete (Int.ofNat n)) :=
+    circleLoopZPow_ofNat_add (m := m) (n := n)
 
 /-- Baseline data describing how π₁(S¹) will be related to ℤ.
 

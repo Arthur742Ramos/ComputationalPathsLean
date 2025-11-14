@@ -270,6 +270,36 @@ def zpow (x : LoopQuot A a) : Int → LoopQuot A a
           inv (zpow x (Int.negSucc k)) := rfl
       exact hlhs.trans (hmid.trans hrhs)
 
+@[simp] theorem zpow_ofNat_add (x : LoopQuot A a) (m n : Nat) :
+    zpow x (Int.ofNat m + Int.ofNat n) =
+      comp (zpow x (Int.ofNat m)) (zpow x (Int.ofNat n)) := by
+  have hsum : (m : Int) + (n : Int) = ((m + n : Nat) : Int) :=
+    (Int.natCast_add m n).symm
+  have hrewrite :
+      zpow x (Int.ofNat m + Int.ofNat n) =
+        zpow x (Int.ofNat (m + n)) :=
+    _root_.congrArg (zpow x) hsum
+  have hsumPow :
+      zpow x (Int.ofNat (m + n)) = pow x (m + n) :=
+    zpow_ofNat (A := A) (a := a) (x := x) (n := m + n)
+  have hpowAdd :=
+    pow_add (A := A) (a := a) (x := x) m n
+  calc
+    zpow x (Int.ofNat m + Int.ofNat n)
+        = zpow x (Int.ofNat (m + n)) := hrewrite
+    _ = pow x (m + n) := hsumPow
+    _ = comp (pow x m) (pow x n) := hpowAdd
+    _ = comp (zpow x (Int.ofNat m)) (pow x n) := by
+          exact
+            (_root_.congrArg
+              (fun y => comp y (pow x n))
+              (zpow_ofNat (A := A) (a := a) (x := x) (n := m))).symm
+    _ = comp (zpow x (Int.ofNat m)) (zpow x (Int.ofNat n)) := by
+          exact
+            (_root_.congrArg
+              (fun y => comp (zpow x (Int.ofNat m)) y)
+              (zpow_ofNat (A := A) (a := a) (x := x) (n := n))).symm
+
 end LoopQuot
 
 /-- Strict (definitional) group structure carried by the loop quotient at a
