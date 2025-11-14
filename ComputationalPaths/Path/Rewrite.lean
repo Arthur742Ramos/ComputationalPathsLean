@@ -13,6 +13,9 @@ import ComputationalPaths.Path.Rewrite.Step
 import ComputationalPaths.Path.Rewrite.Rw
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.Quot
+import ComputationalPaths.Path.Rewrite.LNDEQ
+import ComputationalPaths.Path.Rewrite.Termination
+import ComputationalPaths.Path.Rewrite.Confluence
 
 /-!
   This file now serves as an umbrella import for the modular rewrite system.

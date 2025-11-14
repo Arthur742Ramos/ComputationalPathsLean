@@ -29,7 +29,8 @@ rules reuse the underlying step via `Step.symm_congr`.
 | 17 | `case (inl r)` reduces (mx3ls) | `Step.sum_rec_inl_beta` | Sum-elimination β for the left branch. |
 | 18 | `case (inr r)` reduces (mx3ru) | `Step.sum_rec_inr_beta` | Symmetric β-rule. |
 | 19 | `(λx. f x) a` → `f a` (mxlr) | `Step.fun_app_beta` | Dependent function β-rule. |
-| 20 | `Σ`-elimination β (mxrs/mxls) | `Step.sigma_fst_beta` / `Step.sigma_snd_beta` | Transporting dependent pairs through `Sigma.fst`/`Sigma.snd`. |
+| 20a | `Σ`-elimination β on `Sigma.fst` (mxrs) | `Step.sigma_fst_beta` | Transporting dependent pairs through the first projection. |
+| 20b | `Σ`-elimination β on `Sigma.snd` (mxls) | `Step.sigma_snd_beta` | Transporting dependent pairs through the second projection. |
 | 21 | `⟨fst x, snd x⟩` → `x` (mxr) | `Step.prod_eta` | Pair η-rule. |
 | 22 | `case` congruence (mxxt) | `Step.context_congr` for the `Sum.rec` context | Scrutinee/branch reductions are lifted through contexts. |
 | 23 | `λx, h x` → `h` (xmrr) | `Step.fun_eta` | Function η-rule. |
@@ -53,13 +54,98 @@ rules reuse the underlying step via `Step.symm_congr`.
 
 ## Outstanding items
 
-- The table groups the dependent Σ β-rules (paper’s `mxrs`/`mxls`) under a single entry.
-  If finer granularity is required, we can split rule 20 into separate rows referencing
-  `Step.sigma_fst_beta` and `Step.sigma_snd_beta` individually.
+- Extend the catalog of critical-pair witnesses beyond the currently mechanised
+  β/η and unit overlaps so that every Knuth–Bendix row from §3.3 carries a named
+  `Confluence.Join` certificate.  In addition to the context-sensitive
+  cancellations (`tt` with `ttsv`/`tstu`), the substitution/unit overlaps
+  (`tsbll`/`slr`, `tsbrl`/`srr`) and the symmetric cancellation pair
+  (`stss`/`ssbl`) now have explicit joins.  The remaining Σ-heavy rows remain on
+  the backlog.
+- Exploit the quotient-facing lemmas to streamline downstream developments.
+  Paper-style notation for quotient composition/inversion (`PathRwQuot.cmpA` and
+  `PathRwQuot.invA`) now satisfies the usual unit/inverse laws by definition, and
+  the new `Context.mapQuot` bridge shows that those equalities propagate through
+  unary contexts.  Dependent/Σ contexts remain to be connected in the same way.
 
-With the above caveat, every other LNDEQ rewrite either has a dedicated constructor or
+With the above caveats, every other LNDEQ rewrite either has a dedicated constructor or
 is an instance of the congruence rules (`context_congr`, `symm_congr`, `trans_congr_*`) already
 available in `Step.lean`.
+
+## Termination and confluence witnesses
+
+The follow-up automation lives in two new modules:
+
+- `ComputationalPaths/Path/Rewrite/Termination.lean` packages normalization data.  The
+  `Termination.Witness` structure stores a normal form together with a certificate that
+  a path rewrites to it, and `Instantiation.sourceWitness`/`Instantiation.targetWitness`
+  attach those witnesses directly to every LNDEQ rule instantiation.  Witnesses now ship
+  with `RwEq`/`PathRwQuot` bridges, and the recursive-path ordering layer (`RecursivePathOrdering`)
+  records the actual source/target path lengths inside the multiset arguments, mirroring the
+  data-aware ordering from Definition 3.23.  The fresh `Instantiation.rpoTerm_measure`
+  and `derivationMeasure_*` lemmas expose the multiset weight explicitly, showing that
+  concatenating a non-empty derivation strictly increases the RPO measure (hence peeling
+  steps strictly decreases it).
+- `ComputationalPaths/Path/Rewrite/Confluence.lean` restates `rw_confluent` as concrete
+  join objects.  The `Confluence.Join` record carries the common reduct and the two `Rw`
+  derivations back to it, while `Confluence.of_steps` and `Instantiation.join` provide
+  single-step versions for critical-pair checks.  Each join also exposes `RwEq` and
+  `PathRwQuot` equalities so quotient-facing developments can cite the same witnesses.
+
+Two auxiliary pieces keep the quotient and termination stories aligned with the paper:
+
+- `Context.mapQuot` lifts unary contexts to the `PathRwQuot` level and satisfies
+  `mapQuot (cmpA x y) = cmpA (mapQuot x) (mapQuot y)` together with the analogous
+  statements for `invA` and `toEq`.  This lets higher coherences trade `cmpA`/`invA`
+  equalities through functorial contexts without dropping back to raw paths.
+- `LNDEQ.Derivation` records a tagged list of instantiations between two paths.
+  The helper lemmas `Derivation.toRw`, `Derivation.toRwEq`, and
+  `Derivation.measure_tail_lt` show that each tagged step witnesses a strict
+  decrease of the recursive-path ordering measure `derivationMeasure`, making it
+  possible to argue about termination directly on symbolic derivations rather
+  than funnelling everything through `normalize`.
+
+## Critical pair table
+
+The first entries from the paper’s Knuth–Bendix table are now encoded as explicit
+`Confluence.Join` witnesses.  Each lemma mirrors a row from §3.3 while keeping the
+parameters abstract so it applies uniformly across contexts.
+
+| Pair | Source shape | Join lemma |
+|------|--------------|------------|
+| `mx2l1` / `mx2l2` | `fst (Path.map2 Prod.mk p q)` | `Confluence.CriticalPairs.mx2_fst` |
+| `mx2r1` / `mx2r2` | `snd (Path.map2 Prod.mk (refl a) q)` | `Confluence.CriticalPairs.mx2_snd` |
+| `tt` / `rrr` | `trans (trans p q) (refl)` | `Confluence.CriticalPairs.tt_rrr` |
+| `tt` / `lrr` | `trans (refl) (trans q r)` | `Confluence.CriticalPairs.tt_lrr` |
+| `tt` / `ttsv` | `trans (Context.map C p) (trans (Context.map C (symm p)) v)` | `Confluence.CriticalPairs.tt_ttsv` |
+| `tt` / `tstu` | `trans (trans v (Context.map C p)) (Context.map C (symm p))` | `Confluence.CriticalPairs.tt_tstu` |
+| `tsbll` / `slr` | `trans (refl (C.fill a₁)) (Context.map C p)` | `Confluence.CriticalPairs.tsbll_slr` |
+| `tsbrl` / `srr` | `trans (Context.map C p) (refl (C.fill a₂))` | `Confluence.CriticalPairs.tsbrl_srr` |
+| `stss` / `ssbl` | `symm (trans r (Context.map C p))` | `Confluence.CriticalPairs.stss_ssbl` |
+
+The join proof for each entry is obtained by invoking `Instantiation.join` on the two
+relevant instantiations (after matching their sources), so the resulting witnesses are
+usable both at the `Rw` layer and inside `PathRwQuot` via the automatic bridges.  The
+table is intentionally extensible: additional rows can be registered in
+`Confluence.CriticalPairs` as more overlaps are audited.
+
+These modules keep the Lean development in lockstep with the SAJL storyline: every
+recorded rewrite reason now comes with a bundled normalization witness, and any pair of
+instantiations with a shared source can be joined via the canonical representative
+`Path.ofEq (toEq …)`.
+
+## Next steps
+
+The remaining work mirrors the “full proof” milestones from §3.3:
+
+1. Expand the catalogue of `Confluence.CriticalPairs` entries until every row from the
+  Knuth–Bendix analysis has a matching Lean witness.  Context-sensitive cases like
+  `tt`/`ttsv` and `tt`/`tstu` are now covered; the goal is to push the same treatment to
+  the Σ- and substitution-heavy overlaps.
+2. Use the new `PathRwQuot.cmpA`/`invA` lemmas as the base step for quotient-level higher
+  coherences, wiring these equalities through contexts, transports, and functorial maps.
+3. Strengthen the recursive-path ordering story beyond the global `derivationMeasure`
+  bounds—e.g. reflect the multiset decrease directly in `RwEq` derivations so the
+  termination proof can avoid detouring through `normalize`.
 
 ## Encoding strategy
 
@@ -121,36 +207,6 @@ Implementation outline:
 
 By funnelling every primitive reduction through `Instantiation`, we gain a uniform way
 to cite rewrite reasons and to reason about termination/confluence on the Lean side.
-
-## Planned rewrite-proof work
-
-To finish aligning the code with §3.3 of the paper we need two major workstreams:
-
-1. **Termination proof:** replicate Dershowitz’s recursive path ordering in Lean by:
-  - defining the precedence relation on `Rule` (mirrors the `>` relations in Definition 3.23);
-  - proving `Instantiation.step` decreases under that ordering; and
-  - wrapping it in a well-founded recursion principle so that `Rw` and `RwEq` inherit
-    termination automatically.
-  This likely lives in a new module `Rewrite/Termination.lean` that imports the
-  `Rule` enumeration and the `Instantiation` interpreter.
-2. **Confluence and correspondence:** re-run the Knuth–Bendix superposition inside Lean.
-  Rather than duplicating the full completion, we can state the critical pairs obtained
-  in the paper and `simp`-prove them using the existing `Step` constructors.  Afterwards,
-  we should add lemmas tying rw-equality to `RwEq` (Definition 3.25), e.g.,
-  `lemma of_rweq : RwEq p q → PathRwQuot.representative q = …`.  This cements the
-  “rw = Step*” bridge and makes the groupoid proofs cite the same normalisation facts as
-  the paper.
-
-Deliverables for the next iteration:
-
-- `LNDEQ.Rule` + `Instantiation` data structures.
-- A `Termination` module encoding the recursive path ordering and lifting it to `Rw`.
-- A `Confluence` module packaging the critical pairs from the Knuth–Bendix completion
-  and exporting `rw_confluent : Confluent Step`.
-
-Once these pieces are in place we can formalise the paper’s Theorem 3.22 inside Lean
-and reuse it in the globular/groupoid layers without re-proving ad-hoc normalisation
-facts.
 
 ## Code scaffolding
 

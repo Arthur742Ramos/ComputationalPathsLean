@@ -54,6 +54,14 @@ variable {A : Type u} {B : Type v}
           cases proof₂
           simp [map, Path.trans, List.map_append]
 
+@[simp] theorem map_ofEq (C : Context A B) {a b : A} (h : a = b) :
+    map C (Path.ofEq (A := A) (a := a) (b := b) h) =
+      Path.ofEq (A := B)
+        (a := C.fill a) (b := C.fill b)
+        (_root_.congrArg C.fill h) := by
+  cases h
+  simp [map]
+
 /-- Compose two unary contexts. -/
 @[simp] def comp {C' : Type w}
     (g : Context B C') (f : Context A B) : Context A C' :=

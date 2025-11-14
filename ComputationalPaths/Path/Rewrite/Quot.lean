@@ -213,6 +213,56 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
         exact rweq_of_step
           (Step.trans_assoc (A := A) (p := p) (q := q) (r := r)))))
 
+/-- Paper-style notation `cmpA` for quotient composition. -/
+@[simp] def cmpA {a b c : A} :
+    PathRwQuot A a b → PathRwQuot A b c → PathRwQuot A a c :=
+  trans (A := A)
+
+/-- Paper-style notation `invA` for quotient inversion. -/
+@[simp] def invA {a b : A} :
+    PathRwQuot A a b → PathRwQuot A b a :=
+  symm (A := A)
+
+@[simp] theorem cmpA_refl_left {a b : A}
+    (x : PathRwQuot A a b) :
+    cmpA (A := A) (refl (A := A) a) x = x :=
+  trans_refl_left (A := A) (x := x)
+
+@[simp] theorem cmpA_refl_right {a b : A}
+    (x : PathRwQuot A a b) :
+    cmpA (A := A) x (refl (A := A) b) = x :=
+  trans_refl_right (A := A) (x := x)
+
+@[simp] theorem cmpA_assoc {a b c d : A}
+    (x : PathRwQuot A a b)
+    (y : PathRwQuot A b c)
+    (z : PathRwQuot A c d) :
+    cmpA (A := A) (cmpA x y) z =
+      cmpA (A := A) x (cmpA y z) :=
+  trans_assoc (A := A) (x := x) (y := y) (z := z)
+
+@[simp] theorem cmpA_inv_right {a b : A}
+    (x : PathRwQuot A a b) :
+    cmpA (A := A) x (invA x) =
+      refl (A := A) a :=
+  trans_symm (A := A) (x := x)
+
+@[simp] theorem cmpA_inv_left {a b : A}
+    (x : PathRwQuot A a b) :
+    cmpA (A := A) (invA x) x =
+      refl (A := A) b :=
+  symm_trans (A := A) (x := x)
+
+@[simp] theorem toEq_cmpA_inv_right {a b : A}
+    (x : PathRwQuot A a b) :
+    toEq (A := A) (cmpA (A := A) x (invA x)) = rfl := by
+  simp
+
+@[simp] theorem toEq_cmpA_inv_left {a b : A}
+    (x : PathRwQuot A a b) :
+    toEq (A := A) (cmpA (A := A) (invA x) x) = rfl := by
+  simp
+
 @[simp] theorem canon_reduce {a b : A}
     (x : PathRwQuot A a b) :
     x = Quot.mk _ (Path.ofEq (toEq x)) := by
@@ -485,6 +535,99 @@ namespace PathRwQuot
   exact rweq_fun_eta (α := α) (β := β) (p := p)
 
 end PathRwQuot
+
+namespace Context
+
+variable {A : Type u} {B : Type u}
+variable (C : Context A B)
+
+/-- Lift a unary context action to the quotient level. -/
+@[simp] def mapQuot {a b : A} :
+    PathRwQuot A a b → PathRwQuot B (C.fill a) (C.fill b) :=
+  Quot.lift
+    (fun p => Quot.mk _ (Context.map (A := A) (B := B) C p))
+    (by
+      intro p q h
+      exact Quot.sound
+        (rweq_context_map_of_rweq (A := A) (B := B) (Ctx := C) h))
+
+variable {C}
+
+@[simp] theorem mapQuot_mk {a b : A} (p : Path a b) :
+    mapQuot (A := A) (B := B) C (Quot.mk _ p) =
+      Quot.mk _ (Context.map (A := A) (B := B) C p) := rfl
+
+@[simp] theorem toEq_mapQuot {a b : A}
+    (x : PathRwQuot A a b) :
+    PathRwQuot.toEq (A := B) (mapQuot (A := A) (B := B) C x) =
+      _root_.congrArg C.fill (PathRwQuot.toEq (A := A) x) := by
+  refine Quot.inductionOn x (fun p => ?_)
+  change (Context.map (A := A) (B := B) C p).toEq =
+    _root_.congrArg C.fill p.toEq
+  exact Context.map_toEq (A := A) (B := B) (C := C) (p := p)
+
+@[simp] theorem mapQuot_refl (a : A) :
+    mapQuot (A := A) (B := B) C (PathRwQuot.refl (A := A) a) =
+      PathRwQuot.refl (A := B) (C.fill a) := by
+  change
+    Quot.mk _ (Context.map (A := A) (B := B) C (Path.refl a)) =
+      Quot.mk _ (Path.refl (C.fill a))
+  apply Quot.sound
+  exact
+    (rweq_of_eq
+      (Context.map_refl (A := A) (B := B) (C := C) (a := a)))
+
+@[simp] theorem mapQuot_invA {a b : A}
+    (x : PathRwQuot A a b) :
+    mapQuot (A := A) (B := B) C (PathRwQuot.invA (A := A) x) =
+      PathRwQuot.invA (A := B)
+        (mapQuot (A := A) (B := B) C x) := by
+  refine Quot.inductionOn x (fun p => ?_)
+  change Quot.mk _ (Context.map (A := A) (B := B) C (Path.symm p)) =
+    Quot.mk _ (Path.symm (Context.map (A := A) (B := B) C p))
+  apply Quot.sound
+  exact
+    (rweq_of_eq
+      (Context.map_symm (A := A) (B := B) (C := C) (p := p)))
+
+@[simp] theorem mapQuot_ofEq {a b : A} (h : a = b) :
+    mapQuot (A := A) (B := B) C
+        (PathRwQuot.ofEq (A := A) (a := a) (b := b) h) =
+      PathRwQuot.ofEq (A := B)
+        (a := C.fill a) (b := C.fill b)
+        (_root_.congrArg C.fill h) := by
+  change
+    Quot.mk _
+        (Context.map (A := A) (B := B) C
+          (Path.ofEq (A := A) (a := a) (b := b) h)) =
+      Quot.mk _
+        (Path.ofEq (A := B)
+          (a := C.fill a) (b := C.fill b)
+          (_root_.congrArg C.fill h))
+  apply Quot.sound
+  exact
+    (rweq_of_eq
+      (Context.map_ofEq (A := A) (B := B) (C := C) (h := h)))
+
+@[simp] theorem mapQuot_cmpA {a b c : A}
+    (x : PathRwQuot A a b) (y : PathRwQuot A b c) :
+    mapQuot (A := A) (B := B) C (PathRwQuot.cmpA (A := A) x y) =
+      PathRwQuot.cmpA (A := B)
+        (mapQuot (A := A) (B := B) C x)
+        (mapQuot (A := A) (B := B) C y) := by
+  refine Quot.inductionOn x (fun p =>
+    Quot.inductionOn y (fun q => ?_))
+  change Quot.mk _ (Context.map (A := A) (B := B) C (Path.trans p q)) =
+    Quot.mk _
+      (Path.trans
+        (Context.map (A := A) (B := B) C p)
+        (Context.map (A := A) (B := B) C q))
+  apply Quot.sound
+  exact
+    (rweq_of_eq
+      (Context.map_trans (A := A) (B := B) (C := C) (p := p) (q := q)))
+
+end Context
 
 end Path
 end ComputationalPaths

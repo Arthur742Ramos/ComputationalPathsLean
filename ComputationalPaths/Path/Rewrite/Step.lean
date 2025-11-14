@@ -8,6 +8,7 @@ with their `[simp]` registration and the `step_toEq` lemma.
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Basic.Context
 import ComputationalPaths.Path.Basic.Congruence
+import ComputationalPaths.Path.Basic.Congruence
 
 namespace ComputationalPaths
 namespace Path
@@ -121,7 +122,7 @@ inductive Step :
       Step (A := Sigma B)
         (Path.symm (Path.sigmaMk (B := B) p q))
         (Path.sigmaMk (Path.symm p)
-          (Path.sigmaSymmSnd (B := B) (p := p) (q := q)))
+          (sigmaSymmSnd (B := B) (p := p) (q := q)))
   | sum_rec_inl_beta
     {A : Type u} {α β : Type u}
       {a1 a2 : α}
