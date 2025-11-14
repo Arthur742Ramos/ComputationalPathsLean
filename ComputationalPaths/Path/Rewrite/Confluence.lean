@@ -261,6 +261,25 @@ trailing witness is reflexive, so they admit the same canonical join. -/
     (j := Builder.instSrr (A := A) (B := B) (C := C) (p := p))
     rfl
 
+/-- Reflexive witnesses trigger both `srsr` and `srrrr` reductions from the same source. -/
+@[simp] def srsr_srrrr {a : A} {y : B}
+    (t : Path (C.fill a) y) :
+    Join (A := B) (a := y) (b := C.fill a)
+      (Builder.instSrsr (A := A) (B := B) (C := C)
+        (a₁ := a) (a₂ := a)
+        (p := Path.refl a) (t := t)).q
+      (Builder.instSrrrr (A := A) (B := B) (C := C)
+        (a₁ := a) (a₂ := a)
+        (p := Path.refl a) (t := t)).q := by
+  refine LNDEQ.Instantiation.join
+    (i := Builder.instSrsr (A := A) (B := B) (C := C)
+      (a₁ := a) (a₂ := a)
+      (p := Path.refl a) (t := t))
+    (j := Builder.instSrrrr (A := A) (B := B) (C := C)
+      (a₁ := a) (a₂ := a)
+      (p := Path.refl a) (t := t))
+    rfl
+
 end ContextSubstitution
 
 section SymmetricCancellation

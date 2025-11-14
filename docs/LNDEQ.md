@@ -120,6 +120,7 @@ parameters abstract so it applies uniformly across contexts.
 | `tt` / `tstu` | `trans (trans v (Context.map C p)) (Context.map C (symm p))` | `Confluence.CriticalPairs.tt_tstu` |
 | `tsbll` / `slr` | `trans (refl (C.fill a₁)) (Context.map C p)` | `Confluence.CriticalPairs.tsbll_slr` |
 | `tsbrl` / `srr` | `trans (Context.map C p) (refl (C.fill a₂))` | `Confluence.CriticalPairs.tsbrl_srr` |
+| `srsr` / `srrrr` | `symm (Context.substRight C (refl) (Context.substRight C (refl) t))` | `Confluence.CriticalPairs.srsr_srrrr` |
 | `stss` / `ssbl` | `symm (trans r (Context.map C p))` | `Confluence.CriticalPairs.stss_ssbl` |
 | `stss` / `ssbr` | `symm (trans (Context.map C p) t)` | `Confluence.CriticalPairs.stss_ssbr` |
 
