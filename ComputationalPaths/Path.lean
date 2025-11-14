@@ -13,3 +13,5 @@ import ComputationalPaths.Path.Rewrite.Rw
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.Quot
 import ComputationalPaths.Path.Groupoid
+import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.Homotopy.Loops

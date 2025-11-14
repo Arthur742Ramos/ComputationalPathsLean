@@ -52,11 +52,20 @@ The convenience constant `ComputationalPaths.libraryVersion` (currently `"0.1.0"
    - `RwEq.lean` extends the closure to symmetry, packages the `RewriteLift` helpers for `RwEq`, and exposes congruence lemmas for every constructor.
    - `Quot.lean` defines `rwEqSetoid`, the quotient `PathRwQuot`, normal forms on the quotient, and the equivalence with propositional equality.
 - `ComputationalPaths/Path/Groupoid.lean` - weak groupoid structure coming from computational paths, using the rewrite relation.
+- `ComputationalPaths/Path/HIT/Circle.lean` - axiomatic skeleton for the circle higher-inductive type (base point, fundamental loop, and recursor) plus the `CircleLoopSpace`/`CircleLoopQuot`/`circleLoopGroup` aliases and the `CircleFundamentalGroupPlan` blueprint that will eventually certify π₁(𝕊¹) ≅ ℤ.
+- `ComputationalPaths/Path/Homotopy/Loops.lean` - loop-space infrastructure: aliases for loops at a base point, composition/inversion operators, their rewrite-quotient counterparts, and the bundled `LoopGroup` structure encapsulating the strict group laws.
 - `ComputationalPaths/Basic.lean` - convenience entry point re-exporting the core modules.
 - `ComputationalPaths/Path.lean` – umbrella import for path-specific modules.
 - `agents.md` – overview of the automated agents and guidance on when to invoke them.
-- `docs/tese-arthur-ramos.md` – LLM-ingestion notes for the newly added TESE PDF, including
-   extraction status and the OCR/text-conversion workflow.
+
+## Primary goal: fundamental group of the circle
+The immediate milestone is to formalise the classical HoTT result $\pi_1(\mathbb{S}^1) \cong \mathbb{Z}$ using computational paths. We are tackling it in five incremental checkpoints:
+
+1. **HIT-ready rewrite layer.** Finish the remaining LNDEQ β/η rules and confirm that the normalization/quotient machinery in `Path/Rewrite/{Step,Rw,RwEq,Quot}.lean` handles the new constructors needed by higher-inductive types.
+2. **Circle HIT definition.** ✅ `ComputationalPaths/Path/HIT/Circle.lean` now exposes the axioms, the fundamental loop, and the specialised loop-space aliases (`CircleLoopSpace`, `CircleLoopQuot`, `circleLoopGroup`).
+3. **Loop-space infrastructure.** ✅ `Path/Homotopy/Loops.lean` provides the general `LoopSpace`, its quotient, and the bundled strict `LoopGroup` exported by the circle module.
+4. **Equivalence with integers.** Draft the encode/decode machinery (tracked by `CircleFundamentalGroupPlan`) so we can implement mutually inverse maps `CircleLoopQuot ↔ ℤ`, prove they respect loop concatenation, and descend the result to the strict quotient.
+5. **Documentation and examples.** Surface the final statement (`fundamentalGroupCircle : LoopGroup S¹ base ≃ ℤ`) through the umbrella modules and document the proof sketch in both this README and the thesis notes.
 
 ## Getting started
 1. Install Lean 4 via [`elan`](https://github.com/leanprover/elan):
@@ -85,6 +94,7 @@ If `lake build` completes without errors, all Lean proofs have been checked by t
 kernel.
 
 ## Roadmap
+- **Deliver π₁(𝕊¹) ≅ ℤ.** Execute the five checkpoints listed above so that the circle HIT, its loop group, and the equivalence with ℤ live in the library by default.
 - Finish the LNDEQ rewrite suite by adding the outstanding β/η rules beyond the current context/bi-context coverage (now limited to the dependent `apd`/quotient eliminators, since the Σ transports live as explicit `Step` constructors) so that every construct from the paper has a canonical rewrite witness.
 - Extend the new normalization theorems to those remaining LNDEQ rules and push them deeper into downstream constructions (transport, functors, higher coherences) so that every operation on `PathRwQuot` automatically exposes its canonical witness.
 - Connect computational paths with Lean's identity type tooling (UIP counterexamples, rewriting tactics).

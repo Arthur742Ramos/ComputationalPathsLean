@@ -110,6 +110,19 @@ variable {A : Type u} {a : A}
     comp x (inv x) = id :=
   PathRwQuot.trans_symm (A := A) (a := a) (b := a) x
 
+@[simp] theorem inv_id :
+    inv (LoopQuot.id (A := A) (a := a)) =
+      LoopQuot.id := rfl
+
+@[simp] theorem inv_inv (x : LoopQuot A a) :
+    inv (inv x) = x :=
+  PathRwQuot.symm_symm (A := A) (x := x)
+
+theorem inv_congr {x y : LoopQuot A a} (h : x = y) :
+    inv x = inv y := by
+  cases h
+  rfl
+
 theorem toEq_ofLoop (p : LoopSpace A a) :
     PathRwQuot.toEq (A := A) (ofLoop (A := A) (a := a) p) =
       (p : Path a a).toEq := rfl
@@ -144,6 +157,13 @@ def pow (x : LoopQuot A a) : Nat → LoopQuot A a
 @[simp] theorem pow_succ (x : LoopQuot A a) (n : Nat) :
     pow x (Nat.succ n) = comp (pow x n) x := rfl
 
+@[simp] theorem pow_one (x : LoopQuot A a) :
+    pow x 1 = x := by
+  change comp (pow x 0) x = x
+  have hpow0 : pow x 0 = id := rfl
+  cases hpow0
+  exact LoopQuot.comp_id_left (A := A) (a := a) (x := x)
+
 theorem pow_add (x : LoopQuot A a) (m n : Nat) :
     pow x (m + n) = comp (pow x m) (pow x n) := by
   induction n with
@@ -174,6 +194,81 @@ theorem pow_add (x : LoopQuot A a) (m n : Nat) :
     exact
       (_root_.congrArg (fun y => comp (pow x m) y)
         (pow_succ (A := A) (a := a) (x := x) (n := n))).symm
+
+/-- Integer exponentiation for loop quotients, extending `pow` by sending
+negative exponents to inverses. -/
+def zpow (x : LoopQuot A a) : Int → LoopQuot A a
+  | Int.ofNat n => pow x n
+  | Int.negSucc n => inv (pow x (Nat.succ n))
+
+@[simp] theorem zpow_ofNat (x : LoopQuot A a) (n : Nat) :
+    zpow x n = pow x n := rfl
+
+@[simp] theorem zpow_zero (x : LoopQuot A a) :
+    zpow x 0 = id :=
+  pow_zero (A := A) (a := a) x
+
+@[simp] theorem zpow_one (x : LoopQuot A a) :
+    zpow x 1 = x :=
+  pow_one (A := A) (a := a) x
+
+@[simp] theorem zpow_negSucc (x : LoopQuot A a) (n : Nat) :
+    zpow x (Int.negSucc n) =
+      inv (pow x (Nat.succ n)) := rfl
+
+@[simp] theorem zpow_neg_one (x : LoopQuot A a) :
+    zpow x (-1) = inv x := by
+  have h :=
+    zpow_negSucc (A := A) (a := a) (x := x) (n := 0)
+  have h' : inv (pow x 1) = inv x :=
+    inv_congr (A := A) (a := a)
+      (x := pow x 1) (y := x)
+      (pow_one (A := A) (a := a) (x := x))
+  exact h.trans h'
+
+@[simp] theorem zpow_neg (x : LoopQuot A a) (n : Int) :
+    zpow x (-n) = inv (zpow x n) := by
+  cases n with
+  | ofNat m =>
+      cases m with
+      | zero =>
+          have hz := zpow_zero (A := A) (a := a) (x := x)
+          have hid :=
+            (LoopQuot.inv_id (A := A) (a := a)).symm
+          have hrewrite : LoopQuot.inv LoopQuot.id = inv (zpow x 0) := by
+            cases hz
+            rfl
+          calc
+            zpow x 0 = LoopQuot.id := hz
+            _ = LoopQuot.inv LoopQuot.id := hid
+            _ = inv (zpow x 0) := hrewrite
+      | succ k =>
+          have hneg : - (Int.ofNat (Nat.succ k)) = Int.negSucc k := rfl
+          have hlhs : zpow x (-(Int.ofNat (Nat.succ k))) =
+              inv (pow x (Nat.succ k)) := by
+            cases hneg
+            rfl
+          have hzpow : zpow x (Int.ofNat (Nat.succ k)) =
+              pow x (Nat.succ k) := rfl
+          have hrhs : inv (pow x (Nat.succ k)) =
+              inv (zpow x (Int.ofNat (Nat.succ k))) := by
+            cases hzpow
+            rfl
+          exact hlhs.trans hrhs
+  | negSucc k =>
+      have hneg : - (Int.negSucc k) = Int.ofNat (Nat.succ k) := rfl
+      have hlhs : zpow x (- Int.negSucc k) =
+          pow x (Nat.succ k) := by
+        cases hneg
+        rfl
+      have hmid : pow x (Nat.succ k) =
+          inv (inv (pow x (Nat.succ k))) := by
+        exact
+          (LoopQuot.inv_inv (A := A) (a := a)
+            (x := pow x (Nat.succ k))).symm
+      have hrhs : inv (inv (pow x (Nat.succ k))) =
+          inv (zpow x (Int.negSucc k)) := rfl
+      exact hlhs.trans (hmid.trans hrhs)
 
 end LoopQuot
 
