@@ -366,6 +366,29 @@ variable {b1 : B a1} {b2 : B a2}
         cases h
         simp [transport]
 
+/-- Helper producing the fibre witness that appears when symmetrising
+`sigmaMk` paths. -/
+@[simp] def sigmaSymmSnd
+    (p : Path a1 a2)
+    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
+    Path (A := B a1)
+      (Path.transport (A := A) (D := fun a => B a) (Path.symm p) b2)
+      b1 :=
+  Path.trans
+    (Path.symm
+      (Path.congrArg
+        (fun z : B a2 =>
+          Path.transport (A := A) (D := fun a => B a) (Path.symm p) z)
+        q))
+    (Path.ofEq
+      (A := B a1)
+      (a :=
+        Path.transport (A := A) (D := fun a => B a) (Path.symm p)
+          (Path.transport (A := A) (D := fun a => B a) p b1))
+      (b := b1)
+      (Path.transport_symm_left (A := A) (D := fun a => B a)
+        (p := p) (x := b1)))
+
 @[simp] theorem sigmaSnd_sigmaMk_eq_ofEq
     (p : Path a1 a2)
     (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :

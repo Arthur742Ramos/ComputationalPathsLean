@@ -326,6 +326,13 @@ variable {A : Type u} {α β : Type u}
     , step := Step.context_map_symm (A := α) (B := Sum α β)
         (C := C) (p := p) }
 
+@[simp] def instSxss {a₁ a₂ : α} {b₁ b₂ : β}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) : Instantiation :=
+  { rule := Rule.sxss
+    , p := Path.symm (Path.prodMk (p := p) (q := q))
+    , q := Path.prodMk (Path.symm p) (Path.symm q)
+    , step := Step.prod_mk_symm (A := α) (B := β) (p := p) (q := q) }
+
 @[simp] def instSmcase {a₁ a₂ : Sum α β}
     (f : α → A) (g : β → A)
     (p : Path a₁ a₂) : Instantiation :=
@@ -393,6 +400,14 @@ variable {A : Type u} {B : A → Type u}
     , q := p
     , step := Step.sigma_eta (A := A) (B := B) (p := p) }
 
+@[simp] def instSmsigma (C : DepContext A B)
+    {a₁ a₂ : A} (p : Path a₁ a₂) : Instantiation :=
+  { rule := Rule.smsigma
+    , p := Path.symm (DepContext.map (A := A) (B := B) C p)
+    , q := DepContext.symmMap (A := A) (B := B) C p
+    , step := Step.depContext_map_symm (A := A) (B := B)
+        (C := C) (p := p) }
+
 end
 
 section
@@ -454,6 +469,32 @@ variable {A : Type u}
     , p := Path.trans (Path.trans p q) r
     , q := Path.trans p (Path.trans q r)
     , step := Step.trans_assoc (A := A) (p := p) (q := q) (r := r) }
+
+@[simp] def instTtsv (C : Context A B) {a₁ a₂ : A} {y : B}
+    (p : Path a₁ a₂) (v : Path (C.fill a₁) y) : Instantiation :=
+  { rule := Rule.ttsv
+    , p := Path.trans
+        (Context.map (A := A) (B := B) C p)
+        (Path.trans
+          (Context.map (A := A) (B := B) C (Path.symm p)) v)
+    , q := Path.trans
+        (Context.map (A := A) (B := B) C
+          (Path.trans p (Path.symm p)))
+        v
+    , step := Step.context_tt_cancel_left (A := A) (B := B)
+        (C := C) (p := p) (v := v) }
+
+@[simp] def instTstu (C : Context A B) {a₁ a₂ : A} {x : B}
+    (p : Path a₁ a₂) (v : Path x (C.fill a₁)) : Instantiation :=
+  { rule := Rule.tstu
+    , p := Path.trans
+        (Path.trans v (Context.map (A := A) (B := B) C p))
+        (Context.map (A := A) (B := B) C (Path.symm p))
+    , q := Path.trans v
+        (Context.map (A := A) (B := B) C
+          (Path.trans p (Path.symm p)))
+    , step := Step.context_tt_cancel_right (A := A) (B := B)
+        (C := C) (p := p) (v := v) }
 
 end
 

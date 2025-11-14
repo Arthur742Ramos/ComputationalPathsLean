@@ -78,6 +78,13 @@ inductive Step :
       (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) :
       Step (A := Prod α β)
         (Path.prodMk (Path.fst p) (Path.snd p)) p
+  | prod_mk_symm
+    {A : Type u} {B : Type u}
+      {a₁ a₂ : A} {b₁ b₂ : B}
+      (p : Path a₁ a₂) (q : Path b₁ b₂) :
+      Step (A := Prod A B)
+        (Path.symm (Path.prodMk (p := p) (q := q)))
+        (Path.prodMk (Path.symm p) (Path.symm q))
   | sigma_fst_beta
     {A : Type u} {B : A → Type u}
       {a1 a2 : A} {b1 : B a1} {b2 : B a2}
@@ -106,6 +113,15 @@ inductive Step :
       (p : Path (A := Sigma B) ⟨a1, b1⟩ ⟨a2, b2⟩) :
       Step (A := Sigma B)
         (Path.sigmaMk (Path.sigmaFst p) (Path.sigmaSnd p)) p
+  | sigma_mk_symm
+    {A : Type u} {B : A → Type u}
+      {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+      (p : Path a₁ a₂)
+      (q : Path (Path.transport (A := A) (D := fun a => B a) p b₁) b₂) :
+      Step (A := Sigma B)
+        (Path.symm (Path.sigmaMk (B := B) p q))
+        (Path.sigmaMk (Path.symm p)
+          (Path.sigmaSymmSnd (B := B) (p := p) (q := q)))
   | sum_rec_inl_beta
     {A : Type u} {α β : Type u}
       {a1 a2 : α}
@@ -244,6 +260,31 @@ inductive Step :
       Step (A := B)
         (Path.symm (Context.map (A := A) (B := B) C p))
         (Context.map (A := A) (B := B) C (Path.symm p))
+  | context_tt_cancel_left
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a₁ a₂ : A} {y : B}
+      (p : Path a₁ a₂) (v : Path (C.fill a₁) y) :
+      Step (A := B)
+        (Path.trans
+          (Context.map (A := A) (B := B) C p)
+          (Path.trans
+            (Context.map (A := A) (B := B) C (Path.symm p)) v))
+        (Path.trans
+          (Context.map (A := A) (B := B) C
+            (Path.trans p (Path.symm p)))
+          v)
+  | context_tt_cancel_right
+    {A : Type u} {B : Type u}
+      (C : Context A B) {a₁ a₂ : A} {x : B}
+      (p : Path a₁ a₂) (v : Path x (C.fill a₁)) :
+      Step (A := B)
+        (Path.trans
+          (Path.trans v (Context.map (A := A) (B := B) C p))
+          (Context.map (A := A) (B := B) C (Path.symm p)))
+        (Path.trans
+          v
+          (Context.map (A := A) (B := B) C
+            (Path.trans p (Path.symm p))))
   | context_subst_left_beta
     {A : Type u} {B : Type u}
       (C : Context A B) {x : B} {a₁ a₂ : A}
@@ -344,6 +385,13 @@ inductive Step :
         Step (A := B a₂)
           (DepContext.map (A := A) (B := B) C p)
           (DepContext.map (A := A) (B := B) C q)
+  | depContext_map_symm
+    {A : Type u} {B : A → Type u}
+      (C : DepContext A B) {a₁ a₂ : A}
+      (p : Path a₁ a₂) :
+      Step (A := B a₂)
+        (Path.symm (DepContext.map (A := A) (B := B) C p))
+        (DepContext.symmMap (A := A) (B := B) C p)
   | depContext_subst_left_beta
     {A : Type u} {B : A → Type u}
       (C : DepContext A B) {a₁ a₂ : A} {x : B a₁}
@@ -551,17 +599,19 @@ inductive Step :
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
   Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
-  Step.prod_rec_beta Step.prod_eta Step.sigma_fst_beta Step.sigma_snd_beta Step.sigma_eta
+  Step.prod_rec_beta Step.prod_eta Step.prod_mk_symm Step.sigma_fst_beta Step.sigma_snd_beta Step.sigma_eta
+  Step.sigma_mk_symm
   Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta Step.apd_refl
   Step.transport_refl_beta Step.transport_trans_beta Step.transport_symm_left_beta
   Step.transport_symm_right_beta
-  Step.context_congr Step.context_subst_left_beta Step.context_subst_left_of_right
+  Step.context_congr Step.context_map_symm Step.context_tt_cancel_left Step.context_tt_cancel_right
+  Step.context_subst_left_beta Step.context_subst_left_of_right
   Step.context_subst_left_assoc Step.context_subst_right_beta Step.context_subst_right_assoc
   Step.context_subst_left_refl_right Step.context_subst_left_refl_left
   Step.context_subst_right_refl_left Step.context_subst_right_refl_right
   Step.context_subst_left_idempotent Step.context_subst_right_cancel_inner
   Step.context_subst_right_cancel_outer
-  Step.depContext_congr Step.depContext_subst_left_beta
+  Step.depContext_congr Step.depContext_map_symm Step.depContext_subst_left_beta
   Step.depContext_subst_left_assoc Step.depContext_subst_right_beta
   Step.depContext_subst_right_assoc Step.depContext_subst_left_refl_right
   Step.depContext_subst_left_refl_left Step.depContext_subst_right_refl_left
@@ -590,10 +640,12 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | prod_fst_beta _ _ => simp
   | prod_snd_beta _ _ => simp
   | prod_eta _ => simp
+  | prod_mk_symm _ _ => simp
   | prod_rec_beta _ _ _ => simp
   | sigma_fst_beta _ _ => simp
   | sigma_snd_beta _ _ => simp
   | sigma_eta _ => simp
+  | sigma_mk_symm _ _ => simp
   | sum_rec_inl_beta _ _ _ => simp
   | sum_rec_inr_beta _ _ _ => simp
   | fun_app_beta _ _ => simp
@@ -612,6 +664,10 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     cases ih
     rfl
   | context_map_symm _ _ =>
+    simp
+  | context_tt_cancel_left _ _ _ =>
+    simp
+  | context_tt_cancel_right _ _ _ =>
     simp
   | context_subst_left_beta _ _ _ =>
     simp
@@ -640,6 +696,8 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | depContext_congr _ _ ih =>
     cases ih
     rfl
+  | depContext_map_symm _ _ =>
+    simp
   | depContext_subst_left_beta _ _ _ =>
     simp
   | depContext_subst_left_assoc _ _ _ _ =>

@@ -280,6 +280,28 @@ path in the target fibre. -/
       y :=
   Path.trans (map (A := A) (B := B) C p) t
 
+/-- Symmetry through a dependent context: applying `symm` to the mapped path
+is equivalent to mapping the symmetric witness and transporting the result. -/
+@[simp] def symmMap (C : DepContext A B)
+    {a₁ a₂ : A} (p : Path a₁ a₂) :
+    Path (A := B a₂)
+      (C.fill a₂)
+      (Path.transport (A := A) (D := fun a => B a) p (C.fill a₁)) :=
+  Path.trans
+    (Path.symm
+      (Path.ofEq
+        (A := B a₂)
+        (a :=
+          Path.transport (A := A) (D := fun a => B a) p
+            (Path.transport (A := A) (D := fun a => B a)
+              (Path.symm p) (C.fill a₂)))
+        (b := C.fill a₂)
+        (Path.transport_symm_right (A := A) (D := fun a => B a)
+          (p := p) (y := C.fill a₂))))
+    (Context.map
+      (transportContext (A := A) (B := B) p)
+      (DepContext.map (A := A) (B := B) C (Path.symm p)))
+
 end DepContext
 
 /-- A binary context whose codomain may depend on the left hole. -/
