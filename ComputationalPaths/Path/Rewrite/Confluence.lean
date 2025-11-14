@@ -326,6 +326,99 @@ arguments the two reductions share a source, giving a critical-pair join. -/
 
 end SymmetricCancellation
 
+section Sigma
+
+variable {A : Type u}
+
+variable {B : A → Type u}
+
+variable {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+
+@[simp] def mxsigma_fst_eta
+    (p : Path (Sigma.mk a₁ b₁) (Sigma.mk a₂ b₂)) :
+    Join (A := A) (a := a₁) (b := a₂)
+      (Builder.instMxsigmaFst (A := A) (B := B)
+        (p := Path.sigmaFst (B := B) p)
+        (q := Path.sigmaSnd (B := B) p)).q
+      (Path.congrArg Sigma.fst p) := by
+  classical
+  let i := Builder.instMxsigmaFst (A := A) (B := B)
+      (p := Path.sigmaFst (B := B) p)
+      (q := Path.sigmaSnd (B := B) p)
+  have hbeta : Step (A := A)
+      i.p i.q := i.step
+  let C : Context (Sigma B) A := ⟨Sigma.fst⟩
+  have heta : Step (A := A)
+      i.p (Path.congrArg Sigma.fst p) := by
+    simpa [i]
+      using Step.context_congr (A := Sigma B) (B := A) (C := C)
+        (p := Path.sigmaMk (B := B)
+          (Path.sigmaFst (B := B) p) (Path.sigmaSnd (B := B) p))
+        (q := p)
+        (Step.sigma_eta (A := A) (B := B) (p := p))
+  exact of_steps (A := A) (a := a₁) (b := a₂)
+    (p := i.p) (q := i.q) (r := Path.congrArg Sigma.fst p)
+    hbeta heta
+
+private def sigmaSecondDepContext :
+    DepContext (Sigma B) (fun z => B z.fst) :=
+  ⟨fun z => z.snd⟩
+
+@[simp] lemma sigmaSnd_depContext_map
+    (p : Path (Sigma.mk a₁ b₁) (Sigma.mk a₂ b₂)) :
+    Path.sigmaSnd (B := B) p =
+      DepContext.map (A := Sigma B) (B := fun z => B z.fst)
+        sigmaSecondDepContext p := by
+  classical
+  cases p with
+  | mk steps h =>
+      cases h
+      simp [Path.sigmaSnd, DepContext.map, Context.map,
+        DepContext.transportContext, sigmaSecondDepContext,
+        Path.apd, transport]
+
+@[simp] def mxsigma_snd_eta
+    (p : Path (Sigma.mk a₁ b₁) (Sigma.mk a₂ b₂)) :
+    Join (A := B a₂)
+      (a :=
+        Path.transport (A := A) (D := fun a => B a)
+          (Path.sigmaFst (B := B) p) b₁)
+      (b := b₂)
+      (Builder.instMxsigmaSnd (A := A) (B := B)
+        (p := Path.sigmaFst (B := B) p)
+        (q := Path.sigmaSnd (B := B) p)).q
+      (Path.sigmaSnd (B := B) p) := by
+  classical
+  let base := Path.sigmaMk (B := B)
+      (Path.sigmaFst (B := B) p) (Path.sigmaSnd (B := B) p)
+  let beta := Builder.instMxsigmaSnd (A := A) (B := B)
+      (p := Path.sigmaFst (B := B) p)
+      (q := Path.sigmaSnd (B := B) p)
+  have hbeta : Step (A := B a₂) beta.p beta.q := beta.step
+  have heta : Step (A := B a₂) beta.p (Path.sigmaSnd (B := B) p) := by
+    have hctx : Step (A := B a₂)
+        (DepContext.map (A := Sigma B) (B := fun z => B z.fst)
+          sigmaSecondDepContext base)
+        (DepContext.map (A := Sigma B) (B := fun z => B z.fst)
+          sigmaSecondDepContext p) := by
+      simpa [base]
+        using Step.depContext_congr (A := Sigma B) (B := fun z => B z.fst)
+          (C := sigmaSecondDepContext)
+          (p := base) (q := p)
+          (Step.sigma_eta (A := A) (B := B) (p := p))
+    simpa [beta, sigmaSnd_depContext_map, base]
+      using hctx
+  exact of_steps (A := B a₂)
+    (a :=
+      Path.transport (A := A) (D := fun a => B a)
+        (Path.sigmaFst (B := B) p) b₁)
+    (b := b₂)
+    (p := beta.p) (q := beta.q)
+    (r := Path.sigmaSnd (B := B) p)
+    hbeta heta
+
+end Sigma
+
 end CriticalPairs
 
 end Confluence

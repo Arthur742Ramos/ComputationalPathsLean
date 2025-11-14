@@ -52,20 +52,31 @@ rules reuse the underlying step via `Step.symm_congr`.
 | 39 | `trans (trans t r) s` → `trans t (trans r s)` (tt) | `Step.trans_assoc` | Standard associativity of concatenation. |
 | 40 | `trans (C[u]) (trans (C[symm u]) v)` etc. (ttsv/tstu) | `Step.context_tt_cancel_left` / `Step.context_tt_cancel_right` | Reassociates context-driven cancellations directly, matching the Knuth–Bendix completions. |
 
+Beyond Definition 3.21, the rewrite layer now includes dependent Σ transport
+constructors: `Step.transport_sigmaMk_fst_beta`,
+`Step.transport_sigmaMk_dep_beta`, and `Step.subst_sigmaMk_dep_beta`.  These
+rules internalise the equalities from `transportSigma` and `substSigma`, so
+fibre-sensitive β-reductions on Σ-eliminators admit single-step rewrites.
+
 ## Outstanding items
 
 - Extend the catalog of critical-pair witnesses beyond the currently mechanised
   β/η and unit overlaps so that every Knuth–Bendix row from §3.3 carries a named
   `Confluence.Join` certificate.  In addition to the context-sensitive
   cancellations (`tt` with `ttsv`/`tstu`), the substitution/unit overlaps
-  (`tsbll`/`slr`, `tsbrl`/`srr`) and the symmetric cancellation pair
-  (`stss`/`ssbl`) now have explicit joins.  The remaining Σ-heavy rows remain on
-  the backlog.
+  (`tsbll`/`slr`, `tsbrl`/`srr`), the symmetric cancellation pair
+  (`stss`/`ssbl`), and the Σ-projection overlaps (`mxsigmaLeft`/`mxetaSigma`,
+  `mxsigmaRight`/`mxetaSigma`) now have explicit joins, leaving only the
+  higher-arity Σ rows on the backlog.
 - Exploit the quotient-facing lemmas to streamline downstream developments.
   Paper-style notation for quotient composition/inversion (`PathRwQuot.cmpA` and
   `PathRwQuot.invA`) now satisfies the usual unit/inverse laws by definition, and
   the new `Context.mapQuot` bridge shows that those equalities propagate through
-  unary contexts.  Dependent/Σ contexts remain to be connected in the same way.
+  unary contexts.  Dependent/Σ contexts remain to be connected in the same way,
+  but the transport/substitution lemmas
+  (`transport_sigmaMk_fst`, `transport_sigmaMk_dep`, `subst_sigmaMk_dep`) now
+  have dedicated `Step` constructors so dependent Σ eliminations reduce
+  canonically inside the rewrite system.
 
 With the above caveats, every other LNDEQ rewrite either has a dedicated constructor or
 is an instance of the congruence rules (`context_congr`, `symm_congr`, `trans_congr_*`) already
@@ -126,6 +137,8 @@ parameters abstract so it applies uniformly across contexts.
 | `srsr` / `srrrr` | `symm (Context.substRight C (refl) (Context.substRight C (refl) t))` | `Confluence.CriticalPairs.srsr_srrrr` |
 | `stss` / `ssbl` | `symm (trans r (Context.map C p))` | `Confluence.CriticalPairs.stss_ssbl` |
 | `stss` / `ssbr` | `symm (trans (Context.map C p) t)` | `Confluence.CriticalPairs.stss_ssbr` |
+| `mxsigmaLeft` / `mxetaSigma` | `Sigma.fst (Path.sigmaMk (sigmaFst p) (sigmaSnd p))` | `Confluence.CriticalPairs.mxsigma_fst_eta` |
+| `mxsigmaRight` / `mxetaSigma` | `Sigma.snd (Path.sigmaMk (sigmaFst p) (sigmaSnd p))` | `Confluence.CriticalPairs.mxsigma_snd_eta` |
 
 The join proof for each entry is obtained by invoking `Instantiation.join` on the two
 relevant instantiations (after matching their sources), so the resulting witnesses are

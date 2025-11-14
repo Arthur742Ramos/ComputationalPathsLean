@@ -246,6 +246,86 @@ inductive Step :
                   (Path.symm p) y)))
             (Path.transport_symm_right (A := A) (D := fun t => B t)
               (p := p) (y := y)))
+    | transport_sigmaMk_fst_beta
+      {A : Type u} {B : A → Type u}
+        {D : A → Type u}
+        {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+        (p : Path a₁ a₂)
+        (q : Path (transport (A := A) (D := fun a => B a) p b₁) b₂)
+        (x : D a₁) :
+        Step (A := D a₂)
+          (Path.ofEq (A := D a₂)
+            (a := transport (A := Sigma B)
+                    (D := fun z => D z.fst) (Path.sigmaMk (B := B) p q) x)
+            (b := transport (A := A) (D := D) p x)
+            (transport_sigmaMk_fst (A := A) (B := B)
+              (D := D) (p := p) (q := q) (x := x)))
+          (Eq.ndrec
+            (motive := fun y =>
+              Path (A := D a₂)
+                (transport (A := Sigma B)
+                  (D := fun z => D z.fst)
+                  (Path.sigmaMk (B := B) p q) x) y)
+            (Path.refl
+              (transport (A := Sigma B)
+                (D := fun z => D z.fst)
+                (Path.sigmaMk (B := B) p q) x))
+            (transport_sigmaMk_fst (A := A) (B := B)
+              (D := D) (p := p) (q := q) (x := x)))
+    | transport_sigmaMk_dep_beta
+      {A : Type u} {B : A → Type u}
+        {D : ∀ a, B a → Type u}
+        {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+        (p : Path a₁ a₂)
+        (q : Path (transport (A := A) (D := fun a => B a) p b₁) b₂)
+        (x : D a₁ b₁) :
+        Step (A := D a₂ b₂)
+          (Path.ofEq (A := D a₂ b₂)
+            (a := transport (A := Sigma B)
+                    (D := fun z => D z.fst z.snd)
+                    (Path.sigmaMk (B := B) p q) x)
+            (b := transportSigma (A := A) (B := B) (D := D) p q x)
+            (transport_sigmaMk_dep (A := A) (B := B) (D := D)
+              (p := p) (q := q) (x := x)))
+          (Eq.ndrec
+            (motive := fun y =>
+              Path (A := D a₂ b₂)
+                (transport (A := Sigma B)
+                  (D := fun z => D z.fst z.snd)
+                  (Path.sigmaMk (B := B) p q) x) y)
+            (Path.refl
+              (transport (A := Sigma B)
+                (D := fun z => D z.fst z.snd)
+                (Path.sigmaMk (B := B) p q) x))
+            (transport_sigmaMk_dep (A := A) (B := B) (D := D)
+              (p := p) (q := q) (x := x)))
+    | subst_sigmaMk_dep_beta
+      {A : Type u} {B : A → Type u}
+        {D : ∀ a, B a → Type u}
+        {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+        (p : Path a₁ a₂)
+        (q : Path (transport (A := A) (D := fun a => B a) p b₁) b₂)
+        (x : D a₁ b₁) :
+        Step (A := D a₂ b₂)
+          (Path.ofEq (A := D a₂ b₂)
+            (a := transport (A := Sigma B)
+                    (D := fun z => D z.fst z.snd)
+                    (Path.sigmaMk (B := B) p q) x)
+            (b := substSigma (A := A) (B := B) (D := D) x p q)
+            (subst_sigmaMk_dep (A := A) (B := B) (D := D)
+              (p := p) (q := q) (x := x)))
+          (Eq.ndrec
+            (motive := fun y =>
+              Path (A := D a₂ b₂)
+                (transport (A := Sigma B)
+                  (D := fun z => D z.fst z.snd)
+                  (Path.sigmaMk (B := B) p q) x) y)
+            (Path.refl
+              (transport (A := Sigma B)
+                (D := fun z => D z.fst z.snd)
+                (Path.sigmaMk (B := B) p q) x))
+            (subst_sigmaMk_dep (A := A) (B := B) (D := D)
+              (p := p) (q := q) (x := x)))
   | context_congr
     {A : Type u} {B : Type u}
       (C : Context A B) {a₁ a₂ : A}
@@ -604,7 +684,8 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.sigma_mk_symm
   Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta Step.apd_refl
   Step.transport_refl_beta Step.transport_trans_beta Step.transport_symm_left_beta
-  Step.transport_symm_right_beta
+  Step.transport_symm_right_beta Step.transport_sigmaMk_fst_beta
+  Step.transport_sigmaMk_dep_beta Step.subst_sigmaMk_dep_beta
   Step.context_congr Step.context_map_symm Step.context_tt_cancel_left Step.context_tt_cancel_right
   Step.context_subst_left_beta Step.context_subst_left_of_right
   Step.context_subst_left_assoc Step.context_subst_right_beta Step.context_subst_right_assoc
@@ -660,6 +741,12 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | transport_symm_left_beta _ _ =>
     simp
   | transport_symm_right_beta _ _ =>
+    simp
+  | transport_sigmaMk_fst_beta _ _ _ =>
+    simp
+  | transport_sigmaMk_dep_beta _ _ _ =>
+    simp
+  | subst_sigmaMk_dep_beta _ _ _ =>
     simp
   | context_congr _ _ ih =>
     cases ih
