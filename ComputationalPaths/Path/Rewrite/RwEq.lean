@@ -513,6 +513,85 @@ end RewriteLift
   rweq_of_step
     (Step.depContext_subst_right_cancel_inner (A := A) (B := B) C p t)
 
+@[simp] theorem rweq_depBiContext_mapLeft_of_rweq
+  {A : Type u} {B : Type u} {C : A → B → Type u}
+    (K : DepBiContext A B C) {a₁ a₂ : A} (b : B)
+    {p q : Path a₁ a₂} (h : RwEq p q) :
+    RwEq (DepBiContext.mapLeft (A := A) (B := B) (C := C) K p b)
+      (DepBiContext.mapLeft (A := A) (B := B) (C := C) K q b) := by
+  change
+    RwEq
+      (DepContext.map (A := A) (B := fun a => C a b)
+        (DepBiContext.fixRight (A := A) (B := B) (C := C) K b) p)
+      (DepContext.map (A := A) (B := fun a => C a b)
+        (DepBiContext.fixRight (A := A) (B := B) (C := C) K b) q)
+  exact
+    rweq_depContext_map_of_rweq
+      (A := A) (B := fun a => C a b)
+      (C := DepBiContext.fixRight (A := A) (B := B) (C := C) K b)
+      (p := p) (q := q) (h := h)
+
+@[simp] theorem rweq_depBiContext_mapRight_of_rweq
+  {A : Type u} {B : Type u} {C : A → B → Type u}
+    (K : DepBiContext A B C) (a : A) {b₁ b₂ : B}
+    {p q : Path b₁ b₂} (h : RwEq p q) :
+    RwEq (DepBiContext.mapRight (A := A) (B := B) (C := C) K a p)
+      (DepBiContext.mapRight (A := A) (B := B) (C := C) K a q) := by
+  change
+    RwEq
+      (DepContext.map (A := B) (B := fun b => C a b)
+        (DepBiContext.fixLeft (A := A) (B := B) (C := C) K a) p)
+      (DepContext.map (A := B) (B := fun b => C a b)
+        (DepBiContext.fixLeft (A := A) (B := B) (C := C) K a) q)
+  exact
+    rweq_depContext_map_of_rweq
+      (A := B) (B := fun b => C a b)
+      (C := DepBiContext.fixLeft (A := A) (B := B) (C := C) K a)
+      (p := p) (q := q) (h := h)
+
+@[simp] theorem rweq_depBiContext_map2_left_of_rweq
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+  (K : DepBiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+    {p q : Path a₁ a₂} (r : Path b₁ b₂) (h : RwEq p q) :
+    RwEq (DepBiContext.map2 (A := A) (B := B) (C := C) K p r)
+      (DepBiContext.map2 (A := A) (B := B) (C := C) K q r) := by
+  induction h with
+  | refl _ => exact RwEq.refl _
+  | step step =>
+      exact RwEq.step
+        (Step.depBiContext_map2_congr_left (A := A) (B := B) (C := C)
+          (K := K) (r := r) step)
+  | symm _ ih => exact RwEq.symm ih
+  | trans _ _ ih₁ ih₂ => exact RwEq.trans ih₁ ih₂
+
+@[simp] theorem rweq_depBiContext_map2_right_of_rweq
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+  (K : DepBiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) {q r : Path b₁ b₂} (h : RwEq q r) :
+    RwEq (DepBiContext.map2 (A := A) (B := B) (C := C) K p q)
+      (DepBiContext.map2 (A := A) (B := B) (C := C) K p r) := by
+  induction h with
+  | refl _ => exact RwEq.refl _
+  | step step =>
+      exact RwEq.step
+        (Step.depBiContext_map2_congr_right (A := A) (B := B) (C := C)
+          (K := K) (p := p) step)
+  | symm _ ih => exact RwEq.symm ih
+  | trans _ _ ih₁ ih₂ => exact RwEq.trans ih₁ ih₂
+
+@[simp] theorem rweq_depBiContext_map2_of_rweq
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+  (K : DepBiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+    {p q : Path a₁ a₂} {r s : Path b₁ b₂}
+    (hp : RwEq p q) (hq : RwEq r s) :
+    RwEq (DepBiContext.map2 (A := A) (B := B) (C := C) K p r)
+      (DepBiContext.map2 (A := A) (B := B) (C := C) K q s) :=
+  rweq_trans
+    (rweq_depBiContext_map2_left_of_rweq (A := A) (B := B) (C := C)
+      (K := K) (p := p) (q := q) (r := r) hp)
+    (rweq_depBiContext_map2_right_of_rweq (A := A) (B := B) (C := C)
+      (K := K) (p := q) (q := r) (r := s) hq)
+
 @[simp] theorem rweq_transport_refl_beta
     {A : Type u} {B : A → Type u}
     {a : A} (x : B a) :

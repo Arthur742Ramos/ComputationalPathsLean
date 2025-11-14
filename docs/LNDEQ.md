@@ -95,8 +95,11 @@ Two auxiliary pieces keep the quotient and termination stories aligned with the 
 
 - `Context.mapQuot` lifts unary contexts to the `PathRwQuot` level and satisfies
   `mapQuot (cmpA x y) = cmpA (mapQuot x) (mapQuot y)` together with the analogous
-  statements for `invA` and `toEq`.  This lets higher coherences trade `cmpA`/`invA`
-  equalities through functorial contexts without dropping back to raw paths.
+  statements for `invA` and `toEq`.  The same lifting now exists for dependent and
+  binary contexts via `DepContext.mapQuot` plus the new
+  `BiContext.mapLeftQuot`/`mapRightQuot`/`map2Quot` wrappers, so higher coherences
+  can shuttle `cmpA`/`invA` equalities through any functorial context without
+  dropping back to raw paths.
 - `LNDEQ.Derivation` records a tagged list of instantiations between two paths.
   The helper lemmas `Derivation.toRw`, `Derivation.toRwEq`, and
   `Derivation.measure_tail_lt` show that each tagged step witnesses a strict
