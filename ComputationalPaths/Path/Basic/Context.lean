@@ -66,6 +66,22 @@ variable {A : Type u} {B : Type v}
   cases p
   simp [map, comp]
 
+/-- Substitution through a unary context on the "left" rewrite.
+This packages the composition described in Definition 3.5 of the paper. -/
+@[simp] def substLeft (C : Context A B)
+    {x : B} {a₁ a₂ : A}
+    (h : Path x (C.fill a₁)) (p : Path a₁ a₂) :
+    Path x (C.fill a₂) :=
+  Path.trans h (map C p)
+
+/-- Substitution through a unary context on the "right" rewrite.
+This captures the second rule in Definition 3.5 of the paper. -/
+@[simp] def substRight (C : Context A B)
+    {a₁ a₂ : A} {y : B}
+    (p : Path a₁ a₂) (h : Path (C.fill a₂) y) :
+    Path (C.fill a₁) y :=
+  Path.trans (map C p) h
+
 end Context
 
 /-- A binary context encapsulating Definition 3.5's `sub L` and `sub R`. -/
