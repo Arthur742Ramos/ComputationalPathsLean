@@ -709,6 +709,7 @@ end RewriteLift
     (rw_context_map_of_rw (A := A) (B := A) (Ctx := Ctx) h)
 
 
+
 @[simp] theorem rw_trans {p q r : Path a b}
     (h1 : Rw p q) (h2 : Rw q r) : Rw p r :=
   match h2 with
@@ -1093,6 +1094,133 @@ theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
 @[simp] theorem rweq_trans {p q r : Path a b} (h1 : RwEq p q) (h2 : RwEq q r) :
     RwEq p r :=
   RwEq.trans h1 h2
+
+namespace RewriteLift
+
+variable {A : Type u} {B : Type u}
+
+@[simp] theorem rweq_of_rweq (F : RewriteLift A B)
+  {a b : A} {p q : Path (A := A) a b}
+  (h : RwEq p q) :
+  RwEq (F.map p) (F.map q) :=
+  by
+  induction h with
+  | refl _ => exact RwEq.refl _
+  | step hStep =>
+    exact RwEq.step (F.step_congr hStep)
+  | symm _ ih => exact RwEq.symm ih
+  | trans _ _ ih₁ ih₂ =>
+    exact RwEq.trans ih₁ ih₂
+
+end RewriteLift
+
+@[simp] theorem rweq_context_map_of_rweq {A : Type u} {B : Type u}
+  (Ctx : Context A B) {a₁ a₂ : A}
+  {p q : Path a₁ a₂} (h : RwEq p q) :
+  RwEq (Context.map (A := A) (B := B) Ctx p)
+    (Context.map (A := A) (B := B) Ctx q) := by
+  simpa using
+    (RewriteLift.rweq_of_rweq
+      (A := A) (B := B)
+      (F := RewriteLift.ofContext (A := A) (B := B) Ctx)
+      (p := p) (q := q) h)
+
+@[simp] theorem rweq_biContext_mapLeft_of_rweq
+  {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) {a₁ a₂ : A} (b : B)
+  {p q : Path a₁ a₂} (h : RwEq p q) :
+  RwEq (BiContext.mapLeft (A := A) (B := B) (C := C) K p b)
+    (BiContext.mapLeft (A := A) (B := B) (C := C) K q b) := by
+  simpa using
+    (RewriteLift.rweq_of_rweq
+      (A := A) (B := C)
+      (F := RewriteLift.ofBiContextLeft (A := A) (B := B) (C := C)
+        (K := K) (b₀ := b))
+      (p := p) (q := q) h)
+
+@[simp] theorem rweq_biContext_mapRight_of_rweq
+  {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) (a : A) {b₁ b₂ : B}
+  {p q : Path b₁ b₂} (h : RwEq p q) :
+  RwEq (BiContext.mapRight (A := A) (B := B) (C := C) K a p)
+    (BiContext.mapRight (A := A) (B := B) (C := C) K a q) := by
+  simpa using
+    (RewriteLift.rweq_of_rweq
+      (A := B) (B := C)
+      (F := RewriteLift.ofBiContextRight (A := A) (B := B) (C := C)
+        (K := K) (a := a))
+      (p := p) (q := q) h)
+
+@[simp] theorem rweq_mapLeft_of_rweq {B : Type u}
+  (f : A → B → A) {a₁ a₂ : A} (b : B)
+  {p q : Path a₁ a₂} (h : RwEq p q) :
+  RwEq (Path.mapLeft f p b) (Path.mapLeft f q b) := by
+  classical
+  let Ctx : Context A A := ⟨fun a => f a b⟩
+  simpa [Ctx, Context.map, Path.mapLeft] using
+    (rweq_context_map_of_rweq (A := A) (B := A) (Ctx := Ctx) h)
+
+@[simp] theorem rweq_mapRight_of_rweq
+  (f : A → A → A) (a : A) {b₁ b₂ : A}
+  {p q : Path b₁ b₂} (h : RwEq p q) :
+  RwEq (Path.mapRight f a p) (Path.mapRight f a q) := by
+  classical
+  let Ctx : Context A A := ⟨fun b => f a b⟩
+  simpa [Ctx, Context.map, Path.mapRight] using
+    (rweq_context_map_of_rweq (A := A) (B := A) (Ctx := Ctx) h)
+
+@[simp] theorem rweq_biContext_map2_left_of_rweq
+  {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+  {p q : Path a₁ a₂} (r : Path b₁ b₂) (h : RwEq p q) :
+  RwEq (BiContext.map2 (A := A) (B := B) (C := C) K p r)
+    (BiContext.map2 (A := A) (B := B) (C := C) K q r) := by
+  induction h with
+  | refl _ => exact RwEq.refl _
+  | step step =>
+      exact RwEq.step
+        (Step.biContext_map2_congr_left (A := A) (B := B) (C := C)
+          (K := K) (r := r) step)
+  | symm _ ih => exact RwEq.symm ih
+  | trans _ _ ih₁ ih₂ => exact RwEq.trans ih₁ ih₂
+
+@[simp] theorem rweq_biContext_map2_right_of_rweq
+  {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+  (p : Path a₁ a₂) {q r : Path b₁ b₂} (h : RwEq q r) :
+  RwEq (BiContext.map2 (A := A) (B := B) (C := C) K p q)
+    (BiContext.map2 (A := A) (B := B) (C := C) K p r) := by
+  induction h with
+  | refl _ => exact RwEq.refl _
+  | step step =>
+      exact RwEq.step
+        (Step.biContext_map2_congr_right (A := A) (B := B) (C := C)
+          (K := K) (p := p) step)
+  | symm _ ih => exact RwEq.symm ih
+  | trans _ _ ih₁ ih₂ => exact RwEq.trans ih₁ ih₂
+
+@[simp] theorem rweq_biContext_map2_of_rweq
+  {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+  {p q : Path a₁ a₂} {r s : Path b₁ b₂}
+  (hp : RwEq p q) (hq : RwEq r s) :
+  RwEq (BiContext.map2 (A := A) (B := B) (C := C) K p r)
+    (BiContext.map2 (A := A) (B := B) (C := C) K q s) :=
+  rweq_trans
+    (rweq_biContext_map2_left_of_rweq (A := A) (B := B) (C := C)
+      (K := K) (r := r) hp)
+    (rweq_biContext_map2_right_of_rweq (A := A) (B := B) (C := C)
+      (K := K) (p := q) (h := hq))
+
+@[simp] theorem rweq_map2_of_rweq {A : Type u} {B : Type u} {C : Type u}
+  (f : A → B → C) {a₁ a₂ : A} {b₁ b₂ : B}
+  {p q : Path a₁ a₂} {r s : Path b₁ b₂}
+  (hp : RwEq p q) (hq : RwEq r s) :
+  RwEq (Path.map2 (A := A) (B := B) (C := C) f p r)
+    (Path.map2 (A := A) (B := B) (C := C) f q s) :=
+  rweq_biContext_map2_of_rweq
+    (A := A) (B := B) (C := C)
+    (K := ⟨f⟩) (p := p) (q := q) (r := r) (s := s) hp hq
 
 @[simp] theorem rweq_sr {A : Type u} (a : A) :
     RwEq (Path.symm (Path.refl a)) (Path.refl a) :=
