@@ -8,6 +8,18 @@ reflexive/transitive closure `RwEq`.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.Step
+import ComputationalPaths.Path.Rewrite.Rw
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Rewrite.Quot
+
+/-!
+  This file now serves as an umbrella import for the modular rewrite system.
+  The legacy monolithic implementation is kept below `#exit` for reference.
+-/
+
+#exit
 
 namespace ComputationalPaths.Path
 

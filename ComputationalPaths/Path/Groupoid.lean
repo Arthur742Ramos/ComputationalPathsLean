@@ -10,7 +10,11 @@ definitionally.
 -/
 
 import ComputationalPaths.Path.Basic
-import ComputationalPaths.Path.Rewrite
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.Step
+import ComputationalPaths.Path.Rewrite.Rw
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Rewrite.Quot
 
 namespace ComputationalPaths.Path
 
