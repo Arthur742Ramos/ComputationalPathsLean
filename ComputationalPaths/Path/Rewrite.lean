@@ -677,6 +677,36 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
   | Rw.refl _ => h1
   | Rw.tail h2 step => Rw.tail (rw_trans h1 h2) step
 
+@[simp] theorem rw_biContext_map2_of_rw {A : Type u} {B : Type u} {C : Type u}
+  (K : BiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+  {p q : Path a₁ a₂} {r s : Path b₁ b₂}
+  (hp : Rw (A := A) p q) (hq : Rw (A := B) r s) :
+  Rw (BiContext.map2 (A := A) (B := B) (C := C) K p r)
+    (BiContext.map2 (A := A) (B := B) (C := C) K q s) := by
+  refine (rw_trans (A := C)
+    (a := K.fill a₁ b₁)
+    (b := K.fill a₂ b₂)
+    (p := BiContext.map2 (A := A) (B := B) (C := C) K p r)
+    (q := BiContext.map2 (A := A) (B := B) (C := C) K q r)
+    (r := BiContext.map2 (A := A) (B := B) (C := C) K q s) ?_ ?_)
+  · exact
+      (rw_biContext_map2_left_of_rw (A := A) (B := B) (C := C)
+        (K := K) (r := r) hp)
+  · exact
+      (rw_biContext_map2_right_of_rw (A := A) (B := B) (C := C)
+        (K := K) (p := q) hq)
+
+@[simp] theorem rw_map2_of_rw {A : Type u} {B : Type u} {C : Type u}
+  (f : A → B → C) {a₁ a₂ : A} {b₁ b₂ : B}
+  {p q : Path a₁ a₂} {r s : Path b₁ b₂}
+  (hp : Rw (A := A) p q) (hq : Rw (A := B) r s) :
+  Rw (Path.map2 (A := A) (B := B) (C := C) f p r)
+    (Path.map2 (A := A) (B := B) (C := C) f q s) := by
+  simpa using
+    (rw_biContext_map2_of_rw
+      (A := A) (B := B) (C := C) (K := ⟨f⟩)
+      (p := p) (q := q) (r := r) (s := s) hp hq)
+
 @[simp] theorem rw_to_canonical_of_rw {p q : Path a b} (h : Rw p q) :
     Rw q (Path.ofEq (A := A) (a := a) (b := b) p.toEq) := by
   have hcanon := rw_canon (p := q)
