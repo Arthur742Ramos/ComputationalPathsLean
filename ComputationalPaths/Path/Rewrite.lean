@@ -584,43 +584,85 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
   | tail _ step ih =>
     exact Rw.tail ih (Step.trans_congr_right p step)
 
+/-- A unary action on paths that is compatible with rewrite steps. -/
+structure RewriteLift (A : Type u) (B : Type u) where
+  /-- Object function describing how endpoints are transported. -/
+  obj : A → B
+  /-- Map a path in `A` to a path in `B`. -/
+  map :
+    ∀ {a b : A},
+      Path (A := A) a b → Path (A := B) (obj a) (obj b)
+  /-- Transport of rewrite steps along the action. -/
+  step_congr :
+    ∀ {a b : A} {p q : Path (A := A) a b},
+      Step (A := A) p q →
+        Step (A := B) (map p) (map q)
+
+namespace RewriteLift
+
+variable {A : Type u} {B : Type u}
+
+@[simp] theorem rw_of_rw (F : RewriteLift A B)
+    {a b : A} {p q : Path (A := A) a b}
+    (h : Rw (A := A) p q) :
+    Rw (A := B) (F.map p) (F.map q) := by
+  induction h with
+  | refl =>
+      exact Rw.refl (F.map p)
+  | tail _ step ih =>
+      exact Rw.tail ih (F.step_congr step)
+
+@[simp] def ofContext (C : Context A B) : RewriteLift A B where
+  obj := C.fill
+  map := fun {_ _} p => Context.map (A := A) (B := B) C p
+  step_congr := fun {_ _ _ _} step =>
+    Step.context_congr (A := A) (B := B) C step
+
+@[simp] def ofBiContextLeft (K : BiContext A B C) (b₀ : B) :
+  RewriteLift A C where
+  obj := fun a => K.fill a b₀
+  map := fun {_ _} p =>
+    BiContext.mapLeft (A := A) (B := B) (C := C) K p b₀
+  step_congr := fun {_ _ _ _} step =>
+    Step.biContext_mapLeft_congr (A := A) (B := B) (C := C)
+      (K := K) (b := b₀) step
+
+@[simp] def ofBiContextRight (K : BiContext A B C) (a : A) :
+  RewriteLift B C where
+  obj := fun b => K.fill a b
+  map := fun {_ _} p =>
+    BiContext.mapRight (A := A) (B := B) (C := C) K a p
+  step_congr := fun {_ _ _ _} step =>
+    Step.biContext_mapRight_congr (A := A) (B := B) (C := C)
+      (K := K) (a := a) step
+
+end RewriteLift
+
 @[simp] theorem rw_context_map_of_rw {A : Type u} {B : Type u}
   (Ctx : Context A B) {a₁ a₂ : A}
   {p q : Path a₁ a₂} (h : Rw (A := A) p q) :
   Rw (Context.map (A := A) (B := B) Ctx p)
     (Context.map (A := A) (B := B) Ctx q) := by
-  induction h with
-  | refl =>
-      exact Rw.refl (Context.map (A := A) (B := B) Ctx p)
-  | tail _ step ih =>
-      exact Rw.tail ih
-        (Step.context_congr (A := A) (B := B) Ctx step)
+  simpa using
+    (RewriteLift.ofContext (A := A) (B := B) Ctx).rw_of_rw h
 
 @[simp] theorem rw_biContext_mapLeft_of_rw {A : Type u} {B : Type u} {C : Type u}
   (K : BiContext A B C) {a₁ a₂ : A} (b : B)
   {p q : Path a₁ a₂} (h : Rw (A := A) p q) :
   Rw (BiContext.mapLeft (A := A) (B := B) (C := C) K p b)
     (BiContext.mapLeft (A := A) (B := B) (C := C) K q b) := by
-  induction h with
-  | refl =>
-      exact Rw.refl (BiContext.mapLeft (A := A) (B := B) (C := C) K p b)
-  | tail _ step ih =>
-      exact Rw.tail ih
-        (Step.biContext_mapLeft_congr (A := A) (B := B) (C := C)
-          (K := K) (b := b) step)
+  simpa using
+    (RewriteLift.ofBiContextLeft (A := A) (B := B) (C := C)
+      (K := K) (b₀ := b)).rw_of_rw h
 
 @[simp] theorem rw_biContext_mapRight_of_rw {A : Type u} {B : Type u} {C : Type u}
   (K : BiContext A B C) (a : A) {b₁ b₂ : B}
   {p q : Path b₁ b₂} (h : Rw (A := B) p q) :
   Rw (BiContext.mapRight (A := A) (B := B) (C := C) K a p)
     (BiContext.mapRight (A := A) (B := B) (C := C) K a q) := by
-  induction h with
-  | refl =>
-      exact Rw.refl (BiContext.mapRight (A := A) (B := B) (C := C) K a p)
-  | tail _ step ih =>
-      exact Rw.tail ih
-        (Step.biContext_mapRight_congr (A := A) (B := B) (C := C)
-          (K := K) (a := a) step)
+  simpa using
+    (RewriteLift.ofBiContextRight (A := A) (B := B) (C := C)
+      (K := K) (a := a)).rw_of_rw h
 
 @[simp] theorem rw_biContext_map2_left_of_rw {A : Type u} {B : Type u} {C : Type u}
   (K : BiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
@@ -652,23 +694,19 @@ theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
   (f : A → B → A) {a₁ a₂ : A} (b : B)
   {p q : Path a₁ a₂} (h : Rw p q) :
   Rw (Path.mapLeft f p b) (Path.mapLeft f q b) := by
-  induction h with
-  | refl =>
-    exact Rw.refl (Path.mapLeft f p b)
-  | tail _ step ih =>
-      exact Rw.tail ih
-        (Step.mapLeft_congr (A := A) (B := B) (f := f) (b := b) step)
+  classical
+  let Ctx : Context A A := ⟨fun a => f a b⟩
+  simpa [Ctx, Context.map, Path.mapLeft] using
+    (rw_context_map_of_rw (A := A) (B := A) (Ctx := Ctx) h)
 
 @[simp] theorem rw_mapRight_of_rw
   (f : A → A → A) (a : A) {b₁ b₂ : A}
   {p q : Path b₁ b₂} (h : Rw p q) :
   Rw (Path.mapRight f a p) (Path.mapRight f a q) := by
-  induction h with
-  | refl =>
-    exact Rw.refl (Path.mapRight f a p)
-  | tail _ step ih =>
-      exact Rw.tail ih
-        (Step.mapRight_congr (A := A) (f := f) (a := a) step)
+  classical
+  let Ctx : Context A A := ⟨fun b => f a b⟩
+  simpa [Ctx, Context.map, Path.mapRight] using
+    (rw_context_map_of_rw (A := A) (B := A) (Ctx := Ctx) h)
 
 
 @[simp] theorem rw_trans {p q r : Path a b}
