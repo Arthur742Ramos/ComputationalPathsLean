@@ -506,6 +506,14 @@ theorem circleLoopZPow_exists_unique (x : CircleLoopQuot) :
     z' = circleEncode (circleLoopZPow z') := hzPow.symm
     _ = circleEncode x := hEncode
 
+theorem circleLoopZPow_exists_unique_left (x : CircleLoopQuot) :
+    ∃ z : Int, x = circleLoopZPow z ∧
+        ∀ z', x = circleLoopZPow z' → z' = z := by
+  obtain ⟨z, hz, huniq⟩ := circleLoopZPow_exists_unique x
+  refine ⟨z, hz.symm, ?_⟩
+  intro z' hz'
+  exact huniq z' hz'.symm
+
 theorem circleEncode_injective : Function.Injective circleEncode := by
   intro x y h
   have hx := _root_.congrArg circleLoopZPow h
@@ -546,6 +554,51 @@ theorem circleEncode_injective : Function.Injective circleEncode := by
     _ = circleEncode y + circleEncode x := by
           exact Int.add_comm _ _
     _ = circleEncode (circlePiOneGroup.mul y x) := hy.symm
+
+/-- Winding-number terminology for the map `π₁(S¹) → ℤ`. -/
+@[simp] def circleWindingNumber : circlePiOne → Int :=
+  circleEncode
+
+/-- Iterate the fundamental loop according to an integer. -/
+@[simp] def circleLoopFromInt : Int → circlePiOne :=
+  circleLoopZPow
+
+@[simp] theorem circleWindingNumber_mul (x y : circlePiOne) :
+    circleWindingNumber (circlePiOneGroup.mul x y) =
+      circleWindingNumber x + circleWindingNumber y :=
+  circleEncode_mul x y
+
+@[simp] theorem circleWindingNumber_one :
+    circleWindingNumber circlePiOneGroup.one = 0 :=
+  circleEncode_one
+
+@[simp] theorem circleWindingNumber_inv (x : circlePiOne) :
+    circleWindingNumber (circlePiOneGroup.inv x) =
+      - circleWindingNumber x :=
+  circleEncode_inv x
+
+@[simp] theorem circleLoopFromInt_add (m n : Int) :
+    circleLoopFromInt (m + n) =
+      circlePiOneGroup.mul (circleLoopFromInt m) (circleLoopFromInt n) := by
+  exact circleLoopZPow_add (m := m) (n := n)
+
+@[simp] theorem circleLoopFromInt_zero :
+    circleLoopFromInt 0 = circlePiOneGroup.one :=
+  circleLoopZPow_zero
+
+@[simp] theorem circleLoopFromInt_one :
+    circleLoopFromInt 1 = circleLoopClass :=
+  circleLoopZPow_one
+
+@[simp] theorem circleLoopFromInt_neg (m : Int) :
+    circleLoopFromInt (-m) =
+      circlePiOneGroup.inv (circleLoopFromInt m) :=
+  circleLoopZPow_neg (z := m)
+
+theorem circleLoopFromInt_exists_unique (x : circlePiOne) :
+    ∃ z : Int, x = circleLoopFromInt z ∧
+        ∀ z', x = circleLoopFromInt z' → z' = z :=
+  circleLoopZPow_exists_unique_left (x := x)
 
 @[simp] theorem circleEncode_circleLoopClass :
     circleEncode circleLoopClass = 1 := by
