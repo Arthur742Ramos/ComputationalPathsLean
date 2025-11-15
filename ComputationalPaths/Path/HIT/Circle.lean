@@ -11,6 +11,7 @@ can already depend on a stable API.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Homotopy.Loops
+import ComputationalPaths.Path.Homotopy.FundamentalGroup
 
 namespace ComputationalPaths
 namespace Path
@@ -68,6 +69,14 @@ abbrev CircleLoopQuot : Type u :=
 abbrev circleLoopGroup : LoopGroup Circle circleBase :=
   loopGroup Circle circleBase
 
+/-- Fundamental group π₁(S¹, base) as rewrite classes of loops. -/
+abbrev circlePiOne : Type u :=
+  PiOne Circle circleBase
+
+/-- Strict group structure on π₁(S¹, base). -/
+abbrev circlePiOneGroup : LoopGroup Circle circleBase :=
+  PiOneGroup Circle circleBase
+
 /-- The distinguished fundamental loop as an inhabitant of the circle loop space. -/
 @[simp] def circleLoopPath : CircleLoopSpace :=
   circleLoop
@@ -75,6 +84,10 @@ abbrev circleLoopGroup : LoopGroup Circle circleBase :=
 /-- Fundamental loop represented in the quotient. -/
 @[simp] def circleLoopClass : CircleLoopQuot :=
   LoopQuot.ofLoop (A := Circle) (a := circleBase) circleLoop
+
+/-- The fundamental loop seen as an element of π₁(S¹). -/
+@[simp] def circlePiOneLoop : circlePiOne :=
+  PiOne.ofLoop (A := Circle) (a := circleBase) circleLoop
 
 /-- Iterate the fundamental loop `n` times in the quotient. -/
 def circleLoopPow (n : Nat) : CircleLoopQuot :=
@@ -102,12 +115,26 @@ theorem circleLoopPow_add (m n : Nat) :
   LoopQuot.pow_add (A := Circle) (a := circleBase)
     (x := circleLoopClass) m n
 
+/-- Compatibility of `π₁` multiplication with `circleLoopPow`. -/
+@[simp] theorem circlePiOne_mul_pow (m n : Nat) :
+    PiOne.mul (A := Circle) (a := circleBase)
+      (circleLoopPow m) (circleLoopPow n) =
+      circleLoopPow (m + n) := by
+  change LoopQuot.comp (circleLoopPow m) (circleLoopPow n) =
+    circleLoopPow (m + n)
+  exact (circleLoopPow_add (m := m) (n := n)).symm
+
 /-- Iterate the fundamental loop an integer number of times. -/
 def circleLoopZPow (z : Int) : CircleLoopQuot :=
   LoopQuot.zpow (A := Circle) (a := circleBase) circleLoopClass z
 
 @[simp] theorem circleLoopZPow_ofNat (n : Nat) :
     circleLoopZPow n = circleLoopPow n := rfl
+
+/-- Integer powers in π₁ agree with the explicit loop z-powers. -/
+@[simp] theorem circlePiOne_zpow (z : Int) :
+    PiOne.zpow (A := Circle) (a := circleBase)
+      circleLoopClass z = circleLoopZPow z := rfl
 
 @[simp] theorem circleLoopZPow_zero :
     circleLoopZPow 0 = LoopQuot.id := by
