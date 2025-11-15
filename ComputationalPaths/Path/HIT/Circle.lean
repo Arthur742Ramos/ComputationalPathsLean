@@ -147,6 +147,14 @@ noncomputable def circleCode : Circle → Type _ :=
     Path circleBase x → circleCode x :=
   fun p => Path.transport (A := Circle) (D := circleCode) p circleCodeZero
 
+/-- Circle computation rule transported to the `circleCode` family. -/
+@[simp] theorem circleCode_loop_path :
+    Path.trans (Path.symm (Path.ofEq circleCode_base))
+        (Path.trans (Path.congrArg circleCode circleLoop)
+          (Path.ofEq circleCode_base)) =
+      Path.ua circleSuccEquiv :=
+  circleRec_loop circleCodeData
+
 /-- Iterate the fundamental loop `n` times at the raw path level (natural powers). -/
 @[simp] def circleLoopPathPow : Nat → Path circleBase circleBase
   | 0 => Path.refl circleBase
