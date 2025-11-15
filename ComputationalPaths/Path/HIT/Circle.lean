@@ -225,6 +225,16 @@ def circleDecodeConcrete : Int → CircleLoopQuot :=
 @[simp] theorem circleDecodeConcrete_ofNat (n : Nat) :
     circleDecodeConcrete (Int.ofNat n) = circleLoopPow n := rfl
 
+@[simp] theorem circleDecodeConcrete_ofNat_succ (n : Nat) :
+    circleDecodeConcrete (Int.ofNat n.succ) =
+      LoopQuot.comp (circleLoopPow n) circleLoopClass := by
+  calc
+    circleDecodeConcrete (Int.ofNat (Nat.succ n))
+        = circleLoopPow (Nat.succ n) :=
+            circleDecodeConcrete_ofNat (Nat.succ n)
+    _ = LoopQuot.comp (circleLoopPow n) circleLoopClass :=
+            circleLoopPow_succ (n := n)
+
 @[simp] theorem circleDecodeConcrete_negSucc (n : Nat) :
     circleDecodeConcrete (Int.negSucc n) =
       LoopQuot.inv (circleLoopPow (Nat.succ n)) := by
@@ -380,6 +390,16 @@ downstream developments. -/
         = circleDecodeConcrete (Int.ofNat n) :=
             circleDecode_eq_concrete (n := Int.ofNat n)
     _ = circleLoopPow n := circleDecodeConcrete_ofNat n
+
+@[simp] theorem circleDecode_ofNat_succ (n : Nat) :
+    circleDecode (Int.ofNat n.succ) =
+      LoopQuot.comp (circleLoopPow n) circleLoopClass := by
+  calc
+    circleDecode (Int.ofNat (Nat.succ n))
+        = circleDecodeConcrete (Int.ofNat (Nat.succ n)) :=
+            circleDecode_eq_concrete (n := Int.ofNat (Nat.succ n))
+    _ = LoopQuot.comp (circleLoopPow n) circleLoopClass :=
+            circleDecodeConcrete_ofNat_succ (n := n)
 
 @[simp] theorem circleDecode_one : circleDecode 1 = circleLoopClass := by
   calc
