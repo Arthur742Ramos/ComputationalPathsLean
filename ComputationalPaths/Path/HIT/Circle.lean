@@ -333,6 +333,58 @@ additive group of integers. -/
 @[simp] def fundamentalGroupCircle : CircleLoopGroupEquivInt :=
   circleLoopGroupEquivInt
 
+/-- Equivalence between π₁(S¹, base) and ℤ. -/
+structure CirclePiOneEquivInt where
+  toFun : circlePiOne → Int
+  invFun : Int → circlePiOne
+  left_inv : ∀ x, invFun (toFun x) = x
+  right_inv : ∀ n, toFun (invFun n) = n
+
+/-- Concrete π₁-ℤ equivalence mirroring `circleLoopQuotEquivInt`. -/
+def circlePiOneEquivInt : CirclePiOneEquivInt where
+  toFun := circleEncode
+  invFun := circleDecode
+  left_inv := circleDecode_encode
+  right_inv := circleEncode_decode
+
+/-- Group-level equivalence phrased directly for π₁(S¹, base). -/
+structure CirclePiOneGroupEquivInt where
+  toFun : circlePiOne → Int
+  invFun : Int → circlePiOne
+  map_mul : ∀ x y,
+      toFun (circlePiOneGroup.mul x y) = toFun x + toFun y
+  map_one : toFun circlePiOneGroup.one = 0
+  map_inv : ∀ x,
+      toFun (circlePiOneGroup.inv x) = - toFun x
+  left_inv : ∀ x, invFun (toFun x) = x
+  right_inv : ∀ n, toFun (invFun n) = n
+
+/-- Strict π₁ equivalence packaged at the group level. -/
+@[simp] def circlePiOneGroupEquivInt : CirclePiOneGroupEquivInt where
+  toFun := circleEncode
+  invFun := circleDecode
+  map_mul := by
+    intro x y
+    exact circleEncode_mul x y
+  map_one := circleEncode_one
+  map_inv := by
+    intro x
+    exact circleEncode_inv x
+  left_inv := circleDecode_encode
+  right_inv := circleEncode_decode
+
+@[simp] theorem circlePiOneGroup_mul_decode (m n : Int) :
+    circlePiOneGroup.mul (circleDecode m) (circleDecode n) =
+      circleDecode (m + n) := by
+  change circleLoopGroup.mul (circleDecode m) (circleDecode n) =
+    circleDecode (m + n)
+  exact circleLoopGroup_mul_decode m n
+
+/-- Final statement: π₁(S¹, base) (with its strict group structure) is ℤ. -/
+@[simp] def fundamentalGroupCirclePiOne :
+    CirclePiOneGroupEquivInt :=
+  circlePiOneGroupEquivInt
+
 end
 
 end Path
