@@ -89,80 +89,11 @@ def circleLoopPow (n : Nat) : CircleLoopQuot :=
   LoopQuot.pow_succ (A := Circle) (a := circleBase)
     circleLoopClass n
 
-@[simp] theorem circleLoopPow_one :
-    circleLoopPow 1 = circleLoopClass := by
-  unfold circleLoopPow
-  exact
-    LoopQuot.pow_one (A := Circle) (a := circleBase)
-      (x := circleLoopClass)
-
 theorem circleLoopPow_add (m n : Nat) :
     circleLoopPow (m + n) =
       LoopQuot.comp (circleLoopPow m) (circleLoopPow n) :=
   LoopQuot.pow_add (A := Circle) (a := circleBase)
     (x := circleLoopClass) m n
-
-/-- Iterate the fundamental loop an integer number of times. -/
-def circleLoopZPow (z : Int) : CircleLoopQuot :=
-  LoopQuot.zpow (A := Circle) (a := circleBase) circleLoopClass z
-
-@[simp] theorem circleLoopZPow_ofNat (n : Nat) :
-    circleLoopZPow n = circleLoopPow n := rfl
-
-@[simp] theorem circleLoopZPow_zero :
-    circleLoopZPow 0 = LoopQuot.id := by
-  unfold circleLoopZPow
-  exact
-    LoopQuot.zpow_zero (A := Circle) (a := circleBase) circleLoopClass
-
-@[simp] theorem circleLoopZPow_one :
-    circleLoopZPow 1 = circleLoopClass := by
-  unfold circleLoopZPow
-  exact
-    LoopQuot.zpow_one (A := Circle) (a := circleBase) circleLoopClass
-
-@[simp] theorem circleLoopZPow_negSucc (n : Nat) :
-    circleLoopZPow (Int.negSucc n) =
-      LoopQuot.inv (circleLoopPow (Nat.succ n)) := rfl
-
-@[simp] theorem circleLoopZPow_neg_one :
-    circleLoopZPow (-1) = LoopQuot.inv circleLoopClass := by
-  unfold circleLoopZPow
-  exact
-    LoopQuot.zpow_neg_one (A := Circle) (a := circleBase) circleLoopClass
-
-@[simp] theorem circleLoopZPow_neg (z : Int) :
-    circleLoopZPow (-z) = LoopQuot.inv (circleLoopZPow z) := by
-  unfold circleLoopZPow
-  exact
-    LoopQuot.zpow_neg (A := Circle) (a := circleBase)
-      (x := circleLoopClass) z
-
-@[simp] theorem circleLoopZPow_ofNat_add (m n : Nat) :
-    circleLoopZPow (Int.ofNat m + Int.ofNat n) =
-      LoopQuot.comp (circleLoopZPow (Int.ofNat m))
-        (circleLoopZPow (Int.ofNat n)) := by
-  have hsum : (m : Int) + (n : Int) = ((m + n : Nat) : Int) :=
-    (Int.natCast_add m n).symm
-  have hrewrite :
-      circleLoopZPow (Int.ofNat m + Int.ofNat n) =
-        circleLoopZPow (Int.ofNat (m + n)) :=
-    _root_.congrArg circleLoopZPow hsum
-  have hsumPow :
-      circleLoopZPow (Int.ofNat (m + n)) = circleLoopPow (m + n) :=
-    circleLoopZPow_ofNat (n := m + n)
-  have hpowAdd := circleLoopPow_add (m := m) (n := n)
-  calc
-    circleLoopZPow (Int.ofNat m + Int.ofNat n)
-        = circleLoopZPow (Int.ofNat (m + n)) := hrewrite
-    _ = circleLoopPow (m + n) := hsumPow
-    _ = LoopQuot.comp (circleLoopPow m) (circleLoopPow n) := hpowAdd
-    _ = LoopQuot.comp (circleLoopZPow m) (circleLoopPow n) := by
-      rw [← circleLoopZPow_ofNat (n := m)]
-    _ = LoopQuot.comp (circleLoopZPow m) (circleLoopZPow n) := by
-      rw [← circleLoopZPow_ofNat (n := n)]
-    _ = LoopQuot.comp (circleLoopZPow (Int.ofNat m))
-        (circleLoopZPow (Int.ofNat n)) := rfl
 
 /-- Baseline data describing how π₁(S¹) will be related to ℤ.
 
