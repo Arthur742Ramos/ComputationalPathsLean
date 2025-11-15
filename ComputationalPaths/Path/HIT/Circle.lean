@@ -506,6 +506,47 @@ theorem circleLoopZPow_exists_unique (x : CircleLoopQuot) :
     z' = circleEncode (circleLoopZPow z') := hzPow.symm
     _ = circleEncode x := hEncode
 
+theorem circleEncode_injective : Function.Injective circleEncode := by
+  intro x y h
+  have hx := _root_.congrArg circleLoopZPow h
+  have hxLeft := (circleLoopZPow_encode (x := x)).symm
+  have hxRight := circleLoopZPow_encode (x := y)
+  exact hxLeft.trans (hx.trans hxRight)
+
+@[simp] theorem circleLoopQuot_eq_iff_encode_eq (x y : CircleLoopQuot) :
+    x = y ↔ circleEncode x = circleEncode y := by
+  constructor
+  · intro h; cases h; rfl
+  · intro h; exact circleEncode_injective h
+
+@[simp] theorem circleLoopGroup_mul_comm (x y : CircleLoopQuot) :
+    circleLoopGroup.mul x y = circleLoopGroup.mul y x := by
+  apply circleEncode_injective
+  have hx := circleEncode_mul x y
+  have hy := circleEncode_mul y x
+  calc
+    circleEncode (circleLoopGroup.mul x y)
+        = circleEncode x + circleEncode y := hx
+    _ = circleEncode y + circleEncode x := by
+          exact Int.add_comm _ _
+    _ = circleEncode (circleLoopGroup.mul y x) := hy.symm
+
+@[simp] theorem circlePiOne_eq_iff_encode_eq (x y : circlePiOne) :
+    x = y ↔ circleEncode x = circleEncode y :=
+  circleLoopQuot_eq_iff_encode_eq (x := x) (y := y)
+
+@[simp] theorem circlePiOneGroup_mul_comm (x y : circlePiOne) :
+    circlePiOneGroup.mul x y = circlePiOneGroup.mul y x := by
+  apply circleEncode_injective
+  have hx := circleEncode_mul x y
+  have hy := circleEncode_mul y x
+  calc
+    circleEncode (circlePiOneGroup.mul x y)
+        = circleEncode x + circleEncode y := hx
+    _ = circleEncode y + circleEncode x := by
+          exact Int.add_comm _ _
+    _ = circleEncode (circlePiOneGroup.mul y x) := hy.symm
+
 @[simp] theorem circleEncode_circleLoopClass :
     circleEncode circleLoopClass = 1 := by
   have h := circleEncode_circleLoopZPow (z := 1)
