@@ -10,8 +10,10 @@ can already depend on a stable API.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Basic.Univalence
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 namespace ComputationalPaths
 namespace Path
@@ -90,6 +92,72 @@ axiom circleInd_loop {C : Circle → Type v} (data : CircleIndData C) :
   data.loop
 
 noncomputable section
+
+open SimpleEquiv
+
+/-- Equivalence witnessing the successor/predecessor action on the integers. -/
+def circleSuccEquiv : SimpleEquiv Int Int where
+  toFun := fun z => z + 1
+  invFun := fun z => z - 1
+  left_inv := by
+    intro z
+    simpa using Int.add_sub_cancel z 1
+  right_inv := by
+    intro z
+    simpa using Int.sub_add_cancel z 1
+
+private def circleCodeData : CircleRecData (Type _) where
+  base := Int
+  loop := Path.ua circleSuccEquiv
+
+/-- Universal-cover code family for the circle, landing in the integers. -/
+noncomputable def circleCode : Circle → Type _ :=
+  circleRec circleCodeData
+
+@[simp] theorem circleCode_base :
+    circleCode circleBase = Int :=
+  circleRec_base circleCodeData
+
+/-- View an element of `circleCode circleBase` as an integer using the base computation rule. -/
+@[simp] def circleCodeToInt : circleCode circleBase → Int :=
+  fun z => Eq.mp circleCode_base z
+
+/-- Interpret an integer as an element of `circleCode circleBase`. -/
+@[simp] def circleCodeOfInt : Int → circleCode circleBase :=
+  fun z => Eq.mpr circleCode_base z
+
+@[simp] theorem circleCodeToInt_ofInt (z : Int) :
+    circleCodeToInt (circleCodeOfInt z) = z := by
+  simp [circleCodeToInt, circleCodeOfInt]
+
+@[simp] theorem circleCodeOfInt_toInt (z : circleCode circleBase) :
+    circleCodeOfInt (circleCodeToInt z) = z := by
+  simp [circleCodeToInt, circleCodeOfInt]
+
+/-- Chosen basepoint in the code fibre at the circle base. -/
+@[simp] def circleCodeZero : circleCode circleBase :=
+  circleCodeOfInt 0
+
+@[simp] theorem circleCodeToInt_zero :
+    circleCodeToInt circleCodeZero = 0 := by
+  simp [circleCodeZero]
+
+/-- Transport the base code point along a loop to encode a path. -/
+@[simp] def circleEncodeRaw (x : Circle) :
+    Path circleBase x → circleCode x :=
+  fun p => Path.transport (A := Circle) (D := circleCode) p circleCodeZero
+
+/-- Iterate the fundamental loop `n` times at the raw path level (natural powers). -/
+@[simp] def circleLoopPathPow : Nat → Path circleBase circleBase
+  | 0 => Path.refl circleBase
+  | Nat.succ n =>
+      Path.trans (circleLoopPathPow n) circleLoop
+
+/-- Integer iteration of the fundamental loop at the path level. -/
+@[simp] def circleLoopPathZPow : Int → Path circleBase circleBase
+  | Int.ofNat n => circleLoopPathPow n
+  | Int.negSucc n =>
+      Path.symm (circleLoopPathPow (Nat.succ n))
 
 /-- Loop space of the circle, specialised from the generic `LoopSpace`. -/
 abbrev CircleLoopSpace : Type u :=

@@ -34,12 +34,18 @@ the equivalence. -/
     Path.transport (A := Type u) (D := fun X => X)
         (Path.symm (ua (A := A) (B := B) e)) y =
       e.invFun y := by
-  -- Rewrite the target `y` using the `ua_beta` axiom.
-  have h := ua_beta (A := A) (B := B) e (x := e.invFun y)
+  -- Rewrite the transported argument using the `ua_beta` axiom together with
+  -- the equivalence's right inverse.
+  have hTransport :=
+    ua_beta (A := A) (B := B) e (x := e.invFun y)
+  have hEval : Path.transport (A := Type u) (D := fun X => X)
+      (ua (A := A) (B := B) e) (e.invFun y) = y := by
+    simpa [hTransport, e.right_inv y]
   -- Cancel the forward transport via the general `transport_symm_left` lemma.
-  simpa [h] using
-    (Path.transport_symm_left (A := Type u) (D := fun X => X)
-      (p := ua (A := A) (B := B) e) (x := e.invFun y))
+  have hSymm :=
+    Path.transport_symm_left (A := Type u) (D := fun X => X)
+      (p := ua (A := A) (B := B) e) (x := e.invFun y)
+  simpa [hEval] using hSymm
 
 end Path
 end ComputationalPaths
