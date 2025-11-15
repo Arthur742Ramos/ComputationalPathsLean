@@ -510,6 +510,16 @@ components. -/
     Path (f a) (f b) :=
   Path.mk (p.steps.map (Step.map f)) (_root_.congrArg f p.proof)
 
+theorem transport_congrArg {D : A → Type w}
+    {a b : A} (p : Path a b) (x : D a) :
+    transport (A := A) (D := D) p x =
+      Path.transport (A := Type w) (D := fun X => X)
+        (congrArg (fun t => D t) p) x := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      simp [transport, congrArg]
+
 /-- Unary congruence preserves concatenation. -/
 @[simp] theorem congrArg_trans (f : A → B)
     (p : Path a b) (q : Path b c) :
