@@ -78,6 +78,14 @@ variable {A : Type u} {a : A}
 @[simp] def inv (x : LoopQuot A a) : LoopQuot A a :=
   PathRwQuot.symm (A := A) x
 
+@[simp] theorem ofLoop_trans (p q : LoopSpace A a) :
+    ofLoop (Path.trans p q) =
+      comp (ofLoop p) (ofLoop q) := rfl
+
+@[simp] theorem ofLoop_symm (p : LoopSpace A a) :
+    ofLoop (Path.symm p) =
+      inv (ofLoop p) := rfl
+
 @[simp] theorem id_comp (x : LoopQuot A a) : comp id x = x := by
   unfold comp id
   exact
