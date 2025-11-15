@@ -225,6 +225,12 @@ def circleDecodeConcrete : Int → CircleLoopQuot :=
 @[simp] theorem circleDecodeConcrete_ofNat (n : Nat) :
     circleDecodeConcrete (Int.ofNat n) = circleLoopPow n := rfl
 
+@[simp] theorem circleDecodeConcrete_negSucc (n : Nat) :
+    circleDecodeConcrete (Int.negSucc n) =
+      LoopQuot.inv (circleLoopPow (Nat.succ n)) := by
+  unfold circleDecodeConcrete
+  exact circleLoopZPow_negSucc (n := n)
+
 @[simp] theorem circleDecodeConcrete_zero :
     circleDecodeConcrete 0 = LoopQuot.id :=
   circleLoopZPow_zero
@@ -362,12 +368,44 @@ downstream developments. -/
     have h := circleDecode_eq_concrete (n := 0)
     rw [h, circleDecodeConcrete_zero]
 
+@[simp] theorem circleDecode_ofNat (n : Nat) :
+    circleDecode (Int.ofNat n) = circleLoopPow n := by
+  calc
+    circleDecode (Int.ofNat n)
+        = circleDecodeConcrete (Int.ofNat n) :=
+            circleDecode_eq_concrete (n := Int.ofNat n)
+    _ = circleLoopPow n := circleDecodeConcrete_ofNat n
+
+@[simp] theorem circleDecode_one : circleDecode 1 = circleLoopClass := by
+  calc
+    circleDecode 1
+        = circleDecode (Int.ofNat 1) := rfl
+    _ = circleLoopPow 1 := circleDecode_ofNat 1
+    _ = circleLoopClass := circleLoopPow_one
+
 @[simp] theorem circleDecode_neg (n : Int) :
     circleDecode (-n) = LoopQuot.inv (circleDecode n) :=
   by
-    have hneg := circleDecode_eq_concrete (n := -n)
-    have hpos := circleDecode_eq_concrete (n := n)
-    rw [hneg, circleDecodeConcrete_neg (z := n), hpos]
+    have hInv :=
+      _root_.congrArg LoopQuot.inv
+        (circleDecode_eq_concrete (n := n)).symm
+    calc
+      circleDecode (-n)
+          = circleDecodeConcrete (-n) :=
+              circleDecode_eq_concrete (n := -n)
+      _ = LoopQuot.inv (circleDecodeConcrete n) :=
+              circleDecodeConcrete_neg (z := n)
+      _ = LoopQuot.inv (circleDecode n) := hInv
+
+@[simp] theorem circleDecode_negSucc (n : Nat) :
+    circleDecode (Int.negSucc n) =
+      LoopQuot.inv (circleLoopPow (Nat.succ n)) := by
+  calc
+    circleDecode (Int.negSucc n)
+        = circleDecodeConcrete (Int.negSucc n) :=
+            circleDecode_eq_concrete (n := Int.negSucc n)
+    _ = LoopQuot.inv (circleLoopPow (Nat.succ n)) :=
+            circleDecodeConcrete_negSucc (n := n)
 
 theorem circleDecode_sub (m n : Int) :
     circleDecode (m - n) =
