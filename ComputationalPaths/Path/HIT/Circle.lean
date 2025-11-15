@@ -506,6 +506,32 @@ canonical group structure) and ℤ. -/
       circleDecode (m + n) := by
   exact (circleDecode_add m n).symm
 
+@[simp] theorem circleLoopGroup_mul_decode_ofNat_succ (n : Nat) :
+    circleLoopGroup.mul (circleDecode (Int.ofNat n)) circleLoopClass =
+      circleDecode (Int.ofNat n.succ) := by
+  have hMul :=
+    circleLoopGroup_mul_decode (m := Int.ofNat n) (n := 1)
+  have hBase :
+      circleLoopGroup.mul (circleDecode (Int.ofNat n)) circleLoopClass =
+        circleDecode (Int.ofNat n + 1) := by
+    simpa only [circleLoopClass, circleDecode_one] using hMul
+  have hAdd :=
+    circleDecode_add (m := Int.ofNat n) (n := 1)
+  have hAdd' :
+      circleDecode (Int.ofNat n + 1) =
+        LoopQuot.comp (circleLoopPow n) circleLoopClass := by
+    simpa only [circleDecode_ofNat, circleLoopClass, circleDecode_one]
+      using hAdd
+  have hSucc :
+      circleDecode (Int.ofNat n.succ) =
+        LoopQuot.comp (circleLoopPow n) circleLoopClass :=
+          circleDecode_ofNat_succ (n := n)
+  have hEq :
+      circleDecode (Int.ofNat n + 1) =
+        circleDecode (Int.ofNat n.succ) :=
+    hAdd'.trans hSucc.symm
+  exact hBase.trans hEq
+
 @[simp] theorem circleLoopGroup_inv_decode (n : Int) :
     circleLoopGroup.inv (circleDecode n) = circleDecode (-n) := by
   change LoopQuot.inv (circleDecode n) = circleDecode (-n)
@@ -571,6 +597,14 @@ structure CirclePiOneGroupEquivInt where
   change circleLoopGroup.mul (circleDecode m) (circleDecode n) =
     circleDecode (m + n)
   exact circleLoopGroup_mul_decode m n
+
+@[simp] theorem circlePiOneGroup_mul_decode_ofNat_succ (n : Nat) :
+    circlePiOneGroup.mul (circleDecode (Int.ofNat n)) circleLoopClass =
+      circleDecode (Int.ofNat n.succ) := by
+  change
+    circleLoopGroup.mul (circleDecode (Int.ofNat n)) circleLoopClass =
+      circleDecode (Int.ofNat n.succ)
+  exact circleLoopGroup_mul_decode_ofNat_succ (n := n)
 
 @[simp] theorem circlePiOneGroup_inv_decode (n : Int) :
     circlePiOneGroup.inv (circleDecode n) = circleDecode (-n) := by
