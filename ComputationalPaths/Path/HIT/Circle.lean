@@ -147,6 +147,16 @@ noncomputable def circleCode : Circle → Type _ :=
     Path circleBase x → circleCode x :=
   fun p => Path.transport (A := Circle) (D := circleCode) p circleCodeZero
 
+/-- Encode a loop `p : base = base` as an integer. -/
+@[simp] def circleEncodePath :
+    Path circleBase circleBase → Int :=
+  fun p => circleCodeToInt (circleEncodeRaw circleBase p)
+
+@[simp] theorem circleEncodePath_refl :
+    circleEncodePath (Path.refl circleBase) = 0 := by
+  change circleCodeToInt circleCodeZero = 0
+  simp [circleCodeZero, circleCodeToInt]
+
 /-- Circle computation rule transported to the `circleCode` family. -/
 @[simp] theorem circleCode_loop_path :
     Path.trans (Path.symm (Path.ofEq circleCode_base))
@@ -166,6 +176,13 @@ noncomputable def circleCode : Circle → Type _ :=
   | Int.ofNat n => circleLoopPathPow n
   | Int.negSucc n =>
       Path.symm (circleLoopPathPow (Nat.succ n))
+
+/-- Decode an integer into a raw loop at the base point. -/
+@[simp] def circleDecodePath : Int → Path circleBase circleBase :=
+  circleLoopPathZPow
+
+@[simp] theorem circleDecodePath_zero :
+    circleDecodePath 0 = Path.refl circleBase := rfl
 
 /-- Loop space of the circle, specialised from the generic `LoopSpace`. -/
 abbrev CircleLoopSpace : Type u :=
