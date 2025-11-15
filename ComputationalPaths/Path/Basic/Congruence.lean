@@ -503,6 +503,18 @@ variable {f g h : A → B}
 @[simp] theorem lamCongr_refl (f : A → B) :
     lamCongr (fun x => refl (f x)) = refl f := rfl
 
+@[simp] theorem transport_arrow {A : Type u}
+    {B : A → Sort v} {C : A → Sort w}
+    {a b : A} (p : Path a b) (f : B a → C a) (y : B b) :
+    Path.transport (A := A) (D := fun t => B t → C t) p f y =
+      Path.transport (A := A) (D := C) p
+        (f (Path.transport (A := A) (D := B)
+          (Path.symm p) y)) := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      simp [transport]
+
 @[simp] theorem lamCongr_trans
     (p : ∀ x : A, Path (f x) (g x))
     (q : ∀ x : A, Path (g x) (h x)) :
