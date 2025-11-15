@@ -1,0 +1,45 @@
+/-
+# Univalence axioms for transporting along type equivalences
+
+Provide a lightweight axiomatisation of univalence specialised to the
+computational-paths setting.  The axioms postulate that every equivalence
+between types induces a computational path between them and that transport
+along this path coincides with the forward map of the equivalence.  These
+principles are sufficient to implement the encode–decode argument for the
+circle without committing to a full HoTT-style development of univalence.
+-/
+
+import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
+
+namespace ComputationalPaths
+namespace Path
+
+universe u
+
+/-- Axiomatised univalence: every equivalence between types determines a
+computational path between them.  We restrict to the lightweight
+`SimpleEquiv` structure to avoid additional dependencies. -/
+axiom ua {A B : Type u} : SimpleEquiv A B → Path (A := Type u) A B
+
+/-- Transport along the path produced by `ua` computes to the forward map of
+the equivalence. -/
+axiom ua_beta {A B : Type u} (e : SimpleEquiv A B) (x : A) :
+    Path.transport (A := Type u) (D := fun X => X) (ua (A := A) (B := B) e) x =
+      e.toFun x
+
+/-- Transporting along the inverse univalence path recovers the inverse map of
+the equivalence. -/
+@[simp] theorem ua_beta_symm {A B : Type u} (e : SimpleEquiv A B) (y : B) :
+    Path.transport (A := Type u) (D := fun X => X)
+        (Path.symm (ua (A := A) (B := B) e)) y =
+      e.invFun y := by
+  -- Rewrite the target `y` using the `ua_beta` axiom.
+  have h := ua_beta (A := A) (B := B) e (x := e.invFun y)
+  -- Cancel the forward transport via the general `transport_symm_left` lemma.
+  simpa [h] using
+    (Path.transport_symm_left (A := Type u) (D := fun X => X)
+      (p := ua (A := A) (B := B) e) (x := e.invFun y))
+
+end Path
+end ComputationalPaths
