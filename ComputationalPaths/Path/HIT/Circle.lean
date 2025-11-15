@@ -245,6 +245,15 @@ def circleDecodeConcrete : Int → CircleLoopQuot :=
         (circleDecodeConcrete n) :=
   circleLoopZPow_add (m := m) (n := n)
 
+/-- Subtraction law for the concrete decoder. -/
+theorem circleDecodeConcrete_sub (m n : Int) :
+    circleDecodeConcrete (m - n) =
+      LoopQuot.comp (circleDecodeConcrete m)
+        (LoopQuot.inv (circleDecodeConcrete n)) := by
+  simpa only [Int.sub_eq_add_neg, circleDecodeConcrete_neg,
+    Int.add_comm, Int.add_left_comm, Int.add_assoc]
+    using circleDecodeConcrete_add (m := m) (n := -n)
+
 @[simp] theorem circleLoopGroup_mul_decodeConcrete (m n : Int) :
     circleLoopGroup.mul (circleDecodeConcrete m)
         (circleDecodeConcrete n) =
@@ -266,6 +275,16 @@ def circleDecodeConcrete : Int → CircleLoopQuot :=
       circleDecodeConcrete (m + n)
   exact
     circleLoopGroup_mul_decodeConcrete (m := m) (n := n)
+
+theorem circleLoopGroup_mul_decodeConcrete_sub (m n : Int) :
+    circleLoopGroup.mul (circleDecodeConcrete m)
+        (LoopQuot.inv (circleDecodeConcrete n)) =
+      circleDecodeConcrete (m - n) := by
+  change
+    LoopQuot.comp (circleDecodeConcrete m)
+        (LoopQuot.inv (circleDecodeConcrete n)) =
+      circleDecodeConcrete (m - n)
+  exact (circleDecodeConcrete_sub (m := m) (n := n)).symm
 
 @[simp] theorem circleDecodeConcrete_ofNat_add (m n : Nat) :
     circleDecodeConcrete (Int.ofNat m + Int.ofNat n) =
@@ -350,6 +369,13 @@ downstream developments. -/
     have hpos := circleDecode_eq_concrete (n := n)
     rw [hneg, circleDecodeConcrete_neg (z := n), hpos]
 
+theorem circleDecode_sub (m n : Int) :
+    circleDecode (m - n) =
+      LoopQuot.comp (circleDecode m) (LoopQuot.inv (circleDecode n)) := by
+  simpa only [Int.sub_eq_add_neg, circleDecode_neg,
+    Int.add_comm, Int.add_left_comm, Int.add_assoc]
+    using circleDecode_add (m := m) (n := -n)
+
 @[simp] theorem circleEncode_decode (n : Int) :
     circleEncode (circleDecode n) = n :=
   circleFundamentalGroupPlan.encode_decode n
@@ -409,6 +435,15 @@ canonical group structure) and ℤ. -/
       circleDecode (m + n) := by
   exact (circleDecode_add m n).symm
 
+theorem circleLoopGroup_mul_decode_sub (m n : Int) :
+    circleLoopGroup.mul (circleDecode m)
+        (LoopQuot.inv (circleDecode n)) =
+      circleDecode (m - n) := by
+  change
+    LoopQuot.comp (circleDecode m) (LoopQuot.inv (circleDecode n)) =
+      circleDecode (m - n)
+  exact (circleDecode_sub (m := m) (n := n)).symm
+
 /-- Final statement: the strict loop group of the circle is isomorphic to the
 additive group of integers. -/
 @[simp] def fundamentalGroupCircle : CircleLoopGroupEquivInt :=
@@ -460,6 +495,16 @@ structure CirclePiOneGroupEquivInt where
   change circleLoopGroup.mul (circleDecode m) (circleDecode n) =
     circleDecode (m + n)
   exact circleLoopGroup_mul_decode m n
+
+theorem circlePiOneGroup_mul_decode_sub (m n : Int) :
+    circlePiOneGroup.mul (circleDecode m)
+        (LoopQuot.inv (circleDecode n)) =
+      circleDecode (m - n) := by
+  change
+    circleLoopGroup.mul (circleDecode m)
+        (LoopQuot.inv (circleDecode n)) =
+      circleDecode (m - n)
+  exact circleLoopGroup_mul_decode_sub (m := m) (n := n)
 
 /-- Final statement: π₁(S¹, base) (with its strict group structure) is ℤ. -/
 @[simp] def fundamentalGroupCirclePiOne :
