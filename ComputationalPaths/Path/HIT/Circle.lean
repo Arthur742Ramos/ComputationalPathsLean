@@ -455,6 +455,69 @@ theorem circleDecode_sub (m n : Int) :
     circleDecode (circleEncode x) = x :=
   circleFundamentalGroupPlan.decode_encode x
 
+/-- `circleLoopZPow` is left-inverse to `circleEncode`. -/
+@[simp] theorem circleEncode_circleLoopZPow (z : Int) :
+    circleEncode (circleLoopZPow z) = z := by
+  have hz := circleDecode_eq_concrete (n := z)
+  have h := (_root_.congrArg circleEncode hz) ▸ circleEncode_decode (n := z)
+  dsimp [circleDecodeConcrete] at h
+  exact h
+
+/-- `circleLoopZPow` is right-inverse to `circleEncode`. -/
+@[simp] theorem circleLoopZPow_encode (x : CircleLoopQuot) :
+    circleLoopZPow (circleEncode x) = x := by
+  have hx := circleDecode_eq_concrete (n := circleEncode x)
+  have h := hx ▸ circleDecode_encode (x := x)
+  dsimp [circleDecodeConcrete] at h
+  exact h
+
+theorem circleEncode_leftInverse :
+    Function.LeftInverse circleEncode circleLoopZPow :=
+  fun z => circleEncode_circleLoopZPow (z := z)
+
+theorem circleEncode_rightInverse :
+    Function.RightInverse circleEncode circleLoopZPow :=
+  fun x => circleLoopZPow_encode (x := x)
+
+theorem circleLoopZPow_injective :
+    Function.Injective circleLoopZPow :=
+  circleEncode_leftInverse.injective
+
+theorem circleLoopZPow_surjective :
+    Function.Surjective circleLoopZPow :=
+  circleEncode_rightInverse.surjective
+
+theorem circleLoopZPow_eq_iff (z₁ z₂ : Int) :
+    circleLoopZPow z₁ = circleLoopZPow z₂ ↔ z₁ = z₂ :=
+  circleLoopZPow_injective.eq_iff
+
+theorem circleLoopZPow_exists (x : CircleLoopQuot) :
+    ∃ z : Int, circleLoopZPow z = x :=
+  circleLoopZPow_surjective x
+
+theorem circleLoopZPow_exists_unique (x : CircleLoopQuot) :
+    ∃ z : Int, circleLoopZPow z = x ∧
+        ∀ z', circleLoopZPow z' = x → z' = z := by
+  refine ⟨circleEncode x, circleLoopZPow_encode (x := x), ?_⟩
+  intro z' hz'
+  have hEncode := _root_.congrArg circleEncode hz'
+  have hzPow := circleEncode_circleLoopZPow (z := z')
+  calc
+    z' = circleEncode (circleLoopZPow z') := hzPow.symm
+    _ = circleEncode x := hEncode
+
+@[simp] theorem circleEncode_circleLoopClass :
+    circleEncode circleLoopClass = 1 := by
+  have h := circleEncode_circleLoopZPow (z := 1)
+  have hz := circleLoopZPow_one
+  exact hz ▸ h
+
+@[simp] theorem circleEncode_circleLoopPow (n : Nat) :
+    circleEncode (circleLoopPow n) = Int.ofNat n := by
+  have h := circleEncode_circleLoopZPow (z := Int.ofNat n)
+  have hz := circleLoopZPow_ofNat (n := n)
+  exact hz ▸ h
+
 /-- Lightweight equivalence witness specialised to the circle fundamental
 group.  We record the forward and inverse maps together with their inverse
 laws, packaged separately from Lean's absent `Equiv` infrastructure. -/
