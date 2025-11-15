@@ -177,12 +177,80 @@ noncomputable def circleCode : Circle → Type _ :=
   | Int.negSucc n =>
       Path.symm (circleLoopPathPow (Nat.succ n))
 
+@[simp] theorem circleLoopPathPow_zero :
+    circleLoopPathPow 0 = Path.refl circleBase := rfl
+
+@[simp] theorem circleLoopPathPow_succ (n : Nat) :
+    circleLoopPathPow (Nat.succ n) =
+      Path.trans (circleLoopPathPow n) circleLoop := rfl
+
+@[simp] theorem circleLoopPathPow_one :
+    circleLoopPathPow 1 = circleLoop := by
+  simp [circleLoopPathPow]
+
+theorem circleLoopPathPow_add (m n : Nat) :
+    circleLoopPathPow (m + n) =
+      Path.trans (circleLoopPathPow m) (circleLoopPathPow n) := by
+  induction n with
+  | zero =>
+      simp
+  | succ n ih =>
+      calc
+        circleLoopPathPow (m + Nat.succ n)
+            = Path.trans (circleLoopPathPow (m + n)) circleLoop := by
+                simp
+        _ = Path.trans
+              (Path.trans (circleLoopPathPow m) (circleLoopPathPow n))
+              circleLoop := by
+                simp [ih]
+        _ = Path.trans (circleLoopPathPow m)
+              (Path.trans (circleLoopPathPow n) circleLoop) := by
+                simp
+        _ = Path.trans (circleLoopPathPow m)
+              (circleLoopPathPow (Nat.succ n)) := by
+                simp [circleLoopPathPow]
+
+@[simp] theorem circleLoopPathZPow_ofNat (n : Nat) :
+    circleLoopPathZPow (Int.ofNat n) = circleLoopPathPow n := rfl
+
+@[simp] theorem circleLoopPathZPow_negSucc (n : Nat) :
+    circleLoopPathZPow (Int.negSucc n) =
+      Path.symm (circleLoopPathPow (Nat.succ n)) := rfl
+
+@[simp] theorem circleLoopPathZPow_zero :
+    circleLoopPathZPow 0 = Path.refl circleBase := rfl
+
+@[simp] theorem circleLoopPathZPow_one :
+    circleLoopPathZPow 1 = circleLoop := by
+  simp [circleLoopPathZPow, circleLoopPathPow]
+
+@[simp] theorem circleLoopPathZPow_neg_one :
+    circleLoopPathZPow (-1) = Path.symm circleLoop := by
+  change circleLoopPathZPow (Int.negSucc 0) = _
+  simp [circleLoopPathZPow]
+
 /-- Decode an integer into a raw loop at the base point. -/
 @[simp] def circleDecodePath : Int → Path circleBase circleBase :=
   circleLoopPathZPow
 
 @[simp] theorem circleDecodePath_zero :
     circleDecodePath 0 = Path.refl circleBase := rfl
+
+@[simp] theorem circleDecodePath_ofNat (n : Nat) :
+    circleDecodePath (Int.ofNat n) = circleLoopPathPow n := rfl
+
+@[simp] theorem circleDecodePath_negSucc (n : Nat) :
+    circleDecodePath (Int.negSucc n) =
+      Path.symm (circleLoopPathPow (Nat.succ n)) := rfl
+
+@[simp] theorem circleDecodePath_one :
+    circleDecodePath 1 = circleLoop := by
+  simp [circleDecodePath, circleLoopPathZPow, circleLoopPathPow]
+
+@[simp] theorem circleDecodePath_neg_one :
+    circleDecodePath (-1) = Path.symm circleLoop := by
+  change circleDecodePath (Int.negSucc 0) = _
+  simp [circleDecodePath, circleLoopPathZPow]
 
 /-- Loop space of the circle, specialised from the generic `LoopSpace`. -/
 abbrev CircleLoopSpace : Type u :=
