@@ -231,6 +231,11 @@ def circleDecodeConcrete : Int → CircleLoopQuot :=
   unfold circleDecodeConcrete
   exact circleLoopZPow_negSucc (n := n)
 
+@[simp] theorem circleDecodeConcrete_neg_one :
+    circleDecodeConcrete (-1) = LoopQuot.inv circleLoopClass := by
+  unfold circleDecodeConcrete
+  exact circleLoopZPow_neg_one
+
 @[simp] theorem circleDecodeConcrete_zero :
     circleDecodeConcrete 0 = LoopQuot.id :=
   circleLoopZPow_zero
@@ -407,6 +412,14 @@ downstream developments. -/
     _ = LoopQuot.inv (circleLoopPow (Nat.succ n)) :=
             circleDecodeConcrete_negSucc (n := n)
 
+@[simp] theorem circleDecode_neg_one :
+    circleDecode (-1) = LoopQuot.inv circleLoopClass := by
+  calc
+    circleDecode (-1)
+        = circleDecodeConcrete (-1) :=
+            circleDecode_eq_concrete (n := -1)
+    _ = LoopQuot.inv circleLoopClass := circleDecodeConcrete_neg_one
+
 theorem circleDecode_sub (m n : Int) :
     circleDecode (m - n) =
       LoopQuot.comp (circleDecode m) (LoopQuot.inv (circleDecode n)) := by
@@ -473,6 +486,11 @@ canonical group structure) and ℤ. -/
       circleDecode (m + n) := by
   exact (circleDecode_add m n).symm
 
+@[simp] theorem circleLoopGroup_inv_decode (n : Int) :
+    circleLoopGroup.inv (circleDecode n) = circleDecode (-n) := by
+  change LoopQuot.inv (circleDecode n) = circleDecode (-n)
+  exact (circleDecode_neg (n := n)).symm
+
 theorem circleLoopGroup_mul_decode_sub (m n : Int) :
     circleLoopGroup.mul (circleDecode m)
         (LoopQuot.inv (circleDecode n)) =
@@ -533,6 +551,11 @@ structure CirclePiOneGroupEquivInt where
   change circleLoopGroup.mul (circleDecode m) (circleDecode n) =
     circleDecode (m + n)
   exact circleLoopGroup_mul_decode m n
+
+@[simp] theorem circlePiOneGroup_inv_decode (n : Int) :
+    circlePiOneGroup.inv (circleDecode n) = circleDecode (-n) := by
+  change circleLoopGroup.inv (circleDecode n) = circleDecode (-n)
+  exact circleLoopGroup_inv_decode (n := n)
 
 theorem circlePiOneGroup_mul_decode_sub (m n : Int) :
     circlePiOneGroup.mul (circleDecode m)
