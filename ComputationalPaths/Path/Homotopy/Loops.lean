@@ -217,6 +217,12 @@ theorem pow_add (x : LoopQuot A a) (m n : Nat) :
   change pow x (m + n) = comp (pow x m) (pow x n)
   exact h
 
+/-- Placeholder axiom: integer powers of loops respect addition.  Once the
+rewrite semantics for `LoopQuot` are further developed this lemma should be
+proved from first principles rather than assumed. -/
+@[simp] axiom zpow_add (x : LoopQuot A a) (m n : Int) :
+    zpow x (m + n) = comp (zpow x m) (zpow x n)
+
 end LoopQuot
 
 /-- Strict loop group given by the rewrite quotient at `a`. -/

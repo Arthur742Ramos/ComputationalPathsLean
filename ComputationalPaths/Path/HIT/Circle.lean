@@ -55,6 +55,40 @@ axiom circleRec_loop {C : Type v} (data : CircleRecData C) :
       (Path.ofEq (circleRec_base (C := C) data))) =
   data.loop
 
+/-- Data for the dependent eliminator of the circle.  Besides the fibre `C`
+over `Circle`, we must specify the value on the base point together with a path
+showing how the fibre transports along the fundamental loop. -/
+structure CircleIndData (C : Circle → Type v) where
+  base : C circleBase
+  loop :
+    Path
+      (Path.transport (A := Circle) (D := fun x => C x) circleLoop base)
+      base
+
+/-- Dependent eliminator (induction principle) for the circle. -/
+axiom circleInd {C : Circle → Type v} (data : CircleIndData C) :
+  (x : Circle) → C x
+
+/-- β-rule for the dependent eliminator at the base point. -/
+axiom circleInd_base {C : Circle → Type v} (data : CircleIndData C) :
+  circleInd data circleBase = data.base
+
+/-- Dependent β-rule specialised to the fundamental loop.  The dependent
+application of `circleInd` to `circleLoop` matches the prescribed path stored
+in `CircleIndData`. -/
+axiom circleInd_loop {C : Circle → Type v} (data : CircleIndData C) :
+  Path.trans
+    (Path.symm
+      (Path.congrArg
+        (fun x =>
+          Path.transport (A := Circle) (D := fun y => C y) circleLoop x)
+        (Path.ofEq (circleInd_base (C := C) data))))
+    (Path.trans
+      (Path.apd (A := Circle) (B := fun y => C y)
+        (f := circleInd data) circleLoop)
+      (Path.ofEq (circleInd_base (C := C) data))) =
+  data.loop
+
 noncomputable section
 
 /-- Loop space of the circle, specialised from the generic `LoopSpace`. -/
@@ -173,6 +207,15 @@ def circleLoopZPow (z : Int) : CircleLoopQuot :=
     LoopQuot.zpow_ofNat_add (A := Circle) (a := circleBase)
       (x := circleLoopClass) m n
 
+/-- Integer addition rule for iterated circle loops. -/
+@[simp] theorem circleLoopZPow_add (m n : Int) :
+    circleLoopZPow (m + n) =
+      LoopQuot.comp (circleLoopZPow m) (circleLoopZPow n) := by
+  unfold circleLoopZPow
+  exact
+    LoopQuot.zpow_add (A := Circle) (a := circleBase)
+      (x := circleLoopClass) m n
+
 /-- Decode map ℤ → π₁(S¹), built by iterating the fundamental loop according
 to the given integer.  The accompanying lemmas establish its homomorphic
 behaviour. -/
@@ -195,6 +238,35 @@ def circleDecodeConcrete : Int → CircleLoopQuot :=
       LoopQuot.inv (circleDecodeConcrete z) :=
   circleLoopZPow_neg (z := z)
 
+/-- Decoding respects integer addition. -/
+@[simp] theorem circleDecodeConcrete_add (m n : Int) :
+    circleDecodeConcrete (m + n) =
+      LoopQuot.comp (circleDecodeConcrete m)
+        (circleDecodeConcrete n) :=
+  circleLoopZPow_add (m := m) (n := n)
+
+@[simp] theorem circleLoopGroup_mul_decodeConcrete (m n : Int) :
+    circleLoopGroup.mul (circleDecodeConcrete m)
+        (circleDecodeConcrete n) =
+      circleDecodeConcrete (m + n) := by
+  change
+    LoopQuot.comp (circleDecodeConcrete m)
+      (circleDecodeConcrete n) =
+        circleDecodeConcrete (m + n)
+  exact
+    (circleDecodeConcrete_add (m := m) (n := n)).symm
+
+@[simp] theorem circlePiOneGroup_mul_decodeConcrete (m n : Int) :
+    circlePiOneGroup.mul (circleDecodeConcrete m)
+        (circleDecodeConcrete n) =
+      circleDecodeConcrete (m + n) := by
+  change
+    circleLoopGroup.mul (circleDecodeConcrete m)
+        (circleDecodeConcrete n) =
+      circleDecodeConcrete (m + n)
+  exact
+    circleLoopGroup_mul_decodeConcrete (m := m) (n := n)
+
 @[simp] theorem circleDecodeConcrete_ofNat_add (m n : Nat) :
     circleDecodeConcrete (Int.ofNat m + Int.ofNat n) =
       LoopQuot.comp (circleDecodeConcrete (Int.ofNat m))
@@ -211,20 +283,16 @@ with actual constructions derived from the higher-inductive semantics.
 structure CircleFundamentalGroupPlan where
   /-- Map loops on the circle to integers (winding number). -/
   encode : CircleLoopQuot → Int
-  /-- Map integers back to loops (iterated fundamental loop). -/
-  decode : Int → CircleLoopQuot
   /-- Encoding respects loop multiplication. -/
   encode_mul : ∀ x y, encode (LoopQuot.comp x y) = encode x + encode y
   /-- Encoding sends the identity loop to zero. -/
   encode_one : encode LoopQuot.id = 0
   /-- Encoding sends inverses to negation. -/
   encode_inv : ∀ x, encode (LoopQuot.inv x) = - encode x
-  /-- Decoding respects integer addition. -/
-  decode_add : ∀ m n, decode (m + n) = LoopQuot.comp (decode m) (decode n)
-  /-- Decoding sends zero to the identity loop. -/
-  decode_zero : decode 0 = LoopQuot.id
-  /-- Decoding of negation yields inverse loops. -/
-  decode_neg : ∀ n, decode (-n) = LoopQuot.inv (decode n)
+  /-- Map integers back to loops (iterated fundamental loop). -/
+  decode : Int → CircleLoopQuot
+  /-- The abstract decoder coincides with the concrete iteration of loops. -/
+  decode_eq_concrete : ∀ n, decode n = circleDecodeConcrete n
   /-- Encode then decode yields the original integer. -/
   encode_decode : ∀ n, encode (decode n) = n
   /-- Decode then encode yields the original loop class. -/
@@ -245,6 +313,10 @@ downstream developments. -/
 @[simp] def circleDecode : Int → CircleLoopQuot :=
   circleFundamentalGroupPlan.decode
 
+@[simp] theorem circleDecode_eq_concrete (n : Int) :
+    circleDecode n = circleDecodeConcrete n :=
+  circleFundamentalGroupPlan.decode_eq_concrete n
+
 @[simp] theorem circleEncode_mul (x y : CircleLoopQuot) :
     circleEncode (LoopQuot.comp x y) =
       circleEncode x + circleEncode y :=
@@ -260,14 +332,23 @@ downstream developments. -/
 @[simp] theorem circleDecode_add (m n : Int) :
     circleDecode (m + n) =
       LoopQuot.comp (circleDecode m) (circleDecode n) :=
-  circleFundamentalGroupPlan.decode_add m n
+  by
+    have hSum := circleDecode_eq_concrete (n := m + n)
+    have hm := circleDecode_eq_concrete (n := m)
+    have hn := circleDecode_eq_concrete (n := n)
+    rw [hSum, circleDecodeConcrete_add (m := m) (n := n), hm, hn]
 
 @[simp] theorem circleDecode_zero : circleDecode 0 = LoopQuot.id :=
-  circleFundamentalGroupPlan.decode_zero
+  by
+    have h := circleDecode_eq_concrete (n := 0)
+    rw [h, circleDecodeConcrete_zero]
 
 @[simp] theorem circleDecode_neg (n : Int) :
     circleDecode (-n) = LoopQuot.inv (circleDecode n) :=
-  circleFundamentalGroupPlan.decode_neg n
+  by
+    have hneg := circleDecode_eq_concrete (n := -n)
+    have hpos := circleDecode_eq_concrete (n := n)
+    rw [hneg, circleDecodeConcrete_neg (z := n), hpos]
 
 @[simp] theorem circleEncode_decode (n : Int) :
     circleEncode (circleDecode n) = n :=
