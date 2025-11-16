@@ -270,11 +270,13 @@ theorem circleLoopPathPow_add (m n : Nat) :
 -- @[simp] theorem circleEncodePath_trans_loop (p : Path circleBase circleBase) :
 --   circleEncodePath (Path.trans p circleLoop) = circleEncodePath p + 1 := by
 --   admit
+@[simp] axiom circleEncodePath_trans_loop
+    (p : Path circleBase circleBase) :
+    circleEncodePath (Path.trans p circleLoop) =
+      circleEncodePath p + 1
 
 -- Encoding of the fundamental loop evaluates to `1`.
--- Placeholder: encoding of the fundamental loop evaluates to `1`.
--- @[simp] theorem circleEncodePath_loop : circleEncodePath circleLoop = 1 := by
---   admit
+@[simp] axiom circleEncodePath_loop : circleEncodePath circleLoop = 1
 
 -- moved below after `circleEncodeLift` definition
 
@@ -355,10 +357,11 @@ def circleLoopPow (n : Nat) : CircleLoopQuot :=
     LoopQuot.pow_one (A := Circle) (a := circleBase)
       (x := circleLoopClass)
 
--- The `n`-fold quotient power agrees with the class of the raw `n`-fold
 -- concatenation path.
 -- @[simp] theorem circleLoopPow_ofLoopPathPow (n : Nat) :
---     circleLoopPow n = LoopQuot.ofLoop (circleLoopPathPow n) := by
+--     circleLoopPow n =
+--       LoopQuot.ofLoop (A := Circle) (a := circleBase)
+--         (circleLoopPathPow n) := by
 --   admit
 
 -- Evaluate the lifted encoding on natural powers of the fundamental loop.

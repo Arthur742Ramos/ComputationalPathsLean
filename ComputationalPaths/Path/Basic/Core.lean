@@ -252,6 +252,26 @@ def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
       cases proof
       rfl
 
+/-- Transport along a path built from a propositional equality computes to
+`Eq.mp` on that equality. -/
+@[simp] theorem transport_ofEq {D : A → Sort v}
+    {a b : A} (h : a = b) (x : D a) :
+    transport (A := A) (D := D)
+      (ofEq (A := A) (a := a) (b := b) h) x =
+    Eq.mp (congrArg D h) x := by
+  cases h
+  rfl
+
+/-- Transport along the symmetric of a path built from a propositional
+equality computes to `Eq.mpr`. -/
+@[simp] theorem transport_symm_ofEq {D : A → Sort v}
+    {a b : A} (h : a = b) (y : D b) :
+    transport (A := A) (D := D)
+      (symm (ofEq (A := A) (a := a) (b := b) h)) y =
+    Eq.mpr (congrArg D h) y := by
+  cases h
+  rfl
+
 @[simp] theorem transport_of_toEq_eq {D : A → Sort v}
     {p q : Path a b} (h : p.toEq = q.toEq) (x : D a) :
     transport (D := D) p x = transport (D := D) q x := by
