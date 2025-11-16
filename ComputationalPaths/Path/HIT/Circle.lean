@@ -264,6 +264,10 @@ theorem circleLoopPathPow_add (m n : Nat) :
   change circleDecodePath (Int.negSucc 0) = _
   simp [circleDecodePath, circleLoopPathZPow]
 
+-- Small arithmetic helper used in encoding lemmas.
+@[simp] theorem int_zero_sub_one : (0 : Int) - 1 = (-1 : Int) := by
+  simpa using Int.add_sub_cancel (-1) 1
+
 -- Encoding after concatenating with the fundamental loop increments by `1`.
 -- Placeholder: a future lemma will show that encoding commutes with
 -- concatenation by the fundamental loop at the raw-path level.
@@ -378,6 +382,63 @@ theorem circleLoopPathPow_add (m n : Nat) :
 @[simp] theorem circleEncodePath_loop : circleEncodePath circleLoop = 1 := by
   have := circleCode_transport_loop_add1 (x := circleCodeZero)
   simpa [circleEncodePath, circleEncodeRaw] using this
+
+@[simp] theorem circleEncodePath_trans_symm_loop
+    (p : Path circleBase circleBase) :
+    circleEncodePath (Path.trans p (Path.symm circleLoop)) =
+      circleEncodePath p - 1 := by
+  -- Let `x := transport p circleCodeZero` and apply the +1 lemma to
+  -- `transport (symm circleLoop) x`, then cancel with `transport_symm_right`.
+  let x := Path.transport (A := Circle) (D := circleCode) p circleCodeZero
+  have hPlus := circleCode_transport_loop_add1
+    (x := Path.transport (A := Circle) (D := circleCode)
+      (Path.symm circleLoop) x)
+  have hCancel :=
+    Path.transport_symm_right (A := Circle) (D := circleCode)
+      (p := circleLoop) (y := x)
+  have hSum : circleEncodePath p =
+      circleEncodePath (Path.trans p (Path.symm circleLoop)) + 1 := by
+    -- rewrite the LHS of `hPlus` using `hCancel` and definitions
+    have hEq :
+        circleCodeToInt
+          (Path.transport (A := Circle) (D := circleCode)
+            circleLoop
+            (Path.transport (A := Circle) (D := circleCode)
+              (Path.symm circleLoop) x))
+        = circleCodeToInt x := by
+      simpa using _root_.congrArg circleCodeToInt hCancel
+    -- Combine with `hPlus` and unfold `circleEncodePath`.
+    -- `hPlus`: codeToInt (transport loop ...) = codeToInt (...) + 1
+    -- After rewriting LHS via `hEq`, we obtain the claim.
+    have hComb := hEq.trans hPlus
+    -- Unfold encodings on both sides.
+    simpa [circleEncodePath, circleEncodeRaw, x,
+      Path.transport_trans]
+      using hComb
+  -- Rearrange: a = b + 1 ⇒ b = a - 1
+  have h1 :
+      circleEncodePath p - 1
+        = (circleEncodePath (Path.trans p (Path.symm circleLoop)) + 1) - 1 :=
+    _root_.congrArg (fun z => z - 1) hSum
+  have hRearr :
+      circleEncodePath p - 1
+        = circleEncodePath (Path.trans p (Path.symm circleLoop)) := by
+    simpa [Int.add_sub_cancel] using h1
+  simpa using hRearr.symm
+
+@[simp] theorem circleEncodePath_symm_loop :
+    circleEncodePath (Path.symm circleLoop) = -1 := by
+  exact
+    calc
+      circleEncodePath (Path.symm circleLoop)
+          = circleEncodePath (Path.trans (Path.refl circleBase) (Path.symm circleLoop)) := by rfl
+      _ = circleEncodePath (Path.refl circleBase) - 1 :=
+          circleEncodePath_trans_symm_loop (p := Path.refl circleBase)
+      _ = (0 : Int) - 1 := by
+        have : circleEncodePath (Path.refl circleBase) = (0 : Int) :=
+          circleEncodePath_refl
+        simpa using _root_.congrArg (fun t => t - 1) this
+      _ = -1 := by simpa [int_zero_sub_one]
 
 -- moved below after `circleEncodeLift` definition
 
@@ -734,12 +795,16 @@ with actual constructions derived from the higher-inductive semantics.
 @[simp] theorem circleDecode_ofNat_succ (n : Nat) :
     circleDecode (Int.ofNat n.succ) =
       LoopQuot.comp (circleLoopPow n) circleLoopClass := by
-  change circleLoopZPow (Int.ofNat (Nat.succ n)) = _
-  simp [circleLoopPathPow, circleLoopZPow, circleLoopPow_succ]
+  change circleLoopZPow ((Nat.succ n : Nat) : Int) = _
+  calc
+    circleLoopZPow ((Nat.succ n : Nat) : Int)
+        = circleLoopPow (Nat.succ n) := rfl
+    _ = LoopQuot.comp (circleLoopPow n) circleLoopClass :=
+        circleLoopPow_succ (n := n)
 
 @[simp] theorem circleDecode_one : circleDecode 1 = circleLoopClass := by
   change circleLoopZPow 1 = _
-  simp
+  exact circleLoopZPow_one
 
 @[simp] theorem circleDecode_neg (n : Int) :
     circleDecode (-n) = LoopQuot.inv (circleDecode n) :=
@@ -751,15 +816,18 @@ with actual constructions derived from the higher-inductive semantics.
 
 @[simp] theorem circleDecode_neg_one :
     circleDecode (-1) = LoopQuot.inv circleLoopClass := by
-  change circleLoopZPow (-1) = _; simp
+  change circleLoopZPow (-1) = _; exact circleLoopZPow_neg_one
 
 @[simp] theorem circleEncode_circleLoopClass :
     circleEncode circleLoopClass = 1 := by
   change circleEncodePath circleLoop = 1
-  exact circleEncodePath_loop/-- Winding-number terminology for the map `π₁(S¹) → ℤ`. -/
+  exact circleEncodePath_loop
+
+/-- Winding-number terminology for the map `π₁(S¹) → ℤ`. -/
 @[simp] def circleWindingNumber : circlePiOne → Int :=
   circleEncode
 
+end
 end Path
 end ComputationalPaths
 
