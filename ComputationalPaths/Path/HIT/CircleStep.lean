@@ -1,7 +1,10 @@
 import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 namespace ComputationalPaths
 namespace Path
+
+open SimpleEquiv
 
 @[simp] theorem int_add_sub_add_right (a b c : Int) :
     (a + c) - (b + c) = a - b := by
@@ -60,6 +63,30 @@ theorem circleEncode_circleDecode_of_negNat (k : Nat) :
   | negSucc n =>
       -- z = -(n.succ)
       simpa using circleEncode_circleDecode_of_negNat (Nat.succ n)
+
+/-- Subtype for the image (range) of `circleDecode`. -/
+def circleDecodeRangeSubtype : Type _ :=
+  { x : CircleLoopQuot // ∃ z : Int, x = circleDecode z }
+
+/-- Equivalence between ℤ and the range of `circleDecode` in π₁(S¹).
+This packages the already established `encode ∘ decode = id` into a two-sided
+inverse on the image; the other direction holds by construction of the range. -/
+def circlePiOneEquivIntRange : SimpleEquiv Int circleDecodeRangeSubtype where
+  toFun := fun z => ⟨circleDecode z, ⟨z, rfl⟩⟩
+  invFun := fun s => circleEncode s.val
+  left_inv := by
+    intro z; simp [circleEncode_circleDecode]
+  right_inv := by
+    intro s
+    rcases s with ⟨x, ⟨z, hz⟩⟩
+    -- decode (encode x) = x for x in the range of decode
+    have : circleDecode (circleEncode x) = circleDecode z := by
+      simpa [hz] using congrArg circleDecode (circleEncode_circleDecode (z := z)).symm
+    -- Wrap back into the subtype
+    -- toFun (invFun ⟨x,⟨z,hz⟩⟩) = ⟨decode (encode x), ⟨_, rfl⟩⟩
+    -- Use the above equality to rewrite to ⟨decode z, ⟨z, rfl⟩⟩ = ⟨x, ⟨z, hz⟩⟩
+    apply Subtype.eq
+    simpa [hz] using this
 
 end Path
 end ComputationalPaths
