@@ -818,6 +818,8 @@ with actual constructions derived from the higher-inductive semantics.
     circleDecode (-1) = LoopQuot.inv circleLoopClass := by
   change circleLoopZPow (-1) = _; exact circleLoopZPow_neg_one
 
+-- Convenience rewrites for decode of ±1 steps (available via `circleDecode_add`).
+
 @[simp] theorem circleEncode_circleLoopClass :
     circleEncode circleLoopClass = 1 := by
   change circleEncodePath circleLoop = 1
@@ -847,10 +849,66 @@ with actual constructions derived from the higher-inductive semantics.
   change circleEncodeLift (circleLoopPow n) = (n : Int)
   exact circleEncodeLift_circleLoopPow (n := n)
 
+/-- Encoding after right-composition with the fundamental loop adds `1`. -/
+@[simp] theorem circleEncodeLift_comp_loop (x : CircleLoopQuot) :
+    circleEncodeLift (LoopQuot.comp x circleLoopClass)
+      = circleEncodeLift x + 1 := by
+  refine Quot.inductionOn x ?h
+  intro p
+  -- Reduce to the raw path level and apply the `+1` lemma.
+  change circleEncodePath (Path.trans p circleLoop) =
+    circleEncodePath p + 1
+  exact circleEncodePath_trans_loop (p := p)
+
+/-- Encoding after right-composition with the inverse fundamental loop
+subtracts `1`. -/
+@[simp] theorem circleEncodeLift_comp_inv_loop (x : CircleLoopQuot) :
+    circleEncodeLift (LoopQuot.comp x (LoopQuot.inv circleLoopClass))
+      = circleEncodeLift x - 1 := by
+  refine Quot.inductionOn x ?h
+  intro p
+  -- Reduce to the raw path level and apply the `-1` lemma.
+  change circleEncodePath (Path.trans p (Path.symm circleLoop)) =
+    circleEncodePath p - 1
+  exact circleEncodePath_trans_symm_loop (p := p)
+
+/-- Encoded form of `circleEncodeLift_comp_loop`. -/
+@[simp] theorem circleEncode_comp_loop (x : CircleLoopQuot) :
+    circleEncode (LoopQuot.comp x circleLoopClass)
+      = circleEncode x + 1 := by
+  change circleEncodeLift (LoopQuot.comp x circleLoopClass)
+    = circleEncodeLift x + 1
+  exact circleEncodeLift_comp_loop (x := x)
+
+/-- Encoded form of `circleEncodeLift_comp_inv_loop`. -/
+@[simp] theorem circleEncode_comp_inv_loop (x : CircleLoopQuot) :
+    circleEncode (LoopQuot.comp x (LoopQuot.inv circleLoopClass))
+      = circleEncode x - 1 := by
+  change circleEncodeLift (LoopQuot.comp x (LoopQuot.inv circleLoopClass))
+    = circleEncodeLift x - 1
+  exact circleEncodeLift_comp_inv_loop (x := x)
+
 @[simp] theorem circleEncode_circleDecode_neg_one :
     circleEncode (circleDecode (-1)) = -1 := by
   change circleEncode (LoopQuot.inv circleLoopClass) = -1
   exact circleEncode_inv_circleLoopClass
+
+-- Step law: encoding `decode (z + 1)` increases by one.
+-- Step lemma sketch (commented out to avoid universe friction in Eq.trans):
+-- @[simp] theorem circleEncode_circleDecode_add_one (z : Int) :
+--     circleEncode (circleDecode (z + 1))
+--       = circleEncode (circleDecode z) + 1 := by
+--   have h := circleDecode_add_one_rw z
+--   have e := circleEncode_comp_loop (x := circleDecode z)
+--   exact (_root_.congrArg circleEncode h).trans e
+
+-- Step law: encoding `decode (z + (-1))` decreases by one.
+-- @[simp] theorem circleEncode_circleDecode_add_neg_one (z : Int) :
+--     circleEncode (circleDecode (z + (-1)))
+--       = circleEncode (circleDecode z) - 1 := by
+--   have h := circleDecode_add_neg_one_rw z
+--   have e := circleEncode_comp_inv_loop (x := circleDecode z)
+--   exact (_root_.congrArg circleEncode h).trans e
 
 end
 end Path
