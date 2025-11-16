@@ -847,6 +847,11 @@ with actual constructions derived from the higher-inductive semantics.
   change circleEncodeLift (circleLoopPow n) = (n : Int)
   exact circleEncodeLift_circleLoopPow (n := n)
 
+@[simp] theorem circleEncode_circleDecode_neg_one :
+    circleEncode (circleDecode (-1)) = -1 := by
+  change circleEncode (LoopQuot.inv circleLoopClass) = -1
+  exact circleEncode_inv_circleLoopClass
+
 end
 end Path
 end ComputationalPaths
