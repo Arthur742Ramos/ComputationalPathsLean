@@ -827,6 +827,12 @@ with actual constructions derived from the higher-inductive semantics.
 @[simp] def circleWindingNumber : circlePiOne → Int :=
   circleEncode
 
+/-- Evaluation of `circleEncode ∘ circleDecode` on natural numbers. -/
+@[simp] theorem circleEncode_circleDecode_ofNat (n : Nat) :
+    circleEncode (circleDecode (Int.ofNat n)) = (n : Int) := by
+  change circleEncodeLift (circleLoopPow n) = (n : Int)
+  exact circleEncodeLift_circleLoopPow (n := n)
+
 end
 end Path
 end ComputationalPaths
