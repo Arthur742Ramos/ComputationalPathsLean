@@ -1,0 +1,951 @@
+\setcounter{table}{0}
+
+\chapter{Type Theory}
+
+\let\thefootnote\relax\footnote{Parts of this chapter are based on previous research done by the author and appears in his Master's Thesis \cite{ArtMestrado}}
+
+Among the theories used as a foundation for computation, one of the most famous and that is closely related to a general purpose computer are the theory of Turing machines, proposed by Alan Turing in 1937. Turing machines had great success in giving a mathematical formalization for the concept of computer. Moreover, it is essential in the investigation of the complexity of algorithms and the limits of computations, proving the existence of problems that are not bound to be solved by computers \cite{Stanford5}. 
+
+Even before Turing's groundbreaking work, one theory that has the same power of Turing's machine had already been proposed
+by Alonso Church. Known as $\lambda$-calculus, it can be seen as a very basic programming language, with only two operations: function abstraction and function application. Despite this fact, $\lambda$-calculus plays a very important role in computation, logic and mathematics.
+
+Initially, $\lambda$-calculus was proposed to simplify the notation of functions \cite{Stanford6}. Take $f(x) = x²$ as a very simple example. How do we calculate the value of $f(3)$? It is very simple. We just need to plug the value $3$ in place of $x$ in the expression $x^{2}$, resulting in $3^{2} = 9$. The idea that $x^{2}$ is an expression that awaits one term to be plugged into it is given by the abstraction operation. We denote this fact by the expression $\lambda.x^{2}$. Thus, $f = \lambda.x^{2}$. Function is the reverse process. Given $\lambda.x^{2}$, one can use an application to substitute the value of input $x$ for an arbitrary value $y$. When we apply $y$, we wound up with $(\lambda.x^{2}).y$. Then, we say that this term $\beta$-reduce to $[y/x]x^{2} = y^{2}$. The notation $[y/x]$ indicates that all occurrences of $x$ in the term will be substituted for $y$. We are also going to use this notation in type theory. Therefore, we had in our previous example the following case: $[3/x]x^{2} = 3^{2} = 9$.
+
+One of the most counterintuitive facts is that it is possible to prove that this theory with only two simple operations is powerful enough to formalize all computable functions \cite{lambda}. That way, $\lambda$-calculus, together with the theory of Turing's machines are the two main theories used to formalize computability and that serve as a foundation for computation.
+
+Type theory is a theory that is in many aspects similar to $\lambda$-calculus. Despite this, it was originally proposed with for a different purpose. Instead of being a foundation for computation, the main objective of type theory was to function as a foundation for constructive mathematics. Specifically, an attempt based on Erret Bishop's constructivism. This work will focus on a specific kind of type theory:  Martin-L\"of's intensional type theory, originally proposed in 1971. Since this theory is intrinsically constructive, it has also been used as a foundation for computation. This fact can be seen in practice: Coq, Agda and Epigram are all examples of programming languages based on the concepts of type theory.
+
+In the next section, we describe and develop the main basic concepts and types of Martin-L\"of's intensional type theory. The correct understanding of this concepts will be essential to the development of latter sections of this work.
+
+
+
+\section{Basic Concepts}
+
+The main and most basic concept of type theory is the concept of type. A type must be understood as a fundamental concept that work as the basis of type theory. One can think of a type as similar to the concept of set in set theory. In fact, types are more powerful in type theory than sets in set theory \cite{hott}. The reason for that is that one cannot derive all results of ZFC using sets only. The use of first-order logic is necessary to state the axioms. In ZFC, the concept of set and propositions are completely distinct. In contrast, we are going to see that propositions can be seen as types in type theory.
+
+Let $A$ be a type and $a$ a term of type $A$. We say that $A$ is inhabited by $a$ and denote this by $a : A$. This is the basic judgment of type theory. Another judgment is $a = b : A$, indicating that $a$ and $b$ are intensionally equal elements of type $A$.
+
+The syntax of type theory is independent of the nature of type $A$. $A$ can be a set, a proposition or even a topological space. Nevertheless, for all those cases, if $a$ has type $A$, then we always denote $a : A$. What differs is the semantical interpretation of $a : A$ \cite{hott}. If $A$ is a set, then $a$ can be understood as an element of set $A$. If it is a space, then $a$ is a point of space $A$. A very interesting case is when $A$ is a proposition. In that case, $a$ can be seen as a witness of the veracity of $A$. In other words, $a$ is a proof that $A$ is true. One should keep in mind that it is only a semantical interpretation. Even when $A$ is a set and $a : A$, one cannot write $a \in A$.
+
+In the next subsection, we investigate the existence of two different kinds of equalities in type theory.
+
+\subsection{Definitional Equality vs Propositional Equality}
+
+One of the main things that one should grasp about type theory is the existence and the difference between two types of equality. The first kind of equality is originated by the fact that two terms are equal simply by definition, without the need of some result establishing the equality. This equality is called definitional equality. The other kind of equality is when equality is seen as a type. In that case, it is called propositional equality.
+
+Between the two kinds of equality, the most interesting one is the propositional, since it originates the identity type. Given terms $a,b : A$, one could derive the judgment $a = b : A$. Thus, taken this judgment as a starting point, one can naturally conceive a premise establishing the equality between terms $a$ and $b$ of type $A$. This equality gives rise to a proposition, i.e., a type known as identity type, usually written as $Id_{A}(a,b)$. Using the aforementioned interpretation, $Id_{A}(a,b)$ should be understood as a proposition that establishes the equality between $a$ and $b$. We say that $a$ is propositionally equal to $b$. If we have a proof $p$ of this equality, then $p : Id_{A}(a,b)$. That way, $p$ is a witness of $Id_{A}(a,b)$, establishing the veracity of the proposition that $a$ is propositionally equal to $b$.
+
+The definitional equality is much simpler than the propositional one. In this equality, the existence of a witness that establishes the equality is not necessary. We denote definitional equality using the symbol $\equiv$. For example, take the function $f: \mathbb{N} \rightarrow \mathbb{N}$ as $f(x)  \equiv x^{2}$ \cite{hott}. Suppose one wants to compute $f(3)$. From the definition of $f$, we can conclude that $f(3) \equiv 3^{2}$. Nevertheless, one cannot conclude by definition that $f(3) = 9$. To conclude that, one needs to conceive a proof $p$ such that $p : Id_{\mathbb{N}}(3, 9)$. Thus, one could establish that $3$ is propositionally equal to $9$. To denote that two terms of type $A$ are definitionally equal we use the notation $a \equiv b : A$.
+
+To better grasp the difference between these two kinds of equalities, consider the following example \cite{harper1}:
+
+\begin{example} \normalfont
+	Define addition as following:
+	\begin{equation*}
+	add: \begin{cases}
+	a + 0 = a               \\
+	a + s(b) = s(a + b)               \\
+	\end{cases}
+	\end{equation*}
+	
+	Consider $s(x)$ as the successor function. We can analyze the following cases:
+	
+	\begin{itemize}
+		
+		\item $2 + 2 \equiv 4 : \mathbb N$ (True): First, we have $2 \equiv s(1)$. From the definition, we have $2 + s(1) \equiv s(2 + 1) \equiv s(s(2 + 0)) \equiv s(s(2)) \equiv s(3) \equiv 4$.
+		
+		\item $0 + x \equiv x : \mathbb N$ (False): Since by definition we only have that $x + 0 \equiv x$, we cannot conclude that $0 + x \equiv x$. One can easily prove that, but since we need a proof to establish this, this is a propositional equality.
+		
+		\item $s(x) \equiv (1 + x) : \mathbb N$ (False): We know that $s(x) \equiv (1 + x)$, but we need to prove the commutativity of addition to conclude that $x + 1 = 1 + x$. Thus, this equality is not definitional.
+		
+		\item $(x + y) \equiv (y + x) : \mathbb N$ (False): Same case as before.
+		
+	\end{itemize}
+	
+	This example shows the subtle differences between definitional equality and propositional equality. Every time one needs an external evidence, it is a propositional equality. If the result follows directly from a definition, then it is a definitional equality. That way, even a simple property as commutativity of addition is established by a propositional equality.
+	
+\end{example}
+
+\subsection{Type Families}
+
+In this subsection, our objective is to show that it is possible to simulate the concept of predicate in type theory. To understand that, it is useful to consider a simple example. Given $x : \mathbb{N}$, one wants to decide if $x$ is even. The problem is that if you consider a type that $even(x)$, that is inhabited if $x$ is even, the type would depend of the value of $x$. Since for every different value of $x$ one creates a new type $even(x)$, we say that it is a type family indexed by the values of $x$, i.e., indexed by the natural numbers. Thus, in this type family, we would have $0 : even(0)$. Since $1$ is odd, $even(1)$ is not inhabited. Thus, every $even(2n)$ is inhabited and every $even(2n + 1)$ is not.
+
+As one can see, the concept of type families is equivalent to the concept of predicate. One important property of type families is the following: \cite{harper1}:
+
+\bigskip
+\begin{center}
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$m : A$}
+		\AxiomC{$[x : A]$}
+		\UnaryInfC{$B(x)$ type}
+		\alwaysSingleLine
+		\BinaryInfC{$[m/x]B(x)$ type}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+Given a type family $B(x)$ indexed by a type $A$, then if one has a term $m : A$ then one can obtain the type $[m/x]B(x) \equiv B(m)$. We have another important property: \cite{harper1}:
+
+\bigskip
+\begin{center}
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$m \equiv n: A$}
+		\AxiomC{$[x : A]$}
+		\UnaryInfC{$B(x)$ type}
+		\alwaysSingleLine
+		\LeftLabel{\textit{functionality} \quad}
+		\BinaryInfC{$[m/x]B(x) \equiv [n/x]B(x)$ type}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+This property establishes that if we have a type family indexed by $A$ and two terms $m \equiv n : A$, then it is intuitive to think that $B(m) \equiv B(n)$. For example, we know that $2 + 2 \equiv 1 + 3 \equiv 4 : \mathbb{N}$. Thus, by functionality, we have $even(1 + 3) \equiv even(2 + 2) \equiv even(4)$.
+
+\subsection{Function Type}
+
+In this subsection we are going to introduce the type that represents functions. Given any two types $A, B$, one can build the function type $A \rightarrow B$. The first type, $A$, is called domain of the function and the type $B$ is called codomain.  Of course it is also possible to construct this type using only $A$, obtaining $A \rightarrow A$. In that case, $A$ is at the same time the domain and the codomain of the function. In set theory, a function is built as a relation, i.e., pairs of input and output, whereas in type theory a function is understood as a primitive element of the theory \cite{hott}. Since it is a primitive element, a function must be understood and interpreted by the way of how it is constructed and utilized.
+ 
+In a function type $f: A \rightarrow B$, one can apply $f$ in a term $a : A$ to obtain a term $b : B$. In that case, we write the usual notation $f(a) = b : B$. The notation $f a = b : B$ can also be used sometimes. This behavior defines how the function type can be used. We also need to define how a function can be constructed.
+
+There are two main ways of constructing $A \rightarrow B$ \cite{hott}. The first one is to use directly the definitional equality of $f(x)$. In that case, $A \rightarrow B$ is constructed from an expression $f(x) \equiv \theta$. The necessary conditions are that $x$ must a term of type $A$, i.e., $x : A$ and that $\theta : B$. The second way is defining a function using $\lambda$ notation. In that case, a function is defined using an abstraction $\lambda x$, obtaining $(\lambda(x : A).\theta) : A \rightarrow B$. Using this notation, a function application is similar to how is done in $\lambda$-calculus: $(\lambda x.\theta)(a) \equiv [a/x]\theta$.
+
+As a simple example, one can take a $f: \mathbb N \rightarrow \mathbb N$ that has a input $x : \mathbb N$ and gives $x + 2 : \mathbb N$ as output. One can construct this function using the two aforementioned approaches. First, take the one using definitional equality. One obtain $f(x) \equiv x + 2 : \mathbb N \rightarrow \mathbb N$, with $f(a) \equiv a + 2, a : \mathbb N$. The other way is using $\lambda$ notation. One can define 
+ $f = \lambda x.(x + 2) : \mathbb N \rightarrow \mathbb N$. If one applies  $a : \mathbb N$, one winds up with the same result: ($\lambda x.(x + 2))(a) \equiv [a/x](x + 2) \equiv a + 2$.
+
+It also should be possible to define multivariable functions. In the previous examples, the function received only one input. Nonetheless, it is possible to define functions receiving $2$ or more inputs. Take the case of $2$ inputs as example: $f(x,y : \mathbb N) \equiv \theta : N$. This function has type $f: \mathbb N \times \mathbb N \rightarrow \mathbb N$.
+We have not formally defined the symbol $\times$ yet, but take it as the usual cartesian product, which can also be defined in the framework of type theory. Using $\lambda$ notation, one defines  $f = (\lambda x.\lambda y.\theta) : \mathbb N \times \mathbb N \rightarrow \mathbb N$. To define functions with more than $2$ variables, one can use an analogous process.
+
+
+One important concept of multivariable functions is the existence of a process known as currying. Currying is a process to transform a function in $n$ variables into $n$ functions that receives only one variable, such that the output of those functions is another function \cite{hott}. Let's explain this process in a function of two variables, since one can analogously extend this process to an arbitrary number of variables. Given a function $f(a,b) \equiv c$, it is possible to transform $f$ into a function that receives only $a$ and has as output another function that receives only $b$, giving $c$ as the final output. Doing this, the type  $f: \mathbb N \times \mathbb N \rightarrow \mathbb N$ is transformed in an equivalent type $f: \mathbb N \rightarrow (\mathbb N \rightarrow \mathbb N)$. Since parenthesis is right-associative, one can write this type as  $\mathbb N \rightarrow \mathbb N \rightarrow \mathbb N$.
+
+To a better understanding of this process, let's take an example. Let's take a function $f(x,y) \equiv x + y + 5$. Consider the specific case of an application $x = 3$ and $y = 5$. Without using currying, one could do $f(3,5) \equiv 3 + 5 + 5 \equiv 8 + 5 \equiv 13$. With currying, $f(x)$ outputs $g : \mathbb N \rightarrow \mathbb N$ that receives $y$ as input. In that case, one would have $f(3) \equiv \lambda y.(3 + y + 5)$. This function receives $y = 5$ : $f(3)(5) \equiv 3 + 5 + 5 \equiv 13$. As one could see, the final results of these two approaches is exactly the same.
+
+
+\subsection{Dependent Function Type($\Pi$)}
+
+Sometimes the type of the output of a function depends on the value of the input. Using only the function type, it is impossible to do this kind of construction. That way, we need to introduce a new function type called dependent function type. To better understand that, consider a type $Seq(x)$ indexed by the natural numbers. A term of type $Seq(x)$ can be seen as a sequence of naturals from $0$ to $x$. Now, a problem arises when we try to construct a function that receives $n : \mathbb N$ as input and $\{0...n\} : Seq(n)$ as output. Since the output depends on the value of the input, the previous function type cannot define a function for this case. To indicate that a type is a dependent function, one can use the following notation: $\Pi_{(x : A)} B(x)$, where $x$ is the input and $B(x)$ a type family indexed by the type $A$. In the previous example of $Seq(x)$, one can construct the dependent function $\Pi_{(x : \mathbb N)} Seq(x)$. We also have the following inference rules \cite{harper1}.
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$A$ type}
+		\AxiomC{$[x: A]$}
+		\UnaryInfC{$B(x)$ type}
+		\alwaysSingleLine
+		\RightLabel{$(\Pi - F)$ \quad}
+		\BinaryInfC{$\Pi_{(x : A)} B(x)$ type}
+	\end{bprooftree}
+\end{center}
+
+\begin{center}
+	
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$[x: A]$}
+		\UnaryInfC{$m(x) : B(x)$}
+		\alwaysSingleLine
+		\RightLabel{$(\Pi - I)$ \quad}
+		\UnaryInfC{$\lambda (x : A).m(x) : \Pi _{(x : A)} B(x)$}
+	\end{bprooftree}
+\end{center}
+\bigskip
+
+In the case of \gls{pif}, given a type $A$ and a type family $B(x)$ indexed by this type, it is formed the type $\Pi_{(x : A)} B(x)$. The case of \gls{pii} is also very simple. Given a term $m(x) : B(x)$, with $x : A$, it is possible to obtain a dependent function that receives type $x$ and gives a term of type $m(x)$ as output. The elimination rule is the following:
+
+\bigskip
+
+\begin{center}
+	\noindent
+	\begin{bprooftree}
+		\AxiomC{$n : A$}
+		\AxiomC{$m : \Pi_{(x : A)} B(x)$}
+		\RightLabel{$(\Pi - E)$ \quad}
+		\BinaryInfC{$m.n : [n/x] B(x)$}
+	\end{bprooftree}
+\end{center}
+% ---
+
+\bigskip
+
+The \gls{pie} boils down to an application of a element $n$ in the dependent function. The output is very similar to the non-dependent case, the sole difference is the fact that the type of the output depends on the value of the input. We also have a computation rule:
+
+\bigskip
+
+\begin{center}
+	\noindent
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$n : A$}
+		\AxiomC{$[x: A]$}
+		\UnaryInfC{$m(x) : B(x)$}
+		\alwaysSingleLine
+		\RightLabel{$(\Pi - C)$ \quad}
+		\BinaryInfC{$(\lambda (x : A).m).n = [n/x]m(x) : [n/x]B(x)$}
+	\end{bprooftree}
+\end{center}
+% ---
+
+\bigskip
+
+If one looks closely, the \gls{pic} establishes function application the exactly way that was defined in non-dependent functions. The sole difference is that the output depends on $x$. With that, we have all necessary rules to define and compute dependent functions. Also, when working directly with types that represent propositions, one should can semantically interpret a type $\Pi_{(x : A)} B(x)$ as $\forall(x : A) B(x)$.
+
+\subsection{Product type ($\times$)}
+
+Previously we have mentioned the existence of multivariable functions, that receives two or more inputs. But how can we represent a function that, for instance, receives two natural numbers? In set theory, one could use the cross product to do that. That way, this function receives $\mathbb{N} \times \mathbb{N}$ as input. In this sense, it is essential to define cross product in the framework of type theory.
+
+Intuitively, for any types $A$ and $B$ one should be able to construct the type $A \times B$. A term of $A \times B$ is a pair $(a,b) : A \times B$, with $a : A$ and $b : B$. This is formalized in the following rules \cite{RuyAnjolinaLivro}:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$A$ type}
+		\AxiomC{$B$ type}
+		\RightLabel{$(\times - F)$ \quad}
+		\BinaryInfC{$A \times B$ type}
+	\end{bprooftree}
+\end{center}
+
+\begin{center}
+	\begin{bprooftree}
+	\AxiomC{$a : A$}
+	\AxiomC{$b : B$}
+	\RightLabel{$(\times - I)$ \quad}
+	\BinaryInfC{$ (a,b) : A \times B$}
+\end{bprooftree}		
+\end{center}
+
+\bigskip
+
+If one looks closely, if $A$ and $B$ are propositions, $A \times B$ can be interpreted as $A \land B$. That way, one should be able to infer $A$ and $B$ from $A \times B$. To do that, we introduce functions $FST$ and $SND$ \cite{RuyAnjolinaLivro}:
+
+\begin{center}
+\begin{bprooftree}
+	\AxiomC{$\left< a,b \right> : A \times B$}
+	\RightLabel{$(\times - E_{1})$ \quad}
+	\UnaryInfC{$ FST ((a,b)) : A$}
+\end{bprooftree}
+\end{center}
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$(a,b) : A \times B$}
+		\RightLabel{$(\times - E_{2})$ \quad}
+		\UnaryInfC{$ SND ((a,b)) : B$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+Using $FST$ and $SND$ functions, we want to be able to retrieve the first and second elements of a pair $\left< a,b \right>$ respectively. Thus, we have the following computation rules \cite{RuyAnjolinaLivro}:
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$(a,b) : A \times B$}
+		\RightLabel{$\times - E_{1}$ \quad  $\rhd_{\beta}$ \quad $a : A$}
+		\UnaryInfC{$ FST (( a,b )) : A$}
+	\end{bprooftree}
+\end{center}
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{ $(a,b) : A \times B$}
+		\RightLabel{$\times - E_{2}$ \quad  $\rhd_{\beta}$ \quad $b : A$}
+		\UnaryInfC{$ SND ((a,b)) : B$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+The above rules are called $\times$-reductions. We also have another computation rule called $\times$-induction \cite{RuyAnjolinaLivro}:
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$c : A \times B$}
+		\RightLabel{$\times - E_{1}$}
+		\UnaryInfC{$FST(c) : A$}
+		\RightLabel{$\times - E_{2}$}
+		\AxiomC{$c : A \times B$}
+		\UnaryInfC{$SND(c) : B$}
+		\RightLabel{$\times - I$ \quad  $\rhd_{\eta}$ \quad $c : A \times B$}
+		\BinaryInfC{$ (FST(c), SND(c)) : A \times B$}
+	\end{bprooftree}
+\end{center}
+
+\subsection{Coproduct ($+$)}
+
+In the previous subsection we have introduced the product type. We saw that $\times$ can be seen semantically as a cross product in set theory and the connector $\land$ when dealing with propositions. Thus, it is natural to think that the dual of the product should also be able to be formalized in type theory. That is what we do in this section. In set theory, the coproduct represents the disjoint union. If one is working with propositions, the coproduct can be semantically interpreted as the connector $\lor$.
+
+In the product, we have seen that from a term of $A \times B$ one should be able to obtain terms of $A$ and $B$ by separate processes. Since the coproduct work as the dual of the product, then it is natural to think that one should be able to obtain a term of $A + B$ from a term of $A$ or a term of $B$. That is exactly what happens \cite{RuyAnjolinaLivro}:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$A$ type}
+		\AxiomC{$B$ type}
+		\RightLabel{$(+ - F)$ \quad}
+		\BinaryInfC{$A + B$ type}
+	\end{bprooftree}
+\end{center}
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$a : A$}
+		\RightLabel{$(+ - I_{1})$ \quad}
+		\UnaryInfC{$inl(a) : A + B$}
+	\end{bprooftree}		
+	\begin{bprooftree}
+		\AxiomC{$b : B$}
+		\RightLabel{$(+ - I_{2})$ \quad}
+		\UnaryInfC{$inr(b) : A + B$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+The elimination rule follows directly from the fact that if one from $a : A$ is able to construct a term $r(a) : C$ and from $b : B$ we also construct $l(b) : C$, then we should be able to construct one term of type $C$ directly from a term $c : A + B$ \cite{RuyAnjolinaLivro}:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$c : A + B$}
+		\AxiomC{$[a : A]$}
+		\UnaryInfC{$r(a) : C$}
+		\AxiomC{$[b : B]$}
+		\UnaryInfC{$l(b) : C$}
+		\alwaysSingleLine
+		\RightLabel{$(+ - E)$ \quad}
+		\TrinaryInfC{$CASE(c, \acute{a}r(a), \acute{b}l(b)) : C$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+One should see $d(a)$ and $e(b)$ as functional expressions dependent on $a$ and $b$ respectively. One should also notice the use of `$\acute{\ }$' in $\acute{a}$ and $\acute{b}$.  One should see `$\acute{\ }$' as an abstractor that binds the occurrences of the variable $a$ and $b$ both introduced in the local assumptions. We have the following reduction rules \cite{RuyAnjolinaLivro}:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$c : A$}
+		\UnaryInfC{$inl(c) : A + B$}
+		\alwaysNoLine
+		\AxiomC{$[a : A]$}
+		\UnaryInfC{$r(a) : C$}
+		\AxiomC{$[b : B]$}
+		\UnaryInfC{$l(b) : C$}
+		\alwaysSingleLine
+		\RightLabel{$(+ - E)$ \quad  $\rhd_{\beta}$}
+		\TrinaryInfC{$CASE(inl(c), \acute{a}r(a), \acute{b}l(b)) : C$}
+	\end{bprooftree}
+	\begin{bprooftree}
+	\alwaysNoLine
+	\AxiomC{$[c : A]$}
+	\UnaryInfC{$[c/x]r(a) : C$}
+	\end{bprooftree}
+	
+\end{center}
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$c : B$}
+		\UnaryInfC{$inr(c) : A + B$}
+		\alwaysNoLine
+		\AxiomC{$[a : A]$}
+		\UnaryInfC{$r(a) : C$}
+		\AxiomC{$[b : B]$}
+		\UnaryInfC{$l(b) : C$}
+		\alwaysSingleLine
+		\RightLabel{$(+ - E)$ \quad  $\rhd_{\beta}$}
+		\TrinaryInfC{$CASE(inr(c), \acute{a}r(a), \acute{b}l(b)) : C$}
+	\end{bprooftree}
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$[c : B]$}
+		\UnaryInfC{$[c/x]l(b) : C$}
+	\end{bprooftree}
+	
+\end{center}
+
+\bigskip
+
+We also have an induction rule \cite{RuyAnjolinaLivro}:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$c : A + B$}
+		\AxiomC{$[a : A$]}
+		\RightLabel{$+ - I_{1}$}
+		\UnaryInfC{$inl(a)  : A + B$}
+		\AxiomC{$[b : B]$}
+		\RightLabel{$+ - I_{2}$}
+		\UnaryInfC{$inr(y) : A + B$}
+		\RightLabel{$+ - E$ \quad $\rhd_{\eta}$}
+		\TrinaryInfC{$CASE(c,\acute{(a)}inl(a),\acute{b}inr(b)) : A + B$}
+	\end{bprooftree}
+
+		\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad $c: A + B$
+\end{center}
+\bigskip
+\subsection{Dependent Pair Type ($\Sigma$)}
+
+When working with functions, it is sometimes useful to work with ordered pairs $(a,b)$ such that $a$ is a input for the function and $b$ is the respective output. But what happens if one is working with a dependent function? In that case, the type of the output $b$ would be bounded to the value of the input $a$. To represent this, one needs to use a type called dependent pair. The notation for this type is  $\Sigma_{(x : A)} B(x)$ and it has the following rules\cite{harper1}:
+
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$A$ type}
+		\AxiomC{$[x: A]$}
+		\UnaryInfC{$B(x)$ type}
+		\alwaysSingleLine
+		\RightLabel{$(\Sigma - F)$ \quad}
+		\BinaryInfC{$\Sigma_{(x : A)} B(x)$ type}
+	\end{bprooftree}
+	
+	\bigskip
+	
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$m : A$}
+		\AxiomC{$n : B(m)$}
+		\alwaysSingleLine
+		\RightLabel{$(\Sigma - I)$ \quad}
+		\BinaryInfC{$\langle m,n\rangle : \Sigma_{(x : A)} B(x)$}
+	\end{bprooftree}
+\end{center}
+\bigskip
+
+The \gls{sif} is similar to $\Pi-F$. For \gls{sii}, an element $m : A$ and an element $n : B(m)$ are enough to introduce a dependent pair $\langle m,n\rangle : \Sigma_{(x : A)} B(x)$. We have two elimination rules:
+
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$m : \Sigma_{(x : A)} B(x)$}
+		\RightLabel{$(\Sigma - E_{1})$ \quad}
+		\UnaryInfC{$\pi_{1}(m) : A$}
+	\end{bprooftree}
+
+\bigskip
+
+	\begin{bprooftree}
+		\AxiomC{$m : \Sigma_{(x : A)} B(x)$}
+		\RightLabel{$(\Sigma - E_{2})$ \quad}
+		\UnaryInfC{$\pi_{2}(m) : [\pi_{1}(m)/x]B(x)$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+In traditional type theory, the dependent pair has two eliminations. This is explained by the fact that since the pair is composed by two terms, it is possible to eliminate $\Sigma$ obtaining the first or the second term. From a dependent pair, one can use the \gls{sie1} and extract the first element. From the \gls{sie2} one can extract the second element, which type depends on the value of the first element. Thus, we have two computation rules:
+
+\begin{center}
+	$\pi_{1}$$(\langle m,n\rangle) = m$  e $\pi_{2}$$(\langle m,n\rangle) = n$.
+\end{center}
+
+The operators $\pi_{1}$ and $\pi_{2}$ extract the necessary information from the dependent pair. One obtains $m$ and $n$ respectively. The dependent pair should be understood as the dual of the dependent product.
+
+\subsection{Alternative Formulation for the Dependent Pair}
+
+If one is working within the paradigm of \emph{formulae-as-types}\cite{howard}, the dependent product should be semantically interpreted as the $\exists$ quantifier. Nevertheless, it has been pointed out by\cite{Ruy-existential}  that the previous formulation for the dependent pair leads to problems. The main issue is the fact that the previous formulation does not 'hide' the witness in an existential formula. One can apply directly $\pi_{1}$ to a dependent pair, obtaining the witness and ignoring the fact that it should be hidden. Thus,\cite{Ruy-existential} argues that this 'availability' does not match with the true spirit of indefiniteness of the existential qualifier. To better see this, one could consider the fact that the duality between the existential and universal quantifiers are the first-order counterpart of the duality between the disjunction and the conjunction. In the language of type theory, when one talks about conjunction one is really talking about $\times$-product. In the $\times$-product, the terms of a pair are readily available:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$a : A$}
+		\AxiomC{$b : B$}
+		\RightLabel{$\times - I$}
+		\BinaryInfC{$(a,b) : A \times B$}
+		\RightLabel{$\times - E_{1}$}
+		\UnaryInfC{$FST((a,b)) : A$}
+	\end{bprooftree}
+	\begin{bprooftree}
+	\AxiomC{$a : A$}
+	\AxiomC{$b : B$}
+	\RightLabel{$\times - I$}
+	\BinaryInfC{$(a,b) : A \times B$}
+	\RightLabel{$\times - E_{2}$}
+	\UnaryInfC{$SND((a,b)) : B$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+In the case of the disjunction, i.e., the coproduct in type theory, once one of the disjuncts is used to construct a term of the coproduct, it becomes 'hidden', the elimination rule has to proceed by Skolem-like introductions of new local assumptions\cite{Ruy-existential}:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$a : A$}
+		\RightLabel{$+ - I$}
+		\UnaryInfC{$inl(a) : A + B$}
+		\alwaysNoLine
+		\AxiomC{$[x : A]$}
+		\UnaryInfC{$r(x) : C$}
+		\AxiomC{$[y : B]$}
+		\UnaryInfC{$l(y) : C$}
+		\alwaysSingleLine
+		\RightLabel{$+ - E_{1}$}
+		\TrinaryInfC{$CASE(inl(a),\acute{x}r(x), \acute{y}l(y))$}
+	\end{bprooftree}
+\end{center}
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$b : B$}
+		\RightLabel{$+ - I$}
+		\UnaryInfC{$inr(b) : A + B$}
+		\alwaysNoLine
+		\AxiomC{$[x : A]$}
+		\UnaryInfC{$r(x) : C$}
+		\AxiomC{$[y : B]$}
+		\UnaryInfC{$l(y) : C$}
+		\alwaysSingleLine
+		\RightLabel{$+ - E_{2}$}
+		\TrinaryInfC{$CASE(inr(b),\acute{x}r(x), \acute{y}l(y))$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+In the first case, one has $a : A$ in the start, but after introducing $inl(a) : A + B$, $a$ becomes hidden, i.e., one loses direct access to it. The same thing happens to $b : B$ and $inr(b) : A + B$ in the second case. Thus, one proceeds adding local assumptions $x: A$ and $y : B$. With that in mind, \cite{Ruy-existential} showed that the existential should mirror this aspect. The witness should be hidden and one should proceed by introducing Skolem-like local assumptions. Thus, the elimination rule for the dependent pair is reformulated \cite{Ruy-existential}:
+
+\bigskip
+
+\begin{center}
+	\noindent
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$n : \Sigma_{(x:A)}B(x)$}
+		\AxiomC{$[t: A,\ f(t):B(t)]$}
+		\UnaryInfC{$h(t,f) : C$}
+		\alwaysSingleLine
+		\RightLabel{$(\Sigma - E)$ \quad}
+		\BinaryInfC{$E(n,\acute{t}\acute{f}h(t,f)):C$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+This elimination rule eliminates the dependent pair without giving direct access to the witness. Of course, it generates new computation rules. Here follows the reduction rule\cite{Ruy-existential}:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$a : D$}
+		\AxiomC{$f(a) : F(a)$}
+		\RightLabel{$\Sigma - I$}
+		\BinaryInfC{$\left< a, f(a) \right> : \Sigma_{(x : D)}F(x)$}
+		\alwaysNoLine
+		\AxiomC{$t : D, g(t) : F(t)$}
+		\UnaryInfC{$d(g,t) : C$}
+		\alwaysSingleLine
+		\RightLabel{$\Sigma - E$ \quad $\rhd_{\beta}$}
+		\BinaryInfC{$E(\left< a, f(a) \right>, \acute{g}\acute{t}d(g,t)) : C $}
+	\end{bprooftree}
+	\begin{prooftree}
+	\alwaysNoLine
+	\AxiomC{$[A : D, f(a) : F(a)]$}
+	\UnaryInfC{$[f/g, a/t]d(g,t)$}
+	\end{prooftree}
+\end{center}
+
+\bigskip
+
+The last rule is the induction\cite{Ruy-existential}:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$c : \Sigma_{(x : D)}P(x)$}
+		\AxiomC{$[t : D]$}
+		\AxiomC{$[g(t) : P(t)]$}
+		\RightLabel{$\Sigma - I$}
+		\BinaryInfC{$\left< t, g(t) \right> : \Sigma_{(y : D)}P(y)$}
+		\RightLabel{$\Sigma - E$ \quad $\rhd_{\eta}$ \quad $c : \Sigma_{(x : D)}P(x)$}
+		\BinaryInfC{$E(c, \acute{g}\acute{t}\left< t, g(t) \right>) : \Sigma_{(y : D)}P(y)$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+\subsection{The Natural Numbers}
+It has been said that one of the main objectives that motivated type theory was the fact that it worked as a foundation for constructive mathematics. Thus, a theory that proposes to be a foundation for mathematics should at least be able to formalize the natural numbers. Set theory, for example, is capable of doing that. Thus, the objective of this subsection is to show how the natural numbers can be constructed in type theory and to show some basic properties of the naturals. As always, we start with basic constructions: \cite{harper1}:
+
+\bigskip
+\begin{center}
+	\noindent
+	\begin{bprooftree}
+		\AxiomC{}
+		\RightLabel{$(\mathbb N - I_{0})$ \quad}
+		\UnaryInfC{$0 : \mathbb N$}
+	\end{bprooftree}
+	\begin{bprooftree}
+		\AxiomC{$m : \mathbb N$}
+		\RightLabel{$(\mathbb N - I_{s})$ \quad}
+		\UnaryInfC{$succ(m) : \mathbb N$}
+	\end{bprooftree}
+\end{center}
+\bigskip
+
+The natural are constructed in a simple way, from the two rules above. The \gls{n0} should be understood as the base of the construction. It states the existence of at least one term called $0$ that is a term of $\mathbb N$. From a term $m : \mathbb N$, one can apply the \gls{ns} to obtain another term of type $succ(m) : \mathbb N$. Thus, if one starts from $0$ and inductively construct numbers applying $succ$, one wind up with the entire set of natural numbers. Nevertheless, those two rules does not give us the tools to work with the natural numbers. Ideally, one wants to construct functions on the naturals and also apply the inductive principle to construct proofs. Those tools are given by the computation rules. Let's start with the non-dependent case \cite{harper1}:
+
+\bigskip
+\begin{center}
+	\noindent
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$m : \mathbb N$}
+		\AxiomC{$C$ type}
+		\AxiomC{$N_{0} : C$}
+		\AxiomC{$[x : C]$}
+		\UnaryInfC{$N_{s} : C$}
+		\alwaysSingleLine
+		\QuaternaryInfC{$rec(m, N_{0}, \lambda x.N_{s}) : C$}
+	\end{bprooftree}
+\end{center}
+\bigskip
+
+The inference rule above can be rather confusing. The idea is to use a recursor $rec$ to define basic functions on the naturals, such as addition, multiplication and exponentiation. The recursor receives a base case $N_{0}$, that states how $rec$ should act when it iterates $0$ times. Another piece of information is that given $x$ iterations, the recursor needs to know how to compute the next iteration. This next iteration is represented by $N_{s}$. Thus, based on the inductive definition of the naturals, this is enough to define how any function on the naturals works. To better illustrate that, let's use $rec$ to define addition. Given $m, n : \mathbb N$, we want $m + n : \mathbb N$. Starting from $m$, one can define the base case to be $m + 0 = m$. Thus, one just needs to iterate $n$ times the  function $succ$ starting from $m$. This is expressed as following:
+
+\bigskip
+\begin{center}
+	\noindent
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$m : \mathbb N$}
+		\AxiomC{$\mathbb N$ type}
+		\AxiomC{$m : \mathbb N$}
+		\AxiomC{$[n : \mathbb N]$}
+		\UnaryInfC{$succ(n) : \mathbb N$}
+		\alwaysSingleLine
+		\QuaternaryInfC{$rec(m, m, \lambda n.succ(n)) : \mathbb N$}
+		\UnaryInfC{$\lambda m. rec(m, m, \lambda n.succ(n)) : \mathbb N \rightarrow \mathbb N$}
+	\end{bprooftree}
+\end{center}
+\bigskip
+
+This rule used to define recursive functions on the naturals is called the non-dependent case, since it originates terms of a non-dependent type $C$. To use the induction principle, one needs to define the dependent case \cite{harper1}:
+
+\bigskip
+\begin{center}
+	\noindent
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$m : \mathbb N$}
+		\AxiomC{$[x : \mathbb N]$}
+		\UnaryInfC{$C(x)$ type}
+		\AxiomC{$N_{0} : [0/x]C(x)$}
+		\AxiomC{$[x : \mathbb N,y : C(x)]$}
+		\UnaryInfC{$N_{s} : [suc(x)/x]C(x)$}
+		\alwaysSingleLine
+		\QuaternaryInfC{$rec(m, N_{0}, (x, \lambda y.Ns)) : [m/x] C(x)$}
+	\end{bprooftree}
+\end{center}
+\bigskip
+
+If one looks closely, one should notice that the non-dependent case is the induction principle of the natural numbers. Basically, it states that given a proof of the base case $N_{0} : C(0)$ and the inductive step, i.e., that a proof $y : C(x)$ implies a proof of $N_{s} : C(x + 1)$, then one should wind up with a proof $C(m)$ for any $m : \mathbb N$. With that, we conclude the construction and main properties used to work with the naturals in type theory.
+
+\subsection{Additional Information}
+
+We have said that a type can be semantically interpreted in different ways. It can be a proposition, a topological space, a set, among others semantical interpretation. The main ones are summed up in the table below:\\*
+
+\bigskip
+\begin{table}[htb]
+	\center
+	\footnotesize
+	\caption {Multiple semantical interpretations of a type} \label{tab:título}
+	\begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3.5cm}|}
+		\hline
+		\textbf{Types} & \textbf{Logic}  & \textbf{Sets}  & \textbf{Homotopy}  \\
+		\hline
+		$A$ & proposition & set & space\\
+		\hline
+		$a : A$ & proof & element & point\\
+		\hline
+		$B(x)$ & predicate & family of sets & fibration\\
+		\hline
+		$b(x) : B(x)$ & conditional proof & family of elements & section\\
+		\hline
+		$\textbf{0,1}$ & $\bot$,$\top$ & $\varnothing$, $\{ \varnothing \}$ & $\varnothing ,*$\\
+		\hline
+		$A + B$ & $A \lor B$ & disjoint union & coproduct\\
+		\hline
+		$A \times B$ & $A \land B$ & set of pairs & product space\\
+		\hline
+		$A \rightarrow B$ & $A \Rightarrow B$ & set of functions & function space\\
+		\hline
+		$\Sigma_{x : A}B(x)$ & $\exists_{(x : A)}B(x)$ & disjoint sum & total space\\
+		\hline
+		$\Pi_{x : A}B(x)$ & $\forall_{(x : A)}B(x)$ & product & space of sections\\
+		\hline
+		$Id_{a}$ & equality $=$ & $\{ (x,x) \mid x \in A \}$ & path space $A^{I}$\\
+		\hline
+	\end{tabular}
+	\\
+	Source: Homotopy Type Theory Book \cite{hott}.
+\end{table}
+\bigskip
+
+As one can see, type theory is capable of representing many diverse objects of mathematics and logic. In the previous subsections, we have shown the basic constructions that everyone interested in type theory should be familiar with. Nevertheless, we have not talked about the identity type yet. Since it is a type of central to the main contribution of this work, the next section is completely focused on explaining it.
+
+\section{Identity Type}
+
+After briefly introducing the main concepts and types of type theory, the objective of this section is to introduce the main entity of this work, the identity type. Here we are going to introduce the classic approach of type theory. One can check our proposed formulation for the identity type in \textbf{chapter 4} of this work.
+
+The identity type is arguably the most interesting concept of type theory. This claim is based on the fact that many results have been achieved using it. One of these was the discovery of the Univalent Models in 2005 by Vladimir Voevodsky \cite{Vlad1abnt}. From this work, a groundbreaking result has arisen: the connection between type theory and homotopy theory. The intuitive connection is simple: a term $a : A$ can be considered as a point of the space $A$ and $p: Id_{A}(a,b)$ is a homotopy path between points $a, b \in A$\cite{hott}. This has given rise to a whole new area of research, known as Homotopy Type Theory. It leads to a new perspective on the study of equality, as expressed by Voevodsky in a recent talk in {\em The Paul Bernays Lectures\/} (Sept 2014, Z\"urich): equality (for abstract sets) should be looked at as a {\em structure\/} rather than as a {\em relation\/}.
+
+
+\subsection{Formal Definition of The Identity Type}
+
+We start with the formation and introduction rules \cite{Ruy6}:
+
+\bigskip
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$A$ type}
+		\AxiomC{$a : A$}
+		\AxiomC{$b : A$}
+		\RightLabel{$Id^{int} - F$ \quad}
+		\TrinaryInfC{$Id_{A}^{int}(a,b)$ type}
+	\end{bprooftree}
+
+\bigskip
+
+	\begin{bprooftree}
+		\AxiomC{$a : A$}
+		\RightLabel{$Id^{int} - I$ \quad}
+		\UnaryInfC{$r(a) : Id_{A}^{int}(a,a)$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+First, we need to clarify the meaning of $int$ that appears in $Id^{int}$. This $int$ indicates that we are working with the intensional version of the identity type. The difference between the intensional and extensional version will be explained in detail in the next subsection. For now, let's postulate that every time $int$ or $ext$ do not appear above $Id_{A}$, one should assume that the version being used is the intensional one.
+
+The \gls{iff} is pretty straightforward. Given any terms $a, b : A$, it is possible to create a type that will only be inhabited if there exits an witness that testifies the propositional equality between $a$ and $b$. Nevertheless, the existence of type $Id_{A}(a,b)$ does not dependent on whether it is inhabited or not. 
+
+The rule \gls{ifi} states that there is only one canonical proof of equality, the reflexivity. It states that any term $a : A$ is always propositional equal to itself. This introduces a canonical proof of reflexivity $r(a) : Id_{A}^{int}(a,a)$. Thus, the main idea is that every proof of equality can be constructed inductively from a reflexive proof of equality \cite{Ruy6}: 
+
+\bigskip
+\begin{center}
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$a:A$}
+		\AxiomC{$b:A$}
+		\AxiomC{$c:Id_{A}^{int}(a,b)$}
+		\AxiomC{$[x:A]$}
+		\UnaryInfC{$d(x):C(x,x,r(x))$}
+		\AxiomC{$[x:A,y:A,z:Id_{A}(x,y)]$}
+		\UnaryInfC{$C(x,y,z)$ type}
+		\RightLabel{$Id - E$ \quad}
+		\alwaysSingleLine
+		\QuinaryInfC{$J(c,d):C(a,b,c)$}
+	\end{bprooftree}
+\end{center}
+\bigskip   
+
+\begin{center}
+	\noindent
+	\alwaysNoLine
+	\begin{bprooftree}
+		\AxiomC{$a:A$}
+		\AxiomC{$[x:A]$}
+		\UnaryInfC{$d(x):C(x,x,r(x))$}
+		\AxiomC{$[x:A,y:A,z:Id_{A}(x,y)]$}
+		\UnaryInfC{$C(x,y,z)$ type}
+		\RightLabel{$Id - Eq$ \quad}
+		\alwaysSingleLine
+		\TrinaryInfC{$J(r(a),d(x)) = d(a/x) :C(a,a,r(a))$}
+	\end{bprooftree}
+\end{center}
+\bigskip
+
+The \gls{ie} introduces the recursor $J$ and eliminates the identity type in the process. The inner details of the recursor $J$ are pretty complicated to understand and uses complex concepts of category theory. Nevertheless, one can try to intuitively understand $J$. Basically, $J(c,d):C(a,b,c)$ works constructing $c$ from a reflexive proof $d$. In this case, as any recursor of type theory, $c$ is constructed based on multiple iterations that starts from the base $d$. Since this elimination rule has many terms, constructing some types using $J$ can be a cumbersome process, as we are going to see in the next subsection. In this work, we are going to introduce a way of formalizing the identity type using a new entity known as computational paths. We believe that this way is simpler and more straightforward to use than the one introduced here. Nevertheless, we leave this discussion to a further chapter of this work.
+
+\subsection{Basic Constructions}
+The objective of this subsection is to show the use of the elimination rule of the identity type in practice. The constructions that we have chosen to build are the reflexive, transitive and symmetric type of the identity type. Those were not random choices. The main reason is the fact that reflexive, transitive and symmetric types are essential to the process of building a groupoid model for the identity type \cite{hofmann1}. 	
+
+Before we start the constructions, we think that it is essential to understand how to use the eliminations rules. The process of building a term of some type is a matter of finding the right reason. In the case of $J$, the reason is the correct $x,y : A$ and $z : Id_{A}(a,b)$ that generates the adequate $C(x,y,z)$.
+
+We start proving the reflexivity. We want a witness for $\Pi_{(a : A)}Id_{A}(a,a)$. This case is trivial, since we have the canonical proof of identity:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+	\AxiomC{$a : A$}
+	\RightLabel{$Id - I$ \quad}
+	\UnaryInfC{$r(a) : Id_{A} (a,a)$}
+\end{bprooftree}
+\end{center}
+
+\bigskip
+
+
+The second construction is the symmetry. This one does not follow trivially from the introduction rule. Thus, we need to use the elimination rule in some way. Our objective is to construct a term for the type  $\Pi_{(a : A)}\Pi_{(b : A)}(Id_{A}(a,b) \rightarrow Id_{A}(b,a))$.
+
+Looking at the elimination rule of the constructor J, it is clear that our main objective is to find a suitable $C(x,y,z)$, with $x : A$, $y : A$ and $z : Id_{A}(a,b)$. The main problem is the fact that, to find the correct reason, we do not have a fixed process or a fixed set of rules to follow. One needs to rely on one's intuition. In this case, one could conclude that the correct reason is to look at $C(x,y,,z)$ as the type $Id_{A}(y,x)$, with $x : A$, $y : A$ and $z$ as any term (in the deduction, $z$ will be represented by $-$, to indicate that it can be any term). Thus, we obtain the following deduction:
+
+\bigskip
+\begin{center}
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$a:A$}
+		\AxiomC{$b:A$}
+		\AxiomC{$c:Id_{A}(a,b)$}
+		\AxiomC{$[x:A]$}
+		\UnaryInfC{$r(x):Id_{A}(x,x)$}
+		\AxiomC{$[x:A,y:A,- : Id_{A}(a,b)]$}
+		\UnaryInfC{$Id_{A}(y,x)$ type}
+		\RightLabel{$Id - E$ \quad}
+		\alwaysSingleLine
+		\QuinaryInfC{$J(c,r(x)):Id_{A}(b,a)$}
+		\RightLabel{$\rightarrow - I$}
+		\UnaryInfC{$\lambda c.J(c,r(x)): Id_{A}(a,b) \rightarrow Id_{A}(b,a)$}
+		\RightLabel{$\Pi - I$}
+		\UnaryInfC{$\lambda b.\lambda c.J(c,r(x)): \Pi_{(b : A)}(Id_{A}(a,b) \rightarrow Id_{A}(b,a))$}
+		\RightLabel{$\Pi - I$}
+		\UnaryInfC{$\lambda a.\lambda b.\lambda c.J(c,r(x)): \Pi_{(a : A)}\Pi_{(b : A)}(Id_{A}(a,b) \rightarrow Id_{A}(b,a))$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+The third and last construction will be the transitivity. Our objective is to construct a term for the type $\Pi_{(a : A)}\Pi_{(b : A)}\Pi_{(c : A)} (Id_{A}(a,b) \rightarrow Id_{A}(b,c) \rightarrow Id_{A}(a,c))$.
+
+Let's now use $J$ to build a term for the transitivity. The proof will be based on the one found in \cite{hott}. The difference is that instead of defining induction principles for $J$ based on the elimination rules, we will use the rule directly. The complexity is the same, since the proofs are two forms of presenting the same thing and they share the same reasons. As one should expect, the first and main step is to find a suitable reason. In other words, we need to find suitable $x, y : A$ and $z : Id_{A}(a,b)$ to construct an adequate $C(x,y,z)$. Similar to the case of symmetry, this first step is already problematic. Different from our approach, in which one starts from a path and applies intuitive equality axioms to find a suitable reason, there is no clear point of how one should proceed to find a suitable reason for the construction  based on $J$. In this case, one should rely on intuition and make attempts until one finds out the correct reason. As one can check in \cite{hott}, a suitable reason would be $x : A, y : A, - : Id_{A}(x,y)$ and $C(x,y,z) \equiv Id_{A}(y,c) \rightarrow Id_{A}(x,c)$. Looking closely, the proof is not over yet. The problem is the type of $C(x,x,r(x))$. With this reason, we have that $C(x,x,r(x)) \equiv Id_{A}(x,c) \rightarrow Id_{A}(x,c)$. Therefore, we cannot assume that $q(x) : Id_{A}(x,c) \rightarrow Id_{A}(x,c)$ is the term $r(x)$. The only way to proceed is to apply again the constructor $J$ to build the term $q(x)$. It means, of course, that we will need to find yet another reason to build this type. This second reason is given by  $x : A, y : A, - : Id_{A}(x,y)$ and $C'(x,y,z) \equiv Id_{A}(x,y)$. In that case, $C'(x,x,r(x)) = Id_{A}(x,x)$. We will not need to use $J$ again, since now we have that $r(x) : Id_{A}(x,x)$. Then, we can construct $q(x)$:
+
+\bigskip
+\begin{center}
+	\begin{bprooftree}
+		\alwaysNoLine
+		\AxiomC{$x:A$}
+		\AxiomC{$c:A$}
+		\AxiomC{$q:Id_{A}(x,c)$}
+		\AxiomC{$[x:A]$}
+		\UnaryInfC{$r(x):Id_{A}(x,x)$}
+		\AxiomC{$[x:A,y:A,- : Id_{A}(x,y)]$}
+		\UnaryInfC{$Id_{A}(x,y)$ type}
+		\RightLabel{$Id - E$ \quad}
+		\alwaysSingleLine
+		\QuinaryInfC{$J(q,r(x)):Id_{A}(x,c)$}
+		\RightLabel{$\rightarrow - I$}
+		\UnaryInfC{$\lambda q.J(q,r(x)): Id_{A}(x,c) \rightarrow Id_{A}(x,c)$}
+	\end{bprooftree}
+\end{center}
+\bigskip
+
+Finally, we obtain the desired term:
+
+\bigskip
+\begin{center}
+	\begin{figure}
+		\begin{sideways}
+		\begin{bprooftree}
+			\alwaysNoLine
+			\AxiomC{$a:A$}
+			\AxiomC{$b:A$}
+			\AxiomC{$p:Id_{A}(a,b)$}
+			\AxiomC{$[x:A]$}
+			\UnaryInfC{$\lambda q.J(q,r(x)): Id_{A}(x,c) \rightarrow Id_{A}(x,c)$}
+			\AxiomC{$[x:A,y:A,- : Id_{A}(x,y)]$}
+			\UnaryInfC{$Id_{A}(y,c) \rightarrow Id_{A}(x,c)$ type}
+			\RightLabel{$Id - E$ \quad}
+			\alwaysSingleLine
+			\QuinaryInfC{$J(p,\lambda q.J(q,r(x))):  Id_{A}(b,c) \rightarrow Id_{A}(a,c)$}
+			\RightLabel{$\rightarrow - I$}
+			\UnaryInfC{$\lambda p.J(p,\lambda q.J(q,r(x))): Id_{A}(a,b) \rightarrow Id_{A}(b,c) \rightarrow Id_{A}(a,c)$}
+			\RightLabel{$\Pi-I$}
+			\UnaryInfC{$\lambda c.\lambda p.J(p,\lambda q.J(q,r(x))):  \Pi_{(c : A)}(Id_{A}(a,b) \rightarrow Id_{A}(b,c) \rightarrow Id_{A}(a,c))$}
+			\RightLabel{$\Pi-I$}
+			\UnaryInfC{$\lambda b.\lambda c.\lambda p.J(p,\lambda q.J(q,r(x))):  \Pi_{(b : A)}\Pi_{(c : A)}(Id_{A}(a,b) \rightarrow Id_{A}(b,c) \rightarrow Id_{A}(a,c))$}
+			\RightLabel{$\Pi-I$}
+			\UnaryInfC{$\lambda a.\lambda b.\lambda c.\lambda p.J(p,\lambda q.J(q,r(x))):  \Pi_{(a : A)}\Pi_{(b : A)}\Pi_{(c : A)}(Id_{A}(a,b) \rightarrow Id_{A}(b,c) \rightarrow Id_{A}(a,c))$}
+		\end{bprooftree}
+\end{sideways}
+\end{figure}
+\end{center}
+
+\newpage
+
+This construction is an example that makes clear the difficulties of working with this approach for the identity type. We had to find two different reasons and use two applications of the elimination rule. Another problem is the fact that the reasons were not obtained by a fixed process, like the applications of axioms in some entity of type theory. They were obtained purely by the intuition that a certain $C(x,y,z)$ should be capable of constructing the desired term. For that reason, obtaining these reasons can be troublesome.
+
+Further in this work we are going to construct those types using computational paths. Thus, we will have some base on which we can compare the two approaches. 
+
+\subsection{Extensionality vs Intensionality}
+
+We have seen that functions are extensional in set theory. Functions are considered as pairs of input and output. The way of how those pairs were obtained is ignored completely. This does not occurs on the aforementioned formulation of the identity type. In that case, the proof of how the equality has been obtained matters. That is the reason way we said that this approach is intensional. In the original formulation of type theory, Martin-L\"of proposed an intensional approach \cite{Martin3} and an extensional one \cite{Martin2,Martin4}. Since we have already shown the construction of the intensional approach, we show the construction of the extensional one in this subsection. We have the following rules  \cite{Ruy1}:
+
+\bigskip
+
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$A$ type}
+		\AxiomC{$a : A$}
+		\AxiomC{$b : A$}
+		\RightLabel{$Id^{ext} - F$ \quad}
+		\TrinaryInfC{$Id_{A}^{ext}(a,b)$ type}
+	\end{bprooftree}
+
+\bigskip
+
+	\begin{bprooftree}
+		\AxiomC{$a = b : A$}
+		\RightLabel{$Id^{ext} - I$ \quad}
+		\UnaryInfC{$r : Id_{A}^{ext}(a,b)$}
+	\end{bprooftree}
+\end{center}
+
+\bigskip
+
+The \gls{ife} is completely equal to the intensional case. The \gls{iie} is also very simple. If we have that $a = b : A$, then one has for sure at least one proof $r$ that establishes this equality. Naturally, $r$ has type $Id_{A}^{ext}(a,b)$. We have now the elimination and equality rules \cite{Ruy1}:
+
+\bigskip
+\begin{center}
+	\begin{bprooftree}
+		\AxiomC{$c : Id_{A}^{ext}(a,b)$ }
+		\RightLabel{$Id^{ext} - E$ \quad}
+		\UnaryInfC{$a = b : A$}
+	\end{bprooftree}
+
+\bigskip
+
+	\begin{bprooftree}
+		\AxiomC{$c : Id_{A}^{ext}(a,b)$}
+		\RightLabel{$Id^{ext} - Eq$ \quad}
+		\UnaryInfC{$c = r : Id_{A}^{ext}(a,b)$}
+	\end{bprooftree}
+	
+\end{center}
+
+\bigskip
+
+The first thing one should notice is that \gls{iee} is much simpler than the intensional version. One does not need to define over-complicated structures like $J$. Given any element $Id_{A}^{ext}(a,b)$, since we do not need to keep track of the equality proof, one can extract directly that $a = b : C$. At this point, the information that $c$ is responsible for establishing is irrelevant. As one can see, the existence of the term $c$ is completely excluded of the final inference. The fact that we do not need to keep track of an equality proof is also seen in the \gls{iei}. This rule shows that any two equality proofs $c$ and $r$ are equal. Thus, how $c$ and $r$ are constructed does not matter. The only relevant fact is that they are both proofs of the equality $a = b : A$.
+
+The approach that we are going to propose based on computational paths will be clearly intensional. This is due to the fact that computation is intrinsically intensional. Two algorithms can solve the same problem, but they can be implemented in completely different ways and have difference space and time complexities. Also, the intensional version is much more interesting, since it gave rise to homotopy type theory. Thus, this work will introduce computational paths as an alternative way of formalizing the intensional type theory. 
+
+\section{Conclusion}
+
+In this chapter, we have introduced the basic types of type theory. We showed how to construct and compute using those types. We have also highlighted the essential difference between definitional equality and propositional equality. Based on this difference, we showed how to construct a type based on propositional equality, called identity type. 
+
+A good understanding of the basic concepts of this chapter is essential to understand the main results of this work. In further chapters, we are going to propose a different way of formalizing intensional identity type. We are going to compare the two approaches using the basic constructions shown in this chapter. In the next chapter, we are going to introduce the basic concepts of another theory essential to the results of this work: category theory.
