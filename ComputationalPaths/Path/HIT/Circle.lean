@@ -372,11 +372,65 @@ def circleLoopPow (n : Nat) : CircleLoopQuot :=
       (x := circleLoopClass)
 
 -- concatenation path.
--- @[simp] theorem circleLoopPow_ofLoopPathPow (n : Nat) :
---     circleLoopPow n =
---       LoopQuot.ofLoop (A := Circle) (a := circleBase)
---         (circleLoopPathPow n) := by
---   admit
+@[simp] theorem circleLoopPow_ofLoopPathPow (n : Nat) :
+    circleLoopPow n =
+      LoopQuot.ofLoop (A := Circle) (a := circleBase)
+        (circleLoopPathPow n) := by
+  induction n with
+  | zero =>
+      simp [circleLoopPow, circleLoopPathPow]
+  | succ n ih =>
+      have hstep :
+          circleLoopPow (Nat.succ n)
+            = LoopQuot.comp (circleLoopPow n) circleLoopClass :=
+        circleLoopPow_succ (n := n)
+      calc
+        circleLoopPow (Nat.succ n)
+            = LoopQuot.comp (circleLoopPow n) circleLoopClass := hstep
+        _ = LoopQuot.comp
+              (LoopQuot.ofLoop (A := Circle) (a := circleBase)
+                (circleLoopPathPow n))
+              (LoopQuot.ofLoop (A := Circle) (a := circleBase) circleLoop) := by
+              simpa [ih]
+        _ = LoopQuot.ofLoop (A := Circle) (a := circleBase)
+              (Path.trans (circleLoopPathPow n) circleLoop) := rfl
+        _ = LoopQuot.ofLoop (A := Circle) (a := circleBase)
+              (circleLoopPathPow (Nat.succ n)) := by
+              simp [circleLoopPathPow]
+
+-- Evaluate the lifted encoding on natural powers of the fundamental loop.
+@[simp] theorem circleEncodeLift_circleLoopPow (n : Nat) :
+    circleEncodeLift (circleLoopPow n) = (n : Int) := by
+  induction n with
+  | zero =>
+      have h0 := circleLoopPow_ofLoopPathPow (n := 0)
+      have hEnc := circleEncodeLift_ofLoop (p := circleLoopPathPow 0)
+      simpa [h0, circleLoopPathPow, circleEncodePath_refl] using hEnc
+  | succ n ih =>
+      have hpow := circleLoopPow_ofLoopPathPow (n := Nat.succ n)
+      have hEnc := circleEncodeLift_ofLoop (p := circleLoopPathPow (Nat.succ n))
+      have hPrev := circleEncodeLift_ofLoop (p := circleLoopPathPow n)
+      have hRew : circleEncodeLift (circleLoopPow (Nat.succ n))
+            = circleEncodePath (circleLoopPathPow (Nat.succ n)) := by
+        simpa [hpow] using hEnc
+      have hPrev' : circleEncodeLift (circleLoopPow n)
+            = circleEncodePath (circleLoopPathPow n) := by
+        have hpowPrev := circleLoopPow_ofLoopPathPow (n := n)
+        simpa [hpowPrev] using hPrev
+      calc
+        circleEncodeLift (circleLoopPow (Nat.succ n))
+            = circleEncodePath (circleLoopPathPow (Nat.succ n)) := hRew
+        _ = circleEncodePath
+              (Path.trans (circleLoopPathPow n) circleLoop) := by
+              simp [circleLoopPathPow]
+        _ = circleEncodePath (circleLoopPathPow n) + 1 :=
+              circleEncodePath_trans_loop (p := circleLoopPathPow n)
+        _ = circleEncodeLift (circleLoopPow n) + 1 := by
+              simpa [hPrev']
+        _ = (Int.ofNat n) + 1 := by
+              simpa [ih]
+        _ = (Int.ofNat (Nat.succ n)) := by
+              simpa using (Int.ofNat_succ n).symm
 
 -- Evaluate the lifted encoding on natural powers of the fundamental loop.
 -- @[simp] theorem circleEncodeLift_circleLoopPow (n : Nat) :
@@ -1027,3 +1081,4 @@ end
 
 end Path
 end ComputationalPaths
+
