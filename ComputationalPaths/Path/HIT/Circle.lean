@@ -894,25 +894,35 @@ subtracts `1`. -/
   exact circleEncode_inv_circleLoopClass
 
 -- Step law: encoding `decode (z + 1)` increases by one.
--- Step lemma sketch (commented out to avoid universe friction in Eq.trans):
 -- @[simp] theorem circleEncode_circleDecode_add_one (z : Int) :
 --     circleEncode (circleDecode (z + 1))
 --       = circleEncode (circleDecode z) + 1 := by
---   have h := circleDecode_add_one_rw z
---   have e := circleEncode_comp_loop (x := circleDecode z)
---   exact (_root_.congrArg circleEncode h).trans e
+--   change circleEncode (circleLoopZPow (z + 1))
+--       = circleEncode (circleLoopZPow z) + 1
+--   rw [circleLoopZPow_add (m := z) (n := 1), circleLoopZPow_one]
+--   have step :
+--       circleEncode (LoopQuot.comp (circleLoopZPow z) circleLoopClass)
+--         = circleEncode (circleLoopZPow z) + 1 := by
+--     simpa using circleEncode_comp_loop (x := circleLoopZPow z)
+--   exact step
 
 -- Step law: encoding `decode (z + (-1))` decreases by one.
 -- @[simp] theorem circleEncode_circleDecode_add_neg_one (z : Int) :
 --     circleEncode (circleDecode (z + (-1)))
 --       = circleEncode (circleDecode z) - 1 := by
---   have h := circleDecode_add_neg_one_rw z
---   have e := circleEncode_comp_inv_loop (x := circleDecode z)
---   exact (_root_.congrArg circleEncode h).trans e
+--   change circleEncode (circleLoopZPow (z + (-1)))
+--       = circleEncode (circleLoopZPow z) - 1
+--   rw [circleLoopZPow_add (m := z) (n := -1), circleLoopZPow_neg_one]
+--   have step :
+--       circleEncode (LoopQuot.comp (circleLoopZPow z) (LoopQuot.inv circleLoopClass))
+--         = circleEncode (circleLoopZPow z) - 1 := by
+--     simpa using circleEncode_comp_inv_loop (x := circleLoopZPow z)
+--   exact step
 
 end
 end Path
 end ComputationalPaths
+
 
 
 
