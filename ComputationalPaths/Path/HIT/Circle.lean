@@ -272,11 +272,98 @@ theorem circleLoopPathPow_add (m n : Nat) :
 --   admit
 -- Key transport computation: encoding after following the fundamental loop
 -- increases the integer code by `+1` for any starting code value.
-@[simp] axiom circleCode_transport_loop_add1
+@[simp] theorem circleCode_transport_loop_add1
     (x : circleCode circleBase) :
     circleCodeToInt
       (Path.transport (A := Circle) (D := circleCode) circleLoop x)
-      = circleCodeToInt x + 1
+      = circleCodeToInt x + 1 := by
+  -- Abbreviations for the base computation path and the congruence along the loop.
+  let p1 := Path.ofEq circleCode_base
+  let q := Path.congrArg circleCode circleLoop
+  -- Conjugation equality from the circle computation rule.
+  have hEq :
+      Path.trans (Path.symm p1) (Path.trans q p1) =
+        Path.ua circleSuccEquiv := by
+    simpa [p1, q] using circleCode_loop_path
+  -- Apply transport to both sides at `transport p1 x`.
+  have hTrans :=
+    _root_.congrArg
+      (fun (r : Path (A := Type _) Int Int) =>
+        Path.transport (A := Type _) (D := fun X => X) r
+          (Path.transport (A := Type _) (D := fun X => X) p1 x))
+      hEq
+  -- On the left, cancel the symmetric/forward transports.
+  have hLeftStep :=
+    Path.transport_trans (A := Type _) (D := fun X => X)
+      (p := Path.symm p1) (q := Path.trans q p1)
+      (x := Path.transport (A := Type _) (D := fun X => X) p1 x)
+  have hLeftCancel :=
+    _root_.congrArg
+      (fun z =>
+        Path.transport (A := Type _) (D := fun X => X)
+          (Path.trans q p1) z)
+      (Path.transport_symm_left (A := Type _) (D := fun X => X)
+        (p := p1) (x := x))
+  have hLeftSimp :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans (Path.symm p1) (Path.trans q p1))
+        (Path.transport (A := Type _) (D := fun X => X) p1 x)
+      =
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) x := by
+    -- Combine associativity and cancellation steps.
+    exact hLeftStep.trans hLeftCancel
+  -- Combine the above to rewrite the left to `transport (q • p1) x`.
+  have hComb :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) x
+      =
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.ua circleSuccEquiv)
+        (Path.transport (A := Type _) (D := fun X => X) p1 x) := by
+    simpa [hLeftSimp] using hTrans
+  -- Identify the left with the desired LHS via transport laws.
+  have hAssoc :=
+    Path.transport_trans (A := Type _) (D := fun X => X)
+      (p := q) (q := p1) (x := x)
+  have hMove :=
+    (Path.transport_congrArg (A := Circle) (D := circleCode)
+      (p := circleLoop) (x := x))
+  have hLHS :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) x
+      =
+      circleCodeToInt
+        (Path.transport (A := Circle) (D := circleCode) circleLoop x) := by
+    -- transport (q • p1) x = transport p1 (transport q x)
+    have hSplit :
+        Path.transport (A := Type _) (D := fun X => X)
+          (Path.trans q p1) x
+        =
+        Path.transport (A := Type _) (D := fun X => X) p1
+          (Path.transport (A := Type _) (D := fun X => X) q x) := by
+      simpa using hAssoc
+    -- Replace the inner Type-level transport with the Circle transport.
+    have hInner :
+        Path.transport (A := Type _) (D := fun X => X) q x
+        = Path.transport (A := Circle) (D := circleCode) circleLoop x := by
+      simpa using hMove.symm
+    -- Final identification with `circleCodeToInt`.
+    simpa [circleCodeToInt, hSplit, hInner]
+  -- Evaluate the right using univalence and the base transport equality.
+  have hBase :
+      Path.transport (A := Type _) (D := fun X => X) p1 x
+      = circleCodeToInt x := by
+    simpa [circleCodeToInt] using
+      (Path.transport_ofEq (A := Type _) (D := fun X => X)
+        (h := circleCode_base) (x := x))
+  have hRHS :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.ua circleSuccEquiv) (circleCodeToInt x)
+      = circleCodeToInt x + 1 := by
+    simp [Path.ua_beta, circleSuccEquiv]
+  -- Chain the equalities to finish.
+  exact (hLHS.trans hComb).trans (by simpa [hBase] using hRHS)
 
 @[simp] theorem circleEncodePath_trans_loop
     (p : Path circleBase circleBase) :
@@ -378,7 +465,7 @@ def circleLoopPow (n : Nat) : CircleLoopQuot :=
         (circleLoopPathPow n) := by
   induction n with
   | zero =>
-      simp [circleLoopPow, circleLoopPathPow]
+      rfl
   | succ n ih =>
       have hstep :
           circleLoopPow (Nat.succ n)
@@ -390,47 +477,55 @@ def circleLoopPow (n : Nat) : CircleLoopQuot :=
         _ = LoopQuot.comp
               (LoopQuot.ofLoop (A := Circle) (a := circleBase)
                 (circleLoopPathPow n))
+              circleLoopClass := by
+              rw [ih]
+        _ = LoopQuot.comp
+              (LoopQuot.ofLoop (A := Circle) (a := circleBase)
+                (circleLoopPathPow n))
               (LoopQuot.ofLoop (A := Circle) (a := circleBase) circleLoop) := by
-              simpa [ih]
+              rfl
         _ = LoopQuot.ofLoop (A := Circle) (a := circleBase)
-              (Path.trans (circleLoopPathPow n) circleLoop) := rfl
+              (Path.trans (circleLoopPathPow n) circleLoop) := by
+              exact
+                (LoopQuot.ofLoop_trans (A := Circle) (a := circleBase)
+                  (p := circleLoopPathPow n) (q := circleLoop)).symm
         _ = LoopQuot.ofLoop (A := Circle) (a := circleBase)
               (circleLoopPathPow (Nat.succ n)) := by
-              simp [circleLoopPathPow]
+              -- Unfold the definition of the successor step for `circleLoopPathPow`.
+              rfl
 
 -- Evaluate the lifted encoding on natural powers of the fundamental loop.
 @[simp] theorem circleEncodeLift_circleLoopPow (n : Nat) :
     circleEncodeLift (circleLoopPow n) = (n : Int) := by
   induction n with
   | zero =>
-      have h0 := circleLoopPow_ofLoopPathPow (n := 0)
-      have hEnc := circleEncodeLift_ofLoop (p := circleLoopPathPow 0)
-      simpa [h0, circleLoopPathPow, circleEncodePath_refl] using hEnc
+      -- Unfold to the reflexive loop and evaluate.
+      change circleEncodeLift LoopQuot.id = (0 : Int)
+      change circleEncodePath (Path.refl circleBase) = 0
+      exact circleEncodePath_refl
   | succ n ih =>
       have hpow := circleLoopPow_ofLoopPathPow (n := Nat.succ n)
-      have hEnc := circleEncodeLift_ofLoop (p := circleLoopPathPow (Nat.succ n))
-      have hPrev := circleEncodeLift_ofLoop (p := circleLoopPathPow n)
       have hRew : circleEncodeLift (circleLoopPow (Nat.succ n))
             = circleEncodePath (circleLoopPathPow (Nat.succ n)) := by
-        simpa [hpow] using hEnc
+        -- Rewrite to `ofLoop` and apply the quotient-lift reduction.
+        rw [hpow]; rfl
+      have hpowPrev := circleLoopPow_ofLoopPathPow (n := n)
       have hPrev' : circleEncodeLift (circleLoopPow n)
             = circleEncodePath (circleLoopPathPow n) := by
-        have hpowPrev := circleLoopPow_ofLoopPathPow (n := n)
-        simpa [hpowPrev] using hPrev
+        rw [hpowPrev]; rfl
       calc
         circleEncodeLift (circleLoopPow (Nat.succ n))
             = circleEncodePath (circleLoopPathPow (Nat.succ n)) := hRew
         _ = circleEncodePath
-              (Path.trans (circleLoopPathPow n) circleLoop) := by
-              simp [circleLoopPathPow]
+              (Path.trans (circleLoopPathPow n) circleLoop) := rfl
         _ = circleEncodePath (circleLoopPathPow n) + 1 :=
               circleEncodePath_trans_loop (p := circleLoopPathPow n)
         _ = circleEncodeLift (circleLoopPow n) + 1 := by
-              simpa [hPrev']
+              rw [hPrev']
         _ = (Int.ofNat n) + 1 := by
-              simpa [ih]
+              exact _root_.congrArg (fun z : Int => z + 1) ih
         _ = (Int.ofNat (Nat.succ n)) := by
-              simpa using (Int.ofNat_succ n).symm
+              exact (Int.ofNat_succ n).symm
 
 -- Evaluate the lifted encoding on natural powers of the fundamental loop.
 -- @[simp] theorem circleEncodeLift_circleLoopPow (n : Nat) :
