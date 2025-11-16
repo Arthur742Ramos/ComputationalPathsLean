@@ -270,13 +270,27 @@ theorem circleLoopPathPow_add (m n : Nat) :
 -- @[simp] theorem circleEncodePath_trans_loop (p : Path circleBase circleBase) :
 --   circleEncodePath (Path.trans p circleLoop) = circleEncodePath p + 1 := by
 --   admit
-@[simp] axiom circleEncodePath_trans_loop
+-- Key transport computation: encoding after following the fundamental loop
+-- increases the integer code by `+1` for any starting code value.
+@[simp] axiom circleCode_transport_loop_add1
+    (x : circleCode circleBase) :
+    circleCodeToInt
+      (Path.transport (A := Circle) (D := circleCode) circleLoop x)
+      = circleCodeToInt x + 1
+
+@[simp] theorem circleEncodePath_trans_loop
     (p : Path circleBase circleBase) :
     circleEncodePath (Path.trans p circleLoop) =
-      circleEncodePath p + 1
+      circleEncodePath p + 1 := by
+  have := circleCode_transport_loop_add1
+    (x := Path.transport (A := Circle) (D := circleCode) p circleCodeZero)
+  simpa [circleEncodePath, circleEncodeRaw, Path.transport_trans]
+    using this
 
 -- Encoding of the fundamental loop evaluates to `1`.
-@[simp] axiom circleEncodePath_loop : circleEncodePath circleLoop = 1
+@[simp] theorem circleEncodePath_loop : circleEncodePath circleLoop = 1 := by
+  have := circleCode_transport_loop_add1 (x := circleCodeZero)
+  simpa [circleEncodePath, circleEncodeRaw] using this
 
 -- moved below after `circleEncodeLift` definition
 
