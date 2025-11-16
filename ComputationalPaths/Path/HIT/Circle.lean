@@ -823,6 +823,20 @@ with actual constructions derived from the higher-inductive semantics.
   change circleEncodePath circleLoop = 1
   exact circleEncodePath_loop
 
+@[simp] theorem circleEncode_inv_circleLoopClass :
+    circleEncode (LoopQuot.inv circleLoopClass) = -1 := by
+  change circleEncodeLift (LoopQuot.inv circleLoopClass) = -1
+  -- Move to the raw path using `ofLoop_symm`.
+  have hsymm : LoopQuot.inv circleLoopClass =
+      LoopQuot.ofLoop (A := Circle) (a := circleBase) (Path.symm circleLoop) := by
+    change LoopQuot.inv (LoopQuot.ofLoop (A := Circle) (a := circleBase) circleLoop) = _
+    exact
+      (LoopQuot.ofLoop_symm (A := Circle) (a := circleBase)
+        (p := circleLoop)).symm
+  -- Evaluate via the raw-path encoding.
+  rw [hsymm, circleEncodeLift_ofLoop]
+  exact circleEncodePath_symm_loop
+
 /-- Winding-number terminology for the map `π₁(S¹) → ℤ`. -/
 @[simp] def circleWindingNumber : circlePiOne → Int :=
   circleEncode
