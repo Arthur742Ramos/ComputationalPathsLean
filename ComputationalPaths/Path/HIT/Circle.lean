@@ -709,242 +709,54 @@ plan to establish.  They are left as axioms for now so downstream developments
 can proceed against a stable interface; future work will inhabit this record
 with actual constructions derived from the higher-inductive semantics.
 -/
-structure CircleFundamentalGroupPlan where
-  /-- Map loops on the circle to integers (winding number). -/
-  encode : CircleLoopQuot → Int
-  /-- Encoding respects loop multiplication. -/
-  encode_mul : ∀ x y, encode (LoopQuot.comp x y) = encode x + encode y
-  /-- Encoding sends the identity loop to zero. -/
-  encode_one : encode LoopQuot.id = 0
-  /-- Encoding sends inverses to negation. -/
-  encode_inv : ∀ x, encode (LoopQuot.inv x) = - encode x
-  /-- Map integers back to loops (iterated fundamental loop). -/
-  decode : Int → CircleLoopQuot
-  /-- The abstract decoder coincides with the concrete iteration of loops. -/
-  decode_eq_concrete : ∀ n, decode n = circleDecodeConcrete n
-  /-- Encode then decode yields the original integer. -/
-  encode_decode : ∀ n, encode (decode n) = n
-  /-- Decode then encode yields the original loop class. -/
-  decode_encode : ∀ x, decode (encode x) = x
-
-/-- Placeholder axiom instantiating the planned equivalence between π₁(S¹)
-and ℤ.  The eventual formalisation will replace this axiom with an actual
-construction built from the rewrite-normalised HIT semantics. -/
-axiom circleFundamentalGroupPlan : CircleFundamentalGroupPlan
-
-/-- Concrete interface for the planned equivalence between `CircleLoopQuot`
-and `ℤ`.  All definitions and lemmas below are mere wrappers around the
-fields of `circleFundamentalGroupPlan`, providing ergonomic names for
-downstream developments. -/
+-- Concrete encode/decode without plan
 @[simp] def circleEncode : CircleLoopQuot → Int :=
-  circleFundamentalGroupPlan.encode
+  circleEncodeLift
 
 @[simp] def circleDecode : Int → CircleLoopQuot :=
-  circleFundamentalGroupPlan.decode
+  circleLoopZPow
 
 @[simp] theorem circleDecode_eq_concrete (n : Int) :
-    circleDecode n = circleDecodeConcrete n :=
-  circleFundamentalGroupPlan.decode_eq_concrete n
-
-@[simp] theorem circleEncode_mul (x y : CircleLoopQuot) :
-    circleEncode (LoopQuot.comp x y) =
-      circleEncode x + circleEncode y :=
-  circleFundamentalGroupPlan.encode_mul x y
-
-@[simp] theorem circleEncode_one : circleEncode LoopQuot.id = 0 :=
-  circleFundamentalGroupPlan.encode_one
-
-@[simp] theorem circleEncode_inv (x : CircleLoopQuot) :
-    circleEncode (LoopQuot.inv x) = - circleEncode x :=
-  circleFundamentalGroupPlan.encode_inv x
+    circleDecode n = circleDecodeConcrete n := rfl
 
 @[simp] theorem circleDecode_add (m n : Int) :
     circleDecode (m + n) =
-      LoopQuot.comp (circleDecode m) (circleDecode n) :=
-  by
-    have hSum := circleDecode_eq_concrete (n := m + n)
-    have hm := circleDecode_eq_concrete (n := m)
-    have hn := circleDecode_eq_concrete (n := n)
-    rw [hSum, circleDecodeConcrete_add (m := m) (n := n), hm, hn]
+      LoopQuot.comp (circleDecode m) (circleDecode n) := by
+  change circleLoopZPow (m + n) = LoopQuot.comp (circleLoopZPow m) (circleLoopZPow n)
+  exact circleLoopZPow_add (m := m) (n := n)
 
 @[simp] theorem circleDecode_zero : circleDecode 0 = LoopQuot.id :=
-  by
-    have h := circleDecode_eq_concrete (n := 0)
-    rw [h, circleDecodeConcrete_zero]
+  circleLoopZPow_zero
 
 @[simp] theorem circleDecode_ofNat (n : Nat) :
-    circleDecode (Int.ofNat n) = circleLoopPow n := by
-  calc
-    circleDecode (Int.ofNat n)
-        = circleDecodeConcrete (Int.ofNat n) :=
-            circleDecode_eq_concrete (n := Int.ofNat n)
-    _ = circleLoopPow n := circleDecodeConcrete_ofNat n
+    circleDecode (Int.ofNat n) = circleLoopPow n := rfl
 
 @[simp] theorem circleDecode_ofNat_succ (n : Nat) :
     circleDecode (Int.ofNat n.succ) =
       LoopQuot.comp (circleLoopPow n) circleLoopClass := by
-  calc
-    circleDecode (Int.ofNat (Nat.succ n))
-        = circleDecodeConcrete (Int.ofNat (Nat.succ n)) :=
-            circleDecode_eq_concrete (n := Int.ofNat (Nat.succ n))
-    _ = LoopQuot.comp (circleLoopPow n) circleLoopClass :=
-            circleDecodeConcrete_ofNat_succ (n := n)
+  change circleLoopZPow (Int.ofNat (Nat.succ n)) = _
+  simp [circleLoopPathPow, circleLoopZPow, circleLoopPow_succ]
 
 @[simp] theorem circleDecode_one : circleDecode 1 = circleLoopClass := by
-  calc
-    circleDecode 1
-        = circleDecode (Int.ofNat 1) := rfl
-    _ = circleLoopPow 1 := circleDecode_ofNat 1
-    _ = circleLoopClass := circleLoopPow_one
+  change circleLoopZPow 1 = _
+  simp
 
 @[simp] theorem circleDecode_neg (n : Int) :
     circleDecode (-n) = LoopQuot.inv (circleDecode n) :=
-  by
-    have hInv :=
-      _root_.congrArg LoopQuot.inv
-        (circleDecode_eq_concrete (n := n)).symm
-    calc
-      circleDecode (-n)
-          = circleDecodeConcrete (-n) :=
-              circleDecode_eq_concrete (n := -n)
-      _ = LoopQuot.inv (circleDecodeConcrete n) :=
-              circleDecodeConcrete_neg (z := n)
-      _ = LoopQuot.inv (circleDecode n) := hInv
+  circleLoopZPow_neg (z := n)
 
 @[simp] theorem circleDecode_negSucc (n : Nat) :
     circleDecode (Int.negSucc n) =
-      LoopQuot.inv (circleLoopPow (Nat.succ n)) := by
-  calc
-    circleDecode (Int.negSucc n)
-        = circleDecodeConcrete (Int.negSucc n) :=
-            circleDecode_eq_concrete (n := Int.negSucc n)
-    _ = LoopQuot.inv (circleLoopPow (Nat.succ n)) :=
-            circleDecodeConcrete_negSucc (n := n)
+      LoopQuot.inv (circleLoopPow (Nat.succ n)) := rfl
 
 @[simp] theorem circleDecode_neg_one :
     circleDecode (-1) = LoopQuot.inv circleLoopClass := by
-  calc
-    circleDecode (-1)
-        = circleDecodeConcrete (-1) :=
-            circleDecode_eq_concrete (n := -1)
-    _ = LoopQuot.inv circleLoopClass := circleDecodeConcrete_neg_one
+  change circleLoopZPow (-1) = _; simp
 
-theorem circleDecode_sub (m n : Int) :
-    circleDecode (m - n) =
-      LoopQuot.comp (circleDecode m) (LoopQuot.inv (circleDecode n)) := by
-  simpa only [Int.sub_eq_add_neg, circleDecode_neg,
-    Int.add_comm, Int.add_left_comm, Int.add_assoc]
-    using circleDecode_add (m := m) (n := -n)
-
-@[simp] theorem circleEncode_decode (n : Int) :
-    circleEncode (circleDecode n) = n :=
-  circleFundamentalGroupPlan.encode_decode n
-
-@[simp] theorem circleDecode_encode (x : CircleLoopQuot) :
-    circleDecode (circleEncode x) = x :=
-  circleFundamentalGroupPlan.decode_encode x
-
-/-- `circleLoopZPow` is left-inverse to `circleEncode`. -/
-@[simp] theorem circleEncode_circleLoopZPow (z : Int) :
-    circleEncode (circleLoopZPow z) = z := by
-  have hz := circleDecode_eq_concrete (n := z)
-  have h := (_root_.congrArg circleEncode hz) ▸ circleEncode_decode (n := z)
-  dsimp [circleDecodeConcrete] at h
-  exact h
-
-/-- `circleLoopZPow` is right-inverse to `circleEncode`. -/
-@[simp] theorem circleLoopZPow_encode (x : CircleLoopQuot) :
-    circleLoopZPow (circleEncode x) = x := by
-  have hx := circleDecode_eq_concrete (n := circleEncode x)
-  have h := hx ▸ circleDecode_encode (x := x)
-  dsimp [circleDecodeConcrete] at h
-  exact h
-
-theorem circleEncode_leftInverse :
-    Function.LeftInverse circleEncode circleLoopZPow :=
-  fun z => circleEncode_circleLoopZPow (z := z)
-
-theorem circleEncode_rightInverse :
-    Function.RightInverse circleEncode circleLoopZPow :=
-  fun x => circleLoopZPow_encode (x := x)
-
-theorem circleLoopZPow_injective :
-    Function.Injective circleLoopZPow :=
-  circleEncode_leftInverse.injective
-
-theorem circleLoopZPow_surjective :
-    Function.Surjective circleLoopZPow :=
-  circleEncode_rightInverse.surjective
-
-theorem circleLoopZPow_eq_iff (z₁ z₂ : Int) :
-    circleLoopZPow z₁ = circleLoopZPow z₂ ↔ z₁ = z₂ :=
-  circleLoopZPow_injective.eq_iff
-
-theorem circleLoopZPow_exists (x : CircleLoopQuot) :
-    ∃ z : Int, circleLoopZPow z = x :=
-  circleLoopZPow_surjective x
-
-theorem circleLoopZPow_exists_unique (x : CircleLoopQuot) :
-    ∃ z : Int, circleLoopZPow z = x ∧
-        ∀ z', circleLoopZPow z' = x → z' = z := by
-  refine ⟨circleEncode x, circleLoopZPow_encode (x := x), ?_⟩
-  intro z' hz'
-  have hEncode := _root_.congrArg circleEncode hz'
-  have hzPow := circleEncode_circleLoopZPow (z := z')
-  calc
-    z' = circleEncode (circleLoopZPow z') := hzPow.symm
-    _ = circleEncode x := hEncode
-
-theorem circleLoopZPow_exists_unique_left (x : CircleLoopQuot) :
-    ∃ z : Int, x = circleLoopZPow z ∧
-        ∀ z', x = circleLoopZPow z' → z' = z := by
-  obtain ⟨z, hz, huniq⟩ := circleLoopZPow_exists_unique x
-  refine ⟨z, hz.symm, ?_⟩
-  intro z' hz'
-  exact huniq z' hz'.symm
-
-theorem circleEncode_injective : Function.Injective circleEncode := by
-  intro x y h
-  have hx := _root_.congrArg circleLoopZPow h
-  have hxLeft := (circleLoopZPow_encode (x := x)).symm
-  have hxRight := circleLoopZPow_encode (x := y)
-  exact hxLeft.trans (hx.trans hxRight)
-
-@[simp] theorem circleLoopQuot_eq_iff_encode_eq (x y : CircleLoopQuot) :
-    x = y ↔ circleEncode x = circleEncode y := by
-  constructor
-  · intro h; cases h; rfl
-  · intro h; exact circleEncode_injective h
-
-@[simp] theorem circleLoopGroup_mul_comm (x y : CircleLoopQuot) :
-    circleLoopGroup.mul x y = circleLoopGroup.mul y x := by
-  apply circleEncode_injective
-  have hx := circleEncode_mul x y
-  have hy := circleEncode_mul y x
-  calc
-    circleEncode (circleLoopGroup.mul x y)
-        = circleEncode x + circleEncode y := hx
-    _ = circleEncode y + circleEncode x := by
-          exact Int.add_comm _ _
-    _ = circleEncode (circleLoopGroup.mul y x) := hy.symm
-
-@[simp] theorem circlePiOne_eq_iff_encode_eq (x y : circlePiOne) :
-    x = y ↔ circleEncode x = circleEncode y :=
-  circleLoopQuot_eq_iff_encode_eq (x := x) (y := y)
-
-@[simp] theorem circlePiOneGroup_mul_comm (x y : circlePiOne) :
-    circlePiOneGroup.mul x y = circlePiOneGroup.mul y x := by
-  apply circleEncode_injective
-  have hx := circleEncode_mul x y
-  have hy := circleEncode_mul y x
-  calc
-    circleEncode (circlePiOneGroup.mul x y)
-        = circleEncode x + circleEncode y := hx
-    _ = circleEncode y + circleEncode x := by
-          exact Int.add_comm _ _
-    _ = circleEncode (circlePiOneGroup.mul y x) := hy.symm
-
-/-- Winding-number terminology for the map `π₁(S¹) → ℤ`. -/
+@[simp] theorem circleEncode_circleLoopClass :
+    circleEncode circleLoopClass = 1 := by
+  change circleEncodePath circleLoop = 1
+  exact circleEncodePath_loop/-- Winding-number terminology for the map `π₁(S¹) → ℤ`. -/
 @[simp] def circleWindingNumber : circlePiOne → Int :=
   circleEncode
 
@@ -1176,4 +988,5 @@ end
 
 end Path
 end ComputationalPaths
+
 
