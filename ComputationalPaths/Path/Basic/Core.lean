@@ -538,7 +538,7 @@ theorem transport_congrArg {D : A → Type w}
   cases p with
   | mk steps proof =>
       cases proof
-      simp [transport, congrArg]
+      simp [transport]
 
 /-- Unary congruence preserves concatenation. -/
 @[simp] theorem congrArg_trans (f : A → B)

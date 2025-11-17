@@ -40,12 +40,13 @@ the equivalence. -/
     ua_beta (A := A) (B := B) e (x := e.invFun y)
   have hEval : Path.transport (A := Type u) (D := fun X => X)
       (ua (A := A) (B := B) e) (e.invFun y) = y := by
-    simpa [hTransport, e.right_inv y]
+    simp [hTransport, e.right_inv y]
   -- Cancel the forward transport via the general `transport_symm_left` lemma.
   have hSymm :=
     Path.transport_symm_left (A := Type u) (D := fun X => X)
       (p := ua (A := A) (B := B) e) (x := e.invFun y)
-  simpa [hEval] using hSymm
+  simp [hEval] at hSymm
+  exact hSymm
 
 end Path
 end ComputationalPaths

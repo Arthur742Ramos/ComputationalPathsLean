@@ -101,10 +101,10 @@ def circleSuccEquiv : SimpleEquiv Int Int where
   invFun := fun z => z - 1
   left_inv := by
     intro z
-    simpa using Int.add_sub_cancel z 1
+    simp
   right_inv := by
     intro z
-    simpa using Int.sub_add_cancel z 1
+    simp
 
 private def circleCodeData : CircleRecData (Type _) where
   base := Int
@@ -266,7 +266,7 @@ theorem circleLoopPathPow_add (m n : Nat) :
 
 -- Small arithmetic helper used in encoding lemmas.
 @[simp] theorem int_zero_sub_one : (0 : Int) - 1 = (-1 : Int) := by
-  simpa using Int.add_sub_cancel (-1) 1
+  simp
 
 -- Encoding after concatenating with the fundamental loop increments by `1`.
 -- Placeholder: a future lemma will show that encoding commutes with
@@ -438,7 +438,7 @@ theorem circleLoopPathPow_add (m n : Nat) :
         have : circleEncodePath (Path.refl circleBase) = (0 : Int) :=
           circleEncodePath_refl
         simpa using _root_.congrArg (fun t => t - 1) this
-      _ = -1 := by simpa [int_zero_sub_one]
+      _ = -1 := by simp
 
 -- moved below after `circleEncodeLift` definition
 
@@ -482,7 +482,8 @@ abbrev circlePiOneGroup : LoopGroup Circle circleBase :=
     (by
       intro p q h
       have hrw : RwEq p q := by
-        simpa [rwEqSetoid_r] using h
+        change RwEq p q at h
+        exact h
       exact circleEncodePath_rweq (h := hrw))
 
 @[simp] theorem circleEncodeLift_ofLoop (p : Path circleBase circleBase) :
@@ -586,7 +587,7 @@ def circleLoopPow (n : Nat) : CircleLoopQuot :=
         _ = (Int.ofNat n) + 1 := by
               exact _root_.congrArg (fun z : Int => z + 1) ih
         _ = (Int.ofNat (Nat.succ n)) := by
-              exact (Int.ofNat_succ n).symm
+              simp [Int.natCast_succ]
 
 -- Evaluate the lifted encoding on natural powers of the fundamental loop.
 -- @[simp] theorem circleEncodeLift_circleLoopPow (n : Nat) :
@@ -726,7 +727,7 @@ equalities to ordinary equalities when proving `decode ∘ encode = id`.
       (LoopQuot.ofLoop (A := Circle) (a := circleBase)
         (circleLoopPathPow n))
       = (circleLoopPathPow n).toEq
-  simp [circleLoopPow_ofLoopPathPow]
+  simp
 
 @[simp] theorem circleLoopZPow_toEq (z : Int) :
     PathRwQuot.toEq (A := Circle) (circleLoopZPow z)
@@ -736,14 +737,14 @@ equalities to ordinary equalities when proving `decode ∘ encode = id`.
       -- Reduce to the natural-power case.
       change PathRwQuot.toEq (A := Circle) (circleLoopPow n)
         = (circleLoopPathPow n).toEq
-      simpa using circleLoopPow_toEq (n := n)
+      exact circleLoopPow_toEq (n := n)
   | negSucc n =>
       -- Use `toEq_symm` together with the natural-power lemma.
       change PathRwQuot.toEq (A := Circle)
           (LoopQuot.inv (circleLoopPow (Nat.succ n)))
         = (Path.symm (circleLoopPathPow (Nat.succ n))).toEq
       -- `toEq_symm` on the quotient and on raw paths align.
-      simp [circleLoopZPow_negSucc]
+      simp
 
 -- Subtraction law for the concrete decoder is provided in CircleStep.
 
