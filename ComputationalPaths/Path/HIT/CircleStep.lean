@@ -10,19 +10,21 @@ open SimpleEquiv
 
 @[simp] theorem circleEncode_circleDecode_add_one (z : Int) :
   circleEncode (circleDecode (z + 1)) = circleEncode (circleDecode z) + 1 := by
-  change circleEncode (circleLoopZPow (z + 1))
-      = circleEncode (circleLoopZPow z) + 1
-  rw [circleLoopZPow_add (m := z) (n := 1), circleLoopZPow_one]
-  have hx := circleEncode_comp_loop (x := circleLoopZPow z)
-  exact hx
+  -- Use the circle-specific additivity of decode, then apply the +1 step.
+  have h := circleDecode_add_proved (m := z) (n := 1)
+  have : circleDecode (z + 1) =
+      LoopQuot.comp (circleDecode z) circleLoopClass := by
+    simpa using h
+  simpa [this] using circleEncode_comp_loop (x := circleDecode z)
 
 @[simp] theorem circleEncode_circleDecode_add_neg_one (z : Int) :
   circleEncode (circleDecode (z + (-1))) = circleEncode (circleDecode z) - 1 := by
-  change circleEncode (circleLoopZPow (z + (-1)))
-      = circleEncode (circleLoopZPow z) - 1
-  rw [circleLoopZPow_add (m := z) (n := -1), circleLoopZPow_neg_one]
-  have hx := circleEncode_comp_inv_loop (x := circleLoopZPow z)
-  exact hx
+  -- Use the circle-specific additivity of decode, then apply the -1 step.
+  have h := circleDecode_add_proved (m := z) (n := -1)
+  have : circleDecode (z + (-1)) =
+      LoopQuot.comp (circleDecode z) (LoopQuot.inv circleLoopClass) := by
+    simpa [circleDecode_eq_concrete] using h
+  simpa [this] using circleEncode_comp_inv_loop (x := circleDecode z)
 
 /-- Encode∘decode identity on negative integers by Nat induction. -/
 theorem circleEncode_circleDecode_of_negNat (k : Nat) :
@@ -118,6 +120,62 @@ noncomputable def circlePiOneEquivInt : SimpleEquiv circlePiOne Int where
     circleWindingNumber (circleDecode z) = z := by
   change circleEncode (circleDecode z) = z
   exact circleEncode_circleDecode (z := z)
+
+/-!
+Concrete decode algebra: addition, subtraction, and group-compatibility with
+π₁ multiplication. These mirror results previously stated in `Circle.lean` but
+are proved here using the circle-specific `circleDecode_add_proved`.
+-/
+
+@[simp] theorem circleDecodeConcrete_add (m n : Int) :
+    circleDecodeConcrete (m + n) =
+      LoopQuot.comp (circleDecodeConcrete m)
+        (circleDecodeConcrete n) := by
+  -- `circleDecodeConcrete` is just `circleDecode`.
+  simpa [circleDecode_eq_concrete] using
+    circleDecode_add_proved (m := m) (n := n)
+
+theorem circleDecodeConcrete_sub (m n : Int) :
+    circleDecodeConcrete (m - n) =
+      LoopQuot.comp (circleDecodeConcrete m)
+        (LoopQuot.inv (circleDecodeConcrete n)) := by
+  simpa [circleDecode_eq_concrete]
+    using (by
+      simpa only [Int.sub_eq_add_neg, circleDecodeConcrete_neg,
+        Int.add_comm, Int.add_left_comm, Int.add_assoc]
+        using circleDecodeConcrete_add (m := m) (n := -n))
+
+@[simp] theorem circleLoopGroup_mul_decodeConcrete (m n : Int) :
+    circleLoopGroup.mul (circleDecodeConcrete m)
+        (circleDecodeConcrete n) =
+      circleDecodeConcrete (m + n) := by
+  change
+    LoopQuot.comp (circleDecodeConcrete m)
+      (circleDecodeConcrete n) =
+        circleDecodeConcrete (m + n)
+  exact
+    (circleDecodeConcrete_add (m := m) (n := n)).symm
+
+@[simp] theorem circlePiOneGroup_mul_decodeConcrete (m n : Int) :
+    circlePiOneGroup.mul (circleDecodeConcrete m)
+        (circleDecodeConcrete n) =
+      circleDecodeConcrete (m + n) := by
+  change
+    circleLoopGroup.mul (circleDecodeConcrete m)
+        (circleDecodeConcrete n) =
+      circleDecodeConcrete (m + n)
+  exact
+    circleLoopGroup_mul_decodeConcrete (m := m) (n := n)
+
+theorem circleLoopGroup_mul_decodeConcrete_sub (m n : Int) :
+    circleLoopGroup.mul (circleDecodeConcrete m)
+        (LoopQuot.inv (circleDecodeConcrete n)) =
+      circleDecodeConcrete (m - n) := by
+  change
+    LoopQuot.comp (circleDecodeConcrete m)
+        (LoopQuot.inv (circleDecodeConcrete n)) =
+      circleDecodeConcrete (m - n)
+  exact (circleDecodeConcrete_sub (m := m) (n := n)).symm
 
 /-!
 Decode respects integer addition (circle-specific proof).

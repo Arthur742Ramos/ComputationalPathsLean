@@ -129,8 +129,8 @@ variable {A : Type u} {a : A}
 
 /-!
 Support lemmas: cancellation and inverse-of-composition.
-These will be useful to derive exponent arithmetic (e.g. `zpow_add`) from
-the strict group laws already available on `LoopQuot`.
+These are used to derive exponent arithmetic from
+the strict group laws on `LoopQuot`.
 -/
 
 @[simp] theorem comp_right_cancel {x y z : LoopQuot A a}
@@ -304,11 +304,6 @@ theorem pow_add (x : LoopQuot A a) (m n : Nat) :
   change pow x (m + n) = comp (pow x m) (pow x n)
   exact h
 
-/-- Placeholder axiom: integer powers of loops respect addition.  Once the
-rewrite semantics for `LoopQuot` are further developed this lemma should be
-proved from first principles rather than assumed. -/
-@[simp] axiom zpow_add (x : LoopQuot A a) (m n : Int) :
-    zpow x (m + n) = comp (zpow x m) (zpow x n)
 
 end LoopQuot
 

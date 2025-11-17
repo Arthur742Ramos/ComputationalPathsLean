@@ -665,14 +665,7 @@ def circleLoopZPow (z : Int) : CircleLoopQuot :=
     LoopQuot.zpow_ofNat_add (A := Circle) (a := circleBase)
       (x := circleLoopClass) m n
 
-/-- Integer addition rule for iterated circle loops. -/
-@[simp] theorem circleLoopZPow_add (m n : Int) :
-    circleLoopZPow (m + n) =
-      LoopQuot.comp (circleLoopZPow m) (circleLoopZPow n) := by
-  unfold circleLoopZPow
-  exact
-    LoopQuot.zpow_add (A := Circle) (a := circleBase)
-      (x := circleLoopClass) m n
+-- Integer addition rule for iterated circle loops was relocated to CircleStep.
 
 /-- Decode map ℤ → π₁(S¹), built by iterating the fundamental loop according
 to the given integer.  The accompanying lemmas establish its homomorphic
@@ -717,12 +710,7 @@ def circleDecodeConcrete : Int → CircleLoopQuot :=
       LoopQuot.inv (circleDecodeConcrete z) :=
   circleLoopZPow_neg (z := z)
 
-/-- Decoding respects integer addition. -/
-@[simp] theorem circleDecodeConcrete_add (m n : Int) :
-    circleDecodeConcrete (m + n) =
-      LoopQuot.comp (circleDecodeConcrete m)
-        (circleDecodeConcrete n) :=
-  circleLoopZPow_add (m := m) (n := n)
+-- Decoding respects integer addition is provided in CircleStep.
 
 /-!
 Support: relate quotient-level z-powers to raw path z-powers at the
@@ -757,46 +745,13 @@ equalities to ordinary equalities when proving `decode ∘ encode = id`.
       -- `toEq_symm` on the quotient and on raw paths align.
       simp [circleLoopZPow_negSucc]
 
-/-- Subtraction law for the concrete decoder. -/
-theorem circleDecodeConcrete_sub (m n : Int) :
-    circleDecodeConcrete (m - n) =
-      LoopQuot.comp (circleDecodeConcrete m)
-        (LoopQuot.inv (circleDecodeConcrete n)) := by
-  simpa only [Int.sub_eq_add_neg, circleDecodeConcrete_neg,
-    Int.add_comm, Int.add_left_comm, Int.add_assoc]
-    using circleDecodeConcrete_add (m := m) (n := -n)
+-- Subtraction law for the concrete decoder is provided in CircleStep.
 
-@[simp] theorem circleLoopGroup_mul_decodeConcrete (m n : Int) :
-    circleLoopGroup.mul (circleDecodeConcrete m)
-        (circleDecodeConcrete n) =
-      circleDecodeConcrete (m + n) := by
-  change
-    LoopQuot.comp (circleDecodeConcrete m)
-      (circleDecodeConcrete n) =
-        circleDecodeConcrete (m + n)
-  exact
-    (circleDecodeConcrete_add (m := m) (n := n)).symm
+-- Group compatibility lemmas for the concrete decoder are provided in CircleStep.
 
-@[simp] theorem circlePiOneGroup_mul_decodeConcrete (m n : Int) :
-    circlePiOneGroup.mul (circleDecodeConcrete m)
-        (circleDecodeConcrete n) =
-      circleDecodeConcrete (m + n) := by
-  change
-    circleLoopGroup.mul (circleDecodeConcrete m)
-        (circleDecodeConcrete n) =
-      circleDecodeConcrete (m + n)
-  exact
-    circleLoopGroup_mul_decodeConcrete (m := m) (n := n)
+-- Group compatibility lemmas for the concrete decoder are provided in CircleStep.
 
-theorem circleLoopGroup_mul_decodeConcrete_sub (m n : Int) :
-    circleLoopGroup.mul (circleDecodeConcrete m)
-        (LoopQuot.inv (circleDecodeConcrete n)) =
-      circleDecodeConcrete (m - n) := by
-  change
-    LoopQuot.comp (circleDecodeConcrete m)
-        (LoopQuot.inv (circleDecodeConcrete n)) =
-      circleDecodeConcrete (m - n)
-  exact (circleDecodeConcrete_sub (m := m) (n := n)).symm
+-- Subtraction and inverse-multiplication lemma is provided in CircleStep.
 
 @[simp] theorem circleDecodeConcrete_ofNat_add (m n : Nat) :
     circleDecodeConcrete (Int.ofNat m + Int.ofNat n) =
@@ -822,11 +777,7 @@ with actual constructions derived from the higher-inductive semantics.
 @[simp] theorem circleDecode_eq_concrete (n : Int) :
     circleDecode n = circleDecodeConcrete n := rfl
 
-@[simp] theorem circleDecode_add (m n : Int) :
-    circleDecode (m + n) =
-      LoopQuot.comp (circleDecode m) (circleDecode n) := by
-  change circleLoopZPow (m + n) = LoopQuot.comp (circleLoopZPow m) (circleLoopZPow n)
-  exact circleLoopZPow_add (m := m) (n := n)
+-- Additivity of `circleDecode` is provided in CircleStep.
 
 @[simp] theorem circleDecode_zero : circleDecode 0 = LoopQuot.id :=
   circleLoopZPow_zero
