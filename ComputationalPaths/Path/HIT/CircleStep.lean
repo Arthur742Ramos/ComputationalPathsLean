@@ -6,37 +6,34 @@ namespace Path
 
 open SimpleEquiv
 
--- Precise zpow addition specializations avoiding universe issues.
-theorem circleLoopZPow_add_one (z : Int) :
-    circleLoopZPow (z + 1)
-      = LoopQuot.comp (circleLoopZPow z) circleLoopClass := by
-  simpa [circleLoopZPow_one] using
-    (circleLoopZPow_add (m := z) (n := 1))
-
-theorem circleLoopZPow_add_neg_one (z : Int) :
-    circleLoopZPow (z + (-1))
-      = LoopQuot.comp (circleLoopZPow z) (LoopQuot.inv circleLoopClass) := by
-  simpa [circleLoopZPow_neg_one] using
-    (circleLoopZPow_add (m := z) (n := -1))
+set_option maxHeartbeats 1200000
 
 @[simp] theorem circleEncode_circleDecode_add_one (z : Int) :
     circleEncode (circleDecode (z + 1))
       = circleEncode (circleDecode z) + 1 := by
-  -- Work with `circleEncodeLift` to avoid universe mismatch, then fold back.
-  change circleEncodeLift (circleLoopZPow (z + 1))
-      = circleEncodeLift (circleLoopZPow z) + 1
-  have hz := circleLoopZPow_add_one z
-  have eqA := _root_.congrArg circleEncodeLift hz
-  exact eqA.trans (circleEncodeLift_comp_loop (x := circleLoopZPow z))
+  change circleEncodeLift (circleDecode (z + 1))
+      = circleEncodeLift (circleDecode z) + 1
+  have step := circleEncodeLift_comp_loop (x := circleDecode z)
+  have h0 := _root_.congrArg circleEncodeLift (circleDecode_add (m := z) (n := 1))
+  -- h0: encode(decode(z+1)) = encode(comp (decode z) (decode 1))
+  -- convert (decode 1) to circleLoopClass on RHS under encode
+  have hconv :=
+    _root_.congrArg (fun t => circleEncodeLift (LoopQuot.comp (circleDecode z) t))
+      (circleDecode_one)
+  exact (h0.trans hconv).trans step
 
 @[simp] theorem circleEncode_circleDecode_add_neg_one (z : Int) :
     circleEncode (circleDecode (z + (-1)))
       = circleEncode (circleDecode z) - 1 := by
-  change circleEncodeLift (circleLoopZPow (z + (-1)))
-      = circleEncodeLift (circleLoopZPow z) - 1
-  have hz := circleLoopZPow_add_neg_one z
-  have eqA := _root_.congrArg circleEncodeLift hz
-  exact eqA.trans (circleEncodeLift_comp_inv_loop (x := circleLoopZPow z))
+  change circleEncodeLift (circleDecode (z + (-1)))
+      = circleEncodeLift (circleDecode z) - 1
+  have step := circleEncodeLift_comp_inv_loop (x := circleDecode z)
+  have h0 := _root_.congrArg circleEncodeLift (circleDecode_add (m := z) (n := -1))
+  -- convert (decode -1) to inv circleLoopClass
+  have hconv :=
+    _root_.congrArg (fun t => circleEncodeLift (LoopQuot.comp (circleDecode z) t))
+      (circleDecode_neg_one)
+  exact (h0.trans hconv).trans step
 
 /-- Encode∘decode identity on negative integers by Nat induction. -/
 theorem circleEncode_circleDecode_of_negNat (k : Nat) :
@@ -51,10 +48,10 @@ theorem circleEncode_circleDecode_of_negNat (k : Nat) :
       have hneg : -((Nat.succ k : Nat) : Int) = - (k : Int) + (-1) := by
         have hk := (Int.natCast_succ k)
         -- ((k+1) : Int) = (k : Int) + 1; negate both sides and normalise
-        have := congrArg (fun t => -t) hk
+        have hneg1 := _root_.congrArg (fun t => -t) hk
         -- -((k:ℤ)+1) = -(k:ℤ) + (-1)
         simpa [Int.sub_eq_add_neg, Int.add_comm, Int.add_left_comm, Int.add_assoc]
-          using this
+          using hneg1
       -- Apply the step lemma and the induction hypothesis, then normalise -k - 1 to -(k+1)
       calc
         circleEncode (circleDecode (-(Nat.succ k : Int)))
@@ -63,10 +60,8 @@ theorem circleEncode_circleDecode_of_negNat (k : Nat) :
         _ = circleEncode (circleDecode (-(k : Int))) - 1 := step
         _ = -(k : Int) - 1 := by simpa using ih
         _ = -((Nat.succ k : Nat) : Int) := by
-                -- -(k) - 1 = -(k) + (-1) = -(k + 1)
-                simpa [Int.natCast_succ, Int.sub_eq_add_neg,
-                  Int.add_comm, Int.add_left_comm, Int.add_assoc]
-                  using rfl
+                -- Derived from hneg: -((k+1)) = -k + (-1)
+                simpa [Int.sub_eq_add_neg] using hneg.symm
 
 @[simp] theorem circleEncode_circleDecode (z : Int) :
     circleEncode (circleDecode z) = z := by
