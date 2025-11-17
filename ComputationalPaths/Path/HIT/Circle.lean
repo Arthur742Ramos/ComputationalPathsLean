@@ -804,6 +804,7 @@ theorem circleLoopGroup_mul_decodeConcrete_sub (m n : Int) :
         (circleDecodeConcrete (Int.ofNat n)) :=
   circleLoopZPow_ofNat_add (m := m) (n := n)
 
+
 /-- Baseline data describing how π₁(S¹) will be related to ℤ.
 
 These fields capture the encode/decode functions and the coherence facts we

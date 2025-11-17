@@ -1,6 +1,7 @@
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.Rewrite.Quot
+import ComputationalPaths.Path.Rewrite.Quot
 
 namespace ComputationalPaths
 namespace Path
@@ -111,12 +112,143 @@ noncomputable def circlePiOneEquivInt : SimpleEquiv circlePiOne Int where
   right_inv := by
     intro z
     change circleEncode (circleDecode z) = z
-    exact circleEncode_circleDecode (z := z)
+  exact circleEncode_circleDecode (z := z)
 
 @[simp] theorem circleWindingNumber_decode (z : Int) :
     circleWindingNumber (circleDecode z) = z := by
   change circleEncode (circleDecode z) = z
   exact circleEncode_circleDecode (z := z)
+
+/-!
+Decode respects integer addition (circle-specific proof).
+
+We avoid the generic `zpow_add` placeholder by proving that `encode` is
+injective (has left-inverse `decode`) and computing
+`encode (decode m ⋆ decode n)` via the ±1 step laws.
+-/
+
+private theorem circleEncode_comp_decode_ofNat (m : Int) (k : Nat) :
+    circleEncode
+      (LoopQuot.comp (circleDecode m) (circleDecode (Int.ofNat k)))
+      = m + (k : Int) := by
+  induction k with
+  | zero =>
+      -- comp x id = x
+      simpa using (by
+        change circleEncode (LoopQuot.comp (circleDecode m) LoopQuot.id)
+          = m + (0 : Int)
+        simp)
+  | succ k ih =>
+      -- decode (k+1) = decode k ⋆ loop; associate and use the +1 step.
+      have hstep : circleDecode (Int.ofNat k.succ)
+            = LoopQuot.comp (circleDecode (Int.ofNat k)) circleLoopClass := by
+        change circleLoopZPow ((Nat.succ k : Nat) : Int)
+          = LoopQuot.comp (circleLoopPow k) circleLoopClass
+        simpa using circleLoopPow_succ (n := k)
+      calc
+        circleEncode (LoopQuot.comp (circleDecode m)
+            (circleDecode (Int.ofNat k.succ)))
+            = circleEncode (LoopQuot.comp (circleDecode m)
+                (LoopQuot.comp (circleDecode (Int.ofNat k)) circleLoopClass)) := by
+                  simp [hstep]
+        _ = circleEncode (LoopQuot.comp
+              (LoopQuot.comp (circleDecode m)
+                (circleDecode (Int.ofNat k)))
+              circleLoopClass) := by
+                  simpa using (LoopQuot.comp_assoc (A := Circle) (a := circleBase)
+                    (x := circleDecode m)
+                    (y := circleDecode (Int.ofNat k))
+                    (z := circleLoopClass))
+        _ = circleEncode
+              (LoopQuot.comp (circleDecode m) (circleDecode (Int.ofNat k))) + 1 := by
+                  simpa using
+                    circleEncode_comp_loop
+                      (x := LoopQuot.comp (circleDecode m)
+                              (circleDecode (Int.ofNat k)))
+        _ = (m + (k : Int)) + 1 := by simpa [ih]
+        _ = m + (Int.ofNat (Nat.succ k)) := by
+              simpa [Int.natCast_succ, Int.add_assoc, Int.add_left_comm,
+                Int.add_comm]
+
+private theorem circleEncode_comp_decode_negSucc (m : Int) (n : Nat) :
+    circleEncode
+      (LoopQuot.comp (circleDecode m)
+        (circleDecode (Int.negSucc n)))
+      = m - (Nat.succ n : Int) := by
+  -- decode (-1) case then iterate using associativity and the -1 step.
+  induction n with
+  | zero =>
+      -- decode (-1) = inv loop
+      change circleEncode
+          (LoopQuot.comp (circleDecode m) (LoopQuot.inv circleLoopClass))
+        = m - 1
+      simpa using circleEncode_comp_inv_loop (x := circleDecode m)
+  | succ n ih =>
+      -- decode (-(n+2)) = inv (pow (n+2)) = (inv loop) ⋆ (inv (pow (n+1)))
+      have hneg : circleDecode (Int.negSucc (Nat.succ n))
+            = LoopQuot.comp (LoopQuot.inv circleLoopClass)
+                (LoopQuot.inv (circleLoopPow (Nat.succ n))) := by
+        -- inv (pow (n+2)) = inv (pow (n+1) ⋆ loop) = (inv loop) ⋆ (inv (pow (n+1)))
+        change LoopQuot.inv (circleLoopPow (Nat.succ (Nat.succ n)))
+          = _
+        -- pow_succ then inverse-of-composition
+        have hps : circleLoopPow (Nat.succ (Nat.succ n))
+              = LoopQuot.comp (circleLoopPow (Nat.succ n)) circleLoopClass := by
+          simpa using circleLoopPow_succ (n := Nat.succ n)
+        simpa [hps, LoopQuot.inv_comp_rev]
+      calc
+        circleEncode
+            (LoopQuot.comp (circleDecode m)
+              (circleDecode (Int.negSucc (Nat.succ n))))
+            = circleEncode
+                (LoopQuot.comp (circleDecode m)
+                  (LoopQuot.comp (LoopQuot.inv circleLoopClass)
+                    (LoopQuot.inv (circleLoopPow (Nat.succ n))))) := by
+              simp [hneg]
+        _ = circleEncode
+              (LoopQuot.comp
+                (LoopQuot.comp (circleDecode m)
+                  (LoopQuot.inv circleLoopClass))
+                (LoopQuot.inv (circleLoopPow (Nat.succ n)))) := by
+              simpa using (LoopQuot.comp_assoc (A := Circle) (a := circleBase)
+                  (x := circleDecode m)
+                  (y := LoopQuot.inv circleLoopClass)
+                  (z := LoopQuot.inv (circleLoopPow (Nat.succ n))))
+        _ = circleEncode
+              (LoopQuot.comp (circleDecode m)
+                (LoopQuot.inv (circleLoopPow (Nat.succ n)))) - 1 := by
+              simpa using circleEncode_comp_inv_loop
+                (x := LoopQuot.comp (circleDecode m)
+                        (LoopQuot.inv (circleLoopPow (Nat.succ n))))
+        _ = (m - (Nat.succ n : Int)) - 1 := by simpa [ih]
+        _ = m - (Nat.succ (Nat.succ n) : Int) := by
+              -- arithmetic: (m - (n+1)) - 1 = m - (n+2)
+              simpa [Int.sub_eq_add_neg, Int.add_assoc, Int.add_left_comm,
+                Int.add_comm, Int.natCast_succ]
+
+@[simp] theorem circleDecode_add_proved (m n : Int) :
+    circleDecode (m + n) =
+      LoopQuot.comp (circleDecode m) (circleDecode n) := by
+  -- `circleEncode` is injective since it has left-inverse `circleDecode`.
+  have inj : ∀ {x y}, circleEncode x = circleEncode y → x = y := by
+    intro x y h
+    have := _root_.congrArg circleDecode h
+    simpa [circleDecode_circleEncode] using this
+  -- Compare encodings on both sides.
+  apply inj
+  -- Left: encode ∘ decode = id on ℤ
+  have hL : circleEncode (circleDecode (m + n)) = m + n := by
+    simpa using circleEncode_circleDecode (z := m + n)
+  -- Right: compute via the ±1 step laws by induction on `n`.
+  have hR : circleEncode
+      (LoopQuot.comp (circleDecode m) (circleDecode n)) = m + n := by
+    cases n with
+    | ofNat k =>
+        simpa using circleEncode_comp_decode_ofNat (m := m) (k := k)
+    | negSucc k =>
+        simpa [Int.sub_eq_add_neg] using
+          circleEncode_comp_decode_negSucc (m := m) (n := k)
+  simpa [hR] using hL
 
 end Path
 end ComputationalPaths
