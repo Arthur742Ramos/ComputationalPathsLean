@@ -127,6 +127,85 @@ variable {A : Type u} {a : A}
   exact
     PathRwQuot.symm_symm (A := A) (a := a) (b := a) (x := x)
 
+/-!
+Support lemmas: cancellation and inverse-of-composition.
+These will be useful to derive exponent arithmetic (e.g. `zpow_add`) from
+the strict group laws already available on `LoopQuot`.
+-/
+
+@[simp] theorem comp_right_cancel {x y z : LoopQuot A a}
+    (h : comp x z = comp y z) : x = y := by
+  -- compose both sides on the right by inv z
+  have h' := _root_.congrArg (fun t => comp t (inv (A := A) (a := a) z)) h
+  -- associativity rearrangements
+  have hx : comp (comp x z) (inv z) = comp x (comp z (inv z)) :=
+    comp_assoc (A := A) (a := a) (x := x) (y := z) (z := inv z)
+  have hy : comp (comp y z) (inv z) = comp y (comp z (inv z)) :=
+    comp_assoc (A := A) (a := a) (x := y) (y := z) (z := inv z)
+  -- cancel z ⋅ z⁻¹ on the right
+  have hz : comp z (inv z) = id := comp_inv (A := A) (a := a) (x := z)
+  have hx' : comp (comp x z) (inv z) = comp x id := by
+    exact Eq.trans hx (by rw [hz])
+  have hy' : comp (comp y z) (inv z) = comp y id := by
+    exact Eq.trans hy (by rw [hz])
+  -- rewrite both sides and conclude with right identity
+  have h'' : comp x id = comp y id := by
+    exact (Eq.trans (Eq.symm hx') (Eq.trans h' hy'))
+  have hxid : comp x id = x := comp_id (A := A) (a := a) (x := x)
+  have hyid : comp y id = y := comp_id (A := A) (a := a) (x := y)
+  exact (Eq.trans (Eq.trans (Eq.symm hxid) h'') hyid)
+
+@[simp] theorem comp_left_cancel {x y z : LoopQuot A a}
+    (h : comp x y = comp x z) : y = z := by
+  -- compose both sides on the left by inv x
+  have h' := _root_.congrArg (fun t => comp (inv (A := A) (a := a) x) t) h
+  -- associativity rearrangements
+  have hx : comp (inv x) (comp x y) = comp (comp (inv x) x) y :=
+    (comp_assoc (A := A) (a := a) (x := inv x) (y := x) (z := y)).symm
+  have hz' : comp (inv x) (comp x z) = comp (comp (inv x) x) z :=
+    (comp_assoc (A := A) (a := a) (x := inv x) (y := x) (z := z)).symm
+  -- cancel x⁻¹ ⋅ x on the left
+  have hxinv : comp (inv x) x = id := inv_comp (A := A) (a := a) (x := x)
+  have hx'' : comp (inv x) (comp x y) = comp id y := by
+    exact Eq.trans hx (by rw [hxinv])
+  have hz'' : comp (inv x) (comp x z) = comp id z := by
+    exact Eq.trans hz' (by rw [hxinv])
+  -- rewrite both sides and conclude with left identity
+  have h'' : comp id y = comp id z := by
+    exact (Eq.trans (Eq.symm hx'') (Eq.trans h' hz''))
+  have hidy : comp id y = y := id_comp (A := A) (a := a) (x := y)
+  have hidz : comp id z = z := id_comp (A := A) (a := a) (x := z)
+  exact (Eq.trans (Eq.trans (Eq.symm hidy) h'') hidz)
+
+@[simp] theorem inv_comp_rev (x y : LoopQuot A a) :
+    inv (comp x y) = comp (inv y) (inv x) := by
+  -- Both sides are right-inverses of `comp x y`, hence equal by right cancel.
+  have hL : comp (inv (comp x y)) (comp x y) = id :=
+    inv_comp (A := A) (a := a) (x := comp x y)
+  have hR : comp (comp (inv y) (inv x)) (comp x y) = id := by
+    -- associate to ((inv y) ∘ ((inv x) ∘ (x ∘ y))) and cancel
+    have h1 : comp (comp (inv y) (inv x)) (comp x y)
+            = comp (inv y) (comp (inv x) (comp x y)) :=
+      comp_assoc (A := A) (a := a)
+        (x := inv y) (y := inv x) (z := comp x y)
+    have h2 : comp (inv x) (comp x y)
+            = comp (comp (inv x) x) y :=
+      (comp_assoc (A := A) (a := a) (x := inv x) (y := x) (z := y)).symm
+    have h2' := _root_.congrArg (fun t => comp (A := A) (a := a) (inv y) t) h2
+    have h3 : comp (comp (inv x) x) y = comp id y :=
+      _root_.congrArg (fun t => comp (A := A) (a := a) t y)
+        (inv_comp (A := A) (a := a) (x := x))
+    have h3' := _root_.congrArg (fun t => comp (A := A) (a := a) (inv y) t) h3
+    have h4 : comp (inv y) (comp id y) = comp (inv y) y :=
+      _root_.congrArg (fun t => comp (A := A) (a := a) (inv y) t)
+        (id_comp (A := A) (a := a) (x := y))
+    have h5 : comp (inv y) y = id :=
+      inv_comp (A := A) (a := a) (x := y)
+    exact
+      (Eq.trans h1 (Eq.trans h2' (Eq.trans h3' (Eq.trans h4 h5))))
+  exact comp_right_cancel (A := A) (a := a) (x := inv (comp x y))
+    (y := comp (inv y) (inv x)) (z := comp x y) (h := hL.trans hR.symm)
+
 /-- Natural-number iteration of a loop-quotient element. -/
 @[simp] def pow (x : LoopQuot A a) : Nat → LoopQuot A a
   | 0 => id

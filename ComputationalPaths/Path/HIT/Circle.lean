@@ -599,6 +599,14 @@ theorem circleLoopPow_add (m n : Nat) :
   LoopQuot.pow_add (A := Circle) (a := circleBase)
     (x := circleLoopClass) m n
 
+/-!
+Support: relate quotient-level z-powers to raw path z-powers at the
+propositional equality level. These lemmas are used to reduce quotient
+equalities to ordinary equalities when proving `decode ∘ encode = id`.
+-/
+
+-- moved below after z-power lemmas
+
 /-- Compatibility of `π₁` multiplication with `circleLoopPow`. -/
 @[simp] theorem circlePiOne_mul_pow (m n : Nat) :
     PiOne.mul (A := Circle) (a := circleBase)
@@ -715,6 +723,39 @@ def circleDecodeConcrete : Int → CircleLoopQuot :=
       LoopQuot.comp (circleDecodeConcrete m)
         (circleDecodeConcrete n) :=
   circleLoopZPow_add (m := m) (n := n)
+
+/-!
+Support: relate quotient-level z-powers to raw path z-powers at the
+propositional equality level. These lemmas are used to reduce quotient
+equalities to ordinary equalities when proving `decode ∘ encode = id`.
+-/
+
+@[simp] theorem circleLoopPow_toEq (n : Nat) :
+    PathRwQuot.toEq (A := Circle) (circleLoopPow n)
+      = (circleLoopPathPow n).toEq := by
+  -- Rewrite to an `ofLoop` and use `toEq_mk`.
+  change PathRwQuot.toEq (A := Circle)
+      (LoopQuot.ofLoop (A := Circle) (a := circleBase)
+        (circleLoopPathPow n))
+      = (circleLoopPathPow n).toEq
+  simp [circleLoopPow_ofLoopPathPow]
+
+@[simp] theorem circleLoopZPow_toEq (z : Int) :
+    PathRwQuot.toEq (A := Circle) (circleLoopZPow z)
+      = (circleLoopPathZPow z).toEq := by
+  cases z with
+  | ofNat n =>
+      -- Reduce to the natural-power case.
+      change PathRwQuot.toEq (A := Circle) (circleLoopPow n)
+        = (circleLoopPathPow n).toEq
+      simpa using circleLoopPow_toEq (n := n)
+  | negSucc n =>
+      -- Use `toEq_symm` together with the natural-power lemma.
+      change PathRwQuot.toEq (A := Circle)
+          (LoopQuot.inv (circleLoopPow (Nat.succ n)))
+        = (Path.symm (circleLoopPathPow (Nat.succ n))).toEq
+      -- `toEq_symm` on the quotient and on raw paths align.
+      simp [circleLoopZPow_negSucc]
 
 /-- Subtraction law for the concrete decoder. -/
 theorem circleDecodeConcrete_sub (m n : Int) :
