@@ -19,6 +19,10 @@ universe u
 abbrev PiOne (A : Type u) (a : A) : Type u :=
   LoopQuot A a
 
+/-- Strict monoid structure carried by `π₁(A, a)`. -/
+abbrev PiOneMonoid (A : Type u) (a : A) : LoopMonoid A a :=
+  loopMonoid A a
+
 /-- Strict group structure carried by `π₁(A, a)`. -/
 abbrev PiOneGroup (A : Type u) (a : A) : LoopGroup A a :=
   loopGroup A a

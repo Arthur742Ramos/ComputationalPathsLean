@@ -450,6 +450,10 @@ abbrev CircleLoopSpace : Type u :=
 abbrev CircleLoopQuot : Type u :=
   LoopQuot Circle circleBase
 
+/-- Strict loop monoid carried by the circle's rewrite quotient. -/
+abbrev circleLoopMonoid : LoopMonoid Circle circleBase :=
+  loopMonoid Circle circleBase
+
 /-- Strict loop group carried by the circle's rewrite quotient. -/
 abbrev circleLoopGroup : LoopGroup Circle circleBase :=
   loopGroup Circle circleBase

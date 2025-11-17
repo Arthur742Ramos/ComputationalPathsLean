@@ -307,21 +307,32 @@ theorem pow_add (x : LoopQuot A a) (m n : Nat) :
 
 end LoopQuot
 
-/-- Strict loop group given by the rewrite quotient at `a`. -/
-structure LoopGroup (A : Type u) (a : A) where
-  /-- Group multiplication. -/
+/-- Strict loop monoid given by the rewrite quotient at `a`. -/
+structure LoopMonoid (A : Type u) (a : A) where
+  /-- Multiplication induced by loop composition. -/
   mul : LoopQuot A a → LoopQuot A a → LoopQuot A a
-  /-- Group identity. -/
+  /-- Monoid identity (reflexive loop). -/
   one : LoopQuot A a
-  /-- Inversion. -/
-  inv : LoopQuot A a → LoopQuot A a
   /-- Associativity of multiplication. -/
   mul_assoc :
       ∀ x y z, mul (mul x y) z = mul x (mul y z)
-  /-- Left identity. -/
+  /-- Left identity law. -/
   one_mul : ∀ x, mul one x = x
-  /-- Right identity. -/
+  /-- Right identity law. -/
   mul_one : ∀ x, mul x one = x
+
+/-- Canonical loop monoid induced by rewrite-quotiented loops. -/
+@[simp] def loopMonoid (A : Type u) (a : A) : LoopMonoid A a where
+  mul := LoopQuot.comp
+  one := LoopQuot.id
+  mul_assoc := LoopQuot.comp_assoc
+  one_mul := LoopQuot.id_comp
+  mul_one := LoopQuot.comp_id
+
+/-- Strict loop group given by the rewrite quotient at `a`. -/
+structure LoopGroup (A : Type u) (a : A) extends LoopMonoid A a where
+  /-- Inversion induced by loop symmetry. -/
+  inv : LoopQuot A a → LoopQuot A a
   /-- Left inverse. -/
   mul_left_inv : ∀ x, mul (inv x) x = one
   /-- Right inverse. -/
@@ -329,12 +340,8 @@ structure LoopGroup (A : Type u) (a : A) where
 
 /-- Canonical loop group induced by rewrite-quotiented loops. -/
 @[simp] def loopGroup (A : Type u) (a : A) : LoopGroup A a where
-  mul := LoopQuot.comp
-  one := LoopQuot.id
+  toLoopMonoid := loopMonoid A a
   inv := LoopQuot.inv
-  mul_assoc := LoopQuot.comp_assoc
-  one_mul := LoopQuot.id_comp
-  mul_one := LoopQuot.comp_id
   mul_left_inv := LoopQuot.inv_comp
   mul_right_inv := LoopQuot.comp_inv
 

@@ -72,25 +72,11 @@ def IsGroupoid (C : WeakCategory A) : Prop :=
 
 end WeakCategory
 
-/-- Weak groupoid structure whose laws hold up to `Rw` steps. -/
-structure WeakGroupoid (A : Type u) where
-  /-- composition of paths -/
-  comp : {a b c : A} → Path a b → Path b c → Path a c
+/-- Weak groupoid structure whose laws hold up to `Rw` steps: a weak category
+equipped with inverses up to rewrite. -/
+structure WeakGroupoid (A : Type u) extends WeakCategory A where
   /-- inverse (symmetry) -/
   inv : {a b : A} → Path a b → Path b a
-  /-- identity path -/
-  id : {a : A} → Path a a
-  /-- associativity up to rewrite -/
-  assoc :
-    {a b c d : A} →
-      (p : Path a b) → (q : Path b c) → (r : Path c d) →
-      Rw (comp (comp p q) r) (comp p (comp q r))
-  /-- left identity up to rewrite -/
-  left_id :
-    {a b : A} → (p : Path a b) → Rw (comp (id) p) p
-  /-- right identity up to rewrite -/
-  right_id :
-    {a b : A} → (p : Path a b) → Rw (comp p (id)) p
   /-- left inverse up to rewrite -/
   left_inv :
     {a b : A} → (p : Path a b) → Rw (comp (inv p) p) (id)
@@ -102,22 +88,10 @@ namespace WeakGroupoid
 
 variable {A : Type u}
 
-/-- Forget the inverse operations and retain the weak category structure. -/
-def toWeakCategory (G : WeakGroupoid A) : WeakCategory A where
-  comp := G.comp
-  id := G.id
-  assoc := G.assoc
-  left_id := G.left_id
-  right_id := G.right_id
-
 /-- The canonical weak groupoid carried by any type via computational paths. -/
 def identity (A : Type u) : WeakGroupoid A where
-  comp := (WeakCategory.identity A).comp
+  toWeakCategory := WeakCategory.identity A
   inv := fun p => Path.symm p
-  id := (WeakCategory.identity A).id
-  assoc := (WeakCategory.identity A).assoc
-  left_id := (WeakCategory.identity A).left_id
-  right_id := (WeakCategory.identity A).right_id
   left_inv := by
     intro a b p
     exact rw_of_step (Step.symm_trans p)
@@ -127,21 +101,21 @@ def identity (A : Type u) : WeakGroupoid A where
 
 /-- Every morphism in a weak groupoid has a rewrite inverse. -/
 def isIso (G : WeakGroupoid A) {a b : A} (p : Path a b) :
-    WeakCategory.IsIso (A := A) (toWeakCategory G) p where
+    WeakCategory.IsIso (A := A) (G.toWeakCategory) p where
   inv := G.inv p
   left_inv := G.left_inv (A := A) (a := a) (b := b) (p := p)
   right_inv := G.right_inv (A := A) (a := a) (b := b) (p := p)
 
 /-- The underlying weak category of a weak groupoid is a weak groupoid in the categorical sense. -/
 theorem toWeakCategory_isGroupoid (G : WeakGroupoid A) :
-    WeakCategory.IsGroupoid (A := A) (toWeakCategory G) := by
+    WeakCategory.IsGroupoid (A := A) (G.toWeakCategory) := by
   intro a b p
   exact ⟨isIso (A := A) (G := G) (a := a) (b := b) p⟩
 
 /-- Computational paths form a weak groupoid under rewrite. -/
 theorem identity_isGroupoid (A : Type u) :
     WeakCategory.IsGroupoid (A := A)
-      (toWeakCategory (identity (A := A))) :=
+      ((identity (A := A)).toWeakCategory) :=
   toWeakCategory_isGroupoid (A := A) (G := identity (A := A))
 
 end WeakGroupoid
@@ -206,27 +180,9 @@ def IsGroupoid (C : StrictCategory A) : Prop :=
 end StrictCategory
 
 /-- Strict groupoid structure whose laws hold as definitional equalities. -/
-structure StrictGroupoid (A : Type u) where
-  /-- Composition of quotient paths. -/
-  comp :
-    {a b c : A} → PathRwQuot A a b → PathRwQuot A b c → PathRwQuot A a c
+structure StrictGroupoid (A : Type u) extends StrictCategory A where
   /-- Inversion of a quotient path. -/
   inv : {a b : A} → PathRwQuot A a b → PathRwQuot A b a
-  /-- Identity element at a point. -/
-  id : {a : A} → PathRwQuot A a a
-  /-- Associativity holds definitionally. -/
-  assoc :
-    {a b c d : A} →
-      (p : PathRwQuot A a b) →
-      (q : PathRwQuot A b c) →
-      (r : PathRwQuot A c d) →
-      comp (comp p q) r = comp p (comp q r)
-  /-- Left identity holds definitionally. -/
-  left_id :
-    {a b : A} → (p : PathRwQuot A a b) → comp (id) p = p
-  /-- Right identity holds definitionally. -/
-  right_id :
-    {a b : A} → (p : PathRwQuot A a b) → comp p (id) = p
   /-- Left inverse holds definitionally. -/
   left_inv :
     {a b : A} → (p : PathRwQuot A a b) → comp (inv p) p = id
@@ -238,35 +194,23 @@ namespace StrictGroupoid
 
 variable {A : Type u}
 
-/-- Forget the inverse operations and retain the strict category structure. -/
-def toStrictCategory (G : StrictGroupoid A) : StrictCategory A where
-  comp := G.comp
-  id := G.id
-  assoc := G.assoc
-  left_id := G.left_id
-  right_id := G.right_id
-
 /-- Every morphism in a strict groupoid admits a strict inverse. -/
 def isIso (G : StrictGroupoid A) {a b : A} (p : PathRwQuot A a b) :
-    StrictCategory.IsIso (A := A) (toStrictCategory G) p where
+    StrictCategory.IsIso (A := A) (G.toStrictCategory) p where
   inv := G.inv p
   left_inv := G.left_inv (A := A) (a := a) (b := b) (p := p)
   right_inv := G.right_inv (A := A) (a := a) (b := b) (p := p)
 
 /-- The underlying strict category of a strict groupoid is categorically a groupoid. -/
 theorem toStrictCategory_isGroupoid (G : StrictGroupoid A) :
-    StrictCategory.IsGroupoid (A := A) (toStrictCategory G) := by
+    StrictCategory.IsGroupoid (A := A) (G.toStrictCategory) := by
   intro a b p
   exact ⟨isIso (A := A) (G := G) (a := a) (b := b) p⟩
 
 /-- The quotient of computational paths by rewrite equality forms a strict groupoid. -/
 def quotient (A : Type u) : StrictGroupoid A where
-  comp := (StrictCategory.quotient A).comp
+  toStrictCategory := StrictCategory.quotient A
   inv := fun p => PathRwQuot.symm (A := A) p
-  id := (StrictCategory.quotient A).id
-  assoc := (StrictCategory.quotient A).assoc
-  left_id := (StrictCategory.quotient A).left_id
-  right_id := (StrictCategory.quotient A).right_id
   left_inv := by
     intro a b p
     exact PathRwQuot.symm_trans (A := A) (a := a) (b := b) p
@@ -276,7 +220,7 @@ def quotient (A : Type u) : StrictGroupoid A where
 
 theorem quotient_isGroupoid (A : Type u) :
     StrictCategory.IsGroupoid (A := A)
-      (toStrictCategory (A := A) (quotient A)) :=
+      ((quotient A).toStrictCategory) :=
   toStrictCategory_isGroupoid (A := A) (G := quotient A)
 
 end StrictGroupoid
