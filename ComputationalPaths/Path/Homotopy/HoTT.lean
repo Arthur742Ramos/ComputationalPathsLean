@@ -163,6 +163,87 @@ def leibnizEq {x y : A} (p : x = y) : P x → P y :=
 
 end TransportEq
 
+/-! ### Homotopies -/
+
+section Homotopy
+
+variable {P : A → Type v}
+
+/-- A homotopy between dependent functions assigns a path for every point. -/
+def Homotopy (f g : (x : A) → P x) : Type (max u v) :=
+  (x : A) → Path (f x) (g x)
+
+notation f " ~ᵖ " g => Homotopy f g
+
+/-- Reflexivity of homotopies. -/
+@[simp] def homotopy_refl (f : (x : A) → P x) :
+    f ~ᵖ f :=
+  fun _ => Path.refl _
+
+/-- Symmetry of homotopies. -/
+@[simp] def homotopy_symm {f g : (x : A) → P x}
+    (H : f ~ᵖ g) : g ~ᵖ f :=
+  fun x => Path.symm (H x)
+
+/-- Transitivity of homotopies. -/
+@[simp] def homotopy_trans {f g h : (x : A) → P x}
+    (H₁ : f ~ᵖ g) (H₂ : g ~ᵖ h) : f ~ᵖ h :=
+  fun x => Path.trans (H₁ x) (H₂ x)
+
+variable {B : Type v}
+
+/-- Naturality of homotopies with respect to precomposition by paths. -/
+@[simp] theorem homotopy_naturality_toEq
+    {f g : A → B} (H : f ~ᵖ g)
+    {x y : A} (p : Path x y) :
+    (Path.trans (H x) (ap (A := A) (B := B) g p)).toEq =
+      (Path.trans (ap (A := A) (B := B) f p) (H y)).toEq := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      simp
+
+end Homotopy
+
+/-- Homotopies between non-dependent functions. -/
+abbrev FunHomotopy {A : Type u} {B : Type v}
+    (f g : A → B) : Type (max u v) :=
+  Homotopy (A := A) (P := fun _ => B) f g
+
+section Equivalences
+
+variable {A : Type u} {B : Type v}
+
+/-- A quasi-inverse for a function `f` consists of the inverse function plus
+homotopies witnessing the round-trip laws. -/
+structure QuasiInverse (f : A → B) where
+  inv : B → A
+  leftHomotopy : FunHomotopy (fun b => f (inv b)) (fun b => b)
+  rightHomotopy : FunHomotopy (fun a => inv (f a)) (fun a => a)
+
+/-- A function is an equivalence if it admits a quasi-inverse. -/
+structure IsEquiv (f : A → B) where
+  toQuasiInverse : QuasiInverse f
+
+namespace IsEquiv
+
+variable {f : A → B}
+
+/-- Extract the chosen inverse from an equivalence. -/
+@[simp] def inv (hf : IsEquiv f) : B → A :=
+  hf.toQuasiInverse.inv
+
+end IsEquiv
+
+@[simp] def IsEquiv.refl (A : Type u) :
+    IsEquiv (fun x : A => x) where
+  toQuasiInverse :=
+  { inv := fun x => x
+    leftHomotopy := fun _ => Path.refl _
+    rightHomotopy := fun _ => Path.refl _ }
+
+end Equivalences
+
 end HoTT
 end Path
 end ComputationalPaths
