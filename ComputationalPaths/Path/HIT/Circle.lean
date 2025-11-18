@@ -6,7 +6,9 @@ and an eliminator stated in the computational-path style.  At this stage we work
 axiomatically: the constructors and recursor will later be justified by the
 normalisation machinery developed for computational paths.  By providing these
 interfaces now, downstream developments (loop spaces, fundamental groups, etc.)
-can already depend on a stable API.
+can already depend on a stable API.  The axioms stop with the HIT interface;
+everything below—loop quotients, encode/decode, and transport to ℤ—is defined in
+Lean using the computational-path infrastructure.
 -/
 
 import ComputationalPaths.Path.Basic
@@ -470,7 +472,7 @@ abbrev circlePiOneGroup : LoopGroup Circle circleBase :=
 @[simp] def circleLoopPath : CircleLoopSpace :=
   circleLoop
 
- /-- Fundamental loop represented in the quotient. -/
+/-- Fundamental loop represented in the quotient. -/
 @[simp] def circleLoopClass : CircleLoopQuot :=
   LoopQuot.ofLoop (A := Circle) (a := circleBase) circleLoop
 
@@ -478,9 +480,8 @@ abbrev circlePiOneGroup : LoopGroup Circle circleBase :=
 @[simp] def circlePiOneLoop : circlePiOne :=
   PiOne.ofLoop (A := Circle) (a := circleBase) circleLoop
 
--- Canonical encoding function defined directly via the quotient lift.  This
--- will eventually replace `circleEncode` once the remaining plan axioms are
--- eliminated.
+/-- Canonical encoding function obtained by quotient-lifting the raw loop
+encoding.  This is the implementation used by `circleEncode`. -/
 @[simp] def circleEncodeLift : CircleLoopQuot → Int :=
   Quot.lift (fun (p : Path circleBase circleBase) => circleEncodePath p)
     (by
@@ -499,10 +500,6 @@ abbrev circlePiOneGroup : LoopGroup Circle circleBase :=
 --   change circleEncodePath circleLoop = 1
 --   simpa using circleEncodePath_loop
 
--- Canonical encoding function defined directly via the quotient lift.  This
--- will eventually replace `circleEncode` once the remaining plan axioms are
--- eliminated.
--- moved earlier
 
 /-- Iterate the fundamental loop `n` times in the quotient. -/
 def circleLoopPow (n : Nat) : CircleLoopQuot :=
@@ -768,14 +765,13 @@ equalities to ordinary equalities when proving `decode ∘ encode = id`.
   circleLoopZPow_ofNat_add (m := m) (n := n)
 
 
-/-- Baseline data describing how π₁(S¹) will be related to ℤ.
+/-- Encode/decode interface relating the circle rewrite quotient to ℤ.
 
-These fields capture the encode/decode functions and the coherence facts we
-plan to establish.  They are left as axioms for now so downstream developments
-can proceed against a stable interface; future work will inhabit this record
-with actual constructions derived from the higher-inductive semantics.
+The definitions below simply re-use `circleEncodeLift` and `circleLoopZPow`,
+so no additional axioms are introduced beyond the circle HIT interface and the
+univalence principles imported earlier.  Algebraic properties that require more
+machinery live in `CircleStep`.
 -/
--- Concrete encode/decode without plan
 @[simp] def circleEncode : CircleLoopQuot → Int :=
   circleEncodeLift
 

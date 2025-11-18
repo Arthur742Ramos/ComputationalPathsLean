@@ -45,8 +45,17 @@ Circle π₁(S¹) ≃ ℤ (what to read)
 - Homomorphism (circle-specific): decode respects addition, subtraction, and group multiplication — proved from the step laws and encode injectivity.
 
 Assumptions (axioms)
-- Circle HIT interface (constructors + β-rules) and a lightweight univalence axiom (`ua`, `ua_beta`).
-- No other placeholders remain; everything else is constructed inside Lean.
+- Circle HIT interface (constructors + β-rules).  The type, base point, loop,
+  and eliminators are currently axioms so that downstream developments can use
+  a stable higher-inductive interface while the computational-path semantics
+  for HITs are being developed.
+- Lightweight univalence (`ua`, `ua_beta`) specialised to `SimpleEquiv`.  This
+  suffices for the encode–decode argument without requiring the full HoTT
+  axiom.
+
+Every other component—encode/decode maps, quotient constructions, loop group
+laws, etc.—is defined inside Lean and ultimately reduces to the two axioms
+above.
 
 Contributing
 - Build after non-trivial edits: `./lake.cmd build`.

@@ -5,8 +5,9 @@ Provide a lightweight axiomatisation of univalence specialised to the
 computational-paths setting.  The axioms postulate that every equivalence
 between types induces a computational path between them and that transport
 along this path coincides with the forward map of the equivalence.  These
-principles are sufficient to implement the encode–decode argument for the
-circle without committing to a full HoTT-style development of univalence.
+principles are sufficient to implement the encode-decode argument for the
+circle without committing to a full HoTT-style development of univalence.  Apart
+from the circle HIT interface, these are the only axioms used in the project.
 -/
 
 import ComputationalPaths.Path.Basic.Core
