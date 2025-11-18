@@ -258,6 +258,38 @@ variable {a1 a2 : A} {b1 b2 : B}
   cases p
   rfl
 
+@[simp] theorem toEq_fst_prodMk (p : Path a1 a2) (q : Path b1 b2) :
+    (fst (prodMk p q)).toEq = p.toEq := by
+  cases p
+  cases q
+  rfl
+
+@[simp] theorem toEq_snd_prodMk (p : Path a1 a2) (q : Path b1 b2) :
+    (snd (prodMk p q)).toEq = q.toEq := by
+  cases p
+  cases q
+  rfl
+
+@[simp] theorem transport_prod_fun
+    {Z : Type w} {A_fam : Z → Type u} {B_fam : Z → Type v}
+    {z1 z2 : Z} (p : Path z1 z2) (x : A_fam z1 × B_fam z1) :
+    transport (D := fun z => A_fam z × B_fam z) p x =
+      (transport (D := A_fam) p x.1, transport (D := B_fam) p x.2) := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      rfl
+
+@[simp] theorem toEq_congrArg_prod_map
+    {A' : Type u} {B' : Type v}
+    (g : A → A') (h : B → B')
+    (p : Path a1 a2) (q : Path b1 b2) :
+    (congrArg (fun x : A × B => (g x.1, h x.2)) (prodMk p q)).toEq =
+      (prodMk (congrArg g p) (congrArg h q)).toEq := by
+  cases p
+  cases q
+  rfl
+
 end Prod
 
 section Sum
@@ -427,19 +459,39 @@ variable {b1 : B a1} {b2 : B a2}
     {D : A → Sort w}
     {a1 a2 : A} {b1 : B a1} {b2 : B a2}
     (p : Path a1 a2)
-    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2)
+    (q : Path (transport (D := fun a => B a) p b1) b2)
     (x : D a1) :
     subst (D := fun z : Sigma B => D z.fst) x (sigmaMk p q) =
       subst (D := D) x p := by
   simpa [subst] using
-    transport_sigmaMk_fst (A := A) (B := B) (D := D)
+    transport_sigmaMk_fst (B := B) (D := D)
       (p := p) (q := q) (x := x)
+
+/-- Transport for dependent types (Sigma types). -/
+def transportSigma {A : Type u} {B : A → Type v}
+    {D : ∀ a, B a → Sort w}
+    {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+    (p : Path a₁ a₂)
+    (q : Path (transport (D := B) p b₁) b₂)
+    (x : D a₁ b₁) : D a₂ b₂ :=
+  match p, q with
+  | Path.mk _ h1, Path.mk _ h2 =>
+      cast (by cases h1; cases h2; rfl) x
+
+/-- Substitution for dependent types. -/
+def substSigma {A : Type u} {B : A → Type v}
+    {D : ∀ a, B a → Sort w}
+    {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+    (x : D a₁ b₁)
+    (p : Path a₁ a₂)
+    (q : Path (transport (D := B) p b₁) b₂) : D a₂ b₂ :=
+  transportSigma p q x
 
 @[simp] theorem transport_sigmaMk_dep
     {D : ∀ a, B a → Sort w}
     {a1 a2 : A} {b1 : B a1} {b2 : B a2}
     (p : Path a1 a2)
-    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2)
+    (q : Path (transport (D := fun a => B a) p b1) b2)
     (x : D a1 b1) :
     transport (D := fun z : Sigma B => D z.fst z.snd)
         (sigmaMk p q) x =
@@ -450,13 +502,13 @@ variable {b1 : B a1} {b2 : B a2}
     cases q with
     | mk steps₂ proof₂ =>
       cases proof₂
-      rfl
+      simp [transportSigma, transport]
 
 @[simp] theorem subst_sigmaMk_dep
     {D : ∀ a, B a → Sort w}
     {a1 a2 : A} {b1 : B a1} {b2 : B a2}
     (p : Path a1 a2)
-    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2)
+    (q : Path (transport (D := fun a => B a) p b1) b2)
     (x : D a1 b1) :
     subst (D := fun z : Sigma B => D z.fst z.snd)
         x (sigmaMk p q) =

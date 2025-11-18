@@ -16,7 +16,7 @@ universe u v w
 
 variable {A : Type u}
 
-/-- Witness for `Π a, Id a a`.  Matches the thesis proof that the reflexive
+/-- Witness for `Π a, Id a a`.  Matches the proof that the reflexive
 path inhabits the first groupoid law. -/
 def inhabIdRefl (A : Type u) : (a : A) → a = a :=
   fun _ => rfl

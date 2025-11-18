@@ -69,14 +69,12 @@ def trans {a b c : A} :
         (by
           intro q₁ q₂ hq
           exact Quot.sound
-            (rweq_trans_congr_right (a := a) (b := b) (c := c)
-              (p := p) (q := q₁) (r := q₂) hq)))
+            (rweq_trans_congr_right p hq)))
       (by
         intro p₁ p₂ hp
         refine Quot.inductionOn y (fun q =>
           Quot.sound
-            (rweq_trans_congr_left (a := a) (b := b) (c := c)
-              (p := p₁) (q := p₂) (r := q) hp)))
+            (rweq_trans_congr_left q hp)))
 
 /-- Coerce a propositional equality to the path quotient. -/
 @[simp] def ofEq {a b : A} (h : a = b) : PathRwQuot A a b :=
@@ -495,6 +493,34 @@ namespace PathRwQuot
   apply Quot.sound
   exact rweq_prod_eta (α := α) (β := β) (p := p)
 
+@[simp] theorem fst_prodMk {α β : Type u}
+    {a₁ a₂ : α} {b₁ b₂ : β}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    (Quot.mk _ (Path.fst (Path.prodMk p q)) :
+        PathRwQuot α a₁ a₂) =
+      Quot.mk _ p := by
+  apply Quot.sound
+  exact rweq_fst_prodMk (α := α) (β := β) (p := p) (q := q)
+
+@[simp] theorem snd_prodMk {α β : Type u}
+    {a₁ a₂ : α} {b₁ b₂ : β}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    (Quot.mk _ (Path.snd (Path.prodMk p q)) :
+        PathRwQuot β b₁ b₂) =
+      Quot.mk _ q := by
+  apply Quot.sound
+  exact rweq_snd_prodMk (α := α) (β := β) (p := p) (q := q)
+
+@[simp] theorem congrArg_prod_map {α β α' β' : Type u}
+    (g : α → α') (h : β → β')
+    {a₁ a₂ : α} {b₁ b₂ : β}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    (Quot.mk _ (Path.congrArg (fun x : α × β => (g x.1, h x.2)) (Path.prodMk p q)) :
+        PathRwQuot (α' × β') (g a₁, h b₁) (g a₂, h b₂)) =
+      Quot.mk _ (Path.prodMk (Path.congrArg g p) (Path.congrArg h q)) := by
+  apply Quot.sound
+  exact rweq_congrArg_prod_map (α := α) (β := β) (α' := α') (β' := β') (g := g) (h := h) (p := p) (q := q)
+
 @[simp] theorem sigma_eta {A : Type u} {B : A → Type u}
     {a1 a2 : A} {b1 : B a1} {b2 : B a2}
     (p : Path (A := Sigma B) ⟨a1, b1⟩ ⟨a2, b2⟩) :
@@ -680,71 +706,25 @@ variable {C}
 
 @[simp] theorem toEq_mapQuot {a₁ a₂ : A}
     (x : PathRwQuot A a₁ a₂) :
-    PathRwQuot.toEq (A := B a₂)
+    PathRwQuot.toEq
         (mapQuot (A := A) (B := B) C x) =
       (DepContext.map (A := A) (B := B) C
         (PathRwQuot.normalPath (A := A) (x := x))).toEq := rfl
 
 @[simp] theorem mapQuot_refl (a : A) :
     mapQuot (A := A) (B := B) C (PathRwQuot.refl (A := A) a) =
-      PathRwQuot.refl (A := B a) (C.fill a) := by
+      PathRwQuot.refl (C.fill a) := by
   change
-    Quot.mk _
-        (DepContext.map (A := A) (B := B) C
-          (PathRwQuot.normalPath (A := A) (x := PathRwQuot.refl (A := A) a))) =
+    Quot.mk _ (DepContext.map (A := A) (B := B) C (Path.refl a)) =
       Quot.mk _ (Path.refl (C.fill a))
   apply Quot.sound
-  have hmap :
-      DepContext.map (A := A) (B := B) C (Path.refl a) =
-        Path.refl (C.fill a) := by
-    simp [DepContext.map]
-  have hnorm :
-      DepContext.map (A := A) (B := B) C
-          (PathRwQuot.normalPath (A := A) (x := PathRwQuot.refl (A := A) a)) =
-        Path.refl (C.fill a) := by
-    simpa [PathRwQuot.normalPath] using hmap
-  exact rweq_of_eq hnorm
-
-@[simp] theorem mapQuot_ofEq {a₁ a₂ : A} (h : a₁ = a₂) :
-    mapQuot (A := A) (B := B) C
-        (PathRwQuot.ofEq (A := A) (a := a₁) (b := a₂) h) =
-      PathRwQuot.ofEq (A := B a₂)
-        (a :=
-          Path.transport (A := A) (D := fun a => B a)
-            (Path.ofEq (A := A) (a := a₁) (b := a₂) h)
-            (C.fill a₁))
-        (b := C.fill a₂)
-        (by
-          cases h
-          rfl) := by
-  cases h
-  have htransport :
-      Path.transport (A := A) (D := fun a => B a)
-          (Path.ofEq (A := A) (a := a₁) (b := a₁) rfl)
-          (C.fill a₁) =
-        C.fill a₁ := by
-    have htransportEq :=
-      Path.transport_of_toEq_eq
-        (A := A) (D := fun a => B a)
-        (p := Path.ofEq (A := A) (a := a₁) (b := a₁) rfl)
-        (q := Path.refl a₁) (x := C.fill a₁)
-        (by simp)
-    calc
-      Path.transport (A := A) (D := fun a => B a)
-          (Path.ofEq (A := A) (a := a₁) (b := a₁) rfl)
-          (C.fill a₁)
-          =
-        Path.transport (A := A) (D := fun a => B a)
-          (Path.refl a₁) (C.fill a₁) := htransportEq
-      _ = C.fill a₁ :=
-        Path.transport_refl (A := A) (D := fun a => B a)
-          (a := a₁) (x := C.fill a₁)
-  cases htransport
-  simpa only [PathRwQuot.ofEq_refl]
-    using
-      (mapQuot_refl (A := A) (B := B) (C := C) (a := a₁))
+  exact
+    (rweq_of_eq
+      (DepContext.map_refl (A := A) (B := B) (C := C) (a := a)))
 
 end DepContext
+
+set_option linter.unnecessarySimpa false
 
 namespace BiContext
 
@@ -823,21 +803,27 @@ variable {K}
     mapLeftQuot (A := A) (B := B) (C := C) (K := K) b
         (PathRwQuot.refl (A := A) a) =
       PathRwQuot.refl (A := C) (K.fill a b) := by
-  change Quot.mk _ (BiContext.mapLeft (A := A) (B := B) (C := C) K (Path.refl a) b) =
-    Quot.mk _ (Path.refl (K.fill a b))
+  change Quot.mk _
+      (BiContext.mapLeft (A := A) (B := B) (C := C) K (Path.refl a) b) = _
   apply Quot.sound
-  exact rweq_of_eq
-    (BiContext.mapLeft_refl (A := A) (B := B) (C := C) (K := K) (a := a) (b := b))
+  have hmap :
+      BiContext.mapLeft (A := A) (B := B) (C := C) K (Path.refl a) b =
+        Path.refl (K.fill a b) := by
+    exact BiContext.mapLeft_refl (A := A) (B := B) (C := C) K a b
+  exact rweq_of_eq hmap
 
 @[simp] theorem mapRightQuot_refl (a : A) (b : B) :
     mapRightQuot (A := A) (B := B) (C := C) (K := K) a
         (PathRwQuot.refl (A := B) b) =
       PathRwQuot.refl (A := C) (K.fill a b) := by
-  change Quot.mk _ (BiContext.mapRight (A := A) (B := B) (C := C) K a (Path.refl b)) =
-    Quot.mk _ (Path.refl (K.fill a b))
+  change Quot.mk _
+      (BiContext.mapRight (A := A) (B := B) (C := C) K a (Path.refl b)) = _
   apply Quot.sound
-  exact rweq_of_eq
-    (BiContext.mapRight_refl (A := A) (B := B) (C := C) (K := K) (a := a) (b := b))
+  have hmap :
+      BiContext.mapRight (A := A) (B := B) (C := C) K a (Path.refl b) =
+        Path.refl (K.fill a b) := by
+    exact BiContext.mapRight_refl (A := A) (B := B) (C := C) K a b
+  exact rweq_of_eq hmap
 
 @[simp] theorem mapLeftQuot_invA {a₁ a₂ : A} (b : B)
     (x : PathRwQuot A a₁ a₂) :
@@ -849,9 +835,10 @@ variable {K}
   change Quot.mk _ (BiContext.mapLeft (A := A) (B := B) (C := C) K (Path.symm p) b) =
     Quot.mk _ (Path.symm (BiContext.mapLeft (A := A) (B := B) (C := C) K p b))
   apply Quot.sound
-  exact rweq_of_eq
-    (BiContext.mapLeft_symm (A := A) (B := B) (C := C) (K := K)
-      (p := p) (b := b))
+  exact
+    (rweq_of_eq
+      (BiContext.mapLeft_symm (A := A) (B := B) (C := C) (K := K)
+        (p := p) (b := b)))
 
 @[simp] theorem mapRightQuot_invA {b₁ b₂ : B} (a : A)
     (x : PathRwQuot B b₁ b₂) :
@@ -863,9 +850,10 @@ variable {K}
   change Quot.mk _ (BiContext.mapRight (A := A) (B := B) (C := C) K a (Path.symm p)) =
     Quot.mk _ (Path.symm (BiContext.mapRight (A := A) (B := B) (C := C) K a p))
   apply Quot.sound
-  exact rweq_of_eq
-    (BiContext.mapRight_symm (A := A) (B := B) (C := C) (K := K)
-      (a := a) (p := p))
+  exact
+    (rweq_of_eq
+      (BiContext.mapRight_symm (A := A) (B := B) (C := C) (K := K)
+        (a := a) (p := p)))
 
 @[simp] theorem mapLeftQuot_ofEq {a₁ a₂ : A} (b : B) (h : a₁ = a₂) :
     mapLeftQuot (A := A) (B := B) (C := C) (K := K) b
@@ -1043,13 +1031,14 @@ variable (K : DepBiContext A B C)
           (PathRwQuot.normalPath (A := A) (x := Quot.mk _ p))
           (K.fill a₁ b) =
         Path.transport (A := A) (D := fun a => C a b) p (K.fill a₁ b) := by
-    have htoEq :=
-        (PathRwQuot.normalPath_toEq (A := A) (x := Quot.mk _ p))
     have htoEq' :
-        (PathRwQuot.normalPath (A := A) (x := Quot.mk _ p)).toEq = p.toEq :=
-      by simpa using htoEq
+        (PathRwQuot.normalPath (A := A) (x := Quot.mk _ p)).toEq =
+          p.toEq := by
+      simpa [PathRwQuot.toEq_mk] using
+        (PathRwQuot.normalPath_toEq (A := A) (x := Quot.mk _ p))
     exact
-      Path.transport_of_toEq_eq (A := A) (D := fun a => C a b)
+      Path.transport_of_toEq_eq
+        (A := A) (D := fun a => C a b)
         (p := PathRwQuot.normalPath (A := A) (x := Quot.mk _ p))
         (q := p) (x := K.fill a₁ b) htoEq'
   cases hstart
@@ -1085,13 +1074,14 @@ variable (K : DepBiContext A B C)
           (PathRwQuot.normalPath (A := B) (x := Quot.mk _ p))
           (K.fill a b₁) =
         Path.transport (A := B) (D := fun b => C a b) p (K.fill a b₁) := by
-    have htoEq :=
-        (PathRwQuot.normalPath_toEq (A := B) (x := Quot.mk _ p))
     have htoEq' :
-        (PathRwQuot.normalPath (A := B) (x := Quot.mk _ p)).toEq = p.toEq :=
-      by simpa using htoEq
+        (PathRwQuot.normalPath (A := B) (x := Quot.mk _ p)).toEq =
+          p.toEq := by
+      simpa [PathRwQuot.toEq_mk] using
+        (PathRwQuot.normalPath_toEq (A := B) (x := Quot.mk _ p))
     exact
-      Path.transport_of_toEq_eq (A := B) (D := fun b => C a b)
+      Path.transport_of_toEq_eq
+        (A := B) (D := fun b => C a b)
         (p := PathRwQuot.normalPath (A := B) (x := Quot.mk _ p))
         (q := p) (x := K.fill a b₁) htoEq'
   cases hstart
@@ -1129,13 +1119,14 @@ variable (K : DepBiContext A B C)
           (PathRwQuot.normalPath (A := A) (x := Quot.mk _ p))
           (K.fill a₁ b₁) =
         Path.transport (A := A) (D := fun a => C a b₁) p (K.fill a₁ b₁) := by
-    have htoEq :=
-        (PathRwQuot.normalPath_toEq (A := A) (x := Quot.mk _ p))
     have htoEq' :
-        (PathRwQuot.normalPath (A := A) (x := Quot.mk _ p)).toEq = p.toEq :=
-      by simpa using htoEq
+        (PathRwQuot.normalPath (A := A) (x := Quot.mk _ p)).toEq =
+          p.toEq := by
+      simpa [PathRwQuot.toEq_mk] using
+        (PathRwQuot.normalPath_toEq (A := A) (x := Quot.mk _ p))
     exact
-      Path.transport_of_toEq_eq (A := A) (D := fun a => C a b₁)
+      Path.transport_of_toEq_eq
+        (A := A) (D := fun a => C a b₁)
         (p := PathRwQuot.normalPath (A := A) (x := Quot.mk _ p))
         (q := p) (x := K.fill a₁ b₁) htoEq'
   cases hinner
@@ -1145,11 +1136,11 @@ variable (K : DepBiContext A B C)
           (Path.transport (A := A) (D := fun a => C a b₁) p (K.fill a₁ b₁)) =
         Path.transport (A := B) (D := fun b => C a₂ b) q
           (Path.transport (A := A) (D := fun a => C a b₁) p (K.fill a₁ b₁)) := by
-    have htoEq :=
-        (PathRwQuot.normalPath_toEq (A := B) (x := Quot.mk _ q))
     have htoEq' :
-        (PathRwQuot.normalPath (A := B) (x := Quot.mk _ q)).toEq = q.toEq :=
-      by simpa using htoEq
+        (PathRwQuot.normalPath (A := B) (x := Quot.mk _ q)).toEq =
+          q.toEq := by
+      simpa [PathRwQuot.toEq_mk] using
+        (PathRwQuot.normalPath_toEq (A := B) (x := Quot.mk _ q))
     exact
       Path.transport_of_toEq_eq (A := B) (D := fun b => C a₂ b)
         (p := PathRwQuot.normalPath (A := B) (x := Quot.mk _ q))

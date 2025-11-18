@@ -55,4 +55,4 @@ Contributing
 - When a structure adds data on top of an existing interface, prefer extending the smaller structure (e.g. `WeakGroupoid` extends `WeakCategory`) to keep identities/composition definitions in one place.
 
 Citation
-- Based on the thesis’ Chapter 5 development of computational paths and the fundamental group of the circle. See `docs/thesis` for source materials.
+- Based on the development of computational paths and the fundamental group of the circle. See `docs` for source materials.

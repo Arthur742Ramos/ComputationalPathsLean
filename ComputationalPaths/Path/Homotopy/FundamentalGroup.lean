@@ -2,7 +2,7 @@
 # Fundamental group interface for computational paths
 
 This module packages the loop-quotient machinery into the traditional
-`π₁(A, a)` notation used throughout the thesis.  We work entirely in the
+`π₁(A, a)` notation.  We work entirely in the
 computational-path setting: loops are computational paths, two loops are
 identified when they are related by rewrite equality, and the resulting
 quotient inherits the strict group structure supplied by `LoopGroup`.

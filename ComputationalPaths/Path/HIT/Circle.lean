@@ -15,6 +15,8 @@ import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
+set_option maxHeartbeats 1000000
+
 namespace ComputationalPaths
 namespace Path
 
@@ -271,9 +273,7 @@ theorem circleLoopPathPow_add (m n : Nat) :
 -- Encoding after concatenating with the fundamental loop increments by `1`.
 -- Placeholder: a future lemma will show that encoding commutes with
 -- concatenation by the fundamental loop at the raw-path level.
--- @[simp] theorem circleEncodePath_trans_loop (p : Path circleBase circleBase) :
---   circleEncodePath (Path.trans p circleLoop) = circleEncodePath p + 1 := by
---   admit
+
 -- Key transport computation: encoding after following the fundamental loop
 -- increases the integer code by `+1` for any starting code value.
 @[simp] theorem circleCode_transport_loop_add1
@@ -594,15 +594,12 @@ def circleLoopPow (n : Nat) : CircleLoopQuot :=
               simp [Int.natCast_succ]
 
 -- Evaluate the lifted encoding on natural powers of the fundamental loop.
--- @[simp] theorem circleEncodeLift_circleLoopPow (n : Nat) :
---     circleEncodeLift (circleLoopPow n) = (n : Int) := by
---   admit
+
 
 theorem circleLoopPow_add (m n : Nat) :
     circleLoopPow (m + n) =
-      LoopQuot.comp (circleLoopPow m) (circleLoopPow n) :=
-  LoopQuot.pow_add (A := Circle) (a := circleBase)
-    (x := circleLoopClass) m n
+      LoopQuot.comp (circleLoopPow m) (circleLoopPow n) := by
+  exact LoopQuot.pow_add (A := Circle) (a := circleBase) (x := circleLoopClass) m n
 
 /-!
 Support: relate quotient-level z-powers to raw path z-powers at the
@@ -627,6 +624,12 @@ def circleLoopZPow (z : Int) : CircleLoopQuot :=
 
 @[simp] theorem circleLoopZPow_ofNat (n : Nat) :
     circleLoopZPow n = circleLoopPow n := rfl
+
+theorem circleLoopZPow_add (m n : Int) :
+    circleLoopZPow (m + n) =
+      LoopQuot.comp (circleLoopZPow m) (circleLoopZPow n) :=
+  LoopQuot.zpow_add (A := Circle) (a := circleBase)
+    (x := circleLoopClass) m n
 
 /-- Integer powers in π₁ agree with the explicit loop z-powers. -/
 @[simp] theorem circlePiOne_zpow (z : Int) :
@@ -892,35 +895,21 @@ subtracts `1`. -/
   exact circleEncode_inv_circleLoopClass
 
 -- Step law: encoding `decode (z + 1)` increases by one.
--- @[simp] theorem circleEncode_circleDecode_add_one (z : Int) :
---     circleEncode (circleDecode (z + 1))
---       = circleEncode (circleDecode z) + 1 := by
---   change circleEncode (circleLoopZPow (z + 1))
---       = circleEncode (circleLoopZPow z) + 1
---   rw [circleLoopZPow_add (m := z) (n := 1), circleLoopZPow_one]
---   have step :
---       circleEncode (LoopQuot.comp (circleLoopZPow z) circleLoopClass)
---         = circleEncode (circleLoopZPow z) + 1 := by
---     simpa using circleEncode_comp_loop (x := circleLoopZPow z)
---   exact step
+@[simp] theorem circleEncode_circleDecode_add_one.{w} (z : Int) :
+    circleEncode.{w} (circleDecode.{w} (z + 1))
+      = circleEncode.{w} (circleDecode.{w} z) + 1 := by
+  unfold circleEncode circleDecode
+  rw [circleLoopZPow_add (m := z) (n := 1), circleLoopZPow_one]
+  rw [circleEncodeLift_comp_loop (x := circleLoopZPow z)]
 
 -- Step law: encoding `decode (z + (-1))` decreases by one.
--- @[simp] theorem circleEncode_circleDecode_add_neg_one (z : Int) :
---     circleEncode (circleDecode (z + (-1)))
---       = circleEncode (circleDecode z) - 1 := by
---   change circleEncode (circleLoopZPow (z + (-1)))
---       = circleEncode (circleLoopZPow z) - 1
---   rw [circleLoopZPow_add (m := z) (n := -1), circleLoopZPow_neg_one]
---   have step :
---       circleEncode (LoopQuot.comp (circleLoopZPow z) (LoopQuot.inv circleLoopClass))
---         = circleEncode (circleLoopZPow z) - 1 := by
---     simpa using circleEncode_comp_inv_loop (x := circleLoopZPow z)
---   exact step
+@[simp] theorem circleEncode_circleDecode_add_neg_one.{w} (z : Int) :
+    circleEncode.{w} (circleDecode.{w} (z + (-1)))
+      = circleEncode.{w} (circleDecode.{w} z) - 1 := by
+  unfold circleEncode circleDecode
+  rw [circleLoopZPow_add (m := z) (n := -1), circleLoopZPow_neg_one]
+  rw [circleEncodeLift_comp_inv_loop (x := circleLoopZPow z)]
 
 end
 end Path
 end ComputationalPaths
-
-
-
-

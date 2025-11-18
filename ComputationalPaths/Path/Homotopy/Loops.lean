@@ -5,11 +5,13 @@ This module develops the basic algebra needed to reason about loop spaces in
 the computational-paths setting.  Starting from raw loops (`Path a a`) we
 descend to rewrite equivalence classes, equip them with the induced group
 structure, and provide power operations that mirror the iterated-loop
-manipulations used in the thesis proof that `pi_1(S^1) ~= Z`.
+manipulations used in the proof that `pi_1(S^1) ~= Z`.
 -/
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.Quot
+
+set_option maxHeartbeats 1000000
 
 namespace ComputationalPaths
 namespace Path
@@ -304,6 +306,110 @@ theorem pow_add (x : LoopQuot A a) (m n : Nat) :
   change pow x (m + n) = comp (pow x m) (pow x n)
   exact h
 
+theorem pow_comm (x : LoopQuot A a) (m n : Nat) :
+    comp (pow x m) (pow x n) = comp (pow x n) (pow x m) := by
+  rw [← pow_add, Nat.add_comm, pow_add]
+
+theorem inv_comp_eq (x y : LoopQuot A a) :
+    inv (comp x y) = comp (inv y) (inv x) := by
+  apply comp_right_cancel (z := comp x y)
+  rw [inv_comp, comp_assoc, ← comp_assoc (inv x), inv_comp, id_comp, inv_comp]
+
+theorem pow_succ' (x : LoopQuot A a) (n : Nat) :
+    pow x (Nat.succ n) = comp x (pow x n) := by
+  rw [pow_succ]
+  conv =>
+    rhs
+    lhs
+    rw [← pow_one x]
+  rw [pow_comm, pow_one]
+
+theorem inv_pow_comm_x (x : LoopQuot A a) (n : Nat) :
+    comp (inv (pow x n)) x = comp x (inv (pow x n)) := by
+  apply comp_right_cancel (z := pow x n)
+  rw [comp_assoc, comp_assoc]
+  conv =>
+    lhs
+    rhs
+    rw [← pow_succ']
+  rw [pow_succ, ← comp_assoc, inv_comp, id_comp, comp_id]
+
+theorem zpow_succ (x : LoopQuot A a) (n : Int) :
+    zpow x (n + 1) = comp (zpow x n) x := by
+  cases n with
+  | ofNat n =>
+    have : Int.ofNat n + 1 = Int.ofNat (n + 1) := rfl
+    rw [this]
+    simp only [zpow]
+    rw [pow_succ]
+  | negSucc n =>
+    cases n with
+    | zero =>
+      have : Int.negSucc 0 + 1 = 0 := rfl
+      rw [this]
+      simp only [zpow, pow_zero, pow_one]
+      rw [inv_comp]
+    | succ n =>
+      have : Int.negSucc (Nat.succ n) + 1 = Int.negSucc n := rfl
+      rw [this]
+      simp only [zpow]
+      rw [pow_succ (n := n + 1), inv_comp_eq, comp_assoc, inv_pow_comm_x, ← comp_assoc, inv_comp, id_comp]
+
+theorem zpow_pred (x : LoopQuot A a) (n : Int) :
+    zpow x (n - 1) = comp (zpow x n) (inv x) := by
+  cases n with
+  | ofNat n =>
+    cases n with
+    | zero =>
+      have : Int.ofNat 0 - 1 = Int.negSucc 0 := rfl
+      rw [this]
+      simp only [zpow, pow_zero, pow_one, id_comp]
+    | succ n =>
+      have : Int.ofNat (Nat.succ n) - 1 = Int.ofNat n := by simp
+      rw [this]
+      simp only [zpow]
+      rw [pow_succ, comp_assoc, comp_inv, comp_id]
+  | negSucc n =>
+    have : Int.negSucc n - 1 = Int.negSucc (Nat.succ n) := rfl
+    rw [this]
+    simp only [zpow]
+    rw [pow_succ (n := n + 1), inv_comp_eq, ← inv_comp_eq, ← inv_comp_eq]
+    rw [← pow_succ (n := n + 1), ← pow_succ' (n := n + 1)]
+
+theorem int_induction {P : Int → Prop}
+    (base : P 0)
+    (succ : ∀ n, P n → P (n + 1))
+    (pred : ∀ n, P n → P (n - 1)) : ∀ n, P n := by
+  intro n
+  cases n with
+  | ofNat n =>
+    induction n with
+    | zero => exact base
+    | succ n ih => exact succ _ ih
+  | negSucc n =>
+    induction n with
+    | zero => exact pred 0 base
+    | succ n ih =>
+      have h : Int.negSucc (Nat.succ n) = Int.negSucc n - 1 := rfl
+      rw [h]
+      apply pred
+      exact ih
+
+theorem zpow_add (x : LoopQuot A a) (m n : Int) :
+    zpow x (m + n) = comp (zpow x m) (zpow x n) := by
+  induction n using int_induction with
+  | base =>
+    simp only [Int.add_zero, zpow, pow_zero, comp_id]
+  | succ n ih =>
+    rw [← Int.add_assoc, zpow_succ, ih, zpow_succ, comp_assoc]
+  | pred n ih =>
+    rw [Int.sub_eq_add_neg, ← Int.add_assoc, ← Int.sub_eq_add_neg]
+    rw [zpow_pred, ih]
+    conv =>
+      rhs
+      rw [← Int.sub_eq_add_neg]
+      rw [zpow_pred]
+    rw [comp_assoc]
 
 end LoopQuot
 

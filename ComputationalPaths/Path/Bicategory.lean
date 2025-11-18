@@ -47,15 +47,13 @@ variable {a b c d : A}
 @[simp] def whiskerLeft (f : Path a b) {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f h) :=
-  rweq_trans_congr_right (A := A) (a := a) (b := b) (c := c)
-    (p := f) (q := g) (r := h) η
+  rweq_trans_congr_right f η
 
 /-- Right whiskering: postcompose a 2-cell with a fixed 1-cell. -/
 @[simp] def whiskerRight {f g : Path a b} (h : Path b c)
     (η : TwoCell (A := A) (a := a) (b := b) f g) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f h) (Path.trans g h) :=
-  rweq_trans_congr_left (A := A) (a := a) (b := b) (c := c)
-    (p := f) (q := g) (r := h) η
+  rweq_trans_congr_left h η
 
 /-- Horizontal composition of 2-cells.  This is the operation denoted
 `∘ₕ` (or `circ_h`) in many texts and is defined by first whiskering on the

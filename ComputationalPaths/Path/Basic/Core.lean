@@ -425,8 +425,7 @@ along the `B`-component. -/
           simp [transport₂, transport]
 
 @[simp] theorem transport₂_const {A : Type u} {B : Type v}
-    {D : Type w}
-    {a₁ a₂ : A} {b₁ b₂ : B}
+    {D : Type w} {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) (q : Path b₁ b₂) (x : D) :
     transport₂ (D := fun _ _ => D) p q x = x := by
   cases p with
@@ -498,33 +497,6 @@ along the `B`-component. -/
     subst₂ (D := fun _ _ => D) x p q = x :=
   transport₂_const (D := D) p q x
 
-/-- Transport along a dependent sigma path by splitting it into the
-base path `p` and the fibre path `q`. -/
-@[simp] def transportSigma {A : Type u} {B : A → Type v}
-    {D : ∀ a, B a → Sort w}
-    {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
-    (p : Path a₁ a₂)
-  (q : Path (transport (D := fun a => B a) p b₁) b₂)
-    (x : D a₁ b₁) : D a₂ b₂ := by
-  cases p with
-  | mk steps₁ proof₁ =>
-      cases proof₁
-      cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₂
-          exact x
-
-/-- Substitution along a dependent sigma path splits into base and fibre
-components. -/
-@[simp] def substSigma {A : Type u} {B : A → Type v}
-    {D : ∀ a, B a → Sort w}
-    {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
-    (x : D a₁ b₁)
-    (p : Path a₁ a₂)
-    (q : Path (transport (D := fun a => B a) p b₁) b₂) :
-    D a₂ b₂ :=
-  transportSigma (A := A) (B := B) (D := D) p q x
-
 /-- Congruence of unary functions along paths. -/
 @[simp] def congrArg (f : A → B) (p : Path a b) :
     Path (f a) (f b) :=
@@ -539,6 +511,22 @@ theorem transport_congrArg {D : A → Type w}
   | mk steps proof =>
       cases proof
       simp [transport]
+
+theorem transport_compose {A B : Type u} {P : B → Type v}
+    (f : A → B) {a1 a2 : A} (p : Path a1 a2) (x : P (f a1)) :
+    transport (D := P ∘ f) p x = transport (D := P) (Path.congrArg f p) x := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      rfl
+
+theorem transport_app {P Q : A → Type v} (f : ∀ x, P x → Q x)
+    {a1 a2 : A} (p : Path a1 a2) (u : P a1) :
+    transport (D := Q) p (f a1 u) = f a2 (transport (D := P) p u) := by
+  cases p with
+  | mk steps proof =>
+      cases proof
+      rfl
 
 /-- Unary congruence preserves concatenation. -/
 @[simp] theorem congrArg_trans (f : A → B)

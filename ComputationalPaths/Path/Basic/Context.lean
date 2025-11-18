@@ -264,6 +264,10 @@ variable {A : Type u} {B : A → Type v}
       (C.fill a₂) :=
   Path.apd (A := A) (B := fun a => B a) (f := C.fill) p
 
+@[simp] theorem map_refl (C : DepContext A B) (a : A) :
+    map C (Path.refl a) = Path.refl (C.fill a) :=
+  Path.apd_refl (f := C.fill) a
+
 /-- Dependent substitution on the left: transport the proof across the base path
 before reapplying the context. -/
 @[simp] def substLeft (C : DepContext A B)
