@@ -37,22 +37,13 @@ variable {A : Type u} {B : Type v}
 
 @[simp] theorem map_symm (C : Context A B) {a b : A} (p : Path a b) :
     map C (Path.symm p) = Path.symm (map C p) := by
-  cases p with
-  | mk steps proof =>
-      cases proof
-      simp [map]
+  simp [map]
 
 @[simp] theorem map_trans (C : Context A B)
     {a b c : A} (p : Path a b) (q : Path b c) :
     map C (Path.trans p q) =
       Path.trans (map C p) (map C q) := by
-  cases p with
-  | mk steps₁ proof₁ =>
-      cases proof₁
-      cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₂
-          simp [map, Path.trans, List.map_append]
+  simp [map]
 
 @[simp] theorem map_ofEq (C : Context A B) {a b : A} (h : a = b) :
     map C (Path.ofEq (A := A) (a := a) (b := b) h) =
@@ -72,7 +63,6 @@ variable {A : Type u} {B : Type v}
     {a b : A} (p : Path a b) :
     map (comp g f) p =
       map g (map f p) := by
-  cases p
   simp [map, comp]
 
 /-- Substitution through a unary context on the "left" rewrite.
@@ -105,13 +95,13 @@ variable {A : Type u} {B : Type v} {C : Type w}
 @[simp] def mapLeft (K : BiContext A B C)
     {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
     Path (K.fill a₁ b) (K.fill a₂ b) :=
-  congrArg (fun x => K.fill x b) p
+  Path.mapLeft (f := K.fill) p b
 
 /-- Substitute along the right hole of a binary context (paper's `sub R`). -/
 @[simp] def mapRight (K : BiContext A B C)
     (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
     Path (K.fill a b₁) (K.fill a b₂) :=
-  congrArg (K.fill a) p
+  Path.mapRight (f := K.fill) a p
 
 @[simp] theorem mapLeft_refl (K : BiContext A B C) (a : A) (b : B) :
     mapLeft K (Path.refl a) b = Path.refl (K.fill a b) := by
@@ -121,22 +111,13 @@ variable {A : Type u} {B : Type v} {C : Type w}
     {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
     mapLeft K (Path.symm p) b =
       Path.symm (mapLeft K p b) := by
-  cases p with
-  | mk steps proof =>
-      cases proof
-      simp [mapLeft]
+  simp [mapLeft]
 
 @[simp] theorem mapLeft_trans (K : BiContext A B C)
     {a₁ a₂ a₃ : A} (p : Path a₁ a₂) (q : Path a₂ a₃) (b : B) :
     mapLeft K (Path.trans p q) b =
       Path.trans (mapLeft K p b) (mapLeft K q b) := by
-  cases p with
-  | mk steps₁ proof₁ =>
-      cases proof₁
-      cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₂
-          simp [mapLeft, Path.trans, List.map_append]
+  simp [mapLeft]
 
 /-- Freeze the right hole of a binary context to obtain a unary context. -/
 @[simp] def fixRight (K : BiContext A B C) (b : B) : Context A C :=
@@ -164,29 +145,20 @@ variable {A : Type u} {B : Type v} {C : Type w}
     (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
     mapRight K a (Path.symm p) =
       Path.symm (mapRight K a p) := by
-  cases p with
-  | mk steps proof =>
-      cases proof
-      simp [mapRight]
+  simp [mapRight]
 
 @[simp] theorem mapRight_trans (K : BiContext A B C)
     (a : A) {b₁ b₂ b₃ : B} (p : Path b₁ b₂) (q : Path b₂ b₃) :
     mapRight K a (Path.trans p q) =
       Path.trans (mapRight K a p) (mapRight K a q) := by
-  cases p with
-  | mk steps₁ proof₁ =>
-      cases proof₁
-      cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₂
-          simp [mapRight, Path.trans, List.map_append]
+  simp [mapRight]
 
 /-- Substitute through both holes of a binary context simultaneously. -/
 @[simp] def map2 (K : BiContext A B C)
     {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (K.fill a₁ b₁) (K.fill a₂ b₂) :=
-  Path.trans (mapLeft K p b₁) (mapRight K a₂ q)
+  Path.map2 (f := K.fill) p q
 
 @[simp] theorem map2_refl (K : BiContext A B C) (a : A) (b : B) :
     map2 K (Path.refl a) (Path.refl b) =
@@ -200,30 +172,12 @@ variable {A : Type u} {B : Type v} {C : Type w}
       Path.trans
         (mapRight K a₂ (Path.symm q))
         (mapLeft K (Path.symm p) b₁) := by
-  classical
-  have hRight :
-      Path.symm (mapRight K a₂ q) = mapRight K a₂ (Path.symm q) :=
-    (mapRight_symm (A := A) (B := B) (C := C) (K := K)
-      (a := a₂) (p := q)).symm
-  have hLeft :
-      Path.symm (mapLeft K p b₁) = mapLeft K (Path.symm p) b₁ :=
-    (mapLeft_symm (A := A) (B := B) (C := C) (K := K)
-      (p := p) (b := b₁)).symm
-  calc
-    Path.symm (map2 K p q)
-        = Path.trans (Path.symm (mapRight K a₂ q))
-            (Path.symm (mapLeft K p b₁)) := by
-                simp [map2]
-    _ = Path.trans (mapRight K a₂ (Path.symm q))
-            (Path.symm (mapLeft K p b₁)) := by
-                exact
-                  _root_.congrArg
-                    (fun x => Path.trans x (Path.symm (mapLeft K p b₁))) hRight
-    _ = Path.trans (mapRight K a₂ (Path.symm q))
-            (mapLeft K (Path.symm p) b₁) := by
-                exact
-                  _root_.congrArg
-                    (fun x => Path.trans (mapRight K a₂ (Path.symm q)) x) hLeft
+  change
+    Path.symm (Path.map2 (f := K.fill) p q) =
+      Path.trans
+        (Path.mapRight (f := K.fill) a₂ (Path.symm q))
+        (Path.mapLeft (f := K.fill) (Path.symm p) b₁)
+  exact Path.map2_symm (f := K.fill) (p := p) (q := q)
 
 @[simp] theorem map2_trans (K : BiContext A B C)
     {a₁ a₂ a₃ : A} {b₁ b₂ b₃ : B}
@@ -237,8 +191,18 @@ variable {A : Type u} {B : Type v} {C : Type w}
           (Path.trans
             (mapRight K a₃ q₁)
             (mapRight K a₃ q₂))) := by
-  classical
-  simp [map2]
+  change
+    Path.map2 (f := K.fill) (Path.trans p₁ p₂) (Path.trans q₁ q₂) =
+      Path.trans
+        (Path.mapLeft (f := K.fill) p₁ b₁)
+        (Path.trans
+          (Path.mapLeft (f := K.fill) p₂ b₁)
+          (Path.trans
+            (Path.mapRight (f := K.fill) a₃ q₁)
+            (Path.mapRight (f := K.fill) a₃ q₂)))
+  exact
+    Path.map2_trans (f := K.fill)
+      (p1 := p₁) (p2 := p₂) (q1 := q₁) (q2 := q₂)
 
 end BiContext
 
@@ -316,6 +280,60 @@ is equivalent to mapping the symmetric witness and transporting the result. -/
 
 end DepContext
 
+/-- Dependent congruence for binary functions: left hole. -/
+@[simp] def mapLeftDep
+    {A : Type u} {B : Type v} {C : A → B → Type w}
+    (f : (a : A) → (b : B) → C a b)
+    {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
+    Path (A := C a₂ b)
+      (Path.transport (A := A) (D := fun a => C a b) p (f a₁ b))
+      (f a₂ b) :=
+  Path.apd (A := A) (B := fun a => C a b) (f := fun a => f a b) p
+
+@[simp] theorem mapLeftDep_refl
+    {A : Type u} {B : Type v} {C : A → B → Type w}
+    (f : (a : A) → (b : B) → C a b) (a : A) (b : B) :
+    mapLeftDep f (Path.refl a) b = Path.refl (f a b) := by
+  simp [mapLeftDep]
+
+/-- Dependent congruence for binary functions: right hole. -/
+@[simp] def mapRightDep
+    {A : Type u} {B : Type v} {C : A → B → Type w}
+    (f : (a : A) → (b : B) → C a b)
+    (a : A) {b₁ b₂ : B} (q : Path b₁ b₂) :
+    Path (A := C a b₂)
+      (Path.transport (A := B) (D := fun b => C a b) q (f a b₁))
+      (f a b₂) :=
+  Path.apd (A := B) (B := fun b => C a b) (f := fun b => f a b) q
+
+@[simp] theorem mapRightDep_refl
+    {A : Type u} {B : Type v} {C : A → B → Type w}
+    (f : (a : A) → (b : B) → C a b) (a : A) (b : B) :
+    mapRightDep f a (Path.refl b) = Path.refl (f a b) := by
+  simp [mapRightDep]
+
+/-- Dependent congruence for binary functions on both holes. -/
+@[simp] def map2Dep
+    {A : Type u} {B : Type v} {C : A → B → Type w}
+    (f : (a : A) → (b : B) → C a b)
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    Path (A := C a₂ b₂)
+      (Path.transport (A := B) (D := fun b => C a₂ b) q
+        (Path.transport (A := A) (D := fun a => C a b₁) p (f a₁ b₁)))
+      (f a₂ b₂) :=
+  Path.trans
+    (Context.map
+      ⟨fun z => Path.transport (A := B) (D := fun b => C a₂ b) q z⟩
+      (mapLeftDep f p b₁))
+    (mapRightDep f a₂ q)
+
+@[simp] theorem map2Dep_refl
+    {A : Type u} {B : Type v} {C : A → B → Type w}
+    (f : (a : A) → (b : B) → C a b) (a : A) (b : B) :
+    map2Dep f (Path.refl a) (Path.refl b) = Path.refl (f a b) := by
+  simp [map2Dep]
+
 /-- A binary context whose codomain may depend on the left hole. -/
 structure DepBiContext (A : Type u) (B : Type v)
     (C : A → B → Type w) where
@@ -341,7 +359,7 @@ variable {A : Type u} {B : Type v} {C : A → B → Type w}
     Path (A := C a₂ b)
       (Path.transport (A := A) (D := fun a => C a b) p (K.fill a₁ b))
       (K.fill a₂ b) :=
-  DepContext.map (A := A) (B := fun a => C a b) (fixRight (A := A) (B := B) (C := C) K b) p
+  mapLeftDep (f := K.fill) p b
 
 /-- Map a path through the right hole of a dependent binary context. -/
 @[simp] def mapRight (K : DepBiContext A B C)
@@ -349,13 +367,7 @@ variable {A : Type u} {B : Type v} {C : A → B → Type w}
     Path (A := C a b₂)
       (Path.transport (A := B) (D := fun b => C a b) q (K.fill a b₁))
       (K.fill a b₂) :=
-  DepContext.map (A := B) (B := fun b => C a b) (fixLeft (A := A) (B := B) (C := C) K a) q
-
-/-- Transport along the right hole, viewed as a unary context. -/
-@[simp] def transportRightContext (a : A)
-    {b₁ b₂ : B} (q : Path b₁ b₂) :
-    Context (C a b₁) (C a b₂) :=
-  ⟨fun z => Path.transport (A := B) (D := fun b => C a b) q z⟩
+  mapRightDep (f := K.fill) a q
 
 /-- Simultaneously substitute through both holes of a dependent binary context. -/
 @[simp] def map2 (K : DepBiContext A B C)
@@ -365,11 +377,7 @@ variable {A : Type u} {B : Type v} {C : A → B → Type w}
       (Path.transport (A := B) (D := fun b => C a₂ b) q
         (Path.transport (A := A) (D := fun a => C a b₁) p (K.fill a₁ b₁)))
       (K.fill a₂ b₂) :=
-  Path.trans
-    (Context.map
-      (transportRightContext (A := A) (B := B) (C := C) a₂ q)
-      (mapLeft (A := A) (B := B) (C := C) K p b₁))
-    (mapRight (A := A) (B := B) (C := C) K a₂ q)
+  map2Dep (f := K.fill) p q
 
 end DepBiContext
 
