@@ -148,6 +148,42 @@ up to a rewrite-equality 2-cell. -/
     simp
   exact rweq_of_eq (A := A) (a := a) (b := c) h
 
+/-- The two standard ways of composing four 2-cells coincide.  Since
+`TwoCell` values live in `Prop`, the equality follows from proof
+irrelevance, but the lemma is recorded for convenient rewriting. -/
+@[simp] theorem interchange_eq_interchange'
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    interchange (A := A) (a := a) (b := b) (c := c)
+        (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂) =
+      interchange' (A := A) (a := a) (b := b) (c := c)
+        (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂) := by
+  apply Subsingleton.elim
+
+/-- Convenient `simp`-friendly restatement of the interchange law.  It
+rewrites a vertical composite of horizontal composites into a horizontal
+composite of vertical composites. -/
+@[simp] theorem comp_hcomp_hcomp
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    comp
+        (hcomp (A := A) (a := a) (b := b) (c := c) η₁ θ₁)
+        (hcomp (A := A) (a := a) (b := b) (c := c) η₂ θ₂) =
+      hcomp (A := A) (a := a) (b := b) (c := c)
+        (comp (A := A) (a := a) (b := b)
+          (p := f₀) (q := f₁) (r := f₂) η₁ η₂)
+        (comp (A := A) (a := b) (b := c)
+          (p := g₀) (q := g₁) (r := g₂) θ₁ θ₂) := by
+  exact
+    (interchange_eq_interchange' (A := A) (a := a) (b := b) (c := c)
+      (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂))
+
 end TwoCell
 
 section WeakBicategoryStructure
@@ -200,6 +236,26 @@ structure WeakBicategory (Obj : Type u') where
 
 end WeakBicategoryStructure
 
+section WeakTwoGroupoidStructure
+
+/-- Weak 2-groupoid: a weak bicategory where every 1-cell admits a
+weak inverse (up to 2-cells). -/
+structure WeakTwoGroupoid (Obj : Type u')
+    extends WeakBicategory Obj where
+  /-- Inversion on 1-cells. -/
+  inv₁ :
+    ∀ {a b : Obj}, Hom a b → Hom b a
+  /-- Left inverse law witnessed by a 2-cell. -/
+  leftInv₁ :
+    ∀ {a b : Obj} (f : Hom a b),
+      TwoCell (comp (inv₁ f) f) (id₁ b)
+  /-- Right inverse law witnessed by a 2-cell. -/
+  rightInv₁ :
+    ∀ {a b : Obj} (f : Hom a b),
+      TwoCell (comp f (inv₁ f)) (id₁ a)
+
+end WeakTwoGroupoidStructure
+
 /-- Computational paths and rewrite-equality 2-cells form a weak bicategory. -/
 def weakBicategory (A : Type u) :
     WeakBicategory (Obj := A) where
@@ -234,6 +290,17 @@ def weakBicategory (A : Type u) :
       (d := d) (e := e) f g h k
   triangle := fun {a b c} (f : Path a b) (g : Path b c) =>
     TwoCell.triangle (A := A) (a := a) (b := b) (c := c) f g
+
+/-- Computational paths organise into a weak 2-groupoid: every path has an
+inverse up to rewrite equality. -/
+def weakTwoGroupoid (A : Type u) :
+    WeakTwoGroupoid (Obj := A) where
+  toWeakBicategory := weakBicategory A
+  inv₁ := fun {_ _} f => Path.symm f
+  leftInv₁ := fun {_ _} f =>
+    rweq_cmpA_inv_left (A := A) (p := f)
+  rightInv₁ := fun {_ _} f =>
+    rweq_cmpA_inv_right (A := A) (p := f)
 
 end Path
 end ComputationalPaths

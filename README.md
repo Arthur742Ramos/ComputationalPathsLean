@@ -20,6 +20,19 @@ Project Layout (selected)
 - `ComputationalPaths/Path/HIT/Circle.lean` — circle HIT interface, code family into ℤ, encode/transport lemmas, z-powers.
 - `ComputationalPaths/Path/HIT/CircleStep.lean` — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
 
+## Bicategory & weak 2-groupoid API
+
+- `ComputationalPaths/Path/Bicategory.lean` packages computational paths into the structures
+  ```lean
+  open ComputationalPaths.Path
+
+  variable (A : Type u)
+
+  def pathsBicat : WeakBicategory A := weakBicategory A
+  def pathsTwoGroupoid : WeakTwoGroupoid A := weakTwoGroupoid A
+  ```
+  Both constructions expose whiskering, horizontal composition, associator/unitors, the interchange law, and rewrite-level inverses for 1-cells. Import `ComputationalPaths.Path` and open the namespace to bring the API into scope for your own developments.
+
 Circle π₁(S¹) ≃ ℤ (what to read)
 - Encoding: `circleEncode : π₁(S¹) → ℤ` via quotient-lift of `circleEncodePath`.
 - Decoding: `circleDecode : ℤ → π₁(S¹)` by z-powers of the fundamental loop.
