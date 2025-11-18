@@ -19,6 +19,7 @@ Project Layout (selected)
 - `ComputationalPaths/Path/Homotopy/*` — loop spaces, rewrite monoids (`LoopMonoid`), loop groups (`LoopGroup`), and π₁ interfaces.
 - `ComputationalPaths/Path/HIT/Circle.lean` — circle HIT interface, code family into ℤ, encode/transport lemmas, z-powers.
 - `ComputationalPaths/Path/HIT/CircleStep.lean` — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
+- `ComputationalPaths/Path/Homotopy/HoTT.lean` — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
 
@@ -32,6 +33,7 @@ Project Layout (selected)
   def pathsTwoGroupoid : WeakTwoGroupoid A := weakTwoGroupoid A
   ```
   Both constructions expose whiskering, horizontal composition, associator/unitors, the interchange law, and rewrite-level inverses for 1-cells. Import `ComputationalPaths.Path` and open the namespace to bring the API into scope for your own developments.
+- Automation helpers: use the tactics `rwEq_auto` / `twoCell_auto` to solve common `RwEq` or `TwoCell` goals (they combine `simp` with the trans/symm constructors).
 
 Circle π₁(S¹) ≃ ℤ (what to read)
 - Encoding: `circleEncode : π₁(S¹) → ℤ` via quotient-lift of `circleEncodePath`.

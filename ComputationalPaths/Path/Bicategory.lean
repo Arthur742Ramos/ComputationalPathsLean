@@ -186,6 +186,29 @@ composite of vertical composites. -/
 
 end TwoCell
 
+namespace Tactic
+
+open Lean.Elab.Tactic
+
+syntax (name := rwEqAuto) "rwEq_auto" : tactic
+
+macro_rules
+  | `(tactic| rwEq_auto) =>
+      `(tactic|
+        first
+          | simp (config := {contextual := true})
+          | exact RwEq.refl _
+          | refine RwEq.symm ?_; rwEq_auto
+          | refine RwEq.trans ?_ ?_; first | rwEq_auto | rwEq_auto)
+
+syntax (name := twoCellAuto) "twoCell_auto" : tactic
+
+macro_rules
+  | `(tactic| twoCell_auto) =>
+      `(tactic| rwEq_auto)
+
+end Tactic
+
 section WeakBicategoryStructure
 
 universe u' v w

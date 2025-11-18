@@ -17,3 +17,4 @@ import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.Homotopy.HoTT
