@@ -154,8 +154,9 @@ noncomputable def torusCode : Torus → Type _ :=
   torusRec torusCodeData
 
 @[simp] theorem torusCode_base :
-    torusCode torusBase = (Int × Int) :=
-  torusRec_base torusCodeData
+    torusCode torusBase = (Int × Int) := by
+  unfold torusCode
+  exact torusRec_base torusCodeData
 
 /-- View an element of `torusCode torusBase` as a pair of integers. -/
 @[simp] def torusCodeToProd : torusCode torusBase → Int × Int :=
@@ -173,6 +174,13 @@ noncomputable def torusCode : Torus → Type _ :=
     torusCodeOfProd (torusCodeToProd z) = z := by
   simp [torusCodeToProd, torusCodeOfProd]
 
+theorem cast_torusCode_base_torusCodeOfProd (z : Int × Int) :
+    cast torusCode_base (torusCodeOfProd z) = z := by
+  unfold torusCodeOfProd
+  change cast torusCode_base (cast torusCode_base.symm z) = z
+  rw [cast_cast]
+  rfl
+
 /-- Chosen basepoint in the code fibre at the torus base. -/
 @[simp] def torusCodeZero : torusCode torusBase :=
   torusCodeOfProd (0, 0)
@@ -187,10 +195,10 @@ noncomputable def torusCode : Torus → Type _ :=
     Path torusBase torusBase → Int × Int :=
   fun p => torusCodeToProd (torusEncodeRaw torusBase p)
 
-@[simp] theorem torusEncodePath_refl :
-    torusEncodePath (Path.refl torusBase) = (0, 0) := by
-  change torusCodeToProd torusCodeZero = (0, 0)
-  simp [torusCodeZero, torusCodeToProd]
+@[simp] theorem torusEncodePath_refl : torusEncodePath (Path.refl torusBase) = (0, 0) := by
+  unfold torusEncodePath
+  simp
+  exact cast_torusCode_base_torusCodeOfProd (0, 0)
 
 @[simp] theorem torusCode_loop1_path :
     Path.trans (Path.symm (Path.ofEq torusCode_base))
@@ -224,11 +232,374 @@ def torusLoop2PathZPow : Int → Path torusBase torusBase
   | Int.ofNat n => torusLoop2PathPow n
   | Int.negSucc n => Path.symm (torusLoop2PathPow (Nat.succ n))
 
-/-- Decode a pair of integers into a loop on the torus. -/
+
+-- Helper for Int arithmetic
+theorem eq_sub_of_add_eq {a b c : Int} (h : a + b = c) : a = c - b := by
+  rw [← h]
+  simp
+
+theorem Int.negSucc_add_neg_one (n : Nat) : Int.negSucc n + -1 = Int.negSucc (n + 1) := rfl
+
+@[simp] theorem torusCode_transport_loop1 (z : Int × Int) :
+    torusCodeToProd (Path.transport (A := Torus) (D := torusCode) torusLoop1 (torusCodeOfProd z)) = (z.1 + 1, z.2) := by
+  let p1 := Path.ofEq torusCode_base
+  let q := Path.congrArg torusCode torusLoop1
+  let z_code := torusCodeOfProd z
+  have hEq : Path.trans (Path.symm p1) (Path.trans q p1) = Path.ua torusEquiv1 :=
+    torusCode_loop1_path
+  have hLeftStep :=
+    Path.transport_trans (A := Type _) (D := fun X => X)
+      (p := Path.symm p1) (q := Path.trans q p1)
+      (x := Path.transport (A := Type _) (D := fun X => X) p1 z_code)
+  have hLeftCancel :=
+    _root_.congrArg
+      (fun w =>
+        Path.transport (A := Type _) (D := fun X => X)
+          (Path.trans q p1) w)
+      (Path.transport_symm_left (A := Type _) (D := fun X => X)
+        (p := p1) (x := z_code))
+  have hLeftSimp :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans (Path.symm p1) (Path.trans q p1))
+        (Path.transport (A := Type _) (D := fun X => X) p1 z_code)
+      =
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) z_code := by
+    exact hLeftStep.trans hLeftCancel
+  have hComb :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) z_code
+      =
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.ua torusEquiv1)
+        (Path.transport (A := Type _) (D := fun X => X) p1 z_code) := by
+    rw [← hLeftSimp]
+    rw [hEq]
+
+  have hAssoc :=
+    Path.transport_trans (A := Type _) (D := fun X => X)
+      (p := q) (q := p1) (x := z_code)
+  have hMove :=
+    (Path.transport_congrArg (A := Torus) (D := torusCode)
+      (p := torusLoop1) (x := z_code))
+  have hLHS :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) z_code
+      =
+      torusCodeToProd
+        (Path.transport (A := Torus) (D := torusCode) torusLoop1 z_code) := by
+    have hSplit :
+        Path.transport (A := Type _) (D := fun X => X)
+          (Path.trans q p1) z_code
+        =
+        Path.transport (A := Type _) (D := fun X => X) p1
+          (Path.transport (A := Type _) (D := fun X => X) q z_code) := by
+      simpa using hAssoc
+    have hInner :
+        Path.transport (A := Type _) (D := fun X => X) q z_code
+        = Path.transport (A := Torus) (D := torusCode) torusLoop1 z_code := by
+      exact hMove.symm
+    exact hSplit.trans (_root_.congrArg (fun w => p1.transport w) hInner)
+  have hBase :
+      Path.transport (A := Type _) (D := fun X => X) p1 z_code
+      = z := by
+    exact cast_torusCode_base_torusCodeOfProd z
+  have hRHS :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.ua torusEquiv1) z
+      = (z.1 + 1, z.2) := by
+    simp [Path.ua_beta, torusEquiv1]
+  exact (hLHS.trans hComb).trans (by simpa [hBase] using hRHS)
+
+@[simp] theorem torusCode_transport_loop2 (z : Int × Int) :
+    torusCodeToProd (Path.transport (A := Torus) (D := torusCode) torusLoop2 (torusCodeOfProd z)) = (z.1, z.2 + 1) := by
+  let p1 := Path.ofEq torusCode_base
+  let q := Path.congrArg torusCode torusLoop2
+  let z_code := torusCodeOfProd z
+  have hEq : Path.trans (Path.symm p1) (Path.trans q p1) = Path.ua torusEquiv2 :=
+    torusCode_loop2_path
+  have hLeftStep :=
+    Path.transport_trans (A := Type _) (D := fun X => X)
+      (p := Path.symm p1) (q := Path.trans q p1)
+      (x := Path.transport (A := Type _) (D := fun X => X) p1 z_code)
+  have hLeftCancel :=
+    _root_.congrArg
+      (fun w =>
+        Path.transport (A := Type _) (D := fun X => X)
+          (Path.trans q p1) w)
+      (Path.transport_symm_left (A := Type _) (D := fun X => X)
+        (p := p1) (x := z_code))
+  have hLeftSimp :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans (Path.symm p1) (Path.trans q p1))
+        (Path.transport (A := Type _) (D := fun X => X) p1 z_code)
+      =
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) z_code := by
+    exact hLeftStep.trans hLeftCancel
+  have hComb :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) z_code
+      =
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.ua torusEquiv2)
+        (Path.transport (A := Type _) (D := fun X => X) p1 z_code) := by
+    rw [← hLeftSimp]
+    rw [hEq]
+
+  have hAssoc :=
+    Path.transport_trans (A := Type _) (D := fun X => X)
+      (p := q) (q := p1) (x := z_code)
+  have hMove :=
+    (Path.transport_congrArg (A := Torus) (D := torusCode)
+      (p := torusLoop2) (x := z_code))
+  have hLHS :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) z_code
+      =
+      torusCodeToProd
+        (Path.transport (A := Torus) (D := torusCode) torusLoop2 z_code) := by
+    have hSplit :
+        Path.transport (A := Type _) (D := fun X => X)
+          (Path.trans q p1) z_code
+        =
+        Path.transport (A := Type _) (D := fun X => X) p1
+          (Path.transport (A := Type _) (D := fun X => X) q z_code) := by
+      simpa using hAssoc
+    have hInner :
+        Path.transport (A := Type _) (D := fun X => X) q z_code
+        = Path.transport (A := Torus) (D := torusCode) torusLoop2 z_code := by
+      exact hMove.symm
+    exact hSplit.trans (_root_.congrArg (fun w => p1.transport w) hInner)
+  have hBase :
+      Path.transport (A := Type _) (D := fun X => X) p1 z_code
+      = z := by
+    exact cast_torusCode_base_torusCodeOfProd z
+  have hRHS :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.ua torusEquiv2) z
+      = (z.1, z.2 + 1) := by
+    simp [Path.ua_beta, torusEquiv2]
+  exact (hLHS.trans hComb).trans (by simpa [hBase] using hRHS)
+
+@[simp] theorem torusCode_transport_loop1_inv (z : Int × Int) :
+    torusCodeToProd (Path.transport (A := Torus) (D := torusCode) (Path.symm torusLoop1) (torusCodeOfProd z)) = (z.1 - 1, z.2) := by
+  let x := torusCodeOfProd z
+  have h : torusCodeToProd (Path.transport (A := Torus) (D := torusCode) torusLoop1
+      (Path.transport (A := Torus) (D := torusCode) (Path.symm torusLoop1) x)) = z := by
+    rw [Path.transport_symm_right]
+    exact cast_torusCode_base_torusCodeOfProd z
+  have h2 := torusCode_transport_loop1 (torusCodeToProd (Path.transport (A := Torus) (D := torusCode) (Path.symm torusLoop1) x))
+  rw [torusCodeOfProd_toProd] at h2
+  rw [h] at h2
+  ext
+  . simp at h2
+    have h2_1 := _root_.congrArg Prod.fst h2
+    simp at h2_1
+    apply eq_sub_of_add_eq
+    exact h2_1.symm
+  . simp at h2
+    have h2_2 := _root_.congrArg Prod.snd h2
+    simp at h2_2
+    exact h2_2.symm
+
+@[simp] theorem torusCode_transport_loop2_inv (z : Int × Int) :
+    torusCodeToProd (Path.transport (A := Torus) (D := torusCode) (Path.symm torusLoop2) (torusCodeOfProd z)) = (z.1, z.2 - 1) := by
+  let x := torusCodeOfProd z
+  have h : torusCodeToProd (Path.transport (A := Torus) (D := torusCode) torusLoop2
+      (Path.transport (A := Torus) (D := torusCode) (Path.symm torusLoop2) x)) = z := by
+    rw [Path.transport_symm_right]
+    exact cast_torusCode_base_torusCodeOfProd z
+  have h2 := torusCode_transport_loop2 (torusCodeToProd (Path.transport (A := Torus) (D := torusCode) (Path.symm torusLoop2) x))
+  rw [torusCodeOfProd_toProd] at h2
+  rw [h] at h2
+  ext
+  . simp at h2
+    have h2_1 := _root_.congrArg Prod.fst h2
+    simp at h2_1
+    exact h2_1.symm
+  . simp at h2
+    have h2_2 := _root_.congrArg Prod.snd h2
+    simp at h2_2
+    apply eq_sub_of_add_eq
+    exact h2_2.symm
+
+theorem sub_eq_add_neg (a b : Int) : a - b = a + -b := rfl
+
+theorem torusEncodePath_trans_loop1 (p : Path torusBase torusBase) :
+    torusEncodePath (Path.trans p torusLoop1) =
+      ((torusEncodePath p).1 + 1, (torusEncodePath p).2) := by
+  let z := torusEncodePath p
+  have h : torusEncodePath (Path.trans p torusLoop1) = torusCodeToProd (Path.transport (A := Torus) (D := torusCode) torusLoop1 (torusCodeOfProd z)) := by
+    simp only [torusEncodePath, torusEncodeRaw, Path.transport_trans]
+    congr 2
+    dsimp only [z, torusEncodePath, torusEncodeRaw]
+    rw [torusCodeOfProd_toProd]
+  rw [h]
+  rw [torusCode_transport_loop1]
+
+@[simp] theorem torusEncodePath_trans_loop2 (p : Path torusBase torusBase) :
+    torusEncodePath (Path.trans p torusLoop2) =
+      ((torusEncodePath p).1, (torusEncodePath p).2 + 1) := by
+  let z := torusEncodePath p
+  have h : torusEncodePath (Path.trans p torusLoop2) = torusCodeToProd (Path.transport (A := Torus) (D := torusCode) torusLoop2 (torusCodeOfProd z)) := by
+    simp only [torusEncodePath, torusEncodeRaw, Path.transport_trans]
+    congr 2
+    dsimp only [z, torusEncodePath, torusEncodeRaw]
+    rw [torusCodeOfProd_toProd]
+  rw [h]
+  rw [torusCode_transport_loop2]
+
+@[simp] theorem torusEncodePath_loop1 : torusEncodePath torusLoop1 = (1, 0) := by
+  rw [← Path.trans_refl_left torusLoop1]
+  rw [torusEncodePath_trans_loop1]
+  rw [torusEncodePath_refl]
+  simp
+
+@[simp] theorem torusEncodePath_loop2 : torusEncodePath torusLoop2 = (0, 1) := by
+  rw [← Path.trans_refl_left torusLoop2]
+  rw [torusEncodePath_trans_loop2]
+  rw [torusEncodePath_refl]
+  simp
+
+@[simp] theorem torusEncodePath_trans_symm_loop1
+    (p : Path torusBase torusBase) :
+    torusEncodePath (Path.trans p (Path.symm torusLoop1)) =
+      ((torusEncodePath p).1 - 1, (torusEncodePath p).2) := by
+  let z := torusEncodePath p
+  have h : torusEncodePath (Path.trans p (Path.symm torusLoop1)) = torusCodeToProd (Path.transport (A := Torus) (D := torusCode) (Path.symm torusLoop1) (torusCodeOfProd z)) := by
+    simp only [torusEncodePath, torusEncodeRaw, Path.transport_trans]
+    congr 2
+    dsimp only [z, torusEncodePath, torusEncodeRaw]
+    rw [torusCodeOfProd_toProd]
+  rw [h]
+  rw [torusCode_transport_loop1_inv]
+
+@[simp] theorem torusEncodePath_trans_symm_loop2
+    (p : Path torusBase torusBase) :
+    torusEncodePath (Path.trans p (Path.symm torusLoop2)) =
+      ((torusEncodePath p).1, (torusEncodePath p).2 - 1) := by
+  let z := torusEncodePath p
+  have h : torusEncodePath (Path.trans p (Path.symm torusLoop2)) = torusCodeToProd (Path.transport (A := Torus) (D := torusCode) (Path.symm torusLoop2) (torusCodeOfProd z)) := by
+    simp only [torusEncodePath, torusEncodeRaw, Path.transport_trans]
+    congr 2
+    dsimp only [z, torusEncodePath, torusEncodeRaw]
+    rw [torusCodeOfProd_toProd]
+  rw [h]
+  rw [torusCode_transport_loop2_inv]
+
+theorem torusEncodePath_trans_loop1PathZPow (p : Path torusBase torusBase) (n : Int) :
+    torusEncodePath (Path.trans p (torusLoop1PathZPow n)) =
+      ((torusEncodePath p).1 + n, (torusEncodePath p).2) := by
+  revert p
+  cases n with
+  | ofNat n =>
+    induction n with
+    | zero => intro p; simp only [torusLoop1PathZPow, torusLoop1PathPow, Path.trans_refl_right, Int.ofNat_eq_coe]; simp [Int.add_zero]
+    | succ n ih =>
+      intro p
+      simp only [torusLoop1PathZPow, torusLoop1PathPow]
+      rw [← Path.trans_assoc]
+      rw [torusEncodePath_trans_loop1]
+      simp only [torusLoop1PathZPow] at ih
+      rw [ih]
+      simp [Int.add_assoc]
+  | negSucc n =>
+    induction n with
+    | zero =>
+      intro p
+      simp only [torusLoop1PathZPow, torusLoop1PathPow]
+      simp only [Path.trans_refl_left]
+      rw [torusEncodePath_trans_symm_loop1]
+      simp [sub_eq_add_neg]
+    | succ n ih =>
+      intro p
+      have h_decomp : torusLoop1PathZPow (Int.negSucc (n + 1)) = Path.trans (Path.symm torusLoop1) (torusLoop1PathZPow (Int.negSucc n)) := by
+        simp only [torusLoop1PathZPow, torusLoop1PathPow]
+        rw [Path.symm_trans]
+      rw [h_decomp]
+      rw [← Path.trans_assoc]
+      conv =>
+        lhs
+        erw [ih (Path.trans p (Path.symm torusLoop1))]
+      rw [torusEncodePath_trans_symm_loop1]
+      dsimp
+      rw [sub_eq_add_neg, Int.add_assoc]
+      rw [Int.add_comm (-1)]
+      rw [Int.negSucc_add_neg_one]
+
+theorem torusEncodePath_trans_loop2PathZPow (p : Path torusBase torusBase) (n : Int) :
+    torusEncodePath (Path.trans p (torusLoop2PathZPow n)) =
+      ((torusEncodePath p).1, (torusEncodePath p).2 + n) := by
+  revert p
+  cases n with
+  | ofNat n =>
+    induction n with
+    | zero => intro p; simp only [torusLoop2PathZPow, torusLoop2PathPow, Path.trans_refl_right, Int.ofNat_eq_coe]; simp [Int.add_zero]
+    | succ n ih =>
+      intro p
+      simp only [torusLoop2PathZPow, torusLoop2PathPow]
+      rw [← Path.trans_assoc]
+      rw [torusEncodePath_trans_loop2]
+      simp only [torusLoop2PathZPow] at ih
+      rw [ih]
+      simp [Int.add_assoc]
+  | negSucc n =>
+    induction n with
+    | zero =>
+      intro p
+      simp only [torusLoop2PathZPow, torusLoop2PathPow]
+      simp only [Path.trans_refl_left]
+      rw [torusEncodePath_trans_symm_loop2]
+      simp [sub_eq_add_neg]
+    | succ n ih =>
+      intro p
+      have h_decomp : torusLoop2PathZPow (Int.negSucc (n + 1)) = Path.trans (Path.symm torusLoop2) (torusLoop2PathZPow (Int.negSucc n)) := by
+        simp only [torusLoop2PathZPow, torusLoop2PathPow]
+        rw [Path.symm_trans]
+      rw [h_decomp]
+      rw [← Path.trans_assoc]
+      conv =>
+        lhs
+        erw [ih (Path.trans p (Path.symm torusLoop2))]
+      rw [torusEncodePath_trans_symm_loop2]
+      dsimp
+      apply Prod.ext
+      . rfl
+      . rw [sub_eq_add_neg, Int.add_assoc]
+        rw [Int.add_comm (-1)]
+        rw [Int.negSucc_add_neg_one]
+
+theorem torusLoop_comm (p : Path torusBase torusBase) :
+    Path.trans torusLoop1 (Path.trans torusLoop2 p) = Path.trans torusLoop2 (Path.trans torusLoop1 p) := by
+  rw [← Path.trans_assoc, torusSurf, Path.trans_assoc]
+
+theorem torusLoop_comm_pow (n : Nat) (p : Path torusBase torusBase) :
+    Path.trans torusLoop1 (Path.trans (torusLoop2PathPow n) p) =
+    Path.trans (torusLoop2PathPow n) (Path.trans torusLoop1 p) := by
+  revert p
+  induction n with
+  | zero => intro p; simp [torusLoop2PathPow]
+  | succ n ih =>
+    intro p
+    unfold torusLoop2PathPow
+    conv => lhs; arg 2; rw [Path.trans_assoc]
+    rw [ih]
+    rw [torusLoop_comm]
+    rw [← Path.trans_assoc]
+
 def torusDecodePath (z : Int × Int) : Path torusBase torusBase :=
   Path.trans (torusLoop1PathZPow z.1) (torusLoop2PathZPow z.2)
 
-end
-
-end Path
-end ComputationalPaths
+theorem torusEncode_decode (z : Int × Int) :
+    torusEncodePath (torusDecodePath z) = z := by
+  unfold torusDecodePath
+  rw [torusEncodePath_trans_loop2PathZPow]
+  have h : torusEncodePath (torusLoop1PathZPow z.fst) = (z.fst, 0) := by
+    have h2 := torusEncodePath_trans_loop1PathZPow (Path.refl torusBase) z.fst
+    rw [Path.trans_refl_left] at h2
+    rw [h2]
+    rw [torusEncodePath_refl]
+    simp
+  rw [h]
+  simp
