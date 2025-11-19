@@ -32,6 +32,8 @@ agent/tool is responsible for and when to invoke it.
   large changes helps minimise incidental diffs.
 - The simplifier linter will warn about unused simp arguments during builds;
   prefer trimming those hints when they appear.
+- **Zero-warning policy:** The build should remain warning-free. Address any
+  linter warnings (e.g., `unnecessarySimpa`) immediately.
 
 ## Tips for new contributors
 - Skim `README.md` for the latest project status and roadmap.

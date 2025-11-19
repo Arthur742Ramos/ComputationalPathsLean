@@ -257,9 +257,7 @@ theorem transport_prod (p : Path z₁ z₂)
     transport (A := Z) (P := fun z => A₀ z × B₀ z) p x =
       (transport (A := Z) (P := A₀) p x.1,
         transport (A := Z) (P := B₀) p x.2) := by
-  simpa [transport] using
-    Path.transport_prod_fun
-      (A_fam := A₀) (B_fam := B₀) (p := p) (x := x)
+  simp [transport, Path.transport_prod_fun]
 
 variable {A : Type u} {A' : Type u'} {B : Type v} {B' : Type v'}
 
@@ -273,10 +271,7 @@ variable {A : Type u} {A' : Type u'} {B : Type v} {B' : Type v'}
         (Path.prodMk p q)).toEq =
       (Path.prodMk (Path.congrArg g p)
         (Path.congrArg h q)).toEq := by
-  simpa using
-    Path.toEq_congrArg_prod_map
-      (A := A) (B := B) (A' := A') (B' := B')
-      (g := g) (h := h) (p := p) (q := q)
+  simp
 
 end Prod
 

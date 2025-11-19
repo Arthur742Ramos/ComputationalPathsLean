@@ -49,5 +49,10 @@ the equivalence. -/
   simp [hEval] at hSymm
   exact hSymm
 
+/-- Univalence preserves composition: the path for a composite equivalence is
+the concatenation of the paths. -/
+axiom ua_trans {A B C : Type u} (e : SimpleEquiv A B) (f : SimpleEquiv B C) :
+    Path.trans (ua e) (ua f) = ua (SimpleEquiv.comp e f)
+
 end Path
 end ComputationalPaths
