@@ -12,7 +12,7 @@ namespace ComputationalPaths
 namespace Path
 namespace HoTT
 
-universe u v w
+universe u v w u' v' w'
 
 variable {A : Type u}
 
@@ -243,6 +243,104 @@ end IsEquiv
     rightHomotopy := fun _ => Path.refl _ }
 
 end Equivalences
+
+/-! ### Cartesian products -/
+
+section Prod
+
+variable {Z : Type u} {A₀ : Z → Type v} {B₀ : Z → Type w}
+variable {z₁ z₂ : Z}
+
+/-- Transport along a path in the base of a product family splits componentwise. -/
+theorem transport_prod (p : Path z₁ z₂)
+    (x : A₀ z₁ × B₀ z₁) :
+    transport (A := Z) (P := fun z => A₀ z × B₀ z) p x =
+      (transport (A := Z) (P := A₀) p x.1,
+        transport (A := Z) (P := B₀) p x.2) := by
+  simpa [transport] using
+    Path.transport_prod_fun
+      (A_fam := A₀) (B_fam := B₀) (p := p) (x := x)
+
+variable {A : Type u} {A' : Type u'} {B : Type v} {B' : Type v'}
+
+/-- Applying a product map to a path computed componentwise matches applying
+`ap` to each component and rebuilding the product path. -/
+@[simp] theorem prod_congrArg_toEq
+    (g : A → A') (h : B → B')
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) (q : Path b₁ b₂) :
+    (Path.congrArg (fun x : A × B => (g x.1, h x.2))
+        (Path.prodMk p q)).toEq =
+      (Path.prodMk (Path.congrArg g p)
+        (Path.congrArg h q)).toEq := by
+  simpa using
+    Path.toEq_congrArg_prod_map
+      (A := A) (B := B) (A' := A') (B' := B')
+      (g := g) (h := h) (p := p) (q := q)
+
+end Prod
+
+/-! ### Unit type -/
+
+section Unit
+
+/-- The unit type is contractible: every pair of points is connected by a reflexive path. -/
+@[simp] def unitPath (x y : Unit) : Path x y := by
+  cases x
+  cases y
+  simpa using Path.refl ()
+
+@[simp] theorem unitPath_eq_refl (x : Unit) :
+    unitPath x x = Path.refl x := by
+  cases x
+  simp
+
+@[simp] theorem unitPath_toEq (x y : Unit) :
+    (unitPath x y).toEq = rfl := by
+  cases x
+  cases y
+  simp
+
+end Unit
+
+/-! ### Function extensionality -/
+
+section Funext
+
+variable {A : Type u} {B : Type v}
+
+/-- A pointwise family of computational paths assembles into a path between functions. -/
+@[simp] def funextPath {f g : A → B}
+    (H : (x : A) → Path (f x) (g x)) : Path f g :=
+  Path.lamCongr H
+
+/-- A path between functions restricts to pointwise paths. -/
+@[simp] def funextPointwise {f g : A → B}
+    (p : Path f g) : (x : A) → Path (f x) (g x) :=
+  fun x => Path.app p x
+
+/-- Weak function extensionality in the sense of Chapter 5: an inhabitant of `A`
+packages the pointwise-to-global principle. -/
+def weakFunext (a₀ : A) :
+    (f g : A → B) →
+      ((x : A) → Path (f x) (g x)) → Path f g :=
+  fun f g H =>
+    (show Path f g from
+      (by
+        let _ := a₀
+        exact funextPath (A := A) (B := B) (f := f) (g := g) H))
+
+@[simp] theorem funextPath_toEq {f g : A → B}
+    (H : (x : A) → Path (f x) (g x)) :
+    (funextPath (A := A) (B := B) (f := f) (g := g) H).toEq =
+      funext fun x => (H x).toEq := rfl
+
+@[simp] theorem funextPointwise_toEq {f g : A → B}
+    (p : Path f g) (x : A) :
+    (funextPointwise (A := A) (B := B) (f := f) (g := g) p x).toEq =
+      _root_.congrArg (fun h => h x) p.toEq := rfl
+
+end Funext
 
 end HoTT
 end Path
