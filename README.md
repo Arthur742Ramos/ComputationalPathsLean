@@ -6,6 +6,7 @@ Highlights
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + code family into ℤ (via univalence axioms).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction (no local placeholders).
+- Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd`.
 
 Quick Start
 - Build: `./lake.cmd build`
@@ -19,6 +20,7 @@ Project Layout (selected)
 - `ComputationalPaths/Path/Homotopy/*` — loop spaces, rewrite monoids (`LoopMonoid`), loop groups (`LoopGroup`), and π₁ interfaces.
 - `ComputationalPaths/Path/HIT/Circle.lean` — circle HIT interface, code family into ℤ, encode/transport lemmas, z-powers.
 - `ComputationalPaths/Path/HIT/CircleStep.lean` — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
+- `ComputationalPaths/Path/HIT/Torus.lean` — torus HIT interface, code family into ℤ × ℤ, encode/transport lemmas, iterated loops, and the equivalence `torusPiOneEquivIntProd`.
 - `ComputationalPaths/Path/Homotopy/HoTT.lean` — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -44,6 +46,13 @@ Circle π₁(S¹) ≃ ℤ (what to read)
   - Left-inverse on π₁: `circleDecode (circleEncode x) = x` (reduce to equality with `toEq` and use equality induction).
 - Homomorphism (circle-specific): decode respects addition, subtraction, and group multiplication — proved from the step laws and encode injectivity.
 
+Torus π₁(T²) ≃ ℤ × ℤ (what to read)
+- Encoding: `torusEncode : π₁(T²) → ℤ × ℤ` via the quotient lift of `torusEncodePath`.
+- Decoding: `torusDecode : ℤ × ℤ → π₁(T²)` assembles the z-powers of the two commuting loops.
+- Equivalence: `torusPiOneEquivIntProd` shows the maps are inverse, yielding π₁(T²) ≃ ℤ × ℤ.
+- Follow-up work: extracting a `TorusStep` module (analogous to `CircleStep`) would expose addition/subtraction lemmas as `[simp]` facts.
+
+
 Assumptions (axioms)
 - Circle HIT interface (constructors + β-rules).  The type, base point, loop,
   and eliminators are currently axioms so that downstream developments can use
@@ -62,6 +71,11 @@ Contributing
 - Keep docstrings in sync, prefer small, focused lemmas with `@[simp]` where useful.
 - The simplifier linter flags unused simp arguments; please trim them.
 - When a structure adds data on top of an existing interface, prefer extending the smaller structure (e.g. `WeakGroupoid` extends `WeakCategory`) to keep identities/composition definitions in one place.
+
+Maintenance / refactor opportunities
+- **Circle/Torus step modules**: `CircleStep.lean` redefines lemmas that already live in `Circle.lean`. Consolidating those proofs (and adding a `TorusStep` counterpart) would make the encode/ decode algebra reusable via imports.
+- **Axioms to constructions**: circle and torus HITs are still axioms; replacing them with concrete constructions or a general HIT layer remains an open project.
+- **Developer docs**: a short tutorial showing how to apply the π₁ equivalences downstream (e.g. deriving homomorphisms into ℤ) would help new contributors.
 
 Citation
 - Based on the development of computational paths and the fundamental group of the circle. See `docs` for source materials.
