@@ -10,6 +10,7 @@ import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Basic.Univalence
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.Rewrite.Quot
 
 namespace ComputationalPaths
 namespace Path
@@ -199,6 +200,16 @@ theorem cast_torusCode_base_torusCodeOfProd (z : Int × Int) :
   unfold torusEncodePath
   simp
   exact cast_torusCode_base_torusCodeOfProd (0, 0)
+
+@[simp] theorem torusEncodePath_rweq
+    {p q : Path torusBase torusBase} (h : RwEq p q) :
+    torusEncodePath p = torusEncodePath q := by
+  unfold torusEncodePath torusEncodeRaw
+  have hEq : p.toEq = q.toEq := rweq_toEq (p := p) (q := q) h
+  have htransport :=
+    Path.transport_of_toEq_eq (A := Torus) (D := torusCode)
+      (p := p) (q := q) (x := torusCodeZero) hEq
+  exact _root_.congrArg torusCodeToProd htransport
 
 @[simp] theorem torusCode_loop1_path :
     Path.trans (Path.symm (Path.ofEq torusCode_base))
@@ -603,3 +614,196 @@ theorem torusEncode_decode (z : Int × Int) :
     simp
   rw [h]
   simp
+
+/-
+## Fundamental group interface
+-/
+
+/-- Loop space at the torus base point. -/
+abbrev TorusLoopSpace : Type _ :=
+  LoopSpace Torus torusBase
+
+/-- Loop quotient of the torus. -/
+abbrev TorusLoopQuot : Type _ :=
+  LoopQuot Torus torusBase
+
+/-- Fundamental group π₁(T²) as rewrite classes of loops. -/
+abbrev torusPiOne : Type _ :=
+  PiOne Torus torusBase
+
+/-- Strict group structure on π₁(T²). -/
+abbrev torusPiOneGroup : LoopGroup Torus torusBase :=
+  PiOneGroup Torus torusBase
+
+/-- Fundamental loop classes in the rewrite quotient. -/
+@[simp] def torusLoop1Class : TorusLoopQuot :=
+  LoopQuot.ofLoop (A := Torus) (a := torusBase) torusLoop1
+
+@[simp] def torusLoop2Class : TorusLoopQuot :=
+  LoopQuot.ofLoop (A := Torus) (a := torusBase) torusLoop2
+
+/-- Encode π₁ loops by quotient-lifting `torusEncodePath`. -/
+@[simp] def torusEncodeLift : TorusLoopQuot → Int × Int :=
+  Quot.lift (fun (p : Path torusBase torusBase) => torusEncodePath p)
+    (by
+      intro p q h
+      exact torusEncodePath_rweq (p := p) (q := q) h)
+
+@[simp] theorem torusEncodeLift_ofLoop (p : Path torusBase torusBase) :
+    torusEncodeLift (LoopQuot.ofLoop (A := Torus) (a := torusBase) p) =
+      torusEncodePath p := rfl
+
+/-- Fundamental-group encoding map `π₁(T²) → ℤ × ℤ`. -/
+@[simp] def torusEncode : torusPiOne → Int × Int :=
+  torusEncodeLift
+
+/-- Decode a pair of integers as a torus loop class. -/
+@[simp] def torusDecode : Int × Int → torusPiOne :=
+  fun z =>
+    LoopQuot.ofLoop (A := Torus) (a := torusBase) (torusDecodePath z)
+
+/-- Encoding of the first fundamental loop. -/
+@[simp] theorem torusEncode_loop1Class :
+    torusEncode torusLoop1Class = (1, 0) := by
+  change torusEncodePath torusLoop1 = (1, 0)
+  simpa using torusEncodePath_loop1
+
+/-- Encoding of the second fundamental loop. -/
+@[simp] theorem torusEncode_loop2Class :
+    torusEncode torusLoop2Class = (0, 1) := by
+  change torusEncodePath torusLoop2 = (0, 1)
+  simpa using torusEncodePath_loop2
+
+/-- Encode∘decode is the identity on ℤ × ℤ. -/
+@[simp] theorem torusEncode_torusDecode (z : Int × Int) :
+    torusEncode (torusDecode z) = z := by
+  change torusEncodePath (torusDecodePath z) = z
+  simpa using torusEncode_decode (z := z)
+
+/-- Composing with the first fundamental loop adds `(1, 0)` at the code level. -/
+theorem torusEncodeLift_comp_loop1 (x : TorusLoopQuot) :
+    torusEncodeLift (LoopQuot.comp x torusLoop1Class) =
+      ((torusEncodeLift x).1 + 1, (torusEncodeLift x).2) := by
+  refine Quot.inductionOn x ?_
+  intro p
+  change
+    torusEncodePath (Path.trans p torusLoop1) =
+      ((torusEncodePath p).1 + 1, (torusEncodePath p).2)
+  simpa using torusEncodePath_trans_loop1 (p := p)
+
+/-- Encoded step law for the first fundamental loop. -/
+theorem torusEncode_comp_loop1 (x : torusPiOne) :
+    torusEncode (LoopQuot.comp x torusLoop1Class) =
+      ((torusEncode x).1 + 1, (torusEncode x).2) :=
+  torusEncodeLift_comp_loop1 (x := x)
+
+/-- Composing with the second fundamental loop adds `(0, 1)` at the code level. -/
+theorem torusEncodeLift_comp_loop2 (x : TorusLoopQuot) :
+    torusEncodeLift (LoopQuot.comp x torusLoop2Class) =
+      ((torusEncodeLift x).1, (torusEncodeLift x).2 + 1) := by
+  refine Quot.inductionOn x ?_
+  intro p
+  change
+    torusEncodePath (Path.trans p torusLoop2) =
+      ((torusEncodePath p).1, (torusEncodePath p).2 + 1)
+  simpa using torusEncodePath_trans_loop2 (p := p)
+
+/-- Encoded step law for the second fundamental loop. -/
+theorem torusEncode_comp_loop2 (x : torusPiOne) :
+    torusEncode (LoopQuot.comp x torusLoop2Class) =
+      ((torusEncode x).1, (torusEncode x).2 + 1) :=
+  torusEncodeLift_comp_loop2 (x := x)
+
+/-- Composing with the inverse of the first loop subtracts `(1, 0)`. -/
+theorem torusEncodeLift_comp_inv_loop1 (x : TorusLoopQuot) :
+    torusEncodeLift (LoopQuot.comp x (LoopQuot.inv torusLoop1Class)) =
+      ((torusEncodeLift x).1 - 1, (torusEncodeLift x).2) := by
+  refine Quot.inductionOn x ?_
+  intro p
+  change
+    torusEncodePath (Path.trans p (Path.symm torusLoop1)) =
+      ((torusEncodePath p).1 - 1, (torusEncodePath p).2)
+  simpa using torusEncodePath_trans_symm_loop1 (p := p)
+
+/-- Encoded step law for the inverse of the first loop. -/
+theorem torusEncode_comp_inv_loop1 (x : torusPiOne) :
+    torusEncode (LoopQuot.comp x (LoopQuot.inv torusLoop1Class)) =
+      ((torusEncode x).1 - 1, (torusEncode x).2) :=
+  torusEncodeLift_comp_inv_loop1 (x := x)
+
+/-- Composing with the inverse of the second loop subtracts `(0, 1)`. -/
+theorem torusEncodeLift_comp_inv_loop2 (x : TorusLoopQuot) :
+    torusEncodeLift (LoopQuot.comp x (LoopQuot.inv torusLoop2Class)) =
+      ((torusEncodeLift x).1, (torusEncodeLift x).2 - 1) := by
+  refine Quot.inductionOn x ?_
+  intro p
+  change
+    torusEncodePath (Path.trans p (Path.symm torusLoop2)) =
+      ((torusEncodePath p).1, (torusEncodePath p).2 - 1)
+  simpa using torusEncodePath_trans_symm_loop2 (p := p)
+
+/-- Encoded step law for the inverse of the second loop. -/
+theorem torusEncode_comp_inv_loop2 (x : torusPiOne) :
+    torusEncode (LoopQuot.comp x (LoopQuot.inv torusLoop2Class)) =
+      ((torusEncode x).1, (torusEncode x).2 - 1) :=
+  torusEncodeLift_comp_inv_loop2 (x := x)
+
+@[simp] theorem torusDecodePath_zero_zero :
+    torusDecodePath (0, 0) = Path.refl torusBase := by
+  unfold torusDecodePath
+  simp [torusLoop1PathZPow, torusLoop1PathPow,
+    torusLoop2PathZPow, torusLoop2PathPow]
+
+@[simp] theorem torusDecode_zero_zero :
+    torusDecode (0, 0) = LoopQuot.id := by
+  unfold torusDecode torusDecodePath
+  have htrans :
+      Path.trans (torusLoop1PathZPow 0) (torusLoop2PathZPow 0) =
+        Path.refl torusBase := by
+    simp [torusLoop1PathZPow, torusLoop1PathPow,
+      torusLoop2PathZPow, torusLoop2PathPow]
+  change LoopQuot.ofLoop
+      (Path.trans (torusLoop1PathZPow 0) (torusLoop2PathZPow 0)) =
+    LoopQuot.id
+  rw [htrans]
+  rfl
+
+@[simp] theorem torusDecodeEq_torusEncodeEq
+    (e : torusBase = torusBase) :
+    (torusDecodePath (torusEncodePath (Path.ofEq e))).toEq = e := by
+  cases e
+  simp
+
+@[simp] theorem torusDecode_torusEncode (x : torusPiOne) :
+    torusDecode (torusEncode x) = x := by
+  apply PathRwQuot.eq_of_toEq_eq (A := Torus) (a := torusBase) (b := torusBase)
+  refine Quot.inductionOn x ?_
+  intro p
+  have hcanon :
+      torusEncodePath (Path.ofEq p.toEq) = torusEncodePath p := by
+    have hcanonRw : RwEq (Path.ofEq p.toEq) p := (rweq_canon (p := p)).symm
+    exact torusEncodePath_rweq (h := hcanonRw)
+  have hgoal₀ := torusDecodeEq_torusEncodeEq (e := p.toEq)
+  have hcanonDecode :
+      (torusDecodePath (torusEncodePath (Path.ofEq p.toEq))).toEq =
+        (torusDecodePath (torusEncodePath p)).toEq := by
+    have := _root_.congrArg (fun z : Int × Int => torusDecodePath z) hcanon.symm
+    exact _root_.congrArg Path.toEq this
+  have hgoal :
+      (torusDecodePath (torusEncodePath p)).toEq = p.toEq :=
+    hcanonDecode ▸ hgoal₀
+  change
+      (torusDecodePath (torusEncodePath p)).toEq = p.toEq
+  exact hgoal
+
+/-- Fundamental group of the torus is equivalent to `ℤ × ℤ`. -/
+noncomputable def torusPiOneEquivIntProd :
+    SimpleEquiv torusPiOne (Int × Int) where
+  toFun := torusEncode
+  invFun := torusDecode
+  left_inv := by
+    intro x
+    exact torusDecode_torusEncode (x := x)
+  right_inv := by
+    intro z
+    exact torusEncode_torusDecode (z := z)
