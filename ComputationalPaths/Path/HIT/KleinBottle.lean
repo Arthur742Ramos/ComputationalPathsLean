@@ -532,6 +532,22 @@ namespace KleinBottleWord
 @[simp] def inv (w : KleinBottleWord) : KleinBottleWord :=
   ⟨-w.a, -kleinSign w.a * w.b⟩
 
+@[simp] def toPair (w : KleinBottleWord) : Int × Int :=
+  (w.a, w.b)
+
+@[simp] def ofPair (p : Int × Int) : KleinBottleWord :=
+  ⟨p.fst, p.snd⟩
+
+@[simp] theorem toPair_ofPair (p : Int × Int) :
+    toPair (ofPair p) = p := by
+  cases p
+  rfl
+
+@[simp] theorem ofPair_toPair (w : KleinBottleWord) :
+    ofPair (toPair w) = w := by
+  cases w
+  rfl
+
 @[simp] theorem mul_one (w : KleinBottleWord) :
     mul w one = w := by
   cases w
