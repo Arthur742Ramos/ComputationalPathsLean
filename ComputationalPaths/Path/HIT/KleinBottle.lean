@@ -193,6 +193,33 @@ def kleinLoopAPathPow : Nat → Path kleinBase kleinBase
     kleinLoopAPathPow (Nat.succ n) =
       Path.trans (kleinLoopAPathPow n) kleinLoopA := rfl
 
+/-- Concatenating natural powers of `kleinLoopA` adds the exponents. -/
+theorem kleinLoopAPathPow_add (m n : Nat) :
+    kleinLoopAPathPow (m + n) =
+      Path.trans (kleinLoopAPathPow m) (kleinLoopAPathPow n) := by
+  induction n with
+  | zero =>
+      simp [kleinLoopAPathPow]
+  | succ n ih =>
+      calc
+        kleinLoopAPathPow (m + Nat.succ n)
+            = Path.trans (kleinLoopAPathPow (m + n)) kleinLoopA := by
+                simp [kleinLoopAPathPow]
+        _ = Path.trans
+              (Path.trans (kleinLoopAPathPow m) (kleinLoopAPathPow n))
+              kleinLoopA := by
+                simp [ih]
+        _ = Path.trans (kleinLoopAPathPow m)
+              (Path.trans (kleinLoopAPathPow n) kleinLoopA) := by
+                exact
+                  Path.trans_assoc
+                    (kleinLoopAPathPow m)
+                    (kleinLoopAPathPow n)
+                    kleinLoopA
+        _ = Path.trans (kleinLoopAPathPow m)
+              (kleinLoopAPathPow (Nat.succ n)) := by
+                simp [kleinLoopAPathPow]
+
 /-- Natural powers of the `b`-loop at the path level. -/
 def kleinLoopBPathPow : Nat → Path kleinBase kleinBase
   | 0 => Path.refl _
@@ -204,6 +231,33 @@ def kleinLoopBPathPow : Nat → Path kleinBase kleinBase
 @[simp] theorem kleinLoopBPathPow_succ (n : Nat) :
     kleinLoopBPathPow (Nat.succ n) =
       Path.trans (kleinLoopBPathPow n) kleinLoopB := rfl
+
+/-- Concatenating natural powers of `kleinLoopB` adds the exponents. -/
+theorem kleinLoopBPathPow_add (m n : Nat) :
+    kleinLoopBPathPow (m + n) =
+      Path.trans (kleinLoopBPathPow m) (kleinLoopBPathPow n) := by
+  induction n with
+  | zero =>
+      simp [kleinLoopBPathPow]
+  | succ n ih =>
+      calc
+        kleinLoopBPathPow (m + Nat.succ n)
+            = Path.trans (kleinLoopBPathPow (m + n)) kleinLoopB := by
+                simp [kleinLoopBPathPow]
+        _ = Path.trans
+              (Path.trans (kleinLoopBPathPow m) (kleinLoopBPathPow n))
+              kleinLoopB := by
+                simp [ih]
+        _ = Path.trans (kleinLoopBPathPow m)
+              (Path.trans (kleinLoopBPathPow n) kleinLoopB) := by
+                exact
+                  Path.trans_assoc
+                    (kleinLoopBPathPow m)
+                    (kleinLoopBPathPow n)
+                    kleinLoopB
+        _ = Path.trans (kleinLoopBPathPow m)
+              (kleinLoopBPathPow (Nat.succ n)) := by
+                simp [kleinLoopBPathPow]
 
 /-- Integer powers of the `a`-loop. -/
 def kleinLoopAPathZPow : Int → Path kleinBase kleinBase
@@ -221,6 +275,10 @@ def kleinLoopAPathZPow : Int → Path kleinBase kleinBase
     kleinLoopAPathZPow 0 = Path.refl _ := by
   simp [kleinLoopAPathZPow, kleinLoopAPathPow_zero]
 
+@[simp] theorem kleinLoopAPathZPow_one :
+    kleinLoopAPathZPow 1 = kleinLoopA := by
+  simp [kleinLoopAPathZPow, kleinLoopAPathPow]
+
 /-- Integer powers of the `b`-loop. -/
 def kleinLoopBPathZPow : Int → Path kleinBase kleinBase
   | Int.ofNat n => kleinLoopBPathPow n
@@ -236,6 +294,215 @@ def kleinLoopBPathZPow : Int → Path kleinBase kleinBase
 @[simp] theorem kleinLoopBPathZPow_zero :
     kleinLoopBPathZPow 0 = Path.refl _ := by
   simp [kleinLoopBPathZPow, kleinLoopBPathPow_zero]
+
+@[simp] theorem kleinLoopBPathZPow_one :
+    kleinLoopBPathZPow 1 = kleinLoopB := by
+  simp [kleinLoopBPathZPow, kleinLoopBPathPow]
+
+@[simp] theorem kleinLoopAClass_pow (n : Nat) :
+    LoopQuot.pow (A := KleinBottle) (a := kleinBase) kleinLoopAClass n =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopAPathPow n) := by
+  induction n with
+  | zero =>
+      change
+        LoopQuot.id =
+          LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+            (Path.refl _)
+      exact
+        (LoopQuot.ofLoop_refl
+          (A := KleinBottle) (a := kleinBase)).symm
+  | succ n ih =>
+      have hcomp :
+          LoopQuot.comp
+              (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                kleinLoopAClass n)
+              kleinLoopAClass =
+            LoopQuot.comp
+              (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                (kleinLoopAPathPow n))
+              kleinLoopAClass :=
+        _root_.congrArg
+          (fun x =>
+            LoopQuot.comp (A := KleinBottle) (a := kleinBase) x
+              kleinLoopAClass) ih
+      calc
+        LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+            kleinLoopAClass (Nat.succ n)
+            =
+              LoopQuot.comp
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  kleinLoopAClass n)
+                kleinLoopAClass := rfl
+        _ =
+              LoopQuot.comp
+                (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                  (kleinLoopAPathPow n))
+                kleinLoopAClass := hcomp
+        _ =
+              LoopQuot.comp
+                (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                  (kleinLoopAPathPow n))
+                (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                  kleinLoopA) := rfl
+        _ =
+              LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                (Path.trans (kleinLoopAPathPow n) kleinLoopA) :=
+                  (LoopQuot.ofLoop_trans
+                    (A := KleinBottle) (a := kleinBase)
+                    (p := kleinLoopAPathPow n)
+                    (q := kleinLoopA)).symm
+        _ =
+              LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                (kleinLoopAPathPow (Nat.succ n)) := rfl
+
+@[simp] theorem kleinLoopBClass_pow (n : Nat) :
+    LoopQuot.pow (A := KleinBottle) (a := kleinBase) kleinLoopBClass n =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopBPathPow n) := by
+  induction n with
+  | zero =>
+      change
+        LoopQuot.id =
+          LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+            (Path.refl _)
+      exact
+        (LoopQuot.ofLoop_refl
+          (A := KleinBottle) (a := kleinBase)).symm
+  | succ n ih =>
+      have hcomp :
+          LoopQuot.comp
+              (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                kleinLoopBClass n)
+              kleinLoopBClass =
+            LoopQuot.comp
+              (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                (kleinLoopBPathPow n))
+              kleinLoopBClass :=
+        _root_.congrArg
+          (fun x =>
+            LoopQuot.comp (A := KleinBottle) (a := kleinBase) x
+              kleinLoopBClass) ih
+      calc
+        LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+            kleinLoopBClass (Nat.succ n)
+            =
+              LoopQuot.comp
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  kleinLoopBClass n)
+                kleinLoopBClass := rfl
+        _ =
+              LoopQuot.comp
+                (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                  (kleinLoopBPathPow n))
+                kleinLoopBClass := hcomp
+        _ =
+              LoopQuot.comp
+                (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                  (kleinLoopBPathPow n))
+                (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                  kleinLoopB) := rfl
+        _ =
+              LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                (Path.trans (kleinLoopBPathPow n) kleinLoopB) :=
+                  (LoopQuot.ofLoop_trans
+                    (A := KleinBottle) (a := kleinBase)
+                    (p := kleinLoopBPathPow n)
+                    (q := kleinLoopB)).symm
+        _ =
+              LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+                (kleinLoopBPathPow (Nat.succ n)) := rfl
+
+@[simp] theorem kleinLoopAElement_pow (n : Nat) :
+    PiOne.pow (A := KleinBottle) (a := kleinBase) kleinLoopAElement n =
+      PiOne.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopAPathPow n) := by
+  change
+    LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+        kleinLoopAClass n =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopAPathPow n)
+  exact kleinLoopAClass_pow (n := n)
+
+@[simp] theorem kleinLoopBElement_pow (n : Nat) :
+    PiOne.pow (A := KleinBottle) (a := kleinBase) kleinLoopBElement n =
+      PiOne.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopBPathPow n) := by
+  change
+    LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+        kleinLoopBClass n =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopBPathPow n)
+  exact kleinLoopBClass_pow (n := n)
+
+/-- Integer iteration of the `kleinLoopA` class in the loop quotient. -/
+@[simp] theorem kleinLoopAElement_zpow (z : Int) :
+    PiOne.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopAElement z =
+      PiOne.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopAPathZPow z) := by
+  change
+    LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopAClass z =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopAPathZPow z)
+  cases z using Int.rec with
+  | ofNat n =>
+      unfold LoopQuot.zpow
+      change
+        LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+            kleinLoopAClass n =
+          LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+            (kleinLoopAPathPow n)
+      exact kleinLoopAClass_pow (n := n)
+  | negSucc n =>
+      unfold LoopQuot.zpow
+      change
+        LoopQuot.inv
+            (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+              kleinLoopAClass (Nat.succ n)) =
+          LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+            (Path.symm (kleinLoopAPathPow (Nat.succ n)))
+      have h := kleinLoopAClass_pow (n := Nat.succ n)
+      have h' := _root_.congrArg LoopQuot.inv h
+      have hsymm :=
+        (LoopQuot.ofLoop_symm (A := KleinBottle) (a := kleinBase)
+          (p := kleinLoopAPathPow (Nat.succ n))).symm
+      exact h'.trans hsymm
+
+@[simp] theorem kleinLoopBElement_zpow (z : Int) :
+    PiOne.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopBElement z =
+      PiOne.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopBPathZPow z) := by
+  change
+    LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopBClass z =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopBPathZPow z)
+  cases z using Int.rec with
+  | ofNat n =>
+      unfold LoopQuot.zpow
+      change
+        LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+            kleinLoopBClass n =
+          LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+            (kleinLoopBPathPow n)
+      exact kleinLoopBClass_pow (n := n)
+  | negSucc n =>
+      unfold LoopQuot.zpow
+      change
+        LoopQuot.inv
+            (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+              kleinLoopBClass (Nat.succ n)) =
+          LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+            (Path.symm (kleinLoopBPathPow (Nat.succ n)))
+      have h := kleinLoopBClass_pow (n := Nat.succ n)
+      have h' := _root_.congrArg LoopQuot.inv h
+      have hsymm :=
+        (LoopQuot.ofLoop_symm (A := KleinBottle) (a := kleinBase)
+          (p := kleinLoopBPathPow (Nat.succ n))).symm
+      exact h'.trans hsymm
 
 /-- Words in the Klein-bottle presentation `a^m b^n`. -/
 structure KleinBottleWord where
@@ -296,6 +563,81 @@ def toLoopQuot (w : KleinBottleWord) : KleinBottleLoopQuot :=
   rw [toPath_zero]
   exact
     (LoopQuot.ofLoop_refl (A := KleinBottle) (a := kleinBase))
+
+@[simp] theorem toLoopQuot_loopA :
+    toLoopQuot ⟨1, 0⟩ = kleinLoopAClass := by
+  unfold toLoopQuot toPath
+  have h :
+      Path.trans (kleinLoopAPathZPow 1) (kleinLoopBPathZPow 0) =
+        kleinLoopA := by
+    simp
+  have hloop :
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (Path.trans (kleinLoopAPathZPow 1) (kleinLoopBPathZPow 0)) =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase) kleinLoopA :=
+    LoopQuot.ofLoop_eq (A := KleinBottle) (a := kleinBase)
+      (p := Path.trans (kleinLoopAPathZPow 1) (kleinLoopBPathZPow 0))
+      (q := kleinLoopA) h
+  exact hloop.trans rfl
+
+@[simp] theorem toLoopQuot_loopB :
+    toLoopQuot ⟨0, 1⟩ = kleinLoopBClass := by
+  unfold toLoopQuot toPath
+  have h :
+      Path.trans (kleinLoopAPathZPow 0) (kleinLoopBPathZPow 1) =
+        kleinLoopB := by
+    simp
+  have hloop :
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (Path.trans (kleinLoopAPathZPow 0) (kleinLoopBPathZPow 1)) =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase) kleinLoopB :=
+    LoopQuot.ofLoop_eq (A := KleinBottle) (a := kleinBase)
+      (p := Path.trans (kleinLoopAPathZPow 0) (kleinLoopBPathZPow 1))
+      (q := kleinLoopB) h
+  exact hloop.trans rfl
+
+@[simp] theorem toLoopQuot_eq_zpow (w : KleinBottleWord) :
+    toLoopQuot w =
+      LoopQuot.comp
+        (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+          kleinLoopAClass w.a)
+        (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+          kleinLoopBClass w.b) := by
+  unfold toLoopQuot toPath
+  have hA :=
+    kleinLoopAElement_zpow (z := w.a)
+  change
+    LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopAClass w.a =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopAPathZPow w.a) at hA
+  have hB :=
+    kleinLoopBElement_zpow (z := w.b)
+  change
+    LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopBClass w.b =
+      LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (kleinLoopBPathZPow w.b) at hB
+  calc
+    LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+        (Path.trans (kleinLoopAPathZPow w.a) (kleinLoopBPathZPow w.b))
+        =
+      LoopQuot.comp
+        (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+          (kleinLoopAPathZPow w.a))
+        (LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
+          (kleinLoopBPathZPow w.b)) :=
+            (LoopQuot.ofLoop_trans
+              (A := KleinBottle) (a := kleinBase)
+              (p := kleinLoopAPathZPow w.a)
+              (q := kleinLoopBPathZPow w.b))
+    _ =
+      LoopQuot.comp
+        (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+          kleinLoopAClass w.a)
+        (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+          kleinLoopBClass w.b) := by
+            rw [hA, hB]
 
 end KleinBottleWord
 
