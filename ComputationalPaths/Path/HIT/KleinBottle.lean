@@ -538,6 +538,15 @@ namespace KleinBottleWord
 @[simp] def ofPair (p : Int × Int) : KleinBottleWord :=
   ⟨p.fst, p.snd⟩
 
+@[simp] def pairOne : Int × Int :=
+  (0, 0)
+
+@[simp] def pairMul (p q : Int × Int) : Int × Int :=
+  (p.fst + q.fst, kleinSign q.fst * p.snd + q.snd)
+
+@[simp] def pairInv (p : Int × Int) : Int × Int :=
+  (-p.fst, -kleinSign p.fst * p.snd)
+
 @[simp] theorem toPair_ofPair (p : Int × Int) :
     toPair (ofPair p) = p := by
   cases p
@@ -547,6 +556,36 @@ namespace KleinBottleWord
     ofPair (toPair w) = w := by
   cases w
   rfl
+
+@[simp] theorem toPair_one :
+    toPair one = pairOne := rfl
+
+@[simp] theorem ofPair_pairOne :
+    ofPair pairOne = one := rfl
+
+@[simp] theorem toPair_mul (w₁ w₂ : KleinBottleWord) :
+    toPair (mul w₁ w₂) =
+      pairMul (toPair w₁) (toPair w₂) := by
+  cases w₁
+  cases w₂
+  simp [toPair, pairMul, mul]
+
+@[simp] theorem toPair_inv (w : KleinBottleWord) :
+    toPair (inv w) = pairInv (toPair w) := by
+  cases w
+  simp [toPair, pairInv, inv]
+
+@[simp] theorem ofPair_pairMul (p q : Int × Int) :
+    ofPair (pairMul p q) =
+      mul (ofPair p) (ofPair q) := by
+  cases p
+  cases q
+  simp [ofPair, pairMul, mul]
+
+@[simp] theorem ofPair_pairInv (p : Int × Int) :
+    ofPair (pairInv p) = inv (ofPair p) := by
+  cases p
+  simp [ofPair, pairInv, inv]
 
 @[simp] theorem mul_one (w : KleinBottleWord) :
     mul w one = w := by
