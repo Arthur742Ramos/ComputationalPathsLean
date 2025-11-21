@@ -132,6 +132,23 @@ def kleinSign (m : Int) : Int :=
   else
     -1
 
+@[simp] theorem kleinSign_zero : kleinSign 0 = 1 := by
+  classical
+  simp [kleinSign]
+
+@[simp] theorem kleinSign_neg (m : Int) : kleinSign (-m) = kleinSign m := by
+  classical
+  unfold kleinSign
+  have : (-m).natAbs = m.natAbs := Int.natAbs_neg _
+  simp [this]
+
+theorem kleinSign_sq (m : Int) :
+    kleinSign m * kleinSign m = (1 : Int) := by
+  classical
+  by_cases h : m.natAbs % 2 = 0
+  · simp [kleinSign, h]
+  · simp [kleinSign, h]
+
 /-- Loop space on the Klein bottle at `kleinBase`. -/
 abbrev KleinBottleLoopSpace : Type _ :=
   LoopSpace KleinBottle kleinBase
