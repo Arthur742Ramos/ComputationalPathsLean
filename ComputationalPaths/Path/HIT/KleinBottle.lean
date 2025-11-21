@@ -718,6 +718,48 @@ end KleinBottleWord
         (p := kleinLoopB)
   exact hcomp.trans (hsurf.trans hsymm)
 
+/-- Equivalent commutation law `a b = b⁻¹ a` in the loop quotient. -/
+@[simp] theorem kleinLoopAClass_mul_loopBClass :
+    LoopQuot.comp kleinLoopAClass kleinLoopBClass =
+      LoopQuot.comp (LoopQuot.inv kleinLoopBClass) kleinLoopAClass := by
+  have h :=
+    _root_.congrArg
+      (fun x =>
+        LoopQuot.comp x kleinLoopAClass)
+      kleinLoop_relation_class
+  have h₁ :=
+    _root_.congrArg
+      (fun x =>
+        LoopQuot.comp
+          (LoopQuot.comp kleinLoopAClass kleinLoopBClass) x)
+      (LoopQuot.inv_comp
+        (A := KleinBottle) (a := kleinBase)
+        (x := kleinLoopAClass)).symm
+  have h₂ :=
+    (LoopQuot.comp_assoc
+      (LoopQuot.comp kleinLoopAClass kleinLoopBClass)
+      (LoopQuot.inv kleinLoopAClass)
+      kleinLoopAClass).symm
+  calc
+    LoopQuot.comp kleinLoopAClass kleinLoopBClass
+        =
+          LoopQuot.comp
+            (LoopQuot.comp kleinLoopAClass kleinLoopBClass)
+            LoopQuot.id := (LoopQuot.comp_id _).symm
+    _ =
+          LoopQuot.comp
+            (LoopQuot.comp kleinLoopAClass kleinLoopBClass)
+            (LoopQuot.comp (LoopQuot.inv kleinLoopAClass) kleinLoopAClass) :=
+              h₁
+    _ =
+          LoopQuot.comp
+            (LoopQuot.comp
+              (LoopQuot.comp kleinLoopAClass kleinLoopBClass)
+              (LoopQuot.inv kleinLoopAClass))
+            kleinLoopAClass := h₂
+    _ =
+        LoopQuot.comp (LoopQuot.inv kleinLoopBClass) kleinLoopAClass := h
+
 /-- Conjugation relation expressed in π₁(K, base). -/
 @[simp] theorem kleinPiOne_relation :
     PiOne.mul
