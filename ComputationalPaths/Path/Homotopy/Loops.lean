@@ -88,6 +88,14 @@ variable {A : Type u} {a : A}
     ofLoop (Path.symm p) =
       inv (ofLoop p) := rfl
 
+@[simp] theorem ofLoop_eq {p q : LoopSpace A a} (h : p = q) :
+    ofLoop p = ofLoop q := by
+  cases h
+  rfl
+
+@[simp] theorem ofLoop_refl :
+    ofLoop (Path.refl a) = id := rfl
+
 @[simp] theorem id_comp (x : LoopQuot A a) : comp id x = x := by
   unfold comp id
   exact

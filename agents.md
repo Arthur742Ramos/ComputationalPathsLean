@@ -9,6 +9,10 @@ agent/tool is responsible for and when to invoke it.
   exploratory formalisation work in Lean.
 - **Typical flow:** outline a plan, perform targeted edits (prefer
   `apply_patch` for single files), and finish with a build or relevant checks.
+  When tackling larger features, favour an incremental loop:
+  1. Sketch the next small milestone (update the plan or jot a quick checklist).
+  2. Implement just that slice of work and run `.\lake.cmd build`.
+  3. Commit immediately once the build goes green before moving on.
 - **When to use:** any time you need new definitions, proofs, documentation, or
   review feedback inside the repository.
 
