@@ -385,6 +385,14 @@ end KleinBottleWord
   unfold PiOne.mul PiOne.inv kleinLoopAElement kleinLoopBElement
   exact kleinLoop_relation_class
 
+/-- Conjugating the vertical generator by the horizontal loop reverses it. -/
+@[simp] theorem kleinLoopA_conj_loopB :
+    Path.trans kleinLoopA (Path.trans kleinLoopB (Path.symm kleinLoopA)) =
+      Path.symm kleinLoopB := by
+  have hassoc :=
+    (Path.trans_assoc (kleinLoopA) (kleinLoopB) (Path.symm kleinLoopA)).symm
+  exact hassoc.trans kleinSurf
+
 end LoopAlgebra
 
 end
