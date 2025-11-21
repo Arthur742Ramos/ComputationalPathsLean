@@ -13,6 +13,8 @@ agent/tool is responsible for and when to invoke it.
   1. Sketch the next small milestone (update the plan or jot a quick checklist).
   2. Implement just that slice of work and run `.\lake.cmd build`.
   3. Commit immediately once the build goes green before moving on.
+  4. If you already know the next step, keep iterating—even after pushing—until
+     the user explicitly pauses you or you’ve achieved a substantial chunk of work.
 - **When to use:** any time you need new definitions, proofs, documentation, or
   review feedback inside the repository.
 
