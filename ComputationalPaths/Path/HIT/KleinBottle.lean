@@ -1240,6 +1240,73 @@ theorem kleinLoopAClass_mul_loopBClass_pow (n : Nat) :
 
 end
 
+/-- Decode a pair of integers as the loop class `a^m ⋅ b^n`. -/
+noncomputable def kleinDecode (p : Int × Int) : kleinPiOne :=
+  LoopQuot.comp
+    (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+      kleinLoopAClass p.1)
+    (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+      kleinLoopBClass p.2)
+
+@[simp] theorem kleinDecode_zero_zero :
+    kleinDecode (0, 0) = LoopQuot.id := by
+  have hA :
+      LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopAClass (0 : Int) = LoopQuot.id :=
+    LoopQuot.zpow_zero
+      (A := KleinBottle) (a := kleinBase) (x := kleinLoopAClass)
+  have hB :
+      LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopBClass (0 : Int) = LoopQuot.id :=
+    LoopQuot.zpow_zero
+      (A := KleinBottle) (a := kleinBase) (x := kleinLoopBClass)
+  unfold kleinDecode
+  rw [hA, hB, LoopQuot.comp_id]
+
+@[simp] theorem kleinDecode_loopA :
+    kleinDecode (1, 0) = kleinLoopAClass := by
+  have hA :
+      LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopAClass (1 : Int) = kleinLoopAClass :=
+    LoopQuot.zpow_one
+      (A := KleinBottle) (a := kleinBase) (x := kleinLoopAClass)
+  have hB :
+      LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopBClass (0 : Int) = LoopQuot.id :=
+    LoopQuot.zpow_zero
+      (A := KleinBottle) (a := kleinBase) (x := kleinLoopBClass)
+  unfold kleinDecode
+  rw [hA, hB, LoopQuot.comp_id]
+
+@[simp] theorem kleinDecode_loopB :
+    kleinDecode (0, 1) = kleinLoopBClass := by
+  have hA :
+      LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopAClass (0 : Int) = LoopQuot.id :=
+    LoopQuot.zpow_zero
+      (A := KleinBottle) (a := kleinBase) (x := kleinLoopAClass)
+  have hB :
+      LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopBClass (1 : Int) = kleinLoopBClass :=
+    LoopQuot.zpow_one
+      (A := KleinBottle) (a := kleinBase) (x := kleinLoopBClass)
+  unfold kleinDecode
+  rw [hA, hB, LoopQuot.id_comp]
+
+@[simp] theorem kleinDecode_pair (m n : Int) :
+    kleinDecode (m, n) = KleinBottleWord.toLoopQuot ⟨m, n⟩ := by
+  unfold kleinDecode
+  exact
+    (KleinBottleWord.toLoopQuot_eq_zpow (w := ⟨m, n⟩)).symm
+
+@[simp] theorem kleinDecode_ofPair (p : Int × Int) :
+    kleinDecode p =
+      KleinBottleWord.toLoopQuot (KleinBottleWord.ofPair p) := by
+  cases p with
+  | mk m n =>
+      change kleinDecode (m, n) = KleinBottleWord.toLoopQuot ⟨m, n⟩
+      exact kleinDecode_pair (m := m) (n := n)
+
 -- As with the torus, the higher coherence coming from `kleinSurf` is deferred
 -- until the globular 2-path algebra is fully integrated.
 
