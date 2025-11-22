@@ -413,6 +413,110 @@ def kleinLoopBPathZPow : Int → Path kleinBase kleinBase
               LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase)
                 (kleinLoopBPathPow (Nat.succ n)) := rfl
 
+/-- Inverses of `b`-powers are the corresponding powers of `b⁻¹`. -/
+theorem kleinLoopBClass_pow_inv (n : Nat) :
+    LoopQuot.inv
+        (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+          kleinLoopBClass n) =
+      LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+        (LoopQuot.inv kleinLoopBClass) n := by
+  classical
+  induction n with
+  | zero =>
+      change
+        LoopQuot.inv
+            (LoopQuot.id (A := KleinBottle) (a := kleinBase)) =
+          LoopQuot.id (A := KleinBottle) (a := kleinBase)
+      exact LoopQuot.inv_id
+        (A := KleinBottle) (a := kleinBase)
+  | succ n ih =>
+      -- Expand the recursive definitions on both sides.
+      change
+        LoopQuot.inv
+            (LoopQuot.comp
+              (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                kleinLoopBClass n)
+              kleinLoopBClass)
+          =
+            LoopQuot.comp
+              (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                (LoopQuot.inv kleinLoopBClass) n)
+              (LoopQuot.inv kleinLoopBClass)
+      -- Peel off the final `b` on the left and rewrite using the induction hypothesis.
+      have hcomp :
+          LoopQuot.inv
+              (LoopQuot.comp
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  kleinLoopBClass n)
+                kleinLoopBClass) =
+            LoopQuot.comp
+              (LoopQuot.inv kleinLoopBClass)
+              (LoopQuot.inv
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  kleinLoopBClass n)) :=
+        LoopQuot.inv_comp_rev
+          (A := KleinBottle) (a := kleinBase)
+          (x := LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+            kleinLoopBClass n)
+          (y := kleinLoopBClass)
+      have hone :
+          LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+              (LoopQuot.inv kleinLoopBClass) 1 =
+            LoopQuot.inv kleinLoopBClass :=
+        LoopQuot.pow_one
+          (A := KleinBottle) (a := kleinBase)
+          (x := LoopQuot.inv kleinLoopBClass)
+      have hswap :=
+        LoopQuot.pow_comm
+            (A := KleinBottle) (a := kleinBase)
+            (x := LoopQuot.inv kleinLoopBClass) 1 n
+      calc
+        LoopQuot.inv
+            (LoopQuot.comp
+              (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                kleinLoopBClass n)
+              kleinLoopBClass)
+            =
+              LoopQuot.comp
+                (LoopQuot.inv kleinLoopBClass)
+                (LoopQuot.inv
+                  (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                    kleinLoopBClass n)) := hcomp
+        _ =
+              LoopQuot.comp
+                (LoopQuot.inv kleinLoopBClass)
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  (LoopQuot.inv kleinLoopBClass) n) := by
+                    rw [ih]
+        _ =
+              LoopQuot.comp
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  (LoopQuot.inv kleinLoopBClass) 1)
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  (LoopQuot.inv kleinLoopBClass) n) := by
+                    rw [hone]
+        _ =
+              LoopQuot.comp
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  (LoopQuot.inv kleinLoopBClass) n)
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  (LoopQuot.inv kleinLoopBClass) 1) :=
+                    hswap
+        _ =
+              LoopQuot.comp
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  (LoopQuot.inv kleinLoopBClass) n)
+                (LoopQuot.inv kleinLoopBClass) := by
+                    rw [hone]
+
+@[simp] theorem kleinLoopBClass_inv_pow (n : Nat) :
+    LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+        (LoopQuot.inv kleinLoopBClass) n =
+      LoopQuot.inv
+        (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+          kleinLoopBClass n) :=
+  (kleinLoopBClass_pow_inv (n := n)).symm
+
 @[simp] theorem kleinLoopAElement_pow (n : Nat) :
     PiOne.pow (A := KleinBottle) (a := kleinBase) kleinLoopAElement n =
       PiOne.ofLoop (A := KleinBottle) (a := kleinBase)
@@ -833,6 +937,292 @@ end KleinBottleWord
   exact hassoc.trans kleinSurf
 
 end LoopAlgebra
+
+/- Iterating the Klein relation across natural powers. -/
+theorem kleinLoopAClass_mul_loopBClass_pow (n : Nat) :
+    LoopQuot.comp kleinLoopAClass
+        (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+          kleinLoopBClass n) =
+      LoopQuot.comp
+        (LoopQuot.inv
+          (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+            kleinLoopBClass n))
+        kleinLoopAClass := by
+  classical
+  induction n with
+  | zero =>
+      change
+        LoopQuot.comp kleinLoopAClass
+            (LoopQuot.id (A := KleinBottle) (a := kleinBase)) =
+          LoopQuot.comp
+            (LoopQuot.id (A := KleinBottle) (a := kleinBase))
+            kleinLoopAClass
+      have hL :
+          LoopQuot.comp kleinLoopAClass
+              (LoopQuot.id (A := KleinBottle) (a := kleinBase)) =
+            kleinLoopAClass :=
+        LoopQuot.comp_id
+          (A := KleinBottle) (a := kleinBase)
+          (x := kleinLoopAClass)
+      have hR :
+          LoopQuot.comp
+              (LoopQuot.id (A := KleinBottle) (a := kleinBase))
+              kleinLoopAClass =
+            kleinLoopAClass :=
+        LoopQuot.id_comp
+          (A := KleinBottle) (a := kleinBase)
+          (x := kleinLoopAClass)
+      exact hL.trans hR.symm
+  | succ n ih =>
+      have hassoc :
+          LoopQuot.comp
+              (LoopQuot.comp
+                kleinLoopAClass
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  kleinLoopBClass n))
+              kleinLoopBClass =
+            LoopQuot.comp
+              kleinLoopAClass
+              (LoopQuot.comp
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  kleinLoopBClass n)
+                kleinLoopBClass) :=
+        LoopQuot.comp_assoc
+          (A := KleinBottle) (a := kleinBase)
+          (x := kleinLoopAClass)
+          (y := LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+            kleinLoopBClass n)
+          (z := kleinLoopBClass)
+      have hpow :
+          LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+            kleinLoopBClass (Nat.succ n) =
+            LoopQuot.comp
+              (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                kleinLoopBClass n)
+              kleinLoopBClass := rfl
+      have hfront :
+          LoopQuot.comp kleinLoopAClass
+              (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                kleinLoopBClass (Nat.succ n)) =
+            LoopQuot.comp
+              (LoopQuot.comp
+                kleinLoopAClass
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  kleinLoopBClass n))
+              kleinLoopBClass := by
+                rw [hpow]
+                exact hassoc.symm
+      calc
+        LoopQuot.comp kleinLoopAClass
+            (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+              kleinLoopBClass (Nat.succ n))
+            =
+              LoopQuot.comp
+                (LoopQuot.comp
+                  kleinLoopAClass
+                  (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                    kleinLoopBClass n))
+                kleinLoopBClass := hfront
+        _ =
+              LoopQuot.comp
+                (LoopQuot.comp
+                  (LoopQuot.inv
+                    (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                      kleinLoopBClass n))
+                  kleinLoopAClass)
+                kleinLoopBClass := by
+                    rw [ih]
+        _ =
+              LoopQuot.comp
+                (LoopQuot.inv
+                  (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                    kleinLoopBClass n))
+                (LoopQuot.comp
+                  kleinLoopAClass
+                  kleinLoopBClass) := by
+                    exact
+                      LoopQuot.comp_assoc
+                        (A := KleinBottle) (a := kleinBase)
+                        (x :=
+                          LoopQuot.inv
+                            (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                              kleinLoopBClass n))
+                        (y := kleinLoopAClass)
+                        (z := kleinLoopBClass)
+        _ =
+              LoopQuot.comp
+                (LoopQuot.inv
+                  (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                    kleinLoopBClass n))
+                (LoopQuot.comp
+                  (LoopQuot.inv kleinLoopBClass)
+                  kleinLoopAClass) := by
+                    rw [kleinLoopAClass_mul_loopBClass]
+        _ =
+              LoopQuot.comp
+                (LoopQuot.comp
+                  (LoopQuot.inv
+                    (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                      kleinLoopBClass n))
+                  (LoopQuot.inv kleinLoopBClass))
+                kleinLoopAClass := by
+                    exact
+                      (LoopQuot.comp_assoc
+                        (A := KleinBottle) (a := kleinBase)
+                        (x :=
+                          LoopQuot.inv
+                            (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                              kleinLoopBClass n))
+                        (y := LoopQuot.inv kleinLoopBClass)
+                        (z := kleinLoopAClass)).symm
+        _ =
+              LoopQuot.comp
+                (LoopQuot.comp
+                  (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                    (LoopQuot.inv kleinLoopBClass) n)
+                  (LoopQuot.inv kleinLoopBClass))
+                kleinLoopAClass := by
+                    rw [kleinLoopBClass_pow_inv (n := n)]
+        _ =
+              LoopQuot.comp
+                (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                  (LoopQuot.inv kleinLoopBClass) (Nat.succ n))
+                kleinLoopAClass := by
+                    rfl
+        _ =
+              LoopQuot.comp
+                (LoopQuot.inv
+                  (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+                    kleinLoopBClass (Nat.succ n)))
+                kleinLoopAClass := by
+                    rw [kleinLoopBClass_pow_inv (n := Nat.succ n)]
+@[simp] theorem kleinLoopAClass_mul_loopBClass_zpow (n : Int) :
+    LoopQuot.comp kleinLoopAClass
+        (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+          kleinLoopBClass n) =
+      LoopQuot.comp
+        (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+          (LoopQuot.inv kleinLoopBClass) n)
+        kleinLoopAClass := by
+  classical
+  cases n using Int.rec with
+  | ofNat m =>
+      change
+        LoopQuot.comp kleinLoopAClass
+            (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+              kleinLoopBClass m) =
+          LoopQuot.comp
+            (LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+              (LoopQuot.inv kleinLoopBClass) m)
+            kleinLoopAClass
+      have h := kleinLoopAClass_mul_loopBClass_pow (n := m)
+      -- Rewrite the right-hand side using `kleinLoopBClass_pow_inv`.
+      have h' := h
+      rw [kleinLoopBClass_pow_inv (n := m)] at h'
+      exact h'
+  | negSucc m =>
+      let pb :=
+        LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+          kleinLoopBClass (Nat.succ m)
+      let pinv :=
+        LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+          (LoopQuot.inv kleinLoopBClass) (Nat.succ m)
+      change
+        LoopQuot.comp kleinLoopAClass (LoopQuot.inv pb) =
+          LoopQuot.comp (LoopQuot.inv pinv) kleinLoopAClass
+      have hpos :
+          LoopQuot.comp kleinLoopAClass pb =
+            LoopQuot.comp pinv kleinLoopAClass := by
+        have h :=
+          kleinLoopAClass_mul_loopBClass_pow (n := Nat.succ m)
+        have pb_def :
+            LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+              kleinLoopBClass (Nat.succ m) = pb := rfl
+        have pinv_def :
+            LoopQuot.pow (A := KleinBottle) (a := kleinBase)
+              (LoopQuot.inv kleinLoopBClass) (Nat.succ m) = pinv := rfl
+        have h' := h
+        rw [kleinLoopBClass_pow_inv (n := Nat.succ m)] at h'
+        -- replace the explicit powers with the abbreviations `pb` and `pinv`.
+        have h'' := h'
+        rw [pb_def, pinv_def] at h''
+        exact h''
+
+      have hleft_val :
+          LoopQuot.comp
+              (LoopQuot.comp kleinLoopAClass (LoopQuot.inv pb))
+              pb =
+            kleinLoopAClass := by
+        calc
+          LoopQuot.comp
+              (LoopQuot.comp kleinLoopAClass (LoopQuot.inv pb))
+              pb
+              =
+            LoopQuot.comp
+              kleinLoopAClass
+              (LoopQuot.comp (LoopQuot.inv pb) pb) :=
+                LoopQuot.comp_assoc
+                  (x := kleinLoopAClass)
+                  (y := LoopQuot.inv pb)
+                  (z := pb)
+          _ =
+            LoopQuot.comp
+              kleinLoopAClass
+              LoopQuot.id := by
+                rw [LoopQuot.inv_comp
+                  (A := KleinBottle) (a := kleinBase)
+                  (x := pb)]
+          _ = kleinLoopAClass :=
+            LoopQuot.comp_id
+              (A := KleinBottle) (a := kleinBase)
+              (x := kleinLoopAClass)
+      have hright_val :
+          LoopQuot.comp
+              (LoopQuot.comp (LoopQuot.inv pinv) kleinLoopAClass)
+              pb =
+            kleinLoopAClass := by
+        calc
+          LoopQuot.comp
+              (LoopQuot.comp (LoopQuot.inv pinv) kleinLoopAClass)
+              pb
+              =
+            LoopQuot.comp
+              (LoopQuot.inv pinv)
+              (LoopQuot.comp kleinLoopAClass pb) :=
+                LoopQuot.comp_assoc
+                  (x := LoopQuot.inv pinv)
+                  (y := kleinLoopAClass)
+                  (z := pb)
+          _ =
+            LoopQuot.comp
+              (LoopQuot.inv pinv)
+              (LoopQuot.comp pinv kleinLoopAClass) := by
+                rw [hpos]
+          _ =
+            LoopQuot.comp
+              (LoopQuot.comp
+                (LoopQuot.inv pinv)
+                pinv)
+              kleinLoopAClass :=
+                (LoopQuot.comp_assoc
+                  (x := LoopQuot.inv pinv)
+                  (y := pinv)
+                  (z := kleinLoopAClass)).symm
+          _ =
+            LoopQuot.comp LoopQuot.id kleinLoopAClass := by
+                rw [LoopQuot.inv_comp
+                  (A := KleinBottle) (a := kleinBase)
+                  (x := pinv)]
+          _ = kleinLoopAClass :=
+            LoopQuot.id_comp
+              (A := KleinBottle) (a := kleinBase)
+              (x := kleinLoopAClass)
+      have hgoal :
+          LoopQuot.comp kleinLoopAClass (LoopQuot.inv pb) =
+            LoopQuot.comp (LoopQuot.inv pinv) kleinLoopAClass := by
+        apply LoopQuot.comp_right_cancel
+        exact hleft_val.trans hright_val.symm
+      exact hgoal
 
 end
 
