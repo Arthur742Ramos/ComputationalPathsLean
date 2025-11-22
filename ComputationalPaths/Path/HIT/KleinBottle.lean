@@ -1224,6 +1224,20 @@ theorem kleinLoopAClass_mul_loopBClass_pow (n : Nat) :
         exact hleft_val.trans hright_val.symm
       exact hgoal
 
+@[simp] theorem kleinPiOne_mul_loopB_zpow (n : Int) :
+    PiOne.mul kleinLoopAElement (PiOne.zpow kleinLoopBElement n) =
+      PiOne.mul (PiOne.zpow (PiOne.inv kleinLoopBElement) n) kleinLoopAElement := by
+  unfold PiOne.mul PiOne.inv kleinLoopAElement kleinLoopBElement
+  change
+    LoopQuot.comp kleinLoopAClass
+        (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+          kleinLoopBClass n) =
+      LoopQuot.comp
+        (LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+          (LoopQuot.inv kleinLoopBClass) n)
+        kleinLoopAClass
+  exact kleinLoopAClass_mul_loopBClass_zpow (n := n)
+
 end
 
 -- As with the torus, the higher coherence coming from `kleinSurf` is deferred
