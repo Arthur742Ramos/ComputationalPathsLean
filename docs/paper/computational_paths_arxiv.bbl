@@ -1,0 +1,109 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{RdVdQdO25}
+
+\bibitem[Awo12]{Awodey2012}
+Steve Awodey.
+\newblock Type theory and homotopy.
+\newblock In Peter Dybjer, Sten Lindstr{"o}m, Erik Palmgren, and G{"o}ran
+  Sundholm, editors, {\em Epistemology versus Ontology}, volume~27 of {\em
+  Logic, Epistemology, and the Unity of Science}, pages 183--201. Springer,
+  2012.
+
+\bibitem[BCM20]{Buzzard2020mathlib}
+Kevin Buzzard, Johan Commelin, and Patrick Massot.
+\newblock The lean mathematical library.
+\newblock In {\em Intelligent Computer Mathematics}, volume 12236 of {\em
+  Lecture Notes in Computer Science}, pages 109--123. Springer, 2020.
+
+\bibitem[BN98]{BaaderNipkow1998}
+Franz Baader and Tobias Nipkow.
+\newblock {\em Term Rewriting and All That}.
+\newblock Cambridge University Press, 1998.
+
+\bibitem[CCHM18]{Cohen2018Cubical}
+Cyril Cohen, Thierry Coquand, Simon Huber, and Anders M{"o}rtberg.
+\newblock Cubical type theory: A constructive interpretation of the univalence
+  axiom.
+\newblock {\em Mathematical Structures in Computer Science}, 28(7):1228--1269,
+  2018.
+
+\bibitem[dMKA{\etalchar{+}}15]{deMoura2015Lean}
+Leonardo de~Moura, Soonho Kong, Jeremy Avigad, Floris van Doorn, and Jakob von
+  Raumer.
+\newblock The lean theorem prover (system description).
+\newblock In {\em Automated Deduction -- CADE-25}, volume 9195 of {\em Lecture
+  Notes in Computer Science}, pages 378--388. Springer, 2015.
+
+\bibitem[dQdOR16]{Queiroz2016Paths}
+Ruy J. G.~B. de~Queiroz, Anjolina~G. de~Oliveira, and Arthur~F. Ramos.
+\newblock Propositional equality, identity types, and direct computational
+  paths.
+\newblock {\em South American Journal of Logic}, 2(2):245--296, 2016.
+\newblock Special Issue: A Festschrift for Francisco Miraglia.
+
+\bibitem[dVRdQdO19]{Veras2019LND}
+Tiago M.~L. de~Veras, Arthur~F. Ramos, Ruy J. G.~B. de~Queiroz, and Anjolina~G.
+  de~Oliveira.
+\newblock An alternative approach to the calculation of fundamental groups
+  based on labeled natural deduction.
+\newblock {\em arXiv preprint arXiv:1906.09107}, 2019.
+
+\bibitem[HS94]{HofmannStreicher1994}
+Martin Hofmann and Thomas Streicher.
+\newblock The groupoid model refutes uniqueness of identity proofs.
+\newblock In {\em Proceedings of the Ninth Annual IEEE Symposium on Logic in
+  Computer Science (LICS)}, pages 208--212. IEEE, 1994.
+
+\bibitem[KB70]{KnuthBendix1970}
+Donald~E. Knuth and Peter~B. Bendix.
+\newblock Simple word problems in universal algebras.
+\newblock In J.~Leech, editor, {\em Computational Problems in Abstract
+  Algebra}, pages 263--297. Pergamon, 1970.
+
+\bibitem[LS13]{LicataShulman2013}
+Daniel~R. Licata and Michael Shulman.
+\newblock Calculating the fundamental group of the circle in homotopy type
+  theory.
+\newblock In {\em Proceedings of the 28th Annual IEEE Symposium on Logic in
+  Computer Science}, pages 223--232. IEEE, 2013.
+
+\bibitem[Lum09]{Lumsdaine2009}
+Peter~LeFanu Lumsdaine.
+\newblock Weak $\omega$-categories from intensional type theory.
+\newblock In {\em Typed Lambda Calculi and Applications}, volume 5608 of {\em
+  Lecture Notes in Computer Science}, pages 172--187. Springer, 2009.
+
+\bibitem[ML84]{MartinLoef1984}
+Per Martin-L{"o}f.
+\newblock {\em Intuitionistic Type Theory}.
+\newblock Bibliopolis, Naples, 1984.
+
+\bibitem[New42]{Newman1942}
+M.~H.~A. Newman.
+\newblock On theories with a combinatorial definition of ``equivalence''.
+\newblock {\em Annals of Mathematics}, 43(2):223--243, 1942.
+
+\bibitem[Ram18]{Ramos2018Thesis}
+Arthur~F. Ramos.
+\newblock {\em Explicit Computational Paths in Type Theory}.
+\newblock PhD thesis, Universidade Federal de Pernambuco, Recife, Brazil, 2018.
+
+\bibitem[RdVdQdO25]{ComputationalPathsLean}
+Arthur~F. Ramos, Tiago M.~L. de~Veras, Ruy J. G.~B. de~Queiroz, and Anjolina~G.
+  de~Oliveira.
+\newblock Computational paths in lean.
+\newblock \url{https://github.com/Arthur742Ramos/ComputationalPathsLean}, 2025.
+\newblock Version accessed November 22, 2025.
+
+\bibitem[{Uni}13]{HoTTBook2013}
+{Univalent Foundations Program}.
+\newblock {\em Homotopy Type Theory: Univalent Foundations of Mathematics}.
+\newblock Institute for Advanced Study, 2013.
+
+\bibitem[vdBG11]{BergGarner2011}
+Benno van~den Berg and Richard Garner.
+\newblock Types are weak $\omega$-groupoids.
+\newblock {\em Proceedings of the London Mathematical Society},
+  102(2):370--394, 2011.
+
+\end{thebibliography}
