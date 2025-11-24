@@ -168,15 +168,124 @@ def projectiveCode : ProjectivePlane → Type _ :=
 theorem projectiveCode_base : projectiveCode projectiveBase = Bool :=
   projectivePlaneRec_base projectiveCodeData
 
+/-- The loop on the code family corresponds to univalence of negation. -/
+theorem projectiveCode_loop_path :
+    Path.trans (Path.symm (Path.ofEq projectiveCode_base))
+        (Path.trans (Path.congrArg projectiveCode projectiveLoop)
+          (Path.ofEq projectiveCode_base)) =
+      Path.ua projectiveEquiv :=
+  projectivePlaneRec_loop projectiveCodeData
+
+/-- Coercion helper: cast from `projectiveCode projectiveBase` to `Bool`. -/
+abbrev projectiveCodeToBool (x : projectiveCode projectiveBase) : Bool :=
+  cast projectiveCode_base x
+
+/-- Coercion helper: cast from `Bool` to `projectiveCode projectiveBase`. -/
+abbrev boolToProjectiveCode (b : Bool) : projectiveCode projectiveBase :=
+  cast projectiveCode_base.symm b
+
+@[simp] theorem projectiveCodeToBool_boolToProjectiveCode (b : Bool) :
+    projectiveCodeToBool (boolToProjectiveCode b) = b := by
+  simp only [projectiveCodeToBool, boolToProjectiveCode]
+  simp [cast_cast]
+
+/-- Transport along the projective loop applies negation. -/
+@[simp] theorem projectiveCode_transport_loop (b : Bool) :
+    projectiveCodeToBool (Path.transport (A := ProjectivePlane) (D := projectiveCode)
+      projectiveLoop (boolToProjectiveCode b)) = not b := by
+  let p1 := Path.ofEq projectiveCode_base
+  let q := Path.congrArg projectiveCode projectiveLoop
+  let b_code := boolToProjectiveCode b
+  have hEq : Path.trans (Path.symm p1) (Path.trans q p1) = Path.ua projectiveEquiv :=
+    projectiveCode_loop_path
+  -- Transport along trans decomposes
+  have hAssoc :=
+    Path.transport_trans (A := Type _) (D := fun X => X)
+      (p := q) (q := p1) (x := b_code)
+  -- Transport along congrArg is transport in the family
+  have hMove :=
+    (Path.transport_congrArg (A := ProjectivePlane) (D := projectiveCode)
+      (p := projectiveLoop) (x := b_code))
+  -- Combine to get the LHS
+  have hLHS :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) b_code
+      = projectiveCodeToBool
+          (Path.transport (A := ProjectivePlane) (D := projectiveCode) projectiveLoop b_code) := by
+    have hSplit :
+        Path.transport (A := Type _) (D := fun X => X)
+          (Path.trans q p1) b_code
+        = Path.transport (A := Type _) (D := fun X => X) p1
+            (Path.transport (A := Type _) (D := fun X => X) q b_code) := by
+      simpa using hAssoc
+    have hInner :
+        Path.transport (A := Type _) (D := fun X => X) q b_code
+        = Path.transport (A := ProjectivePlane) (D := projectiveCode) projectiveLoop b_code := by
+      exact hMove.symm
+    simp only [projectiveCodeToBool]
+    rw [hSplit, hInner]
+    rfl
+  -- Now compute the other side using univalence
+  have hLeftStep :=
+    Path.transport_trans (A := Type _) (D := fun X => X)
+      (p := Path.symm p1) (q := Path.trans q p1)
+      (x := Path.transport (A := Type _) (D := fun X => X) p1 b_code)
+  have hLeftCancel :=
+    _root_.congrArg
+      (fun w =>
+        Path.transport (A := Type _) (D := fun X => X)
+          (Path.trans q p1) w)
+      (Path.transport_symm_left (A := Type _) (D := fun X => X)
+        (p := p1) (x := b_code))
+  have hLeftSimp :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans (Path.symm p1) (Path.trans q p1))
+        (Path.transport (A := Type _) (D := fun X => X) p1 b_code)
+      = Path.transport (A := Type _) (D := fun X => X)
+          (Path.trans q p1) b_code := by
+    exact hLeftStep.trans hLeftCancel
+  have hComb :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.trans q p1) b_code
+      = Path.transport (A := Type _) (D := fun X => X)
+          (Path.ua projectiveEquiv)
+          (Path.transport (A := Type _) (D := fun X => X) p1 b_code) := by
+    rw [← hLeftSimp]
+    rw [hEq]
+  have hBase :
+      Path.transport (A := Type _) (D := fun X => X) p1 b_code = b := by
+    simp only [p1, b_code, boolToProjectiveCode, Path.transport_ofEq]
+    -- Goal: cast projectiveCode_base (cast projectiveCode_base.symm b) = b
+    exact cast_cast projectiveCode_base.symm projectiveCode_base b
+  have hRHS :
+      Path.transport (A := Type _) (D := fun X => X)
+        (Path.ua projectiveEquiv) b
+      = not b := by
+    simp [ua_beta, projectiveEquiv]
+  rw [← hLHS, hComb, hBase, hRHS]
+
 /-! ## Encoding and Decoding -/
 
 /-- Encode a loop on the projective plane as an element of Bool (ℤ2).
     Uses the transport along the code family. -/
 def projectiveEncodePath : Path projectiveBase projectiveBase → Bool :=
   fun p =>
-    let transported := Path.transport (A := ProjectivePlane) (D := projectiveCode) p
-      (projectiveCode_base ▸ false)
-    projectiveCode_base ▸ transported
+    projectiveCodeToBool (Path.transport (A := ProjectivePlane) (D := projectiveCode) p
+      (boolToProjectiveCode false))
+
+/-- Encoding the reflexivity path gives false. -/
+@[simp] theorem projectiveEncodePath_refl :
+    projectiveEncodePath (Path.refl projectiveBase) = false := by
+  simp only [projectiveEncodePath]
+  simp only [Path.transport_refl]
+  exact projectiveCodeToBool_boolToProjectiveCode false
+
+/-- Encoding the fundamental loop gives true. -/
+@[simp] theorem projectiveEncodePath_loop :
+    projectiveEncodePath projectiveLoop = true := by
+  simp only [projectiveEncodePath]
+  simp only [projectiveCode_transport_loop]
+  rfl
 
 /-- Decode an element of Bool (ℤ₂) to a loop on the projective plane. -/
 def projectiveDecode : Bool → Path projectiveBase projectiveBase
@@ -254,12 +363,57 @@ def projectiveEncodeQuot : LoopQuot ProjectivePlane projectiveBase → Bool :=
 theorem projectiveEncode_decode (z : Bool) :
     projectiveEncodeQuot (toPathZ2 z) = z := by
   match z with
-  | false => sorry  -- Requires transport computation
-  | true => sorry   -- Requires transport computation
+  | false =>
+    simp only [toPathZ2, projectiveReflClass, projectiveEncodeQuot]
+    simp only [LoopQuot.ofLoop]
+    exact projectiveEncodePath_refl
+  | true =>
+    simp only [toPathZ2, projectiveLoopClass, projectiveEncodeQuot]
+    simp only [LoopQuot.ofLoop]
+    exact projectiveEncodePath_loop
+
+/-- The decode path for a Bool value. -/
+def projectiveDecodePath : Bool → Path projectiveBase projectiveBase
+  | false => Path.refl projectiveBase
+  | true => projectiveLoop
+
+/-- Equality-level helper: `decode ∘ encode = id` on propositional equalities.
+
+    For any `e : projectiveBase = projectiveBase`, decoding the encoding
+    gives back the same equality. This uses the fact that the only loops
+    in RP² are refl and projectiveLoop (and projectiveLoop² = refl). -/
+theorem projectiveDecodeEq_projectiveEncodeEq
+    (e : projectiveBase = projectiveBase) :
+    (projectiveDecodePath (projectiveEncodePath (Path.ofEq e))).toEq = e := by
+  cases e
+  rfl
 
 theorem projectiveDecode_encode (x : LoopQuot ProjectivePlane projectiveBase) :
     toPathZ2 (projectiveEncodeQuot x) = x := by
-  sorry  -- Requires showing all loops reduce to refl or projectiveLoop
+  apply PathRwQuot.eq_of_toEq_eq (A := ProjectivePlane) (a := projectiveBase) (b := projectiveBase)
+  refine Quot.inductionOn x ?_
+  intro p
+  have hcanon :
+      projectiveEncodePath (Path.ofEq p.toEq) = projectiveEncodePath p := by
+    have hcanonRw : RwEq (Path.ofEq p.toEq) p := (rweq_canon (p := p)).symm
+    exact projectiveEncodePath_rweq (h := hcanonRw)
+  have hgoal₀ := projectiveDecodeEq_projectiveEncodeEq (e := p.toEq)
+  have hcanonDecode :
+      (projectiveDecodePath (projectiveEncodePath (Path.ofEq p.toEq))).toEq =
+        (projectiveDecodePath (projectiveEncodePath p)).toEq := by
+    have := _root_.congrArg (fun z : Bool => projectiveDecodePath z) hcanon.symm
+    exact _root_.congrArg Path.toEq this
+  have hgoal :
+      (projectiveDecodePath (projectiveEncodePath p)).toEq = p.toEq :=
+    hcanonDecode ▸ hgoal₀
+  -- Now we need to relate projectiveDecodePath to toPathZ2
+  have hdecodeMatch :
+      PathRwQuot.toEq (toPathZ2 (projectiveEncodePath p)) =
+        (projectiveDecodePath (projectiveEncodePath p)).toEq := by
+    match h : projectiveEncodePath p with
+    | false => rfl
+    | true => rfl
+  rw [hdecodeMatch, hgoal]
 
 /-- The fundamental group of the real projective plane is ℤ₂.
 
