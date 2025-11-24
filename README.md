@@ -52,6 +52,14 @@ Torus π₁(T²) ≃ ℤ × ℤ (what to read)
 - Equivalence: `torusPiOneEquivIntProd` shows the maps are inverse, yielding π₁(T²) ≃ ℤ × ℤ.
 - Follow-up work: extracting a `TorusStep` module (analogous to `CircleStep`) would expose addition/subtraction lemmas as `[simp]` facts.
 
+Klein bottle π₁(K) roadmap (in progress)
+- Reference: [De Oliveira & Ramos, *Fundamental group of the Klein bottle* (2019)](https://arxiv.org/pdf/1906.09107).
+- See `docs/klein_bottle_plan.md` for the encode/decode checklist that mirrors the torus proof.
+- Immediate algebraic tasks:
+  1. Formalise the semidirect multiplication on `KleinBottleWord` (`a^m b^n ⋅ a^{m'} b^{n'} = a^{m+m'} b^{(-1)^{m'} n + n'}`).
+  2. Show `kleinDecode (m, n)` is a group homomorphism into `π₁(K)` and that conjugation by `a` inverts the `b`-power.
+  3. Package the encode/decode equivalence `π₁(K) ≅ ℤ ⋊ ℤ` following the `torusPiOneEquivIntProd` template.
+
 
 Assumptions (axioms)
 - Circle HIT interface (constructors + β-rules).  The type, base point, loop,

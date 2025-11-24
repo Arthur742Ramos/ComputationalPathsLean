@@ -6,4 +6,13 @@
 /.elan/
 05-De Queiroz-De Oliveira-Ramos-SAJL.pdf
 05-De Queiroz-De Oliveira-Ramos-SAJL.txt
-\n# Docs\ndocs/paper/\n
+# Docs
+docs/paper/
+
+# Local packaging artifacts
+add_patch.diff
+arxiv_bbl_snapshot.txt
+arxiv_package/
+computational_paths_arxiv_arxiv.zip
+docs/computational_paths_arxiv_arxiv.zip
+tmpzip/

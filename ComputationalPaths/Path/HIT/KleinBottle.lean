@@ -149,6 +149,20 @@ theorem kleinSign_sq (m : Int) :
   · simp [kleinSign, h]
   · simp [kleinSign, h]
 
+@[simp] theorem kleinSign_ofNat (n : Nat) :
+    kleinSign (Int.ofNat n) =
+      if n % 2 = 0 then 1 else -1 := by
+  classical
+  unfold kleinSign
+  simp
+
+@[simp] theorem kleinSign_negSucc (n : Nat) :
+    kleinSign (Int.negSucc n) =
+      if Nat.succ n % 2 = 0 then 1 else -1 := by
+  classical
+  unfold kleinSign
+  simp
+
 /-- Loop space on the Klein bottle at `kleinBase`. -/
 abbrev KleinBottleLoopSpace : Type _ :=
   LoopSpace KleinBottle kleinBase
