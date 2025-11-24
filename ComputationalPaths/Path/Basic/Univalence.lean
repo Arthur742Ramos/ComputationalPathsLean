@@ -59,5 +59,9 @@ the symmetric path. -/
 axiom ua_symm {A B : Type u} (e : SimpleEquiv A B) :
     Path.symm (ua e) = ua (SimpleEquiv.symm e)
 
+/-- Univalence maps the identity equivalence to the identity path. -/
+axiom ua_refl (A : Type u) :
+    ua (SimpleEquiv.refl A) = Path.refl A
+
 end Path
 end ComputationalPaths

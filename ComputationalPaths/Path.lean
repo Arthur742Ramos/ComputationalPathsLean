@@ -20,3 +20,4 @@ import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.HIT.Torus
 import ComputationalPaths.Path.HIT.KleinBottle
+import ComputationalPaths.Path.HIT.ProjectivePlane

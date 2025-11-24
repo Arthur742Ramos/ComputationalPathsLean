@@ -1,12 +1,13 @@
 # Computational Paths (Lean 4)
 
-Lean 4 formalisation of propositional equality via explicit computational paths and rewrite equality. It provides a practical kernel for transport, symmetry, congruence, rewrite quotients, and normalisation — and uses this machinery to formalise the fundamental group of the circle.
+Lean 4 formalisation of propositional equality via explicit computational paths and rewrite equality. It provides a practical kernel for transport, symmetry, congruence, rewrite quotients, and normalisation — and uses this machinery to formalise fundamental groups of higher-inductive types.
 
 Highlights
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + code family into ℤ (via univalence axioms).
-- Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction (no local placeholders).
+- Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
 - Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd`.
+- Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition).
 
 Quick Start
 - Build: `./lake.cmd build`
@@ -21,6 +22,7 @@ Project Layout (selected)
 - `ComputationalPaths/Path/HIT/Circle.lean` — circle HIT interface, code family into ℤ, encode/transport lemmas, z-powers.
 - `ComputationalPaths/Path/HIT/CircleStep.lean` — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
 - `ComputationalPaths/Path/HIT/Torus.lean` — torus HIT interface, code family into ℤ × ℤ, encode/transport lemmas, iterated loops, and the equivalence `torusPiOneEquivIntProd`.
+- `ComputationalPaths/Path/HIT/ProjectivePlane.lean` — real projective plane RP² with fundamental loop α satisfying α∘α=refl, and equivalence π₁(RP²) ≃ ℤ₂.
 - `ComputationalPaths/Path/Homotopy/HoTT.lean` — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -51,6 +53,14 @@ Torus π₁(T²) ≃ ℤ × ℤ (what to read)
 - Decoding: `torusDecode : ℤ × ℤ → π₁(T²)` assembles the z-powers of the two commuting loops.
 - Equivalence: `torusPiOneEquivIntProd` shows the maps are inverse, yielding π₁(T²) ≃ ℤ × ℤ.
 - Follow-up work: extracting a `TorusStep` module (analogous to `CircleStep`) would expose addition/subtraction lemmas as `[simp]` facts.
+
+Real Projective Plane π₁(RP²) ≃ ℤ₂ (what to read)
+- Reference: de Veras, Ramos, de Queiroz & de Oliveira, "A Topological Application of Labelled Natural Deduction", SAJL.
+- HIT Interface: `ProjectivePlane` with base point and fundamental loop `projectiveLoop` satisfying `projectiveLoopSquare : α ∘ α = refl`.
+- ℤ₂ representation: `Bool` with XOR as addition (no Mathlib dependency).
+- Encoding: `projectiveEncodeQuot : π₁(RP²) → Bool` via quotient lift.
+- Decoding: `toPathZ2 : Bool → π₁(RP²)` maps `false → refl`, `true → loop`.
+- Equivalence: `projectivePiOneEquivZ2` shows π₁(RP²) ≃ ℤ₂ (with two remaining sorrys for transport computations).
 
 Klein bottle π₁(K) roadmap (in progress)
 - Reference: [De Oliveira & Ramos, *Fundamental group of the Klein bottle* (2019)](https://arxiv.org/pdf/1906.09107).
