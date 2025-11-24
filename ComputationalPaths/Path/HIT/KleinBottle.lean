@@ -1224,6 +1224,36 @@ theorem kleinLoopAClass_mul_loopBClass_pow (n : Nat) :
         exact hleft_val.trans hright_val.symm
       exact hgoal
 
+@[simp] theorem kleinLoopBClass_mul_loopAClass :
+    LoopQuot.comp kleinLoopBClass kleinLoopAClass =
+      LoopQuot.comp kleinLoopAClass (LoopQuot.inv kleinLoopBClass) := by
+  classical
+  have h :=
+    kleinLoopAClass_mul_loopBClass_zpow (n := (-1 : Int))
+  have hzpow :
+      LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        kleinLoopBClass (-1) =
+        LoopQuot.inv kleinLoopBClass :=
+    LoopQuot.zpow_neg_one
+      (A := KleinBottle) (a := kleinBase)
+      (x := kleinLoopBClass)
+  have hzpow_inv_raw :=
+    LoopQuot.zpow_neg_one
+      (A := KleinBottle) (a := kleinBase)
+      (x := LoopQuot.inv kleinLoopBClass)
+  have hzpow_inv :
+      LoopQuot.zpow (A := KleinBottle) (a := kleinBase)
+        (LoopQuot.inv kleinLoopBClass) (-1) =
+        kleinLoopBClass :=
+    hzpow_inv_raw.trans
+      (LoopQuot.inv_inv
+        (A := KleinBottle) (a := kleinBase)
+        (x := kleinLoopBClass))
+  have hspec := h
+  rw [hzpow] at hspec
+  rw [hzpow_inv] at hspec
+  exact hspec.symm
+
 @[simp] theorem kleinPiOne_mul_loopB_zpow (n : Int) :
     PiOne.mul kleinLoopAElement (PiOne.zpow kleinLoopBElement n) =
       PiOne.mul (PiOne.zpow (PiOne.inv kleinLoopBElement) n) kleinLoopAElement := by
