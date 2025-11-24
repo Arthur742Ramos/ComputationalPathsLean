@@ -54,5 +54,10 @@ the concatenation of the paths. -/
 axiom ua_trans {A B C : Type u} (e : SimpleEquiv A B) (f : SimpleEquiv B C) :
     Path.trans (ua e) (ua f) = ua (SimpleEquiv.comp e f)
 
+/-- Univalence preserves inverses: the path for the inverse equivalence is
+the symmetric path. -/
+axiom ua_symm {A B : Type u} (e : SimpleEquiv A B) :
+    Path.symm (ua e) = ua (SimpleEquiv.symm e)
+
 end Path
 end ComputationalPaths
