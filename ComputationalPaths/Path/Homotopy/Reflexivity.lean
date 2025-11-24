@@ -1,30 +1,34 @@
 /-
-# Reflexivity Theorem (Thesis Chapter 5, §11)
+# Reflexivity Theorem
 
-This file documents that the Reflexivity Theorem (Theorem 5.10 from the thesis)
-is satisfied by our formalization. The theorem states:
+This file establishes the Reflexivity Theorem: any path constructed from
+reflexivity via the path operations will rewrite back to reflexivity.
 
-> For any type A and a path x =_ρ x : A, if a path s is obtained by a series
-> (perhaps empty) of applications of axioms and rules of inference of λβη-equality
-> theory for type theory to the path ρ, then there is a path t' such that s =_{t'} ρ.
+## Statement
+
+> For any type A and a loop path p : a = a, if p is obtained by applying
+> path operations (symmetry, transitivity, congruence, etc.) to refl,
+> then p is RwEq to refl.
+
+## Implementation
 
 In our Lean implementation, this corresponds to:
-- Every path p : Path a a with p.toEq = rfl is RwEq to Path.refl a
+- Every path `p : Path a a` with `p.toEq = rfl` is `RwEq` to `Path.refl a`
 
 This follows from:
-1. `Step.canon`: Any path p steps to Path.ofEq p.toEq
-2. `rweq_canon`: RwEq p (Path.ofEq p.toEq)
-3. When p.toEq = rfl: RwEq (Path.ofEq rfl) (Path.refl a) via rweq_canon.symm
+1. `Step.canon`: Any path p steps to `Path.ofEq p.toEq`
+2. `rweq_canon`: `RwEq p (Path.ofEq p.toEq)`
+3. When `p.toEq = rfl`: `RwEq (Path.ofEq rfl) (Path.refl a)` via `rweq_canon.symm`
 
-Additionally, the rules 45-47 from the thesis (mxp, nxp, xxp) are satisfied
-definitionally in our implementation:
-- Rule 45 (mxp): congrArg f (refl a) = refl (f a) by rfl
-- Rule 46 (nxp): app (refl f) a = refl (f a) by rfl
-- Rule 47 (xxp): lamCongr (fun x => refl (f x)) = refl f by rfl
+## Definitional Rules
 
-The key insight is that in our implementation, applying constructors to refl
-produces refl definitionally, so these rules don't need to be added as
-explicit Step constructors.
+The following rules are satisfied definitionally:
+- `congrArg f (refl a) = refl (f a)` by rfl
+- `app (refl f) a = refl (f a)` by rfl
+- `lamCongr (fun x => refl (f x)) = refl f` by rfl
+
+Applying constructors to refl produces refl definitionally, so these rules
+don't need explicit Step constructors.
 -/
 
 import ComputationalPaths.Path.Rewrite.RwEq
@@ -42,9 +46,7 @@ theorem rweq_ofEq_rfl_refl {A : Type u} (a : A) :
 /-- The Reflexivity Theorem: Any loop path (path from a to a) with trivial
     equality proof is RwEq to refl.
 
-    This formalizes Theorem 5.10 from the thesis:
-    "For any type A and a path x =_ρ x : A, if a path s is obtained by a series
-    of applications of axioms and rules to ρ, then s =_{t'} ρ" -/
+    If a path `p : Path a a` has `p.toEq = rfl`, then `p` rewrites to `refl a`. -/
 theorem reflexivity_theorem {A : Type u} {a : A} (p : Path a a)
     (hp : p.toEq = rfl) : RwEq p (Path.refl a) := by
   -- First, p is RwEq to Path.ofEq p.toEq

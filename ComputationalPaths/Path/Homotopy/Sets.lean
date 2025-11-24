@@ -1,19 +1,20 @@
 /-
-# Sets and Axiom K (Thesis Chapter 5, §13)
+# Homotopy Sets and Axiom K
 
-This file formalizes the characterization of sets in terms of Axiom K
-from the thesis. A type is a "set" in the homotopy-theoretic sense if
-all parallel paths are RwEq (i.e., it has h-level 0 for paths).
+This file characterizes homotopy sets (h-sets) in terms of Axiom K.
+A type is a "set" in the homotopy-theoretic sense if all parallel paths
+are RwEq (i.e., it has h-level 0 for paths).
 
 ## Key Definitions
 
 - `IsHSet A`: A type A is a homotopy set if any two parallel paths are RwEq
 - `AxiomK A`: A type A satisfies Axiom K if every loop is RwEq to refl
 
-## Main Theorems (from thesis §13)
+## Main Theorems
 
-1. Theorem 5.13: A type is a set iff it satisfies Axiom K
-2. Inverse uniqueness: Every path has a unique inverse (up to RwEq)
+1. `isHSet_iff_axiomK`: A type is a set iff it satisfies Axiom K
+2. `inverse_unique`: Every path has a unique inverse (up to RwEq)
+3. `decidableEq_implies_isHSet`: Types with decidable equality are sets
 -/
 
 import ComputationalPaths.Path.Homotopy.Reflexivity
@@ -66,18 +67,17 @@ theorem inverse_unique {a b : A} (p : Path a b) (q : Path b a)
     exact rweq_of_step (Step.trans_refl_right (Path.symm p))
   exact RwEq.trans (RwEq.trans (RwEq.trans (RwEq.trans h1 h2) h3) h4) h5
 
-/-- Theorem 5.13 (→): If A is a set, then A satisfies Axiom K.
-    Proof: Any loop p : a → a is parallel to refl a, so by IsHSet, p ≈ refl. -/
+/-- If A is a set, then A satisfies Axiom K.
+
+    Proof: Any loop `p : a → a` is parallel to `refl a`, so by `IsHSet`, `p ≈ refl`. -/
 theorem isHSet_implies_axiomK (h : IsHSet A) : AxiomK A := by
   intro a p
   exact h p (Path.refl a)
 
-/-- Theorem 5.13 (←): If A satisfies Axiom K, then A is a set.
+/-- If A satisfies Axiom K, then A is a set.
 
-    Proof sketch from thesis:
-    Given paths p, q : a → b, we form trans p (symm q) : a → a.
-    By Axiom K, this is RwEq to refl.
-    By inverse uniqueness considerations, we derive p ≈ q. -/
+    Proof: Given paths `p, q : a → b`, form `trans p (symm q) : a → a`.
+    By Axiom K, this is RwEq to refl. Then derive `p ≈ q` via path algebra. -/
 theorem axiomK_implies_isHSet (h : AxiomK A) : IsHSet A := by
   intro a b p q
   -- Form the loop trans p (symm q) : a → a
@@ -97,15 +97,14 @@ theorem axiomK_implies_isHSet (h : AxiomK A) : IsHSet A := by
     rweq_of_step (Step.trans_refl_left q)
   exact RwEq.trans (RwEq.trans (RwEq.trans (RwEq.trans h1 h2) h3) h4) h5
 
-/-- Theorem 5.13: A type is a set iff it satisfies Axiom K -/
+/-- A type is a set iff it satisfies Axiom K. -/
 theorem isHSet_iff_axiomK : IsHSet A ↔ AxiomK A :=
   ⟨isHSet_implies_axiomK, axiomK_implies_isHSet⟩
 
 /-- A type with decidable equality is a set.
-    This formalizes Theorem 5.15 from the thesis.
 
-    Proof: For types with decidable equality, every equality proof is refl,
-    so every path has toEq = rfl, and by the Reflexivity Theorem it's RwEq to refl. -/
+    Proof: For types with decidable equality, every equality proof is `rfl`,
+    so every path has `toEq = rfl`, and by the Reflexivity Theorem it's RwEq to refl. -/
 theorem decidableEq_implies_axiomK [DecidableEq A] : AxiomK A := by
   intro a p
   -- For decidable types, p.toEq : a = a must be rfl

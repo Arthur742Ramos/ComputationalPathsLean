@@ -314,8 +314,8 @@ variable {A : Type u} {B : Type v}
     (p : Path f g) : (x : A) → Path (f x) (g x) :=
   fun x => Path.app p x
 
-/-- Weak function extensionality in the sense of Chapter 5: an inhabitant of `A`
-packages the pointwise-to-global principle. -/
+/-- Weak function extensionality: given an inhabitant of `A`,
+    pointwise paths between functions extend to a global path. -/
 def weakFunext (a₀ : A) :
     (f g : A → B) →
       ((x : A) → Path (f x) (g x)) → Path f g :=

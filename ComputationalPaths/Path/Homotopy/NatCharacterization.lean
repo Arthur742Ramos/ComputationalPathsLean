@@ -1,41 +1,23 @@
 /-
-# Natural Numbers Characterization (Thesis Chapter 5, §12)
+# Natural Numbers Path Characterization
 
-This file documents how the Natural Numbers characterization from the thesis
-is satisfied by our formalization.
+This file establishes that the natural numbers form a homotopy set (h-set),
+meaning all parallel paths are equal up to rewrite equivalence.
 
-## Thesis Statement
+## Main Results
 
-The thesis proves:
-1. For any m, n : ℕ, if there is a path m =_t n : ℕ, then t ▷ ρ (t rewrites to refl)
-2. (m = n) ≃ code(m, n) where code is defined recursively
+- `nat_paths_rewrite_to_refl`: Every loop on ℕ rewrites to refl
+- `nat_axiom_k`: ℕ satisfies Axiom K
+- `nat_is_set`: ℕ is a homotopy set
+- `nat_path_decidable`: Path existence on ℕ is decidable
 
-## Our Formalization
+## Key Insight
 
-In our Lean implementation, these results follow naturally:
+For natural numbers, every loop `p : Path m m` has `p.toEq = rfl` because:
+- Lean's decidable equality for ℕ ensures all equality proofs are `rfl`
+- By the Reflexivity Theorem, such paths are `RwEq` to `Path.refl m`
 
-### Theorem 1: All paths on ℕ rewrite to refl
-
-Every path `p : Path m n` carries a proof `p.proof : m = n`. For natural numbers:
-- If m = n definitionally, then p.proof must be rfl (by proof irrelevance in Lean)
-- By the Reflexivity Theorem, any path with p.toEq = rfl is RwEq to Path.refl
-
-### Theorem 2: Path space equivalence
-
-The equivalence (m = n) ≃ code(m, n) is implicitly handled:
-- `Path m n` exists only when m = n
-- For distinct m ≠ n, the type `Path m n` is empty (no proof exists)
-- code(m, n) in the thesis is essentially the decidable equality structure
-
-### Key Insight
-
-Our implementation enforces a stronger property than the thesis:
-- The thesis allows paths between any m, n and proves they reduce to refl when m = n
-- Our implementation only allows paths between equal m, n via the proof field
-
-This means:
-- `natIsSet`: ℕ is a homotopy set (all parallel paths are equal up to RwEq)
-- `natAxiomK`: ℕ satisfies Axiom K (all loops are refl up to RwEq)
+This makes ℕ an h-set: any two paths `p q : Path m n` are `RwEq` to each other.
 -/
 
 import ComputationalPaths.Path.Homotopy.Reflexivity
@@ -52,27 +34,23 @@ theorem nat_path_toEq_eq_rfl (m : Nat) (p : Path m m) :
   -- p.toEq : m = m, and the only proof of m = m for Nat is rfl
   rfl
 
-/-- Theorem 5.11 from thesis: For any m, n : ℕ, if there is a path m =_t n,
-    then t ▷ ρ (i.e., the path rewrites to refl).
+/-- Every loop on ℕ rewrites to refl.
 
-    In our formalization, this follows from:
-    1. Path m n requires m = n via the proof field
-    2. For m = n, the Reflexivity Theorem applies -/
+    For any `p : Path m m`, we have `RwEq p (Path.refl m)` because:
+    1. Decidable equality ensures `p.toEq = rfl`
+    2. The Reflexivity Theorem applies -/
 theorem nat_paths_rewrite_to_refl (m : Nat) (p : Path m m) :
     RwEq p (Path.refl m) :=
   reflexivity_theorem p (nat_path_toEq_eq_rfl m p)
 
-/-- ℕ satisfies Axiom K: Every loop is RwEq to refl.
-    This formalizes part of Theorem 5.13 from the thesis. -/
+/-- ℕ satisfies Axiom K: Every loop is RwEq to refl. -/
 theorem nat_axiom_k (m : Nat) (p : Path m m) :
     RwEq p (Path.refl m) :=
   nat_paths_rewrite_to_refl m p
 
 /-- ℕ is a homotopy set: Any two parallel paths are RwEq.
-    This follows from Axiom K: both paths are RwEq to refl, hence to each other.
 
-    This formalizes Theorem 5.14 from the thesis:
-    "ℕ is a set" -/
+    Both paths are RwEq to refl (by Axiom K), hence to each other. -/
 theorem nat_is_set (m n : Nat) (p q : Path m n) :
     RwEq p q := by
   -- Transport p and q to paths from m to m via q.symm
@@ -99,10 +77,8 @@ theorem nat_is_set (m n : Nat) (p q : Path m n) :
     (RwEq.trans (RwEq.symm h2) h1)) h6
 
 /-- Decidable equality for paths on ℕ at the quotient level.
-    Since all paths m → n are RwEq, the quotient type has at most one element.
 
-    This relates to Theorem 5.15 from thesis:
-    "ℕ has decidable equality and thus is a set" -/
+    Since all paths m → n are RwEq, the quotient type has at most one element. -/
 def nat_path_decidable (m n : Nat) :
     Decidable (Nonempty (Path m n)) :=
   if h : m = n then

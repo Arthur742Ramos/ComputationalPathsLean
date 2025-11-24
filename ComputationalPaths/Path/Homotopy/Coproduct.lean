@@ -1,17 +1,20 @@
 /-
-# Coproduct (Sum) Characterization (Thesis Chapter 5, §10)
+# Coproduct (Sum) Path Characterization
 
-This file formalizes the characterization of the path space of coproducts (sums)
-from the thesis. The key results are:
+This file characterizes the path space of coproducts (sums).
 
-1. (Sum.inl a₀ = Sum.inl a) ≃ (a₀ = a) - paths between inl values
-2. (Sum.inr b₀ = Sum.inr b) ≃ (b₀ = b) - paths between inr values
-3. (Sum.inl a = Sum.inr b) ≃ Empty - no paths between different injections
+## Key Results
 
-In our formalization, these follow from the structure of Path:
-- Path (Sum.inl a₀) (Sum.inl a) requires a proof Sum.inl a₀ = Sum.inl a
-- This is equivalent to a₀ = a by Sum.inl.injEq
-- Path (Sum.inl a) (Sum.inr b) would require Sum.inl a = Sum.inr b, which is impossible
+1. `(Sum.inl a₀ = Sum.inl a) ≃ (a₀ = a)` - paths between inl values
+2. `(Sum.inr b₀ = Sum.inr b) ≃ (b₀ = b)` - paths between inr values
+3. `(Sum.inl a = Sum.inr b) ≃ Empty` - no paths between different injections
+
+## Implementation
+
+These follow from the structure of `Path`:
+- `Path (Sum.inl a₀) (Sum.inl a)` requires a proof `Sum.inl a₀ = Sum.inl a`
+- This is equivalent to `a₀ = a` by `Sum.inl.injEq`
+- `Path (Sum.inl a) (Sum.inr b)` would require `Sum.inl a = Sum.inr b`, which is impossible
 -/
 
 import ComputationalPaths.Path.Homotopy.Sets
@@ -52,14 +55,14 @@ def sumDecode {a₀ : A} {x : Sum A B} (c : sumCode a₀ x) : Path (Sum.inl a₀
   | inl a => exact inlCongr c
   | inr _ => exact c.elim
 
-/-- Theorem 5.9: Paths in Sum between inl values correspond to paths in A.
+/-- Paths in Sum between inl values correspond to paths in A.
 
-The thesis establishes (Sum.inl a₀ = Sum.inl a) ≃ (a₀ = a) at the type level.
-In our formalization:
+This establishes `(Sum.inl a₀ = Sum.inl a) ≃ (a₀ = a)` at the type level:
 - `sumEncode` extracts a path in A from a path in Sum
-- `sumDecode` lifts a path in A to a path in Sum via inlCongr
-The composition produces paths that are RwEq (not definitionally equal due to
-different step lists). -/
+- `sumDecode` lifts a path in A to a path in Sum via `inlCongr`
+
+The composition produces paths that are RwEq (not definitionally equal
+due to different step lists). -/
 theorem sumEncode_decode_rweq (a₀ a : A) (c : Path a₀ a) :
     RwEq (sumEncode (sumDecode c : Path (Sum.inl a₀ : Sum A B) (Sum.inl a))) c := by
   simp only [sumEncode]

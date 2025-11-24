@@ -1,15 +1,18 @@
 /-
 # Identity Type Transport Lemmas
 
-This module formalizes the transport lemmas for identity type families from
-Chapter 5 §9 of the thesis. These lemmas characterize how transport behaves
-when the type family involves the identity type (paths) itself.
+This module formalizes transport lemmas for identity type families.
+These lemmas characterize how transport behaves when the type family
+involves the identity type (paths) itself.
 
-Key results:
-- Lemma 5.20: Transport along identity type families (a = x), (x = a), (x = x)
-- Theorem 5.21: Transport for (f(x) = g(x)) families
-- Theorem 5.22: Dependent version with apd
-- Theorem 5.23: Path equivalence for self-identity transport
+## Key Results
+
+- `transport_pathTo_toEq`: Transport in `x ↦ (a = x)` is right composition
+- `transport_pathFrom_toEq`: Transport in `x ↦ (x = a)` is left composition with inverse
+- `transport_pathLoop_toEq`: Transport in `x ↦ (x = x)` is conjugation
+- `transport_funPath_toEq`: Transport for function path families `x ↦ (f x = g x)`
+- `transport_depFunPath_toEq`: Dependent version using `apd`
+- `transport_loop_iff_toEq`: Path equivalence for self-identity transport
 -/
 
 import ComputationalPaths.Path.Basic
@@ -34,10 +37,10 @@ section Lemma520
 variable {a x₁ x₂ : A}
 
 /-- Transport along the family `x ↦ (a = x)` yields composition on the right.
-    This is the computational path version of: `transport^{x → (a = x)}(p, q) = τ(q, p)`
+    `transport^{x ↦ (a = x)}(p, q) = q · p`
 
-    In the thesis notation: for `q : a = x₁` and `p : x₁ = x₂`,
-    transporting `q` along `p` gives `q · p : a = x₂`. -/
+    For `q : a = x₁` and `p : x₁ = x₂`, transporting `q` along `p` gives
+    `q · p : a = x₂`. -/
 @[simp] theorem transport_pathTo_toEq (p : Path x₁ x₂) (q : Path a x₁) :
     (Path.transport (A := A) (D := fun x => Path a x) p q).toEq =
       (Path.trans q p).toEq := by
@@ -47,10 +50,10 @@ variable {a x₁ x₂ : A}
       simp
 
 /-- Transport along the family `x ↦ (x = a)` yields composition with the inverse.
-    `transport^{x → (x = a)}(p, q) = τ(σ(p), q)`
+    `transport^{x ↦ (x = a)}(p, q) = p⁻¹ · q`
 
-    In the thesis notation: for `q : x₁ = a` and `p : x₁ = x₂`,
-    transporting `q` along `p` gives `p⁻¹ · q : x₂ = a`. -/
+    For `q : x₁ = a` and `p : x₁ = x₂`, transporting `q` along `p` gives
+    `p⁻¹ · q : x₂ = a`. -/
 @[simp] theorem transport_pathFrom_toEq (p : Path x₁ x₂) (q : Path x₁ a) :
     (Path.transport (A := A) (D := fun x => Path x a) p q).toEq =
       (Path.trans (Path.symm p) q).toEq := by
@@ -60,10 +63,10 @@ variable {a x₁ x₂ : A}
       simp
 
 /-- Transport along the family `x ↦ (x = x)` gives conjugation.
-    `transport^{x → (x = x)}(p, q) = τ(σ(p), τ(q, p))`
+    `transport^{x ↦ (x = x)}(p, q) = p⁻¹ · q · p`
 
-    In the thesis notation: for a loop `q : x₁ = x₁` and `p : x₁ = x₂`,
-    transporting `q` along `p` gives the conjugate `p⁻¹ · q · p : x₂ = x₂`. -/
+    For a loop `q : x₁ = x₁` and `p : x₁ = x₂`, transporting `q` along `p`
+    gives the conjugate loop `p⁻¹ · q · p : x₂ = x₂`. -/
 @[simp] theorem transport_pathLoop_toEq (p : Path x₁ x₂) (q : Path x₁ x₁) :
     (Path.transport (A := A) (D := fun x => Path x x) p q).toEq =
       (Path.trans (Path.symm p) (Path.trans q p)).toEq := by
@@ -74,17 +77,17 @@ variable {a x₁ x₂ : A}
 
 end Lemma520
 
-/-! ## Theorem 5.21: Transport for function path families -/
+/-! ## Transport for function path families -/
 
-section Theorem521
+section FunPathTransport
 
 variable {B : Type v} {a a' : A}
 
 /-- Transport along the family `x ↦ (f(x) = g(x))` for non-dependent functions.
-    `transport^{x → (f(x) = g(x))}(p, q) = τ(τ(σ(μf(p)), q), μg(p))`
+    `transport^{x ↦ (f(x) = g(x))}(p, q) = (ap f p)⁻¹ · q · (ap g p)`
 
-    In the thesis notation: for `q : f(a) = g(a)` and `p : a = a'`,
-    transporting `q` along `p` gives `(ap f p)⁻¹ · q · (ap g p) : f(a') = g(a')`. -/
+    For `q : f(a) = g(a)` and `p : a = a'`, transporting `q` along `p` gives
+    `(ap f p)⁻¹ · q · (ap g p) : f(a') = g(a')`. -/
 @[simp] theorem transport_funPath_toEq {f g : A → B}
     (p : Path a a') (q : Path (f a) (g a)) :
     (Path.transport (A := A) (D := fun x => Path (f x) (g x)) p q).toEq =
@@ -98,11 +101,11 @@ variable {B : Type v} {a a' : A}
       cases proof
       simp
 
-end Theorem521
+end FunPathTransport
 
-/-! ## Theorem 5.22: Dependent version with apd -/
+/-! ## Dependent version with apd -/
 
-section Theorem522
+section DepFunPathTransport
 
 variable {P : A → Type v} {a a' : A}
 
@@ -128,9 +131,9 @@ variable {P : A → Type v} {a a' : A}
       cases proof
       simp
 
-end Theorem522
+end DepFunPathTransport
 
-/-! ## Theorem 5.23: Path equivalence for self-identity transport
+/-! ## Path equivalence for self-identity transport
 
 The key equivalence: transport in (x = x) relates to path rearrangement.
 `(transport^{x → (x = x)}(p, q) = r) ⟺ (τ(q, p) = τ(p, r))`
@@ -138,7 +141,7 @@ The key equivalence: transport in (x = x) relates to path rearrangement.
 This characterizes when a loop `q` at `a` transports to a loop `r` at `a'`.
 -/
 
-section Theorem523
+section SelfIdentityTransport
 
 variable {a a' : A}
 
@@ -160,13 +163,13 @@ theorem path_eq_implies_transport_loop_toEq (p : Path a a') (q : Path a a) (r : 
       cases proof
       simp
 
-/-- The main equivalence theorem (Theorem 5.23). -/
+/-- Main equivalence: transport in self-identity relates to path rearrangement. -/
 theorem transport_loop_iff_toEq (p : Path a a') (q : Path a a) (r : Path a' a') :
     (Path.transport (A := A) (D := fun x => Path x x) p q).toEq = r.toEq ↔
     (Path.trans q p).toEq = (Path.trans p r).toEq :=
   ⟨transport_loop_eq_implies_toEq p q r, path_eq_implies_transport_loop_toEq p q r⟩
 
-end Theorem523
+end SelfIdentityTransport
 
 /-! ## Additional useful lemmas -/
 
