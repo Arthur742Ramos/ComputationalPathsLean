@@ -12,6 +12,9 @@ import ComputationalPaths.Path.Rewrite.Step
 import ComputationalPaths.Path.Rewrite.Rw
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.Quot
+import ComputationalPaths.Path.Rewrite.LNDEQ
+import ComputationalPaths.Path.Rewrite.Termination
+import ComputationalPaths.Path.Rewrite.Confluence
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.Homotopy.Loops

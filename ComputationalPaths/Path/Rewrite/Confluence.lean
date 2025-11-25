@@ -36,7 +36,7 @@ structure Join {A : Type u} {a b : A}
     (Quot.mk _ p : PathRwQuot A a b) = Quot.mk _ q :=
   Quot.sound J.rweq
 
-@[simp] theorem join_refl {A : Type u} {a b : A} (p : Path a b) :
+@[simp] def join_refl {A : Type u} {a b : A} (p : Path a b) :
     Join (A := A) (a := a) (b := b) p p :=
   { meet := p, left := Rw.refl p, right := Rw.refl p }
 
@@ -57,38 +57,47 @@ structure Join {A : Type u} {a b : A}
     Join (A := A) (a := a) (b := b) q r :=
   of_rw (A := A) (a := a) (b := b)
     (p := p) (q := q) (r := r)
-    (Rw.step (A := A) (p := p) (q := q) hq)
-    (Rw.step (A := A) (p := p) (q := r) hr)
+    (rw_of_step (A := A) hq)
+    (rw_of_step (A := A) hr)
 
 namespace LNDEQ
 
 /-- LNDEQ instantiations produce concrete join witnesses whenever their sources
-agree. -/
+agree.  This version takes explicit type parameters to avoid heterogeneous equality issues. -/
 @[simp] def Instantiation.join
-    (i j : Instantiation)
-    (h : i.p = j.p) :
-    Join (A := _) (a := _) (b := _) i.q j.q := by
-  subst h
-  exact Confluence.of_steps (A := _) (a := _) (b := _)
-    (p := i.p) (q := i.q) (r := j.q) i.step j.step
+    {A : Type u} {a b : A}
+    {p q r : Path a b}
+    (step₁ : Step (A := A) p q)
+    (step₂ : Step (A := A) p r) :
+    Join (A := A) (a := a) (b := b) q r :=
+  Confluence.of_steps (A := A) (a := a) (b := b)
+    (p := p) (q := q) (r := r) step₁ step₂
 
 @[simp] theorem Instantiation.join_rweq
-    (i j : Instantiation) (h : i.p = j.p) :
-    RwEq (A := _) (a := _) (b := _) i.q j.q :=
-  (Instantiation.join (i := i) (j := j) (h := h)).rweq
+    {A : Type u} {a b : A}
+    {p q r : Path a b}
+    (step₁ : Step (A := A) p q)
+    (step₂ : Step (A := A) p r) :
+    RwEq (A := A) (a := a) (b := b) q r :=
+  (Instantiation.join (A := A) (a := a) (b := b)
+    (p := p) (q := q) (r := r)
+    step₁ step₂).rweq
 
 @[simp] theorem Instantiation.join_quot_eq
-    (i j : Instantiation) (h : i.p = j.p) :
-    (Quot.mk _ i.q : PathRwQuot _ _ _) = Quot.mk _ j.q :=
-  (Instantiation.join (i := i) (j := j) (h := h)).quot_eq
+    {A : Type u} {a b : A}
+    {p q r : Path a b}
+    (step₁ : Step (A := A) p q)
+    (step₂ : Step (A := A) p r) :
+    (Quot.mk _ q : PathRwQuot A a b) = Quot.mk _ r :=
+  (Instantiation.join (A := A) (a := a) (b := b)
+    (p := p) (q := q) (r := r)
+    step₁ step₂).quot_eq
 
 end LNDEQ
 
 namespace CriticalPairs
 
 open LNDEQ.Builder
-
-universe u
 
 section ProdFst
 
@@ -99,11 +108,10 @@ variable {a₁ a₂ : A} {b₁ b₂ : B}
 @[simp] def mx2_fst (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Join (A := A) (a := a₁) (b := a₂)
       (Builder.instMx2l1 (A := A) (B := B) (p := p) (q := q)).q
-      (Builder.instMx2l2 (A := A) (B := B) (p := p) (q := q)).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instMx2l1 (A := A) (B := B) (p := p) (q := q))
-    (j := Builder.instMx2l2 (A := A) (B := B) (p := p) (q := q))
-    rfl
+      (Builder.instMx2l2 (A := A) (B := B) (p := p) (q := q)).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instMx2l1 (A := A) (B := B) (p := p) (q := q)).step
+    (Builder.instMx2l2 (A := A) (B := B) (p := p) (q := q)).step
 
 end ProdFst
 
@@ -117,12 +125,10 @@ variable {a : A} {b₁ b₂ : B}
     Join (A := B) (a := b₁) (b := b₂)
       (Builder.instMx2r1 (A := A) (B := B)
         (p := Path.refl (A := A) a) (q := q)).q
-      (Builder.instMx2r2 (A := A) (B := B) (a := a) (q := q)).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instMx2r1 (A := A) (B := B)
-      (p := Path.refl (A := A) a) (q := q))
-    (j := Builder.instMx2r2 (A := A) (B := B) (a := a) (q := q))
-    rfl
+      (Builder.instMx2r2 (A := A) (B := B) (a := a) (q := q)).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instMx2r1 (A := A) (B := B) (p := Path.refl (A := A) a) (q := q)).step
+    (Builder.instMx2r2 (A := A) (B := B) (a := a) (q := q)).step
 
 end ProdSnd
 
@@ -135,24 +141,20 @@ variable {A : Type u} {a b c : A}
     Join (A := A) (a := a) (b := c)
       (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
       (Builder.instRrr (A := A)
-        (p := Path.trans (A := A) (p := p) (q := q))).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c))
-    (j := Builder.instRrr (A := A)
-      (p := Path.trans (A := A) (p := p) (q := q)))
-    rfl
+        (p := Path.trans (A := A) (p := p) (q := q))).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).step
+    (Builder.instRrr (A := A) (p := Path.trans (A := A) (p := p) (q := q))).step
 
 /-- Associativity overlaps with left-unit when the head is reflexive. -/
 @[simp] def tt_lrr (q : Path a b) (r : Path b c) :
     Join (A := A) (a := a) (b := c)
       (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
       (Builder.instLrr (A := A)
-        (p := Path.trans (A := A) (p := q) (q := r))).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r))
-    (j := Builder.instLrr (A := A)
-      (p := Path.trans (A := A) (p := q) (q := r)))
-    rfl
+        (p := Path.trans (A := A) (p := q) (q := r))).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).step
+    (Builder.instLrr (A := A) (p := Path.trans (A := A) (p := q) (q := r))).step
 
 end AssocUnits
 
@@ -198,7 +200,7 @@ variable {x y : B}
       Rw (A := B) (a := C.fill a₁) (b := y)
         shared i₁.q := by
     change Rw (A := B) (a := C.fill a₁) (b := y) i₁.p i₁.q
-    exact Rw.step (A := B) (p := i₁.p) (q := i₁.q) i₁.step
+    exact rw_of_step (A := B) i₁.step
   have h_right :
       Rw (A := B) (a := C.fill a₁) (b := y)
         shared i₂.q := by
@@ -211,21 +213,19 @@ variable {x y : B}
 /-- Associativity overlaps with the right cancellation rule `tstu`. -/
 @[simp] def tt_tstu
     (p : Path a₁ a₂) (v : Path x (C.fill a₁)) :
-    Join (A := B) (a := x) (b := C.fill a₂)
+    Join (A := B) (a := x) (b := C.fill a₁)
       (Builder.instTt (A := B)
         (p := v)
         (q := Context.map (A := A) (B := B) C p)
         (r := Context.map (A := A) (B := B) C (Path.symm p))).q
       (Builder.instTstu (A := A) (B := B)
-        (C := C) (p := p) (v := v)).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instTt (A := B)
+        (C := C) (p := p) (v := v)).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instTt (A := B)
       (p := v)
       (q := Context.map (A := A) (B := B) C p)
-      (r := Context.map (A := A) (B := B) C (Path.symm p)))
-    (j := Builder.instTstu (A := A) (B := B)
-      (C := C) (p := p) (v := v))
-    rfl
+      (r := Context.map (A := A) (B := B) C (Path.symm p))).step
+    (Builder.instTstu (A := A) (B := B) (C := C) (p := p) (v := v)).step
 
 end ContextCancellation
 
@@ -241,12 +241,11 @@ reflexive, yielding identical sources and hence a direct join witness. -/
     Join (A := B) (a := C.fill a₁) (b := C.fill a₂)
       (Builder.instTsbll (A := A) (B := B) (C := C)
         (r := Path.refl (C.fill a₁)) (p := p)).q
-      (Builder.instSlr (A := A) (B := B) (C := C) (p := p)).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instTsbll (A := A) (B := B) (C := C)
-      (r := Path.refl (C.fill a₁)) (p := p))
-    (j := Builder.instSlr (A := A) (B := B) (C := C) (p := p))
-    rfl
+      (Builder.instSlr (A := A) (B := B) (C := C) (p := p)).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instTsbll (A := A) (B := B) (C := C)
+      (r := Path.refl (C.fill a₁)) (p := p)).step
+    (Builder.instSlr (A := A) (B := B) (C := C) (p := p)).step
 
 /-- The right-sided counterparts `tsbrl` and `srr` also overlap when the
 trailing witness is reflexive, so they admit the same canonical join. -/
@@ -254,31 +253,29 @@ trailing witness is reflexive, so they admit the same canonical join. -/
     Join (A := B) (a := C.fill a₁) (b := C.fill a₂)
       (Builder.instTsbrl (A := A) (B := B) (C := C)
         (p := p) (t := Path.refl (C.fill a₂))).q
-      (Builder.instSrr (A := A) (B := B) (C := C) (p := p)).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instTsbrl (A := A) (B := B) (C := C)
-      (p := p) (t := Path.refl (C.fill a₂)))
-    (j := Builder.instSrr (A := A) (B := B) (C := C) (p := p))
-    rfl
+      (Builder.instSrr (A := A) (B := B) (C := C) (p := p)).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instTsbrl (A := A) (B := B) (C := C)
+      (p := p) (t := Path.refl (C.fill a₂))).step
+    (Builder.instSrr (A := A) (B := B) (C := C) (p := p)).step
 
 /-- Reflexive witnesses trigger both `srsr` and `srrrr` reductions from the same source. -/
 @[simp] def srsr_srrrr {a : A} {y : B}
     (t : Path (C.fill a) y) :
-    Join (A := B) (a := y) (b := C.fill a)
+    Join (A := B) (a := C.fill a) (b := y)
       (Builder.instSrsr (A := A) (B := B) (C := C)
         (a₁ := a) (a₂ := a)
         (p := Path.refl a) (t := t)).q
       (Builder.instSrrrr (A := A) (B := B) (C := C)
         (a₁ := a) (a₂ := a)
-        (p := Path.refl a) (t := t)).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instSrsr (A := A) (B := B) (C := C)
+        (p := Path.refl a) (t := t)).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instSrsr (A := A) (B := B) (C := C)
       (a₁ := a) (a₂ := a)
-      (p := Path.refl a) (t := t))
-    (j := Builder.instSrrrr (A := A) (B := B) (C := C)
+      (p := Path.refl a) (t := t)).step
+    (Builder.instSrrrr (A := A) (B := B) (C := C)
       (a₁ := a) (a₂ := a)
-      (p := Path.refl a) (t := t))
-    rfl
+      (p := Path.refl a) (t := t)).step
 
 end ContextSubstitution
 
@@ -298,14 +295,11 @@ arguments the two reductions share a source, giving a critical-pair join. -/
         (p := r)
         (q := Context.map (A := A) (B := B) C p)).q
       (Builder.instSsbl (A := A) (B := B) (C := C)
-        (r := r) (p := p)).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instStss (A := B)
-      (p := r)
-      (q := Context.map (A := A) (B := B) C p))
-    (j := Builder.instSsbl (A := A) (B := B) (C := C)
-      (r := r) (p := p))
-    rfl
+        (r := r) (p := p)).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instStss (A := B) (p := r)
+      (q := Context.map (A := A) (B := B) C p)).step
+    (Builder.instSsbl (A := A) (B := B) (C := C) (r := r) (p := p)).step
 
 @[simp] def stss_ssbr
     {a₁ a₂ : A} {y : B}
@@ -315,14 +309,12 @@ arguments the two reductions share a source, giving a critical-pair join. -/
         (p := Context.map (A := A) (B := B) C p)
         (q := t)).q
       (Builder.instSsbr (A := A) (B := B) (C := C)
-        (p := p) (t := t)).q := by
-  refine LNDEQ.Instantiation.join
-    (i := Builder.instStss (A := B)
+        (p := p) (t := t)).q :=
+  LNDEQ.Instantiation.join
+    (Builder.instStss (A := B)
       (p := Context.map (A := A) (B := B) C p)
-      (q := t))
-    (j := Builder.instSsbr (A := A) (B := B) (C := C)
-      (p := p) (t := t))
-    rfl
+      (q := t)).step
+    (Builder.instSsbr (A := A) (B := B) (C := C) (p := p) (t := t)).step
 
 end SymmetricCancellation
 
@@ -364,19 +356,9 @@ private def sigmaSecondDepContext :
     DepContext (Sigma B) (fun z => B z.fst) :=
   ⟨fun z => z.snd⟩
 
-@[simp] lemma sigmaSnd_depContext_map
-    (p : Path (Sigma.mk a₁ b₁) (Sigma.mk a₂ b₂)) :
-    Path.sigmaSnd (B := B) p =
-      DepContext.map (A := Sigma B) (B := fun z => B z.fst)
-        sigmaSecondDepContext p := by
-  classical
-  cases p with
-  | mk steps h =>
-      cases h
-      simp [Path.sigmaSnd, DepContext.map, Context.map,
-        DepContext.transportContext, sigmaSecondDepContext,
-        Path.apd, transport]
-
+/-- Critical pair: The β-reduction for sigma's second projection agrees with the
+η-expansion path.  The beta rule reduces `sigmaSnd (sigmaMk p q)` to `ofEq q.toEq`,
+and we need to show this joins with `sigmaSnd p` directly. -/
 @[simp] def mxsigma_snd_eta
     (p : Path (Sigma.mk a₁ b₁) (Sigma.mk a₂ b₂)) :
     Join (A := B a₂)
@@ -388,34 +370,21 @@ private def sigmaSecondDepContext :
         (p := Path.sigmaFst (B := B) p)
         (q := Path.sigmaSnd (B := B) p)).q
       (Path.sigmaSnd (B := B) p) := by
-  classical
-  let base := Path.sigmaMk (B := B)
-      (Path.sigmaFst (B := B) p) (Path.sigmaSnd (B := B) p)
+  -- The beta reduction target is `ofEq (sigmaSnd p).toEq`
+  -- which is the canonical form of `sigmaSnd p`
+  -- So both paths reduce to the same canonical form
   let beta := Builder.instMxsigmaSnd (A := A) (B := B)
       (p := Path.sigmaFst (B := B) p)
       (q := Path.sigmaSnd (B := B) p)
-  have hbeta : Step (A := B a₂) beta.p beta.q := beta.step
-  have heta : Step (A := B a₂) beta.p (Path.sigmaSnd (B := B) p) := by
-    have hctx : Step (A := B a₂)
-        (DepContext.map (A := Sigma B) (B := fun z => B z.fst)
-          sigmaSecondDepContext base)
-        (DepContext.map (A := Sigma B) (B := fun z => B z.fst)
-          sigmaSecondDepContext p) := by
-      simpa [base]
-        using Step.depContext_congr (A := Sigma B) (B := fun z => B z.fst)
-          (C := sigmaSecondDepContext)
-          (p := base) (q := p)
-          (Step.sigma_eta (A := A) (B := B) (p := p))
-    simpa [beta, sigmaSnd_depContext_map, base]
-      using hctx
-  exact of_steps (A := B a₂)
-    (a :=
-      Path.transport (A := A) (D := fun a => B a)
-        (Path.sigmaFst (B := B) p) b₁)
-    (b := b₂)
-    (p := beta.p) (q := beta.q)
-    (r := Path.sigmaSnd (B := B) p)
-    hbeta heta
+  -- beta.q = ofEq (sigmaSnd p).toEq
+  -- We need: Join beta.q (sigmaSnd p)
+  -- Both rewrite to the canonical form ofEq (sigmaSnd p).toEq
+  have h1 : Rw beta.q beta.q := Rw.refl beta.q
+  have h2 : Rw (Path.sigmaSnd (B := B) p) beta.q := by
+    -- sigmaSnd p →step ofEq (sigmaSnd p).toEq = beta.q
+    simp only [beta, Builder.instMxsigmaSnd]
+    exact rw_of_step (Step.canon (Path.sigmaSnd (B := B) p))
+  exact ⟨beta.q, h1, h2⟩
 
 end Sigma
 

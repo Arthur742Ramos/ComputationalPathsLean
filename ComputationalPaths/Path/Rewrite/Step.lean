@@ -86,6 +86,17 @@ inductive Step :
       Step (A := Prod A B)
         (Path.symm (Path.prodMk (p := p) (q := q)))
         (Path.prodMk (Path.symm p) (Path.symm q))
+  /-- Rule 44 (mxc): μ_f(ε_∧(p,q)) ▷ ε_∧(μ_g(p), μ_h(q))
+      For f(x) = (g(fst x), h(snd x)), congrArg f (prodMk p q) = prodMk (congrArg g p) (congrArg h q) -/
+  | prod_map_congrArg
+    {A : Type u} {B : Type u} {A' : Type u} {B' : Type u}
+      {a₁ a₂ : A} {b₁ b₂ : B}
+      (g : A → A') (h : B → B')
+      (p : Path a₁ a₂) (q : Path b₁ b₂) :
+      Step (A := Prod A' B')
+        (Path.congrArg (fun x : Prod A B => (g x.fst, h x.snd))
+          (Path.prodMk p q))
+        (Path.prodMk (Path.congrArg g p) (Path.congrArg h q))
   | sigma_fst_beta
     {A : Type u} {B : A → Type u}
       {a1 a2 : A} {b1 : B a1} {b2 : B a2}
@@ -680,7 +691,8 @@ inductive Step :
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
   Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
-  Step.prod_rec_beta Step.prod_eta Step.prod_mk_symm Step.sigma_fst_beta Step.sigma_snd_beta Step.sigma_eta
+  Step.prod_rec_beta Step.prod_eta Step.prod_mk_symm Step.prod_map_congrArg
+  Step.sigma_fst_beta Step.sigma_snd_beta Step.sigma_eta
   Step.sigma_mk_symm
   Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta Step.apd_refl
   Step.transport_refl_beta Step.transport_trans_beta Step.transport_symm_left_beta
@@ -723,6 +735,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | prod_snd_beta _ _ => simp
   | prod_eta _ => simp
   | prod_mk_symm _ _ => simp
+  | prod_map_congrArg _ _ _ _ => simp
   | prod_rec_beta _ _ _ => simp
   | sigma_fst_beta _ _ => simp
   | sigma_snd_beta _ _ => simp

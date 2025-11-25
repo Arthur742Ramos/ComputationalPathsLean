@@ -2,7 +2,7 @@ import ComputationalPaths.Path.Rewrite.Step
 import ComputationalPaths.Path.Rewrite.Rw
 import ComputationalPaths.Path.Rewrite.RwEq
 
-/‑
+/-
 # LNDEQ rewrite tags
 
 Enumerates the rewrite mnemonics from Definition 3.21 (plus the two `tt` completions)
@@ -16,7 +16,7 @@ namespace LNDEQ
 
 universe u
 
-/‑ Enumerates the paper’s rule names. -/
+/-- Enumerates the paper's rule names. -/
 inductive Rule where
   | sr
   | ss
@@ -60,9 +60,18 @@ inductive Rule where
   | tt
   | ttsv
   | tstu
+  -- Rules 40-47 from Chapter 5
+  | tf      -- Rule 40: τ(μ(r),μ(s)) = μ(τ(r,s)) - definitional
+  | cf      -- Rule 41: μ_g(μ_f(p)) = μ_{g∘f}(p) - definitional
+  | ci      -- Rule 42: μ_{Id}(p) = p - definitional
+  | hp      -- Rule 43: τ(H(x), μ_g(p)) = τ(μ_f(p), H(y)) - homotopy naturality
+  | mxc     -- Rule 44: μ_f(ε_∧(p,q)) = ε_∧(μ_g(p), μ_h(q)) - product map congruence
+  | mxp     -- Rule 45: μ_f(ρ_x) = ρ_{f(x)} - definitional
+  | nxp     -- Rule 46: ν(ρ) = ρ_{f(x)} - definitional
+  | xxp     -- Rule 47: ξ(ρ) = ρ - definitional
   deriving DecidableEq, Repr
 
-/‑ A tagged `Step` witness along with its source/target paths. -/
+/-- A tagged `Step` witness along with its source/target paths. -/
 structure Instantiation where
   {A : Type u}
   {a b : A}
@@ -76,21 +85,21 @@ namespace Instantiation
 
 variable {i : Instantiation}
 
-/‑ Recover the underlying `Step`. -/
+/-- Recover the underlying `Step`. -/
 @[simp] def toStep : Step (A := _) i.p i.q :=
   i.step
 
-/‑ Promote the instantiation to a single-step `Rw`. -/
+/-- Promote the instantiation to a single-step `Rw`. -/
 @[simp] def toRw : Rw (A := _) i.p i.q :=
-  Rw.step (A := _) (p := i.p) (q := i.q) i.step
+  rw_of_step i.step
 
-/‑ Promote the instantiation to the symmetric closure. -/
+/-- Promote the instantiation to the symmetric closure. -/
 @[simp] def toRwEq : RwEq (A := _) i.p i.q :=
-  RwEq.of_rw (Instantiation.toRw (i := i))
+  rweq_of_step i.step
 
 end Instantiation
 
-/-- Smart constructors producing tagged steps for the primitive rules. -/
+/- Smart constructors producing tagged steps for the primitive rules. -/
 namespace Builder
 
 section
@@ -275,7 +284,7 @@ section
 
 variable {A : Type u} {α β : Type u}
 
-@[simp] def instMx3l {a₁ a₂ : α} (f : α → A) (g : β → A)
+@[simp] noncomputable def instMx3l {a₁ a₂ : α} (f : α → A) (g : β → A)
     (p : Path a₁ a₂) : Instantiation :=
   let h : Sum α β → A := fun
     | Sum.inl a => f a
@@ -291,7 +300,7 @@ variable {A : Type u} {α β : Type u}
           (Step.sum_rec_inl_beta (A := A) (α := α) (β := β)
             (f := f) (g := g) (p := p)) }
 
-@[simp] def instMx3r {b₁ b₂ : β} (f : α → A) (g : β → A)
+@[simp] noncomputable def instMx3r {b₁ b₂ : β} (f : α → A) (g : β → A)
     (p : Path b₁ b₂) : Instantiation :=
   let h : Sum α β → A := fun
     | Sum.inl a => f a
@@ -307,7 +316,7 @@ variable {A : Type u} {α β : Type u}
           (Step.sum_rec_inr_beta (A := A) (α := α) (β := β)
             (f := f) (g := g) (p := p)) }
 
-@[simp] def instMxcase {a₁ a₂ : Sum α β}
+@[simp] noncomputable def instMxcase {a₁ a₂ : Sum α β}
     (f : α → A) (g : β → A)
     {p q : Path a₁ a₂} (h : Step (A := Sum α β) p q) : Instantiation :=
   let C : Context (Sum α β) A := ⟨Sum.rec f g⟩
@@ -333,7 +342,7 @@ variable {A : Type u} {α β : Type u}
     , q := Path.prodMk (Path.symm p) (Path.symm q)
     , step := Step.prod_mk_symm (A := α) (B := β) (p := p) (q := q) }
 
-@[simp] def instSmcase {a₁ a₂ : Sum α β}
+@[simp] noncomputable def instSmcase {a₁ a₂ : Sum α β}
     (f : α → A) (g : β → A)
     (p : Path a₁ a₂) : Instantiation :=
   let C : Context (Sum α β) A := ⟨Sum.rec f g⟩
@@ -496,7 +505,57 @@ variable {A : Type u}
     , step := Step.context_tt_cancel_right (A := A) (B := B)
         (C := C) (p := p) (v := v) }
 
+/-- Rule 44 (mxc): μ_f(ε_∧(p,q)) ▷ ε_∧(μ_g(p), μ_h(q))
+    Product map congruence: congrArg of (g, h) on prodMk equals prodMk of congrArgs -/
+@[simp] def instMxc {A B A' B' : Type u}
+    {a₁ a₂ : A} {b₁ b₂ : B}
+    (g : A → A') (h : B → B')
+    (p : Path a₁ a₂) (q : Path b₁ b₂) : Instantiation :=
+  { rule := Rule.mxc
+    , p := Path.congrArg (fun x : Prod A B => (g x.fst, h x.snd))
+        (Path.prodMk p q)
+    , q := Path.prodMk (Path.congrArg g p) (Path.congrArg h q)
+    , step := Step.prod_map_congrArg (A := A) (B := B) (A' := A') (B' := B')
+        (g := g) (h := h) (p := p) (q := q) }
+
 end
+
+/-!
+## Definitional Rules (40-42, 45-47)
+
+The following rules are satisfied definitionally in Lean and don't need Step witnesses:
+
+- Rule 40 (tf): `congrArg f (trans p q) = trans (congrArg f p) (congrArg f q)` - by `congrArg_trans`
+- Rule 41 (cf): `congrArg g (congrArg f p) = congrArg (g ∘ f) p` - by `congrArg_comp`
+- Rule 42 (ci): `congrArg id p = p` - by `congrArg_id`
+- Rule 43 (hp): Homotopy naturality - proven as `homotopy_naturality_toEq` in HoTT.lean
+- Rule 45 (mxp): `congrArg f (refl a) = refl (f a)` - by rfl
+- Rule 46 (nxp): `app (refl f) a = refl (f a)` - by rfl
+- Rule 47 (xxp): `lamCongr (fun x => refl (f x)) = refl f` - by rfl
+
+These can be witnessed via `rfl`:
+-/
+
+example {A B : Type u} (f : A → B) {a b c : A} (p : Path a b) (q : Path b c) :
+    Path.congrArg f (Path.trans p q) = Path.trans (Path.congrArg f p) (Path.congrArg f q) :=
+  Path.congrArg_trans f p q
+
+example {A B C : Type u} (f : B → C) (g : A → B) {a b : A} (p : Path a b) :
+    Path.congrArg (fun x => f (g x)) p = Path.congrArg f (Path.congrArg g p) :=
+  Path.congrArg_comp f g p
+
+example {A : Type u} {a b : A} (p : Path a b) :
+    Path.congrArg (fun x => x) p = p :=
+  Path.congrArg_id p
+
+example {A B : Type u} (f : A → B) (a : A) :
+    Path.congrArg f (Path.refl a) = Path.refl (f a) := rfl
+
+example {A B : Type u} (f : A → B) (a : A) :
+    Path.app (Path.refl f) a = Path.refl (f a) := rfl
+
+example {A B : Type u} (f : A → B) :
+    Path.lamCongr (fun x => Path.refl (f x)) = Path.refl f := rfl
 
 end Builder
 
