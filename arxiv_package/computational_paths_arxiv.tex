@@ -465,7 +465,7 @@ The field \texttt{circleWindingNumber} is just \texttt{circleEncode} seen as a m
 \section{Fundamental group of the cylinder}
 \label{sec:cylinder}
 
-The cylinder $S^1 \times I$ is homotopy equivalent to the circle, as it deformation retracts onto its central circle. The Lean file \texttt{ComputationalPaths/\allowbreak Path/\allowbreak HIT/\allowbreak Cylinder.lean}\footnote{See~\cite{ComputationalPathsLean}.} models the cylinder as a higher-inductive type with two base points connected by a segment, and loops at each end:
+The cylinder $S^1 \times I$ is homotopy equivalent to the circle, as it deformation retracts onto its central circle~\cite{Veras2018FundamentalGroups}. The Lean file \texttt{ComputationalPaths/\allowbreak Path/\allowbreak HIT/\allowbreak Cylinder.lean}\footnote{See~\cite{ComputationalPathsLean}.} models the cylinder as a higher-inductive type with two base points connected by a segment, and loops at each end:
 
 \begin{lstlisting}
 axiom Cylinder : Type u
@@ -525,7 +525,7 @@ This establishes that $\pi_1(\text{Cylinder}) \cong \mathbb{Z}$, as expected fro
 \section{Fundamental group of the M\"obius band}
 \label{sec:mobius}
 
-The M\"obius band is a non-orientable surface that, like the cylinder, deformation retracts to its central circle. Despite the twist, its fundamental group is still $\mathbb{Z}$. The Lean file \texttt{ComputationalPaths/\allowbreak Path/\allowbreak HIT/\allowbreak MobiusBand.lean}\footnote{See~\cite{ComputationalPathsLean}.} models it as a higher-inductive type with a single base point and a fundamental loop:
+The M\"obius band is a non-orientable surface that, like the cylinder, deformation retracts to its central circle~\cite{Veras2018FundamentalGroups}. Despite the twist, its fundamental group is still $\mathbb{Z}$. The Lean file \texttt{ComputationalPaths/\allowbreak Path/\allowbreak HIT/\allowbreak MobiusBand.lean}\footnote{See~\cite{ComputationalPathsLean}.} models it as a higher-inductive type with a single base point and a fundamental loop:
 
 \begin{lstlisting}
 axiom MobiusBand : Type u
