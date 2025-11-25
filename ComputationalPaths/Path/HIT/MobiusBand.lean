@@ -472,12 +472,8 @@ private theorem mobiusDecodeEq_mobiusEncodeEq
 noncomputable def mobiusPiOneEquivInt : SimpleEquiv mobiusPiOne Int where
   toFun := mobiusEncode
   invFun := mobiusDecode
-  left_inv := by
-    intro x
-    exact mobiusDecode_mobiusEncode x
-  right_inv := by
-    intro z
-    exact mobiusEncode_mobiusDecode z
+  left_inv := mobiusDecode_mobiusEncode
+  right_inv := mobiusEncode_mobiusDecode
 
 /-! ## Relationship to Other Spaces
 
