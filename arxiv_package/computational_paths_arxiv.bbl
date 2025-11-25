@@ -1,6 +1,6 @@
 %% BioMed_Central_Bib_Style_v1.01
 
-\begin{thebibliography}{21}
+\begin{thebibliography}{22}
 % BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
 \ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
 \ifx \binits  \undefined \def \binits#1{#1}\fi
@@ -127,7 +127,8 @@ Explicit computational paths in type theory.
 PhD thesis,
 Universidade Federal de Pernambuco,
 Recife, Brazil
-(2018)
+(2018).
+Available at \url{https://github.com/Arthur742Ramos/ComputationalPathsLean/blob/main/docs/thesis/TESE%20Arthur%20Freitas%20Ramos.pdf}
 \end{botherref}
 \endbibitem
 
@@ -355,6 +356,19 @@ Advance Access, available at \url{https://www.sa-logic.org/aaccess/ruy.pdf}
 (\byear{2023})
 \doiurl{10.1093/logcom/exad071}
 \end{barticle}
+\endbibitem
+
+%%% 22
+\bibitem[\protect\citeauthoryear{de~Veras et~al.}{2018}]{Veras2018FundamentalGroups}
+\begin{botherref}
+\oauthor{\bsnm{Veras}, \binits{T.M.L.}},
+\oauthor{\bsnm{Ramos}, \binits{A.F.}},
+\oauthor{\bsnm{Queiroz}, \binits{R.J.G.B.}},
+\oauthor{\bsnm{Oliveira}, \binits{A.G.}}:
+Fundamental groups of some surfaces using computational paths.
+arXiv preprint arXiv:1804.01413
+(2018)
+\end{botherref}
 \endbibitem
 
 \end{thebibliography}
