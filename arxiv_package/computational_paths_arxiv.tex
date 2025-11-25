@@ -55,7 +55,7 @@
 \abstract{Computational paths treat propositional equality as explicit paths built from labelled deduction steps and rewrite rules. This view originates in work by de Queiroz and collaborators~\cite{Queiroz2016Paths} and yields a weak groupoid structure for equality, together with a computational account of homotopy inspired by homotopy type theory. In this paper we present a complete mechanization of this framework in Lean~4 and show how it supports concrete homotopy theoretic computations.\par
 Our contributions are threefold. First, we formalize the theory of computational paths in Lean, including path formation, composition, inverses, and a rewrite system that identifies redundant or trivial paths. We prove that equality types with computational paths carry a weak groupoid structure in the sense of the original theory.\par
 Second, we organize this material into a reusable Lean library, \texttt{ComputationalPathsLean}, which exposes an interface for paths, rewrites, and loop spaces. This library allows later developments to treat computational paths as a drop-in replacement for propositional equality when reasoning about homotopical structure.\par
-Third, we apply the library to four canonical examples in algebraic topology. We give Lean proofs that the fundamental group of the circle is isomorphic to the integers, the fundamental group of the torus is isomorphic to the product of two copies of the integers, the fundamental group of the Klein bottle is isomorphic to the semidirect product $\mathbb{Z} \rtimes \mathbb{Z}$, and the fundamental group of the real projective plane is isomorphic to $\mathbb{Z}_2$. These case studies demonstrate that the computational paths approach scales to nontrivial homotopical computations in a modern proof assistant.\par
+Third, we apply the library to six canonical examples in algebraic topology. We give Lean proofs that the fundamental group of the circle is isomorphic to the integers, the cylinder and M\"obius band also have fundamental group isomorphic to the integers (via retraction to the circle), the fundamental group of the torus is isomorphic to the product of two copies of the integers, the fundamental group of the Klein bottle is isomorphic to the semidirect product $\mathbb{Z} \rtimes \mathbb{Z}$, and the fundamental group of the real projective plane is isomorphic to $\mathbb{Z}_2$. These case studies demonstrate that the computational paths approach scales to nontrivial homotopical computations in a modern proof assistant.\par
 All the definitions and proofs described here are available in an open-source Lean~4 repository~\cite{ComputationalPathsLean}.}
 
 \keywords{Computational paths, Lean theorem prover, Homotopy type theory, Fundamental groups}
@@ -86,9 +86,11 @@ More concretely, the main contributions of this work are:
   \end{itemize}
   \item A proof, mechanized in Lean, that equality types equipped with computational paths form a weak groupoid. In particular, we formalize path composition and inverses and show that the groupoid laws hold up to rewrite equality.
   \item A Lean implementation of loop spaces and fundamental groups based on computational paths.
-  \item Four full case studies:
+  \item Six full case studies:
   \begin{itemize}
     \item a computation of the fundamental group of the circle and an isomorphism with the integers,
+    \item a computation of the fundamental group of the cylinder, showing it retracts to the circle and thus has fundamental group $\mathbb{Z}$,
+    \item a computation of the fundamental group of the M\"obius band, also retracting to the circle with fundamental group $\mathbb{Z}$,
     \item a computation of the fundamental group of the torus and an isomorphism with the product of two copies of the integers,
     \item a computation of the fundamental group of the Klein bottle and an isomorphism with the semidirect product $\mathbb{Z} \rtimes \mathbb{Z}$,
     \item a computation of the fundamental group of the real projective plane and an isomorphism with $\mathbb{Z}_2$.
@@ -100,7 +102,7 @@ To our knowledge this is the first mechanization of the computational paths fram
 
 \subsection*{Structure of the paper}
 
-Section~\ref{sec:background} recalls computational paths and their weak groupoid structure, as well as the basic notions of loop spaces and fundamental groups. Section~\ref{sec:lean-setup} describes our Lean environment and overall library layout. Section~\ref{sec:paths} gives the core definitions of paths and rewrites. Section~\ref{sec:weak-groupoid} presents the formalization of the weak groupoid structure. Section~\ref{sec:circle} describes the computation of the fundamental group of the circle. Section~\ref{sec:torus} does the same for the torus. Section~\ref{sec:klein} presents the Klein bottle and its semidirect product fundamental group. Section~\ref{sec:projective} establishes the fundamental group of the real projective plane. Section~\ref{sec:engineering} discusses engineering aspects of the development, including library design and automation. Section~\ref{sec:related} situates our work in the landscape of homotopy inspired formalizations. Section~\ref{sec:conclusion} concludes and sketches directions for future work.
+Section~\ref{sec:background} recalls computational paths and their weak groupoid structure, as well as the basic notions of loop spaces and fundamental groups. Section~\ref{sec:lean-setup} describes our Lean environment and overall library layout. Section~\ref{sec:paths} gives the core definitions of paths and rewrites. Section~\ref{sec:weak-groupoid} presents the formalization of the weak groupoid structure. Section~\ref{sec:circle} describes the computation of the fundamental group of the circle. Section~\ref{sec:cylinder} presents the cylinder, which retracts to the circle. Section~\ref{sec:mobius} treats the M\"obius band similarly. Section~\ref{sec:torus} does the same for the torus. Section~\ref{sec:klein} presents the Klein bottle and its semidirect product fundamental group. Section~\ref{sec:projective} establishes the fundamental group of the real projective plane. Section~\ref{sec:engineering} discusses engineering aspects of the development, including library design and automation. Section~\ref{sec:related} situates our work in the landscape of homotopy inspired formalizations. Section~\ref{sec:conclusion} concludes and sketches directions for future work.
 
 \section{Background}
 \label{sec:background}
@@ -460,6 +462,116 @@ noncomputable def circlePiOneEquivInt :
 
 The field \texttt{circleWindingNumber} is just \texttt{circleEncode} seen as a map \(\pi_1(S^1)\to\mathbb{Z}\); the equivalence above shows that \(\pi_1(S^1)\) is canonically the additive group of integers inside Lean.  All downstream reasoning about the circle—step laws, naturality results, or transport to other homotopy invariants—reuse these lemmas without ever returning to the raw rewrite system.
 
+\section{Fundamental group of the cylinder}
+\label{sec:cylinder}
+
+The cylinder $S^1 \times I$ is homotopy equivalent to the circle, as it deformation retracts onto its central circle. The Lean file \texttt{ComputationalPaths/\allowbreak Path/\allowbreak HIT/\allowbreak Cylinder.lean}\footnote{See~\cite{ComputationalPathsLean}.} models the cylinder as a higher-inductive type with two base points connected by a segment, and loops at each end:
+
+\begin{lstlisting}
+axiom Cylinder : Type u
+axiom cylinderBase0 : Cylinder
+axiom cylinderBase1 : Cylinder
+axiom cylinderSeg : Path cylinderBase0 cylinderBase1
+axiom cylinderLoop0 : Path cylinderBase0 cylinderBase0
+axiom cylinderLoop1 : Path cylinderBase1 cylinderBase1
+\end{lstlisting}
+
+The key insight is that the cylinder retracts to either boundary circle. We define a map \texttt{cylinderToCircle : Cylinder -> Circle} that collapses the cylinder to the circle, sending both base points to \texttt{circleBase} and both loops to \texttt{circleLoop}. This map induces an isomorphism on fundamental groups.
+
+\subsection{Retraction and encoding}
+
+The encoding of cylinder loops proceeds by first mapping to the circle via the retraction, then using the circle's winding number:
+
+\begin{lstlisting}
+def cylinderLoopToCircleLoop (p : Path cylinderBase0 cylinderBase0) :
+    Path circleBase circleBase :=
+  Path.trans (Path.symm (Path.ofEq cylinderToCircle_base0))
+    (Path.trans (Path.congrArg cylinderToCircle p)
+      (Path.ofEq cylinderToCircle_base0))
+
+def cylinderEncodePath (p : Path cylinderBase0 cylinderBase0) : Int :=
+  circleEncodePath (cylinderLoopToCircleLoop p)
+\end{lstlisting}
+
+The crucial lemma is that \texttt{cylinderToCircle} sends \texttt{cylinderLoop0} to \texttt{circleLoop}:
+
+\begin{lstlisting}
+theorem cylinderToCircle_loop0 :
+    cylinderLoopToCircleLoop cylinderLoop0 = circleLoop
+\end{lstlisting}
+
+This allows all the circle encoding lemmas to be lifted to the cylinder. The decode map constructs loop powers:
+
+\begin{lstlisting}
+def cylinderDecode : Int -> CylinderLoopQuot :=
+  cylinderLoopZPow
+\end{lstlisting}
+
+\subsection{The equivalence}
+
+The encode/decode roundtrip proofs follow the circle pattern:
+
+\begin{lstlisting}
+noncomputable def cylinderPiOneEquivInt :
+    SimpleEquiv cylinderPiOne Int where
+  toFun := cylinderEncode
+  invFun := cylinderDecode
+  left_inv := cylinderDecode_cylinderEncode
+  right_inv := cylinderEncode_cylinderDecode
+\end{lstlisting}
+
+This establishes that $\pi_1(\text{Cylinder}) \cong \mathbb{Z}$, as expected from the retraction to the circle.
+
+\section{Fundamental group of the M\"obius band}
+\label{sec:mobius}
+
+The M\"obius band is a non-orientable surface that, like the cylinder, deformation retracts to its central circle. Despite the twist, its fundamental group is still $\mathbb{Z}$. The Lean file \texttt{ComputationalPaths/\allowbreak Path/\allowbreak HIT/\allowbreak MobiusBand.lean}\footnote{See~\cite{ComputationalPathsLean}.} models it as a higher-inductive type with a single base point and a fundamental loop:
+
+\begin{lstlisting}
+axiom MobiusBand : Type u
+axiom mobiusBase : MobiusBand
+axiom mobiusLoop : Path mobiusBase mobiusBase
+\end{lstlisting}
+
+Note that the M\"obius band HIT is simpler than the cylinder because we only need the central circle for fundamental group purposes. The twist (non-orientability) would manifest in the transport behavior along the loop, but this does not affect the fundamental group.
+
+\subsection{Retraction to the circle}
+
+As with the cylinder, we define a retraction \texttt{mobiusToCircle : MobiusBand -> Circle} that sends the base point to \texttt{circleBase} and the central loop to \texttt{circleLoop}:
+
+\begin{lstlisting}
+def mobiusToCircle : MobiusBand -> Circle :=
+  mobiusBandRec { base := circleBase, loop := circleLoop }
+
+theorem mobiusToCircle_loop :
+    mobiusLoopToCircleLoop mobiusLoop = circleLoop
+\end{lstlisting}
+
+The encoding and decoding follow exactly the same pattern as the cylinder:
+
+\begin{lstlisting}
+def mobiusEncodePath (p : Path mobiusBase mobiusBase) : Int :=
+  circleEncodePath (mobiusLoopToCircleLoop p)
+
+def mobiusDecode : Int -> MobiusLoopQuot :=
+  mobiusLoopZPow
+\end{lstlisting}
+
+\subsection{The equivalence}
+
+The final equivalence establishes the isomorphism:
+
+\begin{lstlisting}
+noncomputable def mobiusPiOneEquivInt :
+    SimpleEquiv mobiusPiOne Int where
+  toFun := mobiusEncode
+  invFun := mobiusDecode
+  left_inv := mobiusDecode_mobiusEncode
+  right_inv := mobiusEncode_mobiusDecode
+\end{lstlisting}
+
+Thus $\pi_1(\text{M\"obius}) \cong \mathbb{Z}$. The M\"obius band and cylinder have the same fundamental group because they are both homotopy equivalent to the circle, despite having different topological properties (orientability, boundary components).
+
 \section{Fundamental group of the torus}
 \label{sec:torus}
 
@@ -788,7 +900,7 @@ Finally, our work adds to a broader effort to formalize algebraic topology in pr
 \section{Conclusion and future work}
 \label{sec:conclusion}
 
-We have presented a Lean 4 formalization of computational paths and their weak groupoid structure. Building on this foundation, we formalized loop spaces and fundamental groups and carried out four classical computations: the fundamental groups of the circle ($\mathbb{Z}$), the torus ($\mathbb{Z} \times \mathbb{Z}$), the Klein bottle ($\mathbb{Z} \rtimes \mathbb{Z}$), and the real projective plane ($\mathbb{Z}_2$). These examples span orientable and non-orientable surfaces, abelian and non-abelian groups, and infinite and finite fundamental groups. The development is packaged as a reusable library that can serve as a basis for further work on computational paths and homotopy theory in proof assistants.
+We have presented a Lean 4 formalization of computational paths and their weak groupoid structure. Building on this foundation, we formalized loop spaces and fundamental groups and carried out six classical computations: the fundamental groups of the circle ($\mathbb{Z}$), the cylinder ($\mathbb{Z}$), the M\"obius band ($\mathbb{Z}$), the torus ($\mathbb{Z} \times \mathbb{Z}$), the Klein bottle ($\mathbb{Z} \rtimes \mathbb{Z}$), and the real projective plane ($\mathbb{Z}_2$). These examples span orientable and non-orientable surfaces, abelian and non-abelian groups, and infinite and finite fundamental groups. The cylinder and M\"obius band demonstrate how retraction arguments can be formalized using computational paths. The development is packaged as a reusable library that can serve as a basis for further work on computational paths and homotopy theory in proof assistants.
 
 There are several promising directions for future work.
 
