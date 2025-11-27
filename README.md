@@ -2,7 +2,7 @@
 
 Lean 4 formalisation of propositional equality via explicit computational paths and rewrite equality. It provides a practical kernel for transport, symmetry, congruence, rewrite quotients, and normalisation — and uses this machinery to formalise fundamental groups of higher-inductive types.
 
-Highlights
+## Highlights
 - **Weak ω-groupoid structure**: Complete proof that computational paths form a weak ω-groupoid with all coherence laws (pentagon, triangle) and contractibility at higher dimensions.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + code family into ℤ (via univalence axioms).
@@ -12,12 +12,12 @@ Highlights
 - **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product) via encode/decode equivalence `kleinPiOneEquivIntProd`.
 - Möbius band, cylinder HITs with π₁ ≃ ℤ (homotopy equivalent to circle).
 
-Quick Start
+## Quick Start
 - Build: `./lake.cmd build`
 - Run demo: `./lake.cmd exe computational_paths` (prints version)
 - Open in VS Code: install Lean 4 extension, open the folder, and build.
 
-Project Layout (selected)
+## Project Layout (selected)
 - [`ComputationalPaths/Path/Basic/`](ComputationalPaths/Path/Basic/) — core path definitions (transport, congruence, symmetry) and helpers.
 - [`ComputationalPaths/Path/Rewrite/`](ComputationalPaths/Path/Rewrite/) — rewrite steps, closures (`Rw`, `RwEq`), and the quotient `PathRwQuot`.
 - [`ComputationalPaths/Path/Groupoid.lean`](ComputationalPaths/Path/Groupoid.lean) — weak and strict categorical packages for computational paths; groupoids extend the corresponding categories so composition/identities are shared.
@@ -82,7 +82,7 @@ Project Layout (selected)
 
 - **References**: This formalisation validates the theoretical results of Lumsdaine (*Weak ω-categories from intensional type theory*, 2010) and van den Berg & Garner (*Types are weak ω-groupoids*, 2011) in the computational paths setting.
 
-Circle π₁(S¹) ≃ ℤ (what to read)
+## Circle π₁(S¹) ≃ ℤ (what to read)
 - Encoding: `circleEncode : π₁(S¹) → ℤ` via quotient-lift of `circleEncodePath`.
 - Decoding: `circleDecode : ℤ → π₁(S¹)` by z-powers of the fundamental loop.
 - Step laws: `circleEncode (x ⋆ loop) = circleEncode x + 1` and the inverse step.
@@ -91,13 +91,13 @@ Circle π₁(S¹) ≃ ℤ (what to read)
   - Left-inverse on π₁: `circleDecode (circleEncode x) = x` (reduce to equality with `toEq` and use equality induction).
 - Homomorphism (circle-specific): decode respects addition, subtraction, and group multiplication — proved from the step laws and encode injectivity.
 
-Torus π₁(T²) ≃ ℤ × ℤ (what to read)
+## Torus π₁(T²) ≃ ℤ × ℤ (what to read)
 - Encoding: `torusEncode : π₁(T²) → ℤ × ℤ` via the quotient lift of `torusEncodePath`.
 - Decoding: `torusDecode : ℤ × ℤ → π₁(T²)` assembles the z-powers of the two commuting loops.
 - Equivalence: `torusPiOneEquivIntProd` shows the maps are inverse, yielding π₁(T²) ≃ ℤ × ℤ.
 - Follow-up work: extracting a `TorusStep` module (analogous to `CircleStep`) would expose addition/subtraction lemmas as `[simp]` facts.
 
-Real Projective Plane π₁(RP²) ≃ ℤ₂ (what to read)
+## Real Projective Plane π₁(RP²) ≃ ℤ₂ (what to read)
 - Reference: de Veras, Ramos, de Queiroz & de Oliveira, "A Topological Application of Labelled Natural Deduction", SAJL.
 - HIT Interface: `ProjectivePlane` with base point and fundamental loop `projectiveLoop` satisfying `projectiveLoopSquare : α ∘ α = refl`.
 - ℤ₂ representation: `Bool` with XOR as addition (no Mathlib dependency).
@@ -105,7 +105,7 @@ Real Projective Plane π₁(RP²) ≃ ℤ₂ (what to read)
 - Decoding: `toPathZ2 : Bool → π₁(RP²)` maps `false → refl`, `true → loop`.
 - Equivalence: `projectivePiOneEquivZ2` shows π₁(RP²) ≃ ℤ₂ (with two remaining sorrys for transport computations).
 
-Klein bottle π₁(K) ≃ ℤ ⋊ ℤ (what to read)
+## Klein bottle π₁(K) ≃ ℤ ⋊ ℤ (what to read)
 - Reference: [de Veras, Ramos, de Queiroz & de Oliveira, *An alternative approach to the calculation of fundamental groups based on labeled natural deduction* (2019)](https://arxiv.org/abs/1906.09107).
 - HIT Interface: `KleinBottle` with base point, generators `kleinLoopA` (a) and `kleinLoopB` (b), and surface relation `aba⁻¹ = b⁻¹`.
 - Code family: `ℤ × ℤ` with semidirect multiplication `(m₁,n₁)·(m₂,n₂) = (m₁+m₂, σ(m₂)·n₁+n₂)` where `σ(m) = (-1)^m`.
@@ -114,14 +114,14 @@ Klein bottle π₁(K) ≃ ℤ ⋊ ℤ (what to read)
 - Key lemma: `kleinLoopBClass_zpow_mul_loopAClass_zpow` establishes conjugation relation `[b]^n · [a]^m = [a]^m · [b]^{σ(m)·n}`.
 - Equivalence: `kleinPiOneEquivIntProd` shows π₁(K) ≃ ℤ ⋊ ℤ with the semidirect product structure.
 
-Möbius Band & Cylinder (what to read)
+## Möbius Band & Cylinder (what to read)
 - Both spaces are homotopy equivalent to S¹, so π₁ ≃ ℤ.
 - [`MobiusBand.lean`](ComputationalPaths/Path/HIT/MobiusBand.lean): Central loop generates π₁; twist affects fiber structure but not fundamental group.
 - [`Cylinder.lean`](ComputationalPaths/Path/HIT/Cylinder.lean): Two boundary circles with connecting segment; surface relation ensures π₁ ≃ ℤ.
 - Reference: [de Veras, Ramos, de Queiroz & de Oliveira, *On the Calculation of Fundamental Groups in Homotopy Type Theory by Means of Computational Paths* (2018)](https://arxiv.org/abs/1804.01413).
 
 
-Assumptions (axioms)
+## Assumptions (axioms)
 - Circle HIT interface (constructors + β-rules).  The type, base point, loop,
   and eliminators are currently axioms so that downstream developments can use
   a stable higher-inductive interface while the computational-path semantics
@@ -134,18 +134,18 @@ Every other component—encode/decode maps, quotient constructions, loop group
 laws, etc.—is defined inside Lean and ultimately reduces to the two axioms
 above.
 
-Contributing
+## Contributing
 - Build after non-trivial edits: `./lake.cmd build`.
 - Keep docstrings in sync, prefer small, focused lemmas with `@[simp]` where useful.
 - The simplifier linter flags unused simp arguments; please trim them.
 - When a structure adds data on top of an existing interface, prefer extending the smaller structure (e.g. `WeakGroupoid` extends `WeakCategory`) to keep identities/composition definitions in one place.
 
-Maintenance / refactor opportunities
+## Maintenance / refactor opportunities
 - **Circle/Torus step modules**: [`CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) redefines lemmas that already live in [`Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean). Consolidating those proofs (and adding a `TorusStep` counterpart) would make the encode/ decode algebra reusable via imports.
 - **Axioms to constructions**: circle and torus HITs are still axioms; replacing them with concrete constructions or a general HIT layer remains an open project.
 - **Developer docs**: a short tutorial showing how to apply the π₁ equivalences downstream (e.g. deriving homomorphisms into ℤ) would help new contributors.
 
-Citation
+## Citation
 - Based on the development of computational paths and the fundamental group of the circle. See `docs` for source materials.
 
 ## References
