@@ -6,8 +6,11 @@
 /.elan/
 05-De Queiroz-De Oliveira-Ramos-SAJL.pdf
 05-De Queiroz-De Oliveira-Ramos-SAJL.txt
-# Docs
+
+# Docs - ignore all papers except thesis
 docs/paper/
+docs/klein_bottle_proof.*
+cover_letter_JAR.*
 
 # Local packaging artifacts
 add_patch.diff
