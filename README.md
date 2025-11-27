@@ -8,6 +8,8 @@ Highlights
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
 - Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd`.
 - Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition).
+- **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product) via encode/decode equivalence `kleinPiOneEquivIntProd`.
+- Möbius band, cylinder HITs with π₁ ≃ ℤ (homotopy equivalent to circle).
 
 Quick Start
 - Build: `./lake.cmd build`
@@ -23,6 +25,9 @@ Project Layout (selected)
 - `ComputationalPaths/Path/HIT/CircleStep.lean` — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
 - `ComputationalPaths/Path/HIT/Torus.lean` — torus HIT interface, code family into ℤ × ℤ, encode/transport lemmas, iterated loops, and the equivalence `torusPiOneEquivIntProd`.
 - `ComputationalPaths/Path/HIT/ProjectivePlane.lean` — real projective plane RP² with fundamental loop α satisfying α∘α=refl, and equivalence π₁(RP²) ≃ ℤ₂.
+- `ComputationalPaths/Path/HIT/KleinBottle.lean` — Klein bottle HIT with generators a, b and surface relation aba⁻¹=b⁻¹, plus full encode/decode equivalence π₁(K) ≃ ℤ ⋊ ℤ.
+- `ComputationalPaths/Path/HIT/MobiusBand.lean` — Möbius band HIT (homotopy equivalent to circle), π₁ ≃ ℤ.
+- `ComputationalPaths/Path/HIT/Cylinder.lean` — Cylinder HIT (S¹ × I), π₁ ≃ ℤ.
 - `ComputationalPaths/Path/Homotopy/HoTT.lean` — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -62,13 +67,20 @@ Real Projective Plane π₁(RP²) ≃ ℤ₂ (what to read)
 - Decoding: `toPathZ2 : Bool → π₁(RP²)` maps `false → refl`, `true → loop`.
 - Equivalence: `projectivePiOneEquivZ2` shows π₁(RP²) ≃ ℤ₂ (with two remaining sorrys for transport computations).
 
-Klein bottle π₁(K) roadmap (in progress)
-- Reference: [De Oliveira & Ramos, *Fundamental group of the Klein bottle* (2019)](https://arxiv.org/pdf/1906.09107).
-- See `docs/klein_bottle_plan.md` for the encode/decode checklist that mirrors the torus proof.
-- Immediate algebraic tasks:
-  1. Formalise the semidirect multiplication on `KleinBottleWord` (`a^m b^n ⋅ a^{m'} b^{n'} = a^{m+m'} b^{(-1)^{m'} n + n'}`).
-  2. Show `kleinDecode (m, n)` is a group homomorphism into `π₁(K)` and that conjugation by `a` inverts the `b`-power.
-  3. Package the encode/decode equivalence `π₁(K) ≅ ℤ ⋊ ℤ` following the `torusPiOneEquivIntProd` template.
+Klein bottle π₁(K) ≃ ℤ ⋊ ℤ (what to read)
+- Reference: [de Veras, Ramos, de Queiroz & de Oliveira, *An alternative approach to the calculation of fundamental groups based on labeled natural deduction* (2019)](https://arxiv.org/abs/1906.09107).
+- HIT Interface: `KleinBottle` with base point, generators `kleinLoopA` (a) and `kleinLoopB` (b), and surface relation `aba⁻¹ = b⁻¹`.
+- Code family: `ℤ × ℤ` with semidirect multiplication `(m₁,n₁)·(m₂,n₂) = (m₁+m₂, σ(m₂)·n₁+n₂)` where `σ(m) = (-1)^m`.
+- Encoding: `kleinEncodeQuot : π₁(K) → ℤ × ℤ` via quotient lift of transport-based encoding.
+- Decoding: `kleinDecodeQuot : ℤ × ℤ → π₁(K)` maps `(m,n) ↦ [a^m · b^n]`.
+- Key lemma: `kleinLoopBClass_zpow_mul_loopAClass_zpow` establishes conjugation relation `[b]^n · [a]^m = [a]^m · [b]^{σ(m)·n}`.
+- Equivalence: `kleinPiOneEquivIntProd` shows π₁(K) ≃ ℤ ⋊ ℤ with the semidirect product structure.
+
+Möbius Band & Cylinder (what to read)
+- Both spaces are homotopy equivalent to S¹, so π₁ ≃ ℤ.
+- `MobiusBand.lean`: Central loop generates π₁; twist affects fiber structure but not fundamental group.
+- `Cylinder.lean`: Two boundary circles with connecting segment; surface relation ensures π₁ ≃ ℤ.
+- Reference: [de Veras, Ramos, de Queiroz & de Oliveira, *On the Calculation of Fundamental Groups in Homotopy Type Theory by Means of Computational Paths* (2018)](https://arxiv.org/abs/1804.01413).
 
 
 Assumptions (axioms)
