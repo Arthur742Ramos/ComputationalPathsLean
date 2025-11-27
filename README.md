@@ -132,3 +132,20 @@ This formalisation is based on the following papers:
 - Univalent Foundations Program, [*Homotopy Type Theory: Univalent Foundations of Mathematics*](https://homotopytypetheory.org/book/), IAS, 2013.
 - Licata & Shulman, [*Calculating the Fundamental Group of the Circle in Homotopy Type Theory*](https://doi.org/10.1109/LICS.2013.28), LICS 2013.
 - Hofmann & Streicher, *The groupoid model refutes uniqueness of identity proofs*, LICS 1994.
+
+## Citing This Repository
+
+If you use this formalisation in your work, please cite:
+
+```bibtex
+@software{ComputationalPathsLean2025,
+  author       = {Ramos, Arthur F. and de Veras, Tiago M. L. and 
+                  de Queiroz, Ruy J. G. B. and de Oliveira, Anjolina G.},
+  title        = {Computational Paths in {Lean} 4},
+  year         = {2025},
+  publisher    = {GitHub},
+  url          = {https://github.com/Arthur742Ramos/ComputationalPathsLean},
+  note         = {Lean 4 formalisation of propositional equality via 
+                  computational paths and fundamental groups of HITs}
+}
+```
