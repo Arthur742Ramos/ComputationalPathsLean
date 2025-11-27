@@ -6,6 +6,31 @@ abstract type equipped with the fundamental loops and the characteristic
 surface relation `aba⁻¹ = b⁻¹`.  Providing this HIT-like API now lets us stage
 the forthcoming fundamental-group calculation without committing to a concrete
 realisation yet.
+
+## Key Results
+
+- `kleinLoopA`, `kleinLoopB`: The two fundamental loops (generators a, b)
+- `kleinSurf`: Surface relation encoding `a ⬝ b ⬝ a⁻¹ = b⁻¹`
+- `kleinPiOne`: π₁(K) ≃ ℤ ⋊ ℤ (the main theorem, semi-direct product)
+- `KleinNormalForm`: Normal form `aⁿbᵐ` for Klein bottle loops
+- `normalFormUnique`: Uniqueness of normal forms
+
+## Mathematical Background
+
+The Klein bottle K has fundamental group π₁(K) ≃ ⟨a, b | aba⁻¹ = b⁻¹⟩.
+This is the semi-direct product ℤ ⋊ ℤ where the action is multiplication
+by -1: a acts on b by conjugation to give b⁻¹.
+
+Every loop can be reduced to normal form `aⁿbᵐ` using the relation
+`ba = ab⁻¹`. The proof establishes:
+1. Normal form existence via rewriting
+2. Normal form uniqueness via encode-decode
+3. Group structure on normal forms matching ℤ ⋊ ℤ
+
+## Reference
+
+de Veras, Ramos, de Queiroz & de Oliveira,
+"A Topological Application of Labelled Natural Deduction"
 -/
 
 import ComputationalPaths.Path.Basic

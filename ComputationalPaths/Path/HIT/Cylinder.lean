@@ -18,6 +18,13 @@ the same direction:
   loop₁
 ```
 
+## Key Results
+
+- `cylinderLoop0`, `cylinderLoop1`: Loops at each end of the cylinder
+- `cylinderSeg`: The segment connecting the two base points
+- `cylinderSurf`: Surface relation `seg ∘ loop₁ = loop₀ ∘ seg`
+- `cylinderPiOneEquivInt`: π₁(Cylinder) ≃ ℤ (the main theorem)
+
 ## Key Structure
 
 - Two base points: `cylinderBase0` and `cylinderBase1`
@@ -131,7 +138,8 @@ structure CylinderIndData (C : Cylinder → Type v) where
   seg : Path (Path.transport (A := Cylinder) (D := C) cylinderSeg base0) base1
   loop0 : Path (Path.transport (A := Cylinder) (D := C) cylinderLoop0 base0) base0
   loop1 : Path (Path.transport (A := Cylinder) (D := C) cylinderLoop1 base1) base1
-  -- Surface coherence is complex and omitted for now.
+  -- Note: Surface coherence (stating how seg/loops interact with the 2D structure)
+  -- requires 2-dimensional path algebra. See `Globular.lean` and §4.5 of the thesis.
 
 /-- Dependent eliminator (induction principle) for the cylinder. -/
 axiom cylinderInd {C : Cylinder → Type v} (data : CylinderIndData C) :

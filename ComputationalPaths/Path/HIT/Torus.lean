@@ -4,6 +4,25 @@
 This module introduces `Torus` together with its base-point, two fundamental loops,
 and a surface path witnessing their commutativity.  We provide an eliminator
 stated in the computational-path style.
+
+## Key Results
+
+- `torusLoop1`, `torusLoop2`: The two fundamental loops around T²
+- `torusSurf`: Surface path witnessing `α ∘ β = β ∘ α`
+- `torusPiOneEquivZxZ`: π₁(T²) ≃ ℤ × ℤ (the main theorem)
+- `TorusLoopClass`: Classification of torus loops by winding numbers
+
+## Mathematical Background
+
+The torus T² = S¹ × S¹ has fundamental group π₁(T²) ≃ ℤ × ℤ, the free
+abelian group on two generators. The two generators correspond to loops
+around each "hole" of the torus. The surface relation `torusSurf` witnesses
+that these generators commute.
+
+## Reference
+
+de Veras, Ramos, de Queiroz & de Oliveira,
+"A Topological Application of Labelled Natural Deduction"
 -/
 
 import ComputationalPaths.Path.Basic
@@ -70,7 +89,9 @@ structure TorusIndData (C : Torus → Type v) where
   base : C torusBase
   loop1 : Path (Path.transport (A := Torus) (D := C) torusLoop1 base) base
   loop2 : Path (Path.transport (A := Torus) (D := C) torusLoop2 base) base
-  -- Note: Surface coherence omitted for now.
+  -- Note: Surface coherence law (stating how loop1/loop2 interact with the 2D structure)
+  -- requires 2-dimensional path algebra. This is partially developed in `Globular.lean`
+  -- but full coherence for dependent elimination is future work.
 
 /-- Dependent eliminator (induction principle) for the torus. -/
 axiom torusInd {C : Torus → Type v} (data : TorusIndData C) :
@@ -108,8 +129,10 @@ axiom torusInd_loop2 {C : Torus → Type v} (data : TorusIndData C) :
       (Path.ofEq (torusInd_base (C := C) data))) =
   data.loop2
 
--- Note: The β-rule for the surface is more complex to state and is omitted for now
--- as it requires 2-dimensional path algebra which is partially available in `Globular`.
+-- Note: The β-rule for the surface (torusSurf) would require stating how 2-paths
+-- are preserved under elimination. This needs the 2-dimensional path algebra from
+-- `Globular.lean` and additional coherence machinery. See §4.5 of the thesis for
+-- the theoretical framework; formalization is future work.
 
 noncomputable section
 

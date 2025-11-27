@@ -75,7 +75,8 @@ axiom projectivePlaneRec_loop {C : Type v} (data : ProjectivePlaneRecData C) :
 structure ProjectivePlaneIndData (C : ProjectivePlane → Type v) where
   base : C projectiveBase
   loop : Path (Path.transport (A := ProjectivePlane) (D := C) projectiveLoop base) base
-  -- Note: loopSquare coherence is more complex and omitted for now.
+  -- Note: The loopSquare coherence (stating how loop² = refl is preserved) requires
+  -- 2-dimensional path algebra. See `Globular.lean` for the theoretical framework.
 
 /-- Dependent eliminator (induction principle) for the projective plane. -/
 axiom projectivePlaneInd {C : ProjectivePlane → Type v} (data : ProjectivePlaneIndData C) :

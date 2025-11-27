@@ -9,6 +9,23 @@ interfaces now, downstream developments (loop spaces, fundamental groups, etc.)
 can already depend on a stable API.  The axioms stop with the HIT interface;
 everything below—loop quotients, encode/decode, and transport to ℤ—is defined in
 Lean using the computational-path infrastructure.
+
+## Key Results
+
+- `circleLoop`: The fundamental loop around S¹
+- `circlePiOneEquivInt`: π₁(S¹) ≃ ℤ (the main theorem)
+- `LoopPowerClass`: Winding number classification of loop powers
+
+## Mathematical Background
+
+The circle S¹ is the simplest non-trivial higher-inductive type with
+π₁(S¹) ≃ ℤ. The encode-decode method proves this equivalence by
+showing that loops around S¹ are classified by their winding number.
+
+## Reference
+
+de Veras, Ramos, de Queiroz & de Oliveira,
+"A Topological Application of Labelled Natural Deduction"
 -/
 
 import ComputationalPaths.Path.Basic

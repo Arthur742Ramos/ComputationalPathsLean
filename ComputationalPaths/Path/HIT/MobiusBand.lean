@@ -19,6 +19,12 @@ in *opposite* directions (twisted):
 
 Alternatively, it is obtained by taking I × I and identifying (0,t) with (1,1-t).
 
+## Key Results
+
+- `mobiusLoop`: The central loop around the Möbius band
+- `mobiusPiOneEquivInt`: π₁(Möbius) ≃ ℤ (the main theorem)
+- `MobiusLoopPower`: Loop power classification
+
 ## Key Structure
 
 - Base point: `mobiusBase`
