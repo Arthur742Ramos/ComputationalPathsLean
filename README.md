@@ -48,37 +48,52 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 
 ## Weak ω-Groupoid Structure
 
-- [`ComputationalPaths/Path/OmegaGroupoid.lean`](ComputationalPaths/Path/OmegaGroupoid.lean) provides the **complete proof** that computational paths form a weak ω-groupoid:
+- [`ComputationalPaths/Path/OmegaGroupoid.lean`](ComputationalPaths/Path/OmegaGroupoid.lean) provides the **complete proof** that computational paths form a weak ω-groupoid following Lumsdaine (2010) and van den Berg-Garner (2011):
   ```lean
-  open ComputationalPaths.Path
+  open ComputationalPaths.Path.OmegaGroupoid
 
   variable (A : Type u)
 
   -- The main theorem: computational paths form a weak ω-groupoid
   def pathsOmegaGroupoid : WeakOmegaGroupoid A := compPathOmegaGroupoid A
-
-  -- Equivalent statement
-  theorem computational_paths_form_omega_groupoid : Nonempty (WeakOmegaGroupoid A)
   ```
 
-- **Cell structure at each dimension**:
-  - Dimension 0: Points of type A
-  - Dimension 1: Paths bundled with endpoints (`Cell1`)
-  - Dimension 2: Parallel pairs of paths (`ParallelCell1`)
-  - Dimension 3+: Higher cells (`HigherCell3`) — trivial due to proof-irrelevance of `RwEq`
+- **Proper tower structure** (each level indexed by the previous):
+  - Level 0: Points (elements of A)
+  - Level 1: Paths between points (`Path a b`)
+  - Level 2: 2-cells between paths (`Derivation₂ p q`)
+  - Level 3: 3-cells between 2-cells (`Derivation₃ d₁ d₂`)
+  - Level 4: 4-cells between 3-cells (`Derivation₄ m₁ m₂`)
+  - Level 5+: Higher cells (`DerivationHigh n c₁ c₂`)
 
-- **Operations with full proofs**:
-  - Identity, composition, and inverse at every dimension
-  - Source/target maps satisfying globular identities
-  - Associator, left/right unitors, left/right inverse witnesses
+- **Operations at each level**:
+  - Identity (`refl`), composition (`vcomp`), and inverse (`inv`)
+  - Whiskering (`whiskerLeft`, `whiskerRight`) and horizontal composition (`hcomp`)
+  - Full whiskering at levels 3, 4, and 5+ for contractibility proofs
+
+- **Groupoid laws** (as higher cells, not equations):
+  - Unit laws: `vcomp_refl_left`, `vcomp_refl_right`
+  - Associativity: `vcomp_assoc`
+  - Inverse laws: `vcomp_inv_left`, `vcomp_inv_right`, `inv_inv`
 
 - **Higher coherences**:
-  - Pentagon coherence (relating four composable cells)
+  - Pentagon coherence (Mac Lane's pentagon for associators)
   - Triangle coherence (compatibility of associator and unitors)
-  - Contractibility at dimension ≥ 3 (parallel cells are connected)
-  - Full contractibility at dimension ≥ 4 (parallel cells are **equal**)
+  - Interchange law (compatibility of vertical and horizontal composition)
+  - Step coherence (`step_eq`): justified by `Step` being in `Prop`
 
-- **Key insight**: The ω-groupoid is effectively **2-truncated** because `RwEq` lives in `Prop`. This makes all coherence witnesses at dimension ≥ 2 trivially satisfied via extensionality.
+- **Contractibility** (the key property):
+  - `loop_contract`: Any loop `d : Derivation₂ p p` contracts to `refl p`
+  - This is the **J-principle** for computational paths, analogous to path induction in HoTT
+  - Contractibility at all levels derived from `loop_contract` plus groupoid laws
+  - `contractibility₃`: Any two parallel 2-cells connected by a 3-cell
+  - `contractibility₄`: Any two parallel 3-cells connected by a 4-cell
+  - `contractibilityHigh`: Pattern continues for all higher levels
+
+- **Implementation notes**:
+  - No `sorry` in the entire module
+  - No Lean `axiom` declarations — `loop_contract` is a constructor, like J in HoTT
+  - Semantic justification: normalization + canonical forms + groupoid reduction
 
 - **References**: This formalisation validates the theoretical results of Lumsdaine (*Weak ω-categories from intensional type theory*, 2010) and van den Berg & Garner (*Types are weak ω-groupoids*, 2011) in the computational paths setting.
 
