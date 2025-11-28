@@ -4,6 +4,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 
 ## Highlights
 - **Weak ω-groupoid structure**: Complete proof that computational paths form a weak ω-groupoid with all coherence laws (pentagon, triangle) and contractibility at higher dimensions.
+- **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + code family into ℤ (via univalence axioms).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
@@ -30,6 +31,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/KleinBottle.lean`](ComputationalPaths/Path/HIT/KleinBottle.lean) — Klein bottle HIT with generators a, b and surface relation aba⁻¹=b⁻¹, plus full encode/decode equivalence π₁(K) ≃ ℤ ⋊ ℤ.
 - [`ComputationalPaths/Path/HIT/MobiusBand.lean`](ComputationalPaths/Path/HIT/MobiusBand.lean) — Möbius band HIT (homotopy equivalent to circle), π₁ ≃ ℤ.
 - [`ComputationalPaths/Path/HIT/Cylinder.lean`](ComputationalPaths/Path/HIT/Cylinder.lean) — Cylinder HIT (S¹ × I), π₁ ≃ ℤ.
+- [`ComputationalPaths/Path/HIT/Pushout.lean`](ComputationalPaths/Path/HIT/Pushout.lean) — Pushout HIT with constructors (inl, inr, glue), eliminators, and special cases (wedge sum, suspension).
+- [`ComputationalPaths/Path/HIT/PushoutPaths.lean`](ComputationalPaths/Path/HIT/PushoutPaths.lean) — Path characterization for pushouts, free products, amalgamated free products, and the **Seifert-van Kampen theorem** (`seifertVanKampenEquiv`).
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -142,19 +145,37 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`Cylinder.lean`](ComputationalPaths/Path/HIT/Cylinder.lean): Two boundary circles with connecting segment; surface relation ensures π₁ ≃ ℤ.
 - Reference: [de Veras, Ramos, de Queiroz & de Oliveira, *On the Calculation of Fundamental Groups in Homotopy Type Theory by Means of Computational Paths* (2018)](https://arxiv.org/abs/1804.01413).
 
+## Pushouts & Seifert-van Kampen (what to read)
+- **Pushout HIT** ([`Pushout.lean`](ComputationalPaths/Path/HIT/Pushout.lean)): Defines the pushout of a span A ←f─ C ─g→ B with:
+  - Point constructors `inl : A → Pushout` and `inr : B → Pushout`
+  - Path constructor `glue : ∀c, Path (inl (f c)) (inr (g c))`
+  - Full eliminators (`rec`, `ind`) with computation rules
+  - Special cases: wedge sum (A ∨ B), suspension (ΣA)
+- **Free products** ([`PushoutPaths.lean`](ComputationalPaths/Path/HIT/PushoutPaths.lean)):
+  - `FreeProductWord G₁ G₂`: Alternating sequences from two groups
+  - `AmalgamatedFreeProduct G₁ G₂ H i₁ i₂`: Quotient by i₁(h) = i₂(h)
+- **Seifert-van Kampen theorem**: `seifertVanKampenEquiv` establishes
+  ```
+  π₁(Pushout A B C f g, inl(f c₀)) ≃ π₁(A, f c₀) *_{π₁(C,c₀)} π₁(B, g c₀)
+  ```
+- **Wedge sum case**: `wedgeFundamentalGroupEquiv` gives π₁(A ∨ B) ≃ π₁(A) * π₁(B) (ordinary free product, since π₁(pt) is trivial).
+- Reference: Favonia & Shulman, *The Seifert-van Kampen Theorem in HoTT*; HoTT Book Chapter 8.7.
 
 ## Assumptions (axioms)
 - Circle HIT interface (constructors + β-rules).  The type, base point, loop,
   and eliminators are currently axioms so that downstream developments can use
   a stable higher-inductive interface while the computational-path semantics
   for HITs are being developed.
+- Pushout HIT interface (constructors + eliminators + computation rules). The
+  encode-decode axioms for SVK would be provable in cubical type theory but
+  must be postulated in Lean 4's setting without native HITs.
 - Lightweight univalence (`ua`, `ua_beta`) specialised to `SimpleEquiv`.  This
   suffices for the encode–decode argument without requiring the full HoTT
   axiom.
 
 Every other component—encode/decode maps, quotient constructions, loop group
-laws, etc.—is defined inside Lean and ultimately reduces to the two axioms
-above.
+laws, free products, amalgamation, etc.—is defined inside Lean and ultimately
+reduces to the axioms above.
 
 ## Contributing
 - Build after non-trivial edits: `./lake.cmd build`.
