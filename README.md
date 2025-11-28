@@ -82,18 +82,25 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
   - Interchange law (compatibility of vertical and horizontal composition)
   - Step coherence (`step_eq`): justified by `Step` being in `Prop`
 
-- **Contractibility** (the key property):
-  - `loop_contract`: Any loop `d : Derivation₂ p p` contracts to `refl p`
-  - This is the **J-principle** for computational paths, analogous to path induction in HoTT
-  - Contractibility at all levels derived from `loop_contract` plus groupoid laws
+- **Canonicity axiom & contractibility** (the key property):
+  - Every path `p` has a **normal form** `‖p‖ := Path.ofEq p.toEq`
+  - The **normalizing derivation** `deriv₂_to_normal p : Derivation₂ p ‖p‖` connects any path to its normal form
+  - The **canonical derivation** between parallel paths: `canonical p q := deriv₂_to_normal p ∘ inv(deriv₂_to_normal q)`
+  - The **canonicity axiom** (`to_canonical`): every derivation connects to the canonical derivation
+  - **Contractibility is derived** from the canonicity axiom:
+    ```
+    contractibility₃ d₁ d₂ := to_canonical d₁ ∘ inv(to_canonical d₂)
+    ```
+  - This is analogous to the **J-principle** in HoTT, but grounded in the normalization algorithm
   - `contractibility₃`: Any two parallel 2-cells connected by a 3-cell
   - `contractibility₄`: Any two parallel 3-cells connected by a 4-cell
   - `contractibilityHigh`: Pattern continues for all higher levels
 
 - **Implementation notes**:
   - No `sorry` in the entire module
-  - No Lean `axiom` declarations — `loop_contract` is a constructor, like J in HoTT
-  - Semantic justification: normalization + canonical forms + groupoid reduction
+  - The `to_canonical` axiom is grounded in the normalization algorithm of the LND_EQ-TRS
+  - Unlike a bare contractibility axiom, `to_canonical` has a concrete, canonical target
+  - Semantic justification: normalization + confluence + proof irrelevance of Step
 
 - **References**: This formalisation validates the theoretical results of Lumsdaine (*Weak ω-categories from intensional type theory*, 2010) and van den Berg & Garner (*Types are weak ω-groupoids*, 2011) in the computational paths setting.
 
