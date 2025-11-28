@@ -5,6 +5,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 ## Highlights
 - **Weak ω-groupoid structure**: Complete proof that computational paths form a weak ω-groupoid with all coherence laws (pentagon, triangle) and contractibility at higher dimensions.
 - **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
+- **Figure-eight space** (S¹ ∨ S¹): π₁ ≃ ℤ * ℤ (free group on 2 generators), demonstrating non-abelian fundamental groups.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + code family into ℤ (via univalence axioms).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
@@ -33,6 +34,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/Cylinder.lean`](ComputationalPaths/Path/HIT/Cylinder.lean) — Cylinder HIT (S¹ × I), π₁ ≃ ℤ.
 - [`ComputationalPaths/Path/HIT/Pushout.lean`](ComputationalPaths/Path/HIT/Pushout.lean) — Pushout HIT with constructors (inl, inr, glue), eliminators, and special cases (wedge sum, suspension).
 - [`ComputationalPaths/Path/HIT/PushoutPaths.lean`](ComputationalPaths/Path/HIT/PushoutPaths.lean) — Path characterization for pushouts, free products, amalgamated free products, and the **Seifert-van Kampen theorem** (`seifertVanKampenEquiv`).
+- [`ComputationalPaths/Path/HIT/FigureEight.lean`](ComputationalPaths/Path/HIT/FigureEight.lean) — Figure-eight space (S¹ ∨ S¹) with π₁ ≃ ℤ * ℤ (free group F₂), demonstrating non-abelian fundamental groups.
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -160,6 +162,16 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
   ```
 - **Wedge sum case**: `wedgeFundamentalGroupEquiv` gives π₁(A ∨ B) ≃ π₁(A) * π₁(B) (ordinary free product, since π₁(pt) is trivial).
 - Reference: Favonia & Shulman, *The Seifert-van Kampen Theorem in HoTT*; HoTT Book Chapter 8.7.
+
+## Figure-Eight Space (S¹ ∨ S¹) (what to read)
+- **Definition** ([`FigureEight.lean`](ComputationalPaths/Path/HIT/FigureEight.lean)): `FigureEight := Wedge Circle Circle circleBase circleBase`
+- **Two generators**: `loopA` (left circle) and `loopB` (right circle, conjugated by glue)
+- **Main theorem** (`figureEightPiOneEquiv`): π₁(S¹ ∨ S¹) ≃ FreeProductWord ℤ ℤ
+- **Proof structure**:
+  1. Apply `wedgeFundamentalGroupEquiv` to get π₁(S¹ ∨ S¹) ≃ π₁(S¹) * π₁(S¹)
+  2. Lift `circlePiOneEquivInt : π₁(S¹) ≃ ℤ` via `freeProductWordEquiv`
+- **Non-abelianness**: `wordAB ≠ wordBA` proves the fundamental group is non-abelian
+- The figure-eight is the simplest space with non-abelian π₁, making it important for testing SVK applications.
 
 ## Assumptions (axioms)
 - Circle HIT interface (constructors + β-rules).  The type, base point, loop,

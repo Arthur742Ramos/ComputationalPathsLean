@@ -28,4 +28,5 @@ import ComputationalPaths.Path.HIT.KleinBottle
 import ComputationalPaths.Path.HIT.ProjectivePlane
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
+import ComputationalPaths.Path.HIT.FigureEight
 import ComputationalPaths.Path.OmegaGroupoid
