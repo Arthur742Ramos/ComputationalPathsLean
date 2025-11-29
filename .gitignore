@@ -20,3 +20,15 @@ computational_paths_arxiv_arxiv.zip
 docs/computational_paths_arxiv_arxiv.zip
 omega_groupoid_arxiv.zip
 tmpzip/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+arxiv_submission/*.pdf
+arxiv_submission/*.zip

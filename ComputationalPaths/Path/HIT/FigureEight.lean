@@ -27,6 +27,7 @@ This demonstrates the power of the Seifert-van Kampen theorem: since
 -/
 
 import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 
@@ -35,29 +36,15 @@ namespace Path
 
 universe u
 
-/-! ## Circle Equivalence Axiom
+/-! ## Circle Equivalence
 
-The full proof that π₁(S¹) ≃ ℤ is in CircleStep.lean, but we axiomatize the
-result here to avoid circular dependencies. The key facts are:
+The full proof that π₁(S¹) ≃ ℤ is provided by CircleStep.lean:
 - `circleEncode : circlePiOne → Int` (defined in Circle.lean)
 - `circleDecode : Int → circlePiOne` (defined in Circle.lean)
-- Round-trip properties (proven in CircleStep.lean)
+- `circleDecode_circleEncode` (proven in CircleStep.lean via equality induction)
+- `circleEncode_circleDecode` (proven in CircleStep.lean by integer induction)
+- `circlePiOneEquivInt` (the equivalence, defined in CircleStep.lean)
 -/
-
-/-- `decode ∘ encode = id` on π₁(S¹). Proven in CircleStep via equality induction. -/
-axiom circleDecode_circleEncode (x : circlePiOne) :
-    circleDecode (circleEncode x) = x
-
-/-- `encode ∘ decode = id` on ℤ. Proven in CircleStep by integer induction. -/
-axiom circleEncode_circleDecode (z : Int) :
-    circleEncode (circleDecode z) = z
-
-/-- The fundamental equivalence π₁(S¹) ≃ ℤ. -/
-noncomputable def circlePiOneEquivInt : SimpleEquiv circlePiOne Int where
-  toFun := circleEncode
-  invFun := circleDecode
-  left_inv := circleDecode_circleEncode
-  right_inv := circleEncode_circleDecode
 
 /-! ## The Figure-Eight Space -/
 

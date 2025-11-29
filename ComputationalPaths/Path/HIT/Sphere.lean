@@ -1,0 +1,350 @@
+/-
+# The 2-Sphere and its Trivial Fundamental Group
+
+This module defines the 2-sphere S² as the suspension of the circle S¹,
+and proves that π₁(S²) ≅ 1 using the Seifert-van Kampen theorem.
+
+## Mathematical Background
+
+The 2-sphere can be constructed as:
+- S² = Σ(S¹) = Suspension of the circle
+- Equivalently: S² = Pushout PUnit' PUnit' S¹
+
+The SVK theorem gives:
+  π₁(Pushout A B C f g) ≃ π₁(A) *_{π₁(C)} π₁(B)
+
+For the suspension Σ(S¹):
+- A = PUnit' (north pole region, contractible)
+- B = PUnit' (south pole region, contractible)
+- C = S¹ (equator)
+- f, g : S¹ → PUnit' (constant maps)
+
+Since π₁(PUnit') = 1 (trivial), we get:
+  π₁(S²) = π₁(Σ(S¹)) = 1 *_{π₁(S¹)} 1 = 1
+
+The key insight is that when both π₁(A) and π₁(B) are trivial, the amalgamated
+free product collapses to the trivial group regardless of what π₁(C) is.
+
+## References
+
+- HoTT Book, Chapter 8.1 (π₁(S¹) = ℤ)
+- HoTT Book, Chapter 8.6 (Suspension and π_n)
+-/
+
+import ComputationalPaths.Path.HIT.Pushout
+import ComputationalPaths.Path.HIT.PushoutPaths
+import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.Homotopy.FundamentalGroup
+
+namespace ComputationalPaths
+namespace Path
+
+universe u
+
+/-! ## The 2-Sphere as Suspension of S¹ -/
+
+/-- The 2-sphere S², defined as the suspension of the circle.
+    S² = Σ(S¹) = Pushout PUnit' PUnit' Circle -/
+def Sphere2 : Type u := Suspension Circle
+
+namespace Sphere2
+
+/-- North pole of S². -/
+noncomputable def north : Sphere2 := Suspension.north
+
+/-- South pole of S². -/
+noncomputable def south : Sphere2 := Suspension.south
+
+/-- Meridian from north to south, parameterized by a point on S¹. -/
+noncomputable def merid (x : Circle) : Path (north : Sphere2) south :=
+  Suspension.merid x
+
+/-- The basepoint of S² (we choose the north pole). -/
+noncomputable def basepoint : Sphere2 := north
+
+/-! ## Path Connectivity of S²
+
+S² is path-connected because it's a suspension of a non-empty type.
+-/
+
+/-- The circle is non-empty (has circleBase). -/
+instance : Nonempty Circle := ⟨circleBase⟩
+
+/-- PUnit' is path-connected (trivially, it has one point). -/
+theorem punit_isPathConnected : IsPathConnected PUnit' := by
+  intro a b
+  cases a; cases b
+  exact ⟨Path.refl _⟩
+
+/-- S² is path-connected. -/
+theorem sphere2_isPathConnected : IsPathConnected Sphere2 := by
+  -- S² = Pushout PUnit' PUnit' Circle
+  -- Both PUnit' components are path-connected, and Circle is nonempty
+  exact Pushout.isPathConnected_of_components
+    punit_isPathConnected
+    punit_isPathConnected
+    inferInstance
+
+/-! ## Fundamental Group of PUnit' is Trivial -/
+
+/-- The loop space at the unique point of PUnit'. -/
+abbrev PUnitLoopSpace : Type u := LoopSpace PUnit' PUnit'.unit
+
+/-- Every loop in PUnit' is refl (there's only one point). -/
+theorem punit_loop_is_refl (p : PUnitLoopSpace) : p.toEq = Eq.refl PUnit'.unit := by
+  rfl
+
+/-- Any two loops in PUnit' are RwEq (since they have the same toEq). -/
+theorem punit_loops_rweq (p q : PUnitLoopSpace) : RwEq p q := by
+  apply rweq_of_toEq_eq
+  rfl
+
+/-- π₁(PUnit') has exactly one element (the trivial group). -/
+theorem punit_pi1_trivial : ∀ (α : π₁(PUnit', PUnit'.unit)), α = Quot.mk _ (Path.refl _) := by
+  intro α
+  induction α using Quot.ind with
+  | _ p =>
+    apply Quot.sound
+    exact punit_loops_rweq p (Path.refl _)
+
+/-- The trivial group structure: π₁(PUnit') ≃ Unit. -/
+noncomputable def punit_pi1_equiv_unit : SimpleEquiv (π₁(PUnit', PUnit'.unit)) Unit where
+  toFun := fun _ => ()
+  invFun := fun _ => Quot.mk _ (Path.refl _)
+  left_inv := by
+    intro α
+    exact (punit_pi1_trivial α).symm
+  right_inv := by
+    intro u
+    cases u
+    rfl
+
+/-! ## SVK Application: π₁(S²) = 1
+
+The suspension Σ(S¹) is a pushout:
+```
+    S¹ ───g──→ PUnit'
+    │           │
+    f           inr
+    │           │
+    ▼           ▼
+  PUnit' ─inl→ Σ(S¹)
+```
+
+where f and g are the constant maps to the unique point.
+
+By SVK:
+  π₁(Σ(S¹)) ≃ π₁(PUnit') *_{π₁(S¹)} π₁(PUnit')
+            = 1 *_{ℤ} 1
+            = 1
+-/
+
+/-- The constant map from Circle to PUnit'. -/
+def circleToNorth : Circle → PUnit' := fun _ => PUnit'.unit
+
+/-- The constant map from Circle to PUnit'. -/
+def circleToSouth : Circle → PUnit' := fun _ => PUnit'.unit
+
+/-! ## Key Lemmas for Trivial Decode
+
+The central insight is that when decoding words over trivial groups (π₁(PUnit')),
+each letter contributes nothing, so the result is always refl.
+-/
+
+/-- congrArg of any function applied to refl is refl. -/
+theorem congrArg_refl_eq_refl {A B : Type u} (f : A → B) (a : A) :
+    Path.congrArg f (Path.refl a) = Path.refl (f a) := rfl
+
+/-- Pushout.inlPath of refl is refl. -/
+theorem inlPath_refl_eq_refl {A B C : Type u} {f : C → A} {g : C → B} (a : A) :
+    Pushout.inlPath (Path.refl a) = Path.refl (Pushout.inl a : Pushout A B C f g) := rfl
+
+/-- Pushout.inrPath of refl is refl. -/
+theorem inrPath_refl_eq_refl {A B C : Type u} {f : C → A} {g : C → B} (b : B) :
+    Pushout.inrPath (Path.refl b) = Path.refl (Pushout.inr b : Pushout A B C f g) := rfl
+
+/-- The conjugate of refl by glue is RwEq to refl.
+    trans (glue c) (trans refl (symm (glue c))) ≈ refl -/
+theorem glue_conj_refl_rweq {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
+    RwEq (Path.trans (Pushout.glue c)
+           (Path.trans (Path.refl _) (Path.symm (Pushout.glue c))))
+         (Path.refl (Pushout.inl (f c) : Pushout A B C f g)) := by
+  -- trans (glue c) (trans refl (symm (glue c)))
+  -- ≈ trans (glue c) (symm (glue c))   by refl_left
+  -- ≈ refl                              by inv_right
+  apply rweq_trans
+  · apply rweq_trans_congr_right
+    exact rweq_cmpA_refl_left (Path.symm (Pushout.glue c))
+  · exact rweq_cmpA_inv_right (Pushout.glue c)
+
+/-- For any element α : π₁(PUnit', PUnit'.unit), its image under the left inclusion
+    into the pushout's fundamental group is the identity element. -/
+theorem trivial_left_inclusion
+    {C : Type u} {f : C → PUnit'} {g : C → PUnit'} (c₀ : C) (α : π₁(PUnit', PUnit'.unit)) :
+    (Quot.lift
+      (fun p => Quot.mk RwEq (Pushout.inlPath p))
+      (fun _ _ hp => Quot.sound (rweq_congrArg_of_rweq Pushout.inl hp))
+      α : π₁(Pushout PUnit' PUnit' C f g, Pushout.inl (f c₀))) =
+    Quot.mk _ (Path.refl _) := by
+  -- Since α : π₁(PUnit'), we have α = Quot.mk _ refl
+  have hα := punit_pi1_trivial α
+  rw [hα]
+  -- Now we need: Quot.mk _ (inlPath refl) = Quot.mk _ refl
+  -- This is definitional since inlPath refl = refl
+  rfl
+
+/-- For any element β : π₁(PUnit', PUnit'.unit), its conjugated image
+    (via glue · inrPath · glue⁻¹) is the identity element. -/
+theorem trivial_right_inclusion
+    {C : Type u} {f : C → PUnit'} {g : C → PUnit'} (c₀ : C) (β : π₁(PUnit', PUnit'.unit)) :
+    (Quot.lift
+      (fun q => Quot.mk RwEq (Path.trans
+          (Pushout.glue c₀)
+          (Path.trans (Pushout.inrPath q)
+            (Path.symm (Pushout.glue c₀)))))
+      (fun _ _ hq => Quot.sound (
+        rweq_trans_congr_right _ (rweq_trans_congr_left _
+          (rweq_congrArg_of_rweq Pushout.inr hq))))
+      β : π₁(Pushout PUnit' PUnit' C f g, Pushout.inl (f c₀))) =
+    Quot.mk _ (Path.refl _) := by
+  -- Since β : π₁(PUnit'), we have β = Quot.mk _ refl
+  have hβ := punit_pi1_trivial β
+  rw [hβ]
+  -- Now we need: Quot.mk _ (trans (glue c₀) (trans (inrPath refl) (symm (glue c₀)))) = Quot.mk _ refl
+  -- inrPath refl = refl
+  show Quot.mk RwEq (Path.trans (Pushout.glue c₀)
+    (Path.trans (Path.refl _) (Path.symm (Pushout.glue c₀)))) = Quot.mk _ (Path.refl _)
+  apply Quot.sound
+  exact glue_conj_refl_rweq c₀
+
+/-- The decode function on words over trivial groups produces the identity element.
+    This is the key lemma: when both factors π₁(A) and π₁(B) are trivial,
+    every word in the free product decodes to refl. -/
+theorem trivial_decode
+    {C : Type u} (f : C → PUnit') (g : C → PUnit') (c₀ : C)
+    (w : FreeProductWord (π₁(PUnit', PUnit'.unit)) (π₁(PUnit', PUnit'.unit))) :
+    pushoutDecode (f := f) (g := g) c₀ w = Quot.mk _ (Path.refl _) := by
+  induction w with
+  | nil =>
+      -- decode nil = Quot.mk _ refl by definition
+      rfl
+  | consLeft α rest ih =>
+      -- decode (consLeft α rest) = piOneMul (αInPushout) (decode rest)
+      -- By trivial_left_inclusion: αInPushout = Quot.mk _ refl
+      -- By ih: decode rest = Quot.mk _ refl
+      -- By piOneMul_refl_left: piOneMul (Quot.mk _ refl) x = x
+      simp only [pushoutDecode]
+      rw [trivial_left_inclusion c₀ α]
+      rw [ih]
+      exact piOneMul_refl_left _
+  | consRight β rest ih =>
+      -- decode (consRight β rest) = piOneMul (βInPushout) (decode rest)
+      -- By trivial_right_inclusion: βInPushout = Quot.mk _ refl
+      -- By ih: decode rest = Quot.mk _ refl
+      -- By piOneMul_refl_left: piOneMul (Quot.mk _ refl) x = x
+      simp only [pushoutDecode]
+      rw [trivial_right_inclusion c₀ β]
+      rw [ih]
+      exact piOneMul_refl_left _
+
+/-- Every element of the amalgamated free product over trivial groups is one. -/
+theorem amalg_trivial_is_one
+    {C : Type u} (f : C → PUnit') (g : C → PUnit') (c₀ : C) :
+    ∀ (x : AmalgamatedFreeProduct (π₁(PUnit', f c₀)) (π₁(PUnit', g c₀))
+           (π₁(C, c₀)) (piOneFmap c₀) (piOneGmap c₀)),
+    pushoutDecodeAmalg (f := f) (g := g) c₀ x = Quot.mk _ (Path.refl _) := by
+  intro x
+  induction x using Quot.ind with
+  | _ w =>
+      -- pushoutDecodeAmalg (Quot.mk _ w) = pushoutDecode c₀ w
+      simp only [pushoutDecodeAmalg]
+      -- Since f c₀ = g c₀ = PUnit'.unit, the word is over π₁(PUnit')
+      -- We need to handle the basepoint issue
+      -- f c₀ = PUnit'.unit by definition of constant function
+      have hf : f c₀ = PUnit'.unit := rfl
+      have hg : g c₀ = PUnit'.unit := rfl
+      -- The decode of any word over trivial groups is refl
+      exact trivial_decode f g c₀ w
+
+/-- The fundamental group of S² is trivial.
+
+    Proof:
+    1. S² = Σ(S¹) = Pushout PUnit' PUnit' S¹
+    2. By SVK: π₁(S²) ≃ π₁(PUnit') *_{π₁(S¹)} π₁(PUnit')
+    3. Every element x of the amalgamated free product satisfies:
+       decode(x) = Quot.mk _ refl (by trivial_decode)
+    4. By the SVK equivalence: α = decode(encode(α)) = Quot.mk _ refl
+-/
+theorem sphere2_pi1_trivial :
+    ∀ (α : π₁(Sphere2, basepoint)), α = Quot.mk _ (Path.refl _) := by
+  intro α
+  -- Use the SVK equivalence: α = invFun (toFun α) = decode(encode(α))
+  -- The encode gives an element of the amalgamated free product
+  -- The decode of any element of the amalg over trivial groups is refl
+  --
+  -- S² = Suspension Circle = Pushout PUnit' PUnit' Circle (fun _ => PUnit'.unit) (fun _ => PUnit'.unit)
+  -- basepoint = north = Suspension.north = Pushout.inl PUnit'.unit
+  --
+  -- We use that pushoutDecodeAmalg ∘ pushoutEncodeAmalg = id (left_inv from SVK equiv)
+  -- and that pushoutDecodeAmalg x = Quot.mk _ refl for all x (from amalg_trivial_is_one)
+
+  -- First, we establish the SVK equivalence for S²
+  let f : Circle → PUnit' := fun _ => PUnit'.unit
+  let g : Circle → PUnit' := fun _ => PUnit'.unit
+  let c₀ : Circle := circleBase
+
+  -- The key: apply left_inv from SVK to get α = decode(encode(α))
+  -- Then use that decode of anything in trivial amalg is refl
+
+  -- Get the encoded element
+  let encoded := pushoutEncodeAmalg (f := f) (g := g) c₀ α
+
+  -- The SVK equivalence tells us: α = pushoutDecodeAmalg (pushoutEncodeAmalg α)
+  have left_inv_α : α = pushoutDecodeAmalg (f := f) (g := g) c₀ encoded := by
+    -- This follows from the left_inv property of seifertVanKampenEquiv
+    -- But we can also prove it directly using the axioms
+    induction α using Quot.ind with
+    | _ p =>
+      simp only [pushoutDecodeAmalg]
+      exact (pushoutDecodeEncodeAxiom PUnit' PUnit' Circle f g c₀ p).symm
+
+  -- Now use that decode of any element is refl
+  rw [left_inv_α]
+  exact amalg_trivial_is_one f g c₀ encoded
+
+/-- π₁(S²) ≃ 1 (the trivial group). -/
+noncomputable def sphere2_pi1_equiv_unit :
+    SimpleEquiv (π₁(Sphere2, basepoint)) Unit where
+  toFun := fun _ => ()
+  invFun := fun _ => Quot.mk _ (Path.refl _)
+  left_inv := by
+    intro α
+    exact (sphere2_pi1_trivial α).symm
+  right_inv := by
+    intro u
+    cases u
+    rfl
+
+end Sphere2
+
+/-! ## Summary
+
+We have shown that the 2-sphere S² = Σ(S¹) has trivial fundamental group:
+  π₁(S²) ≃ 1
+
+The proof uses the Seifert-van Kampen theorem applied to the suspension:
+  π₁(Σ(S¹)) ≃ π₁(PUnit') *_{π₁(S¹)} π₁(PUnit') = 1 *_{ℤ} 1 = 1
+
+Key facts used:
+1. S² = Σ(S¹) is the suspension of the circle
+2. Σ(A) = Pushout PUnit' PUnit' A for any type A
+3. π₁(PUnit') = 1 (trivial, as PUnit' has only one point)
+4. When both factors in an amalgamated free product are trivial,
+   the result is trivial regardless of the amalgamating group
+
+This is the classical result that "S² is simply connected" - any loop
+on the 2-sphere can be continuously contracted to a point.
+-/
+
+end Path
+end ComputationalPaths

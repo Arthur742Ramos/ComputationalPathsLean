@@ -14,11 +14,21 @@ In a weak ω-groupoid, each level is indexed by the PREVIOUS level:
 - Level 4: 4-cells between 3-cells (Derivation₄)
 - Level n: n-cells between (n-1)-cells
 
-## Contractibility
+## Contractibility (Batanin-style)
 
-The KEY property for weak ω-groupoids:
-> For any two parallel n-cells m₁, m₂ (same source and target),
-> there exists an (n+1)-cell FROM m₁ TO m₂.
+The KEY property for weak ω-groupoids is **contractibility at dimension k**:
+> For any two parallel (k-1)-cells c₁, c₂ (same source and target),
+> there exists a k-cell FROM c₁ TO c₂.
+
+**Important terminology note**: This is the *Batanin-style* contractibility condition
+for higher coherence structures, meaning that higher hom-spaces are contractible.
+This is **not** the same as global homotopy contractibility (being equivalent to
+a point). Rather, it says that at sufficiently high dimensions, all parallel cells
+are connected.
+
+In our construction:
+- Contractibility at dimension 3: any two parallel 2-cells (derivations) are connected
+- Contractibility at dimension 4+: any two parallel (n-1)-cells are connected
 
 This is achieved via `loop_contract`: any loop derivation d : Derivation₂ p p
 is connected to refl p. This is semantically justified by:
@@ -123,6 +133,21 @@ def depth {p q : Path a b} : Derivation₂ p q → Nat
   | .inv d => d.depth + 1
   | .vcomp d₁ d₂ => d₁.depth + d₂.depth + 1
 
+/-- Convert a `Derivation₂` (Type-valued 2-cell) to `RwEq` (Prop-valued rewrite equivalence).
+
+This lemma establishes that whenever `Derivation₂ p q` is inhabited, `RwEq p q` holds.
+The converse `ofRwEq` shows the other direction. Together they establish:
+
+> `Derivation₂ p q` is inhabited if and only if `RwEq p q`.
+
+This bridges the gap between the Type-valued derivations used for the ω-groupoid
+structure and the Prop-valued equivalence relation used in the rewriting theory. -/
+def toRwEq {p q : Path a b} : Derivation₂ p q → RwEq p q
+  | .refl _ => RwEq.refl _
+  | .step s => RwEq.step s
+  | .inv d => RwEq.symm (toRwEq d)
+  | .vcomp d₁ d₂ => RwEq.trans (toRwEq d₁) (toRwEq d₂)
+
 end Derivation₂
 
 /-! ## Canonical Derivations via Normalization
@@ -158,6 +183,34 @@ theorem normalize_parallel {a b : A} (p q : Path a b) :
 def canonical {a b : A} (p q : Path a b) : Derivation₂ p q :=
   have h : normalize p = normalize q := normalize_parallel p q
   .vcomp (deriv₂_to_normal p) (h ▸ .inv (deriv₂_to_normal q))
+
+/-! ## Bridging Lemma: RwEq ↔ Derivation₂
+
+The following establishes that the Prop-valued rewrite equivalence `RwEq` and the
+Type-valued 2-cells `Derivation₂` capture the same relation: paths `p` and `q` are
+"rewrite-equivalent" (`RwEq p q`) if and only if `Derivation₂ p q` is inhabited.
+
+The key insight is that `canonical p q` provides a derivation for ANY parallel paths,
+not just those connected by a sequence of rewrite steps. This works because:
+1. All parallel paths share the same normal form (by `normalize_parallel`)
+2. Every path normalizes to its canonical form via `deriv₂_to_normal`
+
+The converse (`Derivation₂ p q → RwEq p q`) follows by structural induction on the
+derivation, mapping each constructor to its `RwEq` counterpart. -/
+
+/-- The equivalence between `RwEq` and `Derivation₂` inhabitedness.
+
+This theorem makes explicit that the Prop-valued rewrite equivalence `RwEq`
+and the Type-valued 2-cells `Derivation₂` capture exactly the same relation:
+two paths are rewrite-equivalent if and only if there exists a derivation between them.
+
+An important consequence is that rewrite-equivalent paths share a normal form:
+if `RwEq p q`, then `normalize p = normalize q`. The distinction between `RwEq`
+(a Prop) and `Derivation₂` (a Type) is that the latter tracks the structure of
+the derivation for coherence purposes. -/
+theorem rweq_iff_derivation₂ {p q : Path a b} :
+    RwEq p q ↔ Nonempty (Derivation₂ p q) :=
+  ⟨fun _ => ⟨canonical p q⟩, fun ⟨d⟩ => d.toRwEq⟩
 
 /-! ## Horizontal Composition (Whiskering) -/
 
@@ -208,18 +261,40 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   | inv_vcomp {a b : A} {p q r : Path a b}
       (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) :
       MetaStep₃ (.inv (.vcomp d₁ d₂)) (.vcomp (.inv d₂) (.inv d₁))
-  -- Step coherence (KEY: Step is Prop, so all steps between same endpoints are equal)
+  /-- Step coherence: `Step p q` is proof-irrelevant (propositional).
+
+  We regard `Step p q` as a proposition (0-truncated): whenever two witnesses
+  `s₁, s₂ : Step p q` exist, they are identified by a canonical 3-cell `step_eq s₁ s₂`.
+  This reflects the fact that the rewrite relation itself doesn't distinguish between
+  different "reasons" for the same rewrite step. -/
   | step_eq {a b : A} {p q : Path a b} (s₁ s₂ : Step p q) :
       MetaStep₃ (.step s₁) (.step s₂)
-  -- THE GROUNDED AXIOM: Any derivation connects to the canonical derivation.
-  -- This is grounded in the normalization algorithm: both `d` and `canonical p q`
-  -- represent equivalent computations through normal forms.
-  -- Semantic justification: Confluence of rewriting ensures all derivations
-  -- between the same paths are equivalent at the level of 3-cells.
-  --
-  -- While we could derive this from a more atomic `step_to_canonical` axiom
-  -- plus groupoid laws, the functoriality of inv/vcomp at the 3-cell level
-  -- requires additional infrastructure. For simplicity, we use this axiom directly.
+  /-- **The Canonicity Axiom**: Any derivation connects to the canonical derivation.
+
+  **Axiomatization**: In this formalization, we *axiomatize* the existence of this
+  3-cell `to_canonical d : MetaStep₃ d (canonical p q)`. This is the key primitive
+  that grounds contractibility at dimension 3.
+
+  **Meta-theoretical Justification**: The canonicity axiom is semantically justified
+  by the normalization algorithm:
+
+  1. The normalizing derivation `δₚ : Derivation₂ p (normalize p)` follows the
+     terminating rewrite sequence `p →* |p|` concretely given by LNDEQ-TRS.
+  2. For parallel paths `p, q : Path a b`, `normalize_parallel` ensures `|p| = |q|`.
+  3. The canonical derivation `γₚ,ₓ = δₚ ∘ inv(δₑ)` is thus a concrete, computable
+     derivation through the shared normal form.
+  4. Since normalization is confluent (all paths to normal form yield the same result),
+     every derivation `d : Derivation₂ p q` represents an equivalent computation
+     through normal forms, and should connect to `γₚ,ₓ` at the level of 3-cells.
+
+  **Distinction from bare contractibility**: Unlike a bare contractibility axiom
+  that would simply assert "any two parallel 2-cells are connected", the canonicity
+  axiom connects each derivation to a *specific, computable target* (`canonical p q`).
+  This grounds the coherence in the computational content of normalization.
+
+  **Derived contractibility**: From this axiom plus groupoid laws, we derive:
+  - `to_canonical d : Derivation₃ d (canonical p q)` for ALL derivations d
+  - `contractibility₃ d₁ d₂ := vcomp (to_canonical d₁) (inv (to_canonical d₂))` -/
   | to_canonical {a b : A} {p q : Path a b} (d : Derivation₂ p q) :
       MetaStep₃ d (canonical p q)
   -- Pentagon coherence

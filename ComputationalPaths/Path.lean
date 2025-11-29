@@ -20,6 +20,7 @@ import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.HIT.Torus
 import ComputationalPaths.Path.HIT.Cylinder
@@ -29,4 +30,5 @@ import ComputationalPaths.Path.HIT.ProjectivePlane
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.HIT.FigureEight
+import ComputationalPaths.Path.HIT.Sphere
 import ComputationalPaths.Path.OmegaGroupoid
