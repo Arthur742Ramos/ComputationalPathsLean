@@ -31,4 +31,5 @@ import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.HIT.FigureEight
 import ComputationalPaths.Path.HIT.Sphere
+import ComputationalPaths.Path.HIT.OrientableSurface
 import ComputationalPaths.Path.OmegaGroupoid

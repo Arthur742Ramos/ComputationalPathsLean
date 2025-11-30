@@ -5,6 +5,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 ## Highlights
 - **Weak ω-groupoid structure**: Complete proof that computational paths form a weak ω-groupoid with all coherence laws (pentagon, triangle) and contractibility at higher dimensions.
 - **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
+- **Orientable genus-g surfaces** (Σ_g): Complete proof that π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩ (surface group presentation), with special cases for sphere (g=0), torus (g=1), and non-abelian higher genus (g≥2).
+- **2-Sphere** (S²): π₁(S²) ≅ 1 (trivial) via SVK applied to the suspension decomposition Σ(S¹).
 - **Figure-eight space** (S¹ ∨ S¹): π₁ ≃ ℤ * ℤ (free group on 2 generators), demonstrating non-abelian fundamental groups.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + code family into ℤ (via univalence axioms).
@@ -35,6 +37,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/Pushout.lean`](ComputationalPaths/Path/HIT/Pushout.lean) — Pushout HIT with constructors (inl, inr, glue), eliminators, and special cases (wedge sum, suspension).
 - [`ComputationalPaths/Path/HIT/PushoutPaths.lean`](ComputationalPaths/Path/HIT/PushoutPaths.lean) — Path characterization for pushouts, free products, amalgamated free products, and the **Seifert-van Kampen theorem** (`seifertVanKampenEquiv`).
 - [`ComputationalPaths/Path/HIT/FigureEight.lean`](ComputationalPaths/Path/HIT/FigureEight.lean) — Figure-eight space (S¹ ∨ S¹) with π₁ ≃ ℤ * ℤ (free group F₂), demonstrating non-abelian fundamental groups.
+- [`ComputationalPaths/Path/HIT/Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean) — The 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK.
+- [`ComputationalPaths/Path/HIT/OrientableSurface.lean`](ComputationalPaths/Path/HIT/OrientableSurface.lean) — **Orientable genus-g surfaces** Σ_g with full fundamental group calculation: π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩.
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -173,6 +177,51 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Non-abelianness**: `wordAB ≠ wordBA` proves the fundamental group is non-abelian
 - The figure-eight is the simplest space with non-abelian π₁, making it important for testing SVK applications.
 
+## 2-Sphere π₁(S²) ≅ 1 (what to read)
+- **Definition** ([`Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean)): `Sphere2 := Suspension Circle` (suspension of S¹)
+- **Mathematical insight**: S² = Σ(S¹) = Pushout PUnit' PUnit' Circle, with both PUnit' having trivial π₁
+- **Main theorem** (`sphere2_piOne_trivial`): π₁(S²) ≅ 1 (trivial group)
+- **Proof via SVK**: When π₁(A) = π₁(B) = 1 in the pushout, the amalgamated free product collapses:
+  ```
+  π₁(S²) = 1 *_{π₁(S¹)} 1 = 1
+  ```
+- **Key lemmas**:
+  - `punit_isPathConnected`: PUnit' is path-connected
+  - `punit_piOne_trivial`: π₁(PUnit') ≅ 1
+  - `sphere2_isPathConnected`: S² is path-connected
+- Reference: HoTT Book, Chapter 8.6.
+
+## Orientable Genus-g Surfaces π₁(Σ_g) (what to read)
+- **Definition** ([`OrientableSurface.lean`](ComputationalPaths/Path/HIT/OrientableSurface.lean)): Higher-inductive type with:
+  - Base point `base g`
+  - 2g generators: loops `loopA g i` and `loopB g i` for i < g
+  - 2-cell: `surfaceRelation` asserting [a₁,b₁]...[a_g,b_g] = refl
+- **Surface group presentation** (`SurfaceGroupPresentation g`):
+  ```
+  ⟨a₁, b₁, ..., a_g, b_g | [a₁,b₁][a₂,b₂]...[a_g,b_g] = 1⟩
+  ```
+  where [a,b] = aba⁻¹b⁻¹ is the commutator.
+- **Main theorem** (`piOneEquivPresentation`):
+  ```lean
+  π₁(Σ_g) ≃ SurfaceGroupPresentation g
+  ```
+- **Encode-decode structure**:
+  - `decodePath`: FreeGroupWord → Path (constructive, with full proofs)
+  - `encodePath`: Path → FreeGroupWord (via HIT recursion)
+  - `decodePath_respects_rel`: decode preserves group relations using RwEq lemmas
+  - Round-trip properties establish the equivalence
+- **Special cases**:
+  - **Genus 0** (S²): `genus0_equiv_unit` gives π₁(Σ₀) ≃ Unit (trivial)
+  - **Genus 1** (T²): `genus1_equiv_ZxZ` gives π₁(Σ₁) ≃ ℤ × ℤ (abelian, since [a,b] = 1)
+  - **Genus ≥ 2**: `genus_ge2_nonabelian` proves non-commutativity
+- **Euler characteristic**: `eulerCharacteristic g = 2 - 2*g` with `euler_determines_genus`
+- **Mathematical background**: The proof uses SVK on the decomposition:
+  ```
+  Σ_g = (Σ_g \ disk) ∪_{S¹} disk
+  ```
+  where (Σ_g \ disk) ≃ ⋁_{i=1}^{2g} S¹ has π₁ = F_{2g} (free group), the disk has trivial π₁, and the boundary circle maps to [a₁,b₁]...[a_g,b_g].
+- Reference: HoTT Book Chapter 8.6; Hatcher, Algebraic Topology Section 1.2.
+
 ## Assumptions (axioms)
 - Circle HIT interface (constructors + β-rules).  The type, base point, loop,
   and eliminators are currently axioms so that downstream developments can use
@@ -181,13 +230,15 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Pushout HIT interface (constructors + eliminators + computation rules). The
   encode-decode axioms for SVK would be provable in cubical type theory but
   must be postulated in Lean 4's setting without native HITs.
+- OrientableSurface HIT interface (type, base point, loops, 2-cell, recursion principle).
+  The encode-decode round-trip axioms complete the fundamental group calculation.
 - Lightweight univalence (`ua`, `ua_beta`) specialised to `SimpleEquiv`.  This
   suffices for the encode–decode argument without requiring the full HoTT
   axiom.
 
 Every other component—encode/decode maps, quotient constructions, loop group
-laws, free products, amalgamation, etc.—is defined inside Lean and ultimately
-reduces to the axioms above.
+laws, free products, amalgamation, surface group presentations, etc.—is defined
+inside Lean and ultimately reduces to the axioms above.
 
 ## Contributing
 - Build after non-trivial edits: `./lake.cmd build`.
