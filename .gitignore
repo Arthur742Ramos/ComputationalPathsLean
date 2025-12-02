@@ -30,5 +30,7 @@ tmpzip/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
-arxiv_submission/*.pdf
-arxiv_submission/*.zip
+arxiv_submission/
+cover_letter_LMCS.pdf
+cover_letter_LMCS.tex
+nul

@@ -13,7 +13,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
 - Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd`.
 - Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition).
-- **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product) via encode/decode equivalence `kleinPiOneEquivIntProd`.
+- **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product) via encode/decode equivalence `kleinPiOneEquivIntProd`, with an alternative proof using Seifert-van Kampen on the CW-complex decomposition.
 - Möbius band, cylinder HITs with π₁ ≃ ℤ (homotopy equivalent to circle).
 
 ## Quick Start
@@ -32,6 +32,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT interface, code family into ℤ × ℤ, encode/transport lemmas, iterated loops, and the equivalence `torusPiOneEquivIntProd`.
 - [`ComputationalPaths/Path/HIT/ProjectivePlane.lean`](ComputationalPaths/Path/HIT/ProjectivePlane.lean) — real projective plane RP² with fundamental loop α satisfying α∘α=refl, and equivalence π₁(RP²) ≃ ℤ₂.
 - [`ComputationalPaths/Path/HIT/KleinBottle.lean`](ComputationalPaths/Path/HIT/KleinBottle.lean) — Klein bottle HIT with generators a, b and surface relation aba⁻¹=b⁻¹, plus full encode/decode equivalence π₁(K) ≃ ℤ ⋊ ℤ.
+- [`ComputationalPaths/Path/HIT/KleinBottleSVK.lean`](ComputationalPaths/Path/HIT/KleinBottleSVK.lean) — Alternative proof of π₁(K) ≃ ℤ ⋊ ℤ using Seifert-van Kampen on the CW-complex pushout (D² attached to S¹∨S¹ via boundary word aba⁻¹b).
 - [`ComputationalPaths/Path/HIT/MobiusBand.lean`](ComputationalPaths/Path/HIT/MobiusBand.lean) — Möbius band HIT (homotopy equivalent to circle), π₁ ≃ ℤ.
 - [`ComputationalPaths/Path/HIT/Cylinder.lean`](ComputationalPaths/Path/HIT/Cylinder.lean) — Cylinder HIT (S¹ × I), π₁ ≃ ℤ.
 - [`ComputationalPaths/Path/HIT/Pushout.lean`](ComputationalPaths/Path/HIT/Pushout.lean) — Pushout HIT with constructors (inl, inr, glue), eliminators, and special cases (wedge sum, suspension).
@@ -144,6 +145,11 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Decoding: `kleinDecodeQuot : ℤ × ℤ → π₁(K)` maps `(m,n) ↦ [a^m · b^n]`.
 - Key lemma: `kleinLoopBClass_zpow_mul_loopAClass_zpow` establishes conjugation relation `[b]^n · [a]^m = [a]^m · [b]^{σ(m)·n}`.
 - Equivalence: `kleinPiOneEquivIntProd` shows π₁(K) ≃ ℤ ⋊ ℤ with the semidirect product structure.
+- **Alternative proof via SVK** ([`KleinBottleSVK.lean`](ComputationalPaths/Path/HIT/KleinBottleSVK.lean)):
+  - Constructs K as pushout: `FigureEight ←boundary─ S¹ ─collapse→ Point`
+  - Boundary map sends `circleLoop` to `aba⁻¹b` (the Klein relation word)
+  - SVK gives: π₁(K) ≃ (ℤ * ℤ) / ⟨⟨aba⁻¹b⟩⟩ ≃ ℤ ⋊ ℤ
+  - Key computation: `wordToIntProd_boundaryWord` shows aba⁻¹b maps to (0,0) in ℤ ⋊ ℤ
 
 ## Möbius Band & Cylinder (what to read)
 - Both spaces are homotopy equivalent to S¹, so π₁ ≃ ℤ.

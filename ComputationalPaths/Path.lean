@@ -26,6 +26,7 @@ import ComputationalPaths.Path.HIT.Torus
 import ComputationalPaths.Path.HIT.Cylinder
 import ComputationalPaths.Path.HIT.MobiusBand
 import ComputationalPaths.Path.HIT.KleinBottle
+import ComputationalPaths.Path.HIT.KleinBottleSVK
 import ComputationalPaths.Path.HIT.ProjectivePlane
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
