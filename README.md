@@ -4,10 +4,14 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 
 ## Highlights
 - **Weak ω-groupoid structure**: Complete proof that computational paths form a weak ω-groupoid with all coherence laws (pentagon, triangle) and contractibility at higher dimensions.
+- **Higher homotopy groups π_n**: Iterated loop spaces (Loop2Space, Loop3Space), π₂(A,a) via derivation quotients, Eckmann-Hilton argument proving π₂ is abelian, and π₂(S²) ≅ 1.
+- **Truncation levels (n-types)**: Full hierarchy connecting ω-groupoid to HoTT: IsContr → IsProp → IsSet → IsGroupoid, with all types automatically 1-groupoids via contractibility₃.
 - **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
 - **Orientable genus-g surfaces** (Σ_g): Complete proof that π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩ (surface group presentation), with special cases for sphere (g=0), torus (g=1), and non-abelian higher genus (g≥2).
-- **2-Sphere** (S²): π₁(S²) ≅ 1 (trivial) via SVK applied to the suspension decomposition Σ(S¹).
+- **2-Sphere** (S²): π₁(S²) ≅ 1 (trivial) via SVK applied to the suspension decomposition Σ(S¹), plus π₂(S²) ≅ 1 via contractibility₃.
 - **Figure-eight space** (S¹ ∨ S¹): π₁ ≃ ℤ * ℤ (free group on 2 generators), demonstrating non-abelian fundamental groups.
+- **Path simplification tactics**: `path_simp`, `path_rfl`, `path_canon`, `path_decide` for automated RwEq reasoning.
+- **Covering space theory**: Total spaces, path lifting, π₁-action on fibers, universal cover, deck transformations.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + code family into ℤ (via univalence axioms).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
@@ -26,7 +30,11 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Rewrite/`](ComputationalPaths/Path/Rewrite/) — rewrite steps, closures (`Rw`, `RwEq`), and the quotient `PathRwQuot`.
 - [`ComputationalPaths/Path/Groupoid.lean`](ComputationalPaths/Path/Groupoid.lean) — weak and strict categorical packages for computational paths; groupoids extend the corresponding categories so composition/identities are shared.
 - [`ComputationalPaths/Path/OmegaGroupoid.lean`](ComputationalPaths/Path/OmegaGroupoid.lean) — **weak ω-groupoid structure** on computational paths with cells at each dimension, globular identities, and all coherence laws.
-- [`ComputationalPaths/Path/Homotopy/`](ComputationalPaths/Path/Homotopy/) — loop spaces, rewrite monoids (`LoopMonoid`), loop groups (`LoopGroup`), and π₁ interfaces.
+- [`ComputationalPaths/Path/Homotopy/`](ComputationalPaths/Path/Homotopy/) — loop spaces, rewrite monoids (`LoopMonoid`), loop groups (`LoopGroup`), π₁ interfaces, higher homotopy groups, truncation levels, and covering spaces.
+- [`ComputationalPaths/Path/Homotopy/HigherHomotopy.lean`](ComputationalPaths/Path/Homotopy/HigherHomotopy.lean) — higher homotopy groups π_n via iterated loop spaces and derivation quotients.
+- [`ComputationalPaths/Path/Homotopy/Truncation.lean`](ComputationalPaths/Path/Homotopy/Truncation.lean) — truncation levels (IsContr, IsProp, IsSet, IsGroupoid) connecting to HoTT n-types.
+- [`ComputationalPaths/Path/Homotopy/CoveringSpace.lean`](ComputationalPaths/Path/Homotopy/CoveringSpace.lean) — covering space theory with path lifting and π₁-actions on fibers.
+- [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
 - [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, code family into ℤ, encode/transport lemmas, z-powers.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
 - [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT interface, code family into ℤ × ℤ, encode/transport lemmas, iterated loops, and the equivalence `torusPiOneEquivIntProd`.
@@ -113,6 +121,86 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
   - Semantic justification: normalization + confluence + proof irrelevance of Step
 
 - **References**: This formalisation validates the theoretical results of Lumsdaine (*Weak ω-categories from intensional type theory*, 2010) and van den Berg & Garner (*Types are weak ω-groupoids*, 2011) in the computational paths setting.
+
+## Higher Homotopy Groups π_n (what to read)
+
+- [`ComputationalPaths/Path/Homotopy/HigherHomotopy.lean`](ComputationalPaths/Path/Homotopy/HigherHomotopy.lean) defines higher homotopy groups using the ω-groupoid tower:
+  ```lean
+  -- Iterated loop spaces
+  def Loop2Space (A : Type u) (a : A) := Derivation₂ (Path.refl a) (Path.refl a)
+  def Loop3Space (A : Type u) (a : A) := Derivation₃ (Derivation₂.refl ...) ...
+
+  -- Second homotopy group
+  def PiTwo (A : Type u) (a : A) := Quotient (Loop2Setoid A a)
+  notation "π₂(" A ", " a ")" => PiTwo A a
+  ```
+- **Group structure on π₂**: `PiTwo.mul`, `PiTwo.inv`, `PiTwo.id` with full group laws
+- **Eckmann-Hilton theorem**: `piTwo_comm` proves π₂(A, a) is abelian via the interchange law
+- **Key insight**: 2-loops are equivalent if connected by a 3-cell (Derivation₃)
+- **π₂(S²) ≅ 1**: In [`Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean), `sphere2_pi2_trivial` proves all 2-loops are trivial via contractibility₃
+
+## Truncation Levels (n-types)
+
+- [`ComputationalPaths/Path/Homotopy/Truncation.lean`](ComputationalPaths/Path/Homotopy/Truncation.lean) connects the ω-groupoid to HoTT truncation:
+  ```lean
+  structure IsContr (A : Type u) where
+    center : A
+    contr : (a : A) → Path a center
+
+  structure IsProp (A : Type u) where
+    eq : (a b : A) → Path a b
+
+  structure IsSet (A : Type u) where
+    pathEq : {a b : A} → (p q : Path a b) → RwEq p q
+
+  structure IsGroupoid (A : Type u) where
+    derivEq : {a b : A} → {p q : Path a b} →
+              (d₁ d₂ : Derivation₂ p q) → Nonempty (Derivation₃ d₁ d₂)
+  ```
+- **Cumulative hierarchy**: `contr_implies_prop`, `prop_implies_set`, `set_implies_groupoid`
+- **All types are 1-groupoids**: `all_types_groupoid` via contractibility₃
+- **Connection to π_n triviality**:
+  - `IsSet A ↔ π₁(A, a) trivial for all a`
+  - `IsGroupoid A ↔ π₂(A, a) trivial for all a`
+
+## Path Simplification Tactics
+
+- [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) provides automation for RwEq proofs:
+  ```lean
+  -- Basic tactics
+  macro "path_rfl" : tactic => `(tactic| exact RwEq.refl _)
+  macro "path_canon" : tactic => `(tactic| (apply rweq_of_toEq_eq; rfl))
+  macro "path_symm" : tactic => `(tactic| apply rweq_symm)
+
+  -- Main workhorse: applies all RwEq simp lemmas
+  macro "path_simp" : tactic => `(tactic| simp only [rweq_refl, ...])
+
+  -- Automatic decision procedure
+  macro "path_decide" : tactic => `(tactic| first | path_rfl | path_canon | path_simp)
+  ```
+- **Usage**: `example (p : Path a a) : RwEq (trans refl p) p := by path_simp`
+- **Simp lemmas**: Unit laws, inverse laws, associativity, double symmetry, congruence
+
+## Covering Space Theory
+
+- [`ComputationalPaths/Path/Homotopy/CoveringSpace.lean`](ComputationalPaths/Path/Homotopy/CoveringSpace.lean) provides basic covering space infrastructure:
+  ```lean
+  -- Total space of a type family
+  def TotalSpace (P : A → Type u) := Σ (a : A), P a
+
+  -- Covering: fibers are sets
+  structure IsCovering (P : A → Type u) where
+    fiberIsSet : (a : A) → IsSet (P a)
+
+  -- π₁ action on fibers
+  def fiberAction : π₁(A, a) → P a → P a
+
+  -- Universal cover
+  def UniversalCoverFiber (A : Type u) (a : A) : A → Type u := fun _ => π₁(A, a)
+  ```
+- **Path lifting**: `pathLift` lifts base paths to total space paths
+- **Deck transformations**: `DeckTransformation` structure with composition and inverses
+- **Future work**: Classification theorem (covers ↔ subgroups of π₁)
 
 ## Circle π₁(S¹) ≃ ℤ (what to read)
 - Encoding: `circleEncode : π₁(S¹) → ℤ` via quotient-lift of `circleEncodePath`.

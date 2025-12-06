@@ -35,6 +35,7 @@ import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.Homotopy.HigherHomotopy
 
 namespace ComputationalPaths
 namespace Path
@@ -325,14 +326,55 @@ noncomputable def sphere2_pi1_equiv_unit :
     cases u
     rfl
 
+/-! ## π₂(S²) via Higher Homotopy Groups
+
+Using the higher homotopy infrastructure, we can also analyze π₂(S²).
+In the computational paths framework with the ω-groupoid structure,
+π₂ of any type becomes trivial due to contractibility at level 3.
+-/
+
+-- Import is already available from PushoutPaths -> OmegaGroupoid
+open HigherHomotopy in
+/-- π₂(S²) is trivial in the computational paths framework.
+
+    In classical homotopy theory, π₂(S²) = ℤ. However, in our setting,
+    the contractibility₃ axiom (which asserts all parallel 2-cells are
+    connected by a 3-cell) implies that every 2-loop is equivalent to
+    the identity.
+
+    This reflects the fact that our framework models the "truncated"
+    or "set-level" view of homotopy theory, where higher structure
+    collapses due to proof irrelevance at the meta level. -/
+theorem sphere2_pi2_trivial :
+    ∀ (α : π₂(Sphere2, basepoint)), α = PiTwo.id := by
+  intro α
+  induction α using Quotient.ind
+  apply Quotient.sound
+  -- By contractibility₃, any 2-loop is equivalent to the identity 2-loop
+  exact ⟨OmegaGroupoid.contractibility₃ _ _⟩
+
+/-- π₂(S²) ≃ 1 in the computational paths framework. -/
+noncomputable def sphere2_pi2_equiv_unit :
+    SimpleEquiv (π₂(Sphere2, basepoint)) Unit where
+  toFun := fun _ => ()
+  invFun := fun _ => HigherHomotopy.PiTwo.id
+  left_inv := by
+    intro α
+    exact (sphere2_pi2_trivial α).symm
+  right_inv := by
+    intro u
+    cases u
+    rfl
+
 end Sphere2
 
 /-! ## Summary
 
-We have shown that the 2-sphere S² = Σ(S¹) has trivial fundamental group:
-  π₁(S²) ≃ 1
+We have shown that the 2-sphere S² = Σ(S¹) has:
+  - π₁(S²) ≃ 1 (trivial fundamental group)
+  - π₂(S²) ≃ 1 (in the computational paths framework)
 
-The proof uses the Seifert-van Kampen theorem applied to the suspension:
+**π₁(S²) = 1** via Seifert-van Kampen:
   π₁(Σ(S¹)) ≃ π₁(PUnit') *_{π₁(S¹)} π₁(PUnit') = 1 *_{ℤ} 1 = 1
 
 Key facts used:
@@ -342,8 +384,14 @@ Key facts used:
 4. When both factors in an amalgamated free product are trivial,
    the result is trivial regardless of the amalgamating group
 
-This is the classical result that "S² is simply connected" - any loop
-on the 2-sphere can be continuously contracted to a point.
+**π₂(S²) = 1** via contractibility₃:
+In the computational paths framework, the ω-groupoid structure provides
+contractibility at level 3: any two parallel 2-cells (Derivation₂s) are
+connected by a 3-cell (Derivation₃). This means π₂ collapses to the trivial group.
+
+Note: In classical homotopy theory, π₂(S²) = ℤ. The difference arises because
+our framework's contractibility axiom identifies all 2-loops, modeling a
+"truncated" view where higher structure is quotiented away.
 -/
 
 end Path
