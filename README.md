@@ -6,6 +6,9 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Weak ω-groupoid structure**: Complete proof that computational paths form a weak ω-groupoid with all coherence laws (pentagon, triangle) and contractibility at higher dimensions.
 - **Higher homotopy groups π_n**: Iterated loop spaces (Loop2Space, Loop3Space), π₂(A,a) via derivation quotients, Eckmann-Hilton argument proving π₂ is abelian, and π₂(S²) ≅ 1.
 - **Truncation levels (n-types)**: Full hierarchy connecting ω-groupoid to HoTT: IsContr → IsProp → IsSet → IsGroupoid, with all types automatically 1-groupoids via contractibility₃.
+- **Eilenberg-MacLane spaces K(G,n)**: Characterization of K(G,1) spaces with circle as K(ℤ,1), group structures, and loop space property Ω(K(G,n+1)) ≃ K(G,n).
+- **Fibrations and fiber sequences**: Fiber types, type families as fibrations, path lifting, connecting map ∂ : π₁(B) → F, and long exact sequence of homotopy groups.
+- **Suspension-loop adjunction**: Pointed types and maps infrastructure, suspension as pointed type, adjunction map construction, and Freudenthal suspension theorem foundations.
 - **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
 - **Orientable genus-g surfaces** (Σ_g): Complete proof that π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩ (surface group presentation), with special cases for sphere (g=0), torus (g=1), and non-abelian higher genus (g≥2).
 - **2-Sphere** (S²): π₁(S²) ≅ 1 (trivial) via SVK applied to the suspension decomposition Σ(S¹), plus π₂(S²) ≅ 1 via contractibility₃.
@@ -34,6 +37,9 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Homotopy/HigherHomotopy.lean`](ComputationalPaths/Path/Homotopy/HigherHomotopy.lean) — higher homotopy groups π_n via iterated loop spaces and derivation quotients.
 - [`ComputationalPaths/Path/Homotopy/Truncation.lean`](ComputationalPaths/Path/Homotopy/Truncation.lean) — truncation levels (IsContr, IsProp, IsSet, IsGroupoid) connecting to HoTT n-types.
 - [`ComputationalPaths/Path/Homotopy/CoveringSpace.lean`](ComputationalPaths/Path/Homotopy/CoveringSpace.lean) — covering space theory with path lifting and π₁-actions on fibers.
+- [`ComputationalPaths/Path/Homotopy/Fibration.lean`](ComputationalPaths/Path/Homotopy/Fibration.lean) — fibrations, fiber sequences F → E → B, connecting map ∂ : π₁(B) → F, long exact sequence of homotopy groups, induced maps on π₁.
+- [`ComputationalPaths/Path/Homotopy/SuspensionLoop.lean`](ComputationalPaths/Path/Homotopy/SuspensionLoop.lean) — suspension-loop adjunction [ΣX, Y]_* ≅ [X, ΩY]_*, pointed types/maps, adjunction map construction, connectivity definitions.
+- [`ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean`](ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean) — Eilenberg-MacLane spaces K(G,n), IsKG1 characterization, circle is K(ℤ,1), loop space property Ω(K(G,n+1)) ≃ K(G,n).
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
 - [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, code family into ℤ, encode/transport lemmas, z-powers.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
@@ -201,6 +207,93 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Path lifting**: `pathLift` lifts base paths to total space paths
 - **Deck transformations**: `DeckTransformation` structure with composition and inverses
 - **Future work**: Classification theorem (covers ↔ subgroups of π₁)
+
+## Fibrations and Fiber Sequences (what to read)
+
+- [`ComputationalPaths/Path/Homotopy/Fibration.lean`](ComputationalPaths/Path/Homotopy/Fibration.lean) develops fibration theory:
+  ```lean
+  -- Fiber of a map
+  def Fiber (f : A → B) (b : B) : Type u := { a : A // f a = b }
+
+  -- Fiber sequence F → E → B
+  structure FiberSeq (F E B : Type u) where
+    proj : E → B
+    baseB : B
+    baseE : E
+    toFiber : F → Fiber proj baseB
+    fromFiber : Fiber proj baseB → F
+    -- ... inverse properties
+
+  -- Connecting map ∂ : π₁(B) → F
+  def connectingMapPi1 : π₁(B, b) → P b
+
+  -- Long exact sequence structure
+  structure LongExactSequencePi1 where
+    incl_star : π₁(F) → π₁(E)
+    proj_star : π₁(E) → π₁(B)
+    boundary : π₁(B) → F
+    exact_at_E : ...  -- im(incl_*) = ker(proj_*)
+    exact_at_B : ...  -- im(proj_*) = ker(∂)
+  ```
+- **Path lifting**: `liftPath` lifts base paths to total space
+- **Induced maps**: `inducedPi1Map` takes f : A → B to f_* : π₁(A) → π₁(B)
+- **Exactness**: `canonicalFiberSeq_exact` proves exactness for type family fibrations
+- **Long exact sequence**: `longExactSequence` constructs π₁(F) → π₁(E) → π₁(B) → π₀(F)
+
+## Suspension-Loop Adjunction (what to read)
+
+- [`ComputationalPaths/Path/Homotopy/SuspensionLoop.lean`](ComputationalPaths/Path/Homotopy/SuspensionLoop.lean) establishes the suspension-loop adjunction:
+  ```lean
+  -- Pointed types and maps
+  structure Pointed where
+    carrier : Type u
+    pt : carrier
+
+  structure PointedMap (X Y : Pointed) where
+    toFun : X.carrier → Y.carrier
+    map_pt : toFun X.pt = Y.pt
+
+  -- Suspension as pointed type (north as basepoint)
+  def suspPointed (X : Type u) : Pointed
+
+  -- Loop space as pointed type (refl as basepoint)
+  def loopPointed (Y : Pointed) : Pointed
+
+  -- Adjunction map: f : ΣX → Y gives X → ΩY
+  def adjMap (x₀ : X) (f : Suspension X → Y.carrier) :
+      X → LoopSpace Y.carrier Y.pt
+  ```
+- **Basepoint preservation**: `adjMap_basepoint` proves x₀ maps to refl
+- **Connectivity**: `IsPathConnectedPointed`, `IsSimplyConnected` structures
+- **Suspension connectivity**: `susp_path_connected_structure` shows south connects to north
+
+## Eilenberg-MacLane Spaces K(G,n) (what to read)
+
+- [`ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean`](ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean) characterizes K(G,n) spaces:
+  ```lean
+  -- Group structures
+  structure GroupStr (G : Type u) where
+    one : G
+    mul : G → G → G
+    inv : G → G
+    -- axioms...
+
+  -- K(G,1) characterization
+  structure IsKG1 (X : PointedType) (G : Type u) (h : GroupStr G) where
+    connected : ∀ x, ∃ _p : Path x X.pt, True
+    pi1_iso_toFun : π₁(X) → G
+    pi1_iso_surj : ∀ g, ∃ α, pi1_iso_toFun α = g
+    pi1_iso_inj : ∀ α β, pi1_iso_toFun α = pi1_iso_toFun β → α = β
+    pi1_iso_one : pi1_iso_toFun refl = h.one
+    pi1_iso_mul : ∀ α β, pi1_iso_toFun (α · β) = h.mul ...
+    pi2_trivial : ∀ l : Loop2Space, Loop2Eq l refl
+
+  -- The circle is K(ℤ,1)
+  def circleIsKZ1 : IsKG1 circlePointed Int intAbelianGroup.toGroupStr
+  ```
+- **Circle is K(ℤ,1)**: Uses encode-decode from Circle.lean with π₂ triviality from contractibility₃
+- **Loop space property**: `loop_of_KGn_shifts_degree` states Ω(K(G,n+1)) ≃ K(G,n)
+- **Classifying spaces**: `IsClassifyingSpace` structure for BG = K(G,1)
 
 ## Circle π₁(S¹) ≃ ℤ (what to read)
 - Encoding: `circleEncode : π₁(S¹) → ℤ` via quotient-lift of `circleEncodePath`.

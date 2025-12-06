@@ -23,6 +23,9 @@ import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.CoveringSpace
+import ComputationalPaths.Path.Homotopy.Fibration
+import ComputationalPaths.Path.Homotopy.SuspensionLoop
+import ComputationalPaths.Path.Homotopy.EilenbergMacLane
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
