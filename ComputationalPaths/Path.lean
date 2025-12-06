@@ -42,4 +42,5 @@ import ComputationalPaths.Path.HIT.FigureEight
 import ComputationalPaths.Path.HIT.Sphere
 import ComputationalPaths.Path.HIT.HopfFibration
 import ComputationalPaths.Path.HIT.OrientableSurface
+import ComputationalPaths.Path.HIT.TorusGenus1
 import ComputationalPaths.Path.OmegaGroupoid

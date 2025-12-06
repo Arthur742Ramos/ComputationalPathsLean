@@ -53,8 +53,12 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/Pushout.lean`](ComputationalPaths/Path/HIT/Pushout.lean) — Pushout HIT with constructors (inl, inr, glue), eliminators, and special cases (wedge sum, suspension).
 - [`ComputationalPaths/Path/HIT/PushoutPaths.lean`](ComputationalPaths/Path/HIT/PushoutPaths.lean) — Path characterization for pushouts, free products, amalgamated free products, and the **Seifert-van Kampen theorem** (`seifertVanKampenEquiv`).
 - [`ComputationalPaths/Path/HIT/FigureEight.lean`](ComputationalPaths/Path/HIT/FigureEight.lean) — Figure-eight space (S¹ ∨ S¹) with π₁ ≃ ℤ * ℤ (free group F₂), demonstrating non-abelian fundamental groups.
-- [`ComputationalPaths/Path/HIT/Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean) — The 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK.
+- [`ComputationalPaths/Path/HIT/Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean) — The 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK. Also defines S³ for the Hopf fibration.
 - [`ComputationalPaths/Path/HIT/OrientableSurface.lean`](ComputationalPaths/Path/HIT/OrientableSurface.lean) — **Orientable genus-g surfaces** Σ_g with full fundamental group calculation: π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩.
+- [`ComputationalPaths/Path/HIT/TorusGenus1.lean`](ComputationalPaths/Path/HIT/TorusGenus1.lean) — **Torus as genus-1 surface**: Proves π₁(OrientableSurface 1) ≃ ℤ × ℤ by constructive methods, demonstrating that the torus result follows from the general orientable surface framework.
+- [`ComputationalPaths/Path/HIT/HopfFibration.lean`](ComputationalPaths/Path/HIT/HopfFibration.lean) — **Hopf fibration** S¹ → S³ → S² with fiber equivalence, long exact sequence application, π₁(S³) = 1, and foundations for π₂(S²) ≅ ℤ.
+- [`ComputationalPaths/Path/HIT/WedgeEncode.lean`](ComputationalPaths/Path/HIT/WedgeEncode.lean) — Constructive encode-decode for wedge sums using bijectivity, eliminating axioms from the SVK approach.
+- [`ComputationalPaths/Path/HIT/ProjectivePlaneSVK.lean`](ComputationalPaths/Path/HIT/ProjectivePlaneSVK.lean) — Alternative proof of π₁(RP²) ≃ ℤ₂ using Seifert-van Kampen on the CW-complex pushout.
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -293,6 +297,9 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
   def circleIsKZ1 : IsKG1 circlePointed Int intAbelianGroup.toGroupStr
   ```
 - **Circle is K(ℤ,1)**: Uses encode-decode from Circle.lean with π₂ triviality from contractibility₃
+- **Proved theorems** (no longer axioms):
+  - `circleConnected`: Every point is path-connected to base (via PLift + circle induction)
+  - `circleEncode_mul`: Encoding is a group homomorphism (via round-trip + integer induction)
 - **Loop space property**: `loop_of_KGn_shifts_degree` states Ω(K(G,n+1)) ≃ K(G,n)
 - **Classifying spaces**: `IsClassifyingSpace` structure for BG = K(G,1)
 
@@ -306,10 +313,21 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Homomorphism (circle-specific): decode respects addition, subtraction, and group multiplication — proved from the step laws and encode injectivity.
 
 ## Torus π₁(T²) ≃ ℤ × ℤ (what to read)
+
+Two approaches are available:
+
+**Axiomatic approach** ([`Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean)):
 - Encoding: `torusEncode : π₁(T²) → ℤ × ℤ` via the quotient lift of `torusEncodePath`.
 - Decoding: `torusDecode : ℤ × ℤ → π₁(T²)` assembles the z-powers of the two commuting loops.
 - Equivalence: `torusPiOneEquivIntProd` shows the maps are inverse, yielding π₁(T²) ≃ ℤ × ℤ.
 - Follow-up work: extracting a `TorusStep` module (analogous to `CircleStep`) would expose addition/subtraction lemmas as `[simp]` facts.
+
+**Derived approach via OrientableSurface** ([`TorusGenus1.lean`](ComputationalPaths/Path/HIT/TorusGenus1.lean)):
+- Defines `Torus'` as `OrientableSurface 1` (genus-1 orientable surface).
+- Proves the round-trip properties `torus_left_inv_def` and `torus_right_inv_def` constructively.
+- Uses `sumPowersA`/`sumPowersB` winding number functions and the `word_eq_canonical` abelianization lemma.
+- Equivalence: `piOneEquivIntProd : π₁(Torus') ≃ ℤ × ℤ` follows from the general surface group machinery.
+- Demonstrates that the torus π₁ result is a special case of the orientable surface framework.
 
 ## Real Projective Plane π₁(RP²) ≃ ℤ₂ (what to read)
 - Reference: de Veras, Ramos, de Queiroz & de Oliveira, "A Topological Application of Labelled Natural Deduction", SAJL.
@@ -414,12 +432,19 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Circle HIT interface (constructors + β-rules).  The type, base point, loop,
   and eliminators are currently axioms so that downstream developments can use
   a stable higher-inductive interface while the computational-path semantics
-  for HITs are being developed.
+  for HITs are being developed. Note: `circleConnected` and `circleEncode_mul`
+  were previously axioms but are now **proved theorems** using circle induction
+  and the encode-decode round-trip properties.
 - Pushout HIT interface (constructors + eliminators + computation rules). The
   encode-decode axioms for SVK would be provable in cubical type theory but
   must be postulated in Lean 4's setting without native HITs.
 - OrientableSurface HIT interface (type, base point, loops, 2-cell, recursion principle).
   The encode-decode round-trip axioms complete the fundamental group calculation.
+  Note: `decodePath_surfaceRelWord_rweq` (that the surface relation word decodes to
+  a path RwEq to refl) and `genus0_loop_trivial` (all loops on Σ₀ are trivial) were
+  previously axioms but are now **proved theorems**. The former uses Fin' index
+  arithmetic and the HIT 2-cell axiom; the latter uses the fact that FreeGroupWord 0
+  has only one element (nil) since Fin' 0 is empty.
 - Lightweight univalence (`ua`, `ua_beta`) specialised to `SimpleEquiv`.  This
   suffices for the encode–decode argument without requiring the full HoTT
   axiom.

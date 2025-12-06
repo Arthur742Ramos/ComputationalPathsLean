@@ -141,17 +141,89 @@ The key components come from the encode-decode proof in Circle.lean.
 -/
 
 /-- Every point in the circle is path-connected to the basepoint.
-    This follows from circle induction: the basepoint is connected to itself,
+    Proved using PLift and circle induction. The basepoint is connected to itself,
     and the loop path gives a coherence condition that's satisfied since
-    existence of a path to base is a proposition. -/
-axiom circleConnected : (x : Circle) → ∃ _p : Path x circleBase, True
+    existence of a path to base is a proposition (Subsingleton). -/
+theorem circleConnected : (x : Circle) → ∃ _p : Path x circleBase, True := by
+  intro x
+  -- Use PLift to lift the Prop to a Type for circle induction
+  let P : Circle → Type := fun y => PLift (∃ _p : Path y circleBase, True)
+  have data : CircleIndData P := {
+    base := PLift.up ⟨Path.refl circleBase, trivial⟩
+    loop := by
+      -- Transport along circleLoop preserves the proof since it's a proposition
+      have h : Path.transport (A := Circle) (D := P) circleLoop (PLift.up ⟨Path.refl circleBase, trivial⟩)
+             = PLift.up ⟨Path.refl circleBase, trivial⟩ := by
+        apply Subsingleton.elim
+      exact Path.ofEq h
+  }
+  have result := circleInd data x
+  exact result.down
+
+/-- Helper: encoding composition with decode of natural numbers. -/
+private theorem circleEncode_comp_decode_nat (α : π₁(Circle, circleBase)) (n : Nat) :
+    circleEncode (LoopQuot.comp α (circleDecode (Int.ofNat n))) = circleEncode α + n := by
+  induction n with
+  | zero =>
+    have h : circleDecode (Int.ofNat 0) = LoopQuot.id := circleDecode_zero
+    rw [h, LoopQuot.comp_id]
+    show circleEncode α = circleEncode α + (0 : Int)
+    rw [Int.add_zero]
+  | succ k ih =>
+    have h1 : circleDecode (Int.ofNat (Nat.succ k)) =
+              LoopQuot.comp (circleDecode (Int.ofNat k)) circleLoopClass :=
+      circleDecode_ofNat_succ k
+    rw [h1]
+    rw [(LoopQuot.comp_assoc α (circleDecode (Int.ofNat k)) circleLoopClass).symm]
+    rw [circleEncode_comp_loop]
+    rw [ih]
+    omega
+
+/-- Helper: encoding composition with decode of negative successor numbers. -/
+private theorem circleEncode_comp_decode_negSucc (α : π₁(Circle, circleBase)) (n : Nat) :
+    circleEncode (LoopQuot.comp α (circleDecode (Int.negSucc n))) = circleEncode α + Int.negSucc n := by
+  induction n with
+  | zero =>
+    have h : circleDecode (Int.negSucc 0) = LoopQuot.inv circleLoopClass := circleDecode_neg_one
+    rw [h]
+    rw [circleEncode_comp_inv_loop]
+    rfl
+  | succ k ih =>
+    have hdecode : circleDecode (Int.negSucc (Nat.succ k)) =
+                   LoopQuot.comp (circleDecode (Int.negSucc k)) (LoopQuot.inv circleLoopClass) := by
+      have heq : Int.negSucc (Nat.succ k) = Int.negSucc k + (-1) := by omega
+      calc circleDecode (Int.negSucc (Nat.succ k))
+          = circleLoopZPow (Int.negSucc (Nat.succ k)) := rfl
+        _ = circleLoopZPow (Int.negSucc k + (-1)) := by rw [heq]
+        _ = LoopQuot.comp (circleLoopZPow (Int.negSucc k)) (circleLoopZPow (-1)) := by
+            rw [circleLoopZPow_add]
+        _ = LoopQuot.comp (circleDecode (Int.negSucc k)) (LoopQuot.inv circleLoopClass) := by
+            simp only [circleDecode, circleLoopZPow_neg_one]
+    rw [hdecode]
+    rw [(LoopQuot.comp_assoc α (circleDecode (Int.negSucc k)) (LoopQuot.inv circleLoopClass)).symm]
+    rw [circleEncode_comp_inv_loop]
+    rw [ih]
+    omega
+
+/-- Helper: encoding composition with decode of any integer. -/
+private theorem circleEncode_comp_decode (α : π₁(Circle, circleBase)) (n : Int) :
+    circleEncode (LoopQuot.comp α (circleDecode n)) = circleEncode α + n := by
+  cases n with
+  | ofNat k => exact circleEncode_comp_decode_nat α k
+  | negSucc k => exact circleEncode_comp_decode_negSucc α k
 
 /-- Circle encoding is a group homomorphism: encode(α · β) = encode(α) + encode(β).
-    This follows from the transport laws for the universal cover construction.
-    Transport along (trans p q) equals transport along q composed with transport along p,
-    which gives the additivity of the winding number. -/
-axiom circleEncode_mul : ∀ (α β : π₁(Circle, circleBase)),
-    circleEncode (LoopQuot.comp α β) = circleEncode α + circleEncode β
+    Proved by rewriting β as circleDecode (circleEncode β) and using the
+    helper lemma circleEncode_comp_decode. -/
+theorem circleEncode_mul : ∀ (α β : π₁(Circle, circleBase)),
+    circleEncode (LoopQuot.comp α β) = circleEncode α + circleEncode β := by
+  intro α β
+  have hβ : β = circleDecode (circleEncode β) := (circleDecode_circleEncode β).symm
+  have step1 : circleEncode (LoopQuot.comp α β) =
+               circleEncode (LoopQuot.comp α (circleDecode (circleEncode β))) := by
+    rw [← hβ]
+  rw [step1]
+  exact circleEncode_comp_decode α (circleEncode β)
 
 /-- The circle is K(ℤ,1). -/
 noncomputable def circleIsKZ1 : IsKG1 circlePointed Int intAbelianGroup.toGroupStr where

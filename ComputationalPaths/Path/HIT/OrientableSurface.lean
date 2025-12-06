@@ -313,6 +313,14 @@ inductive SurfaceGroupRel (g : Nat) :
       SurfaceGroupRel g
         (FreeGroupWord.concat (FreeGroupWord.single i (-1)) (FreeGroupWord.single i 1))
         FreeGroupWord.nil
+  /-- Zero power elimination: xᵢ⁰ · w ~ w. -/
+  | zero_power (i : Fin' (2 * g)) (rest : FreeGroupWord (2 * g)) :
+      SurfaceGroupRel g (FreeGroupWord.cons i 0 rest) rest
+  /-- Power combination: xᵢᵐ · xᵢⁿ · w ~ xᵢᵐ⁺ⁿ · w. -/
+  | power_combine (i : Fin' (2 * g)) (m n : Int) (rest : FreeGroupWord (2 * g)) :
+      SurfaceGroupRel g
+        (FreeGroupWord.cons i m (FreeGroupWord.cons i n rest))
+        (FreeGroupWord.cons i (m + n) rest)
   /-- The surface relation: [a₁,b₁]...[a_g,b_g] ~ ε (for g > 0). -/
   | surface_rel (hg : g > 0) :
       SurfaceGroupRel g (surfaceRelationWord g) FreeGroupWord.nil
@@ -439,6 +447,11 @@ noncomputable def decodePath (g : Nat) :
   | FreeGroupWord.cons gen pow rest =>
       Path.trans (decodeGen g gen pow) (decodePath g rest)
 
+/-- Integer power addition law for decoded generators:
+    loop^m ∘ loop^n ≈ loop^(m+n). -/
+axiom decodeGen_add (g : Nat) (i : Fin' (2 * g)) (m n : Int) :
+    RwEq (Path.trans (decodeGen g i m) (decodeGen g i n)) (decodeGen g i (m + n))
+
 /-- Decode respects concatenation. -/
 theorem decodePath_concat (g : Nat) (w₁ w₂ : FreeGroupWord (2 * g)) :
     RwEq (decodePath g (FreeGroupWord.concat w₁ w₂))
@@ -512,6 +525,20 @@ theorem decodePath_respects_rel (g : Nat) {w₁ w₂ : FreeGroupWord (2 * g)}
       exact rweq_trans_congr_left (decodePath g w₃) ih
   | inv_cancel_right i => exact decodePath_inv_cancel_right g i
   | inv_cancel_left i => exact decodePath_inv_cancel_left g i
+  | zero_power i rest =>
+      -- decodePath (cons i 0 rest) = trans (decodeGen i 0) (decodePath rest)
+      -- decodeGen i 0 = refl, so this is trans refl (decodePath rest) ≈ decodePath rest
+      simp only [decodePath, decodeGen]
+      exact rweq_cmpA_refl_left (decodePath g rest)
+  | power_combine i m n rest =>
+      -- decodePath (cons i m (cons i n rest)) ≈ decodePath (cons i (m+n) rest)
+      -- LHS = trans (decodeGen i m) (trans (decodeGen i n) (decodePath rest))
+      -- RHS = trans (decodeGen i (m+n)) (decodePath rest)
+      -- Need: decodeGen i m ∘ decodeGen i n ≈ decodeGen i (m+n)
+      simp only [decodePath]
+      apply rweq_trans (rweq_symm (rweq_tt (decodeGen g i m) (decodeGen g i n) (decodePath g rest)))
+      apply rweq_trans_congr_left (decodePath g rest)
+      exact decodeGen_add g i m n
   | surface_rel hg => exact decodePath_surface_rel g hg
 
 /-- Decode at the quotient level. -/

@@ -54,6 +54,7 @@ ComputationalPaths/
     │   ├── PushoutPaths.lean     # SVK theorem, free products
     │   ├── FigureEight.lean      # S¹ ∨ S¹ with π₁ ≃ ℤ * ℤ
     │   ├── OrientableSurface.lean # Σ_g with surface group π₁
+    │   ├── TorusGenus1.lean      # Torus via OrientableSurface 1, π₁ ≃ ℤ × ℤ
     │   ├── KleinBottle.lean      # K with π₁(K) ≃ ℤ ⋊ ℤ
     │   ├── ProjectivePlane.lean  # RP² with π₁(RP²) ≃ ℤ₂
     │   ├── MobiusBand.lean       # Möbius band, π₁ ≃ ℤ
@@ -293,6 +294,7 @@ lake clean
 | `Sphere.lean` | `sphere2_pi1_equiv_unit` | π₁(S²) ≃ 1 |
 | `FigureEight.lean` | `figureEightPiOneEquiv` | π₁(S¹ ∨ S¹) ≃ ℤ * ℤ |
 | `OrientableSurface.lean` | `piOneEquivPresentation` | π₁(Σ_g) ≃ SurfaceGroup |
+| `TorusGenus1.lean` | `piOneEquivIntProd` | π₁(OrientableSurface 1) ≃ ℤ × ℤ |
 | `KleinBottle.lean` | `kleinPiOneEquivIntProd` | π₁(K) ≃ ℤ ⋊ ℤ |
 | `ProjectivePlane.lean` | `projectivePiOneEquivZ2` | π₁(RP²) ≃ ℤ₂ |
 | `PushoutPaths.lean` | `seifertVanKampenEquiv` | π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) |
