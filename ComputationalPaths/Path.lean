@@ -35,9 +35,11 @@ import ComputationalPaths.Path.HIT.MobiusBand
 import ComputationalPaths.Path.HIT.KleinBottle
 import ComputationalPaths.Path.HIT.KleinBottleSVK
 import ComputationalPaths.Path.HIT.ProjectivePlane
+import ComputationalPaths.Path.HIT.ProjectivePlaneSVK
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.HIT.FigureEight
 import ComputationalPaths.Path.HIT.Sphere
+import ComputationalPaths.Path.HIT.HopfFibration
 import ComputationalPaths.Path.HIT.OrientableSurface
 import ComputationalPaths.Path.OmegaGroupoid
