@@ -142,6 +142,12 @@ theorem length_concat (w₁ w₂ : FreeGroupWord n) :
   | nil => simp [concat, length]
   | cons g p rest ih => simp [concat, length, ih, Nat.add_assoc]
 
+/-- Any word over an empty set of generators is nil. -/
+theorem eq_nil_of_fin0 (w : FreeGroupWord 0) : w = nil := by
+  cases w with
+  | nil => rfl
+  | cons gen _ _ => exact Fin'.elim0 gen
+
 end FreeGroupWord
 
 /-! ## Surface Relation Word
@@ -633,9 +639,22 @@ section SpecialCases
 -- For genus 0, Σ₀ = S² (the 2-sphere).
 -- π₁(S²) is trivial since all loops can be contracted using the 2-cell.
 
-/-- Every loop on S² (genus 0 surface) is trivial. -/
-axiom genus0_loop_trivial (p : Path (base 0) (base 0)) :
-    RwEq p (Path.refl (base 0))
+/-- Every loop on S² (genus 0 surface) is trivial.
+This is provable because there are no generators at genus 0:
+`Fin' 0` is empty, so `FreeGroupWord 0` contains only `nil`. -/
+theorem genus0_loop_trivial (p : Path (base 0) (base 0)) :
+    RwEq p (Path.refl (base 0)) := by
+  -- encodePath 0 p : FreeGroupWord (2 * 0) = FreeGroupWord 0
+  -- Since Fin' 0 is empty, the only word is nil
+  have h1 : encodePath 0 p = FreeGroupWord.nil := FreeGroupWord.eq_nil_of_fin0 (encodePath 0 p)
+  -- By decode_encode_path: RwEq (decodePath 0 (encodePath 0 p)) p
+  have h2 : RwEq (decodePath 0 (encodePath 0 p)) p := decode_encode_path 0 p
+  -- Substituting h1: RwEq (decodePath 0 nil) p
+  rw [h1] at h2
+  -- decodePath 0 nil = refl by definition
+  simp only [decodePath] at h2
+  -- So RwEq refl p, hence RwEq p refl by symmetry
+  exact rweq_symm h2
 
 /-- π₁(Σ₀) ≃ 1 (trivial group). -/
 noncomputable def genus0_equiv_unit : SimpleEquiv (SurfacePiOne 0) Unit where
@@ -648,28 +667,8 @@ noncomputable def genus0_equiv_unit : SimpleEquiv (SurfacePiOne 0) Unit where
 
 -- For genus 1, Σ₁ = T² (the torus).
 -- π₁(T²) ≃ ℤ × ℤ since [a,b] = 1 makes the group abelian.
-
-/-- The winding numbers for a loop on the torus. -/
-axiom torusWindingA : SurfacePiOne 1 → Int
-axiom torusWindingB : SurfacePiOne 1 → Int
-
-/-- Construct a loop from winding numbers. -/
-axiom torusOfWindings : Int → Int → SurfacePiOne 1
-
-/-- Round-trip: windings determine the loop. -/
-axiom torus_left_inv (α : SurfacePiOne 1) :
-    torusOfWindings (torusWindingA α) (torusWindingB α) = α
-
-/-- Round-trip: loop determines the windings. -/
-axiom torus_right_inv (m n : Int) :
-    (torusWindingA (torusOfWindings m n), torusWindingB (torusOfWindings m n)) = (m, n)
-
-/-- π₁(T²) ≃ ℤ × ℤ. -/
-noncomputable def genus1_equiv_ZxZ : SimpleEquiv (SurfacePiOne 1) (Int × Int) where
-  toFun := fun α => (torusWindingA α, torusWindingB α)
-  invFun := fun ⟨m, n⟩ => torusOfWindings m n
-  left_inv := torus_left_inv
-  right_inv := fun ⟨m, n⟩ => torus_right_inv m n
+-- See `ComputationalPaths.Path.HIT.TorusGenus1` for the full constructive proof
+-- that π₁(OrientableSurface 1) ≃ ℤ × ℤ.
 
 /-- For genus g ≥ 2, the surface group is non-abelian.
 This follows from the fact that [a₁,b₁] is non-trivial when there's a
@@ -726,7 +725,7 @@ This module establishes:
 
 5. **Special cases**:
    - g = 0: π₁(S²) ≃ 1 (trivial, using `genus0_equiv_unit`)
-   - g = 1: π₁(T²) ≃ ℤ × ℤ (abelian, using `genus1_equiv_ZxZ`)
+   - g = 1: π₁(T²) ≃ ℤ × ℤ (abelian, see `TorusGenus1.piOneEquivIntProd`)
    - g ≥ 2: Non-abelian surface groups (`genus_ge2_nonabelian`)
 
 The proof structure follows Seifert-van Kampen applied to:
