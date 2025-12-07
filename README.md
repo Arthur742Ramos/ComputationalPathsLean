@@ -14,6 +14,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Orientable genus-g surfaces** (Σ_g): Complete proof that π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩ (surface group presentation), with special cases for sphere (g=0), torus (g=1), and non-abelian higher genus (g≥2).
 - **2-Sphere** (S²): π₁(S²) ≅ 1 (trivial) via SVK applied to the suspension decomposition Σ(S¹), plus π₂(S²) ≅ 1 via contractibility₃.
 - **Figure-eight space** (S¹ ∨ S¹): π₁ ≃ ℤ * ℤ (free group on 2 generators), demonstrating non-abelian fundamental groups.
+- **Bouquet of n circles** (∨ⁿS¹): π₁ ≃ F_n (free group on n generators), generalizing the figure-eight to arbitrary n with special cases n=0 (trivial), n=1 (ℤ), n=2 (ℤ * ℤ).
 - **Path simplification tactics**: `path_simp`, `path_rfl`, `path_canon`, `path_decide` for automated RwEq reasoning.
 - **Covering space theory**: Total spaces, path lifting, π₁-action on fibers, universal cover, deck transformations.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
@@ -53,6 +54,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/Pushout.lean`](ComputationalPaths/Path/HIT/Pushout.lean) — Pushout HIT with constructors (inl, inr, glue), eliminators, and special cases (wedge sum, suspension).
 - [`ComputationalPaths/Path/HIT/PushoutPaths.lean`](ComputationalPaths/Path/HIT/PushoutPaths.lean) — Path characterization for pushouts, free products, amalgamated free products, and the **Seifert-van Kampen theorem** (`seifertVanKampenEquiv`).
 - [`ComputationalPaths/Path/HIT/FigureEight.lean`](ComputationalPaths/Path/HIT/FigureEight.lean) — Figure-eight space (S¹ ∨ S¹) with π₁ ≃ ℤ * ℤ (free group F₂), demonstrating non-abelian fundamental groups.
+- [`ComputationalPaths/Path/HIT/BouquetN.lean`](ComputationalPaths/Path/HIT/BouquetN.lean) — **Bouquet of n circles** (∨ⁿS¹) with π₁ ≃ F_n (free group on n generators), generalizing Figure-Eight with encode-decode equivalence.
 - [`ComputationalPaths/Path/HIT/Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean) — The 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK. Also defines S³ for the Hopf fibration.
 - [`ComputationalPaths/Path/HIT/OrientableSurface.lean`](ComputationalPaths/Path/HIT/OrientableSurface.lean) — **Orientable genus-g surfaces** Σ_g with full fundamental group calculation: π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩.
 - [`ComputationalPaths/Path/HIT/TorusGenus1.lean`](ComputationalPaths/Path/HIT/TorusGenus1.lean) — **Torus as genus-1 surface**: Proves π₁(OrientableSurface 1) ≃ ℤ × ℤ by constructive methods, demonstrating that the torus result follows from the general orientable surface framework.
@@ -383,6 +385,33 @@ Two approaches are available:
 - **Non-abelianness**: `wordAB ≠ wordBA` proves the fundamental group is non-abelian
 - The figure-eight is the simplest space with non-abelian π₁, making it important for testing SVK applications.
 
+## Bouquet of n Circles (∨ⁿS¹) (what to read)
+- **Definition** ([`BouquetN.lean`](ComputationalPaths/Path/HIT/BouquetN.lean)): Higher-inductive type with:
+  - Base point `bouquetBase`
+  - n loops `bouquetLoop i` for `i : Fin'B n`
+  - Recursion principle `bouquetRec` with computation rules
+- **Free group representation** (`BouquetFreeGroup n`):
+  - `BouquetWord n`: Words built from letters (generator index + non-zero integer power)
+  - `BouquetRel n`: Relation combining/canceling adjacent same-generator letters
+  - Quotient gives the free group F_n
+- **Main theorem** (`bouquetPiOneEquiv`):
+  ```lean
+  π₁(∨ⁿS¹, base) ≃ BouquetFreeGroup n ≃ F_n
+  ```
+- **Encode-decode structure**:
+  - `decodeWord`: BouquetWord → LoopSpace (via loop iteration)
+  - `encodeLoop`: LoopSpace → BouquetWord (axiomatized)
+  - Round-trip properties establish the equivalence
+- **Special cases**:
+  - **n = 0**: `bouquetN_zero_is_point` — every loop is trivial (π₁ = 1)
+  - **n = 1**: Recovers π₁(S¹) ≃ ℤ
+  - **n = 2**: Recovers figure-eight π₁(S¹ ∨ S¹) ≃ ℤ * ℤ
+- **Loop iteration axioms**:
+  - `iterateLoopInt_add`: l^m · l^n ≈ l^{m+n}
+  - `iterateLoopInt_cancel`: l^m · l^{-m} ≈ refl
+  - `iterateLoopInt_zero`: l^0 = refl
+- The bouquet generalizes the figure-eight to arbitrary numbers of generators, providing a parametric family of free groups.
+
 ## 2-Sphere π₁(S²) ≅ 1 (what to read)
 - **Definition** ([`Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean)): `Sphere2 := Suspension Circle` (suspension of S¹)
 - **Mathematical insight**: S² = Σ(S¹) = Pushout PUnit' PUnit' Circle, with both PUnit' having trivial π₁
@@ -445,6 +474,10 @@ Two approaches are available:
   previously axioms but are now **proved theorems**. The former uses Fin' index
   arithmetic and the HIT 2-cell axiom; the latter uses the fact that FreeGroupWord 0
   has only one element (nil) since Fin' 0 is empty.
+- BouquetN HIT interface (type, base point, n loops, recursion principle). The encode-decode
+  axioms establish π₁(∨ⁿS¹) ≃ F_n (free group on n generators). Loop iteration axioms
+  (`iterateLoopInt_add`, `iterateLoopInt_cancel`, `iterateLoopInt_zero`) handle the
+  free group relation.
 - Lightweight univalence (`ua`, `ua_beta`) specialised to `SimpleEquiv`.  This
   suffices for the encode–decode argument without requiring the full HoTT
   axiom.
