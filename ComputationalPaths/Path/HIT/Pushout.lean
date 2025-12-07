@@ -190,12 +190,47 @@ axiom glue_natural {c₁ c₂ : C} (p : Path c₁ c₂) :
     Path.trans (glue c₁) (inrPath (Path.congrArg g p))
 
 /-- Glue naturality in RwEq form for fundamental group calculations.
-States that inlPath(f*(p)) is RwEq to glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹. -/
-axiom glue_natural_rweq {c₁ c₂ : C} (p : Path c₁ c₂) :
+States that inlPath(f*(p)) is RwEq to glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹.
+
+**Derived from `glue_natural`**: We compose both sides with `symm (glue c₂)`,
+then use inverse cancellation and associativity. -/
+theorem glue_natural_rweq {c₁ c₂ : C} (p : Path c₁ c₂) :
     RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
          (Path.trans (glue c₁)
            (Path.trans (inrPath (Path.congrArg g p))
-             (Path.symm (glue c₂))))
+             (Path.symm (glue c₂)))) := by
+  -- Set up notation for the pushout type to help inference
+  let P := Pushout A B C f g
+  let gl1 : Path (inl (f c₁) : P) (inr (g c₁)) := glue c₁
+  let gl2 : Path (inl (f c₂) : P) (inr (g c₂)) := glue c₂
+  let inlP : Path (inl (f c₁) : P) (inl (f c₂)) := inlPath (Path.congrArg f p)
+  let inrP : Path (inr (g c₁) : P) (inr (g c₂)) := inrPath (Path.congrArg g p)
+
+  -- From glue_natural: trans (inlPath ...) (glue c₂) = trans (glue c₁) (inrPath ...)
+  have hnat : Path.trans inlP gl2 = Path.trans gl1 inrP := glue_natural p
+  have hrweq : RwEq (Path.trans inlP gl2) (Path.trans gl1 inrP) := rweq_of_eq hnat
+
+  -- LHS: trans (trans (inlPath ...) (glue c₂)) (symm (glue c₂)) ≈ inlPath ...
+  -- Using associativity, then inverse cancellation, then unit law
+  have h1 : RwEq (Path.trans (Path.trans inlP gl2) (Path.symm gl2)) inlP := by
+    apply rweq_trans (rweq_tt inlP gl2 (Path.symm gl2))
+    apply rweq_trans (rweq_trans_congr_right inlP (rweq_cmpA_inv_right gl2))
+    exact rweq_cmpA_refl_right inlP
+
+  -- RHS: trans (trans (glue c₁) (inrPath ...)) (symm (glue c₂)) ≈ trans (glue c₁) (trans (inrPath ...) (symm ...))
+  have h2 : RwEq (Path.trans (Path.trans gl1 inrP) (Path.symm gl2))
+                 (Path.trans gl1 (Path.trans inrP (Path.symm gl2))) :=
+    rweq_tt gl1 inrP (Path.symm gl2)
+
+  -- Using hrweq, compose with symm (glue c₂) on the right
+  have h3 : RwEq (Path.trans (Path.trans inlP gl2) (Path.symm gl2))
+                 (Path.trans (Path.trans gl1 inrP) (Path.symm gl2)) :=
+    rweq_trans_congr_left (Path.symm gl2) hrweq
+
+  -- Chain: inlPath ≈ LHS (by h1⁻¹) ≈ RHS (by h3) ≈ target (by h2)
+  apply rweq_trans (rweq_symm h1)
+  apply rweq_trans h3
+  exact h2
 
 /-- Glue naturality for loops: For a loop p at c₀, inlPath(f*(p)) equals
 glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹ up to RwEq. This is the key fact for SVK. -/

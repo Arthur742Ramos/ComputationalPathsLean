@@ -453,8 +453,15 @@ noncomputable def decodePath (g : Nat) :
   | FreeGroupWord.cons gen pow rest =>
       Path.trans (decodeGen g gen pow) (decodePath g rest)
 
+/-- decodeGen for zero. -/
+@[simp] theorem decodeGen_zero (g : Nat) (i : Fin' (2 * g)) :
+    decodeGen g i 0 = Path.refl (base g) := rfl
+
 /-- Integer power addition law for decoded generators:
-    loop^m ∘ loop^n ≈ loop^(m+n). -/
+    loop^m ∘ loop^n ≈ loop^(m+n).
+
+This requires case analysis on signs of m and n with cancellation for mixed signs.
+The proof is complex due to the recursive structure of decodeGen and kept as an axiom. -/
 axiom decodeGen_add (g : Nat) (i : Fin' (2 * g)) (m n : Int) :
     RwEq (Path.trans (decodeGen g i m) (decodeGen g i n)) (decodeGen g i (m + n))
 
