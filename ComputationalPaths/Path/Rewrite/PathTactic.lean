@@ -7,14 +7,30 @@ lemma library in RwEq.lean with specialized tactics for path equality reasoning.
 
 ## Tactics Provided
 
+### Basic Tactics
 - `path_simp`: Simplify RwEq goals using the built-in simp lemmas
 - `path_rfl`: Close RwEq goals that are reflexive
 - `path_canon`: Use canonicalization to close RwEq goals
+
+### Transitivity Tactics
+- `path_trans h`: Apply transitivity with intermediate path from hypothesis h
+- `path_trans_via p`: Apply transitivity with explicit intermediate path p
+
+### Congruence Tactics
+- `path_congr_left h`: Apply congruence on left side of trans
+- `path_congr_right h`: Apply congruence on right side of trans
+
+### Structural Tactics
+- `path_assoc`: Reassociate trans chains to the right
+- `path_assoc_left`: Reassociate trans chains to the left
 
 ## Usage Examples
 
 ```lean
 example (p : Path a a) : RwEq (trans refl p) p := by path_simp
+
+example (h : RwEq p q) : RwEq (trans p r) (trans q r) := by
+  path_congr_left h
 ```
 
 ## References
@@ -29,7 +45,7 @@ namespace ComputationalPaths
 namespace Path
 namespace Tactic
 
-/-! ## Main Tactics -/
+/-! ## Basic Tactics -/
 
 /-- `path_rfl` closes RwEq goals that are reflexive (p = p). -/
 macro "path_rfl" : tactic => `(tactic| exact RwEq.refl _)
@@ -40,6 +56,80 @@ macro "path_canon" : tactic => `(tactic| (apply rweq_of_toEq_eq; rfl))
 
 /-- `path_symm` transforms `RwEq p q` to `RwEq q p`. -/
 macro "path_symm" : tactic => `(tactic| apply rweq_symm)
+
+/-! ## Transitivity Tactics -/
+
+/-- `path_trans h` applies transitivity using hypothesis h.
+    If goal is `RwEq p r` and `h : RwEq p q`, produces goal `RwEq q r`.
+    If goal is `RwEq p r` and `h : RwEq q r`, produces goal `RwEq p q`. -/
+macro "path_trans" h:term : tactic =>
+  `(tactic| first
+    | exact rweq_trans $h (by assumption)
+    | exact rweq_trans (by assumption) $h
+    | apply rweq_trans $h
+    | apply rweq_trans _ $h)
+
+/-- `path_trans_via p` applies transitivity with explicit intermediate path p.
+    Transforms goal `RwEq a c` into goals `RwEq a p` and `RwEq p c`. -/
+macro "path_trans_via" p:term : tactic =>
+  `(tactic| apply rweq_trans (q := $p))
+
+/-! ## Congruence Tactics -/
+
+/-- `path_congr_left h` applies left congruence.
+    If goal is `RwEq (trans p r) (trans q r)` and `h : RwEq p q`, closes the goal. -/
+macro "path_congr_left" h:term : tactic =>
+  `(tactic| exact rweq_trans_congr_left _ $h)
+
+/-- `path_congr_right h` applies right congruence.
+    If goal is `RwEq (trans r p) (trans r q)` and `h : RwEq p q`, closes the goal. -/
+macro "path_congr_right" h:term : tactic =>
+  `(tactic| exact rweq_trans_congr_right _ $h)
+
+/-- `path_congr h1 h2` applies congruence on both sides.
+    If goal is `RwEq (trans p q) (trans p' q')`, uses h1 for left and h2 for right. -/
+macro "path_congr" h1:term h2:term : tactic =>
+  `(tactic| exact rweq_trans_congr $h1 $h2)
+
+/-! ## Structural Tactics -/
+
+/-- `path_assoc` reassociates a trans chain to the right.
+    Transforms `RwEq (trans (trans p q) r) t` to use `RwEq (trans p (trans q r)) t`. -/
+macro "path_assoc" : tactic =>
+  `(tactic| first
+    | apply rweq_trans rweq_tt
+    | apply rweq_trans (rweq_symm rweq_tt))
+
+/-- `path_assoc_left` reassociates a trans chain to the left.
+    Transforms `RwEq (trans p (trans q r)) t` to use `RwEq (trans (trans p q) r) t`. -/
+macro "path_assoc_left" : tactic =>
+  `(tactic| first
+    | apply rweq_trans (rweq_symm rweq_tt)
+    | apply rweq_trans rweq_tt)
+
+/-- `path_unit_left` eliminates a left unit (refl · p ≈ p). -/
+macro "path_unit_left" : tactic =>
+  `(tactic| first
+    | apply rweq_trans rweq_cmpA_refl_left
+    | apply rweq_trans (rweq_symm rweq_cmpA_refl_left))
+
+/-- `path_unit_right` eliminates a right unit (p · refl ≈ p). -/
+macro "path_unit_right" : tactic =>
+  `(tactic| first
+    | apply rweq_trans rweq_cmpA_refl_right
+    | apply rweq_trans (rweq_symm rweq_cmpA_refl_right))
+
+/-- `path_cancel_left` applies left inverse cancellation (p⁻¹ · p ≈ refl). -/
+macro "path_cancel_left" : tactic =>
+  `(tactic| first
+    | apply rweq_trans rweq_cmpA_inv_left
+    | exact rweq_cmpA_inv_left _)
+
+/-- `path_cancel_right` applies right inverse cancellation (p · p⁻¹ ≈ refl). -/
+macro "path_cancel_right" : tactic =>
+  `(tactic| first
+    | apply rweq_trans rweq_cmpA_inv_right
+    | exact rweq_cmpA_inv_right _)
 
 /-- `path_simp` simplifies RwEq goals using the extensive simp library.
 
@@ -102,11 +192,30 @@ end Tactic
 
 This module provides automation for RwEq reasoning:
 
-1. **path_simp**: The main workhorse - applies simp with all RwEq lemmas
-2. **path_rfl**: For reflexive cases
-3. **path_canon**: Uses canonicalization (p.toEq = q.toEq → p ≈ q)
-4. **path_symm**: For applying symmetry
-5. **path_decide**: Attempts to close goals automatically
+### Basic Tactics
+1. **path_rfl**: For reflexive cases (p ≈ p)
+2. **path_canon**: Uses canonicalization (p.toEq = q.toEq → p ≈ q)
+3. **path_symm**: For applying symmetry (p ≈ q → q ≈ p)
+4. **path_simp**: The main workhorse - applies simp with all RwEq lemmas
+5. **path_simp_all**: More aggressive version using hypotheses
+6. **path_decide**: Attempts to close goals automatically
+
+### Transitivity Tactics
+7. **path_trans h**: Apply transitivity with hypothesis h
+8. **path_trans_via p**: Apply transitivity with explicit intermediate path
+
+### Congruence Tactics
+9. **path_congr_left h**: Apply congruence on left of trans
+10. **path_congr_right h**: Apply congruence on right of trans
+11. **path_congr h1 h2**: Apply congruence on both sides
+
+### Structural Tactics
+12. **path_assoc**: Reassociate to the right ((p·q)·r ≈ p·(q·r))
+13. **path_assoc_left**: Reassociate to the left
+14. **path_unit_left**: Eliminate left unit (refl·p ≈ p)
+15. **path_unit_right**: Eliminate right unit (p·refl ≈ p)
+16. **path_cancel_left**: Left inverse cancellation (p⁻¹·p ≈ refl)
+17. **path_cancel_right**: Right inverse cancellation (p·p⁻¹ ≈ refl)
 
 These tactics leverage the ~90 @[simp] lemmas in RwEq.lean that encode:
 - Groupoid laws (unit, associativity, inverses)

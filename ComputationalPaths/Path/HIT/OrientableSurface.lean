@@ -457,11 +457,234 @@ noncomputable def decodePath (g : Nat) :
 @[simp] theorem decodeGen_zero (g : Nat) (i : Fin' (2 * g)) :
     decodeGen g i 0 = Path.refl (base g) := rfl
 
-/-- Integer power addition law for decoded generators:
-    loop^m ∘ loop^n ≈ loop^(m+n).
+/-- Helper: Natural number iteration of a loop (1-indexed).
+    loopIter l 0 = l, loopIter l (n+1) = trans (loopIter l n) l -/
+@[reducible] noncomputable def loopIter {A : Type u} {a : A} (l : Path a a) : Nat → Path a a :=
+  fun n => Nat.recOn n l (fun _ acc => Path.trans acc l)
 
-This requires case analysis on signs of m and n with cancellation for mixed signs.
-The proof is complex due to the recursive structure of decodeGen and kept as an axiom. -/
+@[simp] theorem loopIter_zero {A : Type u} {a : A} (l : Path a a) :
+    loopIter l 0 = l := rfl
+
+@[simp] theorem loopIter_succ {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+    loopIter l (Nat.succ n) = Path.trans (loopIter l n) l := rfl
+
+/-- loopIter m · loopIter n ≈ loopIter (m+n) · l -/
+theorem loopIter_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
+    RwEq (Path.trans (loopIter l m) (loopIter l n))
+         (Path.trans (loopIter l (m + n)) l) := by
+  induction n with
+  | zero =>
+    simp only [loopIter, Nat.add_zero]
+    exact RwEq.refl _
+  | succ n ih =>
+    simp only [loopIter, Nat.add_succ]
+    apply rweq_trans (rweq_symm (rweq_tt (loopIter l m) (loopIter l n) l))
+    exact rweq_trans_congr_left l ih
+
+/-- decodeGen for positive integers uses loopIter. -/
+theorem decodeGen_pos (g : Nat) (i : Fin' (2 * g)) (n : Nat) :
+    decodeGen g i (Int.ofNat (n + 1)) = loopIter (generatorLoop g i) n := rfl
+
+/-- decodeGen for negative integers uses loopIter of inverse. -/
+theorem decodeGen_neg (g : Nat) (i : Fin' (2 * g)) (n : Nat) :
+    decodeGen g i (Int.negSucc n) = loopIter (Path.symm (generatorLoop g i)) n := rfl
+
+/-- Cancellation: l · l⁻¹ ≈ refl -/
+theorem loop_cancel_right {A : Type u} {a : A} (l : Path a a) :
+    RwEq (Path.trans l (Path.symm l)) (Path.refl a) := rweq_cmpA_inv_right l
+
+/-- Cancellation: l⁻¹ · l ≈ refl -/
+theorem loop_cancel_left {A : Type u} {a : A} (l : Path a a) :
+    RwEq (Path.trans (Path.symm l) l) (Path.refl a) := rweq_cmpA_inv_left l
+
+/-- Helper: l · (l^{-1})^{n+2} ≈ (l^{-1})^{n+1}, i.e., one cancellation on the left. -/
+theorem loopIter_symm_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+    RwEq (Path.trans l (loopIter (Path.symm l) (n + 1)))
+         (loopIter (Path.symm l) n) := by
+  -- loopIter (symm l) (n+1) = trans (loopIter (symm l) n) (symm l)
+  -- trans l (trans (loopIter (symm l) n) (symm l))
+  -- ≈ trans (trans l (loopIter (symm l) n)) (symm l)  [by tt]
+  -- Need: trans l (loopIter (symm l) n) ≈ trans (loopIter (symm l) n) ?
+  -- Actually let me expand more carefully.
+  --
+  -- loopIter (symm l) 0 = symm l
+  -- loopIter (symm l) 1 = trans (symm l) (symm l)
+  -- loopIter (symm l) (n+1) = trans (loopIter (symm l) n) (symm l)
+  --
+  -- trans l (loopIter (symm l) (n+1)) = trans l (trans (loopIter (symm l) n) (symm l))
+  -- Goal: ≈ loopIter (symm l) n
+  --
+  -- For n = 0:
+  -- trans l (trans (symm l) (symm l))
+  -- ≈ trans (trans l (symm l)) (symm l)  [by tt^{-1}]
+  -- ≈ trans refl (symm l)  [by cancel]
+  -- ≈ symm l  [by refl_left]
+  -- = loopIter (symm l) 0 ✓
+  --
+  -- For general n, by induction:
+  -- trans l (trans (loopIter (symm l) n) (symm l))
+  -- ≈ trans (trans l (loopIter (symm l) n)) (symm l)  [by tt^{-1}]
+  --
+  -- Now I need: trans l (loopIter (symm l) n) ≈ loopIter (symm l) (n-1) for n ≥ 1
+  -- Or: trans l (loopIter (symm l) 0) = trans l (symm l) ≈ refl for n = 0
+  --
+  -- So this is also by induction!
+  -- Base: n = 0
+  --   trans l (loopIter (symm l) 1)
+  --   = trans l (trans (symm l) (symm l))
+  --   ≈ trans (trans l (symm l)) (symm l)
+  --   ≈ trans refl (symm l)
+  --   ≈ symm l
+  --   = loopIter (symm l) 0 ✓
+  --
+  -- Step: assuming trans l (loopIter (symm l) (n+1)) ≈ loopIter (symm l) n,
+  --       prove trans l (loopIter (symm l) (n+2)) ≈ loopIter (symm l) (n+1)
+  --
+  -- trans l (loopIter (symm l) (n+2))
+  -- = trans l (trans (loopIter (symm l) (n+1)) (symm l))
+  -- ≈ trans (trans l (loopIter (symm l) (n+1))) (symm l)  [by tt^{-1}]
+  -- ≈ trans (loopIter (symm l) n) (symm l)  [by IH]
+  -- = loopIter (symm l) (n+1) ✓
+  induction n with
+  | zero =>
+    -- trans l (loopIter (symm l) 1) ≈ loopIter (symm l) 0
+    -- = trans l (trans (symm l) (symm l)) ≈ symm l
+    apply rweq_trans (rweq_symm (rweq_tt l (Path.symm l) (Path.symm l)))
+    apply rweq_trans (rweq_trans_congr_left (Path.symm l) (loop_cancel_right l))
+    exact rweq_cmpA_refl_left (Path.symm l)
+  | succ n ih =>
+    -- trans l (loopIter (symm l) (n+2)) ≈ loopIter (symm l) (n+1)
+    -- = trans l (trans (loopIter (symm l) (n+1)) (symm l))
+    apply rweq_trans (rweq_symm (rweq_tt l (loopIter (Path.symm l) (n + 1)) (Path.symm l)))
+    -- = trans (trans l (loopIter (symm l) (n+1))) (symm l)
+    apply rweq_trans_congr_left (Path.symm l) ih
+    -- = trans (loopIter (symm l) n) (symm l) = loopIter (symm l) (n+1)
+
+/-- Symmetric helper: (l)^{n+2} · l^{-1} ≈ l^{n+1}, i.e., one cancellation on the right. -/
+theorem loopIter_cancel_r {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+    RwEq (Path.trans (loopIter l (n + 1)) (Path.symm l))
+         (loopIter l n) := by
+  -- loopIter l (n+1) = trans (loopIter l n) l
+  -- trans (trans (loopIter l n) l) (symm l)
+  -- ≈ trans (loopIter l n) (trans l (symm l))  [by tt]
+  -- ≈ trans (loopIter l n) refl  [by cancel]
+  -- ≈ loopIter l n  [by refl_right]
+  apply rweq_trans (rweq_tt (loopIter l n) l (Path.symm l))
+  apply rweq_trans (rweq_trans_congr_right (loopIter l n) (loop_cancel_right l))
+  exact rweq_cmpA_refl_right (loopIter l n)
+
+/-- Symmetric helper: l^{-1} · l^{n+2} ≈ l^{n+1}. -/
+theorem loopIter_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+    RwEq (Path.trans (Path.symm l) (loopIter l (n + 1)))
+         (loopIter l n) := by
+  induction n with
+  | zero =>
+    apply rweq_trans (rweq_symm (rweq_tt (Path.symm l) l l))
+    apply rweq_trans (rweq_trans_congr_left l (loop_cancel_left l))
+    exact rweq_cmpA_refl_left l
+  | succ n ih =>
+    apply rweq_trans (rweq_symm (rweq_tt (Path.symm l) (loopIter l (n + 1)) l))
+    apply rweq_trans_congr_left l ih
+
+/-- Now prove the equal case properly -/
+theorem loopIter_cancel_eq' {A : Type u} {a : A} (l : Path a a) (m : Nat) :
+    RwEq (Path.trans (loopIter l m) (loopIter (Path.symm l) m)) (Path.refl a) := by
+  induction m with
+  | zero => exact loop_cancel_right l
+  | succ m ih =>
+    -- trans (loopIter l (m+1)) (loopIter (symm l) (m+1))
+    -- = trans (trans (loopIter l m) l) (loopIter (symm l) (m+1))
+    -- ≈ trans (loopIter l m) (trans l (loopIter (symm l) (m+1)))  [by tt]
+    -- ≈ trans (loopIter l m) (loopIter (symm l) m)  [by loopIter_symm_cancel_l]
+    -- ≈ refl  [by ih]
+    apply rweq_trans (rweq_tt (loopIter l m) l (loopIter (Path.symm l) (m + 1)))
+    apply rweq_trans (rweq_trans_congr_right (loopIter l m) (loopIter_symm_cancel_l l m))
+    exact ih
+
+/-- Cancellation when m > n: loopIter l m · loopIter l⁻¹ n ≈ loopIter l (m - n - 1).
+    This represents l^{m+1} · l^{-(n+1)} = l^{m-n} when m > n. -/
+theorem loopIter_cancel_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m > n) :
+    RwEq (Path.trans (loopIter l m) (loopIter (Path.symm l) n))
+         (loopIter l (m - n - 1)) := by
+  induction n generalizing m with
+  | zero =>
+    -- m > 0, so m = m' + 1 for some m'
+    -- trans (loopIter l m) (loopIter (symm l) 0)
+    -- = trans (loopIter l m) (symm l)
+    -- We need m > 0, so m ≥ 1, meaning loopIter l m = loopIter l (m' + 1) for m' = m - 1
+    -- trans (loopIter l (m'+1)) (symm l) ≈ loopIter l m'  [by loopIter_cancel_r]
+    -- And m - 0 - 1 = m - 1 = m'
+    have hm : m ≥ 1 := h
+    obtain ⟨m', hm'⟩ : ∃ m', m = m' + 1 := ⟨m - 1, by omega⟩
+    rw [hm']
+    have hsub : m' + 1 - 0 - 1 = m' := by omega
+    rw [hsub]
+    exact loopIter_cancel_r l m'
+  | succ n ih =>
+    -- m > n + 1, so m > n
+    have h' : m > n := Nat.lt_of_succ_lt h
+    -- trans (loopIter l m) (loopIter (symm l) (n+1))
+    -- = trans (loopIter l m) (trans (loopIter (symm l) n) (symm l))
+    -- ≈ trans (trans (loopIter l m) (loopIter (symm l) n)) (symm l)  [by tt^{-1}]
+    -- ≈ trans (loopIter l (m - n - 1)) (symm l)  [by ih with h']
+    -- Need: m - n - 1 > 0 since m > n + 1 means m ≥ n + 2, so m - n - 1 ≥ 1
+    -- So loopIter l (m - n - 1) = loopIter l (k + 1) for k = m - n - 2
+    -- trans (loopIter l (k+1)) (symm l) ≈ loopIter l k  [by loopIter_cancel_r]
+    -- And m - (n+1) - 1 = m - n - 2 = k
+    apply rweq_trans (rweq_symm (rweq_tt (loopIter l m) (loopIter (Path.symm l) n) (Path.symm l)))
+    apply rweq_trans (rweq_trans_congr_left (Path.symm l) (ih m h'))
+    have hk : m - n - 1 ≥ 1 := by omega
+    obtain ⟨k, hk'⟩ : ∃ k, m - n - 1 = k + 1 := ⟨m - n - 2, by omega⟩
+    rw [hk']
+    have heq : m - (n + 1) - 1 = k := by omega
+    rw [heq]
+    exact loopIter_cancel_r l k
+
+/-- Cancellation when m < n: loopIter l m · loopIter l⁻¹ n ≈ loopIter l⁻¹ (n - m - 1).
+    This represents l^{m+1} · l^{-(n+1)} = l^{-(n-m)} when m < n. -/
+theorem loopIter_cancel_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m < n) :
+    RwEq (Path.trans (loopIter l m) (loopIter (Path.symm l) n))
+         (loopIter (Path.symm l) (n - m - 1)) := by
+  induction m generalizing n with
+  | zero =>
+    -- n > 0, so n = n' + 1
+    -- trans (loopIter l 0) (loopIter (symm l) n)
+    -- = trans l (loopIter (symm l) n)
+    -- We need n > 0, so n ≥ 1
+    have hn : n ≥ 1 := h
+    obtain ⟨n', hn'⟩ : ∃ n', n = n' + 1 := ⟨n - 1, by omega⟩
+    rw [hn']
+    have hsub : n' + 1 - 0 - 1 = n' := by omega
+    rw [hsub]
+    exact loopIter_symm_cancel_l l n'
+  | succ m ih =>
+    -- m + 1 < n, so m < n and m + 1 ≤ n - 1, meaning n ≥ m + 2
+    have h' : m < n := Nat.lt_of_succ_lt h
+    have hn : n ≥ m + 2 := h
+    obtain ⟨n', hn'⟩ : ∃ n', n = n' + 1 := ⟨n - 1, by omega⟩
+    rw [hn']
+    -- trans (loopIter l (m+1)) (loopIter (symm l) (n'+1))
+    -- = trans (trans (loopIter l m) l) (loopIter (symm l) (n'+1))
+    -- ≈ trans (loopIter l m) (trans l (loopIter (symm l) (n'+1)))  [by tt]
+    -- ≈ trans (loopIter l m) (loopIter (symm l) n')  [by loopIter_symm_cancel_l]
+    apply rweq_trans (rweq_tt (loopIter l m) l (loopIter (Path.symm l) (n' + 1)))
+    apply rweq_trans (rweq_trans_congr_right (loopIter l m) (loopIter_symm_cancel_l l n'))
+    -- Now: trans (loopIter l m) (loopIter (symm l) n') ≈ loopIter (symm l) (n' - m - 1)
+    -- We have m < n' + 1, so m ≤ n', meaning either m < n' or m = n'
+    have h'' : m ≤ n' := by omega
+    cases Nat.eq_or_lt_of_le h'' with
+    | inl heq =>
+      -- m = n' is impossible since we have m + 1 < n = n' + 1, meaning m < n'
+      -- So m ≠ n'. This case is unreachable.
+      omega
+    | inr hlt =>
+      -- m < n'
+      have goal_eq : n' + 1 - (m + 1) - 1 = n' - m - 1 := by omega
+      rw [goal_eq]
+      exact ih n' hlt
+
+/-- Integer power addition law for decoded generators:
+    loop^m ∘ loop^n ≈ loop^(m+n). -/
 axiom decodeGen_add (g : Nat) (i : Fin' (2 * g)) (m n : Int) :
     RwEq (Path.trans (decodeGen g i m) (decodeGen g i n)) (decodeGen g i (m + n))
 
