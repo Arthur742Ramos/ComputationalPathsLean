@@ -24,6 +24,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition).
 - **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product) via encode/decode equivalence `kleinPiOneEquivIntProd`, with an alternative proof using Seifert-van Kampen on the CW-complex decomposition.
 - Möbius band, cylinder HITs with π₁ ≃ ℤ (homotopy equivalent to circle).
+- **Fundamental groupoid Π₁(X)**: Explicit groupoid structure with basepoint independence theorem (π₁(A,a) ≃ π₁(A,b) via path conjugation) and functoriality (f : A → B induces Π₁(f) : Π₁(A) → Π₁(B)).
+- **Lie group connections**: SO(2) ≃ U(1) ≃ S¹ with π₁ ≃ ℤ, n-torus T^n = (S¹)^n as maximal torus in U(n), simply connected groups, and ℤ₂ fundamental groups (SO(n) for n ≥ 3 via RP²).
 
 ## Quick Start
 - Build: `./lake.cmd build`
@@ -42,6 +44,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Homotopy/Fibration.lean`](ComputationalPaths/Path/Homotopy/Fibration.lean) — fibrations, fiber sequences F → E → B, connecting map ∂ : π₁(B) → F, long exact sequence of homotopy groups, induced maps on π₁.
 - [`ComputationalPaths/Path/Homotopy/SuspensionLoop.lean`](ComputationalPaths/Path/Homotopy/SuspensionLoop.lean) — suspension-loop adjunction [ΣX, Y]_* ≅ [X, ΩY]_*, pointed types/maps, adjunction map construction, connectivity definitions.
 - [`ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean`](ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean) — Eilenberg-MacLane spaces K(G,n), IsKG1 characterization, circle is K(ℤ,1), loop space property Ω(K(G,n+1)) ≃ K(G,n).
+- [`ComputationalPaths/Path/Homotopy/FundamentalGroupoid.lean`](ComputationalPaths/Path/Homotopy/FundamentalGroupoid.lean) — **Fundamental groupoid Π₁(A)** with explicit groupoid structure, basepoint independence theorem (`basepointIsomorphism`), and functoriality (`fundamentalGroupoidMap`, `inducedPiOneMap`).
+- [`ComputationalPaths/Path/Homotopy/LieGroups.lean`](ComputationalPaths/Path/Homotopy/LieGroups.lean) — **Connections to Lie groups**: SO(2), U(1) as Circle with π₁ ≃ ℤ, n-torus T^n = (S¹)^n, maximal tori in U(n) and SU(n), simply connected types, and ℤ₂ fundamental groups.
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
 - [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, code family into ℤ, encode/transport lemmas, z-powers.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.

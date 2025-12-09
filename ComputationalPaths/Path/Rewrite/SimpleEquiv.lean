@@ -147,6 +147,39 @@ instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
     simpa [SimpleEquiv.comp, SimpleEquiv.symm, SimpleEquiv.refl]
       using e.left_inv y
 
+/-- Transitivity of equivalences (alias for comp). -/
+@[simp] def trans (e : SimpleEquiv α β) (f : SimpleEquiv β γ) :
+    SimpleEquiv α γ := comp e f
+
+/-- Product of two equivalences. -/
+@[simp] def prodBoth' {α' β' γ' δ' : Type u}
+    (e : SimpleEquiv α' β') (f : SimpleEquiv γ' δ') :
+    SimpleEquiv (α' × γ') (β' × δ') where
+  toFun := fun (a, c) => (e a, f c)
+  invFun := fun (b, d) => (e.invFun b, f.invFun d)
+  left_inv := by
+    intro (a, c)
+    simp [e.left_inv a, f.left_inv c]
+  right_inv := by
+    intro (b, d)
+    simp [e.right_inv b, f.right_inv d]
+
+/-- Equivalence on the left component of a product. -/
+@[simp] def prodLeft' {α' γ' : Type u} (β' : Type u) (e : SimpleEquiv α' γ') :
+    SimpleEquiv (α' × β') (γ' × β') where
+  toFun := fun (a, b) => (e a, b)
+  invFun := fun (c, b) => (e.invFun c, b)
+  left_inv := by intro (a, b); simp [e.left_inv a]
+  right_inv := by intro (c, b); simp [e.right_inv c]
+
+/-- Equivalence on the right component of a product. -/
+@[simp] def prodRight' {β' δ' : Type u} (α' : Type u) (e : SimpleEquiv β' δ') :
+    SimpleEquiv (α' × β') (α' × δ') where
+  toFun := fun (a, b) => (a, e b)
+  invFun := fun (a, d) => (a, e.invFun d)
+  left_inv := by intro (a, b); simp [e.left_inv b]
+  right_inv := by intro (a, d); simp [e.right_inv d]
+
 end SimpleEquiv
 
 end Path

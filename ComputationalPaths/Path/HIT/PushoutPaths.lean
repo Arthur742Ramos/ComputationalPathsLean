@@ -465,12 +465,6 @@ variable (hA : IsPathConnected A)
 variable (hB : IsPathConnected B)
 variable (hC : IsPathConnected C)
 
-/-- congrArg preserves RwEq (follows from Context.map preservation). -/
-theorem rweq_congrArg_of_rweq {A : Type u} {B : Type u} (f : A → B)
-    {a b : A} {p q : Path a b} (h : RwEq p q) :
-    RwEq (Path.congrArg f p) (Path.congrArg f q) :=
-  rweq_context_map_of_rweq ⟨f⟩ h
-
 /-- The induced map on fundamental groups: π₁(A) → π₁(Pushout). -/
 noncomputable def piOneInl :
     π₁(A, a₀) → π₁(Pushout A B C f g, Pushout.inl a₀) :=

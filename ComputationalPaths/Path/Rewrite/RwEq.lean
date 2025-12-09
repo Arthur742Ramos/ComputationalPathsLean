@@ -245,6 +245,20 @@ end RewriteLift
       (Path.symm (Path.congrArg f p)) :=
   rweq_of_eq (Path.congrArg_symm (f := f) (p := p))
 
+/-- congrArg preserves RwEq: if p ≈ q then f*(p) ≈ f*(q). -/
+@[simp] theorem rweq_congrArg_of_rweq {B : Type u} (f : A → B)
+    {a b : A} {p q : Path a b} (h : RwEq p q) :
+    RwEq (Path.congrArg f p) (Path.congrArg f q) := by
+  let Ctx : Context A B := ⟨f⟩
+  change RwEq (Context.map (A := A) (B := B) Ctx p)
+    (Context.map (A := A) (B := B) Ctx q)
+  exact rweq_context_map_of_rweq (A := A) (B := B) (Ctx := Ctx) (p := p) (q := q) h
+
+/-- congrArg on refl is refl. -/
+@[simp] theorem rweq_congrArg_refl {B : Type u} (f : A → B) (a : A) :
+    RwEq (Path.congrArg f (Path.refl a)) (Path.refl (f a)) :=
+  rweq_refl _
+
 @[simp] theorem rweq_mapLeft_trans {B : Type v} {C : Type w}
     {a1 a2 a3 : A} (f : A → B → C)
     (p : Path a1 a2) (q : Path a2 a3) (b : B) :

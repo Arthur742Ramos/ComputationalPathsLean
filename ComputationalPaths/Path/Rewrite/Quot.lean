@@ -458,6 +458,67 @@ instance rwQuot_subsingleton (A : Type u) (a b : A) :
     Subsingleton.elim _ _
   exact PathRwQuot.eq_of_toEq_eq (A := A) (a := a) (b := b) hxEq
 
+/-! ## Functorial operations (congrArg) -/
+
+/-- Apply a function to a quotient path (functorial action). -/
+def congrArg (A : Type u) (B : Type u) (f : A → B) {a a' : A}
+    (x : PathRwQuot A a a') : PathRwQuot B (f a) (f a') :=
+  Quot.lift
+    (fun p => Quot.mk _ (Path.congrArg f p))
+    (fun _ _ h => Quot.sound (rweq_congrArg_of_rweq f h))
+    x
+
+@[simp] theorem congrArg_mk (A : Type u) (B : Type u) (f : A → B) {a a' : A}
+    (p : Path a a') :
+    congrArg A B f (Quot.mk _ p) = Quot.mk _ (Path.congrArg f p) := rfl
+
+@[simp] theorem congrArg_refl (A : Type u) (B : Type u) (f : A → B) (a : A) :
+    congrArg A B f (refl a) = refl (f a) := by
+  change Quot.mk _ (Path.congrArg f (Path.refl a)) = Quot.mk _ (Path.refl (f a))
+  rfl
+
+@[simp] theorem congrArg_trans (A : Type u) (B : Type u) (f : A → B) {a b c : A}
+    (x : PathRwQuot A a b) (y : PathRwQuot A b c) :
+    congrArg A B f (trans x y) = trans (congrArg A B f x) (congrArg A B f y) := by
+  induction x using Quot.ind with
+  | _ p =>
+    induction y using Quot.ind with
+    | _ q =>
+      change Quot.mk _ (Path.congrArg f (Path.trans p q)) =
+        Quot.mk _ (Path.trans (Path.congrArg f p) (Path.congrArg f q))
+      apply Quot.sound
+      exact rweq_of_eq (Path.congrArg_trans f p q)
+
+@[simp] theorem congrArg_symm (A : Type u) (B : Type u) (f : A → B) {a b : A}
+    (x : PathRwQuot A a b) :
+    congrArg A B f (symm x) = symm (congrArg A B f x) := by
+  induction x using Quot.ind with
+  | _ p =>
+    change Quot.mk _ (Path.congrArg f (Path.symm p)) =
+      Quot.mk _ (Path.symm (Path.congrArg f p))
+    apply Quot.sound
+    exact rweq_of_eq (Path.congrArg_symm f p)
+
+/-- Identity function preserves paths. -/
+@[simp] theorem congrArg_id (A : Type u) (a a' : A) (x : PathRwQuot A a a') :
+    congrArg A A id x = x := by
+  induction x using Quot.ind with
+  | _ p =>
+    change Quot.mk _ (Path.congrArg id p) = Quot.mk _ p
+    apply Quot.sound
+    exact rweq_of_eq (Path.congrArg_id p)
+
+/-- Composition of functions composes on paths. -/
+@[simp] theorem congrArg_comp (A : Type u) (B : Type u) (C : Type u)
+    (f : A → B) (g : B → C) {a a' : A} (x : PathRwQuot A a a') :
+    congrArg B C g (congrArg A B f x) = congrArg A C (g ∘ f) x := by
+  induction x using Quot.ind with
+  | _ p =>
+    change Quot.mk _ (Path.congrArg g (Path.congrArg f p)) =
+      Quot.mk _ (Path.congrArg (g ∘ f) p)
+    apply Quot.sound
+    exact rweq_symm (rweq_of_eq (Path.congrArg_comp g f p))
+
 end PathRwQuot
 
 namespace PathRwQuot

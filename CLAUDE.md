@@ -299,6 +299,8 @@ lake clean
 | `ProjectivePlane.lean` | `projectivePiOneEquivZ2` | π₁(RP²) ≃ ℤ₂ |
 | `PushoutPaths.lean` | `seifertVanKampenEquiv` | π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) |
 | `OmegaGroupoid.lean` | `compPathOmegaGroupoid` | Types are weak ω-groupoids |
+| `FundamentalGroupoid.lean` | `basepointIsomorphism` | π₁(A, a) ≃ π₁(A, b) via path conjugation |
+| `LieGroups.lean` | `SO2.piOneEquivInt` | π₁(SO(2)) ≃ ℤ (via Circle) |
 
 ## Common Pitfalls
 
