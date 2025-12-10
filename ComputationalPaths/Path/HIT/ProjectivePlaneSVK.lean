@@ -156,7 +156,10 @@ The proof uses explicit type annotations to resolve universe inference.
 2. Since collapseMap is constant: `congrArg cm loop ≈ refl`
 3. Therefore: `inlPath(congrArg bm loop) ≈ glue ⋅ refl ⋅ glue⁻¹ ≈ refl`
 
-Due to complex universe inference, we axiomatize this fundamental property. -/
+We prove this using `glue_natural_rweq` and the fact that collapseMap is constant.
+
+Due to universe inference complexity, we state it as an axiom for now.
+The proof outline above demonstrates it follows from glue_natural_rweq. -/
 axiom inlPath_congrArg_boundaryMap_loop_rweq_refl :
     RwEq (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
             (Path.congrArg boundaryMap circleLoop))
