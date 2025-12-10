@@ -432,6 +432,125 @@ noncomputable def generatorLoop (g : Nat) (i : Fin' (2 * g)) :
       else
         loopB (Nat.succ g') loopIdx
 
+/-! ### Helper lemmas connecting generator indices to loops
+
+These lemmas establish that:
+- aGenIdx maps to loopA via generatorLoop
+- bGenIdx maps to loopB via generatorLoop
+-/
+
+/-- The toNat of aGenIdx is 2*k. -/
+theorem aGenIdx_toNat (g k : Nat) (hk : k < g) :
+    (aGenIdx g k hk).toNat = 2 * k := by
+  simp only [aGenIdx]
+  revert hk
+  induction k generalizing g with
+  | zero =>
+    intro hk
+    simp only [Nat.mul_zero]
+    cases g with
+    | zero => exact absurd hk (Nat.not_lt_zero 0)
+    | succ g' => rfl
+  | succ k' ih =>
+    intro hk
+    cases g with
+    | zero => exact absurd hk (Nat.not_lt_zero _)
+    | succ g' =>
+      have hk' : k' < g' := by omega
+      -- 2*(k'+1) = 2*k' + 2
+      have h2k' : 2 * (k' + 1) = 2 * k' + 2 := by omega
+      simp only [h2k', Nat.mul_succ]
+      simp only [Fin'.ofNat, Fin'.toNat]
+      have ihapp := ih g' hk'
+      omega
+
+/-- The toNat of bGenIdx is 2*k+1. -/
+theorem bGenIdx_toNat (g k : Nat) (hk : k < g) :
+    (bGenIdx g k hk).toNat = 2 * k + 1 := by
+  simp only [bGenIdx]
+  revert hk
+  induction k generalizing g with
+  | zero =>
+    intro hk
+    simp only [Nat.mul_zero, Nat.zero_add]
+    cases g with
+    | zero => exact absurd hk (Nat.not_lt_zero 0)
+    | succ g' => rfl
+  | succ k' ih =>
+    intro hk
+    cases g with
+    | zero => exact absurd hk (Nat.not_lt_zero _)
+    | succ g' =>
+      have hk' : k' < g' := by omega
+      -- 2*(k'+1)+1 = 2*k'+3 = (2*k'+1) + 2
+      simp only [Nat.mul_succ]
+      simp only [Fin'.ofNat, Fin'.toNat]
+      have ihapp := ih g' hk'
+      omega
+
+/-- aGenIdx has even index. -/
+theorem isEvenIdx_aGenIdx (g k : Nat) (hk : k < g) :
+    Fin'.isEvenIdx (aGenIdx g k hk) = true := by
+  simp only [Fin'.isEvenIdx, Fin'.natIsEven]
+  have h := aGenIdx_toNat g k hk
+  rw [h]
+  have hmod : (2 * k) % 2 = 0 := by omega
+  simp only [hmod, beq_self_eq_true]
+
+/-- bGenIdx has odd index. -/
+theorem isEvenIdx_bGenIdx (g k : Nat) (hk : k < g) :
+    Fin'.isEvenIdx (bGenIdx g k hk) = false := by
+  simp only [Fin'.isEvenIdx, Fin'.natIsEven]
+  have h := bGenIdx_toNat g k hk
+  rw [h]
+  have hmod : (2 * k + 1) % 2 = 1 := by omega
+  simp only [hmod]
+  decide
+
+/-- halfIndex of aGenIdx is the original index. -/
+theorem halfIndex_aGenIdx (g k : Nat) (hk : k < g) :
+    Fin'.halfIndex g (aGenIdx g k hk) = Fin'.ofNat k g hk := by
+  simp only [Fin'.halfIndex, aGenIdx_toNat]
+  have hdiv : (2 * k) / 2 = k := by omega
+  simp only [hdiv]
+
+/-- halfIndex of bGenIdx is the original index. -/
+theorem halfIndex_bGenIdx (g k : Nat) (hk : k < g) :
+    Fin'.halfIndex g (bGenIdx g k hk) = Fin'.ofNat k g hk := by
+  simp only [Fin'.halfIndex, bGenIdx_toNat]
+  have hdiv : (2 * k + 1) / 2 = k := by omega
+  simp only [hdiv]
+
+/-- generatorLoop of aGenIdx is loopA. -/
+theorem generatorLoop_aGenIdx (g k : Nat) (hk : k < g) (hg : g > 0) :
+    generatorLoop g (aGenIdx g k hk) = loopA g (Fin'.ofNat k g hk) := by
+  cases g with
+  | zero => exact absurd hg (Nat.lt_irrefl 0)
+  | succ g' =>
+    simp only [generatorLoop]
+    have heven : Fin'.isEvenIdx (aGenIdx (Nat.succ g') k hk) = true :=
+      isEvenIdx_aGenIdx (Nat.succ g') k hk
+    simp only [heven, ↓reduceIte]
+    have hhalf : Fin'.halfIndex (Nat.succ g') (aGenIdx (Nat.succ g') k hk) =
+                 Fin'.ofNat k (Nat.succ g') hk :=
+      halfIndex_aGenIdx (Nat.succ g') k hk
+    rw [hhalf]
+
+/-- generatorLoop of bGenIdx is loopB. -/
+theorem generatorLoop_bGenIdx (g k : Nat) (hk : k < g) (hg : g > 0) :
+    generatorLoop g (bGenIdx g k hk) = loopB g (Fin'.ofNat k g hk) := by
+  cases g with
+  | zero => exact absurd hg (Nat.lt_irrefl 0)
+  | succ g' =>
+    simp only [generatorLoop]
+    have hodd : Fin'.isEvenIdx (bGenIdx (Nat.succ g') k hk) = false :=
+      isEvenIdx_bGenIdx (Nat.succ g') k hk
+    simp only [hodd, ↓reduceIte, Bool.false_eq_true]
+    have hhalf : Fin'.halfIndex (Nat.succ g') (bGenIdx (Nat.succ g') k hk) =
+                 Fin'.ofNat k (Nat.succ g') hk :=
+      halfIndex_bGenIdx (Nat.succ g') k hk
+    rw [hhalf]
+
 /-- More direct implementation: decode a single generator to a loop. -/
 noncomputable def decodeGen (g : Nat) (i : Fin' (2 * g)) (pow : Int) :
     Path (base g) (base g) :=
@@ -683,10 +802,196 @@ theorem loopIter_cancel_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : 
       rw [goal_eq]
       exact ih n' hlt
 
+/-- Helper: (l^{-1})^{n+2} · l ≈ (l^{-1})^{n+1}. -/
+theorem loopIter_symm_cancel_r {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+    RwEq (Path.trans (loopIter (Path.symm l) (n + 1)) l)
+         (loopIter (Path.symm l) n) := by
+  apply rweq_trans (rweq_tt (loopIter (Path.symm l) n) (Path.symm l) l)
+  apply rweq_trans (rweq_trans_congr_right (loopIter (Path.symm l) n) (loop_cancel_left l))
+  exact rweq_cmpA_refl_right (loopIter (Path.symm l) n)
+
+/-- Symmetric: (l^{-1})^m · l^m ≈ refl. -/
+theorem loopIter_symm_cancel_eq' {A : Type u} {a : A} (l : Path a a) (m : Nat) :
+    RwEq (Path.trans (loopIter (Path.symm l) m) (loopIter l m)) (Path.refl a) := by
+  induction m with
+  | zero => exact loop_cancel_left l
+  | succ m ih =>
+    apply rweq_trans (rweq_tt (loopIter (Path.symm l) m) (Path.symm l) (loopIter l (m + 1)))
+    apply rweq_trans (rweq_trans_congr_right (loopIter (Path.symm l) m) (loopIter_cancel_l l m))
+    exact ih
+
+/-- Symmetric: (l^{-1})^m · l^n ≈ (l^{-1})^{m-n-1} when m > n. -/
+theorem loopIter_symm_cancel_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m > n) :
+    RwEq (Path.trans (loopIter (Path.symm l) m) (loopIter l n))
+         (loopIter (Path.symm l) (m - n - 1)) := by
+  induction n generalizing m with
+  | zero =>
+    have hm : m ≥ 1 := h
+    obtain ⟨m', hm'⟩ : ∃ m', m = m' + 1 := ⟨m - 1, by omega⟩
+    rw [hm']
+    have hsub : m' + 1 - 0 - 1 = m' := by omega
+    rw [hsub]
+    exact loopIter_symm_cancel_r l m'
+  | succ n ih =>
+    have h' : m > n := Nat.lt_of_succ_lt h
+    apply rweq_trans (rweq_symm (rweq_tt (loopIter (Path.symm l) m) (loopIter l n) l))
+    apply rweq_trans (rweq_trans_congr_left l (ih m h'))
+    have hk : m - n - 1 ≥ 1 := by omega
+    obtain ⟨k, hk'⟩ : ∃ k, m - n - 1 = k + 1 := ⟨m - n - 2, by omega⟩
+    rw [hk']
+    have heq : m - (n + 1) - 1 = k := by omega
+    rw [heq]
+    exact loopIter_symm_cancel_r l k
+
+/-- Symmetric: (l^{-1})^m · l^n ≈ l^{n-m-1} when m < n. -/
+theorem loopIter_symm_cancel_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m < n) :
+    RwEq (Path.trans (loopIter (Path.symm l) m) (loopIter l n))
+         (loopIter l (n - m - 1)) := by
+  induction m generalizing n with
+  | zero =>
+    have hn : n ≥ 1 := h
+    obtain ⟨n', hn'⟩ : ∃ n', n = n' + 1 := ⟨n - 1, by omega⟩
+    rw [hn']
+    have hsub : n' + 1 - 0 - 1 = n' := by omega
+    rw [hsub]
+    exact loopIter_cancel_l l n'
+  | succ m ih =>
+    have h' : m < n := Nat.lt_of_succ_lt h
+    have hn : n ≥ m + 2 := h
+    obtain ⟨n', hn'⟩ : ∃ n', n = n' + 1 := ⟨n - 1, by omega⟩
+    rw [hn']
+    apply rweq_trans (rweq_tt (loopIter (Path.symm l) m) (Path.symm l) (loopIter l (n' + 1)))
+    apply rweq_trans (rweq_trans_congr_right (loopIter (Path.symm l) m) (loopIter_cancel_l l n'))
+    have h'' : m ≤ n' := by omega
+    cases Nat.eq_or_lt_of_le h'' with
+    | inl heq => omega
+    | inr hlt =>
+      have goal_eq : n' + 1 - (m + 1) - 1 = n' - m - 1 := by omega
+      rw [goal_eq]
+      exact ih n' hlt
+
+/-- loopIter for symm l also satisfies the add property. -/
+theorem loopIter_symm_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
+    RwEq (Path.trans (loopIter (Path.symm l) m) (loopIter (Path.symm l) n))
+         (Path.trans (loopIter (Path.symm l) (m + n)) (Path.symm l)) :=
+  loopIter_add (Path.symm l) m n
+
+/-- Helper: addition law when left is 0. -/
+theorem decodeGen_zero_left (g : Nat) (i : Fin' (2 * g)) (n : Int) :
+    RwEq (Path.trans (decodeGen g i 0) (decodeGen g i n)) (decodeGen g i n) := by
+  simp only [decodeGen_zero]
+  exact rweq_cmpA_refl_left (decodeGen g i n)
+
+/-- Helper: addition law when right is 0. -/
+theorem decodeGen_zero_right (g : Nat) (i : Fin' (2 * g)) (m : Int) :
+    RwEq (Path.trans (decodeGen g i m) (decodeGen g i 0)) (decodeGen g i m) := by
+  simp only [decodeGen_zero]
+  exact rweq_cmpA_refl_right (decodeGen g i m)
+
 /-- Integer power addition law for decoded generators:
     loop^m ∘ loop^n ≈ loop^(m+n). -/
-axiom decodeGen_add (g : Nat) (i : Fin' (2 * g)) (m n : Int) :
-    RwEq (Path.trans (decodeGen g i m) (decodeGen g i n)) (decodeGen g i (m + n))
+theorem decodeGen_add (g : Nat) (i : Fin' (2 * g)) (m n : Int) :
+    RwEq (Path.trans (decodeGen g i m) (decodeGen g i n)) (decodeGen g i (m + n)) := by
+  let l := generatorLoop g i
+  -- Case analysis on m
+  cases m with
+  | ofNat m_nat =>
+    cases m_nat with
+    | zero =>
+      -- m = 0: 0 + n = n
+      have h : Int.ofNat 0 + n = n := Int.zero_add n
+      rw [h]
+      exact decodeGen_zero_left g i n
+    | succ m' =>
+      -- m = m' + 1 > 0
+      cases n with
+      | ofNat n_nat =>
+        cases n_nat with
+        | zero =>
+          -- n = 0
+          have h : Int.ofNat (m' + 1) + Int.ofNat 0 = Int.ofNat (m' + 1) := Int.add_zero _
+          rw [h]
+          exact decodeGen_zero_right g i (Int.ofNat (m' + 1))
+        | succ n' =>
+          -- Both positive: (m'+1) + (n'+1) = m'+n'+2
+          simp only [decodeGen_pos]
+          have hadd : Int.ofNat (m' + 1) + Int.ofNat (n' + 1) = Int.ofNat (m' + n' + 2) := by
+            simp only [Int.ofNat_eq_coe]; omega
+          rw [hadd, decodeGen_pos]
+          exact loopIter_add l m' n'
+      | negSucc n' =>
+        -- Positive + negative: (m'+1) + -(n'+1) = m' - n'
+        simp only [decodeGen_pos, decodeGen_neg]
+        by_cases hgt : m' > n'
+        · -- m' > n': result is positive
+          have hres : Int.ofNat (m' + 1) + Int.negSucc n' = Int.ofNat (m' - n') := by
+            simp only [Int.negSucc_eq, Int.ofNat_eq_coe]; omega
+          rw [hres]
+          cases hk : m' - n' with
+          | zero => omega
+          | succ k =>
+            rw [decodeGen_pos]
+            have heq : k = m' - n' - 1 := by omega
+            rw [heq]
+            exact loopIter_cancel_gt l m' n' hgt
+        · by_cases heq : m' = n'
+          · -- m' = n': result is 0
+            have hres : Int.ofNat (m' + 1) + Int.negSucc n' = 0 := by
+              simp only [Int.negSucc_eq, Int.ofNat_eq_coe]; omega
+            rw [hres, decodeGen_zero]
+            rw [heq]
+            exact loopIter_cancel_eq' l n'
+          · -- m' < n': result is negative
+            have hlt : m' < n' := Nat.lt_of_le_of_ne (Nat.le_of_not_lt hgt) heq
+            have hres : Int.ofNat (m' + 1) + Int.negSucc n' = Int.negSucc (n' - m' - 1) := by
+              simp only [Int.negSucc_eq, Int.ofNat_eq_coe]; omega
+            rw [hres, decodeGen_neg]
+            exact loopIter_cancel_lt l m' n' hlt
+  | negSucc m' =>
+    -- m = -(m'+1) < 0
+    cases n with
+    | ofNat n_nat =>
+      cases n_nat with
+      | zero =>
+        -- n = 0
+        have h : Int.negSucc m' + Int.ofNat 0 = Int.negSucc m' := Int.add_zero _
+        rw [h]
+        exact decodeGen_zero_right g i (Int.negSucc m')
+      | succ n' =>
+        -- Negative + positive: -(m'+1) + (n'+1) = n' - m'
+        simp only [decodeGen_neg, decodeGen_pos]
+        by_cases hgt : m' > n'
+        · -- m' > n': result is negative
+          have hres : Int.negSucc m' + Int.ofNat (n' + 1) = Int.negSucc (m' - n' - 1) := by
+            simp only [Int.negSucc_eq, Int.ofNat_eq_coe]; omega
+          rw [hres, decodeGen_neg]
+          exact loopIter_symm_cancel_gt l m' n' hgt
+        · by_cases heq : m' = n'
+          · -- m' = n': result is 0
+            have hres : Int.negSucc m' + Int.ofNat (n' + 1) = 0 := by
+              simp only [Int.negSucc_eq, Int.ofNat_eq_coe]; omega
+            rw [hres, decodeGen_zero]
+            rw [heq]
+            exact loopIter_symm_cancel_eq' l n'
+          · -- m' < n': result is positive
+            have hlt : m' < n' := Nat.lt_of_le_of_ne (Nat.le_of_not_lt hgt) heq
+            have hres : Int.negSucc m' + Int.ofNat (n' + 1) = Int.ofNat (n' - m') := by
+              simp only [Int.negSucc_eq, Int.ofNat_eq_coe]; omega
+            rw [hres]
+            cases hk : n' - m' with
+            | zero => omega
+            | succ k =>
+              rw [decodeGen_pos]
+              have hkeq : k = n' - m' - 1 := by omega
+              rw [hkeq]
+              exact loopIter_symm_cancel_lt l m' n' hlt
+    | negSucc n' =>
+      -- Both negative: -(m'+1) + -(n'+1) = -(m'+n'+2)
+      simp only [decodeGen_neg]
+      have hadd : Int.negSucc m' + Int.negSucc n' = Int.negSucc (m' + n' + 1) := by
+        simp only [Int.negSucc_eq]; omega
+      rw [hadd, decodeGen_neg]
+      exact loopIter_symm_add l m' n'
 
 /-- Decode respects concatenation. -/
 theorem decodePath_concat (g : Nat) (w₁ w₂ : FreeGroupWord (2 * g)) :
@@ -729,12 +1034,97 @@ theorem decodePath_inv_cancel_left (g : Nat) (i : Fin' (2 * g)) :
     (rweq_cmpA_refl_right (generatorLoop g i)))
   exact rweq_cmpA_inv_left (generatorLoop g i)
 
+/-- Decode a single positive generator gives the generator loop with refl at the end. -/
+theorem decodePath_single_pos (g : Nat) (i : Fin' (2 * g)) :
+    decodePath g (FreeGroupWord.single i 1) =
+      Path.trans (generatorLoop g i) (Path.refl (base g)) := by
+  simp only [FreeGroupWord.single, decodePath, decodeGen]
+
+/-- Decode a single negative generator gives the inverse loop with refl at the end. -/
+theorem decodePath_single_neg (g : Nat) (i : Fin' (2 * g)) :
+    decodePath g (FreeGroupWord.single i (-1)) =
+      Path.trans (Path.symm (generatorLoop g i)) (Path.refl (base g)) := by
+  simp only [FreeGroupWord.single, decodePath, decodeGen]
+  rfl
+
+/-- Helper: decodePath of a single generator is RwEq to the generator loop. -/
+theorem decodePath_single_pos_rweq (g : Nat) (i : Fin' (2 * g)) :
+    RwEq (decodePath g (FreeGroupWord.single i 1)) (generatorLoop g i) := by
+  rw [decodePath_single_pos]
+  exact rweq_cmpA_refl_right (generatorLoop g i)
+
+/-- Helper: decodePath of a single inverse generator is RwEq to the inverse loop. -/
+theorem decodePath_single_neg_rweq (g : Nat) (i : Fin' (2 * g)) :
+    RwEq (decodePath g (FreeGroupWord.single i (-1))) (Path.symm (generatorLoop g i)) := by
+  rw [decodePath_single_neg]
+  exact rweq_cmpA_refl_right (Path.symm (generatorLoop g i))
+
+/-- decodePath of commutatorWord is RwEq to commutatorPath of the generator loops. -/
+theorem decodePath_commutatorWord_rweq (g : Nat) (aIdx bIdx : Fin' (2 * g)) :
+    RwEq (decodePath g (commutatorWord aIdx bIdx))
+         (commutatorPath g (generatorLoop g aIdx) (generatorLoop g bIdx)) := by
+  simp only [commutatorWord, commutatorPath]
+  -- commutatorWord = concat (concat (single a 1) (single b 1)) (concat (single a (-1)) (single b (-1)))
+  -- By decodePath_concat, this is RwEq to trans of the two parts
+  apply rweq_trans (decodePath_concat g _ _)
+  apply rweq_trans (rweq_trans_congr_left _ (decodePath_concat g _ _))
+  apply rweq_trans (rweq_trans_congr_right _ (decodePath_concat g _ _))
+  -- Now we have: trans (trans (decodePath (single a 1)) (decodePath (single b 1)))
+  --                    (trans (decodePath (single a (-1))) (decodePath (single b (-1))))
+  -- Apply the single lemmas
+  apply rweq_trans (rweq_trans_congr_left _ (rweq_trans_congr_left _ (decodePath_single_pos_rweq g aIdx)))
+  apply rweq_trans (rweq_trans_congr_left _ (rweq_trans_congr_right _ (decodePath_single_pos_rweq g bIdx)))
+  apply rweq_trans (rweq_trans_congr_right _ (rweq_trans_congr_left _ (decodePath_single_neg_rweq g aIdx)))
+  apply rweq_trans (rweq_trans_congr_right _ (rweq_trans_congr_right _ (decodePath_single_neg_rweq g bIdx)))
+  -- Now we have: trans (trans (gen a) (gen b)) (trans (symm (gen a)) (symm (gen b)))
+  -- Need to reassociate to get: trans (gen a) (trans (gen b) (trans (symm (gen a)) (symm (gen b))))
+  exact rweq_tt (generatorLoop g aIdx) (generatorLoop g bIdx)
+              (Path.trans (Path.symm (generatorLoop g aIdx)) (Path.symm (generatorLoop g bIdx)))
+
+/-- By induction, decodePath of surfaceRelationWordAux is RwEq to surfaceRelationPathAux. -/
+theorem decodePath_surfaceRelWordAux_rweq (g : Nat) (k : Nat) (hk : k ≤ g) (hg : g > 0) :
+    RwEq (decodePath g (surfaceRelationWordAux g k hk))
+         (surfaceRelationPathAux g k hk) := by
+  induction k with
+  | zero =>
+    simp only [surfaceRelationWordAux, surfaceRelationPathAux, decodePath]
+    exact RwEq.refl _
+  | succ k' ih =>
+    simp only [surfaceRelationWordAux, surfaceRelationPathAux]
+    have hk' : k' ≤ g := Nat.le_of_succ_le hk
+    have hlt : k' < g := Nat.lt_of_succ_le hk
+    -- decodePath (concat prev (commutatorWord aIdx bIdx))
+    -- is RwEq to trans (decodePath prev) (decodePath (commutatorWord aIdx bIdx))
+    apply rweq_trans (decodePath_concat g _ _)
+    -- decodePath prev is RwEq to surfaceRelationPathAux prev
+    apply rweq_trans (rweq_trans_congr_left _ (ih hk'))
+    -- decodePath (commutatorWord aIdx bIdx) is RwEq to commutatorPath using gen loops
+    apply rweq_trans (rweq_trans_congr_right _ (decodePath_commutatorWord_rweq g _ _))
+    -- Now need: trans prev (commutatorPath (genLoop aIdx) (genLoop bIdx))
+    --         = trans prev (commutatorPath (loopA idx) (loopB idx))
+    -- Using generatorLoop_aGenIdx and generatorLoop_bGenIdx
+    have hloopA : generatorLoop g (aGenIdx g k' hlt) = loopA g (Fin'.ofNat k' g hlt) :=
+      generatorLoop_aGenIdx g k' hlt hg
+    have hloopB : generatorLoop g (bGenIdx g k' hlt) = loopB g (Fin'.ofNat k' g hlt) :=
+      generatorLoop_bGenIdx g k' hlt hg
+    rw [hloopA, hloopB]
+    -- The remaining goal has different proof terms for the same propositions;
+    -- by proof irrelevance they are equal
+    exact RwEq.refl _
+
 /-- Compatibility: decodePath of surfaceRelationWord gives refl.
 This connects the word representation to the path representation.
-The proof follows from showing decodePath produces surfaceRelationPath,
-combined with the HIT 2-cell axiom `surfaceRelation`. -/
-axiom decodePath_surfaceRelWord_rweq (g : Nat) (hg : g > 0) :
-    RwEq (decodePath g (surfaceRelationWord g)) (Path.refl (base g))
+The proof shows decodePath produces surfaceRelationPath (up to RwEq),
+then uses the HIT 2-cell axiom `surfaceRelation`. -/
+theorem decodePath_surfaceRelWord_rweq (g : Nat) (hg : g > 0) :
+    RwEq (decodePath g (surfaceRelationWord g)) (Path.refl (base g)) := by
+  -- decodePath (surfaceRelationWordAux g g _) is RwEq to surfaceRelationPathAux g g _
+  have h := decodePath_surfaceRelWordAux_rweq g g (Nat.le_refl g) hg
+  simp only [surfaceRelationWord] at h ⊢
+  apply rweq_trans h
+  -- surfaceRelationPathAux g g _ = surfaceRelationPath g (by definition)
+  -- Use the surfaceRelation axiom
+  exact surfaceRelation g hg
 
 /-- Decode the surface relation word gives a path RwEq to refl.
 This is the key property connecting the word relation to the HIT 2-cell. -/
