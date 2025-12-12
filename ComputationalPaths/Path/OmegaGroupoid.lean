@@ -42,6 +42,30 @@ The `to_canonical` axiom is *justified* (though not proved) by the normalization
 since all paths normalize to a unique canonical form, any derivation computes the same
 result as the canonical derivation, and they should be identified at the level of 3-cells.
 
+## Axiom Reduction Analysis
+
+Detailed analysis of axiom minimization is provided in companion modules:
+
+- **`OmegaGroupoid/Derived.lean`**: Shows that ALL `MetaStep₃` constructors except
+  `to_canonical` are derivable from `contractibility₃`. This includes groupoid laws
+  (`vcomp_refl_left`, `vcomp_assoc`, etc.), coherences (`pentagon`, `triangle`,
+  `interchange`), and `step_eq`.
+
+- **`OmegaGroupoid/StepToCanonical.lean`**: Shows that `to_canonical` reduces to
+  `step_to_canonical` — an axiom only for single `Step` rewrites. The `.refl`,
+  `.inv`, and `.vcomp` cases are derivable; only `.step s` requires the axiom.
+
+- **`Rewrite/MinimalAxioms.lean`**: Shows that at level 1, several `Step` rules
+  are derivable (e.g., `trans_refl_right` from `trans_refl_left`).
+
+**Minimal axiom count:**
+| Level | Axiom | Status |
+|-------|-------|--------|
+| 1 | ~6 groupoid rules + type-specific | Irreducible |
+| 3 | `step_to_canonical` (~76 cases) | Reducible from `to_canonical` |
+| 4 | `contract₄` | Irreducible |
+| 5+ | `contract_high` | Irreducible |
+
 ## References
 
 - Lumsdaine, "Weak ω-categories from intensional type theory" (2010)
