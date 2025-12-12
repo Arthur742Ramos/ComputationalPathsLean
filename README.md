@@ -25,7 +25,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product) via encode/decode equivalence `kleinPiOneEquivIntProd`, with an alternative proof using Seifert-van Kampen on the CW-complex decomposition.
 - Möbius band, cylinder HITs with π₁ ≃ ℤ (homotopy equivalent to circle).
 - **Fundamental groupoid Π₁(X)**: Explicit groupoid structure with basepoint independence theorem (π₁(A,a) ≃ π₁(A,b) via path conjugation) and functoriality (f : A → B induces Π₁(f) : Π₁(A) → Π₁(B)).
-- **Lie group connections**: SO(2) ≃ U(1) ≃ S¹ with π₁ ≃ ℤ, n-torus T^n = (S¹)^n as maximal torus in U(n), simply connected groups, and ℤ₂ fundamental groups (SO(n) for n ≥ 3 via RP²).
+- **Product fundamental group theorem**: π₁(A × B, (a,b)) ≃ π₁(A, a) × π₁(B, b) via path projection/pairing, enabling inductive computation of π₁(T^n) ≃ ℤⁿ.
+- **Lie group connections**: SO(2) ≃ U(1) ≃ S¹ with π₁ ≃ ℤ, n-torus T^n = (S¹)^n as maximal torus in U(n), simply connected groups, ℤ₂ fundamental groups (SO(n) for n ≥ 3 via RP²), and comparison with Bordg-Cavalleri differential geometry approach.
 
 ## Quick Start
 - Build: `./lake.cmd build`
@@ -45,7 +46,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Homotopy/SuspensionLoop.lean`](ComputationalPaths/Path/Homotopy/SuspensionLoop.lean) — suspension-loop adjunction [ΣX, Y]_* ≅ [X, ΩY]_*, pointed types/maps, adjunction map construction, connectivity definitions.
 - [`ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean`](ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean) — Eilenberg-MacLane spaces K(G,n), IsKG1 characterization, circle is K(ℤ,1), loop space property Ω(K(G,n+1)) ≃ K(G,n).
 - [`ComputationalPaths/Path/Homotopy/FundamentalGroupoid.lean`](ComputationalPaths/Path/Homotopy/FundamentalGroupoid.lean) — **Fundamental groupoid Π₁(A)** with explicit groupoid structure, basepoint independence theorem (`basepointIsomorphism`), and functoriality (`fundamentalGroupoidMap`, `inducedPiOneMap`).
-- [`ComputationalPaths/Path/Homotopy/LieGroups.lean`](ComputationalPaths/Path/Homotopy/LieGroups.lean) — **Connections to Lie groups**: SO(2), U(1) as Circle with π₁ ≃ ℤ, n-torus T^n = (S¹)^n, maximal tori in U(n) and SU(n), simply connected types, and ℤ₂ fundamental groups.
+- [`ComputationalPaths/Path/Homotopy/ProductFundamentalGroup.lean`](ComputationalPaths/Path/Homotopy/ProductFundamentalGroup.lean) — **Product fundamental group theorem**: π₁(A × B, (a,b)) ≃ π₁(A, a) × π₁(B, b) via path projection (`Path.fst`, `Path.snd`) and pairing (`Path.prod`).
+- [`ComputationalPaths/Path/Homotopy/LieGroups.lean`](ComputationalPaths/Path/Homotopy/LieGroups.lean) — **Connections to Lie groups**: SO(2), U(1) as Circle with π₁ ≃ ℤ, n-torus T^n = (S¹)^n with `torusN_product_step` for inductive π₁(T^n) ≃ ℤⁿ, maximal tori in U(n) and SU(n), simply connected types, ℤ₂ fundamental groups, and comparison with Bordg-Cavalleri differential geometry approach.
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
 - [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, code family into ℤ, encode/transport lemmas, z-powers.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
@@ -530,6 +532,9 @@ This formalisation is based on the following papers:
 - Univalent Foundations Program, [*Homotopy Type Theory: Univalent Foundations of Mathematics*](https://homotopytypetheory.org/book/), IAS, 2013.
 - Licata & Shulman, [*Calculating the Fundamental Group of the Circle in Homotopy Type Theory*](https://doi.org/10.1109/LICS.2013.28), LICS 2013.
 - Hofmann & Streicher, *The groupoid model refutes uniqueness of identity proofs*, LICS 1994.
+
+### Related Work (Differential Geometry in Lean)
+- Bordg & Cavalleri, [*Elements of Differential Geometry in Lean*](https://arxiv.org/abs/2108.00484), arXiv:2108.00484, 2021. (Formalizes smooth manifolds, tangent bundles, and Lie groups in Lean — complementary approach to π₁ via covering spaces rather than HITs.)
 
 ## Citing This Repository
 
