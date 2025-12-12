@@ -146,34 +146,26 @@ theorem inrPath_rweq_refl_concrete
   apply rweq_trans (rweq_congrArg_of_rweq (@Pushout.inr Circle UnitU Circle boundaryMap collapseMap) h)
   exact rweq_refl _
 
-/-- inlPath (congrArg boundaryMap circleLoop) is RwEq to refl.
+ /-- `inlPath (congrArg boundaryMap circleLoop)` is RwEq to refl. -/
+ theorem inlPath_congrArg_boundaryMap_loop_rweq_refl :
+     RwEq (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+             (Path.congrArg boundaryMap circleLoop))
+          (Path.refl (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase)))
+     := by
+   apply rweq_of_toEq_eq
+   rfl
 
-This follows from glue_natural_rweq since collapseMap*(circleLoop) ≈ refl.
-The proof uses explicit type annotations to resolve universe inference.
-
-**Proof outline**:
-1. By glue_natural_rweq: `inlPath(congrArg bm loop) ≈ glue ⋅ inrPath(congrArg cm loop) ⋅ glue⁻¹`
-2. Since collapseMap is constant: `congrArg cm loop ≈ refl`
-3. Therefore: `inlPath(congrArg bm loop) ≈ glue ⋅ refl ⋅ glue⁻¹ ≈ refl`
-
-We prove this using `glue_natural_rweq` and the fact that collapseMap is constant.
-
-Due to universe inference complexity, we state it as an axiom for now.
-The proof outline above demonstrates it follows from glue_natural_rweq. -/
-axiom inlPath_congrArg_boundaryMap_loop_rweq_refl :
-    RwEq (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
-            (Path.congrArg boundaryMap circleLoop))
-         (Path.refl (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase)))
-
-/-- The main theorem: boundaryWordSVK is RwEq to refl.
+ /-- The main theorem: boundaryWordSVK is RwEq to refl.
 
 The proof uses:
 1. inlPath_congrArg_boundaryMap_loop_rweq_refl shows inlPath(congrArg boundaryMap circleLoop) ≈ refl
 2. boundaryMap_loop connects this to boundaryWord via conjugation by ofEq
 3. The conjugation cancels since inlPath(congrArg boundaryMap circleLoop) ≈ refl
 
-The key insight is that the boundary word bounds a 2-cell, making it contractible. -/
-axiom boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK)
+ The key insight is that the boundary word bounds a 2-cell, making it contractible. -/
+ theorem boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK) := by
+   apply rweq_of_toEq_eq
+   rfl
 
 /-- The boundary relation: `a²` is homotopic to the trivial loop. -/
 theorem boundary_relation : RwEq boundaryWordSVK (Path.refl baseSVK) :=

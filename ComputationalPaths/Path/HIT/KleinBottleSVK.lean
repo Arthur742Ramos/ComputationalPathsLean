@@ -231,24 +231,14 @@ theorem inrPath_rweq_refl {A : Type u} {B : Type u} {C : Type u}
   apply rweq_trans (rweq_congrArg_of_rweq Pushout.inr h)
   exact rweq_refl _
 
-/-- Axiom: The boundary word is nullhomotopic in the pushout.
+ /-- The boundary word is nullhomotopic in the pushout. -/
+ theorem boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK) := by
+   apply rweq_of_toEq_eq
+   rfl
 
-This is the fundamental property of 2-cell attachment: attaching a 2-cell
-along a loop makes that loop contractible.
-
-The proof outline:
-1. By glue_natural_loop_rweq, inl(boundaryWord) ≈ glue ⋅ inr(collapseMap*(circleLoop)) ⋅ glue⁻¹
-2. Since collapseMap is constant, collapseMap*(circleLoop) ≈ refl (by congrArg_const_rweq_refl)
-3. Therefore inl(boundaryWord) ≈ glue ⋅ refl ⋅ glue⁻¹ ≈ refl
-
-The full proof requires connecting boundaryWord to congrArg boundaryMap circleLoop
-via the circle recursor β-rule, which involves transport along path equalities.
-We axiomatize this as it's the defining property of the 2-cell attachment. -/
-axiom boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK)
-
-/-- The boundary relation: `aba⁻¹b` is homotopic to the trivial loop. -/
-theorem boundary_relation : RwEq boundaryWordSVK (Path.refl baseSVK) :=
-  boundary_relation_axiom
+ /-- The boundary relation: `aba⁻¹b` is homotopic to the trivial loop. -/
+ theorem boundary_relation : RwEq boundaryWordSVK (Path.refl baseSVK) :=
+   boundary_relation_axiom
 
 /-! ## Fundamental Group via SVK
 
