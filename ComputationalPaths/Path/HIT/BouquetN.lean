@@ -772,13 +772,6 @@ end BouquetN
 
 /-! ## Special Cases -/
 
-/-- For n = 0, the bouquet is a point (no loops), so every loop is trivial.
-    This is a consequence of the HIT structure: with no loop constructors,
-    every path must be built from refl. -/
-axiom bouquetN_zero_is_point :
-    ∀ (l : LoopSpace (BouquetN 0) bouquetBase),
-    RwEq l (Path.refl bouquetBase)
-
 /-- For n = 0, the free group is trivial. -/
 theorem bouquetWord_zero_trivial :
     ∀ (w : BouquetWord 0), w = BouquetWord.nil := by
@@ -788,6 +781,35 @@ theorem bouquetWord_zero_trivial :
   | cons l _ =>
       -- l.gen : Fin'B 0 is impossible
       exact Fin'B.elim0 l.gen
+
+/-- The free group on zero generators is a subsingleton. -/
+theorem bouquetFreeGroup_zero_subsingleton : Subsingleton (BouquetFreeGroup 0) := by
+  constructor
+  intro x y
+  refine Quot.inductionOn x ?_
+  refine Quot.inductionOn y ?_
+  intro w1 w2
+  have hw1 : w1 = BouquetWord.nil := bouquetWord_zero_trivial (w := w1)
+  have hw2 : w2 = BouquetWord.nil := bouquetWord_zero_trivial (w := w2)
+  simp [hw1, hw2]
+
+/-- For n = 0, the bouquet has trivial fundamental group. -/
+theorem bouquetPiOne_zero_subsingleton : Subsingleton (BouquetN.PiOneN 0) := by
+  haveI : Subsingleton (BouquetFreeGroup 0) := bouquetFreeGroup_zero_subsingleton
+  let e := BouquetN.bouquetPiOneEquiv (n := 0)
+  constructor
+  intro x y
+  have h : e.toFun x = e.toFun y := Subsingleton.elim _ _
+  have hx : e.invFun (e.toFun x) = x := e.left_inv x
+  have hy : e.invFun (e.toFun y) = y := e.left_inv y
+  have h' : e.invFun (e.toFun x) = e.invFun (e.toFun y) := _root_.congrArg e.invFun h
+  exact hx.symm.trans (h'.trans hy)
+
+/-- For n = 0, every element of `π₁(BouquetN 0)` is equal to the identity. -/
+theorem bouquetPiOne_zero_trivial (x : BouquetN.PiOneN 0) :
+    x = PiOne.id (A := BouquetN 0) (a := bouquetBase) := by
+  haveI : Subsingleton (BouquetN.PiOneN 0) := bouquetPiOne_zero_subsingleton
+  exact Subsingleton.elim x _
 
 /-! ## Summary
 
@@ -803,11 +825,11 @@ This module establishes:
    ```
 
 4. **Special Cases**:
-   - n = 0: π₁ = 1 (trivial, via `bouquetN_zero_is_point`)
+   - n = 0: π₁ = 1 (trivial, via `bouquetPiOne_zero_trivial`)
    - n = 1: π₁ = ℤ (recovers circle result)
    - n = 2: π₁ = F₂ = ℤ * ℤ (figure-eight)
 
-## Axioms (13 total)
+## Axioms (12 total)
 
 **HIT Structure (6):**
 - `BouquetN`: The HIT type
@@ -821,10 +843,10 @@ This module establishes:
 - `encodeLoop_loop`, `encodeLoop_refl`: Computation rules
 - `decode_encode`, `encode_decode`: Round-trip properties
 
-**Special Cases (1):**
-- `bouquetN_zero_is_point`: Every loop in BouquetN 0 is trivial
-
 ## Proved Theorems (previously axioms)
+
+**Special Cases (1):**
+- `bouquetPiOne_zero_trivial`: π₁(BouquetN 0) is trivial
 
 **Loop Iteration (3):**
 - `iterateLoopInt_zero`: l^0 = refl (definition/unfolding)

@@ -3,11 +3,14 @@
 
 Provide a lightweight axiomatisation of univalence specialised to the
 computational-paths setting.  The axioms postulate that every equivalence
-between types induces a computational path between them and that transport
-along this path coincides with the forward map of the equivalence.  These
+between types induces a propositional equality and that transport along the
+induced computational path coincides with the forward map of the equivalence.
+These
 principles are sufficient to implement the encode-decode argument for the
 circle without committing to a full HoTT-style development of univalence.  Apart
-from the circle HIT interface, these are the only axioms used in the project.
+from the HIT interfaces, these are the only Lean `axiom`s used in the library
+core: coherence laws like `ua_trans` are derived from proof irrelevance of `Eq`
+in `Prop`.
 -/
 
 import ComputationalPaths.Path.Basic.Core
@@ -18,10 +21,17 @@ namespace Path
 
 universe u
 
-/-- Axiomatised univalence: every equivalence between types determines a
-computational path between them.  We restrict to the lightweight
-`SimpleEquiv` structure to avoid additional dependencies. -/
-axiom ua {A B : Type u} : SimpleEquiv A B → Path (A := Type u) A B
+/-- Axiomatised univalence (propositional form): every `SimpleEquiv` between
+types determines an equality between them. -/
+axiom uaEq {A B : Type u} : SimpleEquiv A B → A = B
+
+/-- Axiomatised univalence (computational-path form): package `uaEq` as a
+`Path` in `Type u`.
+
+We fix the step list to `[]` so coherences like `ua_trans` become theorems
+(their proof components live in `Prop`). -/
+def ua {A B : Type u} (e : SimpleEquiv A B) : Path (A := Type u) A B :=
+  Path.mk [] (uaEq e)
 
 /-- Transport along the path produced by `ua` computes to the forward map of
 the equivalence. -/
@@ -51,17 +61,33 @@ the equivalence. -/
 
 /-- Univalence preserves composition: the path for a composite equivalence is
 the concatenation of the paths. -/
-axiom ua_trans {A B C : Type u} (e : SimpleEquiv A B) (f : SimpleEquiv B C) :
-    Path.trans (ua e) (ua f) = ua (SimpleEquiv.comp e f)
+theorem ua_trans {A B C : Type u} (e : SimpleEquiv A B) (f : SimpleEquiv B C) :
+    Path.trans (ua e) (ua f) = ua (SimpleEquiv.comp e f) := by
+  have h :
+      (uaEq (A := A) (B := B) e).trans (uaEq (A := B) (B := C) f) =
+        uaEq (A := A) (B := C) (SimpleEquiv.comp e f) := by
+    exact Subsingleton.elim _ _
+  cases h
+  simp [ua, Path.trans]
 
 /-- Univalence preserves inverses: the path for the inverse equivalence is
 the symmetric path. -/
-axiom ua_symm {A B : Type u} (e : SimpleEquiv A B) :
-    Path.symm (ua e) = ua (SimpleEquiv.symm e)
+theorem ua_symm {A B : Type u} (e : SimpleEquiv A B) :
+    Path.symm (ua e) = ua (SimpleEquiv.symm e) := by
+  have h :
+      (uaEq (A := A) (B := B) e).symm =
+        uaEq (A := B) (B := A) (SimpleEquiv.symm e) := by
+    exact Subsingleton.elim _ _
+  cases h
+  simp [ua, Path.symm]
 
 /-- Univalence maps the identity equivalence to the identity path. -/
-axiom ua_refl (A : Type u) :
-    ua (SimpleEquiv.refl A) = Path.refl A
+theorem ua_refl (A : Type u) :
+    ua (SimpleEquiv.refl A) = Path.refl A := by
+  have h : uaEq (A := A) (B := A) (SimpleEquiv.refl A) = rfl := by
+    exact Subsingleton.elim _ _
+  cases h
+  simp [ua, Path.refl]
 
 end Path
 end ComputationalPaths

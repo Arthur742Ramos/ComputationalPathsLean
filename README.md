@@ -407,7 +407,7 @@ Two approaches are available:
   - `encodeLoop`: LoopSpace → BouquetWord (axiomatized)
   - Round-trip properties establish the equivalence
 - **Special cases**:
-  - **n = 0**: `bouquetN_zero_is_point` — every loop is trivial (π₁ = 1)
+  - **n = 0**: `bouquetPiOne_zero_trivial` — π₁ is trivial (π₁ = 1)
   - **n = 1**: Recovers π₁(S¹) ≃ ℤ
   - **n = 2**: Recovers figure-eight π₁(S¹ ∨ S¹) ≃ ℤ * ℤ
 - **Loop iteration axioms**:
@@ -468,9 +468,11 @@ Two approaches are available:
   for HITs are being developed. Note: `circleConnected` and `circleEncode_mul`
   were previously axioms but are now **proved theorems** using circle induction
   and the encode-decode round-trip properties.
-- Pushout HIT interface (constructors + eliminators + computation rules). The
-  encode-decode axioms for SVK would be provable in cubical type theory but
-  must be postulated in Lean 4's setting without native HITs.
+- Pushout SVK encode/decode interface. The pushout itself is implemented as a
+  quotient (constructors + eliminators are definitions in
+  `ComputationalPaths/Path/HIT/Pushout.lean`), but the Seifert-van Kampen
+  encode/decode round-trips remain postulated in
+  `ComputationalPaths/Path/HIT/PushoutPaths.lean`.
 - OrientableSurface HIT interface (type, base point, loops, 2-cell, recursion principle).
   The encode-decode round-trip axioms complete the fundamental group calculation.
   Note: `decodePath_surfaceRelWord_rweq` (that the surface relation word decodes to

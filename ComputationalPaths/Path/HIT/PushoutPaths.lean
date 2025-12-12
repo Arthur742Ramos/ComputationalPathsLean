@@ -845,16 +845,26 @@ on equivalence classes, which follows from RwEq implying equal underlying equali
 paths have equal underlying equality (p.toEq = q.toEq), so any reasonable encoding
 function is well-defined on the quotient.
 
-The actual word extraction would normally use a code family, but since transport
-in the pushout is complex, we axiomatize the encoding for now. -/
-axiom wedgeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) :
-    LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint → FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))
+The actual word extraction would normally use a code family; for now we define
+wedge encoding by specialising the general pushout encoding interface. -/
+noncomputable def wedgeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) :
+    LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint → FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
+  pushoutEncodeAxiom A B PUnit'
+    (fun _ : PUnit' => a₀)
+    (fun _ : PUnit' => b₀)
+    PUnit'.unit
 
 /-- Encode respects RwEq. -/
-axiom wedgeEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
+theorem wedgeEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
     {p q : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint}
     (h : RwEq p q) :
-    wedgeEncodeAxiom A B a₀ b₀ p = wedgeEncodeAxiom A B a₀ b₀ q
+    wedgeEncodeAxiom A B a₀ b₀ p = wedgeEncodeAxiom A B a₀ b₀ q := by
+  simpa [wedgeEncodeAxiom] using
+    pushoutEncodeAxiom_respects_rweq A B PUnit'
+      (fun _ : PUnit' => a₀)
+      (fun _ : PUnit' => b₀)
+      PUnit'.unit
+      (p := p) (q := q) h
 
 /-- Encode at the quotient level: π₁(Wedge) → FreeProductWord. -/
 noncomputable def wedgeEncodeQuot :
@@ -880,6 +890,21 @@ axiom wedgeEncodeAxiom_glueInrGlueInv (A : Type u) (B : Type u) (a₀ : A) (b₀
           (Path.trans (Path.symm (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))) rest))) =
       .consRight (Quot.mk _ β) (wedgeEncodeAxiom A B a₀ b₀ rest)
 
+/-- `wedgeFreeProductDecode` is `pushoutDecode` specialised to `PUnit'`. -/
+theorem wedgeFreeProductDecode_eq_pushoutDecode (a₀ : A) (b₀ : B) :
+    wedgeFreeProductDecode (A := A) (B := B) a₀ b₀ =
+      pushoutDecode (A := A) (B := B) (C := PUnit')
+        (f := fun _ : PUnit' => a₀)
+        (g := fun _ : PUnit' => b₀)
+        PUnit'.unit := by
+  funext w
+  induction w with
+  | nil => rfl
+  | consLeft α rest ih =>
+      simp only [wedgeFreeProductDecode, pushoutDecode, ih]
+  | consRight β rest ih =>
+      simp only [wedgeFreeProductDecode, pushoutDecode, ih, Wedge.glue]
+
 /-- Decode after encode gives back the original loop (at π₁ level).
 
 This is the key round-trip property: encoding a loop extracts its word structure,
@@ -890,9 +915,19 @@ In the code family approach, this follows from:
 2. Transport along inlPath α corresponds to prepending a left letter
 3. Transport along glue sequences corresponds to prepending a right letter
 4. decode reverses these operations exactly -/
-axiom wedgeDecodeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
+theorem wedgeDecodeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
     (p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
-    wedgeFreeProductDecode a₀ b₀ (wedgeEncodeAxiom A B a₀ b₀ p) = Quot.mk _ p
+    wedgeFreeProductDecode a₀ b₀ (wedgeEncodeAxiom A B a₀ b₀ p) = Quot.mk _ p := by
+  -- Expand the wedge-specific definitions into the general pushout statements.
+  -- `simp` turns `wedgeEncodeAxiom` into the specialised `pushoutEncodeAxiom`.
+  simp only [wedgeEncodeAxiom]
+  rw [wedgeFreeProductDecode_eq_pushoutDecode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)]
+  exact
+    pushoutDecodeEncodeAxiom A B PUnit'
+      (fun _ : PUnit' => a₀)
+      (fun _ : PUnit' => b₀)
+      PUnit'.unit
+      p
 
 /-- Encode-decode round-trip for consLeft case at quotient level.
 This is the inductive step for left letters in the encode∘decode = id proof. -/
