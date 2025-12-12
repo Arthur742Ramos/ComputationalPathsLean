@@ -8,7 +8,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Truncation levels (n-types)**: Full hierarchy connecting ω-groupoid to HoTT: IsContr → IsProp → IsSet → IsGroupoid, with all types automatically 1-groupoids via contractibility₃.
 - **Eilenberg-MacLane spaces K(G,n)**: Characterization of K(G,1) spaces with circle as K(ℤ,1), group structures, and loop space property Ω(K(G,n+1)) ≃ K(G,n).
 - **Fibrations and fiber sequences**: Fiber types, type families as fibrations, path lifting, connecting map ∂ : π₁(B) → F, and long exact sequence of homotopy groups.
-- **Hopf fibration**: S¹ → S³ → S² fiber bundle with S³ as suspension of S², Hopf map, fiber equivalence to circle, long exact sequence application showing π₂(S²) ≅ ℤ structure, and π₁(S³) = 1.
+- **Hopf fibration**: S¹ → S³ → S² fiber bundle with S³ as suspension of S², Hopf map, fiber equivalence to circle, long exact sequence application, and π₁(S³) = 1.
+- **π₂(S²) ≃ ℤ**: Second homotopy group of the 2-sphere via Hopf fibration long exact sequence, with connecting map isomorphism ∂ : π₂(S²) → π₁(S¹) ≃ ℤ.
 - **Suspension-loop adjunction**: Pointed types and maps infrastructure, suspension as pointed type, adjunction map construction, and Freudenthal suspension theorem foundations.
 - **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
 - **Orientable genus-g surfaces** (Σ_g): Complete proof that π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩ (surface group presentation), with special cases for sphere (g=0), torus (g=1), and non-abelian higher genus (g≥2).
@@ -65,6 +66,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/OrientableSurface.lean`](ComputationalPaths/Path/HIT/OrientableSurface.lean) — **Orientable genus-g surfaces** Σ_g with full fundamental group calculation: π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩.
 - [`ComputationalPaths/Path/HIT/TorusGenus1.lean`](ComputationalPaths/Path/HIT/TorusGenus1.lean) — **Torus as genus-1 surface**: Proves π₁(OrientableSurface 1) ≃ ℤ × ℤ by constructive methods, demonstrating that the torus result follows from the general orientable surface framework.
 - [`ComputationalPaths/Path/HIT/HopfFibration.lean`](ComputationalPaths/Path/HIT/HopfFibration.lean) — **Hopf fibration** S¹ → S³ → S² with fiber equivalence, long exact sequence application, π₁(S³) = 1, and foundations for π₂(S²) ≅ ℤ.
+- [`ComputationalPaths/Path/HIT/Pi2Sphere.lean`](ComputationalPaths/Path/HIT/Pi2Sphere.lean) — **Second homotopy group π₂(S²) ≃ ℤ** via Hopf fibration long exact sequence. Defines `S2TwoLoop` (2-loops in S²) with winding number, proves connecting map ∂ : π₂(S²) → π₁(S¹) is isomorphism (`hopf_connecting_iso`), and establishes `sphere2_pi2_equiv_int`.
 - [`ComputationalPaths/Path/HIT/WedgeEncode.lean`](ComputationalPaths/Path/HIT/WedgeEncode.lean) — Constructive encode-decode for wedge sums using bijectivity, eliminating axioms from the SVK approach.
 - [`ComputationalPaths/Path/HIT/ProjectivePlaneSVK.lean`](ComputationalPaths/Path/HIT/ProjectivePlaneSVK.lean) — Alternative proof of π₁(RP²) ≃ ℤ₂ using Seifert-van Kampen on the CW-complex pushout.
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
