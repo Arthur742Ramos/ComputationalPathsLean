@@ -729,11 +729,19 @@ noncomputable def decode {n : Nat} : BouquetFreeGroup n → PiOneN n :=
 
 /-- Encode: convert a loop to a free group word.
     This requires HIT recursion and is axiomatized. -/
-axiom encodeLoop {n : Nat} : LoopSpaceN n → BouquetWord n
+axiom encodeLoopQuotAxiom {n : Nat} : PiOneN n → BouquetWord n
+
+/-- Encode on loop representatives. -/
+noncomputable def encodeLoop {n : Nat} : LoopSpaceN n → BouquetWord n :=
+  fun p => encodeLoopQuotAxiom (n := n) (Quot.mk _ p)
 
 /-- Encode respects path equivalence. -/
-axiom encodeLoop_respects_rweq {n : Nat} {p q : LoopSpaceN n} :
-    RwEq p q → BouquetRel n (encodeLoop p) (encodeLoop q) ∨ encodeLoop p = encodeLoop q
+theorem encodeLoop_respects_rweq {n : Nat} {p q : LoopSpaceN n} :
+    RwEq p q → BouquetRel n (encodeLoop p) (encodeLoop q) ∨ encodeLoop p = encodeLoop q := by
+  intro h
+  refine Or.inr ?_
+  unfold encodeLoop
+  exact _root_.congrArg (encodeLoopQuotAxiom (n := n)) (Quot.sound h)
 
 /-- Encode from the fundamental group. -/
 noncomputable def encode {n : Nat} : PiOneN n → BouquetFreeGroup n :=

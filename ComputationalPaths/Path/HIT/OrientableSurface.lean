@@ -1182,11 +1182,23 @@ This uses the universal property via the recursion principle.
 
 /-- Encode a path to a word.
 This is defined via the universal property of the HIT. -/
-axiom encodePath (g : Nat) : Path (base g) (base g) → FreeGroupWord (2 * g)
+axiom encodePathQuotAxiom (g : Nat) : SurfacePiOne g → FreeGroupWord (2 * g)
+
+/-- Encode on loop representatives. -/
+noncomputable def encodePath (g : Nat) : Path (base g) (base g) → FreeGroupWord (2 * g) :=
+  fun p => encodePathQuotAxiom g (Quot.mk _ p)
 
 /-- Encode respects RwEq: equivalent paths give the same word (up to SurfaceGroupRel). -/
-axiom encodePath_respects_rweq (g : Nat) {p q : Path (base g) (base g)}
-    (h : RwEq p q) : SurfaceGroupRel g (encodePath g p) (encodePath g q)
+theorem encodePath_respects_rweq (g : Nat) {p q : Path (base g) (base g)}
+    (h : RwEq p q) : SurfaceGroupRel g (encodePath g p) (encodePath g q) := by
+  have hEq :
+      encodePath g p = encodePath g q := by
+    unfold encodePath
+    exact _root_.congrArg (encodePathQuotAxiom g) (Quot.sound h)
+  have ofEq {w₁ w₂ : FreeGroupWord (2 * g)} (hw : w₁ = w₂) : SurfaceGroupRel g w₁ w₂ := by
+    cases hw
+    exact SurfaceGroupRel.refl _
+  exact ofEq hEq
 
 /-- Encode of refl is nil. -/
 axiom encodePath_refl (g : Nat) : encodePath g (Path.refl (base g)) = FreeGroupWord.nil
