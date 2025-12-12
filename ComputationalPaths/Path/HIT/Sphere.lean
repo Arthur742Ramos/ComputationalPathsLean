@@ -183,7 +183,7 @@ theorem glue_conj_refl_rweq {A B C : Type u} {f : C → A} {g : C → B} (c : C)
 theorem trivial_left_inclusion
     {C : Type u} {f : C → PUnit'} {g : C → PUnit'} (c₀ : C) (α : π₁(PUnit', PUnit'.unit)) :
     (Quot.lift
-      (fun p => Quot.mk RwEq (Pushout.inlPath p))
+      (fun p => Quot.mk _ (Pushout.inlPath p))
       (fun _ _ hp => Quot.sound (rweq_congrArg_of_rweq Pushout.inl hp))
       α : π₁(Pushout PUnit' PUnit' C f g, Pushout.inl (f c₀))) =
     Quot.mk _ (Path.refl _) := by
@@ -199,7 +199,7 @@ theorem trivial_left_inclusion
 theorem trivial_right_inclusion
     {C : Type u} {f : C → PUnit'} {g : C → PUnit'} (c₀ : C) (β : π₁(PUnit', PUnit'.unit)) :
     (Quot.lift
-      (fun q => Quot.mk RwEq (Path.trans
+      (fun q => Quot.mk _ (Path.trans
           (Pushout.glue c₀)
           (Path.trans (Pushout.inrPath q)
             (Path.symm (Pushout.glue c₀)))))
@@ -213,7 +213,7 @@ theorem trivial_right_inclusion
   rw [hβ]
   -- Now we need: Quot.mk _ (trans (glue c₀) (trans (inrPath refl) (symm (glue c₀)))) = Quot.mk _ refl
   -- inrPath refl = refl
-  show Quot.mk RwEq (Path.trans (Pushout.glue c₀)
+  show Quot.mk _ (Path.trans (Pushout.glue c₀)
     (Path.trans (Path.refl _) (Path.symm (Pushout.glue c₀)))) = Quot.mk _ (Path.refl _)
   apply Quot.sound
   exact glue_conj_refl_rweq c₀
