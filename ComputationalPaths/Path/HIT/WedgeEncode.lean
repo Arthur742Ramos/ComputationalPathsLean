@@ -74,16 +74,7 @@ This allows us to define encode as the inverse of decode.
 Proved by induction using the case axioms from PushoutPaths. -/
 theorem wedgeEncodeQuot_decode (w : WedgeFreeProductCode a₀ b₀) :
     wedgeEncodeQuot a₀ b₀ (wedgeFreeProductDecode a₀ b₀ w) = w := by
-  induction w with
-  | nil =>
-    simp only [wedgeFreeProductDecode, wedgeEncodeQuot]
-    exact wedgeEncodeAxiom_refl A B a₀ b₀
-  | consLeft α rest _ =>
-    induction α using Quot.ind with
-    | _ p => exact wedgeEncodeDecode_consLeft_axiom A B a₀ b₀ p rest
-  | consRight β rest _ =>
-    induction β using Quot.ind with
-    | _ q => exact wedgeEncodeDecode_consRight_axiom A B a₀ b₀ q rest
+  exact (wedgeFundamentalGroupEquiv (A := A) (B := B) a₀ b₀).right_inv w
 
 /-- Injectivity: If decode w₁ = decode w₂, then w₁ = w₂.
 

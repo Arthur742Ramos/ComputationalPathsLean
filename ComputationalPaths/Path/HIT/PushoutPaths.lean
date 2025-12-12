@@ -632,18 +632,27 @@ theorem pushoutDecode_respects_amalg
     -- Apply the glue naturality theorem
     exact Pushout.glue_natural_loop_rweq c₀ p
 
-/-- Encode axiom for general pushouts. -/
-axiom pushoutEncodeAxiom (A : Type u) (B : Type u) (C : Type u)
+/-- Encode axiom for general pushouts (at the quotient level). -/
+axiom pushoutEncodeQuotAxiom (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C) :
-    LoopSpace (Pushout A B C f g) (Pushout.inl (f c₀)) →
+    π₁(Pushout A B C f g, Pushout.inl (f c₀)) →
     FreeProductWord (π₁(A, f c₀)) (π₁(B, g c₀))
 
+/-- Encode on loop representatives. -/
+noncomputable def pushoutEncodeAxiom (A : Type u) (B : Type u) (C : Type u)
+    (f : C → A) (g : C → B) (c₀ : C) :
+    LoopSpace (Pushout A B C f g) (Pushout.inl (f c₀)) →
+    FreeProductWord (π₁(A, f c₀)) (π₁(B, g c₀)) :=
+  fun p => pushoutEncodeQuotAxiom A B C f g c₀ (Quot.mk _ p)
+
 /-- Encode respects RwEq. -/
-axiom pushoutEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (C : Type u)
+theorem pushoutEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
     {p q : LoopSpace (Pushout A B C f g) (Pushout.inl (f c₀))}
     (h : RwEq p q) :
-    pushoutEncodeAxiom A B C f g c₀ p = pushoutEncodeAxiom A B C f g c₀ q
+    pushoutEncodeAxiom A B C f g c₀ p = pushoutEncodeAxiom A B C f g c₀ q := by
+  unfold pushoutEncodeAxiom
+  exact _root_.congrArg (pushoutEncodeQuotAxiom A B C f g c₀) (Quot.sound h)
 
 /-- Encode at quotient level. -/
 noncomputable def pushoutEncodeQuot
@@ -651,8 +660,7 @@ noncomputable def pushoutEncodeQuot
     {f : C → A} {g : C → B} (c₀ : C) :
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) →
     PushoutCode A B C f g c₀ :=
-  Quot.lift (pushoutEncodeAxiom A B C f g c₀)
-    (fun _ _ h => pushoutEncodeAxiom_respects_rweq A B C f g c₀ h)
+  pushoutEncodeQuotAxiom A B C f g c₀
 
 /-- The encoding produces an amalgamation-equivalence class. -/
 noncomputable def pushoutEncodeAmalg

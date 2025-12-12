@@ -626,15 +626,17 @@ This map is defined by:
 
 The encode map extracts the "normal form" (m, n) from a loop by counting
 windings around each generator, accounting for the Klein relation. -/
-axiom encodeSVK_path : Path baseSVK baseSVK → Int × Int
+axiom encodeSVK : KleinBottleSVKPiOne → Int × Int
+
+/-- Encode on loop representatives (for stating laws). -/
+noncomputable def encodeSVK_path (p : Path baseSVK baseSVK) : Int × Int :=
+  encodeSVK (Quot.mk _ p)
 
 /-- Encode respects RwEq. -/
-axiom encodeSVK_respects_rweq {p q : Path baseSVK baseSVK}
-    (h : RwEq p q) : encodeSVK_path p = encodeSVK_path q
-
-/-- The encode map at quotient level. -/
-noncomputable def encodeSVK : KleinBottleSVKPiOne → Int × Int :=
-  Quot.lift encodeSVK_path (fun _ _ h => encodeSVK_respects_rweq h)
+theorem encodeSVK_respects_rweq {p q : Path baseSVK baseSVK}
+    (h : RwEq p q) : encodeSVK_path p = encodeSVK_path q := by
+  unfold encodeSVK_path
+  exact _root_.congrArg encodeSVK (Quot.sound h)
 
 /-- Encode of refl is (0, 0). -/
 axiom encodeSVK_refl : encodeSVK_path (Path.refl baseSVK) = (0, 0)

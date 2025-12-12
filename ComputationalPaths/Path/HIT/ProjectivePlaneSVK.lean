@@ -329,15 +329,17 @@ noncomputable def decodeSVK : Bool → ProjectivePlaneSVKPiOne
   | true => loopAClass
 
 /-- Encode: π₁(ProjectivePlaneSVK) → Bool. -/
-axiom encodeSVK_path : Path baseSVK baseSVK → Bool
+axiom encodeSVK : ProjectivePlaneSVKPiOne → Bool
+
+/-- Encode on loop representatives (for stating laws). -/
+noncomputable def encodeSVK_path (p : Path baseSVK baseSVK) : Bool :=
+  encodeSVK (Quot.mk _ p)
 
 /-- Encode respects RwEq. -/
-axiom encodeSVK_respects_rweq {p q : Path baseSVK baseSVK}
-    (h : RwEq p q) : encodeSVK_path p = encodeSVK_path q
-
-/-- The encode map at quotient level. -/
-noncomputable def encodeSVK : ProjectivePlaneSVKPiOne → Bool :=
-  Quot.lift encodeSVK_path (fun _ _ h => encodeSVK_respects_rweq h)
+theorem encodeSVK_respects_rweq {p q : Path baseSVK baseSVK}
+    (h : RwEq p q) : encodeSVK_path p = encodeSVK_path q := by
+  unfold encodeSVK_path
+  exact _root_.congrArg encodeSVK (Quot.sound h)
 
 /-- Encode of refl is false. -/
 axiom encodeSVK_refl : encodeSVK_path (Path.refl baseSVK) = false
