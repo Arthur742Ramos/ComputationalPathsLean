@@ -176,6 +176,10 @@ noncomputable def freeProductWordEquiv {G₁ G₂ H₁ H₂ : Type u}
 
 /-! ## The Main Theorem -/
 
+section MainEquiv
+
+variable [HasWedgeFundamentalGroupEquiv Circle Circle circleBase circleBase]
+
 /-- Step 1: π₁(figure-eight) ≃ FreeProductWord (π₁(S¹)) (π₁(S¹))
 
 This is a direct application of the wedge fundamental group theorem. -/
@@ -229,8 +233,10 @@ theorem wordToLoop_extractWord (α : FigureEightPiOne) :
     wordToLoop (extractWord α) = α :=
   figureEightPiOneEquiv.left_inv α
 
-/-! ## Generator Words
+end MainEquiv
 
+/-! ## Generator Words
+ 
 The two fundamental loops correspond to specific words.
 -/
 

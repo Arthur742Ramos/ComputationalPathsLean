@@ -137,9 +137,9 @@ class HasHopfFibrationData : Type (u + 1) where
   /-- The Hopf map from S³ to S². -/
   hopfMap : Sphere3.{u} → Sphere2.{u}
   /-- The Hopf map sends north to the north pole of S². -/
-  hopfMap_north : hopfMap sphere3North = sphere2North
+  hopfMap_north : hopfMap sphere3North = Sphere2.north
   /-- The Hopf map sends south to the south pole of S². -/
-  hopfMap_south : hopfMap sphere3South = sphere2South
+  hopfMap_south : hopfMap sphere3South = Sphere2.south
   /-- The fiber of the Hopf map over any point is equivalent to S¹.
       This is the key property of the Hopf fibration. -/
   hopfMap_fiber_equiv (x : Sphere2.{u}) :
@@ -153,11 +153,11 @@ noncomputable def hopfMap [HasHopfFibrationData] : Sphere3.{u} → Sphere2.{u} :
   HasHopfFibrationData.hopfMap
 
 /-- The Hopf map sends north to the north pole of S². -/
-theorem hopfMap_north [HasHopfFibrationData] : hopfMap sphere3North = sphere2North :=
+theorem hopfMap_north [HasHopfFibrationData] : hopfMap sphere3North = Sphere2.north :=
   HasHopfFibrationData.hopfMap_north
 
 /-- The Hopf map sends south to the south pole of S². -/
-theorem hopfMap_south [HasHopfFibrationData] : hopfMap sphere3South = sphere2South :=
+theorem hopfMap_south [HasHopfFibrationData] : hopfMap sphere3South = Sphere2.south :=
   HasHopfFibrationData.hopfMap_south
 
 /-- The fiber of the Hopf map over any point is equivalent to S¹. -/
@@ -213,10 +213,10 @@ This proof reuses the SVK machinery from Sphere.lean.
 -/
 
 /-- The constant map from Sphere2 to PUnit'. -/
-def sphere2ToNorth : Sphere2 → PUnit' := fun _ => PUnit'.unit
+def sphere2ToNorth : Sphere2.{u} → PUnit'.{u} := fun _ => PUnit'.unit
 
 /-- The constant map from Sphere2 to PUnit'. -/
-def sphere2ToSouth : Sphere2 → PUnit' := fun _ => PUnit'.unit
+def sphere2ToSouth : Sphere2.{u} → PUnit'.{u} := fun _ => PUnit'.unit
 
 /-- The basepoint of S³ (we choose the north pole). -/
 noncomputable def sphere3Basepoint : Sphere3 := sphere3North
@@ -263,31 +263,36 @@ theorem amalg_trivial_is_one_s3 :
     3. Every element x of the amalgamated free product satisfies:
        decode(x) = Quot.mk _ refl (by trivial_decode_s3)
     4. By the SVK equivalence: α = decode(encode(α)) = Quot.mk _ refl -/
-theorem sphere3_pi1_trivial :
-    ∀ (l : LoopSpace Sphere3.{0} sphere3North),
+theorem sphere3_pi1_trivial
+    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Sphere2.{u} sphere2ToNorth sphere2ToSouth basepoint] :
+    ∀ (l : LoopSpace Sphere3.{u} sphere3North),
     Quot.mk RwEq l = Quot.mk RwEq (Path.refl sphere3North) := by
   intro l
   -- S³ = Suspension Sphere2 = Pushout PUnit' PUnit' Sphere2
   -- sphere3North = Suspension.north = Pushout.inl PUnit'.unit
-  let f : Sphere2 → PUnit' := sphere2ToNorth
-  let g : Sphere2 → PUnit' := sphere2ToSouth
-  let c₀ : Sphere2 := basepoint
+  let f : Sphere2.{u} → PUnit'.{u} := sphere2ToNorth
+  let g : Sphere2.{u} → PUnit'.{u} := sphere2ToSouth
+  let c₀ : Sphere2.{u} := basepoint
 
   -- The encoded element in the amalgamated free product
   let encoded := pushoutEncodeAmalg (f := f) (g := g) c₀ (Quot.mk RwEq l)
 
   -- By SVK left inverse: α = pushoutDecodeAmalg (pushoutEncodeAmalg α)
   have left_inv_l : Quot.mk RwEq l = pushoutDecodeAmalg (f := f) (g := g) c₀ encoded := by
-    simp only [pushoutDecodeAmalg]
-    exact (pushoutDecodeEncodeAxiom PUnit' PUnit' Sphere2 f g c₀ l).symm
+    have h :=
+      (seifertVanKampenEquiv (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Sphere2.{u})
+            (f := f) (g := g) (c₀ := c₀)).left_inv (Quot.mk RwEq l)
+    dsimp [encoded]
+    exact h.symm
 
   -- Now use that decode of any element is refl
   rw [left_inv_l]
   exact amalg_trivial_is_one_s3 encoded
 
 /-- π₁(S³) is equivalent to the trivial group. -/
-noncomputable def sphere3_pi1_equiv_unit :
-    SimpleEquiv (π₁(Sphere3.{0}, sphere3North)) Unit where
+noncomputable def sphere3_pi1_equiv_unit
+    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Sphere2.{u} sphere2ToNorth sphere2ToSouth basepoint] :
+    SimpleEquiv (π₁(Sphere3.{u}, sphere3North)) Unit where
   toFun := fun _ => ()
   invFun := fun _ => Quot.mk _ (Path.refl sphere3North)
   left_inv := fun α => by
@@ -305,7 +310,7 @@ because the adjacent terms vanish.
     This map ∂ : π₂(S², base) → π₁(S¹, base) witnesses the
     relationship between second homotopy of S² and the circle. -/
 noncomputable def hopfConnectingMap :
-    π₂(Sphere2.{0}, sphere2North) → π₁(Circle.{0}, circleBase) :=
+    π₂(Sphere2.{u}, Sphere2.north) → π₁(Circle.{u}, circleBase) :=
   -- The connecting map is constructed via transport in the fibration
   -- For a 2-loop in S², lift it to the total space and project to the fiber
   fun α => Quot.lift

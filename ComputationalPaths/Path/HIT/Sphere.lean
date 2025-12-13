@@ -276,8 +276,10 @@ theorem amalg_trivial_is_one
        decode(x) = Quot.mk _ refl (by trivial_decode)
     4. By the SVK equivalence: α = decode(encode(α)) = Quot.mk _ refl
 -/
-theorem sphere2_pi1_trivial :
-    ∀ (α : π₁(Sphere2, basepoint)), α = Quot.mk _ (Path.refl _) := by
+theorem sphere2_pi1_trivial
+    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
+      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+    ∀ (α : π₁(Sphere2.{u}, (basepoint : Sphere2.{u}))), α = Quot.mk _ (Path.refl _) := by
   intro α
   -- Use the SVK equivalence: α = invFun (toFun α) = decode(encode(α))
   -- The encode gives an element of the amalgamated free product
@@ -290,9 +292,13 @@ theorem sphere2_pi1_trivial :
   -- and that pushoutDecodeAmalg x = Quot.mk _ refl for all x (from amalg_trivial_is_one)
 
   -- First, we establish the SVK equivalence for S²
-  let f : Circle → PUnit' := fun _ => PUnit'.unit
-  let g : Circle → PUnit' := fun _ => PUnit'.unit
-  let c₀ : Circle := circleBase
+  let f : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
+  let g : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
+  let c₀ : Circle.{u} := circleBase
+  letI : HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u} f g c₀ := by
+    simpa [f, g, c₀] using (inferInstance :
+      HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
+        (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u}))
 
   -- The key: apply left_inv from SVK to get α = decode(encode(α))
   -- Then use that decode of anything in trivial amalg is refl
@@ -314,8 +320,10 @@ theorem sphere2_pi1_trivial :
   exact amalg_trivial_is_one f g c₀ encoded
 
 /-- π₁(S²) ≃ 1 (the trivial group). -/
-noncomputable def sphere2_pi1_equiv_unit :
-    SimpleEquiv (π₁(Sphere2, basepoint)) Unit where
+noncomputable def sphere2_pi1_equiv_unit
+    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
+      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+    SimpleEquiv (π₁(Sphere2.{u}, (basepoint : Sphere2.{u}))) Unit where
   toFun := fun _ => ()
   invFun := fun _ => Quot.mk _ (Path.refl _)
   left_inv := by

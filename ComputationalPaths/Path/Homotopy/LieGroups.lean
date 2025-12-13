@@ -289,8 +289,11 @@ def IsSimplyConnected (A : Type u) : Prop :=
 
 /-- S² is simply connected at the basepoint.
     (This is proved in Sphere.lean as sphere2_pi1_trivial) -/
-theorem sphere2_simplyConnected_at_base : ∀ (α : π₁(Sphere2, Sphere2.basepoint)),
-    α = Quot.mk _ (Path.refl Sphere2.basepoint) :=
+theorem sphere2_simplyConnected_at_base
+    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
+      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+    ∀ (α : π₁(Sphere2.{u}, (Sphere2.basepoint : Sphere2.{u}))),
+    α = Quot.mk _ (Path.refl (Sphere2.basepoint : Sphere2.{u})) :=
   Sphere2.sphere2_pi1_trivial
 
 /-- For simply connected types, the fundamental groupoid collapses to

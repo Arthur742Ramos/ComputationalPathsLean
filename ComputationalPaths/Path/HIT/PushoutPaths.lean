@@ -633,21 +633,35 @@ theorem pushoutDecode_respects_amalg
     exact Pushout.glue_natural_loop_rweq c₀ p
 
 /-- Encode axiom for general pushouts (at the quotient level). -/
-axiom pushoutEncodeQuotAxiom (A : Type u) (B : Type u) (C : Type u)
-    (f : C → A) (g : C → B) (c₀ : C) :
+class HasPushoutSVKEncodeData (A : Type u) (B : Type u) (C : Type u)
+    (f : C → A) (g : C → B) (c₀ : C) where
+  encodeQuot :
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) →
-    FreeProductWord (π₁(A, f c₀)) (π₁(B, g c₀))
+      FreeProductWord (π₁(A, f c₀)) (π₁(B, g c₀))
+  decode_encode :
+    ∀ p : LoopSpace (Pushout A B C f g) (Pushout.inl (f c₀)),
+      pushoutDecode c₀ (encodeQuot (Quot.mk _ p)) = Quot.mk _ p
+  encode_decode :
+    ∀ w : PushoutCode A B C f g c₀,
+      AmalgEquiv (piOneFmap c₀) (piOneGmap c₀)
+        (encodeQuot (pushoutDecode c₀ w)) w
+
+noncomputable def pushoutEncodeQuotAxiom (A : Type u) (B : Type u) (C : Type u)
+    (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeData A B C f g c₀] :
+    π₁(Pushout A B C f g, Pushout.inl (f c₀)) →
+    FreeProductWord (π₁(A, f c₀)) (π₁(B, g c₀)) :=
+  HasPushoutSVKEncodeData.encodeQuot
 
 /-- Encode on loop representatives. -/
 noncomputable def pushoutEncodeAxiom (A : Type u) (B : Type u) (C : Type u)
-    (f : C → A) (g : C → B) (c₀ : C) :
+    (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeData A B C f g c₀] :
     LoopSpace (Pushout A B C f g) (Pushout.inl (f c₀)) →
     FreeProductWord (π₁(A, f c₀)) (π₁(B, g c₀)) :=
   fun p => pushoutEncodeQuotAxiom A B C f g c₀ (Quot.mk _ p)
 
 /-- Encode respects RwEq. -/
 theorem pushoutEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (C : Type u)
-    (f : C → A) (g : C → B) (c₀ : C)
+    (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeData A B C f g c₀]
     {p q : LoopSpace (Pushout A B C f g) (Pushout.inl (f c₀))}
     (h : RwEq p q) :
     pushoutEncodeAxiom A B C f g c₀ p = pushoutEncodeAxiom A B C f g c₀ q := by
@@ -657,7 +671,7 @@ theorem pushoutEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (C : Type u)
 /-- Encode at quotient level. -/
 noncomputable def pushoutEncodeQuot
     {A : Type u} {B : Type u} {C : Type u}
-    {f : C → A} {g : C → B} (c₀ : C) :
+    {f : C → A} {g : C → B} (c₀ : C) [HasPushoutSVKEncodeData A B C f g c₀] :
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) →
     PushoutCode A B C f g c₀ :=
   pushoutEncodeQuotAxiom A B C f g c₀
@@ -665,7 +679,7 @@ noncomputable def pushoutEncodeQuot
 /-- The encoding produces an amalgamation-equivalence class. -/
 noncomputable def pushoutEncodeAmalg
     {A : Type u} {B : Type u} {C : Type u}
-    {f : C → A} {g : C → B} (c₀ : C) :
+    {f : C → A} {g : C → B} (c₀ : C) [HasPushoutSVKEncodeData A B C f g c₀] :
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) →
     AmalgamatedFreeProduct (π₁(A, f c₀)) (π₁(B, g c₀)) (π₁(C, c₀))
       (piOneFmap c₀) (piOneGmap c₀) :=
@@ -714,19 +728,25 @@ noncomputable def pushoutDecodeAmalg
     | trans _ _ ih1 ih2 => exact ih1.trans ih2)
 
 /-- Round-trip: decode ∘ encode = id. -/
-axiom pushoutDecodeEncodeAxiom (A : Type u) (B : Type u) (C : Type u)
-    (f : C → A) (g : C → B) (c₀ : C)
+theorem pushoutDecodeEncodeAxiom (A : Type u) (B : Type u) (C : Type u)
+    (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeData A B C f g c₀]
     (p : LoopSpace (Pushout A B C f g) (Pushout.inl (f c₀))) :
-    pushoutDecode c₀ (pushoutEncodeAxiom A B C f g c₀ p) = Quot.mk _ p
+    pushoutDecode c₀ (pushoutEncodeAxiom A B C f g c₀ p) = Quot.mk _ p := by
+  unfold pushoutEncodeAxiom
+  unfold pushoutEncodeQuotAxiom
+  exact HasPushoutSVKEncodeData.decode_encode (A := A) (B := B) (C := C) (f := f) (g := g) (c₀ := c₀) p
 
 /-- Round-trip: encode ∘ decode gives an amalgamation-equivalent word. -/
-axiom pushoutEncodeDecodeAxiom (A : Type u) (B : Type u) (C : Type u)
-    (f : C → A) (g : C → B) (c₀ : C)
+theorem pushoutEncodeDecodeAxiom (A : Type u) (B : Type u) (C : Type u)
+    (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeData A B C f g c₀]
     (w : PushoutCode A B C f g c₀) :
     AmalgEquiv (piOneFmap c₀) (piOneGmap c₀)
-      (pushoutEncodeQuot c₀ (pushoutDecode c₀ w)) w
+      (pushoutEncodeQuot c₀ (pushoutDecode c₀ w)) w := by
+  unfold pushoutEncodeQuot
+  unfold pushoutEncodeQuotAxiom
+  exact HasPushoutSVKEncodeData.encode_decode (A := A) (B := B) (C := C) (f := f) (g := g) (c₀ := c₀) w
 
-noncomputable def seifertVanKampenEquiv :
+noncomputable def seifertVanKampenEquiv [HasPushoutSVKEncodeData A B C f g c₀] :
     SimpleEquiv
       (π₁(Pushout A B C f g, Pushout.inl (f c₀)))
       (AmalgamatedFreeProduct
@@ -855,7 +875,9 @@ function is well-defined on the quotient.
 
 The actual word extraction would normally use a code family; for now we define
 wedge encoding by specialising the general pushout encoding interface. -/
-noncomputable def wedgeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) :
+noncomputable def wedgeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
+    [HasPushoutSVKEncodeData A B PUnit'
+      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit] :
     LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint → FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
   pushoutEncodeAxiom A B PUnit'
     (fun _ : PUnit' => a₀)
@@ -864,6 +886,8 @@ noncomputable def wedgeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : 
 
 /-- Encode respects RwEq. -/
 theorem wedgeEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
+    [HasPushoutSVKEncodeData A B PUnit'
+      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit]
     {p q : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint}
     (h : RwEq p q) :
     wedgeEncodeAxiom A B a₀ b₀ p = wedgeEncodeAxiom A B a₀ b₀ q := by
@@ -875,12 +899,17 @@ theorem wedgeEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (a₀ : A) (b�
       (p := p) (q := q) h
 
 /-- Encode at the quotient level: π₁(Wedge) → FreeProductWord. -/
-noncomputable def wedgeEncodeQuot :
+noncomputable def wedgeEncodeQuot
+    [HasPushoutSVKEncodeData A B PUnit'
+      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit] :
     π₁(Wedge A B a₀ b₀, Wedge.basepoint) → WedgeFreeProductCode a₀ b₀ :=
-  Quot.lift (wedgeEncodeAxiom A B a₀ b₀) (fun _ _ h => wedgeEncodeAxiom_respects_rweq A B a₀ b₀ h)
+  Quot.lift (wedgeEncodeAxiom A B a₀ b₀)
+    (fun _ _ h => wedgeEncodeAxiom_respects_rweq A B a₀ b₀ h)
 
 /-- Computation rule for `wedgeEncodeQuot` on representatives. -/
 @[simp] theorem wedgeEncodeQuot_mk
+    [HasPushoutSVKEncodeData A B PUnit'
+      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit]
     (p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
     wedgeEncodeQuot (A := A) (B := B) a₀ b₀ (Quot.mk _ p) = wedgeEncodeAxiom A B a₀ b₀ p :=
   rfl
@@ -911,6 +940,8 @@ In the code family approach, this follows from:
 3. Transport along glue sequences corresponds to prepending a right letter
 4. decode reverses these operations exactly -/
 theorem wedgeDecodeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
+    [HasPushoutSVKEncodeData A B PUnit'
+      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit]
     (p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
     wedgeFreeProductDecode a₀ b₀ (wedgeEncodeAxiom A B a₀ b₀ p) = Quot.mk _ p := by
   -- Expand the wedge-specific definitions into the general pushout statements.
@@ -929,10 +960,17 @@ theorem wedgeDecodeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
 This is the simplest case of SVK where the gluing space is a point.
 The full encode/decode proof is not yet formalized here, so we record the
 equivalence as a packaged axiom. -/
-axiom wedgeFundamentalGroupEquiv :
+class HasWedgeFundamentalGroupEquiv (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) where
+  equiv :
     SimpleEquiv
       (π₁(Wedge A B a₀ b₀, Wedge.basepoint))
       (WedgeFreeProductCode a₀ b₀)
+
+noncomputable def wedgeFundamentalGroupEquiv [HasWedgeFundamentalGroupEquiv A B a₀ b₀] :
+    SimpleEquiv
+      (π₁(Wedge A B a₀ b₀, Wedge.basepoint))
+      (WedgeFreeProductCode a₀ b₀) :=
+  HasWedgeFundamentalGroupEquiv.equiv
 
 end WedgeSVK
 

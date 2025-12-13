@@ -38,6 +38,9 @@ namespace Path
 universe u
 
 variable {A : Type u} {B : Type u} (a₀ : A) (b₀ : B)
+variable [HasPushoutSVKEncodeData A B PUnit'
+  (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit]
+variable [HasWedgeFundamentalGroupEquiv A B a₀ b₀]
 
 /-! ## Alternative Approach: Encode via Bijectivity
 
