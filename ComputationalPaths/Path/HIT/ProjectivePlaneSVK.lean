@@ -331,9 +331,16 @@ noncomputable def decodeSVK_def : Bool → ProjectivePlaneSVKPiOne
   | false => Quot.mk _ (Path.refl baseSVK)
   | true => loopAClass
 
+/-- Data providing the SVK-based π₁ equivalence. -/
+class HasProjectivePlaneSVKPiOneEquiv where
+  piOneEquiv : SimpleEquiv ProjectivePlaneSVKPiOne Bool
+
 /-- **Main Theorem (SVK version)**: π₁(ProjectivePlaneSVK) ≅ ℤ₂. -/
-axiom projectivePlaneSVK_piOne_equiv :
-    SimpleEquiv ProjectivePlaneSVKPiOne Bool
+noncomputable def projectivePlaneSVK_piOne_equiv [HasProjectivePlaneSVKPiOneEquiv] :
+    SimpleEquiv ProjectivePlaneSVKPiOne Bool :=
+  HasProjectivePlaneSVKPiOneEquiv.piOneEquiv
+
+variable [HasProjectivePlaneSVKPiOneEquiv]
 
 /-- Encode: π₁(ProjectivePlaneSVK) → Bool. -/
 noncomputable def encodeSVK : ProjectivePlaneSVKPiOne → Bool :=
