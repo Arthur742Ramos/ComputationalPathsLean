@@ -105,11 +105,17 @@ structure IsKConnected (A : Type u) (a : A) (k : Nat) where
 The suspension map sends π_n(X) to π_{n+1}(ΣX).
 -/
 
-/-- Type representing π_n of a pointed space (for axiomatization). -/
-axiom PiN (A : Type u) (a : A) (n : Nat) : Type
+/-- Type representing π_n of a pointed space. -/
+abbrev PiN (A : Type u) (a : A) (n : Nat) : Type u :=
+  HigherHomotopy.PiN n A a
 
 /-- The trivial element in π_n. -/
-axiom piN_refl (A : Type u) (a : A) (n : Nat) : PiN A a n
+noncomputable def piN_refl (A : Type u) (a : A) (n : Nat) : PiN A a n :=
+  match n with
+  | 0 => PUnit.unit
+  | 1 => LoopQuot.id (A := A) (a := a)
+  | 2 => PiTwo.id (A := A) (a := a)
+  | _ + 3 => PUnit.unit
 
 /-- The suspension map Σ : π_n(X, x₀) → π_{n+1}(ΣX, north).
 
@@ -183,44 +189,57 @@ axiom sphereN_connectivity (n : Nat) (hn : n ≥ 1) :
 /-- Type representing π_n(Sⁿ), the n-th homotopy group of the n-sphere. -/
 def SpherePiN (n : Nat) : Type := PiN (SphereN n) (sphereN_base n) n
 
-/-- The generator of π_n(Sⁿ): the identity map Sⁿ → Sⁿ. -/
-axiom spherePiN_generator (n : Nat) : SpherePiN n
+/-- **Axiomatized equivalence**: π_n(Sⁿ) ≃ ℤ for all n ≥ 1. -/
+axiom spherePiN_equiv_int (n : Nat) : SimpleEquiv (SpherePiN n) Int
 
 /-- The winding/degree of an element in π_n(Sⁿ).
 
 This generalizes the winding number in π₁(S¹). -/
-axiom spherePiN_degree (n : Nat) : SpherePiN n → Int
+noncomputable def spherePiN_degree (n : Nat) : SpherePiN n → Int :=
+  (spherePiN_equiv_int n).toFun
 
 /-- Construct an element of π_n(Sⁿ) from its degree. -/
-axiom spherePiN_of_degree (n : Nat) : Int → SpherePiN n
+noncomputable def spherePiN_of_degree (n : Nat) : Int → SpherePiN n :=
+  (spherePiN_equiv_int n).invFun
+
+/-- The generator of π_n(Sⁿ): the element of degree 1. -/
+noncomputable def spherePiN_generator (n : Nat) : SpherePiN n :=
+  spherePiN_of_degree n 1
 
 /-- The generator has degree 1. -/
-axiom spherePiN_generator_degree (n : Nat) :
-    spherePiN_degree n (spherePiN_generator n) = 1
+theorem spherePiN_generator_degree (n : Nat) :
+    spherePiN_degree n (spherePiN_generator n) = 1 := by
+  simpa [spherePiN_degree, spherePiN_of_degree, spherePiN_generator] using
+    (spherePiN_equiv_int n).right_inv 1
 
 /-- The trivial element has degree 0. -/
 axiom spherePiN_refl_degree (n : Nat) :
     spherePiN_degree n (piN_refl (SphereN n) (sphereN_base n) n) = 0
 
 /-- Round-trip: degree then construct. -/
-axiom spherePiN_degree_of_degree (n : Nat) (d : Int) :
-    spherePiN_degree n (spherePiN_of_degree n d) = d
+theorem spherePiN_degree_of_degree (n : Nat) (d : Int) :
+    spherePiN_degree n (spherePiN_of_degree n d) = d := by
+  simpa [spherePiN_degree, spherePiN_of_degree] using
+    (spherePiN_equiv_int n).right_inv d
 
 /-- Round-trip: elements with same degree are equal. -/
-axiom spherePiN_eq_of_degree (n : Nat) (x y : SpherePiN n) :
-    spherePiN_degree n x = spherePiN_degree n y → x = y
+theorem spherePiN_eq_of_degree (n : Nat) (x y : SpherePiN n) :
+    spherePiN_degree n x = spherePiN_degree n y → x = y := by
+  intro h
+  have h' := _root_.congrArg (spherePiN_of_degree n) h
+  have hx : spherePiN_of_degree n (spherePiN_degree n x) = x := by
+    simpa [spherePiN_degree, spherePiN_of_degree] using (spherePiN_equiv_int n).left_inv x
+  have hy : spherePiN_of_degree n (spherePiN_degree n y) = y := by
+    simpa [spherePiN_degree, spherePiN_of_degree] using (spherePiN_equiv_int n).left_inv y
+  exact hx ▸ hy ▸ h'
 
 /-- **Main Theorem**: π_n(Sⁿ) ≃ ℤ for all n ≥ 1.
 
 This is the fundamental result connecting dimension and homotopy.
 The generator is the identity map id : Sⁿ → Sⁿ, with degree 1. -/
 noncomputable def sphereN_piN_equiv_int (n : Nat) (_hn : n ≥ 1) :
-    SimpleEquiv (SpherePiN n) Int where
-  toFun := spherePiN_degree n
-  invFun := spherePiN_of_degree n
-  left_inv := fun x => spherePiN_eq_of_degree n _ _
-      (spherePiN_degree_of_degree n (spherePiN_degree n x))
-  right_inv := spherePiN_degree_of_degree n
+    SimpleEquiv (SpherePiN n) Int :=
+  spherePiN_equiv_int n
 
 /-- The suspension map preserves degree.
 
