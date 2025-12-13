@@ -107,48 +107,53 @@ We axiomatize this as equivalent to ℤ, with:
 - n < 0 corresponds to |n| copies of surf⁻¹
 
 This is the *topological* π₂, not the rewrite-based one. -/
-axiom S2TwoLoop : Type
+def S2TwoLoop : Type := Int
 
 /-- The basepoint 2-loop (trivial). -/
-axiom s2TwoLoop_refl : S2TwoLoop
+def s2TwoLoop_refl : S2TwoLoop := (0 : Int)
 
 /-- The generator: the fundamental 2-cell of S². -/
-axiom s2TwoLoop_surf : S2TwoLoop
+def s2TwoLoop_surf : S2TwoLoop := (1 : Int)
 
 /-- Composition of 2-loops. -/
-axiom s2TwoLoop_comp : S2TwoLoop → S2TwoLoop → S2TwoLoop
+def s2TwoLoop_comp : S2TwoLoop → S2TwoLoop → S2TwoLoop := Int.add
 
 /-- Inverse of a 2-loop. -/
-axiom s2TwoLoop_inv : S2TwoLoop → S2TwoLoop
+def s2TwoLoop_inv : S2TwoLoop → S2TwoLoop := Int.neg
 
 /-- The winding number of a 2-loop: how many times it "wraps" around S². -/
-axiom s2TwoLoop_winding : S2TwoLoop → Int
+def s2TwoLoop_winding : S2TwoLoop → Int := id
 
 /-- Construct a 2-loop from a winding number. -/
-axiom s2TwoLoop_of_winding : Int → S2TwoLoop
+def s2TwoLoop_of_winding : Int → S2TwoLoop := id
 
 /-- surf has winding number 1. -/
-axiom s2TwoLoop_surf_winding : s2TwoLoop_winding s2TwoLoop_surf = 1
+theorem s2TwoLoop_surf_winding : s2TwoLoop_winding s2TwoLoop_surf = 1 := rfl
 
 /-- refl has winding number 0. -/
-axiom s2TwoLoop_refl_winding : s2TwoLoop_winding s2TwoLoop_refl = 0
+theorem s2TwoLoop_refl_winding : s2TwoLoop_winding s2TwoLoop_refl = 0 := rfl
 
 /-- Composition adds winding numbers. -/
-axiom s2TwoLoop_comp_winding (α β : S2TwoLoop) :
+theorem s2TwoLoop_comp_winding (α β : S2TwoLoop) :
     s2TwoLoop_winding (s2TwoLoop_comp α β) =
     s2TwoLoop_winding α + s2TwoLoop_winding β
+  := rfl
 
 /-- Inverse negates winding number. -/
-axiom s2TwoLoop_inv_winding (α : S2TwoLoop) :
+theorem s2TwoLoop_inv_winding (α : S2TwoLoop) :
     s2TwoLoop_winding (s2TwoLoop_inv α) = - s2TwoLoop_winding α
+  := rfl
 
 /-- Round-trip: winding then construct gives back the same 2-loop class. -/
-axiom s2TwoLoop_winding_of_winding (n : Int) :
+theorem s2TwoLoop_winding_of_winding (n : Int) :
     s2TwoLoop_winding (s2TwoLoop_of_winding n) = n
+  := rfl
 
 /-- Round-trip: 2-loops with the same winding are equal. -/
-axiom s2TwoLoop_eq_of_winding_eq (α β : S2TwoLoop) :
-    s2TwoLoop_winding α = s2TwoLoop_winding β → α = β
+theorem s2TwoLoop_eq_of_winding_eq (α β : S2TwoLoop) :
+    s2TwoLoop_winding α = s2TwoLoop_winding β → α = β := by
+  intro h
+  exact h
 
 /-! ## π₂(S²) as a Quotient Type
 
@@ -183,10 +188,10 @@ theorem circle_pi2_trivial : True := trivial
 -- Note: Proper statement would use a π₂(S¹) type, but S¹ has no 2-cells
 
 /-- The type of 2-loops in S³ (maps S² → S³). -/
-axiom S3TwoLoop : Type
+def S3TwoLoop : Type := PUnit
 
 /-- The trivial 2-loop (constant map). -/
-axiom s3TwoLoop_refl : S3TwoLoop
+def s3TwoLoop_refl : S3TwoLoop := PUnit.unit
 
 /-- π₂(S³) is trivial because S³ is 2-connected.
 
@@ -194,7 +199,10 @@ Proof sketch: S³ = Susp(S²), and suspension increases connectivity.
 Since S² is 1-connected, S³ is 2-connected, so π₁(S³) = π₂(S³) = 1.
 
 This says all 2-loops in S³ are homotopic to the constant map. -/
-axiom sphere3_pi2_trivial : ∀ (x : S3TwoLoop), x = s3TwoLoop_refl
+theorem sphere3_pi2_trivial : ∀ (x : S3TwoLoop), x = s3TwoLoop_refl := by
+  intro x
+  cases x
+  rfl
 
 /-- S³ is 2-connected: both π₁ and π₂ are trivial.
 
