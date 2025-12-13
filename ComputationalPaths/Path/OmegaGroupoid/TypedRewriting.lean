@@ -155,6 +155,9 @@ For 3-cells, we additionally require the two closing paths to be 3-equivalent.
     When two single steps diverge, they can close to a common point,
     and the two derivations are 3-equivalent. -/
 structure TDiamond {a b : A} (r : ∀ {p q : Path a b}, Prop) : Type (u + 1) where
+  /-- Embed an `r`-witness as a `Step` so we can form 2-cells (`Derivation₂`)
+  and state 3-cell coherences. -/
+  step_of : ∀ {p q : Path a b}, r (p := p) (q := q) → Step p q
   /-- Given two steps from the same source... -/
   close : ∀ {p q₁ q₂ : Path a b},
     r (p := p) (q := q₁) → r (p := p) (q := q₂) →
@@ -168,12 +171,8 @@ structure TDiamond {a b : A} (r : ∀ {p q : Path a b}, Prop) : Type (u + 1) whe
     let ⟨s, h₃, h₄⟩ := close h₁ h₂
     -- The two derivations p → q₁ → s and p → q₂ → s are 3-equivalent
     Derivation₃
-      (.vcomp (.step (step_of_r h₁)) (.step (step_of_r h₃)))
-      (.vcomp (.step (step_of_r h₂)) (.step (step_of_r h₄)))
-
-/-- Helper: convert relation witness to Step (placeholder - needs instantiation) -/
-axiom step_of_r : ∀ {a b : A} {p q : Path a b} {r : ∀ {p q : Path a b}, Prop},
-  r (p := p) (q := q) → Step p q
+      (.vcomp (.step (step_of h₁)) (.step (step_of h₃)))
+      (.vcomp (.step (step_of h₂)) (.step (step_of h₄)))
 
 /-! ## Type-Valued Local Confluence
 
