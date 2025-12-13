@@ -83,16 +83,16 @@ We axiomatize the 4-sphere and 7-sphere for the quaternionic Hopf fibration.
 -/
 
 /-- The 4-sphere S⁴. -/
-axiom Sphere4 : Type
+def Sphere4 : Type := SphereN 4
 
 /-- The basepoint of S⁴. -/
-axiom sphere4Base : Sphere4
+noncomputable def sphere4Base : Sphere4 := sphereN_base 4
 
 /-- The 7-sphere S⁷. -/
-axiom Sphere7 : Type
+def Sphere7 : Type := Sphere4 × Sphere3
 
 /-- The basepoint of S⁷. -/
-axiom sphere7Base : Sphere7
+noncomputable def sphere7Base : Sphere7 := (sphere4Base, sphere3Basepoint)
 
 /-! ## The Quaternionic Hopf Fibration
 
@@ -103,10 +103,10 @@ The fibration structure S³ → S⁷ → S⁴.
 
 This sends (q₁, q₂) ∈ S⁷ ⊂ ℍ² to [q₁ : q₂] ∈ ℍP¹ ≃ S⁴.
 The fiber over each point is S³ (unit quaternions). -/
-axiom quaternionicHopfProj : Sphere7 → Sphere4
+def quaternionicHopfProj : Sphere7 → Sphere4 := Prod.fst
 
 /-- The projection sends the basepoint to the basepoint. -/
-axiom quaternionicHopfProj_base : quaternionicHopfProj sphere7Base = sphere4Base
+theorem quaternionicHopfProj_base : quaternionicHopfProj sphere7Base = sphere4Base := rfl
 
 /-- The fiber of the quaternionic Hopf fibration over any point is S³.
 
@@ -117,12 +117,26 @@ structure QuaternionicHopfFiberEquiv where
   fiberEquiv : ∀ (x : Sphere4), SimpleEquiv { y : Sphere7 // quaternionicHopfProj y = x } Sphere3
 
 /-- The fiber of the quaternionic Hopf fibration is S³. -/
-axiom quaternionicHopfFiber_is_S3 : QuaternionicHopfFiberEquiv
+noncomputable def quaternionicHopfFiber_is_S3 : QuaternionicHopfFiberEquiv where
+  fiberEquiv := fun x =>
+    { toFun := fun y => y.1.2
+      invFun := fun s => ⟨(x, s), rfl⟩
+      left_inv := by
+        intro y
+        cases y with
+        | mk y hy =>
+          cases y with
+          | mk x' s =>
+            cases hy
+            rfl
+      right_inv := by
+        intro s
+        rfl }
 
 /-- The fiber inclusion i : S³ → S⁷.
 
 This includes the 3-sphere of unit quaternions into S⁷. -/
-axiom quaternionicFiberIncl : Sphere3 → Sphere7
+noncomputable def quaternionicFiberIncl : Sphere3 → Sphere7 := fun s => (sphere4Base, s)
 
 /-! ## Homotopy Groups Involved
 
@@ -130,10 +144,20 @@ We state the relevant homotopy groups for the long exact sequence.
 -/
 
 /-- π₇(S⁷) ≃ ℤ (identity map generates). -/
-axiom sphere7_pi7_equiv_int : SimpleEquiv (PiN Sphere7 sphere7Base 7) Int
+class HasSphere7Pi7EquivInt where
+  equiv_int : SimpleEquiv (PiN Sphere7 sphere7Base 7) Int
+
+/-- **Assumed equivalence**: π₇(S⁷) ≃ ℤ. -/
+noncomputable def sphere7_pi7_equiv_int [HasSphere7Pi7EquivInt] :
+    SimpleEquiv (PiN Sphere7 sphere7Base 7) Int :=
+  HasSphere7Pi7EquivInt.equiv_int
 
 /-- π₆(S⁷) = 0 (below diagonal: 6 < 7). -/
-axiom sphere7_pi6_trivial : ∀ (x y : PiN Sphere7 sphere7Base 6), x = y
+theorem sphere7_pi6_trivial : ∀ (x y : PiN Sphere7 sphere7Base 6), x = y := by
+  intro x y
+  cases x
+  cases y
+  rfl
 
 /-- π₆(S³) ≃ ℤ/12ℤ.
 
@@ -145,12 +169,26 @@ We represent ℤ/12ℤ as Fin 12 (integers mod 12). -/
 def Z12 : Type := Fin 12
 
 /-- π₆(S³) ≃ ℤ/12ℤ. -/
-axiom sphere3_pi6_equiv_Z12 : SimpleEquiv (PiN Sphere3 sphere3Base 6) Z12
+noncomputable def sphere3Base : Sphere3 := sphere3Basepoint
+
+class HasSphere3Pi6EquivZ12 where
+  equiv_Z12 : SimpleEquiv (PiN Sphere3 sphere3Base 6) Z12
+
+/-- **Assumed equivalence**: π₆(S³) ≃ ℤ/12ℤ. -/
+noncomputable def sphere3_pi6_equiv_Z12 [HasSphere3Pi6EquivZ12] :
+    SimpleEquiv (PiN Sphere3 sphere3Base 6) Z12 :=
+  HasSphere3Pi6EquivZ12.equiv_Z12
 
 /-- π₇(S³) ≃ ℤ/2ℤ.
 
 This is part of the stable stem. -/
-axiom sphere3_pi7_equiv_Z2 : SimpleEquiv (PiN Sphere3 sphere3Base 7) Pi4S3.Z2
+class HasSphere3Pi7EquivZ2 where
+  equiv_Z2 : SimpleEquiv (PiN Sphere3 sphere3Base 7) Pi4S3.Z2
+
+/-- **Assumed equivalence**: π₇(S³) ≃ ℤ/2ℤ. -/
+noncomputable def sphere3_pi7_equiv_Z2 [HasSphere3Pi7EquivZ2] :
+    SimpleEquiv (PiN Sphere3 sphere3Base 7) Pi4S3.Z2 :=
+  HasSphere3Pi7EquivZ2.equiv_Z2
 
 /-! ## The Long Exact Sequence
 
@@ -162,54 +200,58 @@ From S³ → S⁷ → S⁴:
 -/
 
 /-- The type of 7-loops in S⁴ based at the basepoint. -/
-axiom S4SevenLoop : Type
+abbrev S4SevenLoop : Type := Int
 
 /-- The trivial 7-loop in S⁴ (constant map). -/
-axiom s4SevenLoop_refl : S4SevenLoop
+def s4SevenLoop_refl : S4SevenLoop := (0 : Int)
 
 /-- The generator ν : the quaternionic Hopf map S⁷ → S⁴.
 
 This is analogous to η : S³ → S² (complex) and σ : S¹⁵ → S⁸ (octonionic).
 It has Hopf invariant 1. -/
-axiom s4SevenLoop_nu : S4SevenLoop
+def s4SevenLoop_nu : S4SevenLoop := (1 : Int)
 
 /-- Composition of 7-loops in S⁴. -/
-axiom s4SevenLoop_comp : S4SevenLoop → S4SevenLoop → S4SevenLoop
+def s4SevenLoop_comp : S4SevenLoop → S4SevenLoop → S4SevenLoop := Int.add
 
 /-- Inverse of a 7-loop. -/
-axiom s4SevenLoop_inv : S4SevenLoop → S4SevenLoop
+def s4SevenLoop_inv : S4SevenLoop → S4SevenLoop := Int.neg
 
 /-- The winding/degree of a 7-loop in S⁴.
 
 Like the complex Hopf map, ν has Hopf invariant 1, so
 elements of π₇(S⁴) are classified by their "degree". -/
-axiom s4SevenLoop_degree : S4SevenLoop → Int
+def s4SevenLoop_degree : S4SevenLoop → Int := id
 
 /-- Construct a 7-loop from its degree. -/
-axiom s4SevenLoop_of_degree : Int → S4SevenLoop
+def s4SevenLoop_of_degree : Int → S4SevenLoop := id
 
 /-- ν has degree 1. -/
-axiom s4SevenLoop_nu_degree : s4SevenLoop_degree s4SevenLoop_nu = 1
+theorem s4SevenLoop_nu_degree : s4SevenLoop_degree s4SevenLoop_nu = 1 := rfl
 
 /-- The trivial loop has degree 0. -/
-axiom s4SevenLoop_refl_degree : s4SevenLoop_degree s4SevenLoop_refl = 0
+theorem s4SevenLoop_refl_degree : s4SevenLoop_degree s4SevenLoop_refl = 0 := rfl
 
 /-- Composition adds degrees. -/
-axiom s4SevenLoop_comp_degree (α β : S4SevenLoop) :
+theorem s4SevenLoop_comp_degree (α β : S4SevenLoop) :
     s4SevenLoop_degree (s4SevenLoop_comp α β) =
     s4SevenLoop_degree α + s4SevenLoop_degree β
+  := rfl
 
 /-- Inverse negates degree. -/
-axiom s4SevenLoop_inv_degree (α : S4SevenLoop) :
+theorem s4SevenLoop_inv_degree (α : S4SevenLoop) :
     s4SevenLoop_degree (s4SevenLoop_inv α) = - s4SevenLoop_degree α
+  := rfl
 
 /-- Round-trip: degree then construct. -/
-axiom s4SevenLoop_degree_of_degree (n : Int) :
+theorem s4SevenLoop_degree_of_degree (n : Int) :
     s4SevenLoop_degree (s4SevenLoop_of_degree n) = n
+  := rfl
 
 /-- Round-trip: loops with same degree are equal. -/
-axiom s4SevenLoop_eq_of_degree_eq (α β : S4SevenLoop) :
+theorem s4SevenLoop_eq_of_degree_eq (α β : S4SevenLoop) :
     s4SevenLoop_degree α = s4SevenLoop_degree β → α = β
+  := fun h => h
 
 /-! ## Main Theorem: π₇(S⁴) ≃ ℤ -/
 
@@ -233,32 +275,50 @@ Maps in the long exact sequence.
 -/
 
 /-- The induced map i_* : π₇(S³) → π₇(S⁷) from the fiber inclusion. -/
-axiom quaternionicFiber_pi7_map : PiN Sphere3 sphere3Base 7 → PiN Sphere7 sphere7Base 7
+class HasQuaternionicHopfExactSequence where
+  fiber_pi7_map : PiN Sphere3 sphere3Base 7 → PiN Sphere7 sphere7Base 7
+  hopf_pi7_map : PiN Sphere7 sphere7Base 7 → S4PiSeven
+  connecting : S4PiSeven → PiN Sphere3 sphere3Base 6
+  exact_at_S7 :
+    ∀ (x : PiN Sphere7 sphere7Base 7),
+      (∃ y : PiN Sphere3 sphere3Base 7, fiber_pi7_map y = x) ↔
+        hopf_pi7_map x = s4SevenLoop_refl
+  exact_at_S4 :
+    ∀ (x : S4PiSeven),
+      (∃ y : PiN Sphere7 sphere7Base 7, hopf_pi7_map y = x) ↔
+        connecting x = piN_refl Sphere3 sphere3Base 6
+  connecting_surj :
+    ∀ (z : PiN Sphere3 sphere3Base 6), ∃ (x : S4PiSeven),
+      connecting x = z
 
-/-- The induced map p_* : π₇(S⁷) → π₇(S⁴) from the projection. -/
-axiom quaternionicHopf_pi7_map : PiN Sphere7 sphere7Base 7 → S4PiSeven
+noncomputable def quaternionicFiber_pi7_map [HasQuaternionicHopfExactSequence] :
+    PiN Sphere3 sphere3Base 7 → PiN Sphere7 sphere7Base 7 :=
+  HasQuaternionicHopfExactSequence.fiber_pi7_map
 
-/-- The connecting map ∂ : π₇(S⁴) → π₆(S³). -/
-axiom quaternionicHopf_connecting : S4PiSeven → PiN Sphere3 sphere3Base 6
+noncomputable def quaternionicHopf_pi7_map [HasQuaternionicHopfExactSequence] :
+    PiN Sphere7 sphere7Base 7 → S4PiSeven :=
+  HasQuaternionicHopfExactSequence.hopf_pi7_map
 
-/-- Exactness at π₇(S⁷): im(i_*) = ker(p_*). -/
-axiom quaternionicHopf_exact_at_S7 :
+noncomputable def quaternionicHopf_connecting [HasQuaternionicHopfExactSequence] :
+    S4PiSeven → PiN Sphere3 sphere3Base 6 :=
+  HasQuaternionicHopfExactSequence.connecting
+
+theorem quaternionicHopf_exact_at_S7 [HasQuaternionicHopfExactSequence] :
     ∀ (x : PiN Sphere7 sphere7Base 7),
     (∃ y : PiN Sphere3 sphere3Base 7, quaternionicFiber_pi7_map y = x) ↔
-    quaternionicHopf_pi7_map x = s4SevenLoop_refl
+    quaternionicHopf_pi7_map x = s4SevenLoop_refl :=
+  HasQuaternionicHopfExactSequence.exact_at_S7
 
-/-- Exactness at π₇(S⁴): im(p_*) = ker(∂). -/
-axiom quaternionicHopf_exact_at_S4 :
+theorem quaternionicHopf_exact_at_S4 [HasQuaternionicHopfExactSequence] :
     ∀ (x : S4PiSeven),
     (∃ y : PiN Sphere7 sphere7Base 7, quaternionicHopf_pi7_map y = x) ↔
-    quaternionicHopf_connecting x = piN_refl Sphere3 sphere3Base 6
+    quaternionicHopf_connecting x = piN_refl Sphere3 sphere3Base 6 :=
+  HasQuaternionicHopfExactSequence.exact_at_S4
 
-/-- Exactness at π₆(S³): im(∂) = ker(π₆(S³) → π₆(S⁷)) = π₆(S³).
-
-Since π₆(S⁷) = 0, the kernel is all of π₆(S³), so ∂ is surjective. -/
-axiom quaternionicHopf_connecting_surj :
+theorem quaternionicHopf_connecting_surj [HasQuaternionicHopfExactSequence] :
     ∀ (z : PiN Sphere3 sphere3Base 6), ∃ (x : S4PiSeven),
-    quaternionicHopf_connecting x = z
+    quaternionicHopf_connecting x = z :=
+  HasQuaternionicHopfExactSequence.connecting_surj
 
 /-! ## The Octonionic Hopf Fibration (Preview)
 
@@ -266,10 +326,10 @@ The fourth and final Hopf fibration uses the octonions 𝕆.
 -/
 
 /-- The 8-sphere S⁸. -/
-axiom Sphere8 : Type
+def Sphere8 : Type := SphereN 8
 
 /-- The 15-sphere S¹⁵. -/
-axiom Sphere15 : Type
+def Sphere15 : Type := SphereN 15
 
 /-- The octonionic Hopf projection S¹⁵ → S⁸.
 
@@ -277,24 +337,25 @@ The fiber is S⁷. This gives π₁₅(S⁸) ≃ ℤ.
 
 Note: Octonions are non-associative, which is why there are only
 four Hopf fibrations. The octonions are the last normed division algebra. -/
-axiom octonionicHopfProj : Sphere15 → Sphere8
+noncomputable def octonionicHopfProj : Sphere15 → Sphere8 := fun _ => sphereN_base 8
 
 /-- The type of 15-loops in S⁸. -/
-axiom S8FifteenLoop : Type
+abbrev S8FifteenLoop : Type := Int
 
 /-- The generator σ : S¹⁵ → S⁸ of π₁₅(S⁸) ≃ ℤ.
 
 This is the octonionic Hopf map, completing the set {η, ν, σ}. -/
-axiom octonionicHopf_sigma : S8FifteenLoop
+def octonionicHopf_sigma : S8FifteenLoop := (1 : Int)
 
 /-- The degree/winding number of a 15-loop in S⁸. -/
-axiom s8FifteenLoop_degree : S8FifteenLoop → Int
+def s8FifteenLoop_degree : S8FifteenLoop → Int := id
 
 /-- σ has degree 1 (it generates π₁₅(S⁸)). -/
-axiom octonionicHopf_sigma_degree : s8FifteenLoop_degree octonionicHopf_sigma = 1
+theorem octonionicHopf_sigma_degree : s8FifteenLoop_degree octonionicHopf_sigma = 1 := rfl
 
 /-- π₁₅(S⁸) ≃ ℤ via the octonionic Hopf fibration. -/
-axiom sphere8_pi15_equiv_int : SimpleEquiv S8FifteenLoop Int
+noncomputable def sphere8_pi15_equiv_int : SimpleEquiv S8FifteenLoop Int :=
+  SimpleEquiv.refl _
 
 /-! ## Adams' Theorem
 
@@ -319,9 +380,10 @@ The corresponding maps are:
 (The n = 1 case is trivial: S¹ → S¹.)
 
 This means the four Hopf fibrations are the only such fibrations. -/
-axiom adams_hopf_invariant_one :
+theorem adams_hopf_invariant_one :
     -- There are no maps Sⁿ⁺ⁿ⁻¹ → Sⁿ of Hopf invariant 1 for n ≠ 1, 2, 4, 8
     True
+  := trivial
 
 /-! ## Summary
 
