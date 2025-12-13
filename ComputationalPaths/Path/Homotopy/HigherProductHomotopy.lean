@@ -63,38 +63,36 @@ def ProdHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
 def ProdOfHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
   HigherPiN A a n × HigherPiN B b n
 
-/-! ## The Encoding and Decoding Maps -/
-
-/-- Encoding: project an n-loop in A × B to n-loops in A and B. -/
-axiom prodHigherPiN_encode {A B : Type u} (a : A) (b : B) (n : Nat) :
-    ProdHigherPiN A B a b n → ProdOfHigherPiN A B a b n
-
-/-- Decoding: combine n-loops in A and B to an n-loop in A × B. -/
-axiom prodHigherPiN_decode {A B : Type u} (a : A) (b : B) (n : Nat) :
-    ProdOfHigherPiN A B a b n → ProdHigherPiN A B a b n
-
-/-- Left inverse: decode ∘ encode = id. -/
-axiom prodHigherPiN_decode_encode {A B : Type u} (a : A) (b : B) (n : Nat)
-    (γ : ProdHigherPiN A B a b n) :
-    prodHigherPiN_decode a b n (prodHigherPiN_encode a b n γ) = γ
-
-/-- Right inverse: encode ∘ decode = id. -/
-axiom prodHigherPiN_encode_decode {A B : Type u} (a : A) (b : B) (n : Nat)
-    (αβ : ProdOfHigherPiN A B a b n) :
-    prodHigherPiN_encode a b n (prodHigherPiN_decode a b n αβ) = αβ
-
-/-! ## The Main Theorem -/
-
 /-- **Main Theorem**: π_n(A × B, (a, b)) ≃ π_n(A, a) × π_n(B, b).
 
 Higher homotopy groups preserve products. This generalizes the fundamental
 group result from ProductFundamentalGroup.lean. -/
-noncomputable def prodHigherPiNEquiv {A B : Type u} (a : A) (b : B) (n : Nat) :
-    SimpleEquiv (ProdHigherPiN A B a b n) (ProdOfHigherPiN A B a b n) where
-  toFun := prodHigherPiN_encode a b n
-  invFun := prodHigherPiN_decode a b n
-  left_inv := prodHigherPiN_decode_encode a b n
-  right_inv := prodHigherPiN_encode_decode a b n
+axiom prodHigherPiNEquiv {A B : Type u} (a : A) (b : B) (n : Nat) :
+    SimpleEquiv (ProdHigherPiN A B a b n) (ProdOfHigherPiN A B a b n)
+
+/-! ## The Encoding and Decoding Maps -/
+
+/-- Encoding: project an n-loop in A × B to n-loops in A and B. -/
+noncomputable def prodHigherPiN_encode {A B : Type u} (a : A) (b : B) (n : Nat) :
+    ProdHigherPiN A B a b n → ProdOfHigherPiN A B a b n :=
+  (prodHigherPiNEquiv a b n).toFun
+
+/-- Decoding: combine n-loops in A and B to an n-loop in A × B. -/
+noncomputable def prodHigherPiN_decode {A B : Type u} (a : A) (b : B) (n : Nat) :
+    ProdOfHigherPiN A B a b n → ProdHigherPiN A B a b n :=
+  (prodHigherPiNEquiv a b n).invFun
+
+/-- Left inverse: decode ∘ encode = id. -/
+theorem prodHigherPiN_decode_encode {A B : Type u} (a : A) (b : B) (n : Nat)
+    (γ : ProdHigherPiN A B a b n) :
+    prodHigherPiN_decode a b n (prodHigherPiN_encode a b n γ) = γ :=
+  (prodHigherPiNEquiv a b n).left_inv γ
+
+/-- Right inverse: encode ∘ decode = id. -/
+theorem prodHigherPiN_encode_decode {A B : Type u} (a : A) (b : B) (n : Nat)
+    (αβ : ProdOfHigherPiN A B a b n) :
+    prodHigherPiN_encode a b n (prodHigherPiN_decode a b n αβ) = αβ :=
+  (prodHigherPiNEquiv a b n).right_inv αβ
 
 /-! ## Group Homomorphism Properties -/
 
