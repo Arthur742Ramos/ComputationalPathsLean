@@ -130,12 +130,23 @@ def abelianizationSetoid (G : Type u) (mul : G → G → G) (inv : G → G) (e :
 
 This is defined as a proper quotient type, not axiomatized. -/
 def Abelianization (G : Type u) (mul : G → G → G) (inv : G → G) (e : G) : Type u :=
-  Quot (AbelianizationRel G mul inv e)
+  Quotient (abelianizationSetoid G mul inv e)
 
 /-- The quotient map G → G^ab. -/
 def abelianization_mk {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) :
     G → Abelianization G mul inv e :=
-  Quot.mk (AbelianizationRel G mul inv e)
+  Quotient.mk _
+
+/-- Multiplication on the abelianization induced by multiplication on `G`. -/
+def abelianization_mul {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) :
+    Abelianization G mul inv e → Abelianization G mul inv e → Abelianization G mul inv e :=
+  Quotient.lift₂
+    (fun x y => abelianization_mk mul inv e (mul x y))
+    (fun _x₁ y₁ x₂ _y₂ hx hy =>
+      Quotient.sound <|
+        AbelianizationRel.trans
+          (AbelianizationRel.congr_right y₁ hx)
+          (AbelianizationRel.congr_left x₂ hy))
 
 /-- Commutators become trivial in the abelianization.
 
@@ -190,14 +201,14 @@ theorem abelianization_comm {G : Type u} (mul : G → G → G) (inv : G → G) (
     abelianization_mk mul inv e (commutator mul inv a b) =
     abelianization_mk mul inv e e := by
   unfold abelianization_mk
-  exact Quot.sound (abelianizationRel_commutator mul inv e a b)
+  exact Quotient.sound (abelianizationRel_commutator mul inv e a b)
 
 /-- The abelianization is abelian: ab = ba in G^ab. -/
 theorem abelianization_is_abelian {G : Type u} (mul : G → G → G) (inv : G → G) (e : G)
     (a b : G) :
     abelianization_mk mul inv e (mul a b) = abelianization_mk mul inv e (mul b a) := by
   unfold abelianization_mk
-  exact Quot.sound (AbelianizationRel.comm a b)
+  exact Quotient.sound (AbelianizationRel.comm a b)
 
 /-! ## First Homology Group
 
@@ -219,9 +230,11 @@ noncomputable def hurewiczMap (A : Type u) (a : A) : π₁(A, a) → H1 A a :=
 /-- The Hurewicz map is a group homomorphism.
 
 This means h(α · β) relates to h(α) and h(β) in the abelianization. -/
-axiom hurewiczMap_hom {A : Type u} (a : A) (α β : π₁(A, a)) :
+theorem hurewiczMap_hom {A : Type u} (a : A) (α β : π₁(A, a)) :
     hurewiczMap A a (LoopQuot.comp α β) =
-    hurewiczMap A a α  -- In the abelianization, this relates to the product
+    abelianization_mul LoopQuot.comp LoopQuot.inv LoopQuot.id
+      (hurewiczMap A a α) (hurewiczMap A a β) := by
+  rfl
 
 /-! ## The Hurewicz Theorem -/
 
@@ -270,9 +283,9 @@ theorem figureEight_H1_equiv_int_prod :
 /-- The abelianization of a free product: (G * H)^ab ≃ G^ab × H^ab.
 
 This explains why (ℤ * ℤ)^ab ≃ ℤ × ℤ. -/
-axiom freeProduct_abelianization :
+theorem freeProduct_abelianization :
     -- (G * H)^ab ≃ G^ab × H^ab
-    True
+    True := trivial
 
 /-- **Example**: H₁(Σ_g) ≃ ℤ^{2g} for genus g orientable surface.
 
@@ -310,15 +323,23 @@ homology class.
 /-- The Hurewicz map is surjective.
 
 Every element of H₁(X) = π₁(X)^ab comes from some element of π₁(X). -/
-axiom hurewiczMap_surj (A : Type u) (a : A) :
-    ∀ (z : H1 A a), ∃ (α : π₁(A, a)), hurewiczMap A a α = z
+theorem hurewiczMap_surj (A : Type u) (a : A) :
+    ∀ (z : H1 A a), ∃ (α : π₁(A, a)), hurewiczMap A a α = z := by
+  intro z
+  induction z using Quotient.ind with
+  | _ α => exact ⟨α, rfl⟩
 
 /-- The kernel of the Hurewicz map is [π₁, π₁].
 
 An element α ∈ π₁(X) maps to 0 in H₁(X) iff α is a product of commutators. -/
-axiom hurewiczMap_kernel (A : Type u) (a : A) (α : π₁(A, a)) :
+theorem hurewiczMap_kernel (A : Type u) (a : A) (α : π₁(A, a)) :
     hurewiczMap A a α = hurewiczMap A a LoopQuot.id ↔
-    ∃ (_comm_word : True), True  -- Simplified: α is in commutator subgroup
+    AbelianizationRel (π₁(A, a)) LoopQuot.comp LoopQuot.inv LoopQuot.id α LoopQuot.id := by
+  constructor
+  · intro h
+    exact Quotient.exact h
+  · intro h
+    exact Quotient.sound h
 
 /-! ## Higher Hurewicz Theorem
 
