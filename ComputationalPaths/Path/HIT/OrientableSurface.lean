@@ -1167,102 +1167,45 @@ theorem decodePath_respects_rel (g : Nat) {w₁ w₂ : FreeGroupWord (2 * g)}
       exact decodeGen_add g i m n
   | surface_rel hg => exact decodePath_surface_rel g hg
 
-/-- Decode at the quotient level. -/
-noncomputable def decode (g : Nat) :
+/-- Candidate decode at the quotient level. -/
+noncomputable def decode_def (g : Nat) :
     SurfaceGroupPresentation g → SurfacePiOne g :=
   Quot.lift
     (fun w => Quot.mk RwEq (decodePath g w))
     (fun _ _ h => Quot.sound (decodePath_respects_rel g h))
 
-/-! ## Encode: π₁(Σ_g) → SurfaceGroupPresentation
+/-! ## Fundamental Group Presentation
 
-The encode function extracts the word structure from a loop.
-This uses the universal property via the recursion principle.
+The full encode-decode proof is not yet formalized in this development.  We
+record the expected result as a single packaged axiom and derive the usual
+encode/decode maps and round-trip laws from it.
 -/
 
-/-- Encode a path to a word.
-This is defined via the universal property of the HIT. -/
-axiom encodePathQuotAxiom (g : Nat) : SurfacePiOne g → FreeGroupWord (2 * g)
+/-- **Main Theorem**: π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩. -/
+axiom piOneEquivPresentation (g : Nat) :
+    SimpleEquiv (SurfacePiOne g) (SurfaceGroupPresentation g)
 
-/-- Encode on loop representatives. -/
-noncomputable def encodePath (g : Nat) : Path (base g) (base g) → FreeGroupWord (2 * g) :=
-  fun p => encodePathQuotAxiom g (Quot.mk _ p)
-
-/-- Encode respects RwEq: equivalent paths give the same word (up to SurfaceGroupRel). -/
-theorem encodePath_respects_rweq (g : Nat) {p q : Path (base g) (base g)}
-    (h : RwEq p q) : SurfaceGroupRel g (encodePath g p) (encodePath g q) := by
-  have hEq :
-      encodePath g p = encodePath g q := by
-    unfold encodePath
-    exact _root_.congrArg (encodePathQuotAxiom g) (Quot.sound h)
-  have ofEq {w₁ w₂ : FreeGroupWord (2 * g)} (hw : w₁ = w₂) : SurfaceGroupRel g w₁ w₂ := by
-    cases hw
-    exact SurfaceGroupRel.refl _
-  exact ofEq hEq
-
-/-- Encode of refl is nil. -/
-axiom encodePath_refl (g : Nat) : encodePath g (Path.refl (base g)) = FreeGroupWord.nil
-
-/-- Encode of trans is concat. -/
-axiom encodePath_trans (g : Nat) (p q : Path (base g) (base g)) :
-    SurfaceGroupRel g (encodePath g (Path.trans p q))
-                      (FreeGroupWord.concat (encodePath g p) (encodePath g q))
-
-/-- Encode of loopA gives the corresponding generator. -/
-axiom encodePath_loopA (g : Nat) (i : Fin' g) :
-    encodePath g (loopA g i) = FreeGroupWord.single (aGenIdx g i.toNat (Fin'.toNat_lt i)) 1
-
-/-- Encode of loopB gives the corresponding generator. -/
-axiom encodePath_loopB (g : Nat) (i : Fin' g) :
-    encodePath g (loopB g i) = FreeGroupWord.single (bGenIdx g i.toNat (Fin'.toNat_lt i)) 1
-
-/-- Encode at the quotient level. -/
+/-- Encode: π₁(Σ_g) → SurfaceGroupPresentation. -/
 noncomputable def encode (g : Nat) :
     SurfacePiOne g → SurfaceGroupPresentation g :=
-  Quot.lift
-    (fun p => SurfaceGroupPresentation.ofWord (encodePath g p))
-    (fun _ _ h => Quot.sound (encodePath_respects_rweq g h))
+  (piOneEquivPresentation g).toFun
+
+/-- Decode: SurfaceGroupPresentation → π₁(Σ_g). -/
+noncomputable def decode (g : Nat) :
+    SurfaceGroupPresentation g → SurfacePiOne g :=
+  (piOneEquivPresentation g).invFun
 
 /-! ## Round-Trip Properties -/
 
-/-- decode ∘ encode = id at the path level. -/
-axiom decode_encode_path (g : Nat) (p : Path (base g) (base g)) :
-    RwEq (decodePath g (encodePath g p)) p
-
 /-- decode ∘ encode = id. -/
 theorem decode_encode (g : Nat) (α : SurfacePiOne g) :
-    decode g (encode g α) = α := by
-  induction α using Quot.ind with
-  | _ p =>
-    simp only [encode, decode, SurfaceGroupPresentation.ofWord]
-    exact Quot.sound (decode_encode_path g p)
-
-/-- encode ∘ decode = id at the word level (up to SurfaceGroupRel). -/
-axiom encode_decode_word (g : Nat) (w : FreeGroupWord (2 * g)) :
-    SurfaceGroupRel g (encodePath g (decodePath g w)) w
+    decode g (encode g α) = α :=
+  (piOneEquivPresentation g).left_inv α
 
 /-- encode ∘ decode = id. -/
 theorem encode_decode (g : Nat) (x : SurfaceGroupPresentation g) :
-    encode g (decode g x) = x := by
-  induction x using Quot.ind with
-  | _ w =>
-    simp only [decode, encode, SurfaceGroupPresentation.ofWord]
-    exact Quot.sound (encode_decode_word g w)
-
-/-! ## Main Theorem -/
-
-/-- **Main Theorem**: π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩
-
-This establishes that the fundamental group of an orientable surface of genus g
-is isomorphic to the surface group presentation. The proof uses:
-1. The Seifert-van Kampen theorem applied to the decomposition Σ_g = (Σ_g \ disk) ∪ disk
-2. The encode-decode method to construct the isomorphism -/
-noncomputable def piOneEquivPresentation (g : Nat) :
-    SimpleEquiv (SurfacePiOne g) (SurfaceGroupPresentation g) where
-  toFun := encode g
-  invFun := decode g
-  left_inv := decode_encode g
-  right_inv := encode_decode g
+    encode g (decode g x) = x :=
+  (piOneEquivPresentation g).right_inv x
 
 /-! ## Special Cases -/
 
@@ -1276,17 +1219,11 @@ This is provable because there are no generators at genus 0:
 `Fin' 0` is empty, so `FreeGroupWord 0` contains only `nil`. -/
 theorem genus0_loop_trivial (p : Path (base 0) (base 0)) :
     RwEq p (Path.refl (base 0)) := by
-  -- encodePath 0 p : FreeGroupWord (2 * 0) = FreeGroupWord 0
-  -- Since Fin' 0 is empty, the only word is nil
-  have h1 : encodePath 0 p = FreeGroupWord.nil := FreeGroupWord.eq_nil_of_fin0 (encodePath 0 p)
-  -- By decode_encode_path: RwEq (decodePath 0 (encodePath 0 p)) p
-  have h2 : RwEq (decodePath 0 (encodePath 0 p)) p := decode_encode_path 0 p
-  -- Substituting h1: RwEq (decodePath 0 nil) p
-  rw [h1] at h2
-  -- decodePath 0 nil = refl by definition
-  simp only [decodePath] at h2
-  -- So RwEq refl p, hence RwEq p refl by symmetry
-  exact rweq_symm h2
+  -- For any parallel loops, rewrite equality follows from equality of the
+  -- underlying propositional equality proofs.
+  refine rweq_of_toEq_eq (A := OrientableSurface 0) (a := base 0) (b := base 0)
+    (p := p) (q := Path.refl (base 0)) ?_
+  exact Subsingleton.elim p.toEq rfl
 
 /-- π₁(Σ₀) ≃ 1 (trivial group). -/
 noncomputable def genus0_equiv_unit : SimpleEquiv (SurfacePiOne 0) Unit where
