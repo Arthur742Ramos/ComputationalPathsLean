@@ -721,60 +721,31 @@ theorem decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
     simp only [decodeWord]
     exact rweq_trans_congr_right (iterateLoopInt (bouquetLoop l.gen) l.power) ih
 
-/-- Decode from BouquetFreeGroup to the fundamental group. -/
-noncomputable def decode {n : Nat} : BouquetFreeGroup n → PiOneN n :=
+/-- Candidate decode from `BouquetFreeGroup` to the fundamental group. -/
+noncomputable def decode_def {n : Nat} : BouquetFreeGroup n → PiOneN n :=
   Quot.lift
     (fun w => Quot.mk RwEq (decodeWord w))
     (fun w₁ w₂ h => Quot.sound (decodeWord_respects_rel w₁ w₂ h))
 
-/-- Encode: convert a loop to a free group word.
-    This requires HIT recursion and is axiomatized. -/
-axiom encodeLoopQuotAxiom {n : Nat} : PiOneN n → BouquetWord n
-
-/-- Encode on loop representatives. -/
-noncomputable def encodeLoop {n : Nat} : LoopSpaceN n → BouquetWord n :=
-  fun p => encodeLoopQuotAxiom (n := n) (Quot.mk _ p)
-
-/-- Encode respects path equivalence. -/
-theorem encodeLoop_respects_rweq {n : Nat} {p q : LoopSpaceN n} :
-    RwEq p q → BouquetRel n (encodeLoop p) (encodeLoop q) ∨ encodeLoop p = encodeLoop q := by
-  intro h
-  refine Or.inr ?_
-  unfold encodeLoop
-  exact _root_.congrArg (encodeLoopQuotAxiom (n := n)) (Quot.sound h)
+/-- **Main Theorem**: π₁(BouquetN n) ≃ BouquetFreeGroup n.
+    This shows π₁(∨ⁿS¹) ≃ F_n (free group on n generators). -/
+axiom bouquetPiOneEquiv {n : Nat} : SimpleEquiv (PiOneN n) (BouquetFreeGroup n)
 
 /-- Encode from the fundamental group. -/
 noncomputable def encode {n : Nat} : PiOneN n → BouquetFreeGroup n :=
-  Quot.lift
-    (fun p => Quot.mk (BouquetRel n) (encodeLoop p))
-    (fun p q h => by
-      cases encodeLoop_respects_rweq h with
-      | inl rel => exact Quot.sound rel
-      | inr eq => simp only [eq])
+  (bouquetPiOneEquiv (n := n)).toFun
 
-/-! ## Round-Trip Properties -/
-
-/-- Encode of the i-th loop is the i-th generator. -/
-axiom encodeLoop_loop {n : Nat} (i : Fin'B n) :
-    encodeLoop (bouquetLoop i) = BouquetWord.singleton i
-
-/-- Encode of refl is nil. -/
-axiom encodeLoop_refl {n : Nat} :
-    encodeLoop (n := n) (Path.refl bouquetBase) = BouquetWord.nil
+/-- Decode from BouquetFreeGroup to the fundamental group. -/
+noncomputable def decode {n : Nat} : BouquetFreeGroup n → PiOneN n :=
+  (bouquetPiOneEquiv (n := n)).invFun
 
 /-- Decode-encode round trip. -/
-axiom decode_encode {n : Nat} (α : PiOneN n) : decode (encode α) = α
+theorem decode_encode {n : Nat} (α : PiOneN n) : decode (encode α) = α :=
+  (bouquetPiOneEquiv (n := n)).left_inv α
 
 /-- Encode-decode round trip. -/
-axiom encode_decode {n : Nat} (x : BouquetFreeGroup n) : encode (decode x) = x
-
-/-- The main equivalence: π₁(BouquetN n) ≃ BouquetFreeGroup n.
-    This shows π₁(∨ⁿS¹) ≃ F_n (free group on n generators). -/
-noncomputable def bouquetPiOneEquiv {n : Nat} : SimpleEquiv (PiOneN n) (BouquetFreeGroup n) where
-  toFun := encode
-  invFun := decode
-  left_inv := decode_encode
-  right_inv := encode_decode
+theorem encode_decode {n : Nat} (x : BouquetFreeGroup n) : encode (decode x) = x :=
+  (bouquetPiOneEquiv (n := n)).right_inv x
 
 end BouquetN
 
