@@ -200,25 +200,27 @@ structure DeckEquivPiOneData {A : Type u} (a : A) (uc : UniversalCover A a) wher
     equiv.toFun (DeckTransformation.comp a uc f g) =
       LoopQuot.comp (equiv.toFun f) (equiv.toFun g)
 
-axiom deckEquivPiOneData {A : Type u} (a : A) (uc : UniversalCover A a) :
-    DeckEquivPiOneData (A := A) a uc
+class HasDeckEquivPiOneData {A : Type u} (a : A) (uc : UniversalCover A a) : Type u where
+  data : DeckEquivPiOneData (A := A) a uc
 
 /-- Deck transformations of the universal cover correspond to loops in the base. -/
-noncomputable def deck_equiv_pi1 {A : Type u} (a : A) (uc : UniversalCover A a) :
+noncomputable def deck_equiv_pi1 {A : Type u} (a : A) (uc : UniversalCover A a)
+    [HasDeckEquivPiOneData a uc] :
     SimpleEquiv (Deck a uc) (π₁(A, a)) :=
-  (deckEquivPiOneData a uc).equiv
+  (HasDeckEquivPiOneData.data (a := a) (uc := uc)).equiv
 
 /-- The correspondence sends identity deck transformation to trivial loop. -/
-theorem deck_equiv_pi1_id {A : Type u} (a : A) (uc : UniversalCover A a) :
+theorem deck_equiv_pi1_id {A : Type u} (a : A) (uc : UniversalCover A a)
+    [HasDeckEquivPiOneData a uc] :
     (deck_equiv_pi1 a uc).toFun (DeckTransformation.id a uc) = LoopQuot.id :=
-  (deckEquivPiOneData a uc).id_to_id
+  (HasDeckEquivPiOneData.data (a := a) (uc := uc)).id_to_id
 
 /-- The correspondence respects composition/multiplication. -/
 theorem deck_equiv_pi1_hom {A : Type u} (a : A) (uc : UniversalCover A a)
-    (f g : Deck a uc) :
+    [HasDeckEquivPiOneData a uc] (f g : Deck a uc) :
     (deck_equiv_pi1 a uc).toFun (DeckTransformation.comp a uc f g) =
     LoopQuot.comp ((deck_equiv_pi1 a uc).toFun f) ((deck_equiv_pi1 a uc).toFun g) :=
-  (deckEquivPiOneData a uc).hom_to_mul f g
+  (HasDeckEquivPiOneData.data (a := a) (uc := uc)).hom_to_mul f g
 
 /-! ## The Galois Correspondence
 
@@ -268,9 +270,18 @@ theorem galois_correspondence {A : Type u} (_a : A) :
 
 For any covering Y → X, there's a unique map X̃ → Y making the
 diagram commute. -/
-axiom universal_cover_universal {A : Type u} (a : A)
-    (uc : UniversalCover A a) (cov : CoveringOf A a) :
-    ∃ (f : uc.space → cov.space), cov.proj ∘ f = uc.proj
+class HasUniversalCoverUniversalProperty {A : Type u} (a : A) (uc : UniversalCover A a) : Type u where
+  universal : ∀ (cov : CoveringOf A a), ∃ (f : uc.space → cov.space), cov.proj ∘ f = uc.proj
+
+/-- Universal property: X̃ covers all other covers.
+
+For any covering Y → X, there's a unique map X̃ → Y making the
+diagram commute. -/
+theorem universal_cover_universal {A : Type u} (a : A)
+    (uc : UniversalCover A a) [HasUniversalCoverUniversalProperty a uc]
+    (cov : CoveringOf A a) :
+    ∃ (f : uc.space → cov.space), cov.proj ∘ f = uc.proj :=
+  (HasUniversalCoverUniversalProperty.universal (a := a) (uc := uc)) cov
 
 /-! ## Regular (Galois) Covers
 
