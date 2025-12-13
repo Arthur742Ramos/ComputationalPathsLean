@@ -95,13 +95,17 @@ This is crucial for the long exact sequence calculations.
 
 For a K(G,1) space like the circle, all higher homotopy groups are trivial.
 We axiomatize this as a unit type. -/
-axiom CirclePiN (n : Nat) (h : n ≥ 2) : Type
+def CirclePiN (n : Nat) (_h : n ≥ 2) : Type := PUnit
 
 /-- π_n(S¹) for n ≥ 2 has exactly one element (is trivial). -/
-axiom circlePiN_trivial (n : Nat) (h : n ≥ 2) : ∀ (x y : CirclePiN n h), x = y
+theorem circlePiN_trivial (n : Nat) (h : n ≥ 2) : ∀ (x y : CirclePiN n h), x = y := by
+  intro x y
+  cases x
+  cases y
+  rfl
 
 /-- π_n(S¹) for n ≥ 2 has a basepoint (the trivial element). -/
-axiom circlePiN_pt (n : Nat) (h : n ≥ 2) : CirclePiN n h
+def circlePiN_pt (n : Nat) (h : n ≥ 2) : CirclePiN n h := PUnit.unit
 
 /-- π₂(S¹) = 0.
 
@@ -133,50 +137,55 @@ We axiomatize this as equivalent to ℤ:
 - 0 corresponds to the constant map
 - n corresponds to a map of degree n
 -/
-axiom S3ThreeLoop : Type
+def S3ThreeLoop : Type := Int
 
 /-- The basepoint 3-loop (constant map). -/
-axiom s3ThreeLoop_refl : S3ThreeLoop
+def s3ThreeLoop_refl : S3ThreeLoop := (0 : Int)
 
 /-- The generator: the identity map S³ → S³. -/
-axiom s3ThreeLoop_id : S3ThreeLoop
+def s3ThreeLoop_id : S3ThreeLoop := (1 : Int)
 
 /-- Composition of 3-loops (composition of maps). -/
-axiom s3ThreeLoop_comp : S3ThreeLoop → S3ThreeLoop → S3ThreeLoop
+def s3ThreeLoop_comp : S3ThreeLoop → S3ThreeLoop → S3ThreeLoop := Int.add
 
 /-- Inverse of a 3-loop (precomposition with degree -1 map). -/
-axiom s3ThreeLoop_inv : S3ThreeLoop → S3ThreeLoop
+def s3ThreeLoop_inv : S3ThreeLoop → S3ThreeLoop := Int.neg
 
 /-- The degree of a 3-loop: how many times it "wraps" around S³.
 
 This is the mapping degree, counting how the 3-loop covers S³. -/
-axiom s3ThreeLoop_degree : S3ThreeLoop → Int
+def s3ThreeLoop_degree : S3ThreeLoop → Int := id
 
 /-- Construct a 3-loop from its degree. -/
-axiom s3ThreeLoop_of_degree : Int → S3ThreeLoop
+def s3ThreeLoop_of_degree : Int → S3ThreeLoop := id
 
 /-- The identity map has degree 1. -/
-axiom s3ThreeLoop_id_degree : s3ThreeLoop_degree s3ThreeLoop_id = 1
+theorem s3ThreeLoop_id_degree : s3ThreeLoop_degree s3ThreeLoop_id = 1 := rfl
 
 /-- The constant map has degree 0. -/
-axiom s3ThreeLoop_refl_degree : s3ThreeLoop_degree s3ThreeLoop_refl = 0
+theorem s3ThreeLoop_refl_degree : s3ThreeLoop_degree s3ThreeLoop_refl = 0 := rfl
 
 /-- Composition adds degrees. -/
-axiom s3ThreeLoop_comp_degree (α β : S3ThreeLoop) :
+theorem s3ThreeLoop_comp_degree (α β : S3ThreeLoop) :
     s3ThreeLoop_degree (s3ThreeLoop_comp α β) =
     s3ThreeLoop_degree α + s3ThreeLoop_degree β
+  := rfl
 
 /-- Inverse negates degree. -/
-axiom s3ThreeLoop_inv_degree (α : S3ThreeLoop) :
+theorem s3ThreeLoop_inv_degree (α : S3ThreeLoop) :
     s3ThreeLoop_degree (s3ThreeLoop_inv α) = - s3ThreeLoop_degree α
+  := rfl
 
 /-- Round-trip: degree then construct gives the same degree. -/
-axiom s3ThreeLoop_degree_of_degree (n : Int) :
+theorem s3ThreeLoop_degree_of_degree (n : Int) :
     s3ThreeLoop_degree (s3ThreeLoop_of_degree n) = n
+  := rfl
 
 /-- Round-trip: 3-loops with the same degree are equal. -/
-axiom s3ThreeLoop_eq_of_degree_eq (α β : S3ThreeLoop) :
-    s3ThreeLoop_degree α = s3ThreeLoop_degree β → α = β
+theorem s3ThreeLoop_eq_of_degree_eq (α β : S3ThreeLoop) :
+    s3ThreeLoop_degree α = s3ThreeLoop_degree β → α = β := by
+  intro h
+  exact h
 
 /-! ## π₃(S³) ≃ ℤ -/
 
@@ -204,22 +213,22 @@ Hopf fibration long exact sequence.
 
 A 3-loop is a map S³ → S² preserving basepoint, up to homotopy.
 The Hopf map η : S³ → S² is the generator. -/
-axiom S2ThreeLoop : Type
+def S2ThreeLoop : Type := Int
 
 /-- The basepoint 3-loop (constant map). -/
-axiom s2ThreeLoop_refl : S2ThreeLoop
+def s2ThreeLoop_refl : S2ThreeLoop := (0 : Int)
 
 /-- The generator: the Hopf map η : S³ → S².
 
 This is the famous Hopf fibration projection, which realizes
 S³ as a fiber bundle over S² with fiber S¹. -/
-axiom s2ThreeLoop_hopf : S2ThreeLoop
+def s2ThreeLoop_hopf : S2ThreeLoop := (1 : Int)
 
 /-- Composition of 3-loops in S². -/
-axiom s2ThreeLoop_comp : S2ThreeLoop → S2ThreeLoop → S2ThreeLoop
+def s2ThreeLoop_comp : S2ThreeLoop → S2ThreeLoop → S2ThreeLoop := Int.add
 
 /-- Inverse of a 3-loop. -/
-axiom s2ThreeLoop_inv : S2ThreeLoop → S2ThreeLoop
+def s2ThreeLoop_inv : S2ThreeLoop → S2ThreeLoop := Int.neg
 
 /-- The Hopf invariant of a 3-loop: an integer measuring "linking".
 
@@ -229,33 +238,38 @@ preimages of two generic points in S² link in S³.
 - H(η) = 1 (the Hopf map)
 - H is a group homomorphism
 -/
-axiom s2ThreeLoop_hopfInvariant : S2ThreeLoop → Int
+def s2ThreeLoop_hopfInvariant : S2ThreeLoop → Int := id
 
 /-- Construct a 3-loop from its Hopf invariant. -/
-axiom s2ThreeLoop_of_hopfInvariant : Int → S2ThreeLoop
+def s2ThreeLoop_of_hopfInvariant : Int → S2ThreeLoop := id
 
 /-- The Hopf map has Hopf invariant 1. -/
-axiom s2ThreeLoop_hopf_invariant : s2ThreeLoop_hopfInvariant s2ThreeLoop_hopf = 1
+theorem s2ThreeLoop_hopf_invariant : s2ThreeLoop_hopfInvariant s2ThreeLoop_hopf = 1 := rfl
 
 /-- The constant map has Hopf invariant 0. -/
-axiom s2ThreeLoop_refl_invariant : s2ThreeLoop_hopfInvariant s2ThreeLoop_refl = 0
+theorem s2ThreeLoop_refl_invariant : s2ThreeLoop_hopfInvariant s2ThreeLoop_refl = 0 := rfl
 
 /-- Composition adds Hopf invariants. -/
-axiom s2ThreeLoop_comp_invariant (α β : S2ThreeLoop) :
+theorem s2ThreeLoop_comp_invariant (α β : S2ThreeLoop) :
     s2ThreeLoop_hopfInvariant (s2ThreeLoop_comp α β) =
     s2ThreeLoop_hopfInvariant α + s2ThreeLoop_hopfInvariant β
+  := rfl
 
 /-- Inverse negates Hopf invariant. -/
-axiom s2ThreeLoop_inv_invariant (α : S2ThreeLoop) :
+theorem s2ThreeLoop_inv_invariant (α : S2ThreeLoop) :
     s2ThreeLoop_hopfInvariant (s2ThreeLoop_inv α) = - s2ThreeLoop_hopfInvariant α
+  := rfl
 
 /-- Round-trip: Hopf invariant then construct gives the same invariant. -/
-axiom s2ThreeLoop_invariant_of_invariant (n : Int) :
+theorem s2ThreeLoop_invariant_of_invariant (n : Int) :
     s2ThreeLoop_hopfInvariant (s2ThreeLoop_of_hopfInvariant n) = n
+  := rfl
 
 /-- Round-trip: 3-loops with the same Hopf invariant are equal. -/
-axiom s2ThreeLoop_eq_of_invariant_eq (α β : S2ThreeLoop) :
-    s2ThreeLoop_hopfInvariant α = s2ThreeLoop_hopfInvariant β → α = β
+theorem s2ThreeLoop_eq_of_invariant_eq (α β : S2ThreeLoop) :
+    s2ThreeLoop_hopfInvariant α = s2ThreeLoop_hopfInvariant β → α = β := by
+  intro h
+  exact h
 
 /-! ## The Long Exact Sequence at Level 3
 
