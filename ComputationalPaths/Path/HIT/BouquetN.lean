@@ -729,22 +729,27 @@ noncomputable def decode_def {n : Nat} : BouquetFreeGroup n → PiOneN n :=
 
 /-- **Main Theorem**: π₁(BouquetN n) ≃ BouquetFreeGroup n.
     This shows π₁(∨ⁿS¹) ≃ F_n (free group on n generators). -/
-axiom bouquetPiOneEquiv {n : Nat} : SimpleEquiv (PiOneN n) (BouquetFreeGroup n)
+class HasBouquetPiOneEquiv (n : Nat) : Type u where
+  equiv : SimpleEquiv (PiOneN n) (BouquetFreeGroup n)
+
+noncomputable def bouquetPiOneEquiv {n : Nat} [HasBouquetPiOneEquiv n] :
+    SimpleEquiv (PiOneN n) (BouquetFreeGroup n) :=
+  HasBouquetPiOneEquiv.equiv (n := n)
 
 /-- Encode from the fundamental group. -/
-noncomputable def encode {n : Nat} : PiOneN n → BouquetFreeGroup n :=
+noncomputable def encode {n : Nat} [HasBouquetPiOneEquiv n] : PiOneN n → BouquetFreeGroup n :=
   (bouquetPiOneEquiv (n := n)).toFun
 
 /-- Decode from BouquetFreeGroup to the fundamental group. -/
-noncomputable def decode {n : Nat} : BouquetFreeGroup n → PiOneN n :=
+noncomputable def decode {n : Nat} [HasBouquetPiOneEquiv n] : BouquetFreeGroup n → PiOneN n :=
   (bouquetPiOneEquiv (n := n)).invFun
 
 /-- Decode-encode round trip. -/
-theorem decode_encode {n : Nat} (α : PiOneN n) : decode (encode α) = α :=
+theorem decode_encode {n : Nat} [HasBouquetPiOneEquiv n] (α : PiOneN n) : decode (encode α) = α :=
   (bouquetPiOneEquiv (n := n)).left_inv α
 
 /-- Encode-decode round trip. -/
-theorem encode_decode {n : Nat} (x : BouquetFreeGroup n) : encode (decode x) = x :=
+theorem encode_decode {n : Nat} [HasBouquetPiOneEquiv n] (x : BouquetFreeGroup n) : encode (decode x) = x :=
   (bouquetPiOneEquiv (n := n)).right_inv x
 
 end BouquetN
@@ -773,9 +778,10 @@ theorem bouquetFreeGroup_zero_subsingleton : Subsingleton (BouquetFreeGroup 0) :
   simp [hw1, hw2]
 
 /-- For n = 0, the bouquet has trivial fundamental group. -/
-theorem bouquetPiOne_zero_subsingleton : Subsingleton (BouquetN.PiOneN 0) := by
+theorem bouquetPiOne_zero_subsingleton [BouquetN.HasBouquetPiOneEquiv.{u} 0] :
+    Subsingleton (BouquetN.PiOneN.{u} 0) := by
   haveI : Subsingleton (BouquetFreeGroup 0) := bouquetFreeGroup_zero_subsingleton
-  let e := BouquetN.bouquetPiOneEquiv (n := 0)
+  let e : SimpleEquiv (BouquetN.PiOneN.{u} 0) (BouquetFreeGroup 0) := BouquetN.bouquetPiOneEquiv (n := 0)
   constructor
   intro x y
   have h : e.toFun x = e.toFun y := Subsingleton.elim _ _
@@ -785,9 +791,9 @@ theorem bouquetPiOne_zero_subsingleton : Subsingleton (BouquetN.PiOneN 0) := by
   exact hx.symm.trans (h'.trans hy)
 
 /-- For n = 0, every element of `π₁(BouquetN 0)` is equal to the identity. -/
-theorem bouquetPiOne_zero_trivial (x : BouquetN.PiOneN 0) :
+theorem bouquetPiOne_zero_trivial [BouquetN.HasBouquetPiOneEquiv.{u} 0] (x : BouquetN.PiOneN.{u} 0) :
     x = PiOne.id (A := BouquetN 0) (a := bouquetBase) := by
-  haveI : Subsingleton (BouquetN.PiOneN 0) := bouquetPiOne_zero_subsingleton
+  haveI : Subsingleton (BouquetN.PiOneN.{u} 0) := bouquetPiOne_zero_subsingleton
   exact Subsingleton.elim x _
 
 /-! ## Summary
