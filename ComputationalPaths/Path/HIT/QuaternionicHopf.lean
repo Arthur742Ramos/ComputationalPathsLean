@@ -108,11 +108,16 @@ axiom quaternionicHopfProj : Sphere7 → Sphere4
 /-- The projection sends the basepoint to the basepoint. -/
 axiom quaternionicHopfProj_base : quaternionicHopfProj sphere7Base = sphere4Base
 
-/-- The fiber of the quaternionic Hopf fibration is S³.
+/-- The fiber of the quaternionic Hopf fibration over any point is S³.
 
-This is the 3-sphere of unit quaternions. -/
-axiom quaternionicHopfFiber_is_S3 : True
--- The actual fiber type would need more infrastructure
+More precisely, for any point x ∈ S⁴, the preimage p⁻¹(x) is homeomorphic to S³.
+This is the 3-sphere of unit quaternions acting by left multiplication. -/
+structure QuaternionicHopfFiberEquiv where
+  /-- The fiber over any point is equivalent to S³. -/
+  fiberEquiv : ∀ (x : Sphere4), SimpleEquiv { y : Sphere7 // quaternionicHopfProj y = x } Sphere3
+
+/-- The fiber of the quaternionic Hopf fibration is S³. -/
+axiom quaternionicHopfFiber_is_S3 : QuaternionicHopfFiberEquiv
 
 /-- The fiber inclusion i : S³ → S⁷.
 
@@ -274,13 +279,22 @@ Note: Octonions are non-associative, which is why there are only
 four Hopf fibrations. The octonions are the last normed division algebra. -/
 axiom octonionicHopfProj : Sphere15 → Sphere8
 
+/-- The type of 15-loops in S⁸. -/
+axiom S8FifteenLoop : Type
+
 /-- The generator σ : S¹⁵ → S⁸ of π₁₅(S⁸) ≃ ℤ.
 
 This is the octonionic Hopf map, completing the set {η, ν, σ}. -/
-axiom octonionicHopf_sigma : True  -- Placeholder
+axiom octonionicHopf_sigma : S8FifteenLoop
+
+/-- The degree/winding number of a 15-loop in S⁸. -/
+axiom s8FifteenLoop_degree : S8FifteenLoop → Int
+
+/-- σ has degree 1 (it generates π₁₅(S⁸)). -/
+axiom octonionicHopf_sigma_degree : s8FifteenLoop_degree octonionicHopf_sigma = 1
 
 /-- π₁₅(S⁸) ≃ ℤ via the octonionic Hopf fibration. -/
-axiom sphere8_pi15_equiv_int : True  -- Full formalization would be similar
+axiom sphere8_pi15_equiv_int : SimpleEquiv S8FifteenLoop Int
 
 /-! ## Adams' Theorem
 

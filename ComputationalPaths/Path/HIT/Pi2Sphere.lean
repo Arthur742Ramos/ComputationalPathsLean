@@ -182,12 +182,19 @@ K(G,1) spaces have π₁ ≃ G and πₙ = 1 for n ≥ 2. -/
 theorem circle_pi2_trivial : True := trivial
 -- Note: Proper statement would use a π₂(S¹) type, but S¹ has no 2-cells
 
+/-- The type of 2-loops in S³ (maps S² → S³). -/
+axiom S3TwoLoop : Type
+
+/-- The trivial 2-loop (constant map). -/
+axiom s3TwoLoop_refl : S3TwoLoop
+
 /-- π₂(S³) is trivial because S³ is 2-connected.
 
 Proof sketch: S³ = Susp(S²), and suspension increases connectivity.
-Since S² is 1-connected, S³ is 2-connected, so π₁(S³) = π₂(S³) = 1. -/
-axiom sphere3_pi2_trivial : True
--- The actual content is that any map S² → S³ is null-homotopic
+Since S² is 1-connected, S³ is 2-connected, so π₁(S³) = π₂(S³) = 1.
+
+This says all 2-loops in S³ are homotopic to the constant map. -/
+axiom sphere3_pi2_trivial : ∀ (x : S3TwoLoop), x = s3TwoLoop_refl
 
 /-- S³ is 2-connected: both π₁ and π₂ are trivial.
 
