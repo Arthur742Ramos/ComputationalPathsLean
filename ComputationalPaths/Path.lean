@@ -48,6 +48,7 @@ import ComputationalPaths.Path.HIT.BouquetN
 import ComputationalPaths.Path.HIT.Sphere
 import ComputationalPaths.Path.HIT.HopfFibration
 import ComputationalPaths.Path.HIT.Pi2Sphere
+import ComputationalPaths.Path.HIT.Pi3Sphere
 import ComputationalPaths.Path.HIT.OrientableSurface
 import ComputationalPaths.Path.HIT.TorusGenus1
 import ComputationalPaths.Path.OmegaGroupoid
