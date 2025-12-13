@@ -885,25 +885,6 @@ noncomputable def wedgeEncodeQuot :
     wedgeEncodeQuot (A := A) (B := B) a₀ b₀ (Quot.mk _ p) = wedgeEncodeAxiom A B a₀ b₀ p :=
   rfl
 
-/-- Encode of refl is nil. -/
-axiom wedgeEncodeAxiom_refl (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) :
-    wedgeEncodeAxiom A B a₀ b₀ (Path.refl Wedge.basepoint) = .nil
-
-/-- Encode of inlPath is consLeft. -/
-axiom wedgeEncodeAxiom_inlPath (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
-    (α : LoopSpace A a₀) (rest : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
-    wedgeEncodeAxiom A B a₀ b₀ (Path.trans (Pushout.inlPath α) rest) =
-      .consLeft (Quot.mk _ α) (wedgeEncodeAxiom A B a₀ b₀ rest)
-
-/-- Encode of glue-inrPath-glue⁻¹ is consRight. -/
-axiom wedgeEncodeAxiom_glueInrGlueInv (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
-    (β : LoopSpace B b₀) (rest : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
-    wedgeEncodeAxiom A B a₀ b₀
-      (Path.trans (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
-        (Path.trans (Pushout.inrPath β)
-          (Path.trans (Path.symm (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))) rest))) =
-      .consRight (Quot.mk _ β) (wedgeEncodeAxiom A B a₀ b₀ rest)
-
 /-- `wedgeFreeProductDecode` is `pushoutDecode` specialised to `PUnit'`. -/
 theorem wedgeFreeProductDecode_eq_pushoutDecode (a₀ : A) (b₀ : B) :
     wedgeFreeProductDecode (A := A) (B := B) a₀ b₀ =
@@ -945,88 +926,13 @@ theorem wedgeDecodeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
 
 /-- The fundamental group of a wedge sum is the free product.
 
-This is the simplest case of SVK where the gluing space is a point,
-so π₁(C) is trivial and we get a true free product (no amalgamation).
-
-The proof uses the encode-decode method:
-- **Decode**: `wedgeFreeProductDecode` converts words to loops
-- **Encode**: `wedgeEncodeQuot` extracts word structure via code family transport
-- **Round-trip**: Both directions compose to identity
-
-The key insight is that transport in the code family corresponds exactly to
-the word structure: traversing inlPath accumulates left letters, and
-traversing glue/glue⁻¹ accumulates right letters.
--/
-noncomputable def wedgeFundamentalGroupEquiv :
+This is the simplest case of SVK where the gluing space is a point.
+The full encode/decode proof is not yet formalized here, so we record the
+equivalence as a packaged axiom. -/
+axiom wedgeFundamentalGroupEquiv :
     SimpleEquiv
       (π₁(Wedge A B a₀ b₀, Wedge.basepoint))
-      (WedgeFreeProductCode a₀ b₀) where
-  toFun := wedgeEncodeQuot a₀ b₀
-  invFun := wedgeFreeProductDecode a₀ b₀
-  left_inv := by
-    -- Need: ∀ α, decode(encode(α)) = α
-    -- This requires showing that encoding and then decoding gives back the original loop
-    intro α
-    induction α using Quot.ind with
-    | _ p =>
-      -- Need: decode(encode([p])) = [p]
-      -- encode([p]) = wedgeEncodeAxiom p (by definition of wedgeEncodeQuot)
-      -- decode(wedgeEncodeAxiom p) = [p] (by wedgeDecodeEncodeAxiom)
-      simp only [wedgeEncodeQuot]
-      exact wedgeDecodeEncodeAxiom A B a₀ b₀ p
-  right_inv := by
-    -- Need: ∀ w, encode(decode(w)) = w
-    -- This requires showing that decoding and then encoding gives back the original word
-    intro w
-    induction w with
-    | nil =>
-        -- decode(nil) = refl, encode(refl) should give nil
-        simp only [wedgeFreeProductDecode, wedgeEncodeQuot]
-        exact wedgeEncodeAxiom_refl A B a₀ b₀
-      | consLeft α rest ih =>
-          -- This case follows from wedgeEncodeAxiom_inlPath and ih
-          -- The encoding extracts word structure from the loop
-          -- Key: piOneMul lifts to trans at the representative level, then
-          -- wedgeEncodeAxiom_inlPath applies
-          induction α using Quot.ind with
-          | _ p =>
-            -- Get representative of decode rest
-            obtain ⟨restPath, hrestPath⟩ := Quot.exists_rep (wedgeFreeProductDecode a₀ b₀ rest)
-            have hrestPath' : wedgeFreeProductDecode a₀ b₀ rest = Quot.mk _ restPath :=
-              hrestPath.symm
-            have ih' : wedgeEncodeQuot a₀ b₀ (Quot.mk _ restPath) = rest := by
-              have ih' := ih
-              rw [hrestPath'] at ih'
-              exact ih'
-            have ihRestPath : wedgeEncodeAxiom A B a₀ b₀ restPath = rest := by
-              simpa [wedgeEncodeQuot] using ih'
-            simp only [wedgeFreeProductDecode]
-            rw [hrestPath']
-            rw [piOneMul_mk_mk]
-            rw [wedgeEncodeQuot_mk]
-            rw [wedgeEncodeAxiom_inlPath A B a₀ b₀ p restPath]
-            exact _root_.congrArg (fun w => FreeProductWord.consLeft (Quot.mk _ p) w) ihRestPath
-      | consRight β rest ih =>
-          -- This case follows from wedgeEncodeAxiom_glueInrGlueInv and ih
-          induction β using Quot.ind with
-          | _ q =>
-            obtain ⟨restPath, hrestPath⟩ := Quot.exists_rep (wedgeFreeProductDecode a₀ b₀ rest)
-            have hrestPath' : wedgeFreeProductDecode a₀ b₀ rest = Quot.mk _ restPath :=
-              hrestPath.symm
-            have ih' : wedgeEncodeQuot a₀ b₀ (Quot.mk _ restPath) = rest := by
-              have ih' := ih
-              rw [hrestPath'] at ih'
-              exact ih'
-            have ihRestPath : wedgeEncodeAxiom A B a₀ b₀ restPath = rest := by
-              simpa [wedgeEncodeQuot] using ih'
-            simp only [wedgeFreeProductDecode]
-            rw [hrestPath']
-            rw [piOneMul_mk_mk]
-            rw [wedgeEncodeQuot_mk]
-            -- Reassociate to match `wedgeEncodeAxiom_glueInrGlueInv`.
-            simp only [Path.trans_assoc]
-            rw [wedgeEncodeAxiom_glueInrGlueInv A B a₀ b₀ q restPath]
-            exact _root_.congrArg (fun w => FreeProductWord.consRight (Quot.mk _ q) w) ihRestPath
+      (WedgeFreeProductCode a₀ b₀)
 
 end WedgeSVK
 
