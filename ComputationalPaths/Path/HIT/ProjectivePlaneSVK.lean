@@ -323,13 +323,25 @@ noncomputable def pathZPow (p : Path baseSVK baseSVK) : Int → Path baseSVK bas
 noncomputable def loopAClass_zpow (n : Int) : ProjectivePlaneSVKPiOne :=
   Quot.mk _ (pathZPow loopASVK n)
 
-/-- Decode: Bool → π₁(ProjectivePlaneSVK). -/
-noncomputable def decodeSVK : Bool → ProjectivePlaneSVKPiOne
+/-- Candidate decode map: Bool → π₁(ProjectivePlaneSVK).
+
+This is the expected inverse of the SVK equivalence, but we do not yet prove
+it matches the inverse of `projectivePlaneSVK_piOne_equiv`. -/
+noncomputable def decodeSVK_def : Bool → ProjectivePlaneSVKPiOne
   | false => Quot.mk _ (Path.refl baseSVK)
   | true => loopAClass
 
+/-- **Main Theorem (SVK version)**: π₁(ProjectivePlaneSVK) ≅ ℤ₂. -/
+axiom projectivePlaneSVK_piOne_equiv :
+    SimpleEquiv ProjectivePlaneSVKPiOne Bool
+
 /-- Encode: π₁(ProjectivePlaneSVK) → Bool. -/
-axiom encodeSVK : ProjectivePlaneSVKPiOne → Bool
+noncomputable def encodeSVK : ProjectivePlaneSVKPiOne → Bool :=
+  projectivePlaneSVK_piOne_equiv.toFun
+
+/-- Decode: Bool → π₁(ProjectivePlaneSVK). -/
+noncomputable def decodeSVK : Bool → ProjectivePlaneSVKPiOne :=
+  projectivePlaneSVK_piOne_equiv.invFun
 
 /-- Encode on loop representatives (for stating laws). -/
 noncomputable def encodeSVK_path (p : Path baseSVK baseSVK) : Bool :=
@@ -341,31 +353,15 @@ theorem encodeSVK_respects_rweq {p q : Path baseSVK baseSVK}
   unfold encodeSVK_path
   exact _root_.congrArg encodeSVK (Quot.sound h)
 
-/-- Encode of refl is false. -/
-axiom encodeSVK_refl : encodeSVK_path (Path.refl baseSVK) = false
-
-/-- Encode of loopA is true. -/
-axiom encodeSVK_loopA : encodeSVK_path loopASVK = true
-
-/-- Encode respects composition via XOR. -/
-axiom encodeSVK_trans (p q : Path baseSVK baseSVK) :
-    encodeSVK_path (Path.trans p q) = z2Add (encodeSVK_path p) (encodeSVK_path q)
-
 /-- Round-trip: decode ∘ encode = id. -/
-axiom decodeSVK_encodeSVK (α : ProjectivePlaneSVKPiOne) :
-    decodeSVK (encodeSVK α) = α
+theorem decodeSVK_encodeSVK (α : ProjectivePlaneSVKPiOne) :
+    decodeSVK (encodeSVK α) = α :=
+  projectivePlaneSVK_piOne_equiv.left_inv α
 
 /-- Round-trip: encode ∘ decode = id. -/
-axiom encodeSVK_decodeSVK (z : Bool) :
-    encodeSVK (decodeSVK z) = z
-
-/-- **Main Theorem (SVK version)**: π₁(ProjectivePlaneSVK) ≅ ℤ₂ -/
-noncomputable def projectivePlaneSVK_piOne_equiv :
-    SimpleEquiv ProjectivePlaneSVKPiOne Bool where
-  toFun := encodeSVK
-  invFun := decodeSVK
-  left_inv := decodeSVK_encodeSVK
-  right_inv := encodeSVK_decodeSVK
+theorem encodeSVK_decodeSVK (z : Bool) :
+    encodeSVK (decodeSVK z) = z :=
+  projectivePlaneSVK_piOne_equiv.right_inv z
 
 end ProjectivePlaneSVK
 end Path

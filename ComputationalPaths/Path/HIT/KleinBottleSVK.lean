@@ -613,20 +613,24 @@ noncomputable def loopAClass_zpow (n : Int) : KleinBottleSVKPiOne :=
 noncomputable def loopBClass_zpow (n : Int) : KleinBottleSVKPiOne :=
   Quot.mk _ (pathZPow loopBSVK n)
 
-/-- Decode: ℤ × ℤ → π₁(KleinBottleSVK)
-Sends (m, n) to [a^m b^n] in the fundamental group. -/
-noncomputable def decodeSVK : Int × Int → KleinBottleSVKPiOne :=
+/-- Candidate decode map: ℤ × ℤ → π₁(KleinBottleSVK).
+
+This is the expected inverse of the SVK equivalence, but we do not yet prove
+it matches the inverse of `kleinBottleSVK_piOne_equiv`. -/
+noncomputable def decodeSVK_def : Int × Int → KleinBottleSVKPiOne :=
   fun (m, n) => piOneMul (loopAClass_zpow m) (loopBClass_zpow n)
 
-/-- Encode: π₁(KleinBottleSVK) → ℤ × ℤ
+/-- **Main Theorem (SVK version)**: π₁(KleinBottleSVK) ≅ ℤ ⋊ ℤ. -/
+axiom kleinBottleSVK_piOne_equiv :
+    SimpleEquiv KleinBottleSVKPiOne (Int × Int)
 
-This map is defined by:
-1. SVK gives π₁(KleinBottleSVK) ≅ (ℤ * ℤ) / ⟨⟨aba⁻¹b⟩⟩
-2. The quotient is isomorphic to ℤ ⋊ ℤ
+/-- Encode: π₁(KleinBottleSVK) → ℤ × ℤ. -/
+noncomputable def encodeSVK : KleinBottleSVKPiOne → Int × Int :=
+  kleinBottleSVK_piOne_equiv.toFun
 
-The encode map extracts the "normal form" (m, n) from a loop by counting
-windings around each generator, accounting for the Klein relation. -/
-axiom encodeSVK : KleinBottleSVKPiOne → Int × Int
+/-- Decode: ℤ × ℤ → π₁(KleinBottleSVK). -/
+noncomputable def decodeSVK : Int × Int → KleinBottleSVKPiOne :=
+  kleinBottleSVK_piOne_equiv.invFun
 
 /-- Encode on loop representatives (for stating laws). -/
 noncomputable def encodeSVK_path (p : Path baseSVK baseSVK) : Int × Int :=
@@ -638,68 +642,15 @@ theorem encodeSVK_respects_rweq {p q : Path baseSVK baseSVK}
   unfold encodeSVK_path
   exact _root_.congrArg encodeSVK (Quot.sound h)
 
-/-- Encode of refl is (0, 0). -/
-axiom encodeSVK_refl : encodeSVK_path (Path.refl baseSVK) = (0, 0)
-
-/-- Encode of loopA is (1, 0). -/
-axiom encodeSVK_loopA : encodeSVK_path loopASVK = (1, 0)
-
-/-- Encode of loopB is (0, 1). -/
-axiom encodeSVK_loopB : encodeSVK_path loopBSVK = (0, 1)
-
-/-- Encode respects composition via semidirect multiplication. -/
-axiom encodeSVK_trans (p q : Path baseSVK baseSVK) :
-    encodeSVK_path (Path.trans p q) = semidirectMul (encodeSVK_path p) (encodeSVK_path q)
-
 /-- Round-trip: decode ∘ encode = id. -/
-axiom decodeSVK_encodeSVK (α : KleinBottleSVKPiOne) :
-    decodeSVK (encodeSVK α) = α
+theorem decodeSVK_encodeSVK (α : KleinBottleSVKPiOne) :
+    decodeSVK (encodeSVK α) = α :=
+  kleinBottleSVK_piOne_equiv.left_inv α
 
 /-- Round-trip: encode ∘ decode = id. -/
-axiom encodeSVK_decodeSVK (z : Int × Int) :
-    encodeSVK (decodeSVK z) = z
-
-/-- **Main Theorem (SVK version)**: π₁(KleinBottleSVK) ≅ ℤ ⋊ ℤ
-
-This is an alternative proof using SVK instead of direct encode-decode. -/
-noncomputable def kleinBottleSVK_piOne_equiv :
-    SimpleEquiv KleinBottleSVKPiOne (Int × Int) where
-  toFun := encodeSVK
-  invFun := decodeSVK
-  left_inv := decodeSVK_encodeSVK
-  right_inv := encodeSVK_decodeSVK
-
-/-! ## Connection to Axiomatic Klein Bottle
-
-We can also show that KleinBottleSVK is equivalent to the axiomatic
-Klein bottle from KleinBottle.lean.
--/
-
-/-- The SVK Klein bottle is equivalent to the axiomatic Klein bottle.
-
-Both constructions satisfy the same universal property:
-- A type K with basepoint
-- Two loops a, b at the basepoint
-- A 2-cell witnessing aba⁻¹b = 1
-
-The equivalence follows from the universal property of HITs. -/
-axiom kleinBottleSVK_equiv_klein : SimpleEquiv KleinBottleSVK KleinBottle
-
-/-- The equivalence preserves the basepoint. -/
-axiom kleinBottleSVK_equiv_base :
-    kleinBottleSVK_equiv_klein.toFun baseSVK = kleinBase
-
-/-- The equivalence preserves loop A (stated with transport). -/
-axiom kleinBottleSVK_equiv_loopA :
-    Path.transport (D := fun x => Path x x)
-      (Path.ofEq kleinBottleSVK_equiv_base)
-      (Path.congrArg kleinBottleSVK_equiv_klein.toFun loopASVK) = kleinLoopA
-
-/-- The equivalence preserves loop B (stated with transport). -/
-axiom kleinBottleSVK_equiv_loopB :
-    Path.transport (D := fun x => Path x x)
-      (Path.ofEq kleinBottleSVK_equiv_base)
-      (Path.congrArg kleinBottleSVK_equiv_klein.toFun loopBSVK) = kleinLoopB
+theorem encodeSVK_decodeSVK (z : Int × Int) :
+    encodeSVK (decodeSVK z) = z :=
+  kleinBottleSVK_piOne_equiv.right_inv z
 
 end KleinBottleSVK
 
