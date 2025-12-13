@@ -1182,28 +1182,32 @@ encode/decode maps and round-trip laws from it.
 -/
 
 /-- **Main Theorem**: π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩. -/
-axiom piOneEquivPresentation (g : Nat) :
-    SimpleEquiv (SurfacePiOne g) (SurfaceGroupPresentation g)
+class HasPiOneEquivPresentation (g : Nat) : Type u where
+  equiv : SimpleEquiv (SurfacePiOne g) (SurfaceGroupPresentation g)
+
+noncomputable def piOneEquivPresentation (g : Nat) [HasPiOneEquivPresentation g] :
+    SimpleEquiv (SurfacePiOne g) (SurfaceGroupPresentation g) :=
+  HasPiOneEquivPresentation.equiv (g := g)
 
 /-- Encode: π₁(Σ_g) → SurfaceGroupPresentation. -/
-noncomputable def encode (g : Nat) :
+noncomputable def encode (g : Nat) [HasPiOneEquivPresentation g] :
     SurfacePiOne g → SurfaceGroupPresentation g :=
   (piOneEquivPresentation g).toFun
 
 /-- Decode: SurfaceGroupPresentation → π₁(Σ_g). -/
-noncomputable def decode (g : Nat) :
+noncomputable def decode (g : Nat) [HasPiOneEquivPresentation g] :
     SurfaceGroupPresentation g → SurfacePiOne g :=
   (piOneEquivPresentation g).invFun
 
 /-! ## Round-Trip Properties -/
 
 /-- decode ∘ encode = id. -/
-theorem decode_encode (g : Nat) (α : SurfacePiOne g) :
+theorem decode_encode (g : Nat) [HasPiOneEquivPresentation g] (α : SurfacePiOne g) :
     decode g (encode g α) = α :=
   (piOneEquivPresentation g).left_inv α
 
 /-- encode ∘ decode = id. -/
-theorem encode_decode (g : Nat) (x : SurfaceGroupPresentation g) :
+theorem encode_decode (g : Nat) [HasPiOneEquivPresentation g] (x : SurfaceGroupPresentation g) :
     encode g (decode g x) = x :=
   (piOneEquivPresentation g).right_inv x
 
@@ -1242,8 +1246,12 @@ noncomputable def genus0_equiv_unit : SimpleEquiv (SurfacePiOne 0) Unit where
 /-- For genus g ≥ 2, the surface group is non-abelian.
 This follows from the fact that [a₁,b₁] is non-trivial when there's a
 second pair of generators to "absorb" the relation. -/
-axiom genus_ge2_nonabelian (g : Nat) (hg : g ≥ 2) :
-    ∃ (α β : SurfacePiOne g), piOneMul α β ≠ piOneMul β α
+class HasGenusGe2Nonabelian (g : Nat) : Prop where
+  nonabelian : g ≥ 2 → ∃ (α β : SurfacePiOne.{u} g), piOneMul α β ≠ piOneMul β α
+
+theorem genus_ge2_nonabelian (g : Nat) (hg : g ≥ 2) [HasGenusGe2Nonabelian.{u} g] :
+    ∃ (α β : SurfacePiOne.{u} g), piOneMul α β ≠ piOneMul β α :=
+  HasGenusGe2Nonabelian.nonabelian (g := g) hg
 
 end SpecialCases
 

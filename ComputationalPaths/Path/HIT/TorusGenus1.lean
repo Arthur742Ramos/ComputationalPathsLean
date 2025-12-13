@@ -276,21 +276,21 @@ theorem presentationWindingB_ofWindings (m n : Int) :
 -- property for SurfacePiOne 1 would follow from this abelianization.
 
 /-- The winding A function on SurfacePiOne 1. -/
-noncomputable def torusWindingA_def : SurfacePiOne 1 → Int :=
+noncomputable def torusWindingA_def [HasPiOneEquivPresentation 1] : SurfacePiOne 1 → Int :=
   fun α => presentationWindingA ((piOneEquivPresentation 1).toFun α)
 
 /-- The winding B function on SurfacePiOne 1. -/
-noncomputable def torusWindingB_def : SurfacePiOne 1 → Int :=
+noncomputable def torusWindingB_def [HasPiOneEquivPresentation 1] : SurfacePiOne 1 → Int :=
   fun α => presentationWindingB ((piOneEquivPresentation 1).toFun α)
 
 /-- Construct a loop from windings. -/
-noncomputable def torusOfWindings_def (m n : Int) : SurfacePiOne 1 :=
+noncomputable def torusOfWindings_def [HasPiOneEquivPresentation 1] (m n : Int) : SurfacePiOne 1 :=
   (piOneEquivPresentation 1).invFun (presentationOfWindings m n)
 
 /-! ## Round-trip properties -/
 
 /-- Helper to prove the right inverse at the presentation level. -/
-theorem presentation_right_inv (m n : Int) :
+theorem presentation_right_inv [HasPiOneEquivPresentation 1] (m n : Int) :
     (presentationWindingA
       ((piOneEquivPresentation 1).toFun
         ((piOneEquivPresentation 1).invFun (presentationOfWindings m n))),
@@ -315,7 +315,7 @@ theorem presentation_right_inv (m n : Int) :
 
 /-- Right inverse: windings of constructed loop are the original values.
     The proof shows that windings ∘ presentationOfWindings = id. -/
-theorem torus_right_inv_def (m n : Int) :
+theorem torus_right_inv_def [HasPiOneEquivPresentation 1] (m n : Int) :
     (torusWindingA_def (torusOfWindings_def m n),
      torusWindingB_def (torusOfWindings_def m n)) = (m, n) := by
   unfold torusWindingA_def torusWindingB_def torusOfWindings_def
@@ -1216,7 +1216,7 @@ theorem presentation_left_inv (x : SurfaceGroupPresentation 1) :
 /-- Left inverse: constructing from windings recovers the original.
     This requires the abelianization lemma showing any presentation element
     equals its canonical form. -/
-theorem torus_left_inv_def (α : SurfacePiOne 1) :
+theorem torus_left_inv_def [HasPiOneEquivPresentation 1] (α : SurfacePiOne 1) :
     torusOfWindings_def (torusWindingA_def α) (torusWindingB_def α) = α := by
   simp only [torusWindingA_def, torusWindingB_def, torusOfWindings_def]
   -- Need to show:
@@ -1306,6 +1306,8 @@ abbrev loop2 : Path base base := OrientableSurface.loopB 1 fin1_zero
 
 /-- The fundamental group of the torus. -/
 abbrev π₁ : Type _ := OrientableSurface.SurfacePiOne 1
+
+variable [OrientableSurface.HasPiOneEquivPresentation 1]
 
 /-- The winding number in the loop1 direction. -/
 noncomputable abbrev windingA : π₁ → Int := OrientableSurface.torusWindingA_def
