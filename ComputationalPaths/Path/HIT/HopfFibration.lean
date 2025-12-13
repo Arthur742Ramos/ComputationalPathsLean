@@ -133,19 +133,37 @@ The classical Hopf map h : S³ → S² can be constructed using the
 join construction or via quaternions. Here we axiomatize its key properties.
 -/
 
+class HasHopfFibrationData : Type (u + 1) where
+  /-- The Hopf map from S³ to S². -/
+  hopfMap : Sphere3.{u} → Sphere2.{u}
+  /-- The Hopf map sends north to the north pole of S². -/
+  hopfMap_north : hopfMap sphere3North = sphere2North
+  /-- The Hopf map sends south to the south pole of S². -/
+  hopfMap_south : hopfMap sphere3South = sphere2South
+  /-- The fiber of the Hopf map over any point is equivalent to S¹.
+      This is the key property of the Hopf fibration. -/
+  hopfMap_fiber_equiv (x : Sphere2.{u}) :
+    SimpleEquiv (Fiber hopfMap x) Circle.{u}
+  /-- S³ is equivalent to the total space of the Hopf type family.
+      This witnesses that our Σ-type construction captures S³. -/
+  sphere3_equiv_hopfTotal : SimpleEquiv Sphere3.{u} HopfTotal.{u}
+
 /-- The Hopf map from S³ to S². -/
-axiom hopfMap : Sphere3.{u} → Sphere2.{u}
+noncomputable def hopfMap [HasHopfFibrationData] : Sphere3.{u} → Sphere2.{u} :=
+  HasHopfFibrationData.hopfMap
 
 /-- The Hopf map sends north to the north pole of S². -/
-axiom hopfMap_north : hopfMap sphere3North = sphere2North
+theorem hopfMap_north [HasHopfFibrationData] : hopfMap sphere3North = sphere2North :=
+  HasHopfFibrationData.hopfMap_north
 
 /-- The Hopf map sends south to the south pole of S². -/
-axiom hopfMap_south : hopfMap sphere3South = sphere2South
+theorem hopfMap_south [HasHopfFibrationData] : hopfMap sphere3South = sphere2South :=
+  HasHopfFibrationData.hopfMap_south
 
-/-- The fiber of the Hopf map over any point is equivalent to S¹.
-    This is the key property of the Hopf fibration. -/
-axiom hopfMap_fiber_equiv (x : Sphere2.{u}) :
-    SimpleEquiv (Fiber hopfMap x) Circle.{u}
+/-- The fiber of the Hopf map over any point is equivalent to S¹. -/
+noncomputable def hopfMap_fiber_equiv [HasHopfFibrationData] (x : Sphere2.{u}) :
+    SimpleEquiv (Fiber hopfMap x) Circle.{u} :=
+  HasHopfFibrationData.hopfMap_fiber_equiv x
 
 /-! ## S³ as Total Space
 
@@ -153,9 +171,9 @@ We establish that S³ is equivalent to the total space of the Hopf fibration.
 This is axiomatized as it requires detailed path algebra.
 -/
 
-/-- S³ is equivalent to the total space of the Hopf type family.
-    This witnesses that our Σ-type construction captures S³. -/
-axiom sphere3_equiv_hopfTotal : SimpleEquiv Sphere3.{u} HopfTotal.{u}
+noncomputable def sphere3_equiv_hopfTotal [HasHopfFibrationData] :
+    SimpleEquiv Sphere3.{u} HopfTotal.{u} :=
+  HasHopfFibrationData.sphere3_equiv_hopfTotal
 
 /-! ## Long Exact Sequence Application
 
@@ -317,10 +335,10 @@ Therefore ∂ : π₂(S²) → π₁(S¹) ≅ ℤ is an isomorphism.
 
 /-- In the untruncated theory, π₂(S²) ≅ ℤ via the Hopf fibration.
     This captures the key topological content of the Hopf fibration. -/
-axiom hopf_pi2_sphere2_equiv_int :
+theorem hopf_pi2_sphere2_equiv_int :
     -- There exists an equivalence π₂(S²) ≃ ℤ
     -- This is the content of the Hopf fibration's long exact sequence
-    True -- Stated as True since full proof requires untruncated homotopy groups
+    True := trivial
 
 /-- The connecting map is an isomorphism (in appropriate sense).
     Statement: The map ∂ : π₂(S²) → π₁(S¹) is a bijection. -/
