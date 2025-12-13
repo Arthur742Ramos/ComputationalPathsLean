@@ -181,18 +181,34 @@ lifted path determines a deck transformation.
 
 Conversely, each deck transformation f determines a path from x̃₀ to f(x̃₀),
 which projects to a loop in X. -/
-axiom deck_equiv_pi1 {A : Type u} (a : A) (uc : UniversalCover A a) :
-    SimpleEquiv (Deck a uc) (π₁(A, a))
+structure DeckEquivPiOneData {A : Type u} (a : A) (uc : UniversalCover A a) where
+  equiv : SimpleEquiv (Deck a uc) (π₁(A, a))
+  /-- The correspondence sends identity deck transformation to trivial loop. -/
+  id_to_id : equiv.toFun (DeckTransformation.id a uc) = LoopQuot.id
+  /-- The correspondence respects composition/multiplication. -/
+  hom_to_mul : ∀ (f g : Deck a uc),
+    equiv.toFun (DeckTransformation.comp a uc f g) =
+      LoopQuot.comp (equiv.toFun f) (equiv.toFun g)
+
+axiom deckEquivPiOneData {A : Type u} (a : A) (uc : UniversalCover A a) :
+    DeckEquivPiOneData (A := A) a uc
+
+/-- Deck transformations of the universal cover correspond to loops in the base. -/
+noncomputable def deck_equiv_pi1 {A : Type u} (a : A) (uc : UniversalCover A a) :
+    SimpleEquiv (Deck a uc) (π₁(A, a)) :=
+  (deckEquivPiOneData a uc).equiv
 
 /-- The correspondence sends identity deck transformation to trivial loop. -/
-axiom deck_equiv_pi1_id {A : Type u} (a : A) (uc : UniversalCover A a) :
-    (deck_equiv_pi1 a uc).toFun (DeckTransformation.id a uc) = LoopQuot.id
+theorem deck_equiv_pi1_id {A : Type u} (a : A) (uc : UniversalCover A a) :
+    (deck_equiv_pi1 a uc).toFun (DeckTransformation.id a uc) = LoopQuot.id :=
+  (deckEquivPiOneData a uc).id_to_id
 
 /-- The correspondence respects composition/multiplication. -/
-axiom deck_equiv_pi1_hom {A : Type u} (a : A) (uc : UniversalCover A a)
+theorem deck_equiv_pi1_hom {A : Type u} (a : A) (uc : UniversalCover A a)
     (f g : Deck a uc) :
     (deck_equiv_pi1 a uc).toFun (DeckTransformation.comp a uc f g) =
-    LoopQuot.comp ((deck_equiv_pi1 a uc).toFun f) ((deck_equiv_pi1 a uc).toFun g)
+    LoopQuot.comp ((deck_equiv_pi1 a uc).toFun f) ((deck_equiv_pi1 a uc).toFun g) :=
+  (deckEquivPiOneData a uc).hom_to_mul f g
 
 /-! ## The Galois Correspondence
 
