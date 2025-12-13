@@ -120,12 +120,21 @@ noncomputable def piN_refl (A : Type u) (a : A) (n : Nat) : PiN A a n :=
 /-- The suspension map Σ : π_n(X, x₀) → π_{n+1}(ΣX, north).
 
 This takes an n-loop in X and suspends it to an (n+1)-loop in ΣX. -/
-axiom suspensionMap {A : Type u} (a : A) (n : Nat) :
+class HasSuspensionMap : Type (u + 1) where
+  suspensionMap {A : Type u} (a : A) (n : Nat) :
     PiN A a n → PiN (Suspension A) Suspension.north (n + 1)
+  suspensionMap_refl {A : Type u} (a : A) (n : Nat) :
+    suspensionMap a n (piN_refl A a n) = piN_refl (Suspension A) Suspension.north (n + 1)
 
 /-- The suspension map preserves the trivial element. -/
-axiom suspensionMap_refl {A : Type u} (a : A) (n : Nat) :
-    suspensionMap a n (piN_refl A a n) = piN_refl (Suspension A) Suspension.north (n + 1)
+noncomputable def suspensionMap {A : Type u} (a : A) (n : Nat) [HasSuspensionMap] :
+    PiN A a n → PiN (Suspension A) Suspension.north (n + 1) :=
+  HasSuspensionMap.suspensionMap a n
+
+/-- The suspension map preserves the trivial element. -/
+theorem suspensionMap_refl {A : Type u} (a : A) (n : Nat) [HasSuspensionMap] :
+    suspensionMap a n (piN_refl A a n) = piN_refl (Suspension A) Suspension.north (n + 1) :=
+  HasSuspensionMap.suspensionMap_refl a n
 
 /-! ## The Freudenthal Suspension Theorem
 
@@ -142,22 +151,35 @@ In terms of connectivity parameter:
 
 For spheres: Sⁿ is (n-1)-connected, so k = n.
 - Σ : π_n(Sⁿ) → π_{n+1}(Sⁿ⁺¹) is iso when n < 2n - 1, always true for n ≥ 1 -/
-axiom freudenthal_iso {A : Type u} (a : A) (k n : Nat)
+class HasFreudenthalTheorem : Type (u + 1) extends HasSuspensionMap where
+  freudenthal_iso {A : Type u} (a : A) (k n : Nat)
+      (hconn : IsKConnected A a (k - 1))
+      (hrange : n < 2 * k - 1) :
+      ∃ (inv : PiN (Suspension A) Suspension.north (n + 1) → PiN A a n),
+        (∀ x, inv (suspensionMap a n x) = x) ∧
+        (∀ y, suspensionMap a n (inv y) = y)
+  freudenthal_surj {A : Type u} (a : A) (k n : Nat)
+      (hconn : IsKConnected A a (k - 1))
+      (hrange : n ≤ 2 * k - 1) :
+      ∀ y : PiN (Suspension A) Suspension.north (n + 1),
+      ∃ x : PiN A a n, suspensionMap a n x = y
+
+/-- **Freudenthal Suspension Theorem (Isomorphism Range)** -/
+theorem freudenthal_iso {A : Type u} (a : A) (k n : Nat)
     (hconn : IsKConnected A a (k - 1))
-    (hrange : n < 2 * k - 1) :
+    (hrange : n < 2 * k - 1) [HasFreudenthalTheorem] :
     ∃ (inv : PiN (Suspension A) Suspension.north (n + 1) → PiN A a n),
       (∀ x, inv (suspensionMap a n x) = x) ∧
-      (∀ y, suspensionMap a n (inv y) = y)
+      (∀ y, suspensionMap a n (inv y) = y) :=
+  HasFreudenthalTheorem.freudenthal_iso a k n hconn hrange
 
-/-- **Freudenthal Suspension Theorem (Surjection Range)**
-
-If X is (k-1)-connected, then Σ : π_n(X) → π_{n+1}(ΣX) is surjective
-for n = 2k - 1. -/
-axiom freudenthal_surj {A : Type u} (a : A) (k n : Nat)
+/-- **Freudenthal Suspension Theorem (Surjection Range)** -/
+theorem freudenthal_surj {A : Type u} (a : A) (k n : Nat)
     (hconn : IsKConnected A a (k - 1))
-    (hrange : n ≤ 2 * k - 1) :
+    (hrange : n ≤ 2 * k - 1) [HasFreudenthalTheorem] :
     ∀ y : PiN (Suspension A) Suspension.north (n + 1),
-    ∃ x : PiN A a n, suspensionMap a n x = y
+    ∃ x : PiN A a n, suspensionMap a n x = y :=
+  HasFreudenthalTheorem.freudenthal_surj a k n hconn hrange
 
 /-! ## Application to Spheres: π_n(Sⁿ) ≃ ℤ
 
@@ -165,65 +187,85 @@ The n-sphere Sⁿ is (n-1)-connected. By Freudenthal, π_n(Sⁿ) ≃ π_{n+1}(S�
 for all n ≥ 1. Combined with π₁(S¹) ≃ ℤ, this gives π_n(Sⁿ) ≃ ℤ.
 -/
 
-/-- Spheres of dimension n, axiomatized for arbitrary n. -/
-axiom SphereN (n : Nat) : Type
+/-- Spheres of dimension n, defined by iterated suspension. -/
+def SphereN : Nat → Type u
+  | 0 => PUnit.{u+1}
+  | 1 => Circle
+  | n + 2 => Suspension (SphereN (n + 1))
 
 /-- The basepoint of Sⁿ. -/
-axiom sphereN_base (n : Nat) : SphereN n
+noncomputable def sphereN_base : ∀ n : Nat, SphereN n
+  | 0 => PUnit.unit
+  | 1 => circleBase
+  | _ + 2 => Suspension.north
 
 /-- S¹ is the circle. -/
-axiom sphereN_1_is_circle : SphereN 1 = Circle
+theorem sphereN_1_is_circle : SphereN 1 = Circle := rfl
 
 /-- S² is the 2-sphere. -/
-axiom sphereN_2_is_sphere2 : SphereN 2 = Sphere2
+theorem sphereN_2_is_sphere2 : SphereN 2 = Sphere2 := rfl
 
 /-- Sⁿ⁺¹ is the suspension of Sⁿ. -/
-axiom sphereN_succ_is_susp (n : Nat) : SphereN (n + 1) = Suspension (SphereN n)
+theorem sphereN_succ_is_susp (n : Nat) (hn : n ≥ 1) :
+    SphereN (n + 1) = Suspension (SphereN n) := by
+  cases n with
+  | zero => cases (Nat.not_succ_le_zero 0 hn)
+  | succ _ => rfl
 
-/-- Sⁿ is (n-1)-connected for n ≥ 1.
+/-!
+Sⁿ is (n-1)-connected for n ≥ 1 (i.e. πᵢ(Sⁿ) = 0 for i < n).
 
-π_i(Sⁿ) = 0 for i < n. -/
-axiom sphereN_connectivity (n : Nat) (hn : n ≥ 1) :
-    IsKConnected (SphereN n) (sphereN_base n) (n - 1)
+This module does not package connectivity data.
+-/
 
 /-- Type representing π_n(Sⁿ), the n-th homotopy group of the n-sphere. -/
 def SpherePiN (n : Nat) : Type := PiN (SphereN n) (sphereN_base n) n
 
-/-- **Axiomatized equivalence**: π_n(Sⁿ) ≃ ℤ for all n ≥ 1. -/
-axiom spherePiN_equiv_int (n : Nat) : SimpleEquiv (SpherePiN n) Int
+class HasSpherePiNData : Type (u + 1) where
+  equiv_int : ∀ n : Nat, SimpleEquiv (SpherePiN n) Int
+  refl_degree : ∀ n : Nat,
+    (equiv_int n).toFun (piN_refl (SphereN n) (sphereN_base n) n) = 0
+  suspension_preserves_degree : ∀ n : Nat, ∀ x : SpherePiN n,
+    ∃ y : SpherePiN (n + 1), (equiv_int (n + 1)).toFun y = (equiv_int n).toFun x
+
+/-- **Assumed equivalence**: π_n(Sⁿ) ≃ ℤ for all n. -/
+noncomputable def spherePiN_equiv_int (n : Nat) [HasSpherePiNData] :
+    SimpleEquiv (SpherePiN n) Int :=
+  HasSpherePiNData.equiv_int n
 
 /-- The winding/degree of an element in π_n(Sⁿ).
 
 This generalizes the winding number in π₁(S¹). -/
-noncomputable def spherePiN_degree (n : Nat) : SpherePiN n → Int :=
+noncomputable def spherePiN_degree (n : Nat) [HasSpherePiNData] : SpherePiN n → Int :=
   (spherePiN_equiv_int n).toFun
 
 /-- Construct an element of π_n(Sⁿ) from its degree. -/
-noncomputable def spherePiN_of_degree (n : Nat) : Int → SpherePiN n :=
+noncomputable def spherePiN_of_degree (n : Nat) [HasSpherePiNData] : Int → SpherePiN n :=
   (spherePiN_equiv_int n).invFun
 
 /-- The generator of π_n(Sⁿ): the element of degree 1. -/
-noncomputable def spherePiN_generator (n : Nat) : SpherePiN n :=
+noncomputable def spherePiN_generator (n : Nat) [HasSpherePiNData] : SpherePiN n :=
   spherePiN_of_degree n 1
 
 /-- The generator has degree 1. -/
-theorem spherePiN_generator_degree (n : Nat) :
+theorem spherePiN_generator_degree (n : Nat) [HasSpherePiNData] :
     spherePiN_degree n (spherePiN_generator n) = 1 := by
   simpa [spherePiN_degree, spherePiN_of_degree, spherePiN_generator] using
     (spherePiN_equiv_int n).right_inv 1
 
 /-- The trivial element has degree 0. -/
-axiom spherePiN_refl_degree (n : Nat) :
-    spherePiN_degree n (piN_refl (SphereN n) (sphereN_base n) n) = 0
+theorem spherePiN_refl_degree (n : Nat) [HasSpherePiNData] :
+    spherePiN_degree n (piN_refl (SphereN n) (sphereN_base n) n) = 0 := by
+  simpa [spherePiN_degree, spherePiN_equiv_int] using (HasSpherePiNData.refl_degree (n := n))
 
 /-- Round-trip: degree then construct. -/
-theorem spherePiN_degree_of_degree (n : Nat) (d : Int) :
+theorem spherePiN_degree_of_degree (n : Nat) (d : Int) [HasSpherePiNData] :
     spherePiN_degree n (spherePiN_of_degree n d) = d := by
   simpa [spherePiN_degree, spherePiN_of_degree] using
     (spherePiN_equiv_int n).right_inv d
 
 /-- Round-trip: elements with same degree are equal. -/
-theorem spherePiN_eq_of_degree (n : Nat) (x y : SpherePiN n) :
+theorem spherePiN_eq_of_degree (n : Nat) (x y : SpherePiN n) [HasSpherePiNData] :
     spherePiN_degree n x = spherePiN_degree n y → x = y := by
   intro h
   have h' := _root_.congrArg (spherePiN_of_degree n) h
@@ -237,7 +279,7 @@ theorem spherePiN_eq_of_degree (n : Nat) (x y : SpherePiN n) :
 
 This is the fundamental result connecting dimension and homotopy.
 The generator is the identity map id : Sⁿ → Sⁿ, with degree 1. -/
-noncomputable def sphereN_piN_equiv_int (n : Nat) (_hn : n ≥ 1) :
+noncomputable def sphereN_piN_equiv_int (n : Nat) (_hn : n ≥ 1) [HasSpherePiNData] :
     SimpleEquiv (SpherePiN n) Int :=
   spherePiN_equiv_int n
 
@@ -246,8 +288,11 @@ noncomputable def sphereN_piN_equiv_int (n : Nat) (_hn : n ≥ 1) :
 Σ : π_n(Sⁿ) → π_{n+1}(Sⁿ⁺¹) sends an element of degree d to an element of degree d.
 
 Note: We state this abstractly since SpherePiN (n+1) ≃ SpherePiN n via suspension. -/
-axiom suspension_preserves_degree (n : Nat) (x : SpherePiN n) :
+theorem suspension_preserves_degree (n : Nat) (x : SpherePiN n) [HasSpherePiNData] :
     ∃ (y : SpherePiN (n + 1)), spherePiN_degree (n + 1) y = spherePiN_degree n x
+  := by
+  rcases HasSpherePiNData.suspension_preserves_degree (n := n) (x := x) with ⟨y, hy⟩
+  exact ⟨y, by simpa [spherePiN_degree, spherePiN_equiv_int] using hy⟩
 
 /-! ## Stable Homotopy Groups
 
@@ -258,7 +303,7 @@ By Freudenthal, this stabilizes for n > k + 1.
 /-- The stem: πₛ_k ≃ π_{n+k}(Sⁿ) for large enough n. -/
 structure StableStem (k : Nat) where
   /-- The stabilized homotopy group. -/
-  carrier : Type
+  carrier : Type u
   /-- The comparison maps from π_{n+k}(Sⁿ). -/
   stabilize : ∀ (n : Nat), n > k + 1 → PiN (SphereN n) (sphereN_base n) (n + k) → carrier
   /-- The maps are compatible with suspension. -/
@@ -266,7 +311,7 @@ structure StableStem (k : Nat) where
     True  -- stabilize n hn x = stabilize (n+1) (suspension of x)
 
 /-- The type representing ℤ/2ℤ. -/
-def Z2 : Type := Bool
+def Z2 : Type 0 := Bool
 
 /-- The group structure on ℤ/2ℤ (XOR). -/
 instance : Add Z2 where add := xor
@@ -284,17 +329,16 @@ structure StableStemData where
   two_eta_trivial :
     stem1_equiv_Z2.invFun (xor true true) = stem1_equiv_Z2.invFun false
 
-axiom stableStemData : StableStemData
-
 /-- The zeroth stable stem: πₛ_0 ≃ ℤ.
 
 This is generated by the identity maps id : Sⁿ → Sⁿ. -/
-noncomputable def stable_stem_0 : StableStem 0 :=
-  stableStemData.stem0
+noncomputable def stable_stem_0 (stemData : StableStemData) : StableStem 0 :=
+  stemData.stem0
 
 /-- πₛ_0 ≃ ℤ. -/
-noncomputable def stable_stem_0_equiv_int : SimpleEquiv stable_stem_0.carrier Int :=
-  stableStemData.stem0_equiv_int
+noncomputable def stable_stem_0_equiv_int (stemData : StableStemData) :
+    SimpleEquiv (stable_stem_0 stemData).carrier Int :=
+  stemData.stem0_equiv_int
 
 /-- The first stable stem: πₛ_1 ≃ ℤ/2ℤ.
 
@@ -304,26 +348,28 @@ The generator is η, the Hopf map. In the stable range:
 - π_{n+1}(Sⁿ) ≃ ℤ/2ℤ for n ≥ 3
 
 The 2-torsion comes from 2η being null-homotopic. -/
-noncomputable def stable_stem_1 : StableStem 1 :=
-  stableStemData.stem1
+noncomputable def stable_stem_1 (stemData : StableStemData) : StableStem 1 :=
+  stemData.stem1
 
 /-- πₛ_1 ≃ ℤ/2ℤ.
 
 The generator [η] is the stable class of the Hopf map.
 Note: π₃(S²) ≃ ℤ is *unstable*; it becomes ℤ/2ℤ upon stabilization
 because 2η : S³ → S² is null-homotopic in the stable range. -/
-noncomputable def stable_stem_1_equiv_Z2 : SimpleEquiv stable_stem_1.carrier Z2 :=
-  stableStemData.stem1_equiv_Z2
+noncomputable def stable_stem_1_equiv_Z2 (stemData : StableStemData) :
+    SimpleEquiv (stable_stem_1 stemData).carrier Z2 :=
+  stemData.stem1_equiv_Z2
 
 /-- The second stable stem: πₛ_2 ≃ ℤ/2ℤ.
 
 Generated by η², the composition of η with itself (after suitable suspension). -/
-noncomputable def stable_stem_2 : StableStem 2 :=
-  stableStemData.stem2
+noncomputable def stable_stem_2 (stemData : StableStemData) : StableStem 2 :=
+  stemData.stem2
 
 /-- πₛ_2 ≃ ℤ/2ℤ, generated by η². -/
-noncomputable def stable_stem_2_equiv_Z2 : SimpleEquiv stable_stem_2.carrier Z2 :=
-  stableStemData.stem2_equiv_Z2
+noncomputable def stable_stem_2_equiv_Z2 (stemData : StableStemData) :
+    SimpleEquiv (stable_stem_2 stemData).carrier Z2 :=
+  stemData.stem2_equiv_Z2
 
 /-! ## The Hopf Element in Stable Homotopy
 
@@ -334,23 +380,23 @@ The Hopf map η : S³ → S² represents an element of πₛ_1.
 
 This is the image of the Hopf map under stabilization.
 It generates πₛ_1 ≃ ℤ/2ℤ. -/
-noncomputable def stable_eta : stable_stem_1.carrier :=
-  stableStemData.eta
+noncomputable def stable_eta (stemData : StableStemData) : (stable_stem_1 stemData).carrier :=
+  stemData.eta
 
 /-- η generates πₛ_1. -/
-theorem stable_eta_generator :
-    stable_stem_1_equiv_Z2 stable_eta = true :=
-  stableStemData.eta_generator
+theorem stable_eta_generator (stemData : StableStemData) :
+    stable_stem_1_equiv_Z2 stemData (stable_eta stemData) = true :=
+  stemData.eta_generator
 
 /-- 2η = 0 in stable homotopy.
 
 This is why πₛ_1 ≃ ℤ/2ℤ rather than ℤ.
 In terms of maps: the composite S⁴ → S³ →η S² is null-homotopic
 after stabilization. -/
-theorem stable_two_eta_trivial :
-    stable_stem_1_equiv_Z2.invFun (xor true true) =
-    stable_stem_1_equiv_Z2.invFun false :=
-  stableStemData.two_eta_trivial
+theorem stable_two_eta_trivial (stemData : StableStemData) :
+    (stable_stem_1_equiv_Z2 stemData).invFun (xor true true) =
+    (stable_stem_1_equiv_Z2 stemData).invFun false :=
+  stemData.two_eta_trivial
 
 /-! ## Computational Verification
 
