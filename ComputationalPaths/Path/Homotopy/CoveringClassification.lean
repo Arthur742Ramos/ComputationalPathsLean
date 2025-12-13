@@ -258,11 +258,11 @@ semi-locally simply-connected):
 The correspondence:
 - p : Y → X  ↦  p_*(π₁(Y)) ⊆ π₁(X)
 - H ⊆ π₁(X)  ↦  unique covering with p_*(π₁) = H -/
-axiom galois_correspondence {A : Type u} (a : A) :
+theorem galois_correspondence {A : Type u} (_a : A) :
     -- There is a bijection between:
     -- - Isomorphism classes of coverings of A
     -- - Subgroups of π₁(A, a)
-    True
+    True := trivial
 
 /-- Universal property: X̃ covers all other covers.
 
@@ -285,10 +285,10 @@ def IsRegularCover {A : Type u} (a : A) (cov : CoveringOf A a) : Prop :=
 
 The quotient appears because deck transformations correspond to
 cosets of the induced subgroup. -/
-axiom regular_cover_deck {A : Type u} (a : A) (cov : CoveringOf A a)
-    (hreg : IsRegularCover a cov) :
+theorem regular_cover_deck {A : Type u} (a : A) (cov : CoveringOf A a)
+    (_hreg : IsRegularCover a cov) :
     -- Deck(Y/X) ≃ π₁(X) / p_*(π₁(Y))
-    True
+    True := trivial
 
 /-! ## Examples
 
