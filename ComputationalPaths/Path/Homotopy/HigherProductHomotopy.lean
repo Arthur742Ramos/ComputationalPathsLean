@@ -50,10 +50,16 @@ We axiomatize the product theorem for higher homotopy groups.
 -/
 
 /-- Type representing π_n(A, a) for the higher product theorem. -/
-axiom HigherPiN (A : Type u) (a : A) (n : Nat) : Type
+abbrev HigherPiN (A : Type u) (a : A) (n : Nat) : Type u :=
+  HigherHomotopy.PiN n A a
 
 /-- The trivial element in π_n. -/
-axiom higherPiN_refl (A : Type u) (a : A) (n : Nat) : HigherPiN A a n
+noncomputable def higherPiN_refl (A : Type u) (a : A) (n : Nat) : HigherPiN A a n :=
+  match n with
+  | 0 => PUnit.unit
+  | 1 => LoopQuot.id (A := A) (a := a)
+  | 2 => PiTwo.id (A := A) (a := a)
+  | _ + 3 => PUnit.unit
 
 /-- Type representing π_n(A × B, (a, b)). -/
 def ProdHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
@@ -63,12 +69,53 @@ def ProdHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
 def ProdOfHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
   HigherPiN A a n × HigherPiN B b n
 
+/-- Helper: `π₂` is always a subsingleton in the current computational-paths model. -/
+private theorem piTwo_subsingleton (A : Type u) (a : A) : Subsingleton (π₂(A, a)) := by
+  constructor
+  intro x y
+  induction x using Quotient.ind with
+  | _ α =>
+    induction y using Quotient.ind with
+    | _ β =>
+      apply Quotient.sound
+      exact ⟨OmegaGroupoid.contractibility₃ α β⟩
+
+private noncomputable def unit_equiv_unit_prod : SimpleEquiv PUnit (PUnit × PUnit) where
+  toFun := fun _ => (PUnit.unit, PUnit.unit)
+  invFun := fun _ => PUnit.unit
+  left_inv := fun x => by cases x; rfl
+  right_inv := fun y => by
+    cases y with
+    | mk y₁ y₂ =>
+        cases y₁
+        cases y₂
+        rfl
+
+private noncomputable def piTwo_equiv_prod {A B : Type u} (a : A) (b : B) :
+    SimpleEquiv (π₂(A × B, (a, b))) (π₂(A, a) × π₂(B, b)) where
+  toFun := fun _ => (PiTwo.id (A := A) (a := a), PiTwo.id (A := B) (a := b))
+  invFun := fun _ => PiTwo.id (A := A × B) (a := (a, b))
+  left_inv := by
+    intro x
+    letI : Subsingleton (π₂(A × B, (a, b))) := piTwo_subsingleton (A := A × B) (a := (a, b))
+    exact Subsingleton.elim _ _
+  right_inv := by
+    intro y
+    letI : Subsingleton (π₂(A, a)) := piTwo_subsingleton (A := A) (a := a)
+    letI : Subsingleton (π₂(B, b)) := piTwo_subsingleton (A := B) (a := b)
+    exact Subsingleton.elim _ _
+
 /-- **Main Theorem**: π_n(A × B, (a, b)) ≃ π_n(A, a) × π_n(B, b).
 
 Higher homotopy groups preserve products. This generalizes the fundamental
 group result from ProductFundamentalGroup.lean. -/
-axiom prodHigherPiNEquiv {A B : Type u} (a : A) (b : B) (n : Nat) :
-    SimpleEquiv (ProdHigherPiN A B a b n) (ProdOfHigherPiN A B a b n)
+noncomputable def prodHigherPiNEquiv {A B : Type u} (a : A) (b : B) (n : Nat) :
+    SimpleEquiv (ProdHigherPiN A B a b n) (ProdOfHigherPiN A B a b n) :=
+  match n with
+  | 0 => unit_equiv_unit_prod
+  | 1 => prodPiOneEquiv (A := A) (B := B) a b
+  | 2 => piTwo_equiv_prod (A := A) (B := B) a b
+  | _ + 3 => unit_equiv_unit_prod
 
 /-! ## The Encoding and Decoding Maps -/
 
@@ -97,37 +144,147 @@ theorem prodHigherPiN_encode_decode {A B : Type u} (a : A) (b : B) (n : Nat)
 /-! ## Group Homomorphism Properties -/
 
 /-- Encoding preserves the identity (trivial n-loop). -/
-axiom prodHigherPiN_encode_refl {A B : Type u} (a : A) (b : B) (n : Nat) :
+theorem prodHigherPiN_encode_refl {A B : Type u} (a : A) (b : B) (n : Nat) :
     prodHigherPiN_encode a b n (higherPiN_refl (A × B) (a, b) n) =
-    (higherPiN_refl A a n, higherPiN_refl B b n)
+    (higherPiN_refl A a n, higherPiN_refl B b n) := by
+  cases n with
+  | zero => rfl
+  | succ n =>
+      cases n with
+      | zero =>
+          -- n = 1
+          apply Prod.ext
+          · apply Quot.sound
+            apply rweq_of_toEq_eq
+            simp
+          · apply Quot.sound
+            apply rweq_of_toEq_eq
+            simp
+      | succ n =>
+          cases n with
+          | zero => rfl
+          | succ _ => rfl
 
 /-- Decoding preserves the identity. -/
-axiom prodHigherPiN_decode_refl {A B : Type u} (a : A) (b : B) (n : Nat) :
+theorem prodHigherPiN_decode_refl {A B : Type u} (a : A) (b : B) (n : Nat) :
     prodHigherPiN_decode a b n (higherPiN_refl A a n, higherPiN_refl B b n) =
-    higherPiN_refl (A × B) (a, b) n
+    higherPiN_refl (A × B) (a, b) n := by
+  cases n with
+  | zero => rfl
+  | succ n =>
+      cases n with
+      | zero =>
+          -- n = 1
+          apply Quot.sound
+          apply rweq_of_toEq_eq
+          simp
+      | succ n =>
+          cases n with
+          | zero => rfl
+          | succ _ => rfl
 
 /-- Group operation on π_n. -/
-axiom higherPiN_comp {X : Type u} (x : X) (n : Nat) :
-    HigherPiN X x n → HigherPiN X x n → HigherPiN X x n
+noncomputable def higherPiN_comp {X : Type u} (x : X) (n : Nat) :
+    HigherPiN X x n → HigherPiN X x n → HigherPiN X x n :=
+  match n with
+  | 0 => fun _ _ => PUnit.unit
+  | 1 => LoopQuot.comp (A := X) (a := x)
+  | 2 => PiTwo.mul (A := X) (a := x)
+  | _ + 3 => fun _ _ => PUnit.unit
 
 /-- Group inverse on π_n. -/
-axiom higherPiN_inv {X : Type u} (x : X) (n : Nat) :
-    HigherPiN X x n → HigherPiN X x n
+noncomputable def higherPiN_inv {X : Type u} (x : X) (n : Nat) :
+    HigherPiN X x n → HigherPiN X x n :=
+  match n with
+  | 0 => fun _ => PUnit.unit
+  | 1 => LoopQuot.inv (A := X) (a := x)
+  | 2 => PiTwo.inv (A := X) (a := x)
+  | _ + 3 => fun _ => PUnit.unit
 
 /-- Encoding preserves composition. -/
-axiom prodHigherPiN_encode_comp {A B : Type u} (a : A) (b : B) (n : Nat)
+theorem prodHigherPiN_encode_comp {A B : Type u} (a : A) (b : B) (n : Nat)
     (γ₁ γ₂ : ProdHigherPiN A B a b n) :
     prodHigherPiN_encode a b n (higherPiN_comp (a, b) n γ₁ γ₂) =
     let (α₁, β₁) := prodHigherPiN_encode a b n γ₁
     let (α₂, β₂) := prodHigherPiN_encode a b n γ₂
-    (higherPiN_comp a n α₁ α₂, higherPiN_comp b n β₁ β₂)
+    (higherPiN_comp a n α₁ α₂, higherPiN_comp b n β₁ β₂) := by
+  cases n with
+  | zero =>
+      cases γ₁
+      cases γ₂
+      rfl
+  | succ n =>
+      cases n with
+      | zero =>
+          -- n = 1
+          induction γ₁ using Quot.ind with
+          | _ p₁ =>
+            induction γ₂ using Quot.ind with
+            | _ p₂ =>
+              simp only [prodHigherPiN_encode, prodHigherPiNEquiv, higherPiN_comp, prodPiOneEquiv,
+                prodPiOneEncode, LoopQuot.comp]
+              apply Prod.ext
+              · apply Quot.sound
+                apply rweq_of_toEq_eq
+                unfold Path.fst Path.trans
+                simp
+              · apply Quot.sound
+                apply rweq_of_toEq_eq
+                unfold Path.snd Path.trans
+                simp
+      | succ n =>
+          cases n with
+          | zero =>
+              -- n = 2
+              letI : Subsingleton (HigherPiN A a 2) := by
+                simpa [HigherPiN, HigherHomotopy.PiN] using piTwo_subsingleton (A := A) (a := a)
+              letI : Subsingleton (HigherPiN B b 2) := by
+                simpa [HigherPiN, HigherHomotopy.PiN] using piTwo_subsingleton (A := B) (a := b)
+              apply Prod.ext <;> apply Subsingleton.elim
+          | succ _ =>
+              cases γ₁
+              cases γ₂
+              rfl
 
 /-- Encoding preserves inverses. -/
-axiom prodHigherPiN_encode_inv {A B : Type u} (a : A) (b : B) (n : Nat)
+theorem prodHigherPiN_encode_inv {A B : Type u} (a : A) (b : B) (n : Nat)
     (γ : ProdHigherPiN A B a b n) :
     prodHigherPiN_encode a b n (higherPiN_inv (a, b) n γ) =
     let (α, β) := prodHigherPiN_encode a b n γ
-    (higherPiN_inv a n α, higherPiN_inv b n β)
+    (higherPiN_inv a n α, higherPiN_inv b n β) := by
+  cases n with
+  | zero =>
+      cases γ
+      rfl
+  | succ n =>
+      cases n with
+      | zero =>
+          -- n = 1
+          induction γ using Quot.ind with
+          | _ p =>
+            simp only [prodHigherPiN_encode, prodHigherPiNEquiv, higherPiN_inv, prodPiOneEquiv,
+              prodPiOneEncode, LoopQuot.inv]
+            apply Prod.ext
+            · apply Quot.sound
+              apply rweq_of_toEq_eq
+              unfold Path.fst Path.symm
+              simp
+            · apply Quot.sound
+              apply rweq_of_toEq_eq
+              unfold Path.snd Path.symm
+              simp
+      | succ n =>
+          cases n with
+          | zero =>
+              -- n = 2
+              letI : Subsingleton (HigherPiN A a 2) := by
+                simpa [HigherPiN, HigherHomotopy.PiN] using piTwo_subsingleton (A := A) (a := a)
+              letI : Subsingleton (HigherPiN B b 2) := by
+                simpa [HigherPiN, HigherHomotopy.PiN] using piTwo_subsingleton (A := B) (a := b)
+              apply Prod.ext <;> apply Subsingleton.elim
+          | succ _ =>
+              cases γ
+              rfl
 
 /-! ## Special Cases -/
 
