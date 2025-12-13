@@ -31,6 +31,7 @@ import ComputationalPaths.Path.Homotopy.EilenbergMacLane
 import ComputationalPaths.Path.Homotopy.FreudenthalSuspension
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
+import ComputationalPaths.Path.Homotopy.HigherProductHomotopy
 import ComputationalPaths.Path.Homotopy.LieGroups
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
