@@ -620,9 +620,16 @@ it matches the inverse of `kleinBottleSVK_piOne_equiv`. -/
 noncomputable def decodeSVK_def : Int × Int → KleinBottleSVKPiOne :=
   fun (m, n) => piOneMul (loopAClass_zpow m) (loopBClass_zpow n)
 
+/-- Data providing the SVK-based π₁ equivalence. -/
+class HasKleinBottleSVKPiOneEquiv where
+  piOneEquiv : SimpleEquiv KleinBottleSVKPiOne (Int × Int)
+
 /-- **Main Theorem (SVK version)**: π₁(KleinBottleSVK) ≅ ℤ ⋊ ℤ. -/
-axiom kleinBottleSVK_piOne_equiv :
-    SimpleEquiv KleinBottleSVKPiOne (Int × Int)
+noncomputable def kleinBottleSVK_piOne_equiv [HasKleinBottleSVKPiOneEquiv] :
+    SimpleEquiv KleinBottleSVKPiOne (Int × Int) :=
+  HasKleinBottleSVKPiOneEquiv.piOneEquiv
+
+variable [HasKleinBottleSVKPiOneEquiv]
 
 /-- Encode: π₁(KleinBottleSVK) → ℤ × ℤ. -/
 noncomputable def encodeSVK : KleinBottleSVKPiOne → Int × Int :=
