@@ -75,6 +75,39 @@ def length {a b : A} {r : ∀ {p q : Path a b}, Prop}
   | .refl _ => 0
   | .tail h _ => h.length + 1
 
+/-- Decompose a `TStar` derivation into its first step (if any) together with
+the remaining derivation.
+
+`uncons h` is `none` exactly when `h` is reflexive. When it is `some`, it returns
+the first one-step reduction `p ⟶ q₁` and the remaining tail `q₁ ⟶* q`. -/
+def uncons {a b : A} {r : forall {p q : Path a b}, Prop}
+    {p q : Path a b} (h : TStar r p q) :
+    Option (Sigma fun q1 : Path a b =>
+      r (p := p) (q := q1) × TStar r q1 q) := by
+  induction h with
+  | refl =>
+      exact none
+  | tail hstar hstep ih =>
+      cases ih with
+      | none =>
+          exact some ⟨_, hstep, .refl _⟩
+      | some data =>
+          rcases data with ⟨q1, hpq1, hq1q⟩
+          exact some ⟨q1, hpq1, .tail hq1q hstep⟩
+
+/-- `uncons` always succeeds on a non-empty derivation. -/
+theorem uncons_tail_some {a b : A} {r : forall {p q : Path a b}, Prop}
+    {p q s : Path a b} (hstar : TStar r p q) (hstep : r (p := q) (q := s)) :
+    ∃ data, uncons (r := r) (.tail hstar hstep) = some data := by
+  cases hu : uncons (r := r) hstar with
+  | none =>
+      refine ⟨⟨_, hstep, .refl _⟩, ?_⟩
+      simp [uncons, hu]
+  | some data =>
+      rcases data with ⟨q1, hpq1, hq1q⟩
+      refine ⟨⟨q1, hpq1, .tail hq1q hstep⟩, ?_⟩
+      simp [uncons, hu]
+
 end TStar
 
 /-! ## Type-Valued Joinability
@@ -344,7 +377,48 @@ def newman (hterm : Terminating (a := a) (b := b) r)
         | tail h₂' hstep₂ =>
           -- h₂' : TStar r p p'', hstep₂ : r p'' q₂
           -- Get p' from h₁'
-          sorry -- This requires more careful induction; implementing fully
+          -- Reconstruct the full derivations and split off their *first* steps.
+          -- (Our `TStar` is defined by appending steps, so we use `TStar.uncons`.)
+          let h1full : TStar r p q₁ := .tail h₁' hstep₁
+          let h2full : TStar r p q₂ := .tail h₂' hstep₂
+
+          -- Helper: extend a `TPlus` derivation by a `TStar` tail.
+          have transPlusStar :
+              ∀ {x y z : Path a b}, TPlus r x y → TStar r y z → TPlus r x z := by
+            intro x y z hxy hyz
+            induction hyz generalizing x with
+            | refl =>
+                exact hxy
+            | tail hstar hstep ih =>
+                exact TPlus.tail (ih hxy) hstep
+
+          -- Extract the head step p ⟶ p₁ and the remainder p₁ ⟶* q₁ (and likewise for q₂).
+          rcases TStar.uncons_tail_some (r := r) h₁' hstep₁ with ⟨data1, _h1u⟩
+          rcases data1 with ⟨p₁, hp₁, h₁rest⟩
+          rcases TStar.uncons_tail_some (r := r) h₂' hstep₂ with ⟨data2, _h2u⟩
+          rcases data2 with ⟨p₂, hp₂, h₂rest⟩
+
+          -- Local confluence closes the one-step divergence.
+          obtain ⟨s, hp₁s, hp₂s⟩ := hlc.close (p := p) (q1 := p₁) (q2 := p₂) hp₁ hp₂
+
+          -- Apply IH at `p₁` and `p₂` to join the endpoints with `s`.
+          have jq₁s : TJoinable r q₁ s :=
+            ih p₁ (.single hp₁) h₁rest hp₁s
+          have jq₂s : TJoinable r q₂ s :=
+            ih p₂ (.single hp₂) h₂rest hp₂s
+
+          -- `s` is reachable from `p` by at least one step, so IH applies at `s`.
+          have p_to_s : TPlus r p s :=
+            transPlusStar (.single hp₁) hp₁s
+
+          -- Use IH at `s` to join the two common points coming from `q₁` and `q₂`.
+          have jCommon : TJoinable r jq₁s.common jq₂s.common :=
+            ih s p_to_s jq₁s.right jq₂s.right
+
+          -- Assemble the final joinability witness for `q₁` and `q₂`.
+          refine ⟨jCommon.common, ?_, ?_⟩
+          · exact TStar.trans jq₁s.left jCommon.left
+          · exact TStar.trans jq₂s.left jCommon.right
 
 end Newman
 

@@ -184,8 +184,10 @@ theorem prodEncodePath_toEq_eq {p q : Path (a, b) (a, b)}
     (h : RwEq p q) :
     (prodEncodePath a b p).1.toEq = (prodEncodePath a b q).1.toEq ∧
     (prodEncodePath a b p).2.toEq = (prodEncodePath a b q).2.toEq := by
+  have hEq : p.toEq = q.toEq := rweq_toEq h
   unfold prodEncodePath Path.fst Path.snd Path.ofEq
-  simp [rweq_toEq h]
+  cases hEq
+  simp
 
 /-- RwEq on product corresponds to component-wise RwEq. -/
 theorem prodDecodePath_respects_rweq {p₁ p₂ : Path a a} {q₁ q₂ : Path b b}
@@ -193,8 +195,9 @@ theorem prodDecodePath_respects_rweq {p₁ p₂ : Path a a} {q₁ q₂ : Path b 
     RwEq (prodDecodePath a b (p₁, q₁)) (prodDecodePath a b (p₂, q₂)) := by
   unfold prodDecodePath Path.prod
   apply rweq_of_toEq_eq
-  unfold Path.ofEq
-  simp [rweq_toEq hp, rweq_toEq hq]
+  cases rweq_toEq hp
+  cases rweq_toEq hq
+  rfl
 
 /-- Round-trip: encode after decode gives toEq-equal paths. -/
 theorem prodEncode_prodDecode (pq : Path a a × Path b b) :
@@ -265,14 +268,15 @@ noncomputable def prodPiOneEncode :
     (fun p => (Quot.mk RwEq (Path.fst p), Quot.mk RwEq (Path.snd p)))
     (fun p q h => by
       have hEq : p.toEq = q.toEq := rweq_toEq h
+      cases hEq
       have hfst : RwEq (Path.fst p) (Path.fst q) := by
         apply rweq_of_toEq_eq
         unfold Path.fst Path.ofEq
-        simp [hEq]
+        simp
       have hsnd : RwEq (Path.snd p) (Path.snd q) := by
         apply rweq_of_toEq_eq
         unfold Path.snd Path.ofEq
-        simp [hEq]
+        simp
       exact Prod.ext (Quot.sound hfst) (Quot.sound hsnd))
 
 /-- Decode at the quotient level: π₁(A) × π₁(B) → π₁(A × B). -/
@@ -352,7 +356,7 @@ The general inductive structure is:
 - Base: π₁(T⁰) = π₁(point) ≃ 1
 - Step: π₁(Tⁿ⁺¹) ≃ π₁(Tⁿ) × π₁(S¹) ≃ ℤⁿ × ℤ ≃ ℤⁿ⁺¹ -/
 theorem nTorus_piOne_structure :
-    ∀ n : Nat, True := fun _ => trivial
+    ∀ _ : Nat, True := fun _ => trivial
 
 end NTorusFundamentalGroup
 
