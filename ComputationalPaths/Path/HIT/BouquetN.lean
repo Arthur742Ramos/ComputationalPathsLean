@@ -164,45 +164,43 @@ def genPow (i : Fin'B n) (k : Int) : BouquetFreeGroup n :=
 
 end BouquetFreeGroup
 
-/-! ## The Bouquet HIT
+/-! ## The Bouquet of n Circles
 
-The bouquet of n circles is the HIT with:
-- One point (base)
-- n loops (indexed by Fin'B n)
+The bouquet `∨ⁿ S¹` is defined here as an iterated wedge of circles, built from the
+pushout-based wedge construction.
+
+* `BouquetN 0` is the point `PUnit'`.
+* `BouquetN (n+1)` is `BouquetN n ∨ S¹`.
+
+The basepoint is always the left injection basepoint, and the loops are indexed by
+`Fin'B n` where `fzero` picks out the newest circle and `fsucc` shifts older ones.
 -/
 
-/-- The bouquet of n circles. -/
-axiom BouquetN (n : Nat) : Type u
+private noncomputable def bouquetNData : Nat → Σ A : Type u, A
+  | 0 => ⟨PUnit'.{u}, PUnit'.unit⟩
+  | Nat.succ n =>
+      let prev := bouquetNData n
+      ⟨Wedge prev.1 Circle.{u} prev.2 circleBase,
+        Wedge.basepoint (A := prev.1) (B := Circle.{u}) (a₀ := prev.2) (b₀ := circleBase)⟩
+
+/-- The bouquet of `n` circles as an iterated wedge. -/
+noncomputable def BouquetN (n : Nat) : Type u :=
+  (bouquetNData n).1
 
 /-- The basepoint of the bouquet. -/
-axiom bouquetBase {n : Nat} : BouquetN n
+noncomputable def bouquetBase {n : Nat} : BouquetN n :=
+  (bouquetNData n).2
 
-/-- The i-th loop in the bouquet. -/
-axiom bouquetLoop {n : Nat} (i : Fin'B n) : Path (A := BouquetN n) bouquetBase bouquetBase
-
-/-- Recursion principle for BouquetN. -/
-axiom bouquetRec {n : Nat} {C : Type v}
-    (base : C)
-    (loop : (i : Fin'B n) → Path (A := C) base base) :
-    BouquetN n → C
-
-/-- Computation rule: recursion on basepoint. -/
-axiom bouquetRec_base {n : Nat} {C : Type v}
-    (base : C)
-    (loop : (i : Fin'B n) → Path (A := C) base base) :
-    bouquetRec base loop bouquetBase = base
-
-/-- Computation rule: recursion on loop.
-    The application of bouquetRec to a loop gives back the loop data.
-    Note: This requires transport because bouquetRec_base tells us that
-    bouquetRec base lp bouquetBase = base. -/
-axiom bouquetRec_loop {n : Nat} {C : Type v}
-    (base : C)
-    (lp : (i : Fin'B n) → Path (A := C) base base)
-    (i : Fin'B n) :
-    -- The path from bouquetRec applied to the loop equals lp i
-    -- (after accounting for bouquetRec_base via HEq or transport)
-    HEq (Path.congrArg (bouquetRec base lp) (bouquetLoop i)) (lp i)
+/-- The `i`-th loop in the bouquet. -/
+noncomputable def bouquetLoop : {n : Nat} → Fin'B n →
+    Path (A := BouquetN n) (bouquetBase (n := n)) (bouquetBase (n := n))
+  | 0, i => Fin'B.elim0 i
+  | Nat.succ n, .fzero =>
+      let prev := bouquetNData n
+      let glue :=
+        Wedge.glue (A := prev.1) (B := Circle.{u}) (a₀ := prev.2) (b₀ := circleBase)
+      Path.trans glue (Path.trans (Pushout.inrPath circleLoop) (Path.symm glue))
+  | Nat.succ n, .fsucc i => Pushout.inlPath (bouquetLoop (n := n) i)
 
 /-! ## Loop Space and Fundamental Group -/
 
@@ -800,7 +798,7 @@ theorem bouquetPiOne_zero_trivial [BouquetN.HasBouquetPiOneEquiv.{u} 0] (x : Bou
 
 This module establishes:
 
-1. **BouquetN Definition**: The HIT with one point and n loops
+1. **BouquetN Definition**: Iterated wedge of circles (`BouquetN (n+1) := BouquetN n ∨ S¹`)
 
 2. **BouquetFreeGroup Definition**: Free group on n generators as quotient of words
 
@@ -814,19 +812,13 @@ This module establishes:
    - n = 1: π₁ = ℤ (recovers circle result)
    - n = 2: π₁ = F₂ = ℤ * ℤ (figure-eight)
 
-## Axioms (12 total)
+## Placeholders
 
-**HIT Structure (6):**
-- `BouquetN`: The HIT type
-- `bouquetBase`: The basepoint
-- `bouquetLoop`: The n loops indexed by Fin'B n
-- `bouquetRec`, `bouquetRec_base`, `bouquetRec_loop`: Recursion principle
+**Circle HIT axioms:** `BouquetN` is built from wedges of `Circle`, so the circle
+constructors/recursors from `Circle.lean` remain assumptions.
 
-**Encode-Decode (6):**
-- `encodeLoop`: Encoding function from loops to words
-- `encodeLoop_respects_rweq`: Encode respects path equivalence
-- `encodeLoop_loop`, `encodeLoop_refl`: Computation rules
-- `decode_encode`, `encode_decode`: Round-trip properties
+**Main equivalence:** `HasBouquetPiOneEquiv` packages the unproved equivalence
+`π₁(BouquetN n) ≃ BouquetFreeGroup n`.
 
 ## Proved Theorems (previously axioms)
 
