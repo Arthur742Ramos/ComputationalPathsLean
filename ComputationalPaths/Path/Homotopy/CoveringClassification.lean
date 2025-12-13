@@ -125,9 +125,19 @@ structure UniversalCover (A : Type u) (a : A) where
   simply_connected : ∀ (l : LoopSpace space basepoint),
     ∃ _h : Path l (Path.refl basepoint), True
 
-/-- The fundamental group of the universal cover is trivial. -/
-axiom universal_cover_pi1_trivial {A : Type u} (a : A) (uc : UniversalCover A a) :
-    ∀ (α : π₁(uc.space, uc.basepoint)), α = LoopQuot.id
+/-- The fundamental group of the universal cover is trivial.
+
+In this computational-paths development, `π₁` is a rewrite quotient, so any two
+loops with the same endpoints are identified. -/
+theorem universal_cover_pi1_trivial {A : Type u} (a : A) (uc : UniversalCover A a) :
+    ∀ (α : π₁(uc.space, uc.basepoint)), α = LoopQuot.id := by
+  intro α
+  induction α using Quot.ind with
+  | _ p =>
+      apply Quot.sound
+      refine rweq_of_toEq_eq (A := uc.space) (a := uc.basepoint) (b := uc.basepoint)
+        (p := p) (q := Path.refl uc.basepoint) ?_
+      exact Subsingleton.elim p.toEq rfl
 
 /-! ## Deck Transformations
 
