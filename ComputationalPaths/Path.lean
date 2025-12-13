@@ -33,6 +33,8 @@ import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 import ComputationalPaths.Path.Homotopy.HigherProductHomotopy
 import ComputationalPaths.Path.Homotopy.LieGroups
+import ComputationalPaths.Path.Homotopy.Hurewicz
+import ComputationalPaths.Path.Homotopy.CoveringClassification
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
@@ -51,6 +53,8 @@ import ComputationalPaths.Path.HIT.Sphere
 import ComputationalPaths.Path.HIT.HopfFibration
 import ComputationalPaths.Path.HIT.Pi2Sphere
 import ComputationalPaths.Path.HIT.Pi3Sphere
+import ComputationalPaths.Path.HIT.Pi4S3
+import ComputationalPaths.Path.HIT.QuaternionicHopf
 import ComputationalPaths.Path.HIT.OrientableSurface
 import ComputationalPaths.Path.HIT.TorusGenus1
 import ComputationalPaths.Path.OmegaGroupoid
