@@ -216,17 +216,12 @@ axiom unitU_pathEq {a b : UnitU} (p q : Path a b) : RwEq p q
 theorem unitU_loop_rweq_refl (p : Path unitU unitU) : RwEq p (Path.refl unitU) :=
   unitU_pathEq p (Path.refl unitU)
 
-/-- **Constant function axiom**: congrArg of a constant function applied to any path
-is RwEq to refl. This captures the fact that constant maps kill all path information. -/
-axiom congrArg_const_rweq {A : Type u} {B : Type u} (b : B)
-    {a₁ a₂ : A} (p : Path a₁ a₂) :
-    RwEq (Path.congrArg (fun _ => b) p) (Path.refl b)
-
-/-- congrArg of a constant function applied to any path is RwEq to refl. -/
+/-- congrArg of a constant function applied to any path is RwEq to refl.
+Uses `rweq_congrArg_const` from RwEq.lean. -/
 theorem congrArg_const_rweq_refl {A : Type u} {B : Type u} (b : B)
     {a₁ a₂ : A} (p : Path a₁ a₂) :
     RwEq (Path.congrArg (fun _ => b) p) (Path.refl b) :=
-  congrArg_const_rweq b p
+  rweq_congrArg_const b p
 
 /-- inrPath of a loop RwEq to refl is RwEq to refl. -/
 theorem inrPath_rweq_refl {A : Type u} {B : Type u} {C : Type u}

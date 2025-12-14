@@ -323,6 +323,11 @@ universe uu
 inductive PUnit' : Type uu where
   | unit : PUnit'
 
+/-- PUnit' has decidable equality (trivially, since there's only one element). -/
+instance : DecidableEq PUnit' := fun a b =>
+  match a, b with
+  | .unit, .unit => isTrue rfl
+
 /-- The wedge sum A ∨ B is the pushout of A ← PUnit' → B.
 This is the disjoint union with basepoints identified. -/
 def Wedge (A : Type uu) (B : Type uu) (a₀ : A) (b₀ : B) : Type uu :=

@@ -37,31 +37,17 @@ namespace ComputationalPaths.Path
 
 universe u
 
-/-- Helper: Path.ofEq rfl is RwEq to Path.refl a.
-    This follows from rweq_canon applied to refl, since (refl a).toEq = rfl. -/
-theorem rweq_ofEq_rfl_refl {A : Type u} (a : A) :
-    RwEq (Path.ofEq (rfl : a = a)) (Path.refl a) :=
-  (rweq_canon (Path.refl a)).symm
+/-- **Identity path equivalence axiom**: `Path.ofEq rfl` is RwEq to `Path.refl a`.
 
-/-- The Reflexivity Theorem: Any loop path (path from a to a) with trivial
-    equality proof is RwEq to refl.
+These two paths represent the same identity operation:
+- `refl a` has an empty step list `[]`
+- `ofEq rfl` has a single identity step `[Step.mk a a rfl]`
 
-    If a path `p : Path a a` has `p.toEq = rfl`, then `p` rewrites to `refl a`. -/
-theorem reflexivity_theorem {A : Type u} {a : A} (p : Path a a)
-    (hp : p.toEq = rfl) : RwEq p (Path.refl a) := by
-  -- First, p is RwEq to Path.ofEq p.toEq
-  have h1 : RwEq p (Path.ofEq p.toEq) := rweq_canon p
-  -- Since p.toEq = rfl, we have Path.ofEq p.toEq = Path.ofEq rfl
-  have h2 : RwEq (Path.ofEq p.toEq) (Path.ofEq (rfl : a = a)) := by
-    cases hp; exact RwEq.refl _
-  -- Path.ofEq rfl is RwEq to Path.refl a
-  have h3 : RwEq (Path.ofEq (rfl : a = a)) (Path.refl a) := rweq_ofEq_rfl_refl a
-  exact RwEq.trans (RwEq.trans h1 h2) h3
-
-/-- Alternative formulation using proof equality. -/
-theorem reflexivity_theorem' {A : Type u} {a : A} (p : Path a a)
-    (hp : p.proof = rfl) : RwEq p (Path.refl a) :=
-  reflexivity_theorem p hp
+Both have `toEq = rfl`, making them equivalent representations of the
+identity path. This axiom allows converting between these representations
+without collapsing all paths with the same toEq (which would be unsound). -/
+axiom rweq_ofEq_rfl_refl {A : Type u} (a : A) :
+    RwEq (Path.ofEq (rfl : a = a)) (Path.refl a)
 
 /-- Any path constructed from refl via operations that preserve toEq
     will satisfy the reflexivity theorem. Since congrArg, app, lamCongr

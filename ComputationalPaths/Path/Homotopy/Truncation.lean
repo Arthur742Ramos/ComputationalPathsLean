@@ -25,6 +25,7 @@ In the computational paths framework with contractibility₃:
 
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
+import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.HIT.Pushout
 
@@ -111,15 +112,20 @@ axiom prop_pathEq {A : Type u} (_h : IsProp A) {a b : A} (p q : Path a b) : RwEq
 def ofProp (h : IsProp A) : IsSet A where
   pathEq := fun p q => prop_pathEq h p q
 
-/-- **Set axiom for Nat**: Parallel paths in Nat are RwEq.
-Nat has UIP in Lean's type theory due to decidable equality. -/
-axiom nat_pathEq {a b : Nat} (p q : Path a b) : RwEq p q
+/-- **Set theorem for Nat**: Parallel paths in Nat are RwEq.
+Derived from `decidableEq_implies_isHSet` since Nat has DecidableEq. -/
+theorem nat_pathEq {a b : Nat} (p q : Path a b) : RwEq p q :=
+  decidableEq_implies_isHSet p q
 
-/-- **Set axiom for Bool**: Parallel paths in Bool are RwEq. -/
-axiom bool_pathEq {a b : Bool} (p q : Path a b) : RwEq p q
+/-- **Set theorem for Bool**: Parallel paths in Bool are RwEq.
+Derived from `decidableEq_implies_isHSet` since Bool has DecidableEq. -/
+theorem bool_pathEq {a b : Bool} (p q : Path a b) : RwEq p q :=
+  decidableEq_implies_isHSet p q
 
-/-- **Set axiom for Int**: Parallel paths in Int are RwEq. -/
-axiom int_pathEq {a b : Int} (p q : Path a b) : RwEq p q
+/-- **Set theorem for Int**: Parallel paths in Int are RwEq.
+Derived from `decidableEq_implies_isHSet` since Int has DecidableEq. -/
+theorem int_pathEq {a b : Int} (p q : Path a b) : RwEq p q :=
+  decidableEq_implies_isHSet p q
 
 /-- **Axiom for set characterization**: If all loops in π₁(A, a) are trivial for all a,
 then A is a set (parallel paths are RwEq). This completes the characterization of sets

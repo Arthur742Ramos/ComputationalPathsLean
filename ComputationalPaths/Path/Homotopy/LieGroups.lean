@@ -197,14 +197,20 @@ def TorusN : Nat → Type u
 
 namespace TorusN
 
+/-- TorusN 0 = PUnit' has decidable equality. -/
+instance : DecidableEq (TorusN 0) := fun a b =>
+  match a, b with
+  | .unit, .unit => isTrue rfl
+
 /-- The basepoint (identity element) of T^n. -/
 noncomputable def base : (n : Nat) → TorusN n
   | 0 => PUnit'.unit
   | n + 1 => (base n, circleBase)
 
-/-- **TorusN 0 axiom**: Parallel paths in TorusN 0 (a point) are RwEq.
-T⁰ is a point, so it's trivially a set. -/
-axiom torusN_zero_pathEq {a b : TorusN 0} (p q : Path a b) : RwEq p q
+/-- **TorusN 0 theorem**: Parallel paths in TorusN 0 (a point) are RwEq.
+T⁰ = PUnit', which is a set. Derived from `decidableEq_implies_isHSet`. -/
+theorem torusN_zero_pathEq {a b : TorusN 0} (p q : Path a b) : RwEq p q :=
+  decidableEq_implies_isHSet p q
 
 /-- T⁰ is a point, with trivial π₁. -/
 theorem torusN_zero_trivial (α : π₁(TorusN 0, base 0)) :

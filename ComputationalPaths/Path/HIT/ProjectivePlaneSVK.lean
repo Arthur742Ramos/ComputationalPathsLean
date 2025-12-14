@@ -128,18 +128,11 @@ noncomputable def glueBase : Path (@Pushout.inl Circle UnitU Circle boundaryMap 
                                   (@Pushout.inr Circle UnitU Circle boundaryMap collapseMap (collapseMap circleBase)) :=
   @Pushout.glue Circle UnitU Circle boundaryMap collapseMap circleBase
 
-/-- **UnitU axiom (projective plane)**: Parallel paths in UnitU are RwEq.
-UnitU has only one element, so it's trivially a set. -/
-axiom unitU_pathEq' {a b : UnitU} (p q : Path a b) : RwEq p q
-
-/-- Since collapseMap is constant, any loop in UnitU is reflexive. -/
-theorem unitU_loop_rweq_refl' (p : Path unitU unitU) : RwEq p (Path.refl unitU) :=
-  unitU_pathEq' p (Path.refl unitU)
-
-/-- congrArg of collapseMap on circleLoop gives a path in UnitU. -/
+/-- congrArg of collapseMap on circleLoop gives a path in UnitU.
+Uses `unitU_loop_rweq_refl` from KleinBottleSVK. -/
 theorem collapseMap_circleLoop_rweq_refl :
     RwEq (Path.congrArg collapseMap circleLoop) (Path.refl unitU) := by
-  apply unitU_loop_rweq_refl'
+  apply KleinBottleSVK.unitU_loop_rweq_refl
 
 /-- inrPath of a loop RwEq to refl gives refl. Concrete version for our pushout. -/
 theorem inrPath_rweq_refl_concrete

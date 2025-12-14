@@ -36,6 +36,7 @@ import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
+import ComputationalPaths.Path.Homotopy.Sets
 
 namespace ComputationalPaths
 namespace Path
@@ -95,9 +96,11 @@ abbrev PUnitLoopSpace : Type u := LoopSpace PUnit' PUnit'.unit
 theorem punit_loop_is_refl (p : PUnitLoopSpace) : p.toEq = Eq.refl PUnit'.unit := by
   rfl
 
-/-- **PUnit' set axiom**: Parallel paths in PUnit' are RwEq.
-PUnit' is a proposition (has at most one element), so it's trivially a set. -/
-axiom punit_pathEq {a b : PUnit'} (p q : Path a b) : RwEq p q
+/-- **PUnit' set theorem**: Parallel paths in PUnit' are RwEq.
+PUnit' is a proposition (has at most one element), so it's trivially a set.
+Derived from `decidableEq_implies_isHSet` since PUnit' has DecidableEq. -/
+theorem punit_pathEq {a b : PUnit'} (p q : Path a b) : RwEq p q :=
+  decidableEq_implies_isHSet p q
 
 /-- Any two loops in PUnit' are RwEq. -/
 theorem punit_loops_rweq (p q : PUnitLoopSpace) : RwEq p q :=
