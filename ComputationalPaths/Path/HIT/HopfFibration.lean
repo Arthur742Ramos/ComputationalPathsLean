@@ -315,7 +315,7 @@ noncomputable def hopfConnectingMap :
   -- For a 2-loop in S², lift it to the total space and project to the fiber
   fun α => Quot.lift
     (fun _ => Quot.mk RwEq (Path.refl circleBase)) -- simplified; actual construction uses lifting
-    (fun _ _ _ => Quot.sound (rweq_of_toEq_eq rfl))
+    (fun _ _ _ => rfl)  -- Constant function respects relation trivially
     α
 
 /-! ## Key Theorem: Structure of the Long Exact Sequence

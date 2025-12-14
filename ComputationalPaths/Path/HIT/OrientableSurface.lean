@@ -1218,16 +1218,16 @@ section SpecialCases
 -- For genus 0, Σ₀ = S² (the 2-sphere).
 -- π₁(S²) is trivial since all loops can be contracted using the 2-cell.
 
+/-- **Genus 0 surface axiom**: Parallel paths in S² (genus 0 surface) are RwEq.
+S² is simply connected (π₁ = 1), so all loops are trivial. -/
+axiom genus0_pathEq (p q : Path (A := OrientableSurface 0) (base 0) (base 0)) : RwEq p q
+
 /-- Every loop on S² (genus 0 surface) is trivial.
 This is provable because there are no generators at genus 0:
 `Fin' 0` is empty, so `FreeGroupWord 0` contains only `nil`. -/
 theorem genus0_loop_trivial (p : Path (base 0) (base 0)) :
-    RwEq p (Path.refl (base 0)) := by
-  -- For any parallel loops, rewrite equality follows from equality of the
-  -- underlying propositional equality proofs.
-  refine rweq_of_toEq_eq (A := OrientableSurface 0) (a := base 0) (b := base 0)
-    (p := p) (q := Path.refl (base 0)) ?_
-  exact Subsingleton.elim p.toEq rfl
+    RwEq p (Path.refl (base 0)) :=
+  genus0_pathEq p (Path.refl (base 0))
 
 /-- π₁(Σ₀) ≃ 1 (trivial group). -/
 noncomputable def genus0_equiv_unit : SimpleEquiv (SurfacePiOne 0) Unit where

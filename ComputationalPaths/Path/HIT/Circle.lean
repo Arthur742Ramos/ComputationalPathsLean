@@ -285,6 +285,16 @@ theorem circleLoopPathPow_add (m n : Nat) :
   change circleDecodePath (Int.negSucc 0) = _
   simp [circleDecodePath, circleLoopPathZPow]
 
+/-- **Circle loop classification axiom**: Every loop on the circle is RwEq to the
+decoded form of its winding number. This is the characteristic property of π₁(S¹) ≃ ℤ
+and does not generalize to arbitrary types.
+
+Unlike the removed `Step.canon` rule which would collapse ALL paths to their toEq
+representations (causing inconsistency), this axiom is specific to the circle HIT
+and captures the geometric fact that loops on S¹ are classified by winding number. -/
+axiom circleLoop_rweq_decode (p : Path circleBase circleBase) :
+    RwEq p (circleLoopPathZPow (circleEncodePath p))
+
 -- Small arithmetic helper used in encoding lemmas.
 @[simp] theorem int_zero_sub_one : (0 : Int) - 1 = (-1 : Int) := by
   simp
@@ -766,6 +776,27 @@ equalities to ordinary equalities when proving `decode ∘ encode = id`.
         = (Path.symm (circleLoopPathPow (Nat.succ n))).toEq
       -- `toEq_symm` on the quotient and on raw paths align.
       simp
+
+/-- Quotient-level z-powers equal the embedding of raw z-power paths. -/
+@[simp] theorem circleLoopZPow_eq_ofLoop (z : Int) :
+    circleLoopZPow z =
+      LoopQuot.ofLoop (A := Circle) (a := circleBase)
+        (circleLoopPathZPow z) := by
+  cases z with
+  | ofNat n =>
+      -- Use circleLoopPow_ofLoopPathPow for natural powers.
+      exact circleLoopPow_ofLoopPathPow n
+  | negSucc n =>
+      -- circleLoopZPow (Int.negSucc n) = LoopQuot.inv (circleLoopPow (Nat.succ n))
+      -- By circleLoopPow_ofLoopPathPow: = LoopQuot.inv (ofLoop (circleLoopPathPow (Nat.succ n)))
+      -- By ofLoop_symm: = ofLoop (Path.symm (circleLoopPathPow (Nat.succ n)))
+      -- By def: = ofLoop (circleLoopPathZPow (Int.negSucc n))
+      change LoopQuot.inv (circleLoopPow (Nat.succ n)) =
+        LoopQuot.ofLoop (A := Circle) (a := circleBase)
+          (Path.symm (circleLoopPathPow (Nat.succ n)))
+      rw [circleLoopPow_ofLoopPathPow (Nat.succ n)]
+      exact (LoopQuot.ofLoop_symm (A := Circle) (a := circleBase)
+        (p := circleLoopPathPow (Nat.succ n))).symm
 
 -- Subtraction law for the concrete decoder is provided in CircleStep.
 

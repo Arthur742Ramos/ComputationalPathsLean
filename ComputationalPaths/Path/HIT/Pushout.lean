@@ -114,6 +114,17 @@ def rec {D : Type v} (data : RecData (f := f) (g := g) D) :
 @[simp] theorem rec_inr {D : Type v} (data : RecData (f := f) (g := g) D) (b : B) :
     rec data (inr (A := A) (B := B) (C := C) (f := f) (g := g) b) = data.onInr b := rfl
 
+/-- **Pushout rec computation axiom**: The recursion principle computes correctly on glue paths.
+This is a β-rule for the pushout HIT. -/
+axiom rec_glue_rweq {D : Type v} (data : RecData (f := f) (g := g) D) (c : C) :
+    RwEq
+      (Path.trans
+        (Path.symm (Path.ofEq (rec_inl (f := f) (g := g) data (f c))))
+        (Path.trans
+          (Path.congrArg (rec data) (glue (A := A) (B := B) (C := C) (f := f) (g := g) c))
+          (Path.ofEq (rec_inr (f := f) (g := g) data (g c)))))
+      (data.onGlue c)
+
 /-- Computation rule for rec on the glue path.
 The image of glue c under rec is (up to transport) data.onGlue c. -/
 theorem rec_glue {D : Type v} (data : RecData (f := f) (g := g) D) (c : C) :
@@ -123,9 +134,8 @@ theorem rec_glue {D : Type v} (data : RecData (f := f) (g := g) D) (c : C) :
         (Path.trans
           (Path.congrArg (rec data) (glue (A := A) (B := B) (C := C) (f := f) (g := g) c))
           (Path.ofEq (rec_inr (f := f) (g := g) data (g c)))))
-      (data.onGlue c) := by
-  apply rweq_of_toEq_eq
-  exact Subsingleton.elim _ _
+      (data.onGlue c) :=
+  rec_glue_rweq data c
 
 /-
 The original HIT-style β-rule states an equality of computational paths.  Since
@@ -176,6 +186,21 @@ noncomputable def ind {D : Pushout A B C f g → Type v} (data : IndData (f := f
     ind data (inr (A := A) (B := B) (C := C) (f := f) (g := g) b) = data.onInr b := by
   rfl
 
+/-- **Pushout ind computation axiom**: The induction principle computes correctly on glue paths.
+This is a dependent β-rule for the pushout HIT. -/
+axiom ind_glue_rweq {D : Pushout A B C f g → Type v}
+    (data : IndData (f := f) (g := g) D) (c : C) :
+    RwEq
+      (Path.trans
+      (Path.symm
+        (Path.congrArg
+          (fun x => Path.transport (D := D) (glue c) x)
+          (Path.ofEq (ind_inl data (f c)))))
+      (Path.trans
+        (Path.apd (f := ind data) (glue c))
+        (Path.ofEq (ind_inr data (g c)))))
+      (data.onGlue c)
+
 /-- Computation rule for ind on the glue path. -/
 theorem ind_glue {D : Pushout A B C f g → Type v}
     (data : IndData (f := f) (g := g) D) (c : C) :
@@ -188,9 +213,8 @@ theorem ind_glue {D : Pushout A B C f g → Type v}
       (Path.trans
         (Path.apd (f := ind data) (glue c))
         (Path.ofEq (ind_inr data (g c)))))
-      (data.onGlue c) := by
-  apply rweq_of_toEq_eq
-  exact Subsingleton.elim _ _
+      (data.onGlue c) :=
+  ind_glue_rweq data c
 
 /-! ## Basic Properties -/
 
@@ -227,6 +251,15 @@ we have a commuting square:
 This means: inlPath(f*(p)) ⋅ glue(c₂) = glue(c₁) ⋅ inrPath(g*(p))
 -/
 
+/-- **Glue naturality axiom**: The glue path is natural with respect to paths in C.
+This states that inlPath(f*(p)) ≈ glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹, which captures
+the commutativity of the pushout square at the level of paths. -/
+axiom glue_natural_rweq_axiom {c₁ c₂ : C} (p : Path c₁ c₂) :
+    RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
+         (Path.trans (glue c₁)
+            (Path.trans (inrPath (Path.congrArg g p))
+              (Path.symm (glue c₂))))
+
 /-- Glue naturality in RwEq form for fundamental group calculations.
 States that inlPath(f*(p)) is RwEq to glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹.
 
@@ -236,9 +269,8 @@ theorem glue_natural_rweq {c₁ c₂ : C} (p : Path c₁ c₂) :
     RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
          (Path.trans (glue c₁)
             (Path.trans (inrPath (Path.congrArg g p))
-              (Path.symm (glue c₂)))) := by
-  apply rweq_of_toEq_eq
-  exact Subsingleton.elim _ _
+              (Path.symm (glue c₂)))) :=
+  glue_natural_rweq_axiom p
 
 /-- Glue naturality for loops: For a loop p at c₀, inlPath(f*(p)) equals
 glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹ up to RwEq. This is the key fact for SVK. -/

@@ -40,15 +40,24 @@ structure Join {A : Type u} {a b : A}
     Join (A := A) (a := a) (b := b) p p :=
   { meet := p, left := Rw.refl p, right := Rw.refl p }
 
-/-- Join witnesses built from the canonical normal form. -/
+/-- **Confluence axiom**: Given two rewrites from a common source, their targets
+can be joined. This axiom captures the paper's critical pair lemma which shows
+that all critical pairs of the LND_EQ-TRS system are joinable.
+
+Previously this was proved using `Step.canon` which was removed because it
+caused inconsistency. The axiom here is weaker than `Step.canon` - it only
+asserts that join witnesses exist, not that every path canonicalizes. -/
+axiom join_of_rw {A : Type u} {a b : A}
+    {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
+    Join (A := A) (a := a) (b := b) q r
+
+noncomputable section
+
+/-- Join witnesses built from confluence of rewrites. -/
 @[simp] def of_rw {A : Type u} {a b : A}
     {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
     Join (A := A) (a := a) (b := b) q r :=
-  { meet := Path.ofEq (A := A) (a := a) (b := b) p.toEq
-    left := rw_to_canonical_of_rw (A := A) (a := a) (b := b)
-      (p := p) (q := q) hq
-    right := rw_to_canonical_of_rw (A := A) (a := a) (b := b)
-      (p := p) (q := r) hr }
+  join_of_rw hq hr
 
 /-- Joining the targets of two single-step reductions. -/
 @[simp] def of_steps {A : Type u} {a b : A}
@@ -352,43 +361,11 @@ variable {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
     (p := i.p) (q := i.q) (r := Path.congrArg Sigma.fst p)
     hbeta heta
 
-private def sigmaSecondDepContext :
-    DepContext (Sigma B) (fun z => B z.fst) :=
-  ⟨fun z => z.snd⟩
-
-/-- Critical pair: The β-reduction for sigma's second projection agrees with the
-η-expansion path.  The beta rule reduces `sigmaSnd (sigmaMk p q)` to `ofEq q.toEq`,
-and we need to show this joins with `sigmaSnd p` directly. -/
-@[simp] def mxsigma_snd_eta
-    (p : Path (Sigma.mk a₁ b₁) (Sigma.mk a₂ b₂)) :
-    Join (A := B a₂)
-      (a :=
-        Path.transport (A := A) (D := fun a => B a)
-          (Path.sigmaFst (B := B) p) b₁)
-      (b := b₂)
-      (Builder.instMxsigmaSnd (A := A) (B := B)
-        (p := Path.sigmaFst (B := B) p)
-        (q := Path.sigmaSnd (B := B) p)).q
-      (Path.sigmaSnd (B := B) p) := by
-  -- The beta reduction target is `ofEq (sigmaSnd p).toEq`
-  -- which is the canonical form of `sigmaSnd p`
-  -- So both paths reduce to the same canonical form
-  let beta := Builder.instMxsigmaSnd (A := A) (B := B)
-      (p := Path.sigmaFst (B := B) p)
-      (q := Path.sigmaSnd (B := B) p)
-  -- beta.q = ofEq (sigmaSnd p).toEq
-  -- We need: Join beta.q (sigmaSnd p)
-  -- Both rewrite to the canonical form ofEq (sigmaSnd p).toEq
-  have h1 : Rw beta.q beta.q := Rw.refl beta.q
-  have h2 : Rw (Path.sigmaSnd (B := B) p) beta.q := by
-    -- sigmaSnd p →step ofEq (sigmaSnd p).toEq = beta.q
-    simp only [beta, Builder.instMxsigmaSnd]
-    exact rw_of_step (Step.canon (Path.sigmaSnd (B := B) p))
-  exact ⟨beta.q, h1, h2⟩
-
 end Sigma
 
 end CriticalPairs
+
+end
 
 end Confluence
 end Rewrite

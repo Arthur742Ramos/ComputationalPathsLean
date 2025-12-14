@@ -50,10 +50,6 @@ namespace Tactic
 /-- `path_rfl` closes RwEq goals that are reflexive (p = p). -/
 macro "path_rfl" : tactic => `(tactic| exact RwEq.refl _)
 
-/-- `path_canon` closes RwEq goals by canonicalizing both sides.
-    This works when p.toEq = q.toEq (proof irrelevance). -/
-macro "path_canon" : tactic => `(tactic| (apply rweq_of_toEq_eq; rfl))
-
 /-- `path_symm` transforms `RwEq p q` to `RwEq q p`. -/
 macro "path_symm" : tactic => `(tactic| apply rweq_symm)
 
@@ -150,7 +146,7 @@ macro "path_simp" : tactic =>
     first
     | exact RwEq.refl _
     | simp only [
-        rweq_refl, rweq_of_step, rweq_canon, rweq_symm, rweq_trans,
+        rweq_refl, rweq_of_step, rweq_symm, rweq_trans,
         rweq_trans_congr_left, rweq_trans_congr_right, rweq_trans_congr,
         rweq_cmpA_refl_left, rweq_cmpA_refl_right,
         rweq_cmpA_inv_left, rweq_cmpA_inv_right,
@@ -165,7 +161,7 @@ macro "path_simp" : tactic =>
 macro "path_simp_all" : tactic =>
   `(tactic|
     simp_all only [
-      rweq_refl, rweq_of_step, rweq_canon, rweq_symm, rweq_trans,
+      rweq_refl, rweq_of_step, rweq_symm, rweq_trans,
       rweq_trans_congr_left, rweq_trans_congr_right, rweq_trans_congr,
       rweq_cmpA_refl_left, rweq_cmpA_refl_right,
       rweq_cmpA_inv_left, rweq_cmpA_inv_right,
@@ -177,13 +173,11 @@ macro "path_simp_all" : tactic =>
 
 /-- `path_decide` attempts to close RwEq goals automatically by:
     1. Trying direct reflexivity
-    2. Using toEq equality (proof irrelevance)
-    3. Normalizing and comparing -/
+    2. Normalizing and comparing -/
 macro "path_decide" : tactic =>
   `(tactic|
     first
     | exact RwEq.refl _
-    | (apply rweq_of_toEq_eq; rfl)
     | (path_simp; try exact RwEq.refl _))
 
 end Tactic
@@ -194,33 +188,31 @@ This module provides automation for RwEq reasoning:
 
 ### Basic Tactics
 1. **path_rfl**: For reflexive cases (p ≈ p)
-2. **path_canon**: Uses canonicalization (p.toEq = q.toEq → p ≈ q)
-3. **path_symm**: For applying symmetry (p ≈ q → q ≈ p)
-4. **path_simp**: The main workhorse - applies simp with all RwEq lemmas
-5. **path_simp_all**: More aggressive version using hypotheses
-6. **path_decide**: Attempts to close goals automatically
+2. **path_symm**: For applying symmetry (p ≈ q → q ≈ p)
+3. **path_simp**: The main workhorse - applies simp with all RwEq lemmas
+4. **path_simp_all**: More aggressive version using hypotheses
+5. **path_decide**: Attempts to close goals automatically
 
 ### Transitivity Tactics
-7. **path_trans h**: Apply transitivity with hypothesis h
-8. **path_trans_via p**: Apply transitivity with explicit intermediate path
+6. **path_trans h**: Apply transitivity with hypothesis h
+7. **path_trans_via p**: Apply transitivity with explicit intermediate path
 
 ### Congruence Tactics
-9. **path_congr_left h**: Apply congruence on left of trans
-10. **path_congr_right h**: Apply congruence on right of trans
-11. **path_congr h1 h2**: Apply congruence on both sides
+8. **path_congr_left h**: Apply congruence on left of trans
+9. **path_congr_right h**: Apply congruence on right of trans
+10. **path_congr h1 h2**: Apply congruence on both sides
 
 ### Structural Tactics
-12. **path_assoc**: Reassociate to the right ((p·q)·r ≈ p·(q·r))
-13. **path_assoc_left**: Reassociate to the left
-14. **path_unit_left**: Eliminate left unit (refl·p ≈ p)
-15. **path_unit_right**: Eliminate right unit (p·refl ≈ p)
-16. **path_cancel_left**: Left inverse cancellation (p⁻¹·p ≈ refl)
-17. **path_cancel_right**: Right inverse cancellation (p·p⁻¹ ≈ refl)
+11. **path_assoc**: Reassociate to the right ((p·q)·r ≈ p·(q·r))
+12. **path_assoc_left**: Reassociate to the left
+13. **path_unit_left**: Eliminate left unit (refl·p ≈ p)
+14. **path_unit_right**: Eliminate right unit (p·refl ≈ p)
+15. **path_cancel_left**: Left inverse cancellation (p⁻¹·p ≈ refl)
+16. **path_cancel_right**: Right inverse cancellation (p·p⁻¹ ≈ refl)
 
-These tactics leverage the ~90 @[simp] lemmas in RwEq.lean that encode:
+These tactics leverage the @[simp] lemmas in RwEq.lean that encode:
 - Groupoid laws (unit, associativity, inverses)
 - Congruence principles
-- Canonicalization via Step.canon
 
 This implements part of the Future Work from the SVK paper:
 "Automated path computation via term rewriting"

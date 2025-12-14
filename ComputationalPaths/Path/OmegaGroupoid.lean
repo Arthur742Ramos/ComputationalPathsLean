@@ -26,50 +26,25 @@ This is **not** the same as global homotopy contractibility (being equivalent to
 a point). Rather, it says that at sufficiently high dimensions, all parallel cells
 are connected.
 
-In our construction:
-- Contractibility at dimension 3: *derived* from the `to_canonical` axiom + groupoid laws
-- Contractibility at dimension 4+: *postulated* via `contract₄` and `contract_high` axioms
+**Critical design choice**: Contractibility starts at dimension 3, NOT dimension 2.
+- At level 2 (derivations between paths): NOT contractible - only paths connected
+  by actual rewrite steps have derivations between them. This preserves non-trivial
+  fundamental groups like π₁(S¹) ≃ ℤ.
+- At level 3+: Contractible - any two parallel 2-cells are connected by a 3-cell.
 
 ## Axiom Structure
 
-The construction uses three axioms beyond Lean's core (which includes proof-irrelevant `Prop`):
+The construction uses axioms for contractibility at levels 3 and above:
 
-1. **`to_canonical`** (level 3): every `Derivation₂` connects to `canonical p q`
+1. **`contractibility₃`** (level 3): any two parallel `Derivation₂`s are connected
 2. **`contract₄`** (level 4): any two parallel `Derivation₃`s are connected
 3. **`contract_high`** (level 5+): any two parallel `Derivation₄`s are connected
-
-The `to_canonical` axiom is *justified* (though not proved) by the normalization algorithm:
-since all paths normalize to a unique canonical form, any derivation computes the same
-result as the canonical derivation, and they should be identified at the level of 3-cells.
-
-## Axiom Reduction Analysis
-
-Detailed analysis of axiom minimization is provided in companion modules:
-
-- **`OmegaGroupoid/Derived.lean`**: Shows that ALL `MetaStep₃` constructors except
-  `to_canonical` are derivable from `contractibility₃`. This includes groupoid laws
-  (`vcomp_refl_left`, `vcomp_assoc`, etc.), coherences (`pentagon`, `triangle`,
-  `interchange`), and `step_eq`.
-
-- **`OmegaGroupoid/StepToCanonical.lean`**: Shows that `to_canonical` reduces to
-  `step_to_canonical` — an axiom only for single `Step` rewrites. The `.refl`,
-  `.inv`, and `.vcomp` cases are derivable; only `.step s` requires the axiom.
-
-- **`Rewrite/MinimalAxioms.lean`**: Shows that at level 1, several `Step` rules
-  are derivable (e.g., `trans_refl_right` from `trans_refl_left`).
-
-**Minimal axiom count:**
-| Level | Axiom | Status |
-|-------|-------|--------|
-| 1 | ~6 groupoid rules + type-specific | Irreducible |
-| 3 | `step_to_canonical` (~76 cases) | Reducible from `to_canonical` |
-| 4 | `contract₄` | Irreducible |
-| 5+ | `contract_high` | Irreducible |
 
 ## References
 
 - Lumsdaine, "Weak ω-categories from intensional type theory" (2010)
 - van den Berg & Garner, "Types are weak ω-groupoids" (2011)
+- de Queiroz et al., "Propositional equality, identity types, and computational paths"
 -/
 
 import ComputationalPaths.Path.Basic
@@ -85,74 +60,50 @@ universe u
 
 variable {A : Type u}
 
-/-! ## Contractibility via Canonical Derivations
+/-! ## Contractibility at Higher Dimensions
 
-The key coherence for weak ω-groupoids is **contractibility**: any two parallel
-cells are connected by a higher cell. In HoTT, this follows from the J eliminator
-(path induction). For computational paths, we *justify* this by the **normalization**
-algorithm, encoding the key insight as a single axiom.
+The key coherence for weak ω-groupoids is **contractibility**: at dimension k ≥ 3,
+any two parallel (k-1)-cells are connected by a k-cell.
 
-### The Canonical Derivation
+### Key Design Choice: Contractibility Starts at Level 3
 
-Every path `p : Path a b` normalizes to a canonical form `normalize p = Path.ofEq p.toEq`.
-For parallel paths `p q : Path a b`, their normal forms coincide (since `p.toEq = q.toEq`
-by proof irrelevance). This gives us a **canonical derivation**:
+**Critical**: Contractibility does NOT hold at level 2 (between paths).
 
-```
-canonical p q := vcomp (deriv₂_to_normal p) (inv (deriv₂_to_normal q))
-```
+- **Level 2 (NOT contractible)**: `Derivation₂ p q` is only inhabited when there is
+  an actual sequence of rewrite steps from `p` to `q`. Parallel paths without such
+  a connection have no derivation between them. This preserves non-trivial
+  fundamental groups like π₁(S¹) ≃ ℤ.
 
-where `deriv₂_to_normal p : Derivation₂ p (normalize p)` lifts the single-step
-canonicalization `Step.canon p` to a derivation.
-
-### The Axiom: `to_canonical`
-
-We axiomatize that **every derivation connects to the canonical derivation**:
-
-```
-to_canonical (d : Derivation₂ p q) : MetaStep₃ d (canonical p q)
-```
-
-This is the single axiom at level 3. It is *semantically justified* by the normalization
-algorithm: since all paths normalize to a unique canonical form, any derivation
-`d : Derivation₂ p q` computes the same "result" as `canonical p q`, and they should
-be identified at the level of 3-cells.
-
-**Crucially**, unlike a bare contractibility axiom that would simply assert "any two
-parallel 2-cells are connected", the `to_canonical` axiom connects each derivation
-to a *specific, computable target* (`canonical p q`). This grounds the coherence in
-the computational content of normalization.
+- **Level 3+ (contractible)**: `Derivation₃ d₁ d₂` is inhabited for any parallel
+  derivations `d₁, d₂ : Derivation₂ p q`. Similarly for higher levels.
 
 ### Axiom Inventory
 
 This module assumes the following beyond Lean's core (including proof-irrelevant `Prop`):
 
-1. **Level 3**: `to_canonical` — every `Derivation₂` connects to `canonical p q`
+1. **Level 3**: `contractibility₃` — any two parallel `Derivation₂`s are connected
 2. **Level 4**: `contract₄` — any two parallel `Derivation₃`s are connected
 3. **Level 5+**: `contract_high` — any two parallel `Derivation₄`s are connected
 
 The groupoid laws (unit, associativity, inverses), pentagon, triangle, and interchange
 coherences are all *proved* as constructors of `MetaStep₃`/`MetaStep₄`/`MetaStepHigh`.
-The contractibility results `contractibility₃`, `contractibility₄`, `contractibilityHigh`
-are *derived* from these axioms via:
-```
-contractibility₃ d₁ d₂ := vcomp (to_canonical d₁) (inv (to_canonical d₂))
-```
+
+### Why This Is Consistent
+
+The fundamental group π₁(X, x) is defined as the quotient of loops by `RwEq`, which
+corresponds to `PathRwQuot X x x`. The contractibility₃ axiom says that different
+*derivations* between the same paths are connected, but it does NOT create derivations
+between paths that have no rewrite connection.
+
+For example, in π₁(S¹):
+- `loop` and `loop · loop` are different paths with no derivation between them
+- Different derivations of the same path (if they existed) would be connected by 3-cells
+- But since no derivation exists, there's no collapse
 
 ### Metatheory
 
 This formalization is carried out in Lean 4, which corresponds to intensional MLTT
-with proof-irrelevant `Prop` and a universe hierarchy. The constructions are purely
-type-theoretic and should port to other intensional type theories with minor adjustments.
-
-### Comparison with HoTT
-
-| HoTT | Computational Paths |
-|------|---------------------|
-| J eliminator | `to_canonical` axiom (justified by normalization) |
-| Path induction | Canonical derivations through normal forms |
-| `refl` is canonical | `Path.ofEq` is canonical |
-| Contractibility axiom | Derived from `to_canonical` + groupoid laws |
+with proof-irrelevant `Prop` and a universe hierarchy.
 -/
 
 /-! ## Level 2: Derivations (2-cells between paths) -/
@@ -189,67 +140,16 @@ def toRwEq {p q : Path a b} : Derivation₂ p q → RwEq p q
 
 end Derivation₂
 
-/-! ## Canonical Derivations via Normalization
+/-! ## Bridging Lemma: Derivation₂ → RwEq
 
-The key insight: every path normalizes to `Path.ofEq p.toEq` via a single
-`Step.canon` step, and we can lift this to `Derivation₂`. For parallel paths,
-normal forms coincide by proof irrelevance of equality.
--/
+The Type-valued 2-cells `Derivation₂` track explicit rewrite derivations.
+Every derivation corresponds to a `RwEq` proof. Note that the converse does
+NOT hold in general - not all parallel paths have derivations between them.
+This is essential for preserving non-trivial fundamental groups. -/
 
-/-- Key lemma: parallel paths have equal toEq proofs (proof irrelevance). -/
-theorem toEq_parallel {a b : A} (p q : Path a b) : p.toEq = q.toEq :=
-  Subsingleton.elim p.toEq q.toEq
-
-/-- The canonical normal form. For parallel paths, this is the same. -/
-abbrev normalize {a b : A} (p : Path a b) : Path a b := Path.ofEq p.toEq
-
-/-- Lift the single-step canonicalization `Step.canon` to a `Derivation₂`.
-    Uses `Step.canon p : Step p (Path.ofEq p.toEq)`. -/
-def deriv₂_to_normal {a b : A} (p : Path a b) :
-    Derivation₂ p (normalize p) :=
-  .step (Step.canon p)
-
-/-- Key lemma: parallel paths have the same normal form. -/
-theorem normalize_parallel {a b : A} (p q : Path a b) :
-    normalize p = normalize q := by
-  unfold normalize
-  cases toEq_parallel p q
-  rfl
-
-/-- The canonical derivation between parallel paths goes through normal forms.
-    Since normalize p = normalize q definitionally (via toEq_parallel),
-    we can compose: p → normalize p = normalize q → q -/
-def canonical {a b : A} (p q : Path a b) : Derivation₂ p q :=
-  have h : normalize p = normalize q := normalize_parallel p q
-  .vcomp (deriv₂_to_normal p) (h ▸ .inv (deriv₂_to_normal q))
-
-/-! ## Bridging Lemma: RwEq ↔ Derivation₂
-
-The following establishes that the Prop-valued rewrite equivalence `RwEq` and the
-Type-valued 2-cells `Derivation₂` capture the same relation: paths `p` and `q` are
-"rewrite-equivalent" (`RwEq p q`) if and only if `Derivation₂ p q` is inhabited.
-
-The key insight is that `canonical p q` provides a derivation for ANY parallel paths,
-not just those connected by a sequence of rewrite steps. This works because:
-1. All parallel paths share the same normal form (by `normalize_parallel`)
-2. Every path normalizes to its canonical form via `deriv₂_to_normal`
-
-The converse (`Derivation₂ p q → RwEq p q`) follows by structural induction on the
-derivation, mapping each constructor to its `RwEq` counterpart. -/
-
-/-- The equivalence between `RwEq` and `Derivation₂` inhabitedness.
-
-This theorem makes explicit that the Prop-valued rewrite equivalence `RwEq`
-and the Type-valued 2-cells `Derivation₂` capture exactly the same relation:
-two paths are rewrite-equivalent if and only if there exists a derivation between them.
-
-An important consequence is that rewrite-equivalent paths share a normal form:
-if `RwEq p q`, then `normalize p = normalize q`. The distinction between `RwEq`
-(a Prop) and `Derivation₂` (a Type) is that the latter tracks the structure of
-the derivation for coherence purposes. -/
-theorem rweq_iff_derivation₂ {p q : Path a b} :
-    RwEq p q ↔ Nonempty (Derivation₂ p q) :=
-  ⟨fun _ => ⟨canonical p q⟩, fun ⟨d⟩ => d.toRwEq⟩
+/-- A derivation implies RwEq (but not conversely in general). -/
+theorem derivation₂_to_rweq {p q : Path a b} : Derivation₂ p q → RwEq p q :=
+  Derivation₂.toRwEq
 
 /-! ## Horizontal Composition (Whiskering) -/
 
@@ -308,34 +208,22 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   different "reasons" for the same rewrite step. -/
   | step_eq {a b : A} {p q : Path a b} (s₁ s₂ : Step p q) :
       MetaStep₃ (.step s₁) (.step s₂)
-  /-- **The Canonicity Axiom**: Any derivation connects to the canonical derivation.
+  /-- **Contractibility at Level 3**: Any two parallel 2-cells are connected.
 
-  **Axiomatization**: In this formalization, we *axiomatize* the existence of this
-  3-cell `to_canonical d : MetaStep₃ d (canonical p q)`. This is the key primitive
-  that grounds contractibility at dimension 3.
+  This is the Batanin-style contractibility axiom for weak ω-groupoids. It asserts
+  that whenever we have two derivations `d₁, d₂ : Derivation₂ p q` with the same
+  source and target paths, there exists a 3-cell connecting them.
 
-  **Meta-theoretical Justification**: The canonicity axiom is semantically justified
-  by the normalization algorithm:
+  **Critical distinction from level 2**: This does NOT imply that all parallel
+  PATHS are connected - only that all parallel DERIVATIONS are. Parallel paths
+  without a rewrite derivation between them remain distinct.
 
-  1. The normalizing derivation `δₚ : Derivation₂ p (normalize p)` follows the
-     terminating rewrite sequence `p →* |p|` concretely given by LNDEQ-TRS.
-  2. For parallel paths `p, q : Path a b`, `normalize_parallel` ensures `|p| = |q|`.
-  3. The canonical derivation `γₚ,ₓ = δₚ ∘ inv(δₑ)` is thus a concrete, computable
-     derivation through the shared normal form.
-  4. Since normalization is confluent (all paths to normal form yield the same result),
-     every derivation `d : Derivation₂ p q` represents an equivalent computation
-     through normal forms, and should connect to `γₚ,ₓ` at the level of 3-cells.
-
-  **Distinction from bare contractibility**: Unlike a bare contractibility axiom
-  that would simply assert "any two parallel 2-cells are connected", the canonicity
-  axiom connects each derivation to a *specific, computable target* (`canonical p q`).
-  This grounds the coherence in the computational content of normalization.
-
-  **Derived contractibility**: From this axiom plus groupoid laws, we derive:
-  - `to_canonical d : Derivation₃ d (canonical p q)` for ALL derivations d
-  - `contractibility₃ d₁ d₂ := vcomp (to_canonical d₁) (inv (to_canonical d₂))` -/
-  | to_canonical {a b : A} {p q : Path a b} (d : Derivation₂ p q) :
-      MetaStep₃ d (canonical p q)
+  This axiom is consistent with non-trivial fundamental groups because:
+  - π₁ is computed from path quotients, not derivation quotients
+  - Different loop classes in π₁(S¹) have no derivation between them
+  - The contractibility only applies when a derivation already exists -/
+  | contractibility₃ {a b : A} {p q : Path a b}
+      (d₁ d₂ : Derivation₂ p q) : MetaStep₃ d₁ d₂
   -- Pentagon coherence
   | pentagon {a b c d e : A} (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
       MetaStep₃
@@ -403,95 +291,38 @@ def whiskerRight₃ {a b : A} {p q r : Path a b}
 
 end Derivation₃
 
-/-! ## Derived Contractibility via Canonical Derivations
+/-! ## Contractibility at Level 3
 
-The key insight is that `canonical p p = vcomp (norm p) (inv (norm p))` contracts
-to `refl p` via `vcomp_inv_right`. From this, we derive all of contractibility.
+The key property for weak ω-groupoids is contractibility at dimension 3 and above.
+This means any two parallel 2-cells are connected by a 3-cell.
 
-Due to the complexity of dependent type transport, we use an auxiliary definition
-that keeps track of the normal form explicitly to avoid transport issues.
+**Critical**: This does NOT mean all parallel PATHS are connected. Only parallel
+DERIVATIONS (which already have the same source and target paths) are connected.
 -/
 
-section CanonicalDerivations
+section Contractibility
 
 variable {a b : A}
 
-/-- The canonical derivation expressed without transport, using the shared normal form. -/
-def canonical' {a b : A} (p q : Path a b) (n : Path a b)
-    (hp : Derivation₂ p n) (hq : Derivation₂ q n) : Derivation₂ p q :=
-  .vcomp hp (.inv hq)
+/-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
-/-- canonical expressed via canonical' -/
-theorem canonical_eq (p q : Path a b) :
-    canonical p q = canonical' p q (normalize p)
-      (deriv₂_to_normal p) (normalize_parallel p q ▸ deriv₂_to_normal q) := rfl
-
-/-- **Loop equation for canonical derivations**.
-
-For loops (where source = target), the canonical derivation simplifies to
-`vcomp (deriv₂_to_normal p) (inv (deriv₂_to_normal p))`.
-
-This is the key lemma connecting canonical derivations to reflexivity. The equation
-holds because `normalize_parallel p p` is definitionally `rfl` (since `toEq_parallel p p`
-is `Subsingleton.elim p.toEq p.toEq = rfl`), so there's no transport to worry about.
-
-**Why this matters**: Combined with the groupoid law `vcomp_inv_right`, this shows that
-`canonical p p` is connected to `refl p` by a 3-cell. This is the foundation for
-deriving loop contraction and full contractibility from the `to_canonical` axiom. -/
-theorem canonical_loop_eq (p : Path a b) :
-    canonical p p = .vcomp (deriv₂_to_normal p) (.inv (deriv₂_to_normal p)) := by
-  -- Unfold canonical and normalize
-  unfold canonical normalize_parallel toEq_parallel normalize
-  -- After unfolding, we have Subsingleton.elim p.toEq p.toEq ▸ X = X
-  -- which holds definitionally because Subsingleton.elim returns rfl when both args are same
-  rfl
-
-/-- **Canonical loop derivation contracts to reflexivity**.
-
-Since `canonical p p = vcomp (norm p) (inv (norm p))` by `canonical_loop_eq`,
-and we have the groupoid law `vcomp_inv_right : vcomp d (inv d) ⟹ refl`,
-we get a 3-cell from `canonical p p` to `refl p`.
-
-This is a *derived* result using only the groupoid laws—no axioms needed here. -/
-def canonical_to_refl (p : Path a b) : Derivation₃ (canonical p p) (.refl p) := by
-  rw [canonical_loop_eq]
-  exact .step (.vcomp_inv_right (deriv₂_to_normal p))
-
-/-- The inverse of `canonical_to_refl`: reflexivity connects to the canonical loop. -/
-def refl_to_canonical (p : Path a b) : Derivation₃ (.refl p) (canonical p p) :=
-  .inv (canonical_to_refl p)
-
-/-- Lift the `to_canonical` axiom from `MetaStep₃` to `Derivation₃`. -/
-def to_canonical {p q : Path a b} (d : Derivation₂ p q) : Derivation₃ d (canonical p q) :=
-  .step (.to_canonical d)
+This lifts the `MetaStep₃.contractibility₃` axiom to `Derivation₃`. -/
+def contractibility₃ {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
+  .step (.contractibility₃ d₁ d₂)
 
 /-- **Loop contraction**: Any loop derivation `d : Derivation₂ p p` contracts to `refl p`.
 
-This is *derived* from the `to_canonical` axiom plus groupoid laws:
-```
-d ⟹ canonical p p ⟹ refl p
-    (to_canonical)   (canonical_to_refl)
-```
+This follows from contractibility₃: both `d` and `refl p` are derivations from `p` to `p`,
+so they are connected by a 3-cell.
 
 Loop contraction is the key property that makes the fundamental group well-defined:
 it ensures that different derivations representing the "same" loop are identified. -/
 def loop_contract {p : Path a b} (d : Derivation₂ p p) :
     Derivation₃ d (.refl p) :=
-  .vcomp (to_canonical d) (canonical_to_refl p)
+  contractibility₃ d (.refl p)
 
-/-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
-
-This is the Batanin-style contractibility condition, *derived* from the `to_canonical`
-axiom via a zig-zag through the canonical derivation:
-```
-d₁ ⟹ canonical p q ⟸ d₂
-```
-becomes `vcomp (to_canonical d₁) (inv (to_canonical d₂)) : Derivation₃ d₁ d₂`. -/
-def contractibility₃ {p q : Path a b}
-    (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .vcomp (to_canonical d₁) (.inv (to_canonical d₂))
-
-end CanonicalDerivations
+end Contractibility
 
 /-! ## Level 4: 4-cells between 3-cells
 
@@ -826,43 +657,37 @@ This module establishes the **complete** weak ω-groupoid structure:
 - Level 4: `Derivation₄ m₁ m₂` where m₁, m₂ : Derivation₃ ✓
 - Level 5+: `DerivationHigh n c₁ c₂` where c₁, c₂ : Derivation₄ ✓
 
+**Key Design Choice: Contractibility Starts at Level 3**
+
+The critical insight is that contractibility does NOT hold at level 2 (between paths),
+only at level 3 and above (between derivations).
+
+- **Level 2 (NOT contractible)**: `Derivation₂ p q` only exists when there's an actual
+  rewrite sequence from `p` to `q`. This preserves non-trivial fundamental groups.
+
+- **Level 3+ (contractible)**: All parallel derivations/higher cells are connected.
+
 **Axiom Structure**
 
 The construction uses three axioms, one at each level ≥ 3:
 
-| Level | Axiom | Justification |
-|-------|-------|---------------|
-| 3 | `to_canonical d` | Normalization: all derivations compute the same canonical result |
-| 4 | `contract₄ m₁ m₂` | Contractibility₃ collapses all 2-cell distinctions |
-| 5+ | `contract_high c₁ c₂` | Contractibility₄ collapses all 3-cell distinctions |
+| Level | Axiom | Purpose |
+|-------|-------|---------|
+| 3 | `contractibility₃ d₁ d₂` | Any two parallel derivations are connected |
+| 4 | `contract₄ m₁ m₂` | Any two parallel 3-cells are connected |
+| 5+ | `contract_high c₁ c₂` | Any two parallel 4-cells are connected |
 
-**The `to_canonical` Axiom (Level 3)**
+**Why This Is Consistent**
 
-The key insight is connecting contractibility to the **normalization algorithm**:
+The fundamental group π₁(X, x) is the quotient of loops by `RwEq`. The contractibility
+axioms at level 3+ say that different DERIVATIONS between the same paths are connected,
+but they do NOT create derivations between paths that have no rewrite connection.
 
-1. `normalize p = Path.ofEq p.toEq` gives the canonical representative of any path
-2. `deriv₂_to_normal p : Derivation₂ p (normalize p)` lifts `Step.canon` to a derivation
-3. `canonical p q := vcomp (deriv₂_to_normal p) (inv (deriv₂_to_normal q))` is the canonical derivation
-4. `to_canonical d : MetaStep₃ d (canonical p q)` asserts every derivation connects to canonical
-
-This is *axiomatized* (not proved), but semantically justified: since normalization is confluent,
-any derivation `d : Derivation₂ p q` computes the same result as `canonical p q`.
-
-**Derived Contractibility**
-
-From `to_canonical` and groupoid laws, we *derive*:
-```
-contractibility₃ d₁ d₂ := vcomp (to_canonical d₁) (inv (to_canonical d₂))
-```
-
-**Higher Levels (4+)**
-
-At levels 4 and above, we *postulate* contractibility directly:
-- Level 4: `contract₄` is an axiom, justified by derived `contractibility₃`
-- Level 5+: `contract_high` is an axiom, justified by `contractibility₄`
-
-The intuition is that once level-3 contractibility holds, all higher coherence
-data collapses—there is no further computational content to exploit.
+For π₁(S¹) ≃ ℤ:
+- Different loop powers (loop, loop·loop, etc.) have no rewrite derivation between them
+- Each remains a distinct element in the fundamental group
+- The contractibility₃ axiom doesn't affect this because it only connects derivations
+  that already exist
 
 **Coherences** (all proved, not axiomatized):
 - Pentagon: `MetaStep₃.pentagon` (Mac Lane's pentagon for associators)
@@ -871,17 +696,7 @@ data collapses—there is no further computational content to exploit.
 - Anti-homomorphism: `MetaStep₃.inv_vcomp` (inverse distributes over composition)
 - Step coherence: `MetaStep₃.step_eq` (justified by `Step` being in `Prop`)
 
-**Comparison with HoTT**:
-| HoTT | Computational Paths |
-|------|---------------------|
-| J eliminator | `to_canonical` axiom (justified by normalization) |
-| Path induction | Canonical derivations through normal forms |
-| `refl` is canonical | `Path.ofEq` is canonical |
-| Bare contractibility axiom | Contractibility *derived* from `to_canonical` |
-
 This implements the Lumsdaine/van den Berg-Garner weak ω-groupoid construction.
-The unique feature is that level-3 contractibility is derived from the `to_canonical`
-axiom, which is itself *justified* (though not proved) by the normalization algorithm.
 -/
 
 end OmegaGroupoid

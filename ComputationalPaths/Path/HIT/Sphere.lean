@@ -95,10 +95,13 @@ abbrev PUnitLoopSpace : Type u := LoopSpace PUnit' PUnit'.unit
 theorem punit_loop_is_refl (p : PUnitLoopSpace) : p.toEq = Eq.refl PUnit'.unit := by
   rfl
 
-/-- Any two loops in PUnit' are RwEq (since they have the same toEq). -/
-theorem punit_loops_rweq (p q : PUnitLoopSpace) : RwEq p q := by
-  apply rweq_of_toEq_eq
-  rfl
+/-- **PUnit' set axiom**: Parallel paths in PUnit' are RwEq.
+PUnit' is a proposition (has at most one element), so it's trivially a set. -/
+axiom punit_pathEq {a b : PUnit'} (p q : Path a b) : RwEq p q
+
+/-- Any two loops in PUnit' are RwEq. -/
+theorem punit_loops_rweq (p q : PUnitLoopSpace) : RwEq p q :=
+  punit_pathEq p q
 
 /-- π₁(PUnit') has exactly one element (the trivial group). -/
 theorem punit_pi1_trivial : ∀ (α : π₁(PUnit', PUnit'.unit)), α = Quot.mk _ (Path.refl _) := by

@@ -202,11 +202,15 @@ noncomputable def base : (n : Nat) → TorusN n
   | 0 => PUnit'.unit
   | n + 1 => (base n, circleBase)
 
+/-- **TorusN 0 axiom**: Parallel paths in TorusN 0 (a point) are RwEq.
+T⁰ is a point, so it's trivially a set. -/
+axiom torusN_zero_pathEq {a b : TorusN 0} (p q : Path a b) : RwEq p q
+
 /-- T⁰ is a point, with trivial π₁. -/
 theorem torusN_zero_trivial (α : π₁(TorusN 0, base 0)) :
     α = Quot.mk _ (Path.refl (base 0)) := by
   induction α using Quot.ind with
-  | _ p => exact Quot.sound (rweq_of_toEq_eq rfl)
+  | _ p => exact Quot.sound (torusN_zero_pathEq p (Path.refl (base 0)))
 
 /-- T¹ ≃ S¹ -/
 def torusOneEquivCircle : SimpleEquiv (TorusN 1) Circle where
@@ -364,7 +368,7 @@ noncomputable def torusN1_piOne_equiv_int :
         intro (α, β)
         have hα : α = Quot.mk _ (Path.refl PUnit'.unit) := by
           induction α using Quot.ind with
-          | _ p => exact Quot.sound (rweq_of_toEq_eq rfl)
+          | _ p => exact Quot.sound (TorusN.torusN_zero_pathEq p (Path.refl PUnit'.unit))
         have hβ : circleDecode (circleWindingNumber β) = β :=
           circleDecode_circleEncode β
         simp only [hα, hβ]

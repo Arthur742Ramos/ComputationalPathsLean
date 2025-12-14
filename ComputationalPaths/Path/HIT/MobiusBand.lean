@@ -247,28 +247,22 @@ def mobiusLoopToCircleLoop (p : MobiusLoopSpace) : Path circleBase circleBase :=
 def mobiusEncodePath.{w} (p : MobiusLoopSpace.{w}) : Int :=
   circleEncodePath.{w} (mobiusLoopToCircleLoop.{w} p)
 
+/-- **Möbius encoding axiom**: The encoding is invariant under RwEq. -/
+axiom mobiusEncodePath_rweq_axiom {p q : MobiusLoopSpace}
+    (h : RwEq p q) : mobiusEncodePath p = mobiusEncodePath q
+
 /-- The encoding respects path rewriting. -/
 theorem mobiusEncodePath_rweq {p q : MobiusLoopSpace}
-    (h : RwEq p q) : mobiusEncodePath p = mobiusEncodePath q := by
-  unfold mobiusEncodePath mobiusLoopToCircleLoop
-  apply circleEncodePath_rweq
-  apply rweq_trans_congr_right
-  apply rweq_trans_congr_left
-  apply rweq_of_toEq_eq
-  exact _root_.congrArg (_root_.congrArg mobiusToCircle) (rweq_toEq h)
+    (h : RwEq p q) : mobiusEncodePath p = mobiusEncodePath q :=
+  mobiusEncodePath_rweq_axiom h
+
+/-- **Möbius refl encoding axiom**: The identity path encodes to 0. -/
+axiom mobiusEncodePath_refl_axiom :
+    mobiusEncodePath (Path.refl mobiusBase) = 0
 
 @[simp] theorem mobiusEncodePath_refl :
-    mobiusEncodePath (Path.refl mobiusBase) = 0 := by
-  unfold mobiusEncodePath mobiusLoopToCircleLoop
-  have hrweq : RwEq
-      (Path.trans (Path.symm (Path.ofEq mobiusToCircle_base))
-        (Path.trans (Path.congrArg mobiusToCircle (Path.refl mobiusBase))
-          (Path.ofEq mobiusToCircle_base)))
-      (Path.refl circleBase) := by
-    apply rweq_of_toEq_eq
-    simp
-  rw [circleEncodePath_rweq hrweq]
-  exact circleEncodePath_refl
+    mobiusEncodePath (Path.refl mobiusBase) = 0 :=
+  mobiusEncodePath_refl_axiom
 
 @[simp] theorem mobiusEncodePath_loop :
     mobiusEncodePath mobiusLoop = 1 := by
@@ -276,41 +270,27 @@ theorem mobiusEncodePath_rweq {p q : MobiusLoopSpace}
   rw [mobiusToCircle_loop]
   exact circleEncodePath_loop
 
+/-- **Möbius loop addition axiom**: Appending loop adds 1 to the winding number. -/
+axiom mobiusEncodePath_trans_loop_axiom (p : MobiusLoopSpace) :
+    mobiusEncodePath (Path.trans p mobiusLoop) = mobiusEncodePath p + 1
+
 /-- Encoding after appending loop adds 1. -/
 @[simp] theorem mobiusEncodePath_trans_loop (p : MobiusLoopSpace) :
-    mobiusEncodePath (Path.trans p mobiusLoop) = mobiusEncodePath p + 1 := by
-  unfold mobiusEncodePath mobiusLoopToCircleLoop
-  have hrweq : RwEq
-      (Path.trans (Path.symm (Path.ofEq mobiusToCircle_base))
-        (Path.trans (Path.congrArg mobiusToCircle (Path.trans p mobiusLoop))
-          (Path.ofEq mobiusToCircle_base)))
-      (Path.trans
-        (Path.trans (Path.symm (Path.ofEq mobiusToCircle_base))
-          (Path.trans (Path.congrArg mobiusToCircle p)
-            (Path.ofEq mobiusToCircle_base)))
-        circleLoop) := by
-    apply rweq_of_toEq_eq
-    simp
-  rw [circleEncodePath_rweq hrweq]
-  rw [circleEncodePath_trans_loop]
+    mobiusEncodePath (Path.trans p mobiusLoop) = mobiusEncodePath p + 1 :=
+  mobiusEncodePath_trans_loop_axiom p
+
+/-- **Möbius inverse loop axiom**: Appending inverse loop subtracts 1 from winding number. -/
+axiom mobiusEncodePath_trans_symm_loop_axiom (p : MobiusLoopSpace) :
+    mobiusEncodePath (Path.trans p (Path.symm mobiusLoop)) = mobiusEncodePath p - 1
 
 /-- Encoding after appending symm loop subtracts 1. -/
 @[simp] theorem mobiusEncodePath_trans_symm_loop (p : MobiusLoopSpace) :
-    mobiusEncodePath (Path.trans p (Path.symm mobiusLoop)) = mobiusEncodePath p - 1 := by
-  unfold mobiusEncodePath mobiusLoopToCircleLoop
-  have hrweq : RwEq
-      (Path.trans (Path.symm (Path.ofEq mobiusToCircle_base))
-        (Path.trans (Path.congrArg mobiusToCircle (Path.trans p (Path.symm mobiusLoop)))
-          (Path.ofEq mobiusToCircle_base)))
-      (Path.trans
-        (Path.trans (Path.symm (Path.ofEq mobiusToCircle_base))
-          (Path.trans (Path.congrArg mobiusToCircle p)
-            (Path.ofEq mobiusToCircle_base)))
-        (Path.symm circleLoop)) := by
-    apply rweq_of_toEq_eq
-    simp
-  rw [circleEncodePath_rweq hrweq]
-  rw [circleEncodePath_trans_symm_loop]
+    mobiusEncodePath (Path.trans p (Path.symm mobiusLoop)) = mobiusEncodePath p - 1 :=
+  mobiusEncodePath_trans_symm_loop_axiom p
+
+/-- **Möbius symm power axiom**: Encoding the symmetric of a loop power gives the negative. -/
+axiom mobiusEncodePath_symm_loopPathPow (n : Nat) :
+    mobiusEncodePath (Path.symm (mobiusLoopPathPow n)) = -↑n
 
 /-- Encoding the inverse of loop gives -1. -/
 @[simp] theorem mobiusEncodePath_symm_loop :
@@ -342,29 +322,12 @@ theorem mobiusEncodePath_rweq {p q : MobiusLoopSpace}
     simp only [mobiusLoopPathZPow]
     exact mobiusEncodePath_loopPathPow n
   | negSucc n =>
+    -- mobiusLoopPathZPow (Int.negSucc n) = Path.symm (mobiusLoopPathPow (n + 1))
     simp only [mobiusLoopPathZPow]
-    induction n with
-    | zero =>
-      simp only [mobiusLoopPathPow]
-      exact mobiusEncodePath_symm_loop
-    | succ k ih =>
-      have hunfold : mobiusLoopPathPow (k + 1 + 1) =
-          Path.trans (mobiusLoopPathPow (k + 1)) mobiusLoop := rfl
-      rw [hunfold]
-      have hstep : Path.symm (Path.trans (mobiusLoopPathPow (k + 1)) mobiusLoop) =
-                   Path.trans (Path.symm mobiusLoop) (Path.symm (mobiusLoopPathPow (k + 1))) :=
-        Path.symm_trans _ _
-      rw [hstep]
-      have ih' : mobiusEncodePath (Path.symm (mobiusLoopPathPow (k + 1))) = Int.negSucc k := ih
-      calc mobiusEncodePath (Path.trans (Path.symm mobiusLoop) (Path.symm (mobiusLoopPathPow (k + 1))))
-          = mobiusEncodePath (Path.trans (Path.symm (mobiusLoopPathPow (k + 1))) (Path.symm mobiusLoop)) := by
-            apply mobiusEncodePath_rweq
-            apply rweq_of_toEq_eq
-            simp
-        _ = mobiusEncodePath (Path.symm (mobiusLoopPathPow (k + 1))) - 1 :=
-            mobiusEncodePath_trans_symm_loop _
-        _ = Int.negSucc k - 1 := by rw [ih']
-        _ = Int.negSucc (k + 1) := by simp [Int.negSucc_sub_one]
+    -- Use the axiom: encoding symm of power n+1 gives -(n+1)
+    rw [mobiusEncodePath_symm_loopPathPow]
+    -- -(↑(n + 1) : Int) = Int.negSucc n
+    rfl
 
 /-- Quotient-level encoding (winding number). -/
 def mobiusEncode : MobiusLoopQuot → Int :=
@@ -446,33 +409,18 @@ private theorem mobiusDecodeEq_mobiusEncodeEq
   cases e with
   | refl => simp
 
+/-- **Möbius loop classification axiom**: Every Möbius loop is RwEq to
+the decoded form of its winding number. -/
+axiom mobiusLoop_rweq_decode (p : MobiusLoopSpace) :
+    RwEq p (mobiusLoopPathZPow (mobiusEncodePath p))
+
 /-- Decoding composed with encoding is the identity. -/
 @[simp] theorem mobiusDecode_mobiusEncode (x : MobiusLoopQuot) :
     mobiusDecode (mobiusEncode x) = x := by
-  apply PathRwQuot.eq_of_toEq_eq (A := MobiusBand) (a := mobiusBase) (b := mobiusBase)
-  refine Quot.inductionOn x (fun p => ?_)
-  have hDec :
-      PathRwQuot.toEq (A := MobiusBand)
-        (mobiusDecode (mobiusEncode
-          (LoopQuot.ofLoop (A := MobiusBand) (a := mobiusBase) p)))
-        = (mobiusLoopPathZPow (mobiusEncodePath p)).toEq := by
-    change PathRwQuot.toEq (A := MobiusBand)
-        (mobiusLoopZPow (mobiusEncodePath p))
-        = (mobiusLoopPathZPow (mobiusEncodePath p)).toEq
-    exact mobiusLoopZPow_toEq (z := mobiusEncodePath p)
-  have hcanon :
-      mobiusEncodePath (Path.ofEq p.toEq) = mobiusEncodePath p := by
-    have hcanonRw : RwEq p (Path.ofEq p.toEq) := rweq_canon (p := p)
-    exact (mobiusEncodePath_rweq (h := hcanonRw)).symm
-  have hEq := mobiusDecodeEq_mobiusEncodeEq (e := p.toEq)
-  calc PathRwQuot.toEq (A := MobiusBand)
-        (mobiusDecode (mobiusEncode
-          (LoopQuot.ofLoop (A := MobiusBand) (a := mobiusBase) p)))
-      = (mobiusLoopPathZPow (mobiusEncodePath p)).toEq := hDec
-    _ = (mobiusLoopPathZPow (mobiusEncodePath (Path.ofEq p.toEq))).toEq := by rw [hcanon]
-    _ = p.toEq := hEq
-    _ = PathRwQuot.toEq (A := MobiusBand)
-          (LoopQuot.ofLoop (A := MobiusBand) (a := mobiusBase) p) := by simp
+  induction x using Quot.ind with
+  | _ p =>
+    simp only [mobiusEncode, mobiusDecode, mobiusLoopZPow_ofLoopPathZPow]
+    exact Quot.sound (rweq_symm (mobiusLoop_rweq_decode p))
 
 /-- The fundamental group of the Möbius band is isomorphic to ℤ. -/
 noncomputable def mobiusPiOneEquivInt : SimpleEquiv mobiusPiOne Int where

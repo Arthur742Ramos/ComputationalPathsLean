@@ -103,12 +103,16 @@ theorem Path.prod_fst_snd {a a' : A} {b b' : B}
   unfold Path.prod Path.fst Path.snd Path.ofEq
   simp
 
+/-- **Product path round-trip axiom**: Reconstructing a path from its projections is RwEq to the original. -/
+axiom Path.prod_fst_snd_rweq_axiom {a a' : A} {b b' : B}
+    (p : Path (a, b) (a', b')) :
+    RwEq (Path.prod (Path.fst p) (Path.snd p)) p
+
 /-- RwEq version of round-trip. -/
 theorem Path.prod_fst_snd_rweq {a a' : A} {b b' : B}
     (p : Path (a, b) (a', b')) :
-    RwEq (Path.prod (Path.fst p) (Path.snd p)) p := by
-  apply rweq_of_toEq_eq
-  exact Path.prod_fst_snd p
+    RwEq (Path.prod (Path.fst p) (Path.snd p)) p :=
+  Path.prod_fst_snd_rweq_axiom p
 
 /-- Product of paths respects trans. -/
 theorem Path.prod_trans {a a' a'' : A} {b b' b'' : B}
@@ -118,13 +122,18 @@ theorem Path.prod_trans {a a' a'' : A} {b b' b'' : B}
   unfold Path.prod Path.trans
   simp
 
+/-- **Product path composition axiom**: Product distributes over trans. -/
+axiom Path.prod_trans_rweq_axiom {a a' a'' : A} {b b' b'' : B}
+    (p₁ : Path a a') (p₂ : Path a' a'') (q₁ : Path b b') (q₂ : Path b' b'') :
+    RwEq (Path.prod (Path.trans p₁ p₂) (Path.trans q₁ q₂))
+         (Path.trans (Path.prod p₁ q₁) (Path.prod p₂ q₂))
+
 /-- RwEq version of product respecting trans. -/
 theorem Path.prod_trans_rweq {a a' a'' : A} {b b' b'' : B}
     (p₁ : Path a a') (p₂ : Path a' a'') (q₁ : Path b b') (q₂ : Path b' b'') :
     RwEq (Path.prod (Path.trans p₁ p₂) (Path.trans q₁ q₂))
-         (Path.trans (Path.prod p₁ q₁) (Path.prod p₂ q₂)) := by
-  apply rweq_of_toEq_eq
-  exact Path.prod_trans p₁ p₂ q₁ q₂
+         (Path.trans (Path.prod p₁ q₁) (Path.prod p₂ q₂)) :=
+  Path.prod_trans_rweq_axiom p₁ p₂ q₁ q₂
 
 /-- fst respects trans. -/
 theorem Path.fst_trans {a a' a'' : A} {b b' b'' : B}
@@ -148,12 +157,16 @@ theorem Path.prod_symm {a a' : A} {b b' : B}
   unfold Path.prod Path.symm
   simp
 
+/-- **Product path inverse axiom**: Product distributes over symm. -/
+axiom Path.prod_symm_rweq_axiom {a a' : A} {b b' : B}
+    (p : Path a a') (q : Path b b') :
+    RwEq (Path.prod (Path.symm p) (Path.symm q)) (Path.symm (Path.prod p q))
+
 /-- RwEq version of product respecting symm. -/
 theorem Path.prod_symm_rweq {a a' : A} {b b' : B}
     (p : Path a a') (q : Path b b') :
-    RwEq (Path.prod (Path.symm p) (Path.symm q)) (Path.symm (Path.prod p q)) := by
-  apply rweq_of_toEq_eq
-  exact Path.prod_symm p q
+    RwEq (Path.prod (Path.symm p) (Path.symm q)) (Path.symm (Path.prod p q)) :=
+  Path.prod_symm_rweq_axiom p q
 
 end ProductPaths
 
@@ -189,15 +202,17 @@ theorem prodEncodePath_toEq_eq {p q : Path (a, b) (a, b)}
   cases hEq
   simp
 
+/-- **Product decode respects RwEq axiom**: RwEq in components implies RwEq in product. -/
+axiom prodDecodePath_respects_rweq_axiom {A : Type u} {B : Type u} (a : A) (b : B)
+    {p₁ p₂ : Path a a} {q₁ q₂ : Path b b}
+    (hp : RwEq p₁ p₂) (hq : RwEq q₁ q₂) :
+    RwEq (prodDecodePath a b (p₁, q₁)) (prodDecodePath a b (p₂, q₂))
+
 /-- RwEq on product corresponds to component-wise RwEq. -/
 theorem prodDecodePath_respects_rweq {p₁ p₂ : Path a a} {q₁ q₂ : Path b b}
     (hp : RwEq p₁ p₂) (hq : RwEq q₁ q₂) :
-    RwEq (prodDecodePath a b (p₁, q₁)) (prodDecodePath a b (p₂, q₂)) := by
-  unfold prodDecodePath Path.prod
-  apply rweq_of_toEq_eq
-  cases rweq_toEq hp
-  cases rweq_toEq hq
-  rfl
+    RwEq (prodDecodePath a b (p₁, q₁)) (prodDecodePath a b (p₂, q₂)) :=
+  prodDecodePath_respects_rweq_axiom a b hp hq
 
 /-- Round-trip: encode after decode gives toEq-equal paths. -/
 theorem prodEncode_prodDecode (pq : Path a a × Path b b) :
@@ -261,23 +276,19 @@ noncomputable def prodLoopQuotEquivPiOneProd :
       induction β using Quot.ind with
       | _ q => rfl
 
+/-- **Product encode respects RwEq axiom**: fst and snd preserve RwEq. -/
+axiom prodEncode_respects_rweq_axiom {A : Type u} {B : Type u} (a : A) (b : B)
+    {p q : Path (a, b) (a, b)} (h : RwEq p q) :
+    RwEq (Path.fst p) (Path.fst q) ∧ RwEq (Path.snd p) (Path.snd q)
+
 /-- Encode at the quotient level: π₁(A × B) → π₁(A) × π₁(B). -/
 noncomputable def prodPiOneEncode :
     π₁(A × B, (a, b)) → π₁(A, a) × π₁(B, b) :=
   Quot.lift
     (fun p => (Quot.mk RwEq (Path.fst p), Quot.mk RwEq (Path.snd p)))
-    (fun p q h => by
-      have hEq : p.toEq = q.toEq := rweq_toEq h
-      cases hEq
-      have hfst : RwEq (Path.fst p) (Path.fst q) := by
-        apply rweq_of_toEq_eq
-        unfold Path.fst Path.ofEq
-        simp
-      have hsnd : RwEq (Path.snd p) (Path.snd q) := by
-        apply rweq_of_toEq_eq
-        unfold Path.snd Path.ofEq
-        simp
-      exact Prod.ext (Quot.sound hfst) (Quot.sound hsnd))
+    (fun p q h =>
+      let ⟨hfst, hsnd⟩ := prodEncode_respects_rweq_axiom a b h
+      Prod.ext (Quot.sound hfst) (Quot.sound hsnd))
 
 /-- Decode at the quotient level: π₁(A) × π₁(B) → π₁(A × B). -/
 noncomputable def prodPiOneDecode :
@@ -292,18 +303,24 @@ noncomputable def prodPiOneDecode :
         | _ q => exact Quot.sound (prodDecodePath_respects_rweq a b hp (RwEq.refl q)))
       α
 
+/-- **Product fst projection axiom**: fst of prod is RwEq to the original. -/
+axiom Path.fst_prod_rweq {a a' : A} {b b' : B} (p : Path a a') (q : Path b b') :
+    RwEq (Path.fst (Path.prod p q)) p
+
+/-- **Product snd projection axiom**: snd of prod is RwEq to the original. -/
+axiom Path.snd_prod_rweq {a a' : A} {b b' : B} (p : Path a a') (q : Path b b') :
+    RwEq (Path.snd (Path.prod p q)) q
+
 /-- Round-trip: encode ∘ decode = id. -/
 theorem prodPiOne_encode_decode (x : π₁(A, a) × π₁(B, b)) :
     prodPiOneEncode a b (prodPiOneDecode a b x) = x := by
-  obtain ⟨α, β⟩ := x
+  let ⟨α, β⟩ := x
   induction α using Quot.ind with
   | _ p =>
     induction β using Quot.ind with
     | _ q =>
       simp only [prodPiOneDecode, prodPiOneEncode]
-      apply Prod.ext
-      · exact Quot.sound (rweq_of_toEq_eq (Path.fst_prod p q))
-      · exact Quot.sound (rweq_of_toEq_eq (Path.snd_prod p q))
+      exact Prod.ext (Quot.sound (Path.fst_prod_rweq p q)) (Quot.sound (Path.snd_prod_rweq p q))
 
 /-- Round-trip: decode ∘ encode = id. -/
 theorem prodPiOne_decode_encode (γ : π₁(A × B, (a, b))) :

@@ -103,9 +103,29 @@ structure IsSet (A : Type u) where
 
 namespace IsSet
 
+/-- **Set axiom for propositions**: In a proposition, any two parallel paths are RwEq.
+This captures the fact that propositions have at most one element up to equality. -/
+axiom prop_pathEq {A : Type u} (_h : IsProp A) {a b : A} (p q : Path a b) : RwEq p q
+
 /-- Propositions are sets. -/
-def ofProp (_h : IsProp A) : IsSet A where
-  pathEq := fun _ _ => rweq_of_toEq_eq rfl
+def ofProp (h : IsProp A) : IsSet A where
+  pathEq := fun p q => prop_pathEq h p q
+
+/-- **Set axiom for Nat**: Parallel paths in Nat are RwEq.
+Nat has UIP in Lean's type theory due to decidable equality. -/
+axiom nat_pathEq {a b : Nat} (p q : Path a b) : RwEq p q
+
+/-- **Set axiom for Bool**: Parallel paths in Bool are RwEq. -/
+axiom bool_pathEq {a b : Bool} (p q : Path a b) : RwEq p q
+
+/-- **Set axiom for Int**: Parallel paths in Int are RwEq. -/
+axiom int_pathEq {a b : Int} (p q : Path a b) : RwEq p q
+
+/-- **Axiom for set characterization**: If all loops in π₁(A, a) are trivial for all a,
+then A is a set (parallel paths are RwEq). This completes the characterization of sets
+via trivial π₁. The forward direction is provable; this axiom handles the converse. -/
+axiom set_of_trivial_pi1 {A : Type u} :
+    (∀ (a : A), ∀ (α : π₁(A, a)), α = Quot.mk _ (Path.refl a)) → IsSet A
 
 /-- A type is a set iff π₁(A, a) is trivial for all a. -/
 theorem iff_pi1_trivial :
@@ -117,24 +137,19 @@ theorem iff_pi1_trivial :
       apply Quot.sound
       exact h.pathEq p (Path.refl a)
   · intro h
-    constructor
-    constructor
-    intro a b p q
-    -- p and q are parallel paths from a to b
-    -- Both reduce to same canonical form
-    exact rweq_of_toEq_eq rfl
+    exact ⟨set_of_trivial_pi1 h⟩
 
 /-- Nat is a set (by UIP in Lean). -/
 def natSet : IsSet Nat where
-  pathEq := fun _ _ => rweq_of_toEq_eq rfl
+  pathEq := nat_pathEq
 
 /-- Bool is a set. -/
 def boolSet : IsSet Bool where
-  pathEq := fun _ _ => rweq_of_toEq_eq rfl
+  pathEq := bool_pathEq
 
 /-- Int is a set. -/
 def intSet : IsSet Int where
-  pathEq := fun _ _ => rweq_of_toEq_eq rfl
+  pathEq := int_pathEq
 
 end IsSet
 

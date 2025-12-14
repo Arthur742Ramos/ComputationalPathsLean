@@ -59,51 +59,37 @@ private theorem circleDecodeEq_circleEncodeEq.{u}
       show (circleLoopPathZPow.{u} (circleEncodePath.{u} (Path.refl circleBase.{u}))).toEq = rfl
       rw [circleEncodePath_refl.{u}]
 
-/-- `decode ∘ encode = id` on π₁(S¹). -/
+/-- `decode ∘ encode = id` on π₁(S¹).
+
+This proof uses `circleLoop_rweq_decode`, a circle-specific axiom stating that
+every loop on S¹ is RwEq to the decoded form of its winding number. This captures
+the geometric fact that loops on the circle are classified by winding number,
+without collapsing all paths globally (as the removed `Step.canon` would have). -/
 theorem circleDecode_circleEncode (x : circlePiOne) :
     circleDecode (circleEncode x) = x := by
-  -- Compare via propositional equality using `toEq`.
-  apply PathRwQuot.eq_of_toEq_eq (A := Circle) (a := circleBase) (b := circleBase)
-  -- Work with a path representative of `x`.
-  refine Quot.inductionOn x (fun p => ?_)
-  -- Reduce `decode (encode (ofLoop p))` to an equality on raw z-powers.
-  have hzpow :
-      PathRwQuot.toEq (A := Circle)
-        (circleDecode (circleEncode
-          (LoopQuot.ofLoop (A := Circle) (a := circleBase) p)))
-        = (circleLoopPathZPow (circleEncodePath p)).toEq := by
-    -- `toEq (decode z)` calculates to the raw `circleLoopPathZPow`.
-    change PathRwQuot.toEq (A := Circle)
-        (circleLoopZPow (circleEncodePath p))
-        = (circleLoopPathZPow (circleEncodePath p)).toEq
-    exact circleLoopZPow_toEq (z := circleEncodePath p)
-  -- Replace the integer by the canonicalised version built from `p.toEq`.
-  have hcanon :
-      circleEncodePath (Path.ofEq p.toEq) = circleEncodePath p := by
-    have hcanonRw : RwEq (Path.ofEq p.toEq) p := rweq_symm (rweq_canon (p := p))
-    exact circleEncodePath_rweq (h := hcanonRw)
-  -- Finish by equality induction on `e := p.toEq`.
-  have hEq := circleDecodeEq_circleEncodeEq (e := p.toEq)
-  -- Rewrite the integer using `hcanon` and conclude.
-  have hzpow_eq : (circleLoopPathZPow (circleEncodePath p)).toEq = p.toEq := by
-    calc (circleLoopPathZPow (circleEncodePath p)).toEq
-        = (circleLoopPathZPow (circleEncodePath (Path.ofEq p.toEq))).toEq := by rw [hcanon]
-      _ = p.toEq := hEq
-  -- Right-hand side `toEq` is just `p.toEq`.
-  have hfinal :
-      PathRwQuot.toEq (A := Circle)
-        (circleDecode (circleEncode
-          (LoopQuot.ofLoop (A := Circle) (a := circleBase) p)))
-        = PathRwQuot.toEq (A := Circle)
-            (LoopQuot.ofLoop (A := Circle) (a := circleBase) p) := by
-    calc PathRwQuot.toEq (A := Circle)
-            (circleDecode (circleEncode
-              (LoopQuot.ofLoop (A := Circle) (a := circleBase) p)))
-        = (circleLoopPathZPow (circleEncodePath p)).toEq := hzpow
-      _ = p.toEq := hzpow_eq
-      _ = PathRwQuot.toEq (A := Circle)
-            (LoopQuot.ofLoop (A := Circle) (a := circleBase) p) := rfl
-  exact hfinal
+  -- Induct on the quotient
+  refine Quot.inductionOn x ?h
+  intro p
+  -- circleEncode (Quot.mk _ p) = circleEncodePath p by definition
+  show circleDecode (circleEncode (Quot.mk _ p)) = Quot.mk _ p
+  -- Unfold: circleEncode (Quot.mk _ p) = circleEncodeLift (Quot.mk _ p) = circleEncodePath p
+  have henc : circleEncode (Quot.mk _ p) = circleEncodePath p := rfl
+  rw [henc]
+  -- By circleLoop_rweq_decode: RwEq p (circleLoopPathZPow (circleEncodePath p))
+  have hrweq := circleLoop_rweq_decode p
+  -- This gives: Quot.mk _ p = Quot.mk _ (circleLoopPathZPow (circleEncodePath p))
+  have heq : Quot.mk RwEq p = Quot.mk RwEq (circleLoopPathZPow (circleEncodePath p)) :=
+    Quot.sound hrweq
+  -- By circleLoopZPow_eq_ofLoop: circleDecode z = LoopQuot.ofLoop (circleLoopPathZPow z)
+  have hdec : circleDecode (circleEncodePath p) =
+      LoopQuot.ofLoop (A := Circle) (a := circleBase)
+        (circleLoopPathZPow (circleEncodePath p)) :=
+    circleLoopZPow_eq_ofLoop (circleEncodePath p)
+  -- LoopQuot.ofLoop = Quot.mk _ by definition
+  rw [hdec]
+  -- Now goal is: LoopQuot.ofLoop (circleLoopPathZPow (circleEncodePath p)) = Quot.mk _ p
+  -- Which is: Quot.mk _ (circleLoopPathZPow (circleEncodePath p)) = Quot.mk _ p
+  exact heq.symm
 
 noncomputable def circlePiOneEquivInt : SimpleEquiv circlePiOne Int where
   toFun := circleWindingNumber

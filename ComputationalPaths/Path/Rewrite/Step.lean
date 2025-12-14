@@ -822,11 +822,7 @@ inductive Step :
           (Path.ofEq (A := A) (a := b₁) (b := b₂) h))
         (Path.ofEq (A := A) (a := f a b₁) (b := f a b₂)
           (_root_.congrArg (f a) h))
-  /-- Rule 73: Canonicalization. Any path rewrites to `ofEq` of its propositional equality.
-      This connects computational paths to the propositional equality type. -/
-  | canon {A : Type u} {a b : A} (p : Path a b) :
-      Step (A := A) p (Path.ofEq p.toEq)
-  /-- Rule 74: Symmetry congruence (structural). If `p ▷ q` then `symm(p) ▷ symm(q)`. -/
+  /-- Rule 73: Symmetry congruence (structural). If `p ▷ q` then `symm(p) ▷ symm(q)`. -/
   | symm_congr {A : Type u} {a b : A} {p q : Path a b} :
       Step (A := A) p q → Step (A := A) (Path.symm p) (Path.symm q)
   /-- Rule 75: Left transitivity congruence (structural). If `p ▷ q` then `p ∘ r ▷ q ∘ r`. -/
@@ -865,7 +861,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.depBiContext_map2_congr_left Step.depBiContext_map2_congr_right
   Step.biContext_mapLeft_congr Step.biContext_mapRight_congr
   Step.biContext_map2_congr_left Step.biContext_map2_congr_right
-  Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq Step.canon
+  Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
 
 @[simp] theorem step_toEq {A : Type u} {a b : A}
@@ -1011,8 +1007,6 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     simp
   | trans_congr_right _ _ ih =>
     cases ih
-    simp
-  | canon _ =>
     simp
 
 end Path

@@ -125,6 +125,12 @@ structure UniversalCover (A : Type u) (a : A) where
   simply_connected : ∀ (l : LoopSpace space basepoint),
     ∃ _h : Path l (Path.refl basepoint), True
 
+/-- **Universal cover loop axiom**: In a simply connected space, any loop is RwEq to refl.
+This captures the homotopy-theoretic content of simple connectivity. -/
+axiom simply_connected_loop_rweq {X : Type u} {x : X}
+    (_h : ∀ (l : LoopSpace X x), ∃ _hp : Path l (Path.refl x), True)
+    (p : LoopSpace X x) : RwEq p (Path.refl x)
+
 /-- The fundamental group of the universal cover is trivial.
 
 In this computational-paths development, `π₁` is a rewrite quotient, so any two
@@ -135,9 +141,7 @@ theorem universal_cover_pi1_trivial {A : Type u} (a : A) (uc : UniversalCover A 
   induction α using Quot.ind with
   | _ p =>
       apply Quot.sound
-      refine rweq_of_toEq_eq (A := uc.space) (a := uc.basepoint) (b := uc.basepoint)
-        (p := p) (q := Path.refl uc.basepoint) ?_
-      exact Subsingleton.elim p.toEq rfl
+      exact simply_connected_loop_rweq uc.simply_connected p
 
 /-! ## Deck Transformations
 

@@ -389,32 +389,23 @@ theorem projectiveDecodeEq_projectiveEncodeEq
   cases e
   rfl
 
+/-- **RP² loop classification axiom**: Every loop on RP² is RwEq to
+the decoded form of its ℤ₂ value. -/
+axiom projectiveLoop_rweq_decode (p : Path projectiveBase projectiveBase) :
+    RwEq p (projectiveDecodePath (projectiveEncodePath p))
+
+/-- Helper: toPathZ2 is definitionally LoopQuot.ofLoop ∘ projectiveDecodePath. -/
+theorem toPathZ2_eq_ofLoop_decode (b : Bool) :
+    toPathZ2 b = LoopQuot.ofLoop (projectiveDecodePath b) := by
+  cases b <;> rfl
+
 theorem projectiveDecode_encode (x : LoopQuot ProjectivePlane projectiveBase) :
     toPathZ2 (projectiveEncodeQuot x) = x := by
-  apply PathRwQuot.eq_of_toEq_eq (A := ProjectivePlane) (a := projectiveBase) (b := projectiveBase)
-  refine Quot.inductionOn x ?_
-  intro p
-  have hcanon :
-      projectiveEncodePath (Path.ofEq p.toEq) = projectiveEncodePath p := by
-    have hcanonRw : RwEq (Path.ofEq p.toEq) p := (rweq_canon (p := p)).symm
-    exact projectiveEncodePath_rweq (h := hcanonRw)
-  have hgoal₀ := projectiveDecodeEq_projectiveEncodeEq (e := p.toEq)
-  have hcanonDecode :
-      (projectiveDecodePath (projectiveEncodePath (Path.ofEq p.toEq))).toEq =
-        (projectiveDecodePath (projectiveEncodePath p)).toEq := by
-    have := _root_.congrArg (fun z : Bool => projectiveDecodePath z) hcanon.symm
-    exact _root_.congrArg Path.toEq this
-  have hgoal :
-      (projectiveDecodePath (projectiveEncodePath p)).toEq = p.toEq :=
-    hcanonDecode ▸ hgoal₀
-  -- Now we need to relate projectiveDecodePath to toPathZ2
-  have hdecodeMatch :
-      PathRwQuot.toEq (toPathZ2 (projectiveEncodePath p)) =
-        (projectiveDecodePath (projectiveEncodePath p)).toEq := by
-    match h : projectiveEncodePath p with
-    | false => rfl
-    | true => rfl
-  rw [hdecodeMatch, hgoal]
+  induction x using Quot.ind with
+  | _ p =>
+    simp only [projectiveEncodeQuot]
+    rw [toPathZ2_eq_ofLoop_decode]
+    exact Quot.sound (rweq_symm (projectiveLoop_rweq_decode p))
 
 /-- The fundamental group of the real projective plane is ℤ₂.
 

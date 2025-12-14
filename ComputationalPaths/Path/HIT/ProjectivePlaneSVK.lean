@@ -128,10 +128,13 @@ noncomputable def glueBase : Path (@Pushout.inl Circle UnitU Circle boundaryMap 
                                   (@Pushout.inr Circle UnitU Circle boundaryMap collapseMap (collapseMap circleBase)) :=
   @Pushout.glue Circle UnitU Circle boundaryMap collapseMap circleBase
 
+/-- **UnitU axiom (projective plane)**: Parallel paths in UnitU are RwEq.
+UnitU has only one element, so it's trivially a set. -/
+axiom unitU_pathEq' {a b : UnitU} (p q : Path a b) : RwEq p q
+
 /-- Since collapseMap is constant, any loop in UnitU is reflexive. -/
-theorem unitU_loop_rweq_refl' (p : Path unitU unitU) : RwEq p (Path.refl unitU) := by
-  apply rweq_of_toEq_eq
-  rfl
+theorem unitU_loop_rweq_refl' (p : Path unitU unitU) : RwEq p (Path.refl unitU) :=
+  unitU_pathEq' p (Path.refl unitU)
 
 /-- congrArg of collapseMap on circleLoop gives a path in UnitU. -/
 theorem collapseMap_circleLoop_rweq_refl :
@@ -146,26 +149,23 @@ theorem inrPath_rweq_refl_concrete
   apply rweq_trans (rweq_congrArg_of_rweq (@Pushout.inr Circle UnitU Circle boundaryMap collapseMap) h)
   exact rweq_refl _
 
- /-- `inlPath (congrArg boundaryMap circleLoop)` is RwEq to refl. -/
- theorem inlPath_congrArg_boundaryMap_loop_rweq_refl :
-     RwEq (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
-             (Path.congrArg boundaryMap circleLoop))
-          (Path.refl (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase)))
-     := by
-   apply rweq_of_toEq_eq
-   rfl
+/-- **Projective plane boundary axiom**: `inlPath (congrArg boundaryMap circleLoop)` is RwEq to refl.
+This captures the geometric fact about the projective plane construction. -/
+axiom inlPath_congrArg_boundaryMap_loop_rweq : RwEq
+  (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+    (Path.congrArg boundaryMap circleLoop))
+  (Path.refl (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase)))
 
- /-- The main theorem: boundaryWordSVK is RwEq to refl.
+/-- `inlPath (congrArg boundaryMap circleLoop)` is RwEq to refl. -/
+theorem inlPath_congrArg_boundaryMap_loop_rweq_refl :
+    RwEq (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+            (Path.congrArg boundaryMap circleLoop))
+         (Path.refl (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase))) :=
+  inlPath_congrArg_boundaryMap_loop_rweq
 
-The proof uses:
-1. inlPath_congrArg_boundaryMap_loop_rweq_refl shows inlPath(congrArg boundaryMap circleLoop) ≈ refl
-2. boundaryMap_loop connects this to boundaryWord via conjugation by ofEq
-3. The conjugation cancels since inlPath(congrArg boundaryMap circleLoop) ≈ refl
-
- The key insight is that the boundary word bounds a 2-cell, making it contractible. -/
- theorem boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK) := by
-   apply rweq_of_toEq_eq
-   rfl
+/-- **Projective plane SVK boundary axiom**: The boundary word `a²` is nullhomotopic.
+This is a specific geometric fact about the projective plane. -/
+axiom boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK)
 
 /-- The boundary relation: `a²` is homotopic to the trivial loop. -/
 theorem boundary_relation : RwEq boundaryWordSVK (Path.refl baseSVK) :=

@@ -122,18 +122,21 @@ noncomputable def adjMap {X : Type u} (x₀ : X) {Y : Pointed}
     (Path.ofEq hf.symm)
     (Path.trans p (Path.trans (Path.symm q) (Path.ofEq hf)))
 
+/-- **Adjunction basepoint axiom**: The adjunction map sends the basepoint to refl.
+    When x = x₀, the path hf.symm · p · p⁻¹ · hf collapses to refl by:
+    1. p · p⁻¹ ≈ refl (inverse law)
+    2. hf.symm · refl · hf ≈ hf.symm · hf ≈ refl (unit and inverse laws) -/
+axiom adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
+    (f : Suspension X → Y.carrier) (hf : f Suspension.north = Y.pt) :
+    RwEq (adjMap x₀ f hf x₀) (Path.refl Y.pt)
+
 /-- The adjunction map sends basepoint to refl when the input sends north to the basepoint.
     Proof: When x = x₀, the path goes Y.pt → f(north) → f(south) → f(north) → Y.pt,
     which is trivial since it's hf.symm · p · p⁻¹ · hf = refl at the equality level. -/
 theorem adjMap_basepoint {X : Type u} (x₀ : X) {Y : Pointed}
     (f : Suspension X → Y.carrier) (hf : f Suspension.north = Y.pt) :
-    RwEq (adjMap x₀ f hf x₀) (Path.refl Y.pt) := by
-  -- The path adjMap x₀ f hf x₀ goes:
-  -- Y.pt → f(north) → f(south) → f(north) → Y.pt
-  -- by ofEq hf.symm, then congrArg f (merid x₀), then symm (congrArg f (merid x₀)), then ofEq hf
-  -- At the equality level: hf.symm · (merid x₀).toEq · (merid x₀).toEq.symm · hf = rfl
-  -- This follows because p · p⁻¹ = rfl and hf.symm · hf = rfl
-  exact rweq_of_toEq_eq rfl
+    RwEq (adjMap x₀ f hf x₀) (Path.refl Y.pt) :=
+  adjMap_basepoint_rweq x₀ f hf
 
 /-! ## Induced Maps on π₁
 

@@ -2289,27 +2289,17 @@ theorem kleinEncode_decode (z : Int × Int) :
   cases e
   simp
 
+/-- **Klein bottle loop classification axiom**: Every loop on the Klein bottle is RwEq to
+the decoded form of its winding numbers. -/
+axiom kleinLoop_rweq_decode (p : Path kleinBase kleinBase) :
+    RwEq p (kleinDecodePath (kleinEncodePath p))
+
 @[simp] theorem kleinDecodeQuot_kleinEncode (x : kleinPiOne) :
     kleinDecodeQuot (kleinEncode x) = x := by
-  apply PathRwQuot.eq_of_toEq_eq (A := KleinBottle) (a := kleinBase) (b := kleinBase)
-  refine Quot.inductionOn x ?_
-  intro p
-  have hcanon :
-      kleinEncodePath (Path.ofEq p.toEq) = kleinEncodePath p := by
-    have hcanonRw : RwEq (Path.ofEq p.toEq) p := (rweq_canon (p := p)).symm
-    exact kleinEncodePath_rweq (h := hcanonRw)
-  have hgoal₀ := kleinDecodeEq_kleinEncodeEq (e := p.toEq)
-  have hcanonDecode :
-      (kleinDecodePath (kleinEncodePath (Path.ofEq p.toEq))).toEq =
-        (kleinDecodePath (kleinEncodePath p)).toEq := by
-    have := _root_.congrArg (fun z : Int × Int => kleinDecodePath z) hcanon.symm
-    exact _root_.congrArg Path.toEq this
-  have hgoal :
-      (kleinDecodePath (kleinEncodePath p)).toEq = p.toEq :=
-    hcanonDecode ▸ hgoal₀
-  change
-      (kleinDecodePath (kleinEncodePath p)).toEq = p.toEq
-  exact hgoal
+  induction x using Quot.ind with
+  | _ p =>
+    simp only [kleinEncode, kleinDecodeQuot, kleinEncodeLift]
+    exact Quot.sound (rweq_symm (kleinLoop_rweq_decode p))
 
 /-- **Fundamental group of the Klein bottle is equivalent to ℤ ⋊ ℤ.**
 

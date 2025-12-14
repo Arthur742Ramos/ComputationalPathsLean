@@ -58,9 +58,6 @@ inductive RwEq {A : Type u} {a b : A} : Path a b → Path a b → Prop
 @[simp] theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
   RwEq.step h
 
-@[simp] theorem rweq_canon (p : Path a b) : RwEq p (Path.ofEq p.toEq) :=
-  rweq_of_step (Step.canon p)
-
 @[simp] theorem rweq_symm {p q : Path a b} (h : RwEq p q) : RwEq q p :=
   match h with
   | RwEq.refl _ => RwEq.refl _
@@ -121,23 +118,6 @@ inductive RwEq {A : Type u} {a b : A} : Path a b → Path a b → Prop
     {p q : Path a b} (h : p = q) : RwEq p q := by
   cases h
   exact RwEq.refl _
-
-@[simp] theorem rweq_of_toEq_eq {A : Type u} {a b : A}
-    {p q : Path a b} (h : p.toEq = q.toEq) : RwEq p q := by
-  have hcanon :
-      RwEq (Path.ofEq (A := A) (a := a) (b := b) p.toEq)
-        (Path.ofEq (A := A) (a := a) (b := b) q.toEq) :=
-    rweq_of_eq <|
-      _root_.congrArg
-        (fun h' => Path.ofEq (A := A) (a := a) (b := b) h') h
-  exact
-    rweq_trans
-      (rweq_trans (rweq_canon (p := p)) hcanon)
-      (rweq_symm (rweq_canon (p := q)))
-
-@[simp] theorem rweq_iff_toEq_eq {A : Type u} {a b : A}
-    {p q : Path a b} : RwEq p q ↔ p.toEq = q.toEq :=
-  ⟨rweq_toEq, rweq_of_toEq_eq⟩
 
 namespace RewriteLift
 
@@ -258,6 +238,11 @@ end RewriteLift
 @[simp] theorem rweq_congrArg_refl {B : Type u} (f : A → B) (a : A) :
     RwEq (Path.congrArg f (Path.refl a)) (Path.refl (f a)) :=
   rweq_refl _
+
+/-- **Constant function axiom**: congrArg of a constant function applied to any path
+is RwEq to refl. This captures that paths under constant maps collapse. -/
+axiom rweq_congrArg_const {B : Type u} (b : B)
+    {a₁ a₂ : A} (p : Path a₁ a₂) : RwEq (Path.congrArg (fun _ => b) p) (Path.refl b)
 
 @[simp] theorem rweq_mapLeft_trans {B : Type v} {C : Type w}
     {a1 a2 a3 : A} (f : A → B → C)
@@ -882,28 +867,6 @@ end RewriteLift
   cases hfst
   cases hsnd
   exact h
-
-@[simp] theorem rweq_sigmaSnd_sigmaMk {A : Type u} {B : A → Type u}
-    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
-    (p : Path a1 a2)
-    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
-    RwEq
-      (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
-      q :=
-  rweq_trans
-    (rweq_of_rw (rw_sigma_snd_beta (A := A) (B := B) (p := p) (q := q)))
-    (rweq_symm (rweq_of_rw (rw_canon (p := q))))
-
-@[simp] theorem rweq_sigmaFst_sigmaMk {A : Type u} {B : A → Type u}
-    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
-    (p : Path a1 a2)
-    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
-    RwEq
-      (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q))
-      p :=
-  rweq_trans
-    (rweq_of_rw (rw_sigma_fst_beta (A := A) (B := B) (p := p) (q := q)))
-    (rweq_symm (rweq_of_rw (rw_canon (p := p))))
 
 @[simp] theorem rweq_fst_prodMk {α β : Type u}
     {a₁ a₂ : α} {b₁ b₂ : β}

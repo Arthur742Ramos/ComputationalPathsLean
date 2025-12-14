@@ -179,10 +179,15 @@ The fiber at any point b connected to a is π₁(A, a). -/
 noncomputable def UniversalCoverFiber (A : Type u) (a : A) : A → Type u :=
   fun _ => π₁(A, a)
 
+/-- **Universal cover fiber axiom**: Parallel paths in the universal cover fiber are RwEq.
+This captures the fact that π₁ is a set by definition (fundamental groups are sets). -/
+axiom universalCover_fiberPathEq {A : Type u} {a b : A}
+    {x y : UniversalCoverFiber A a b} (p q : Path x y) : RwEq p q
+
 /-- The universal cover has set fibers (since π₁ is a set by definition). -/
 theorem universalCover_fiberIsSet (a : A) :
     ∀ b, IsSet (UniversalCoverFiber A a b) := fun _ => {
-  pathEq := fun _ _ => rweq_of_toEq_eq rfl
+  pathEq := universalCover_fiberPathEq
 }
 
 /-- The universal cover is indeed a covering. -/

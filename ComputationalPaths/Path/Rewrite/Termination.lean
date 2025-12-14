@@ -127,74 +127,17 @@ namespace Precedence
 end Precedence
 
 /-!
-## Normalization Witnesses
-
-Records that store the normal form for a path together with proofs.
--/
-
-/-- A record storing the normal form for a path together with a proof
-that the path rewrites to it.  Compared to `normalizeForm`, this structure keeps
-track of the originating path so that we can compose it with `Instantiation`
-records. -/
-structure Witness {A : Type u} {a b : A} (p : Path a b) where
-  /-- The canonical normal form of `p`. -/
-  normal : NormalForm A a b
-  /-- A derivation witnessing that `p` reduces to its normal form. -/
-  rewrites : Rw (A := A) (a := a) (b := b) p normal.path
-
-namespace Witness
-
-variable {A : Type u} {a b : A}
-
-@[simp] def ofPath (p : Path a b) : Witness (A := A) (a := a) (b := b) p :=
-  { normal := normalizeForm (A := A) (a := a) (b := b) p
-    rewrites := rw_normalizes (A := A) (a := a) (b := b) p }
-
-@[simp] theorem normal_path (p : Path a b) :
-    (ofPath (A := A) (a := a) (b := b) p).normal.path =
-      normalize (A := A) (a := a) (b := b) p := rfl
-
-@[simp] def toRwEq (w : Witness (A := A) (a := a) (b := b) p) :
-    RwEq (A := A) (a := a) (b := b) p w.normal.path :=
-  rweq_of_rw w.rewrites
-
-@[simp] def toQuot (w : Witness (A := A) (a := a) (b := b) p) :
-    PathRwQuot A a b :=
-  Quot.mk _ w.normal.path
-
-@[simp] theorem quot_eq (w : Witness (A := A) (a := a) (b := b) p) :
-    (Quot.mk _ p : PathRwQuot A a b) = w.toQuot := by
-  apply Quot.sound
-  exact w.toRwEq
-
-end Witness
-
-/-!
 ## LNDEQ Instantiation Extensions
 
-Extensions to `Instantiation` for termination and normalization.
+Extensions to `Instantiation` for rule ranking.
+
+Note: The `Witness` structure for normalization has been removed because it
+relied on `Step.canon` which was found to be inconsistent (it would collapse
+all paths to be RwEq, contradicting π₁(S¹) ≃ ℤ). Without automatic normalization,
+witnesses must be constructed explicitly when needed.
 -/
 
 namespace LNDEQ
-
-/-- The target of an instantiation is already accompanied by a
-`Witness.ofPath` record. -/
-@[simp] def Instantiation.targetWitness (i : Instantiation) :
-    Witness (A := _) (a := _) (b := _) i.q :=
-  Witness.ofPath (A := _) (a := _) (b := _) i.q
-
-/-- Every instantiation inherits a normalization witness for its source by
-chaining the single-step rewrite with `normalize`. -/
-@[simp] def Instantiation.sourceWitness (i : Instantiation) :
-    Witness (A := _) (a := _) (b := _) i.p :=
-  { normal := normalizeForm (A := _) (a := _) (b := _) i.q
-    rewrites := by
-      refine rw_trans ?_ (rw_normalizes (A := _) (a := _) (b := _) i.q)
-      exact rw_of_step i.step }
-
-@[simp] theorem Instantiation.sourceWitness_normal_path (i : Instantiation) :
-    (Instantiation.sourceWitness i).normal.path =
-      normalize (A := _) (a := _) (b := _) i.q := rfl
 
 @[simp] def Instantiation.rank (i : Instantiation) : Nat :=
   Rule.rank i.rule

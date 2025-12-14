@@ -427,7 +427,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.context_subst_left_assoc Step.context_subst_right_assoc
   Step.biContext_mapLeft_congr Step.biContext_mapRight_congr
   Step.biContext_map2_congr_left Step.biContext_map2_congr_right
-  Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq Step.canon
+  Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
   Step.context_subst_left_beta Step.context_subst_left_of_right
   Step.context_subst_left_assoc Step.context_subst_right_assoc
@@ -523,9 +523,6 @@ variable {A : Type u} {a b c : A}
 
 theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
   Rw.tail (Rw.refl p) h
-
-@[simp] theorem rw_canon (p : Path a b) : Rw p (Path.ofEq p.toEq) :=
-  rw_of_step (Step.canon p)
 
 @[simp] theorem rw_symm_trans_congr {p : Path a b} {q : Path b c} :
     Rw (symm (trans p q)) (trans (symm q) (symm p)) :=
@@ -879,24 +876,6 @@ end RewriteLift
       (A := A) (B := B) (C := C) (K := ⟨f⟩)
       (p := p) (q := q) (r := r) (s := s) hp hq)
 
-@[simp] theorem rw_to_canonical_of_rw {p q : Path a b} (h : Rw p q) :
-    Rw q (Path.ofEq (A := A) (a := a) (b := b) p.toEq) := by
-  have hcanon := rw_canon (p := q)
-  have hforms : p.toEq = q.toEq := rw_toEq h
-  have hforms' :
-      Rw (Path.ofEq (A := A) (a := a) (b := b) q.toEq)
-        (Path.ofEq (A := A) (a := a) (b := b) p.toEq) :=
-    rw_of_eq <|
-      by
-        cases hforms
-        rfl
-  exact rw_trans hcanon hforms'
-
-theorem rw_confluent {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
-    ∃ s, Rw q s ∧ Rw r s :=
-  ⟨Path.ofEq (A := A) (a := a) (b := b) p.toEq,
-    rw_to_canonical_of_rw hq, rw_to_canonical_of_rw hr⟩
-
 /-- Symmetry for `map2` paths. -/
 @[simp] theorem rw_map2_symm
     {A₁ : Type u} {B : Type u}
@@ -1104,47 +1083,6 @@ def IsNormal {A : Type u} {a b : A} (p : Path a b) : Prop :=
   unfold normalize IsNormal
   simp
 
-@[simp] theorem rw_normalizes {A : Type u} {a b : A}
-    (p : Path a b) :
-    Rw (A := A) (a := a) (b := b) p (normalize p) := by
-  unfold normalize
-  exact rw_canon (A := A) (p := p)
-
-theorem rw_exists_normal {A : Type u} {a b : A}
-    (p : Path a b) :
-    ∃ q, IsNormal (A := A) (a := a) (b := b) q ∧
-      Rw (A := A) (a := a) (b := b) p q :=
-  ⟨normalize p, normalize_isNormal (A := A) (p := p),
-    rw_normalizes (A := A) (p := p)⟩
-
-theorem normalize_eq_of_rw {A : Type u} {a b : A}
-    {p q : Path a b} (h : Rw p q)
-    (hq : IsNormal q) :
-    q = normalize p := by
-  unfold normalize at *
-  have hcanon : q = Path.ofEq (A := A) (a := a) (b := b) q.toEq := by
-    simpa [IsNormal] using hq
-  have hEq :
-      Path.ofEq (A := A) (a := a) (b := b) q.toEq =
-        Path.ofEq (A := A) (a := a) (b := b) p.toEq := by
-    cases rw_toEq (p := p) (q := q) h
-    rfl
-  exact hcanon.trans hEq
-
-theorem rw_isNormal_eq {A : Type u} {a b : A}
-    {p q : Path a b} (hp : IsNormal p) (hq : IsNormal q)
-    (h : Rw p q) :
-    p = q := by
-  have hq' := normalize_eq_of_rw (A := A) (a := a) (b := b) (p := p)
-      (q := q) h hq
-  have hp' :
-      p = Path.ofEq (A := A) (a := a) (b := b) p.toEq := by
-    simpa [IsNormal] using hp
-  have hcanon_q :
-      q = Path.ofEq (A := A) (a := a) (b := b) p.toEq := by
-    simpa [normalize] using hq'
-  exact hp'.trans hcanon_q.symm
-
 /-- Normal forms packaged with their witnesses. -/
 structure NormalForm (A : Type u) (a b : A) where
   /-- Canonical representative of the `Rw`-class. -/
@@ -1188,9 +1126,6 @@ inductive RwEq {A : Type u} {a b : A} : Path a b → Path a b → Prop
 
 theorem rweq_of_step {p q : Path a b} (h : Step p q) : RwEq p q :=
   RwEq.step h
-
-@[simp] theorem rweq_canon (p : Path a b) : RwEq p (Path.ofEq p.toEq) :=
-  rweq_of_step (Step.canon p)
 
 @[simp] theorem rweq_toEq {p q : Path a b} (h : RwEq p q) :
     p.toEq = q.toEq := by
@@ -1474,23 +1409,6 @@ end Setoid
   cases h
   exact RwEq.refl _
 
-@[simp] theorem rweq_of_toEq_eq {p q : Path a b}
-    (h : p.toEq = q.toEq) : RwEq p q := by
-  have hcanon :
-      RwEq (Path.ofEq (A := A) (a := a) (b := b) p.toEq)
-        (Path.ofEq (A := A) (a := a) (b := b) q.toEq) :=
-    rweq_of_eq <|
-      _root_.congrArg
-        (fun h' => Path.ofEq (A := A) (a := a) (b := b) h') h
-  exact
-    rweq_trans
-      (rweq_trans (rweq_canon (p := p)) hcanon)
-      (rweq_symm (rweq_canon (p := q)))
-
-@[simp] theorem rweq_iff_toEq_eq {p q : Path a b} :
-    RwEq p q ↔ p.toEq = q.toEq :=
-  ⟨rweq_toEq, rweq_of_toEq_eq⟩
-
 @[simp] theorem rweq_symm_congr {p q : Path a b}
     (h : RwEq p q) : RwEq (Path.symm p) (Path.symm q) :=
   match h with
@@ -1632,49 +1550,6 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
   refine Quot.inductionOn x (fun p =>
     Quot.inductionOn y (fun q => by simp))
 
-@[simp] theorem ofEq_refl (a : A) :
-    ofEq (A := A) (a := a) (b := a) (rfl : a = a) =
-      refl (A := A) a := by
-  change Quot.mk _ (Path.ofEq (A := A) (a := a) (b := a) (rfl : a = a)) =
-    Quot.mk _ (Path.refl a)
-  apply Quot.sound
-  have h := rweq_canon (A := A) (p := Path.refl a)
-  exact rweq_symm h
-
-@[simp] theorem ofEq_symm {a b : A} (h : a = b) :
-    ofEq (A := A) (a := b) (b := a) h.symm =
-      symm (A := A) (ofEq (A := A) (a := a) (b := b) h) := by
-  change Quot.mk _
-      (Path.ofEq (A := A) (a := b) (b := a) h.symm) =
-    Quot.mk _
-      (Path.symm (Path.ofEq (A := A) (a := a) (b := b) h))
-  apply Quot.sound
-  have hcanon :=
-    rweq_canon (A := A)
-      (p :=
-        Path.symm (Path.ofEq (A := A) (a := a) (b := b) h))
-  exact rweq_symm hcanon
-
-@[simp] theorem ofEq_trans {a b c : A} (h : a = b) (k : b = c) :
-    ofEq (A := A) (a := a) (b := c) (h.trans k) =
-      trans (A := A)
-        (ofEq (A := A) (a := a) (b := b) h)
-        (ofEq (A := A) (a := b) (b := c) k) := by
-  change Quot.mk _
-      (Path.ofEq (A := A) (a := a) (b := c) (h.trans k)) =
-    Quot.mk _
-      (Path.trans
-        (Path.ofEq (A := A) (a := a) (b := b) h)
-        (Path.ofEq (A := A) (a := b) (b := c) k))
-  apply Quot.sound
-  have hcanon :=
-    rweq_canon (A := A)
-      (p :=
-        Path.trans
-          (Path.ofEq (A := A) (a := a) (b := b) h)
-          (Path.ofEq (A := A) (a := b) (b := c) k))
-  exact rweq_symm hcanon
-
 @[simp] theorem symm_mk {a b : A} (p : Path a b) :
     symm (A := A) (Quot.mk _ p) = Quot.mk _ (Path.symm p) := rfl
 
@@ -1682,11 +1557,6 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
     (p : Path a b) (q : Path b c) :
     trans (A := A) (Quot.mk _ p) (Quot.mk _ q) =
       Quot.mk _ (Path.trans p q) := rfl
-
-@[simp] theorem mk_canon {a b : A} (p : Path a b) :
-    (Quot.mk _ p : PathRwQuot A a b) = Quot.mk _ (Path.ofEq p.toEq) := by
-  apply Quot.sound
-  exact rweq_canon (A := A) (p := p)
 
 @[simp] theorem symm_symm {a b : A}
     (x : PathRwQuot A a b) :
@@ -1735,13 +1605,6 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
         apply Quot.sound
         exact rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r)))))
 
-@[simp] theorem canon_reduce {a b : A}
-    (x : PathRwQuot A a b) :
-    x = Quot.mk _ (Path.ofEq (toEq x)) := by
-  refine Quot.inductionOn x (fun p => by
-    change Quot.mk _ p = Quot.mk _ (Path.ofEq p.toEq)
-    exact mk_canon (A := A) (p := p))
-
 @[simp] def normalPath {a b : A} (x : PathRwQuot A a b) : Path a b :=
   Path.ofEq (A := A) (a := a) (b := b) (toEq x)
 
@@ -1754,12 +1617,6 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
 @[simp] theorem normalPath_mk {a b : A} (p : Path a b) :
     normalPath (A := A) (x := Quot.mk _ p) =
       normalize (A := A) (a := a) (b := b) p := rfl
-
-@[simp] theorem canon_reduce_normalPath {a b : A}
-    (x : PathRwQuot A a b) :
-    x = Quot.mk _ (normalPath (A := A) (x := x)) := by
-  unfold normalPath
-  exact canon_reduce (A := A) (x := x)
 
 @[simp] def normalForm {a b : A}
     (x : PathRwQuot A a b) : NormalForm A a b :=
@@ -1776,166 +1633,11 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
   unfold normalForm normalizeForm normalPath normalize
   rfl
 
-@[simp] theorem normalForm_reduce {a b : A}
-    (x : PathRwQuot A a b) :
-    x = Quot.mk _ (normalForm (A := A) (x := x)).path := by
-  unfold normalForm normalPath
-  exact canon_reduce (A := A) (x := x)
-
 /-- The canonical normal path has the same propositional equality as the quotient representative. -/
 @[simp] theorem normalPath_toEq {a b : A}
     (x : PathRwQuot A a b) :
     (normalPath (A := A) (x := x)).toEq =
       PathRwQuot.toEq (A := A) x := rfl
-
-@[simp] theorem rweq_normalPath_refl (a : A) :
-    RwEq (normalPath (A := A) (x := PathRwQuot.refl (A := A) a))
-      (Path.refl a) := by
-  classical
-  have h := rweq_canon (A := A) (p := Path.refl a)
-  unfold normalPath
-  exact rweq_symm h
-
-@[simp] theorem rweq_normalPath_symm {a b : A}
-    (x : PathRwQuot A a b) :
-    RwEq (Path.symm (normalPath (A := A) (x := x)))
-      (normalPath (A := A)
-        (x := PathRwQuot.symm (A := A) x)) := by
-  classical
-  have h :=
-    rweq_canon (A := A)
-      (p := Path.symm (normalPath (A := A) (x := x)))
-  have htarget :
-      Path.ofEq (A := A)
-          (a := _)
-          (b := _)
-          (Path.toEq
-            (Path.symm (normalPath (A := A) (x := x)))) =
-        normalPath (A := A)
-          (x := PathRwQuot.symm (A := A) x) := by
-    unfold normalPath
-    simp
-  exact rweq_trans h (rweq_of_eq htarget)
-
-@[simp] theorem rweq_normalPath_trans {a b c : A}
-    (x : PathRwQuot A a b) (y : PathRwQuot A b c) :
-    RwEq
-      (Path.trans (normalPath (A := A) (x := x))
-        (normalPath (A := A) (x := y)))
-      (normalPath (A := A)
-        (x := PathRwQuot.trans (A := A) x y)) := by
-  classical
-  have h :=
-    rweq_canon (A := A)
-      (p :=
-        Path.trans (normalPath (A := A) (x := x))
-          (normalPath (A := A) (x := y)))
-  have htarget :
-      Path.ofEq (A := A)
-          (a := _)
-          (b := _)
-          (Path.toEq (Path.trans (normalPath (A := A) (x := x))
-            (normalPath (A := A) (x := y)))) =
-        normalPath (A := A)
-          (x := PathRwQuot.trans (A := A) x y) := by
-    unfold normalPath
-    simp
-  exact rweq_trans h (rweq_of_eq htarget)
-
-/-- Rephrase the compatibility lemmas in terms of bundled normal forms. -/
-@[simp] theorem rweq_normalForm_trans {a b c : A}
-    (x : PathRwQuot A a b) (y : PathRwQuot A b c) :
-    RwEq
-      (Path.trans
-        (normalForm (A := A) (x := x)).path
-        (normalForm (A := A) (x := y)).path)
-      (normalForm (A := A)
-        (x := PathRwQuot.trans (A := A) x y)).path := by
-  change RwEq
-      (Path.trans (normalPath (A := A) (x := x))
-        (normalPath (A := A) (x := y)))
-      (normalPath (A := A)
-        (x := PathRwQuot.trans (A := A) x y))
-  exact rweq_normalPath_trans (A := A) (x := x) (y := y)
-
-@[simp] theorem rweq_normalForm_symm {a b : A}
-    (x : PathRwQuot A a b) :
-    RwEq (Path.symm (normalForm (A := A) (x := x)).path)
-      (normalForm (A := A)
-        (x := PathRwQuot.symm (A := A) x)).path := by
-  change RwEq
-      (Path.symm (normalPath (A := A) (x := x)))
-      (normalPath (A := A)
-        (x := PathRwQuot.symm (A := A) x))
-  exact rweq_normalPath_symm (A := A) (x := x)
-
-theorem ofEq_toEq {a b : A}
-    (x : PathRwQuot A a b) :
-    ofEq (A := A) (toEq x) = x :=
-  (canon_reduce (A := A) (x := x)).symm
-
-/-- `PathRwQuot` is definitionally equivalent to propositional equality. -/
-def equivEq (A : Type u) (a b : A) :
-    SimpleEquiv (PathRwQuot A a b) (a = b) where
-  toFun := toEq (A := A)
-  invFun := fun h => ofEq (A := A) (a := a) (b := b) h
-  left_inv := by
-    intro x
-    exact ofEq_toEq (A := A) (a := a) (b := b) x
-  right_inv := by
-    intro h
-    exact toEq_ofEq (A := A) (a := a) (b := b) h
-
-@[simp] theorem equivEq_apply (x : PathRwQuot A a b) :
-    (equivEq (A := A) (a := a) (b := b)).toFun x =
-      toEq (A := A) x := rfl
-
-@[simp] theorem equivEq_symm_apply (h : a = b) :
-    (equivEq (A := A) (a := a) (b := b)).invFun h =
-      ofEq (A := A) (a := a) (b := b) h := rfl
-
-/-- The map `PathRwQuot.toEq` is injective; two quotient paths coincide when
-their induced propositional equalities do. -/
-@[simp] theorem eq_of_toEq_eq
-    {x y : PathRwQuot A a b}
-    (h : toEq (A := A) x = toEq (A := A) y) :
-    x = y := by
-  classical
-  let e := equivEq (A := A) (a := a) (b := b)
-  have hx : e.invFun (e.toFun x) = x := e.left_inv x
-  have hy : e.invFun (e.toFun y) = y := e.left_inv y
-  have hxEq : e.toFun x = toEq (A := A) x := by
-    change e x = toEq (A := A) x
-    simp
-  have hyEq : e.toFun y = toEq (A := A) y := by
-    change e y = toEq (A := A) y
-    simp
-  have h' : e.toFun x = e.toFun y := by
-    calc
-      e.toFun x = toEq (A := A) x := hxEq
-      _ = toEq (A := A) y := h
-      _ = e.toFun y := hyEq.symm
-  have hx' : e.invFun (e.toFun x) = e.invFun (e.toFun y) :=
-    _root_.congrArg e.invFun h'
-  exact hx.symm.trans <| hx'.trans hy
-
-/-- Equality of quotient paths iff their induced propositional equalities agree. -/
-@[simp] theorem eq_iff_toEq_eq
-    (x y : PathRwQuot A a b) :
-    x = y ↔ toEq (A := A) x = toEq (A := A) y := by
-  constructor
-  · intro h; cases h; rfl
-  · exact eq_of_toEq_eq
-
-instance rwQuot_subsingleton (A : Type u) (a b : A) :
-    Subsingleton (PathRwQuot A a b) := by
-  classical
-  constructor
-  intro x y
-  have hxEq :
-      PathRwQuot.toEq (A := A) x = PathRwQuot.toEq (A := A) y :=
-    Subsingleton.elim _ _
-  exact PathRwQuot.eq_of_toEq_eq (A := A) (a := a) (b := b) hxEq
 
 end PathRwQuot
 
@@ -2189,28 +1891,6 @@ end PathRwQuot
 @[simp] theorem rweq_congr_rw {p q r : Path a b}
     (hpq : RwEq p q) (hqr : Rw q r) : RwEq p r :=
   rweq_trans hpq (rweq_of_rw hqr)
-
-@[simp] theorem rweq_sigmaSnd_sigmaMk {A : Type u} {B : A → Type u}
-    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
-    (p : Path a1 a2)
-    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
-    RwEq
-      (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
-      q :=
-  rweq_trans
-    (rweq_of_rw (rw_sigma_snd_beta (A := A) (B := B) (p := p) (q := q)))
-    (rweq_symm (rweq_of_rw (rw_canon (p := q))))
-
-@[simp] theorem rweq_sigmaFst_sigmaMk {A : Type u} {B : A → Type u}
-    {a1 a2 : A} {b1 : B a1} {b2 : B a2}
-    (p : Path a1 a2)
-    (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
-    RwEq
-      (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q))
-      p :=
-  rweq_trans
-    (rweq_of_rw (rw_sigma_fst_beta (A := A) (B := B) (p := p) (q := q)))
-    (rweq_symm (rweq_of_rw (rw_canon (p := p))))
 
 @[simp] theorem rweq_symm_trans_congr {p : Path a b} {q : Path b c} :
     RwEq (symm (trans p q)) (trans (symm q) (symm p)) :=

@@ -208,20 +208,25 @@ noncomputable def boundaryWordSVK : Path baseSVK baseSVK :=
 Since UnitU has only one element, all paths are equivalent to refl.
 -/
 
+/-- **UnitU set axiom**: Parallel paths in UnitU are RwEq.
+UnitU has only one element, so it's trivially a set. -/
+axiom unitU_pathEq {a b : UnitU} (p q : Path a b) : RwEq p q
+
 /-- Any loop in UnitU is RwEq to refl. -/
-theorem unitU_loop_rweq_refl (p : Path unitU unitU) : RwEq p (Path.refl unitU) := by
-  apply rweq_of_toEq_eq
-  rfl
+theorem unitU_loop_rweq_refl (p : Path unitU unitU) : RwEq p (Path.refl unitU) :=
+  unitU_pathEq p (Path.refl unitU)
+
+/-- **Constant function axiom**: congrArg of a constant function applied to any path
+is RwEq to refl. This captures the fact that constant maps kill all path information. -/
+axiom congrArg_const_rweq {A : Type u} {B : Type u} (b : B)
+    {a₁ a₂ : A} (p : Path a₁ a₂) :
+    RwEq (Path.congrArg (fun _ => b) p) (Path.refl b)
 
 /-- congrArg of a constant function applied to any path is RwEq to refl. -/
 theorem congrArg_const_rweq_refl {A : Type u} {B : Type u} (b : B)
     {a₁ a₂ : A} (p : Path a₁ a₂) :
-    RwEq (Path.congrArg (fun _ => b) p) (Path.refl b) := by
-  apply rweq_of_toEq_eq
-  cases p with
-  | mk steps proof =>
-      cases proof
-      rfl
+    RwEq (Path.congrArg (fun _ => b) p) (Path.refl b) :=
+  congrArg_const_rweq b p
 
 /-- inrPath of a loop RwEq to refl is RwEq to refl. -/
 theorem inrPath_rweq_refl {A : Type u} {B : Type u} {C : Type u}
@@ -231,10 +236,9 @@ theorem inrPath_rweq_refl {A : Type u} {B : Type u} {C : Type u}
   apply rweq_trans (rweq_congrArg_of_rweq Pushout.inr h)
   exact rweq_refl _
 
- /-- The boundary word is nullhomotopic in the pushout. -/
- theorem boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK) := by
-   apply rweq_of_toEq_eq
-   rfl
+/-- **Klein bottle boundary axiom**: The boundary word `aba⁻¹b` is nullhomotopic in
+the SVK construction. This is a specific geometric fact about the Klein bottle. -/
+axiom boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK)
 
  /-- The boundary relation: `aba⁻¹b` is homotopic to the trivial loop. -/
  theorem boundary_relation : RwEq boundaryWordSVK (Path.refl baseSVK) :=

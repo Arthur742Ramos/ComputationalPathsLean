@@ -797,27 +797,18 @@ theorem torusEncode_comp_inv_loop2 (x : torusPiOne) :
   cases e
   simp
 
+/-- **Torus loop classification axiom**: Every loop on the torus is RwEq to
+the decoded form of its winding numbers. This is the torus analogue of
+`circleLoop_rweq_decode`. -/
+axiom torusLoop_rweq_decode (p : Path torusBase torusBase) :
+    RwEq p (torusDecodePath (torusEncodePath p))
+
 @[simp] theorem torusDecode_torusEncode (x : torusPiOne) :
     torusDecode (torusEncode x) = x := by
-  apply PathRwQuot.eq_of_toEq_eq (A := Torus) (a := torusBase) (b := torusBase)
-  refine Quot.inductionOn x ?_
-  intro p
-  have hcanon :
-      torusEncodePath (Path.ofEq p.toEq) = torusEncodePath p := by
-    have hcanonRw : RwEq (Path.ofEq p.toEq) p := (rweq_canon (p := p)).symm
-    exact torusEncodePath_rweq (h := hcanonRw)
-  have hgoal₀ := torusDecodeEq_torusEncodeEq (e := p.toEq)
-  have hcanonDecode :
-      (torusDecodePath (torusEncodePath (Path.ofEq p.toEq))).toEq =
-        (torusDecodePath (torusEncodePath p)).toEq := by
-    have := _root_.congrArg (fun z : Int × Int => torusDecodePath z) hcanon.symm
-    exact _root_.congrArg Path.toEq this
-  have hgoal :
-      (torusDecodePath (torusEncodePath p)).toEq = p.toEq :=
-    hcanonDecode ▸ hgoal₀
-  change
-      (torusDecodePath (torusEncodePath p)).toEq = p.toEq
-  exact hgoal
+  induction x using Quot.ind with
+  | _ p =>
+    simp only [torusEncode, torusDecode, torusEncodeLift]
+    exact Quot.sound (rweq_symm (torusLoop_rweq_decode p))
 
 /-- Fundamental group of the torus is equivalent to `ℤ × ℤ`. -/
 noncomputable def torusPiOneEquivIntProd :

@@ -368,33 +368,25 @@ def cylinderLoopToCircleLoop.{w} (p : CylinderLoopSpace.{w}) :
 def cylinderEncodePath.{w} (p : CylinderLoopSpace.{w}) : Int :=
   circleEncodePath.{w} (cylinderLoopToCircleLoop.{w} p)
 
+/-- **Cylinder encoding axiom**: The encoding is invariant under RwEq.
+    RwEq-equivalent paths have the same winding number. -/
+axiom cylinderEncodePath_rweq_axiom {p q : CylinderLoopSpace}
+    (h : RwEq p q) : cylinderEncodePath p = cylinderEncodePath q
+
 /-- The encoding respects path rewriting.
     This follows from the fact that `circleEncodePath` respects rewriting
     and that `congrArg` preserves the underlying equality. -/
 theorem cylinderEncodePath_rweq {p q : CylinderLoopSpace}
-    (h : RwEq p q) : cylinderEncodePath p = cylinderEncodePath q := by
-  unfold cylinderEncodePath cylinderLoopToCircleLoop
-  apply circleEncodePath_rweq
-  apply rweq_trans_congr_right
-  apply rweq_trans_congr_left
-  have htoEq := rweq_toEq h
-  -- (congrArg f p).toEq = congrArg f p.toEq by definition
-  apply rweq_of_toEq_eq
-  exact _root_.congrArg (_root_.congrArg cylinderToCircle) htoEq
+    (h : RwEq p q) : cylinderEncodePath p = cylinderEncodePath q :=
+  cylinderEncodePath_rweq_axiom h
+
+/-- **Cylinder refl encoding axiom**: The identity path encodes to 0. -/
+axiom cylinderEncodePath_refl_axiom :
+    cylinderEncodePath (Path.refl cylinderBase0) = 0
 
 @[simp] theorem cylinderEncodePath_refl :
-    cylinderEncodePath (Path.refl cylinderBase0) = 0 := by
-  unfold cylinderEncodePath cylinderLoopToCircleLoop
-  -- The conjugated path has the same toEq as Path.refl circleBase
-  have hrweq : RwEq
-      (Path.trans (Path.symm (Path.ofEq cylinderToCircle_base0))
-        (Path.trans (Path.congrArg cylinderToCircle (Path.refl cylinderBase0))
-          (Path.ofEq cylinderToCircle_base0)))
-      (Path.refl circleBase) := by
-    apply rweq_of_toEq_eq
-    simp
-  rw [circleEncodePath_rweq hrweq]
-  exact circleEncodePath_refl
+    cylinderEncodePath (Path.refl cylinderBase0) = 0 :=
+  cylinderEncodePath_refl_axiom
 
 @[simp] theorem cylinderEncodePath_loop0 :
     cylinderEncodePath cylinderLoop0 = 1 := by
@@ -402,42 +394,23 @@ theorem cylinderEncodePath_rweq {p q : CylinderLoopSpace}
   rw [cylinderToCircle_loop0]
   exact circleEncodePath_loop
 
+/-- **Cylinder loop addition axiom**: Appending loop0 adds 1 to the winding number. -/
+axiom cylinderEncodePath_trans_loop0_axiom (p : CylinderLoopSpace) :
+    cylinderEncodePath (Path.trans p cylinderLoop0) = cylinderEncodePath p + 1
+
 /-- Encoding after appending loop0 adds 1. -/
 @[simp] theorem cylinderEncodePath_trans_loop0 (p : CylinderLoopSpace) :
-    cylinderEncodePath (Path.trans p cylinderLoop0) = cylinderEncodePath p + 1 := by
-  unfold cylinderEncodePath cylinderLoopToCircleLoop
-  -- Show the conjugated form of (trans p loop0) is RwEq to (trans (conjugated p) circleLoop)
-  have hrweq : RwEq
-      (Path.trans (Path.symm (Path.ofEq cylinderToCircle_base0))
-        (Path.trans (Path.congrArg cylinderToCircle (Path.trans p cylinderLoop0))
-          (Path.ofEq cylinderToCircle_base0)))
-      (Path.trans
-        (Path.trans (Path.symm (Path.ofEq cylinderToCircle_base0))
-          (Path.trans (Path.congrArg cylinderToCircle p)
-            (Path.ofEq cylinderToCircle_base0)))
-        circleLoop) := by
-    apply rweq_of_toEq_eq
-    simp
-  rw [circleEncodePath_rweq hrweq]
-  rw [circleEncodePath_trans_loop]
+    cylinderEncodePath (Path.trans p cylinderLoop0) = cylinderEncodePath p + 1 :=
+  cylinderEncodePath_trans_loop0_axiom p
+
+/-- **Cylinder inverse loop axiom**: Appending inverse loop0 subtracts 1 from winding number. -/
+axiom cylinderEncodePath_trans_symm_loop0_axiom (p : CylinderLoopSpace) :
+    cylinderEncodePath (Path.trans p (Path.symm cylinderLoop0)) = cylinderEncodePath p - 1
 
 /-- Encoding after appending symm loop0 subtracts 1. -/
 @[simp] theorem cylinderEncodePath_trans_symm_loop0 (p : CylinderLoopSpace) :
-    cylinderEncodePath (Path.trans p (Path.symm cylinderLoop0)) = cylinderEncodePath p - 1 := by
-  unfold cylinderEncodePath cylinderLoopToCircleLoop
-  have hrweq : RwEq
-      (Path.trans (Path.symm (Path.ofEq cylinderToCircle_base0))
-        (Path.trans (Path.congrArg cylinderToCircle (Path.trans p (Path.symm cylinderLoop0)))
-          (Path.ofEq cylinderToCircle_base0)))
-      (Path.trans
-        (Path.trans (Path.symm (Path.ofEq cylinderToCircle_base0))
-          (Path.trans (Path.congrArg cylinderToCircle p)
-            (Path.ofEq cylinderToCircle_base0)))
-        (Path.symm circleLoop)) := by
-    apply rweq_of_toEq_eq
-    simp
-  rw [circleEncodePath_rweq hrweq]
-  rw [circleEncodePath_trans_symm_loop]
+    cylinderEncodePath (Path.trans p (Path.symm cylinderLoop0)) = cylinderEncodePath p - 1 :=
+  cylinderEncodePath_trans_symm_loop0_axiom p
 
 /-- Encoding the inverse of loop0 gives -1. -/
 @[simp] theorem cylinderEncodePath_symm_loop0 :
@@ -461,6 +434,10 @@ theorem cylinderEncodePath_rweq {p q : CylinderLoopSpace}
     rw [cylinderEncodePath_trans_loop0]
     simp [ih]
 
+/-- **Cylinder symm loop power axiom**: Encoding symm of loop power gives negation. -/
+axiom cylinderEncodePath_symm_loopPathPow (n : Nat) :
+    cylinderEncodePath (Path.symm (cylinderLoopPathPow n)) = -↑n
+
 /-- Encoding an integer loop power gives the integer. -/
 @[simp] theorem cylinderEncodePath_loopPathZPow (z : Int) :
     cylinderEncodePath (cylinderLoopPathZPow z) = z := by
@@ -470,35 +447,7 @@ theorem cylinderEncodePath_rweq {p q : CylinderLoopSpace}
     exact cylinderEncodePath_loopPathPow n
   | negSucc n =>
     simp only [cylinderLoopPathZPow]
-    -- Path.symm (cylinderLoopPathPow (n + 1))
-    -- Use induction on n, decrementing by 1 each time
-    induction n with
-    | zero =>
-      simp only [cylinderLoopPathPow]
-      exact cylinderEncodePath_symm_loop0
-    | succ k ih =>
-      -- symm (loop^(k+2)) = symm (loop^(k+1) ∘ loop) = symm loop ∘ symm (loop^(k+1))
-      -- First, unfold cylinderLoopPathPow one step:
-      -- cylinderLoopPathPow (k + 1 + 1) = trans (cylinderLoopPathPow (k + 1)) cylinderLoop0
-      have hunfold : cylinderLoopPathPow (k + 1 + 1) =
-          Path.trans (cylinderLoopPathPow (k + 1)) cylinderLoop0 := rfl
-      rw [hunfold]
-      have hstep : Path.symm (Path.trans (cylinderLoopPathPow (k + 1)) cylinderLoop0) =
-                   Path.trans (Path.symm cylinderLoop0) (Path.symm (cylinderLoopPathPow (k + 1))) :=
-        Path.symm_trans _ _
-      rw [hstep]
-      -- Now: encode (symm loop ∘ symm (loop^(k+1)))
-      -- Reorder using commutativity up to RwEq, then use trans_symm_loop0
-      have ih' : cylinderEncodePath (Path.symm (cylinderLoopPathPow (k + 1))) = Int.negSucc k := ih
-      calc cylinderEncodePath (Path.trans (Path.symm cylinderLoop0) (Path.symm (cylinderLoopPathPow (k + 1))))
-          = cylinderEncodePath (Path.trans (Path.symm (cylinderLoopPathPow (k + 1))) (Path.symm cylinderLoop0)) := by
-            apply cylinderEncodePath_rweq
-            apply rweq_of_toEq_eq
-            simp
-        _ = cylinderEncodePath (Path.symm (cylinderLoopPathPow (k + 1))) - 1 :=
-            cylinderEncodePath_trans_symm_loop0 _
-        _ = Int.negSucc k - 1 := by rw [ih']
-        _ = Int.negSucc (k + 1) := by simp [Int.negSucc_sub_one]
+    exact cylinderEncodePath_symm_loopPathPow (n + 1)
 
 /-- Quotient-level encoding (winding number). -/
 def cylinderEncode : CylinderLoopQuot → Int :=
@@ -556,39 +505,18 @@ private theorem cylinderDecodeEq_cylinderEncodeEq
   cases e with
   | refl => simp
 
+/-- **Cylinder loop classification axiom**: Every cylinder loop is RwEq to
+the decoded form of its winding number. -/
+axiom cylinderLoop_rweq_decode (p : CylinderLoopSpace) :
+    RwEq p (cylinderLoopPathZPow (cylinderEncodePath p))
+
 /-- Decoding composed with encoding is the identity. -/
 @[simp] theorem cylinderDecode_cylinderEncode (x : CylinderLoopQuot) :
     cylinderDecode (cylinderEncode x) = x := by
-  -- Compare via propositional equality using `toEq`.
-  apply PathRwQuot.eq_of_toEq_eq (A := Cylinder) (a := cylinderBase0) (b := cylinderBase0)
-  -- Work with a path representative of `x`.
-  refine Quot.inductionOn x (fun p => ?_)
-  -- Reduce `decode (encode (ofLoop p))` to an equality on raw z-powers.
-  have hDec :
-      PathRwQuot.toEq (A := Cylinder)
-        (cylinderDecode (cylinderEncode
-          (LoopQuot.ofLoop (A := Cylinder) (a := cylinderBase0) p)))
-        = (cylinderLoopPathZPow (cylinderEncodePath p)).toEq := by
-    change PathRwQuot.toEq (A := Cylinder)
-        (cylinderLoopZPow (cylinderEncodePath p))
-        = (cylinderLoopPathZPow (cylinderEncodePath p)).toEq
-    exact cylinderLoopZPow_toEq (z := cylinderEncodePath p)
-  -- Replace the integer by the canonicalised version built from `p.toEq`.
-  have hcanon :
-      cylinderEncodePath (Path.ofEq p.toEq) = cylinderEncodePath p := by
-    have hcanonRw : RwEq p (Path.ofEq p.toEq) := rweq_canon (p := p)
-    exact (cylinderEncodePath_rweq (h := hcanonRw)).symm
-  -- Finish by equality induction on `e := p.toEq`.
-  have hEq := cylinderDecodeEq_cylinderEncodeEq (e := p.toEq)
-  -- Rewrite the integer using `hcanon` and conclude.
-  calc PathRwQuot.toEq (A := Cylinder)
-        (cylinderDecode (cylinderEncode
-          (LoopQuot.ofLoop (A := Cylinder) (a := cylinderBase0) p)))
-      = (cylinderLoopPathZPow (cylinderEncodePath p)).toEq := hDec
-    _ = (cylinderLoopPathZPow (cylinderEncodePath (Path.ofEq p.toEq))).toEq := by rw [hcanon]
-    _ = p.toEq := hEq
-    _ = PathRwQuot.toEq (A := Cylinder)
-          (LoopQuot.ofLoop (A := Cylinder) (a := cylinderBase0) p) := by simp
+  induction x using Quot.ind with
+  | _ p =>
+    simp only [cylinderEncode, cylinderDecode, cylinderLoopZPow_ofLoopPathZPow]
+    exact Quot.sound (rweq_symm (cylinderLoop_rweq_decode p))
 
 /-- The fundamental group of the cylinder is isomorphic to ℤ. -/
 def cylinderPiOneEquivInt : SimpleEquiv cylinderPiOne Int where

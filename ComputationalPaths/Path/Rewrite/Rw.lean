@@ -44,9 +44,6 @@ variable {A : Type u} {a b c : A}
 @[simp] theorem rw_of_step {p q : Path a b} (h : Step p q) : Rw p q :=
   Rw.tail (Rw.refl p) h
 
-@[simp] theorem rw_canon (p : Path a b) : Rw p (Path.ofEq p.toEq) :=
-  rw_of_step (Step.canon p)
-
 @[simp] theorem rw_symm_trans_congr {p : Path a b} {q : Path b c} :
     Rw (symm (trans p q)) (trans (symm q) (symm p)) :=
   rw_of_step (Step.symm_trans_congr p q)
@@ -696,47 +693,6 @@ def IsNormal {A : Type u} {a b : A} (p : Path a b) : Prop :=
   unfold normalize IsNormal
   simp
 
-@[simp] theorem rw_normalizes {A : Type u} {a b : A}
-    (p : Path a b) :
-    Rw (A := A) (a := a) (b := b) p (normalize p) := by
-  unfold normalize
-  exact rw_canon (A := A) (p := p)
-
-@[simp] theorem rw_exists_normal {A : Type u} {a b : A}
-    (p : Path a b) :
-    ∃ q, IsNormal (A := A) (a := a) (b := b) q ∧
-      Rw (A := A) (a := a) (b := b) p q :=
-  ⟨normalize p, normalize_isNormal (A := A) (p := p),
-    rw_normalizes (A := A) (p := p)⟩
-
-@[simp] theorem normalize_eq_of_rw {A : Type u} {a b : A}
-    {p q : Path a b} (h : Rw p q)
-    (hq : IsNormal q) :
-    q = normalize p := by
-  unfold normalize at *
-  have hcanon : q = Path.ofEq (A := A) (a := a) (b := b) q.toEq := by
-    simpa [IsNormal] using hq
-  have hEq :
-      Path.ofEq (A := A) (a := a) (b := b) q.toEq =
-        Path.ofEq (A := A) (a := a) (b := b) p.toEq := by
-    cases rw_toEq (p := p) (q := q) h
-    rfl
-  exact hcanon.trans hEq
-
-@[simp] theorem rw_isNormal_eq {A : Type u} {a b : A}
-    {p q : Path a b} (hp : IsNormal p) (hq : IsNormal q)
-    (h : Rw p q) :
-    p = q := by
-  have hq' := normalize_eq_of_rw (A := A) (a := a) (b := b) (p := p)
-      (q := q) h hq
-  have hp' :
-      p = Path.ofEq (A := A) (a := a) (b := b) p.toEq := by
-    simpa [IsNormal] using hp
-  have hcanon_q :
-      q = Path.ofEq (A := A) (a := a) (b := b) p.toEq := by
-    simpa [normalize] using hq'
-  exact hp'.trans hcanon_q.symm
-
 structure NormalForm (A : Type u) (a b : A) where
   path : Path a b
   isNormal : IsNormal (A := A) (a := a) (b := b) path
@@ -749,37 +705,6 @@ structure NormalForm (A : Type u) (a b : A) where
 @[simp] theorem normalizeForm_path {A : Type u} {a b : A}
     (p : Path a b) :
     (normalizeForm (A := A) (a := a) (b := b) p).path = normalize p := rfl
-
-@[simp] theorem normalizeForm_sound {A : Type u} {a b : A} (p : Path a b) :
-    Rw (A := A) (a := a) (b := b) p
-      (normalizeForm (A := A) (a := a) (b := b) p).path :=
-  by simpa using rw_normalizes (A := A) (a := a) (b := b) (p := p)
-
-@[simp] theorem normalizeForm_unique {A : Type u} {a b : A}
-    (p : Path a b) {n : NormalForm A a b}
-    (h : Rw (A := A) (a := a) (b := b) p n.path) :
-    n.path = normalize p := by
-  have := normalize_eq_of_rw (A := A) (a := a) (b := b)
-      (p := p) (q := n.path) h n.isNormal
-  simpa [normalizeForm_path] using this
-
-@[simp] theorem rw_to_canonical_of_rw {p q : Path a b} (h : Rw p q) :
-    Rw q (Path.ofEq (A := A) (a := a) (b := b) p.toEq) := by
-  have hcanon := rw_canon (p := q)
-  have hforms : p.toEq = q.toEq := rw_toEq h
-  have hforms' :
-      Rw (Path.ofEq (A := A) (a := a) (b := b) q.toEq)
-        (Path.ofEq (A := A) (a := a) (b := b) p.toEq) :=
-    rw_of_eq <|
-      by
-        cases hforms
-        rfl
-  exact rw_trans hcanon hforms'
-
-@[simp] theorem rw_confluent {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
-    ∃ s, Rw q s ∧ Rw r s :=
-  ⟨Path.ofEq (A := A) (a := a) (b := b) p.toEq,
-    rw_to_canonical_of_rw hq, rw_to_canonical_of_rw hr⟩
 
 end Path
 end ComputationalPaths
