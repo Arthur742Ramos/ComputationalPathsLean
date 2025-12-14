@@ -480,31 +480,47 @@ Two approaches are available:
 - Reference: HoTT Book Chapter 8.6; Hatcher, Algebraic Topology Section 1.2.
 
 ## Assumptions (axioms)
-- Circle HIT interface (constructors + β-rules).  The type, base point, loop,
-  and eliminators are currently axioms so that downstream developments can use
-  a stable higher-inductive interface while the computational-path semantics
-  for HITs are being developed. Note: `circleConnected` and `circleEncode_mul`
-  were previously axioms but are now **proved theorems** using circle induction
-  and the encode-decode round-trip properties.
-- Pushout SVK encode/decode interface. The pushout itself is implemented as a
-  quotient (constructors + eliminators are definitions in
-  `ComputationalPaths/Path/HIT/Pushout.lean`), but the Seifert-van Kampen
-  encode/decode round-trips remain postulated in
-  `ComputationalPaths/Path/HIT/PushoutPaths.lean`.
-- OrientableSurface HIT interface (type, base point, loops, 2-cell, recursion principle).
-  The encode-decode round-trip axioms complete the fundamental group calculation.
-  Note: `decodePath_surfaceRelWord_rweq` (that the surface relation word decodes to
-  a path RwEq to refl) and `genus0_loop_trivial` (all loops on Σ₀ are trivial) were
-  previously axioms but are now **proved theorems**. The former uses Fin' index
-  arithmetic and the HIT 2-cell axiom; the latter uses the fact that FreeGroupWord 0
-  has only one element (nil) since Fin' 0 is empty.
-- BouquetN HIT interface (type, base point, n loops, recursion principle). The encode-decode
-  axioms establish π₁(∨ⁿS¹) ≃ F_n (free group on n generators). Loop iteration axioms
-  (`iterateLoopInt_add`, `iterateLoopInt_cancel`, `iterateLoopInt_zero`) handle the
-  free group relation.
-- Lightweight univalence (`ua`, `ua_beta`) specialised to `SimpleEquiv`.  This
-  suffices for the encode–decode argument without requiring the full HoTT
-  axiom.
+
+The project uses **134 axioms** organized into the following categories:
+
+### HIT Type/Constructor Axioms (fundamentally necessary)
+- **Circle**: `Circle`, `circleBase`, `circleLoop` + recursion/induction principles
+- **Torus**: `Torus`, `torusBase`, `torusLoop1`, `torusLoop2`, `torusSurf` + eliminators
+- **Klein bottle**: `KleinBottle`, `kleinBase`, `kleinLoopA`, `kleinLoopB`, `kleinSurf` + eliminators
+- **Projective plane**: `ProjectivePlane`, `projectiveBase`, `projectiveLoop`, `projectiveLoopSquare` + eliminators
+- **Möbius band**: `MobiusBand`, `mobiusBase`, `mobiusLoop` + eliminators
+- **Cylinder**: `Cylinder`, `cylinderBase0`, `cylinderBase1`, `cylinderSeg`, `cylinderLoop0`, `cylinderLoop1`, `cylinderSurf` + eliminators
+- **OrientableSurface**: `OrientableSurface g`, `base g`, `loopA g i`, `loopB g i`, `surfaceRelation`, `isPathConnected` + eliminators
+- **BouquetN**: type, base point, n loops, recursion principle
+
+### π₁ Encode-Decode Axioms (for fundamental group calculations)
+- Loop classification axioms: `circleLoop_rweq_decode`, `torusLoop_rweq_decode`, `kleinLoop_rweq_decode`, `projectiveLoop_rweq_decode`, `mobiusLoop_rweq_decode`, `cylinderLoop_rweq_decode`
+- Encode path computation axioms (refl, trans, symm rules)
+- Pushout SVK encode/decode round-trip axioms
+
+### Path Theory Axioms
+- `decidableEq_implies_axiomK`: Types with decidable equality satisfy Axiom K
+- `rweq_congrArg_const`: congrArg of constant function is RwEq to refl
+- `rweq_ofEq_rfl_refl`: `Path.ofEq rfl` is RwEq to `Path.refl`
+- `join_of_rw`: Confluence axiom for critical pair joins
+
+### Univalence
+- `uaEq`: SimpleEquiv A B → A = B
+- `ua_beta`: Transport along ua computes to the forward map
+
+### ω-Groupoid Structure
+- `to_canonical`: Every derivation connects to the canonical derivation (grounded in normalization)
+
+### Derived Theorems (no longer axioms)
+The following were axioms but are now **proved theorems**:
+- `nat_pathEq`, `bool_pathEq`, `int_pathEq`, `punit_pathEq`, `torusN_zero_pathEq`: Derived from `decidableEq_implies_isHSet`
+- `circleConnected`, `circleEncode_mul`: Proved using circle induction
+- `decodePath_surfaceRelWord_rweq`: Proved using Fin' index arithmetic and the HIT 2-cell
+- `genus0_loop_trivial`: Proved using the fact that FreeGroupWord 0 has only nil
+
+### Removed Axioms (caused inconsistency)
+- `Step.canon`: Was removing as it collapsed all paths with the same `toEq` to be RwEq, contradicting π₁(S¹) ≃ ℤ
+- `rweq_of_toEq_eq`: General version that would imply UIP-like collapse
 
 Every other component—encode/decode maps, quotient constructions, loop group
 laws, free products, amalgamation, surface group presentations, etc.—is defined
