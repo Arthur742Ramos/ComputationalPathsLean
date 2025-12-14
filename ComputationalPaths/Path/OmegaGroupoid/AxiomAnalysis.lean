@@ -71,13 +71,9 @@ contract₄ (m₁ m₂ : Derivation₃ d₁ d₂) : MetaStep₄ m₁ m₂
 **Analysis:**
 If level 3 is contractible, why doesn't level 4 follow automatically?
 
-The issue: `contractibility₃` produces 3-cells functionally:
-```
-contractibility₃ d₁ d₂ := vcomp (to_canonical d₁) (inv (to_canonical d₂))
-```
-
-But different inputs can produce different outputs! We need to show
-these outputs are 4-equivalent, which requires `contract₄`.
+The issue: `contractibility₃` is derived from `to_canonical`, producing
+3-cells functionally. But different inputs can produce different outputs!
+We need to show these outputs are 4-equivalent, which requires `contract₄`.
 
 **Path to elimination: Single truncation axiom**
 ```
@@ -150,7 +146,8 @@ Remove from Step inductive:
 | DepContext | 12 | Many? |
 | BiContext | 8 | Many? |
 | Congruence | 4 | 0 (essential) |
-| Canon | 1 | 0 (essential) |
+
+Note: `Step.canon` was removed due to causing path collapse.
 
 **Potential reduction:** 74 → ~50-60 if η rules and some context rules are derivable.
 
@@ -281,13 +278,13 @@ def derivationMeasure {p q : Path a b} : Derivation₂ p q → Nat
   | .inv d => derivationMeasure d
   | .vcomp d₁ d₂ => derivationMeasure d₁ + derivationMeasure d₂ + 1
 
-/-- The canonical derivation has a specific measure. -/
-def canonicalMeasure {p q : Path a b} : Nat :=
-  derivationMeasure (canonical p q)
-
 /-
+**Note:** The `canonical` function originally depended on `Step.canon` which was removed.
+The analysis of proving `to_canonical` from confluence remains valid conceptually,
+but the specific measure-based approach would need to be reformulated.
+
 To prove `to_canonical`, we would need to show:
-1. Every derivation can be transformed to `canonical` via measure-reducing steps
+1. Every derivation can be transformed to some "canonical" form via measure-reducing steps
 2. Each step produces a 3-cell
 3. Compose the 3-cells to get the full `to_canonical`
 

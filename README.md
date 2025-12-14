@@ -481,7 +481,7 @@ Two approaches are available:
 
 ## Assumptions (axioms)
 
-The project uses **134 axioms** organized into the following categories:
+The project uses **137 axioms** organized into the following categories:
 
 ### HIT Type/Constructor Axioms (fundamentally necessary)
 - **Circle**: `Circle`, `circleBase`, `circleLoop` + recursion/induction principles
@@ -513,7 +513,7 @@ The project uses **134 axioms** organized into the following categories:
 
 ### Derived Theorems (no longer axioms)
 The following were axioms but are now **proved theorems**:
-- `nat_pathEq`, `bool_pathEq`, `int_pathEq`, `punit_pathEq`, `torusN_zero_pathEq`: Derived from `decidableEq_implies_isHSet`
+- `nat_pathEq`, `bool_pathEq`, `int_pathEq`, `punit_pathEq`, `torusN_zero_pathEq`, `unitU_pathEq`: Derived from `decidableEq_implies_isHSet`
 - `circleConnected`, `circleEncode_mul`: Proved using circle induction
 - `decodePath_surfaceRelWord_rweq`: Proved using Fin' index arithmetic and the HIT 2-cell
 - `genus0_loop_trivial`: Proved using the fact that FreeGroupWord 0 has only nil

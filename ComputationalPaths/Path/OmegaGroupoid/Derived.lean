@@ -33,16 +33,18 @@ Once we have contractibility, all the individual coherence axioms become
 special cases: they're just saying that two specific derivations are equal,
 which follows immediately from contractibility.
 
-## Toward Proving `to_canonical`
+## On `to_canonical`
 
-The `to_canonical` axiom is *justified* by normalization but not proved.
-We sketch how it could potentially be proved from:
+The `to_canonical` axiom is *justified* by normalization but currently not proved
+constructively. The original approach used `Step.canon` which was removed because
+it collapsed all paths with the same `toEq` to be RwEq (causing π₁(S¹) to be trivial).
 
-1. **Strong normalization**: Every path normalizes (we have this via `rw_normalizes`)
-2. **Confluence**: All derivations to normal form yield the same result (we have `rw_confluent`)
-3. **Normal form uniqueness**: `normalize_parallel` shows parallel paths have same normal form
+Without `Step.canon`, we cannot computationally derive `to_canonical` from:
+1. Strong normalization
+2. Confluence
+3. Normal form uniqueness
 
-The gap is lifting these facts from `Rw` (rewrite sequences) to `Derivation₂` (2-cells).
+The axiom remains as a justified semantic assertion about the ω-groupoid structure.
 -/
 
 import ComputationalPaths.Path.OmegaGroupoid
@@ -154,46 +156,41 @@ def derive_interchange {f f' : Path a b} {g g' : Path b c}
 
 end HigherCoherences
 
-/-! ## Part 3: Toward Proving `to_canonical`
+/-! ## Part 3: Notes on `to_canonical`
 
 The `to_canonical` axiom says every derivation connects to the canonical one.
-Here we explore how this could potentially be proved from normalization.
 
 **Current axiom:**
 ```
 axiom to_canonical (d : Derivation₂ p q) : MetaStep₃ d (canonical p q)
 ```
 
-**Potential proof strategy:**
+**Historical note:** The original approach used `Step.canon` which normalized any path
+to `Path.ofEq p.toEq`. This was removed because it collapsed all paths with the same
+`toEq` to be RwEq, contradicting π₁(S¹) ≃ ℤ.
 
-1. We already have `rw_normalizes : Rw p (normalize p)` for any path.
-2. We have `rw_confluent` showing all reductions meet at the canonical form.
-3. We have `normalize_parallel : normalize p = normalize q` for parallel paths.
+Without `Step.canon`, we cannot computationally construct a normalization derivation.
+The `canonical` function in OmegaGroupoid.lean now uses an alternative construction
+that doesn't depend on a general canonicalization step.
 
-The key gap is that `Rw` and `RwEq` are in `Prop`, while `Derivation₂` is in `Type`.
-We need to "internalize" the normalization proof as a derivation.
-
-**Observation:** The `canonical` derivation is constructed via:
-```
-canonical p q := .vcomp (deriv₂_to_normal p) (.inv (deriv₂_to_normal q))
-```
-
-where `deriv₂_to_normal p : Derivation₂ p (normalize p)` is `.step (Step.canon p)`.
-
-So `canonical` uses the `canon` step directly. Any other derivation `d : Derivation₂ p q`
-must (semantically) "go through" the same canonical forms, because:
-- All paths between `p` and `q` normalize to `normalize p = normalize q`
-- The derivation `d` represents a witness that these normalizations coincide
-
-The axiom `to_canonical` formalizes that this semantic argument lifts to a 3-cell.
+The `to_canonical` axiom captures the semantic content: any derivation between two
+paths is connected (via a 3-cell) to the canonical derivation between them.
 -/
 
 section TowardProvingToCanonical
 
-/-- The normalization derivation: `p →₂ normalize p` via single step. -/
-def normalizeDerivation {a b : A} (p : Path a b) :
-    Derivation₂ p (Path.ofEq p.toEq) :=
-  .step (Step.canon p)
+/-
+**Note:** The `Step.canon` rule was removed because it caused all paths with the same
+`toEq` to become RwEq, which collapsed π₁(S¹) to be trivial (contradicting π₁(S¹) ≃ ℤ).
+
+Without `Step.canon`, we cannot define a computational `normalizeDerivation` that
+reduces every path to its canonical form. The `canonical` derivation and `to_canonical`
+axiom in OmegaGroupoid.lean rely on alternative constructions that don't use `Step.canon`.
+
+The key insight remains valid: if we had a sound normalization step, contractibility
+at level 3 would follow. The current formulation uses `to_canonical` as an axiom that
+captures this semantic property without the problematic computational rule.
+-/
 
 /-- Key observation: Any two derivations from the same path to normal forms
     that happen to be equal can be connected via transitivity with inverses.
@@ -202,11 +199,6 @@ def normalizeDerivation {a b : A} (p : Path a b) :
 theorem normalizations_connected {a b : A} {p : Path a b} {n : Path a b}
     (d₁ d₂ : Derivation₂ p n) : Nonempty (Derivation₃ d₁ d₂) :=
   ⟨connect d₁ d₂⟩
-
-/-- The RwEq ↔ Derivation₂ correspondence shows the axiom is semantically sound. -/
-theorem to_canonical_semantically_sound {a b : A} {p q : Path a b}
-    (d : Derivation₂ p q) :
-    RwEq p q ∧ RwEq p q := ⟨d.toRwEq, (canonical p q).toRwEq⟩
 
 /-
 **Conjecture:** `to_canonical` could be proved if we had a computational witness

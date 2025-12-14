@@ -43,6 +43,7 @@ import ComputationalPaths.Path.HIT.FigureEight
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.HIT.KleinBottle
+import ComputationalPaths.Path.Homotopy.Sets
 
 namespace ComputationalPaths
 namespace Path
@@ -51,6 +52,11 @@ universe u
 
 /-- Unit type lifted to universe u for pushout compatibility. -/
 def UnitU : Type u := PUnit.{u+1}
+
+/-- UnitU has decidable equality (trivially, since there's only one element). -/
+instance : DecidableEq UnitU := fun a b =>
+  match a, b with
+  | .unit, .unit => isTrue rfl
 
 /-- The single element of UnitU. -/
 def unitU : UnitU := PUnit.unit
@@ -208,9 +214,11 @@ noncomputable def boundaryWordSVK : Path baseSVK baseSVK :=
 Since UnitU has only one element, all paths are equivalent to refl.
 -/
 
-/-- **UnitU set axiom**: Parallel paths in UnitU are RwEq.
-UnitU has only one element, so it's trivially a set. -/
-axiom unitU_pathEq {a b : UnitU} (p q : Path a b) : RwEq p q
+/-- **UnitU set theorem**: Parallel paths in UnitU are RwEq.
+UnitU has only one element, so it's trivially a set.
+Derived from `decidableEq_implies_isHSet` since UnitU has DecidableEq. -/
+theorem unitU_pathEq {a b : UnitU} (p q : Path a b) : RwEq p q :=
+  decidableEq_implies_isHSet p q
 
 /-- Any loop in UnitU is RwEq to refl. -/
 theorem unitU_loop_rweq_refl (p : Path unitU unitU) : RwEq p (Path.refl unitU) :=
