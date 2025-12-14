@@ -47,7 +47,6 @@ import ComputationalPaths.Path.HIT.ProjectivePlane
 import ComputationalPaths.Path.HIT.ProjectivePlaneSVK
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
-import ComputationalPaths.Path.HIT.PushoutPathsInstances
 import ComputationalPaths.Path.HIT.FigureEight
 import ComputationalPaths.Path.HIT.BouquetN
 import ComputationalPaths.Path.HIT.Sphere
