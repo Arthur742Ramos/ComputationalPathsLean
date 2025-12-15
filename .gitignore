@@ -34,3 +34,8 @@ arxiv_submission/
 cover_letter_LMCS.pdf
 cover_letter_LMCS.tex
 nul
+
+# Generated axiom inventory outputs / local scratch
+axioms.txt
+axioms_all.txt
+Scripts/CheckCylinder.lean

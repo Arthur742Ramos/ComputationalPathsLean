@@ -16,6 +16,9 @@ From the repository root:
 - Kernel axiom dependencies for a specific declaration:
   - `.\lake.cmd env lean Scripts\AxiomDependencies.lean`
   - Edit `Scripts/AxiomDependencies.lean` to change the queried declaration.
+- Prop-valued typeclass assumptions required by a specific declaration:
+  - `.\lake.cmd env lean Scripts\AssumptionDependencies.lean`
+  - Edit `Scripts/AssumptionDependencies.lean` to change the queried declaration.
 
 ## Current kernel axioms (global)
 
@@ -62,4 +65,3 @@ These are now **non-kernel assumptions**:
 They are defined in `ComputationalPaths/Path/HIT/Pushout.lean`, and threaded into consumers
 like `ComputationalPaths/Path/HIT/PushoutPaths.lean`, `ComputationalPaths/Path/HIT/Sphere.lean`,
 and `ComputationalPaths/Path/HIT/HopfFibration.lean`.
-
