@@ -19,6 +19,28 @@ From the repository root:
 - Prop-valued typeclass assumptions required by a specific declaration:
   - `.\lake.cmd env lean Scripts\AssumptionDependencies.lean`
   - Edit `Scripts/AssumptionDependencies.lean` to change the queried declaration.
+- Quick multi-theorem survey (handy while refactoring):
+  - `.\lake.cmd env lean Scripts\AssumptionSurvey.lean`
+
+## Consistency note: `HasUnivalence`
+
+In standard Lean, `Eq` lives in `Prop`, hence is **proof-irrelevant**. This has an important
+consequence for any “univalence via `Eq` + `transport`” interface:
+
+- For any type `A`, the equality `A = A` is definitionally reflexive.
+- Therefore `transport` along any proof of `A = A` must be the identity function.
+- So an axiom stating that transport along `ua (e : A ≃ A)` computes to `e.toFun` forces
+  *every* autoequivalence to be judgmentally the identity.
+
+This collapses nontrivial equivalences (e.g. boolean negation), and yields a contradiction.
+
+The script `Scripts/UnivalenceInconsistency.lean` proves `False` from `[HasUnivalence]` using
+`Bool` as a tiny witness:
+
+- `.\lake.cmd env lean Scripts\UnivalenceInconsistency.lean`
+
+As a result, `HasUnivalence` is currently best understood as a **meta-level marker** for
+HoTT-style developments, not something that can be instantiated inside Lean’s standard logic.
 
 ## Current kernel axioms (global)
 

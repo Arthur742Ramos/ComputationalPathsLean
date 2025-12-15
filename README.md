@@ -501,7 +501,9 @@ This project tries to minimize **Lean kernel axioms**. We distinguish:
 
 Non-kernel assumptions that are intentionally explicit (selected examples):
 
-- **Univalence**: `ComputationalPaths.Path.HasUnivalence` (needed for the circle code family into `Int`).
+- **Univalence marker**: `ComputationalPaths.Path.HasUnivalence`.
+  - Used to model HoTT-style “transport along `ua` computes to the equivalence”.
+  - **Cannot be instantiated in standard Lean** (proof-irrelevance makes it inconsistent); see `docs/axioms.md` and `Scripts/UnivalenceInconsistency.lean`.
 - **Circle loop classification**: `ComputationalPaths.Path.HasCircleLoopDecode` (needed for the “decode∘encode” direction).
 - **Pushout β/naturality (SVK)**: `Pushout.HasRecGlueRwEq`, `Pushout.HasIndGlueRwEq`, `Pushout.HasGlueNaturalRwEq`.
 
