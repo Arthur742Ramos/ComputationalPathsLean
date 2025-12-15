@@ -79,6 +79,18 @@ Non-kernel assumptions required by the circle encode/decode development:
 - `ComputationalPaths.Path.HasCircleLoopDecode`
   - Circle-specific loop classification hypothesis (encode/decode “decode∘encode” direction).
   - Defined in `ComputationalPaths/Path/HIT/Circle.lean`.
+  - This is the **strongest** current circle assumption: it speaks about *raw* loops
+    (`Path circleBase circleBase`) and provides a normal form `loop^n` up to `RwEq`.
+
+- `ComputationalPaths.Path.HasCirclePiOneEncode`
+  - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
+    an `encode : π₁(S¹) → ℤ` with `encode (circleDecode z) = z` and
+    `circleDecode (encode x) = x`.
+  - Defined in `ComputationalPaths/Path/HIT/CircleStep.lean`.
+  - Every `[HasCircleLoopDecode]` provides an instance, but downstream developments
+    (e.g. `ComputationalPaths/Path/HIT/Pi2Sphere.lean`,
+    `ComputationalPaths/Path/Homotopy/LieGroups.lean`) now depend only on this weaker
+    hypothesis.
 
 ## Torus fundamental group (π₁(T²) ≃ ℤ × ℤ)
 

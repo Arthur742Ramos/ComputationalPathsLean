@@ -262,7 +262,7 @@ We derive that ∂ is an isomorphism.
 /-- Exactness at π₂(S²): ker(∂) = im(π₂(S³) → π₂(S²)) = 1.
 
 Since π₂(S³) = 1, the image is trivial, so ∂ is injective. -/
-theorem hopf_exact_at_pi2_S2 [HasCircleLoopDecode.{u}] :
+theorem hopf_exact_at_pi2_S2 [HasCirclePiOneEncode.{u}] :
     ∀ (α : S2PiTwo),
       hopf_connecting_map α = Quot.mk _ (Path.refl circleBase.{u}) →
     α = s2TwoLoop_refl := by
@@ -276,20 +276,16 @@ theorem hopf_exact_at_pi2_S2 [HasCircleLoopDecode.{u}] :
         circleDecode.{u} (s2TwoLoop_winding α) =
           Quot.mk _ (Path.refl circleBase.{u}) := h
     have hEncEq :
-        circleEncode.{u} (circleDecode.{u} (s2TwoLoop_winding α)) =
-          circleEncode.{u} (Quot.mk _ (Path.refl circleBase.{u})) :=
-      _root_.congrArg (circleEncode.{u}) hDecode
+        circlePiOneEncode.{u} (circleDecode.{u} (s2TwoLoop_winding α)) =
+          circlePiOneEncode.{u} (Quot.mk _ (Path.refl circleBase.{u})) :=
+      _root_.congrArg (circlePiOneEncode.{u}) hDecode
     have hw' : s2TwoLoop_winding α =
-        circleEncode.{u} (Quot.mk _ (Path.refl circleBase.{u})) :=
-      (circleEncode_circleDecode (s2TwoLoop_winding α)).symm.trans hEncEq
-    have hRefl : circleEncode.{u} (Quot.mk _ (Path.refl circleBase.{u})) = 0 := by
-      change
-        circleEncode.{u}
-            (LoopQuot.ofLoop (A := Circle.{u}) (a := circleBase.{u})
-              (Path.refl circleBase.{u})) =
-          0
-      change circleEncodePath (Path.refl circleBase.{u}) = 0
-      exact circleEncodePath_refl
+        circlePiOneEncode.{u} (Quot.mk _ (Path.refl circleBase.{u})) :=
+      (circlePiOneEncode_circleDecode (z := s2TwoLoop_winding α)).symm.trans hEncEq
+    have hRefl : circlePiOneEncode.{u} (Quot.mk _ (Path.refl circleBase.{u})) = 0 := by
+      -- `encode(decode 0) = 0` and `decode 0` is the identity loop class.
+      simpa [circleDecode_zero, LoopQuot.id] using
+        (circlePiOneEncode_circleDecode.{u} (z := (0 : Int)))
     exact hw'.trans hRefl
   -- winding(α) = 0 implies α = refl
   exact s2TwoLoop_eq_of_winding_eq α s2TwoLoop_refl
@@ -298,38 +294,38 @@ theorem hopf_exact_at_pi2_S2 [HasCircleLoopDecode.{u}] :
 /-- Exactness at π₁(S¹): im(∂) = ker(π₁(S¹) → π₁(S³)) = π₁(S¹).
 
 Since π₁(S³) = 1, the kernel is all of π₁(S¹), so ∂ is surjective. -/
-theorem hopf_exact_at_pi1_S1 [HasCircleLoopDecode.{u}] :
+theorem hopf_exact_at_pi1_S1 [HasCirclePiOneEncode.{u}] :
     ∀ (β : π₁(Circle.{u}, circleBase.{u})), ∃ (α : S2PiTwo),
     hopf_connecting_map α = β := by
   intro β
   -- For any β ∈ π₁(S¹), find α ∈ π₂(S²) with ∂(α) = β
-  exact ⟨s2TwoLoop_of_winding (circleWindingNumber β), by
+  exact ⟨s2TwoLoop_of_winding (circlePiOneEncode.{u} β), by
     unfold hopf_connecting_map
     rw [s2TwoLoop_winding_of_winding]
-    exact circleDecode_circleEncode.{u} β⟩
+    exact circleDecode_circlePiOneEncode.{u} β⟩
 
 /-- **Main Theorem**: The connecting map ∂ : π₂(S²) → π₁(S¹) is an isomorphism.
 
 Combined with π₁(S¹) ≃ ℤ, this gives π₂(S²) ≃ ℤ. -/
-noncomputable def hopf_connecting_iso [HasCircleLoopDecode.{u}] :
+noncomputable def hopf_connecting_iso [HasCirclePiOneEncode.{u}] :
     SimpleEquiv S2PiTwo (π₁(Circle.{u}, circleBase.{u})) where
   toFun := hopf_connecting_map
-  invFun := fun β => s2TwoLoop_of_winding (circleWindingNumber β)
+  invFun := fun β => s2TwoLoop_of_winding (circlePiOneEncode.{u} β)
   left_inv := fun α => by
     apply s2TwoLoop_eq_of_winding_eq
     unfold hopf_connecting_map
     rw [s2TwoLoop_winding_of_winding]
-    exact circleEncode_circleDecode (s2TwoLoop_winding α)
+    exact circlePiOneEncode_circleDecode (z := s2TwoLoop_winding α)
   right_inv := fun β => by
     unfold hopf_connecting_map
     rw [s2TwoLoop_winding_of_winding]
-    exact circleDecode_circleEncode.{u} β
+    exact circleDecode_circlePiOneEncode.{u} β
 
 /-- **Corollary**: π₂(S²) ≃ ℤ via composition of equivalences.
 
 This is the classical result that the second homotopy group of the
 2-sphere is the integers. -/
-noncomputable def sphere2_pi2_equiv_int' [HasCircleLoopDecode.{u}] : SimpleEquiv S2PiTwo Int :=
+noncomputable def sphere2_pi2_equiv_int' [HasCirclePiOneEncode.{u}] : SimpleEquiv S2PiTwo Int :=
   SimpleEquiv.comp hopf_connecting_iso circlePiOneEquivInt.{u}
 
 /-! ## Physical/Geometric Interpretation
