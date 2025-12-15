@@ -3,7 +3,9 @@
 This project distinguishes:
 
 - **Kernel axioms**: Lean `axiom` declarations that extend the trusted base.
-- **Assumptions**: `Prop`-valued typeclasses (e.g. `HasUnivalence`) that appear as explicit hypotheses in theorems/definitions, but *do not* extend the kernel.
+- **Assumptions**: explicit hypotheses (usually typeclasses), ranging from `Prop`-valued markers
+  (e.g. `HasUnivalence`) to `Type`-valued data interfaces (e.g. `HasCircleLoopDecode`). These
+  do *not* extend the kernel, but must be discharged by providing an instance/proof.
 
 The goal is to keep the **kernel axiom set** as small as possible, and make any additional assumptions **local and explicit** in signatures.
 
@@ -63,14 +65,11 @@ No univalence or pushout computation/naturality principles remain as kernel axio
 Kernel axioms *used by* `ComputationalPaths.Path.circlePiOneEquivInt`:
 
 - `Circle`, `circleBase`, `circleLoop`
-- `circleRec`, `circleRec_base`, `circleRec_loop`
 
 This is reported by `Scripts/AxiomDependencies.lean`.
 
 Non-kernel assumptions required by the circle encode/decode development:
 
-- `ComputationalPaths.Path.HasUnivalence.{0}` (univalence interface for `Type 0`)
-  - Defined in `ComputationalPaths/Path/Basic/Univalence.lean`.
 - `ComputationalPaths.Path.HasCircleLoopDecode`
   - Circle-specific loop classification hypothesis (encode/decode “decode∘encode” direction).
   - Defined in `ComputationalPaths/Path/HIT/Circle.lean`.

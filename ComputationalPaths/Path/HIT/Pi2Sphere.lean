@@ -248,10 +248,6 @@ theorem hopf_connecting_hom (α β : S2PiTwo) :
   rw [s2TwoLoop_comp_winding]
   exact circleDecode_add' (s2TwoLoop_winding α) (s2TwoLoop_winding β)
 
-section Univalence
-
-variable [HasUnivalence.{0}]
-
 /-! ## Exactness and the Isomorphism
 
 From the long exact sequence:
@@ -266,8 +262,9 @@ We derive that ∂ is an isomorphism.
 /-- Exactness at π₂(S²): ker(∂) = im(π₂(S³) → π₂(S²)) = 1.
 
 Since π₂(S³) = 1, the image is trivial, so ∂ is injective. -/
-theorem hopf_exact_at_pi2_S2 :
-    ∀ (α : S2PiTwo), hopf_connecting_map α = Quot.mk _ (Path.refl circleBase) →
+theorem hopf_exact_at_pi2_S2 [HasCircleLoopDecode.{u}] :
+    ∀ (α : S2PiTwo),
+      hopf_connecting_map α = Quot.mk _ (Path.refl circleBase.{u}) →
     α = s2TwoLoop_refl := by
   intro α h
   -- If ∂(α) = refl, then winding(α) = 0
@@ -275,15 +272,25 @@ theorem hopf_exact_at_pi2_S2 :
   have hw : s2TwoLoop_winding α = 0 := by
     -- circleDecode(n) = refl iff n = 0
     -- circleDecode 0 = circleLoopZPow 0 = LoopQuot.id = Quot.mk _ refl
-    have hDecode : circleDecode (s2TwoLoop_winding α) = Quot.mk _ (Path.refl circleBase) := h
-    -- circleEncode (circleDecode n) = n
-    have hEncode : circleEncode (circleDecode (s2TwoLoop_winding α)) = s2TwoLoop_winding α :=
-      circleEncode_circleDecode (s2TwoLoop_winding α)
-    -- circleEncode (Quot.mk _ refl) = 0
-    rw [hDecode] at hEncode
-    -- circleEncode (Quot.mk _ refl) = circleEncodePath refl = 0
-    simp only [circleEncode, circleEncodeLift] at hEncode
-    exact hEncode.symm.trans circleEncodePath_refl
+    have hDecode :
+        circleDecode.{u} (s2TwoLoop_winding α) =
+          Quot.mk _ (Path.refl circleBase.{u}) := h
+    have hEncEq :
+        circleEncode.{u} (circleDecode.{u} (s2TwoLoop_winding α)) =
+          circleEncode.{u} (Quot.mk _ (Path.refl circleBase.{u})) :=
+      _root_.congrArg (circleEncode.{u}) hDecode
+    have hw' : s2TwoLoop_winding α =
+        circleEncode.{u} (Quot.mk _ (Path.refl circleBase.{u})) :=
+      (circleEncode_circleDecode (s2TwoLoop_winding α)).symm.trans hEncEq
+    have hRefl : circleEncode.{u} (Quot.mk _ (Path.refl circleBase.{u})) = 0 := by
+      change
+        circleEncode.{u}
+            (LoopQuot.ofLoop (A := Circle.{u}) (a := circleBase.{u})
+              (Path.refl circleBase.{u})) =
+          0
+      change circleEncodePath (Path.refl circleBase.{u}) = 0
+      exact circleEncodePath_refl
+    exact hw'.trans hRefl
   -- winding(α) = 0 implies α = refl
   exact s2TwoLoop_eq_of_winding_eq α s2TwoLoop_refl
       (hw.trans s2TwoLoop_refl_winding.symm)
@@ -324,8 +331,6 @@ This is the classical result that the second homotopy group of the
 2-sphere is the integers. -/
 noncomputable def sphere2_pi2_equiv_int' [HasCircleLoopDecode.{u}] : SimpleEquiv S2PiTwo Int :=
   SimpleEquiv.comp hopf_connecting_iso circlePiOneEquivInt.{u}
-
-end Univalence
 
 /-! ## Physical/Geometric Interpretation
 

@@ -25,7 +25,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Covering space classification**: Galois correspondence between covering spaces and subgroups of π₁. Deck(X̃/X) ≃ π₁(X) for universal cover. Regular covers correspond to normal subgroups.
 - **Covering space theory**: Total spaces, path lifting, π₁-action on fibers, universal cover, deck transformations.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
-- Higher-inductive circle interface + code family into ℤ (requires an explicit univalence assumption `HasUnivalence`).
+- Higher-inductive circle interface + winding-number classification into ℤ (requires `HasCircleLoopDecode`, no univalence).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
 - Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd`.
 - Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition).
@@ -484,7 +484,9 @@ Two approaches are available:
 This project tries to minimize **Lean kernel axioms**. We distinguish:
 
 - **Kernel axioms**: Lean `axiom` declarations that extend the trusted base.
-- **Assumptions**: `Prop`-valued typeclasses (e.g. `HasUnivalence`) that appear as explicit hypotheses in signatures, but do **not** extend the kernel.
+- **Assumptions**: explicit hypotheses (usually typeclasses), ranging from `Prop`-valued markers
+  (e.g. `HasUnivalence`) to `Type`-valued data interfaces (e.g. `HasCircleLoopDecode`). These do
+  **not** extend the kernel, but must be discharged by providing an instance/proof.
 
 ### Measuring kernel axioms
 
@@ -497,14 +499,14 @@ This project tries to minimize **Lean kernel axioms**. We distinguish:
 
 - `Scripts/AxiomInventory.lean` reports **56 kernel axioms** for `import ComputationalPaths`; these are **exactly the HIT interfaces** (types/constructors/recursors) for:
   - `Circle`, `Cylinder`, `Torus`, `KleinBottle`, `MobiusBand`, `ProjectivePlane`, `OrientableSurface`.
-- `Scripts/AxiomDependencies.lean` reports that `circlePiOneEquivInt` depends on only the **circle HIT interface** (6 kernel axioms: `Circle`, `circleBase`, `circleLoop`, `circleRec`, `circleRec_base`, `circleRec_loop`).
+- `Scripts/AxiomDependencies.lean` reports that `circlePiOneEquivInt` depends on only the **circle generators** (3 kernel axioms: `Circle`, `circleBase`, `circleLoop`).
 
 Non-kernel assumptions that are intentionally explicit (selected examples):
 
-- **Univalence marker**: `ComputationalPaths.Path.HasUnivalence`.
-  - Used to model HoTT-style “transport along `ua` computes to the equivalence”.
-  - **Cannot be instantiated in standard Lean** (proof-irrelevance makes it inconsistent); see `docs/axioms.md` and `Scripts/UnivalenceInconsistency.lean`.
 - **Circle loop classification**: `ComputationalPaths.Path.HasCircleLoopDecode` (needed for the “decode∘encode” direction).
+- **Univalence marker**: `ComputationalPaths.Path.HasUnivalence`.
+  - Used by some HoTT-style developments to model “transport along `ua` computes to the equivalence”.
+  - **Cannot be instantiated in standard Lean** (proof-irrelevance makes it inconsistent); see `docs/axioms.md` and `Scripts/UnivalenceInconsistency.lean`.
 - **Pushout β/naturality (SVK)**: `Pushout.HasRecGlueRwEq`, `Pushout.HasIndGlueRwEq`, `Pushout.HasGlueNaturalRwEq`.
 
 See `docs/axioms.md` for the authoritative overview.

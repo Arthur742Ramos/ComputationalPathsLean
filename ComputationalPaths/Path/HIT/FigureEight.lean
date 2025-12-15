@@ -187,9 +187,6 @@ noncomputable def figureEightPiOneEquivPiOneProduct :
     SimpleEquiv FigureEightPiOne (FreeProductWord circlePiOne circlePiOne) :=
   wedgeFundamentalGroupEquiv circleBase circleBase
 
-section Univalence
-
-variable [HasUnivalence.{0}]
 variable [HasCircleLoopDecode.{u}]
 
 /-- Step 2: FreeProductWord (π₁(S¹)) (π₁(S¹)) ≃ FreeProductWord ℤ ℤ
@@ -237,8 +234,6 @@ theorem extractWord_wordToLoop (w : FreeProductWord Int Int) :
 theorem wordToLoop_extractWord (α : FigureEightPiOne) :
     wordToLoop (extractWord α) = α :=
   figureEightPiOneEquiv.left_inv α
-
-end Univalence
 
 end MainEquiv
 
