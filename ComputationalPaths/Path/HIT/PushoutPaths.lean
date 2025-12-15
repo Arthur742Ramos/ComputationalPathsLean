@@ -612,6 +612,7 @@ are homotopic in the pushout. -/
 theorem pushoutDecode_respects_amalg
     {A : Type u} {B : Type u} {C : Type u}
     {f : C → A} {g : C → B}
+    [Pushout.HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
     (c₀ : C)
     (γ : π₁(C, c₀))
     (rest : PushoutCode A B C f g c₀) :
@@ -689,7 +690,8 @@ set_option maxHeartbeats 400000 in
 /-- Decode at the amalgamated free product level respects amalgamation. -/
 noncomputable def pushoutDecodeAmalg
     {A : Type u} {B : Type u} {C : Type u}
-    {f : C → A} {g : C → B} (c₀ : C) :
+    {f : C → A} {g : C → B} (c₀ : C)
+    [Pushout.HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)] :
     AmalgamatedFreeProduct (π₁(A, f c₀)) (π₁(B, g c₀)) (π₁(C, c₀))
       (piOneFmap c₀) (piOneGmap c₀) →
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) :=
@@ -746,7 +748,8 @@ theorem pushoutEncodeDecodeAxiom (A : Type u) (B : Type u) (C : Type u)
   unfold pushoutEncodeQuotAxiom
   exact HasPushoutSVKEncodeData.encode_decode (A := A) (B := B) (C := C) (f := f) (g := g) (c₀ := c₀) w
 
-noncomputable def seifertVanKampenEquiv [HasPushoutSVKEncodeData A B C f g c₀] :
+noncomputable def seifertVanKampenEquiv [Pushout.HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
+    [HasPushoutSVKEncodeData A B C f g c₀] :
     SimpleEquiv
       (π₁(Pushout A B C f g, Pushout.inl (f c₀)))
       (AmalgamatedFreeProduct

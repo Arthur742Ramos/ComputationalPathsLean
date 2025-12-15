@@ -71,35 +71,6 @@ axiom projectivePlaneRec_loop {C : Type v} (data : ProjectivePlaneRecData C) :
       (Path.ofEq (projectivePlaneRec_base (C := C) data))) =
   data.loop
 
-/-- Data for the dependent eliminator of the projective plane. -/
-structure ProjectivePlaneIndData (C : ProjectivePlane → Type v) where
-  base : C projectiveBase
-  loop : Path (Path.transport (A := ProjectivePlane) (D := C) projectiveLoop base) base
-  -- Note: The loopSquare coherence (stating how loop² = refl is preserved) requires
-  -- 2-dimensional path algebra. See `Globular.lean` for the theoretical framework.
-
-/-- Dependent eliminator (induction principle) for the projective plane. -/
-axiom projectivePlaneInd {C : ProjectivePlane → Type v} (data : ProjectivePlaneIndData C) :
-  (x : ProjectivePlane) → C x
-
-/-- β-rule for the dependent eliminator at the base point. -/
-axiom projectivePlaneInd_base {C : ProjectivePlane → Type v} (data : ProjectivePlaneIndData C) :
-  projectivePlaneInd data projectiveBase = data.base
-
-/-- Dependent β-rule for the fundamental loop. -/
-axiom projectivePlaneInd_loop {C : ProjectivePlane → Type v} (data : ProjectivePlaneIndData C) :
-  Path.trans
-    (Path.symm
-      (Path.congrArg
-        (fun x =>
-          Path.transport (A := ProjectivePlane) (D := fun y => C y) projectiveLoop x)
-        (Path.ofEq (projectivePlaneInd_base (C := C) data))))
-    (Path.trans
-      (Path.apd (A := ProjectivePlane) (B := fun y => C y)
-        (f := projectivePlaneInd data) projectiveLoop)
-      (Path.ofEq (projectivePlaneInd_base (C := C) data))) =
-  data.loop
-
 noncomputable section
 
 open SimpleEquiv
@@ -152,6 +123,10 @@ theorem projectiveEquiv_square :
     simp [SimpleEquiv.comp, projectiveEquiv, SimpleEquiv.refl]
   · intro x
     simp [SimpleEquiv.comp, projectiveEquiv, SimpleEquiv.refl]
+
+section Univalence
+
+variable [HasUnivalence.{0}]
 
 /-- Code family data for the projective plane recursor. -/
 def projectiveCodeData : ProjectivePlaneRecData (Type _) where
@@ -288,10 +263,16 @@ def projectiveEncodePath : Path projectiveBase projectiveBase → Bool :=
   simp only [projectiveCode_transport_loop]
   rfl
 
+end Univalence
+
 /-- Decode an element of Bool (ℤ₂) to a loop on the projective plane. -/
 def projectiveDecode : Bool → Path projectiveBase projectiveBase
   | false => Path.refl projectiveBase
   | true => projectiveLoop
+
+/-- Decode path helper (definitionally the same as `projectiveDecode`). -/
+abbrev projectiveDecodePath : Bool → Path projectiveBase projectiveBase :=
+  projectiveDecode
 
 /-- Decode respects the group structure. -/
 theorem projectiveDecode_add (x y : Bool) :
@@ -338,6 +319,11 @@ def toPathZ2 : Bool → LoopQuot ProjectivePlane projectiveBase
   | false => projectiveReflClass
   | true => projectiveLoopClass
 
+/-- Helper: toPathZ2 is definitionally LoopQuot.ofLoop ∘ projectiveDecodePath. -/
+theorem toPathZ2_eq_ofLoop_decode (b : Bool) :
+    toPathZ2 b = LoopQuot.ofLoop (projectiveDecodePath b) := by
+  cases b <;> rfl
+
 set_option maxHeartbeats 400000 in
 /-- The map is a homomorphism (respects group operation). -/
 theorem toPathZ2_add (x y : Bool) :
@@ -347,6 +333,10 @@ theorem toPathZ2_add (x y : Bool) :
   | false, true => exact LoopQuot.id_comp projectiveLoopClass
   | true, false => exact LoopQuot.comp_id projectiveLoopClass
   | true, true => exact projectiveLoopClass_square
+
+section Univalence
+
+variable [HasUnivalence.{0}]
 
 /-- RwEq paths have the same encoding. -/
 theorem projectiveEncodePath_rweq {p q : Path projectiveBase projectiveBase}
@@ -372,12 +362,6 @@ theorem projectiveEncode_decode (z : Bool) :
     simp only [toPathZ2, projectiveLoopClass, projectiveEncodeQuot]
     simp only [LoopQuot.ofLoop]
     exact projectiveEncodePath_loop
-
-/-- The decode path for a Bool value. -/
-def projectiveDecodePath : Bool → Path projectiveBase projectiveBase
-  | false => Path.refl projectiveBase
-  | true => projectiveLoop
-
 /-- Equality-level helper: `decode ∘ encode = id` on propositional equalities.
 
     For any `e : projectiveBase = projectiveBase`, decoding the encoding
@@ -391,21 +375,24 @@ theorem projectiveDecodeEq_projectiveEncodeEq
 
 /-- **RP² loop classification axiom**: Every loop on RP² is RwEq to
 the decoded form of its ℤ₂ value. -/
-axiom projectiveLoop_rweq_decode (p : Path projectiveBase projectiveBase) :
-    RwEq p (projectiveDecodePath (projectiveEncodePath p))
+class HasProjectiveLoopDecode : Prop where
+  projectiveLoop_rweq_decode (p : Path.{u} projectiveBase projectiveBase) :
+    RwEq.{u} p (projectiveDecodePath (projectiveEncodePath p))
 
-/-- Helper: toPathZ2 is definitionally LoopQuot.ofLoop ∘ projectiveDecodePath. -/
-theorem toPathZ2_eq_ofLoop_decode (b : Bool) :
-    toPathZ2 b = LoopQuot.ofLoop (projectiveDecodePath b) := by
-  cases b <;> rfl
+/-- Every loop is RwEq to the decoded form of its ℤ₂ value. -/
+theorem projectiveLoop_rweq_decode [h : HasProjectiveLoopDecode.{u}]
+    (p : Path.{u} projectiveBase projectiveBase) :
+    RwEq.{u} p (projectiveDecodePath (projectiveEncodePath p)) :=
+  h.projectiveLoop_rweq_decode p
 
-theorem projectiveDecode_encode (x : LoopQuot ProjectivePlane projectiveBase) :
+theorem projectiveDecode_encode [h : HasProjectiveLoopDecode.{u}]
+    (x : LoopQuot ProjectivePlane.{u} projectiveBase) :
     toPathZ2 (projectiveEncodeQuot x) = x := by
   induction x using Quot.ind with
   | _ p =>
     simp only [projectiveEncodeQuot]
     rw [toPathZ2_eq_ofLoop_decode]
-    exact Quot.sound (rweq_symm (projectiveLoop_rweq_decode p))
+    exact Quot.sound (rweq_symm (projectiveLoop_rweq_decode (h := h) p))
 
 /-- The fundamental group of the real projective plane is ℤ₂.
 
@@ -414,11 +401,14 @@ theorem projectiveDecode_encode (x : LoopQuot ProjectivePlane projectiveBase) :
 
     Here ℤ₂ is represented as `Bool` with XOR as addition.
 -/
-def projectivePiOneEquivZ2 : SimpleEquiv (LoopQuot ProjectivePlane projectiveBase) Bool where
+def projectivePiOneEquivZ2 [HasProjectiveLoopDecode.{u}] :
+    SimpleEquiv (LoopQuot ProjectivePlane projectiveBase) Bool where
   toFun := projectiveEncodeQuot
   invFun := toPathZ2
   left_inv := projectiveDecode_encode
   right_inv := projectiveEncode_decode
+
+end Univalence
 
 end
 

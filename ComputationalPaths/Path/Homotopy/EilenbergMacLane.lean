@@ -131,8 +131,8 @@ Here we state that this makes S¹ into K(ℤ,1).
 
 /-- The circle as a pointed type. -/
 noncomputable def circlePointed : PointedType where
-  carrier := Circle
-  pt := circleBase
+  carrier := Circle.{u}
+  pt := circleBase.{u}
 
 /-! ### Circle K(ℤ,1) Infrastructure
 
@@ -159,6 +159,10 @@ theorem circleConnected : (x : Circle) → ∃ _p : Path x circleBase, True := b
   }
   have result := circleInd data x
   exact result.down
+
+section Univalence
+
+variable [HasUnivalence.{0}]
 
 /-- Helper: encoding composition with decode of natural numbers. -/
 private theorem circleEncode_comp_decode_nat (α : π₁(Circle, circleBase)) (n : Nat) :
@@ -215,10 +219,12 @@ private theorem circleEncode_comp_decode (α : π₁(Circle, circleBase)) (n : I
 /-- Circle encoding is a group homomorphism: encode(α · β) = encode(α) + encode(β).
     Proved by rewriting β as circleDecode (circleEncode β) and using the
     helper lemma circleEncode_comp_decode. -/
-theorem circleEncode_mul : ∀ (α β : π₁(Circle, circleBase)),
+theorem circleEncode_mul [HasCircleLoopDecode.{u}] :
+    ∀ (α β : π₁(Circle.{u}, circleBase.{u})),
     circleEncode (LoopQuot.comp α β) = circleEncode α + circleEncode β := by
   intro α β
-  have hβ : β = circleDecode (circleEncode β) := (circleDecode_circleEncode β).symm
+  have hβ : β = circleDecode.{u} (circleEncode β) :=
+    (circleDecode_circleEncode.{u} β).symm
   have step1 : circleEncode (LoopQuot.comp α β) =
                circleEncode (LoopQuot.comp α (circleDecode (circleEncode β))) := by
     rw [← hβ]
@@ -226,16 +232,19 @@ theorem circleEncode_mul : ∀ (α β : π₁(Circle, circleBase)),
   exact circleEncode_comp_decode α (circleEncode β)
 
 /-- The circle is K(ℤ,1). -/
-noncomputable def circleIsKZ1 : IsKG1 circlePointed Int intAbelianGroup.toGroupStr where
+noncomputable def circleIsKZ1 [HasCircleLoopDecode.{u}] :
+    IsKG1 circlePointed Int intAbelianGroup.toGroupStr where
   connected := circleConnected
   pi1_iso_toFun := circleEncode
   pi1_iso_surj := fun z =>
     ⟨circleDecode z, circleEncode_circleDecode z⟩
   pi1_iso_inj := fun α β h => by
-    have hα : circleDecode (circleEncode α) = α := circleDecode_circleEncode α
-    have hβ : circleDecode (circleEncode β) = β := circleDecode_circleEncode β
-    calc α = circleDecode (circleEncode α) := hα.symm
-      _ = circleDecode (circleEncode β) := _root_.congrArg circleDecode h
+    have hα : circleDecode.{u} (circleEncode α) = α :=
+      circleDecode_circleEncode.{u} α
+    have hβ : circleDecode.{u} (circleEncode β) = β :=
+      circleDecode_circleEncode.{u} β
+    calc α = circleDecode.{u} (circleEncode α) := hα.symm
+      _ = circleDecode.{u} (circleEncode β) := _root_.congrArg (circleDecode.{u}) h
       _ = β := hβ
   pi1_iso_one := circleEncodePath_refl
   pi1_iso_mul := circleEncode_mul
@@ -245,9 +254,11 @@ noncomputable def circleIsKZ1 : IsKG1 circlePointed Int intAbelianGroup.toGroupS
 
 /-- Statement: The circle is K(ℤ,1).
     The proof uses the encode-decode method from Circle.lean. -/
-theorem circleIsKZ1_statement :
-    ∃ (_iso : IsKG1 circlePointed Int intAbelianGroup.toGroupStr), True :=
+theorem circleIsKZ1_statement [HasCircleLoopDecode.{u}] :
+    ∃ (_iso : IsKG1.{0, u} circlePointed Int intAbelianGroup.toGroupStr), True :=
   ⟨circleIsKZ1, trivial⟩
+
+end Univalence
 
 /-! ## Loop Space of K(G,n+1)
 

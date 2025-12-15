@@ -37,17 +37,22 @@ namespace ComputationalPaths.Path
 
 universe u
 
-/-- **Identity path equivalence axiom**: `Path.ofEq rfl` is RwEq to `Path.refl a`.
+/-- `Path.ofEq rfl` rewrites to `Path.refl`.
 
 These two paths represent the same identity operation:
 - `refl a` has an empty step list `[]`
 - `ofEq rfl` has a single identity step `[Step.mk a a rfl]`
 
-Both have `toEq = rfl`, making them equivalent representations of the
-identity path. This axiom allows converting between these representations
-without collapsing all paths with the same toEq (which would be unsound). -/
-axiom rweq_ofEq_rfl_refl {A : Type u} (a : A) :
-    RwEq (Path.ofEq (rfl : a = a)) (Path.refl a)
+We can relate them via the primitive rewrite rule `Step.transport_refl_beta`,
+instantiated with a constant family. This avoids the unsound global
+canonicalization rule (`Step.canon`). -/
+theorem rweq_ofEq_rfl_refl {A : Type u} (a : A) :
+    RwEq (Path.ofEq (rfl : a = a)) (Path.refl a) := by
+  -- `transport (refl ⋆) a = a` is definitional for the constant family `fun _ => A`.
+  simpa using
+    (RwEq.step <|
+      Step.transport_refl_beta (A := PUnit) (B := fun _ : PUnit => A)
+        (a := PUnit.unit) (x := a))
 
 /-- Any path constructed from refl via operations that preserve toEq
     will satisfy the reflexivity theorem. Since congrArg, app, lamCongr

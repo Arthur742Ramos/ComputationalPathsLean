@@ -239,10 +239,53 @@ end RewriteLift
     RwEq (Path.congrArg f (Path.refl a)) (Path.refl (f a)) :=
   rweq_refl _
 
-/-- **Constant function axiom**: congrArg of a constant function applied to any path
-is RwEq to refl. This captures that paths under constant maps collapse. -/
-axiom rweq_congrArg_const {B : Type u} (b : B)
-    {a₁ a₂ : A} (p : Path a₁ a₂) : RwEq (Path.congrArg (fun _ => b) p) (Path.refl b)
+/-- Congruence along a constant map collapses to reflexivity.
+
+This is derivable from the primitive rewrite rule `Step.transport_refl_beta`,
+instantiated with a constant family, plus the usual `trans` congruence rules. -/
+@[simp] theorem rweq_congrArg_const {B : Type u} (b : B)
+    {a₁ a₂ : A} (p : Path a₁ a₂) : RwEq (Path.congrArg (fun _ => b) p) (Path.refl b) := by
+  -- Reduce to the case where the underlying equality proof is reflexive.
+  cases p with
+  | mk steps proof =>
+      cases proof
+      -- Now `p = Path.mk steps rfl`.
+      -- We show that any list of reflexive steps in the codomain rewrites to `refl`.
+      -- The key base rewrite is `ofEq rfl ▷ refl`, which is `transport_refl_beta`.
+      have hOfEq : RwEq (Path.ofEq (rfl : b = b)) (Path.refl b) := by
+        simpa using
+          (RwEq.step <|
+            Step.transport_refl_beta (A := PUnit) (B := fun _ : PUnit => B)
+              (a := PUnit.unit) (x := b))
+      -- Prove the claim by induction on the stored step list.
+      -- (The endpoints of a `Path` are carried by the `proof` field, so we pin them explicitly.)
+      have : RwEq (Path.congrArg (fun _ : A => b) (Path.mk (A := A) (a := a₁) (b := a₁) steps rfl))
+          (Path.refl b) := by
+        induction steps with
+        | nil =>
+            simp [Path.congrArg, Path.refl]
+        | cons s tail ih =>
+            -- Peel one step: after mapping through the constant function it becomes `ofEq rfl`.
+            cases s with
+            | mk src tgt stepProof =>
+                cases stepProof
+                -- With a reflexive source step, the mapped path is definitionally a `trans` with `ofEq rfl`.
+                have hsplit :
+                    Path.congrArg (fun _ : A => b)
+                        (Path.mk (A := A) (a := a₁) (b := a₁)
+                          (ComputationalPaths.Step.mk src src rfl :: tail) rfl) =
+                      Path.trans (Path.ofEq (rfl : b = b))
+                        (Path.congrArg (fun _ : A => b)
+                          (Path.mk (A := A) (a := a₁) (b := a₁) tail rfl)) := by
+                  rfl
+                -- Rewrite to the split form, then reduce the left factor to `refl` and use the IH.
+                exact
+                  RwEq.trans (rweq_of_eq hsplit)
+                    (RwEq.trans
+                      (RwEq.trans (rweq_trans_congr_left _ hOfEq)
+                        (rweq_of_step (Step.trans_refl_left _)))
+                      ih)
+      simpa [Path.congrArg] using this
 
 @[simp] theorem rweq_mapLeft_trans {B : Type v} {C : Type w}
     {a1 a2 a3 : A} (f : A → B → C)

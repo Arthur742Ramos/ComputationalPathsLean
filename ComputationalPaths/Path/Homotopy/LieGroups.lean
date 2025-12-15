@@ -147,14 +147,16 @@ This is inherited directly from π₁(S¹) ≃ ℤ.
 
 **Physical interpretation**: The integer n corresponds to the winding number -
 how many times a loop in SO(2) "wraps around" the group. -/
-noncomputable def piOneEquivInt : SimpleEquiv (π₁(SO2, e)) Int :=
+noncomputable def piOneEquivInt [HasUnivalence.{0}] [HasCircleLoopDecode.{u}] :
+    SimpleEquiv (π₁(SO2, e)) Int :=
   circlePiOneEquivInt
 
 /-- The fundamental loop as an element of π₁(SO(2)). -/
 noncomputable def piOneGenerator : π₁(SO2, e) := circlePiOneLoop
 
 /-- The winding number of a loop in SO(2). -/
-noncomputable def windingNumber : π₁(SO2, e) → Int := circleWindingNumber
+noncomputable def windingNumber [HasUnivalence.{0}] : π₁(SO2, e) → Int :=
+  circleWindingNumber
 
 end SO2
 
@@ -166,7 +168,9 @@ abbrev U1 : Type u := Circle
 namespace U1
 
 noncomputable def e : U1 := circleBase
-noncomputable def piOneEquivInt : SimpleEquiv (π₁(U1, e)) Int := circlePiOneEquivInt
+noncomputable def piOneEquivInt [HasUnivalence.{0}] [HasCircleLoopDecode.{u}] :
+    SimpleEquiv (π₁(U1, e)) Int :=
+  circlePiOneEquivInt
 
 end U1
 
@@ -209,14 +213,18 @@ noncomputable def base : (n : Nat) → TorusN n
 
 /-- **TorusN 0 theorem**: Parallel paths in TorusN 0 (a point) are RwEq.
 T⁰ = PUnit', which is a set. Derived from `decidableEq_implies_isHSet`. -/
-theorem torusN_zero_pathEq {a b : TorusN 0} (p q : Path a b) : RwEq p q :=
-  decidableEq_implies_isHSet p q
+theorem torusN_zero_pathEq [h : HasDecidableEqAxiomK.{u} (TorusN.{u} 0)]
+    {a b : TorusN.{u} 0} (p q : Path.{u} a b) : RwEq.{u} p q :=
+  (@decidableEq_implies_isHSet.{u} (A := TorusN.{u} 0) _ h) (a := a) (b := b) p q
 
 /-- T⁰ is a point, with trivial π₁. -/
-theorem torusN_zero_trivial (α : π₁(TorusN 0, base 0)) :
-    α = Quot.mk _ (Path.refl (base 0)) := by
+theorem torusN_zero_trivial [h : HasDecidableEqAxiomK.{u} (TorusN.{u} 0)]
+    (α : π₁(TorusN.{u} 0, TorusN.base.{u} 0)) :
+    α = Quot.mk _ (Path.refl (TorusN.base.{u} 0)) := by
   induction α using Quot.ind with
-  | _ p => exact Quot.sound (torusN_zero_pathEq p (Path.refl (base 0)))
+  | _ p =>
+      exact Quot.sound
+        (torusN_zero_pathEq (h := h) p (Path.refl (TorusN.base.{u} 0)))
 
 /-- T¹ ≃ S¹ -/
 def torusOneEquivCircle : SimpleEquiv (TorusN 1) Circle where
@@ -239,7 +247,8 @@ def IntTuple.zero : (n : Nat) → IntTuple n
 
 This is already proved in Torus.lean. The torus is the simplest
 compact non-simply-connected abelian Lie group of rank 2. -/
-noncomputable def torus2PiOneEquiv : SimpleEquiv (π₁(Torus, torusBase)) (Int × Int) :=
+noncomputable def torus2PiOneEquiv [HasUnivalence.{0}] [HasTorusLoopDecode.{u}] :
+    SimpleEquiv (π₁(Torus, torusBase)) (Int × Int) :=
   torusPiOneEquivIntProd
 
 end TorusN
@@ -300,6 +309,9 @@ def IsSimplyConnected (A : Type u) : Prop :=
 /-- S² is simply connected at the basepoint.
     (This is proved in Sphere.lean as sphere2_pi1_trivial) -/
 theorem sphere2_simplyConnected_at_base
+    [HasDecidableEqAxiomK PUnit'.{u}]
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
+      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
     [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
       (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
     ∀ (α : π₁(Sphere2.{u}, (Sphere2.basepoint : Sphere2.{u}))),
@@ -334,7 +346,7 @@ section Z2FundamentalGroup
 
 For n ≥ 3, SO(n) has π₁ ≃ ℤ₂. The double cover is the spin group Spin(n).
 RP² demonstrates this structure in the computational paths framework. -/
-noncomputable def rp2_piOne_equiv_Z2 :
+noncomputable def rp2_piOne_equiv_Z2 [HasUnivalence.{0}] [HasProjectiveLoopDecode.{u}] :
     SimpleEquiv (π₁(ProjectivePlane, projectiveBase)) Bool :=
   projectivePiOneEquivZ2
 
@@ -364,7 +376,8 @@ noncomputable def torusN_product_step (n : Nat) :
 /-- π₁(T¹) ≃ π₁(point) × π₁(S¹) ≃ 1 × ℤ ≃ ℤ
 
 The first component (π₁ of a point) is trivial, so this reduces to π₁(S¹) ≃ ℤ. -/
-noncomputable def torusN1_piOne_equiv_int :
+noncomputable def torusN1_piOne_equiv_int [HasUnivalence.{0}] [HasCircleLoopDecode.{u}]
+    [h0 : HasDecidableEqAxiomK.{u} (TorusN 0)] :
     SimpleEquiv (π₁(TorusN 1, TorusN.base 1)) Int :=
   SimpleEquiv.comp
     (torusN_product_step 0)
@@ -374,7 +387,8 @@ noncomputable def torusN1_piOne_equiv_int :
         intro (α, β)
         have hα : α = Quot.mk _ (Path.refl PUnit'.unit) := by
           induction α using Quot.ind with
-          | _ p => exact Quot.sound (TorusN.torusN_zero_pathEq p (Path.refl PUnit'.unit))
+          | _ p =>
+              exact Quot.sound (TorusN.torusN_zero_pathEq (h := h0) p (Path.refl PUnit'.unit))
         have hβ : circleDecode (circleWindingNumber β) = β :=
           circleDecode_circleEncode β
         simp only [hα, hβ]

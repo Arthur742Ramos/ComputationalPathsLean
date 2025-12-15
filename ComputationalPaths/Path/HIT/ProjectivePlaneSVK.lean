@@ -94,7 +94,7 @@ theorem boundaryMap_loop :
 /-! ### The Collapse Map -/
 
 /-- The trivial collapse map: Circle → UnitU. -/
-def collapseMap : Circle → UnitU := fun _ => unitU
+def collapseMap : Circle.{u} → UnitU.{u} := fun _ => (unitU : UnitU.{u})
 
 /-! ## RP² as Pushout -/
 
@@ -132,7 +132,8 @@ noncomputable def glueBase : Path (@Pushout.inl Circle UnitU Circle boundaryMap 
 Uses `unitU_loop_rweq_refl` from KleinBottleSVK. -/
 theorem collapseMap_circleLoop_rweq_refl :
     RwEq (Path.congrArg collapseMap circleLoop) (Path.refl unitU) := by
-  apply KleinBottleSVK.unitU_loop_rweq_refl
+  simpa [collapseMap] using
+    (KleinBottleSVK.congrArg_const_rweq_refl (A := Circle) (B := UnitU) unitU circleLoop)
 
 /-- inrPath of a loop RwEq to refl gives refl. Concrete version for our pushout. -/
 theorem inrPath_rweq_refl_concrete
@@ -142,27 +143,27 @@ theorem inrPath_rweq_refl_concrete
   apply rweq_trans (rweq_congrArg_of_rweq (@Pushout.inr Circle UnitU Circle boundaryMap collapseMap) h)
   exact rweq_refl _
 
-/-- **Projective plane boundary axiom**: `inlPath (congrArg boundaryMap circleLoop)` is RwEq to refl.
-This captures the geometric fact about the projective plane construction. -/
-axiom inlPath_congrArg_boundaryMap_loop_rweq : RwEq
-  (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
-    (Path.congrArg boundaryMap circleLoop))
-  (Path.refl (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase)))
+/-!
+The SVK presentation of RP² requires two geometric facts about the boundary
+circle and its image in the pushout.  We record these as a single typeclass so
+downstream results can remain explicit about their assumptions. -/
+
+class HasBoundaryFacts : Prop where
+  inlPath_congrArg_boundaryMap_loop_rweq :
+    RwEq.{u}
+      (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+        (Path.congrArg boundaryMap circleLoop))
+      (Path.refl (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase)))
+  boundary_relation :
+    RwEq.{u} boundaryWordSVK (Path.refl baseSVK)
 
 /-- `inlPath (congrArg boundaryMap circleLoop)` is RwEq to refl. -/
-theorem inlPath_congrArg_boundaryMap_loop_rweq_refl :
-    RwEq (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
-            (Path.congrArg boundaryMap circleLoop))
-         (Path.refl (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase))) :=
-  inlPath_congrArg_boundaryMap_loop_rweq
-
-/-- **Projective plane SVK boundary axiom**: The boundary word `a²` is nullhomotopic.
-This is a specific geometric fact about the projective plane. -/
-axiom boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK)
+abbrev inlPath_congrArg_boundaryMap_loop_rweq_refl [h : HasBoundaryFacts.{u}] :=
+  h.inlPath_congrArg_boundaryMap_loop_rweq
 
 /-- The boundary relation: `a²` is homotopic to the trivial loop. -/
-theorem boundary_relation : RwEq boundaryWordSVK (Path.refl baseSVK) :=
-  boundary_relation_axiom
+abbrev boundary_relation [h : HasBoundaryFacts.{u}] :=
+  h.boundary_relation
 
 /-! ## Fundamental Group via SVK -/
 

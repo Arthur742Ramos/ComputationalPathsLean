@@ -217,12 +217,14 @@ Since UnitU has only one element, all paths are equivalent to refl.
 /-- **UnitU set theorem**: Parallel paths in UnitU are RwEq.
 UnitU has only one element, so it's trivially a set.
 Derived from `decidableEq_implies_isHSet` since UnitU has DecidableEq. -/
-theorem unitU_pathEq {a b : UnitU} (p q : Path a b) : RwEq p q :=
-  decidableEq_implies_isHSet p q
+theorem unitU_pathEq [h : HasDecidableEqAxiomK.{u} UnitU]
+    {a b : UnitU} (p q : Path.{u} a b) : RwEq.{u} p q :=
+  (@decidableEq_implies_isHSet.{u} (A := UnitU) _ h) (a := a) (b := b) p q
 
 /-- Any loop in UnitU is RwEq to refl. -/
-theorem unitU_loop_rweq_refl (p : Path unitU unitU) : RwEq p (Path.refl unitU) :=
-  unitU_pathEq p (Path.refl unitU)
+theorem unitU_loop_rweq_refl [h : HasDecidableEqAxiomK.{u} UnitU]
+    (p : Path.{u} unitU unitU) : RwEq.{u} p (Path.refl unitU) :=
+  unitU_pathEq (h := h) p (Path.refl unitU)
 
 /-- congrArg of a constant function applied to any path is RwEq to refl.
 Uses `rweq_congrArg_const` from RwEq.lean. -/
@@ -241,11 +243,13 @@ theorem inrPath_rweq_refl {A : Type u} {B : Type u} {C : Type u}
 
 /-- **Klein bottle boundary axiom**: The boundary word `aba⁻¹b` is nullhomotopic in
 the SVK construction. This is a specific geometric fact about the Klein bottle. -/
-axiom boundary_relation_axiom : RwEq boundaryWordSVK (Path.refl baseSVK)
+class HasBoundaryRelation : Prop where
+  boundary_relation : RwEq boundaryWordSVK.{u} (Path.refl baseSVK.{u})
 
- /-- The boundary relation: `aba⁻¹b` is homotopic to the trivial loop. -/
- theorem boundary_relation : RwEq boundaryWordSVK (Path.refl baseSVK) :=
-   boundary_relation_axiom
+/-- The boundary relation: `aba⁻¹b` is homotopic to the trivial loop. -/
+theorem boundary_relation [HasBoundaryRelation.{u}] :
+    RwEq boundaryWordSVK.{u} (Path.refl baseSVK.{u}) :=
+  HasBoundaryRelation.boundary_relation
 
 /-! ## Fundamental Group via SVK
 

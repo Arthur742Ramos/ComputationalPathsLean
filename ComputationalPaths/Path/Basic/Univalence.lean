@@ -21,27 +21,40 @@ namespace Path
 
 universe u
 
+/-- Assumed univalence interface: every `SimpleEquiv` between types determines an
+equality between them, and transport along that equality computes to the forward
+map.  We keep this as an explicit `Prop`-valued typeclass so downstream results
+can record precisely where univalence is required. -/
+class HasUnivalence : Prop where
+  uaEq {A B : Type u} : SimpleEquiv A B → A = B
+  ua_beta {A B : Type u} (e : SimpleEquiv A B) (x : A) :
+      Path.transport (A := Type u) (D := fun X => X)
+          (Path.mk [] (uaEq (A := A) (B := B) e)) x =
+        e.toFun x
+
 /-- Axiomatised univalence (propositional form): every `SimpleEquiv` between
 types determines an equality between them. -/
-axiom uaEq {A B : Type u} : SimpleEquiv A B → A = B
+theorem uaEq [HasUnivalence.{u}] {A B : Type u} (e : SimpleEquiv A B) : A = B :=
+  HasUnivalence.uaEq e
 
 /-- Axiomatised univalence (computational-path form): package `uaEq` as a
 `Path` in `Type u`.
 
 We fix the step list to `[]` so coherences like `ua_trans` become theorems
 (their proof components live in `Prop`). -/
-def ua {A B : Type u} (e : SimpleEquiv A B) : Path (A := Type u) A B :=
+def ua {A B : Type u} [HasUnivalence.{u}] (e : SimpleEquiv A B) : Path (A := Type u) A B :=
   Path.mk [] (uaEq e)
 
 /-- Transport along the path produced by `ua` computes to the forward map of
 the equivalence. -/
-axiom ua_beta {A B : Type u} (e : SimpleEquiv A B) (x : A) :
+theorem ua_beta [h : HasUnivalence.{u}] {A B : Type u} (e : SimpleEquiv A B) (x : A) :
     Path.transport (A := Type u) (D := fun X => X) (ua (A := A) (B := B) e) x =
-      e.toFun x
+      e.toFun x := by
+  simpa [ua] using h.ua_beta (e := e) (x := x)
 
 /-- Transporting along the inverse univalence path recovers the inverse map of
 the equivalence. -/
-@[simp] theorem ua_beta_symm {A B : Type u} (e : SimpleEquiv A B) (y : B) :
+@[simp] theorem ua_beta_symm [HasUnivalence.{u}] {A B : Type u} (e : SimpleEquiv A B) (y : B) :
     Path.transport (A := Type u) (D := fun X => X)
         (Path.symm (ua (A := A) (B := B) e)) y =
       e.invFun y := by
@@ -61,7 +74,7 @@ the equivalence. -/
 
 /-- Univalence preserves composition: the path for a composite equivalence is
 the concatenation of the paths. -/
-theorem ua_trans {A B C : Type u} (e : SimpleEquiv A B) (f : SimpleEquiv B C) :
+theorem ua_trans [HasUnivalence.{u}] {A B C : Type u} (e : SimpleEquiv A B) (f : SimpleEquiv B C) :
     Path.trans (ua e) (ua f) = ua (SimpleEquiv.comp e f) := by
   have h :
       (uaEq (A := A) (B := B) e).trans (uaEq (A := B) (B := C) f) =
@@ -72,7 +85,7 @@ theorem ua_trans {A B C : Type u} (e : SimpleEquiv A B) (f : SimpleEquiv B C) :
 
 /-- Univalence preserves inverses: the path for the inverse equivalence is
 the symmetric path. -/
-theorem ua_symm {A B : Type u} (e : SimpleEquiv A B) :
+theorem ua_symm [HasUnivalence.{u}] {A B : Type u} (e : SimpleEquiv A B) :
     Path.symm (ua e) = ua (SimpleEquiv.symm e) := by
   have h :
       (uaEq (A := A) (B := B) e).symm =
@@ -82,7 +95,7 @@ theorem ua_symm {A B : Type u} (e : SimpleEquiv A B) :
   simp [ua, Path.symm]
 
 /-- Univalence maps the identity equivalence to the identity path. -/
-theorem ua_refl (A : Type u) :
+theorem ua_refl [HasUnivalence.{u}] (A : Type u) :
     ua (SimpleEquiv.refl A) = Path.refl A := by
   have h : uaEq (A := A) (B := A) (SimpleEquiv.refl A) = rfl := by
     exact Subsingleton.elim _ _

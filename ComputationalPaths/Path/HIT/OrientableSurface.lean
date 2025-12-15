@@ -232,53 +232,6 @@ This is the defining relation of the surface group. -/
 axiom surfaceRelation (g : Nat) (hg : g > 0) :
     RwEq (surfaceRelationPath g) (Path.refl (base g))
 
-/-- Path connectivity of Σ_g. -/
-axiom isPathConnected (g : Nat) : IsPathConnected (OrientableSurface g)
-
-/-! ## Recursion Principle for Orientable Surface
-
-To define functions out of Σ_g, we need:
-1. A value at the base point
-2. Loops corresponding to each aᵢ and bᵢ
-3. A proof that the surface relation holds in the target
--/
-
-/-- Data for the non-dependent eliminator of Σ_g. -/
-structure RecData (g : Nat) (D : Type v) where
-  /-- Image of the base point. -/
-  onBase : D
-  /-- Image of loop aᵢ. -/
-  onLoopA : (i : Fin' g) → Path onBase onBase
-  /-- Image of loop bᵢ. -/
-  onLoopB : (i : Fin' g) → Path onBase onBase
-
-/-- Non-dependent eliminator for Σ_g.
-Given RecData, produces a function Σ_g → D. -/
-axiom rec' {g : Nat} {D : Type v} (data : RecData g D) :
-    OrientableSurface g → D
-
-/-- Computation rule at base. -/
-axiom rec'_base {g : Nat} {D : Type v} (data : RecData g D) :
-    rec' data (base g) = data.onBase
-
-/-- Computation rule for loopA. -/
-axiom rec'_loopA {g : Nat} {D : Type v} (data : RecData g D) (i : Fin' g) :
-    Path.trans
-      (Path.symm (Path.ofEq (rec'_base data)))
-      (Path.trans
-        (Path.congrArg (rec' data) (loopA g i))
-        (Path.ofEq (rec'_base data))) =
-    data.onLoopA i
-
-/-- Computation rule for loopB. -/
-axiom rec'_loopB {g : Nat} {D : Type v} (data : RecData g D) (i : Fin' g) :
-    Path.trans
-      (Path.symm (Path.ofEq (rec'_base data)))
-      (Path.trans
-        (Path.congrArg (rec' data) (loopB g i))
-        (Path.ofEq (rec'_base data))) =
-    data.onLoopB i
-
 /-! ## Fundamental Group of Σ_g -/
 
 /-- The fundamental group π₁(Σ_g, base). -/
@@ -1218,21 +1171,28 @@ section SpecialCases
 -- For genus 0, Σ₀ = S² (the 2-sphere).
 -- π₁(S²) is trivial since all loops can be contracted using the 2-cell.
 
-/-- **Genus 0 surface axiom**: Parallel paths in S² (genus 0 surface) are RwEq.
-S² is simply connected (π₁ = 1), so all loops are trivial. -/
-axiom genus0_pathEq (p q : Path (A := OrientableSurface 0) (base 0) (base 0)) : RwEq p q
+/-!
+`OrientableSurface 0` is intended to model the 2-sphere.  The development in
+this file does not yet construct the full encode/decode proof of simple
+connectivity, so we package the needed loop-triviality assumption as a typeclass
+instead of a global axiom. -/
+
+class HasGenus0PathEq : Prop where
+  pathEq :
+    (p q : Path (A := OrientableSurface.{u} 0) (base.{u} 0) (base.{u} 0)) → RwEq p q
 
 /-- Every loop on S² (genus 0 surface) is trivial.
 This is provable because there are no generators at genus 0:
 `Fin' 0` is empty, so `FreeGroupWord 0` contains only `nil`. -/
-theorem genus0_loop_trivial (p : Path (base 0) (base 0)) :
-    RwEq p (Path.refl (base 0)) :=
-  genus0_pathEq p (Path.refl (base 0))
+theorem genus0_loop_trivial (p : Path (base.{u} 0) (base.{u} 0)) [h : HasGenus0PathEq.{u}] :
+    RwEq p (Path.refl (base.{u} 0)) :=
+  h.pathEq p (Path.refl (base.{u} 0))
 
 /-- π₁(Σ₀) ≃ 1 (trivial group). -/
-noncomputable def genus0_equiv_unit : SimpleEquiv (SurfacePiOne 0) Unit where
+noncomputable def genus0_equiv_unit [h : HasGenus0PathEq.{u}] :
+    SimpleEquiv (SurfacePiOne 0) Unit where
   toFun := fun _ => ()
-  invFun := fun _ => Quot.mk _ (Path.refl (base 0))
+  invFun := fun _ => Quot.mk _ (Path.refl (base.{u} 0))
   left_inv := fun α => by
     induction α using Quot.ind with
     | _ p => exact Quot.sound (rweq_symm (genus0_loop_trivial p))

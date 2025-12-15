@@ -73,7 +73,7 @@ S² is path-connected because it's a suspension of a non-empty type.
 instance : Nonempty Circle := ⟨circleBase⟩
 
 /-- PUnit' is path-connected (trivially, it has one point). -/
-theorem punit_isPathConnected : IsPathConnected PUnit' := by
+theorem punit_isPathConnected : IsPathConnected PUnit'.{u} := by
   intro a b
   cases a; cases b
   exact ⟨Path.refl _⟩
@@ -90,7 +90,7 @@ theorem sphere2_isPathConnected : IsPathConnected Sphere2 := by
 /-! ## Fundamental Group of PUnit' is Trivial -/
 
 /-- The loop space at the unique point of PUnit'. -/
-abbrev PUnitLoopSpace : Type u := LoopSpace PUnit' PUnit'.unit
+abbrev PUnitLoopSpace : Type u := LoopSpace PUnit'.{u} PUnit'.unit
 
 /-- Every loop in PUnit' is refl (there's only one point). -/
 theorem punit_loop_is_refl (p : PUnitLoopSpace) : p.toEq = Eq.refl PUnit'.unit := by
@@ -99,15 +99,18 @@ theorem punit_loop_is_refl (p : PUnitLoopSpace) : p.toEq = Eq.refl PUnit'.unit :
 /-- **PUnit' set theorem**: Parallel paths in PUnit' are RwEq.
 PUnit' is a proposition (has at most one element), so it's trivially a set.
 Derived from `decidableEq_implies_isHSet` since PUnit' has DecidableEq. -/
-theorem punit_pathEq {a b : PUnit'} (p q : Path a b) : RwEq p q :=
-  decidableEq_implies_isHSet p q
+theorem punit_pathEq [h : HasDecidableEqAxiomK PUnit'.{u}]
+    {a b : PUnit'.{u}} (p q : Path.{u} a b) : RwEq.{u} p q :=
+  decidableEq_implies_isHSet (A := PUnit'.{u}) (a := a) (b := b) p q
 
 /-- Any two loops in PUnit' are RwEq. -/
-theorem punit_loops_rweq (p q : PUnitLoopSpace) : RwEq p q :=
-  punit_pathEq p q
+theorem punit_loops_rweq [h : HasDecidableEqAxiomK PUnit'.{u}]
+    (p q : PUnitLoopSpace.{u}) : RwEq.{u} p q :=
+  punit_pathEq (h := h) p q
 
 /-- π₁(PUnit') has exactly one element (the trivial group). -/
-theorem punit_pi1_trivial : ∀ (α : π₁(PUnit', PUnit'.unit)), α = Quot.mk _ (Path.refl _) := by
+theorem punit_pi1_trivial [HasDecidableEqAxiomK PUnit'.{u}] :
+    ∀ (α : π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u}))), α = Quot.mk _ (Path.refl _) := by
   intro α
   induction α using Quot.ind with
   | _ p =>
@@ -115,7 +118,8 @@ theorem punit_pi1_trivial : ∀ (α : π₁(PUnit', PUnit'.unit)), α = Quot.mk 
     exact punit_loops_rweq p (Path.refl _)
 
 /-- The trivial group structure: π₁(PUnit') ≃ Unit. -/
-noncomputable def punit_pi1_equiv_unit : SimpleEquiv (π₁(PUnit', PUnit'.unit)) Unit where
+noncomputable def punit_pi1_equiv_unit [HasDecidableEqAxiomK PUnit'.{u}] :
+    SimpleEquiv (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u}))) Unit where
   toFun := fun _ => ()
   invFun := fun _ => Quot.mk _ (Path.refl _)
   left_inv := by
@@ -147,10 +151,10 @@ By SVK:
 -/
 
 /-- The constant map from Circle to PUnit'. -/
-def circleToNorth : Circle → PUnit' := fun _ => PUnit'.unit
+def circleToNorth : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
 
 /-- The constant map from Circle to PUnit'. -/
-def circleToSouth : Circle → PUnit' := fun _ => PUnit'.unit
+def circleToSouth : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
 
 /-! ## Key Lemmas for Trivial Decode
 
@@ -186,12 +190,13 @@ theorem glue_conj_refl_rweq {A B C : Type u} {f : C → A} {g : C → B} (c : C)
 
 /-- For any element α : π₁(PUnit', PUnit'.unit), its image under the left inclusion
     into the pushout's fundamental group is the identity element. -/
-theorem trivial_left_inclusion
-    {C : Type u} {f : C → PUnit'} {g : C → PUnit'} (c₀ : C) (α : π₁(PUnit', PUnit'.unit)) :
+theorem trivial_left_inclusion [HasDecidableEqAxiomK PUnit'.{u}]
+    {C : Type u} {f : C → PUnit'.{u}} {g : C → PUnit'.{u}} (c₀ : C)
+    (α : π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u}))) :
     (Quot.lift
       (fun p => Quot.mk _ (Pushout.inlPath p))
       (fun _ _ hp => Quot.sound (rweq_congrArg_of_rweq Pushout.inl hp))
-      α : π₁(Pushout PUnit' PUnit' C f g, Pushout.inl (f c₀))) =
+      α : π₁(Pushout PUnit'.{u} PUnit'.{u} C f g, Pushout.inl (f c₀))) =
     Quot.mk _ (Path.refl _) := by
   -- Since α : π₁(PUnit'), we have α = Quot.mk _ refl
   have hα := punit_pi1_trivial α
@@ -202,8 +207,9 @@ theorem trivial_left_inclusion
 
 /-- For any element β : π₁(PUnit', PUnit'.unit), its conjugated image
     (via glue · inrPath · glue⁻¹) is the identity element. -/
-theorem trivial_right_inclusion
-    {C : Type u} {f : C → PUnit'} {g : C → PUnit'} (c₀ : C) (β : π₁(PUnit', PUnit'.unit)) :
+theorem trivial_right_inclusion [HasDecidableEqAxiomK PUnit'.{u}]
+    {C : Type u} {f : C → PUnit'.{u}} {g : C → PUnit'.{u}} (c₀ : C)
+    (β : π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u}))) :
     (Quot.lift
       (fun q => Quot.mk _ (Path.trans
           (Pushout.glue c₀)
@@ -212,7 +218,7 @@ theorem trivial_right_inclusion
       (fun _ _ hq => Quot.sound (
         rweq_trans_congr_right _ (rweq_trans_congr_left _
           (rweq_congrArg_of_rweq Pushout.inr hq))))
-      β : π₁(Pushout PUnit' PUnit' C f g, Pushout.inl (f c₀))) =
+      β : π₁(Pushout PUnit'.{u} PUnit'.{u} C f g, Pushout.inl (f c₀))) =
     Quot.mk _ (Path.refl _) := by
   -- Since β : π₁(PUnit'), we have β = Quot.mk _ refl
   have hβ := punit_pi1_trivial β
@@ -227,9 +233,11 @@ theorem trivial_right_inclusion
 /-- The decode function on words over trivial groups produces the identity element.
     This is the key lemma: when both factors π₁(A) and π₁(B) are trivial,
     every word in the free product decodes to refl. -/
-theorem trivial_decode
-    {C : Type u} (f : C → PUnit') (g : C → PUnit') (c₀ : C)
-    (w : FreeProductWord (π₁(PUnit', PUnit'.unit)) (π₁(PUnit', PUnit'.unit))) :
+theorem trivial_decode [HasDecidableEqAxiomK PUnit'.{u}]
+    {C : Type u} (f : C → PUnit'.{u}) (g : C → PUnit'.{u}) (c₀ : C)
+    (w : FreeProductWord
+      (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u})))
+      (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u})))) :
     pushoutDecode (f := f) (g := g) c₀ w = Quot.mk _ (Path.refl _) := by
   induction w with
   | nil =>
@@ -255,10 +263,11 @@ theorem trivial_decode
       exact piOneMul_refl_left _
 
 /-- Every element of the amalgamated free product over trivial groups is one. -/
-theorem amalg_trivial_is_one
-    {C : Type u} (f : C → PUnit') (g : C → PUnit') (c₀ : C) :
-    ∀ (x : AmalgamatedFreeProduct (π₁(PUnit', f c₀)) (π₁(PUnit', g c₀))
-           (π₁(C, c₀)) (piOneFmap c₀) (piOneGmap c₀)),
+theorem amalg_trivial_is_one [HasDecidableEqAxiomK PUnit'.{u}]
+    {C : Type u} (f : C → PUnit'.{u}) (g : C → PUnit'.{u}) (c₀ : C)
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := C) (f := f) (g := g)] :
+    ∀ (x : AmalgamatedFreeProduct (π₁(PUnit'.{u}, f c₀)) (π₁(PUnit'.{u}, g c₀))
+            (π₁(C, c₀)) (piOneFmap c₀) (piOneGmap c₀)),
     pushoutDecodeAmalg (f := f) (g := g) c₀ x = Quot.mk _ (Path.refl _) := by
   intro x
   induction x using Quot.ind with
@@ -282,7 +291,9 @@ theorem amalg_trivial_is_one
        decode(x) = Quot.mk _ refl (by trivial_decode)
     4. By the SVK equivalence: α = decode(encode(α)) = Quot.mk _ refl
 -/
-theorem sphere2_pi1_trivial
+theorem sphere2_pi1_trivial [HasDecidableEqAxiomK PUnit'.{u}]
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
+      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
     [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
       (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
     ∀ (α : π₁(Sphere2.{u}, (basepoint : Sphere2.{u}))), α = Quot.mk _ (Path.refl _) := by
@@ -326,7 +337,9 @@ theorem sphere2_pi1_trivial
   exact amalg_trivial_is_one f g c₀ encoded
 
 /-- π₁(S²) ≃ 1 (the trivial group). -/
-noncomputable def sphere2_pi1_equiv_unit
+noncomputable def sphere2_pi1_equiv_unit [HasDecidableEqAxiomK PUnit'.{u}]
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
+      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
     [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
       (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
     SimpleEquiv (π₁(Sphere2.{u}, (basepoint : Sphere2.{u}))) Unit where

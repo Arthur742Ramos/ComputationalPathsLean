@@ -20,7 +20,7 @@ In HoTT, covering spaces correspond to:
 - `IsCovering P`: P is a covering of A
 - `pathLift`: Lifting paths from base to total space
 - `fiberAction`: Action of π₁(A, a) on P(a)
-- `universalCover`: The covering with fiber = π₁
+- `UniversalCover` (future work): the covering with fiber = π₁
 
 ## References
 
@@ -167,32 +167,6 @@ theorem fiberAction_id {P : A → Type u} {a : A} (x : P a) :
     fiberAction (Quot.mk _ (Path.refl a)) x = x := by
   unfold fiberAction loopAction fiberTransport
   rfl
-
-/-! ## Universal Cover
-
-The universal cover of A at basepoint a has fiber = π₁(A, a) itself.
-Loops act by multiplication in the group.
--/
-
-/-- The universal cover of A at basepoint a.
-The fiber at any point b connected to a is π₁(A, a). -/
-noncomputable def UniversalCoverFiber (A : Type u) (a : A) : A → Type u :=
-  fun _ => π₁(A, a)
-
-/-- **Universal cover fiber axiom**: Parallel paths in the universal cover fiber are RwEq.
-This captures the fact that π₁ is a set by definition (fundamental groups are sets). -/
-axiom universalCover_fiberPathEq {A : Type u} {a b : A}
-    {x y : UniversalCoverFiber A a b} (p q : Path x y) : RwEq p q
-
-/-- The universal cover has set fibers (since π₁ is a set by definition). -/
-theorem universalCover_fiberIsSet (a : A) :
-    ∀ b, IsSet (UniversalCoverFiber A a b) := fun _ => {
-  pathEq := universalCover_fiberPathEq
-}
-
-/-- The universal cover is indeed a covering. -/
-def universalCoverIsCovering (a : A) : IsCovering (UniversalCoverFiber A a) where
-  fiberIsSet := universalCover_fiberIsSet a
 
 /-! ## Deck Transformations
 

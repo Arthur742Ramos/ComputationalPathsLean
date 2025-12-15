@@ -104,49 +104,6 @@ axiom kleinRec_loopB {C : Type v} (data : KleinBottleRecData C) :
 -- The full computation rule for `kleinSurf` involves two-dimensional path
 -- algebra and will be stated once the corresponding globular machinery is ready.
 
-/-- Data for the dependent eliminator of the Klein bottle. -/
-structure KleinBottleIndData (C : KleinBottle → Type v) where
-  base : C kleinBase
-  loopA : Path (Path.transport (A := KleinBottle) (D := C) kleinLoopA base) base
-  loopB : Path (Path.transport (A := KleinBottle) (D := C) kleinLoopB base) base
-  -- Surface coherence is postponed, mirroring the torus development.
-
-/-- Dependent eliminator (induction principle) for the Klein bottle. -/
-axiom kleinInd {C : KleinBottle → Type v} (data : KleinBottleIndData C) :
-  (x : KleinBottle) → C x
-
-/-- �-rule for the dependent eliminator at the base point. -/
-axiom kleinInd_base {C : KleinBottle → Type v} (data : KleinBottleIndData C) :
-  kleinInd data kleinBase = data.base
-
-/-- Dependent �-rule for the horizontal generator. -/
-axiom kleinInd_loopA {C : KleinBottle → Type v} (data : KleinBottleIndData C) :
-  Path.trans
-    (Path.symm
-      (Path.congrArg
-        (fun x =>
-          Path.transport (A := KleinBottle) (D := fun y => C y) kleinLoopA x)
-        (Path.ofEq (kleinInd_base (C := C) data))))
-    (Path.trans
-      (Path.apd (A := KleinBottle) (B := fun y => C y)
-        (f := kleinInd data) kleinLoopA)
-      (Path.ofEq (kleinInd_base (C := C) data))) =
-  data.loopA
-
-/-- Dependent �-rule for the vertical generator. -/
-axiom kleinInd_loopB {C : KleinBottle → Type v} (data : KleinBottleIndData C) :
-  Path.trans
-    (Path.symm
-      (Path.congrArg
-        (fun x =>
-          Path.transport (A := KleinBottle) (D := fun y => C y) kleinLoopB x)
-        (Path.ofEq (kleinInd_base (C := C) data))))
-    (Path.trans
-      (Path.apd (A := KleinBottle) (B := fun y => C y)
-        (f := kleinInd data) kleinLoopB)
-      (Path.ofEq (kleinInd_base (C := C) data))) =
-  data.loopB
-
 noncomputable section
 
 section LoopAlgebra
@@ -1752,6 +1709,17 @@ theorem kleinEquiv_surf :
     simp only [Prod.mk.injEq]
     constructor <;> omega
 
+/-- Helper for Int arithmetic. -/
+theorem eq_sub_of_add_eq' {a b c : Int} (h : a + b = c) : a = c - b := by omega
+
+theorem sub_eq_add_neg' (a b : Int) : a - b = a + -b := rfl
+
+theorem Int.negSucc_add_neg_one' (n : Nat) : Int.negSucc n + -1 = Int.negSucc (n + 1) := rfl
+
+section Univalence
+
+variable [HasUnivalence.{0}]
+
 /-- Data for the code type family over the Klein bottle. -/
 noncomputable def kleinCodeData : KleinBottleRecData (Type _) where
   base := Int × Int
@@ -1835,9 +1803,6 @@ theorem cast_kleinCode_base_kleinCodeOfProd (z : Int × Int) :
           (Path.ofEq kleinCode_base)) =
       Path.ua kleinEquivB :=
   kleinRec_loopB kleinCodeData
-
-/-- Helper for Int arithmetic. -/
-theorem eq_sub_of_add_eq' {a b c : Int} (h : a + b = c) : a = c - b := by omega
 
 /-- Transport along `kleinLoopA` applies `kleinEquivA`. -/
 @[simp] theorem kleinCode_transport_loopA (z : Int × Int) :
@@ -2097,10 +2062,6 @@ theorem kleinEncodePath_trans_symm_loopB (p : Path kleinBase kleinBase) :
   rw [kleinEncodePath_refl]
   simp
 
-theorem sub_eq_add_neg' (a b : Int) : a - b = a + -b := rfl
-
-theorem Int.negSucc_add_neg_one' (n : Nat) : Int.negSucc n + -1 = Int.negSucc (n + 1) := rfl
-
 /-- Encoding `a^n` for integer powers. The key point is that repeatedly going
     around `a` alternates the sign of the second coordinate. -/
 theorem kleinEncodePath_trans_loopAPathZPow (p : Path kleinBase kleinBase) (n : Int) :
@@ -2215,9 +2176,41 @@ theorem kleinEncodePath_trans_loopBPathZPow (p : Path kleinBase kleinBase) (n : 
         rw [Int.add_comm (-1)]
         rw [Int.negSucc_add_neg_one']
 
+end Univalence
+
 /-- Decode a pair of integers as a Klein bottle path `a^m ⋅ b^n`. -/
 noncomputable def kleinDecodePath (z : Int × Int) : Path kleinBase kleinBase :=
   Path.trans (kleinLoopAPathZPow z.1) (kleinLoopBPathZPow z.2)
+
+/-- Decode on `(0, 0)` is the reflexive path. -/
+@[simp] theorem kleinDecodePath_zero_zero :
+    kleinDecodePath (0, 0) = Path.refl kleinBase := by
+  unfold kleinDecodePath
+  simp [kleinLoopAPathZPow, kleinLoopAPathPow,
+    kleinLoopBPathZPow, kleinLoopBPathPow]
+
+/-- Decode a pair of integers as a Klein bottle loop class. -/
+@[simp] noncomputable def kleinDecodeQuot : Int × Int → kleinPiOne :=
+  fun z =>
+    LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase) (kleinDecodePath z)
+
+@[simp] theorem kleinDecodeQuot_zero_zero :
+    kleinDecodeQuot (0, 0) = LoopQuot.id := by
+  unfold kleinDecodeQuot kleinDecodePath
+  have htrans :
+      Path.trans (kleinLoopAPathZPow 0) (kleinLoopBPathZPow 0) =
+        Path.refl kleinBase := by
+    simp [kleinLoopAPathZPow, kleinLoopAPathPow,
+      kleinLoopBPathZPow, kleinLoopBPathPow]
+  change LoopQuot.ofLoop
+      (Path.trans (kleinLoopAPathZPow 0) (kleinLoopBPathZPow 0)) =
+    LoopQuot.id
+  rw [htrans]
+  rfl
+
+section Univalence
+
+variable [HasUnivalence.{0}]
 
 /-- `encode ∘ decode = id` on `ℤ × ℤ`. -/
 theorem kleinEncode_decode (z : Int × Int) :
@@ -2248,11 +2241,6 @@ theorem kleinEncode_decode (z : Int × Int) :
 @[simp] noncomputable def kleinEncode : kleinPiOne → Int × Int :=
   kleinEncodeLift
 
-/-- Decode a pair of integers as a Klein bottle loop class. -/
-@[simp] noncomputable def kleinDecodeQuot : Int × Int → kleinPiOne :=
-  fun z =>
-    LoopQuot.ofLoop (A := KleinBottle) (a := kleinBase) (kleinDecodePath z)
-
 @[simp] theorem kleinEncode_loopAClass :
     kleinEncode kleinLoopAClass = (1, 0) := kleinEncodePath_loopA
 
@@ -2263,26 +2251,6 @@ theorem kleinEncode_decode (z : Int × Int) :
 @[simp] theorem kleinEncode_kleinDecodeQuot (z : Int × Int) :
     kleinEncode (kleinDecodeQuot z) = z := kleinEncode_decode z
 
-@[simp] theorem kleinDecodePath_zero_zero :
-    kleinDecodePath (0, 0) = Path.refl kleinBase := by
-  unfold kleinDecodePath
-  simp [kleinLoopAPathZPow, kleinLoopAPathPow,
-    kleinLoopBPathZPow, kleinLoopBPathPow]
-
-@[simp] theorem kleinDecodeQuot_zero_zero :
-    kleinDecodeQuot (0, 0) = LoopQuot.id := by
-  unfold kleinDecodeQuot kleinDecodePath
-  have htrans :
-      Path.trans (kleinLoopAPathZPow 0) (kleinLoopBPathZPow 0) =
-        Path.refl kleinBase := by
-    simp [kleinLoopAPathZPow, kleinLoopAPathPow,
-      kleinLoopBPathZPow, kleinLoopBPathPow]
-  change LoopQuot.ofLoop
-      (Path.trans (kleinLoopAPathZPow 0) (kleinLoopBPathZPow 0)) =
-    LoopQuot.id
-  rw [htrans]
-  rfl
-
 @[simp] theorem kleinDecodeEq_kleinEncodeEq
     (e : kleinBase = kleinBase) :
     (kleinDecodePath (kleinEncodePath (Path.ofEq e))).toEq = e := by
@@ -2291,22 +2259,28 @@ theorem kleinEncode_decode (z : Int × Int) :
 
 /-- **Klein bottle loop classification axiom**: Every loop on the Klein bottle is RwEq to
 the decoded form of its winding numbers. -/
-axiom kleinLoop_rweq_decode (p : Path kleinBase kleinBase) :
-    RwEq p (kleinDecodePath (kleinEncodePath p))
+class HasKleinLoopDecode : Prop where
+  kleinLoop_rweq_decode (p : Path.{u} kleinBase kleinBase) :
+    RwEq.{u} p (kleinDecodePath (kleinEncodePath p))
 
-@[simp] theorem kleinDecodeQuot_kleinEncode (x : kleinPiOne) :
+/-- Every loop is RwEq to the decoded form of its winding numbers. -/
+theorem kleinLoop_rweq_decode [h : HasKleinLoopDecode.{u}] (p : Path.{u} kleinBase kleinBase) :
+    RwEq.{u} p (kleinDecodePath (kleinEncodePath p)) :=
+  h.kleinLoop_rweq_decode p
+
+@[simp] theorem kleinDecodeQuot_kleinEncode [h : HasKleinLoopDecode.{u}] (x : kleinPiOne.{u}) :
     kleinDecodeQuot (kleinEncode x) = x := by
   induction x using Quot.ind with
   | _ p =>
     simp only [kleinEncode, kleinDecodeQuot, kleinEncodeLift]
-    exact Quot.sound (rweq_symm (kleinLoop_rweq_decode p))
+    exact Quot.sound (rweq_symm (kleinLoop_rweq_decode (h := h) p))
 
 /-- **Fundamental group of the Klein bottle is equivalent to ℤ ⋊ ℤ.**
 
 This is the main result: π₁(K) ≅ ℤ × ℤ as sets, where the group structure
 on ℤ × ℤ is the semidirect product with multiplication
 `(m₁, n₁) * (m₂, n₂) = (m₁ + m₂, (-1)^{m₂} · n₁ + n₂)`. -/
-noncomputable def kleinPiOneEquivIntProd :
+noncomputable def kleinPiOneEquivIntProd [HasKleinLoopDecode.{u}] :
     SimpleEquiv kleinPiOne (Int × Int) where
   toFun := kleinEncode
   invFun := kleinDecodeQuot
@@ -2355,6 +2329,8 @@ The proof follows the **encode-decode** pattern from HoTT:
 - The decode map `kleinDecodePath` constructs a^m · b^n from (m,n)
 - The roundtrip properties follow from the transport laws
 -/
+
+end Univalence
 
 end Path
 end ComputationalPaths

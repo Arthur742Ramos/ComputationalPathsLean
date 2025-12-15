@@ -34,7 +34,7 @@ import ComputationalPaths.Path.HIT.PushoutPaths
 namespace ComputationalPaths
 namespace Path
 
-universe u
+universe u v w
 
 /-! ## Circle Equivalence
 
@@ -121,15 +121,15 @@ The proof proceeds in two steps:
 /-- Helper: Map an equivalence through a FreeProductWord.
 Given equivalences e₁ : G₁ ≃ H₁ and e₂ : G₂ ≃ H₂, we get
 FreeProductWord G₁ G₂ ≃ FreeProductWord H₁ H₂ -/
-def freeProductWordMap {G₁ G₂ H₁ H₂ : Type u}
+def freeProductWordMap {G₁ G₂ : Type u} {H₁ H₂ : Type v}
     (f₁ : G₁ → H₁) (f₂ : G₂ → H₂) :
-    FreeProductWord G₁ G₂ → FreeProductWord H₁ H₂
+    FreeProductWord.{u} G₁ G₂ → FreeProductWord.{v} H₁ H₂
   | .nil => .nil
   | .consLeft x rest => .consLeft (f₁ x) (freeProductWordMap f₁ f₂ rest)
   | .consRight y rest => .consRight (f₂ y) (freeProductWordMap f₁ f₂ rest)
 
 /-- The map is functorial: id maps to id. -/
-theorem freeProductWordMap_id {G₁ G₂ : Type u} (w : FreeProductWord G₁ G₂) :
+theorem freeProductWordMap_id {G₁ G₂ : Type u} (w : FreeProductWord.{u} G₁ G₂) :
     freeProductWordMap id id w = w := by
   induction w with
   | nil => rfl
@@ -137,10 +137,10 @@ theorem freeProductWordMap_id {G₁ G₂ : Type u} (w : FreeProductWord G₁ G�
   | consRight y rest ih => simp [freeProductWordMap, ih]
 
 /-- The map is functorial: composition. -/
-theorem freeProductWordMap_comp {G₁ G₂ H₁ H₂ K₁ K₂ : Type u}
+theorem freeProductWordMap_comp {G₁ G₂ : Type u} {H₁ H₂ : Type v} {K₁ K₂ : Type w}
     (f₁ : G₁ → H₁) (f₂ : G₂ → H₂)
     (g₁ : H₁ → K₁) (g₂ : H₂ → K₂)
-    (w : FreeProductWord G₁ G₂) :
+    (w : FreeProductWord.{u} G₁ G₂) :
     freeProductWordMap g₁ g₂ (freeProductWordMap f₁ f₂ w) =
     freeProductWordMap (g₁ ∘ f₁) (g₂ ∘ f₂) w := by
   induction w with
@@ -152,7 +152,7 @@ theorem freeProductWordMap_comp {G₁ G₂ H₁ H₂ K₁ K₂ : Type u}
 theorem freeProductWordMap_id_of_pointwise {G₁ G₂ : Type u}
     {f₁ : G₁ → G₁} {f₂ : G₂ → G₂}
     (hf₁ : ∀ x, f₁ x = x) (hf₂ : ∀ y, f₂ y = y)
-    (w : FreeProductWord G₁ G₂) :
+    (w : FreeProductWord.{u} G₁ G₂) :
     freeProductWordMap f₁ f₂ w = w := by
   induction w with
   | nil => rfl
@@ -160,9 +160,9 @@ theorem freeProductWordMap_id_of_pointwise {G₁ G₂ : Type u}
   | consRight y rest ih => simp [freeProductWordMap, hf₂ y, ih]
 
 /-- Lift equivalences to free product words. -/
-noncomputable def freeProductWordEquiv {G₁ G₂ H₁ H₂ : Type u}
+noncomputable def freeProductWordEquiv {G₁ G₂ : Type u} {H₁ H₂ : Type v}
     (e₁ : SimpleEquiv G₁ H₁) (e₂ : SimpleEquiv G₂ H₂) :
-    SimpleEquiv (FreeProductWord G₁ G₂) (FreeProductWord H₁ H₂) where
+    SimpleEquiv (FreeProductWord.{u} G₁ G₂) (FreeProductWord.{v} H₁ H₂) where
   toFun := freeProductWordMap e₁.toFun e₂.toFun
   invFun := freeProductWordMap e₁.invFun e₂.invFun
   left_inv := by
@@ -186,6 +186,11 @@ This is a direct application of the wedge fundamental group theorem. -/
 noncomputable def figureEightPiOneEquivPiOneProduct :
     SimpleEquiv FigureEightPiOne (FreeProductWord circlePiOne circlePiOne) :=
   wedgeFundamentalGroupEquiv circleBase circleBase
+
+section Univalence
+
+variable [HasUnivalence.{0}]
+variable [HasCircleLoopDecode.{u}]
 
 /-- Step 2: FreeProductWord (π₁(S¹)) (π₁(S¹)) ≃ FreeProductWord ℤ ℤ
 
@@ -232,6 +237,8 @@ theorem extractWord_wordToLoop (w : FreeProductWord Int Int) :
 theorem wordToLoop_extractWord (α : FigureEightPiOne) :
     wordToLoop (extractWord α) = α :=
   figureEightPiOneEquiv.left_inv α
+
+end Univalence
 
 end MainEquiv
 

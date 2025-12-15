@@ -226,7 +226,11 @@ noncomputable def sphere3Basepoint : Sphere3 := sphere3North
     every word in the free product decodes to refl.
     (Adapted from Sphere.lean for S³) -/
 theorem trivial_decode_s3
-    (w : FreeProductWord (π₁(PUnit', PUnit'.unit)) (π₁(PUnit', PUnit'.unit))) :
+    [HasDecidableEqAxiomK PUnit'.{u}]
+    (w :
+      FreeProductWord
+        (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u})))
+        (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u})))) :
     pushoutDecode (f := sphere2ToNorth) (g := sphere2ToSouth) basepoint w =
     Quot.mk _ (Path.refl _) := by
   induction w with
@@ -243,10 +247,13 @@ theorem trivial_decode_s3
       exact piOneMul_refl_left _
 
 /-- Every element of the amalgamated free product over trivial groups is one. -/
-theorem amalg_trivial_is_one_s3 :
-    ∀ (x : AmalgamatedFreeProduct (π₁(PUnit', sphere2ToNorth basepoint))
-           (π₁(PUnit', sphere2ToSouth basepoint))
-           (π₁(Sphere2, basepoint)) (piOneFmap basepoint) (piOneGmap basepoint)),
+theorem amalg_trivial_is_one_s3
+    [HasDecidableEqAxiomK PUnit'.{u}]
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Sphere2.{u})
+      (f := sphere2ToNorth) (g := sphere2ToSouth)] :
+    ∀ (x : AmalgamatedFreeProduct (π₁(PUnit'.{u}, sphere2ToNorth basepoint))
+           (π₁(PUnit'.{u}, sphere2ToSouth basepoint))
+           (π₁(Sphere2.{u}, basepoint)) (piOneFmap basepoint) (piOneGmap basepoint)),
     pushoutDecodeAmalg (f := sphere2ToNorth) (g := sphere2ToSouth) basepoint x =
     Quot.mk _ (Path.refl _) := by
   intro x
@@ -264,6 +271,9 @@ theorem amalg_trivial_is_one_s3 :
        decode(x) = Quot.mk _ refl (by trivial_decode_s3)
     4. By the SVK equivalence: α = decode(encode(α)) = Quot.mk _ refl -/
 theorem sphere3_pi1_trivial
+    [HasDecidableEqAxiomK PUnit'.{u}]
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Sphere2.{u})
+      (f := sphere2ToNorth) (g := sphere2ToSouth)]
     [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Sphere2.{u} sphere2ToNorth sphere2ToSouth basepoint] :
     ∀ (l : LoopSpace Sphere3.{u} sphere3North),
     Quot.mk RwEq l = Quot.mk RwEq (Path.refl sphere3North) := by
@@ -291,6 +301,9 @@ theorem sphere3_pi1_trivial
 
 /-- π₁(S³) is equivalent to the trivial group. -/
 noncomputable def sphere3_pi1_equiv_unit
+    [HasDecidableEqAxiomK PUnit'.{u}]
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Sphere2.{u})
+      (f := sphere2ToNorth) (g := sphere2ToSouth)]
     [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Sphere2.{u} sphere2ToNorth sphere2ToSouth basepoint] :
     SimpleEquiv (π₁(Sphere3.{u}, sphere3North)) Unit where
   toFun := fun _ => ()

@@ -49,32 +49,15 @@ universe u
 We axiomatize the product theorem for higher homotopy groups.
 -/
 
-/-! ### Product Path Axioms
+/-! ### Product Path Facts
 
-These axioms capture the fact that product projections and pairings behave well
-with respect to RwEq. They replace the removed `rweq_of_toEq_eq` which was too
-general and caused inconsistency.
+Unlike an `rweq_of_toEq_eq`-style axiom (which would collapse all computational
+paths with the same underlying equality), the proofs below use only the
+standard rewrite congruence lemmas already available for:
 
-These axioms are safe because they only apply to paths arising from product
-operations (projections and pairings), not to paths in arbitrary HITs. -/
-
-/-- **Path RwEq for product fst projections**: Parallel paths in the first component
-of a product are RwEq when their toEq values match. -/
-axiom rweq_fst_of_toEq_eq {A B : Type u} {a₁ a₂ : A}
-    {p q : Path (A := A) a₁ a₂}
-    (_h : p.toEq = q.toEq) : RwEq p q
-
-/-- **Path RwEq for product snd projections**: Parallel paths in the second component
-of a product are RwEq when their toEq values match. -/
-axiom rweq_snd_of_toEq_eq {A B : Type u} {b₁ b₂ : B}
-    {p q : Path (A := B) b₁ b₂}
-    (_h : p.toEq = q.toEq) : RwEq p q
-
-/-- **Path RwEq for product paths**: Parallel paths in a product type are RwEq
-when their toEq values match. -/
-axiom rweq_prod_of_toEq_eq {A B : Type u} {ab₁ ab₂ : A × B}
-    {p q : Path (A := A × B) ab₁ ab₂}
-    (_h : p.toEq = q.toEq) : RwEq p q
+- projections (`Path.fst`, `Path.snd` are `congrArg`)
+- pairing (`Path.prodMk` / `Path.map2`)
+-/
 
 /-- Type representing π_n(A, a) for the higher product theorem. -/
 abbrev HigherPiN (A : Type u) (a : A) (n : Nat) : Type u :=
@@ -180,13 +163,8 @@ theorem prodHigherPiN_encode_refl {A B : Type u} (a : A) (b : B) (n : Nat) :
       cases n with
       | zero =>
           -- n = 1
-          apply Prod.ext
-          · apply Quot.sound
-            apply rweq_fst_of_toEq_eq (A := A) (B := B)
-            simp
-          · apply Quot.sound
-            apply rweq_snd_of_toEq_eq (A := A) (B := B)
-            simp
+          simp [prodHigherPiN_encode, prodHigherPiNEquiv, higherPiN_refl, prodPiOneEquiv,
+            prodPiOneEncode, LoopQuot.id, PathRwQuot.refl]
       | succ n =>
           cases n with
           | zero => rfl
@@ -202,9 +180,8 @@ theorem prodHigherPiN_decode_refl {A B : Type u} (a : A) (b : B) (n : Nat) :
       cases n with
       | zero =>
           -- n = 1
-          apply Quot.sound
-          apply rweq_prod_of_toEq_eq (A := A) (B := B)
-          simp
+          simp [prodHigherPiN_decode, prodHigherPiNEquiv, higherPiN_refl, prodPiOneEquiv,
+            prodPiOneDecode, LoopQuot.id, PathRwQuot.refl, Path.prod]
       | succ n =>
           cases n with
           | zero => rfl
@@ -246,19 +223,15 @@ theorem prodHigherPiN_encode_comp {A B : Type u} (a : A) (b : B) (n : Nat)
           -- n = 1
           induction γ₁ using Quot.ind with
           | _ p₁ =>
-            induction γ₂ using Quot.ind with
-            | _ p₂ =>
-              simp only [prodHigherPiN_encode, prodHigherPiNEquiv, higherPiN_comp, prodPiOneEquiv,
-                prodPiOneEncode, LoopQuot.comp]
-              apply Prod.ext
-              · apply Quot.sound
-                apply rweq_fst_of_toEq_eq (A := A) (B := B)
-                unfold Path.fst Path.trans
-                simp
-              · apply Quot.sound
-                apply rweq_snd_of_toEq_eq (A := A) (B := B)
-                unfold Path.snd Path.trans
-                simp
+          induction γ₂ using Quot.ind with
+          | _ p₂ =>
+            simp only [prodHigherPiN_encode, prodHigherPiNEquiv, higherPiN_comp, prodPiOneEquiv,
+              prodPiOneEncode, LoopQuot.comp]
+            apply Prod.ext
+            · apply Quot.sound
+              exact rweq_congrArg_trans (A := A × B) (f := Prod.fst) (p := p₁) (q := p₂)
+            · apply Quot.sound
+              exact rweq_congrArg_trans (A := A × B) (f := Prod.snd) (p := p₁) (q := p₂)
       | succ n =>
           cases n with
           | zero =>
@@ -293,13 +266,9 @@ theorem prodHigherPiN_encode_inv {A B : Type u} (a : A) (b : B) (n : Nat)
               prodPiOneEncode, LoopQuot.inv]
             apply Prod.ext
             · apply Quot.sound
-              apply rweq_fst_of_toEq_eq (A := A) (B := B)
-              unfold Path.fst Path.symm
-              simp
+              exact rweq_congrArg_symm (A := A × B) (f := Prod.fst) (p := p)
             · apply Quot.sound
-              apply rweq_snd_of_toEq_eq (A := A) (B := B)
-              unfold Path.snd Path.symm
-              simp
+              exact rweq_congrArg_symm (A := A × B) (f := Prod.snd) (p := p)
       | succ n =>
           cases n with
           | zero =>

@@ -104,57 +104,31 @@ structure IsSet (A : Type u) where
 
 namespace IsSet
 
-/-- **Set axiom for propositions**: In a proposition, any two parallel paths are RwEq.
-This captures the fact that propositions have at most one element up to equality. -/
-axiom prop_pathEq {A : Type u} (_h : IsProp A) {a b : A} (p q : Path a b) : RwEq p q
-
-/-- Propositions are sets. -/
-def ofProp (h : IsProp A) : IsSet A where
-  pathEq := fun p q => prop_pathEq h p q
-
 /-- **Set theorem for Nat**: Parallel paths in Nat are RwEq.
 Derived from `decidableEq_implies_isHSet` since Nat has DecidableEq. -/
-theorem nat_pathEq {a b : Nat} (p q : Path a b) : RwEq p q :=
+theorem nat_pathEq [HasDecidableEqAxiomK Nat] {a b : Nat} (p q : Path a b) : RwEq p q :=
   decidableEq_implies_isHSet p q
 
 /-- **Set theorem for Bool**: Parallel paths in Bool are RwEq.
 Derived from `decidableEq_implies_isHSet` since Bool has DecidableEq. -/
-theorem bool_pathEq {a b : Bool} (p q : Path a b) : RwEq p q :=
+theorem bool_pathEq [HasDecidableEqAxiomK Bool] {a b : Bool} (p q : Path a b) : RwEq p q :=
   decidableEq_implies_isHSet p q
 
 /-- **Set theorem for Int**: Parallel paths in Int are RwEq.
 Derived from `decidableEq_implies_isHSet` since Int has DecidableEq. -/
-theorem int_pathEq {a b : Int} (p q : Path a b) : RwEq p q :=
+theorem int_pathEq [HasDecidableEqAxiomK Int] {a b : Int} (p q : Path a b) : RwEq p q :=
   decidableEq_implies_isHSet p q
 
-/-- **Axiom for set characterization**: If all loops in π₁(A, a) are trivial for all a,
-then A is a set (parallel paths are RwEq). This completes the characterization of sets
-via trivial π₁. The forward direction is provable; this axiom handles the converse. -/
-axiom set_of_trivial_pi1 {A : Type u} :
-    (∀ (a : A), ∀ (α : π₁(A, a)), α = Quot.mk _ (Path.refl a)) → IsSet A
-
-/-- A type is a set iff π₁(A, a) is trivial for all a. -/
-theorem iff_pi1_trivial :
-    Nonempty (IsSet A) ↔ ∀ (a : A), ∀ (α : π₁(A, a)), α = Quot.mk _ (Path.refl a) := by
-  constructor
-  · intro ⟨h⟩ a α
-    induction α using Quot.ind with
-    | _ p =>
-      apply Quot.sound
-      exact h.pathEq p (Path.refl a)
-  · intro h
-    exact ⟨set_of_trivial_pi1 h⟩
-
 /-- Nat is a set (by UIP in Lean). -/
-def natSet : IsSet Nat where
+def natSet [HasDecidableEqAxiomK Nat] : IsSet Nat where
   pathEq := nat_pathEq
 
 /-- Bool is a set. -/
-def boolSet : IsSet Bool where
+def boolSet [HasDecidableEqAxiomK Bool] : IsSet Bool where
   pathEq := bool_pathEq
 
 /-- Int is a set. -/
-def intSet : IsSet Int where
+def intSet [HasDecidableEqAxiomK Int] : IsSet Int where
   pathEq := int_pathEq
 
 end IsSet
@@ -202,8 +176,12 @@ The truncation level determines which homotopy groups are trivial.
 
 /-- If A is a set (0-type), then π₁(A, a) is trivial. -/
 theorem set_pi1_trivial (h : IsSet A) (a : A) :
-    ∀ (α : π₁(A, a)), α = Quot.mk _ (Path.refl a) :=
-  IsSet.iff_pi1_trivial.mp ⟨h⟩ a
+    ∀ (α : π₁(A, a)), α = Quot.mk _ (Path.refl a) := by
+  intro α
+  induction α using Quot.ind with
+  | _ p =>
+      apply Quot.sound
+      exact h.pathEq p (Path.refl a)
 
 /-- π₂(A, a) is always trivial in our framework (by contractibility₃). -/
 theorem pi2_trivial (a : A) :
@@ -218,10 +196,6 @@ Higher truncation levels include lower ones.
 /-- Contractible types are propositions. -/
 def contr_implies_prop : IsContr A → IsProp A :=
   IsProp.ofContr
-
-/-- Propositions are sets. -/
-def prop_implies_set : IsProp A → IsSet A :=
-  IsSet.ofProp
 
 /-- Sets are 1-groupoids. -/
 def set_implies_groupoid : IsSet A → IsGroupoid A :=

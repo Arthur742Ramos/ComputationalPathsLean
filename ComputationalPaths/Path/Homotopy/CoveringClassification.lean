@@ -127,9 +127,11 @@ structure UniversalCover (A : Type u) (a : A) where
 
 /-- **Universal cover loop axiom**: In a simply connected space, any loop is RwEq to refl.
 This captures the homotopy-theoretic content of simple connectivity. -/
-axiom simply_connected_loop_rweq {X : Type u} {x : X}
+theorem simply_connected_loop_rweq {X : Type u} {x : X}
     (_h : ∀ (l : LoopSpace X x), ∃ _hp : Path l (Path.refl x), True)
-    (p : LoopSpace X x) : RwEq p (Path.refl x)
+    (p : LoopSpace X x) : RwEq p (Path.refl x) := by
+  obtain ⟨hp, _⟩ := _h p
+  exact rweq_of_eq hp.toEq
 
 /-- The fundamental group of the universal cover is trivial.
 

@@ -25,7 +25,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Covering space classification**: Galois correspondence between covering spaces and subgroups of π₁. Deck(X̃/X) ≃ π₁(X) for universal cover. Regular covers correspond to normal subgroups.
 - **Covering space theory**: Total spaces, path lifting, π₁-action on fibers, universal cover, deck transformations.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
-- Higher-inductive circle interface + code family into ℤ (via univalence axioms).
+- Higher-inductive circle interface + code family into ℤ (requires an explicit univalence assumption `HasUnivalence`).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
 - Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd`.
 - Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition).
@@ -479,52 +479,37 @@ Two approaches are available:
   where (Σ_g \ disk) ≃ ⋁_{i=1}^{2g} S¹ has π₁ = F_{2g} (free group), the disk has trivial π₁, and the boundary circle maps to [a₁,b₁]...[a_g,b_g].
 - Reference: HoTT Book Chapter 8.6; Hatcher, Algebraic Topology Section 1.2.
 
-## Assumptions (axioms)
+## Axioms and assumptions
 
-The project uses **137 axioms** organized into the following categories:
+This project tries to minimize **Lean kernel axioms**. We distinguish:
 
-### HIT Type/Constructor Axioms (fundamentally necessary)
-- **Circle**: `Circle`, `circleBase`, `circleLoop` + recursion/induction principles
-- **Torus**: `Torus`, `torusBase`, `torusLoop1`, `torusLoop2`, `torusSurf` + eliminators
-- **Klein bottle**: `KleinBottle`, `kleinBase`, `kleinLoopA`, `kleinLoopB`, `kleinSurf` + eliminators
-- **Projective plane**: `ProjectivePlane`, `projectiveBase`, `projectiveLoop`, `projectiveLoopSquare` + eliminators
-- **Möbius band**: `MobiusBand`, `mobiusBase`, `mobiusLoop` + eliminators
-- **Cylinder**: `Cylinder`, `cylinderBase0`, `cylinderBase1`, `cylinderSeg`, `cylinderLoop0`, `cylinderLoop1`, `cylinderSurf` + eliminators
-- **OrientableSurface**: `OrientableSurface g`, `base g`, `loopA g i`, `loopB g i`, `surfaceRelation`, `isPathConnected` + eliminators
-- **BouquetN**: type, base point, n loops, recursion principle
+- **Kernel axioms**: Lean `axiom` declarations that extend the trusted base.
+- **Assumptions**: `Prop`-valued typeclasses (e.g. `HasUnivalence`) that appear as explicit hypotheses in signatures, but do **not** extend the kernel.
 
-### π₁ Encode-Decode Axioms (for fundamental group calculations)
-- Loop classification axioms: `circleLoop_rweq_decode`, `torusLoop_rweq_decode`, `kleinLoop_rweq_decode`, `projectiveLoop_rweq_decode`, `mobiusLoop_rweq_decode`, `cylinderLoop_rweq_decode`
-- Encode path computation axioms (refl, trans, symm rules)
-- Pushout SVK encode/decode round-trip axioms
+### Measuring kernel axioms
 
-### Path Theory Axioms
-- `decidableEq_implies_axiomK`: Types with decidable equality satisfy Axiom K
-- `rweq_congrArg_const`: congrArg of constant function is RwEq to refl
-- `rweq_ofEq_rfl_refl`: `Path.ofEq rfl` is RwEq to `Path.refl`
-- `join_of_rw`: Confluence axiom for critical pair joins
+- Kernel axiom inventory for `import ComputationalPaths`:
+  - `.\lake.cmd env lean Scripts/AxiomInventory.lean`
+- Kernel axiom dependencies for a specific declaration:
+  - `.\lake.cmd env lean Scripts/AxiomDependencies.lean` (edit the target name inside the file)
 
-### Univalence
-- `uaEq`: SimpleEquiv A B → A = B
-- `ua_beta`: Transport along ua computes to the forward map
+### Current status
 
-### ω-Groupoid Structure
-- `to_canonical`: Every derivation connects to the canonical derivation (grounded in normalization)
+- `Scripts/AxiomInventory.lean` reports **56 kernel axioms** for `import ComputationalPaths`; these are **exactly the HIT interfaces** (types/constructors/recursors) for:
+  - `Circle`, `Cylinder`, `Torus`, `KleinBottle`, `MobiusBand`, `ProjectivePlane`, `OrientableSurface`.
+- `Scripts/AxiomDependencies.lean` reports that `circlePiOneEquivInt` depends on only the **circle HIT interface** (6 kernel axioms: `Circle`, `circleBase`, `circleLoop`, `circleRec`, `circleRec_base`, `circleRec_loop`).
 
-### Derived Theorems (no longer axioms)
-The following were axioms but are now **proved theorems**:
-- `nat_pathEq`, `bool_pathEq`, `int_pathEq`, `punit_pathEq`, `torusN_zero_pathEq`, `unitU_pathEq`: Derived from `decidableEq_implies_isHSet`
-- `circleConnected`, `circleEncode_mul`: Proved using circle induction
-- `decodePath_surfaceRelWord_rweq`: Proved using Fin' index arithmetic and the HIT 2-cell
-- `genus0_loop_trivial`: Proved using the fact that FreeGroupWord 0 has only nil
+Non-kernel assumptions that are intentionally explicit (selected examples):
 
-### Removed Axioms (caused inconsistency)
-- `Step.canon`: Was removing as it collapsed all paths with the same `toEq` to be RwEq, contradicting π₁(S¹) ≃ ℤ
-- `rweq_of_toEq_eq`: General version that would imply UIP-like collapse
+- **Univalence**: `ComputationalPaths.Path.HasUnivalence` (needed for the circle code family into `Int`).
+- **Circle loop classification**: `ComputationalPaths.Path.HasCircleLoopDecode` (needed for the “decode∘encode” direction).
+- **Pushout β/naturality (SVK)**: `Pushout.HasRecGlueRwEq`, `Pushout.HasIndGlueRwEq`, `Pushout.HasGlueNaturalRwEq`.
 
-Every other component—encode/decode maps, quotient constructions, loop group
-laws, free products, amalgamation, surface group presentations, etc.—is defined
-inside Lean and ultimately reduces to the axioms above.
+See `docs/axioms.md` for the authoritative overview.
+
+### Removed global collapse assumptions
+
+We intentionally do **not** assume global UIP-like collapse principles (e.g. the old `Step.canon` / “`toEq` implies `RwEq`”), because they contradict π₁(S¹) ≃ ℤ.
 
 ## Contributing
 - Build after non-trivial edits: `./lake.cmd build`.

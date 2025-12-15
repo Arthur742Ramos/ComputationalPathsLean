@@ -224,8 +224,8 @@ and look at the induced loop in the fiber S¹.
 
 The key property is that ∂(surf) = loop, where surf is the generator
 of π₂(S²) and loop is the generator of π₁(S¹). -/
-noncomputable def hopf_connecting_map : S2PiTwo → π₁(Circle, circleBase) :=
-  fun α => circleDecode (s2TwoLoop_winding α)
+noncomputable def hopf_connecting_map : S2PiTwo → π₁(Circle.{u}, circleBase.{u}) :=
+  fun α => circleDecode.{u} (s2TwoLoop_winding α)
 
 /-- The connecting map sends the generator surf to the generator loop. -/
 theorem hopf_connecting_surf :
@@ -247,6 +247,10 @@ theorem hopf_connecting_hom (α β : S2PiTwo) :
   unfold hopf_connecting_map
   rw [s2TwoLoop_comp_winding]
   exact circleDecode_add' (s2TwoLoop_winding α) (s2TwoLoop_winding β)
+
+section Univalence
+
+variable [HasUnivalence.{0}]
 
 /-! ## Exactness and the Isomorphism
 
@@ -287,20 +291,21 @@ theorem hopf_exact_at_pi2_S2 :
 /-- Exactness at π₁(S¹): im(∂) = ker(π₁(S¹) → π₁(S³)) = π₁(S¹).
 
 Since π₁(S³) = 1, the kernel is all of π₁(S¹), so ∂ is surjective. -/
-theorem hopf_exact_at_pi1_S1 :
-    ∀ (β : π₁(Circle, circleBase)), ∃ (α : S2PiTwo),
+theorem hopf_exact_at_pi1_S1 [HasCircleLoopDecode.{u}] :
+    ∀ (β : π₁(Circle.{u}, circleBase.{u})), ∃ (α : S2PiTwo),
     hopf_connecting_map α = β := by
   intro β
   -- For any β ∈ π₁(S¹), find α ∈ π₂(S²) with ∂(α) = β
   exact ⟨s2TwoLoop_of_winding (circleWindingNumber β), by
     unfold hopf_connecting_map
     rw [s2TwoLoop_winding_of_winding]
-    exact circleDecode_circleEncode β⟩
+    exact circleDecode_circleEncode.{u} β⟩
 
 /-- **Main Theorem**: The connecting map ∂ : π₂(S²) → π₁(S¹) is an isomorphism.
 
 Combined with π₁(S¹) ≃ ℤ, this gives π₂(S²) ≃ ℤ. -/
-noncomputable def hopf_connecting_iso : SimpleEquiv S2PiTwo (π₁(Circle, circleBase)) where
+noncomputable def hopf_connecting_iso [HasCircleLoopDecode.{u}] :
+    SimpleEquiv S2PiTwo (π₁(Circle.{u}, circleBase.{u})) where
   toFun := hopf_connecting_map
   invFun := fun β => s2TwoLoop_of_winding (circleWindingNumber β)
   left_inv := fun α => by
@@ -311,14 +316,16 @@ noncomputable def hopf_connecting_iso : SimpleEquiv S2PiTwo (π₁(Circle, circl
   right_inv := fun β => by
     unfold hopf_connecting_map
     rw [s2TwoLoop_winding_of_winding]
-    exact circleDecode_circleEncode β
+    exact circleDecode_circleEncode.{u} β
 
 /-- **Corollary**: π₂(S²) ≃ ℤ via composition of equivalences.
 
 This is the classical result that the second homotopy group of the
 2-sphere is the integers. -/
-noncomputable def sphere2_pi2_equiv_int' : SimpleEquiv S2PiTwo Int :=
-  SimpleEquiv.comp hopf_connecting_iso circlePiOneEquivInt.{0}
+noncomputable def sphere2_pi2_equiv_int' [HasCircleLoopDecode.{u}] : SimpleEquiv S2PiTwo Int :=
+  SimpleEquiv.comp hopf_connecting_iso circlePiOneEquivInt.{u}
+
+end Univalence
 
 /-! ## Physical/Geometric Interpretation
 

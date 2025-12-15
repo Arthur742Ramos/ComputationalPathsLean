@@ -107,24 +107,29 @@ For such types, every loop is RwEq to refl.
 This is sound because types with DecidableEq have unique equality proofs (all equal to rfl).
 Without the general canonicalization rule, we state this as a targeted axiom for types
 where path collapsing is known to be safe. -/
-axiom decidableEq_implies_axiomK [DecidableEq A] : AxiomK A
+class HasDecidableEqAxiomK (A : Type u) [DecidableEq A] : Prop where
+  axiomK : AxiomK A
+
+/-- Types with decidable equality satisfy Axiom K (assumed as an explicit hypothesis). -/
+theorem decidableEq_implies_axiomK [DecidableEq A] [h : HasDecidableEqAxiomK A] : AxiomK A :=
+  h.axiomK
 
 /-- A type with decidable equality is a set -/
-theorem decidableEq_implies_isHSet [DecidableEq A] : IsHSet A :=
+theorem decidableEq_implies_isHSet [DecidableEq A] [HasDecidableEqAxiomK A] : IsHSet A :=
   axiomK_implies_isHSet decidableEq_implies_axiomK
 
 -- Examples: Concrete types are sets
 
-instance : IsHSet Nat :=
+instance [HasDecidableEqAxiomK Nat] : IsHSet Nat :=
   decidableEq_implies_isHSet
 
-instance : IsHSet Bool :=
+instance [HasDecidableEqAxiomK Bool] : IsHSet Bool :=
   decidableEq_implies_isHSet
 
-instance : IsHSet Unit :=
+instance [HasDecidableEqAxiomK Unit] : IsHSet Unit :=
   decidableEq_implies_isHSet
 
-instance : IsHSet Empty :=
+instance [HasDecidableEqAxiomK Empty] : IsHSet Empty :=
   decidableEq_implies_isHSet
 
 end ComputationalPaths.Path

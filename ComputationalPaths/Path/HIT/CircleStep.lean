@@ -19,6 +19,10 @@ namespace Path
 
 open SimpleEquiv
 
+universe u
+
+variable [HasUnivalence.{0}]
+
 /-- Encode∘decode identity on negative integers by Nat induction. -/
 theorem circleEncode_circleDecode_of_negNat (k : Nat) :
   circleEncode (circleDecode (-(k : Int))) = -(k : Int) := by
@@ -49,24 +53,24 @@ theorem circleEncode_circleDecode_of_negNat (k : Nat) :
       exact circleEncode_circleDecode_of_negNat (Nat.succ n)
 
 -- Equality-level helper: `decodeEq ∘ encodeEq = id` on `(=)`.
-private theorem circleDecodeEq_circleEncodeEq.{u}
-    (e : circleBase.{u} = circleBase.{u}) :
-    (circleLoopPathZPow.{u} (circleEncodePath.{u} (Path.ofEq e))).toEq = e := by
+ private theorem circleDecodeEq_circleEncodeEq.{v}
+     (e : circleBase.{v} = circleBase.{v}) :
+     (circleLoopPathZPow.{v} (circleEncodePath.{v} (Path.ofEq e))).toEq = e := by
   cases e with
   | refl =>
       -- encodeEq rfl = 0 and decodeEq 0 = rfl
       -- Path.ofEq rfl = refl, and circleEncodePath refl = 0
-      show (circleLoopPathZPow.{u} (circleEncodePath.{u} (Path.refl circleBase.{u}))).toEq = rfl
-      rw [circleEncodePath_refl.{u}]
+      show (circleLoopPathZPow.{v} (circleEncodePath.{v} (Path.refl circleBase.{v}))).toEq = rfl
+      rw [circleEncodePath_refl.{v}]
 
 /-- `decode ∘ encode = id` on π₁(S¹).
 
 This proof uses `circleLoop_rweq_decode`, a circle-specific axiom stating that
 every loop on S¹ is RwEq to the decoded form of its winding number. This captures
-the geometric fact that loops on the circle are classified by winding number,
-without collapsing all paths globally (as the removed `Step.canon` would have). -/
-theorem circleDecode_circleEncode (x : circlePiOne) :
-    circleDecode (circleEncode x) = x := by
+  the geometric fact that loops on the circle are classified by winding number,
+  without collapsing all paths globally (as the removed `Step.canon` would have). -/
+ theorem circleDecode_circleEncode [HasCircleLoopDecode.{u}] (x : circlePiOne.{u}) :
+     circleDecode (circleEncode x) = x := by
   -- Induct on the quotient
   refine Quot.inductionOn x ?h
   intro p
@@ -91,7 +95,7 @@ theorem circleDecode_circleEncode (x : circlePiOne) :
   -- Which is: Quot.mk _ (circleLoopPathZPow (circleEncodePath p)) = Quot.mk _ p
   exact heq.symm
 
-noncomputable def circlePiOneEquivInt : SimpleEquiv circlePiOne Int where
+ noncomputable def circlePiOneEquivInt [HasCircleLoopDecode.{u}] : SimpleEquiv (circlePiOne.{u}) Int where
   toFun := circleWindingNumber
   invFun := circleDecode
   left_inv := by

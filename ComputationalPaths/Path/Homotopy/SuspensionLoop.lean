@@ -126,9 +126,53 @@ noncomputable def adjMap {X : Type u} (x₀ : X) {Y : Pointed}
     When x = x₀, the path hf.symm · p · p⁻¹ · hf collapses to refl by:
     1. p · p⁻¹ ≈ refl (inverse law)
     2. hf.symm · refl · hf ≈ hf.symm · hf ≈ refl (unit and inverse laws) -/
-axiom adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
+theorem adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
     (f : Suspension X → Y.carrier) (hf : f Suspension.north = Y.pt) :
-    RwEq (adjMap x₀ f hf x₀) (Path.refl Y.pt)
+    RwEq (adjMap x₀ f hf x₀) (Path.refl Y.pt) := by
+  -- Expand the definition at `x₀`: the two meridian images coincide.
+  simp [adjMap]
+  -- Name the common meridian image under `f`.
+  let q : Path (f Suspension.north) (f Suspension.south) :=
+    Path.congrArg f (Suspension.merid x₀)
+  -- Rewrite the goal so subsequent steps can refer to `q`.
+  change
+    RwEq
+      (Path.trans (Path.ofEq hf.symm)
+        (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf))))
+      (Path.refl Y.pt)
+  -- Simplify the middle segment: q · q⁻¹ · hf ≈ hf.
+  have h_mid :
+      RwEq
+        (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf)))
+        (Path.ofEq hf) := by
+    -- Reassociate to (q · q⁻¹) · hf, cancel, then drop refl.
+    have hassoc :
+        RwEq
+          (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf)))
+          (Path.trans (Path.trans q (Path.symm q)) (Path.ofEq hf)) :=
+      rweq_symm (rweq_tt q (Path.symm q) (Path.ofEq hf))
+    have hcancel :
+        RwEq
+          (Path.trans (Path.trans q (Path.symm q)) (Path.ofEq hf))
+          (Path.trans (Path.refl (f Suspension.north)) (Path.ofEq hf)) :=
+      rweq_trans_congr_left (Path.ofEq hf) (rweq_cmpA_inv_right q)
+    have hdrop :
+        RwEq (Path.trans (Path.refl (f Suspension.north)) (Path.ofEq hf)) (Path.ofEq hf) :=
+      rweq_cmpA_refl_left (Path.ofEq hf)
+    exact RwEq.trans (RwEq.trans hassoc hcancel) hdrop
+  -- Use the middle simplification inside the outer concatenation.
+  have h_outer :
+      RwEq
+        (Path.trans (Path.ofEq hf.symm)
+          (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf))))
+        (Path.trans (Path.ofEq hf.symm) (Path.ofEq hf)) :=
+    rweq_trans_congr_right (Path.ofEq hf.symm) h_mid
+  -- Finally, hf.symm · hf is a loop inverse pair, hence refl.
+  have h_end :
+      RwEq (Path.trans (Path.ofEq hf.symm) (Path.ofEq hf)) (Path.refl Y.pt) := by
+    -- `symm (ofEq hf.symm) = ofEq hf` definitionally.
+    simpa using rweq_cmpA_inv_right (Path.ofEq hf.symm)
+  exact RwEq.trans h_outer h_end
 
 /-- The adjunction map sends basepoint to refl when the input sends north to the basepoint.
     Proof: When x = x₀, the path goes Y.pt → f(north) → f(south) → f(north) → Y.pt,

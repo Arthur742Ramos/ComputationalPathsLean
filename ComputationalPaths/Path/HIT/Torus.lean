@@ -84,57 +84,9 @@ axiom torusRec_loop2 {C : Type v} (data : TorusRecData C) :
       (Path.ofEq (torusRec_base (C := C) data))) =
   data.loop2
 
-/-- Data for the dependent eliminator of the torus. -/
-structure TorusIndData (C : Torus → Type v) where
-  base : C torusBase
-  loop1 : Path (Path.transport (A := Torus) (D := C) torusLoop1 base) base
-  loop2 : Path (Path.transport (A := Torus) (D := C) torusLoop2 base) base
-  -- Note: Surface coherence law (stating how loop1/loop2 interact with the 2D structure)
-  -- requires 2-dimensional path algebra. This is partially developed in `Globular.lean`
-  -- but full coherence for dependent elimination is future work.
-
-/-- Dependent eliminator (induction principle) for the torus. -/
-axiom torusInd {C : Torus → Type v} (data : TorusIndData C) :
-  (x : Torus) → C x
-
-/-- β-rule for the dependent eliminator at the base point. -/
-axiom torusInd_base {C : Torus → Type v} (data : TorusIndData C) :
-  torusInd data torusBase = data.base
-
-/-- Dependent β-rule for the first fundamental loop. -/
-axiom torusInd_loop1 {C : Torus → Type v} (data : TorusIndData C) :
-  Path.trans
-    (Path.symm
-      (Path.congrArg
-        (fun x =>
-          Path.transport (A := Torus) (D := fun y => C y) torusLoop1 x)
-        (Path.ofEq (torusInd_base (C := C) data))))
-    (Path.trans
-      (Path.apd (A := Torus) (B := fun y => C y)
-        (f := torusInd data) torusLoop1)
-      (Path.ofEq (torusInd_base (C := C) data))) =
-  data.loop1
-
-/-- Dependent β-rule for the second fundamental loop. -/
-axiom torusInd_loop2 {C : Torus → Type v} (data : TorusIndData C) :
-  Path.trans
-    (Path.symm
-      (Path.congrArg
-        (fun x =>
-          Path.transport (A := Torus) (D := fun y => C y) torusLoop2 x)
-        (Path.ofEq (torusInd_base (C := C) data))))
-    (Path.trans
-      (Path.apd (A := Torus) (B := fun y => C y)
-        (f := torusInd data) torusLoop2)
-      (Path.ofEq (torusInd_base (C := C) data))) =
-  data.loop2
-
--- Note: The β-rule for the surface (torusSurf) would require stating how 2-paths
--- are preserved under elimination. This needs the 2-dimensional path algebra from
--- `Globular.lean` and additional coherence machinery. See §4.5 of the thesis for
--- the theoretical framework; formalization is future work.
-
 noncomputable section
+
+variable [HasUnivalence.{0}]
 
 open SimpleEquiv
 
@@ -152,18 +104,20 @@ def torusEquiv2 : SimpleEquiv (Int × Int) (Int × Int) where
   left_inv := by intro (x, y); simp
   right_inv := by intro (x, y); simp
 
+omit [HasUnivalence] in
 theorem SimpleEquiv_eq {α : Type u} {β : Type v} (e1 e2 : SimpleEquiv α β)
   (h1 : e1.toFun = e2.toFun) (h2 : e1.invFun = e2.invFun) : e1 = e2 := by
   cases e1
   cases e2
   congr
 
+omit [HasUnivalence] in
 theorem torusEquiv_comm :
     SimpleEquiv.comp torusEquiv1 torusEquiv2 =
       SimpleEquiv.comp torusEquiv2 torusEquiv1 := by
   apply SimpleEquiv_eq
-  . rfl
-  . rfl
+  · rfl
+  · rfl
 
 def torusCodeData : TorusRecData (Type _) where
   base := Int × Int
@@ -268,10 +222,12 @@ def torusLoop2PathZPow : Int → Path torusBase torusBase
 
 
 -- Helper for Int arithmetic
+omit [HasUnivalence] in
 theorem eq_sub_of_add_eq {a b c : Int} (h : a + b = c) : a = c - b := by
   rw [← h]
   simp
 
+omit [HasUnivalence] in
 theorem Int.negSucc_add_neg_one (n : Nat) : Int.negSucc n + -1 = Int.negSucc (n + 1) := rfl
 
 @[simp] theorem torusCode_transport_loop1 (z : Int × Int) :
@@ -458,6 +414,7 @@ theorem Int.negSucc_add_neg_one (n : Nat) : Int.negSucc n + -1 = Int.negSucc (n 
     apply eq_sub_of_add_eq
     exact h2_2.symm
 
+omit [HasUnivalence] in
 theorem sub_eq_add_neg (a b : Int) : a - b = a + -b := rfl
 
 theorem torusEncodePath_trans_loop1 (p : Path torusBase torusBase) :
@@ -604,10 +561,12 @@ theorem torusEncodePath_trans_loop2PathZPow (p : Path torusBase torusBase) (n : 
         rw [Int.add_comm (-1)]
         rw [Int.negSucc_add_neg_one]
 
+omit [HasUnivalence] in
 theorem torusLoop_comm (p : Path torusBase torusBase) :
     Path.trans torusLoop1 (Path.trans torusLoop2 p) = Path.trans torusLoop2 (Path.trans torusLoop1 p) := by
   rw [← Path.trans_assoc, torusSurf, Path.trans_assoc]
 
+omit [HasUnivalence] in
 theorem torusLoop_comm_pow (n : Nat) (p : Path torusBase torusBase) :
     Path.trans torusLoop1 (Path.trans (torusLoop2PathPow n) p) =
     Path.trans (torusLoop2PathPow n) (Path.trans torusLoop1 p) := by
@@ -771,12 +730,14 @@ theorem torusEncode_comp_inv_loop2 (x : torusPiOne) :
       ((torusEncode x).1, (torusEncode x).2 - 1) :=
   torusEncodeLift_comp_inv_loop2 (x := x)
 
+omit [HasUnivalence] in
 @[simp] theorem torusDecodePath_zero_zero :
     torusDecodePath (0, 0) = Path.refl torusBase := by
   unfold torusDecodePath
   simp [torusLoop1PathZPow, torusLoop1PathPow,
     torusLoop2PathZPow, torusLoop2PathPow]
 
+omit [HasUnivalence] in
 @[simp] theorem torusDecode_zero_zero :
     torusDecode (0, 0) = LoopQuot.id := by
   unfold torusDecode torusDecodePath
@@ -800,18 +761,24 @@ theorem torusEncode_comp_inv_loop2 (x : torusPiOne) :
 /-- **Torus loop classification axiom**: Every loop on the torus is RwEq to
 the decoded form of its winding numbers. This is the torus analogue of
 `circleLoop_rweq_decode`. -/
-axiom torusLoop_rweq_decode (p : Path torusBase torusBase) :
-    RwEq p (torusDecodePath (torusEncodePath p))
+class HasTorusLoopDecode : Prop where
+  torusLoop_rweq_decode (p : Path.{u} torusBase torusBase) :
+    RwEq.{u} p (torusDecodePath (torusEncodePath p))
 
-@[simp] theorem torusDecode_torusEncode (x : torusPiOne) :
+/-- Every loop is RwEq to the decoded form of its winding numbers. -/
+theorem torusLoop_rweq_decode [h : HasTorusLoopDecode.{u}] (p : Path.{u} torusBase torusBase) :
+    RwEq.{u} p (torusDecodePath (torusEncodePath p)) :=
+  h.torusLoop_rweq_decode p
+
+@[simp] theorem torusDecode_torusEncode [h : HasTorusLoopDecode.{u}] (x : torusPiOne.{u}) :
     torusDecode (torusEncode x) = x := by
   induction x using Quot.ind with
   | _ p =>
     simp only [torusEncode, torusDecode, torusEncodeLift]
-    exact Quot.sound (rweq_symm (torusLoop_rweq_decode p))
+    exact Quot.sound (rweq_symm (torusLoop_rweq_decode (h := h) p))
 
 /-- Fundamental group of the torus is equivalent to `ℤ × ℤ`. -/
-noncomputable def torusPiOneEquivIntProd :
+noncomputable def torusPiOneEquivIntProd [HasTorusLoopDecode.{u}] :
     SimpleEquiv torusPiOne (Int × Int) where
   toFun := torusEncode
   invFun := torusDecode

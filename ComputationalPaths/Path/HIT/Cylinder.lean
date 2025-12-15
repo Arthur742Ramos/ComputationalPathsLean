@@ -129,72 +129,6 @@ axiom cylinderRec_loop1 {C : Type v} (data : CylinderRecData C) :
       (Path.ofEq (cylinderRec_base1 (C := C) data))) =
   data.loop1
 
-/-! ## Dependent Eliminator -/
-
-/-- Data for the dependent eliminator of the cylinder. -/
-structure CylinderIndData (C : Cylinder → Type v) where
-  base0 : C cylinderBase0
-  base1 : C cylinderBase1
-  seg : Path (Path.transport (A := Cylinder) (D := C) cylinderSeg base0) base1
-  loop0 : Path (Path.transport (A := Cylinder) (D := C) cylinderLoop0 base0) base0
-  loop1 : Path (Path.transport (A := Cylinder) (D := C) cylinderLoop1 base1) base1
-  -- Note: Surface coherence (stating how seg/loops interact with the 2D structure)
-  -- requires 2-dimensional path algebra. See `Globular.lean` and §4.5 of the thesis.
-
-/-- Dependent eliminator (induction principle) for the cylinder. -/
-axiom cylinderInd {C : Cylinder → Type v} (data : CylinderIndData C) :
-  (x : Cylinder) → C x
-
-/-- β-rule for the dependent eliminator at the first base point. -/
-axiom cylinderInd_base0 {C : Cylinder → Type v} (data : CylinderIndData C) :
-  cylinderInd data cylinderBase0 = data.base0
-
-/-- β-rule for the dependent eliminator at the second base point. -/
-axiom cylinderInd_base1 {C : Cylinder → Type v} (data : CylinderIndData C) :
-  cylinderInd data cylinderBase1 = data.base1
-
-/-- Dependent β-rule for the segment path. -/
-axiom cylinderInd_seg {C : Cylinder → Type v} (data : CylinderIndData C) :
-  Path.trans
-    (Path.symm
-      (Path.congrArg
-        (fun x =>
-          Path.transport (A := Cylinder) (D := fun y => C y) cylinderSeg x)
-        (Path.ofEq (cylinderInd_base0 (C := C) data))))
-    (Path.trans
-      (Path.apd (A := Cylinder) (B := fun y => C y)
-        (f := cylinderInd data) cylinderSeg)
-      (Path.ofEq (cylinderInd_base1 (C := C) data))) =
-  data.seg
-
-/-- Dependent β-rule for the bottom loop. -/
-axiom cylinderInd_loop0 {C : Cylinder → Type v} (data : CylinderIndData C) :
-  Path.trans
-    (Path.symm
-      (Path.congrArg
-        (fun x =>
-          Path.transport (A := Cylinder) (D := fun y => C y) cylinderLoop0 x)
-        (Path.ofEq (cylinderInd_base0 (C := C) data))))
-    (Path.trans
-      (Path.apd (A := Cylinder) (B := fun y => C y)
-        (f := cylinderInd data) cylinderLoop0)
-      (Path.ofEq (cylinderInd_base0 (C := C) data))) =
-  data.loop0
-
-/-- Dependent β-rule for the top loop. -/
-axiom cylinderInd_loop1 {C : Cylinder → Type v} (data : CylinderIndData C) :
-  Path.trans
-    (Path.symm
-      (Path.congrArg
-        (fun x =>
-          Path.transport (A := Cylinder) (D := fun y => C y) cylinderLoop1 x)
-        (Path.ofEq (cylinderInd_base1 (C := C) data))))
-    (Path.trans
-      (Path.apd (A := Cylinder) (B := fun y => C y)
-        (f := cylinderInd data) cylinderLoop1)
-      (Path.ofEq (cylinderInd_base1 (C := C) data))) =
-  data.loop1
-
 noncomputable section
 
 open SimpleEquiv
@@ -365,66 +299,161 @@ def cylinderLoopToCircleLoop.{w} (p : CylinderLoopSpace.{w}) :
       (Path.ofEq cylinderToCircle_base0))
 
 /-- Encode a raw cylinder loop as an integer via the retraction. -/
-def cylinderEncodePath.{w} (p : CylinderLoopSpace.{w}) : Int :=
+def cylinderEncodePath.{w} [HasUnivalence.{0}] (p : CylinderLoopSpace.{w}) : Int :=
   circleEncodePath.{w} (cylinderLoopToCircleLoop.{w} p)
 
-/-- **Cylinder encoding axiom**: The encoding is invariant under RwEq.
-    RwEq-equivalent paths have the same winding number. -/
-axiom cylinderEncodePath_rweq_axiom {p q : CylinderLoopSpace}
-    (h : RwEq p q) : cylinderEncodePath p = cylinderEncodePath q
-
 /-- The encoding respects path rewriting.
-    This follows from the fact that `circleEncodePath` respects rewriting
-    and that `congrArg` preserves the underlying equality. -/
-theorem cylinderEncodePath_rweq {p q : CylinderLoopSpace}
-    (h : RwEq p q) : cylinderEncodePath p = cylinderEncodePath q :=
-  cylinderEncodePath_rweq_axiom h
 
-/-- **Cylinder refl encoding axiom**: The identity path encodes to 0. -/
-axiom cylinderEncodePath_refl_axiom :
-    cylinderEncodePath (Path.refl cylinderBase0) = 0
+This is inherited from `circleEncodePath_rweq` because `cylinderEncodePath` is defined
+via the retraction `cylinderLoopToCircleLoop`. -/
+theorem cylinderEncodePath_rweq [HasUnivalence.{0}] {p q : CylinderLoopSpace}
+    (h : RwEq p q) : cylinderEncodePath.{u} p = cylinderEncodePath.{u} q := by
+  unfold cylinderEncodePath
+  -- Reduce to rewrite-invariance of the circle encoding.
+  apply circleEncodePath_rweq
+  unfold cylinderLoopToCircleLoop
+  -- `congrArg` preserves `RwEq`, and `trans` is congruent in both arguments.
+  have hCongr :
+      RwEq (Path.congrArg cylinderToCircle p) (Path.congrArg cylinderToCircle q) :=
+    rweq_congrArg_of_rweq cylinderToCircle h
+  have hInner :
+      RwEq
+        (Path.trans (Path.congrArg cylinderToCircle p) (Path.ofEq cylinderToCircle_base0))
+        (Path.trans (Path.congrArg cylinderToCircle q) (Path.ofEq cylinderToCircle_base0)) :=
+    rweq_trans_congr_left (Path.ofEq cylinderToCircle_base0) hCongr
+  exact
+    rweq_trans_congr_right (Path.symm (Path.ofEq cylinderToCircle_base0)) hInner
 
-@[simp] theorem cylinderEncodePath_refl :
-    cylinderEncodePath (Path.refl cylinderBase0) = 0 :=
-  cylinderEncodePath_refl_axiom
+@[simp] theorem cylinderEncodePath_refl [HasUnivalence.{0}] :
+    cylinderEncodePath.{u} (Path.refl cylinderBase0) = 0 := by
+  unfold cylinderEncodePath cylinderLoopToCircleLoop
+  -- Fix the universe instantiation of the basepoint equation so no metavariables
+  -- remain in the compiled proof term.
+  let baseEq := cylinderToCircle_base0.{u, u}
+  -- The conjugation path `symm(ofEq e) · ofEq e` rewrites to `refl`.
+  have hCancel :
+      RwEq
+        (Path.trans (Path.symm (Path.ofEq baseEq)) (Path.ofEq baseEq))
+        (Path.refl (circleBase.{u})) := by
+    simpa using rweq_cmpA_inv_left (p := Path.ofEq baseEq)
+  calc
+    circleEncodePath
+        (Path.trans (Path.symm (Path.ofEq baseEq)) (Path.ofEq baseEq))
+        = circleEncodePath (Path.refl (circleBase.{u})) := circleEncodePath_rweq hCancel
+    _ = 0 := circleEncodePath_refl
 
-@[simp] theorem cylinderEncodePath_loop0 :
-    cylinderEncodePath cylinderLoop0 = 1 := by
+@[simp] theorem cylinderEncodePath_loop0 [HasUnivalence.{0}] :
+    cylinderEncodePath.{u} cylinderLoop0 = 1 := by
   unfold cylinderEncodePath cylinderLoopToCircleLoop
   rw [cylinderToCircle_loop0]
   exact circleEncodePath_loop
 
-/-- **Cylinder loop addition axiom**: Appending loop0 adds 1 to the winding number. -/
-axiom cylinderEncodePath_trans_loop0_axiom (p : CylinderLoopSpace) :
-    cylinderEncodePath (Path.trans p cylinderLoop0) = cylinderEncodePath p + 1
+/-! ### Algebraic laws for `cylinderLoopToCircleLoop` and `cylinderEncodePath` -/
+
+/-- `cylinderLoopToCircleLoop` preserves concatenation up to `RwEq`.
+
+This is the standard “conjugation is a homomorphism” calculation:
+the middle factor `ofEq e · symm(ofEq e)` cancels by `rweq_cmpA_inv_right`. -/
+private theorem cylinderLoopToCircleLoop_trans_rweq (p q : CylinderLoopSpace) :
+    RwEq (cylinderLoopToCircleLoop (Path.trans p q))
+      (Path.trans (cylinderLoopToCircleLoop p) (cylinderLoopToCircleLoop q)) := by
+  unfold cylinderLoopToCircleLoop
+  -- Push `congrArg` through concatenation in the middle.
+  rw [Path.congrArg_trans (f := cylinderToCircle) (p := p) (q := q)]
+  -- Now it is a pure `trans`/associativity/cancellation argument.
+  have h1 :=
+    rweq_tt (Path.symm (Path.ofEq cylinderToCircle_base0))
+      (Path.trans (Path.congrArg cylinderToCircle p) (Path.ofEq cylinderToCircle_base0))
+      (Path.trans (Path.symm (Path.ofEq cylinderToCircle_base0))
+        (Path.trans (Path.congrArg cylinderToCircle q) (Path.ofEq cylinderToCircle_base0)))
+  have h2 :=
+    rweq_trans_congr_right (Path.symm (Path.ofEq cylinderToCircle_base0)) <|
+      rweq_tt (Path.congrArg cylinderToCircle p) (Path.ofEq cylinderToCircle_base0)
+        (Path.trans (Path.symm (Path.ofEq cylinderToCircle_base0))
+          (Path.trans (Path.congrArg cylinderToCircle q) (Path.ofEq cylinderToCircle_base0)))
+  have h3 :=
+    rweq_trans_congr_right (Path.symm (Path.ofEq cylinderToCircle_base0)) <|
+      rweq_trans_congr_right (Path.congrArg cylinderToCircle p) <|
+        (rweq_tt (Path.ofEq cylinderToCircle_base0)
+          (Path.symm (Path.ofEq cylinderToCircle_base0))
+          (Path.trans (Path.congrArg cylinderToCircle q) (Path.ofEq cylinderToCircle_base0))).symm
+  have hCancel :=
+    rweq_cmpA_inv_right (p := Path.ofEq cylinderToCircle_base0)
+  have h4 :=
+    rweq_trans_congr_right (Path.symm (Path.ofEq cylinderToCircle_base0)) <|
+      rweq_trans_congr_right (Path.congrArg cylinderToCircle p) <|
+        RwEq.trans
+          (rweq_trans_congr_left
+            (Path.trans (Path.congrArg cylinderToCircle q) (Path.ofEq cylinderToCircle_base0))
+            hCancel)
+          (rweq_cmpA_refl_left
+            (Path.trans (Path.congrArg cylinderToCircle q) (Path.ofEq cylinderToCircle_base0)))
+  have h5 :=
+    rweq_trans_congr_right (Path.symm (Path.ofEq cylinderToCircle_base0)) <|
+      (rweq_tt (Path.congrArg cylinderToCircle p)
+        (Path.congrArg cylinderToCircle q)
+        (Path.ofEq cylinderToCircle_base0)).symm
+  -- The chain as written produces `RwEq` in the reverse direction; flip it at the end.
+  exact rweq_symm (RwEq.trans (RwEq.trans (RwEq.trans (RwEq.trans h1 h2) h3) h4) h5)
+
+section
+
+variable [HasUnivalence.{0}] [HasCircleLoopDecode.{u}]
+
+/-- `cylinderEncodePath` is additive over concatenation (raw loop level). -/
+theorem cylinderEncodePath_trans (p q : CylinderLoopSpace) :
+    cylinderEncodePath.{u} (Path.trans p q) = cylinderEncodePath.{u} p + cylinderEncodePath.{u} q := by
+  unfold cylinderEncodePath
+  have hMul := cylinderLoopToCircleLoop_trans_rweq (p := p) (q := q)
+  calc
+    circleEncodePath (cylinderLoopToCircleLoop (Path.trans p q))
+        = circleEncodePath (Path.trans (cylinderLoopToCircleLoop p) (cylinderLoopToCircleLoop q)) :=
+      circleEncodePath_rweq hMul
+    _ = circleEncodePath (cylinderLoopToCircleLoop p) + circleEncodePath (cylinderLoopToCircleLoop q) := by
+      simpa using
+        circleEncodePath_trans
+          (p := cylinderLoopToCircleLoop p)
+          (q := cylinderLoopToCircleLoop q)
+
+/-- Encoding respects inversion: `encode (p⁻¹) = - encode p`. -/
+theorem cylinderEncodePath_symm (p : CylinderLoopSpace) :
+    cylinderEncodePath.{u} (Path.symm p) = - cylinderEncodePath.{u} p := by
+  -- `p · p⁻¹ ≈ refl` in `RwEq`, hence encodes to 0.
+  have hCancel : RwEq (Path.trans p (Path.symm p)) (Path.refl cylinderBase0) :=
+    rweq_cmpA_inv_right (p := p)
+  have h0 :
+      cylinderEncodePath.{u} (Path.trans p (Path.symm p)) = 0 := by
+    have hEq := cylinderEncodePath_rweq (h := hCancel)
+    exact hEq.trans cylinderEncodePath_refl
+  have hTrans := cylinderEncodePath_trans (p := p) (q := Path.symm p)
+  have hSum : cylinderEncodePath.{u} p + cylinderEncodePath.{u} (Path.symm p) = 0 :=
+    (Eq.symm hTrans).trans h0
+  -- Solve the resulting linear integer equation.
+  omega
 
 /-- Encoding after appending loop0 adds 1. -/
 @[simp] theorem cylinderEncodePath_trans_loop0 (p : CylinderLoopSpace) :
-    cylinderEncodePath (Path.trans p cylinderLoop0) = cylinderEncodePath p + 1 :=
-  cylinderEncodePath_trans_loop0_axiom p
-
-/-- **Cylinder inverse loop axiom**: Appending inverse loop0 subtracts 1 from winding number. -/
-axiom cylinderEncodePath_trans_symm_loop0_axiom (p : CylinderLoopSpace) :
-    cylinderEncodePath (Path.trans p (Path.symm cylinderLoop0)) = cylinderEncodePath p - 1
+    cylinderEncodePath.{u} (Path.trans p cylinderLoop0) = cylinderEncodePath.{u} p + 1 := by
+  simpa [cylinderEncodePath_loop0] using cylinderEncodePath_trans (p := p) (q := cylinderLoop0)
 
 /-- Encoding after appending symm loop0 subtracts 1. -/
 @[simp] theorem cylinderEncodePath_trans_symm_loop0 (p : CylinderLoopSpace) :
-    cylinderEncodePath (Path.trans p (Path.symm cylinderLoop0)) = cylinderEncodePath p - 1 :=
-  cylinderEncodePath_trans_symm_loop0_axiom p
+    cylinderEncodePath.{u} (Path.trans p (Path.symm cylinderLoop0)) = cylinderEncodePath.{u} p - 1 := by
+  have hLoopInv : cylinderEncodePath.{u} (Path.symm cylinderLoop0) = -1 := by
+    simpa [cylinderEncodePath_loop0] using cylinderEncodePath_symm (p := cylinderLoop0)
+  -- `encode (p · loop⁻¹) = encode p + encode(loop⁻¹) = encode p - 1`.
+  rw [Int.sub_eq_add_neg]
+  refine (cylinderEncodePath_trans (p := p) (q := Path.symm cylinderLoop0)).trans ?_
+  rw [hLoopInv]
 
 /-- Encoding the inverse of loop0 gives -1. -/
 @[simp] theorem cylinderEncodePath_symm_loop0 :
-    cylinderEncodePath (Path.symm cylinderLoop0) = -1 := by
-  calc cylinderEncodePath (Path.symm cylinderLoop0)
-      = cylinderEncodePath (Path.trans (Path.refl cylinderBase0) (Path.symm cylinderLoop0)) := rfl
-    _ = cylinderEncodePath (Path.refl cylinderBase0) - 1 :=
-        cylinderEncodePath_trans_symm_loop0 (Path.refl cylinderBase0)
-    _ = 0 - 1 := by rw [cylinderEncodePath_refl]
-    _ = -1 := by simp
+    cylinderEncodePath.{u} (Path.symm cylinderLoop0) = -1 := by
+  simpa [cylinderEncodePath_loop0] using cylinderEncodePath_symm (p := cylinderLoop0)
 
 /-- Encoding a natural loop power gives the natural number. -/
 @[simp] theorem cylinderEncodePath_loopPathPow (n : Nat) :
-    cylinderEncodePath (cylinderLoopPathPow n) = n := by
+    cylinderEncodePath.{u} (cylinderLoopPathPow n) = n := by
   induction n with
   | zero =>
     simp only [cylinderLoopPathPow]
@@ -434,13 +463,15 @@ axiom cylinderEncodePath_trans_symm_loop0_axiom (p : CylinderLoopSpace) :
     rw [cylinderEncodePath_trans_loop0]
     simp [ih]
 
-/-- **Cylinder symm loop power axiom**: Encoding symm of loop power gives negation. -/
-axiom cylinderEncodePath_symm_loopPathPow (n : Nat) :
-    cylinderEncodePath (Path.symm (cylinderLoopPathPow n)) = -↑n
+/-- Encoding of symm (loop^n) gives -n. -/
+theorem cylinderEncodePath_symm_loopPathPow (n : Nat) :
+    cylinderEncodePath.{u} (Path.symm (cylinderLoopPathPow n)) = -↑n := by
+  simpa [cylinderEncodePath_loopPathPow] using
+    cylinderEncodePath_symm (p := cylinderLoopPathPow n)
 
 /-- Encoding an integer loop power gives the integer. -/
 @[simp] theorem cylinderEncodePath_loopPathZPow (z : Int) :
-    cylinderEncodePath (cylinderLoopPathZPow z) = z := by
+    cylinderEncodePath.{u} (cylinderLoopPathZPow z) = z := by
   cases z with
   | ofNat n =>
     simp only [cylinderLoopPathZPow]
@@ -449,17 +480,19 @@ axiom cylinderEncodePath_symm_loopPathPow (n : Nat) :
     simp only [cylinderLoopPathZPow]
     exact cylinderEncodePath_symm_loopPathPow (n + 1)
 
+end
+
 /-- Quotient-level encoding (winding number). -/
-def cylinderEncode : CylinderLoopQuot → Int :=
+def cylinderEncode [HasUnivalence.{0}] : CylinderLoopQuot → Int :=
   Quot.lift cylinderEncodePath (fun _ _ h => cylinderEncodePath_rweq h)
 
-@[simp] theorem cylinderEncode_ofLoop (p : CylinderLoopSpace) :
+@[simp] theorem cylinderEncode_ofLoop [HasUnivalence.{0}] (p : CylinderLoopSpace) :
     cylinderEncode (LoopQuot.ofLoop p) = cylinderEncodePath p := rfl
 
-@[simp] theorem cylinderEncode_id : cylinderEncode LoopQuot.id = 0 :=
+@[simp] theorem cylinderEncode_id [HasUnivalence.{0}] : cylinderEncode LoopQuot.id = 0 :=
   cylinderEncodePath_refl
 
-@[simp] theorem cylinderEncode_loopClass :
+@[simp] theorem cylinderEncode_loopClass [HasUnivalence.{0}] :
     cylinderEncode cylinderLoopClass = 1 :=
   cylinderEncodePath_loop0
 
@@ -489,8 +522,8 @@ an isomorphism, which follows from the homotopy equivalence.
 /-- Encoding composed with decoding is the identity.
     This follows from the cylinder being homotopy equivalent to the circle,
     which implies the fundamental group is ℤ. -/
-@[simp] theorem cylinderEncode_cylinderDecode (z : Int) :
-    cylinderEncode (cylinderDecode z) = z := by
+@[simp] theorem cylinderEncode_cylinderDecode [HasUnivalence.{0}] [HasCircleLoopDecode.{u}] (z : Int) :
+    cylinderEncode.{u} (cylinderDecode.{u} z) = z := by
   -- cylinderDecode z = cylinderLoopZPow z = ofLoop (cylinderLoopPathZPow z)
   simp only [cylinderDecode, cylinderLoopZPow_ofLoopPathZPow]
   -- cylinderEncode (ofLoop p) = cylinderEncodePath p
@@ -499,7 +532,7 @@ an isomorphism, which follows from the homotopy equivalence.
   exact cylinderEncodePath_loopPathZPow z
 
 -- Equality-level helper: `decodeEq ∘ encodeEq = id` on `(=)`.
-private theorem cylinderDecodeEq_cylinderEncodeEq
+private theorem cylinderDecodeEq_cylinderEncodeEq [HasUnivalence.{0}]
     (e : cylinderBase0 = cylinderBase0) :
     (cylinderLoopPathZPow (cylinderEncodePath (Path.ofEq e))).toEq = e := by
   cases e with
@@ -507,19 +540,26 @@ private theorem cylinderDecodeEq_cylinderEncodeEq
 
 /-- **Cylinder loop classification axiom**: Every cylinder loop is RwEq to
 the decoded form of its winding number. -/
-axiom cylinderLoop_rweq_decode (p : CylinderLoopSpace) :
-    RwEq p (cylinderLoopPathZPow (cylinderEncodePath p))
+class HasCylinderLoopDecode [HasUnivalence.{0}] : Prop where
+  cylinderLoop_rweq_decode (p : CylinderLoopSpace.{u}) :
+    RwEq.{u} p (cylinderLoopPathZPow (cylinderEncodePath p))
+
+/-- Every loop is RwEq to the decoded form of its winding number. -/
+theorem cylinderLoop_rweq_decode [HasUnivalence.{0}] [h : HasCylinderLoopDecode.{u}] (p : CylinderLoopSpace.{u}) :
+    RwEq.{u} p (cylinderLoopPathZPow (cylinderEncodePath p)) :=
+  h.cylinderLoop_rweq_decode p
 
 /-- Decoding composed with encoding is the identity. -/
-@[simp] theorem cylinderDecode_cylinderEncode (x : CylinderLoopQuot) :
+@[simp] theorem cylinderDecode_cylinderEncode [HasUnivalence.{0}] [h : HasCylinderLoopDecode.{u}] (x : CylinderLoopQuot.{u}) :
     cylinderDecode (cylinderEncode x) = x := by
   induction x using Quot.ind with
   | _ p =>
     simp only [cylinderEncode, cylinderDecode, cylinderLoopZPow_ofLoopPathZPow]
-    exact Quot.sound (rweq_symm (cylinderLoop_rweq_decode p))
+    exact Quot.sound (rweq_symm (cylinderLoop_rweq_decode (h := h) p))
 
 /-- The fundamental group of the cylinder is isomorphic to ℤ. -/
-def cylinderPiOneEquivInt : SimpleEquiv cylinderPiOne Int where
+def cylinderPiOneEquivInt [HasUnivalence.{0}] [HasCircleLoopDecode.{u}] [HasCylinderLoopDecode.{u}] :
+    SimpleEquiv cylinderPiOne Int where
   toFun := cylinderEncode
   invFun := cylinderDecode
   left_inv := cylinderDecode_cylinderEncode

@@ -16,6 +16,22 @@ Lean using the computational-path infrastructure.
 - `circlePiOneEquivInt`: π₁(S¹) ≃ ℤ (the main theorem)
 - `LoopPowerClass`: Winding number classification of loop powers
 
+## Axiom Structure
+
+**HIT Axioms (standard for any HIT):**
+- `Circle`, `circleBase`, `circleLoop`: Type and constructors
+- `circleRec`, `circleRec_base`, `circleRec_loop`: Non-dependent eliminator
+- `circleInd`, `circleInd_base`, `circleInd_loop`: Dependent eliminator
+
+**Encode-decode axiom:**
+- `circleLoop_rweq_decode`: Any loop p is RwEq to loop^(encode p)
+
+**Derived theorems (not axioms):**
+- `circleCode_transport_shift`: Transport acts by adding winding number
+- `circleEncodePath_trans`: Encoding is additive on path composition
+- `circleCode_transport_loopPow_add`: Transport along loop^n adds n
+- `circleCode_transport_symm_loopPow_sub`: Transport along symm(loop^n) subtracts n
+
 ## Mathematical Background
 
 The circle S¹ is the simplest non-trivial higher-inductive type with
@@ -92,26 +108,6 @@ structure CircleIndData (C : Circle → Type v) where
 axiom circleInd {C : Circle → Type v} (data : CircleIndData C) :
   (x : Circle) → C x
 
-/-- β-rule for the dependent eliminator at the base point. -/
-axiom circleInd_base {C : Circle → Type v} (data : CircleIndData C) :
-  circleInd data circleBase = data.base
-
-/-- Dependent β-rule specialised to the fundamental loop.  The dependent
-application of `circleInd` to `circleLoop` matches the prescribed path stored
-in `CircleIndData`. -/
-axiom circleInd_loop {C : Circle → Type v} (data : CircleIndData C) :
-  Path.trans
-    (Path.symm
-      (Path.congrArg
-        (fun x =>
-          Path.transport (A := Circle) (D := fun y => C y) circleLoop x)
-        (Path.ofEq (circleInd_base (C := C) data))))
-    (Path.trans
-      (Path.apd (A := Circle) (B := fun y => C y)
-        (f := circleInd data) circleLoop)
-      (Path.ofEq (circleInd_base (C := C) data))) =
-  data.loop
-
 noncomputable section
 
 open SimpleEquiv
@@ -126,6 +122,10 @@ def circleSuccEquiv : SimpleEquiv Int Int where
   right_inv := by
     intro z
     simp
+
+section Univalence
+
+variable [HasUnivalence.{0}]
 
 private def circleCodeData : CircleRecData (Type _) where
   base := Int
@@ -197,6 +197,8 @@ noncomputable def circleCode : Circle → Type _ :=
           (Path.ofEq circleCode_base)) =
       Path.ua circleSuccEquiv :=
   circleRec_loop circleCodeData
+
+end Univalence
 
 /-- Iterate the fundamental loop `n` times at the raw path level (natural powers). -/
 @[simp] def circleLoopPathPow : Nat → Path circleBase circleBase
@@ -285,16 +287,6 @@ theorem circleLoopPathPow_add (m n : Nat) :
   change circleDecodePath (Int.negSucc 0) = _
   simp [circleDecodePath, circleLoopPathZPow]
 
-/-- **Circle loop classification axiom**: Every loop on the circle is RwEq to the
-decoded form of its winding number. This is the characteristic property of π₁(S¹) ≃ ℤ
-and does not generalize to arbitrary types.
-
-Unlike the removed `Step.canon` rule which would collapse ALL paths to their toEq
-representations (causing inconsistency), this axiom is specific to the circle HIT
-and captures the geometric fact that loops on S¹ are classified by winding number. -/
-axiom circleLoop_rweq_decode (p : Path circleBase circleBase) :
-    RwEq p (circleLoopPathZPow (circleEncodePath p))
-
 -- Small arithmetic helper used in encoding lemmas.
 @[simp] theorem int_zero_sub_one : (0 : Int) - 1 = (-1 : Int) := by
   simp
@@ -305,7 +297,7 @@ axiom circleLoop_rweq_decode (p : Path circleBase circleBase) :
 
 -- Key transport computation: encoding after following the fundamental loop
 -- increases the integer code by `+1` for any starting code value.
-@[simp] theorem circleCode_transport_loop_add1
+@[simp] theorem circleCode_transport_loop_add1 [HasUnivalence.{0}]
     (x : circleCode circleBase) :
     circleCodeToInt
       (Path.transport (A := Circle) (D := circleCode) circleLoop x)
@@ -398,7 +390,105 @@ axiom circleLoop_rweq_decode (p : Path circleBase circleBase) :
   -- Chain the equalities to finish.
   exact (hLHS.trans hComb).trans (by simpa [hBase] using hRHS)
 
-@[simp] theorem circleEncodePath_trans_loop
+-- Transport along the inverse loop subtracts 1 from the code value.
+@[simp] theorem circleCode_transport_symm_loop_sub1 [HasUnivalence.{0}]
+    (x : circleCode circleBase) :
+    circleCodeToInt
+      (Path.transport (A := Circle) (D := circleCode) (Path.symm circleLoop) x)
+      = circleCodeToInt x - 1 := by
+  -- Use cancellation: transport loop (transport (symm loop) x) = x
+  let y := Path.transport (A := Circle) (D := circleCode) (Path.symm circleLoop) x
+  have hCancel : Path.transport (A := Circle) (D := circleCode) circleLoop y = x :=
+    Path.transport_symm_right (A := Circle) (D := circleCode) (p := circleLoop) (y := x)
+  have hPlus := circleCode_transport_loop_add1 y
+  -- hPlus: circleCodeToInt (transport loop y) = circleCodeToInt y + 1
+  -- hCancel: transport loop y = x
+  -- So: circleCodeToInt x = circleCodeToInt y + 1
+  -- Thus: circleCodeToInt y = circleCodeToInt x - 1
+  calc circleCodeToInt y
+      = circleCodeToInt y + 1 - 1 := by omega
+    _ = circleCodeToInt (Path.transport (A := Circle) (D := circleCode) circleLoop y) - 1 := by
+        rw [← hPlus]
+    _ = circleCodeToInt x - 1 := by rw [hCancel]
+
+/-- Transport along loop^n adds n to the code value. Proved by induction on n. -/
+@[simp] theorem circleCode_transport_loopPow_add [HasUnivalence.{0}] (n : Nat) (x : circleCode circleBase) :
+    circleCodeToInt (Path.transport (A := Circle) (D := circleCode) (circleLoopPathPow n) x)
+      = circleCodeToInt x + n := by
+  induction n with
+  | zero =>
+      simp only [circleLoopPathPow, Path.transport_refl]
+      omega
+  | succ n ih =>
+      calc circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+              (circleLoopPathPow (n + 1)) x)
+          = circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+              (Path.trans (circleLoopPathPow n) circleLoop) x) := rfl
+        _ = circleCodeToInt (Path.transport (A := Circle) (D := circleCode) circleLoop
+              (Path.transport (A := Circle) (D := circleCode) (circleLoopPathPow n) x)) := by
+            rw [Path.transport_trans]
+        _ = circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+              (circleLoopPathPow n) x) + 1 := by
+            exact circleCode_transport_loop_add1 _
+        _ = (circleCodeToInt x + n) + 1 := by rw [ih]
+        _ = circleCodeToInt x + (n + 1) := by omega
+
+/-- Transport along symm(loop^n) subtracts n from the code value. Proved by induction. -/
+@[simp] theorem circleCode_transport_symm_loopPow_sub [HasUnivalence.{0}] (n : Nat) (x : circleCode circleBase) :
+    circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+        (Path.symm (circleLoopPathPow n)) x)
+      = circleCodeToInt x - n := by
+  -- Use Nat.rec to get IH universally quantified over x
+  induction n generalizing x with
+  | zero =>
+      -- symm(refl) has same toEq as refl: both are Eq.refl
+      have hToEq : (Path.symm (circleLoopPathPow 0)).toEq = (Path.refl circleBase).toEq := rfl
+      rw [Path.transport_of_toEq_eq hToEq, Path.transport_refl]
+      omega
+  | succ n ih =>
+      -- symm(loop^(n+1)) has same toEq as trans (symm loop) (symm(loop^n))
+      -- So their transports are equal
+      have hToEq : (Path.symm (circleLoopPathPow (n + 1))).toEq =
+          (Path.trans (Path.symm circleLoop) (Path.symm (circleLoopPathPow n))).toEq := rfl
+      -- Note: `ih` is now generalized over x, so we can use it for any value
+      let y := Path.transport (A := Circle) (D := circleCode) (Path.symm circleLoop) x
+      calc circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+              (Path.symm (circleLoopPathPow (n + 1))) x)
+          = circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+              (Path.trans (Path.symm circleLoop) (Path.symm (circleLoopPathPow n))) x) := by
+            rw [Path.transport_of_toEq_eq hToEq]
+        _ = circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+              (Path.symm (circleLoopPathPow n)) y) := by
+            rw [Path.transport_trans]
+        _ = circleCodeToInt y - n := ih y
+        _ = (circleCodeToInt x - 1) - n := by
+            simp only [y, circleCode_transport_symm_loop_sub1]
+        _ = circleCodeToInt x - (n + 1) := by omega
+
+/-- Transport along loop^z (for integer z) shifts by z. -/
+@[simp] theorem circleCode_transport_loopZPow_add [HasUnivalence.{0}] (z : Int) (x : circleCode circleBase) :
+    circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+        (circleLoopPathZPow z) x)
+      = circleCodeToInt x + z := by
+  cases z with
+  | ofNat n =>
+      simp only [circleLoopPathZPow]
+      exact circleCode_transport_loopPow_add n x
+  | negSucc n =>
+      simp only [circleLoopPathZPow]
+      have h := circleCode_transport_symm_loopPow_sub (n + 1) x
+      -- h : ... = circleCodeToInt x - (n + 1)
+      -- goal: ... = circleCodeToInt x + Int.negSucc n
+      -- Int.negSucc n = -(n + 1)
+      simp only [Int.negSucc_eq, Int.add_neg_eq_sub] at h ⊢
+      -- h: ... = circleCodeToInt x - (↑n + 1)
+      -- goal: ... = circleCodeToInt x - (↑n + 1)
+      exact h
+
+-- Note: The general circleEncodePath_trans is defined later, after circleLoop_rweq_decode,
+-- since it depends on circleCode_transport_shift which is derived from circleLoop_rweq_decode.
+
+@[simp] theorem circleEncodePath_trans_loop [HasUnivalence.{0}]
     (p : Path circleBase circleBase) :
     circleEncodePath (Path.trans p circleLoop) =
       circleEncodePath p + 1 := by
@@ -408,11 +498,11 @@ axiom circleLoop_rweq_decode (p : Path circleBase circleBase) :
     using this
 
 -- Encoding of the fundamental loop evaluates to `1`.
-@[simp] theorem circleEncodePath_loop : circleEncodePath circleLoop = 1 := by
+@[simp] theorem circleEncodePath_loop [HasUnivalence.{0}] : circleEncodePath circleLoop = 1 := by
   have := circleCode_transport_loop_add1 (x := circleCodeZero)
   simpa [circleEncodePath, circleEncodeRaw] using this
 
-@[simp] theorem circleEncodePath_trans_symm_loop
+@[simp] theorem circleEncodePath_trans_symm_loop [HasUnivalence.{0}]
     (p : Path circleBase circleBase) :
     circleEncodePath (Path.trans p (Path.symm circleLoop)) =
       circleEncodePath p - 1 := by
@@ -455,7 +545,7 @@ axiom circleLoop_rweq_decode (p : Path circleBase circleBase) :
     simpa [Int.add_sub_cancel] using h1
   simpa using hRearr.symm
 
-@[simp] theorem circleEncodePath_symm_loop :
+@[simp] theorem circleEncodePath_symm_loop [HasUnivalence.{0}] :
     circleEncodePath (Path.symm circleLoop) = -1 := by
   exact
     calc
@@ -468,6 +558,101 @@ axiom circleLoop_rweq_decode (p : Path circleBase circleBase) :
           circleEncodePath_refl
         simpa using _root_.congrArg (fun t => t - 1) this
       _ = -1 := by simp
+
+/-! ### Encode-Decode Round-Trip Lemmas -/
+
+/-- Encoding a natural loop power gives the natural number.
+    Uses the direct transport computation, avoiding circleEncodePath_trans. -/
+@[simp] theorem circleEncodePath_circleLoopPathPow [HasUnivalence.{0}] (n : Nat) :
+    circleEncodePath (circleLoopPathPow n) = (n : Int) := by
+  -- encode(loop^n) = codeToInt(transport (loop^n) 0) = codeToInt(0) + n = n
+  calc circleEncodePath (circleLoopPathPow n)
+      = circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+          (circleLoopPathPow n) circleCodeZero) := rfl
+    _ = circleCodeToInt circleCodeZero + n := circleCode_transport_loopPow_add n circleCodeZero
+    _ = 0 + n := by rw [circleCodeToInt_zero]
+    _ = n := by omega
+
+/-- Encoding of symm (loop^n) gives -n.
+    Uses the direct transport computation, avoiding circleEncodePath_trans. -/
+@[simp] theorem circleEncodePath_symm_circleLoopPathPow [HasUnivalence.{0}] (n : Nat) :
+    circleEncodePath (Path.symm (circleLoopPathPow n)) = -(n : Int) := by
+  -- encode(symm(loop^n)) = codeToInt(transport (symm(loop^n)) 0) = codeToInt(0) - n = -n
+  calc circleEncodePath (Path.symm (circleLoopPathPow n))
+      = circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+          (Path.symm (circleLoopPathPow n)) circleCodeZero) := rfl
+    _ = circleCodeToInt circleCodeZero - n := circleCode_transport_symm_loopPow_sub n circleCodeZero
+    _ = 0 - n := by rw [circleCodeToInt_zero]
+    _ = -(n : Int) := by omega
+
+/-- Encoding a z-power gives the integer back. (Right inverse for encode-decode) -/
+@[simp] theorem circleEncodePath_circleDecodePath [HasUnivalence.{0}] (n : Int) :
+    circleEncodePath (circleDecodePath n) = n := by
+  cases n with
+  | ofNat n => exact circleEncodePath_circleLoopPathPow n
+  | negSucc n =>
+      simp only [circleDecodePath_negSucc]
+      exact circleEncodePath_symm_circleLoopPathPow (n + 1)
+
+ /-- **Circle loop classification theorem**: Every loop on the circle is RwEq to the
+ decoded form of its winding number. This is the characteristic property of π₁(S¹) ≃ ℤ.
+
+This theorem captures the geometric fact that loops on S¹ are classified by winding number.
+The proof relies on the covering space theory - any loop on S¹ lifts uniquely to the
+universal cover ℤ (via transport in circleCode), and the endpoint of that lift determines
+the winding number. The Step rules then allow normalizing the loop to its canonical form.
+
+ **Note**: This fact is semantically justified by the encode-decode method.  Until
+ the development provides a fully constructive proof, we keep it as an explicit
+ hypothesis (a typeclass) rather than a global Lean kernel axiom. -/
+ class HasCircleLoopDecode [HasUnivalence.{0}] : Prop where
+    circleLoop_rweq_decode (p : Path.{u} circleBase circleBase) :
+      RwEq.{u} p (circleLoopPathZPow (circleEncodePath p))
+
+ /-- Every loop is RwEq to the decoded form of its winding number. -/
+ theorem circleLoop_rweq_decode [HasUnivalence.{0}] [h : HasCircleLoopDecode.{u}] (p : Path.{u} circleBase circleBase) :
+      RwEq.{u} p (circleLoopPathZPow (circleEncodePath p)) :=
+    h.circleLoop_rweq_decode p
+ 
+ /-- **Transport shift theorem**: Transport along a path acts by adding the winding number.
+ 
+ This is derived from `circleLoop_rweq_decode`: since any loop p is RwEq to `loop^(encode p)`,
+ they have the same `toEq`, hence the same transport behavior. -/
+ @[simp] theorem circleCode_transport_shift [HasUnivalence.{0}] [HasCircleLoopDecode.{u}]
+      (p : Path.{u} circleBase circleBase) (x : circleCode circleBase) :
+      circleCodeToInt (Path.transport (A := Circle) (D := circleCode) p x)
+        = circleCodeToInt x + circleEncodePath p := by
+  -- By circleLoop_rweq_decode: RwEq p (loop^(encode p))
+  have hrweq := circleLoop_rweq_decode p
+  -- RwEq implies same toEq
+  have htoEq := rweq_toEq hrweq
+  -- Same toEq implies same transport
+  have htransport := Path.transport_of_toEq_eq (A := Circle) (D := circleCode)
+      (p := p) (q := circleLoopPathZPow (circleEncodePath p)) htoEq x
+  -- Transport of loop^z adds z
+  have hshift := circleCode_transport_loopZPow_add (circleEncodePath p) x
+  -- Combine
+  calc circleCodeToInt (Path.transport (A := Circle) (D := circleCode) p x)
+      = circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+          (circleLoopPathZPow (circleEncodePath p)) x) := by rw [htransport]
+    _ = circleCodeToInt x + circleEncodePath p := hshift
+
+ /-- Encoding is additive over path composition.
+     Derived from `circleCode_transport_shift`. -/
+ @[simp] theorem circleEncodePath_trans [HasUnivalence.{0}] [HasCircleLoopDecode.{u}]
+      (p q : Path.{u} circleBase circleBase) :
+      circleEncodePath (Path.trans p q) = circleEncodePath p + circleEncodePath q := by
+  calc circleEncodePath (Path.trans p q)
+      = circleCodeToInt (Path.transport (A := Circle) (D := circleCode)
+          (Path.trans p q) circleCodeZero) := rfl
+    _ = circleCodeToInt (Path.transport (A := Circle) (D := circleCode) q
+          (Path.transport (A := Circle) (D := circleCode) p circleCodeZero)) := by
+        rw [Path.transport_trans]
+    _ = circleCodeToInt (Path.transport (A := Circle) (D := circleCode) p circleCodeZero)
+          + circleEncodePath q := by
+        exact circleCode_transport_shift q
+          (Path.transport (A := Circle) (D := circleCode) p circleCodeZero)
+    _ = circleEncodePath p + circleEncodePath q := rfl
 
 -- moved below after `circleEncodeLift` definition
 
@@ -509,7 +694,7 @@ abbrev circlePiOneGroup : LoopGroup Circle circleBase :=
 
 /-- Canonical encoding function obtained by quotient-lifting the raw loop
 encoding.  This is the implementation used by `circleEncode`. -/
-@[simp] def circleEncodeLift : CircleLoopQuot → Int :=
+@[simp] def circleEncodeLift [HasUnivalence.{0}] : CircleLoopQuot → Int :=
   Quot.lift (fun (p : Path circleBase circleBase) => circleEncodePath p)
     (by
       intro p q h
@@ -518,7 +703,7 @@ encoding.  This is the implementation used by `circleEncode`. -/
         exact h
       exact circleEncodePath_rweq (h := hrw))
 
-@[simp] theorem circleEncodeLift_ofLoop (p : Path circleBase circleBase) :
+@[simp] theorem circleEncodeLift_ofLoop [HasUnivalence.{0}] (p : Path circleBase circleBase) :
     circleEncodeLift (LoopQuot.ofLoop (A := Circle) (a := circleBase) p)
       = circleEncodePath p := rfl
 
@@ -585,7 +770,7 @@ def circleLoopPow (n : Nat) : CircleLoopQuot :=
               rfl
 
 -- Evaluate the lifted encoding on natural powers of the fundamental loop.
-@[simp] theorem circleEncodeLift_circleLoopPow (n : Nat) :
+@[simp] theorem circleEncodeLift_circleLoopPow [HasUnivalence.{0}] (n : Nat) :
     circleEncodeLift (circleLoopPow n) = (n : Int) := by
   induction n with
   | zero =>
@@ -820,7 +1005,7 @@ so no additional axioms are introduced beyond the circle HIT interface and the
 univalence principles imported earlier.  Algebraic properties that require more
 machinery live in `CircleStep`.
 -/
-@[simp] def circleEncode : CircleLoopQuot → Int :=
+@[simp] def circleEncode [HasUnivalence.{0}] : CircleLoopQuot → Int :=
   circleEncodeLift
 
 @[simp] def circleDecode : Int → CircleLoopQuot :=
@@ -865,12 +1050,12 @@ machinery live in `CircleStep`.
 
 -- Convenience rewrites for decode of ±1 steps (available via `circleDecode_add`).
 
-@[simp] theorem circleEncode_circleLoopClass :
+@[simp] theorem circleEncode_circleLoopClass [HasUnivalence.{0}] :
     circleEncode circleLoopClass = 1 := by
   change circleEncodePath circleLoop = 1
   exact circleEncodePath_loop
 
-@[simp] theorem circleEncode_inv_circleLoopClass :
+@[simp] theorem circleEncode_inv_circleLoopClass [HasUnivalence.{0}] :
     circleEncode (LoopQuot.inv circleLoopClass) = -1 := by
   change circleEncodeLift (LoopQuot.inv circleLoopClass) = -1
   -- Move to the raw path using `ofLoop_symm`.
@@ -885,17 +1070,17 @@ machinery live in `CircleStep`.
   exact circleEncodePath_symm_loop
 
 /-- Winding-number terminology for the map `π₁(S¹) → ℤ`. -/
-@[simp] def circleWindingNumber : circlePiOne → Int :=
+@[simp] def circleWindingNumber [HasUnivalence.{0}] : circlePiOne → Int :=
   circleEncode
 
 /-- Evaluation of `circleEncode ∘ circleDecode` on natural numbers. -/
-@[simp] theorem circleEncode_circleDecode_ofNat (n : Nat) :
+@[simp] theorem circleEncode_circleDecode_ofNat [HasUnivalence.{0}] (n : Nat) :
     circleEncode (circleDecode (Int.ofNat n)) = (n : Int) := by
   change circleEncodeLift (circleLoopPow n) = (n : Int)
   exact circleEncodeLift_circleLoopPow (n := n)
 
 /-- Encoding after right-composition with the fundamental loop adds `1`. -/
-@[simp] theorem circleEncodeLift_comp_loop (x : CircleLoopQuot) :
+@[simp] theorem circleEncodeLift_comp_loop [HasUnivalence.{0}] (x : CircleLoopQuot) :
     circleEncodeLift (LoopQuot.comp x circleLoopClass)
       = circleEncodeLift x + 1 := by
   refine Quot.inductionOn x ?h
@@ -907,7 +1092,7 @@ machinery live in `CircleStep`.
 
 /-- Encoding after right-composition with the inverse fundamental loop
 subtracts `1`. -/
-@[simp] theorem circleEncodeLift_comp_inv_loop (x : CircleLoopQuot) :
+@[simp] theorem circleEncodeLift_comp_inv_loop [HasUnivalence.{0}] (x : CircleLoopQuot) :
     circleEncodeLift (LoopQuot.comp x (LoopQuot.inv circleLoopClass))
       = circleEncodeLift x - 1 := by
   refine Quot.inductionOn x ?h
@@ -918,7 +1103,7 @@ subtracts `1`. -/
   exact circleEncodePath_trans_symm_loop (p := p)
 
 /-- Encoded form of `circleEncodeLift_comp_loop`. -/
-@[simp] theorem circleEncode_comp_loop (x : CircleLoopQuot) :
+@[simp] theorem circleEncode_comp_loop [HasUnivalence.{0}] (x : CircleLoopQuot) :
     circleEncode (LoopQuot.comp x circleLoopClass)
       = circleEncode x + 1 := by
   change circleEncodeLift (LoopQuot.comp x circleLoopClass)
@@ -926,20 +1111,20 @@ subtracts `1`. -/
   exact circleEncodeLift_comp_loop (x := x)
 
 /-- Encoded form of `circleEncodeLift_comp_inv_loop`. -/
-@[simp] theorem circleEncode_comp_inv_loop (x : CircleLoopQuot) :
+@[simp] theorem circleEncode_comp_inv_loop [HasUnivalence.{0}] (x : CircleLoopQuot) :
     circleEncode (LoopQuot.comp x (LoopQuot.inv circleLoopClass))
       = circleEncode x - 1 := by
   change circleEncodeLift (LoopQuot.comp x (LoopQuot.inv circleLoopClass))
     = circleEncodeLift x - 1
   exact circleEncodeLift_comp_inv_loop (x := x)
 
-@[simp] theorem circleEncode_circleDecode_neg_one :
+@[simp] theorem circleEncode_circleDecode_neg_one [HasUnivalence.{0}] :
     circleEncode (circleDecode (-1)) = -1 := by
   change circleEncode (LoopQuot.inv circleLoopClass) = -1
   exact circleEncode_inv_circleLoopClass
 
 -- Step law: encoding `decode (z + 1)` increases by one.
-@[simp] theorem circleEncode_circleDecode_add_one.{w} (z : Int) :
+@[simp] theorem circleEncode_circleDecode_add_one.{w} [HasUnivalence.{0}] (z : Int) :
     circleEncode.{w} (circleDecode.{w} (z + 1))
       = circleEncode.{w} (circleDecode.{w} z) + 1 := by
   unfold circleEncode circleDecode
@@ -947,7 +1132,7 @@ subtracts `1`. -/
   rw [circleEncodeLift_comp_loop (x := circleLoopZPow z)]
 
 -- Step law: encoding `decode (z + (-1))` decreases by one.
-@[simp] theorem circleEncode_circleDecode_add_neg_one.{w} (z : Int) :
+@[simp] theorem circleEncode_circleDecode_add_neg_one.{w} [HasUnivalence.{0}] (z : Int) :
     circleEncode.{w} (circleDecode.{w} (z + (-1)))
       = circleEncode.{w} (circleDecode.{w} z) - 1 := by
   unfold circleEncode circleDecode

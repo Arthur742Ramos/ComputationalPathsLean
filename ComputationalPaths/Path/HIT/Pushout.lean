@@ -116,19 +116,32 @@ def rec {D : Type v} (data : RecData (f := f) (g := g) D) :
 
 /-- **Pushout rec computation axiom**: The recursion principle computes correctly on glue paths.
 This is a β-rule for the pushout HIT. -/
-axiom rec_glue_rweq {D : Type v} (data : RecData (f := f) (g := g) D) (c : C) :
-    RwEq
+class HasRecGlueRwEq : Prop where
+  rec_glue_rweq {D : Type v} (data : RecData.{u, v} (f := f) (g := g) D) (c : C) :
+      RwEq.{v}
+        (Path.trans
+          (Path.symm (Path.ofEq (rec_inl (f := f) (g := g) data (f c))))
+          (Path.trans
+            (Path.congrArg (rec data) (glue (A := A) (B := B) (C := C) (f := f) (g := g) c))
+            (Path.ofEq (rec_inr (f := f) (g := g) data (g c)))))
+        (data.onGlue c)
+
+theorem rec_glue_rweq [h : HasRecGlueRwEq.{u, v} (A := A) (B := B) (C := C) (f := f) (g := g)]
+    {D : Type v} (data : RecData.{u, v} (f := f) (g := g) D) (c : C) :
+    RwEq.{v}
       (Path.trans
         (Path.symm (Path.ofEq (rec_inl (f := f) (g := g) data (f c))))
         (Path.trans
           (Path.congrArg (rec data) (glue (A := A) (B := B) (C := C) (f := f) (g := g) c))
           (Path.ofEq (rec_inr (f := f) (g := g) data (g c)))))
-      (data.onGlue c)
+      (data.onGlue c) :=
+  h.rec_glue_rweq (data := data) (c := c)
 
 /-- Computation rule for rec on the glue path.
 The image of glue c under rec is (up to transport) data.onGlue c. -/
-theorem rec_glue {D : Type v} (data : RecData (f := f) (g := g) D) (c : C) :
-    RwEq
+theorem rec_glue [HasRecGlueRwEq.{u, v} (A := A) (B := B) (C := C) (f := f) (g := g)]
+    {D : Type v} (data : RecData.{u, v} (f := f) (g := g) D) (c : C) :
+    RwEq.{v}
       (Path.trans
         (Path.symm (Path.ofEq (rec_inl (f := f) (g := g) data (f c))))
         (Path.trans
@@ -188,9 +201,22 @@ noncomputable def ind {D : Pushout A B C f g → Type v} (data : IndData (f := f
 
 /-- **Pushout ind computation axiom**: The induction principle computes correctly on glue paths.
 This is a dependent β-rule for the pushout HIT. -/
-axiom ind_glue_rweq {D : Pushout A B C f g → Type v}
-    (data : IndData (f := f) (g := g) D) (c : C) :
-    RwEq
+class HasIndGlueRwEq : Prop where
+  ind_glue_rweq {D : Pushout A B C f g → Type v} (data : IndData.{u, v} (f := f) (g := g) D) (c : C) :
+      RwEq.{v}
+        (Path.trans
+        (Path.symm
+          (Path.congrArg
+            (fun x => Path.transport (D := D) (glue c) x)
+            (Path.ofEq (ind_inl data (f c)))))
+        (Path.trans
+          (Path.apd (f := ind data) (glue c))
+          (Path.ofEq (ind_inr data (g c)))))
+        (data.onGlue c)
+
+theorem ind_glue_rweq [h : HasIndGlueRwEq.{u, v} (A := A) (B := B) (C := C) (f := f) (g := g)]
+    {D : Pushout A B C f g → Type v} (data : IndData.{u, v} (f := f) (g := g) D) (c : C) :
+    RwEq.{v}
       (Path.trans
       (Path.symm
         (Path.congrArg
@@ -199,12 +225,13 @@ axiom ind_glue_rweq {D : Pushout A B C f g → Type v}
       (Path.trans
         (Path.apd (f := ind data) (glue c))
         (Path.ofEq (ind_inr data (g c)))))
-      (data.onGlue c)
+      (data.onGlue c) :=
+  h.ind_glue_rweq (data := data) (c := c)
 
 /-- Computation rule for ind on the glue path. -/
-theorem ind_glue {D : Pushout A B C f g → Type v}
-    (data : IndData (f := f) (g := g) D) (c : C) :
-    RwEq
+theorem ind_glue [HasIndGlueRwEq.{u, v} (A := A) (B := B) (C := C) (f := f) (g := g)]
+    {D : Pushout A B C f g → Type v} (data : IndData.{u, v} (f := f) (g := g) D) (c : C) :
+    RwEq.{v}
       (Path.trans
       (Path.symm
         (Path.congrArg
@@ -254,18 +281,28 @@ This means: inlPath(f*(p)) ⋅ glue(c₂) = glue(c₁) ⋅ inrPath(g*(p))
 /-- **Glue naturality axiom**: The glue path is natural with respect to paths in C.
 This states that inlPath(f*(p)) ≈ glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹, which captures
 the commutativity of the pushout square at the level of paths. -/
-axiom glue_natural_rweq_axiom {c₁ c₂ : C} (p : Path c₁ c₂) :
+class HasGlueNaturalRwEq : Prop where
+  glue_natural_rweq_axiom {c₁ c₂ : C} (p : Path c₁ c₂) :
+      RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
+           (Path.trans (glue c₁)
+              (Path.trans (inrPath (Path.congrArg g p))
+                (Path.symm (glue c₂))))
+
+theorem glue_natural_rweq_axiom [h : HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
+    {c₁ c₂ : C} (p : Path c₁ c₂) :
     RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
          (Path.trans (glue c₁)
             (Path.trans (inrPath (Path.congrArg g p))
-              (Path.symm (glue c₂))))
+              (Path.symm (glue c₂)))) :=
+  h.glue_natural_rweq_axiom (p := p)
 
 /-- Glue naturality in RwEq form for fundamental group calculations.
 States that inlPath(f*(p)) is RwEq to glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹.
 
 Since equality proofs are proof-irrelevant, it is enough to show both sides
 have the same underlying propositional equality. -/
-theorem glue_natural_rweq {c₁ c₂ : C} (p : Path c₁ c₂) :
+theorem glue_natural_rweq [HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
+    {c₁ c₂ : C} (p : Path c₁ c₂) :
     RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
          (Path.trans (glue c₁)
             (Path.trans (inrPath (Path.congrArg g p))
@@ -274,11 +311,12 @@ theorem glue_natural_rweq {c₁ c₂ : C} (p : Path c₁ c₂) :
 
 /-- Glue naturality for loops: For a loop p at c₀, inlPath(f*(p)) equals
 glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹ up to RwEq. This is the key fact for SVK. -/
-theorem glue_natural_loop_rweq (c₀ : C) (p : LoopSpace C c₀) :
+theorem glue_natural_loop_rweq [HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
+    (c₀ : C) (p : LoopSpace C c₀) :
     RwEq (inlPath (Path.congrArg f p) : LoopSpace (Pushout A B C f g) (inl (f c₀)))
          (Path.trans (glue c₀)
            (Path.trans (inrPath (Path.congrArg g p))
-             (Path.symm (glue c₀)))) :=
+              (Path.symm (glue c₀)))) :=
   glue_natural_rweq p
 
 /-! ## Cocone Structure -/
