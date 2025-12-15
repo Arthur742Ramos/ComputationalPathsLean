@@ -46,11 +46,12 @@ HoTT-style developments, not something that can be instantiated inside Lean’s 
 
 ## Current kernel axioms (global)
 
-`Scripts/AxiomInventory.lean` currently reports **45** kernel axioms when importing `ComputationalPaths`.
+`Scripts/AxiomInventory.lean` currently reports **43** kernel axioms when importing `ComputationalPaths`.
 
 They are **exactly the HIT interfaces**:
 
 - `Circle`, `Cylinder`, `MobiusBand` include point/path constructors **and** recursors.
+- `Cylinder` keeps only the β-rules used downstream (base points and the bottom loop).
 - `Torus`, `KleinBottle`, `ProjectivePlane` currently expose only point/path constructors (and the
   defining surface relations), keeping the kernel axiom surface smaller.
 - `OrientableSurface` exposes the genus-indexed point/loop constructors plus the surface relation.

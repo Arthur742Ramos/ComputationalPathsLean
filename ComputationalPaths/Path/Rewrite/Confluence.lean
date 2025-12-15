@@ -47,11 +47,19 @@ that all critical pairs of the LND_EQ-TRS system are joinable.
 Previously this was proved using `Step.canon` which was removed because it
 caused inconsistency. The axiom here is weaker than `Step.canon` - it only
 asserts that join witnesses exist, not that every path canonicalizes. -/
-axiom join_of_rw {A : Type u} {a b : A}
-    {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
-    Join (A := A) (a := a) (b := b) q r
+class HasJoinOfRw : Type (u + 1) where
+  join_of_rw {A : Type u} {a b : A}
+      {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
+      Join (A := A) (a := a) (b := b) q r
+
+@[simp] def join_of_rw [h : HasJoinOfRw.{u}]
+    {A : Type u} {a b : A} {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
+    Join (A := A) (a := a) (b := b) q r :=
+  h.join_of_rw (hq := hq) (hr := hr)
 
 noncomputable section
+
+variable [HasJoinOfRw.{u}]
 
 /-- Join witnesses built from confluence of rewrites. -/
 @[simp] def of_rw {A : Type u} {a b : A}

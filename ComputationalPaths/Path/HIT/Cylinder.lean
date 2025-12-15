@@ -101,15 +101,8 @@ axiom cylinderRec_base0 {C : Type v} (data : CylinderRecData C) :
 axiom cylinderRec_base1 {C : Type v} (data : CylinderRecData C) :
   cylinderRec data cylinderBase1 = data.base1
 
-/-- β-rule for `cylinderRec` on the segment path. -/
-axiom cylinderRec_seg {C : Type v} (data : CylinderRecData C) :
-  Path.trans
-    (Path.symm (Path.ofEq (cylinderRec_base0 (C := C) data)))
-    (Path.trans
-      (Path.congrArg (cylinderRec data) cylinderSeg)
-      (Path.ofEq (cylinderRec_base1 (C := C) data))) =
-  data.seg
-
+/- We do not assume β-rules for `cylinderSeg` or `cylinderLoop1` in the current
+development.  Only the computation rules needed downstream are kept as axioms. -/
 /-- β-rule for `cylinderRec` on the bottom loop. -/
 axiom cylinderRec_loop0 {C : Type v} (data : CylinderRecData C) :
   Path.trans
@@ -118,15 +111,6 @@ axiom cylinderRec_loop0 {C : Type v} (data : CylinderRecData C) :
       (Path.congrArg (cylinderRec data) cylinderLoop0)
       (Path.ofEq (cylinderRec_base0 (C := C) data))) =
   data.loop0
-
-/-- β-rule for `cylinderRec` on the top loop. -/
-axiom cylinderRec_loop1 {C : Type v} (data : CylinderRecData C) :
-  Path.trans
-    (Path.symm (Path.ofEq (cylinderRec_base1 (C := C) data)))
-    (Path.trans
-      (Path.congrArg (cylinderRec data) cylinderLoop1)
-      (Path.ofEq (cylinderRec_base1 (C := C) data))) =
-  data.loop1
 
 noncomputable section
 
