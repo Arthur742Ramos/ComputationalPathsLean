@@ -52,41 +52,6 @@ axiom kleinSurf :
   Path.trans (Path.trans kleinLoopA kleinLoopB) (Path.symm kleinLoopA) =
     Path.symm kleinLoopB
 
-/-- Data required to eliminate from the Klein bottle into a target type `C`. -/
-structure KleinBottleRecData (C : Type v) where
-  base : C
-  loopA : Path base base
-  loopB : Path base base
-  surf :
-    Path.trans (Path.trans loopA loopB) (Path.symm loopA) =
-      Path.symm loopB
-
-/-- Recursor for the Klein bottle HIT skeleton. -/
-axiom kleinRec {C : Type v} (data : KleinBottleRecData C) :
-  KleinBottle → C
-
-/-- β-rule for `kleinRec` at the base point. -/
-axiom kleinRec_base {C : Type v} (data : KleinBottleRecData C) :
-  kleinRec data kleinBase = data.base
-
-/-- β-rule for the horizontal generator. -/
-axiom kleinRec_loopA {C : Type v} (data : KleinBottleRecData C) :
-  Path.trans
-    (Path.symm (Path.ofEq (kleinRec_base (C := C) data)))
-    (Path.trans
-      (Path.congrArg (kleinRec data) kleinLoopA)
-      (Path.ofEq (kleinRec_base (C := C) data))) =
-  data.loopA
-
-/-- β-rule for the vertical generator. -/
-axiom kleinRec_loopB {C : Type v} (data : KleinBottleRecData C) :
-  Path.trans
-    (Path.symm (Path.ofEq (kleinRec_base (C := C) data)))
-    (Path.trans
-      (Path.congrArg (kleinRec data) kleinLoopB)
-      (Path.ofEq (kleinRec_base (C := C) data))) =
-  data.loopB
-
 noncomputable section
 
 /-! ## Parity sign `(-1)^m` -/

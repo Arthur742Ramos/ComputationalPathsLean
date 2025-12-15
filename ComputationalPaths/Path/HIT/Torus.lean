@@ -46,38 +46,6 @@ axiom torusLoop2 : Path (A := Torus) torusBase torusBase
 axiom torusSurf :
   Path.trans torusLoop1 torusLoop2 = Path.trans torusLoop2 torusLoop1
 
-/-- Data required to eliminate from the torus into a target type `C`. -/
-structure TorusRecData (C : Type v) where
-  base : C
-  loop1 : Path base base
-  loop2 : Path base base
-  surf : Path.trans loop1 loop2 = Path.trans loop2 loop1
-
-/-- Torus eliminator (recursor). -/
-axiom torusRec {C : Type v} (data : TorusRecData C) : Torus → C
-
-/-- β-rule for `torusRec` at the base point. -/
-axiom torusRec_base {C : Type v} (data : TorusRecData C) :
-  torusRec data torusBase = data.base
-
-/-- β-rule for `torusRec` on the first fundamental loop. -/
-axiom torusRec_loop1 {C : Type v} (data : TorusRecData C) :
-  Path.trans
-    (Path.symm (Path.ofEq (torusRec_base (C := C) data)))
-    (Path.trans
-      (Path.congrArg (torusRec data) torusLoop1)
-      (Path.ofEq (torusRec_base (C := C) data))) =
-  data.loop1
-
-/-- β-rule for `torusRec` on the second fundamental loop. -/
-axiom torusRec_loop2 {C : Type v} (data : TorusRecData C) :
-  Path.trans
-    (Path.symm (Path.ofEq (torusRec_base (C := C) data)))
-    (Path.trans
-      (Path.congrArg (torusRec data) torusLoop2)
-      (Path.ofEq (torusRec_base (C := C) data))) =
-  data.loop2
-
 noncomputable section
 
 /-! ## Raw loop powers and decoding -/

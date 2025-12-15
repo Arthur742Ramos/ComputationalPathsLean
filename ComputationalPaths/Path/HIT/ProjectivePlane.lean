@@ -40,29 +40,6 @@ axiom projectiveLoop : Path (A := ProjectivePlane) projectiveBase projectiveBase
 axiom projectiveLoopSquare :
   Path.trans projectiveLoop projectiveLoop = Path.refl projectiveBase
 
-/-- Data required to eliminate from the projective plane into a target type `C`. -/
-structure ProjectivePlaneRecData (C : Type v) where
-  base : C
-  loop : Path base base
-  loopSquare : Path.trans loop loop = Path.refl base
-
-/-- Projective plane eliminator (recursor). -/
-axiom projectivePlaneRec {C : Type v} (data : ProjectivePlaneRecData C) :
-  ProjectivePlane → C
-
-/-- β-rule for `projectivePlaneRec` at the base point. -/
-axiom projectivePlaneRec_base {C : Type v} (data : ProjectivePlaneRecData C) :
-  projectivePlaneRec data projectiveBase = data.base
-
-/-- β-rule for `projectivePlaneRec` on the fundamental loop. -/
-axiom projectivePlaneRec_loop {C : Type v} (data : ProjectivePlaneRecData C) :
-  Path.trans
-    (Path.symm (Path.ofEq (projectivePlaneRec_base (C := C) data)))
-    (Path.trans
-      (Path.congrArg (projectivePlaneRec data) projectiveLoop)
-      (Path.ofEq (projectivePlaneRec_base (C := C) data))) =
-  data.loop
-
 noncomputable section
 
 /-! ## Decoding -/
