@@ -74,6 +74,44 @@ Non-kernel assumptions required by the circle encode/decode development:
   - Circle-specific loop classification hypothesis (encode/decode “decode∘encode” direction).
   - Defined in `ComputationalPaths/Path/HIT/Circle.lean`.
 
+## Torus fundamental group (π₁(T²) ≃ ℤ × ℤ)
+
+Kernel axioms *used by* `ComputationalPaths.Path.torusPiOneEquivIntProd`:
+
+- `Torus`, `torusBase`, `torusLoop1`, `torusLoop2`
+
+Non-kernel assumptions required by the torus encode/decode development:
+
+- `ComputationalPaths.Path.HasTorusLoopDecode`
+  - Torus-specific winding-number classification hypothesis for raw loops.
+  - Defined in `ComputationalPaths/Path/HIT/Torus.lean`.
+
+## Projective plane (π₁(RP²) ≃ ℤ₂)
+
+Kernel axioms *used by* `ComputationalPaths.Path.projectivePiOneEquivZ2`:
+
+- `ProjectivePlane`, `projectiveBase`, `projectiveLoop`
+
+Non-kernel assumptions required by the RP² encode/decode development:
+
+- `ComputationalPaths.Path.HasProjectiveLoopDecode`
+  - `Bool`-valued loop classification hypothesis for raw loops.
+  - Defined in `ComputationalPaths/Path/HIT/ProjectivePlane.lean`.
+
+## Klein bottle (π₁(K) ≃ ℤ ⋊ ℤ)
+
+Kernel axioms *used by* `ComputationalPaths.Path.kleinPiOneEquivIntProd`:
+
+- `KleinBottle`, `kleinBase`, `kleinLoopA`, `kleinLoopB`
+
+Non-kernel assumptions required by the Klein bottle encode/decode development:
+
+- `ComputationalPaths.Path.HasKleinLoopDecode`
+  - Normal-form classification hypothesis for raw loops (`a^m ⬝ b^n`).
+  - Defined in `ComputationalPaths/Path/HIT/KleinBottle.lean`.
+  - This gives an equivalence with `Int × Int` (normal-form coordinates); the SVK development
+    in `ComputationalPaths/Path/HIT/KleinBottleSVK.lean` builds the semidirect-product viewpoint.
+
 ## Pushout / SVK
 
 The pushout is implemented as a quotient, but some HIT-style β/naturality laws are not definitional.

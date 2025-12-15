@@ -235,7 +235,7 @@ def z2Add (x y : Bool) : Bool := xor x y
 
 @[simp] theorem z2Add_assoc (x y z : Bool) :
     z2Add (z2Add x y) z = z2Add x (z2Add y z) := by
-  simp [z2Add]; cases x <;> cases y <;> cases z <;> rfl
+  simp [z2Add]
 
 /-- Helper: convert a word to Bool (parity). -/
 def wordToBool : FreeProductWord Int Unit → Bool

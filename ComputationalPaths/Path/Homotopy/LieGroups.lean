@@ -246,10 +246,10 @@ def IntTuple.zero : (n : Nat) → IntTuple n
 /-- The standard 2-torus T² has π₁(T²) ≃ ℤ × ℤ.
 
 This is already proved in Torus.lean. The torus is the simplest
-compact non-simply-connected abelian Lie group of rank 2. -/
-noncomputable def torus2PiOneEquiv [HasUnivalence.{0}] [HasTorusLoopDecode.{u}] :
-    SimpleEquiv (π₁(Torus, torusBase)) (Int × Int) :=
-  torusPiOneEquivIntProd
+  compact non-simply-connected abelian Lie group of rank 2. -/
+ noncomputable def torus2PiOneEquiv [HasTorusLoopDecode] :
+     SimpleEquiv (π₁(Torus, torusBase)) (Int × Int) :=
+   torusPiOneEquivIntProd
 
 end TorusN
 
@@ -344,11 +344,11 @@ section Z2FundamentalGroup
 
 /-- Prototype for Lie groups with π₁ ≃ ℤ₂: the projective plane.
 
-For n ≥ 3, SO(n) has π₁ ≃ ℤ₂. The double cover is the spin group Spin(n).
-RP² demonstrates this structure in the computational paths framework. -/
-noncomputable def rp2_piOne_equiv_Z2 [HasUnivalence.{0}] [HasProjectiveLoopDecode.{u}] :
-    SimpleEquiv (π₁(ProjectivePlane, projectiveBase)) Bool :=
-  projectivePiOneEquivZ2
+ For n ≥ 3, SO(n) has π₁ ≃ ℤ₂. The double cover is the spin group Spin(n).
+ RP² demonstrates this structure in the computational paths framework. -/
+ noncomputable def rp2_piOne_equiv_Z2 [HasProjectiveLoopDecode] :
+     SimpleEquiv (π₁(ProjectivePlane, projectiveBase)) Bool :=
+   projectivePiOneEquivZ2
 
 end Z2FundamentalGroup
 

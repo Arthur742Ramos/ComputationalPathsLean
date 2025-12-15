@@ -27,9 +27,9 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + winding-number classification into ℤ (requires `HasCircleLoopDecode`, no univalence).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
-- Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd`.
-- Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition).
-- **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product) via encode/decode equivalence `kleinPiOneEquivIntProd`, with an alternative proof using Seifert-van Kampen on the CW-complex decomposition.
+- Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd` (requires `HasTorusLoopDecode`).
+- Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition; requires `HasProjectiveLoopDecode`).
+- **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product): normal-form equivalence `kleinPiOneEquivIntProd` (requires `HasKleinLoopDecode`), plus an alternative proof using Seifert-van Kampen on the CW-complex decomposition.
 - Möbius band, cylinder HITs with π₁ ≃ ℤ (homotopy equivalent to circle).
 - **Fundamental groupoid Π₁(X)**: Explicit groupoid structure with basepoint independence theorem (π₁(A,a) ≃ π₁(A,b) via path conjugation) and functoriality (f : A → B induces Π₁(f) : Π₁(A) → Π₁(B)).
 - **Product fundamental group theorem**: π₁(A × B, (a,b)) ≃ π₁(A, a) × π₁(B, b) via path projection/pairing, enabling inductive computation of π₁(T^n) ≃ ℤⁿ.
@@ -61,11 +61,11 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Homotopy/Hurewicz.lean`](ComputationalPaths/Path/Homotopy/Hurewicz.lean) — **Hurewicz theorem**: H₁(X) ≃ π₁(X)^ab (abelianization). Defines commutators, abelianization, first homology group H₁. Examples: H₁(S¹∨S¹) ≃ ℤ×ℤ, H₁(Klein bottle) ≃ ℤ×ℤ/2ℤ. Higher Hurewicz for simply-connected spaces.
 - [`ComputationalPaths/Path/Homotopy/CoveringClassification.lean`](ComputationalPaths/Path/Homotopy/CoveringClassification.lean) — **Covering space classification** via Galois correspondence: covering spaces ↔ subgroups of π₁. Universal cover with `deck_equiv_pi1` (Deck(X̃/X) ≃ π₁(X)). Regular covers, normal subgroups, examples for circle, torus, figure-eight, projective plane.
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
-- [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, code family into ℤ, encode/transport lemmas, z-powers.
+- [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface and loop classification interface `HasCircleLoopDecode`, with π₁(S¹) ≃ ℤ.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
-- [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT interface, code family into ℤ × ℤ, encode/transport lemmas, iterated loops, and the equivalence `torusPiOneEquivIntProd`.
-- [`ComputationalPaths/Path/HIT/ProjectivePlane.lean`](ComputationalPaths/Path/HIT/ProjectivePlane.lean) — real projective plane RP² with fundamental loop α satisfying α∘α=refl, and equivalence π₁(RP²) ≃ ℤ₂.
-- [`ComputationalPaths/Path/HIT/KleinBottle.lean`](ComputationalPaths/Path/HIT/KleinBottle.lean) — Klein bottle HIT with generators a, b and surface relation aba⁻¹=b⁻¹, plus full encode/decode equivalence π₁(K) ≃ ℤ ⋊ ℤ.
+- [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT skeleton and winding-number classification interface `HasTorusLoopDecode`, with π₁(T²) ≃ ℤ × ℤ.
+- [`ComputationalPaths/Path/HIT/ProjectivePlane.lean`](ComputationalPaths/Path/HIT/ProjectivePlane.lean) — real projective plane HIT skeleton and loop classification interface `HasProjectiveLoopDecode`, with π₁(RP²) ≃ ℤ₂.
+- [`ComputationalPaths/Path/HIT/KleinBottle.lean`](ComputationalPaths/Path/HIT/KleinBottle.lean) — Klein bottle HIT skeleton, parity sign `kleinSign`, and loop classification interface `HasKleinLoopDecode`, with a normal-form equivalence π₁(K) ≃ `Int × Int`.
 - [`ComputationalPaths/Path/HIT/KleinBottleSVK.lean`](ComputationalPaths/Path/HIT/KleinBottleSVK.lean) — Alternative proof of π₁(K) ≃ ℤ ⋊ ℤ using Seifert-van Kampen on the CW-complex pushout (D² attached to S¹∨S¹ via boundary word aba⁻¹b).
 - [`ComputationalPaths/Path/HIT/MobiusBand.lean`](ComputationalPaths/Path/HIT/MobiusBand.lean) — Möbius band HIT (homotopy equivalent to circle), π₁ ≃ ℤ.
 - [`ComputationalPaths/Path/HIT/Cylinder.lean`](ComputationalPaths/Path/HIT/Cylinder.lean) — Cylinder HIT (S¹ × I), π₁ ≃ ℤ.
@@ -344,6 +344,7 @@ Two approaches are available:
 - Encoding: `torusEncode : π₁(T²) → ℤ × ℤ` via the quotient lift of `torusEncodePath`.
 - Decoding: `torusDecode : ℤ × ℤ → π₁(T²)` assembles the z-powers of the two commuting loops.
 - Equivalence: `torusPiOneEquivIntProd` shows the maps are inverse, yielding π₁(T²) ≃ ℤ × ℤ.
+- Assumption: the classification data is packaged as the typeclass `HasTorusLoopDecode`.
 - Follow-up work: extracting a `TorusStep` module (analogous to `CircleStep`) would expose addition/subtraction lemmas as `[simp]` facts.
 
 **Derived approach via OrientableSurface** ([`TorusGenus1.lean`](ComputationalPaths/Path/HIT/TorusGenus1.lean)):
@@ -357,18 +358,15 @@ Two approaches are available:
 - Reference: de Veras, Ramos, de Queiroz & de Oliveira, "A Topological Application of Labelled Natural Deduction", SAJL.
 - HIT Interface: `ProjectivePlane` with base point and fundamental loop `projectiveLoop` satisfying `projectiveLoopSquare : α ∘ α = refl`.
 - ℤ₂ representation: `Bool` with XOR as addition (no Mathlib dependency).
-- Encoding: `projectiveEncodeQuot : π₁(RP²) → Bool` via quotient lift.
-- Decoding: `toPathZ2 : Bool → π₁(RP²)` maps `false → refl`, `true → loop`.
-- Equivalence: `projectivePiOneEquivZ2` shows π₁(RP²) ≃ ℤ₂ (with two remaining sorrys for transport computations).
+- Encoding/decoding: `projectiveEncode` / `projectiveDecode` with `projectiveDecodePath : Bool → Path projectiveBase projectiveBase`.
+- Equivalence: `projectivePiOneEquivZ2` shows π₁(RP²) ≃ ℤ₂, assuming `HasProjectiveLoopDecode`.
 
 ## Klein bottle π₁(K) ≃ ℤ ⋊ ℤ (what to read)
 - Reference: [de Veras, Ramos, de Queiroz & de Oliveira, *An alternative approach to the calculation of fundamental groups based on labeled natural deduction* (2019)](https://arxiv.org/abs/1906.09107).
 - HIT Interface: `KleinBottle` with base point, generators `kleinLoopA` (a) and `kleinLoopB` (b), and surface relation `aba⁻¹ = b⁻¹`.
-- Code family: `ℤ × ℤ` with semidirect multiplication `(m₁,n₁)·(m₂,n₂) = (m₁+m₂, σ(m₂)·n₁+n₂)` where `σ(m) = (-1)^m`.
-- Encoding: `kleinEncodeQuot : π₁(K) → ℤ × ℤ` via quotient lift of transport-based encoding.
-- Decoding: `kleinDecodeQuot : ℤ × ℤ → π₁(K)` maps `(m,n) ↦ [a^m · b^n]`.
-- Key lemma: `kleinLoopBClass_zpow_mul_loopAClass_zpow` establishes conjugation relation `[b]^n · [a]^m = [a]^m · [b]^{σ(m)·n}`.
-- Equivalence: `kleinPiOneEquivIntProd` shows π₁(K) ≃ ℤ ⋊ ℤ with the semidirect product structure.
+- Normal form: `kleinDecodePath : Int × Int → Path kleinBase kleinBase` builds loops `a^m ⬝ b^n`.
+- Encoding/decoding: `kleinEncode` / `kleinDecode`, with equivalence `kleinPiOneEquivIntProd`, assuming `HasKleinLoopDecode`.
+- Semidirect product viewpoint (multiplication on `Int × Int`) is developed in `KleinBottleSVK.lean`.
 - **Alternative proof via SVK** ([`KleinBottleSVK.lean`](ComputationalPaths/Path/HIT/KleinBottleSVK.lean)):
   - Constructs K as pushout: `FigureEight ←boundary─ S¹ ─collapse→ Point`
   - Boundary map sends `circleLoop` to `aba⁻¹b` (the Klein relation word)
