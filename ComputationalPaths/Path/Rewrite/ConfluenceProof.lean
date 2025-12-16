@@ -182,7 +182,7 @@ def join_lift_symm {a b : A} {p q : Path a b} (hj : Confluence.Join p q) :
   , right := Rw.refl p }
 
 /-- Extend a join by applying additional steps. -/
-@[simp] def join_extend_left {a b : A} {p q r s : Path a b}
+@[simp] def join_extend_left {a b : A} {p q r : Path a b} {_s : Path a b}
     (j : Confluence.Join p q) (hs : Rw r j.meet) (hp : r = p) :
     Confluence.Join p q :=
   { meet := j.meet
@@ -190,7 +190,7 @@ def join_lift_symm {a b : A} {p q : Path a b} (hj : Confluence.Join p q) :
   , right := j.right }
 
 /-- Build a join when one side already reduces to the other's target. -/
-@[simp] def join_of_rw_to_same {a b : A} {p q r s : Path a b}
+@[simp] def join_of_rw_to_same {a b : A} {p q : Path a b} {_r : Path a b} {s : Path a b}
     (hq : Rw p s) (hr : Rw q s) :
     Confluence.Join p q :=
   { meet := s

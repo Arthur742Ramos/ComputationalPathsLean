@@ -107,7 +107,23 @@ def reverse : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
   | consLeft x rest => concat (reverse rest) (singleLeft x)
   | consRight y rest => concat (reverse rest) (singleRight y)
 
+/-- Inverse of a word in a free product: reverse and negate each element.
+This requires `Neg` instances on the component types (e.g., for ℤ). -/
+def inverse [Neg G₁] [Neg G₂] : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
+  | nil => nil
+  | consLeft x rest => concat (inverse rest) (singleLeft (-x))
+  | consRight y rest => concat (inverse rest) (singleRight (-y))
+
+@[simp] theorem inverse_nil [Neg G₁] [Neg G₂] :
+    inverse (nil : FreeProductWord G₁ G₂) = nil := rfl
+
 @[simp] theorem concat_nil_left (w : FreeProductWord G₁ G₂) : concat nil w = w := rfl
+
+@[simp] theorem singleLeft_concat (x : G₁) (w : FreeProductWord G₁ G₂) :
+    concat (singleLeft x) w = consLeft x w := rfl
+
+@[simp] theorem singleRight_concat (y : G₂) (w : FreeProductWord G₁ G₂) :
+    concat (singleRight y) w = consRight y w := rfl
 
 @[simp] theorem concat_nil_right (w : FreeProductWord G₁ G₂) : concat w nil = w := by
   induction w with
@@ -121,6 +137,471 @@ def reverse : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
   | nil => rfl
   | consLeft x rest ih => simp [concat, ih]
   | consRight y rest ih => simp [concat, ih]
+
+/-! ### Inverse Properties -/
+
+/-- Inverse distributes over concatenation (in reverse order). -/
+theorem inverse_concat [Neg G₁] [Neg G₂] (w₁ w₂ : FreeProductWord G₁ G₂) :
+    inverse (concat w₁ w₂) = concat (inverse w₂) (inverse w₁) := by
+  induction w₁ with
+  | nil => simp [concat, inverse]
+  | consLeft x rest ih =>
+      simp only [concat, inverse]
+      rw [ih]
+      simp only [concat_assoc]
+  | consRight y rest ih =>
+      simp only [concat, inverse]
+      rw [ih]
+      simp only [concat_assoc]
+
+/-- Double inverse is identity (requires double negation to be identity). -/
+theorem inverse_inverse [Neg G₁] [Neg G₂]
+    (hG₁ : ∀ x : G₁, -(-x) = x) (hG₂ : ∀ y : G₂, -(-y) = y)
+    (w : FreeProductWord G₁ G₂) : inverse (inverse w) = w := by
+  induction w with
+  | nil => rfl
+  | consLeft x rest ih =>
+      simp only [inverse, singleLeft]
+      rw [inverse_concat, ih]
+      simp only [inverse, hG₁, concat_nil_left, singleLeft_concat]
+  | consRight y rest ih =>
+      simp only [inverse, singleRight]
+      rw [inverse_concat, ih]
+      simp only [inverse, hG₂, concat_nil_left, singleRight_concat]
+
+/-- Inverse of a singleton left element. -/
+@[simp] theorem inverse_singleLeft [Neg G₁] [Neg G₂] (x : G₁) :
+    inverse (singleLeft x : FreeProductWord G₁ G₂) = singleLeft (-x) := by
+  simp [inverse, singleLeft]
+
+/-- Inverse of a singleton right element. -/
+@[simp] theorem inverse_singleRight [Neg G₁] [Neg G₂] (y : G₂) :
+    inverse (singleRight y : FreeProductWord G₁ G₂) = singleRight (-y) := by
+  simp [inverse, singleRight]
+
+/-! ### Reduced Words
+
+A reduced word has no adjacent elements from the same side. This is important
+for normal forms in free products. -/
+
+/-- A word is reduced if no two adjacent elements are from the same side. -/
+def isReduced : FreeProductWord G₁ G₂ → Bool
+  | nil => true
+  | consLeft _ nil => true
+  | consLeft _ (consLeft _ _) => false
+  | consLeft _ rest@(consRight _ _) => isReduced rest
+  | consRight _ nil => true
+  | consRight _ (consRight _ _) => false
+  | consRight _ rest@(consLeft _ _) => isReduced rest
+
+/-- The empty word is reduced. -/
+theorem isReduced_nil : isReduced (nil : FreeProductWord G₁ G₂) = true := by
+  unfold isReduced
+  rfl
+
+/-- A singleton left word is reduced. -/
+theorem isReduced_singleLeft (x : G₁) :
+    isReduced (singleLeft x : FreeProductWord G₁ G₂) = true := by
+  unfold singleLeft isReduced
+  rfl
+
+/-- A singleton right word is reduced. -/
+theorem isReduced_singleRight (y : G₂) :
+    isReduced (singleRight y : FreeProductWord G₁ G₂) = true := by
+  unfold singleRight isReduced
+  rfl
+
+/-- Inductive characterization of reduced words. -/
+inductive IsReducedInd : FreeProductWord G₁ G₂ → Prop where
+  | nil : IsReducedInd nil
+  | singleLeft (x : G₁) : IsReducedInd (singleLeft x)
+  | singleRight (y : G₂) : IsReducedInd (singleRight y)
+  | consLeftRight (x : G₁) (y : G₂) (rest : FreeProductWord G₁ G₂)
+      (h : IsReducedInd (consRight y rest)) :
+      IsReducedInd (consLeft x (consRight y rest))
+  | consRightLeft (y : G₂) (x : G₁) (rest : FreeProductWord G₁ G₂)
+      (h : IsReducedInd (consLeft x rest)) :
+      IsReducedInd (consRight y (consLeft x rest))
+
+/-- Boolean `isReduced` implies `IsReducedInd`. -/
+theorem isReducedInd_of_isReduced {w : FreeProductWord G₁ G₂} (h : isReduced w = true) :
+    IsReducedInd w := by
+  induction w with
+  | nil => exact IsReducedInd.nil
+  | consLeft x rest ih =>
+      cases rest with
+      | nil => exact IsReducedInd.singleLeft x
+      | consLeft x' rest' =>
+          unfold isReduced at h
+          exact False.elim (Bool.false_ne_true h)
+      | consRight y rest' =>
+          unfold isReduced at h
+          exact IsReducedInd.consLeftRight x y rest' (ih h)
+  | consRight y rest ih =>
+      cases rest with
+      | nil => exact IsReducedInd.singleRight y
+      | consRight y' rest' =>
+          unfold isReduced at h
+          exact False.elim (Bool.false_ne_true h)
+      | consLeft x rest' =>
+          unfold isReduced at h
+          exact IsReducedInd.consRightLeft y x rest' (ih h)
+
+/-! ### Free Group Reduction Relation
+
+For free products of groups (not just sets), we need a reduction relation that:
+1. Combines adjacent elements from the same side: `consLeft x (consLeft y rest) ≈ consLeft (x + y) rest`
+2. Removes identity elements: `consLeft 0 rest ≈ rest`
+
+This allows proving that `w * inverse(w) = nil` (the group cancellation law). -/
+
+/-- Single-step reduction in a free product word.
+This captures both adjacent element combination and identity removal. -/
+inductive FreeGroupStep [Add G₁] [Add G₂] [Zero G₁] [Zero G₂] :
+    FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂ → Prop where
+  /-- Combine adjacent left elements: consLeft x (consLeft y rest) → consLeft (x + y) rest -/
+  | combineLeft (x y : G₁) (rest : FreeProductWord G₁ G₂) :
+      FreeGroupStep (consLeft x (consLeft y rest)) (consLeft (x + y) rest)
+  /-- Combine adjacent right elements: consRight x (consRight y rest) → consRight (x + y) rest -/
+  | combineRight (x y : G₂) (rest : FreeProductWord G₁ G₂) :
+      FreeGroupStep (consRight x (consRight y rest)) (consRight (x + y) rest)
+  /-- Remove left identity: consLeft 0 rest → rest -/
+  | removeLeftZero (rest : FreeProductWord G₁ G₂) :
+      FreeGroupStep (consLeft 0 rest) rest
+  /-- Remove right identity: consRight 0 rest → rest -/
+  | removeRightZero (rest : FreeProductWord G₁ G₂) :
+      FreeGroupStep (consRight 0 rest) rest
+  /-- Congruence: reduce inside consLeft -/
+  | congrLeft (x : G₁) {w w' : FreeProductWord G₁ G₂} :
+      FreeGroupStep w w' → FreeGroupStep (consLeft x w) (consLeft x w')
+  /-- Congruence: reduce inside consRight -/
+  | congrRight (y : G₂) {w w' : FreeProductWord G₁ G₂} :
+      FreeGroupStep w w' → FreeGroupStep (consRight y w) (consRight y w')
+
+/-- Multi-step reduction (reflexive-transitive closure). -/
+inductive FreeGroupRw [Add G₁] [Add G₂] [Zero G₁] [Zero G₂] :
+    FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂ → Prop where
+  | refl (w : FreeProductWord G₁ G₂) : FreeGroupRw w w
+  | step {w₁ w₂ : FreeProductWord G₁ G₂} :
+      FreeGroupStep w₁ w₂ → FreeGroupRw w₁ w₂
+  | trans {w₁ w₂ w₃ : FreeProductWord G₁ G₂} :
+      FreeGroupRw w₁ w₂ → FreeGroupRw w₂ w₃ → FreeGroupRw w₁ w₃
+
+/-- Free group equivalence (symmetric-transitive closure of FreeGroupRw). -/
+inductive FreeGroupEq [Add G₁] [Add G₂] [Zero G₁] [Zero G₂] :
+    FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂ → Prop where
+  | refl (w : FreeProductWord G₁ G₂) : FreeGroupEq w w
+  | step {w₁ w₂ : FreeProductWord G₁ G₂} :
+      FreeGroupStep w₁ w₂ → FreeGroupEq w₁ w₂
+  | symm {w₁ w₂ : FreeProductWord G₁ G₂} :
+      FreeGroupEq w₁ w₂ → FreeGroupEq w₂ w₁
+  | trans {w₁ w₂ w₃ : FreeProductWord G₁ G₂} :
+      FreeGroupEq w₁ w₂ → FreeGroupEq w₂ w₃ → FreeGroupEq w₁ w₃
+
+namespace FreeGroupEq
+
+variable [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+
+/-- FreeGroupRw implies FreeGroupEq. -/
+theorem of_rw {w₁ w₂ : FreeProductWord G₁ G₂} (h : FreeGroupRw w₁ w₂) :
+    FreeGroupEq w₁ w₂ := by
+  induction h with
+  | refl w => exact FreeGroupEq.refl w
+  | step hs => exact FreeGroupEq.step hs
+  | trans _ _ ih1 ih2 => exact FreeGroupEq.trans ih1 ih2
+
+/-- Congruence for consLeft. -/
+theorem consLeft_congr (x : G₁) {w w' : FreeProductWord G₁ G₂}
+    (h : FreeGroupEq w w') : FreeGroupEq (consLeft x w) (consLeft x w') := by
+  induction h with
+  | refl _ => exact FreeGroupEq.refl _
+  | step hs => exact FreeGroupEq.step (FreeGroupStep.congrLeft x hs)
+  | symm _ ih => exact FreeGroupEq.symm ih
+  | trans _ _ ih1 ih2 => exact FreeGroupEq.trans ih1 ih2
+
+/-- Congruence for consRight. -/
+theorem consRight_congr (y : G₂) {w w' : FreeProductWord G₁ G₂}
+    (h : FreeGroupEq w w') : FreeGroupEq (consRight y w) (consRight y w') := by
+  induction h with
+  | refl _ => exact FreeGroupEq.refl _
+  | step hs => exact FreeGroupEq.step (FreeGroupStep.congrRight y hs)
+  | symm _ ih => exact FreeGroupEq.symm ih
+  | trans _ _ ih1 ih2 => exact FreeGroupEq.trans ih1 ih2
+
+/-- Adjacent left elements can be combined. -/
+theorem combineLeft (x y : G₁) (rest : FreeProductWord G₁ G₂) :
+    FreeGroupEq (consLeft x (consLeft y rest)) (consLeft (x + y) rest) :=
+  FreeGroupEq.step (FreeGroupStep.combineLeft x y rest)
+
+/-- Adjacent right elements can be combined. -/
+theorem combineRight (x y : G₂) (rest : FreeProductWord G₁ G₂) :
+    FreeGroupEq (consRight x (consRight y rest)) (consRight (x + y) rest) :=
+  FreeGroupEq.step (FreeGroupStep.combineRight x y rest)
+
+/-- Left zero can be removed. -/
+theorem removeLeftZero (rest : FreeProductWord G₁ G₂) :
+    FreeGroupEq (consLeft 0 rest) rest :=
+  FreeGroupEq.step (FreeGroupStep.removeLeftZero rest)
+
+/-- Right zero can be removed. -/
+theorem removeRightZero (rest : FreeProductWord G₁ G₂) :
+    FreeGroupEq (consRight 0 rest) rest :=
+  FreeGroupEq.step (FreeGroupStep.removeRightZero rest)
+
+end FreeGroupEq
+
+/-! ### Key Lemma: Cancellation
+
+The key property we need: `concat w (inverse w) ≈ nil` (in FreeGroupEq).
+This requires that addition and negation satisfy group laws. -/
+
+/-- FreeGroupStep lifts through concat on the left. -/
+theorem freeGroupStep_concat_left [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+    (w₂ : FreeProductWord G₁ G₂) {w₁ w₁' : FreeProductWord G₁ G₂}
+    (h : FreeGroupStep w₁ w₁') :
+    FreeGroupEq (concat w₁ w₂) (concat w₁' w₂) := by
+  induction h with
+  | combineLeft x y rest =>
+      simp only [concat]
+      exact FreeGroupEq.step (FreeGroupStep.combineLeft x y (concat rest w₂))
+  | combineRight x y rest =>
+      simp only [concat]
+      exact FreeGroupEq.step (FreeGroupStep.combineRight x y (concat rest w₂))
+  | removeLeftZero rest =>
+      simp only [concat]
+      exact FreeGroupEq.step (FreeGroupStep.removeLeftZero _)
+  | removeRightZero rest =>
+      simp only [concat]
+      exact FreeGroupEq.step (FreeGroupStep.removeRightZero _)
+  | congrLeft x _ ih =>
+      simp only [concat]
+      exact FreeGroupEq.consLeft_congr x ih
+  | congrRight y _ ih =>
+      simp only [concat]
+      exact FreeGroupEq.consRight_congr y ih
+
+/-- Concatenation respects FreeGroupEq on the left. -/
+theorem concat_freeGroupEq_left [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+    (w₂ : FreeProductWord G₁ G₂) {w₁ w₁' : FreeProductWord G₁ G₂}
+    (h : FreeGroupEq w₁ w₁') :
+    FreeGroupEq (concat w₁ w₂) (concat w₁' w₂) := by
+  induction h with
+  | refl _ => exact FreeGroupEq.refl _
+  | step hs => exact freeGroupStep_concat_left w₂ hs
+  | symm _ ih => exact FreeGroupEq.symm ih
+  | trans _ _ ih1 ih2 => exact FreeGroupEq.trans ih1 ih2
+
+/-- Concatenation respects FreeGroupEq on the right. -/
+theorem concat_freeGroupEq_right [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+    (w₁ : FreeProductWord G₁ G₂) {w₂ w₂' : FreeProductWord G₁ G₂}
+    (h : FreeGroupEq w₂ w₂') :
+    FreeGroupEq (concat w₁ w₂) (concat w₁ w₂') := by
+  induction w₁ with
+  | nil => exact h
+  | consLeft x rest ih =>
+      simp only [concat]
+      exact FreeGroupEq.consLeft_congr x ih
+  | consRight y rest ih =>
+      simp only [concat]
+      exact FreeGroupEq.consRight_congr y ih
+
+/-- Key cancellation lemma: `concat (singleLeft x) (singleLeft (-x)) ≈ nil`
+when `x + (-x) = 0`. -/
+theorem singleLeft_cancel [Add G₁] [Add G₂] [Zero G₁] [Zero G₂] [Neg G₁]
+    (hadd : ∀ x : G₁, x + (-x) = 0) (x : G₁) :
+    FreeGroupEq (concat (singleLeft x) (singleLeft (-x)))
+                (nil : FreeProductWord G₁ G₂) := by
+  simp only [singleLeft, concat]
+  -- consLeft x (consLeft (-x) nil) → consLeft (x + (-x)) nil → consLeft 0 nil → nil
+  apply FreeGroupEq.trans (FreeGroupEq.combineLeft x (-x) nil)
+  rw [hadd]
+  exact FreeGroupEq.removeLeftZero nil
+
+/-- Key cancellation lemma: `concat (singleRight y) (singleRight (-y)) ≈ nil`
+when `y + (-y) = 0`. -/
+theorem singleRight_cancel [Add G₁] [Add G₂] [Zero G₁] [Zero G₂] [Neg G₂]
+    (hadd : ∀ y : G₂, y + (-y) = 0) (y : G₂) :
+    FreeGroupEq (concat (singleRight y) (singleRight (-y)))
+                (nil : FreeProductWord G₁ G₂) := by
+  simp only [singleRight, concat]
+  apply FreeGroupEq.trans (FreeGroupEq.combineRight y (-y) nil)
+  rw [hadd]
+  exact FreeGroupEq.removeRightZero nil
+
+/-- The main cancellation theorem: `concat w (inverse w) ≈ nil`.
+This is the key property making free products into groups. -/
+theorem concat_inverse_nil [Add G₁] [Add G₂] [Zero G₁] [Zero G₂] [Neg G₁] [Neg G₂]
+    (haddG₁ : ∀ x : G₁, x + (-x) = 0)
+    (haddG₂ : ∀ y : G₂, y + (-y) = 0)
+    (w : FreeProductWord G₁ G₂) :
+    FreeGroupEq (concat w (inverse w)) nil := by
+  induction w with
+  | nil =>
+      simp only [inverse, concat]
+      exact FreeGroupEq.refl nil
+  | consLeft x rest ih =>
+      -- inverse (consLeft x rest) = concat (inverse rest) (singleLeft (-x))
+      -- concat (consLeft x rest) (concat (inverse rest) (singleLeft (-x)))
+      -- = consLeft x (concat rest (concat (inverse rest) (singleLeft (-x))))
+      -- By associativity: = consLeft x (concat (concat rest (inverse rest)) (singleLeft (-x)))
+      -- By ih: ≈ consLeft x (concat nil (singleLeft (-x)))
+      --       = consLeft x (singleLeft (-x))
+      --       = consLeft x (consLeft (-x) nil)
+      -- By combine + remove: ≈ nil
+      simp only [inverse, concat]
+      -- Goal: FreeGroupEq (consLeft x (concat rest (concat (inverse rest) (singleLeft (-x))))) nil
+      have h1 : FreeGroupEq
+          (consLeft x (concat rest (concat (inverse rest) (singleLeft (-x)))))
+          (consLeft x (concat (concat rest (inverse rest)) (singleLeft (-x)))) := by
+        apply FreeGroupEq.consLeft_congr
+        rw [concat_assoc]
+        exact FreeGroupEq.refl _
+      apply FreeGroupEq.trans h1
+      have h2 : FreeGroupEq
+          (consLeft x (concat (concat rest (inverse rest)) (singleLeft (-x))))
+          (consLeft x (concat nil (singleLeft (-x)))) := by
+        apply FreeGroupEq.consLeft_congr
+        exact concat_freeGroupEq_left _ ih
+      apply FreeGroupEq.trans h2
+      simp only [concat]
+      -- consLeft x (consLeft (-x) nil) ≈ nil
+      apply FreeGroupEq.trans (FreeGroupEq.combineLeft x (-x) nil)
+      rw [haddG₁]
+      exact FreeGroupEq.removeLeftZero nil
+  | consRight y rest ih =>
+      simp only [inverse, concat]
+      have h1 : FreeGroupEq
+          (consRight y (concat rest (concat (inverse rest) (singleRight (-y)))))
+          (consRight y (concat (concat rest (inverse rest)) (singleRight (-y)))) := by
+        apply FreeGroupEq.consRight_congr
+        rw [concat_assoc]
+        exact FreeGroupEq.refl _
+      apply FreeGroupEq.trans h1
+      have h2 : FreeGroupEq
+          (consRight y (concat (concat rest (inverse rest)) (singleRight (-y))))
+          (consRight y (concat nil (singleRight (-y)))) := by
+        apply FreeGroupEq.consRight_congr
+        exact concat_freeGroupEq_left _ ih
+      apply FreeGroupEq.trans h2
+      simp only [concat]
+      apply FreeGroupEq.trans (FreeGroupEq.combineRight y (-y) nil)
+      rw [haddG₂]
+      exact FreeGroupEq.removeRightZero nil
+
+/-- Inverse respects FreeGroupStep.
+This requires the group anti-homomorphism property: -(x + y) = (-y) + (-x). -/
+theorem inverse_freeGroupStep [Add G₁] [Add G₂] [Zero G₁] [Zero G₂] [Neg G₁] [Neg G₂]
+    (hnegG₁ : ∀ x y : G₁, -(x + y) = (-y) + (-x))
+    (hnegG₂ : ∀ x y : G₂, -(x + y) = (-y) + (-x))
+    (hnegZeroG₁ : -(0 : G₁) = 0)
+    (hnegZeroG₂ : -(0 : G₂) = 0)
+    {w₁ w₂ : FreeProductWord G₁ G₂}
+    (h : FreeGroupStep w₁ w₂) :
+    FreeGroupEq (inverse w₁) (inverse w₂) := by
+  induction h with
+  | combineLeft x y rest =>
+      -- inverse (consLeft x (consLeft y rest)) = concat (concat (inverse rest) (singleLeft (-y))) (singleLeft (-x))
+      -- inverse (consLeft (x+y) rest) = concat (inverse rest) (singleLeft (-(x+y)))
+      simp only [inverse]
+      -- Need: concat (concat (inverse rest) (singleLeft (-y))) (singleLeft (-x)) ≈
+      --       concat (inverse rest) (singleLeft (-(x+y)))
+      -- Use associativity and combine
+      rw [concat_assoc]
+      apply concat_freeGroupEq_right
+      -- Need: concat (singleLeft (-y)) (singleLeft (-x)) ≈ singleLeft (-(x+y))
+      simp only [singleLeft, concat]
+      -- consLeft (-y) (consLeft (-x) nil) ≈ consLeft (-(x+y)) nil
+      apply FreeGroupEq.trans (FreeGroupEq.combineLeft (-y) (-x) nil)
+      rw [← hnegG₁]
+      exact FreeGroupEq.refl _
+  | combineRight x y rest =>
+      simp only [inverse]
+      rw [concat_assoc]
+      apply concat_freeGroupEq_right
+      simp only [singleRight, concat]
+      apply FreeGroupEq.trans (FreeGroupEq.combineRight (-y) (-x) nil)
+      rw [← hnegG₂]
+      exact FreeGroupEq.refl _
+  | removeLeftZero rest =>
+      -- inverse (consLeft 0 rest) = concat (inverse rest) (singleLeft (-0))
+      -- inverse rest
+      simp only [inverse]
+      -- concat (inverse rest) (singleLeft (-0)) ≈ inverse rest
+      rw [hnegZeroG₁]
+      simp only [singleLeft]
+      -- Goal: FreeGroupEq (concat (inverse rest) (consLeft 0 nil)) (inverse rest)
+      -- Use: concat (inverse rest) (consLeft 0 nil) ≈ concat (inverse rest) nil ≈ inverse rest
+      apply FreeGroupEq.trans (concat_freeGroupEq_right (inverse rest) (FreeGroupEq.removeLeftZero nil))
+      simp only [concat_nil_right]
+      exact FreeGroupEq.refl _
+  | removeRightZero rest =>
+      simp only [inverse]
+      rw [hnegZeroG₂]
+      simp only [singleRight]
+      -- Goal: FreeGroupEq (concat (inverse rest) (consRight 0 nil)) (inverse rest)
+      apply FreeGroupEq.trans (concat_freeGroupEq_right (inverse rest) (FreeGroupEq.removeRightZero nil))
+      simp only [concat_nil_right]
+      exact FreeGroupEq.refl _
+  | congrLeft x _ ih =>
+      simp only [inverse]
+      exact concat_freeGroupEq_left _ ih
+  | congrRight y _ ih =>
+      simp only [inverse]
+      exact concat_freeGroupEq_left _ ih
+
+/-- Right cancellation: `concat (inverse w) w ≈ nil`. -/
+theorem inverse_concat_nil [Add G₁] [Add G₂] [Zero G₁] [Zero G₂] [Neg G₁] [Neg G₂]
+    (haddG₁ : ∀ x : G₁, (-x) + x = 0)
+    (haddG₂ : ∀ y : G₂, (-y) + y = 0)
+    (w : FreeProductWord G₁ G₂) :
+    FreeGroupEq (concat (inverse w) w) nil := by
+  induction w with
+  | nil =>
+      simp only [inverse, concat]
+      exact FreeGroupEq.refl nil
+  | consLeft x rest ih =>
+      -- inverse (consLeft x rest) = concat (inverse rest) (singleLeft (-x))
+      -- concat (concat (inverse rest) (singleLeft (-x))) (consLeft x rest)
+      -- By assoc: = concat (inverse rest) (concat (singleLeft (-x)) (consLeft x rest))
+      --          = concat (inverse rest) (consLeft (-x) (consLeft x rest))
+      -- By combine: ≈ concat (inverse rest) (consLeft ((-x) + x) rest)
+      --            = concat (inverse rest) (consLeft 0 rest)
+      -- By remove: ≈ concat (inverse rest) rest
+      -- By ih: ≈ nil
+      simp only [inverse]
+      rw [concat_assoc]
+      simp only [singleLeft, concat]
+      -- Goal: FreeGroupEq (concat (inverse rest) (consLeft (-x) (consLeft x rest))) nil
+      have h1 : FreeGroupEq (consLeft (-x) (consLeft x rest)) (consLeft ((-x) + x) rest) :=
+        FreeGroupEq.combineLeft (-x) x rest
+      have h2 : FreeGroupEq (concat (inverse rest) (consLeft (-x) (consLeft x rest)))
+                            (concat (inverse rest) (consLeft ((-x) + x) rest)) :=
+        concat_freeGroupEq_right _ h1
+      apply FreeGroupEq.trans h2
+      rw [haddG₁]
+      have h3 : FreeGroupEq (consLeft 0 rest) rest := FreeGroupEq.removeLeftZero rest
+      have h4 : FreeGroupEq (concat (inverse rest) (consLeft 0 rest))
+                            (concat (inverse rest) rest) :=
+        concat_freeGroupEq_right _ h3
+      apply FreeGroupEq.trans h4
+      exact ih
+  | consRight y rest ih =>
+      simp only [inverse]
+      rw [concat_assoc]
+      simp only [singleRight, concat]
+      have h1 : FreeGroupEq (consRight (-y) (consRight y rest)) (consRight ((-y) + y) rest) :=
+        FreeGroupEq.combineRight (-y) y rest
+      have h2 : FreeGroupEq (concat (inverse rest) (consRight (-y) (consRight y rest)))
+                            (concat (inverse rest) (consRight ((-y) + y) rest)) :=
+        concat_freeGroupEq_right _ h1
+      apply FreeGroupEq.trans h2
+      rw [haddG₂]
+      have h3 : FreeGroupEq (consRight 0 rest) rest := FreeGroupEq.removeRightZero rest
+      have h4 : FreeGroupEq (concat (inverse rest) (consRight 0 rest))
+                            (concat (inverse rest) rest) :=
+        concat_freeGroupEq_right _ h3
+      apply FreeGroupEq.trans h4
+      exact ih
 
 end FreeProductWord
 
@@ -315,7 +796,362 @@ theorem mul_assoc' (x y z : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
              mul (Quot.mk _ w₁) (mul (Quot.mk _ w₂) (Quot.mk _ w₃))
         simp only [mul, ofWord, mulWordRight, FreeProductWord.concat_assoc]
 
+/-! ### Inverse Operation -/
+
+/-- Inverse respects the amalgamation relation.
+If `w₁ ≈ w₂` via amalgamation, then `inverse w₁ ≈ inverse w₂`.
+
+This requires that the amalgamation maps commute with negation:
+`-i₁(h) = i₁(-h)` and `-i₂(h) = i₂(-h)`. This is automatic for group homomorphisms. -/
+theorem inverse_respects_amalg [Neg G₁] [Neg G₂] [Neg H]
+    (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))  -- i₁ commutes with negation
+    (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))  -- i₂ commutes with negation
+    {w₁ w₂ : FreeProductWord G₁ G₂}
+    (h : AmalgEquiv i₁ i₂ w₁ w₂) :
+    AmalgEquiv i₁ i₂ (FreeProductWord.inverse w₁) (FreeProductWord.inverse w₂) := by
+  induction h with
+  | refl _ => exact AmalgEquiv.refl _
+  | step hr =>
+      cases hr with
+      | amalgLeftToRight hh pre suf =>
+          -- inverse (concat pre (concat (singleLeft (i₁ hh)) suf))
+          -- = concat (concat (inverse suf) (singleLeft (-(i₁ hh)))) (inverse pre)
+          -- We need to show this ≈ concat (concat (inverse suf) (singleRight (-(i₂ hh)))) (inverse pre)
+          simp only [FreeProductWord.inverse_concat]
+          -- Use associativity to restructure: (A · B) · C = A · (B · C)
+          have assoc1 : FreeProductWord.concat
+              (FreeProductWord.concat (FreeProductWord.inverse suf)
+                (FreeProductWord.inverse (FreeProductWord.singleLeft (i₁ hh))))
+              (FreeProductWord.inverse pre) =
+            FreeProductWord.concat (FreeProductWord.inverse suf)
+              (FreeProductWord.concat
+                (FreeProductWord.inverse (FreeProductWord.singleLeft (i₁ hh)))
+                (FreeProductWord.inverse pre)) := by
+            simp [FreeProductWord.concat_assoc]
+          have assoc2 : FreeProductWord.concat
+              (FreeProductWord.concat (FreeProductWord.inverse suf)
+                (FreeProductWord.inverse (FreeProductWord.singleRight (i₂ hh))))
+              (FreeProductWord.inverse pre) =
+            FreeProductWord.concat (FreeProductWord.inverse suf)
+              (FreeProductWord.concat
+                (FreeProductWord.inverse (FreeProductWord.singleRight (i₂ hh)))
+                (FreeProductWord.inverse pre)) := by
+            simp [FreeProductWord.concat_assoc]
+          rw [assoc1, assoc2]
+          apply concat_respects_right
+          apply concat_respects_left
+          simp only [FreeProductWord.inverse_singleLeft, FreeProductWord.inverse_singleRight]
+          rw [hi₁ hh, hi₂ hh]
+          apply AmalgEquiv.step
+          -- Goal: AmalgRelation ... (singleLeft (i₁ (-hh))) (singleRight (i₂ (-hh)))
+          have h1 : (FreeProductWord.singleLeft (i₁ (-hh)) : FreeProductWord G₁ G₂) =
+              FreeProductWord.concat (FreeProductWord.nil : FreeProductWord G₁ G₂)
+                (FreeProductWord.concat (FreeProductWord.singleLeft (i₁ (-hh)))
+                  (FreeProductWord.nil : FreeProductWord G₁ G₂)) := rfl
+          have h2 : (FreeProductWord.singleRight (i₂ (-hh)) : FreeProductWord G₁ G₂) =
+              FreeProductWord.concat (FreeProductWord.nil : FreeProductWord G₁ G₂)
+                (FreeProductWord.concat (FreeProductWord.singleRight (i₂ (-hh)))
+                  (FreeProductWord.nil : FreeProductWord G₁ G₂)) := rfl
+          rw [h1, h2]
+          exact AmalgRelation.amalgLeftToRight (-hh)
+            (FreeProductWord.nil : FreeProductWord G₁ G₂)
+            (FreeProductWord.nil : FreeProductWord G₁ G₂)
+      | amalgRightToLeft hh pre suf =>
+          simp only [FreeProductWord.inverse_concat]
+          have assoc1 : FreeProductWord.concat
+              (FreeProductWord.concat (FreeProductWord.inverse suf)
+                (FreeProductWord.inverse (FreeProductWord.singleRight (i₂ hh))))
+              (FreeProductWord.inverse pre) =
+            FreeProductWord.concat (FreeProductWord.inverse suf)
+              (FreeProductWord.concat
+                (FreeProductWord.inverse (FreeProductWord.singleRight (i₂ hh)))
+                (FreeProductWord.inverse pre)) := by
+            simp [FreeProductWord.concat_assoc]
+          have assoc2 : FreeProductWord.concat
+              (FreeProductWord.concat (FreeProductWord.inverse suf)
+                (FreeProductWord.inverse (FreeProductWord.singleLeft (i₁ hh))))
+              (FreeProductWord.inverse pre) =
+            FreeProductWord.concat (FreeProductWord.inverse suf)
+              (FreeProductWord.concat
+                (FreeProductWord.inverse (FreeProductWord.singleLeft (i₁ hh)))
+                (FreeProductWord.inverse pre)) := by
+            simp [FreeProductWord.concat_assoc]
+          rw [assoc1, assoc2]
+          apply concat_respects_right
+          apply concat_respects_left
+          simp only [FreeProductWord.inverse_singleLeft, FreeProductWord.inverse_singleRight]
+          rw [hi₁ hh, hi₂ hh]
+          apply AmalgEquiv.step
+          have h1 : (FreeProductWord.singleRight (i₂ (-hh)) : FreeProductWord G₁ G₂) =
+              FreeProductWord.concat (FreeProductWord.nil : FreeProductWord G₁ G₂)
+                (FreeProductWord.concat (FreeProductWord.singleRight (i₂ (-hh)))
+                  (FreeProductWord.nil : FreeProductWord G₁ G₂)) := rfl
+          have h2 : (FreeProductWord.singleLeft (i₁ (-hh)) : FreeProductWord G₁ G₂) =
+              FreeProductWord.concat (FreeProductWord.nil : FreeProductWord G₁ G₂)
+                (FreeProductWord.concat (FreeProductWord.singleLeft (i₁ (-hh)))
+                  (FreeProductWord.nil : FreeProductWord G₁ G₂)) := rfl
+          rw [h1, h2]
+          exact AmalgRelation.amalgRightToLeft (-hh)
+            (FreeProductWord.nil : FreeProductWord G₁ G₂)
+            (FreeProductWord.nil : FreeProductWord G₁ G₂)
+  | symm _ ih => exact AmalgEquiv.symm ih
+  | trans _ _ ih1 ih2 => exact AmalgEquiv.trans ih1 ih2
+
+/-- Inverse operation on the amalgamated free product.
+Requires that the amalgamation maps commute with negation. -/
+def inv [Neg G₁] [Neg G₂] [Neg H]
+    (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
+    (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))
+    (x : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
+    AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
+  Quot.lift
+    (fun w => ofWord (FreeProductWord.inverse w))
+    (fun _ _ h => Quot.sound (inverse_respects_amalg hi₁ hi₂ h))
+    x
+
+/-- Inverse of identity is identity. -/
+@[simp] theorem inv_one [Neg G₁] [Neg G₂] [Neg H]
+    (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
+    (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h)) :
+    inv hi₁ hi₂ (one : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) = one := by
+  simp only [inv, one, ofWord, FreeProductWord.inverse_nil]
+
+/-- Inverse distributes over multiplication (in reverse order). -/
+theorem inv_mul [Neg G₁] [Neg G₂] [Neg H]
+    (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
+    (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))
+    (x y : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
+    inv hi₁ hi₂ (mul x y) = mul (inv hi₁ hi₂ y) (inv hi₁ hi₂ x) := by
+  induction x using Quot.ind with
+  | _ _w₁ =>
+    induction y using Quot.ind with
+    | _ _w₂ =>
+      simp only [inv, mul, ofWord, mulWordRight, FreeProductWord.inverse_concat]
+
 end AmalgamatedFreeProduct
+
+/-! ## Full Amalgamated Free Product with Group Laws
+
+For the group laws (mul_inv_cancel, inv_mul_cancel) to hold, we need to
+quotient by both the amalgamation relation AND the free group reduction relation.
+-/
+
+/-- Combined equivalence relation including both amalgamation and free group reduction.
+This is the proper equivalence for free products of groups. -/
+inductive FullAmalgEquiv {G₁ G₂ H : Type u} [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+    (i₁ : H → G₁) (i₂ : H → G₂) :
+    FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂ → Prop where
+  | refl (w : FreeProductWord G₁ G₂) : FullAmalgEquiv i₁ i₂ w w
+  | amalg {w₁ w₂ : FreeProductWord G₁ G₂} :
+      AmalgRelation i₁ i₂ w₁ w₂ → FullAmalgEquiv i₁ i₂ w₁ w₂
+  | freeGroup {w₁ w₂ : FreeProductWord G₁ G₂} :
+      FreeProductWord.FreeGroupStep w₁ w₂ → FullAmalgEquiv i₁ i₂ w₁ w₂
+  | symm {w₁ w₂ : FreeProductWord G₁ G₂} :
+      FullAmalgEquiv i₁ i₂ w₁ w₂ → FullAmalgEquiv i₁ i₂ w₂ w₁
+  | trans {w₁ w₂ w₃ : FreeProductWord G₁ G₂} :
+      FullAmalgEquiv i₁ i₂ w₁ w₂ → FullAmalgEquiv i₁ i₂ w₂ w₃ → FullAmalgEquiv i₁ i₂ w₁ w₃
+
+namespace FullAmalgEquiv
+
+variable {G₁ G₂ H : Type u} [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+variable {i₁ : H → G₁} {i₂ : H → G₂}
+
+/-- AmalgEquiv implies FullAmalgEquiv. -/
+theorem of_amalgEquiv {w₁ w₂ : FreeProductWord G₁ G₂} (h : AmalgEquiv i₁ i₂ w₁ w₂) :
+    FullAmalgEquiv i₁ i₂ w₁ w₂ := by
+  induction h with
+  | refl _ => exact FullAmalgEquiv.refl _
+  | step hr => exact FullAmalgEquiv.amalg hr
+  | symm _ ih => exact FullAmalgEquiv.symm ih
+  | trans _ _ ih1 ih2 => exact FullAmalgEquiv.trans ih1 ih2
+
+/-- FreeGroupEq implies FullAmalgEquiv. -/
+theorem of_freeGroupEq {w₁ w₂ : FreeProductWord G₁ G₂}
+    (h : FreeProductWord.FreeGroupEq w₁ w₂) :
+    FullAmalgEquiv i₁ i₂ w₁ w₂ := by
+  induction h with
+  | refl _ => exact FullAmalgEquiv.refl _
+  | step hs => exact FullAmalgEquiv.freeGroup hs
+  | symm _ ih => exact FullAmalgEquiv.symm ih
+  | trans _ _ ih1 ih2 => exact FullAmalgEquiv.trans ih1 ih2
+
+end FullAmalgEquiv
+
+/-- The full amalgamated free product with group structure.
+Quotiented by both amalgamation and free group reduction. -/
+def FullAmalgamatedFreeProduct (G₁ G₂ H : Type u) [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+    (i₁ : H → G₁) (i₂ : H → G₂) : Type u :=
+  Quot (FullAmalgEquiv i₁ i₂)
+
+namespace FullAmalgamatedFreeProduct
+
+variable {G₁ G₂ H : Type u} [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+variable {i₁ : H → G₁} {i₂ : H → G₂}
+
+/-- Embed a word into the full amalgamated free product. -/
+def ofWord (w : FreeProductWord G₁ G₂) : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
+  Quot.mk _ w
+
+/-- Identity element (empty word). -/
+def one : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ := ofWord .nil
+
+/-- Concatenation respects the full equivalence relation on the left. -/
+theorem concat_respects_left (w₂ : FreeProductWord G₁ G₂) {w₁ w₁' : FreeProductWord G₁ G₂}
+    (h : FullAmalgEquiv i₁ i₂ w₁ w₁') :
+    FullAmalgEquiv i₁ i₂ (FreeProductWord.concat w₁ w₂) (FreeProductWord.concat w₁' w₂) := by
+  induction h with
+  | refl _ => exact FullAmalgEquiv.refl _
+  | amalg hr =>
+      cases hr with
+      | amalgLeftToRight hh pre suf =>
+          apply FullAmalgEquiv.amalg
+          simp only [FreeProductWord.concat_assoc]
+          exact AmalgRelation.amalgLeftToRight hh pre (FreeProductWord.concat suf w₂)
+      | amalgRightToLeft hh pre suf =>
+          apply FullAmalgEquiv.amalg
+          simp only [FreeProductWord.concat_assoc]
+          exact AmalgRelation.amalgRightToLeft hh pre (FreeProductWord.concat suf w₂)
+  | freeGroup hs =>
+      exact FullAmalgEquiv.of_freeGroupEq (FreeProductWord.freeGroupStep_concat_left w₂ hs)
+  | symm _ ih => exact FullAmalgEquiv.symm ih
+  | trans _ _ ih1 ih2 => exact FullAmalgEquiv.trans ih1 ih2
+
+/-- Concatenation respects the full equivalence relation on the right. -/
+theorem concat_respects_right (w₁ : FreeProductWord G₁ G₂) {w₂ w₂' : FreeProductWord G₁ G₂}
+    (h : FullAmalgEquiv i₁ i₂ w₂ w₂') :
+    FullAmalgEquiv i₁ i₂ (FreeProductWord.concat w₁ w₂) (FreeProductWord.concat w₁ w₂') := by
+  induction h with
+  | refl _ => exact FullAmalgEquiv.refl _
+  | amalg hr =>
+      cases hr with
+      | amalgLeftToRight hh pre suf =>
+          apply FullAmalgEquiv.amalg
+          -- Goal: concat w₁ (concat pre (concat (singleLeft ..) suf)) ≈
+          --       concat w₁ (concat pre (concat (singleRight ..) suf))
+          -- Use associativity: concat w₁ (concat pre x) = concat (concat w₁ pre) x
+          rw [← FreeProductWord.concat_assoc w₁ pre, ← FreeProductWord.concat_assoc w₁ pre]
+          exact AmalgRelation.amalgLeftToRight hh (FreeProductWord.concat w₁ pre) suf
+      | amalgRightToLeft hh pre suf =>
+          apply FullAmalgEquiv.amalg
+          rw [← FreeProductWord.concat_assoc w₁ pre, ← FreeProductWord.concat_assoc w₁ pre]
+          exact AmalgRelation.amalgRightToLeft hh (FreeProductWord.concat w₁ pre) suf
+  | freeGroup hs =>
+      -- Use the existing concat_freeGroupEq_right lemma
+      exact FullAmalgEquiv.of_freeGroupEq (FreeProductWord.concat_freeGroupEq_right w₁ (FreeProductWord.FreeGroupEq.step hs))
+  | symm _ ih => exact FullAmalgEquiv.symm ih
+  | trans _ _ ih1 ih2 => exact FullAmalgEquiv.trans ih1 ih2
+
+/-- Multiplication helper: multiply a word on the right. -/
+def mulWordRight (w₂ : FreeProductWord G₁ G₂) :
+    FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ → FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
+  Quot.lift
+    (fun w₁ => ofWord (FreeProductWord.concat w₁ w₂))
+    (fun _ _ h => Quot.sound (concat_respects_left w₂ h))
+
+/-- Multiplication in the full amalgamated free product. -/
+def mul (x y : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
+    FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
+  Quot.lift
+    (fun w₂ => mulWordRight w₂ x)
+    (fun w₂ w₂' h => by
+      induction x using Quot.ind with
+      | _ w₁ =>
+        unfold mulWordRight
+        apply Quot.sound
+        exact concat_respects_right w₁ h)
+    y
+
+instance : Mul (FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨mul⟩
+instance : One (FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨one⟩
+
+@[simp] theorem one_mul' (x : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) : mul one x = x := by
+  induction x using Quot.ind with
+  | _ w => rfl
+
+@[simp] theorem mul_one' (x : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) : mul x one = x := by
+  induction x using Quot.ind with
+  | _ w =>
+    simp only [mul, one, ofWord, mulWordRight, FreeProductWord.concat_nil_right]
+
+theorem mul_assoc' (x y z : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
+    mul (mul x y) z = mul x (mul y z) := by
+  induction x using Quot.ind with
+  | _ w₁ =>
+    induction y using Quot.ind with
+    | _ w₂ =>
+      induction z using Quot.ind with
+      | _ w₃ =>
+        simp only [mul, ofWord, mulWordRight, FreeProductWord.concat_assoc]
+
+/-- Inverse operation on the full amalgamated free product.
+Requires group axioms for negation:
+- Negation commutes with i₁, i₂
+- Negation anti-distributes over addition: -(x + y) = (-y) + (-x)
+- Negation of zero is zero -/
+def inv [Neg G₁] [Neg G₂] [Neg H]
+    (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
+    (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))
+    (hnegG₁ : ∀ x y : G₁, -(x + y) = (-y) + (-x))
+    (hnegG₂ : ∀ x y : G₂, -(x + y) = (-y) + (-x))
+    (hnegZeroG₁ : -(0 : G₁) = 0)
+    (hnegZeroG₂ : -(0 : G₂) = 0)
+    (x : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
+    FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
+  Quot.lift
+    (fun w => ofWord (FreeProductWord.inverse w))
+    (fun w₁ w₂ h => by
+      apply Quot.sound
+      induction h with
+      | refl _ => exact FullAmalgEquiv.refl _
+      | amalg hr =>
+          exact FullAmalgEquiv.of_amalgEquiv (AmalgamatedFreeProduct.inverse_respects_amalg hi₁ hi₂ (AmalgEquiv.step hr))
+      | freeGroup hs =>
+          exact FullAmalgEquiv.of_freeGroupEq (FreeProductWord.inverse_freeGroupStep hnegG₁ hnegG₂ hnegZeroG₁ hnegZeroG₂ hs)
+      | symm _ ih => exact FullAmalgEquiv.symm ih
+      | trans _ _ ih1 ih2 => exact FullAmalgEquiv.trans ih1 ih2)
+    x
+
+/-! ### Group Laws -/
+
+/-- **Left cancellation law**: x * inv(x) = one.
+This is the key group axiom showing that inverse is a right inverse. -/
+theorem mul_inv_cancel [Neg G₁] [Neg G₂] [Neg H]
+    (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
+    (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))
+    (hnegG₁ : ∀ x y : G₁, -(x + y) = (-y) + (-x))
+    (hnegG₂ : ∀ x y : G₂, -(x + y) = (-y) + (-x))
+    (hnegZeroG₁ : -(0 : G₁) = 0)
+    (hnegZeroG₂ : -(0 : G₂) = 0)
+    (haddG₁ : ∀ x : G₁, x + (-x) = 0)
+    (haddG₂ : ∀ y : G₂, y + (-y) = 0)
+    (x : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
+    mul x (inv hi₁ hi₂ hnegG₁ hnegG₂ hnegZeroG₁ hnegZeroG₂ x) = one := by
+  induction x using Quot.ind with
+  | _ w =>
+    simp only [mul, inv, one, ofWord, mulWordRight]
+    apply Quot.sound
+    exact FullAmalgEquiv.of_freeGroupEq (FreeProductWord.concat_inverse_nil haddG₁ haddG₂ w)
+
+/-- **Right cancellation law**: inv(x) * x = one.
+This is the key group axiom showing that inverse is a left inverse. -/
+theorem inv_mul_cancel [Neg G₁] [Neg G₂] [Neg H]
+    (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
+    (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))
+    (hnegG₁ : ∀ x y : G₁, -(x + y) = (-y) + (-x))
+    (hnegG₂ : ∀ x y : G₂, -(x + y) = (-y) + (-x))
+    (hnegZeroG₁ : -(0 : G₁) = 0)
+    (hnegZeroG₂ : -(0 : G₂) = 0)
+    (haddG₁ : ∀ x : G₁, (-x) + x = 0)
+    (haddG₂ : ∀ y : G₂, (-y) + y = 0)
+    (x : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
+    mul (inv hi₁ hi₂ hnegG₁ hnegG₂ hnegZeroG₁ hnegZeroG₂ x) x = one := by
+  induction x using Quot.ind with
+  | _ w =>
+    simp only [mul, inv, one, ofWord, mulWordRight]
+    apply Quot.sound
+    exact FullAmalgEquiv.of_freeGroupEq (FreeProductWord.inverse_concat_nil haddG₁ haddG₂ w)
+
+end FullAmalgamatedFreeProduct
 
 /-! ## Wedge Sum Loops
 
@@ -349,22 +1185,6 @@ noncomputable def wedgeDecode :
           (Path.trans (Pushout.inrPath q)
             (Path.symm (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)))))
         (wedgeDecode rest)
-
-/-- The encode function: extract a word from a loop in the wedge.
-
-**Implementation note**: This requires the "code family" approach:
-1. Define a type family `Code : Wedge → Type` via the pushout eliminator
-2. Show that `Code(basepoint) = WedgeLoopCode`
-3. Define encode via transport: `encode(p) = transport_along_p(nil)`
-
-The key insight is that transport along `glue` corresponds to prepending
-a letter to the word, allowing us to "read off" the word structure from
-any loop in the wedge.
-
-This construction fundamentally uses `Pushout.ind` (the dependent eliminator). -/
-noncomputable def wedgeEncode :
-    LoopSpace (Wedge A B a₀ b₀) (Wedge.basepoint) → WedgeLoopCode a₀ b₀ :=
-  fun _ => .nil -- Placeholder: requires Pushout.ind for correct implementation
 
 /-- Decode respects word concatenation. -/
 theorem wedgeDecode_concat (w₁ w₂ : WedgeLoopCode a₀ b₀) :
@@ -983,9 +1803,16 @@ This module establishes:
 
 1. **Free Product Words** (`FreeProductWord`): The representation of elements
    in a free product as alternating sequences.
+   - `concat`: Concatenation of words
+   - `inverse`: Word inverse (with `Neg` constraint)
+   - `isReduced`: Predicate for reduced words (no adjacent same-side elements)
 
 2. **Amalgamated Free Product** (`AmalgamatedFreeProduct`): The quotient of
    the free product by the amalgamation relation i₁(h) = i₂(h).
+   - `mul`, `one`: Monoid structure
+   - `inv`: Group inverse (requires amalgamation maps to commute with negation)
+   - `mul_assoc'`, `one_mul'`, `mul_one'`: Monoid laws
+   - `inv_one`, `inv_mul`: Inverse properties
 
 3. **Wedge Decode** (`wedgeDecode`): Converts a word in π₁(A) * π₁(B) to
    an actual loop in the wedge sum A ∨ B.
