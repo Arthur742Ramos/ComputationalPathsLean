@@ -148,6 +148,16 @@ Non-kernel assumptions required by the RP² encode/decode development:
 - `ComputationalPaths.Path.HasProjectiveLoopDecode`
   - `Bool`-valued loop classification hypothesis for raw loops.
   - Defined in `ComputationalPaths/Path/HIT/ProjectivePlane.lean`.
+  - This interface implies the quotient-level interface `HasProjectivePiOneEncode`.
+
+- `ComputationalPaths.Path.HasProjectivePiOneEncode`
+  - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
+    an `encode : π₁(RP²) → Bool` with `encode (projectiveDecode b) = b` and
+    `projectiveDecode (encode x) = x`.
+  - Defined in `ComputationalPaths/Path/HIT/ProjectivePlaneStep.lean`.
+  - Every `[HasProjectiveLoopDecode]` provides an instance, and conversely
+    `HasProjectivePiOneEncode` can be turned back into `HasProjectiveLoopDecode`
+    when a raw-loop statement is required.
 
 ## Klein bottle (π₁(K) ≃ ℤ ⋊ ℤ)
 
@@ -160,8 +170,19 @@ Non-kernel assumptions required by the Klein bottle encode/decode development:
 - `ComputationalPaths.Path.HasKleinLoopDecode`
   - Normal-form classification hypothesis for raw loops (`a^m ⬝ b^n`).
   - Defined in `ComputationalPaths/Path/HIT/KleinBottle.lean`.
-  - This gives an equivalence with `Int × Int` (normal-form coordinates); the SVK development
-    in `ComputationalPaths/Path/HIT/KleinBottleSVK.lean` builds the semidirect-product viewpoint.
+  - This interface implies the quotient-level interface `HasKleinPiOneEncode`.
+
+- `ComputationalPaths.Path.HasKleinPiOneEncode`
+  - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
+    an `encode : π₁(K) → ℤ × ℤ` with `encode (kleinDecode z) = z` and
+    `kleinDecode (encode x) = x`.
+  - Defined in `ComputationalPaths/Path/HIT/KleinBottleStep.lean`.
+  - Every `[HasKleinLoopDecode]` provides an instance, and conversely
+    `HasKleinPiOneEncode` can be turned back into `HasKleinLoopDecode` when a raw-loop
+    statement is required.
+
+The SVK development in `ComputationalPaths/Path/HIT/KleinBottleSVK.lean` builds the
+semidirect-product viewpoint and requires additional pushout assumptions.
 
 ## Pushout / SVK
 

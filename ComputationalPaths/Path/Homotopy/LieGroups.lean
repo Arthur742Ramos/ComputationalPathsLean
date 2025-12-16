@@ -98,7 +98,7 @@ import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.HIT.TorusStep
 import ComputationalPaths.Path.HIT.Sphere
-import ComputationalPaths.Path.HIT.ProjectivePlane
+import ComputationalPaths.Path.HIT.ProjectivePlaneStep
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
@@ -346,7 +346,7 @@ section Z2FundamentalGroup
 
  For n ≥ 3, SO(n) has π₁ ≃ ℤ₂. The double cover is the spin group Spin(n).
  RP² demonstrates this structure in the computational paths framework. -/
- noncomputable def rp2_piOne_equiv_Z2 [HasProjectiveLoopDecode] :
+ noncomputable def rp2_piOne_equiv_Z2 [HasProjectivePiOneEncode] :
      SimpleEquiv (π₁(ProjectivePlane, projectiveBase)) Bool :=
    projectivePiOneEquivZ2
 

@@ -121,7 +121,7 @@ theorem projectiveDecode_projectiveEncode [HasProjectiveLoopDecode]
   exact Quot.sound (rweq_symm hrweq)
 
 /-- Fundamental group of RP² is equivalent to `ℤ₂`, represented as `Bool`. -/
-noncomputable def projectivePiOneEquivZ2 [HasProjectiveLoopDecode] :
+noncomputable def projectivePiOneEquivZ2_ofLoopDecode [HasProjectiveLoopDecode] :
     SimpleEquiv projectivePiOne Bool where
   toFun := projectiveEncode
   invFun := projectiveDecode

@@ -28,8 +28,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Higher-inductive circle interface + π₁(S¹) ≃ ℤ via winding number (requires `HasCirclePiOneEncode`; optional raw-loop interface `HasCircleLoopDecode` is derivable).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
 - Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd` (requires `HasTorusPiOneEncode`; optional raw-loop interface `HasTorusLoopDecode` is derivable).
-- Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition; requires `HasProjectiveLoopDecode`).
-- **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product): normal-form equivalence `kleinPiOneEquivIntProd` (requires `HasKleinLoopDecode`), plus an alternative proof using Seifert-van Kampen on the CW-complex decomposition.
+- Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition; requires `HasProjectivePiOneEncode`; optional raw-loop interface `HasProjectiveLoopDecode` is derivable).
+- **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product): normal-form equivalence `kleinPiOneEquivIntProd` (requires `HasKleinPiOneEncode`; optional raw-loop interface `HasKleinLoopDecode` is derivable), plus an alternative proof using Seifert-van Kampen on the CW-complex decomposition.
 - Möbius band, cylinder HITs with π₁ ≃ ℤ (homotopy equivalent to circle).
 - **Fundamental groupoid Π₁(X)**: Explicit groupoid structure with basepoint independence theorem (π₁(A,a) ≃ π₁(A,b) via path conjugation) and functoriality (f : A → B induces Π₁(f) : Π₁(A) → Π₁(B)).
 - **Product fundamental group theorem**: π₁(A × B, (a,b)) ≃ π₁(A, a) × π₁(B, b) via path projection/pairing, enabling inductive computation of π₁(T^n) ≃ ℤⁿ.
@@ -66,8 +66,10 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean`](ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean) — **opt-in**: installs a global `HasCirclePiOneEncode` instance as a kernel axiom and exports `circlePiOneEquivInt'` with no extra parameters.
 - [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT interface, canonical `torusDecode : ℤ × ℤ → π₁(T²)`, and the optional raw-loop interface `HasTorusLoopDecode`.
 - [`ComputationalPaths/Path/HIT/TorusStep.lean`](ComputationalPaths/Path/HIT/TorusStep.lean) — quotient-level interface `HasTorusPiOneEncode` and `torusPiOneEquivIntProd : π₁(T²) ≃ ℤ × ℤ`.
-- [`ComputationalPaths/Path/HIT/ProjectivePlane.lean`](ComputationalPaths/Path/HIT/ProjectivePlane.lean) — real projective plane HIT skeleton and loop classification interface `HasProjectiveLoopDecode`, with π₁(RP²) ≃ ℤ₂.
-- [`ComputationalPaths/Path/HIT/KleinBottle.lean`](ComputationalPaths/Path/HIT/KleinBottle.lean) — Klein bottle HIT skeleton, parity sign `kleinSign`, and loop classification interface `HasKleinLoopDecode`, with a normal-form equivalence π₁(K) ≃ `Int × Int`.
+- [`ComputationalPaths/Path/HIT/ProjectivePlane.lean`](ComputationalPaths/Path/HIT/ProjectivePlane.lean) — real projective plane HIT skeleton and raw loop classification interface `HasProjectiveLoopDecode`, with the raw-loop equivalence `projectivePiOneEquivZ2_ofLoopDecode`.
+- [`ComputationalPaths/Path/HIT/ProjectivePlaneStep.lean`](ComputationalPaths/Path/HIT/ProjectivePlaneStep.lean) — quotient-level interface `HasProjectivePiOneEncode` and `projectivePiOneEquivZ2 : π₁(RP²) ≃ ℤ₂`.
+- [`ComputationalPaths/Path/HIT/KleinBottle.lean`](ComputationalPaths/Path/HIT/KleinBottle.lean) — Klein bottle HIT skeleton, parity sign `kleinSign`, and raw loop classification interface `HasKleinLoopDecode`, with the raw-loop equivalence `kleinPiOneEquivIntProd_ofLoopDecode`.
+- [`ComputationalPaths/Path/HIT/KleinBottleStep.lean`](ComputationalPaths/Path/HIT/KleinBottleStep.lean) — quotient-level interface `HasKleinPiOneEncode` and `kleinPiOneEquivIntProd : π₁(K) ≃ Int × Int`.
 - [`ComputationalPaths/Path/HIT/KleinBottleSVK.lean`](ComputationalPaths/Path/HIT/KleinBottleSVK.lean) — Alternative proof of π₁(K) ≃ ℤ ⋊ ℤ using Seifert-van Kampen on the CW-complex pushout (D² attached to S¹∨S¹ via boundary word aba⁻¹b).
 - [`ComputationalPaths/Path/HIT/MobiusBand.lean`](ComputationalPaths/Path/HIT/MobiusBand.lean) — Möbius band HIT (homotopy equivalent to circle), π₁ ≃ ℤ.
 - [`ComputationalPaths/Path/HIT/Cylinder.lean`](ComputationalPaths/Path/HIT/Cylinder.lean) — Cylinder HIT (S¹ × I), π₁ ≃ ℤ.
@@ -360,14 +362,17 @@ Two approaches are available:
 - Reference: de Veras, Ramos, de Queiroz & de Oliveira, "A Topological Application of Labelled Natural Deduction", SAJL.
 - HIT Interface: `ProjectivePlane` with base point and fundamental loop `projectiveLoop` satisfying `projectiveLoopSquare : α ∘ α = refl`.
 - ℤ₂ representation: `Bool` with XOR as addition (no Mathlib dependency).
-- Encoding/decoding: `projectiveEncode` / `projectiveDecode` with `projectiveDecodePath : Bool → Path projectiveBase projectiveBase`.
-- Equivalence: `projectivePiOneEquivZ2` shows π₁(RP²) ≃ ℤ₂, assuming `HasProjectiveLoopDecode`.
+- Decoding: `projectiveDecode : Bool → π₁(RP²)` with `projectiveDecodePath : Bool → Path projectiveBase projectiveBase`.
+- Encoding: `projectivePiOneEncode : π₁(RP²) → Bool` from the quotient-level interface `HasProjectivePiOneEncode` (the raw-loop `projectiveEncode` lives under `HasProjectiveLoopDecode`).
+- Equivalence: `projectivePiOneEquivZ2` shows π₁(RP²) ≃ ℤ₂, assuming `HasProjectivePiOneEncode`.
 
 ## Klein bottle π₁(K) ≃ ℤ ⋊ ℤ (what to read)
 - Reference: [de Veras, Ramos, de Queiroz & de Oliveira, *An alternative approach to the calculation of fundamental groups based on labeled natural deduction* (2019)](https://arxiv.org/abs/1906.09107).
 - HIT Interface: `KleinBottle` with base point, generators `kleinLoopA` (a) and `kleinLoopB` (b), and surface relation `aba⁻¹ = b⁻¹`.
 - Normal form: `kleinDecodePath : Int × Int → Path kleinBase kleinBase` builds loops `a^m ⬝ b^n`.
-- Encoding/decoding: `kleinEncode` / `kleinDecode`, with equivalence `kleinPiOneEquivIntProd`, assuming `HasKleinLoopDecode`.
+- Decoding: `kleinDecode : Int × Int → π₁(K)` with `kleinDecodePath` as the raw loop normal form.
+- Encoding: `kleinPiOneEncode : π₁(K) → Int × Int` from the quotient-level interface `HasKleinPiOneEncode` (the raw-loop `kleinEncode` lives under `HasKleinLoopDecode`).
+- Equivalence: `kleinPiOneEquivIntProd` shows π₁(K) ≃ ℤ × ℤ, assuming `HasKleinPiOneEncode`.
 - Semidirect product viewpoint (multiplication on `Int × Int`) is developed in `KleinBottleSVK.lean`.
 - **Alternative proof via SVK** ([`KleinBottleSVK.lean`](ComputationalPaths/Path/HIT/KleinBottleSVK.lean)):
   - Constructs K as pushout: `FigureEight ←boundary─ S¹ ─collapse→ Point`

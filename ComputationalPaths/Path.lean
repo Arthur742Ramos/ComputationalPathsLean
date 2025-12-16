@@ -40,9 +40,9 @@ import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.HIT.TorusStep
 import ComputationalPaths.Path.HIT.Cylinder
 import ComputationalPaths.Path.HIT.MobiusBand
-import ComputationalPaths.Path.HIT.KleinBottle
+import ComputationalPaths.Path.HIT.KleinBottleStep
 import ComputationalPaths.Path.HIT.KleinBottleSVK
-import ComputationalPaths.Path.HIT.ProjectivePlane
+import ComputationalPaths.Path.HIT.ProjectivePlaneStep
 import ComputationalPaths.Path.HIT.ProjectivePlaneSVK
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths

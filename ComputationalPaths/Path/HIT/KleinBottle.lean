@@ -212,7 +212,7 @@ theorem kleinDecode_kleinEncode [HasKleinLoopDecode] (x : kleinPiOne) :
 
 /-- Fundamental group of the Klein bottle, packaged as an equivalence
 `π₁(K) ≃ ℤ × ℤ` (normal-form coordinates). -/
-noncomputable def kleinPiOneEquivIntProd [HasKleinLoopDecode] :
+noncomputable def kleinPiOneEquivIntProd_ofLoopDecode [HasKleinLoopDecode] :
     SimpleEquiv kleinPiOne (Int × Int) where
   toFun := kleinEncode
   invFun := kleinDecode
