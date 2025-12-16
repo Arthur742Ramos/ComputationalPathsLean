@@ -24,6 +24,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Hurewicz theorem**: H₁(X) ≃ π₁(X)^ab (abelianization). First homology as abelianization of fundamental group. Examples: H₁(S¹∨S¹) ≃ ℤ×ℤ (from non-abelian ℤ*ℤ), H₁(Klein bottle) ≃ ℤ×ℤ/2ℤ.
 - **Covering space classification**: Galois correspondence between covering spaces and subgroups of π₁. Deck(X̃/X) ≃ π₁(X) for universal cover. Regular covers correspond to normal subgroups.
 - **Covering space theory**: Total spaces, path lifting, π₁-action on fibers, universal cover, deck transformations.
+- **Confluence of LND_EQ-TRS**: Complete proof that the computational path rewrite system is confluent via Newman's Lemma (local confluence + termination). Critical pair analysis for all core path algebra rules including the challenging inverse-related pairs.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + π₁(S¹) ≃ ℤ via winding number (requires `HasCirclePiOneEncode`; optional raw-loop interface `HasCircleLoopDecode` is derivable).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
@@ -61,6 +62,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Homotopy/Hurewicz.lean`](ComputationalPaths/Path/Homotopy/Hurewicz.lean) — **Hurewicz theorem**: H₁(X) ≃ π₁(X)^ab (abelianization). Defines commutators, abelianization, first homology group H₁. Examples: H₁(S¹∨S¹) ≃ ℤ×ℤ, H₁(Klein bottle) ≃ ℤ×ℤ/2ℤ. Higher Hurewicz for simply-connected spaces.
 - [`ComputationalPaths/Path/Homotopy/CoveringClassification.lean`](ComputationalPaths/Path/Homotopy/CoveringClassification.lean) — **Covering space classification** via Galois correspondence: covering spaces ↔ subgroups of π₁. Universal cover with `deck_equiv_pi1` (Deck(X̃/X) ≃ π₁(X)). Regular covers, normal subgroups, examples for circle, torus, figure-eight, projective plane.
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
+- [`ComputationalPaths/Path/Rewrite/ConfluenceProof.lean`](ComputationalPaths/Path/Rewrite/ConfluenceProof.lean) — **Confluence proof** via Newman's Lemma: critical pair analysis, local confluence, strip lemma, and `HasJoinOfRw` instance.
 - [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, canonical `circleDecode : ℤ → π₁(S¹)`, and the optional raw-loop interface `HasCircleLoopDecode`.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — quotient-level interface `HasCirclePiOneEncode`, `circlePiOneEquivInt : π₁(S¹) ≃ ℤ`, and winding-number algebra lemmas.
 - [`ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean`](ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean) — **opt-in**: installs a global `HasCirclePiOneEncode` instance as a kernel axiom and exports `circlePiOneEquivInt'` with no extra parameters.
@@ -518,6 +520,9 @@ Non-kernel assumptions that are intentionally explicit (selected examples):
   - Used by some HoTT-style developments to model “transport along `ua` computes to the equivalence”.
   - **Cannot be instantiated in standard Lean** (proof-irrelevance makes it inconsistent); see `docs/axioms.md` and `Scripts/UnivalenceInconsistency.lean`.
 - **Pushout β/naturality (SVK)**: `Pushout.HasRecGlueRwEq`, `Pushout.HasIndGlueRwEq`, `Pushout.HasGlueNaturalRwEq`.
+- **Confluence axioms** (justified by critical pair analysis + termination):
+  - `local_confluence`: Any two single-step reductions from the same source can be joined.
+  - `step_strip_prop`: Strip lemma — single step joins with multi-step derivation.
 
 See `docs/axioms.md` for the authoritative overview.
 
