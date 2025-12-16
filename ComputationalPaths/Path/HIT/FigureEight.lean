@@ -187,7 +187,7 @@ noncomputable def figureEightPiOneEquivPiOneProduct :
     SimpleEquiv FigureEightPiOne (FreeProductWord circlePiOne circlePiOne) :=
   wedgeFundamentalGroupEquiv circleBase circleBase
 
-variable [HasCircleLoopDecode.{u}]
+variable [HasCirclePiOneEncode.{u}]
 
 /-- Step 2: FreeProductWord (π₁(S¹)) (π₁(S¹)) ≃ FreeProductWord ℤ ℤ
 

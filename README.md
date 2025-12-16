@@ -25,7 +25,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Covering space classification**: Galois correspondence between covering spaces and subgroups of π₁. Deck(X̃/X) ≃ π₁(X) for universal cover. Regular covers correspond to normal subgroups.
 - **Covering space theory**: Total spaces, path lifting, π₁-action on fibers, universal cover, deck transformations.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
-- Higher-inductive circle interface + winding-number classification into ℤ (requires `HasCircleLoopDecode`, no univalence).
+- Higher-inductive circle interface + π₁(S¹) ≃ ℤ via winding number (requires `HasCirclePiOneEncode`; optional raw-loop interface `HasCircleLoopDecode` is derivable).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
 - Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd` (requires `HasTorusLoopDecode`).
 - Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition; requires `HasProjectiveLoopDecode`).
@@ -61,8 +61,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Homotopy/Hurewicz.lean`](ComputationalPaths/Path/Homotopy/Hurewicz.lean) — **Hurewicz theorem**: H₁(X) ≃ π₁(X)^ab (abelianization). Defines commutators, abelianization, first homology group H₁. Examples: H₁(S¹∨S¹) ≃ ℤ×ℤ, H₁(Klein bottle) ≃ ℤ×ℤ/2ℤ. Higher Hurewicz for simply-connected spaces.
 - [`ComputationalPaths/Path/Homotopy/CoveringClassification.lean`](ComputationalPaths/Path/Homotopy/CoveringClassification.lean) — **Covering space classification** via Galois correspondence: covering spaces ↔ subgroups of π₁. Universal cover with `deck_equiv_pi1` (Deck(X̃/X) ≃ π₁(X)). Regular covers, normal subgroups, examples for circle, torus, figure-eight, projective plane.
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
-- [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface and loop classification interface `HasCircleLoopDecode`, with π₁(S¹) ≃ ℤ.
-- [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — step laws, encode∘decode=id on ℤ, decode∘encode=id on π₁, and decode-add/sub/group lemmas.
+- [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, canonical `circleDecode : ℤ → π₁(S¹)`, and the optional raw-loop interface `HasCircleLoopDecode`.
+- [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — quotient-level interface `HasCirclePiOneEncode`, `circlePiOneEquivInt : π₁(S¹) ≃ ℤ`, and winding-number algebra lemmas.
 - [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT skeleton and winding-number classification interface `HasTorusLoopDecode`, with π₁(T²) ≃ ℤ × ℤ.
 - [`ComputationalPaths/Path/HIT/ProjectivePlane.lean`](ComputationalPaths/Path/HIT/ProjectivePlane.lean) — real projective plane HIT skeleton and loop classification interface `HasProjectiveLoopDecode`, with π₁(RP²) ≃ ℤ₂.
 - [`ComputationalPaths/Path/HIT/KleinBottle.lean`](ComputationalPaths/Path/HIT/KleinBottle.lean) — Klein bottle HIT skeleton, parity sign `kleinSign`, and loop classification interface `HasKleinLoopDecode`, with a normal-form equivalence π₁(K) ≃ `Int × Int`.
@@ -483,7 +483,7 @@ This project tries to minimize **Lean kernel axioms**. We distinguish:
 
 - **Kernel axioms**: Lean `axiom` declarations that extend the trusted base.
 - **Assumptions**: explicit hypotheses (usually typeclasses), ranging from `Prop`-valued markers
-  (e.g. `HasUnivalence`) to `Type`-valued data interfaces (e.g. `HasCircleLoopDecode`). These do
+  (e.g. `HasUnivalence`) to `Type`-valued data interfaces (e.g. `HasCirclePiOneEncode`). These do
   **not** extend the kernel, but must be discharged by providing an instance/proof.
 
 ### Measuring kernel axioms
@@ -492,16 +492,21 @@ This project tries to minimize **Lean kernel axioms**. We distinguish:
   - `.\lake.cmd env lean Scripts/AxiomInventory.lean`
 - Kernel axiom dependencies for a specific declaration:
   - `.\lake.cmd env lean Scripts/AxiomDependencies.lean` (edit the target name inside the file)
+- Typeclass assumption dependencies for a specific declaration:
+  - `.\lake.cmd env lean Scripts/AssumptionDependencies.lean` (edit the target name inside the file)
+- Quick survey of key theorems’ assumptions:
+  - `.\lake.cmd env lean Scripts/AssumptionSurvey.lean`
 
 ### Current status
 
-- `Scripts/AxiomInventory.lean` reports **56 kernel axioms** for `import ComputationalPaths`; these are **exactly the HIT interfaces** (types/constructors/recursors) for:
+- `Scripts/AxiomInventory.lean` reports **43 kernel axioms** for `import ComputationalPaths`; these are **exactly the HIT interfaces** (types/constructors/recursors) for:
   - `Circle`, `Cylinder`, `Torus`, `KleinBottle`, `MobiusBand`, `ProjectivePlane`, `OrientableSurface`.
 - `Scripts/AxiomDependencies.lean` reports that `circlePiOneEquivInt` depends on only the **circle generators** (3 kernel axioms: `Circle`, `circleBase`, `circleLoop`).
 
 Non-kernel assumptions that are intentionally explicit (selected examples):
 
-- **Circle loop classification**: `ComputationalPaths.Path.HasCircleLoopDecode` (needed for the “decode∘encode” direction).
+- **Circle π₁ equivalence data**: `ComputationalPaths.Path.HasCirclePiOneEncode` (minimal interface used by `circlePiOneEquivInt`).
+- **(Optional) Raw circle loop normal forms**: `ComputationalPaths.Path.HasCircleLoopDecode` (used only for raw-loop statements; derivable from `HasCirclePiOneEncode`).
 - **Univalence marker**: `ComputationalPaths.Path.HasUnivalence`.
   - Used by some HoTT-style developments to model “transport along `ua` computes to the equivalence”.
   - **Cannot be instantiated in standard Lean** (proof-irrelevance makes it inconsistent); see `docs/axioms.md` and `Scripts/UnivalenceInconsistency.lean`.
@@ -520,7 +525,7 @@ We intentionally do **not** assume global UIP-like collapse principles (e.g. the
 - When a structure adds data on top of an existing interface, prefer extending the smaller structure (e.g. `WeakGroupoid` extends `WeakCategory`) to keep identities/composition definitions in one place.
 
 ## Maintenance / refactor opportunities
-- **Circle/Torus step modules**: [`CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) redefines lemmas that already live in [`Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean). Consolidating those proofs (and adding a `TorusStep` counterpart) would make the encode/ decode algebra reusable via imports.
+- **Torus step module**: [`CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) centralizes the quotient-level π₁(S¹) ≃ ℤ interface and algebra. A `TorusStep` counterpart would make the π₁(T²) encode/decode algebra reusable via imports.
 - **Axioms to constructions**: circle and torus HITs are still axioms; replacing them with concrete constructions or a general HIT layer remains an open project.
 - **Developer docs**: a short tutorial showing how to apply the π₁ equivalences downstream (e.g. deriving homomorphisms into ℤ) would help new contributors.
 

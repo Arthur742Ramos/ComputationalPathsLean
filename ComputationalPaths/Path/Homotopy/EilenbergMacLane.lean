@@ -161,29 +161,35 @@ theorem circleConnected : (x : Circle) → ∃ _p : Path x circleBase, True := b
   exact result.down
 
 /-- The circle is K(ℤ,1). -/
-noncomputable def circleIsKZ1 [HasCircleLoopDecode.{u}] :
-    IsKG1 circlePointed Int intAbelianGroup.toGroupStr where
-  connected := circleConnected
-  pi1_iso_toFun := circleEncode
-  pi1_iso_surj := fun z =>
-    ⟨circleDecode z, circleEncode_circleDecode z⟩
-  pi1_iso_inj := fun α β h => by
-    have hα : circleDecode.{u} (circleEncode α) = α :=
-      circleDecode_circleEncode.{u} α
-    have hβ : circleDecode.{u} (circleEncode β) = β :=
-      circleDecode_circleEncode.{u} β
-    calc α = circleDecode.{u} (circleEncode α) := hα.symm
-      _ = circleDecode.{u} (circleEncode β) := _root_.congrArg (circleDecode.{u}) h
-      _ = β := hβ
-  pi1_iso_one := circleEncodePath_refl
-  pi1_iso_mul := circleEncode_mul
-  pi2_trivial := fun l =>
-    -- All types are 1-groupoids in this framework, so π₂ is always trivial
-    Truncation.IsGroupoid.allTypes.derivEq l Loop2Space.refl
+noncomputable def circleIsKZ1 [HasCirclePiOneEncode.{u}] :
+    IsKG1 circlePointed Int intAbelianGroup.toGroupStr := by
+  -- Everything we need is available directly from the quotient-level interface
+  -- `HasCirclePiOneEncode` (no raw loop normal forms required).
+  refine {
+    connected := circleConnected
+    pi1_iso_toFun := circlePiOneEncode.{u}
+    pi1_iso_surj := fun z =>
+      ⟨circleDecode z, circlePiOneEncode_circleDecode (z := z)⟩
+    pi1_iso_inj := fun α β h => by
+      have hα : circleDecode.{u} (circlePiOneEncode.{u} α) = α :=
+        circleDecode_circlePiOneEncode (x := α)
+      have hβ : circleDecode.{u} (circlePiOneEncode.{u} β) = β :=
+        circleDecode_circlePiOneEncode (x := β)
+      calc α = circleDecode.{u} (circlePiOneEncode.{u} α) := hα.symm
+        _ = circleDecode.{u} (circlePiOneEncode.{u} β) := _root_.congrArg (circleDecode.{u}) h
+        _ = β := hβ
+    pi1_iso_one := by
+      simpa using (circlePiOneEncode_id.{u})
+    pi1_iso_mul := fun α β => by
+      simpa using (circlePiOneEncode_mul.{u} α β)
+    pi2_trivial := fun l =>
+      -- All types are 1-groupoids in this framework, so π₂ is always trivial
+      Truncation.IsGroupoid.allTypes.derivEq l Loop2Space.refl
+  }
 
 /-- Statement: The circle is K(ℤ,1).
     The proof uses the encode-decode method from Circle.lean. -/
-theorem circleIsKZ1_statement [HasCircleLoopDecode.{u}] :
+theorem circleIsKZ1_statement [HasCirclePiOneEncode.{u}] :
     ∃ (_iso : IsKG1.{0, u} circlePointed Int intAbelianGroup.toGroupStr), True :=
   ⟨circleIsKZ1, trivial⟩
 

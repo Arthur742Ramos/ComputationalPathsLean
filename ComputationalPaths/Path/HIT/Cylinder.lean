@@ -47,6 +47,7 @@ import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Rewrite.Quot
 import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.HIT.CircleStep
 
 namespace ComputationalPaths
 namespace Path
@@ -282,18 +283,16 @@ def cylinderLoopToCircleLoop.{w} (p : CylinderLoopSpace.{w}) :
       (Path.ofEq cylinderToCircle_base0))
 
 /-- Encode a raw cylinder loop as an integer via the retraction. -/
-def cylinderEncodePath.{w} [HasCircleLoopDecode.{w}] (p : CylinderLoopSpace.{w}) : Int :=
-  circleEncodePath.{w} (cylinderLoopToCircleLoop.{w} p)
+def cylinderEncodePath.{w} [HasCirclePiOneEncode.{w}] (p : CylinderLoopSpace.{w}) : Int :=
+  circlePiOneEncode.{w} (Quot.mk _ (cylinderLoopToCircleLoop.{w} p))
 
 /-- The encoding respects path rewriting.
 
 This is inherited from `circleEncodePath_rweq` because `cylinderEncodePath` is defined
 via the retraction `cylinderLoopToCircleLoop`. -/
-theorem cylinderEncodePath_rweq [HasCircleLoopDecode.{u}] {p q : CylinderLoopSpace}
+theorem cylinderEncodePath_rweq [HasCirclePiOneEncode.{u}] {p q : CylinderLoopSpace}
     (h : RwEq p q) : cylinderEncodePath.{u} p = cylinderEncodePath.{u} q := by
   unfold cylinderEncodePath
-  -- Reduce to rewrite-invariance of the circle encoding.
-  apply circleEncodePath_rweq
   unfold cylinderLoopToCircleLoop
   -- `congrArg` preserves `RwEq`, and `trans` is congruent in both arguments.
   have hCongr :
@@ -304,10 +303,22 @@ theorem cylinderEncodePath_rweq [HasCircleLoopDecode.{u}] {p q : CylinderLoopSpa
         (Path.trans (Path.congrArg cylinderToCircle p) (Path.ofEq cylinderToCircle_base0))
         (Path.trans (Path.congrArg cylinderToCircle q) (Path.ofEq cylinderToCircle_base0)) :=
     rweq_trans_congr_left (Path.ofEq cylinderToCircle_base0) hCongr
-  exact
+  have hLoop :
+      RwEq
+        (Path.trans
+          (Path.symm (Path.ofEq cylinderToCircle_base0))
+          (Path.trans (Path.congrArg cylinderToCircle p) (Path.ofEq cylinderToCircle_base0)))
+        (Path.trans
+          (Path.symm (Path.ofEq cylinderToCircle_base0))
+          (Path.trans (Path.congrArg cylinderToCircle q) (Path.ofEq cylinderToCircle_base0))) :=
     rweq_trans_congr_right (Path.symm (Path.ofEq cylinderToCircle_base0)) hInner
+  have hQuot :
+      (Quot.mk _ (cylinderLoopToCircleLoop p) : circlePiOne.{u}) =
+        Quot.mk _ (cylinderLoopToCircleLoop q) :=
+    Quot.sound hLoop
+  exact _root_.congrArg (circlePiOneEncode.{u}) hQuot
 
-@[simp] theorem cylinderEncodePath_refl [HasCircleLoopDecode.{u}] :
+@[simp] theorem cylinderEncodePath_refl [HasCirclePiOneEncode.{u}] :
     cylinderEncodePath.{u} (Path.refl cylinderBase0) = 0 := by
   unfold cylinderEncodePath cylinderLoopToCircleLoop
   -- Fix the universe instantiation of the basepoint equation so no metavariables
@@ -319,17 +330,23 @@ theorem cylinderEncodePath_rweq [HasCircleLoopDecode.{u}] {p q : CylinderLoopSpa
         (Path.trans (Path.symm (Path.ofEq baseEq)) (Path.ofEq baseEq))
         (Path.refl (circleBase.{u})) := by
     simpa using rweq_cmpA_inv_left (p := Path.ofEq baseEq)
-  calc
-    circleEncodePath
-        (Path.trans (Path.symm (Path.ofEq baseEq)) (Path.ofEq baseEq))
-        = circleEncodePath (Path.refl (circleBase.{u})) := circleEncodePath_rweq hCancel
-    _ = 0 := circleEncodePath_refl
+  have hQuot :
+      (Quot.mk _ (Path.trans (Path.symm (Path.ofEq baseEq)) (Path.ofEq baseEq)) : circlePiOne.{u}) =
+        LoopQuot.id (A := Circle.{u}) (a := circleBase.{u}) := by
+    -- `LoopQuot.id` is represented by the reflexive raw loop.
+    simpa [LoopQuot.id] using (Quot.sound hCancel)
+  have hEnc :
+      circlePiOneEncode.{u}
+          (Quot.mk _ (Path.trans (Path.symm (Path.ofEq baseEq)) (Path.ofEq baseEq)) : circlePiOne.{u}) =
+        circlePiOneEncode.{u} (LoopQuot.id (A := Circle.{u}) (a := circleBase.{u})) :=
+    _root_.congrArg (circlePiOneEncode.{u}) hQuot
+  exact hEnc.trans (circlePiOneEncode_id.{u})
 
-@[simp] theorem cylinderEncodePath_loop0 [HasCircleLoopDecode.{u}] :
+@[simp] theorem cylinderEncodePath_loop0 [HasCirclePiOneEncode.{u}] :
     cylinderEncodePath.{u} cylinderLoop0 = 1 := by
   unfold cylinderEncodePath cylinderLoopToCircleLoop
   rw [cylinderToCircle_loop0]
-  exact circleEncodePath_loop
+  simpa using (circlePiOneEncode_loop.{u})
 
 /-! ### Algebraic laws for `cylinderLoopToCircleLoop` and `cylinderEncodePath` -/
 
@@ -381,22 +398,38 @@ private theorem cylinderLoopToCircleLoop_trans_rweq (p q : CylinderLoopSpace) :
 
 section
 
-variable [HasCircleLoopDecode.{u}]
+variable [HasCirclePiOneEncode.{u}]
 
 /-- `cylinderEncodePath` is additive over concatenation (raw loop level). -/
 theorem cylinderEncodePath_trans (p q : CylinderLoopSpace) :
     cylinderEncodePath.{u} (Path.trans p q) = cylinderEncodePath.{u} p + cylinderEncodePath.{u} q := by
   unfold cylinderEncodePath
   have hMul := cylinderLoopToCircleLoop_trans_rweq (p := p) (q := q)
+  have hQuot :
+      (Quot.mk _ (cylinderLoopToCircleLoop (Path.trans p q)) : circlePiOne.{u}) =
+        LoopQuot.comp (A := Circle.{u}) (a := circleBase.{u})
+          (Quot.mk _ (cylinderLoopToCircleLoop p))
+          (Quot.mk _ (cylinderLoopToCircleLoop q)) := by
+    have h' :
+        (Quot.mk _ (cylinderLoopToCircleLoop (Path.trans p q)) : circlePiOne.{u}) =
+          (Quot.mk _ (Path.trans (cylinderLoopToCircleLoop p) (cylinderLoopToCircleLoop q)) : circlePiOne.{u}) :=
+      Quot.sound hMul
+    simpa [LoopQuot.comp] using h'
   calc
-    circleEncodePath (cylinderLoopToCircleLoop (Path.trans p q))
-        = circleEncodePath (Path.trans (cylinderLoopToCircleLoop p) (cylinderLoopToCircleLoop q)) :=
-      circleEncodePath_rweq hMul
-    _ = circleEncodePath (cylinderLoopToCircleLoop p) + circleEncodePath (cylinderLoopToCircleLoop q) := by
-      simpa using
-        circleEncodePath_trans
-          (p := cylinderLoopToCircleLoop p)
-          (q := cylinderLoopToCircleLoop q)
+    circlePiOneEncode.{u} (Quot.mk _ (cylinderLoopToCircleLoop (Path.trans p q)))
+        =
+        circlePiOneEncode.{u}
+          (LoopQuot.comp (A := Circle.{u}) (a := circleBase.{u})
+            (Quot.mk _ (cylinderLoopToCircleLoop p))
+            (Quot.mk _ (cylinderLoopToCircleLoop q))) := by
+          simpa using _root_.congrArg (circlePiOneEncode.{u}) hQuot
+    _ =
+        circlePiOneEncode.{u} (Quot.mk _ (cylinderLoopToCircleLoop p)) +
+          circlePiOneEncode.{u} (Quot.mk _ (cylinderLoopToCircleLoop q)) := by
+          simpa using
+            circlePiOneEncode_mul.{u}
+              (α := (Quot.mk _ (cylinderLoopToCircleLoop p) : circlePiOne.{u}))
+              (β := (Quot.mk _ (cylinderLoopToCircleLoop q) : circlePiOne.{u}))
 
 /-- Encoding respects inversion: `encode (p⁻¹) = - encode p`. -/
 theorem cylinderEncodePath_symm (p : CylinderLoopSpace) :
@@ -466,16 +499,16 @@ theorem cylinderEncodePath_symm_loopPathPow (n : Nat) :
 end
 
 /-- Quotient-level encoding (winding number). -/
-def cylinderEncode [HasCircleLoopDecode.{u}] : CylinderLoopQuot → Int :=
+def cylinderEncode [HasCirclePiOneEncode.{u}] : CylinderLoopQuot → Int :=
   Quot.lift cylinderEncodePath (fun _ _ h => cylinderEncodePath_rweq h)
 
-@[simp] theorem cylinderEncode_ofLoop [HasCircleLoopDecode.{u}] (p : CylinderLoopSpace) :
+@[simp] theorem cylinderEncode_ofLoop [HasCirclePiOneEncode.{u}] (p : CylinderLoopSpace) :
     cylinderEncode (LoopQuot.ofLoop p) = cylinderEncodePath p := rfl
 
-@[simp] theorem cylinderEncode_id [HasCircleLoopDecode.{u}] : cylinderEncode LoopQuot.id = 0 :=
+@[simp] theorem cylinderEncode_id [HasCirclePiOneEncode.{u}] : cylinderEncode LoopQuot.id = 0 :=
   cylinderEncodePath_refl
 
-@[simp] theorem cylinderEncode_loopClass [HasCircleLoopDecode.{u}] :
+@[simp] theorem cylinderEncode_loopClass [HasCirclePiOneEncode.{u}] :
     cylinderEncode cylinderLoopClass = 1 :=
   cylinderEncodePath_loop0
 
@@ -505,7 +538,7 @@ an isomorphism, which follows from the homotopy equivalence.
 /-- Encoding composed with decoding is the identity.
     This follows from the cylinder being homotopy equivalent to the circle,
     which implies the fundamental group is ℤ. -/
-@[simp] theorem cylinderEncode_cylinderDecode [HasCircleLoopDecode.{u}] (z : Int) :
+@[simp] theorem cylinderEncode_cylinderDecode [HasCirclePiOneEncode.{u}] (z : Int) :
     cylinderEncode.{u} (cylinderDecode.{u} z) = z := by
   -- cylinderDecode z = cylinderLoopZPow z = ofLoop (cylinderLoopPathZPow z)
   simp only [cylinderDecode, cylinderLoopZPow_ofLoopPathZPow]
@@ -515,7 +548,7 @@ an isomorphism, which follows from the homotopy equivalence.
   exact cylinderEncodePath_loopPathZPow z
 
 -- Equality-level helper: `decodeEq ∘ encodeEq = id` on `(=)`.
-private theorem cylinderDecodeEq_cylinderEncodeEq [HasCircleLoopDecode.{u}]
+private theorem cylinderDecodeEq_cylinderEncodeEq [HasCirclePiOneEncode.{u}]
     (e : cylinderBase0 = cylinderBase0) :
     (cylinderLoopPathZPow (cylinderEncodePath (Path.ofEq e))).toEq = e := by
   cases e with
@@ -523,17 +556,17 @@ private theorem cylinderDecodeEq_cylinderEncodeEq [HasCircleLoopDecode.{u}]
 
 /-- **Cylinder loop classification axiom**: Every cylinder loop is RwEq to
 the decoded form of its winding number. -/
-class HasCylinderLoopDecode [HasCircleLoopDecode.{u}] : Prop where
+class HasCylinderLoopDecode [HasCirclePiOneEncode.{u}] : Prop where
   cylinderLoop_rweq_decode (p : CylinderLoopSpace.{u}) :
     RwEq.{u} p (cylinderLoopPathZPow (cylinderEncodePath p))
 
 /-- Every loop is RwEq to the decoded form of its winding number. -/
-theorem cylinderLoop_rweq_decode [HasCircleLoopDecode.{u}] [h : HasCylinderLoopDecode.{u}] (p : CylinderLoopSpace.{u}) :
+theorem cylinderLoop_rweq_decode [HasCirclePiOneEncode.{u}] [h : HasCylinderLoopDecode.{u}] (p : CylinderLoopSpace.{u}) :
     RwEq.{u} p (cylinderLoopPathZPow (cylinderEncodePath p)) :=
   h.cylinderLoop_rweq_decode p
 
 /-- Decoding composed with encoding is the identity. -/
-@[simp] theorem cylinderDecode_cylinderEncode [HasCircleLoopDecode.{u}] [h : HasCylinderLoopDecode.{u}] (x : CylinderLoopQuot.{u}) :
+@[simp] theorem cylinderDecode_cylinderEncode [HasCirclePiOneEncode.{u}] [h : HasCylinderLoopDecode.{u}] (x : CylinderLoopQuot.{u}) :
     cylinderDecode (cylinderEncode x) = x := by
   induction x using Quot.ind with
   | _ p =>
@@ -541,7 +574,7 @@ theorem cylinderLoop_rweq_decode [HasCircleLoopDecode.{u}] [h : HasCylinderLoopD
     exact Quot.sound (rweq_symm (cylinderLoop_rweq_decode (h := h) p))
 
 /-- The fundamental group of the cylinder is isomorphic to ℤ. -/
-def cylinderPiOneEquivInt [HasCircleLoopDecode.{u}] [HasCylinderLoopDecode.{u}] :
+def cylinderPiOneEquivInt [HasCirclePiOneEncode.{u}] [HasCylinderLoopDecode.{u}] :
     SimpleEquiv cylinderPiOne Int where
   toFun := cylinderEncode
   invFun := cylinderDecode
