@@ -169,8 +169,12 @@ theorem torusDecode_torusEncode [HasTorusLoopDecode] (x : torusPiOne) :
     rweq_symm (torusLoop_rweq_decode (p := p))
   exact Quot.sound hrweq
 
-/-- Fundamental group of the torus is equivalent to `ℤ × ℤ`. -/
-noncomputable def torusPiOneEquivIntProd [HasTorusLoopDecode] :
+/-- Fundamental group of the torus is equivalent to `ℤ × ℤ`.
+
+This version depends on the raw loop normal-form interface `HasTorusLoopDecode`.
+For a discharge-friendly π₁-level interface, see `TorusStep.lean`.
+-/
+noncomputable def torusPiOneEquivIntProd_ofLoopDecode [HasTorusLoopDecode] :
     SimpleEquiv torusPiOne (Int × Int) where
   toFun := torusEncode
   invFun := torusDecode

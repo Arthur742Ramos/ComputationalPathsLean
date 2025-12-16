@@ -27,7 +27,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Higher-inductive circle interface + π₁(S¹) ≃ ℤ via winding number (requires `HasCirclePiOneEncode`; optional raw-loop interface `HasCircleLoopDecode` is derivable).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
-- Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd` (requires `HasTorusLoopDecode`).
+- Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd` (requires `HasTorusPiOneEncode`; optional raw-loop interface `HasTorusLoopDecode` is derivable).
 - Real projective plane RP² with π₁(RP²) ≃ ℤ₂ (represented as Bool with XOR as addition; requires `HasProjectiveLoopDecode`).
 - **Klein bottle** π₁(K) ≃ ℤ ⋊ ℤ (semidirect product): normal-form equivalence `kleinPiOneEquivIntProd` (requires `HasKleinLoopDecode`), plus an alternative proof using Seifert-van Kampen on the CW-complex decomposition.
 - Möbius band, cylinder HITs with π₁ ≃ ℤ (homotopy equivalent to circle).
@@ -63,7 +63,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
 - [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, canonical `circleDecode : ℤ → π₁(S¹)`, and the optional raw-loop interface `HasCircleLoopDecode`.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — quotient-level interface `HasCirclePiOneEncode`, `circlePiOneEquivInt : π₁(S¹) ≃ ℤ`, and winding-number algebra lemmas.
-- [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT skeleton and winding-number classification interface `HasTorusLoopDecode`, with π₁(T²) ≃ ℤ × ℤ.
+- [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT interface, canonical `torusDecode : ℤ × ℤ → π₁(T²)`, and the optional raw-loop interface `HasTorusLoopDecode`.
+- [`ComputationalPaths/Path/HIT/TorusStep.lean`](ComputationalPaths/Path/HIT/TorusStep.lean) — quotient-level interface `HasTorusPiOneEncode` and `torusPiOneEquivIntProd : π₁(T²) ≃ ℤ × ℤ`.
 - [`ComputationalPaths/Path/HIT/ProjectivePlane.lean`](ComputationalPaths/Path/HIT/ProjectivePlane.lean) — real projective plane HIT skeleton and loop classification interface `HasProjectiveLoopDecode`, with π₁(RP²) ≃ ℤ₂.
 - [`ComputationalPaths/Path/HIT/KleinBottle.lean`](ComputationalPaths/Path/HIT/KleinBottle.lean) — Klein bottle HIT skeleton, parity sign `kleinSign`, and loop classification interface `HasKleinLoopDecode`, with a normal-form equivalence π₁(K) ≃ `Int × Int`.
 - [`ComputationalPaths/Path/HIT/KleinBottleSVK.lean`](ComputationalPaths/Path/HIT/KleinBottleSVK.lean) — Alternative proof of π₁(K) ≃ ℤ ⋊ ℤ using Seifert-van Kampen on the CW-complex pushout (D² attached to S¹∨S¹ via boundary word aba⁻¹b).
@@ -340,12 +341,12 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 
 Two approaches are available:
 
-**Axiomatic approach** ([`Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean)):
-- Encoding: `torusEncode : π₁(T²) → ℤ × ℤ` via the quotient lift of `torusEncodePath`.
+**Axiomatic approach** ([`Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean), [`TorusStep.lean`](ComputationalPaths/Path/HIT/TorusStep.lean)):
+- Encoding: `torusPiOneEncode : π₁(T²) → ℤ × ℤ` from the quotient-level interface `HasTorusPiOneEncode`.
 - Decoding: `torusDecode : ℤ × ℤ → π₁(T²)` assembles the z-powers of the two commuting loops.
 - Equivalence: `torusPiOneEquivIntProd` shows the maps are inverse, yielding π₁(T²) ≃ ℤ × ℤ.
-- Assumption: the classification data is packaged as the typeclass `HasTorusLoopDecode`.
-- Follow-up work: extracting a `TorusStep` module (analogous to `CircleStep`) would expose addition/subtraction lemmas as `[simp]` facts.
+- Assumption: the classification data is packaged as the typeclass `HasTorusPiOneEncode`.
+- Optional: raw loop normal forms are available as `HasTorusLoopDecode` and are derivable from `HasTorusPiOneEncode`.
 
 **Derived approach via OrientableSurface** ([`TorusGenus1.lean`](ComputationalPaths/Path/HIT/TorusGenus1.lean)):
 - Defines `Torus'` as `OrientableSurface 1` (genus-1 orientable surface).
@@ -525,7 +526,7 @@ We intentionally do **not** assume global UIP-like collapse principles (e.g. the
 - When a structure adds data on top of an existing interface, prefer extending the smaller structure (e.g. `WeakGroupoid` extends `WeakCategory`) to keep identities/composition definitions in one place.
 
 ## Maintenance / refactor opportunities
-- **Torus step module**: [`CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) centralizes the quotient-level π₁(S¹) ≃ ℤ interface and algebra. A `TorusStep` counterpart would make the π₁(T²) encode/decode algebra reusable via imports.
+- **Torus step module**: [`TorusStep.lean`](ComputationalPaths/Path/HIT/TorusStep.lean) now parallels [`CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean). Adding quotient-level winding-number algebra lemmas (loops, multiplication, etc.) would further reduce proof duplication.
 - **Axioms to constructions**: circle and torus HITs are still axioms; replacing them with concrete constructions or a general HIT layer remains an open project.
 - **Developer docs**: a short tutorial showing how to apply the π₁ equivalences downstream (e.g. deriving homomorphisms into ℤ) would help new contributors.
 

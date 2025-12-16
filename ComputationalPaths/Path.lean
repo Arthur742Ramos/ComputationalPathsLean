@@ -37,7 +37,7 @@ import ComputationalPaths.Path.Homotopy.CoveringClassification
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
-import ComputationalPaths.Path.HIT.Torus
+import ComputationalPaths.Path.HIT.TorusStep
 import ComputationalPaths.Path.HIT.Cylinder
 import ComputationalPaths.Path.HIT.MobiusBand
 import ComputationalPaths.Path.HIT.KleinBottle

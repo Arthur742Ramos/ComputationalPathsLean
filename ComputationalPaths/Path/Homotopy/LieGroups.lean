@@ -96,7 +96,7 @@ The differential geometry approach is needed for:
 
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
-import ComputationalPaths.Path.HIT.Torus
+import ComputationalPaths.Path.HIT.TorusStep
 import ComputationalPaths.Path.HIT.Sphere
 import ComputationalPaths.Path.HIT.ProjectivePlane
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
@@ -247,7 +247,7 @@ def IntTuple.zero : (n : Nat) → IntTuple n
 
 This is already proved in Torus.lean. The torus is the simplest
   compact non-simply-connected abelian Lie group of rank 2. -/
- noncomputable def torus2PiOneEquiv [HasTorusLoopDecode] :
+ noncomputable def torus2PiOneEquiv [HasTorusPiOneEncode] :
      SimpleEquiv (π₁(Torus, torusBase)) (Int × Int) :=
    torusPiOneEquivIntProd
 

@@ -109,6 +109,22 @@ Non-kernel assumptions required by the torus encode/decode development:
 - `ComputationalPaths.Path.HasTorusLoopDecode`
   - Torus-specific winding-number classification hypothesis for raw loops.
   - Defined in `ComputationalPaths/Path/HIT/Torus.lean`.
+  - Speaks about *raw* loops (`Path torusBase torusBase`) and provides a normal form
+    `loop1^m ⬝ loop2^n` up to `RwEq`.
+  - This interface is now *derivable* from the quotient-level interface
+    `HasTorusPiOneEncode` via `hasTorusLoopDecodeOfPiOneEncode` in
+    `ComputationalPaths/Path/HIT/TorusStep.lean`.
+
+- `ComputationalPaths.Path.HasTorusPiOneEncode`
+  - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
+    an `encode : π₁(T²) → ℤ × ℤ` with `encode (torusDecode z) = z` and
+    `torusDecode (encode x) = x`.
+  - Defined in `ComputationalPaths/Path/HIT/TorusStep.lean`.
+  - Every `[HasTorusLoopDecode]` provides an instance, and conversely
+    `HasTorusPiOneEncode` can be turned back into `HasTorusLoopDecode` when a
+    raw-loop statement is required.
+  - Downstream developments (e.g. `ComputationalPaths/Path/Homotopy/LieGroups.lean`)
+    now depend only on this weaker hypothesis.
 
 ## Projective plane (π₁(RP²) ≃ ℤ₂)
 

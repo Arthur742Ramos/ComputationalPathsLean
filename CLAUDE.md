@@ -289,8 +289,8 @@ lake clean
 
 | Module | Main Theorem | Statement |
 |--------|--------------|-----------|
-| `Circle.lean` | `circlePiOneEquivInt` | π₁(S¹) ≃ ℤ |
-| `Torus.lean` | `torusPiOneEquivIntProd` | π₁(T²) ≃ ℤ × ℤ |
+| `CircleStep.lean` | `circlePiOneEquivInt` | π₁(S¹) ≃ ℤ |
+| `TorusStep.lean` | `torusPiOneEquivIntProd` | π₁(T²) ≃ ℤ × ℤ |
 | `Sphere.lean` | `sphere2_pi1_equiv_unit` | π₁(S²) ≃ 1 |
 | `FigureEight.lean` | `figureEightPiOneEquiv` | π₁(S¹ ∨ S¹) ≃ ℤ * ℤ |
 | `OrientableSurface.lean` | `piOneEquivPresentation` | π₁(Σ_g) ≃ SurfaceGroup |
