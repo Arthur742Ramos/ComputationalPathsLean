@@ -1153,6 +1153,292 @@ theorem inv_mul_cancel [Neg G₁] [Neg G₂] [Neg H]
 
 end FullAmalgamatedFreeProduct
 
+/-! ## Universal Property of Free Products
+
+The free product G₁ * G₂ satisfies a universal property: for any group H with
+homomorphisms φ₁ : G₁ → H and φ₂ : G₂ → H, there exists a unique homomorphism
+φ : G₁ * G₂ → H such that φ ∘ inl = φ₁ and φ ∘ inr = φ₂.
+
+We formalize this using FreeProductWord with the appropriate quotient.
+-/
+
+namespace FreeProductUniversal
+
+variable {G₁ G₂ H : Type u}
+
+/-- Lift a pair of functions to a function on free product words.
+This is the "word extension" that applies φ₁ to left letters and φ₂ to right letters,
+then combines the results using the group operation in H. -/
+def wordLift [One H] [Mul H] (φ₁ : G₁ → H) (φ₂ : G₂ → H) :
+    FreeProductWord G₁ G₂ → H
+  | .nil => 1
+  | .consLeft x rest => φ₁ x * wordLift φ₁ φ₂ rest
+  | .consRight y rest => φ₂ y * wordLift φ₁ φ₂ rest
+
+/-- wordLift on nil gives the identity. -/
+@[simp] theorem wordLift_nil [One H] [Mul H] (φ₁ : G₁ → H) (φ₂ : G₂ → H) :
+    wordLift φ₁ φ₂ .nil = 1 := rfl
+
+/-- wordLift on consLeft. -/
+@[simp] theorem wordLift_consLeft [One H] [Mul H] (φ₁ : G₁ → H) (φ₂ : G₂ → H)
+    (x : G₁) (rest : FreeProductWord G₁ G₂) :
+    wordLift φ₁ φ₂ (.consLeft x rest) = φ₁ x * wordLift φ₁ φ₂ rest := rfl
+
+/-- wordLift on consRight. -/
+@[simp] theorem wordLift_consRight [One H] [Mul H] (φ₁ : G₁ → H) (φ₂ : G₂ → H)
+    (y : G₂) (rest : FreeProductWord G₁ G₂) :
+    wordLift φ₁ φ₂ (.consRight y rest) = φ₂ y * wordLift φ₁ φ₂ rest := rfl
+
+/-- wordLift respects concatenation when H has One and associative Mul with left identity. -/
+theorem wordLift_concat [One H] [Mul H]
+    (hone_mul : ∀ x : H, 1 * x = x)
+    (hmul_assoc : ∀ x y z : H, (x * y) * z = x * (y * z))
+    (φ₁ : G₁ → H) (φ₂ : G₂ → H)
+    (w₁ w₂ : FreeProductWord G₁ G₂) :
+    wordLift φ₁ φ₂ (FreeProductWord.concat w₁ w₂) =
+    wordLift φ₁ φ₂ w₁ * wordLift φ₁ φ₂ w₂ := by
+  induction w₁ with
+  | nil =>
+      simp only [FreeProductWord.concat, wordLift_nil]
+      exact (hone_mul _).symm
+  | consLeft x rest ih =>
+      simp only [FreeProductWord.concat, wordLift_consLeft, ih]
+      exact (hmul_assoc _ _ _).symm
+  | consRight y rest ih =>
+      simp only [FreeProductWord.concat, wordLift_consRight, ih]
+      exact (hmul_assoc _ _ _).symm
+
+/-- wordLift sends singleLeft to φ₁. -/
+@[simp] theorem wordLift_singleLeft [One H] [Mul H]
+    (hmul_one : ∀ x : H, x * 1 = x)
+    (φ₁ : G₁ → H) (φ₂ : G₂ → H) (x : G₁) :
+    wordLift φ₁ φ₂ (FreeProductWord.singleLeft x) = φ₁ x := by
+  simp only [FreeProductWord.singleLeft, wordLift_consLeft, wordLift_nil]
+  exact hmul_one _
+
+/-- wordLift sends singleRight to φ₂. -/
+@[simp] theorem wordLift_singleRight [One H] [Mul H]
+    (hmul_one : ∀ x : H, x * 1 = x)
+    (φ₁ : G₁ → H) (φ₂ : G₂ → H) (y : G₂) :
+    wordLift φ₁ φ₂ (FreeProductWord.singleRight y) = φ₂ y := by
+  simp only [FreeProductWord.singleRight, wordLift_consRight, wordLift_nil]
+  exact hmul_one _
+
+/-- wordLift respects FreeGroupStep when φ₁, φ₂ preserve additive structure.
+This requires that φ₁(x + y) = φ₁(x) * φ₁(y) and φ₁(0) = 1, etc. -/
+theorem wordLift_respects_freeGroupStep [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+    [One H] [Mul H]
+    (hone_mul : ∀ x : H, 1 * x = x)
+    (hmul_assoc : ∀ x y z : H, (x * y) * z = x * (y * z))
+    (φ₁ : G₁ → H) (φ₂ : G₂ → H)
+    (hφ₁_add : ∀ x y, φ₁ (x + y) = φ₁ x * φ₁ y)
+    (hφ₂_add : ∀ x y, φ₂ (x + y) = φ₂ x * φ₂ y)
+    (hφ₁_zero : φ₁ 0 = 1)
+    (hφ₂_zero : φ₂ 0 = 1)
+    {w₁ w₂ : FreeProductWord G₁ G₂}
+    (h : FreeProductWord.FreeGroupStep w₁ w₂) :
+    wordLift φ₁ φ₂ w₁ = wordLift φ₁ φ₂ w₂ := by
+  induction h with
+  | combineLeft x y rest =>
+      simp only [wordLift_consLeft, hφ₁_add]
+      exact (hmul_assoc _ _ _).symm
+  | combineRight x y rest =>
+      simp only [wordLift_consRight, hφ₂_add]
+      exact (hmul_assoc _ _ _).symm
+  | removeLeftZero rest =>
+      simp only [wordLift_consLeft, hφ₁_zero]
+      exact hone_mul _
+  | removeRightZero rest =>
+      simp only [wordLift_consRight, hφ₂_zero]
+      exact hone_mul _
+  | congrLeft x _ ih =>
+      simp only [wordLift_consLeft, ih]
+  | congrRight y _ ih =>
+      simp only [wordLift_consRight, ih]
+
+/-- wordLift respects FreeGroupEq when φ₁, φ₂ preserve additive structure. -/
+theorem wordLift_respects_freeGroupEq [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+    [One H] [Mul H]
+    (hone_mul : ∀ x : H, 1 * x = x)
+    (hmul_assoc : ∀ x y z : H, (x * y) * z = x * (y * z))
+    (φ₁ : G₁ → H) (φ₂ : G₂ → H)
+    (hφ₁_add : ∀ x y, φ₁ (x + y) = φ₁ x * φ₁ y)
+    (hφ₂_add : ∀ x y, φ₂ (x + y) = φ₂ x * φ₂ y)
+    (hφ₁_zero : φ₁ 0 = 1)
+    (hφ₂_zero : φ₂ 0 = 1)
+    {w₁ w₂ : FreeProductWord G₁ G₂}
+    (h : FreeProductWord.FreeGroupEq w₁ w₂) :
+    wordLift φ₁ φ₂ w₁ = wordLift φ₁ φ₂ w₂ := by
+  induction h with
+  | refl _ => rfl
+  | step hs =>
+      exact wordLift_respects_freeGroupStep hone_mul hmul_assoc φ₁ φ₂
+        hφ₁_add hφ₂_add hφ₁_zero hφ₂_zero hs
+  | symm _ ih => exact ih.symm
+  | trans _ _ ih1 ih2 => exact ih1.trans ih2
+
+end FreeProductUniversal
+
+/-! ## Free Group on Generators (via Free Products)
+
+The free group F_n on n generators can be represented as a special case
+of free products. F₁ ≃ ℤ, and F₂ = ℤ * ℤ.
+
+For a general free group on a type of generators, we use words where
+each generator and its inverse can appear. This is distinct from
+OrientableSurface.FreeGroupWord which uses Nat-indexed generators.
+-/
+
+/-- The free group on a type of generators α, as a free product.
+Elements are represented as words with positive (Left) and inverse (Right) generators.
+This is an alias for FreeProductWord α α. -/
+def GeneratorWord (α : Type u) : Type u := FreeProductWord α α
+
+namespace GeneratorWord
+
+variable {α : Type u}
+
+/-- Empty word (identity element). -/
+def nil : GeneratorWord α := FreeProductWord.nil
+
+/-- A positive generator (g⁺). -/
+def gen (a : α) : GeneratorWord α := FreeProductWord.singleLeft a
+
+/-- An inverse generator (g⁻¹). -/
+def genInv (a : α) : GeneratorWord α := FreeProductWord.singleRight a
+
+/-- Concatenation of free group words. -/
+def mul (w₁ w₂ : GeneratorWord α) : GeneratorWord α :=
+  FreeProductWord.concat w₁ w₂
+
+/-- Length of a word. -/
+def length : GeneratorWord α → Nat := FreeProductWord.length
+
+/-- The word for a⁺ ⋅ a⁻¹. -/
+def genTimesGenInv (a : α) : GeneratorWord α :=
+  mul (gen a) (genInv a)
+
+/-- The word for a⁻¹ ⋅ a⁺. -/
+def genInvTimesGen (a : α) : GeneratorWord α :=
+  mul (genInv a) (gen a)
+
+instance : One (GeneratorWord α) := ⟨nil⟩
+instance : Mul (GeneratorWord α) := ⟨mul⟩
+
+@[simp] theorem one_def : (1 : GeneratorWord α) = nil := rfl
+@[simp] theorem mul_def (w₁ w₂ : GeneratorWord α) : w₁ * w₂ = mul w₁ w₂ := rfl
+
+@[simp] theorem one_mul (w : GeneratorWord α) : 1 * w = w := rfl
+
+@[simp] theorem mul_one (w : GeneratorWord α) : w * 1 = w :=
+  FreeProductWord.concat_nil_right w
+
+theorem mul_assoc (w₁ w₂ w₃ : GeneratorWord α) : (w₁ * w₂) * w₃ = w₁ * (w₂ * w₃) := by
+  simp only [mul_def, mul, FreeProductWord.concat_assoc]
+
+/-- The free group on one generator is isomorphic to ℤ.
+We represent this via GeneratorWord Unit. -/
+abbrev FreeGroupOne := GeneratorWord Unit
+
+/-- The free group on two generators.
+We represent this via GeneratorWord Bool. -/
+abbrev FreeGroupTwo := GeneratorWord Bool
+
+/-- Generator a in F₂. -/
+def genA : FreeGroupTwo := gen false
+
+/-- Generator b in F₂. -/
+def genB : FreeGroupTwo := gen true
+
+/-- Inverse of generator a in F₂. -/
+def genAInv : FreeGroupTwo := genInv false
+
+/-- Inverse of generator b in F₂. -/
+def genBInv : FreeGroupTwo := genInv true
+
+/-- The word aba⁻¹b⁻¹ (commutator) in F₂. -/
+def commutator : FreeGroupTwo :=
+  genA * genB * genAInv * genBInv
+
+/-- The commutator has length 4. -/
+theorem commutator_length : commutator.length = 4 := rfl
+
+end GeneratorWord
+
+/-! ## Free Group F₁ ≃ ℤ
+
+The free group on one generator is isomorphic to the integers.
+A word in F₁ can be "evaluated" to an integer by summing:
+- +1 for each positive occurrence of the generator
+- -1 for each inverse occurrence
+-/
+
+namespace FreeGroupOne
+
+/-- Evaluate a word in F₁ to an integer (winding number). -/
+def toInt : GeneratorWord.FreeGroupOne → Int
+  | .nil => 0
+  | .consLeft () rest => 1 + toInt rest
+  | .consRight () rest => -1 + toInt rest
+
+/-- Convert a natural number to a word in F₁ (positive powers of the generator). -/
+def ofNat : Nat → GeneratorWord.FreeGroupOne
+  | 0 => .nil
+  | n + 1 => .consLeft () (ofNat n)
+
+/-- ofInt for negative integers. -/
+def ofNegNat : Nat → GeneratorWord.FreeGroupOne
+  | 0 => .nil
+  | n + 1 => .consRight () (ofNegNat n)
+
+/-- toInt of the generator is 1. -/
+@[simp] theorem toInt_gen : toInt (GeneratorWord.gen ()) = 1 := by
+  simp [GeneratorWord.gen, FreeProductWord.singleLeft, toInt]
+
+/-- toInt of the inverse generator is -1. -/
+@[simp] theorem toInt_genInv : toInt (GeneratorWord.genInv ()) = -1 := by
+  simp [GeneratorWord.genInv, FreeProductWord.singleRight, toInt]
+
+/-- Helper: toInt is additive with respect to FreeProductWord.concat. -/
+theorem toInt_concat (w₁ w₂ : GeneratorWord.FreeGroupOne) :
+    toInt (FreeProductWord.concat w₁ w₂) = toInt w₁ + toInt w₂ := by
+  induction w₁ with
+  | nil => simp [FreeProductWord.concat, toInt]
+  | consLeft x rest ih =>
+      simp only [FreeProductWord.concat, toInt]
+      rw [ih, Int.add_assoc]
+  | consRight y rest ih =>
+      simp only [FreeProductWord.concat, toInt]
+      rw [ih, Int.add_assoc]
+
+/-- toInt is additive with respect to multiplication. -/
+theorem toInt_mul (w₁ w₂ : GeneratorWord.FreeGroupOne) :
+    toInt (w₁ * w₂) = toInt w₁ + toInt w₂ :=
+  toInt_concat w₁ w₂
+
+/-- toInt of ofNat n is n. -/
+theorem toInt_ofNat (n : Nat) : toInt (ofNat n) = n := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+      simp only [ofNat, toInt]
+      rw [ih]
+      -- 1 + n = n + 1
+      exact Int.add_comm 1 n
+
+/-- toInt of ofNegNat n is -n. -/
+theorem toInt_ofNegNat (n : Nat) : toInt (ofNegNat n) = -n := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+      simp only [ofNegNat, toInt]
+      rw [ih]
+      -- -1 + -n = -(n + 1)
+      rw [← Int.neg_add, Int.add_comm]
+      rfl
+
+end FreeGroupOne
+
 /-! ## Wedge Sum Loops
 
 For the wedge sum A ∨ B (pushout of A ← pt → B), the fundamental group
