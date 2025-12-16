@@ -63,6 +63,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
 - [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, canonical `circleDecode : ℤ → π₁(S¹)`, and the optional raw-loop interface `HasCircleLoopDecode`.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — quotient-level interface `HasCirclePiOneEncode`, `circlePiOneEquivInt : π₁(S¹) ≃ ℤ`, and winding-number algebra lemmas.
+- [`ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean`](ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean) — **opt-in**: installs a global `HasCirclePiOneEncode` instance as a kernel axiom and exports `circlePiOneEquivInt'` with no extra parameters.
 - [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT interface, canonical `torusDecode : ℤ × ℤ → π₁(T²)`, and the optional raw-loop interface `HasTorusLoopDecode`.
 - [`ComputationalPaths/Path/HIT/TorusStep.lean`](ComputationalPaths/Path/HIT/TorusStep.lean) — quotient-level interface `HasTorusPiOneEncode` and `torusPiOneEquivIntProd : π₁(T²) ≃ ℤ × ℤ`.
 - [`ComputationalPaths/Path/HIT/ProjectivePlane.lean`](ComputationalPaths/Path/HIT/ProjectivePlane.lean) — real projective plane HIT skeleton and loop classification interface `HasProjectiveLoopDecode`, with π₁(RP²) ≃ ℤ₂.

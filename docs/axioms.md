@@ -98,6 +98,17 @@ Non-kernel assumptions required by the circle encode/decode development:
     `ComputationalPaths/Path/Homotopy/LieGroups.lean`) now depend only on this weaker
     hypothesis.
 
+### Opt-in “assumption-free” import
+
+If you want to use the circle π₁ result without threading a typeclass hypothesis
+through your signatures, import:
+
+- `ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean`
+
+This file adds a global `HasCirclePiOneEncode` **as a kernel axiom** and exports
+`circlePiOneEquivInt' : π₁(S¹) ≃ ℤ` with no extra parameters. The core library
+does *not* import it by default.
+
 ## Torus fundamental group (π₁(T²) ≃ ℤ × ℤ)
 
 Kernel axioms *used by* `ComputationalPaths.Path.torusPiOneEquivIntProd`:
