@@ -477,5 +477,98 @@ theorem isPathConnected_of_components
 
 end Pushout
 
+/-! ## Concrete SVK Instances for Wedge Sums
+
+For the wedge sum A ∨ B (defined as Pushout A B PUnit' (fun _ => a₀) (fun _ => b₀)),
+the glue naturality axiom holds trivially because the maps f and g are constant.
+-/
+
+namespace Wedge
+
+variable {A : Type u} {B : Type u} {a₀ : A} {b₀ : B}
+
+/-- For wedge sums, glue naturality holds because f and g are constant functions.
+
+Since f = (fun _ => a₀) and g = (fun _ => b₀), for any path p : Path c₁ c₂ in PUnit':
+- congrArg f p ≈ refl a₀ (by rweq_congrArg_const)
+- congrArg g p ≈ refl b₀ (by rweq_congrArg_const)
+
+And since c₁ = c₂ = PUnit'.unit (unique element), both sides reduce to refl. -/
+instance hasGlueNaturalRwEq :
+    Pushout.HasGlueNaturalRwEq
+      (A := A) (B := B) (C := PUnit')
+      (f := fun _ => a₀) (g := fun _ => b₀) where
+  glue_natural_rweq_axiom {c₁ c₂} p := by
+    -- Since PUnit' has only one element, c₁ = c₂ = unit
+    cases c₁; cases c₂
+    -- Abbreviate the Wedge type for clarity
+    let W := Wedge A B a₀ b₀
+    -- LHS: inlPath (congrArg (fun _ => a₀) p)
+    -- RHS: trans (glue unit) (trans (inrPath (congrArg (fun _ => b₀) p)) (symm (glue unit)))
+    -- Both simplify to refl
+    have lhs_eq : RwEq
+        (Pushout.inlPath (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀)
+          (Path.congrArg (fun _ => a₀) p))
+        (Path.refl (Pushout.inl (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) a₀)) := by
+      apply rweq_trans
+        (rweq_congrArg_of_rweq
+          (Pushout.inl (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀))
+          (rweq_congrArg_const a₀ p))
+      exact rweq_congrArg_refl
+        (Pushout.inl (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀)) a₀
+    have rhs_eq : RwEq
+        (Path.trans
+          (Pushout.glue (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit)
+          (Path.trans
+            (Pushout.inrPath (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀)
+              (Path.congrArg (fun _ => b₀) p))
+            (Path.symm
+              (Pushout.glue (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit))))
+        (Path.refl (Pushout.inl (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) a₀)) := by
+      -- inrPath (congrArg (fun _ => b₀) p) ≈ refl (inr b₀)
+      have inr_eq : RwEq
+          (Pushout.inrPath (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀)
+            (Path.congrArg (fun _ => b₀) p))
+          (Path.refl (Pushout.inr (A := A) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) b₀)) := by
+        apply rweq_trans
+          (rweq_congrArg_of_rweq
+            (Pushout.inr (A := A) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀))
+            (rweq_congrArg_const b₀ p))
+        exact rweq_congrArg_refl
+          (Pushout.inr (A := A) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀)) b₀
+      -- Let's abbreviate
+      let glueW := Pushout.glue (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit
+      let symGlueW := Path.symm glueW
+      let reflInrB₀ := Path.refl (Pushout.inr (A := A) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) b₀)
+      -- trans (inrPath ...) (symm glue) ≈ trans refl (symm glue) ≈ symm glue
+      have step1 : RwEq
+          (Path.trans
+            (Pushout.inrPath (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀)
+              (Path.congrArg (fun _ => b₀) p))
+            symGlueW)
+          (Path.trans reflInrB₀ symGlueW) :=
+        rweq_trans_congr_left symGlueW inr_eq
+      have step2 : RwEq (Path.trans reflInrB₀ symGlueW) symGlueW :=
+        rweq_cmpA_refl_left symGlueW
+      have inner_eq : RwEq
+          (Path.trans
+            (Pushout.inrPath (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀)
+              (Path.congrArg (fun _ => b₀) p))
+            symGlueW)
+          symGlueW := rweq_trans step1 step2
+      -- trans glue (inner) ≈ trans glue (symm glue) ≈ refl
+      have step3 : RwEq (Path.trans glueW (Path.trans
+            (Pushout.inrPath (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀)
+              (Path.congrArg (fun _ => b₀) p))
+            symGlueW)) (Path.trans glueW symGlueW) :=
+        rweq_trans_congr_right glueW inner_eq
+      have step4 : RwEq (Path.trans glueW symGlueW)
+          (Path.refl (Pushout.inl (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) a₀)) :=
+        rweq_cmpA_inv_right glueW
+      exact rweq_trans step3 step4
+    exact rweq_trans lhs_eq (rweq_symm rhs_eq)
+
+end Wedge
+
 end Path
 end ComputationalPaths

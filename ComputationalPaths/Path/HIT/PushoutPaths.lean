@@ -1797,6 +1797,110 @@ noncomputable def wedgeFundamentalGroupEquiv [HasWedgeFundamentalGroupEquiv A B 
 
 end WedgeSVK
 
+/-! ## Concrete SVK Instances for Wedge Sums
+
+For wedge sums A ∨ B (where C = PUnit'), we can provide concrete instances
+of the SVK typeclasses. The encode direction requires HIT recursion, which
+we axiomatize. The key properties follow from path analysis in wedge sums.
+-/
+
+namespace WedgeSVKInstances
+
+variable {A : Type u} {B : Type u} (a₀ : A) (b₀ : B)
+
+/-- Axiom: Primitive encode function for paths in a wedge sum.
+
+This axiom states that every loop at the basepoint of a wedge sum
+can be analyzed to extract a word in π₁(A) * π₁(B).
+
+The encode function is characterized by:
+- encode(refl) = nil
+- encode(inlPath p ⋅ rest) = consLeft [p] (encode rest)
+- encode(glue ⋅ inrPath q ⋅ glue⁻¹ ⋅ rest) = consRight [q] (encode rest)
+
+These computation rules are captured by the round-trip properties. -/
+axiom wedgeEncodePrim :
+    LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint →
+    FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))
+
+/-- Axiom: The primitive encode respects RwEq. -/
+axiom wedgeEncodePrim_respects_rweq
+    {p q : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint}
+    (h : RwEq p q) :
+    wedgeEncodePrim a₀ b₀ p = wedgeEncodePrim a₀ b₀ q
+
+/-- Encode at the quotient level. -/
+noncomputable def wedgeEncodeQuotPrim :
+    π₁(Wedge A B a₀ b₀, Wedge.basepoint) →
+    FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
+  Quot.lift (wedgeEncodePrim a₀ b₀) (fun _ _ h => wedgeEncodePrim_respects_rweq a₀ b₀ h)
+
+/-- Axiom: decode ∘ encode = id on loop representatives.
+
+This axiom states that encoding a loop and then decoding gives back the
+same loop (up to RwEq, hence equal in the quotient). -/
+axiom wedgeDecodeEncodePrim
+    (p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
+    pushoutDecode (A := A) (B := B) (C := PUnit')
+      (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit
+      (wedgeEncodePrim a₀ b₀ p) = Quot.mk _ p
+
+/-- Axiom: encode ∘ decode = id on words at the quotient level.
+
+For wedge sums, the amalgamation is trivial since C = PUnit' has trivial π₁. -/
+axiom wedgeEncodeDecodeQuotPrim
+    (w : FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))) :
+    wedgeEncodeQuotPrim a₀ b₀
+      (pushoutDecode (A := A) (B := B) (C := PUnit')
+        (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit w) = w
+
+/-- AmalgEquiv version of wedgeEncodeDecodeQuotPrim for HasPushoutSVKEncodeData. -/
+theorem wedgeEncodeDecodeQuotPrim_amalg
+    (w : FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))) :
+    AmalgEquiv
+      (piOneFmap (A := A) (C := PUnit') (f := fun _ => a₀) PUnit'.unit)
+      (piOneGmap (B := B) (C := PUnit') (g := fun _ => b₀) PUnit'.unit)
+      (wedgeEncodeQuotPrim a₀ b₀
+        (pushoutDecode (A := A) (B := B) (C := PUnit')
+          (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit w))
+      w := by
+  rw [wedgeEncodeDecodeQuotPrim]
+  exact AmalgEquiv.refl w
+
+/-- Instance: HasPushoutSVKEncodeData for Wedge sums.
+
+This provides the encode-decode infrastructure needed for SVK. -/
+noncomputable instance hasPushoutSVKEncodeData :
+    HasPushoutSVKEncodeData A B PUnit'
+      (fun _ => a₀) (fun _ => b₀) PUnit'.unit where
+  encodeQuot := wedgeEncodeQuotPrim a₀ b₀
+  decode_encode := fun p => by
+    simp only [wedgeEncodeQuotPrim]
+    exact wedgeDecodeEncodePrim a₀ b₀ p
+  encode_decode := fun w => wedgeEncodeDecodeQuotPrim_amalg a₀ b₀ w
+
+/-- Instance: HasWedgeFundamentalGroupEquiv for Wedge sums.
+
+This packages the encode-decode equivalence. -/
+noncomputable instance hasWedgeFundamentalGroupEquiv :
+    HasWedgeFundamentalGroupEquiv A B a₀ b₀ where
+  equiv := {
+    toFun := wedgeEncodeQuotPrim a₀ b₀
+    invFun := wedgeFreeProductDecode a₀ b₀
+    left_inv := by
+      intro α
+      induction α using Quot.ind with
+      | _ p =>
+        simp only [wedgeEncodeQuotPrim, wedgeFreeProductDecode_eq_pushoutDecode]
+        exact wedgeDecodeEncodePrim a₀ b₀ p
+    right_inv := by
+      intro w
+      simp only [wedgeEncodeQuotPrim, wedgeFreeProductDecode_eq_pushoutDecode]
+      exact wedgeEncodeDecodeQuotPrim a₀ b₀ w
+  }
+
+end WedgeSVKInstances
+
 /-! ## Summary
 
 This module establishes:
