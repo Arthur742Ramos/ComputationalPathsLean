@@ -14,6 +14,8 @@ import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.Quot
 import ComputationalPaths.Path.Rewrite.LNDEQ
 import ComputationalPaths.Path.Rewrite.Termination
+import ComputationalPaths.Path.Rewrite.Confluence
+import ComputationalPaths.Path.Rewrite.ConfluenceProof
 import ComputationalPaths.Path.Rewrite.PathTactic
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.Bicategory

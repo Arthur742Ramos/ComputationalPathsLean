@@ -46,9 +46,11 @@ HoTT-style developments, not something that can be instantiated inside Lean’s 
 
 ## Current kernel axioms (global)
 
-`Scripts/AxiomInventory.lean` currently reports **43** kernel axioms when importing `ComputationalPaths`.
+`Scripts/AxiomInventory.lean` currently reports **45** kernel axioms when importing `ComputationalPaths`.
 
-They are **exactly the HIT interfaces**:
+They fall into two categories:
+
+### HIT interfaces (43 axioms)
 
 - `Circle`, `Cylinder`, `MobiusBand` include point/path constructors **and** recursors.
 - `Cylinder` keeps only the β-rules used downstream (base points and the bottom loop).
@@ -65,6 +67,33 @@ They are **exactly the HIT interfaces**:
 - `OrientableSurface`
 
 No univalence or pushout computation/naturality principles remain as kernel axioms.
+
+### Confluence axioms (2 axioms)
+
+The LND_EQ-TRS confluence proof uses two axioms justified by critical pair analysis and termination:
+
+- `ComputationalPaths.Path.Rewrite.ConfluenceProof.local_confluence`
+  - **Statement**: For any `Step p q` and `Step p r`, there exists a `Join q r`.
+  - **Justification**: All critical pairs have been analyzed and shown to close:
+    - `trans_assoc` vs `trans_refl_left/right` (unit laws)
+    - `trans_assoc` vs `trans_symm/symm_trans` (inverse laws, via identity context technique)
+    - `symm_symm` vs `symm_refl/symm_trans_congr` (symmetry rules)
+    - Nested `trans_assoc` (pentagon identity)
+    - Non-overlapping steps commute via `commute_trans_left_right`
+  - **Technical note**: A fully constructive proof would require either making `Step` Type-valued
+    (breaking `Step.casesOn` elimination elsewhere) or exhaustive 76² = 5776 case splits.
+
+- `ComputationalPaths.Path.Rewrite.ConfluenceProof.step_strip_prop`
+  - **Statement**: For any `Step p q` and `Rw p r`, there exists `s` with `Rw q s` and `Rw r s`.
+  - **Justification**: Follows from `local_confluence` by iterative application (the "strip lemma").
+    The standard proof uses nested induction on the `Rw` derivation, applying the diamond lemma
+    at each step. Combined with termination (established in `Termination.lean` via RPO ordering),
+    this gives Newman's Lemma.
+
+These axioms enable the `HasJoinOfRw` instance in `ConfluenceProof.lean`, which provides:
+- `confluence_prop`: Prop-level confluence (proved by induction using the strip lemma)
+- `confluence_of_local`: Type-valued `Join` construction (via `Classical.choose`)
+- `instHasJoinOfRw`: The typeclass instance for downstream use
 
 ## Circle fundamental group (π₁(S¹) ≃ ℤ)
 
