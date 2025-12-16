@@ -68,10 +68,13 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean`](ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean) — **opt-in**: installs a global `HasCirclePiOneEncode` instance as a kernel axiom and exports `circlePiOneEquivInt'` with no extra parameters.
 - [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus HIT interface, canonical `torusDecode : ℤ × ℤ → π₁(T²)`, and the optional raw-loop interface `HasTorusLoopDecode`.
 - [`ComputationalPaths/Path/HIT/TorusStep.lean`](ComputationalPaths/Path/HIT/TorusStep.lean) — quotient-level interface `HasTorusPiOneEncode` and `torusPiOneEquivIntProd : π₁(T²) ≃ ℤ × ℤ`.
+- [`ComputationalPaths/Path/HIT/TorusPiOneAxiom.lean`](ComputationalPaths/Path/HIT/TorusPiOneAxiom.lean) — **opt-in**: installs a global `HasTorusPiOneEncode` instance as a kernel axiom and exports `torusPiOneEquivIntProd'` with no extra parameters.
 - [`ComputationalPaths/Path/HIT/ProjectivePlane.lean`](ComputationalPaths/Path/HIT/ProjectivePlane.lean) — real projective plane HIT skeleton and raw loop classification interface `HasProjectiveLoopDecode`, with the raw-loop equivalence `projectivePiOneEquivZ2_ofLoopDecode`.
 - [`ComputationalPaths/Path/HIT/ProjectivePlaneStep.lean`](ComputationalPaths/Path/HIT/ProjectivePlaneStep.lean) — quotient-level interface `HasProjectivePiOneEncode` and `projectivePiOneEquivZ2 : π₁(RP²) ≃ ℤ₂`.
+- [`ComputationalPaths/Path/HIT/ProjectivePiOneAxiom.lean`](ComputationalPaths/Path/HIT/ProjectivePiOneAxiom.lean) — **opt-in**: installs a global `HasProjectivePiOneEncode` instance as a kernel axiom and exports `projectivePiOneEquivZ2'` with no extra parameters.
 - [`ComputationalPaths/Path/HIT/KleinBottle.lean`](ComputationalPaths/Path/HIT/KleinBottle.lean) — Klein bottle HIT skeleton, parity sign `kleinSign`, and raw loop classification interface `HasKleinLoopDecode`, with the raw-loop equivalence `kleinPiOneEquivIntProd_ofLoopDecode`.
 - [`ComputationalPaths/Path/HIT/KleinBottleStep.lean`](ComputationalPaths/Path/HIT/KleinBottleStep.lean) — quotient-level interface `HasKleinPiOneEncode` and `kleinPiOneEquivIntProd : π₁(K) ≃ Int × Int`.
+- [`ComputationalPaths/Path/HIT/KleinPiOneAxiom.lean`](ComputationalPaths/Path/HIT/KleinPiOneAxiom.lean) — **opt-in**: installs a global `HasKleinPiOneEncode` instance as a kernel axiom and exports `kleinPiOneEquivIntProd'` with no extra parameters.
 - [`ComputationalPaths/Path/HIT/KleinBottleSVK.lean`](ComputationalPaths/Path/HIT/KleinBottleSVK.lean) — Alternative proof of π₁(K) ≃ ℤ ⋊ ℤ using Seifert-van Kampen on the CW-complex pushout (D² attached to S¹∨S¹ via boundary word aba⁻¹b).
 - [`ComputationalPaths/Path/HIT/MobiusBand.lean`](ComputationalPaths/Path/HIT/MobiusBand.lean) — Möbius band HIT (homotopy equivalent to circle), π₁ ≃ ℤ.
 - [`ComputationalPaths/Path/HIT/Cylinder.lean`](ComputationalPaths/Path/HIT/Cylinder.lean) — Cylinder HIT (S¹ × I), π₁ ≃ ℤ.
@@ -508,14 +511,29 @@ This project tries to minimize **Lean kernel axioms**. We distinguish:
 
 ### Current status
 
-- `Scripts/AxiomInventory.lean` reports **43 kernel axioms** for `import ComputationalPaths`; these are **exactly the HIT interfaces** (types/constructors/recursors) for:
-  - `Circle`, `Cylinder`, `Torus`, `KleinBottle`, `MobiusBand`, `ProjectivePlane`, `OrientableSurface`.
+- `Scripts/AxiomInventory.lean` reports **45 kernel axioms** for `import ComputationalPaths`: **43 HIT interface axioms** (types/constructors/recursors) for:
+  - `Circle`, `Cylinder`, `Torus`, `KleinBottle`, `MobiusBand`, `ProjectivePlane`, `OrientableSurface`
+  - Plus **2 confluence axioms** (`local_confluence`, `step_strip_prop`) justified by critical pair analysis.
 - `Scripts/AxiomDependencies.lean` reports that `circlePiOneEquivInt` depends on only the **circle generators** (3 kernel axioms: `Circle`, `circleBase`, `circleLoop`).
 
 Non-kernel assumptions that are intentionally explicit (selected examples):
 
 - **Circle π₁ equivalence data**: `ComputationalPaths.Path.HasCirclePiOneEncode` (minimal interface used by `circlePiOneEquivInt`).
 - **(Optional) Raw circle loop normal forms**: `ComputationalPaths.Path.HasCircleLoopDecode` (used only for raw-loop statements; derivable from `HasCirclePiOneEncode`).
+
+### Opt-in axiom imports
+
+For convenience, you can import an "assumption-free" version of each π₁ result that adds the corresponding `Has*PiOneEncode` typeclass **as a kernel axiom**. These are intentionally **not** imported by `ComputationalPaths` by default, but provide a simpler API when you don't want to thread typeclass hypotheses:
+
+| Import | Provides | Wrapper function |
+|--------|----------|------------------|
+| `ComputationalPaths.Path.HIT.CirclePiOneAxiom` | `HasCirclePiOneEncode` | `circlePiOneEquivInt' : π₁(S¹) ≃ ℤ` |
+| `ComputationalPaths.Path.HIT.TorusPiOneAxiom` | `HasTorusPiOneEncode` | `torusPiOneEquivIntProd' : π₁(T²) ≃ ℤ × ℤ` |
+| `ComputationalPaths.Path.HIT.ProjectivePiOneAxiom` | `HasProjectivePiOneEncode` | `projectivePiOneEquivZ2' : π₁(RP²) ≃ Bool` |
+| `ComputationalPaths.Path.HIT.KleinPiOneAxiom` | `HasKleinPiOneEncode` | `kleinPiOneEquivIntProd' : π₁(K) ≃ ℤ × ℤ` |
+
+See `docs/axioms.md` for detailed documentation on each opt-in axiom file.
+
 - **Univalence marker**: `ComputationalPaths.Path.HasUnivalence`.
   - Used by some HoTT-style developments to model “transport along `ua` computes to the equivalence”.
   - **Cannot be instantiated in standard Lean** (proof-irrelevance makes it inconsistent); see `docs/axioms.md` and `Scripts/UnivalenceInconsistency.lean`.

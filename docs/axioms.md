@@ -166,6 +166,17 @@ Non-kernel assumptions required by the torus encode/decode development:
   - Downstream developments (e.g. `ComputationalPaths/Path/Homotopy/LieGroups.lean`)
     now depend only on this weaker hypothesis.
 
+### Opt-in "assumption-free" import
+
+If you want to use the torus π₁ result without threading a typeclass hypothesis
+through your signatures, import:
+
+- `ComputationalPaths/Path/HIT/TorusPiOneAxiom.lean`
+
+This file adds a global `HasTorusPiOneEncode` **as a kernel axiom** and exports
+`torusPiOneEquivIntProd' : π₁(T²) ≃ ℤ × ℤ` with no extra parameters. The core library
+does *not* import it by default.
+
 ## Projective plane (π₁(RP²) ≃ ℤ₂)
 
 Kernel axioms *used by* `ComputationalPaths.Path.projectivePiOneEquivZ2`:
@@ -188,6 +199,17 @@ Non-kernel assumptions required by the RP² encode/decode development:
     `HasProjectivePiOneEncode` can be turned back into `HasProjectiveLoopDecode`
     when a raw-loop statement is required.
 
+### Opt-in "assumption-free" import
+
+If you want to use the projective plane π₁ result without threading a typeclass hypothesis
+through your signatures, import:
+
+- `ComputationalPaths/Path/HIT/ProjectivePiOneAxiom.lean`
+
+This file adds a global `HasProjectivePiOneEncode` **as a kernel axiom** and exports
+`projectivePiOneEquivZ2' : π₁(RP²) ≃ Bool` with no extra parameters. The core library
+does *not* import it by default.
+
 ## Klein bottle (π₁(K) ≃ ℤ ⋊ ℤ)
 
 Kernel axioms *used by* `ComputationalPaths.Path.kleinPiOneEquivIntProd`:
@@ -209,6 +231,17 @@ Non-kernel assumptions required by the Klein bottle encode/decode development:
   - Every `[HasKleinLoopDecode]` provides an instance, and conversely
     `HasKleinPiOneEncode` can be turned back into `HasKleinLoopDecode` when a raw-loop
     statement is required.
+
+### Opt-in "assumption-free" import
+
+If you want to use the Klein bottle π₁ result without threading a typeclass hypothesis
+through your signatures, import:
+
+- `ComputationalPaths/Path/HIT/KleinPiOneAxiom.lean`
+
+This file adds a global `HasKleinPiOneEncode` **as a kernel axiom** and exports
+`kleinPiOneEquivIntProd' : π₁(K) ≃ ℤ × ℤ` with no extra parameters. The core library
+does *not* import it by default.
 
 The SVK development in `ComputationalPaths/Path/HIT/KleinBottleSVK.lean` builds the
 semidirect-product viewpoint and requires additional pushout assumptions.
