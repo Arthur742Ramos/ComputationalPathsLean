@@ -295,8 +295,8 @@ lake clean
 | `FigureEight.lean` | `figureEightPiOneEquiv` | π₁(S¹ ∨ S¹) ≃ ℤ * ℤ |
 | `OrientableSurface.lean` | `piOneEquivPresentation` | π₁(Σ_g) ≃ SurfaceGroup |
 | `TorusGenus1.lean` | `piOneEquivIntProd` | π₁(OrientableSurface 1) ≃ ℤ × ℤ |
-| `KleinBottle.lean` | `kleinPiOneEquivIntProd` | π₁(K) ≃ ℤ ⋊ ℤ |
-| `ProjectivePlane.lean` | `projectivePiOneEquivZ2` | π₁(RP²) ≃ ℤ₂ |
+| `KleinBottleStep.lean` | `kleinPiOneEquivIntProd` | π₁(K) ≃ ℤ ⋊ ℤ |
+| `ProjectivePlaneStep.lean` | `projectivePiOneEquivZ2` | π₁(RP²) ≃ ℤ₂ |
 | `PushoutPaths.lean` | `seifertVanKampenEquiv` | π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) |
 | `OmegaGroupoid.lean` | `compPathOmegaGroupoid` | Types are weak ω-groupoids |
 | `FundamentalGroupoid.lean` | `basepointIsomorphism` | π₁(A, a) ≃ π₁(A, b) via path conjugation |
