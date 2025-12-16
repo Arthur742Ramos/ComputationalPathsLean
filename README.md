@@ -16,6 +16,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Freudenthal suspension theorem**: Σ : π_n(X) → π_{n+1}(ΣX) is iso when n < 2k-1 (X is (k-1)-connected). Key result: π_n(Sⁿ) ≃ ℤ for all n ≥ 1. Stable homotopy groups πₛ_0 ≃ ℤ, πₛ_1 ≃ ℤ/2ℤ (Hopf element η).
 - **Suspension-loop adjunction**: Pointed types and maps infrastructure, suspension as pointed type, adjunction map construction, and Freudenthal suspension theorem foundations.
 - **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
+- **Lens spaces L(p,1)**: π₁(L(p,1)) ≃ ℤ/pℤ via Heegaard decomposition and SVK. First example of SVK producing **finite cyclic groups** (complementing infinite groups ℤ, ℤ×ℤ, ℤ*ℤ). Requires `HasLensPiOneEncode`.
 - **Orientable genus-g surfaces** (Σ_g): Complete proof that π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩ (surface group presentation), with special cases for sphere (g=0), torus (g=1), and non-abelian higher genus (g≥2).
 - **2-Sphere** (S²): π₁(S²) ≅ 1 (trivial) via SVK applied to the suspension decomposition Σ(S¹), plus π₂(S²) ≅ 1 via contractibility₃.
 - **Figure-eight space** (S¹ ∨ S¹): π₁ ≃ ℤ * ℤ (free group on 2 generators), demonstrating non-abelian fundamental groups.
@@ -85,6 +86,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean) — The 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK. Also defines S³ for the Hopf fibration.
 - [`ComputationalPaths/Path/HIT/OrientableSurface.lean`](ComputationalPaths/Path/HIT/OrientableSurface.lean) — **Orientable genus-g surfaces** Σ_g with full fundamental group calculation: π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩.
 - [`ComputationalPaths/Path/HIT/TorusGenus1.lean`](ComputationalPaths/Path/HIT/TorusGenus1.lean) — **Torus as genus-1 surface**: Proves π₁(OrientableSurface 1) ≃ ℤ × ℤ by constructive methods, demonstrating that the torus result follows from the general orientable surface framework.
+- [`ComputationalPaths/Path/HIT/LensSpace.lean`](ComputationalPaths/Path/HIT/LensSpace.lean) — **Lens spaces L(p,1)**: Heegaard decomposition as pushout of solid tori, cyclic group ℤ/pℤ representation, quotient-level interface `HasLensPiOneEncode`, and `lensPiOneEquivZMod : π₁(L(p,1)) ≃ ℤ/pℤ`.
+- [`ComputationalPaths/Path/HIT/LensPiOneAxiom.lean`](ComputationalPaths/Path/HIT/LensPiOneAxiom.lean) — **opt-in**: installs a global `HasLensPiOneEncode` instance as a kernel axiom and exports `lensPiOneEquivZMod'` with no extra parameters.
 - [`ComputationalPaths/Path/HIT/HopfFibration.lean`](ComputationalPaths/Path/HIT/HopfFibration.lean) — **Hopf fibration** S¹ → S³ → S² with fiber equivalence, long exact sequence application, π₁(S³) = 1, and foundations for π₂(S²) ≅ ℤ.
 - [`ComputationalPaths/Path/HIT/Pi2Sphere.lean`](ComputationalPaths/Path/HIT/Pi2Sphere.lean) — **Second homotopy group π₂(S²) ≃ ℤ** via Hopf fibration long exact sequence. Defines `S2TwoLoop` (2-loops in S²) with winding number, proves connecting map ∂ : π₂(S²) → π₁(S¹) is isomorphism (`hopf_connecting_iso`), and establishes `sphere2_pi2_equiv_int`.
 - [`ComputationalPaths/Path/HIT/Pi3Sphere.lean`](ComputationalPaths/Path/HIT/Pi3Sphere.lean) — **Third homotopy group π₃(S²) ≃ ℤ** via Hopf fibration. Defines `S3ThreeLoop` (3-loops in S³) and `S2ThreeLoop` (3-loops in S²), proves `sphere3_pi3_equiv_int` and `hopf_pi3_iso` (isomorphism from LES), establishes `sphere2_pi3_equiv_int`. Generator is the Hopf map η with Hopf invariant 1.
@@ -385,6 +388,30 @@ Two approaches are available:
   - SVK gives: π₁(K) ≃ (ℤ * ℤ) / ⟨⟨aba⁻¹b⟩⟩ ≃ ℤ ⋊ ℤ
   - Key computation: `wordToIntProd_boundaryWord` shows aba⁻¹b maps to (0,0) in ℤ ⋊ ℤ
 
+## Lens Spaces π₁(L(p,1)) ≃ ℤ/pℤ (what to read)
+- **Definition** ([`LensSpace.lean`](ComputationalPaths/Path/HIT/LensSpace.lean)): Lens space L(p,1) via Heegaard decomposition:
+  ```
+  L(p,1) = V₁ ∪_φ V₂
+  ```
+  where V₁, V₂ are solid tori glued along their boundary torus.
+- **Cyclic group**: `ZMod p hp` = ℤ/pℤ represented as `Fin p` with addition modulo p.
+- **Solid torus HIT**: `SolidTorus` axiomatized with base point and core loop (π₁(V) ≃ ℤ).
+- **Boundary torus inclusion**: `torusToSolidTorus : Torus → SolidTorus` with:
+  - `meridian_trivial`: Meridian bounds disk, maps to 0 in π₁(V)
+  - `longitude_to_core`: Longitude maps to generator of π₁(V)
+- **Heegaard decomposition**: `LensSpace p := Pushout SolidTorus SolidTorus Torus`
+- **SVK application**: The amalgamation relations from the two solid torus inclusions yield:
+  ```
+  π₁(L(p,1)) ≃ ℤ *_{ℤ×ℤ} ℤ ≃ ℤ/pℤ
+  ```
+- **Key axiom**: `lens_loop_order` — the p-th power of the fundamental loop is contractible.
+- **Main theorem** (`lensPiOneEquivZMod`): π₁(L(p,1)) ≃ ℤ/pℤ, assuming `HasLensPiOneEncode p hp`.
+- **Special cases**:
+  - L(1,1) ≃ S³ (3-sphere)
+  - L(2,1) ≃ RP³ (real projective 3-space)
+- **Significance**: First SVK example producing **finite cyclic groups**, complementing infinite groups (ℤ from S¹, ℤ×ℤ from T², ℤ*ℤ from S¹∨S¹).
+- Reference: Hatcher, "Algebraic Topology", Section 1.2; Rolfsen, "Knots and Links", Chapter 9.
+
 ## Möbius Band & Cylinder (what to read)
 - Both spaces are homotopy equivalent to S¹, so π₁ ≃ ℤ.
 - [`MobiusBand.lean`](ComputationalPaths/Path/HIT/MobiusBand.lean): Central loop generates π₁; twist affects fiber structure but not fundamental group.
@@ -531,6 +558,7 @@ For convenience, you can import an "assumption-free" version of each π₁ resul
 | `ComputationalPaths.Path.HIT.TorusPiOneAxiom` | `HasTorusPiOneEncode` | `torusPiOneEquivIntProd' : π₁(T²) ≃ ℤ × ℤ` |
 | `ComputationalPaths.Path.HIT.ProjectivePiOneAxiom` | `HasProjectivePiOneEncode` | `projectivePiOneEquivZ2' : π₁(RP²) ≃ Bool` |
 | `ComputationalPaths.Path.HIT.KleinPiOneAxiom` | `HasKleinPiOneEncode` | `kleinPiOneEquivIntProd' : π₁(K) ≃ ℤ × ℤ` |
+| `ComputationalPaths.Path.HIT.LensPiOneAxiom` | `HasLensPiOneEncode` | `lensPiOneEquivZMod' : π₁(L(p,1)) ≃ ℤ/pℤ` |
 
 See `docs/axioms.md` for detailed documentation on each opt-in axiom file.
 

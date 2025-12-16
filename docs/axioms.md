@@ -246,6 +246,52 @@ does *not* import it by default.
 The SVK development in `ComputationalPaths/Path/HIT/KleinBottleSVK.lean` builds the
 semidirect-product viewpoint and requires additional pushout assumptions.
 
+## Lens space (π₁(L(p,1)) ≃ ℤ/pℤ)
+
+Kernel axioms *used by* `ComputationalPaths.Path.lensPiOneEquivZMod`:
+
+- `SolidTorus`, `solidTorusBase`, `solidTorusCore`
+- `torusToSolidTorus`, `torusToSolidTorus_base`
+- `meridian_trivial`, `longitude_to_core`
+- `lens_loop_order`
+
+Non-kernel assumptions required by the lens space encode/decode development:
+
+- `ComputationalPaths.Path.HasLensPiOneEncode`
+  - Cyclic-group classification hypothesis for the lens space fundamental group.
+  - Defined in `ComputationalPaths/Path/HIT/LensSpace.lean`.
+  - Provides `encode : π₁(L(p,1)) → ℤ/pℤ` with `encode (decode z) = z` and
+    `decode (encode x) = x`.
+
+### Mathematical background
+
+Lens spaces L(p,q) are 3-manifolds defined as S³/ℤ_p quotients. The construction via
+**Heegaard decomposition** represents L(p,1) as:
+
+```
+L(p,1) = V₁ ∪_φ V₂
+```
+
+where V₁, V₂ are solid tori glued along their boundary torus T². The key axiom
+`lens_loop_order` states that the p-th power of the fundamental loop is contractible,
+which follows from SVK applied to the Heegaard decomposition.
+
+### Special cases
+
+- L(1,1) ≃ S³ (3-sphere, trivial fundamental group)
+- L(2,1) ≃ RP³ (real projective 3-space, π₁ ≃ ℤ/2ℤ)
+
+### Opt-in "assumption-free" import
+
+If you want to use the lens space π₁ result without threading a typeclass hypothesis
+through your signatures, import:
+
+- `ComputationalPaths/Path/HIT/LensPiOneAxiom.lean`
+
+This file adds a global `HasLensPiOneEncode` **as a kernel axiom** and exports
+`lensPiOneEquivZMod' : π₁(L(p,1)) ≃ ℤ/pℤ` with no extra parameters. The core library
+does *not* import it by default.
+
 ## Pushout / SVK
 
 The pushout is implemented as a quotient, but some HIT-style β/naturality laws are not definitional.

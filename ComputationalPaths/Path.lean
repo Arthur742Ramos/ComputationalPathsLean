@@ -58,4 +58,5 @@ import ComputationalPaths.Path.HIT.Pi4S3
 import ComputationalPaths.Path.HIT.QuaternionicHopf
 import ComputationalPaths.Path.HIT.OrientableSurface
 import ComputationalPaths.Path.HIT.TorusGenus1
+import ComputationalPaths.Path.HIT.LensSpace
 import ComputationalPaths.Path.OmegaGroupoid
