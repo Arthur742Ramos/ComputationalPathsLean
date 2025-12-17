@@ -63,5 +63,6 @@ import ComputationalPaths.Path.HIT.TorusGenus1
 import ComputationalPaths.Path.HIT.LensSpace
 import ComputationalPaths.Path.HIT.ProjectiveSpaces
 import ComputationalPaths.Path.HIT.ComplexProjectiveSpaces
+import ComputationalPaths.Path.HIT.QuaternionicProjectiveSpaces
 import ComputationalPaths.Path.HIT.SVKApplications
 import ComputationalPaths.Path.OmegaGroupoid
