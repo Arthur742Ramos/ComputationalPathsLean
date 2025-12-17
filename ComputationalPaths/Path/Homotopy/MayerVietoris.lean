@@ -101,13 +101,13 @@ structure MVSequence (D : MVDecomposition) where
 /-- Exactness at H_n(A) ⊕ H_n(B): ker(j_*) = im(i_*). -/
 def MVSequence.exactAtSum (seq : MVSequence D) (n : Nat) : Prop :=
   ∀ (ab : seq.H_A n × seq.H_B n),
-    (∃ z : seq.H_total n, True) →  -- Simplified: j_*(ab) = 0
+    (∃ _z : seq.H_total n, True) →  -- Simplified: j_*(ab) = 0
     (∃ c : seq.H_intersection n, seq.incl_map n c = ab)
 
 /-- Exactness at H_n(X): ker(∂) = im(j_*). -/
 def MVSequence.exactAtTotal (seq : MVSequence D) (n : Nat) : Prop :=
   ∀ (x : seq.H_total (n + 1)),
-    (∃ z : seq.H_intersection n, True) →  -- Simplified: ∂(x) = 0
+    (∃ _z : seq.H_intersection n, True) →  -- Simplified: ∂(x) = 0
     (∃ ab : seq.H_A (n + 1) × seq.H_B (n + 1), seq.sum_map (n + 1) ab = x)
 
 /-! ## The Main Theorem -/

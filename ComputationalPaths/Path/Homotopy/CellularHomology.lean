@@ -115,7 +115,7 @@ def CWStructure.cellularBoundary (X : CWStructure) (n : Nat)
     (c : X.chainGroup (n + 1)) : X.chainGroup n :=
   fun j =>
     -- Sum over all (n+1)-cells
-    if h : X.numCells (n + 1) > 0 then
+    if _h : X.numCells (n + 1) > 0 then
       let indices := List.range (X.numCells (n + 1))
       indices.foldl (fun acc i =>
         if hi : i < X.numCells (n + 1) then
@@ -186,7 +186,7 @@ For the n-sphere with CW structure {e⁰, eⁿ}:
 - H_0(Sⁿ) ≃ ℤ (one 0-cell, no boundary from above)
 - H_n(Sⁿ) ≃ ℤ (one n-cell, d(eⁿ) = 0)
 - H_k(Sⁿ) = 0 for k ≠ 0, n -/
-theorem sphere_cellular_homology (n k : Nat) (hn : n ≥ 1) :
+theorem sphere_cellular_homology (n k : Nat) (_hn : n ≥ 1) :
     ∃ desc : String,
       desc = if k = 0 then "H₀(Sⁿ) ≃ ℤ"
              else if k = n then s!"H_{n}(S^{n}) ≃ ℤ"

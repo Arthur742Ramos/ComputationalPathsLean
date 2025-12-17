@@ -7,6 +7,7 @@ groupoid structure provided by identity types.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Basic.Univalence
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.Rewrite.Step
 import ComputationalPaths.Path.Rewrite.Rw
@@ -17,6 +18,7 @@ import ComputationalPaths.Path.Rewrite.Termination
 import ComputationalPaths.Path.Rewrite.Confluence
 import ComputationalPaths.Path.Rewrite.ConfluenceProof
 import ComputationalPaths.Path.Rewrite.PathTactic
+import ComputationalPaths.Path.Rewrite.StripLemma
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.Homotopy.Loops
@@ -41,10 +43,17 @@ import ComputationalPaths.Path.Homotopy.CellularHomology
 import ComputationalPaths.Path.Homotopy.MayerVietoris
 import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 import ComputationalPaths.Path.Homotopy.Pi2Surfaces
+import ComputationalPaths.Path.Homotopy.Sets
+import ComputationalPaths.Path.Homotopy.Reflexivity
+import ComputationalPaths.Path.Homotopy.IdentityType
+import ComputationalPaths.Path.Homotopy.Coproduct
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
+import ComputationalPaths.Path.HIT.Torus
 import ComputationalPaths.Path.HIT.TorusStep
+import ComputationalPaths.Path.HIT.KleinBottle
+import ComputationalPaths.Path.HIT.ProjectivePlane
 import ComputationalPaths.Path.HIT.Cylinder
 import ComputationalPaths.Path.HIT.MobiusBand
 import ComputationalPaths.Path.HIT.KleinBottleStep
@@ -70,3 +79,6 @@ import ComputationalPaths.Path.HIT.ComplexProjectiveSpaces
 import ComputationalPaths.Path.HIT.QuaternionicProjectiveSpaces
 import ComputationalPaths.Path.HIT.SVKApplications
 import ComputationalPaths.Path.OmegaGroupoid
+import ComputationalPaths.Path.OmegaGroupoid.Derived
+import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
+import ComputationalPaths.Path.OmegaGroupoid.AxiomAnalysis

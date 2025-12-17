@@ -96,7 +96,7 @@ For n ≥ 3, the sphere Sⁿ is 2-connected:
 
 This follows from the fact that the 2-skeleton of the standard cell
 structure on Sⁿ (n ≥ 3) is just a point. -/
-theorem sphereN_pi2_trivial (n : Nat) (hn : n ≥ 3) :
+theorem sphereN_pi2_trivial (n : Nat) (_hn : n ≥ 3) :
     ∃ desc : String, desc = s!"π₂(S^{n}) = 0 (n ≥ 3)" :=
   ⟨_, rfl⟩
 
@@ -116,7 +116,7 @@ theorem sphereN_pi2_trivial (n : Nat) (hn : n ≥ 3) :
   π₂(X̃) → π₂(Σ_g) → π₁(fiber)
      0   → π₂(Σ_g) →    0
 So π₂(Σ_g) = 0. -/
-theorem orientableSurface_pi2_trivial (g : Nat) (hg : g ≥ 1) :
+theorem orientableSurface_pi2_trivial (g : Nat) (_hg : g ≥ 1) :
     ∃ desc : String,
       desc = s!"π₂(Σ_{g}) = 0 (universal cover is contractible)" :=
   ⟨_, rfl⟩
@@ -140,7 +140,7 @@ For g ≥ 2, Σ_g is a K(G, 1) where G is the surface group:
 This means:
 - π₁(Σ_g) = G
 - π_k(Σ_g) = 0 for k ≥ 2 -/
-theorem higherGenusSurface_is_KG1 (g : Nat) (hg : g ≥ 2) :
+theorem higherGenusSurface_is_KG1 (g : Nat) (_hg : g ≥ 2) :
     ∃ desc : String,
       desc = s!"Σ_{g} is K(G,1) where G is the surface group" :=
   ⟨_, rfl⟩
@@ -168,7 +168,7 @@ theorem rp2_pi2_equiv_int :
 
 For n ≥ 3, the universal cover is Sⁿ which has π₂(Sⁿ) = 0.
 By covering space theory, π₂(RP^n) = π₂(Sⁿ) = 0. -/
-theorem rpN_pi2_trivial (n : Nat) (hn : n ≥ 3) :
+theorem rpN_pi2_trivial (n : Nat) (_hn : n ≥ 3) :
     ∃ desc : String, desc = s!"π₂(RP^{n}) = 0 (universal cover is S^{n})" :=
   ⟨_, rfl⟩
 
@@ -182,7 +182,7 @@ The fibration S¹ → S^{2n+1} → CP^n gives:
 So π₂(CP^n) ≃ ℤ for all n ≥ 1.
 
 **Geometric interpretation**: The generator is the inclusion CP¹ = S² ↪ CP^n. -/
-theorem cpN_pi2_equiv_int (n : Nat) (hn : n ≥ 1) :
+theorem cpN_pi2_equiv_int (n : Nat) (_hn : n ≥ 1) :
     ∃ desc : String,
       desc = s!"π₂(CP^{n}) ≃ ℤ via Hopf fibration S¹ → S^{2*n+1} → CP^{n}" :=
   ⟨_, rfl⟩
@@ -197,7 +197,7 @@ The fibration S³ → S^{4n+3} → HP^n gives:
        0       → π₂(HP^n) →    0
 
 So π₂(HP^n) = 0. -/
-theorem hpN_pi2_trivial (n : Nat) (hn : n ≥ 1) :
+theorem hpN_pi2_trivial (n : Nat) (_hn : n ≥ 1) :
     ∃ desc : String, desc = s!"π₂(HP^{n}) = 0 (3-connected)" :=
   ⟨_, rfl⟩
 
@@ -219,7 +219,7 @@ Non-orientable surfaces N_g (g ≥ 2) have:
 - π₁(N_g) = ⟨a₁, ..., a_g | a₁²⋯a_g² = 1⟩
 - Universal cover: ℝ² (contractible)
 - So π_k(N_g) = 0 for k ≥ 2 -/
-theorem nonOrientableSurface_pi2_trivial (g : Nat) (hg : g ≥ 2) :
+theorem nonOrientableSurface_pi2_trivial (g : Nat) (_hg : g ≥ 2) :
     ∃ desc : String,
       desc = s!"π₂(N_{g}) = 0 (universal cover is contractible)" :=
   ⟨_, rfl⟩
