@@ -30,6 +30,7 @@ import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.HIT.FigureEight
 import ComputationalPaths.Path.HIT.Sphere
+import ComputationalPaths.Path.Rewrite.PathTactic
 
 namespace ComputationalPaths
 namespace Path
@@ -623,7 +624,7 @@ theorem loopIter_symm_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
     -- = trans l (trans (symm l) (symm l)) ≈ symm l
     apply rweq_trans (rweq_symm (rweq_tt l (Path.symm l) (Path.symm l)))
     apply rweq_trans (rweq_trans_congr_left (Path.symm l) (loop_cancel_right l))
-    exact rweq_cmpA_refl_left (Path.symm l)
+    path_simp  -- refl · X ≈ X
   | succ n ih =>
     -- trans l (loopIter (symm l) (n+2)) ≈ loopIter (symm l) (n+1)
     -- = trans l (trans (loopIter (symm l) (n+1)) (symm l))
@@ -643,7 +644,7 @@ theorem loopIter_cancel_r {A : Type u} {a : A} (l : Path a a) (n : Nat) :
   -- ≈ loopIter l n  [by refl_right]
   apply rweq_trans (rweq_tt (loopIter l n) l (Path.symm l))
   apply rweq_trans (rweq_trans_congr_right (loopIter l n) (loop_cancel_right l))
-  exact rweq_cmpA_refl_right (loopIter l n)
+  path_simp  -- X · refl ≈ X
 
 /-- Symmetric helper: l^{-1} · l^{n+2} ≈ l^{n+1}. -/
 theorem loopIter_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
@@ -653,7 +654,7 @@ theorem loopIter_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
   | zero =>
     apply rweq_trans (rweq_symm (rweq_tt (Path.symm l) l l))
     apply rweq_trans (rweq_trans_congr_left l (loop_cancel_left l))
-    exact rweq_cmpA_refl_left l
+    path_simp  -- refl · X ≈ X
   | succ n ih =>
     apply rweq_trans (rweq_symm (rweq_tt (Path.symm l) (loopIter l (n + 1)) l))
     apply rweq_trans_congr_left l ih
@@ -761,7 +762,7 @@ theorem loopIter_symm_cancel_r {A : Type u} {a : A} (l : Path a a) (n : Nat) :
          (loopIter (Path.symm l) n) := by
   apply rweq_trans (rweq_tt (loopIter (Path.symm l) n) (Path.symm l) l)
   apply rweq_trans (rweq_trans_congr_right (loopIter (Path.symm l) n) (loop_cancel_left l))
-  exact rweq_cmpA_refl_right (loopIter (Path.symm l) n)
+  path_simp  -- X · refl ≈ X
 
 /-- Symmetric: (l^{-1})^m · l^m ≈ refl. -/
 theorem loopIter_symm_cancel_eq' {A : Type u} {a : A} (l : Path a a) (m : Nat) :
@@ -833,13 +834,13 @@ theorem loopIter_symm_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
 theorem decodeGen_zero_left (g : Nat) (i : Fin' (2 * g)) (n : Int) :
     RwEq (Path.trans (decodeGen g i 0) (decodeGen g i n)) (decodeGen g i n) := by
   simp only [decodeGen_zero]
-  exact rweq_cmpA_refl_left (decodeGen g i n)
+  path_simp  -- refl · X ≈ X
 
 /-- Helper: addition law when right is 0. -/
 theorem decodeGen_zero_right (g : Nat) (i : Fin' (2 * g)) (m : Int) :
     RwEq (Path.trans (decodeGen g i m) (decodeGen g i 0)) (decodeGen g i m) := by
   simp only [decodeGen_zero]
-  exact rweq_cmpA_refl_right (decodeGen g i m)
+  path_simp  -- X · refl ≈ X
 
 /-- Integer power addition law for decoded generators:
     loop^m ∘ loop^n ≈ loop^(m+n). -/
@@ -1004,13 +1005,13 @@ theorem decodePath_single_neg (g : Nat) (i : Fin' (2 * g)) :
 theorem decodePath_single_pos_rweq (g : Nat) (i : Fin' (2 * g)) :
     RwEq (decodePath g (FreeGroupWord.single i 1)) (generatorLoop g i) := by
   rw [decodePath_single_pos]
-  exact rweq_cmpA_refl_right (generatorLoop g i)
+  path_simp  -- X · refl ≈ X
 
 /-- Helper: decodePath of a single inverse generator is RwEq to the inverse loop. -/
 theorem decodePath_single_neg_rweq (g : Nat) (i : Fin' (2 * g)) :
     RwEq (decodePath g (FreeGroupWord.single i (-1))) (Path.symm (generatorLoop g i)) := by
   rw [decodePath_single_neg]
-  exact rweq_cmpA_refl_right (Path.symm (generatorLoop g i))
+  path_simp  -- X · refl ≈ X
 
 /-- decodePath of commutatorWord is RwEq to commutatorPath of the generator loops. -/
 theorem decodePath_commutatorWord_rweq (g : Nat) (aIdx bIdx : Fin' (2 * g)) :
@@ -1108,7 +1109,7 @@ theorem decodePath_respects_rel (g : Nat) {w₁ w₂ : FreeGroupWord (2 * g)}
       -- decodePath (cons i 0 rest) = trans (decodeGen i 0) (decodePath rest)
       -- decodeGen i 0 = refl, so this is trans refl (decodePath rest) ≈ decodePath rest
       simp only [decodePath, decodeGen]
-      exact rweq_cmpA_refl_left (decodePath g rest)
+      path_simp  -- refl · X ≈ X
   | power_combine i m n rest =>
       -- decodePath (cons i m (cons i n rest)) ≈ decodePath (cons i (m+n) rest)
       -- LHS = trans (decodeGen i m) (trans (decodeGen i n) (decodePath rest))

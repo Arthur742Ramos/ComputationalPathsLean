@@ -258,7 +258,7 @@ theorem iterateLoopPos_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
   induction m with
   | zero =>
     simp only [iterateLoopPos, Nat.zero_add]
-    exact rweq_cmpA_refl_left (iterateLoopPos l n)
+    path_simp  -- refl · X ≈ X
   | succ m ih =>
     -- iterateLoopPos l (m+1) = trans l (iterateLoopPos l m)
     -- trans (trans l (iterateLoopPos l m)) (iterateLoopPos l n)
@@ -278,7 +278,7 @@ theorem iterateLoopNeg_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
   induction m with
   | zero =>
     simp only [iterateLoopNeg, Nat.zero_add]
-    exact rweq_cmpA_refl_left (iterateLoopNeg l n)
+    path_simp  -- refl · X ≈ X
   | succ m ih =>
     simp only [iterateLoopNeg, Nat.succ_add]
     apply rweq_trans (rweq_tt (Path.symm l) (iterateLoopNeg l m) (iterateLoopNeg l n))
@@ -307,7 +307,7 @@ theorem iterateLoopNeg_cancel_one {A : Type u} {a : A} (l : Path a a) (n : Nat) 
   -- Now: trans (trans l (symm l)) (iterateLoopNeg l n) ≈ iterateLoopNeg l n
   apply rweq_trans (rweq_trans_congr_left (iterateLoopNeg l n) (loop_cancel l))
   -- Now: trans refl (iterateLoopNeg l n) ≈ iterateLoopNeg l n
-  exact rweq_cmpA_refl_left (iterateLoopNeg l n)
+  path_simp
 
 /-- (l⁻¹) · l^{n+1} ≈ l^n
     This is: l⁻¹ · (l · l^n) ≈ (l⁻¹ · l) · l^n ≈ refl · l^n ≈ l^n -/
@@ -317,7 +317,7 @@ theorem iterateLoopPos_cancel_one {A : Type u} {a : A} (l : Path a a) (n : Nat) 
   simp only [iterateLoopPos]
   apply rweq_trans (rweq_symm (rweq_tt (Path.symm l) l (iterateLoopPos l n)))
   apply rweq_trans (rweq_trans_congr_left (iterateLoopPos l n) (loop_cancel' l))
-  exact rweq_cmpA_refl_left (iterateLoopPos l n)
+  path_simp  -- refl · X ≈ X
 
 /-- l^{m+1} · l⁻¹ ≈ l^m
     Key insight: l^{m+1} = l · l^m, so l^{m+1} · l⁻¹ = l · (l^m · l⁻¹)
@@ -385,7 +385,7 @@ theorem iterateLoopPos_neg_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h
   induction n generalizing m with
   | zero =>
     simp only [iterateLoopNeg, Nat.sub_zero]
-    exact rweq_cmpA_refl_right (iterateLoopPos l m)
+    path_simp  -- X · refl ≈ X
   | succ n ih =>
     -- m > n + 1
     have hm : m ≥ 2 := by omega
@@ -713,7 +713,7 @@ theorem decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
     have hadd := iterateLoopInt_add (bouquetLoop l₁.gen) l₁.power l₂.power
     rw [hinv, iterateLoopInt_zero] at hadd
     apply rweq_trans (rweq_trans_congr_left (decodeWord rest) hadd)
-    exact rweq_cmpA_refl_left (decodeWord rest)
+    path_simp  -- refl · X ≈ X
   | congr l h ih =>
     -- decode (cons l w₁) ≈ decode (cons l w₂)
     -- = iterateLoopInt (bouquetLoop l.gen) l.power · decode w₁

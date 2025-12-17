@@ -29,6 +29,7 @@ of generator loops, such as Circle, Torus, OrientableSurface, etc.
 -/
 
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Rewrite.PathTactic
 
 namespace ComputationalPaths
 namespace Path
@@ -107,7 +108,7 @@ theorem loopIter_symm_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
     -- ≈ trans (trans l (symm l)) (symm l) ≈ trans refl (symm l) ≈ symm l
     apply rweq_trans (rweq_symm (rweq_tt l (Path.symm l) (Path.symm l)))
     apply rweq_trans (rweq_trans_congr_left (Path.symm l) (loop_cancel_right l))
-    exact rweq_cmpA_refl_left (Path.symm l)
+    path_simp  -- refl · X ≈ X
   | succ n ih =>
     -- trans l (loopIter (symm l) (n+2))
     -- = trans l (trans (loopIter (symm l) (n+1)) (symm l))
@@ -129,7 +130,7 @@ theorem loopIter_cancel_r {A : Type u} {a : A} (l : Path a a) (n : Nat) :
   -- ≈ loopIter l n  [by refl_right]
   apply rweq_trans (rweq_tt (loopIter l n) l (Path.symm l))
   apply rweq_trans (rweq_trans_congr_right (loopIter l n) (loop_cancel_right l))
-  exact rweq_cmpA_refl_right (loopIter l n)
+  path_simp  -- X · refl ≈ X
 
 /-- Helper: l^{-1} · l^{n+2} ≈ l^{n+1}
     One cancellation on the left. -/
@@ -143,7 +144,7 @@ theorem loopIter_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
   apply rweq_trans (rweq_symm (rweq_tt (Path.symm l) l (loopIter l n)))
   -- ≈ trans refl (loopIter l n)
   apply rweq_trans (rweq_trans_congr_left (loopIter l n) (loop_cancel_left l))
-  exact rweq_cmpA_refl_left (loopIter l n)
+  path_simp  -- refl · X ≈ X
 
 /-- Equal powers cancel: l^{m+1} · (l^{-1})^{m+1} ≈ refl -/
 theorem loopIter_cancel_eq' {A : Type u} {a : A} (l : Path a a) (m : Nat) :

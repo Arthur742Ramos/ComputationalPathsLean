@@ -106,28 +106,57 @@ rweq_congrArg_of_rweq : RwEq p q → RwEq (congrArg f p) (congrArg f q)
 
 ### Path Tactics (in PathTactic.lean)
 
+**Import**: `import ComputationalPaths.Path.Rewrite.PathTactic`
+
 The `path_*` tactics automate RwEq reasoning:
 
-| Tactic | Description |
-|--------|-------------|
-| `path_rfl` | Close reflexive goals (p ≈ p) |
-| `path_symm` | Apply symmetry |
-| `path_simp` | Simplify using groupoid laws |
-| `path_auto` | Main automation - combines ~25 simp lemmas |
-| `path_auto!` | Aggressive version using simp_all |
-| `path_normalize` | Put paths in canonical (right-assoc) form |
-| `path_beta` | Beta reductions for products/sigmas/functions |
-| `path_eta` | Eta expansion/contraction |
-| `path_congr_left h` | Left congruence for trans |
-| `path_congr_right h` | Right congruence for trans |
-| `path_cancel_left` | Left inverse cancellation |
-| `path_cancel_right` | Right inverse cancellation |
+| Tactic | Description | Use Case |
+|--------|-------------|----------|
+| `path_simp` | Simplify using groupoid laws | Base cases, unit/inverse elimination |
+| `path_auto` | Main automation (~25 simp lemmas) | Most standalone RwEq goals |
+| `path_rfl` | Close reflexive goals (p ≈ p) | Trivial equality |
+| `path_symm` | Apply symmetry | Flip RwEq direction |
+| `path_normalize` | Right-associative form | Structural normalization |
+| `path_beta` | Product/sigma beta rules | `fst (prodMk p q) ≈ p` |
+| `path_eta` | Eta expansion/contraction | `prodMk (fst p) (snd p) ≈ p` |
+| `path_congr_left h` | Left congruence for trans | Apply hypothesis on right |
+| `path_congr_right h` | Right congruence for trans | Apply hypothesis on left |
+| `path_cancel_left` | Left inverse cancellation | `trans (symm p) p ≈ refl` |
+| `path_cancel_right` | Right inverse cancellation | `trans p (symm p) ≈ refl` |
+| `path_trans_via t` | Transitivity via `t` | Split proof at intermediate |
+
+#### When to Use Each Tactic
+
+**`path_simp`** - Best for base cases in induction proofs:
+```lean
+-- Before (verbose):
+exact rweq_cmpA_refl_left (iterateLoopPos l n)
+
+-- After (concise):
+path_simp  -- refl · X ≈ X
+```
+
+**`path_auto`** - Try first for standalone goals, falls back gracefully
+
+**Manual lemmas** - Still needed for complex intermediate steps:
+```lean
+-- Complex proof still requires explicit lemmas
+apply rweq_trans (rweq_tt (loopIter l n) l (Path.symm l))
+apply rweq_trans (rweq_trans_congr_right (loopIter l n) (loop_cancel_right l))
+path_simp  -- Only the final step simplifies automatically
+```
+
+#### The `≈` Notation
 
 The `≈` notation for RwEq is scoped in `ComputationalPaths.Path` and works with calc:
 ```lean
 calc trans (refl a) p
   _ ≈ p := rweq_cmpA_refl_left _
 ```
+
+#### Test Examples
+
+See `PathTacticExamples.lean` for comprehensive tests of all tactics.
 
 ## Coding Conventions
 

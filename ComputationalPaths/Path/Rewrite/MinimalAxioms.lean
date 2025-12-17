@@ -24,6 +24,7 @@ All derivations use the fact that `RwEq` is a congruence (closed under
 -/
 
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Rewrite.PathTactic
 
 namespace ComputationalPaths
 namespace Path
@@ -73,7 +74,7 @@ private theorem step4_left_unit : RwEq
     (Path.symm (Path.trans (Path.refl b) (Path.symm p)))
     (Path.symm (Path.symm p)) := by
   apply rweq_symm_congr
-  exact rweq_cmpA_refl_left (Path.symm p)
+  path_simp  -- refl · X ≈ X
 
 /-- Step 5: σ(σ(p)) ≈ p by symm_symm -/
 private theorem step5_ss : RwEq (Path.symm (Path.symm p)) p :=
@@ -201,7 +202,7 @@ theorem derive_symm_symm_from_both_inverses : RwEq (Path.symm (Path.symm p)) p :
   apply rweq_trans
   · exact rweq_trans_congr_left p (rweq_cmpA_inv_left (Path.symm p))
   -- Left unit
-  exact rweq_cmpA_refl_left p
+  path_simp  -- refl · X ≈ X
 
 end DeriveSymmSymm
 

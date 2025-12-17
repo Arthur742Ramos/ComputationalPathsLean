@@ -212,21 +212,50 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 
 ## Path Simplification Tactics
 
-- [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) provides automation for RwEq proofs:
-  ```lean
-  -- Basic tactics
-  macro "path_rfl" : tactic => `(tactic| exact RwEq.refl _)
-  macro "path_canon" : tactic => `(tactic| (apply rweq_of_toEq_eq; rfl))
-  macro "path_symm" : tactic => `(tactic| apply rweq_symm)
+- [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) provides comprehensive automation for RwEq proofs:
 
-  -- Main workhorse: applies all RwEq simp lemmas
-  macro "path_simp" : tactic => `(tactic| simp only [rweq_refl, ...])
+### Primary Tactics
 
-  -- Automatic decision procedure
-  macro "path_decide" : tactic => `(tactic| first | path_rfl | path_canon | path_simp)
-  ```
-- **Usage**: `example (p : Path a a) : RwEq (trans refl p) p := by path_simp`
-- **Simp lemmas**: Unit laws, inverse laws, associativity, double symmetry, congruence
+| Tactic | Description |
+|--------|-------------|
+| `path_simp` | Simplify using ~25 groupoid laws (unit, inverse, assoc, symm) |
+| `path_auto` | Full automation combining simp + structural lemmas |
+| `path_rfl` | Close reflexive goals `RwEq p p` |
+
+### Structural Tactics
+
+| Tactic | Description |
+|--------|-------------|
+| `path_symm` | Apply symmetry to RwEq goal |
+| `path_normalize` | Rewrite to canonical (right-associative) form |
+| `path_beta` | Apply beta reductions for products/sigmas/functions |
+| `path_eta` | Apply eta expansion/contraction for products |
+| `path_congr_left h` | Left congruence: `RwEq q₁ q₂ → RwEq (trans p q₁) (trans p q₂)` |
+| `path_congr_right h` | Right congruence: `RwEq p₁ p₂ → RwEq (trans p₁ q) (trans p₂ q)` |
+| `path_cancel_left` | Close `RwEq (trans (symm p) p) refl` |
+| `path_cancel_right` | Close `RwEq (trans p (symm p)) refl` |
+| `path_trans_via t` | Split goal via intermediate path `t` |
+
+### Usage Examples
+
+```lean
+-- Unit elimination (replaces manual rweq_cmpA_refl_left/right)
+example (p : Path a b) : RwEq (trans refl p) p := by path_simp
+example (p : Path a b) : RwEq (trans p refl) p := by path_simp
+
+-- Inverse cancellation
+example (p : Path a b) : RwEq (trans (symm p) p) refl := by path_cancel_left
+example (p : Path a b) : RwEq (trans p (symm p)) refl := by path_cancel_right
+
+-- Double symmetry
+example (p : Path a b) : RwEq (symm (symm p)) p := by path_simp
+
+-- Product eta
+example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p := by path_eta
+```
+
+- **Simp lemmas**: Unit laws, inverse laws, associativity, double symmetry, congruence, product beta/eta
+- **When to use**: `path_simp` for base cases in inductions; `path_auto` for standalone goals; manual lemmas for complex intermediate steps
 
 ## Covering Space Theory
 

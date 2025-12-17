@@ -208,16 +208,76 @@ theorem debug_proof : RwEq p q := by
   exact rweq_trans h1 h2
 ```
 
+## Path Tactics (RECOMMENDED)
+
+**Import**: `import ComputationalPaths.Path.Rewrite.PathTactic`
+
+The PathTactic module provides automated tactics that simplify RwEq proofs significantly.
+
+### Primary Tactics
+
+| Tactic | Description | Use Case |
+|--------|-------------|----------|
+| `path_simp` | Simplify using ~25 groupoid laws | Base cases, unit/inverse elimination |
+| `path_auto` | Full automation combining simp lemmas | Most common RwEq goals |
+| `path_rfl` | Close reflexive goals `p ≈ p` | Trivial equality |
+
+### Structural Tactics
+
+| Tactic | Description |
+|--------|-------------|
+| `path_symm` | Apply symmetry to goal |
+| `path_normalize` | Rewrite to canonical (right-assoc) form |
+| `path_beta` | Apply beta reductions for products/sigmas |
+| `path_eta` | Apply eta expansion/contraction |
+| `path_congr_left h` | Apply `RwEq (trans p q₁) (trans p q₂)` from `h : RwEq q₁ q₂` |
+| `path_congr_right h` | Apply `RwEq (trans p₁ q) (trans p₂ q)` from `h : RwEq p₁ p₂` |
+| `path_cancel_left` | Close `RwEq (trans (symm p) p) refl` |
+| `path_cancel_right` | Close `RwEq (trans p (symm p)) refl` |
+
+### Examples: Manual vs Tactic
+
+**Before (manual)**:
+```lean
+exact rweq_cmpA_refl_left (iterateLoopPos l n)
+```
+
+**After (tactic)**:
+```lean
+path_simp  -- refl · X ≈ X
+```
+
+**Before (manual chain)**:
+```lean
+apply rweq_trans (rweq_tt (loopIter l n) l (Path.symm l))
+apply rweq_trans (rweq_trans_congr_right (loopIter l n) (loop_cancel_right l))
+exact rweq_cmpA_refl_right (loopIter l n)
+```
+
+**After (tactic for final step)**:
+```lean
+apply rweq_trans (rweq_tt (loopIter l n) l (Path.symm l))
+apply rweq_trans (rweq_trans_congr_right (loopIter l n) (loop_cancel_right l))
+path_simp  -- X · refl ≈ X
+```
+
+### When to Use Each
+
+- **`path_simp`**: Best for base cases in inductions where goal is unit elimination (`refl · X ≈ X`) or inverse cancellation
+- **`path_auto`**: Try first for any standalone RwEq goal
+- **Manual lemmas**: Still needed for complex intermediate steps, congruence arguments
+
 ## Quick Reference
 
-| Goal Shape | Likely Lemma |
-|------------|--------------|
-| `RwEq (trans refl p) p` | `rweq_cmpA_refl_left` |
-| `RwEq (trans p refl) p` | `rweq_cmpA_refl_right` |
-| `RwEq (trans (symm p) p) refl` | `rweq_cmpA_inv_left` |
-| `RwEq (trans p (symm p)) refl` | `rweq_cmpA_inv_right` |
+| Goal Shape | Tactic / Lemma |
+|------------|----------------|
+| `RwEq (trans refl p) p` | `path_simp` or `rweq_cmpA_refl_left` |
+| `RwEq (trans p refl) p` | `path_simp` or `rweq_cmpA_refl_right` |
+| `RwEq (trans (symm p) p) refl` | `path_cancel_left` or `rweq_cmpA_inv_left` |
+| `RwEq (trans p (symm p)) refl` | `path_cancel_right` or `rweq_cmpA_inv_right` |
 | `RwEq (trans (trans p q) r) _` | `rweq_tt` or `rweq_tt_symm` |
-| `RwEq (symm (symm p)) p` | `rweq_symm_symm` |
-| `RwEq (congrArg f refl) refl` | `rweq_congrArg_refl` |
-| `RwEq (trans p _) (trans p _)` | `rweq_trans_congr_left` |
-| `RwEq (trans _ q) (trans _ q)` | `rweq_trans_congr_right` |
+| `RwEq (symm (symm p)) p` | `path_simp` or `rweq_ss` |
+| `RwEq (congrArg f refl) refl` | `path_rfl` or `rweq_congrArg_refl` |
+| `RwEq (trans p _) (trans p _)` | `path_congr_left` or `rweq_trans_congr_left` |
+| `RwEq (trans _ q) (trans _ q)` | `path_congr_right` or `rweq_trans_congr_right` |
+| `RwEq p p` | `path_rfl` |

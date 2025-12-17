@@ -48,6 +48,7 @@ The axiom remains as a justified semantic assertion about the ω-groupoid struct
 -/
 
 import ComputationalPaths.Path.OmegaGroupoid
+import ComputationalPaths.Path.Rewrite.PathTactic
 
 namespace ComputationalPaths
 namespace Path
@@ -274,7 +275,7 @@ section EliminateRedundantPathLaws
 theorem derive_trans_refl_right_via_left {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p := by
   -- Direct proof using existing RwEq lemmas
-  exact rweq_cmpA_refl_right p
+  path_simp  -- X · refl ≈ X
 
 /-- Derive symm_trans from trans_symm + symmetry.
 

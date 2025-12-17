@@ -37,6 +37,7 @@ import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Sets
+import ComputationalPaths.Path.Rewrite.PathTactic
 
 namespace ComputationalPaths
 namespace Path
@@ -185,7 +186,7 @@ theorem glue_conj_refl_rweq {A B C : Type u} {f : C → A} {g : C → B} (c : C)
   -- ≈ refl                              by inv_right
   apply rweq_trans
   · apply rweq_trans_congr_right
-    exact rweq_cmpA_refl_left (Path.symm (Pushout.glue c))
+    path_simp  -- refl · X ≈ X
   · exact rweq_cmpA_inv_right (Pushout.glue c)
 
 /-- For any element α : π₁(PUnit', PUnit'.unit), its image under the left inclusion
