@@ -248,6 +248,10 @@ structure ZMod (n : Nat) where
 
 namespace ZMod
 
+/-- Two ZMod values are equal iff their underlying Nat values are equal. -/
+@[ext] theorem ext {n : Nat} {a b : ZMod n} (h : a.val = b.val) : a = b := by
+  cases a; cases b; simp at h; subst h; rfl
+
 def zero (n : Nat) (hn : n > 0) : ZMod n := ⟨0, hn⟩
 
 def add {n : Nat} (a b : ZMod n) : ZMod n :=
@@ -257,6 +261,53 @@ def neg {n : Nat} (a : ZMod n) (hn : n > 0) : ZMod n :=
   if h : a.val = 0 then ⟨0, hn⟩
   else ⟨n - a.val, Nat.sub_lt hn (Nat.pos_of_ne_zero h)⟩
 
+theorem add_val {n : Nat} (a b : ZMod n) : (add a b).val = (a.val + b.val) % n := rfl
+
+theorem zero_val (n : Nat) (hn : n > 0) : (zero n hn).val = 0 := rfl
+
+theorem neg_val {n : Nat} (a : ZMod n) (hn : n > 0) :
+    (neg a hn).val = if a.val = 0 then 0 else n - a.val := by
+  simp only [neg]
+  split <;> rfl
+
+/-- Right identity: a + 0 = a -/
+theorem add_zero {n : Nat} (hn : n > 0) (a : ZMod n) : add a (zero n hn) = a := by
+  apply ext
+  simp only [add_val, zero_val, Nat.add_zero]
+  exact Nat.mod_eq_of_lt a.lt
+
+/-- Left identity: 0 + a = a -/
+theorem zero_add {n : Nat} (hn : n > 0) (a : ZMod n) : add (zero n hn) a = a := by
+  apply ext
+  simp only [add_val, zero_val, Nat.zero_add]
+  exact Nat.mod_eq_of_lt a.lt
+
+/-- Left inverse: (-a) + a = 0 -/
+theorem neg_add {n : Nat} (hn : n > 0) (a : ZMod n) : add (neg a hn) a = zero n hn := by
+  apply ext
+  simp only [add_val, neg_val, zero_val]
+  split
+  case isTrue h =>
+    simp only [h, Nat.zero_add, Nat.zero_mod]
+  case isFalse h =>
+    have hsub : n - a.val + a.val = n := Nat.sub_add_cancel (Nat.le_of_lt a.lt)
+    simp only [hsub, Nat.mod_self]
+
+/-- Associativity: (a + b) + c = a + (b + c) -/
+theorem add_assoc {n : Nat} (a b c : ZMod n) : add (add a b) c = add a (add b c) := by
+  apply ext
+  simp only [add_val]
+  -- Need to show: ((a.val + b.val) % n + c.val) % n = (a.val + (b.val + c.val) % n) % n
+  -- Use the fact that (x % n + y) % n = (x + y) % n
+  have h1 : ((a.val + b.val) % n + c.val) % n = (a.val + b.val + c.val) % n := by
+    rw [Nat.add_mod, Nat.mod_mod_of_dvd, ← Nat.add_mod]
+    exact Nat.dvd_refl n
+  have h2 : (a.val + (b.val + c.val) % n) % n = (a.val + b.val + c.val) % n := by
+    rw [Nat.add_mod, Nat.mod_mod_of_dvd, ← Nat.add_mod]
+    · simp only [Nat.add_assoc]
+    · exact Nat.dvd_refl n
+  rw [h1, h2]
+
 end ZMod
 
 /-- ℤ/n forms a group under addition mod n. -/
@@ -264,10 +315,10 @@ def zmodGroupStr (n : Nat) (hn : n > 0) : GroupStr (ZMod n) where
   one := ZMod.zero n hn
   mul := ZMod.add
   inv := fun a => ZMod.neg a hn
-  mul_one := fun _ => by simp [ZMod.add, ZMod.zero]; sorry -- placeholder
-  one_mul := fun _ => by simp [ZMod.add, ZMod.zero]; sorry -- placeholder
-  inv_mul := fun _ => by sorry -- placeholder
-  mul_assoc := fun _ _ _ => by sorry -- placeholder
+  mul_one := ZMod.add_zero hn
+  one_mul := ZMod.zero_add hn
+  inv_mul := ZMod.neg_add hn
+  mul_assoc := ZMod.add_assoc
 
 /-- The lens space L(n,1) is K(ℤ/n, 1) for n ≥ 2.
 
