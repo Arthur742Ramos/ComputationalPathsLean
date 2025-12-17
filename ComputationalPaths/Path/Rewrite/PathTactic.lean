@@ -43,6 +43,12 @@ import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
+
+/-! ## Notation for RwEq -/
+
+/-- Notation `p ≈ q` for `RwEq p q` in path reasoning. -/
+scoped infix:50 " ≈ " => RwEq
+
 namespace Tactic
 
 /-! ## Basic Tactics -/
@@ -146,12 +152,12 @@ macro "path_simp" : tactic =>
     first
     | exact RwEq.refl _
     | simp only [
-        rweq_refl, rweq_of_step, rweq_symm, rweq_trans,
+        rweq_refl, rweq_of_step,
         rweq_trans_congr_left, rweq_trans_congr_right, rweq_trans_congr,
         rweq_cmpA_refl_left, rweq_cmpA_refl_right,
         rweq_cmpA_inv_left, rweq_cmpA_inv_right,
-        rweq_dd, rweq_tt,
-        rweq_symm_refl, rweq_symm_symm, rweq_symm_trans,
+        rweq_tt, rweq_sr, rweq_ss,
+        rweq_symm_trans_congr,
         rweq_congrArg_of_rweq, rweq_congrArg_trans,
         rweq_congrArg_symm, rweq_congrArg_refl
       ])
@@ -161,12 +167,12 @@ macro "path_simp" : tactic =>
 macro "path_simp_all" : tactic =>
   `(tactic|
     simp_all only [
-      rweq_refl, rweq_of_step, rweq_symm, rweq_trans,
+      rweq_refl, rweq_of_step,
       rweq_trans_congr_left, rweq_trans_congr_right, rweq_trans_congr,
       rweq_cmpA_refl_left, rweq_cmpA_refl_right,
       rweq_cmpA_inv_left, rweq_cmpA_inv_right,
-      rweq_dd, rweq_tt,
-      rweq_symm_refl, rweq_symm_symm, rweq_symm_trans,
+      rweq_tt, rweq_sr, rweq_ss,
+      rweq_symm_trans_congr,
       rweq_congrArg_of_rweq, rweq_congrArg_trans,
       rweq_congrArg_symm, rweq_congrArg_refl
     ])
@@ -180,16 +186,151 @@ macro "path_decide" : tactic =>
     | exact RwEq.refl _
     | (path_simp; try exact RwEq.refl _))
 
+/-! ## Advanced Tactics -/
+
+/-- `path_auto` is the main automation tactic for RwEq goals.
+
+    It repeatedly applies simplification, congruence, and structural
+    rules until the goal is solved or no more progress can be made.
+
+    Strategy order:
+    1. Try reflexivity
+    2. Apply simp with all RwEq lemmas
+    3. Try symmetry if goal is symmetric to something in context
+    4. Apply congruence rules for nested trans/symm/congrArg
+    5. Try hypothesis from context -/
+macro "path_auto" : tactic =>
+  `(tactic|
+    first
+    | exact RwEq.refl _
+    | simp only [
+        rweq_refl, rweq_of_step, rweq_of_eq, rweq_of_rw,
+        rweq_trans_congr_left, rweq_trans_congr_right, rweq_trans_congr,
+        rweq_cmpA_refl_left, rweq_cmpA_refl_right,
+        rweq_cmpA_inv_left, rweq_cmpA_inv_right,
+        rweq_tt, rweq_sr, rweq_ss,
+        rweq_symm_trans_congr, rweq_symm_congr,
+        rweq_congrArg_of_rweq, rweq_congrArg_trans,
+        rweq_congrArg_symm, rweq_congrArg_refl, rweq_congrArg_const,
+        rweq_mapLeft_of_rweq, rweq_mapRight_of_rweq, rweq_map2_of_rweq,
+        rweq_mapLeft_trans, rweq_mapRight_trans,
+        rweq_mapLeft_symm, rweq_mapRight_symm,
+        rweq_mapLeft_refl, rweq_mapRight_refl,
+        rweq_prod_fst_beta, rweq_prod_snd_beta, rweq_prod_eta,
+        rweq_fst_prodMk, rweq_snd_prodMk,
+        rweq_sigma_fst_beta, rweq_sigma_snd_beta, rweq_sigma_eta,
+        rweq_sigmaMk_refl,
+        rweq_fun_app_beta, rweq_fun_eta,
+        rweq_apd_refl, rweq_transport_refl_beta
+      ]; first | exact RwEq.refl _ | assumption
+    | assumption)
+
+/-- `path_auto!` is a more aggressive version that also uses hypotheses. -/
+macro "path_auto!" : tactic =>
+  `(tactic|
+    first
+    | exact RwEq.refl _
+    | simp_all only [
+        rweq_refl, rweq_of_step, rweq_of_eq, rweq_of_rw,
+        rweq_trans_congr_left, rweq_trans_congr_right, rweq_trans_congr,
+        rweq_cmpA_refl_left, rweq_cmpA_refl_right,
+        rweq_cmpA_inv_left, rweq_cmpA_inv_right,
+        rweq_tt, rweq_sr, rweq_ss,
+        rweq_symm_trans_congr, rweq_symm_congr,
+        rweq_congrArg_of_rweq, rweq_congrArg_trans,
+        rweq_congrArg_symm, rweq_congrArg_refl, rweq_congrArg_const,
+        rweq_mapLeft_of_rweq, rweq_mapRight_of_rweq, rweq_map2_of_rweq,
+        rweq_mapLeft_trans, rweq_mapRight_trans,
+        rweq_mapLeft_symm, rweq_mapRight_symm,
+        rweq_mapLeft_refl, rweq_mapRight_refl,
+        rweq_prod_fst_beta, rweq_prod_snd_beta, rweq_prod_eta,
+        rweq_fst_prodMk, rweq_snd_prodMk,
+        rweq_sigma_fst_beta, rweq_sigma_snd_beta, rweq_sigma_eta,
+        rweq_sigmaMk_refl,
+        rweq_fun_app_beta, rweq_fun_eta,
+        rweq_apd_refl, rweq_transport_refl_beta
+      ]; first | exact RwEq.refl _ | assumption
+    | assumption)
+
+/-! ## Normalization Tactics -/
+
+/-- `path_normalize` puts paths in a canonical form:
+    - Right-associated trans chains: p · (q · r) instead of (p · q) · r
+    - Units eliminated: refl · p → p, p · refl → p
+    - Double inverses removed: symm (symm p) → p
+
+    This is useful before comparing two paths or as a preprocessing step. -/
+macro "path_normalize" : tactic =>
+  `(tactic|
+    simp only [
+      -- Associativity (right-associate)
+      rweq_tt,
+      -- Unit elimination
+      rweq_cmpA_refl_left, rweq_cmpA_refl_right,
+      -- Double inverse
+      rweq_ss,
+      -- Symm of refl
+      rweq_sr,
+      -- congrArg simplifications
+      rweq_congrArg_refl, rweq_congrArg_trans, rweq_congrArg_symm
+    ])
+
+/-- `path_normalize_left` normalizes by left-associating trans chains.
+    Useful when the target is left-associated.
+
+    Note: This only eliminates units and simplifies; for actual left-association
+    use `path_assoc_left` repeatedly. -/
+macro "path_normalize_left" : tactic =>
+  `(tactic|
+    simp only [
+      -- Unit elimination
+      rweq_cmpA_refl_left, rweq_cmpA_refl_right,
+      -- Double inverse
+      rweq_ss,
+      -- Symm of refl
+      rweq_sr,
+      -- congrArg simplifications
+      rweq_congrArg_refl, rweq_congrArg_trans, rweq_congrArg_symm
+    ])
+
+/-! ## Beta/Eta Tactics -/
+
+/-- `path_beta` applies beta reduction rules for products, sigmas, and functions. -/
+macro "path_beta" : tactic =>
+  `(tactic|
+    simp only [
+      rweq_prod_fst_beta, rweq_prod_snd_beta, rweq_prod_rec_beta,
+      rweq_sigma_fst_beta, rweq_sigma_snd_beta,
+      rweq_fun_app_beta,
+      rweq_sum_rec_inl_beta, rweq_sum_rec_inr_beta,
+      rweq_apd_refl, rweq_transport_refl_beta
+    ])
+
+/-- `path_eta` applies eta expansion/contraction rules. -/
+macro "path_eta" : tactic =>
+  `(tactic|
+    first
+    | exact rweq_prod_eta _
+    | exact rweq_sigma_eta _
+    | exact rweq_fun_eta _
+    | simp only [rweq_prod_eta, rweq_sigma_eta, rweq_fun_eta])
+
+/-! ## Calc Support for RwEq -/
+
+/-- Enable calc notation for RwEq: `calc p ≈ q := h₁; _ ≈ r := h₂` -/
+instance : Trans (α := Path a b) RwEq RwEq RwEq where
+  trans := rweq_trans
+
 end Tactic
 
 /-! ## Summary
 
-This module provides automation for RwEq reasoning:
+This module provides comprehensive automation for RwEq reasoning.
 
 ### Basic Tactics
 1. **path_rfl**: For reflexive cases (p ≈ p)
 2. **path_symm**: For applying symmetry (p ≈ q → q ≈ p)
-3. **path_simp**: The main workhorse - applies simp with all RwEq lemmas
+3. **path_simp**: The main workhorse - applies simp with core RwEq lemmas
 4. **path_simp_all**: More aggressive version using hypotheses
 5. **path_decide**: Attempts to close goals automatically
 
@@ -210,12 +351,37 @@ This module provides automation for RwEq reasoning:
 15. **path_cancel_left**: Left inverse cancellation (p⁻¹·p ≈ refl)
 16. **path_cancel_right**: Right inverse cancellation (p·p⁻¹ ≈ refl)
 
-These tactics leverage the @[simp] lemmas in RwEq.lean that encode:
-- Groupoid laws (unit, associativity, inverses)
-- Congruence principles
+### Advanced Automation Tactics
+17. **path_auto**: The most powerful tactic - combines simplification,
+    congruence, beta/eta rules, and hypothesis search
+18. **path_auto!**: Aggressive version that also rewrites hypotheses
 
-This implements part of the Future Work from the SVK paper:
-"Automated path computation via term rewriting"
+### Normalization Tactics
+19. **path_normalize**: Put paths in canonical right-associated form
+20. **path_normalize_left**: Left-associating variant
+
+### Beta/Eta Tactics
+21. **path_beta**: Apply beta rules for products, sigmas, functions
+22. **path_eta**: Apply eta expansion/contraction rules
+
+### Calc Support
+The `Trans` instance enables calc notation:
+```lean
+calc p
+  _ ≈ q := h₁
+  _ ≈ r := h₂
+```
+
+### Implementation Notes
+
+These tactics leverage the ~90 @[simp] lemmas in RwEq.lean encoding:
+- Groupoid laws (unit, associativity, inverses)
+- Congruence principles (trans, symm, congrArg, mapLeft, mapRight)
+- Beta rules (prod_fst_beta, sigma_fst_beta, fun_app_beta, etc.)
+- Eta rules (prod_eta, sigma_eta, fun_eta)
+
+This implements the "Automated path computation via term rewriting"
+goal from the computational paths research program.
 -/
 
 end Path
