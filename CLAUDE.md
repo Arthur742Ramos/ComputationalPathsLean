@@ -104,6 +104,31 @@ rweq_trans_congr_right : RwEq p₁ p₂ → RwEq (trans p₁ q) (trans p₂ q)
 rweq_congrArg_of_rweq : RwEq p q → RwEq (congrArg f p) (congrArg f q)
 ```
 
+### Path Tactics (in PathTactic.lean)
+
+The `path_*` tactics automate RwEq reasoning:
+
+| Tactic | Description |
+|--------|-------------|
+| `path_rfl` | Close reflexive goals (p ≈ p) |
+| `path_symm` | Apply symmetry |
+| `path_simp` | Simplify using groupoid laws |
+| `path_auto` | Main automation - combines ~25 simp lemmas |
+| `path_auto!` | Aggressive version using simp_all |
+| `path_normalize` | Put paths in canonical (right-assoc) form |
+| `path_beta` | Beta reductions for products/sigmas/functions |
+| `path_eta` | Eta expansion/contraction |
+| `path_congr_left h` | Left congruence for trans |
+| `path_congr_right h` | Right congruence for trans |
+| `path_cancel_left` | Left inverse cancellation |
+| `path_cancel_right` | Right inverse cancellation |
+
+The `≈` notation for RwEq is scoped in `ComputationalPaths.Path` and works with calc:
+```lean
+calc trans (refl a) p
+  _ ≈ p := rweq_cmpA_refl_left _
+```
+
 ## Coding Conventions
 
 ### File Structure

@@ -29,6 +29,7 @@ import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.PathTactic
 
 namespace ComputationalPaths
 namespace Path
@@ -364,12 +365,12 @@ theorem iterateLoopPos_neg_cancel_eq {A : Type u} {a : A} (l : Path a a) (m : Na
     RwEq (Path.trans (iterateLoopPos l m) (iterateLoopNeg l m)) (Path.refl a) := by
   induction m with
   | zero =>
+    -- Base case: refl · refl ≈ refl - use path_simp automation
     simp only [iterateLoopPos, iterateLoopNeg]
-    exact rweq_cmpA_refl_left (Path.refl a)
+    path_simp
   | succ m ih =>
     -- l^{m+1} · (l⁻¹)^{m+1}
-    -- = l^{m+1} · (l⁻¹ · (l⁻¹)^m)
-    -- ≈ (l^{m+1} · l⁻¹) · (l⁻¹)^m  [by tt⁻¹]
+    -- ≈ (l^{m+1} · l⁻¹) · (l⁻¹)^m  [by assoc⁻¹]
     -- ≈ l^m · (l⁻¹)^m  [by iterateLoopPos_cancel_right]
     -- ≈ refl  [by ih]
     simp only [iterateLoopNeg]
@@ -448,8 +449,9 @@ theorem iterateLoopNeg_pos_cancel_eq {A : Type u} {a : A} (l : Path a a) (m : Na
     RwEq (Path.trans (iterateLoopNeg l m) (iterateLoopPos l m)) (Path.refl a) := by
   induction m with
   | zero =>
+    -- Base case: refl · refl ≈ refl - use path_simp automation
     simp only [iterateLoopNeg, iterateLoopPos]
-    exact rweq_cmpA_refl_left (Path.refl a)
+    path_simp
   | succ m ih =>
     -- (l⁻¹)^{m+1} · l^{m+1}
     -- = (l⁻¹)^{m+1} · (l · l^m)
