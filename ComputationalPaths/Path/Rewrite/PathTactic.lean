@@ -133,6 +133,32 @@ macro "path_cancel_right" : tactic =>
     | apply rweq_trans rweq_cmpA_inv_right
     | exact rweq_cmpA_inv_right _)
 
+/-- `path_inv_inv` applies double inverse: σ(σ(p)) ≈ p. -/
+macro "path_inv_inv" : tactic =>
+  `(tactic| first
+    | apply rweq_trans rweq_ss
+    | exact rweq_ss _)
+
+/-- `path_symm_refl` applies symm of refl: σ(ρ) ≈ ρ. -/
+macro "path_symm_refl" : tactic =>
+  `(tactic| first
+    | apply rweq_trans rweq_sr
+    | exact rweq_sr _)
+
+/-- `path_inv_distr` applies distribution of symm over trans: σ(p · q) ≈ σ(q) · σ(p). -/
+macro "path_inv_distr" : tactic =>
+  `(tactic| first
+    | apply rweq_trans rweq_symm_trans_congr
+    | exact rweq_symm_trans_congr)
+
+/-- `path_congr_symm h` applies symm congruence: if h : RwEq p q, then RwEq (symm p) (symm q). -/
+macro "path_congr_symm" h:term : tactic =>
+  `(tactic| exact rweq_symm_congr $h)
+
+/-- `path_congrArg f h` applies congrArg congruence: if h : RwEq p q, then RwEq (congrArg f p) (congrArg f q). -/
+macro "path_congrArg" f:term h:term : tactic =>
+  `(tactic| exact rweq_congrArg_of_rweq $f $h)
+
 /-- `path_simp` simplifies RwEq goals using the extensive simp library.
 
     This tactic:
@@ -342,27 +368,32 @@ This module provides comprehensive automation for RwEq reasoning.
 8. **path_congr_left h**: Apply congruence on left of trans
 9. **path_congr_right h**: Apply congruence on right of trans
 10. **path_congr h1 h2**: Apply congruence on both sides
+11. **path_congr_symm h**: Apply symm congruence (σ(p) ≈ σ(q) from p ≈ q)
+12. **path_congrArg f h**: Apply congrArg congruence (f*(p) ≈ f*(q) from p ≈ q)
 
 ### Structural Tactics
-11. **path_assoc**: Reassociate to the right ((p·q)·r ≈ p·(q·r))
-12. **path_assoc_left**: Reassociate to the left
-13. **path_unit_left**: Eliminate left unit (refl·p ≈ p)
-14. **path_unit_right**: Eliminate right unit (p·refl ≈ p)
-15. **path_cancel_left**: Left inverse cancellation (p⁻¹·p ≈ refl)
-16. **path_cancel_right**: Right inverse cancellation (p·p⁻¹ ≈ refl)
+13. **path_assoc**: Reassociate to the right ((p·q)·r ≈ p·(q·r))
+14. **path_assoc_left**: Reassociate to the left
+15. **path_unit_left**: Eliminate left unit (refl·p ≈ p)
+16. **path_unit_right**: Eliminate right unit (p·refl ≈ p)
+17. **path_cancel_left**: Left inverse cancellation (p⁻¹·p ≈ refl)
+18. **path_cancel_right**: Right inverse cancellation (p·p⁻¹ ≈ refl)
+19. **path_inv_inv**: Double inverse (σ(σ(p)) ≈ p)
+20. **path_symm_refl**: Symm of refl (σ(ρ) ≈ ρ)
+21. **path_inv_distr**: Distribute symm over trans (σ(p·q) ≈ σ(q)·σ(p))
 
 ### Advanced Automation Tactics
-17. **path_auto**: The most powerful tactic - combines simplification,
+22. **path_auto**: The most powerful tactic - combines simplification,
     congruence, beta/eta rules, and hypothesis search
-18. **path_auto!**: Aggressive version that also rewrites hypotheses
+23. **path_auto!**: Aggressive version that also rewrites hypotheses
 
 ### Normalization Tactics
-19. **path_normalize**: Put paths in canonical right-associated form
-20. **path_normalize_left**: Left-associating variant
+24. **path_normalize**: Put paths in canonical right-associated form
+25. **path_normalize_left**: Left-associating variant
 
 ### Beta/Eta Tactics
-21. **path_beta**: Apply beta rules for products, sigmas, functions
-22. **path_eta**: Apply eta expansion/contraction rules
+26. **path_beta**: Apply beta rules for products, sigmas, functions
+27. **path_eta**: Apply eta expansion/contraction rules
 
 ### Calc Support
 The `Trans` instance enables calc notation:

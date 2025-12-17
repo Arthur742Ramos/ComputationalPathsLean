@@ -190,6 +190,41 @@ example {B : Type} (f : A → B) (a : A) :
     congrArg f (refl a) ≈ refl (f a) := by
   path_rfl
 
+/-! ## 10. New Structural Tactics -/
+
+/-- `path_inv_inv` handles double inverse: σ(σ(p)) ≈ p. -/
+example (p : Path a b) : symm (symm p) ≈ p := by
+  path_inv_inv
+
+/-- `path_symm_refl` handles symm of refl: σ(ρ) ≈ ρ. -/
+example : symm (refl a) ≈ refl a := by
+  path_symm_refl
+
+/-- `path_inv_distr` distributes symm over trans: σ(p·q) ≈ σ(q)·σ(p). -/
+example (p : Path a b) (q : Path b c) :
+    symm (trans p q) ≈ trans (symm q) (symm p) := by
+  path_inv_distr
+
+/-- `path_congr_symm` applies symm congruence. -/
+example (p q : Path a b) (h : RwEq p q) :
+    symm p ≈ symm q := by
+  path_congr_symm h
+
+/-- `path_congrArg` applies congrArg congruence. -/
+example {B : Type} (f : A → B) (p q : Path a b) (h : RwEq p q) :
+    congrArg f p ≈ congrArg f q := by
+  path_congrArg f h
+
+/-- Combined: inverse distribution then apply congruence. -/
+example (p : Path a b) (q : Path b c) :
+    symm (symm (trans p q)) ≈ trans p q := by
+  path_inv_inv
+
+/-- Inverse distribution is useful for deriving left inverse from right. -/
+example (p : Path a b) :
+    symm (trans p (symm p)) ≈ trans (symm (symm p)) (symm p) := by
+  path_inv_distr
+
 /-! ## Summary
 
 This module demonstrates:
@@ -201,6 +236,8 @@ This module demonstrates:
 5. **path_auto** simplifies many common RwEq goals
 6. **Beta/Eta** lemmas for products
 7. **Calc notation** with ≈ enables clean equational proofs
+8. **New structural tactics** (path_inv_inv, path_symm_refl, path_inv_distr)
+9. **New congruence tactics** (path_congr_symm, path_congrArg)
 
 All examples build without `sorry` as regression tests.
 -/
