@@ -27,6 +27,7 @@ import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.Fibration
+import ComputationalPaths.Path.Homotopy.LongExactSequence
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.EilenbergMacLane
 import ComputationalPaths.Path.Homotopy.FreudenthalSuspension
@@ -57,8 +58,10 @@ import ComputationalPaths.Path.HIT.Pi3Sphere
 import ComputationalPaths.Path.HIT.Pi4S3
 import ComputationalPaths.Path.HIT.QuaternionicHopf
 import ComputationalPaths.Path.HIT.OrientableSurface
+import ComputationalPaths.Path.HIT.NonOrientableSurface
 import ComputationalPaths.Path.HIT.TorusGenus1
 import ComputationalPaths.Path.HIT.LensSpace
 import ComputationalPaths.Path.HIT.ProjectiveSpaces
+import ComputationalPaths.Path.HIT.ComplexProjectiveSpaces
 import ComputationalPaths.Path.HIT.SVKApplications
 import ComputationalPaths.Path.OmegaGroupoid

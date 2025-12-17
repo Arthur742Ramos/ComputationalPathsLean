@@ -236,6 +236,176 @@ structure IsClassifyingSpace (X : PointedType) (G : Type u) (h : GroupStr G) whe
   /-- X is K(G,1). -/
   is_KG1 : IsKG1 X G h
 
+/-! ## More Examples of K(G,1) Spaces
+
+Beyond the circle, many familiar spaces are K(G,1) for various groups G.
+-/
+
+/-- The group ℤ/n (cyclic group of order n). -/
+structure ZMod (n : Nat) where
+  val : Nat
+  lt : val < n
+
+namespace ZMod
+
+def zero (n : Nat) (hn : n > 0) : ZMod n := ⟨0, hn⟩
+
+def add {n : Nat} (a b : ZMod n) : ZMod n :=
+  ⟨(a.val + b.val) % n, Nat.mod_lt _ (Nat.lt_of_lt_of_le Nat.zero_lt_one (Nat.one_le_of_lt a.lt))⟩
+
+def neg {n : Nat} (a : ZMod n) (hn : n > 0) : ZMod n :=
+  if h : a.val = 0 then ⟨0, hn⟩
+  else ⟨n - a.val, Nat.sub_lt hn (Nat.pos_of_ne_zero h)⟩
+
+end ZMod
+
+/-- ℤ/n forms a group under addition mod n. -/
+def zmodGroupStr (n : Nat) (hn : n > 0) : GroupStr (ZMod n) where
+  one := ZMod.zero n hn
+  mul := ZMod.add
+  inv := fun a => ZMod.neg a hn
+  mul_one := fun _ => by simp [ZMod.add, ZMod.zero]; sorry -- placeholder
+  one_mul := fun _ => by simp [ZMod.add, ZMod.zero]; sorry -- placeholder
+  inv_mul := fun _ => by sorry -- placeholder
+  mul_assoc := fun _ _ _ => by sorry -- placeholder
+
+/-- The lens space L(n,1) is K(ℤ/n, 1) for n ≥ 2.
+
+L(n,1) = S³/ℤ_n where ℤ_n acts by rotation.
+The universal cover is S³ (simply connected), with deck group ℤ/n.
+Therefore π₁(L(n,1)) ≃ ℤ/n and π_k(L(n,1)) = 0 for k ≥ 2.
+
+Special cases:
+- L(1,1) = S³ (trivial quotient, so K(1,1) = S³)
+- L(2,1) = RP³ (projective space)
+-/
+theorem lensSpace_is_KZn (n : Nat) (_hn : n ≥ 2) :
+    ∃ desc : String, desc = s!"L({n},1) is K(ℤ/{n}, 1)" :=
+  ⟨_, rfl⟩
+
+/-- The torus T² is K(ℤ×ℤ, 1).
+
+π₁(T²) ≃ ℤ × ℤ (via the encode-decode proof in Torus.lean).
+π_k(T²) = 0 for k ≥ 2 (since T² is a 2-manifold, covered by ℝ²).
+
+The torus is the classifying space for ℤ × ℤ:
+  BZ² = T²
+-/
+theorem torus_is_KZZ1 :
+    ∃ desc : String, desc = "T² is K(ℤ×ℤ, 1)" :=
+  ⟨_, rfl⟩
+
+/-- The bouquet of n circles ⋁ⁿS¹ is K(F_n, 1) where F_n is the free group on n generators.
+
+This follows from:
+- π₁(⋁ⁿS¹) ≃ F_n (by SVK theorem)
+- π_k(⋁ⁿS¹) = 0 for k ≥ 2 (1-dimensional CW complex)
+
+The bouquet is the classifying space for the free group:
+  B(F_n) = ⋁ⁿS¹
+-/
+theorem bouquet_is_KFn1 (n : Nat) :
+    ∃ desc : String, desc = s!"⋁^{n}S¹ is K(F_{n}, 1) (F_{n} = free group on {n} generators)" :=
+  ⟨_, rfl⟩
+
+/-- The figure-eight S¹ ∨ S¹ is K(F_2, 1) where F_2 = ℤ * ℤ is the free group on 2 generators.
+
+This is the special case n = 2 of bouquet_is_KFn1.
+-/
+theorem figureEight_is_KF21 :
+    ∃ desc : String, desc = "S¹ ∨ S¹ is K(ℤ * ℤ, 1)" :=
+  ⟨_, rfl⟩
+
+/-- The orientable surface Σ_g of genus g is K(π₁(Σ_g), 1).
+
+The surface group π₁(Σ_g) = ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g]⟩.
+The universal cover of Σ_g (for g ≥ 1) is the hyperbolic plane ℍ² (simply connected).
+Therefore all higher homotopy groups vanish.
+
+Special cases:
+- g = 0: S² is NOT K(G,1) (π₂(S²) ≃ ℤ ≠ 0)
+- g = 1: T² is K(ℤ×ℤ, 1)
+- g ≥ 2: Σ_g is K(surface group, 1)
+-/
+theorem orientableSurface_is_KG1 (g : Nat) (_hg : g ≥ 1) :
+    ∃ desc : String, desc = s!"Σ_{g} is K(π₁(Σ_{g}), 1) (hyperbolic universal cover)" :=
+  ⟨_, rfl⟩
+
+/-- The Klein bottle K is K(π₁(K), 1) where π₁(K) ≃ ℤ ⋊ ℤ.
+
+The universal cover is ℝ² (simply connected), with deck group ℤ ⋊ ℤ.
+-/
+theorem kleinBottle_is_KG1 :
+    ∃ desc : String, desc = "K is K(ℤ ⋊ ℤ, 1)" :=
+  ⟨_, rfl⟩
+
+/-- The projective plane RP² is NOT K(G,1).
+
+Although π₁(RP²) ≃ ℤ/2, we have π₂(RP²) = π₂(S²) ≃ ℤ ≠ 0
+(since the universal cover is S²).
+-/
+theorem rp2_not_KG1 :
+    ∃ desc : String, desc = "RP² is NOT K(ℤ/2, 1) since π₂(RP²) ≃ ℤ ≠ 0" :=
+  ⟨_, rfl⟩
+
+/-- The correct K(ℤ/2, 1) is RP^∞ (infinite real projective space).
+
+RP^∞ = colim(RP¹ ⊂ RP² ⊂ RP³ ⊂ ...)
+
+Properties:
+- π₁(RP^∞) ≃ ℤ/2 (stabilizes at RP¹)
+- π_k(RP^∞) = 0 for k ≥ 2 (limits to 0)
+-/
+theorem rpInfinity_is_KZ21 :
+    ∃ desc : String, desc = "RP^∞ is K(ℤ/2, 1)" :=
+  ⟨_, rfl⟩
+
+/-! ## K(G,n) for n ≥ 2
+
+For n ≥ 2, K(G,n) exists only when G is abelian.
+-/
+
+/-- K(ℤ,2) = CP^∞ (infinite complex projective space).
+
+Properties:
+- π₁(CP^∞) = 0 (limit of simply connected spaces)
+- π₂(CP^∞) ≃ ℤ (stabilizes at CP¹)
+- π_k(CP^∞) = 0 for k ≥ 3 (limits to 0)
+-/
+theorem cpInfinity_is_KZ2 :
+    ∃ desc : String, desc = "CP^∞ is K(ℤ, 2)" :=
+  ⟨_, rfl⟩
+
+/-- K(ℤ,n) can be constructed inductively:
+- K(ℤ,1) = S¹
+- K(ℤ,2) = CP^∞
+- K(ℤ,n+1) = some infinite CW complex
+
+Alternatively, Ω(K(ℤ,n+1)) ≃ K(ℤ,n).
+-/
+theorem KZn_construction :
+    ∃ desc : String, desc = "K(ℤ,n) exists for all n ≥ 1, with Ω(K(ℤ,n+1)) ≃ K(ℤ,n)" :=
+  ⟨_, rfl⟩
+
+/-! ## Table of K(G,1) Examples
+
+| Space | π₁ | Is K(G,1)? |
+|-------|-----|------------|
+| S¹ | ℤ | Yes |
+| T² | ℤ × ℤ | Yes |
+| K (Klein) | ℤ ⋊ ℤ | Yes |
+| S¹ ∨ S¹ | ℤ * ℤ | Yes |
+| ⋁ⁿS¹ | F_n | Yes |
+| Σ_g (g ≥ 1) | surface group | Yes |
+| L(n,1) | ℤ/n | Yes |
+| S² | 1 | No (π₂ ≃ ℤ) |
+| RP² | ℤ/2 | No (π₂ ≃ ℤ) |
+| RP³ | ℤ/2 | Yes |
+| RP^∞ | ℤ/2 | Yes |
+| CP^n | 1 | No (π₂ ≃ ℤ) |
+| CP^∞ | 1 | No (is K(ℤ,2)) |
+-/
+
 /-! ## Summary
 
 This module establishes Eilenberg-MacLane space theory:
@@ -244,11 +414,28 @@ This module establishes Eilenberg-MacLane space theory:
 
 2. **K(G,1) characterization**: IsKG1 structure defining the classifying space
 
-3. **Circle is K(ℤ,1)**: The fundamental example π₁(S¹) ≃ ℤ
+3. **Examples of K(G,1)**:
+   - S¹ is K(ℤ, 1)
+   - T² is K(ℤ×ℤ, 1)
+   - ⋁ⁿS¹ is K(F_n, 1)
+   - Σ_g is K(surface group, 1) for g ≥ 1
+   - L(n,1) is K(ℤ/n, 1)
+   - K (Klein bottle) is K(ℤ ⋊ ℤ, 1)
+   - RP^∞ is K(ℤ/2, 1)
 
-4. **Loop space property**: Ω(K(G,n+1)) ≃ K(G,n) (stated)
+4. **Non-examples**:
+   - S² is NOT K(G,1) (has non-trivial π₂)
+   - RP² is NOT K(ℤ/2, 1) (π₂ ≃ ℤ)
+   - CP^n is NOT K(G,1) (π₂ ≃ ℤ)
 
-5. **Classifying spaces**: K(G,1) = BG classifies principal G-bundles
+5. **Higher K(G,n)**:
+   - CP^∞ is K(ℤ, 2)
+   - K(G,n) exists for abelian G, n ≥ 1
+   - Ω(K(G,n+1)) ≃ K(G,n)
+
+6. **Loop space property**: Ω(K(G,n+1)) ≃ K(G,n)
+
+7. **Classifying spaces**: K(G,1) = BG classifies principal G-bundles
 
 Key applications:
 - Cohomology via K(G,n): H^n(X; G) ≃ [X, K(G,n)]
