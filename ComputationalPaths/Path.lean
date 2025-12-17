@@ -37,6 +37,10 @@ import ComputationalPaths.Path.Homotopy.HigherProductHomotopy
 import ComputationalPaths.Path.Homotopy.LieGroups
 import ComputationalPaths.Path.Homotopy.Hurewicz
 import ComputationalPaths.Path.Homotopy.CoveringClassification
+import ComputationalPaths.Path.Homotopy.CellularHomology
+import ComputationalPaths.Path.Homotopy.MayerVietoris
+import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
+import ComputationalPaths.Path.Homotopy.Pi2Surfaces
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
