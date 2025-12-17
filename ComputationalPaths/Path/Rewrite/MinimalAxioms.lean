@@ -59,7 +59,7 @@ private theorem step2_symm_trans : RwEq
     (Path.symm (Path.symm (Path.trans p (Path.refl b))))
     (Path.symm (Path.trans (Path.symm (Path.refl b)) (Path.symm p))) := by
   apply rweq_symm_congr
-  exact rweq_symm_trans_congr
+  path_inv_distr  -- σ(p · q) ≈ σ(q) · σ(p)
 
 /-- Step 3: σ(σ(ρ) · σ(p)) ≈ σ(ρ · σ(p)) by applying symm_refl inside -/
 private theorem step3_sr : RwEq
@@ -67,7 +67,7 @@ private theorem step3_sr : RwEq
     (Path.symm (Path.trans (Path.refl b) (Path.symm p))) := by
   apply rweq_symm_congr
   apply rweq_trans_congr_left
-  exact rweq_sr b
+  path_symm_refl  -- σ(ρ) ≈ ρ
 
 /-- Step 4: σ(ρ · σ(p)) ≈ σ(σ(p)) by trans_refl_left -/
 private theorem step4_left_unit : RwEq
@@ -142,7 +142,7 @@ theorem derive_symm_trans : RwEq (Path.trans (Path.symm p) p) (Path.refl b) := b
   apply rweq_trans
   · exact rweq_trans_congr_right (Path.symm p) (rweq_symm (rweq_ss p))
   -- Apply trans_symm to σ(p)
-  · exact rweq_cmpA_inv_right (Path.symm p)
+  · path_cancel_right  -- p · p⁻¹ ≈ refl
 
 end DeriveLeftInverse
 

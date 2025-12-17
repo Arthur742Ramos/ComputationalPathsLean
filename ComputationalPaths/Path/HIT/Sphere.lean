@@ -187,7 +187,7 @@ theorem glue_conj_refl_rweq {A B C : Type u} {f : C → A} {g : C → B} (c : C)
   apply rweq_trans
   · apply rweq_trans_congr_right
     path_simp  -- refl · X ≈ X
-  · exact rweq_cmpA_inv_right (Pushout.glue c)
+  · path_cancel_right  -- p · p⁻¹ ≈ refl
 
 /-- For any element α : π₁(PUnit', PUnit'.unit), its image under the left inclusion
     into the pushout's fundamental group is the identity element. -/

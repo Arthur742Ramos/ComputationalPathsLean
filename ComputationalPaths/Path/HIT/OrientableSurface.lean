@@ -976,7 +976,7 @@ theorem decodePath_inv_cancel_right (g : Nat) (i : Fin' (2 * g)) :
   apply rweq_trans (rweq_trans_congr_right (generatorLoop g i)
     (rweq_cmpA_refl_right (Path.symm (generatorLoop g i))))
   -- Now: trans (generatorLoop i) (symm (generatorLoop i))
-  exact rweq_cmpA_inv_right (generatorLoop g i)
+  path_cancel_right  -- p · p⁻¹ ≈ refl
 
 /-- Decode single generator power -1 then 1 gives refl. -/
 theorem decodePath_inv_cancel_left (g : Nat) (i : Fin' (2 * g)) :
@@ -986,7 +986,7 @@ theorem decodePath_inv_cancel_left (g : Nat) (i : Fin' (2 * g)) :
   simp only [FreeGroupWord.single, FreeGroupWord.concat, decodePath, decodeGen]
   apply rweq_trans (rweq_trans_congr_right (Path.symm (generatorLoop g i))
     (rweq_cmpA_refl_right (generatorLoop g i)))
-  exact rweq_cmpA_inv_left (generatorLoop g i)
+  path_cancel_left  -- p⁻¹ · p ≈ refl
 
 /-- Decode a single positive generator gives the generator loop with refl at the end. -/
 theorem decodePath_single_pos (g : Nat) (i : Fin' (2 * g)) :

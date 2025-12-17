@@ -286,8 +286,8 @@ theorem derive_trans_refl_right_via_left {a b : A} (p : Path a b) :
 -/
 theorem derive_symm_trans_via_trans_symm {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl b) := by
-  -- Direct proof using existing RwEq lemmas
-  exact rweq_cmpA_inv_left p
+  -- Direct proof using path tactics
+  path_cancel_left  -- p⁻¹ · p ≈ refl
 
 end EliminateRedundantPathLaws
 
