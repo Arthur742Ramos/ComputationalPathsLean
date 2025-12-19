@@ -1,7 +1,9 @@
 # Automation & Agents
 
+This file is kept for backward compatibility; the canonical Codex CLI instructions live in `AGENTS.md`.
+
 This repository is set up for interactive development with the Codex CLI and a
-handful of lightweight build helpers.  The sections below summarise what each
+handful of lightweight build helpers. The sections below summarise what each
 agent/tool is responsible for and when to invoke it.
 
 ## Coding agent (Codex CLI)
@@ -13,15 +15,15 @@ agent/tool is responsible for and when to invoke it.
   1. Sketch the next small milestone (update the plan or jot a quick checklist).
   2. Implement just that slice of work and run `.\lake.cmd build`.
   3. Commit immediately once the build goes green before moving on.
-  4. If you already know the next step, keep iterating—even after pushing—until
-     the user explicitly pauses you or you’ve achieved a substantial chunk of work.
+  4. If you already know the next step, keep iterating-even after pushing-until
+     the user explicitly pauses you or you've achieved a substantial chunk of work.
 - **When to use:** any time you need new definitions, proofs, documentation, or
   review feedback inside the repository.
 
 ## Build agent (`.\lake.cmd build`)
 - **Purpose:** type-check the project and ensure the Lean kernel accepts every
   proof.
-- **How to run:** invoke `.\lake.cmd build` from the repository root.  The shim
+- **How to run:** invoke `.\lake.cmd build` from the repository root. The shim
   forwards to the toolchain selected via `elan`, so no additional PATH changes
   are required.
 - **When to use:** after non-trivial edits, before submitting a PR, or whenever
