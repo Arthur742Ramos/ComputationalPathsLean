@@ -40,11 +40,13 @@ universe u
 
 /-- Cancellation: l · l⁻¹ ≈ refl -/
 @[simp] theorem loop_cancel_right {A : Type u} {a : A} (l : Path a a) :
-    RwEq (Path.trans l (Path.symm l)) (Path.refl a) := rweq_cmpA_inv_right l
+    RwEq (Path.trans l (Path.symm l)) (Path.refl a) := by
+  path_simp
 
 /-- Cancellation: l⁻¹ · l ≈ refl -/
 @[simp] theorem loop_cancel_left {A : Type u} {a : A} (l : Path a a) :
-    RwEq (Path.trans (Path.symm l) l) (Path.refl a) := rweq_cmpA_inv_left l
+    RwEq (Path.trans (Path.symm l) l) (Path.refl a) := by
+  path_simp
 
 /-! ## Natural Number Iteration -/
 

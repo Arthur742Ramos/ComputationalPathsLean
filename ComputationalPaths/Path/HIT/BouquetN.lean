@@ -288,11 +288,13 @@ theorem iterateLoopNeg_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
 
 /-- l · l⁻¹ ≈ refl -/
 theorem loop_cancel {A : Type u} {a : A} (l : Path a a) :
-    RwEq (Path.trans l (Path.symm l)) (Path.refl a) := rweq_cmpA_inv_right l
+    RwEq (Path.trans l (Path.symm l)) (Path.refl a) := by
+  path_simp
 
 /-- l⁻¹ · l ≈ refl -/
 theorem loop_cancel' {A : Type u} {a : A} (l : Path a a) :
-    RwEq (Path.trans (Path.symm l) l) (Path.refl a) := rweq_cmpA_inv_left l
+    RwEq (Path.trans (Path.symm l) l) (Path.refl a) := by
+  path_simp
 
 /-- l · (l⁻¹)^{n+1} ≈ (l⁻¹)^n
     This is: l · (l⁻¹ · (l⁻¹)^n) ≈ (l · l⁻¹) · (l⁻¹)^n ≈ refl · (l⁻¹)^n ≈ (l⁻¹)^n -/

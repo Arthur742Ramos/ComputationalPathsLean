@@ -564,11 +564,13 @@ theorem decodeGen_neg (g : Nat) (i : Fin' (2 * g)) (n : Nat) :
 
 /-- Cancellation: l · l⁻¹ ≈ refl -/
 theorem loop_cancel_right {A : Type u} {a : A} (l : Path a a) :
-    RwEq (Path.trans l (Path.symm l)) (Path.refl a) := rweq_cmpA_inv_right l
+    RwEq (Path.trans l (Path.symm l)) (Path.refl a) := by
+  path_simp
 
 /-- Cancellation: l⁻¹ · l ≈ refl -/
 theorem loop_cancel_left {A : Type u} {a : A} (l : Path a a) :
-    RwEq (Path.trans (Path.symm l) l) (Path.refl a) := rweq_cmpA_inv_left l
+    RwEq (Path.trans (Path.symm l) l) (Path.refl a) := by
+  path_simp
 
 /-- Helper: l · (l^{-1})^{n+2} ≈ (l^{-1})^{n+1}, i.e., one cancellation on the left. -/
 theorem loopIter_symm_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
