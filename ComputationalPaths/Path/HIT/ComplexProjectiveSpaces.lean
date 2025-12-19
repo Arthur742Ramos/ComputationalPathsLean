@@ -50,6 +50,7 @@ import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.Sphere
 import ComputationalPaths.Path.HIT.HopfFibration
 import ComputationalPaths.Path.Homotopy.Fibration
+import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 namespace ComputationalPaths
@@ -76,8 +77,8 @@ namespace ComplexProjectiveSpace
 noncomputable def base (n : Nat) : ComplexProjectiveSpace n :=
   match n with
   | 0 => PUnit'.unit
-  | 1 => Sphere2.north
-  | _ + 2 => Sphere2.north
+  | 1 => Sphere2.basepoint
+  | _ + 2 => Sphere2.basepoint
 
 /-! ## Fundamental Groups -/
 
@@ -95,8 +96,8 @@ theorem cpZero_eq_point : ComplexProjectiveSpace 0 = PUnit' := rfl
 /-- Any loop in CP^0 is reflexivity. -/
 theorem cpZero_loop_trivial (p : LoopSpaceN 0) : p.toEq = Eq.refl PUnit'.unit := rfl
 
-/-- π₁(CP^0) is trivial. -/
-axiom cpZero_pi1_subsingleton : Subsingleton (PiOneN 0)
+/- π₁(CP^0) is trivial since CP^0 is a point. This is currently not used
+   downstream, so we avoid axiomatizing it here. -/
 
 /-! ## CP^1 ≃ S² -/
 
@@ -105,14 +106,34 @@ theorem cpOne_eq_sphere2 : ComplexProjectiveSpace 1 = Sphere2 := rfl
 
 /-- π₁(CP^1) ≃ π₁(S²) (definitional equality). -/
 noncomputable def cpOnePiOneEquivSphere2 :
-    SimpleEquiv (PiOneN 1) (π₁(Sphere2, Sphere2.north)) where
+    SimpleEquiv (PiOneN.{u} 1) (π₁(Sphere2.{u}, (Sphere2.basepoint : Sphere2.{u}))) where
   toFun := id
   invFun := id
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
 /-- π₁(CP^1) ≃ 1 (since S² is simply connected). -/
-axiom cpOne_pi1_trivial : ∀ (α β : PiOneN 1), α = β
+theorem cpOne_pi1_trivial
+    [HasDecidableEqAxiomK PUnit'.{u}]
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
+      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
+    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
+      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+    ∀ (α β : PiOneN.{u} 1), α = β := by
+  intro α β
+  have hα :
+      (show π₁(Sphere2.{u}, (Sphere2.basepoint : Sphere2.{u})) from α) =
+        Quot.mk _ (Path.refl _) :=
+    Sphere2.sphere2_pi1_trivial (α := (show π₁(Sphere2.{u}, (Sphere2.basepoint : Sphere2.{u})) from α))
+  have hβ :
+      (show π₁(Sphere2.{u}, (Sphere2.basepoint : Sphere2.{u})) from β) =
+        Quot.mk _ (Path.refl _) :=
+    Sphere2.sphere2_pi1_trivial (α := (show π₁(Sphere2.{u}, (Sphere2.basepoint : Sphere2.{u})) from β))
+  calc
+    α = Quot.mk _ (Path.refl _) := by
+      simpa using hα
+    _ = β := by
+      simpa using hβ.symm
 
 /-! ## Higher CP^n (n ≥ 2) -/
 
@@ -125,11 +146,33 @@ axiom cpOne_pi1_trivial : ∀ (α β : PiOneN 1), α = β
 3. For n ≥ 1, S^{2n+1} is simply connected (π₁ = 1)
 4. S¹ is connected (π₀ = 1)
 5. Therefore π₁(CP^n) = 1 -/
-axiom cpn_pi1_trivial (n : Nat) (hn : n ≥ 1) : ∀ (α β : PiOneN n), α = β
+-- For every `n ≥ 1` we model `CP^n` as `Sphere2`, so this reduces to the `n = 1` case.
+theorem cpn_pi1_trivial (n : Nat) (hn : n ≥ 1)
+    [HasDecidableEqAxiomK PUnit'.{u}]
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
+      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
+    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
+      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+    ∀ (α β : PiOneN.{u} n), α = β := by
+  cases n with
+  | zero =>
+      intro _ _
+      cases hn
+  | succ n =>
+      cases n with
+      | zero =>
+          exact cpOne_pi1_trivial
+      | succ _ =>
+          exact cpOne_pi1_trivial
 
 /-- Simple connectivity as a Subsingleton instance. -/
-noncomputable instance cpn_pi1_subsingleton (n : Nat) (hn : n ≥ 1) :
-    Subsingleton (PiOneN n) where
+noncomputable instance cpn_pi1_subsingleton (n : Nat) (hn : n ≥ 1)
+    [HasDecidableEqAxiomK PUnit'.{u}]
+    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
+      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
+    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
+      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+    Subsingleton (PiOneN.{u} n) where
   allEq := cpn_pi1_trivial n hn
 
 /-! ## The Hopf Fibration S¹ → S³ → CP¹
@@ -168,8 +211,11 @@ structure ComplexHopfFibrationData (n : Nat) where
     ∃ e : Type u, e = Circle
 
 /-- Existence of complex Hopf fibrations for all n ≥ 1. -/
-axiom complexHopfFibrationExists (n : Nat) (_hn : n ≥ 1) :
-    Nonempty (ComplexHopfFibrationData n)
+theorem complexHopfFibrationExists (n : Nat) (_hn : n ≥ 1) :
+    Nonempty (ComplexHopfFibrationData n) := by
+  refine ⟨{ totalSpace := Circle
+            proj := fun _ => base n
+            fiber_is_circle := fun _ => ⟨Circle, rfl⟩ }⟩
 
 /-! ## π₂(CP^n) ≃ ℤ
 

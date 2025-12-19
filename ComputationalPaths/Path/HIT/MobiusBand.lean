@@ -72,14 +72,16 @@ so we can use a simpler presentation focused on the central loop.
 -/
 
 /-- Abstract Möbius band type. -/
-axiom MobiusBand : Type u
+noncomputable abbrev MobiusBand : Type u := Circle.{u}
 
 /-- Distinguished point on the Möbius band (on the central circle). -/
-axiom mobiusBase : MobiusBand
+noncomputable abbrev mobiusBase : MobiusBand.{u} := circleBase.{u}
 
 /-- The central loop around the Möbius band.
     This generates the fundamental group. -/
-axiom mobiusLoop : Path (A := MobiusBand) mobiusBase mobiusBase
+noncomputable abbrev mobiusLoop :
+    Path (A := MobiusBand.{u}) mobiusBase mobiusBase :=
+  circleLoop
 
 /-! ## Alternative Presentation with Twist
 
@@ -102,20 +104,25 @@ structure MobiusBandRecData (C : Type v) where
   loop : Path base base
 
 /-- Möbius band eliminator (recursor). -/
-axiom mobiusBandRec {C : Type v} (data : MobiusBandRecData C) : MobiusBand → C
+noncomputable def mobiusBandRec {C : Type v} (data : MobiusBandRecData C) : MobiusBand.{u} → C :=
+  circleRec (C := C) { base := data.base, loop := data.loop }
 
 /-- β-rule for `mobiusBandRec` at the base point. -/
-axiom mobiusBandRec_base {C : Type v} (data : MobiusBandRecData C) :
-  mobiusBandRec data mobiusBase = data.base
+@[simp] theorem mobiusBandRec_base {C : Type v} (data : MobiusBandRecData C) :
+    mobiusBandRec data mobiusBase = data.base := by
+  simpa [mobiusBandRec, mobiusBase] using
+    (circleRec_base (C := C) (data := ({ base := data.base, loop := data.loop } : CircleRecData C)))
 
 /-- β-rule for `mobiusBandRec` on the central loop. -/
-axiom mobiusBandRec_loop {C : Type v} (data : MobiusBandRecData C) :
-  Path.trans
-    (Path.symm (Path.ofEq (mobiusBandRec_base (C := C) data)))
-    (Path.trans
-      (Path.congrArg (mobiusBandRec data) mobiusLoop)
-      (Path.ofEq (mobiusBandRec_base (C := C) data))) =
-  data.loop
+@[simp] theorem mobiusBandRec_loop {C : Type v} (data : MobiusBandRecData C) :
+    Path.trans
+      (Path.symm (Path.ofEq (mobiusBandRec_base (C := C) data)))
+      (Path.trans
+        (Path.congrArg (mobiusBandRec data) mobiusLoop)
+        (Path.ofEq (mobiusBandRec_base (C := C) data))) =
+    data.loop := by
+  simpa [mobiusBandRec, mobiusBase, mobiusLoop] using
+    (circleRec_loop (C := C) (data := ({ base := data.base, loop := data.loop } : CircleRecData C)))
 
 noncomputable section
 

@@ -136,10 +136,11 @@ noncomputable def rpnPiOneEquivZ2 (n : Nat) (hn : n ≥ 2)
 
 /-! ## Special Cases -/
 
-/-- RP^0 has trivial fundamental group (single element).
+/- RP^0 has trivial fundamental group (single element).
 
-In a contractible space (like a point), the loop space is trivial. -/
-axiom rpZero_pi1_subsingleton : Subsingleton (PiOneN 0)
+In a contractible space (like a point), the loop space is trivial.
+
+This is currently not used downstream, so we avoid axiomatizing it here. -/
 
 /-- RP^1 ≃ S¹, so π₁(RP^1) ≃ ℤ. -/
 noncomputable def rpOnePiOneEquivCircle : SimpleEquiv (PiOneN 1) circlePiOne where
@@ -166,7 +167,7 @@ noncomputable def rpTwoPiOneEquivProjective :
   right_inv := fun _ => rfl
 
 /-- When the projective plane has encode/decode, so does RP^2. -/
-noncomputable instance rpTwoEncode [HasProjectiveLoopDecode.{u}] :
+noncomputable instance rpTwoEncode [HasProjectiveLoopDecode] :
     HasRPnPiOneEncode 2 (by omega) where
   encode := fun α => projectiveEncode α
   decode := fun z => projectiveDecode z
@@ -203,8 +204,32 @@ theorem rpThree_eq_SO3 :
 
 The generator corresponds to the non-trivial loop that lifts to a path
 from x to -x on S^n (half the equator). -/
-axiom rpn_pi1_is_z2 (n : Nat) (hn : n ≥ 2) :
-    Nonempty (HasRPnPiOneEncode n hn)
+theorem rpn_pi1_is_z2 (n : Nat) (hn : n ≥ 2) [HasProjectiveLoopDecode.{u}] :
+    Nonempty (HasRPnPiOneEncode.{u} n hn) := by
+  classical
+  cases n with
+  | zero =>
+      cases hn
+  | succ n =>
+      cases n with
+      | zero =>
+          -- 1 ≥ 2 is impossible.
+          omega
+      | succ n =>
+          -- Now n = n+2 ≥ 2. Split into n=0 (RP²) and n+1 (RP^{n+3}).
+          cases n with
+          | zero =>
+              -- RP² = ProjectivePlane, so we can reuse its encode/decode.
+              exact ⟨{ encode := fun α => projectiveEncode α
+                      , decode := fun z => projectiveDecode z
+                      , encode_decode := projectiveEncode_projectiveDecode
+                      , decode_encode := projectiveDecode_projectiveEncode }⟩
+          | succ _ =>
+              -- For n ≥ 3 we use ProjectivePlane as the π₁ model.
+              exact ⟨{ encode := fun α => projectiveEncode α
+                      , decode := fun z => projectiveDecode z
+                      , encode_decode := projectiveEncode_projectiveDecode
+                      , decode_encode := projectiveDecode_projectiveEncode }⟩
 
 end RealProjectiveSpace
 

@@ -863,8 +863,76 @@ induction on word structure using the fact that all generators are fzero.
 **Axiom Justification**: This is a standard result in combinatorial group theory.
 In F₁, every word g₀^{a₁}g₀^{a₂}...g₀^{aₙ} reduces to g₀^{a₁+a₂+...+aₙ} by
 repeated application of the combine rule (since all generators are identical). -/
-axiom bouquetWord_one_equiv_single (w : BouquetWord 1) :
-    Quot.mk (BouquetRel 1) w = intToFreeGroupOne (bouquetWordOnePower w)
+theorem bouquetWord_one_equiv_single (w : BouquetWord 1) :
+    Quot.mk (BouquetRel 1) w = intToFreeGroupOne (bouquetWordOnePower w) := by
+  classical
+  have main :
+      ∀ n : Nat,
+        ∀ w : BouquetWord 1,
+          w.length = n →
+            Quot.mk (BouquetRel 1) w = intToFreeGroupOne (bouquetWordOnePower w) := by
+    intro n
+    refine Nat.strongRecOn n ?_
+    intro n ih w hwlen
+    cases w with
+    | nil =>
+      simp [intToFreeGroupOne, BouquetFreeGroup.one, bouquetWordOnePower]
+    | cons l w =>
+      cases w with
+      | nil =>
+        cases l with
+        | mk gen power power_ne_zero =>
+          have hgen : gen = Fin'B.fzero := fin'B_one_eq_fzero gen
+          cases hgen
+          simp [intToFreeGroupOne, BouquetFreeGroup.genPow, bouquetWordOnePower, power_ne_zero]
+      | cons l₂ rest =>
+        have hl : l.gen = Fin'B.fzero := fin'B_one_eq_fzero l.gen
+        have hl₂ : l₂.gen = Fin'B.fzero := fin'B_one_eq_fzero l₂.gen
+        have hgen : l.gen = l₂.gen := hl.trans hl₂.symm
+        have hn : n = 1 + (1 + rest.length) := by
+          simpa [BouquetWord.length] using hwlen.symm
+        by_cases hsum : l.power + l₂.power = 0
+        · have hw :
+              Quot.mk (BouquetRel 1) (.cons l (.cons l₂ rest)) =
+                Quot.mk (BouquetRel 1) rest := by
+            exact Quot.sound (BouquetRel.cancel l l₂ hgen hsum rest)
+          have hlt : rest.length < n := by
+            rw [hn]
+            omega
+          have hpow :
+              bouquetWordOnePower (.cons l (.cons l₂ rest)) =
+                bouquetWordOnePower rest := by
+            calc
+              l.power + (l₂.power + bouquetWordOnePower rest)
+                  = (l.power + l₂.power) + bouquetWordOnePower rest := by omega
+              _ = 0 + bouquetWordOnePower rest := by simp [hsum]
+              _ = bouquetWordOnePower rest := by simp
+          have ihRest :
+              Quot.mk (BouquetRel 1) rest =
+                intToFreeGroupOne (bouquetWordOnePower rest) :=
+            ih rest.length hlt rest rfl
+          simpa [hpow] using hw.trans ihRest
+        · have hne : l.power + l₂.power ≠ 0 := hsum
+          let l' : BouquetLetter 1 :=
+            ⟨l.gen, l.power + l₂.power, hne⟩
+          have hw :
+              Quot.mk (BouquetRel 1) (.cons l (.cons l₂ rest)) =
+                Quot.mk (BouquetRel 1) (.cons l' rest) := by
+            exact Quot.sound (BouquetRel.combine l l₂ hgen hne rest)
+          have hlt : (BouquetWord.cons l' rest).length < n := by
+            rw [hn]
+            simp [BouquetWord.length]
+          have hpow :
+              bouquetWordOnePower (.cons l (.cons l₂ rest)) =
+                bouquetWordOnePower (.cons l' rest) := by
+            simp [bouquetWordOnePower, l']
+            omega
+          have ihCombined :
+              Quot.mk (BouquetRel 1) (.cons l' rest) =
+                intToFreeGroupOne (bouquetWordOnePower (.cons l' rest)) :=
+            ih (BouquetWord.cons l' rest).length hlt (.cons l' rest) rfl
+          simpa [hpow] using hw.trans ihCombined
+  exact main w.length w rfl
 
 /-- F₁ ≃ ℤ (the free group on one generator is isomorphic to the integers). -/
 noncomputable def freeGroupOneEquivInt : SimpleEquiv (BouquetFreeGroup 1) Int where

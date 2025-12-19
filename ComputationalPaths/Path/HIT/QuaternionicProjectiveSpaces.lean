@@ -102,8 +102,8 @@ theorem hp0_subsingleton : ∀ (x y : QuaternionicProjectiveSpace 0), x = y := b
   intro x y
   rw [hp0_unique x, hp0_unique y]
 
-/-- π₁(HP^0) is trivial (point is contractible). -/
-axiom hpZero_pi1_subsingleton : Subsingleton (PiOneN 0)
+/- π₁(HP^0) is trivial since HP^0 is a point. This is currently not used
+   downstream, so we avoid axiomatizing it here. -/
 
 /-! ## HP^1 ≃ S⁴ -/
 
@@ -113,9 +113,6 @@ which is exactly the construction of S⁴. -/
 theorem hpOne_homotopy_equiv_S4 :
     ∃ desc : String, desc = "HP¹ ≃ S⁴ (quaternionic projective line is 4-sphere)" :=
   ⟨_, rfl⟩
-
-/-- π₁(HP^1) ≃ 1 (S⁴ is simply connected). -/
-axiom hpOne_pi1_trivial : ∀ (α β : PiOneN 1), α = β
 
 /-! ## Higher HP^n (n ≥ 2) -/
 
@@ -129,6 +126,12 @@ axiom hpOne_pi1_trivial : ∀ (α β : PiOneN 1), α = β
 4. S³ is connected (π₀ = 1)
 5. Therefore π₁(HP^n) = 1 -/
 axiom hpn_pi1_trivial (n : Nat) (hn : n ≥ 1) : ∀ (α β : PiOneN n), α = β
+
+/-- π₁(HP^1) ≃ 1 (S⁴ is simply connected).
+
+This is the `n = 1` instance of `hpn_pi1_trivial`. -/
+theorem hpOne_pi1_trivial : ∀ (α β : PiOneN 1), α = β :=
+  hpn_pi1_trivial 1 (by exact Nat.le_refl 1)
 
 /-- Simple connectivity as a Subsingleton instance. -/
 noncomputable instance hpn_pi1_subsingleton (n : Nat) (hn : n ≥ 1) :
@@ -215,8 +218,11 @@ structure QuaternionicHopfFibrationData (n : Nat) where
     ∃ e : Type, e = HopfFibration.Sphere3
 
 /-- Existence of quaternionic Hopf fibrations for all n ≥ 1. -/
-axiom quaternionicHopfFibrationExists (n : Nat) (_hn : n ≥ 1) :
-    Nonempty (QuaternionicHopfFibrationData n)
+theorem quaternionicHopfFibrationExists (n : Nat) (_hn : n ≥ 1) :
+    Nonempty (QuaternionicHopfFibrationData n) := by
+  refine ⟨{ totalSpace := HopfFibration.Sphere3
+            proj := fun _ => base n
+            fiber_is_S3 := fun _ => ⟨HopfFibration.Sphere3, rfl⟩ }⟩
 
 /-! ## Dimension and Manifold Properties -/
 

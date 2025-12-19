@@ -259,15 +259,44 @@ theorem abelian_group_abelianization_desc :
   ⟨_, rfl⟩
 
 /-- Projection from the abelianization to ℤ when the underlying group is ℤ. -/
-axiom abelianization_int_proj :
-    Abelianization Int Int.add Int.neg 0 → Int
+theorem abelianizationRel_int_eq {x y : Int} :
+    AbelianizationRel Int Int.add Int.neg 0 x y → x = y := by
+  intro h
+  induction h with
+  | refl x => rfl
+  | symm h ih => simpa using ih.symm
+  | trans h₁ h₂ ih₁ ih₂ => exact ih₁.trans ih₂
+  | comm a b => simpa using (Int.add_comm a b)
+  | congr_left z _h ih =>
+    simpa using _root_.congrArg (fun t => Int.add z t) ih
+  | congr_right z _h ih =>
+    simpa using _root_.congrArg (fun t => Int.add t z) ih
+  | assoc x y z => simpa using (Int.add_assoc x y z)
+  | id_left x => simp
+  | id_right x => simp
+  | inv_left x => simpa using (Int.add_left_neg x)
+  | inv_right x => simpa using (Int.add_right_neg x)
+
+def abelianization_int_proj : Abelianization Int Int.add Int.neg 0 → Int :=
+  Quotient.lift (fun x : Int => x) (by
+    intro x y h
+    exact abelianizationRel_int_eq (x := x) (y := y) h)
 
 /-- Injection from ℤ into its abelianization. -/
 def abelianization_int_inj : Int → Abelianization Int Int.add Int.neg 0 :=
   abelianization_mk Int.add Int.neg 0
 
 /-- ℤ^ab ≃ ℤ (integers are already abelian). -/
-axiom int_abelianization_equiv : SimpleEquiv (Abelianization Int Int.add Int.neg 0) Int
+def int_abelianization_equiv : SimpleEquiv (Abelianization Int Int.add Int.neg 0) Int where
+  toFun := abelianization_int_proj
+  invFun := abelianization_int_inj
+  left_inv := by
+    intro q
+    refine Quotient.inductionOn q (fun x => ?_) 
+    rfl
+  right_inv := by
+    intro x
+    rfl
 
 /-! ## H₁ of Known Spaces -/
 
