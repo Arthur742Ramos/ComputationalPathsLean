@@ -206,6 +206,11 @@ instance : DecidableEq (TorusN 0) := fun a b =>
   match a, b with
   | .unit, .unit => isTrue rfl
 
+/-- TorusN 0 = PUnit' is a subsingleton. -/
+instance : Subsingleton (TorusN 0) := by
+  dsimp [TorusN]
+  infer_instance
+
 /-- The basepoint (identity element) of T^n. -/
 noncomputable def base : (n : Nat) → TorusN n
   | 0 => PUnit'.unit
@@ -213,18 +218,16 @@ noncomputable def base : (n : Nat) → TorusN n
 
 /-- **TorusN 0 theorem**: Parallel paths in TorusN 0 (a point) are RwEq.
 T⁰ = PUnit', which is a set. Derived from `decidableEq_implies_isHSet`. -/
-theorem torusN_zero_pathEq [h : HasDecidableEqAxiomK.{u} (TorusN.{u} 0)]
-    {a b : TorusN.{u} 0} (p q : Path.{u} a b) : RwEq.{u} p q :=
-  (@decidableEq_implies_isHSet.{u} (A := TorusN.{u} 0) _ h) (a := a) (b := b) p q
+theorem torusN_zero_pathEq {a b : TorusN.{u} 0} (p q : Path.{u} a b) : RwEq.{u} p q :=
+  decidableEq_implies_isHSet (A := TorusN.{u} 0) (a := a) (b := b) p q
 
 /-- T⁰ is a point, with trivial π₁. -/
-theorem torusN_zero_trivial [h : HasDecidableEqAxiomK.{u} (TorusN.{u} 0)]
-    (α : π₁(TorusN.{u} 0, TorusN.base.{u} 0)) :
+theorem torusN_zero_trivial (α : π₁(TorusN.{u} 0, TorusN.base.{u} 0)) :
     α = Quot.mk _ (Path.refl (TorusN.base.{u} 0)) := by
   induction α using Quot.ind with
   | _ p =>
       exact Quot.sound
-        (torusN_zero_pathEq (h := h) p (Path.refl (TorusN.base.{u} 0)))
+        (torusN_zero_pathEq p (Path.refl (TorusN.base.{u} 0)))
 
 /-- T¹ ≃ S¹ -/
 def torusOneEquivCircle : SimpleEquiv (TorusN 1) Circle where
@@ -308,12 +311,7 @@ def IsSimplyConnected (A : Type u) : Prop :=
 
 /-- S² is simply connected at the basepoint.
     (This is proved in Sphere.lean as sphere2_pi1_trivial) -/
-theorem sphere2_simplyConnected_at_base
-    [HasDecidableEqAxiomK PUnit'.{u}]
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
-      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
-    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
-      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+theorem sphere2_simplyConnected_at_base :
     ∀ (α : π₁(Sphere2.{u}, (Sphere2.basepoint : Sphere2.{u}))),
     α = Quot.mk _ (Path.refl (Sphere2.basepoint : Sphere2.{u})) :=
   Sphere2.sphere2_pi1_trivial
@@ -377,7 +375,7 @@ noncomputable def torusN_product_step (n : Nat) :
 
 The first component (π₁ of a point) is trivial, so this reduces to π₁(S¹) ≃ ℤ. -/
 noncomputable def torusN1_piOne_equiv_int [HasCirclePiOneEncode.{u}]
-    [h0 : HasDecidableEqAxiomK.{u} (TorusN 0)] :
+    :
     SimpleEquiv (π₁(TorusN 1, TorusN.base 1)) Int :=
   SimpleEquiv.comp
     (torusN_product_step 0)
@@ -388,7 +386,7 @@ noncomputable def torusN1_piOne_equiv_int [HasCirclePiOneEncode.{u}]
         have hα : α = Quot.mk _ (Path.refl PUnit'.unit) := by
           induction α using Quot.ind with
           | _ p =>
-              exact Quot.sound (TorusN.torusN_zero_pathEq (h := h0) p (Path.refl PUnit'.unit))
+              exact Quot.sound (TorusN.torusN_zero_pathEq p (Path.refl PUnit'.unit))
         have hβ : circleDecode.{u} (circlePiOneEncode.{u} β) = β :=
           circleDecode_circlePiOneEncode.{u} β
         simp only [hα, hβ]

@@ -1718,8 +1718,8 @@ are homotopic in the pushout. -/
 theorem pushoutDecode_respects_amalg
     {A : Type u} {B : Type u} {C : Type u}
     {f : C → A} {g : C → B}
-    [Pushout.HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
     (c₀ : C)
+    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     (γ : π₁(C, c₀))
     (rest : PushoutCode A B C f g c₀) :
     pushoutDecode c₀ (.consLeft (piOneFmap c₀ γ) rest) =
@@ -1797,7 +1797,7 @@ set_option maxHeartbeats 400000 in
 noncomputable def pushoutDecodeAmalg
     {A : Type u} {B : Type u} {C : Type u}
     {f : C → A} {g : C → B} (c₀ : C)
-    [Pushout.HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)] :
+    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] :
     AmalgamatedFreeProduct (π₁(A, f c₀)) (π₁(B, g c₀)) (π₁(C, c₀))
       (piOneFmap c₀) (piOneGmap c₀) →
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) :=
@@ -1854,7 +1854,8 @@ theorem pushoutEncodeDecodeAxiom (A : Type u) (B : Type u) (C : Type u)
   unfold pushoutEncodeQuotAxiom
   exact HasPushoutSVKEncodeData.encode_decode (A := A) (B := B) (C := C) (f := f) (g := g) (c₀ := c₀) w
 
-noncomputable def seifertVanKampenEquiv [Pushout.HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
+noncomputable def seifertVanKampenEquiv
+    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeData A B C f g c₀] :
     SimpleEquiv
       (π₁(Pushout A B C f g, Pushout.inl (f c₀)))
@@ -1968,7 +1969,7 @@ theorem wedgeFreeProductDecode_concat (w₁ w₂ : WedgeFreeProductCode a₀ b�
       rw [ih]
       exact (piOneMul_assoc _ _ _).symm
 
-/-- Encode function for wedge loops.
+/-! Encode function for wedge loops.
 
 The encode function extracts word structure from a loop. The key insight is that
 any loop at the basepoint is RwEq-equivalent to one built from:
@@ -1982,46 +1983,10 @@ on equivalence classes, which follows from RwEq implying equal underlying equali
 paths have equal underlying equality (p.toEq = q.toEq), so any reasonable encoding
 function is well-defined on the quotient.
 
-The actual word extraction would normally use a code family; for now we define
-wedge encoding by specialising the general pushout encoding interface. -/
-noncomputable def wedgeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
-    [HasPushoutSVKEncodeData A B PUnit'
-      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit] :
-    LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint → FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
-  pushoutEncodeAxiom A B PUnit'
-    (fun _ : PUnit' => a₀)
-    (fun _ : PUnit' => b₀)
-    PUnit'.unit
-
-/-- Encode respects RwEq. -/
-theorem wedgeEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
-    [HasPushoutSVKEncodeData A B PUnit'
-      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit]
-    {p q : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint}
-    (h : RwEq p q) :
-    wedgeEncodeAxiom A B a₀ b₀ p = wedgeEncodeAxiom A B a₀ b₀ q := by
-  simpa [wedgeEncodeAxiom] using
-    pushoutEncodeAxiom_respects_rweq A B PUnit'
-      (fun _ : PUnit' => a₀)
-      (fun _ : PUnit' => b₀)
-      PUnit'.unit
-      (p := p) (q := q) h
-
-/-- Encode at the quotient level: π₁(Wedge) → FreeProductWord. -/
-noncomputable def wedgeEncodeQuot
-    [HasPushoutSVKEncodeData A B PUnit'
-      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit] :
-    π₁(Wedge A B a₀ b₀, Wedge.basepoint) → WedgeFreeProductCode a₀ b₀ :=
-  Quot.lift (wedgeEncodeAxiom A B a₀ b₀)
-    (fun _ _ h => wedgeEncodeAxiom_respects_rweq A B a₀ b₀ h)
-
-/-- Computation rule for `wedgeEncodeQuot` on representatives. -/
-@[simp] theorem wedgeEncodeQuot_mk
-    [HasPushoutSVKEncodeData A B PUnit'
-      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit]
-    (p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
-    wedgeEncodeQuot (A := A) (B := B) a₀ b₀ (Quot.mk _ p) = wedgeEncodeAxiom A B a₀ b₀ p :=
-  rfl
+ The actual word extraction would normally use a code family. In this codebase we
+ expose the missing encode direction for wedge sums via the explicit typeclass
+`WedgeSVKInstances.HasWedgeSVKEncodeData` (see the `WedgeEncodeAPI` re-export near
+the end of this file). -/
 
 /-- `wedgeFreeProductDecode` is `pushoutDecode` specialised to `PUnit'`. -/
 theorem wedgeFreeProductDecode_eq_pushoutDecode (a₀ : A) (b₀ : B) :
@@ -2038,7 +2003,7 @@ theorem wedgeFreeProductDecode_eq_pushoutDecode (a₀ : A) (b₀ : B) :
   | consRight β rest ih =>
       simp only [wedgeFreeProductDecode, pushoutDecode, ih, Wedge.glue]
 
-/-- Decode after encode gives back the original loop (at π₁ level).
+/-! Decode after encode gives back the original loop (at π₁ level).
 
 This is the key round-trip property: encoding a loop extracts its word structure,
 and decoding that word reconstructs a loop in the same equivalence class.
@@ -2048,21 +2013,8 @@ In the code family approach, this follows from:
 2. Transport along inlPath α corresponds to prepending a left letter
 3. Transport along glue sequences corresponds to prepending a right letter
 4. decode reverses these operations exactly -/
-theorem wedgeDecodeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
-    [HasPushoutSVKEncodeData A B PUnit'
-      (fun _ : PUnit' => a₀) (fun _ : PUnit' => b₀) PUnit'.unit]
-    (p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
-    wedgeFreeProductDecode a₀ b₀ (wedgeEncodeAxiom A B a₀ b₀ p) = Quot.mk _ p := by
-  -- Expand the wedge-specific definitions into the general pushout statements.
-  -- `simp` turns `wedgeEncodeAxiom` into the specialised `pushoutEncodeAxiom`.
-  simp only [wedgeEncodeAxiom]
-  rw [wedgeFreeProductDecode_eq_pushoutDecode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)]
-  exact
-    pushoutDecodeEncodeAxiom A B PUnit'
-      (fun _ : PUnit' => a₀)
-      (fun _ : PUnit' => b₀)
-      PUnit'.unit
-      p
+-- (The round-trip property is re-stated later as `wedgeDecodeEncodeAxiom`,
+-- now under the minimal wedge-specific assumptions.)
 
 /-- The fundamental group of a wedge sum is the free product.
 
@@ -2094,54 +2046,58 @@ namespace WedgeSVKInstances
 
 variable {A : Type u} {B : Type u} (a₀ : A) (b₀ : B)
 
-/-- Axiom: Primitive encode function for paths in a wedge sum.
+/-- Encode/decode data for wedge sums (explicit assumption).
 
-This axiom states that every loop at the basepoint of a wedge sum
-can be analyzed to extract a word in π₁(A) * π₁(B).
+This packages the missing encode direction for wedge sums as a typeclass,
+so no kernel axioms are introduced by importing `PushoutPaths.lean`.
 
-The encode function is characterized by:
-- encode(refl) = nil
-- encode(inlPath p ⋅ rest) = consLeft [p] (encode rest)
-- encode(glue ⋅ inrPath q ⋅ glue⁻¹ ⋅ rest) = consRight [q] (encode rest)
+It is intentionally stronger than `HasPushoutSVKEncodeData` for the wedge case:
+we assume `encode ∘ decode = id` as an equality on words (not just `AmalgEquiv`). -/
+class HasWedgeSVKEncodeData (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) : Type u where
+  /-- Encode at the quotient level: π₁(Wedge) → FreeProductWord. -/
+  encodeQuot :
+      π₁(Wedge A B a₀ b₀, Wedge.basepoint) →
+      FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))
 
-These computation rules are captured by the round-trip properties. -/
-axiom wedgeEncodePrim :
-    LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint →
-    FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))
+  /-- `decode ∘ encode = id` on loop representatives (hence on π₁). -/
+  decode_encode :
+      ∀ p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint,
+        pushoutDecode (A := A) (B := B) (C := PUnit')
+          (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit
+          (encodeQuot (Quot.mk _ p)) = Quot.mk _ p
 
-/-- Axiom: The primitive encode respects RwEq. -/
-axiom wedgeEncodePrim_respects_rweq
-    {p q : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint}
-    (h : RwEq p q) :
-    wedgeEncodePrim a₀ b₀ p = wedgeEncodePrim a₀ b₀ q
+  /-- `encode ∘ decode = id` as an equality on words (wedge case). -/
+  encode_decode :
+      ∀ w : FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)),
+        encodeQuot
+          (pushoutDecode (A := A) (B := B) (C := PUnit')
+            (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit w) = w
 
-/-- Encode at the quotient level. -/
-noncomputable def wedgeEncodeQuotPrim :
+/-- Encode at the quotient level (from `HasWedgeSVKEncodeData`). -/
+noncomputable def wedgeEncodeQuotPrim [HasWedgeSVKEncodeData A B a₀ b₀] :
     π₁(Wedge A B a₀ b₀, Wedge.basepoint) →
     FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
-  Quot.lift (wedgeEncodePrim a₀ b₀) (fun _ _ h => wedgeEncodePrim_respects_rweq a₀ b₀ h)
+  HasWedgeSVKEncodeData.encodeQuot (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
 
-/-- Axiom: decode ∘ encode = id on loop representatives.
-
-This axiom states that encoding a loop and then decoding gives back the
-same loop (up to RwEq, hence equal in the quotient). -/
-axiom wedgeDecodeEncodePrim
+/-- `decode ∘ encode = id` on loop representatives (from `HasWedgeSVKEncodeData`). -/
+theorem wedgeDecodeEncodePrim [HasWedgeSVKEncodeData A B a₀ b₀]
     (p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
     pushoutDecode (A := A) (B := B) (C := PUnit')
       (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit
-      (wedgeEncodePrim a₀ b₀ p) = Quot.mk _ p
+      (wedgeEncodeQuotPrim (A := A) (B := B) a₀ b₀ (Quot.mk _ p)) = Quot.mk _ p :=
+  HasWedgeSVKEncodeData.decode_encode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) p
 
-/-- Axiom: encode ∘ decode = id on words at the quotient level.
-
-For wedge sums, the amalgamation is trivial since C = PUnit' has trivial π₁. -/
-axiom wedgeEncodeDecodeQuotPrim
+/-- `encode ∘ decode = id` on words (from `HasWedgeSVKEncodeData`). -/
+theorem wedgeEncodeDecodeQuotPrim [HasWedgeSVKEncodeData A B a₀ b₀]
     (w : FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))) :
-    wedgeEncodeQuotPrim a₀ b₀
+    wedgeEncodeQuotPrim (A := A) (B := B) a₀ b₀
       (pushoutDecode (A := A) (B := B) (C := PUnit')
-        (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit w) = w
+        (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit w) = w :=
+  HasWedgeSVKEncodeData.encode_decode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) w
 
 /-- AmalgEquiv version of wedgeEncodeDecodeQuotPrim for HasPushoutSVKEncodeData. -/
 theorem wedgeEncodeDecodeQuotPrim_amalg
+    [HasWedgeSVKEncodeData A B a₀ b₀]
     (w : FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))) :
     AmalgEquiv
       (piOneFmap (A := A) (C := PUnit') (f := fun _ => a₀) PUnit'.unit)
@@ -2156,7 +2112,7 @@ theorem wedgeEncodeDecodeQuotPrim_amalg
 /-- Instance: HasPushoutSVKEncodeData for Wedge sums.
 
 This provides the encode-decode infrastructure needed for SVK. -/
-noncomputable instance hasPushoutSVKEncodeData :
+noncomputable instance hasPushoutSVKEncodeData [HasWedgeSVKEncodeData A B a₀ b₀] :
     HasPushoutSVKEncodeData A B PUnit'
       (fun _ => a₀) (fun _ => b₀) PUnit'.unit where
   encodeQuot := wedgeEncodeQuotPrim a₀ b₀
@@ -2168,7 +2124,7 @@ noncomputable instance hasPushoutSVKEncodeData :
 /-- Instance: HasWedgeFundamentalGroupEquiv for Wedge sums.
 
 This packages the encode-decode equivalence. -/
-noncomputable instance hasWedgeFundamentalGroupEquiv :
+noncomputable instance hasWedgeFundamentalGroupEquiv [HasWedgeSVKEncodeData A B a₀ b₀] :
     HasWedgeFundamentalGroupEquiv A B a₀ b₀ where
   equiv := {
     toFun := wedgeEncodeQuotPrim a₀ b₀
@@ -2186,6 +2142,63 @@ noncomputable instance hasWedgeFundamentalGroupEquiv :
   }
 
 end WedgeSVKInstances
+
+/-! ## Wedge Encode API (minimal assumptions)
+
+The legacy wedge-encode helpers in the `WedgeSVK` section used the generic
+`HasPushoutSVKEncodeData` specialization to `PUnit'`. Now that wedge encoding is
+packaged explicitly as `WedgeSVKInstances.HasWedgeSVKEncodeData`, we provide a
+small API that depends only on this wedge-specific class.
+-/
+
+section WedgeEncodeAPI
+
+variable {A : Type u} {B : Type u} (a₀ : A) (b₀ : B)
+
+/-- Encode on loop representatives, using the wedge-specific encode data. -/
+noncomputable def wedgeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
+    [WedgeSVKInstances.HasWedgeSVKEncodeData A B a₀ b₀] :
+    LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint →
+      FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
+  fun p =>
+    WedgeSVKInstances.wedgeEncodeQuotPrim (A := A) (B := B) a₀ b₀ (Quot.mk _ p)
+
+/-- Encode respects RwEq (as it factors through π₁). -/
+theorem wedgeEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
+    [WedgeSVKInstances.HasWedgeSVKEncodeData A B a₀ b₀]
+    {p q : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint}
+    (h : RwEq p q) :
+    wedgeEncodeAxiom A B a₀ b₀ p = wedgeEncodeAxiom A B a₀ b₀ q := by
+  unfold wedgeEncodeAxiom
+  exact
+    _root_.congrArg (WedgeSVKInstances.wedgeEncodeQuotPrim (A := A) (B := B) a₀ b₀)
+      (Quot.sound h)
+
+/-- Encode at the quotient level: π₁(Wedge) → FreeProductWord. -/
+noncomputable def wedgeEncodeQuot
+    [WedgeSVKInstances.HasWedgeSVKEncodeData A B a₀ b₀] :
+    π₁(Wedge A B a₀ b₀, Wedge.basepoint) → WedgeFreeProductCode a₀ b₀ :=
+  WedgeSVKInstances.wedgeEncodeQuotPrim (A := A) (B := B) a₀ b₀
+
+/-- Computation rule for `wedgeEncodeQuot` on representatives. -/
+@[simp] theorem wedgeEncodeQuot_mk
+    [WedgeSVKInstances.HasWedgeSVKEncodeData A B a₀ b₀]
+    (p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
+    wedgeEncodeQuot (A := A) (B := B) a₀ b₀ (Quot.mk _ p) =
+      wedgeEncodeAxiom A B a₀ b₀ p :=
+  rfl
+
+/-- Decode after encode gives back the original loop (at π₁ level). -/
+theorem wedgeDecodeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
+    [WedgeSVKInstances.HasWedgeSVKEncodeData A B a₀ b₀]
+    (p : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint) :
+    wedgeFreeProductDecode a₀ b₀ (wedgeEncodeAxiom A B a₀ b₀ p) = Quot.mk _ p := by
+  -- Reduce to the corresponding statement phrased with `pushoutDecode`.
+  rw [wedgeFreeProductDecode_eq_pushoutDecode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)]
+  simpa [wedgeEncodeAxiom] using
+    WedgeSVKInstances.wedgeDecodeEncodePrim (A := A) (B := B) a₀ b₀ p
+
+end WedgeEncodeAPI
 
 /-! ## Summary
 

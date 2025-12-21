@@ -69,6 +69,10 @@ universe u
 /-- The 3-sphere, defined as the suspension of S². -/
 def Sphere3 : Type u := Suspension Sphere2.{u}
 
+instance : Subsingleton Sphere3 := by
+  unfold Sphere3 Suspension
+  infer_instance
+
 /-- North pole of S³. -/
 noncomputable def sphere3North : Sphere3 := Suspension.north
 
@@ -226,7 +230,6 @@ noncomputable def sphere3Basepoint : Sphere3 := sphere3North
     every word in the free product decodes to refl.
     (Adapted from Sphere.lean for S³) -/
 theorem trivial_decode_s3
-    [HasDecidableEqAxiomK PUnit'.{u}]
     (w :
       FreeProductWord
         (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u})))
@@ -247,10 +250,7 @@ theorem trivial_decode_s3
       exact piOneMul_refl_left _
 
 /-- Every element of the amalgamated free product over trivial groups is one. -/
-theorem amalg_trivial_is_one_s3
-    [HasDecidableEqAxiomK PUnit'.{u}]
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Sphere2.{u})
-      (f := sphere2ToNorth) (g := sphere2ToSouth)] :
+theorem amalg_trivial_is_one_s3 :
     ∀ (x : AmalgamatedFreeProduct (π₁(PUnit'.{u}, sphere2ToNorth basepoint))
            (π₁(PUnit'.{u}, sphere2ToSouth basepoint))
            (π₁(Sphere2.{u}, basepoint)) (piOneFmap basepoint) (piOneGmap basepoint)),
@@ -270,41 +270,15 @@ theorem amalg_trivial_is_one_s3
     3. Every element x of the amalgamated free product satisfies:
        decode(x) = Quot.mk _ refl (by trivial_decode_s3)
     4. By the SVK equivalence: α = decode(encode(α)) = Quot.mk _ refl -/
-theorem sphere3_pi1_trivial
-    [HasDecidableEqAxiomK PUnit'.{u}]
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Sphere2.{u})
-      (f := sphere2ToNorth) (g := sphere2ToSouth)]
-    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Sphere2.{u} sphere2ToNorth sphere2ToSouth basepoint] :
+theorem sphere3_pi1_trivial :
     ∀ (l : LoopSpace Sphere3.{u} sphere3North),
     Quot.mk RwEq l = Quot.mk RwEq (Path.refl sphere3North) := by
   intro l
-  -- S³ = Suspension Sphere2 = Pushout PUnit' PUnit' Sphere2
-  -- sphere3North = Suspension.north = Pushout.inl PUnit'.unit
-  let f : Sphere2.{u} → PUnit'.{u} := sphere2ToNorth
-  let g : Sphere2.{u} → PUnit'.{u} := sphere2ToSouth
-  let c₀ : Sphere2.{u} := basepoint
-
-  -- The encoded element in the amalgamated free product
-  let encoded := pushoutEncodeAmalg (f := f) (g := g) c₀ (Quot.mk RwEq l)
-
-  -- By SVK left inverse: α = pushoutDecodeAmalg (pushoutEncodeAmalg α)
-  have left_inv_l : Quot.mk RwEq l = pushoutDecodeAmalg (f := f) (g := g) c₀ encoded := by
-    have h :=
-      (seifertVanKampenEquiv (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Sphere2.{u})
-            (f := f) (g := g) (c₀ := c₀)).left_inv (Quot.mk RwEq l)
-    dsimp [encoded]
-    exact h.symm
-
-  -- Now use that decode of any element is refl
-  rw [left_inv_l]
-  exact amalg_trivial_is_one_s3 encoded
+  simpa using
+    pi1_trivial_of_subsingleton (A := Sphere3.{u}) (a := sphere3North) (Quot.mk _ l)
 
 /-- π₁(S³) is equivalent to the trivial group. -/
-noncomputable def sphere3_pi1_equiv_unit
-    [HasDecidableEqAxiomK PUnit'.{u}]
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Sphere2.{u})
-      (f := sphere2ToNorth) (g := sphere2ToSouth)]
-    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Sphere2.{u} sphere2ToNorth sphere2ToSouth basepoint] :
+noncomputable def sphere3_pi1_equiv_unit :
     SimpleEquiv (π₁(Sphere3.{u}, sphere3North)) Unit where
   toFun := fun _ => ()
   invFun := fun _ => Quot.mk _ (Path.refl sphere3North)

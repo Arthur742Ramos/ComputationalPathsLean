@@ -113,12 +113,7 @@ noncomputable def cpOnePiOneEquivSphere2 :
   right_inv := fun _ => rfl
 
 /-- π₁(CP^1) ≃ 1 (since S² is simply connected). -/
-theorem cpOne_pi1_trivial
-    [HasDecidableEqAxiomK PUnit'.{u}]
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
-      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
-    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
-      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+theorem cpOne_pi1_trivial :
     ∀ (α β : PiOneN.{u} 1), α = β := by
   intro α β
   have hα :
@@ -148,11 +143,7 @@ theorem cpOne_pi1_trivial
 5. Therefore π₁(CP^n) = 1 -/
 -- For every `n ≥ 1` we model `CP^n` as `Sphere2`, so this reduces to the `n = 1` case.
 theorem cpn_pi1_trivial (n : Nat) (hn : n ≥ 1)
-    [HasDecidableEqAxiomK PUnit'.{u}]
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
-      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
-    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
-      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+    :
     ∀ (α β : PiOneN.{u} n), α = β := by
   cases n with
   | zero =>
@@ -167,12 +158,7 @@ theorem cpn_pi1_trivial (n : Nat) (hn : n ≥ 1)
 
 /-- Simple connectivity as a Subsingleton instance. -/
 noncomputable instance cpn_pi1_subsingleton (n : Nat) (hn : n ≥ 1)
-    [HasDecidableEqAxiomK PUnit'.{u}]
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
-      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
-    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
-      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
-    Subsingleton (PiOneN.{u} n) where
+    : Subsingleton (PiOneN.{u} n) where
   allEq := cpn_pi1_trivial n hn
 
 /-! ## The Hopf Fibration S¹ → S³ → CP¹

@@ -16,13 +16,13 @@ We want to show there exists `s` such that:
 ## Analysis
 
 The standard proof uses Newman's lemma which requires:
-1. Local confluence (we have this via `local_confluence` axiom)
+1. Local confluence (assumed via `ConfluenceProof.HasLocalConfluence`)
 2. Termination (we have this via RPO in Termination.lean)
 
 The challenge in formalizing is that `Rw` is Prop-valued, so we cannot
 directly extract derivation lengths for well-founded recursion.
 
-The `step_strip_prop` axiom in ConfluenceProof.lean is justified by
+The `step_strip_prop` assumption (typeclass) in ConfluenceProof.lean is justified by
 the metatheoretic argument that:
 - All critical pairs join (established by explicit proofs)
 - The TRS terminates (established by RPO)
@@ -56,14 +56,14 @@ theorem step_strip_refl {p q : Path a b}
   ⟨q, Rw.refl q, rw_of_step hstep⟩
 
 /-- Strip lemma when multi-step has length 1: diamond property. -/
-theorem step_strip_single {p q r : Path a b}
+theorem step_strip_single [HasLocalConfluence.{u}] {p q r : Path a b}
     (hstep_pq : Step p q) (hstep_pr : Step p r) :
     ∃ s : Path a b, Rw q s ∧ Rw r s := by
   let j := local_confluence hstep_pq hstep_pr
   exact ⟨j.meet, j.left, j.right⟩
 
 /-- Strip lemma when multi-step has length 2. -/
-theorem step_strip_two {p q r' r : Path a b}
+theorem step_strip_two [HasLocalConfluence.{u}] [HasStepStrip.{u}] {p q r' r : Path a b}
     (hstep : Step p q) (h1 : Step p r') (h2 : Step r' r) :
     ∃ s : Path a b, Rw q s ∧ Rw r s := by
   -- First join hstep with h1
@@ -145,6 +145,10 @@ The measure decreases because:
 - Local confluence produces derivations whose sum is bounded
 -/
 
+section
+
+variable [HasStepStrip.{u}]
+
 /-- Helper: join a single step with RwN using well-founded recursion.
 
 This is the core of Newman's strip lemma. Given:
@@ -216,6 +220,8 @@ theorem strip_lemma_via_axiom {p q r : Path a b}
     ∃ s : Path a b, Rw q s ∧ Rw r s :=
   step_strip_prop hstep hmulti
 
+end
+
 /-! ## Summary: Axiom Justification Analysis
 
 ### Current Axiom Status
@@ -275,10 +281,11 @@ Similar analysis applies to encode-decode axioms for HITs like Circle, Wedge, et
    - Needed because we must analyze loop structure to extract integer windings.
    - Justified by the standard encode-decode argument for S¹.
 
-2. **Wedge SVK axioms** (`wedgeEncodePrim`, etc.): Define the free product encoding.
+2. **Wedge SVK encode/decode data** (`WedgeSVKInstances.HasWedgeSVKEncodeData`):
    - Needed because we must decompose wedge loops into left/right pieces.
-   - Justified by the Seifert-Van Kampen theorem.
-   - The Pushout rec/ind work at point level, not path level.
+   - Justified by the Seifert-Van Kampen theorem (wedge case).
+   - Kept as an explicit typeclass assumption; an opt-in kernel-axiom instance is
+     provided by `ComputationalPaths.Path.HIT.WedgeSVKAxiom`.
 
 To prove these constructively would require:
 - A "flattening lemma" relating Ω(Pushout) to Pushout(Ω(...))

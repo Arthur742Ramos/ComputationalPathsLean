@@ -34,6 +34,7 @@ with a path `glue c : inl (f c) = inr (g c)` for each c : C.
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Rewrite.Quot
 
 namespace ComputationalPaths
@@ -251,6 +252,45 @@ noncomputable def ofA (a : A) : Pushout A B C f g := inl a
 /-- The pushout is nonempty if B is nonempty. -/
 noncomputable def ofB (b : B) : Pushout A B C f g := inr b
 
+/-- If both legs are subsingletons and `C` is inhabited, then the pushout is a subsingleton. -/
+instance instSubsingleton_of_subsingleton_of_nonempty
+    (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B)
+    [Subsingleton A] [Subsingleton B] [Nonempty C] :
+    Subsingleton (Pushout A B C f g) where
+  allEq := by
+    intro x y
+    refine Quot.inductionOn x ?_
+    intro sx
+    refine Quot.inductionOn y ?_
+    intro sy
+    cases sx with
+    | inl a =>
+        cases sy with
+        | inl a' =>
+            have ha : a = a' := Subsingleton.elim a a'
+            cases ha
+            rfl
+        | inr b =>
+            obtain ⟨c⟩ := (inferInstance : Nonempty C)
+            have ha : a = f c := Subsingleton.elim a (f c)
+            have hb : b = g c := Subsingleton.elim b (g c)
+            cases ha
+            cases hb
+            exact Quot.sound (PushoutRel.glue (A := A) (B := B) (C := C) (f := f) (g := g) c)
+    | inr b =>
+        cases sy with
+        | inl a =>
+            obtain ⟨c⟩ := (inferInstance : Nonempty C)
+            have ha : a = f c := Subsingleton.elim a (f c)
+            have hb : b = g c := Subsingleton.elim b (g c)
+            cases ha
+            cases hb
+            exact (Quot.sound (PushoutRel.glue (A := A) (B := B) (C := C) (f := f) (g := g) c)).symm
+        | inr b' =>
+            have hb : b = b' := Subsingleton.elim b b'
+            cases hb
+            rfl
+
 /-- Functorial action on paths within the left component. -/
 noncomputable def inlPath {a₁ a₂ : A} (p : Path a₁ a₂) :
     Path (inl a₁ : Pushout A B C f g) (inl a₂) :=
@@ -309,15 +349,127 @@ theorem glue_natural_rweq [HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f
               (Path.symm (glue c₂)))) :=
   glue_natural_rweq_axiom p
 
+/-- **Loop-only glue naturality axiom**: The glue path is natural with respect to loops at `c₀`.
+
+This is the only form of glue naturality used by the SVK decoding proof, since
+amalgamation is witnessed by conjugating loops at the chosen basepoint. -/
+class HasGlueNaturalLoopRwEq (c₀ : C) : Prop where
+  glue_natural_loop_rweq_axiom (p : LoopSpace C c₀) :
+      RwEq
+        (inlPath (Path.congrArg f p) :
+          LoopSpace (Pushout A B C f g) (inl (f c₀)))
+        (Path.trans (glue c₀)
+          (Path.trans (inrPath (Path.congrArg g p))
+            (Path.symm (glue c₀))))
+
+instance hasGlueNaturalLoopRwEq_of_hasGlueNaturalRwEq (c₀ : C)
+    [HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)] :
+    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ where
+  glue_natural_loop_rweq_axiom p := by
+    simpa using (glue_natural_rweq (A := A) (B := B) (C := C) (f := f) (g := g) (p := p))
+
+/-- If `C` satisfies Axiom K (all loops rewrite to refl), then glue naturality for loops
+holds automatically: both sides reduce to the trivial loop at the basepoint. -/
+theorem hasGlueNaturalLoopRwEq_of_axiomK (c₀ : C) (hC : AxiomK C) :
+    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ where
+  glue_natural_loop_rweq_axiom p := by
+    -- In a type satisfying Axiom K, every loop is rewrite-equal to `refl`.
+    have hp : RwEq p (Path.refl c₀) := hC c₀ p
+
+    have hf : RwEq (Path.congrArg f p) (Path.refl (f c₀)) :=
+      RwEq.trans (rweq_congrArg_of_rweq f hp) (rweq_congrArg_refl f c₀)
+    have hg : RwEq (Path.congrArg g p) (Path.refl (g c₀)) :=
+      RwEq.trans (rweq_congrArg_of_rweq g hp) (rweq_congrArg_refl g c₀)
+
+    have hlhs :
+        RwEq
+          (inlPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg f p))
+          (Path.refl (inl (A := A) (B := B) (C := C) (f := f) (g := g) (f c₀))) := by
+      -- `inlPath` is `congrArg inl`, so rewrite via congruence.
+      simpa [inlPath] using
+        RwEq.trans (rweq_congrArg_of_rweq (inl (A := A) (B := B) (C := C) (f := f) (g := g)) hf)
+          (rweq_congrArg_refl (inl (A := A) (B := B) (C := C) (f := f) (g := g)) (f c₀))
+
+    have hinr :
+        RwEq
+          (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+          (Path.refl (inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c₀))) := by
+      simpa [inrPath] using
+        RwEq.trans (rweq_congrArg_of_rweq (inr (A := A) (B := B) (C := C) (f := f) (g := g)) hg)
+          (rweq_congrArg_refl (inr (A := A) (B := B) (C := C) (f := f) (g := g)) (g c₀))
+
+    -- Reduce the RHS to `refl` using the above and the inverse law for `glue`.
+    let glue₀ :=
+      glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀
+    have inner_eq :
+        RwEq
+          (Path.trans
+            (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+            (Path.symm glue₀))
+          (Path.symm glue₀) := by
+      have step1 :
+          RwEq
+            (Path.trans
+              (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+              (Path.symm glue₀))
+            (Path.trans
+              (Path.refl (inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c₀)))
+              (Path.symm glue₀)) :=
+        rweq_trans_congr_left (Path.symm glue₀) hinr
+      have step2 :
+          RwEq
+            (Path.trans
+              (Path.refl (inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c₀)))
+              (Path.symm glue₀))
+            (Path.symm glue₀) :=
+        rweq_cmpA_refl_left (Path.symm glue₀)
+      exact RwEq.trans step1 step2
+
+    have hrhs :
+        RwEq
+          (Path.trans glue₀
+            (Path.trans
+              (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+              (Path.symm glue₀)))
+          (Path.refl (inl (A := A) (B := B) (C := C) (f := f) (g := g) (f c₀))) := by
+      have step3 :
+          RwEq
+            (Path.trans glue₀
+              (Path.trans
+                (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+                (Path.symm glue₀)))
+            (Path.trans glue₀ (Path.symm glue₀)) :=
+        rweq_trans_congr_right glue₀ inner_eq
+      exact RwEq.trans step3 (rweq_cmpA_inv_right glue₀)
+
+    -- Both sides are rewrite-equal to `refl`, so they are rewrite-equal to each other.
+    exact RwEq.trans hlhs (rweq_symm hrhs)
+
+/-- A convenient specialization: subsingleton gluing types automatically satisfy loop naturality. -/
+instance hasGlueNaturalLoopRwEq_of_subsingleton (c₀ : C) [Subsingleton C] :
+    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ :=
+  hasGlueNaturalLoopRwEq_of_axiomK (A := A) (B := B) (C := C) (f := f) (g := g) c₀
+    (hC := axiomK_of_subsingleton (A := C))
+
+/-- If `C` has decidable equality and we assume `HasDecidableEqAxiomK C`, then `C`
+has Axiom K, hence glue naturality for loops follows. -/
+instance hasGlueNaturalLoopRwEq_of_decidableEq (c₀ : C)
+    [DecidableEq C] [HasDecidableEqAxiomK C] :
+    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ :=
+  hasGlueNaturalLoopRwEq_of_axiomK (A := A) (B := B) (C := C) (f := f) (g := g) c₀
+    (hC := decidableEq_implies_axiomK (A := C))
+
 /-- Glue naturality for loops: For a loop p at c₀, inlPath(f*(p)) equals
 glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹ up to RwEq. This is the key fact for SVK. -/
-theorem glue_natural_loop_rweq [HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
-    (c₀ : C) (p : LoopSpace C c₀) :
+theorem glue_natural_loop_rweq
+    (c₀ : C)
+    [h : HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    (p : LoopSpace C c₀) :
     RwEq (inlPath (Path.congrArg f p) : LoopSpace (Pushout A B C f g) (inl (f c₀)))
          (Path.trans (glue c₀)
            (Path.trans (inrPath (Path.congrArg g p))
               (Path.symm (glue c₀)))) :=
-  glue_natural_rweq p
+  h.glue_natural_loop_rweq_axiom p
 
 /-! ## Cocone Structure -/
 
@@ -365,6 +517,12 @@ inductive PUnit' : Type uu where
 instance : DecidableEq PUnit' := fun a b =>
   match a, b with
   | .unit, .unit => isTrue rfl
+
+/-- PUnit' is a subsingleton (there is only one element). -/
+instance : Subsingleton PUnit' where
+  allEq := by
+    intro a b
+    cases a <;> cases b <;> rfl
 
 /-- The wedge sum A ∨ B is the pushout of A ← PUnit' → B.
 This is the disjoint union with basepoints identified. -/
@@ -474,6 +632,138 @@ theorem isPathConnected_of_components
   obtain ⟨py⟩ := path_to_hub (c := c) hA hB y
   -- Compose: x → hub → y
   exact ⟨Path.trans px (Path.symm py)⟩
+
+end Pushout
+
+/-! ## Concrete Glue Naturality Instances
+
+The glue naturality axiom is provable when both span maps are constant. This
+covers wedge sums and suspensions, which are pushouts of constant maps.
+-/
+
+namespace Pushout
+
+variable {A : Type u} {B : Type u} {C : Type u}
+
+/-- Glue naturality holds when both maps are constant. -/
+instance hasGlueNaturalRwEq_const (a₀ : A) (b₀ : B) :
+    Pushout.HasGlueNaturalRwEq
+      (A := A) (B := B) (C := C)
+      (f := fun _ : C => a₀) (g := fun _ : C => b₀) where
+  glue_natural_rweq_axiom {c₁ c₂} p := by
+    have lhs_eq :
+        RwEq
+          (Pushout.inlPath (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀)
+            (Path.congrArg (fun _ : C => a₀) p))
+          (Path.refl
+            (Pushout.inl (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) a₀)) := by
+      apply rweq_trans
+        (rweq_congrArg_of_rweq
+          (Pushout.inl (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀))
+          (rweq_congrArg_const a₀ p))
+      exact
+        rweq_congrArg_refl
+          (Pushout.inl (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀)) a₀
+
+    have rhs_eq :
+        RwEq
+          (Path.trans
+            (Pushout.glue (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) c₁)
+            (Path.trans
+              (Pushout.inrPath (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀)
+                (Path.congrArg (fun _ : C => b₀) p))
+              (Path.symm
+                (Pushout.glue (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) c₂))))
+          (Path.refl
+            (Pushout.inl (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) a₀)) := by
+      have inr_eq :
+          RwEq
+            (Pushout.inrPath (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀)
+              (Path.congrArg (fun _ : C => b₀) p))
+            (Path.refl
+              (Pushout.inr (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) b₀)) := by
+        apply rweq_trans
+          (rweq_congrArg_of_rweq
+            (Pushout.inr (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀))
+            (rweq_congrArg_const b₀ p))
+        exact
+          rweq_congrArg_refl
+            (Pushout.inr (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀)) b₀
+
+      let glue₁ :=
+        Pushout.glue (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) c₁
+      let glue₂ :=
+        Pushout.glue (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) c₂
+
+      have inner1 :
+          RwEq
+            (Path.trans
+              (Pushout.inrPath (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀)
+                (Path.congrArg (fun _ : C => b₀) p))
+              (Path.symm glue₂))
+            (Path.trans
+              (Path.refl
+                (Pushout.inr (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) b₀))
+              (Path.symm glue₂)) :=
+        rweq_trans_congr_left (Path.symm glue₂) inr_eq
+
+      have inner2 : RwEq
+          (Path.trans
+            (Path.refl
+              (Pushout.inr (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) b₀))
+            (Path.symm glue₂))
+          (Path.symm glue₂) :=
+        rweq_cmpA_refl_left (Path.symm glue₂)
+
+      have inner : RwEq
+          (Path.trans
+            (Pushout.inrPath (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀)
+              (Path.congrArg (fun _ : C => b₀) p))
+            (Path.symm glue₂))
+          (Path.symm glue₂) :=
+        rweq_trans inner1 inner2
+
+      have step3 :
+          RwEq
+            (Path.trans glue₁
+              (Path.trans
+                (Pushout.inrPath (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀)
+                  (Path.congrArg (fun _ : C => b₀) p))
+                (Path.symm glue₂)))
+            (Path.trans glue₁ (Path.symm glue₂)) :=
+        rweq_trans_congr_right glue₁ inner
+
+      have hglue : glue₂ = glue₁ := by
+        simp [glue₁, glue₂, Pushout.glue]
+
+      have step4 :
+          RwEq (Path.trans glue₁ (Path.symm glue₂))
+            (Path.refl
+              (Pushout.inl (A := A) (B := B) (C := C) (f := fun _ : C => a₀) (g := fun _ : C => b₀) a₀)) := by
+        have h :
+            Path.trans glue₁ (Path.symm glue₂) =
+              Path.trans glue₁ (Path.symm glue₁) := by
+          simp [hglue]
+        exact rweq_trans (rweq_of_eq h) (rweq_cmpA_inv_right glue₁)
+
+      exact rweq_trans step3 step4
+
+    exact rweq_trans lhs_eq (rweq_symm rhs_eq)
+
+/-- Glue naturality is automatic when both codomains are `PUnit'`. -/
+instance hasGlueNaturalRwEq_punit {C : Type u} (f g : C → PUnit'.{u}) :
+    Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := C) (f := f) (g := g) := by
+  have hf : f = (fun _ : C => PUnit'.unit) := by
+    funext c
+    cases f c
+    rfl
+  have hg : g = (fun _ : C => PUnit'.unit) := by
+    funext c
+    cases g c
+    rfl
+  cases hf
+  cases hg
+  infer_instance
 
 end Pushout
 

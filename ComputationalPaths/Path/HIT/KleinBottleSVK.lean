@@ -58,6 +58,12 @@ instance : DecidableEq UnitU := fun a b =>
   match a, b with
   | .unit, .unit => isTrue rfl
 
+/-- UnitU is a subsingleton (there is only one element). -/
+instance : Subsingleton UnitU where
+  allEq := by
+    intro a b
+    cases a <;> cases b <;> rfl
+
 /-- The single element of UnitU. -/
 def unitU : UnitU := PUnit.unit
 
@@ -217,14 +223,14 @@ Since UnitU has only one element, all paths are equivalent to refl.
 /-- **UnitU set theorem**: Parallel paths in UnitU are RwEq.
 UnitU has only one element, so it's trivially a set.
 Derived from `decidableEq_implies_isHSet` since UnitU has DecidableEq. -/
-theorem unitU_pathEq [h : HasDecidableEqAxiomK.{u} UnitU]
+theorem unitU_pathEq
     {a b : UnitU} (p q : Path.{u} a b) : RwEq.{u} p q :=
-  (@decidableEq_implies_isHSet.{u} (A := UnitU) _ h) (a := a) (b := b) p q
+  decidableEq_implies_isHSet (A := UnitU) (a := a) (b := b) p q
 
 /-- Any loop in UnitU is RwEq to refl. -/
-theorem unitU_loop_rweq_refl [h : HasDecidableEqAxiomK.{u} UnitU]
+theorem unitU_loop_rweq_refl
     (p : Path.{u} unitU unitU) : RwEq.{u} p (Path.refl unitU) :=
-  unitU_pathEq (h := h) p (Path.refl unitU)
+  unitU_pathEq p (Path.refl unitU)
 
 /-- congrArg of a constant function applied to any path is RwEq to refl.
 Uses `rweq_congrArg_const` from RwEq.lean. -/

@@ -4,13 +4,14 @@
 This module proves `HasJoinOfRw` by establishing local confluence and applying
 Newman's Lemma.
 
-## Status: COMPLETE (with justified axioms)
+## Status: COMPLETE (with justified assumptions)
 
-The module provides a complete proof of confluence for the LND_EQ-TRS via two
-well-justified axioms:
+The module provides a confluence development for the LND_EQ-TRS via two
+well-justified assumptions, packaged as typeclasses (so importing this file
+does **not** add new kernel axioms):
 
 1. **`local_confluence`**: For any `Step p q` and `Step p r`, there exists a
-   `Join q r`. This axiom is justified by explicit critical pair proofs.
+   `Join q r`. This is justified by explicit critical pair proofs.
 
 2. **`step_strip_prop`**: For any `Step p q` and `Rw p r`, there exists `s`
    with `Rw q s` and `Rw r s`. This follows from `local_confluence` + termination
@@ -435,9 +436,16 @@ A fully constructive proof would require either:
     1. Both steps are the same (diagonal), giving trivial join
     2. Non-overlapping steps that commute via congruence rules
     3. Steps in disjoint subterms that lift via join_lift_* lemmas -/
-axiom local_confluence {A : Type u} {a b : A} {p q r : Path a b}
+class HasLocalConfluence : Type (u + 1) where
+  join {A : Type u} {a b : A} {p q r : Path a b}
+      (hq : Step p q) (hr : Step p r) :
+      Confluence.Join q r
+
+@[simp] def local_confluence [h : HasLocalConfluence.{u}]
+    {A : Type u} {a b : A} {p q r : Path a b}
     (hq : Step p q) (hr : Step p r) :
-    Confluence.Join q r
+    Confluence.Join q r :=
+  h.join (hq := hq) (hr := hr)
 
 /-! ## Full Confluence via Newman's Lemma
 
@@ -473,7 +481,7 @@ def rw_append {a b : A} {p q r : Path a b} (h1 : Rw p q) (h2 : Rw q r) : Rw p r 
 
 /-- Diamond lemma: Given Step p q and Step p r, there exists s with Rw q s and Rw r s.
     This follows directly from local_confluence. -/
-theorem diamond_prop {a b : A} {p q r : Path a b}
+theorem diamond_prop [HasLocalConfluence.{u}] {a b : A} {p q r : Path a b}
     (hq : Step p q) (hr : Step p r) :
     ∃ s : Path a b, Rw q s ∧ Rw r s := by
   let j := local_confluence hq hr
@@ -502,9 +510,20 @@ theorem diamond_prop {a b : A} {p q r : Path a b}
     2. The TRS terminates (Termination.lean)
 
     This lemma follows from the standard proof of Newman's Lemma. -/
-axiom step_strip_prop {A : Type u} {a b : A} {p q r : Path a b}
+class HasStepStrip : Prop where
+  strip {A : Type u} {a b : A} {p q r : Path a b}
+      (hstep : Step p q) (hmulti : Rw p r) :
+      ∃ s : Path a b, Rw q s ∧ Rw r s
+
+theorem step_strip_prop [h : HasStepStrip.{u}]
+    {A : Type u} {a b : A} {p q r : Path a b}
     (hstep : Step p q) (hmulti : Rw p r) :
-    ∃ s : Path a b, Rw q s ∧ Rw r s
+    ∃ s : Path a b, Rw q s ∧ Rw r s :=
+  h.strip (hstep := hstep) (hmulti := hmulti)
+
+section
+
+variable [HasStepStrip.{u}]
 
 /-- Strip lemma (Prop version): Alias for step_strip_prop. -/
 theorem strip_lemma_prop {a b : A} {p q r : Path a b}
@@ -547,6 +566,8 @@ noncomputable def confluence_of_local {a b : A} {p q r : Path a b}
 /-- The main result: instantiate HasJoinOfRw. -/
 noncomputable instance instHasJoinOfRw : Confluence.HasJoinOfRw.{u} where
   join_of_rw := fun hq hr => confluence_of_local hq hr
+
+end
 
 end ConfluenceProof
 end Rewrite

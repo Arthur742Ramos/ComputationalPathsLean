@@ -125,16 +125,27 @@ theorem hpOne_homotopy_equiv_S4 :
 3. For n ≥ 1, S^{4n+3} is simply connected (π₁ = 1)
 4. S³ is connected (π₀ = 1)
 5. Therefore π₁(HP^n) = 1 -/
-axiom hpn_pi1_trivial (n : Nat) (hn : n ≥ 1) : ∀ (α β : PiOneN n), α = β
+/-
+Rather than asserting π₁-triviality as a global kernel axiom, we package it as an
+explicit hypothesis. Downstream developments can provide an instance when they
+want to assume simple connectivity for `HP^n`.
+-/
+class HasHpnPi1Trivial (n : Nat) : Prop where
+  pi1_trivial : ∀ (α β : PiOneN n), α = β
+
+/-- π₁(HP^n) = 1 for all n ≥ 1 (assumed via `HasHpnPi1Trivial`). -/
+theorem hpn_pi1_trivial (n : Nat) (_hn : n ≥ 1) [HasHpnPi1Trivial n] :
+    ∀ (α β : PiOneN n), α = β :=
+  HasHpnPi1Trivial.pi1_trivial (n := n)
 
 /-- π₁(HP^1) ≃ 1 (S⁴ is simply connected).
 
 This is the `n = 1` instance of `hpn_pi1_trivial`. -/
-theorem hpOne_pi1_trivial : ∀ (α β : PiOneN 1), α = β :=
+theorem hpOne_pi1_trivial [HasHpnPi1Trivial 1] : ∀ (α β : PiOneN 1), α = β :=
   hpn_pi1_trivial 1 (by exact Nat.le_refl 1)
 
 /-- Simple connectivity as a Subsingleton instance. -/
-noncomputable instance hpn_pi1_subsingleton (n : Nat) (hn : n ≥ 1) :
+instance hpn_pi1_subsingleton (n : Nat) (hn : n ≥ 1) [HasHpnPi1Trivial n] :
     Subsingleton (PiOneN n) where
   allEq := hpn_pi1_trivial n hn
 

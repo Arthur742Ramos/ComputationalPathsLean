@@ -18,6 +18,7 @@ are RwEq (i.e., it has h-level 0 for paths).
 -/
 
 import ComputationalPaths.Path.Homotopy.Reflexivity
+import ComputationalPaths.Path.Homotopy.FundamentalGroup
 
 namespace ComputationalPaths.Path
 
@@ -34,6 +35,55 @@ def IsHSet (A : Type u) : Prop :=
     This is the computational paths analog of the "K axiom" in type theory. -/
 def AxiomK (A : Type u) : Prop :=
   ∀ (a : A) (p : Path a a), RwEq p (Path.refl a)
+
+/-- Subsingleton types satisfy Axiom K: any loop rewrites to reflexivity.
+
+This is provable because, when `A` has exactly one element, every base rewrite
+step in a loop can be replaced by the unique reflexive step at the basepoint,
+and `Path.ofEq rfl` rewrites to `Path.refl` (see `Homotopy/Reflexivity.lean`). -/
+theorem axiomK_of_subsingleton (A : Type u) [Subsingleton A] : AxiomK A := by
+  intro a p
+  have step_eq_refl (s : ComputationalPaths.Step A) :
+      s = ComputationalPaths.Step.mk a a (rfl : a = a) := by
+    cases s with
+    | mk src tgt proof =>
+        have hsrc : src = a := Subsingleton.elim src a
+        have htgt : tgt = a := Subsingleton.elim tgt a
+        cases hsrc
+        cases htgt
+        have hproof : proof = (rfl : a = a) := Subsingleton.elim proof rfl
+        cases hproof
+        rfl
+  cases p with
+  | mk steps proof =>
+      cases proof
+      induction steps with
+      | nil =>
+          -- `Path.mk [] rfl` is definitionally `Path.refl a`.
+          simp [Path.refl]
+      | cons s ss ih =>
+          have hseg :
+              RwEq
+                (Path.mk ([s] : List (ComputationalPaths.Step A)) (rfl : a = a))
+                (Path.refl a) := by
+            have hs : s = ComputationalPaths.Step.mk a a (rfl : a = a) :=
+              step_eq_refl s
+            have hpath :
+                Path.mk ([s] : List (ComputationalPaths.Step A)) (rfl : a = a) =
+                  Path.ofEq (A := A) (a := a) (b := a) (rfl : a = a) := by
+              simp [Path.ofEq, hs]
+            exact RwEq.trans (rweq_of_eq hpath) (rweq_ofEq_rfl_refl a)
+          have htrans :
+              RwEq
+                (Path.trans
+                  (Path.mk ([s] : List (ComputationalPaths.Step A)) (rfl : a = a))
+                  (Path.mk (A := A) (a := a) (b := a) ss (rfl : a = a)))
+                (Path.trans (Path.refl a) (Path.refl a)) :=
+            rweq_trans_congr (hp := hseg) (hq := ih)
+          have hrefl :
+              RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+            rweq_of_step (Step.trans_refl_left (Path.refl a))
+          simpa [Path.trans] using RwEq.trans htrans hrefl
 
 /-- Lemma 5.12: Every path has an inverse that composes to refl on both sides.
     In our formalization, the inverse is `Path.symm`. -/
@@ -101,6 +151,16 @@ theorem axiomK_implies_isHSet (h : AxiomK A) : IsHSet A := by
 theorem isHSet_iff_axiomK : IsHSet A ↔ AxiomK A :=
   ⟨isHSet_implies_axiomK, axiomK_implies_isHSet⟩
 
+/-- Subsingleton types have trivial fundamental group. -/
+theorem pi1_trivial_of_subsingleton (A : Type u) [Subsingleton A] (a : A) :
+    ∀ (α : π₁(A, a)), α = Quot.mk _ (Path.refl a) := by
+  intro α
+  induction α using Quot.ind with
+  | _ p =>
+      apply Quot.sound
+      have hk : AxiomK A := axiomK_of_subsingleton (A := A)
+      exact hk a p
+
 /-- **Decidable equality axiom for paths**: Types with decidable equality satisfy Axiom K.
 For such types, every loop is RwEq to refl.
 
@@ -113,6 +173,11 @@ class HasDecidableEqAxiomK (A : Type u) [DecidableEq A] : Prop where
 /-- Types with decidable equality satisfy Axiom K (assumed as an explicit hypothesis). -/
 theorem decidableEq_implies_axiomK [DecidableEq A] [h : HasDecidableEqAxiomK A] : AxiomK A :=
   h.axiomK
+
+/-- Subsingleton types satisfy `HasDecidableEqAxiomK` (no extra axioms required). -/
+instance instHasDecidableEqAxiomK_of_subsingleton (A : Type u) [DecidableEq A] [Subsingleton A] :
+    HasDecidableEqAxiomK A where
+  axiomK := axiomK_of_subsingleton (A := A)
 
 /-- A type with decidable equality is a set -/
 theorem decidableEq_implies_isHSet [DecidableEq A] [HasDecidableEqAxiomK A] : IsHSet A :=

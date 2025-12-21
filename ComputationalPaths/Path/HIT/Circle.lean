@@ -36,6 +36,9 @@ axiom Circle : Type u
 /-- Distinguished point on the circle. -/
 axiom circleBase : Circle
 
+/-- The circle is inhabited (by `circleBase`). -/
+instance : Nonempty Circle := ⟨circleBase⟩
+
 /-- Fundamental loop around the circle, expressed as a computational path. -/
 axiom circleLoop : Path (A := Circle) circleBase circleBase
 

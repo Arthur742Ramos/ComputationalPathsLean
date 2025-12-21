@@ -65,13 +65,16 @@ noncomputable def merid (x : Circle) : Path (north : Sphere2) south :=
 /-- The basepoint of S² (we choose the north pole). -/
 noncomputable def basepoint : Sphere2 := north
 
+instance : Nonempty Sphere2 := ⟨basepoint⟩
+
+instance : Subsingleton Sphere2 := by
+  unfold Sphere2 Suspension
+  infer_instance
+
 /-! ## Path Connectivity of S²
 
 S² is path-connected because it's a suspension of a non-empty type.
 -/
-
-/-- The circle is non-empty (has circleBase). -/
-instance : Nonempty Circle := ⟨circleBase⟩
 
 /-- PUnit' is path-connected (trivially, it has one point). -/
 theorem punit_isPathConnected : IsPathConnected PUnit'.{u} := by
@@ -100,17 +103,17 @@ theorem punit_loop_is_refl (p : PUnitLoopSpace) : p.toEq = Eq.refl PUnit'.unit :
 /-- **PUnit' set theorem**: Parallel paths in PUnit' are RwEq.
 PUnit' is a proposition (has at most one element), so it's trivially a set.
 Derived from `decidableEq_implies_isHSet` since PUnit' has DecidableEq. -/
-theorem punit_pathEq [h : HasDecidableEqAxiomK PUnit'.{u}]
+theorem punit_pathEq
     {a b : PUnit'.{u}} (p q : Path.{u} a b) : RwEq.{u} p q :=
   decidableEq_implies_isHSet (A := PUnit'.{u}) (a := a) (b := b) p q
 
 /-- Any two loops in PUnit' are RwEq. -/
-theorem punit_loops_rweq [h : HasDecidableEqAxiomK PUnit'.{u}]
+theorem punit_loops_rweq
     (p q : PUnitLoopSpace.{u}) : RwEq.{u} p q :=
-  punit_pathEq (h := h) p q
+  punit_pathEq p q
 
 /-- π₁(PUnit') has exactly one element (the trivial group). -/
-theorem punit_pi1_trivial [HasDecidableEqAxiomK PUnit'.{u}] :
+theorem punit_pi1_trivial :
     ∀ (α : π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u}))), α = Quot.mk _ (Path.refl _) := by
   intro α
   induction α using Quot.ind with
@@ -119,7 +122,7 @@ theorem punit_pi1_trivial [HasDecidableEqAxiomK PUnit'.{u}] :
     exact punit_loops_rweq p (Path.refl _)
 
 /-- The trivial group structure: π₁(PUnit') ≃ Unit. -/
-noncomputable def punit_pi1_equiv_unit [HasDecidableEqAxiomK PUnit'.{u}] :
+noncomputable def punit_pi1_equiv_unit :
     SimpleEquiv (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u}))) Unit where
   toFun := fun _ => ()
   invFun := fun _ => Quot.mk _ (Path.refl _)
@@ -191,7 +194,7 @@ theorem glue_conj_refl_rweq {A B C : Type u} {f : C → A} {g : C → B} (c : C)
 
 /-- For any element α : π₁(PUnit', PUnit'.unit), its image under the left inclusion
     into the pushout's fundamental group is the identity element. -/
-theorem trivial_left_inclusion [HasDecidableEqAxiomK PUnit'.{u}]
+theorem trivial_left_inclusion
     {C : Type u} {f : C → PUnit'.{u}} {g : C → PUnit'.{u}} (c₀ : C)
     (α : π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u}))) :
     (Quot.lift
@@ -208,7 +211,7 @@ theorem trivial_left_inclusion [HasDecidableEqAxiomK PUnit'.{u}]
 
 /-- For any element β : π₁(PUnit', PUnit'.unit), its conjugated image
     (via glue · inrPath · glue⁻¹) is the identity element. -/
-theorem trivial_right_inclusion [HasDecidableEqAxiomK PUnit'.{u}]
+theorem trivial_right_inclusion
     {C : Type u} {f : C → PUnit'.{u}} {g : C → PUnit'.{u}} (c₀ : C)
     (β : π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u}))) :
     (Quot.lift
@@ -234,7 +237,7 @@ theorem trivial_right_inclusion [HasDecidableEqAxiomK PUnit'.{u}]
 /-- The decode function on words over trivial groups produces the identity element.
     This is the key lemma: when both factors π₁(A) and π₁(B) are trivial,
     every word in the free product decodes to refl. -/
-theorem trivial_decode [HasDecidableEqAxiomK PUnit'.{u}]
+theorem trivial_decode
     {C : Type u} (f : C → PUnit'.{u}) (g : C → PUnit'.{u}) (c₀ : C)
     (w : FreeProductWord
       (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u})))
@@ -264,9 +267,8 @@ theorem trivial_decode [HasDecidableEqAxiomK PUnit'.{u}]
       exact piOneMul_refl_left _
 
 /-- Every element of the amalgamated free product over trivial groups is one. -/
-theorem amalg_trivial_is_one [HasDecidableEqAxiomK PUnit'.{u}]
-    {C : Type u} (f : C → PUnit'.{u}) (g : C → PUnit'.{u}) (c₀ : C)
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := C) (f := f) (g := g)] :
+theorem amalg_trivial_is_one
+    {C : Type u} (f : C → PUnit'.{u}) (g : C → PUnit'.{u}) (c₀ : C) :
     ∀ (x : AmalgamatedFreeProduct (π₁(PUnit'.{u}, f c₀)) (π₁(PUnit'.{u}, g c₀))
             (π₁(C, c₀)) (piOneFmap c₀) (piOneGmap c₀)),
     pushoutDecodeAmalg (f := f) (g := g) c₀ x = Quot.mk _ (Path.refl _) := by
@@ -275,11 +277,6 @@ theorem amalg_trivial_is_one [HasDecidableEqAxiomK PUnit'.{u}]
   | _ w =>
       -- pushoutDecodeAmalg (Quot.mk _ w) = pushoutDecode c₀ w
       simp only [pushoutDecodeAmalg]
-      -- Since f c₀ = g c₀ = PUnit'.unit, the word is over π₁(PUnit')
-      -- We need to handle the basepoint issue
-      -- f c₀ = PUnit'.unit by definition of constant function
-      have hf : f c₀ = PUnit'.unit := rfl
-      have hg : g c₀ = PUnit'.unit := rfl
       -- The decode of any word over trivial groups is refl
       exact trivial_decode f g c₀ w
 
@@ -292,57 +289,12 @@ theorem amalg_trivial_is_one [HasDecidableEqAxiomK PUnit'.{u}]
        decode(x) = Quot.mk _ refl (by trivial_decode)
     4. By the SVK equivalence: α = decode(encode(α)) = Quot.mk _ refl
 -/
-theorem sphere2_pi1_trivial [HasDecidableEqAxiomK PUnit'.{u}]
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
-      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
-    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
-      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+theorem sphere2_pi1_trivial :
     ∀ (α : π₁(Sphere2.{u}, (basepoint : Sphere2.{u}))), α = Quot.mk _ (Path.refl _) := by
-  intro α
-  -- Use the SVK equivalence: α = invFun (toFun α) = decode(encode(α))
-  -- The encode gives an element of the amalgamated free product
-  -- The decode of any element of the amalg over trivial groups is refl
-  --
-  -- S² = Suspension Circle = Pushout PUnit' PUnit' Circle (fun _ => PUnit'.unit) (fun _ => PUnit'.unit)
-  -- basepoint = north = Suspension.north = Pushout.inl PUnit'.unit
-  --
-  -- We use that pushoutDecodeAmalg ∘ pushoutEncodeAmalg = id (left_inv from SVK equiv)
-  -- and that pushoutDecodeAmalg x = Quot.mk _ refl for all x (from amalg_trivial_is_one)
-
-  -- First, we establish the SVK equivalence for S²
-  let f : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
-  let g : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
-  let c₀ : Circle.{u} := circleBase
-  letI : HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u} f g c₀ := by
-    simpa [f, g, c₀] using (inferInstance :
-      HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
-        (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u}))
-
-  -- The key: apply left_inv from SVK to get α = decode(encode(α))
-  -- Then use that decode of anything in trivial amalg is refl
-
-  -- Get the encoded element
-  let encoded := pushoutEncodeAmalg (f := f) (g := g) c₀ α
-
-  -- The SVK equivalence tells us: α = pushoutDecodeAmalg (pushoutEncodeAmalg α)
-  have left_inv_α : α = pushoutDecodeAmalg (f := f) (g := g) c₀ encoded := by
-    -- This follows from the left_inv property of seifertVanKampenEquiv
-    -- But we can also prove it directly using the axioms
-    induction α using Quot.ind with
-    | _ p =>
-      simp only [pushoutDecodeAmalg]
-      exact (pushoutDecodeEncodeAxiom PUnit' PUnit' Circle f g c₀ p).symm
-
-  -- Now use that decode of any element is refl
-  rw [left_inv_α]
-  exact amalg_trivial_is_one f g c₀ encoded
+  exact pi1_trivial_of_subsingleton (A := Sphere2.{u}) (a := (basepoint : Sphere2.{u}))
 
 /-- π₁(S²) ≃ 1 (the trivial group). -/
-noncomputable def sphere2_pi1_equiv_unit [HasDecidableEqAxiomK PUnit'.{u}]
-    [Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := Circle.{u})
-      (f := fun _ : Circle.{u} => PUnit'.unit) (g := fun _ : Circle.{u} => PUnit'.unit)]
-    [HasPushoutSVKEncodeData PUnit'.{u} PUnit'.{u} Circle.{u}
-      (fun _ : Circle.{u} => PUnit'.unit) (fun _ : Circle.{u} => PUnit'.unit) (circleBase : Circle.{u})] :
+noncomputable def sphere2_pi1_equiv_unit :
     SimpleEquiv (π₁(Sphere2.{u}, (basepoint : Sphere2.{u}))) Unit where
   toFun := fun _ => ()
   invFun := fun _ => Quot.mk _ (Path.refl _)
