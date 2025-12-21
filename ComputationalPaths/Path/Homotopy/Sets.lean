@@ -161,6 +161,15 @@ theorem pi1_trivial_of_subsingleton (A : Type u) [Subsingleton A] (a : A) :
       have hk : AxiomK A := axiomK_of_subsingleton (A := A)
       exact hk a p
 
+/-- Subsingleton types have a subsingleton fundamental group. -/
+theorem subsingleton_pi1_of_subsingleton (A : Type u) [Subsingleton A] (a : A) :
+    Subsingleton (π₁(A, a)) := by
+  constructor
+  intro x y
+  exact
+    (pi1_trivial_of_subsingleton (A := A) (a := a) x).trans
+      (pi1_trivial_of_subsingleton (A := A) (a := a) y).symm
+
 /-- **Decidable equality axiom for paths**: Types with decidable equality satisfy Axiom K.
 For such types, every loop is RwEq to refl.
 

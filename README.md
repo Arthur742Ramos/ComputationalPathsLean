@@ -594,7 +594,7 @@ See `docs/axioms.md` for detailed documentation on each opt-in axiom file.
 - **Univalence marker**: `ComputationalPaths.Path.HasUnivalence`.
   - Used by some HoTT-style developments to model “transport along `ua` computes to the equivalence”.
   - **Cannot be instantiated in standard Lean** (proof-irrelevance makes it inconsistent); see `docs/axioms.md` and `Scripts/UnivalenceInconsistency.lean`.
-- **Pushout β/naturality (SVK)**: `Pushout.HasRecGlueRwEq`, `Pushout.HasIndGlueRwEq`, `Pushout.HasGlueNaturalRwEq`.
+- **Pushout / SVK**: `Pushout.HasGlueNaturalLoopRwEq`, `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeData` (and full `Pushout.HasGlueNaturalRwEq` when needed).
 - **Confluence axioms** (justified by critical pair analysis + termination):
   - `local_confluence`: Any two single-step reductions from the same source can be joined.
   - `step_strip_prop`: Strip lemma — single step joins with multi-step derivation.

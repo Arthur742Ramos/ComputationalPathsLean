@@ -299,8 +299,18 @@ These are now **non-kernel assumptions**:
 
 - `Pushout.HasRecGlueRwEq` (recursor β-rule on `glue`, up to `RwEq`)
 - `Pushout.HasIndGlueRwEq` (inductor β-rule on `glue`, up to `RwEq`)
-- `Pushout.HasGlueNaturalRwEq` (glue naturality, up to `RwEq`)
+- `Pushout.HasGlueNaturalRwEq` (full glue naturality, up to `RwEq`)
+- `Pushout.HasGlueNaturalLoopRwEq` (loop-only glue naturality at a chosen basepoint)
+- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeData` (encode/decode data for `seifertVanKampenEquiv`)
 
-They are defined in `ComputationalPaths/Path/HIT/Pushout.lean`, and threaded into consumers
-like `ComputationalPaths/Path/HIT/PushoutPaths.lean`, `ComputationalPaths/Path/HIT/Sphere.lean`,
-and `ComputationalPaths/Path/HIT/HopfFibration.lean`.
+They are defined in `ComputationalPaths/Path/HIT/Pushout.lean` and
+`ComputationalPaths/Path/HIT/PushoutPaths.lean`.
+
+Notes:
+
+- The SVK decoding proof only needs the **loop-only** naturality hypothesis
+  `Pushout.HasGlueNaturalLoopRwEq c₀`, and this is derived automatically in common cases
+  (e.g. `Subsingleton C`, or `[DecidableEq C] [HasDecidableEqAxiomK C]`).
+- The wedge case `π₁(A ∨ B) ≃ π₁(A) * π₁(B)` is packaged as the explicit typeclass
+  `WedgeSVKInstances.HasWedgeSVKEncodeData`; an opt-in kernel-axiom instance is provided by
+  `ComputationalPaths/Path/HIT/WedgeSVKAxiom.lean`.

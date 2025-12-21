@@ -768,6 +768,12 @@ theorem bouquetWord_zero_trivial :
       -- l.gen : Fin'B 0 is impossible
       exact Fin'B.elim0 l.gen
 
+/-- The bouquet with zero circles is just a point, hence a subsingleton. -/
+instance : Subsingleton (BouquetN.{u} 0) := by
+  -- Unfold the definition: `BouquetN 0 = PUnit'`.
+  unfold BouquetN
+  simpa [bouquetNData] using (inferInstance : Subsingleton PUnit'.{u})
+
 /-- The free group on zero generators is a subsingleton. -/
 theorem bouquetFreeGroup_zero_subsingleton : Subsingleton (BouquetFreeGroup 0) := by
   constructor
@@ -780,23 +786,43 @@ theorem bouquetFreeGroup_zero_subsingleton : Subsingleton (BouquetFreeGroup 0) :
   simp [hw1, hw2]
 
 /-- For n = 0, the bouquet has trivial fundamental group. -/
-theorem bouquetPiOne_zero_subsingleton [BouquetN.HasBouquetPiOneEquiv.{u} 0] :
+theorem bouquetPiOne_zero_subsingleton :
     Subsingleton (BouquetN.PiOneN.{u} 0) := by
-  haveI : Subsingleton (BouquetFreeGroup 0) := bouquetFreeGroup_zero_subsingleton
-  let e : SimpleEquiv (BouquetN.PiOneN.{u} 0) (BouquetFreeGroup 0) := BouquetN.bouquetPiOneEquiv (n := 0)
   constructor
   intro x y
-  have h : e.toFun x = e.toFun y := Subsingleton.elim _ _
-  have hx : e.invFun (e.toFun x) = x := e.left_inv x
-  have hy : e.invFun (e.toFun y) = y := e.left_inv y
-  have h' : e.invFun (e.toFun x) = e.invFun (e.toFun y) := _root_.congrArg e.invFun h
-  exact hx.symm.trans (h'.trans hy)
+  have hx : x = PiOne.id (A := BouquetN 0) (a := bouquetBase (n := 0)) := by
+    simpa [PiOne.id] using
+      (pi1_trivial_of_subsingleton (A := BouquetN 0) (a := bouquetBase (n := 0)) x)
+  have hy : y = PiOne.id (A := BouquetN 0) (a := bouquetBase (n := 0)) := by
+    simpa [PiOne.id] using
+      (pi1_trivial_of_subsingleton (A := BouquetN 0) (a := bouquetBase (n := 0)) y)
+  exact hx.trans hy.symm
 
 /-- For n = 0, every element of `π₁(BouquetN 0)` is equal to the identity. -/
-theorem bouquetPiOne_zero_trivial [BouquetN.HasBouquetPiOneEquiv.{u} 0] (x : BouquetN.PiOneN.{u} 0) :
+theorem bouquetPiOne_zero_trivial (x : BouquetN.PiOneN.{u} 0) :
     x = PiOne.id (A := BouquetN 0) (a := bouquetBase) := by
-  haveI : Subsingleton (BouquetN.PiOneN.{u} 0) := bouquetPiOne_zero_subsingleton
-  exact Subsingleton.elim x _
+  simpa [PiOne.id] using
+    (pi1_trivial_of_subsingleton (A := BouquetN 0) (a := bouquetBase (n := 0)) x)
+
+namespace BouquetN
+
+/-- For `n = 0`, the bouquet π₁ equivalence is trivial (both sides are subsingletons). -/
+noncomputable instance instHasBouquetPiOneEquiv_zero : HasBouquetPiOneEquiv.{u} 0 where
+  equiv :=
+    let basePiOne : PiOneN.{u} 0 := PiOne.id (A := BouquetN 0) (a := bouquetBase (n := 0))
+    let baseFree : BouquetFreeGroup 0 := BouquetFreeGroup.one (n := 0)
+    { toFun := fun _ => baseFree
+      invFun := fun _ => basePiOne
+      left_inv := by
+        intro x
+        haveI : Subsingleton (PiOneN.{u} 0) := bouquetPiOne_zero_subsingleton
+        exact Subsingleton.elim _ _
+      right_inv := by
+        intro y
+        haveI : Subsingleton (BouquetFreeGroup 0) := bouquetFreeGroup_zero_subsingleton
+        exact Subsingleton.elim _ _ }
+
+end BouquetN
 
 /-! ## Free Group Decomposition: F_n ≃ ℤ * ... * ℤ
 
