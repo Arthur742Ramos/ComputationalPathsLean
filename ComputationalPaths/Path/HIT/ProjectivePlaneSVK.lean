@@ -131,9 +131,9 @@ noncomputable def glueBase : Path (@Pushout.inl Circle UnitU Circle boundaryMap 
 /-- congrArg of collapseMap on circleLoop gives a path in UnitU.
 Uses `unitU_loop_rweq_refl` from KleinBottleSVK. -/
 theorem collapseMap_circleLoop_rweq_refl :
-    RwEq (Path.congrArg collapseMap circleLoop) (Path.refl unitU) := by
+    RwEq.{u} (Path.congrArg collapseMap circleLoop.{u}) (Path.refl unitU) := by
   simpa [collapseMap] using
-    (KleinBottleSVK.congrArg_const_rweq_refl (A := Circle) (B := UnitU) unitU circleLoop)
+    (KleinBottleSVK.congrArg_const_rweq_refl (A := Circle.{u}) (B := UnitU.{u}) unitU circleLoop.{u})
 
 /-- inrPath of a loop RwEq to refl gives refl. Concrete version for our pushout. -/
 theorem inrPath_rweq_refl_concrete
@@ -143,27 +143,166 @@ theorem inrPath_rweq_refl_concrete
   apply rweq_trans (rweq_congrArg_of_rweq (@Pushout.inr Circle UnitU Circle boundaryMap collapseMap) h)
   exact rweq_refl _
 
-/-!
-The SVK presentation of RP² requires two geometric facts about the boundary
-circle and its image in the pushout.  We record these as a single typeclass so
-downstream results can remain explicit about their assumptions. -/
+/-! ## Boundary Triviality in the Pushout
 
-class HasBoundaryFacts : Prop where
-  inlPath_congrArg_boundaryMap_loop_rweq :
+For `ProjectivePlaneSVK`, the attaching circle is collapsed to the point `unitU`.
+Assuming loop-only glue naturality at `circleBase`, the image of the attaching
+loop becomes RwEq-trivial in the pushout, yielding the expected boundary
+relation `a² ≈ refl`. -/
+
+/-- `inlPath (congrArg boundaryMap circleLoop)` is RwEq to refl, assuming loop-only glue naturality. -/
+theorem inlPath_congrArg_boundaryMap_loop_rweq_refl
+    [Pushout.HasGlueNaturalLoopRwEq (A := Circle.{u}) (B := UnitU.{u}) (C := Circle.{u})
+      (f := boundaryMap) (g := collapseMap) circleBase.{u}] :
     RwEq.{u}
-      (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
-        (Path.congrArg boundaryMap circleLoop))
-      (Path.refl (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase)))
-  boundary_relation :
-    RwEq.{u} boundaryWordSVK (Path.refl baseSVK)
+      (@Pushout.inlPath Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap _ _
+        (Path.congrArg boundaryMap circleLoop.{u}))
+      (Path.refl
+        (@Pushout.inl Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap
+          (boundaryMap circleBase.{u}))) := by
+  let glue₀ :=
+    @Pushout.glue Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap circleBase.{u}
+  have hnat :
+      RwEq.{u}
+        (@Pushout.inlPath Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap _ _
+          (Path.congrArg boundaryMap circleLoop.{u}))
+        (Path.trans glue₀
+          (Path.trans
+            (@Pushout.inrPath Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap _ _
+              (Path.congrArg collapseMap circleLoop.{u}))
+            (Path.symm glue₀))) := by
+    simpa [glue₀] using
+      (Pushout.glue_natural_loop_rweq (A := Circle.{u}) (B := UnitU.{u}) (C := Circle.{u})
+        (f := boundaryMap) (g := collapseMap) (c₀ := circleBase.{u}) (p := circleLoop.{u}))
+  have hinr :
+      RwEq.{u}
+        (@Pushout.inrPath Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap _ _
+          (Path.congrArg collapseMap circleLoop.{u}))
+        (Path.refl (@Pushout.inr Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap unitU)) := by
+    exact
+      inrPath_rweq_refl_concrete (p := Path.congrArg collapseMap circleLoop.{u})
+        (h := collapseMap_circleLoop_rweq_refl)
+  have inner :
+      RwEq.{u}
+        (Path.trans
+          (@Pushout.inrPath Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap _ _
+            (Path.congrArg collapseMap circleLoop.{u}))
+          (Path.symm glue₀))
+        (Path.trans (Path.refl (@Pushout.inr Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap unitU))
+          (Path.symm glue₀)) :=
+    rweq_trans_congr_left (Path.symm glue₀) hinr
+  have step1 :
+      RwEq.{u}
+        (Path.trans glue₀
+          (Path.trans
+            (@Pushout.inrPath Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap _ _
+              (Path.congrArg collapseMap circleLoop.{u}))
+            (Path.symm glue₀)))
+        (Path.trans glue₀
+          (Path.trans (Path.refl (@Pushout.inr Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap unitU))
+            (Path.symm glue₀))) :=
+    rweq_trans_congr_right glue₀ inner
+  have step2 :
+      RwEq.{u}
+        (Path.trans glue₀
+          (Path.trans (Path.refl (@Pushout.inr Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap unitU))
+            (Path.symm glue₀)))
+        (Path.trans glue₀ (Path.symm glue₀)) := by
+    refine rweq_trans_congr_right glue₀ ?_
+    exact rweq_cmpA_refl_left (Path.symm glue₀)
+  have step3 :
+      RwEq.{u} (Path.trans glue₀ (Path.symm glue₀))
+        (Path.refl
+          (@Pushout.inl Circle.{u} UnitU.{u} Circle.{u} boundaryMap collapseMap
+            (boundaryMap circleBase.{u}))) :=
+    rweq_cmpA_inv_right glue₀
+  exact rweq_trans hnat (rweq_trans step1 (rweq_trans step2 step3))
 
-/-- `inlPath (congrArg boundaryMap circleLoop)` is RwEq to refl. -/
-abbrev inlPath_congrArg_boundaryMap_loop_rweq_refl [h : HasBoundaryFacts.{u}] :=
-  h.inlPath_congrArg_boundaryMap_loop_rweq
-
-/-- The boundary relation: `a²` is homotopic to the trivial loop. -/
-abbrev boundary_relation [h : HasBoundaryFacts.{u}] :=
-  h.boundary_relation
+/-- The boundary relation in `ProjectivePlaneSVK`: `a²` is homotopic to `refl`,
+assuming loop-only glue naturality at `circleBase`. -/
+theorem boundary_relation
+    [Pushout.HasGlueNaturalLoopRwEq (A := Circle.{u}) (B := UnitU.{u}) (C := Circle.{u})
+      (f := boundaryMap) (g := collapseMap) circleBase.{u}] :
+    RwEq.{u} boundaryWordSVK (Path.refl baseSVK) := by
+  have hEq :
+      @Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+        (Path.trans
+          (Path.symm (Path.ofEq boundaryMap_base))
+          (Path.trans (Path.congrArg boundaryMap circleLoop) (Path.ofEq boundaryMap_base))) =
+        boundaryWordSVK := by
+    simpa [boundaryWordSVK] using
+      _root_.congrArg
+        (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _)
+        boundaryMap_loop
+  have hStart :
+      RwEq boundaryWordSVK
+        (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+          (Path.trans
+            (Path.symm (Path.ofEq boundaryMap_base))
+            (Path.trans (Path.congrArg boundaryMap circleLoop) (Path.ofEq boundaryMap_base)))) :=
+    rweq_of_eq hEq.symm
+  let baseAdj :
+      Path
+        (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase))
+        baseSVK :=
+    @Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _ (Path.ofEq boundaryMap_base)
+  have hConjEq :
+      @Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+          (Path.trans
+            (Path.symm (Path.ofEq boundaryMap_base))
+            (Path.trans (Path.congrArg boundaryMap circleLoop) (Path.ofEq boundaryMap_base))) =
+        Path.trans (Path.symm baseAdj)
+          (Path.trans
+            (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+              (Path.congrArg boundaryMap circleLoop))
+            baseAdj) := by
+    unfold baseAdj
+    unfold Pushout.inlPath
+    rw [Path.congrArg_trans, Path.congrArg_symm, Path.congrArg_trans]
+  have hConj :
+      RwEq
+        (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+          (Path.trans
+            (Path.symm (Path.ofEq boundaryMap_base))
+            (Path.trans (Path.congrArg boundaryMap circleLoop) (Path.ofEq boundaryMap_base))))
+        (Path.trans (Path.symm baseAdj)
+          (Path.trans
+            (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+              (Path.congrArg boundaryMap circleLoop))
+            baseAdj)) :=
+    rweq_of_eq hConjEq
+  have hLoop := inlPath_congrArg_boundaryMap_loop_rweq_refl
+  have step1 :
+      RwEq
+        (Path.trans (Path.symm baseAdj)
+          (Path.trans
+            (@Pushout.inlPath Circle UnitU Circle boundaryMap collapseMap _ _
+              (Path.congrArg boundaryMap circleLoop))
+            baseAdj))
+        (Path.trans (Path.symm baseAdj)
+          (Path.trans
+            (Path.refl
+              (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase)))
+            baseAdj)) := by
+    have inner :=
+      rweq_trans_congr_left baseAdj hLoop
+    exact rweq_trans_congr_right (Path.symm baseAdj) inner
+  have step2 :
+      RwEq
+        (Path.trans (Path.symm baseAdj)
+          (Path.trans
+            (Path.refl
+              (@Pushout.inl Circle UnitU Circle boundaryMap collapseMap (boundaryMap circleBase)))
+            baseAdj))
+        (Path.trans (Path.symm baseAdj) baseAdj) := by
+    refine rweq_trans_congr_right (Path.symm baseAdj) ?_
+    exact rweq_cmpA_refl_left baseAdj
+  have step3 :
+      RwEq (Path.trans (Path.symm baseAdj) baseAdj) (Path.refl baseSVK) :=
+    rweq_cmpA_inv_left baseAdj
+  exact
+    rweq_trans hStart
+      (rweq_trans hConj (rweq_trans step1 (rweq_trans step2 step3)))
 
 /-! ## Fundamental Group via SVK -/
 
