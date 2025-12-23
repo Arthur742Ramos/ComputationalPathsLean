@@ -178,7 +178,7 @@ noncomputable def freeProductWordEquiv {G₁ G₂ : Type u} {H₁ H₂ : Type v}
 
 section MainEquiv
 
-variable [HasWedgeFundamentalGroupEquiv Circle Circle circleBase circleBase]
+variable [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase]
 
 /-- Step 1: π₁(figure-eight) ≃ FreeProductWord (π₁(S¹)) (π₁(S¹))
 

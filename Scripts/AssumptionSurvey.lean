@@ -1,5 +1,7 @@
 import Lean
 import ComputationalPaths
+import ComputationalPaths.Path.HIT.Sphere
+import ComputationalPaths.Path.HIT.HopfFibration
 
 open Lean
 open Lean.Meta
@@ -50,4 +52,15 @@ open ComputationalPaths.Scripts
 #cp_assumptions_for ComputationalPaths.Path.torusPiOneEquivIntProd
 #cp_assumptions_for ComputationalPaths.Path.projectivePiOneEquivZ2
 #cp_assumptions_for ComputationalPaths.Path.seifertVanKampenEquiv
+#cp_assumptions_for ComputationalPaths.Path.seifertVanKampenFullEquiv
+#cp_assumptions_for ComputationalPaths.Path.seifertVanKampenEquiv_of_decodeAmalg_bijective
+#cp_assumptions_for ComputationalPaths.Path.seifertVanKampenFullEquiv_of_decodeFullAmalg_bijective
+#cp_assumptions_for ComputationalPaths.Path.hasPushoutSVKEncodeData_of_decodeAmalg_bijective
+#cp_assumptions_for ComputationalPaths.Path.pushoutDecodeAmalg_surjective
+#cp_assumptions_for ComputationalPaths.Path.pushoutEncodeAmalg_surjective
 #cp_assumptions_for ComputationalPaths.Path.kleinPiOneEquivIntProd
+#cp_assumptions_for ComputationalPaths.Path.Sphere2.amalg_trivial_is_one
+#cp_assumptions_for ComputationalPaths.Path.HopfFibration.amalg_trivial_is_one_s3
+#cp_assumptions_for ComputationalPaths.Path.WedgeSVKInstances.wedgeDecodeEncodePrim
+#cp_assumptions_for ComputationalPaths.Path.WedgeSVKInstances.wedgeEncodeDecodeQuotPrim
+#cp_assumptions_for ComputationalPaths.Path.wedgeFundamentalGroupEquiv_of_decode_bijective

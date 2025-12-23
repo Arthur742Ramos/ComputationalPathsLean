@@ -1,0 +1,23 @@
+- Goal (incl. success criteria):
+  - Keep `main` (UNCONFIRMED) building warning-free while reducing/discharging Lean `assumption`/`by_cases`/axiom usage related to `SVK` (UNCONFIRMED meaning of SVK).
+  - Commit and push incremental progress as build stays green.
+- Constraints/Assumptions:
+  - Follow repo `AGENTS.md`: run `.\lake.cmd build` after non-trivial edits; zero-warning policy.
+  - Prefer small, incremental proof refactors; do not fix unrelated issues.
+- Key decisions:
+  - Start/maintain this Continuity Ledger in `CONTINUITY.md` (was missing).
+- State:
+  - Done:
+    - Created `CONTINUITY.md`.
+    - `.\lake.cmd build` succeeds on current working tree (172 jobs; no warnings observed).
+  - Now:
+    - Commit and push current changes (working tree modified; build green).
+  - Next:
+    - Locate `SVK`-related assumptions and attempt to discharge them.
+    - Rebuild (`.\lake.cmd build`) and keep warning-free; commit/push incremental progress.
+- Open questions (UNCONFIRMED if needed):
+  - What does `SVK` stand for in this codebase, and which files/lemmas are in scope?
+  - Are we targeting a specific branch/remote (assume `origin` unless configured otherwise)?
+- Working set (files/ids/commands):
+  - Files: `CONTINUITY.md`, `ComputationalPaths/Path/HIT/WedgeSVKAxiom.lean` (and other modified HIT files; see `git status`).
+  - Commands: `git status`, `git diff`, `git commit`, `git push`, `rg -n \"SVK\"`, `rg -n \"assumption\"`, `.\u005clake.cmd build`.

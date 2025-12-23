@@ -281,11 +281,13 @@ Similar analysis applies to encode-decode axioms for HITs like Circle, Wedge, et
    - Needed because we must analyze loop structure to extract integer windings.
    - Justified by the standard encode-decode argument for S¹.
 
-2. **Wedge SVK encode/decode data** (`WedgeSVKInstances.HasWedgeSVKEncodeData`):
-   - Needed because we must decompose wedge loops into left/right pieces.
-   - Justified by the Seifert-Van Kampen theorem (wedge case).
-   - Kept as an explicit typeclass assumption; an opt-in kernel-axiom instance is
-     provided by `ComputationalPaths.Path.HIT.WedgeSVKAxiom`.
+2. **Wedge SVK** (`π₁(A ∨ B) ≃ π₁(A) * π₁(B)`):
+   - The core development can assume explicit encode/decode data
+     (`WedgeSVKInstances.HasWedgeSVKEncodeData`) when it needs a concrete `encode` map.
+   - There is also a Prop-level interface (`HasWedgeSVKDecodeBijective`) that reconstructs
+     the equivalence noncomputably by classical choice.
+   - An opt-in kernel-axiom instance of the Prop-level interface is provided by
+     `ComputationalPaths.Path.HIT.WedgeSVKAxiom`.
 
 To prove these constructively would require:
 - A "flattening lemma" relating Ω(Pushout) to Pushout(Ω(...))

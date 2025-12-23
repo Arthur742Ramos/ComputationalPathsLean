@@ -451,6 +451,87 @@ instance hasGlueNaturalLoopRwEq_of_subsingleton (c₀ : C) [Subsingleton C] :
   hasGlueNaturalLoopRwEq_of_axiomK (A := A) (B := B) (C := C) (f := f) (g := g) c₀
     (hC := axiomK_of_subsingleton (A := C))
 
+/-- If both legs `A` and `B` satisfy Axiom K (all loops rewrite to refl), then glue naturality for
+loops holds automatically: both sides of the naturality statement reduce to the trivial loop in
+the pushout. -/
+theorem hasGlueNaturalLoopRwEq_of_axiomK_left_right (c₀ : C) (hA : AxiomK A) (hB : AxiomK B) :
+    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ where
+  glue_natural_loop_rweq_axiom p := by
+    have hf : RwEq (Path.congrArg f p) (Path.refl (f c₀)) := hA (f c₀) (Path.congrArg f p)
+    have hg : RwEq (Path.congrArg g p) (Path.refl (g c₀)) := hB (g c₀) (Path.congrArg g p)
+
+    have hlhs :
+        RwEq
+          (inlPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg f p))
+          (Path.refl (inl (A := A) (B := B) (C := C) (f := f) (g := g) (f c₀))) := by
+      simpa [inlPath] using
+        RwEq.trans
+          (rweq_congrArg_of_rweq (inl (A := A) (B := B) (C := C) (f := f) (g := g)) hf)
+          (rweq_congrArg_refl (inl (A := A) (B := B) (C := C) (f := f) (g := g)) (f c₀))
+
+    have hinr :
+        RwEq
+          (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+          (Path.refl (inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c₀))) := by
+      simpa [inrPath] using
+        RwEq.trans
+          (rweq_congrArg_of_rweq (inr (A := A) (B := B) (C := C) (f := f) (g := g)) hg)
+          (rweq_congrArg_refl (inr (A := A) (B := B) (C := C) (f := f) (g := g)) (g c₀))
+
+    let glue₀ := glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀
+
+    have inner_eq :
+        RwEq
+          (Path.trans
+            (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+            (Path.symm glue₀))
+          (Path.symm glue₀) := by
+      have step1 :
+          RwEq
+            (Path.trans
+              (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+              (Path.symm glue₀))
+            (Path.trans
+              (Path.refl (inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c₀)))
+              (Path.symm glue₀)) :=
+        rweq_trans_congr_left (Path.symm glue₀) hinr
+      have step2 :
+          RwEq
+            (Path.trans
+              (Path.refl (inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c₀)))
+              (Path.symm glue₀))
+            (Path.symm glue₀) :=
+        rweq_cmpA_refl_left (Path.symm glue₀)
+      exact RwEq.trans step1 step2
+
+    have hrhs :
+        RwEq
+          (Path.trans glue₀
+            (Path.trans
+              (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+              (Path.symm glue₀)))
+          (Path.refl (inl (A := A) (B := B) (C := C) (f := f) (g := g) (f c₀))) := by
+      have step3 :
+          RwEq
+            (Path.trans glue₀
+              (Path.trans
+                (inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.congrArg g p))
+                (Path.symm glue₀)))
+            (Path.trans glue₀ (Path.symm glue₀)) :=
+        rweq_trans_congr_right glue₀ inner_eq
+      exact RwEq.trans step3 (rweq_cmpA_inv_right glue₀)
+
+    exact RwEq.trans hlhs (rweq_symm hrhs)
+
+/-- A convenient specialization: if both legs are subsingletons, loop naturality holds
+without assumptions on the gluing type `C`. -/
+instance (priority := 50) hasGlueNaturalLoopRwEq_of_subsingleton_left_right (c₀ : C)
+    [Subsingleton A] [Subsingleton B] :
+    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ :=
+  hasGlueNaturalLoopRwEq_of_axiomK_left_right (A := A) (B := B) (C := C) (f := f) (g := g) c₀
+    (hA := axiomK_of_subsingleton (A := A))
+    (hB := axiomK_of_subsingleton (A := B))
+
 /-- If `C` has decidable equality and we assume `HasDecidableEqAxiomK C`, then `C`
 has Axiom K, hence glue naturality for loops follows. -/
 instance hasGlueNaturalLoopRwEq_of_decidableEq (c₀ : C)
@@ -458,6 +539,15 @@ instance hasGlueNaturalLoopRwEq_of_decidableEq (c₀ : C)
     HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ :=
   hasGlueNaturalLoopRwEq_of_axiomK (A := A) (B := B) (C := C) (f := f) (g := g) c₀
     (hC := decidableEq_implies_axiomK (A := C))
+
+/-- If both legs have decidable equality and the corresponding Axiom K interfaces, loop naturality
+holds without assumptions on the gluing type `C`. -/
+instance (priority := 50) hasGlueNaturalLoopRwEq_of_decidableEq_left_right (c₀ : C)
+    [DecidableEq A] [HasDecidableEqAxiomK A] [DecidableEq B] [HasDecidableEqAxiomK B] :
+    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ :=
+  hasGlueNaturalLoopRwEq_of_axiomK_left_right (A := A) (B := B) (C := C) (f := f) (g := g) c₀
+    (hA := decidableEq_implies_axiomK (A := A))
+    (hB := decidableEq_implies_axiomK (A := B))
 
 /-- Glue naturality for loops: For a loop p at c₀, inlPath(f*(p)) equals
 glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹ up to RwEq. This is the key fact for SVK. -/

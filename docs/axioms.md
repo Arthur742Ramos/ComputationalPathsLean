@@ -46,54 +46,26 @@ HoTT-style developments, not something that can be instantiated inside Lean’s 
 
 ## Current kernel axioms (global)
 
-`Scripts/AxiomInventory.lean` currently reports **45** kernel axioms when importing `ComputationalPaths`.
+`Scripts/AxiomInventory.lean` currently reports **36** kernel axioms when importing `ComputationalPaths`.
 
-They fall into two categories:
+### HIT interfaces (36 axioms)
 
-### HIT interfaces (43 axioms)
+Kernel axioms are restricted to HIT-style interfaces that are not constructible in standard Lean 4:
 
-- `Circle`, `Cylinder`, `MobiusBand` include point/path constructors **and** recursors.
-- `Cylinder` keeps only the β-rules used downstream (base points and the bottom loop).
-- `Torus`, `KleinBottle`, `ProjectivePlane` currently expose only point/path constructors (and the
-  defining surface relations), keeping the kernel axiom surface smaller.
-- `OrientableSurface` exposes the genus-indexed point/loop constructors plus the surface relation.
+- `Circle` (constructors + recursor/β rules)
+- `Cylinder` (constructors + the specific recursor/β rules used downstream)
+- `KleinBottle` (constructors + surface relation)
+- `ProjectivePlane` (constructors + loop-square relation)
+- `NonOrientableSurface` (constructors + 2-cell)
+- `OrientableSurface` (constructors + genus-indexed relation)
 
-- `Circle`
-- `Cylinder`
-- `Torus`
-- `KleinBottle`
-- `MobiusBand`
-- `ProjectivePlane`
-- `OrientableSurface`
+`Torus` and `MobiusBand` are now *constructed* types (`Circle × Circle` and `Circle`, respectively)
+and contribute no kernel axioms.
+
+Rewrite-system confluence is packaged as **non-kernel** typeclass assumptions
+(see `ComputationalPaths/Path/Rewrite/Confluence.lean` and `ComputationalPaths/Path/Rewrite/ConfluenceProof.lean`).
 
 No univalence or pushout computation/naturality principles remain as kernel axioms.
-
-### Confluence axioms (2 axioms)
-
-The LND_EQ-TRS confluence proof uses two axioms justified by critical pair analysis and termination:
-
-- `ComputationalPaths.Path.Rewrite.ConfluenceProof.local_confluence`
-  - **Statement**: For any `Step p q` and `Step p r`, there exists a `Join q r`.
-  - **Justification**: All critical pairs have been analyzed and shown to close:
-    - `trans_assoc` vs `trans_refl_left/right` (unit laws)
-    - `trans_assoc` vs `trans_symm/symm_trans` (inverse laws, via identity context technique)
-    - `symm_symm` vs `symm_refl/symm_trans_congr` (symmetry rules)
-    - Nested `trans_assoc` (pentagon identity)
-    - Non-overlapping steps commute via `commute_trans_left_right`
-  - **Technical note**: A fully constructive proof would require either making `Step` Type-valued
-    (breaking `Step.casesOn` elimination elsewhere) or exhaustive 76² = 5776 case splits.
-
-- `ComputationalPaths.Path.Rewrite.ConfluenceProof.step_strip_prop`
-  - **Statement**: For any `Step p q` and `Rw p r`, there exists `s` with `Rw q s` and `Rw r s`.
-  - **Justification**: Follows from `local_confluence` by iterative application (the "strip lemma").
-    The standard proof uses nested induction on the `Rw` derivation, applying the diamond lemma
-    at each step. Combined with termination (established in `Termination.lean` via RPO ordering),
-    this gives Newman's Lemma.
-
-These axioms enable the `HasJoinOfRw` instance in `ConfluenceProof.lean`, which provides:
-- `confluence_prop`: Prop-level confluence (proved by induction using the strip lemma)
-- `confluence_of_local`: Type-valued `Join` construction (via `Classical.choose`)
-- `instHasJoinOfRw`: The typeclass instance for downstream use
 
 ## Circle fundamental group (π₁(S¹) ≃ ℤ)
 
@@ -142,29 +114,18 @@ does *not* import it by default.
 
 Kernel axioms *used by* `ComputationalPaths.Path.torusPiOneEquivIntProd`:
 
-- `Torus`, `torusBase`, `torusLoop1`, `torusLoop2`
+- `Circle`, `circleBase`, `circleLoop`
 
 Non-kernel assumptions required by the torus encode/decode development:
-
-- `ComputationalPaths.Path.HasTorusLoopDecode`
-  - Torus-specific winding-number classification hypothesis for raw loops.
-  - Defined in `ComputationalPaths/Path/HIT/Torus.lean`.
-  - Speaks about *raw* loops (`Path torusBase torusBase`) and provides a normal form
-    `loop1^m ⬝ loop2^n` up to `RwEq`.
-  - This interface is now *derivable* from the quotient-level interface
-    `HasTorusPiOneEncode` via `hasTorusLoopDecodeOfPiOneEncode` in
-    `ComputationalPaths/Path/HIT/TorusStep.lean`.
 
 - `ComputationalPaths.Path.HasTorusPiOneEncode`
   - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
     an `encode : π₁(T²) → ℤ × ℤ` with `encode (torusDecode z) = z` and
     `torusDecode (encode x) = x`.
   - Defined in `ComputationalPaths/Path/HIT/TorusStep.lean`.
-  - Every `[HasTorusLoopDecode]` provides an instance, and conversely
-    `HasTorusPiOneEncode` can be turned back into `HasTorusLoopDecode` when a
-    raw-loop statement is required.
-  - Downstream developments (e.g. `ComputationalPaths/Path/Homotopy/LieGroups.lean`)
-    now depend only on this weaker hypothesis.
+  - Since `Torus` is defined as `Circle × Circle`, `TorusStep.lean` provides an instance
+    `[HasCirclePiOneEncode] → HasTorusPiOneEncode` using the product fundamental group theorem.
+  - Downstream developments can therefore depend only on the circle π₁ hypothesis.
 
 ### Opt-in "assumption-free" import
 
@@ -173,7 +134,7 @@ through your signatures, import:
 
 - `ComputationalPaths/Path/HIT/TorusPiOneAxiom.lean`
 
-This file adds a global `HasTorusPiOneEncode` **as a kernel axiom** and exports
+This file imports `CirclePiOneAxiom.lean` and exports
 `torusPiOneEquivIntProd' : π₁(T²) ≃ ℤ × ℤ` with no extra parameters. The core library
 does *not* import it by default.
 
@@ -301,7 +262,12 @@ These are now **non-kernel assumptions**:
 - `Pushout.HasIndGlueRwEq` (inductor β-rule on `glue`, up to `RwEq`)
 - `Pushout.HasGlueNaturalRwEq` (full glue naturality, up to `RwEq`)
 - `Pushout.HasGlueNaturalLoopRwEq` (loop-only glue naturality at a chosen basepoint)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeData` (encode/decode data for `seifertVanKampenEquiv`)
+- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeQuot` (SVK encode map)
+- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeEncode` (SVK law: `decode ∘ encode = id`)
+- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeDecode` (SVK law: `encode ∘ decode ~ id` up to `AmalgEquiv`)
+- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeDecodeFull` (SVK law: `encode ∘ decode ~ id` up to `FullAmalgEquiv`)
+- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeAmalgBijective` (SVK: Prop-level `pushoutDecodeAmalg` bijective)
+- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeFullAmalgBijective` (SVK: Prop-level `pushoutDecodeFullAmalg` bijective)
 
 They are defined in `ComputationalPaths/Path/HIT/Pushout.lean` and
 `ComputationalPaths/Path/HIT/PushoutPaths.lean`.
@@ -310,7 +276,29 @@ Notes:
 
 - The SVK decoding proof only needs the **loop-only** naturality hypothesis
   `Pushout.HasGlueNaturalLoopRwEq c₀`, and this is derived automatically in common cases
-  (e.g. `Subsingleton C`, or `[DecidableEq C] [HasDecidableEqAxiomK C]`).
-- The wedge case `π₁(A ∨ B) ≃ π₁(A) * π₁(B)` is packaged as the explicit typeclass
-  `WedgeSVKInstances.HasWedgeSVKEncodeData`; an opt-in kernel-axiom instance is provided by
-  `ComputationalPaths/Path/HIT/WedgeSVKAxiom.lean`.
+  (e.g. `Subsingleton C`, `[DecidableEq C] [HasDecidableEqAxiomK C]`,
+  or when both legs satisfy Axiom K (e.g. `Subsingleton A` and `Subsingleton B`,
+  or `[DecidableEq A] [HasDecidableEqAxiomK A]` and similarly for `B`)).
+- `seifertVanKampenEquiv` depends on the split SVK assumptions above; the legacy bundled
+  class `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeData` remains as a convenience wrapper.
+- `seifertVanKampenFullEquiv` is the corresponding equivalence with the *full* target
+  `FullAmalgamatedFreeProduct` (amalgamation + free reduction). It depends on
+  `HasPushoutSVKEncodeDecodeFull`, which is weaker than `HasPushoutSVKEncodeDecode`
+  (and is derived automatically when `HasPushoutSVKEncodeDecode` is available).
+- If you want to avoid assuming an explicit `encode` map, use the Prop-only wrapper
+  `seifertVanKampenEquiv_of_decodeAmalg_bijective`, which depends only on
+  `HasPushoutSVKDecodeAmalgBijective` (and builds `encode` by classical choice).
+- The analogous wrapper for the full target is
+  `seifertVanKampenFullEquiv_of_decodeFullAmalg_bijective`, which depends only on
+  `HasPushoutSVKDecodeFullAmalgBijective`.
+- If you need the legacy word-level `encode` data, it can be reconstructed noncomputably from
+  `HasPushoutSVKDecodeAmalgBijective` via
+  `hasPushoutSVKEncodeData_of_decodeAmalg_bijective` (in `PushoutPaths.lean`).
+- The wedge case `π₁(A ∨ B) ≃ π₁(A) * π₁(B)` is available in two layers:
+  - Explicit (non-kernel) encode/decode assumptions:
+    `WedgeSVKInstances.HasWedgeSVKEncodeQuot`, `WedgeSVKInstances.HasWedgeSVKDecodeEncode`,
+    and `WedgeSVKInstances.HasWedgeSVKEncodeDecode` (bundled as `WedgeSVKInstances.HasWedgeSVKEncodeData`).
+  - Prop-level interface `HasWedgeSVKDecodeBijective`, plus the choice-based equivalence
+    `wedgeFundamentalGroupEquiv_of_decode_bijective`.
+  An opt-in kernel-axiom instance of the Prop-level interface is provided by
+  `ComputationalPaths/Path/HIT/WedgeSVKAxiom.lean` (exporting `wedgeFundamentalGroupEquiv'`).

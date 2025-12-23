@@ -1,11 +1,12 @@
 /-
 # π₁(T²) ≃ ℤ × ℤ
 
-This module packages the winding-number encode/decode data from `Torus.lean`
-into a `SimpleEquiv` between `π₁(T²)` and `ℤ × ℤ`.
+This module packages the torus π₁ computation as a `SimpleEquiv`
+between `π₁(T²)` and `ℤ × ℤ`.
 -/
 
 import ComputationalPaths.Path.HIT.Torus
+import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 set_option maxHeartbeats 1000000
@@ -43,39 +44,38 @@ class HasTorusPiOneEncode : Type u where
     torusDecode.{u} (torusPiOneEncode.{u} x) = x :=
   HasTorusPiOneEncode.torusDecode_encode x
 
-/-- `HasTorusLoopDecode` (raw loop normal forms) implies the π₁-level interface. -/
-instance instHasTorusPiOneEncode [HasTorusLoopDecode.{u}] : HasTorusPiOneEncode.{u} where
-  encode := torusEncode
-  encode_torusDecode := torusEncode_torusDecode
-  torusDecode_encode := torusDecode_torusEncode
+/-!
+## Canonical instance from the circle π₁ computation
 
-/-- Build the raw loop encode/decode interface from the quotient-level one. -/
-noncomputable def hasTorusLoopDecodeOfPiOneEncode [HasTorusPiOneEncode.{u}] :
-    HasTorusLoopDecode.{u} where
-  encodePath := fun p => torusPiOneEncode.{u} (Quot.mk _ p)
-  encodePath_rweq := by
-    intro p q hpq
-    have hquot : (Quot.mk _ p : torusPiOne.{u}) = Quot.mk _ q :=
-      Quot.sound hpq
-    exact _root_.congrArg (torusPiOneEncode.{u}) hquot
-  encodePath_torusDecodePath := by
+Because `Torus` is defined as `Circle × Circle`, we can construct the torus
+π₁ encode/decode data from:
+- the product fundamental group equivalence, and
+- the circle π₁ encode/decode interface (`HasCirclePiOneEncode`).
+-/
+noncomputable instance instHasTorusPiOneEncode_ofCircle [HasCirclePiOneEncode.{u}] :
+    HasTorusPiOneEncode.{u} where
+  encode := fun x =>
+    let yz := prodPiOneEncode (A := Circle.{u}) (B := Circle.{u})
+      circleBase circleBase x
+    (circlePiOneEncode.{u} yz.1, circlePiOneEncode.{u} yz.2)
+  encode_torusDecode := by
     intro z
-    -- `torusDecode z` is definitionally `Quot.mk _ (torusDecodePath z)`.
-    simpa [torusDecode] using (torusPiOneEncode_torusDecode.{u} (z := z))
-  torusLoop_rweq_decode := by
-    intro p
-    have hq :
-        torusDecode.{u} (torusPiOneEncode.{u} (Quot.mk _ p)) =
-          (Quot.mk _ p : torusPiOne.{u}) :=
-      torusDecode_torusPiOneEncode (x := (Quot.mk _ p))
-    have hq' :
-        Quotient.mk (rwEqSetoid Torus torusBase torusBase)
-            (torusDecodePath (torusPiOneEncode.{u} (Quot.mk _ p))) =
-          Quotient.mk (rwEqSetoid Torus torusBase torusBase) p := by
-      simpa [torusDecode] using hq
-    have hr : RwEq (torusDecodePath (torusPiOneEncode.{u} (Quot.mk _ p))) p := by
-      simpa using (Quotient.exact (s := rwEqSetoid Torus torusBase torusBase) hq')
-    exact rweq_symm hr
+    -- Reduce to the product round-trip plus the circle round-trip.
+    cases z with
+    | mk m n =>
+        simp [torusDecode, prodPiOne_encode_decode, -circlePiOneEncode, -circleDecode, -circleDecode_eq_concrete]
+  torusDecode_encode := by
+    intro x
+    -- Reduce to the circle round-trip plus the product round-trip.
+    -- First simplify away the circle encode/decode round-trips.
+    simp [torusDecode, -circlePiOneEncode, -circleDecode, -circleDecode_eq_concrete]
+    -- Then use the product round-trip, taking care of the `Prod` η-expansion.
+    have heta :
+        ((prodPiOneEncode circleBase circleBase x).fst, (prodPiOneEncode circleBase circleBase x).snd) =
+          prodPiOneEncode circleBase circleBase x := by
+      cases prodPiOneEncode circleBase circleBase x <;> rfl
+    simpa [heta] using
+      (prodPiOne_decode_encode (A := Circle.{u}) (B := Circle.{u}) circleBase circleBase x)
 
 /-- Fundamental group of the torus is equivalent to `ℤ × ℤ`. -/
 noncomputable def torusPiOneEquivIntProd [HasTorusPiOneEncode.{u}] :
@@ -91,4 +91,3 @@ noncomputable def torusPiOneEquivIntProd [HasTorusPiOneEncode.{u}] :
 
 end Path
 end ComputationalPaths
-

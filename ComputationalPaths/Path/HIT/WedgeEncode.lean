@@ -2,7 +2,7 @@
 # Constructive Wedge Encode-Decode
 
 This module provides a constructive implementation of the encode-decode method
-for wedge sums, eliminating the axioms in PushoutPaths.lean.
+for wedge sums, assuming only that the decode map is bijective.
 
 The key insight is that for wedge sums A ∨ B:
 1. The decode function is already constructive
@@ -38,7 +38,7 @@ namespace Path
 universe u
 
 variable {A : Type u} {B : Type u} (a₀ : A) (b₀ : B)
-variable [WedgeSVKInstances.HasWedgeSVKEncodeData A B a₀ b₀]
+variable [HasWedgeSVKDecodeBijective A B a₀ b₀]
 
 /-! ## Alternative Approach: Encode via Bijectivity
 
@@ -48,8 +48,7 @@ we define encode INDIRECTLY by showing decode is bijective.
 The encode function can then be defined as the inverse of decode:
   encode(α) = w where decode(w) = α
 
-This approach leverages the existing encode-decode axioms from
-PushoutPaths.lean to prove the bijectivity properties.
+This approach uses the Prop-level assumption `HasWedgeSVKDecodeBijective`.
 -/
 
 /-! ## Bijectivity of Decode
@@ -65,49 +64,24 @@ This allows us to define encode as the inverse.
 theorem wedgeFreeProductDecode_nil :
     wedgeFreeProductDecode a₀ b₀ .nil = Quot.mk _ (Path.refl _) := rfl
 
-/-! ### Injectivity and Surjectivity of Decode
-
-We prove that decode is bijective using the encode-decode axioms from PushoutPaths.
-This allows us to define encode as the inverse of decode.
--/
-
-/-- Helper: encode ∘ decode = id on words.
-Proved by induction using the case axioms from PushoutPaths. -/
-theorem wedgeEncodeQuot_decode (w : WedgeFreeProductCode a₀ b₀) :
-    wedgeEncodeQuot a₀ b₀ (wedgeFreeProductDecode a₀ b₀ w) = w := by
-  exact (wedgeFundamentalGroupEquiv (A := A) (B := B) a₀ b₀).right_inv w
-
 /-- Injectivity: If decode w₁ = decode w₂, then w₁ = w₂.
-
-Proof: Apply encode to both sides, then use encode ∘ decode = id.
+This is provided by the `HasWedgeSVKDecodeBijective` assumption.
 -/
 theorem wedgeFreeProductDecode_injective
     (w₁ w₂ : WedgeFreeProductCode a₀ b₀)
     (h : wedgeFreeProductDecode a₀ b₀ w₁ = wedgeFreeProductDecode a₀ b₀ w₂) :
     w₁ = w₂ := by
-  -- Apply encode to both sides of h
-  have h' : wedgeEncodeQuot a₀ b₀ (wedgeFreeProductDecode a₀ b₀ w₁) =
-            wedgeEncodeQuot a₀ b₀ (wedgeFreeProductDecode a₀ b₀ w₂) := by
-    rw [h]
-  -- Use the encode-decode round-trip
-  rw [wedgeEncodeQuot_decode, wedgeEncodeQuot_decode] at h'
-  exact h'
+  exact
+    (HasWedgeSVKDecodeBijective.bijective (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)).1 h
 
 /-- Surjectivity: Every π₁ element is decode of some word.
 
-Proof: We use the encode axiom from PushoutPaths.lean.
-For any α in π₁, we can lift to a representative p and encode it.
-Then decode(encode p) = [p] = α by wedgeDecodeEncodeAxiom.
+This is provided by the `HasWedgeSVKDecodeBijective` assumption.
 -/
 theorem wedgeFreeProductDecode_surjective
     (α : π₁(Wedge A B a₀ b₀, Wedge.basepoint)) :
-    ∃ w, wedgeFreeProductDecode a₀ b₀ w = α := by
-  -- Lift α to a representative loop p
-  induction α using Quot.ind with
-  | _ p =>
-    -- Use the encoded word as our witness
-    -- decode(encode p) = [p] by wedgeDecodeEncodeAxiom
-    exact ⟨wedgeEncodeAxiom A B a₀ b₀ p, wedgeDecodeEncodeAxiom A B a₀ b₀ p⟩
+    ∃ w, wedgeFreeProductDecode a₀ b₀ w = α :=
+  (HasWedgeSVKDecodeBijective.bijective (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)).2 α
 
 /-- Define encode as the inverse of decode.
 
