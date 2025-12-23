@@ -379,6 +379,72 @@ lake clean
 - Chapter 6: Higher Inductive Types
 - Chapter 8: Homotopy Theory (π₁ calculations)
 
+## Continuity Ledger (Compaction-Safe Sessions)
+
+For long-running sessions that may exceed context limits, maintain a **Continuity Ledger** in `CONTINUITY.md`. This ensures session state survives context compaction.
+
+### How It Works
+
+1. **At the start of every turn**: Read `CONTINUITY.md`, update it to reflect the latest goal/constraints/decisions/state, then proceed with work.
+
+2. **Update the ledger** whenever any of these change:
+   - Goal or success criteria
+   - Constraints or assumptions
+   - Key decisions made
+   - Progress state (Done/Now/Next)
+   - Important tool outcomes
+
+3. **Keep it short and stable**: Facts only, no transcripts. Use bullets. Mark uncertainty as `UNCONFIRMED` (never guess).
+
+4. **After compaction**: If you notice missing recall or a summary event, refresh the ledger from visible context, mark gaps `UNCONFIRMED`, ask 1-3 targeted questions, then continue.
+
+### Ledger Format
+
+```markdown
+# CONTINUITY.md
+
+## Goal
+[What we're trying to achieve, including success criteria]
+
+## Constraints/Assumptions
+- [Key constraint 1]
+- [Assumption 2]
+
+## Key Decisions
+- [Decision 1]: [rationale]
+- [Decision 2]: [rationale]
+
+## State
+- **Done**: [completed items]
+- **Now**: [current focus]
+- **Next**: [upcoming items]
+
+## Open Questions
+- [Question 1] (UNCONFIRMED if uncertain)
+
+## Working Set
+- Files: [list of active files]
+- Commands: [recent important commands]
+```
+
+### Ledger vs TodoWrite
+
+| Tool | Purpose | Scope |
+|------|---------|-------|
+| `TodoWrite` | Short-term execution scaffolding | 3-7 step task list with pending/in_progress/completed |
+| `CONTINUITY.md` | Long-running continuity across compaction | What/why/current state (not micro-steps) |
+
+Keep them consistent: when the plan or state changes, update the ledger at the intent/progress level.
+
+### In Replies
+
+Begin long sessions with a brief **Ledger Snapshot**:
+```
+**Ledger**: [Goal summary] | Now: [current task] | Next: [upcoming]
+```
+
+Print the full ledger only when it materially changes or when requested.
+
 ## Tips for Claude
 
 1. **Read before editing**: Always `Read` a file before making changes
@@ -389,3 +455,4 @@ lake clean
 6. **Minimize axioms**: Prove as much as possible from existing axioms
 7. **Test edge cases**: For Fin'-indexed things, test genus 0, 1, and ≥2
 8. **Keep README updated**: Add new results to the README and highlights
+9. **Use the Continuity Ledger**: For long sessions, maintain `CONTINUITY.md` to survive compaction
