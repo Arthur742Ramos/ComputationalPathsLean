@@ -18,6 +18,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
 - **Lens spaces L(p,q)**: π₁(L(p,q)) ≃ ℤ/pℤ for all coprime p,q via Heegaard decomposition and SVK. Includes general `GeneralLensSpace p q` definition with coprimality requirement. First example of SVK producing **finite cyclic groups** (complementing infinite groups ℤ, ℤ×ℤ, ℤ*ℤ). Requires `HasLensPiOneEncode` or `HasGeneralLensPiOneEncode`.
 - **Orientable genus-g surfaces** (Σ_g): Complete proof that π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]...[a_g,b_g] = 1⟩ (surface group presentation), with special cases for sphere (g=0), torus (g=1), and non-abelian higher genus (g≥2).
+- **Non-orientable surfaces** (N_n): Complete proof that π₁(N_n) ≃ ⟨a₁,...,a_n | a₁²...a_n² = 1⟩ for genus-n non-orientable surfaces (n crosscaps). Special cases: RP² (n=1) with π₁ ≃ ℤ/2ℤ, Klein bottle (n=2) with π₁ ≃ ℤ ⋊ ℤ. Euler characteristic χ(N_n) = 2 - n.
 - **2-Sphere** (S²): π₁(S²) ≅ 1 (trivial) via SVK applied to the suspension decomposition Σ(S¹), plus π₂(S²) ≅ 1 via contractibility₃.
 - **Figure-eight space** (S¹ ∨ S¹): π₁ ≃ ℤ * ℤ (free group on 2 generators), demonstrating non-abelian fundamental groups.
 - **Bouquet of n circles** (∨ⁿS¹): π₁ ≃ F_n (free group on n generators), generalizing the figure-eight to arbitrary n with special cases n=0 (trivial), n=1 (ℤ), n=2 (ℤ * ℤ).
@@ -37,6 +38,12 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **Product fundamental group theorem**: π₁(A × B, (a,b)) ≃ π₁(A, a) × π₁(B, b) via path projection/pairing, enabling inductive computation of π₁(T^n) ≃ ℤⁿ.
 - **Higher product homotopy**: π_n(A × B) ≃ π_n(A) × π_n(B) for all n, generalizing the π₁ product theorem to higher homotopy groups. Application: π_n(Tᵏ) = 0 for n ≥ 2.
 - **Lie group connections**: SO(2) ≃ U(1) ≃ S¹ with π₁ ≃ ℤ, n-torus T^n = (S¹)^n as maximal torus in U(n), simply connected groups, ℤ₂ fundamental groups (SO(n) for n ≥ 3 via RP²), and comparison with Bordg-Cavalleri differential geometry approach.
+- **Complex projective spaces** (CP^n): Simply connected for n ≥ 1 (π₁(CP^n) = 1), with π₂(CP^n) ≃ ℤ via the generalized Hopf fibration S¹ → S^{2n+1} → CP^n. CP^∞ ≃ K(ℤ, 2).
+- **Quaternionic projective spaces** (HP^n): Simply connected with π₄(HP^n) ≃ ℤ, via S³ → S^{4n+3} → HP^n fibration.
+- **Whitehead theorem**: Weak homotopy equivalences between CW complexes are homotopy equivalences. Includes weak h.e. definitions, CW complex structure, and obstruction theory foundations.
+- **Mayer-Vietoris sequence**: Long exact sequence H_n(C) → H_n(A) ⊕ H_n(B) → H_n(X) → H_{n-1}(C) for X = A ∪ B, with exactness proofs and applications to sphere/wedge homology.
+- **Cellular homology**: Chain complexes, boundary maps, homology groups H_n(X) for CW complexes, with connections to singular homology.
+- **SVK applications**: Punctured plane π₁(ℝ² - {p}) ≃ ℤ, multiple punctures π₁(ℝ² - {p₁,...,pₙ}) ≃ F_{n-1}, graph fundamental groups, and doubles of manifolds.
 
 ## Quick Start
 - Build: `./lake.cmd build`
@@ -48,6 +55,15 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Rewrite/`](ComputationalPaths/Path/Rewrite/) — rewrite steps, closures (`Rw`, `RwEq`), and the quotient `PathRwQuot`.
 - [`ComputationalPaths/Path/Groupoid.lean`](ComputationalPaths/Path/Groupoid.lean) — weak and strict categorical packages for computational paths; groupoids extend the corresponding categories so composition/identities are shared.
 - [`ComputationalPaths/Path/OmegaGroupoid.lean`](ComputationalPaths/Path/OmegaGroupoid.lean) — **weak ω-groupoid structure** on computational paths with cells at each dimension, globular identities, and all coherence laws.
+- [`ComputationalPaths/Path/OmegaGroupoid/`](ComputationalPaths/Path/OmegaGroupoid/) — subdirectory with axiom analysis and derived coherences:
+  - [`Derived.lean`](ComputationalPaths/Path/OmegaGroupoid/Derived.lean) — demonstrates that most coherence axioms are derivable from `to_canonical`
+  - [`StepToCanonical.lean`](ComputationalPaths/Path/OmegaGroupoid/StepToCanonical.lean) — the key `to_canonical` axiom and its justification
+  - [`AxiomElimination.lean`](ComputationalPaths/Path/OmegaGroupoid/AxiomElimination.lean) — systematic elimination of redundant axioms
+  - [`AxiomAnalysis.lean`](ComputationalPaths/Path/OmegaGroupoid/AxiomAnalysis.lean) — analysis of axiom dependencies
+  - [`AxiomMinimality.lean`](ComputationalPaths/Path/OmegaGroupoid/AxiomMinimality.lean) — minimality proofs for axiom sets
+  - [`ComputationalConfluence.lean`](ComputationalPaths/Path/OmegaGroupoid/ComputationalConfluence.lean) — computational aspects of confluence
+  - [`ConfluenceWithCells.lean`](ComputationalPaths/Path/OmegaGroupoid/ConfluenceWithCells.lean) — confluence integrated with cell structure
+  - [`TypedRewriting.lean`](ComputationalPaths/Path/OmegaGroupoid/TypedRewriting.lean) — typed rewriting system foundations
 - [`ComputationalPaths/Path/Homotopy/`](ComputationalPaths/Path/Homotopy/) — loop spaces, rewrite monoids (`LoopMonoid`), loop groups (`LoopGroup`), π₁ interfaces, higher homotopy groups, truncation levels, and covering spaces.
 - [`ComputationalPaths/Path/Homotopy/HigherHomotopy.lean`](ComputationalPaths/Path/Homotopy/HigherHomotopy.lean) — higher homotopy groups π_n via iterated loop spaces and derivation quotients.
 - [`ComputationalPaths/Path/Homotopy/Truncation.lean`](ComputationalPaths/Path/Homotopy/Truncation.lean) — truncation levels (IsContr, IsProp, IsSet, IsGroupoid) connecting to HoTT n-types.
@@ -62,7 +78,17 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Homotopy/LieGroups.lean`](ComputationalPaths/Path/Homotopy/LieGroups.lean) — **Connections to Lie groups**: SO(2), U(1) as Circle with π₁ ≃ ℤ, n-torus T^n = (S¹)^n with `torusN_product_step` for inductive π₁(T^n) ≃ ℤⁿ, maximal tori in U(n) and SU(n), simply connected types, ℤ₂ fundamental groups, and comparison with Bordg-Cavalleri differential geometry approach.
 - [`ComputationalPaths/Path/Homotopy/Hurewicz.lean`](ComputationalPaths/Path/Homotopy/Hurewicz.lean) — **Hurewicz theorem**: H₁(X) ≃ π₁(X)^ab (abelianization). Defines commutators, abelianization, first homology group H₁. Examples: H₁(S¹∨S¹) ≃ ℤ×ℤ, H₁(Klein bottle) ≃ ℤ×ℤ/2ℤ. Higher Hurewicz for simply-connected spaces.
 - [`ComputationalPaths/Path/Homotopy/CoveringClassification.lean`](ComputationalPaths/Path/Homotopy/CoveringClassification.lean) — **Covering space classification** via Galois correspondence: covering spaces ↔ subgroups of π₁. Universal cover with `deck_equiv_pi1` (Deck(X̃/X) ≃ π₁(X)). Regular covers, normal subgroups, examples for circle, torus, figure-eight, projective plane.
+- [`ComputationalPaths/Path/Homotopy/WhiteheadTheorem.lean`](ComputationalPaths/Path/Homotopy/WhiteheadTheorem.lean) — **Whitehead theorem**: weak homotopy equivalences between CW complexes are homotopy equivalences. Includes `InducesIsoOnPiN`, `WeakHomotopyEquiv`, `HomotopyEquiv` structures, and obstruction theory.
+- [`ComputationalPaths/Path/Homotopy/CellularHomology.lean`](ComputationalPaths/Path/Homotopy/CellularHomology.lean) — **Cellular homology** for CW complexes: chain complexes, boundary maps, cellular homology groups H_n(X), and connections to singular homology.
+- [`ComputationalPaths/Path/Homotopy/MayerVietoris.lean`](ComputationalPaths/Path/Homotopy/MayerVietoris.lean) — **Mayer-Vietoris sequence**: long exact sequence H_n(C) → H_n(A) ⊕ H_n(B) → H_n(X) → H_{n-1}(C) for X = A ∪ B, with exactness proofs.
+- [`ComputationalPaths/Path/Homotopy/LongExactSequence.lean`](ComputationalPaths/Path/Homotopy/LongExactSequence.lean) — general long exact sequence infrastructure for homotopy and homology theories.
+- [`ComputationalPaths/Path/Homotopy/Pi2Surfaces.lean`](ComputationalPaths/Path/Homotopy/Pi2Surfaces.lean) — π₂ calculations for surfaces, extending π₁ results to higher homotopy.
+- [`ComputationalPaths/Path/Homotopy/LoopIteration.lean`](ComputationalPaths/Path/Homotopy/LoopIteration.lean) — loop iteration infrastructure supporting loop power operations and group structure.
+- [`ComputationalPaths/Path/Homotopy/Coproduct.lean`](ComputationalPaths/Path/Homotopy/Coproduct.lean) — coproduct constructions for homotopy-theoretic types.
+- [`ComputationalPaths/Path/Homotopy/Sets.lean`](ComputationalPaths/Path/Homotopy/Sets.lean) — set-theoretic constructions supporting homotopy definitions.
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
+- [`ComputationalPaths/Path/Rewrite/PathTacticExamples.lean`](ComputationalPaths/Path/Rewrite/PathTacticExamples.lean) — comprehensive test suite for path tactics demonstrating usage patterns.
+- [`ComputationalPaths/Path/Rewrite/MinimalAxioms.lean`](ComputationalPaths/Path/Rewrite/MinimalAxioms.lean) — analysis of minimal axiom requirements for the rewrite system.
 - [`ComputationalPaths/Path/Rewrite/ConfluenceProof.lean`](ComputationalPaths/Path/Rewrite/ConfluenceProof.lean) — **Confluence proof** via Newman's Lemma: critical pair analysis, local confluence, strip lemma, and `HasJoinOfRw` instance.
 - [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, canonical `circleDecode : ℤ → π₁(S¹)`, and the optional raw-loop interface `HasCircleLoopDecode`.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — quotient-level interface `HasCirclePiOneEncode`, `circlePiOneEquivInt : π₁(S¹) ≃ ℤ`, and winding-number algebra lemmas.
@@ -95,6 +121,11 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/QuaternionicHopf.lean`](ComputationalPaths/Path/HIT/QuaternionicHopf.lean) — **Quaternionic Hopf fibration** S³ → S⁷ → S⁴ with `sphere4_pi7_equiv_int` (π₇(S⁴) ≃ ℤ). Generator ν, Adams' theorem on Hopf invariant one, preview of octonionic Hopf fibration S⁷ → S¹⁵ → S⁸.
 - [`ComputationalPaths/Path/HIT/WedgeEncode.lean`](ComputationalPaths/Path/HIT/WedgeEncode.lean) — Constructive encode-decode for wedge sums using bijectivity, eliminating axioms from the SVK approach.
 - [`ComputationalPaths/Path/HIT/ProjectivePlaneSVK.lean`](ComputationalPaths/Path/HIT/ProjectivePlaneSVK.lean) — Alternative proof of π₁(RP²) ≃ ℤ₂ using Seifert-van Kampen on the CW-complex pushout.
+- [`ComputationalPaths/Path/HIT/NonOrientableSurface.lean`](ComputationalPaths/Path/HIT/NonOrientableSurface.lean) — **Non-orientable surfaces** N_n with π₁(N_n) ≃ ⟨a₁,...,a_n | a₁²...a_n² = 1⟩. Crosscap-based construction, Euler characteristic χ(N_n) = 2 - n, special cases RP² and Klein bottle.
+- [`ComputationalPaths/Path/HIT/SVKApplications.lean`](ComputationalPaths/Path/HIT/SVKApplications.lean) — **Additional SVK applications**: punctured plane π₁(ℝ² - {p}) ≃ ℤ, multiple punctures π₁(ℝ² - {p₁,...,pₙ}) ≃ F_{n-1}, graph fundamental groups, doubles of manifolds.
+- [`ComputationalPaths/Path/HIT/ComplexProjectiveSpaces.lean`](ComputationalPaths/Path/HIT/ComplexProjectiveSpaces.lean) — **Complex projective spaces** CP^n: π₁(CP^n) = 1 for n ≥ 1 (simply connected), π₂(CP^n) ≃ ℤ via generalized Hopf fibration.
+- [`ComputationalPaths/Path/HIT/QuaternionicProjectiveSpaces.lean`](ComputationalPaths/Path/HIT/QuaternionicProjectiveSpaces.lean) — **Quaternionic projective spaces** HP^n: simply connected with π₄(HP^n) ≃ ℤ via S³ → S^{4n+3} → HP^n fibration.
+- [`ComputationalPaths/Path/HIT/ProjectiveSpaces.lean`](ComputationalPaths/Path/HIT/ProjectiveSpaces.lean) — unified treatment of real, complex, and quaternionic projective spaces with common structure.
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -503,7 +534,7 @@ Two approaches are available:
 ## 2-Sphere π₁(S²) ≅ 1 (what to read)
 - **Definition** ([`Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean)): `Sphere2 := Suspension Circle` (suspension of S¹)
 - **Mathematical insight**: S² = Σ(S¹) = Pushout PUnit' PUnit' Circle, with both PUnit' having trivial π₁
-- **Main theorem** (`sphere2_piOne_trivial`): π₁(S²) ≅ 1 (trivial group)
+- **Main theorem** (`sphere2_pi1_trivial`): π₁(S²) ≅ 1 (trivial group)
 - **Proof via SVK**: When π₁(A) = π₁(B) = 1 in the pushout, the amalgamated free product collapses:
   ```
   π₁(S²) = 1 *_{π₁(S¹)} 1 = 1
