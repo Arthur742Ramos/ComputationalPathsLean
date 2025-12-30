@@ -17,6 +17,8 @@ import ComputationalPaths.Path.Rewrite.LNDEQ
 import ComputationalPaths.Path.Rewrite.Termination
 import ComputationalPaths.Path.Rewrite.Confluence
 import ComputationalPaths.Path.Rewrite.ConfluenceProof
+import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
+import ComputationalPaths.Path.Rewrite.TerminationBridge
 import ComputationalPaths.Path.Rewrite.PathTactic
 import ComputationalPaths.Path.Rewrite.StripLemma
 import ComputationalPaths.Path.Groupoid
@@ -60,6 +62,7 @@ import ComputationalPaths.Path.HIT.KleinBottleStep
 import ComputationalPaths.Path.HIT.KleinBottleSVK
 import ComputationalPaths.Path.HIT.ProjectivePlaneStep
 import ComputationalPaths.Path.HIT.ProjectivePlaneSVK
+import ComputationalPaths.Path.HIT.ProjectivePlanePi2
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.HIT.FigureEight
@@ -69,6 +72,7 @@ import ComputationalPaths.Path.HIT.HopfFibration
 import ComputationalPaths.Path.HIT.Pi2Sphere
 import ComputationalPaths.Path.HIT.Pi3Sphere
 import ComputationalPaths.Path.HIT.Pi4S3
+import ComputationalPaths.Path.HIT.Pi6S3
 import ComputationalPaths.Path.HIT.QuaternionicHopf
 import ComputationalPaths.Path.HIT.OrientableSurface
 import ComputationalPaths.Path.HIT.NonOrientableSurface
@@ -78,6 +82,8 @@ import ComputationalPaths.Path.HIT.ProjectiveSpaces
 import ComputationalPaths.Path.HIT.ComplexProjectiveSpaces
 import ComputationalPaths.Path.HIT.QuaternionicProjectiveSpaces
 import ComputationalPaths.Path.HIT.SVKApplications
+import ComputationalPaths.Path.HIT.JamesConstruction
+import ComputationalPaths.Path.HIT.HopfInvariantOne
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical

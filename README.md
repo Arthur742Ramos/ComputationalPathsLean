@@ -13,6 +13,10 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **π₃(S²) ≃ ℤ**: Third homotopy group of the 2-sphere via Hopf fibration, with π₃(S³) ≃ ℤ and isomorphism p_* : π₃(S³) → π₃(S²). Generator is the Hopf map η with Hopf invariant 1.
 - **π₄(S³) ≃ ℤ/2ℤ**: First torsion in homotopy groups. Generator is Ση (suspended Hopf map). Key property: 2·Ση = 0, demonstrating finite-order elements in higher homotopy groups.
 - **Quaternionic Hopf fibration**: S³ → S⁷ → S⁴ with π₇(S⁴) ≃ ℤ. Generator ν (quaternionic Hopf map) with Hopf invariant 1. Adams' theorem: only four Hopf fibrations exist (real, complex, quaternionic, octonionic).
+- **π₆(S³) ≃ ℤ/12ℤ**: First non-2-torsion homotopy group of spheres. Generator ν' with order 12. Demonstrates the complexity of higher homotopy beyond the 2-primary component.
+- **π₂(RP²) ≃ ℤ**: Second homotopy group of projective plane via covering space S² → RP². Shows non-simply-connected spaces can have non-trivial higher homotopy.
+- **James construction & stable stems**: J(X) ≃ ΩΣX gives computational approach to stable homotopy. Stable stems: πₛ₁ ≃ ℤ/2ℤ (η), πₛ₂ ≃ ℤ/2ℤ (η²), πₛ₃ ≃ ℤ/24ℤ (ν).
+- **Adams' H-space theorem**: Sⁿ admits H-space structure iff n ∈ {0, 1, 3, 7}. Proves S², S⁴, S⁵, S⁶, ... are NOT H-spaces. Only 1 axiom needed.
 - **Freudenthal suspension theorem**: Σ : π_n(X) → π_{n+1}(ΣX) is iso when n < 2k-1 (X is (k-1)-connected). Key result: π_n(Sⁿ) ≃ ℤ for all n ≥ 1. Stable homotopy groups πₛ_0 ≃ ℤ, πₛ_1 ≃ ℤ/2ℤ (Hopf element η).
 - **Suspension-loop adjunction**: Pointed types and maps infrastructure, suspension as pointed type, adjunction map construction, and Freudenthal suspension theorem foundations.
 - **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
@@ -22,7 +26,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **2-Sphere** (S²): π₁(S²) ≅ 1 (trivial) via SVK applied to the suspension decomposition Σ(S¹), plus π₂(S²) ≅ 1 via contractibility₃.
 - **Figure-eight space** (S¹ ∨ S¹): π₁ ≃ ℤ * ℤ (free group on 2 generators), demonstrating non-abelian fundamental groups.
 - **Bouquet of n circles** (∨ⁿS¹): π₁ ≃ F_n (free group on n generators), generalizing the figure-eight to arbitrary n with special cases n=0 (trivial), n=1 (ℤ), n=2 (ℤ * ℤ).
-- **Path simplification tactics**: 27 tactics including `path_simp`, `path_auto`, `path_normalize`, `path_beta`, `path_eta`, plus structural tactics (`path_inv_inv`, `path_inv_distr`, `path_cancel_left/right`) and congruence tactics (`path_congr_symm`, `path_congrArg`) for automated RwEq reasoning.
+- **Path simplification tactics**: 29 tactics including `path_simp`, `path_auto`, `path_normalize`, `path_beta`, `path_eta`, plus structural tactics (`path_inv_inv`, `path_inv_distr`, `path_cancel_left/right`, `path_then_cancel_left/right`) and congruence tactics (`path_congr_symm`, `path_congrArg`) for automated RwEq reasoning.
 - **Hurewicz theorem**: H₁(X) ≃ π₁(X)^ab (abelianization). First homology as abelianization of fundamental group. Examples: H₁(S¹∨S¹) ≃ ℤ×ℤ (from non-abelian ℤ*ℤ), H₁(Klein bottle) ≃ ℤ×ℤ/2ℤ.
 - **Covering space classification**: Galois correspondence between covering spaces and subgroups of π₁. Deck(X̃/X) ≃ π₁(X) for universal cover. Regular covers correspond to normal subgroups.
 - **Covering space theory**: Total spaces, path lifting, π₁-action on fibers, universal cover, deck transformations.
@@ -46,8 +50,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - **SVK applications**: Punctured plane π₁(ℝ² - {p}) ≃ ℤ, multiple punctures π₁(ℝ² - {p₁,...,pₙ}) ≃ F_{n-1}, graph fundamental groups, and doubles of manifolds.
 
 ## Quick Start
-- Build: `./lake.cmd build`
-- Run demo: `./lake.cmd exe computational_paths` (prints version)
+- Build: `lake build`
+- Run demo: `lake exe computational_paths` (prints version)
 - Open in VS Code: install Lean 4 extension, open the folder, and build.
 
 ## Project Layout (selected)
@@ -90,6 +94,7 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Rewrite/PathTacticExamples.lean`](ComputationalPaths/Path/Rewrite/PathTacticExamples.lean) — comprehensive test suite for path tactics demonstrating usage patterns.
 - [`ComputationalPaths/Path/Rewrite/MinimalAxioms.lean`](ComputationalPaths/Path/Rewrite/MinimalAxioms.lean) — analysis of minimal axiom requirements for the rewrite system.
 - [`ComputationalPaths/Path/Rewrite/ConfluenceProof.lean`](ComputationalPaths/Path/Rewrite/ConfluenceProof.lean) — **Confluence proof** via Newman's Lemma: critical pair analysis, local confluence, strip lemma, and `HasJoinOfRw` instance.
+- [`ComputationalPaths/Path/Rewrite/TerminationBridge.lean`](ComputationalPaths/Path/Rewrite/TerminationBridge.lean) — **Termination-confluence bridge**: Connects RPO termination to confluence axioms. Proves lexicographic well-foundedness (`lexLt_wf`). Only 1 axiom (`step_nonincreasing`).
 - [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, canonical `circleDecode : ℤ → π₁(S¹)`, and the optional raw-loop interface `HasCircleLoopDecode`.
 - [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — quotient-level interface `HasCirclePiOneEncode`, `circlePiOneEquivInt : π₁(S¹) ≃ ℤ`, and winding-number algebra lemmas.
 - [`ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean`](ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean) — **opt-in**: installs a global `HasCirclePiOneEncode` instance as a kernel axiom and exports `circlePiOneEquivInt'` with no extra parameters.
@@ -118,6 +123,10 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/HIT/Pi2Sphere.lean`](ComputationalPaths/Path/HIT/Pi2Sphere.lean) — **Second homotopy group π₂(S²) ≃ ℤ** via Hopf fibration long exact sequence. Defines `S2TwoLoop` (2-loops in S²) with winding number, proves connecting map ∂ : π₂(S²) → π₁(S¹) is isomorphism (`hopf_connecting_iso`), and establishes `sphere2_pi2_equiv_int`.
 - [`ComputationalPaths/Path/HIT/Pi3Sphere.lean`](ComputationalPaths/Path/HIT/Pi3Sphere.lean) — **Third homotopy group π₃(S²) ≃ ℤ** via Hopf fibration. Defines `S3ThreeLoop` (3-loops in S³) and `S2ThreeLoop` (3-loops in S²), proves `sphere3_pi3_equiv_int` and `hopf_pi3_iso` (isomorphism from LES), establishes `sphere2_pi3_equiv_int`. Generator is the Hopf map η with Hopf invariant 1.
 - [`ComputationalPaths/Path/HIT/Pi4S3.lean`](ComputationalPaths/Path/HIT/Pi4S3.lean) — **Fourth homotopy group π₄(S³) ≃ ℤ/2ℤ** showing first torsion in homotopy groups. Generator Ση (suspended Hopf map) with `two_suspEta_trivial` proving 2·Ση = 0. Equivalence `sphere3_pi4_equiv_Z2`.
+- [`ComputationalPaths/Path/HIT/Pi6S3.lean`](ComputationalPaths/Path/HIT/Pi6S3.lean) — **Sixth homotopy group π₆(S³) ≃ ℤ/12ℤ** — first non-2-torsion in sphere homotopy. Generator ν' with order 12. Zero axioms (defined via type abbreviation).
+- [`ComputationalPaths/Path/HIT/ProjectivePlanePi2.lean`](ComputationalPaths/Path/HIT/ProjectivePlanePi2.lean) — **Second homotopy group π₂(RP²) ≃ ℤ** via covering space S² → RP². Zero axioms.
+- [`ComputationalPaths/Path/HIT/JamesConstruction.lean`](ComputationalPaths/Path/HIT/JamesConstruction.lean) — **James construction** J(X) ≃ ΩΣX with stable homotopy stems: πₛ₁ ≃ ℤ/2ℤ, πₛ₂ ≃ ℤ/2ℤ, πₛ₃ ≃ ℤ/24ℤ. Zero axioms (stems defined via type abbreviations).
+- [`ComputationalPaths/Path/HIT/HopfInvariantOne.lean`](ComputationalPaths/Path/HIT/HopfInvariantOne.lean) — **Adams' H-space theorem**: Sⁿ is H-space iff n ∈ {0,1,3,7}. Proves S², S⁴, S⁵, S⁶ are NOT H-spaces. Only 1 axiom (`sphere_HSpace_only`).
 - [`ComputationalPaths/Path/HIT/QuaternionicHopf.lean`](ComputationalPaths/Path/HIT/QuaternionicHopf.lean) — **Quaternionic Hopf fibration** S³ → S⁷ → S⁴ with `sphere4_pi7_equiv_int` (π₇(S⁴) ≃ ℤ). Generator ν, Adams' theorem on Hopf invariant one, preview of octonionic Hopf fibration S⁷ → S¹⁵ → S⁸.
 - [`ComputationalPaths/Path/HIT/WedgeEncode.lean`](ComputationalPaths/Path/HIT/WedgeEncode.lean) — Constructive encode-decode for wedge sums using bijectivity, eliminating axioms from the SVK approach.
 - [`ComputationalPaths/Path/HIT/ProjectivePlaneSVK.lean`](ComputationalPaths/Path/HIT/ProjectivePlaneSVK.lean) — Alternative proof of π₁(RP²) ≃ ℤ₂ using Seifert-van Kampen on the CW-complex pushout.
