@@ -171,8 +171,6 @@ theorem surfaceRelationWord_genus1_windings :
   rw [surfaceRelationWord_genus1, aGenIdx_1_0, bGenIdx_1_0]
   exact commutator_windings_zero
 
-#check @surfaceRelationWord_genus1_windings
-
 /-! ## Windings are preserved by SurfaceGroupRel 1 -/
 
 /-- sumPowersA is preserved by the surface group relation. -/
@@ -323,8 +321,6 @@ theorem torus_right_inv_def [HasPiOneEquivPresentation 1] (m n : Int) :
 
 -- Note: torus_left_inv_def is proved below, after the abelianization lemmas
 -- are established (see word_eq_canonical and presentation_eq_canonical).
-
-#check @torus_right_inv_def
 
 /-! ## Abelianization: Proving ab ≈ ba
 
@@ -1232,8 +1228,6 @@ theorem torus_left_inv_def [HasPiOneEquivPresentation 1] (α : SurfacePiOne 1) :
          (presentationOfWindings (presentationWindingA x) (presentationWindingB x))
     _ = (piOneEquivPresentation 1).invFun x := by rw [h_canonical]
     _ = α := (piOneEquivPresentation 1).left_inv α
-
-#check @torus_left_inv_def
 
 /-! ## Summary
 

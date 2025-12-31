@@ -88,9 +88,9 @@ macro "path_congr_left" h:term : tactic =>
 macro "path_congr_right" h:term : tactic =>
   `(tactic| exact rweq_trans_congr_right _ $h)
 
-/-- `path_congr h1 h2` applies congruence on both sides.
+/-- `path_congr h1, h2` applies congruence on both sides.
     If goal is `RwEq (trans p q) (trans p' q')`, uses h1 for left and h2 for right. -/
-macro "path_congr" h1:term h2:term : tactic =>
+macro "path_congr" h1:term "," h2:term : tactic =>
   `(tactic| exact rweq_trans_congr $h1 $h2)
 
 /-! ## Structural Tactics -/
@@ -148,15 +148,15 @@ macro "path_symm_refl" : tactic =>
 /-- `path_inv_distr` applies distribution of symm over trans: σ(p · q) ≈ σ(q) · σ(p). -/
 macro "path_inv_distr" : tactic =>
   `(tactic| first
-    | apply rweq_trans rweq_symm_trans_congr
-    | exact rweq_symm_trans_congr)
+    | exact rweq_symm_trans_congr
+    | apply rweq_trans rweq_symm_trans_congr)
 
 /-- `path_congr_symm h` applies symm congruence: if h : RwEq p q, then RwEq (symm p) (symm q). -/
 macro "path_congr_symm" h:term : tactic =>
   `(tactic| exact rweq_symm_congr $h)
 
-/-- `path_congrArg f h` applies congrArg congruence: if h : RwEq p q, then RwEq (congrArg f p) (congrArg f q). -/
-macro "path_congrArg" f:term h:term : tactic =>
+/-- `path_congrArg f, h` applies congrArg congruence: if h : RwEq p q, then RwEq (congrArg f p) (congrArg f q). -/
+macro "path_congrArg" f:term "," h:term : tactic =>
   `(tactic| exact rweq_congrArg_of_rweq $f $h)
 
 /-- `path_simp` simplifies RwEq goals using the extensive simp library.
@@ -319,6 +319,64 @@ macro "path_normalize_left" : tactic =>
       rweq_congrArg_refl, rweq_congrArg_trans, rweq_congrArg_symm
     ])
 
+/-! ## Combined Transitivity-Congruence Tactics
+
+These tactics combine transitivity with congruence, which is the most common
+pattern in RwEq proofs. They correspond to:
+- `apply rweq_trans (rweq_trans_congr_left q h)` - apply h in left position
+- `apply rweq_trans (rweq_trans_congr_right p h)` - apply h in right position
+-/
+
+/-- `path_trans_congr_left h` transforms goal `RwEq (trans p q) t` using `h : RwEq p p'`
+    to produce goal `RwEq (trans p' q) t`.
+
+    This is the combined pattern: `apply rweq_trans (rweq_trans_congr_left q h)` -/
+macro "path_trans_congr_left" h:term : tactic =>
+  `(tactic| apply rweq_trans (rweq_trans_congr_left _ $h))
+
+/-- `path_trans_congr_right h` transforms goal `RwEq (trans p q) t` using `h : RwEq q q'`
+    to produce goal `RwEq (trans p q') t`.
+
+    This is the combined pattern: `apply rweq_trans (rweq_trans_congr_right p h)` -/
+macro "path_trans_congr_right" h:term : tactic =>
+  `(tactic| apply rweq_trans (rweq_trans_congr_right _ $h))
+
+/-- `path_both_eq h1, h2` closes goal `RwEq p q` when `h1 : RwEq p t` and `h2 : RwEq q t`
+    for some common path t. The proof is `rweq_trans h1 (rweq_symm h2)`.
+
+    This is a very common pattern when showing two expressions are equal by
+    reducing both to the same normal form. -/
+macro "path_both_eq" h1:term "," h2:term : tactic =>
+  `(tactic| exact rweq_trans $h1 (rweq_symm $h2))
+
+/-- `path_chain h1, h2` applies `rweq_trans h1 h2` for chaining two hypotheses. -/
+macro "path_chain" h1:term "," h2:term : tactic =>
+  `(tactic| exact rweq_trans $h1 $h2)
+
+/-- `path_chain3 h1, h2, h3` chains three hypotheses via transitivity. -/
+macro "path_chain3" h1:term "," h2:term "," h3:term : tactic =>
+  `(tactic| exact rweq_trans $h1 (rweq_trans $h2 $h3))
+
+/-- `path_chain4 h1, h2, h3, h4` chains four hypotheses via transitivity. -/
+macro "path_chain4" h1:term "," h2:term "," h3:term "," h4:term : tactic =>
+  `(tactic| exact rweq_trans $h1 (rweq_trans $h2 (rweq_trans $h3 $h4)))
+
+/-- `path_then_cancel_right` applies congruence then right inverse cancellation.
+    Transforms `trans p (trans q (symm q))` to `p`. -/
+macro "path_then_cancel_right" : tactic =>
+  `(tactic|
+    first
+    | exact rweq_trans (rweq_trans_congr_right _ (rweq_cmpA_inv_right _)) (rweq_cmpA_refl_right _)
+    | apply rweq_trans (rweq_trans_congr_right _ (rweq_cmpA_inv_right _)))
+
+/-- `path_then_cancel_left` applies congruence then left inverse cancellation.
+    Transforms `trans (trans (symm q) q) p` to `p`. -/
+macro "path_then_cancel_left" : tactic =>
+  `(tactic|
+    first
+    | exact rweq_trans (rweq_trans_congr_left _ (rweq_cmpA_inv_left _)) (rweq_cmpA_refl_left _)
+    | apply rweq_trans (rweq_trans_congr_left _ (rweq_cmpA_inv_left _)))
+
 /-! ## Beta/Eta Tactics -/
 
 /-- `path_beta` applies beta reduction rules for products, sigmas, and functions. -/
@@ -367,9 +425,9 @@ This module provides comprehensive automation for RwEq reasoning.
 ### Congruence Tactics
 8. **path_congr_left h**: Apply congruence on left of trans
 9. **path_congr_right h**: Apply congruence on right of trans
-10. **path_congr h1 h2**: Apply congruence on both sides
+10. **path_congr h1, h2**: Apply congruence on both sides (comma-separated)
 11. **path_congr_symm h**: Apply symm congruence (σ(p) ≈ σ(q) from p ≈ q)
-12. **path_congrArg f h**: Apply congrArg congruence (f*(p) ≈ f*(q) from p ≈ q)
+12. **path_congrArg f, h**: Apply congrArg congruence (comma-separated)
 
 ### Structural Tactics
 13. **path_assoc**: Reassociate to the right ((p·q)·r ≈ p·(q·r))
@@ -382,18 +440,22 @@ This module provides comprehensive automation for RwEq reasoning.
 20. **path_symm_refl**: Symm of refl (σ(ρ) ≈ ρ)
 21. **path_inv_distr**: Distribute symm over trans (σ(p·q) ≈ σ(q)·σ(p))
 
+### Combined Cancellation Tactics
+22. **path_then_cancel_right**: Congruence + right inverse cancellation
+23. **path_then_cancel_left**: Congruence + left inverse cancellation
+
 ### Advanced Automation Tactics
-22. **path_auto**: The most powerful tactic - combines simplification,
+24. **path_auto**: The most powerful tactic - combines simplification,
     congruence, beta/eta rules, and hypothesis search
-23. **path_auto!**: Aggressive version that also rewrites hypotheses
+25. **path_auto!**: Aggressive version that also rewrites hypotheses
 
 ### Normalization Tactics
-24. **path_normalize**: Put paths in canonical right-associated form
-25. **path_normalize_left**: Left-associating variant
+26. **path_normalize**: Put paths in canonical right-associated form
+27. **path_normalize_left**: Left-associating variant
 
 ### Beta/Eta Tactics
-26. **path_beta**: Apply beta rules for products, sigmas, functions
-27. **path_eta**: Apply eta expansion/contraction rules
+28. **path_beta**: Apply beta rules for products, sigmas, functions
+29. **path_eta**: Apply eta expansion/contraction rules
 
 ### Calc Support
 The `Trans` instance enables calc notation:

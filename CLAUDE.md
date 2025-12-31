@@ -124,6 +124,16 @@ The `path_*` tactics automate RwEq reasoning:
 | `path_cancel_left` | Left inverse cancellation | `trans (symm p) p ≈ refl` |
 | `path_cancel_right` | Right inverse cancellation | `trans p (symm p) ≈ refl` |
 | `path_trans_via t` | Transitivity via `t` | Split proof at intermediate |
+| `path_congr h1, h2` | Both sides congruence | Multi-argument (comma-separated) |
+| `path_congrArg f, h` | congrArg congruence | Multi-argument (comma-separated) |
+| `path_chain h1, h2` | Chain two hypotheses | Multi-argument (comma-separated) |
+| `path_chain3 h1, h2, h3` | Chain three hypotheses | Multi-argument (comma-separated) |
+| `path_chain4 h1, h2, h3, h4` | Chain four hypotheses | Multi-argument (comma-separated) |
+| `path_both_eq h1, h2` | Close when both reduce to same | Multi-argument (comma-separated) |
+| `path_trans_congr_left h` | Transitivity + left congruence | Transform left of trans |
+| `path_trans_congr_right h` | Transitivity + right congruence | Transform right of trans |
+| `path_then_cancel_right` | Congruence + right inverse cancel | `trans p (trans q (symm q)) ≈ p` |
+| `path_then_cancel_left` | Congruence + left inverse cancel | `trans (trans (symm q) q) p ≈ p` |
 
 #### When to Use Each Tactic
 
@@ -364,6 +374,7 @@ lake clean
 4. **Noncomputable**: Most definitions involving HITs need `noncomputable`
 5. **Quotient equality direction**: `Quot.sound` needs `Setoid.r a b`, check the direction
 6. **Fin' vs Fin**: This codebase uses custom `Fin'` type, not Mathlib's `Fin`
+7. **Multi-argument macro syntax**: In Lean 4, tactic macros with multiple term arguments need comma separators (e.g., `path_congr h1, h2` not `path_congr h1 h2`). Without commas, Lean parses `h1 h2` as function application.
 
 ## References
 

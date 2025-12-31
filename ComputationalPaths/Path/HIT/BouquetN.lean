@@ -57,6 +57,11 @@ def toNat : {n : Nat} → Fin'B n → Nat
   | _, fzero => 0
   | _, fsucc k => k.toNat + 1
 
+/-- The natural number representation of a Fin'B is less than the bound. -/
+theorem toNat_lt : {n : Nat} → (i : Fin'B n) → i.toNat < n
+  | Nat.succ _, fzero => Nat.zero_lt_succ _
+  | Nat.succ _, fsucc k => Nat.succ_lt_succ (toNat_lt k)
+
 end Fin'B
 
 /-! ## The Free Group on n Generators

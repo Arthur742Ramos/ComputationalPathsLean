@@ -210,10 +210,10 @@ example (p q : Path a b) (h : RwEq p q) :
     symm p ≈ symm q := by
   path_congr_symm h
 
-/-- `path_congrArg` applies congrArg congruence. -/
+/-- `path_congrArg f, h` applies congrArg congruence (comma-separated syntax). -/
 example {B : Type} (f : A → B) (p q : Path a b) (h : RwEq p q) :
     congrArg f p ≈ congrArg f q := by
-  path_congrArg f h
+  path_congrArg f, h
 
 /-- Combined: inverse distribution then apply congruence. -/
 example (p : Path a b) (q : Path b c) :
@@ -224,6 +224,69 @@ example (p : Path a b) (q : Path b c) :
 example (p : Path a b) :
     symm (trans p (symm p)) ≈ trans (symm (symm p)) (symm p) := by
   path_inv_distr
+
+/-! ## 11. Combined Transitivity-Congruence Examples (Using Macros)
+
+These examples demonstrate the multi-argument macros for common proof patterns.
+-/
+
+/-- `path_congr h1, h2` applies congruence on both sides simultaneously. -/
+example (p p' : Path a b) (q q' : Path b c) (hp : RwEq p p') (hq : RwEq q q') :
+    RwEq (trans p q) (trans p' q') := by
+  path_congr hp, hq
+
+/-- `path_trans_congr_left h` applies hypothesis in left context. -/
+example (p p' : Path a b) (q : Path b c) (h : RwEq p p') :
+    RwEq (trans p q) (trans p' q) := by
+  path_trans_congr_left h
+  path_rfl
+
+/-- `path_trans_congr_right h` applies hypothesis in right context. -/
+example (p : Path a b) (q q' : Path b c) (h : RwEq q q') :
+    RwEq (trans p q) (trans p q') := by
+  path_trans_congr_right h
+  path_rfl
+
+/-- `path_both_eq h1, h2` closes goal when both sides reduce to same path. -/
+example (p q r : Path a b) (hp : RwEq p r) (hq : RwEq q r) :
+    RwEq p q := by
+  path_both_eq hp, hq
+
+/-- `path_chain h1, h2` chains two hypotheses via transitivity. -/
+example (p q r : Path a b) (h1 : RwEq p q) (h2 : RwEq q r) : RwEq p r := by
+  path_chain h1, h2
+
+/-- `path_chain3 h1, h2, h3` chains three hypotheses. -/
+example (p q r s : Path a b) (h1 : RwEq p q) (h2 : RwEq q r) (h3 : RwEq r s) :
+    RwEq p s := by
+  path_chain3 h1, h2, h3
+
+/-- `path_chain4 h1, h2, h3, h4` chains four hypotheses. -/
+example (p q r s t : Path a b)
+    (h1 : RwEq p q) (h2 : RwEq q r) (h3 : RwEq r s) (h4 : RwEq s t) :
+    RwEq p t := by
+  path_chain4 h1, h2, h3, h4
+
+/-- `path_congrArg f, h` applies congrArg congruence. -/
+example {B : Type} (f : A → B) (p q : Path a b) (h : RwEq p q) :
+    RwEq (congrArg f p) (congrArg f q) := by
+  path_congrArg f, h
+
+/-- Combined macro usage: congruence then simplification. -/
+example (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans (refl a) p) q) (trans p q) := by
+  path_trans_congr_left (rweq_cmpA_refl_left p)
+  path_rfl
+
+/-- `path_then_cancel_right` cancels right inverse in context. -/
+example (p : Path a b) (q : Path b c) :
+    RwEq (trans p (trans q (symm q))) p := by
+  path_then_cancel_right
+
+/-- `path_then_cancel_left` cancels left inverse in context. -/
+example (p : Path a b) (q : Path b a) :
+    RwEq (trans (trans (symm q) q) p) p := by
+  path_then_cancel_left
 
 /-! ## Summary
 
@@ -238,6 +301,7 @@ This module demonstrates:
 7. **Calc notation** with ≈ enables clean equational proofs
 8. **New structural tactics** (path_inv_inv, path_symm_refl, path_inv_distr)
 9. **New congruence tactics** (path_congr_symm, path_congrArg)
+10. **Combined tactics** (path_trans_congr_*, path_both_eq, path_chain, path_then_cancel_*)
 
 All examples build without `sorry` as regression tests.
 -/

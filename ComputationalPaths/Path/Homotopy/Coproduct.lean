@@ -25,6 +25,12 @@ universe u
 
 variable {A : Type u} {B : Type u}
 
+/-- Helper: Sum.inl a ≠ Sum.inr b -/
+private theorem sum_inl_ne_inr (a : A) (b : B) : Sum.inl a ≠ Sum.inr b := fun h => nomatch h
+
+/-- Helper: Sum.inr b ≠ Sum.inl a -/
+private theorem sum_inr_ne_inl (b : B) (a : A) : Sum.inr b ≠ Sum.inl a := fun h => nomatch h
+
 /-- The code family for characterizing paths in Sum A B from Sum.inl a₀.
     code(inl a) = (a₀ = a)
     code(inr b) = PEmpty (universe-polymorphic empty type) -/
@@ -45,7 +51,7 @@ def sumEncode {a₀ : A} {x : Sum A B} (p : Path (Sum.inl a₀) x) : sumCode a�
   | inr b =>
       -- p : Path (Sum.inl a₀) (Sum.inr b)
       -- p.toEq : Sum.inl a₀ = Sum.inr b, which is impossible
-      exact absurd p.toEq (Sum.noConfusion)
+      exact absurd p.toEq (sum_inl_ne_inr a₀ b)
 
 /-- decode: code(x) → (Sum.inl a₀ = x)
     For x = inl a, we lift the path via congrArg
@@ -62,7 +68,7 @@ def sumCodeR (b₀ : B) : Sum A B → Type u
 
 def sumEncodeR {b₀ : B} {x : Sum A B} (p : Path (Sum.inr b₀ : Sum A B) x) : sumCodeR b₀ x := by
   cases x with
-  | inl a => exact absurd p.toEq (Sum.noConfusion)
+  | inl a => exact absurd p.toEq (sum_inr_ne_inl b₀ a)
   | inr b => exact Path.ofEq (Sum.inr.injEq b₀ b ▸ p.toEq)
 
 def sumDecodeR {b₀ : B} {x : Sum A B} (c : sumCodeR b₀ x) : Path (Sum.inr b₀ : Sum A B) x := by
@@ -120,12 +126,12 @@ theorem sumDecodeR_respects_rweq (b₀ b : B) {c₁ c₂ : Path b₀ b} (h : RwE
 /-- No paths between inl and inr (the path type is uninhabited) -/
 theorem sum_inl_inr_path_empty (a : A) (b : B) (p : Path (Sum.inl a : Sum A B) (Sum.inr b)) :
     False :=
-  absurd p.toEq Sum.noConfusion
+  absurd p.toEq (sum_inl_ne_inr a b)
 
 /-- No paths between inr and inl (the path type is uninhabited) -/
 theorem sum_inr_inl_path_empty (a : A) (b : B) (p : Path (Sum.inr b : Sum A B) (Sum.inl a)) :
     False :=
-  absurd p.toEq Sum.noConfusion
+  absurd p.toEq (sum_inr_ne_inl b a)
 
 /-- Corollary: Sum of sets is a set.
 
@@ -147,11 +153,11 @@ theorem sum_isHSet [HasSumDecodeEncodeRwEq A B] (ha : IsHSet A) (hb : IsHSet B) 
           -- decode respects RwEq by functoriality of congrArg
           exact sumDecode_respects_rweq a₁ a₂ h
       | inr b₂ =>
-          exact absurd p.toEq Sum.noConfusion
+          exact absurd p.toEq (sum_inl_ne_inr a₁ b₂)
   | inr b₁ =>
       cases y with
       | inl a₂ =>
-          exact absurd p.toEq Sum.noConfusion
+          exact absurd p.toEq (sum_inr_ne_inl b₁ a₂)
       | inr b₂ =>
           have h : RwEq (sumEncodeR p) (sumEncodeR q) := hb (sumEncodeR p) (sumEncodeR q)
           apply rweq_trans (rweq_symm (sumDecodeR_encodeR_rweq b₁ b₂ p))

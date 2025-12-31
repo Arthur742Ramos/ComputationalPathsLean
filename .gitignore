@@ -38,4 +38,5 @@ nul
 # Generated axiom inventory outputs / local scratch
 axioms.txt
 axioms_all.txt
+build_log.txt
 Scripts/CheckCylinder.lean
