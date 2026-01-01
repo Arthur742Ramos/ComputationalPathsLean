@@ -1,53 +1,34 @@
 # CONTINUITY.md
-
 ## Goal
-Minimize axioms in the ComputationalPaths Algebra modules while maintaining a building codebase.
+- Land “nice” homotopy/topology results in Lean (builds, no warnings, no `sorry`).
 
 ## Constraints/Assumptions
-- Follow repo CLAUDE.md: run `lake build` after non-trivial edits; zero-warning policy
-- No sorries allowed
-- Prefer eliminating axioms by proving them constructively over consolidation
+- Run `.\lake.cmd build` after non-trivial edits; keep build warning-free.
+- No `sorry`.
 
 ## Key Decisions
-- Consolidated 16+ axioms → 9 in NielsenSchreier.lean via structural grouping
-- Consolidated 2 axioms → 1 in Abelianization.lean
-- Proved `inverse_respects_rel` constructively (was axiom) - key technique: use `rw [hgen]` for generator unification
+- Basepoint-independence: prove conjugation respects π₁ operations (`conjugateByPath_comp`, `conjugateByPath_inv`).
+- Covering classification: make `galois_correspondence` return an actual `SimpleEquiv` (currently via axiom `covering_equiv_subgroup`); keep `inducedSubgroup`/`IsRegularCover` as explicit placeholders pending functoriality infrastructure.
 
 ## State
-- **Done**:
-  - Eliminated `inverse_respects_rel` axiom via constructive proof
-  - Consolidated graph π₁ axioms into single `graphPi1Equiv`
-  - Consolidated Nielsen-Schreier axioms into `NielsenSchreierData` structure
-  - Consolidated abelianization axioms into single `freeGroup_ab_equiv_axiom`
-  - Derived `tree_pi1_trivial` theorem from `graphPi1Equiv`
-  - Added partial constructive infrastructure for abelianization equivalence:
-    - `singleGenWord`, `genPowAb`, `FreeGroupAb.mul`, `FreeGroupAb.one`
-    - `liftWord`, `buildWordRec`, `intPowToFreeGroupAbAux`
+- Done:
+  - Added `conjugateByPath_comp` and `conjugateByPath_inv` in `ComputationalPaths/Path/Homotopy/FundamentalGroupoid.lean`.
+  - Restated `galois_correspondence` as `SimpleEquiv (CoveringOf A a) (Subgroup A a)` in `ComputationalPaths/Path/Homotopy/CoveringClassification.lean`.
+  - Silenced unused-binder warnings in `ComputationalPaths/Path/Algebra/NielsenSchreier.lean` (underscore binders).
+  - `.\lake.cmd build` succeeds.
+  - Removed stray benchmark scripts under `Scripts/` (were unrequested).
+- Now:
+  - Commit and push the current changes to `origin/main`.
+- Next:
+  - If desired: strengthen placeholders (`inducedSubgroup`, `IsRegularCover`) once π₁/covering functoriality exists.
 
-- **Now**: Axiom minimization complete for current session
+## Open questions
+- UNCONFIRMED: Mapping of “first 2” items to the two implemented results.
 
-- **Next** (for future sessions):
-  - Prove `encode_decode`: `wordToIntPow (buildWordRec n v) = v`
-  - Prove `decode_encode`: any word equals canonical form in FreeGroupAb (complex - requires commutativity reordering)
-
-## Current Axiom Count (Algebra modules)
-- NielsenSchreier.lean: 9 axioms (structural + covering theory)
-- Abelianization.lean: 1 axiom (abelianization equivalence)
-- Total: 10 axioms
-
-## Axioms by Category
-1. **Structural HITs** (hard to eliminate without explicit constructions):
-   - `GraphRealization`, `graphVertex`, `graphEdgePath`, `graphRealization_connected`
-
-2. **Covering Space Theory** (deep theorems):
-   - `graphPi1Equiv` - π₁ of graphs is free
-   - `bouquetCovering_isGraph` - coverings are graphs
-   - `nielsenSchreierData` - Nielsen-Schreier theorem
-   - `schreierRankFormula` - Schreier index formula
-
-3. **Potentially Provable** (infrastructure added):
-   - `freeGroup_ab_equiv_axiom` - abelianization of free group is ℤⁿ
-
-## Working Set
-- Files: `NielsenSchreier.lean`, `Abelianization.lean`, `BouquetN.lean`
-- Commands: `lake build`, `lake build ComputationalPaths.Path.Algebra.NielsenSchreier`
+## Working set
+- Files:
+  - `ComputationalPaths/Path/Homotopy/FundamentalGroupoid.lean`
+  - `ComputationalPaths/Path/Homotopy/CoveringClassification.lean`
+  - `ComputationalPaths/Path/Algebra/NielsenSchreier.lean`
+- Commands:
+  - `.\lake.cmd build`

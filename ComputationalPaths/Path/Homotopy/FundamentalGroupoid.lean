@@ -189,6 +189,51 @@ theorem conjugateByPath_id {a b : A} (p : FundamentalGroupoid.Hom A a b) :
   unfold conjugateByPath FundamentalGroupoid.comp' FundamentalGroupoid.inv' LoopQuot.id
   simp only [PathRwQuot.trans_refl_left, PathRwQuot.symm_trans]
 
+/-- Conjugation by a path respects loop composition. -/
+theorem conjugateByPath_comp {a b : A} (p : FundamentalGroupoid.Hom A a b)
+    (α β : π₁(A, a)) :
+    conjugateByPath p (LoopQuot.comp α β) =
+      LoopQuot.comp (conjugateByPath p α) (conjugateByPath p β) := by
+  unfold conjugateByPath FundamentalGroupoid.comp' FundamentalGroupoid.inv' LoopQuot.comp
+  -- Reduce both sides to path concatenation in the rewrite quotient.
+  -- LHS: p⁻¹ · (α · β) · p
+  -- RHS: (p⁻¹ · α · p) · (p⁻¹ · β · p) with cancellation p · p⁻¹ = refl.
+  rw [PathRwQuot.trans_assoc α β p]
+  rw [PathRwQuot.trans_assoc (PathRwQuot.symm p) (PathRwQuot.trans α p)
+    (PathRwQuot.trans (PathRwQuot.symm p) (PathRwQuot.trans β p))]
+  rw [(PathRwQuot.trans_assoc (PathRwQuot.trans α p) (PathRwQuot.symm p)
+    (PathRwQuot.trans β p)).symm]
+  have hcancel :
+      PathRwQuot.trans (PathRwQuot.trans α p) (PathRwQuot.symm p) = α := by
+    rw [PathRwQuot.trans_assoc α p (PathRwQuot.symm p)]
+    rw [PathRwQuot.trans_symm, PathRwQuot.trans_refl_right]
+  rw [hcancel]
+
+/-- Conjugation by a path respects loop inversion. -/
+theorem conjugateByPath_inv {a b : A} (p : FundamentalGroupoid.Hom A a b)
+    (α : π₁(A, a)) :
+    conjugateByPath p (LoopQuot.inv α) =
+      LoopQuot.inv (conjugateByPath p α) := by
+  -- Show both sides are left inverses of `conjugateByPath p α`, then cancel.
+  apply LoopQuot.comp_right_cancel (A := A) (a := b) (z := conjugateByPath p α)
+  have hx :
+      LoopQuot.comp (conjugateByPath p (LoopQuot.inv α)) (conjugateByPath p α) =
+        LoopQuot.id := by
+    calc
+      LoopQuot.comp (conjugateByPath p (LoopQuot.inv α)) (conjugateByPath p α)
+          = conjugateByPath p (LoopQuot.comp (LoopQuot.inv α) α) := by
+              exact
+                (conjugateByPath_comp (A := A) (p := p) (α := LoopQuot.inv α) (β := α)).symm
+      _ = conjugateByPath p LoopQuot.id := by
+            simp
+      _ = LoopQuot.id := by
+            exact conjugateByPath_id (A := A) (p := p)
+  have hy :
+      LoopQuot.comp (LoopQuot.inv (conjugateByPath p α)) (conjugateByPath p α) =
+        LoopQuot.id := by
+    simp
+  exact hx.trans hy.symm
+
 /-- The inverse conjugation map. -/
 def conjugateByPathInv {a b : A} (p : FundamentalGroupoid.Hom A a b) :
     π₁(A, b) → π₁(A, a) :=

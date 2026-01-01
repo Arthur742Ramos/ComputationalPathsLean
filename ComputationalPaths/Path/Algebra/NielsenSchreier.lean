@@ -267,7 +267,7 @@ structure FiniteGraph extends Graph where
 
 /-- A graph is connected if any two vertices can be joined by a path. -/
 class IsConnected (Γ : Graph) : Prop where
-  connected : ∀ (v w : Γ.V), ∃ (_path : List Γ.E), True  -- Simplified
+  connected : ∀ (_v _w : Γ.V), ∃ (_path : List Γ.E), True  -- Simplified
 
 /-- The Euler characteristic of a finite graph: χ = V - E. -/
 def eulerChar (Γ : FiniteGraph) : Int := Γ.numV - Γ.numE
@@ -279,7 +279,7 @@ def eulerChar (Γ : FiniteGraph) : Int := Γ.numV - Γ.numE
     For a single cycle (E = V): rank = 1
     For general graph: rank = E - V + 1 -/
 def graphPi1Rank (Γ : FiniteGraph) : Nat :=
-  if h : Γ.numE + 1 ≥ Γ.numV then
+  if _h : Γ.numE + 1 ≥ Γ.numV then
     Γ.numE + 1 - Γ.numV  -- Equals E - V + 1 in integers
   else
     0  -- Disconnected/invalid case
@@ -319,7 +319,7 @@ structure SpanningTree (Γ : Graph) where
   /-- Which edges are in the tree. -/
   inTree : Γ.E → Prop
   /-- The tree edges connect all vertices. -/
-  spans : ∀ (v w : Γ.V), ∃ (_path : List { e : Γ.E // inTree e }), True
+  spans : ∀ (_v _w : Γ.V), ∃ (_path : List { e : Γ.E // inTree e }), True
   /-- The tree has no cycles. -/
   acyclic : True  -- Simplified
 
