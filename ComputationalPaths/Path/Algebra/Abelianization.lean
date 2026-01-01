@@ -307,6 +307,25 @@ def finToFin'B : {n : Nat} → Fin n → Fin'B n
   | _ + 1, ⟨0, _⟩ => Fin'B.fzero
   | _ + 1, ⟨k + 1, h⟩ => Fin'B.fsucc (finToFin'B ⟨k, Nat.lt_of_succ_lt_succ h⟩)
 
+/-- finToFin'B preserves the natural number value. -/
+theorem finToFin'B_toNat : {n : Nat} → (i : Fin n) → (finToFin'B i).toNat = i.val
+  | _ + 1, ⟨0, _⟩ => rfl
+  | _ + 1, ⟨k + 1, h⟩ => by
+      simp only [finToFin'B, Fin'B.toNat]
+      have ih := finToFin'B_toNat ⟨k, Nat.lt_of_succ_lt_succ h⟩
+      rw [ih]
+
+/-- finToFin'B is the inverse of toNat: given g : Fin'B n, finToFin'B ⟨g.toNat, ...⟩ = g -/
+theorem finToFin'B_inverse : {n : Nat} → (g : Fin'B n) →
+    finToFin'B ⟨g.toNat, Fin'B.toNat_lt g⟩ = g
+  | _ + 1, .fzero => rfl
+  | _ + 1, .fsucc k => by
+      simp only [Fin'B.toNat, finToFin'B]
+      congr 1
+      -- Need: finToFin'B ⟨k.toNat, _⟩ = k
+      -- Both proofs give the same Fin since they have the same .val
+      exact finToFin'B_inverse k
+
 /-- freeGroupToIntPow respects the AbelianizationRel. -/
 theorem freeGroupToIntPow_respects_abelianization {n : Nat} {x y : BouquetFreeGroup n}
     (h : AbelianizationRel (BouquetFreeGroup n) BouquetFreeGroup.mul BouquetFreeGroup.inv
@@ -394,6 +413,17 @@ noncomputable def FreeGroupAb.mul {n : Nat} (x y : FreeGroupAb n) : FreeGroupAb 
 def FreeGroupAb.one {n : Nat} : FreeGroupAb n :=
   toAb (BouquetFreeGroup.one (n := n))
 
+/-- Commutativity in FreeGroupAb: multiplication is commutative. -/
+theorem FreeGroupAb.mul_comm {n : Nat} (x y : FreeGroupAb n) :
+    FreeGroupAb.mul x y = FreeGroupAb.mul y x := by
+  induction x using Quot.ind with
+  | _ a =>
+    induction y using Quot.ind with
+    | _ b =>
+      simp only [FreeGroupAb.mul]
+      apply Quot.sound
+      exact AbelianizationRel.comm a b
+
 /-! ### Partial Constructive Infrastructure
 
 The following provides infrastructure toward a constructive proof of the
@@ -411,45 +441,740 @@ def liftWord : {n : Nat} → BouquetWord n → BouquetWord (n + 1)
   | _, .nil => BouquetWord.nil
   | _, .cons l rest => BouquetWord.cons ⟨Fin'B.fsucc l.gen, l.power, l.power_ne_zero⟩ (liftWord rest)
 
-/-- Build word by recursion: gₘ₋₁^{v(m-1)} · lifted(g₀^{v(0)} · ... · gₘ₋₂^{v(m-2)}).
+/-- wordToIntPow on singleGenWord gives the appropriate unit vector scaled by k. -/
+theorem wordToIntPow_singleGenWord {n : Nat} (i : Fin n) (k : Int) :
+    wordToIntPow (singleGenWord i k) = fun j => if i = j then k else 0 := by
+  unfold singleGenWord
+  by_cases hk : k = 0
+  · simp only [hk, ↓reduceDIte, wordToIntPow]
+    funext j
+    simp only [IntPow.zero]
+    split <;> rfl
+  · simp only [hk, ↓reduceDIte, wordToIntPow]
+    funext j
+    simp only [IntPow.zero]
+    have hgen : (finToFin'B i).toNat < n := by
+      rw [finToFin'B_toNat]
+      exact i.isLt
+    simp only [hgen, ↓reduceDIte]
+    rw [finToFin'B_toNat]
+    by_cases hij : i.val = j.val
+    · have heq : i = j := Fin.ext hij
+      simp only [heq, ↓reduceIte, Int.add_zero]
+    · have hne : i ≠ j := fun h => hij (by rw [h])
+      simp only [hne, ↓reduceIte, hij]
+
+/-- Helper: liftWord on nil gives zero. -/
+@[simp] theorem liftWord_nil {n : Nat} :
+    wordToIntPow (liftWord (n := n) BouquetWord.nil) = IntPow.zero := by
+  simp only [liftWord, wordToIntPow]
+
+/-- liftWord shifts generator indices, so at index 0 we get 0, and at index k+1 we get value at k. -/
+theorem liftWord_wordToIntPow {n : Nat} (w : BouquetWord n) (j : Fin (n + 1)) :
+    wordToIntPow (liftWord w) j =
+      match j with
+      | ⟨0, _⟩ => 0
+      | ⟨k + 1, h⟩ => wordToIntPow w ⟨k, Nat.lt_of_succ_lt_succ h⟩ := by
+  induction w generalizing j with
+  | nil =>
+    simp only [liftWord, wordToIntPow]
+    match j with
+    | ⟨0, _⟩ => simp only [IntPow.zero]
+    | ⟨k + 1, _⟩ => simp only [IntPow.zero]
+  | cons l rest ih =>
+    simp only [liftWord, wordToIntPow]
+    have hgen : (Fin'B.fsucc l.gen).toNat < n + 1 := by
+      simp only [Fin'B.toNat]
+      have hlt := Fin'B.toNat_lt l.gen
+      omega
+    simp only [hgen, ↓reduceDIte]
+    match j with
+    | ⟨0, _⟩ =>
+      -- At index 0, fsucc of any generator gives non-zero toNat
+      have hne : (Fin'B.fsucc l.gen).toNat ≠ 0 := by
+        simp only [Fin'B.toNat]
+        omega
+      simp only [hne, ↓reduceIte]
+      -- ih gives us the value from rest
+      have ihVal := ih ⟨0, Nat.zero_lt_succ n⟩
+      simp only at ihVal
+      exact ihVal
+    | ⟨k + 1, h⟩ =>
+      -- At index k+1, we compare with (fsucc l.gen).toNat = l.gen.toNat + 1
+      have htoNat : (Fin'B.fsucc l.gen).toNat = l.gen.toNat + 1 := by simp only [Fin'B.toNat]
+      rw [htoNat]
+      have hgenOrig : l.gen.toNat < n := Fin'B.toNat_lt l.gen
+      have hkLtN : k < n := Nat.lt_of_succ_lt_succ h
+      -- Compare k + 1 with l.gen.toNat + 1, which is same as comparing k with l.gen.toNat
+      by_cases hcmp : l.gen.toNat + 1 = k + 1
+      · -- Equal case
+        have hcmpK : l.gen.toNat = k := by omega
+        simp only [hcmp, ↓reduceIte]
+        rw [dif_pos hgenOrig]
+        simp only [hcmpK, ↓reduceIte]
+        -- ih gives us the value from rest at position k
+        have ihVal := ih ⟨k + 1, h⟩
+        simp only at ihVal
+        omega
+      · -- Not equal case
+        have hcmpK : l.gen.toNat ≠ k := by omega
+        simp only [hcmp, ↓reduceIte]
+        rw [dif_pos hgenOrig]
+        simp only [hcmpK, ↓reduceIte]
+        have ihVal := ih ⟨k + 1, h⟩
+        simp only at ihVal
+        exact ihVal
+
+/-- Build word by recursion: g₀^{v(0)} · g₁^{v(1)} · ... · gₙ₋₁^{v(n-1)}.
     The result represents the product of all generators with their respective powers. -/
 def buildWordRec : (n : Nat) → (v : Fin n → Int) → BouquetWord n
   | 0, _ => BouquetWord.nil
   | m + 1, v =>
-      let gen_m := singleGenWord ⟨m, Nat.lt_succ_self m⟩ (v ⟨m, Nat.lt_succ_self m⟩)
-      let rest := buildWordRec m (fun i => v ⟨i.val, Nat.lt_trans i.isLt (Nat.lt_succ_self m)⟩)
-      BouquetWord.wordConcat gen_m (liftWord rest)
+      -- gen_0 is the term for generator 0 with power v(0)
+      let gen_0 := singleGenWord ⟨0, Nat.zero_lt_succ m⟩ (v ⟨0, Nat.zero_lt_succ m⟩)
+      -- rest handles generators 0..m-1 with shifted values v(1), v(2), ..., v(m)
+      let rest := buildWordRec m (fun i => v ⟨i.val + 1, Nat.succ_lt_succ i.isLt⟩)
+      -- liftWord shifts rest's generators 0..m-1 to 1..m, then we prepend gen_0
+      BouquetWord.wordConcat gen_0 (liftWord rest)
 
 /-- Constructive inverse map candidate: IntPow n → FreeGroupAb n.
     Builds the canonical word gₙ₋₁^{v(n-1)} · ... · g₀^{v(0)} and projects to FreeGroupAb. -/
 def intPowToFreeGroupAbAux (n : Nat) (v : Fin n → Int) : FreeGroupAb n :=
   toAb (Quot.mk _ (buildWordRec n v))
 
-/-- **Abelianization Equivalence Axiom**: F_n^ab ≃ ℤⁿ
+/-- toAb respects wordConcat as multiplication. -/
+theorem toAb_wordConcat {n : Nat} (w₁ w₂ : BouquetWord n) :
+    toAb (Quot.mk _ (BouquetWord.wordConcat w₁ w₂)) =
+    FreeGroupAb.mul (toAb (Quot.mk _ w₁)) (toAb (Quot.mk _ w₂)) := by
+  simp only [toAb, FreeGroupAb.mul, BouquetFreeGroup.mul]
 
-This single axiom captures the isomorphism between the abelianization of the
-free group on n generators and ℤⁿ (the free abelian group on n generators).
+/-- liftWord distributes over wordConcat. -/
+theorem liftWord_wordConcat {n : Nat} (w₁ w₂ : BouquetWord n) :
+    liftWord (BouquetWord.wordConcat w₁ w₂) =
+    BouquetWord.wordConcat (liftWord w₁) (liftWord w₂) := by
+  induction w₁ with
+  | nil => simp only [BouquetWord.wordConcat, liftWord]
+  | cons l rest ih => simp only [BouquetWord.wordConcat, liftWord, ih]
 
-Mathematically:
-- The map F_n → ℤⁿ sends each generator to the corresponding basis vector
-- This map is a homomorphism (proved constructively above)
-- The abelianization relation forces commutativity, making the kernel exactly [F_n, F_n]
-- By the universal property, the induced map F_n^ab → ℤⁿ is an isomorphism
+/-- toAb of liftWord distributes over multiplication. -/
+theorem toAb_liftWord_mul {n : Nat} (w₁ w₂ : BouquetWord n) :
+    toAb (Quot.mk _ (liftWord (BouquetWord.wordConcat w₁ w₂))) =
+    FreeGroupAb.mul (toAb (Quot.mk _ (liftWord w₁))) (toAb (Quot.mk _ (liftWord w₂))) := by
+  rw [liftWord_wordConcat, toAb_wordConcat]
 
-This axiom provides both the inverse map and the round-trip properties. -/
-axiom freeGroup_ab_equiv_axiom : {n : Nat} → SimpleEquiv (FreeGroupAb n) (IntPow n)
+/-- liftWord respects BouquetRel: if w₁ ~ w₂ under BouquetRel n, then
+    liftWord w₁ ~ liftWord w₂ under BouquetRel (n+1). -/
+theorem liftWord_respects_BouquetRel {n : Nat} {w₁ w₂ : BouquetWord n}
+    (h : BouquetRel n w₁ w₂) : BouquetRel (n + 1) (liftWord w₁) (liftWord w₂) := by
+  induction h with
+  | combine l₁ l₂ hgen hne rest =>
+    -- combine: cons l₁ (cons l₂ rest) ~ cons ⟨l₁.gen, l₁.power + l₂.power⟩ rest
+    -- lift gives: cons ⟨fsucc l₁.gen, l₁.power⟩ (cons ⟨fsucc l₂.gen, l₂.power⟩ (liftWord rest))
+    --           ~ cons ⟨fsucc l₁.gen, l₁.power + l₂.power⟩ (liftWord rest)
+    simp only [liftWord]
+    have hgenLift : Fin'B.fsucc l₁.gen = Fin'B.fsucc l₂.gen := by rw [hgen]
+    exact BouquetRel.combine ⟨Fin'B.fsucc l₁.gen, l₁.power, l₁.power_ne_zero⟩
+                             ⟨Fin'B.fsucc l₂.gen, l₂.power, l₂.power_ne_zero⟩
+                             hgenLift hne (liftWord rest)
+  | cancel l₁ l₂ hgen hinv rest =>
+    -- cancel: cons l₁ (cons l₂ rest) ~ rest when powers sum to 0
+    simp only [liftWord]
+    have hgenLift : Fin'B.fsucc l₁.gen = Fin'B.fsucc l₂.gen := by rw [hgen]
+    exact BouquetRel.cancel ⟨Fin'B.fsucc l₁.gen, l₁.power, l₁.power_ne_zero⟩
+                            ⟨Fin'B.fsucc l₂.gen, l₂.power, l₂.power_ne_zero⟩
+                            hgenLift hinv (liftWord rest)
+  | congr l _h ih =>
+    -- congr: cons l w₁ ~ cons l w₂ when w₁ ~ w₂
+    simp only [liftWord]
+    exact BouquetRel.congr ⟨Fin'B.fsucc l.gen, l.power, l.power_ne_zero⟩ ih
 
-/-- The inverse map ℤⁿ → F_n^ab from the equivalence axiom. -/
-noncomputable def intPowToFreeGroupAb {n : Nat} : IntPow n → FreeGroupAb n :=
-  freeGroup_ab_equiv_axiom.invFun
+/-- Lift a BouquetFreeGroup element from n to n+1 generators. -/
+def liftBouquetFreeGroup {n : Nat} : BouquetFreeGroup n → BouquetFreeGroup (n + 1) :=
+  Quot.lift (fun w => Quot.mk (BouquetRel (n + 1)) (liftWord w))
+    (fun _ _ h => Quot.sound (liftWord_respects_BouquetRel h))
+
+/-- liftBouquetFreeGroup respects multiplication. -/
+theorem liftBouquetFreeGroup_mul {n : Nat} (x y : BouquetFreeGroup n) :
+    liftBouquetFreeGroup (BouquetFreeGroup.mul x y) =
+    BouquetFreeGroup.mul (liftBouquetFreeGroup x) (liftBouquetFreeGroup y) := by
+  induction x using Quot.ind with
+  | _ w₁ =>
+    induction y using Quot.ind with
+    | _ w₂ =>
+      simp only [liftBouquetFreeGroup, BouquetFreeGroup.mul]
+      -- Need: Quot.mk (liftWord (wordConcat w₁ w₂)) = Quot.mk (wordConcat (liftWord w₁) (liftWord w₂))
+      rw [liftWord_wordConcat]
+
+/-- liftBouquetFreeGroup maps identity to identity. -/
+theorem liftBouquetFreeGroup_one {n : Nat} :
+    liftBouquetFreeGroup (BouquetFreeGroup.one (n := n)) = BouquetFreeGroup.one := by
+  simp only [liftBouquetFreeGroup, BouquetFreeGroup.one, liftWord]
+
+/-- liftBouquetFreeGroup respects inverse. -/
+theorem liftBouquetFreeGroup_inv {n : Nat} (x : BouquetFreeGroup n) :
+    liftBouquetFreeGroup (BouquetFreeGroup.inv x) =
+    BouquetFreeGroup.inv (liftBouquetFreeGroup x) := by
+  induction x using Quot.ind with
+  | _ w =>
+    simp only [liftBouquetFreeGroup, BouquetFreeGroup.inv]
+    -- Need: liftWord (inverse w) = inverse (liftWord w)
+    congr 1
+    induction w with
+    | nil => simp only [BouquetWord.inverse, liftWord]
+    | cons l rest ih =>
+      simp only [BouquetWord.inverse, liftWord, liftWord_wordConcat]
+      rw [ih]
+
+/-- liftBouquetFreeGroup respects AbelianizationRel.
+
+If x ≈ y in AbelianizationRel on BouquetFreeGroup n, then
+liftBouquetFreeGroup x ≈ liftBouquetFreeGroup y in AbelianizationRel on BouquetFreeGroup (n+1). -/
+theorem liftBouquetFreeGroup_respects_AbelianizationRel {n : Nat}
+    {x y : BouquetFreeGroup n}
+    (h : AbelianizationRel (BouquetFreeGroup n) BouquetFreeGroup.mul BouquetFreeGroup.inv
+         (BouquetFreeGroup.one (n := n)) x y) :
+    AbelianizationRel (BouquetFreeGroup (n + 1)) BouquetFreeGroup.mul BouquetFreeGroup.inv
+         (BouquetFreeGroup.one (n := n + 1))
+         (liftBouquetFreeGroup x) (liftBouquetFreeGroup y) := by
+  induction h with
+  | refl x => exact AbelianizationRel.refl _
+  | symm _h ih => exact AbelianizationRel.symm ih
+  | trans _h₁ _h₂ ih₁ ih₂ => exact AbelianizationRel.trans ih₁ ih₂
+  | comm a b =>
+    rw [liftBouquetFreeGroup_mul, liftBouquetFreeGroup_mul]
+    exact AbelianizationRel.comm _ _
+  | congr_left z _h ih =>
+    rw [liftBouquetFreeGroup_mul, liftBouquetFreeGroup_mul]
+    exact AbelianizationRel.congr_left _ ih
+  | congr_right z _h ih =>
+    rw [liftBouquetFreeGroup_mul, liftBouquetFreeGroup_mul]
+    exact AbelianizationRel.congr_right _ ih
+  | assoc x y z =>
+    rw [liftBouquetFreeGroup_mul, liftBouquetFreeGroup_mul,
+        liftBouquetFreeGroup_mul, liftBouquetFreeGroup_mul]
+    exact AbelianizationRel.assoc _ _ _
+  | id_left x =>
+    rw [liftBouquetFreeGroup_mul, liftBouquetFreeGroup_one]
+    exact AbelianizationRel.id_left _
+  | id_right x =>
+    rw [liftBouquetFreeGroup_mul, liftBouquetFreeGroup_one]
+    exact AbelianizationRel.id_right _
+  | inv_left x =>
+    rw [liftBouquetFreeGroup_mul, liftBouquetFreeGroup_inv, liftBouquetFreeGroup_one]
+    exact AbelianizationRel.inv_left _
+  | inv_right x =>
+    rw [liftBouquetFreeGroup_mul, liftBouquetFreeGroup_inv, liftBouquetFreeGroup_one]
+    exact AbelianizationRel.inv_right _
+
+/-- Lift a FreeGroupAb element from n to n+1 generators.
+
+This is the quotient lift of liftBouquetFreeGroup to FreeGroupAb. -/
+def liftFreeGroupAb {n : Nat} : FreeGroupAb n → FreeGroupAb (n + 1) :=
+  Quot.lift (fun x : BouquetFreeGroup n => toAb (liftBouquetFreeGroup x))
+    (fun _ _ h => Quot.sound (liftBouquetFreeGroup_respects_AbelianizationRel h))
+
+/-- liftFreeGroupAb commutes with toAb. -/
+theorem liftFreeGroupAb_toAb {n : Nat} (x : BouquetFreeGroup n) :
+    liftFreeGroupAb (toAb x) = toAb (liftBouquetFreeGroup x) := rfl
+
+/-- liftFreeGroupAb on a word representative. -/
+theorem liftFreeGroupAb_toAb_word {n : Nat} (w : BouquetWord n) :
+    liftFreeGroupAb (toAb (Quot.mk (BouquetRel n) w)) =
+    toAb (Quot.mk (BouquetRel (n + 1)) (liftWord w)) := rfl
+
+/-- **Theorem**: Lifting preserves FreeGroupAb equality.
+
+If two words are equal in FreeGroupAb n, their lifts are equal in FreeGroupAb (n+1).
+
+**Proof**: We define liftFreeGroupAb : FreeGroupAb n → FreeGroupAb (n+1) via Quot.lift,
+which is well-defined because liftBouquetFreeGroup respects AbelianizationRel.
+Then equality is preserved by applying congrArg to the well-defined function. -/
+theorem toAb_liftWord_congr {n : Nat} {w₁ w₂ : BouquetWord n}
+    (h : toAb (Quot.mk (BouquetRel n) w₁) = toAb (Quot.mk (BouquetRel n) w₂)) :
+    toAb (Quot.mk (BouquetRel (n + 1)) (liftWord w₁)) =
+    toAb (Quot.mk (BouquetRel (n + 1)) (liftWord w₂)) := by
+  -- liftFreeGroupAb is a well-defined function on FreeGroupAb
+  -- Applying it to both sides of h preserves equality
+  have h' : liftFreeGroupAb (toAb (Quot.mk (BouquetRel n) w₁)) =
+            liftFreeGroupAb (toAb (Quot.mk (BouquetRel n) w₂)) := by rw [h]
+  -- liftFreeGroupAb (toAb (Quot.mk _ w)) = toAb (Quot.mk _ (liftWord w)) by rfl
+  exact h'
+
+/-- Helper: A single generator word in FreeGroupAb. -/
+def genWordAb {n : Nat} (i : Fin n) (k : Int) : FreeGroupAb n :=
+  toAb (Quot.mk _ (singleGenWord i k))
+
+/-- finToFin'B at a successor index equals fsucc of finToFin'B at the predecessor. -/
+theorem finToFin'B_succ {m : Nat} (j : Nat) (h : j + 1 < m + 1) :
+    finToFin'B ⟨j + 1, h⟩ = Fin'B.fsucc (finToFin'B ⟨j, Nat.lt_of_succ_lt_succ h⟩) := by
+  simp only [finToFin'B]
+
+/-- singleGenWord at a successor index equals liftWord of singleGenWord at predecessor. -/
+theorem singleGenWord_succ_eq_liftWord {m : Nat} (j : Nat) (h : j + 1 < m + 1) (k : Int) :
+    singleGenWord (n := m + 1) ⟨j + 1, h⟩ k =
+    liftWord (singleGenWord (n := m) ⟨j, Nat.lt_of_succ_lt_succ h⟩ k) := by
+  simp only [singleGenWord]
+  by_cases hk : k = 0
+  · simp only [hk, ↓reduceDIte, liftWord]
+  · simp only [hk, ↓reduceDIte, liftWord]
+    -- Need: cons ⟨finToFin'B ⟨j+1, h⟩, k, hk⟩ nil = cons ⟨fsucc (finToFin'B ⟨j, _⟩), k, hk⟩ nil
+    simp only [finToFin'B_succ]
+
+/-- genWordAb at a successor index equals lifted genWordAb at predecessor (in FreeGroupAb). -/
+theorem genWordAb_succ_eq_liftWord {m : Nat} (j : Nat) (h : j + 1 < m + 1) (k : Int) :
+    genWordAb (n := m + 1) ⟨j + 1, h⟩ k =
+    toAb (Quot.mk _ (liftWord (singleGenWord (n := m) ⟨j, Nat.lt_of_succ_lt_succ h⟩ k))) := by
+  simp only [genWordAb]
+  rw [singleGenWord_succ_eq_liftWord]
+
+/-- genWordAb with k=0 is the identity. -/
+theorem genWordAb_zero {n : Nat} (i : Fin n) :
+    genWordAb i 0 = FreeGroupAb.one := by
+  simp only [genWordAb, singleGenWord, FreeGroupAb.one, BouquetFreeGroup.one]
+  rfl
+
+/-- Multiplication in FreeGroupAb is associative. -/
+theorem FreeGroupAb.mul_assoc {n : Nat} (x y z : FreeGroupAb n) :
+    FreeGroupAb.mul (FreeGroupAb.mul x y) z = FreeGroupAb.mul x (FreeGroupAb.mul y z) := by
+  induction x using Quot.ind with
+  | _ a =>
+    induction y using Quot.ind with
+    | _ b =>
+      induction z using Quot.ind with
+      | _ c =>
+        simp only [FreeGroupAb.mul]
+        apply Quot.sound
+        exact AbelianizationRel.assoc a b c
+
+/-- Left identity for FreeGroupAb.mul. -/
+theorem FreeGroupAb.one_mul {n : Nat} (x : FreeGroupAb n) :
+    FreeGroupAb.mul FreeGroupAb.one x = x := by
+  induction x using Quot.ind with
+  | _ a =>
+    simp only [FreeGroupAb.one, FreeGroupAb.mul]
+    apply Quot.sound
+    exact AbelianizationRel.id_left a
+
+/-- Right identity for FreeGroupAb.mul. -/
+theorem FreeGroupAb.mul_one {n : Nat} (x : FreeGroupAb n) :
+    FreeGroupAb.mul x FreeGroupAb.one = x := by
+  induction x using Quot.ind with
+  | _ a =>
+    simp only [FreeGroupAb.one, FreeGroupAb.mul]
+    apply Quot.sound
+    exact AbelianizationRel.id_right a
+
+/-- Helper: buildWordRec on the zero vector gives nil. -/
+theorem buildWordRec_zero (n : Nat) : buildWordRec n (fun _ => (0 : Int)) = BouquetWord.nil := by
+  induction n with
+  | zero => rfl
+  | succ m ihm =>
+    simp only [buildWordRec, singleGenWord, ↓reduceDIte, BouquetWord.wordConcat, ihm, liftWord]
+
+/-! ### Key Lemmas for Decode-Encode
+
+The following lemmas establish that any word equals its canonical form in FreeGroupAb.
+The key insight is that using commutativity, we can reorder generators freely.
+-/
+
+/-- A cons is the same as multiplication with a singleton. -/
+theorem toAb_cons {n : Nat} (l : BouquetLetter n) (w : BouquetWord n) :
+    toAb (Quot.mk _ (BouquetWord.cons l w)) =
+    FreeGroupAb.mul (toAb (Quot.mk _ (BouquetWord.cons l BouquetWord.nil))) (toAb (Quot.mk _ w)) := by
+  have h : BouquetWord.cons l w = BouquetWord.wordConcat (BouquetWord.cons l BouquetWord.nil) w := by
+    simp only [BouquetWord.wordConcat]
+  rw [h]
+  exact toAb_wordConcat _ _
+
+/-- Equality in BouquetFreeGroup lifts to equality in FreeGroupAb. -/
+theorem toAb_eq_of_quot_eq {n : Nat} {w₁ w₂ : BouquetWord n}
+    (h : Quot.mk (BouquetRel n) w₁ = Quot.mk (BouquetRel n) w₂) :
+    toAb (Quot.mk _ w₁) = toAb (Quot.mk _ w₂) := by
+  simp only [toAb]
+  rw [h]
+
+/-- BouquetRel.cancel gives equality in BouquetFreeGroup. -/
+theorem bouquetFreeGroup_cancel {n : Nat} (l₁ l₂ : BouquetLetter n)
+    (hgen : l₁.gen = l₂.gen) (hinv : l₁.power + l₂.power = 0) (rest : BouquetWord n) :
+    Quot.mk (BouquetRel n) (BouquetWord.cons l₁ (BouquetWord.cons l₂ rest)) =
+    Quot.mk (BouquetRel n) rest :=
+  Quot.sound (BouquetRel.cancel l₁ l₂ hgen hinv rest)
+
+/-- BouquetRel.combine gives equality in BouquetFreeGroup. -/
+theorem bouquetFreeGroup_combine {n : Nat} (l₁ l₂ : BouquetLetter n)
+    (hgen : l₁.gen = l₂.gen) (hne : l₁.power + l₂.power ≠ 0) (rest : BouquetWord n) :
+    Quot.mk (BouquetRel n) (BouquetWord.cons l₁ (BouquetWord.cons l₂ rest)) =
+    Quot.mk (BouquetRel n) (BouquetWord.cons ⟨l₁.gen, l₁.power + l₂.power, hne⟩ rest) :=
+  Quot.sound (BouquetRel.combine l₁ l₂ hgen hne rest)
+
+/-- The product of genWordAb for same generator adds exponents (via Fin'B).
+    This is the key combining lemma: gᵢ^k · gᵢ^m = gᵢ^(k+m) in FreeGroupAb. -/
+theorem genWordAb_combine_fin'b {n : Nat} (g : Fin'B n) (k₁ k₂ : Int)
+    (hk1 : k₁ ≠ 0) (hk2 : k₂ ≠ 0) :
+    FreeGroupAb.mul
+      (toAb (Quot.mk _ (BouquetWord.cons ⟨g, k₁, hk1⟩ BouquetWord.nil)))
+      (toAb (Quot.mk _ (BouquetWord.cons ⟨g, k₂, hk2⟩ BouquetWord.nil))) =
+    if hsum : k₁ + k₂ = 0 then
+      FreeGroupAb.one
+    else
+      toAb (Quot.mk _ (BouquetWord.cons ⟨g, k₁ + k₂, hsum⟩ BouquetWord.nil)) := by
+  simp only [toAb, FreeGroupAb.mul, BouquetFreeGroup.mul, BouquetWord.wordConcat]
+  split
+  · case isTrue hsum =>
+    -- Cancel case
+    apply Quot.sound
+    have hbr : Quot.mk (BouquetRel n)
+        (BouquetWord.cons ⟨g, k₁, hk1⟩ (BouquetWord.cons ⟨g, k₂, hk2⟩ BouquetWord.nil)) =
+        Quot.mk (BouquetRel n) BouquetWord.nil :=
+      bouquetFreeGroup_cancel ⟨g, k₁, hk1⟩ ⟨g, k₂, hk2⟩ rfl hsum BouquetWord.nil
+    simp only [BouquetFreeGroup.one]
+    -- Need AbelianizationRel between (Quot.mk _ (cons ... (cons ... nil))) and (Quot.mk _ nil)
+    -- Since they're equal in BouquetFreeGroup (by hbr), we get AbelianizationRel.refl after coercion
+    rw [hbr]
+    exact AbelianizationRel.refl _
+  · case isFalse hsum =>
+    -- Combine case
+    have hbr : Quot.mk (BouquetRel n)
+        (BouquetWord.cons ⟨g, k₁, hk1⟩ (BouquetWord.cons ⟨g, k₂, hk2⟩ BouquetWord.nil)) =
+        Quot.mk (BouquetRel n) (BouquetWord.cons ⟨g, k₁ + k₂, hsum⟩ BouquetWord.nil) :=
+      bouquetFreeGroup_combine ⟨g, k₁, hk1⟩ ⟨g, k₂, hk2⟩ rfl hsum BouquetWord.nil
+    apply Quot.sound
+    rw [hbr]
+    exact AbelianizationRel.refl _
+
+/-- A word decomposes into its letters in FreeGroupAb. -/
+theorem toAb_word_decompose {n : Nat} (w : BouquetWord n) :
+    toAb (Quot.mk _ w) = match w with
+      | .nil => FreeGroupAb.one
+      | .cons l rest => FreeGroupAb.mul
+          (toAb (Quot.mk _ (BouquetWord.cons l BouquetWord.nil)))
+          (toAb (Quot.mk _ rest)) := by
+  cases w with
+  | nil => simp only [toAb, FreeGroupAb.one, BouquetFreeGroup.one]
+  | cons l rest => exact toAb_cons l rest
+
+/-- Key lemma: A letter can be moved to the end of a word in FreeGroupAb.
+    This follows directly from commutativity. -/
+theorem toAb_letter_commutes {n : Nat} (l : BouquetLetter n) (w : BouquetWord n) :
+    toAb (Quot.mk _ (BouquetWord.cons l w)) =
+    toAb (Quot.mk _ (BouquetWord.wordConcat w (BouquetWord.cons l BouquetWord.nil))) := by
+  rw [toAb_cons, toAb_wordConcat]
+  exact FreeGroupAb.mul_comm _ _
+
+/-- The product of genWordAb for same generator adds exponents.
+    This is the key combining lemma: gᵢ^k · gᵢ^m = gᵢ^(k+m) in FreeGroupAb. -/
+theorem genWordAb_add {n : Nat} (i : Fin n) (k₁ k₂ : Int) :
+    FreeGroupAb.mul (genWordAb i k₁) (genWordAb i k₂) = genWordAb i (k₁ + k₂) := by
+  simp only [genWordAb, singleGenWord]
+  by_cases hk1 : k₁ = 0
+  · simp only [hk1, ↓reduceDIte, Int.zero_add]
+    exact FreeGroupAb.one_mul _
+  · by_cases hk2 : k₂ = 0
+    · simp only [hk2, ↓reduceDIte, Int.add_zero]
+      exact FreeGroupAb.mul_one _
+    · by_cases hsum : k₁ + k₂ = 0
+      · -- k₁ + k₂ = 0, so they cancel to identity
+        simp only [hk1, hk2, hsum, ↓reduceDIte]
+        simp only [toAb, FreeGroupAb.mul, BouquetFreeGroup.mul, BouquetWord.wordConcat,
+                   BouquetFreeGroup.one]
+        have hcancel := bouquetFreeGroup_cancel
+          ⟨finToFin'B i, k₁, hk1⟩ ⟨finToFin'B i, k₂, hk2⟩ rfl hsum BouquetWord.nil
+        apply Quot.sound
+        rw [hcancel]
+        exact AbelianizationRel.refl _
+      · -- Normal case: k₁ + k₂ ≠ 0, combine to single letter
+        simp only [hk1, hk2, hsum, ↓reduceDIte]
+        simp only [toAb, FreeGroupAb.mul, BouquetFreeGroup.mul, BouquetWord.wordConcat]
+        have hcombine := bouquetFreeGroup_combine
+          ⟨finToFin'B i, k₁, hk1⟩ ⟨finToFin'B i, k₂, hk2⟩ rfl hsum BouquetWord.nil
+        apply Quot.sound
+        rw [hcombine]
+        exact AbelianizationRel.refl _
+
+/-- genWordAb with exponent 0 is the identity. -/
+theorem genWordAb_zero' {n : Nat} (i : Fin n) : genWordAb i 0 = FreeGroupAb.one := by
+  simp only [genWordAb, singleGenWord, ↓reduceDIte, toAb, FreeGroupAb.one, BouquetFreeGroup.one]
+
+/-- A single BouquetLetter, when converted to FreeGroupAb, equals the corresponding genWordAb. -/
+theorem toAb_single_letter_eq_genWordAb {n : Nat} (l : BouquetLetter n) :
+    toAb (Quot.mk _ (BouquetWord.cons l BouquetWord.nil)) =
+    genWordAb ⟨l.gen.toNat, Fin'B.toNat_lt l.gen⟩ l.power := by
+  simp only [genWordAb, singleGenWord]
+  -- l.power ≠ 0 by BouquetLetter.power_ne_zero
+  simp only [l.power_ne_zero, ↓reduceDIte]
+  -- Need: cons l nil = cons ⟨finToFin'B ⟨l.gen.toNat, _⟩, l.power, _⟩ nil
+  -- By finToFin'B_inverse, finToFin'B ⟨l.gen.toNat, _⟩ = l.gen
+  have heqGen : finToFin'B ⟨l.gen.toNat, Fin'B.toNat_lt l.gen⟩ = l.gen := finToFin'B_inverse l.gen
+  simp only [heqGen]
+
+/-- singleGenWord gives genWordAb. -/
+theorem toAb_singleGenWord_eq_genWordAb {n : Nat} (i : Fin n) (k : Int) :
+    toAb (Quot.mk _ (singleGenWord i k)) = genWordAb i k := rfl
+
+/-- wordToIntPow (cons l rest) equals the update of wordToIntPow rest at position l.gen. -/
+theorem wordToIntPow_cons_eq {n : Nat} (l : BouquetLetter n) (rest : BouquetWord n) :
+    wordToIntPow (BouquetWord.cons l rest) =
+    (fun j : Fin n => if (⟨l.gen.toNat, Fin'B.toNat_lt l.gen⟩ : Fin n) = j
+                      then l.power + wordToIntPow rest j
+                      else wordToIntPow rest j) := by
+  funext j
+  simp only [wordToIntPow]
+  have hlt : l.gen.toNat < n := Fin'B.toNat_lt l.gen
+  simp only [hlt, ↓reduceDIte]
+  by_cases heq : l.gen.toNat = j.val
+  · have hfinEq : (⟨l.gen.toNat, hlt⟩ : Fin n) = j := Fin.ext heq
+    simp only [heq, ↓reduceIte]
+  · have hfinNe : ¬(⟨l.gen.toNat, hlt⟩ : Fin n) = j := fun h => heq (Fin.val_eq_of_eq h)
+    simp only [hfinNe, heq, ↓reduceIte]
+
+/-- Multiplying by genWordAb is equivalent to adding to the exponent vector.
+
+This captures the algebraic fact that in FreeGroupAb (an abelian group):
+- genWordAb terms commute with each other
+- genWordAb i k * genWordAb i m = genWordAb i (k + m)
+
+Therefore, multiplying the canonical form by genWordAb i k just adds k to position i.
+
+**Proof Strategy**:
+1. Induction on n
+2. For n = 0: trivial (empty type)
+3. For n = m+1:
+   - Case i.val = 0: genWordAb combines with singleGenWord 0 (v 0) via genWordAb_add
+   - Case i.val = j+1: genWordAb commutes past singleGenWord 0 (v 0), then recurses on lifted part -/
+theorem mul_genWordAb_buildWordRec {n : Nat} (i : Fin n) (k : Int) (v : Fin n → Int) :
+    FreeGroupAb.mul (genWordAb i k) (toAb (Quot.mk _ (buildWordRec n v))) =
+    toAb (Quot.mk _ (buildWordRec n (fun j => if i = j then k + v j else v j))) := by
+  induction n with
+  | zero => exact i.elim0
+  | succ m ih =>
+    -- buildWordRec (m+1) v = wordConcat (singleGenWord 0 (v 0)) (liftWord (buildWordRec m v'))
+    simp only [buildWordRec]
+    -- Expand toAb of wordConcat
+    rw [toAb_wordConcat]
+    -- Case split on whether i = 0
+    cases hi : i.val with
+    | zero =>
+      -- i = ⟨0, _⟩ case: genWordAb combines with singleGenWord 0 (v 0)
+      have hi0 : i = ⟨0, Nat.zero_lt_succ m⟩ := Fin.ext hi
+      rw [hi0]
+      -- Use associativity to group: (genWordAb 0 k * singleGenWord 0 (v 0)) * lifted_rest
+      rw [← FreeGroupAb.mul_assoc]
+      -- genWordAb 0 k * toAb (singleGenWord 0 (v 0)) = genWordAb 0 (k + v 0) via genWordAb_add
+      have hcombine : FreeGroupAb.mul (genWordAb ⟨0, Nat.zero_lt_succ m⟩ k)
+                        (toAb (Quot.mk _ (singleGenWord ⟨0, Nat.zero_lt_succ m⟩ (v ⟨0, Nat.zero_lt_succ m⟩)))) =
+                      genWordAb ⟨0, Nat.zero_lt_succ m⟩ (k + v ⟨0, Nat.zero_lt_succ m⟩) := by
+        rw [← toAb_singleGenWord_eq_genWordAb]
+        exact genWordAb_add ⟨0, Nat.zero_lt_succ m⟩ k (v ⟨0, Nat.zero_lt_succ m⟩)
+      rw [hcombine]
+      -- RHS: positions 1..m are unchanged (0 ≠ idx+1)
+      have hsimpRest : (fun idx : Fin m => (fun x => if (⟨0, Nat.zero_lt_succ m⟩ : Fin (m + 1)) = x then k + v x else v x)
+                        ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩) =
+                       (fun idx : Fin m => v ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩) := by
+        funext idx
+        have hne : ¬(⟨0, Nat.zero_lt_succ m⟩ : Fin (m + 1)) = ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩ := by
+          intro heq
+          simp only [Fin.mk.injEq] at heq
+          omega
+        simp only [hne, ↓reduceIte]
+      -- Transform to canonical wordConcat form
+      rw [toAb_wordConcat]
+      simp only [genWordAb]
+      -- Goal: mul (toAb singleGenWord_0_(k+v0)) (toAb (liftWord rest)) =
+      --       mul (toAb singleGenWord_0_updated) (toAb (liftWord updated_rest))
+      -- Both sides equal after simplifying the if-conditions:
+      -- 1. (fun x => if 0=x then k+v x else v x) 0 = k + v 0
+      -- 2. The shifted indices idx+1 never equal 0, so updated_rest = rest
+      simp only [hsimpRest, ↓reduceIte]
+    | succ j =>
+      -- i = ⟨j+1, _⟩ case: genWordAb commutes past singleGenWord 0 and interacts with lifted part
+      have hjLt : j < m := by
+        have h := i.isLt
+        simp only [hi] at h
+        exact Nat.lt_of_succ_lt_succ h
+      have hisuc : i = ⟨j + 1, Nat.succ_lt_succ hjLt⟩ := Fin.ext hi
+      rw [hisuc]
+      -- Use commutativity: genWordAb (j+1) k * (singleGenWord 0 (v 0) * lifted_rest)
+      --                  = singleGenWord 0 (v 0) * (genWordAb (j+1) k * lifted_rest)
+      rw [← FreeGroupAb.mul_assoc]
+      rw [FreeGroupAb.mul_comm (genWordAb ⟨j + 1, _⟩ k) (toAb (Quot.mk _ (singleGenWord ⟨0, _⟩ _)))]
+      rw [FreeGroupAb.mul_assoc]
+      -- Use genWordAb_succ_eq_liftWord: genWordAb (j+1) k = toAb (liftWord (singleGenWord j k))
+      rw [genWordAb_succ_eq_liftWord]
+      -- Multiply lifted terms using toAb_liftWord_mul
+      rw [← toAb_liftWord_mul]
+      -- Use IH on the smaller problem
+      have ihSpec := ih ⟨j, hjLt⟩ (fun idx => v ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩)
+      -- Convert IH from genWordAb to toAb form
+      simp only [genWordAb] at ihSpec
+      -- IH gives: toAb (singleGenWord j k) * toAb (buildWordRec m v') = toAb (buildWordRec m updated_v')
+      -- This equals: toAb (wordConcat (singleGenWord j k) (buildWordRec m v')) = toAb (buildWordRec m updated_v')
+      have ihSpec' : toAb (Quot.mk _ (BouquetWord.wordConcat (singleGenWord ⟨j, hjLt⟩ k)
+                          (buildWordRec m (fun idx => v ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩)))) =
+                     toAb (Quot.mk _ (buildWordRec m (fun idx =>
+                          if (⟨j, hjLt⟩ : Fin m) = idx then k + v ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩
+                          else v ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩))) := by
+        rw [toAb_wordConcat]
+        exact ihSpec
+      -- Use toAb_liftWord_congr to lift the IH result
+      have hlift := toAb_liftWord_congr ihSpec'
+      rw [hlift]
+      -- Now show RHS matches
+      rw [toAb_wordConcat]
+      -- First factor: (j+1) ≠ 0, so v 0 unchanged
+      have hne0 : ¬(⟨j + 1, Nat.succ_lt_succ hjLt⟩ : Fin (m + 1)) = ⟨0, Nat.zero_lt_succ m⟩ := by
+        intro heq; simp only [Fin.mk.injEq] at heq; omega
+      have harg0 : (fun x => if (⟨j + 1, Nat.succ_lt_succ hjLt⟩ : Fin (m + 1)) = x then k + v x else v x)
+                   ⟨0, Nat.zero_lt_succ m⟩ = v ⟨0, Nat.zero_lt_succ m⟩ := by simp only [hne0, ↓reduceIte]
+      -- Second factor: comparing conditions ⟨j, _⟩ = idx ↔ ⟨j+1, _⟩ = ⟨idx+1, _⟩
+      have hargRest : (fun idx => (fun x => if (⟨j + 1, Nat.succ_lt_succ hjLt⟩ : Fin (m + 1)) = x then k + v x else v x)
+                        ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩) =
+                      (fun idx : Fin m => if (⟨j, hjLt⟩ : Fin m) = idx
+                        then k + v ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩
+                        else v ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩) := by
+        funext idx
+        by_cases hjEq : (⟨j, hjLt⟩ : Fin m) = idx
+        · have heq : (⟨j + 1, Nat.succ_lt_succ hjLt⟩ : Fin (m + 1)) = ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩ := by
+            have hvalEq : j = idx.val := Fin.val_eq_of_eq hjEq
+            simp only [hvalEq]
+          simp only [hjEq, heq, ↓reduceIte]
+        · have hne : ¬(⟨j + 1, Nat.succ_lt_succ hjLt⟩ : Fin (m + 1)) = ⟨idx.val + 1, Nat.succ_lt_succ idx.isLt⟩ := by
+            intro heq; simp only [Fin.mk.injEq] at heq; exact hjEq (Fin.ext (Nat.succ.inj heq))
+          simp only [hjEq, hne, ↓reduceIte]
+      simp only [harg0, hargRest]
+
+/-! ### Main Theorem: Decode-Encode Direction
+
+The proof strategy is semantic: in FreeGroupAb, multiplication is commutative,
+so any word with exponent vector v equals the canonical word buildWordRec n v.
+
+This is justified because:
+1. Every word is a product of single-letter terms (genWordAb)
+2. FreeGroupAb.mul is commutative, so the order doesn't matter
+3. Same-generator terms combine via genWordAb_add
+4. The canonical form buildWordRec n v is exactly this reordered/combined product
+
+The proof proceeds by induction with the mul_genWordAb_buildWordRec lemma.
+-/
+
+/-- **Theorem (Decode-Encode Direction)**: Words with same exponents are equal in FreeGroupAb.
+
+This theorem states that any word is equivalent to its canonical form in FreeGroupAb.
+The canonical form is built by `buildWordRec n (wordToIntPow w)`.
+
+**Proof Strategy**:
+1. Induction on the word `w`
+2. Base case (`nil`): Both sides are `FreeGroupAb.one`
+3. Step case (`cons l rest`):
+   - `toAb (cons l rest) = mul (toAb (cons l nil)) (toAb rest)` by `toAb_cons`
+   - `toAb (cons l nil) = genWordAb i l.power` by `toAb_single_letter_eq_genWordAb`
+   - By IH: `toAb rest = toAb (buildWordRec n (wordToIntPow rest))`
+   - Apply `mul_genWordAb_buildWordRec` to combine the generator with the canonical form -/
+theorem decode_encode_word (n : Nat) (w : BouquetWord n) :
+    toAb (Quot.mk _ w) = toAb (Quot.mk _ (buildWordRec n (wordToIntPow w))) := by
+  induction w with
+  | nil =>
+    -- wordToIntPow nil = IntPow.zero, buildWordRec n IntPow.zero = nil
+    simp only [wordToIntPow]
+    -- IntPow.zero = fun _ => 0, so buildWordRec n IntPow.zero = buildWordRec n (fun _ => 0) = nil
+    have h : buildWordRec n IntPow.zero = BouquetWord.nil := buildWordRec_zero n
+    rw [h]
+  | cons l rest ih =>
+    -- Step 1: toAb (cons l rest) = mul (toAb (single l)) (toAb rest)
+    rw [toAb_cons]
+    -- Step 2: toAb (single l) = genWordAb ⟨l.gen.toNat, ...⟩ l.power
+    rw [toAb_single_letter_eq_genWordAb]
+    -- Step 3: Apply induction hypothesis to rest
+    rw [ih]
+    -- Step 4: Apply mul_genWordAb_buildWordRec
+    rw [mul_genWordAb_buildWordRec]
+    -- Step 5: Show the vectors match
+    congr 2
+    -- wordToIntPow (cons l rest) = update (wordToIntPow rest) at l.gen by l.power
+    rw [wordToIntPow_cons_eq]
+    -- The update function matches the if-then-else from mul_genWordAb_buildWordRec
+
+/-- The encode direction: wordToIntPow (buildWordRec n v) = v.
+    This shows that building a word from a vector and then extracting exponents gives back the vector. -/
+theorem encode_decode_word (n : Nat) (v : Fin n → Int) :
+    wordToIntPow (buildWordRec n v) = v := by
+  induction n with
+  | zero =>
+    -- For n = 0, both sides are functions from Fin 0, which is empty
+    funext i
+    exact i.elim0
+  | succ m ih =>
+    -- buildWordRec (m+1) v = wordConcat (singleGenWord 0 v_0) (liftWord (buildWordRec m v'))
+    simp only [buildWordRec]
+    -- Use wordToIntPow_concat to split
+    rw [wordToIntPow_concat]
+    funext j
+    simp only [IntPow.add]
+    -- Apply wordToIntPow_singleGenWord
+    rw [wordToIntPow_singleGenWord]
+    -- Apply liftWord_wordToIntPow
+    rw [liftWord_wordToIntPow]
+    -- Now case split on j
+    match j with
+    | ⟨0, h0⟩ =>
+      -- Index 0: singleGenWord contributes v(0), liftWord contributes 0
+      simp only [↓reduceIte, Int.add_zero]
+    | ⟨k + 1, hk⟩ =>
+      -- Index k+1: singleGenWord contributes 0 (since 0 ≠ k+1), liftWord contributes rest at k
+      have hne : ¬(⟨0, Nat.zero_lt_succ m⟩ : Fin (m + 1)) = ⟨k + 1, hk⟩ := by
+        intro heq
+        cases heq
+      simp only [hne, ↓reduceIte, Int.zero_add]
+      -- Now use IH: wordToIntPow (buildWordRec m v') = v' where v' i = v ⟨i+1, ...⟩
+      have hkLt : k < m := Nat.lt_of_succ_lt_succ hk
+      have ihSpec := ih (fun i => v ⟨i.val + 1, Nat.succ_lt_succ i.isLt⟩)
+      have ihVal := congrFun ihSpec ⟨k, hkLt⟩
+      -- ihVal : wordToIntPow (buildWordRec m ...) ⟨k, hkLt⟩ = v ⟨k + 1, ...⟩
+      -- Goal: wordToIntPow (buildWordRec m ...) ⟨k, ...⟩ = v ⟨k + 1, hk⟩
+      -- Both sides are equal up to proof irrelevance
+      exact ihVal
+
+/-- The inverse map ℤⁿ → F_n^ab. -/
+def intPowToFreeGroupAb {n : Nat} : IntPow n → FreeGroupAb n :=
+  intPowToFreeGroupAbAux n
+
+/-- The encode-decode round-trip: freeGroupAbToIntPow (intPowToFreeGroupAb v) = v.
+    This follows from encode_decode_word. -/
+theorem freeGroup_ab_left_inv {n : Nat} (v : IntPow n) :
+    freeGroupAbToIntPow (intPowToFreeGroupAb v) = v := by
+  simp only [intPowToFreeGroupAb, intPowToFreeGroupAbAux, freeGroupAbToIntPow, freeGroupToIntPow]
+  exact encode_decode_word n v
+
+/-- The decode-encode round-trip: intPowToFreeGroupAb (freeGroupAbToIntPow x) = x.
+    This follows from decode_encode_word via quotient induction. -/
+theorem freeGroup_ab_right_inv {n : Nat} (x : FreeGroupAb n) :
+    intPowToFreeGroupAb (freeGroupAbToIntPow x) = x := by
+  -- FreeGroupAb n is a double quotient: Quot (AbelianizationRel ...) over Quot (BouquetRel n)
+  -- Use quotient induction
+  induction x using Quot.ind with
+  | _ g =>
+    -- g : BouquetFreeGroup n = Quot (BouquetRel n)
+    induction g using Quot.ind with
+    | _ w =>
+      -- w : BouquetWord n
+      simp only [freeGroupAbToIntPow, freeGroupToIntPow, intPowToFreeGroupAb, intPowToFreeGroupAbAux]
+      exact (decode_encode_word n w).symm
 
 /-- **Main Theorem**: F_n^ab ≃ ℤⁿ
 
 The free group on n generators abelianizes to ℤⁿ.
 Each generator maps to a standard basis vector.
-Commutativity in the abelianization corresponds to commutativity of addition in ℤⁿ. -/
-noncomputable def freeGroup_ab_equiv (n : Nat) : SimpleEquiv (FreeGroupAb n) (IntPow n) :=
-  freeGroup_ab_equiv_axiom
+Commutativity in the abelianization corresponds to commutativity of addition in ℤⁿ.
+
+**Proof Structure**:
+- Forward map (`freeGroupAbToIntPow`): Sum exponents for each generator (constructively proved)
+- Inverse map (`intPowToFreeGroupAb`): Build canonical word g₀^{v₀}·g₁^{v₁}·...·gₙ₋₁^{vₙ₋₁}
+- Left inverse (`freeGroup_ab_left_inv`): Constructively proved via `encode_decode_word`
+- Right inverse (`freeGroup_ab_right_inv`): Constructively proved via `decode_encode_word` -/
+def freeGroup_ab_equiv (n : Nat) : SimpleEquiv (FreeGroupAb n) (IntPow n) where
+  toFun := freeGroupAbToIntPow
+  invFun := intPowToFreeGroupAb
+  left_inv := freeGroup_ab_right_inv
+  right_inv := freeGroup_ab_left_inv
 
 /-! ## (G * H)^ab ≃ G^ab × H^ab
 
@@ -550,13 +1275,20 @@ This is why H₁(S¹ ∨ S¹) ≃ ℤ² even though π₁(S¹ ∨ S¹) ≃ F₂ 
 
 ## Axioms Used
 
-**1 axiom** (consolidated from 2):
-- `freeGroup_ab_equiv_axiom`: F_n^ab ≃ ℤⁿ (single equivalence axiom)
+**None!** All theorems in this module are proved constructively.
 
-### Constructively Proved
+### Key Constructively Proved Results
+- `freeGroup_ab_equiv`: The full equivalence F_n^ab ≃ ℤⁿ
+- `decode_encode_word`: Any word equals its canonical form in FreeGroupAb
+- `encode_decode_word`: Building a word from a vector preserves exponents
+- `mul_genWordAb_buildWordRec`: Key lemma for decode-encode direction
+- `toAb_liftWord_congr`: Lifting preserves FreeGroupAb equality
+  (Proved by defining liftFreeGroupAb via Quot.lift and showing it respects both quotient relations)
 - `freeGroupToIntPow_respects_abelianization`: The forward map F_n^ab → ℤⁿ is well-defined
 - `wordToIntPow_respects_rel`: Respects the BouquetRel relation
 - `wordToIntPow_concat`, `wordToIntPow_inverse`: Homomorphism properties
+- `liftWord_respects_BouquetRel`: liftWord respects BouquetRel
+- `liftBouquetFreeGroup_respects_AbelianizationRel`: Lifting respects AbelianizationRel
 -/
 
 end Abelianization

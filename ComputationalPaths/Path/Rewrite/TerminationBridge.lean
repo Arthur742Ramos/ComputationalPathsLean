@@ -24,6 +24,14 @@ ConfluenceProof.lean. All overlapping step pairs have explicit join witnesses.
 - **Termination**: RPO ordering on paths (Termination.lean)
 - **Newman's lemma**: Local confluence + termination ⟹ confluence
 
+## Important Note on Termination Measures
+
+The naive measure `p.steps.length` does NOT work for termination. The `sigma_eta`
+step is a counterexample: it increases the step count (from 1 to len(p)).
+
+The correct termination measure is **RPO term complexity** (the syntactic structure
+of the path expression), not the length of the stored rewrite step list.
+
 ## References
 
 - Newman, "On theories with a combinatorial definition of equivalence", 1942
@@ -42,30 +50,37 @@ open Termination RecursivePathOrdering LNDEQ ConfluenceConstructive
 
 universe u
 
-/-! ## Path Measure
+/-! ## Path Measure (Historical Note)
 
-A measure on paths that does not increase with each rewrite step.
+**Important**: The naive measure `p.steps.length` (counting elementary rewrite steps
+stored in the Path structure) does NOT work as a termination measure for this TRS.
+
+### Why `steps.length` Fails
+
+The `sigma_eta` step violates monotonicity:
+- `sigma_eta : Step (sigmaMk (sigmaFst p) (sigmaSnd p)) p`
+- Source: `sigmaMk` uses `Path.ofEq`, which always has exactly 1 step
+- Target: `p` can have arbitrarily many steps
+
+For example, if `p` has 5 steps, then:
+- Source measure: 1
+- Target measure: 5
+- This INCREASES the measure, violating termination requirements.
+
+### The Correct Approach
+
+The paper's termination argument uses a **term complexity measure** based on the
+recursive path ordering (RPO), NOT the `steps.length` of the Path structure.
+The RPO measures the syntactic complexity of the path expression itself (number
+of Path constructors like `trans`, `symm`, `congrArg`, etc.), not the stored
+rewrite witness list.
+
+See `Termination.lean` for the RPO infrastructure.
 -/
 
-/-- The structural size of a path. -/
+/-- The structural size of a path (for reference, but NOT a valid termination measure). -/
 noncomputable def pathMeasure {A : Type u} {a b : A} (p : Path a b) : Nat :=
   p.steps.length
-
-/-- Axiom: Step does not increase path measure.
-
-This is justified by inspection of all LND_EQ-TRS rules:
-- Contraction rules reduce size
-- Rearrangement rules preserve size
-- No rule increases the number of constructors -/
-axiom step_nonincreasing {A : Type u} {a b : A} {p q : Path a b}
-    (h : Step p q) : pathMeasure q ≤ pathMeasure p
-
-/-- Corollary: Rw derivations do not increase path measure. -/
-theorem rw_nonincreasing {A : Type u} {a b : A} {p q : Path a b}
-    (h : Rw p q) : pathMeasure q ≤ pathMeasure p := by
-  induction h with
-  | refl => exact Nat.le_refl _
-  | tail _ hstep ih => exact Nat.le_trans (step_nonincreasing hstep) ih
 
 /-! ## Termination Argument
 
@@ -202,7 +217,10 @@ theorem step_strip_justified :
 |--------------------------|--------|
 | Critical pair proofs | ConfluenceProof.lean |
 | RPO well-foundedness | Termination.lean |
-| Step-decreases-measure | `step_nonincreasing` axiom |
+
+**Note**: The naive `steps.length` measure does NOT decrease under all Step rules
+(see `sigma_eta` counterexample above). The paper's termination argument relies on
+RPO term complexity, not the stored step list length.
 
 ## Connection to Other Modules
 
