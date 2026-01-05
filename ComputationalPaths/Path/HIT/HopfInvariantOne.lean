@@ -77,7 +77,14 @@ def IsHSpace (X : Type u) (e : X) : Prop :=
 /-- Check if n is a valid H-space sphere dimension. -/
 def isHSpaceDimension (n : Nat) : Prop := n = 0 ∨ n = 1 ∨ n = 3 ∨ n = 7
 
-/-- **Adams' H-Space Classification** (forward direction)
+/-! ## Typeclass Interface for Adams' Theorem
+
+The classification theorem is packaged as a typeclass assumption so that
+it can be made explicit in signatures and optionally instantiated via
+a kernel axiom (see `HopfInvariantOneAxiom.lean`).
+-/
+
+/-- **Adams' H-Space Classification** (typeclass interface)
 
 If Sⁿ admits an H-space structure, then n ∈ {0, 1, 3, 7}.
 
@@ -85,37 +92,46 @@ This is a consequence of Adams' Hopf invariant one theorem (1960).
 The proof uses K-theory and Adams operations to show that maps with
 Hopf invariant one only exist in dimensions 2, 4, and 8, which
 corresponds to H-space spheres in dimensions 0, 1, 3, and 7. -/
-axiom sphere_HSpace_only (d : Nat) :
-  IsHSpace (SphereN d) (sphereN_base d) → isHSpaceDimension d
+class HasSphereHSpaceClassification.{v} : Prop where
+  sphere_HSpace_only : ∀ (d : Nat),
+    IsHSpace (SphereN.{v} d) (sphereN_base.{v} d) → isHSpaceDimension d
+
+/-- The classification theorem, given the typeclass assumption. -/
+theorem sphere_HSpace_only [h : HasSphereHSpaceClassification.{u}] (d : Nat) :
+    IsHSpace (SphereN.{u} d) (sphereN_base.{u} d) → isHSpaceDimension d :=
+  h.sphere_HSpace_only d
 
 /-! ## Negative Results
 
 The main application: proving certain spheres are NOT H-spaces.
+These results require the `HasSphereHSpaceClassification` assumption.
 -/
 
+variable [HasSphereHSpaceClassification.{u}]
+
 /-- S² is not an H-space. -/
-theorem sphere2_not_HSpace : ¬IsHSpace (SphereN 2) (sphereN_base 2) := by
+theorem sphere2_not_HSpace : ¬IsHSpace (SphereN.{u} 2) (sphereN_base.{u} 2) := by
   intro h
   have : isHSpaceDimension 2 := sphere_HSpace_only 2 h
   simp only [isHSpaceDimension] at this
   omega
 
 /-- S⁴ is not an H-space. -/
-theorem sphere4_not_HSpace : ¬IsHSpace (SphereN 4) (sphereN_base 4) := by
+theorem sphere4_not_HSpace : ¬IsHSpace (SphereN.{u} 4) (sphereN_base.{u} 4) := by
   intro h
   have : isHSpaceDimension 4 := sphere_HSpace_only 4 h
   simp only [isHSpaceDimension] at this
   omega
 
 /-- S⁵ is not an H-space. -/
-theorem sphere5_not_HSpace : ¬IsHSpace (SphereN 5) (sphereN_base 5) := by
+theorem sphere5_not_HSpace : ¬IsHSpace (SphereN.{u} 5) (sphereN_base.{u} 5) := by
   intro h
   have : isHSpaceDimension 5 := sphere_HSpace_only 5 h
   simp only [isHSpaceDimension] at this
   omega
 
 /-- S⁶ is not an H-space. -/
-theorem sphere6_not_HSpace : ¬IsHSpace (SphereN 6) (sphereN_base 6) := by
+theorem sphere6_not_HSpace : ¬IsHSpace (SphereN.{u} 6) (sphereN_base.{u} 6) := by
   intro h
   have : isHSpaceDimension 6 := sphere_HSpace_only 6 h
   simp only [isHSpaceDimension] at this
@@ -123,7 +139,7 @@ theorem sphere6_not_HSpace : ¬IsHSpace (SphereN 6) (sphereN_base 6) := by
 
 /-- Generic: Sⁿ is not an H-space for n ∉ {0, 1, 3, 7}. -/
 theorem sphere_not_HSpace (n : Nat) (hn : ¬isHSpaceDimension n) :
-    ¬IsHSpace (SphereN n) (sphereN_base n) :=
+    ¬IsHSpace (SphereN.{u} n) (sphereN_base.{u} n) :=
   fun h => hn (sphere_HSpace_only n h)
 
 /-! ## Summary
@@ -144,11 +160,14 @@ This module captures the key consequence of Adams' 1960 theorem:
 | S⁷ | Yes | Unit octonions |
 | Sⁿ (n≥8) | **No** | `sphere_not_HSpace` |
 
-### Axiom Used (1 total)
+### Assumption Used
 
-| Axiom | Justification |
-|-------|---------------|
-| `sphere_HSpace_only` | Adams' theorem (1960) via K-theory |
+| Typeclass | Justification |
+|-----------|---------------|
+| `HasSphereHSpaceClassification` | Adams' theorem (1960) via K-theory |
+
+All negative results (`sphere2_not_HSpace`, etc.) require this typeclass assumption.
+For convenience, import `HopfInvariantOneAxiom.lean` to get a global instance.
 
 ### Mathematical Note
 
@@ -157,7 +176,7 @@ The full Adams theorem characterizes Hopf invariant one maps:
 - ν : S⁷ → S⁴ (Hopf invariant 1)
 - σ : S¹⁵ → S⁸ (Hopf invariant 1)
 
-We axiomatize only the H-space consequence since that's what we use.
+We package only the H-space consequence since that's what we use.
 The Hopf invariant machinery isn't needed for the sphere classification proofs.
 
 ## Connection to Other Modules
@@ -165,6 +184,7 @@ The Hopf invariant machinery isn't needed for the sphere classification proofs.
 - **HopfFibration.lean**: The complex Hopf map η
 - **QuaternionicHopf.lean**: The quaternionic Hopf map ν
 - **FreudenthalSuspension.lean**: Stable homotopy infrastructure
+- **HopfInvariantOneAxiom.lean**: Opt-in kernel axiom for `HasSphereHSpaceClassification`
 -/
 
 end HopfInvariantOne

@@ -77,7 +77,9 @@ We need to show these outputs are 4-equivalent, which requires `contract₄`.
 
 **Path to elimination: Single truncation axiom**
 ```
-axiom truncation₃ : ∀ (d₁ d₂ : Derivation₂ p q), Subsingleton (Derivation₃ d₁ d₂)
+-- NOTE: This is documentation-only pseudocode inside a markdown block; it is not
+-- a Lean declaration.
+-- axiom truncation₃ : ∀ (d₁ d₂ : Derivation₂ p q), Subsingleton (Derivation₃ d₁ d₂)
 ```
 
 This says "3-cells are proof-irrelevant" and implies:
@@ -100,7 +102,9 @@ Replace the current structure with:
 | contract₃ (d₁ d₂ : Derivation₂ p q) : MetaStep₃ d₁ d₂
 
 -- Level 4+: Subsumed by truncation
-axiom truncation₃ : ∀ d₁ d₂, Subsingleton (Derivation₃ d₁ d₂)
+-- NOTE: This is documentation-only pseudocode inside a markdown block; it is not
+-- a Lean declaration.
+-- axiom truncation₃ : ∀ d₁ d₂, Subsingleton (Derivation₃ d₁ d₂)
 ```
 
 **Result:** 2 axioms total (contract₃ + truncation₃)

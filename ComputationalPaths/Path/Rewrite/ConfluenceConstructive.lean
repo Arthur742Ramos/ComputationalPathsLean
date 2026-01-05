@@ -81,7 +81,7 @@ theorem join_lift_symm_prop {a b : A} {p q : Path a b}
   obtain ⟨s, hp, hq⟩ := h
   exact ⟨symm s, rw_symm_congr hp, rw_symm_congr hq⟩
 
-/-! ## Local Confluence Axiom
+/-! ## Local Confluence Typeclass Interface
 
 The local confluence property (diamond property) states that for any two
 single-step rewrites from the same source, the results can be joined.
@@ -91,12 +91,11 @@ This is established metatheoretically by:
 2. Commutation of non-overlapping steps
 3. Trivial join for identical steps
 
-We assert this as an axiom justified by the critical pair proofs. This approach
-is standard for HoTT-style formalizations where the case analysis would be
-prohibitively tedious (150² = 22500 Step pairs).
+The property is packaged as a typeclass assumption. For a global instance
+backed by a kernel axiom, import `ConfluenceConstructiveAxiom.lean`.
 -/
 
-/-- Axiom: Local confluence at the Prop level.
+/-- **Local Confluence Prop** (typeclass interface).
 
 For any two single-step rewrites from the same source path, there exists
 a common descendant reachable by multi-step rewrites from both results.
@@ -109,39 +108,37 @@ The ~150 Step constructors yield ~22500 pairs, but most are:
 - Commuting (different subterms)
 - Critical pairs (explicit joins provided)
 -/
-axiom local_confluence_prop {A : Type u} {a b : A} {p q r : Path a b}
-    (hq : Step p q) (hr : Step p r) :
-    ∃ s, Rw q s ∧ Rw r s
+class HasLocalConfluenceProp.{v} : Prop where
+  local_confluence : ∀ {A : Type v} {a b : A} {p q r : Path a b}
+    (hq : Step p q) (hr : Step p r), ∃ s, Rw q s ∧ Rw r s
+
+/-- Local confluence at the Prop level, given the typeclass assumption. -/
+theorem local_confluence_prop [h : HasLocalConfluenceProp.{u}] {A : Type u} {a b : A} {p q r : Path a b}
+    (hq : Step p q) (hr : Step p r) : ∃ s, Rw q s ∧ Rw r s :=
+  h.local_confluence hq hr
 
 /-! ## Classical Instantiation
 
-Now we use Classical.choose to extract Type-valued witnesses from the
-axiom-based Prop existence statement.
+Given `HasLocalConfluenceProp`, we can use Classical.choose to extract
+Type-valued witnesses for `HasLocalConfluence`.
 -/
 
-/-- Noncomputable instance of HasLocalConfluence using Classical.choose.
+/-- Noncomputable instance of HasLocalConfluence from HasLocalConfluenceProp.
 
-This provides a global instance by:
-1. Using `local_confluence_prop` (axiom justified by critical pair analysis)
-2. Extracting a concrete meet point via `Classical.choose`
+This provides a Type-valued join by extracting via `Classical.choose`.
 -/
-noncomputable instance hasLocalConfluence_classical : HasLocalConfluence.{u} where
+noncomputable instance hasLocalConfluence_of_prop [HasLocalConfluenceProp.{u}] : HasLocalConfluence.{u} where
   join {A} {a} {b} {_p} {_q} {_r} hq hr :=
     let h := local_confluence_prop (A := A) (a := a) (b := b) hq hr
     ⟨Classical.choose h,
      (Classical.choose_spec h).1,
      (Classical.choose_spec h).2⟩
 
-/-! ## Strip Lemma Axiom
+/-! ## Strip Lemma Typeclass Interface
 
 The strip lemma states that a single step can be joined with a multi-step
 derivation. This follows from local confluence plus termination via
 Newman's lemma.
-
-Since the proof of Newman's lemma requires well-founded induction on terms
-(not just structural induction on Rw), and we haven't connected the RPO
-termination ordering from `Termination.lean` to `Step`, we assert the
-strip lemma as an axiom.
 
 **Metatheoretic justification**: Newman's lemma tells us that for a
 terminating TRS, local confluence implies confluence (and hence the
@@ -149,10 +146,11 @@ strip lemma). Our TRS is:
 1. Locally confluent (by `local_confluence_prop`)
 2. Terminating (by RPO ordering in `Termination.lean`)
 
-Therefore, the strip lemma holds.
+The property is packaged as a typeclass assumption. For a global instance
+backed by a kernel axiom, import `ConfluenceConstructiveAxiom.lean`.
 -/
 
-/-- Axiom: Strip lemma at the Prop level.
+/-- **Strip Lemma Prop** (typeclass interface).
 
 For a single-step rewrite `Step p q` and a multi-step rewrite `Rw p r`,
 there exists a common descendant `s` reachable from both `q` and `r`.
@@ -160,47 +158,52 @@ there exists a common descendant `s` reachable from both `q` and `r`.
 **Justification**: Follows from Newman's lemma:
 - Local confluence: `local_confluence_prop`
 - Termination: RPO ordering (Termination.lean)
-⟹ Strip lemma holds
-
-The constructive proof would require well-founded induction on (term, length)
-lexicographically, using the RPO ordering on terms. This is metatheoretically
-sound but would require significant infrastructure to connect RPO to Step.
 -/
-axiom step_strip_prop {A : Type u} {a b : A} {p q r : Path a b}
-    (hstep : Step p q) (hmulti : Rw p r) :
-    ∃ s, Rw q s ∧ Rw r s
+class HasStepStripProp.{v} : Prop where
+  step_strip : ∀ {A : Type v} {a b : A} {p q r : Path a b}
+    (hstep : Step p q) (hmulti : Rw p r), ∃ s, Rw q s ∧ Rw r s
 
-/-- Noncomputable instance of HasStepStrip using the strip lemma axiom.
+/-- Strip lemma at the Prop level, given the typeclass assumption. -/
+theorem step_strip_prop [h : HasStepStripProp.{u}] {A : Type u} {a b : A} {p q r : Path a b}
+    (hstep : Step p q) (hmulti : Rw p r) : ∃ s, Rw q s ∧ Rw r s :=
+  h.step_strip hstep hmulti
 
-This provides a global instance by extracting witnesses via Classical.choose.
+/-- Instance of HasStepStrip from HasStepStripProp.
+
+This simply forwards the Prop-level strip lemma.
 -/
-noncomputable instance hasStepStrip_classical : HasStepStrip.{u} where
+instance hasStepStrip_of_prop [HasStepStripProp.{u}] : HasStepStrip.{u} where
   strip {_A} {_a} {_b} {_p} {_q} {_r} hstep hmulti :=
     step_strip_prop hstep hmulti
 
 /-! ## Summary
 
-This module provides global instances of `HasLocalConfluence` and `HasStepStrip`
-using two axioms justified by metatheoretic analysis:
+This module provides instances of `HasLocalConfluence` and `HasStepStrip`
+via typeclass assumptions:
 
-### Axioms Used
+### Typeclass Assumptions
 
-1. **`local_confluence_prop`**: Diamond property for single steps.
+1. **`HasLocalConfluenceProp`**: Diamond property for single steps.
    - **Justification**: Critical pair analysis in ConfluenceProof.lean
    - All ~22500 Step pairs are either impossible, trivial, commuting, or
      have explicit join witnesses
 
-2. **`step_strip_prop`**: Strip lemma (step vs multi-step).
+2. **`HasStepStripProp`**: Strip lemma (step vs multi-step).
    - **Justification**: Newman's lemma = local confluence + termination
    - Termination: RPO ordering in Termination.lean
    - Local confluence: `local_confluence_prop`
 
-### Instances Provided
+### Instances Provided (require typeclass assumptions)
 
-- **`hasLocalConfluence_classical`**: Extracts Type-valued `Join` from
-  `local_confluence_prop` using `Classical.choose`
+- **`hasLocalConfluence_of_prop`**: Extracts Type-valued `Join` from
+  `HasLocalConfluenceProp` using `Classical.choose`
 
-- **`hasStepStrip_classical`**: Uses `step_strip_prop` directly
+- **`hasStepStrip_of_prop`**: Uses `HasStepStripProp` directly
+
+### Opt-in Axiom File
+
+For a global instance backed by kernel axioms, import:
+`ComputationalPaths/Path/Rewrite/ConfluenceConstructiveAxiom.lean`
 
 ### Architecture
 
@@ -210,12 +213,12 @@ Critical pair proofs        RPO termination ordering
         │                           │
         │ justify                   │ justify
         ▼                           ▼
-local_confluence_prop ────────► step_strip_prop
-    (axiom)             Newman's    (axiom)
+HasLocalConfluenceProp ──────► HasStepStripProp
+    (typeclass)         Newman's    (typeclass)
         │               lemma           │
         │                               │
         ▼                               ▼
-hasLocalConfluence_classical    hasStepStrip_classical
+hasLocalConfluence_of_prop      hasStepStrip_of_prop
     (instance)                      (instance)
         │                               │
         └───────────────┬───────────────┘
@@ -224,7 +227,7 @@ hasLocalConfluence_classical    hasStepStrip_classical
          (theorem in ConfluenceProof.lean)
 ```
 
-### Why Axioms?
+### Why Typeclass Assumptions?
 
 A fully constructive proof would require:
 1. **For local confluence**: Case analysis on ~22500 Step pairs, or making
@@ -232,8 +235,8 @@ A fully constructive proof would require:
 2. **For strip lemma**: Well-founded induction on (term, length) using the
    RPO ordering, which requires connecting Termination.lean to Step
 
-The axiom-based approach is standard for HoTT-style formalizations where
-the metatheory guarantees the properties hold.
+The typeclass approach keeps the assumptions explicit. The opt-in axiom file
+provides kernel axioms when needed.
 
 ### Critical Pair Coverage
 

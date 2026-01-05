@@ -74,6 +74,7 @@ import ComputationalPaths.Path.HIT.Pi3Sphere
 import ComputationalPaths.Path.HIT.Pi4S3
 import ComputationalPaths.Path.HIT.Pi6S3
 import ComputationalPaths.Path.HIT.QuaternionicHopf
+import ComputationalPaths.Path.HIT.OctonionicHopf
 import ComputationalPaths.Path.HIT.OrientableSurface
 import ComputationalPaths.Path.HIT.NonOrientableSurface
 import ComputationalPaths.Path.HIT.TorusGenus1

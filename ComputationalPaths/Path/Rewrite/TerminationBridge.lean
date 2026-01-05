@@ -136,15 +136,15 @@ confluence. We state the key property here.
 /-- The key property needed for Newman's lemma:
 If we have a step and a derivation from the same source,
 we can join them (and the derivations are "smaller"). -/
-def NewmanProperty (A : Type u) : Prop :=
+def NewmanProperty.{v} (A : Type v) : Prop :=
   ∀ {a b : A} {p q r : Path a b},
     Step p q → Rw p r →
     ∃ s, Rw q s ∧ Rw r s
 
 /-- The axiom `step_strip_prop` in ConfluenceConstructive.lean
 states exactly the Newman property. -/
-theorem newman_property_from_axiom :
-    NewmanProperty A :=
+theorem newman_property_from_axiom [HasStepStripProp.{u}] {A : Type u} :
+    NewmanProperty.{u} A :=
   fun hstep hmulti => step_strip_prop hstep hmulti
 
 /-! ## Justification Summary
@@ -196,14 +196,14 @@ The axiom-based approach is:
 -/
 
 /-- The theoretical justification for `local_confluence_prop`. -/
-theorem local_confluence_justified :
+theorem local_confluence_justified [HasLocalConfluenceProp.{u}] :
     (∀ {A : Type u} {a b : A} {p q r : Path a b},
       Step p q → Step p r → ∃ s, Rw q s ∧ Rw r s) = True :=
   propext ⟨fun _ => trivial, fun _ => local_confluence_prop⟩
 
 /-- The theoretical justification for `step_strip_prop`. -/
-theorem step_strip_justified :
-    NewmanProperty A = True :=
+theorem step_strip_justified [HasStepStripProp.{u}] {A : Type u} :
+    NewmanProperty.{u} A = True :=
   propext ⟨fun _ => trivial, fun _ => newman_property_from_axiom⟩
 
 /-! ## Summary

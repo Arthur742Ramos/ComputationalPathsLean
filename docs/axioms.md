@@ -62,6 +62,21 @@ Kernel axioms are restricted to HIT-style interfaces that are not constructible 
 `Torus` and `MobiusBand` are now *constructed* types (`Circle × Circle` and `Circle`, respectively)
 and contribute no kernel axioms.
 
+### Quarantined axioms (opt-in only)
+
+The following axioms have been moved to opt-in import files to minimize the kernel axiom footprint:
+
+| Axiom | Opt-in File | Justification |
+|-------|-------------|---------------|
+| `HasSphereHSpaceClassification` | `HIT/HopfInvariantOneAxiom.lean` | Adams' theorem (K-theory) |
+| `HasCoveringEquivSubgroup` | `Homotopy/CoveringClassificationAxiom.lean` | Galois correspondence |
+| `HasLocalConfluenceProp` | `Rewrite/ConfluenceConstructiveAxiom.lean` | Critical pair analysis |
+| `HasStepStripProp` | `Rewrite/ConfluenceConstructiveAxiom.lean` | Newman's lemma |
+
+Import these files only when you need the corresponding results without typeclass constraints.
+
+### Non-kernel typeclass assumptions
+
 Rewrite-system confluence is packaged as **non-kernel** typeclass assumptions
 (see `ComputationalPaths/Path/Rewrite/Confluence.lean` and `ComputationalPaths/Path/Rewrite/ConfluenceProof.lean`).
 

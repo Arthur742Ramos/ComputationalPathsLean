@@ -320,70 +320,15 @@ theorem quaternionicHopf_connecting_surj [HasQuaternionicHopfExactSequence] :
     quaternionicHopf_connecting x = z :=
   HasQuaternionicHopfExactSequence.connecting_surj
 
-/-! ## The Octonionic Hopf Fibration (Preview)
+/-! ## The Octonionic Hopf Fibration
 
-The fourth and final Hopf fibration uses the octonions 𝕆.
+The fourth and final Hopf fibration uses the octonions 𝕆:
+- S⁷ → S¹⁵ → S⁸
+- Proves π₁₅(S⁸) ≃ ℤ
+- Generator σ (octonionic Hopf map)
+
+See `OctonionicHopf.lean` for the full formalization with exact sequence.
 -/
-
-/-- The 8-sphere S⁸. -/
-def Sphere8 : Type := SphereN 8
-
-/-- The 15-sphere S¹⁵. -/
-def Sphere15 : Type := SphereN 15
-
-/-- The octonionic Hopf projection S¹⁵ → S⁸.
-
-The fiber is S⁷. This gives π₁₅(S⁸) ≃ ℤ.
-
-Note: Octonions are non-associative, which is why there are only
-four Hopf fibrations. The octonions are the last normed division algebra. -/
-noncomputable def octonionicHopfProj : Sphere15 → Sphere8 := fun _ => sphereN_base 8
-
-/-- The type of 15-loops in S⁸. -/
-abbrev S8FifteenLoop : Type := Int
-
-/-- The generator σ : S¹⁵ → S⁸ of π₁₅(S⁸) ≃ ℤ.
-
-This is the octonionic Hopf map, completing the set {η, ν, σ}. -/
-def octonionicHopf_sigma : S8FifteenLoop := (1 : Int)
-
-/-- The degree/winding number of a 15-loop in S⁸. -/
-def s8FifteenLoop_degree : S8FifteenLoop → Int := id
-
-/-- σ has degree 1 (it generates π₁₅(S⁸)). -/
-theorem octonionicHopf_sigma_degree : s8FifteenLoop_degree octonionicHopf_sigma = 1 := rfl
-
-/-- π₁₅(S⁸) ≃ ℤ via the octonionic Hopf fibration. -/
-noncomputable def sphere8_pi15_equiv_int : SimpleEquiv S8FifteenLoop Int :=
-  SimpleEquiv.refl _
-
-/-! ## Adams' Theorem
-
-A famous theorem of Adams (1960) states:
-
-**There are no maps of Hopf invariant 1 in dimensions other than 1, 2, 4, 8.**
-
-This is equivalent to saying:
-1. The only normed division algebras are ℝ, ℂ, ℍ, 𝕆
-2. Sⁿ admits an H-space structure only for n ∈ {0, 1, 3, 7}
-3. The four Hopf fibrations are the only ones
-
-The proof uses K-theory and Adams operations. We state it as an axiom.
--/
-
-/-- **Adams' Theorem**: Maps of Hopf invariant 1 exist only in dimensions 1, 2, 4, 8.
-
-The corresponding maps are:
-- η : S³ → S² (complex Hopf, n = 2)
-- ν : S⁷ → S⁴ (quaternionic Hopf, n = 4)
-- σ : S¹⁵ → S⁸ (octonionic Hopf, n = 8)
-(The n = 1 case is trivial: S¹ → S¹.)
-
-This means the four Hopf fibrations are the only such fibrations. -/
-theorem adams_hopf_invariant_one :
-    -- There are no maps Sⁿ⁺ⁿ⁻¹ → Sⁿ of Hopf invariant 1 for n ≠ 1, 2, 4, 8
-    True
-  := trivial
 
 /-! ## Summary
 
@@ -397,8 +342,6 @@ This module establishes the quaternionic Hopf fibration:
 
 4. **Long exact sequence**: Used to compute π₇(S⁴)
 
-5. **Four Hopf fibrations**: Complete classification (Adams' theorem)
-
 ## Key Theorems
 
 | Theorem | Statement |
@@ -406,16 +349,15 @@ This module establishes the quaternionic Hopf fibration:
 | `sphere4_pi7_equiv_int` | π₇(S⁴) ≃ ℤ |
 | `quaternionicHopfProj` | The Hopf projection S⁷ → S⁴ |
 | `s4SevenLoop_nu` | Generator ν of π₇(S⁴) |
-| `adams_hopf_invariant_one` | Only four Hopf fibrations |
 
 ## The Complete Hopf Story
 
-| Fibration | Result | Generator |
-|-----------|--------|-----------|
-| S⁰ → S¹ → S¹ | π₁(S¹) ≃ ℤ | loop |
-| S¹ → S³ → S² | π₃(S²) ≃ ℤ | η |
-| S³ → S⁷ → S⁴ | π₇(S⁴) ≃ ℤ | ν |
-| S⁷ → S¹⁵ → S⁸ | π₁₅(S⁸) ≃ ℤ | σ |
+| Fibration | Result | Generator | Module |
+|-----------|--------|-----------|--------|
+| S⁰ → S¹ → S¹ | π₁(S¹) ≃ ℤ | loop | Circle.lean |
+| S¹ → S³ → S² | π₃(S²) ≃ ℤ | η | HopfFibration.lean |
+| S³ → S⁷ → S⁴ | π₇(S⁴) ≃ ℤ | ν | QuaternionicHopf.lean |
+| S⁷ → S¹⁵ → S⁸ | π₁₅(S⁸) ≃ ℤ | σ | OctonionicHopf.lean |
 
 ## Connection to Division Algebras
 
@@ -425,8 +367,9 @@ The existence of these four fibrations is intimately connected to:
 - ℍ: 4-dimensional, quaternionic Hopf
 - 𝕆: 8-dimensional, octonionic Hopf
 
-There are no higher-dimensional normed division algebras (Hurwitz's theorem),
-which is related to Adams' theorem on Hopf invariant one.
+There are no higher-dimensional normed division algebras (Hurwitz's theorem).
+Adams' theorem proves maps of Hopf invariant 1 exist only in dimensions 1, 2, 4, 8.
+See `HopfInvariantOne.lean` for the H-space classification.
 -/
 
 end QuaternionicHopf

@@ -255,9 +255,25 @@ def inducedSubgroup {A : Type u} (a : A) (_cov : CoveringOf A a) : Subgroup A a 
   -- covering/π₁ functoriality story beyond the current scope of this module.
   wholeGroup A a
 
-/-- Axiomatized classification theorem packaging. -/
-axiom covering_equiv_subgroup {A : Type u} (a : A) :
-    SimpleEquiv (CoveringOf A a) (Subgroup A a)
+/-! ## Typeclass Interface for the Galois Correspondence
+
+The classification theorem is packaged as a typeclass assumption so that
+it can be made explicit in signatures and optionally instantiated via
+a kernel axiom (see `CoveringClassificationAxiom.lean`).
+-/
+
+/-- **Galois Correspondence** (typeclass interface).
+
+The classification theorem: covering spaces correspond to subgroups.
+This is a deep result requiring significant topological infrastructure
+(path lifting, homotopy lifting, local properties). -/
+class HasCoveringEquivSubgroup.{v} : Type (v + 1) where
+  covering_equiv_subgroup : ∀ {A : Type v} (a : A), SimpleEquiv (CoveringOf A a) (Subgroup A a)
+
+/-- The classification equivalence, given the typeclass assumption. -/
+noncomputable def covering_equiv_subgroup [h : HasCoveringEquivSubgroup.{u}] {A : Type u} (a : A) :
+    SimpleEquiv (CoveringOf A a) (Subgroup A a) :=
+  h.covering_equiv_subgroup a
 
 /-- **Galois Correspondence**: Covering spaces correspond to subgroups.
 
@@ -267,8 +283,10 @@ semi-locally simply-connected):
 
 The correspondence:
 - p : Y → X  ↦  p_*(π₁(Y)) ⊆ π₁(X)
-- H ⊆ π₁(X)  ↦  unique covering with p_*(π₁) = H -/
-noncomputable def galois_correspondence {A : Type u} (_a : A) :
+- H ⊆ π₁(X)  ↦  unique covering with p_*(π₁) = H
+
+Requires `HasCoveringEquivSubgroup` assumption. -/
+noncomputable def galois_correspondence [HasCoveringEquivSubgroup.{u}] {A : Type u} (_a : A) :
     -- There is a bijection between:
     -- - Isomorphism classes of coverings of A
     -- - Subgroups of π₁(A, a)
@@ -400,16 +418,25 @@ This module establishes the classification of covering spaces:
 
 | Theorem | Statement |
 |---------|-----------|
-| `galois_correspondence` | Covers ↔ Subgroups |
-| `deck_equiv_pi1` | Deck(X̃/X) ≃ π₁(X) |
+| `galois_correspondence` | Covers ↔ Subgroups (requires `HasCoveringEquivSubgroup`) |
+| `deck_equiv_pi1` | Deck(X̃/X) ≃ π₁(X) (requires `HasDeckEquivPiOneData`) |
 | `regular_cover_deck` | Deck ≃ π₁/H for regular covers |
 | `universal_cover_universal` | X̃ covers all covers |
+
+## Assumption Used
+
+| Typeclass | Justification |
+|-----------|---------------|
+| `HasCoveringEquivSubgroup` | Galois correspondence (deep topology) |
+
+For convenience, import `CoveringClassificationAxiom.lean` to get a global instance.
 
 ## Connection to Other Modules
 
 - **CoveringSpace.lean**: Basic covering space infrastructure
 - **FundamentalGroup.lean**: π₁ definitions
 - **Circle.lean, ProjectivePlane.lean**: Concrete examples
+- **CoveringClassificationAxiom.lean**: Opt-in kernel axiom
 -/
 
 end CoveringClassification
