@@ -32,6 +32,7 @@ import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Homotopy.LongExactSequence
+import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.EilenbergMacLane
 import ComputationalPaths.Path.Homotopy.FreudenthalSuspension

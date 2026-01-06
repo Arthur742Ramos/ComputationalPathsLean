@@ -110,7 +110,7 @@ The ~150 Step constructors yield ~22500 pairs, but most are:
 -/
 class HasLocalConfluenceProp.{v} : Prop where
   local_confluence : ∀ {A : Type v} {a b : A} {p q r : Path a b}
-    (hq : Step p q) (hr : Step p r), ∃ s, Rw q s ∧ Rw r s
+    (_hq : Step p q) (_hr : Step p r), ∃ s, Rw q s ∧ Rw r s
 
 /-- Local confluence at the Prop level, given the typeclass assumption. -/
 theorem local_confluence_prop [h : HasLocalConfluenceProp.{u}] {A : Type u} {a b : A} {p q r : Path a b}
@@ -161,7 +161,7 @@ there exists a common descendant `s` reachable from both `q` and `r`.
 -/
 class HasStepStripProp.{v} : Prop where
   step_strip : ∀ {A : Type v} {a b : A} {p q r : Path a b}
-    (hstep : Step p q) (hmulti : Rw p r), ∃ s, Rw q s ∧ Rw r s
+    (_hstep : Step p q) (_hmulti : Rw p r), ∃ s, Rw q s ∧ Rw r s
 
 /-- Strip lemma at the Prop level, given the typeclass assumption. -/
 theorem step_strip_prop [h : HasStepStripProp.{u}] {A : Type u} {a b : A} {p q r : Path a b}
