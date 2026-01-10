@@ -326,6 +326,214 @@ lake exe computational_paths
 lake clean
 ```
 
+## Aristotle Integration (Automated Theorem Proving)
+
+This project supports [Aristotle](https://aristotle.harmonic.fun), an AI-powered theorem prover for Lean 4. Aristotle can automatically fill `sorry` placeholders in your Lean files.
+
+### Quick Start
+
+```bash
+# Set API key (add to ~/.bashrc or ~/.zshrc for persistence)
+export ARISTOTLE_API_KEY='arstl_YOUR_KEY_HERE'
+
+# Run Aristotle on a file
+uvx --from aristotlelib aristotle.exe prove-from-file "path/to/file.lean"
+```
+
+### Installation
+
+1. **Install UV** (recommended package manager):
+   ```bash
+   # See https://github.com/astral-sh/uv for installation
+   ```
+
+2. **Set your API key** (get one from https://aristotle.harmonic.fun):
+   ```bash
+   # Windows (PowerShell)
+   $env:ARISTOTLE_API_KEY = "arstl_YOUR_KEY_HERE"
+
+   # Windows (add to profile for persistence)
+   # Add to $PROFILE: $env:ARISTOTLE_API_KEY = "arstl_YOUR_KEY_HERE"
+
+   # Linux/Mac (add to ~/.bashrc or ~/.zshrc)
+   export ARISTOTLE_API_KEY='arstl_YOUR_KEY_HERE'
+   ```
+
+3. **Run Aristotle**:
+   ```bash
+   uvx --from aristotlelib aristotle.exe prove-from-file <file.lean>
+   ```
+
+### CLI Options
+
+```bash
+uvx --from aristotlelib aristotle.exe prove-from-file <input_file> [options]
+
+Options:
+  --api-key KEY              API key (overrides environment variable)
+  --output-file FILE         Output path (default: <input>_aristotle.lean)
+  --no-auto-add-imports      Disable automatic import resolution
+  --context-files FILE...    Additional context files
+  --context-folder DIR       Include all .lean/.md/.txt/.tex from directory
+  --no-wait                  Submit job without waiting for completion
+  --polling-interval SECS    Check interval (default: 30)
+  --informal                 Use natural language input mode
+  --silent                   Suppress console output
+```
+
+### Usage Examples
+
+```bash
+# Basic usage - fill sorries in a file
+uvx --from aristotlelib aristotle.exe prove-from-file \
+  "ComputationalPaths/Path/MyFile.lean"
+
+# Specify output location
+uvx --from aristotlelib aristotle.exe prove-from-file \
+  "ComputationalPaths/Path/MyFile.lean" \
+  --output-file "ComputationalPaths/Path/MyFile_proved.lean"
+
+# Include additional context
+uvx --from aristotlelib aristotle.exe prove-from-file \
+  "ComputationalPaths/Path/MyFile.lean" \
+  --context-folder "ComputationalPaths/Path/Basic"
+```
+
+### Guiding Aristotle with Proof Hints
+
+You can provide natural language hints in docstrings using `PROVIDED SOLUTION`:
+
+```lean
+/--
+Prove that the composition of three reflexivity paths equals reflexivity.
+
+PROVIDED SOLUTION
+Use the fact that trans (refl a) p = p (left unit law) twice.
+First simplify trans (trans (refl a) (refl a)) (refl a) to trans (refl a) (refl a),
+then simplify again to refl a.
+-/
+theorem triple_refl_eq_refl : trans (trans (refl a) (refl a)) (refl a) = refl a := by
+  sorry
+```
+
+### Important: HIT Axiom Limitation
+
+**Aristotle rejects files that import Higher Inductive Type (HIT) axioms.**
+
+When processing imports, Aristotle checks for new axioms. Since this project defines HITs via axioms (Circle, Torus, OrientableSurface, etc.), files that import HIT modules will fail with:
+
+```
+Aristotle encountered an error while processing imports for this file.
+Error: Axioms were added during init_sorries: ['Circle', 'circleBase', ...]
+```
+
+#### Which Files Work with Aristotle
+
+| Module Category | Works? | Reason |
+|-----------------|--------|--------|
+| `Path/Basic/*` | ✅ Yes | Core definitions, no axioms |
+| `Path/Rewrite/*` | ✅ Yes* | Rewrite system (*except ConfluenceConstructiveAxiom) |
+| `Path/Groupoid.lean` | ✅ Yes | Category theory, no HITs |
+| `Path/Bicategory.lean` | ✅ Yes | 2-category theory |
+| `Path/HIT/*` | ❌ No | Defines HIT axioms |
+| `Path/Homotopy/*` | ⚠️ Depends | Check if imports HITs |
+| Files importing HITs | ❌ No | Transitively imports axioms |
+
+#### Workaround Strategy
+
+1. **Factor out non-HIT code** into separate modules
+2. **Use Aristotle** on those modules
+3. **Manually prove** theorems that require HIT axioms
+
+Example: If you have a file with both pure path lemmas and HIT-dependent theorems:
+
+```lean
+-- File: MyProofs.lean (imports Circle - won't work with Aristotle)
+import ComputationalPaths.Path.HIT.Circle
+
+theorem pure_path_lemma : ... := by sorry  -- Could be auto-proved
+theorem circle_lemma : ... := by sorry     -- Needs HIT
+```
+
+Refactor to:
+```lean
+-- File: MyPureProofs.lean (works with Aristotle)
+import ComputationalPaths.Path.Basic
+
+theorem pure_path_lemma : ... := by sorry  -- Aristotle can fill this
+
+-- File: MyCircleProofs.lean
+import ComputationalPaths.Path.HIT.Circle
+import MyPureProofs
+
+theorem circle_lemma : ... := by sorry     -- Manual proof
+```
+
+### What Aristotle Produces
+
+Aristotle replaces `sorry` with proof tactics. Common outputs:
+
+| Tactic | Meaning |
+|--------|---------|
+| `exact?` | Search tactic - found matching lemma |
+| `grind` | Powerful automation tactic |
+| `simp` | Simplification |
+| `rfl` | Reflexivity |
+| `omega` | Linear arithmetic |
+
+The output includes suggestions in comments:
+```lean
+theorem foo : ... := by
+  exact?
+-- info: Try this: exact rfl
+```
+
+### Counterexample Detection
+
+Aristotle can disprove false statements. If a theorem is false, Aristotle leaves a comment with the counterexample:
+
+```lean
+/-
+Aristotle found this block to be false.
+Here is a proof of the negation:
+theorem false_claim : ... := by
+    negate_state;
+    -- Proof of negation here
+-/
+theorem false_claim : ... := by
+  sorry
+```
+
+### Best Practices
+
+1. **Check file imports first** - Ensure no transitive HIT dependencies
+2. **Use `admit` for partial runs** - Replace sorries you don't want filled with `admit`
+3. **Provide hints** - Use `PROVIDED SOLUTION` for complex proofs
+4. **Build after Aristotle** - Verify the output compiles: `lake build ModuleName`
+5. **Review `exact?` suggestions** - Replace with concrete terms for cleaner code
+
+### Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| "Axioms were added" | File imports HITs - factor out non-HIT code |
+| "already been declared" | Theorem name conflicts with imported module |
+| Timeout | Try `--no-wait` and check status later |
+| `exact?` left in output | Run `lake build` to see suggested replacement |
+
+### Version Compatibility
+
+Aristotle runs on fixed versions:
+- **Lean**: `leanprover/lean4:v4.24.0`
+- **Mathlib**: `v4.24.0` (commit `f897ebcf72cd16f89ab4577d0c826cd14afaafc7`)
+
+This project's `lean-toolchain` should be compatible. If you encounter issues, check version alignment.
+
+### Further Resources
+
+- [Aristotle Dashboard](https://aristotle.harmonic.fun/dashboard)
+- [Aristotle Documentation](https://aristotle.harmonic.fun/dashboard/docs/overview)
+
 ## Adding New Content
 
 ### Adding a New HIT
@@ -467,3 +675,8 @@ Print the full ledger only when it materially changes or when requested.
 7. **Test edge cases**: For Fin'-indexed things, test genus 0, 1, and ≥2
 8. **Keep README updated**: Add new results to the README and highlights
 9. **Use the Continuity Ledger**: For long sessions, maintain `CONTINUITY.md` to survive compaction
+10. **Use Aristotle for non-HIT files**: For files that don't import HITs, use Aristotle to auto-fill sorries:
+    ```bash
+    uvx --from aristotlelib aristotle.exe prove-from-file "path/to/file.lean"
+    ```
+    See the "Aristotle Integration" section above for details and limitations.
