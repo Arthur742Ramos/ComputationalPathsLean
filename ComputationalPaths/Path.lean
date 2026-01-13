@@ -22,6 +22,8 @@ import ComputationalPaths.Path.Rewrite.TerminationBridge
 import ComputationalPaths.Path.Rewrite.PathTactic
 import ComputationalPaths.Path.Rewrite.StripLemma
 import ComputationalPaths.Path.Groupoid
+import ComputationalPaths.Path.GroupoidDerived
+import ComputationalPaths.Path.PathAlgebraDerived
 import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
