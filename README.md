@@ -4,6 +4,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 
 ## Highlights
 - **Weak ω-groupoid structure**: Complete proof that computational paths form a weak ω-groupoid with all coherence laws (pentagon, triangle) and contractibility at higher dimensions.
+- **Derived groupoid theorems** (axiom-free): Cancellation laws, uniqueness of inverses, mixed trans/symm cancellation, whiskering, and conjugation — all derived from primitive Step rules with no custom axioms.
+- **Path algebra derived results** (axiom-free): Four-fold associativity, symmetry-transitivity interactions, congruence composition, pentagon components, and Eckmann-Hilton preparation lemmas.
 - **Higher homotopy groups π_n**: Iterated loop spaces (Loop2Space, Loop3Space), π₂(A,a) via derivation quotients, Eckmann-Hilton argument proving π₂ is abelian, and π₂(S²) ≅ 1.
 - **Truncation levels (n-types)**: Full hierarchy connecting ω-groupoid to HoTT: IsContr → IsProp → IsSet → IsGroupoid, with all types automatically 1-groupoids via contractibility₃.
 - **Eilenberg-MacLane spaces K(G,n)**: Characterization of K(G,1) spaces with circle as K(ℤ,1), group structures, and loop space property Ω(K(G,n+1)) ≃ K(G,n).
@@ -60,6 +62,8 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - [`ComputationalPaths/Path/Basic/`](ComputationalPaths/Path/Basic/) — core path definitions (transport, congruence, symmetry) and helpers.
 - [`ComputationalPaths/Path/Rewrite/`](ComputationalPaths/Path/Rewrite/) — rewrite steps, closures (`Rw`, `RwEq`), and the quotient `PathRwQuot`.
 - [`ComputationalPaths/Path/Groupoid.lean`](ComputationalPaths/Path/Groupoid.lean) — weak and strict categorical packages for computational paths; groupoids extend the corresponding categories so composition/identities are shared.
+- [`ComputationalPaths/Path/GroupoidDerived.lean`](ComputationalPaths/Path/GroupoidDerived.lean) — **axiom-free derived groupoid theorems**: cancellation laws (`rweq_cancel_left/right`), uniqueness of inverses (`rweq_inv_unique_left/right`), mixed trans/symm cancellation, whiskering and conjugation laws, transport compatibility. All depend only on Lean's standard axioms (propext, Quot.sound).
+- [`ComputationalPaths/Path/PathAlgebraDerived.lean`](ComputationalPaths/Path/PathAlgebraDerived.lean) — **axiom-free path algebra**: four-fold associativity, symm/trans interactions (`rweq_symm_trans_three`), congruence composition (`rweq_congrArg_comp`), pentagon coherence components, Eckmann-Hilton preparation, and inversion properties.
 - [`ComputationalPaths/Path/OmegaGroupoid.lean`](ComputationalPaths/Path/OmegaGroupoid.lean) — **weak ω-groupoid structure** on computational paths with cells at each dimension, globular identities, and all coherence laws.
 - [`ComputationalPaths/Path/OmegaGroupoid/`](ComputationalPaths/Path/OmegaGroupoid/) — subdirectory with axiom analysis and derived coherences:
   - [`Derived.lean`](ComputationalPaths/Path/OmegaGroupoid/Derived.lean) — demonstrates that most coherence axioms are derivable from `to_canonical`
@@ -301,6 +305,38 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 - **Simp lemmas**: Unit laws, inverse laws, associativity, double symmetry, congruence, product beta/eta
 - **When to use**: `path_simp` for base cases in inductions; `path_auto` for standalone goals; manual lemmas for complex intermediate steps
+
+## Axiom-Free Derived Results
+
+Two modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules:
+
+### GroupoidDerived.lean
+
+| Theorem | Description |
+|---------|-------------|
+| `rweq_cancel_left` | Left cancellation: p · q ≈ p · r → q ≈ r |
+| `rweq_cancel_right` | Right cancellation: p · r ≈ q · r → p ≈ q |
+| `rweq_inv_unique_left` | Left inverse uniqueness: q · p ≈ refl → q ≈ p⁻¹ |
+| `rweq_inv_unique_right` | Right inverse uniqueness: p · q ≈ refl → q ≈ p⁻¹ |
+| `rweq_inv_trans_cancel` | (p · q)⁻¹ · p ≈ q⁻¹ |
+| `rweq_trans_inv_cancel` | p · (p⁻¹ · q) ≈ q |
+| `rweq_symm_trans_cancel` | p⁻¹ · (p · q) ≈ q |
+| `rweq_conj_refl` | p · refl · p⁻¹ ≈ refl |
+| `rweq_conj_trans` | Conjugation distributes over trans |
+
+### PathAlgebraDerived.lean
+
+| Theorem | Description |
+|---------|-------------|
+| `rweq_trans_four_assoc` | Four-fold associativity: ((p·q)·r)·s ≈ p·(q·(r·s)) |
+| `rweq_symm_trans` | Contravariance: (p·q)⁻¹ ≈ q⁻¹·p⁻¹ |
+| `rweq_symm_trans_three` | Triple: (p·q·r)⁻¹ ≈ r⁻¹·q⁻¹·p⁻¹ |
+| `rweq_congrArg_comp` | Composition: (g∘f)*(p) = g*(f*(p)) |
+| `rweq_pentagon_left/right/top` | Pentagon coherence components |
+| `rweq_inv_refl` | refl⁻¹ ≈ refl |
+| `rweq_inv_inv` | (p⁻¹)⁻¹ ≈ p |
+
+All theorems depend only on `propext` and `Quot.sound` (Lean's standard axioms) — no HIT axioms.
 
 ## Covering Space Theory
 
