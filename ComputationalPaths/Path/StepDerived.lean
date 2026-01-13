@@ -441,6 +441,95 @@ theorem rweq_context_right_cancel_full {B : Type u}
   -- Chain
   exact RwEq.trans h1 (RwEq.trans h6 h7)
 
+/-! ## Dependent Context Rules (Rules 49-60)
+
+These rules handle contexts that depend on the path's base type. -/
+
+/-- Rule 50: Symmetry with dependent context. symm(C[p]) ▷ C.symmMap(p) -/
+theorem rweq_depContext_map_symm {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A}
+    (p : Path a₁ a₂) :
+    RwEq (symm (DepContext.map C p)) (DepContext.symmMap C p) :=
+  rweq_of_step (Step.depContext_map_symm C p)
+
+/-- Rule 51: Dependent context left substitution β-rule. -/
+theorem rweq_depContext_subst_left_beta {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {x : B a₁}
+    (r : Path (A := B a₁) x (C.fill a₁)) (p : Path a₁ a₂) :
+    RwEq (trans (Context.map (DepContext.transportContext p) r)
+               (DepContext.map C p))
+         (DepContext.substLeft C r p) :=
+  rweq_of_step (Step.depContext_subst_left_beta C r p)
+
+/-- Rule 52: Dependent context left substitution associativity. -/
+theorem rweq_depContext_subst_left_assoc {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {x : B a₁} {y : B a₂}
+    (r : Path (A := B a₁) x (C.fill a₁)) (p : Path a₁ a₂)
+    (t : Path (A := B a₂) (C.fill a₂) y) :
+    RwEq (trans (DepContext.substLeft C r p) t)
+         (trans (Context.map (DepContext.transportContext p) r)
+                (DepContext.substRight C p t)) :=
+  rweq_of_step (Step.depContext_subst_left_assoc C r p t)
+
+/-- Rule 53: Dependent context right substitution β-rule. -/
+theorem rweq_depContext_subst_right_beta {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {y : B a₂}
+    (p : Path a₁ a₂)
+    (t : Path (A := B a₂) (C.fill a₂) y) :
+    RwEq (trans (DepContext.map C p) t)
+         (DepContext.substRight C p t) :=
+  rweq_of_step (Step.depContext_subst_right_beta C p t)
+
+/-- Rule 54: Dependent context right substitution associativity. -/
+theorem rweq_depContext_subst_right_assoc {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {y z : B a₂}
+    (p : Path a₁ a₂)
+    (t : Path (A := B a₂) (C.fill a₂) y)
+    (u : Path (A := B a₂) y z) :
+    RwEq (trans (DepContext.substRight C p t) u)
+         (DepContext.substRight C p (trans t u)) :=
+  rweq_of_step (Step.depContext_subst_right_assoc C p t u)
+
+/-- Rule 55: Dependent left substitution with refl on right simplifies. -/
+theorem rweq_depContext_subst_left_refl_right {B : A → Type u}
+    (C : DepContext A B) {a : A} {x : B a}
+    (r : Path (A := B a) x (C.fill a)) :
+    RwEq (DepContext.substLeft C r (refl a)) r :=
+  rweq_of_step (Step.depContext_subst_left_refl_right C r)
+
+/-- Rule 56: Dependent left substitution with refl on left simplifies. -/
+theorem rweq_depContext_subst_left_refl_left {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A}
+    (p : Path a₁ a₂) :
+    RwEq (DepContext.substLeft C (refl (C.fill a₁)) p)
+         (DepContext.map C p) :=
+  rweq_of_step (Step.depContext_subst_left_refl_left C p)
+
+/-- Rule 57: Dependent right substitution with refl on left simplifies. -/
+theorem rweq_depContext_subst_right_refl_left {B : A → Type u}
+    (C : DepContext A B) {a : A} {y : B a}
+    (r : Path (A := B a) (C.fill a) y) :
+    RwEq (DepContext.substRight C (refl a) r) r :=
+  rweq_of_step (Step.depContext_subst_right_refl_left C r)
+
+/-- Rule 58: Dependent right substitution with refl on right simplifies. -/
+theorem rweq_depContext_subst_right_refl_right {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A}
+    (p : Path a₁ a₂) :
+    RwEq (DepContext.substRight C p (refl (C.fill a₂)))
+         (DepContext.map C p) :=
+  rweq_of_step (Step.depContext_subst_right_refl_right C p)
+
+/-- Rule 59: Idempotence for nested dependent left substitutions. -/
+theorem rweq_depContext_subst_left_idempotent {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {x : B a₁}
+    (r : Path (A := B a₁) x (C.fill a₁))
+    (p : Path a₁ a₂) :
+    RwEq (DepContext.substLeft C
+           (DepContext.substLeft C r (refl a₁)) p)
+         (DepContext.substLeft C r p) :=
+  rweq_of_step (Step.depContext_subst_left_idempotent C r p)
+
 end StepDerived
 end Path
 end ComputationalPaths
