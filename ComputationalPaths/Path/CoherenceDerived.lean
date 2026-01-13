@@ -221,6 +221,50 @@ theorem rweq_symm_trans_four (p : Path a b) (q : Path b c) (r : Path c d) (s : P
   have h2 := rweq_symm_trans_assoc p q r
   exact RwEq.trans h1 (rweq_trans_congr_right (symm s) h2)
 
+/-- Five-fold symm distribution: (((p·q)·r)·s)·t)⁻¹ → t⁻¹·(s⁻¹·(r⁻¹·(q⁻¹·p⁻¹))) -/
+theorem rweq_symm_trans_five (p : Path a b) (q : Path b c) (r : Path c d) 
+    (s : Path d e) (t : Path e f') :
+    RwEq (symm (trans (trans (trans (trans p q) r) s) t))
+         (trans (symm t) (trans (symm s) (trans (symm r) (trans (symm q) (symm p))))) := by
+  -- Outer symm_trans_congr
+  have h1 : RwEq (symm (trans (trans (trans (trans p q) r) s) t))
+                 (trans (symm t) (symm (trans (trans (trans p q) r) s))) :=
+    rweq_of_step (Step.symm_trans_congr (trans (trans (trans p q) r) s) t)
+  -- Inner: use four-fold
+  have h2 := rweq_symm_trans_four p q r s
+  exact RwEq.trans h1 (rweq_trans_congr_right (symm t) h2)
+
+/-! ## Six-fold Associativity -/
+
+/-- Six-fold associativity: ((((f·g)·h)·i)·j)·k → f·(g·(h·(i·(j·k)))) -/
+theorem rweq_trans_six_assoc (f : Path a b) (g : Path b c) (h : Path c d)
+    (i : Path d e) (j : Path e f') (k : Path f' a) :
+    RwEq (trans (trans (trans (trans (trans f g) h) i) j) k)
+         (trans f (trans g (trans h (trans i (trans j k))))) := by
+  -- Use five-fold then one more assoc
+  have h1 := rweq_trans_five_assoc f g h i j
+  have h2 : RwEq (trans (trans (trans (trans (trans f g) h) i) j) k)
+                 (trans (trans f (trans g (trans h (trans i j)))) k) :=
+    rweq_trans_congr_left k h1
+  have h3 : RwEq (trans (trans f (trans g (trans h (trans i j)))) k)
+                 (trans f (trans (trans g (trans h (trans i j))) k)) :=
+    rweq_of_step (Step.trans_assoc f (trans g (trans h (trans i j))) k)
+  have h4 : RwEq (trans (trans g (trans h (trans i j))) k)
+                 (trans g (trans (trans h (trans i j)) k)) :=
+    rweq_of_step (Step.trans_assoc g (trans h (trans i j)) k)
+  have h5 : RwEq (trans (trans h (trans i j)) k)
+                 (trans h (trans (trans i j) k)) :=
+    rweq_of_step (Step.trans_assoc h (trans i j) k)
+  have h6 : RwEq (trans (trans i j) k)
+                 (trans i (trans j k)) :=
+    rweq_of_step (Step.trans_assoc i j k)
+  have h7 := rweq_trans_congr_right h h6
+  have h8 := RwEq.trans h5 h7
+  have h9 := rweq_trans_congr_right g h8
+  have h10 := RwEq.trans h4 h9
+  have h11 := rweq_trans_congr_right f h10
+  exact RwEq.trans h2 (RwEq.trans h3 h11)
+
 end CoherenceDerived
 end Path
 end ComputationalPaths

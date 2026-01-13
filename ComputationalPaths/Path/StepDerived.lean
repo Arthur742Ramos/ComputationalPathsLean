@@ -530,6 +530,58 @@ theorem rweq_depContext_subst_left_idempotent {B : A → Type u}
          (DepContext.substLeft C r p) :=
   rweq_of_step (Step.depContext_subst_left_idempotent C r p)
 
+/-! ## Context Functoriality
+
+Contexts behave functorially: C[p·q] ≈ C[p]·C[q] -/
+
+/-- Context map is functorial over trans: C[p·q] ≈ C[p]·C[q]
+    This follows from congrArg_trans. -/
+theorem rweq_context_map_functorial {B : Type u}
+    (C : Context A B) {a₁ a₂ a₃ : A}
+    (p : Path a₁ a₂) (q : Path a₂ a₃) :
+    RwEq (Context.map C (trans p q))
+         (trans (Context.map C p) (Context.map C q)) :=
+  rweq_of_eq (Context.map_trans C p q)
+
+/-- Context map preserves reflexivity: C[refl] ≈ refl -/
+theorem rweq_context_map_refl {B : Type u}
+    (C : Context A B) (a : A) :
+    RwEq (Context.map C (refl a)) (refl (C.fill a)) :=
+  rweq_of_eq (Context.map_refl C a)
+
+/-- Context map preserves symm: C[p⁻¹] ≈ C[p]⁻¹ -/
+theorem rweq_context_map_symm_derived {B : Type u}
+    (C : Context A B) {a₁ a₂ : A}
+    (p : Path a₁ a₂) :
+    RwEq (Context.map C (symm p)) (symm (Context.map C p)) :=
+  RwEq.symm (rweq_of_step (Step.context_map_symm C p))
+
+/-! ## Derived Multi-Step Context Rules -/
+
+/-- Double context map composition: C[p]·C[q] ≈ C[p·q]
+    (The reverse direction of functoriality) -/
+theorem rweq_context_double_map {B : Type u}
+    (C : Context A B) {a₁ a₂ a₃ : A}
+    (p : Path a₁ a₂) (q : Path a₂ a₃) :
+    RwEq (trans (Context.map C p) (Context.map C q))
+         (Context.map C (trans p q)) :=
+  RwEq.symm (rweq_context_map_functorial C p q)
+
+/-- Triple context composition: C[p]·C[q]·C[r] ≈ C[p·q·r] -/
+theorem rweq_context_triple_map {B : Type u}
+    (C : Context A B) {a₁ a₂ a₃ a₄ : A}
+    (p : Path a₁ a₂) (q : Path a₂ a₃) (r : Path a₃ a₄) :
+    RwEq (trans (trans (Context.map C p) (Context.map C q)) (Context.map C r))
+         (Context.map C (trans (trans p q) r)) := by
+  -- First: C[p]·C[q] ≈ C[p·q]
+  have h1 := rweq_context_double_map C p q
+  have h2 : RwEq (trans (trans (Context.map C p) (Context.map C q)) (Context.map C r))
+                 (trans (Context.map C (trans p q)) (Context.map C r)) :=
+    rweq_trans_congr_left (Context.map C r) h1
+  -- Then: C[p·q]·C[r] ≈ C[(p·q)·r]
+  have h3 := rweq_context_double_map C (trans p q) r
+  exact RwEq.trans h2 h3
+
 end StepDerived
 end Path
 end ComputationalPaths
