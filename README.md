@@ -337,9 +337,9 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 ## Axiom-Free Derived Results
 
-Six modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
+Seven modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
 
-**Total: 136 uses of `rweq_of_step`** across these modules.
+**Total: 146 uses of `rweq_of_step`** across these modules.
 
 ### GroupoidDerived.lean (41 uses of `rweq_of_step`)
 
@@ -433,6 +433,20 @@ Higher coherence laws for the weak ω-groupoid structure:
 | `rweq_symm_trans_assoc` | ((p·q)·r)⁻¹ ≈ r⁻¹·(q⁻¹·p⁻¹) |
 | `rweq_symm_trans_four` | Four-fold symm distribution |
 | `rweq_symm_trans_five` | Five-fold symm distribution |
+
+### BiContextDerived.lean (10 uses of `rweq_of_step`)
+
+| Theorem | Description |
+|---------|-------------|
+| `rweq_biContext_mapLeft_congr` | Rule 65: BiContext left map congruence |
+| `rweq_biContext_mapRight_congr` | Rule 66: BiContext right map congruence |
+| `rweq_biContext_map2_congr_left` | Rule 67: BiContext map2 left congruence |
+| `rweq_biContext_map2_congr_right` | Rule 68: BiContext map2 right congruence |
+| `rweq_mapLeft_congr_derived` | Rule 69: mapLeft congruence |
+| `rweq_mapRight_congr_derived` | Rule 70: mapRight congruence |
+| `rweq_mapLeft_ofEq` | Rule 71: mapLeft with propositional equality |
+| `rweq_mapRight_ofEq` | Rule 72: mapRight with propositional equality |
+| `rweq_biContext_map2_decompose` | Rule 9: BiContext map2 decomposition |
 
 ## Covering Space Theory
 

@@ -28,6 +28,7 @@ import ComputationalPaths.Path.ProductSigmaDerived
 import ComputationalPaths.Path.TransportDerived
 import ComputationalPaths.Path.StepDerived
 import ComputationalPaths.Path.CoherenceDerived
+import ComputationalPaths.Path.BiContextDerived
 import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
