@@ -337,9 +337,9 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 ## Axiom-Free Derived Results
 
-Seven modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
+Eight modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
 
-**Total: 160 uses of `rweq_of_step`** across these modules.
+**Total: 174 uses of `rweq_of_step`** across these modules.
 
 ### GroupoidDerived.lean (41 uses of `rweq_of_step`)
 
@@ -449,6 +449,19 @@ Higher coherence laws for the weak ω-groupoid structure:
 | `rweq_mapLeft_ofEq` | Rule 71: mapLeft with propositional equality |
 | `rweq_mapRight_ofEq` | Rule 72: mapRight with propositional equality |
 | `rweq_biContext_map2_decompose` | Rule 9: BiContext map2 decomposition |
+
+### LoopDerived.lean (14 uses of `rweq_of_step`)
+
+| Theorem | Description |
+|---------|-------------|
+| `rweq_loop_unit` | refl · p ≈ p |
+| `rweq_loop_inv_right` | p · p⁻¹ ≈ refl |
+| `rweq_loop_inv_left` | p⁻¹ · p ≈ refl |
+| `rweq_loop_assoc` | (p · q) · r ≈ p · (q · r) |
+| `rweq_loop_symm_trans` | (p · q)⁻¹ ≈ q⁻¹ · p⁻¹ |
+| `rweq_loop_symm_trans3` | ((p·q)·r)⁻¹ ≈ r⁻¹·q⁻¹·p⁻¹ |
+| `rweq_loop_conj_refl` | refl·q·refl⁻¹ ≈ q |
+| `rweq_loop_self_commutator` | [p, p] ≈ refl |
 
 ## Covering Space Theory
 
