@@ -339,7 +339,7 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 Six modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
 
-**Total: 130 uses of `rweq_of_step`** across these modules.
+**Total: 136 uses of `rweq_of_step`** across these modules.
 
 ### GroupoidDerived.lean (41 uses of `rweq_of_step`)
 
@@ -367,7 +367,7 @@ Six modules provide extensive axiom-free, sorry-free results derived purely from
 | `rweq_inv_refl` | refl⁻¹ ≈ refl |
 | `rweq_inv_inv` | (p⁻¹)⁻¹ ≈ p |
 
-### StepDerived.lean (27 uses of `rweq_of_step`)
+### StepDerived.lean (47 uses of `rweq_of_step`)
 
 Direct lifts of primitive Step rules to RwEq equivalences:
 
@@ -390,6 +390,7 @@ Direct lifts of primitive Step rules to RwEq equivalences:
 | `rweq_step_transport_refl_beta` | Rule 26 | Transport over refl |
 | `rweq_step_context_*` | Rules 33-48 | Context substitution rules |
 | `rweq_depContext_*` | Rules 50-59 | Dependent context rules |
+| `rweq_context_map_*` | Derived | Context functoriality |
 
 ### ProductSigmaDerived.lean
 
@@ -416,7 +417,7 @@ Transport coherence laws:
 | `transport_roundtrip` | p⁻¹_* ∘ p_* ≈ id |
 | `transport_roundtrip'` | p_* ∘ p⁻¹_* ≈ id |
 
-### CoherenceDerived.lean (21 uses of `rweq_of_step`)
+### CoherenceDerived.lean (26 uses of `rweq_of_step`)
 
 Higher coherence laws for the weak ω-groupoid structure:
 
@@ -426,10 +427,12 @@ Higher coherence laws for the weak ω-groupoid structure:
 | `rweq_pentagon_full` | Full pentagon: ((f·g)·h)·k → f·(g·(h·k)) |
 | `rweq_triangle_full` | Triangle: (f·refl)·g → f·g |
 | `rweq_trans_five_assoc` | Five-fold associativity |
+| `rweq_trans_six_assoc` | Six-fold associativity |
 | `rweq_whisker_left_comp` | Whiskering is functorial |
 | `rweq_double_unit` | (refl·p)·refl ≈ p |
 | `rweq_symm_trans_assoc` | ((p·q)·r)⁻¹ ≈ r⁻¹·(q⁻¹·p⁻¹) |
 | `rweq_symm_trans_four` | Four-fold symm distribution |
+| `rweq_symm_trans_five` | Five-fold symm distribution |
 
 ## Covering Space Theory
 
