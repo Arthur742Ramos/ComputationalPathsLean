@@ -337,7 +337,9 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 ## Axiom-Free Derived Results
 
-Five modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
+Six modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
+
+**Total: 120 uses of `rweq_of_step`** across these modules.
 
 ### GroupoidDerived.lean (41 uses of `rweq_of_step`)
 
@@ -412,6 +414,21 @@ Transport coherence laws:
 | `transport_symm_symm` | (p⁻¹)⁻¹_* ≈ p_* |
 | `transport_roundtrip` | p⁻¹_* ∘ p_* ≈ id |
 | `transport_roundtrip'` | p_* ∘ p⁻¹_* ≈ id |
+
+### CoherenceDerived.lean (21 uses of `rweq_of_step`)
+
+Higher coherence laws for the weak ω-groupoid structure:
+
+| Theorem | Description |
+|---------|-------------|
+| `rweq_pentagon_face1..5` | All 5 faces of the pentagon identity |
+| `rweq_pentagon_full` | Full pentagon: ((f·g)·h)·k → f·(g·(h·k)) |
+| `rweq_triangle_full` | Triangle: (f·refl)·g → f·g |
+| `rweq_trans_five_assoc` | Five-fold associativity |
+| `rweq_whisker_left_comp` | Whiskering is functorial |
+| `rweq_double_unit` | (refl·p)·refl ≈ p |
+| `rweq_symm_trans_assoc` | ((p·q)·r)⁻¹ ≈ r⁻¹·(q⁻¹·p⁻¹) |
+| `rweq_symm_trans_four` | Four-fold symm distribution |
 
 ## Covering Space Theory
 
