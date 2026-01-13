@@ -224,6 +224,18 @@ theorem rweq_transport_refl_step {B : A → Type u}
 These rules describe how paths interact with contextual substitution,
 a key feature of the LND_EQ-TRS system. -/
 
+/-- Rule 33: Context congruence.
+    If p ≈ q then C[p] ≈ C[q] -/
+theorem rweq_context_congr_step {B : Type u}
+    (C : Context A B) {a₁ a₂ : A}
+    {p q : Path a₁ a₂} (h : RwEq p q) :
+    RwEq (Context.map C p) (Context.map C q) := by
+  induction h with
+  | refl => exact RwEq.refl _
+  | step s => exact rweq_of_step (Step.context_congr C s)
+  | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
+  | symm _ ih => exact RwEq.symm ih
+
 /-- Rule 34: Symmetry commutes with context mapping.
     `(C[p])⁻¹ ▷ C[p⁻¹]` -/
 theorem rweq_context_map_symm_step {B : Type u}
@@ -476,6 +488,18 @@ theorem rweq_context_right_cancel_full {B : Type u}
 /-! ## Dependent Context Rules (Rules 49-60)
 
 These rules handle contexts that depend on the path's base type. -/
+
+/-- Rule 49: Dependent context congruence.
+    If p ≈ q then C.map p ≈ C.map q -/
+theorem rweq_depContext_congr {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A}
+    {p q : Path a₁ a₂} (h : RwEq p q) :
+    RwEq (DepContext.map C p) (DepContext.map C q) := by
+  induction h with
+  | refl => exact RwEq.refl _
+  | step s => exact rweq_of_step (Step.depContext_congr C s)
+  | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
+  | symm _ ih => exact RwEq.symm ih
 
 /-- Rule 50: Symmetry with dependent context. symm(C[p]) ▷ C.symmMap(p) -/
 theorem rweq_depContext_map_symm {B : A → Type u}

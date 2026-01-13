@@ -339,7 +339,7 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 Eight modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
 
-**Total: 174 uses of `rweq_of_step`** across these modules.
+**Total: 176 uses of `rweq_of_step`** across these modules.
 
 ### GroupoidDerived.lean (41 uses of `rweq_of_step`)
 
@@ -367,7 +367,7 @@ Eight modules provide extensive axiom-free, sorry-free results derived purely fr
 | `rweq_inv_refl` | refl⁻¹ ≈ refl |
 | `rweq_inv_inv` | (p⁻¹)⁻¹ ≈ p |
 
-### StepDerived.lean (51 uses of `rweq_of_step`)
+### StepDerived.lean (53 uses of `rweq_of_step`)
 
 Direct lifts of primitive Step rules to RwEq equivalences:
 
