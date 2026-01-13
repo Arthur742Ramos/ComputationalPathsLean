@@ -6,6 +6,7 @@ Audit axioms/assumptions in the repo and discharge (prove/replace or quarantine)
 ## Constraints/Assumptions
 - Run `lake build` after non-trivial edits; keep build warning-free.
 - No `sorry`.
+- No new axioms - only constructive theorems.
 
 ## Key Decisions
 - Basepoint-independence: prove conjugation respects π₁ operations (`conjugateByPath_comp`, `conjugateByPath_inv`).
@@ -22,38 +23,35 @@ Audit axioms/assumptions in the repo and discharge (prove/replace or quarantine)
   - Kernel axiom count reduced: **40 → 36** (all HIT-related now)
   - **Octonionic Hopf fibration**: Complete formalization in `OctonionicHopf.lean`
   - **Stable homotopy stems complete**: πₛ₁ through πₛ₇ in `JamesConstruction.lean`
-  - **Nielsen-Schreier Derivation** (NEW):
+  - **Nielsen-Schreier Derivation**:
     - Created `Algebra/GraphHIT.lean`: Graph realization as quotient type with edge paths typeclass
     - Created `Algebra/NielsenSchreierDerived.lean`: Derives Nielsen-Schreier from covering space theory
-    - `deriveNielsenSchreierData`: Replaces `nielsenSchreierData` axiom with typeclass-based derivation
-    - `deriveSchreierRankFormula`: Proves Schreier rank formula from covering degree
-    - Key typeclasses: `HasEdgePaths`, `HasGraphPi1Equiv`, `HasSubgroupCovering`
-    - Original axioms remain for backward compatibility; new modules provide derivation pathway
-  - Build succeeds with no errors
-  - Documentation updated (`docs/axioms.md`)
-- **Now**: Hurewicz theorem infrastructure complete
-- **Next**: Consider migrating users of original axioms to derived versions
-- **GitHub Copilot Instructions**: Added `.github/copilot-instructions.md` and skills
-  - Skills: lean-build, aristotle, ci-and-releases, lean-hit-development, path-tactics, quotients-and-lifts, rweq-proofs
-- **Singular Homology Module**: Added `SingularHomology.lean` with:
-  - Singular homology axiomatization (Hₙ functor with functoriality, homotopy invariance)
-  - Fundamental class [Sⁿ] ∈ Hₙ(Sⁿ)
-  - Hurewicz homomorphism h : πₙ → Hₙ
-  - Higher Hurewicz theorem for (n-1)-connected spaces (axiomatized)
-  - Connectedness definitions (`IsConnected`, `IsSimplyConnected`)
-  - `simply_connected_H1_trivial`: π₁ = 1 → H₁ = 0
+  - **Hurewicz Applications**:
+    - `IsSimplyConnected` definition
+    - `simply_connected_H1_trivial`: Constructive proof π₁ = 1 → H₁ = 0
+    - `H1_nontrivial_implies_pi1_nontrivial`: Contrapositive application
+  - **Blakers-Massey Theorem** (NEW):
+    - Created `Homotopy/BlakersMassey.lean`: Main connectivity theorem
+    - Derives Freudenthal suspension as special case
+    - Homotopy excision, wedge connectivity, join connectivity
+  - **Cellular Approximation Theorem** (NEW):
+    - Created `Homotopy/CellularApproximation.lean`: Maps homotopic to cellular maps
+    - Skeletal stability: π_k(X^n) ≃ π_k(X) for k < n
+    - Compression lemma, cellular = singular homology
+  - Build succeeds with no errors (202 jobs, 0 warnings)
+  - **Axiom count: 55** (unchanged - all new results are constructive)
+- **Now**: Ready to commit
+- **Next**: Consider additional results or axiom discharge
 
 ## Open Questions
-- None - major results complete
 - Future: Could some HIT axioms (e.g., Cylinder) be derived from others?
 - Future: Extend PiN infrastructure to compute non-trivial higher groups?
 - Future: Deprecate original Nielsen-Schreier axioms in favor of derived versions?
 
 ## Working Set
 - Files:
-  - `ComputationalPaths/Path/Algebra/GraphHIT.lean` (new)
-  - `ComputationalPaths/Path/Algebra/NielsenSchreierDerived.lean` (new)
-  - `ComputationalPaths/Path/Homotopy/SingularHomology.lean` (new)
+  - `ComputationalPaths/Path/Homotopy/BlakersMassey.lean` (new)
+  - `ComputationalPaths/Path/Homotopy/CellularApproximation.lean` (new)
   - `ComputationalPaths/Path.lean` (updated with imports)
 - Commands:
-  - `lake build`
+  - `source ~/.elan/env && lake build`

@@ -50,6 +50,8 @@ import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Homotopy.Reflexivity
 import ComputationalPaths.Path.Homotopy.IdentityType
 import ComputationalPaths.Path.Homotopy.Coproduct
+import ComputationalPaths.Path.Homotopy.BlakersMassey
+import ComputationalPaths.Path.Homotopy.CellularApproximation
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
