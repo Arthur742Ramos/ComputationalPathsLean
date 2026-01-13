@@ -246,6 +246,64 @@ theorem rweq_mapRight_ofEq
     RwEq (mapRight f a (ofEq h)) (ofEq (_root_.congrArg (f a) h)) :=
   rweq_of_step (Step.mapRight_ofEq f a h)
 
+/-! ## Dependent BiContext Congruence (Rules 61-64) -/
+
+/-- Rule 61: DepBiContext left map congruence.
+    If p ≈ q then K.mapLeft p b ≈ K.mapLeft q b -/
+theorem rweq_depBiContext_mapLeft_congr
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+    (K : DepBiContext A B C) {a₁ a₂ : A} (b : B)
+    {p q : Path a₁ a₂}
+    (h : RwEq p q) :
+    RwEq (DepBiContext.mapLeft K p b) (DepBiContext.mapLeft K q b) := by
+  induction h with
+  | refl => exact RwEq.refl _
+  | step s => exact rweq_of_step (Step.depBiContext_mapLeft_congr K b s)
+  | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
+  | symm _ ih => exact RwEq.symm ih
+
+/-- Rule 62: DepBiContext right map congruence.
+    If p ≈ q then K.mapRight a p ≈ K.mapRight a q -/
+theorem rweq_depBiContext_mapRight_congr
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+    (K : DepBiContext A B C) (a : A) {b₁ b₂ : B}
+    {p q : Path b₁ b₂}
+    (h : RwEq p q) :
+    RwEq (DepBiContext.mapRight K a p) (DepBiContext.mapRight K a q) := by
+  induction h with
+  | refl => exact RwEq.refl _
+  | step s => exact rweq_of_step (Step.depBiContext_mapRight_congr K a s)
+  | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
+  | symm _ ih => exact RwEq.symm ih
+
+/-- Rule 63: DepBiContext map2 left congruence.
+    If p ≈ q then K.map2 p r ≈ K.map2 q r -/
+theorem rweq_depBiContext_map2_congr_left
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+    (K : DepBiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+    {p q : Path a₁ a₂} (r : Path b₁ b₂)
+    (h : RwEq p q) :
+    RwEq (DepBiContext.map2 K p r) (DepBiContext.map2 K q r) := by
+  induction h with
+  | refl => exact RwEq.refl _
+  | step s => exact rweq_of_step (Step.depBiContext_map2_congr_left K r s)
+  | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
+  | symm _ ih => exact RwEq.symm ih
+
+/-- Rule 64: DepBiContext map2 right congruence.
+    If q ≈ r then K.map2 p q ≈ K.map2 p r -/
+theorem rweq_depBiContext_map2_congr_right
+    {A : Type u} {B : Type u} {C : A → B → Type u}
+    (K : DepBiContext A B C) {a₁ a₂ : A} {b₁ b₂ : B}
+    (p : Path a₁ a₂) {q r : Path b₁ b₂}
+    (h : RwEq q r) :
+    RwEq (DepBiContext.map2 K p q) (DepBiContext.map2 K p r) := by
+  induction h with
+  | refl => exact RwEq.refl _
+  | step s => exact rweq_of_step (Step.depBiContext_map2_congr_right K p s)
+  | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
+  | symm _ ih => exact RwEq.symm ih
+
 end BiContextDerived
 end Path
 end ComputationalPaths

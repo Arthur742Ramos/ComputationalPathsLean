@@ -339,9 +339,9 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 Eight modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
 
-**Total: 188 uses of `rweq_of_step`** across these modules.
+**Total: 200 uses of `rweq_of_step`** across these modules.
 
-### GroupoidDerived.lean (41 uses of `rweq_of_step`)
+### GroupoidDerived.lean (47 uses of `rweq_of_step`)
 
 | Theorem | Description |
 |---------|-------------|
@@ -436,7 +436,7 @@ Higher coherence laws for the weak ω-groupoid structure:
 | `rweq_symm_trans_five` | Five-fold symm distribution |
 | `rweq_congrArg_symm_natural` | Naturality of symm under congrArg |
 
-### BiContextDerived.lean (10 uses of `rweq_of_step`)
+### BiContextDerived.lean (14 uses of `rweq_of_step`)
 
 | Theorem | Description |
 |---------|-------------|
@@ -450,7 +450,7 @@ Higher coherence laws for the weak ω-groupoid structure:
 | `rweq_mapRight_ofEq` | Rule 72: mapRight with propositional equality |
 | `rweq_biContext_map2_decompose` | Rule 9: BiContext map2 decomposition |
 
-### LoopDerived.lean (14 uses of `rweq_of_step`)
+### LoopDerived.lean (16 uses of `rweq_of_step`)
 
 | Theorem | Description |
 |---------|-------------|

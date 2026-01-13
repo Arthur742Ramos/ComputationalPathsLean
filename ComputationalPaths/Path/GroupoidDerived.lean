@@ -321,6 +321,72 @@ theorem rweq_congrArg_refl_nat {B : Type u} (f : A → B) (a : A) :
     RwEq (congrArg f (refl a)) (refl (f a)) :=
   rweq_refl _
 
+/-! ## Triple Cancellation Laws -/
+
+/-- Triple left cancellation: p · q · r ≈ p · q' · r → q ≈ q' -/
+theorem rweq_triple_cancel {p : Path a b} {q q' : Path b c} {r : Path c d}
+    (h : RwEq (trans (trans p q) r) (trans (trans p q') r)) :
+    RwEq q q' := by
+  have h1 : RwEq (trans (symm p) (trans (trans p q) r))
+                 (trans (symm p) (trans (trans p q') r)) :=
+    rweq_trans_congr_right (symm p) h
+  have h2 : RwEq (trans (symm p) (trans (trans p q) r))
+                 (trans q r) := by
+    have ha : RwEq (trans (trans p q) r) (trans p (trans q r)) :=
+      rweq_of_step (Step.trans_assoc p q r)
+    have hb : RwEq (trans (symm p) (trans (trans p q) r))
+                   (trans (symm p) (trans p (trans q r))) :=
+      rweq_trans_congr_right (symm p) ha
+    have hc : RwEq (trans (symm p) (trans p (trans q r)))
+                   (trans q r) :=
+      rweq_symm_trans_cancel
+    exact RwEq.trans hb hc
+  have h3 : RwEq (trans (symm p) (trans (trans p q') r))
+                 (trans q' r) := by
+    have ha : RwEq (trans (trans p q') r) (trans p (trans q' r)) :=
+      rweq_of_step (Step.trans_assoc p q' r)
+    have hb : RwEq (trans (symm p) (trans (trans p q') r))
+                   (trans (symm p) (trans p (trans q' r))) :=
+      rweq_trans_congr_right (symm p) ha
+    have hc : RwEq (trans (symm p) (trans p (trans q' r)))
+                   (trans q' r) :=
+      rweq_symm_trans_cancel
+    exact RwEq.trans hb hc
+  have h4 : RwEq (trans q r) (trans q' r) :=
+    RwEq.trans (RwEq.symm h2) (RwEq.trans h1 h3)
+  exact rweq_cancel_right h4
+
+/-- Symm distributes three-fold: (p · q · r)⁻¹ ≈ r⁻¹ · q⁻¹ · p⁻¹ -/
+theorem rweq_symm_trans_three_distrib (p : Path a b) (q : Path b c) (r : Path c d) :
+    RwEq (symm (trans (trans p q) r))
+         (trans (trans (symm r) (symm q)) (symm p)) := by
+  have h1 : RwEq (symm (trans (trans p q) r))
+                 (trans (symm r) (symm (trans p q))) :=
+    rweq_of_step (Step.symm_trans_congr (trans p q) r)
+  have h2 : RwEq (symm (trans p q))
+                 (trans (symm q) (symm p)) :=
+    rweq_of_step (Step.symm_trans_congr p q)
+  have h3 : RwEq (trans (symm r) (symm (trans p q)))
+                 (trans (symm r) (trans (symm q) (symm p))) :=
+    rweq_trans_congr_right (symm r) h2
+  have h4 : RwEq (trans (symm r) (trans (symm q) (symm p)))
+                 (trans (trans (symm r) (symm q)) (symm p)) :=
+    RwEq.symm (rweq_of_step (Step.trans_assoc (symm r) (symm q) (symm p)))
+  exact RwEq.trans h1 (RwEq.trans h3 h4)
+
+/-- Inverse uniqueness for composite: if p·q = refl then q = p⁻¹ -/
+theorem rweq_inv_unique_composite {p : Path a b} {q : Path b a}
+    (h : RwEq (trans p q) (refl a)) :
+    RwEq q (symm p) := by
+  have h1 : RwEq (trans (symm p) (trans p q))
+                 (trans (symm p) (refl a)) :=
+    rweq_trans_congr_right (symm p) h
+  have h2 : RwEq (trans (symm p) (trans p q)) q :=
+    rweq_symm_trans_cancel
+  have h3 : RwEq (trans (symm p) (refl a)) (symm p) :=
+    rweq_of_step (Step.trans_refl_right (symm p))
+  exact RwEq.trans (RwEq.symm h2) (RwEq.trans h1 h3)
+
 /-! ## Summary
 
 All theorems in this module are derived purely from the primitive Step rules
@@ -328,11 +394,12 @@ without introducing any new axioms. They extend the groupoid structure with
 useful derived operations.
 
 **Key derived results:**
-1. Cancellation laws (left and right)
+1. Cancellation laws (left, right, triple)
 2. Uniqueness of inverses
 3. Mixed trans/symm cancellation
 4. Whiskering and conjugation laws
 5. Naturality of congrArg
+6. Symm distribution over composition
 
 These are all "free" consequences of the LND_EQ-TRS rewrite system.
 -/

@@ -148,6 +148,16 @@ theorem rweq_loop_whisker_right_refl (p : Path a a) :
     RwEq (trans p (refl a)) p :=
   rweq_of_step (Step.trans_refl_right p)
 
+/-- Loop double symm: (p⁻¹)⁻¹ ≈ p -/
+theorem rweq_loop_symm_symm (p : Path a a) :
+    RwEq (symm (symm p)) p :=
+  rweq_of_step (Step.symm_symm p)
+
+/-- Loop triple symm: ((p⁻¹)⁻¹)⁻¹ ≈ p⁻¹ -/
+theorem rweq_loop_symm_symm_symm (p : Path a a) :
+    RwEq (symm (symm (symm p))) (symm p) :=
+  rweq_of_step (Step.symm_symm (symm p))
+
 end LoopDerived
 end Path
 end ComputationalPaths
