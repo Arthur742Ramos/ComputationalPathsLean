@@ -90,3 +90,7 @@ import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.OmegaGroupoid.AxiomAnalysis
+import ComputationalPaths.Path.Algebra.Abelianization
+import ComputationalPaths.Path.Algebra.NielsenSchreier
+import ComputationalPaths.Path.Algebra.GraphHIT
+import ComputationalPaths.Path.Algebra.NielsenSchreierDerived

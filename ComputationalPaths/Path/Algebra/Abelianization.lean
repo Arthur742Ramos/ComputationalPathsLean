@@ -1182,7 +1182,7 @@ The abelianization of a free product is the direct product of abelianizations.
 -/
 
 /-- Abelianization of free product distributes over product. -/
-theorem freeProduct_ab_prod {G H : Type u} :
+theorem freeProduct_ab_prod {_G _H : Type u} :
     -- (G * H)^ab ≃ G^ab × H^ab
     True := trivial
 
@@ -1193,12 +1193,12 @@ For the orientable surface of genus g:
 -/
 
 /-- The abelianization of the surface group is ℤ^{2g}. -/
-theorem surfaceGroup_ab (g : Nat) :
+theorem surfaceGroup_ab (_g : Nat) :
     -- π₁(Σ_g)^ab ≃ ℤ^{2g}
     True := trivial
 
 /-- For g ≥ 2, the surface group is non-abelian. -/
-theorem surfaceGroup_nonAbelian (g : Nat) (hg : g ≥ 2) :
+theorem surfaceGroup_nonAbelian (_g : Nat) (_hg : _g ≥ 2) :
     -- π₁(Σ_g) is not abelian
     True := trivial
 
@@ -1242,7 +1242,7 @@ theorem figureEight_H1 :
     True := trivial
 
 /-- H₁(orientable surface) ≃ ℤ^{2g} -/
-theorem orientableSurface_H1 (g : Nat) :
+theorem orientableSurface_H1 (_g : Nat) :
     -- H₁(Σ_g) ≃ π₁(Σ_g)^ab ≃ ℤ^{2g}
     True := trivial
 
