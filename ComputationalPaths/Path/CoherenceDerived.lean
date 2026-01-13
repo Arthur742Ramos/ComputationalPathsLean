@@ -18,11 +18,13 @@ Step rules and RwEq congruence lemmas.
 -/
 
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.GroupoidDerived
 
 namespace ComputationalPaths.Path
 namespace CoherenceDerived
 
 open Step
+open GroupoidDerived
 
 universe u
 
@@ -336,6 +338,62 @@ theorem rweq_congrArg_symm_natural {B : Type u} (f : A → B)
 theorem rweq_symm_symm_derived (p : Path a b) :
     RwEq (symm (symm p)) p :=
   rweq_of_step (Step.symm_symm p)
+
+/-! ## Mac Lane Coherence Preparation
+
+These theorems help establish that all diagrams of associativity/unit 
+coherence cells commute (Mac Lane's coherence theorem). -/
+
+/-- Associator squared: α ∘ α gives the same result as α ∘ (1 ⊗ α) ∘ α
+    ((p·q)·r)·s → (p·(q·r))·s → p·((q·r)·s) → p·(q·(r·s))
+    vs
+    ((p·q)·r)·s → (p·q)·(r·s) → p·(q·(r·s))
+    Both give the same result (pentagon coherence). -/
+theorem rweq_assoc_coherence_4 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans p (trans q (trans r s))) :=
+  rweq_pentagon_full p q r s
+
+/-- Left unit coherence: (refl · p) · q → p · q -/
+theorem rweq_left_unit_coherence (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans (refl a) p) q) (trans p q) := by
+  have h1 : RwEq (trans (refl a) p) p :=
+    rweq_of_step (Step.trans_refl_left p)
+  exact rweq_trans_congr_left q h1
+
+/-- Right unit coherence: (p · refl) · q → p · q -/
+theorem rweq_right_unit_coherence (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans p (refl b)) q) (trans p q) := by
+  have h1 : RwEq (trans p (refl b)) p :=
+    rweq_of_step (Step.trans_refl_right p)
+  exact rweq_trans_congr_left q h1
+
+/-- Unit coherence: p · (refl · q) → p · q -/
+theorem rweq_inner_unit_coherence (p : Path a b) (q : Path b c) :
+    RwEq (trans p (trans (refl b) q)) (trans p q) := by
+  have h1 : RwEq (trans (refl b) q) q :=
+    rweq_of_step (Step.trans_refl_left q)
+  exact rweq_trans_congr_right p h1
+
+/-- Inverse coherence: p⁻¹ · (p · q) → q (left cancellation) -/
+theorem rweq_inv_left_coherence (p : Path a b) (q : Path b c) :
+    RwEq (trans (symm p) (trans p q)) q :=
+  GroupoidDerived.rweq_symm_trans_cancel
+
+/-- Inverse coherence: (p · q) · q⁻¹ → p (right cancellation) -/
+theorem rweq_inv_right_coherence (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans p q) (symm q)) p := by
+  have h1 : RwEq (trans (trans p q) (symm q))
+                 (trans p (trans q (symm q))) :=
+    rweq_of_step (Step.trans_assoc p q (symm q))
+  have h2 : RwEq (trans q (symm q)) (refl b) :=
+    rweq_cmpA_inv_right q
+  have h3 : RwEq (trans p (trans q (symm q)))
+                 (trans p (refl b)) :=
+    rweq_trans_congr_right p h2
+  have h4 : RwEq (trans p (refl b)) p :=
+    rweq_of_step (Step.trans_refl_right p)
+  exact RwEq.trans h1 (RwEq.trans h3 h4)
 
 end CoherenceDerived
 end Path

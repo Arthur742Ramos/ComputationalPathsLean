@@ -339,7 +339,7 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 Eight modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
 
-**Total: 176 uses of `rweq_of_step`** across these modules.
+**Total: 181 uses of `rweq_of_step`** across these modules.
 
 ### GroupoidDerived.lean (41 uses of `rweq_of_step`)
 
@@ -417,7 +417,7 @@ Transport coherence laws:
 | `transport_roundtrip` | p⁻¹_* ∘ p_* ≈ id |
 | `transport_roundtrip'` | p_* ∘ p⁻¹_* ≈ id |
 
-### CoherenceDerived.lean (36 uses of `rweq_of_step`)
+### CoherenceDerived.lean (41 uses of `rweq_of_step`)
 
 Higher coherence laws for the weak ω-groupoid structure:
 
