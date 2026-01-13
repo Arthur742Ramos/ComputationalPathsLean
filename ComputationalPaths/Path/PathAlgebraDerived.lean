@@ -247,6 +247,56 @@ theorem rweq_whisker_right_trans (p : Path a b) {q₁ : Path b c} {q₂ : Path c
     RwEq (trans p (trans q₁ q₂)) (trans (trans p q₁) q₂) :=
   RwEq.symm (rweq_of_step (Step.trans_assoc p q₁ q₂))
 
+/-! ## Interchange Law Preparation
+
+The interchange law states that horizontal and vertical composition 
+of 2-cells commute. These lemmas prepare for such proofs. -/
+
+/-- Double whiskering: (p · q) · (r · s) can be reassociated -/
+theorem rweq_double_whisker {p : Path a b} {q : Path b c} {r : Path c d} {s : Path d e} :
+    RwEq (trans (trans p q) (trans r s))
+         (trans p (trans (trans q r) s)) := by
+  have h1 : RwEq (trans (trans p q) (trans r s))
+                 (trans p (trans q (trans r s))) :=
+    rweq_of_step (Step.trans_assoc p q (trans r s))
+  have h2 : RwEq (trans q (trans r s))
+                 (trans (trans q r) s) :=
+    RwEq.symm (rweq_of_step (Step.trans_assoc q r s))
+  exact RwEq.trans h1 (rweq_trans_congr_right p h2)
+
+/-- Alternate double whiskering -/
+theorem rweq_double_whisker_alt {p : Path a b} {q : Path b c} {r : Path c d} {s : Path d e} :
+    RwEq (trans (trans p q) (trans r s))
+         (trans (trans p (trans q r)) s) := by
+  have h1 : RwEq (trans (trans p q) (trans r s))
+                 (trans p (trans q (trans r s))) :=
+    rweq_of_step (Step.trans_assoc p q (trans r s))
+  have h2 : RwEq (trans q (trans r s))
+                 (trans (trans q r) s) :=
+    RwEq.symm (rweq_of_step (Step.trans_assoc q r s))
+  have h3 : RwEq (trans p (trans q (trans r s)))
+                 (trans p (trans (trans q r) s)) :=
+    rweq_trans_congr_right p h2
+  have h4 : RwEq (trans p (trans (trans q r) s))
+                 (trans (trans p (trans q r)) s) :=
+    RwEq.symm (rweq_of_step (Step.trans_assoc p (trans q r) s))
+  exact RwEq.trans h1 (RwEq.trans h3 h4)
+
+/-- Left-then-right whiskering: p · q can be built step-by-step -/
+theorem rweq_whisker_decompose (p : Path a b) (q : Path b c) :
+    RwEq (trans p q)
+         (trans (trans p (refl b)) (trans (refl b) q)) := by
+  have h1 : RwEq p (trans p (refl b)) :=
+    RwEq.symm (rweq_of_step (Step.trans_refl_right p))
+  have h2 : RwEq q (trans (refl b) q) :=
+    RwEq.symm (rweq_of_step (Step.trans_refl_left q))
+  have h3 : RwEq (trans p q) (trans (trans p (refl b)) q) :=
+    rweq_trans_congr_left q h1
+  have h4 : RwEq (trans (trans p (refl b)) q)
+                 (trans (trans p (refl b)) (trans (refl b) q)) :=
+    rweq_trans_congr_right (trans p (refl b)) h2
+  exact RwEq.trans h3 h4
+
 /-! ## Summary
 
 All theorems in this module are derived purely from the primitive Step rules
@@ -261,6 +311,7 @@ derived operations for working with:
 6. Pentagon coherence components
 7. Inversion properties
 8. Whiskering compatibility
+9. Interchange law preparation
 
 These are all consequences of the LND_EQ-TRS rewrite system.
 -/
