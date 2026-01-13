@@ -571,19 +571,34 @@ The Hurewicz theorem is used to:
 3. Study covering spaces: deck transformations act on H₁
 -/
 
-/-- If H₁(X) ≠ 0, then π₁(X) ≠ 0.
+/-- A space is simply connected if π₁ = {id}. -/
+def IsSimplyConnected (A : Type u) (a : A) : Prop :=
+  ∀ (α : π₁(A, a)), α = LoopQuot.id
 
-Contrapositive: if π₁(X) = 0 (simply connected), then H₁(X) = 0. -/
-theorem H1_detects_pi1 (_A : Type u) (_a : _A) :
-    -- H₁(A) = 0 iff π₁(A) is perfect (equals its commutator subgroup)
-    True := trivial
+/-- If π₁(X) = {id} (simply connected), then H₁(X) = {0}.
 
-/-- For the universal cover p : X̃ → X, π₁(X) acts on H₁(X̃) = 0.
+**Proof**: H₁ = π₁^ab. If π₁ has only one element (the identity),
+then π₁^ab also has only one element. -/
+theorem simply_connected_H1_trivial {A : Type u} {a : A}
+    (hsc : IsSimplyConnected A a) :
+    ∀ (h : H1 A a), h = abelianization_mk LoopQuot.comp LoopQuot.inv LoopQuot.id LoopQuot.id := by
+  intro h
+  induction h using Quotient.ind with
+  | _ α =>
+    -- α ∈ π₁(A, a), and by simple-connectedness, α = id
+    have hα : α = LoopQuot.id := hsc α
+    simp only [hα]
+    rfl
 
-This connects covering space theory to homology. -/
-theorem universal_cover_H1 :
-    -- H₁(X̃) = 0 for the universal cover
-    True := trivial
+/-- Contrapositive: If H₁(X) has a non-trivial element, then π₁(X) ≠ {id}.
+
+This is the detection principle: non-trivial H₁ implies non-trivial π₁. -/
+theorem H1_nontrivial_implies_pi1_nontrivial {A : Type u} {a : A}
+    (h : H1 A a) (hne : h ≠ abelianization_mk LoopQuot.comp LoopQuot.inv LoopQuot.id LoopQuot.id) :
+    ¬IsSimplyConnected A a := by
+  intro hsc
+  have := simply_connected_H1_trivial hsc h
+  exact hne this
 
 /-! ## Summary
 

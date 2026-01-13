@@ -31,10 +31,17 @@ Audit axioms/assumptions in the repo and discharge (prove/replace or quarantine)
     - Original axioms remain for backward compatibility; new modules provide derivation pathway
   - Build succeeds with no errors
   - Documentation updated (`docs/axioms.md`)
-- **Now**: All tasks complete
+- **Now**: Hurewicz theorem infrastructure complete
 - **Next**: Consider migrating users of original axioms to derived versions
-- **GitHub Copilot Instructions**: Added `.github/copilot/instructions.md` and skills
+- **GitHub Copilot Instructions**: Added `.github/copilot-instructions.md` and skills
   - Skills: lean-build, aristotle, ci-and-releases, lean-hit-development, path-tactics, quotients-and-lifts, rweq-proofs
+- **Singular Homology Module**: Added `SingularHomology.lean` with:
+  - Singular homology axiomatization (Hₙ functor with functoriality, homotopy invariance)
+  - Fundamental class [Sⁿ] ∈ Hₙ(Sⁿ)
+  - Hurewicz homomorphism h : πₙ → Hₙ
+  - Higher Hurewicz theorem for (n-1)-connected spaces (axiomatized)
+  - Connectedness definitions (`IsConnected`, `IsSimplyConnected`)
+  - `simply_connected_H1_trivial`: π₁ = 1 → H₁ = 0
 
 ## Open Questions
 - None - major results complete
@@ -46,6 +53,7 @@ Audit axioms/assumptions in the repo and discharge (prove/replace or quarantine)
 - Files:
   - `ComputationalPaths/Path/Algebra/GraphHIT.lean` (new)
   - `ComputationalPaths/Path/Algebra/NielsenSchreierDerived.lean` (new)
-  - `ComputationalPaths/Path.lean` (updated with Algebra imports)
+  - `ComputationalPaths/Path/Homotopy/SingularHomology.lean` (new)
+  - `ComputationalPaths/Path.lean` (updated with imports)
 - Commands:
   - `lake build`
