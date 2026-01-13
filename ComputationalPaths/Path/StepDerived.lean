@@ -187,6 +187,94 @@ theorem rweq_transport_refl_step {B : A → Type u}
          (refl x) :=
   rweq_of_step (Step.transport_refl_beta (B := B) x)
 
+/-! ## Context Rules (Rules 33-47)
+
+These rules describe how paths interact with contextual substitution,
+a key feature of the LND_EQ-TRS system. -/
+
+/-- Rule 34: Symmetry commutes with context mapping.
+    `(C[p])⁻¹ ▷ C[p⁻¹]` -/
+theorem rweq_context_map_symm_step {B : Type u}
+    (C : Context A B) {a₁ a₂ : A}
+    (p : Path a₁ a₂) :
+    RwEq (symm (Context.map C p))
+         (Context.map C (symm p)) :=
+  rweq_of_step (Step.context_map_symm C p)
+
+/-- Rule 37: Left substitution beta.
+    `r · C[p] ▷ substLeft C r p` -/
+theorem rweq_context_subst_left_beta_step {B : Type u}
+    (C : Context A B) {x : B} {a₁ a₂ : A}
+    (r : Path x (C.fill a₁)) (p : Path a₁ a₂) :
+    RwEq (trans r (Context.map C p))
+         (Context.substLeft C r p) :=
+  rweq_of_step (Step.context_subst_left_beta C r p)
+
+/-- Rule 40: Right substitution beta.
+    `C[p] · t ▷ substRight C p t` -/
+theorem rweq_context_subst_right_beta_step {B : Type u}
+    (C : Context A B) {a₁ a₂ : A} {y : B}
+    (p : Path a₁ a₂) (t : Path (C.fill a₂) y) :
+    RwEq (trans (Context.map C p) t)
+         (Context.substRight C p t) :=
+  rweq_of_step (Step.context_subst_right_beta C p t)
+
+/-- Rule 39: Associativity for left substitution.
+    `substLeft C r p · t ▷ r · substRight C p t` -/
+theorem rweq_context_subst_left_assoc_step {B : Type u}
+    (C : Context A B) {x : B} {a₁ a₂ : A} {y : B}
+    (r : Path x (C.fill a₁)) (p : Path a₁ a₂)
+    (t : Path (C.fill a₂) y) :
+    RwEq (trans (Context.substLeft C r p) t)
+         (trans r (Context.substRight C p t)) :=
+  rweq_of_step (Step.context_subst_left_assoc C r p t)
+
+/-- Rule 41: Associativity for right substitution.
+    `substRight C p t · u ▷ substRight C p (t · u)` -/
+theorem rweq_context_subst_right_assoc_step {B : Type u}
+    (C : Context A B) {a₁ a₂ : A} {y z : B}
+    (p : Path a₁ a₂) (t : Path (C.fill a₂) y)
+    (u : Path y z) :
+    RwEq (trans (Context.substRight C p t) u)
+         (Context.substRight C p (trans t u)) :=
+  rweq_of_step (Step.context_subst_right_assoc C p t u)
+
+/-- Rule 42: Left substitution with refl on right.
+    `substLeft C r refl ▷ r` -/
+theorem rweq_context_subst_left_refl_right_step {B : Type u}
+    (C : Context A B) {x : B} {a : A}
+    (r : Path x (C.fill a)) :
+    RwEq (Context.substLeft C r (refl a))
+         r :=
+  rweq_of_step (Step.context_subst_left_refl_right C r)
+
+/-- Rule 43: Left substitution with refl on left.
+    `substLeft C refl p ▷ C[p]` -/
+theorem rweq_context_subst_left_refl_left_step {B : Type u}
+    (C : Context A B) {a₁ a₂ : A}
+    (p : Path a₁ a₂) :
+    RwEq (Context.substLeft C (refl (C.fill a₁)) p)
+         (Context.map C p) :=
+  rweq_of_step (Step.context_subst_left_refl_left C p)
+
+/-- Rule 44: Right substitution with refl on left.
+    `substRight C refl t ▷ t` -/
+theorem rweq_context_subst_right_refl_left_step {B : Type u}
+    (C : Context A B) {a : A} {y : B}
+    (t : Path (C.fill a) y) :
+    RwEq (Context.substRight C (refl a) t)
+         t :=
+  rweq_of_step (Step.context_subst_right_refl_left C t)
+
+/-- Rule 45: Right substitution with refl on right.
+    `substRight C p refl ▷ C[p]` -/
+theorem rweq_context_subst_right_refl_right_step {B : Type u}
+    (C : Context A B) {a₁ a₂ : A}
+    (p : Path a₁ a₂) :
+    RwEq (Context.substRight C p (refl (C.fill a₂)))
+         (Context.map C p) :=
+  rweq_of_step (Step.context_subst_right_refl_right C p)
+
 /-! ## Derived Chains
 
 These theorems chain multiple Step rules to derive non-trivial results. -/
@@ -220,6 +308,17 @@ theorem rweq_symm_trans_four {a b c d e : A}
                  (trans (symm r) (trans (symm q) (symm p))) :=
     rweq_symm_trans_three p q r
   exact RwEq.trans h1 (rweq_trans_congr_right (symm s) h2)
+
+/-- Derived: Context map distributes over trans.
+    Using the context_subst rules we can show C[p·q] ≈ C[p]·C[q] -/
+theorem rweq_context_map_trans {B : Type u}
+    (C : Context A B) {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq (Context.map C (trans p q))
+         (trans (Context.map C p) (Context.map C q)) := by
+  -- C[p·q] = congrArg C.fill (p·q) = trans (congrArg C.fill p) (congrArg C.fill q)
+  -- by congrArg_trans
+  exact rweq_of_eq (Context.map_trans C p q)
 
 end StepDerived
 end Path
