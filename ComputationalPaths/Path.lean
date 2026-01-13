@@ -26,6 +26,7 @@ import ComputationalPaths.Path.GroupoidDerived
 import ComputationalPaths.Path.PathAlgebraDerived
 import ComputationalPaths.Path.ProductSigmaDerived
 import ComputationalPaths.Path.TransportDerived
+import ComputationalPaths.Path.StepDerived
 import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
