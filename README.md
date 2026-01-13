@@ -339,9 +339,9 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 Eight modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
 
-**Total: 200 uses of `rweq_of_step`** across these modules.
+**Total: 250 uses of `rweq_of_step`** across these modules.
 
-### GroupoidDerived.lean (47 uses of `rweq_of_step`)
+### GroupoidDerived.lean (56 uses of `rweq_of_step`)
 
 | Theorem | Description |
 |---------|-------------|
@@ -355,7 +355,7 @@ Eight modules provide extensive axiom-free, sorry-free results derived purely fr
 | `rweq_conj_refl` | p · refl · p⁻¹ ≈ refl |
 | `rweq_conj_trans` | Conjugation distributes over trans |
 
-### PathAlgebraDerived.lean (29 uses of `rweq_of_step`)
+### PathAlgebraDerived.lean (40 uses of `rweq_of_step`)
 
 | Theorem | Description |
 |---------|-------------|
@@ -367,7 +367,7 @@ Eight modules provide extensive axiom-free, sorry-free results derived purely fr
 | `rweq_inv_refl` | refl⁻¹ ≈ refl |
 | `rweq_inv_inv` | (p⁻¹)⁻¹ ≈ p |
 
-### StepDerived.lean (53 uses of `rweq_of_step`)
+### StepDerived.lean (59 uses of `rweq_of_step`)
 
 Direct lifts of primitive Step rules to RwEq equivalences:
 
@@ -417,7 +417,7 @@ Transport coherence laws:
 | `transport_roundtrip` | p⁻¹_* ∘ p_* ≈ id |
 | `transport_roundtrip'` | p_* ∘ p⁻¹_* ≈ id |
 
-### CoherenceDerived.lean (41 uses of `rweq_of_step`)
+### CoherenceDerived.lean (51 uses of `rweq_of_step`)
 
 Higher coherence laws for the weak ω-groupoid structure:
 
@@ -436,7 +436,7 @@ Higher coherence laws for the weak ω-groupoid structure:
 | `rweq_symm_trans_five` | Five-fold symm distribution |
 | `rweq_congrArg_symm_natural` | Naturality of symm under congrArg |
 
-### BiContextDerived.lean (14 uses of `rweq_of_step`)
+### BiContextDerived.lean (17 uses of `rweq_of_step`)
 
 | Theorem | Description |
 |---------|-------------|
@@ -450,7 +450,7 @@ Higher coherence laws for the weak ω-groupoid structure:
 | `rweq_mapRight_ofEq` | Rule 72: mapRight with propositional equality |
 | `rweq_biContext_map2_decompose` | Rule 9: BiContext map2 decomposition |
 
-### LoopDerived.lean (16 uses of `rweq_of_step`)
+### LoopDerived.lean (27 uses of `rweq_of_step`)
 
 | Theorem | Description |
 |---------|-------------|

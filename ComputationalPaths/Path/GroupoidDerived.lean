@@ -387,6 +387,102 @@ theorem rweq_inv_unique_composite {p : Path a b} {q : Path b a}
     rweq_of_step (Step.trans_refl_right (symm p))
   exact RwEq.trans (RwEq.symm h2) (RwEq.trans h1 h3)
 
+/-! ## Quadruple Symm Distribution -/
+
+/-- Quadruple inverse distribution: (p·q·r·s)⁻¹ ≈ s⁻¹·r⁻¹·q⁻¹·p⁻¹ -/
+theorem rweq_symm_trans_four {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (symm (trans (trans (trans p q) r) s))
+         (trans (symm s) (trans (symm r) (trans (symm q) (symm p)))) := by
+  -- First: (((p·q)·r)·s)⁻¹ → s⁻¹·((p·q)·r)⁻¹
+  have h1 : RwEq (symm (trans (trans (trans p q) r) s))
+                 (trans (symm s) (symm (trans (trans p q) r))) :=
+    rweq_of_step (Step.symm_trans_congr (trans (trans p q) r) s)
+  -- Then: ((p·q)·r)⁻¹ → r⁻¹·(p·q)⁻¹
+  have h2 : RwEq (symm (trans (trans p q) r))
+                 (trans (symm r) (symm (trans p q))) :=
+    rweq_of_step (Step.symm_trans_congr (trans p q) r)
+  -- Then: (p·q)⁻¹ → q⁻¹·p⁻¹
+  have h3 : RwEq (symm (trans p q)) (trans (symm q) (symm p)) :=
+    rweq_of_step (Step.symm_trans_congr p q)
+  -- Combine h2 and h3
+  have h4 : RwEq (trans (symm r) (symm (trans p q)))
+                 (trans (symm r) (trans (symm q) (symm p))) :=
+    rweq_trans_congr_right (symm r) h3
+  have h5 := RwEq.trans h2 h4
+  -- Combine h1 and h5
+  have h6 : RwEq (trans (symm s) (symm (trans (trans p q) r)))
+                 (trans (symm s) (trans (symm r) (trans (symm q) (symm p)))) :=
+    rweq_trans_congr_right (symm s) h5
+  exact RwEq.trans h1 h6
+
+/-! ## Four-Element Cancellation -/
+
+/-- Four-path double cancellation: (p·q)·q⁻¹·p⁻¹ ≈ refl -/
+theorem rweq_quad_cancel {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans (trans p q) (symm q)) (symm p)) (refl a) := by
+  -- First: ((p·q)·q⁻¹) → p·(q·q⁻¹)
+  have h1 : RwEq (trans (trans p q) (symm q))
+                 (trans p (trans q (symm q))) :=
+    rweq_of_step (Step.trans_assoc p q (symm q))
+  -- q·q⁻¹ ≈ refl
+  have h2 : RwEq (trans q (symm q)) (refl b) :=
+    rweq_cmpA_inv_right q
+  -- p·(q·q⁻¹) ≈ p·refl
+  have h3 : RwEq (trans p (trans q (symm q))) (trans p (refl b)) :=
+    rweq_trans_congr_right p h2
+  -- p·refl ≈ p
+  have h4 : RwEq (trans p (refl b)) p :=
+    rweq_of_step (Step.trans_refl_right p)
+  -- ((p·q)·q⁻¹) ≈ p
+  have h5 := RwEq.trans h1 (RwEq.trans h3 h4)
+  -- ((p·q)·q⁻¹)·p⁻¹ ≈ p·p⁻¹
+  have h6 : RwEq (trans (trans (trans p q) (symm q)) (symm p))
+                 (trans p (symm p)) :=
+    rweq_trans_congr_left (symm p) h5
+  -- p·p⁻¹ ≈ refl
+  have h7 : RwEq (trans p (symm p)) (refl a) :=
+    rweq_cmpA_inv_right p
+  exact RwEq.trans h6 h7
+
+/-! ## Symm Commutes With Conjugation -/
+
+/-- Conjugation symm: (p·q·p⁻¹)⁻¹ ≈ p·q⁻¹·p⁻¹ -/
+theorem rweq_conjugation_symm {a b : A}
+    (p : Path a b) (q : Path b b) :
+    RwEq (symm (trans (trans p q) (symm p)))
+         (trans (trans p (symm q)) (symm p)) := by
+  -- (p·q·p⁻¹)⁻¹ ≈ p⁻¹⁻¹·(p·q)⁻¹
+  have h1 : RwEq (symm (trans (trans p q) (symm p)))
+                 (trans (symm (symm p)) (symm (trans p q))) :=
+    rweq_of_step (Step.symm_trans_congr (trans p q) (symm p))
+  have h2 : RwEq (symm (trans p q)) (trans (symm q) (symm p)) :=
+    rweq_of_step (Step.symm_trans_congr p q)
+  have h3 : RwEq (trans (symm (symm p)) (symm (trans p q)))
+                 (trans (symm (symm p)) (trans (symm q) (symm p))) :=
+    rweq_trans_congr_right (symm (symm p)) h2
+  -- p⁻¹⁻¹ ≈ p
+  have h4 : RwEq (symm (symm p)) p :=
+    rweq_of_step (Step.symm_symm p)
+  have h5 : RwEq (trans (symm (symm p)) (trans (symm q) (symm p)))
+                 (trans p (trans (symm q) (symm p))) :=
+    rweq_trans_congr_left (trans (symm q) (symm p)) h4
+  -- p·(q⁻¹·p⁻¹) ≈ (p·q⁻¹)·p⁻¹
+  have h6 : RwEq (trans p (trans (symm q) (symm p)))
+                 (trans (trans p (symm q)) (symm p)) :=
+    RwEq.symm (rweq_of_step (Step.trans_assoc p (symm q) (symm p)))
+  exact RwEq.trans h1 (RwEq.trans h3 (RwEq.trans h5 h6))
+
+/-! ## More Naturality -/
+
+/-- CongrArg distributes: congrArg f (p·q) ≈ congrArg f p · congrArg f q -/
+theorem rweq_congrArg_trans_derived {B : Type u} (f : A → B)
+    {a b c : A} (p : Path a b) (q : Path b c) :
+    RwEq (congrArg f (trans p q))
+         (trans (congrArg f p) (congrArg f q)) :=
+  rweq_of_eq (congrArg_trans f p q)
+
 /-! ## Summary
 
 All theorems in this module are derived purely from the primitive Step rules
@@ -394,12 +490,13 @@ without introducing any new axioms. They extend the groupoid structure with
 useful derived operations.
 
 **Key derived results:**
-1. Cancellation laws (left, right, triple)
+1. Cancellation laws (left, right, triple, quadruple)
 2. Uniqueness of inverses
 3. Mixed trans/symm cancellation
 4. Whiskering and conjugation laws
 5. Naturality of congrArg
 6. Symm distribution over composition
+7. Conjugation symm theorem
 
 These are all "free" consequences of the LND_EQ-TRS rewrite system.
 -/

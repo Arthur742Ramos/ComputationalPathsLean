@@ -638,6 +638,87 @@ theorem rweq_context_triple_map {B : Type u}
   have h3 := rweq_context_double_map C (trans p q) r
   exact RwEq.trans h2 h3
 
+/-! ## Dependent Context Cancellation (Rule 60) -/
+
+/-- Rule 60: Inner cancellation for nested dependent right substitutions. -/
+theorem rweq_depContext_subst_right_cancel_inner {B : A → Type u}
+    (C : DepContext A B) {a₁ a₂ : A} {y : B a₂}
+    (p : Path a₁ a₂)
+    (t : Path (A := B a₂) (C.fill a₂) y) :
+    RwEq (DepContext.substRight C p
+           (DepContext.substRight C (refl a₂) t))
+         (DepContext.substRight C p t) :=
+  rweq_of_step (Step.depContext_subst_right_cancel_inner C p t)
+
+/-! ## MapLeft / MapRight Congruence Rules (Rules 69-72) -/
+
+/-- Rule 69: mapLeft congruence. If p ≈ q then mapLeft f p b ≈ mapLeft f q b -/
+theorem rweq_mapLeft_congr {B : Type u}
+    (f : A → B → A) {a₁ a₂ : A} (b : B)
+    {p q : Path a₁ a₂} (h : RwEq p q) :
+    RwEq (mapLeft f p b) (mapLeft f q b) := by
+  induction h with
+  | refl => exact RwEq.refl _
+  | step s => exact rweq_of_step (Step.mapLeft_congr f b s)
+  | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
+  | symm _ ih => exact RwEq.symm ih
+
+/-- Rule 70: mapRight congruence. If p ≈ q then mapRight f a p ≈ mapRight f a q -/
+theorem rweq_mapRight_congr
+    (f : A → A → A) (a : A) {b₁ b₂ : A}
+    {p q : Path b₁ b₂} (h : RwEq p q) :
+    RwEq (mapRight f a p) (mapRight f a q) := by
+  induction h with
+  | refl => exact RwEq.refl _
+  | step s => exact rweq_of_step (Step.mapRight_congr f a s)
+  | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
+  | symm _ ih => exact RwEq.symm ih
+
+/-- Rule 71: mapLeft with ofEq. -/
+theorem rweq_mapLeft_ofEq {B : Type u}
+    (f : A → B → A) {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
+    RwEq (mapLeft f (ofEq h) b)
+         (ofEq (_root_.congrArg (fun x => f x b) h)) :=
+  rweq_of_step (Step.mapLeft_ofEq f h b)
+
+/-- Rule 72: mapRight with ofEq. -/
+theorem rweq_mapRight_ofEq
+    (f : A → A → A) (a : A) {b₁ b₂ : A} (h : b₁ = b₂) :
+    RwEq (mapRight f a (ofEq h))
+         (ofEq (_root_.congrArg (f a) h)) :=
+  rweq_of_step (Step.mapRight_ofEq f a h)
+
+/-! ## Derived: Quadruple Context Composition -/
+
+/-- Quadruple context composition: C[p]·C[q]·C[r]·C[s] ≈ C[p·q·r·s] -/
+theorem rweq_context_quad_map {B : Type u}
+    (C : Context A B) {a₁ a₂ a₃ a₄ a₅ : A}
+    (p : Path a₁ a₂) (q : Path a₂ a₃) (r : Path a₃ a₄) (s : Path a₄ a₅) :
+    RwEq (trans (trans (trans (Context.map C p) (Context.map C q))
+                       (Context.map C r)) (Context.map C s))
+         (Context.map C (trans (trans (trans p q) r) s)) := by
+  have h1 := rweq_context_triple_map C p q r
+  have h2 : RwEq (trans (trans (trans (Context.map C p) (Context.map C q))
+                               (Context.map C r)) (Context.map C s))
+                 (trans (Context.map C (trans (trans p q) r)) (Context.map C s)) :=
+    rweq_trans_congr_left (Context.map C s) h1
+  have h3 := rweq_context_double_map C (trans (trans p q) r) s
+  exact RwEq.trans h2 h3
+
+/-! ## Five-Path Symm Distribution -/
+
+/-- Derived: Five-path inverse distribution.
+    (p·q·r·s·t)⁻¹ ≈ t⁻¹·s⁻¹·r⁻¹·q⁻¹·p⁻¹ -/
+theorem rweq_symm_trans_five {a b c d e f : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) (t : Path e f) :
+    RwEq (symm (trans (trans (trans (trans p q) r) s) t))
+         (trans (symm t) (trans (symm s) (trans (symm r) (trans (symm q) (symm p))))) := by
+  have h1 : RwEq (symm (trans (trans (trans (trans p q) r) s) t))
+                 (trans (symm t) (symm (trans (trans (trans p q) r) s))) :=
+    rweq_of_step (Step.symm_trans_congr _ t)
+  have h2 := rweq_symm_trans_four p q r s
+  exact RwEq.trans h1 (rweq_trans_congr_right (symm t) h2)
+
 end StepDerived
 end Path
 end ComputationalPaths

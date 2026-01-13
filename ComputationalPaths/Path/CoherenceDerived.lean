@@ -395,6 +395,93 @@ theorem rweq_inv_right_coherence (p : Path a b) (q : Path b c) :
     rweq_of_step (Step.trans_refl_right p)
   exact RwEq.trans h1 (RwEq.trans h3 h4)
 
+/-! ## 8-fold Associativity -/
+
+/-- 8-fold left-assoc to right-assoc:
+    (((((((p·q)·r)·s)·t)·u)·v)·w) ≈ p·(q·(r·(s·(t·(u·(v·w)))))) -/
+theorem rweq_assoc_eight {a b c d e f' g' h' i' : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e)
+    (t : Path e f') (u : Path f' g') (v : Path g' h') (w : Path h' i') :
+    RwEq (trans (trans (trans (trans (trans (trans (trans p q) r) s) t) u) v) w)
+         (trans p (trans q (trans r (trans s (trans t (trans u (trans v w))))))) := by
+  -- First use 7-fold on (((((((p·q)·r)·s)·t)·u)·v)
+  have h1 := rweq_trans_seven_assoc p q r s t u v
+  have h2 : RwEq (trans (trans (trans (trans (trans (trans (trans p q) r) s) t) u) v) w)
+                 (trans (trans p (trans q (trans r (trans s (trans t (trans u v)))))) w) :=
+    rweq_trans_congr_left w h1
+  -- (p·(q·(r·(s·(t·(u·v))))))·w → p·((q·(r·(s·(t·(u·v)))))·w)
+  have h3 : RwEq (trans (trans p (trans q (trans r (trans s (trans t (trans u v)))))) w)
+                 (trans p (trans (trans q (trans r (trans s (trans t (trans u v))))) w)) :=
+    rweq_of_step (Step.trans_assoc p (trans q (trans r (trans s (trans t (trans u v))))) w)
+  -- Continue reassociating inner
+  have h4 : RwEq (trans (trans q (trans r (trans s (trans t (trans u v))))) w)
+                 (trans q (trans (trans r (trans s (trans t (trans u v)))) w)) :=
+    rweq_of_step (Step.trans_assoc q (trans r (trans s (trans t (trans u v)))) w)
+  have h5 : RwEq (trans (trans r (trans s (trans t (trans u v)))) w)
+                 (trans r (trans (trans s (trans t (trans u v))) w)) :=
+    rweq_of_step (Step.trans_assoc r (trans s (trans t (trans u v))) w)
+  have h6 : RwEq (trans (trans s (trans t (trans u v))) w)
+                 (trans s (trans (trans t (trans u v)) w)) :=
+    rweq_of_step (Step.trans_assoc s (trans t (trans u v)) w)
+  have h7 : RwEq (trans (trans t (trans u v)) w)
+                 (trans t (trans (trans u v) w)) :=
+    rweq_of_step (Step.trans_assoc t (trans u v) w)
+  have h8 : RwEq (trans (trans u v) w)
+                 (trans u (trans v w)) :=
+    rweq_of_step (Step.trans_assoc u v w)
+  have h9 := rweq_trans_congr_right t h8
+  have h10 := RwEq.trans h7 h9
+  have h11 := rweq_trans_congr_right s h10
+  have h12 := RwEq.trans h6 h11
+  have h13 := rweq_trans_congr_right r h12
+  have h14 := RwEq.trans h5 h13
+  have h15 := rweq_trans_congr_right q h14
+  have h16 := RwEq.trans h4 h15
+  have h17 := rweq_trans_congr_right p h16
+  exact RwEq.trans h2 (RwEq.trans h3 h17)
+
+/-! ## Double Inverse Cancellation -/
+
+/-- Double inverse on left: p⁻¹⁻¹ ≈ p -/
+theorem rweq_double_inv (p : Path a b) :
+    RwEq (symm (symm p)) p :=
+  rweq_of_step (Step.symm_symm p)
+
+/-- Conjugation preserves identity: p·refl·p⁻¹ ≈ refl -/
+theorem rweq_conjugation_refl (p : Path a b) :
+    RwEq (trans p (trans (refl b) (symm p))) (refl a) := by
+  have h1 : RwEq (trans (refl b) (symm p)) (symm p) :=
+    rweq_of_step (Step.trans_refl_left (symm p))
+  have h2 : RwEq (trans p (trans (refl b) (symm p))) (trans p (symm p)) :=
+    rweq_trans_congr_right p h1
+  have h3 : RwEq (trans p (symm p)) (refl a) :=
+    rweq_cmpA_inv_right p
+  exact RwEq.trans h2 h3
+
+/-! ## Hexagon Coherence Preparation -/
+
+/-- Outer associator: ((p·q)·r)·s ≈ (p·(q·r))·s via Step.trans_assoc on left part -/
+theorem rweq_hexagon_step1 {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans (trans p (trans q r)) s) := by
+  have h := rweq_of_step (Step.trans_assoc p q r)
+  exact rweq_trans_congr_left s h
+
+/-- Inner associator: (p·(q·r))·s ≈ p·((q·r)·s) -/
+theorem rweq_hexagon_step2 {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans p (trans q r)) s)
+         (trans p (trans (trans q r) s)) :=
+  rweq_of_step (Step.trans_assoc p (trans q r) s)
+
+/-- Full hexagon: ((p·q)·r)·s ≈ p·((q·r)·s) (two steps) -/
+theorem rweq_hexagon_full {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans p (trans (trans q r) s)) :=
+  RwEq.trans (rweq_hexagon_step1 p q r s) (rweq_hexagon_step2 p q r s)
+
 end CoherenceDerived
 end Path
 end ComputationalPaths

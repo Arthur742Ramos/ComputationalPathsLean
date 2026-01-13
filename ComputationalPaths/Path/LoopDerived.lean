@@ -158,6 +158,66 @@ theorem rweq_loop_symm_symm_symm (p : Path a a) :
     RwEq (symm (symm (symm p))) (symm p) :=
   rweq_of_step (Step.symm_symm (symm p))
 
+/-! ## Loop Power Laws -/
+
+/-- Loop power 2 with unit: (p · p) · refl ≈ p · p -/
+theorem rweq_loop_square_unit (p : Path a a) :
+    RwEq (trans (trans p p) (refl a)) (trans p p) :=
+  rweq_of_step (Step.trans_refl_right (trans p p))
+
+/-- Loop inverse power: (p · p)⁻¹ ≈ p⁻¹ · p⁻¹ -/
+theorem rweq_loop_square_symm (p : Path a a) :
+    RwEq (symm (trans p p)) (trans (symm p) (symm p)) :=
+  rweq_of_step (Step.symm_trans_congr p p)
+
+/-- Loop power refl: refl · refl ≈ refl -/
+theorem rweq_loop_refl_compose (a : A) :
+    RwEq (trans (refl a) (refl a)) (refl a) :=
+  rweq_of_step (Step.trans_refl_left (refl a))
+
+/-- Loop triple compose symm: (p · q · r)⁻¹ ≈ r⁻¹ · q⁻¹ · p⁻¹ -/
+theorem rweq_loop_symm_trans_three (p q r : Path a a) :
+    RwEq (symm (trans (trans p q) r))
+         (trans (symm r) (trans (symm q) (symm p))) := by
+  have h1 : RwEq (symm (trans (trans p q) r))
+                 (trans (symm r) (symm (trans p q))) :=
+    rweq_of_step (Step.symm_trans_congr (trans p q) r)
+  have h2 : RwEq (symm (trans p q)) (trans (symm q) (symm p)) :=
+    rweq_of_step (Step.symm_trans_congr p q)
+  exact RwEq.trans h1 (rweq_trans_congr_right (symm r) h2)
+
+/-! ## Loop Double Cancellation -/
+
+/-- Loop double left cancel: p⁻¹ · (p · q) ≈ q -/
+theorem rweq_loop_symm_trans_cancel_ext (p q : Path a a) :
+    RwEq (trans (symm p) (trans p q)) q := by
+  have h1 : RwEq (trans (symm p) (trans p q))
+                 (trans (trans (symm p) p) q) :=
+    RwEq.symm (rweq_of_step (Step.trans_assoc (symm p) p q))
+  have h2 : RwEq (trans (symm p) p) (refl a) :=
+    rweq_of_step (Step.symm_trans p)
+  have h3 : RwEq (trans (trans (symm p) p) q)
+                 (trans (refl a) q) :=
+    rweq_trans_congr_left q h2
+  have h4 : RwEq (trans (refl a) q) q :=
+    rweq_of_step (Step.trans_refl_left q)
+  exact RwEq.trans h1 (RwEq.trans h3 h4)
+
+/-- Loop double right cancel: (p · q) · q⁻¹ ≈ p -/
+theorem rweq_loop_trans_symm_cancel_ext (p q : Path a a) :
+    RwEq (trans (trans p q) (symm q)) p := by
+  have h1 : RwEq (trans (trans p q) (symm q))
+                 (trans p (trans q (symm q))) :=
+    rweq_of_step (Step.trans_assoc p q (symm q))
+  have h2 : RwEq (trans q (symm q)) (refl a) :=
+    rweq_of_step (Step.trans_symm q)
+  have h3 : RwEq (trans p (trans q (symm q)))
+                 (trans p (refl a)) :=
+    rweq_trans_congr_right p h2
+  have h4 : RwEq (trans p (refl a)) p :=
+    rweq_of_step (Step.trans_refl_right p)
+  exact RwEq.trans h1 (RwEq.trans h3 h4)
+
 end LoopDerived
 end Path
 end ComputationalPaths

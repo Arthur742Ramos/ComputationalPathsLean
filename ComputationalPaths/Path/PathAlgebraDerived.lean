@@ -297,13 +297,87 @@ theorem rweq_whisker_decompose (p : Path a b) (q : Path b c) :
     rweq_trans_congr_right (trans p (refl b)) h2
   exact RwEq.trans h3 h4
 
+/-! ## More Unit Laws -/
+
+/-- Nested left unit: refl · (refl · p) ≈ p -/
+theorem rweq_double_left_unit (p : Path a b) :
+    RwEq (trans (refl a) (trans (refl a) p)) p := by
+  have h1 : RwEq (trans (refl a) p) p :=
+    rweq_of_step (Step.trans_refl_left p)
+  have h2 : RwEq (trans (refl a) (trans (refl a) p)) (trans (refl a) p) :=
+    rweq_of_step (Step.trans_refl_left (trans (refl a) p))
+  exact RwEq.trans h2 h1
+
+/-- Nested right unit: (p · refl) · refl ≈ p -/
+theorem rweq_double_right_unit (p : Path a b) :
+    RwEq (trans (trans p (refl b)) (refl b)) p := by
+  have h1 : RwEq (trans p (refl b)) p :=
+    rweq_of_step (Step.trans_refl_right p)
+  have h2 : RwEq (trans (trans p (refl b)) (refl b)) (trans p (refl b)) :=
+    rweq_of_step (Step.trans_refl_right (trans p (refl b)))
+  exact RwEq.trans h2 h1
+
+/-- Middle unit: p · (refl · refl) ≈ p -/
+theorem rweq_middle_double_unit (p : Path a b) :
+    RwEq (trans p (trans (refl b) (refl b))) p := by
+  have h1 : RwEq (trans (refl b) (refl b)) (refl b) :=
+    rweq_of_step (Step.trans_refl_left (refl b))
+  have h2 : RwEq (trans p (trans (refl b) (refl b))) (trans p (refl b)) :=
+    rweq_trans_congr_right p h1
+  have h3 : RwEq (trans p (refl b)) p :=
+    rweq_of_step (Step.trans_refl_right p)
+  exact RwEq.trans h2 h3
+
+/-! ## Symm Interactions with Trans -/
+
+/-- Symm of refl·p: (refl·p)⁻¹ ≈ p⁻¹ -/
+theorem rweq_symm_trans_refl_left (p : Path a b) :
+    RwEq (symm (trans (refl a) p)) (symm p) := by
+  have h1 : RwEq (trans (refl a) p) p :=
+    rweq_of_step (Step.trans_refl_left p)
+  exact rweq_symm_congr h1
+
+/-- Symm of p·refl: (p·refl)⁻¹ ≈ p⁻¹ -/
+theorem rweq_symm_trans_refl_right (p : Path a b) :
+    RwEq (symm (trans p (refl b))) (symm p) := by
+  have h1 : RwEq (trans p (refl b)) p :=
+    rweq_of_step (Step.trans_refl_right p)
+  exact rweq_symm_congr h1
+
+/-! ## Five-Fold Associativity -/
+
+/-- Five-fold complete left-to-right:
+    ((((p·q)·r)·s)·t) ≈ p·(q·(r·(s·t))) -/
+theorem rweq_five_fold_complete {a b c d e f' : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) (t : Path e f') :
+    RwEq (trans (trans (trans (trans p q) r) s) t)
+         (trans p (trans q (trans r (trans s t)))) := by
+  have h1 : RwEq (trans (trans (trans p q) r) s) (trans p (trans q (trans r s))) :=
+    rweq_trans_four_assoc
+  have h2 : RwEq (trans (trans (trans (trans p q) r) s) t)
+                 (trans (trans p (trans q (trans r s))) t) :=
+    rweq_trans_congr_left t h1
+  have h3 : RwEq (trans (trans p (trans q (trans r s))) t)
+                 (trans p (trans (trans q (trans r s)) t)) :=
+    rweq_of_step (Step.trans_assoc p (trans q (trans r s)) t)
+  have h4 : RwEq (trans (trans q (trans r s)) t)
+                 (trans q (trans (trans r s) t)) :=
+    rweq_of_step (Step.trans_assoc q (trans r s) t)
+  have h5 : RwEq (trans (trans r s) t)
+                 (trans r (trans s t)) :=
+    rweq_of_step (Step.trans_assoc r s t)
+  have h6 := rweq_trans_congr_right q h5
+  have h7 := RwEq.trans h4 h6
+  have h8 := rweq_trans_congr_right p h7
+  exact RwEq.trans h2 (RwEq.trans h3 h8)
+
 /-! ## Summary
 
 All theorems in this module are derived purely from the primitive Step rules
 without introducing any new axioms. They extend the path algebra with useful
 derived operations for working with:
 
-1. Extended associativity (3+ paths)
+1. Extended associativity (3-5 paths)
 2. Symmetry-transitivity interactions
 3. Congruence composition laws
 4. Transport properties
@@ -312,6 +386,8 @@ derived operations for working with:
 7. Inversion properties
 8. Whiskering compatibility
 9. Interchange law preparation
+10. Nested unit laws
+11. Five-fold associativity
 
 These are all consequences of the LND_EQ-TRS rewrite system.
 -/

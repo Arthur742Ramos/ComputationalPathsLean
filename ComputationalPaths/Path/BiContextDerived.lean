@@ -304,6 +304,30 @@ theorem rweq_depBiContext_map2_congr_right
   | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
   | symm _ ih => exact RwEq.symm ih
 
+/-! ## Additional BiContext Laws -/
+
+/-- BiContext left-right cancellation: 
+    K.mapLeft p b · K.mapLeft (p⁻¹) b ≈ refl can be proven directly -/
+theorem rweq_biContext_mapLeft_trans_symm
+    (K : BiContext A B C) {a₁ a₂ : A}
+    (p : Path a₁ a₂) (b : B) :
+    RwEq (BiContext.mapLeft K (trans p (symm p)) b) (BiContext.mapLeft K (refl a₁) b) :=
+  rweq_biContext_mapLeft_congr K b (rweq_of_step (Step.trans_symm p))
+
+/-- BiContext right-left cancellation -/
+theorem rweq_biContext_mapRight_trans_symm
+    (K : BiContext A B C) (a : A) {b₁ b₂ : B}
+    (p : Path b₁ b₂) :
+    RwEq (BiContext.mapRight K a (trans p (symm p))) (BiContext.mapRight K a (refl b₁)) :=
+  rweq_biContext_mapRight_congr K a (rweq_of_step (Step.trans_symm p))
+
+/-- BiContext left double symm: K.mapLeft p⁻¹⁻¹ b ≈ K.mapLeft p b -/
+theorem rweq_biContext_mapLeft_symm_symm
+    (K : BiContext A B C) {a₁ a₂ : A}
+    (p : Path a₁ a₂) (b : B) :
+    RwEq (BiContext.mapLeft K (symm (symm p)) b) (BiContext.mapLeft K p b) :=
+  rweq_biContext_mapLeft_congr K b (rweq_of_step (Step.symm_symm p))
+
 end BiContextDerived
 end Path
 end ComputationalPaths
