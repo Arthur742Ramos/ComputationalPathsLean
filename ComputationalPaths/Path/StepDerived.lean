@@ -320,6 +320,127 @@ theorem rweq_context_map_trans {B : Type u}
   -- by congrArg_trans
   exact rweq_of_eq (Context.map_trans C p q)
 
+/-! ## Context Cancellation Rules (Rules 35-36) -/
+
+/-- Rule 35: Left cancellation in context.
+    C[p]·(C[p⁻¹]·v) ▷ C[p·p⁻¹]·v -/
+theorem rweq_context_tt_cancel_left {B : Type u}
+    (C : Context A B) {a₁ a₂ : A} {y : B}
+    (p : Path a₁ a₂) (v : Path (C.fill a₁) y) :
+    RwEq (trans (Context.map C p)
+               (trans (Context.map C (symm p)) v))
+         (trans (Context.map C (trans p (symm p))) v) :=
+  rweq_of_step (Step.context_tt_cancel_left C p v)
+
+/-- Rule 36: Right cancellation in context.
+    (v·C[p])·C[p⁻¹] ▷ v·C[p·p⁻¹] -/
+theorem rweq_context_tt_cancel_right {B : Type u}
+    (C : Context A B) {a₁ a₂ : A} {x : B}
+    (p : Path a₁ a₂) (v : Path x (C.fill a₁)) :
+    RwEq (trans (trans v (Context.map C p))
+               (Context.map C (symm p)))
+         (trans v (Context.map C (trans p (symm p)))) :=
+  rweq_of_step (Step.context_tt_cancel_right C p v)
+
+/-! ## Context Idempotence and Nesting Rules (Rules 46-48) -/
+
+/-- Rule 46: Idempotence for nested left substitutions.
+    substLeft C (substLeft C r refl) p ▷ substLeft C r p -/
+theorem rweq_context_subst_left_idempotent {B : Type u}
+    (C : Context A B) {x : B} {a₁ a₂ : A}
+    (r : Path x (C.fill a₁)) (p : Path a₁ a₂) :
+    RwEq (Context.substLeft C (Context.substLeft C r (refl a₁)) p)
+         (Context.substLeft C r p) :=
+  rweq_of_step (Step.context_subst_left_idempotent C r p)
+
+/-- Rule 47: Inner cancellation for nested right substitutions.
+    substRight C p (substRight C refl t) ▷ substRight C p t -/
+theorem rweq_context_subst_right_cancel_inner {B : Type u}
+    (C : Context A B) {a₁ a₂ : A} {y : B}
+    (p : Path a₁ a₂) (t : Path (C.fill a₂) y) :
+    RwEq (Context.substRight C p (Context.substRight C (refl a₂) t))
+         (Context.substRight C p t) :=
+  rweq_of_step (Step.context_subst_right_cancel_inner C p t)
+
+/-- Rule 48: Outer cancellation for nested right substitutions.
+    substRight C refl (substRight C p t) ▷ substRight C p t -/
+theorem rweq_context_subst_right_cancel_outer {B : Type u}
+    (C : Context A B) {a₁ a₂ : A} {y : B}
+    (p : Path a₁ a₂) (t : Path (C.fill a₂) y) :
+    RwEq (Context.substRight C (refl a₁) (Context.substRight C p t))
+         (Context.substRight C p t) :=
+  rweq_of_step (Step.context_subst_right_cancel_outer C p t)
+
+/-! ## Higher-Level Context Derived Results -/
+
+/-- Derived: Full context left cancellation.
+    C[p]·C[p⁻¹]·v reduces to v when p·p⁻¹ ≈ refl -/
+theorem rweq_context_left_cancel_full {B : Type u}
+    (C : Context A B) {a₁ a₂ : A} {y : B}
+    (p : Path a₁ a₂) (v : Path (C.fill a₁) y) :
+    RwEq (trans (Context.map C p)
+               (trans (Context.map C (symm p)) v))
+         v := by
+  -- Step 1: Apply Rule 35 to get C[p·p⁻¹]·v
+  have h1 := rweq_context_tt_cancel_left C p v
+  -- Step 2: p·p⁻¹ ≈ refl by trans_symm
+  have h2 : RwEq (trans p (symm p)) (refl a₁) :=
+    rweq_of_step (Step.trans_symm p)
+  -- Step 3: C[p·p⁻¹] ≈ C[refl]
+  have h3 : RwEq (Context.map C (trans p (symm p))) (Context.map C (refl a₁)) :=
+    rweq_context_map_of_rweq C h2
+  -- Step 4: C[refl] = refl (definitional)
+  have h4 : Context.map C (refl a₁) = refl (C.fill a₁) :=
+    Context.map_refl C a₁
+  have h4' : RwEq (Context.map C (refl a₁)) (refl (C.fill a₁)) :=
+    rweq_of_eq h4
+  -- Step 5: C[p·p⁻¹] ≈ refl
+  have h5 : RwEq (Context.map C (trans p (symm p))) (refl (C.fill a₁)) :=
+    RwEq.trans h3 h4'
+  -- Step 6: C[p·p⁻¹]·v ≈ refl·v
+  have h6 : RwEq (trans (Context.map C (trans p (symm p))) v)
+                 (trans (refl (C.fill a₁)) v) :=
+    rweq_trans_congr_left v h5
+  -- Step 7: refl·v ≈ v
+  have h7 : RwEq (trans (refl (C.fill a₁)) v) v :=
+    rweq_of_step (Step.trans_refl_left v)
+  -- Chain
+  exact RwEq.trans h1 (RwEq.trans h6 h7)
+
+/-- Derived: Full context right cancellation.
+    v·C[p]·C[p⁻¹] reduces to v when p·p⁻¹ ≈ refl -/
+theorem rweq_context_right_cancel_full {B : Type u}
+    (C : Context A B) {a₁ a₂ : A} {x : B}
+    (p : Path a₁ a₂) (v : Path x (C.fill a₁)) :
+    RwEq (trans (trans v (Context.map C p))
+               (Context.map C (symm p)))
+         v := by
+  -- Step 1: Apply Rule 36 to get v·C[p·p⁻¹]
+  have h1 := rweq_context_tt_cancel_right C p v
+  -- Step 2: p·p⁻¹ ≈ refl
+  have h2 : RwEq (trans p (symm p)) (refl a₁) :=
+    rweq_of_step (Step.trans_symm p)
+  -- Step 3: C[p·p⁻¹] ≈ C[refl]
+  have h3 : RwEq (Context.map C (trans p (symm p))) (Context.map C (refl a₁)) :=
+    rweq_context_map_of_rweq C h2
+  -- Step 4: C[refl] = refl
+  have h4 : Context.map C (refl a₁) = refl (C.fill a₁) :=
+    Context.map_refl C a₁
+  have h4' : RwEq (Context.map C (refl a₁)) (refl (C.fill a₁)) :=
+    rweq_of_eq h4
+  -- Step 5: C[p·p⁻¹] ≈ refl
+  have h5 : RwEq (Context.map C (trans p (symm p))) (refl (C.fill a₁)) :=
+    RwEq.trans h3 h4'
+  -- Step 6: v·C[p·p⁻¹] ≈ v·refl
+  have h6 : RwEq (trans v (Context.map C (trans p (symm p))))
+                 (trans v (refl (C.fill a₁))) :=
+    rweq_trans_congr_right v h5
+  -- Step 7: v·refl ≈ v
+  have h7 : RwEq (trans v (refl (C.fill a₁))) v :=
+    rweq_of_step (Step.trans_refl_right v)
+  -- Chain
+  exact RwEq.trans h1 (RwEq.trans h6 h7)
+
 end StepDerived
 end Path
 end ComputationalPaths
