@@ -175,6 +175,38 @@ theorem rweq_sum_rec_inr_beta_step {B C : Type u}
          (congrArg g q) :=
   rweq_of_step (Step.sum_rec_inr_beta f g q)
 
+/-! ## Function Rules (Rules 22-24)
+
+Computation and structural rules for function types. -/
+
+/-- Rule 22: Function application beta.
+    `congrArg (fun h => h a) (lamCongr p) ▷ p a` -/
+theorem rweq_fun_app_beta_step {B : Type u}
+    {f g : A → B} (p : ∀ x : A, Path (f x) (g x)) (a : A) :
+    RwEq (congrArg (fun h : A → B => h a) (lamCongr p)) (p a) :=
+  rweq_of_step (Step.fun_app_beta p a)
+
+/-- Rule 23: Function eta.
+    `lamCongr (fun x => app p x) ▷ p` -/
+theorem rweq_fun_eta_step {B : Type u}
+    {f g : A → B} (p : Path f g) :
+    RwEq (lamCongr (fun x => app p x)) p :=
+  rweq_of_step (Step.fun_eta p)
+
+/-- Rule 24: Symmetry distributes into lambda.
+    `symm (lamCongr p) ▷ lamCongr (fun x => symm (p x))` -/
+theorem rweq_lam_congr_symm_step {B : Type u}
+    {f g : A → B} (p : ∀ x : A, Path (f x) (g x)) :
+    RwEq (symm (lamCongr p)) (lamCongr (fun x => symm (p x))) :=
+  rweq_of_step (Step.lam_congr_symm p)
+
+/-- Rule 25: Dependent application on reflexivity.
+    `apd f refl ▷ refl` -/
+theorem rweq_apd_refl_step {B : A → Type u}
+    (f : ∀ x : A, B x) (a : A) :
+    RwEq (apd f (refl a)) (refl (f a)) :=
+  rweq_of_step (Step.apd_refl f a)
+
 /-! ## Transport Rules (Rule 26)
 
 Note: Rules 27-29 have typing that doesn't match directly due to the

@@ -265,6 +265,78 @@ theorem rweq_trans_six_assoc (f : Path a b) (g : Path b c) (h : Path c d)
   have h11 := rweq_trans_congr_right f h10
   exact RwEq.trans h2 (RwEq.trans h3 h11)
 
+/-- Seven-fold associativity: (((((f·g)·h)·i)·j)·k)·l → f·(g·(h·(i·(j·(k·l))))) -/
+theorem rweq_trans_seven_assoc {a b c d e f' g' h' : A} 
+    (f : Path a b) (g : Path b c) (h : Path c d)
+    (i : Path d e) (j : Path e f') (k : Path f' g') (l : Path g' h') :
+    RwEq (trans (trans (trans (trans (trans (trans f g) h) i) j) k) l)
+         (trans f (trans g (trans h (trans i (trans j (trans k l)))))) := by
+  -- First: (((((f·g)·h)·i)·j)·k) → f·(g·(h·(i·(j·k)))) via five then assoc
+  have h1 := rweq_trans_five_assoc f g h i j
+  have h2 : RwEq (trans (trans (trans (trans (trans f g) h) i) j) k)
+                 (trans (trans f (trans g (trans h (trans i j)))) k) :=
+    rweq_trans_congr_left k h1
+  have h3 : RwEq (trans (trans f (trans g (trans h (trans i j)))) k)
+                 (trans f (trans (trans g (trans h (trans i j))) k)) :=
+    rweq_of_step (Step.trans_assoc f (trans g (trans h (trans i j))) k)
+  have h4 : RwEq (trans (trans g (trans h (trans i j))) k)
+                 (trans g (trans (trans h (trans i j)) k)) :=
+    rweq_of_step (Step.trans_assoc g (trans h (trans i j)) k)
+  have h5 : RwEq (trans (trans h (trans i j)) k)
+                 (trans h (trans (trans i j) k)) :=
+    rweq_of_step (Step.trans_assoc h (trans i j) k)
+  have h6 : RwEq (trans (trans i j) k)
+                 (trans i (trans j k)) :=
+    rweq_of_step (Step.trans_assoc i j k)
+  have h7 := rweq_trans_congr_right h h6
+  have h8 := RwEq.trans h5 h7
+  have h9 := rweq_trans_congr_right g h8
+  have h10 := RwEq.trans h4 h9
+  have h11 := rweq_trans_congr_right f h10
+  have h12 := RwEq.trans h2 (RwEq.trans h3 h11)
+  -- Now: (((((f·g)·h)·i)·j)·k)·l → (f·(g·(h·(i·(j·k)))))·l
+  have h13 : RwEq (trans (trans (trans (trans (trans (trans f g) h) i) j) k) l)
+                  (trans (trans f (trans g (trans h (trans i (trans j k))))) l) :=
+    rweq_trans_congr_left l h12
+  -- (f·(g·(h·(i·(j·k)))))·l → f·((g·(h·(i·(j·k))))·l)
+  have h14 : RwEq (trans (trans f (trans g (trans h (trans i (trans j k))))) l)
+                  (trans f (trans (trans g (trans h (trans i (trans j k)))) l)) :=
+    rweq_of_step (Step.trans_assoc f (trans g (trans h (trans i (trans j k)))) l)
+  -- Continue reassociating inner parts
+  have h15 : RwEq (trans (trans g (trans h (trans i (trans j k)))) l)
+                  (trans g (trans (trans h (trans i (trans j k))) l)) :=
+    rweq_of_step (Step.trans_assoc g (trans h (trans i (trans j k))) l)
+  have h16 : RwEq (trans (trans h (trans i (trans j k))) l)
+                  (trans h (trans (trans i (trans j k)) l)) :=
+    rweq_of_step (Step.trans_assoc h (trans i (trans j k)) l)
+  have h17 : RwEq (trans (trans i (trans j k)) l)
+                  (trans i (trans (trans j k) l)) :=
+    rweq_of_step (Step.trans_assoc i (trans j k) l)
+  have h18 : RwEq (trans (trans j k) l)
+                  (trans j (trans k l)) :=
+    rweq_of_step (Step.trans_assoc j k l)
+  have h19 := rweq_trans_congr_right i h18
+  have h20 := RwEq.trans h17 h19
+  have h21 := rweq_trans_congr_right h h20
+  have h22 := RwEq.trans h16 h21
+  have h23 := rweq_trans_congr_right g h22
+  have h24 := RwEq.trans h15 h23
+  have h25 := rweq_trans_congr_right f h24
+  exact RwEq.trans h13 (RwEq.trans h14 h25)
+
+/-! ## Inverse Naturality -/
+
+/-- Naturality of symm under congruence: (congrArg f p)⁻¹ ≈ congrArg f (p⁻¹) -/
+theorem rweq_congrArg_symm_natural {B : Type u} (f : A → B)
+    {a₁ a₂ : A} (p : Path a₁ a₂) :
+    RwEq (symm (congrArg f p)) (congrArg f (symm p)) :=
+  RwEq.symm (rweq_of_eq (congrArg_symm f p))
+
+/-- Double symm is identity -/
+theorem rweq_symm_symm_derived (p : Path a b) :
+    RwEq (symm (symm p)) p :=
+  rweq_of_step (Step.symm_symm p)
+
 end CoherenceDerived
 end Path
 end ComputationalPaths

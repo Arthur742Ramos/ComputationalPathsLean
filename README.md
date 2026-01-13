@@ -339,7 +339,7 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 Seven modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
 
-**Total: 146 uses of `rweq_of_step`** across these modules.
+**Total: 160 uses of `rweq_of_step`** across these modules.
 
 ### GroupoidDerived.lean (41 uses of `rweq_of_step`)
 
@@ -367,7 +367,7 @@ Seven modules provide extensive axiom-free, sorry-free results derived purely fr
 | `rweq_inv_refl` | refl⁻¹ ≈ refl |
 | `rweq_inv_inv` | (p⁻¹)⁻¹ ≈ p |
 
-### StepDerived.lean (47 uses of `rweq_of_step`)
+### StepDerived.lean (51 uses of `rweq_of_step`)
 
 Direct lifts of primitive Step rules to RwEq equivalences:
 
@@ -417,7 +417,7 @@ Transport coherence laws:
 | `transport_roundtrip` | p⁻¹_* ∘ p_* ≈ id |
 | `transport_roundtrip'` | p_* ∘ p⁻¹_* ≈ id |
 
-### CoherenceDerived.lean (26 uses of `rweq_of_step`)
+### CoherenceDerived.lean (36 uses of `rweq_of_step`)
 
 Higher coherence laws for the weak ω-groupoid structure:
 
@@ -428,11 +428,13 @@ Higher coherence laws for the weak ω-groupoid structure:
 | `rweq_triangle_full` | Triangle: (f·refl)·g → f·g |
 | `rweq_trans_five_assoc` | Five-fold associativity |
 | `rweq_trans_six_assoc` | Six-fold associativity |
+| `rweq_trans_seven_assoc` | Seven-fold associativity |
 | `rweq_whisker_left_comp` | Whiskering is functorial |
 | `rweq_double_unit` | (refl·p)·refl ≈ p |
 | `rweq_symm_trans_assoc` | ((p·q)·r)⁻¹ ≈ r⁻¹·(q⁻¹·p⁻¹) |
 | `rweq_symm_trans_four` | Four-fold symm distribution |
 | `rweq_symm_trans_five` | Five-fold symm distribution |
+| `rweq_congrArg_symm_natural` | Naturality of symm under congrArg |
 
 ### BiContextDerived.lean (10 uses of `rweq_of_step`)
 
