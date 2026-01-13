@@ -1,6 +1,17 @@
 # Computational Paths (Lean 4)
 
-Lean 4 formalisation of propositional equality via explicit computational paths and rewrite equality. It provides a practical kernel for transport, symmetry, congruence, rewrite quotients, and normalisation — and uses this machinery to formalise fundamental groups of higher-inductive types.
+Lean 4 formalisation of propositional equality via **explicit computational paths** and rewrite equality. Unlike Lean's built-in `Eq` type which is proof-irrelevant, `Path a b` stores an explicit list of rewrite steps—making equality computational. This machinery provides transport, symmetry, congruence, rewrite quotients, and normalisation, and uses it to formalise fundamental groups of higher-inductive types.
+
+## Core Concept: Computational Paths
+
+The key type is `Path a b` which consists of:
+```lean
+structure Path {A : Type u} (a b : A) where
+  steps : List (Step A)   -- Explicit rewrite step witnesses
+  proof : a = b           -- Derived equality
+```
+
+Paths compose via `trans` (concatenating step lists), invert via `symm` (reversing and inverting steps), and are related by the `RwEq` equivalence (the symmetric-transitive closure of the LND_EQ-TRS rewrite system from de Queiroz et al.).
 
 ## Highlights
 - **Weak ω-groupoid structure**: Complete proof that computational paths form a weak ω-groupoid with all coherence laws (pentagon, triangle) and contractibility at higher dimensions.
@@ -59,11 +70,29 @@ Lean 4 formalisation of propositional equality via explicit computational paths 
 - Open in VS Code: install Lean 4 extension, open the folder, and build.
 
 ## Project Layout (selected)
-- [`ComputationalPaths/Path/Basic/`](ComputationalPaths/Path/Basic/) — core path definitions (transport, congruence, symmetry) and helpers.
-- [`ComputationalPaths/Path/Rewrite/`](ComputationalPaths/Path/Rewrite/) — rewrite steps, closures (`Rw`, `RwEq`), and the quotient `PathRwQuot`.
+
+### Core Path Infrastructure
+- [`ComputationalPaths/Path/Basic/`](ComputationalPaths/Path/Basic/) — core path definitions: `Path` structure with explicit step lists, `Step` elementary rewrites, transport, congruence (`congrArg`), symmetry (`symm`), transitivity (`trans`), and `Context` for substitution.
+- [`ComputationalPaths/Path/Basic/Core.lean`](ComputationalPaths/Path/Basic/Core.lean) — the fundamental `Path` and `Step` structures that store explicit rewrite witnesses.
+- [`ComputationalPaths/Path/Basic/Congruence.lean`](ComputationalPaths/Path/Basic/Congruence.lean) — `mapLeft`, `mapRight`, `map2` for binary functions, product paths (`prodMk`, `fst`, `snd`), sigma paths (`sigmaMk`, `sigmaFst`, `sigmaSnd`).
+- [`ComputationalPaths/Path/Basic/Context.lean`](ComputationalPaths/Path/Basic/Context.lean) — contextual substitution (`substLeft`, `substRight`) implementing Definition 3.5 of de Queiroz et al.
+
+### Rewrite System (LND_EQ-TRS)
+- [`ComputationalPaths/Path/Rewrite/`](ComputationalPaths/Path/Rewrite/) — the term rewriting system for path equality.
+- [`ComputationalPaths/Path/Rewrite/Step.lean`](ComputationalPaths/Path/Rewrite/Step.lean) — **47 primitive rewrite rules** including: symm_refl, symm_symm, trans_refl_left/right, trans_symm, symm_trans, symm_trans_congr, trans_assoc, map2_subst, product/sigma beta-eta, sum recursors, function beta-eta, transport rules (26-29), and context substitution rules (33-47).
+- [`ComputationalPaths/Path/Rewrite/Rw.lean`](ComputationalPaths/Path/Rewrite/Rw.lean) — `Rw` reflexive-transitive closure of `Step`.
+- [`ComputationalPaths/Path/Rewrite/RwEq.lean`](ComputationalPaths/Path/Rewrite/RwEq.lean) — `RwEq` symmetric-transitive closure (path equivalence), congruence lemmas, `rweq_of_step` lifting.
+- [`ComputationalPaths/Path/Rewrite/Quot.lean`](ComputationalPaths/Path/Rewrite/Quot.lean) — quotient `PathRwQuot` for path equality classes.
+
+### Derived Theorems (Axiom-Free)
+- [`ComputationalPaths/Path/GroupoidDerived.lean`](ComputationalPaths/Path/GroupoidDerived.lean) — **41 uses of `rweq_of_step`**: cancellation laws (`rweq_cancel_left/right`), uniqueness of inverses (`rweq_inv_unique_left/right`), mixed trans/symm cancellation, whiskering and conjugation laws.
+- [`ComputationalPaths/Path/PathAlgebraDerived.lean`](ComputationalPaths/Path/PathAlgebraDerived.lean) — **22 uses of `rweq_of_step`**: four-fold associativity, symm/trans interactions (`rweq_symm_trans_three`), congruence composition (`rweq_congrArg_comp`), pentagon coherence components.
+- [`ComputationalPaths/Path/StepDerived.lean`](ComputationalPaths/Path/StepDerived.lean) — **27 uses of `rweq_of_step`**: direct lifts of Step rules including symm_trans_congr (Rule 7), map2_subst (Rule 9), product/sigma/sum rules (10-24), transport rules (26), and context substitution rules (33-47).
+- [`ComputationalPaths/Path/ProductSigmaDerived.lean`](ComputationalPaths/Path/ProductSigmaDerived.lean) — product/sigma path algebra: composition, symmetry, projection naturality, map2 decomposition.
+- [`ComputationalPaths/Path/TransportDerived.lean`](ComputationalPaths/Path/TransportDerived.lean) — transport coherence: triple composition, associativity, double symmetry, round-trip identities.
+
+### Groupoid and ω-Groupoid Structure
 - [`ComputationalPaths/Path/Groupoid.lean`](ComputationalPaths/Path/Groupoid.lean) — weak and strict categorical packages for computational paths; groupoids extend the corresponding categories so composition/identities are shared.
-- [`ComputationalPaths/Path/GroupoidDerived.lean`](ComputationalPaths/Path/GroupoidDerived.lean) — **axiom-free derived groupoid theorems**: cancellation laws (`rweq_cancel_left/right`), uniqueness of inverses (`rweq_inv_unique_left/right`), mixed trans/symm cancellation, whiskering and conjugation laws, transport compatibility. All depend only on Lean's standard axioms (propext, Quot.sound).
-- [`ComputationalPaths/Path/PathAlgebraDerived.lean`](ComputationalPaths/Path/PathAlgebraDerived.lean) — **axiom-free path algebra**: four-fold associativity, symm/trans interactions (`rweq_symm_trans_three`), congruence composition (`rweq_congrArg_comp`), pentagon coherence components, Eckmann-Hilton preparation, and inversion properties.
 - [`ComputationalPaths/Path/OmegaGroupoid.lean`](ComputationalPaths/Path/OmegaGroupoid.lean) — **weak ω-groupoid structure** on computational paths with cells at each dimension, globular identities, and all coherence laws.
 - [`ComputationalPaths/Path/OmegaGroupoid/`](ComputationalPaths/Path/OmegaGroupoid/) — subdirectory with axiom analysis and derived coherences:
   - [`Derived.lean`](ComputationalPaths/Path/OmegaGroupoid/Derived.lean) — demonstrates that most coherence axioms are derivable from `to_canonical`
@@ -308,9 +337,9 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 ## Axiom-Free Derived Results
 
-Two modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules:
+Five modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
 
-### GroupoidDerived.lean
+### GroupoidDerived.lean (41 uses of `rweq_of_step`)
 
 | Theorem | Description |
 |---------|-------------|
@@ -324,7 +353,7 @@ Two modules provide extensive axiom-free, sorry-free results derived purely from
 | `rweq_conj_refl` | p · refl · p⁻¹ ≈ refl |
 | `rweq_conj_trans` | Conjugation distributes over trans |
 
-### PathAlgebraDerived.lean
+### PathAlgebraDerived.lean (22 uses of `rweq_of_step`)
 
 | Theorem | Description |
 |---------|-------------|
@@ -336,7 +365,53 @@ Two modules provide extensive axiom-free, sorry-free results derived purely from
 | `rweq_inv_refl` | refl⁻¹ ≈ refl |
 | `rweq_inv_inv` | (p⁻¹)⁻¹ ≈ p |
 
-All theorems depend only on `propext` and `Quot.sound` (Lean's standard axioms) — no HIT axioms.
+### StepDerived.lean (27 uses of `rweq_of_step`)
+
+Direct lifts of primitive Step rules to RwEq equivalences:
+
+| Theorem | Step Rule | Description |
+|---------|-----------|-------------|
+| `rweq_step_symm_trans_congr` | Rule 7 | Contravariance: (p·q)⁻¹ ≈ q⁻¹·p⁻¹ |
+| `rweq_step_map2_subst` | Rule 9 | Decomposition: f*(p,q) ≈ f*(p,refl)·f*(refl,q) |
+| `rweq_step_prod_rec_beta` | Rule 10 | Product recursor β |
+| `rweq_step_prod_eta` | Rule 11 | Product η |
+| `rweq_step_prod_symm` | Rule 12 | Product symm |
+| `rweq_step_prod_fst` | Rule 13 | First projection |
+| `rweq_step_prod_snd` | Rule 14 | Second projection |
+| `rweq_step_prod_map2` | Rule 15 | Product map2 |
+| `rweq_step_sigma_rec_beta` | Rule 16 | Sigma recursor β |
+| `rweq_step_sigma_eta` | Rule 17 | Sigma η |
+| `rweq_step_sigma_symm` | Rule 18 | Sigma symm |
+| `rweq_step_sigma_snd` | Rule 19 | Sigma second projection |
+| `rweq_step_sum_inl_beta` | Rule 23 | Sum inl β |
+| `rweq_step_sum_inr_beta` | Rule 24 | Sum inr β |
+| `rweq_step_transport_refl_beta` | Rule 26 | Transport over refl |
+| `rweq_step_context_*` | Rules 33-47 | Context substitution rules |
+
+### ProductSigmaDerived.lean
+
+Product and sigma path algebra working with explicit `Path` structures:
+
+| Theorem | Description |
+|---------|-------------|
+| `prodMk_trans` | Product composition: (p₁,p₂)·(q₁,q₂) = (p₁·q₁,p₂·q₂) |
+| `prodMk_symm` | Product symmetry: (p₁,p₂)⁻¹ = (p₁⁻¹,p₂⁻¹) |
+| `fst_trans`, `snd_trans` | Projection naturality |
+| `map2_prodMk_decomp` | f*(p,q) via product decomposition |
+| `sigmaMk_trans`, `sigmaMk_symm` | Sigma composition and symmetry |
+| `sigmaFst_trans`, `sigmaSnd_trans` | Sigma projection naturality |
+
+### TransportDerived.lean
+
+Transport coherence laws:
+
+| Theorem | Description |
+|---------|-------------|
+| `transport_trans_triple` | (p·q·r)_* ≈ r_* ∘ q_* ∘ p_* |
+| `transport_trans_assoc` | ((p·q)·r)_* ≈ (p·(q·r))_* |
+| `transport_symm_symm` | (p⁻¹)⁻¹_* ≈ p_* |
+| `transport_roundtrip` | p⁻¹_* ∘ p_* ≈ id |
+| `transport_roundtrip'` | p_* ∘ p⁻¹_* ≈ id |
 
 ## Covering Space Theory
 
