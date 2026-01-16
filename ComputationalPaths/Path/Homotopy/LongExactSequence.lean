@@ -297,8 +297,7 @@ This module develops the long exact sequence of homotopy groups:
 
 This module connects to:
 - `Fibration.lean`: Basic fibration definitions
-- `HopfFibration.lean`: The Hopf fibration
-- `Pi2Sphere.lean`, `Pi3Sphere.lean`: Applications
+- Hopf fibration and higher sphere computations were removed (legacy axioms).
 - `EilenbergMacLane.lean`: K(G,n) spaces via loop spaces
 -/
 

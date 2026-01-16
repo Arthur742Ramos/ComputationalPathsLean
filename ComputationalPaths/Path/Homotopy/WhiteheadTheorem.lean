@@ -37,7 +37,6 @@ then f is a homotopy equivalence.
 -/
 
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
-import ComputationalPaths.Path.Homotopy.CellularHomology
 
 namespace ComputationalPaths
 namespace Path

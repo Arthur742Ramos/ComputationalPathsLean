@@ -46,28 +46,21 @@ HoTT-style developments, not something that can be instantiated inside Lean’s 
 
 ## Current kernel axioms (global)
 
-`Scripts/AxiomInventory.lean` currently reports **36** kernel axioms when importing `ComputationalPaths`.
+`Scripts/AxiomInventory.lean` currently reports **7** kernel axioms when importing `ComputationalPaths` (the Circle constructors and eliminators).
 
-### HIT interfaces (36 axioms)
+### HIT interfaces (7 axioms)
 
 Kernel axioms are restricted to HIT-style interfaces that are not constructible in standard Lean 4:
 
 - `Circle` (constructors + recursor/β rules)
-- `Cylinder` (constructors + the specific recursor/β rules used downstream)
-- `KleinBottle` (constructors + surface relation)
-- `ProjectivePlane` (constructors + loop-square relation)
-- `NonOrientableSurface` (constructors + 2-cell)
-- `OrientableSurface` (constructors + genus-indexed relation)
 
-`Torus` and `MobiusBand` are now *constructed* types (`Circle × Circle` and `Circle`, respectively)
-and contribute no kernel axioms.
+Torus is now a *constructed* type (Circle × Circle) and contributes no kernel axioms. The Möbius band module was removed as legacy placeholder code.
 
 ### Quarantined assumptions (typeclasses)
 These assumptions remain explicit in signatures; there are no opt-in kernel-axiom wrapper files anymore.
 
 | Assumption | Scope | Justification |
 |-----------|-------|---------------|
-| `HasSphereHSpaceClassification` | `HIT/HopfInvariantOne.lean` | Adams' theorem (K-theory) |
 | `HasCoveringEquivSubgroup` | `Homotopy/CoveringClassification.lean` | Galois correspondence |
 | `HasLocalConfluenceProp` | `Rewrite/ConfluenceConstructive.lean` | Critical pair analysis |
 | `HasStepStripProp` | `Rewrite/ConfluenceConstructive.lean` | Newman's lemma |
@@ -106,7 +99,7 @@ Non-kernel assumptions required by the circle encode/decode development:
     `HasCirclePiOneEncode` can be turned back into `HasCircleLoopDecode` when a
     raw-loop statement is required.
   - Downstream developments
-    (e.g. `ComputationalPaths/Path/HIT/Pi2Sphere.lean`,
+    (e.g. legacy `Pi2Sphere.lean`,
     `ComputationalPaths/Path/Homotopy/LieGroups.lean`) now depend only on this weaker
     hypothesis.
 
@@ -141,109 +134,9 @@ through your signatures, provide a local instance of `HasTorusPiOneEncode` (or
 keep it scoped inside a helper module). The core library no longer ships a
 kernel-axiom wrapper.
 
-## Projective plane (π₁(RP²) ≃ ℤ₂)
-
-Kernel axioms *used by* `ComputationalPaths.Path.projectivePiOneEquivZ2`:
-
-- `ProjectivePlane`, `projectiveBase`, `projectiveLoop`
-
-Non-kernel assumptions required by the RP² encode/decode development:
-
-- `ComputationalPaths.Path.HasProjectiveLoopDecode`
-  - `Bool`-valued loop classification hypothesis for raw loops.
-  - Defined in `ComputationalPaths/Path/HIT/ProjectivePlane.lean`.
-  - This interface implies the quotient-level interface `HasProjectivePiOneEncode`.
-
-- `ComputationalPaths.Path.HasProjectivePiOneEncode`
-  - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
-    an `encode : π₁(RP²) → Bool` with `encode (projectiveDecode b) = b` and
-    `projectiveDecode (encode x) = x`.
-  - Defined in `ComputationalPaths/Path/HIT/ProjectivePlaneStep.lean`.
-  - Every `[HasProjectiveLoopDecode]` provides an instance, and conversely
-    `HasProjectivePiOneEncode` can be turned back into `HasProjectiveLoopDecode`
-    when a raw-loop statement is required.
-
-### Local assumption instance
-
-If you want to use the projective plane π₁ result without threading a typeclass
-hypothesis through your signatures, provide a local instance of
-`HasProjectivePiOneEncode` (or keep it scoped inside a helper module). The core
-library no longer ships a kernel-axiom wrapper.
-
-## Klein bottle (π₁(K) ≃ ℤ ⋊ ℤ)
-
-Kernel axioms *used by* `ComputationalPaths.Path.kleinPiOneEquivIntProd`:
-
-- `KleinBottle`, `kleinBase`, `kleinLoopA`, `kleinLoopB`
-
-Non-kernel assumptions required by the Klein bottle encode/decode development:
-
-- `ComputationalPaths.Path.HasKleinLoopDecode`
-  - Normal-form classification hypothesis for raw loops (`a^m ⬝ b^n`).
-  - Defined in `ComputationalPaths/Path/HIT/KleinBottle.lean`.
-  - This interface implies the quotient-level interface `HasKleinPiOneEncode`.
-
-- `ComputationalPaths.Path.HasKleinPiOneEncode`
-  - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
-    an `encode : π₁(K) → ℤ × ℤ` with `encode (kleinDecode z) = z` and
-    `kleinDecode (encode x) = x`.
-  - Defined in `ComputationalPaths/Path/HIT/KleinBottleStep.lean`.
-  - Every `[HasKleinLoopDecode]` provides an instance, and conversely
-    `HasKleinPiOneEncode` can be turned back into `HasKleinLoopDecode` when a raw-loop
-    statement is required.
-
-### Local assumption instance
-
-If you want to use the Klein bottle π₁ result without threading a typeclass
-hypothesis through your signatures, provide a local instance of
-`HasKleinPiOneEncode` (or keep it scoped inside a helper module). The core
-library no longer ships a kernel-axiom wrapper.
-
-The SVK development in `ComputationalPaths/Path/HIT/KleinBottleSVK.lean` builds the
-semidirect-product viewpoint and requires additional pushout assumptions.
-
 ## Lens space (π₁(L(p,1)) ≃ ℤ/pℤ)
-
-Kernel axioms *used by* `ComputationalPaths.Path.lensPiOneEquivZMod`:
-
-- `SolidTorus`, `solidTorusBase`, `solidTorusCore`
-- `torusToSolidTorus`, `torusToSolidTorus_base`
-- `meridian_trivial`, `longitude_to_core`
-- `lens_loop_order`
-
-Non-kernel assumptions required by the lens space encode/decode development:
-
-- `ComputationalPaths.Path.HasLensPiOneEncode`
-  - Cyclic-group classification hypothesis for the lens space fundamental group.
-  - Defined in `ComputationalPaths/Path/HIT/LensSpace.lean`.
-  - Provides `encode : π₁(L(p,1)) → ℤ/pℤ` with `encode (decode z) = z` and
-    `decode (encode x) = x`.
-
-### Mathematical background
-
-Lens spaces L(p,q) are 3-manifolds defined as S³/ℤ_p quotients. The construction
-via
-**Heegaard decomposition** represents L(p,1) as:
-
-```
-L(p,1) = V₁ ∪_φ V₂
-```
-
-where V₁, V₂ are solid tori glued along their boundary torus T². The key axiom
-`lens_loop_order` states that the p-th power of the fundamental loop is contractible,
-which follows from SVK applied to the Heegaard decomposition.
-
-### Special cases
-
-- L(1,1) ≃ S³ (3-sphere, trivial fundamental group)
-- L(2,1) ≃ RP³ (real projective 3-space, π₁ ≃ ℤ/2ℤ)
-
-### Local assumption instance
-
-If you want to use the lens space π₁ result without threading a typeclass
-hypothesis through your signatures, provide a local instance of
-`HasLensPiOneEncode` (or keep it scoped inside a helper module). The core
-library no longer ships a kernel-axiom wrapper.
+The lens space module was removed as legacy placeholder code. Any future
+formalization should reintroduce the equivalence without new axioms.
 ## Pushout / SVK
 
 The pushout is implemented as a quotient, but some HIT-style β/naturality laws are not definitional.
@@ -290,6 +183,14 @@ Notes:
     `WedgeSVKInstances.HasWedgeSVKEncodeQuot`, `WedgeSVKInstances.HasWedgeSVKDecodeEncode`,
     and `WedgeSVKInstances.HasWedgeSVKEncodeDecode` (bundled as `WedgeSVKInstances.HasWedgeSVKEncodeData`).
   - Prop-level interface `HasWedgeSVKDecodeBijective`, plus the choice-based equivalence
-    `wedgeFundamentalGroupEquiv_of_decode_bijective`.
+    `wedgeFundamentalGroupEquiv_of_decode_bijective` (no wrapper class).
   Provide local instances of the Prop-level interface where needed; the old
   kernel-axiom wrapper file has been removed.
+
+
+
+
+
+
+
+

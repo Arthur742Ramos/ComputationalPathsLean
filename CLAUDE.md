@@ -53,12 +53,7 @@ ComputationalPaths/
     │   ├── Pushout.lean          # Pushout HIT, wedge sum, suspension
     │   ├── PushoutPaths.lean     # SVK theorem, free products
     │   ├── FigureEight.lean      # S¹ ∨ S¹ with π₁ ≃ ℤ * ℤ
-    │   ├── OrientableSurface.lean # Σ_g with surface group π₁
-    │   ├── TorusGenus1.lean      # Torus via OrientableSurface 1, π₁ ≃ ℤ × ℤ
-    │   ├── KleinBottle.lean      # K with π₁(K) ≃ ℤ ⋊ ℤ
-    │   ├── ProjectivePlane.lean  # RP² with π₁(RP²) ≃ ℤ₂
-    │   ├── MobiusBand.lean       # Möbius band, π₁ ≃ ℤ
-    │   └── Cylinder.lean         # Cylinder, π₁ ≃ ℤ
+    │   ├── (legacy removed) MobiusBand/LensSpace/ComplexProjectiveSpaces/JamesConstruction
     │
     ├── Groupoid.lean             # Weak/strict category & groupoid
     ├── Bicategory.lean           # Weak bicategory, 2-groupoid
@@ -317,7 +312,7 @@ theorem quot_eq : Quot.mk r x = Quot.mk r y :=
 lake build
 
 # Build specific module
-lake build ComputationalPaths.Path.HIT.OrientableSurface
+lake build ComputationalPaths.Path.HIT.FigureEight
 
 # Run executable (prints version)
 lake exe computational_paths
@@ -420,7 +415,6 @@ theorem triple_refl_eq_refl : trans (trans (refl a) (refl a)) (refl a) = refl a 
 
 **Aristotle rejects files that import Higher Inductive Type (HIT) axioms.**
 
-When processing imports, Aristotle checks for new axioms. Since this project defines HITs via axioms (Circle, Torus, OrientableSurface, etc.), files that import HIT modules will fail with:
 
 ```
 Aristotle encountered an error while processing imports for this file.
@@ -431,6 +425,7 @@ Error: Axioms were added during init_sorries: ['Circle', 'circleBase', ...]
 
 | Module Category | Works? | Reason |
 |-----------------|--------|--------|
+| `Circle.lean` | ❌ No | Base HIT constructors |
 | `Path/Basic/*` | ✅ Yes | Core definitions, no axioms |
 | `Path/Rewrite/*` | ✅ Yes* | Rewrite system (assumptions are explicit typeclasses) |
 | `Path/Groupoid.lean` | ✅ Yes | Category theory, no HITs |
@@ -565,10 +560,6 @@ This project's `lean-toolchain` should be compatible. If you encounter issues, c
 | `TorusStep.lean` | `torusPiOneEquivIntProd` | π₁(T²) ≃ ℤ × ℤ |
 | `Sphere.lean` | `sphere2_pi1_equiv_unit` | π₁(S²) ≃ 1 |
 | `FigureEight.lean` | `figureEightPiOneEquiv` | π₁(S¹ ∨ S¹) ≃ ℤ * ℤ |
-| `OrientableSurface.lean` | `piOneEquivPresentation` | π₁(Σ_g) ≃ SurfaceGroup |
-| `TorusGenus1.lean` | `piOneEquivIntProd` | π₁(OrientableSurface 1) ≃ ℤ × ℤ |
-| `KleinBottleStep.lean` | `kleinPiOneEquivIntProd` | π₁(K) ≃ ℤ ⋊ ℤ |
-| `ProjectivePlaneStep.lean` | `projectivePiOneEquivZ2` | π₁(RP²) ≃ ℤ₂ |
 | `PushoutPaths.lean` | `seifertVanKampenEquiv` | π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) |
 | `OmegaGroupoid.lean` | `compPathOmegaGroupoid` | Types are weak ω-groupoids |
 | `FundamentalGroupoid.lean` | `basepointIsomorphism` | π₁(A, a) ≃ π₁(A, b) via path conjugation |

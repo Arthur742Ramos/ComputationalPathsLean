@@ -98,7 +98,6 @@ import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.HIT.TorusStep
 import ComputationalPaths.Path.HIT.Sphere
-import ComputationalPaths.Path.HIT.ProjectivePlaneStep
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
@@ -326,30 +325,6 @@ theorem simplyConnected_unique_path {A : Type u} (h : IsSimplyConnected A)
 
 end SimplyConnected
 
-/-! ## Groups with π₁ ≃ ℤ₂
-
-Several important Lie groups have π₁ ≃ ℤ₂:
-- SO(n) for n ≥ 3
-- O(n) for n ≥ 3
-- PSL(2, ℂ)
-
-This is related to the existence of double covers (spin groups, etc.).
-The projective plane RP² has π₁ ≃ ℤ₂ (proved in ProjectivePlane.lean),
-and SO(3) ≃ RP³ topologically.
--/
-
-section Z2FundamentalGroup
-
-/-- Prototype for Lie groups with π₁ ≃ ℤ₂: the projective plane.
-
- For n ≥ 3, SO(n) has π₁ ≃ ℤ₂. The double cover is the spin group Spin(n).
- RP² demonstrates this structure in the computational paths framework. -/
- noncomputable def rp2_piOne_equiv_Z2 [HasProjectivePiOneEncode] :
-     SimpleEquiv (π₁(ProjectivePlane, projectiveBase)) Bool :=
-   projectivePiOneEquivZ2
-
-end Z2FundamentalGroup
-
 /-! ## Product Fundamental Group and n-Torus
 
 With the product fundamental group theorem from `ProductFundamentalGroup.lean`,
@@ -439,7 +414,7 @@ aspects of Lie groups without requiring the smooth manifold structure.
 
 ## Future Directions
 
-1. **Higher homotopy**: π₂(S²) ≃ ℤ using HopfFibration.lean
+1. **Higher homotopy**: π₂(S²) ≃ ℤ (not formalized here)
 2. **Spin groups**: Spin(n) → SO(n) as double covers
 3. **Lie algebra connection**: Link to tangent space at identity
 4. **Integration with Mathlib**: Potential alignment with existing Lie group defs

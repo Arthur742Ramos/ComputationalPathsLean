@@ -21,7 +21,7 @@ generator loops.
 ## Usage
 
 Import this module when working with π₁ calculations that involve integer powers
-of generator loops, such as Circle, Torus, OrientableSurface, etc.
+of generator loops, such as Circle and Torus.
 
 ## References
 
@@ -268,7 +268,8 @@ This module provides a reusable framework for reasoning about integer powers of 
 3. **Cancellation lemmas**: Handle all cases of l^m · l^{-n}
 4. **Symmetry**: `loopIter_symm_symm` for converting between l and symm(symm l)
 
-These are essential for proving properties like `decodeGen_add` in π₁ calculations.
+These are essential for proving properties about loop normal forms in π₁
+calculations.
 -/
 
 end Path

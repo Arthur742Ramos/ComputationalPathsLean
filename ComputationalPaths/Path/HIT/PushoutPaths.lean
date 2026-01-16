@@ -1285,8 +1285,8 @@ The free group F_n on n generators can be represented as a special case
 of free products. F₁ ≃ ℤ, and F₂ = ℤ * ℤ.
 
 For a general free group on a type of generators, we use words where
-each generator and its inverse can appear. This is distinct from
-OrientableSurface.FreeGroupWord which uses Nat-indexed generators.
+each generator and its inverse can appear. This is distinct from the
+surface-specific free-group encodings used in older developments.
 -/
 
 /-- The free group on a type of generators α, as a free product.
@@ -3006,29 +3006,14 @@ In the code family approach, this follows from:
 -- (The round-trip property is re-stated later as `wedgeDecodeEncodeAxiom`,
 -- now under the minimal wedge-specific assumptions.)
 
-/-- The fundamental group of a wedge sum is the free product.
+/-! The fundamental group of a wedge sum is the free product.
 
 This is the simplest case of SVK where the gluing space is a point.
-The full encode/decode proof is not yet formalized here, so we record the
-equivalence as a packaged axiom. -/
-class HasWedgeFundamentalGroupEquiv (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) where
-  equiv :
-    SimpleEquiv
-      (π₁(Wedge A B a₀ b₀, Wedge.basepoint))
-      (WedgeFreeProductCode a₀ b₀)
-
-noncomputable instance (priority := 2000) instHasWedgeFundamentalGroupEquiv_of_decode_bijective
-    [HasWedgeSVKDecodeBijective A B a₀ b₀] :
-    HasWedgeFundamentalGroupEquiv A B a₀ b₀ where
-  equiv := wedgeFundamentalGroupEquiv_of_decode_bijective (A := A) (B := B) a₀ b₀
-
-noncomputable def wedgeFundamentalGroupEquiv [HasWedgeFundamentalGroupEquiv A B a₀ b₀] :
-    SimpleEquiv
-      (π₁(Wedge A B a₀ b₀, Wedge.basepoint))
-      (WedgeFreeProductCode a₀ b₀) :=
-  HasWedgeFundamentalGroupEquiv.equiv
+Use `wedgeFundamentalGroupEquiv_of_decode_bijective` with
+`HasWedgeSVKDecodeBijective` instead of a bespoke wrapper axiom. -/
 
 end WedgeSVK
+
 
 /-! ## Concrete SVK Instances for Wedge Sums
 
@@ -3178,28 +3163,9 @@ noncomputable instance hasPushoutSVKEncodeData [HasWedgeSVKEncodeData A B a₀ b
     exact wedgeDecodeEncodePrim a₀ b₀ p
   encode_decode := fun w => wedgeEncodeDecodeQuotPrim_amalg a₀ b₀ w
 
-/-- Instance: HasWedgeFundamentalGroupEquiv for Wedge sums.
-
-This packages the encode-decode equivalence. -/
-noncomputable instance hasWedgeFundamentalGroupEquiv
-    [HasWedgeSVKEncodeQuot A B a₀ b₀]
-    [HasWedgeSVKDecodeEncode A B a₀ b₀] [HasWedgeSVKEncodeDecode A B a₀ b₀] :
-    HasWedgeFundamentalGroupEquiv A B a₀ b₀ where
-  equiv := {
-    toFun := wedgeEncodeQuotPrim a₀ b₀
-    invFun := wedgeFreeProductDecode a₀ b₀
-    left_inv := by
-      intro α
-      induction α using Quot.ind with
-      | _ p =>
-        simp only [wedgeEncodeQuotPrim, wedgeFreeProductDecode_eq_pushoutDecode]
-        exact wedgeDecodeEncodePrim a₀ b₀ p
-    right_inv := by
-      intro w
-      simp only [wedgeEncodeQuotPrim, wedgeFreeProductDecode_eq_pushoutDecode]
-      exact wedgeEncodeDecodeQuotPrim a₀ b₀ w
-  }
-
+/- The wedge equivalence is obtained directly from
+`wedgeFundamentalGroupEquiv_of_decode_bijective` or the wedge encode/decode
+assumptions; no wrapper instance is needed. -/
 end WedgeSVKInstances
 
 /-! ## Wedge Encode API (minimal assumptions)

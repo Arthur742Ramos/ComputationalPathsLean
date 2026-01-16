@@ -14,8 +14,7 @@ about Int.ofNat and Int.negSucc that omega doesn't handle directly.
 
 ## Usage
 
-Import this module when proving properties about integer powers of loops,
-such as `decodeGen_add` in OrientableSurface.lean.
+Import this module when proving properties about integer powers of loops.
 -/
 
 namespace ComputationalPaths
@@ -134,8 +133,8 @@ in fundamental group calculations:
 5. **Both same sign**: `int_negSucc_add_negSucc`, `int_ofNat_succ_add_ofNat_succ`
 6. **Trichotomy helper**: `natTrichotomyDec`
 
-These lemmas help with proofs like `decodeGen_add` where we case split on
-the signs of integers and need to compute the resulting integer sum.
+These lemmas help with proofs that case split on integer signs and compute
+the resulting integer sum.
 -/
 
 end Path

@@ -29,6 +29,7 @@ Special cases:
 -/
 
 import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.HIT.FigureEight
 import ComputationalPaths.Path.HIT.BouquetN
 import ComputationalPaths.Path.HIT.PushoutPaths
@@ -66,7 +67,7 @@ noncomputable def fundamentalLoop : Path base base := circleLoop
 abbrev PiOne : Type u := π₁(PuncturedPlane, base)
 
 /-- π₁(ℝ² - {0}) ≃ ℤ, since ℝ² - {0} ≃ S¹. -/
-noncomputable def piOneEquivInt [HasCirclePiOneEncode] :
+noncomputable def piOneEquivInt { _ : HasCirclePiOneEncode } :
     SimpleEquiv PiOne Int :=
   circlePiOneEquivInt
 

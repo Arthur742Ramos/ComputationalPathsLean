@@ -61,7 +61,6 @@ This gives: the map Σ : π_n(X) → π_{n+1}(ΣX) is iso for n < 2k-1.
 - Anel, Biedermann, Finster, Joyal, "A Generalized Blakers-Massey Theorem"
 -/
 
-import ComputationalPaths.Path.Homotopy.FreudenthalSuspension
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.Homotopy.Fibration
 
@@ -69,7 +68,7 @@ namespace ComputationalPaths
 namespace Path
 namespace BlakersMassey
 
-open FreudenthalSuspension Fibration
+open Fibration
 
 universe u
 

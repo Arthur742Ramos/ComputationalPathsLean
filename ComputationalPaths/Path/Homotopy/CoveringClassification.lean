@@ -46,8 +46,7 @@ For a covering p : Y → X:
 | Theorem | Statement |
 |---------|-----------|
 | `galois_correspondence` | Covers ↔ Subgroups |
-| `universal_cover_deck` | Deck(X̃/X) ≃ π₁(X) |
-| `regular_cover_deck` | Deck ≃ π₁(X)/H for H = p_*(π₁(Y)) |
+| `deck_equiv_pi1` | Deck(X̃/X) ≃ π₁(X) (requires `HasDeckEquivPiOneData`) |
 
 ## References
 
@@ -247,13 +246,89 @@ structure CoveringOf (A : Type u) (a : A) where
   /-- Covering property (evenly covered neighborhoods). -/
   is_covering : True  -- Simplified
 
-/-- The induced subgroup p_*(π₁(Y)) ⊆ π₁(X) for a covering p : Y → X.     
+/-- The induced subgroup p_*(π₁(Y)) ⊆ π₁(X) for a covering p : Y → X.
 
 A loop in X lifts to a loop in Y iff it's in this subgroup. -/
-def inducedSubgroup {A : Type u} (a : A) (_cov : CoveringOf A a) : Subgroup A a :=
-  -- Placeholder: a full induced-subgroup construction requires a developed
-  -- covering/π₁ functoriality story beyond the current scope of this module.
-  wholeGroup A a
+noncomputable def coveringPiOneMap {A : Type u} (a : A) (cov : CoveringOf A a) :
+    π₁(cov.space, cov.basepoint) → π₁(A, a) :=
+  fun α =>
+    let p : PathRwQuot A (cov.proj cov.basepoint) a :=
+      PathRwQuot.ofEq (A := A) (a := cov.proj cov.basepoint) (b := a)
+        cov.proj_base
+    conjugateByPath (A := A) (p := p)
+      (inducedPiOneMap cov.proj cov.basepoint α)
+
+theorem coveringPiOneMap_id {A : Type u} (a : A) (cov : CoveringOf A a) :
+    coveringPiOneMap a cov (LoopQuot.id (A := cov.space) (a := cov.basepoint)) =
+      LoopQuot.id (A := A) (a := a) := by
+  have hmap :
+      inducedPiOneMap cov.proj cov.basepoint
+        (LoopQuot.id (A := cov.space) (a := cov.basepoint)) =
+      LoopQuot.id (A := A) (a := cov.proj cov.basepoint) := by
+    simpa [inducedPiOneMap, FundamentalGroupoid.id'] using
+      (fundamentalGroupoidMap_id (A := cov.space) (B := A)
+        (f := cov.proj) (a := cov.basepoint))
+  simpa [coveringPiOneMap, hmap] using
+    (conjugateByPath_id (A := A)
+      (p := PathRwQuot.ofEq (A := A) (a := cov.proj cov.basepoint) (b := a)
+        cov.proj_base))
+
+theorem coveringPiOneMap_comp {A : Type u} (a : A) (cov : CoveringOf A a)       
+    (α β : π₁(cov.space, cov.basepoint)) :
+    coveringPiOneMap a cov (LoopQuot.comp α β) =
+      LoopQuot.comp (coveringPiOneMap a cov α) (coveringPiOneMap a cov β) := by
+  have hmap :
+      inducedPiOneMap cov.proj cov.basepoint (PathRwQuot.trans α β) =
+        PathRwQuot.trans (inducedPiOneMap cov.proj cov.basepoint α)
+          (inducedPiOneMap cov.proj cov.basepoint β) := by
+    unfold inducedPiOneMap fundamentalGroupoidMap
+    exact PathRwQuot.congrArg_trans (A := cov.space) (B := A) (f := cov.proj)
+      (x := α) (y := β)
+  dsimp [coveringPiOneMap]
+  rw [hmap]
+  simpa [LoopQuot.comp] using
+    conjugateByPath_comp (A := A)
+      (p := PathRwQuot.ofEq (A := A) (a := cov.proj cov.basepoint) (b := a)
+        cov.proj_base)
+      (α := inducedPiOneMap cov.proj cov.basepoint α)
+      (β := inducedPiOneMap cov.proj cov.basepoint β)
+
+theorem coveringPiOneMap_inv {A : Type u} (a : A) (cov : CoveringOf A a)        
+    (α : π₁(cov.space, cov.basepoint)) :
+    coveringPiOneMap a cov (LoopQuot.inv α) =
+      LoopQuot.inv (coveringPiOneMap a cov α) := by
+  have hmap :
+      inducedPiOneMap cov.proj cov.basepoint (PathRwQuot.symm α) =
+        PathRwQuot.symm (inducedPiOneMap cov.proj cov.basepoint α) := by
+    unfold inducedPiOneMap fundamentalGroupoidMap
+    exact PathRwQuot.congrArg_symm (A := cov.space) (B := A) (f := cov.proj)
+      (x := α)
+  dsimp [coveringPiOneMap]
+  rw [hmap]
+  simpa [LoopQuot.inv] using
+    conjugateByPath_inv (A := A)
+      (p := PathRwQuot.ofEq (A := A) (a := cov.proj cov.basepoint) (b := a)
+        cov.proj_base)
+      (α := inducedPiOneMap cov.proj cov.basepoint α)
+
+def inducedSubgroup {A : Type u} (a : A) (cov : CoveringOf A a) : Subgroup A a
+    where
+  mem := fun α =>
+    ∃ β : π₁(cov.space, cov.basepoint), coveringPiOneMap a cov β = α
+  one_mem := by
+    refine ⟨LoopQuot.id, ?_⟩
+    simpa using coveringPiOneMap_id (a := a) (cov := cov)
+  mul_mem := by
+    intro α β hα hβ
+    rcases hα with ⟨α', rfl⟩
+    rcases hβ with ⟨β', rfl⟩
+    refine ⟨LoopQuot.comp α' β', ?_⟩
+    simpa using coveringPiOneMap_comp (a := a) (cov := cov) (α := α') (β := β')
+  inv_mem := by
+    intro α hα
+    rcases hα with ⟨α', rfl⟩
+    refine ⟨LoopQuot.inv α', ?_⟩
+    simpa using coveringPiOneMap_inv (a := a) (cov := cov) (α := α')
 
 /-! ## Typeclass Interface for the Galois Correspondence
 
@@ -309,80 +384,6 @@ theorem universal_cover_universal {A : Type u} (a : A)
     ∃ (f : uc.space → cov.space), cov.proj ∘ f = uc.proj :=
   (HasUniversalCoverUniversalProperty.universal (a := a) (uc := uc)) cov
 
-/-! ## Regular (Galois) Covers
-
-A covering is regular if deck transformations act transitively on fibers.
--/
-
-  /-- A covering is regular if the induced subgroup is normal.
-
-  The full statement depends on a working `inducedSubgroup` construction.
-  For now we keep it as a placeholder. -/
-  def IsRegularCover {A : Type u} (_a : A) (_cov : CoveringOf A _a) : Prop := True
-
-/-- For regular covers, Deck(Y/X) ≃ π₁(X)/p_*(π₁(Y)).
-
-The quotient appears because deck transformations correspond to
-cosets of the induced subgroup. -/
-theorem regular_cover_deck {A : Type u} (a : A) (cov : CoveringOf A a)
-    (_hreg : IsRegularCover a cov) :
-    -- Deck(Y/X) ≃ π₁(X) / p_*(π₁(Y))
-    True := trivial
-
-/-! ## Examples
-
-Concrete examples of the Galois correspondence.
--/
-
-/-- **Example**: The universal cover of S¹ is ℝ.
-
-- ℝ → S¹ given by t ↦ e^{2πit}
-- p_*(π₁(ℝ)) = {1} (trivial subgroup)
-- Deck(ℝ/S¹) ≃ π₁(S¹) ≃ ℤ (translations by integers)
--/
-theorem circle_universal_cover :
-    -- The universal cover of S¹ is ℝ
-    True := trivial
-
-/-- **Example**: n-fold cover of S¹ corresponds to nℤ ⊆ ℤ.
-
-- S¹ →[z↦zⁿ] S¹ is an n-sheeted cover
-- p_*(π₁) = nℤ ⊆ ℤ ≃ π₁(S¹)
-- Index [ℤ : nℤ] = n (number of sheets)
-- Deck ≃ ℤ/nℤ
--/
-theorem circle_n_cover (_n : Nat) (_hn : _n ≥ 1) :
-    -- The n-fold cover of S¹ corresponds to nℤ ⊆ ℤ
-    True := trivial
-
-/-- **Example**: The universal cover of T² is ℝ².
-
-- ℝ² → T² given by (x, y) ↦ (e^{2πix}, e^{2πiy})
-- Deck(ℝ²/T²) ≃ ℤ² ≃ π₁(T²)
--/
-theorem torus_universal_cover :
-    -- The universal cover of T² is ℝ²
-    True := trivial
-
-/-- **Example**: The universal cover of S¹ ∨ S¹ is the Cayley graph of F₂.
-
-- The free group F₂ = ⟨a, b⟩ acts on its Cayley graph
-- Deck ≃ F₂ ≃ π₁(S¹ ∨ S¹)
-- The Cayley graph is an infinite tree
--/
-theorem figureEight_universal_cover :
-    -- The universal cover of S¹ ∨ S¹ is the Cayley graph of F₂
-    True := trivial
-
-/-- **Example**: The universal cover of RP² is S².
-
-- S² → RP² is a 2-fold cover (antipodal quotient)
-- p_*(π₁(S²)) = {1} ⊆ ℤ/2ℤ ≃ π₁(RP²)
-- Deck(S²/RP²) ≃ ℤ/2ℤ (antipodal map)
--/
-theorem projectivePlane_cover :
-    -- S² is the universal cover of RP²
-    True := trivial
 
 /-! ## Classification Table
 
@@ -407,11 +408,7 @@ This module establishes the classification of covering spaces:
 
 3. **Deck transformations**: Deck(X̃/X) ≃ π₁(X)
 
-4. **Regular covers**: H normal ⟹ Deck ≃ π₁(X)/H
-
-5. **Galois correspondence**: Full bijection
-
-6. **Examples**: ℝ → S¹, S² → RP², etc.
+4. **Galois correspondence**: Full bijection
 
 ## Key Theorems
 
@@ -419,14 +416,15 @@ This module establishes the classification of covering spaces:
 |---------|-----------|
 | `galois_correspondence` | Covers ↔ Subgroups (requires `HasCoveringEquivSubgroup`) |
 | `deck_equiv_pi1` | Deck(X̃/X) ≃ π₁(X) (requires `HasDeckEquivPiOneData`) |
-| `regular_cover_deck` | Deck ≃ π₁/H for regular covers |
 | `universal_cover_universal` | X̃ covers all covers |
 
 ## Assumption Used
 
 | Typeclass | Justification |
 |-----------|---------------|
+| `HasDeckEquivPiOneData` | Deck(X̃/X) ≃ π₁(X) (path lifting + uniqueness) |
 | `HasCoveringEquivSubgroup` | Galois correspondence (deep topology) |
+| `HasUniversalCoverUniversalProperty` | Universal cover initiality |
 
 Provide a local instance where the global correspondence is required.
 
@@ -434,7 +432,7 @@ Provide a local instance where the global correspondence is required.
 
 - **CoveringSpace.lean**: Basic covering space infrastructure
 - **FundamentalGroup.lean**: π₁ definitions
-- **Circle.lean, ProjectivePlane.lean**: Concrete examples
+- **Circle.lean**: Concrete examples
 - **HasCoveringEquivSubgroup**: Typeclass assumption for the Galois correspondence
 -/
 

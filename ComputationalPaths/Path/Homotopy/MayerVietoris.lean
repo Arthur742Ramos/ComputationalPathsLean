@@ -43,7 +43,6 @@ The sequence is exact at each term:
 - May, "A Concise Course in Algebraic Topology", Chapter 14
 -/
 
-import ComputationalPaths.Path.Homotopy.CellularHomology
 import ComputationalPaths.Path.HIT.Pushout
 import ComputationalPaths.Path.HIT.PushoutPaths
 

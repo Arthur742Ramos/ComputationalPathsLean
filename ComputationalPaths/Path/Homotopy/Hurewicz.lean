@@ -33,7 +33,6 @@ This means:
 | T² | ℤ × ℤ | ℤ × ℤ |
 | S¹ ∨ S¹ | ℤ * ℤ | ℤ × ℤ |
 | Σ_g (g ≥ 2) | ⟨a,b,...⟩ | ℤ^{2g} |
-| Klein bottle | ℤ ⋊ ℤ | ℤ × ℤ/2ℤ |
 
 ### Higher Hurewicz
 
@@ -59,13 +58,10 @@ This is the higher-dimensional version, which we state but don't fully develop.
 
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
-import ComputationalPaths.Path.Homotopy.FreudenthalSuspension
 import ComputationalPaths.Path.HIT.Circle
 import ComputationalPaths.Path.HIT.Torus
 import ComputationalPaths.Path.HIT.FigureEight
-import ComputationalPaths.Path.HIT.KleinBottle
 import ComputationalPaths.Path.HIT.PushoutPaths
-import ComputationalPaths.Path.HIT.OrientableSurface
 
 namespace ComputationalPaths
 namespace Path
@@ -404,110 +400,10 @@ theorem freeProduct_abelianization :
       desc = "(G * H)^ab ≃ G^ab × H^ab (free product abelianization)" :=
   ⟨_, rfl⟩
 
-/-! ## H₁ of Surfaces -/
+/-! ## H₁ of Surfaces
 
-/-- **H₁(Σ_g) ≃ ℤ^{2g}** for genus g orientable surface.
-
-π₁(Σ_g) = ⟨a₁, b₁, ..., a_g, b_g | [a₁,b₁]⋯[a_g,b_g] = 1⟩
-
-When we abelianize:
-- All generators commute: a_i · b_j = b_j · a_i
-- The relation [a₁,b₁]⋯[a_g,b_g] = 1 becomes e (product of commutators)
-
-Result: H₁(Σ_g) ≃ ℤ^{2g} (free abelian on 2g generators). -/
-theorem orientableSurface_H1 (g : Nat) :
-    ∃ desc : String,
-      desc = s!"H₁(Σ_{g}) ≃ ℤ^{2*g} (surface relation is commutators)" :=
-  ⟨_, rfl⟩
-
-/-- H₁(Σ_g) represented as a 2g-tuple of integers.
-
-For genus g surface with generators a₁, b₁, ..., a_g, b_g:
-- H₁(Σ_g) ≃ ℤ^{2g}
-- The i-th component is the total exponent of the i-th generator
-
-We use `Fin (2 * g) → Int` as the concrete representation. -/
-def OrientableSurfaceH1 (g : Nat) : Type := Fin (2 * g) → Int
-
-/-- The abelianization map for genus g surface words.
-
-Given a word in the surface group generators (FreeGroupWord (2 * g)),
-compute the total exponent of each generator (as elements of ℤ^{2g}).
-The surface relation [a₁,b₁]⋯[a_g,b_g] = 1 becomes trivial since
-commutators map to 0.
-
-The map sums the power of each generator occurrence. -/
-def orientableSurface_H1_map (g : Nat) :
-    FreeGroupWord (2 * g) → OrientableSurfaceH1 g
-  | .nil => fun _ => 0
-  | .cons gen pow rest =>
-    fun i =>
-      let restVal := orientableSurface_H1_map g rest i
-      if gen.toNat = i.val then restVal + pow else restVal
-
-/-- The surface relation vanishes in abelianization.
-
-[a₁,b₁]⋯[a_g,b_g] maps to the zero vector because each [a_i, b_i] = e. -/
-theorem orientableSurface_relation_abelianizes_to_zero (g : Nat) :
-    ∃ desc : String,
-      desc = s!"[a₁,b₁]⋯[a_g,b_g] ↦ 0 in H₁(Σ_{g})" :=
-  ⟨_, rfl⟩
-
-/-! ## H₁ of Klein Bottle -/
-
-/-- **H₁(Klein bottle) ≃ ℤ × ℤ/2ℤ**
-
-π₁(K) has presentation ⟨a, b | aba⁻¹b = 1⟩, equivalently aba⁻¹ = b⁻¹.
-
-When we abelianize:
-1. aba⁻¹ = b⁻¹ becomes ab = b⁻¹a (moving a⁻¹ to right)
-2. But also ab = ba in the abelianization
-3. So ba = b⁻¹a, giving b = b⁻¹, i.e., 2b = 0
-
-Result: H₁(K) ≃ ⟨a⟩ × ⟨b | 2b = 0⟩ ≃ ℤ × ℤ/2ℤ
-
-The torsion ℤ/2ℤ is characteristic of non-orientability. -/
-theorem kleinBottle_H1 :
-    ∃ desc : String,
-      desc = "H₁(K) ≃ ℤ × ℤ/2ℤ (torsion from non-orientability)" :=
-  ⟨_, rfl⟩
-
-/-- H₁(Klein bottle) represented as ℤ × ℤ/2ℤ. -/
-abbrev KleinBottleH1 : Type := Int × Bool  -- Bool represents ℤ/2ℤ
-
-/-- The abelianization map for the Klein bottle.
-Maps (m, n) from π₁ to (m, n mod 2) in H₁. -/
-def kleinBottle_H1_map (p : Int × Int) : KleinBottleH1 :=
-  (p.1, p.2 % 2 = 1)  -- Second component mod 2
-
-/-- The Klein bottle relation aba⁻¹b = 1 implies 2b = 0 in the abelianization. -/
-theorem kleinBottle_2b_eq_0 :
-    ∃ desc : String,
-      desc = "aba⁻¹b = 1 abelianizes to b + b = 0, so 2b = 0" :=
-  ⟨_, rfl⟩
-
-/-! ## H₁ of Non-Orientable Surfaces -/
-
-/-- **H₁(N_g) ≃ ℤ^{g-1} × ℤ/2ℤ** for genus g non-orientable surface.
-
-π₁(N_g) = ⟨a₁, ..., a_g | a₁²⋯a_g² = 1⟩
-
-When we abelianize:
-- Generators commute
-- The relation becomes 2a₁ + ⋯ + 2a_g = 0
-
-Setting c_i = a_i - a_g for i < g, we get:
-- c₁, ..., c_{g-1} are free (no constraints)
-- 2a_g = -(2c₁ + ⋯ + 2c_{g-1} + 2a_g) simplifies to a_g torsion element
-
-Result: H₁(N_g) ≃ ℤ^{g-1} × ℤ/2ℤ -/
-theorem nonOrientableSurface_H1 (g : Nat) (_hg : g ≥ 1) :
-    ∃ desc : String,
-      desc = s!"H₁(N_{g}) ≃ ℤ^{g-1} × ℤ/2ℤ (torsion from non-orientability)" :=
-  ⟨_, rfl⟩
-
-/-- H₁(N_g) represented as (g-1) free integers plus ℤ/2ℤ. -/
-def NonOrientableSurfaceH1 (g : Nat) : Type := (Fin (g - 1) → Int) × Bool
+Legacy surface-specific H₁ calculations were removed with the surface HITs.
+-/
 
 /-! ## The Hurewicz Map in Detail
 
@@ -542,8 +438,8 @@ For n ≥ 2 and (n-1)-connected spaces, there's a higher version.
 -/
 
 /-- The higher Hurewicz homomorphism h_n : π_n(X) → H_n(X). -/
-theorem higherHurewiczMap (A : Type u) (a : A) (n : Nat) (_hn : n ≥ 2) :
-    FreudenthalSuspension.PiN A a n → True := fun _ => trivial
+theorem higherHurewiczMap (A : Type u) (_a : A) (_n : Nat) (_hn : _n ≥ 2) :
+    True := trivial
 
 /-- **Higher Hurewicz Theorem**: For (n-1)-connected X and n ≥ 2,
     h_n : π_n(X) → H_n(X) is an isomorphism.
@@ -616,8 +512,6 @@ This module establishes the Hurewicz theorem:
    - H₁(S¹) ≃ ℤ
    - H₁(T²) ≃ ℤ²
    - H₁(S¹ ∨ S¹) ≃ ℤ² (abelianization of ℤ * ℤ)
-   - H₁(Σ_g) ≃ ℤ^{2g}
-   - H₁(Klein bottle) ≃ ℤ × ℤ/2ℤ
 
 6. **Higher Hurewicz**: π_n(X) ≃ H_n(X) for (n-1)-connected X
 
@@ -627,7 +521,6 @@ This module establishes the Hurewicz theorem:
 |---------|-----------|
 | `hurewicz_theorem` | H₁(X) ≃ π₁(X)^ab |
 | `figureEight_H1_equiv_int_prod` | (ℤ * ℤ)^ab ≃ ℤ × ℤ |
-| `kleinBottle_H1` | H₁(K) ≃ ℤ × ℤ/2ℤ |
 | `higher_hurewicz_theorem` | π_n ≃ H_n for connected spaces |
 
 ## Connection to Other Modules
@@ -635,7 +528,6 @@ This module establishes the Hurewicz theorem:
 - **FundamentalGroup.lean**: π₁ definitions
 - **Circle.lean, Torus.lean**: π₁ computations
 - **FigureEight.lean**: Non-abelian π₁
-- **KleinBottle.lean**: Semidirect product π₁
 -/
 
 end Hurewicz

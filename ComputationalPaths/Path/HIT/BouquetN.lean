@@ -1,14 +1,15 @@
 /-
 # The Bouquet of n Circles (Wedge of n Copies of S¹)
 
-This module formalizes the bouquet of n circles (∨ⁿS¹) and proves that its
-fundamental group is the free group on n generators, F_n.
+This module formalizes the bouquet of n circles (∨ⁿS¹) and the free group on n
+generators. It builds a candidate decode map into the fundamental group; the
+full π₁ equivalence is not yet formalized.
 
 ## Main Results
 
 - `BouquetN n`: The bouquet of n circles as a HIT
-- `FreeGroupN n`: The free group on n generators
-- `bouquetPiOneEquiv n`: π₁(∨ⁿS¹) ≃ F_n
+- `BouquetFreeGroup n`: The free group on n generators
+- `BouquetN.decode_def`: candidate map `BouquetFreeGroup n → PiOneN n`
 
 ## Mathematical Background
 
@@ -18,6 +19,9 @@ It generalizes:
 - n = 1: The circle S¹ (π₁ = ℤ)
 - n = 2: The figure-eight S¹ ∨ S¹ (π₁ = F₂ = ℤ * ℤ)
 - n ≥ 2: The free group on n generators
+
+The expected equivalence π₁(∨ⁿS¹) ≃ F_n is standard, but the proof is not yet
+formalized here.
 
 ## References
 
@@ -832,36 +836,11 @@ theorem decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
     simp only [decodeWord]
     exact rweq_trans_congr_right (iterateLoopInt (bouquetLoop l.gen) l.power) ih
 
-/-- Candidate decode from `BouquetFreeGroup` to the fundamental group. -/
-noncomputable def decode_def {n : Nat} : BouquetFreeGroup n → PiOneN n :=
+/-- Candidate decode from `BouquetFreeGroup` to the fundamental group. -/       
+noncomputable def decode_def {n : Nat} : BouquetFreeGroup n → PiOneN n :=       
   Quot.lift
     (fun w => Quot.mk RwEq (decodeWord w))
     (fun w₁ w₂ h => Quot.sound (decodeWord_respects_rel w₁ w₂ h))
-
-/-- **Main Theorem**: π₁(BouquetN n) ≃ BouquetFreeGroup n.
-    This shows π₁(∨ⁿS¹) ≃ F_n (free group on n generators). -/
-class HasBouquetPiOneEquiv (n : Nat) : Type u where
-  equiv : SimpleEquiv (PiOneN n) (BouquetFreeGroup n)
-
-noncomputable def bouquetPiOneEquiv {n : Nat} [HasBouquetPiOneEquiv n] :
-    SimpleEquiv (PiOneN n) (BouquetFreeGroup n) :=
-  HasBouquetPiOneEquiv.equiv (n := n)
-
-/-- Encode from the fundamental group. -/
-noncomputable def encode {n : Nat} [HasBouquetPiOneEquiv n] : PiOneN n → BouquetFreeGroup n :=
-  (bouquetPiOneEquiv (n := n)).toFun
-
-/-- Decode from BouquetFreeGroup to the fundamental group. -/
-noncomputable def decode {n : Nat} [HasBouquetPiOneEquiv n] : BouquetFreeGroup n → PiOneN n :=
-  (bouquetPiOneEquiv (n := n)).invFun
-
-/-- Decode-encode round trip. -/
-theorem decode_encode {n : Nat} [HasBouquetPiOneEquiv n] (α : PiOneN n) : decode (encode α) = α :=
-  (bouquetPiOneEquiv (n := n)).left_inv α
-
-/-- Encode-decode round trip. -/
-theorem encode_decode {n : Nat} [HasBouquetPiOneEquiv n] (x : BouquetFreeGroup n) : encode (decode x) = x :=
-  (bouquetPiOneEquiv (n := n)).right_inv x
 
 end BouquetN
 
@@ -913,26 +892,6 @@ theorem bouquetPiOne_zero_trivial (x : BouquetN.PiOneN.{u} 0) :
   simpa [PiOne.id] using
     (pi1_trivial_of_subsingleton (A := BouquetN 0) (a := bouquetBase (n := 0)) x)
 
-namespace BouquetN
-
-/-- For `n = 0`, the bouquet π₁ equivalence is trivial (both sides are subsingletons). -/
-noncomputable instance instHasBouquetPiOneEquiv_zero : HasBouquetPiOneEquiv.{u} 0 where
-  equiv :=
-    let basePiOne : PiOneN.{u} 0 := PiOne.id (A := BouquetN 0) (a := bouquetBase (n := 0))
-    let baseFree : BouquetFreeGroup 0 := BouquetFreeGroup.one (n := 0)
-    { toFun := fun _ => baseFree
-      invFun := fun _ => basePiOne
-      left_inv := by
-        intro x
-        haveI : Subsingleton (PiOneN.{u} 0) := bouquetPiOne_zero_subsingleton
-        exact Subsingleton.elim _ _
-      right_inv := by
-        intro y
-        haveI : Subsingleton (BouquetFreeGroup 0) := bouquetFreeGroup_zero_subsingleton
-        exact Subsingleton.elim _ _ }
-
-end BouquetN
-
 /-! ## Free Group Decomposition: F_n ≃ ℤ * ... * ℤ
 
 The free group on n generators decomposes as an iterated free product:
@@ -940,7 +899,7 @@ The free group on n generators decomposes as an iterated free product:
 - F₁ ≃ ℤ
 - F_{n+1} ≃ ℤ * F_n
 
-This establishes that F_n is isomorphic to the n-fold free product of ℤ.
+This establishes that F_n is isomorphic to the n-fold free product of ℤ.        
 -/
 
 /-! ### Part 1: F₁ ≃ ℤ -/
@@ -995,11 +954,7 @@ theorem freeGroupOneToInt_intToFreeGroupOne (k : Int) :
 
 This lemma requires showing that the combine and cancel rules of BouquetRel reduce
 any word to the canonical form with total power. The proof is a straightforward
-induction on word structure using the fact that all generators are fzero.
-
-**Axiom Justification**: This is a standard result in combinatorial group theory.
-In F₁, every word g₀^{a₁}g₀^{a₂}...g₀^{aₙ} reduces to g₀^{a₁+a₂+...+aₙ} by
-repeated application of the combine rule (since all generators are identical). -/
+induction on word structure using the fact that all generators are fzero. -/
 theorem bouquetWord_one_equiv_single (w : BouquetWord 1) :
     Quot.mk (BouquetRel 1) w = intToFreeGroupOne (bouquetWordOnePower w) := by
   classical
@@ -1128,51 +1083,11 @@ inductive DecomposedWord (n : Nat) where
   | consFirst (power : Int) (hne : power ≠ 0) (rest : DecomposedWord n) : DecomposedWord n
   | consRest (w : BouquetWord n) (hw : w ≠ BouquetWord.nil) (rest : DecomposedWord n) : DecomposedWord n
 
-/-! ### Part 4: Statement of the Decomposition Theorem -/
+/-! ### Part 4: Decomposition (not yet formalized)
 
-/-- **Theorem**: F_n is the n-fold free product of ℤ.
-
-This is the structural theorem showing that the free group on n generators
-is isomorphic to ℤ * ℤ * ... * ℤ (n times).
-
-For n = 0: F₀ ≃ 1 (trivial, proved above)
-For n = 1: F₁ ≃ ℤ (freeGroupOneEquivInt)
-For n ≥ 2: F_n ≃ ℤ * F_{n-1} by iterative decomposition -/
-class HasFreeGroupDecomposition (n : Nat) : Type u where
-  equiv : SimpleEquiv (BouquetFreeGroup n) (IntFreeProductN n)
-
-/-- F₀ ≃ Unit (trivial group). -/
-noncomputable instance : HasFreeGroupDecomposition 0 where
-  equiv := {
-    toFun := fun _ => PUnit.unit
-    invFun := fun _ => BouquetFreeGroup.one
-    left_inv := by
-      intro x
-      haveI : Subsingleton (BouquetFreeGroup 0) := bouquetFreeGroup_zero_subsingleton
-      exact Subsingleton.elim _ _
-    right_inv := by
-      intro x
-      cases x
-      rfl
-  }
-
-/-- F₁ ≃ ℤ. -/
-noncomputable instance : HasFreeGroupDecomposition 1 where
-  equiv := freeGroupOneEquivInt
-
-/-- Get the decomposition equivalence for F_n. -/
-noncomputable def freeGroupDecomposition (n : Nat) [HasFreeGroupDecomposition n] :
-    SimpleEquiv (BouquetFreeGroup n) (IntFreeProductN n) :=
-  HasFreeGroupDecomposition.equiv
-
-/-- **Corollary**: π₁(∨ⁿS¹) ≃ ℤ * ... * ℤ (n copies).
-
-Combining the main theorem π₁(BouquetN n) ≃ F_n with the decomposition
-F_n ≃ IntFreeProductN n gives us the n-fold free product representation. -/
-noncomputable def bouquetPiOneEquivIntProduct (n : Nat)
-    [BouquetN.HasBouquetPiOneEquiv n] [HasFreeGroupDecomposition n] :
-    SimpleEquiv (BouquetN.PiOneN n) (IntFreeProductN n) :=
-  SimpleEquiv.trans (BouquetN.bouquetPiOneEquiv (n := n)) (freeGroupDecomposition n)
+The expected equivalence F_n ≃ ℤ * ... * ℤ (n copies) is standard but not
+formalized here. We keep the iterated free-product definitions for future work.
+-/
 
 /-! ## Summary
 
@@ -1182,36 +1097,22 @@ This module establishes:
 
 2. **BouquetFreeGroup Definition**: Free group on n generators as quotient of words
 
-3. **Main Theorem** (`bouquetPiOneEquiv`):
-   ```
-   π₁(∨ⁿS¹, base) ≃ F_n
-   ```
+3. **Decode Map** (`BouquetN.decode_def`): candidate map from free group words
+   to π₁(∨ⁿS¹) that respects the quotient relation.
 
 4. **Special Cases**:
    - n = 0: π₁ = 1 (trivial, via `bouquetPiOne_zero_trivial`)
-   - n = 1: π₁ = ℤ (via `freeGroupOneEquivInt`)
-   - n = 2: π₁ = F₂ = ℤ * ℤ (figure-eight)
-
-5. **Free Group Decomposition** (`HasFreeGroupDecomposition`):
-   ```
-   F_n ≃ ℤ * ... * ℤ  (n copies)
-   ```
-   - F₀ ≃ Unit (trivial)
-   - F₁ ≃ ℤ
-   - `IteratedFreeProduct`: n-fold free product definition
-   - `IntFreeProductN n`: ℤ * ... * ℤ (n copies)
-   - `bouquetPiOneEquivIntProduct`: π₁(∨ⁿS¹) ≃ ℤ * ... * ℤ
+   - n = 1: F₁ = ℤ (via `freeGroupOneEquivInt`)
+   - n = 2: F₂ is the free group on two generators (figure-eight expected)
 
 ## Placeholders
 
 **Circle HIT axioms:** `BouquetN` is built from wedges of `Circle`, so the circle
 constructors/recursors from `Circle.lean` remain assumptions.
 
-**Main equivalence:** `HasBouquetPiOneEquiv` packages the unproved equivalence
-`π₁(BouquetN n) ≃ BouquetFreeGroup n`.
-
-**Word simplification:** `bouquetWord_one_equiv_single` is an axiom stating that
-words in F₁ reduce to their total power (standard combinatorial group theory).
+**Equivalences not yet formalized:** the equivalence `π₁(BouquetN n) ≃
+BouquetFreeGroup n` and the n-fold free-product decomposition are not yet
+formalized.
 
 ## Proved Theorems (previously axioms)
 
@@ -1227,9 +1128,8 @@ words in F₁ reduce to their total power (standard combinatorial group theory).
 **Decode (1):**
 - `decodeWord_respects_rel`: Decode respects the free group relation (via iterateLoopInt lemmas)
 
-**Free Group Equivalences (2):**
+**Free Group Equivalences (1):**
 - `freeGroupOneToInt_intToFreeGroupOne`: F₁ → ℤ → F₁ round-trip
-- `HasFreeGroupDecomposition 0` and `HasFreeGroupDecomposition 1` instances
 -/
 
 end Path
