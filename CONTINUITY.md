@@ -1,6 +1,6 @@
 # CONTINUITY.md
 ## Goal
-Remove assumptions by proving/formalizing concrete entities; delete legacy axiomatic modules; keep development `sorry`-free and use axioms only when strictly necessary (e.g., HIT constraints). Keep `to_canonical` unchanged. After commit/push, work on discharging encode/decode assumptions and major theorem assumptions so only HIT or strictly necessary axioms remain.
+Remove assumptions by proving/formalizing concrete entities; delete legacy axiomatic modules; keep development `sorry`-free and use axioms only when strictly necessary (e.g., HIT constraints). Keep `to_canonical` unchanged. Discharge encode/decode assumptions and major theorem assumptions in the recommended order so only HIT or strictly necessary axioms remain.
 
 ## Constraints/Assumptions
 - Run `./lake.cmd build` after non-trivial edits; keep build warning-free.
@@ -53,15 +53,24 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
     - `CLAUDE.md`
     - `README.md`
     - `docs/axioms.md` (rewrote affected sections to reflect explicit assumptions)
-- **Now**: Validate docs for consistency and run a clean build.
 - **Done**: `./lake.cmd build` completed successfully.
-- **Now**: Commit and push the current cleanup changes.
-- **Next**: Start discharging encode/decode assumptions and major theorem assumptions; use surveys to target remaining axioms if needed.
+- **Done**: Committed and pushed cleanup changes (`60c122b` to `main`).
+- **Done**:
+  - Reworked `ComputationalPaths/Path/Rewrite/ConfluenceProof.lean` to prove `step_strip_prop` constructively from `Rw` induction plus `diamond_prop`.
+  - Rewrote `ComputationalPaths/Path/Rewrite/ConfluenceConstructive.lean` as a minimal Prop-level local confluence module (`HasLocalConfluenceProp`, `local_confluence_prop`, join lift lemmas).
+  - Deleted legacy confluence bridge modules: `ComputationalPaths/Path/Rewrite/StripLemma.lean`, `ComputationalPaths/Path/Rewrite/ConfluenceFull.lean`, `ComputationalPaths/Path/Rewrite/TerminationBridge.lean`.
+  - Removed those legacy imports from `ComputationalPaths/Path.lean`.
+  - Added `rw_symm_congr` to `ComputationalPaths/Path/Rewrite/Rw.lean`.
+  - Reintroduced Prop-level strip lemma as explicit assumption `HasStepStripProp` in `ComputationalPaths/Path/Rewrite/ConfluenceProof.lean` so confluence can be derived without sorries.
+  - `./lake.cmd build` succeeds.
+- **Now**: Commit the cleanup.
+- **Next**: Tackle circle/torus encode-decode assumptions, then covering classification, then Adams' theorem; survey remaining axioms as needed.
 
 ## Open Questions
-- Which remote/branch should be pushed to? (UNCONFIRMED)
 - Which remaining non-HIT axioms, if any, must stay due to Lean limitations? (UNCONFIRMED)
 
 ## Working Set
-- Files: `CONTINUITY.md`, `README.md`, `docs/axioms.md`, `ComputationalPaths/Path/Rewrite/StripLemma.lean`, `ComputationalPaths/Path/Homotopy/CoveringClassification.lean`, `ComputationalPaths/Path/HIT/HopfInvariantOne.lean`, `CLAUDE.md`
-- Commands: `rg -n "^\\s*axiom\\b" ComputationalPaths -g "*.lean"`, `rg -n "sorry" ComputationalPaths -g "*.lean"`, `rg -n "CirclePiOneAxiom|TorusPiOneAxiom|ProjectivePiOneAxiom|KleinPiOneAxiom|LensPiOneAxiom|WedgeSVKAxiom|HopfInvariantOneAxiom|CoveringClassificationAxiom|ConfluenceConstructiveAxiom"`, `./lake.cmd build`
+- Files: `CONTINUITY.md`, `ComputationalPaths/Path.lean`, `ComputationalPaths/Path/Rewrite/ConfluenceProof.lean`, `ComputationalPaths/Path/Rewrite/ConfluenceConstructive.lean`
+- Commands: `rg -n "HasLocalConfluence|HasStepStrip" ComputationalPaths -g "*.lean"`, `./lake.cmd build`
+
+

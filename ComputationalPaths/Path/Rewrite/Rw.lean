@@ -350,6 +350,14 @@ variable {A : Type u} {a b c : A}
   | tail _ step ih =>
     exact Rw.tail ih (Step.trans_congr_right p step)
 
+@[simp] theorem rw_symm_congr {a b : A} {p q : Path a b} (h : Rw p q) :
+  Rw (Path.symm p) (Path.symm q) := by
+  induction h with
+  | refl =>
+    exact Rw.refl (Path.symm p)
+  | tail _ step ih =>
+    exact Rw.tail ih (Step.symm_congr step)
+
 /-- A unary action on paths that is compatible with rewrite steps. -/
 structure RewriteLift (A : Type u) (B : Type u) where
   /-- Object function describing how endpoints are transported. -/

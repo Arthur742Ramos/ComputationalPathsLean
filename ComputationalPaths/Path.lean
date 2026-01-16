@@ -17,9 +17,7 @@ import ComputationalPaths.Path.Rewrite.Termination
 import ComputationalPaths.Path.Rewrite.Confluence
 import ComputationalPaths.Path.Rewrite.ConfluenceProof
 import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
-import ComputationalPaths.Path.Rewrite.TerminationBridge
 import ComputationalPaths.Path.Rewrite.PathTactic
-import ComputationalPaths.Path.Rewrite.StripLemma
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.GroupoidDerived
 import ComputationalPaths.Path.PathAlgebraDerived
