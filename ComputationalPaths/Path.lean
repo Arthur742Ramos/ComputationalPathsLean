@@ -7,7 +7,6 @@ groupoid structure provided by identity types.
 -/
 
 import ComputationalPaths.Path.Basic
-import ComputationalPaths.Path.Basic.Univalence
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.Rewrite.Step
 import ComputationalPaths.Path.Rewrite.Rw
@@ -99,8 +98,6 @@ import ComputationalPaths.Path.HIT.HopfInvariantOne
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
-import ComputationalPaths.Path.OmegaGroupoid.AxiomAnalysis
 import ComputationalPaths.Path.Algebra.Abelianization
-import ComputationalPaths.Path.Algebra.NielsenSchreier
 import ComputationalPaths.Path.Algebra.GraphHIT
 import ComputationalPaths.Path.Algebra.NielsenSchreierDerived

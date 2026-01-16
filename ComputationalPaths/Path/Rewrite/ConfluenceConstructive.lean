@@ -91,8 +91,8 @@ This is established metatheoretically by:
 2. Commutation of non-overlapping steps
 3. Trivial join for identical steps
 
-The property is packaged as a typeclass assumption. For a global instance
-backed by a kernel axiom, import `ConfluenceConstructiveAxiom.lean`.
+The property is packaged as a typeclass assumption. Provide a local instance
+in downstream code if you want a global default.
 -/
 
 /-- **Local Confluence Prop** (typeclass interface).
@@ -146,8 +146,8 @@ strip lemma). Our TRS is:
 1. Locally confluent (by `local_confluence_prop`)
 2. Terminating (by RPO ordering in `Termination.lean`)
 
-The property is packaged as a typeclass assumption. For a global instance
-backed by a kernel axiom, import `ConfluenceConstructiveAxiom.lean`.
+The property is packaged as a typeclass assumption. Provide a local instance
+in downstream code if you want a global default.
 -/
 
 /-- **Strip Lemma Prop** (typeclass interface).
@@ -200,10 +200,10 @@ via typeclass assumptions:
 
 - **`hasStepStrip_of_prop`**: Uses `HasStepStripProp` directly
 
-### Opt-in Axiom File
+### Global Instances
 
-For a global instance backed by kernel axioms, import:
-`ComputationalPaths/Path/Rewrite/ConfluenceConstructiveAxiom.lean`
+This module does not ship opt-in kernel axiom files. If you want a global
+instance, provide it in your downstream project (axiomatically or otherwise).
 
 ### Architecture
 

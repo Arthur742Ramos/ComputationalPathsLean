@@ -14,7 +14,6 @@ are RwEq (i.e., it has h-level 0 for paths).
 
 1. `isHSet_iff_axiomK`: A type is a set iff it satisfies Axiom K
 2. `inverse_unique`: Every path has a unique inverse (up to RwEq)
-3. `decidableEq_implies_isHSet`: Types with decidable equality are sets
 -/
 
 import ComputationalPaths.Path.Homotopy.Reflexivity
@@ -147,6 +146,9 @@ theorem axiomK_implies_isHSet (h : AxiomK A) : IsHSet A := by
     rweq_of_step (Step.trans_refl_left q)
   exact RwEq.trans (RwEq.trans (RwEq.trans (RwEq.trans h1 h2) h3) h4) h5
 
+theorem isHSet_of_subsingleton (A : Type u) [Subsingleton A] : IsHSet A := by
+  exact axiomK_implies_isHSet (A := A) (h := axiomK_of_subsingleton (A := A))
+
 /-- A type is a set iff it satisfies Axiom K. -/
 theorem isHSet_iff_axiomK : IsHSet A ↔ AxiomK A :=
   ⟨isHSet_implies_axiomK, axiomK_implies_isHSet⟩
@@ -168,42 +170,12 @@ theorem subsingleton_pi1_of_subsingleton (A : Type u) [Subsingleton A] (a : A) :
   intro x y
   exact
     (pi1_trivial_of_subsingleton (A := A) (a := a) x).trans
-      (pi1_trivial_of_subsingleton (A := A) (a := a) y).symm
+    (pi1_trivial_of_subsingleton (A := A) (a := a) y).symm
 
-/-- **Decidable equality axiom for paths**: Types with decidable equality satisfy Axiom K.
-For such types, every loop is RwEq to refl.
+instance : IsHSet Unit := by
+  exact isHSet_of_subsingleton (A := Unit)
 
-This is sound because types with DecidableEq have unique equality proofs (all equal to rfl).
-Without the general canonicalization rule, we state this as a targeted axiom for types
-where path collapsing is known to be safe. -/
-class HasDecidableEqAxiomK (A : Type u) [DecidableEq A] : Prop where
-  axiomK : AxiomK A
-
-/-- Types with decidable equality satisfy Axiom K (assumed as an explicit hypothesis). -/
-theorem decidableEq_implies_axiomK [DecidableEq A] [h : HasDecidableEqAxiomK A] : AxiomK A :=
-  h.axiomK
-
-/-- Subsingleton types satisfy `HasDecidableEqAxiomK` (no extra axioms required). -/
-instance instHasDecidableEqAxiomK_of_subsingleton (A : Type u) [DecidableEq A] [Subsingleton A] :
-    HasDecidableEqAxiomK A where
-  axiomK := axiomK_of_subsingleton (A := A)
-
-/-- A type with decidable equality is a set -/
-theorem decidableEq_implies_isHSet [DecidableEq A] [HasDecidableEqAxiomK A] : IsHSet A :=
-  axiomK_implies_isHSet decidableEq_implies_axiomK
-
--- Examples: Concrete types are sets
-
-instance [HasDecidableEqAxiomK Nat] : IsHSet Nat :=
-  decidableEq_implies_isHSet
-
-instance [HasDecidableEqAxiomK Bool] : IsHSet Bool :=
-  decidableEq_implies_isHSet
-
-instance [HasDecidableEqAxiomK Unit] : IsHSet Unit :=
-  decidableEq_implies_isHSet
-
-instance [HasDecidableEqAxiomK Empty] : IsHSet Empty :=
-  decidableEq_implies_isHSet
+instance : IsHSet Empty := by
+  exact isHSet_of_subsingleton (A := Empty)
 
 end ComputationalPaths.Path

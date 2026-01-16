@@ -101,11 +101,10 @@ theorem punit_loop_is_refl (p : PUnitLoopSpace) : p.toEq = Eq.refl PUnit'.unit :
   rfl
 
 /-- **PUnit' set theorem**: Parallel paths in PUnit' are RwEq.
-PUnit' is a proposition (has at most one element), so it's trivially a set.
-Derived from `decidableEq_implies_isHSet` since PUnit' has DecidableEq. -/
+PUnit' is a proposition (has at most one element), so it's trivially a set. -/
 theorem punit_pathEq
     {a b : PUnit'.{u}} (p q : Path.{u} a b) : RwEq.{u} p q :=
-  decidableEq_implies_isHSet (A := PUnit'.{u}) (a := a) (b := b) p q
+  (isHSet_of_subsingleton (A := PUnit'.{u})) p q
 
 /-- Any two loops in PUnit' are RwEq. -/
 theorem punit_loops_rweq

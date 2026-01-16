@@ -273,7 +273,7 @@ The current axiom-based approach is:
 The axioms represent "computed" results that are metatheoretically valid but expensive
 to fully formalize in Lean's type theory.
 
-### Note on Other Axioms (Wedge SVK, Circle encode-decode)
+### Note on Other Assumptions (Wedge SVK, Circle encode-decode)
 
 Similar analysis applies to encode-decode axioms for HITs like Circle, Wedge, etc.:
 
@@ -286,15 +286,15 @@ Similar analysis applies to encode-decode axioms for HITs like Circle, Wedge, et
      (`WedgeSVKInstances.HasWedgeSVKEncodeData`) when it needs a concrete `encode` map.
    - There is also a Prop-level interface (`HasWedgeSVKDecodeBijective`) that reconstructs
      the equivalence noncomputably by classical choice.
-   - An opt-in kernel-axiom instance of the Prop-level interface is provided by
-     `ComputationalPaths.Path.HIT.WedgeSVKAxiom`.
+   - Provide local instances of these interfaces where needed; the old opt-in
+     kernel-axiom wrapper file has been removed.
 
 To prove these constructively would require:
 - A "flattening lemma" relating Ω(Pushout) to Pushout(Ω(...))
 - Or detailed structural analysis of path spaces in HITs
 - Both are complex and beyond typical HIT axiomatizations
 
-The current approach of using well-justified axioms is standard practice for
+The current approach of using explicit, well-justified assumptions is standard practice for
 formalizing HoTT-style results in proof assistants.
 -/
 

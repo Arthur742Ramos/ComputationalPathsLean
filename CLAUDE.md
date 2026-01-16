@@ -432,7 +432,7 @@ Error: Axioms were added during init_sorries: ['Circle', 'circleBase', ...]
 | Module Category | Works? | Reason |
 |-----------------|--------|--------|
 | `Path/Basic/*` | ✅ Yes | Core definitions, no axioms |
-| `Path/Rewrite/*` | ✅ Yes* | Rewrite system (*except ConfluenceConstructiveAxiom) |
+| `Path/Rewrite/*` | ✅ Yes* | Rewrite system (assumptions are explicit typeclasses) |
 | `Path/Groupoid.lean` | ✅ Yes | Category theory, no HITs |
 | `Path/Bicategory.lean` | ✅ Yes | 2-category theory |
 | `Path/HIT/*` | ❌ No | Defines HIT axioms |

@@ -104,32 +104,9 @@ structure IsSet (A : Type u) where
 
 namespace IsSet
 
-/-- **Set theorem for Nat**: Parallel paths in Nat are RwEq.
-Derived from `decidableEq_implies_isHSet` since Nat has DecidableEq. -/
-theorem nat_pathEq [HasDecidableEqAxiomK Nat] {a b : Nat} (p q : Path a b) : RwEq p q :=
-  decidableEq_implies_isHSet p q
-
-/-- **Set theorem for Bool**: Parallel paths in Bool are RwEq.
-Derived from `decidableEq_implies_isHSet` since Bool has DecidableEq. -/
-theorem bool_pathEq [HasDecidableEqAxiomK Bool] {a b : Bool} (p q : Path a b) : RwEq p q :=
-  decidableEq_implies_isHSet p q
-
-/-- **Set theorem for Int**: Parallel paths in Int are RwEq.
-Derived from `decidableEq_implies_isHSet` since Int has DecidableEq. -/
-theorem int_pathEq [HasDecidableEqAxiomK Int] {a b : Int} (p q : Path a b) : RwEq p q :=
-  decidableEq_implies_isHSet p q
-
-/-- Nat is a set (by UIP in Lean). -/
-def natSet [HasDecidableEqAxiomK Nat] : IsSet Nat where
-  pathEq := nat_pathEq
-
-/-- Bool is a set. -/
-def boolSet [HasDecidableEqAxiomK Bool] : IsSet Bool where
-  pathEq := bool_pathEq
-
-/-- Int is a set. -/
-def intSet [HasDecidableEqAxiomK Int] : IsSet Int where
-  pathEq := int_pathEq
+/-- PUnit' is a set. -/
+def punitSet : IsSet PUnit' where
+  pathEq := (isHSet_of_subsingleton (A := PUnit'))
 
 end IsSet
 

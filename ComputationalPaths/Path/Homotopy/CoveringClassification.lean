@@ -258,8 +258,7 @@ def inducedSubgroup {A : Type u} (a : A) (_cov : CoveringOf A a) : Subgroup A a 
 /-! ## Typeclass Interface for the Galois Correspondence
 
 The classification theorem is packaged as a typeclass assumption so that
-it can be made explicit in signatures and optionally instantiated via
-a kernel axiom (see `CoveringClassificationAxiom.lean`).
+it can be made explicit in signatures.
 -/
 
 /-- **Galois Correspondence** (typeclass interface).
@@ -429,14 +428,14 @@ This module establishes the classification of covering spaces:
 |-----------|---------------|
 | `HasCoveringEquivSubgroup` | Galois correspondence (deep topology) |
 
-For convenience, import `CoveringClassificationAxiom.lean` to get a global instance.
+Provide a local instance where the global correspondence is required.
 
 ## Connection to Other Modules
 
 - **CoveringSpace.lean**: Basic covering space infrastructure
 - **FundamentalGroup.lean**: π₁ definitions
 - **Circle.lean, ProjectivePlane.lean**: Concrete examples
-- **CoveringClassificationAxiom.lean**: Opt-in kernel axiom
+- **HasCoveringEquivSubgroup**: Typeclass assumption for the Galois correspondence
 -/
 
 end CoveringClassification

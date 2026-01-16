@@ -532,22 +532,9 @@ instance (priority := 50) hasGlueNaturalLoopRwEq_of_subsingleton_left_right (c�
     (hA := axiomK_of_subsingleton (A := A))
     (hB := axiomK_of_subsingleton (A := B))
 
-/-- If `C` has decidable equality and we assume `HasDecidableEqAxiomK C`, then `C`
-has Axiom K, hence glue naturality for loops follows. -/
-instance hasGlueNaturalLoopRwEq_of_decidableEq (c₀ : C)
-    [DecidableEq C] [HasDecidableEqAxiomK C] :
-    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ :=
-  hasGlueNaturalLoopRwEq_of_axiomK (A := A) (B := B) (C := C) (f := f) (g := g) c₀
-    (hC := decidableEq_implies_axiomK (A := C))
-
-/-- If both legs have decidable equality and the corresponding Axiom K interfaces, loop naturality
-holds without assumptions on the gluing type `C`. -/
-instance (priority := 50) hasGlueNaturalLoopRwEq_of_decidableEq_left_right (c₀ : C)
-    [DecidableEq A] [HasDecidableEqAxiomK A] [DecidableEq B] [HasDecidableEqAxiomK B] :
-    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ :=
-  hasGlueNaturalLoopRwEq_of_axiomK_left_right (A := A) (B := B) (C := C) (f := f) (g := g) c₀
-    (hA := decidableEq_implies_axiomK (A := A))
-    (hB := decidableEq_implies_axiomK (A := B))
+/- Decidable-equality shortcuts previously relied on a global Axiom K interface.
+   We now keep only explicit Axiom K proofs, so supply `hasGlueNaturalLoopRwEq_of_axiomK`
+   or `hasGlueNaturalLoopRwEq_of_axiomK_left_right` directly when available. -/
 
 /-- Glue naturality for loops: For a loop p at c₀, inlPath(f*(p)) equals
 glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹ up to RwEq. This is the key fact for SVK. -/

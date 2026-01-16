@@ -80,8 +80,7 @@ def isHSpaceDimension (n : Nat) : Prop := n = 0 ∨ n = 1 ∨ n = 3 ∨ n = 7
 /-! ## Typeclass Interface for Adams' Theorem
 
 The classification theorem is packaged as a typeclass assumption so that
-it can be made explicit in signatures and optionally instantiated via
-a kernel axiom (see `HopfInvariantOneAxiom.lean`).
+it can be made explicit in signatures.
 -/
 
 /-- **Adams' H-Space Classification** (typeclass interface)
@@ -167,7 +166,6 @@ This module captures the key consequence of Adams' 1960 theorem:
 | `HasSphereHSpaceClassification` | Adams' theorem (1960) via K-theory |
 
 All negative results (`sphere2_not_HSpace`, etc.) require this typeclass assumption.
-For convenience, import `HopfInvariantOneAxiom.lean` to get a global instance.
 
 ### Mathematical Note
 
@@ -184,7 +182,7 @@ The Hopf invariant machinery isn't needed for the sphere classification proofs.
 - **HopfFibration.lean**: The complex Hopf map η
 - **QuaternionicHopf.lean**: The quaternionic Hopf map ν
 - **FreudenthalSuspension.lean**: Stable homotopy infrastructure
-- **HopfInvariantOneAxiom.lean**: Opt-in kernel axiom for `HasSphereHSpaceClassification`
+- **HasSphereHSpaceClassification**: Typeclass assumption for Adams' theorem.
 -/
 
 end HopfInvariantOne

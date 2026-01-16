@@ -62,19 +62,15 @@ Kernel axioms are restricted to HIT-style interfaces that are not constructible 
 `Torus` and `MobiusBand` are now *constructed* types (`Circle × Circle` and `Circle`, respectively)
 and contribute no kernel axioms.
 
-### Quarantined axioms (opt-in only)
+### Quarantined assumptions (typeclasses)
+These assumptions remain explicit in signatures; there are no opt-in kernel-axiom wrapper files anymore.
 
-The following axioms have been moved to opt-in import files to minimize the kernel axiom footprint:
-
-| Axiom | Opt-in File | Justification |
-|-------|-------------|---------------|
-| `HasSphereHSpaceClassification` | `HIT/HopfInvariantOneAxiom.lean` | Adams' theorem (K-theory) |
-| `HasCoveringEquivSubgroup` | `Homotopy/CoveringClassificationAxiom.lean` | Galois correspondence |
-| `HasLocalConfluenceProp` | `Rewrite/ConfluenceConstructiveAxiom.lean` | Critical pair analysis |
-| `HasStepStripProp` | `Rewrite/ConfluenceConstructiveAxiom.lean` | Newman's lemma |
-
-Import these files only when you need the corresponding results without typeclass constraints.
-
+| Assumption | Scope | Justification |
+|-----------|-------|---------------|
+| `HasSphereHSpaceClassification` | `HIT/HopfInvariantOne.lean` | Adams' theorem (K-theory) |
+| `HasCoveringEquivSubgroup` | `Homotopy/CoveringClassification.lean` | Galois correspondence |
+| `HasLocalConfluenceProp` | `Rewrite/ConfluenceConstructive.lean` | Critical pair analysis |
+| `HasStepStripProp` | `Rewrite/ConfluenceConstructive.lean` | Newman's lemma |
 ### Non-kernel typeclass assumptions
 
 Rewrite-system confluence is packaged as **non-kernel** typeclass assumptions
@@ -114,17 +110,12 @@ Non-kernel assumptions required by the circle encode/decode development:
     `ComputationalPaths/Path/Homotopy/LieGroups.lean`) now depend only on this weaker
     hypothesis.
 
-### Opt-in “assumption-free” import
+### Local assumption instance
 
 If you want to use the circle π₁ result without threading a typeclass hypothesis
-through your signatures, import:
-
-- `ComputationalPaths/Path/HIT/CirclePiOneAxiom.lean`
-
-This file adds a global `HasCirclePiOneEncode` **as a kernel axiom** and exports
-`circlePiOneEquivInt' : π₁(S¹) ≃ ℤ` with no extra parameters. The core library
-does *not* import it by default.
-
+through your signatures, provide a local instance of `HasCirclePiOneEncode` (or
+keep it scoped inside a helper module). The core library no longer ships a
+kernel-axiom wrapper.
 ## Torus fundamental group (π₁(T²) ≃ ℤ × ℤ)
 
 Kernel axioms *used by* `ComputationalPaths.Path.torusPiOneEquivIntProd`:
@@ -139,19 +130,16 @@ Non-kernel assumptions required by the torus encode/decode development:
     `torusDecode (encode x) = x`.
   - Defined in `ComputationalPaths/Path/HIT/TorusStep.lean`.
   - Since `Torus` is defined as `Circle × Circle`, `TorusStep.lean` provides an instance
-    `[HasCirclePiOneEncode] → HasTorusPiOneEncode` using the product fundamental group theorem.
+    `[HasCirclePiOneEncode] → HasTorusPiOneEncode` using the product fundamental
+    group theorem.
   - Downstream developments can therefore depend only on the circle π₁ hypothesis.
 
-### Opt-in "assumption-free" import
+### Local assumption instance
 
 If you want to use the torus π₁ result without threading a typeclass hypothesis
-through your signatures, import:
-
-- `ComputationalPaths/Path/HIT/TorusPiOneAxiom.lean`
-
-This file imports `CirclePiOneAxiom.lean` and exports
-`torusPiOneEquivIntProd' : π₁(T²) ≃ ℤ × ℤ` with no extra parameters. The core library
-does *not* import it by default.
+through your signatures, provide a local instance of `HasTorusPiOneEncode` (or
+keep it scoped inside a helper module). The core library no longer ships a
+kernel-axiom wrapper.
 
 ## Projective plane (π₁(RP²) ≃ ℤ₂)
 
@@ -175,16 +163,12 @@ Non-kernel assumptions required by the RP² encode/decode development:
     `HasProjectivePiOneEncode` can be turned back into `HasProjectiveLoopDecode`
     when a raw-loop statement is required.
 
-### Opt-in "assumption-free" import
+### Local assumption instance
 
-If you want to use the projective plane π₁ result without threading a typeclass hypothesis
-through your signatures, import:
-
-- `ComputationalPaths/Path/HIT/ProjectivePiOneAxiom.lean`
-
-This file adds a global `HasProjectivePiOneEncode` **as a kernel axiom** and exports
-`projectivePiOneEquivZ2' : π₁(RP²) ≃ Bool` with no extra parameters. The core library
-does *not* import it by default.
+If you want to use the projective plane π₁ result without threading a typeclass
+hypothesis through your signatures, provide a local instance of
+`HasProjectivePiOneEncode` (or keep it scoped inside a helper module). The core
+library no longer ships a kernel-axiom wrapper.
 
 ## Klein bottle (π₁(K) ≃ ℤ ⋊ ℤ)
 
@@ -208,16 +192,12 @@ Non-kernel assumptions required by the Klein bottle encode/decode development:
     `HasKleinPiOneEncode` can be turned back into `HasKleinLoopDecode` when a raw-loop
     statement is required.
 
-### Opt-in "assumption-free" import
+### Local assumption instance
 
-If you want to use the Klein bottle π₁ result without threading a typeclass hypothesis
-through your signatures, import:
-
-- `ComputationalPaths/Path/HIT/KleinPiOneAxiom.lean`
-
-This file adds a global `HasKleinPiOneEncode` **as a kernel axiom** and exports
-`kleinPiOneEquivIntProd' : π₁(K) ≃ ℤ × ℤ` with no extra parameters. The core library
-does *not* import it by default.
+If you want to use the Klein bottle π₁ result without threading a typeclass
+hypothesis through your signatures, provide a local instance of
+`HasKleinPiOneEncode` (or keep it scoped inside a helper module). The core
+library no longer ships a kernel-axiom wrapper.
 
 The SVK development in `ComputationalPaths/Path/HIT/KleinBottleSVK.lean` builds the
 semidirect-product viewpoint and requires additional pushout assumptions.
@@ -241,7 +221,8 @@ Non-kernel assumptions required by the lens space encode/decode development:
 
 ### Mathematical background
 
-Lens spaces L(p,q) are 3-manifolds defined as S³/ℤ_p quotients. The construction via
+Lens spaces L(p,q) are 3-manifolds defined as S³/ℤ_p quotients. The construction
+via
 **Heegaard decomposition** represents L(p,1) as:
 
 ```
@@ -257,17 +238,12 @@ which follows from SVK applied to the Heegaard decomposition.
 - L(1,1) ≃ S³ (3-sphere, trivial fundamental group)
 - L(2,1) ≃ RP³ (real projective 3-space, π₁ ≃ ℤ/2ℤ)
 
-### Opt-in "assumption-free" import
+### Local assumption instance
 
-If you want to use the lens space π₁ result without threading a typeclass hypothesis
-through your signatures, import:
-
-- `ComputationalPaths/Path/HIT/LensPiOneAxiom.lean`
-
-This file adds a global `HasLensPiOneEncode` **as a kernel axiom** and exports
-`lensPiOneEquivZMod' : π₁(L(p,1)) ≃ ℤ/pℤ` with no extra parameters. The core library
-does *not* import it by default.
-
+If you want to use the lens space π₁ result without threading a typeclass
+hypothesis through your signatures, provide a local instance of
+`HasLensPiOneEncode` (or keep it scoped inside a helper module). The core
+library no longer ships a kernel-axiom wrapper.
 ## Pushout / SVK
 
 The pushout is implemented as a quotient, but some HIT-style β/naturality laws are not definitional.
@@ -315,5 +291,5 @@ Notes:
     and `WedgeSVKInstances.HasWedgeSVKEncodeDecode` (bundled as `WedgeSVKInstances.HasWedgeSVKEncodeData`).
   - Prop-level interface `HasWedgeSVKDecodeBijective`, plus the choice-based equivalence
     `wedgeFundamentalGroupEquiv_of_decode_bijective`.
-  An opt-in kernel-axiom instance of the Prop-level interface is provided by
-  `ComputationalPaths/Path/HIT/WedgeSVKAxiom.lean` (exporting `wedgeFundamentalGroupEquiv'`).
+  Provide local instances of the Prop-level interface where needed; the old
+  kernel-axiom wrapper file has been removed.

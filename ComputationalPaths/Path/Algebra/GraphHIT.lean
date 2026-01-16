@@ -41,7 +41,7 @@ universe u v
 
 open BouquetN
 
-/-! ## Graph Structure (matching NielsenSchreier.lean) -/
+/-! ## Graph Structure -/
 
 /-- A combinatorial graph. -/
 structure Graph where

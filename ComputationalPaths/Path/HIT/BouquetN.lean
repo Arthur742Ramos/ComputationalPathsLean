@@ -168,6 +168,110 @@ def genPow (i : Fin'B n) (k : Int) : BouquetFreeGroup n :=
   if h : k = 0 then one
   else Quot.mk _ (BouquetWord.cons ⟨i, k, h⟩ BouquetWord.nil)
 
+/-! ## Free Group Operations
+
+We define multiplication and inverse on `BouquetFreeGroup` constructively
+via word concatenation and reversal.
+-/
+
+/-- Word concatenation respects the relation on the right. -/
+private theorem wordConcat_rel_right (w₁ : BouquetWord n) {w₂ w₂' : BouquetWord n}
+    (h : BouquetRel n w₂ w₂') :
+    BouquetRel n (BouquetWord.wordConcat w₁ w₂) (BouquetWord.wordConcat w₁ w₂') := by
+  induction w₁ with
+  | nil => exact h
+  | cons l _rest ih => exact BouquetRel.congr l ih
+
+/-- Word concatenation respects the relation on the left. -/
+private theorem wordConcat_rel_left (w₂ : BouquetWord n) {w₁ w₁' : BouquetWord n}
+    (h : BouquetRel n w₁ w₁') :
+    BouquetRel n (BouquetWord.wordConcat w₁ w₂) (BouquetWord.wordConcat w₁' w₂) := by
+  induction h with
+  | combine l₁ l₂ hgen hne rest =>
+      simp only [BouquetWord.wordConcat]
+      exact BouquetRel.combine l₁ l₂ hgen hne (BouquetWord.wordConcat rest w₂)
+  | cancel l₁ l₂ hgen hinv rest =>
+      simp only [BouquetWord.wordConcat]
+      exact BouquetRel.cancel l₁ l₂ hgen hinv (BouquetWord.wordConcat rest w₂)
+  | congr l _ ih =>
+      simp only [BouquetWord.wordConcat]
+      exact BouquetRel.congr l ih
+
+/-- Multiplication on BouquetFreeGroup via word concatenation. -/
+noncomputable def mul (x y : BouquetFreeGroup n) : BouquetFreeGroup n :=
+  Quot.lift
+    (fun w₁ => Quot.lift
+      (fun w₂ => Quot.mk _ (BouquetWord.wordConcat w₁ w₂))
+      (fun _ _ h => Quot.sound (wordConcat_rel_right w₁ h))
+      y)
+    (fun _ _ h => by
+      induction y using Quot.ind with
+      | _ w₂ => exact Quot.sound (wordConcat_rel_left w₂ h))
+    x
+
+/-- Word concatenation with nil on the right is identity. -/
+private theorem wordConcat_nil_right {n : Nat} (w : BouquetWord n) :
+    BouquetWord.wordConcat w BouquetWord.nil = w := by
+  induction w with
+  | nil => rfl
+  | cons l rest ih => simp only [BouquetWord.wordConcat, ih]
+
+/-- Word concatenation is associative. -/
+private theorem wordConcat_assoc {n : Nat} (w₁ w₂ w₃ : BouquetWord n) :
+    BouquetWord.wordConcat (BouquetWord.wordConcat w₁ w₂) w₃ =
+    BouquetWord.wordConcat w₁ (BouquetWord.wordConcat w₂ w₃) := by
+  induction w₁ with
+  | nil => rfl
+  | cons l rest ih => simp only [BouquetWord.wordConcat, ih]
+
+/-- Inverse respects the BouquetRel relation. -/
+private theorem inverse_respects_rel {n : Nat} {w₁ w₂ : BouquetWord n}
+    (h : BouquetRel n w₁ w₂) :
+    BouquetRel n (BouquetWord.inverse w₁) (BouquetWord.inverse w₂) := by
+  induction h with
+  | combine l₁ l₂ hgen hne rest =>
+      simp only [BouquetWord.inverse]
+      rw [wordConcat_assoc]
+      apply wordConcat_rel_right
+      simp only [BouquetWord.wordConcat]
+      -- Rewrite goal to use l₂.gen.
+      rw [hgen]
+      have hne' : -l₂.power + (-l₁.power) ≠ 0 := by
+        intro heq
+        have h2 : l₁.power + l₂.power = 0 := by omega
+        exact hne h2
+      have step := BouquetRel.combine
+        ⟨l₂.gen, -l₂.power, fun h => l₂.power_ne_zero (Int.neg_eq_zero.mp h)⟩
+        ⟨l₂.gen, -l₁.power, fun h => l₁.power_ne_zero (Int.neg_eq_zero.mp h)⟩
+        rfl hne' BouquetWord.nil
+      have hpow : -l₂.power + (-l₁.power) = -(l₁.power + l₂.power) := by omega
+      simp only [hpow] at step
+      exact step
+  | cancel l₁ l₂ hgen hinv rest =>
+      simp only [BouquetWord.inverse]
+      rw [wordConcat_assoc]
+      simp only [BouquetWord.wordConcat]
+      -- Use BouquetRel.cancel. First unify generators with rw.
+      rw [hgen]
+      have hinv' : -l₂.power + (-l₁.power) = 0 := by omega
+      have step := BouquetRel.cancel
+        ⟨l₂.gen, -l₂.power, fun h => l₂.power_ne_zero (Int.neg_eq_zero.mp h)⟩
+        ⟨l₂.gen, -l₁.power, fun h => l₁.power_ne_zero (Int.neg_eq_zero.mp h)⟩
+        rfl hinv' BouquetWord.nil
+      have hstep := wordConcat_rel_right (BouquetWord.inverse rest) step
+      simp only [wordConcat_nil_right] at hstep
+      exact hstep
+  | congr l _ ih =>
+      simp only [BouquetWord.inverse]
+      exact wordConcat_rel_left _ ih
+
+/-- Inverse on BouquetFreeGroup via word inverse. -/
+noncomputable def inv (x : BouquetFreeGroup n) : BouquetFreeGroup n :=
+  Quot.lift
+    (fun w => Quot.mk _ (BouquetWord.inverse w))
+    (fun _ _ h => Quot.sound (inverse_respects_rel h))
+    x
+
 end BouquetFreeGroup
 
 /-! ## The Bouquet of n Circles

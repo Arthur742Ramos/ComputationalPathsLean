@@ -234,13 +234,10 @@ The axioms are replaced with:
 - `nielsenSchreierData` → `deriveNielsenSchreierData` (derived)
 - `schreierRankFormula` → `deriveSchreierRankFormula` (proved)
 
-## Relationship to Original Axioms
+## Relationship to Legacy Axioms
 
-The original `NielsenSchreier.lean` uses:
-- `axiom nielsenSchreierData`
-- `axiom schreierRankFormula`
-
-These can be replaced by providing `HasSubgroupCovering` instances.
+Earlier versions used axiomatic packages for Nielsen-Schreier data.
+Those are no longer needed: provide `HasSubgroupCovering` instances instead.
 The covering construction itself requires `HasCoveringEquivSubgroup` from
 the Galois correspondence (already a typeclass in CoveringClassification).
 -/

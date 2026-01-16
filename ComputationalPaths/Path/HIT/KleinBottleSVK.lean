@@ -221,11 +221,10 @@ Since UnitU has only one element, all paths are equivalent to refl.
 -/
 
 /-- **UnitU set theorem**: Parallel paths in UnitU are RwEq.
-UnitU has only one element, so it's trivially a set.
-Derived from `decidableEq_implies_isHSet` since UnitU has DecidableEq. -/
+UnitU has only one element, so it's trivially a set. -/
 theorem unitU_pathEq
     {a b : UnitU} (p q : Path.{u} a b) : RwEq.{u} p q :=
-  decidableEq_implies_isHSet (A := UnitU) (a := a) (b := b) p q
+  (isHSet_of_subsingleton (A := UnitU)) p q
 
 /-- Any loop in UnitU is RwEq to refl. -/
 theorem unitU_loop_rweq_refl
