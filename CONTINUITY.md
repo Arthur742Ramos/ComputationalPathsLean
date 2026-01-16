@@ -99,8 +99,9 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
   - Committed and pushed all current changes (`64a6c07` to `main`).
 - **Done**:
   - Adjusted `LieGroups.lean` binder syntax for `HasCirclePiOneEncode`/`HasTorusPiOneEncode` and committed/pushed (`65a7bf8`).
+- **Done**:
+  - Removed legacy placeholder homotopy modules (SVKApplications, EilenbergMacLane, LongExactSequence, MayerVietoris, WhiteheadTheorem, CellularApproximation, BlakersMassey), updated imports/docs, and built successfully (`3df7d5d`).
 - **Now**:
-  - Remove legacy placeholder homotopy modules (SVKApplications, EilenbergMacLane, LongExactSequence, MayerVietoris, WhiteheadTheorem, CellularApproximation, BlakersMassey) and update imports/docs.
   - Continue discharging remaining encode/decode and major-theorem assumptions. 
 - **Next**:
   - Continue discharging remaining encode/decode and major-theorem assumptions in the recommended order.
