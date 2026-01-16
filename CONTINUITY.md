@@ -100,6 +100,7 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
 - **Done**:
   - Adjusted `LieGroups.lean` binder syntax for `HasCirclePiOneEncode`/`HasTorusPiOneEncode` and committed/pushed (`65a7bf8`).
 - **Now**:
+  - Remove legacy placeholder homotopy modules (SVKApplications, EilenbergMacLane, LongExactSequence, MayerVietoris, WhiteheadTheorem, CellularApproximation, BlakersMassey) and update imports/docs.
   - Continue discharging remaining encode/decode and major-theorem assumptions. 
 - **Next**:
   - Continue discharging remaining encode/decode and major-theorem assumptions in the recommended order.
@@ -109,7 +110,7 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
 - Any remaining non-HIT assumption modules to delete vs formalize? (UNCONFIRMED)
 
 ## Working Set
-- Files: `CONTINUITY.md`, `Scripts/AssumptionSurvey.lean`, `docs/axioms.md`, `README.md`
+- Files: `CONTINUITY.md`, `ComputationalPaths/Path.lean`, `ComputationalPaths/Path/Homotopy/HigherProductHomotopy.lean`, `README.md`, `docs/axioms.md`
 - Commands: `./lake.cmd build`, `./lake.cmd env lean Scripts/AxiomInventory.lean`, `./lake.cmd env lean Scripts/AssumptionSurvey.lean`
 
 

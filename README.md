@@ -19,7 +19,6 @@ Paths compose via `trans` (concatenating step lists), invert via `symm` (reversi
 - **Path algebra derived results** (axiom-free): Four-fold associativity, symmetry-transitivity interactions, congruence composition, pentagon components, and Eckmann-Hilton preparation lemmas.
 - **Higher homotopy groups π_n**: Iterated loop spaces (Loop2Space, Loop3Space), π₂(A,a) via derivation quotients, Eckmann-Hilton argument proving π₂ is abelian, and π₂(S²) ≅ 1.
 - **Truncation levels (n-types)**: Full hierarchy connecting ω-groupoid to HoTT: IsContr → IsProp → IsSet → IsGroupoid, with all types automatically 1-groupoids via contractibility₃.
-- **Eilenberg-MacLane spaces K(G,n)**: Characterization of K(G,1) spaces with circle as K(ℤ,1), group structures, and loop space property Ω(K(G,n+1)) ≃ K(G,n).
 - **Fibrations and fiber sequences**: Fiber types, type families as fibrations, path lifting, connecting map ∂ : π₁(B) → F, and long exact sequence of homotopy groups.
 - **Higher homotopy (legacy removed)**: Hopf fibration, π₂(S²), π₃(S²), James construction, and Freudenthal suspension were legacy axiomatic modules and have been removed.
 - **Suspension-loop adjunction**: Pointed types and maps infrastructure, suspension as pointed type, adjunction map construction, and legacy Freudenthal scaffolding (removed).
@@ -42,10 +41,7 @@ Paths compose via `trans` (concatenating step lists), invert via `symm` (reversi
 - **Higher product homotopy**: π_n(A × B) ≃ π_n(A) × π_n(B) for all n, generalizing the π₁ product theorem to higher homotopy groups. Application: π_n(Tᵏ) = 0 for n ≥ 2.
 - **Lie group connections**: SO(2) ≃ U(1) ≃ S¹ with π₁ ≃ ℤ, n-torus T^n = (S¹)^n as maximal torus in U(n), simply connected groups, ℤ₂ fundamental groups (SO(n) for n ≥ 3 via RP²), and comparison with Bordg-Cavalleri differential geometry approach.
 - **Complex projective spaces (legacy removed)**: The CP^n module was removed as legacy placeholder code.
-- **Whitehead theorem**: Weak homotopy equivalences between CW complexes are homotopy equivalences. Includes weak h.e. definitions, CW complex structure, and obstruction theory foundations.
-- **Mayer-Vietoris sequence**: Long exact sequence H_n(C) → H_n(A) ⊕ H_n(B) → H_n(X) → H_{n-1}(C) for X = A ∪ B, with exactness proofs and applications to sphere/wedge homology.
 - **Cellular homology (legacy removed)**: Cellular homology module was removed as legacy placeholder code.
-- **SVK applications**: Punctured plane π₁(ℝ² - {p}) ≃ ℤ, multiple punctures π₁(ℝ² - {p₁,...,pₙ}) ≃ F_{n-1}, graph fundamental groups, and doubles of manifolds.
 
 ## Quick Start
 - Build: `lake build`
@@ -87,7 +83,6 @@ Paths compose via `trans` (concatenating step lists), invert via `symm` (reversi
 - [`ComputationalPaths/Path/Homotopy/CoveringSpace.lean`](ComputationalPaths/Path/Homotopy/CoveringSpace.lean) — covering space theory with path lifting and π₁-actions on fibers.
 - [`ComputationalPaths/Path/Homotopy/Fibration.lean`](ComputationalPaths/Path/Homotopy/Fibration.lean) — fibrations, fiber sequences F → E → B, connecting map ∂ : π₁(B) → F, long exact sequence of homotopy groups, induced maps on π₁.
 - [`ComputationalPaths/Path/Homotopy/SuspensionLoop.lean`](ComputationalPaths/Path/Homotopy/SuspensionLoop.lean) — suspension-loop adjunction [ΣX, Y]_* ≅ [X, ΩY]_*, pointed types/maps, adjunction map construction, connectivity definitions.
-- [`ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean`](ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean) — Eilenberg-MacLane spaces K(G,n), IsKG1 characterization, circle is K(ℤ,1), loop space property Ω(K(G,n+1)) ≃ K(G,n).
 - [`ComputationalPaths/Path/Homotopy/FundamentalGroupoid.lean`](ComputationalPaths/Path/Homotopy/FundamentalGroupoid.lean) — **Fundamental groupoid Π₁(A)** with explicit groupoid structure, basepoint independence theorem (`basepointIsomorphism`), and functoriality (`fundamentalGroupoidMap`, `inducedPiOneMap`).
 - [`ComputationalPaths/Path/Homotopy/ProductFundamentalGroup.lean`](ComputationalPaths/Path/Homotopy/ProductFundamentalGroup.lean) — **Product fundamental group theorem**: π₁(A × B, (a,b)) ≃ π₁(A, a) × π₁(B, b) via path projection (`Path.fst`, `Path.snd`) and pairing (`Path.prod`).
 - [`ComputationalPaths/Path/Homotopy/HigherProductHomotopy.lean`](ComputationalPaths/Path/Homotopy/HigherProductHomotopy.lean) — **Higher product homotopy theorem**: π_n(A × B) ≃ π_n(A) × π_n(B) for all n ≥ 1, with `prodHigherPiNEquiv`. Generalizes π₁ product theorem; application: π_n(Tᵏ) = 0 for n ≥ 2.
@@ -95,9 +90,6 @@ Paths compose via `trans` (concatenating step lists), invert via `symm` (reversi
 - [`ComputationalPaths/Path/Algebra/Abelianization.lean`](ComputationalPaths/Path/Algebra/Abelianization.lean) — **Free group abelianization** F_n^ab ≃ ℤⁿ (axiom-free). Constructive encode-decode equivalence with `freeGroup_ab_equiv`, `wordToIntPow`, `liftWord_respects_BouquetRel`, and `liftBouquetFreeGroup_respects_AbelianizationRel`.
 - [`ComputationalPaths/Path/Algebra/NielsenSchreierDerived.lean`](ComputationalPaths/Path/Algebra/NielsenSchreierDerived.lean) — **Nielsen-Schreier theorem (derived)**: replaces axioms with covering-theoretic typeclass data.
 - [`ComputationalPaths/Path/Homotopy/CoveringClassification.lean`](ComputationalPaths/Path/Homotopy/CoveringClassification.lean) — **Covering space classification** via Galois correspondence: covering spaces ↔ subgroups of π₁. Universal cover with `deck_equiv_pi1` (Deck(X̃/X) ≃ π₁(X)). Regular covers, normal subgroups, examples for circle, torus, figure-eight, projective plane.
-- [`ComputationalPaths/Path/Homotopy/WhiteheadTheorem.lean`](ComputationalPaths/Path/Homotopy/WhiteheadTheorem.lean) — **Whitehead theorem**: weak homotopy equivalences between CW complexes are homotopy equivalences. Includes `InducesIsoOnPiN`, `WeakHomotopyEquiv`, `HomotopyEquiv` structures, and obstruction theory.
-- [`ComputationalPaths/Path/Homotopy/MayerVietoris.lean`](ComputationalPaths/Path/Homotopy/MayerVietoris.lean) — **Mayer-Vietoris sequence**: long exact sequence H_n(C) → H_n(A) ⊕ H_n(B) → H_n(X) → H_{n-1}(C) for X = A ∪ B, with exactness proofs.
-- [`ComputationalPaths/Path/Homotopy/LongExactSequence.lean`](ComputationalPaths/Path/Homotopy/LongExactSequence.lean) — general long exact sequence infrastructure for homotopy and homology theories.
 - [`ComputationalPaths/Path/Homotopy/LoopIteration.lean`](ComputationalPaths/Path/Homotopy/LoopIteration.lean) — loop iteration infrastructure supporting loop power operations and group structure.
 - [`ComputationalPaths/Path/Homotopy/Coproduct.lean`](ComputationalPaths/Path/Homotopy/Coproduct.lean) — coproduct constructions for homotopy-theoretic types.
 - [`ComputationalPaths/Path/Homotopy/Sets.lean`](ComputationalPaths/Path/Homotopy/Sets.lean) — set-theoretic constructions supporting homotopy definitions.
@@ -116,7 +108,6 @@ Paths compose via `trans` (concatenating step lists), invert via `symm` (reversi
 - [`ComputationalPaths/Path/HIT/BouquetN.lean`](ComputationalPaths/Path/HIT/BouquetN.lean) — **Bouquet of n circles** (∨ⁿS¹) with free group model and decode map; π₁ equivalence not yet formalized.
 - [`ComputationalPaths/Path/HIT/Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean) — The 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK. Also defines S³ for the Hopf fibration.
 - Wedge encode/decode is now integrated in `ComputationalPaths/Path/HIT/PushoutPaths.lean` via `wedgeFundamentalGroupEquiv_of_decode_bijective`.
-- [`ComputationalPaths/Path/HIT/SVKApplications.lean`](ComputationalPaths/Path/HIT/SVKApplications.lean) — **Additional SVK applications**: punctured plane π₁(ℝ² - {p}) ≃ ℤ, multiple punctures π₁(ℝ² - {p₁,...,pₙ}) ≃ F_{n-1}, graph fundamental groups, doubles of manifolds.
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -487,37 +478,6 @@ Higher coherence laws for the weak ω-groupoid structure:
 - **Connectivity**: `IsPathConnectedPointed`, `IsSimplyConnected` structures
 - **Suspension connectivity**: `susp_path_connected_structure` shows south connects to north
 
-## Eilenberg-MacLane Spaces K(G,n) (what to read)
-
-- [`ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean`](ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean) characterizes K(G,n) spaces:
-  ```lean
-  -- Group structures
-  structure GroupStr (G : Type u) where
-    one : G
-    mul : G → G → G
-    inv : G → G
-    -- axioms...
-
-  -- K(G,1) characterization
-  structure IsKG1 (X : PointedType) (G : Type u) (h : GroupStr G) where
-    connected : ∀ x, ∃ _p : Path x X.pt, True
-    pi1_iso_toFun : π₁(X) → G
-    pi1_iso_surj : ∀ g, ∃ α, pi1_iso_toFun α = g
-    pi1_iso_inj : ∀ α β, pi1_iso_toFun α = pi1_iso_toFun β → α = β
-    pi1_iso_one : pi1_iso_toFun refl = h.one
-    pi1_iso_mul : ∀ α β, pi1_iso_toFun (α · β) = h.mul ...
-    pi2_trivial : ∀ l : Loop2Space, Loop2Eq l refl
-
-  -- The circle is K(ℤ,1)
-  def circleIsKZ1 : IsKG1 circlePointed Int intAbelianGroup.toGroupStr
-  ```
-- **Circle is K(ℤ,1)**: Uses encode-decode from Circle.lean with π₂ triviality from contractibility₃
-- **Proved theorems** (no longer axioms):
-  - `circleConnected`: Every point is path-connected to base (via PLift + circle induction)
-  - `circleEncode_mul`: Encoding is a group homomorphism (via round-trip + integer induction)
-- **Loop space property**: `loop_of_KGn_shifts_degree` states Ω(K(G,n+1)) ≃ K(G,n)
-- **Classifying spaces**: `IsClassifyingSpace` structure for BG = K(G,1)
-
 ## Circle π₁(S¹) ≃ ℤ (what to read)
 - Encoding: `circleEncode : π₁(S¹) → ℤ` via quotient-lift of `circleEncodePath`.
 - Decoding: `circleDecode : ℤ → π₁(S¹)` by z-powers of the fundamental loop.
@@ -568,7 +528,7 @@ Two approaches are available:
 - **Two generators**: `loopA` (left circle) and `loopB` (right circle, conjugated by glue)
 - **Main theorem (legacy removed)**: figure-eight π₁ equivalence is not yet formalized.
 - **Non-abelianness**: `wordAB ≠ wordBA` proves the fundamental group is non-abelian.
-- The figure-eight is the simplest space with non-abelian π₁, making it important for testing SVK applications.
+- The figure-eight is the simplest space with non-abelian π₁, making it important for testing SVK.
 
 ## Bouquet of n Circles (∨ⁿS¹) (what to read)
 - **Definition** ([`BouquetN.lean`](ComputationalPaths/Path/HIT/BouquetN.lean)): Higher-inductive type with:

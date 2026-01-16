@@ -340,7 +340,7 @@ This module establishes the higher product theorem:
 
 - **ProductFundamentalGroup.lean**: Special case n = 1
 - **HigherHomotopy.lean**: Higher loop spaces
-- **EilenbergMacLane.lean**: π_n(S¹) = 0 for n ≥ 2
+- **EilenbergMacLane.lean**: π_n(S¹) = 0 for n ≥ 2 (legacy placeholder removed)
 -/
 
 end HigherProductHomotopy
