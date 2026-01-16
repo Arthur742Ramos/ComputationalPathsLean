@@ -97,8 +97,9 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
   - `./lake.cmd env lean Scripts/AxiomInventory.lean` reports 7 kernel axioms (Circle constructors/recursors only).
   - Updated `README.md` figure-eight/bouquet sections to match removed equivalence claims and new wedge equivalence name.
   - Committed and pushed all current changes (`64a6c07` to `main`).
+- **Done**:
+  - Adjusted `LieGroups.lean` binder syntax for `HasCirclePiOneEncode`/`HasTorusPiOneEncode` and committed/pushed (`65a7bf8`).
 - **Now**:
-  - Commit pending `LieGroups.lean` binder-style change; keep build green.
   - Continue discharging remaining encode/decode and major-theorem assumptions. 
 - **Next**:
   - Continue discharging remaining encode/decode and major-theorem assumptions in the recommended order.
@@ -108,7 +109,7 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
 - Any remaining non-HIT assumption modules to delete vs formalize? (UNCONFIRMED)
 
 ## Working Set
-- Files: `CONTINUITY.md`, `ComputationalPaths/Path/Homotopy/LieGroups.lean`, `ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean`, `Scripts/AssumptionSurvey.lean`
+- Files: `CONTINUITY.md`, `Scripts/AssumptionSurvey.lean`, `docs/axioms.md`, `README.md`
 - Commands: `./lake.cmd build`, `./lake.cmd env lean Scripts/AxiomInventory.lean`, `./lake.cmd env lean Scripts/AssumptionSurvey.lean`
 
 
