@@ -96,8 +96,9 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
   - `./lake.cmd env lean Scripts/AssumptionSurvey.lean` completed; remaining assumptions include `HasCirclePiOneEncode`, `HasTorusPiOneEncode`, SVK encode/decode classes, wedge decode bijective, and covering classification data.
   - `./lake.cmd env lean Scripts/AxiomInventory.lean` reports 7 kernel axioms (Circle constructors/recursors only).
   - Updated `README.md` figure-eight/bouquet sections to match removed equivalence claims and new wedge equivalence name.
+  - Committed and pushed all current changes (`64a6c07` to `main`).
 - **Now**:
-  - Commit/push all current changes (user approved).
+  - Continue discharging remaining encode/decode and major-theorem assumptions.
 - **Next**:
   - Continue discharging remaining encode/decode and major-theorem assumptions in the recommended order.
 
