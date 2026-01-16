@@ -98,7 +98,8 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
   - Updated `README.md` figure-eight/bouquet sections to match removed equivalence claims and new wedge equivalence name.
   - Committed and pushed all current changes (`64a6c07` to `main`).
 - **Now**:
-  - Continue discharging remaining encode/decode and major-theorem assumptions.
+  - Commit pending `LieGroups.lean` binder-style change; keep build green.
+  - Continue discharging remaining encode/decode and major-theorem assumptions. 
 - **Next**:
   - Continue discharging remaining encode/decode and major-theorem assumptions in the recommended order.
 
@@ -107,7 +108,7 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
 - Any remaining non-HIT assumption modules to delete vs formalize? (UNCONFIRMED)
 
 ## Working Set
-- Files: `CONTINUITY.md`, `ComputationalPaths/Path/HIT/PushoutPaths.lean`, `ComputationalPaths/Path/HIT/FigureEight.lean`, `ComputationalPaths/Path/HIT/BouquetN.lean`, `README.md`, `docs/axioms.md`, `Scripts/AssumptionSurvey.lean`
+- Files: `CONTINUITY.md`, `ComputationalPaths/Path/Homotopy/LieGroups.lean`, `ComputationalPaths/Path/Homotopy/EilenbergMacLane.lean`, `Scripts/AssumptionSurvey.lean`
 - Commands: `./lake.cmd build`, `./lake.cmd env lean Scripts/AxiomInventory.lean`, `./lake.cmd env lean Scripts/AssumptionSurvey.lean`
 
 

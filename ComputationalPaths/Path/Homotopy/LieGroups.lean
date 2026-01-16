@@ -146,7 +146,7 @@ This is inherited directly from π₁(S¹) ≃ ℤ.
 
 **Physical interpretation**: The integer n corresponds to the winding number -
 how many times a loop in SO(2) "wraps around" the group. -/
-noncomputable def piOneEquivInt [HasCirclePiOneEncode.{u}] :
+noncomputable def piOneEquivInt { _ : HasCirclePiOneEncode.{u} } :
     SimpleEquiv (π₁(SO2, e)) Int :=
   circlePiOneEquivInt
 
@@ -154,7 +154,7 @@ noncomputable def piOneEquivInt [HasCirclePiOneEncode.{u}] :
 noncomputable def piOneGenerator : π₁(SO2, e) := circlePiOneLoop
 
 /-- The winding number of a loop in SO(2). -/
-noncomputable def windingNumber [HasCirclePiOneEncode.{u}] : π₁(SO2, e) → Int :=
+noncomputable def windingNumber { _ : HasCirclePiOneEncode.{u} } : π₁(SO2, e) → Int :=
   circlePiOneEncode.{u}
 
 end SO2
@@ -167,7 +167,7 @@ abbrev U1 : Type u := Circle
 namespace U1
 
 noncomputable def e : U1 := circleBase
-noncomputable def piOneEquivInt [HasCirclePiOneEncode.{u}] :
+noncomputable def piOneEquivInt { _ : HasCirclePiOneEncode.{u} } :
     SimpleEquiv (π₁(U1, e)) Int :=
   circlePiOneEquivInt
 
@@ -249,9 +249,9 @@ def IntTuple.zero : (n : Nat) → IntTuple n
 
 This is already proved in Torus.lean. The torus is the simplest
   compact non-simply-connected abelian Lie group of rank 2. -/
- noncomputable def torus2PiOneEquiv [HasTorusPiOneEncode] :
-     SimpleEquiv (π₁(Torus, torusBase)) (Int × Int) :=
-   torusPiOneEquivIntProd
+noncomputable def torus2PiOneEquiv { _ : HasTorusPiOneEncode } :
+    SimpleEquiv (π₁(Torus, torusBase)) (Int × Int) :=
+  torusPiOneEquivIntProd
 
 end TorusN
 
@@ -349,7 +349,7 @@ noncomputable def torusN_product_step (n : Nat) :
 /-- π₁(T¹) ≃ π₁(point) × π₁(S¹) ≃ 1 × ℤ ≃ ℤ
 
 The first component (π₁ of a point) is trivial, so this reduces to π₁(S¹) ≃ ℤ. -/
-noncomputable def torusN1_piOne_equiv_int [HasCirclePiOneEncode.{u}]
+noncomputable def torusN1_piOne_equiv_int { _ : HasCirclePiOneEncode.{u} }
     :
     SimpleEquiv (π₁(TorusN 1, TorusN.base 1)) Int :=
   SimpleEquiv.comp
