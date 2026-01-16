@@ -63,8 +63,8 @@ Remove assumptions by proving/formalizing concrete entities; delete legacy axiom
   - Added `rw_symm_congr` to `ComputationalPaths/Path/Rewrite/Rw.lean`.
   - Reintroduced Prop-level strip lemma as explicit assumption `HasStepStripProp` in `ComputationalPaths/Path/Rewrite/ConfluenceProof.lean` so confluence can be derived without sorries.
   - `./lake.cmd build` succeeds.
-- **Now**: Commit the cleanup.
-- **Next**: Tackle circle/torus encode-decode assumptions, then covering classification, then Adams' theorem; survey remaining axioms as needed.
+- **Now**: Move to circle/torus encode-decode assumptions (discharge where possible).
+- **Next**: Covering classification, then Adams' theorem; survey remaining axioms as needed.
 
 ## Open Questions
 - Which remaining non-HIT axioms, if any, must stay due to Lean limitations? (UNCONFIRMED)
