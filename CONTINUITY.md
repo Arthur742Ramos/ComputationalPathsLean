@@ -25,8 +25,9 @@
   - Assumption survey rerun; remaining assumptions: circle/torus encode, SVK encode/decode (pushout + wedge), glue naturality.
   - Axiom inventory: 7 kernel axioms (Circle constructors/recursors).
   - `./lake.cmd build` succeeds after removals.
+  - Committed and pushed removals/cleanup (`c3ac80c`).
 - Now:
-  - Commit and push the current milestone.
+  - Update README note on coproduct assumptions and commit/push.
 - Next:
   - Reassess remaining assumptions (circle/torus, SVK, glue naturality) for formalization vs necessary axioms.
   - Commit/push milestone after build passes.
@@ -36,5 +37,5 @@
 - Any additional legacy modules to delete vs formalize after removing covering-classification stack?
 
 ## Working set (files/ids/commands):
-- Files: `CONTINUITY.md`, `Scripts/AssumptionSurvey.lean`, `ComputationalPaths/Path/Homotopy/Coproduct.lean`, `ComputationalPaths/Path.lean`, `README.md`, `docs/axioms.md`.
+- Files: `CONTINUITY.md`, `Scripts/AssumptionSurvey.lean`, `ComputationalPaths/Path/HIT/Pushout.lean`, `ComputationalPaths/Path/HIT/PushoutPaths.lean`, `ComputationalPaths/Path/HIT/CircleStep.lean`, `ComputationalPaths/Path/HIT/TorusStep.lean`, `docs/axioms.md`.
 - Commands: `./lake.cmd env lean Scripts/AssumptionSurvey.lean`, `./lake.cmd env lean Scripts/AxiomInventory.lean`, `./lake.cmd build`.
