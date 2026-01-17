@@ -43,7 +43,6 @@ import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 import ComputationalPaths.Path.Homotopy.HigherProductHomotopy
 import ComputationalPaths.Path.Homotopy.LieGroups
 import ComputationalPaths.Path.Homotopy.Hurewicz
-import ComputationalPaths.Path.Homotopy.CoveringClassification
 import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Homotopy.Reflexivity
 import ComputationalPaths.Path.Homotopy.IdentityType
@@ -63,6 +62,4 @@ import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.Abelianization
-import ComputationalPaths.Path.Algebra.GraphHIT
-import ComputationalPaths.Path.Algebra.NielsenSchreierDerived
 

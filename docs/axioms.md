@@ -61,7 +61,6 @@ These assumptions remain explicit in signatures; there are no opt-in kernel-axio
 
 | Assumption | Scope | Justification |
 |-----------|-------|---------------|
-| `HasCoveringEquivSubgroup` | `Homotopy/CoveringClassification.lean` | Galois correspondence |
 | `HasLocalConfluenceProp` | `Rewrite/ConfluenceConstructive.lean` | Critical pair analysis |
 | `HasStepStripProp` | `Rewrite/ConfluenceConstructive.lean` | Newman's lemma |
 ### Non-kernel typeclass assumptions
