@@ -62,7 +62,7 @@ These assumptions remain explicit in signatures; there are no opt-in kernel-axio
 | Assumption | Scope | Justification |
 |-----------|-------|---------------|
 | `HasLocalConfluenceProp` | `Rewrite/ConfluenceConstructive.lean` | Critical pair analysis |
-| `HasStepStripProp` | `Rewrite/ConfluenceConstructive.lean` | Newman's lemma |
+| `HasTerminationProp` | `Rewrite/ConfluenceProof.lean` | Newman's lemma |
 ### Non-kernel typeclass assumptions
 
 Rewrite-system confluence is packaged as **non-kernel** typeclass assumptions

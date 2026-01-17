@@ -6,12 +6,14 @@ This module proves `HasJoinOfRw` from Prop-level local confluence. We assume
 rewrites), derive the strip lemma and confluence for `Rw`, and extract
 Type-valued join witnesses with `Classical.choose`.
 
-## Status: COMPLETE (with Prop-level local confluence assumption)
+## Status: COMPLETE (with Prop-level local confluence + termination assumptions)
 
-The only assumption is:
+The assumptions are:
 
 1. **`local_confluence_prop`**: For any `Step p q` and `Step p r`, there exists
    `s` with `Rw q s` and `Rw r s`.
+2. **`termination_prop`**: The one-step rewrite relation is terminating
+   (well-founded on the non-empty transitive closure).
 
 This stays Prop-level because `Step` is Prop-valued and exhaustive case analysis
 into `Type` would require a large explicit enumeration of rule pairs.
@@ -338,9 +340,9 @@ The intended justification is:
 
 /-! ## Full Confluence from Local Confluence
 
-We prove the strip lemma by induction using Prop-valued `Rw` and then derive
-Prop-level confluence. `Classical.choose` is only used to produce `Type`-level
-join witnesses for downstream convenience.
+We use a Prop-level Newman's lemma (termination + local confluence → confluence).
+`Classical.choose` is only used to produce `Type`-level join witnesses for
+downstream convenience.
 -/
 /-- Transitivity for Rw (append two derivations). -/
 def rw_append {a b : A} {p q r : Path a b} (h1 : Rw p q) (h2 : Rw q r) : Rw p r := by
@@ -355,42 +357,87 @@ theorem diamond_prop [ConfluenceConstructive.HasLocalConfluenceProp.{u}] {a b : 
     ∃ s : Path a b, Rw q s ∧ Rw r s :=
   ConfluenceConstructive.local_confluence_prop hq hr
 
-/-! ## Strip lemma
+/-! ## Termination and Newman's lemma (Prop-level) -/
 
-We leave the strip lemma as an explicit assumption while we formalize the
-termination-based proof. This keeps the proof of confluence modular. -/
+/-- Non-empty transitive closure of `Step`. -/
+inductive RwPlus {A : Type u} {a b : A} : Path a b → Path a b → Prop
+  | single {p q : Path a b} : Step p q → RwPlus p q
+  | tail {p q r : Path a b} : RwPlus p q → Step q r → RwPlus p r
 
-class HasStepStripProp.{v} : Prop where
-  step_strip_prop : ∀ {A : Type v} {a b : A} {p q r : Path a b},
-    Step p q → Rw p r → ∃ s, Rw q s ∧ Rw r s
+theorem rw_of_plus {a b : A} {p q : Path a b} (h : RwPlus p q) : Rw p q := by
+  induction h with
+  | single hstep => exact rw_of_step hstep
+  | tail hplus hstep ih => exact Rw.tail ih hstep
 
-theorem step_strip_prop [HasStepStripProp.{u}] {a b : A} {p q r : Path a b}
-    (hstep : Step p q) (hmulti : Rw p r) :
-    ∃ s : Path a b, Rw q s ∧ Rw r s :=
-  HasStepStripProp.step_strip_prop hstep hmulti
+theorem rw_plus_trans {a b : A} {p q r : Path a b}
+    (h1 : RwPlus p q) (h2 : Rw q r) : RwPlus p r := by
+  induction h2 with
+  | refl => exact h1
+  | tail _ step ih => exact RwPlus.tail ih step
+
+theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
+    p = q ∨ ∃ r, Step p r ∧ Rw r q := by
+  induction h with
+  | refl => exact Or.inl rfl
+  | tail h step ih =>
+    cases ih with
+    | inl hpeq =>
+        refine Or.inr ?_
+        refine ⟨_, ?_, Rw.refl _⟩
+        simpa [hpeq] using step
+    | inr hdata =>
+        rcases hdata with ⟨r, hstep, hrq⟩
+        refine Or.inr ⟨r, hstep, ?_⟩
+        exact Rw.tail hrq step
+
+/-- Termination: well-foundedness of the reverse `RwPlus` relation. -/
+def Terminating {A : Type u} {a b : A} : Prop :=
+  WellFounded (fun p q => RwPlus (A := A) (a := a) (b := b) q p)
+
+class HasTerminationProp.{v} : Prop where
+  termination_prop : ∀ {A : Type v} {a b : A}, Terminating (A := A) (a := a) (b := b)
+
+theorem termination_prop [HasTerminationProp.{u}] {a b : A} :
+    Terminating (A := A) (a := a) (b := b) :=
+  HasTerminationProp.termination_prop
 
 section
 
-variable [HasStepStripProp.{u}]
+variable [HasTerminationProp.{u}] [ConfluenceConstructive.HasLocalConfluenceProp.{u}]
 
-/-- Strip lemma (Prop version): Alias for step_strip_prop. -/
-theorem strip_lemma_prop {a b : A} {p q r : Path a b}
-    (hstep : Step p q) (hmulti : Rw p r) :
-    ∃ s : Path a b, Rw q s ∧ Rw r s :=
-  step_strip_prop (hstep := hstep) (hmulti := hmulti)
 theorem confluence_prop {a b : A} {p q r : Path a b}
     (hq : Rw p q) (hr : Rw p r) :
     ∃ s : Path a b, Rw q s ∧ Rw r s := by
-  induction hq generalizing r with
-  | refl => exact ⟨r, hr, Rw.refl r⟩
-  | tail hpq' step_q'q ih =>
-    -- hpq' : Rw p q', step_q'q : Step q' q
-    -- ih : ∀ r, Rw p r → ∃ s, Rw q' s ∧ Rw r s
-    obtain ⟨s', hq's', hrs'⟩ := ih hr
-    -- Now use strip_lemma: Step q' q and Rw q' s' → ∃ s, Rw q s ∧ Rw s' s
-    have ⟨s, hqs, hs's⟩ := strip_lemma_prop step_q'q hq's'
-    exact ⟨s, hqs, rw_append hrs' hs's⟩
+  classical
+  revert q r hq hr
+  induction p using (termination_prop (A := A) (a := a) (b := b)).induction with
+  | h p ih =>
+    intro q r hq hr
+    cases rw_uncons hq with
+    | inl hq_eq =>
+        refine ⟨r, ?_, Rw.refl r⟩
+        simpa [hq_eq] using hr
+    | inr hq_data =>
+        rcases hq_data with ⟨p1, hp1, hq_rest⟩
+        cases rw_uncons hr with
+        | inl hr_eq =>
+            refine ⟨q, Rw.refl q, ?_⟩
+            simpa [hr_eq] using hq
+        | inr hr_data =>
+            rcases hr_data with ⟨p2, hp2, hr_rest⟩
+            obtain ⟨s, hp1s, hp2s⟩ := local_confluence_prop hp1 hp2
+            obtain ⟨s1, hq_s1, hs_s1⟩ := ih p1 (RwPlus.single hp1) hq_rest hp1s
+            obtain ⟨s2, hr_s2, hs_s2⟩ := ih p2 (RwPlus.single hp2) hr_rest hp2s
+            have hplus_ps : RwPlus (A := A) (a := a) (b := b) p s :=
+              rw_plus_trans (RwPlus.single hp1) hp1s
+            obtain ⟨t, hs1t, hs2t⟩ := ih s hplus_ps hs_s1 hs_s2
+            exact ⟨t, rw_append hq_s1 hs1t, rw_append hr_s2 hs2t⟩
 
+/-- Strip lemma (Prop version): a single step joins with a multi-step. -/
+theorem strip_lemma_prop {a b : A} {p q r : Path a b}
+    (hstep : Step p q) (hmulti : Rw p r) :
+    ∃ s : Path a b, Rw q s ∧ Rw r s :=
+  confluence_prop (hq := rw_of_step hstep) (hr := hmulti)
 /-- **Confluence of LND_EQ-TRS**: For any two multi-step rewrites from the same
     source, there exists a common descendant.
 

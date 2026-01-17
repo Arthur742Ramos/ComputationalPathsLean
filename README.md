@@ -606,7 +606,7 @@ and explicit assumptions.
 - **Pushout / SVK**: `Pushout.HasGlueNaturalLoopRwEq`, `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeQuot`, `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeEncode`, `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeDecode`, and the Prop-only alternative `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeAmalgBijective` (and full `Pushout.HasGlueNaturalRwEq` when needed).
 - **Confluence assumptions** (justified by critical pair analysis + termination):
   - `HasLocalConfluenceProp`: Any two single-step reductions from the same source can be joined.
-  - `HasStepStripProp`: Strip lemma — single step joins with multi-step derivations.
+  - `HasTerminationProp`: Termination of one-step rewrites (well-founded on the non-empty transitive closure).
   - These remain explicit because `Step` is Prop-valued and `Classical.choose` is used to extract witnesses.
 
 See `docs/axioms.md` for the authoritative overview.
