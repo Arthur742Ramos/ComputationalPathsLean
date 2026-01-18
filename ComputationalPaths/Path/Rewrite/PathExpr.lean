@@ -17,13 +17,26 @@ namespace Rewrite
 universe u
 
 /-- Syntactic path expressions for the core groupoid fragment. -/
-inductive PathExpr {A : Type u} : {a b : A} → Type u
-  | atom {a b : A} (p : Path a b) : PathExpr (a := a) (b := b)
-  | refl (a : A) : PathExpr (a := a) (b := a)
-  | symm {a b : A} (p : PathExpr (a := a) (b := b)) : PathExpr (a := b) (b := a)
-  | trans {a b c : A}
-      (p : PathExpr (a := a) (b := b)) (q : PathExpr (a := b) (b := c)) :
-      PathExpr (a := a) (b := c)
+inductive PathExpr : {A : Type u} → {a b : A} → Type u
+  | atom {A : Type u} {a b : A} (p : Path a b) :
+      PathExpr (A := A) (a := a) (b := b)
+  | refl {A : Type u} (a : A) : PathExpr (A := A) (a := a) (b := a)
+  | symm {A : Type u} {a b : A}
+      (p : PathExpr (A := A) (a := a) (b := b)) :
+      PathExpr (A := A) (a := b) (b := a)
+  | trans {A : Type u} {a b c : A}
+      (p : PathExpr (A := A) (a := a) (b := b))
+      (q : PathExpr (A := A) (a := b) (b := c)) :
+      PathExpr (A := A) (a := a) (b := c)
+  | congrArg {A : Type u} {B : Type u}
+      (f : A → B) {a b : A}
+      (p : PathExpr (A := A) (a := a) (b := b)) :
+      PathExpr (A := B) (a := f a) (b := f b)
+  | map2 {A : Type u} {B : Type u} {C : Type u}
+      (f : A → B → C) {a₁ a₂ : A} {b₁ b₂ : B}
+      (p : PathExpr (A := A) (a := a₁) (b := a₂))
+      (q : PathExpr (A := B) (a := b₁) (b := b₂)) :
+      PathExpr (A := C) (a := f a₁ b₁) (b := f a₂ b₂)
   | context_map {A : Type u} {B : Type u}
       (C : Context A B) {a b : A}
       (p : PathExpr (A := A) (a := a) (b := b)) :
@@ -50,6 +63,8 @@ variable {A : Type u} {a b c d : A}
   | refl a => Path.refl a
   | symm p => Path.symm (eval p)
   | trans p q => Path.trans (eval p) (eval q)
+  | congrArg f p => Path.congrArg f (eval p)
+  | map2 f p q => Path.map2 f (eval p) (eval q)
   | context_map C p => Context.map (A := A) (B := _) C (eval p)
   | context_subst_left C r p =>
       Context.substLeft (A := A) (B := _) C (eval r) (eval p)
@@ -63,6 +78,8 @@ variable {A : Type u} {a b c d : A}
   | refl _ => 1
   | symm p => size p + 1
   | trans p q => size p + size q + 1
+  | congrArg _ p => size p + 1
+  | map2 _ p q => size p + size q + 4
   | context_map _ p => size p + 1
   | context_subst_left _ r p => size r + size p + 1
   | context_subst_right _ p t => size p + size t + 1
@@ -72,6 +89,8 @@ variable {A : Type u} {a b c d : A}
   | refl _ => 0
   | symm p => leftSpine p
   | trans p _ => leftSpine p + 1
+  | congrArg _ p => leftSpine p
+  | map2 _ p _ => leftSpine p
   | context_map _ p => leftSpine p
   | context_subst_left _ r _ => leftSpine r + 1
   | context_subst_right _ p _ => leftSpine p
@@ -125,12 +144,49 @@ inductive Step {A : Type u} {a b : A} :
       Step (PathExpr.trans p (PathExpr.symm p)) (PathExpr.refl a)
   | symm_trans {a b : A} (p : PathExpr (A := A) (a := a) (b := b)) :
       Step (PathExpr.trans (PathExpr.symm p) p) (PathExpr.refl b)
+  | symm_trans_congr {a b c : A}
+      (p : PathExpr (A := A) (a := a) (b := b))
+      (q : PathExpr (A := A) (a := b) (b := c)) :
+      Step (PathExpr.symm (PathExpr.trans p q))
+        (PathExpr.trans (PathExpr.symm q) (PathExpr.symm p))
   | trans_assoc {a b c d : A}
       (p : PathExpr (A := A) (a := a) (b := b))
       (q : PathExpr (A := A) (a := b) (b := c))
       (r : PathExpr (A := A) (a := c) (b := d)) :
       Step (PathExpr.trans (PathExpr.trans p q) r)
         (PathExpr.trans p (PathExpr.trans q r))
+  | congrArg_congr {A : Type u} {B : Type u}
+      (f : A → B) {a b : A}
+      {p q : PathExpr (A := A) (a := a) (b := b)} :
+      Step p q →
+        Step (A := B)
+          (PathExpr.congrArg (A := A) (B := B) f p)
+          (PathExpr.congrArg (A := A) (B := B) f q)
+  | map2_congr_left {A : Type u} {B : Type u} {C : Type u}
+      (f : A → B → C) {a₁ a₂ : A} {b₁ b₂ : B}
+      {p q : PathExpr (A := A) (a := a₁) (b := a₂)}
+      (r : PathExpr (A := B) (a := b₁) (b := b₂)) :
+      Step p q →
+        Step (A := C)
+          (PathExpr.map2 (A := A) (B := B) (C := C) f p r)
+          (PathExpr.map2 (A := A) (B := B) (C := C) f q r)
+  | map2_congr_right {A : Type u} {B : Type u} {C : Type u}
+      (f : A → B → C) {a₁ a₂ : A} {b₁ b₂ : B}
+      (p : PathExpr (A := A) (a := a₁) (b := a₂))
+      {q r : PathExpr (A := B) (a := b₁) (b := b₂)} :
+      Step q r →
+        Step (A := C)
+          (PathExpr.map2 (A := A) (B := B) (C := C) f p q)
+          (PathExpr.map2 (A := A) (B := B) (C := C) f p r)
+  | map2_subst {A : Type u} {B : Type u} {C : Type u}
+      (f : A → B → C) {a₁ a₂ : A} {b₁ b₂ : B}
+      (p : PathExpr (A := A) (a := a₁) (b := a₂))
+      (q : PathExpr (A := B) (a := b₁) (b := b₂)) :
+      Step (A := C)
+        (PathExpr.map2 (A := A) (B := B) (C := C) f p q)
+        (PathExpr.trans
+          (PathExpr.congrArg (A := B) (B := C) (fun b => f a₁ b) q)
+          (PathExpr.congrArg (A := A) (B := C) (fun a => f a b₂) p))
   | symm_congr {a b : A} {p q : PathExpr (A := A) (a := a) (b := b)} :
       Step p q → Step (PathExpr.symm p) (PathExpr.symm q)
   | trans_congr_left {a b c : A} {p q : PathExpr (A := A) (a := a) (b := b)}
@@ -285,7 +341,8 @@ inductive Step {A : Type u} {a b : A} :
         (PathExpr.context_subst_right (A := A) (B := B) C p t)
 
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
-  Step.trans_refl_right Step.trans_symm Step.symm_trans Step.trans_assoc
+  Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr Step.trans_assoc
+  Step.congrArg_congr Step.map2_congr_left Step.map2_congr_right Step.map2_subst
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
   Step.context_congr Step.context_map_refl Step.context_tt_cancel_left Step.context_tt_cancel_right
   Step.context_subst_left_beta Step.context_subst_left_of_right
@@ -320,8 +377,25 @@ theorem step_complexity_lt {p q : PathExpr (A := A) (a := a) (b := b)}
       apply complexity_lt_of_size_lt
       simp [size]
       omega
+  | symm_trans_congr p q =>
+      apply complexity_lt_of_size_lt
+      simp [size]
+      omega
   | trans_assoc p q r =>
       simp [complexity, size, leftSpine]
+      omega
+  | congrArg_congr _ _ ih =>
+      simp [complexity, size, leftSpine] at *
+      omega
+  | map2_congr_left _ _ _ _ ih =>
+      simp [complexity, size, leftSpine] at *
+      omega
+  | map2_congr_right _ _ _ ih =>
+      simp [complexity, size, leftSpine] at *
+      omega
+  | map2_subst _ p q =>
+      apply complexity_lt_of_size_lt
+      simp [size]
       omega
   | symm_congr _ ih =>
       simp [complexity, size, leftSpine] at *
@@ -459,9 +533,29 @@ theorem eval_step {p q : PathExpr (A := A) (a := a) (b := b)}
       simpa using Path.rw_of_step (Path.Step.trans_symm (A := A) (p := eval p))
   | symm_trans p =>
       simpa using Path.rw_of_step (Path.Step.symm_trans (A := A) (p := eval p))
+  | symm_trans_congr p q =>
+      simpa using Path.rw_of_step
+        (Path.Step.symm_trans_congr (A := A) (p := eval p) (q := eval q))
   | trans_assoc p q r =>
       simpa using Path.rw_of_step (Path.Step.trans_assoc (A := A)
         (p := eval p) (q := eval q) (r := eval r))
+  | congrArg_congr f hstep =>
+      simpa using Path.rw_of_step
+        (Path.Step.context_congr (A := A) (B := _) (C := ⟨f⟩) hstep)
+  | map2_congr_left f r hstep =>
+      let K : BiContext A _ _ := ⟨f⟩
+      simpa using Path.rw_of_step
+        (Path.Step.biContext_map2_congr_left (A := A) (B := _) (C := _)
+          (K := K) (r := eval r) hstep)
+  | map2_congr_right f p hstep =>
+      let K : BiContext A _ _ := ⟨f⟩
+      simpa using Path.rw_of_step
+        (Path.Step.biContext_map2_congr_right (A := A) (B := _) (C := _)
+          (K := K) (p := eval p) hstep)
+  | map2_subst f p q =>
+      simpa using Path.rw_of_step
+        (Path.Step.map2_subst (A₁ := A) (B := _) (A := _)
+          (f := f) (p := eval p) (q := eval q))
   | symm_congr _ hstep =>
       simpa using Path.rw_of_step
         (Path.Step.symm_congr (A := A) (p := eval _) (q := eval _) hstep)
