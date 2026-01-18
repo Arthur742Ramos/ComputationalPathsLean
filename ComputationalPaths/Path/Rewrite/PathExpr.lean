@@ -2103,8 +2103,6 @@ theorem pathExpr_local_confluence
       cases hr with
       | symm_refl _ =>
           exact join_refl
-      | _ =>
-          cases (impossible (hq := Step.symm_refl a) (hr := hr))
   | symm_symm (PathExpr.refl a) =>
       cases hr with
       | symm_congr (Step.symm_refl _) =>
