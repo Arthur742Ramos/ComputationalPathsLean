@@ -115,49 +115,6 @@ def rec {D : Type v} (data : RecData (f := f) (g := g) D) :
 @[simp] theorem rec_inr {D : Type v} (data : RecData (f := f) (g := g) D) (b : B) :
     rec data (inr (A := A) (B := B) (C := C) (f := f) (g := g) b) = data.onInr b := rfl
 
-/-- **Pushout rec computation axiom**: The recursion principle computes correctly on glue paths.
-This is a β-rule for the pushout HIT. -/
-class HasRecGlueRwEq : Prop where
-  rec_glue_rweq {D : Type v} (data : RecData.{u, v} (f := f) (g := g) D) (c : C) :
-      RwEq.{v}
-        (Path.trans
-          (Path.symm (Path.ofEq (rec_inl (f := f) (g := g) data (f c))))
-          (Path.trans
-            (Path.congrArg (rec data) (glue (A := A) (B := B) (C := C) (f := f) (g := g) c))
-            (Path.ofEq (rec_inr (f := f) (g := g) data (g c)))))
-        (data.onGlue c)
-
-theorem rec_glue_rweq [h : HasRecGlueRwEq.{u, v} (A := A) (B := B) (C := C) (f := f) (g := g)]
-    {D : Type v} (data : RecData.{u, v} (f := f) (g := g) D) (c : C) :
-    RwEq.{v}
-      (Path.trans
-        (Path.symm (Path.ofEq (rec_inl (f := f) (g := g) data (f c))))
-        (Path.trans
-          (Path.congrArg (rec data) (glue (A := A) (B := B) (C := C) (f := f) (g := g) c))
-          (Path.ofEq (rec_inr (f := f) (g := g) data (g c)))))
-      (data.onGlue c) :=
-  h.rec_glue_rweq (data := data) (c := c)
-
-/-- Computation rule for rec on the glue path.
-The image of glue c under rec is (up to transport) data.onGlue c. -/
-theorem rec_glue [HasRecGlueRwEq.{u, v} (A := A) (B := B) (C := C) (f := f) (g := g)]
-    {D : Type v} (data : RecData.{u, v} (f := f) (g := g) D) (c : C) :
-    RwEq.{v}
-      (Path.trans
-        (Path.symm (Path.ofEq (rec_inl (f := f) (g := g) data (f c))))
-        (Path.trans
-          (Path.congrArg (rec data) (glue (A := A) (B := B) (C := C) (f := f) (g := g) c))
-          (Path.ofEq (rec_inr (f := f) (g := g) data (g c)))))
-      (data.onGlue c) :=
-  rec_glue_rweq data c
-
-/-
-The original HIT-style β-rule states an equality of computational paths.  Since
-the `Path` structure remembers a concrete step list, our quotient-based
-implementation validates the β-rule up to rewrite equality (`RwEq`), which is
-the notion used by the rest of the development.
--/
-
 /-! ## Dependent Eliminator (Induction Principle) -/
 
 /-- Data for the dependent eliminator of the pushout. -/
@@ -199,50 +156,6 @@ noncomputable def ind {D : Pushout A B C f g → Type v} (data : IndData (f := f
     (data : IndData (f := f) (g := g) D) (b : B) :
     ind data (inr (A := A) (B := B) (C := C) (f := f) (g := g) b) = data.onInr b := by
   rfl
-
-/-- **Pushout ind computation axiom**: The induction principle computes correctly on glue paths.
-This is a dependent β-rule for the pushout HIT. -/
-class HasIndGlueRwEq : Prop where
-  ind_glue_rweq {D : Pushout A B C f g → Type v} (data : IndData.{u, v} (f := f) (g := g) D) (c : C) :
-      RwEq.{v}
-        (Path.trans
-        (Path.symm
-          (Path.congrArg
-            (fun x => Path.transport (D := D) (glue c) x)
-            (Path.ofEq (ind_inl data (f c)))))
-        (Path.trans
-          (Path.apd (f := ind data) (glue c))
-          (Path.ofEq (ind_inr data (g c)))))
-        (data.onGlue c)
-
-theorem ind_glue_rweq [h : HasIndGlueRwEq.{u, v} (A := A) (B := B) (C := C) (f := f) (g := g)]
-    {D : Pushout A B C f g → Type v} (data : IndData.{u, v} (f := f) (g := g) D) (c : C) :
-    RwEq.{v}
-      (Path.trans
-      (Path.symm
-        (Path.congrArg
-          (fun x => Path.transport (D := D) (glue c) x)
-          (Path.ofEq (ind_inl data (f c)))))
-      (Path.trans
-        (Path.apd (f := ind data) (glue c))
-        (Path.ofEq (ind_inr data (g c)))))
-      (data.onGlue c) :=
-  h.ind_glue_rweq (data := data) (c := c)
-
-/-- Computation rule for ind on the glue path. -/
-theorem ind_glue [HasIndGlueRwEq.{u, v} (A := A) (B := B) (C := C) (f := f) (g := g)]
-    {D : Pushout A B C f g → Type v} (data : IndData.{u, v} (f := f) (g := g) D) (c : C) :
-    RwEq.{v}
-      (Path.trans
-      (Path.symm
-        (Path.congrArg
-          (fun x => Path.transport (D := D) (glue c) x)
-          (Path.ofEq (ind_inl data (f c)))))
-      (Path.trans
-        (Path.apd (f := ind data) (glue c))
-        (Path.ofEq (ind_inr data (g c)))))
-      (data.onGlue c) :=
-  ind_glue_rweq data c
 
 /-! ## Basic Properties -/
 

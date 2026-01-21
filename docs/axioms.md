@@ -63,6 +63,8 @@ These assumptions remain explicit in signatures; there are no opt-in kernel-axio
 |-----------|-------|---------------|
 | `HasLocalConfluenceProp` | `Rewrite/ConfluenceConstructive.lean` | Critical pair analysis |
 | `HasTerminationProp` | `Rewrite/ConfluenceProof.lean` | Newman's lemma |
+
+> **Note:** We keep `HasLocalConfluenceProp` and `HasTerminationProp` as explicit assumptions because the full critical-pair and termination proofs for the complete rewrite system involve a prohibitively large case analysis. These remain non-kernel, local obligations rather than global axioms.
 ### Non-kernel typeclass assumptions
 
 Rewrite-system confluence is packaged as **non-kernel** typeclass assumptions
@@ -141,8 +143,6 @@ formalization should reintroduce the equivalence without new axioms.
 The pushout is implemented as a quotient, but some HIT-style β/naturality laws are not definitional.
 These are now **non-kernel assumptions**:
 
-- `Pushout.HasRecGlueRwEq` (recursor β-rule on `glue`, up to `RwEq`)
-- `Pushout.HasIndGlueRwEq` (inductor β-rule on `glue`, up to `RwEq`)
 - `Pushout.HasGlueNaturalRwEq` (full glue naturality, up to `RwEq`)
 - `Pushout.HasGlueNaturalLoopRwEq` (loop-only glue naturality at a chosen basepoint)
 - `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeQuot` (SVK encode map)
