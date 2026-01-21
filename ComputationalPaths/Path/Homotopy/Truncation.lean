@@ -106,7 +106,7 @@ namespace IsSet
 
 /-- PUnit' is a set. -/
 def punitSet : IsSet PUnit' where
-  pathEq := (isHSet_of_subsingleton (A := PUnit'))
+  pathEq := (isHSet_of_subsingleton (A := PUnit')).rweq
 
 end IsSet
 

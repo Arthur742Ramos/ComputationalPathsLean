@@ -104,7 +104,7 @@ theorem punit_loop_is_refl (p : PUnitLoopSpace) : p.toEq = Eq.refl PUnit'.unit :
 PUnit' is a proposition (has at most one element), so it's trivially a set. -/
 theorem punit_pathEq
     {a b : PUnit'.{u}} (p q : Path.{u} a b) : RwEq.{u} p q :=
-  (isHSet_of_subsingleton (A := PUnit'.{u})) p q
+  (isHSet_of_subsingleton (A := PUnit'.{u})).rweq p q
 
 /-- Any two loops in PUnit' are RwEq. -/
 theorem punit_loops_rweq

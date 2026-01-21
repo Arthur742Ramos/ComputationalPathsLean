@@ -159,9 +159,8 @@ Notes:
 
 - The SVK decoding proof only needs the **loop-only** naturality hypothesis
   `Pushout.HasGlueNaturalLoopRwEq c₀`, and this is derived automatically in common cases
-  (e.g. `Subsingleton C`, `[DecidableEq C] [HasDecidableEqAxiomK C]`,
-  or when both legs satisfy Axiom K (e.g. `Subsingleton A` and `Subsingleton B`,
-  or `[DecidableEq A] [HasDecidableEqAxiomK A]` and similarly for `B`)).
+  (e.g. `Subsingleton C`, `IsHSet C`, or when both legs satisfy Axiom K / `IsHSet`
+  such as `Subsingleton A` and `Subsingleton B`).
 - `seifertVanKampenEquiv` depends on the split SVK assumptions above; the legacy bundled
   class `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeData` remains as a convenience wrapper.
 - `seifertVanKampenFullEquiv` is the corresponding equivalence with the *full* target

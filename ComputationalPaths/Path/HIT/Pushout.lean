@@ -364,6 +364,12 @@ instance hasGlueNaturalLoopRwEq_of_subsingleton (c₀ : C) [Subsingleton C] :
   hasGlueNaturalLoopRwEq_of_axiomK (A := A) (B := B) (C := C) (f := f) (g := g) c₀
     (hC := axiomK_of_subsingleton (A := C))
 
+/-- H-set gluing types satisfy loop naturality (via Axiom K). -/
+instance hasGlueNaturalLoopRwEq_of_isHSet (c₀ : C) [IsHSet C] :
+    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ := by
+  have hC : AxiomK C := isHSet_implies_axiomK (A := C) (h := inferInstance)
+  exact hasGlueNaturalLoopRwEq_of_axiomK (A := A) (B := B) (C := C) (f := f) (g := g) c₀ hC
+
 /-- If both legs `A` and `B` satisfy Axiom K (all loops rewrite to refl), then glue naturality for
 loops holds automatically: both sides of the naturality statement reduce to the trivial loop in
 the pushout. -/
@@ -444,6 +450,16 @@ instance (priority := 50) hasGlueNaturalLoopRwEq_of_subsingleton_left_right (c�
   hasGlueNaturalLoopRwEq_of_axiomK_left_right (A := A) (B := B) (C := C) (f := f) (g := g) c₀
     (hA := axiomK_of_subsingleton (A := A))
     (hB := axiomK_of_subsingleton (A := B))
+
+/-- If both legs are h-sets, loop naturality follows from Axiom K on each leg. -/
+instance (priority := 50) hasGlueNaturalLoopRwEq_of_isHSet_left_right (c₀ : C)
+    [IsHSet A] [IsHSet B] :
+    HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ := by
+  have hA : AxiomK A := isHSet_implies_axiomK (A := A) (h := inferInstance)
+  have hB : AxiomK B := isHSet_implies_axiomK (A := B) (h := inferInstance)
+  exact
+    hasGlueNaturalLoopRwEq_of_axiomK_left_right
+      (A := A) (B := B) (C := C) (f := f) (g := g) c₀ hA hB
 
 /- Decidable-equality shortcuts previously relied on a global Axiom K interface.
    We now keep only explicit Axiom K proofs, so supply `hasGlueNaturalLoopRwEq_of_axiomK`
