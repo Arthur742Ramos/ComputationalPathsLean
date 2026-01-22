@@ -251,6 +251,13 @@ theorem rweq_conj_refl (p : Path a b) :
     rweq_of_step (Step.trans_symm p)
   exact RwEq.trans h1 h2
 
+/-- Conjugation preserves rewrite equality: q ≈ r → p · q · p⁻¹ ≈ p · r · p⁻¹. -/
+theorem rweq_conj_congr {p : Path a b} {q r : Path b b} (h : RwEq q r) :
+    RwEq (trans (trans p q) (symm p)) (trans (trans p r) (symm p)) := by
+  have h' : RwEq (trans p q) (trans p r) :=
+    rweq_trans_congr_right p h
+  exact rweq_trans_congr_left (symm p) h'
+
 /-- Conjugation distributes over trans: p · (q · r) · p⁻¹ ≈ (p · q · p⁻¹) · (p · r · p⁻¹) -/
 theorem rweq_conj_trans {p : Path a b} {q : Path b b} {r : Path b b} :
     RwEq (trans (trans p (trans q r)) (symm p))
