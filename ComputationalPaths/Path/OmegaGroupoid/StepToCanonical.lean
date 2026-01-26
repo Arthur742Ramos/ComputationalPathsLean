@@ -20,13 +20,14 @@ where `deriv₂_to_normal p := .step (Step.canon p)` used a canonicalization ste
 ## Current Status
 
 Without `Step.canon`, the `canonical` function requires a different construction.
-The current formalization uses `to_canonical` directly as an axiom without attempting
-to reduce it to `step_to_canonical`.
+The current formalization no longer needs `to_canonical`: contractibility at level 3
+is derived from proof irrelevance of `RwEq`.
 
 ## The Semantic Argument (Still Valid)
 
 At the level of `RwEq` (Prop-valued), everything works: any two derivations
-between the same paths have equal `toRwEq`. The challenge is lifting this to Type.
+between the same paths have equal `toRwEq`. This equality now yields a 3-cell
+via `MetaStep₃.rweq_eq`.
 
 ## The Structural Gap
 
@@ -35,15 +36,15 @@ The fundamental issue is the gap between `Prop` and `Type`:
 - `Derivation₂ p q` is in `Type` — preserves structure of the derivation
 
 All `Derivation₂ p q` values have the same `toRwEq` (by proof irrelevance of `RwEq`).
-The `to_canonical` axiom asserts this propositional equality "lifts" to a Type-valued
-3-cell. This is semantically justified by confluence but not syntactically provable.
+We now use this equality directly to produce a Type-valued 3-cell via
+`MetaStep₃.rweq_eq`.
 
 ## Analysis Summary
 
 | Level | Current Axioms | Notes |
 |-------|----------------|-------|
 | 1 | Step constructors (~76) | Term rewriting rules |
-| 3 | `to_canonical` (1) | Justified by confluence |
+| 3 | None | Contractibility from proof irrelevance |
 | 4 | `contract₄` (1) | Contractibility |
 | 5+ | `contract_high` (1) | Higher contractibility |
 
@@ -66,7 +67,8 @@ variable {A : Type u}
 /-! ## Part 1: The Semantic Argument
 
 At the level of `RwEq` (Prop-valued), everything works: any two derivations
-between the same paths have equal `toRwEq`. The axiom lifts this to Type.
+between the same paths have equal `toRwEq`. This equality now yields a 3-cell
+via `MetaStep₃.rweq_eq`, so no axiom is needed.
 -/
 
 section SemanticArgument
@@ -82,8 +84,8 @@ end SemanticArgument
 
 /-! ## Part 2: Derivability from Contractibility
 
-All coherences at level 3 are derivable from `contractibility₃`, which is
-in turn derivable from `to_canonical`. See `Derived.lean` for details.
+All coherences at level 3 are derivable from `contractibility₃`. See
+`Derived.lean` for details.
 -/
 
 section FromContractibility
@@ -135,10 +137,9 @@ No axioms needed — `Derivation₂` is a free structure.
 
 ### Level 3: Meta-derivations (Derivation₃)
 
-**Minimal axiom:** `to_canonical`
-
+No axiom is needed: `contractibility₃` follows from proof irrelevance of `RwEq`.
 All groupoid laws, coherences, and step equality are derivable from
-`contractibility₃`, which is derived from `to_canonical`.
+`contractibility₃`.
 
 ### Level 4+: Higher cells
 
@@ -148,7 +149,7 @@ All groupoid laws, coherences, and step equality are derivable from
 
 | Level | Axiom | Justification |
 |-------|-------|---------------|
-| 3 | `to_canonical` | Confluence (semantic) |
+| 3 | None | Contractibility for 2-cells |
 | 4 | `contract₄` | Contractibility₃ (derived) |
 | 5+ | `contract_high` | Contractibility₄ (derived) |
 

@@ -13,7 +13,7 @@ computational paths framework:
 
 A type A is an n-type if π_k(A, a) is trivial for all k > n.
 
-In the computational paths framework with contractibility₃:
+In the computational paths framework with contractibility₃ derived from proof irrelevance:
 - All types are at most 1-types (by contractibility₃)
 - This reflects the "truncated" nature of our model
 
@@ -128,7 +128,7 @@ namespace IsGroupoid
 def ofSet (_h : IsSet A) : IsGroupoid A where
   derivEq := fun d₁ d₂ => ⟨contractibility₃ d₁ d₂⟩
 
-/-- All types are 1-groupoids in our framework (by contractibility₃). -/
+/-- All types are 1-groupoids in our framework (by contractibility₃, when assumed). -/
 def allTypes : IsGroupoid A where
   derivEq := fun d₁ d₂ => ⟨contractibility₃ d₁ d₂⟩
 
@@ -160,7 +160,7 @@ theorem set_pi1_trivial (h : IsSet A) (a : A) :
       apply Quot.sound
       exact h.pathEq p (Path.refl a)
 
-/-- π₂(A, a) is always trivial in our framework (by contractibility₃). -/
+/-- π₂(A, a) is always trivial in our framework (by contractibility₃, when assumed). -/
 theorem pi2_trivial (a : A) :
     ∀ (α : π₂(A, a)), α = PiTwo.id :=
   IsGroupoid.iff_pi2_trivial.mp ⟨IsGroupoid.allTypes⟩ a

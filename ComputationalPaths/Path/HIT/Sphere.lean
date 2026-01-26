@@ -317,7 +317,7 @@ open HigherHomotopy in
 /-- π₂(S²) is trivial in the computational paths framework.
 
     In classical homotopy theory, π₂(S²) = ℤ. However, in our setting,
-    the contractibility₃ axiom (which asserts all parallel 2-cells are
+    contractibility₃ (derived from proof irrelevance of `RwEq`) implies that
     connected by a 3-cell) implies that every 2-loop is equivalent to
     the identity.
 

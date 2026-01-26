@@ -80,7 +80,8 @@ def ProdOfHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
   HigherPiN A a n × HigherPiN B b n
 
 /-- Helper: `π₂` is always a subsingleton in the current computational-paths model. -/
-private theorem piTwo_subsingleton (A : Type u) (a : A) : Subsingleton (π₂(A, a)) := by
+private theorem piTwo_subsingleton (A : Type u) (a : A) :
+    Subsingleton (π₂(A, a)) := by
   constructor
   intro x y
   induction x using Quotient.ind with
@@ -101,13 +102,15 @@ private noncomputable def unit_equiv_unit_prod : SimpleEquiv PUnit (PUnit × PUn
         cases y₂
         rfl
 
-private noncomputable def piTwo_equiv_prod {A B : Type u} (a : A) (b : B) :
+private noncomputable def piTwo_equiv_prod {A B : Type u} (a : A) (b : B)
+    :
     SimpleEquiv (π₂(A × B, (a, b))) (π₂(A, a) × π₂(B, b)) where
   toFun := fun _ => (PiTwo.id (A := A) (a := a), PiTwo.id (A := B) (a := b))
   invFun := fun _ => PiTwo.id (A := A × B) (a := (a, b))
   left_inv := by
     intro x
-    letI : Subsingleton (π₂(A × B, (a, b))) := piTwo_subsingleton (A := A × B) (a := (a, b))
+    letI : Subsingleton (π₂(A × B, (a, b))) :=
+      piTwo_subsingleton (A := A × B) (a := (a, b))
     exact Subsingleton.elim _ _
   right_inv := by
     intro y
@@ -188,7 +191,8 @@ theorem prodHigherPiN_decode_refl {A B : Type u} (a : A) (b : B) (n : Nat) :
           | succ _ => rfl
 
 /-- Group operation on π_n. -/
-noncomputable def higherPiN_comp {X : Type u} (x : X) (n : Nat) :
+noncomputable def higherPiN_comp {X : Type u} (x : X) (n : Nat)
+    :
     HigherPiN X x n → HigherPiN X x n → HigherPiN X x n :=
   match n with
   | 0 => fun _ _ => PUnit.unit
@@ -197,7 +201,8 @@ noncomputable def higherPiN_comp {X : Type u} (x : X) (n : Nat) :
   | _ + 3 => fun _ _ => PUnit.unit
 
 /-- Group inverse on π_n. -/
-noncomputable def higherPiN_inv {X : Type u} (x : X) (n : Nat) :
+noncomputable def higherPiN_inv {X : Type u} (x : X) (n : Nat)
+    :
     HigherPiN X x n → HigherPiN X x n :=
   match n with
   | 0 => fun _ => PUnit.unit

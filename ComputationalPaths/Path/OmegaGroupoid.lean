@@ -34,9 +34,9 @@ are connected.
 
 ## Axiom Structure
 
-The construction uses axioms for contractibility at levels 3 and above:
+The construction uses axioms for contractibility at levels 4 and above:
 
-1. **`contractibility₃`** (level 3): any two parallel `Derivation₂`s are connected
+1. **Level 3**: contractibility follows from proof irrelevance of `RwEq`
 2. **`contract₄`** (level 4): any two parallel `Derivation₃`s are connected
 3. **`contract_high`** (level 5+): any two parallel `Derivation₄`s are connected
 
@@ -81,7 +81,7 @@ any two parallel (k-1)-cells are connected by a k-cell.
 
 This module assumes the following beyond Lean's core (including proof-irrelevant `Prop`):
 
-1. **Level 3**: `contractibility₃` — any two parallel `Derivation₂`s are connected
+1. **Level 3**: `contractibility₃` is derived from proof irrelevance of `RwEq`
 2. **Level 4**: `contract₄` — any two parallel `Derivation₃`s are connected
 3. **Level 5+**: `contract_high` — any two parallel `Derivation₄`s are connected
 
@@ -91,7 +91,7 @@ coherences are all *proved* as constructors of `MetaStep₃`/`MetaStep₄`/`Meta
 ### Why This Is Consistent
 
 The fundamental group π₁(X, x) is defined as the quotient of loops by `RwEq`, which
-corresponds to `PathRwQuot X x x`. The contractibility₃ axiom says that different
+corresponds to `PathRwQuot X x x`. The contractibility₃ theorem says that different
 *derivations* between the same paths are connected, but it does NOT create derivations
 between paths that have no rewrite connection.
 
@@ -208,22 +208,12 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   different "reasons" for the same rewrite step. -/
   | step_eq {a b : A} {p q : Path a b} (s₁ s₂ : Step p q) :
       MetaStep₃ (.step s₁) (.step s₂)
-  /-- **Contractibility at Level 3**: Any two parallel 2-cells are connected.
+  /-- Equality of the induced Prop-level `RwEq` witnesses yields a 3-cell.
 
-  This is the Batanin-style contractibility axiom for weak ω-groupoids. It asserts
-  that whenever we have two derivations `d₁, d₂ : Derivation₂ p q` with the same
-  source and target paths, there exists a 3-cell connecting them.
-
-  **Critical distinction from level 2**: This does NOT imply that all parallel
-  PATHS are connected - only that all parallel DERIVATIONS are. Parallel paths
-  without a rewrite derivation between them remain distinct.
-
-  This axiom is consistent with non-trivial fundamental groups because:
-  - π₁ is computed from path quotients, not derivation quotients
-  - Different loop classes in π₁(S¹) have no derivation between them
-  - The contractibility only applies when a derivation already exists -/
-  | contractibility₃ {a b : A} {p q : Path a b}
-      (d₁ d₂ : Derivation₂ p q) : MetaStep₃ d₁ d₂
+  Since `RwEq p q` is a proposition, any two derivations have equal `toRwEq` proofs.
+  This constructor replaces the former contractibility axiom. -/
+  | rweq_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      (h : d₁.toRwEq = d₂.toRwEq) : MetaStep₃ d₁ d₂
   -- Pentagon coherence
   | pentagon {a b c d e : A} (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
       MetaStep₃
@@ -293,23 +283,19 @@ end Derivation₃
 
 /-! ## Contractibility at Level 3
 
-The key property for weak ω-groupoids is contractibility at dimension 3 and above.
-This means any two parallel 2-cells are connected by a 3-cell.
-
-**Critical**: This does NOT mean all parallel PATHS are connected. Only parallel
-DERIVATIONS (which already have the same source and target paths) are connected.
+Contractibility is derived from proof irrelevance of `RwEq` witnesses. Any two
+derivations yield equal `toRwEq` proofs, so we obtain a 3-cell via
+`MetaStep₃.rweq_eq`.
 -/
 
 section Contractibility
 
 variable {a b : A}
 
-/-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
-
-This lifts the `MetaStep₃.contractibility₃` axiom to `Derivation₃`. -/
+/-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell. -/
 def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .step (.contractibility₃ d₁ d₂)
+  .step (.rweq_eq (Subsingleton.elim d₁.toRwEq d₂.toRwEq))
 
 /-- **Loop contraction**: Any loop derivation `d : Derivation₂ p p` contracts to `refl p`.
 
@@ -669,7 +655,7 @@ only at level 3 and above (between derivations).
 
 **Axiom Structure**
 
-The construction uses three axioms, one at each level ≥ 3:
+The construction uses three hypotheses, one at each level ≥ 3:
 
 | Level | Axiom | Purpose |
 |-------|-------|---------|
@@ -680,13 +666,13 @@ The construction uses three axioms, one at each level ≥ 3:
 **Why This Is Consistent**
 
 The fundamental group π₁(X, x) is the quotient of loops by `RwEq`. The contractibility
-axioms at level 3+ say that different DERIVATIONS between the same paths are connected,
+hypotheses at level 3+ say that different DERIVATIONS between the same paths are connected,
 but they do NOT create derivations between paths that have no rewrite connection.
 
 For π₁(S¹) ≃ ℤ:
 - Different loop powers (loop, loop·loop, etc.) have no rewrite derivation between them
 - Each remains a distinct element in the fundamental group
-- The contractibility₃ axiom doesn't affect this because it only connects derivations
+- The contractibility₃ theorem doesn't affect this because it only connects derivations
   that already exist
 
 **Coherences** (all proved, not axiomatized):

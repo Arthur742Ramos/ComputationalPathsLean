@@ -7,9 +7,9 @@ in Type rather than collapsing to Prop.
 
 ## Purpose
 
-To eliminate `to_canonical`, we need confluence at the TYPE level with 3-cells.
-The Metatheory library proves confluence in Prop; here we lift those structures
-to Type, adding 3-cell witnesses throughout.
+This module developed a type-valued confluence pipeline, once aimed at
+eliminating `to_canonical`. Contractibility₃ is now derived directly from proof
+irrelevance of `RwEq`, but the typed framework remains useful for future work.
 
 ## Key Definitions
 
@@ -26,6 +26,8 @@ to Type, adding 3-cell witnesses throughout.
 -/
 
 import ComputationalPaths.Path.OmegaGroupoid
+import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
+import ComputationalPaths.Path.Rewrite.PathExpr
 
 namespace ComputationalPaths
 namespace Path
@@ -68,6 +70,16 @@ def trans {a b : A} {r : ∀ {p q : Path a b}, Prop}
 def head {a b : A} {r : ∀ {p q : Path a b}, Prop}
     {p q s : Path a b} (hpq : r (p := p) (q := q)) (hqs : TStar r q s) : TStar r p s :=
   trans (single hpq) hqs
+
+/-! ### Bridge to `Derivation₂` -/
+
+/-- Convert a `TStar Step` derivation into a `Derivation₂`. -/
+def toDerivation₂ {a b : A} {p q : Path a b}
+    (h : TStar (r := Step) p q) : Derivation₂ p q := by
+  induction h with
+  | refl p => exact .refl p
+  | tail hstar hstep ih =>
+    exact .vcomp ih (.step hstep)
 
 /-- Length of a TStar derivation -/
 def length {a b : A} {r : ∀ {p q : Path a b}, Prop}
@@ -420,6 +432,39 @@ def newman (hterm : Terminating (a := a) (b := b) r)
           · exact TStar.trans jq₂s.left jCommon.right
 
 end Newman
+
+/-! ## Typed Instances for `Step` -/
+
+section StepInstances
+
+open Path Rewrite
+
+variable {a b : A}
+
+lemma TStar.of_rw {p q : Path a b} : Rw p q → TStar (r := Step) p q
+  | .refl _ => .refl _
+  | .tail h step => .tail (TStar.of_rw h) step
+
+/-- `Step` is type-level locally confluent using the Prop-level proof. -/
+noncomputable def localConfluent_step
+    [Rewrite.ConfluenceConstructive.HasLocalConfluenceProp.{u}] :
+    TLocalConfluent (a := a) (b := b) (r := Step) where
+  close := fun {p q₁ q₂} h₁ h₂ => by
+    classical
+    have hjoin :=
+      (ConfluenceConstructive.local_confluence_prop
+        (A := A) (a := a) (b := b) h₁ h₂)
+    rcases hjoin with ⟨s, hq₁s, hq₂s⟩
+    exact ⟨s, TStar.of_rw hq₁s, TStar.of_rw hq₂s⟩
+
+/-- `Step` is type-level confluent, using termination + local confluence. -/
+noncomputable def confluent_step
+    [Rewrite.ConfluenceConstructive.HasLocalConfluenceProp.{u}]
+    (hterm : Terminating (a := a) (b := b) (r := Step)) :
+    TConfluent (a := a) (b := b) (r := Step) :=
+  newman (a := a) (b := b) (r := Step) hterm (localConfluent_step (a := a) (b := b))
+
+end StepInstances
 
 end TypedRewriting
 end OmegaGroupoid

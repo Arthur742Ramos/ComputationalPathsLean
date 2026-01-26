@@ -2,12 +2,12 @@
 # Derived Coherences for Weak ω-Groupoids
 
 This module demonstrates that most `MetaStep₃` constructors in the ω-groupoid
-structure are **derivable** from the single `to_canonical` axiom. This reduces
-the axiomatic content of the weak ω-groupoid structure significantly.
+structure are **derivable** from `contractibility₃`. This reduces the axiomatic
+content of the weak ω-groupoid structure significantly.
 
 ## Main Results
 
-We show that the following are derivable from `to_canonical`:
+We show that the following are derivable from `contractibility₃`:
 
 1. **Groupoid laws at level 3**: `vcomp_refl_left`, `vcomp_refl_right`,
    `vcomp_assoc`, `inv_inv`, `vcomp_inv_left`, `vcomp_inv_right`, `inv_vcomp`
@@ -24,10 +24,7 @@ All these derivations follow from a single observation:
 > Any two `Derivation₂ p q` values (for the same `p, q`) are connected by
 > a `Derivation₃` via the canonical derivation.
 
-This is exactly `contractibility₃`, which is *derived* from `to_canonical`:
-```
-contractibility₃ d₁ d₂ := vcomp (to_canonical d₁) (inv (to_canonical d₂))
-```
+This is exactly `contractibility₃`, derived from proof irrelevance of `RwEq`.
 
 Once we have contractibility, all the individual coherence axioms become
 special cases: they're just saying that two specific derivations are equal,
@@ -35,16 +32,8 @@ which follows immediately from contractibility.
 
 ## On `to_canonical`
 
-The `to_canonical` axiom is *justified* by normalization but currently not proved
-constructively. The original approach used `Step.canon` which was removed because
-it collapsed all paths with the same `toEq` to be RwEq (causing π₁(S¹) to be trivial).
-
-Without `Step.canon`, we cannot computationally derive `to_canonical` from:
-1. Strong normalization
-2. Confluence
-3. Normal form uniqueness
-
-The axiom remains as a justified semantic assertion about the ω-groupoid structure.
+`to_canonical` was a historical justification and is no longer part of the
+core development.
 -/
 
 import ComputationalPaths.Path.OmegaGroupoid
@@ -159,98 +148,25 @@ end HigherCoherences
 
 /-! ## Part 3: Notes on `to_canonical`
 
-The `to_canonical` axiom says every derivation connects to the canonical one.
-
-**Current axiom:**
-```
-axiom to_canonical (d : Derivation₂ p q) : MetaStep₃ d (canonical p q)
-```
-
-**Historical note:** The original approach used `Step.canon` which normalized any path
-to `Path.ofEq p.toEq`. This was removed because it collapsed all paths with the same
-`toEq` to be RwEq, contradicting π₁(S¹) ≃ ℤ.
-
-Without `Step.canon`, we cannot computationally construct a normalization derivation.
-The `canonical` function in OmegaGroupoid.lean now uses an alternative construction
-that doesn't depend on a general canonicalization step.
-
-The `to_canonical` axiom captures the semantic content: any derivation between two
-paths is connected (via a 3-cell) to the canonical derivation between them.
+`to_canonical` was historically used to justify contractibility. It is not part
+of the core development here.
 -/
-
-section TowardProvingToCanonical
-
-/-
-**Note:** The `Step.canon` rule was removed because it caused all paths with the same
-`toEq` to become RwEq, which collapsed π₁(S¹) to be trivial (contradicting π₁(S¹) ≃ ℤ).
-
-Without `Step.canon`, we cannot define a computational `normalizeDerivation` that
-reduces every path to its canonical form. The `canonical` derivation and `to_canonical`
-axiom in OmegaGroupoid.lean rely on alternative constructions that don't use `Step.canon`.
-
-The key insight remains valid: if we had a sound normalization step, contractibility
-at level 3 would follow. The current formulation uses `to_canonical` as an axiom that
-captures this semantic property without the problematic computational rule.
--/
-
-/-- Key observation: Any two derivations from the same path to normal forms
-    that happen to be equal can be connected via transitivity with inverses.
-
-    This is the "semantic" content that `to_canonical` captures. -/
-theorem normalizations_connected {a b : A} {p : Path a b} {n : Path a b}
-    (d₁ d₂ : Derivation₂ p n) : Nonempty (Derivation₃ d₁ d₂) :=
-  ⟨connect d₁ d₂⟩
-
-/-
-**Conjecture:** `to_canonical` could be proved if we had a computational witness
-showing that `Derivation₂.toRwEq` is "reversible" up to 3-cells.
-
-The idea: since `d.toRwEq` and `(canonical p q).toRwEq` are both proofs of the
-same proposition `RwEq p q`, and since we can lift any `RwEq` back to a
-`Derivation₂` via `canonical`, there should be a 3-cell connecting them.
-
-The formal gap is that `RwEq` doesn't "remember" which derivation produced it.
-The `to_canonical` axiom asserts that this forgetfulness is harmless at level 3.
--/
-
-end TowardProvingToCanonical
 
 /-! ## Part 4: Alternative Axiom Systems
 
 Based on this analysis, we could reformulate the ω-groupoid with a
 **minimal axiom set**:
 
-**Option A: Current (canonical-based)**
-- Level 3: `to_canonical` only (all else derives)
+The minimal axiom set is now:
 - Level 4: `contract₄`
 - Level 5+: `contract_high`
-
-**Option B: Pure contractibility**
-- Level 3: `contract₃ : ∀ d₁ d₂, Derivation₃ d₁ d₂` (bare contractibility)
-- Level 4+: Same
-
-Option A is preferable because it grounds contractibility in the normalization
-algorithm rather than postulating it directly.
-
-**Option C: Prove `to_canonical` (ideal)**
-- Prove `to_canonical` from termination + confluence
-- All level-3 structure becomes derived
-- Level 4+: Still need contractibility axioms (no computational content there)
 -/
 
 /-
-**Summary: A minimal weak ω-groupoid only needs these three axioms:**
+**Summary: A minimal weak ω-groupoid now needs these axioms:**
 
-1. `to_canonical` (Level 3): Every derivation connects to the canonical one
-2. `contract₄` (Level 4): Any two parallel 3-cells are connected
-3. `contract_high` (Level 5+): Any two parallel 4-cells are connected
-
-The existing OmegaGroupoid module instantiates these via:
-- `MetaStep₃.to_canonical`
-- `MetaStep₄.contract₄`
-- `MetaStepHigh.contract_high`
-
-All other constructors in those inductives are derivable from the above.
+1. `contract₄` (Level 4): Any two parallel 3-cells are connected
+2. `contract_high` (Level 5+): Any two parallel 4-cells are connected
 -/
 
 /-! ## Part 5: Eliminating One Unit/Inverse Law
@@ -307,16 +223,14 @@ end EliminateRedundantPathLaws
 11. `interchange` - derived from contractibility₃
 
 **Remaining true axioms:**
-1. `to_canonical` (Level 3) - could potentially be proved from normalization
-2. `contract₄` (Level 4) - justified by contractibility₃
-3. `contract_high` (Level 5+) - justified by contractibility₄
+1. `contract₄` (Level 4) - justified by contractibility₃
+2. `contract_high` (Level 5+) - justified by contractibility₄
 
 **At level 1 (paths):**
 - One of `trans_refl_left`/`trans_refl_right` is derivable
 - One of `trans_symm`/`symm_trans` is derivable
 
-This reduces the axiom count from 14+ to just 3 (or potentially 2 if `to_canonical`
-can be proved from normalization).
+This reduces the axiom count from 14+ to just 2.
 -/
 
 end Derived

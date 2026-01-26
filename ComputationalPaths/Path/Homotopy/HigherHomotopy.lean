@@ -182,7 +182,8 @@ def inv (x : π₂(A, a)) : π₂(A, a) :=
 /-- Embed a 2-loop into π₂. -/
 def ofLoop2 (α : Loop2Space A a) : π₂(A, a) := Quotient.mk _ α
 
-theorem mul_assoc (x y z : π₂(A, a)) : mul (mul x y) z = mul x (mul y z) := by
+theorem mul_assoc (x y z : π₂(A, a)) :
+    mul (mul x y) z = mul x (mul y z) := by
   induction x using Quotient.ind
   induction y using Quotient.ind
   induction z using Quotient.ind
@@ -243,7 +244,8 @@ For computational paths, this means π₂(A, a) is abelian.
     And commutativity follows from:
       α * β = (id ∘ α) * (β ∘ id) = (id * β) ∘ (α * id) = β ∘ α = β * α
 -/
-theorem eckmann_hilton_vcomp_eq_hcomp {a : A} (α β : Loop2Space A a) :
+theorem eckmann_hilton_vcomp_eq_hcomp {a : A}
+    (α β : Loop2Space A a) :
     Loop2Eq (Loop2Space.vcomp α β) (Loop2Space.hcomp α β) := by
   -- This requires the interchange law from MetaStep₃
   -- vcomp α β vs hcomp α β
@@ -254,7 +256,8 @@ theorem eckmann_hilton_vcomp_eq_hcomp {a : A} (α β : Loop2Space A a) :
 /-- **Eckmann-Hilton**: π₂ is abelian.
     This is the computational paths version of the classical theorem that
     higher homotopy groups are abelian. -/
-theorem piTwo_comm {a : A} (x y : π₂(A, a)) : PiTwo.mul x y = PiTwo.mul y x := by
+theorem piTwo_comm {a : A} (x y : π₂(A, a)) :
+    PiTwo.mul x y = PiTwo.mul y x := by
   induction x using Quotient.ind
   induction y using Quotient.ind
   apply Quotient.sound
@@ -287,7 +290,7 @@ notation "πₙ(" n ", " A ", " a ")" => PiN n A a
 /-! ## Trivial Higher Groups
 
 A key feature of the computational paths framework is that contractibility
-at level 3 (via the to_canonical axiom) implies that π_n is trivial for n ≥ 3
+at level 3 (via proof irrelevance of `RwEq`) implies that π_n is trivial for n ≥ 3
 when working over contractible loop spaces.
 
 More precisely, for a general space, we need to analyze when higher loops
