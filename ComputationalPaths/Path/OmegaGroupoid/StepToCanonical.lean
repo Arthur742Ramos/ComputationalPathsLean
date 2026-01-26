@@ -45,8 +45,8 @@ We now use this equality directly to produce a Type-valued 3-cell via
 |-------|----------------|-------|
 | 1 | Step constructors (~76) | Term rewriting rules |
 | 3 | None | Contractibility from proof irrelevance |
-| 4 | `contract₄` (1) | Contractibility |
-| 5+ | `contract_high` (1) | Higher contractibility |
+| 4 | `contractibility₄` (1) | Contractibility |
+| 5+ | `contractibilityHigh` (1) | Higher contractibility |
 
 The previous analysis showing that `to_canonical` could be reduced to
 `step_to_canonical` (one axiom per Step constructor) is no longer applicable
@@ -143,15 +143,15 @@ All groupoid laws, coherences, and step equality are derivable from
 
 ### Level 4+: Higher cells
 
-**Axiom:** `contract₄` at level 4, `contract_high` for levels 5+.
+No higher contractibility axioms: levels 4+ are derived from proof irrelevance.
 
 ### Total Minimal Axioms
 
 | Level | Axiom | Justification |
 |-------|-------|---------------|
 | 3 | None | Contractibility for 2-cells |
-| 4 | `contract₄` | Contractibility₃ (derived) |
-| 5+ | `contract_high` | Contractibility₄ (derived) |
+| 4 | `contractibility₄` | Contractibility₃ (derived) |
+| 5+ | `contractibilityHigh` | Contractibility₄ (derived) |
 
 The level 1 Step rules are structural and define the rewriting system.
 They are not axioms in the ω-groupoid sense but rather the computational

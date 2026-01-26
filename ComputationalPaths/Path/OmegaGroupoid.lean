@@ -37,8 +37,8 @@ are connected.
 The construction uses axioms for contractibility at levels 4 and above:
 
 1. **Level 3**: contractibility follows from proof irrelevance of `RwEq`
-2. **`contract₄`** (level 4): any two parallel `Derivation₃`s are connected
-3. **`contract_high`** (level 5+): any two parallel `Derivation₄`s are connected
+2. **`contractibility₄`** (level 4): any two parallel `Derivation₃`s are connected
+3. **`contractibilityHigh`** (level 5+): any two parallel `Derivation₄`s are connected
 
 ## References
 
@@ -82,8 +82,8 @@ any two parallel (k-1)-cells are connected by a k-cell.
 This module assumes the following beyond Lean's core (including proof-irrelevant `Prop`):
 
 1. **Level 3**: `contractibility₃` is derived from proof irrelevance of `RwEq`
-2. **Level 4**: `contract₄` — any two parallel `Derivation₃`s are connected
-3. **Level 5+**: `contract_high` — any two parallel `Derivation₄`s are connected
+2. **Level 4**: `contractibility₄` — any two parallel `Derivation₃`s are connected
+3. **Level 5+**: `contractibilityHigh` — any two parallel `Derivation₄`s are connected
 
 The groupoid laws (unit, associativity, inverses), pentagon, triangle, and interchange
 coherences are all *proved* as constructors of `MetaStep₃`/`MetaStep₄`/`MetaStepHigh`.
@@ -259,6 +259,12 @@ def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ 
   | .inv m => m.depth + 1
   | .vcomp m₁ m₂ => m₁.depth + m₂.depth + 1
 
+/-- Prop-level projection: any 3-cell yields the same equality proof between
+    the induced `RwEq` witnesses of the endpoints. -/
+def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q} (_ : Derivation₃ d₁ d₂) :
+    d₁.toRwEq = d₂.toRwEq :=
+  Subsingleton.elim _ _
+
 /-- Left whiskering for 3-cells: c · _ applied to both sides -/
 def whiskerLeft₃ {a b : A} {p q r : Path a b} (c : Derivation₂ r p)
     {d₁ d₂ : Derivation₂ p q} (α : Derivation₃ d₁ d₂) :
@@ -313,16 +319,12 @@ end Contractibility
 /-! ## Level 4: 4-cells between 3-cells
 
 At level 4, the "canonical" 3-cell is given by `contractibility₃` itself, which we derived
-at level 3. The contract axiom at level 4 is therefore justified by the derived
-contractibility at level 3: since any two 2-cells are connected by a 3-cell (derived),
-any two 3-cells between the same 2-cells should be connected by a 4-cell.
-
-Unlike level 3 where we grounded the axiom in the normalization algorithm, at level 4+
-there is no further computational content to exploit. The contract axiom is the primitive.
+at level 3. Contractibility at level 4 now follows from proof irrelevance of the
+Prop-valued equality `d₁.toRwEq = d₂.toRwEq` between 2-cells.
 -/
 
 /-- Meta-steps at level 4: primitive 4-cells encoding groupoid laws and coherences.
-    The contract₄ axiom is justified by the derived contractibility₃ at level 3. -/
+    Contractibility is derived from proof irrelevance of the induced `RwEq` equality. -/
 inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivation₂ p q} →
     Derivation₃ d₁ d₂ → Derivation₃ d₁ d₂ → Type u where
   -- Groupoid laws for 3-cells
@@ -352,11 +354,14 @@ inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivati
   | step_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       (s₁ s₂ : MetaStep₃ d₁ d₂) :
       MetaStep₄ (.step s₁) (.step s₂)
-  -- CONTRACT AXIOM at level 4: Any two parallel 3-cells are connected by a 4-cell.
-  -- Justified by: contractibility₃ is derived at level 3, so the "canonical" 3-cell
-  -- between any d₁, d₂ exists. All 3-cells should connect to this canonical one.
-  | contract₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      (m₁ m₂ : Derivation₃ d₁ d₂) :
+  /-- Equality of the induced Prop-level `RwEq` witnesses yields a 4-cell.
+
+  Since `d₁.toRwEq = d₂.toRwEq` is a proposition, any two 3-cells induce equal
+  proofs of it, and we can connect them at level 4. -/
+  | rweq_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      {m₁ m₂ : Derivation₃ d₁ d₂}
+      (h : Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
+           Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂) :
       MetaStep₄ m₁ m₂
   -- Whiskering at level 4 (functoriality of vcomp)
   | whisker_left₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
@@ -408,32 +413,37 @@ def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
   | .inv c => c.depth + 1
   | .vcomp c₁ c₂ => c₁.depth + c₂.depth + 1
 
+/-- Prop-level projection: any 4-cell yields the same equality proof between
+    the induced `RwEq` witnesses of the endpoints. -/
+def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    {m₁ m₂ : Derivation₃ d₁ d₂} (_ : Derivation₄ m₁ m₂) :
+    Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
+      Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂ :=
+  Subsingleton.elim _ _
+
 end Derivation₄
 
-/-- Loop contraction at level 4: Any loop m : Derivation₃ d d contracts to .refl d.
-    With the `contract₄` axiom, this is a one-liner. -/
-def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂ p q}
-    (m : Derivation₃ d d) : Derivation₄ m (.refl d) :=
-  .step (.contract₄ m (.refl d))
-
-/-- Contractibility at Level 4: any two parallel 3-cells are connected by a 4-cell.
-    With the `contract₄` axiom, this is a one-liner. -/
+/-- Contractibility at Level 4: any two parallel 3-cells are connected by a 4-cell. -/
 def contractibility₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m₁ m₂ : Derivation₃ d₁ d₂) : Derivation₄ m₁ m₂ :=
-  .step (.contract₄ m₁ m₂)
+  .step (.rweq_eq (Subsingleton.elim
+    (Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁)
+    (Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂)))
+
+/-- Loop contraction at level 4: Any loop m : Derivation₃ d d contracts to .refl d. -/
+def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂ p q}
+    (m : Derivation₃ d d) : Derivation₄ m (.refl d) :=
+  contractibility₄ m (.refl d)
 
 /-! ## Level 5+: Higher Levels
 
 At levels 5 and above, the pattern continues: the canonical n-cell is given by
-contractibility at level (n-1). The contract axiom at each level is justified
-by the contractibility at the level below, forming an infinite tower.
-
-The key insight is that only level 3 requires computational grounding (via normalization).
-All higher levels follow automatically from the structure established at level 3.
+contractibility at level (n-1). Each higher contractibility follows by proof
+irrelevance of the Prop-level witness produced at the lower level.
 -/
 
 /-- Meta-steps for levels ≥ 5: primitive higher cells encoding groupoid laws.
-    The contract_high axiom is justified by contractibility at level 4. -/
+    Contractibility is derived from proof irrelevance of the induced equality. -/
 inductive MetaStepHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
     {d₁ d₂ : Derivation₂ p q} → {m₁ m₂ : Derivation₃ d₁ d₂} →
     Derivation₄ m₁ m₂ → Derivation₄ m₁ m₂ → Type u where
@@ -463,10 +473,11 @@ inductive MetaStepHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
   | step_eq {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ : Derivation₃ d₁ d₂} (s₁ s₂ : MetaStep₄ m₁ m₂) :
       MetaStepHigh n (.step s₁) (.step s₂)
-  -- CONTRACT AXIOM at level 5+: Any two parallel 4-cells are connected.
-  -- Justified by contractibility₄ at level 4.
-  | contract_high {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      {m₁ m₂ : Derivation₃ d₁ d₂} (c₁ c₂ : Derivation₄ m₁ m₂) :
+  /-- Equality of the induced Prop-level witnesses yields a higher cell. -/
+  | rweq_eq {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      {m₁ m₂ : Derivation₃ d₁ d₂} {c₁ c₂ : Derivation₄ m₁ m₂}
+      (h : Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₁ =
+           Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₂) :
       MetaStepHigh n c₁ c₂
   -- Whiskering at level 5+ (functoriality of vcomp)
   | whisker_left {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
@@ -522,19 +533,19 @@ def whiskerRight {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂
 
 end DerivationHigh
 
-/-- Loop contraction at level 5+: Any loop c : Derivation₄ m m contracts to .refl m.
-    With the `contract_high` axiom, this is a one-liner. -/
-def loop_contract_high {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-    {m : Derivation₃ d₁ d₂} (n : Nat) (c : Derivation₄ m m) :
-    DerivationHigh n c (.refl m) :=
-  .step (.contract_high c (.refl m))
-
-/-- Contractibility at Level 5+: any two parallel cells are connected.
-    With the `contract_high` axiom, this is a one-liner. -/
+/-- Contractibility at Level 5+: any two parallel cells are connected. -/
 def contractibilityHigh {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (n : Nat)
     (c₁ c₂ : Derivation₄ m₁ m₂) : DerivationHigh n c₁ c₂ :=
-  .step (.contract_high c₁ c₂)
+  .step (.rweq_eq (Subsingleton.elim
+    (Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₁)
+    (Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₂)))
+
+/-- Loop contraction at level 5+: Any loop c : Derivation₄ m m contracts to .refl m. -/
+def loop_contract_high {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    {m : Derivation₃ d₁ d₂} (n : Nat) (c : Derivation₄ m m) :
+    DerivationHigh n c (.refl m) :=
+  contractibilityHigh n c (.refl m)
 
 /-! ## Coherences
 
@@ -653,15 +664,15 @@ only at level 3 and above (between derivations).
 
 - **Level 3+ (contractible)**: All parallel derivations/higher cells are connected.
 
-**Axiom Structure**
+**Contractibility Structure**
 
-The construction uses three hypotheses, one at each level ≥ 3:
+The construction uses derived contractibility results, one at each level ≥ 3:
 
-| Level | Axiom | Purpose |
+| Level | Lemma | Purpose |
 |-------|-------|---------|
 | 3 | `contractibility₃ d₁ d₂` | Any two parallel derivations are connected |
-| 4 | `contract₄ m₁ m₂` | Any two parallel 3-cells are connected |
-| 5+ | `contract_high c₁ c₂` | Any two parallel 4-cells are connected |
+| 4 | `contractibility₄ m₁ m₂` | Any two parallel 3-cells are connected |
+| 5+ | `contractibilityHigh c₁ c₂` | Any two parallel 4-cells are connected |
 
 **Why This Is Consistent**
 

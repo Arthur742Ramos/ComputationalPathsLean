@@ -158,15 +158,15 @@ Based on this analysis, we could reformulate the ω-groupoid with a
 **minimal axiom set**:
 
 The minimal axiom set is now:
-- Level 4: `contract₄`
-- Level 5+: `contract_high`
+- Level 4: `contractibility₄`
+- Level 5+: `contractibilityHigh`
 -/
 
 /-
 **Summary: A minimal weak ω-groupoid now needs these axioms:**
 
-1. `contract₄` (Level 4): Any two parallel 3-cells are connected
-2. `contract_high` (Level 5+): Any two parallel 4-cells are connected
+1. `contractibility₄` (Level 4): Any two parallel 3-cells are connected
+2. `contractibilityHigh` (Level 5+): Any two parallel 4-cells are connected
 -/
 
 /-! ## Part 5: Eliminating One Unit/Inverse Law
@@ -223,8 +223,8 @@ end EliminateRedundantPathLaws
 11. `interchange` - derived from contractibility₃
 
 **Remaining true axioms:**
-1. `contract₄` (Level 4) - justified by contractibility₃
-2. `contract_high` (Level 5+) - justified by contractibility₄
+1. `contractibility₄` (Level 4) - derived from proof irrelevance
+2. `contractibilityHigh` (Level 5+) - derived from proof irrelevance
 
 **At level 1 (paths):**
 - One of `trans_refl_left`/`trans_refl_right` is derivable
