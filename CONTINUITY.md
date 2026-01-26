@@ -1,30 +1,28 @@
 # CONTINUITY.md
 ## Goal (incl. success criteria):
-- Create `ComputationalPaths/Path/Homotopy/StableStems.lean` defining πₛ₁..πₛ₉ with specified group identifications, no sorries/axioms, build passes, then commit and push.
+- Implement full type-level normalization proof for contractibility₃: extend TypedRewriting/TStar/Derivation₂ infrastructure, define confluence/normalization/canonical derivations, remove MetaStep₃ axiom, and prove contractibility₃; build passes.
 
 ## Constraints/Assumptions:
-- Run `./lake.cmd build` after non-trivial edits; keep build warning-free.
+- Follow user plan steps 1-7 exactly and keep file layout conventions.
+- Run `./lake.cmd build` after each major change; keep build warning-free.
 - No `sorry`; avoid new axioms except HIT/strictly necessary limitations.
 - Use `apply_patch` for single-file edits; prefer Read/Glob/Grep over bash for files.
-- Follow patterns from `Pi5S3.lean` and `AdamsSpectralSequence.lean`.
-- Commit and push once done.
 
 ## Key decisions:
 - None yet.
 
 ## State:
 - Done:
-  - Read updated user request for new stable stems file.
+  - Read user instructions (steps 1-7).
+  - Loaded ledger context.
 - Now:
-  - Inspect `Pi5S3.lean` and `AdamsSpectralSequence.lean` patterns.
-  - Add `ComputationalPaths/Path/Homotopy/StableStems.lean` with πₛ₁..πₛ₉ definitions and stated equivalences.
+  - Inspect `TypedRewriting.lean` and `OmegaGroupoid.lean` for existing normalization/confluence scaffolding to extend.
 - Next:
-  - Run `./lake.cmd build` and ensure warning-free.
-  - Commit and push updates.
+  - Implement plan steps 1-7 incrementally with builds after major changes.
 
 ## Open questions (UNCONFIRMED if needed):
-- None yet.
+- UNCONFIRMED: precise location/definition of `Derivation₂`, `MetaStep₃`, and `TStar` to extend.
 
 ## Working set (files/ids/commands):
-- Files: `CONTINUITY.md`, `ComputationalPaths/Path/Homotopy/StableStems.lean`, `ComputationalPaths/Path/Algebra/Pi5S3.lean`, `ComputationalPaths/Path/Algebra/AdamsSpectralSequence.lean`.
+- Files: `CONTINUITY.md`, `ComputationalPaths/Path/OmegaGroupoid.lean`, `ComputationalPaths/Path/OmegaGroupoid/TypedRewriting.lean`, `ComputationalPaths/Path/OmegaGroupoid/Derived.lean`, `ComputationalPaths/Path/OmegaGroupoid/StepToCanonical.lean`, `ComputationalPaths/Path/Rewrite/*.lean`.
 - Commands: `./lake.cmd build`.
