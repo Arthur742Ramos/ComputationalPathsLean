@@ -13,6 +13,23 @@ structure Path {A : Type u} (a b : A) where
 
 Paths compose via `trans` (concatenating step lists), invert via `symm` (reversing and inverting steps), and are related by the `RwEq` equivalence (the symmetric-transitive closure of the LND_EQ-TRS rewrite system from de Queiroz et al.).
 
+## Computational Paths vs HoTT Identity Types
+
+This development is *not* a HoTT identity-type formalisation. A computational
+path is a **trace-carrying wrapper around Lean's propositional equality**:
+
+- `Path a b` stores `proof : a = b` in `Prop`, so UIP/proof irrelevance is
+  intentional and relied upon.
+- `steps : List (Step A)` is metadata: it records a rewrite trace used by the
+  LND_EQ-TRS rewrite system, but it does **not** change the equality semantics.
+- Different traces can witness the same equality; `Path.toEq` forgets the trace.
+- Univalence (when assumed) is modelled as *propositional* equality plus an
+  empty trace; coherence comes from proof irrelevance, not higher paths.
+
+In short: computational paths are explicit equality traces inside extensional
+type theory (Lean's `Eq`), not higher inductive identity types. They are meant
+to preserve rewrite information while keeping equality proof-irrelevant.
+
 ## Highlights
 - **Weak ω-groupoid structure**: Complete proof that computational paths form a weak ω-groupoid with all coherence laws (pentagon, triangle) and contractibility at higher dimensions.
 - **Derived groupoid theorems** (axiom-free): Cancellation laws, uniqueness of inverses, mixed trans/symm cancellation, whiskering, and conjugation — all derived from primitive Step rules with no custom axioms.

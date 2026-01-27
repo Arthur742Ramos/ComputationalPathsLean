@@ -4,6 +4,14 @@
 Core definitions for computational paths: we introduce elementary rewrite
 steps, package them into paths, and record the foundational operations
 (`refl`, `symm`, `trans`) together with transport/substitution infrastructure.
+
+Important: `Path` is a structure that *records* a propositional equality
+(`proof : a = b`) plus a list of rewrite steps as metadata.  The equality
+semantics are given entirely by the `proof` field (Lean's `Eq` in `Prop`, hence
+UIP/proof-irrelevance), while the `steps` list preserves a trace for the
+computational-path rewriting system.  This is *not* the HoTT identity type: we
+do not treat `Path` as a higher inductive identity, and we intentionally rely
+on UIP to keep coherence proofs proof-irrelevant.
 -/
 
 namespace List
@@ -24,8 +32,10 @@ open List Function
 
 universe u v w
 
-/-- An elementary rewrite step between two elements of `A`.  The fields record
-the source, the target, and the propositional equality justifying the step. -/
+/-- An elementary rewrite step between two elements of `A`. The fields record
+the source, the target, and the propositional equality justifying the step.
+The equality proof lives in `Prop`, so different proofs are definitionally
+irrelevant (UIP). -/
 structure Step (A : Type u) where
   src : A
   tgt : A
@@ -59,10 +69,13 @@ variable {A : Type u} {B : Type v}
 
 end Step
 
-/-- A computational path from `a` to `b`.  Besides the derived equality proof,
-we store the explicit list of rewrite steps.  When composing paths we append
-these lists, and when inverting a path we reverse the list and take the symmetric
-of each step. -/
+/-- A computational path from `a` to `b`. The equality semantics come solely from
+`proof : a = b`; the `steps` list is metadata recording a rewrite trace used by
+the path-rewrite system (`RwEq`, normalisation, and derived groupoid laws).
+
+This is not the HoTT identity type: `Path` packages a proof-irrelevant equality
+with its trace, and different traces can witness the same equality.
+Composition concatenates the trace; symmetry reverses it. -/
 structure Path {A : Type u} (a b : A) where
   steps : List (Step A)
   proof : a = b
@@ -82,7 +95,8 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
       cases s
       simp [Step.map, ih]
 
-/-- Extract the propositional equality witnessed by a path. -/
+/-- Extract the propositional equality witnessed by a path.  This is the
+semantic equality; the trace `steps` does not affect `toEq`. -/
 @[simp] def toEq (p : Path a b) : a = b :=
   p.proof
 
@@ -96,7 +110,8 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
 
 @[simp] theorem toEq_ofEq (h : a = b) : toEq (ofEq h) = h := rfl
 
-/-- Paths built from two equality witnesses are definitionally equal. -/
+/-- Paths built from two equality witnesses are definitionally equal.
+This reflects proof irrelevance (UIP) for Lean's `Eq` in `Prop`. -/
 @[simp] theorem ofEq_eq_ofEq (h₁ h₂ : a = b) :
     ofEq h₁ = ofEq h₂ := by
   cases h₁

@@ -2,15 +2,17 @@
 # Univalence axioms for transporting along type equivalences
 
 Provide a lightweight axiomatisation of univalence specialised to the
-computational-paths setting.  The axioms postulate that every equivalence
+computational-paths setting. The axioms postulate that every equivalence
 between types induces a propositional equality and that transport along the
 induced computational path coincides with the forward map of the equivalence.
-These
-principles are sufficient to implement the encode-decode argument for the
-circle without committing to a full HoTT-style development of univalence.  Apart
-from the HIT interfaces, these are the only Lean `axiom`s used in the library
-core: coherence laws like `ua_trans` are derived from proof irrelevance of `Eq`
-in `Prop`.
+These principles are sufficient to implement the encode-decode argument for the
+circle without committing to a full HoTT-style development of univalence.
+
+Crucially, `Path` is *not* the HoTT identity type: it packages a proof-irrelevant
+`Eq` proof together with a rewrite trace, and UIP is intentional.  The univalence
+axioms here simply postulate equalities in `Prop` and then wrap them as paths
+with an empty trace.  Coherence results such as `ua_trans` follow from proof
+irrelevance, not from higher-path structure.
 -/
 
 import ComputationalPaths.Path.Basic.Core
@@ -23,8 +25,12 @@ universe u
 
 /-- Assumed univalence interface: every `SimpleEquiv` between types determines an
 equality between them, and transport along that equality computes to the forward
-map.  We keep this as an explicit `Prop`-valued typeclass so downstream results
-can record precisely where univalence is required. -/
+map. We keep this as an explicit `Prop`-valued typeclass so downstream results
+can record precisely where univalence is required.
+
+This interface is intentionally weaker than HoTT univalence: it does not
+introduce higher identity structure, only a propositional equality used for
+transport in the computational-paths setting. -/
 class HasUnivalence : Prop where
   uaEq {A B : Type u} : SimpleEquiv A B → A = B
   ua_beta {A B : Type u} (e : SimpleEquiv A B) (x : A) :
@@ -40,8 +46,9 @@ theorem uaEq [HasUnivalence.{u}] {A B : Type u} (e : SimpleEquiv A B) : A = B :=
 /-- Axiomatised univalence (computational-path form): package `uaEq` as a
 `Path` in `Type u`.
 
-We fix the step list to `[]` so coherences like `ua_trans` become theorems
-(their proof components live in `Prop`). -/
+We fix the step list to `[]`, reflecting that trace data is metadata. The
+semantics are entirely the underlying propositional equality, so coherences
+like `ua_trans` become theorems by proof irrelevance. -/
 def ua {A B : Type u} [HasUnivalence.{u}] (e : SimpleEquiv A B) : Path (A := Type u) A B :=
   Path.mk [] (uaEq e)
 
