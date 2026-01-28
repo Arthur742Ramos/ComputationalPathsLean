@@ -58,7 +58,7 @@ This is the higher-dimensional version, which we state but don't fully develop.
 
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
-import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.HIT.CircleCompPath
 import ComputationalPaths.Path.HIT.Torus
 import ComputationalPaths.Path.HIT.FigureEight
 import ComputationalPaths.Path.HIT.PushoutPaths
@@ -342,7 +342,7 @@ So any word reduces to a^m · b^n for some m, n ∈ ℤ.
 
 The free product word (left elements are from first ℤ, right from second)
 maps to the sum of left elements and sum of right elements. -/
-def figureEight_abelianization_map : FreeProductWord Int Int → FigureEightH1
+def figureEight_abelianization_map : HIT.FreeProductWord Int Int → FigureEightH1
   | .nil => (0, 0)
   | .consLeft x rest =>
     let (m, n) := figureEight_abelianization_map rest
@@ -352,13 +352,13 @@ def figureEight_abelianization_map : FreeProductWord Int Int → FigureEightH1
     (m, n + y)
 
 /-- The abelianization map is additive on the left component. -/
-theorem figureEight_abelianization_left (x : Int) (rest : FreeProductWord Int Int) :
+theorem figureEight_abelianization_left (x : Int) (rest : HIT.FreeProductWord Int Int) :
     (figureEight_abelianization_map (.consLeft x rest)).1 =
     (figureEight_abelianization_map rest).1 + x := by
   simp [figureEight_abelianization_map]
 
 /-- The abelianization map is additive on the right component. -/
-theorem figureEight_abelianization_right (y : Int) (rest : FreeProductWord Int Int) :
+theorem figureEight_abelianization_right (y : Int) (rest : HIT.FreeProductWord Int Int) :
     (figureEight_abelianization_map (.consRight y rest)).2 =
     (figureEight_abelianization_map rest).2 + y := by
   simp [figureEight_abelianization_map]
@@ -366,29 +366,29 @@ theorem figureEight_abelianization_right (y : Int) (rest : FreeProductWord Int I
 /-- The abelianization respects concatenation of words (is a homomorphism).
 The first component of the result is the sum of first components.
 The second component of the result is the sum of second components. -/
-theorem figureEight_abelianization_concat_fst (w₁ w₂ : FreeProductWord Int Int) :
+theorem figureEight_abelianization_concat_fst (w₁ w₂ : HIT.FreeProductWord Int Int) :
     (figureEight_abelianization_map (w₁.concat w₂)).1 =
     (figureEight_abelianization_map w₁).1 + (figureEight_abelianization_map w₂).1 := by
   induction w₁ with
-  | nil => simp [figureEight_abelianization_map, FreeProductWord.concat]
+  | nil => simp [figureEight_abelianization_map, HIT.FreeProductWord.concat]
   | consLeft x rest ih =>
-    simp only [figureEight_abelianization_map, FreeProductWord.concat]
+    simp only [figureEight_abelianization_map, HIT.FreeProductWord.concat]
     omega
   | consRight _y rest ih =>
-    simp only [figureEight_abelianization_map, FreeProductWord.concat]
+    simp only [figureEight_abelianization_map, HIT.FreeProductWord.concat]
     exact ih
 
 /-- Second component of the abelianization respects concatenation. -/
-theorem figureEight_abelianization_concat_snd (w₁ w₂ : FreeProductWord Int Int) :
+theorem figureEight_abelianization_concat_snd (w₁ w₂ : HIT.FreeProductWord Int Int) :
     (figureEight_abelianization_map (w₁.concat w₂)).2 =
     (figureEight_abelianization_map w₁).2 + (figureEight_abelianization_map w₂).2 := by
   induction w₁ with
-  | nil => simp [figureEight_abelianization_map, FreeProductWord.concat]
+  | nil => simp [figureEight_abelianization_map, HIT.FreeProductWord.concat]
   | consLeft _x rest ih =>
-    simp only [figureEight_abelianization_map, FreeProductWord.concat]
+    simp only [figureEight_abelianization_map, HIT.FreeProductWord.concat]
     exact ih
   | consRight y rest ih =>
-    simp only [figureEight_abelianization_map, FreeProductWord.concat]
+    simp only [figureEight_abelianization_map, HIT.FreeProductWord.concat]
     omega
 
 /-- **Theorem**: (G * H)^ab ≃ G^ab × H^ab

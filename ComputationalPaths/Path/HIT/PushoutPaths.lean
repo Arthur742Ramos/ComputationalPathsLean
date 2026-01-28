@@ -25,13 +25,18 @@ where:
 - HoTT Book, Chapter 8.7
 -/
 
-import ComputationalPaths.Path.HIT.Pushout
+import ComputationalPaths.Path.HIT.PushoutCompPath
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Rewrite.Quot
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.PathTactic
 
 namespace ComputationalPaths
 namespace Path
+namespace HIT
+
+open Pushout
+open Wedge
 
 universe u v
 
@@ -1460,15 +1465,17 @@ noncomputable def wedgeDecode :
   | .nil => Path.refl _
   | .consLeft p rest =>
       -- p is a loop in A at a₀
-      -- We need: loop at Wedge.basepoint = Wedge.inl a₀
-      Path.trans (Pushout.inlPath p) (wedgeDecode rest)
+      Path.trans (Pushout.inlPath (A := A) (B := B) (C := PUnit')
+        (f := fun _ => a₀) (g := fun _ => b₀) p)
+        (wedgeDecode rest)
   | .consRight q rest =>
       -- q is a loop in B at b₀
       -- Go to inr b₀ via glue, do the loop, come back
       Path.trans
         (Path.trans
           (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
-          (Path.trans (Pushout.inrPath q)
+          (Path.trans (Pushout.inrPath (A := A) (B := B) (C := PUnit')
+            (f := fun _ => a₀) (g := fun _ => b₀) q)
             (Path.symm (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)))))
         (wedgeDecode rest)
 
@@ -1489,7 +1496,10 @@ theorem wedgeDecode_concat (w₁ w₂ : WedgeLoopCode a₀ b₀) :
       -- By ih: RwEq (wedgeDecode (concat rest w₂)) (trans (wedgeDecode rest) (wedgeDecode w₂))
       -- We have: trans (inlPath p) (wedgeDecode (concat rest w₂))
       -- Want:    trans (trans (inlPath p) (wedgeDecode rest)) (wedgeDecode w₂)
-      apply rweq_trans (rweq_trans_congr_right (Pushout.inlPath p) ih)
+      apply rweq_trans
+        (rweq_trans_congr_right
+          (Pushout.inlPath (A := A) (B := B) (C := PUnit')
+            (f := fun _ => a₀) (g := fun _ => b₀) p) ih)
       exact rweq_symm (rweq_tt _ _ _)
   | consRight q rest ih =>
       simp only [FreeProductWord.concat, wedgeDecode]
@@ -1567,9 +1577,9 @@ variable (a₀ : A) (b₀ : B) (c₀ : C)
 variable (hf : f c₀ = a₀) (hg : g c₀ = b₀)
 
 -- Assume all spaces are path-connected
-variable (hA : IsPathConnected A)
-variable (hB : IsPathConnected B)
-variable (hC : IsPathConnected C)
+variable (hA : HIT.IsPathConnected A)
+variable (hB : HIT.IsPathConnected B)
+variable (hC : HIT.IsPathConnected C)
 
 /-- The induced map on fundamental groups: π₁(A) → π₁(Pushout). -/
 noncomputable def piOneInl :
@@ -1719,7 +1729,7 @@ theorem pushoutDecode_respects_amalg
     {A : Type u} {B : Type u} {C : Type u}
     {f : C → A} {g : C → B}
     (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     (γ : π₁(C, c₀))
     (rest : PushoutCode A B C f g c₀) :
     pushoutDecode c₀ (.consLeft (piOneFmap c₀ γ) rest) =
@@ -1735,9 +1745,81 @@ theorem pushoutDecode_respects_amalg
     -- Need to show that the two loop representations are equal in π₁
     -- This follows from the glue naturality square
     apply _root_.congrArg (piOneMul · (pushoutDecode c₀ rest))
+    let path : Path (PushoutCompPath.inl (f c₀)) (PushoutCompPath.inl (f c₀)) :=
+      (inlPath (congrArg f p)).symm.trans ((Pushout.glue c₀).trans (inrPath (congrArg g p) |>.trans (Pushout.glue c₀).symm))
+    
+    -- The naturality lemma is: symm(f*p) . glue c₀ . g*p ≈ glue c₀
+    -- But `p` here is a loop at c₀, so `c = c₀` and `glue c = glue c₀`.
+    -- `HasGlueNaturalLoopRwEq.eq` gives:
+    -- RwEq (symm (f*p) . glue c₀ . g*p) (glue c₀)
+    
+    have h : RwEq ((inlPath (congrArg f p)).symm.trans ((Pushout.glue c₀).trans (inrPath (congrArg g p)))) (Pushout.glue c₀) :=
+      HasGlueNaturalLoopRwEq.eq (A := A) (B := B) (C := C) (f := f) (g := g) (c₀ := c₀) c₀ p
+      
+    have h' : RwEq path (Path.refl (PushoutCompPath.inl (f c₀))) := by
+      -- Goal: symm(f*p) . glue c₀ . g*p . symm(glue c₀) ≈ refl
+      -- We know: symm(f*p) . glue c₀ . g*p ≈ glue c₀
+      -- So LHS ≈ glue c₀ . symm(glue c₀) ≈ refl
+      
+      -- We need to associate the LHS to expose the subterm that matches `h`.
+      -- path is: symm(f*p) . (glue . (g*p . symm(glue)))
+      -- We want: (symm(f*p) . (glue . g*p)) . symm(glue)
+      
+      -- Let L = symm(f*p), M = glue, R = g*p, S = symm(glue)
+      -- path = L . (M . (R . S))
+      -- h says: L . (M . R) ≈ M
+      
+      -- Assoc: L . (M . (R . S)) ≈ L . ((M . R) . S)
+      -- Using rweq_tt backwards (rweq_tt.symm)
+      -- rweq_tt: trans (trans a b) c ≈ trans a (trans b c)
+      -- symm: trans a (trans b c) ≈ trans (trans a b) c
+      
+      -- Current term structure: trans L (trans M (trans R S))
+      -- We want: trans (trans L (trans M R)) S
+      
+      -- First, associate M . (R . S) to (M . R) . S inside
+      -- trans L (trans M (trans R S)) ≈ trans L (trans (trans M R) S)
+      apply rweq_trans (rweq_trans_congr_right _ (rweq_tt _ _ _).symm)
+      
+      -- Now associate L . (K . S) to (L . K) . S
+      -- trans L (trans (trans M R) S) ≈ trans (trans L (trans M R)) S
+      apply rweq_trans (rweq_tt _ _ _).symm
+      
+      -- Now use `h` on `trans L (trans M R)`
+      -- trans (trans L (trans M R)) S ≈ trans M S
+      apply rweq_trans (rweq_trans_congr_left _ h)
+      
+      -- M . S ≈ refl
+      apply rweq_cmpA_inv_right _
+      
+    -- The goal of Quot.sound is: Setoid.r (inlPath (congrArg f p)) (...)
+    -- This is `inlPath (congrArg f p) ≈ ...`
+    -- But `h'` is `path ≈ refl`.
+    -- path = symm(inlPath ...) . (...)
+    -- So `symm(A) . B ≈ refl` implies `A ≈ B`.
+    
+    -- We can use `rweq_of_trans_symm_refl_left` if it exists, or just manipulate `h'`.
+    -- Or better, show `inlPath ...` is `symm (symm (inlPath ...))` then use congruences.
+    
+    -- Let A = inlPath (congrArg f p)
+    -- Let B = (glue . (g*p . symm(glue)))
+    -- We have `symm A . B ≈ refl`.
+    -- We want `A ≈ B`.
+    
+    have h_final : RwEq (inlPath (congrArg f p)) ((Pushout.glue c₀).trans ((inrPath (congrArg g p)).trans (Pushout.glue c₀).symm)) := by
+      -- A ≈ A . refl
+      apply rweq_trans (rweq_cmpA_refl_right (inlPath (congrArg f p))).symm
+      -- ≈ A . (symm A . B)  (using h'.symm)
+      apply rweq_trans (rweq_trans_congr_right _ (rweq_symm h'))
+      -- ≈ (A . symm A) . B
+      apply rweq_trans (rweq_tt _ _ _).symm
+      -- ≈ refl . B
+      apply rweq_trans (rweq_trans_congr_left _ (rweq_cmpA_inv_right _))
+      -- ≈ B
+      apply rweq_cmpA_refl_left
+    
     apply Quot.sound
-    -- Apply the glue naturality theorem
-    exact Pushout.glue_natural_loop_rweq c₀ p
+    exact h_final
 
 /-- Encode map for general pushouts (at the quotient level). -/
 class HasPushoutSVKEncodeQuot (A : Type u) (B : Type u) (C : Type u)
@@ -1828,7 +1910,7 @@ set_option maxHeartbeats 400000 in
 noncomputable def pushoutDecodeAmalg
     {A : Type u} {B : Type u} {C : Type u}
     {f : C → A} {g : C → B} (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] :
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] :
     AmalgamatedFreeProduct (π₁(A, f c₀)) (π₁(B, g c₀)) (π₁(C, c₀))
       (piOneFmap c₀) (piOneGmap c₀) →
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) :=
@@ -2265,7 +2347,7 @@ theorem pushoutDecode_respects_freeGroupStep
 set_option maxHeartbeats 400000 in
 /-- Decode at the *full* amalgamated free product level (amalgamation + free group reduction). -/
 noncomputable def pushoutDecodeFullAmalg
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] :
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] :
     FullAmalgamatedFreeProduct (π₁(A, f c₀)) (π₁(B, g c₀)) (π₁(C, c₀))
       (piOneFmap c₀) (piOneGmap c₀) →
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) :=
@@ -2323,7 +2405,7 @@ instance (priority := 100) hasPushoutSVKEncodeDecodeFull_of_encodeDecode
 
 /-- Full SVK equivalence: π₁(Pushout) ≃ FullAmalgamatedFreeProduct (amalgamation + free reduction). -/
 noncomputable def seifertVanKampenFullEquiv
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀]
     [HasPushoutSVKDecodeEncode A B C f g c₀]
     [HasPushoutSVKEncodeDecodeFull A B C f g c₀] :
@@ -2357,7 +2439,7 @@ This is an “encode-free” assumption: given bijectivity of `pushoutDecodeFull
 we can construct an `encode` map by classical choice and recover the full SVK equivalence. -/
 class HasPushoutSVKDecodeFullAmalgBijective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] : Prop where
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] : Prop where
   bijective :
     Function.Injective
         (pushoutDecodeFullAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀) ∧
@@ -2366,7 +2448,7 @@ class HasPushoutSVKDecodeFullAmalgBijective (A : Type u) (B : Type u) (C : Type 
 
 instance (priority := 200) hasPushoutSVKDecodeFullAmalgBijective_of_encode
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀]
     [HasPushoutSVKDecodeEncode A B C f g c₀]
     [HasPushoutSVKEncodeDecodeFull A B C f g c₀] :
@@ -2387,7 +2469,7 @@ instance (priority := 200) hasPushoutSVKDecodeFullAmalgBijective_of_encode
 
 /-- Choice-based full SVK equivalence: requires only Prop-level bijectivity of full decode. -/
 noncomputable def seifertVanKampenFullEquiv_of_decodeFullAmalg_bijective
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKDecodeFullAmalgBijective A B C f g c₀] :
     SimpleEquiv
       (π₁(Pushout A B C f g, Pushout.inl (f c₀)))
@@ -2428,7 +2510,7 @@ noncomputable def seifertVanKampenFullEquiv_of_decodeFullAmalg_bijective
 `pushoutDecodeAmalg c₀ (pushoutEncodeAmalg c₀ α) = α`. -/
 theorem pushoutDecodeAmalg_encodeAmalg (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀] [HasPushoutSVKDecodeEncode A B C f g c₀]
     (α : π₁(Pushout A B C f g, Pushout.inl (f c₀))) :
     pushoutDecodeAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀
@@ -2442,7 +2524,7 @@ theorem pushoutDecodeAmalg_encodeAmalg (A : Type u) (B : Type u) (C : Type u)
 /-- `pushoutDecodeAmalg` is surjective assuming only the `decode ∘ encode` law. -/
 theorem pushoutDecodeAmalg_surjective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀] [HasPushoutSVKDecodeEncode A B C f g c₀] :
     Function.Surjective
       (pushoutDecodeAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀) := by
@@ -2453,7 +2535,7 @@ theorem pushoutDecodeAmalg_surjective (A : Type u) (B : Type u) (C : Type u)
 /-- `pushoutEncodeAmalg` is injective assuming only the `decode ∘ encode` law. -/
 theorem pushoutEncodeAmalg_injective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀] [HasPushoutSVKDecodeEncode A B C f g c₀] :
     Function.Injective
       (pushoutEncodeAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀) := by
@@ -2469,7 +2551,7 @@ theorem pushoutEncodeAmalg_injective (A : Type u) (B : Type u) (C : Type u)
 `pushoutEncodeAmalg c₀ (pushoutDecodeAmalg c₀ x) = x`. -/
 theorem pushoutEncodeAmalg_decodeAmalg (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀] [HasPushoutSVKEncodeDecode A B C f g c₀]
     (x :
       AmalgamatedFreeProduct (π₁(A, f c₀)) (π₁(B, g c₀)) (π₁(C, c₀))
@@ -2487,7 +2569,7 @@ theorem pushoutEncodeAmalg_decodeAmalg (A : Type u) (B : Type u) (C : Type u)
 /-- `pushoutEncodeAmalg` is surjective assuming only the `encode ∘ decode` law. -/
 theorem pushoutEncodeAmalg_surjective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀] [HasPushoutSVKEncodeDecode A B C f g c₀] :
     Function.Surjective
       (pushoutEncodeAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀) := by
@@ -2498,7 +2580,7 @@ theorem pushoutEncodeAmalg_surjective (A : Type u) (B : Type u) (C : Type u)
 /-- `pushoutDecodeAmalg` is injective assuming only the `encode ∘ decode` law. -/
 theorem pushoutDecodeAmalg_injective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀] [HasPushoutSVKEncodeDecode A B C f g c₀] :
     Function.Injective
       (pushoutDecodeAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀) := by
@@ -2515,7 +2597,7 @@ This is a useful “encode-free” assumption: given bijectivity of `pushoutDeco
 we can construct an `encode` map by classical choice and recover the SVK equivalence. -/
 class HasPushoutSVKDecodeAmalgBijective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] : Prop where
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] : Prop where
   bijective :
     Function.Injective
         (pushoutDecodeAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀) ∧
@@ -2524,7 +2606,7 @@ class HasPushoutSVKDecodeAmalgBijective (A : Type u) (B : Type u) (C : Type u)
 
 instance (priority := 200) hasPushoutSVKDecodeAmalgBijective_of_encode
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀]
     [HasPushoutSVKDecodeEncode A B C f g c₀]
     [HasPushoutSVKEncodeDecode A B C f g c₀] :
@@ -2535,7 +2617,7 @@ instance (priority := 200) hasPushoutSVKDecodeAmalgBijective_of_encode
 
 /-- Choice-based SVK equivalence: requires only Prop-level bijectivity of decode (no explicit encode map). -/
 noncomputable def seifertVanKampenEquiv_of_decodeAmalg_bijective
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKDecodeAmalgBijective A B C f g c₀] :
     SimpleEquiv
       (π₁(Pushout A B C f g, Pushout.inl (f c₀)))
@@ -2621,7 +2703,7 @@ private theorem amalgEquiv_equivalence {G₁ G₂ H : Type u} (i₁ : H → G₁
 /-- Choice-based encode into the amalgamated free product, derived from bijectivity of decode. -/
 noncomputable def pushoutEncodeAmalg_of_decodeAmalg_bijective
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKDecodeAmalgBijective A B C f g c₀] :
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) →
       AmalgamatedFreeProduct
@@ -2641,7 +2723,7 @@ noncomputable def pushoutEncodeAmalg_of_decodeAmalg_bijective
 /-- Round-trip: decode after the choice-based encode (at amalgam level) gives back the original. -/
 theorem pushoutDecodeAmalg_encodeAmalg_of_decodeAmalg_bijective
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKDecodeAmalgBijective A B C f g c₀]
     (α : π₁(Pushout A B C f g, Pushout.inl (f c₀))) :
     pushoutDecodeAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀
@@ -2657,7 +2739,7 @@ theorem pushoutDecodeAmalg_encodeAmalg_of_decodeAmalg_bijective
 /-- Choice-based encode at word level, derived from bijectivity of `pushoutDecodeAmalg`. -/
 noncomputable def pushoutEncodeQuot_of_decodeAmalg_bijective
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKDecodeAmalgBijective A B C f g c₀] :
     π₁(Pushout A B C f g, Pushout.inl (f c₀)) →
       PushoutCode A B C f g c₀ := by
@@ -2671,7 +2753,7 @@ noncomputable def pushoutEncodeQuot_of_decodeAmalg_bijective
 /-- Round-trip: decode after the choice-based word-level encode gives back the original. -/
 theorem pushoutDecode_encodeQuot_of_decodeAmalg_bijective
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKDecodeAmalgBijective A B C f g c₀]
     (α : π₁(Pushout A B C f g, Pushout.inl (f c₀))) :
     pushoutDecode (A := A) (B := B) (C := C) (f := f) (g := g) c₀
@@ -2707,7 +2789,7 @@ theorem pushoutDecode_encodeQuot_of_decodeAmalg_bijective
 /-- Round-trip: the choice-based word-level encode is an amalgamation representative. -/
 theorem pushoutEncodeQuot_decode_of_decodeAmalg_bijective
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKDecodeAmalgBijective A B C f g c₀]
     (w : PushoutCode A B C f g c₀) :
     AmalgEquiv (piOneFmap c₀) (piOneGmap c₀)
@@ -2788,7 +2870,7 @@ theorem pushoutEncodeQuot_decode_of_decodeAmalg_bijective
 /-- Recover the full SVK encode/decode package from Prop-level bijectivity of decode. -/
 noncomputable def hasPushoutSVKEncodeData_of_decodeAmalg_bijective
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKDecodeAmalgBijective A B C f g c₀] :
     HasPushoutSVKEncodeData A B C f g c₀ where
   encodeQuot := pushoutEncodeQuot_of_decodeAmalg_bijective A B C f g c₀
@@ -2801,7 +2883,7 @@ noncomputable def hasPushoutSVKEncodeData_of_decodeAmalg_bijective
     simpa using pushoutEncodeQuot_decode_of_decodeAmalg_bijective A B C f g c₀ w
 
 noncomputable def seifertVanKampenEquiv
-    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀]
     [HasPushoutSVKDecodeEncode A B C f g c₀]
     [HasPushoutSVKEncodeDecode A B C f g c₀] :
@@ -3115,7 +3197,7 @@ noncomputable instance (priority := 200) instHasWedgeSVKDecodeBijective_of_encod
     [HasWedgeSVKEncodeQuot A B a₀ b₀]
     [HasWedgeSVKDecodeEncode A B a₀ b₀]
     [HasWedgeSVKEncodeDecode A B a₀ b₀] :
-    _root_.ComputationalPaths.Path.HasWedgeSVKDecodeBijective A B a₀ b₀ where
+    HasWedgeSVKDecodeBijective A B a₀ b₀ where
   bijective := by
     refine ⟨?_, ?_⟩
     · intro w₁ w₂ h
@@ -3257,5 +3339,6 @@ The proofs use the computational paths framework where:
 - The fundamental group is the quotient by rewrite equality
 -/
 
+end HIT
 end Path
 end ComputationalPaths

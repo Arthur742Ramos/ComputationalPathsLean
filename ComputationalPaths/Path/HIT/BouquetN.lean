@@ -29,14 +29,18 @@ formalized here.
 - Hatcher, "Algebraic Topology", Section 1.2
 -/
 
-import ComputationalPaths.Path.HIT.Circle
-import ComputationalPaths.Path.HIT.Pushout
+import ComputationalPaths.Path.HIT.CircleCompPath
+import ComputationalPaths.Path.HIT.PushoutCompPath
 import ComputationalPaths.Path.HIT.PushoutPaths
 import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Rewrite.PathTactic
+import ComputationalPaths.Path.Homotopy.Sets
 
 namespace ComputationalPaths
 namespace Path
+
+open HIT
+open Pushout
 
 universe u
 
@@ -291,7 +295,7 @@ The basepoint is always the left injection basepoint, and the loops are indexed 
 -/
 
 private noncomputable def bouquetNData : Nat → Σ A : Type u, A
-  | 0 => ⟨PUnit'.{u}, PUnit'.unit⟩
+  | 0 => ⟨HIT.PUnit'.{u}, HIT.PUnit'.unit⟩
   | Nat.succ n =>
       let prev := bouquetNData n
       ⟨Wedge prev.1 Circle.{u} prev.2 circleBase,
@@ -313,8 +317,8 @@ noncomputable def bouquetLoop : {n : Nat} → Fin'B n →
       let prev := bouquetNData n
       let glue :=
         Wedge.glue (A := prev.1) (B := Circle.{u}) (a₀ := prev.2) (b₀ := circleBase)
-      Path.trans glue (Path.trans (Pushout.inrPath circleLoop) (Path.symm glue))
-  | Nat.succ n, .fsucc i => Pushout.inlPath (bouquetLoop (n := n) i)
+      Path.trans glue (Path.trans (Pushout.inrPath (A := prev.1) (B := Circle.{u}) (C := HIT.PUnit') (f := fun _ => prev.2) (g := fun _ => circleBase) circleLoop) (Path.symm glue))
+  | Nat.succ n, .fsucc i => Pushout.inlPath (A := (bouquetNData n).1) (B := Circle.{u}) (C := HIT.PUnit') (f := fun _ => (bouquetNData n).2) (g := fun _ => circleBase) (bouquetLoop (n := n) i)
 
 /-! ## Loop Space and Fundamental Group -/
 
@@ -860,7 +864,7 @@ theorem bouquetWord_zero_trivial :
 instance : Subsingleton (BouquetN.{u} 0) := by
   -- Unfold the definition: `BouquetN 0 = PUnit'`.
   unfold BouquetN
-  simpa [bouquetNData] using (inferInstance : Subsingleton PUnit'.{u})
+  simpa [bouquetNData] using (inferInstance : Subsingleton HIT.PUnit'.{u})
 
 /-- The free group on zero generators is a subsingleton. -/
 theorem bouquetFreeGroup_zero_subsingleton : Subsingleton (BouquetFreeGroup 0) := by

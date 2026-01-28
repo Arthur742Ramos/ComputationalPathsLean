@@ -32,13 +32,16 @@ This adjunction is characterized by:
 
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Fibration
-import ComputationalPaths.Path.HIT.Pushout
+import ComputationalPaths.Path.HIT.PushoutCompPath
 
 namespace ComputationalPaths
 namespace Path
 namespace SuspensionLoop
 
-open HigherHomotopy Pushout Fibration
+open HigherHomotopy Fibration HIT
+open HIT
+
+open HIT.Pushout
 
 universe u
 
@@ -87,10 +90,34 @@ end PointedMap
 The suspension ΣX has north pole as its basepoint.
 -/
 
+/-! ## Suspension (computational pushout) -/
+
+/-- Suspension as a pushout of unit types. -/
+def Suspension (X : Type u) : Type u :=
+  HIT.Pushout PUnit' PUnit' X (fun _ => PUnit'.unit) (fun _ => PUnit'.unit)
+
+namespace Suspension
+
+def north : Suspension X :=
+  HIT.Pushout.inl (A := PUnit') (B := PUnit') (C := X)
+    (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) PUnit'.unit
+
+def south : Suspension X :=
+  HIT.Pushout.inr (A := PUnit') (B := PUnit') (C := X)
+    (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) PUnit'.unit
+
+def merid (x : X) : Path (north (X := X)) (south (X := X)) :=
+  HIT.Pushout.glue (A := PUnit') (B := PUnit') (C := X)
+    (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) x
+
+end Suspension
+
+open Suspension
+
 /-- Suspension of a type viewed as a pointed type with basepoint at north. -/
 noncomputable def suspPointed (X : Type u) : Pointed where
   carrier := Suspension X
-  pt := Suspension.north
+  pt := Suspension.north (X := X)
 
 /-- Loop space of a pointed type. -/
 def loopPointed (Y : Pointed) : Pointed where
@@ -107,14 +134,14 @@ The key maps in the adjunction:
 /-- Given a pointed map f : ΣX → Y and a basepoint x₀ in X,
     construct a map X → ΩY sending x to f(merid(x) · merid(x₀)⁻¹). -/
 noncomputable def adjMap {X : Type u} (x₀ : X) {Y : Pointed}
-    (f : Suspension X → Y.carrier) (hf : f Suspension.north = Y.pt) :
+    (f : Suspension X → Y.carrier) (hf : f (Suspension.north (X := X)) = Y.pt) :
     X → LoopSpace Y.carrier Y.pt := fun x =>
   -- f(merid x) gives a path from f(north) to f(south)
   -- f(merid x₀) gives a path from f(north) to f(south)
   -- We want a loop at f(north) = Y.pt
   -- So we take: (f ∘ merid)(x) · (f ∘ merid)(x₀)⁻¹
-  let p := Path.congrArg f (Suspension.merid x)
-  let q := Path.congrArg f (Suspension.merid x₀)
+  let p := Path.congrArg f (Suspension.merid (X := X) x)
+  let q := Path.congrArg f (Suspension.merid (X := X) x₀)
   -- p : Path (f north) (f south)
   -- q : Path (f north) (f south)
   -- We need a loop at Y.pt = f(north)
@@ -127,19 +154,15 @@ noncomputable def adjMap {X : Type u} (x₀ : X) {Y : Pointed}
     1. p · p⁻¹ ≈ refl (inverse law)
     2. hf.symm · refl · hf ≈ hf.symm · hf ≈ refl (unit and inverse laws) -/
 theorem adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
-    (f : Suspension X → Y.carrier) (hf : f Suspension.north = Y.pt) :
+    (f : Suspension X → Y.carrier) (hf : f (Suspension.north (X := X)) = Y.pt) :
     RwEq (adjMap x₀ f hf x₀) (Path.refl Y.pt) := by
   -- Expand the definition at `x₀`: the two meridian images coincide.
   simp [adjMap]
   -- Name the common meridian image under `f`.
-  let q : Path (f Suspension.north) (f Suspension.south) :=
-    Path.congrArg f (Suspension.merid x₀)
+  let q : Path (f (Suspension.north (X := X))) (f (Suspension.south (X := X))) :=
+    Path.congrArg f (Suspension.merid (X := X) x₀)
   -- Rewrite the goal so subsequent steps can refer to `q`.
-  change
-    RwEq
-      (Path.trans (Path.ofEq hf.symm)
-        (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf))))
-      (Path.refl Y.pt)
+  -- Use direct rewrite sequence without reshaping the goal.
   -- Simplify the middle segment: q · q⁻¹ · hf ≈ hf.
   have h_mid :
       RwEq
@@ -178,7 +201,7 @@ theorem adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
     Proof: When x = x₀, the path goes Y.pt → f(north) → f(south) → f(north) → Y.pt,
     which is trivial since it's hf.symm · p · p⁻¹ · hf = refl at the equality level. -/
 theorem adjMap_basepoint {X : Type u} (x₀ : X) {Y : Pointed}
-    (f : Suspension X → Y.carrier) (hf : f Suspension.north = Y.pt) :
+    (f : Suspension X → Y.carrier) (hf : f (Suspension.north (X := X)) = Y.pt) :
     RwEq (adjMap x₀ f hf x₀) (Path.refl Y.pt) :=
   adjMap_basepoint_rweq x₀ f hf
 
@@ -229,13 +252,13 @@ structure IsSimplyConnected (X : Pointed) extends IsPathConnectedPointed X where
     using Seifert-van Kampen. The general case requires similar machinery. -/
 noncomputable def susp_path_connected_structure {X : Type u} (x₀ : X) :
     -- South is connected to north via the meridian at x₀
-    Path (Suspension.south (A := X)) Suspension.north :=
-  Path.symm (Suspension.merid x₀)
+    Path (Suspension.south (X := X)) (Suspension.north (X := X)) :=
+  Path.symm (Suspension.merid (X := X) x₀)
 
 /-- North pole is connected to itself. -/
 noncomputable def susp_north_connected {X : Type u} :
-    Path (Suspension.north (A := X)) Suspension.north :=
-  Path.refl Suspension.north
+    Path (Suspension.north (X := X)) (Suspension.north (X := X)) :=
+  Path.refl (Suspension.north (X := X))
 
 /-- For a proof that suspensions of path-connected spaces are simply connected,
     see Sphere.lean which establishes π₁(S²) = 1 via Seifert-van Kampen.

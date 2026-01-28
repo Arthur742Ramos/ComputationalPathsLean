@@ -22,12 +22,14 @@ but that equivalence is not formalized here.
 - de Veras et al., "On the Calculation of Fundamental Groups..."
 -/
 
-import ComputationalPaths.Path.HIT.Circle
-import ComputationalPaths.Path.HIT.Pushout
+import ComputationalPaths.Path.HIT.CircleCompPath
+import ComputationalPaths.Path.HIT.PushoutCompPath
 import ComputationalPaths.Path.HIT.PushoutPaths
 
 namespace ComputationalPaths
 namespace Path
+
+open HIT
 
 universe u v w
 
@@ -52,7 +54,7 @@ noncomputable def inrCircle (x : Circle) : FigureEight := Wedge.inr x
 
 /-- The glue path identifying the two basepoints. -/
 noncomputable def glue : Path (inlCircle circleBase) (inrCircle circleBase) :=
-  Wedge.glue
+  Wedge.glue (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase)
 
 /-! ## The Two Fundamental Loops
 
@@ -66,7 +68,7 @@ These generate the fundamental group freely.
 /-- Loop A: The fundamental loop of the left circle, embedded in the figure-eight.
 This is simply the left circle's loop, which is already based at the basepoint. -/
 noncomputable def loopA : Path base base :=
-  Pushout.inlPath circleLoop
+  Pushout.inlPath (A := Circle) (B := Circle) (C := PUnit') (f := fun _ => circleBase) (g := fun _ => circleBase) circleLoop
 
 /-- Loop B: The fundamental loop of the right circle, conjugated to be based at
 the figure-eight basepoint.
@@ -76,7 +78,7 @@ we must conjugate: loopB = glue ⋅ circleLoop ⋅ glue⁻¹ -/
 noncomputable def loopB : Path base base :=
   Path.trans
     (Wedge.glue (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))
-    (Path.trans (Pushout.inrPath circleLoop)
+    (Path.trans (Pushout.inrPath (A := Circle) (B := Circle) (C := PUnit') (f := fun _ => circleBase) (g := fun _ => circleBase) circleLoop)
       (Path.symm (Wedge.glue (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))))
 
 /-! ## Loop Space and Fundamental Group -/

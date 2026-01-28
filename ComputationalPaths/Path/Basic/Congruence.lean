@@ -474,9 +474,13 @@ def transportSigma {A : Type u} {B : A → Type v}
     (p : Path a₁ a₂)
     (q : Path (transport (D := B) p b₁) b₂)
     (x : D a₁ b₁) : D a₂ b₂ :=
-  match p, q with
-  | Path.mk _ h1, Path.mk _ h2 =>
-      cast (by cases h1; cases h2; rfl) x
+  by
+    cases p with | mk _ h1 =>
+    cases h1
+    simp [transport] at q
+    cases q with | mk _ h2 =>
+    cases h2
+    exact x
 
 /-- Substitution for dependent types. -/
 def substSigma {A : Type u} {B : A → Type v}

@@ -8,12 +8,13 @@ interface, we can construct the torus as the ordinary product `Circle × Circle`
 The π₁ computation is packaged in `TorusStep.lean`.
 -/
 
-import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.HIT.CircleCompPath
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 
 namespace ComputationalPaths
 namespace Path
+open HIT
 
 universe u
 
@@ -31,15 +32,13 @@ noncomputable def torusLoop1 : Path (A := Torus.{u}) torusBase torusBase :=
 noncomputable def torusLoop2 : Path (A := Torus.{u}) torusBase torusBase :=
   Path.prodMk (Path.refl (circleBase.{u})) (circleLoop.{u})
 
-/-- Fundamental group π₁(T², base). -/
-abbrev torusPiOne : Type u :=
-  PiOne Torus torusBase
+/-- The fundamental group of the torus based at `torusBase`. -/
+noncomputable abbrev torusPiOne : Type u := circlePiOne.{u} × circlePiOne.{u}
 
-/-- Decode map `ℤ × ℤ → π₁(T²)`, induced by product structure and `circleDecode`. -/
-noncomputable def torusDecode : Int × Int → torusPiOne.{u} :=
-  fun z =>
-    prodPiOneDecode (A := Circle.{u}) (B := Circle.{u})
-      circleBase circleBase (circleDecode.{u} z.1, circleDecode.{u} z.2)
+/-- Decodes an integer pair into a loop on the torus. -/
+noncomputable def torusDecode (z : Int × Int) : torusPiOne.{u} :=
+  (circleDecode z.1, circleDecode z.2)
+
 
 end Path
 end ComputationalPaths

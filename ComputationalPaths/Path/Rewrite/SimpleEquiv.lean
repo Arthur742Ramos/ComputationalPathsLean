@@ -180,6 +180,11 @@ instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
   left_inv := by intro (a, b); simp [e.left_inv b]
   right_inv := by intro (a, d); simp [e.right_inv d]
 
+/-- Cast an element along an equality of types. -/
+def cast {α β : Sort u} (h : α = β) (e : SimpleEquiv α γ) : SimpleEquiv β γ :=
+  h ▸ e
+
+
 end SimpleEquiv
 
 end Path

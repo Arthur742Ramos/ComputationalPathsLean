@@ -134,6 +134,13 @@ This reflects proof irrelevance (UIP) for Lean's `Eq` in `Prop`. -/
 @[simp] def cmpA (p : Path a b) (q : Path b c) : Path a c :=
   trans p q
 
+/-- Cast an element from `D a` to `D b` given a path `p : Path a b`. -/
+def cast {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
+  Eq.recOn p.proof x
+
+@[simp] theorem cast_refl {D : A → Sort v} (x : D a) :
+    cast (refl a) x = x := rfl
+
 @[simp] theorem trans_steps (p : Path a b) (q : Path b c) :
     (trans p q).steps = p.steps ++ q.steps := rfl
 

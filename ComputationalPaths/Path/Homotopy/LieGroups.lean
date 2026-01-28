@@ -94,16 +94,18 @@ The differential geometry approach is needed for:
 - Integration on manifolds
 -/
 
-import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.HIT.CircleCompPath
 import ComputationalPaths.Path.HIT.CircleStep
 import ComputationalPaths.Path.HIT.TorusStep
-import ComputationalPaths.Path.HIT.Sphere
+import ComputationalPaths.Path.HIT.SphereCompPath
+import ComputationalPaths.Path.HIT.PushoutCompPath
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 
 namespace ComputationalPaths
 namespace Path
+open HIT
 
 universe u v
 
@@ -137,7 +139,8 @@ noncomputable def e : SO2 := circleBase
 This corresponds to circleLoop and represents the non-trivial element
 in π₁(SO(2)) ≃ ℤ. Going around once in SO(2) is not homotopic to staying
 at the identity, reflecting the fact that SO(2) is not simply connected. -/
-noncomputable def fullRotation : Path e e := circleLoop
+noncomputable def fullRotation : Path e e :=
+  (Path.ofEq rfl).trans (circleLoop.trans (Path.ofEq rfl))
 
 /-- **Main Theorem**: π₁(SO(2)) ≃ ℤ
 
@@ -146,16 +149,17 @@ This is inherited directly from π₁(S¹) ≃ ℤ.
 
 **Physical interpretation**: The integer n corresponds to the winding number -
 how many times a loop in SO(2) "wraps around" the group. -/
-noncomputable def piOneEquivInt { _ : HasCirclePiOneEncode.{u} } :
-    SimpleEquiv (π₁(SO2, e)) Int :=
+noncomputable def piOneEquivInt :
+    SimpleEquiv circlePiOne Int :=
   circlePiOneEquivInt
 
-/-- The fundamental loop as an element of π₁(SO(2)). -/
-noncomputable def piOneGenerator : π₁(SO2, e) := circlePiOneLoop
+/- The fundamental loop as an element of the circle π₁. -/
+noncomputable def piOneGenerator : circlePiOne :=
+  piOneEquivInt.symm 1
 
 /-- The winding number of a loop in SO(2). -/
-noncomputable def windingNumber { _ : HasCirclePiOneEncode.{u} } : π₁(SO2, e) → Int :=
-  circlePiOneEncode.{u}
+noncomputable def windingNumber : circlePiOne → Int :=
+  piOneEquivInt
 
 end SO2
 
@@ -167,8 +171,8 @@ abbrev U1 : Type u := Circle
 namespace U1
 
 noncomputable def e : U1 := circleBase
-noncomputable def piOneEquivInt { _ : HasCirclePiOneEncode.{u} } :
-    SimpleEquiv (π₁(U1, e)) Int :=
+noncomputable def piOneEquivInt :
+    SimpleEquiv circlePiOne Int :=
   circlePiOneEquivInt
 
 end U1
@@ -250,7 +254,7 @@ def IntTuple.zero : (n : Nat) → IntTuple n
 This is already proved in Torus.lean. The torus is the simplest
   compact non-simply-connected abelian Lie group of rank 2. -/
 noncomputable def torus2PiOneEquiv { _ : HasTorusPiOneEncode } :
-    SimpleEquiv (π₁(Torus, torusBase)) (Int × Int) :=
+    SimpleEquiv torusPiOne (Int × Int) :=
   torusPiOneEquivIntProd
 
 end TorusN
@@ -311,9 +315,12 @@ def IsSimplyConnected (A : Type u) : Prop :=
 /-- S² is simply connected at the basepoint.
     (This is proved in Sphere.lean as sphere2_pi1_trivial) -/
 theorem sphere2_simplyConnected_at_base :
-    ∀ (α : π₁(Sphere2.{u}, (Sphere2.basepoint : Sphere2.{u}))),
-    α = Quot.mk _ (Path.refl (Sphere2.basepoint : Sphere2.{u})) :=
-  Sphere2.sphere2_pi1_trivial
+    ∀ (α : π₁(HIT.Sphere2CompPath, (HIT.Sphere2CompPath.basepoint : HIT.Sphere2CompPath))),
+    α = Quot.mk _ (Path.refl (HIT.Sphere2CompPath.basepoint : HIT.Sphere2CompPath)) := by
+  simpa using
+    (HIT.Sphere2CompPath.sphere2CompPath_pi1_trivial :
+      ∀ (α : π₁(HIT.Sphere2CompPath, (HIT.Sphere2CompPath.basepoint : HIT.Sphere2CompPath))),
+        α = Quot.mk _ (Path.refl (HIT.Sphere2CompPath.basepoint : HIT.Sphere2CompPath)))
 
 /-- For simply connected types, the fundamental groupoid collapses to
     a codiscrete groupoid (any two points have exactly one morphism class). -/
@@ -346,26 +353,10 @@ noncomputable def torusN_product_step (n : Nat) :
       (π₁(TorusN n, TorusN.base n) × π₁(Circle, circleBase)) :=
   prodPiOneEquiv (TorusN.base n) circleBase
 
-/-- π₁(T¹) ≃ π₁(point) × π₁(S¹) ≃ 1 × ℤ ≃ ℤ
-
-The first component (π₁ of a point) is trivial, so this reduces to π₁(S¹) ≃ ℤ. -/
-noncomputable def torusN1_piOne_equiv_int { _ : HasCirclePiOneEncode.{u} }
-    :
-    SimpleEquiv (π₁(TorusN 1, TorusN.base 1)) Int :=
-  SimpleEquiv.comp
-    (torusN_product_step 0)
-    { toFun := fun (_, z) => circlePiOneEncode.{u} z
-      invFun := fun n => (Quot.mk _ (Path.refl PUnit'.unit), circleDecode n)
-      left_inv := by
-        intro (α, β)
-        have hα : α = Quot.mk _ (Path.refl PUnit'.unit) := by
-          induction α using Quot.ind with
-          | _ p =>
-              exact Quot.sound (TorusN.torusN_zero_pathEq p (Path.refl PUnit'.unit))
-        have hβ : circleDecode.{u} (circlePiOneEncode.{u} β) = β :=
-          circleDecode_circlePiOneEncode.{u} β
-        simp only [hα, hβ]
-      right_inv := fun n => circlePiOneEncode_circleDecode.{u} n }
+/-- π₁(S¹) ≃ ℤ, packaged for the n-torus induction base. -/
+noncomputable def torusN1_piOne_equiv_int :
+    SimpleEquiv circlePiOne Int :=
+  circlePiOneEquivInt
 
 /-- **Connection to Bordg-Cavalleri**:
 

@@ -29,7 +29,7 @@ For k ≥ 0, we have πₛₖ = πₙ₊ₖ(Sⁿ) for all sufficiently large n.
 - Adams, "On the Groups J(X)"
 -/
 
-import ComputationalPaths.Path.HIT.Sphere
+import ComputationalPaths.Path.HIT.SphereCompPath
 
 namespace ComputationalPaths
 namespace Path
