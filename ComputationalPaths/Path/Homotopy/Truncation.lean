@@ -27,7 +27,7 @@ import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.OmegaGroupoid
-import ComputationalPaths.Path.HIT.PushoutCompPath
+import ComputationalPaths.Path.CompPath.PushoutCompPath
 
 namespace ComputationalPaths
 namespace Path
@@ -59,9 +59,9 @@ def allPathsConnected (h : IsContr A) (a b : A) : Path a b :=
   Path.trans (h.contr a) (Path.symm (h.contr b))
 
 /-- Unit (PUnit') is contractible. -/
-def punitContr : IsContr HIT.PUnit' where
-  center := HIT.PUnit'.unit
-  contr := fun _ => Path.refl HIT.PUnit'.unit
+def punitContr : IsContr CompPath.PUnit' where
+  center := CompPath.PUnit'.unit
+  contr := fun _ => Path.refl CompPath.PUnit'.unit
 
 end IsContr
 
@@ -82,8 +82,8 @@ def emptyProp : IsProp Empty where
   eq := fun a _ => nomatch a
 
 /-- Unit type is a proposition. -/
-def punitProp : IsProp HIT.PUnit' where
-  eq := fun _ _ => Path.refl HIT.PUnit'.unit
+def punitProp : IsProp CompPath.PUnit' where
+  eq := fun _ _ => Path.refl CompPath.PUnit'.unit
 
 /-- Contractible types are propositions. -/
 def ofContr (h : IsContr A) : IsProp A where
@@ -105,10 +105,10 @@ structure IsSet (A : Type u) where
 namespace IsSet
 
 /-- PUnit' is a set. -/
-def punitSet : IsSet HIT.PUnit' where
+def punitSet : IsSet CompPath.PUnit' where
   pathEq := by
     intro a b p q
-    exact isHSet_of_subsingleton (A := HIT.PUnit') p q
+    exact isHSet_of_subsingleton (A := CompPath.PUnit') p q
 
 end IsSet
 

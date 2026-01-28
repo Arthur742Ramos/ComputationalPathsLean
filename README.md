@@ -1,6 +1,6 @@
 # Computational Paths (Lean 4)
 
-Lean 4 formalisation of propositional equality via **explicit computational paths** and rewrite equality. Unlike Lean's built-in `Eq` type which is proof-irrelevant, `Path a b` stores an explicit list of rewrite steps—making equality computational. This machinery provides transport, symmetry, congruence, rewrite quotients, and normalisation, and uses it to formalise fundamental groups of higher-inductive types.
+Lean 4 formalisation of propositional equality via **explicit computational paths** and rewrite equality. Unlike Lean's built-in `Eq` type which is proof-irrelevant, `Path a b` stores an explicit list of rewrite steps—making equality computational. This machinery provides transport, symmetry, congruence, rewrite quotients, and normalisation, and uses it to formalise fundamental groups of computational-path constructions.
 
 ## Core Concept: Computational Paths
 
@@ -27,7 +27,7 @@ path is a **trace-carrying wrapper around Lean's propositional equality**:
   empty trace; coherence comes from proof irrelevance, not higher paths.
 
 In short: computational paths are explicit equality traces inside extensional
-type theory (Lean's `Eq`), not higher inductive identity types. They are meant
+type theory (Lean's `Eq`), not a HoTT identity-type formalisation. They are meant
 to preserve rewrite information while keeping equality proof-irrelevant.
 
 ## Highlights
@@ -49,7 +49,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - **Covering space theory**: Total spaces, path lifting, π₁-action on fibers, universal cover, deck transformations.
 - **Confluence of LND_EQ-TRS**: Complete proof that the computational path rewrite system is confluent via Newman's Lemma (local confluence + termination). Critical pair analysis for all core path algebra rules including the challenging inverse-related pairs.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
-- Higher-inductive circle interface + π₁(S¹) ≃ ℤ via winding number (requires `HasCirclePiOneEncode`; optional raw-loop interface `HasCircleLoopDecode` is derivable).
+- Computational-path circle interface + π₁(S¹) ≃ ℤ via winding number (requires `HasCirclePiOneEncode`; optional raw-loop interface `HasCircleLoopDecode` is derivable).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
 - Completed proof π₁(T²) ≃ ℤ × ℤ via the encode/decode equivalence `torusPiOneEquivIntProd` (requires `HasTorusPiOneEncode`; optional raw-loop interface `HasTorusLoopDecode` is derivable).
 - **Fundamental groupoid Π₁(X)**: Explicit groupoid structure with basepoint independence theorem (π₁(A,a) ≃ π₁(A,b) via path conjugation) and functoriality (f : A → B induces Π₁(f) : Π₁(A) → Π₁(B)).
@@ -111,16 +111,16 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`ComputationalPaths/Path/Rewrite/PathTacticExamples.lean`](ComputationalPaths/Path/Rewrite/PathTacticExamples.lean) — comprehensive test suite for path tactics demonstrating usage patterns.
 - [`ComputationalPaths/Path/Rewrite/MinimalAxioms.lean`](ComputationalPaths/Path/Rewrite/MinimalAxioms.lean) — analysis of minimal axiom requirements for the rewrite system.
 - [`ComputationalPaths/Path/Rewrite/ConfluenceProof.lean`](ComputationalPaths/Path/Rewrite/ConfluenceProof.lean) — **Confluence proof** via Newman's Lemma: critical pair analysis, local confluence, strip lemma, and `HasJoinOfRw` instance.
-- [`ComputationalPaths/Path/HIT/Circle.lean`](ComputationalPaths/Path/HIT/Circle.lean) — circle HIT interface, canonical `circleDecode : ℤ → π₁(S¹)`, and the optional raw-loop interface `HasCircleLoopDecode`.
-- [`ComputationalPaths/Path/HIT/CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean) — quotient-level interface `HasCirclePiOneEncode`, `circlePiOneEquivInt : π₁(S¹) ≃ ℤ`, and winding-number algebra lemmas.
-- [`ComputationalPaths/Path/HIT/Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean) — torus definition (`Circle × Circle`), canonical `torusDecode : ℤ × ℤ → π₁(T²)`, and the optional raw-loop interface `HasTorusLoopDecode`.
-- [`ComputationalPaths/Path/HIT/TorusStep.lean`](ComputationalPaths/Path/HIT/TorusStep.lean) — quotient-level interface `HasTorusPiOneEncode` and `torusPiOneEquivIntProd : π₁(T²) ≃ ℤ × ℤ`.
-- [`ComputationalPaths/Path/HIT/Pushout.lean`](ComputationalPaths/Path/HIT/Pushout.lean) — Pushout HIT with constructors (inl, inr, glue), eliminators, and special cases (wedge sum, suspension).
-- [`ComputationalPaths/Path/HIT/PushoutPaths.lean`](ComputationalPaths/Path/HIT/PushoutPaths.lean) — Path characterization for pushouts, free products, amalgamated free products, and the **Seifert-van Kampen theorem** (`seifertVanKampenEquiv`).
-- [`ComputationalPaths/Path/HIT/FigureEight.lean`](ComputationalPaths/Path/HIT/FigureEight.lean) — Figure-eight space (S¹ ∨ S¹) with basic loops; π₁ equivalence not yet formalized.
-- [`ComputationalPaths/Path/HIT/BouquetN.lean`](ComputationalPaths/Path/HIT/BouquetN.lean) — **Bouquet of n circles** (∨ⁿS¹) with free group model and decode map; π₁ equivalence not yet formalized.
-- [`ComputationalPaths/Path/HIT/Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean) — The 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK. Also defines S³ for the Hopf fibration.
-- Wedge encode/decode is now integrated in `ComputationalPaths/Path/HIT/PushoutPaths.lean` via `wedgeFundamentalGroupEquiv_of_decode_bijective`.
+- [`ComputationalPaths/Path/CompPath/CircleCompPath.lean`](ComputationalPaths/Path/CompPath/CircleCompPath.lean) — circle construction via path expressions, canonical `circleCompPathPiOneEquivInt : π₁(S¹) ≃ ℤ`.
+- [`ComputationalPaths/Path/CompPath/CircleStep.lean`](ComputationalPaths/Path/CompPath/CircleStep.lean) — quotient-level interface `circlePiOneEquivInt : π₁(S¹) ≃ ℤ`, winding-number algebra lemmas.
+- [`ComputationalPaths/Path/CompPath/Torus.lean`](ComputationalPaths/Path/CompPath/Torus.lean) — torus definition (`Circle × Circle`) in the computational-path setting.
+- [`ComputationalPaths/Path/CompPath/TorusStep.lean`](ComputationalPaths/Path/CompPath/TorusStep.lean) — quotient-level `torusPiOneEquivIntProd : π₁(T²) ≃ ℤ × ℤ`.
+- [`ComputationalPaths/Path/CompPath/PushoutCompPath.lean`](ComputationalPaths/Path/CompPath/PushoutCompPath.lean) — pushout construction in computational paths with constructors and elimination principles.
+- [`ComputationalPaths/Path/CompPath/PushoutPaths.lean`](ComputationalPaths/Path/CompPath/PushoutPaths.lean) — path characterization for pushouts, free products, amalgamated free products, and the **Seifert-van Kampen theorem** (`seifertVanKampenEquiv`).
+- [`ComputationalPaths/Path/CompPath/FigureEight.lean`](ComputationalPaths/Path/CompPath/FigureEight.lean) — figure-eight space (S¹ ∨ S¹) with basic loops; π₁ equivalence not yet formalized.
+- [`ComputationalPaths/Path/CompPath/BouquetN.lean`](ComputationalPaths/Path/CompPath/BouquetN.lean) — **Bouquet of n circles** (∨ⁿS¹) with free group model and decode map; π₁ equivalence not yet formalized.
+- [`ComputationalPaths/Path/CompPath/SphereCompPath.lean`](ComputationalPaths/Path/CompPath/SphereCompPath.lean) — the 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK. Also defines S³ for the Hopf fibration.
+- Wedge encode/decode is now integrated in `ComputationalPaths/Path/CompPath/PushoutPaths.lean` via `wedgeFundamentalGroupEquiv_of_decode_bijective`.
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 
 ## Bicategory & weak 2-groupoid API
@@ -210,7 +210,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - **Group structure on π₂**: `PiTwo.mul`, `PiTwo.inv`, `PiTwo.id` with full group laws
 - **Eckmann-Hilton theorem**: `piTwo_comm` proves π₂(A, a) is abelian via the interchange law
 - **Key insight**: 2-loops are equivalent if connected by a 3-cell (Derivation₃)
-- **π₂(S²) ≅ 1**: In [`Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean), `sphere2_pi2_trivial` proves all 2-loops are trivial via contractibility₃
+- **π₂(S²) ≅ 1**: In [`SphereCompPath.lean`](ComputationalPaths/Path/CompPath/SphereCompPath.lean), `sphere2_pi2_trivial` proves all 2-loops are trivial via contractibility₃
 
 ## Truncation Levels (n-types)
 
@@ -285,7 +285,7 @@ example (p : Path (a₁, b₁) (a₂, b₂)) : RwEq (prodMk (fst p) (snd p)) p :
 
 ## Axiom-Free Derived Results
 
-Eight modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no HIT axioms.
+Eight modules provide extensive axiom-free, sorry-free results derived purely from the primitive Step rules via `rweq_of_step`. All depend only on Lean's standard axioms (`propext`, `Quot.sound`) — no additional axioms.
 
 **Total: 250 uses of `rweq_of_step`** across these modules.
 
@@ -504,7 +504,7 @@ Higher coherence laws for the weak ω-groupoid structure:
 
 Two approaches are available:
 
-**Axiomatic approach** ([`Torus.lean`](ComputationalPaths/Path/HIT/Torus.lean), [`TorusStep.lean`](ComputationalPaths/Path/HIT/TorusStep.lean)):
+**Computational-path approach** ([`Torus.lean`](ComputationalPaths/Path/CompPath/Torus.lean), [`TorusStep.lean`](ComputationalPaths/Path/CompPath/TorusStep.lean)):
 - Encoding: `torusPiOneEncode : π₁(T²) → ℤ × ℤ` from the quotient-level interface `HasTorusPiOneEncode`.
 - Decoding: `torusDecode : ℤ × ℤ → π₁(T²)` assembles the z-powers of the two commuting loops.
 - Equivalence: `torusPiOneEquivIntProd` shows the maps are inverse, yielding π₁(T²) ≃ ℤ × ℤ.
@@ -521,12 +521,12 @@ Two approaches are available:
 
 
 ## Pushouts & Seifert-van Kampen (what to read)
-- **Pushout HIT** ([`Pushout.lean`](ComputationalPaths/Path/HIT/Pushout.lean)): Defines the pushout of a span A ←f─ C ─g→ B with:
+- **Pushout construction** ([`PushoutCompPath.lean`](ComputationalPaths/Path/CompPath/PushoutCompPath.lean)): Defines the pushout of a span A ←f─ C ─g→ B with:
   - Point constructors `inl : A → Pushout` and `inr : B → Pushout`
   - Path constructor `glue : ∀c, Path (inl (f c)) (inr (g c))`
   - Full eliminators (`rec`, `ind`) with computation rules
   - Special cases: wedge sum (A ∨ B), suspension (ΣA)
-- **Free products** ([`PushoutPaths.lean`](ComputationalPaths/Path/HIT/PushoutPaths.lean)):
+- **Free products** ([`PushoutPaths.lean`](ComputationalPaths/Path/CompPath/PushoutPaths.lean)):
   - `FreeProductWord G₁ G₂`: Alternating sequences from two groups
   - `AmalgamatedFreeProduct G₁ G₂ H i₁ i₂`: Quotient by i₁(h) = i₂(h)
 - **Seifert-van Kampen theorem**: `seifertVanKampenEquiv` establishes
@@ -537,14 +537,14 @@ Two approaches are available:
 - Reference: Favonia & Shulman, *The Seifert-van Kampen Theorem in HoTT*; HoTT Book Chapter 8.7.
 
 ## Figure-Eight Space (S¹ ∨ S¹) (what to read)
-- **Definition** ([`FigureEight.lean`](ComputationalPaths/Path/HIT/FigureEight.lean)): `FigureEight := Wedge Circle Circle circleBase circleBase`
+- **Definition** ([`FigureEight.lean`](ComputationalPaths/Path/CompPath/FigureEight.lean)): `FigureEight := Wedge Circle Circle circleBase circleBase`
 - **Two generators**: `loopA` (left circle) and `loopB` (right circle, conjugated by glue)
 - **Main theorem (legacy removed)**: figure-eight π₁ equivalence is not yet formalized.
 - **Non-abelianness**: `wordAB ≠ wordBA` proves the fundamental group is non-abelian.
 - The figure-eight is the simplest space with non-abelian π₁, making it important for testing SVK.
 
 ## Bouquet of n Circles (∨ⁿS¹) (what to read)
-- **Definition** ([`BouquetN.lean`](ComputationalPaths/Path/HIT/BouquetN.lean)): Higher-inductive type with:
+- **Definition** ([`BouquetN.lean`](ComputationalPaths/Path/CompPath/BouquetN.lean)): Higher-inductive style type with:
   - Base point `bouquetBase`
   - n loops `bouquetLoop i` for `i : Fin'B n`
   - Recursion principle `bouquetRec` with computation rules
@@ -565,7 +565,7 @@ Two approaches are available:
 - The bouquet generalizes the figure-eight to arbitrary numbers of generators, providing a parametric family of free groups.
 
 ## 2-Sphere π₁(S²) ≅ 1 (what to read)
-- **Definition** ([`Sphere.lean`](ComputationalPaths/Path/HIT/Sphere.lean)): `Sphere2 := Suspension Circle` (suspension of S¹)
+- **Definition** ([`SphereCompPath.lean`](ComputationalPaths/Path/CompPath/SphereCompPath.lean)): `Sphere2 := Suspension Circle` (suspension of S¹)
 - **Mathematical insight**: S² = Σ(S¹) = Pushout PUnit' PUnit' Circle, with both PUnit' having trivial π₁
 - **Main theorem** (`sphere2_pi1_trivial`): π₁(S²) ≅ 1 (trivial group)
 - **Proof via SVK**: When π₁(A) = π₁(B) = 1 in the pushout, the amalgamated free product collapses:
@@ -600,8 +600,8 @@ This project tries to minimize **Lean kernel axioms**. We distinguish:
 
 ### Current status
 
-- `Scripts/AxiomInventory.lean` reports **7 kernel axioms** for `import ComputationalPaths` (circle constructors/recursors in `ComputationalPaths/Path/HIT/Circle.lean`).
-- `Scripts/AxiomDependencies.lean` reports that `circlePiOneEquivInt` depends on only the **circle generators** (3 kernel axioms: `Circle`, `circleBase`, `circleLoop`).
+- `Scripts/AxiomInventory.lean` reports **0 kernel axioms** for `import ComputationalPaths`.
+- `Scripts/AxiomDependencies.lean` reports that `circlePiOneEquivInt` depends on no kernel axioms.
 
 Non-kernel assumptions that are intentionally explicit (selected examples):
 
@@ -620,7 +620,7 @@ and explicit assumptions.
   - Used by some HoTT-style developments to model “transport along `ua` computes to the equivalence”.
   - **Cannot be instantiated in standard Lean** (proof-irrelevance makes it inconsistent); see `docs/axioms.md` and `Scripts/UnivalenceInconsistency.lean`.
   - This interface is opt-in only; it is not imported by `ComputationalPaths.Path`.
-- **Pushout / SVK**: `Pushout.HasGlueNaturalLoopRwEq`, `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeQuot`, `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeEncode`, `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeDecode`, and the Prop-only alternative `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeAmalgBijective` (and full `Pushout.HasGlueNaturalRwEq` when needed).
+- **Pushout / SVK**: `Pushout.HasGlueNaturalLoopRwEq`, `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKEncodeQuot`, `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKDecodeEncode`, `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKEncodeDecode`, and the Prop-only alternative `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKDecodeAmalgBijective` (and full `Pushout.HasGlueNaturalRwEq` when needed).
 - **Confluence assumptions** (justified by critical pair analysis + termination):
   - `HasLocalConfluenceProp`: Any two single-step reductions from the same source can be joined.
   - `HasTerminationProp`: Termination of one-step rewrites (well-founded on the non-empty transitive closure).
@@ -639,8 +639,8 @@ We intentionally do **not** assume global UIP-like collapse principles (e.g. the
 - When a structure adds data on top of an existing interface, prefer extending the smaller structure (e.g. `WeakGroupoid` extends `WeakCategory`) to keep identities/composition definitions in one place.
 
 ## Maintenance / refactor opportunities
-- **Torus step module**: [`TorusStep.lean`](ComputationalPaths/Path/HIT/TorusStep.lean) now parallels [`CircleStep.lean`](ComputationalPaths/Path/HIT/CircleStep.lean). Adding quotient-level winding-number algebra lemmas (loops, multiplication, etc.) would further reduce proof duplication.
-- **Axioms to constructions**: circle and related HIT interfaces remain axiomatic; replacing them with concrete constructions or a general HIT layer remains an open project.
+- **Torus step module**: [`TorusStep.lean`](ComputationalPaths/Path/CompPath/TorusStep.lean) now parallels [`CircleStep.lean`](ComputationalPaths/Path/CompPath/CircleStep.lean). Adding quotient-level winding-number algebra lemmas (loops, multiplication, etc.) would further reduce proof duplication.
+- **Constructions**: circle and related interfaces are now computational-path constructions; expanding automated equivalence lemmas remains an open project.
 - **Developer docs**: a short tutorial showing how to apply the π₁ equivalences downstream (e.g. deriving homomorphisms into ℤ) would help new contributors.
 
 ## Citation
@@ -672,7 +672,7 @@ This formalisation is based on the following papers:
 - Hofmann & Streicher, *The groupoid model refutes uniqueness of identity proofs*, LICS 1994.
 
 ### Related Work (Differential Geometry in Lean)
-- Bordg & Cavalleri, [*Elements of Differential Geometry in Lean*](https://arxiv.org/abs/2108.00484), arXiv:2108.00484, 2021. (Formalizes smooth manifolds, tangent bundles, and Lie groups in Lean — complementary approach to π₁ via covering spaces rather than HITs.)
+- Bordg & Cavalleri, [*Elements of Differential Geometry in Lean*](https://arxiv.org/abs/2108.00484), arXiv:2108.00484, 2021. (Formalizes smooth manifolds, tangent bundles, and Lie groups in Lean — complementary approach to π₁ via covering spaces rather than axiomatic loop-space models.)
 
 ## Citing This Repository
 
@@ -687,6 +687,6 @@ If you use this formalisation in your work, please cite:
   publisher    = {GitHub},
   url          = {https://github.com/Arthur742Ramos/ComputationalPathsLean},
   note         = {Lean 4 formalisation of propositional equality via 
-                  computational paths and fundamental groups of HITs}
+                  computational paths and fundamental groups of computational-path constructions}
 }
 ```

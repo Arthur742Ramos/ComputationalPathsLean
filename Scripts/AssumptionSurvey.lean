@@ -1,6 +1,6 @@
 import Lean
 import ComputationalPaths
-import ComputationalPaths.Path.HIT.SphereCompPath
+import ComputationalPaths.Path.CompPath.SphereCompPath
 
 open Lean
 open Lean.Meta

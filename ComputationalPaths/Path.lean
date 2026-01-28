@@ -47,16 +47,17 @@ import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Homotopy.Reflexivity
 import ComputationalPaths.Path.Homotopy.IdentityType
 import ComputationalPaths.Path.Homotopy.Coproduct
-import ComputationalPaths.Path.HIT.CircleCompPath
-import ComputationalPaths.Path.HIT.CircleStep
+import ComputationalPaths.Path.CompPath.CircleCompPath
+import ComputationalPaths.Path.CompPath.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
-import ComputationalPaths.Path.HIT.Torus
-import ComputationalPaths.Path.HIT.TorusStep
-import ComputationalPaths.Path.HIT.PushoutCompPath
-import ComputationalPaths.Path.HIT.PushoutPaths
-import ComputationalPaths.Path.HIT.FigureEight
-import ComputationalPaths.Path.HIT.BouquetN
-import ComputationalPaths.Path.HIT.SphereCompPath
+import ComputationalPaths.Path.CompPath.Torus
+import ComputationalPaths.Path.CompPath.TorusStep
+import ComputationalPaths.Path.CompPath.PushoutCompPath
+import ComputationalPaths.Path.CompPath.PushoutPaths
+import ComputationalPaths.Path.CompPath.FigureEight
+import ComputationalPaths.Path.CompPath.BouquetN
+import ComputationalPaths.Path.CompPath.SphereCompPath
+import ComputationalPaths.Path.CompPath.Pi5S3
 -- removed legacy assumption-heavy modules (Mobius/Lens/Hopf/Pi2/Pi3/CP/James/Freudenthal/Cellular)
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived

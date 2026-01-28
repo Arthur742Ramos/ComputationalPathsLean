@@ -2,9 +2,9 @@
 # Connections to Lie Groups
 
 This module establishes connections between the computational paths framework
-and classical Lie group theory. It demonstrates how the abstract HIT-based
-approach captures the homotopy theory of important mathematical objects without
-requiring the smooth manifold structure.
+and classical Lie group theory. It demonstrates how the abstract computational
+path approach captures the homotopy theory of important mathematical objects
+without requiring the smooth manifold structure.
 
 ## Mathematical Background
 
@@ -28,7 +28,7 @@ is a crucial invariant that captures the "holes" in the group's topology.
 
 The computational paths framework captures homotopy-theoretic aspects:
 1. **No smooth structure needed**: We work purely with paths and their algebra
-2. **HITs model topological spaces**: Circle = SO(2) = U(1) as types
+2. **Constructed types model spaces**: Circle = SO(2) = U(1) as types
 3. **π₁ calculations are algebraic**: Encode-decode avoids geometric arguments
 4. **Maximal tori**: T^n appears as maximal torus in U(n), SU(n), SO(2n)
 
@@ -76,8 +76,8 @@ are complementary:
 
 | Aspect | Bordg-Cavalleri | This Framework |
 |--------|-----------------|----------------|
-| **Foundation** | Smooth manifolds | Higher Inductive Types |
-| **π₁ definition** | Via covering spaces | Via encode-decode on HITs |
+| **Foundation** | Smooth manifolds | Computational paths |
+| **π₁ definition** | Via covering spaces | Via encode-decode on computational paths |
 | **Lie group def** | Smooth manifold + group ops | Type with group structure |
 | **Tangent bundle** | Explicit construction | Not needed for homotopy |
 | **Strengths** | Full diff geometry | Direct π₁ computations |
@@ -85,8 +85,8 @@ are complementary:
 Both approaches should yield isomorphic π₁ for classical Lie groups. The computational
 paths approach is particularly suited for:
 - Direct algebraic computation of π₁
-- Working with HITs (spaces defined by constructors + path equations)
-- Univalence-style reasoning
+- Working with computational path semantics for spaces
+ - Reasoning with computational path equivalences
 
 The differential geometry approach is needed for:
 - Connections and curvature
@@ -94,18 +94,18 @@ The differential geometry approach is needed for:
 - Integration on manifolds
 -/
 
-import ComputationalPaths.Path.HIT.CircleCompPath
-import ComputationalPaths.Path.HIT.CircleStep
-import ComputationalPaths.Path.HIT.TorusStep
-import ComputationalPaths.Path.HIT.SphereCompPath
-import ComputationalPaths.Path.HIT.PushoutCompPath
+import ComputationalPaths.Path.CompPath.CircleCompPath
+import ComputationalPaths.Path.CompPath.CircleStep
+import ComputationalPaths.Path.CompPath.TorusStep
+import ComputationalPaths.Path.CompPath.SphereCompPath
+import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 
 namespace ComputationalPaths
 namespace Path
-open HIT
+open CompPath
 
 universe u v
 
@@ -302,7 +302,7 @@ Examples:
 - S³ ≃ SU(2): The 3-sphere is the simplest non-trivial simply connected
   compact Lie group.
 
-The 2-sphere S² (as shown in Sphere.lean) has π₁(S²) = 1, demonstrating
+The 2-sphere S² (as shown in CompPath/SphereCompPath.lean) has π₁(S²) = 1, demonstrating
 simple connectivity in the framework.
 -/
 
@@ -313,14 +313,14 @@ def IsSimplyConnected (A : Type u) : Prop :=
   ∀ (a : A) (α : π₁(A, a)), α = Quot.mk _ (Path.refl a)
 
 /-- S² is simply connected at the basepoint.
-    (This is proved in Sphere.lean as sphere2_pi1_trivial) -/
+    (This is proved in CompPath/SphereCompPath.lean as sphere2CompPath_pi1_trivial) -/
 theorem sphere2_simplyConnected_at_base :
-    ∀ (α : π₁(HIT.Sphere2CompPath, (HIT.Sphere2CompPath.basepoint : HIT.Sphere2CompPath))),
-    α = Quot.mk _ (Path.refl (HIT.Sphere2CompPath.basepoint : HIT.Sphere2CompPath)) := by
+    ∀ (α : π₁(CompPath.Sphere2CompPath, (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath))),
+    α = Quot.mk _ (Path.refl (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath)) := by
   simpa using
-    (HIT.Sphere2CompPath.sphere2CompPath_pi1_trivial :
-      ∀ (α : π₁(HIT.Sphere2CompPath, (HIT.Sphere2CompPath.basepoint : HIT.Sphere2CompPath))),
-        α = Quot.mk _ (Path.refl (HIT.Sphere2CompPath.basepoint : HIT.Sphere2CompPath)))
+    (CompPath.Sphere2CompPath.sphere2CompPath_pi1_trivial :
+      ∀ (α : π₁(CompPath.Sphere2CompPath, (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath))),
+        α = Quot.mk _ (Path.refl (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath)))
 
 /-- For simply connected types, the fundamental groupoid collapses to
     a codiscrete groupoid (any two points have exactly one morphism class). -/
@@ -362,8 +362,8 @@ noncomputable def torusN1_piOne_equiv_int :
 
 Both approaches should yield π₁(T^n) ≃ ℤⁿ for the n-torus. The key difference:
 
-1. **This framework**: Uses HITs + encode-decode
-   - T^n defined as iterated product of Circle (itself a HIT)
+1. **This framework**: Uses computational paths + encode-decode
+   - T^n defined as iterated product of Circle (constructed via paths)
    - π₁(S¹) ≃ ℤ via encode-decode
    - π₁(A × B) ≃ π₁(A) × π₁(B) via path projections
 
@@ -373,7 +373,7 @@ Both approaches should yield π₁(T^n) ≃ ℤⁿ for the n-torus. The key diff
    - The universal cover is ℝⁿ
 
 The isomorphism of results demonstrates that homotopy-theoretic invariants
-are independent of the foundation (smooth manifolds vs HITs). -/
+are independent of the foundation (smooth manifolds vs computational paths). -/
 theorem bordgCavalleri_connection :
     -- Both approaches yield π₁(S¹) ≃ ℤ
     -- Both should yield π₁(T^n) ≃ ℤⁿ

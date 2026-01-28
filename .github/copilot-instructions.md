@@ -7,7 +7,7 @@ This document provides guidance for GitHub Copilot when working with the Computa
 **Computational Paths** is a Lean 4 formalization of propositional equality via explicit computational paths and rewrite equality. It provides:
 
 1. **A rewrite-based equality system**: Paths are explicit witnesses of equality, related by a term rewriting system (LND_EQ-TRS)
-2. **Fundamental group calculations**: π₁ of various higher-inductive types (HITs) using encode-decode methods
+2. **Fundamental group calculations**: π₁ of computational-path constructions using encode-decode methods
 3. **Higher categorical structures**: Weak ω-groupoid structure on types via computational paths
 
 ## Build Commands
@@ -17,7 +17,7 @@ This document provides guidance for GitHub Copilot when working with the Computa
 lake build
 
 # Build specific module
-lake build ComputationalPaths.Path.HIT.Circle
+lake build ComputationalPaths.Path.CompPath.CircleCompPath
 
 # Run executable
 lake exe computational_paths
@@ -92,14 +92,7 @@ end ComputationalPaths
 
 ### Axiom Usage
 
-HITs require axioms for:
-- The type itself (`axiom Circle : Type u`)
-- Point constructors (`axiom circleBase : Circle`)
-- Path constructors (`axiom circleLoop : Path circleBase circleBase`)
-- Recursion/elimination principles
-- Computation rules
-
-Everything else should be proved from these axioms. Minimize axiom usage.
+Avoid new axioms. Prefer computational-path constructions (inductive point types + path-expression syntax) and keep any assumptions local and explicit in signatures.
 
 ## Common Patterns
 
@@ -133,8 +126,8 @@ def myFun : QuotType → Result :=
 
 1. **Don't use `Quot.liftOn₂`** - it doesn't exist in Lean 4; use nested `Quot.lift`
 2. **RwEq lemma names**: Use `rweq_cmpA_*` not `rweq_trans_*` for unit/inverse laws
-3. **Universe levels**: HITs are typically `Type u`; be consistent
-4. **Noncomputable**: Most definitions involving HITs need `noncomputable`
+3. **Universe levels**: Prefer `Type u` for new inductive types; be consistent
+4. **Noncomputable**: Encode/decode and quotient lifts often need `noncomputable`
 5. **Fin' vs Fin**: This codebase uses custom `Fin'` type, not Mathlib's `Fin`
 
 ## Key Theorems
@@ -149,4 +142,4 @@ def myFun : QuotType → Result :=
 ## References
 
 - de Queiroz et al., *Propositional equality, identity types, and direct computational paths*, SAJL 2016
-- HoTT Book, Chapters 2, 6, 8
+- HoTT Book, Chapters 2 and 8

@@ -92,7 +92,7 @@ This paper provides:
 
 	\item \textbf{Applications to algebraic topology}: stable homotopy stems $\pi_k^s$ for $k \leq 9$, Adams spectral sequence infrastructure, and axiom-free free group abelianization.
 
-	\item \textbf{Machine verification} in Lean 4: over 130 modules, zero \texttt{sorry} placeholders, no custom axioms beyond Lean's \texttt{Prop}.
+\item \textbf{Machine verification} in Lean 4: over 130 modules, zero \texttt{sorry} placeholders, no custom axioms beyond Lean's \texttt{Prop}.
 \end{enumerate}
 
 \subsection{Key Insight: Proof Irrelevance Yields Contractibility}
@@ -949,6 +949,7 @@ def derive_vcomp_refl_left (d : Derivation2 p q) :
 	The weak $\omega$-groupoid structure requires \textbf{no axioms} beyond:
 	\begin{enumerate}
 		\item Lean's proof-irrelevant \texttt{Prop} universe (built-in)
+		\item Circle HIT axioms (for $\pi_1(S^1) \cong \mathbb{Z}$, if computing fundamental groups)
 	\end{enumerate}
 \end{theorem}
 
@@ -1077,12 +1078,12 @@ The formalization includes complete encode-decode proofs for several fundamental
 \end{theorem}
 
 \begin{proof}[Proof Outline]
-	Using the computational-path circle with basepoint $\mathsf{base} : S^1$ and a formal loop generator $\mathsf{loop} : \mathsf{base} = \mathsf{base}$, we define:
+	Using the circle HIT with point constructor $\mathsf{base} : S^1$ and loop constructor $\mathsf{loop} : \mathsf{base} = \mathsf{base}$, we define:
 	\begin{itemize}
 		\item \textbf{Encode}: $\mathsf{encode} : (x : S^1) \to (\mathsf{base} = x) \to \mathsf{Cover}(x)$ where $\mathsf{Cover}$ is the universal cover (integers)
 		\item \textbf{Decode}: $\mathsf{decode} : (x : S^1) \to \mathsf{Cover}(x) \to (\mathsf{base} = x)$
 	\end{itemize}
-	The encode-decode equivalence is established by induction on path expressions, with $\mathsf{loop}^n$ corresponding to $n \in \mathbb{Z}$.
+	The encode-decode equivalence is established by path induction, with $\mathsf{loop}^n$ corresponding to $n \in \mathbb{Z}$.
 \end{proof}
 
 \paragraph{Torus.}
@@ -1211,7 +1212,7 @@ This is a fundamental result in algebra. Our proof is fully constructive with an
 
 The Lean formalization spans over 1100 lines, handling:
 \begin{itemize}
-	\item Free group definition as a quotient of words by relations
+	\item Free group definition as a HIT quotient
 	\item Abelianization as a further quotient by commutators
 	\item Explicit encode and decode functions
 	\item Full verification of the equivalence
@@ -1243,7 +1244,7 @@ We now assemble the preceding results into our main theorem.
 			      \item Triangle coherence (Theorem~\ref{thm:triangle})
 			      \item Interchange (Theorem~\ref{thm:interchange})
 		      \end{itemize}
-		\item \textbf{No axioms} beyond Lean's \texttt{Prop}
+		\item \textbf{No axioms} beyond Lean's \texttt{Prop} and Circle HIT
 	\end{enumerate}
 \end{theorem}
 
@@ -1319,7 +1320,7 @@ def contractibility3 (d1 d2 : Derivation2 p q) : Derivation3 d1 d2 :=
 
 	\item \textbf{Complete Confluence Proof:} We provide a machine-checked proof of confluence for $\mathrm{LND_{EQ}}$-TRS via Newman's Lemma, with explicit critical pair analysis.
 
-	\item \textbf{Minimal Axioms:} The construction requires no axioms beyond Lean's built-in \texttt{Prop}.
+	\item \textbf{Minimal Axioms:} The construction requires no axioms beyond Lean's built-in \texttt{Prop} and the Circle HIT (for $\pi_1(S^1)$ applications).
 
 	\item \textbf{Applications:} Stable homotopy stems $\pi_1^s$ through $\pi_9^s$, Adams spectral sequence infrastructure, and axiom-free free group abelianization $F_n^{\mathrm{ab}} \simeq \mathbb{Z}^n$.
 \end{enumerate}
@@ -1341,7 +1342,7 @@ The constructions in this paper have been formalized in Lean 4 and are available
 The formalized code comprises over 130 verified modules with:
 \begin{itemize}
 	\item Zero \texttt{sorry} placeholders
-	\item No custom axioms beyond Lean's \texttt{Prop}
+	\item No custom axioms beyond Circle HIT
 	\item Full compatibility with Lean 4's standard library (Mathlib)
 \end{itemize}
 
@@ -1374,7 +1375,7 @@ Several directions for future research emerge:
 
 	\item \textbf{Non-Contractible Higher Structure:} Our weak $\omega$-groupoid has contractible higher cells (dimension $\geq 3$). To model types with genuinely non-trivial higher homotopy (e.g., $S^2$ with $\pi_2 \cong \mathbb{Z}$), one would need to place $\mathrm{RwEq}$ in \texttt{Type} rather than \texttt{Prop}, making rewrite derivations distinguishable data.
 
-	\item \textbf{Computational-Path Constructions:} Extend the framework to additional spaces with explicit path-expression generators and quotient interfaces.
+	\item \textbf{Higher Inductive Types:} Extend the framework to handle HITs beyond the circle, with explicit path and higher path constructors.
 
 	\item \textbf{Spectral Sequences:} Complete the Adams spectral sequence infrastructure to enable full computation of stable homotopy groups from first principles.
 \end{enumerate}

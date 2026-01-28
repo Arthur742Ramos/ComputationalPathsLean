@@ -37,7 +37,7 @@ lake build
 lake build ComputationalPaths
 
 # Build specific module
-lake build ComputationalPaths.Path.HIT.Circle
+lake build ComputationalPaths.Path.CompPath.CircleCompPath
 
 # Build executable
 lake build computational_paths
@@ -114,10 +114,10 @@ failed to synthesize instance
 universe level mismatch
 ```
 
-**Solution**: Ensure consistent universe variables. HITs typically use `Type u`.
+**Solution**: Ensure consistent universe variables. Prefer `Type u` for new inductive types and structures.
 
 ```lean
-axiom MyHIT : Type u  -- not Type or Type*
+inductive MyType : Type u  -- not Type or Type*
 ```
 
 ### 5. Noncomputable Definition
@@ -205,7 +205,7 @@ import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
-import ComputationalPaths.Path.HIT.Circle
+import ComputationalPaths.Path.CompPath.CircleCompPath
 -- etc.
 ```
 
@@ -218,8 +218,8 @@ ComputationalPaths/
 └── Path/
     ├── Basic/
     │   └── Core.lean          → import ComputationalPaths.Path.Basic.Core
-    └── HIT/
-        └── Circle.lean        → import ComputationalPaths.Path.HIT.Circle
+    └── CompPath/
+        └── CircleCompPath.lean → import ComputationalPaths.Path.CompPath.CircleCompPath
 ```
 
 ## CI Integration

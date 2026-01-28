@@ -32,16 +32,16 @@ This adjunction is characterized by:
 
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Fibration
-import ComputationalPaths.Path.HIT.PushoutCompPath
+import ComputationalPaths.Path.CompPath.PushoutCompPath
 
 namespace ComputationalPaths
 namespace Path
 namespace SuspensionLoop
 
-open HigherHomotopy Fibration HIT
-open HIT
+open HigherHomotopy Fibration CompPath
+open CompPath
 
-open HIT.Pushout
+open CompPath.Pushout
 
 universe u
 
@@ -94,20 +94,20 @@ The suspension ΣX has north pole as its basepoint.
 
 /-- Suspension as a pushout of unit types. -/
 def Suspension (X : Type u) : Type u :=
-  HIT.Pushout PUnit' PUnit' X (fun _ => PUnit'.unit) (fun _ => PUnit'.unit)
+  CompPath.Pushout PUnit' PUnit' X (fun _ => PUnit'.unit) (fun _ => PUnit'.unit)
 
 namespace Suspension
 
 def north : Suspension X :=
-  HIT.Pushout.inl (A := PUnit') (B := PUnit') (C := X)
+  CompPath.Pushout.inl (A := PUnit') (B := PUnit') (C := X)
     (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) PUnit'.unit
 
 def south : Suspension X :=
-  HIT.Pushout.inr (A := PUnit') (B := PUnit') (C := X)
+  CompPath.Pushout.inr (A := PUnit') (B := PUnit') (C := X)
     (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) PUnit'.unit
 
 def merid (x : X) : Path (north (X := X)) (south (X := X)) :=
-  HIT.Pushout.glue (A := PUnit') (B := PUnit') (C := X)
+  CompPath.Pushout.glue (A := PUnit') (B := PUnit') (C := X)
     (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) x
 
 end Suspension
@@ -248,7 +248,8 @@ structure IsSimplyConnected (X : Pointed) extends IsPathConnectedPointed X where
     Quot.mk RwEq l = Quot.mk RwEq (Path.refl X.pt)
 
 /-- The suspension of a non-empty space has path-connected structure.
-    For the proof that π₁(ΣX) = 1, see Sphere.lean which proves this for S² = Σ(S¹)
+    For the proof that π₁(ΣX) = 1, see `CompPath/SphereCompPath.lean` which proves this
+    for S² = Σ(S¹)
     using Seifert-van Kampen. The general case requires similar machinery. -/
 noncomputable def susp_path_connected_structure {X : Type u} (x₀ : X) :
     -- South is connected to north via the meridian at x₀
@@ -261,10 +262,10 @@ noncomputable def susp_north_connected {X : Type u} :
   Path.refl (Suspension.north (X := X))
 
 /-- For a proof that suspensions of path-connected spaces are simply connected,
-    see Sphere.lean which establishes π₁(S²) = 1 via Seifert-van Kampen.
+    see `CompPath/SphereCompPath.lean` which establishes π₁(S²) = 1 via Seifert-van Kampen.
     The π₁(ΣX) = 1 result for general X follows the same pattern. -/
 theorem susp_pi1_trivial_for_sphere :
-    -- π₁(S²) = 1 is proven in Sphere.lean
+    -- π₁(S²) = 1 is proven in CompPath/SphereCompPath.lean
     True := trivial
 
 /-! ## Summary

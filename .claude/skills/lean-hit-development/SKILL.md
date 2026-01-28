@@ -1,183 +1,110 @@
 ---
 name: lean-hit-development
-description: Guides adding new Higher Inductive Types to the ComputationalPaths library. Use when creating new HITs, defining fundamental group (pi1) calculations, implementing encode-decode proofs, or adding new topological spaces.
+description: Guides adding new computational-path constructions to the ComputationalPaths library. Use when defining new spaces, pi1 calculations, encode-decode proofs, or adding new topological constructions.
 ---
 
-# Higher Inductive Type Development
+# Computational Path Construction Development
 
-This skill guides the implementation of new Higher Inductive Types (HITs) in the ComputationalPaths Lean 4 library, following established patterns for axiom declarations, recursion principles, and fundamental group calculations.
+This skill guides implementation of new computational-path spaces in the ComputationalPaths Lean 4 library. The goal is to define spaces using inductive point types and explicit path-expression syntax, then quotient by a relation and build encode-decode proofs without introducing new axioms.
 
 ## File Location
 
-New HITs go in `ComputationalPaths/Path/HIT/YourHIT.lean`
+New constructions go in `ComputationalPaths/Path/CompPath/YourSpace.lean`.
 
 ## Required Module Structure
 
 ```lean
-/-
-# [HIT Name] Higher Inductive Type
+/--
+# [Space Name] via computational paths
 
 Brief mathematical description of the space.
 
 ## Key Results
-
-- `yourHITBase`: The base point constructor
-- `yourHITLoop`: The path constructor(s)
-- `piOneEquiv*`: π₁(YourHIT) ≃ [Group]
-
-## Mathematical Background
-
-[Explain the topology/homotopy theory]
-
-## References
-
-- [Cite relevant papers]
+- `yourSpaceBase`: basepoint
+- `yourSpaceLoopExpr`: loop generator expression (if present)
+- `piOneEquiv*`: pi1 equivalence when available
 -/
 
-import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
--- other imports as needed
+import ComputationalPaths.Path.Homotopy.FundamentalGroup
 
 namespace ComputationalPaths
-namespace Path.HIT
+namespace Path.CompPath
 
-/-! ## Type and Constructor Axioms -/
+universe u
 
-axiom YourHIT : Type u
-axiom yourHITBase : YourHIT
-axiom yourHITLoop : Path yourHITBase yourHITBase  -- or other path constructors
+/-! ## Point type and basepoint -/
 
-/-! ## Recursion Principle -/
+inductive YourSpace : Type u
+  | base : YourSpace
 
-axiom YourHIT.rec {β : Type v} (base : β) (loop : Path base base) : YourHIT → β
-axiom YourHIT.rec_base : YourHIT.rec base loop yourHITBase = base
+@[simp] def yourSpaceBase : YourSpace := YourSpace.base
 
-/-! ## Path Recursion (for encode) -/
+/-! ## Path expressions and generators -/
 
-axiom YourHIT.recPath {a : YourHIT} (P : YourHIT → Type)
-  (pbase : P yourHITBase)
-  (ploop : Path (transport P yourHITLoop pbase) pbase)
-  : (x : YourHIT) → P x
+inductive YourSpaceExpr : YourSpace → YourSpace → Type u
+  | loop : YourSpaceExpr yourSpaceBase yourSpaceBase
+  | refl (a : YourSpace) : YourSpaceExpr a a
+  | symm {a b} (p : YourSpaceExpr a b) : YourSpaceExpr b a
+  | trans {a b c} (p : YourSpaceExpr a b) (q : YourSpaceExpr b c) : YourSpaceExpr a c
 
-/-! ## Presentation Type -/
+/-! ## Relation, quotient, and pi1 -/
 
--- Define the group presentation
-inductive YourGroupWord
-  | e : YourGroupWord           -- identity
-  | gen : YourGroupWord         -- generator(s)
-  | inv : YourGroupWord → YourGroupWord
-  | mul : YourGroupWord → YourGroupWord → YourGroupWord
+def yourSpaceRel : YourSpaceExpr yourSpaceBase yourSpaceBase →
+  YourSpaceExpr yourSpaceBase yourSpaceBase → Prop := ...
 
-inductive YourGroupRel : YourGroupWord → YourGroupWord → Prop
-  | inv_left : YourGroupRel (mul (inv w) w) e
-  | inv_right : YourGroupRel (mul w (inv w)) e
-  -- group-specific relations
+def yourSpaceSetoid : Setoid (YourSpaceExpr yourSpaceBase yourSpaceBase) := ...
 
-def YourGroupPresentation := Quot YourGroupRel
+abbrev yourSpacePiOne : Type u := Quot yourSpaceSetoid.r
 
-/-! ## Encode-Decode -/
+/-! ## Encode-decode -/
 
--- Decode: presentation → π₁
-noncomputable def decode : YourGroupPresentation → π₁(YourHIT, yourHITBase) :=
-  Quot.lift
-    (fun w => wordToLoop w)
-    (fun _ _ h => Quot.sound (decode_respects_rel h))
+noncomputable def encode : yourSpacePiOne → Presentation := ...
+noncomputable def decode : Presentation → yourSpacePiOne := ...
 
--- Encode: π₁ → presentation (often needs axioms)
-axiom encodePath : Path yourHITBase yourHITBase → YourGroupWord
-axiom encodePath_respects_rweq : RwEq p q → YourGroupRel (encodePath p) (encodePath q)
+theorem decode_encode (x : yourSpacePiOne) : decode (encode x) = x := by
+  -- quotient induction
+  ...
 
-noncomputable def encode : π₁(YourHIT, yourHITBase) → YourGroupPresentation :=
-  Quot.lift
-    (fun p => Quot.mk _ (encodePath p))
-    (fun _ _ h => Quot.sound (encodePath_respects_rweq h))
+theorem encode_decode (y : Presentation) : encode (decode y) = y := by
+  -- quotient induction
+  ...
 
-/-! ## Round-Trip Proofs -/
+noncomputable def piOneEquiv : SimpleEquiv yourSpacePiOne Presentation := ...
 
-theorem decode_encode (α : π₁(YourHIT, yourHITBase)) : decode (encode α) = α := by
-  induction α using Quot.ind with
-  | _ p => exact Quot.sound (decode_encode_path p)
-
-theorem encode_decode (x : YourGroupPresentation) : encode (decode x) = x := by
-  induction x using Quot.ind with
-  | _ w => exact Quot.sound (encode_decode_word w)
-
-/-! ## Main Equivalence -/
-
-noncomputable def piOneEquivYourGroup : SimpleEquiv (π₁(YourHIT, yourHITBase)) YourGroupPresentation where
-  toFun := encode
-  invFun := decode
-  left_inv := decode_encode
-  right_inv := encode_decode
-
-/-! ## Summary -/
-
-/-
-This module establishes:
-1. YourHIT as an axiomatized higher inductive type
-2. π₁(YourHIT, yourHITBase) ≃ YourGroupPresentation
--/
-
-end Path.HIT
+end Path.CompPath
 end ComputationalPaths
 ```
 
-## Checklist for New HITs
+## Checklist for New Constructions
 
-1. **Define axioms** for type and constructors
-2. **Define recursion principle** (non-dependent and dependent)
-3. **Define computation rules** (β-rules as axioms)
-4. **Create group presentation type** (words + relations)
-5. **Implement decode** (presentation → π₁)
-6. **Implement encode** (π₁ → presentation, may need axioms)
-7. **Prove decode_respects_rel** using RwEq lemmas
-8. **Prove round-trip properties** (decode_encode, encode_decode)
-9. **Package as SimpleEquiv**
-10. **Add to imports** in `ComputationalPaths/Path.lean`
-11. **Update README** with new result
+1. Define the point type and basepoint.
+2. Define path expressions and any generators.
+3. Provide a relation or normal form for loops.
+4. Define the quotient for pi1 (or path classes).
+5. Implement encode/decode and prove round-trip properties.
+6. Add to imports in `ComputationalPaths/Path.lean`.
+7. Update README with the new result.
 
-## Common HIT Patterns
+## Common Patterns
 
-### Circle (S¹)
-- One base point, one loop
-- π₁(S¹) ≃ ℤ
-
-### Torus (T²)
-- One base point, two loops (a, b) with `aba⁻¹b⁻¹ = refl`
-- π₁(T²) ≃ ℤ × ℤ
-
-### Sphere (S²)
-- One base point, one 2-cell (surface) filling a constant loop
-- π₁(S²) ≃ 1 (trivial)
-
-### Wedge Sum (A ∨ B)
-- Glue base points together
-- π₁(A ∨ B) ≃ π₁(A) * π₁(B) (free product)
-
-### Orientable Surface (Σ_g)
-- Genus g with 2g generators and surface relation
-- π₁(Σ_g) ≃ ⟨a₁,b₁,...,a_g,b_g | [a₁,b₁]⋯[a_g,b_g] = 1⟩
+- Circle: one basepoint, one loop generator, encode via winding number.
+- Torus: product of circle constructions and the pi1 product theorem.
+- Pushout/wedge: quotient-based pushout plus SVK encode/decode interfaces.
+- Sphere: suspension or pushout arguments for pi1 triviality.
 
 ## Key Imports
 
 ```lean
-import ComputationalPaths.Path.Basic.Core           -- Path, refl, symm, trans
-import ComputationalPaths.Path.Basic.Congruence     -- congrArg, transport
-import ComputationalPaths.Path.Rewrite.RwEq         -- RwEq and lemmas
-import ComputationalPaths.Path.Rewrite.SimpleEquiv  -- SimpleEquiv structure
-import ComputationalPaths.Path.Homotopy.FundamentalGroup  -- π₁ notation
-import ComputationalPaths.Path.Homotopy.Loops       -- LoopSpace
+import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Basic.Congruence
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.CompPath.CircleCompPath
 ```
 
-## Axiom Minimization
+## Axiom Policy
 
-Only use axioms for:
-- The HIT type itself
-- Point constructors
-- Path constructors
-- Higher path constructors (2-cells, etc.)
-- Recursion/elimination principles
-- Computation rules (β-rules)
-- Encode function (when not definable)
-
-Everything else should be **proved** from these axioms.
+Avoid new axioms. If an interface is needed, prefer Prop-level typeclass assumptions and keep them local to the smallest scope possible.

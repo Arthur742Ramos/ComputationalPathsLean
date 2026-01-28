@@ -46,15 +46,11 @@ HoTT-style developments, not something that can be instantiated inside Lean’s 
 
 ## Current kernel axioms (global)
 
-`Scripts/AxiomInventory.lean` currently reports **7** kernel axioms when importing `ComputationalPaths` (the Circle constructors and eliminators).
+`Scripts/AxiomInventory.lean` currently reports **0** kernel axioms when importing `ComputationalPaths`.
 
-### HIT interfaces (7 axioms)
+### Axiomatic interfaces
 
-Kernel axioms are restricted to HIT-style interfaces that are not constructible in standard Lean 4:
-
-- `Circle` (constructors + recursor/β rules)
-
-Torus is now a *constructed* type (Circle × Circle) and contributes no kernel axioms. The Möbius band module was removed as legacy placeholder code.
+This project no longer relies on kernel axioms for space constructors; all core spaces are defined via computational paths.
 
 ### Quarantined assumptions (typeclasses)
 These assumptions remain explicit in signatures; there are no opt-in kernel-axiom wrapper files anymore.
@@ -74,7 +70,7 @@ No univalence or pushout computation/naturality principles remain as kernel axio
 
 Kernel axioms *used by* `ComputationalPaths.Path.circlePiOneEquivInt`:
 
-- `Circle`, `circleBase`, `circleLoop`
+- None (all computational-path constructions).
 
 This is reported by `Scripts/AxiomDependencies.lean`.
 
@@ -82,25 +78,22 @@ Non-kernel assumptions required by the circle encode/decode development:
 
 - `ComputationalPaths.Path.HasCircleLoopDecode`
   - Circle-specific loop classification hypothesis (encode/decode “decode∘encode” direction).
-  - Defined in `ComputationalPaths/Path/HIT/Circle.lean`.
-  - Speaks about *raw* loops (`Path circleBase circleBase`) and provides a normal form
+  - Defined in `ComputationalPaths/Path/CompPath/CircleCompPath.lean`.
+  - Speaks about *raw* loops (`Path circleCompPathBase circleCompPathBase`) and provides a normal form
     `loop^n` up to `RwEq`.
   - This interface is now *derivable* from the quotient-level interface
     `HasCirclePiOneEncode` via `hasCircleLoopDecodeOfPiOneEncode` in
-    `ComputationalPaths/Path/HIT/CircleStep.lean`.
+    `ComputationalPaths/Path/CompPath/CircleStep.lean`.
 
 - `ComputationalPaths.Path.HasCirclePiOneEncode`
   - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
     an `encode : π₁(S¹) → ℤ` with `encode (circleDecode z) = z` and
     `circleDecode (encode x) = x`.
-  - Defined in `ComputationalPaths/Path/HIT/CircleStep.lean`.
+  - Defined in `ComputationalPaths/Path/CompPath/CircleStep.lean`.
   - Every `[HasCircleLoopDecode]` provides an instance, and conversely
     `HasCirclePiOneEncode` can be turned back into `HasCircleLoopDecode` when a
     raw-loop statement is required.
-  - Downstream developments
-    (e.g. legacy `Pi2Sphere.lean`,
-    `ComputationalPaths/Path/Homotopy/LieGroups.lean`) now depend only on this weaker
-    hypothesis.
+  - Downstream developments now depend only on this weaker hypothesis.
 
 ### Local assumption instance
 
@@ -112,7 +105,7 @@ kernel-axiom wrapper.
 
 Kernel axioms *used by* `ComputationalPaths.Path.torusPiOneEquivIntProd`:
 
-- `Circle`, `circleBase`, `circleLoop`
+- None (all computational-path constructions).
 
 Non-kernel assumptions required by the torus encode/decode development:
 
@@ -120,7 +113,7 @@ Non-kernel assumptions required by the torus encode/decode development:
   - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
     an `encode : π₁(T²) → ℤ × ℤ` with `encode (torusDecode z) = z` and
     `torusDecode (encode x) = x`.
-  - Defined in `ComputationalPaths/Path/HIT/TorusStep.lean`.
+  - Defined in `ComputationalPaths/Path/CompPath/TorusStep.lean`.
   - Since `Torus` is defined as `Circle × Circle`, `TorusStep.lean` provides an instance
     `[HasCirclePiOneEncode] → HasTorusPiOneEncode` using the product fundamental
     group theorem.
@@ -138,22 +131,22 @@ The lens space module was removed as legacy placeholder code. Any future
 formalization should reintroduce the equivalence without new axioms.
 ## Pushout / SVK
 
-The pushout is implemented as a quotient, but some HIT-style β/naturality laws are not definitional.
+The pushout is implemented as a quotient, but some β/naturality laws are not definitional.
 These are now **non-kernel assumptions**:
 
 - `Pushout.HasRecGlueRwEq` (recursor β-rule on `glue`, up to `RwEq`)
 - `Pushout.HasIndGlueRwEq` (inductor β-rule on `glue`, up to `RwEq`)
 - `Pushout.HasGlueNaturalRwEq` (full glue naturality, up to `RwEq`)
 - `Pushout.HasGlueNaturalLoopRwEq` (loop-only glue naturality at a chosen basepoint)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeQuot` (SVK encode map)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeEncode` (SVK law: `decode ∘ encode = id`)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeDecode` (SVK law: `encode ∘ decode ~ id` up to `AmalgEquiv`)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeDecodeFull` (SVK law: `encode ∘ decode ~ id` up to `FullAmalgEquiv`)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeAmalgBijective` (SVK: Prop-level `pushoutDecodeAmalg` bijective)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeFullAmalgBijective` (SVK: Prop-level `pushoutDecodeFullAmalg` bijective)
+- `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKEncodeQuot` (SVK encode map)
+- `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKDecodeEncode` (SVK law: `decode ∘ encode = id`)
+- `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKEncodeDecode` (SVK law: `encode ∘ decode ~ id` up to `AmalgEquiv`)
+- `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKEncodeDecodeFull` (SVK law: `encode ∘ decode ~ id` up to `FullAmalgEquiv`)
+- `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKDecodeAmalgBijective` (SVK: Prop-level `pushoutDecodeAmalg` bijective)
+- `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKDecodeFullAmalgBijective` (SVK: Prop-level `pushoutDecodeFullAmalg` bijective)
 
-They are defined in `ComputationalPaths/Path/HIT/Pushout.lean` and
-`ComputationalPaths/Path/HIT/PushoutPaths.lean`.
+They are defined in `ComputationalPaths/Path/CompPath/PushoutCompPath.lean` and
+`ComputationalPaths/Path/CompPath/PushoutPaths.lean`.
 
 Notes:
 
@@ -163,7 +156,7 @@ Notes:
   or when both legs satisfy Axiom K (e.g. `Subsingleton A` and `Subsingleton B`,
   or `[DecidableEq A] [HasDecidableEqAxiomK A]` and similarly for `B`)).
 - `seifertVanKampenEquiv` depends on the split SVK assumptions above; the legacy bundled
-  class `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeData` remains as a convenience wrapper.
+  class `ComputationalPaths.Path.CompPath.PushoutPaths.HasPushoutSVKEncodeData` remains as a convenience wrapper.
 - `seifertVanKampenFullEquiv` is the corresponding equivalence with the *full* target
   `FullAmalgamatedFreeProduct` (amalgamation + free reduction). It depends on
   `HasPushoutSVKEncodeDecodeFull`, which is weaker than `HasPushoutSVKEncodeDecode`
@@ -185,9 +178,6 @@ Notes:
     `wedgeFundamentalGroupEquiv_of_decode_bijective` (no wrapper class).
   Provide local instances of the Prop-level interface where needed; the old
   kernel-axiom wrapper file has been removed.
-
-
-
 
 
 

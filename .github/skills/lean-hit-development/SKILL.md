@@ -1,62 +1,80 @@
 ---
 name: lean-hit-development
-description: Guides adding new Higher Inductive Types to the ComputationalPaths library. Use when creating new HITs, defining fundamental group (pi1) calculations, implementing encode-decode proofs, or adding new topological spaces.
+description: Guides adding new computational-path constructions to the ComputationalPaths library. Use when defining new spaces, π₁ calculations, encode-decode proofs, or adding new topological constructions.
 ---
 
-# Higher Inductive Type Development
+# Computational Path Construction Development
 
-Add new HITs to the ComputationalPaths library.
+Add new computational-path constructions to the ComputationalPaths library.
 
 ## File Location
 
-`ComputationalPaths/Path/HIT/YourHIT.lean`
+`ComputationalPaths/Path/CompPath/YourSpace.lean`
 
 ## Required Structure
 
 ```lean
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 
-namespace ComputationalPaths.Path.HIT
+namespace ComputationalPaths.Path.CompPath
 
-/-! ## Type and Constructor Axioms -/
+/-! ## Point type and basepoint -/
 
-axiom YourHIT : Type u
-axiom yourHITBase : YourHIT
-axiom yourHITLoop : Path yourHITBase yourHITBase
+inductive YourSpace : Type u
+  | base : YourSpace
 
-/-! ## Recursion Principle -/
+@[simp] def yourSpaceBase : YourSpace := YourSpace.base
 
-axiom YourHIT.rec {β : Type v} (base : β) (loop : Path base base) : YourHIT → β
+/-! ## Path expressions with generators -/
 
-/-! ## Encode-Decode for π₁ -/
+inductive YourSpaceExpr : YourSpace → YourSpace → Type u
+  | loop : YourSpaceExpr yourSpaceBase yourSpaceBase
+  | refl (a : YourSpace) : YourSpaceExpr a a
+  | symm {a b} (p : YourSpaceExpr a b) : YourSpaceExpr b a
+  | trans {a b c} (p : YourSpaceExpr a b) (q : YourSpaceExpr b c) : YourSpaceExpr a c
 
-noncomputable def decode : Presentation → π₁(YourHIT, yourHITBase) := ...
-noncomputable def encode : π₁(YourHIT, yourHITBase) → Presentation := ...
+/-! ## Relation, quotient, and encode/decode -/
 
-noncomputable def piOneEquiv : SimpleEquiv (π₁(YourHIT, base)) Presentation where
-  toFun := encode
-  invFun := decode
-  left_inv := decode_encode
-  right_inv := encode_decode
+def yourSpaceRel : YourSpaceExpr yourSpaceBase yourSpaceBase →
+  YourSpaceExpr yourSpaceBase yourSpaceBase → Prop := ...
 
-end ComputationalPaths.Path.HIT
+def yourSpaceSetoid : Setoid (YourSpaceExpr yourSpaceBase yourSpaceBase) := ...
+
+abbrev yourSpacePiOne : Type u := Quot yourSpaceSetoid.r
+
+noncomputable def encode : yourSpacePiOne → Presentation := ...
+noncomputable def decode : Presentation → yourSpacePiOne := ...
+
+theorem decode_encode : decode (encode x) = x := by
+  -- quotient induction
+  ...
+
+theorem encode_decode : encode (decode y) = y := by
+  -- quotient induction
+  ...
+
+noncomputable def piOneEquiv : SimpleEquiv yourSpacePiOne Presentation := ...
+
+end ComputationalPaths.Path.CompPath
 ```
 
 ## Checklist
 
-1. Define axioms for type and constructors
-2. Define recursion principle
-3. Create group presentation type
-4. Implement encode/decode
+1. Define the point type and basepoint
+2. Define path expressions and generators
+3. Provide a relation/normal form and a quotient for π₁
+4. Implement encode/decode over the quotient
 5. Prove round-trip properties
 6. Add to imports in `ComputationalPaths/Path.lean`
 7. Update README
 
-## Common HITs
+## Common Constructions
 
-| HIT | π₁ |
-|-----|-----|
-| Circle (S¹) | ℤ |
-| Torus (T²) | ℤ × ℤ |
-| Sphere (S²) | 1 (trivial) |
-| Wedge (A ∨ B) | π₁(A) * π₁(B) |
+| Space | Computational-path model |
+|------|---------------------------|
+| Circle (S¹) | One basepoint, one loop generator |
+| Torus (T²) | Product of circle constructions |
+| Sphere (S²) | Suspension/pushout-based loop triviality |
+| Wedge (A ∨ B) | Pushout of basepoints, free product on π₁ |

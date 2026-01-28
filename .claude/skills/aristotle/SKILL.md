@@ -1,6 +1,6 @@
 ---
 name: aristotle
-description: Run Aristotle automated theorem prover on Lean files to fill sorry placeholders. Use when you have a file with sorries that needs automated proof search. Handles API setup, HIT detection, and result verification.
+description: Run Aristotle automated theorem prover on Lean files to fill sorry placeholders. Use when you have a file with sorries that needs automated proof search. Handles API setup, axiom import checks, and result verification.
 ---
 
 # Aristotle Automated Theorem Prover
@@ -21,20 +21,20 @@ When the user invokes `/aristotle`, follow these steps:
 
 1. **Check file exists**: Verify the specified `.lean` file exists
 2. **Check for sorries**: Grep for `sorry` in the file - if none, inform user
-3. **Check for HIT imports**: Search for imports from `Path/HIT/` or HIT axiom files
+3. **Check for axiom imports**: Search for imports from `*Axiom.lean` or explicit `axiom` declarations
 
 ```bash
-# Check for HIT imports that will cause Aristotle to fail
-grep -E "import.*Path\.HIT\.|import.*Circle|import.*Torus|import.*Sphere|import.*Klein|import.*Projective|import.*Orientable|import.*NonOrientable|import.*Pushout|import.*Cylinder|import.*Mobius" "path/to/file.lean"
+# Check for axiom imports that will cause Aristotle to fail
+grep -E "import.*Axiom|axiom " "path/to/file.lean"
 ```
 
-If HIT imports found, **warn the user**:
+If axiom imports found, **warn the user**:
 ```
-WARNING: This file imports HIT modules. Aristotle will likely reject it due to axiom detection.
+WARNING: This file imports axiom-heavy modules. Aristotle will likely reject it due to axiom detection.
 
 Options:
-1. Factor out non-HIT dependent proofs into a separate file
-2. Use `admit` for HIT-dependent sorries and run Aristotle on the rest
+1. Factor out axiom-free proofs into a separate file
+2. Use `admit` for axiom-dependent sorries and run Aristotle on the rest
 3. Proceed anyway (will likely fail)
 
 Do you want to proceed?
@@ -100,28 +100,29 @@ info: path/to/file_aristotle.lean:41:2: Try this: exact rfl
 /aristotle ComputationalPaths/Path/MyFile.lean --context ComputationalPaths/Path/Basic
 ```
 
-## HIT Axiom Limitation
+## Axiom Import Limitation
 
 **Critical**: Aristotle rejects files that import modules containing axioms.
 
 ### Files That Work
 - `Path/Basic/*` - Core definitions
-- `Path/Rewrite/*` - Rewrite system (except ConfluenceConstructiveAxiom)
+- `Path/Rewrite/*` - Rewrite system (excluding `*Axiom.lean` helpers)
+- `Path/CompPath/*` - Computational-path constructions
 - `Path/Groupoid.lean` - Category theory
 - `Path/Bicategory.lean` - 2-category theory
 
 ### Files That Don't Work
-- `Path/HIT/*` - All HIT definitions
-- Any file importing HITs transitively
 - Files with `*Axiom.lean` imports
+- Files that declare new `axiom`s locally
+- Any file importing axiom-heavy modules transitively
 
 ### Workaround Strategy
 
-If a file has both HIT-dependent and pure theorems:
+If a file has both axiom-dependent and pure theorems:
 
 1. **Factor out pure proofs** into a separate file
 2. **Run Aristotle** on the pure file
-3. **Manually prove** HIT-dependent theorems
+3. **Manually prove** axiom-dependent theorems
 
 ## Interpreting Aristotle Output
 
@@ -157,7 +158,7 @@ The following was proved by Aristotle:
 Aristotle encountered an error while processing imports for this file.
 Error: Axioms were added during init_sorries: [...]
 ```
-**Cause**: File imports HIT axioms.
+**Cause**: File imports axiom declarations.
 
 ### Counterexamples
 
@@ -210,7 +211,7 @@ export ARISTOTLE_API_KEY='arstl_hCSoWHQ4OwTccQbXeuRXOHF-UqIH8RtVMUjS2B_vIpI'
 
 | Issue | Solution |
 |-------|----------|
-| "Axioms were added" | File imports HITs - factor out non-HIT code |
+| "Axioms were added" | File imports axioms - factor out axiom-free code |
 | "already been declared" | Rename theorem to avoid conflict |
 | Timeout/stuck | Use `--no-wait`, check dashboard later |
 | `exact?` in output | Run `lake build` to see suggestions |
@@ -222,7 +223,7 @@ User: `/aristotle ComputationalPaths/Path/Basic/NewLemmas.lean`
 
 Claude:
 1. Reads file, finds 3 sorries
-2. Checks imports - no HITs, safe to proceed
+2. Checks imports - no axiom imports, safe to proceed
 3. Runs Aristotle (waits ~3-5 minutes)
 4. Reports: "Aristotle proved 3/3 theorems"
 5. Offers: "Want me to verify the output compiles?"

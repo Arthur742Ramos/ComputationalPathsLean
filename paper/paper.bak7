@@ -1341,7 +1341,7 @@ The constructions in this paper have been formalized in Lean 4 and are available
 The formalized code comprises over 130 verified modules with:
 \begin{itemize}
 	\item Zero \texttt{sorry} placeholders
-	\item No custom axioms beyond Lean's \texttt{Prop}
+\item No custom axioms beyond Lean's \texttt{Prop}
 	\item Full compatibility with Lean 4's standard library (Mathlib)
 \end{itemize}
 
@@ -1374,7 +1374,7 @@ Several directions for future research emerge:
 
 	\item \textbf{Non-Contractible Higher Structure:} Our weak $\omega$-groupoid has contractible higher cells (dimension $\geq 3$). To model types with genuinely non-trivial higher homotopy (e.g., $S^2$ with $\pi_2 \cong \mathbb{Z}$), one would need to place $\mathrm{RwEq}$ in \texttt{Type} rather than \texttt{Prop}, making rewrite derivations distinguishable data.
 
-	\item \textbf{Computational-Path Constructions:} Extend the framework to additional spaces with explicit path-expression generators and quotient interfaces.
+	\item \textbf{Higher Inductive Types:} Extend the framework to handle HITs beyond the circle, with explicit path and higher path constructors.
 
 	\item \textbf{Spectral Sequences:} Complete the Adams spectral sequence infrastructure to enable full computation of stable homotopy groups from first principles.
 \end{enumerate}

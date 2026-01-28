@@ -8,7 +8,7 @@ Rewrite `original_paper.tex` (arXiv:2512.00657) into `paper.tex` (v2) incorporat
 - All coherences shown as derivable from contractibility
 - Confluence proof expanded with Newman's Lemma
 - New applications section (stable stems, Adams SS, abelianization)
-- Axiom count updated: 0 beyond Circle HIT and Prop
+- Axiom count updated: 0 beyond Lean's Prop
 - Paper length ~24+ pages (original is 1276 lines)
 
 ## Constraints/Assumptions

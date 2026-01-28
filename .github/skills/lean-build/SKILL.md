@@ -14,7 +14,7 @@ Build the ComputationalPaths Lean 4 project using Lake.
 lake build
 
 # Build specific module
-lake build ComputationalPaths.Path.HIT.Circle
+lake build ComputationalPaths.Path.CompPath.CircleCompPath
 
 # Clean and rebuild
 lake clean && lake build

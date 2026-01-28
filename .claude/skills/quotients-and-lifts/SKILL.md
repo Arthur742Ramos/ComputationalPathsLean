@@ -23,7 +23,7 @@ def encode : Quot r → B :=
     exact hf a b hab)
 ```
 
-In this repo, the “respects” proof is often built from an `RwEq` lemma, e.g. `circleEncodePath_rweq` in `ComputationalPaths/Path/HIT/Circle.lean`.
+In this repo, the “respects” proof is often built from an `RwEq` lemma or a normal-form lemma; see `circleCompPathEncode` in `ComputationalPaths/Path/CompPath/CircleCompPath.lean` for a concrete example.
 
 ### 2) Proving something for all quotient elements: `Quot.ind`
 
@@ -62,7 +62,7 @@ def f2 : Quot r1 → Quot r2 → C :=
     x
 ```
 
-This pattern appears in HIT / SVK developments where you map pairs of quotient classes into another quotient.
+This pattern appears in SVK and other quotient-heavy developments where you map pairs of quotient classes into another quotient.
 
 ## Practical checklist for “respects relation” proofs
 
@@ -77,4 +77,3 @@ When `Quot.lift` fails due to the second argument:
 - **Wrong obligation shape**: `Quot.lift` wants equality in the codomain, not a relation proof. If your codomain is itself a quotient, you usually finish with `Quot.sound`.
 - **Direction mismatch**: `Quot.sound` expects `r a b`; use symmetry of the relation when you have `r b a`.
 - **Getting stuck on function equality** (nested lifts): use `funext` + `Quot.ind` on the remaining quotient argument(s).
-

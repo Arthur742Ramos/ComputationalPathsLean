@@ -1,5 +1,5 @@
 import Lean
-import ComputationalPaths.Path.HIT.CircleStep
+import ComputationalPaths.Path.CompPath.CircleStep
 
 open Lean
 open Lean.Elab

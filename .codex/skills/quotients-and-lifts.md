@@ -8,5 +8,4 @@ Use this checklist when writing or refactoring code that maps out of a quotient 
 - For nested quotients, prefer nested `Quot.lift` + `funext` + `Quot.ind` (Lean 4 often lacks convenient `liftOn2` helpers).
 
 Useful repo examples:
-- `ComputationalPaths/Path/HIT/Circle.lean` uses `Quot.lift` for an `encode`-style map.
-
+- `ComputationalPaths/Path/CompPath/CircleCompPath.lean` uses `Quot.lift` for an `encode`-style map.

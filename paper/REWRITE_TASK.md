@@ -65,19 +65,19 @@ The formalization now includes:
 **Free Group Abelianization** (`Algebra/Abelianization.lean`):
 - F_n^ab ≅ ℤⁿ with full encode-decode equivalence
 
-**π₅(S³) ≅ ℤ/2ℤ** (`HIT/Pi5S3.lean`)
+**π₅(S³) ≅ ℤ/2ℤ** (`CompPath/Pi5S3.lean`)
 
 ### 5. Update Axiom Count
 
 **Original**: 14+ axioms
-**New**: 0 axioms beyond Circle HIT and Lean's Prop
+**New**: 0 axioms beyond Lean's Prop
 
 Add a comparison table in the introduction.
 
 ### 6. Update Verification Claims
 
 **Original**: "formalized in Lean 4"
-**New**: "130+ verified modules, zero sorry placeholders, no custom axioms beyond Circle HIT, complete confluence proof"
+**New**: "130+ verified modules, zero sorry placeholders, no custom axioms beyond Lean's Prop, complete confluence proof"
 
 ## Files to Reference
 

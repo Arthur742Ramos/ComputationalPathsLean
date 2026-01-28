@@ -7,7 +7,7 @@ This document provides guidance for AI assistants working with the Computational
 **Computational Paths** is a Lean 4 formalization of propositional equality via explicit computational paths and rewrite equality. It provides:
 
 1. **A rewrite-based equality system**: Paths are explicit witnesses of equality, related by a term rewriting system (LND_EQ-TRS)
-2. **Fundamental group calculations**: π₁ of various higher-inductive types (HITs) using encode-decode methods
+2. **Fundamental group calculations**: π₁ of computational-path constructions using encode-decode methods
 3. **Higher categorical structures**: Weak ω-groupoid structure on types via computational paths
 
 ### Mathematical Foundation
@@ -45,15 +45,16 @@ ComputationalPaths/
     │   ├── HoTT.lean             # Homotopy lemmas exported to Eq
     │   └── ...
     │
-    ├── HIT/                      # Higher-Inductive Types
-    │   ├── Circle.lean           # S¹ with π₁(S¹) ≃ ℤ
+    ├── CompPath/                 # Computational-path constructions
+    │   ├── CircleCompPath.lean   # S¹ via path expressions
     │   ├── CircleStep.lean       # Circle encode-decode proofs
-    │   ├── Torus.lean            # T² with π₁(T²) ≃ ℤ × ℤ
-    │   ├── Sphere.lean           # S² with π₁(S²) ≅ 1
-    │   ├── Pushout.lean          # Pushout HIT, wedge sum, suspension
+    │   ├── Torus.lean            # T² via product
+    │   ├── TorusStep.lean        # Torus encode-decode proofs
+    │   ├── SphereCompPath.lean   # S² with π₁(S²) ≅ 1
+    │   ├── PushoutCompPath.lean  # Pushout construction and recursors
     │   ├── PushoutPaths.lean     # SVK theorem, free products
     │   ├── FigureEight.lean      # S¹ ∨ S¹ with π₁ ≃ ℤ * ℤ
-    │   ├── (legacy removed) MobiusBand/LensSpace/ComplexProjectiveSpaces/JamesConstruction
+    │   ├── BouquetN.lean         # ∨ⁿS¹ and free group presentation
     │
     ├── Groupoid.lean             # Weak/strict category & groupoid
     ├── Bicategory.lean           # Weak bicategory, 2-groupoid
@@ -221,15 +222,7 @@ end ComputationalPaths
 
 ### Axiom Usage
 
-HITs require axioms for:
-- The type itself (`axiom Circle : Type u`)
-- Point constructors (`axiom circleBase : Circle`)
-- Path constructors (`axiom circleLoop : Path circleBase circleBase`)
-- Higher path constructors (2-cells, etc.)
-- Recursion/elimination principles
-- Computation rules (β-rules)
-
-Everything else should be proved from these axioms. Minimize axiom usage.
+Avoid new axioms. Prefer computational-path constructions (inductive point types, path expressions, and quotients), and keep any assumptions local and explicit in signatures (often Prop-valued typeclasses). Everything else should be proved from these definitions.
 
 ### Proof Style
 
@@ -249,9 +242,9 @@ Everything else should be proved from these axioms. Minimize axiom usage.
 -- Define decode (constructive when possible)
 noncomputable def decode : Presentation → π₁(X, base) := ...
 
--- Define encode (often via HIT recursion axiom)
-axiom encodePath : Path base base → Word
-axiom encodePath_respects_rweq : RwEq p q → Rel (encodePath p) (encodePath q)
+-- Define encode (often via explicit loop normal forms or a local interface)
+def encodePath : Path base base → Word := ...
+theorem encodePath_respects_rweq : RwEq p q → Rel (encodePath p) (encodePath q) := ...
 
 noncomputable def encode : π₁(X, base) → Presentation :=
   Quot.lift (fun p => Quot.mk _ (encodePath p))
@@ -312,7 +305,7 @@ theorem quot_eq : Quot.mk r x = Quot.mk r y :=
 lake build
 
 # Build specific module
-lake build ComputationalPaths.Path.HIT.FigureEight
+lake build ComputationalPaths.Path.CompPath.FigureEight
 
 # Run executable (prints version)
 lake exe computational_paths
@@ -411,43 +404,41 @@ theorem triple_refl_eq_refl : trans (trans (refl a) (refl a)) (refl a) = refl a 
   sorry
 ```
 
-### Important: HIT Axiom Limitation
+### Important: Axiom Import Limitation
 
-**Aristotle rejects files that import Higher Inductive Type (HIT) axioms.**
-
+**Aristotle rejects files that import modules containing axioms.**
 
 ```
 Aristotle encountered an error while processing imports for this file.
-Error: Axioms were added during init_sorries: ['Circle', 'circleBase', ...]
+Error: Axioms were added during init_sorries: [...]
 ```
 
 #### Which Files Work with Aristotle
 
 | Module Category | Works? | Reason |
 |-----------------|--------|--------|
-| `Circle.lean` | ❌ No | Base HIT constructors |
 | `Path/Basic/*` | ✅ Yes | Core definitions, no axioms |
-| `Path/Rewrite/*` | ✅ Yes* | Rewrite system (assumptions are explicit typeclasses) |
-| `Path/Groupoid.lean` | ✅ Yes | Category theory, no HITs |
+| `Path/Rewrite/*` | ✅ Yes* | Rewrite system (avoid `*Axiom.lean` helpers) |
+| `Path/CompPath/*` | ✅ Yes | Computational-path constructions |
+| `Path/Groupoid.lean` | ✅ Yes | Category theory, no axioms |
 | `Path/Bicategory.lean` | ✅ Yes | 2-category theory |
-| `Path/HIT/*` | ❌ No | Defines HIT axioms |
-| `Path/Homotopy/*` | ⚠️ Depends | Check if imports HITs |
-| Files importing HITs | ❌ No | Transitively imports axioms |
+| `*Axiom.lean` | ❌ No | Adds axioms |
+| Files importing axiom modules | ❌ No | Transitively imports axioms |
 
 #### Workaround Strategy
 
-1. **Factor out non-HIT code** into separate modules
+1. **Factor out axiom-free code** into separate modules
 2. **Use Aristotle** on those modules
-3. **Manually prove** theorems that require HIT axioms
+3. **Manually prove** theorems that require axioms
 
-Example: If you have a file with both pure path lemmas and HIT-dependent theorems:
+Example: If you have a file with both pure path lemmas and axiom-dependent theorems:
 
 ```lean
--- File: MyProofs.lean (imports Circle - won't work with Aristotle)
-import ComputationalPaths.Path.HIT.Circle
+-- File: MyProofs.lean (imports axiom helpers - won't work with Aristotle)
+import ComputationalPaths.Path.Rewrite.ConfluenceConstructiveAxiom
 
 theorem pure_path_lemma : ... := by sorry  -- Could be auto-proved
-theorem circle_lemma : ... := by sorry     -- Needs HIT
+theorem axiom_lemma : ... := by sorry      -- Needs axioms
 ```
 
 Refactor to:
@@ -457,11 +448,11 @@ import ComputationalPaths.Path.Basic
 
 theorem pure_path_lemma : ... := by sorry  -- Aristotle can fill this
 
--- File: MyCircleProofs.lean
-import ComputationalPaths.Path.HIT.Circle
+-- File: MyAxiomProofs.lean
+import ComputationalPaths.Path.Rewrite.ConfluenceConstructiveAxiom
 import MyPureProofs
 
-theorem circle_lemma : ... := by sorry     -- Manual proof
+theorem axiom_lemma : ... := by sorry      -- Manual proof
 ```
 
 ### What Aristotle Produces
@@ -501,7 +492,7 @@ theorem false_claim : ... := by
 
 ### Best Practices
 
-1. **Check file imports first** - Ensure no transitive HIT dependencies
+1. **Check file imports first** - Ensure no transitive axiom dependencies
 2. **Use `admit` for partial runs** - Replace sorries you don't want filled with `admit`
 3. **Provide hints** - Use `PROVIDED SOLUTION` for complex proofs
 4. **Build after Aristotle** - Verify the output compiles: `lake build ModuleName`
@@ -511,7 +502,7 @@ theorem false_claim : ... := by
 
 | Issue | Solution |
 |-------|----------|
-| "Axioms were added" | File imports HITs - factor out non-HIT code |
+| "Axioms were added" | File imports axioms - factor out axiom-free code |
 | "already been declared" | Theorem name conflicts with imported module |
 | Timeout | Try `--no-wait` and check status later |
 | `exact?` left in output | Run `lake build` to see suggested replacement |
@@ -531,12 +522,12 @@ This project's `lean-toolchain` should be compatible. If you encounter issues, c
 
 ## Adding New Content
 
-### Adding a New HIT
+### Adding a New Computational-Path Construction
 
-1. Create `ComputationalPaths/Path/HIT/NewHIT.lean`
-2. Define the type and constructors as axioms
-3. Define the recursion principle
-4. Define encode/decode functions
+1. Create `ComputationalPaths/Path/CompPath/NewSpace.lean`
+2. Define the point type and basepoint (inductive)
+3. Define path-expression syntax and generators
+4. Define relation/quotient and encode/decode functions
 5. Prove the round-trip properties
 6. Add to imports in `ComputationalPaths/Path.lean`
 7. Update `README.md` with the new result
@@ -556,11 +547,11 @@ This project's `lean-toolchain` should be compatible. If you encounter issues, c
 
 | Module | Main Theorem | Statement |
 |--------|--------------|-----------|
-| `CircleStep.lean` | `circlePiOneEquivInt` | π₁(S¹) ≃ ℤ |
-| `TorusStep.lean` | `torusPiOneEquivIntProd` | π₁(T²) ≃ ℤ × ℤ |
-| `Sphere.lean` | `sphere2_pi1_equiv_unit` | π₁(S²) ≃ 1 |
-| `FigureEight.lean` | `figureEightPiOneEquiv` | π₁(S¹ ∨ S¹) ≃ ℤ * ℤ |
-| `PushoutPaths.lean` | `seifertVanKampenEquiv` | π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) |
+| `CompPath/CircleStep.lean` | `circlePiOneEquivInt` | π₁(S¹) ≃ ℤ |
+| `CompPath/TorusStep.lean` | `torusPiOneEquivIntProd` | π₁(T²) ≃ ℤ × ℤ |
+| `CompPath/SphereCompPath.lean` | `sphere2_pi1_equiv_unit` | π₁(S²) ≃ 1 |
+| `CompPath/FigureEight.lean` | `figureEightPiOneEquiv` | π₁(S¹ ∨ S¹) ≃ ℤ * ℤ |
+| `CompPath/PushoutPaths.lean` | `seifertVanKampenEquiv` | π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) |
 | `OmegaGroupoid.lean` | `compPathOmegaGroupoid` | Types are weak ω-groupoids |
 | `FundamentalGroupoid.lean` | `basepointIsomorphism` | π₁(A, a) ≃ π₁(A, b) via path conjugation |
 | `LieGroups.lean` | `SO2.piOneEquivInt` | π₁(SO(2)) ≃ ℤ (via Circle) |
@@ -569,8 +560,8 @@ This project's `lean-toolchain` should be compatible. If you encounter issues, c
 
 1. **Don't use `Quot.liftOn₂`** - it doesn't exist in Lean 4; use nested `Quot.lift`
 2. **RwEq lemma names**: Use `rweq_cmpA_*` not `rweq_trans_*` for unit/inverse laws
-3. **Universe levels**: HITs are typically `Type u`; be consistent
-4. **Noncomputable**: Most definitions involving HITs need `noncomputable`
+3. **Universe levels**: Prefer `Type u` for new inductive types; be consistent
+4. **Noncomputable**: Encode/decode and quotient lifts often need `noncomputable`
 5. **Quotient equality direction**: `Quot.sound` needs `Setoid.r a b`, check the direction
 6. **Fin' vs Fin**: This codebase uses custom `Fin'` type, not Mathlib's `Fin`
 7. **Multi-argument macro syntax**: In Lean 4, tactic macros with multiple term arguments need comma separators (e.g., `path_congr h1, h2` not `path_congr h1 h2`). Without commas, Lean parses `h1 h2` as function application.
@@ -586,7 +577,6 @@ This project's `lean-toolchain` should be compatible. If you encounter issues, c
 
 ### HoTT Book
 - Chapter 2: Homotopy Type Theory
-- Chapter 6: Higher Inductive Types
 - Chapter 8: Homotopy Theory (π₁ calculations)
 
 ## Continuity Ledger (Compaction-Safe Sessions)
@@ -658,7 +648,7 @@ Print the full ledger only when it materially changes or when requested.
 ## Tips for Claude
 
 1. **Read before editing**: Always `Read` a file before making changes
-2. **Check existing patterns**: Look at similar modules (e.g., Circle.lean when adding a new HIT)
+2. **Check existing patterns**: Look at similar modules (e.g., `CompPath/CircleCompPath.lean` when adding a new construction)
 3. **Build incrementally**: Build after each significant change
 4. **Use the Task tool**: For exploring the codebase, use `subagent_type=Explore`
 5. **Document everything**: Follow the docstring conventions strictly
@@ -666,7 +656,7 @@ Print the full ledger only when it materially changes or when requested.
 7. **Test edge cases**: For Fin'-indexed things, test genus 0, 1, and ≥2
 8. **Keep README updated**: Add new results to the README and highlights
 9. **Use the Continuity Ledger**: For long sessions, maintain `CONTINUITY.md` to survive compaction
-10. **Use Aristotle for non-HIT files**: For files that don't import HITs, use Aristotle to auto-fill sorries:
+10. **Use Aristotle for axiom-free files**: For files that don't import axiom modules, use Aristotle to auto-fill sorries:
     ```bash
     uvx --from aristotlelib aristotle.exe prove-from-file "path/to/file.lean"
     ```

@@ -26,13 +26,11 @@ The Adams spectral sequence has:
 - HoTT Book, Section 8.9
 -/
 
-import ComputationalPaths.Path.HIT.JamesConstruction
+import ComputationalPaths.Path.Homotopy.StableStems
 
 namespace ComputationalPaths
 namespace Path
 namespace AdamsSpectralSequence
-
-open JamesConstruction
 
 universe u
 
@@ -129,8 +127,8 @@ The Adams spectral sequence connects Ext groups to stable homotopy.
 We reference the stable stems computed via the James construction.
 -/
 
-/-- Reference to stable stem types from JamesConstruction -/
-abbrev StableStem (k : Nat) : Type := StableStemType k
+/-- Reference to stable stem types (placeholder). -/
+abbrev StableStem (_k : Nat) : Type := Unit
 
 /-- The Adams E_2 page converges to stable homotopy groups.
     This is a statement of the convergence theorem (not a proof). -/

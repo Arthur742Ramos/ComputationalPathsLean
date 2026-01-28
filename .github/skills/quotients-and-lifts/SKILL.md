@@ -50,11 +50,11 @@ def myFun₂ : Quot r → Quot s → C :=
 - **No `Quot.liftOn₂`** in Lean 4 - use nested `Quot.lift`
 - Proof obligation for nested lifts often needs `funext` + `Quot.ind`
 
-## Example (from Circle.lean)
+## Example (from CircleCompPath.lean)
 
 ```lean
-noncomputable def encode : π₁(Circle, circleBase) → Int :=
+noncomputable def circleCompPathEncode : circleCompPathPiOne → Int :=
   Quot.lift
-    encodePath
-    (fun _ _ h => encodePath_respects_rweq h)
+    circleCompPathEncodeExpr'
+    (fun _ _ h => h)
 ```
