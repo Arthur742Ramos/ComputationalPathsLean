@@ -112,6 +112,49 @@ def reverse : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
   | consLeft x rest => concat (reverse rest) (singleLeft x)
   | consRight y rest => concat (reverse rest) (singleRight y)
 
+/-- Map a word by mapping each letter on its side. -/
+def map {H₁ H₂ : Type u}
+    (f : G₁ → H₁) (g : G₂ → H₂) :
+    FreeProductWord G₁ G₂ → FreeProductWord H₁ H₂
+  | nil => nil
+  | consLeft x rest => consLeft (f x) (map f g rest)
+  | consRight y rest => consRight (g y) (map f g rest)
+
+@[simp] theorem map_nil {H₁ H₂ : Type u}
+    (f : G₁ → H₁) (g : G₂ → H₂) :
+    map f g (nil : FreeProductWord G₁ G₂) = nil := rfl
+
+@[simp] theorem map_consLeft {H₁ H₂ : Type u}
+    (f : G₁ → H₁) (g : G₂ → H₂) (x : G₁) (rest : FreeProductWord G₁ G₂) :
+    map f g (consLeft x rest) = consLeft (f x) (map f g rest) := rfl
+
+@[simp] theorem map_consRight {H₁ H₂ : Type u}
+    (f : G₁ → H₁) (g : G₂ → H₂) (y : G₂) (rest : FreeProductWord G₁ G₂) :
+    map f g (consRight y rest) = consRight (g y) (map f g rest) := rfl
+
+/-- Equivalence on free-product words induced by equivalences on each side. -/
+def equiv {H₁ H₂ : Type u}
+    (e₁ : SimpleEquiv G₁ H₁) (e₂ : SimpleEquiv G₂ H₂) :
+    SimpleEquiv (FreeProductWord G₁ G₂) (FreeProductWord H₁ H₂) where
+  toFun := map e₁.toFun e₂.toFun
+  invFun := map e₁.invFun e₂.invFun
+  left_inv := by
+    intro w
+    induction w with
+    | nil => simp [map]
+    | consLeft x rest ih =>
+        simp [map, ih, e₁.left_inv]
+    | consRight y rest ih =>
+        simp [map, ih, e₂.left_inv]
+  right_inv := by
+    intro w
+    induction w with
+    | nil => simp [map]
+    | consLeft x rest ih =>
+        simp [map, ih, e₁.right_inv]
+    | consRight y rest ih =>
+        simp [map, ih, e₂.right_inv]
+
 /-- Inverse of a word in a free product: reverse and negate each element.
 This requires `Neg` instances on the component types (e.g., for ℤ). -/
 def inverse [Neg G₁] [Neg G₂] : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
@@ -1669,6 +1712,308 @@ At the basepoint inl(f c₀), this is the amalgamated free product. -/
 abbrev PushoutCode (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C) : Type u :=
   FreeProductWord (π₁(A, f c₀)) (π₁(B, g c₀))
+
+/-! ### Encoding provenance-aware pushout paths -/
+
+namespace PushoutCompPath
+
+variable {A : Type u} {B : Type u} {C : Type u}
+variable {f : C → A} {g : C → B}
+variable {a₀ : A} {b₀ : B}
+
+/-- Encode a provenance-aware pushout path by mapping `inl`/`inr` steps to letters.
+Glue steps are ignored, serving only to switch sides in a path representation. -/
+def encodeWith
+    (encodeInl : ∀ {a a' : A}, Path a a' → π₁(A, a₀))
+    (encodeInr : ∀ {b b' : B}, Path b b' → π₁(B, b₀))
+    {x y : PushoutCompPath A B C f g} :
+    PushoutPath A B C f g x y → FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))
+  | PushoutPath.refl _ => FreeProductWord.nil
+  | PushoutPath.cons (PushoutStep.inlStep p) rest =>
+      FreeProductWord.consLeft (encodeInl p) (encodeWith encodeInl encodeInr rest)
+  | PushoutPath.cons (PushoutStep.inrStep p) rest =>
+      FreeProductWord.consRight (encodeInr p) (encodeWith encodeInl encodeInr rest)
+  | PushoutPath.cons (PushoutStep.glueStep _) rest =>
+      encodeWith encodeInl encodeInr rest
+  | PushoutPath.cons (PushoutStep.glueStepInv _) rest =>
+      encodeWith encodeInl encodeInr rest
+
+/-- Encoding of a reflexive provenance path is the empty word. -/
+@[simp] theorem encodeWith_refl
+    (encodeInl : ∀ {a a' : A}, Path a a' → π₁(A, a₀))
+    (encodeInr : ∀ {b b' : B}, Path b b' → π₁(B, b₀))
+    (x : PushoutCompPath A B C f g) :
+    encodeWith (A := A) (B := B) (C := C) (f := f) (g := g)
+        (encodeInl := encodeInl) (encodeInr := encodeInr)
+        (PushoutPath.refl x) = FreeProductWord.nil := rfl
+
+/-- Encoding of an `inl` step prepends a left letter. -/
+@[simp] theorem encodeWith_cons_inl
+    (encodeInl : ∀ {a a' : A}, Path a a' → π₁(A, a₀))
+    (encodeInr : ∀ {b b' : B}, Path b b' → π₁(B, b₀))
+    {a a' : A} {y : PushoutCompPath A B C f g}
+    (p : Path a a')
+    (rest : PushoutPath A B C f g (PushoutCompPath.inl a') y) :
+    encodeWith (A := A) (B := B) (C := C) (f := f) (g := g)
+        (encodeInl := encodeInl) (encodeInr := encodeInr)
+        (PushoutPath.cons (PushoutStep.inlStep p) rest) =
+      FreeProductWord.consLeft (encodeInl p)
+        (encodeWith (A := A) (B := B) (C := C) (f := f) (g := g)
+          (encodeInl := encodeInl) (encodeInr := encodeInr) rest) := rfl
+
+/-- Encoding of an `inr` step prepends a right letter. -/
+@[simp] theorem encodeWith_cons_inr
+    (encodeInl : ∀ {a a' : A}, Path a a' → π₁(A, a₀))
+    (encodeInr : ∀ {b b' : B}, Path b b' → π₁(B, b₀))
+    {b b' : B} {y : PushoutCompPath A B C f g}
+    (p : Path b b')
+    (rest : PushoutPath A B C f g (PushoutCompPath.inr b') y) :
+    encodeWith (A := A) (B := B) (C := C) (f := f) (g := g)
+        (encodeInl := encodeInl) (encodeInr := encodeInr)
+        (PushoutPath.cons (PushoutStep.inrStep p) rest) =
+      FreeProductWord.consRight (encodeInr p)
+        (encodeWith (A := A) (B := B) (C := C) (f := f) (g := g)
+          (encodeInl := encodeInl) (encodeInr := encodeInr) rest) := rfl
+
+/-- Encoding ignores a glue step. -/
+@[simp] theorem encodeWith_cons_glue
+    (encodeInl : ∀ {a a' : A}, Path a a' → π₁(A, a₀))
+    (encodeInr : ∀ {b b' : B}, Path b b' → π₁(B, b₀))
+    (c : C) {y : PushoutCompPath A B C f g}
+    (rest : PushoutPath A B C f g (PushoutCompPath.inr (g c)) y) :
+    encodeWith (A := A) (B := B) (C := C) (f := f) (g := g)
+        (encodeInl := encodeInl) (encodeInr := encodeInr)
+        (PushoutPath.cons (PushoutStep.glueStep c) rest) =
+      encodeWith (A := A) (B := B) (C := C) (f := f) (g := g)
+        (encodeInl := encodeInl) (encodeInr := encodeInr) rest := rfl
+
+/-- Encoding ignores an inverse glue step. -/
+@[simp] theorem encodeWith_cons_glueInv
+    (encodeInl : ∀ {a a' : A}, Path a a' → π₁(A, a₀))
+    (encodeInr : ∀ {b b' : B}, Path b b' → π₁(B, b₀))
+    (c : C) {y : PushoutCompPath A B C f g}
+    (rest : PushoutPath A B C f g (PushoutCompPath.inl (f c)) y) :
+    encodeWith (A := A) (B := B) (C := C) (f := f) (g := g)
+        (encodeInl := encodeInl) (encodeInr := encodeInr)
+        (PushoutPath.cons (PushoutStep.glueStepInv c) rest) =
+      encodeWith (A := A) (B := B) (C := C) (f := f) (g := g)
+        (encodeInl := encodeInl) (encodeInr := encodeInr) rest := rfl
+
+end PushoutCompPath
+
+/-! ## Provenance-Based Wedge Loop Quotient
+
+We define a wedge-loop quotient that keeps explicit provenance (left/right steps)
+and quotients only by equality of the encoded word. This avoids axioms by
+building encode/decode directly on provenance paths.
+-/
+
+namespace WedgeProvenance
+
+open PushoutCompPath
+
+variable {A : Type u} {B : Type u} (a₀ : A) (b₀ : B)
+
+/-- Provenance loops in a wedge sum, as chains of pushout steps at the basepoint. -/
+abbrev WedgeProvenanceLoop : Type u :=
+  PushoutCompPath.PushoutPath A B PUnit'
+    (fun _ => a₀) (fun _ => b₀)
+    (Wedge.basepoint (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+    (Wedge.basepoint (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+
+/-- Encoding primitives for provenance loops in wedge sums. -/
+class HasWedgeProvenanceEncode (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) : Type u where
+  /-- Encode a left-side path as a loop class in `π₁(A, a₀)`. -/
+  encodeInl : ∀ {a a' : A}, Path a a' → π₁(A, a₀)
+  /-- Encode a right-side path as a loop class in `π₁(B, b₀)`. -/
+  encodeInr : ∀ {b b' : B}, Path b b' → π₁(B, b₀)
+  /-- On loops at `a₀`, `encodeInl` is the quotient map. -/
+  encodeInl_loop : ∀ p : LoopSpace A a₀, encodeInl p = Quot.mk _ p
+  /-- On loops at `b₀`, `encodeInr` is the quotient map. -/
+  encodeInr_loop : ∀ p : LoopSpace B b₀, encodeInr p = Quot.mk _ p
+
+/-- Encode a provenance loop as a word in the free product of `π₁(A)` and `π₁(B)`. -/
+def wedgeProvenanceEncode
+    [HasWedgeProvenanceEncode A B a₀ b₀] :
+    WedgeProvenanceLoop (A := A) (B := B) a₀ b₀ →
+      FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
+  PushoutCompPath.encodeWith
+    (A := A) (B := B) (C := PUnit')
+    (f := fun _ => a₀) (g := fun _ => b₀)
+    (encodeInl :=
+      HasWedgeProvenanceEncode.encodeInl (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+    (encodeInr :=
+      HasWedgeProvenanceEncode.encodeInr (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+
+/-- Two provenance loops are equivalent if their encoded words coincide. -/
+def wedgeProvenanceRel
+    [HasWedgeProvenanceEncode A B a₀ b₀]
+    (p q : WedgeProvenanceLoop (A := A) (B := B) a₀ b₀) : Prop :=
+  wedgeProvenanceEncode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) p =
+    wedgeProvenanceEncode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) q
+
+/-- Setoid on provenance loops by encoded-word equality. -/
+def wedgeProvenanceSetoid
+    [HasWedgeProvenanceEncode A B a₀ b₀] :
+    Setoid (WedgeProvenanceLoop (A := A) (B := B) a₀ b₀) where
+  r := wedgeProvenanceRel (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+  iseqv := by
+    refine ⟨?refl, ?symm, ?trans⟩
+    · intro p
+      rfl
+    · intro p q h
+      exact h.symm
+    · intro p q r h₁ h₂
+      exact h₁.trans h₂
+
+/-- Provenance-based loop quotient for wedge sums. -/
+abbrev WedgeProvenanceQuot
+    [HasWedgeProvenanceEncode A B a₀ b₀] : Type u :=
+  Quot (wedgeProvenanceSetoid (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)).r
+
+/-- Encode at the quotient level. -/
+def wedgeProvenanceEncodeQuot
+    [HasWedgeProvenanceEncode A B a₀ b₀] :
+    WedgeProvenanceQuot (A := A) (B := B) a₀ b₀ →
+      FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
+  Quot.lift
+    (wedgeProvenanceEncode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+    (by
+      intro p q h
+      exact h)
+
+/-- Choose a representative loop in `A` for a `π₁(A)` element. -/
+noncomputable def loopRepInl
+    (α : π₁(A, a₀)) : LoopSpace A a₀ := by
+  classical
+  exact Classical.choose (Quot.exists_rep α)
+
+/-- Representative lemma for `loopRepInl`. -/
+@[simp] theorem loopRepInl_spec (α : π₁(A, a₀)) :
+    Quot.mk _ (loopRepInl (A := A) (a₀ := a₀) α) = α := by
+  classical
+  exact Classical.choose_spec (Quot.exists_rep α)
+
+/-- Choose a representative loop in `B` for a `π₁(B)` element. -/
+noncomputable def loopRepInr
+    (β : π₁(B, b₀)) : LoopSpace B b₀ := by
+  classical
+  exact Classical.choose (Quot.exists_rep β)
+
+/-- Representative lemma for `loopRepInr`. -/
+@[simp] theorem loopRepInr_spec (β : π₁(B, b₀)) :
+    Quot.mk _ (loopRepInr (B := B) (b₀ := b₀) β) = β := by
+  classical
+  exact Classical.choose_spec (Quot.exists_rep β)
+
+/-- Decode a word into a provenance loop (before quotienting). -/
+noncomputable def wedgeProvenanceDecodeLoop
+    [HasWedgeProvenanceEncode A B a₀ b₀] :
+    FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) →
+      WedgeProvenanceLoop (A := A) (B := B) a₀ b₀
+  | .nil => PushoutPath.refl (Wedge.basepoint (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+  | .consLeft α rest =>
+      PushoutPath.cons
+        (PushoutStep.inlStep (loopRepInl (A := A) (a₀ := a₀) α))
+        (wedgeProvenanceDecodeLoop rest)
+  | .consRight β rest =>
+      PushoutPath.cons
+        (PushoutStep.glueStep (A := A) (B := B) (C := PUnit')
+          (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit)
+        (PushoutPath.cons
+          (PushoutStep.inrStep (loopRepInr (B := B) (b₀ := b₀) β))
+          (PushoutPath.cons
+            (PushoutStep.glueStepInv (A := A) (B := B) (C := PUnit')
+              (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit)
+            (wedgeProvenanceDecodeLoop rest)))
+
+/-- Decode a word into the provenance quotient. -/
+noncomputable def wedgeProvenanceDecodeQuot
+    [HasWedgeProvenanceEncode A B a₀ b₀] :
+    FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) →
+      WedgeProvenanceQuot (A := A) (B := B) a₀ b₀ :=
+  fun w => Quot.mk _ (wedgeProvenanceDecodeLoop (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) w)
+
+/-- Encode after decode is the identity on words. -/
+theorem wedgeProvenanceEncodeDecode
+    [HasWedgeProvenanceEncode A B a₀ b₀]
+    (w : FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))) :
+    wedgeProvenanceEncodeQuot (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+        (wedgeProvenanceDecodeQuot (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) w) = w := by
+  induction w with
+  | nil =>
+      simp [wedgeProvenanceDecodeQuot, wedgeProvenanceDecodeLoop,
+        wedgeProvenanceEncodeQuot, wedgeProvenanceEncode]
+  | consLeft α rest ih =>
+      have hrest :
+          PushoutCompPath.encodeWith
+              (A := A) (B := B) (C := PUnit')
+              (f := fun _ => a₀) (g := fun _ => b₀)
+              (encodeInl :=
+                HasWedgeProvenanceEncode.encodeInl
+                  (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+              (encodeInr :=
+                HasWedgeProvenanceEncode.encodeInr
+                  (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+              (wedgeProvenanceDecodeLoop (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) rest) =
+            rest := by
+        simpa [wedgeProvenanceEncode, wedgeProvenanceEncodeQuot, wedgeProvenanceDecodeQuot]
+          using ih
+      have hα :
+          HasWedgeProvenanceEncode.encodeInl (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+              (loopRepInl (A := A) (a₀ := a₀) α) = α := by
+        simpa [HasWedgeProvenanceEncode.encodeInl_loop]
+          using (loopRepInl_spec (A := A) (a₀ := a₀) α)
+      simp [wedgeProvenanceDecodeQuot, wedgeProvenanceDecodeLoop,
+        wedgeProvenanceEncodeQuot, wedgeProvenanceEncode, hα, hrest]
+  | consRight β rest ih =>
+      have hrest :
+          PushoutCompPath.encodeWith
+              (A := A) (B := B) (C := PUnit')
+              (f := fun _ => a₀) (g := fun _ => b₀)
+              (encodeInl :=
+                HasWedgeProvenanceEncode.encodeInl
+                  (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+              (encodeInr :=
+                HasWedgeProvenanceEncode.encodeInr
+                  (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+              (wedgeProvenanceDecodeLoop (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) rest) =
+            rest := by
+        simpa [wedgeProvenanceEncode, wedgeProvenanceEncodeQuot, wedgeProvenanceDecodeQuot]
+          using ih
+      have hβ :
+          HasWedgeProvenanceEncode.encodeInr (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+              (loopRepInr (B := B) (b₀ := b₀) β) = β := by
+        simpa [HasWedgeProvenanceEncode.encodeInr_loop]
+          using (loopRepInr_spec (B := B) (b₀ := b₀) β)
+      simp [wedgeProvenanceDecodeQuot, wedgeProvenanceDecodeLoop,
+        wedgeProvenanceEncodeQuot, wedgeProvenanceEncode, hβ, hrest]
+
+/-- Decode after encode is the identity in the provenance quotient. -/
+theorem wedgeProvenanceDecodeEncode
+    [HasWedgeProvenanceEncode A B a₀ b₀]
+    (x : WedgeProvenanceQuot (A := A) (B := B) a₀ b₀) :
+    wedgeProvenanceDecodeQuot (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+        (wedgeProvenanceEncodeQuot (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) x) = x := by
+  refine Quot.inductionOn x ?_
+  intro p
+  apply Quot.sound
+  simpa [wedgeProvenanceEncodeQuot, wedgeProvenanceDecodeQuot] using
+    (wedgeProvenanceEncodeDecode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+      (wedgeProvenanceEncode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) p))
+
+/-- Provenance-based SVK equivalence for wedge sums. -/
+noncomputable def wedgeProvenanceEquiv
+    [HasWedgeProvenanceEncode A B a₀ b₀] :
+    SimpleEquiv
+      (WedgeProvenanceQuot (A := A) (B := B) a₀ b₀)
+      (FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))) where
+  toFun := wedgeProvenanceEncodeQuot (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+  invFun := wedgeProvenanceDecodeQuot (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+  left_inv := wedgeProvenanceDecodeEncode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+  right_inv := wedgeProvenanceEncodeDecode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
+
+end WedgeProvenance
 
 /-- Decode for general pushouts: Convert a word to a loop in Pushout.
 Similar to wedge decode, but needs to handle basepoint transport. -/
@@ -3333,6 +3678,10 @@ This module establishes:
 
 5. **Seifert-Van Kampen** (`seifertVanKampenEquiv`): The statement that
    π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B).
+
+6. **Provenance Wedge Quotient** (`WedgeProvenance`): A provenance-based loop
+   quotient for wedge sums together with `wedgeProvenanceEquiv`, giving a
+   constructive SVK-style equivalence without axioms.
 
 The proofs use the computational paths framework where:
 - Loops are computational paths (with explicit step structure)

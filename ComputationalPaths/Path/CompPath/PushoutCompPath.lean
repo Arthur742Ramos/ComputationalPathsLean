@@ -130,6 +130,82 @@ def exprToPath {x y : PushoutCompPath A B C f g} :
   | PushoutCompPathExpr.symm p => Path.symm (exprToPath p)
   | PushoutCompPathExpr.trans p q => Path.trans (exprToPath p) (exprToPath q)
 
+/-! ## Provenance steps -/
+
+/-- A provenance-aware step in the pushout.
+
+`inlStep` and `inrStep` record paths coming from `A` and `B`, while
+`glueStep`/`glueStepInv` record the generating gluing identifications. -/
+inductive PushoutStep (A : Type u) (B : Type u) (C : Type u)
+    (f : C → A) (g : C → B) :
+    PushoutCompPath A B C f g → PushoutCompPath A B C f g → Type u
+  | inlStep {a a' : A} (p : Path a a') :
+      PushoutStep A B C f g (inl (A := A) (B := B) (C := C) (f := f) (g := g) a)
+        (inl (A := A) (B := B) (C := C) (f := f) (g := g) a')
+  | inrStep {b b' : B} (p : Path b b') :
+      PushoutStep A B C f g (inr (A := A) (B := B) (C := C) (f := f) (g := g) b)
+        (inr (A := A) (B := B) (C := C) (f := f) (g := g) b')
+  | glueStep (c : C) :
+      PushoutStep A B C f g
+        (inl (A := A) (B := B) (C := C) (f := f) (g := g) (f c))
+        (inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c))
+  | glueStepInv (c : C) :
+      PushoutStep A B C f g
+        (inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c))
+        (inl (A := A) (B := B) (C := C) (f := f) (g := g) (f c))
+
+namespace PushoutStep
+
+variable {A : Type u} {B : Type u} {C : Type u}
+variable {f : C → A} {g : C → B}
+
+/-- Reverse the direction of a pushout step. -/
+@[simp] def symm {x y : PushoutCompPath A B C f g} :
+    PushoutStep A B C f g x y → PushoutStep A B C f g y x
+  | inlStep p => inlStep (Path.symm p)
+  | inrStep p => inrStep (Path.symm p)
+  | glueStep c => glueStepInv (A := A) (B := B) (C := C) (f := f) (g := g) c
+  | glueStepInv c => glueStep (A := A) (B := B) (C := C) (f := f) (g := g) c
+
+/-- Interpret a pushout step as a computational path. -/
+def toPath {x y : PushoutCompPath A B C f g} :
+    PushoutStep A B C f g x y → Path x y
+  | inlStep p =>
+      Path.congrArg
+        (inl (A := A) (B := B) (C := C) (f := f) (g := g)) p
+  | inrStep p =>
+      Path.congrArg
+        (inr (A := A) (B := B) (C := C) (f := f) (g := g)) p
+  | glueStep c => glue (A := A) (B := B) (C := C) (f := f) (g := g) c
+  | glueStepInv c => glueInv (A := A) (B := B) (C := C) (f := f) (g := g) c
+
+end PushoutStep
+
+/-- A chained list of provenance-aware pushout steps. -/
+inductive PushoutPath (A : Type u) (B : Type u) (C : Type u)
+    (f : C → A) (g : C → B) :
+    PushoutCompPath A B C f g → PushoutCompPath A B C f g → Type u
+  | refl (x : PushoutCompPath A B C f g) :
+      PushoutPath A B C f g x x
+  | cons {x y z : PushoutCompPath A B C f g}
+      (s : PushoutStep A B C f g x y)
+      (rest : PushoutPath A B C f g y z) :
+      PushoutPath A B C f g x z
+
+namespace PushoutPath
+
+variable {A : Type u} {B : Type u} {C : Type u}
+variable {f : C → A} {g : C → B}
+
+/-- Forget provenance and interpret a `PushoutPath` as a `Path`. -/
+def toPath {x y : PushoutCompPath A B C f g} :
+    PushoutPath A B C f g x y → Path x y
+  | refl x => Path.refl x
+  | cons s rest => Path.trans (PushoutStep.toPath (A := A) (B := B) (C := C) (f := f) (g := g) s)
+      (toPath rest)
+
+end PushoutPath
+
 /-! ## Expression quotient -/
 
 /-- Two expressions are equivalent if their interpreted paths are rewrite-equal. -/
@@ -260,6 +336,62 @@ def glue : Path (inl (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) a₀)
   Pushout.glue (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit
 
 end Wedge
+
+/-! ## Instance: HasGlueNaturalLoopRwEq for wedge sums -/
+
+/-- For wedge sums where C = PUnit', the glue naturality condition holds trivially
+because all paths in PUnit' are rewrite-equivalent to refl, and congrArg along
+constant functions collapses to refl. -/
+instance instHasGlueNaturalLoopRwEq_Wedge {A : Type u} {B : Type u} (a₀ : A) (b₀ : B) :
+    Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := PUnit')
+      (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit where
+  eq := fun c p => by
+    -- Since PUnit' is a subsingleton, c = PUnit'.unit = c₀
+    cases c
+    -- Abbreviations for the pushout type parameters
+    let f' : PUnit' → A := fun _ => a₀
+    let g' : PUnit' → B := fun _ => b₀
+    -- The goal is:
+    -- RwEq (trans (symm (inlPath (congrArg f' p)))
+    --             (trans (glue PUnit'.unit) (inrPath (congrArg g' p))))
+    --      (glue PUnit'.unit)
+    -- Since f' and g' are constant, congrArg f' p ≈ refl and congrArg g' p ≈ refl
+    have h1 : RwEq (Path.congrArg f' p) (Path.refl a₀) := rweq_congrArg_const a₀ p
+    have h2 : RwEq (Path.congrArg g' p) (Path.refl b₀) := rweq_congrArg_const b₀ p
+    -- inlPath and inrPath are just congrArg
+    let inl' := Pushout.inl (A := A) (B := B) (C := PUnit') (f := f') (g := g')
+    let inr' := Pushout.inr (A := A) (B := B) (C := PUnit') (f := f') (g := g')
+    let glue' := Pushout.glue (A := A) (B := B) (C := PUnit') (f := f') (g := g') PUnit'.unit
+    -- inlPath (congrArg f' p) ≈ inlPath (refl a₀) = refl (inl' a₀)
+    have hinl : RwEq (Pushout.inlPath (A := A) (B := B) (C := PUnit') (f := f') (g := g')
+                        (congrArg f' p))
+                     (Path.refl (inl' a₀)) := by
+      apply rweq_trans (rweq_congrArg_of_rweq inl' h1)
+      exact rweq_refl _
+    -- inrPath (congrArg g' p) ≈ inrPath (refl b₀) = refl (inr' b₀)
+    have hinr : RwEq (Pushout.inrPath (A := A) (B := B) (C := PUnit') (f := f') (g := g')
+                        (congrArg g' p))
+                     (Path.refl (inr' b₀)) := by
+      apply rweq_trans (rweq_congrArg_of_rweq inr' h2)
+      exact rweq_refl _
+    -- symm (inlPath ...) ≈ symm refl ≈ refl
+    have hsymm : RwEq (Path.symm (Pushout.inlPath (A := A) (B := B) (C := PUnit') (f := f') (g := g')
+                          (congrArg f' p)))
+                      (Path.refl (inl' a₀)) := by
+      apply rweq_trans (rweq_symm_congr hinl)
+      exact rweq_sr _
+    -- Now the LHS becomes: trans refl (trans glue' refl)
+    -- Step 1: simplify inner trans glue' (inrPath ...) ≈ glue'
+    have hmid : RwEq (Path.trans glue'
+                        (Pushout.inrPath (A := A) (B := B) (C := PUnit') (f := f') (g := g')
+                          (congrArg g' p)))
+                     glue' := by
+      apply rweq_trans (rweq_trans_congr_right glue' hinr)
+      exact rweq_cmpA_refl_right glue'
+    -- Step 2: Transform the full expression
+    apply rweq_trans (rweq_trans_congr_left _ hsymm)
+    apply rweq_trans (rweq_cmpA_refl_left _)
+    exact hmid
 
 /-! ## Legacy notation -/
 
