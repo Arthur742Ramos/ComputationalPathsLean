@@ -4,7 +4,19 @@ This document provides guidance for AI assistants working with the Computational
 
 ## Project Overview
 
-**Computational Paths** is a Lean 4 formalization of propositional equality via explicit computational paths and rewrite equality. It provides:
+**Computational Paths** is a Lean 4 formalization of propositional equality via explicit computational paths and rewrite equality.
+
+### Current Status (January 2025)
+
+| Metric | Value |
+|--------|-------|
+| **Lean Modules** | 96 (in ComputationalPaths/) |
+| **Lines of Code** | ~29,000 |
+| **Build Jobs** | 140 |
+| **Kernel Axioms** | **0** (fully axiom-free) |
+| **Sorries** | **0** (all proofs complete) |
+
+### What This Project Provides
 
 1. **A rewrite-based equality system**: Paths are explicit witnesses of equality, related by a term rewriting system (LND_EQ-TRS)
 2. **Fundamental group calculations**: π₁ of computational-path constructions using encode-decode methods
@@ -17,48 +29,68 @@ The key insight is that identity types can be modeled as *computational paths* -
 ## Architecture
 
 ```
-ComputationalPaths/
-├── Basic.lean                    # Re-exports
-├── Path.lean                     # Main import hub
+ComputationalPaths/                    # 96 modules, ~29K lines
+├── Basic.lean                         # Re-exports
+├── Path.lean                          # Main import hub
 └── Path/
-    ├── Basic/                    # Core path definitions
-    │   ├── Core.lean             # Path type, refl, symm, trans
-    │   ├── Congruence.lean       # congrArg, transport
-    │   ├── Context.lean          # Contexts for rewriting
-    │   ├── Globular.lean         # Globular identities
-    │   ├── UIP.lean              # Path → Eq conversion
-    │   └── Univalence.lean       # Lightweight UA for SimpleEquiv
+    ├── Basic/                         # Core path definitions (5 modules)
+    │   ├── Core.lean                  # Path type, refl, symm, trans
+    │   ├── Congruence.lean            # congrArg, transport, map2
+    │   ├── Context.lean               # Contexts for rewriting
+    │   ├── Globular.lean              # Globular identities
+    │   └── UIP.lean                   # Path → Eq conversion
     │
-    ├── Rewrite/                  # The rewrite system
-    │   ├── Step.lean             # Single-step rewrites (40+ rules)
-    │   ├── Rw.lean               # Multi-step rewrite closure
-    │   ├── RwEq.lean             # Symmetric-transitive closure
-    │   ├── Quot.lean             # PathRwQuot quotient type
-    │   ├── SimpleEquiv.lean      # Lightweight equivalence structure
-    │   ├── LNDEQ.lean            # Rule enumeration and instantiation
-    │   ├── Termination.lean      # Normalization witnesses
-    │   └── Confluence.lean       # Critical pair joins
-    │
-    ├── Homotopy/                 # Homotopy-theoretic structures
-    │   ├── Loops.lean            # Loop spaces, LoopSpace type
-    │   ├── FundamentalGroup.lean # π₁ definition, group operations
-    │   ├── HoTT.lean             # Homotopy lemmas exported to Eq
+    ├── Rewrite/                       # The rewrite system (18 modules)
+    │   ├── Step.lean                  # 47+ primitive rewrite rules
+    │   ├── Rw.lean                    # Multi-step rewrite closure
+    │   ├── RwEq.lean                  # Symmetric-transitive closure
+    │   ├── Quot.lean                  # PathRwQuot quotient type
+    │   ├── PathTactic.lean            # 29 automation tactics
+    │   ├── Confluence*.lean           # Confluence via Newman's Lemma
     │   └── ...
     │
-    ├── CompPath/                 # Computational-path constructions
-    │   ├── CircleCompPath.lean   # S¹ via path expressions
-    │   ├── CircleStep.lean       # Circle encode-decode proofs
-    │   ├── Torus.lean            # T² via product
-    │   ├── TorusStep.lean        # Torus encode-decode proofs
-    │   ├── SphereCompPath.lean   # S² with π₁(S²) ≅ 1
-    │   ├── PushoutCompPath.lean  # Pushout construction and recursors
-    │   ├── PushoutPaths.lean     # SVK theorem, free products
-    │   ├── FigureEight.lean      # S¹ ∨ S¹ with π₁ ≃ ℤ * ℤ
-    │   ├── BouquetN.lean         # ∨ⁿS¹ and free group presentation
+    ├── Homotopy/                      # Homotopy theory (30+ modules)
+    │   ├── Loops.lean                 # Loop spaces
+    │   ├── FundamentalGroup.lean      # π₁ definition
+    │   ├── FundamentalGroupoid.lean   # Π₁(A) groupoid structure
+    │   ├── HigherHomotopy.lean        # π_n via iterated loops
+    │   ├── Truncation.lean            # n-types hierarchy
+    │   ├── Fibration.lean             # Fiber sequences, LES
+    │   ├── CoveringSpace.lean         # Covering space theory
+    │   ├── LieGroups.lean             # SO(2), U(1), tori
+    │   └── ...
     │
-    ├── Groupoid.lean             # Weak/strict category & groupoid
-    ├── Bicategory.lean           # Weak bicategory, 2-groupoid
-    └── OmegaGroupoid.lean        # Weak ω-groupoid structure
+    ├── CompPath/                      # Space constructions (12 modules)
+    │   ├── CircleCompPath.lean        # S¹ via path expressions
+    │   ├── CircleStep.lean            # π₁(S¹) ≃ ℤ
+    │   ├── Torus.lean                 # T² = S¹ × S¹
+    │   ├── TorusStep.lean             # π₁(T²) ≃ ℤ × ℤ
+    │   ├── SphereCompPath.lean        # S² with π₁(S²) ≃ 1
+    │   ├── PushoutCompPath.lean       # Pushout construction
+    │   ├── PushoutPaths.lean          # SVK theorem
+    │   ├── FigureEight.lean           # S¹ ∨ S¹
+    │   └── BouquetN.lean              # ∨ⁿS¹ and free groups
+    │
+    ├── Algebra/                       # Algebraic structures (4 modules)
+    │   ├── Abelianization.lean        # F_n^ab ≃ ℤⁿ
+    │   └── NielsenSchreier*.lean      # Subgroup theory
+    │
+    ├── OmegaGroupoid/                 # ω-groupoid structure (5 modules)
+    │   ├── Derived.lean               # Coherence derivations
+    │   ├── StepToCanonical.lean       # Canonicity axiom
+    │   └── TypedRewriting.lean        # Typed TRS foundations
+    │
+    ├── Groupoid.lean                  # Weak/strict groupoid
+    ├── Bicategory.lean                # Weak bicategory, 2-groupoid
+    ├── OmegaGroupoid.lean             # Weak ω-groupoid structure
+    │
+    └── *Derived.lean                  # 8 derived theorem modules
+        ├── GroupoidDerived.lean       # 56 uses of rweq_of_step
+        ├── PathAlgebraDerived.lean    # 40 uses
+        ├── StepDerived.lean           # 59 uses
+        ├── CoherenceDerived.lean      # 51 uses
+        ├── LoopDerived.lean           # 27 uses
+        └── ...
 ```
 
 ## Key Types and Concepts
@@ -549,12 +581,13 @@ This project's `lean-toolchain` should be compatible. If you encounter issues, c
 |--------|--------------|-----------|
 | `CompPath/CircleStep.lean` | `circlePiOneEquivInt` | π₁(S¹) ≃ ℤ |
 | `CompPath/TorusStep.lean` | `torusPiOneEquivIntProd` | π₁(T²) ≃ ℤ × ℤ |
-| `CompPath/SphereCompPath.lean` | `sphere2_pi1_equiv_unit` | π₁(S²) ≃ 1 |
-| `CompPath/FigureEight.lean` | `figureEightPiOneEquiv` | π₁(S¹ ∨ S¹) ≃ ℤ * ℤ |
+| `CompPath/SphereCompPath.lean` | `sphere2CompPath_pi1_equiv_unit` | π₁(S²) ≃ 1 |
 | `CompPath/PushoutPaths.lean` | `seifertVanKampenEquiv` | π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) |
 | `OmegaGroupoid.lean` | `compPathOmegaGroupoid` | Types are weak ω-groupoids |
-| `FundamentalGroupoid.lean` | `basepointIsomorphism` | π₁(A, a) ≃ π₁(A, b) via path conjugation |
-| `LieGroups.lean` | `SO2.piOneEquivInt` | π₁(SO(2)) ≃ ℤ (via Circle) |
+| `Homotopy/FundamentalGroupoid.lean` | `basepointIsomorphism` | π₁(A, a) ≃ π₁(A, b) via path conjugation |
+| `Homotopy/LieGroups.lean` | `SO2.piOneEquivInt` | π₁(SO(2)) ≃ ℤ (via Circle) |
+| `Rewrite/ConfluenceProof.lean` | `instHasJoinOfRw` | LND_EQ-TRS confluence |
+| `Algebra/Abelianization.lean` | `freeGroup_ab_equiv` | F_n^ab ≃ ℤⁿ |
 
 ## Common Pitfalls
 

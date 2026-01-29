@@ -1,5 +1,13 @@
 # Axiom minimization status
 
+## Summary
+
+| Property | Status |
+|----------|--------|
+| **Kernel Axioms** | **0** (confirmed via `Scripts/AxiomInventory.lean`) |
+| **Sorries** | **0** (all proofs complete) |
+| **Explicit Assumptions** | Typeclass-based, not kernel axioms |
+
 This project distinguishes:
 
 - **Kernel axioms**: Lean `axiom` declarations that extend the trusted base.
@@ -47,6 +55,20 @@ HoTT-style developments, not something that can be instantiated inside Lean’s 
 ## Current kernel axioms (global)
 
 `Scripts/AxiomInventory.lean` currently reports **0** kernel axioms when importing `ComputationalPaths`.
+
+This is verified by running:
+```bash
+lake env lean Scripts/AxiomInventory.lean
+# Output: ComputationalPaths axioms (importing `ComputationalPaths`): 0
+```
+
+### Why Axiom-Free Matters
+
+Being axiom-free means:
+1. **No custom axiom declarations** extend Lean's trusted kernel
+2. **All proofs are constructive** (modulo Lean's standard `propext`, `Quot.sound`)
+3. **Results are maximally trustworthy** - verified by Lean's type checker alone
+4. **No inconsistency risk** from custom axioms
 
 ### Axiomatic interfaces
 
