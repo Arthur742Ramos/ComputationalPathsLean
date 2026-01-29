@@ -26,8 +26,9 @@
   - Added `FreeProductWord.map`/`FreeProductWord.equiv` helpers in `PushoutPaths.lean`
   - Added `figureEightPiOneEquiv` alias in `FigureEight.lean`
   - Full build succeeded (`timeout 3600 ~/.elan/bin/lake build`)
+  - Committed changes and sent clawdbot wake message via `clawdbot system event`
 
-- **Now**: Commit changes and send clawdbot wake message.
+- **Now**: None
 
 - **Next**:
   - None
