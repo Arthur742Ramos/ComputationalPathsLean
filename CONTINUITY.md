@@ -1,48 +1,31 @@
 # CONTINUITY.md
 
 ## Goal
-- Deep dive documentation update: comprehensive analysis of the codebase and update of all documentation to reflect current state.
-- Success criteria: README.md, CLAUDE.md, docs/axioms.md, AGENTS.md all accurately reflect the 103-module, 111K-line, axiom-free, sorry-free formalization.
+- Audit and remove remaining axioms or HIT-style definitions, ensure build passes, commit changes, and notify via clawdbot.
 
 ## Constraints/Assumptions
-- No kernel axioms (confirmed via Scripts/AxiomInventory.lean)
-- No sorries (all proofs complete)
-- Uses Lean 4 with Lake build system
-- Build command: `~/.elan/bin/lake build`
-- UIP/proof-irrelevance is intentional (not HoTT)
+- No axioms and no sorries in final code; proofs must be constructive
+- Run axiom inventory: `~/.elan/bin/lake env lean Scripts/AxiomInventory.lean`
+- Check for HIT-style definitions; migrate to CompPath if needed
+- Build must pass: `~/.elan/bin/lake build`
+- Commit message: `refactor: remove remaining axioms/HITs`
+- On success: run `clawdbot gateway wake --text 'LEGION: Axiom/HIT audit complete' --mode now`
 
 ## Key Decisions
-- Documentation should emphasize:
-  1. Axiom-free, sorry-free status
-  2. ~111K lines across 140 modules
-  3. Key theorems (π₁(S¹)≃ℤ, π₁(T²)≃ℤ×ℤ, π₁(S²)≃1, SVK)
-  4. ω-groupoid structure
-  5. Rewrite system with confluence proof
-- Create ARCHITECTURE.md for detailed module structure
+- No code changes: axiom inventory empty and no HIT-style definitions found
 
 ## State
 - **Done**:
-  - Phase 1 complete: Deep analysis of codebase
-    - Verified 0 kernel axioms, 0 sorries
-    - Mapped module structure (96 modules in ComputationalPaths/)
-    - Analyzed core concepts (Path, Step, RwEq)
-    - Reviewed rewrite system (confluence via Newman's lemma)
-    - Mapped HoTT-like constructions (S¹, T², S², pushouts)
-    - Checked ω-groupoid and bicategory structures
-
-- **Now**:
-  - Phase 2: Updating documentation files
-
-- **Next**:
-  - Update README.md with accurate statistics
-  - Update CLAUDE.md with current module structure
-  - Update docs/axioms.md
-  - Create ARCHITECTURE.md
-  - Commit and notify
+  - Ran axiom inventory (0 axioms)
+  - Searched for axiom/HIT keywords and declarations; only doc mentions found
+  - Build succeeded (`~/.elan/bin/lake build`)
+  - Sent clawdbot notification
+- **Now**: Report results
+- **Next**: None
 
 ## Open Questions
 - None
 
 ## Working Set
-- Files: README.md, CLAUDE.md, docs/axioms.md, AGENTS.md, CONTINUITY.md
-- Commands: `~/.elan/bin/lake build`, `~/.elan/bin/lake env lean Scripts/AxiomInventory.lean`
+- Files: None
+- Commands: `~/.elan/bin/lake env lean Scripts/AxiomInventory.lean`, `~/.elan/bin/lake build`
