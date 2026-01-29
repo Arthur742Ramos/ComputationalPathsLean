@@ -40,3 +40,8 @@ axioms.txt
 axioms_all.txt
 build_log.txt
 Scripts/CheckCylinder.lean
+
+# Ignore arxiv papers
+arxiv_svk/
+arXiv-*.tar
+*.pdf
