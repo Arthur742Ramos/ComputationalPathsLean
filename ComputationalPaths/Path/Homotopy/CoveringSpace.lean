@@ -83,6 +83,41 @@ noncomputable def pathLift {P : A → Type u} {a b : A} (p : Path a b) (x : P a)
     -- Since transport refl = id, this is ⟨a, x⟩ = ⟨a, x⟩
     rfl)
 
+/-! ## Lifting Properties
+
+Coverings provide canonical lifts of paths in the base once a starting point
+in the fiber is chosen. The lifted path starts at the given point, and its
+projection is the base path.
+-/
+
+/-- The lifted path projects to the canonical `ofEq` path in the base. -/
+theorem proj_pathLift_ofEq {P : A → Type u} {a b : A}
+    (p : Path a b) (x : P a) :
+    Path.congrArg proj (pathLift (P := P) p x) = Path.ofEq p.toEq := by
+  cases p with
+  | mk steps proof =>
+    cases proof
+    rfl
+
+/-- Lifting along reflexivity produces the canonical `ofEq` path. -/
+theorem pathLift_refl_ofEq {P : A → Type u} {a : A} (x : P a) :
+    pathLift (P := P) (Path.refl a) x = Path.ofEq (by rfl) := by
+  rfl
+
+/-! ## Transport Composition in Fibers -/
+
+/-- Transport along a composite base path equals successive transports. -/
+theorem fiberTransport_trans {P : A → Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) (x : P a) :
+    fiberTransport (Path.trans p q) x = fiberTransport q (fiberTransport p x) := by
+  cases p with
+  | mk _ proof₁ =>
+    cases q with
+    | mk _ proof₂ =>
+      cases proof₁
+      cases proof₂
+      rfl
+
 /-! ## Covering Space Structure
 
 A type family P : A → Type is a covering space when the fibers
@@ -168,6 +203,23 @@ theorem fiberAction_id {P : A → Type u} {a : A} (x : P a) :
   unfold fiberAction loopAction fiberTransport
   rfl
 
+/-! ## Fiber Paths and π₁-Action
+
+Loops in the base transport points in the fiber, yielding a canonical path
+in the total space between points in the same fiber.
+-/
+
+/-- A loop induces a path between a point and its action on the fiber. -/
+noncomputable def fiberLoopPath {P : A → Type u} {a : A} (l : LoopSpace A a) (x : P a) :
+    Path (TotalPoint a x) (TotalPoint a (loopAction l x)) := by
+  simpa [loopAction] using pathLift (P := P) l x
+
+/-- The projection of the fiber-loop path is the canonical `ofEq` loop. -/
+theorem proj_fiberLoopPath_ofEq {P : A → Type u} {a : A}
+    (l : LoopSpace A a) (x : P a) :
+    Path.congrArg proj (fiberLoopPath (P := P) l x) = Path.ofEq l.toEq := by
+  simpa [fiberLoopPath] using proj_pathLift_ofEq (P := P) l x
+
 /-! ## Deck Transformations
 
 Deck transformations are automorphisms of the total space that
@@ -207,6 +259,22 @@ def comp (f g : DeckTransformation P) : DeckTransformation P where
   inv := g.inv ∘ f.inv
   left_inv := fun x => by simp [f.left_inv, g.left_inv]
   right_inv := fun x => by simp [f.right_inv, g.right_inv]
+
+/-- Deck transformations form an identity element under composition. -/
+@[simp] theorem comp_id (f : DeckTransformation P) : comp f id = f := by
+  cases f
+  rfl
+
+@[simp] theorem id_comp (f : DeckTransformation P) : comp id f = f := by
+  cases f
+  rfl
+
+@[simp] theorem comp_assoc (f g h : DeckTransformation P) :
+    comp (comp f g) h = comp f (comp g h) := by
+  cases f
+  cases g
+  cases h
+  rfl
 
 end DeckTransformation
 

@@ -58,6 +58,10 @@ import ComputationalPaths.Path.CompPath.FigureEight
 import ComputationalPaths.Path.CompPath.BouquetN
 import ComputationalPaths.Path.CompPath.SphereCompPath
 import ComputationalPaths.Path.CompPath.Pi5S3
+import ComputationalPaths.Path.CompPath.KleinBottle
+import ComputationalPaths.Path.CompPath.MobiusBand
+import ComputationalPaths.Path.CompPath.RealProjective
+import ComputationalPaths.Path.CompPath.LensSpace
 -- removed legacy assumption-heavy modules (Mobius/Lens/Hopf/Pi2/Pi3/CP/James/Freudenthal/Cellular)
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived

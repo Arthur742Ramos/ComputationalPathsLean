@@ -285,11 +285,11 @@ def kernelOnPi1 (f : A → B) (a : A) : π₁(A, a) → Prop :=
 
 /-! ## Long Exact Sequence of Homotopy Groups
 
-For a fiber sequence F → E → B, there is a long exact sequence:
-
-  ... → π_n(F) → π_n(E) → π_n(B) → π_{n-1}(F) → ... → π_1(B) → π_0(F)
-
-At each position, the image of one map equals the kernel of the next.
+The computational paths framework collapses higher homotopies beyond π₂ to
+`PUnit` (see `HigherHomotopy.PiN`). We provide a structure-level long exact
+sequence that is compatible with that truncation. For n ≥ 3 the maps are
+trivial by definition, while for n = 1 and n = 2 we recover the explicit
+connecting map at the π₁ level.
 -/
 
 /-- Structure capturing exactness at a point in the sequence.
@@ -299,6 +299,27 @@ structure ExactAt {X Y Z : Type u} (f : X → Y) (g : Y → Z) (z₀ : Z) where
   im_subset_ker : ∀ x, g (f x) = z₀
   /-- Kernel is contained in image. -/
   ker_subset_im : ∀ y, g y = z₀ → ∃ x, f x = y
+
+/-- Induced maps on higher homotopy groups for a function.
+    For n ≥ 3, `PiN` is `PUnit`, so the map is the unique constant map. -/
+noncomputable def inducedPiNMap (n : Nat) (f : A → B) (a : A) :
+    HigherHomotopy.PiN n A a → HigherHomotopy.PiN n B (f a) := by
+  cases n with
+  | zero =>
+      intro _
+      exact PUnit.unit
+  | succ n =>
+      cases n with
+      | zero =>
+          exact inducedPi1Map f a
+      | succ n =>
+          cases n with
+          | zero =>
+              intro _
+              exact PiTwo.id (A := B) (a := f a)
+          | succ n =>
+              intro _
+              exact PUnit.unit
 
 /-- The long exact sequence at the π₁ level for a type family fibration.
     We have: π₁(F) →i* π₁(E) →p* π₁(B) →∂ π₀(F) -/
