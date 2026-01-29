@@ -1,26 +1,72 @@
 # GitHub Copilot Instructions for ComputationalPaths
 
-> **TL;DR**: Lean 4 formalization proving that propositional equality can be modeled as computational paths forming a term rewriting system (LND_EQ-TRS). Key results: π₁(S¹)≃ℤ, π₁(T²)≃ℤ×ℤ, types are weak ω-groupoids.
+> **Lean 4 • Homotopy Type Theory • Term Rewriting**
+>
+> A formal proof that Martin-Löf's identity types are *computational paths*—explicit syntactic witnesses of equality that form a confluent term rewriting system (LND_EQ-TRS). Key results: π₁(S¹)≃ℤ, π₁(T²)≃ℤ×ℤ, all types are weak ω-groupoids.
+
+## 🧭 Origin Story: Why This Project Exists
+
+**The Problem (2011–2016)**: Homotopy Type Theory (HoTT) showed that identity types have rich structure—they're not just "two things are equal" but carry *paths* between points, paths between paths, and so on infinitely. But HoTT relied on the *univalence axiom*, which is non-constructive and doesn't compute.
+
+**The Insight**: Ruy de Queiroz and collaborators at UFPE (Brazil) asked: *What if we took the path metaphor literally?* Instead of identity being abstract, make it **explicit syntax**—you can *see* the proof term that witnesses `a = b`. These proof terms form a term rewriting system, and two proofs are "the same" when they normalize to the same form.
+
+**The Result**: This library formalizes 20+ years of research (SAJL 2016, IGPL 2017, LSFA 2011) proving that this "computational paths" approach:
+1. Gives the same π₁ calculations as classical algebraic topology
+2. Requires **zero axioms** beyond Lean's core type theory
+3. Makes every type a weak ω-groupoid (Lumsdaine's theorem, computationally!)
+
+**Why Lean 4?** Unlike Coq/Agda HoTT libraries that postulate univalence, we derive structure from *computation*. Lean 4's quotient types + definitional proof irrelevance give us clean quotients without axioms.
 
 ## ⚡ Critical Facts (Read First)
 
 | Aspect | Details |
 |--------|---------|
-| **Language** | Lean 4 (Lake build system) |
+| **Language** | **Lean 4** with Lake build system |
+| **Mathematical Field** | Homotopy Type Theory (constructive fragment) |
 | **Core Insight** | Identity types = explicit syntactic paths + rewrite equivalence |
 | **Main Purpose** | Prove fundamental group calculations via encode-decode |
 | **Build** | `lake build` (clean: `lake clean`) |
 | **Test a module** | `lake build ComputationalPaths.Path.CompPath.CircleStep` |
 
-## Why This Architecture Exists
+## 💡 Mathematical Background (Not in the Code)
 
-### The Core Idea: Paths as Syntax, Not Black Boxes
+### Connection to Algebraic Topology
 
-Unlike Lean's built-in `Eq` which is opaque, this library makes equality **explicit syntactic objects**:
+In classical topology, the **fundamental group** π₁(X, x₀) is "loops at x₀ up to homotopy." We prove the *same* groups emerge from pure type theory:
+
+| Space | Classical Result | Our Proof |
+|-------|------------------|-----------|
+| Circle S¹ | π₁ ≃ ℤ (winding number) | Loops = `loop^n`, encode counts n |
+| Torus T² | π₁ ≃ ℤ×ℤ | Two independent generators |
+| Sphere S² | π₁ ≃ 1 | Surface relation kills loops |
+| Figure-8 | π₁ ≃ F₂ (free group) | No relations between generators |
+
+**Key insight**: The encode-decode method from HoTT (Licata-Shulman 2013) works computationally! We don't need univalence—quotients suffice.
+
+### The ω-Groupoid Connection
+
+A **weak ω-groupoid** is an infinite-dimensional structure where:
+- 0-cells are points
+- 1-cells are paths between points  
+- 2-cells are "paths between paths"
+- n-cells are paths between (n-1)-cells
+- Composition is associative and unital *up to higher cells*
+
+**Lumsdaine's Theorem (2009)**: Every type in intensional type theory is a weak ω-groupoid. We prove this *computationally* in `OmegaGroupoid.lean`—the groupoid laws hold up to `RwEq`, not just propositionally.
+
+### Why "LND_EQ-TRS"?
+
+The name comes from the papers: **L**abelled **N**atural **D**eduction with **EQ**uality as a **T**erm **R**ewriting **S**ystem. The 47+ rewrite rules in `Step.lean` form a confluent, terminating TRS that normalizes path expressions.
+
+## 🧠 Development Philosophy
+
+### Why Explicit Paths Over Implicit Tactics?
+
+**Design choice**: We *don't* use Lean's built-in `Eq` and `rfl`. Instead:
 
 ```lean
 -- Standard Lean: equality is abstract
-#check @Eq.refl  -- ∀ a, a = a (you can't inspect why)
+#check @Eq.refl  -- ∀ a, a = a (you can't inspect HOW)
 
 -- Computational Paths: equality is concrete syntax
 inductive Path : A → A → Type where
@@ -34,6 +80,18 @@ inductive Path : A → A → Type where
 1. **Normalize** paths to canonical forms via term rewriting
 2. **Quotient** by rewrite equivalence to get a computable equality
 3. **Calculate** π₁ by encoding loops as algebraic objects
+4. **Prove** the groupoid laws *computationally*, not axiomatically
+
+**The tradeoff**: More verbose proofs, but every step is inspectable. When `path_auto` fails, you can *see* exactly which rewrite rule is missing.
+
+### Why Avoid Mathlib?
+
+Mathlib provides `Fin`, groupoids, and quotients. We define our own (`Fin'`, `SimpleEquiv`, etc.) because:
+1. **Minimal dependencies** = faster builds, clearer foundations
+2. **Custom `Fin' n`** is n ∈ {1,...,n} not {0,...,n-1} (matches paper conventions)
+3. **`SimpleEquiv`** is just `toFun`/`invFun`/round-trips—no `Equiv.symm` complexity
+
+### The Core Idea: Paths as Syntax, Not Black Boxes
 
 ### The Rewrite Hierarchy
 
@@ -211,6 +269,74 @@ namespace ComputationalPaths.Path
 end ComputationalPaths.Path
 ```
 
+## 🎓 Mental Models for Newcomers
+
+### Think of Paths as Proof Terms
+
+In standard Lean, `rfl : a = a` is opaque. Here, think of paths as **explicit proof scripts**:
+
+```
+Path.trans (Path.symm (Path.congrArg f p)) (Path.trans q Path.refl)
+```
+
+This is a *data structure* you can pattern-match on, rewrite, and normalize.
+
+### RwEq is "Proof Irrelevance for Paths"
+
+Two paths `p q : Path a b` might be syntactically different but represent the "same" equality. `RwEq p q` means they normalize to the same canonical form. Think: "These are the same proof, written differently."
+
+### The Quotient Hierarchy
+
+```
+Path a b          -- Many syntactically distinct paths
+    ↓ RwEq
+PathRwQuot a b    -- Paths up to normalization (≈)
+    ↓ (when a = b)
+π₁(A, a)          -- Loops at a, up to RwEq (the fundamental group!)
+```
+
+### Encode-Decode = "Universal Property"
+
+When proving `π₁(S¹) ≃ ℤ`, think:
+- **Encode**: Count winding number (loops → integers)
+- **Decode**: Build loop from count (integers → loops)
+- **Round-trip**: These are mutual inverses
+
+This is the computational version of "ℤ is the free group on one generator."
+
+## 🚨 Common Newcomer Mistakes
+
+### 1. Trying to Use Lean's `Eq` Instead of `Path`
+```lean
+-- WRONG: Using built-in equality
+theorem foo : a = b := ...
+
+-- RIGHT: Using computational paths
+theorem foo : Path a b := ...
+```
+
+### 2. Forgetting That Path is a Type, Not a Prop
+```lean
+-- Paths live in Type, not Prop!
+-- This means: different paths between the same points are distinguishable
+-- (until you quotient by RwEq)
+```
+
+### 3. Expecting `rfl` to Work
+```lean
+-- WRONG: Lean's rfl doesn't apply
+example : Path.refl a = Path.refl a := rfl  -- This works (Lean eq)
+example : RwEq p p := rfl  -- WRONG! Use `RwEq.refl` or `path_rfl`
+```
+
+### 4. Not Respecting RwEq When Lifting Through Quotients
+```lean
+-- When defining functions on π₁, you MUST prove they respect RwEq:
+def myFun : π₁(X, x) → Result :=
+  Quot.lift (fun loop => ...)
+    (fun p q h => ...)  -- h : RwEq p q, must show same result
+```
+
 ## Key Theorems (The Main Results)
 
 | File | Theorem | Mathematical Statement |
@@ -248,7 +374,20 @@ uvx --from aristotlelib aristotle.exe prove-from-file "path/to/file.lean"
 
 ## References
 
-- de Queiroz et al., *Propositional equality, identity types, and direct computational paths*, SAJL 2016
-- Ramos et al., *On the Identity Type as the Type of Computational Paths*, IGPL 2017
-- HoTT Book, Chapters 2 (Homotopy Type Theory) and 8 (π₁ calculations)
-- Lumsdaine, *Weak ω-categories from intensional type theory*, TLCA 2009
+### Primary Sources (The Papers Behind This Code)
+
+- **de Queiroz et al., *Propositional equality, identity types, and direct computational paths*, SAJL 2016** — The foundational paper introducing LND_EQ-TRS
+- **Ramos et al., *On the Identity Type as the Type of Computational Paths*, IGPL 2017** — Extended treatment with confluence proofs
+- **de Queiroz & Gabbay, *Equality in Labelled Deductive Systems*, LSFA 2011** — Early work on labelled deduction
+
+### Background Reading
+
+- **HoTT Book, Chapters 2 and 8** — Homotopy Type Theory foundations and π₁ calculations
+- **Lumsdaine, *Weak ω-categories from intensional type theory*, TLCA 2009** — The ω-groupoid structure we formalize
+- **Licata & Shulman, *Calculating the Fundamental Group of the Circle*, LICS 2013** — The encode-decode method
+
+### Related Formalizations
+
+- **HoTT-Agda** — Agda formalization using univalence axiom (contrast: we're axiom-free)
+- **Cubical Agda** — Computational univalence via cubical type theory (different approach)
+- **Lean 4 Mathlib** — We deliberately avoid Mathlib to stay self-contained

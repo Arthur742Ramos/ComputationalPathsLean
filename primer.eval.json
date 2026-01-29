@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {
+      "id": "project-overview",
+      "prompt": "What is this project about?",
+      "expectation": "Should mention Lean 4, homotopy theory, computational paths, type theory, or path algebra"
+    },
+    {
+      "id": "tech-stack",
+      "prompt": "What language does this project use?",
+      "expectation": "Should mention Lean 4"
+    }
+  ]
+}
