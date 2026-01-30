@@ -694,3 +694,21 @@ Print the full ledger only when it materially changes or when requested.
     uvx --from aristotlelib aristotle.exe prove-from-file "path/to/file.lean"
     ```
     See the "Aristotle Integration" section above for details and limitations.
+
+---
+
+## Skills (Domain-Specific Instructions)
+
+This project has specialized skills in `.github/skills/`:
+
+| Skill | Purpose | When to use |
+|-------|---------|-------------|
+| `aristotle` | Using Aristotle LLM prover for axiom-free files | Auto-proving sorries, integration tips |
+| `ci-and-releases` | CI/CD workflows, release process | Modifying workflows, publishing |
+| `lean-build` | Lake build system, dependencies | Build issues, adding dependencies |
+| `lean-hit-development` | HIT patterns, quotient types, path algebra | Working on Higher Inductive Types |
+| `path-tactics` | Custom tactics (path_induction, rweq_refl) | Writing proofs with path tactics |
+| `quotients-and-lifts` | Quotient constructions, lift patterns | Working with quotient types |
+| `rweq-proofs` | Rewrite equality proofs, normalization | Proving RwEq statements |
+
+**Read the relevant SKILL.md before working in that domain.**
