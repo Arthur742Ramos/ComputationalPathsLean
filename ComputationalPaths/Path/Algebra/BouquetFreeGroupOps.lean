@@ -58,7 +58,7 @@ variable {n : Nat}
   induction w₁ with
   | nil => simp [wordConcat, length]
   | cons l rest ih =>
-      simp [wordConcat, length, ih, Nat.add_assoc, Nat.add_left_comm]
+      simp [wordConcat, length, ih, Nat.add_assoc]
 
 /-- Length of an inverse word equals the length of the word. -/
 @[simp] theorem length_inverse (w : BouquetWord n) :
@@ -66,8 +66,12 @@ variable {n : Nat}
   induction w with
   | nil => rfl
   | cons l rest ih =>
-    simp only [inverse, length, length_wordConcat, ih]
-    simp [length, Nat.add_comm, Nat.add_left_comm, Nat.add_assoc]
+    calc
+      (inverse (BouquetWord.cons l rest)).length
+          = (inverse rest).length + 1 := by
+              simp [inverse, length, length_wordConcat, Nat.add_comm]
+      _ = rest.length + 1 := by simp [ih]
+      _ = (BouquetWord.cons l rest).length := by simp [length, Nat.add_comm]
 
 /-- Inverse of the empty word. -/
 @[simp] theorem inverse_nil : inverse (n := n) .nil = .nil := rfl
@@ -78,7 +82,7 @@ variable {n : Nat}
       BouquetWord.cons
         ⟨l.gen, -l.power, fun h => l.power_ne_zero (Int.neg_eq_zero.mp h)⟩
         .nil := by
-  simp [inverse, wordConcat]
+  simp [inverse]
 
 /-- Inverse respects word concatenation. -/
 @[simp] theorem inverse_wordConcat (w₁ w₂ : BouquetWord n) :
@@ -98,7 +102,7 @@ variable {n : Nat}
   | cons l rest ih =>
       cases l with
       | mk gen power power_ne_zero =>
-          simp [inverse, inverse_wordConcat, ih, wordConcat_assoc, wordConcat, Int.neg_neg]
+          simp [inverse, inverse_wordConcat, ih, wordConcat]
 
 /-- Word exponentiation by natural numbers. -/
 @[simp] def wordPow (w : BouquetWord n) : Nat → BouquetWord n
@@ -123,7 +127,7 @@ variable {n : Nat}
   | zero =>
       simp [wordPow, wordConcat_nil_right]
   | succ n ih =>
-      simp [wordPow, wordConcat_assoc, ih, Nat.add_assoc]
+      simp [wordPow, wordConcat_assoc, ih]
 
 /-- Left successor law for word powers. -/
 @[simp] theorem wordPow_succ_left (w : BouquetWord n) (k : Nat) :
@@ -137,7 +141,7 @@ variable {n : Nat}
   induction k with
   | zero => rfl
   | succ k ih =>
-      simp [wordPow, wordConcat, ih]
+      simp [wordPow, ih]
 
 /-- Inverse of a word power. -/
 @[simp] theorem inverse_wordPow (w : BouquetWord n) (k : Nat) :
@@ -152,7 +156,7 @@ variable {n : Nat}
         _ = wordConcat (inverse w) (wordPow (inverse w) k) := by
                 simp [ih]
         _ = wordPow (inverse w) (Nat.succ k) := by
-                simpa using wordPow_succ_left (w := inverse w) (k := k)
+                simp
 
 end BouquetWord
 
@@ -219,8 +223,7 @@ variable {n : Nat}
   | _ w₁ =>
       induction y using Quot.ind with
       | _ w₂ =>
-          simp [BouquetFreeGroup.mul, BouquetFreeGroup.inv, BouquetWord.inverse_wordConcat,
-            BouquetWord.wordConcat_assoc]
+          simp [BouquetFreeGroup.mul, BouquetFreeGroup.inv, BouquetWord.inverse_wordConcat]
 
 /-- Strict monoid structure on `BouquetFreeGroup`. -/
 @[simp] noncomputable def strictMonoid (n : Nat) : StrictMonoid (BouquetFreeGroup n) where

@@ -52,22 +52,23 @@ noncomputable def fiberActionGroupAction {P : A → Type u} (a : A) :
   act := fiberAction (P := P) (a := a)
   act_one := by
     intro x
-    simpa [LoopQuot.id] using (fiberAction_id (P := P) (a := a) x)
+    simpa using (fiberAction_id (P := P) (a := a) (x := x))
   act_mul := by
     intro g h x
-    simpa [LoopQuot.comp] using (fiberAction_comp (P := P) (a := a) g h x).symm
+    symm
+    simpa using (fiberAction_comp (P := P) (a := a) (α := g) (β := h) (x := x))
 
 /-- Fiber action respects identity (restated). -/
 @[simp] theorem fiberAction_one {P : A → Type u} {a : A} (x : P a) :
     fiberAction (P := P) (a := a) (LoopQuot.id (A := A) (a := a)) x = x := by
-  simpa [LoopQuot.id] using (fiberAction_id (P := P) (a := a) x)
+  simpa using (fiberAction_id (P := P) (a := a) (x := x))
 
 /-- Fiber action respects composition (restated). -/
 @[simp] theorem fiberAction_mul {P : A → Type u} {a : A}
     (g h : LoopQuot A a) (x : P a) :
     fiberAction (P := P) (a := a) g (fiberAction (P := P) (a := a) h x) =
       fiberAction (P := P) (a := a) (LoopQuot.comp g h) x := by
-  simpa [LoopQuot.comp] using (fiberAction_comp (P := P) (a := a) g h x)
+  simp [fiberAction_comp]
 
 /-! ## Inverse and Cancellation Laws -/
 
@@ -83,7 +84,7 @@ theorem fiberAction_inv_left {P : A → Type u} {a : A}
         = fiberAction (P := P) (a := a)
             (LoopQuot.comp (LoopQuot.inv g) g) x := h
     _ = fiberAction (P := P) (a := a) (LoopQuot.id (A := A) (a := a)) x := by
-          simpa [LoopQuot.inv_comp]
+          simp
     _ = x := fiberAction_one (P := P) (a := a) (x := x)
 
 /-- Action of a loop cancels the action of its inverse. -/
@@ -98,12 +99,12 @@ theorem fiberAction_inv_right {P : A → Type u} {a : A}
         = fiberAction (P := P) (a := a)
             (LoopQuot.comp g (LoopQuot.inv g)) x := h
     _ = fiberAction (P := P) (a := a) (LoopQuot.id (A := A) (a := a)) x := by
-          simpa [LoopQuot.comp_inv]
+          simp
     _ = x := fiberAction_one (P := P) (a := a) (x := x)
 
 /-- Left cancellation for the fiber action. -/
 theorem fiberAction_left_cancel {P : A → Type u} {a : A}
-    {g h : LoopQuot A a} {x y : P a}
+    {g _h : LoopQuot A a} {x y : P a}
     (hxy : fiberAction (P := P) (a := a) g x = fiberAction (P := P) (a := a) g y) :
     x = y := by
   have h' :=
@@ -124,14 +125,14 @@ noncomputable def actionIter {P : A → Type u} {a : A} (g : LoopQuot A a) (n : 
 
 @[simp] theorem actionIter_zero {P : A → Type u} {a : A} (g : LoopQuot A a) (x : P a) :
     actionIter (P := P) (a := a) g 0 x = x := by
-  simpa [actionIter, LoopQuot.pow] using
-    (fiberAction_one (P := P) (a := a) (x := x))
+  simpa [actionIter, LoopQuot.pow, PathRwQuot.refl] using
+    (fiberAction_id (P := P) (a := a) (x := x))
 
 @[simp] theorem actionIter_succ {P : A → Type u} {a : A} (g : LoopQuot A a) (n : Nat) (x : P a) :
     actionIter (P := P) (a := a) g (Nat.succ n) x =
       actionIter (P := P) (a := a) g n (fiberAction (P := P) (a := a) g x) := by
-  have h := fiberAction_mul (P := P) (a := a) (LoopQuot.pow g n) g x
-  simpa [actionIter, LoopQuot.pow] using h
+  symm
+  simp [actionIter, LoopQuot.pow]
 
 /-- Iterated action respects addition. -/
 @[simp] theorem actionIter_add {P : A → Type u} {a : A}
@@ -144,9 +145,9 @@ noncomputable def actionIter {P : A → Type u} {a : A} (g : LoopQuot A a) (n : 
         = fiberAction (P := P) (a := a) (LoopQuot.pow g (m + n)) x := rfl
     _ = fiberAction (P := P) (a := a)
           (LoopQuot.comp (LoopQuot.pow g m) (LoopQuot.pow g n)) x := by
-          simpa [LoopQuot.pow_add]
+          simp [LoopQuot.pow_add]
     _ = actionIter (P := P) (a := a) g m (actionIter (P := P) (a := a) g n x) := by
-          simpa [actionIter] using h
+          simp [actionIter]
 
 /-- Fiber action of powers equals iterated action. -/
 theorem fiberAction_pow {P : A → Type u} {a : A}
@@ -158,15 +159,16 @@ theorem fiberAction_pow {P : A → Type u} {a : A}
 @[simp] theorem fiberAction_pow_zero {P : A → Type u} {a : A}
     (g : LoopQuot A a) (x : P a) :
     fiberAction (P := P) (a := a) (LoopQuot.pow g 0) x = x := by
-  simpa [LoopQuot.pow] using (fiberAction_one (P := P) (a := a) (x := x))
+  simpa [LoopQuot.pow, PathRwQuot.refl] using
+    (fiberAction_id (P := P) (a := a) (x := x))
 
 /-- Power action at successor. -/
 @[simp] theorem fiberAction_pow_succ {P : A → Type u} {a : A}
     (g : LoopQuot A a) (n : Nat) (x : P a) :
     fiberAction (P := P) (a := a) (LoopQuot.pow g (Nat.succ n)) x =
       fiberAction (P := P) (a := a) (LoopQuot.pow g n) (fiberAction (P := P) (a := a) g x) := by
-  have h := fiberAction_mul (P := P) (a := a) (LoopQuot.pow g n) g x
-  simpa [LoopQuot.pow] using h
+  symm
+  simp [LoopQuot.pow]
 
 /-- Power action respects addition. -/
 theorem fiberAction_pow_add {P : A → Type u} {a : A}
@@ -179,10 +181,10 @@ theorem fiberAction_pow_add {P : A → Type u} {a : A}
     fiberAction (P := P) (a := a) (LoopQuot.pow g (m + n)) x
         = fiberAction (P := P) (a := a)
             (LoopQuot.comp (LoopQuot.pow g m) (LoopQuot.pow g n)) x := by
-            simpa [LoopQuot.pow_add]
+            simp [LoopQuot.pow_add]
     _ = fiberAction (P := P) (a := a) (LoopQuot.pow g m)
           (fiberAction (P := P) (a := a) (LoopQuot.pow g n) x) := by
-          simpa using h
+          simp
 
 /-! ## Integer Powers -/
 

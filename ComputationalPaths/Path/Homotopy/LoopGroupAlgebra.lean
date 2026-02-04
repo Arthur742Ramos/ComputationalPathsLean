@@ -121,11 +121,11 @@ variable {A : Type u} {a : A}
   Algebra.StrictGroup.zpow (loopGroupStructure A a) x
 
 @[simp] theorem pow_zero (x : LoopQuot A a) : pow (A := A) (a := a) x 0 = LoopQuot.id := by
-  simpa [pow] using (Algebra.StrictGroup.pow_zero (loopGroupStructure A a) x)
+  simp [pow]
 
 @[simp] theorem pow_succ (x : LoopQuot A a) (n : Nat) :
     pow (A := A) (a := a) x (Nat.succ n) = LoopQuot.comp (pow (A := A) (a := a) x n) x := by
-  simpa [pow] using (Algebra.StrictGroup.pow_succ (loopGroupStructure A a) x n)
+  simp [pow]
 
 @[simp] theorem pow_add (x : LoopQuot A a) (m n : Nat) :
     pow (A := A) (a := a) x (m + n) =
@@ -142,10 +142,10 @@ variable {A : Type u} {a : A}
   simpa [pow] using (Algebra.StrictGroup.pow_mul (loopGroupStructure A a) x m n)
 
 @[simp] theorem zpow_zero (x : LoopQuot A a) : zpow (A := A) (a := a) x 0 = LoopQuot.id := by
-  simpa [zpow] using (Algebra.StrictGroup.zpow_zero (loopGroupStructure A a) x)
+  simp [zpow]
 
 @[simp] theorem zpow_one (x : LoopQuot A a) : zpow (A := A) (a := a) x 1 = x := by
-  simpa [zpow] using (Algebra.StrictGroup.zpow_one (loopGroupStructure A a) x)
+  simp [zpow]
 
 @[simp] theorem zpow_neg (x : LoopQuot A a) (z : Int) :
     zpow (A := A) (a := a) x (-z) = LoopQuot.inv (zpow (A := A) (a := a) x z) := by

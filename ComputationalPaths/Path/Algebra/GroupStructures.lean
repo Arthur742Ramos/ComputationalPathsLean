@@ -62,7 +62,7 @@ theorem mul_left_cancel {S : StrictMonoid M}
     x = S.mul S.one x := (S.one_mul x).symm
     _ = S.mul (S.mul inv z) x := by simp [h_inv]
     _ = S.mul inv (S.mul z x) := S.mul_assoc _ _ _
-    _ = S.mul inv (S.mul z y) := by simpa [h]
+    _ = S.mul inv (S.mul z y) := by simp [h]
     _ = S.mul (S.mul inv z) y := (S.mul_assoc _ _ _).symm
     _ = S.mul S.one y := by simp [h_inv]
     _ = y := S.one_mul y
@@ -76,7 +76,7 @@ theorem mul_right_cancel {S : StrictMonoid M}
     x = S.mul x S.one := (S.mul_one x).symm
     _ = S.mul x (S.mul z inv) := by simp [h_inv]
     _ = S.mul (S.mul x z) inv := (S.mul_assoc _ _ _).symm
-    _ = S.mul (S.mul y z) inv := by simpa [h]
+    _ = S.mul (S.mul y z) inv := by simp [h]
     _ = S.mul y (S.mul z inv) := S.mul_assoc _ _ _
     _ = S.mul y S.one := by simp [h_inv]
     _ = y := S.mul_one y
@@ -235,7 +235,7 @@ variable {G : Type u} {S : StrictGroup G}
   one_mem := rfl
   mul_mem := by
     intro x y hx hy
-    simpa [hx, hy, S.mul_one] using (S.one_mul S.one)
+    simp [hx, hy, S.mul_one]
   inv_mem := by
     intro x hx
     simpa [hx] using (StrictGroup.inv_one S)
@@ -252,7 +252,7 @@ variable {G : Type u} {S : StrictGroup G}
     exact ⟨H.inv_mem hx.1, K.inv_mem hx.2⟩
 
 /-- Membership of the identity is unique in a subgroup. -/
-theorem one_unique {H : Subgroup G S} {x : G} (hx : H.carrier x) (hx' : H.carrier (S.inv x)) :
+theorem one_unique {H : Subgroup G S} {x : G} (_ : H.carrier x) (_ : H.carrier (S.inv x)) :
     S.mul x (S.inv x) = S.one := by
   exact S.mul_right_inv x
 
@@ -315,14 +315,13 @@ theorem pow_add (S : StrictMonoid M) (x : M) (m n : Nat) :
   | zero =>
       simp [pow, S.mul_one]
   | succ n ih =>
-      have hNat : m + Nat.succ n = Nat.succ (m + n) := Nat.add_succ m n
       calc
         pow S x (m + Nat.succ n)
-            = pow S x (Nat.succ (m + n)) := by simpa [hNat]
+            = pow S x (Nat.succ (m + n)) := by simp
         _ = S.mul (pow S x (m + n)) x := rfl
-        _ = S.mul (S.mul (pow S x m) (pow S x n)) x := by simpa [ih]
+        _ = S.mul (S.mul (pow S x m) (pow S x n)) x := by simp [ih]
         _ = S.mul (pow S x m) (S.mul (pow S x n) x) := by
-            simpa [S.mul_assoc]
+            simp [S.mul_assoc]
         _ = S.mul (pow S x m) (pow S x (Nat.succ n)) := rfl
 
 /-- Power commutation for a fixed base. -/
@@ -330,7 +329,7 @@ theorem pow_comm (S : StrictMonoid M) (x : M) (m n : Nat) :
     S.mul (pow S x m) (pow S x n) = S.mul (pow S x n) (pow S x m) := by
   calc
     S.mul (pow S x m) (pow S x n) = pow S x (m + n) := (pow_add S x m n).symm
-    _ = pow S x (n + m) := by simpa [Nat.add_comm]
+    _ = pow S x (n + m) := by simp [Nat.add_comm]
     _ = S.mul (pow S x n) (pow S x m) := pow_add S x n m
 
 /-- Multiplicative law for powers. -/
@@ -343,9 +342,9 @@ theorem pow_mul (S : StrictMonoid M) (x : M) (m n : Nat) :
       have hNat : m * Nat.succ n = m * n + m := Nat.mul_succ m n
       calc
         pow S x (m * Nat.succ n)
-            = pow S x (m * n + m) := by simpa [hNat]
+            = pow S x (m * n + m) := by simp [hNat]
         _ = S.mul (pow S x (m * n)) (pow S x m) := pow_add S x (m * n) m
-        _ = S.mul (pow S (pow S x m) n) (pow S x m) := by simpa [ih]
+        _ = S.mul (pow S (pow S x m) n) (pow S x m) := by simp [ih]
         _ = pow S (pow S x m) (Nat.succ n) := rfl
 
 end StrictMonoid
@@ -438,9 +437,9 @@ theorem inv_pow (S : StrictGroup G) (x : G) (n : Nat) :
         calc
           S.mul (S.mul (pow S x n) x) (S.mul (S.inv x) (S.inv (pow S x n)))
               = S.mul (pow S x n) (S.mul x (S.mul (S.inv x) (S.inv (pow S x n)))) := by
-                  simpa [S.mul_assoc]
+                  simp [S.mul_assoc]
           _ = S.mul (pow S x n) (S.mul (S.mul x (S.inv x)) (S.inv (pow S x n))) := by
-                  simpa [S.mul_assoc]
+                  simp [S.mul_assoc]
           _ = S.mul (pow S x n) (S.mul S.one (S.inv (pow S x n))) := by
                   simp [S.mul_right_inv]
           _ = S.mul (pow S x n) (S.inv (pow S x n)) := by simp [S.one_mul]
@@ -466,9 +465,9 @@ theorem inv_mul_eq (S : StrictGroup G) (x y : G) :
     calc
       S.mul (S.mul (S.inv y) (S.inv x)) (S.mul x y)
           = S.mul (S.inv y) (S.mul (S.inv x) (S.mul x y)) := by
-              simpa [S.mul_assoc]
+              simp [S.mul_assoc]
       _ = S.mul (S.inv y) (S.mul (S.mul (S.inv x) x) y) := by
-              simpa [S.mul_assoc]
+              simp [S.mul_assoc]
       _ = S.mul (S.inv y) (S.mul S.one y) := by
               simp [S.mul_left_inv]
       _ = S.mul (S.inv y) y := by simp [S.one_mul]
@@ -482,12 +481,12 @@ theorem pow_succ_left (S : StrictGroup G) (x : G) (n : Nat) :
     pow S x (Nat.succ n) = S.mul x (pow S x n) := by
   calc
     pow S x (Nat.succ n) = pow S x (n + 1) := by
-      simp [Nat.succ_eq_add_one]
+      simp
     _ = pow S x (1 + n) := by
-      simpa [Nat.add_comm]
+      simp [Nat.add_comm]
     _ = S.mul (pow S x 1) (pow S x n) := pow_add S x 1 n
     _ = S.mul x (pow S x n) := by
-          simp [pow_one, S.one_mul]
+          rw [pow_one]
 
 /-- Commutation between x and inverse of x^n. -/
 theorem inv_pow_comm (S : StrictGroup G) (x : G) (n : Nat) :
@@ -499,12 +498,12 @@ theorem inv_pow_comm (S : StrictGroup G) (x : G) (n : Nat) :
   calc
     S.mul (S.mul (S.inv (pow S x n)) x) (pow S x n)
         = S.mul (S.inv (pow S x n)) (S.mul x (pow S x n)) := by
-            simpa [S.mul_assoc]
+            simp [S.mul_assoc]
     _ = S.mul (S.inv (pow S x n)) (pow S x (Nat.succ n)) := by
             rw [← pow_succ_left (S := S) (x := x) (n := n)]
     _ = S.mul (S.inv (pow S x n)) (S.mul (pow S x n) x) := by rfl
     _ = S.mul (S.mul (S.inv (pow S x n)) (pow S x n)) x := by
-            simpa [S.mul_assoc]
+            simp [S.mul_assoc]
     _ = S.mul S.one x := by
             simp [S.mul_left_inv]
     _ = x := by simp [S.one_mul]
@@ -512,7 +511,7 @@ theorem inv_pow_comm (S : StrictGroup G) (x : G) (n : Nat) :
     _ = S.mul x (S.mul (S.inv (pow S x n)) (pow S x n)) := by
             simp [S.mul_left_inv]
     _ = S.mul (S.mul x (S.inv (pow S x n))) (pow S x n) := by
-            simpa [S.mul_assoc]
+            simp [S.mul_assoc]
 
 /-- Integer successor law. -/
 theorem zpow_succ (S : StrictGroup G) (x : G) (n : Int) :
@@ -521,13 +520,13 @@ theorem zpow_succ (S : StrictGroup G) (x : G) (n : Int) :
   | ofNat n =>
       have : Int.ofNat n + 1 = Int.ofNat (n + 1) := rfl
       rw [this]
-      simp [zpow, pow_succ]
+      simp [zpow]
   | negSucc n =>
       cases n with
       | zero =>
           have : Int.negSucc 0 + 1 = 0 := rfl
           rw [this]
-          simp [zpow, pow_zero, pow_one, S.mul_left_inv, S.one_mul]
+          simp [zpow, S.mul_left_inv, S.one_mul]
       | succ n =>
           have : Int.negSucc (Nat.succ n) + 1 = Int.negSucc n := rfl
           rw [this]
@@ -538,7 +537,7 @@ theorem zpow_succ (S : StrictGroup G) (x : G) (n : Int) :
             calc
               S.mul (S.inv (pow S x (Nat.succ (Nat.succ n)))) x
                   = S.mul (S.inv (S.mul (pow S x (Nat.succ n)) x)) x := by
-                      simp [pow_succ]
+                      simp
               _ = S.mul (S.mul (S.inv x) (S.inv (pow S x (Nat.succ n)))) x := by
                       simp [inv_mul_eq, S.mul_assoc]
               _ = S.mul (S.inv x) (S.mul (S.inv (pow S x (Nat.succ n))) x) := by
@@ -562,11 +561,11 @@ theorem zpow_pred (S : StrictGroup G) (x : G) (n : Int) :
       | zero =>
           have : Int.ofNat 0 - 1 = Int.negSucc 0 := rfl
           rw [this]
-          simp [zpow, pow_zero, pow_one, S.one_mul]
+          simp [zpow, S.one_mul]
       | succ n =>
           have : Int.ofNat (Nat.succ n) - 1 = Int.ofNat n := by simp
           rw [this]
-          simp [zpow, pow_succ, S.mul_assoc, S.mul_right_inv, S.mul_one]
+          simp [zpow, S.mul_assoc, S.mul_right_inv, S.mul_one]
   | negSucc n =>
       have : Int.negSucc n - 1 = Int.negSucc (Nat.succ n) := rfl
       rw [this]
@@ -576,7 +575,7 @@ theorem zpow_pred (S : StrictGroup G) (x : G) (n : Int) :
             = S.inv (S.mul x (pow S x (Nat.succ n))) := by
                 rw [pow_succ_left (S := S) (x := x) (n := Nat.succ n)]
         _ = S.mul (S.inv (pow S x (Nat.succ n))) (S.inv x) := by
-                simpa [inv_mul_eq, S.mul_assoc]
+                simp [inv_mul_eq, S.mul_assoc]
 
 /-- Integer induction for group power proofs. -/
 theorem int_induction {P : Int → Prop}
@@ -599,7 +598,7 @@ theorem zpow_add (S : StrictGroup G) (x : G) (m n : Int) :
     zpow S x (m + n) = S.mul (zpow S x m) (zpow S x n) := by
   induction n using int_induction with
   | base =>
-      simp [zpow, pow_zero, S.mul_one]
+      simp [zpow, S.mul_one]
   | succ n ih =>
       rw [← Int.add_assoc, zpow_succ, ih, zpow_succ, S.mul_assoc]
   | pred n ih =>
@@ -619,7 +618,7 @@ theorem zpow_neg (S : StrictGroup G) (x : G) (z : Int) :
       cases n with
       | zero =>
           change S.one = S.inv S.one
-          simpa [StrictGroup.inv_one] using (rfl : (S.one = S.one))
+          simp [StrictGroup.inv_one]
       | succ n =>
           rw [neg_ofNat_succ_eq_negSucc]
           rfl
@@ -646,7 +645,7 @@ theorem zpow_neg (S : StrictGroup G) (x : G) (z : Int) :
     conj S g S.one = S.one := by
   calc
     conj S g S.one = S.mul (S.mul g S.one) (S.inv g) := rfl
-    _ = S.mul g (S.inv g) := by simp [S.mul_one, S.mul_assoc]
+    _ = S.mul g (S.inv g) := by simp [S.mul_one]
     _ = S.one := S.mul_right_inv g
 
 /-- Conjugation distributes over multiplication. -/
@@ -675,11 +674,11 @@ theorem conj_mul (S : StrictGroup G) (g x y : G) :
     conj S g (S.mul x y)
         = S.mul (S.mul g (S.mul x y)) (S.inv g) := rfl
     _ = S.mul (S.mul (S.mul g x) y) (S.inv g) := by
-          simpa [S.mul_assoc]
+          simp [S.mul_assoc]
     _ = S.mul (S.mul g x) (S.mul y (S.inv g)) := by
-          simpa [S.mul_assoc]
+          simp [S.mul_assoc]
     _ = S.mul (S.mul g x) (S.mul (S.inv g) (S.mul (S.mul g y) (S.inv g))) := by
-          simpa [h2]
+          simp [h2]
     _ = S.mul (S.mul (S.mul g x) (S.inv g)) (S.mul (S.mul g y) (S.inv g)) := by
           simp [S.mul_assoc]
     _ = S.mul (conj S g x) (conj S g y) := rfl
@@ -700,7 +699,7 @@ theorem conj_inv (S : StrictGroup G) (g x : G) :
             simp [S.mul_assoc]
   calc
     conj S g (S.inv x) = S.mul (S.mul g (S.inv x)) (S.inv g) := rfl
-    _ = S.inv (S.mul (S.mul g x) (S.inv g)) := by simpa [h]
+    _ = S.inv (S.mul (S.mul g x) (S.inv g)) := by simp [h]
     _ = S.inv (conj S g x) := rfl
 
 /-- Conjugation composition law. -/
@@ -710,7 +709,7 @@ theorem conj_conj (S : StrictGroup G) (g h x : G) :
     conj S g (conj S h x)
         = S.mul (S.mul g (S.mul (S.mul h x) (S.inv h))) (S.inv g) := rfl
     _ = S.mul (S.mul (S.mul g h) x) (S.mul (S.inv h) (S.inv g)) := by
-          simpa [S.mul_assoc]
+          simp [S.mul_assoc]
     _ = S.mul (S.mul (S.mul g h) x) (S.inv (S.mul g h)) := by
           simp [inv_mul_eq]
     _ = conj S (S.mul g h) x := rfl
@@ -722,12 +721,12 @@ theorem conj_conj (S : StrictGroup G) (g h x : G) :
 /-- Commutator with identity on the left. -/
 @[simp] theorem commutator_one_left (S : StrictGroup G) (y : G) :
     commutator S S.one y = S.one := by
-  simp [commutator, S.one_mul, StrictGroup.inv_one S, S.mul_right_inv, S.mul_assoc]
+  simp [commutator, S.one_mul, StrictGroup.inv_one S, S.mul_right_inv]
 
 /-- Commutator with identity on the right. -/
 @[simp] theorem commutator_one_right (S : StrictGroup G) (x : G) :
     commutator S x S.one = S.one := by
-  simp [commutator, S.mul_one, StrictGroup.inv_one S, S.mul_right_inv, S.mul_assoc]
+  simp [commutator, S.mul_one, StrictGroup.inv_one S, S.mul_right_inv]
 
 /-- Self-commutator is identity. -/
 @[simp] theorem commutator_self (S : StrictGroup G) (x : G) :
@@ -736,7 +735,7 @@ theorem conj_conj (S : StrictGroup G) (g h x : G) :
     commutator S x x = S.mul (S.mul (S.mul x x) (S.inv x)) (S.inv x) := by
       simp [commutator, S.mul_assoc]
     _ = S.mul (S.mul x (S.mul x (S.inv x))) (S.inv x) := by
-      simpa [S.mul_assoc]
+      simp [S.mul_assoc]
     _ = S.mul (S.mul x S.one) (S.inv x) := by
       simp [S.mul_right_inv]
     _ = S.mul x (S.inv x) := by simp [S.one_mul, S.mul_assoc]

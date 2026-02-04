@@ -61,9 +61,9 @@ def Stabilizer (A : GroupAction G S X) (x : X) : Subgroup G S where
   inv_mem := by
     intro g hg
     calc
-      A.act (S.inv g) x = A.act (S.inv g) (A.act g x) := by simpa [hg]
+      A.act (S.inv g) x = A.act (S.inv g) (A.act g x) := by simp [hg]
       _ = A.act (S.mul (S.inv g) g) x := (A.act_mul _ _ _).symm
-      _ = x := by simpa [S.mul_left_inv] using A.act_one x
+      _ = x := by simp [S.mul_left_inv, A.act_one]
 
 /-- Membership in the orbit via identity. -/
 theorem orbit_self (A : GroupAction G S X) (x : X) :
@@ -85,7 +85,7 @@ theorem orbit_symm (A : GroupAction G S X) {x y : X}
   refine ⟨S.inv g, ?_⟩
   calc
     A.act (S.inv g) (A.act g x) = A.act (S.mul (S.inv g) g) x := (A.act_mul _ _ _).symm
-    _ = x := by simpa [S.mul_left_inv] using A.act_one x
+    _ = x := by simp [S.mul_left_inv, A.act_one]
 
 /-- Orbits are transitive under the action. -/
 theorem orbit_trans (A : GroupAction G S X) {x y z : X}
@@ -113,7 +113,7 @@ variable {G : Type u} {X : Type v} {S : StrictGroup G}
   funext x
   calc
     A.act (S.inv g) (A.act g x) = A.act (S.mul (S.inv g) g) x := (A.act_mul _ _ _).symm
-    _ = x := by simpa [S.mul_left_inv] using A.act_one x
+    _ = x := by simp [S.mul_left_inv, A.act_one]
 
 /-- Action defines a monoid homomorphism into endomorphisms. -/
 @[simp] def actionHom (A : GroupAction G S X) :
