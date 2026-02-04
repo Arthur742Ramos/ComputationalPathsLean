@@ -16,6 +16,8 @@ import ComputationalPaths.Path.Rewrite.LNDEQ
 import ComputationalPaths.Path.Rewrite.Termination
 import ComputationalPaths.Path.Rewrite.Confluence
 import ComputationalPaths.Path.Rewrite.ConfluenceProof
+import ComputationalPaths.Path.Rewrite.ConfluenceTerminationDerived
+import ComputationalPaths.Path.Rewrite.NormalizationDerived
 import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
 import ComputationalPaths.Path.Rewrite.PathTactic
 import ComputationalPaths.Path.Groupoid
@@ -28,14 +30,17 @@ import ComputationalPaths.Path.CoherenceDerived
 import ComputationalPaths.Path.BiContextDerived
 import ComputationalPaths.Path.LoopDerived
 import ComputationalPaths.Path.Bicategory
+import ComputationalPaths.Path.BicategoryDerived
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.LoopIteration
 import ComputationalPaths.Path.Homotopy.IntArith
+import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.Fibration
+import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
@@ -66,4 +71,7 @@ import ComputationalPaths.Path.CompPath.LensSpace
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
+import ComputationalPaths.Path.Algebra.GroupStructures
+import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
+import ComputationalPaths.Path.Algebra.GroupActionOps
 import ComputationalPaths.Path.Algebra.Abelianization
