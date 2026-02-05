@@ -699,6 +699,11 @@ theorem conj_pow (S : StrictGroup G) (g x : G) (n : Nat) :
               rw [ih]
         _ = pow S (conj S g x) (Nat.succ n) := rfl
 
+/-- Power of a conjugate as conjugate of a power. -/
+theorem pow_conj (S : StrictGroup G) (g x : G) (n : Nat) :
+    pow S (conj S g x) n = conj S g (pow S x n) := by
+  exact (conj_pow (S := S) (g := g) (x := x) (n := n)).symm
+
 /-- Conjugation of an inverse. -/
 theorem conj_inv (S : StrictGroup G) (g x : G) :
     conj S g (S.inv x) = S.inv (conj S g x) := by
