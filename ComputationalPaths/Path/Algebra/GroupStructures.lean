@@ -683,6 +683,22 @@ theorem conj_mul (S : StrictGroup G) (g x y : G) :
           simp [S.mul_assoc]
     _ = S.mul (conj S g x) (conj S g y) := rfl
 
+/-- Conjugation distributes over powers. -/
+theorem conj_pow (S : StrictGroup G) (g x : G) (n : Nat) :
+    conj S g (pow S x n) = pow S (conj S g x) n := by
+  induction n with
+  | zero =>
+      simp [pow, conj, S.mul_one, S.mul_right_inv]
+  | succ n ih =>
+      calc
+        conj S g (pow S x (Nat.succ n))
+            = conj S g (S.mul (pow S x n) x) := rfl
+        _ = S.mul (conj S g (pow S x n)) (conj S g x) := by
+              simpa using (conj_mul (S := S) g (pow S x n) x)
+        _ = S.mul (pow S (conj S g x) n) (conj S g x) := by
+              rw [ih]
+        _ = pow S (conj S g x) (Nat.succ n) := rfl
+
 /-- Conjugation of an inverse. -/
 theorem conj_inv (S : StrictGroup G) (g x : G) :
     conj S g (S.inv x) = S.inv (conj S g x) := by
@@ -740,6 +756,20 @@ theorem conj_conj (S : StrictGroup G) (g h x : G) :
       simp [S.mul_right_inv]
     _ = S.mul x (S.inv x) := by simp [S.one_mul, S.mul_assoc]
     _ = S.one := S.mul_right_inv x
+
+/-- Inverse of a commutator swaps the arguments. -/
+theorem commutator_inv (S : StrictGroup G) (x y : G) :
+    S.inv (commutator S x y) = commutator S y x := by
+  calc
+    S.inv (commutator S x y)
+        = S.inv (S.mul (S.mul x y) (S.mul (S.inv x) (S.inv y))) := rfl
+    _ = S.mul (S.inv (S.mul (S.inv x) (S.inv y))) (S.inv (S.mul x y)) := by
+          simp [inv_mul_eq]
+    _ = S.mul (S.mul (S.inv (S.inv y)) (S.inv (S.inv x))) (S.mul (S.inv y) (S.inv x)) := by
+          simp [inv_mul_eq, S.mul_assoc]
+    _ = S.mul (S.mul y x) (S.mul (S.inv y) (S.inv x)) := by
+          simp [inv_inv]
+    _ = commutator S y x := rfl
 
 /-- Conjugation preserves commutators. -/
 theorem conj_commutator (S : StrictGroup G) (g x y : G) :
