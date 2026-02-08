@@ -37,6 +37,7 @@ import ComputationalPaths.Path.Homotopy.LoopIteration
 import ComputationalPaths.Path.Homotopy.IntArith
 import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
+import ComputationalPaths.Path.Homotopy.EckmannHilton
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.Fibration
