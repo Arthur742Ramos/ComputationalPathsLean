@@ -1,7 +1,7 @@
 # CONTINUITY.md
 
 ## Goal
-- Add a new module proving derived algebraic properties for π₁ of wedge sums/free products, and verify with the required lake build command.
+- Create NaturalitySquares.lean proving naturality for SimpleEquiv composition, functoriality of π₁, and SVK naturality squares, then verify with the required build command.
 
 ## Constraints/Assumptions
 - No sorries, axioms, or #check in new code.
@@ -9,17 +9,17 @@
 - Verify with `export PATH=$HOME/.elan/bin:$PATH && lake build 2>&1 | tail -30`.
 
 ## Key Decisions
-- Create a new wedge/free-product derived module that proves multiplication compatibility of the wedge π₁ equivalence and the universal map.
-- Add the new module to `ComputationalPaths/Path.lean` (README only if needed).
+- Add NaturalitySquares.lean under `ComputationalPaths/Path/` and import it in `ComputationalPaths/Path.lean`.
+- Use existing `SimpleEquiv.comp_*`, `fundamentalGroupoidMap_compFun`, and pushout decode lemmas to prove naturality.
 
 ## State
-- **Done**: Read AGENTS.md, ARCHITECTURE.md, CONTINUITY.md; reviewed PushoutPaths wedge/free product sections and WedgeFreeProductUniversal.
-- **Now**: Implement new wedge/free-product derived module and wire imports.
-- **Next**: Run required build command and summarize results.
+- **Done**: Added `NaturalitySquares.lean`, imported it in `Path.lean`, ran required build command.
+- **Now**: Report build failures (pre-existing in AbelianFundamentalGroup/SemidirectProductDerived) and summarize changes.
+- **Next**: Await user direction.
 
 ## Open Questions
 - None.
 
 ## Working Set
-- Files: new module file, ComputationalPaths/Path/CompPath/PushoutPaths.lean, ComputationalPaths/Path/CompPath/WedgeFreeProductUniversal.lean, ComputationalPaths/Path.lean.
+- Files: ComputationalPaths/Path/NaturalitySquares.lean (new), ComputationalPaths/Path/Rewrite/SimpleEquiv.lean, ComputationalPaths/Path/Homotopy/FundamentalGroupoid.lean, ComputationalPaths/Path/Homotopy/FundamentalGroupoidFunctor.lean, ComputationalPaths/Path/CompPath/PushoutPaths.lean, ComputationalPaths/Path.lean.
 - Commands: export PATH=$HOME/.elan/bin:$PATH && lake build 2>&1 | tail -30

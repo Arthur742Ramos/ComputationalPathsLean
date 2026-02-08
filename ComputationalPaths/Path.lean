@@ -23,8 +23,11 @@ import ComputationalPaths.Path.Rewrite.PathTactic
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.GroupoidDerived
 import ComputationalPaths.Path.PathAlgebraDerived
+import ComputationalPaths.Path.PathAlgebraIdentities
+import ComputationalPaths.Path.NaturalitySquares
 import ComputationalPaths.Path.ProductSigmaDerived
 import ComputationalPaths.Path.TransportDerived
+import ComputationalPaths.Path.HigherPathInduction
 import ComputationalPaths.Path.StepDerived
 import ComputationalPaths.Path.CoherenceDerived
 import ComputationalPaths.Path.BiContextDerived
@@ -41,6 +44,7 @@ import ComputationalPaths.Path.Homotopy.IntArith
 import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.EckmannHilton
+import ComputationalPaths.Path.Homotopy.AbelianFundamentalGroup
 import ComputationalPaths.Path.Homotopy.OmegaTwoCoherence
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.CoveringSpace
@@ -51,6 +55,7 @@ import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
+import ComputationalPaths.Path.Homotopy.FundamentalGroupoidFunctor
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 import ComputationalPaths.Path.Homotopy.PiOneDerived
 import ComputationalPaths.Path.Homotopy.HigherProductHomotopy
@@ -76,6 +81,7 @@ import ComputationalPaths.Path.CompPath.SphereCompPath
 import ComputationalPaths.Path.CompPath.SuspensionCircle
 import ComputationalPaths.Path.CompPath.Pi5S3
 import ComputationalPaths.Path.CompPath.KleinBottle
+import ComputationalPaths.Path.CompPath.SemidirectProductDerived
 import ComputationalPaths.Path.CompPath.MobiusBand
 import ComputationalPaths.Path.CompPath.RealProjective
 import ComputationalPaths.Path.CompPath.LensSpace
