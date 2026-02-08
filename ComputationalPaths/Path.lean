@@ -81,7 +81,6 @@ import ComputationalPaths.Path.CompPath.SphereCompPath
 import ComputationalPaths.Path.CompPath.SuspensionCircle
 import ComputationalPaths.Path.CompPath.Pi5S3
 import ComputationalPaths.Path.CompPath.KleinBottle
-import ComputationalPaths.Path.CompPath.SemidirectProductDerived
 import ComputationalPaths.Path.CompPath.MobiusBand
 import ComputationalPaths.Path.CompPath.RealProjective
 import ComputationalPaths.Path.CompPath.LensSpace
