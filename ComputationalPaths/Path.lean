@@ -38,14 +38,19 @@ import ComputationalPaths.Path.Homotopy.IntArith
 import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.EckmannHilton
+import ComputationalPaths.Path.Homotopy.OmegaTwoCoherence
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.CoveringSpace
+import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
+import ComputationalPaths.Path.Homotopy.CoveringPathLifting
 import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
+import ComputationalPaths.Path.Homotopy.FundamentalGroupDerived
+import ComputationalPaths.Path.Homotopy.PiOneDerived
 import ComputationalPaths.Path.Homotopy.HigherProductHomotopy
 import ComputationalPaths.Path.Homotopy.LieGroups
 import ComputationalPaths.Path.Homotopy.Hurewicz
@@ -62,6 +67,7 @@ import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.CompPath.PushoutPaths
 import ComputationalPaths.Path.CompPath.FigureEight
 import ComputationalPaths.Path.CompPath.FigureEightStep
+import ComputationalPaths.Path.CompPath.WedgeFreeProductUniversal
 import ComputationalPaths.Path.CompPath.BouquetN
 import ComputationalPaths.Path.CompPath.SphereCompPath
 import ComputationalPaths.Path.CompPath.SuspensionCircle

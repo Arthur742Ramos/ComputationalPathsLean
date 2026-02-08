@@ -73,7 +73,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - **Seifert-van Kampen theorem**: Full encode-decode proof that π₁(Pushout) ≃ π₁(A) *_{π₁(C)} π₁(B) (amalgamated free product), with special case π₁(A ∨ B) ≃ π₁(A) * π₁(B) for wedge sums.
 - **Lens spaces (legacy removed)**: The lens space module and its encode/decode assumptions were removed as legacy placeholders.
 - **2-Sphere** (S²): π₁(S²) ≅ 1 (trivial) via SVK applied to the suspension decomposition Σ(S¹), plus π₂(S²) ≅ 1 via contractibility₃.
-- **Figure-eight space** (S¹ ∨ S¹): basic loops are defined; π₁ equivalence to ℤ * ℤ is not yet formalized.
+- **Figure-eight space** (S¹ ∨ S¹): basic loops are defined; π₁ equivalence to π₁(S¹) * π₁(S¹) is formalized via the wedge SVK interface.
 - **Bouquet of n circles** (∨ⁿS¹): free group model and decode map defined; π₁ equivalence is not yet formalized.
 - **Path simplification tactics**: 29 tactics including `path_simp`, `path_auto`, `path_normalize`, `path_beta`, `path_eta`, plus structural tactics (`path_inv_inv`, `path_inv_distr`, `path_cancel_left/right`, `path_then_cancel_left/right`) and congruence tactics (`path_congr_symm`, `path_congrArg`) for automated RwEq reasoning.
 - **Free group abelianization** (axiom-free): Constructive proof that F_n^ab ≃ ℤⁿ with full encode-decode equivalence.
@@ -148,7 +148,9 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`ComputationalPaths/Path/CompPath/TorusStep.lean`](ComputationalPaths/Path/CompPath/TorusStep.lean) — quotient-level `torusPiOneEquivIntProd : π₁(T²) ≃ ℤ × ℤ`.
 - [`ComputationalPaths/Path/CompPath/PushoutCompPath.lean`](ComputationalPaths/Path/CompPath/PushoutCompPath.lean) — pushout construction in computational paths with constructors and elimination principles.
 - [`ComputationalPaths/Path/CompPath/PushoutPaths.lean`](ComputationalPaths/Path/CompPath/PushoutPaths.lean) — path characterization for pushouts, free products, amalgamated free products, and the **Seifert-van Kampen theorem** (`seifertVanKampenEquiv`).
-- [`ComputationalPaths/Path/CompPath/FigureEight.lean`](ComputationalPaths/Path/CompPath/FigureEight.lean) — figure-eight space (S¹ ∨ S¹) with basic loops; π₁ equivalence not yet formalized.
+- [`ComputationalPaths/Path/CompPath/WedgeFreeProductUniversal.lean`](ComputationalPaths/Path/CompPath/WedgeFreeProductUniversal.lean) — universal map from π₁(A ∨ B) built from the free-product word lift.
+- [`ComputationalPaths/Path/CompPath/FigureEight.lean`](ComputationalPaths/Path/CompPath/FigureEight.lean) — figure-eight space (S¹ ∨ S¹) with basic loops.
+- [`ComputationalPaths/Path/CompPath/FigureEightStep.lean`](ComputationalPaths/Path/CompPath/FigureEightStep.lean) — SVK wedge equivalence π₁(FigureEight) ≃ π₁(S¹) * π₁(S¹).
 - [`ComputationalPaths/Path/CompPath/BouquetN.lean`](ComputationalPaths/Path/CompPath/BouquetN.lean) — **Bouquet of n circles** (∨ⁿS¹) with free group model and decode map; π₁ equivalence not yet formalized.
 - [`ComputationalPaths/Path/CompPath/SphereCompPath.lean`](ComputationalPaths/Path/CompPath/SphereCompPath.lean) — the 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK. Also defines S³ for the Hopf fibration.
 - Wedge encode/decode is now integrated in `ComputationalPaths/Path/CompPath/PushoutPaths.lean` via `wedgeFundamentalGroupEquiv_of_decode_bijective`.
@@ -572,7 +574,7 @@ Two approaches are available:
 - **Two generators**: `loopA` (left circle) and `loopB` (right circle, conjugated by glue)
 - **Main theorem** ([`FigureEightStep.lean`](ComputationalPaths/Path/CompPath/FigureEightStep.lean)):
   `figureEightPiOneEquivFreeGroup` proves π₁(FigureEight) ≃ π₁(S¹) * π₁(S¹)
-  under `HasWedgeSVKDecodeBijective` (and thus ℤ * ℤ after the circle computation).
+  under `HasWedgeSVKDecodeBijective`.
 - **Non-abelianness**: `wordAB ≠ wordBA` proves the fundamental group is non-abelian.
 - The figure-eight is the simplest space with non-abelian π₁, making it important for testing SVK.
 
