@@ -27,6 +27,7 @@ import ComputationalPaths.Path.ProductSigmaDerived
 import ComputationalPaths.Path.TransportDerived
 import ComputationalPaths.Path.StepDerived
 import ComputationalPaths.Path.CoherenceDerived
+import ComputationalPaths.Path.EckmannHilton
 import ComputationalPaths.Path.BiContextDerived
 import ComputationalPaths.Path.LoopDerived
 import ComputationalPaths.Path.Bicategory
@@ -67,6 +68,7 @@ import ComputationalPaths.Path.CompPath.KleinBottle
 import ComputationalPaths.Path.CompPath.MobiusBand
 import ComputationalPaths.Path.CompPath.RealProjective
 import ComputationalPaths.Path.CompPath.LensSpace
+import ComputationalPaths.Path.CompPath.LensSpaceAlgebra
 -- removed legacy assumption-heavy modules (Mobius/Lens/Hopf/Pi2/Pi3/CP/James/Freudenthal/Cellular)
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived

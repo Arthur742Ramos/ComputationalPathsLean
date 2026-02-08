@@ -802,6 +802,25 @@ noncomputable def decodeWord {n : Nat} : BouquetWord n → LoopSpaceN n
   | .cons l rest =>
       Path.trans (iterateLoopInt (bouquetLoop l.gen) l.power) (decodeWord rest)
 
+/-- Decode respects word concatenation. -/
+theorem decodeWord_concat {n : Nat} (w₁ w₂ : BouquetWord n) :
+    RwEq (decodeWord (BouquetWord.wordConcat w₁ w₂))
+         (Path.trans (decodeWord w₁) (decodeWord w₂)) := by
+  induction w₁ with
+  | nil =>
+      show RwEq (decodeWord w₂) (Path.trans (Path.refl bouquetBase) (decodeWord w₂))
+      exact rweq_symm (rweq_cmpA_refl_left (decodeWord w₂))
+  | cons l rest ih =>
+      show RwEq
+        (Path.trans (iterateLoopInt (bouquetLoop l.gen) l.power)
+          (decodeWord (BouquetWord.wordConcat rest w₂)))
+        (Path.trans (Path.trans (iterateLoopInt (bouquetLoop l.gen) l.power)
+          (decodeWord rest)) (decodeWord w₂))
+      exact RwEq.trans
+        (rweq_trans_congr_right (iterateLoopInt (bouquetLoop l.gen) l.power) ih)
+        (rweq_symm
+          (rweq_tt (iterateLoopInt (bouquetLoop l.gen) l.power) (decodeWord rest) (decodeWord w₂)))
+
 /-- Decode respects the free group relation.
     The proof uses loop iteration theorems to handle combining and cancellation. -/
 theorem decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
@@ -845,6 +864,17 @@ noncomputable def decode_def {n : Nat} : BouquetFreeGroup n → PiOneN n :=
   Quot.lift
     (fun w => Quot.mk RwEq (decodeWord w))
     (fun w₁ w₂ h => Quot.sound (decodeWord_respects_rel w₁ w₂ h))
+
+/-- Decode is multiplicative with respect to free-group multiplication. -/
+theorem decode_def_mul {n : Nat} (x y : BouquetFreeGroup n) :
+    decode_def (BouquetFreeGroup.mul x y) =
+      piOneMul (decode_def x) (decode_def y) := by
+  induction x using Quot.ind with
+  | _ w₁ =>
+      induction y using Quot.ind with
+      | _ w₂ =>
+          simpa [BouquetFreeGroup.mul, decode_def, piOneMul_mk_mk] using
+            (Quot.sound (decodeWord_concat w₁ w₂))
 
 end BouquetN
 
@@ -1130,6 +1160,7 @@ formalized.
 
 **Decode (1):**
 - `decodeWord_respects_rel`: Decode respects the free group relation (via iterateLoopInt lemmas)
+- `decode_def_mul`: Decode preserves multiplication on `BouquetFreeGroup`
 
 **Free Group Equivalences (1):**
 - `freeGroupOneToInt_intToFreeGroupOne`: F₁ → ℤ → F₁ round-trip
