@@ -51,7 +51,6 @@ import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
-import ComputationalPaths.Path.Homotopy.HomotopyInvariance
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 import ComputationalPaths.Path.Homotopy.PiOneDerived
 import ComputationalPaths.Path.Homotopy.HigherProductHomotopy
