@@ -570,7 +570,9 @@ Two approaches are available:
 ## Figure-Eight Space (S¹ ∨ S¹) (what to read)
 - **Definition** ([`FigureEight.lean`](ComputationalPaths/Path/CompPath/FigureEight.lean)): `FigureEight := Wedge Circle Circle circleBase circleBase`
 - **Two generators**: `loopA` (left circle) and `loopB` (right circle, conjugated by glue)
-- **Main theorem (legacy removed)**: figure-eight π₁ equivalence is not yet formalized.
+- **Main theorem** ([`FigureEightStep.lean`](ComputationalPaths/Path/CompPath/FigureEightStep.lean)):
+  `figureEightPiOneEquivFreeGroup` proves π₁(FigureEight) ≃ π₁(S¹) * π₁(S¹)
+  under `HasWedgeSVKDecodeBijective` (and thus ℤ * ℤ after the circle computation).
 - **Non-abelianness**: `wordAB ≠ wordBA` proves the fundamental group is non-abelian.
 - The figure-eight is the simplest space with non-abelian π₁, making it important for testing SVK.
 

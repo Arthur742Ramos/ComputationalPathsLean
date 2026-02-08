@@ -14,6 +14,7 @@ vertical and horizontal composition coincide.
 - `OmegaTwo`: The double loop space Ω²(A, a) with group structure
 - `hcomp_eq_vcomp`: Horizontal and vertical composition coincide on Ω²
 - `eckmann_hilton`: Commutativity of Ω² (the Eckmann-Hilton theorem)
+- `hcomp_comm`: Commutativity of horizontal composition on Ω²
 - `unitLeft_natural` / `unitRight_natural`: Naturality squares for unit laws
 
 ## Mathematical Background
@@ -347,6 +348,15 @@ def eckmann_hilton (α β : OmegaTwo A a) :
       (interchange_omegaTwo α β))
     (hcomp'_eq_vcomp α β)
 
+/-- Horizontal composition on Ω² is commutative. -/
+def hcomp_comm (α β : OmegaTwo A a) :
+    Derivation₃ (OmegaTwo.hcomp α β) (OmegaTwo.hcomp β α) :=
+  .vcomp
+    (hcomp_eq_vcomp α β)
+    (.vcomp
+      (eckmann_hilton α β)
+      (.inv (hcomp_eq_vcomp β α)))
+
 /-- Eckmann-Hilton at the RwEq level: the induced rewrite-equivalence proofs
     of `vcomp α β` and `vcomp β α` coincide. -/
 theorem eckmann_hilton_rweq (α β : OmegaTwo A a) :
@@ -375,6 +385,8 @@ This module establishes the Eckmann-Hilton argument for computational paths:
 5. **Eckmann-Hilton** (`hcomp_eq_vcomp`, `eckmann_hilton`): On the double loop
    space Ω²(A, a), vertical and horizontal composition coincide and are
    commutative. This implies that π₂(A, a) is always abelian.
+6. **Horizontal commutativity** (`hcomp_comm`): Horizontal composition on Ω² is
+   commutative, witnessed directly as a 3-cell.
 
 The key insight is that since `trans (refl a) (refl a)` reduces definitionally to
 `refl a` in the computational paths framework, horizontal composition on Ω² requires

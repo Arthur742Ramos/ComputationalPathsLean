@@ -1,31 +1,27 @@
 # CONTINUITY.md
 
 ## Goal
-- Audit and remove remaining axioms or HIT-style definitions, ensure build passes, commit changes, and notify via clawdbot.
+- Add a new module proving pi_1(figure-eight) is the free group on two generators.
 
 ## Constraints/Assumptions
-- No axioms and no sorries in final code; proofs must be constructive
-- Run axiom inventory: `~/.elan/bin/lake env lean Scripts/AxiomInventory.lean`
-- Check for HIT-style definitions; migrate to CompPath if needed
-- Build must pass: `~/.elan/bin/lake build`
-- Commit message: `refactor: remove remaining axioms/HITs`
-- On success: run `clawdbot gateway wake --text 'LEGION: Axiom/HIT audit complete' --mode now`
+- No axioms, sorries, or #check in new code.
+- Follow existing module/docstring conventions.
+- Run `export PATH=$HOME/.elan/bin:$PATH && lake build 2>&1 | tail -30` before and after changes.
 
 ## Key Decisions
-- No code changes: axiom inventory empty and no HIT-style definitions found
+- Use the wedge SVK decode-bijective interface to obtain pi_1(Wedge Circle Circle).
+- Identify the free group on two generators as FreeProductWord Int Int via circlePiOneEquivInt.
 
 ## State
 - **Done**:
-  - Ran axiom inventory (0 axioms)
-  - Searched for axiom/HIT keywords and declarations; only doc mentions found
-  - Build succeeded (`~/.elan/bin/lake build`)
-  - Sent clawdbot notification
-- **Now**: Report results
-- **Next**: None
+  - Read AGENTS.md, ARCHITECTURE.md, FigureEight.lean, BouquetN.lean, PushoutPaths.lean, CircleStep.lean, TorusStep.lean.
+  - Baseline build completed.
+- **Now**: Create plan, add FigureEightStep module, update imports/docs.
+- **Next**: Run lake build and report results.
 
 ## Open Questions
-- None
+- None.
 
 ## Working Set
-- Files: None
-- Commands: `~/.elan/bin/lake env lean Scripts/AxiomInventory.lean`, `~/.elan/bin/lake build`
+- Files: ComputationalPaths/Path/CompPath/FigureEight.lean, ComputationalPaths/Path/CompPath/PushoutPaths.lean, ComputationalPaths/Path/CompPath/CircleStep.lean, ComputationalPaths/Path/CompPath/BouquetN.lean, ComputationalPaths/Path.lean, README.md, (new) ComputationalPaths/Path/CompPath/FigureEightStep.lean
+- Commands: export PATH=$HOME/.elan/bin:$PATH && lake build 2>&1 | tail -30

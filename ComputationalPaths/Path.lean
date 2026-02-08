@@ -61,8 +61,10 @@ import ComputationalPaths.Path.CompPath.TorusStep
 import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.CompPath.PushoutPaths
 import ComputationalPaths.Path.CompPath.FigureEight
+import ComputationalPaths.Path.CompPath.FigureEightStep
 import ComputationalPaths.Path.CompPath.BouquetN
 import ComputationalPaths.Path.CompPath.SphereCompPath
+import ComputationalPaths.Path.CompPath.SuspensionCircle
 import ComputationalPaths.Path.CompPath.Pi5S3
 import ComputationalPaths.Path.CompPath.KleinBottle
 import ComputationalPaths.Path.CompPath.MobiusBand
