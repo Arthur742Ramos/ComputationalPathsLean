@@ -1,25 +1,25 @@
 # CONTINUITY.md
 
 ## Goal
-- Add a new module proving a free-product/wedge-sum property for fundamental groups.
+- Add a new module proving derived algebraic properties for π₁ of wedge sums/free products, and verify with the required lake build command.
 
 ## Constraints/Assumptions
 - No sorries, axioms, or #check in new code.
 - Follow module/docstring conventions.
-- Run `export PATH=$HOME/.elan/bin:$PATH && lake build 2>&1 | tail -30` before and after changes.
+- Verify with `export PATH=$HOME/.elan/bin:$PATH && lake build 2>&1 | tail -30`.
 
 ## Key Decisions
-- Create `ComputationalPaths/Path/CompPath/WedgeFreeProductUniversal.lean` proving a universal property/monoid-hom for wedge free-product words.
-- Add the new module to `ComputationalPaths/Path.lean` (and README if appropriate).
+- Create a new wedge/free-product derived module that proves multiplication compatibility of the wedge π₁ equivalence and the universal map.
+- Add the new module to `ComputationalPaths/Path.lean` (README only if needed).
 
 ## State
-- **Done**: Read AGENTS.md, ARCHITECTURE.md, CONTINUITY.md, PushoutPaths.lean, BouquetN.lean, FigureEight*.lean, CircleCompPath/Step, GroupStructures.
-- **Now**: Write plan.md, add the new module and imports, run baseline build.
-- **Next**: Implement proofs, run final build, summarize.
+- **Done**: Read AGENTS.md, ARCHITECTURE.md, CONTINUITY.md; reviewed PushoutPaths wedge/free product sections and WedgeFreeProductUniversal.
+- **Now**: Implement new wedge/free-product derived module and wire imports.
+- **Next**: Run required build command and summarize results.
 
 ## Open Questions
 - None.
 
 ## Working Set
-- Files: new module file, ComputationalPaths/Path/CompPath/PushoutPaths.lean, ComputationalPaths/Path/Algebra/GroupStructures.lean, ComputationalPaths/Path.lean, README.md.
+- Files: new module file, ComputationalPaths/Path/CompPath/PushoutPaths.lean, ComputationalPaths/Path/CompPath/WedgeFreeProductUniversal.lean, ComputationalPaths/Path.lean.
 - Commands: export PATH=$HOME/.elan/bin:$PATH && lake build 2>&1 | tail -30

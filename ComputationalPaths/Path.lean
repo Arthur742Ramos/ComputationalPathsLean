@@ -31,7 +31,10 @@ import ComputationalPaths.Path.BiContextDerived
 import ComputationalPaths.Path.LoopDerived
 import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.BicategoryDerived
+import ComputationalPaths.Path.WhiskerOperations
+import ComputationalPaths.Path.HigherGroupoidCoherence
 import ComputationalPaths.Path.Homotopy.Loops
+import ComputationalPaths.Path.Homotopy.LoopSpaceAlgebra
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.LoopIteration
 import ComputationalPaths.Path.Homotopy.IntArith
@@ -48,6 +51,7 @@ import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
+import ComputationalPaths.Path.Homotopy.HomotopyInvariance
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 import ComputationalPaths.Path.Homotopy.PiOneDerived
 import ComputationalPaths.Path.Homotopy.HigherProductHomotopy
@@ -64,6 +68,8 @@ import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.TorusStep
 import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.CompPath.PushoutPaths
+import ComputationalPaths.Path.CompPath.FreeProductUniversal
+import ComputationalPaths.Path.CompPath.WedgeFreeProductDerived
 import ComputationalPaths.Path.CompPath.FigureEight
 import ComputationalPaths.Path.CompPath.FigureEightStep
 import ComputationalPaths.Path.CompPath.BouquetN
