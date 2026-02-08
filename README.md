@@ -53,7 +53,6 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 | **π₁(S¹) ≃ ℤ** | Circle fundamental group is integers | `CircleStep.lean` |
 | **π₁(T²) ≃ ℤ × ℤ** | Torus fundamental group | `TorusStep.lean` |
 | **π₁(S²) ≃ 1** | 2-sphere is simply connected | `SphereCompPath.lean` |
-| **π₁(ΣS¹) ≃ 1** | Suspension of the circle is simply connected | `SphereCompPath.lean` |
 | **Seifert-van Kampen** | π₁(Pushout) ≃ amalgamated free product | `PushoutPaths.lean` |
 | **ω-Groupoid Structure** | Types form weak ω-groupoids | `OmegaGroupoid.lean` |
 | **Confluence** | LND_EQ-TRS is confluent (Newman's Lemma) | `ConfluenceProof.lean` |

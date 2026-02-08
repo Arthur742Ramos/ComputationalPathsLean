@@ -14,7 +14,6 @@ its fundamental group is trivial (as a subsingleton pushout).
 
 - `Sphere2CompPath`: suspension of `CircleCompPath`.
 - `sphere2CompPath_pi1_equiv_unit`: π₁(S²) ≃ 1 (Unit).
-- `suspensionCircle_pi1_equiv_unit`: π₁(ΣS¹) ≃ 1 (Unit).
 
 ## References
 
@@ -103,26 +102,6 @@ noncomputable def sphere2CompPath_pi1_equiv_unit :
     intro u
     cases u
     rfl
-
-/-! ## Suspension of the Circle -/
-
-/-- The suspension of the computational circle (ΣS¹). -/
-abbrev SuspensionCircle : Type u := SuspensionCompPath CircleCompPath
-
-/-- Basepoint of ΣS¹ (north pole). -/
-abbrev suspensionCircleBasepoint : SuspensionCircle := basepoint
-
-/-- The fundamental group of ΣS¹ is trivial. -/
-theorem suspensionCircle_pi1_trivial :
-    ∀ (α : π₁(SuspensionCircle, suspensionCircleBasepoint)),
-      α = Quot.mk _ (Path.refl _) := by
-  intro α
-  simpa [SuspensionCircle, suspensionCircleBasepoint] using sphere2CompPath_pi1_trivial α
-
-/-- π₁(ΣS¹) ≃ 1 (the trivial group). -/
-noncomputable def suspensionCircle_pi1_equiv_unit :
-    SimpleEquiv (π₁(SuspensionCircle, suspensionCircleBasepoint)) Unit := by
-  simpa [SuspensionCircle, suspensionCircleBasepoint] using sphere2CompPath_pi1_equiv_unit
 
 /-! ## Summary -/
 

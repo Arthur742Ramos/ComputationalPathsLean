@@ -90,58 +90,12 @@ variable {a b c d : A}
   apply Subsingleton.elim
 
 /-- Interchange with identities collapses to whiskering (right). -/
-  @[simp] theorem interchange_id_right {f g : Path a b} {h k : Path b c}
-      (η : TwoCell (A := A) (a := a) (b := b) f g)
-      (θ : TwoCell (A := A) (a := b) (b := c) h k) :
-      comp (TwoCell.id (Path.trans f h))
-        (hcomp (A := A) (a := a) (b := b) (c := c) η θ) =
-          hcomp (A := A) (a := a) (b := b) (c := c) η θ := by
-    apply Subsingleton.elim
-
-/-! ## Associator Naturality -/
-
-/-- The associator is natural with respect to parallel 2-cells. -/
-@[simp] theorem assoc_naturality
-    {f f' : Path a b} {g g' : Path b c} {h h' : Path c d}
-    (η : TwoCell (A := A) (a := a) (b := b) f f')
-    (θ : TwoCell (A := A) (a := b) (b := c) g g')
-    (ι : TwoCell (A := A) (a := c) (b := d) h h') :
-    comp
-        (hcomp (A := A) (a := a) (b := c) (c := d)
-          (hcomp (A := A) (a := a) (b := b) (c := c) η θ) ι)
-        (assoc (A := A) (a := a) (b := b) (c := c) (d := d) f' g' h') =
-      comp
-        (assoc (A := A) (a := a) (b := b) (c := c) (d := d) f g h)
-        (hcomp (A := A) (a := a) (b := b) (c := d)
-          η (hcomp (A := A) (a := b) (b := c) (c := d) θ ι)) := by
-  apply Subsingleton.elim
-
-/-! ## Unitor Naturality -/
-
-/-- The left unitor is natural with respect to parallel 2-cells. -/
-@[simp] theorem leftUnitor_naturality
-    {f g : Path a b}
-    (η : TwoCell (A := A) (a := a) (b := b) f g) :
-    comp
-        (whiskerLeft (A := A) (a := a) (b := a) (c := b)
-          (f := refl a) η)
-        (leftUnitor (A := A) (a := a) (b := b) g) =
-      comp
-        (leftUnitor (A := A) (a := a) (b := b) f)
-        η := by
-  apply Subsingleton.elim
-
-/-- The right unitor is natural with respect to parallel 2-cells. -/
-@[simp] theorem rightUnitor_naturality
-    {f g : Path a b}
-    (η : TwoCell (A := A) (a := a) (b := b) f g) :
-    comp
-        (whiskerRight (A := A) (a := a) (b := b) (c := b)
-          (h := refl b) η)
-        (rightUnitor (A := A) (a := a) (b := b) g) =
-      comp
-        (rightUnitor (A := A) (a := a) (b := b) f)
-        η := by
+@[simp] theorem interchange_id_right {f g : Path a b} {h k : Path b c}
+    (η : TwoCell (A := A) (a := a) (b := b) f g)
+    (θ : TwoCell (A := A) (a := b) (b := c) h k) :
+    comp (TwoCell.id (Path.trans f h))
+      (hcomp (A := A) (a := a) (b := b) (c := c) η θ) =
+        hcomp (A := A) (a := a) (b := b) (c := c) η θ := by
   apply Subsingleton.elim
 
 end BicategoryDerived
