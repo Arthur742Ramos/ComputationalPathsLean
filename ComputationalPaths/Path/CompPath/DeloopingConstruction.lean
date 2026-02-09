@@ -11,6 +11,8 @@ loop space is presented by explicit loop expressions labelled by elements of
 - `BG`: the delooping space of a strict group
 - `DeloopingOmega`: loop expressions modulo evaluation
 - `deloopingOmegaEquiv`: `DeloopingOmega` is equivalent to `G`
+- `deloopingOmegaMap`: functorial map on loop quotients
+- `deloopingOmegaEncode_map`: naturality of the encoding
 
 ## References
 
@@ -68,6 +70,86 @@ variable {G : Type u} (S : StrictGroup G)
   | DeloopingExpr.trans p q => S.mul (deloopingExprEval p) (deloopingExprEval q)
 
 end Eval
+
+/-! ## Functoriality of loop expressions -/
+
+section Functoriality
+
+variable {G H : Type u}
+variable {S : StrictGroup G} {T : StrictGroup H}
+
+/-- Map loop expressions along a group homomorphism. -/
+@[simp] def deloopingExprMap (f : GroupHom G H S T) : DeloopingExpr G → DeloopingExpr H
+  | DeloopingExpr.loop g => DeloopingExpr.loop (f g)
+  | DeloopingExpr.refl => DeloopingExpr.refl
+  | DeloopingExpr.symm p => DeloopingExpr.symm (deloopingExprMap f p)
+  | DeloopingExpr.trans p q =>
+      DeloopingExpr.trans (deloopingExprMap f p) (deloopingExprMap f q)
+
+/-- Mapping by the identity homomorphism fixes loop expressions. -/
+@[simp] theorem deloopingExprMap_id (p : DeloopingExpr G) :
+    deloopingExprMap (S := S) (T := S) (GroupHom.id S) p = p := by
+  induction p with
+  | loop g => rfl
+  | refl => rfl
+  | symm p ih =>
+      calc
+        deloopingExprMap (GroupHom.id S) (DeloopingExpr.symm p) =
+            DeloopingExpr.symm (deloopingExprMap (GroupHom.id S) p) := rfl
+        _ = DeloopingExpr.symm p := by
+              rw [ih]
+  | trans p q ihp ihq =>
+      calc
+        deloopingExprMap (GroupHom.id S) (DeloopingExpr.trans p q) =
+            DeloopingExpr.trans (deloopingExprMap (GroupHom.id S) p)
+              (deloopingExprMap (GroupHom.id S) q) := rfl
+        _ = DeloopingExpr.trans p (deloopingExprMap (GroupHom.id S) q) := by
+              rw [ihp]
+        _ = DeloopingExpr.trans p q := by
+              rw [ihq]
+
+/-- Mapping along a composite homomorphism composes expression maps. -/
+@[simp] theorem deloopingExprMap_comp {K : Type u} {U : StrictGroup K}
+    (f : GroupHom G H S T) (g : GroupHom H K T U) (p : DeloopingExpr G) :
+    deloopingExprMap (S := S) (T := U) (GroupHom.comp f g) p =
+      deloopingExprMap (S := T) (T := U) g
+        (deloopingExprMap (S := S) (T := T) f p) := by
+  induction p with
+  | loop g =>
+      simp [deloopingExprMap]
+  | refl => rfl
+  | symm p ih =>
+      calc
+        deloopingExprMap (GroupHom.comp f g) (DeloopingExpr.symm p) =
+            DeloopingExpr.symm (deloopingExprMap (GroupHom.comp f g) p) := rfl
+        _ = DeloopingExpr.symm (deloopingExprMap g (deloopingExprMap f p)) := by
+              rw [ih]
+        _ = deloopingExprMap g (deloopingExprMap f (DeloopingExpr.symm p)) := rfl
+  | trans p q ihp ihq =>
+      calc
+        deloopingExprMap (GroupHom.comp f g) (DeloopingExpr.trans p q) =
+            DeloopingExpr.trans (deloopingExprMap (GroupHom.comp f g) p)
+              (deloopingExprMap (GroupHom.comp f g) q) := rfl
+        _ = DeloopingExpr.trans (deloopingExprMap g (deloopingExprMap f p))
+              (deloopingExprMap g (deloopingExprMap f q)) := by
+              rw [ihp, ihq]
+        _ = deloopingExprMap g (deloopingExprMap f (DeloopingExpr.trans p q)) := rfl
+
+/-- Evaluation commutes with a group homomorphism. -/
+@[simp] theorem deloopingExprEval_map (f : GroupHom G H S T) (p : DeloopingLoopExpr G) :
+    deloopingExprEval (S := T) (deloopingExprMap (f := f) p) =
+      f (deloopingExprEval (S := S) p) := by
+  induction p with
+  | loop g =>
+      simp [deloopingExprMap, deloopingExprEval]
+  | refl =>
+      simp [deloopingExprMap, deloopingExprEval, f.map_one]
+  | symm p ih =>
+      simp [deloopingExprMap, deloopingExprEval, ih, f.map_inv]
+  | trans p q ihp ihq =>
+      simp [deloopingExprMap, deloopingExprEval, ihp, ihq, f.map_mul]
+
+end Functoriality
 
 /-! ## Loop quotient -/
 
@@ -134,6 +216,110 @@ noncomputable def deloopingOmegaEquiv :
   invFun := deloopingOmegaDecode (S := S)
   left_inv := deloopingOmegaDecodeEncode (S := S)
   right_inv := deloopingOmegaEncodeDecode (S := S)
+
+/-! ## Functoriality on loop quotients -/
+
+section Functoriality
+
+variable {H : Type u} {T : StrictGroup H}
+
+/-- The delooping relation is preserved by group homomorphisms. -/
+theorem deloopingRel_map (f : GroupHom G H S T)
+    {p q : DeloopingLoopExpr G} (h : DeloopingRel (S := S) p q) :
+    DeloopingRel (S := T)
+      (deloopingExprMap (S := S) (T := T) f p)
+      (deloopingExprMap (S := S) (T := T) f q) := by
+  dsimp [DeloopingRel] at h ⊢
+  simpa [deloopingExprEval_map (S := S) (T := T) f] using _root_.congrArg f h
+
+/-- Map loop quotients along a group homomorphism. -/
+def deloopingOmegaMap (f : GroupHom G H S T) :
+    DeloopingOmega (S := S) → DeloopingOmega (S := T) :=
+  Quot.lift
+    (fun p => Quot.mk _ (deloopingExprMap (S := S) (T := T) f p))
+    (by
+      intro p q hpq
+      apply Quot.sound
+      exact deloopingRel_map (S := S) (T := T) f hpq)
+
+/-- Mapping a loop class represented by a loop expression. -/
+@[simp] theorem deloopingOmegaMap_mk (f : GroupHom G H S T) (p : DeloopingLoopExpr G) :
+    deloopingOmegaMap (S := S) (T := T) f (Quot.mk _ p) =
+      Quot.mk _ (deloopingExprMap (S := S) (T := T) f p) := rfl
+
+/-- Mapping commutes with decoding a group element. -/
+@[simp] theorem deloopingOmegaMap_decode (f : GroupHom G H S T) (g : G) :
+    deloopingOmegaMap (S := S) (T := T) f (deloopingOmegaDecode (S := S) g) =
+      deloopingOmegaDecode (S := T) (f g) := rfl
+
+/-- Encoding commutes with the induced map on loop quotients. -/
+@[simp] theorem deloopingOmegaEncode_map (f : GroupHom G H S T)
+    (x : DeloopingOmega (S := S)) :
+    deloopingOmegaEncode (S := T) (deloopingOmegaMap (S := S) (T := T) f x) =
+      f (deloopingOmegaEncode (S := S) x) := by
+  refine Quot.inductionOn x ?_
+  intro p
+  simp [deloopingOmegaMap, deloopingOmegaEncode, deloopingExprEval_map]
+
+/-- The induced map on loop quotients respects identity. -/
+@[simp] theorem deloopingOmegaMap_id (x : DeloopingOmega (S := S)) :
+    deloopingOmegaMap (S := S) (T := S) (GroupHom.id S) x = x := by
+  refine Quot.inductionOn x ?_
+  intro p
+  simpa [deloopingOmegaMap] using
+    _root_.congrArg (fun q => Quot.mk _ q) (deloopingExprMap_id (S := S) p)
+
+/-- The induced map on loop quotients respects composition. -/
+@[simp] theorem deloopingOmegaMap_comp {K : Type u} {U : StrictGroup K}
+    (f : GroupHom G H S T) (g : GroupHom H K T U)
+    (x : DeloopingOmega (S := S)) :
+    deloopingOmegaMap (S := S) (T := U) (GroupHom.comp f g) x =
+      deloopingOmegaMap (S := T) (T := U) g
+        (deloopingOmegaMap (S := S) (T := T) f x) := by
+  refine Quot.inductionOn x ?_
+  intro p
+  simpa [deloopingOmegaMap] using
+    _root_.congrArg (fun q => Quot.mk _ q)
+      (deloopingExprMap_comp (S := S) (T := T) (U := U) f g p)
+
+end Functoriality
+
+/-- Alias for `π₁(BG)` as the delooping loop quotient. -/
+abbrev piOneBG (S : StrictGroup G) : Type u :=
+  DeloopingOmega (S := S)
+
+/-- `π₁(BG)` is equivalent to the underlying group. -/
+noncomputable def piOneBGEquiv :
+    SimpleEquiv (piOneBG (S := S)) G :=
+  deloopingOmegaEquiv (S := S)
+
+/-! ## Induced maps on `π₁(BG)` -/
+
+section PiOneMaps
+
+variable {H : Type u} {T : StrictGroup H}
+
+/-- The induced map on `π₁(BG)` from a group homomorphism. -/
+def piOneBGMap (f : GroupHom G H S T) :
+    piOneBG (S := S) → piOneBG (S := T) :=
+  deloopingOmegaMap (S := S) (T := T) f
+
+/-- The induced map respects identity. -/
+@[simp] theorem piOneBGMap_id (x : piOneBG (S := S)) :
+    piOneBGMap (S := S) (T := S) (GroupHom.id S) x = x := by
+  change deloopingOmegaMap (S := S) (T := S) (GroupHom.id S) x = x
+  exact deloopingOmegaMap_id (S := S) (x := x)
+
+/-- The induced map respects composition. -/
+@[simp] theorem piOneBGMap_comp {K : Type u} {U : StrictGroup K}
+    (f : GroupHom G H S T) (g : GroupHom H K T U) (x : piOneBG (S := S)) :
+    piOneBGMap (S := S) (T := U) (GroupHom.comp f g) x =
+      piOneBGMap (S := T) (T := U) g (piOneBGMap (S := S) (T := T) f x) := by
+  change deloopingOmegaMap (S := S) (T := U) (GroupHom.comp f g) x =
+    deloopingOmegaMap (S := T) (T := U) g (deloopingOmegaMap (S := S) (T := T) f x)
+  exact deloopingOmegaMap_comp (S := S) (T := T) (U := U) f g x
+
+end PiOneMaps
 
 end Quotient
 
