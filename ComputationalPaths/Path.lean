@@ -71,6 +71,7 @@ import ComputationalPaths.Path.Homotopy.AbelianFundamentalGroup
 import ComputationalPaths.Path.Homotopy.OmegaTwoCoherence
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.TruncationLevels
+import ComputationalPaths.Path.Homotopy.PostnikovTower
 import ComputationalPaths.Path.Homotopy.PathSpaceMonad
 import ComputationalPaths.Path.Homotopy.PointedMapCategory
 import ComputationalPaths.Path.Homotopy.UniversalCover
@@ -107,6 +108,7 @@ import ComputationalPaths.Path.Homotopy.Hurewicz
 import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Homotopy.Reflexivity
 import ComputationalPaths.Path.Homotopy.IdentityType
+import ComputationalPaths.Path.Homotopy.EilenbergMacLane
 import ComputationalPaths.Path.Homotopy.Coproduct
 import ComputationalPaths.Path.Homotopy.CoproductPaths
 import ComputationalPaths.Path.CompPath.CircleCompPath

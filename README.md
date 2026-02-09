@@ -129,6 +129,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`ComputationalPaths/Path/Homotopy/`](ComputationalPaths/Path/Homotopy/) — loop spaces, rewrite monoids (`LoopMonoid`), loop groups (`LoopGroup`), π₁ interfaces, higher homotopy groups, truncation levels, and covering spaces.
 - [`ComputationalPaths/Path/Homotopy/HigherHomotopy.lean`](ComputationalPaths/Path/Homotopy/HigherHomotopy.lean) — higher homotopy groups π_n via iterated loop spaces and derivation quotients.
 - [`ComputationalPaths/Path/Homotopy/Truncation.lean`](ComputationalPaths/Path/Homotopy/Truncation.lean) — truncation levels (IsContr, IsProp, IsSet, IsGroupoid) connecting to HoTT n-types.
+- [`ComputationalPaths/Path/Homotopy/PostnikovTower.lean`](ComputationalPaths/Path/Homotopy/PostnikovTower.lean) — Postnikov tower stages via n-groupoid truncations, convergence, and stage collapse.
 - [`ComputationalPaths/Path/Homotopy/CoveringSpace.lean`](ComputationalPaths/Path/Homotopy/CoveringSpace.lean) — covering space theory with path lifting and π₁-actions on fibers.
 - [`ComputationalPaths/Path/Homotopy/Fibration.lean`](ComputationalPaths/Path/Homotopy/Fibration.lean) — fibrations, fiber sequences F → E → B, connecting map ∂ : π₁(B) → F, long exact sequence of homotopy groups, induced maps on π₁.
 - [`ComputationalPaths/Path/Homotopy/SuspensionLoop.lean`](ComputationalPaths/Path/Homotopy/SuspensionLoop.lean) — suspension-loop adjunction [ΣX, Y]_* ≅ [X, ΩY]_*, pointed types/maps, adjunction map construction, connectivity definitions.
