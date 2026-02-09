@@ -29,6 +29,7 @@ import ComputationalPaths.Path.GroupoidDerived
 import ComputationalPaths.Path.PathAlgebraDerived
 import ComputationalPaths.Path.PathAlgebraIdentities
 import ComputationalPaths.Path.PathAlgebraHomomorphism
+import ComputationalPaths.Path.PathAlgebraModule
 import ComputationalPaths.Path.LimitsColimits
 import ComputationalPaths.Path.MonoidalCoherence
 import ComputationalPaths.Path.OperadicStructure
@@ -36,6 +37,7 @@ import ComputationalPaths.Path.SymmetricMonoidal
 import ComputationalPaths.Path.NaturalitySquares
 import ComputationalPaths.Path.NaturalTransformationPaths
 import ComputationalPaths.Path.YonedaLemma
+import ComputationalPaths.Path.BrownRepresentability
 import ComputationalPaths.Path.KanExtension
 import ComputationalPaths.Path.AdjointEquivalence
 import ComputationalPaths.Path.ProductSigmaDerived
@@ -48,7 +50,9 @@ import ComputationalPaths.Path.LoopDerived
 import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.BicategoryDerived
 import ComputationalPaths.Path.EnrichedCategory
+import ComputationalPaths.Path.SimplicialPath
 import ComputationalPaths.Path.DoubleGroupoid
+import ComputationalPaths.Path.DoubleCategoryPaths
 import ComputationalPaths.Path.TwoCategory
 import ComputationalPaths.Path.HigherCoherenceDerived
 import ComputationalPaths.Path.WhiskerOperations
@@ -90,6 +94,7 @@ import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
+import ComputationalPaths.Path.Homotopy.StableHomotopy
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoidFunctor
 import ComputationalPaths.Path.Homotopy.DerivedFunctor

@@ -83,6 +83,26 @@ def pathGroupoidEnriched (A : Type u) : GroupoidEnrichedCategory (Obj := A) wher
       TwoCell.comp_hcomp_hcomp (A := A) (a := a) (b := b) (c := c)
         (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)
 
+/-! ## Composition coherence -/
+
+/-- Composition in the enriched path groupoid is associative up to the canonical 2-cell. -/
+theorem pathGroupoidEnriched_assoc (A : Type u) {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    (pathGroupoidEnriched A).TwoCell
+      ((pathGroupoidEnriched A).comp ((pathGroupoidEnriched A).comp p q) r)
+      ((pathGroupoidEnriched A).comp p ((pathGroupoidEnriched A).comp q r)) :=
+  (pathGroupoidEnriched A).assoc p q r
+
+/-- The associator satisfies the pentagon coherence in the enriched path category. -/
+theorem pathGroupoidEnriched_pentagon (A : Type u) {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    (pathGroupoidEnriched A).TwoCell
+      ((pathGroupoidEnriched A).comp ((pathGroupoidEnriched A).comp
+        ((pathGroupoidEnriched A).comp p q) r) s)
+      ((pathGroupoidEnriched A).comp p
+        ((pathGroupoidEnriched A).comp q ((pathGroupoidEnriched A).comp r s))) :=
+  (pathGroupoidEnriched A).pentagon p q r s
+
 end PathEnriched
 
 /-! ## Summary -/
