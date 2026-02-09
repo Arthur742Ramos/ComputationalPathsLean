@@ -146,7 +146,7 @@ theorem zpGenPow_add (p : Nat) (hp : p > 0) (m n : Nat) :
   | zero =>
       simp [zpGenPow, zpAdd_zero_right]
   | succ n ih =>
-      simp [zpGenPow, Nat.add_assoc, ih, zpAdd_assoc]
+      simp [zpGenPow, ih, zpAdd_assoc]
 
 /-- The generator has exact order p: p · 1 = 0 -/
 theorem zpGen_order (p : Nat) (hp : p > 0) :

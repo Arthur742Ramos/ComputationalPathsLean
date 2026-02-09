@@ -125,7 +125,7 @@ def rightPathAction (A : Type u) (a b : A) :
           = PathRwQuot.trans p (LoopQuot.comp (LoopQuot.inv h) (LoopQuot.inv g)) := by
               rw [LoopQuot.inv_comp_rev]
       _ = PathRwQuot.trans (PathRwQuot.trans p (LoopQuot.inv h)) (LoopQuot.inv g) := by
-            simpa [PathRwQuot.trans_assoc]
+            simp [PathRwQuot.trans_assoc]
 
 /-- Every path lies in the left orbit of any other path. -/
 theorem leftPathOrbit (p q : PathRwQuot A a b) :
