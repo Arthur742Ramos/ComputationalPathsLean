@@ -28,6 +28,7 @@ import ComputationalPaths.Path.EquivariantPaths
 import ComputationalPaths.Path.GroupoidDerived
 import ComputationalPaths.Path.PathAlgebraDerived
 import ComputationalPaths.Path.PathAlgebraIdentities
+import ComputationalPaths.Path.PathConcatenation
 import ComputationalPaths.Path.PathAlgebraHomomorphism
 import ComputationalPaths.Path.PathAlgebraModule
 import ComputationalPaths.Path.LimitsColimits
@@ -66,6 +67,7 @@ import ComputationalPaths.Path.Homotopy.LoopIteration
 import ComputationalPaths.Path.Homotopy.IntArith
 import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
+import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
 import ComputationalPaths.Path.Homotopy.EckmannHilton
 import ComputationalPaths.Path.Homotopy.AbelianFundamentalGroup
 import ComputationalPaths.Path.Homotopy.OmegaTwoCoherence
@@ -90,7 +92,9 @@ import ComputationalPaths.Path.Homotopy.PathSpaceFibration
 import ComputationalPaths.Path.Homotopy.PathSpaceHomotopy
 import ComputationalPaths.Path.Homotopy.HomotopyCommutativeDiagram
 import ComputationalPaths.Path.Homotopy.LongExactSequence
+import ComputationalPaths.Path.Homotopy.HomotopyExactSequence
 import ComputationalPaths.Path.Homotopy.MayerVietoris
+import ComputationalPaths.Path.Homotopy.BarrattPuppe
 import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop

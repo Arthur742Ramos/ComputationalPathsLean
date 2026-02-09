@@ -1,107 +1,65 @@
-/- 
-# Homotopy Pullbacks
+/-
+# Homotopy Properties of Pullback Squares
 
-This module defines homotopy pullbacks (homotopy fiber products) using
-computational paths. We record the universal property via cones and connect
-the construction to fibrations by identifying it with the total space of a
-pullback family over the right leg.
+This module records basic homotopy-invariance properties for pullback squares in `TopCat`.
 
 ## Key Results
 
-- `HomotopyPullback`: homotopy pullback of a span.
-- `HomotopyPullback.coneEquiv`: universal property equivalence.
-- `HomotopyPullback.family`: pullback family over the right leg.
-- `HomotopyPullback.totalEquiv`: equivalence with the total space of the family.
-- `HomotopyPullback.total_proj`: projection compatibility.
+- `HomotopyPullbackSquare`: squares commuting up to homotopy.
+- `HomotopyPullbackSquare.of_eq`: strict commutation gives a homotopy square.
+- `pullback_square_commutes`: the canonical pullback square in `TopCat` strictly commutes.
 
 ## References
 
-- HoTT Book, Chapter 2 (pullbacks).
+- HoTT Book, Chapter 2 (pullbacks and homotopies).
 -/
 
-import ComputationalPaths.Path.CompPath.PullbackPaths
-import ComputationalPaths.Path.Homotopy.Fibration
+import Mathlib.Topology.Homotopy.Basic
+import Mathlib.Topology.Category.TopCat.Limits.Pullbacks
 
-namespace ComputationalPaths
-namespace Path
-
-open Fibration
-
-universe u x
-
-variable {A : Type u} {B : Type u} {C : Type u}
+open CategoryTheory
+open CategoryTheory.Limits
 
 /-! ## Definition -/
 
-/-- The homotopy pullback of a span `A -> C <- B`. -/
-abbrev HomotopyPullback (f : A → C) (g : B → C) : Type u :=
-  CompPath.Pullback A B C f g
+/-- A pullback square that commutes up to homotopy.
+    For continuous maps f : X → Z and g : Y → Z with projections p1 : P → X and p2 : P → Y,
+    the square commutes up to homotopy if f ∘ p1 is homotopic to g ∘ p2. -/
+structure HomotopyPullbackSquare {X Y Z P : Type*} [TopologicalSpace X] [TopologicalSpace Y]
+    [TopologicalSpace Z] [TopologicalSpace P] (f : C(X, Z)) (g : C(Y, Z))
+    (p1 : C(P, X)) (p2 : C(P, Y)) : Prop where
+  homotopic : ContinuousMap.Homotopic (f.comp p1) (g.comp p2)
 
-namespace HomotopyPullback
+namespace HomotopyPullbackSquare
 
-variable {f : A → C} {g : B → C}
+/-! ## Basic properties -/
 
-/-! ## Universal property -/
+/-- A strictly commuting square yields a homotopy pullback square. -/
+theorem of_eq {X Y Z P : Type*} [TopologicalSpace X] [TopologicalSpace Y]
+    [TopologicalSpace Z] [TopologicalSpace P] {f : C(X, Z)} {g : C(Y, Z)}
+    {p1 : C(P, X)} {p2 : C(P, Y)} (h : f.comp p1 = g.comp p2) :
+    HomotopyPullbackSquare f g p1 p2 where
+  homotopic := h ▸ ContinuousMap.Homotopic.refl _
 
-/-- A cone over the span `A -> C <- B` with vertex `X`. -/
-abbrev Cone (X : Type x) : Type (max u x) :=
-  CompPath.Pullback.Cone (A := A) (B := B) (C := C) (f := f) (g := g) X
+/-- Homotopy pullback squares are symmetric in composition order. -/
+theorem symm {X Y Z P : Type*} [TopologicalSpace X] [TopologicalSpace Y]
+    [TopologicalSpace Z] [TopologicalSpace P] {f : C(X, Z)} {g : C(Y, Z)}
+    {p1 : C(P, X)} {p2 : C(P, Y)} (h : HomotopyPullbackSquare f g p1 p2) :
+    ContinuousMap.Homotopic (g.comp p2) (f.comp p1) :=
+  h.homotopic.symm
 
-/-- The canonical lift into the homotopy pullback. -/
-abbrev lift {X : Type x} (p : X → A) (q : X → B)
-    (h : ∀ x : X, Path (f (p x)) (g (q x))) :
-    X → HomotopyPullback (f := f) (g := g) :=
-  CompPath.Pullback.lift (A := A) (B := B) (C := C) (f := f) (g := g) p q h
+end HomotopyPullbackSquare
 
-/-- Universal property: maps into the homotopy pullback are equivalent to cones. -/
-abbrev coneEquiv (X : Type x) :
-    SimpleEquiv (X → HomotopyPullback (f := f) (g := g))
-      (Cone (A := A) (B := B) (C := C) (f := f) (g := g) X) :=
-  CompPath.Pullback.coneEquiv (A := A) (B := B) (C := C) (f := f) (g := g) X
+/-! ## Pullback square in TopCat -/
 
-/-! ## Connection to fibrations -/
-
-/-- The pullback family over `B`, with fiber the homotopy fiber of `f` over `g b`. -/
-abbrev family (f : A → C) (g : B → C) : B → Type u :=
-  fun b => Sigma fun a : A => Path (f a) (g b)
-
-/-- The homotopy pullback is equivalent to the total space of the pullback family. -/
-def totalEquiv (f : A → C) (g : B → C) :
-    SimpleEquiv (HomotopyPullback (f := f) (g := g))
-      (Total (P := family (f := f) (g := g))) where
-  toFun := fun x =>
-    match x with
-    | ⟨(a, b), h⟩ => ⟨b, ⟨a, h⟩⟩
-  invFun := fun x =>
-    match x with
-    | ⟨b, ⟨a, h⟩⟩ => ⟨(a, b), h⟩
-  left_inv := by
-    intro x
-    cases x with
-    | mk ab h =>
-        cases ab with
-        | mk a b => rfl
-  right_inv := by
-    intro x
-    cases x with
-    | mk b rest =>
-        cases rest with
-        | mk a h => rfl
-
-/-- The projection to `B` agrees with the total-space projection of the family. -/
-theorem total_proj (f : A → C) (g : B → C) :
-    Total.proj (P := family (f := f) (g := g)) ∘
-        (totalEquiv (f := f) (g := g)).toFun =
-      CompPath.Pullback.snd (A := A) (B := B) (C := C) (f := f) (g := g) := by
-  rfl
+/-- The canonical pullback square in `TopCat` strictly commutes. -/
+theorem pullback_square_commutes {X Y Z : TopCat} (f : X ⟶ Z) (g : Y ⟶ Z) :
+    pullback.fst f g ≫ f = pullback.snd f g ≫ g :=
+  pullback.condition
 
 /-! ## Summary
 
-We defined homotopy pullbacks using computational paths, recorded the universal
-property via cones, and identified the homotopy pullback with the total space
-of a pullback family over the right leg.
+We defined homotopy pullback squares using continuous maps and the Mathlib homotopy API,
+showed that strict commutation implies homotopy commutation, and recorded that the
+canonical pullback square in `TopCat` strictly commutes.
 -/
-
-end HomotopyPullback
-end Path
-end ComputationalPaths
