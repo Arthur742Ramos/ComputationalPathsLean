@@ -31,6 +31,7 @@ import ComputationalPaths.Path.MonoidalCoherence
 import ComputationalPaths.Path.SymmetricMonoidal
 import ComputationalPaths.Path.NaturalitySquares
 import ComputationalPaths.Path.NaturalTransformationPaths
+import ComputationalPaths.Path.AdjointEquivalence
 import ComputationalPaths.Path.ProductSigmaDerived
 import ComputationalPaths.Path.TransportDerived
 import ComputationalPaths.Path.HigherPathInduction
@@ -59,11 +60,13 @@ import ComputationalPaths.Path.Homotopy.EckmannHilton
 import ComputationalPaths.Path.Homotopy.AbelianFundamentalGroup
 import ComputationalPaths.Path.Homotopy.OmegaTwoCoherence
 import ComputationalPaths.Path.Homotopy.Truncation
+import ComputationalPaths.Path.Homotopy.TruncationLevels
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
 import ComputationalPaths.Path.Homotopy.GroupoidCovering
 import ComputationalPaths.Path.Homotopy.Fibration
+import ComputationalPaths.Path.Homotopy.HomotopyFiber
 import ComputationalPaths.Path.Homotopy.PathSpaceFibration
 import ComputationalPaths.Path.Homotopy.PathSpaceHomotopy
 import ComputationalPaths.Path.Homotopy.LongExactSequence
