@@ -2,6 +2,11 @@ name = "computational_paths"
 version = "0.1.0"
 defaultTargets = ["computational_paths"]
 
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "v4.24.0"
+
 [[lean_lib]]
 name = "ComputationalPaths"
 

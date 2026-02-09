@@ -95,6 +95,7 @@ import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
+import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
 import ComputationalPaths.Path.Homotopy.StableHomotopy
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoidFunctor
@@ -123,6 +124,7 @@ import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.CompPath.PushoutPaths
 import ComputationalPaths.Path.CompPath.PullbackPaths
 import ComputationalPaths.Path.CompPath.VanKampenGeneralized
+import ComputationalPaths.Path.SeifertVanKampen
 import ComputationalPaths.Path.CompPath.SeifertVanKampenDerived
 import ComputationalPaths.Path.CompPath.FreeProductUniversal
 import ComputationalPaths.Path.CompPath.WedgeFreeProductDerived
