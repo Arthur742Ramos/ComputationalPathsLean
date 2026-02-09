@@ -21,6 +21,8 @@ import ComputationalPaths.Path.Rewrite.NormalizationDerived
 import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
 import ComputationalPaths.Path.Rewrite.PathTactic
 import ComputationalPaths.Path.Groupoid
+import ComputationalPaths.Path.LocalizationCategory
+import ComputationalPaths.Path.ModelCategory
 import ComputationalPaths.Path.ActionGroupoid
 import ComputationalPaths.Path.EquivariantPaths
 import ComputationalPaths.Path.GroupoidDerived
