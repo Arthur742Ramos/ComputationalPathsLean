@@ -88,7 +88,6 @@ import ComputationalPaths.Path.CompPath.DeloopingConstruction
 import ComputationalPaths.Path.CompPath.ClassifyingSpace
 import ComputationalPaths.Path.CompPath.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
-import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.TorusStep
 import ComputationalPaths.Path.CompPath.PushoutCompPath
