@@ -31,6 +31,7 @@ import ComputationalPaths.Path.PathAlgebraIdentities
 import ComputationalPaths.Path.PathAlgebraHomomorphism
 import ComputationalPaths.Path.LimitsColimits
 import ComputationalPaths.Path.MonoidalCoherence
+import ComputationalPaths.Path.OperadicStructure
 import ComputationalPaths.Path.SymmetricMonoidal
 import ComputationalPaths.Path.NaturalitySquares
 import ComputationalPaths.Path.NaturalTransformationPaths
@@ -82,6 +83,7 @@ import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Homotopy.HomotopyFiber
 import ComputationalPaths.Path.Homotopy.PathSpaceFibration
 import ComputationalPaths.Path.Homotopy.PathSpaceHomotopy
+import ComputationalPaths.Path.Homotopy.HomotopyCommutativeDiagram
 import ComputationalPaths.Path.Homotopy.LongExactSequence
 import ComputationalPaths.Path.Homotopy.MayerVietoris
 import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
