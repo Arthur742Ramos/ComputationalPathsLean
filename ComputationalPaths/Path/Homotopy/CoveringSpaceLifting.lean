@@ -104,6 +104,26 @@ noncomputable def fiberTransportQuot {P : A → Type u} {a b : A} :
   simpa [PathRwQuot.trans_mk] using
     (fiberTransport_trans (P := P) (p := p') (q := q') (x := x))
 
+/-- Transport along a quotient path and its inverse returns the original element. -/
+@[simp] theorem fiberTransportQuot_symm_left {P : A → Type u} {a b : A}
+    (p : PathRwQuot A a b) (x : P a) :
+    fiberTransportQuot (P := P) (a := b) (b := a)
+        (PathRwQuot.symm p)
+        (fiberTransportQuot (P := P) (a := a) (b := b) p x) = x := by
+  refine Quot.inductionOn p (fun p' => ?_)
+  simpa [fiberTransportQuot_mk] using
+    (fiberTransport_symm_left (P := P) (p := p') (x := x))
+
+/-- Transport along an inverse quotient path and back returns the original element. -/
+@[simp] theorem fiberTransportQuot_symm_right {P : A → Type u} {a b : A}
+    (p : PathRwQuot A a b) (y : P b) :
+    fiberTransportQuot (P := P) (a := a) (b := b) p
+        (fiberTransportQuot (P := P) (a := b) (b := a)
+          (PathRwQuot.symm p) y) = y := by
+  refine Quot.inductionOn p (fun p' => ?_)
+  simpa [fiberTransportQuot_mk] using
+    (fiberTransport_symm_right (P := P) (p := p') (y := y))
+
 end CoveringSpace
 end Path
 end ComputationalPaths
