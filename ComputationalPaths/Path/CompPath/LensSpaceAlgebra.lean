@@ -139,6 +139,15 @@ theorem zpGenPow_val (p : Nat) (hp : p > 0) (n : Nat) :
       rw [hp2]
       rw [Nat.add_mod, Nat.mod_mod_of_dvd _ ⟨1, by omega⟩, ← Nat.add_mod]
 
+/-- Addition law for generator powers: (m + n) · 1 = m · 1 + n · 1. -/
+theorem zpGenPow_add (p : Nat) (hp : p > 0) (m n : Nat) :
+    zpGenPow p hp (m + n) = zpAdd p hp (zpGenPow p hp m) (zpGenPow p hp n) := by
+  induction n with
+  | zero =>
+      simp [zpGenPow, zpAdd_zero_right]
+  | succ n ih =>
+      simp [zpGenPow, Nat.add_assoc, ih, zpAdd_assoc]
+
 /-- The generator has exact order p: p · 1 = 0 -/
 theorem zpGen_order (p : Nat) (hp : p > 0) :
     zpGenPow p hp p = zpZero p hp := by
