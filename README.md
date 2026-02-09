@@ -149,6 +149,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`ComputationalPaths/Path/CompPath/TorusStep.lean`](ComputationalPaths/Path/CompPath/TorusStep.lean) — quotient-level `torusPiOneEquivIntProd : π₁(T²) ≃ ℤ × ℤ`.
 - [`ComputationalPaths/Path/CompPath/PushoutCompPath.lean`](ComputationalPaths/Path/CompPath/PushoutCompPath.lean) — pushout construction in computational paths with constructors and elimination principles.
 - [`ComputationalPaths/Path/CompPath/PushoutPaths.lean`](ComputationalPaths/Path/CompPath/PushoutPaths.lean) — path characterization for pushouts, free products, amalgamated free products, and the **Seifert-van Kampen theorem** (`seifertVanKampenEquiv`).
+- [`ComputationalPaths/Path/CompPath/HomotopyPushout.lean`](ComputationalPaths/Path/CompPath/HomotopyPushout.lean) — homotopy pushout (double mapping cylinder) with universal property and pi_1 amalgamation via SVK.
 - [`ComputationalPaths/Path/CompPath/WedgeFreeProductUniversal.lean`](ComputationalPaths/Path/CompPath/WedgeFreeProductUniversal.lean) — universal map from π₁(A ∨ B) built from the free-product word lift.
 - [`ComputationalPaths/Path/CompPath/FigureEight.lean`](ComputationalPaths/Path/CompPath/FigureEight.lean) — figure-eight space (S¹ ∨ S¹) with basic loops.
 - [`ComputationalPaths/Path/CompPath/FigureEightStep.lean`](ComputationalPaths/Path/CompPath/FigureEightStep.lean) — SVK wedge equivalence π₁(FigureEight) ≃ π₁(S¹) * π₁(S¹).
@@ -524,6 +525,9 @@ Higher coherence laws for the weak ω-groupoid structure:
 - **Basepoint preservation**: `adjMap_basepoint` proves x₀ maps to refl
 - **Connectivity**: `IsPathConnectedPointed`, `IsSimplyConnected` structures
 - **Suspension connectivity**: `susp_path_connected_structure` shows south connects to north
+- [`ComputationalPaths/Path/Homotopy/LoopSpaceAdjunction.lean`](ComputationalPaths/Path/Homotopy/LoopSpaceAdjunction.lean) packages the Sigma/OmegaEq adjunction:
+  - Defines Sigma/OmegaEq functors on pointed spaces with unit/counit and naturality.
+  - Connects Sigma(circle) to `SuspensionCircleCompPath` and compares propositional loops to computational loops.
 
 ## Circle π₁(S¹) ≃ ℤ (what to read)
 - Encoding: `circleEncode : π₁(S¹) → ℤ` via quotient-lift of `circleEncodePath`.
