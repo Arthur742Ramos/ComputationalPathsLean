@@ -22,12 +22,15 @@ import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
 import ComputationalPaths.Path.Rewrite.PathTactic
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.ActionGroupoid
+import ComputationalPaths.Path.EquivariantPaths
 import ComputationalPaths.Path.GroupoidDerived
 import ComputationalPaths.Path.PathAlgebraDerived
 import ComputationalPaths.Path.PathAlgebraIdentities
+import ComputationalPaths.Path.PathAlgebraHomomorphism
 import ComputationalPaths.Path.MonoidalCoherence
 import ComputationalPaths.Path.SymmetricMonoidal
 import ComputationalPaths.Path.NaturalitySquares
+import ComputationalPaths.Path.NaturalTransformationPaths
 import ComputationalPaths.Path.ProductSigmaDerived
 import ComputationalPaths.Path.TransportDerived
 import ComputationalPaths.Path.HigherPathInduction
