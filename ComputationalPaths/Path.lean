@@ -52,6 +52,7 @@ import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.BicategoryDerived
 import ComputationalPaths.Path.EnrichedCategory
 import ComputationalPaths.Path.SimplicialPath
+import ComputationalPaths.Path.SimplicialHomotopy
 import ComputationalPaths.Path.DoubleGroupoid
 import ComputationalPaths.Path.DoubleCategoryPaths
 import ComputationalPaths.Path.TwoCategory
@@ -74,6 +75,7 @@ import ComputationalPaths.Path.Homotopy.OmegaTwoCoherence
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.TruncationLevels
 import ComputationalPaths.Path.Homotopy.PostnikovTower
+import ComputationalPaths.Path.Homotopy.ObstructionTheory
 import ComputationalPaths.Path.Homotopy.PathSpaceMonad
 import ComputationalPaths.Path.Homotopy.PointedMapCategory
 import ComputationalPaths.Path.Homotopy.UniversalCover
@@ -81,12 +83,14 @@ import ComputationalPaths.Path.Homotopy.HomotopyPullback
 import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 import ComputationalPaths.Path.Homotopy.PathAlgebraQuotient
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.Homotopy.AcyclicModels
 import ComputationalPaths.Path.Homotopy.PathHomology
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
 import ComputationalPaths.Path.Homotopy.GroupoidCovering
 import ComputationalPaths.Path.Homotopy.Fibration
+import ComputationalPaths.Path.Homotopy.HopfFibration
 import ComputationalPaths.Path.Homotopy.HomotopyFiber
 import ComputationalPaths.Path.Homotopy.PathSpaceFibration
 import ComputationalPaths.Path.Homotopy.PathSpaceHomotopy
@@ -100,7 +104,9 @@ import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
 import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
+import ComputationalPaths.Path.Homotopy.JamesConstruction
 import ComputationalPaths.Path.Homotopy.StableHomotopy
+import ComputationalPaths.Path.Homotopy.StableSplitting
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoidFunctor
 import ComputationalPaths.Path.Homotopy.DerivedFunctor
@@ -110,6 +116,9 @@ import ComputationalPaths.Path.Homotopy.PiOneDerived
 import ComputationalPaths.Path.Homotopy.HigherProductHomotopy
 import ComputationalPaths.Path.Homotopy.LieGroups
 import ComputationalPaths.Path.Homotopy.Hurewicz
+import ComputationalPaths.Path.Homotopy.DoldThom
+import ComputationalPaths.Path.Homotopy.CWComplexHomotopy
+import ComputationalPaths.Path.Homotopy.BrouwerDegree
 import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Homotopy.Reflexivity
 import ComputationalPaths.Path.Homotopy.IdentityType
@@ -143,7 +152,7 @@ import ComputationalPaths.Path.CompPath.MobiusBand
 import ComputationalPaths.Path.CompPath.RealProjective
 import ComputationalPaths.Path.CompPath.LensSpace
 import ComputationalPaths.Path.CompPath.LensSpaceAlgebra
--- removed legacy assumption-heavy modules (Mobius/Lens/Hopf/Pi2/Pi3/CP/James/Freudenthal/Cellular)
+-- removed legacy assumption-heavy modules (Mobius/Lens/Hopf/Pi2/Pi3/CP/Freudenthal/Cellular)
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.InfinityGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
