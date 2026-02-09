@@ -33,6 +33,7 @@ import ComputationalPaths.Path.MonoidalCoherence
 import ComputationalPaths.Path.SymmetricMonoidal
 import ComputationalPaths.Path.NaturalitySquares
 import ComputationalPaths.Path.NaturalTransformationPaths
+import ComputationalPaths.Path.YonedaLemma
 import ComputationalPaths.Path.AdjointEquivalence
 import ComputationalPaths.Path.ProductSigmaDerived
 import ComputationalPaths.Path.TransportDerived
@@ -70,6 +71,7 @@ import ComputationalPaths.Path.Homotopy.HomotopyPullback
 import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 import ComputationalPaths.Path.Homotopy.PathAlgebraQuotient
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.Homotopy.PathHomology
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
