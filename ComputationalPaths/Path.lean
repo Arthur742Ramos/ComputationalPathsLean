@@ -29,11 +29,13 @@ import ComputationalPaths.Path.GroupoidDerived
 import ComputationalPaths.Path.PathAlgebraDerived
 import ComputationalPaths.Path.PathAlgebraIdentities
 import ComputationalPaths.Path.PathAlgebraHomomorphism
+import ComputationalPaths.Path.LimitsColimits
 import ComputationalPaths.Path.MonoidalCoherence
 import ComputationalPaths.Path.SymmetricMonoidal
 import ComputationalPaths.Path.NaturalitySquares
 import ComputationalPaths.Path.NaturalTransformationPaths
 import ComputationalPaths.Path.YonedaLemma
+import ComputationalPaths.Path.KanExtension
 import ComputationalPaths.Path.AdjointEquivalence
 import ComputationalPaths.Path.ProductSigmaDerived
 import ComputationalPaths.Path.TransportDerived
@@ -88,6 +90,7 @@ import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoidFunctor
+import ComputationalPaths.Path.Homotopy.DerivedFunctor
 import ComputationalPaths.Path.Homotopy.GrothendieckConstruction
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 import ComputationalPaths.Path.Homotopy.PiOneDerived
