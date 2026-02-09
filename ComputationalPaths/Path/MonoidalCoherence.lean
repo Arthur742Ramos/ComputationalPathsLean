@@ -142,12 +142,54 @@ theorem unit_inner_coherence (p : Path a b) (q : Path b c) :
          (tensorPath p q) :=
   CoherenceDerived.rweq_inner_unit_coherence p q
 
+/-! ## Braiding and Symmetry -/
+
+/-- Braiding for the path tensor via inversion. -/
+theorem tensor_braiding (p : Path a b) (q : Path b c) :
+    RwEq (symm (tensorPath p q))
+         (tensorPath (symm q) (symm p)) :=
+  by
+    change
+      RwEq (symm (Path.trans p q))
+        (Path.trans (symm q) (symm p))
+    exact rweq_symm_trans_congr (p := p) (q := q)
+
+/-- The braiding is symmetric: reversing twice returns the original tensor. -/
+theorem tensor_braiding_symm (p : Path a b) (q : Path b c) :
+    RwEq (symm (tensorPath (symm q) (symm p)))
+         (tensorPath p q) := by
+  have h1 :
+      RwEq (symm (tensorPath (symm q) (symm p)))
+           (tensorPath (symm (symm p)) (symm (symm q))) := by
+    change
+      RwEq (symm (Path.trans (symm q) (symm p)))
+        (Path.trans (symm (symm p)) (symm (symm q)))
+    exact rweq_symm_trans_congr (p := symm q) (q := symm p)
+  have h2 :
+      RwEq (tensorPath (symm (symm p)) (symm (symm q)))
+           (tensorPath p q) := by
+    change
+      RwEq (Path.trans (symm (symm p)) (symm (symm q)))
+        (Path.trans p q)
+    exact rweq_trans_congr (rweq_ss p) (rweq_ss q)
+  exact RwEq.trans h1 h2
+
+/-- Hexagon coherence for the inversion braiding. -/
+theorem tensor_hexagon_braiding (p : Path a b) (q : Path b c) (r : Path c d) :
+    RwEq (symm (tensorPath (tensorPath p q) r))
+         (tensorPath (symm r) (tensorPath (symm q) (symm p))) := by
+  change
+    RwEq (symm (Path.trans (Path.trans p q) r))
+      (Path.trans (symm r) (Path.trans (symm q) (symm p)))
+  exact PathAlgebraIdentities.rweq_hexagon_braiding (p := p) (q := q) (r := r)
+
 /-! ## Summary -/
 
 /-!
 We package path concatenation as a monoidal structure and record the Mac Lane
 coherence laws (pentagon and triangle), together with a fivefold reassociation
-lemma and explicit unit coherence statements.
+lemma, explicit unit coherence statements, and inversion-based braiding
+coherence.
 -/
 
 end MonoidalCoherence
