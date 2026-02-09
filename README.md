@@ -137,6 +137,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`ComputationalPaths/Path/Algebra/Abelianization.lean`](ComputationalPaths/Path/Algebra/Abelianization.lean) — **Free group abelianization** F_n^ab ≃ ℤⁿ (axiom-free). Constructive encode-decode equivalence with `freeGroup_ab_equiv`, `wordToIntPow`, `liftWord_respects_BouquetRel`, and `liftBouquetFreeGroup_respects_AbelianizationRel`.
 - [`ComputationalPaths/Path/Homotopy/LoopIteration.lean`](ComputationalPaths/Path/Homotopy/LoopIteration.lean) — loop iteration infrastructure supporting loop power operations and group structure.
 - [`ComputationalPaths/Path/Homotopy/Coproduct.lean`](ComputationalPaths/Path/Homotopy/Coproduct.lean) — coproduct constructions for homotopy-theoretic types (no global RwEq round-trip assumptions).
+- [`ComputationalPaths/Path/Homotopy/CoproductPaths.lean`](ComputationalPaths/Path/Homotopy/CoproductPaths.lean) — coproduct path codes for sums plus wedge π₁ free-product and universal map wrappers.
 - [`ComputationalPaths/Path/Homotopy/Sets.lean`](ComputationalPaths/Path/Homotopy/Sets.lean) — set-theoretic constructions supporting homotopy definitions.
 - [`ComputationalPaths/Path/Rewrite/PathTactic.lean`](ComputationalPaths/Path/Rewrite/PathTactic.lean) — automation tactics (`path_simp`, `path_rfl`, `path_canon`, `path_decide`) for RwEq proofs.
 - [`ComputationalPaths/Path/Rewrite/PathTacticExamples.lean`](ComputationalPaths/Path/Rewrite/PathTacticExamples.lean) — comprehensive test suite for path tactics demonstrating usage patterns.

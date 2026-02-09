@@ -37,6 +37,9 @@ import ComputationalPaths.Path.BiContextDerived
 import ComputationalPaths.Path.LoopDerived
 import ComputationalPaths.Path.Bicategory
 import ComputationalPaths.Path.BicategoryDerived
+import ComputationalPaths.Path.EnrichedCategory
+import ComputationalPaths.Path.DoubleGroupoid
+import ComputationalPaths.Path.HigherCoherenceDerived
 import ComputationalPaths.Path.WhiskerOperations
 import ComputationalPaths.Path.HigherGroupoidCoherence
 import ComputationalPaths.Path.Homotopy.Loops
@@ -70,7 +73,9 @@ import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Homotopy.Reflexivity
 import ComputationalPaths.Path.Homotopy.IdentityType
 import ComputationalPaths.Path.Homotopy.Coproduct
+import ComputationalPaths.Path.Homotopy.CoproductPaths
 import ComputationalPaths.Path.CompPath.CircleCompPath
+import ComputationalPaths.Path.CompPath.WindingNumberProperties
 import ComputationalPaths.Path.CompPath.DeloopingConstruction
 import ComputationalPaths.Path.CompPath.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
