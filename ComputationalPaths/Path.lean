@@ -67,6 +67,7 @@ import ComputationalPaths.Path.Homotopy.UniversalCover
 import ComputationalPaths.Path.Homotopy.HomotopyPullback
 import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 import ComputationalPaths.Path.Homotopy.PathAlgebraQuotient
+import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
