@@ -63,6 +63,7 @@ import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.TruncationLevels
 import ComputationalPaths.Path.Homotopy.PathSpaceMonad
 import ComputationalPaths.Path.Homotopy.UniversalCover
+import ComputationalPaths.Path.Homotopy.HomotopyPullback
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
@@ -118,6 +119,7 @@ import ComputationalPaths.Path.CompPath.LensSpace
 import ComputationalPaths.Path.CompPath.LensSpaceAlgebra
 -- removed legacy assumption-heavy modules (Mobius/Lens/Hopf/Pi2/Pi3/CP/James/Freudenthal/Cellular)
 import ComputationalPaths.Path.OmegaGroupoid
+import ComputationalPaths.Path.InfinityGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.GroupStructures
