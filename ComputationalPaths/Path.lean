@@ -42,6 +42,7 @@ import ComputationalPaths.Path.DoubleGroupoid
 import ComputationalPaths.Path.TwoCategory
 import ComputationalPaths.Path.HigherCoherenceDerived
 import ComputationalPaths.Path.WhiskerOperations
+import ComputationalPaths.Path.HigherPathOperations
 import ComputationalPaths.Path.HigherGroupoidCoherence
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.LoopSpaceAlgebra
@@ -67,6 +68,7 @@ import ComputationalPaths.Path.Homotopy.MayerVietoris
 import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
+import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoidFunctor
 import ComputationalPaths.Path.Homotopy.GrothendieckConstruction
@@ -86,12 +88,14 @@ import ComputationalPaths.Path.CompPath.DeloopingConstruction
 import ComputationalPaths.Path.CompPath.ClassifyingSpace
 import ComputationalPaths.Path.CompPath.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
+import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.TorusStep
 import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.CompPath.PushoutPaths
 import ComputationalPaths.Path.CompPath.PullbackPaths
 import ComputationalPaths.Path.CompPath.VanKampenGeneralized
+import ComputationalPaths.Path.CompPath.SeifertVanKampenDerived
 import ComputationalPaths.Path.CompPath.FreeProductUniversal
 import ComputationalPaths.Path.CompPath.WedgeFreeProductDerived
 import ComputationalPaths.Path.CompPath.FigureEight

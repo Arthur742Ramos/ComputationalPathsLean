@@ -10,6 +10,7 @@ records the corresponding naturality and interchange laws.
 - `whiskerLeft_respects_rweq` / `whiskerRight_respects_rweq`: preservation of rewrite equivalence
 - `whiskerLeft_natural` / `whiskerRight_natural`: naturality with respect to vertical composition
 - `interchange_law`: interchange law for horizontal/vertical composition
+- `godement_interchange`: Godement interchange for whiskering composites
 -/
 
 import ComputationalPaths.Path.BicategoryDerived
@@ -98,12 +99,23 @@ theorem whiskerRight_respects_rweq {f g : Path a b} {h : Path b c}
     (theta2 : TwoCell (A := A) (a := b) (b := c) g1 g2) :
     comp (hcomp (A := A) (a := a) (b := b) (c := c) eta1 theta1)
         (hcomp (A := A) (a := a) (b := b) (c := c) eta2 theta2) =
-      hcomp (A := A) (a := a) (b := b) (c := c)
+  hcomp (A := A) (a := a) (b := b) (c := c)
         (comp (A := A) (a := a) (b := b)
           (p := f0) (q := f1) (r := f2) eta1 eta2)
         (comp (A := A) (a := b) (b := c)
           (p := g0) (q := g1) (r := g2) theta1 theta2) := by
   simp
+
+/-- Godement interchange: the two whiskering composites agree. -/
+@[simp] theorem godement_interchange
+    {f f' : Path a b} {g g' : Path b c}
+    (eta : TwoCell (A := A) (a := a) (b := b) f f')
+    (theta : TwoCell (A := A) (a := b) (b := c) g g') :
+    comp (whiskerRight (A := A) (a := a) (b := b) (c := c) g eta)
+        (whiskerLeft (A := A) (a := a) (b := b) (c := c) f' theta) =
+      comp (whiskerLeft (A := A) (a := a) (b := b) (c := c) f theta)
+        (whiskerRight (A := A) (a := a) (b := b) (c := c) g' eta) := by
+  apply Subsingleton.elim
 
 end WhiskerOperations
 end Path

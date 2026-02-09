@@ -127,10 +127,10 @@ theorem pointedMap_subsingleton_of_subsingleton {X Y : Pointed}
   intro x
   have hx : x = X.pt := Subsingleton.elim _ _
   calc
-    f.toFun x = f.toFun X.pt := by simpa [hx]
+    f.toFun x = f.toFun X.pt := by simp [hx]
     _ = Y.pt := f.map_pt
     _ = g.toFun X.pt := g.map_pt.symm
-    _ = g.toFun x := by simpa [hx]
+    _ = g.toFun x := by simp [hx]
  
 instance instSubsingleton_pointedMap_sigma (X Y : Pointed) :
     Subsingleton (PointedMap (sigmaPointed X) Y) :=
@@ -165,7 +165,7 @@ def omegaEqMap {X Y : Pointed} (f : PointedMap X Y) :
   toFun := fun p =>
     LiftEq.mk (by
       have h := _root_.congrArg f.toFun (LiftEq.toEq p)
-      simpa [f.map_pt] using h)
+      exact Eq.trans (Eq.trans (Eq.symm f.map_pt) h) f.map_pt)
   map_pt := by
     apply Subsingleton.elim
  
