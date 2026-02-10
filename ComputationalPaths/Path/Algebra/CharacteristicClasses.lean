@@ -172,10 +172,19 @@ variable {R : GradedRing} (C : ChernClassData R)
 theorem chern_zero_is_one (E : Bundle) : C.chern 0 E = R.one :=
   C.chern_zero E
 
+/-- `Path`-typed witness of `c_0(E) = 1`. -/
+def chern_zero_is_onePath (E : Bundle) : Path (C.chern 0 E) R.one :=
+  Path.ofEq (C.chern_zero E)
+
 /-- c_k vanishes above the rank. -/
 theorem chern_vanishing_above (k : Nat) (E : Bundle) (hk : k > E.rank) :
     C.chern k E = R.zero (2 * k) :=
   C.chern_vanishing k E hk
+
+/-- `Path`-typed vanishing above the rank. -/
+def chern_vanishing_abovePath (k : Nat) (E : Bundle) (hk : k > E.rank) :
+    Path (C.chern k E) (R.zero (2 * k)) :=
+  Path.ofEq (C.chern_vanishing k E hk)
 
 /-- For a rank-0 bundle, all positive Chern classes vanish. -/
 theorem chern_rank_zero (k : Nat) (hk : k > 0) :
@@ -258,10 +267,19 @@ variable {M : GradedMod2} (W : StiefelWhitneyData M)
 theorem sw_zero_is_one (E : Bundle) : W.sw 0 E = M.one :=
   W.sw_zero E
 
+/-- `Path`-typed witness of `w_0(E) = 1`. -/
+def sw_zero_is_onePath (E : Bundle) : Path (W.sw 0 E) M.one :=
+  Path.ofEq (W.sw_zero E)
+
 /-- w_k vanishes above the rank. -/
 theorem sw_vanishing_above (k : Nat) (E : Bundle) (hk : k > E.rank) :
     W.sw k E = M.zero k :=
   W.sw_vanishing k E hk
+
+/-- `Path`-typed vanishing above the rank. -/
+def sw_vanishing_abovePath (k : Nat) (E : Bundle) (hk : k > E.rank) :
+    Path (W.sw k E) (M.zero k) :=
+  Path.ofEq (W.sw_vanishing k E hk)
 
 /-- For a rank-0 bundle, all positive SW classes vanish. -/
 theorem sw_rank_zero (k : Nat) (hk : k > 0) :
@@ -331,6 +349,11 @@ theorem euler_rank_zero :
     E_data.euler (Bundle.trivial 0) = cast (by simp [Bundle.rank_trivial]) R.one :=
   E_data.euler_trivial_zero
 
+/-- `Path`-typed Euler class for the rank-0 trivial bundle. -/
+def euler_rank_zeroPath :
+    Path (E_data.euler (Bundle.trivial 0)) (cast (by simp [Bundle.rank_trivial]) R.one) :=
+  Path.ofEq E_data.euler_trivial_zero
+
 /-- Euler class for rank-1 trivial bundle vanishes. -/
 theorem euler_rank_one :
     E_data.euler (Bundle.trivial 1) = R.zero 1 := by
@@ -338,6 +361,10 @@ theorem euler_rank_one :
   have : 2 * 0 + 1 = 1 := by omega
   rw [this] at h
   exact h
+
+/-- `Path`-typed Euler class for the rank-1 trivial bundle. -/
+def euler_rank_onePath : Path (E_data.euler (Bundle.trivial 1)) (R.zero 1) :=
+  Path.ofEq (euler_rank_one (E_data := E_data))
 
 end EulerClassData
 

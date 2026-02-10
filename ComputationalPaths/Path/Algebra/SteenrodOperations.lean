@@ -205,6 +205,11 @@ theorem sq_above_zero (i n : Nat) (hi : i > n) (x : M.carrier n) :
     S.sq i n x = M.zero (n + i) :=
   S.sq_above i n hi x
 
+/-- Path witnessing Sq^i vanishes above the degree. -/
+def sq_above_zero_path (i n : Nat) (hi : i > n) (x : M.carrier n) :
+    Path (S.sq i n x) (M.zero (n + i)) :=
+  Path.ofEq (S.sq_above i n hi x)
+
 /-- Sq^i applied to zero is zero. -/
 @[simp] theorem sq_zero_elem (i n : Nat) : S.sq i n (M.zero n) = M.zero (n + i) :=
   S.sq_map_zero i n
