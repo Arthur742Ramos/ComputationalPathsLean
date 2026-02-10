@@ -121,7 +121,7 @@ noncomputable def stableAdjunction :
         (stableAdjunction n X (omegaEqPointed Y))
 
 /-- Unfolding equation for the stabilized adjunction. -/
-def stableAdjunction_succ (n : Nat) (X Y : Pointed) :
+noncomputable def stableAdjunction_succ (n : Nat) (X Y : Pointed) :
     Path
       (stableAdjunction (n + 1) X Y)
       (pathSimpleEquivComp

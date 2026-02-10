@@ -32,13 +32,13 @@ are connected.
   fundamental groups like π₁(S¹) ≃ ℤ.
 - At level 3+: Contractible - any two parallel 2-cells are connected by a 3-cell.
 
-## Axiom Structure
+## Contractibility Structure
 
-The construction uses axioms for contractibility at levels 4 and above:
+Contractibility at levels ≥ 3 is **derived**, not axiomatized:
 
-1. **Level 3**: contractibility follows from proof irrelevance of `RwEq`
-2. **`contractibility₄`** (level 4): any two parallel `Derivation₃`s are connected
-3. **`contractibilityHigh`** (level 5+): any two parallel `Derivation₄`s are connected
+1. **Level 3**: `contractibility₃` from proof irrelevance of `RwEq`
+2. **Level 4**: `contractibility₄` from proof irrelevance of `d₁.toRwEq = d₂.toRwEq`
+3. **Level 5+**: `contractibilityHigh` from proof irrelevance of the induced level-4 equality
 
 ## References
 
@@ -77,13 +77,13 @@ any two parallel (k-1)-cells are connected by a k-cell.
 - **Level 3+ (contractible)**: `Derivation₃ d₁ d₂` is inhabited for any parallel
   derivations `d₁, d₂ : Derivation₂ p q`. Similarly for higher levels.
 
-### Axiom Inventory
+### Contractibility Inventory
 
-This module assumes the following beyond Lean's core (including proof-irrelevant `Prop`):
+This module derives the following contractibility results from proof irrelevance:
 
-1. **Level 3**: `contractibility₃` is derived from proof irrelevance of `RwEq`
-2. **Level 4**: `contractibility₄` — any two parallel `Derivation₃`s are connected
-3. **Level 5+**: `contractibilityHigh` — any two parallel `Derivation₄`s are connected
+1. **Level 3**: `contractibility₃` for parallel `Derivation₂`
+2. **Level 4**: `contractibility₄` for parallel `Derivation₃`
+3. **Level 5+**: `contractibilityHigh` for parallel `Derivation₄`
 
 The groupoid laws (unit, associativity, inverses), pentagon, triangle, and interchange
 coherences are all *proved* as constructors of `MetaStep₃`/`MetaStep₄`/`MetaStepHigh`.
@@ -211,7 +211,7 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   /-- Equality of the induced Prop-level `RwEq` witnesses yields a 3-cell.
 
   Since `RwEq p q` is a proposition, any two derivations have equal `toRwEq` proofs.
-  This constructor replaces the former contractibility axiom. -/
+  This constructor encodes contractibility via proof irrelevance. -/
   | rweq_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       (h : d₁.toRwEq = d₂.toRwEq) : MetaStep₃ d₁ d₂
   -- Pentagon coherence

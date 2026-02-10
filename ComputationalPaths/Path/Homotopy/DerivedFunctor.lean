@@ -33,15 +33,16 @@ structure PreFunctor (A : Type u) (B : Type u) (f : A -> B) where
   /-- Action on paths. -/
   map : {a b : A} -> Path a b -> FundamentalGroupoid.Hom B (f a) (f b)
   /-- Map preserves reflexivity. -/
-  map_refl : forall a, map (Path.refl a) = FundamentalGroupoid.id' B (f a)
+  map_refl : forall a,
+    Path (map (Path.refl a)) (FundamentalGroupoid.id' B (f a))
   /-- Map preserves path composition. -/
   map_trans :
     forall {a b c : A} (p : Path a b) (q : Path b c),
-      map (Path.trans p q) =
-        FundamentalGroupoid.comp' B (map p) (map q)
+      Path (map (Path.trans p q))
+        (FundamentalGroupoid.comp' B (map p) (map q))
   /-- Map respects rewrite equality. -/
   respects_rweq :
-    forall {a b : A} {p q : Path a b}, RwEq p q -> map p = map q
+    forall {a b : A} {p q : Path a b}, RwEq p q -> Path (map p) (map q)
 
 /-! ## Fixed-object functors -/
 
@@ -99,7 +100,7 @@ def FunctorOn.toFunctor {A B : Type u} {f : A -> B}
 def PreFunctor.localizationMap {A B : Type u} {f : A -> B}
     (F : PreFunctor A B f) :
     PathLocalizationMap A (fun a b => FundamentalGroupoid.Hom B (f a) (f b)) :=
-  { map := F.map, respects := F.respects_rweq }
+  { map := F.map, respects := fun h => (F.respects_rweq h).toEq }
 
 /-- The induced map on quotient paths. -/
 def PreFunctor.derivedMap {A B : Type u} {f : A -> B}
@@ -118,7 +119,7 @@ def leftDerivedFunctorOn {A B : Type u} {f : A -> B}
     intro a
     change PathLocalizationMap.lift (PreFunctor.localizationMap F)
       (Quot.mk _ (Path.refl a)) = FundamentalGroupoid.id' B (f a)
-    simpa [PreFunctor.localizationMap] using F.map_refl a
+    simpa [PreFunctor.localizationMap] using (F.map_refl a).toEq
   map_comp := by
     intro a b c p q
     induction p using Quot.ind with
@@ -153,7 +154,7 @@ def leftDerivedFunctorOn {A B : Type u} {f : A -> B}
               (F := PreFunctor.localizationMap F)
               (p := q))
         rw [h_left, h_p, h_q]
-        simpa [FundamentalGroupoid.comp'] using F.map_trans p q
+        simpa [FundamentalGroupoid.comp'] using (F.map_trans p q).toEq
 
 /-- Right derived functor on the fundamental groupoid. -/
 def rightDerivedFunctorOn {A B : Type u} {f : A -> B}
