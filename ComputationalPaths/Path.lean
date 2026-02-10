@@ -116,6 +116,7 @@ import ComputationalPaths.Path.Homotopy.SuspensionTheorems
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
 import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
 import ComputationalPaths.Path.Homotopy.LoopSpaceDelooping
+import ComputationalPaths.Path.Homotopy.OmegaSpectrum
 import ComputationalPaths.Path.Homotopy.JamesConstruction
 import ComputationalPaths.Path.Homotopy.StableHomotopy
 import ComputationalPaths.Path.Homotopy.StableSplitting
@@ -189,6 +190,7 @@ import ComputationalPaths.Path.Algebra.GroupActionOps
 import ComputationalPaths.Path.Algebra.ExtFunctor
 import ComputationalPaths.Path.Algebra.BarComplex
 import ComputationalPaths.Path.Algebra.Abelianization
+import ComputationalPaths.Path.Algebra.KTheory
 import ComputationalPaths.Path.Algebra.FreeGroupProperties
 import ComputationalPaths.Path.Homotopy.HurewiczTheorem
 import ComputationalPaths.Path.Homotopy.WhiteheadTower
