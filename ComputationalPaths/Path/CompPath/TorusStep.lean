@@ -3,6 +3,12 @@
 
 This module packages the torus π₁ computation as a `PathSimpleEquiv`
 between `π₁(T²)` and `ℤ × ℤ`.
+
+## Key Results
+
+- `torusPiOneEncode_torusDecode`: encoding after decoding is the identity (as a `Path`).
+- `torusDecode_torusPiOneEncode`: decoding after encoding is the identity (as a `Path`).
+- `torusPiOneEquivIntProd`: `π₁(T²)` is `PathSimpleEquiv` to `ℤ × ℤ`.
 -/
 
 import ComputationalPaths.Path.CompPath.Torus
@@ -55,11 +61,11 @@ class HasTorusPiOneEncode : Type u where
 @[simp] def torusPiOneEncode [HasTorusPiOneEncode] : torusPiOne → Int × Int :=
   HasTorusPiOneEncode.encode
 
-theorem torusPiOneEncode_torusDecode [HasTorusPiOneEncode] (z : Int × Int) :
+noncomputable def torusPiOneEncode_torusDecode [HasTorusPiOneEncode] (z : Int × Int) :
     Path (torusPiOneEncode (torusDecode z)) z :=
   HasTorusPiOneEncode.encode_torusDecode z
 
-theorem torusDecode_torusPiOneEncode [HasTorusPiOneEncode] (x : torusPiOne) :
+noncomputable def torusDecode_torusPiOneEncode [HasTorusPiOneEncode] (x : torusPiOne) :
     Path (torusDecode (torusPiOneEncode x)) x :=
   HasTorusPiOneEncode.torusDecode_encode x
 
@@ -85,14 +91,20 @@ noncomputable instance instHasTorusPiOneEncode_ofCircle :
     (circlePiOneEncode x.1, circlePiOneEncode x.2)
   encode_torusDecode := by
     intro z
-    cases z
-    exact Path.ofEq (by
-      apply Prod.ext <;> simp [torusDecode])
+    cases z with
+    | mk z1 z2 =>
+        exact
+          Path.prodMk
+            (Path.ofEq (circlePiOneEncode_circleDecode z1))
+            (Path.ofEq (circlePiOneEncode_circleDecode z2))
   torusDecode_encode := by
     intro x
-    cases x
-    exact Path.ofEq (by
-      apply Prod.ext <;> simp [torusDecode])
+    cases x with
+    | mk x1 x2 =>
+        exact
+          Path.prodMk
+            (Path.ofEq (circleDecode_circlePiOneEncode x1))
+            (Path.ofEq (circleDecode_circlePiOneEncode x2))
 
 
 

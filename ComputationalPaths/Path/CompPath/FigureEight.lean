@@ -35,6 +35,27 @@ open CompPath
 
 universe u v w
 
+/-! ## Path-Based Equivalences -/
+
+/-- Path-based equivalence structure (inverse laws witnessed by `Path`). -/
+structure PathSimpleEquiv (α : Type u) (β : Type v) where
+  /-- Forward map. -/
+  toFun : α → β
+  /-- Inverse map. -/
+  invFun : β → α
+  /-- Inverse after forward map is the identity, as a `Path`. -/
+  left_inv : ∀ x : α, Path (invFun (toFun x)) x
+  /-- Forward after inverse map is the identity, as a `Path`. -/
+  right_inv : ∀ y : β, Path (toFun (invFun y)) y
+
+/-- Convert a `SimpleEquiv` into a `PathSimpleEquiv`. -/
+def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
+    PathSimpleEquiv α β :=
+  { toFun := e.toFun
+    invFun := e.invFun
+    left_inv := fun x => Path.ofEq (e.left_inv x)
+    right_inv := fun y => Path.ofEq (e.right_inv y) }
+
 /-! ## The Figure-Eight Space -/
 
 /-- The figure-eight space: wedge sum of two circles sharing a common basepoint.
@@ -119,19 +140,21 @@ noncomputable instance instHasWedgeProvenanceEncode_FigureEight :
 
 /-- Provenance-based SVK equivalence for the figure-eight. -/
 noncomputable def figureEightProvenanceEquiv :
-    SimpleEquiv
+    PathSimpleEquiv
       (WedgeProvenance.WedgeProvenanceQuot
         (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))
       (FreeProductWord (π₁(Circle, circleBase)) (π₁(Circle, circleBase))) :=
-  WedgeProvenance.wedgeProvenanceEquiv
-    (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase)
+  simpleEquivToPathSimpleEquiv
+    (WedgeProvenance.wedgeProvenanceEquiv
+      (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))
 
 /-- SVK equivalence for the figure-eight (free product words over π₁(S¹)).
 Requires `HasWedgeSVKDecodeBijective` for the wedge decode map. -/
 noncomputable def figureEightPiOneEquiv
     [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase] :
-    SimpleEquiv FigureEightPiOne
+    PathSimpleEquiv FigureEightPiOne
       (FreeProductWord (π₁(Circle, circleBase)) (π₁(Circle, circleBase))) := by
+  refine simpleEquivToPathSimpleEquiv ?_
   simpa [FigureEight, FigureEight.base, FigureEightPiOne, WedgeFreeProductCode] using
     (wedgeFundamentalGroupEquiv_of_decode_bijective
       (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))
@@ -153,11 +176,11 @@ This module establishes:
 
 4. **Fundamental Group Equivalence**:
     - `figureEightPiOneEquiv` identifies π₁(FigureEight) with free product words,
-      using the SVK decode bijectivity assumption.
+      using the SVK decode bijectivity assumption (inverse laws witnessed by `Path`).
 
 5. **Provenance SVK Equivalence**:
     - `figureEightProvenanceEquiv` provides the constructive SVK-style equivalence
-      on provenance loops.
+      on provenance loops (inverse laws witnessed by `Path`).
 -/
 
 end Path

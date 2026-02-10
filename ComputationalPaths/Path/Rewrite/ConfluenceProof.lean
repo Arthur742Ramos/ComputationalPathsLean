@@ -376,20 +376,21 @@ theorem rw_plus_trans {a b : A} {p q r : Path a b}
   | tail _ step ih => exact RwPlus.tail ih step
 
 theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
-    Sum (Path p q) (∃ r, Step p r ∧ Rw r q) := by
+    Sum (Path p q) { r : Path a b // Step p r ∧ Rw r q } := by
   induction h with
   | refl => exact Sum.inl (Path.refl _)
   | tail h step ih =>
     cases ih with
     | inl hpeq =>
         refine Sum.inr ?_
-        refine ⟨_, ?_, Rw.refl _⟩
+        refine ⟨_, ?_⟩
+        refine ⟨?_, Rw.refl _⟩
         cases hpeq.toEq
         exact step
     | inr hdata =>
         rcases hdata with ⟨r, hstep, hrq⟩
-        refine Sum.inr ⟨r, hstep, ?_⟩
-        exact Rw.tail hrq step
+        refine Sum.inr ⟨r, ?_⟩
+        exact ⟨hstep, Rw.tail hrq step⟩
 
 /-- Termination: well-foundedness of the reverse `RwPlus` relation. -/
 def Terminating {A : Type u} {a b : A} : Prop :=
@@ -465,9 +466,6 @@ end ConfluenceProof
 end Rewrite
 end Path
 end ComputationalPaths
-
-
-
 
 
 
