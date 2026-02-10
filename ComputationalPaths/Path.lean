@@ -82,6 +82,7 @@ import ComputationalPaths.Path.Homotopy.PathSpaceMonad
 import ComputationalPaths.Path.Homotopy.PointedMapCategory
 import ComputationalPaths.Path.Homotopy.UniversalCover
 import ComputationalPaths.Path.Homotopy.HomotopyPullback
+import ComputationalPaths.Path.Homotopy.HomotopyLimitColimit
 import ComputationalPaths.Path.Homotopy.WhiteheadProduct
 import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 import ComputationalPaths.Path.Homotopy.PathAlgebraQuotient
@@ -93,12 +94,14 @@ import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
 import ComputationalPaths.Path.Homotopy.GroupoidCovering
 import ComputationalPaths.Path.Homotopy.Fibration
+import ComputationalPaths.Path.Homotopy.QuillenAdjunction
 import ComputationalPaths.Path.Homotopy.HopfFibration
 import ComputationalPaths.Path.Homotopy.HopfInvariant
 import ComputationalPaths.Path.Homotopy.HomotopyFiber
 import ComputationalPaths.Path.Homotopy.PathSpaceFibration
 import ComputationalPaths.Path.Homotopy.PathSpaceHomotopy
 import ComputationalPaths.Path.Homotopy.HomotopyCommutativeDiagram
+import ComputationalPaths.Path.Homotopy.HomotopyCartan
 import ComputationalPaths.Path.Homotopy.LongExactSequence
 import ComputationalPaths.Path.Homotopy.HomotopyExactSequence
 import ComputationalPaths.Path.Homotopy.MayerVietoris
@@ -116,7 +119,9 @@ import ComputationalPaths.Path.Homotopy.StableHomotopy
 import ComputationalPaths.Path.Homotopy.StableSplitting
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoidFunctor
+import ComputationalPaths.Path.Homotopy.LocalizationCategory
 import ComputationalPaths.Path.Homotopy.DerivedFunctor
+import ComputationalPaths.Path.Homotopy.DerivedFunctorHomotopy
 import ComputationalPaths.Path.Homotopy.GrothendieckConstruction
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 import ComputationalPaths.Path.Homotopy.PiOneDerived
@@ -136,6 +141,8 @@ import ComputationalPaths.Path.Homotopy.CoproductPaths
 import ComputationalPaths.Path.CompPath.CircleCompPath
 import ComputationalPaths.Path.CompPath.WindingNumberProperties
 import ComputationalPaths.Path.CompPath.DeloopingConstruction
+import ComputationalPaths.Path.CompPath.HomogeneousSpace
+import ComputationalPaths.Path.CompPath.OrbitSpace
 import ComputationalPaths.Path.CompPath.ClassifyingSpace
 import ComputationalPaths.Path.CompPath.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
@@ -157,7 +164,11 @@ import ComputationalPaths.Path.CompPath.SuspensionCircle
 import ComputationalPaths.Path.CompPath.Pi5S3
 import ComputationalPaths.Path.CompPath.KleinBottle
 import ComputationalPaths.Path.CompPath.MobiusBand
+import ComputationalPaths.Path.CompPath.FlagManifold
 import ComputationalPaths.Path.CompPath.RealProjective
+import ComputationalPaths.Path.CompPath.ProjectiveSpace
+import ComputationalPaths.Path.CompPath.StiefelManifold
+import ComputationalPaths.Path.CompPath.GrassmannManifold
 import ComputationalPaths.Path.CompPath.LensSpace
 import ComputationalPaths.Path.CompPath.LensSpaceAlgebra
 -- removed legacy assumption-heavy modules (Mobius/Lens/Hopf/Pi2/Pi3/CP/Freudenthal/Cellular)

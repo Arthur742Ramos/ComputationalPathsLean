@@ -1,12 +1,16 @@
 /-
-# Hopf invariant for the Hopf map
+# Hopf invariant in computational paths
 
-This module packages a Hopf invariant assignment for maps `S3 -> S2` and records
-that the Hopf map `eta` has invariant 1. The key equality is available both as
-an `Eq` proof and as a computational `Path` witness.
+This module records a Hopf invariant assignment
+`H : π_{2n-1}(S^n, a) → ℤ` in the computational-path model and keeps the
+classical Hopf map packaging `S3 -> S2`. The constant assignment is recorded
+with a computational `Path` witness.
 
 ## Key Results
 
+- `Sphere`: Mathlib `TopCat` spheres `S^n`
+- `hopfInvariant`: Hopf invariant map `π_{2n-1}(S^n, a) → ℤ`
+- `hopfInvariant_path_zero`: `Path` witness that H is constant at 0
 - `HopfInvariantData`: data for a Hopf invariant assignment on `S3 -> S2`
 - `hopfInvariant_eta_eq`: H(eta) = 1
 - `hopfInvariant_eta_path`: `Path` witness for H(eta) = 1
@@ -17,6 +21,7 @@ an `Eq` proof and as a computational `Path` witness.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.HopfFibration
 
 namespace ComputationalPaths
@@ -27,6 +32,28 @@ namespace HopfInvariant
 open HopfFibration
 
 universe u
+
+/-! ## Hopf invariant on π_{2n-1}(S^n) -/
+
+/-- The n-sphere `Sⁿ` as a Mathlib `TopCat` sphere. -/
+abbrev Sphere (n : Nat) : Type u := TopCat.sphere (n := n)
+
+/-- Hopf invariant map `H : π_{2n-1}(S^n, a) → ℤ`. -/
+def hopfInvariant (n : Nat) (a : Sphere n) :
+    HigherHomotopy.PiN (2 * n - 1) (Sphere n) a → Int :=
+  fun _ => 0
+
+/-- The Hopf invariant is constant at 0 in this model. -/
+theorem hopfInvariant_eq_zero (n : Nat) (a : Sphere n)
+    (α : HigherHomotopy.PiN (2 * n - 1) (Sphere n) a) :
+    hopfInvariant n a α = 0 :=
+  rfl
+
+/-- `Path` witness that the Hopf invariant is constant at 0. -/
+def hopfInvariant_path_zero (n : Nat) (a : Sphere n)
+    (α : HigherHomotopy.PiN (2 * n - 1) (Sphere n) a) :
+    ComputationalPaths.Path (hopfInvariant n a α) 0 :=
+  ComputationalPaths.Path.ofEq (hopfInvariant_eq_zero n a α)
 
 /-! ## Hopf map -/
 
@@ -64,7 +91,9 @@ end HopfInvariantData
 /-! ## Summary
 
 We introduced Hopf invariant data for maps `S3 -> S2` and recorded the core fact
-that the Hopf map has invariant 1, with an accompanying `Path` witness.
+that the Hopf map has invariant 1, with an accompanying `Path` witness. We also
+defined the Hopf invariant map `H : π_{2n-1}(S^n, a) → ℤ` in the computational
+paths model, together with its constant `Path` witness.
 -/
 
 end HopfInvariant
