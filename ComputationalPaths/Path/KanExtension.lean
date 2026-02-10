@@ -62,14 +62,14 @@ def precompose (F : PathCategoryFunctor A B)
     calc
       G.map (F.map (Path.refl a)) x =
           G.map (Path.refl (F.obj a)) x := by
-            rw [F.map_id a]
+            rw [F.map_id]
       _ = x := G.map_id (F.obj a) x
   map_comp := by
     intro a b c p q x
     calc
       G.map (F.map (Path.trans p q)) x =
           G.map (Path.trans (F.map p) (F.map q)) x := by
-            rw [F.map_comp (p := p) (q := q)]
+            rw [F.map_comp]
       _ = G.map (F.map q) (G.map (F.map p) x) :=
         G.map_comp (p := F.map p) (q := F.map q) (x := x)
 
@@ -132,7 +132,8 @@ def pointwiseLeftKanMap (F : PathCategoryFunctor A B)
 def pointwiseLeftKan (F : PathCategoryFunctor A B)
     (G : PathFunctor.{u, v} (A := A)) : PathFunctor.{u, max u v} (A := B) where
   obj := pointwiseLeftKanObj F G
-  map := fun {b b'} q x => pointwiseLeftKanMap F G (b := b) (b' := b') q x
+  map := fun {b b'} q x =>
+    pointwiseLeftKanMap (F := F) (G := G) (b := b) (b' := b') q x
   map_id := by
     intro b x
     cases x with
@@ -163,7 +164,8 @@ def pointwiseRightKanMap (F : PathCategoryFunctor A B)
 def pointwiseRightKan (F : PathCategoryFunctor A B)
     (G : PathFunctor.{u, v} (A := A)) : PathFunctor.{u, max u v} (A := B) where
   obj := pointwiseRightKanObj F G
-  map := fun {b b'} q h => pointwiseRightKanMap F G (b := b) (b' := b') q h
+  map := fun {b b'} q h =>
+    pointwiseRightKanMap (F := F) (G := G) (b := b) (b' := b') q h
   map_id := by
     intro b h
     funext a p
