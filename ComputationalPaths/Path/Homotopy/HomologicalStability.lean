@@ -81,7 +81,7 @@ structure GroupCompletionData (M : Monoid.{u}) where
 homology equivalence (recorded abstractly). -/
 structure GroupCompletionTheorem (M : Monoid.{u}) (hty : HomologyTheory.{u}) where
   gc : GroupCompletionData M
-  inducesIso : ∀ (k : Nat), Prop
+  inducesIso : Nat → Prop
 
 end HomologicalStability
 end Homotopy

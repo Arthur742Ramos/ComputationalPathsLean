@@ -61,7 +61,7 @@ def symmProdInfAdd {X : Type u} :
         Sym.mk ((s : Multiset X) + (t : Multiset X))
           (by
             -- `simp` discharges the cardinality proof using `Multiset.card_add`.
-            simp [Multiset.card_add, s.property, t.property])⟩
+            simp [Multiset.card_add])⟩
 
 /-! ## Degree properties -/
 

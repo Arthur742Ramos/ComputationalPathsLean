@@ -27,17 +27,19 @@ namespace Algebra
 
 open CompPath
 
+noncomputable section
+
 /-! ## Nielsen-Schreier base case: Path witnesses -/
 
 /-- Path witness for the Nielsen-Schreier rank formula base case. -/
 def freeGroup_rank_formula_one_path (k : Nat) :
     Path (freeGroupRank 1) (1 + k * (1 - 1)) :=
-  Path.ofEq (freeGroup_rank_formula_one k)
+  freeGroup_rank_formula_one k
 
 /-- Path witness for the generator power form in F1. -/
 def intToFreeGroupOne_eq_genPow_path (k : Int) :
     Path (intToFreeGroupOne k) (BouquetFreeGroup.genPow Fin'B.fzero k) :=
-  Path.ofEq (intToFreeGroupOne_eq_genPow k)
+  intToFreeGroupOne_eq_genPow k
 
 /-- Path witness for multiplication in F1 under the Int encoding. -/
 def freeGroupOneToInt_mul_path (x y : BouquetFreeGroup 1) :
@@ -64,6 +66,8 @@ def intToFreeGroupOne_freeGroupOneToInt_path (x : BouquetFreeGroup 1) :
   intro w
   simp [freeGroupOneToInt]
   exact (bouquetWord_one_equiv_single w).symm
+
+end
 
 /-! ## Summary -/
 

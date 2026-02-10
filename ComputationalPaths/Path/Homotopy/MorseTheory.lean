@@ -146,11 +146,11 @@ def sphereMorseFunction : MorseFunctionData 2 where
   ]
   index_le_dim := by
     intro cp hcp
-    simp [List.mem_cons, List.mem_singleton] at hcp
+    simp [List.mem_cons] at hcp
     rcases hcp with rfl | rfl <;> decide
   distinct_values := by
     intro cp₁ hcp₁ cp₂ hcp₂ hne
-    simp [List.mem_cons, List.mem_singleton] at hcp₁ hcp₂
+    simp [List.mem_cons] at hcp₁ hcp₂
     rcases hcp₁ with rfl | rfl <;> rcases hcp₂ with rfl | rfl <;> simp_all
 
 /-- S² has exactly 2 critical points. -/
@@ -188,11 +188,11 @@ def torusMorseFunction : MorseFunctionData 2 where
   ]
   index_le_dim := by
     intro cp hcp
-    simp [List.mem_cons, List.mem_singleton] at hcp
+    simp [List.mem_cons] at hcp
     rcases hcp with rfl | rfl | rfl | rfl <;> decide
   distinct_values := by
     intro cp₁ hcp₁ cp₂ hcp₂ hne
-    simp [List.mem_cons, List.mem_singleton] at hcp₁ hcp₂
+    simp [List.mem_cons] at hcp₁ hcp₂
     rcases hcp₁ with rfl | rfl | rfl | rfl <;>
       rcases hcp₂ with rfl | rfl | rfl | rfl <;> simp_all
 

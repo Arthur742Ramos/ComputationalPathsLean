@@ -59,12 +59,19 @@ def precompose (F : PathCategoryFunctor A B)
   map := fun {a b} p x => G.map (F.map p) x
   map_id := by
     intro a x
-    have h := F.map_id a
-    simpa [h] using (G.map_id (F.obj a) x)
+    calc
+      G.map (F.map (Path.refl a)) x =
+          G.map (Path.refl (F.obj a)) x := by
+            rw [F.map_id a]
+      _ = x := G.map_id (F.obj a) x
   map_comp := by
     intro a b c p q x
-    have h := F.map_comp (p := p) (q := q)
-    simpa [h] using (G.map_comp (p := F.map p) (q := F.map q) (x := x))
+    calc
+      G.map (F.map (Path.trans p q)) x =
+          G.map (Path.trans (F.map p) (F.map q)) x := by
+            rw [F.map_comp (p := p) (q := q)]
+      _ = G.map (F.map q) (G.map (F.map p) x) :=
+        G.map_comp (p := F.map p) (q := F.map q) (x := x)
 
 end PathFunctor
 
@@ -75,7 +82,7 @@ section KanExtensions
 variable {A B : Type u}
 
 /-- Data for a left Kan extension of a path functor. -/
-structure LeftKanExtension (F : FundamentalGroupoidFunctor A B)
+structure LeftKanExtension (F : PathCategoryFunctor A B)
     (G : PathFunctor.{u, v} (A := A)) where
   /-- The left Kan extension functor. -/
   lan : PathFunctor.{u, v} (A := B)
@@ -88,7 +95,7 @@ structure LeftKanExtension (F : FundamentalGroupoidFunctor A B)
         (PathNatTrans G (PathFunctor.precompose F M))
 
 /-- Data for a right Kan extension of a path functor. -/
-structure RightKanExtension (F : FundamentalGroupoidFunctor A B)
+structure RightKanExtension (F : PathCategoryFunctor A B)
     (G : PathFunctor.{u, v} (A := A)) where
   /-- The right Kan extension functor. -/
   ran : PathFunctor.{u, v} (A := B)
@@ -107,59 +114,64 @@ end KanExtensions
 section Pointwise
 
 variable {A B : Type u}
-variable (F : FundamentalGroupoidFunctor A B) (G : PathFunctor.{u, v} (A := A))
 
 /-- Pointwise object for the left Kan extension. -/
-def pointwiseLeftKanObj (b : B) : Type (max u v) :=
+def pointwiseLeftKanObj (F : PathCategoryFunctor A B)
+    (G : PathFunctor.{u, v} (A := A)) (b : B) : Type (max u v) :=
   Sigma fun a : A =>
     Sigma fun _ : Path (F.obj a) b =>
       G.obj a
 
 /-- Action on morphisms for the pointwise left Kan extension. -/
-def pointwiseLeftKanMap {b b' : B} (q : Path b b') :
+def pointwiseLeftKanMap (F : PathCategoryFunctor A B)
+    (G : PathFunctor.{u, v} (A := A)) {b b' : B} (q : Path b b') :
     pointwiseLeftKanObj F G b → pointwiseLeftKanObj F G b'
   | ⟨a, ⟨p, x⟩⟩ => ⟨a, ⟨Path.trans p q, x⟩⟩
 
 /-- Pointwise left Kan extension as a path functor. -/
-def pointwiseLeftKan : PathFunctor.{u, max u v} (A := B) where
+def pointwiseLeftKan (F : PathCategoryFunctor A B)
+    (G : PathFunctor.{u, v} (A := A)) : PathFunctor.{u, max u v} (A := B) where
   obj := pointwiseLeftKanObj F G
-  map := fun {b b'} q x => pointwiseLeftKanMap (F := F) (G := G) (b := b) (b' := b') q x
+  map := fun {b b'} q x => pointwiseLeftKanMap F G (b := b) (b' := b') q x
   map_id := by
     intro b x
     cases x with
     | mk a px =>
       cases px with
       | mk p y =>
-        simp [pointwiseLeftKanMap, Path.trans_refl_right]
+        simp [pointwiseLeftKanMap]
   map_comp := by
     intro b c d q r x
     cases x with
     | mk a px =>
       cases px with
       | mk p y =>
-        simp [pointwiseLeftKanMap, Path.trans_assoc]
+        simp [pointwiseLeftKanMap]
 
 /-- Pointwise object for the right Kan extension. -/
-def pointwiseRightKanObj (b : B) : Type (max u v) :=
+def pointwiseRightKanObj (F : PathCategoryFunctor A B)
+    (G : PathFunctor.{u, v} (A := A)) (b : B) : Type (max u v) :=
   ∀ a : A, Path b (F.obj a) → G.obj a
 
 /-- Action on morphisms for the pointwise right Kan extension. -/
-def pointwiseRightKanMap {b b' : B} (q : Path b b') :
+def pointwiseRightKanMap (F : PathCategoryFunctor A B)
+    (G : PathFunctor.{u, v} (A := A)) {b b' : B} (q : Path b b') :
     pointwiseRightKanObj F G b → pointwiseRightKanObj F G b'
   | h => fun a p => h a (Path.trans q p)
 
 /-- Pointwise right Kan extension as a path functor. -/
-def pointwiseRightKan : PathFunctor.{u, max u v} (A := B) where
+def pointwiseRightKan (F : PathCategoryFunctor A B)
+    (G : PathFunctor.{u, v} (A := A)) : PathFunctor.{u, max u v} (A := B) where
   obj := pointwiseRightKanObj F G
-  map := fun {b b'} q h => pointwiseRightKanMap (F := F) (G := G) (b := b) (b' := b') q h
+  map := fun {b b'} q h => pointwiseRightKanMap F G (b := b) (b' := b') q h
   map_id := by
     intro b h
     funext a p
-    simp [pointwiseRightKanMap, Path.trans_refl_left]
+    simp [pointwiseRightKanMap]
   map_comp := by
     intro b c d q r h
     funext a p
-    simp [pointwiseRightKanMap, Path.trans_assoc]
+    simp [pointwiseRightKanMap]
 
 end Pointwise
 
