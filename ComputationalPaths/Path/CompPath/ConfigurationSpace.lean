@@ -23,9 +23,11 @@ universe u
 
 /-! ## Collision predicates -/
 
-/-- Path-based collision predicate for a family of points. -/
+/-- Path-based collision predicate for a family of points.
+    Two distinct indices must not be connected by a path.
+    Since `Path` lives in `Type u`, we use function to `False`. -/
 def NoCollision {A : Type u} {n : Nat} (f : Fin n → A) : Prop :=
-  ∀ {i j : Fin n}, i ≠ j → ¬ Path (f i) (f j)
+  ∀ {i j : Fin n}, i ≠ j → Path (f i) (f j) → False
 
 /-! ## Configuration spaces -/
 
@@ -41,9 +43,9 @@ variable {A : Type u} {n : Nat}
 @[simp] def points (c : ConfigurationSpace A n) : Fin n → A := c.1
 
 /-- Collision-free property for configurations. -/
-theorem noCollision (c : ConfigurationSpace A n) {i j : Fin n} (h : i ≠ j) :
-    ¬ Path (points c i) (points c j) :=
-  c.2 h
+theorem noCollision (c : ConfigurationSpace A n) {i j : Fin n} (h : i ≠ j)
+    (p : Path (points c i) (points c j)) : False :=
+  c.2 h p
 
 end ConfigurationSpace
 
@@ -51,9 +53,7 @@ end ConfigurationSpace
 
 /-- The unique empty configuration. -/
 def configurationSpaceEmpty (A : Type u) : ConfigurationSpace A 0 :=
-  ⟨(fun i => nomatch i), by
-    intro i j h
-    cases i⟩
+  ⟨(fun i => nomatch i), fun {i} => nomatch i⟩
 
 /-! ## Summary -/
 
