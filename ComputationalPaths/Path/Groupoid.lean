@@ -120,26 +120,27 @@ theorem identity_isGroupoid (A : Type u) :
 
 end WeakGroupoid
 
-/-- Strict category structure whose laws hold as definitional equalities. -/
+/-- Strict category structure whose laws hold by definitional equality,
+recorded as computational paths. -/
 structure StrictCategory (A : Type u) where
   /-- Composition of quotient paths. -/
   comp :
     {a b c : A} -> PathRwQuot A a b -> PathRwQuot A b c -> PathRwQuot A a c
   /-- Identity element at a point. -/
   id : {a : A} -> PathRwQuot A a a
-  /-- Associativity holds definitionally. -/
+  /-- Associativity recorded as a path. -/
   assoc :
     {a b c d : A} ->
       (p : PathRwQuot A a b) ->
       (q : PathRwQuot A b c) ->
       (r : PathRwQuot A c d) ->
-      comp (comp p q) r = comp p (comp q r)
-  /-- Left identity holds definitionally. -/
+      Path (comp (comp p q) r) (comp p (comp q r))
+  /-- Left identity recorded as a path. -/
   left_id :
-    {a b : A} -> (p : PathRwQuot A a b) -> comp (id) p = p
-  /-- Right identity holds definitionally. -/
+    {a b : A} -> (p : PathRwQuot A a b) -> Path (comp (id) p) p
+  /-- Right identity recorded as a path. -/
   right_id :
-    {a b : A} -> (p : PathRwQuot A a b) -> comp p (id) = p
+    {a b : A} -> (p : PathRwQuot A a b) -> Path (comp p (id)) p
 
 namespace StrictCategory
 
@@ -152,25 +153,25 @@ def quotient (A : Type u) : StrictCategory A where
   assoc := by
     intro a b c d p q r
     exact
-      PathRwQuot.trans_assoc (A := A) (a := a) (b := b)
-        (c := c) (d := d) p q r
+      Path.ofEq (PathRwQuot.trans_assoc (A := A) (a := a) (b := b)
+        (c := c) (d := d) p q r)
   left_id := by
     intro a b p
-    exact PathRwQuot.trans_refl_left (A := A) (a := a) (b := b) p
+    exact Path.ofEq (PathRwQuot.trans_refl_left (A := A) (a := a) (b := b) p)
   right_id := by
     intro a b p
-    exact PathRwQuot.trans_refl_right (A := A) (a := a) (b := b) p
+    exact Path.ofEq (PathRwQuot.trans_refl_right (A := A) (a := a) (b := b) p)
 
 structure IsIso (C : StrictCategory A) {a b : A}
     (f : PathRwQuot A a b) where
   /-- Candidate inverse morphism. -/
   inv : PathRwQuot A b a
-  /-- Left inverse law. -/
+  /-- Left inverse law recorded as a path. -/
   left_inv :
-    C.comp inv f = C.id (a := b)
-  /-- Right inverse law. -/
+    Path (C.comp inv f) (C.id (a := b))
+  /-- Right inverse law recorded as a path. -/
   right_inv :
-    C.comp f inv = C.id (a := a)
+    Path (C.comp f inv) (C.id (a := a))
 
 /-- A strict category is a groupoid when every morphism admits an inverse. -/
 def IsGroupoid (C : StrictCategory A) : Prop :=
@@ -179,16 +180,17 @@ def IsGroupoid (C : StrictCategory A) : Prop :=
 
 end StrictCategory
 
-/-- Strict groupoid structure whose laws hold as definitional equalities. -/
+/-- Strict groupoid structure whose laws hold by definitional equality,
+recorded as computational paths. -/
 structure StrictGroupoid (A : Type u) extends StrictCategory A where
   /-- Inversion of a quotient path. -/
   inv : {a b : A} → PathRwQuot A a b → PathRwQuot A b a
-  /-- Left inverse holds definitionally. -/
+  /-- Left inverse recorded as a path. -/
   left_inv :
-    {a b : A} → (p : PathRwQuot A a b) → comp (inv p) p = id
-  /-- Right inverse holds definitionally. -/
+    {a b : A} → (p : PathRwQuot A a b) → Path (comp (inv p) p) id
+  /-- Right inverse recorded as a path. -/
   right_inv :
-    {a b : A} → (p : PathRwQuot A a b) → comp p (inv p) = id
+    {a b : A} → (p : PathRwQuot A a b) → Path (comp p (inv p)) id
 
 namespace StrictGroupoid
 
@@ -213,10 +215,10 @@ def quotient (A : Type u) : StrictGroupoid A where
   inv := fun p => PathRwQuot.symm (A := A) p
   left_inv := by
     intro a b p
-    exact PathRwQuot.symm_trans (A := A) (a := a) (b := b) p
+    exact Path.ofEq (PathRwQuot.symm_trans (A := A) (a := a) (b := b) p)
   right_inv := by
     intro a b p
-    exact PathRwQuot.trans_symm (A := A) (a := a) (b := b) p
+    exact Path.ofEq (PathRwQuot.trans_symm (A := A) (a := a) (b := b) p)
 
 theorem quotient_isGroupoid (A : Type u) :
     StrictCategory.IsGroupoid (A := A)
