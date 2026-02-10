@@ -7,6 +7,7 @@ We make the 0/1/2-cells explicit and record the vertical/horizontal unit laws.
 
 ## Key Results
 
+- `Path1Cell`/`Path2Cell`: explicit `Path`-based 1/2-cells for the path 2-category.
 - `TwoCategory`: a 2-category interface extending `WeakBicategory`.
 - `pathTwoCategory`: the computational-path 2-category.
 - `pathTwoCategory_to_weakBicategory`: compatibility with `weakBicategory`.
@@ -73,7 +74,7 @@ abbrev Path1Cell {A : Type u} (a b : A) : Type u :=
 
 /-- 2-cells in the path 2-category are rewrite equalities. -/
 abbrev Path2Cell {A : Type u} {a b : A} (p q : Path a b) : Prop :=
-  TwoCell (A := A) (a := a) (b := b) p q
+  RwEq (A := A) (a := a) (b := b) p q
 
 /-- The 2-category carried by computational paths. -/
 def pathTwoCategory (A : Type u) : TwoCategory (Obj := A) where

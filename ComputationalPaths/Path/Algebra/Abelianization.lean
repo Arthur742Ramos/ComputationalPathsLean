@@ -53,7 +53,18 @@ namespace Abelianization
 
 open BouquetN Hurewicz
 
-universe u
+universe u v
+
+/-- Path-based equivalence structure (inverse laws witnessed by `Path`). -/
+structure PathSimpleEquiv (α : Type u) (β : Type v) where
+  /-- Forward map. -/
+  toFun : α → β
+  /-- Inverse map. -/
+  invFun : β → α
+  /-- Inverse after forward map is the identity, as a `Path`. -/
+  left_inv : ∀ x : α, Path (invFun (toFun x)) x
+  /-- Forward after inverse map is the identity, as a `Path`. -/
+  right_inv : ∀ y : β, Path (toFun (invFun y)) y
 
 /-! ## The Abelianization Quotient
 
@@ -1069,7 +1080,9 @@ The canonical form is built by `buildWordRec n (wordToIntPow w)`.
    - By IH: `toAb rest = toAb (buildWordRec n (wordToIntPow rest))`
    - Apply `mul_genWordAb_buildWordRec` to combine the generator with the canonical form -/
 theorem decode_encode_word (n : Nat) (w : BouquetWord n) :
-    toAb (Quot.mk _ w) = toAb (Quot.mk _ (buildWordRec n (wordToIntPow w))) := by
+    Path (toAb (Quot.mk _ w))
+      (toAb (Quot.mk _ (buildWordRec n (wordToIntPow w)))) := by
+  refine Path.ofEq ?_
   induction w with
   | nil =>
     -- wordToIntPow nil = IntPow.zero, buildWordRec n IntPow.zero = nil
@@ -1095,7 +1108,8 @@ theorem decode_encode_word (n : Nat) (w : BouquetWord n) :
 /-- The encode direction: wordToIntPow (buildWordRec n v) = v.
     This shows that building a word from a vector and then extracting exponents gives back the vector. -/
 theorem encode_decode_word (n : Nat) (v : Fin n → Int) :
-    wordToIntPow (buildWordRec n v) = v := by
+    Path (wordToIntPow (buildWordRec n v)) v := by
+  refine Path.ofEq ?_
   induction n with
   | zero =>
     -- For n = 0, both sides are functions from Fin 0, which is empty
@@ -1139,14 +1153,15 @@ def intPowToFreeGroupAb {n : Nat} : IntPow n → FreeGroupAb n :=
 /-- The encode-decode round-trip: freeGroupAbToIntPow (intPowToFreeGroupAb v) = v.
     This follows from encode_decode_word. -/
 theorem freeGroup_ab_left_inv {n : Nat} (v : IntPow n) :
-    freeGroupAbToIntPow (intPowToFreeGroupAb v) = v := by
+    Path (freeGroupAbToIntPow (intPowToFreeGroupAb v)) v := by
+  refine Path.ofEq ?_
   simp only [intPowToFreeGroupAb, intPowToFreeGroupAbAux, freeGroupAbToIntPow, freeGroupToIntPow]
-  exact encode_decode_word n v
+  exact (encode_decode_word n v).toEq
 
 /-- The decode-encode round-trip: intPowToFreeGroupAb (freeGroupAbToIntPow x) = x.
     This follows from decode_encode_word via quotient induction. -/
 theorem freeGroup_ab_right_inv {n : Nat} (x : FreeGroupAb n) :
-    intPowToFreeGroupAb (freeGroupAbToIntPow x) = x := by
+    Path (intPowToFreeGroupAb (freeGroupAbToIntPow x)) x := by
   -- FreeGroupAb n is a double quotient: Quot (AbelianizationRel ...) over Quot (BouquetRel n)
   -- Use quotient induction
   induction x using Quot.ind with
@@ -1155,8 +1170,9 @@ theorem freeGroup_ab_right_inv {n : Nat} (x : FreeGroupAb n) :
     induction g using Quot.ind with
     | _ w =>
       -- w : BouquetWord n
+      refine Path.ofEq ?_
       simp only [freeGroupAbToIntPow, freeGroupToIntPow, intPowToFreeGroupAb, intPowToFreeGroupAbAux]
-      exact (decode_encode_word n w).symm
+      exact (decode_encode_word n w).symm.toEq
 
 /-- **Main Theorem**: F_n^ab ≃ ℤⁿ
 
@@ -1169,7 +1185,7 @@ Commutativity in the abelianization corresponds to commutativity of addition in 
 - Inverse map (`intPowToFreeGroupAb`): Build canonical word g₀^{v₀}·g₁^{v₁}·...·gₙ₋₁^{vₙ₋₁}
 - Left inverse (`freeGroup_ab_left_inv`): Constructively proved via `encode_decode_word`
 - Right inverse (`freeGroup_ab_right_inv`): Constructively proved via `decode_encode_word` -/
-def freeGroup_ab_equiv (n : Nat) : SimpleEquiv (FreeGroupAb n) (IntPow n) where
+def freeGroup_ab_equiv (n : Nat) : PathSimpleEquiv (FreeGroupAb n) (IntPow n) where
   toFun := freeGroupAbToIntPow
   invFun := intPowToFreeGroupAb
   left_inv := freeGroup_ab_right_inv

@@ -2,13 +2,12 @@
 # Yoneda Lemma for the Path Category
 
 This module presents a lightweight Yoneda lemma for the path category whose
-morphisms are rewrite-quotiented paths. We define representable functors on
-`PathRwQuot`, describe natural transformations, and show the Yoneda embedding
-is fully faithful.
+morphisms are computational paths. We define representable functors on `Path`,
+describe natural transformations, and show the Yoneda embedding is fully faithful.
 
 ## Key Results
 
-- `representable`: covariant representable functor Hom(a, -)
+- `representable`: covariant representable functor `Path a _`
 - `yoneda`: Yoneda lemma as an equivalence between natural transformations and elements
 - `yonedaEmbeddingFullyFaithful`: full faithfulness of the Yoneda embedding
 
@@ -18,7 +17,7 @@ is fully faithful.
 - Leinster, "Higher Operads, Higher Categories"
 -/
 
-import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
+import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 namespace ComputationalPaths
@@ -33,14 +32,14 @@ structure PathFunctor (A : Type u) where
   /-- Object assignment. -/
   obj : A → Type v
   /-- Action on morphisms. -/
-  map : {a b : A} → FundamentalGroupoid.Hom A a b → obj a → obj b
+  map : {a b : A} → Path a b → obj a → obj b
   /-- Identity preservation. -/
-  map_id : ∀ a (x : obj a), map (FundamentalGroupoid.id' A a) x = x
+  map_id : ∀ a (x : obj a), map (Path.refl a) x = x
   /-- Composition preservation. -/
   map_comp :
-    ∀ {a b c : A} (p : FundamentalGroupoid.Hom A a b)
-      (q : FundamentalGroupoid.Hom A b c) (x : obj a),
-      map (FundamentalGroupoid.comp' A p q) x = map q (map p x)
+    ∀ {a b c : A} (p : Path a b)
+      (q : Path b c) (x : obj a),
+      map (Path.trans p q) x = map q (map p x)
 
 /-- Natural transformations between path functors. -/
 structure PathNatTrans {A : Type u} (F G : PathFunctor (A := A)) where
@@ -48,7 +47,7 @@ structure PathNatTrans {A : Type u} (F G : PathFunctor (A := A)) where
   app : ∀ a, F.obj a → G.obj a
   /-- Naturality with respect to paths. -/
   naturality :
-    ∀ {a b : A} (p : FundamentalGroupoid.Hom A a b) (x : F.obj a),
+    ∀ {a b : A} (p : Path a b) (x : F.obj a),
       G.map p (app a x) = app b (F.map p x)
 
 namespace PathNatTrans
@@ -74,21 +73,21 @@ end PathNatTrans
 
 /-- Representable functor Hom(a, -) on the path category. -/
 def representable (A : Type u) (a : A) : PathFunctor (A := A) where
-  obj := fun b => FundamentalGroupoid.Hom A a b
-  map := fun {b c} p q => FundamentalGroupoid.comp' A q p
+  obj := fun b => Path a b
+  map := fun {b c} p q => Path.trans q p
   map_id := by
     intro b q
-    exact FundamentalGroupoid.comp_id' (A := A) (p := q)
+    exact Path.trans_refl_right q
   map_comp := by
     intro b c d p q r
-    exact (FundamentalGroupoid.comp_assoc' (A := A) (p := r) (q := p) (r := q)).symm
+    exact (Path.trans_assoc r p q).symm
 
 /-! ## Yoneda lemma -/
 
 /-- Yoneda lemma for the path category. -/
 def yoneda {A : Type u} (F : PathFunctor (A := A)) (a : A) :
     SimpleEquiv (PathNatTrans (representable A a) F) (F.obj a) where
-  toFun := fun η => η.app a (FundamentalGroupoid.id' A a)
+  toFun := fun η => η.app a (Path.refl a)
   invFun := fun x =>
     { app := fun b q => F.map q x
       naturality := by
@@ -99,8 +98,8 @@ def yoneda {A : Type u} (F : PathFunctor (A := A)) (a : A) :
     apply PathNatTrans.ext
     intro b
     funext q
-    have h := η.naturality (p := q) (x := FundamentalGroupoid.id' A a)
-    simpa [representable, FundamentalGroupoid.id_comp'] using h
+    have h := η.naturality (p := q) (x := Path.refl a)
+    simpa [representable, Path.trans_refl_left] using h
   right_inv := by
     intro x
     exact F.map_id a x
@@ -113,7 +112,7 @@ def yonedaEmbedding (A : Type u) : A → PathFunctor (A := A) :=
 
 /-- Yoneda embedding on morphisms (precomposition). -/
 def yonedaEmbeddingMap {A : Type u} {a b : A}
-    (p : FundamentalGroupoid.Hom A b a) :
+    (p : Path b a) :
     PathNatTrans (yonedaEmbedding A a) (yonedaEmbedding A b) :=
   (yoneda (A := A) (F := representable A b) a).invFun p
 
@@ -122,7 +121,7 @@ def yonedaEmbeddingFullyFaithful (A : Type u) :
     ∀ a b,
       SimpleEquiv
         (PathNatTrans (yonedaEmbedding A a) (yonedaEmbedding A b))
-        (FundamentalGroupoid.Hom A b a) :=
+        (Path b a) :=
   fun a b => yoneda (A := A) (F := representable A b) a
 
 /-! ## Summary -/
@@ -130,7 +129,7 @@ def yonedaEmbeddingFullyFaithful (A : Type u) :
 /-!
 We defined the representable functors on the path category, proved the Yoneda
 lemma as a simple equivalence, and recorded the full faithfulness of the
-Yoneda embedding on `PathRwQuot` morphisms.
+Yoneda embedding on computational paths.
 -/
 
 end Path
