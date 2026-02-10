@@ -13,6 +13,7 @@ its fundamental group is trivial (as a subsingleton pushout).
 ## Key Results
 
 - `Sphere2CompPath`: suspension of `CircleCompPath`.
+- `sphere2CompPath_path`: any two points of S² are connected by a `Path`.
 - `sphere2CompPath_pi1_equiv_unit`: π₁(S²) ≃ 1 (Unit).
 
 ## References
@@ -64,9 +65,9 @@ instance : Nonempty Sphere2CompPath := ⟨basepoint⟩
 
 instance : Subsingleton Sphere2CompPath where
   allEq x y := by
-    refine Quot.inductionOn x ?_ 
+    refine Quot.inductionOn x ?_
     intro x'
-    refine Quot.inductionOn y ?_ 
+    refine Quot.inductionOn y ?_
     intro y'
     cases x' <;> cases y' <;>
       first
@@ -83,6 +84,10 @@ instance : Subsingleton Sphere2CompPath where
                 (A := PUnit') (B := PUnit') (C := CircleCompPath)
                 (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit)
                 circleCompPathBase)).symm
+
+/-- Any two points of S² are connected by a computational path. -/
+def sphere2CompPath_path (x y : Sphere2CompPath) : Path x y :=
+  Path.ofEq (Subsingleton.elim x y)
 
 /-- The fundamental group of S² is trivial. -/
 theorem sphere2CompPath_pi1_trivial :

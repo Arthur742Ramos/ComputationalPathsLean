@@ -98,10 +98,10 @@ def intProdAdd (x y : Int × Int) : Int × Int :=
 noncomputable def torusPresentation :
     FundamentalGroupPresentation torusPiOne.{u} :=
   let torusGenerator : TorusGenerator → Int × Int
-    | TorusGenerator.loop1 => torusPiOneEquivIntProd.{u} (torusDecode.{u} (1, 0))
-    | TorusGenerator.loop2 => torusPiOneEquivIntProd.{u} (torusDecode.{u} (0, 1))
+    | TorusGenerator.loop1 => torusPiOneEquivIntProdSimple.{u} (torusDecode.{u} (1, 0))
+    | TorusGenerator.loop2 => torusPiOneEquivIntProdSimple.{u} (torusDecode.{u} (0, 1))
   { presentationGroup := Int × Int
-    equiv := torusPiOneEquivIntProd.{u}
+    equiv := torusPiOneEquivIntProdSimple.{u}
     generators := TorusGenerator
     generator := torusGenerator
     relations := TorusRelation
@@ -121,16 +121,16 @@ noncomputable def torusPresentation :
 /-- The first torus generator maps to `(1, 0)`. -/
 @[simp] theorem torusPresentation_generator_loop1 :
     torusPresentation.generator TorusGenerator.loop1 = (1, 0) := by
-  change torusPiOneEquivIntProd.toFun (torusDecode (1, 0)) = (1, 0)
-  dsimp [torusPiOneEquivIntProd]
-  exact torusPiOneEncode_torusDecode (z := (1, 0))
+  change torusPiOneEquivIntProdSimple.toFun (torusDecode (1, 0)) = (1, 0)
+  dsimp [torusPiOneEquivIntProdSimple]
+  exact torusPiOneEncode_torusDecode_eq (z := (1, 0))
 
 /-- The second torus generator maps to `(0, 1)`. -/
 @[simp] theorem torusPresentation_generator_loop2 :
     torusPresentation.generator TorusGenerator.loop2 = (0, 1) := by
-  change torusPiOneEquivIntProd.toFun (torusDecode (0, 1)) = (0, 1)
-  dsimp [torusPiOneEquivIntProd]
-  exact torusPiOneEncode_torusDecode (z := (0, 1))
+  change torusPiOneEquivIntProdSimple.toFun (torusDecode (0, 1)) = (0, 1)
+  dsimp [torusPiOneEquivIntProdSimple]
+  exact torusPiOneEncode_torusDecode_eq (z := (0, 1))
 
 /-! ## Figure-eight presentation -/
 

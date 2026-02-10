@@ -1,14 +1,15 @@
 /-
 # Confluence witnesses for LNDEQ rewrites
 
-This module repackages the `rw_confluent` theorem from `Rw.lean` so that
-critical-pair style arguments can cite explicit join objects.  The API mirrors
+This module packages join data for multi-step rewrites on computational `Path`s.
+Concrete join witnesses are provided in `ConfluenceProof.lean`, which derives
+`HasJoinOfRw` from termination and local confluence assumptions. The API mirrors
 the presentation in the SAJL paper: given two reductions out of the same source
 we produce a common successor together with the necessary `Rw` certificates.
 -/
 
 import ComputationalPaths.Path.Rewrite.LNDEQ
-import ComputationalPaths.Path.Rewrite.Termination
+import ComputationalPaths.Path.Rewrite.Quot
 
 namespace ComputationalPaths
 namespace Path
@@ -40,13 +41,9 @@ structure Join {A : Type u} {a b : A}
     Join (A := A) (a := a) (b := b) p p :=
   { meet := p, left := Rw.refl p, right := Rw.refl p }
 
-/-- **Confluence axiom**: Given two rewrites from a common source, their targets
-can be joined. This axiom captures the paper's critical pair lemma which shows
-that all critical pairs of the LND_EQ-TRS system are joinable.
-
-Previously this was proved using `Step.canon` which was removed because it
-caused inconsistency. The axiom here is weaker than `Step.canon` - it only
-asserts that join witnesses exist, not that every path canonicalizes. -/
+/-- **Confluence interface**: Given two rewrites from a common source, their
+targets can be joined. This is instantiated in `ConfluenceProof.lean` under
+termination and local confluence assumptions, so no new axioms are required. -/
 class HasJoinOfRw : Type (u + 1) where
   join_of_rw {A : Type u} {a b : A}
       {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :

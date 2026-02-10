@@ -1617,7 +1617,7 @@ section SVK
 variable {A : Type u} {B : Type u} {C : Type u}
 variable {f : C → A} {g : C → B}
 variable (a₀ : A) (b₀ : B) (c₀ : C)
-variable (hf : f c₀ = a₀) (hg : g c₀ = b₀)
+variable (hf : Path (f c₀) a₀) (hg : Path (g c₀) b₀)
 
 -- Assume all spaces are path-connected
 variable (hA : CompPath.IsPathConnected A)

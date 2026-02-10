@@ -34,12 +34,12 @@ structure PathFunctor (A : Type u) where
   /-- Action on morphisms. -/
   map : {a b : A} → Path a b → obj a → obj b
   /-- Identity preservation. -/
-  map_id : ∀ a (x : obj a), map (Path.refl a) x = x
+  map_id : ∀ a (x : obj a), Path (map (Path.refl a) x) x
   /-- Composition preservation. -/
   map_comp :
     ∀ {a b c : A} (p : Path a b)
       (q : Path b c) (x : obj a),
-      map (Path.trans p q) x = map q (map p x)
+      Path (map (Path.trans p q) x) (map q (map p x))
 
 /-- Natural transformations between path functors. -/
 structure PathNatTrans {A : Type u} (F G : PathFunctor (A := A)) where
@@ -77,10 +77,10 @@ def representable (A : Type u) (a : A) : PathFunctor (A := A) where
   map := fun {b c} p q => Path.trans q p
   map_id := by
     intro b q
-    exact Path.trans_refl_right q
+    exact Path.ofEq (Path.trans_refl_right q)
   map_comp := by
     intro b c d p q r
-    exact (Path.trans_assoc r p q).symm
+    exact Path.ofEq (Path.trans_assoc r p q).symm
 
 /-! ## Yoneda lemma -/
 
@@ -92,7 +92,7 @@ def yoneda {A : Type u} (F : PathFunctor (A := A)) (a : A) :
     { app := fun b q => F.map q x
       naturality := by
         intro b c p q
-        exact (F.map_comp (p := q) (q := p) (x := x)).symm }
+        exact (F.map_comp (p := q) (q := p) (x := x)).toEq.symm }
   left_inv := by
     intro η
     apply PathNatTrans.ext
@@ -102,7 +102,7 @@ def yoneda {A : Type u} (F : PathFunctor (A := A)) (a : A) :
     simpa [representable, Path.trans_refl_left] using h
   right_inv := by
     intro x
-    exact F.map_id a x
+    exact (F.map_id a x).toEq
 
 /-! ## Yoneda embedding -/
 

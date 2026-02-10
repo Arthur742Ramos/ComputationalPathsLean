@@ -7,10 +7,9 @@ and records its basic loops and fundamental group elements.
 ## Main Results
 
 - `FigureEight`: The figure-eight space as `Wedge Circle Circle`
-- `loopA`, `loopB`: The two fundamental loops
-- `loopAClass`, `loopBClass`: The corresponding π₁ classes
-- `figureEightProvenanceEquiv`: provenance SVK equivalence
-- `figureEightPiOneEquiv`: provenance SVK equivalence (free product words)
+- `loopA`, `loopB`: The two fundamental loops (computational paths)
+- `loopAClass`, `loopBClass`: The corresponding π₁ classes (rewrite-quotiented paths)
+- `figureEightPiOneEquiv`: π₁(FigureEight, base) ≃ free product words (SVK, Path-based)
 
 ## Mathematical Background
 
@@ -24,6 +23,7 @@ computes the free product word structure directly.
 - de Veras et al., "On the Calculation of Fundamental Groups..."
 -/
 
+import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.CompPath.CircleCompPath
 import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.CompPath.PushoutPaths
@@ -69,7 +69,7 @@ These generate the fundamental group freely.
 
 /-- Loop A: The fundamental loop of the left circle, embedded in the figure-eight.
 This is simply the left circle's loop, which is already based at the basepoint. -/
-noncomputable def loopA : Path base base :=
+noncomputable def loopA : Path (A := FigureEight) base base :=
   Pushout.inlPath (A := Circle) (B := Circle) (C := PUnit') (f := fun _ => circleBase) (g := fun _ => circleBase) circleLoop
 
 /-- Loop B: The fundamental loop of the right circle, conjugated to be based at
@@ -77,7 +77,7 @@ the figure-eight basepoint.
 
 Since the right circle's basepoint is identified with the left via glue,
 we must conjugate: loopB = glue ⋅ circleLoop ⋅ glue⁻¹ -/
-noncomputable def loopB : Path base base :=
+noncomputable def loopB : Path (A := FigureEight) base base :=
   Path.trans
     (Wedge.glue (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))
     (Path.trans (Pushout.inrPath (A := Circle) (B := Circle) (C := PUnit') (f := fun _ => circleBase) (g := fun _ => circleBase) circleLoop)
@@ -85,17 +85,17 @@ noncomputable def loopB : Path base base :=
 
 /-! ## Loop Space and Fundamental Group -/
 
-/-- Loop space of the figure-eight at its basepoint. -/
-abbrev FigureEightLoopSpace : Type u := LoopSpace FigureEight base
+/-- Loop space of the figure-eight at its basepoint (raw computational paths). -/
+abbrev FigureEightLoopSpace : Type u := Path (A := FigureEight) base base
 
-/-- Fundamental group π₁(figure-eight, base). -/
-abbrev FigureEightPiOne : Type u := π₁(FigureEight, base)
+/-- Fundamental group π₁(figure-eight, base) as a rewrite quotient of paths. -/
+abbrev FigureEightPiOne : Type u := PathRwQuot FigureEight base base
 
 /-- Loop A as an element of the fundamental group. -/
-noncomputable def loopAClass : FigureEightPiOne := Quot.mk _ loopA
+noncomputable def loopAClass : FigureEightPiOne := PiOne.ofLoop loopA
 
 /-- Loop B as an element of the fundamental group. -/
-noncomputable def loopBClass : FigureEightPiOne := Quot.mk _ loopB
+noncomputable def loopBClass : FigureEightPiOne := PiOne.ofLoop loopB
 
 /-! ## Provenance-Based SVK Data -/
 
@@ -126,13 +126,15 @@ noncomputable def figureEightProvenanceEquiv :
   WedgeProvenance.wedgeProvenanceEquiv
     (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase)
 
-/-- SVK equivalence for the figure-eight (free product words over π₁(S¹)). -/
-noncomputable def figureEightPiOneEquiv :
-    SimpleEquiv
-      (WedgeProvenance.WedgeProvenanceQuot
-        (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))
-      (FreeProductWord (π₁(Circle, circleBase)) (π₁(Circle, circleBase))) :=
-  figureEightProvenanceEquiv
+/-- SVK equivalence for the figure-eight (free product words over π₁(S¹)).
+Requires `HasWedgeSVKDecodeBijective` for the wedge decode map. -/
+noncomputable def figureEightPiOneEquiv
+    [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase] :
+    SimpleEquiv FigureEightPiOne
+      (FreeProductWord (π₁(Circle, circleBase)) (π₁(Circle, circleBase))) := by
+  simpa [FigureEight, FigureEight.base, FigureEightPiOne, WedgeFreeProductCode] using
+    (wedgeFundamentalGroupEquiv_of_decode_bijective
+      (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))
 
 end FigureEight
 
@@ -149,14 +151,13 @@ This module establishes:
 3. **Fundamental Group Elements**:
    - `loopAClass` and `loopBClass` are the π₁ classes of the two loops.
 
-4. **Provenance SVK Equivalence**:
-    - `figureEightProvenanceEquiv` gives a constructive SVK-style equivalence
-      using the provenance-based wedge loop quotient.
-    - `figureEightPiOneEquiv` repackages the same equivalence as the canonical
-      SVK statement for `Circle ∨ Circle`.
+4. **Fundamental Group Equivalence**:
+    - `figureEightPiOneEquiv` identifies π₁(FigureEight) with free product words,
+      using the SVK decode bijectivity assumption.
 
-This records the SVK-style computation without axioms by working with explicit
-provenance paths.
+5. **Provenance SVK Equivalence**:
+    - `figureEightProvenanceEquiv` provides the constructive SVK-style equivalence
+      on provenance loops.
 -/
 
 end Path

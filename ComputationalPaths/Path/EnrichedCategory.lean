@@ -85,23 +85,25 @@ def pathGroupoidEnriched (A : Type u) : GroupoidEnrichedCategory (Obj := A) wher
 
 /-! ## Composition coherence -/
 
-/-- Composition in the enriched path groupoid is associative up to the canonical 2-cell. -/
-theorem pathGroupoidEnriched_assoc (A : Type u) {a b c d : A}
+/-- Composition in the enriched path groupoid is associative as a path equality. -/
+def pathGroupoidEnriched_assoc (A : Type u) {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
-    (pathGroupoidEnriched A).TwoCell
+    Path
       ((pathGroupoidEnriched A).comp ((pathGroupoidEnriched A).comp p q) r)
-      ((pathGroupoidEnriched A).comp p ((pathGroupoidEnriched A).comp q r)) :=
-  (pathGroupoidEnriched A).assoc p q r
+      ((pathGroupoidEnriched A).comp p ((pathGroupoidEnriched A).comp q r)) := by
+  refine Path.ofEq ?_
+  simp [pathGroupoidEnriched, weakBicategory]
 
-/-- The associator satisfies the pentagon coherence in the enriched path category. -/
-theorem pathGroupoidEnriched_pentagon (A : Type u) {a b c d e : A}
+/-- Pentagon coherence for path composition in the enriched path category. -/
+def pathGroupoidEnriched_pentagon (A : Type u) {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
-    (pathGroupoidEnriched A).TwoCell
+    Path
       ((pathGroupoidEnriched A).comp ((pathGroupoidEnriched A).comp
         ((pathGroupoidEnriched A).comp p q) r) s)
       ((pathGroupoidEnriched A).comp p
-        ((pathGroupoidEnriched A).comp q ((pathGroupoidEnriched A).comp r s))) :=
-  (pathGroupoidEnriched A).pentagon p q r s
+        ((pathGroupoidEnriched A).comp q ((pathGroupoidEnriched A).comp r s))) := by
+  refine Path.ofEq ?_
+  simp [pathGroupoidEnriched, weakBicategory]
 
 end PathEnriched
 

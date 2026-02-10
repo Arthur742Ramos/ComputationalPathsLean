@@ -18,6 +18,7 @@ import ComputationalPaths.Path.Rewrite.Termination
 import ComputationalPaths.Path.Rewrite.Confluence
 import ComputationalPaths.Path.Rewrite.ConfluenceProof
 import ComputationalPaths.Path.Rewrite.ConfluenceTerminationDerived
+import ComputationalPaths.Path.Rewrite.Normalization
 import ComputationalPaths.Path.Rewrite.NormalizationDerived
 import ComputationalPaths.Path.Rewrite.PathExpr
 import ComputationalPaths.Path.Rewrite.ExprConfluence

@@ -117,7 +117,7 @@ variable [HasTorusPiOneEncode]
 local notation "encode" => HasTorusPiOneEncode.encode
 
 @[simp] theorem encode_torusDecode (z : Int × Int) : encode (torusDecode z) = z :=
-  HasTorusPiOneEncode.encode_torusDecode z
+  (HasTorusPiOneEncode.encode_torusDecode z).toEq
 
 /-- Torus pi_1 multiplication induced by Z x Z addition. -/
 noncomputable def torusPiOneMul (x y : torusPiOne) : torusPiOne :=
@@ -140,9 +140,10 @@ noncomputable def torusPiOneOne : torusPiOne :=
 theorem torusPiOneEncode_injective {x y : torusPiOne}
     (h : encode x = encode y) : x = y := by
   calc
-    x = torusDecode (encode x) := (HasTorusPiOneEncode.torusDecode_encode (x := x)).symm
+    x = torusDecode (encode x) :=
+      (HasTorusPiOneEncode.torusDecode_encode (x := x)).toEq.symm
     _ = torusDecode (encode y) := by rw [h]
-    _ = y := HasTorusPiOneEncode.torusDecode_encode (x := y)
+    _ = y := (HasTorusPiOneEncode.torusDecode_encode (x := y)).toEq
 
 theorem torusPiOneMul_one_left (x : torusPiOne) :
     torusPiOneMul torusPiOneOne x = x := by

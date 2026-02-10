@@ -136,11 +136,11 @@ def join_lift_symm {a b : A} {p q : Path a b} (hj : Confluence.Join p q) :
   , right := rw_symm_congr hj.right }
 
 /-- Direct join construction when both steps result in the same path. -/
-@[simp] def join_eq {a b : A} {p q : Path a b} (h : p = q) :
+@[simp] def join_eq {a b : A} {p q : Path a b} (h : Path p q) :
     Confluence.Join p q :=
   { meet := p
   , left := Rw.refl p
-  , right := h ▸ Rw.refl p }
+  , right := rw_of_eq h.toEq.symm }
 
 /-- Join from definitional equality. -/
 @[simp] def join_rfl {a b : A} (p : Path a b) :
@@ -151,10 +151,10 @@ def join_lift_symm {a b : A} {p q : Path a b} (hj : Confluence.Join p q) :
 
 /-- Extend a join by applying additional steps. -/
 @[simp] def join_extend_left {a b : A} {p q r : Path a b} {_s : Path a b}
-    (j : Confluence.Join p q) (hs : Rw r j.meet) (hp : r = p) :
+    (j : Confluence.Join p q) (hs : Rw r j.meet) (hp : Path r p) :
     Confluence.Join p q :=
   { meet := j.meet
-  , left := hp ▸ hs
+  , left := hp.toEq ▸ hs
   , right := j.right }
 
 /-- Build a join when one side already reduces to the other's target. -/
@@ -376,18 +376,19 @@ theorem rw_plus_trans {a b : A} {p q r : Path a b}
   | tail _ step ih => exact RwPlus.tail ih step
 
 theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
-    p = q ∨ ∃ r, Step p r ∧ Rw r q := by
+    Sum (Path p q) (∃ r, Step p r ∧ Rw r q) := by
   induction h with
-  | refl => exact Or.inl rfl
+  | refl => exact Sum.inl (Path.refl _)
   | tail h step ih =>
     cases ih with
     | inl hpeq =>
-        refine Or.inr ?_
+        refine Sum.inr ?_
         refine ⟨_, ?_, Rw.refl _⟩
-        simpa [hpeq] using step
+        cases hpeq.toEq
+        exact step
     | inr hdata =>
         rcases hdata with ⟨r, hstep, hrq⟩
-        refine Or.inr ⟨r, hstep, ?_⟩
+        refine Sum.inr ⟨r, hstep, ?_⟩
         exact Rw.tail hrq step
 
 /-- Termination: well-foundedness of the reverse `RwPlus` relation. -/
@@ -416,13 +417,15 @@ theorem confluence_prop {a b : A} {p q r : Path a b}
     cases rw_uncons hq with
     | inl hq_eq =>
         refine ⟨r, ?_, Rw.refl r⟩
-        simpa [hq_eq] using hr
+        cases hq_eq.toEq
+        simpa using hr
     | inr hq_data =>
         rcases hq_data with ⟨p1, hp1, hq_rest⟩
         cases rw_uncons hr with
         | inl hr_eq =>
             refine ⟨q, Rw.refl q, ?_⟩
-            simpa [hr_eq] using hq
+            cases hr_eq.toEq
+            simpa using hq
         | inr hr_data =>
             rcases hr_data with ⟨p2, hp2, hr_rest⟩
             obtain ⟨s, hp1s, hp2s⟩ := local_confluence_prop hp1 hp2
@@ -462,8 +465,6 @@ end ConfluenceProof
 end Rewrite
 end Path
 end ComputationalPaths
-
-
 
 
 

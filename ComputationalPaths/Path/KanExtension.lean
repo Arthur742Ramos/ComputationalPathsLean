@@ -59,19 +59,21 @@ def precompose (F : PathCategoryFunctor A B)
   map := fun {a b} p x => G.map (F.map p) x
   map_id := by
     intro a x
+    apply Path.ofEq
     calc
       G.map (F.map (Path.refl a)) x =
           G.map (Path.refl (F.obj a)) x := by
             rw [F.map_id]
-      _ = x := G.map_id (F.obj a) x
+      _ = x := (G.map_id (F.obj a) x).toEq
   map_comp := by
     intro a b c p q x
+    apply Path.ofEq
     calc
       G.map (F.map (Path.trans p q)) x =
           G.map (Path.trans (F.map p) (F.map q)) x := by
             rw [F.map_comp]
       _ = G.map (F.map q) (G.map (F.map p) x) :=
-        G.map_comp (p := F.map p) (q := F.map q) (x := x)
+        (G.map_comp (p := F.map p) (q := F.map q) (x := x)).toEq
 
 end PathFunctor
 
@@ -136,6 +138,7 @@ def pointwiseLeftKan (F : PathCategoryFunctor A B)
     pointwiseLeftKanMap (F := F) (G := G) (b := b) (b' := b') q x
   map_id := by
     intro b x
+    apply Path.ofEq
     cases x with
     | mk a px =>
       cases px with
@@ -143,6 +146,7 @@ def pointwiseLeftKan (F : PathCategoryFunctor A B)
         simp [pointwiseLeftKanMap]
   map_comp := by
     intro b c d q r x
+    apply Path.ofEq
     cases x with
     | mk a px =>
       cases px with
@@ -168,10 +172,12 @@ def pointwiseRightKan (F : PathCategoryFunctor A B)
     pointwiseRightKanMap (F := F) (G := G) (b := b) (b' := b') q h
   map_id := by
     intro b h
+    apply Path.ofEq
     funext a p
     simp [pointwiseRightKanMap]
   map_comp := by
     intro b c d q r h
+    apply Path.ofEq
     funext a p
     simp [pointwiseRightKanMap]
 

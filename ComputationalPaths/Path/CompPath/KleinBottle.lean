@@ -5,6 +5,12 @@ We model the Klein bottle as a one-point type with path expressions generated
 by two loops a and b. Loop expressions are quotiented by a normal-form encoding
 into the semidirect product Z ⋊ Z, yielding the presentation
   <a, b | a b a^{-1} b = 1>.
+
+## Key Results
+
+- `kleinBottleLoopA`, `kleinBottleLoopB`: Path-level loop generators.
+- `kleinBottleLoopAPathZPow`, `kleinBottleLoopBPathZPow`: Path-level loop powers.
+- `kleinBottleDecodePath`: Decoding integer pairs into Path-level loops.
 -/
 
 import ComputationalPaths.Path.Basic
@@ -140,6 +146,52 @@ noncomputable def kleinBottleEncodeExpr' :
     (p q : KleinBottleExpr kleinBottleBase kleinBottleBase) :
     kleinBottleEncodeExpr' (KleinBottleExpr.trans p q) =
       kleinBottleMul (kleinBottleEncodeExpr' p) (kleinBottleEncodeExpr' q) := rfl
+
+/-! ## Path-level loops -/
+
+/-- Chosen equality proof used to seed loop A. -/
+noncomputable def kleinBottleLoopAEq : kleinBottleBase = kleinBottleBase :=
+  Classical.choice (by
+    exact (⟨rfl⟩ : Nonempty (kleinBottleBase = kleinBottleBase)))
+
+/-- Chosen equality proof used to seed loop B. -/
+noncomputable def kleinBottleLoopBEq : kleinBottleBase = kleinBottleBase :=
+  Classical.choice (by
+    exact (⟨rfl⟩ : Nonempty (kleinBottleBase = kleinBottleBase)))
+
+/-- Loop A at the path level. -/
+@[simp] noncomputable def kleinBottleLoopA : Path kleinBottleBase kleinBottleBase :=
+  Path.ofEq kleinBottleLoopAEq
+
+/-- Loop B at the path level. -/
+@[simp] noncomputable def kleinBottleLoopB : Path kleinBottleBase kleinBottleBase :=
+  Path.ofEq kleinBottleLoopBEq
+
+/-- Integer iteration of loop A at the path level. -/
+@[simp] noncomputable def kleinBottleLoopAPathZPow :
+    Int → Path kleinBottleBase kleinBottleBase := by
+  let rec loopPow : Nat → Path kleinBottleBase kleinBottleBase
+    | 0 => Path.refl kleinBottleBase
+    | Nat.succ n => Path.trans (loopPow n) kleinBottleLoopA
+  exact fun
+    | Int.ofNat n => loopPow n
+    | Int.negSucc n => Path.symm (loopPow (Nat.succ n))
+
+/-- Integer iteration of loop B at the path level. -/
+@[simp] noncomputable def kleinBottleLoopBPathZPow :
+    Int → Path kleinBottleBase kleinBottleBase := by
+  let rec loopPow : Nat → Path kleinBottleBase kleinBottleBase
+    | 0 => Path.refl kleinBottleBase
+    | Nat.succ n => Path.trans (loopPow n) kleinBottleLoopB
+  exact fun
+    | Int.ofNat n => loopPow n
+    | Int.negSucc n => Path.symm (loopPow (Nat.succ n))
+
+/-- Decode an integer pair into a raw loop on the Klein bottle. -/
+@[simp] noncomputable def kleinBottleDecodePath :
+    Int × Int → Path kleinBottleBase kleinBottleBase
+  | (m, n) =>
+      Path.trans (kleinBottleLoopAPathZPow m) (kleinBottleLoopBPathZPow n)
 
 /-! ## pi_1(K) as the semidirect product Z ⋊ Z -/
 

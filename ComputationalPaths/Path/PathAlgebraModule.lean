@@ -34,11 +34,11 @@ structure LeftModule (A : Type u) where
   /-- Action of paths on the left. -/
   act : {a b : A} → Path a b → carrier a → carrier b
   /-- Action preserves reflexivity. -/
-  act_refl : ∀ a x, act (Path.refl a) x = x
+  act_refl : ∀ a x, Path (act (Path.refl a) x) x
   /-- Action preserves composition. -/
   act_trans :
     ∀ {a b c : A} (p : Path a b) (q : Path b c) (x : carrier a),
-      act (Path.trans p q) x = act q (act p x)
+      Path (act (Path.trans p q) x) (act q (act p x))
 
 namespace LeftModule
 
@@ -50,10 +50,10 @@ def ofFamily (B : A → Type v) : LeftModule A where
   act := fun {a b} p x => transport (D := B) p x
   act_refl := by
     intro a x
-    simpa using (transport_refl (D := B) (a := a) (x := x))
+    exact Path.ofEq (transport_refl (D := B) (a := a) (x := x))
   act_trans := by
     intro a b c p q x
-    simpa using (transport_trans (D := B) p q x)
+    exact Path.ofEq (transport_trans (D := B) p q x)
 
 /-- A submodule of a left module, closed under the path action. -/
 structure Submodule (M : LeftModule A) where
@@ -94,12 +94,14 @@ def subtype (S : Submodule M) : LeftModule A where
   act := fun {a b} p x => ⟨M.act p x.1, S.stable p x.2⟩
   act_refl := by
     intro a x
+    apply Path.ofEq
     apply Subtype.ext
-    simpa using (M.act_refl a x.1)
+    exact (M.act_refl a x.1).toEq
   act_trans := by
     intro a b c p q x
+    apply Path.ofEq
     apply Subtype.ext
-    simpa using (M.act_trans p q x.1)
+    exact (M.act_trans p q x.1).toEq
 
 end Submodule
 
@@ -122,14 +124,16 @@ def quotient {M : LeftModule A} (R : QuotientRel M) : LeftModule A where
     exact Quot.sound (R.respects (a := a) (b := b) p (x := x) (y := y) h)
   act_refl := by
     intro a x
+    apply Path.ofEq
     refine Quot.inductionOn x ?_
     intro x
-    exact _root_.congrArg (fun y => Quot.mk _ y) (M.act_refl a x)
+    exact _root_.congrArg (fun y => Quot.mk _ y) (M.act_refl a x).toEq
   act_trans := by
     intro a b c p q x
+    apply Path.ofEq
     refine Quot.inductionOn x ?_
     intro x
-    exact _root_.congrArg (fun y => Quot.mk _ y) (M.act_trans p q x)
+    exact _root_.congrArg (fun y => Quot.mk _ y) (M.act_trans p q x).toEq
 
 end LeftModule
 
@@ -142,11 +146,11 @@ structure RightModule (A : Type u) where
   /-- Action of paths on the right. -/
   act : {a b : A} → Path a b → carrier b → carrier a
   /-- Action preserves reflexivity. -/
-  act_refl : ∀ a x, act (Path.refl a) x = x
+  act_refl : ∀ a x, Path (act (Path.refl a) x) x
   /-- Action preserves composition. -/
   act_trans :
     ∀ {a b c : A} (p : Path a b) (q : Path b c) (x : carrier c),
-      act (Path.trans p q) x = act p (act q x)
+      Path (act (Path.trans p q) x) (act p (act q x))
 
 namespace RightModule
 
@@ -158,10 +162,10 @@ def ofFamily (B : A → Type v) : RightModule A where
   act := fun {a b} p x => transport (D := B) (Path.symm p) x
   act_refl := by
     intro a x
-    simpa using (transport_refl (D := B) (a := a) (x := x))
+    exact Path.ofEq (transport_refl (D := B) (a := a) (x := x))
   act_trans := by
     intro a b c p q x
-    simpa using
+    exact Path.ofEq
       (transport_trans (D := B) (p := Path.symm q) (q := Path.symm p) (x := x))
 
 /-- A submodule of a right module, closed under the path action. -/
@@ -203,12 +207,14 @@ def subtype (S : Submodule M) : RightModule A where
   act := fun {a b} p x => ⟨M.act p x.1, S.stable p x.2⟩
   act_refl := by
     intro a x
+    apply Path.ofEq
     apply Subtype.ext
-    simpa using (M.act_refl a x.1)
+    exact (M.act_refl a x.1).toEq
   act_trans := by
     intro a b c p q x
+    apply Path.ofEq
     apply Subtype.ext
-    simpa using (M.act_trans p q x.1)
+    exact (M.act_trans p q x.1).toEq
 
 end Submodule
 
@@ -231,14 +237,16 @@ def quotient {M : RightModule A} (R : QuotientRel M) : RightModule A where
     exact Quot.sound (R.respects (a := a) (b := b) p (x := x) (y := y) h)
   act_refl := by
     intro a x
+    apply Path.ofEq
     refine Quot.inductionOn x ?_
     intro x
-    exact _root_.congrArg (fun y => Quot.mk _ y) (M.act_refl a x)
+    exact _root_.congrArg (fun y => Quot.mk _ y) (M.act_refl a x).toEq
   act_trans := by
     intro a b c p q x
+    apply Path.ofEq
     refine Quot.inductionOn x ?_
     intro x
-    exact _root_.congrArg (fun y => Quot.mk _ y) (M.act_trans p q x)
+    exact _root_.congrArg (fun y => Quot.mk _ y) (M.act_trans p q x).toEq
 
 end RightModule
 
@@ -264,10 +272,11 @@ def tensorMk {A : Type u} {R : RightModule.{u, v} A} {L : LeftModule.{u, w} A} {
   Quot.mk (TensorRel R L) (Sigma.mk a (Prod.mk r l))
 
 /-- The tensor relation identifying left and right actions. -/
-theorem tensor_rel {A : Type u} {R : RightModule.{u, v} A} {L : LeftModule.{u, w} A}
+def tensor_rel {A : Type u} {R : RightModule.{u, v} A} {L : LeftModule.{u, w} A}
     {a b : A} (p : Path a b) (r : R.carrier b) (l : L.carrier a) :
-    tensorMk (r := R.act p r) (l := l) = tensorMk (r := r) (l := L.act p l) :=
-  Quot.sound (TensorRel.act (R := R) (L := L) p r l)
+    Path (tensorMk (r := R.act p r) (l := l))
+      (tensorMk (r := r) (l := L.act p l)) :=
+  Path.ofEq (Quot.sound (TensorRel.act (R := R) (L := L) p r l))
 
 /-! ## Summary -/
 

@@ -27,26 +27,26 @@ class HasCirclePiOneEncode : Type u where
   /-- Winding-number map `π₁(S¹) → ℤ`. -/
   encode : circlePiOne → Int
   /-- Encoding after decoding is the identity on `ℤ`. -/
-  encode_circleDecode : ∀ z : Int, encode (circleDecode z) = z
+  encode_circleDecode : ∀ z : Int, Path (encode (circleDecode z)) z
   /-- Decoding after encoding is the identity on `π₁(S¹)`. -/
-  circleDecode_encode : ∀ x : circlePiOne, circleDecode (encode x) = x
+  circleDecode_encode : ∀ x : circlePiOne, Path (circleDecode (encode x)) x
 
 /-- Canonical instance for the circle computation. -/
 noncomputable instance instHasCirclePiOneEncode : HasCirclePiOneEncode where
   encode := circlePiOneEncode
-  encode_circleDecode := circlePiOneEncode_circleDecode
-  circleDecode_encode := circleDecode_circlePiOneEncode
+  encode_circleDecode := fun z => Path.ofEq (circlePiOneEncode_circleDecode z)
+  circleDecode_encode := fun x => Path.ofEq (circleDecode_circlePiOneEncode x)
 
 /-- Winding-number map specialised to the computational circle. -/
 @[simp] noncomputable def circlePiOneEncode' [HasCirclePiOneEncode] : circlePiOne → Int :=
   HasCirclePiOneEncode.encode
 
-@[simp] theorem circlePiOneEncode_circleDecode' [HasCirclePiOneEncode] (z : Int) :
-    circlePiOneEncode' (circleDecode z) = z :=
+noncomputable def circlePiOneEncode_circleDecode' [HasCirclePiOneEncode] (z : Int) :
+    Path (circlePiOneEncode' (circleDecode z)) z :=
   HasCirclePiOneEncode.encode_circleDecode z
 
-@[simp] theorem circleDecode_circlePiOneEncode' [HasCirclePiOneEncode] (x : circlePiOne) :
-    circleDecode (circlePiOneEncode' x) = x :=
+noncomputable def circleDecode_circlePiOneEncode' [HasCirclePiOneEncode] (x : circlePiOne) :
+    Path (circleDecode (circlePiOneEncode' x)) x :=
   HasCirclePiOneEncode.circleDecode_encode x
 
 /-! ## π₁ equivalence -/
@@ -63,9 +63,9 @@ noncomputable def circlePiOneEquivInt :
     SimpleEquiv circlePiOne Int :=
   circleCompPathPiOneEquivInt
 
-@[simp] theorem circlePiOneEncode_decode (z : Int) :
-    circlePiOneEncode (circleDecode z) = z :=
-  circlePiOneEncode_circleDecode z
+noncomputable def circlePiOneEncode_decode (z : Int) :
+    Path (circlePiOneEncode (circleDecode z)) z :=
+  Path.ofEq (circlePiOneEncode_circleDecode z)
 
 end Path
 end ComputationalPaths

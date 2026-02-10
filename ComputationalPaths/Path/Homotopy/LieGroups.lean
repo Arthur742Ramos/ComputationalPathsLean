@@ -255,7 +255,7 @@ This is already proved in Torus.lean. The torus is the simplest
   compact non-simply-connected abelian Lie group of rank 2. -/
 noncomputable def torus2PiOneEquiv { _ : HasTorusPiOneEncode } :
     SimpleEquiv torusPiOne (Int × Int) :=
-  torusPiOneEquivIntProd
+  torusPiOneEquivIntProdSimple
 
 end TorusN
 
