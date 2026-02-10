@@ -34,16 +34,12 @@ variable {β : Type u}
 @[simp] def symm (c : GlobularCell β) : GlobularCell β :=
   { src := c.tgt, tgt := c.src, path := Path.symm c.path }
 
-/-- Composition of cells; the equality argument aligns the midpoint. -/
+/-- Composition of cells; the path argument aligns the midpoint. -/
 @[simp] def trans (p : GlobularCell β) (q : GlobularCell β)
-    (h : p.tgt = q.src) : GlobularCell β := by
-  cases q with
-  | mk qs qt qp =>
-      cases h
-      exact
-        { src := p.src
-          tgt := qt
-          path := Path.trans p.path qp }
+    (h : Path p.tgt q.src) : GlobularCell β :=
+  { src := p.src
+    tgt := q.tgt
+    path := Path.trans (Path.trans p.path h) q.path }
 
 @[simp] theorem symm_symm (c : GlobularCell β) : symm (symm c) = c := by
   cases c with
@@ -56,14 +52,14 @@ variable {β : Type u}
   simp [refl, symm]
 
 @[simp] theorem trans_refl_left (c : GlobularCell β) :
-    trans (refl c.src) c rfl = c := by
+    trans (refl c.src) c (Path.refl c.src) = c := by
   cases c
-  simp [refl]
+  simp [refl, trans]
 
 @[simp] theorem trans_refl_right (c : GlobularCell β) :
-    trans c (refl c.tgt) rfl = c := by
+    trans c (refl c.tgt) (Path.refl c.tgt) = c := by
   cases c
-  simp [refl]
+  simp [refl, trans]
 
 @[simp] theorem symm_src (c : GlobularCell β) :
     (symm c).src = c.tgt := rfl
@@ -71,40 +67,30 @@ variable {β : Type u}
 @[simp] theorem symm_tgt (c : GlobularCell β) :
     (symm c).tgt = c.src := rfl
 
-@[simp] theorem trans_src (p q : GlobularCell β) (h : p.tgt = q.src) :
+@[simp] theorem trans_src (p q : GlobularCell β) (h : Path p.tgt q.src) :
     (trans p q h).src = p.src := by
   cases q
   cases h
   rfl
 
-@[simp] theorem trans_tgt (p q : GlobularCell β) (h : p.tgt = q.src) :
+@[simp] theorem trans_tgt (p q : GlobularCell β) (h : Path p.tgt q.src) :
     (trans p q h).tgt = q.tgt := by
   cases q
   cases h
   rfl
 
 private theorem trans_assoc_left_eq (p q r : GlobularCell β)
-    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
-    (trans p q h₁).tgt = r.src := by
-  cases p
-  cases q
-  cases r
-  cases h₁
-  cases h₂
-  simp [trans]
+    (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
+    Path (trans p q h₁).tgt r.src := by
+  simpa [trans] using h₂
 
 private theorem trans_assoc_right_eq (p q r : GlobularCell β)
-    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
-    p.tgt = (trans q r h₂).src := by
-  cases p
-  cases q
-  cases r
-  cases h₁
-  cases h₂
-  simp [trans]
+    (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
+    Path p.tgt (trans q r h₂).src := by
+  simpa [trans] using h₁
 
 @[simp] theorem trans_assoc (p q r : GlobularCell β)
-    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
+    (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     trans (trans p q h₁) r (trans_assoc_left_eq p q r h₁ h₂) =
       trans p (trans q r h₂) (trans_assoc_right_eq p q r h₁ h₂) := by
   cases p
@@ -142,10 +128,10 @@ variable {A : Type u}
     GlobularLevel A (n + 1) :=
   GlobularCell.symm c
 
-/-- Composition at level `n+1`.  The middle equality aligns the endpoints. -/
+/-- Composition at level `n+1`.  The middle path aligns the endpoints. -/
 @[simp] def trans {n : Nat}
     (p : GlobularLevel A (n + 1)) (q : GlobularLevel A (n + 1))
-    (h : p.tgt = q.src) :
+    (h : Path p.tgt q.src) :
     GlobularLevel A (n + 1) :=
   GlobularCell.trans p q (β := GlobularLevel A n) h
 
@@ -162,13 +148,13 @@ variable {A : Type u}
 
 @[simp] theorem trans_refl_left {n : Nat}
     (c : GlobularLevel A (n + 1)) :
-    trans (A := A) (refl c.src) c rfl = c := by
+    trans (A := A) (refl c.src) c (Path.refl c.src) = c := by
   cases c
   simp [refl, trans]
 
 @[simp] theorem trans_refl_right {n : Nat}
     (c : GlobularLevel A (n + 1)) :
-    trans (A := A) c (refl c.tgt) rfl = c := by
+    trans (A := A) c (refl c.tgt) (Path.refl c.tgt) = c := by
   cases c
   simp [refl, trans]
 
@@ -183,34 +169,34 @@ variable {A : Type u}
   simp [symm]
 
 @[simp] theorem trans_src {n : Nat}
-    (p q : GlobularLevel A (n + 1)) (h : p.tgt = q.src) :
+    (p q : GlobularLevel A (n + 1)) (h : Path p.tgt q.src) :
     (trans (A := A) p q h).src = p.src := by
   simpa [trans] using
     (GlobularCell.trans_src (β := GlobularLevel A n) p q h)
 
 @[simp] theorem trans_tgt {n : Nat}
-    (p q : GlobularLevel A (n + 1)) (h : p.tgt = q.src) :
+    (p q : GlobularLevel A (n + 1)) (h : Path p.tgt q.src) :
     (trans (A := A) p q h).tgt = q.tgt := by
   simpa [trans] using
     (GlobularCell.trans_tgt (β := GlobularLevel A n) p q h)
 
 private theorem globular_trans_assoc_left_eq {n : Nat}
     (p q r : GlobularLevel A (n + 1))
-    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
-    (trans (A := A) p q h₁).tgt = r.src := by
+    (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
+    Path (trans (A := A) p q h₁).tgt r.src := by
   simpa [trans] using
     (GlobularCell.trans_assoc_left_eq (β := GlobularLevel A n) p q r h₁ h₂)
 
 private theorem globular_trans_assoc_right_eq {n : Nat}
     (p q r : GlobularLevel A (n + 1))
-    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
-    p.tgt = (trans (A := A) q r h₂).src := by
+    (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
+    Path p.tgt (trans (A := A) q r h₂).src := by
   simpa [trans] using
     (GlobularCell.trans_assoc_right_eq (β := GlobularLevel A n) p q r h₁ h₂)
 
 @[simp] theorem trans_assoc {n : Nat}
     (p q r : GlobularLevel A (n + 1))
-    (h₁ : p.tgt = q.src) (h₂ : q.tgt = r.src) :
+    (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     trans (A := A) (trans (A := A) p q h₁) r
         (globular_trans_assoc_left_eq p q r h₁ h₂) =
       trans (A := A) p (trans (A := A) q r h₂)
@@ -255,12 +241,10 @@ computational path. -/
   simp [symm, map]
 
 @[simp] theorem map_trans {n : Nat} (f : A → B)
-    (p q : GlobularLevel A (n + 1)) (h : p.tgt = q.src) :
+    (p q : GlobularLevel A (n + 1)) (h : Path p.tgt q.src) :
     map (n := n + 1) f (trans (A := A) p q h) =
       trans (map (n := n + 1) f p) (map (n := n + 1) f q)
-        (by
-          have := _root_.congrArg (map (n := n) f) h
-          simpa [map_src, map_tgt] using this) := by
+        (Path.congrArg (map (n := n) f) h) := by
   cases q
   cases h
   cases p
@@ -283,14 +267,10 @@ end Functoriality
   simp [toPath, symm, GlobularCell.symm]
 
 @[simp] theorem toPath_trans {n : Nat}
-    (p q : GlobularLevel A (n + 1)) (h : p.tgt = q.src) :
+    (p q : GlobularLevel A (n + 1)) (h : Path p.tgt q.src) :
     toPath (A := A) (trans (A := A) p q h) =
-      (trans_tgt (A := A) (n := n) p q h).symm ▸
-        ((trans_src (A := A) (n := n) p q h).symm ▸
-          Path.trans (toPath (A := A) p) (h ▸ toPath (A := A) q)) := by
-  cases q
-  cases h
-  simp [toPath, trans, GlobularCell.trans]
+      Path.trans (Path.trans (toPath (A := A) p) h) (toPath (A := A) q) := by
+  simp [toPath, trans]
 
 section Functoriality
 
