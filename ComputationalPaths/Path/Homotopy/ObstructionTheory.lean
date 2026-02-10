@@ -1,87 +1,107 @@
-/- 
-# Obstruction theory for CW-complex extensions
+/-
+# Obstruction theory via computational paths
 
-This module packages a minimal obstruction-theoretic interface for extending maps over
-relative CW complexes using Mathlib's categorical CW-complex definition.
+This module packages a minimal obstruction-theory interface for extending
+maps along a function using computational paths. The obstruction to an
+extension is represented by a `Path` witness that the restriction of a
+candidate extension agrees with the original map.
 
 ## Key Results
 
-- `Extension`: data of a map `Y ⟶ Z` extending `g : X ⟶ Z` along `f : X ⟶ Y`
-  with a `Path` commutation witness
-- `obstructionFree`: existence of an extension (no obstruction)
-- `cellRestriction`: restriction of a map to an attached cell
-- `hom_ext_of_cells`, `extension_unique`: `Path` uniqueness of extension maps from cell data
+- `Extension`: extension data with a path witness on the base
+- `Obstruction`: a path-level compatibility witness for a candidate extension
+- `obstructionFree`: existence of an extension
+- `extensionOfObstruction`, `obstructionOfExtension`: move between extensions
+  and obstruction witnesses
+- `extension_unique`: pointwise path extensionality for extension maps
 
 ## References
 
-- Mathlib `Topology/CWComplex/Abstract/Basic`
-- Hatcher, *Algebraic Topology*, Chapter 4 (obstruction theory)
+- Hatcher, Algebraic Topology, Chapter 4 (obstruction theory)
+- de Queiroz et al., "Propositional equality, identity types, and direct
+  computational paths"
 -/
 
-import Mathlib.Topology.CWComplex.Abstract.Basic
-import ComputationalPaths.Path.Basic.Core
-
-open CategoryTheory
-open HomotopicalAlgebra
+import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths
 namespace Path
 namespace Homotopy
 namespace ObstructionTheory
 
-universe u
-
-variable {X Y Z : TopCat.{u}} {f : X ⟶ Y}
+universe u v w
 
 /-! ## Extension data -/
 
-/-- Data of a map `Y ⟶ Z` extending `g : X ⟶ Z` along `f : X ⟶ Y`. -/
-structure Extension (f : X ⟶ Y) (g : X ⟶ Z) where
+/-- Restrict a map along a function. -/
+@[simp] def restrict {A : Type u} {B : Type v} (i : A -> B) {X : Type w}
+    (h : B -> X) : A -> X :=
+  fun a => h (i a)
+
+/-- Data of an extension along `i : A -> B` with a path witness on the base. -/
+structure Extension {A : Type u} {B : Type v} {X : Type w}
+    (i : A -> B) (g : A -> X) where
   /-- The extended map. -/
-  map : Y ⟶ Z
-  /-- Compatibility on the base (as a `Path`). -/
-  comm : Path (f ≫ map) g
+  map : B -> X
+  /-- Compatibility on the base as a path. -/
+  comm : forall a, Path (map (i a)) (g a)
 
 /-- The extension problem is obstruction-free if an extension exists. -/
-def obstructionFree (f : X ⟶ Y) (g : X ⟶ Z) : Prop :=
-  Nonempty (Extension f g)
+def obstructionFree {A : Type u} {B : Type v} {X : Type w}
+    (i : A -> B) (g : A -> X) : Prop :=
+  Nonempty (Extension i g)
 
-/-! ## Cell restrictions -/
+/-! ## Obstruction witnesses -/
 
-/-- Restrict a map to a CW cell of a relative CW complex. -/
-noncomputable def cellRestriction (c : TopCat.RelativeCWComplex f) (φ : Y ⟶ Z)
-    (γ : RelativeCellComplex.Cells c) :=
-  γ.ι ≫ φ
+/-- A path witness that a candidate extension restricts to `g`. -/
+abbrev Obstruction {A : Type u} {B : Type v} {X : Type w}
+    (i : A -> B) (g : A -> X) (h : B -> X) :=
+  Path (restrict i h) g
 
-/-- A map out of a relative CW complex is determined by its restriction to the base
-and to each attached cell, with a `Path` witness. -/
-def hom_ext_of_cells (c : TopCat.RelativeCWComplex f) {φ₁ φ₂ : Y ⟶ Z}
-    (h₀ : Path (f ≫ φ₁) (f ≫ φ₂))
-    (hcell : ∀ γ, Path (cellRestriction (f := f) c φ₁ γ)
-      (cellRestriction (f := f) c φ₂ γ)) :
-    Path φ₁ φ₂ := by
-  apply Path.ofEq
-  apply RelativeCellComplex.hom_ext (c := c) h₀.toEq
-  intro γ
-  simpa [cellRestriction] using (hcell γ).toEq
+namespace Extension
 
-/-- Extensions are unique once their restrictions to the base and all cells agree,
-    with a `Path` between the extension maps. -/
-def extension_unique (c : TopCat.RelativeCWComplex f) {g : X ⟶ Z}
-    {e₁ e₂ : Extension f g}
-    (hcell : ∀ γ, Path (cellRestriction (f := f) c e₁.map γ)
-      (cellRestriction (f := f) c e₂.map γ)) :
-    Path e₁.map e₂.map := by
-  apply hom_ext_of_cells (f := f) (c := c)
-  · exact Path.trans e₁.comm (Path.symm e₂.comm)
-  · exact hcell
+variable {A : Type u} {B : Type v} {X : Type w}
+variable {i : A -> B} {g : A -> X}
+
+/-- Restriction of an extension to the base. -/
+@[simp] def restrict (e : Extension i g) : A -> X :=
+  ObstructionTheory.restrict i e.map
+
+/-- The restriction of an extension agrees with the base map. -/
+def restrict_path (e : Extension i g) : Path e.restrict g := by
+  simpa [Extension.restrict, ObstructionTheory.restrict] using
+    (Path.lamCongr (fun a => e.comm a))
+
+end Extension
+
+/-- Extract the obstruction witness from an extension. -/
+def obstructionOfExtension {A : Type u} {B : Type v} {X : Type w}
+    {i : A -> B} {g : A -> X} (e : Extension i g) :
+    Obstruction i g e.map :=
+  Extension.restrict_path (i := i) (g := g) e
+
+/-- Build an extension from a candidate map and an obstruction witness. -/
+def extensionOfObstruction {A : Type u} {B : Type v} {X : Type w}
+    (i : A -> B) (g : A -> X) (h : B -> X) (p : Obstruction i g h) :
+    Extension i g :=
+  { map := h
+    comm := fun a => Path.app p a }
+
+/-! ## Extensionality -/
+
+/-- Extension maps are path-equal when they agree pointwise. -/
+def extension_unique {A : Type u} {B : Type v} {X : Type w}
+    {i : A -> B} {g : A -> X} (e1 e2 : Extension i g)
+    (h : forall b, Path (e1.map b) (e2.map b)) :
+    Path e1.map e2.map :=
+  Path.lamCongr h
 
 /-! ## Summary
 
-We package the extension problem for relative CW complexes as a map together with a
-commuting triangle, define obstruction-freeness as existence of an extension, and
-show that extension maps are unique once their restrictions to the base and each cell
-agree, with uniqueness witnessed by `Path`.
+We encode the extension problem for a function `i : A -> B` by storing a map
+`B -> X` together with a path that its restriction agrees with the base map.
+Obstruction witnesses are the corresponding path-level compatibilities, and
+extensions are unique up to a function path when they agree pointwise.
 -/
 
 end ObstructionTheory

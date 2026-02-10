@@ -77,6 +77,7 @@ import ComputationalPaths.Path.Homotopy.OmegaTwoCoherence
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.TruncationLevels
 import ComputationalPaths.Path.Homotopy.PostnikovTower
+import ComputationalPaths.Path.Homotopy.PostnikovSystem
 import ComputationalPaths.Path.Homotopy.ObstructionTheory
 import ComputationalPaths.Path.Homotopy.PathSpaceMonad
 import ComputationalPaths.Path.Homotopy.PointedMapCategory
@@ -85,6 +86,7 @@ import ComputationalPaths.Path.Homotopy.HomotopyPullback
 import ComputationalPaths.Path.Homotopy.HomotopyLimitColimit
 import ComputationalPaths.Path.Homotopy.WhiteheadProduct
 import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
+import ComputationalPaths.Path.Homotopy.BrownRepresentability
 import ComputationalPaths.Path.Homotopy.PathAlgebraQuotient
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Homotopy.AcyclicModels
@@ -130,6 +132,7 @@ import ComputationalPaths.Path.Homotopy.LieGroups
 import ComputationalPaths.Path.Homotopy.Hurewicz
 import ComputationalPaths.Path.Homotopy.DoldThom
 import ComputationalPaths.Path.Homotopy.CWComplexHomotopy
+import ComputationalPaths.Path.Homotopy.CWApproximation
 import ComputationalPaths.Path.Homotopy.BrouwerDegree
 import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Homotopy.Reflexivity
@@ -149,6 +152,8 @@ import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.TorusStep
 import ComputationalPaths.Path.CompPath.PushoutCompPath
+import ComputationalPaths.Path.CompPath.MappingCylinder
+import ComputationalPaths.Path.CompPath.MappingCone
 import ComputationalPaths.Path.CompPath.PushoutPaths
 import ComputationalPaths.Path.CompPath.PullbackPaths
 import ComputationalPaths.Path.CompPath.VanKampenGeneralized
@@ -159,6 +164,7 @@ import ComputationalPaths.Path.CompPath.WedgeFreeProductDerived
 import ComputationalPaths.Path.CompPath.FigureEight
 import ComputationalPaths.Path.CompPath.FigureEightStep
 import ComputationalPaths.Path.CompPath.BouquetN
+import ComputationalPaths.Path.CompPath.SuspensionSpace
 import ComputationalPaths.Path.CompPath.SphereCompPath
 import ComputationalPaths.Path.CompPath.SuspensionCircle
 import ComputationalPaths.Path.CompPath.Pi5S3
@@ -180,6 +186,7 @@ import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
 import ComputationalPaths.Path.Algebra.ExtFunctor
+import ComputationalPaths.Path.Algebra.BarComplex
 import ComputationalPaths.Path.Algebra.Abelianization
 import ComputationalPaths.Path.Algebra.FreeGroupProperties
 import ComputationalPaths.Path.Homotopy.HurewiczTheorem

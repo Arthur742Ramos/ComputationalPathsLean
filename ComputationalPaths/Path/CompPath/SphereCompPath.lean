@@ -1,5 +1,6 @@
 import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.CompPath.CircleCompPath
+import ComputationalPaths.Path.CompPath.SuspensionSpace
 import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.Sets
@@ -29,11 +30,6 @@ namespace CompPath
 universe u
 
 /-! ## The 2-sphere as suspension of the computational circle -/
-
-
-/-- Suspension in the computational pushout setting. -/
-def SuspensionCompPath (A : Type u) : Type u :=
-  PushoutCompPath PUnit' PUnit' A (fun _ => PUnit'.unit) (fun _ => PUnit'.unit)
 
 /-- The 2-sphere as suspension of the computational circle. -/
 def Sphere2CompPath : Type u :=
