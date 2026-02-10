@@ -49,6 +49,11 @@ structure GradedMap (M N : GradedGroup) where
   /-- Preserves zero. -/
   map_zero : ∀ (n : Nat), map n (M.zero n) = N.zero n
 
+/-- `Path`-typed witness that a graded map preserves zero. -/
+def GradedMap.mapZeroPath {M N : GradedGroup} (f : GradedMap M N) (n : Nat) :
+    Path (f.map n (M.zero n)) (N.zero n) :=
+  Path.ofEq (f.map_zero n)
+
 /-- The identity graded map. -/
 def GradedMap.id' (M : GradedGroup) : GradedMap M M where
   map := fun _ x => x

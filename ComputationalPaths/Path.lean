@@ -171,3 +171,12 @@ import ComputationalPaths.Path.Homotopy.EquivariantHomotopy
 import ComputationalPaths.Path.Algebra.UniversalCoefficient
 import ComputationalPaths.Path.Homotopy.BordismTheory
 import ComputationalPaths.Path.Homotopy.HomologicalStability
+import ComputationalPaths.Path.Algebra.DeRhamCohomology
+import ComputationalPaths.Path.Algebra.KunnethFormula
+import ComputationalPaths.Path.Algebra.CechCohomology
+import ComputationalPaths.Path.Algebra.GrothendieckDuality
+import ComputationalPaths.Path.Homotopy.PoincareDuality
+import ComputationalPaths.Path.Homotopy.MorseTheory
+import ComputationalPaths.Path.Homotopy.LocalizationHomotopy
+import ComputationalPaths.Path.Homotopy.MotivicHomotopy
+import ComputationalPaths.Path.Homotopy.TransferMap

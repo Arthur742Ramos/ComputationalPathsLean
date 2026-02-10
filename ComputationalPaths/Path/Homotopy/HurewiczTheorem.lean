@@ -61,10 +61,20 @@ theorem hurewiczPreservesOne {G H : Type u} (hd : HurewiczData G H) :
     hd.toFun hd.oneG = hd.oneH :=
   hd.map_one
 
+/-- `Path`-typed identity preservation. -/
+def hurewiczPreservesOnePath {G H : Type u} (hd : HurewiczData G H) :
+    Path (hd.toFun hd.oneG) hd.oneH :=
+  Path.ofEq hd.map_one
+
 /-- The Hurewicz map is a homomorphism. -/
 theorem hurewiczHom {G H : Type u} (hd : HurewiczData G H) (a b : G) :
     hd.toFun (hd.mulG a b) = hd.mulH (hd.toFun a) (hd.toFun b) :=
   hd.map_mul a b
+
+/-- `Path`-typed homomorphism law. -/
+def hurewiczHomPath {G H : Type u} (hd : HurewiczData G H) (a b : G) :
+    Path (hd.toFun (hd.mulG a b)) (hd.mulH (hd.toFun a) (hd.toFun b)) :=
+  Path.ofEq (hd.map_mul a b)
 
 /-! ## Naturality -/
 
@@ -77,6 +87,14 @@ structure HurewiczNatural {G G' H H' : Type u}
     (fG : G → G') (fH : H → H') : Prop where
   /-- The square commutes: fH ∘ h = h' ∘ fG. -/
   comm : ∀ x, fH (hd.toFun x) = hd'.toFun (fG x)
+
+/-- `Path`-typed naturality square. -/
+def hurewiczNaturalPath {G G' H H' : Type u}
+    {hd : HurewiczData G H} {hd' : HurewiczData G' H'}
+    {fG : G → G'} {fH : H → H'}
+    (nat : HurewiczNatural hd hd' fG fH) (x : G) :
+    Path (fH (hd.toFun x)) (hd'.toFun (fG x)) :=
+  Path.ofEq (nat.comm x)
 
 /-- Naturality for the identity map. -/
 theorem hurewiczNatural_id {G H : Type u} (hd : HurewiczData G H) :
@@ -104,6 +122,12 @@ structure NConnected (n : ℕ) (G : ℕ → Type u) (one : (k : ℕ) → G k) : 
   /-- All groups below n are trivial. -/
   trivial_below : ∀ k, k ≤ n → ∀ x : G k, x = one k
 
+/-- `Path`-typed connectedness witness. -/
+def nConnectedPath {n : ℕ} {G : ℕ → Type u} {one : (k : ℕ) → G k}
+    (hc : NConnected n G one) (k : ℕ) (hk : k ≤ n) (x : G k) :
+    Path x (one k) :=
+  Path.ofEq (hc.trivial_below k hk x)
+
 /-- The higher Hurewicz theorem: for an (n-1)-connected space,
 the Hurewicz map at dimension n is a bijection.
 
@@ -115,6 +139,16 @@ structure HurewiczIso (G H : Type u) extends HurewiczData G H where
   left_inv : ∀ x, invFun (toFun x) = x
   /-- Right inverse. -/
   right_inv : ∀ y, toFun (invFun y) = y
+
+/-- `Path`-typed left inverse. -/
+def hurewiczIso_leftInvPath {G H : Type u} (hi : HurewiczIso G H) (x : G) :
+    Path (hi.invFun (hi.toFun x)) x :=
+  Path.ofEq (hi.left_inv x)
+
+/-- `Path`-typed right inverse. -/
+def hurewiczIso_rightInvPath {G H : Type u} (hi : HurewiczIso G H) (y : H) :
+    Path (hi.toFun (hi.invFun y)) y :=
+  Path.ofEq (hi.right_inv y)
 
 /-- An isomorphism gives surjectivity. -/
 theorem hurewiczIso_surj {G H : Type u} (hi : HurewiczIso G H) :
@@ -128,6 +162,12 @@ theorem hurewiczIso_inj {G H : Type u} (hi : HurewiczIso G H) :
   have hx : hi.invFun (hi.toFun x) = x := hi.left_inv x
   have hy : hi.invFun (hi.toFun y) = y := hi.left_inv y
   rw [← hx, ← hy, h]
+
+/-- `Path`-typed injectivity: from a `Path` on images to a `Path` on sources. -/
+def hurewiczIso_injPath {G H : Type u} (hi : HurewiczIso G H)
+    (x y : G) (hp : Path (hi.toFun x) (hi.toFun y)) :
+    Path x y :=
+  Path.ofEq (hurewiczIso_inj hi x y hp.proof)
 
 /-! ## Composition with Abelianization -/
 
@@ -209,3 +249,5 @@ def hurewiczTrivial (G : Type u) (mul : G → G → G) (one : G) :
 end HurewiczTheorem
 end Path
 end ComputationalPaths
+
+-- TEST_MOD

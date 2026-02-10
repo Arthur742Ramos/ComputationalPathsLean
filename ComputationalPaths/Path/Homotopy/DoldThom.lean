@@ -5,6 +5,9 @@ This module introduces symmetric products, the infinite symmetric product,
 and a minimal Dold-Thom interface linking homotopy groups of the infinite
 symmetric product to reduced homology.
 
+Key algebraic identities (degree bookkeeping and equivalence round-trips)
+are additionally exposed via computational `Path` witnesses.
+
 ## Key Results
 
 - `SymmetricProduct`: the nth symmetric product implemented via Mathlib's `Sym`.
@@ -22,6 +25,7 @@ symmetric product to reduced homology.
 
 import Mathlib.Data.Sym.Basic
 import Mathlib.Data.Multiset.AddSub
+import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
 
@@ -56,13 +60,42 @@ def symmProdInfAdd {X : Type u} :
       ⟨n + m,
         Sym.mk ((s : Multiset X) + (t : Multiset X))
           (by
-            simpa [s.property, t.property] using
-              (Multiset.card_add (s : Multiset X) (t : Multiset X)))⟩
+            -- `simp` discharges the cardinality proof using `Multiset.card_add`.
+            simp [Multiset.card_add, s.property, t.property])⟩
+
+/-! ## Degree properties -/
+
+/-- The degree component of `symmProdInfAdd` is addition on naturals. -/
+theorem symmProdInfAdd_fst {X : Type u}
+    (a b : SymmetricProductInfinity X) :
+    (symmProdInfAdd a b).1 = a.1 + b.1 := by
+  cases a; cases b; rfl
+
+/-- `Path` witnessing that the degree component of `symmProdInfAdd` is additive. -/
+def symmProdInfAdd_fst_path {X : Type u}
+    (a b : SymmetricProductInfinity X) :
+    ComputationalPaths.Path (symmProdInfAdd a b).1 (a.1 + b.1) :=
+  ComputationalPaths.Path.ofEq (symmProdInfAdd_fst a b)
+
+/-- Associativity of the degree component of symmetric product addition. -/
+theorem symmProdInfAdd_fst_assoc {X : Type u}
+    (a b c : SymmetricProductInfinity X) :
+    (symmProdInfAdd (symmProdInfAdd a b) c).1 =
+    (symmProdInfAdd a (symmProdInfAdd b c)).1 := by
+  simp [symmProdInfAdd_fst, Nat.add_assoc]
+
+/-- `Path` witnessing associativity of the degree component. -/
+def symmProdInfAdd_fst_assoc_path {X : Type u}
+    (a b c : SymmetricProductInfinity X) :
+    ComputationalPaths.Path
+      (symmProdInfAdd (symmProdInfAdd a b) c).1
+      (symmProdInfAdd a (symmProdInfAdd b c)).1 :=
+  ComputationalPaths.Path.ofEq (symmProdInfAdd_fst_assoc a b c)
 
 /-! ## Dold-Thom data -/
 
 /-- Reduced homology groups of a space, recorded as a family of types. -/
-abbrev ReducedHomology (X : Type u) : Type (u + 1) :=
+abbrev ReducedHomology (_X : Type u) : Type (u + 1) :=
   ℕ → Type u
 
 /-- The n-th homotopy group of the infinite symmetric product of `X`. -/
@@ -85,11 +118,30 @@ def doldThomHomologyEquiv {X : Type u} [TopologicalSpace X]
     SimpleEquiv (A.homology n) (B.homology n) :=
   SimpleEquiv.comp (SimpleEquiv.symm (A.equivalence n)) (B.equivalence n)
 
+/-- `Path` witnessing the Dold-Thom equivalence round-trip. -/
+def doldThomRoundtrip_path {X : Type u} [TopologicalSpace X]
+    [TopologicalSpace (SymmetricProductInfinity X)]
+    (D : DoldThomSpace X) (n : ℕ) (x : symmProdInfPi n X) :
+    ComputationalPaths.Path
+      ((D.equivalence n).invFun ((D.equivalence n).toFun x)) x :=
+  ComputationalPaths.Path.ofEq ((D.equivalence n).left_inv x)
+
+/-- `Path` witnessing the forward round-trip. -/
+def doldThomFwdRoundtrip_path {X : Type u} [TopologicalSpace X]
+    [TopologicalSpace (SymmetricProductInfinity X)]
+    (D : DoldThomSpace X) (n : ℕ) (y : D.homology n) :
+    ComputationalPaths.Path
+      ((D.equivalence n).toFun ((D.equivalence n).invFun y)) y :=
+  ComputationalPaths.Path.ofEq ((D.equivalence n).right_inv y)
+
 /-! ## Summary
 
 We define symmetric products using Mathlib's `Sym`, the infinite symmetric
 product as a sigma type, and a minimal Dold-Thom interface that packages the
 equivalences between homotopy groups of `SP^infty(X)` and reduced homology.
+
+We also add basic `Path` witnesses for degree bookkeeping and equivalence
+round-trip laws.
 -/
 
 end DoldThom

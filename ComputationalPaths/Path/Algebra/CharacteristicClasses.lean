@@ -363,10 +363,19 @@ variable {R : GradedRing} (P : PontryaginClassData R)
 theorem pont_zero_is_one (E : Bundle) : P.pont 0 E = R.one :=
   P.pont_zero E
 
+/-- `Path`-typed witness of `p_0(E) = 1`. -/
+def pont_zero_is_onePath (E : Bundle) : Path (P.pont 0 E) R.one :=
+  Path.ofEq (P.pont_zero E)
+
 /-- Pontryagin classes vanish above half the rank. -/
 theorem pont_vanishing_above (k : Nat) (E : Bundle) (hk : 2 * k > E.rank) :
     P.pont k E = R.zero (4 * k) :=
   P.pont_vanishing k E hk
+
+/-- `Path`-typed vanishing above half the rank. -/
+def pont_vanishing_abovePath (k : Nat) (E : Bundle) (hk : 2 * k > E.rank) :
+    Path (P.pont k E) (R.zero (4 * k)) :=
+  Path.ofEq (P.pont_vanishing k E hk)
 
 end PontryaginClassData
 

@@ -5,12 +5,19 @@ This module packages the Hopf fibration `S³ → S²` with fiber `S¹` using Mat
 TopCat spheres. We record the projection, basepoints, and fiber identification
 as data, then expose the associated fiber sequence and basic applications.
 
+Key identities additionally carry computational `Path` witnesses.
+
 ## Key Results
 
 - `HopfFibrationData`: data for the Hopf projection and fiber identification
 - `hopfFiberSeq`: the fiber sequence `S¹ → S³ → S²`
 - `hopfFiberSeq_exact`: exactness at the total space
 - `hopfInducedPi1Map`: induced map on `π₁` from the Hopf projection
+
+`Path` companions:
+- `hopfBaseProj_path`
+- `hopfFiberEquiv_roundtrip_path`, `hopfFiberEquiv_fwd_roundtrip_path`
+- `hopfFiberIncl_proj_path`, `hopfFiberSeq_exact_path`
 
 ## References
 
@@ -58,6 +65,26 @@ structure HopfFibrationData where
   /-- Identification of the fiber over `base` with `S¹`. -/
   fiberEquiv : SimpleEquiv (Fiber proj base) S1
 
+/-! ## Path witnesses for the Hopf data -/
+
+/-- `Path` witnessing the base-projection condition. -/
+def hopfBaseProj_path (data : HopfFibrationData) :
+    ComputationalPaths.Path (data.proj data.baseTotal) data.base :=
+  ComputationalPaths.Path.ofEq data.base_proj
+
+/-- `Path` witnessing that the fiber equivalence round-trip is the identity. -/
+def hopfFiberEquiv_roundtrip_path (data : HopfFibrationData)
+    (x : Fiber data.proj data.base) :
+    ComputationalPaths.Path
+      (data.fiberEquiv.invFun (data.fiberEquiv.toFun x)) x :=
+  ComputationalPaths.Path.ofEq (data.fiberEquiv.left_inv x)
+
+/-- `Path` witnessing the forward round-trip of the fiber equivalence. -/
+def hopfFiberEquiv_fwd_roundtrip_path (data : HopfFibrationData) (x : S1) :
+    ComputationalPaths.Path
+      (data.fiberEquiv.toFun (data.fiberEquiv.invFun x)) x :=
+  ComputationalPaths.Path.ofEq (data.fiberEquiv.right_inv x)
+
 /-! ## Fiber sequence package -/
 
 /-- The fiber of the Hopf projection over the chosen basepoint. -/
@@ -86,6 +113,11 @@ theorem hopfFiberIncl_proj (data : HopfFibrationData) (x : S1) :
     data.proj (hopfFiberIncl data x) = data.base :=
   (hopfFiberSeq data).proj_incl x
 
+/-- `Path` witnessing that the fiber inclusion projects to the base. -/
+def hopfFiberIncl_proj_path (data : HopfFibrationData) (x : S1) :
+    ComputationalPaths.Path (data.proj (hopfFiberIncl data x)) data.base :=
+  ComputationalPaths.Path.ofEq ((hopfFiberSeq data).proj_incl x)
+
 /-- The Hopf fiber sequence is exact at the total space. -/
 theorem hopfFiberSeq_exact (data : HopfFibrationData) :
     IsExactAt (hopfFiberSeq data) := by
@@ -96,6 +128,13 @@ theorem hopfFiberSeq_exact (data : HopfFibrationData) :
     refine ⟨(hopfFiberSeq data).fromFiber ⟨e, h⟩, ?_⟩
     have h' := (hopfFiberSeq data).right_inv ⟨e, h⟩
     simpa [FiberSeq.incl] using _root_.congrArg Fiber.point h'
+
+/-- `Path` witnessing exactness: incl composed with proj yields the base. -/
+def hopfFiberSeq_exact_path (data : HopfFibrationData) (f : S1) :
+    ComputationalPaths.Path
+      (data.proj ((hopfFiberSeq data).incl f))
+      data.base :=
+  ComputationalPaths.Path.ofEq ((hopfFiberSeq data).proj_incl f)
 
 /-- The induced map on `π₁` from the Hopf projection. -/
 noncomputable def hopfInducedPi1Map (data : HopfFibrationData) :

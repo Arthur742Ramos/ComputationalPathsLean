@@ -4,7 +4,9 @@
 This module provides a lightweight Mathlib-friendly interface for Brouwer
 degree on continuous self-maps. We package the degree as data together with
 homotopy invariance and a "no fixed point implies null-homotopic" hypothesis.
-From this data we derive fixed point consequences.
+
+From this data we derive fixed point consequences and provide `Path` witnesses
+for the key equalities.
 
 ## Key Results
 
@@ -12,6 +14,11 @@ From this data we derive fixed point consequences.
 - `degree_of_no_fixed_point`: maps without fixed points have degree 0.
 - `fixed_point_of_degree_ne_zero`: nonzero degree forces a fixed point.
 - `brouwer_fixed_point`: homotopy-to-identity implies a fixed point.
+
+`Path` companions:
+- `degree_id_path`, `degree_const_path`
+- `degree_homotopy_path`, `degree_of_no_fp_path`
+- `degree_of_homotopic_id_path`
 
 ## References
 
@@ -21,6 +28,7 @@ From this data we derive fixed point consequences.
 
 import Mathlib.Topology.Homotopy.Basic
 import Mathlib.Topology.ContinuousMap.Basic
+import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths
 namespace Path
@@ -53,6 +61,22 @@ attribute [simp] BrouwerDegreeData.degree_id BrouwerDegreeData.degree_const
 
 namespace BrouwerDegreeData
 
+/-- `Path` witnessing that the identity has degree 1. -/
+def degree_id_path (D : BrouwerDegreeData X) :
+    ComputationalPaths.Path (D.degree (ContinuousMap.id X)) 1 :=
+  ComputationalPaths.Path.ofEq D.degree_id
+
+/-- `Path` witnessing that constant maps have degree 0. -/
+def degree_const_path (D : BrouwerDegreeData X) (x : X) :
+    ComputationalPaths.Path (D.degree (ContinuousMap.const X x)) 0 :=
+  ComputationalPaths.Path.ofEq (D.degree_const x)
+
+/-- `Path` witnessing homotopy invariance of the degree. -/
+def degree_homotopy_path (D : BrouwerDegreeData X) {f g : C(X, X)}
+    (h : ContinuousMap.Homotopic f g) :
+    ComputationalPaths.Path (D.degree f) (D.degree g) :=
+  ComputationalPaths.Path.ofEq (D.homotopy_invariant h)
+
 /-- Maps without fixed points have degree zero. -/
 theorem degree_of_no_fixed_point (D : BrouwerDegreeData X) (f : C(X, X))
     (h : ∀ x, f x ≠ x) : D.degree f = 0 := by
@@ -61,6 +85,12 @@ theorem degree_of_no_fixed_point (D : BrouwerDegreeData X) (f : C(X, X))
     D.degree f = D.degree (ContinuousMap.const X x) :=
       D.homotopy_invariant hx
     _ = 0 := D.degree_const x
+
+/-- `Path` witnessing that no-fixed-point maps have degree 0. -/
+def degree_of_no_fp_path (D : BrouwerDegreeData X) (f : C(X, X))
+    (h : ∀ x, f x ≠ x) :
+    ComputationalPaths.Path (D.degree f) 0 :=
+  ComputationalPaths.Path.ofEq (degree_of_no_fixed_point D f h)
 
 /-- A nonzero degree forces a fixed point. -/
 theorem fixed_point_of_degree_ne_zero (D : BrouwerDegreeData X) (f : C(X, X))
@@ -80,7 +110,7 @@ theorem fixed_point_of_homotopic_id (D : BrouwerDegreeData X) (f : C(X, X))
       _ = 1 := D.degree_id
   have hdeg_ne : D.degree f ≠ 0 := by
     have : (1 : Int) ≠ 0 := by decide
-    simpa [hdeg] using this
+    simp [hdeg]
   exact fixed_point_of_degree_ne_zero D f hdeg_ne
 
 /-- Brouwer fixed point theorem in the presence of degree data. -/
@@ -88,13 +118,19 @@ theorem brouwer_fixed_point (D : BrouwerDegreeData X) (f : C(X, X))
     (h : ContinuousMap.Homotopic f (ContinuousMap.id X)) : ∃ x, f x = x :=
   fixed_point_of_homotopic_id D f h
 
+/-- `Path` witnessing that a map homotopic to id has degree 1. -/
+def degree_of_homotopic_id_path (D : BrouwerDegreeData X) (f : C(X, X))
+    (h : ContinuousMap.Homotopic f (ContinuousMap.id X)) :
+    ComputationalPaths.Path (D.degree f) 1 :=
+  ComputationalPaths.Path.trans (degree_homotopy_path D h) (degree_id_path D)
+
 end BrouwerDegreeData
 
 /-! ## Summary
 
 We packaged Brouwer degree as data on continuous self-maps, proved that
 absence of fixed points forces degree zero, and derived fixed-point results
-for maps homotopic to the identity.
+for maps homotopic to the identity.  Key equalities carry `Path` witnesses.
 -/
 
 end BrouwerDegree

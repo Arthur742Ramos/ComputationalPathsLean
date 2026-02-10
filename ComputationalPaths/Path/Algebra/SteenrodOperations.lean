@@ -2,7 +2,8 @@
 # Steenrod Operations for Computational Paths
 
 This module formalises the Steenrod algebra and Steenrod squares in a
-self-contained way inside the computational paths framework.  We define
+self-contained way inside the computational paths framework.  Key algebraic
+identities carry `Path` witnesses.  We define
 Steenrod squares as operations on a graded ℤ/2-module, state the Adem
 relations, and build the Steenrod algebra as the free algebra modulo
 those relations.
@@ -49,6 +50,8 @@ import ComputationalPaths.Path.Rewrite.SimpleEquiv
 namespace ComputationalPaths
 
 namespace SteenrodOperations
+
+open Path
 
 universe u
 
@@ -113,6 +116,14 @@ namespace F2
 @[simp] theorem add_mul (a b c : F2) : mul (add a b) c = add (mul a c) (mul b c) := by
   cases a <;> cases b <;> cases c <;> rfl
 
+/-- Path witnessing commutativity of F2 addition. -/
+def add_comm_path (a b : F2) : Path (add a b) (add b a) :=
+  Path.ofEq (add_comm a b)
+
+/-- Path witnessing that every F2 element is its own inverse. -/
+def add_self_path (a : F2) : Path (add a a) zero :=
+  Path.ofEq (add_self a)
+
 end F2
 
 /-! ## Graded ℤ/2-Modules -/
@@ -150,6 +161,16 @@ variable (M : GradedF2Module)
   have h := M.add_comm n x (M.zero n)
   rw [h]
   exact M.zero_add n x
+
+/-- Path witnessing that x + 0 = x in a graded module. -/
+def add_zero_path (n : Nat) (x : M.carrier n) :
+    Path (M.add n x (M.zero n)) x :=
+  Path.ofEq (M.add_zero n x)
+
+/-- Path witnessing x + x = 0 (characteristic 2). -/
+def add_self_path (n : Nat) (x : M.carrier n) :
+    Path (M.add n x x) (M.zero n) :=
+  Path.ofEq (M.add_self n x)
 
 end GradedF2Module
 
@@ -198,6 +219,32 @@ theorem sq_add_self (i n : Nat) (x : M.carrier n) :
     M.add (n + i) (S.sq i n x) (S.sq i n x) = M.zero (n + i) :=
   M.add_self (n + i) (S.sq i n x)
 
+/-- Path witnessing that Sq^0 acts as identity. -/
+def sq_zero_path (n : Nat) (x : M.carrier n) :
+    Path (S.sq 0 n x) (cast (congrArg M.carrier (Nat.add_zero n).symm) x) :=
+  Path.ofEq (S.sq_zero_id n x)
+
+/-- Path witnessing Sq^i(0) = 0. -/
+def sq_zero_elem_path (i n : Nat) :
+    Path (S.sq i n (M.zero n)) (M.zero (n + i)) :=
+  Path.ofEq (S.sq_map_zero i n)
+
+/-- Path witnessing additivity of Sq^i. -/
+def sq_add_path (i n : Nat) (x y : M.carrier n) :
+    Path (S.sq i n (M.add n x y))
+         (M.add (n + i) (S.sq i n x) (S.sq i n y)) :=
+  Path.ofEq (S.sq_map_add i n x y)
+
+/-- Path witnessing Sq^i(x) + Sq^i(x) = 0 (char 2). -/
+def sq_add_self_path (i n : Nat) (x : M.carrier n) :
+    Path (M.add (n + i) (S.sq i n x) (S.sq i n x)) (M.zero (n + i)) :=
+  Path.ofEq (M.add_self (n + i) (S.sq i n x))
+
+/-- Composite path: Sq^i(x + x) = Sq^i(x) + Sq^i(x) = 0. -/
+def sq_of_add_self_path (i n : Nat) (x : M.carrier n) :
+    Path (S.sq i n (M.add n x x)) (M.zero (n + i)) :=
+  Path.trans (sq_add_path S i n x x) (sq_add_self_path S i n x)
+
 end SteenrodData
 
 /-! ## Adem Relations
@@ -242,7 +289,6 @@ theorem binomial_above (n : Nat) : ∀ k, k > n → binomial n k = 0 := by
     | zero => omega
     | succ k =>
       simp [binomial]
-      have hk' : k ≥ n + 1 := by omega
       have h1 : binomial n k = 0 := ih k (by omega)
       have h2 : binomial n (k + 1) = 0 := ih (k + 1) (by omega)
       omega
@@ -289,6 +335,11 @@ theorem ademDegree_append (w₁ w₂ : AdemWord) :
     simp [ademDegree, ih]
     omega
 
+/-- Path witnessing the additivity of degree under word concatenation. -/
+def ademDegree_append_path (w₁ w₂ : AdemWord) :
+    Path (ademDegree (w₁ ++ w₂)) (ademDegree w₁ + ademDegree w₂) :=
+  Path.ofEq (ademDegree_append w₁ w₂)
+
 /-- An Adem relation record: for 0 < a < 2b, Sq^a Sq^b can be rewritten. -/
 structure AdemRelation where
   /-- First index. -/
@@ -307,6 +358,11 @@ def AdemRelation.lhs (r : AdemRelation) : AdemWord := [r.a, r.b]
 theorem AdemRelation.degree_lhs (r : AdemRelation) :
     ademDegree r.lhs = r.a + r.b := by
   simp [AdemRelation.lhs, ademDegree]
+
+/-- Path witnessing the degree computation for an Adem LHS. -/
+def AdemRelation.degree_lhs_path (r : AdemRelation) :
+    Path (ademDegree r.lhs) (r.a + r.b) :=
+  Path.ofEq r.degree_lhs
 
 /-! ## Steenrod Algebra
 
@@ -337,6 +393,11 @@ def single (w : AdemWord) : F2LinComb := ⟨[w]⟩
 theorem add_terms_length (a b : F2LinComb) :
     (add a b).terms.length = a.terms.length + b.terms.length := by
   simp [add, List.length_append]
+
+/-- Path witnessing length additivity of `add`. -/
+def add_terms_length_path (a b : F2LinComb) :
+    Path (add a b).terms.length (a.terms.length + b.terms.length) :=
+  Path.ofEq (add_terms_length a b)
 
 end F2LinComb
 
@@ -389,6 +450,14 @@ def sq (i : Nat) : SteenrodAlgebra := mk (F2LinComb.single [i])
 /-- Sq^0 is the class of [0]. -/
 theorem sq_zero_unit : sq 0 = mk (F2LinComb.single [0]) := rfl
 
+/-- Path witnessing Sq^0 = mk(single [0]). -/
+def sq_zero_unit_path : Path (sq 0) (mk (F2LinComb.single [0])) :=
+  Path.refl _
+
+/-- Path witnessing that adding a generator to itself yields zero (char 2). -/
+def sq_char2_path (i : Nat) : Path (add (sq i) (sq i)) zero :=
+  Path.ofEq (Quot.sound (SteenrodRel.char2 [i]))
+
 end SteenrodAlgebra
 
 /-! ## Cartan Formula (Trivial Case) -/
@@ -398,6 +467,12 @@ theorem cartan_trivial {M : GradedF2Module} (S : SteenrodData M)
     (k n : Nat) :
     S.sq k n (M.zero n) = M.zero (n + k) :=
   S.sq_map_zero k n
+
+/-- Path witnessing the Cartan formula for zero elements. -/
+def cartan_trivial_path {M : GradedF2Module} (S : SteenrodData M)
+    (k n : Nat) :
+    Path (S.sq k n (M.zero n)) (M.zero (n + k)) :=
+  Path.ofEq (S.sq_map_zero k n)
 
 /-! ## Total Steenrod Square -/
 
@@ -413,6 +488,21 @@ theorem totalSq_zero_component {M : GradedF2Module} (S : SteenrodData M)
       cast (congrArg M.carrier (Nat.add_zero n).symm) x := by
   simp [totalSqComponents]
   exact S.sq_zero_id n x
+
+/-- Path witnessing the Sq^0 component of the total square. -/
+def totalSq_zero_component_path {M : GradedF2Module} (S : SteenrodData M)
+    (n : Nat) (x : M.carrier n) :
+    Path (totalSqComponents S n x ⟨0, Nat.zero_lt_succ n⟩)
+         (cast (congrArg M.carrier (Nat.add_zero n).symm) x) :=
+  Path.ofEq (totalSq_zero_component S n x)
+
+/-- Path witnessing C(n, 0) = 1. -/
+def binomial_zero_right_path (n : Nat) : Path (binomial n 0) 1 :=
+  Path.ofEq (binomial_zero_right n)
+
+/-- Path witnessing C(n, n) = 1. -/
+def binomial_self_path (n : Nat) : Path (binomial n n) 1 :=
+  Path.ofEq (binomial_self n)
 
 end SteenrodOperations
 end ComputationalPaths
