@@ -166,3 +166,8 @@ import ComputationalPaths.Path.Homotopy.HurewiczTheorem
 import ComputationalPaths.Path.Homotopy.WhiteheadTower
 import ComputationalPaths.Path.Homotopy.LoopSpaceHomology
 import ComputationalPaths.Path.Homotopy.EilenbergZilber
+import ComputationalPaths.Path.Homotopy.RationalHomotopy
+import ComputationalPaths.Path.Homotopy.EquivariantHomotopy
+import ComputationalPaths.Path.Algebra.UniversalCoefficient
+import ComputationalPaths.Path.Homotopy.BordismTheory
+import ComputationalPaths.Path.Homotopy.HomologicalStability
