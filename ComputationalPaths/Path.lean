@@ -162,3 +162,7 @@ import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
 import ComputationalPaths.Path.Algebra.Abelianization
 import ComputationalPaths.Path.Algebra.FreeGroupProperties
+import ComputationalPaths.Path.Homotopy.HurewiczTheorem
+import ComputationalPaths.Path.Homotopy.WhiteheadTower
+import ComputationalPaths.Path.Homotopy.LoopSpaceHomology
+import ComputationalPaths.Path.Homotopy.EilenbergZilber
