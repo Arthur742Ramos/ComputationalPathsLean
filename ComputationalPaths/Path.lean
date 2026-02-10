@@ -147,6 +147,7 @@ import ComputationalPaths.Path.Homotopy.CoproductPaths
 import ComputationalPaths.Path.CompPath.CircleCompPath
 import ComputationalPaths.Path.CompPath.WindingNumberProperties
 import ComputationalPaths.Path.CompPath.DeloopingConstruction
+import ComputationalPaths.Path.CompPath.LoopSpaceRecognition
 import ComputationalPaths.Path.CompPath.HomogeneousSpace
 import ComputationalPaths.Path.CompPath.OrbitSpace
 import ComputationalPaths.Path.CompPath.ClassifyingSpace
