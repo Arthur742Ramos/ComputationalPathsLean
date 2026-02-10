@@ -2,8 +2,8 @@
 # Path concatenation laws
 
 Advanced associativity and unit results for concatenation in the path groupoid
-(`PathRwQuot`). These lemmas provide right-associated normal forms and triangle
-identities for nested concatenations.
+(`Path`) up to `RwEq`. These lemmas provide right-associated normal forms and
+triangle identities for nested concatenations.
 
 ## Key Results
 - `trans_four_assoc`: Four-fold associativity.
@@ -17,12 +17,12 @@ identities for nested concatenations.
 - de Queiroz et al., "Propositional equality, identity types, and direct computational paths".
 -/
 
-import Mathlib
-import ComputationalPaths.Path.Rewrite.Quot
+import ComputationalPaths.Path.PathAlgebraDerived
+import ComputationalPaths.Path.CoherenceDerived
 
 namespace ComputationalPaths.Path
 
-/-! ## Concatenation laws for `PathRwQuot` -/
+/-! ## Concatenation laws for `Path` -/
 
 namespace PathConcatenation
 
@@ -30,45 +30,37 @@ universe u
 
 variable {A : Type u} {a b c d e f : A}
 
-/-- Four-fold associativity for path concatenation in the quotient groupoid. -/
-theorem trans_four_assoc (p : PathRwQuot A a b) (q : PathRwQuot A b c)
-    (r : PathRwQuot A c d) (s : PathRwQuot A d e) :
-    PathRwQuot.trans (PathRwQuot.trans (PathRwQuot.trans p q) r) s =
-      PathRwQuot.trans p (PathRwQuot.trans q (PathRwQuot.trans r s)) := by
-  simp
+/-- Four-fold associativity for path concatenation. -/
+theorem trans_four_assoc (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s) (trans p (trans q (trans r s))) := by
+  exact PathAlgebraDerived.rweq_trans_four_assoc (p := p) (q := q) (r := r) (s := s)
 
-/-- Five-fold associativity for path concatenation in the quotient groupoid. -/
-theorem trans_five_assoc (p : PathRwQuot A a b) (q : PathRwQuot A b c)
-    (r : PathRwQuot A c d) (s : PathRwQuot A d e) (t : PathRwQuot A e f) :
-    PathRwQuot.trans
-        (PathRwQuot.trans (PathRwQuot.trans (PathRwQuot.trans p q) r) s) t =
-      PathRwQuot.trans p
-        (PathRwQuot.trans q (PathRwQuot.trans r (PathRwQuot.trans s t))) := by
-  simp
+/-- Five-fold associativity for path concatenation. -/
+theorem trans_five_assoc (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e)
+    (t : Path e f) :
+    RwEq (trans (trans (trans (trans p q) r) s) t) (trans p (trans q (trans r (trans s t)))) := by
+  exact CoherenceDerived.rweq_trans_five_assoc p q r s t
 
-/-- Triangle identity: (p * refl) * q collapses to p * q. -/
-theorem trans_triangle (p : PathRwQuot A a b) (q : PathRwQuot A b c) :
-    PathRwQuot.trans (PathRwQuot.trans p (PathRwQuot.refl (A := A) b)) q =
-      PathRwQuot.trans p q := by
-  simp
+/-- Triangle identity: (p · refl) · q collapses to p · q. -/
+theorem trans_triangle (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans p (refl b)) q) (trans p q) := by
+  exact CoherenceDerived.rweq_triangle_full p q
 
 /-- Left unit inside a nested concatenation can be removed. -/
-theorem trans_refl_left_assoc (p : PathRwQuot A a b) (q : PathRwQuot A b c) :
-    PathRwQuot.trans (PathRwQuot.trans (PathRwQuot.refl (A := A) a) p) q =
-      PathRwQuot.trans p q := by
-  simp
+theorem trans_refl_left_assoc (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans (refl a) p) q) (trans p q) := by
+  exact rweq_trans_congr_left q (PathAlgebraDerived.rweq_refl_trans p)
 
 /-- Right unit inside a nested concatenation can be removed. -/
-theorem trans_refl_right_assoc (p : PathRwQuot A a b) (q : PathRwQuot A b c) :
-    PathRwQuot.trans p (PathRwQuot.trans (PathRwQuot.refl (A := A) b) q) =
-      PathRwQuot.trans p q := by
-  simp
+theorem trans_refl_right_assoc (p : Path a b) (q : Path b c) :
+    RwEq (trans p (trans (refl b) q)) (trans p q) := by
+  exact rweq_trans_congr_right p (PathAlgebraDerived.rweq_refl_trans q)
 
 /-! ## Summary -/
 
 /-!
 This module records higher associativity and triangle-style unit identities for
-path concatenation in the strict path groupoid `PathRwQuot`.
+path concatenation in terms of `RwEq` on `Path`.
 -/
 
 end PathConcatenation

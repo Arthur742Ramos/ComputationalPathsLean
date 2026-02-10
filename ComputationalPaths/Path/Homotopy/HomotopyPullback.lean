@@ -1,65 +1,78 @@
 /-
 # Homotopy Properties of Pullback Squares
 
-This module records basic homotopy-invariance properties for pullback squares in `TopCat`.
+This module records basic homotopy-invariance properties for pullback squares in
+the computational paths setting.
 
 ## Key Results
 
-- `HomotopyPullbackSquare`: squares commuting up to homotopy.
+- `HomotopyPullbackSquare`: squares commuting up to Path-valued homotopy.
 - `HomotopyPullbackSquare.of_eq`: strict commutation gives a homotopy square.
-- `pullback_square_commutes`: the canonical pullback square in `TopCat` strictly commutes.
+- `pullback_square_commutes`: the canonical computational pullback square commutes.
 
 ## References
 
 - HoTT Book, Chapter 2 (pullbacks and homotopies).
 -/
 
-import Mathlib.Topology.Homotopy.Basic
-import Mathlib.Topology.Category.TopCat.Limits.Pullbacks
+import ComputationalPaths.Path.CompPath.PullbackPaths
+import ComputationalPaths.Path.Homotopy.HoTT
 
-open CategoryTheory
-open CategoryTheory.Limits
+namespace ComputationalPaths
+namespace Path
+namespace HomotopyPullback
+
+open HoTT
+open CompPath
+
+universe u
 
 /-! ## Definition -/
 
 /-- A pullback square that commutes up to homotopy.
-    For continuous maps f : X → Z and g : Y → Z with projections p1 : P → X and p2 : P → Y,
+    For maps f : X → Z and g : Y → Z with projections p1 : P → X and p2 : P → Y,
     the square commutes up to homotopy if f ∘ p1 is homotopic to g ∘ p2. -/
-structure HomotopyPullbackSquare {X Y Z P : Type*} [TopologicalSpace X] [TopologicalSpace Y]
-    [TopologicalSpace Z] [TopologicalSpace P] (f : C(X, Z)) (g : C(Y, Z))
-    (p1 : C(P, X)) (p2 : C(P, Y)) : Prop where
-  homotopic : ContinuousMap.Homotopic (f.comp p1) (g.comp p2)
+structure HomotopyPullbackSquare {X Y Z P : Type u}
+    (f : X → Z) (g : Y → Z) (p1 : P → X) (p2 : P → Y) : Type u where
+  /-- Pointwise homotopy witnessing the commutative square. -/
+  comm : FunHomotopy (fun p => f (p1 p)) (fun p => g (p2 p))
 
 namespace HomotopyPullbackSquare
 
 /-! ## Basic properties -/
 
 /-- A strictly commuting square yields a homotopy pullback square. -/
-theorem of_eq {X Y Z P : Type*} [TopologicalSpace X] [TopologicalSpace Y]
-    [TopologicalSpace Z] [TopologicalSpace P] {f : C(X, Z)} {g : C(Y, Z)}
-    {p1 : C(P, X)} {p2 : C(P, Y)} (h : f.comp p1 = g.comp p2) :
+def of_eq {X Y Z P : Type u} {f : X → Z} {g : Y → Z}
+    {p1 : P → X} {p2 : P → Y}
+    (h : (fun p => f (p1 p)) = (fun p => g (p2 p))) :
     HomotopyPullbackSquare f g p1 p2 where
-  homotopic := h ▸ ContinuousMap.Homotopic.refl _
+  comm := fun p =>
+    Path.ofEq (_root_.congrArg (fun k => k p) h)
 
 /-- Homotopy pullback squares are symmetric in composition order. -/
-theorem symm {X Y Z P : Type*} [TopologicalSpace X] [TopologicalSpace Y]
-    [TopologicalSpace Z] [TopologicalSpace P] {f : C(X, Z)} {g : C(Y, Z)}
-    {p1 : C(P, X)} {p2 : C(P, Y)} (h : HomotopyPullbackSquare f g p1 p2) :
-    ContinuousMap.Homotopic (g.comp p2) (f.comp p1) :=
-  h.homotopic.symm
+def symm {X Y Z P : Type u} {f : X → Z} {g : Y → Z}
+    {p1 : P → X} {p2 : P → Y} (h : HomotopyPullbackSquare f g p1 p2) :
+    FunHomotopy (fun p => g (p2 p)) (fun p => f (p1 p)) :=
+  fun p => Path.symm (h.comm p)
 
 end HomotopyPullbackSquare
 
-/-! ## Pullback square in TopCat -/
+/-! ## Pullback square in the path setting -/
 
-/-- The canonical pullback square in `TopCat` strictly commutes. -/
-theorem pullback_square_commutes {X Y Z : TopCat} (f : X ⟶ Z) (g : Y ⟶ Z) :
-    pullback.fst f g ≫ f = pullback.snd f g ≫ g :=
-  pullback.condition
+/-- The canonical pullback square in the computational pullback type commutes. -/
+def pullback_square_commutes {A B C : Type u} (f : A → C) (g : B → C) :
+    HomotopyPullbackSquare f g
+      (CompPath.Pullback.fst (f := f) (g := g))
+      (CompPath.Pullback.snd (f := f) (g := g)) where
+  comm := fun x => CompPath.Pullback.comm (f := f) (g := g) x
 
 /-! ## Summary
 
-We defined homotopy pullback squares using continuous maps and the Mathlib homotopy API,
-showed that strict commutation implies homotopy commutation, and recorded that the
-canonical pullback square in `TopCat` strictly commutes.
+We defined homotopy pullback squares using computational paths, showed that
+strict commutation yields a Path-valued homotopy, and recorded the canonical
+pullback square for the computational pullback type.
 -/
+
+end HomotopyPullback
+end Path
+end ComputationalPaths

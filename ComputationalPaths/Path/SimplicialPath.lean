@@ -31,16 +31,16 @@ structure SimplicialPath (X : Nat → Type u) where
   /-- Face maps commute. -/
   face_face :
     ∀ (n : Nat) (i j : Nat) (x : X (n + 2)),
-      face n i (face (n + 1) j x) = face n j (face (n + 1) i x)
+      Path (face n i (face (n + 1) j x)) (face n j (face (n + 1) i x))
   /-- Degeneracy maps commute. -/
   degeneracy_degeneracy :
     ∀ (n : Nat) (i j : Nat) (x : X n),
-      degeneracy (n + 1) i (degeneracy n j x) =
-        degeneracy (n + 1) j (degeneracy n i x)
+      Path (degeneracy (n + 1) i (degeneracy n j x))
+        (degeneracy (n + 1) j (degeneracy n i x))
   /-- Faces cancel degeneracies. -/
   face_degeneracy :
     ∀ (n : Nat) (i j : Nat) (x : X n),
-      face n i (degeneracy n j x) = x
+      Path (face n i (degeneracy n j x)) x
 
 /-! ## Simplicial paths -/
 
@@ -55,13 +55,13 @@ def simplicialPath (A : Type u) (a : A) :
   degeneracy := fun _ _ x => x
   face_face := by
     intro n i j x
-    rfl
+    exact Path.refl x
   degeneracy_degeneracy := by
     intro n i j x
-    rfl
+    exact Path.refl x
   face_degeneracy := by
     intro n i j x
-    rfl
+    exact Path.refl x
 
 /-! ## Summary -/
 

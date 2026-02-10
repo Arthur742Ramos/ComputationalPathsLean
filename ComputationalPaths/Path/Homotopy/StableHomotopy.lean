@@ -19,6 +19,7 @@ adjunction, and expose the basic stable stems as stable homotopy groups.
 -/
 
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
+import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
 import ComputationalPaths.Path.Homotopy.StableStems
 
 namespace ComputationalPaths
@@ -28,6 +29,7 @@ namespace StableHomotopy
 
 open SuspensionLoop
 open LoopSpaceAdjunction
+open LoopSpaceSuspension
 
 universe u
 
@@ -76,6 +78,27 @@ noncomputable def pathSpectrum (X : Pointed) : Spectrum :=
 
 /-! ## Stabilized suspension-loop adjunction -/
 
+/-- Identity path equivalence. -/
+def pathSimpleEquivRefl (α : Type u) : PathSimpleEquiv α α :=
+  { toFun := id
+    invFun := id
+    left_inv := fun x => Path.refl x
+    right_inv := fun x => Path.refl x }
+
+/-- Composition of path equivalences. -/
+def pathSimpleEquivComp {α β γ : Type u} (e : PathSimpleEquiv α β)
+    (f : PathSimpleEquiv β γ) : PathSimpleEquiv α γ :=
+  { toFun := fun x => f.toFun (e.toFun x)
+    invFun := fun z => e.invFun (f.invFun z)
+    left_inv := fun x =>
+      Path.trans
+        (Path.congrArg e.invFun (f.left_inv (e.toFun x)))
+        (e.left_inv x)
+    right_inv := fun z =>
+      Path.trans
+        (Path.congrArg f.toFun (e.right_inv (f.invFun z)))
+        (f.right_inv z) }
+
 /-- n-fold suspension as a pointed type (Sigma^n X). -/
 noncomputable def iteratedSigmaPointed : Nat → Pointed → Pointed
   | 0, X => X
@@ -89,20 +112,22 @@ def iteratedOmegaEqPointed : Nat → Pointed → Pointed
 /-- Stabilized suspension-loop adjunction by iterated application. -/
 noncomputable def stableAdjunction :
     (n : Nat) → (X Y : Pointed) →
-      SimpleEquiv (PointedMap (iteratedSigmaPointed n X) Y)
+      PathSimpleEquiv (PointedMap (iteratedSigmaPointed n X) Y)
         (PointedMap X (iteratedOmegaEqPointed n Y))
-  | 0, _, _ => SimpleEquiv.refl _
+  | 0, _, _ => pathSimpleEquivRefl _
   | n + 1, X, Y =>
-      SimpleEquiv.comp
-        (suspLoopAdjunction (X := iteratedSigmaPointed n X) (Y := Y))
+      pathSimpleEquivComp
+        (loopSpaceSuspensionAdjunction (X := iteratedSigmaPointed n X) (Y := Y))
         (stableAdjunction n X (omegaEqPointed Y))
 
 /-- Unfolding equation for the stabilized adjunction. -/
-theorem stableAdjunction_succ (n : Nat) (X Y : Pointed) :
-    stableAdjunction (n + 1) X Y =
-      SimpleEquiv.comp
-        (suspLoopAdjunction (X := iteratedSigmaPointed n X) (Y := Y))
-        (stableAdjunction n X (omegaEqPointed Y)) := rfl
+def stableAdjunction_succ (n : Nat) (X Y : Pointed) :
+    Path
+      (stableAdjunction (n + 1) X Y)
+      (pathSimpleEquivComp
+        (loopSpaceSuspensionAdjunction (X := iteratedSigmaPointed n X) (Y := Y))
+        (stableAdjunction n X (omegaEqPointed Y))) :=
+  Path.ofEq rfl
 
 /-! ## Stable homotopy groups of spheres (basic stems) -/
 
@@ -120,54 +145,58 @@ def StablePi : Nat → Type
   | _ => Unit
 
 /-- pi_s_1 is Z2. -/
-theorem stablePi_one_def : StablePi 1 = StableStems.Z2 := rfl
+def stablePi_one_def : Path (StablePi 1) StableStems.Z2 :=
+  Path.ofEq rfl
 
 /-- pi_s_2 is Z2. -/
-theorem stablePi_two_def : StablePi 2 = StableStems.Z2 := rfl
+def stablePi_two_def : Path (StablePi 2) StableStems.Z2 :=
+  Path.ofEq rfl
 
 /-- pi_s_3 is Z24. -/
-theorem stablePi_three_def : StablePi 3 = StableStems.Z24 := rfl
+def stablePi_three_def : Path (StablePi 3) StableStems.Z24 :=
+  Path.ofEq rfl
 
 /-- pi_s_4 is trivial. -/
-theorem stablePi_four_trivial : ∀ x : StablePi 4, x = () :=
-  StableStems.stableStem4_trivial
+def stablePi_four_trivial : ∀ x : StablePi 4, Path x () := fun x =>
+  Path.ofEq (StableStems.stableStem4_trivial x)
 
 /-- pi_s_5 is trivial. -/
-theorem stablePi_five_trivial : ∀ x : StablePi 5, x = () :=
-  StableStems.stableStem5_trivial
+def stablePi_five_trivial : ∀ x : StablePi 5, Path x () := fun x =>
+  Path.ofEq (StableStems.stableStem5_trivial x)
 
 /-- pi_s_7 is Z240. -/
-theorem stablePi_seven_def : StablePi 7 = StableStems.Z240 := rfl
+def stablePi_seven_def : Path (StablePi 7) StableStems.Z240 :=
+  Path.ofEq rfl
 
 /-- The eta class has order two in the first stable stem. -/
-theorem stablePi_one_two_torsion :
-    (2 : Nat) • StableStems.eta = (0 : StableStems.StableStem1) :=
-  StableStems.two_eta_zero
+def stablePi_one_two_torsion :
+    Path ((2 : Nat) • StableStems.eta) (0 : StableStems.StableStem1) :=
+  Path.ofEq StableStems.two_eta_zero
 
 /-- The eta-squared class has order two in the second stable stem. -/
-theorem stablePi_two_two_torsion :
-    (2 : Nat) • StableStems.etaSquared = (0 : StableStems.StableStem2) :=
-  StableStems.two_etaSquared_zero
+def stablePi_two_two_torsion :
+    Path ((2 : Nat) • StableStems.etaSquared) (0 : StableStems.StableStem2) :=
+  Path.ofEq StableStems.two_etaSquared_zero
 
 /-- The nu class has order twenty-four in the third stable stem. -/
-theorem stablePi_three_twentyfour_torsion :
-    (24 : Nat) • StableStems.nu = (0 : StableStems.StableStem3) :=
-  StableStems.twentyfour_nu_zero
+def stablePi_three_twentyfour_torsion :
+    Path ((24 : Nat) • StableStems.nu) (0 : StableStems.StableStem3) :=
+  Path.ofEq StableStems.twentyfour_nu_zero
 
 /-- The sigma class has order two hundred forty in the seventh stable stem. -/
-theorem stablePi_seven_twohundredforty_torsion :
-    (240 : Nat) • StableStems.sigma = (0 : StableStems.StableStem7) :=
-  StableStems.twohundredforty_sigma_zero
+def stablePi_seven_twohundredforty_torsion :
+    Path ((240 : Nat) • StableStems.sigma) (0 : StableStems.StableStem7) :=
+  Path.ofEq StableStems.twohundredforty_sigma_zero
 
 /-- pi_s_8 is generated by a Z2 x Z2 basis. -/
-theorem stablePi_eight_generators :
-    ∀ x : StablePi 8, ∃ a b : StableStems.Z2, x = (a, b) :=
-  StableStems.stableStem8_generators
+def stablePi_eight_generators :
+    ∀ x : StablePi 8, Σ a b : StableStems.Z2, Path x (a, b)
+  | (a, b) => ⟨a, b, Path.refl (a, b)⟩
 
 /-- pi_s_9 is generated by a Z2 x Z2 x Z2 basis. -/
-theorem stablePi_nine_generators :
-    ∀ x : StablePi 9, ∃ a b c : StableStems.Z2, x = (a, b, c) :=
-  StableStems.stableStem9_generators
+def stablePi_nine_generators :
+    ∀ x : StablePi 9, Σ a b c : StableStems.Z2, Path x (a, b, c)
+  | (a, b, c) => ⟨a, b, c, Path.refl (a, b, c)⟩
 
 /-! ## Summary -/
 

@@ -125,12 +125,9 @@ the same composite up to a rewrite-equality 2-cell. -/
     TwoCell (A := A) (a := a) (b := e)
       (Path.trans (Path.trans (Path.trans p q) r) s)
       (Path.trans p (Path.trans q (Path.trans r s))) := by
-  classical
-  have h :
-      Path.trans (Path.trans (Path.trans p q) r) s =
-        Path.trans p (Path.trans q (Path.trans r s)) := by
-    simp
-  exact rweq_of_eq (A := A) (a := a) (b := e) h
+  apply rweq_trans (rweq_trans_congr_left (q := s) (rweq_tt p q r))
+  apply rweq_trans (rweq_tt p (Path.trans q r) s)
+  exact rweq_trans_congr_right p (rweq_tt q r s)
 
 /-- Triangle coherence: inserting a reflexive path behaves as the identity
 up to a rewrite-equality 2-cell. -/
@@ -139,12 +136,7 @@ up to a rewrite-equality 2-cell. -/
     TwoCell (A := A) (a := a) (b := c)
       (Path.trans (Path.trans p (Path.refl b)) q)
       (Path.trans p q) := by
-  classical
-  have h :
-      Path.trans (Path.trans p (Path.refl b)) q =
-        Path.trans p q := by
-    simp
-  exact rweq_of_eq (A := A) (a := a) (b := c) h
+  exact rweq_trans_congr_left (q := q) (rweq_cmpA_refl_right p)
 
 /-- The two standard ways of composing four 2-cells coincide.  Since
 `TwoCell` values live in `Prop`, the equality follows from proof
