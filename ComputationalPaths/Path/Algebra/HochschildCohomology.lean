@@ -104,14 +104,14 @@ def CochainPath {n : Nat} (f g : HochschildCochain A n) : Type u :=
   ∀ x, Path (f x) (g x)
 
 /-- Reflexivity of pointwise `Path`. -/
-def cochainPath_refl {n : Nat} (f : HochschildCochain A n) : CochainPath (Alg := Alg) f f :=
+def cochainPath_refl {n : Nat} (f : HochschildCochain A n) : CochainPath f f :=
   fun x => Path.refl (f x)
 
 /-- Build a pointwise `Path` from definitional equality. -/
 def cochainPath_ofEq {n : Nat} {f g : HochschildCochain A n} (h : f = g) :
-    CochainPath (Alg := Alg) f g := by
-  intro x
-  exact Path.ofEq (by simpa using congrArg (fun k => k x) h)
+    CochainPath f g := by
+  subst h
+  exact cochainPath_refl f
 
 /-! ## Differentials and cocycles -/
 
@@ -148,7 +148,7 @@ structure HochschildCocycle (A : Type u) (Alg : HochschildAlgebra A)
 def cocycleRel {A : Type u} {Alg : HochschildAlgebra A}
     {D : HochschildDifferential A Alg} {n : Nat}
     (f g : HochschildCocycle A Alg D n) : Prop :=
-  Nonempty (CochainPath (Alg := Alg) f.cochain g.cochain)
+  Nonempty (CochainPath f.cochain g.cochain)
 
 /-- Hochschild cohomology as a quotient by pointwise `Path`. -/
 def HochschildCohomology (A : Type u) (Alg : HochschildAlgebra A)
