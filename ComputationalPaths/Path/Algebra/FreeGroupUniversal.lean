@@ -16,7 +16,7 @@ its specialization to the fundamental group `π₁(A, a)` from computational pat
 - Hatcher, *Algebraic Topology*, Section 1.2
 -/
 
-import Mathlib/GroupTheory/FreeGroup
+import Mathlib.GroupTheory.FreeGroup.Basic
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 
 namespace ComputationalPaths
@@ -38,15 +38,17 @@ abbrev freeGroupUniversal : (α → G) ≃ (_root_.FreeGroup α →* G) :=
 
 /-- The universal lift agrees with the generator map on `FreeGroup.of`. -/
 @[simp] theorem freeGroupUniversal_apply_of (f : α → G) (a : α) :
-    freeGroupUniversal (α := α) (G := G) f (_root_.FreeGroup.of a) = f a := by
-  simpa using (_root_.FreeGroup.lift_apply_of (f := f) (x := a))
+    Path (freeGroupUniversal (α := α) (G := G) f (_root_.FreeGroup.of a)) (f a) := by
+  exact Path.ofEq <| by
+    simpa using (_root_.FreeGroup.lift_apply_of (f := f) (x := a))
 
 /-- Uniqueness: a homomorphism out of a free group is determined by its values on generators. -/
 theorem freeGroupUniversal_unique (f : α → G) (g : _root_.FreeGroup α →* G)
-    (hg : ∀ a, g (_root_.FreeGroup.of a) = f a) :
-    g = freeGroupUniversal (α := α) (G := G) f := by
+    (hg : ∀ a, Path (g (_root_.FreeGroup.of a)) (f a)) :
+    Path g (freeGroupUniversal (α := α) (G := G) f) := by
+  refine Path.ofEq ?_
   ext x
-  exact _root_.FreeGroup.lift_unique (f := f) g hg
+  exact _root_.FreeGroup.lift_unique (f := f) g (fun a => (hg a).toEq)
 
 end UniversalProperty
 
@@ -72,16 +74,18 @@ def piOneFreeGroupLift {ι : Type v} (f : ι → π₁(A, a)) :
 
 /-- The free-group lift to `π₁(A, a)` agrees with the generator map. -/
 @[simp] theorem piOneFreeGroupLift_of {ι : Type v} (f : ι → π₁(A, a)) (i : ι) :
-    piOneFreeGroupLift (A := A) (a := a) f (_root_.FreeGroup.of i) = f i := by
-  simpa using (_root_.FreeGroup.lift_apply_of (f := f) (x := i))
+    Path (piOneFreeGroupLift (A := A) (a := a) f (_root_.FreeGroup.of i)) (f i) := by
+  exact Path.ofEq <| by
+    simpa using (_root_.FreeGroup.lift_apply_of (f := f) (x := i))
 
 /-- Uniqueness of the free-group lift into `π₁(A, a)`. -/
 theorem piOneFreeGroupLift_unique {ι : Type v} (f : ι → π₁(A, a))
     (g : _root_.FreeGroup ι →* π₁(A, a))
-    (hg : ∀ i, g (_root_.FreeGroup.of i) = f i) :
-    g = piOneFreeGroupLift (A := A) (a := a) f := by
+    (hg : ∀ i, Path (g (_root_.FreeGroup.of i)) (f i)) :
+    Path g (piOneFreeGroupLift (A := A) (a := a) f) := by
+  refine Path.ofEq ?_
   ext x
-  exact _root_.FreeGroup.lift_unique (f := f) g hg
+  exact _root_.FreeGroup.lift_unique (f := f) g (fun i => (hg i).toEq)
 
 end PiOneApplication
 

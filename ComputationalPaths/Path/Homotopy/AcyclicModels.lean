@@ -1,14 +1,18 @@
 /-
 # Acyclic Models and Homology
 
-This module formalizes a retract-style acyclic models theorem for functors into
-homological complexes, and records homology-vanishing applications.
+This module formalizes a retract-style acyclic models theorem for the
+computational paths homology of 3-term chain complexes. We package a
+Path-based notion of zero objects and retracts, then show that retracts of
+acyclic models have trivial homology.
 
 ## Key Results
 
+- `IsZero`: Path-based notion of a zero type.
+- `Retract`: retracts witnessed by paths.
 - `AcyclicModelsData`: acyclic models with retract coverage.
 - `acyclic_models_homology_isZero`: homology vanishes under acyclic models.
-- `homology_functor_isZero`: the induced homology functor is zero.
+- `homology_functor_isZero`: objectwise zero homology.
 
 ## References
 
@@ -16,92 +20,83 @@ homological complexes, and records homology-vanishing applications.
 - Weibel, "An Introduction to Homological Algebra"
 -/
 
-import Mathlib
+import ComputationalPaths.Path.Homotopy.PathHomology
 
 namespace ComputationalPaths
 namespace Path
 namespace Homotopy
 namespace AcyclicModels
 
-open CategoryTheory
-open CategoryTheory.Limits
+open HomologicalAlgebra PathHomology
 
-universe u v w w'
+universe u v w
 
-variable {C : Type u} [Category C]
-variable {V : Type v} [Category V] [HasZeroMorphisms V] [CategoryWithHomology V]
-variable {ι : Type w} {c : ComplexShape ι}
+variable {C : Type u}
 
 /-! ## Retracts and zero objects -/
 
+/-- A type is zero if it has a chosen element and all elements are path-connected to it. -/
+structure IsZero (A : Type u) where
+  /-- The chosen zero element. -/
+  zero : A
+  /-- Every element is path-connected to zero. -/
+  eq_zero : (a : A) → Path a zero
+
+/-- A retract between types, witnessed by a section in the sense of paths. -/
+structure Retract (X Y : Type u) where
+  /-- Inclusion into the model. -/
+  i : X → Y
+  /-- Retraction back to the object. -/
+  r : Y → X
+  /-- The retraction is a left inverse up to paths. -/
+  sectionPath : (x : X) → Path (r (i x)) x
+
 /-- `IsZero` is stable under retracts. -/
-theorem isZero_of_retract {X Y : V} (hY : IsZero Y) (h : Retract X Y) : IsZero X := by
-  refine ⟨?unique_to, ?unique_from⟩
-  · intro Z
-    refine ⟨⟨⟨h.i ≫ hY.to_ Z⟩, ?_⟩⟩
-    intro f
-    have huniq : h.r ≫ f = hY.to_ Z := hY.eq_of_src _ _
-    calc
-      f = (𝟙 X) ≫ f := by simp
-      _ = (h.i ≫ h.r) ≫ f := by simpa
-      _ = h.i ≫ (h.r ≫ f) := by simp [Category.assoc]
-      _ = h.i ≫ hY.to_ Z := by simp [huniq]
-  · intro Z
-    refine ⟨⟨⟨hY.from_ Z ≫ h.r⟩, ?_⟩⟩
-    intro f
-    have huniq : f ≫ h.i = hY.from_ Z := hY.eq_of_tgt _ _
-    calc
-      f = f ≫ (𝟙 X) := by simp
-      _ = f ≫ (h.i ≫ h.r) := by simpa
-      _ = (f ≫ h.i) ≫ h.r := by simp [Category.assoc]
-      _ = hY.from_ Z ≫ h.r := by simp [huniq]
+def isZero_of_retract {X Y : Type u} (hY : IsZero Y) (h : Retract X Y) :
+    IsZero X := by
+  refine ⟨h.r hY.zero, ?_⟩
+  intro x
+  have hzero : Path (h.i x) hY.zero := hY.eq_zero (h.i x)
+  have hmap : Path (h.r (h.i x)) (h.r hY.zero) :=
+    Path.congrArg h.r hzero
+  exact Path.trans (Path.symm (h.sectionPath x)) hmap
 
 /-! ## Acyclic models data -/
 
-/-- Data for a retract-style acyclic models hypothesis on a functor. -/
-structure AcyclicModelsData (F : C ⥤ HomologicalComplex V c) where
+/-- Data for a retract-style acyclic models hypothesis on a family of chain complexes. -/
+structure AcyclicModelsData (F : C → ChainComplex3.{v}) where
   /-- The type of models. -/
-  Model : Type w'
-  /-- Models as objects of the source category. -/
+  Model : Type w
+  /-- Models as objects of the source type. -/
   modelObj : Model → C
-  /-- Every object is a retract of a model. -/
-  retract : ∀ X : C, Σ m : Model, Retract X (modelObj m)
-  /-- Model values are acyclic homological complexes. -/
-  acyclic : ∀ m : Model, (F.obj (modelObj m)).Acyclic
+  /-- Every object retracts onto a model at the homology level. -/
+  retract :
+    ∀ X : C, Σ m : Model, Retract (Homology (F X)) (Homology (F (modelObj m)))
+  /-- Model values are acyclic (homology is zero). -/
+  acyclic : ∀ m : Model, IsZero (Homology (F (modelObj m)))
 
 /-! ## Acyclic models theorem -/
 
-/-- Acyclic models theorem: retracts of acyclic models have vanishing homology. -/
-theorem acyclic_models_homology_isZero {F : C ⥤ HomologicalComplex V c}
-    (data : AcyclicModelsData (F := F)) (X : C) (i : ι) :
-    IsZero ((F.obj X).homology i) := by
+/-- Acyclic models theorem: retracts of acyclic models have zero homology. -/
+def acyclic_models_homology_isZero {F : C → ChainComplex3.{v}}
+    (data : AcyclicModelsData (F := F)) (X : C) :
+    IsZero (Homology (F X)) := by
   rcases data.retract X with ⟨m, h⟩
-  have hModelZero : IsZero ((F.obj (data.modelObj m)).homology i) := by
-    have hExact : (F.obj (data.modelObj m)).ExactAt i := (data.acyclic m) i
-    exact HomologicalComplex.ExactAt.isZero_homology
-      (K := F.obj (data.modelObj m)) (i := i) hExact
-  have hRetract : Retract (F.obj X) (F.obj (data.modelObj m)) := h.map F
-  have hRetractHomology :
-      Retract ((F.obj X).homology i) ((F.obj (data.modelObj m)).homology i) := by
-    simpa using
-      (Retract.map (F := HomologicalComplex.homologyFunctor (C := V) (c := c) (i := i))
-        hRetract)
-  exact isZero_of_retract hModelZero hRetractHomology
+  exact isZero_of_retract (data.acyclic m) h
 
 /-! ## Applications to homology -/
 
-/-- The homology functor of an acyclic-models functor is zero. -/
-theorem homology_functor_isZero {F : C ⥤ HomologicalComplex V c}
-    (data : AcyclicModelsData (F := F)) (i : ι) :
-    IsZero (F ⋙ HomologicalComplex.homologyFunctor (C := V) (c := c) (i := i)) := by
-  apply Functor.isZero
+/-- The homology family of an acyclic-models functor is zero objectwise. -/
+def homology_functor_isZero {F : C → ChainComplex3.{v}}
+    (data : AcyclicModelsData (F := F)) :
+    ∀ X : C, IsZero (Homology (F X)) := by
   intro X
-  simpa using acyclic_models_homology_isZero (data := data) (X := X) (i := i)
+  exact acyclic_models_homology_isZero (data := data) (X := X)
 
 /-! ## Summary
 
 We package a retract-based acyclic models hypothesis and show that it forces
-homology to vanish objectwise, yielding a zero homology functor.
+homology to vanish objectwise, yielding a zero homology family.
 -/
 
 end AcyclicModels

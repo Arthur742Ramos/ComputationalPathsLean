@@ -3,13 +3,13 @@
 
 This module packages the long exact sequence on homotopy groups (at the π₁ level)
 for a type-family fibration, reusing the constructions already available in
-`Fibration` and `LongExactSequence` while keeping a Mathlib-friendly import.
+`Fibration` and `LongExactSequence` inside the computational-paths framework.
 
 ## Key Results
 
 - `longExactSequencePi1`: the π₁ long exact sequence for a fibration
 - `connectingHomomorphism`: the boundary map in the sequence
-- `exact_at_totalSpace`, `exact_at_base`: exactness at the middle terms
+- `exact_at_totalSpace`, `exact_at_base`: Path witnesses of exactness at the middle terms
 
 ## References
 
@@ -17,7 +17,6 @@ for a type-family fibration, reusing the constructions already available in
 - May, "A Concise Course in Algebraic Topology"
 -/
 
-import Mathlib
 import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Homotopy.LongExactSequence
 
@@ -43,19 +42,24 @@ noncomputable def connectingHomomorphism {B : Type u} {P : B → Type u} (b : B)
   LongExactSequence.connectingHomomorphism (P := P) b x₀
 
 /-- Exactness at the total space term of the π₁ long exact sequence. -/
-theorem exact_at_totalSpace {B : Type u} {P : B → Type u} (b : B) (x₀ : P b) :
+noncomputable def exact_at_totalSpace {B : Type u} {P : B → Type u} (b : B) (x₀ : P b) :
     ∀ α : π₁(P b, x₀),
-      (longExactSequencePi1 (P := P) b x₀).proj_star
-          ((longExactSequencePi1 (P := P) b x₀).incl_star α) =
-        Quot.mk _ (Path.refl b) :=
-  (longExactSequencePi1 (P := P) b x₀).exact_at_E
+      Path
+        ((longExactSequencePi1 (P := P) b x₀).proj_star
+          ((longExactSequencePi1 (P := P) b x₀).incl_star α))
+        (Quot.mk _ (Path.refl b)) := by
+  intro α
+  exact Path.ofEq ((longExactSequencePi1 (P := P) b x₀).exact_at_E α)
 
 /-- Exactness at the base term of the π₁ long exact sequence. -/
-theorem exact_at_base {B : Type u} {P : B → Type u} (b : B) (x₀ : P b) :
+noncomputable def exact_at_base {B : Type u} {P : B → Type u} (b : B) (x₀ : P b) :
     ∀ β : π₁(Total (P := P), ⟨b, x₀⟩),
-      (longExactSequencePi1 (P := P) b x₀).boundary
-          ((longExactSequencePi1 (P := P) b x₀).proj_star β) = x₀ :=
-  (longExactSequencePi1 (P := P) b x₀).exact_at_B
+      Path
+        ((longExactSequencePi1 (P := P) b x₀).boundary
+          ((longExactSequencePi1 (P := P) b x₀).proj_star β))
+        x₀ := by
+  intro β
+  exact Path.ofEq ((longExactSequencePi1 (P := P) b x₀).exact_at_B β)
 
 /-! ## Summary
 

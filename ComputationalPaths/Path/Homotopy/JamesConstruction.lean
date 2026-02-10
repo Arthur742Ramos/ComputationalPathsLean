@@ -19,7 +19,7 @@ suspension.
 - HoTT Book, Chapter 8
 -/
 
-import Mathlib
+import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.Loops
 
@@ -139,15 +139,19 @@ noncomputable def jamesToLoop (X : SuspensionLoop.Pointed) :
       simpa [JamesRel] using _root_.congrArg (fun t => loopOfList X t) h)
 
 /-- Basepoint is sent to the reflexivity loop. -/
-theorem jamesToLoop_base (X : SuspensionLoop.Pointed) :
-    jamesToLoop X (jamesBase X) =
-      Path.refl (Suspension.north (X := X.carrier)) := by
+def jamesToLoop_base (X : SuspensionLoop.Pointed) :
+    Path
+      (jamesToLoop X (jamesBase X))
+      (Path.refl (Suspension.north (X := X.carrier))) := by
+  apply Path.ofEq
   simp [jamesToLoop, jamesBase, loopOfList, reduceList]
 
 /-- Concatenation in the James construction maps to loop composition. -/
-theorem jamesToLoop_mul (X : SuspensionLoop.Pointed) (a b : JamesConstruction X) :
-    jamesToLoop X (jamesMul X a b) =
-      LoopSpace.comp (jamesToLoop X a) (jamesToLoop X b) := by
+def jamesToLoop_mul (X : SuspensionLoop.Pointed) (a b : JamesConstruction X) :
+    Path
+      (jamesToLoop X (jamesMul X a b))
+      (LoopSpace.comp (jamesToLoop X a) (jamesToLoop X b)) := by
+  apply Path.ofEq
   refine Quot.inductionOn a ?_
   intro l1
   refine Quot.inductionOn b ?_

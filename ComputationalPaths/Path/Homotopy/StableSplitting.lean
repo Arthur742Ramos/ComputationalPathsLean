@@ -90,16 +90,16 @@ structure PtdEquiv (X Y : PtdType.{u}) where
   /-- Inverse pointed map. -/
   invMap : PtdMap Y X
   /-- Left inverse law. -/
-  left_inv : PtdMap.comp invMap toMap = PtdMap.id X
+  left_inv : Path (PtdMap.comp invMap toMap) (PtdMap.id X)
   /-- Right inverse law. -/
-  right_inv : PtdMap.comp toMap invMap = PtdMap.id Y
+  right_inv : Path (PtdMap.comp toMap invMap) (PtdMap.id Y)
 
 /-- Identity pointed equivalence. -/
 def PtdEquiv.refl (X : PtdType.{u}) : PtdEquiv X X where
   toMap := PtdMap.id X
   invMap := PtdMap.id X
-  left_inv := by simp
-  right_inv := by simp
+  left_inv := Path.ofEq (PtdMap.id_comp (PtdMap.id X))
+  right_inv := Path.ofEq (PtdMap.comp_id (PtdMap.id X))
 
 /-! ## Stable splitting data -/
 

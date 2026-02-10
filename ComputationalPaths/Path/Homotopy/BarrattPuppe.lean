@@ -17,7 +17,6 @@ of the Puppe sequence associated to a map `f : A → B`.
 - May, "A Concise Course in Algebraic Topology", Chapter 9
 -/
 
-import Mathlib
 import ComputationalPaths.Path.Homotopy.CofiberSequence
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 
@@ -49,14 +48,16 @@ def suspensionMap (f : A → B) : Suspension A → Suspension B :=
           exact (Suspension.merid (X := B) (f a)).toEq)
 
 /-- `suspensionMap` sends the north pole to the north pole. -/
-@[simp] theorem suspensionMap_north (f : A → B) :
-    suspensionMap f (Suspension.north (X := A)) = Suspension.north (X := B) :=
-  rfl
+def suspensionMap_north (f : A → B) :
+    Path (suspensionMap f (Suspension.north (X := A)))
+      (Suspension.north (X := B)) :=
+  Path.refl _
 
 /-- `suspensionMap` sends the south pole to the south pole. -/
-@[simp] theorem suspensionMap_south (f : A → B) :
-    suspensionMap f (Suspension.south (X := A)) = Suspension.south (X := B) :=
-  rfl
+def suspensionMap_south (f : A → B) :
+    Path (suspensionMap f (Suspension.south (X := A)))
+      (Suspension.south (X := B)) :=
+  Path.refl _
 
 /-! ## Barratt-Puppe sequence data -/
 

@@ -2,13 +2,14 @@
 # CW Complex Homotopy and Cellular Approximation
 
 This module introduces cellular maps between CW complexes using Mathlib's CW complex API and
-packages the data of a cellular approximation of a continuous map.
+packages the data of a cellular approximation of a continuous map using computational-path
+homotopies.
 
 ## Key Results
 
 - `IsCellularMap`: continuous maps preserving all skeleta.
 - `cellular_id`, `cellular_comp`, `cellular_mapsTo_complex`: basic closure properties.
-- `CellularApproximation`: data of a cellular map homotopic to a given map.
+- `CellularApproximation`: data of a cellular map Path-homotopic to a given map.
 - `cellularApproximation_of_cellular`: trivial approximation for a cellular map.
 
 ## References
@@ -17,7 +18,7 @@ packages the data of a cellular approximation of a continuous map.
 -/
 
 import Mathlib.Topology.CWComplex.Classical.Basic
-import Mathlib.Topology.Homotopy.Basic
+import ComputationalPaths.Path.Homotopy.HoTT
 
 namespace ComputationalPaths
 namespace Path
@@ -25,6 +26,7 @@ namespace CWComplexHomotopy
 
 open Topology
 open scoped Topology
+open HoTT
 
 universe u v w
 
@@ -69,18 +71,18 @@ structure CellularApproximation (f : ContinuousMap X Y) : Type (max u v) where
   /-- The approximating map is cellular. -/
   cellular : IsCellularMap C D map
   /-- The approximating map is homotopic to the original map. -/
-  homotopic : ContinuousMap.Homotopic map f
+  homotopic : map ~ᵖ f
 
 /-- A cellular map gives a tautological cellular approximation. -/
 def cellularApproximation_of_cellular {f : ContinuousMap X Y}
     (hf : IsCellularMap C D f) :
     CellularApproximation (C := C) (D := D) f :=
-  { map := f, cellular := hf, homotopic := ContinuousMap.Homotopic.refl _ }
+  { map := f, cellular := hf, homotopic := homotopy_refl (f := f) }
 
 /-! ## Summary
 
 We introduced cellular maps between CW complexes as maps preserving each skeleton, proved
-closure under identity and composition, and packaged cellular approximations as homotopies
+closure under identity and composition, and packaged cellular approximations as Path homotopies
 from a cellular map to a given map.
 -/
 

@@ -51,15 +51,20 @@ structure BiGradedGroup where
   /-- Negation at each bidegree -/
   neg : ∀ s t, carrier s t → carrier s t
   /-- Addition is associative -/
-  add_assoc : ∀ s t (a b c : carrier s t), add s t (add s t a b) c = add s t a (add s t b c)
+  add_assoc : ∀ s t (a b c : carrier s t),
+    Path (add s t (add s t a b) c) (add s t a (add s t b c))
   /-- Zero is left identity -/
-  zero_add : ∀ s t (a : carrier s t), add s t (zero s t) a = a
+  zero_add : ∀ s t (a : carrier s t),
+    Path (add s t (zero s t) a) a
   /-- Zero is right identity -/
-  add_zero : ∀ s t (a : carrier s t), add s t a (zero s t) = a
+  add_zero : ∀ s t (a : carrier s t),
+    Path (add s t a (zero s t)) a
   /-- Left inverse -/
-  add_left_neg : ∀ s t (a : carrier s t), add s t (neg s t a) a = zero s t
+  add_left_neg : ∀ s t (a : carrier s t),
+    Path (add s t (neg s t a) a) (zero s t)
   /-- Right inverse -/
-  add_right_neg : ∀ s t (a : carrier s t), add s t a (neg s t a) = zero s t
+  add_right_neg : ∀ s t (a : carrier s t),
+    Path (add s t a (neg s t a)) (zero s t)
 
 namespace BiGradedGroup
 
@@ -81,10 +86,12 @@ structure Differential (G : BiGradedGroup) (r : Nat) where
   /-- The differential map d_r : E_r^{s,t} → E_r^{s+r,t+r-1} -/
   map : ∀ s t, G.carrier s t → G.carrier (s + r) (t + r - 1)
   /-- d_r is a group homomorphism: preserves zero -/
-  map_zero : ∀ s t, map s t (G.zero s t) = G.zero (s + r) (t + r - 1)
+  map_zero : ∀ s t,
+    Path (map s t (G.zero s t)) (G.zero (s + r) (t + r - 1))
   /-- d_r is a group homomorphism: preserves addition -/
-  map_add : ∀ s t (a b : G.carrier s t), 
-    map s t (G.add s t a b) = G.add (s + r) (t + r - 1) (map s t a) (map s t b)
+  map_add : ∀ s t (a b : G.carrier s t),
+    Path (map s t (G.add s t a b))
+      (G.add (s + r) (t + r - 1) (map s t a) (map s t b))
 
 /-- A spectral sequence page E_r -/
 structure SpectralSequencePage (r : Nat) where
@@ -113,12 +120,14 @@ This is what allows us to take homology.
 class HasDifferentialSquaredZero {r : Nat} (E : SpectralSequencePage r) where
   /-- d_{s+r,t+r-1} ∘ d_{s,t} = 0 for all s, t -/
   d_squared_zero : ∀ s t (x : E.groups.carrier s t),
-    E.d (s + r) (t + r - 1) (E.d s t x) = E.groups.zero (s + r + r) (t + r - 1 + r - 1)
+    Path (E.d (s + r) (t + r - 1) (E.d s t x))
+      (E.groups.zero (s + r + r) (t + r - 1 + r - 1))
 
 /-- The main theorem: d ∘ d = 0 -/
-theorem differential_squared_zero {r : Nat} (E : SpectralSequencePage r) 
+def differential_squared_zero {r : Nat} (E : SpectralSequencePage r) 
     [h : HasDifferentialSquaredZero E] (s t : Nat) (x : E.groups.carrier s t) :
-    E.d (s + r) (t + r - 1) (E.d s t x) = E.groups.zero (s + r + r) (t + r - 1 + r - 1) :=
+    Path (E.d (s + r) (t + r - 1) (E.d s t x))
+      (E.groups.zero (s + r + r) (t + r - 1 + r - 1)) :=
   h.d_squared_zero s t x
 
 /-! ## Connection to Stable Homotopy
@@ -154,17 +163,17 @@ def trivialBiGradedGroup : BiGradedGroup where
   zero := fun _ _ => ()
   add := fun _ _ _ _ => ()
   neg := fun _ _ _ => ()
-  add_assoc := fun _ _ _ _ _ => rfl
-  zero_add := fun _ _ _ => rfl
-  add_zero := fun _ _ _ => rfl
-  add_left_neg := fun _ _ _ => rfl
-  add_right_neg := fun _ _ _ => rfl
+  add_assoc := fun _ _ _ _ _ => Path.ofEq rfl
+  zero_add := fun _ _ _ => Path.ofEq rfl
+  add_zero := fun _ _ _ => Path.ofEq rfl
+  add_left_neg := fun _ _ _ => Path.ofEq rfl
+  add_right_neg := fun _ _ _ => Path.ofEq rfl
 
 /-- The zero differential on the trivial group -/
 def trivialDifferential (r : Nat) : Differential trivialBiGradedGroup r where
   map := fun _ _ _ => ()
-  map_zero := fun _ _ => rfl
-  map_add := fun _ _ _ _ => rfl
+  map_zero := fun _ _ => Path.ofEq rfl
+  map_add := fun _ _ _ _ => Path.ofEq rfl
 
 /-- The trivial spectral sequence page -/
 def trivialPage (r : Nat) : SpectralSequencePage r where
@@ -173,7 +182,7 @@ def trivialPage (r : Nat) : SpectralSequencePage r where
 
 /-- The trivial page satisfies d ∘ d = 0 -/
 instance (r : Nat) : HasDifferentialSquaredZero (trivialPage r) where
-  d_squared_zero := fun _ _ _ => rfl
+  d_squared_zero := fun _ _ _ => Path.ofEq rfl
 
 end AdamsSpectralSequence
 end Path

@@ -1,14 +1,13 @@
 /-
 # Loop-Suspension Adjunction (Pointed Spaces)
 
-This module packages the loop-suspension adjunction for pointed spaces in a
-Mathlib-friendly form, reusing the adjunction maps already constructed in
-`LoopSpaceAdjunction`.
+This module packages the loop-suspension adjunction for pointed spaces using
+the computational-path `Path` equality. It reuses the adjunction maps already
+constructed in `LoopSpaceAdjunction`.
 
 ## Key Results
 
-- `loopSpaceSuspensionAdjunction`: `SimpleEquiv` form of the adjunction
-- `loopSpaceSuspensionAdjunctionEquiv`: Mathlib `Equiv` form
+- `loopSpaceSuspensionAdjunction`: Path-based equivalence for the adjunction
 - `unit`, `counit`: adjunction unit and counit maps
 
 ## References
@@ -17,7 +16,6 @@ Mathlib-friendly form, reusing the adjunction maps already constructed in
 - `LoopSpaceAdjunction` for the underlying construction
 -/
 
-import Mathlib
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
 
 namespace ComputationalPaths
@@ -34,22 +32,29 @@ universe u v
 
 noncomputable section
 
-/-- Loop-suspension adjunction as a `SimpleEquiv`. -/
-def loopSpaceSuspensionAdjunction (X Y : SuspensionLoop.Pointed) :
-    SimpleEquiv (PointedMap (sigmaPointed X) Y) (PointedMap X (omegaEqPointed Y)) :=
-  LoopSpaceAdjunction.suspLoopAdjunction (X := X) (Y := Y)
+/-- Path-based equivalence structure (inverse laws witnessed by `Path`). -/
+structure PathSimpleEquiv (α : Type u) (β : Type v) where
+  /-- Forward map. -/
+  toFun : α → β
+  /-- Inverse map. -/
+  invFun : β → α
+  /-- Inverse after forward map is the identity, as a `Path`. -/
+  left_inv : ∀ x : α, Path (invFun (toFun x)) x
+  /-- Forward after inverse map is the identity, as a `Path`. -/
+  right_inv : ∀ y : β, Path (toFun (invFun y)) y
 
-/-- Cast a `SimpleEquiv` to a Mathlib `Equiv`. -/
-def simpleEquivToEquiv {α : Sort u} {β : Sort v} (e : SimpleEquiv α β) : Equiv α β :=
+/-- Convert a `SimpleEquiv` into a `PathSimpleEquiv`. -/
+def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
+    PathSimpleEquiv α β :=
   { toFun := e.toFun
     invFun := e.invFun
-    left_inv := e.left_inv
-    right_inv := e.right_inv }
+    left_inv := fun x => Path.ofEq (e.left_inv x)
+    right_inv := fun y => Path.ofEq (e.right_inv y) }
 
-/-- Loop-suspension adjunction as a Mathlib `Equiv`. -/
-def loopSpaceSuspensionAdjunctionEquiv (X Y : SuspensionLoop.Pointed) :
-    Equiv (PointedMap (sigmaPointed X) Y) (PointedMap X (omegaEqPointed Y)) :=
-  simpleEquivToEquiv (loopSpaceSuspensionAdjunction (X := X) (Y := Y))
+/-- Loop-suspension adjunction as a `PathSimpleEquiv`. -/
+def loopSpaceSuspensionAdjunction (X Y : SuspensionLoop.Pointed) :
+    PathSimpleEquiv (PointedMap (sigmaPointed X) Y) (PointedMap X (omegaEqPointed Y)) :=
+  simpleEquivToPathSimpleEquiv (LoopSpaceAdjunction.suspLoopAdjunction (X := X) (Y := Y))
 
 /-- Unit of the loop-suspension adjunction. -/
 def unit (X : SuspensionLoop.Pointed) :
