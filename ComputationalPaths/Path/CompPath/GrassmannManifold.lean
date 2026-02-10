@@ -91,10 +91,18 @@ private def punitEquivUnit : SimpleEquiv PUnit' Unit where
 
 /-- pi_1 model equivalence for real Grassmannians. -/
 noncomputable def realGrassmannPiOneEquiv (k n : Nat) :
-    SimpleEquiv (realGrassmannPiOne k n) (realGrassmannPiOneModel k n) :=
-  match k, n with
-  | 1, Nat.succ n => realProjectivePiOneEquiv n
-  | _, _ => punitEquivUnit
+    SimpleEquiv (realGrassmannPiOne k n) (realGrassmannPiOneModel k n) := by
+  cases k with
+  | zero =>
+      exact punitEquivUnit
+  | succ k =>
+      cases k with
+      | zero =>
+          cases n with
+          | zero => exact punitEquivUnit
+          | succ n => exact realProjectivePiOneEquiv n
+      | succ _ =>
+          exact punitEquivUnit
 
 /-! ## pi_1 of complex Grassmannians -/
 
@@ -102,9 +110,21 @@ noncomputable def realGrassmannPiOneEquiv (k n : Nat) :
 theorem complexGrassmann_pi1_trivial (k n : Nat) :
     ∀ (α : PiOne (ComplexGrassmann k n) (complexGrassmannBase k n)),
       α = Quot.mk _ (Path.refl _) := by
-  cases k <;> cases n <;>
-    simpa [ComplexGrassmann, complexGrassmannBase] using
-      (pi1_trivial_of_subsingleton (A := PUnit') (a := PUnit'.unit))
+  cases k with
+  | zero =>
+      cases n <;>
+        simpa [ComplexGrassmann, complexGrassmannBase] using
+          (pi1_trivial_of_subsingleton (A := PUnit') (a := PUnit'.unit))
+  | succ k =>
+      cases k with
+      | zero =>
+          cases n <;>
+            simpa [ComplexGrassmann, complexGrassmannBase] using
+              (pi1_trivial_of_subsingleton (A := PUnit') (a := PUnit'.unit))
+      | succ _ =>
+          cases n <;>
+            simpa [ComplexGrassmann, complexGrassmannBase] using
+              (pi1_trivial_of_subsingleton (A := PUnit') (a := PUnit'.unit))
 
 /-- pi_1(Gr_C(k, n)) ~= 1. -/
 noncomputable def complexGrassmannPiOneEquivUnit (k n : Nat) :
