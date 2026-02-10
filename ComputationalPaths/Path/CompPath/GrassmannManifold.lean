@@ -1,4 +1,4 @@
-/- 
+/-
 # Grassmannians via computational paths
 
 Lightweight computational-path models for real and complex Grassmannians.
