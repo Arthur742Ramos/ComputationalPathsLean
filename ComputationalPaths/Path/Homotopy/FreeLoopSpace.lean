@@ -74,7 +74,7 @@ def freeLoopFiberSeq (X : Type u) (x0 : X) :
     FiberSeq (LoopSpace X x0) (FreeLoopSpace X) X :=
   canonicalFiberSeq (P := fun x => LoopSpace X x) x0 (Path.refl x0)
 
-theorem freeLoopFiberSeq_exact (X : Type u) (x0 : X) :
+def freeLoopFiberSeq_exact (X : Type u) (x0 : X) :
     IsExactAt (freeLoopFiberSeq X x0) :=
   canonicalFiberSeq_exact (P := fun x => LoopSpace X x) x0 (Path.refl x0)
 

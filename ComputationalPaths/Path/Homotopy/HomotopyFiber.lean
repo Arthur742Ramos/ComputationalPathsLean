@@ -59,14 +59,14 @@ def fiberSeq {f : A → B} {b : B} (x0 : HomotopyFiber f b) :
   right_inv := by intro x; rfl
 
 /-- The homotopy fiber sequence is exact at the total space. -/
-theorem fiberSeq_exact {f : A → B} {b : B} (x0 : HomotopyFiber f b) :
+def fiberSeq_exact {f : A → B} {b : B} (x0 : HomotopyFiber f b) :
     IsExactAt (fiberSeq (f := f) (b := b) x0) := by
   refine
     { incl_to_base := ?_, base_from_fiber := ?_ }
   · intro x
     exact x.prop
   · intro e h
-    exact ⟨⟨e, h⟩, rfl⟩
+    exact ⟨⟨e, h.toEq⟩, Path.refl e⟩
 
 /-! ## Total space equivalence -/
 

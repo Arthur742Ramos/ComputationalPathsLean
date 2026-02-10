@@ -105,7 +105,7 @@ def pathSpaceFiberSeq (A : Type u) (a : A) :
     FiberSeq (LoopSpaceEq A a) (PathSpace A a) A :=
   canonicalFiberSeq (P := fun x => LiftEq a x) (b := a) (x₀ := liftEqRefl a)
 
-theorem pathSpaceFiberSeq_exact (A : Type u) (a : A) :
+def pathSpaceFiberSeq_exact (A : Type u) (a : A) :
     IsExactAt (pathSpaceFiberSeq A a) :=
   canonicalFiberSeq_exact (P := fun x => LiftEq a x) (b := a) (x₀ := liftEqRefl a)
 

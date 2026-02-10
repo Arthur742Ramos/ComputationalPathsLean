@@ -96,7 +96,7 @@ def hopfFiberSeq (data : HopfFibrationData) : FiberSeq S1 S3 S2 where
   proj := data.proj
   baseB := data.base
   baseE := data.baseTotal
-  base_proj := data.base_proj
+  base_proj := Path.ofEq data.base_proj
   toFiber := data.fiberEquiv.invFun
   fromFiber := data.fiberEquiv.toFun
   left_inv := data.fiberEquiv.right_inv
@@ -109,32 +109,35 @@ def hopfFiberIncl (data : HopfFibrationData) : S1 → S3 :=
   (hopfFiberSeq data).incl
 
 /-- The projection of the fiber inclusion is the Hopf basepoint. -/
-theorem hopfFiberIncl_proj (data : HopfFibrationData) (x : S1) :
-    data.proj (hopfFiberIncl data x) = data.base :=
+def hopfFiberIncl_proj (data : HopfFibrationData) (x : S1) :
+    Path (data.proj (hopfFiberIncl data x)) data.base :=
   (hopfFiberSeq data).proj_incl x
 
 /-- `Path` witnessing that the fiber inclusion projects to the base. -/
 def hopfFiberIncl_proj_path (data : HopfFibrationData) (x : S1) :
     ComputationalPaths.Path (data.proj (hopfFiberIncl data x)) data.base :=
-  ComputationalPaths.Path.ofEq ((hopfFiberSeq data).proj_incl x)
+  (hopfFiberSeq data).proj_incl x
 
 /-- The Hopf fiber sequence is exact at the total space. -/
-theorem hopfFiberSeq_exact (data : HopfFibrationData) :
+def hopfFiberSeq_exact (data : HopfFibrationData) :
     IsExactAt (hopfFiberSeq data) := by
   refine { incl_to_base := ?_, base_from_fiber := ?_ }
   · intro f
     exact (hopfFiberSeq data).proj_incl f
   · intro e h
-    refine ⟨(hopfFiberSeq data).fromFiber ⟨e, h⟩, ?_⟩
-    have h' := (hopfFiberSeq data).right_inv ⟨e, h⟩
-    simpa [FiberSeq.incl] using _root_.congrArg Fiber.point h'
+    refine ⟨(hopfFiberSeq data).fromFiber ⟨e, h.toEq⟩, ?_⟩
+    have h' := (hopfFiberSeq data).right_inv ⟨e, h.toEq⟩
+    have h'' : (hopfFiberSeq data).incl
+        ((hopfFiberSeq data).fromFiber ⟨e, h.toEq⟩) = e := by
+      simpa [FiberSeq.incl] using _root_.congrArg Fiber.point h'
+    exact Path.ofEq h''
 
 /-- `Path` witnessing exactness: incl composed with proj yields the base. -/
 def hopfFiberSeq_exact_path (data : HopfFibrationData) (f : S1) :
     ComputationalPaths.Path
       (data.proj ((hopfFiberSeq data).incl f))
       data.base :=
-  ComputationalPaths.Path.ofEq ((hopfFiberSeq data).proj_incl f)
+  (hopfFiberSeq data).proj_incl f
 
 /-- The induced map on `π₁` from the Hopf projection. -/
 noncomputable def hopfInducedPi1Map (data : HopfFibrationData) :

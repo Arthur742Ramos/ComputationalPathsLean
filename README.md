@@ -476,12 +476,14 @@ Higher coherence laws for the weak ω-groupoid structure:
   ```lean
   -- Fiber of a map
   def Fiber (f : A → B) (b : B) : Type u := { a : A // f a = b }
+  def Fiber.prop (x : Fiber f b) : Path (f x.point) b
 
   -- Fiber sequence F → E → B
   structure FiberSeq (F E B : Type u) where
     proj : E → B
     baseB : B
     baseE : E
+    base_proj : Path (proj baseE) baseB
     toFiber : F → Fiber proj baseB
     fromFiber : Fiber proj baseB → F
     -- ... inverse properties

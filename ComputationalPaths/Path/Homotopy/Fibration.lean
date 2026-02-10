@@ -54,12 +54,12 @@ def Fiber.point {f : A → B} {b : B} (x : Fiber f b) : A :=
   x.val
 
 /-- The proof that a fiber element maps to the base point. -/
-def Fiber.prop {f : A → B} {b : B} (x : Fiber f b) : f x.point = b :=
-  x.property
+def Fiber.prop {f : A → B} {b : B} (x : Fiber f b) : Path (f x.point) b :=
+  Path.ofEq x.property
 
 /-- Construct a fiber element. -/
-def Fiber.mk {f : A → B} {b : B} (a : A) (h : f a = b) : Fiber f b :=
-  ⟨a, h⟩
+def Fiber.mk {f : A → B} {b : B} (a : A) (h : Path (f a) b) : Fiber f b :=
+  ⟨a, h.toEq⟩
 
 /-! ## Type Families as Fibrations
 
@@ -76,8 +76,8 @@ def Total.proj {P : B → Type u} : Total P → B := Sigma.fst
 /-- The fiber of Total.proj over b is equivalent to P(b). -/
 def fiberEquivFamily {P : B → Type u} (b : B) :
     SimpleEquiv (Fiber (@Total.proj B P) b) (P b) where
-  toFun := fun ⟨⟨_, p⟩, h⟩ => h ▸ p
-  invFun := fun p => ⟨⟨b, p⟩, rfl⟩
+  toFun := fun ⟨⟨_, p⟩, h⟩ => Path.transport (Path.ofEq h) p
+  invFun := fun p => Fiber.mk (f := @Total.proj B P) (b := b) ⟨b, p⟩ (Path.refl b)
   left_inv := fun ⟨⟨_, _⟩, h⟩ => by subst h; rfl
   right_inv := fun _ => rfl
 
@@ -95,7 +95,7 @@ structure FiberSeq (F : Type u) (E : Type u) (B : Type u) where
   /-- The basepoint in E lying over baseB. -/
   baseE : E
   /-- Proof that baseE projects to baseB. -/
-  base_proj : proj baseE = baseB
+  base_proj : Path (proj baseE) baseB
   /-- Function from F to the fiber. -/
   toFiber : F → Fiber proj baseB
   /-- Function from fiber to F. -/
@@ -114,8 +114,8 @@ def incl (seq : FiberSeq F E B) : F → E :=
   fun f => (seq.toFiber f).point
 
 /-- The fiber inclusion composed with projection is constant. -/
-theorem proj_incl (seq : FiberSeq F E B) (f : F) :
-    seq.proj (seq.incl f) = seq.baseB :=
+def proj_incl (seq : FiberSeq F E B) (f : F) :
+    Path (seq.proj (seq.incl f)) seq.baseB :=
   (seq.toFiber f).prop
 
 end FiberSeq
@@ -186,9 +186,9 @@ Exactness at E means: im(incl) = ker(proj).
 In our setting, this means: e is in im(incl) iff proj(e) = baseB. -/
 structure IsExactAt (seq : FiberSeq F E B) where
   /-- Elements in the image of incl map to baseB. -/
-  incl_to_base : ∀ f, seq.proj (seq.incl f) = seq.baseB
+  incl_to_base : ∀ f, Path (seq.proj (seq.incl f)) seq.baseB
   /-- Elements mapping to baseB come from the fiber. -/
-  base_from_fiber : ∀ e, seq.proj e = seq.baseB → ∃ f, seq.incl f = e
+  base_from_fiber : ∀ e, Path (seq.proj e) seq.baseB → Σ f, Path (seq.incl f) e
 
 /-- The canonical fiber sequence for a type family. -/
 def canonicalFiberSeq {P : B → Type u} (b : B) (x₀ : P b) :
@@ -196,25 +196,23 @@ def canonicalFiberSeq {P : B → Type u} (b : B) (x₀ : P b) :
   proj := @Total.proj B P
   baseB := b
   baseE := ⟨b, x₀⟩
-  base_proj := rfl
-  toFiber := fun p => ⟨⟨b, p⟩, rfl⟩
+  base_proj := Path.refl b
+  toFiber := fun p => Fiber.mk (f := @Total.proj B P) (b := b) ⟨b, p⟩ (Path.refl b)
   fromFiber := fun x =>
     match x with
-    | ⟨⟨b', p⟩, h⟩ => h ▸ p
+    | ⟨⟨b', p⟩, h⟩ => Path.transport (Path.ofEq h) p
   left_inv := fun _ => rfl
   right_inv := fun x =>
     match x with
     | ⟨⟨_, p⟩, h⟩ => by subst h; rfl
 
 /-- The canonical fiber sequence is exact. -/
-theorem canonicalFiberSeq_exact {P : B → Type u} (b : B) (x₀ : P b) :
+def canonicalFiberSeq_exact {P : B → Type u} (b : B) (x₀ : P b) :
     IsExactAt (canonicalFiberSeq b x₀) where
-  incl_to_base := fun _ => rfl
+  incl_to_base := fun f => (canonicalFiberSeq b x₀).proj_incl f
   base_from_fiber := fun ⟨b', p⟩ h => by
-    -- h : Total.proj ⟨b', p⟩ = b, i.e., b' = b
-    simp only [canonicalFiberSeq, Total.proj] at h
-    subst h
-    exact ⟨p, rfl⟩
+    cases h.toEq
+    exact ⟨p, Path.refl _⟩
 
 /-! ## Induced Maps on Homotopy Groups
 
@@ -296,9 +294,9 @@ connecting map at the π₁ level.
     Exactness at X means: im(f) = ker(g). -/
 structure ExactAt {X Y Z : Type u} (f : X → Y) (g : Y → Z) (z₀ : Z) where
   /-- Image is contained in kernel. -/
-  im_subset_ker : ∀ x, g (f x) = z₀
+  im_subset_ker : ∀ x, Path (g (f x)) z₀
   /-- Kernel is contained in image. -/
-  ker_subset_im : ∀ y, g y = z₀ → ∃ x, f x = y
+  ker_subset_im : ∀ y, Path (g y) z₀ → Σ x, Path (f x) y
 
 /-- Induced maps on higher homotopy groups for a function.
     For n ≥ 3, `PiN` is `PUnit`, so the map is the unique constant map. -/
