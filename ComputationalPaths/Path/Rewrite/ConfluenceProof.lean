@@ -376,21 +376,21 @@ theorem rw_plus_trans {a b : A} {p q r : Path a b}
   | tail _ step ih => exact RwPlus.tail ih step
 
 theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
-    Sum (Path p q) { r : Path a b // Step p r ∧ Rw r q } := by
+    Nonempty (Path p q) ∨ ∃ r, Step p r ∧ Rw r q := by
   induction h with
-  | refl => exact Sum.inl (Path.refl _)
+  | refl => exact Or.inl ⟨Path.refl _⟩
   | tail h step ih =>
     cases ih with
     | inl hpeq =>
-        refine Sum.inr ?_
-        refine ⟨_, ?_⟩
-        refine ⟨?_, Rw.refl _⟩
-        cases hpeq.toEq
+        rcases hpeq with ⟨hpath⟩
+        refine Or.inr ?_
+        refine ⟨_, ?_, Rw.refl _⟩
+        cases hpath.toEq
         exact step
     | inr hdata =>
         rcases hdata with ⟨r, hstep, hrq⟩
-        refine Sum.inr ⟨r, ?_⟩
-        exact ⟨hstep, Rw.tail hrq step⟩
+        refine Or.inr ⟨r, hstep, ?_⟩
+        exact Rw.tail hrq step
 
 /-- Termination: well-foundedness of the reverse `RwPlus` relation. -/
 def Terminating {A : Type u} {a b : A} : Prop :=
@@ -417,15 +417,17 @@ theorem confluence_prop {a b : A} {p q r : Path a b}
     intro q r hq hr
     cases rw_uncons hq with
     | inl hq_eq =>
+        rcases hq_eq with ⟨hq_path⟩
         refine ⟨r, ?_, Rw.refl r⟩
-        cases hq_eq.toEq
+        cases hq_path.toEq
         simpa using hr
     | inr hq_data =>
         rcases hq_data with ⟨p1, hp1, hq_rest⟩
         cases rw_uncons hr with
         | inl hr_eq =>
+            rcases hr_eq with ⟨hr_path⟩
             refine ⟨q, Rw.refl q, ?_⟩
-            cases hr_eq.toEq
+            cases hr_path.toEq
             simpa using hq
         | inr hr_data =>
             rcases hr_data with ⟨p2, hp2, hr_rest⟩
@@ -466,7 +468,6 @@ end ConfluenceProof
 end Rewrite
 end Path
 end ComputationalPaths
-
 
 
 

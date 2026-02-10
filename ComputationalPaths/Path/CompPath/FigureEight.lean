@@ -35,6 +35,14 @@ open CompPath
 
 universe u v w
 
+/-! ## The Figure-Eight Space -/
+
+/-- The figure-eight space: wedge sum of two circles sharing a common basepoint.
+Topologically, this is two circles joined at a single point, forming an "8" shape. -/
+def FigureEight : Type u := Wedge Circle.{u} Circle.{u} circleBase circleBase
+
+namespace FigureEight
+
 /-! ## Path-Based Equivalences -/
 
 /-- Path-based equivalence structure (inverse laws witnessed by `Path`). -/
@@ -55,14 +63,6 @@ def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α
     invFun := e.invFun
     left_inv := fun x => Path.ofEq (e.left_inv x)
     right_inv := fun y => Path.ofEq (e.right_inv y) }
-
-/-! ## The Figure-Eight Space -/
-
-/-- The figure-eight space: wedge sum of two circles sharing a common basepoint.
-Topologically, this is two circles joined at a single point, forming an "8" shape. -/
-def FigureEight : Type u := Wedge Circle.{u} Circle.{u} circleBase circleBase
-
-namespace FigureEight
 
 /-! ## Basic Structure -/
 
