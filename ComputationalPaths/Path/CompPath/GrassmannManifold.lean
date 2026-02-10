@@ -69,35 +69,42 @@ def ComplexGrassmann : Nat → Nat → Type u
 /-- Model for pi_1 of the real Grassmannian. -/
 def realGrassmannPiOne : Nat → Nat → Type u
   | 1, Nat.succ n => realProjectivePiOne n
-  | _, _ => Unit
+  | _, _ => PUnit'
 
 /-- Group model for pi_1 of the real Grassmannian. -/
 def realGrassmannPiOneModel : Nat → Nat → Type
   | 1, Nat.succ n => realProjectivePiOneModel n
   | _, _ => Unit
 
+/-- Equivalence between the unit types used in the Grassmannian models. -/
+private def punitEquivUnit : SimpleEquiv PUnit' Unit where
+  toFun := fun _ => ()
+  invFun := fun _ => PUnit'.unit
+  left_inv := by
+    intro x
+    cases x
+    rfl
+  right_inv := by
+    intro u
+    cases u
+    rfl
+
 /-- pi_1 model equivalence for real Grassmannians. -/
 noncomputable def realGrassmannPiOneEquiv (k n : Nat) :
     SimpleEquiv (realGrassmannPiOne k n) (realGrassmannPiOneModel k n) :=
   match k, n with
   | 1, Nat.succ n => realProjectivePiOneEquiv n
-  | _, _ =>
-      { toFun := id
-        invFun := id
-        left_inv := fun _ => rfl
-        right_inv := fun _ => rfl }
+  | _, _ => punitEquivUnit
 
 /-! ## pi_1 of complex Grassmannians -/
-
-instance complexGrassmann_subsingleton (k n : Nat) :
-    Subsingleton (ComplexGrassmann k n) := by
-  cases k <;> cases n <;> infer_instance
 
 /-- The fundamental group of a complex Grassmannian is trivial in this model. -/
 theorem complexGrassmann_pi1_trivial (k n : Nat) :
     ∀ (α : PiOne (ComplexGrassmann k n) (complexGrassmannBase k n)),
-      α = Quot.mk _ (Path.refl _) :=
-  pi1_trivial_of_subsingleton (A := ComplexGrassmann k n) (a := complexGrassmannBase k n)
+      α = Quot.mk _ (Path.refl _) := by
+  cases k <;> cases n <;>
+    simpa [ComplexGrassmann, complexGrassmannBase] using
+      (pi1_trivial_of_subsingleton (A := PUnit') (a := PUnit'.unit))
 
 /-- pi_1(Gr_C(k, n)) ~= 1. -/
 noncomputable def complexGrassmannPiOneEquivUnit (k n : Nat) :
