@@ -79,12 +79,12 @@ variable {β : Type u}
   cases h
   rfl
 
-private theorem trans_assoc_left_eq (p q r : GlobularCell β)
+private def trans_assoc_left_eq (p q r : GlobularCell β)
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path (trans p q h₁).tgt r.src := by
   simpa [trans] using h₂
 
-private theorem trans_assoc_right_eq (p q r : GlobularCell β)
+private def trans_assoc_right_eq (p q r : GlobularCell β)
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path p.tgt (trans q r h₂).src := by
   simpa [trans] using h₁
@@ -96,9 +96,7 @@ private theorem trans_assoc_right_eq (p q r : GlobularCell β)
   cases p
   cases q
   cases r
-  cases h₁
-  cases h₂
-  simp [trans]
+  simp [trans, trans_assoc_left_eq, trans_assoc_right_eq]
 
 
 end GlobularCell
@@ -171,23 +169,27 @@ variable {A : Type u}
 @[simp] theorem trans_src {n : Nat}
     (p q : GlobularLevel A (n + 1)) (h : Path p.tgt q.src) :
     (trans (A := A) p q h).src = p.src := by
-  simpa [trans] using
-    (GlobularCell.trans_src (β := GlobularLevel A n) p q h)
+  cases p
+  cases q
+  cases h
+  rfl
 
 @[simp] theorem trans_tgt {n : Nat}
     (p q : GlobularLevel A (n + 1)) (h : Path p.tgt q.src) :
     (trans (A := A) p q h).tgt = q.tgt := by
-  simpa [trans] using
-    (GlobularCell.trans_tgt (β := GlobularLevel A n) p q h)
+  cases p
+  cases q
+  cases h
+  rfl
 
-private theorem globular_trans_assoc_left_eq {n : Nat}
+private def globular_trans_assoc_left_eq {n : Nat}
     (p q r : GlobularLevel A (n + 1))
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path (trans (A := A) p q h₁).tgt r.src := by
   simpa [trans] using
     (GlobularCell.trans_assoc_left_eq (β := GlobularLevel A n) p q r h₁ h₂)
 
-private theorem globular_trans_assoc_right_eq {n : Nat}
+private def globular_trans_assoc_right_eq {n : Nat}
     (p q r : GlobularLevel A (n + 1))
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path p.tgt (trans (A := A) q r h₂).src := by
@@ -201,7 +203,7 @@ private theorem globular_trans_assoc_right_eq {n : Nat}
         (globular_trans_assoc_left_eq p q r h₁ h₂) =
       trans (A := A) p (trans (A := A) q r h₂)
         (globular_trans_assoc_right_eq p q r h₁ h₂) := by
-  simpa [trans] using
+  simpa [trans, globular_trans_assoc_left_eq, globular_trans_assoc_right_eq] using
     (GlobularCell.trans_assoc (β := GlobularLevel A n) p q r h₁ h₂)
 
 section Functoriality
