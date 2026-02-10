@@ -37,7 +37,7 @@ def whiteheadProduct {m n : Nat} {A : Type u} {a : A} :
   | m, n => fun _ _ => piN_one (n := m + n - 1) (x := a)
 
 /-- Bracket notation for the Whitehead product. -/
-scoped[WhiteheadProduct] notation "[" x ", " y "]" => whiteheadProduct x y
+notation "[" x ", " y "]" => whiteheadProduct x y
 
 end WhiteheadProduct
 end Homotopy

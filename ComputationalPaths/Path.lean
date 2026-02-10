@@ -102,6 +102,7 @@ import ComputationalPaths.Path.Homotopy.HomotopyCommutativeDiagram
 import ComputationalPaths.Path.Homotopy.LongExactSequence
 import ComputationalPaths.Path.Homotopy.HomotopyExactSequence
 import ComputationalPaths.Path.Homotopy.MayerVietoris
+import ComputationalPaths.Path.Homotopy.PuppeSequence
 import ComputationalPaths.Path.Homotopy.BarrattPuppe
 import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
@@ -109,6 +110,7 @@ import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.SuspensionTheorems
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
 import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
+import ComputationalPaths.Path.Homotopy.LoopSpaceDelooping
 import ComputationalPaths.Path.Homotopy.JamesConstruction
 import ComputationalPaths.Path.Homotopy.StableHomotopy
 import ComputationalPaths.Path.Homotopy.StableSplitting
@@ -128,6 +130,7 @@ import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Homotopy.Reflexivity
 import ComputationalPaths.Path.Homotopy.IdentityType
 import ComputationalPaths.Path.Homotopy.EilenbergMacLane
+import ComputationalPaths.Path.Homotopy.MooreSpace
 import ComputationalPaths.Path.Homotopy.Coproduct
 import ComputationalPaths.Path.Homotopy.CoproductPaths
 import ComputationalPaths.Path.CompPath.CircleCompPath
@@ -165,6 +168,7 @@ import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
+import ComputationalPaths.Path.Algebra.ExtFunctor
 import ComputationalPaths.Path.Algebra.Abelianization
 import ComputationalPaths.Path.Algebra.FreeGroupProperties
 import ComputationalPaths.Path.Homotopy.HurewiczTheorem

@@ -87,7 +87,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - **Product fundamental group theorem**: π₁(A × B, (a,b)) ≃ π₁(A, a) × π₁(B, b) via path projection/pairing, enabling inductive computation of π₁(T^n) ≃ ℤⁿ.
 - **Higher product homotopy**: π_n(A × B) ≃ π_n(A) × π_n(B) for all n, generalizing the π₁ product theorem to higher homotopy groups. Application: π_n(Tᵏ) = 0 for n ≥ 2.
 - **Lie group connections**: SO(2) ≃ U(1) ≃ S¹ with π₁ ≃ ℤ, n-torus T^n = (S¹)^n as maximal torus in U(n), simply connected groups, ℤ₂ fundamental groups (SO(n) for n ≥ 3 via RP²), and comparison with Bordg-Cavalleri differential geometry approach.
-- **Complex projective spaces (legacy removed)**: The CP^n module was removed as legacy placeholder code.
+- **Projective spaces**: Real/complex projective space pi_1 models (RP^1 ~= Z, RP^n>=2 ~= Z/2, CP^n ~= 1) in `CompPath/ProjectiveSpace.lean`.
 - **Cellular homology (legacy removed)**: Cellular homology module was removed as legacy placeholder code.
 
 ## Quick Start

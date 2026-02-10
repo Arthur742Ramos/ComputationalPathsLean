@@ -64,9 +64,9 @@ theorem samelson_congr {p p' q q' : LoopSpace A a}
         (Path.trans (Path.trans (Path.refl a) p) (Path.symm (Path.refl a)))
         (Path.symm p))
         (Path.trans p (Path.symm p)) := by
-    simpa using
-      (rweq_trans_congr_left (Path.symm p)
-        (LoopDerived.rweq_loop_conj_refl (a := a) (q := p)))
+    exact
+      rweq_trans_congr_left (Path.symm p)
+        (LoopDerived.rweq_loop_conj_refl (a := a) (q := p))
   have h2 : RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
     LoopDerived.rweq_loop_inv_right (a := a) (p := p)
   simpa [samelson, LoopSpace.id] using (RwEq.trans h1 h2)
@@ -78,22 +78,21 @@ theorem samelson_congr {p p' q q' : LoopSpace A a}
   have h1 :
       RwEq (Path.trans (Path.trans p (Path.refl a)) (Path.symm p))
         (Path.trans p (Path.symm p)) := by
-    simpa using
-      (rweq_trans_congr_left (Path.symm p)
-        (LoopDerived.rweq_loop_unit_right (a := a) (p := p)))
+    exact
+      rweq_trans_congr_left (Path.symm p)
+        (LoopDerived.rweq_loop_unit_right (a := a) (p := p))
   have h2 :
       RwEq
         (Path.trans (Path.trans (Path.trans p (Path.refl a)) (Path.symm p))
           (Path.symm (Path.refl a)))
         (Path.trans (Path.trans p (Path.symm p)) (Path.symm (Path.refl a))) := by
-    simpa using (rweq_trans_congr_left (Path.symm (Path.refl a)) h1)
+    exact rweq_trans_congr_left (Path.symm (Path.refl a)) h1
   have h3 : RwEq (Path.symm (Path.refl a)) (Path.refl a) :=
     rweq_of_step (Step.symm_refl a)
   have h4 :
       RwEq (Path.trans (Path.trans p (Path.symm p)) (Path.symm (Path.refl a)))
         (Path.trans (Path.trans p (Path.symm p)) (Path.refl a)) := by
-    simpa using
-      (rweq_trans_congr_right (Path.trans p (Path.symm p)) h3)
+    exact rweq_trans_congr_right (Path.trans p (Path.symm p)) h3
   have h5 :
       RwEq (Path.trans (Path.trans p (Path.symm p)) (Path.refl a))
         (Path.trans p (Path.symm p)) :=
