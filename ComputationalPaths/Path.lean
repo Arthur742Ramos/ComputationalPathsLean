@@ -152,6 +152,7 @@ import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.TorusStep
 import ComputationalPaths.Path.CompPath.PushoutCompPath
+import ComputationalPaths.Path.CompPath.JoinSpace
 import ComputationalPaths.Path.CompPath.MappingCylinder
 import ComputationalPaths.Path.CompPath.MappingCone
 import ComputationalPaths.Path.CompPath.PushoutPaths

@@ -18,17 +18,17 @@ namespace ComputationalPaths
 namespace Path
 namespace CompPath
 
-universe u v
+universe u
 
 /-! ## Join space -/
 
 /-- Join of `X` and `Y` as the computational pushout of the projections. -/
-def JoinSpace (X : Type u) (Y : Type v) : Type (max u v) :=
+def JoinSpace (X : Type u) (Y : Type u) : Type u :=
   Pushout (A := X) (B := Y) (C := X × Y) Prod.fst Prod.snd
 
 namespace JoinSpace
 
-variable {X : Type u} {Y : Type v}
+variable {X : Type u} {Y : Type u}
 
 /-- Left inclusion into the join. -/
 def inl (x : X) : JoinSpace X Y :=
@@ -48,7 +48,7 @@ end JoinSpace
 /-! ## Compatibility aliases -/
 
 /-- Alias for the join space. -/
-abbrev Join (X : Type u) (Y : Type v) : Type (max u v) := JoinSpace X Y
+abbrev Join (X : Type u) (Y : Type u) : Type u := JoinSpace X Y
 
 /-! ## Summary -/
 
