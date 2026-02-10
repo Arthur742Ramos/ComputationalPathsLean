@@ -187,6 +187,7 @@ import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
+import ComputationalPaths.Path.Algebra.AInfinityAlgebra
 import ComputationalPaths.Path.Algebra.ExtFunctor
 import ComputationalPaths.Path.Algebra.BarComplex
 import ComputationalPaths.Path.Algebra.Abelianization

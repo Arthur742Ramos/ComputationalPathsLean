@@ -53,11 +53,11 @@ end OmegaSpectrum
 /-! ## Path-space spectra -/
 
 /-- n-fold iterated loop space as a pointed type. -/
-def iteratedLoopPointed (n : Nat) (X : Pointed) : Pointed :=
+noncomputable def iteratedLoopPointed (n : Nat) (X : Pointed) : Pointed :=
   Nat.recOn n X (fun _ acc => loopPointed acc)
 
 /-- Omega-spectrum built from iterated loop spaces with constant structure maps. -/
-def pathOmegaSpectrum (X : Pointed) : OmegaSpectrum where
+noncomputable def pathOmegaSpectrum (X : Pointed) : OmegaSpectrum where
   level := fun n => iteratedLoopPointed n X
   structureMap := fun n =>
     basepointMap (iteratedLoopPointed n X) (loopPointed (iteratedLoopPointed (n + 1) X))
