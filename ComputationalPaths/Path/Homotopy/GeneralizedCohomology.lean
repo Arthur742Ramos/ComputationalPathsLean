@@ -68,20 +68,20 @@ structure ReducedCohomologyTheory where
   /-- Graded cohomology groups. -/
   cohomology : Nat → Pointed → Type u
   /-- Zero class in each degree. -/
-  zero : (n : Nat) (X : Pointed) → cohomology n X
+  zero : ∀ (n : Nat) (X : Pointed), cohomology n X
   /-- Contravariant action on pointed maps. -/
-  map : (n : Nat) {X Y : Pointed} → PointedMap X Y → cohomology n Y → cohomology n X
+  map : ∀ (n : Nat) {X Y : Pointed}, PointedMap X Y → cohomology n Y → cohomology n X
   /-- Functoriality on identities. -/
-  map_id : ∀ (n : Nat) (X : Pointed) (x : cohomology n X),
+  mapId : ∀ (n : Nat) (X : Pointed) (x : cohomology n X),
       Path (map n (PointedMap.id X) x) x
   /-- Functoriality on compositions. -/
-  map_comp :
+  mapComp :
     ∀ (n : Nat) {X Y Z : Pointed} (g : PointedMap Y Z) (f : PointedMap X Y)
       (x : cohomology n Z),
       Path (map n f (map n g x)) (map n (PointedMap.comp g f) x)
   /-- Suspension isomorphism. -/
-  suspensionIso :
-    (n : Nat) (X : Pointed) →
+  suspIso :
+    ∀ (n : Nat) (X : Pointed),
       PathSimpleEquiv (cohomology n (suspPointed X.carrier)) (cohomology (n + 1) X)
 
 namespace ReducedCohomologyTheory
@@ -90,16 +90,16 @@ namespace ReducedCohomologyTheory
 def trivial : ReducedCohomologyTheory :=
   { cohomology := fun _ _ => PUnit
     zero := fun _ _ => PUnit.unit
-    map := fun _ _ _ _ => PUnit.unit
-    map_id := by
+    map := by intro _ _ _ _ _; exact PUnit.unit
+    mapId := by
       intro n X x
       cases x
       exact Path.refl PUnit.unit
-    map_comp := by
-      intro n X Y Z g f x
+    mapComp := by
+      intro n _ _ _ g f x
       cases x
       exact Path.refl PUnit.unit
-    suspensionIso := fun _ _ => pathSimpleEquivRefl PUnit }
+    suspIso := fun _ _ => pathSimpleEquivRefl PUnit }
 
 end ReducedCohomologyTheory
 

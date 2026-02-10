@@ -95,7 +95,7 @@ end GeneralizedHomologyTheory
 def trivialTheory : GeneralizedHomologyTheory.{u, v} where
   H := fun _ _ => PUnit
   zero := fun _ _ => PUnit.unit
-  map := fun _ _ _ _ => PUnit.unit
+  map := @fun _ _ _ _ _ => PUnit.unit
   map_zero := by
     intro X Y f n
     rfl
