@@ -139,7 +139,7 @@ noncomputable def jamesToLoop (X : SuspensionLoop.Pointed) :
       simpa [JamesRel] using _root_.congrArg (fun t => loopOfList X t) h)
 
 /-- Basepoint is sent to the reflexivity loop. -/
-def jamesToLoop_base (X : SuspensionLoop.Pointed) :
+noncomputable def jamesToLoop_base (X : SuspensionLoop.Pointed) :
     Path
       (jamesToLoop X (jamesBase X))
       (Path.refl (Suspension.north (X := X.carrier))) := by
@@ -147,7 +147,7 @@ def jamesToLoop_base (X : SuspensionLoop.Pointed) :
   simp [jamesToLoop, jamesBase, loopOfList, reduceList]
 
 /-- Concatenation in the James construction maps to loop composition. -/
-def jamesToLoop_mul (X : SuspensionLoop.Pointed) (a b : JamesConstruction X) :
+noncomputable def jamesToLoop_mul (X : SuspensionLoop.Pointed) (a b : JamesConstruction X) :
     Path
       (jamesToLoop X (jamesMul X a b))
       (LoopSpace.comp (jamesToLoop X a) (jamesToLoop X b)) := by

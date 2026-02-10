@@ -98,37 +98,33 @@ def symmProdInfAdd_fst_assoc_path {X : Type u}
 abbrev ReducedHomology (_X : Type u) : Type (u + 1) :=
   ℕ → Type u
 
-/-- The n-th homotopy group of the infinite symmetric product of `X`. -/
-abbrev symmProdInfPi (n : ℕ) (X : Type u) [TopologicalSpace X]
-    [TopologicalSpace (SymmetricProductInfinity X)] : Type _ :=
+/-- The n-th homotopy group of the infinite symmetric product of `X`.
+    Uses the computational definition from HigherHomotopyGroups. -/
+abbrev symmProdInfPi (n : ℕ) (X : Type u) : Type u :=
   HigherHomotopyGroups.PiN n (SymmetricProductInfinity X) (symmProdInfBase X)
 
 /-- Data of the Dold-Thom theorem: homotopy of `SP^infty(X)` matches homology. -/
-structure DoldThomSpace (X : Type u) [TopologicalSpace X]
-    [TopologicalSpace (SymmetricProductInfinity X)] where
+structure DoldThomSpace (X : Type u) where
   /-- Reduced homology groups. -/
   homology : ReducedHomology X
   /-- Dold-Thom equivalence between homotopy and homology. -/
   equivalence : ∀ n : ℕ, SimpleEquiv (symmProdInfPi n X) (homology n)
 
 /-- Any two Dold-Thom structures on `X` yield equivalent homology theories. -/
-def doldThomHomologyEquiv {X : Type u} [TopologicalSpace X]
-    [TopologicalSpace (SymmetricProductInfinity X)]
+def doldThomHomologyEquiv {X : Type u}
     (A B : DoldThomSpace X) (n : ℕ) :
     SimpleEquiv (A.homology n) (B.homology n) :=
   SimpleEquiv.comp (SimpleEquiv.symm (A.equivalence n)) (B.equivalence n)
 
 /-- `Path` witnessing the Dold-Thom equivalence round-trip. -/
-def doldThomRoundtrip_path {X : Type u} [TopologicalSpace X]
-    [TopologicalSpace (SymmetricProductInfinity X)]
+def doldThomRoundtrip_path {X : Type u}
     (D : DoldThomSpace X) (n : ℕ) (x : symmProdInfPi n X) :
     ComputationalPaths.Path
       ((D.equivalence n).invFun ((D.equivalence n).toFun x)) x :=
   ComputationalPaths.Path.ofEq ((D.equivalence n).left_inv x)
 
 /-- `Path` witnessing the forward round-trip. -/
-def doldThomFwdRoundtrip_path {X : Type u} [TopologicalSpace X]
-    [TopologicalSpace (SymmetricProductInfinity X)]
+def doldThomFwdRoundtrip_path {X : Type u}
     (D : DoldThomSpace X) (n : ℕ) (y : D.homology n) :
     ComputationalPaths.Path
       ((D.equivalence n).toFun ((D.equivalence n).invFun y)) y :=

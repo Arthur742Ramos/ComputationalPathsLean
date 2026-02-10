@@ -17,7 +17,7 @@ Snaith splitting pattern using smash powers and indexed wedges.
 - HoTT Book, Chapter 8
 -/
 
-import Mathlib
+import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.PointedMapCategory
 import ComputationalPaths.Path.Homotopy.SmashProduct

@@ -7,9 +7,10 @@ relative CW complexes using Mathlib's categorical CW-complex definition.
 ## Key Results
 
 - `Extension`: data of a map `Y ⟶ Z` extending `g : X ⟶ Z` along `f : X ⟶ Y`
+  with a `Path` commutation witness
 - `obstructionFree`: existence of an extension (no obstruction)
 - `cellRestriction`: restriction of a map to an attached cell
-- `hom_ext_of_cells`, `extension_unique`: uniqueness of extensions from cell data
+- `hom_ext_of_cells`, `extension_unique`: `Path` uniqueness of extension maps from cell data
 
 ## References
 
@@ -38,7 +39,7 @@ variable {X Y Z : TopCat.{u}} {f : X ⟶ Y}
 structure Extension (f : X ⟶ Y) (g : X ⟶ Z) where
   /-- The extended map. -/
   map : Y ⟶ Z
-  /-- Compatibility on the base. -/
+  /-- Compatibility on the base (as a `Path`). -/
   comm : Path (f ≫ map) g
 
 /-- The extension problem is obstruction-free if an extension exists. -/
@@ -53,7 +54,7 @@ noncomputable def cellRestriction (c : TopCat.RelativeCWComplex f) (φ : Y ⟶ Z
   γ.ι ≫ φ
 
 /-- A map out of a relative CW complex is determined by its restriction to the base
-and to each attached cell (Path form). -/
+and to each attached cell, with a `Path` witness. -/
 def hom_ext_of_cells (c : TopCat.RelativeCWComplex f) {φ₁ φ₂ : Y ⟶ Z}
     (h₀ : Path (f ≫ φ₁) (f ≫ φ₂))
     (hcell : ∀ γ, Path (cellRestriction (f := f) c φ₁ γ)
@@ -64,8 +65,8 @@ def hom_ext_of_cells (c : TopCat.RelativeCWComplex f) {φ₁ φ₂ : Y ⟶ Z}
   intro γ
   simpa [cellRestriction] using (hcell γ).toEq
 
-/-- Extensions are unique once their restrictions to the base and all cells agree
-    (Path between extension maps). -/
+/-- Extensions are unique once their restrictions to the base and all cells agree,
+    with a `Path` between the extension maps. -/
 def extension_unique (c : TopCat.RelativeCWComplex f) {g : X ⟶ Z}
     {e₁ e₂ : Extension f g}
     (hcell : ∀ γ, Path (cellRestriction (f := f) c e₁.map γ)
@@ -79,8 +80,8 @@ def extension_unique (c : TopCat.RelativeCWComplex f) {g : X ⟶ Z}
 
 We package the extension problem for relative CW complexes as a map together with a
 commuting triangle, define obstruction-freeness as existence of an extension, and
-show that extensions are unique once their restrictions to the base and each cell
-agree.
+show that extension maps are unique once their restrictions to the base and each cell
+agree, with uniqueness witnessed by `Path`.
 -/
 
 end ObstructionTheory
