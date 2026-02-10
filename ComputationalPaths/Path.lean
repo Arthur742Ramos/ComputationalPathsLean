@@ -119,6 +119,8 @@ import ComputationalPaths.Path.Homotopy.LoopSpaceDelooping
 import ComputationalPaths.Path.Homotopy.OmegaSpectrum
 import ComputationalPaths.Path.Homotopy.JamesConstruction
 import ComputationalPaths.Path.Homotopy.StableHomotopy
+import ComputationalPaths.Path.Homotopy.GeneralizedCohomology
+import ComputationalPaths.Path.Homotopy.SpectrumTheory
 import ComputationalPaths.Path.Homotopy.StableSplitting
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoidFunctor
@@ -202,6 +204,7 @@ import ComputationalPaths.Path.Homotopy.EquivariantHomotopy
 import ComputationalPaths.Path.Algebra.UniversalCoefficient
 import ComputationalPaths.Path.Homotopy.BordismTheory
 import ComputationalPaths.Path.Homotopy.HomologicalStability
+import ComputationalPaths.Path.Homotopy.GeneralizedHomology
 import ComputationalPaths.Path.Algebra.DeRhamCohomology
 import ComputationalPaths.Path.Algebra.KunnethFormula
 import ComputationalPaths.Path.Algebra.CechCohomology

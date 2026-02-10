@@ -159,15 +159,15 @@ def CochainPath {n : Nat} (f g : LieCochain L M n) : Type (max u v) :=
 
 /-- Reflexivity of pointwise Path. -/
 def cochainPath_refl {n : Nat} (f : LieCochain L M n) :
-    CochainPath (Mod := Mod) f f :=
+    CochainPath f f :=
   fun x => Path.refl (f x)
 
 /-- Build a cochain Path from definitional equality. -/
 def cochainPath_ofEq {n : Nat} {f g : LieCochain L M n} (h : f = g) :
-    CochainPath (Mod := Mod) f g := by
+    CochainPath f g := by
   intro x
   exact Path.ofEq (by
-    simpa using congrArg (fun k => k x) h)
+    simpa using _root_.congrArg (fun k => k x) h)
 
 /-! ## Differentials and cocycles -/
 
@@ -207,7 +207,7 @@ structure LieCocycle (L : Type u) (M : Type v)
 def cocycleRel {L : Type u} {M : Type v} {A : LieAlgebra L}
     {Mod : LieModule L M A} {D : LieDifferential L M A Mod} {n : Nat}
     (f g : LieCocycle L M A Mod D n) : Prop :=
-  Nonempty (CochainPath (Mod := Mod) f.cochain g.cochain)
+  Nonempty (CochainPath f.cochain g.cochain)
 
 /-- Lie algebra cohomology as a quotient by pointwise Path. -/
 def LieCohomology (L : Type u) (M : Type v)

@@ -2,13 +2,13 @@
 # Cyclic Cohomology via Computational Paths
 
 This module introduces a minimal cyclic cohomology interface based on
-computational paths. We reuse the additive algebra data from Hochschild
-cohomology and record cyclicity and differential laws as definitional
-equalities, with `Path` witnesses derived from them.
+computational paths. We package additive algebra data for cyclic cochains
+and record cyclicity and differential laws as definitional equalities, with
+`Path` witnesses derived from them.
 
 ## Main Definitions
 
-- `CyclicAlgebra`: algebra data reused from Hochschild cohomology
+- `CyclicAlgebra`: additive algebra data for cyclic cochains
 - `CyclicCochain`: cyclic n-cochains `(Fin (n + 1) → A) → A`
 - `CyclicComplex`: cyclic operator and differential with Path-typed laws
 - `CyclicCocycle`: closed and cyclic cochains
@@ -20,21 +20,33 @@ equalities, with `Path` witnesses derived from them.
 - Connes, "Noncommutative Geometry"
 -/
 
-import ComputationalPaths.Path.Algebra.HochschildCohomology
+import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths
 namespace Path
 namespace Algebra
 namespace CyclicCohomology
 
-open HochschildCohomology
-
 universe u
 
 /-! ## Cochains -/
 
-/-- Reuse the additive algebra data from Hochschild cohomology. -/
-abbrev CyclicAlgebra (A : Type u) := HochschildAlgebra A
+/-- Additive algebra data for cyclic cochains. -/
+structure CyclicAlgebra (A : Type u) where
+  /-- Additive identity. -/
+  zero : A
+  /-- Addition. -/
+  add : A → A → A
+  /-- Additive inverse. -/
+  neg : A → A
+  /-- Addition is associative. -/
+  add_assoc : ∀ x y z, add (add x y) z = add x (add y z)
+  /-- Addition is commutative. -/
+  add_comm : ∀ x y, add x y = add y x
+  /-- Left identity for addition. -/
+  add_zero : ∀ x, add zero x = x
+  /-- Left inverse for addition. -/
+  add_left_neg : ∀ x, add (neg x) x = zero
 
 /-- Cyclic n-cochains: functions `(Fin (n + 1) → A) → A`. -/
 def CyclicCochain (A : Type u) (n : Nat) : Type u :=
@@ -59,14 +71,14 @@ def CochainPath {n : Nat} (f g : CyclicCochain A n) : Type u :=
   ∀ x, Path (f x) (g x)
 
 /-- Reflexivity of pointwise `Path`. -/
-def cochainPath_refl {n : Nat} (f : CyclicCochain A n) : CochainPath (Alg := Alg) f f :=
+def cochainPath_refl {n : Nat} (f : CyclicCochain A n) : CochainPath f f :=
   fun x => Path.refl (f x)
 
 /-- Build a pointwise `Path` from definitional equality. -/
 def cochainPath_ofEq {n : Nat} {f g : CyclicCochain A n} (h : f = g) :
-    CochainPath (Alg := Alg) f g := by
+    CochainPath f g := by
   intro x
-  exact Path.ofEq (by simpa using congrArg (fun k => k x) h)
+  exact Path.ofEq (by simpa using _root_.congrArg (fun k => k x) h)
 
 /-! ## Iteration -/
 
@@ -131,7 +143,7 @@ structure CyclicCocycle (A : Type u) (Alg : CyclicAlgebra A)
 /-- Pointwise `Path` relation on cyclic cocycles. -/
 def cocycleRel {A : Type u} {Alg : CyclicAlgebra A} {C : CyclicComplex A Alg} {n : Nat}
     (f g : CyclicCocycle A Alg C n) : Prop :=
-  Nonempty (CochainPath (Alg := Alg) f.cochain g.cochain)
+  Nonempty (CochainPath f.cochain g.cochain)
 
 /-- Cyclic cohomology as a quotient by pointwise `Path`. -/
 def CyclicCohomology (A : Type u) (Alg : CyclicAlgebra A)
