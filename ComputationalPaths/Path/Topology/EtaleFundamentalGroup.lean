@@ -132,7 +132,7 @@ structure SpecializationMap (X : Scheme.{u}) (x y : GeometricPoint X) where
   /-- The underlying specialization path. -/
   specialize : Path x.point y.point
   /-- Induced map on etale fundamental groups. -/
-  onPi1 : EtaleFundamentalGroup X x → EtaleFundamentalGroup X y
+  onPi1 : EtalePi1 X x → EtalePi1 X y
   /-- Functoriality witness. -/
   functorial : True
 
@@ -141,7 +141,7 @@ structure SpecializationMap (X : Scheme.{u}) (x y : GeometricPoint X) where
 /-- The tame fundamental group as a quotient of the etale pi1. -/
 structure TameFundamentalGroup (X : Scheme.{u}) (x : GeometricPoint X) where
   /-- Underlying etale fundamental group. -/
-  underlying : EtaleFundamentalGroup X x
+  underlying : EtalePi1 X x
   /-- Tameness condition (structural). -/
   tame : Prop
 
@@ -167,7 +167,7 @@ structure TopologicalFundamentalGroup (X : ComplexVariety) where
 /-- Comparison of etale and topological fundamental groups. -/
 structure ComparisonWithTopologicalPi1 (X : ComplexVariety) (x : GeometricPoint X.scheme) where
   /-- Etale fundamental group. -/
-  etale : EtaleFundamentalGroup X.scheme x
+  etale : EtalePi1 X.scheme x
   /-- Topological fundamental group. -/
   topological : TopologicalFundamentalGroup X
   /-- Comparison map to the topological pi1. -/
