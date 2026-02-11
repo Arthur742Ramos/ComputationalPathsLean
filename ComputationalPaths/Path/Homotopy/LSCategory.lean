@@ -24,8 +24,6 @@ lightweight form consistent with other homotopy modules.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Homotopy.Truncation
-import ComputationalPaths.Path.Homotopy.HopfInvariant
-import ComputationalPaths.Path.Homotopy.LieGroups
 import ComputationalPaths.Path.Algebra.CohomologyRing
 
 namespace ComputationalPaths
@@ -33,24 +31,14 @@ namespace Path
 namespace Homotopy
 namespace LSCategory
 
-universe u v
-
-/-! ## Aliases for standard spaces -/
-
-/-- The n-sphere used in LS-category statements. -/
-abbrev Sphere (n : Nat) : Type u :=
-  _root_.ComputationalPaths.Path.Homotopy.HopfInvariant.Sphere n
-
-/-- The n-torus used in LS-category statements. -/
-abbrev TorusN (n : Nat) : Type u :=
-  _root_.ComputationalPaths.Path.Homotopy.LieGroups.TorusN n
+universe u
 
 /-! ## Contractible-in-X sets -/
 
 /-- A set that is contractible when viewed inside X. -/
 structure ContractibleIn (X : Type u) where
   /-- The carrier type of the subset. -/
-  carrier : Type v
+  carrier : Type u
   /-- Inclusion into X. -/
   incl : carrier -> X
   /-- A chosen center point in X. -/
@@ -68,7 +56,7 @@ def contract_path (U : ContractibleIn X) (x : U.carrier) :
   U.contract x
 
 /-- Build a contractible-in-X set from a contractible carrier. -/
-def ofIsContr {U : Type v} (h : Truncation.IsContr U) (incl : U -> X) :
+def ofIsContr {U : Type u} (h : Truncation.IsContr U) (incl : U -> X) :
     ContractibleIn X where
   carrier := U
   incl := incl
@@ -150,7 +138,7 @@ theorem cupLength_lower_bound {X : Type u} (H : CohomologyOn X)
 /-! ## Product inequality -/
 
 /-- Product inequality for LS-category. -/
-theorem cat_product_inequality (X : Type u) (Y : Type u) :
+theorem cat_product_inequality (_X : Type u) (_Y : Type u) :
     Exists (fun desc : String =>
       desc = "cat(X x Y) <= cat(X) + cat(Y)") :=
   ⟨_, rfl⟩
@@ -158,12 +146,12 @@ theorem cat_product_inequality (X : Type u) (Y : Type u) :
 /-! ## Sphere and torus values -/
 
 /-- cat(S^n) = 1 (recorded value). -/
-theorem cat_sphere_eq_one (n : Nat) :
+theorem cat_sphere_eq_one (_n : Nat) :
     Exists (fun desc : String => desc = "cat(S^n) = 1") :=
   ⟨_, rfl⟩
 
 /-- cat(T^n) = n (recorded value). -/
-theorem cat_torus_eq (n : Nat) :
+theorem cat_torus_eq (_n : Nat) :
     Exists (fun desc : String => desc = "cat(T^n) = n") :=
   ⟨_, rfl⟩
 
@@ -192,7 +180,7 @@ def section_path (g : GaneaFibration X n) (x : X) :
 end GaneaFibration
 
 /-- Relationship between LS-category and Ganea fibrations. -/
-theorem cat_ganea_relation (X : Type u) (n : Nat) :
+theorem cat_ganea_relation (_X : Type u) (_n : Nat) :
     Exists (fun desc : String =>
       desc = "cat(X) <= n iff the n-th Ganea fibration admits a section") :=
   ⟨_, rfl⟩
