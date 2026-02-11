@@ -39,11 +39,11 @@ universe u v
 
 /-- The n-sphere used in LS-category statements. -/
 abbrev Sphere (n : Nat) : Type u :=
-  HopfInvariant.Sphere (u := u) n
+  _root_.ComputationalPaths.Path.Homotopy.HopfInvariant.Sphere n
 
 /-- The n-torus used in LS-category statements. -/
 abbrev TorusN (n : Nat) : Type u :=
-  LieGroups.TorusN (u := u) n
+  _root_.ComputationalPaths.Path.Homotopy.LieGroups.TorusN n
 
 /-! ## Contractible-in-X sets -/
 
@@ -151,7 +151,7 @@ theorem cupLength_lower_bound {X : Type u} (H : CohomologyOn X)
 
 /-- Product inequality for LS-category. -/
 theorem cat_product_inequality (X : Type u) (Y : Type u) :
-    Sigma (fun desc : String =>
+    Exists (fun desc : String =>
       desc = "cat(X x Y) <= cat(X) + cat(Y)") :=
   ⟨_, rfl⟩
 
@@ -159,12 +159,12 @@ theorem cat_product_inequality (X : Type u) (Y : Type u) :
 
 /-- cat(S^n) = 1 (recorded value). -/
 theorem cat_sphere_eq_one (n : Nat) :
-    Sigma (fun desc : String => desc = "cat(S^n) = 1") :=
+    Exists (fun desc : String => desc = "cat(S^n) = 1") :=
   ⟨_, rfl⟩
 
 /-- cat(T^n) = n (recorded value). -/
 theorem cat_torus_eq (n : Nat) :
-    Sigma (fun desc : String => desc = "cat(T^n) = n") :=
+    Exists (fun desc : String => desc = "cat(T^n) = n") :=
   ⟨_, rfl⟩
 
 /-! ## Ganea fibrations -/
@@ -175,10 +175,10 @@ structure GaneaFibration (X : Type u) (n : Nat) where
   total : Type u
   /-- Projection to the base. -/
   proj : total -> X
-  /-- A chosen section. -/
-  section : X -> total
+  /-- A chosen section map. -/
+  sectionMap : X -> total
   /-- The section is a right inverse. -/
-  section_eq : forall x, proj (section x) = x
+  sectionMap_eq : forall x, proj (sectionMap x) = x
 
 namespace GaneaFibration
 
@@ -186,14 +186,14 @@ variable {X : Type u} {n : Nat}
 
 /-- Path witness for the section equation. -/
 def section_path (g : GaneaFibration X n) (x : X) :
-    Path (g.proj (g.section x)) x :=
-  Path.ofEq (g.section_eq x)
+    Path (g.proj (g.sectionMap x)) x :=
+  Path.ofEq (g.sectionMap_eq x)
 
 end GaneaFibration
 
 /-- Relationship between LS-category and Ganea fibrations. -/
 theorem cat_ganea_relation (X : Type u) (n : Nat) :
-    Sigma (fun desc : String =>
+    Exists (fun desc : String =>
       desc = "cat(X) <= n iff the n-th Ganea fibration admits a section") :=
   ⟨_, rfl⟩
 

@@ -119,7 +119,7 @@ def ganeaHasSection (n : Nat) (X : PtdType.{u}) : Prop :=
   Nonempty (GaneaSection n X)
 
 /-- LS-category (scaffold value). -/
-def cat (X : PtdType.{u}) : Nat :=
+def cat (_ : PtdType.{u}) : Nat :=
   0
 
 /-- cat(X) <= n iff the n-th Ganea fibration admits a section (scaffold). -/
@@ -136,19 +136,20 @@ theorem cat_le_iff_section (X : PtdType.{u}) (n : Nat) :
 /-- Data packaging the Ganea-Whitehead characterization (scaffold). -/
 structure GaneaWhiteheadData (n : Nat) (X : PtdType.{u}) where
   /-- A section of the n-th Ganea fibration. -/
-  section : GaneaSection n X
+  ganeaSection : GaneaSection n X
   /-- Whitehead-type condition (placeholder). -/
   whitehead : True
 
 /-- Ganea-Whitehead characterization: sections correspond to Whitehead data. -/
 theorem ganea_whitehead_characterization (n : Nat) (X : PtdType.{u}) :
-    ganeaHasSection n X ↔ GaneaWhiteheadData n X := by
+    ganeaHasSection n X ↔ Nonempty (GaneaWhiteheadData n X) := by
   constructor
   · intro h
     rcases h with ⟨s⟩
-    exact { section := s, whitehead := trivial }
+    exact ⟨{ ganeaSection := s, whitehead := trivial }⟩
   · intro h
-    exact ⟨h.section⟩
+    rcases h with ⟨data⟩
+    exact ⟨data.ganeaSection⟩
 
 /-! ## Summary -/
 

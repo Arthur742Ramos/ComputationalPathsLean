@@ -168,7 +168,7 @@ structure BinaryProduct (C : QuasiCategory) (X Y : C.obj) where
   snd : QCHom C obj Y
   /-- Universal property: maps into the product correspond to pairs. -/
   universal : ∀ {Z : C.obj} (_ : QCHom C Z X) (_ : QCHom C Z Y),
-    ∃ h : QCHom C Z obj, True
+    ∃ _ : QCHom C Z obj, True
 
 /-- Binary coproduct in a quasi-category (universal property). -/
 structure BinaryCoproduct (C : QuasiCategory) (X Y : C.obj) where
@@ -180,7 +180,7 @@ structure BinaryCoproduct (C : QuasiCategory) (X Y : C.obj) where
   inr : QCHom C Y obj
   /-- Universal property: maps out of the coproduct correspond to pairs. -/
   universal : ∀ {Z : C.obj} (_ : QCHom C X Z) (_ : QCHom C Y Z),
-    ∃ h : QCHom C obj Z, True
+    ∃ _ : QCHom C obj Z, True
 
 /-- Pullback in a quasi-category (universal property). -/
 structure Pullback {C : QuasiCategory} {X Y Z : C.obj}
@@ -195,7 +195,7 @@ structure Pullback {C : QuasiCategory} {X Y Z : C.obj}
   comm : True
   /-- Universal property: pullback mediating map. -/
   universal : ∀ {W : C.obj} (_ : QCHom C W X) (_ : QCHom C W Y),
-    True → ∃ h : QCHom C W obj, True
+    (_ : True) → ∃ _ : QCHom C W obj, True
 
 /-- Pushout in a quasi-category (universal property). -/
 structure Pushout {C : QuasiCategory} {X Y Z : C.obj}
@@ -210,7 +210,7 @@ structure Pushout {C : QuasiCategory} {X Y Z : C.obj}
   comm : True
   /-- Universal property: pushout mediating map. -/
   universal : ∀ {W : C.obj} (_ : QCHom C Y W) (_ : QCHom C Z W),
-    True → ∃ h : QCHom C obj W, True
+    (_ : True) → ∃ _ : QCHom C obj W, True
 
 /-! ## Adjoint functor theorem (presentable infinity-categories) -/
 
