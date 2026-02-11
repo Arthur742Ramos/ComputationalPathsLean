@@ -22,6 +22,7 @@ import ComputationalPaths.Path.Rewrite.Normalization
 import ComputationalPaths.Path.Rewrite.NormalizationDerived
 import ComputationalPaths.Path.Rewrite.PathNormalizationDecision
 import ComputationalPaths.Path.Rewrite.PathExpr
+import ComputationalPaths.Path.Rewrite.HigherRewriting
 import ComputationalPaths.Path.Rewrite.ExprConfluence
 import ComputationalPaths.Path.Rewrite.PathExprConfluence
 import ComputationalPaths.Path.Rewrite.ConfluenceProofPathExpr

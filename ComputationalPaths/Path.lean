@@ -14,6 +14,7 @@ import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.Quot
 import ComputationalPaths.Path.Rewrite.LNDEQ
 import ComputationalPaths.Path.Rewrite.Termination
+import ComputationalPaths.Path.Rewrite.PathComplexity
 import ComputationalPaths.Path.Rewrite.Confluence
 import ComputationalPaths.Path.Rewrite.ConfluenceProof
 import ComputationalPaths.Path.Rewrite.ConfluenceTerminationDerived
@@ -97,8 +98,10 @@ import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
 import ComputationalPaths.Path.Homotopy.GroupoidCovering
+import ComputationalPaths.Path.Homotopy.GaloisTheoryCovers
 import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Homotopy.QuillenAdjunction
+import ComputationalPaths.Path.Homotopy.ModelCategoryExamples
 import ComputationalPaths.Path.Homotopy.HopfFibration
 import ComputationalPaths.Path.Homotopy.HopfInvariant
 import ComputationalPaths.Path.Homotopy.KervaireInvariant
@@ -107,6 +110,7 @@ import ComputationalPaths.Path.Homotopy.PathSpaceFibration
 import ComputationalPaths.Path.Homotopy.GaneaFibration
 import ComputationalPaths.Path.Homotopy.PathSpaceHomotopy
 import ComputationalPaths.Path.Homotopy.HomotopyCommutativeDiagram
+import ComputationalPaths.Path.Homotopy.HomotopyCoherence
 import ComputationalPaths.Path.Homotopy.HomotopyCartan
 import ComputationalPaths.Path.Homotopy.LongExactSequence
 import ComputationalPaths.Path.Homotopy.HomotopyExactSequence
@@ -122,10 +126,13 @@ import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
 import ComputationalPaths.Path.Homotopy.LoopSpaceDelooping
 import ComputationalPaths.Path.Homotopy.OmegaSpectrum
 import ComputationalPaths.Path.Homotopy.JamesConstruction
+import ComputationalPaths.Path.Homotopy.HSpaces
 import ComputationalPaths.Path.Homotopy.EHPSequence
 import ComputationalPaths.Path.Homotopy.StableHomotopy
+import ComputationalPaths.Path.Homotopy.StableHomotopyGroups
 import ComputationalPaths.Path.Homotopy.GeneralizedCohomology
 import ComputationalPaths.Path.Homotopy.BottPeriodicity
+import ComputationalPaths.Path.Homotopy.AdamsOperations
 import ComputationalPaths.Path.Homotopy.SpectrumTheory
 import ComputationalPaths.Path.Homotopy.ThomSpectra
 import ComputationalPaths.Path.Homotopy.StableSplitting
@@ -159,6 +166,8 @@ import ComputationalPaths.Path.CompPath.LoopSpaceRecognition
 import ComputationalPaths.Path.CompPath.HomogeneousSpace
 import ComputationalPaths.Path.CompPath.OrbitSpace
 import ComputationalPaths.Path.CompPath.ClassifyingSpace
+import ComputationalPaths.Path.CompPath.ClassifyingSpaceBG
+import ComputationalPaths.Path.CompPath.ThomSpaces
 import ComputationalPaths.Path.CompPath.CircleStep
 import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.CompPath.Torus
@@ -190,6 +199,7 @@ import ComputationalPaths.Path.CompPath.StiefelManifold
 import ComputationalPaths.Path.CompPath.GrassmannManifold
 import ComputationalPaths.Path.CompPath.LensSpace
 import ComputationalPaths.Path.CompPath.LensSpaceAlgebra
+import ComputationalPaths.Path.CompPath.MilnorFibration
 -- removed legacy assumption-heavy modules (Mobius/Lens/Hopf/Pi2/Pi3/CP/Freudenthal/Cellular)
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.InfinityGroupoid
@@ -198,10 +208,12 @@ import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
+import ComputationalPaths.Path.Algebra.SpectralMackey
 import ComputationalPaths.Path.Algebra.AInfinityAlgebra
 import ComputationalPaths.Path.Algebra.StringTopology
 import ComputationalPaths.Path.Algebra.ZigzagPersistence
 import ComputationalPaths.Path.Algebra.ExtFunctor
+import ComputationalPaths.Path.Algebra.HomotopicalAlgebra
 import ComputationalPaths.Path.Algebra.BarComplex
 import ComputationalPaths.Path.Algebra.Abelianization
 import ComputationalPaths.Path.Algebra.KTheory
@@ -213,6 +225,7 @@ import ComputationalPaths.Path.Homotopy.BlakersMasseyImproved
 import ComputationalPaths.Path.Homotopy.WhiteheadTower
 import ComputationalPaths.Path.Homotopy.LoopSpaceHomology
 import ComputationalPaths.Path.Homotopy.EilenbergZilber
+import ComputationalPaths.Path.Homotopy.EilenbergMoore
 import ComputationalPaths.Path.Homotopy.RationalHomotopy
 import ComputationalPaths.Path.Homotopy.PhantomMaps
 import ComputationalPaths.Path.Homotopy.EquivariantHomotopy
@@ -242,6 +255,7 @@ import ComputationalPaths.Path.Homotopy.VectorBundle
 import ComputationalPaths.Path.Homotopy.PrincipalBundle
 import ComputationalPaths.Path.Homotopy.CharacteristicClass
 import ComputationalPaths.Path.Homotopy.KanComplex
+import ComputationalPaths.Path.Homotopy.SimplicialModel
 import ComputationalPaths.Path.Homotopy.NerveRealization
 import ComputationalPaths.Path.Homotopy.QuasiCategory
 import ComputationalPaths.Path.Homotopy.TotalSingularComplex
