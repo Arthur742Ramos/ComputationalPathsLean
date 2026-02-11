@@ -304,3 +304,4 @@ import ComputationalPaths.Path.Topology.HandleDecomposition
 import ComputationalPaths.Path.Topology.IntersectionForm
 import ComputationalPaths.Path.Topology.SurgeryTheory
 import ComputationalPaths.Path.Topology.FlowCategory
+import ComputationalPaths.Path.Topology.ToposTheory
