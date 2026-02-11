@@ -294,3 +294,8 @@ import ComputationalPaths.Path.Category.EnrichedCategory
 import ComputationalPaths.Path.Category.DoubleCategory
 import ComputationalPaths.Path.Category.KanExtension
 import ComputationalPaths.Path.Category.GrothendieckConstruction
+import ComputationalPaths.Path.Algebra.AlgebraicKTheoryPaths
+import ComputationalPaths.Path.Algebra.MilnorKTheory
+import ComputationalPaths.Path.Algebra.SteinbergGroup
+import ComputationalPaths.Path.Topology.CobordismRing
+import ComputationalPaths.Path.Topology.CharacteristicNumbers
