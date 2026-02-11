@@ -71,7 +71,7 @@ def coverComp {X : Scheme.{u}} {Y Z W : FiniteEtaleCover X}
 
 /-- The fiber of a cover at a geometric point. -/
 def fiber {X : Scheme.{u}} (x : GeometricPoint X) (Y : FiniteEtaleCover X) : Type u :=
-  { y : Y.carrier // Path (Y.map y) x.point }
+  { y : Y.carrier // Y.map y = x.point }
 
 /-- The fiber functor on finite etale covers. -/
 structure FiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) where
@@ -85,7 +85,7 @@ structure FiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) where
 /-- The canonical fiber functor given by geometric fibers. -/
 def geometricFiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) : FiberFunctor X x :=
   { onObj := fiber x
-    onHom := fun {_ _} f y => ⟨f.toFun y.1, Path.trans (f.comm y.1) y.2⟩
+    onHom := fun {_ _} f y => ⟨f.toFun y.1, (f.comm y.1).proof.trans y.2⟩
     functorial := True.intro }
 
 /-! ## Profinite Completion and Grothendieck Pi1 -/

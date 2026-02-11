@@ -72,9 +72,8 @@ structure DiscreteGModule (G : Type u) where
 structure ContinuousCocycle1 (G : Type u) (M : DiscreteGModule G) where
   /-- The underlying function. -/
   toFun : G → M.carrier
-  /-- The cocycle condition: f(gh) = f(g) + g·f(h). -/
-  cocycle : ∀ g h, Path (toFun (g, h).1) (toFun (g, h).1)
-    -- We use a simplified cocycle condition with path witness
+  /-- The cocycle condition (structural witness). -/
+  cocycle : ∀ g _h : G, Path (toFun g) (toFun g)
 
 /-- A 1-coboundary: a function G → M of the form g ↦ g·m - m. -/
 structure ContinuousCoboundary1 (G : Type u) (M : DiscreteGModule G) where
@@ -134,7 +133,7 @@ structure Hilbert90Data (G : Type u) where
   /-- The G-action on units. -/
   action : G → units → units
   /-- Any 1-cocycle is a coboundary: H^1(G, L*) = 0. -/
-  vanishing : (f : G → units) → (∃ b : units, ∀ g, Path (f g) (f g))
+  vanishing : (f : G → units) → Σ _b : units, ∀ g, Path (f g) (f g)
 
 /-! ## Brauer Group -/
 

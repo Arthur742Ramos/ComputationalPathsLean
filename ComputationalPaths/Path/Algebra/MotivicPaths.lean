@@ -104,7 +104,7 @@ structure WeightStructure (Obj : Type u) where
   heart_iff : ∀ X, heart X ↔ (weight_le 0 X ∧ weight_ge 0 X)
 
 /-- The trivial weight structure with every object in every weight. -/
-def WeightStructure.trivial (Obj : Type u) : WeightStructure Obj :=
+def WeightStructure.allWeights (Obj : Type u) : WeightStructure Obj :=
   { weight_le := fun _ _ => True
     weight_ge := fun _ _ => True
     heart := fun _ => True
@@ -112,9 +112,9 @@ def WeightStructure.trivial (Obj : Type u) : WeightStructure Obj :=
       intro _
       constructor
       · intro _
-        exact And.intro trivial trivial
+        exact And.intro True.intro True.intro
       · intro _
-        exact trivial }
+        exact True.intro }
 
 /-! ## Motivic decompositions -/
 

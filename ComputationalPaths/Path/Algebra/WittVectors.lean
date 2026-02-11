@@ -40,12 +40,9 @@ structure BigWittVector (R : Type u) where
   coeff : Nat → R
 
 /-- Equality of big Witt vectors via pointwise path equality. -/
-theorem bigWitt_ext {R : Type u} (a b : BigWittVector R)
-    (h : ∀ n, Path (a.coeff n) (b.coeff n)) : Path a b := by
-  cases a; cases b
-  simp only [BigWittVector.mk.injEq]
-  funext n
-  exact h n
+def bigWitt_ext {R : Type u} (a b : BigWittVector R)
+    (h : ∀ n, Path (a.coeff n) (b.coeff n)) : Path a b :=
+  Path.mk [] (by cases a; cases b; congr; funext n; exact (h n).proof)
 
 /-! ## Ghost Map -/
 
@@ -69,7 +66,7 @@ def ghostMapFn {R : Type u} (g : GhostMap R) (v : BigWittVector R) : Nat → R :
   fun n => g.ghostComponent n v
 
 /-- Ghost map applied at index 0 recovers the first component. -/
-theorem ghost_at_zero {R : Type u} (g : GhostMap R) (v : BigWittVector R) :
+def ghost_at_zero {R : Type u} (g : GhostMap R) (v : BigWittVector R) :
     Path (ghostMapFn g v 0) (v.coeff 0) :=
   g.ghost_zero v
 
@@ -106,12 +103,9 @@ structure PTypicalWittVector (p : Nat) (R : Type u) where
   coeff : Nat → R
 
 /-- Equality of p-typical Witt vectors. -/
-theorem ptypical_ext {p : Nat} {R : Type u} (a b : PTypicalWittVector p R)
-    (h : ∀ n, Path (a.coeff n) (b.coeff n)) : Path a b := by
-  cases a; cases b
-  simp only [PTypicalWittVector.mk.injEq]
-  funext n
-  exact h n
+def ptypical_ext {p : Nat} {R : Type u} (a b : PTypicalWittVector p R)
+    (h : ∀ n, Path (a.coeff n) (b.coeff n)) : Path a b :=
+  Path.mk [] (by cases a; cases b; congr; funext n; exact (h n).proof)
 
 /-- Embedding p-typical Witt vectors into big Witt vectors. -/
 def ptypicalToBig {p : Nat} {R : Type u} (zero : R)
@@ -134,7 +128,7 @@ def iterFrob {p : Nat} {R : Type u} (F : FrobeniusOp p R) :
   | n + 1 => F.frob ∘ iterFrob F n
 
 /-- Iterated Frobenius at 0 is identity. -/
-theorem iterFrob_zero {p : Nat} {R : Type u} (F : FrobeniusOp p R)
+def iterFrob_zero {p : Nat} {R : Type u} (F : FrobeniusOp p R)
     (v : PTypicalWittVector p R) : Path (iterFrob F 0 v) v :=
   Path.refl v
 
@@ -173,7 +167,7 @@ structure TeichmuellerLift (p : Nat) (R : Type u) where
     Path ((teichmueller r).coeff (n + 1)) zero
 
 /-- Teichmüller lift recovers the input at degree 0. -/
-theorem teich_recover {p : Nat} {R : Type u} (T : TeichmuellerLift p R)
+def teich_recover {p : Nat} {R : Type u} (T : TeichmuellerLift p R)
     (r : R) : Path ((T.teichmueller r).coeff 0) r :=
   T.teich_coeff_zero r
 
@@ -190,7 +184,7 @@ def truncate {p : Nat} {n : Nat} {R : Type u}
   { coeff := fun i => v.coeff i.val }
 
 /-- Truncation respects the first component. -/
-theorem truncate_coeff_zero {p : Nat} {n : Nat} {R : Type u}
+def truncate_coeff_zero {p : Nat} {n : Nat} {R : Type u}
     (v : PTypicalWittVector p R) (hn : 0 < n) :
     Path ((truncate v : TruncatedWittVector p n R).coeff ⟨0, hn⟩) (v.coeff 0) :=
   Path.refl _
@@ -208,7 +202,7 @@ structure WittFunctoriality (p : Nat) (R : Type u) (S : Type v) where
     Path ((wittMap v).coeff n) (ringMap (v.coeff n))
 
 /-- Functoriality preserves components. -/
-theorem wittMap_preserves {p : Nat} {R : Type u} {S : Type v}
+def wittMap_preserves {p : Nat} {R : Type u} {S : Type v}
     (F : WittFunctoriality p R S) (v : PTypicalWittVector p R) (n : Nat) :
     Path ((F.wittMap v).coeff n) (F.ringMap (v.coeff n)) :=
   F.wittMap_coeff v n
