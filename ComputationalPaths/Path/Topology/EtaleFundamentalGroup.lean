@@ -85,7 +85,7 @@ structure FiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) where
 /-- The canonical fiber functor given by geometric fibers. -/
 def geometricFiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) : FiberFunctor X x :=
   { onObj := fiber x
-    onHom := fun {Y Z} f y => ⟨f.toFun y.1, Path.trans (f.comm y.1) y.2⟩
+    onHom := fun {_ _} f y => ⟨f.toFun y.1, Path.trans (f.comm y.1) y.2⟩
     functorial := True.intro }
 
 /-! ## Profinite Completion and Grothendieck Pi1 -/
@@ -107,7 +107,7 @@ structure GrothendieckPi1 (X : Scheme.{u}) (x : GeometricPoint X) where
   actsOn : FiberFunctor X x → Prop
 
 /-- Etale fundamental group as Grothendieck's profinite group. -/
-abbrev EtaleFundamentalGroup (X : Scheme.{u}) (x : GeometricPoint X) :=
+abbrev EtalePi1 (X : Scheme.{u}) (x : GeometricPoint X) :=
   GrothendieckPi1 X x
 
 /-! ## Etale Path Groupoid and Specialization -/

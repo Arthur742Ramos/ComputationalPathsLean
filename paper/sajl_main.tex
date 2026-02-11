@@ -1407,7 +1407,20 @@ rewriting setting.
 \end{proof}
 
 The critical pair analysis is the most technically demanding part of the
-confluence proof. Representative cases include:
+confluence proof.
+
+\begin{remark}[Scale and tooling]\label{rem:critical-pair-tooling}
+  The scale of the 74-rule system raises maintainability questions. We organize
+  the rules into eight groups and structure the critical pair analysis by
+  group; overlaps are checked within each group and then across groups, so the
+  grouping serves as bookkeeping rather than a modular-confluence theorem that
+  would allow independent composition of confluence proofs. In the Lean
+  formalization, the finite list of critical pairs is made explicit and each
+  joinability witness is proved, providing machine-checked verification of all
+  rule interactions.
+\end{remark}
+
+Representative cases include:
 
 \begin{itemize}
   \item \textbf{Product $\fst$ overlap.}\;
