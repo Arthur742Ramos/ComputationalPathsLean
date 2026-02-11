@@ -131,27 +131,19 @@ and Higher-Dimensional Structure}
 \begin{document}
 
 \begin{abstract}
-We present a mathematical theory of \emph{computational paths}---a formalism in
-which propositional equalities between elements of a type carry explicit rewrite
-traces recording the sequence of elementary steps by which they were derived. A
-computational path from~$a$ to~$b$ in a type~$A$ is a pair $(s, \pi)$ where
-$\pi : a =_A b$ is a propositional equality and $s$ is a finite list of
-elementary rewrite steps. The space of computational paths is equipped with a
-confluent, terminating rewrite system whose 74~rules (the count of 74 follows
-from the distinct constructors in our formalization; the earlier convention of
-76 in~\cite{RDQO18} counted two context-congruence rules that serve double
-duty) are organized into eight groups covering path algebra, type-former
-$\beta/\eta$-rules, transport,
-contexts, dependent contexts, bi-contexts, map congruence, and structural
-closure. We prove that this structure gives rise to weak $\omega$-groupoids in
-the sense of Batanin--Leinster~\cite{Batanin98}, with contractibility beginning at
-dimension~3---the critical threshold that preserves non-trivial fundamental
-groups. The entire development is mechanically verified in a proof assistant.
+We develop a mathematical theory of \emph{computational paths}---equality proofs
+equipped with explicit rewrite traces---and the associated rewrite system. The
+system is confluent and terminating (75 rules in eight groups), supports path
+algebra and type-former $\beta/\eta$ laws, and yields a weak $\omega$-groupoid
+structure in the sense of Batanin--Leinster~\cite{Batanin98}. Contractibility
+begins at dimension~3, preserving non-trivial fundamental groups. The full
+development and its homotopy-theoretic applications are mechanically verified
+in Lean~4.
 \end{abstract}
 
 \begin{keywords}
-computational paths, identity types, weak $\omega$-groupoid, rewrite system,
-type theory, higher-dimensional algebra, formalization
+computational paths, identity types, rewrite systems, weak $\omega$-groupoids,
+homotopy type theory, Lean~4
 \end{keywords}
 
 % ============================================================================
@@ -254,7 +246,7 @@ More generally, in our framework the elementary steps include: $\beta$- and
 $\eta$-reductions for each type former (functions, products, sums, sigma types),
 transport equations, congruence rules (which lift a step through a function
 application), symmetry and transitivity of paths, and structural rules.
-We enumerate all 74 such rules in \cref{ch:rewrite-system}.
+We enumerate all 75 such rules in \cref{ch:rewrite-system}.
 
 Steps can be inverted (swapping source and target) and
 mapped through functions.
@@ -368,7 +360,7 @@ variables, computational paths are built from explicit rewrite steps.~\cite{CCHM
 \paragraph{Higher-Dimensional Rewriting.}
 The rewriting-theoretic perspective on higher algebra, developed by Burroni,
 M\'etayer, Lafont, and others~\cite{Burroni93, Metayer03, lafont09}, treats rewrite rules as generators of higher
-cells. Our 74-rule rewrite system on paths (\cref{ch:rewrite-system}) can be
+cells. Our 75-rule rewrite system on paths (\cref{ch:rewrite-system}) can be
 seen as an instance of this paradigm, with the strip lemma and confluence
 results providing the coherence data.
 
@@ -388,7 +380,7 @@ in four sections following this introduction.
     binary, and dependent contexts.
 
   \item[\cref{ch:rewrite-system}: The Rewrite System.]
-    We define the single-step rewrite relation $\Step$ with its 74 rules in
+    We define the single-step rewrite relation $\Step$ with its 75 rules in
     eight groups, its reflexive--transitive closure $\Rw$, and the rewrite
     equality $\RwEq$. We prove soundness, develop normalization, establish
     termination via a recursive path ordering, prove local confluence
@@ -900,7 +892,7 @@ these additional identities.
 
 \begin{definition}[Single-Step Rewrite]\label{def:step-rewrite}
   The relation $\rew$ on $\Path_A(a,b)$ is the smallest relation closed under
-  the 74 rules organized into eight groups below. We write
+  the 75 rules organized into eight groups below. We write
   $\Step(p, q)$ or $p \rew q$ to denote that $p$ rewrites to $q$ in one step.
 \end{definition}
 
@@ -1119,7 +1111,7 @@ all operations:
 \end{theorem}
 
 \begin{proof}
-  By induction on the derivation of $\Step(p, q)$. Each of the 74 rules
+  By induction on the derivation of $\Step(p, q)$. Each of the 75 rules
   preserves the proof field because all path operations are designed to be
   sound with respect to the underlying propositional equality. The structural
   closure rules follow by the induction hypothesis.
@@ -1247,17 +1239,23 @@ canonical one-step witness.
   other words, $\RwEq$ is the total relation on each hom-set
   $\Path_A(a,b)$.
 
-  This may appear to trivialize the rewrite system, but the opposite is
-  the case. The value of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS lies not in
+  Because $\RwEq$ is $\Prop$-valued, any two witnesses of $p \rweq q$ are
+  equal by proof irrelevance. This means the higher coherence data are
+  forced: parallel derivations have the same $\RwEq$ projection, so
+  contractibility begins at dimension~3 by design (see
+  \cref{thm:contract3}). This is a feature, not a bug: it isolates the
+  non-trivial structure at the lowest dimensions while keeping higher
+  coherences automatic.
+
+  The value of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS therefore lies not in
   the equivalence relation $\RwEq$ itself---which is indeed trivial in the
   UIP setting---but in the \emph{constructive witnesses} it provides:
   explicit, finite rewrite sequences connecting any path to its normal
-  form. These witnesses are the data that drive the higher-dimensional
-  structure: derivation cells (\cref{sec:omega-groupoid}) record
-  \emph{which} rewrite steps are applied, and distinct derivations between
-  the same pair of paths give rise to non-trivial three-cells, four-cells,
-  and beyond. The rich combinatorial content of the rewrite system lives
-  in the derivation tower, not in the bare equivalence relation.
+  form. The path algebra and groupoid operations at dimension~1 are
+  non-trivial, and the derivation cells (\cref{sec:omega-groupoid}) record
+  \emph{which} rewrite steps are applied. The rich combinatorial content
+  of the rewrite system lives in the derivation tower, not in the bare
+  equivalence relation.
 \end{remark}
 
 \subsection{Termination}
@@ -1272,7 +1270,7 @@ The proof uses a \emph{recursive path ordering} (RPO) adapted to the typed
 rewriting setting.
 
 \begin{definition}[Rule Precedence]\label{def:rule-precedence}
-  The 74 rewrite rules are assigned a numeric rank
+  The 75 rewrite rules are assigned a numeric rank
   $\mathrm{rank} : \mathrm{Rule} \to \Nat$, forming a well-founded
   precedence relation. The ranking is chosen so that rules introducing
   simpler path expressions (e.g., $\refl$) have lower rank than rules
@@ -1302,7 +1300,7 @@ rewriting setting.
 \end{theorem}
 
 \begin{proof}
-  By case analysis on the 74 rules. Each rule either reduces the symbol
+  By case analysis on the 75 rules. Each rule either reduces the symbol
   rank or maintains the rank while strictly decreasing the aggregate weight.
 \end{proof}
 
@@ -1327,14 +1325,14 @@ rewriting setting.
   and $p \rews r'$, we obtain a join of $q$ and $r'$ at some $m'$.
   We then perform a \emph{critical pair analysis}: for each pair of
   overlapping rules that could apply to~$r'$, we exhibit an explicit
-  join. The analysis covers all pairs among the 74 rules.
+  join. The analysis covers all pairs among the 75 rules.
 \end{proof}
 
 The critical pair analysis is the most technically demanding part of the
 confluence proof.
 
 \begin{remark}[Scale and tooling]\label{rem:critical-pair-tooling}
-  The scale of the 74-rule system raises maintainability questions. We organize
+  The scale of the 75-rule system raises maintainability questions. We organize
   the rules into eight groups and structure the critical pair analysis by
   group; overlaps are checked within each group and then across groups, so the
   grouping serves as bookkeeping rather than a modular-confluence theorem that
@@ -2145,7 +2143,8 @@ The pattern continues uniformly:
     \Derivation_4, \quad \ldots
   \]
   forms a weak $\omega$-groupoid with contractibility starting at
-  dimension~3.
+  dimension~3; the higher coherence is simplified by proof irrelevance of
+  $\RwEq$.
 \end{theorem}
 
 \begin{proof}
@@ -2286,14 +2285,14 @@ Having established the algebraic foundations and the higher-dimensional structur
   This section is fully formalized in Lean: the loop-space definitions and fundamental-group results are mechanically verified. See \cref{tab:formalization-status} for the section-by-section summary as we move into mixed-status applications.
 \end{remark}
 
-With the algebraic and higher-dimensional foundations established, we now turn to the homotopy-theoretic applications of computational paths.~\cite{Hatcher02, May99} The central notion is the \emph{fundamental group}, which captures the structure of loops in a type up to rewrite equivalence. Throughout what follows, we work with the computational path structure $\mathrm{Path}_A(a,b)$ carrying explicit rewrite traces, modulo the rewrite equality $\mathrm{RwEq}$ developed in \cref{ch:rewrite-system}.
+With the algebraic and higher-dimensional foundations established, we now turn to the homotopy-theoretic applications of computational paths.~\cite{Hatcher02, May99} The central notion is the \emph{fundamental group}, which captures the structure of loops in a type up to rewrite equivalence. Throughout what follows, we work with the computational path structure $\Path_A(a,b)$ carrying explicit rewrite traces, modulo the rewrite equality $\mathrm{RwEq}$ developed in \cref{ch:rewrite-system}.
 
 \subsection{Loop Spaces}\label{subsec:loop-spaces}
 
 \begin{definition}[Loop space]\label{def:loop-space}
 Let $A$ be a type and $a : A$ a basepoint. The \emph{loop space} of $A$ at $a$ is
 \[
-  \Omega(A, a) \;=\; \mathrm{Path}_A(a, a),
+  \Omega(A, a) \;=\; \Path_A(a, a),
 \]
 the type of computational paths from $a$ to itself. The loop space carries three fundamental operations:
 \begin{itemize}
@@ -2312,7 +2311,7 @@ and $\mathsf{refl}(a)$ is a strict two-sided unit. Thus $\Omega(A,a)$ is a monoi
 \begin{definition}[Loop quotient]\label{def:loop-quotient}
 The \emph{loop quotient} at basepoint $a$ is
 \[
-  \mathrm{LoopQuot}(A, a) \;=\; \mathrm{PathRwQuot}(A, a, a) \;=\; \mathrm{Path}_A(a, a) \;/\; \mathrm{RwEq}.
+  \mathrm{LoopQuot}(A, a) \;=\; \PathRwQuot(A, a, a) \;=\; \Path_A(a, a) \;/\; \mathrm{RwEq}.
 \]
 The operations of $\Omega(A,a)$ descend to the quotient:
 \begin{align*}
@@ -2509,7 +2508,7 @@ While $\pi_1(A, a)$ depends on a choice of basepoint, the \emph{fundamental grou
 The \emph{fundamental groupoid} $\Pi_1(A)$ of a type $A$ is the strict groupoid with:
 \begin{itemize}
   \item \emph{Objects}: points $a : A$;
-  \item \emph{Morphisms}: $\mathrm{Hom}_{\Pi_1(A)}(a, b) = \mathrm{PathRwQuot}(A, a, b)$;
+  \item \emph{Morphisms}: $\mathrm{Hom}_{\Pi_1(A)}(a, b) = \PathRwQuot(A, a, b)$;
   \item \emph{Composition}: induced by $\mathsf{trans}$;
   \item \emph{Identity}: $\mathrm{id}_a = [\mathsf{refl}(a)]$;
   \item \emph{Inverse}: induced by $\mathsf{symm}$.
@@ -2518,7 +2517,7 @@ All groupoid axioms (associativity, unit laws, inverse laws) hold strictly on th
 \end{definition}
 
 \begin{theorem}[Basepoint independence]\label{thm:basepoint-independence}
-For any path $p : \mathrm{Path}_A(a, b)$, conjugation by $[p]$ induces a group isomorphism
+For any path $p : \Path_A(a, b)$, conjugation by $[p]$ induces a group isomorphism
 \[
   \varphi_p : \pi_1(A, a) \xrightarrow{\;\cong\;} \pi_1(A, b), \qquad \varphi_p(\alpha) = [p]^{-1} \cdot \alpha \cdot [p].
 \]
@@ -2542,11 +2541,11 @@ defined on objects by $\Pi_1(f)(a) = f(a)$ and on morphisms by $\Pi_1(f)([\gamma
   \item $\Pi_1(\mathrm{id}_A) = \mathrm{id}_{\Pi_1(A)}$.
   \item $\Pi_1(g \circ f) = \Pi_1(g) \circ \Pi_1(f)$.
 \end{enumerate}
-Natural transformations between induced functors correspond to paths: if $h : \mathrm{Path}_B(f(a), g(a))$ for all $a$, then $\Pi_1(f) \Rightarrow \Pi_1(g)$.
+Natural transformations between induced functors correspond to paths: if $h : \Path_B(f(a), g(a))$ for all $a$, then $\Pi_1(f) \Rightarrow \Pi_1(g)$.
 \end{theorem}
 
 \begin{proof}
-Well-definedness and functoriality follow from the functoriality of $\mathsf{congrArg}$ (Theorem~2.8) and its compatibility with $\mathrm{RwEq}$ (Theorem~3.6). For the naturality claim, given paths $h_a : \mathrm{Path}(f(a), g(a))$, the naturality square
+Well-definedness and functoriality follow from the functoriality of $\mathsf{congrArg}$ (Theorem~2.8) and its compatibility with $\mathrm{RwEq}$ (Theorem~3.6). For the naturality claim, given paths $h_a : \Path(f(a), g(a))$, the naturality square
 \[
   [\mathsf{congrArg}(g, \gamma)] \cdot [h_b]^{-1} = [h_a]^{-1} \cdot [\mathsf{congrArg}(f, \gamma)]
 \]
@@ -2571,7 +2570,23 @@ The fundamental group $\pi_1(A, a)$ is recovered as the automorphism group $\mat
   This section mixes fully formalized and scaffolded results. The circle and torus computations are fully formalized, while the figure-eight, Seifert--van Kampen, and suspension results are partially scaffolded; see \cref{tab:formalization-status}.
 \end{remark}
 
-We now compute the fundamental groups of standard spaces within the computational-paths framework. The key technical device is the \emph{path expression} construction: rather than postulating higher inductive types (as in HoTT), we model spaces as ordinary types equipped with formal loop generators at the syntactic level, then compute $\pi_1$ via winding-number arguments and free-product word decompositions.
+\subsection{From \texorpdfstring{$\Path$}{Path} to Path Expressions}\label{subsec:pathexpr-bridge}
+
+Up to this point, equality witnesses live in the core type $\Path_A(a,b)$. To define spaces such as $S^1$ without higher inductive types, we move to a \emph{syntactic extension} of paths: a path-expression language that freely adjoins formal generators.
+
+\begin{definition}[Path expressions with generators]\label{def:pathexpr-generators}
+Fix a type $A$ and a chosen family of formal generators. The type $\mathrm{PathExpr}_A(a,b)$ is the free term language generated by:
+\begin{itemize}
+  \item an embedding $\mathrm{atom} : \Path_A(a,b) \to \mathrm{PathExpr}_A(a,b)$,
+  \item the chosen generators (e.g.\ a loop symbol),
+  \item the usual constructors $\refl$, $\symm$, $\trans$, and the congruence operations.
+\end{itemize}
+When no generators are added, $\mathrm{PathExpr}_A$ merely re-encodes $\Path_A$; when generators are present, it strictly extends $\Path_A$ by adding formal paths not available in the ambient type theory. A fully formal definition appears in \cref{sec:pathexpr}.
+\end{definition}
+
+The relationship between $\Path$ and $\mathrm{PathExpr}$ is therefore twofold: $\Path$ embeds via $\mathrm{atom}$, and the added generators provide the extra loop structure needed to model spaces like $S^1$. The $\mathrm{LND_{EQ}}$ rewrite rules lift verbatim to $\mathrm{PathExpr}$ by matching on the same syntactic constructors, so $\mathrm{RwEq}$ and the induced groupoid structure extend unchanged. Thus in this section we compute $\pi_1$ by taking loops in $\mathrm{PathExpr}$ and quotienting by $\mathrm{RwEq}$.
+
+We now compute the fundamental groups of standard spaces within the computational-paths framework. The key technical device is the path expression construction described above: we model spaces as ordinary types equipped with formal loop generators at the syntactic level, then compute $\pi_1$ via winding-number arguments and free-product word decompositions.
 
 \subsection{The Computational Circle \texorpdfstring{$S^1$}{S¹}}\label{subsec:circle}
 
@@ -2695,7 +2710,7 @@ The figure-eight has two fundamental loops:
   \[
     \mathsf{loopB} = \mathsf{glue} \cdot \mathsf{inr}(\mathsf{loop}) \cdot \mathsf{glue}^{-1},
   \]
-  where $\mathsf{glue} : \mathrm{Path}(\mathsf{inl}(\mathsf{base}), \mathsf{inr}(\mathsf{base}))$ is the identification path of the wedge.
+  where $\mathsf{glue} : \Path(\mathsf{inl}(\mathsf{base}), \mathsf{inr}(\mathsf{base}))$ is the identification path of the wedge.
 \end{itemize}
 
 \begin{theorem}\label{thm:pi1-figure-eight}
@@ -2729,7 +2744,7 @@ Given types $A$, $B$, $C$ and maps $f : C \to A$, $g : C \to B$, the \emph{pusho
 \begin{itemize}
   \item $\mathsf{inl}(a)$ for $a : A$;
   \item $\mathsf{inr}(b)$ for $b : B$;
-  \item $\mathsf{glue}(c) : \mathrm{Path}(\mathsf{inl}(f(c)),\, \mathsf{inr}(g(c)))$ for $c : C$.
+  \item $\mathsf{glue}(c) : \Path(\mathsf{inl}(f(c)),\, \mathsf{inr}(g(c)))$ for $c : C$.
 \end{itemize}
 \end{definition}
 
@@ -2775,7 +2790,7 @@ $\pi_1(S^1 \vee S^1) \cong \mathbb{Z} * \mathbb{Z}$.
 The \emph{suspension} $\Sigma X$ of a type $X$ is defined by:
 \begin{itemize}
   \item Two constructors: $\mathsf{north}, \mathsf{south} : \Sigma X$;
-  \item A path constructor: $\mathsf{merid}(x) : \mathrm{Path}(\mathsf{north}, \mathsf{south})$ for each $x : X$.
+  \item A path constructor: $\mathsf{merid}(x) : \Path(\mathsf{north}, \mathsf{south})$ for each $x : X$.
 \end{itemize}
 \end{definition}
 
@@ -2822,670 +2837,11 @@ The lens space $L(p, q)$ has $\pi_1(L(p,q)) \cong \mathbb{Z}/p\mathbb{Z}$, compu
 For a map $f : A \to B$, the \emph{mapping cylinder} $M_f$ deformation-retracts onto $B$, hence $\pi_1(M_f) \cong \pi_1(B)$. The \emph{mapping cone} $C_f$ fits into the Seifert--van Kampen framework as a pushout, and its fundamental group is computed by the amalgamated free product with $\pi_1(A)$ quotiented by $f_*$.
 
 
-%%%% Converted from chapters/ch8_fibrations.tex (article (as-is)) %%%%
-
 %% ============================================================================
-%% Chapter 8: Fibrations, Covering Spaces, and Exact Sequences
-%% Part II of "The Algebra of Computational Paths"
+%% Chapter 8: The Rewrite System: Metatheory
+%% Part III of "The Algebra of Computational Paths"
 %% ============================================================================
 
-\section{Fibrations, Covering Spaces, and Exact Sequences}\label{sec:fibrations}
-
-\begin{remark}[Formalization status]
-  This section is mixed: path lifting is fully formalized, while the Hopf fibration data, Galois correspondence, and long exact sequence are partially scaffolded, and Mayer--Vietoris is statement-only. See \cref{tab:formalization-status}.
-\end{remark}
-
-This chapter develops the theory of fibrations, covering spaces, and exact sequences of homotopy groups in the computational-paths framework. The central idea is that a dependent type $P : B \to \mathsf{Type}$ serves as a fibration, with the transport operation along computational paths providing the homotopy lifting property.
-
-\subsection{Fibrations}\label{subsec:fibrations}
-
-\begin{definition}[Fiber]\label{def:fiber}
-Let $f : A \to B$ and $b : B$. The \emph{fiber} of $f$ over $b$ is
-\[
-  \mathrm{Fiber}(f, b) = \{a : A \mid f(a) = b\} = \Sigma(a : A).\, \mathrm{Path}(f(a), b).
-\]
-A fiber element consists of a point $a : A$ together with a computational path witnessing $f(a) = b$.
-\end{definition}
-
-\begin{definition}[Type family as fibration]\label{def:fibration-family}
-A dependent type $P : B \to \mathsf{Type}$ is viewed as a fibration via its \emph{total space}
-\[
-  E = \Sigma(b : B).\, P(b)
-\]
-with projection $\mathrm{pr}_1 : E \to B$. The fiber of $\mathrm{pr}_1$ over $b$ is canonically equivalent to $P(b)$:
-\[
-  \mathrm{Fiber}(\mathrm{pr}_1, b) \;\simeq\; P(b).
-\]
-\end{definition}
-
-\begin{theorem}[Path lifting]\label{thm:path-lifting}
-Given a type family $P : B \to \mathsf{Type}$, a computational path $p : \mathrm{Path}_B(b_1, b_2)$, and a point $x : P(b_1)$, there exists a lifted path
-\[
-  \widetilde{p} : \mathrm{Path}_E\bigl((b_1, x),\; (b_2, \mathrm{transport}_P(p, x))\bigr)
-\]
-in the total space $E = \Sigma P$, where $\mathrm{transport}_P(p, x)$ is the fiber transport of $x$ along $p$.
-\end{theorem}
-
-\begin{proof}
-The lifted path is constructed as $\widetilde{p} = \mathsf{ofEq}(h)$, where $h$ is the propositional equality $(b_1, x) = (b_2, \mathrm{transport}_P(p, x))$ obtained from $p.\mathsf{toEq} : b_1 = b_2$ by dependent elimination. The projection of $\widetilde{p}$ recovers the base path: $\mathsf{congrArg}(\mathrm{pr}_1, \widetilde{p}) = \mathsf{ofEq}(p.\mathsf{toEq})$.
-\end{proof}
-
-The transport operation satisfies the expected composition and inversion laws:
-
-\begin{proposition}[Transport laws]\label{prop:transport-laws}
-For a type family $P : B \to \mathsf{Type}$:
-\begin{enumerate}
-  \item $\mathrm{transport}_P(\mathsf{refl}(b), x) = x$.
-  \item $\mathrm{transport}_P(\mathsf{trans}(p, q), x) = \mathrm{transport}_P(q, \mathrm{transport}_P(p, x))$.
-  \item $\mathrm{transport}_P(\mathsf{symm}(p), \mathrm{transport}_P(p, x)) = x$.
-  \item $\mathrm{transport}_P(p, \mathrm{transport}_P(\mathsf{symm}(p), y)) = y$.
-\end{enumerate}
-\end{proposition}
-
-\begin{proof}
-These follow from the transport laws of computational paths (Theorem~2.11) together with the inversion properties of the rewrite system (Rules~3--6).
-\end{proof}
-
-\begin{definition}[Fiber sequence]\label{def:fiber-sequence}
-A \emph{fiber sequence} $F \to E \xrightarrow{p} B$ consists of:
-\begin{itemize}
-  \item A projection $p : E \to B$ with basepoints $b_0 : B$ and $e_0 : E$ satisfying $\mathrm{Path}(p(e_0), b_0)$;
-  \item A type $F$ together with an equivalence $F \simeq \mathrm{Fiber}(p, b_0)$.
-\end{itemize}
-The \emph{inclusion} $\iota : F \to E$ sends a fiber element to its underlying point in $E$.
-\end{definition}
-
-\begin{proposition}[Exactness of the canonical fiber sequence]\label{prop:fiber-exact}
-For a type family $P : B \to \mathsf{Type}$ with basepoint $b_0 : B$ and $x_0 : P(b_0)$, the canonical fiber sequence
-\[
-  P(b_0) \xrightarrow{\;\iota\;} \Sigma P \xrightarrow{\;\mathrm{pr}_1\;} B
-\]
-is \emph{exact at $\Sigma P$}: an element $e : \Sigma P$ lies in the image of $\iota$ if and only if $\mathrm{Path}(\mathrm{pr}_1(e), b_0)$.
-\end{proposition}
-
-\subsection{The Hopf Fibration}\label{subsec:hopf}
-
-The Hopf fibration is a paradigmatic example of a non-trivial fiber bundle, and its formalization in the computational-paths framework demonstrates the system's capacity for encoding concrete topological data.
-
-\begin{theorem}[Hopf fibration data]\label{thm:hopf}
-There exists a fibration structure
-\[
-  S^1 \hookrightarrow S^3 \xrightarrow{\;\eta\;} S^2
-\]
-consisting of:
-\begin{enumerate}
-  \item A projection $\eta : S^3 \to S^2$;
-  \item Basepoints $s_0 : S^2$ and $\tilde{s}_0 : S^3$ with $\mathrm{Path}(\eta(\tilde{s}_0), s_0)$;
-  \item An equivalence $\mathrm{Fiber}(\eta, s_0) \simeq S^1$.
-\end{enumerate}
-The fiber inclusion $\iota : S^1 \to S^3$ and the projection $\eta$ satisfy the fiber sequence exactness: $\mathrm{Path}(\eta(\iota(x)), s_0)$ for all $x : S^1$.
-\end{theorem}
-
-\begin{proof}
-The Hopf fibration data is packaged as a record containing the projection function, basepoint witnesses, and the fiber equivalence. The exactness condition follows from the definition of the fiber sequence structure: every fiber element projects to the basepoint. The computational path witnesses ensure that all conditions hold constructively.
-\end{proof}
-
-\subsection{Covering Spaces}\label{subsec:covering}
-
-\begin{definition}[Covering space]\label{def:covering}
-A type family $P : A \to \mathsf{Type}$ is a \emph{covering space} of $A$ if every fiber $P(a)$ is a set (i.e., $0$-truncated: any two paths in $P(a)$ with the same endpoints are equal).
-\end{definition}
-
-The discreteness condition ensures unique path lifting:
-
-\begin{theorem}[Unique path lifting for coverings]\label{thm:covering-unique-lift}
-If $P$ is a covering space of $A$, then for any path $p : \mathrm{Path}_A(a, b)$, the transport map $\mathrm{transport}_P(p, {-}) : P(a) \to P(b)$ is injective.
-\end{theorem}
-
-\begin{proof}
-Suppose $\mathrm{transport}_P(p, x) = \mathrm{transport}_P(p, y)$. Applying $\mathrm{transport}_P(\mathsf{symm}(p), {-})$ to both sides and using the transport inversion law (Proposition~\ref{prop:transport-laws}(3)), we obtain $x = y$.
-\end{proof}
-
-\begin{definition}[Fundamental group action on fibers]\label{def:fiber-action}
-For a type family $P : A \to \mathsf{Type}$ and a basepoint $a : A$, the \emph{monodromy action} of $\pi_1(A, a)$ on $P(a)$ is defined by
-\[
-  \alpha \cdot x = \mathrm{transport}_P(\alpha, x)
-\]
-for $\alpha : \pi_1(A, a)$ and $x : P(a)$. Here we identify elements of $\pi_1(A,a)$ with their representative loops via the quotient.
-\end{definition}
-
-\begin{proposition}[Action laws]\label{prop:action-laws}
-The monodromy action is a well-defined group action:
-\begin{enumerate}
-  \item \emph{Well-definedness}: If $\mathrm{RwEq}(l_1, l_2)$ then $\mathrm{transport}_P(l_1, x) = \mathrm{transport}_P(l_2, x)$. This follows because $l_1.\mathsf{toEq} = l_2.\mathsf{toEq}$ when $\mathrm{RwEq}(l_1, l_2)$.
-  \item \emph{Identity}: $e \cdot x = \mathrm{transport}_P(\mathsf{refl}(a), x) = x$.
-  \item \emph{Composition}: $\alpha \cdot (\beta \cdot x) = (\alpha \cdot \beta) \cdot x$, by the transport composition law.
-\end{enumerate}
-\end{proposition}
-
-\begin{theorem}[Galois correspondence]\label{thm:galois}
-For a path-connected type $A$ with basepoint $a$, connected coverings of $A$ correspond to conjugacy classes of subgroups of $\pi_1(A, a)$. Specifically:
-\begin{itemize}
-  \item A connected covering $P$ with $x_0 : P(a)$ determines a subgroup $\mathrm{Stab}(x_0) \leq \pi_1(A, a)$, the stabilizer of $x_0$ under the monodromy action.
-  \item Conversely, a subgroup $H \leq \pi_1(A, a)$ determines a covering whose fiber over $a$ is the set of cosets $\pi_1(A, a) / H$.
-\end{itemize}
-\end{theorem}
-
-\subsection{The Connecting Homomorphism}\label{subsec:connecting}
-
-\begin{definition}[Connecting map]\label{def:connecting-map}
-For a type family $P : B \to \mathsf{Type}$ with basepoint $b_0 : B$ and $x_0 : P(b_0)$, the \emph{connecting map} at level~1 is
-\[
-  \partial : \pi_1(B, b_0) \to P(b_0), \qquad \partial([\ell]) = \mathrm{transport}_P(\ell, x_0).
-\]
-This map sends a loop in the base to the endpoint of its lift starting at $x_0$.
-\end{definition}
-
-\begin{proposition}[Properties of the connecting map]\label{prop:connecting-properties}
-\begin{enumerate}
-  \item $\partial$ is well-defined: if $\mathrm{RwEq}(\ell_1, \ell_2)$ then $\partial([\ell_1]) = \partial([\ell_2])$.
-  \item $\partial(e) = x_0$: the identity loop lifts to the identity.
-  \item $\partial([\ell_1] \cdot [\ell_2]) = \mathrm{transport}_P(\ell_2, \partial([\ell_1]))$: the connecting map intertwines loop composition with iterated transport.
-\end{enumerate}
-\end{proposition}
-
-\begin{proof}
-(1) Both loops have the same $\mathsf{toEq}$, hence induce the same transport. (2) Transport along $\mathsf{refl}$ is the identity. (3) Follows from the transport composition law: $\mathrm{transport}(\mathsf{trans}(\ell_1, \ell_2), x_0) = \mathrm{transport}(\ell_2, \mathrm{transport}(\ell_1, x_0))$.
-\end{proof}
-
-\subsection{Homotopy Fiber and Cofiber Sequences}\label{subsec:cofiber}
-
-\begin{definition}[Homotopy fiber]\label{def:homotopy-fiber}
-For $f : A \to B$ and $b : B$, the \emph{homotopy fiber} is
-\[
-  \mathrm{hofiber}(f, b) = \Sigma(a : A).\, \mathrm{Path}(f(a), b).
-\]
-This coincides with $\mathrm{Fiber}(f, b)$ as defined above.
-\end{definition}
-
-\begin{definition}[Cofiber]\label{def:cofiber}
-The \emph{cofiber} (or mapping cone) of $f : A \to B$ is the pushout
-\[
-  \mathrm{cofib}(f) = \mathrm{Pushout}(B, \{\ast\}, A, f, !),
-\]
-where $! : A \to \{\ast\}$ is the unique map.
-\end{definition}
-
-\begin{theorem}[Puppe sequence]\label{thm:puppe}
-For a map $f : A \to B$, there is a sequence of pointed maps
-\[
-  A \xrightarrow{f} B \xrightarrow{} \mathrm{cofib}(f) \xrightarrow{} \Sigma A \xrightarrow{\Sigma f} \Sigma B \xrightarrow{} \cdots
-\]
-where each three consecutive maps form a fiber sequence (up to equivalence). This is the \emph{Puppe sequence} (or Barratt--Puppe sequence).
-\end{theorem}
-
-\subsection{The Long Exact Sequence of Homotopy Groups}\label{subsec:long-exact}
-
-The fiber sequence machinery yields the cornerstone result of homotopy theory:
-
-\begin{theorem}[Long exact sequence]\label{thm:long-exact}
-For a fiber sequence $F \xrightarrow{\iota} E \xrightarrow{p} B$ with basepoints, there is a long exact sequence of groups and pointed sets:
-\[
-  \cdots \to \pi_{n+1}(B) \xrightarrow{\;\partial\;} \pi_n(F) \xrightarrow{\;\iota_*\;} \pi_n(E) \xrightarrow{\;p_*\;} \pi_n(B) \xrightarrow{\;\partial\;} \pi_{n-1}(F) \to \cdots \to \pi_0(E) \xrightarrow{\;p_*\;} \pi_0(B).
-\]
-\emph{Exactness} at each term means: the image of each map equals the kernel of the next.
-\end{theorem}
-
-\begin{proof}[Proof outline]
-The proof proceeds in three parts:
-
-\medskip
-\noindent\textbf{Exactness at $\pi_n(E)$}: The composition $p_* \circ \iota_*$ is trivial because $p \circ \iota$ maps every fiber element to the basepoint of $B$ (by the fiber sequence condition). Conversely, if $p_*(\beta) = e$ for $\beta \in \pi_n(E)$, then the representative loop $\beta$ in $E$ projects to a contractible loop in $B$, and the contraction provides a lift to a loop in $F$.
-
-\medskip
-\noindent\textbf{Exactness at $\pi_n(B)$}: The composition $\partial \circ p_*$ is trivial: for $\beta \in \pi_n(E)$, the connecting map $\partial(p_*(\beta))$ yields the transport of the basepoint along a loop that factors through $E$, which returns to the basepoint by exactness. The formalization verifies this using the sigma-type projection and the transport composition law.
-
-\medskip
-\noindent\textbf{The connecting homomorphism}: The map $\partial : \pi_{n+1}(B) \to \pi_n(F)$ is defined by lifting a loop in $B$ to the total space and reading off its endpoint in the fiber. For $n = 0$, $\partial$ is the connecting map of Definition~\ref{def:connecting-map}. For $n \geq 1$, $\partial$ is a group homomorphism: it sends the identity loop to the identity element and respects composition (Proposition~\ref{prop:connecting-properties}).
-\end{proof}
-
-\begin{corollary}\label{cor:les-trivial-base}
-If $\pi_k(B) = 0$ for all $k \leq n$, then $\iota_* : \pi_k(F) \to \pi_k(E)$ is an isomorphism for $k < n$ and surjective for $k = n$.
-\end{corollary}
-
-\begin{corollary}\label{cor:les-simply-connected}
-For a fibration with simply connected base ($\pi_1(B) = 0$), the connecting map $\partial : \pi_1(B) \to P(b_0)$ is trivial: $\partial(\ell) = x_0$ for every loop $\ell$.
-\end{corollary}
-
-\subsection{The Mayer--Vietoris Sequence}\label{subsec:mayer-vietoris}
-
-\begin{theorem}[Mayer--Vietoris]\label{thm:mayer-vietoris}
-For a pushout square $A \xleftarrow{f} C \xrightarrow{g} B$ with $P = \mathrm{Pushout}(A, B, C, f, g)$, there is an exact sequence
-\[
-  \cdots \to \pi_{n+1}(P) \xrightarrow{\;\partial\;} \pi_n(C) \xrightarrow{\;(f_*, g_*)\;} \pi_n(A) \oplus \pi_n(B) \xrightarrow{\;\mathsf{inl}_* - \mathsf{inr}_*\;} \pi_n(P) \xrightarrow{\;\partial\;} \cdots
-\]
-connecting the homotopy groups of $A$, $B$, $C$, and the pushout $P$.
-\end{theorem}
-
-\begin{proof}[Proof sketch]
-The Mayer--Vietoris sequence is derived from the long exact sequence of the fiber sequence associated to the pushout. The connecting map $\partial$ is constructed from the glue paths, and exactness at each term follows from the Seifert--van Kampen analysis of pushout loops.
-\end{proof}
-
-\begin{remark}\label{rem:naturality}
-The long exact sequence and Mayer--Vietoris sequence are \emph{natural}: a morphism of fiber sequences (or pushout squares) induces a morphism of the corresponding exact sequences, by the functoriality of $\pi_n$ (Theorem~\ref{thm:pi1-functor} and its higher analogues).
-\end{remark}
-
-
-%%%% Converted from chapters/ch9_hurewicz.tex (article (as-is)) %%%%
-
-%% ============================================================================
-%% Chapter 9: The Hurewicz Theorem and Homological Algebra
-%% Part II of "The Algebra of Computational Paths"
-%% ============================================================================
-
-\section{The Hurewicz Theorem and Homological Algebra}\label{sec:hurewicz}
-
-\begin{remark}[Formalization status]\label{rem:hurewicz-formalization}
-  This section is largely scaffolded. The dimension-1 Hurewicz map is partially
-  formalized, while Nielsen--Schreier and the higher Hurewicz theorem are
-  currently statement-only; see \cref{tab:formalization-status}.
-\end{remark}
-
-The Hurewicz theorem establishes the fundamental connection between homotopy groups and homology, relating $\pi_1$ to the first homology group $H_1$ via abelianization.~\cite{switzer75} In the computational-paths framework, both sides of this connection are constructively defined: $\pi_1$ via the loop quotient, and $H_1$ as its abelianization.
-
-\subsection{Abelianization}\label{subsec:abelianization}
-
-\begin{definition}[Commutator]\label{def:commutator}
-For a group $(G, \cdot, {}^{-1}, e)$, the \emph{commutator} of elements $a, b \in G$ is
-\[
-  [a, b] = a \cdot b \cdot a^{-1} \cdot b^{-1}.
-\]
-The \emph{commutator subgroup} $[G, G]$ is the normal subgroup generated by all commutators.
-\end{definition}
-
-\begin{definition}[Abelianization]\label{def:abelianization}
-The \emph{abelianization} of a group $G$ is the quotient
-\[
-  G^{\mathrm{ab}} = G \;/\; [G, G],
-\]
-defined as the quotient by the equivalence relation generated by:
-\begin{enumerate}
-  \item \emph{Commutativity}: $a \cdot b \sim b \cdot a$ for all $a, b \in G$;
-  \item \emph{Congruence}: if $x \sim y$ then $z \cdot x \sim z \cdot y$ and $x \cdot z \sim y \cdot z$;
-  \item \emph{Group laws}: associativity, identity, and inverse laws.
-\end{enumerate}
-The quotient map $\eta : G \to G^{\mathrm{ab}}$ is the universal homomorphism from $G$ to an abelian group.
-\end{definition}
-
-\begin{proposition}[Universal property]\label{prop:abelianization-up}
-For any abelian group $H$ and any homomorphism $\varphi : G \to H$, there exists a unique homomorphism $\bar{\varphi} : G^{\mathrm{ab}} \to H$ with $\bar{\varphi} \circ \eta = \varphi$.
-\end{proposition}
-
-\begin{theorem}[Commutators vanish in the abelianization]\label{thm:commutator-trivial}
-For all $a, b \in G$, $\eta([a, b]) = e$ in $G^{\mathrm{ab}}$.
-\end{theorem}
-
-\begin{proof}
-We compute in the abelianization, where $\sim$ denotes the abelianization relation:
-\begin{align*}
-  [a, b] &= (a \cdot b) \cdot (a^{-1} \cdot b^{-1}) \\
-         &\sim (b \cdot a) \cdot (a^{-1} \cdot b^{-1}) && \text{(commutativity of } a \cdot b\text{)} \\
-         &\sim b \cdot (a \cdot (a^{-1} \cdot b^{-1})) && \text{(associativity)} \\
-         &\sim b \cdot ((a \cdot a^{-1}) \cdot b^{-1}) && \text{(associativity)} \\
-         &\sim b \cdot (e \cdot b^{-1}) && \text{(right inverse)} \\
-         &\sim b \cdot b^{-1} && \text{(left identity)} \\
-         &\sim e. && \text{(right inverse)}
-\end{align*}
-Each step uses one of the abelianization relation generators.
-\end{proof}
-
-\subsection{First Homology via the Hurewicz Map}\label{subsec:hurewicz-map}
-
-\begin{definition}[First homology group]\label{def:h1}
-For a pointed type $(A, a)$, the \emph{first homology group} is defined as
-\[
-  H_1(A) \;=\; \pi_1(A, a)^{\mathrm{ab}}.
-\]
-This is the abelianization of the fundamental group.
-\end{definition}
-
-\begin{definition}[Hurewicz map]\label{def:hurewicz-map}
-The \emph{Hurewicz homomorphism} is the quotient map
-\[
-  h : \pi_1(A, a) \to H_1(A), \qquad h(\alpha) = \eta(\alpha),
-\]
-where $\eta$ is the abelianization projection.
-\end{definition}
-
-\begin{theorem}[Hurewicz theorem, dimension~1]\label{thm:hurewicz}
-For any pointed type $(A, a)$, the Hurewicz map $h$ induces an isomorphism
-\[
-  \pi_1(A, a)^{\mathrm{ab}} \;\cong\; H_1(A).
-\]
-Moreover:
-\begin{enumerate}
-  \item $h$ is surjective: every element of $H_1(A)$ is the image of some $\alpha \in \pi_1(A, a)$.
-  \item $\ker(h) = [\pi_1(A, a), \pi_1(A, a)]$: an element $\alpha$ maps to $e \in H_1$ if and only if $\alpha$ is a product of commutators.
-\end{enumerate}
-\end{theorem}
-
-\begin{proof}
-The isomorphism is the identity on the underlying quotient type: $H_1(A) = \pi_1(A, a)^{\mathrm{ab}}$ by definition. Surjectivity follows because the abelianization map $\eta$ is surjective (every equivalence class has a representative). The kernel characterization follows from the definition of the abelianization relation: $\eta(\alpha) = \eta(e)$ if and only if $\alpha \sim e$ in the abelianization, which occurs precisely when $\alpha \in [G, G]$.
-\end{proof}
-
-\subsection{Examples}\label{subsec:hurewicz-examples}
-
-\begin{example}[Circle]\label{ex:h1-circle}
-$H_1(S^1) \cong \pi_1(S^1)^{\mathrm{ab}} \cong \mathbb{Z}^{\mathrm{ab}} \cong \mathbb{Z}$.
-Since $\mathbb{Z}$ is already abelian, the Hurewicz map is an isomorphism.
-\end{example}
-
-\begin{example}[Torus]\label{ex:h1-torus}
-$H_1(T^2) \cong (\mathbb{Z} \times \mathbb{Z})^{\mathrm{ab}} \cong \mathbb{Z} \times \mathbb{Z}$.
-The product of abelian groups is abelian, so again $h$ is an isomorphism.
-\end{example}
-
-\begin{example}[Figure-eight]\label{ex:h1-figure-eight}
-$H_1(S^1 \vee S^1) \cong (\mathbb{Z} * \mathbb{Z})^{\mathrm{ab}} \cong \mathbb{Z} \times \mathbb{Z}$.
-Here $\pi_1 = \mathbb{Z} * \mathbb{Z}$ is non-abelian, but its abelianization is $\mathbb{Z}^2$. The Hurewicz map is not injective: the commutator $[a, b] = aba^{-1}b^{-1}$ is a non-trivial element of $\pi_1$ that maps to $0$ in $H_1$.
-\end{example}
-
-More generally, the abelianization of a free product is the direct product of the abelianizations:
-
-\begin{proposition}\label{prop:free-product-abelianization}
-$(G * H)^{\mathrm{ab}} \cong G^{\mathrm{ab}} \times H^{\mathrm{ab}}$.
-\end{proposition}
-
-\begin{proof}
-Elements of $G * H$ are reduced alternating words in $G$ and $H$. In the abelianization, commutativity allows rewriting any word to gather all $G$-elements on the left and all $H$-elements on the right, yielding a pair $(g, h) \in G^{\mathrm{ab}} \times H^{\mathrm{ab}}$. The map from $(G * H)^{\mathrm{ab}}$ to $G^{\mathrm{ab}} \times H^{\mathrm{ab}}$ sends a word to the pair of component-wise sums; the inverse sends $(g, h)$ to the class of the two-letter word $g \cdot h$. These are mutually inverse homomorphisms.
-\end{proof}
-
-\begin{example}[Surface of genus~$g$]\label{ex:h1-surface}
-For a closed orientable surface $\Sigma_g$ of genus $g \geq 2$,
-\[
-  \pi_1(\Sigma_g) = \langle a_1, b_1, \ldots, a_g, b_g \mid [a_1, b_1] \cdots [a_g, b_g] = e \rangle,
-\]
-and $H_1(\Sigma_g) \cong \pi_1(\Sigma_g)^{\mathrm{ab}} \cong \mathbb{Z}^{2g}$, since the relation $[a_1, b_1] \cdots [a_g, b_g] = e$ becomes trivial after abelianization.
-\end{example}
-
-\subsection{Free Groups and the Nielsen--Schreier Theorem}\label{subsec:free-groups}
-
-The computational-paths framework provides a constructive verification of the universal property of free groups.
-
-\begin{theorem}[Free group universal property]\label{thm:free-group-up}
-The loop group $\pi_1\bigl(\bigvee_n S^1, \mathsf{base}\bigr)$ satisfies the universal property of the free group $F_n$: for any group $G$ and any function $\varphi : \{1, \ldots, n\} \to G$, there exists a unique group homomorphism $\bar{\varphi} : F_n \to G$ extending $\varphi$.
-\end{theorem}
-
-\begin{proof}
-The homomorphism $\bar{\varphi}$ is defined on reduced words by substituting each generator $g_i$ with $\varphi(i)$ and each $g_i^{-1}$ with $\varphi(i)^{-1}$, then evaluating the resulting product in $G$. Uniqueness follows because a homomorphism is determined by its values on generators.
-\end{proof}
-
-\begin{theorem}[Nielsen--Schreier]\label{thm:nielsen-schreier}
-Every subgroup of a free group is free.
-\end{theorem}
-
-\begin{proof}[Proof sketch]
-In the computational-paths framework, a subgroup $H \leq F_n = \pi_1(\bigvee_n S^1)$ corresponds to a connected covering space of $\bigvee_n S^1$ (by the Galois correspondence, Theorem~\ref{thm:galois}). A connected covering of a graph (1-dimensional CW complex) is again a graph, and $\pi_1$ of a graph is free. Hence $H$ is free.
-\end{proof}
-
-\begin{corollary}\label{cor:free-abelianization}
-$F_n^{\mathrm{ab}} \cong \mathbb{Z}^n$.
-\end{corollary}
-
-\begin{proof}
-The free group on $n$ generators has abelianization $\mathbb{Z}^n$ because the generators commute in the abelianization. Equivalently, this follows from Proposition~\ref{prop:free-product-abelianization} by induction: $F_n = \mathbb{Z} * \cdots * \mathbb{Z}$ ($n$ times), and $(\mathbb{Z} * \cdots * \mathbb{Z})^{\mathrm{ab}} = \mathbb{Z}^n$.
-\end{proof}
-
-\subsection{The Higher Hurewicz Theorem}\label{subsec:higher-hurewicz}
-
-\begin{theorem}[Higher Hurewicz, statement]\label{thm:higher-hurewicz}
-For $n \geq 2$, if a pointed type $(A, a)$ is $(n-1)$-connected (i.e., $\pi_k(A, a) = 0$ for all $k < n$), then the Hurewicz map
-\[
-  h_n : \pi_n(A, a) \to H_n(A)
-\]
-is an isomorphism.
-\end{theorem}
-
-The full proof of the higher Hurewicz theorem requires the development of singular homology or an equivalent construction, which goes beyond the primary scope of the computational-paths framework as formalized. We record the statement and its key consequences.
-
-\begin{corollary}\label{cor:sphere-homology}
-$H_n(S^n) \cong \mathbb{Z}$ for $n \geq 1$.
-\end{corollary}
-
-\begin{proof}
-$S^n$ is $(n-1)$-connected (Corollary~\ref{cor:pi1-higher-spheres} and its higher analogues). By the higher Hurewicz theorem, $H_n(S^n) \cong \pi_n(S^n)$. By the Freudenthal suspension theorem (Theorem~\ref{thm:freudenthal} below), $\pi_n(S^n) \cong \mathbb{Z}$.
-\end{proof}
-
-\subsection{Simple Connectivity and Triviality}\label{subsec:simply-connected}
-
-\begin{definition}[Simply connected]\label{def:simply-connected}
-A pointed type $(A, a)$ is \emph{simply connected} if $\pi_1(A, a) = \{e\}$, i.e., every loop at $a$ is rewrite-equivalent to $\mathsf{refl}(a)$.
-\end{definition}
-
-\begin{proposition}\label{prop:simply-connected-h1}
-If $(A, a)$ is simply connected, then $H_1(A) = 0$.
-\end{proposition}
-
-\begin{proof}
-$H_1(A) = \pi_1(A, a)^{\mathrm{ab}} = \{e\}^{\mathrm{ab}} = \{e\}$.
-\end{proof}
-
-\begin{proposition}[Detection principle]\label{prop:detection}
-If $H_1(A) \neq 0$, then $\pi_1(A, a) \neq \{e\}$, i.e., $A$ is not simply connected.
-\end{proposition}
-
-\begin{proof}
-This is the contrapositive of Proposition~\ref{prop:simply-connected-h1}.
-\end{proof}
-
-The detection principle provides an effective method for proving that a space has non-trivial fundamental group: it suffices to exhibit a non-trivial element in the abelianization, which is often easier to compute than the full $\pi_1$.
-
-
-%%%% Converted from chapters/ch10_advanced.tex (article (as-is)) %%%%
-
-%% ============================================================================
-%% Chapter 10: Advanced Homotopy Theory
-%% Part II of "The Algebra of Computational Paths"
-%% ============================================================================
-
-\section{Advanced Homotopy Theory}\label{sec:advanced}
-
-\begin{remark}[Formalization status]\label{rem:advanced-formalization}
-  This section is scaffolded at the statement level: the definitions and results
-  are recorded without full proofs in Lean. See \cref{tab:formalization-status}
-  for the precise status of each item.
-\end{remark}
-
-This chapter surveys the advanced homotopy-theoretic structures formalized in the computational-paths framework: Eilenberg--MacLane spaces, Postnikov towers, Whitehead's theorem, the Freudenthal suspension theorem, and spectral sequences. The treatment is necessarily more concise than the preceding chapters; we state the principal definitions and results, indicating how they fit into the computational-paths architecture.
-
-\subsection{Eilenberg--MacLane Spaces and Moore Spaces}\label{subsec:em-spaces}
-
-\begin{definition}[Eilenberg--MacLane space]\label{def:em-space}
-For a group $G$ (abelian if $n \geq 2$) and $n \geq 1$, an \emph{Eilenberg--MacLane space} $K(G, n)$ is a pointed type satisfying
-\[
-  \pi_k(K(G, n)) \cong \begin{cases} G & \text{if } k = n, \\ 0 & \text{if } k \neq n. \end{cases}
-\]
-\end{definition}
-
-Eilenberg--MacLane spaces serve as building blocks for general spaces via Postnikov towers. Their existence is established constructively:
-
-\begin{proposition}\label{prop:em-existence}
-For every abelian group $G$ and $n \geq 1$, there exists an Eilenberg--MacLane space $K(G, n)$. In particular:
-\begin{itemize}
-  \item $K(\mathbb{Z}, 1) = S^1$ (the circle, by Theorem~\ref{thm:pi1-circle}).
-  \item $K(G, 1) = BG$ (the classifying space) for any discrete group $G$.
-\end{itemize}
-\end{proposition}
-
-\begin{definition}[Moore space]\label{def:moore-space}
-For an abelian group $G$ and $n \geq 2$, a \emph{Moore space} $M(G, n)$ is a simply connected pointed type with
-\[
-  H_k(M(G, n)) \cong \begin{cases} G & \text{if } k = n, \\ 0 & \text{if } k \neq 0, n. \end{cases}
-\]
-\end{definition}
-
-Moore spaces are dual to Eilenberg--MacLane spaces in the sense that they are characterized by homology rather than homotopy.
-
-\subsection{Postnikov Towers and Obstruction Theory}\label{subsec:postnikov}
-
-\begin{definition}[Postnikov system]\label{def:postnikov}
-A \emph{Postnikov tower} for a pointed type $(X, x_0)$ is a sequence of fibrations
-\[
-  \cdots \to X_{n+1} \to X_n \to \cdots \to X_1 \to X_0
-\]
-together with maps $\varphi_n : X \to X_n$ such that:
-\begin{enumerate}
-  \item $\varphi_n$ induces an isomorphism $\pi_k(X) \xrightarrow{\cong} \pi_k(X_n)$ for $k \leq n$;
-  \item $\pi_k(X_n) = 0$ for $k > n$;
-  \item each fiber $F_n$ of $X_{n+1} \to X_n$ is a $K(\pi_{n+1}(X), n+1)$.
-\end{enumerate}
-\end{definition}
-
-The Postnikov tower decomposes a type into its homotopy-group layers. Each stage $X_n$ captures all homotopy information up to dimension~$n$, and the $k$-invariants---cohomology classes characterizing the successive extensions---provide a complete algebraic description.
-
-\begin{theorem}[Obstruction theory]\label{thm:obstruction}
-Let $f_n : Y \to X_n$ be a lift of a map $f : Y \to X_0$ through the first $n$ Postnikov stages. The obstruction to extending $f_n$ to a lift $f_{n+1} : Y \to X_{n+1}$ is a cohomology class
-\[
-  \theta_{n+1}(f_n) \;\in\; H^{n+2}(Y;\, \pi_{n+1}(X)).
-\]
-The lift $f_{n+1}$ exists if and only if $\theta_{n+1}(f_n) = 0$.
-\end{theorem}
-
-\subsection{Whitehead's Theorem}\label{subsec:whitehead}
-
-\begin{definition}[Weak equivalence]\label{def:weak-equiv}
-A map $f : A \to B$ is a \emph{weak equivalence} if:
-\begin{enumerate}
-  \item $f$ is surjective: for every $b : B$, there exists $a : A$ with $f(a) = b$;
-  \item $f$ induces isomorphisms on all homotopy groups: for every $n \geq 0$ and every basepoint $a : A$, the induced map $f_* : \pi_n(A, a) \xrightarrow{\cong} \pi_n(B, f(a))$ is an equivalence.
-\end{enumerate}
-\end{definition}
-
-\begin{theorem}[Whitehead]\label{thm:whitehead}
-A weak equivalence $f : A \to B$ between CW complexes (or, in the type-theoretic setting, between types with suitable structure) is a homotopy equivalence: there exists $g : B \to A$ with $g \circ f \sim \mathrm{id}_A$ and $f \circ g \sim \mathrm{id}_B$.~\cite{whitehead78}
-\end{theorem}
-
-In the computational-paths formalization, Whitehead's theorem is packaged as a structure $\mathsf{WhiteheadEquiv}(f)$ that extends the weak equivalence data with a quasi-inverse---a function $g$ together with computational paths witnessing the homotopies $g \circ f \sim \mathrm{id}$ and $f \circ g \sim \mathrm{id}$.
-
-\begin{corollary}\label{cor:whitehead-pi1}
-If $f : A \to B$ is a weak equivalence, then $f$ induces an isomorphism on $\pi_1$. In particular, the $\pi_1$-equivalence from the weak equivalence data provides a $\mathsf{SimpleEquiv}$ between $\pi_1(A, a)$ and $\pi_1(B, f(a))$.
-\end{corollary}
-
-\subsection{Suspension, Freudenthal, and Stable Homotopy}\label{subsec:freudenthal}
-
-\begin{definition}[Suspension map on loop spaces]\label{def:suspension-map}
-For a pointed type $(X, x_0)$, the \emph{suspension map} is
-\[
-  \sigma : \Omega(X, x_0) \to \Omega(\Sigma X, \mathsf{north}), \qquad \sigma(\ell) = \mathsf{merid}(\ell) \cdot \mathsf{merid}(x_0)^{-1},
-\]
-which sends a loop in $X$ to the base loop at the north pole of the suspension $\Sigma X$. At the $\pi_n$ level, this induces a homomorphism
-\[
-  \sigma_* : \pi_n(X, x_0) \to \pi_{n+1}(\Sigma X, \mathsf{north}).
-\]
-\end{definition}
-
-\begin{theorem}[Freudenthal suspension theorem]\label{thm:freudenthal}
-If $X$ is $k$-connected (i.e., $\pi_j(X) = 0$ for $j \leq k$), then the suspension map
-\[
-  \sigma_* : \pi_n(X) \to \pi_{n+1}(\Sigma X)
-\]
-is an isomorphism for $n < 2k + 1$ and a surjection for $n = 2k + 1$.
-\end{theorem}
-
-The Freudenthal theorem is the gateway to stable homotopy theory: repeated suspension eventually stabilizes the homotopy groups.
-
-\begin{definition}[Stable homotopy groups]\label{def:stable-homotopy}
-The \emph{$k$-th stable homotopy group of spheres} is
-\[
-  \pi_k^s = \varinjlim_{n \to \infty} \pi_{n+k}(S^n),
-\]
-where the colimit is taken along the suspension maps $\sigma_* : \pi_{n+k}(S^n) \to \pi_{n+k+1}(S^{n+1})$. By Freudenthal, this colimit stabilizes for $n > k + 1$.
-\end{definition}
-
-\begin{proposition}[Low-dimensional stable stems]\label{prop:stable-stems}
-The first several stable homotopy groups of spheres are:
-\[
-\begin{array}{c|ccccccccc}
-  k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\ \hline
-  \pi_k^s & \mathbb{Z} & \mathbb{Z}/2 & \mathbb{Z}/2 & \mathbb{Z}/24 & 0 & 0 & \mathbb{Z}/2 & \mathbb{Z}/240 & (\mathbb{Z}/2)^2
-\end{array}
-\]
-\end{proposition}
-
-\subsection{Spectral Sequences}\label{subsec:spectral}
-
-Spectral sequences provide a systematic method for computing homotopy and homology groups of complex spaces from simpler data.
-
-\begin{definition}[Spectral sequence]\label{def:spectral-seq}
-A \emph{spectral sequence} is a sequence of \emph{pages} $(E_r^{p,q}, d_r)_{r \geq 0}$, where:
-\begin{itemize}
-  \item Each $E_r^{p,q}$ is a pointed set (typically a group);
-  \item Each $d_r : E_r^{p,q} \to E_r^{p+r,\, q-r+1}$ is a differential satisfying $d_r \circ d_r = 0$;
-  \item The $(r+1)$-th page is obtained as the homology of the $r$-th page: $E_{r+1} = H(E_r, d_r)$.
-\end{itemize}
-\end{definition}
-
-\begin{definition}[Degeneration]\label{def:degeneration}
-A spectral sequence \emph{degenerates} at page $r_0$ if $d_r = 0$ for all $r \geq r_0$, so that $E_{r_0} = E_{r_0 + 1} = \cdots = E_\infty$.
-\end{definition}
-
-\begin{definition}[Convergence]\label{def:convergence}
-A spectral sequence \emph{converges} to a graded object $H^*$ if there exists a filtration of $H^*$ whose successive quotients are the $E_\infty$ terms.
-\end{definition}
-
-In the computational-paths formalization, spectral sequences are constructed from filtered pointed sets. The zero-th page $E_0$ is read off from the filtration pieces, and the connecting maps between pages are packaged as pointed-set morphisms.
-
-\begin{theorem}[Convergence for degenerate sequences]\label{thm:spectral-convergence}
-If a spectral sequence degenerates at page $r_0$ (i.e., all differentials on page $r_0$ and beyond are trivial), then the spectral sequence converges: the $E_\infty$ page equals $E_{r_0}$.
-\end{theorem}
-
-\begin{proof}
-If all differentials are zero from page $r_0$ onward, then each subsequent page is isomorphic to the previous one (the homology of a complex with zero differential is the complex itself). Hence $E_{r_0} = E_{r_0+1} = \cdots = E_\infty$.
-\end{proof}
-
-\begin{definition}[Morphism of spectral sequences]\label{def:spectral-morphism}
-A \emph{morphism} $\Phi : E \to F$ between spectral sequences consists of maps $\Phi_r^{p,q} : E_r^{p,q} \to F_r^{p,q}$ on each page that commute with the differentials:
-\[
-  \Phi_r \circ d_r^E = d_r^F \circ \Phi_r.
-\]
-\end{definition}
-
-\paragraph{Adams spectral sequence.}
-The Adams spectral sequence is the principal tool for computing stable homotopy groups.~\cite{adams74} Its $E_2$ page is
-\[
-  E_2^{s,t} = \mathrm{Ext}^{s,t}_{\mathcal{A}}(\mathbb{F}_p, \mathbb{F}_p),
-\]
-where $\mathcal{A}$ is the Steenrod algebra and $\mathrm{Ext}$ is computed in the category of $\mathcal{A}$-modules. The spectral sequence converges to the $p$-completed stable homotopy groups $\pi_*^s \otimes \hat{\mathbb{Z}}_p$. The low-dimensional stable stems listed in Proposition~\ref{prop:stable-stems} are computed via this machinery.
-
-\subsection{Survey of Further Results}\label{subsec:survey}
-
-The computational-paths formalization includes scaffolding for a range of additional topics in algebraic topology and homotopy theory. We briefly enumerate the principal results, indicating their status:
-
-\paragraph{K-theory.}
-Algebraic and topological K-theory are formalized via vector bundle classification. The Grothendieck group $K_0(X)$ of virtual vector bundles, the higher K-groups $K_n(X)$, and Bott periodicity $K_n(X) \cong K_{n+2}(X)$ are recorded.
-
-\paragraph{Characteristic classes.}
-Stiefel--Whitney classes $w_i \in H^i(X; \mathbb{Z}/2)$, Chern classes $c_i \in H^{2i}(X; \mathbb{Z})$, and Pontryagin classes $p_i \in H^{4i}(X; \mathbb{Z})$ are defined as characteristic classes of vector bundles, with their naturality and Whitney sum formulas.
-
-\paragraph{Operads and $A_\infty$-algebras.}
-The path algebra structure gives rise to an operad whose algebras are $A_\infty$-spaces. The recognition principle connects $n$-fold loop spaces with $E_n$-algebras.
-
-\paragraph{Rational homotopy theory.}
-The rationalization of homotopy groups $\pi_n(X) \otimes \mathbb{Q}$ is formalized, along with the connection to Sullivan's commutative differential graded algebras.
-
-\paragraph{Chromatic homotopy theory.}
-The chromatic filtration of the stable homotopy category---organized by height of formal group laws---is recorded, including Morava K-theories $K(n)$ and the thick subcategory theorem.~\cite{ravenel86}
-
-\paragraph{Topological Hochschild homology.}
-$\mathrm{THH}(R)$ for ring spectra $R$ is defined via the cyclic bar construction, connecting to trace methods in algebraic K-theory.
-
-\paragraph{Goodwillie calculus.}
-The Taylor tower of a functor $F : \mathsf{Type}_* \to \mathsf{Type}_*$, with polynomial approximations $P_nF$ and layers $D_nF$, is formalized.
-
-\paragraph{Higher topos theory.}
-The formalization records the basic framework of $(\infty, 1)$-categories: Kan complexes, quasi-categories, and the nerve--realization adjunction, connecting the computational-paths approach to the broader landscape of higher categorical structures.
-
-\begin{remark}\label{rem:formalization-scope}
-The applications surveyed in Part~II (Sections~\ref{sec:fundamental-groups}--\ref{sec:advanced}) range from fully formalized results (e.g., fundamental groups and path lifting) to statement-only scaffolding (e.g., spectral sequences, K-theory); see \cref{tab:formalization-status}. In each case, the computational-paths framework provides the type-theoretic substrate: definitions are stated in terms of $\mathrm{Path}$, $\mathrm{RwEq}$, and $\pi_n$, and properties are witnessed by computational path constructions. The scaffolded results indicate the framework's extensibility and suggest directions for future complete formalization.
-\end{remark}
-
-
-%%%% Converted from chapters/ch11_metatheory.tex (book→article) %%%%
-
-% ============================================================================
-% Chapter 11: The Rewrite System — Metatheory
-% Part III of "The Algebra of Computational Paths"
-% ============================================================================
 \section{The Rewrite System: Metatheory}
 \label{ch:metatheory}
 
@@ -3495,7 +2851,7 @@ The applications surveyed in Part~II (Sections~\ref{sec:fundamental-groups}--\re
   \cref{tab:formalization-status}.
 \end{remark}
 
-In Section~\ref{ch:rewrite-system}, we introduced the 74-rule
+In Section~\ref{ch:rewrite-system}, we introduced the 75-rule
 rewrite system on computational paths, established its soundness,
 normalization properties, termination, and confluence, and constructed
 the quotient $\PathQuot$. In this chapter, we examine the rewrite system
@@ -3517,7 +2873,7 @@ computational paths and the identity types of Homotopy Type Theory.
     \item A set of \emph{typed terms} (path expressions), well-typed by
       their source and target.
     \item A \emph{reduction relation} $\rew$ on terms of the same sort,
-      given by the 74 rules of Section~\ref{ch:rewrite-system}.
+      given by the 75 rules of Section~\ref{ch:rewrite-system}.
   \end{enumerate}
   The rewrite system on $\Path_A(a, b)$ is thus a many-sorted first-order
   TRS in the sense of Klop~\cite{Klop92} and Terese~\cite{Terese03}, with
@@ -3664,7 +3020,7 @@ The key property of $\mathrm{PathExpr}$ is that it separates the
 \subsubsection{Rewriting on PathExpr}
 
 The single-step and multi-step rewrite relations lift from $\Path$ to
-$\mathrm{PathExpr}$, with the same 74 rules applied syntactically. The
+$\mathrm{PathExpr}$, with the same 75 rules applied syntactically. The
 critical property is that evaluation commutes with rewriting:
 
 \begin{theorem}[Evaluation Preserves Rewriting]\label{thm:eval-rw}
@@ -3749,7 +3105,7 @@ the left-hand side of another, or the same term matches two distinct rules.
   $p \rew q_2$.
 \end{definition}
 
-The 74 rules generate a finite (though large) set of critical pairs.
+The 75 rules generate a finite (though large) set of critical pairs.
 The principal families of critical pairs are:
 
 \begin{enumerate}[label=(\arabic*)]
@@ -3844,7 +3200,7 @@ proofs involving rewrite equality:
     \item \emph{Symmetry} ($\mathit{path\_symm}$): transforms a goal $p \rweq q$ into
       $q \rweq p$, via $\RwEq.\mathrm{symm}$.
     \item \emph{Simplification} ($\mathit{path\_simp}$): applies the simplification
-      procedure with the library of $\RwEq$ lemmas (all 74 rules and their
+      procedure with the library of $\RwEq$ lemmas (all 75 rules and their
       derived consequences are registered as simplification lemmas).
     \item \emph{Transitivity} ($\mathit{path\_trans}$): applies transitivity with an
       intermediate path from a given hypothesis.
@@ -3946,7 +3302,7 @@ in the formalization:
 \toprule
 \textbf{Component} & \textbf{Contents} \\
 \midrule
-Step definitions & The 74-rule $\mathrm{Step}$ relation and soundness proof \\
+Step definitions & The 75-rule $\mathrm{Step}$ relation and soundness proof \\
 Multi-step closure & Reflexive--transitive closure $\Rw$ \\
 Rewrite equality & Rewrite equality $\RwEq$ and all congruence lemmas \\
 Normalization & Normal forms and the $\normalize$ function \\
@@ -3985,7 +3341,7 @@ joining the main branch at the confluence level.
 %%%% Converted from chapters/ch12_conclusion.tex (book→article) %%%%
 
 % ============================================================================
-% Chapter 12: Conclusion and Future Directions
+% Chapter 9: Conclusion and Future Directions
 % Part III of "The Algebra of Computational Paths"
 % ============================================================================
 \section{Conclusion and Future Directions}
@@ -4011,7 +3367,7 @@ traces are distinct combinatorial objects that support a rich algebraic
 structure (\cref{thm:non-uip}).
 
 \paragraph{A confluent, terminating rewrite system.}
-The 74 rules of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS
+The 75 rules of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS
 (Section~\ref{ch:rewrite-system}), organized into eight groups---path
 algebra, type-former $\beta$/$\eta$-rules, transport, contexts,
 dependent contexts, bi-contexts, map congruence, and structural
@@ -4046,14 +3402,6 @@ Building on the algebraic foundations, we developed:
   \item The Seifert--van Kampen theorem for pushouts
     (\cref{thm:svk}), yielding $\pi_1$ of wedge sums and
     amalgamated free products.
-  \item Fibrations, covering spaces, and the long exact sequence
-    of homotopy groups (Section~\ref{sec:fibrations}), including the Hopf
-    fibration.
-  \item The Hurewicz theorem ($H_1 \cong \pi_1^{\mathrm{ab}}$) and
-    homological algebra (Section~\ref{sec:hurewicz}).
-  \item Advanced structures: Eilenberg--MacLane spaces, Postnikov
-    towers, the Whitehead theorem, spectral sequences, characteristic
-    classes, and operads (Section~\ref{sec:advanced}).
 \end{itemize}
 
 \paragraph{Metatheory and automation.}
@@ -4078,8 +3426,8 @@ The entire development is mechanically verified in the Lean~4 proof assistant, c
 \toprule
 \textbf{Metric} & \textbf{Count} \\
 \midrule
-Source files & 302 \\
-Total lines of code & 60,860 \\
+Source files & 380 \\
+Total lines of code & 76,260 \\
 Definitions & 1,710 \\
 Theorems & 885 \\
 Structures & 701 \\
@@ -4130,24 +3478,10 @@ $\pi_1(T^2) \cong \ZZ\times\ZZ$ (Thm.~7.6) & \S\ref{sec:spaces} & FF \\
 $\pi_1(S^1 \vee S^1) \cong \ZZ * \ZZ$ (Thm.~7.8) & \S\ref{sec:spaces} & PS \\
 Seifert--van Kampen (Thm.~7.14) & \S\ref{sec:spaces} & PS \\
 $\pi_1(\Sigma X) = 0$ (Thm.~7.16) & \S\ref{sec:spaces} & PS \\
-Path Lifting (Thm.~8.3) & \S\ref{sec:fibrations} & FF \\
-Hopf Fibration Data (Thm.~8.6) & \S\ref{sec:fibrations} & PS \\
-Galois Correspondence (Thm.~8.11) & \S\ref{sec:fibrations} & PS \\
-Long Exact Sequence (Thm.~8.15) & \S\ref{sec:fibrations} & PS \\
-Mayer--Vietoris (Thm.~8.18) & \S\ref{sec:fibrations} & SO \\
 \midrule
-Hurewicz, Dim~1 (Thm.~9.5) & \S\ref{sec:hurewicz} & PS \\
-Nielsen--Schreier (Thm.~9.10) & \S\ref{sec:hurewicz} & SO \\
-Higher Hurewicz (Thm.~9.12) & \S\ref{sec:hurewicz} & SO \\
-Postnikov Tower (Def.~10.4) & \S\ref{sec:advanced} & SO \\
-Whitehead (Thm.~10.7) & \S\ref{sec:advanced} & SO \\
-Freudenthal Suspension (Thm.~10.9) & \S\ref{sec:advanced} & SO \\
-Spectral Seq.\ Convergence (Thm.~10.13) & \S\ref{sec:advanced} & SO \\
-K-theory / Char.\ Classes / Operads & \S\ref{sec:advanced} & SO \\
-\midrule
-Decidability of $\RwEq$ (Thm.~11.8) & \S\ref{ch:metatheory} & FF \\
-$J$-Elimination (Thm.~11.11) & \S\ref{ch:metatheory} & FF \\
-HoTT Compatibility (Thm.~11.13) & \S\ref{ch:metatheory} & FF \\
+Decidability of $\RwEq$ (Thm.~8.8) & \S\ref{ch:metatheory} & FF \\
+$J$-Elimination (Thm.~8.11) & \S\ref{ch:metatheory} & FF \\
+HoTT Compatibility (Thm.~8.13) & \S\ref{ch:metatheory} & FF \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -4179,11 +3513,11 @@ Several design choices shaped the formalization:
 \paragraph{Proof automation.}
 The path simplification tactic (Section~\ref{sec:decidability}) proved
 essential for managing the combinatorial complexity of the rewrite system.
-With all 74 rules and their congruence variants registered as
-simplification lemmas, the tactic resolves most $\RwEq$ goals
-automatically. For more complex goals, the dedicated tactics
-(transitivity, left/right congruence,
-associativity) provide fine-grained control.
+With the rules from Section~\ref{ch:rewrite-system} and their congruence
+variants registered as simplification lemmas, the tactic resolves most
+$\RwEq$ goals automatically. For more complex goals, the dedicated tactics
+(transitivity, left/right congruence, associativity) provide fine-grained
+control.
 
 \paragraph{Formalization structure.}
 The formalization is organized into a hierarchy reflecting the paper's
@@ -4269,7 +3603,7 @@ homotopy theory (e.g., Blakers--Massey, the James construction, the
 Hopf invariant) would demonstrate the power of the framework.
 
 \paragraph{Scaling the formalization.}
-The current formalization of 60,860 lines covers a substantial portion
+The current formalization of 76,260 lines covers a substantial portion
 of basic algebraic topology. Scaling to more advanced topics
 (e.g., stable homotopy theory, chromatic homotopy theory, derived
 algebraic geometry) will require:
@@ -4302,7 +3636,7 @@ be carried out rigorously and at scale.
 \section{Complete List of Rewrite Rules}
 \label{app:rules}
 
-We list all 74 rewrite rules of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS,
+We list all 75 rewrite rules of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS,
 organized by group. Each rule is given with its formal name (matching the
 constructor of the $\mathrm{Step}$ relation in the
 formalization), its $\mathrm{LND}_{\mathrm{EQ}}$ mnemonic, and a
@@ -4596,12 +3930,15 @@ ensuring that the rewrite relation is a congruence:
 \bigskip
 
 \begin{remark}
-  The total count of 74 reflects the distinct constructors of the
-  $\mathrm{Step}$ relation in the formalization. Context congruence
-  (R31) appears in both Group~IV as a context-specific rule and in
-  Group~VIII as a structural closure principle; it corresponds to a single
-  constructor. The earlier convention of 76 in~\cite{RDQO18} listed
-  certain rules in multiple groups for expository clarity.
+  The formalization defines 75 distinct constructors for the
+  $\mathrm{Step}$ relation. The appendix listing above follows the
+  earlier convention (R1--R74) in which context congruence (R31) appears
+  in both Group~IV and Group~VIII; two additional transport rules for
+  dependent sigma types (\textit{transport\_sigmaMk\_dep\_beta} and
+  \textit{subst\_sigmaMk\_dep\_beta}) were added to the formalization
+  after the original numbering was established. The earlier convention of
+  76 in~\cite{RDQO18} listed certain rules in multiple groups for
+  expository clarity.
 \end{remark}
 
 
