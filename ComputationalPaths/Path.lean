@@ -229,6 +229,7 @@ import ComputationalPaths.Path.Homotopy.EilenbergMoore
 import ComputationalPaths.Path.Homotopy.RationalHomotopy
 import ComputationalPaths.Path.Homotopy.PhantomMaps
 import ComputationalPaths.Path.Homotopy.EquivariantHomotopy
+import ComputationalPaths.Path.Homotopy.EquivariantStable
 import ComputationalPaths.Path.Algebra.UniversalCoefficient
 import ComputationalPaths.Path.Homotopy.BordismTheory
 import ComputationalPaths.Path.Homotopy.HomologicalStability
@@ -280,6 +281,7 @@ import ComputationalPaths.Path.Algebra.DerivedAlgebraicGeometry
 import ComputationalPaths.Path.Homotopy.HigherTopos
 import ComputationalPaths.Path.Homotopy.InfinityCatLimits
 import ComputationalPaths.Path.Homotopy.CobordismTheory
+import ComputationalPaths.Path.Homotopy.CobordismComputation
 import ComputationalPaths.Path.Algebra.SteenrodAlgebra
 import ComputationalPaths.Path.Homotopy.SurgeryTheory
 import ComputationalPaths.Path.Homotopy.EtaleCohomology

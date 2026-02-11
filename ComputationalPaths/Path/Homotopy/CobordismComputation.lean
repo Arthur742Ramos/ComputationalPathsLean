@@ -24,7 +24,9 @@ oriented cobordism (MSO), and the Todd genus.
 - Stong, "Notes on Cobordism Theory"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Homotopy.CobordismTheory
+import ComputationalPaths.Path.Homotopy.ThomSpectra
+import ComputationalPaths.Path.Homotopy.FormalGroupLaw
 
 namespace ComputationalPaths
 namespace Path
