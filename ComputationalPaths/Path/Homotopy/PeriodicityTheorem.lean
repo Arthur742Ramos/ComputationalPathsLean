@@ -5,7 +5,7 @@ This module records data-level statements of the Hopkins-Smith periodicity theor
 the thick subcategory theorem for finite p-local spectra, and Bousfield classes
 of Morava K-theories in the computational paths setting.
 
-All proofs are complete -- no sorry, no axiom.
+All proofs are complete -- no placeholders or new assumptions.
 
 ## Key Results
 

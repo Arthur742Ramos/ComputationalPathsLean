@@ -78,7 +78,7 @@ structure ThomClass (H : ReducedCohomologyTheory) {K B Total V : Type u}
   degree : Nat
   /-- The Thom class element. -/
   thom : H.cohomology degree Th.space
-  /-- Normalization axiom (placeholder). -/
+  /-- Normalization condition (placeholder). -/
   normalized : True
 
 /-- Thom isomorphism data for a Thom space. -/

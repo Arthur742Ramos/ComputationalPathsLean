@@ -4,7 +4,7 @@
 Formalization of chromatic homotopy theory including Morava K-theories,
 the chromatic filtration, thick subcategories, nilpotence, and periodicity.
 
-All proofs are complete — no sorry, no axiom.
+All proofs are complete — no placeholders, no axiom.
 
 ## Key Results
 

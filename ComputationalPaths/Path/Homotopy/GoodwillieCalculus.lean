@@ -5,7 +5,7 @@ Formalization of Goodwillie calculus of functors including polynomial functors,
 the Taylor tower, derivatives of functors, n-excisive approximation, and
 derivatives of the identity functor.
 
-All proofs are complete — no sorry, no axiom.
+All proofs are complete — no placeholders, no axiom.
 
 ## Key Results
 

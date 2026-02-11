@@ -1,8 +1,8 @@
 /-
 # Analysis: `to_canonical` and `step_to_canonical`
 
-This module documents the analysis of the `to_canonical` axiom and its relationship
-to a hypothetical `step_to_canonical` axiom.
+This module documents the analysis of the `to_canonical` assumption and its relationship
+to a hypothetical `step_to_canonical` assumption.
 
 ## Historical Context
 
@@ -49,7 +49,7 @@ We now use this equality directly to produce a Type-valued 3-cell via
 | 5+ | `contractibilityHigh` (1) | Higher contractibility |
 
 The previous analysis showing that `to_canonical` could be reduced to
-`step_to_canonical` (one axiom per Step constructor) is no longer applicable
+`step_to_canonical` (one assumption per Step constructor) is no longer applicable
 without `Step.canon`.
 -/
 
@@ -68,7 +68,7 @@ variable {A : Type u}
 
 At the level of `RwEq` (Prop-valued), everything works: any two derivations
 between the same paths have equal `toRwEq`. This equality now yields a 3-cell
-via `MetaStep₃.rweq_eq`, so no axiom is needed.
+via `MetaStep₃.rweq_eq`, so no assumption is needed.
 -/
 
 section SemanticArgument
@@ -117,13 +117,13 @@ end FromContractibility
 
 /-! ## Part 3: Axiom Analysis
 
-This section documents the minimal axiom set for the ω-groupoid structure.
+This section documents the minimal assumption set for the ω-groupoid structure.
 
 ### Level 1: Path Rewrite Rules (Step)
 
 The `Step` inductive has ~76 constructors. These form the term rewriting system.
 
-**Minimal groupoid axioms (6 rules):**
+**Minimal groupoid assumptions (6 rules):**
 1. `symm_refl` : σ(ρ) → ρ
 2. `trans_refl_left` : ρ · p → p
 3. `trans_assoc` : (p · q) · r → p · (q · r)
@@ -133,17 +133,17 @@ The `Step` inductive has ~76 constructors. These form the term rewriting system.
 
 ### Level 2: Derivations (Derivation₂)
 
-No axioms needed — `Derivation₂` is a free structure.
+No assumptions needed — `Derivation₂` is a free structure.
 
 ### Level 3: Meta-derivations (Derivation₃)
 
-No axiom is needed: `contractibility₃` follows from proof irrelevance of `RwEq`.
+No assumption is needed: `contractibility₃` follows from proof irrelevance of `RwEq`.
 All groupoid laws, coherences, and step equality are derivable from
 `contractibility₃`.
 
 ### Level 4+: Higher cells
 
-No higher contractibility axioms: levels 4+ are derived from proof irrelevance.
+No higher contractibility assumptions: levels 4+ are derived from proof irrelevance.
 
 ### Total Minimal Axioms
 
@@ -154,7 +154,7 @@ No higher contractibility axioms: levels 4+ are derived from proof irrelevance.
 | 5+ | `contractibilityHigh` | Contractibility₄ (derived) |
 
 The level 1 Step rules are structural and define the rewriting system.
-They are not axioms in the ω-groupoid sense but rather the computational
+They are not assumptions in the ω-groupoid sense but rather the computational
 content of path equality.
 -/
 

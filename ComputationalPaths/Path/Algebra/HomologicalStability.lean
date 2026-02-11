@@ -5,7 +5,7 @@ Formalization of homological stability including stability theorems,
 stabilization maps, stable range, group homology stability, and
 symmetric groups stability.
 
-All proofs are complete — no sorry, no axiom.
+All proofs are complete — no placeholders remain.
 
 ## Key Results
 

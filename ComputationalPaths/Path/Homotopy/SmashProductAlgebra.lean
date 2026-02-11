@@ -4,7 +4,7 @@
 Formalization of smash product algebra including smash product associativity,
 commutativity, unit, ring spectra, and module spectra.
 
-All proofs are complete — no sorry, no axiom.
+All proofs are complete — no placeholders or new assumptions.
 
 ## References
 

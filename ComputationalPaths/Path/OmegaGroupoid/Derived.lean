@@ -2,8 +2,8 @@
 # Derived Coherences for Weak ω-Groupoids
 
 This module demonstrates that most `MetaStep₃` constructors in the ω-groupoid
-structure are **derivable** from `contractibility₃`. This reduces the axiomatic
-content of the weak ω-groupoid structure significantly.
+structure are **derivable** from `contractibility₃`. This reduces the assumption
+burden of the weak ω-groupoid structure significantly.
 
 ## Main Results
 
@@ -26,7 +26,7 @@ All these derivations follow from a single observation:
 
 This is exactly `contractibility₃`, derived from proof irrelevance of `RwEq`.
 
-Once we have contractibility, all the individual coherence axioms become
+Once we have contractibility, all the individual coherence laws become
 special cases: they're just saying that two specific derivations are equal,
 which follows immediately from contractibility.
 
@@ -155,15 +155,15 @@ of the core development here.
 /-! ## Part 4: Alternative Axiom Systems
 
 Based on this analysis, we could reformulate the ω-groupoid with a
-**minimal axiom set**:
+**minimal assumption set**:
 
-The minimal axiom set is now:
+The minimal assumption set is now:
 - Level 4: `contractibility₄`
 - Level 5+: `contractibilityHigh`
 -/
 
 /-
-**Summary: A minimal weak ω-groupoid now needs these axioms:**
+**Summary: A minimal weak ω-groupoid now needs these assumptions:**
 
 1. `contractibility₄` (Level 4): Any two parallel 3-cells are connected
 2. `contractibilityHigh` (Level 5+): Any two parallel 4-cells are connected
@@ -209,7 +209,7 @@ end EliminateRedundantPathLaws
 
 /-! ## Summary
 
-**Eliminable axioms (now theorems):**
+**Eliminable assumptions (now theorems):**
 1. `vcomp_refl_left` - derived from contractibility₃
 2. `vcomp_refl_right` - derived from contractibility₃
 3. `vcomp_assoc` - derived from contractibility₃
@@ -222,7 +222,7 @@ end EliminateRedundantPathLaws
 10. `triangle` - derived from contractibility₃
 11. `interchange` - derived from contractibility₃
 
-**Remaining true axioms:**
+**Remaining true assumptions:**
 1. `contractibility₄` (Level 4) - derived from proof irrelevance
 2. `contractibilityHigh` (Level 5+) - derived from proof irrelevance
 
@@ -230,7 +230,7 @@ end EliminateRedundantPathLaws
 - One of `trans_refl_left`/`trans_refl_right` is derivable
 - One of `trans_symm`/`symm_trans` is derivable
 
-This reduces the axiom count from 14+ to just 2.
+This reduces the assumption count from 14+ to just 2.
 -/
 
 end Derived

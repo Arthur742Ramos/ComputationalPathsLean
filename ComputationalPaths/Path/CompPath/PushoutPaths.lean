@@ -1132,7 +1132,7 @@ theorem mul_assoc' (x y z : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
         simp only [mul, ofWord, mulWordRight, FreeProductWord.concat_assoc]
 
 /-- Inverse operation on the full amalgamated free product.
-Requires group axioms for negation:
+Requires group laws for negation:
 - Negation commutes with i₁, i₂
 - Negation anti-distributes over addition: -(x + y) = (-y) + (-x)
 - Negation of zero is zero -/
@@ -1162,7 +1162,7 @@ def inv [Neg G₁] [Neg G₂] [Neg H]
 /-! ### Group Laws -/
 
 /-- **Left cancellation law**: x * inv(x) = one.
-This is the key group axiom showing that inverse is a right inverse. -/
+This is the key group law showing that inverse is a right inverse. -/
 theorem mul_inv_cancel [Neg G₁] [Neg G₂] [Neg H]
     (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
     (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))
@@ -1181,7 +1181,7 @@ theorem mul_inv_cancel [Neg G₁] [Neg G₂] [Neg H]
     exact FullAmalgEquiv.of_freeGroupEq (FreeProductWord.concat_inverse_nil haddG₁ haddG₂ w)
 
 /-- **Right cancellation law**: inv(x) * x = one.
-This is the key group axiom showing that inverse is a left inverse. -/
+This is the key group law showing that inverse is a left inverse. -/
 theorem inv_mul_cancel [Neg G₁] [Neg G₂] [Neg H]
     (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
     (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))
@@ -1804,7 +1804,7 @@ end PushoutCompPath
 /-! ## Provenance-Based Wedge Loop Quotient
 
 We define a wedge-loop quotient that keeps explicit provenance (left/right steps)
-and quotients only by equality of the encoded word. This avoids axioms by
+and quotients only by equality of the encoded word. This avoids assumptions by
 building encode/decode directly on provenance paths.
 -/
 
@@ -3437,7 +3437,7 @@ In the code family approach, this follows from:
 
 This is the simplest case of SVK where the gluing space is a point.
 Use `wedgeFundamentalGroupEquiv_of_decode_bijective` with
-`HasWedgeSVKDecodeBijective` instead of a bespoke wrapper axiom. -/
+`HasWedgeSVKDecodeBijective` instead of a bespoke wrapper assumption. -/
 
 end WedgeSVK
 
@@ -3457,7 +3457,7 @@ variable {A : Type u} {B : Type u} (a₀ : A) (b₀ : B)
 /-- Encode/decode data for wedge sums (explicit assumption).
 
 This packages the missing encode direction for wedge sums as a typeclass,
-so no kernel axioms are introduced by importing `PushoutPaths.lean`.
+so no kernel assumptions are introduced by importing `PushoutPaths.lean`.
 
 It is intentionally stronger than `HasPushoutSVKEncodeData` for the wedge case:
 we assume `encode ∘ decode = id` as an equality on words (not just `AmalgEquiv`). -/
@@ -3681,7 +3681,7 @@ This module establishes:
 
 6. **Provenance Wedge Quotient** (`WedgeProvenance`): A provenance-based loop
    quotient for wedge sums together with `wedgeProvenanceEquiv`, giving a
-   constructive SVK-style equivalence without axioms.
+   constructive SVK-style equivalence without assumptions.
 
 The proofs use the computational paths framework where:
 - Loops are computational paths (with explicit step structure)

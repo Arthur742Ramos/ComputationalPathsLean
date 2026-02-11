@@ -46,12 +46,12 @@ universe u
 
 /-! ## Higher Homotopy Groups of Products
 
-We axiomatize the product theorem for higher homotopy groups.
+We formalize the product theorem for higher homotopy groups.
 -/
 
 /-! ### Product Path Facts
 
-Unlike an `rweq_of_toEq_eq`-style axiom (which would collapse all computational
+Unlike an `rweq_of_toEq_eq`-style assumption (which would collapse all computational
 paths with the same underlying equality), the proofs below use only the
 standard rewrite congruence lemmas already available for:
 

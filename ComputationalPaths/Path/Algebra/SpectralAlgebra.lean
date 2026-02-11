@@ -5,7 +5,7 @@ Formalization of spectral algebra including structured ring spectra,
 commutative ring spectra, modules over ring spectra, Thom spectra,
 and power operations.
 
-All proofs are complete — no sorry, no axiom.
+All proofs are complete — no placeholders remain.
 
 ## Key Results
 

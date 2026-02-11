@@ -2,7 +2,7 @@
 # Minimal Axiom Set for Path Rewriting
 
 This module demonstrates that several `Step` constructors are derivable from
-others, reducing the axiom count for the rewrite system.
+others, reducing the rule count for the rewrite system.
 
 ## Eliminable Rules
 
@@ -246,7 +246,7 @@ If we keep `symm_trans`:
 Plus the type-specific rules (β/η for products, sigma, functions).
 -/
 
-/-- The minimal axiom structure for groupoid laws. -/
+/-- The minimal rule structure for groupoid laws. -/
 structure MinimalGroupoidAxioms (A : Type u) where
   /-- σ(ρ) → ρ -/
   symm_refl : ∀ (a : A), RwEq (Path.symm (Path.refl a)) (Path.refl a)

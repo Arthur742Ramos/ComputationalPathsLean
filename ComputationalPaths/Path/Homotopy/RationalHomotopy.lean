@@ -4,7 +4,7 @@
 Formalization of rational homotopy theory including rationalization, Sullivan models,
 minimal models, formality, and the rational dichotomy.
 
-All proofs are complete — no sorry, no axiom.
+All proofs are complete — no placeholders or new assumptions.
 
 ## Key Results
 

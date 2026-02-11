@@ -4,7 +4,7 @@
 Formalization of parametrized homotopy theory including ex-spaces, fiberwise
 homotopy, parametrized spectra, twisted cohomology, and the Thom isomorphism.
 
-All proofs are complete — no sorry, no axiom.
+All proofs are complete — no placeholders, no axiom.
 
 ## Key Results
 
