@@ -149,7 +149,7 @@ structure ExactTriangle {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
 structure OctahedralAxiom (TC : TriangulatedCategory.{u}) where
   octahedral :
     ∀ {X Y Z : TC.cat.Obj}
-      (f : TC.cat.Hom X Y) (g : TC.cat.Hom Y Z)
+      (_ : TC.cat.Hom X Y) (_ : TC.cat.Hom Y Z)
       (Cf : TC.cat.Obj) (Tf : Triangle TC.cat TC.shift)
       (_ : TC.distinguished Tf) (_ : Tf.X = X ∧ Tf.Y = Y ∧ Tf.Z = Cf)
       (Cg : TC.cat.Obj) (Tg : Triangle TC.cat TC.shift)

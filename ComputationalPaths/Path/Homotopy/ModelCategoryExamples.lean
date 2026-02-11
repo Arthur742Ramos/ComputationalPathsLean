@@ -126,10 +126,10 @@ structure ReedyCategory where
   /-- Inverse morphisms (recorded abstractly). -/
   inverse : Obj → Obj → Prop
   /-- Factorization axiom (recorded abstractly). -/
-  factorization : ∀ {a b : Obj}, True
+  factorization : ∀ {_ _ : Obj}, True
 
 /-- Diagrams of shape `C` in a type `A`. -/
-abbrev Diagram (C : ReedyCategory) (A : Type v) : Type (max u v) :=
+abbrev Diagram (C : ReedyCategory.{u}) (A : Type v) : Type (max u v) :=
   C.Obj → A
 
 /-- Reedy model structure on diagrams valued in a model category. -/

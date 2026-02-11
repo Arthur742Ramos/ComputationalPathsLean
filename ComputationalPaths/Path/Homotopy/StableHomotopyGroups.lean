@@ -3,8 +3,8 @@
 
 This module records stable stem data together with lightweight interfaces for the
 image of J, the Adams e-invariant, the alpha/beta families, and the chromatic
-spectral sequence at height 1. All definitions are axiom-free placeholders that
-reuse the existing stable-stem data.
+spectral sequence at height 1. All definitions are axiom-free placeholders with
+trivial stable-stem carriers, ready to be refined.
 
 ## Key Results
 
@@ -36,35 +36,16 @@ universe u
 
 /-! ## Stable stems -/
 
-/-- Stable stem in degree n, reusing `StableHomotopy.StablePi`. -/
-abbrev StableStem (n : Nat) : Type := StableHomotopy.StablePi n
-
-/-- Zero element in Z/2Z, used for stable stem basepoints. -/
-def z2_zero : StableStems.Z2 := ⟨0, by decide⟩
-
-/-- Zero element in Z/24Z. -/
-def z24_zero : StableStems.Z24 := ⟨0, by decide⟩
-
-/-- Zero element in Z/240Z. -/
-def z240_zero : StableStems.Z240 := ⟨0, by decide⟩
+/-- Stable stem in degree n (placeholder). -/
+abbrev StableStem (_n : Nat) : Type := Unit
 
 /-- Canonical basepoint element in each stable stem. -/
-def stableStemBase : (n : Nat) → StableStem n
-  | 1 => z2_zero
-  | 2 => z2_zero
-  | 3 => z24_zero
-  | 4 => ()
-  | 5 => ()
-  | 6 => z2_zero
-  | 7 => z240_zero
-  | 8 => (z2_zero, z2_zero)
-  | 9 => (z2_zero, z2_zero, z2_zero)
-  | _ => ()
+def stableStemBase (n : Nat) : StableStem n := ()
 
 /-! ## Image of J -/
 
 /-- Placeholder for the source of the J-homomorphism in degree n. -/
-abbrev JSource (n : Nat) : Type := Unit
+abbrev JSource (_n : Nat) : Type := Unit
 
 /-- The J-homomorphism into stable stems (modeled as a constant map). -/
 def jHomomorphism (n : Nat) : JSource n → StableStem n :=
@@ -72,8 +53,8 @@ def jHomomorphism (n : Nat) : JSource n → StableStem n :=
 
 /-- The image of J in degree n, tagged as stable stem classes. -/
 structure ImageOfJ (n : Nat) where
-  /-- Underlying stable stem class. -/
-  class : StableStem n
+  /-- Underlying stable stem element. -/
+  elem : StableStem n
 
 /-- The canonical image-of-J element. -/
 def imageOfJBase (n : Nat) : ImageOfJ n :=
@@ -87,14 +68,14 @@ def imageOfJMap (n : Nat) : JSource n → ImageOfJ n :=
 
 /-- Adams e-invariant data for a stable stem class. -/
 structure AdamsEInvariant (n : Nat) where
-  /-- Stable stem class. -/
-  class : StableStem n
+  /-- Stable stem element. -/
+  elem : StableStem n
   /-- Value of the e-invariant (modeled as an integer). -/
   value : Int
 
 /-- The Adams e-invariant (placeholder returning 0). -/
 def adamsEInvariant (n : Nat) (x : StableStem n) : AdamsEInvariant n :=
-  { class := x, value := 0 }
+  { elem := x, value := 0 }
 
 /-- The e-invariant of the base J-image class. -/
 def adamsEInvariantOfJ (n : Nat) : AdamsEInvariant n :=
@@ -111,12 +92,12 @@ def betaStem (k : Nat) : Nat := 2 * k + 2
 /-- The alpha family class at index k. -/
 structure AlphaFamily (k : Nat) where
   /-- The stable stem class in degree `alphaStem k`. -/
-  class : StableStem (alphaStem k)
+  elem : StableStem (alphaStem k)
 
 /-- The beta family class at index k. -/
 structure BetaFamily (k : Nat) where
   /-- The stable stem class in degree `betaStem k`. -/
-  class : StableStem (betaStem k)
+  elem : StableStem (betaStem k)
 
 /-- Placeholder alpha family element. -/
 def alphaFamily (k : Nat) : AlphaFamily k :=

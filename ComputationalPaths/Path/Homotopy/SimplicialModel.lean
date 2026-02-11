@@ -85,9 +85,9 @@ structure SimplicialModelCategory (A : Type u) extends ModelCategory A where
   /-- Cotensor with a simplicial set. -/
   cotensor : A → SSetData → A
   /-- Tensor unit law (recorded abstractly). -/
-  tensor_unit : ∀ (a : A), True
+  tensor_unit : ∀ (_ : A), True
   /-- Cotensor unit law (recorded abstractly). -/
-  cotensor_unit : ∀ (a : A), True
+  cotensor_unit : ∀ (_ : A), True
   /-- Pushout-product axiom (recorded abstractly). -/
   pushout_product : ∀ {a b : A} (_ : Path a b), True
 
@@ -118,7 +118,7 @@ structure HammockLocalization {A : Type u} (M : ModelCategory A) where
   localize_rweq :
     ∀ {a b : A} {p q : Path a b}, RwEq p q → localize p = localize q
   /-- Localization preserves identities (recorded abstractly). -/
-  localize_id : ∀ (a : A), True
+  localize_id : ∀ (_ : A), True
   /-- Localization preserves composition (recorded abstractly). -/
   localize_comp :
     ∀ {a b c : A} (_ : Path a b) (_ : Path b c), True

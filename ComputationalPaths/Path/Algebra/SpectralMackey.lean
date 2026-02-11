@@ -42,7 +42,7 @@ structure GSet (G : Type u) (S : StrictGroup G) where
   action : GroupAction G S carrier
 
 /-- An equivariant map between G-sets. -/
-structure GSetHom {G : Type u} {S : StrictGroup G} (X Y : GSet G S) where
+structure GSetHom {G : Type u} {S : StrictGroup G} (X Y : GSet.{u, v} G S) where
   /-- Underlying function. -/
   toFun : X.carrier → Y.carrier
   /-- Equivariance of the map. -/
@@ -53,21 +53,17 @@ namespace GSetHom
 variable {G : Type u} {S : StrictGroup G}
 
 /-- Identity equivariant map. -/
-def id (X : GSet G S) : GSetHom X X where
+def id (X : GSet.{u, v} G S) : GSetHom X X where
   toFun := fun x => x
-  equivariant := by
-    intro g x
-    rfl
+  equivariant := fun _ _ => rfl
 
 /-- Composition of equivariant maps. -/
-def comp {X Y Z : GSet G S} (f : GSetHom X Y) (g : GSetHom Y Z) : GSetHom X Z where
+def comp {X Y Z : GSet.{u, v} G S} (f : GSetHom X Y) (g : GSetHom Y Z) :
+    GSetHom X Z where
   toFun := fun x => g.toFun (f.toFun x)
   equivariant := by
     intro g' x
-    calc
-      g.toFun (f.toFun (X.action.act g' x))
-          = g.toFun (Y.action.act g' (f.toFun x)) := congrArg g.toFun (f.equivariant g' x)
-      _ = Z.action.act g' (g.toFun (f.toFun x)) := g.equivariant g' (f.toFun x)
+    rw [f.equivariant g' x, g.equivariant g' (f.toFun x)]
 
 end GSetHom
 
@@ -85,37 +81,40 @@ namespace FiniteGSet
 variable {G : Type u} {S : StrictGroup G}
 
 /-- Forget the finiteness data. -/
-def toGSet (X : FiniteGSet G S) : GSet G S where
+def toGSet (X : FiniteGSet.{u, v} G S) : GSet.{u, v} G S where
   carrier := X.carrier
   action := X.action
 
 end FiniteGSet
 
 /-- Equivariant maps between finite G-sets. -/
-abbrev FiniteGSetHom {G : Type u} {S : StrictGroup G}
-    (X Y : FiniteGSet G S) : Type (max u v) :=
-  GSetHom (X.toGSet) (Y.toGSet)
+def FiniteGSetHom {G : Type u} {S : StrictGroup G}
+    (X Y : FiniteGSet.{u, v} G S) :=
+  GSetHom X.toGSet Y.toGSet
 
 /-! ## Mackey functors -/
 
 /-- A Mackey functor for finite G-sets, with restriction and transfer. -/
 structure MackeyFunctor (G : Type u) (S : StrictGroup G) where
   /-- Object assignment. -/
-  obj : FiniteGSet G S → Type w
+  obj : FiniteGSet.{u, v} G S → Type w
   /-- Restriction along a G-map (contravariant). -/
-  res : {X Y : FiniteGSet G S} → FiniteGSetHom X Y → obj Y → obj X
+  res : {X Y : FiniteGSet.{u, v} G S} → FiniteGSetHom X Y → obj Y → obj X
   /-- Transfer along a G-map (covariant). -/
-  tr : {X Y : FiniteGSet G S} → FiniteGSetHom X Y → obj X → obj Y
-  /-- Identity axiom for restriction. -/
-  res_id : ∀ X, True
-  /-- Identity axiom for transfer. -/
-  tr_id : ∀ X, True
-  /-- Composition axiom for restriction. -/
-  res_comp : ∀ {X Y Z} (f : FiniteGSetHom X Y) (g : FiniteGSetHom Y Z), True
-  /-- Composition axiom for transfer. -/
-  tr_comp : ∀ {X Y Z} (f : FiniteGSetHom X Y) (g : FiniteGSetHom Y Z), True
+  tr : {X Y : FiniteGSet.{u, v} G S} → FiniteGSetHom X Y → obj X → obj Y
+  /-- Identity for restriction (abstract). -/
+  res_id : ∀ (_ : FiniteGSet.{u, v} G S), True
+  /-- Identity for transfer (abstract). -/
+  tr_id : ∀ (_ : FiniteGSet.{u, v} G S), True
+  /-- Composition for restriction (abstract). -/
+  res_comp : ∀ {X Y Z : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ : FiniteGSetHom Y Z), True
+  /-- Composition for transfer (abstract). -/
+  tr_comp : ∀ {X Y Z : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ : FiniteGSetHom Y Z), True
   /-- Mackey double-coset compatibility (abstract). -/
-  mackey : ∀ {X Y Z} (f : FiniteGSetHom X Y) (g : FiniteGSetHom X Z), True
+  mackey : ∀ {X Y Z : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ : FiniteGSetHom X Z), True
 
 /-! ## Spectral Mackey functors -/
 
@@ -131,88 +130,98 @@ namespace SpectrumMap
 /-- Identity spectrum map. -/
 def id (X : Spectrum.{w}) : SpectrumMap X X where
   map := fun _ x => x
-  map_pt := by
-    intro n
-    rfl
+  map_pt := fun _ => rfl
 
 /-- Composition of spectrum maps. -/
-def comp {X Y Z : Spectrum.{w}} (f : SpectrumMap X Y) (g : SpectrumMap Y Z) : SpectrumMap X Z where
+def comp {X Y Z : Spectrum.{w}} (f : SpectrumMap X Y) (g : SpectrumMap Y Z) :
+    SpectrumMap X Z where
   map := fun n x => g.map n (f.map n x)
   map_pt := by
     intro n
-    calc
-      g.map n (f.map n (X.basepoint n))
-          = g.map n (Y.basepoint n) := congrArg (fun x => g.map n x) (f.map_pt n)
-      _ = Z.basepoint n := g.map_pt n
+    rw [f.map_pt n, g.map_pt n]
 
 end SpectrumMap
 
 /-- A Mackey functor valued in spectra. -/
 structure SpectralMackeyFunctor (G : Type u) (S : StrictGroup G) where
   /-- Spectrum assigned to each finite G-set. -/
-  obj : FiniteGSet G S → Spectrum.{w}
+  obj : FiniteGSet.{u, v} G S → Spectrum.{w}
   /-- Restriction maps of spectra. -/
-  res : {X Y : FiniteGSet G S} → FiniteGSetHom X Y → SpectrumMap (obj Y) (obj X)
+  res : {X Y : FiniteGSet.{u, v} G S} → FiniteGSetHom X Y →
+    SpectrumMap (obj Y) (obj X)
   /-- Transfer maps of spectra. -/
-  tr : {X Y : FiniteGSet G S} → FiniteGSetHom X Y → SpectrumMap (obj X) (obj Y)
-  /-- Identity axiom for restriction. -/
-  res_id : ∀ X, True
-  /-- Identity axiom for transfer. -/
-  tr_id : ∀ X, True
-  /-- Composition axiom for restriction. -/
-  res_comp : ∀ {X Y Z} (f : FiniteGSetHom X Y) (g : FiniteGSetHom Y Z), True
-  /-- Composition axiom for transfer. -/
-  tr_comp : ∀ {X Y Z} (f : FiniteGSetHom X Y) (g : FiniteGSetHom Y Z), True
+  tr : {X Y : FiniteGSet.{u, v} G S} → FiniteGSetHom X Y →
+    SpectrumMap (obj X) (obj Y)
+  /-- Identity for restriction (abstract). -/
+  res_id : ∀ (_ : FiniteGSet.{u, v} G S), True
+  /-- Identity for transfer (abstract). -/
+  tr_id : ∀ (_ : FiniteGSet.{u, v} G S), True
+  /-- Composition for restriction (abstract). -/
+  res_comp : ∀ {X Y Z : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ : FiniteGSetHom Y Z), True
+  /-- Composition for transfer (abstract). -/
+  tr_comp : ∀ {X Y Z : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ : FiniteGSetHom Y Z), True
   /-- Mackey compatibility (abstract). -/
-  mackey : ∀ {X Y Z} (f : FiniteGSetHom X Y) (g : FiniteGSetHom X Z), True
+  mackey : ∀ {X Y Z : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ : FiniteGSetHom X Z), True
 
 /-! ## Green functors -/
 
 /-- A Green functor: a Mackey functor with multiplicative structure. -/
-structure GreenFunctor (G : Type u) (S : StrictGroup G) extends MackeyFunctor G S where
+structure GreenFunctor (G : Type u) (S : StrictGroup G)
+    extends MackeyFunctor.{u, v, w} G S where
   /-- Addition. -/
-  add : ∀ X, obj X → obj X → obj X
+  add : ∀ (X : FiniteGSet.{u, v} G S), obj X → obj X → obj X
   /-- Zero element. -/
-  zero : ∀ X, obj X
+  zero : ∀ (X : FiniteGSet.{u, v} G S), obj X
   /-- Multiplication. -/
-  mul : ∀ X, obj X → obj X → obj X
+  mul : ∀ (X : FiniteGSet.{u, v} G S), obj X → obj X → obj X
   /-- Unit element. -/
-  one : ∀ X, obj X
+  one : ∀ (X : FiniteGSet.{u, v} G S), obj X
   /-- Additive associativity. -/
-  add_assoc : ∀ X x y z, True
+  add_assoc : ∀ (X : FiniteGSet.{u, v} G S) (_ _ _ : obj X), True
   /-- Additive commutativity. -/
-  add_comm : ∀ X x y, True
+  add_comm : ∀ (X : FiniteGSet.{u, v} G S) (_ _ : obj X), True
   /-- Additive identity. -/
-  add_zero : ∀ X x, True
+  add_zero : ∀ (X : FiniteGSet.{u, v} G S) (_ : obj X), True
   /-- Multiplicative associativity. -/
-  mul_assoc : ∀ X x y z, True
+  mul_assoc : ∀ (X : FiniteGSet.{u, v} G S) (_ _ _ : obj X), True
   /-- Multiplicative commutativity. -/
-  mul_comm : ∀ X x y, True
+  mul_comm : ∀ (X : FiniteGSet.{u, v} G S) (_ _ : obj X), True
   /-- Multiplicative identity. -/
-  mul_one : ∀ X x, True
+  mul_one : ∀ (X : FiniteGSet.{u, v} G S) (_ : obj X), True
   /-- Distributivity. -/
-  distrib : ∀ X x y z, True
+  distrib : ∀ (X : FiniteGSet.{u, v} G S) (_ _ _ : obj X), True
   /-- Restriction preserves addition. -/
-  res_add : ∀ {X Y} (f : FiniteGSetHom X Y) (x y : obj Y), True
+  res_add : ∀ {X Y : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ _ : obj Y), True
   /-- Transfer preserves addition. -/
-  tr_add : ∀ {X Y} (f : FiniteGSetHom X Y) (x y : obj X), True
+  tr_add : ∀ {X Y : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ _ : obj X), True
   /-- Restriction preserves multiplication. -/
-  res_mul : ∀ {X Y} (f : FiniteGSetHom X Y) (x y : obj Y), True
+  res_mul : ∀ {X Y : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ _ : obj Y), True
   /-- Transfer is additive with respect to multiplication. -/
-  tr_mul : ∀ {X Y} (f : FiniteGSetHom X Y) (x y : obj X), True
+  tr_mul : ∀ {X Y : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ _ : obj X), True
 
 /-! ## Tambara functors -/
 
 /-- A Tambara functor: a Green functor with norm maps. -/
-structure TambaraFunctor (G : Type u) (S : StrictGroup G) extends GreenFunctor G S where
+structure TambaraFunctor (G : Type u) (S : StrictGroup G)
+    extends GreenFunctor.{u, v, w} G S where
   /-- Norm maps along finite G-maps. -/
-  norm : {X Y : FiniteGSet G S} → FiniteGSetHom X Y → obj X → obj Y
+  norm : {X Y : FiniteGSet.{u, v} G S} → FiniteGSetHom X Y → obj X → obj Y
   /-- Norm preserves units (abstract). -/
-  norm_one : ∀ {X Y} (f : FiniteGSetHom X Y) (x : obj X), True
+  norm_one : ∀ {X Y : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ : obj X), True
   /-- Norm is multiplicative (abstract). -/
-  norm_mul : ∀ {X Y} (f : FiniteGSetHom X Y) (x y : obj X), True
+  norm_mul : ∀ {X Y : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ _ : obj X), True
   /-- Norm composition (abstract). -/
-  norm_comp : ∀ {X Y Z} (f : FiniteGSetHom X Y) (g : FiniteGSetHom Y Z), True
+  norm_comp : ∀ {X Y Z : FiniteGSet.{u, v} G S}
+    (_ : FiniteGSetHom X Y) (_ : FiniteGSetHom Y Z), True
   /-- Distributivity of norms with transfers (abstract). -/
   norm_distrib : True
 
@@ -244,7 +253,8 @@ def full (G : Type u) (S : StrictGroup G) : DressFamily G S where
 end DressFamily
 
 /-- Dress induction data for a Mackey functor. -/
-structure DressInduction {G : Type u} {S : StrictGroup G} (F : MackeyFunctor G S) where
+structure DressInduction {G : Type u} {S : StrictGroup G}
+    (F : MackeyFunctor.{u, v, w} G S) where
   /-- Chosen Dress family. -/
   family : DressFamily G S
   /-- Induction property (abstract). -/
@@ -253,10 +263,11 @@ structure DressInduction {G : Type u} {S : StrictGroup G} (F : MackeyFunctor G S
 /-! ## Burnside Mackey functor -/
 
 /-- The Burnside Mackey functor, modeled as the constant Nat functor. -/
-def burnsideMackeyFunctor (G : Type u) (S : StrictGroup G) : MackeyFunctor G S where
+def burnsideMackeyFunctor (G : Type u) (S : StrictGroup G) :
+    MackeyFunctor.{u, v, 0} G S where
   obj := fun _ => Nat
-  res := fun {X Y} _ n => n
-  tr := fun {X Y} _ n => n
+  res := fun _ n => n
+  tr := fun _ n => n
   res_id := fun _ => trivial
   tr_id := fun _ => trivial
   res_comp := fun _ _ => trivial
@@ -265,7 +276,7 @@ def burnsideMackeyFunctor (G : Type u) (S : StrictGroup G) : MackeyFunctor G S w
 
 /-- Dress induction holds for the Burnside Mackey functor with the full family. -/
 def burnsideDressInduction (G : Type u) (S : StrictGroup G) :
-    DressInduction (burnsideMackeyFunctor G S) where
+    DressInduction (burnsideMackeyFunctor.{u, v} G S) where
   family := DressFamily.full G S
   induction := trivial
 

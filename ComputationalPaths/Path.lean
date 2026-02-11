@@ -208,6 +208,7 @@ import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
+import ComputationalPaths.Path.Algebra.StableModule
 import ComputationalPaths.Path.Algebra.SpectralMackey
 import ComputationalPaths.Path.Algebra.AInfinityAlgebra
 import ComputationalPaths.Path.Algebra.StringTopology
@@ -287,3 +288,8 @@ import ComputationalPaths.Path.Homotopy.SurgeryTheory
 import ComputationalPaths.Path.Homotopy.EtaleCohomology
 import ComputationalPaths.Path.Algebra.MotivicCohomology
 import ComputationalPaths.Path.Homotopy.FloerHomotopy
+import ComputationalPaths.Path.Category.BicategoryPaths
+import ComputationalPaths.Path.Category.EnrichedCategory
+import ComputationalPaths.Path.Category.DoubleCategory
+import ComputationalPaths.Path.Category.KanExtension
+import ComputationalPaths.Path.Category.GrothendieckConstruction
