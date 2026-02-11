@@ -1,0 +1,438 @@
+%%*************************************%%
+%%     A template and instructions     %%
+%% concerning manuscripts submitted to %%
+%%   BULLETIN OF THE SECTION OF LOGIC  %%
+%%                                     %%
+%%             ver 1.01                %%
+%%          August 01, 2020            %%
+%%*************************************%%
+
+
+% ********** BSL PART: DO NOT TAMPER WITH IT! **********
+
+\documentclass[manuscript]{BSLstyle} % This is the class for Bulletin of the Section of Logic.
+									 % It should be loaded with the `manuscript' option.
+
+
+% These fields will be filled by the editorial office
+
+%\Presenter{John Smith} %Name of the editor who accepted the paper
+%
+%\Received{1}{1}{2020} %Date of the paper's submission (format {d(d)}{mm}{yyyy})
+%
+%\Revised{1}{6}{2020} %Date of paper's revision submission (format {d(d)}{m(m)}{yyyy})
+%
+%\Accepted{1}{6}{2020} %Date of paper's acceptance (format {d(d)}{m(m)}{yyyy})
+%
+%\Ordinal{01} %Number of papers hitherto accepted in the current year + 1
+%
+%\PublishedOnline{1}{6}{2020} %Date of paper's online publication (format {d(d)}{m(m)}{yyyy})
+%
+%%\Page{1} %Number of the first page of the paper
+%
+%\Published{50}{1}{2021} %Volume, number, and year of the issue the paper is published in (format {vv}{n}{yyyy})
+%
+%\AuthAbbrv{a} %If the length of the sequence of authors' names in the header exceeds the header's length, it is possible to pick one of two abbreviated forms: (a) S. Jones, J. Smith, H. Anders (i.e., the abbreviated forms of all names -- if provided; argument: "a") or (b) Susan Jones \textit{et al.} (argument: "b")
+
+
+
+% ********** AUTHORS' PART (optional) **********
+
+% You can put your own macros or packages here. Avoid, however, loading the packages that are already pre-loaded by the BSLstyle class. A detailed list of such packages can be found in Section 2 of this template.
+
+% Please do not tamper with any dimensions defined in the BSLstyle class!
+
+\usepackage{mathrsfs}     % Additional packages that are not pre-loaded by BSLstyle.cls
+\usepackage{bussproofs}	  %	and are necessary for proper compilation of the template.tex file.
+
+
+
+% ********** TITLE PART (mandatory) **********
+
+% The \AuthorEmail command has the following syntax: \AuthorEmail[#1]{#2}[#3]{#4}[#5]{#6}, where:
+% #1 is an optional argument which can contain an author's ORCID number in the format: dddd-dddd-dddd-dddd
+% (an author is requested to fill this argument should they have an ORCID number),
+% #2 is a mandatory argument which should contain an author's full name,
+% #3 is an optional argument which can contain an author's name in an abbreviated form (in case the full name does not fit within the header)
+% #4 is a mandatory argument which should contain an author's email address,
+% #5 is an optional argument which can contain a thanks footnote text if an author wants to include one,
+% #6 is a mandatory argument which should contain an integer between 0 and 100 that represents the percentage share of the author in preparation of the work; the sum of the shares of all authors should be 100.
+% If a paper is multi-authored, then each author should fill a separate \AuthorEmail field.
+% The authors' names will be displayed in the same order as below.
+
+\AuthorEmail[0000-0000-0000-0000]{Susan Jones}{s.jones@univie.ac.at}[\text{\emph{Thanks} note by Susan Jones.}]{4}
+\AuthorEmail{John Smith}[J. Smith]{john.smith@berkeley.edu}[\textit{Thanks} note by John Smith.]{3}
+\AuthorEmail[9999-9999-9999-9999]{Hans Anders}[H. Anders]{anders@uva.nl}{3}
+
+% The \Affiliation command has the following syntax: \Affiliation{#1}{#2}{#3}{#4}{#5}, where:
+% #1 is a mandatory argument which should contain a university's / institution's name,
+% #2 is a mandatory argument which should contain an institute's / department's / faculty's name,
+% #3 is a mandatory argument which should contain a work address in the format: postal code, street name and number,
+% #4 is a mandatory argument which should contain the names of a town and country,
+% #5 is a mandatory argument which should contain the indices of authors with this affiliation
+% (e.g., if a given affiliation is assigned to authors 1 and 3, one should put "1,3" as #5).
+% If there are multiple affiliations occurring in the paper, then each of them needs to be included in a separate \Affiliation command.
+% In such a case the order in which subsequent \Affiliation commands are executed can be arbitrary.
+% If a given argument is not applicable, leave it empty.
+
+\Affiliation{University of California}{Department of Philosophy}{94720-2390, 314 Moses Hall \#2390}{Berkeley, California, USA}{1,2}
+\Affiliation{University of Amsterdam}{Faculty of Science\\Institute for Logic, Language and Computation}{1098 XG, Science Park 107}{Amsterdam, The Netherlands}{3}
+\Affiliation{University of Vienna}{Institute of Mathematics\\ Kurt G\"odel Research Center for Mathematical Logic}{1090, Augasse 2--6, UZA 1 -- Building 2}{Vienna, Austria}{1}
+
+%Filling the \Funding, \Conflict, \Ethics, and \UseofGAI fields is mandatory. They should contain, respectively, the relevant funding information, the declaration of any relevant conflicts of interests, the statement of any relevant ethical considerations, and the declaration regarding the use of GAI tools in preparing the paper. The Author(s) may leave the default values as is, should they find it appropriate.
+
+\Funding{Not applicable.}
+
+\Conflict{None.}
+
+\Ethics{The Author assures of no violations of publication ethics and take full responsibility for the content of the publication.}
+
+\UseOfGAI{Not used.}
+
+% The \Title command has the following syntax: \Title[#1]{#2}[#3], where:
+% #1 is an optional argument which can contain the paper's title in an abbreviated form if the full title does not fit within the header
+% #2 is a mandatory argument which should contain the paper's title in a full form. If it needs to be broken into multiple lines, one can do that by inserting the "\\" symbols in the appropriate places,
+% #3 is an optional argument which can contain a footnote text if an author wants to attach one to the title.
+
+\Title[Full title or abbreviated title (if provided)]{Full title \\ Full subtitle}[Title \textit{thanks} note.]
+\begin{document}
+
+	\begin{abstract}
+		The abstract should briefly summarize the contents of the paper and \textbf{should not contain any references}.
+		
+		If needed, it can be split into several paragraphs.
+		
+		The abstract should be followed by a list of keywords. The authors \textbf{must provide at least 3 keywords} which should be typed in lowercase (except for proper names) and separated with commas.
+		
+		The authors can \textbf{optionally} provide the \textit{Mathematical Subject Classification} codes by using the \texttt{msc} environment which has an \textbf{optional argument} indicating the year (the default value is \texttt{2010}). However, it is \textbf{not compulsory}.
+	\end{abstract}
+	\begin{keywords}
+		keyword 1, keyword 2, keyword 3
+	\end{keywords}
+	\begin{msc}[2020]
+		code 1, code 2, code 3
+	\end{msc}
+
+
+\section{Title part}
+
+There are three commands in the preamble the authors are requested to use and fill with arguments:
+\begin{itemize}
+	\item \texttt{AuthorEmail}
+	\item \texttt{Affiliation}
+	\item \texttt{Title}.
+\end{itemize}
+
+\subsection{AuthorEmail}
+
+The \texttt{\textbackslash AuthorEmail} command has the following syntax:
+\begin{center}
+\texttt{\textbackslash AuthorEmail[\#1]\{\#2\}[\#3]\{\#4\}[\#5]\{\#6\}},
+\end{center}
+where:
+\begin{description}
+\item[\texttt{\#1}] is an \underline{optional} argument which can contain an author's \textbf{ORCID number} in the format: dddd-dddd-dddd-dddd (an author is requested to fill this argument should they have an ORCID number),
+\item[\texttt{\#2}] is a \underline{mandatory} argument which should contain an author's \textbf{full name},
+\item[\texttt{\#3}] is an \underline{optional} argument which can contain an author's name \textbf{in an abbreviated form} (in case the full name does not fit within the header),
+\item[\texttt{\#4}] is a \underline{mandatory} argument which should contain an author's \textbf{email address},
+\item[\texttt{\#5}] is an \underline{optional} argument which can contain a thanks footnote text if an author wants to include one,
+\item[\texttt{\#6}] is a \underline{mandatory} argument which should contain an integer between 0 and 100 that represents \textbf{the percentage share of the author in preparation of the work}; the sum of the shares of all authors should be 100.
+\end{description}
+If a paper is multi-authored, then each author should invoke the command \texttt{\textbackslash AuthorEmail} separately. The order in which authors' names will appear in the output pdf will reflect the order in which the commands have been invoked.
+
+\subsection{Affiliation}
+
+The \texttt{\textbackslash Affiliation} command has the following syntax:
+\begin{center}
+	\texttt{\textbackslash Affiliation\{\#1\}\{\#2\}\{\#3\}\{\#4\}\{\#5\}},
+\end{center}
+where:
+\begin{description}
+	\item[\texttt{\#1}] is a \underline{mandatory} argument which should contain a \textbf{university's / institution's name},
+	\item[\texttt{\#2}] is a \underline{mandatory} argument which should contain an \textbf{institute's / department's / faculty's name},
+	\item[\texttt{\#3}] is a \underline{mandatory} argument which should contain a \textbf{work address in the format: postal code, street name and number},
+	\item[\texttt{\#4}] is a \underline{mandatory} argument which should contain the \textbf{names of a town and country},
+	\item[\texttt{\#5}] is a \underline{mandatory} argument which should contain the \textbf{indices of authors with this affiliation} (e.g., if a given affiliation is assigned to authors 1 and 3, one should put `1,3' as \texttt{\#5}).
+\end{description}
+If there are multiple affiliations occurring in the paper, then each of them needs to be included in a separate \texttt{\textbackslash Affiliation} command. In such a case the order in which subsequent \texttt{\textbackslash Affiliation} commands are executed can be arbitrary\footnote{The reference for the last argument of the \texttt{\textbackslash Affiliation} command is the order in which the \texttt{\textbackslash AuthorEmail} command for the given author was invoked.}.
+
+If a given argument is not applicable, leave it empty.
+
+\subsection{Funding, Conflict, Ethics, and UseOfGAI}
+
+Filling the \texttt{\textbackslash Funding}, \texttt{\textbackslash Conflict}, \texttt{\textbackslash Ethics}, and \texttt{\textbackslash UseofGAI} fields is \underline{mandatory}. They should contain:
+\begin{itemize}
+	\item the relevant funding information,
+	\item the declaration of any relevant conflicts of interests,
+	\item the statement of any relevant ethical considerations, and
+	\item the declaration regarding the use of GAI tools in preparing the paper,
+\end{itemize}
+respectively. The Author(s) may leave the default values of the fields as is, should they find it appropriate.
+
+\subsection{Title}
+
+The \texttt{\textbackslash Title} command has the following syntax:
+\begin{center}
+	\texttt{\textbackslash Title[\#1]\{\#2\}[\#3]},
+\end{center}
+where:
+\begin{description}
+	\item[\texttt{\#1}] is an \underline{optional} argument which can contain the \textbf{paper's title in an abbreviated form} if the full title does not fit within the header,
+	\item[\texttt{\#2}] is a \underline{mandatory} argument which should contain\textbf{ paper's title in the full form}. If it needs to be broken into multiple lines, one can do that by inserting the `\texttt{\textbackslash\textbackslash}' commands in the appropriate places,
+	\item[\texttt{\#3}] is an \underline{optional} argument which can contain a \textbf{footnote text} if the author wants to attach one to the title.
+\end{description}
+
+
+\section{Extra packages and commands}
+
+The authors can define their own commands in the preamble of the document. They can also use additional packages, however since the \texttt{BSLstyle} class automatically loads certain packages, they are asked not to include these packages in the preamble as it can lead to compilation errors. The list of packages pre-loaded by \texttt{BSLstyle} is as follows:
+
+\begin{center}
+	\bgroup
+	\renewcommand*{\arraystretch}{1.5}
+	\begin{tabular}{lll}
+	\textbullet\ \texttt{amsmath}&\qquad\textbullet\ \texttt{graphicx}&\qquad\textbullet\ \texttt{datetime}\\
+	\textbullet\ \texttt{amsfonts}&\qquad\textbullet\ \texttt{enumitem}&\qquad\textbullet\ \texttt{totpages}\\
+	\textbullet\ \texttt{amscd}&\qquad\textbullet\ \texttt{url}&\qquad\textbullet\ \texttt{fancyhdr}\\
+	\textbullet\ \texttt{amssymb}&\qquad\textbullet\ \texttt{hyperref}&\qquad	\textbullet\ \texttt{footmisc}\\
+	\textbullet\ \texttt{amsthm}&\qquad\textbullet\ \texttt{xargs}&\qquad\textbullet\ \texttt{setspace}\\
+	\textbullet\ \texttt{caption}&\qquad\textbullet\ \texttt{titling}&\qquad\textbullet\ \texttt{textcase}\\
+	\textbullet\ \texttt{etoolbox}&\qquad\textbullet\ \texttt{lineno}&\qquad\textbullet\ \texttt{xstring} \\
+	\textbullet\ \texttt{cleveref}&\qquad\textbullet\ \texttt{aliascnt}&\qquad \textbullet\ \texttt{geometry}
+	\end{tabular}
+	\egroup
+\end{center}
+
+
+\section{Maths: Environments and formulas}
+
+\subsection{Mathematics environments}
+
+The authors are requested to use predefined mathematics environments the list of which is presented below:
+
+\begin{itemize}
+	\item \texttt{definition} (\texttt{\textbackslash begin\{definition\}\ldots\textbackslash end\{definition\}})
+	\item \texttt{theorem} (\texttt{\textbackslash begin\{theorem\}\ldots\textbackslash end\{theorem\}})
+	\item \texttt{remark} (\texttt{\textbackslash begin\{remark\}\ldots\textbackslash end\{remark\}})
+	\item \texttt{proposition} (\texttt{\textbackslash begin\{proposition\}\ldots\textbackslash end\{proposition\}})
+	\item \texttt{corollary} (\texttt{\textbackslash begin\{corollary\}\ldots\textbackslash end\{corollary\}})
+	\item \texttt{fact} (\texttt{\textbackslash begin\{fact\}\ldots\textbackslash end\{fact\}})
+	\item \texttt{conjecture} (\texttt{\textbackslash begin\{conjecture\}\ldots\textbackslash end\{conjecture\}})
+	\item \texttt{lemma} (\texttt{\textbackslash begin\{lemma\}\ldots\textbackslash end\{lemma\}})
+	\item \texttt{example} (\texttt{\textbackslash begin\{example\}\ldots\textbackslash end\{example\}})
+	\item \texttt{claim} (\texttt{\textbackslash begin\{claim\}\ldots\textbackslash end\{claim\}})
+	\item \texttt{proof} (\texttt{\textbackslash begin\{proof\}\ldots\textbackslash end\{proof\}}).
+\end{itemize}
+Each of the above-mentioned environments (except for \textit{proof}) has its unnumbered version which will be yielded if an astherisk is added to the environment command (e.g., \texttt{\textbackslash begin\{example\textsuperscript{*}\}\ldots\textbackslash end\{example\textsuperscript{*}\}}).
+
+In case the author wants to use a mathematics environment which is not listed above, they should define in it in the preamble in a standard \texttt{amsthm}-manner and assign to it one of the following theorem styles:
+\begin{itemize}
+	\item \texttt{definition}
+	\item \texttt{plain}
+	\item \texttt{remark}.
+\end{itemize}
+The anchor for numbering should be \texttt{theorem}. For instance:
+\begin{itemize}
+\item[]\texttt{\textbackslash theoremstyle\{definition\}}
+\item[]\texttt{\textbackslash newtheorem\{statement\}[theorem]\{Statement\}}
+\end{itemize}
+If one wants the newly introduced environment to properly cooperate with the \texttt{cleveref} package, they should put in the preamble the following lines of code (below the exemplary new environment is \texttt{Statement} defined in the \texttt{definition} style):
+\begin{itemize}
+	\item[]\texttt{\textbackslash theoremstyle\{definition\}}
+	\item[]\texttt{\textbackslash newaliascnt\{Statement\}\{theorem\}}
+	\item[]\texttt{\textbackslash newtheorem\{statement\}[Statement]\{Statement\}}
+	\item[]\texttt{\textbackslash aliascntresetthe\{Statement\}}
+	\item[]\texttt{\textbackslash crefname\{Statement\}\{statement\}\{statements\}}
+\end{itemize}
+
+Below come some examples of usage of mathematical environments.
+
+\begin{definition}[Strong finite model property~{\cite[Sect. 6.2]{BlackburnEtAl01}}]
+	Let $\Lambda$ be a normal modal logic, $\mathsf{M}$ a set of finitely based models such that $\Lambda=\Lambda_\mathsf{M}$, and $f$ a function mapping natural numbers to natural numbers. $\Lambda$ has the $f(n)$-size model property with respect to $\mathsf{M}$ if every $\Lambda$-consistent formula $\phi$ is satisfiable in a model in M containing at most $f(|\phi|)$ states.
+	
+	$\Lambda$ has the strong finite model property with respect to $\mathsf{M}$ if there is a computable function $f$ such that $\Lambda$ has the $f(n)$-size model property with respect to $\mathsf{M}$. $\Lambda$ has the polysize model property with respect to $\mathsf{M}$ if there is a polynomial $p$ such that $\Lambda$ has the $p(n)$-size model property with respect to $\mathsf{M}$.
+	
+	$\Lambda$ has the $f(n)$-size model property (respectively, strong finite model property, polysize model property) if there is a set of finitely based models $\mathsf{M}$ such that $\Lambda=\Lambda_\mathsf{M}$ and $\Lambda$ has the $f(n)$-size model property (respectively, strong finite model property, polysize model property) with respect to $\mathsf{M}$.
+\end{definition}
+
+\begin{lemma}[Zorn's Maximum Principle~\cite{Zorn35}]
+	In a closed set $\mathfrak{A}$ of sets $A$ there exists at least one, $A^*$,
+	not contained as a proper subset in any other $A\in\mathfrak{A}$. 
+\end{lemma}
+
+\begin{theorem}[McKinsey \& Tarski~\cite{McKinseyTarski44}]
+	$\mathsf{S4}\vdash\varphi$ iff $\mathfrak{A}_X\vDash\varphi$ for every dense-in-itself metrizable space $X$.
+\end{theorem}
+
+\begin{conjecture*}[Goldbach]
+	Every even integer greater than 2 can be expressed as the sum of two prime numbers.
+\end{conjecture*}
+
+\begin{remark}
+	Every countable subset of $\mathbb{R}$ has Lebesgue measure 0.
+\end{remark}
+
+If a list (such as the \texttt{itemize} or \texttt{enumerate} environment) is placed at the beginning of a mathematical environment such as \texttt{definition}, \texttt{theorem}, \texttt{proof}, it automatically starts in a new line.
+
+\begin{fact}[Axioms of ZFC~\cite{Kunen83}]
+	\begin{enumerate}[label=\textsc{Axiom} \arabic*., align=left, leftmargin=\parindent]
+		\setcounter{enumi}{-1}
+		\item\label{ax::0} \textit{Set existence.}
+		\begin{align*}
+			\exists x(x=x).
+		\end{align*}
+		\item\label{ax::1} \textit{Extensionality.}
+		\begin{align*}
+		\forall x\forall y(\forall z(z\in x\leftrightarrow z\in y)\to x=y).
+		\end{align*}
+		\item\label{ax::2} \textit{Foundation.}
+		\begin{align*}
+		\forall x[\exists y(y\in x)\to\exists y(y\in x\land\neg\exists z(z\in x\land z\in y))].
+		\end{align*}
+		\item\label{ax::3} \textit{Comprehension scheme.} For each formula $\phi$ with free variables among $x,z,w_1,\ldots,w_n$,
+		\begin{align*}
+		\forall z\forall w_1,\ldots,w_n\exists y\forall x(x\in y\leftrightarrow x\in z\land\phi).
+		\end{align*}
+		\item\label{ax::4} \textit{Pairing.}
+		\begin{align*}
+		\forall x\forall y\exists z(x\in z\land y\in z).
+		\end{align*}
+		\item\label{ax::5} \textit{Union.}
+		\begin{align*}
+		\forall\mathscr{F}\exists A\forall Y\forall x(x\in Y\land Y\in\mathscr{F}\to x\in A).
+		\end{align*}
+		\item\label{ax::6} \textit{Replacement Scheme.} For each formula $\phi$ with free variables among $x, y, A, w_l,\ldots,w_n$,
+		\begin{align*}
+		\forall A\forall w_1,\ldots,w_n[\forall x\in A\exists!y\phi\to\exists Y\forall x\in A\exists y\in Y\phi].
+		\end{align*}
+	\end{enumerate}
+On the basis of Axioms \href{ax::0}{0}, \href{ax::1}{1}, \href{ax::3}{3}, \href{ax::4}{4}, \href{ax::5}{5} and \href{ax::6}{6}, one may define $\subset$ (subset), $\emptyset$ (empty set), $S$ (ordinal successor; $S(x) = x \cup \{x\}$), and the notion of wellordering. The following axioms are then defined.
+\begin{enumerate}[resume*]
+	\item \textit{Infinity.}
+	\begin{align*}
+	\exists x(\emptyset\in x\land\forall y\in x(S(y)\in x)).
+	\end{align*}
+	\item \textit{Power set.}
+	\begin{align*}
+	\forall x\exists y\forall z(z\subset x\to z\in y).
+	\end{align*}
+	\item \textit{Choice.}
+	\begin{align*}
+	\forall A\exists R(R\text{ well orders }A).
+	\end{align*}
+\end{enumerate}
+\end{fact}
+
+\begin{corollary}[van Benthem~\cite{vanBenthem77}]
+	$E$ is not provably arithmetical in $ZF$.
+\end{corollary}
+
+\begin{proof}
+	$ZF + AC \vdash E(\phi^m, \phi^o)$ and $ZF \vdash E(\phi^m, \phi^o) + AC^{u0}$. The latter implies, by Jech's result, that ${\sim}ZF \vdash E(\phi^m, \phi^o)$. But then $E$ cannot be provably arithmetical in $ZF$, since $ZF+AC$ is conservative over $ZF$ with respect to arithmetical statements. (If $\phi$ is arithmetical,	i.e., all quantifiers in $\phi$ are relativized to $\omega$, and $ZF + AC \vdash \phi$, then, since $ZF \vdash (ZF)^L$ and $ZF \vdash (AC)^L$, $ZF \vdash \phi^L$, where $L$ defines the constructible universe. Now $\omega$ is absolute and, therefore, $ZF \vdash \phi$.)
+\end{proof}
+
+\begin{proposition}[Segerberg~\cite{Segerberg71}]
+	Suppose that $L$ is a classical system. Let $\mathscr{C}$ be any class o frames. If every modal axiom of $L$ is valid in $\mathscr{C}$, then $L$ is consistent with respect to $\mathscr{C}$.
+\end{proposition}
+
+\begin{proof}
+	The proof goes by induction on the length of derivations in $L$. Every nonmodal axiom is easily seen to be valid in $\mathscr{C}$. The modal axioms are valid in $\mathscr{C}$ by hypothesis.
+	
+	Suppose $A$ and $A\to B$ are valid in $\mathscr{C}$. Let $M$ be any model on any frame in $\mathscr{C}$. Take any $w$ in $M$. Then $M, w \models A$ and $M, w \models A\to B$. So, by truth definition, $M, w \models B$. Hence $\mathsf{MP}$ preserves validity in $\mathscr{C}$.
+	
+	Suppose finally that $A\leftrightarrow B$ is valid in $\mathscr{C}$. Let $M$ be any model on any frame in $\mathscr{C}$. Since $A\leftrightarrow B$ is true in $M$, $\lVert A\rVert^M = \lVert B\rVert^M$. Then $A\leftrightarrow B$ must hold at every point in $M$. Hence $\mathsf{RE}$ preserves validity in $\mathscr{C}$.
+\end{proof}
+
+\subsection{Mathematical formulas}
+
+Below are some examples of mathematical formulas.
+
+The so-called Dirac delta is a measure $\delta(x):\mathcal{B}(\mathbb{R})\longrightarrow\overline{\mathbb{R}}_+$ defined as follows:
+\begin{equation}\label{eq::1}
+\delta(A)=\begin{cases}1,&\text{if }0\in A,\\
+0,&\text{if }0\notin A.
+\end{cases}
+\end{equation}
+If we switch to informal definition, then the formula (\ref{eq::1}) is replaced by:
+\begin{equation}\label{eq::2}
+\delta(x)=\begin{cases}+\infty,&\text{if }x=0,\\
+0,&\text{if }x\neq0.
+\end{cases}
+\end{equation}
+
+Here is a simple sequent-based proof of the formula $((A\to C)\lor(B\to C))\to((A\land B)\to C)$:
+
+\begin{prooftree}
+	\AxiomC{}
+	\RightLabel{(\textsf{Ax})}
+	\UnaryInfC{$A,B,C\vdash C$}
+	\RightLabel{(\textsf{MP})}
+	\UnaryInfC{$A,B,A\to C\vdash C$}
+	\AxiomC{}
+	\RightLabel{(\textsf{Ax})}
+	\UnaryInfC{$A,B,C\vdash C$}
+	\RightLabel{(\textsf{MP})}
+	\UnaryInfC{$A,B,B\to C\vdash C$}
+	\RightLabel{($\lor\vdash$)}
+	\BinaryInfC{$A,B,(A\to C)\lor(B\to C)\vdash C$}
+	\RightLabel{($\land\vdash$)}
+	\UnaryInfC{$A\land B,(A\to C)\lor(B\to C)\vdash C$}
+	\RightLabel{($\vdash\to$)}
+	\UnaryInfC{$(A\to C)\lor(B\to C)\vdash A\land B\to C$}
+	\RightLabel{($\vdash\to$)}
+	\UnaryInfC{$\vdash((A\to C)\lor(B\to C))\to(A\land B\to C)$}
+\end{prooftree}
+
+And here is a formula that estimates the number of elements of a structure yielded by a genering stream reasoning algorithm for DatalogMTL (see~\cite{WalegaEtAl19}):
+
+\begin{equation}
+\left(4\cdot\left(\frac{w+2\cdot step}{\mathsf{gcd}(\mathcal{T}_I\cup\mathsf{N}\cup\{step\})}+1 \right)^2\right)\cdot\mathsf{P}\cdot|\mathcal{O}_I|^\mathsf{A}
+\end{equation}
+
+\section{Sectioning: This is a section header}
+
+Here come the contents of the section.
+
+\subsection{This is a subsection header}
+
+Here come the contents of the subsection.
+
+\subsubsection{This is a subsubsection header}
+
+Here come the contents of the subsubsection.
+
+\paragraph{This is a paragraph header}
+
+Here come the contents of the paragraph.
+
+\subparagraph{This is a subparagraph header}
+
+Here come the contents of the subparagraph.
+
+
+\section{Bibliography management}
+
+The authors are requested to use \textsc{Bib}\negthinspace\TeX{} to process their bibliographies. It involves creating a separate \texttt{.bib} file with bibliography entries and putting it in the same folder as the main \texttt{.tex} source file.
+
+In order for \LaTeX{} to generate a bibliography which will be formatted in accordance with \texttt{BSLbibstyle}, one needs to execute the following sequence of commands:
+\begin{itemize}
+	\item[] \texttt{\textbackslash bibliographystyle\{BSLbibstyle\}}
+	\item[] \texttt{\textbackslash bibliography\{\#1\}}
+\end{itemize}
+in the place where the bibliography is to be displayed (\texttt{\#1} is the name (without the file type extension) of the \texttt{.bib} file with bibliography entries). The authors can use the attached bibliography template (named \texttt{biblio.bib}) to create their own bibliography file. More information about bibliography management with \textsc{Bib}\negthinspace\TeX{} see~\cite{BibTeX}.
+
+There are three rules the authors are asked to abide by when preparing their \texttt{.bib} files:
+
+\begin{description}
+	\item[Rule 1:] Always use journal names and names of proceedings series in their \textbf{full form}. For instance: \texttt{Journal of Logic and Computation} rather than (\texttt{J. Logic Comput.}) or \texttt{Lecture Notes in Computer Science} rather than \texttt{LNCS}.
+	\item[Rule 2:] Whenever for a given publication occurring in the bibliography there exists a DOI number, include it in the bibliography entry in the \texttt{.bib} file. Use, however, \textbf{plain DOI numbers} rather than\linebreak full links, so for example \texttt{10.2307/2267577} rather than\linebreak \texttt{http://dx.doi.org/10.2307/2267577}.
+	\item[Rule 3:] When providing page numbers of a given bibliography entry use an ndash (i.e., \texttt{{-}{-}}) rather than a hyphen (i.e., \texttt{-}) to separate the first page and the last page numbers. For example: \texttt{pages = \{153{-}{-}169\}} rather than \texttt{pages = \{153-169\}}.
+\end{description}
+
+\Acknowledgements{Acknowledgements such as thanks for reviewers' remarks can be put here.}
+
+\bibliographystyle{BSLbibstyle}
+\bibliography{biblio}
+
+
+\end{document}
