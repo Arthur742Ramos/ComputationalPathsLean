@@ -19,6 +19,7 @@ import ComputationalPaths.Path.Rewrite.ConfluenceProof
 import ComputationalPaths.Path.Rewrite.ConfluenceTerminationDerived
 import ComputationalPaths.Path.Rewrite.Normalization
 import ComputationalPaths.Path.Rewrite.NormalizationDerived
+import ComputationalPaths.Path.Rewrite.PathNormalizationDecision
 import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
 import ComputationalPaths.Path.Rewrite.PathTactic
 import ComputationalPaths.Path.Groupoid
@@ -91,6 +92,7 @@ import ComputationalPaths.Path.Homotopy.PathAlgebraQuotient
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Homotopy.AcyclicModels
 import ComputationalPaths.Path.Homotopy.PathHomology
+import ComputationalPaths.Path.Homotopy.MapperAlgorithm
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
@@ -99,6 +101,7 @@ import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Homotopy.QuillenAdjunction
 import ComputationalPaths.Path.Homotopy.HopfFibration
 import ComputationalPaths.Path.Homotopy.HopfInvariant
+import ComputationalPaths.Path.Homotopy.KervaireInvariant
 import ComputationalPaths.Path.Homotopy.HomotopyFiber
 import ComputationalPaths.Path.Homotopy.PathSpaceFibration
 import ComputationalPaths.Path.Homotopy.GaneaFibration
@@ -197,17 +200,21 @@ import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
 import ComputationalPaths.Path.Algebra.AInfinityAlgebra
 import ComputationalPaths.Path.Algebra.StringTopology
+import ComputationalPaths.Path.Algebra.ZigzagPersistence
 import ComputationalPaths.Path.Algebra.ExtFunctor
 import ComputationalPaths.Path.Algebra.BarComplex
 import ComputationalPaths.Path.Algebra.Abelianization
 import ComputationalPaths.Path.Algebra.KTheory
+import ComputationalPaths.Path.Algebra.WaldhausenKTheory
 import ComputationalPaths.Path.Algebra.FreeGroupProperties
 import ComputationalPaths.Path.Homotopy.HurewiczTheorem
+import ComputationalPaths.Path.Homotopy.SerreModC
 import ComputationalPaths.Path.Homotopy.BlakersMasseyImproved
 import ComputationalPaths.Path.Homotopy.WhiteheadTower
 import ComputationalPaths.Path.Homotopy.LoopSpaceHomology
 import ComputationalPaths.Path.Homotopy.EilenbergZilber
 import ComputationalPaths.Path.Homotopy.RationalHomotopy
+import ComputationalPaths.Path.Homotopy.PhantomMaps
 import ComputationalPaths.Path.Homotopy.EquivariantHomotopy
 import ComputationalPaths.Path.Algebra.UniversalCoefficient
 import ComputationalPaths.Path.Homotopy.BordismTheory
@@ -246,9 +253,11 @@ import ComputationalPaths.Path.Homotopy.LocalizationTheory
 import ComputationalPaths.Path.Homotopy.ChromaticHomotopy
 import ComputationalPaths.Path.Homotopy.PeriodicityTheorem
 import ComputationalPaths.Path.Homotopy.NilpotenceTheorem
+import ComputationalPaths.Path.Homotopy.SullivanConjecture
 import ComputationalPaths.Path.Homotopy.FormalGroupLaw
 import ComputationalPaths.Path.Algebra.SpectralAlgebra
 import ComputationalPaths.Path.Algebra.HomologicalStability
+import ComputationalPaths.Path.Algebra.StabilityTheorem
 import ComputationalPaths.Path.Homotopy.ParametrizedHomotopy
 import ComputationalPaths.Path.Homotopy.GoodwillieCalculus
 import ComputationalPaths.Path.Homotopy.THH
