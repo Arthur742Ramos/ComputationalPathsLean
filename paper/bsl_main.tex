@@ -134,7 +134,7 @@ and Higher-Dimensional Structure}
 We develop a mathematical theory of \emph{computational paths}---equality proofs
 equipped with explicit rewrite traces---and the associated rewrite system. The
 system is confluent and terminating (75 rules in eight groups), supports path
-algebra and type-former $\beta/\eta$ laws, and yields a weak $\omega$-groupoid
+calculus and type-former $\beta/\eta$ laws, and yields a weak $\omega$-groupoid
 structure in the sense of Batanin--Leinster~\cite{Batanin98}. Contractibility
 begins at dimension~3, preserving non-trivial fundamental groups. The full
 development and its homotopy-theoretic applications are mechanically verified
@@ -375,7 +375,7 @@ computational paths in several sections following this introduction.
   \item[\cref{sec:basic-constructions}: Basic Constructions.]
     We introduce the fundamental operations on paths---reflexivity, symmetry,
     transitivity, congruence---and establish their strict algebraic laws. We
-    develop the path algebra for products, sums, dependent pairs, and function
+    develop the path calculus for products, sums, dependent pairs, and function
     types, and define transport and dependent application. We introduce unary,
     binary, and dependent contexts.
 
@@ -840,7 +840,7 @@ categorical analogue of ``evaluation in context'' from term rewriting.
   \end{enumerate}
 \end{definition}
 
-Context substitution supports an extensive algebra of identities
+Context substitution supports an extensive calculus of identities
 (cf.\ \cref{sec:context-rules} in \cref{ch:rewrite-system}),
 including:
 \begin{itemize}
@@ -920,7 +920,7 @@ these additional identities.
   $\Step(p, q)$ or $p \rew q$ to denote that $p$ rewrites to $q$ in one step.
 \end{definition}
 
-\subsubsection{Group I: Path Algebra (8 rules)}
+\subsubsection{Group I: Path Calculus (8 rules)}
 \label{sec:group-i}
 
 These rules express the groupoid laws that are \emph{not} strict equalities.
@@ -1275,7 +1275,7 @@ canonical one-step witness.
   the equivalence relation $\RwEq$ itself---which is indeed trivial in the
   UIP setting---but in the \emph{constructive witnesses} it provides:
   explicit, finite rewrite sequences connecting any path to its normal
-  form. The path algebra and groupoid operations at dimension~1 are
+  form. The path calculus and groupoid operations at dimension~1 are
   non-trivial, and the derivation cells (\cref{sec:omega-groupoid}) record
   \emph{which} rewrite steps are applied. The rich combinatorial content
   of the rewrite system lives in the derivation tower, not in the bare
@@ -1421,7 +1421,7 @@ provided the extension follows the same modular discipline.
 \paragraph{Modular rule groups.}
 The eight groups isolate distinct sources of rewriting:
 \begin{enumerate}[label=(\roman*)]
-  \item Group~I: path algebra (unit, associativity, inverse, cancellation).
+  \item Group~I: path calculus (unit, associativity, inverse, cancellation).
   \item Group~II: type-former $\beta/\eta$ rules (products, sums, sigma, functions).
   \item Group~III: transport rules.
   \item Group~IV: context rules (substitution in unary contexts).
@@ -1766,7 +1766,7 @@ which refines the category of types with equality functors.
 \section{Higher-Dimensional Structure}
 \label{ch:higher-dimensional}
 
-We now ascend from the one-dimensional algebra of paths to the
+We now ascend from the one-dimensional calculus of paths to the
 higher-dimensional structure that constitutes the central contribution of this
 work. Rewrite equalities between paths serve as \emph{two-cells}, and iterated
 derivation structures provide cells at every dimension. The resulting tower
@@ -2271,7 +2271,7 @@ on the computational path space.
 \subsubsection{Anti-Involution Structure}
 
 \begin{definition}[Anti-Involution]\label{def:anti-involution}
-  The symmetry operation $\mathrm{inv}$ on the monoidal path algebra is an
+  The symmetry operation $\mathrm{inv}$ on the monoidal path calculus is an
   \emph{anti-involution}: it reverses composition while squaring to the identity.
   \begin{enumerate}[label=(\roman*)]
     \item $\inv{(p \comp q)} \rweq \inv{q} \comp \inv{p}$ \quad
@@ -2877,7 +2877,7 @@ For a map $f : A \to B$, the \emph{mapping cylinder} $M_f$ deformation-retracts 
   \cref{tab:formalization-status}.
 \end{remark}
 
-The algebraic and fundamental-group computations above are only the first
+The path-calculus and fundamental-group computations above are only the first
 layer of the computational-paths program. In the full development, the same
 rewrite-equality machinery supports the classical infrastructure of algebraic
 topology: path lifting for fibrations, classification of coverings, long exact
@@ -3643,10 +3643,10 @@ This paper has developed a comprehensive mathematical theory of
 equalities carry explicit rewrite traces recording the computational
 steps by which they were derived. The principal contributions are:
 
-\paragraph{A complete algebraic framework.}
+\paragraph{A complete path-calculus framework.}
 Starting from the definition of a computational path as a pair
 $(s, \pi)$ of a step list and a propositional equality
-(\cref{def:path}), we constructed the full path algebra: reflexivity,
+(\cref{def:path}), we constructed the full path calculus: reflexivity,
 symmetry, transitivity, congruence, transport, dependent application,
 and operations for products, sums, dependent pairs, and function types
 (Section~\ref{sec:basic-constructions}). The key insight is that even in a
@@ -3657,7 +3657,7 @@ structure (\cref{thm:non-uip}).
 \paragraph{A confluent, terminating rewrite system.}
 The 75 rules of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS
 (Section~\ref{ch:rewrite-system}), organized into eight groups---path
-algebra, type-former $\beta$/$\eta$-rules, transport, contexts,
+calculus, type-former $\beta$/$\eta$-rules, transport, contexts,
 dependent contexts, bi-contexts, map congruence, and structural
 closure---axiomatize the identities that do not hold strictly on
 computational traces. We proved soundness
@@ -3918,7 +3918,7 @@ algebraic geometry) will require:
 
 \noindent
 In summary, computational paths offer a distinctive perspective on the
-algebra of equality: by recording \emph{how} an equality was derived
+calculus of equality: by recording \emph{how} an equality was derived
 (not just \emph{that} it holds), we recover higher-dimensional structure
 in a proof-irrelevant setting, build a complete homotopy theory with
 explicit combinatorial foundations, and provide a framework where all
@@ -3942,7 +3942,7 @@ formalization), its $\mathrm{LND}_{\mathrm{EQ}}$ mnemonic, and a
 mathematical description. The notation follows Section~\ref{ch:rewrite-system}:
 $p \rew q$ denotes a single rewrite step from~$p$ to~$q$.
 
-\subsection{Group I: Path Algebra (8 rules)}
+\subsection{Group I: Path Calculus (8 rules)}
 
 \begin{enumerate}[label=\textbf{R\arabic*.}, leftmargin=3.5em]
   \item $\mathit{symm\_refl}$ \hfill \textbf{(sr)} \\
