@@ -305,3 +305,5 @@ import ComputationalPaths.Path.Topology.IntersectionForm
 import ComputationalPaths.Path.Topology.SurgeryTheory
 import ComputationalPaths.Path.Topology.FlowCategory
 import ComputationalPaths.Path.Topology.ToposTheory
+import ComputationalPaths.Path.Topology.EtaleFundamentalGroup
+import ComputationalPaths.Path.Topology.ArithmeticTopology

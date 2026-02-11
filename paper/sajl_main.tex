@@ -272,6 +272,7 @@ rewriting steps that produced them. Even when the underlying logic satisfies
 UIP---so that the propositional equality $a =_A b$ is proof-irrelevant---the
 rewrite \emph{traces} are distinct combinatorial objects that can be compared,
 composed, and quotiented.
+An accompanying Lean~4 formalization is available online; see~\cite{cplean}.
 
 The key insight is a separation of concerns:
 \begin{itemize}[leftmargin=2em]
@@ -483,6 +484,9 @@ in four sections following this introduction.
     dimension~$\geq 3$, and establish the main structure theorem:
     computational paths form a weak $\omega$-groupoid.
 \end{description}
+
+\paragraph{Formalization status.}
+Sections~\ref{sec:basic-constructions}--\ref{ch:higher-dimensional} are fully formalized in Lean. Later sections mix fully formalized and scaffolded results; we flag the status at the start of each later section and summarize all statuses in \cref{tab:formalization-status} (Section~\ref{sec:formalization}).
 
 
 % ============================================================================
@@ -1448,6 +1452,68 @@ confluence proof. Representative cases include:
   $m_2 \rews m$; since $m_1$ and $m_2$ are normal, $m_1 = m = m_2$.
 \end{proof}
 
+\subsection{Extension Patterns}
+\label{sec:extension-patterns}
+
+The rewrite system is designed to be extensible: new type formers or new
+computation rules can be added without disrupting termination and confluence,
+provided the extension follows the same modular discipline.
+
+\paragraph{Modular rule groups.}
+The eight groups isolate distinct sources of rewriting:
+\begin{enumerate}[label=(\roman*)]
+  \item Group~I: path algebra (unit, associativity, inverse, cancellation).
+  \item Group~II: type-former $\beta/\eta$ rules (products, sums, sigma, functions).
+  \item Group~III: transport rules.
+  \item Group~IV: context rules (substitution in unary contexts).
+  \item Group~V: dependent context rules.
+  \item Group~VI: bi-context and dependent bi-context rules.
+  \item Group~VII: map congruence rules ($\mapLeft$, $\mapRight$, $\mapTwo$).
+  \item Group~VIII: structural closure (propagating rewrites through constructors).
+\end{enumerate}
+New type formers typically extend Group~II with their $\beta/\eta$ rules, and
+may require corresponding congruence or context rules in Groups~IV--VII; the
+structural closure rules of Group~VIII remain unchanged.
+
+\paragraph{Critical pair analysis for new rules.}
+To preserve local confluence, each new rule must be checked for overlaps with
+the existing system:
+\begin{enumerate}[label=(\roman*)]
+  \item Enumerate the new redex patterns (left-hand sides), including their
+    appearance under $\symm$, $\trans$, and contexts (by Group~VIII).
+  \item Check overlaps against Group~I (algebraic laws) and existing Group~II
+    $\beta/\eta$ rules, as these are the most common sources of ambiguity.
+  \item For every overlap, exhibit a concrete join term and reduction witnesses.
+    These joins are added as new strip-lemma cases, extending the critical-pair
+    analysis used in \cref{thm:strip-lemma}.
+\end{enumerate}
+
+\paragraph{Extending the recursive path ordering.}
+Termination is preserved by extending the rule precedence and RPO measure:
+\begin{enumerate}[label=(\roman*)]
+  \item Add new rule symbols to $\mathrm{rank} : \mathrm{Rule} \to \Nat$,
+    assigning strictly higher ranks to redex-producing rules than to the
+    simpler normal-form constructors they reduce to.
+  \item Extend the aggregate weight $\mathrm{pathLenSum}$ so that each new
+    constructor contributes positively; then orient each new rule so that the
+    RHS either lowers the rank or strictly decreases the weight at equal rank.
+  \item Re-run the RPO decrease proof (\cref{thm:rpo-decrease}) for the new rules.
+\end{enumerate}
+
+\paragraph{Practical workflow.}
+A typical extension follows this checklist:
+\begin{enumerate}[label=(\roman*)]
+  \item Add the new rule constructors in $\Step$ and update the rule tables and
+    appendix listings.
+  \item Add any missing congruence/context rules needed to propagate the new
+    constructors through $\symm$, $\trans$, and contexts.
+  \item Extend the precedence ranking and the RPO decrease proof.
+  \item Extend the critical-pair analysis with joins for all new overlaps, and
+    update the strip-lemma cases accordingly.
+  \item Register the new rules with the simplification/tactic infrastructure so
+    that $\RwEq$ automation reflects the extension.
+\end{enumerate}
+
 \subsection{The Quotient $\PathQuot$}
 \label{sec:path-quot}
 
@@ -1501,6 +1567,42 @@ operations descend to well-defined operations on the quotient:
   UIP). Hence each equivalence class corresponds to exactly one element
   of the identity type.
 \end{proof}
+
+\subsection{Well-Formed Traces and Canonicalization}
+\label{sec:well-formed-traces}
+
+\begin{definition}[Well-Formed Trace]\label{def:wf-trace}
+  A trace $s : \List(\Step(A))$ is \emph{well-formed} from $a$ to $b$,
+  written $\mathrm{WFTrace}_A(a, b, s)$, if it is generated by:
+  \begin{enumerate}[label=(\roman*)]
+    \item $\mathrm{WFTrace}_A(a, a, [\,])$.
+    \item If $s = \langle a, c, \pi \rangle :: s'$ and
+      $\mathrm{WFTrace}_A(c, b, s')$, then $\mathrm{WFTrace}_A(a, b, s)$.
+  \end{enumerate}
+  In this case there is a canonical composite proof
+  $\mathrm{comp}(s) : a =_A b$, obtained by chaining the step proofs in
+  order. A computational path $p = (s, \pi)$ is \emph{well-formed} when
+  $\mathrm{WFTrace}_A(a, b, s)$ and $\pi = \mathrm{comp}(s)$.
+\end{definition}
+
+\begin{theorem}[Canonical Trace]\label{thm:canonical-trace}
+  Every path $p : \Path_A(a, b)$ is rewrite-equivalent to one with a
+  well-formed trace. In particular, $p \rweq \normalize(p)$, and
+  $\normalize(p) = \ofEq(\toEq(p))$ has a single-step well-formed trace.
+\end{theorem}
+
+\begin{proof}
+  By \cref{thm:normalization}(ii), $p \rweq \normalize(p)$. The path
+  $\normalize(p)$ has trace $[\langle a, b, \toEq(p) \rangle]$, which is
+  well-formed by \cref{def:wf-trace}(ii) with a trivial tail.
+\end{proof}
+
+\paragraph{Semantics.}
+The semantic projection depends only on rewrite-equivalence classes:
+if $p \rweq q$ then $\toEq(p) = \toEq(q)$ by soundness
+(\cref{thm:step-sound}). Hence the meaning of a computational path is
+determined by its $\RwEq$-class, not by the raw trace; well-formed traces
+serve as canonical representatives.
 
 
 %%%% Converted from chapters/ch4_groupoid.tex (book→article) %%%%
@@ -2022,6 +2124,19 @@ $\Derivation_2$ supports horizontal operations:
   two-cell, which is what allows $\pi_1(S^1) \cong \ZZ$.
 \end{remark}
 
+\begin{remark}[Higher structure vs.\ HoTT]\label{rem:hott-contrast}
+  In HoTT, higher cells arise as iterated identity types and can carry
+  intrinsic higher homotopy, whereas here they are \emph{syntactic}:
+  two-cells are proofs of $\RwEq$ (hence $\Prop$-valued), and higher
+  $\Derivation_k$ are generated by the rewrite system and the path-expression
+  constructors. The choice that two-cells are proof-irrelevant and that
+  contractibility begins at dimension~3 is deliberate: it preserves
+  non-trivial $\pi_1$ while collapsing higher coherence to rewrite-derived
+  homotopies. The tradeoff is that we avoid univalence and HIT axioms and gain
+  explicit, computable traces, but we do not model the full hierarchy of
+  higher homotopy types available in HoTT.
+\end{remark}
+
 \subsubsection{Dimensions 4 and Beyond}
 
 The pattern continues uniformly:
@@ -2218,7 +2333,7 @@ on the computational path space.
 
 \medskip
 
-Having established the algebraic foundations and the higher-dimensional structure, we now turn to the homotopy theory built on them: fundamental groups, covering spaces, fibrations, exact sequences, and the computation of $\pi_1$ for standard spaces.
+Having established the algebraic foundations and the higher-dimensional structure, we now turn to the homotopy theory built on them: fundamental groups, covering spaces, fibrations, exact sequences, and the computation of $\pi_1$ for standard spaces. Formalization status varies across these applications; see \cref{tab:formalization-status} and the status notes at the start of each section.
 
 
 %%%% Converted from chapters/ch6_fundamental_groups.tex (article (as-is)) %%%%
@@ -2229,6 +2344,10 @@ Having established the algebraic foundations and the higher-dimensional structur
 %% ============================================================================
 
 \section{Fundamental Groups and Loop Spaces}\label{sec:fundamental-groups}
+
+\begin{remark}[Formalization status]
+  This section is fully formalized in Lean: the loop-space definitions and fundamental-group results are mechanically verified. See \cref{tab:formalization-status} for the section-by-section summary as we move into mixed-status applications.
+\end{remark}
 
 With the algebraic and higher-dimensional foundations established, we now turn to the homotopy-theoretic applications of computational paths.~\cite{hatcher02, may99} The central notion is the \emph{fundamental group}, which captures the structure of loops in a type up to rewrite equivalence. Throughout what follows, we work with the computational path structure $\mathrm{Path}_A(a,b)$ carrying explicit rewrite traces, modulo the rewrite equality $\mathrm{RwEq}$ developed in \cref{ch:rewrite-system}.
 
@@ -2511,6 +2630,10 @@ The fundamental group $\pi_1(A, a)$ is recovered as the automorphism group $\mat
 
 \section{Spaces and Their Fundamental Groups}\label{sec:spaces}
 
+\begin{remark}[Formalization status]
+  This section mixes fully formalized and scaffolded results. The circle and torus computations are fully formalized, while the figure-eight, Seifert--van Kampen, and suspension results are partially scaffolded; see \cref{tab:formalization-status}.
+\end{remark}
+
 We now compute the fundamental groups of standard spaces within the computational-paths framework. The key technical device is the \emph{path expression} construction: rather than postulating higher inductive types (as in HoTT), we model spaces as ordinary types equipped with formal loop generators at the syntactic level, then compute $\pi_1$ via winding-number arguments and free-product word decompositions.
 
 \subsection{The Computational Circle \texorpdfstring{$S^1$}{S¹}}\label{subsec:circle}
@@ -2771,6 +2894,10 @@ For a map $f : A \to B$, the \emph{mapping cylinder} $M_f$ deformation-retracts 
 
 \section{Fibrations, Covering Spaces, and Exact Sequences}\label{sec:fibrations}
 
+\begin{remark}[Formalization status]
+  This section is mixed: path lifting is fully formalized, while the Hopf fibration data, Galois correspondence, and long exact sequence are partially scaffolded, and Mayer--Vietoris is statement-only. See \cref{tab:formalization-status}.
+\end{remark}
+
 This chapter develops the theory of fibrations, covering spaces, and exact sequences of homotopy groups in the computational-paths framework. The central idea is that a dependent type $P : B \to \mathsf{Type}$ serves as a fibration, with the transport operation along computational paths providing the homotopy lifting property.
 
 \subsection{Fibrations}\label{subsec:fibrations}
@@ -3012,11 +3139,9 @@ The long exact sequence and Mayer--Vietoris sequence are \emph{natural}: a morph
 \section{The Hurewicz Theorem and Homological Algebra}\label{sec:hurewicz}
 
 \begin{remark}[Formalization status]\label{rem:hurewicz-formalization}
-  The results in this section range from fully formalized to partially
-  scaffolded in our Lean development. We present them to illustrate the
-  scope of the computational-paths framework, but the reader should
-  consult the formalization-status table (\cref{tab:formalization-status})
-  for the precise verification level of each result.
+  This section is largely scaffolded. The dimension-1 Hurewicz map is partially
+  formalized, while Nielsen--Schreier and the higher Hurewicz theorem are
+  currently statement-only; see \cref{tab:formalization-status}.
 \end{remark}
 
 The Hurewicz theorem establishes the fundamental connection between homotopy groups and homology, relating $\pi_1$ to the first homology group $H_1$ via abelianization.~\cite{switzer75} In the computational-paths framework, both sides of this connection are constructively defined: $\pi_1$ via the loop quotient, and $H_1$ as its abelianization.
@@ -3219,11 +3344,9 @@ The detection principle provides an effective method for proving that a space ha
 \section{Advanced Homotopy Theory}\label{sec:advanced}
 
 \begin{remark}[Formalization status]\label{rem:advanced-formalization}
-  The results in this section range from fully formalized to partially
-  scaffolded in our Lean development. We present them to illustrate the
-  scope of the computational-paths framework, but the reader should
-  consult the formalization-status table (\cref{tab:formalization-status})
-  for the precise verification level of each result.
+  This section is scaffolded at the statement level: the definitions and results
+  are recorded without full proofs in Lean. See \cref{tab:formalization-status}
+  for the precise status of each item.
 \end{remark}
 
 This chapter surveys the advanced homotopy-theoretic structures formalized in the computational-paths framework: Eilenberg--MacLane spaces, Postnikov towers, Whitehead's theorem, the Freudenthal suspension theorem, and spectral sequences. The treatment is necessarily more concise than the preceding chapters; we state the principal definitions and results, indicating how they fit into the computational-paths architecture.
@@ -3416,7 +3539,7 @@ The Taylor tower of a functor $F : \mathsf{Type}_* \to \mathsf{Type}_*$, with po
 The formalization records the basic framework of $(\infty, 1)$-categories: Kan complexes, quasi-categories, and the nerve--realization adjunction, connecting the computational-paths approach to the broader landscape of higher categorical structures.
 
 \begin{remark}\label{rem:formalization-scope}
-The topics surveyed above range from fully formalized (fundamental groups, covering spaces, exact sequences) to partially scaffolded (spectral sequences, K-theory). In each case, the computational-paths framework provides the type-theoretic substrate: definitions are stated in terms of $\mathrm{Path}$, $\mathrm{RwEq}$, and $\pi_n$, and properties are witnessed by computational path constructions. The scaffolded results indicate the framework's extensibility and suggest directions for future complete formalization.
+The applications surveyed in Part~II (Sections~\ref{sec:fundamental-groups}--\ref{sec:advanced}) range from fully formalized results (e.g., fundamental groups and path lifting) to statement-only scaffolding (e.g., spectral sequences, K-theory); see \cref{tab:formalization-status}. In each case, the computational-paths framework provides the type-theoretic substrate: definitions are stated in terms of $\mathrm{Path}$, $\mathrm{RwEq}$, and $\pi_n$, and properties are witnessed by computational path constructions. The scaffolded results indicate the framework's extensibility and suggest directions for future complete formalization.
 \end{remark}
 
 
@@ -3428,6 +3551,12 @@ The topics surveyed above range from fully formalized (fundamental groups, cover
 % ============================================================================
 \section{The Rewrite System: Metatheory}
 \label{ch:metatheory}
+
+\begin{remark}[Formalization status]
+  This section is fully formalized in Lean; all metatheoretic results and
+  automation tools are mechanically verified. See
+  \cref{tab:formalization-status}.
+\end{remark}
 
 In Section~\ref{ch:rewrite-system}, we introduced the 74-rule
 rewrite system on computational paths, established its soundness,
@@ -4001,6 +4130,12 @@ automates rewrite-equality reasoning.
 
 The entire development is mechanically verified in the Lean~4 proof assistant, comprising:
 
+\medskip
+\begin{center}
+\fbox{\parbox{0.9\linewidth}{\centering\textbf{Lean~4 formalization repository:} \url{https://github.com/Arthur742Ramos/ComputationalPathsLean}}}
+\end{center}
+\medskip
+
 \begin{center}
 \begin{tabular}{lr}
 \toprule
@@ -4552,6 +4687,11 @@ A.~F. Ramos, R.~J.~G.~B. de~Queiroz, and A.~G. de~Oliveira.
 \newblock Explicit computational paths.
 \newblock {\em South American Journal of Logic}, 5(2):1--52, 2019.
 
+\bibitem{cplean}
+A.~F. Ramos.
+\newblock \emph{Computational Paths in Lean~4} (GitHub repository).
+\newblock \url{https://github.com/Arthur742Ramos/ComputationalPathsLean}.
+
 \bibitem{lumsdaine10}
 P.~L. Lumsdaine.
 \newblock Weak $\omega$-categories from intensional type theory.
@@ -4720,4 +4860,3 @@ R. Manuel de Medeiros, Dois Irm\~aos, CEP 52171-900, Recife, PE, Brazil}
 \email{tiago.veras@ufrpe.br}
 
 \end{document}
-
