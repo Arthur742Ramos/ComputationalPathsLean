@@ -49,7 +49,7 @@ abbrev ThomIsomorphism (H : ReducedCohomologyTheory) {K B Total V : Type u}
   Homotopy.ThomSpectra.ThomIsomorphism H bundle Th b0
 
 /-- Basepointed helper used in Thom constructions (alias). -/
-abbrev thomBasePointed (B : Type u) (b : B) : Pointed :=
+abbrev thomBasePointed (B : Type u) (b : B) : SuspensionLoop.Pointed :=
   Homotopy.ThomSpectra.basePointed B b
 
 /-! ## Orientation theory -/
@@ -95,8 +95,8 @@ structure OrientedThomIsomorphism (H : ReducedCohomologyTheory)
   isomorphism : ThomIsomorphism H bundle orientation.thomSpace b0
   /-- Degree matches the bundle rank. -/
   degree_eq_rank : isomorphism.degree = bundle.rank
-  /-- The Thom class agrees with the orientation class. -/
-  class_eq : isomorphism.thomClass = orientation.thomClass.thom
+  /-- The Thom class agrees with the orientation class (heterogeneous equality). -/
+  class_eq : HEq isomorphism.thomClass orientation.thomClass.thom
 
 namespace OrientedThomIsomorphism
 
@@ -108,10 +108,10 @@ def degreePath (T : OrientedThomIsomorphism H bundle b0) :
     Path T.isomorphism.degree bundle.rank :=
   Path.ofEq T.degree_eq_rank
 
-/-- `Path`-typed witness that the Thom class matches the orientation class. -/
+/-- Heterogeneous witness that the Thom class matches the orientation class. -/
 def classPath (T : OrientedThomIsomorphism H bundle b0) :
-    Path T.isomorphism.thomClass T.orientation.thomClass.thom :=
-  Path.ofEq T.class_eq
+    HEq T.isomorphism.thomClass T.orientation.thomClass.thom :=
+  T.class_eq
 
 end OrientedThomIsomorphism
 
