@@ -17,7 +17,7 @@ namespace Rewrite
 universe u
 
 /-- Syntactic path expressions for the core groupoid fragment. -/
-inductive PathExpr : {A : Type u} → {a b : A} → Type u
+inductive PathExpr : {A : Type u} → {a b : A} → Type (u + 1)
   | atom {A : Type u} {a b : A} (p : Path a b) :
       PathExpr (A := A) (a := a) (b := b)
   | refl {A : Type u} (a : A) : PathExpr (A := A) (a := a) (b := a)
@@ -58,42 +58,45 @@ variable {A : Type u} {a b c d : A}
 
 /-! ## Evaluation -/
 
-@[simp] def eval : PathExpr (A := A) (a := a) (b := b) → Path a b
-  | atom p => p
-  | refl a => Path.refl a
-  | symm p => Path.symm (eval p)
-  | trans p q => Path.trans (eval p) (eval q)
-  | congrArg f p => Path.congrArg f (eval p)
-  | map2 f p q => Path.map2 f (eval p) (eval q)
-  | context_map C p => Context.map (A := A) (B := _) C (eval p)
-  | context_subst_left C r p =>
-      Context.substLeft (A := A) (B := _) C (eval r) (eval p)
-  | context_subst_right C p t =>
-      Context.substRight (A := A) (B := _) C (eval p) (eval t)
+@[simp] def eval : {A : Type u} → {a b : A} →
+    PathExpr (A := A) (a := a) (b := b) → Path a b
+  | _, _, _, atom p => p
+  | _, _, _, refl a => Path.refl a
+  | _, _, _, symm p => Path.symm (eval p)
+  | _, _, _, trans p q => Path.trans (eval p) (eval q)
+  | _, _, _, congrArg f p => Path.congrArg f (eval p)
+  | _, _, _, map2 f p q => Path.map2 f (eval p) (eval q)
+  | _, _, _, context_map C p => Context.map C (eval p)
+  | _, _, _, context_subst_left C r p =>
+      Context.substLeft C (eval r) (eval p)
+  | _, _, _, context_subst_right C p t =>
+      Context.substRight C (eval p) (eval t)
 
 /-! ## Size Measures -/
 
-@[simp] def size : PathExpr (A := A) (a := a) (b := b) → Nat
-  | atom _ => 1
-  | refl _ => 1
-  | symm p => size p + 1
-  | trans p q => size p + size q + 1
-  | congrArg _ p => size p + 1
-  | map2 _ p q => size p + size q + 4
-  | context_map _ p => size p + 1
-  | context_subst_left _ r p => size r + size p + 1
-  | context_subst_right _ p t => size p + size t + 1
+@[simp] def size : {A : Type u} → {a b : A} →
+    PathExpr (A := A) (a := a) (b := b) → Nat
+  | _, _, _, atom _ => 1
+  | _, _, _, refl _ => 1
+  | _, _, _, symm p => size p + 1
+  | _, _, _, trans p q => size p + size q + 1
+  | _, _, _, congrArg _ p => size p + 1
+  | _, _, _, map2 _ p q => size p + size q + 4
+  | _, _, _, context_map _ p => size p + 1
+  | _, _, _, context_subst_left _ r p => size r + size p + 1
+  | _, _, _, context_subst_right _ p t => size p + size t + 1
 
-@[simp] def leftSpine : PathExpr (A := A) (a := a) (b := b) → Nat
-  | atom _ => 0
-  | refl _ => 0
-  | symm p => leftSpine p
-  | trans p _ => leftSpine p + 1
-  | congrArg _ p => leftSpine p
-  | map2 _ p _ => leftSpine p
-  | context_map _ p => leftSpine p
-  | context_subst_left _ r _ => leftSpine r + 1
-  | context_subst_right _ p _ => leftSpine p
+@[simp] def leftSpine : {A : Type u} → {a b : A} →
+    PathExpr (A := A) (a := a) (b := b) → Nat
+  | _, _, _, atom _ => 0
+  | _, _, _, refl _ => 0
+  | _, _, _, symm p => leftSpine p
+  | _, _, _, trans p _ => leftSpine p + 1
+  | _, _, _, congrArg _ p => leftSpine p
+  | _, _, _, map2 _ p _ => leftSpine p
+  | _, _, _, context_map _ p => leftSpine p
+  | _, _, _, context_subst_left _ r _ => leftSpine r + 1
+  | _, _, _, context_subst_right _ p _ => leftSpine p
 
 @[simp] def complexity (p : PathExpr (A := A) (a := a) (b := b)) : Nat :=
   (size p) * (size p) + leftSpine p
@@ -109,6 +112,12 @@ theorem leftSpine_le_size (p : PathExpr (A := A) (a := a) (b := b)) :
   | trans p q ihp ihq =>
       have hleft := ihp
       have hright := ihq
+      simp [leftSpine, size] at *
+      omega
+  | congrArg _ _ ih =>
+      simp [leftSpine, size] at *
+      omega
+  | map2 _ _ _ ihp ihq =>
       simp [leftSpine, size] at *
       omega
   | context_map _ p ih =>

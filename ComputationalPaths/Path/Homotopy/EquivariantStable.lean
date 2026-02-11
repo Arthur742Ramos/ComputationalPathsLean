@@ -68,7 +68,7 @@ structure GenuineGSpectrum (G : Type u) (S : StrictGroup G) where
 /-- Burnside ring data for a finite group. -/
 structure BurnsideRing (G : Type u) (S : StrictGroup G) where
   /-- Carrier type. -/
-  carrier : Type u
+  carrier : Type v
   /-- Additive unit. -/
   zero : carrier
   /-- Multiplicative unit. -/
@@ -78,19 +78,19 @@ structure BurnsideRing (G : Type u) (S : StrictGroup G) where
   /-- Multiplication. -/
   mul : carrier → carrier → carrier
   /-- Additive commutativity (abstract). -/
-  add_comm : ∀ x y, True
+  add_comm : ∀ x y : carrier, True
   /-- Additive associativity (abstract). -/
-  add_assoc : ∀ x y z, True
+  add_assoc : ∀ x y z : carrier, True
   /-- Additive identity (abstract). -/
-  add_zero : ∀ x, True
+  add_zero : ∀ x : carrier, True
   /-- Multiplicative commutativity (abstract). -/
-  mul_comm : ∀ x y, True
+  mul_comm : ∀ x y : carrier, True
   /-- Multiplicative associativity (abstract). -/
-  mul_assoc : ∀ x y z, True
+  mul_assoc : ∀ x y z : carrier, True
   /-- Multiplicative identity (abstract). -/
-  mul_one : ∀ x, True
+  mul_one : ∀ x : carrier, True
   /-- Distributivity (abstract). -/
-  distrib : ∀ x y z, True
+  distrib : ∀ x y z : carrier, True
 
 /-- The Burnside ring modeled as the constant Nat ring. -/
 def burnsideRing (G : Type u) (S : StrictGroup G) : BurnsideRing G S where
@@ -182,7 +182,7 @@ structure TomDieckSplitting {G : Type u} {S : StrictGroup G}
 /-- Trivial tom Dieck splitting witness. -/
 def TomDieckSplitting.trivial {G : Type u} {S : StrictGroup G}
     (E : GenuineGSpectrum G S) : TomDieckSplitting E :=
-  { splitting := fun _ => trivial }
+  { splitting := fun _ => True.intro }
 
 /-! ## Summary -/
 

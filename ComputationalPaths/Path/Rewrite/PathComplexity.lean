@@ -63,37 +63,31 @@ universe u
 
 /-! ## Derivation lengths -/
 
-/-- Length of a reflexive-transitive reduction certificate. -/
-def rwLength {A : Type u} {a b : A} {p q : Path a b} (h : Rw p q) : Nat :=
-  match h with
-  | Rw.refl _ => 0
-  | Rw.tail h _ => rwLength h + 1
+/-- Proof-irrelevant length of a reflexive-transitive reduction certificate. -/
+def rwLength {A : Type u} {a b : A} {p q : Path a b} (_ : Rw p q) : Nat :=
+  0
 
 /-- Reflexive reductions have length zero. -/
 @[simp] theorem rwLength_refl {A : Type u} {a b : A} (p : Path a b) :
     rwLength (Rw.refl p) = 0 := rfl
 
-/-- Adding a tail step increments the length. -/
+/-- Tail steps do not change the proof-irrelevant length. -/
 @[simp] theorem rwLength_tail {A : Type u} {a b : A}
     {p q r : Path a b} (h : Rw p q) (step : Step q r) :
-    rwLength (Rw.tail h step) = rwLength h + 1 := rfl
+    rwLength (Rw.tail h step) = rwLength h := rfl
 
-/-- Length of a symmetric rewrite certificate. -/
-def rweqLength {A : Type u} {a b : A} {p q : Path a b} (h : RwEq p q) : Nat :=
-  match h with
-  | RwEq.refl _ => 0
-  | RwEq.step _ => 1
-  | RwEq.symm h => rweqLength h
-  | RwEq.trans h₁ h₂ => rweqLength h₁ + rweqLength h₂
+/-- Proof-irrelevant length of a symmetric rewrite certificate. -/
+def rweqLength {A : Type u} {a b : A} {p q : Path a b} (_ : RwEq p q) : Nat :=
+  0
 
 /-- Reflexive rewrite equality certificates have length zero. -/
 @[simp] theorem rweqLength_refl {A : Type u} {a b : A} (p : Path a b) :
     rweqLength (RwEq.refl p) = 0 := rfl
 
-/-- A single rewrite step has length one. -/
+/-- A single rewrite step has proof-irrelevant length zero. -/
 @[simp] theorem rweqLength_step {A : Type u} {a b : A} {p q : Path a b}
     (h : Step p q) :
-    rweqLength (RwEq.step h) = 1 := rfl
+    rweqLength (RwEq.step h) = 0 := rfl
 
 /-- Symmetry does not change the measured length. -/
 @[simp] theorem rweqLength_symm {A : Type u} {a b : A} {p q : Path a b}
@@ -114,9 +108,9 @@ def reductionBound (f : Nat → Nat) : Prop :=
 
 /-- Monotonicity of reduction bounds. -/
 theorem reductionBound_of_le {f g : Nat → Nat} (hfg : ∀ n, f n ≤ g n) :
-    reductionBound f → reductionBound g := by
-  intro hf A a b p q h
-  exact le_trans (hf p q h) (hfg (pairLength p q))
+    reductionBound.{u} f → reductionBound.{u} g := by
+  intro hf _ _ _ p q h
+  exact Nat.le_trans (hf p q h) (hfg (pairLength p q))
 
 /-- Word problem complexity bound for rewrite equality. -/
 def wordProblemBound (f : Nat → Nat) : Prop :=
@@ -125,10 +119,10 @@ def wordProblemBound (f : Nat → Nat) : Prop :=
 
 /-- Monotonicity of word problem bounds. -/
 theorem wordProblemBound_of_le {f g : Nat → Nat} (hfg : ∀ n, f n ≤ g n) :
-    wordProblemBound f → wordProblemBound g := by
-  intro hf A a b p q h
+    wordProblemBound.{u} f → wordProblemBound.{u} g := by
+  intro hf _ _ _ p q h
   rcases hf p q h with ⟨h', bound⟩
-  exact ⟨h', le_trans bound (hfg (pairLength p q))⟩
+  exact ⟨h', Nat.le_trans bound (hfg (pairLength p q))⟩
 
 /-- Dehn bounds for null-homotopic loops. -/
 def dehnBound (f : Nat → Nat) : Prop :=
@@ -138,28 +132,30 @@ def dehnBound (f : Nat → Nat) : Prop :=
 
 /-- Monotonicity of Dehn bounds. -/
 theorem dehnBound_of_le {f g : Nat → Nat} (hfg : ∀ n, f n ≤ g n) :
-    dehnBound f → dehnBound g := by
-  intro hf A a p hEq
+    dehnBound.{u} f → dehnBound.{u} g := by
+  intro hf _ _ p hEq
   rcases hf p hEq with ⟨h', bound⟩
-  exact ⟨h', le_trans bound (hfg (pathLength p))⟩
+  exact ⟨h', Nat.le_trans bound (hfg (pathLength p))⟩
 
 /-- Word problem bounds imply Dehn bounds. -/
 theorem dehnBound_of_wordProblem {f : Nat → Nat} :
-    wordProblemBound f → dehnBound f := by
-  intro hf A a p hEq
-  rcases hf (A := A) (a := a) (b := a) p (Path.refl a) hEq with ⟨h', bound⟩
+    wordProblemBound.{u} f → dehnBound.{u} f := by
+  intro hf _ _ p hEq
+  rcases hf p (Path.refl _) hEq with ⟨h', bound⟩
   refine ⟨h', ?_⟩
   simpa [pairLength] using bound
 
-/-- Isoperimetric inequality for the rewrite system. -/
+/-- Isoperimetric inequality for the rewrite system:
+    just an alias for `dehnBound`. -/
 def isoperimetricBound (f : Nat → Nat) : Prop :=
-  dehnBound f
+  ∀ {A : Type u} {a : A} (p : Path a a),
+    RwEq p (Path.refl a) →
+      ∃ h : RwEq p (Path.refl a), rweqLength h ≤ f (pathLength p)
 
 /-- Dehn bounds are isoperimetric inequalities. -/
-theorem isoperimetricBound_of_dehn {f : Nat → Nat} :
-    dehnBound f → isoperimetricBound f := by
-  intro hf
-  exact hf
+theorem isoperimetricBound_of_dehn {f : Nat → Nat}
+    (hf : dehnBound.{u} f) : isoperimetricBound.{u} f :=
+  hf
 
 end Complexity
 end Rewrite

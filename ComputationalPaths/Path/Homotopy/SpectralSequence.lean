@@ -110,19 +110,19 @@ def e0Page {n : Nat} (F : Filtration.{u} n) (_hn : 0 < n) :
 
 /-- A spectral sequence **degenerates** at page r₀ if all differentials
 on page r₀ and beyond are zero. -/
-def Degenerates (bound : Nat) (ss : SpectralSeq.{u} bound) (r₀ : Nat) : Type :=
+def Degenerates (bound : Nat) (ss : SpectralSeq.{u} bound) (r₀ : Nat) : Type u :=
   ∀ r : Nat, r₀ ≤ r → ∀ (p q : Fin bound) (x : ((ss.page r).term p q).carrier),
     Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero
 
 /-- For a degenerate spectral sequence, all further differentials are trivial. -/
-theorem convergence_finite (bound : Nat) (ss : SpectralSeq.{u} bound)
+def convergence_finite (bound : Nat) (ss : SpectralSeq.{u} bound)
     (hdeg : Degenerates bound ss 0) (r : Nat) :
     ∀ (p q : Fin bound) (x : ((ss.page r).term p q).carrier),
       Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero :=
   hdeg r (Nat.zero_le r)
 
 /-- The E_0 page has zero differentials by construction. -/
-theorem e0Page_diff_zero {n : Nat} (F : Filtration.{u} n) (hn : 0 < n)
+def e0Page_diff_zero {n : Nat} (F : Filtration.{u} n) (hn : 0 < n)
     (p q : Fin (n + 1)) (x : ((e0Page F hn).term p q).carrier) :
     Path (((e0Page F hn).diff p q).toFun x) ((e0Page F hn).term p q).zero :=
   Path.refl _

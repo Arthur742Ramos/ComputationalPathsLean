@@ -38,7 +38,7 @@ open Homotopy.LocalizationCategory
 /-! ## Quillen model categories -/
 
 /-- A Quillen model category on computational paths. -/
-abbrev QuillenModelCategory (A : Type u) : Type (u + 1) :=
+abbrev QuillenModelCategory (A : Type u) : Type u :=
   ModelCategory A
 
 /-! ## Homotopy category Ho(C) -/

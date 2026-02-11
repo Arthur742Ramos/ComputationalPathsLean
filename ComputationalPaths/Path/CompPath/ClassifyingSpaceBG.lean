@@ -45,7 +45,7 @@ universe u
 
 /-- Bar construction for a strict group, viewed as a strict monoid. -/
 abbrev BarConstruction (G : Type u) (S : StrictGroup G) :
-    Type u :=
+    Type (u + 1) :=
   Homotopy.LoopSpaceRecognition.BarConstruction G S.toStrictMonoid
 
 /-- Canonical bar construction on a strict group. -/
