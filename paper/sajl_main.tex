@@ -222,7 +222,7 @@ confluent, terminating rewrite system whose 74~rules\footnote{The count of 74 fo
 groups covering path algebra, type-former $\beta/\eta$-rules, transport,
 contexts, dependent contexts, bi-contexts, map congruence, and structural
 closure. We prove that this structure gives rise to weak $\omega$-groupoids in
-the sense of Batanin--Leinster, with contractibility beginning at
+the sense of Batanin--Leinster~\cite{batanin98}, with contractibility beginning at
 dimension~3---the critical threshold that preserves non-trivial fundamental
 groups. The entire development is mechanically verified in a proof assistant.
 \end{abstract}
@@ -241,7 +241,7 @@ groups. The entire development is mechanically verified in a proof assistant.
   Equality}
 \label{subsec:curry-howard}
 
-In Martin-L\"of type theory, the \emph{identity type} $\IdA_A(a,b)$ captures
+In Martin-L\"of type theory~\cite{mltt84}, the \emph{identity type} $\IdA_A(a,b)$ captures
 propositional equality between elements $a,b : A$. Its sole introduction rule
 is reflexivity: the term $\refl(a) : \IdA_A(a,a)$ witnesses that every element
 is equal to itself. The elimination rule---\emph{path induction}, also known as
@@ -266,7 +266,7 @@ intensional type theory.
 \subsection{The Computational Paths Program}
 \label{subsec:comp-paths-program}
 
-Following de~Queiroz, de~Oliveira, and Ramos~\cite{dqor16, ramos18}, we propose
+Following de~Queiroz, de~Oliveira, and Ramos~\cite{dqor16, ramos18, ramos19}, we propose
 that equality proofs carry \emph{computational content}: the sequence of
 rewriting steps that produced them. Even when the underlying logic satisfies
 UIP---so that the propositional equality $a =_A b$ is proof-irrelevant---the
@@ -416,7 +416,7 @@ higher-dimensional structure even in a proof-irrelevant setting:
 \label{subsec:related-work}
 
 Our work connects to several strands of research in type theory and
-higher-dimensional algebra.
+higher-dimensional algebra~\cite{baez95}.
 
 \paragraph{Homotopy Type Theory.}
 The Univalent Foundations program~\cite{hott13} interprets types as spaces,
@@ -438,11 +438,11 @@ contractibility begins at dimension~3 rather than dimension~1.
 Bezem, Coquand, and Huber~\cite{bezem14} introduced cubical sets as a
 constructive model of HoTT. Computational paths offer an alternative
 computational semantics: where cubical paths are built from interval
-variables, computational paths are built from explicit rewrite steps.
+variables, computational paths are built from explicit rewrite steps.~\cite{cohen18}
 
 \paragraph{Higher-Dimensional Rewriting.}
 The rewriting-theoretic perspective on higher algebra, developed by Burroni,
-M\'etayer, Lafont, and others, treats rewrite rules as generators of higher
+M\'etayer, Lafont, and others~\cite{burroni93, metayer03, lafont09}, treats rewrite rules as generators of higher
 cells. Our 74-rule rewrite system on paths (\cref{ch:rewrite-system}) can be
 seen as an instance of this paradigm, with the strip lemma and confluence
 results providing the coherence data.
@@ -471,7 +471,7 @@ in four sections following this introduction.
     construct the quotient $\PathQuot$.
 
   \item[\cref{ch:groupoid}: The Groupoid of Computational Paths.]
-    We show that every type carries a canonical weak groupoid structure
+    We show that every type carries a canonical weak groupoid structure~\cite{hofmann98}
     under computational paths, that the quotient $\PathQuot$ is a strict
     groupoid, and that rewrite lifts provide functorial transport of the
     rewrite structure.
@@ -2230,7 +2230,7 @@ Having established the algebraic foundations and the higher-dimensional structur
 
 \section{Fundamental Groups and Loop Spaces}\label{sec:fundamental-groups}
 
-With the algebraic and higher-dimensional foundations established, we now turn to the homotopy-theoretic applications of computational paths. The central notion is the \emph{fundamental group}, which captures the structure of loops in a type up to rewrite equivalence. Throughout what follows, we work with the computational path structure $\mathrm{Path}_A(a,b)$ carrying explicit rewrite traces, modulo the rewrite equality $\mathrm{RwEq}$ developed in \cref{ch:rewrite-system}.
+With the algebraic and higher-dimensional foundations established, we now turn to the homotopy-theoretic applications of computational paths.~\cite{hatcher02, may99} The central notion is the \emph{fundamental group}, which captures the structure of loops in a type up to rewrite equivalence. Throughout what follows, we work with the computational path structure $\mathrm{Path}_A(a,b)$ carrying explicit rewrite traces, modulo the rewrite equality $\mathrm{RwEq}$ developed in \cref{ch:rewrite-system}.
 
 \subsection{Loop Spaces}\label{subsec:loop-spaces}
 
@@ -2393,13 +2393,13 @@ The \emph{$n$-th homotopy group} is
 \[
   \pi_n(A, a) = \pi_0(\Omega^n(A, a)),
 \]
-where $\pi_0$ denotes path-connected components (the quotient by the relation of being connected by a path). For $n \geq 1$, this coincides with $\mathrm{LoopQuot}(\Omega^{n-1}(A, a),\, \mathsf{pt}_{n-1})$.
+where $\pi_0$ denotes path-connected components (the quotient by the relation of being connected by a path). For $n \geq 1$, this coincides with $\mathrm{LoopQuot}(\Omega^{n-1}(A, a),\, \mathsf{pt}_{n-1})$.~\cite{brunerie16}
 \end{definition}
 
 The group operations on $\pi_n(A,a)$ for $n \geq 1$ are inherited from the loop space structure of $\Omega^n(A,a)$: composition in $\Omega^n$ descends to multiplication in $\pi_n$, reflexivity gives the identity, and symmetry gives inversion.
 
 \begin{theorem}[Eckmann--Hilton]\label{thm:eckmann-hilton}
-For $n \geq 2$, the group $\pi_n(A, a)$ is abelian.
+For $n \geq 2$, the group $\pi_n(A, a)$ is abelian.~\cite{eckmann62}
 \end{theorem}
 
 \begin{proof}
@@ -3019,7 +3019,7 @@ The long exact sequence and Mayer--Vietoris sequence are \emph{natural}: a morph
   for the precise verification level of each result.
 \end{remark}
 
-The Hurewicz theorem establishes the fundamental connection between homotopy groups and homology, relating $\pi_1$ to the first homology group $H_1$ via abelianization. In the computational-paths framework, both sides of this connection are constructively defined: $\pi_1$ via the loop quotient, and $H_1$ as its abelianization.
+The Hurewicz theorem establishes the fundamental connection between homotopy groups and homology, relating $\pi_1$ to the first homology group $H_1$ via abelianization.~\cite{switzer75} In the computational-paths framework, both sides of this connection are constructively defined: $\pi_1$ via the loop quotient, and $H_1$ as its abelianization.
 
 \subsection{Abelianization}\label{subsec:abelianization}
 
@@ -3292,7 +3292,7 @@ A map $f : A \to B$ is a \emph{weak equivalence} if:
 \end{definition}
 
 \begin{theorem}[Whitehead]\label{thm:whitehead}
-A weak equivalence $f : A \to B$ between CW complexes (or, in the type-theoretic setting, between types with suitable structure) is a homotopy equivalence: there exists $g : B \to A$ with $g \circ f \sim \mathrm{id}_A$ and $f \circ g \sim \mathrm{id}_B$.
+A weak equivalence $f : A \to B$ between CW complexes (or, in the type-theoretic setting, between types with suitable structure) is a homotopy equivalence: there exists $g : B \to A$ with $g \circ f \sim \mathrm{id}_A$ and $f \circ g \sim \mathrm{id}_B$.~\cite{whitehead78}
 \end{theorem}
 
 In the computational-paths formalization, Whitehead's theorem is packaged as a structure $\mathsf{WhiteheadEquiv}(f)$ that extends the weak equivalence data with a quasi-inverse---a function $g$ together with computational paths witnessing the homotopies $g \circ f \sim \mathrm{id}$ and $f \circ g \sim \mathrm{id}$.
@@ -3381,7 +3381,7 @@ A \emph{morphism} $\Phi : E \to F$ between spectral sequences consists of maps $
 \end{definition}
 
 \paragraph{Adams spectral sequence.}
-The Adams spectral sequence is the principal tool for computing stable homotopy groups. Its $E_2$ page is
+The Adams spectral sequence is the principal tool for computing stable homotopy groups.~\cite{adams74} Its $E_2$ page is
 \[
   E_2^{s,t} = \mathrm{Ext}^{s,t}_{\mathcal{A}}(\mathbb{F}_p, \mathbb{F}_p),
 \]
@@ -3404,7 +3404,7 @@ The path algebra structure gives rise to an operad whose algebras are $A_\infty$
 The rationalization of homotopy groups $\pi_n(X) \otimes \mathbb{Q}$ is formalized, along with the connection to Sullivan's commutative differential graded algebras.
 
 \paragraph{Chromatic homotopy theory.}
-The chromatic filtration of the stable homotopy category---organized by height of formal group laws---is recorded, including Morava K-theories $K(n)$ and the thick subcategory theorem.
+The chromatic filtration of the stable homotopy category---organized by height of formal group laws---is recorded, including Morava K-theories $K(n)$ and the thick subcategory theorem.~\cite{ravenel86}
 
 \paragraph{Topological Hochschild homology.}
 $\mathrm{THH}(R)$ for ring spectra $R$ is defined via the cyclic bar construction, connecting to trace methods in algebraic K-theory.
@@ -4545,7 +4545,7 @@ R.~J.~G.~B. de~Queiroz, A.~G. de~Oliveira, and A.~F. Ramos.
 \bibitem{ramos18}
 A.~F. Ramos, R.~J.~G.~B. de~Queiroz, and A.~G. de~Oliveira.
 \newblock On the identity type as the type of computational paths.
-\newblock {\em Logic Journal of the IGPL}, 26(4):378--399, 2018.
+\newblock {\em Logic Journal of the IGPL}, 25(4):562--584, 2017.
 
 \bibitem{ramos19}
 A.~F. Ramos, R.~J.~G.~B. de~Queiroz, and A.~G. de~Oliveira.
