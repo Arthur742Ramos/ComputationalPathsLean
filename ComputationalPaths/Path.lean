@@ -308,3 +308,8 @@ import ComputationalPaths.Path.Topology.TQFTPaths
 import ComputationalPaths.Path.Topology.ToposTheory
 import ComputationalPaths.Path.Topology.EtaleFundamentalGroup
 import ComputationalPaths.Path.Topology.ArithmeticTopology
+import ComputationalPaths.Path.Algebra.CayleyGraphPaths
+import ComputationalPaths.Path.Algebra.BassSerrePaths
+import ComputationalPaths.Path.Topology.HyperbolicGroups
+import ComputationalPaths.Path.Topology.QuasiIsometry
+import ComputationalPaths.Path.Topology.GromovBoundary
