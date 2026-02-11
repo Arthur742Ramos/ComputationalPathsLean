@@ -41,13 +41,14 @@ open Fibration
 open SpectralSequence
 open HomologicalAlgebra
 open Algebra
+open Homotopy.LSCategory
 
 universe u
 
 /-! ## Cohomology inputs -/
 
 /-- Trivial cohomology data on a space. -/
-def trivialCohomologyOn (X : Type u) : LSCategory.CohomologyOn X where
+def trivialCohomologyOn (X : Type u) : CohomologyOn X where
   ring := Algebra.CohomologyRing.trivial
 
 /-! ## Input data from fibrations -/
@@ -57,11 +58,11 @@ structure EilenbergMooreInput (F E B : Type u) where
   /-- The underlying fiber sequence. -/
   fiberSeq : FiberSeq F E B
   /-- Cohomology data on the fiber. -/
-  cohomFiber : LSCategory.CohomologyOn F
+  cohomFiber : CohomologyOn F
   /-- Cohomology data on the total space. -/
-  cohomTotal : LSCategory.CohomologyOn E
+  cohomTotal : CohomologyOn E
   /-- Cohomology data on the base. -/
-  cohomBase : LSCategory.CohomologyOn B
+  cohomBase : CohomologyOn B
 
 namespace EilenbergMooreInput
 
@@ -131,8 +132,8 @@ variable {A : PointedSet.{u}}
 /-- The trivial Koszul resolution. -/
 def trivial (A : PointedSet.{u}) : KoszulResolution A :=
   { (Algebra.BarResolution.trivial A) with
-    koszul := True.intro
-    linear := True.intro }
+    koszul := True
+    linear := True }
 
 end KoszulResolution
 

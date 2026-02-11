@@ -49,13 +49,13 @@ variable {A : Type u} {a b : A}
     (HigherPathInduction.ofEq_toEq_eq (A := A) (a := a) (b := b) p q)
 
 /-- Equality of normal forms is decidable (in fact, always true). -/
-theorem normalize_decidable (p q : Path a b) :
+def normalize_decidable (p q : Path a b) :
     Decidable (normalize (A := A) (a := a) (b := b) p =
       normalize (A := A) (a := a) (b := b) q) := by
   exact isTrue (normalize_eq_of_toEq (A := A) (a := a) (b := b) p q)
 
 /-- Rewrite equality is classically decidable. -/
-noncomputable theorem rweq_decidable (p q : Path a b) : Decidable (RwEq p q) := by
+noncomputable def rweq_decidable (p q : Path a b) : Decidable (RwEq p q) := by
   classical
   exact inferInstance
 
@@ -86,7 +86,7 @@ def ExprWordProblem {A : Type u} {a b : A}
   ∃ r, PathExpr.Rw p r ∧ PathExpr.Rw q r
 
 /-- The expression word problem is classically decidable. -/
-noncomputable theorem expr_wordProblem_decidable
+noncomputable def expr_wordProblem_decidable
     {p q : PathExpr (A := A) (a := a) (b := b)} :
     Decidable (ExprWordProblem (A := A) (a := a) (b := b) p q) := by
   classical
