@@ -1,0 +1,901 @@
+% ============================================================================
+% The Algebra of Computational Paths — SAJL Format
+% ============================================================================
+% Compile: pdflatex sajl_main && bibtex sajl_main && pdflatex sajl_main x2
+% ============================================================================
+\documentclass{sajl}
+
+% --- Encoding & Fonts ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% --- Mathematics ---
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{stmaryrd}        % \llbracket, \rrbracket
+\usepackage{bm}
+
+% --- Cross-references & Hyperlinks ---
+\usepackage[colorlinks=true,
+            linkcolor=blue!60!black,
+            citecolor=green!50!black,
+            urlcolor=blue!70!black]{hyperref}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+% --- Lists ---
+\usepackage{enumitem}
+
+% --- Diagrams ---
+\usepackage{tikz-cd}
+
+% ============================================================================
+% SAJL metadata
+% ============================================================================
+\volume{}
+\issue{}
+\year{2026}
+
+% ============================================================================
+% Theorem-like environments (sajl.cls does NOT define these)
+% ============================================================================
+\newcounter{thmcounter}[section]
+\renewcommand{\thethmcounter}{\thesection.\arabic{thmcounter}}
+
+\newenvironment{definition}[1][]{%
+  \refstepcounter{thmcounter}%
+  \medskip\noindent\textbf{Definition~\thethmcounter%
+    \if\relax\detokenize{#1}\relax\else\space({#1})\fi.}\itshape\space}%
+  {\medskip}
+
+\newenvironment{theorem}[1][]{%
+  \refstepcounter{thmcounter}%
+  \medskip\noindent\textbf{Theorem~\thethmcounter%
+    \if\relax\detokenize{#1}\relax\else\space({#1})\fi.}\itshape\space}%
+  {\medskip}
+
+\newenvironment{lemma}[1][]{%
+  \refstepcounter{thmcounter}%
+  \medskip\noindent\textbf{Lemma~\thethmcounter%
+    \if\relax\detokenize{#1}\relax\else\space({#1})\fi.}\itshape\space}%
+  {\medskip}
+
+\newenvironment{proposition}[1][]{%
+  \refstepcounter{thmcounter}%
+  \medskip\noindent\textbf{Proposition~\thethmcounter%
+    \if\relax\detokenize{#1}\relax\else\space({#1})\fi.}\itshape\space}%
+  {\medskip}
+
+\newenvironment{corollary}[1][]{%
+  \refstepcounter{thmcounter}%
+  \medskip\noindent\textbf{Corollary~\thethmcounter%
+    \if\relax\detokenize{#1}\relax\else\space({#1})\fi.}\itshape\space}%
+  {\medskip}
+
+\newenvironment{remark}[1][]{%
+  \refstepcounter{thmcounter}%
+  \medskip\noindent\textbf{Remark~\thethmcounter%
+    \if\relax\detokenize{#1}\relax\else\space({#1})\fi.}\rmfamily\space}%
+  {\medskip}
+
+\newenvironment{example}[1][]{%
+  \refstepcounter{thmcounter}%
+  \medskip\noindent\textbf{Example~\thethmcounter%
+    \if\relax\detokenize{#1}\relax\else\space({#1})\fi.}\rmfamily\space}%
+  {\medskip}
+
+% --- SAJL-style proof environment ---
+\newenvironment{proof}[1][Proof]{%
+  \medskip\noindent{\bf #1.}\rm\space}%
+  {\hfill$\blacksquare$\medskip}
+
+% ============================================================================
+% Custom operators and notation
+% ============================================================================
+\DeclareMathOperator{\refl}{refl}
+\DeclareMathOperator{\symop}{symm}
+\DeclareMathOperator{\ofEq}{ofEq}
+\DeclareMathOperator{\toEq}{toEq}
+\DeclareMathOperator{\tr}{transport}
+\DeclareMathOperator{\apd}{apd}
+\DeclareMathOperator{\id}{id}
+
+\DeclareMathOperator{\congrArgOp}{congrArg}
+\DeclareMathOperator{\mapLeft}{mapLeft}
+\DeclareMathOperator{\mapRight}{mapRight}
+\DeclareMathOperator{\mapTwo}{map_2}
+\DeclareMathOperator{\prodMk}{prodMk}
+\DeclareMathOperator{\fst}{fst}
+\DeclareMathOperator{\snd}{snd}
+\DeclareMathOperator{\inlOp}{inl}
+\DeclareMathOperator{\inrOp}{inr}
+\DeclareMathOperator{\sigmaMk}{sigmaMk}
+\DeclareMathOperator{\sigmaFst}{sigmaFst}
+\DeclareMathOperator{\sigmaSnd}{sigmaSnd}
+\DeclareMathOperator{\lamCongr}{lamCongr}
+\DeclareMathOperator{\app}{app}
+
+\DeclareMathOperator{\substL}{substL}
+\DeclareMathOperator{\substR}{substR}
+\DeclareMathOperator{\normalize}{normalize}
+
+% Aliases
+\newcommand{\congrArg}{\congrArgOp}
+\newcommand{\transport}{\tr}
+\newcommand{\symm}{\symop}
+\newcommand{\inl}{\inlOp}
+\newcommand{\inr}{\inrOp}
+
+% Short-hand
+\newcommand{\Path}{\operatorname{Path}}
+\newcommand{\Step}{\operatorname{Step}}
+\newcommand{\Rw}{\operatorname{Rw}}
+\newcommand{\RwEq}{\operatorname{RwEq}}
+\newcommand{\PathQuot}{\operatorname{PathQuot}}
+\newcommand{\LoopQuot}{\operatorname{LoopQuot}}
+\newcommand{\StrictGroupoid}{\operatorname{StrictGroupoid}}
+\newcommand{\Context}{\operatorname{Context}}
+\newcommand{\BiContext}{\operatorname{BiContext}}
+\newcommand{\DepContext}{\operatorname{DepContext}}
+\newcommand{\Derivation}{\operatorname{D}}
+\newcommand{\Deriv}{\operatorname{D}}
+\newcommand{\MetaStep}{\operatorname{MetaStep}}
+\newcommand{\PathRwQuot}{\operatorname{PathRwQuot}}
+
+% Rewrite arrows
+\newcommand{\rew}{\mathbin{\triangleright}}         % single step
+\newcommand{\rews}{\mathbin{\triangleright^{*}}}    % multi-step
+\newcommand{\rweq}{\mathbin{\approx}}               % rewrite equality
+
+% Misc
+\newcommand{\comp}{\mathbin{\cdot}}
+\newcommand{\inv}[1]{{#1}^{-1}}
+\newcommand{\ofEqfn}[1]{\ofEq(#1)}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\Sort}{\mathsf{Sort}}
+\newcommand{\Type}{\mathsf{Type}}
+\newcommand{\Prop}{\mathsf{Prop}}
+\newcommand{\List}{\operatorname{List}}
+\newcommand{\Eq}{\operatorname{Eq}}
+\newcommand{\IdA}{\operatorname{Id}}
+\newcommand{\ab}{\mathrm{ab}}
+\renewcommand{\trans}{\operatorname{trans}}
+
+% ============================================================================
+% Title and Author (SAJL two-argument format)
+% ============================================================================
+\title{The Algebra of Computational Paths}%
+      {The Algebra of Computational Paths: \\
+       Rewrite-Trace Equality, Weak $\omega$-Groupoids, \\
+       and Higher-Dimensional Structure}
+
+\author{A.\,F.~Ramos, R.\,J.\,G.\,B.~de~Queiroz, A.\,G.~de~Oliveira}%
+       {Arthur Ferreira Ramos, Ruy J.\,G.\,B.\ de Queiroz, \\
+        Anjolina G.\ de Oliveira}
+
+% ============================================================================
+\begin{document}
+
+\maketitle
+
+\authorname{Arthur Ferreira Ramos}
+\address{Centro de Inform\'atica, Universidade Federal de Pernambuco, Recife, Brazil}
+\email{afr@cin.ufpe.br}
+
+\authorname{Ruy J.\,G.\,B.\ de Queiroz}
+\address{Centro de Inform\'atica, Universidade Federal de Pernambuco, Recife, Brazil}
+\email{ruy@cin.ufpe.br}
+
+\authorname{Anjolina G.\ de Oliveira}
+\address{Centro de Inform\'atica, Universidade Federal de Pernambuco, Recife, Brazil}
+\email{ago@cin.ufpe.br}
+
+% --- Abstract ---
+\begin{abstract}
+We present a mathematical theory of \emph{computational paths}---a formalism in
+which propositional equalities between elements of a type carry explicit rewrite
+traces recording the sequence of elementary steps by which they were derived. A
+computational path from~$a$ to~$b$ in a type~$A$ is a pair $(s, \pi)$ where
+$\pi : a =_A b$ is a propositional equality and $s$ is a finite list of
+elementary rewrite steps. The space of computational paths is equipped with a
+confluent, terminating rewrite system whose 76~rules are organized into eight
+groups covering path algebra, type-former $\beta/\eta$-rules, transport,
+contexts, dependent contexts, bi-contexts, map congruence, and structural
+closure. We prove that this structure gives rise to weak $\omega$-groupoids in
+the sense of Batanin--Leinster, with contractibility beginning at
+dimension~3---the critical threshold that preserves non-trivial fundamental
+groups. The entire development is formalized in Lean~4.
+\end{abstract}
+
+\keywords{computational paths, identity types, weak $\omega$-groupoid,
+  rewrite system, type theory, higher-dimensional algebra}
+
+% ============================================================================
+%  SECTION 1: INTRODUCTION AND MOTIVATION
+% ============================================================================
+\section{Introduction and Motivation}
+\label{sec:introduction}
+
+% ----------------------------------------------------------------------------
+\subsection{The Curry--Howard--de~Bruijn Correspondence and Propositional
+  Equality}
+\label{subsec:curry-howard}
+
+In Martin-L\"of type theory, the \emph{identity type} $\IdA_A(a,b)$ captures
+propositional equality between elements $a,b : A$. Its sole introduction rule
+is reflexivity: the term $\refl(a) : \IdA_A(a,a)$ witnesses that every element
+is equal to itself. The elimination rule---\emph{path induction}, also known as
+the~$J$-rule---states that to prove a property of an arbitrary inhabitant of
+$\IdA_A(a,b)$, it suffices to verify the property for $\refl(a)$.
+
+In proof assistants based on the Calculus of Inductive Constructions, such as
+Lean~4 and Coq, the identity type \texttt{Eq} lives in $\Prop$, a universe
+governed by \emph{proof irrelevance}: all inhabitants of a proposition are
+definitionally identified. As a consequence, the \emph{Uniqueness of Identity
+Proofs} (UIP) principle holds:
+\begin{equation}\label{eq:uip}
+  \forall\, p, q : \IdA_A(a,b),\quad p =_{\IdA_A(a,b)} q.
+\end{equation}
+This axiom collapses the entire space of identity proofs to at most one element
+per pair of endpoints. From the perspective of homotopy type theory~\cite{HoTTBook},
+UIP asserts that every type is a \emph{set} (a $0$-truncated type), precluding
+the rich higher-dimensional structure that identity types can carry in
+intensional type theory.
+
+% ----------------------------------------------------------------------------
+\subsection{The Computational Paths Program}
+\label{subsec:comp-paths-program}
+
+Following de~Queiroz, de~Oliveira, and Ramos~\cite{DQOR16, RDQO18}, we propose
+that equality proofs carry \emph{computational content}: the sequence of
+rewriting steps that produced them. Even when the underlying logic satisfies
+UIP---so that the propositional equality $a =_A b$ is proof-irrelevant---the
+rewrite \emph{traces} are distinct combinatorial objects that can be compared,
+composed, and quotiented.
+
+The key insight is a separation of concerns:
+\begin{itemize}[leftmargin=2em]
+  \item The \textbf{semantic content} of an equality proof is the proposition
+    $a =_A b$, which by UIP carries no information beyond its truth value.
+  \item The \textbf{computational trace} is a finite sequence of elementary
+    rewrite steps recording \emph{how} the equality was derived---which
+    congruence rules, symmetries, transitivities, and $\beta/\eta$-reductions
+    were applied, and in what order.
+\end{itemize}
+This separation creates a rich algebraic structure \emph{atop} the
+proof-irrelevant equality, without modifying the underlying type theory.
+
+% ----------------------------------------------------------------------------
+\subsection{Design Principle: Path = Proof + Trace}
+\label{subsec:design-principle}
+
+We now state the central definitions that constitute the formal framework.
+
+\begin{definition}[Elementary Rewrite Step]\label{def:step}
+  An \emph{elementary rewrite step} in a type~$A$ is a triple
+  \[
+    s = (\mathrm{src}, \mathrm{tgt}, \pi) \quad\text{where}\quad
+    \mathrm{src}, \mathrm{tgt} : A \quad\text{and}\quad
+    \pi : \mathrm{src} =_A \mathrm{tgt}.
+  \]
+  We write $\Step(A)$ for the type of all elementary rewrite steps in~$A$.
+\end{definition}
+
+Each step records a single atomic equation between two elements together with
+its justification. Steps can be inverted (swapping source and target) and
+mapped through functions.
+
+\begin{definition}[Computational Path]\label{def:path}
+  A \emph{computational path} from $a$ to $b$ in a type~$A$ is a pair
+  \[
+    p = (s, \pi) \quad\text{where}\quad
+    s : \List(\Step(A)) \quad\text{and}\quad
+    \pi : a =_A b.
+  \]
+  We write $\Path_A(a,b)$ for the type of computational paths from~$a$
+  to~$b$.
+\end{definition}
+
+The list $s$ is the \emph{computational trace}---it records which elementary
+steps were applied. The proof $\pi$ is the \emph{semantic witness}---it
+certifies that the composite rewrite is valid. Two paths with the same
+endpoints but different traces are \emph{distinct} as elements of
+$\Path_A(a,b)$, even though their proof fields are identified by UIP.
+
+\begin{definition}[Semantic Projection]\label{def:toEq}
+  The \emph{semantic projection} $\toEq : \Path_A(a,b) \to (a =_A b)$
+  extracts the underlying propositional equality from a computational path,
+  discarding the trace:
+  \[
+    \toEq(s, \pi) \;=\; \pi.
+  \]
+\end{definition}
+
+\begin{definition}[Canonical Witness]\label{def:ofEq}
+  For any propositional equality $\pi : a =_A b$, the \emph{canonical
+  witness} is the single-step path
+  \[
+    \ofEq(\pi) \;=\; \bigl([\langle a, b, \pi\rangle],\; \pi\bigr)
+    \;:\; \Path_A(a,b).
+  \]
+\end{definition}
+
+The function $\ofEq$ embeds the standard identity type into the computational
+path space. Its image consists precisely of the one-step paths.
+
+% ----------------------------------------------------------------------------
+\subsection{Non-UIP for Computational Paths}
+\label{subsec:non-uip}
+
+The raison d'\^etre of the computational paths framework is that it recovers
+higher-dimensional structure even in a proof-irrelevant setting:
+
+\begin{theorem}[Non-UIP for Paths]\label{thm:non-uip}
+  For any nonempty type~$A$, the space of computational paths does not
+  satisfy the Uniqueness of Identity Proofs:
+  \[
+    \neg\,\bigl(\forall\, a, b : A,\;\forall\, p, q : \Path_A(a,b),\;
+    p = q\bigr).
+  \]
+\end{theorem}
+
+\begin{proof}
+  Let $a : A$ be any element. Consider two paths from $a$ to itself:
+  \begin{align*}
+    p &\;=\; \refl(a) \;=\; ([\,],\; \refl) \;:\; \Path_A(a,a), \\
+    q &\;=\; \ofEq(\refl) \;=\; \bigl([\langle a, a, \refl\rangle],\;
+    \refl\bigr) \;:\; \Path_A(a,a).
+  \end{align*}
+  These have the same proof field ($\refl$) but differ in their step lists:
+  $p.\mathrm{steps} = [\,]$ while $q.\mathrm{steps} = [\langle a, a,
+  \refl\rangle]$. Since the step lists are structurally distinct,
+  $p \neq q$ as elements of $\Path_A(a,a)$.
+\end{proof}
+
+\begin{remark}\label{rem:key-distinction}
+  \cref{thm:non-uip} is the foundational result that enables the entire
+  subsequent development. It shows that even in a type theory where all
+  identity proofs are identified (UIP holds for $\Eq$), the space
+  $\Path_A(a,b)$ supports a non-trivial ``higher'' structure. The extra
+  information resides in the trace, not in the equality proof.
+\end{remark}
+
+% ----------------------------------------------------------------------------
+\subsection{Related Work}
+\label{subsec:related-work}
+
+Our work connects to several strands of research in type theory and
+higher-dimensional algebra.
+
+\paragraph{Homotopy Type Theory.}
+The Univalent Foundations program~\cite{HoTTBook} interprets types as spaces,
+identity types as path spaces, and higher identity types as higher homotopy
+groups. In HoTT, the identity type \emph{itself} carries higher structure, and
+UIP is rejected. Our approach is complementary: we work \emph{within} a
+UIP-satisfying type theory and build the higher structure externally via
+rewrite traces.
+
+\paragraph{Types as weak $\omega$-groupoids.}
+Lumsdaine~\cite{Lumsdaine10} and van~den~Berg--Garner~\cite{vdBG11}
+independently showed that the tower of iterated identity types in intensional
+type theory carries the structure of a weak $\omega$-groupoid. Our
+\cref{thm:omega-groupoid} (\cref{sec:higher-dimensional}) establishes an
+analogous result for computational paths, with the crucial difference that
+contractibility begins at dimension~3 rather than dimension~1.
+
+\paragraph{Cubical Type Theory.}
+Bezem, Coquand, and Huber~\cite{BeCH14} introduced cubical sets as a
+constructive model of HoTT. Computational paths offer an alternative
+computational semantics: where cubical paths are built from interval
+variables, computational paths are built from explicit rewrite steps.
+
+\paragraph{Higher-Dimensional Rewriting.}
+The rewriting-theoretic perspective on higher algebra, developed by Burroni,
+M\'etayer, Lafont, and others, treats rewrite rules as generators of higher
+cells. Our 76-rule rewrite system on paths (\cref{sec:rewrite-system}) can be
+seen as an instance of this paradigm, with the strip lemma and confluence
+results providing the coherence data.
+
+% ----------------------------------------------------------------------------
+\subsection{Outline of the Paper}
+\label{subsec:outline}
+
+This paper develops the foundations of the theory of computational paths
+in four sections following this introduction.
+
+\begin{description}[leftmargin=2em,style=nextline]
+  \item[\cref{sec:basic-constructions}: Basic Constructions.]
+    We introduce the fundamental operations on paths---reflexivity, symmetry,
+    transitivity, congruence---and establish their strict algebraic laws. We
+    develop the path algebra for products, sums, dependent pairs, and function
+    types, and define transport and dependent application. We introduce unary,
+    binary, and dependent contexts.
+
+  \item[\cref{sec:rewrite-system}: The Rewrite System.]
+    We define the single-step rewrite relation $\Step$ with its 76 rules in
+    eight groups, its reflexive--transitive closure $\Rw$, and the rewrite
+    equality $\RwEq$. We prove soundness, develop normalization, establish
+    termination via a recursive path ordering, prove local confluence
+    (the strip lemma) and global confluence (via Newman's lemma), and
+    construct the quotient $\PathQuot$.
+
+  \item[\cref{sec:groupoid}: The Groupoid of Computational Paths.]
+    We show that every type carries a canonical weak groupoid structure
+    under computational paths, that the quotient $\PathQuot$ is a strict
+    groupoid, and that rewrite lifts provide functorial transport of the
+    rewrite structure.
+
+  \item[\cref{sec:higher-dimensional}: Higher-Dimensional Structure.]
+    We define two-cells (rewrite equalities between paths) and establish
+    the weak bicategory structure. We construct the globular tower, define
+    derivation cells at each dimension, prove contractibility at
+    dimension~$\geq 3$, and establish the main structure theorem:
+    computational paths form a weak $\omega$-groupoid.
+\end{description}
+
+
+% ============================================================================
+%  SECTION 2: BASIC CONSTRUCTIONS
+% ============================================================================
+\section{Computational Paths: Basic Constructions}
+\label{sec:basic-constructions}
+
+Throughout this section, $A$, $B$, $C$ denote types in a fixed universe,
+and $a, b, c, d$ denote elements of~$A$ unless otherwise stated.
+
+% ----------------------------------------------------------------------------
+\subsection{Fundamental Operations}
+\label{subsec:fundamental-ops}
+
+We equip the space $\Path_A(a,b)$ with three primitive operations.
+
+\begin{definition}[Reflexivity]\label{def:refl}
+  The \emph{reflexive path} at $a : A$ is
+  \[
+    \refl(a) \;=\; ([\,],\; \refl_a) \;:\; \Path_A(a,a),
+  \]
+  where the step list is empty and the proof field is the reflexivity
+  of~$\Eq$.
+\end{definition}
+
+\begin{definition}[Symmetry]\label{def:symm}
+  For $p = (s, \pi) : \Path_A(a,b)$, the \emph{symmetric path} is
+  \[
+    \inv{p} \;=\; \symop(p) \;=\;
+    \bigl(\mathrm{reverse}(\mathrm{map}(\mathrm{symm}_{\Step}, s)),\;
+    \pi^{-1}\bigr) \;:\; \Path_A(b,a),
+  \]
+  where $\mathrm{symm}_{\Step}$ inverts each elementary step and
+  $\mathrm{reverse}$ reverses the list.
+\end{definition}
+
+\begin{definition}[Transitivity / Composition]\label{def:trans}
+  For $p = (s_1, \pi_1) : \Path_A(a,b)$ and
+  $q = (s_2, \pi_2) : \Path_A(b,c)$, the \emph{composite path} is
+  \[
+    p \comp q \;=\; \mathrm{trans}(p, q) \;=\;
+    (s_1 \mathbin{+\!\!+} s_2,\; \pi_1 \cdot \pi_2) \;:\; \Path_A(a,c),
+  \]
+  where $\mathbin{+\!\!+}$ denotes list concatenation and $\cdot$ is
+  transitivity of~$\Eq$.
+\end{definition}
+
+\begin{remark}
+  We use $p \comp q$ and $\mathrm{trans}(p, q)$ interchangeably,
+  adopting the diagrammatic order: $p$ is followed by~$q$.
+\end{remark}
+
+% ----------------------------------------------------------------------------
+\subsection{Strict Algebraic Laws}
+\label{subsec:strict-laws}
+
+A remarkable feature of computational paths is that many algebraic identities
+hold as \emph{strict} equalities---i.e., as definitional equalities of the
+$\Path$ record structure---not merely up to rewriting. This is a consequence
+of the list-based representation: the laws reduce to standard identities on
+list concatenation and reversal.
+
+\begin{theorem}[Strict Monoid Laws]\label{thm:strict-monoid}
+  For all $p : \Path_A(a,b)$, $q : \Path_A(b,c)$,
+  $r : \Path_A(c,d)$:
+  \begin{enumerate}[label=(\roman*)]
+    \item \textbf{Left identity.}\; $\refl(a) \comp p = p$.
+    \item \textbf{Right identity.}\; $p \comp \refl(b) = p$.
+    \item \textbf{Associativity.}\;
+      $(p \comp q) \comp r = p \comp (q \comp r)$.
+  \end{enumerate}
+  All three equalities hold as structural equalities of $\Path$ records
+  (not merely up to rewriting).
+\end{theorem}
+
+\begin{proof}
+  (i) By definition,
+  $\refl(a) \comp p = ([\,] \mathbin{+\!\!+} s,\; \refl \cdot \pi)
+  = (s, \pi) = p$, since prepending the empty list is the identity on
+  lists, and $\refl \cdot \pi = \pi$.
+  (ii) Similarly,
+  $p \comp \refl(b) = (s \mathbin{+\!\!+} [\,],\; \pi \cdot \refl)
+  = (s, \pi) = p$.
+  (iii) Follows from $\mathrm{List.append\_assoc}$:
+  $(s_1 \mathbin{+\!\!+} s_2) \mathbin{+\!\!+} s_3
+  = s_1 \mathbin{+\!\!+} (s_2 \mathbin{+\!\!+} s_3)$ and
+  associativity of $\Eq.\mathrm{trans}$.
+\end{proof}
+
+\begin{theorem}[Strict Involution]\label{thm:strict-involution}
+  For all $p : \Path_A(a,b)$:
+  \[
+    \inv{(\inv{p})} = p.
+  \]
+\end{theorem}
+
+\begin{proof}
+  We compute $\inv{(\inv{p})}$: reversing the reversed list recovers the
+  original list, and applying $\mathrm{symm}_{\Step}$ twice to each step
+  is the identity (since swapping source and target twice returns to the
+  original step). On the proof field, $(\pi^{-1})^{-1} = \pi$.
+\end{proof}
+
+\begin{theorem}[Strict Anti-Homomorphism]\label{thm:strict-antihom}
+  For all $p : \Path_A(a,b)$ and $q : \Path_A(b,c)$:
+  \[
+    \inv{(p \comp q)} \;=\; \inv{q} \comp \inv{p}.
+  \]
+\end{theorem}
+
+\begin{proof}
+  By the list identity
+  $\mathrm{reverse}(s_1 \mathbin{+\!\!+} s_2) =
+  \mathrm{reverse}(s_2) \mathbin{+\!\!+} \mathrm{reverse}(s_1)$
+  and the fact that mapping commutes with reversal and append.
+\end{proof}
+
+\begin{remark}[Cancellation is not strict]\label{rem:cancel-not-strict}
+  The cancellation law $p \comp \inv{p} = \refl(a)$ does \emph{not}
+  hold strictly: the left-hand side has step list
+  $s \mathbin{+\!\!+} \mathrm{reverse}(\mathrm{map}(\mathrm{symm}_{\Step}, s))$,
+  which is non-empty whenever $s \neq [\,]$, while $\refl(a)$ has an
+  empty step list. Cancellation holds only up to the rewrite
+  relation~$\Step$ (\cref{sec:rewrite-system}).
+\end{remark}
+
+% ----------------------------------------------------------------------------
+\subsection{Congruence (Functorial Action)}
+\label{subsec:congruence}
+
+\begin{definition}[Unary Congruence]\label{def:congrArg}
+  For $f : A \to B$ and $p = (s, \pi) : \Path_A(a,b)$, the
+  \emph{congruence} (or \emph{functorial action}) of~$f$ on~$p$ is
+  \[
+    f_*(p) \;=\; \congrArgOp(f, p) \;=\;
+    \bigl(\mathrm{map}(\mathrm{map}_f, s),\; \congrArgOp(f, \pi)\bigr)
+    \;:\; \Path_B(f(a), f(b)),
+  \]
+  where $\mathrm{map}_f$ sends a step $\langle x, y, h \rangle$ to
+  $\langle f(x), f(y), \congrArgOp(f, h) \rangle$.
+\end{definition}
+
+The functorial action satisfies strict algebraic laws:
+
+\begin{theorem}[Functoriality of Congruence]\label{thm:congrArg-functor}
+  For $f : A \to B$, $g : B \to C$, and paths $p : \Path_A(a,b)$,
+  $q : \Path_A(b,c)$:
+  \begin{enumerate}[label=(\roman*)]
+    \item \textbf{Composition.}\;
+      $f_*(p \comp q) = f_*(p) \comp f_*(q)$.
+    \item \textbf{Symmetry.}\;
+      $f_*(\inv{p}) = \inv{f_*(p)}$.
+    \item \textbf{Identity.}\;
+      $\id_*(p) = p$ \;(where $\id = \lambda x.\, x$).
+    \item \textbf{Composition of functions.}\;
+      $(g \circ f)_*(p) = g_*(f_*(p))$.
+  \end{enumerate}
+  All equalities are strict.
+\end{theorem}
+
+\begin{proof}
+  Each part reduces to a standard identity on list operations:
+  (i)~$\mathrm{map}(F, s_1 \mathbin{+\!\!+} s_2) = \mathrm{map}(F, s_1)
+  \mathbin{+\!\!+} \mathrm{map}(F, s_2)$.
+  (ii)~$\mathrm{map}(F, \mathrm{reverse}(\mathrm{map}(G, s))) =
+  \mathrm{reverse}(\mathrm{map}(F \circ G, s))$, combined with the fact
+  that $\mathrm{map}_f \circ \mathrm{symm}_{\Step} = \mathrm{symm}_{\Step}
+  \circ \mathrm{map}_f$.
+  (iii)~$\mathrm{map}_{\id} = \id$ on steps.
+  (iv)~$\mathrm{map}_{g \circ f} = \mathrm{map}_g \circ \mathrm{map}_f$
+  on steps.
+\end{proof}
+
+\begin{corollary}\label{cor:path-functor}
+  The assignment $A \mapsto \Path_A$ and $f \mapsto f_*$ is a functor from
+  the category of types and functions to the category of types and
+  path-preserving maps (strictly preserving composition and identities).
+\end{corollary}
+
+% ----------------------------------------------------------------------------
+\subsection{Binary Congruence}
+\label{subsec:binary-congruence}
+
+For binary functions, congruence decomposes into left and right components.
+
+\begin{definition}[Left, Right, and Binary Maps]\label{def:binary-maps}
+  Let $f : A \to B \to C$.
+  \begin{enumerate}[label=(\roman*)]
+    \item \textbf{Left map.}\;
+      $\mapLeft(f, p, b) = (\lambda x.\, f(x,b))_*(p)
+      : \Path_C(f(a_1, b), f(a_2, b))$
+      for $p : \Path_A(a_1, a_2)$ and $b : B$.
+    \item \textbf{Right map.}\;
+      $\mapRight(f, a, q) = f(a)_*(q)
+      : \Path_C(f(a, b_1), f(a, b_2))$
+      for $a : A$ and $q : \Path_B(b_1, b_2)$.
+    \item \textbf{Binary map.}\;
+      $\mapTwo(f, p, q) = \mapLeft(f, p, b_1) \comp \mapRight(f, a_2, q)$
+      for $p : \Path_A(a_1, a_2)$ and $q : \Path_B(b_1, b_2)$.
+  \end{enumerate}
+\end{definition}
+
+The binary map first varies the left argument (holding the right argument
+at its \emph{source} $b_1$), then varies the right argument (holding the
+left argument at its \emph{target} $a_2$). This is the canonical choice
+that makes the binary map compose correctly with projections.
+
+The binary map satisfies its own functoriality laws, inherited from those
+of the unary congruence. In particular, $\mapTwo(f, -, -)$ preserves
+composition in each variable separately:
+\[
+  \mapTwo(f, p_1 \comp p_2, q_1 \comp q_2) =
+  \mapLeft(f, p_1, b_1) \comp \mapLeft(f, p_2, b_1) \comp
+  \mapRight(f, a_3, q_1) \comp \mapRight(f, a_3, q_2).
+\]
+Symmetry of $\mapTwo$ reverses the order of the components:
+\[
+  \inv{\mapTwo(f, p, q)} = \mapRight(f, a_2, \inv{q}) \comp
+  \mapLeft(f, \inv{p}, b_1).
+\]
+
+% ----------------------------------------------------------------------------
+\subsection{Product Paths}
+\label{subsec:product-paths}
+
+\begin{definition}[Product Path Operations]\label{def:prod-paths}
+  For $p : \Path_A(a_1, a_2)$ and $q : \Path_B(b_1, b_2)$:
+  \begin{enumerate}[label=(\roman*)]
+    \item $\prodMk(p, q) = \mapTwo(\mathrm{Prod.mk}, p, q)
+      : \Path_{A \times B}((a_1, b_1), (a_2, b_2))$.
+    \item $\fst(r) = (\mathrm{Prod.fst})_*(r)$ for
+      $r : \Path_{A \times B}((a_1, b_1), (a_2, b_2))$.
+    \item $\snd(r) = (\mathrm{Prod.snd})_*(r)$ for
+      $r : \Path_{A \times B}((a_1, b_1), (a_2, b_2))$.
+  \end{enumerate}
+\end{definition}
+
+\begin{theorem}[Product $\beta$/$\eta$-Rules]\label{thm:prod-beta-eta}
+  The product path operations satisfy:
+  \begin{enumerate}[label=(\roman*)]
+    \item \textbf{$\beta$-rules.}\;
+      $\fst(\prodMk(p, q)) = p$ \;(strictly, by functoriality);\;
+      $\snd(\prodMk(p, q))$ reduces to~$q$ via a single rewrite step.
+    \item \textbf{$\eta$-rule.}\;
+      $\prodMk(\fst(r), \snd(r)) \rew r$
+      \;(as a rewrite step, see \cref{sec:rewrite-system}).
+  \end{enumerate}
+\end{theorem}
+
+The $\eta$-rule is not a strict equality because
+$\prodMk(\fst(r), \snd(r))$ applies the binary map construction,
+producing a different step list than the original path~$r$.
+
+% ----------------------------------------------------------------------------
+\subsection{Sigma Paths}
+\label{subsec:sigma-paths}
+
+For a dependent type $B : A \to \Type$, paths between dependent pairs
+$\langle a_1, b_1 \rangle$ and $\langle a_2, b_2 \rangle$ in
+$\Sigma_{x:A} B(x)$ decompose into a base path and a fiber path.
+
+\begin{definition}[Sigma Path Operations]\label{def:sigma-paths}
+  \begin{enumerate}[label=(\roman*)]
+    \item \textbf{Construction.}\;
+      $\sigmaMk(p, q) : \Path_{\Sigma B}(\langle a_1, b_1\rangle,
+      \langle a_2, b_2\rangle)$ where $p : \Path_A(a_1, a_2)$ and
+      $q : \Path_{B(a_2)}(\tr(p, b_1), b_2)$.
+    \item \textbf{First projection.}\;
+      $\sigmaFst(r) = (\Sigma.\mathrm{fst})_*(r) : \Path_A(a_1, a_2)$.
+    \item \textbf{Second projection.}\;
+      $\sigmaSnd(r) : \Path_{B(a_2)}(\tr(\sigmaFst(r), b_1), b_2)$.
+  \end{enumerate}
+\end{definition}
+
+The sigma path operations satisfy analogous $\beta/\eta$-rules to the
+product case. These hold as rewrite steps (not strict equalities), since
+the $\sigmaMk$ constructor creates a single-step path via $\ofEq$:
+\begin{align*}
+  \sigmaFst(\sigmaMk(p, q)) &\rew \ofEq(\toEq(p)), \\
+  \sigmaSnd(\sigmaMk(p, q)) &\rew \ofEq(\toEq(q)), \\
+  \sigmaMk(\sigmaFst(r), \sigmaSnd(r)) &\rew r.
+\end{align*}
+
+% ----------------------------------------------------------------------------
+\subsection{Sum Paths}
+\label{subsec:sum-paths}
+
+\begin{definition}[Sum Path Constructors]\label{def:sum-paths}
+  For $p : \Path_A(a_1, a_2)$ and $q : \Path_B(b_1, b_2)$:
+  \begin{enumerate}[label=(\roman*)]
+    \item $\inlOp_*(p) = (\mathrm{Sum.inl})_*(p) :
+      \Path_{A + B}(\mathrm{inl}(a_1), \mathrm{inl}(a_2))$.
+    \item $\inrOp_*(q) = (\mathrm{Sum.inr})_*(q) :
+      \Path_{A + B}(\mathrm{inr}(b_1), \mathrm{inr}(b_2))$.
+  \end{enumerate}
+\end{definition}
+
+\begin{theorem}[Sum $\beta$-Rules]\label{thm:sum-beta}
+  For $f : A \to C$, $g : B \to C$, and the eliminator
+  $\mathrm{rec}(f, g) : A + B \to C$:
+  \begin{align*}
+    (\mathrm{rec}(f,g))_*(\inlOp_*(p)) &\rew f_*(p), \\
+    (\mathrm{rec}(f,g))_*(\inrOp_*(q)) &\rew g_*(q).
+  \end{align*}
+\end{theorem}
+
+% ----------------------------------------------------------------------------
+\subsection{Function Paths}
+\label{subsec:function-paths}
+
+\begin{definition}[Function Path Operations]\label{def:fun-paths}
+  Let $f, g : A \to B$.
+  \begin{enumerate}[label=(\roman*)]
+    \item \textbf{Lambda congruence.}\;
+      $\lamCongr(p) : \Path_{A \to B}(f, g)$ where
+      $p : \prod_{x:A} \Path_B(f(x), g(x))$ is a family of pointwise
+      paths. The step list is empty and the proof field is
+      $\mathrm{funext}(\lambda x.\, \toEq(p(x)))$.
+    \item \textbf{Application.}\;
+      $\app(r, a) = (\lambda h.\, h(a))_*(r) : \Path_B(f(a), g(a))$
+      for $r : \Path_{A \to B}(f, g)$ and $a : A$.
+  \end{enumerate}
+\end{definition}
+
+\begin{theorem}[Function $\beta$/$\eta$-Rules]\label{thm:fun-beta-eta}
+  \begin{enumerate}[label=(\roman*)]
+    \item \textbf{$\beta$.}\;
+      $\app(\lamCongr(p), a) \rew p(a)$.
+    \item \textbf{$\eta$.}\;
+      $\lamCongr(\lambda x.\, \app(q, x)) \rew q$.
+  \end{enumerate}
+\end{theorem}
+
+Additional strict identities hold for $\lamCongr$: it preserves composition
+and symmetry strictly:
+\begin{align*}
+  \lamCongr(p) \comp \lamCongr(q) &= \lamCongr(\lambda x.\, p(x) \comp q(x)),\\
+  \inv{\lamCongr(p)} &= \lamCongr(\lambda x.\, \inv{p(x)}).
+\end{align*}
+
+% ----------------------------------------------------------------------------
+\subsection{Transport and Dependent Application}
+\label{subsec:transport}
+
+\begin{definition}[Transport]\label{def:transport}
+  For a type family $D : A \to \Sort$, a path $p : \Path_A(a,b)$, and
+  an element $x : D(a)$, the \emph{transport} of $x$ along $p$ is
+  \[
+    \tr_D(p, x) \;=\; \Eq.\mathrm{rec}(\pi, x) \;:\; D(b),
+  \]
+  where $\pi = \toEq(p) : a =_A b$. Transport uses only the semantic
+  content of~$p$, not its trace.
+\end{definition}
+
+\begin{theorem}[Transport Laws]\label{thm:transport-laws}
+  The following hold strictly:
+  \begin{enumerate}[label=(\roman*)]
+    \item $\tr_D(\refl(a), x) = x$.
+    \item $\tr_D(p \comp q, x) = \tr_D(q, \tr_D(p, x))$.
+    \item $\tr_D(\inv{p}, \tr_D(p, x)) = x$.
+    \item $\tr_D(p, \tr_D(\inv{p}, y)) = y$.
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  All follow from case analysis on the path's proof field.
+  Since $\Eq.\mathrm{rec}$ is definitionally the identity when the
+  proof is $\refl$, (i) is immediate. Parts (ii)--(iv) follow from
+  the corresponding properties of $\Eq.\mathrm{rec}$.
+\end{proof}
+
+\begin{definition}[Dependent Application]\label{def:apd}
+  For a dependent function $f : \prod_{x:A} D(x)$ and a path
+  $p : \Path_A(a,b)$, the \emph{dependent application} is
+  \[
+    \apd(f, p) \;:\; \Path_{D(b)}(\tr_D(p, f(a)),\; f(b)).
+  \]
+  When $p = \refl(a)$, this reduces to $\refl(f(a))$.
+\end{definition}
+
+% ----------------------------------------------------------------------------
+\subsection{Contexts}
+\label{subsec:contexts}
+
+Contexts formalize substitution of paths into sub-expressions. They are the
+categorical analogue of ``evaluation in context'' from term rewriting.
+
+\begin{definition}[Unary Context]\label{def:context}
+  A \emph{context} $C : \Context(A, B)$ is a function
+  $\mathrm{fill} : A \to B$. It acts on paths by
+  \[
+    C[p] \;=\; \congrArgOp(\mathrm{fill}, p) \;:\;
+    \Path_B(C[a_1], C[a_2])
+  \]
+  for $p : \Path_A(a_1, a_2)$, where we write $C[a]$ for
+  $\mathrm{fill}(a)$.
+\end{definition}
+
+\begin{definition}[Context Substitution]\label{def:context-subst}
+  Let $C : \Context(A, B)$.
+  \begin{enumerate}[label=(\roman*)]
+    \item \textbf{Left substitution.}\;
+      $\substL(C, r, p) = r \comp C[p] : \Path_B(x, C[a_2])$
+      for $r : \Path_B(x, C[a_1])$ and $p : \Path_A(a_1, a_2)$.
+    \item \textbf{Right substitution.}\;
+      $\substR(C, p, t) = C[p] \comp t : \Path_B(C[a_1], y)$
+      for $p : \Path_A(a_1, a_2)$ and $t : \Path_B(C[a_2], y)$.
+  \end{enumerate}
+\end{definition}
+
+Context substitution supports an extensive algebra of identities
+(cf.\ \cref{subsec:context-rules} in \cref{sec:rewrite-system}),
+including:
+\begin{itemize}
+  \item Unit laws: $\substL(C, \refl, p) \rew C[p]$ and
+    $\substR(C, p, \refl) \rew C[p]$.
+  \item Associativity:
+    $\substR(C, p, t) \comp u \rew \substR(C, p, t \comp u)$.
+  \item Idempotence:
+    $\substL(C, \substL(C, r, \refl), p) \rew \substL(C, r, p)$.
+  \item $\beta$-rules:
+    $r \comp C[p] \rew \substL(C, r, p)$ and
+    $C[p] \comp t \rew \substR(C, p, t)$.
+\end{itemize}
+
+\begin{definition}[Binary Context]\label{def:bicontext}
+  A \emph{binary context} $K : \BiContext(A, B, C)$ is a function
+  $\mathrm{fill} : A \to B \to C$. It supports $\mapLeft$, $\mapRight$,
+  and $\mapTwo$ operations obtained by freezing one argument:
+  \begin{align*}
+    K.\mapLeft(p, b) &= (\lambda x.\, K[x, b])_*(p), \\
+    K.\mapRight(a, q) &= K[a, -]_*(q), \\
+    K.\mapTwo(p, q) &= K.\mapLeft(p, b_1) \comp K.\mapRight(a_2, q).
+  \end{align*}
+\end{definition}
+
+\begin{definition}[Dependent Context]\label{def:depcontext}
+  A \emph{dependent context} $C : \DepContext(A, B)$ consists of
+  $\mathrm{fill} : \prod_{a:A} B(a)$ for a type family $B : A \to \Type$.
+  Its action on a path $p : \Path_A(a_1, a_2)$ produces
+  \[
+    C.\mathrm{map}(p) \;:\;
+    \Path_{B(a_2)}(\tr_B(p, C[a_1]),\; C[a_2]),
+  \]
+  which is the dependent application $\apd(\mathrm{fill}, p)$.
+\end{definition}
+
+Dependent contexts admit analogues of left and right substitution
+($\substL$ and $\substR$), with additional transport factors to account
+for the dependence of the codomain on the base.
+
+\begin{definition}[Dependent Binary Context]\label{def:depbicontext}
+  A \emph{dependent binary context} $K : \DepContext(A, B, C)$, where
+  $C : A \to B \to \Type$, consists of
+  $\mathrm{fill} : \prod_{a:A} \prod_{b:B} C(a, b)$. It supports
+  $\mapLeft$, $\mapRight$, and $\mapTwo$ operations that combine
+  transport in the base with fiber paths, generalizing the binary
+  context operations.
+\end{definition}
+
+
+% ============================================================================
+%  SECTION 3: THE REWRITE SYSTEM
+%  (to be appended in subsequent calls)
+% ============================================================================

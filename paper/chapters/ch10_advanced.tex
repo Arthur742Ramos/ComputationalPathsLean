@@ -1,0 +1,199 @@
+%% ============================================================================
+%% Chapter 10: Advanced Homotopy Theory
+%% Part II of "The Algebra of Computational Paths"
+%% ============================================================================
+
+\section{Advanced Homotopy Theory}\label{sec:advanced}
+
+This chapter surveys the advanced homotopy-theoretic structures formalized in the computational-paths framework: Eilenberg--MacLane spaces, Postnikov towers, Whitehead's theorem, the Freudenthal suspension theorem, and spectral sequences. The treatment is necessarily more concise than the preceding chapters; we state the principal definitions and results, indicating how they fit into the computational-paths architecture.
+
+\subsection{Eilenberg--MacLane Spaces and Moore Spaces}\label{subsec:em-spaces}
+
+\begin{definition}[Eilenberg--MacLane space]\label{def:em-space}
+For a group $G$ (abelian if $n \geq 2$) and $n \geq 1$, an \emph{Eilenberg--MacLane space} $K(G, n)$ is a pointed type satisfying
+\[
+  \pi_k(K(G, n)) \cong \begin{cases} G & \text{if } k = n, \\ 0 & \text{if } k \neq n. \end{cases}
+\]
+\end{definition}
+
+Eilenberg--MacLane spaces serve as building blocks for general spaces via Postnikov towers. Their existence is established constructively:
+
+\begin{proposition}\label{prop:em-existence}
+For every abelian group $G$ and $n \geq 1$, there exists an Eilenberg--MacLane space $K(G, n)$. In particular:
+\begin{itemize}
+  \item $K(\mathbb{Z}, 1) = S^1$ (the circle, by Theorem~\ref{thm:pi1-circle}).
+  \item $K(G, 1) = BG$ (the classifying space) for any discrete group $G$.
+\end{itemize}
+\end{proposition}
+
+\begin{definition}[Moore space]\label{def:moore-space}
+For an abelian group $G$ and $n \geq 2$, a \emph{Moore space} $M(G, n)$ is a simply connected pointed type with
+\[
+  H_k(M(G, n)) \cong \begin{cases} G & \text{if } k = n, \\ 0 & \text{if } k \neq 0, n. \end{cases}
+\]
+\end{definition}
+
+Moore spaces are dual to Eilenberg--MacLane spaces in the sense that they are characterized by homology rather than homotopy.
+
+\subsection{Postnikov Towers and Obstruction Theory}\label{subsec:postnikov}
+
+\begin{definition}[Postnikov system]\label{def:postnikov}
+A \emph{Postnikov tower} for a pointed type $(X, x_0)$ is a sequence of fibrations
+\[
+  \cdots \to X_{n+1} \to X_n \to \cdots \to X_1 \to X_0
+\]
+together with maps $\varphi_n : X \to X_n$ such that:
+\begin{enumerate}
+  \item $\varphi_n$ induces an isomorphism $\pi_k(X) \xrightarrow{\cong} \pi_k(X_n)$ for $k \leq n$;
+  \item $\pi_k(X_n) = 0$ for $k > n$;
+  \item each fiber $F_n$ of $X_{n+1} \to X_n$ is a $K(\pi_{n+1}(X), n+1)$.
+\end{enumerate}
+\end{definition}
+
+The Postnikov tower decomposes a type into its homotopy-group layers. Each stage $X_n$ captures all homotopy information up to dimension~$n$, and the $k$-invariants---cohomology classes characterizing the successive extensions---provide a complete algebraic description.
+
+\begin{theorem}[Obstruction theory]\label{thm:obstruction}
+Let $f_n : Y \to X_n$ be a lift of a map $f : Y \to X_0$ through the first $n$ Postnikov stages. The obstruction to extending $f_n$ to a lift $f_{n+1} : Y \to X_{n+1}$ is a cohomology class
+\[
+  \theta_{n+1}(f_n) \;\in\; H^{n+2}(Y;\, \pi_{n+1}(X)).
+\]
+The lift $f_{n+1}$ exists if and only if $\theta_{n+1}(f_n) = 0$.
+\end{theorem}
+
+\subsection{Whitehead's Theorem}\label{subsec:whitehead}
+
+\begin{definition}[Weak equivalence]\label{def:weak-equiv}
+A map $f : A \to B$ is a \emph{weak equivalence} if:
+\begin{enumerate}
+  \item $f$ is surjective: for every $b : B$, there exists $a : A$ with $f(a) = b$;
+  \item $f$ induces isomorphisms on all homotopy groups: for every $n \geq 0$ and every basepoint $a : A$, the induced map $f_* : \pi_n(A, a) \xrightarrow{\cong} \pi_n(B, f(a))$ is an equivalence.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Whitehead]\label{thm:whitehead}
+A weak equivalence $f : A \to B$ between CW complexes (or, in the type-theoretic setting, between types with suitable structure) is a homotopy equivalence: there exists $g : B \to A$ with $g \circ f \sim \mathrm{id}_A$ and $f \circ g \sim \mathrm{id}_B$.
+\end{theorem}
+
+In the computational-paths formalization, Whitehead's theorem is packaged as a structure $\mathsf{WhiteheadEquiv}(f)$ that extends the weak equivalence data with a quasi-inverse---a function $g$ together with computational paths witnessing the homotopies $g \circ f \sim \mathrm{id}$ and $f \circ g \sim \mathrm{id}$.
+
+\begin{corollary}\label{cor:whitehead-pi1}
+If $f : A \to B$ is a weak equivalence, then $f$ induces an isomorphism on $\pi_1$. In particular, the $\pi_1$-equivalence from the weak equivalence data provides a $\mathsf{SimpleEquiv}$ between $\pi_1(A, a)$ and $\pi_1(B, f(a))$.
+\end{corollary}
+
+\subsection{Suspension, Freudenthal, and Stable Homotopy}\label{subsec:freudenthal}
+
+\begin{definition}[Suspension map on loop spaces]\label{def:suspension-map}
+For a pointed type $(X, x_0)$, the \emph{suspension map} is
+\[
+  \sigma : \Omega(X, x_0) \to \Omega(\Sigma X, \mathsf{north}), \qquad \sigma(\ell) = \mathsf{merid}(x_0) \cdot \mathsf{merid}(x_0)^{-1},
+\]
+which sends a loop in $X$ to the base loop at the north pole of the suspension $\Sigma X$. At the $\pi_n$ level, this induces a homomorphism
+\[
+  \sigma_* : \pi_n(X, x_0) \to \pi_{n+1}(\Sigma X, \mathsf{north}).
+\]
+\end{definition}
+
+\begin{theorem}[Freudenthal suspension theorem]\label{thm:freudenthal}
+If $X$ is $k$-connected (i.e., $\pi_j(X) = 0$ for $j \leq k$), then the suspension map
+\[
+  \sigma_* : \pi_n(X) \to \pi_{n+1}(\Sigma X)
+\]
+is an isomorphism for $n < 2k + 1$ and a surjection for $n = 2k + 1$.
+\end{theorem}
+
+The Freudenthal theorem is the gateway to stable homotopy theory: repeated suspension eventually stabilizes the homotopy groups.
+
+\begin{definition}[Stable homotopy groups]\label{def:stable-homotopy}
+The \emph{$k$-th stable homotopy group of spheres} is
+\[
+  \pi_k^s = \varinjlim_{n \to \infty} \pi_{n+k}(S^n),
+\]
+where the colimit is taken along the suspension maps $\sigma_* : \pi_{n+k}(S^n) \to \pi_{n+k+1}(S^{n+1})$. By Freudenthal, this colimit stabilizes for $n > k + 1$.
+\end{definition}
+
+\begin{proposition}[Low-dimensional stable stems]\label{prop:stable-stems}
+The first several stable homotopy groups of spheres are:
+\[
+\begin{array}{c|ccccccccc}
+  k & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\ \hline
+  \pi_k^s & \mathbb{Z} & \mathbb{Z}/2 & \mathbb{Z}/2 & \mathbb{Z}/24 & 0 & 0 & \mathbb{Z}/2 & \mathbb{Z}/240 & (\mathbb{Z}/2)^2
+\end{array}
+\]
+\end{proposition}
+
+\subsection{Spectral Sequences}\label{subsec:spectral}
+
+Spectral sequences provide a systematic method for computing homotopy and homology groups of complex spaces from simpler data.
+
+\begin{definition}[Spectral sequence]\label{def:spectral-seq}
+A \emph{spectral sequence} is a sequence of \emph{pages} $(E_r^{p,q}, d_r)_{r \geq 0}$, where:
+\begin{itemize}
+  \item Each $E_r^{p,q}$ is a pointed set (typically a group);
+  \item Each $d_r : E_r^{p,q} \to E_r^{p,q}$ is a differential satisfying $d_r \circ d_r = 0$;
+  \item The $(r+1)$-th page is obtained as the homology of the $r$-th page: $E_{r+1} = H(E_r, d_r)$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Degeneration]\label{def:degeneration}
+A spectral sequence \emph{degenerates} at page $r_0$ if $d_r = 0$ for all $r \geq r_0$, so that $E_{r_0} = E_{r_0 + 1} = \cdots = E_\infty$.
+\end{definition}
+
+\begin{definition}[Convergence]\label{def:convergence}
+A spectral sequence \emph{converges} to a graded object $H^*$ if there exists a filtration of $H^*$ whose successive quotients are the $E_\infty$ terms.
+\end{definition}
+
+In the computational-paths formalization, spectral sequences are constructed from filtered pointed sets. The zero-th page $E_0$ is read off from the filtration pieces, and the connecting maps between pages are packaged as pointed-set morphisms.
+
+\begin{theorem}[Convergence for degenerate sequences]\label{thm:spectral-convergence}
+If a spectral sequence degenerates at page $r_0$ (i.e., all differentials on page $r_0$ and beyond are trivial), then the spectral sequence converges: the $E_\infty$ page equals $E_{r_0}$.
+\end{theorem}
+
+\begin{proof}
+If all differentials are zero from page $r_0$ onward, then each subsequent page is isomorphic to the previous one (the homology of a complex with zero differential is the complex itself). Hence $E_{r_0} = E_{r_0+1} = \cdots = E_\infty$.
+\end{proof}
+
+\begin{definition}[Morphism of spectral sequences]\label{def:spectral-morphism}
+A \emph{morphism} $\Phi : E \to F$ between spectral sequences consists of maps $\Phi_r^{p,q} : E_r^{p,q} \to F_r^{p,q}$ on each page that commute with the differentials:
+\[
+  \Phi_r \circ d_r^E = d_r^F \circ \Phi_r.
+\]
+\end{definition}
+
+\paragraph{Adams spectral sequence.}
+The Adams spectral sequence is the principal tool for computing stable homotopy groups. Its $E_2$ page is
+\[
+  E_2^{s,t} = \mathrm{Ext}^{s,t}_{\mathcal{A}}(\mathbb{F}_p, \mathbb{F}_p),
+\]
+where $\mathcal{A}$ is the Steenrod algebra and $\mathrm{Ext}$ is computed in the category of $\mathcal{A}$-modules. The spectral sequence converges to the $p$-completed stable homotopy groups $\pi_*^s \otimes \hat{\mathbb{Z}}_p$. The low-dimensional stable stems listed in Proposition~\ref{prop:stable-stems} are computed via this machinery.
+
+\subsection{Survey of Further Results}\label{subsec:survey}
+
+The computational-paths formalization includes scaffolding for a range of additional topics in algebraic topology and homotopy theory. We briefly enumerate the principal results, indicating their status:
+
+\paragraph{K-theory.}
+Algebraic and topological K-theory are formalized via vector bundle classification. The Grothendieck group $K_0(X)$ of virtual vector bundles, the higher K-groups $K_n(X)$, and Bott periodicity $K_n(X) \cong K_{n+2}(X)$ are recorded.
+
+\paragraph{Characteristic classes.}
+Stiefel--Whitney classes $w_i \in H^i(X; \mathbb{Z}/2)$, Chern classes $c_i \in H^{2i}(X; \mathbb{Z})$, and Pontryagin classes $p_i \in H^{4i}(X; \mathbb{Z})$ are defined as characteristic classes of vector bundles, with their naturality and Whitney sum formulas.
+
+\paragraph{Operads and $A_\infty$-algebras.}
+The path algebra structure gives rise to an operad whose algebras are $A_\infty$-spaces. The recognition principle connects $n$-fold loop spaces with $E_n$-algebras.
+
+\paragraph{Rational homotopy theory.}
+The rationalization of homotopy groups $\pi_n(X) \otimes \mathbb{Q}$ is formalized, along with the connection to Sullivan's commutative differential graded algebras.
+
+\paragraph{Chromatic homotopy theory.}
+The chromatic filtration of the stable homotopy category---organized by height of formal group laws---is recorded, including Morava K-theories $K(n)$ and the thick subcategory theorem.
+
+\paragraph{Topological Hochschild homology.}
+$\mathrm{THH}(R)$ for ring spectra $R$ is defined via the cyclic bar construction, connecting to trace methods in algebraic K-theory.
+
+\paragraph{Goodwillie calculus.}
+The Taylor tower of a functor $F : \mathsf{Type}_* \to \mathsf{Type}_*$, with polynomial approximations $P_nF$ and layers $D_nF$, is formalized.
+
+\paragraph{Higher topos theory.}
+The formalization records the basic framework of $(\infty, 1)$-categories: Kan complexes, quasi-categories, and the nerve--realization adjunction, connecting the computational-paths approach to the broader landscape of higher categorical structures.
+
+\begin{remark}\label{rem:formalization-scope}
+The topics surveyed above range from fully formalized (fundamental groups, covering spaces, exact sequences) to partially scaffolded (spectral sequences, K-theory). In each case, the computational-paths framework provides the type-theoretic substrate: definitions are stated in terms of $\mathrm{Path}$, $\mathrm{RwEq}$, and $\pi_n$, and properties are witnessed by computational path constructions. The scaffolded results indicate the framework's extensibility and suggest directions for future complete formalization.
+\end{remark}

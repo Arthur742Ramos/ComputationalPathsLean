@@ -1,0 +1,277 @@
+%% ============================================================================
+%% Chapter 6: Fundamental Groups and Loop Spaces
+%% Part II of "The Algebra of Computational Paths"
+%% ============================================================================
+
+\section{Fundamental Groups and Loop Spaces}\label{sec:fundamental-groups}
+
+With the algebraic and higher-dimensional foundations established in Part~I, we now turn to the homotopy-theoretic applications of computational paths. The central notion is the \emph{fundamental group}, which captures the structure of loops in a type up to rewrite equivalence. Throughout Part~II, we work with the computational path structure $\mathrm{Path}_A(a,b)$ carrying explicit rewrite traces, modulo the rewrite equality $\mathrm{RwEq}$ developed in Chapter~3.
+
+\subsection{Loop Spaces}\label{subsec:loop-spaces}
+
+\begin{definition}[Loop space]\label{def:loop-space}
+Let $A$ be a type and $a : A$ a basepoint. The \emph{loop space} of $A$ at $a$ is
+\[
+  \Omega(A, a) \;=\; \mathrm{Path}_A(a, a),
+\]
+the type of computational paths from $a$ to itself. The loop space carries three fundamental operations:
+\begin{itemize}
+  \item \emph{Composition}: $\mathsf{comp}(p, q) = \mathsf{trans}(p, q)$ for $p, q : \Omega(A, a)$;
+  \item \emph{Identity}: $\mathsf{id} = \mathsf{refl}(a)$;
+  \item \emph{Inversion}: $\mathsf{inv}(p) = \mathsf{symm}(p)$.
+\end{itemize}
+\end{definition}
+
+By Theorem~2.4 (the monoid laws for computational paths), composition in $\Omega(A,a)$ is strictly associative: for all $p, q, r : \Omega(A,a)$,
+\[
+  \mathsf{comp}(\mathsf{comp}(p, q), r) \;=\; \mathsf{comp}(p, \mathsf{comp}(q, r)),
+\]
+and $\mathsf{refl}(a)$ is a strict two-sided unit. Thus $\Omega(A,a)$ is a monoid in the strict sense. However, inverse laws hold only up to rewrite equality: $\mathsf{comp}(p, \mathsf{inv}(p)) \not= \mathsf{refl}(a)$ as path structures (since the traces differ), but $\mathrm{RwEq}(\mathsf{comp}(p, \mathsf{inv}(p)),\, \mathsf{refl}(a))$ holds by Rules~5 and~6 of the $\mathrm{LND_{EQ}}$-TRS.
+
+\begin{definition}[Loop quotient]\label{def:loop-quotient}
+The \emph{loop quotient} at basepoint $a$ is
+\[
+  \mathrm{LoopQuot}(A, a) \;=\; \mathrm{PathRwQuot}(A, a, a) \;=\; \mathrm{Path}_A(a, a) \;/\; \mathrm{RwEq}.
+\]
+The operations of $\Omega(A,a)$ descend to the quotient:
+\begin{align*}
+  \mathsf{comp}\bigl([p], [q]\bigr) &= [\mathsf{trans}(p, q)], \\
+  \mathsf{inv}\bigl([p]\bigr) &= [\mathsf{symm}(p)], \\
+  \mathsf{id} &= [\mathsf{refl}(a)].
+\end{align*}
+These are well-defined by the congruence property of $\mathrm{RwEq}$ (Theorem~3.6).
+\end{definition}
+
+\subsection{The Fundamental Group}\label{subsec:fundamental-group}
+
+\begin{definition}[Fundamental group]\label{def:pi-one}
+The \emph{fundamental group} of a type $A$ at basepoint $a$ is
+\[
+  \pi_1(A, a) \;=\; \mathrm{LoopQuot}(A, a)
+\]
+equipped with group multiplication $[p] \cdot [q] = [\mathsf{trans}(p, q)]$, identity element $e = [\mathsf{refl}(a)]$, and inversion $[p]^{-1} = [\mathsf{symm}(p)]$.
+\end{definition}
+
+\begin{theorem}[Group axioms]\label{thm:pi1-group}
+$\pi_1(A, a)$ is a group: the following identities hold as strict equalities on the quotient.
+\begin{enumerate}
+  \item \emph{Associativity}: $(\alpha \cdot \beta) \cdot \gamma = \alpha \cdot (\beta \cdot \gamma)$ for all $\alpha, \beta, \gamma : \pi_1(A,a)$.
+  \item \emph{Left identity}: $e \cdot \alpha = \alpha$.
+  \item \emph{Right identity}: $\alpha \cdot e = \alpha$.
+  \item \emph{Left inverse}: $\alpha^{-1} \cdot \alpha = e$.
+  \item \emph{Right inverse}: $\alpha \cdot \alpha^{-1} = e$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Associativity on the quotient follows from the strict associativity of $\mathsf{trans}$ on computational paths (Theorem~2.4(iii)). The identity laws follow from the corresponding $\mathrm{RwEq}$ witnesses: $\mathrm{RwEq}(\mathsf{trans}(\mathsf{refl}(a), p),\, p)$ and $\mathrm{RwEq}(\mathsf{trans}(p, \mathsf{refl}(a)),\, p)$, which are provided by Rules~3 and~4. The inverse laws use Rules~5 and~6: $\mathrm{RwEq}(\mathsf{trans}(p, \mathsf{symm}(p)),\, \mathsf{refl}(a))$ and $\mathrm{RwEq}(\mathsf{trans}(\mathsf{symm}(p), p),\, \mathsf{refl}(a))$. Since $\mathrm{RwEq}$ is exactly the kernel of the quotient map, these witnesses yield strict equalities in $\mathrm{LoopQuot}(A,a)$.
+\end{proof}
+
+Several additional identities follow from the group structure:
+
+\begin{corollary}\label{cor:pi1-identities}
+For all $\alpha, \beta : \pi_1(A, a)$:
+\begin{enumerate}
+  \item $e^{-1} = e$.
+  \item $(\alpha^{-1})^{-1} = \alpha$.
+  \item $(\alpha \cdot \beta)^{-1} = \beta^{-1} \cdot \alpha^{-1}$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+(1) follows from $e^{-1} \cdot e = e$ and right cancellation. (2) follows from $\mathrm{RwEq}(\mathsf{symm}(\mathsf{symm}(p)),\, p)$ (Rule~2). (3) follows from $\mathrm{RwEq}(\mathsf{symm}(\mathsf{trans}(p, q)),\, \mathsf{trans}(\mathsf{symm}(q), \mathsf{symm}(p)))$ (Rule~7).
+\end{proof}
+
+The strict group structure also supports cancellation lemmas that are essential for later algebraic computations:
+
+\begin{lemma}[Cancellation]\label{lem:cancellation}
+In $\pi_1(A, a)$:
+\begin{enumerate}
+  \item \emph{Right cancellation}: if $\alpha \cdot \gamma = \beta \cdot \gamma$, then $\alpha = \beta$.
+  \item \emph{Left cancellation}: if $\alpha \cdot \beta = \alpha \cdot \gamma$, then $\beta = \gamma$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+For right cancellation, compose both sides with $\gamma^{-1}$ on the right and apply associativity and the inverse law. Left cancellation is analogous.
+\end{proof}
+
+\subsection{Functoriality}\label{subsec:pi1-functoriality}
+
+\begin{theorem}[Induced homomorphism]\label{thm:induced-hom}
+A based map $f : (A, a) \to (B, b)$ (i.e., a function $f : A \to B$ with $f(a) = b$) induces a group homomorphism
+\[
+  f_* : \pi_1(A, a) \to \pi_1(B, b)
+\]
+defined on representatives by $f_*([p]) = [\mathsf{congrArg}(f, p)]$.
+\end{theorem}
+
+\begin{proof}
+Well-definedness: if $\mathrm{RwEq}(p, q)$, then $\mathrm{RwEq}(\mathsf{congrArg}(f, p),\, \mathsf{congrArg}(f, q))$ by Theorem~3.6. The map is a homomorphism because $\mathsf{congrArg}$ is functorial (Theorem~2.8):
+\[
+  f_*(\alpha \cdot \beta) = [\mathsf{congrArg}(f, \mathsf{trans}(p, q))] = [\mathsf{trans}(\mathsf{congrArg}(f, p), \mathsf{congrArg}(f, q))] = f_*(\alpha) \cdot f_*(\beta).
+\]
+Identity preservation follows from $\mathsf{congrArg}(f, \mathsf{refl}(a)) = \mathsf{refl}(f(a))$.
+\end{proof}
+
+\begin{theorem}[Functoriality]\label{thm:pi1-functor}
+The fundamental group construction is functorial:
+\begin{enumerate}
+  \item $(\mathrm{id}_A)_* = \mathrm{id}_{\pi_1(A,a)}$.
+  \item For $f : (A, a) \to (B, b)$ and $g : (B, b) \to (C, c)$, $(g \circ f)_* = g_* \circ f_*$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(1) follows from $\mathsf{congrArg}(\mathrm{id}, p) = p$. (2) follows from $\mathsf{congrArg}(g \circ f, p) = \mathsf{congrArg}(g, \mathsf{congrArg}(f, p))$, both of which hold as equalities of computational paths.
+\end{proof}
+
+\begin{theorem}[Product formula]\label{thm:pi1-product}
+For types $A$ and $B$ with basepoints $a : A$ and $b : B$,
+\[
+  \pi_1(A \times B, (a, b)) \;\cong\; \pi_1(A, a) \times \pi_1(B, b).
+\]
+\end{theorem}
+
+\begin{proof}
+The isomorphism is given by encoding and decoding maps at the quotient level:
+\begin{align*}
+  \Phi &: \pi_1(A \times B, (a,b)) \to \pi_1(A,a) \times \pi_1(B,b), & \Phi([\gamma]) &= ([\mathsf{fst}(\gamma)],\, [\mathsf{snd}(\gamma)]); \\
+  \Psi &: \pi_1(A,a) \times \pi_1(B,b) \to \pi_1(A \times B, (a,b)), & \Psi([\alpha], [\beta]) &= [\mathsf{prodMk}(\alpha, \beta)].
+\end{align*}
+Well-definedness of $\Phi$ holds because projection preserves $\mathrm{RwEq}$: if $\mathrm{RwEq}(\gamma_1, \gamma_2)$ then $\mathrm{RwEq}(\mathsf{fst}(\gamma_1), \mathsf{fst}(\gamma_2))$, and similarly for $\mathsf{snd}$. Well-definedness of $\Psi$ holds because $\mathsf{prodMk}$ preserves $\mathrm{RwEq}$ in each component.
+
+The round-trip $\Phi \circ \Psi = \mathrm{id}$ follows from the product $\beta$-rules (Theorem~2.13):
+\[
+  \mathsf{fst}(\mathsf{prodMk}(p, q)) = p, \qquad \mathsf{snd}(\mathsf{prodMk}(p, q)) = q.
+\]
+The round-trip $\Psi \circ \Phi = \mathrm{id}$ follows from the product $\eta$-rule:
+\[
+  \mathrm{RwEq}\bigl(\mathsf{prodMk}(\mathsf{fst}(\gamma), \mathsf{snd}(\gamma)),\, \gamma\bigr).
+\]
+Both $\Phi$ and $\Psi$ are homomorphisms: $\Phi$ preserves multiplication because $\mathsf{fst}$ and $\mathsf{snd}$ distribute over $\mathsf{trans}$ (by the congruence rules), and $\Psi$ preserves multiplication because $\mathsf{prodMk}$ distributes over $\mathsf{trans}$ componentwise.
+\end{proof}
+
+\subsection{Iterated Loop Spaces and Higher Homotopy Groups}\label{subsec:higher-homotopy}
+
+\begin{definition}[Iterated loop space]\label{def:iterated-loop}
+The \emph{$n$-fold iterated loop space} is defined recursively:
+\begin{align*}
+  \Omega^0(A, a) &= A, \\
+  \Omega^{n+1}(A, a) &= \Omega(\Omega^n(A, a),\, \mathsf{pt}_n),
+\end{align*}
+where $\mathsf{pt}_0 = a$ and $\mathsf{pt}_{n+1} = \mathsf{refl}(\mathsf{pt}_n)$.
+\end{definition}
+
+\begin{definition}[Higher homotopy groups]\label{def:pi-n}
+The \emph{$n$-th homotopy group} is
+\[
+  \pi_n(A, a) = \pi_0(\Omega^n(A, a)),
+\]
+where $\pi_0$ denotes path-connected components (the quotient by the relation of being connected by a path). For $n \geq 1$, this coincides with $\mathrm{LoopQuot}(\Omega^{n-1}(A, a),\, \mathsf{pt}_{n-1})$.
+\end{definition}
+
+The group operations on $\pi_n(A,a)$ for $n \geq 1$ are inherited from the loop space structure of $\Omega^n(A,a)$: composition in $\Omega^n$ descends to multiplication in $\pi_n$, reflexivity gives the identity, and symmetry gives inversion.
+
+\begin{theorem}[Eckmann--Hilton]\label{thm:eckmann-hilton}
+For $n \geq 2$, the group $\pi_n(A, a)$ is abelian.
+\end{theorem}
+
+\begin{proof}
+The double loop space $\Omega^2(A, a)$ admits two composition operations:
+\begin{itemize}
+  \item \emph{Vertical composition} $\alpha \circ_v \beta$: sequential concatenation of derivations;
+  \item \emph{Horizontal composition} $\alpha \circ_h \beta$: defined via whiskering,
+  \[
+    \alpha \circ_h \beta \;=\; (\alpha \triangleright_R \mathsf{refl}(a)) \circ_v (\mathsf{refl}(a) \triangleleft_L \beta),
+  \]
+  where $\triangleright_R$ and $\triangleleft_L$ denote right and left whiskering.
+\end{itemize}
+
+The proof proceeds in three steps, each witnessed by a 3-cell (an element of $\mathrm{Derivation}_3$):
+
+\medskip
+\noindent\textbf{Step 1} (Whiskering by $\mathsf{refl}$ is trivial). Since $\mathsf{trans}(\mathsf{refl}(a), \mathsf{refl}(a))$ reduces definitionally to $\mathsf{refl}(a)$ in the computational-paths framework, left and right whiskering by $\mathsf{refl}(a)$ act as the identity on $\Omega^2$-elements. More precisely, for $\alpha : \Omega^2(A,a)$:
+\begin{align*}
+  \alpha \triangleright_R \mathsf{refl}(a) &\equiv_3 \alpha, \\
+  \mathsf{refl}(a) \triangleleft_L \alpha &\equiv_3 \alpha,
+\end{align*}
+where $\equiv_3$ denotes the existence of a connecting $\mathrm{Derivation}_3$ cell.
+
+\medskip
+\noindent\textbf{Step 2} (Horizontal equals vertical). Combining the whiskering triviality:
+\[
+  \alpha \circ_h \beta \;=\; (\alpha \triangleright_R \mathsf{refl}) \circ_v (\mathsf{refl} \triangleleft_L \beta) \;\equiv_3\; \alpha \circ_v \beta.
+\]
+
+\medskip
+\noindent\textbf{Step 3} (Commutativity via interchange). The interchange law (Theorem~5.3, realized by the primitive 3-cell $\mathsf{MetaStep}_3.\mathsf{interchange}$) states
+\[
+  (\alpha \triangleright_R g) \circ_v (f' \triangleleft_L \beta) \;\equiv_3\; (f \triangleleft_L \beta) \circ_v (\alpha \triangleright_R g').
+\]
+Specializing $f = f' = g = g' = \mathsf{refl}(a)$ and combining with Step~2:
+\[
+  \alpha \circ_v \beta \;\equiv_3\; \alpha \circ_h \beta \;\equiv_3\; \alpha \circ_h' \beta \;\equiv_3\; \beta \circ_v \alpha,
+\]
+where $\circ_h'$ denotes the alternative horizontal composition (left-whisker first, then right-whisker). Since $\equiv_3$-related derivations yield the same $\mathrm{RwEq}$ witness (by proof irrelevance at level~3), this gives strict commutativity in $\pi_2(A,a)$ and, by iteration, in $\pi_n(A,a)$ for all $n \geq 2$.
+\end{proof}
+
+\begin{remark}\label{rem:pi1-nonabelian}
+The Eckmann--Hilton argument does \emph{not} apply to $\pi_1$. This is essential: non-abelian fundamental groups, such as $\pi_1(S^1 \vee S^1) \cong \mathbb{Z} * \mathbb{Z}$, constitute key examples developed in Chapter~7.
+\end{remark}
+
+\subsection{The Fundamental Groupoid}\label{subsec:fundamental-groupoid}
+
+While $\pi_1(A, a)$ depends on a choice of basepoint, the \emph{fundamental groupoid} captures the path structure of $A$ in a basepoint-free manner.
+
+\begin{definition}[Fundamental groupoid]\label{def:fundamental-groupoid}
+The \emph{fundamental groupoid} $\Pi_1(A)$ of a type $A$ is the strict groupoid with:
+\begin{itemize}
+  \item \emph{Objects}: points $a : A$;
+  \item \emph{Morphisms}: $\mathrm{Hom}_{\Pi_1(A)}(a, b) = \mathrm{PathRwQuot}(A, a, b)$;
+  \item \emph{Composition}: induced by $\mathsf{trans}$;
+  \item \emph{Identity}: $\mathrm{id}_a = [\mathsf{refl}(a)]$;
+  \item \emph{Inverse}: induced by $\mathsf{symm}$.
+\end{itemize}
+All groupoid axioms (associativity, unit laws, inverse laws) hold strictly on the quotient by Theorem~3.15.
+\end{definition}
+
+\begin{theorem}[Basepoint independence]\label{thm:basepoint-independence}
+For any path $p : \mathrm{Path}_A(a, b)$, conjugation by $[p]$ induces a group isomorphism
+\[
+  \varphi_p : \pi_1(A, a) \xrightarrow{\;\cong\;} \pi_1(A, b), \qquad \varphi_p(\alpha) = [p]^{-1} \cdot \alpha \cdot [p].
+\]
+\end{theorem}
+
+\begin{proof}
+The map $\varphi_p$ is a homomorphism:
+\[
+  \varphi_p(\alpha \cdot \beta) = [p]^{-1} \cdot \alpha \cdot \beta \cdot [p] = [p]^{-1} \cdot \alpha \cdot [p] \cdot [p]^{-1} \cdot \beta \cdot [p] = \varphi_p(\alpha) \cdot \varphi_p(\beta),
+\]
+using the insertion of $[p] \cdot [p]^{-1} = e$. The map $\varphi_{\mathsf{symm}(p)}$ provides a two-sided inverse.
+\end{proof}
+
+\begin{theorem}[Functoriality of the fundamental groupoid]\label{thm:groupoid-functor}
+A function $f : A \to B$ induces a groupoid functor
+\[
+  \Pi_1(f) : \Pi_1(A) \to \Pi_1(B)
+\]
+defined on objects by $\Pi_1(f)(a) = f(a)$ and on morphisms by $\Pi_1(f)([\gamma]) = [\mathsf{congrArg}(f, \gamma)]$. This construction is functorial:
+\begin{enumerate}
+  \item $\Pi_1(\mathrm{id}_A) = \mathrm{id}_{\Pi_1(A)}$.
+  \item $\Pi_1(g \circ f) = \Pi_1(g) \circ \Pi_1(f)$.
+\end{enumerate}
+Natural transformations between induced functors correspond to paths: if $h : \mathrm{Path}_B(f(a), g(a))$ for all $a$, then $\Pi_1(f) \Rightarrow \Pi_1(g)$.
+\end{theorem}
+
+\begin{proof}
+Well-definedness and functoriality follow from the functoriality of $\mathsf{congrArg}$ (Theorem~2.8) and its compatibility with $\mathrm{RwEq}$ (Theorem~3.6). For the naturality claim, given paths $h_a : \mathrm{Path}(f(a), g(a))$, the naturality square
+\[
+  [\mathsf{congrArg}(g, \gamma)] \cdot [h_b]^{-1} = [h_a]^{-1} \cdot [\mathsf{congrArg}(f, \gamma)]
+\]
+holds in $\Pi_1(B)$ because both sides, lifted to paths, are connected by $\mathrm{RwEq}$.
+\end{proof}
+
+\begin{remark}\label{rem:pi1-automorphism}
+The fundamental group $\pi_1(A, a)$ is recovered as the automorphism group $\mathrm{Aut}_{\Pi_1(A)}(a) = \mathrm{Hom}_{\Pi_1(A)}(a, a)$. Path-connectedness of $A$ corresponds to connectedness of $\Pi_1(A)$ as a category: for every pair of objects, the morphism set is non-empty. Simple-connectedness corresponds to codiscreteness: every morphism set is a singleton.
+\end{remark}

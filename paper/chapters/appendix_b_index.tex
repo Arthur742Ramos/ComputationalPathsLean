@@ -1,0 +1,161 @@
+% ============================================================================
+% Appendix B: Index of Definitions and Theorems
+% ============================================================================
+\chapter{Index of Definitions and Theorems}
+\label{app:index}
+
+The following table maps the principal definitions and theorems in this
+paper to their corresponding locations in the Lean~4 formalization.
+Module paths are relative to the root namespace
+\texttt{ComputationalPaths}.
+
+\section*{Part I: Foundations}
+
+\small
+\begin{longtable}{p{3.8cm}p{2.5cm}p{5.5cm}}
+\toprule
+\textbf{Paper Reference} & \textbf{Type} & \textbf{Lean Module / Name} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Paper Reference} & \textbf{Type} & \textbf{Lean Module / Name} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\multicolumn{3}{l}{\textbf{Chapter 1: Introduction}} \\
+\cmidrule(l){1-3}
+Def.~\ref{def:step} (Step) & structure & \texttt{Path.Basic.ElemStep} \\
+Def.~\ref{def:path} (Path) & structure & \texttt{Path.Basic.Path} \\
+Def.~\ref{def:toEq} (toEq) & def & \texttt{Path.Basic.Path.toEq} \\
+Def.~\ref{def:ofEq} (ofEq) & def & \texttt{Path.Basic.Path.ofEq} \\
+Thm.~\ref{thm:non-uip} (Non-UIP) & theorem & \texttt{Path.Basic.Path.nonUIP} \\
+\midrule
+
+\multicolumn{3}{l}{\textbf{Chapter 2: Basic Constructions}} \\
+\cmidrule(l){1-3}
+Def.~2.3 (refl, symm, trans) & def & \texttt{Path.Basic.Path.refl/symm/trans} \\
+Thm.~2.4 (Monoid laws) & theorem & \texttt{Path.Basic.trans\_assoc}, etc. \\
+Thm.~2.5 (Involution) & theorem & \texttt{Path.Basic.symm\_symm} \\
+Thm.~2.6 (Anti-homomorphism) & theorem & \texttt{Path.Basic.symm\_trans} \\
+Def.~2.7 (congrArg) & def & \texttt{Path.Basic.Congruence.congrArg} \\
+Thm.~2.8 (Functoriality) & theorem & \texttt{Path.Basic.Congruence.congrArg\_trans} \\
+Def.~2.9 (Binary congr.) & def & \texttt{Path.Basic.Congruence.map2} \\
+Def.~2.10 (Transport) & def & \texttt{Path.Basic.Path.transport} \\
+Def.~2.12 (apd) & def & \texttt{Path.Basic.Path.apd} \\
+Thm.~2.13 (Product $\beta$/$\eta$) & theorem & \texttt{Path.Basic.Prod.*} \\
+Def.~2.17 (Context) & structure & \texttt{Path.Basic.Context.Context} \\
+Def.~2.18 (substLeft/Right) & def & \texttt{Path.Basic.Context.substLeft/Right} \\
+\midrule
+
+\multicolumn{3}{l}{\textbf{Chapter 3: The Rewrite System}} \\
+\cmidrule(l){1-3}
+Def.~\ref{def:step-rewrite} (Step relation) & inductive & \texttt{Path.Rewrite.Step.Step} \\
+Thm.~\ref{thm:step-sound} (Soundness) & theorem & \texttt{Path.Rewrite.Step.step\_toEq} \\
+Def.~\ref{def:rw} (Rw) & inductive & \texttt{Path.Rewrite.Rw.Rw} \\
+Def.~\ref{def:rweq} (RwEq) & inductive & \texttt{Path.Rewrite.RwEq.RwEq} \\
+Thm.~\ref{thm:rweq-congruence} (Congruence) & theorem & \texttt{Path.Rewrite.RwEq.rweq\_*} \\
+Def.~\ref{def:normal-form} (Normal form) & def & \texttt{Path.Rewrite.Normalization.normalize} \\
+Thm.~\ref{thm:normalization} (Normalization) & theorem & \texttt{Path.Rewrite.Normalization.*} \\
+Thm.~\ref{thm:termination} (Termination) & theorem & \texttt{Path.Rewrite.Termination.*} \\
+Thm.~\ref{thm:strip-lemma} (Strip lemma) & theorem & \texttt{Path.Rewrite.StripLemma.*} \\
+Thm.~\ref{thm:confluence} (Confluence) & theorem & \texttt{Path.Rewrite.Confluence.*} \\
+Def.~\ref{def:path-quot} (PathQuot) & def & \texttt{Path.Rewrite.Quot.PathRwQuot} \\
+Thm.~\ref{thm:quot-equiv} (Quotient equiv.) & theorem & \texttt{Path.Rewrite.SimpleEquiv.*} \\
+\midrule
+
+\multicolumn{3}{l}{\textbf{Chapter 4: The Groupoid}} \\
+\cmidrule(l){1-3}
+Def.~4.1 (WeakCategory) & structure & \texttt{Groupoid.WeakCategory} \\
+Thm.~4.2 (Canonical weak cat.) & theorem & \texttt{Groupoid.weakCategory\_of\_path} \\
+Def.~4.3 (WeakGroupoid) & structure & \texttt{Groupoid.WeakGroupoid} \\
+Thm.~4.4 (Type is weak gpd.) & theorem & \texttt{Groupoid.weakGroupoid\_of\_path} \\
+Thm.~4.5 (Strict quotient gpd.) & theorem & \texttt{Groupoid.strictGroupoid\_quot} \\
+Def.~4.6 (RewriteLift) & structure & \texttt{Groupoid.RewriteLift} \\
+\midrule
+
+\multicolumn{3}{l}{\textbf{Chapter 5: Higher-Dimensional Structure}} \\
+\cmidrule(l){1-3}
+Def.~\ref{def:two-cell} (Two-cell) & def & \texttt{HigherDimensional.TwoCell} \\
+Def.~\ref{def:globular-cell} (GlobularCell) & structure & \texttt{HigherDimensional.GlobularCell} \\
+Def.~\ref{def:derivation2} (Derivation$_2$) & inductive & \texttt{HigherDimensional.Derivation2} \\
+Def.~\ref{def:derivation3} (Derivation$_3$) & inductive & \texttt{HigherDimensional.Derivation3} \\
+Thm.~\ref{thm:contract3} (Contractibility $\ge 3$) & theorem & \texttt{HigherDimensional.contract3} \\
+Thm.~\ref{thm:omega-groupoid} ($\omega$-groupoid) & theorem & \texttt{HigherDimensional.omegaGroupoid} \\
+\end{longtable}
+
+\section*{Part II: Homotopy Theory}
+
+\small
+\begin{longtable}{p{3.8cm}p{2.5cm}p{5.5cm}}
+\toprule
+\textbf{Paper Reference} & \textbf{Type} & \textbf{Lean Module / Name} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Paper Reference} & \textbf{Type} & \textbf{Lean Module / Name} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\multicolumn{3}{l}{\textbf{Chapter 6: Fundamental Groups}} \\
+\cmidrule(l){1-3}
+Def.~\ref{def:loop-space} (Loop space) & def & \texttt{HomotopyTheory.LoopSpace} \\
+Def.~\ref{def:fundamental-group} ($\pi_1$) & def & \texttt{HomotopyTheory.PiOne} \\
+Thm.~\ref{thm:pi1-group} (Group axioms) & theorem & \texttt{HomotopyTheory.PiOne.group} \\
+Thm.~\ref{thm:induced-pi1} (Induced hom.) & theorem & \texttt{HomotopyTheory.PiOne.induced} \\
+Thm.~\ref{thm:pi1-product} (Product formula) & theorem & \texttt{HomotopyTheory.PiOne.prod\_iso} \\
+Thm.~\ref{thm:eckmann-hilton} (Eckmann--Hilton) & theorem & \texttt{HomotopyTheory.EckmannHilton} \\
+Def.~\ref{def:fundamental-groupoid} ($\Pi_1$) & structure & \texttt{HomotopyTheory.FundamentalGroupoid} \\
+\midrule
+
+\multicolumn{3}{l}{\textbf{Chapter 7: Spaces}} \\
+\cmidrule(l){1-3}
+Def.~\ref{def:circle} (Circle) & structure & \texttt{HomotopyTheory.Circle.CircleCompPath} \\
+Thm.~\ref{thm:pi1-circle} ($\pi_1(S^1) \cong \ZZ$) & theorem & \texttt{HomotopyTheory.Circle.pi1\_iso} \\
+Thm.~\ref{thm:pi1-torus} ($\pi_1(T^2)$) & theorem & \texttt{HomotopyTheory.Torus.pi1\_iso} \\
+Thm.~\ref{thm:pi1-figure-eight} ($\pi_1(S^1 \vee S^1)$) & theorem & \texttt{HomotopyTheory.FigureEight.pi1\_iso} \\
+Thm.~\ref{thm:svk} (Seifert--van Kampen) & theorem & \texttt{HomotopyTheory.VanKampen.svk} \\
+\midrule
+
+\multicolumn{3}{l}{\textbf{Chapter 8: Fibrations}} \\
+\cmidrule(l){1-3}
+Def.~\ref{def:fiber} (Fiber) & def & \texttt{Fibration.Fiber} \\
+Thm.~\ref{thm:path-lifting} (Path lifting) & theorem & \texttt{Fibration.pathLifting} \\
+Def.~\ref{def:covering-space} (Covering space) & structure & \texttt{Fibration.CoveringSpace} \\
+Def.~\ref{def:hopf} (Hopf fibration) & structure & \texttt{Fibration.Hopf.HopfData} \\
+Thm.~\ref{thm:les} (Long exact sequence) & theorem & \texttt{Fibration.LES.les} \\
+\midrule
+
+\multicolumn{3}{l}{\textbf{Chapter 9: Hurewicz Theorem}} \\
+\cmidrule(l){1-3}
+Def.~\ref{def:abelianization} (Abelianization) & def & \texttt{Homological.Abelianization} \\
+Def.~\ref{def:hurewicz-map} (Hurewicz map) & def & \texttt{Homological.Hurewicz.hurewiczMap} \\
+Thm.~\ref{thm:hurewicz} (Hurewicz theorem) & theorem & \texttt{Homological.Hurewicz.hurewicz\_iso} \\
+\midrule
+
+\multicolumn{3}{l}{\textbf{Chapter 10: Advanced}} \\
+\cmidrule(l){1-3}
+Def.~\ref{def:EM-space} (EM space) & structure & \texttt{Advanced.EilenbergMacLane} \\
+Def.~\ref{def:postnikov-tower} (Postnikov) & structure & \texttt{Advanced.Postnikov.Tower} \\
+Thm.~\ref{thm:whitehead} (Whitehead) & theorem & \texttt{Advanced.Whitehead.whitehead} \\
+Def.~\ref{def:spectral-seq} (Spectral seq.) & structure & \texttt{Advanced.SpectralSeq.Sequence} \\
+\midrule
+
+\multicolumn{3}{l}{\textbf{Chapter 11: Metatheory}} \\
+\cmidrule(l){1-3}
+Def.~\ref{def:pathexpr} (PathExpr) & inductive & \texttt{Path.Rewrite.PathExpr.PathExpr} \\
+Def.~\ref{def:pathexpr-eval} (Evaluation) & def & \texttt{Path.Rewrite.PathExpr.eval} \\
+Thm.~\ref{thm:pathexpr-confluence} (Expr conf.) & theorem & \texttt{Path.Rewrite.ExprConfluence.*} \\
+Thm.~\ref{thm:rweq-decidable} (Decidability) & theorem & \texttt{Path.Rewrite.Normalization.rweq\_dec} \\
+Def.~\ref{def:path-tactics} (Tactics) & tactic & \texttt{Path.Rewrite.PathTactic.*} \\
+\end{longtable}
+
+\normalsize
+\begin{remark}
+  Module names are indicative and may vary slightly across
+  formalization versions. The definitive module paths are recorded in the
+  \texttt{ComputationalPaths.lean} manifest file at the repository root.
+\end{remark}

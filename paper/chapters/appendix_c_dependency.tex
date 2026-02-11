@@ -1,0 +1,176 @@
+% ============================================================================
+% Appendix C: Dependency Graph
+% ============================================================================
+\chapter{Dependency Graph}
+\label{app:dependency}
+
+The formalization comprises 302 Lean~4 source files organized into a
+layered dependency structure. This appendix describes the principal
+layers and their inter-dependencies. A schematic representation is given
+in Figure~\ref{fig:dependency}.
+
+\section*{Layer 0: Basic Path Algebra}
+
+The foundation consists of the core path definitions and their algebraic
+laws:
+
+\begin{center}
+\small
+\begin{tabular}{lp{8cm}}
+\texttt{Path.Basic} & Path record type, elementary operations (refl,
+  symm, trans, ofEq, toEq), strict monoid/involution/anti-homomorphism
+  laws. \\
+\texttt{Path.Basic.Congruence} & Unary congruence (congrArg), binary
+  congruence (map2, mapLeft, mapRight), and functoriality theorems. \\
+\texttt{Path.Basic.Context} & Context, BiContext, DepContext,
+  DepBiContext structures and their substitution operations. \\
+\texttt{Path.Basic.Transport} & Transport, dependent application (apd),
+  and their laws. \\
+\texttt{Path.Basic.Prod} & Product type path operations and
+  $\beta$/$\eta$-rules. \\
+\texttt{Path.Basic.Sigma} & Sigma type path operations. \\
+\texttt{Path.Basic.Sum} & Sum type path operations. \\
+\texttt{Path.Basic.Fun} & Function type path operations (lamCongr,
+  app). \\
+\end{tabular}
+\end{center}
+
+\section*{Layer 1: The Rewrite System}
+
+Built on Layer~0, this layer contains the TRS infrastructure:
+
+\begin{center}
+\small
+\begin{tabular}{lp{8cm}}
+\texttt{Path.Rewrite.Step} & The 76-rule \texttt{Step} inductive type
+  and soundness proof. \\
+\texttt{Path.Rewrite.Rw} & Reflexive--transitive closure. \\
+\texttt{Path.Rewrite.RwEq} & Rewrite equality and all congruence
+  lemmas. \\
+\texttt{Path.Rewrite.LNDEQ} & Rule enumeration and mnemonic names. \\
+\texttt{Path.Rewrite.Normalization} & Normal forms. \\
+\texttt{Path.Rewrite.Termination} & Rule precedence and RPO. \\
+\texttt{Path.Rewrite.StripLemma} & Local confluence. \\
+\texttt{Path.Rewrite.Confluence*} & Global confluence and join
+  witnesses. \\
+\texttt{Path.Rewrite.PathExpr} & Syntactic path expressions. \\
+\texttt{Path.Rewrite.Quot} & The quotient $\PathQuot$. \\
+\texttt{Path.Rewrite.PathTactic} & Proof automation. \\
+\end{tabular}
+\end{center}
+
+\section*{Layer 2: Groupoid and Higher-Dimensional Structure}
+
+Built on Layers~0--1:
+
+\begin{center}
+\small
+\begin{tabular}{lp{8cm}}
+\texttt{Groupoid.*} & Weak and strict category/groupoid structures,
+  rewrite lifts, enriched and double groupoid, symmetric monoidal
+  structure. \\
+\texttt{HigherDimensional.*} & Globular tower, two-cells, Derivation$_2$
+  through Derivation$_4$ and DerivationHigh, contractibility theorems,
+  $\omega$-groupoid assembly. \\
+\end{tabular}
+\end{center}
+
+\section*{Layer 3: Homotopy Theory}
+
+Built on Layers~0--2:
+
+\begin{center}
+\small
+\begin{tabular}{lp{8cm}}
+\texttt{HomotopyTheory.LoopSpace} & Loop spaces, iterated loop spaces,
+  loop quotient, loop group. \\
+\texttt{HomotopyTheory.PiOne} & Fundamental group, induced
+  homomorphisms, functoriality. \\
+\texttt{HomotopyTheory.FundamentalGroupoid} & The fundamental groupoid
+  $\Pi_1(A)$. \\
+\texttt{HomotopyTheory.EckmannHilton} & The Eckmann--Hilton argument
+  and commutativity of $\pi_n$ for $n \ge 2$. \\
+\texttt{HomotopyTheory.Circle} & The computational circle and
+  $\pi_1(S^1) \cong \ZZ$. \\
+\texttt{HomotopyTheory.Torus} & The torus and its fundamental group. \\
+\texttt{HomotopyTheory.FigureEight} & The figure-eight, free products,
+  bouquets. \\
+\texttt{HomotopyTheory.VanKampen} & Seifert--van Kampen theorem. \\
+\texttt{HomotopyTheory.Suspension} & Suspensions, spheres,
+  Freudenthal. \\
+\texttt{HomotopyTheory.KleinBottle} & Klein bottle,
+  $\pi_1 \cong \ZZ \rtimes \ZZ$. \\
+\texttt{HomotopyTheory.LensSpace} & Lens spaces and projective
+  spaces. \\
+\end{tabular}
+\end{center}
+
+\section*{Layer 4: Fibrations and Exact Sequences}
+
+Built on Layers~0--3:
+
+\begin{center}
+\small
+\begin{tabular}{lp{8cm}}
+\texttt{Fibration.*} & Fiber, path lifting, fiber transport, fiber
+  sequences, covering spaces, Hopf fibration. \\
+\texttt{Fibration.LES} & Long exact sequence of homotopy groups. \\
+\texttt{Fibration.MayerVietoris} & Mayer--Vietoris sequence. \\
+\end{tabular}
+\end{center}
+
+\section*{Layer 5: Homological Algebra and Advanced Topics}
+
+Built on Layers~0--4:
+
+\begin{center}
+\small
+\begin{tabular}{lp{8cm}}
+\texttt{Homological.*} & Abelianization, commutators, Hurewicz map and
+  theorem, free groups, resolutions, Ext/Tor. \\
+\texttt{Advanced.*} & Eilenberg--MacLane spaces, Postnikov towers,
+  obstruction theory, Whitehead theorem, spectral sequences,
+  characteristic classes, operads, K-theory, stable homotopy. \\
+\end{tabular}
+\end{center}
+
+\section*{Dependency Diagram}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzcd}[column sep=small, row sep=large]
+  & \fbox{\texttt{Path.Basic}} \ar[dl] \ar[d] \ar[dr] & \\
+  \fbox{\texttt{Rewrite.Step}} \ar[d]
+  & \fbox{\texttt{Rewrite.PathExpr}} \ar[d]
+  & \fbox{\texttt{Basic.Context}} \ar[dl] \\
+  \fbox{\texttt{Rw $\to$ RwEq}} \ar[d] \ar[dr]
+  & \fbox{\texttt{ExprConfluence}} \ar[dl] & \\
+  \fbox{\texttt{Confluence}} \ar[d]
+  & \fbox{\texttt{Normalization}} \ar[l] & \\
+  \fbox{\texttt{Quot}} \ar[d] \ar[dr] & & \\
+  \fbox{\texttt{Groupoid}} \ar[d]
+  & \fbox{\texttt{HigherDimensional}} \ar[d] & \\
+  \fbox{\texttt{HomotopyTheory}} \ar[d] \ar[dr]
+  & \fbox{\texttt{$\omega$-Groupoid}} \ar[l] & \\
+  \fbox{\texttt{Fibration}} \ar[d]
+  & \fbox{\texttt{Spaces ($\pi_1$)}} \ar[l] & \\
+  \fbox{\texttt{Homological}} \ar[d] & & \\
+  \fbox{\texttt{Advanced}} & &
+\end{tikzcd}
+\caption{Schematic dependency graph of the formalization. Arrows point
+from dependency to dependent module. Boxes represent module groups.
+The foundational kernel (\texttt{Path.Basic} $\to$ \texttt{Rewrite}
+$\to$ \texttt{Quot}) is the critical path on which all subsequent
+development depends.}
+\label{fig:dependency}
+\end{figure}
+
+\begin{remark}
+  The dependency graph is acyclic by construction. The longest dependency
+  chain runs from \texttt{Path.Basic} through
+  \texttt{Rewrite} $\to$ \texttt{Groupoid} $\to$
+  \texttt{HigherDimensional} $\to$ \texttt{HomotopyTheory} $\to$
+  \texttt{Fibration} $\to$ \texttt{Homological} $\to$
+  \texttt{Advanced}, spanning all seven layers. Each layer adds new
+  mathematical content while depending only on the layers below.
+\end{remark}

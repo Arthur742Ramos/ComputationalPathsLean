@@ -1,0 +1,190 @@
+% ============================================================================
+% Chapter 4: The Groupoid of Computational Paths
+% ============================================================================
+\chapter{The Groupoid of Computational Paths}
+\label{ch:groupoid}
+
+Having established the rewrite system and its metatheoretic properties, we
+now show that the algebraic structure of computational paths gives rise to
+categorical structures: a \emph{weak} groupoid on the raw path space, a
+\emph{strict} groupoid on the quotient, and functorial transport of the
+entire rewrite structure.
+
+\section{Weak Category and Weak Groupoid}
+\label{sec:weak-groupoid}
+
+\begin{definition}[Weak Category]\label{def:weak-cat}
+  A \emph{weak category} on a type $A$ consists of:
+  \begin{itemize}
+    \item A composition $\mathrm{comp} : \Path_A(a,b) \to \Path_A(b,c) \to
+      \Path_A(a,c)$.
+    \item An identity $\mathrm{id} : (a : A) \to \Path_A(a,a)$.
+    \item Witnesses (in $\Rw$) of the associativity and unit laws:
+      \begin{align*}
+        &\mathrm{comp}(\mathrm{comp}(p, q), r) \rews
+          \mathrm{comp}(p, \mathrm{comp}(q, r)), \\
+        &\mathrm{comp}(\mathrm{id}(a), p) \rews p, \\
+        &\mathrm{comp}(p, \mathrm{id}(b)) \rews p.
+      \end{align*}
+  \end{itemize}
+\end{definition}
+
+\begin{theorem}\label{thm:type-weak-cat}
+  Every type $A$ carries a canonical weak category with
+  $\mathrm{comp} = \mathrm{trans}$ and $\mathrm{id} = \refl$. The unit
+  and associativity laws hold via single rewrite steps (hence a fortiori
+  via $\Rw$).
+\end{theorem}
+
+\begin{proof}
+  The three witnesses are provided by rules~\ref{rule:lrr} (left unit),
+  \ref{rule:rrr} (right unit), and \ref{rule:tt} (associativity) from
+  Group~I of the rewrite system.
+\end{proof}
+
+\begin{definition}[Weak Groupoid]\label{def:weak-gpd}
+  A \emph{weak groupoid} on $A$ extends a weak category with:
+  \begin{itemize}
+    \item An inversion $\mathrm{inv} : \Path_A(a,b) \to \Path_A(b,a)$.
+    \item Witnesses of the cancellation laws:
+      \begin{align*}
+        &\mathrm{comp}(\mathrm{inv}(p), p) \rews \mathrm{id}(b), \\
+        &\mathrm{comp}(p, \mathrm{inv}(p)) \rews \mathrm{id}(a).
+      \end{align*}
+  \end{itemize}
+\end{definition}
+
+\begin{theorem}\label{thm:type-weak-gpd}
+  Every type $A$ is a weak groupoid under computational paths, with
+  $\mathrm{inv} = \symop$.
+\end{theorem}
+
+\begin{proof}
+  The cancellation laws are provided by rules~\ref{rule:tsr}
+  ($\inv{p} \comp p \rew \refl(b)$) and~\ref{rule:tr}
+  ($p \comp \inv{p} \rew \refl(a)$).
+\end{proof}
+
+\begin{remark}\label{rem:weakness}
+  The word ``weak'' is used precisely: the groupoid laws hold only up to
+  the rewrite relation $\Rw$, not as strict equalities of $\Path$ records.
+  The strict equalities of \cref{thm:strict-monoid} (unit and associativity)
+  provide even stronger witnesses, but the cancellation laws genuinely
+  require the rewrite system.
+\end{remark}
+
+\section{Strict Category and Strict Groupoid on the Quotient}
+\label{sec:strict-groupoid}
+
+\begin{definition}[Strict Category]\label{def:strict-cat}
+  A \emph{strict category} on $A$ is a category in the usual sense: the
+  associativity and unit laws hold as equalities (not merely up to~$\Rw$).
+\end{definition}
+
+\begin{definition}[Strict Groupoid]\label{def:strict-gpd}
+  A \emph{strict groupoid} on $A$ extends a strict category with an
+  inversion satisfying the cancellation laws as equalities.
+\end{definition}
+
+\begin{theorem}\label{thm:quot-strict-gpd}
+  The quotient $\PathQuot_A(-,-)$ carries the structure of a strict groupoid.
+\end{theorem}
+
+\begin{proof}
+  By \cref{thm:quot-groupoid}, all groupoid axioms hold as equalities of
+  quotient elements. The operations $\mathrm{trans}$, $\symop$, and $\refl$
+  descend to well-defined operations on $\PathQuot$ by the congruence
+  property of $\RwEq$ (\cref{thm:rweq-congruence}).
+\end{proof}
+
+This result establishes a clean separation between two levels of structure:
+
+\begin{center}
+\begin{tabular}{lll}
+  \toprule
+  \textbf{Level} & \textbf{Object} & \textbf{Laws} \\
+  \midrule
+  Raw paths & $\Path_A(a,b)$ & Weak groupoid (laws up to $\Rw$) \\
+  Quotient  & $\PathQuot_A(a,b)$ & Strict groupoid (laws as equalities) \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+The quotient recovers the standard identity type (\cref{thm:quot-equiv}),
+while the raw path space carries the additional combinatorial structure
+needed for higher-dimensional algebra.
+
+\section{Equality Functors}
+\label{sec:eq-functor}
+
+\begin{definition}[Equality Functor]\label{def:eq-functor}
+  An \emph{equality functor} from $A$ to $B$ consists of:
+  \begin{itemize}
+    \item An object map $\mathrm{obj} : A \to B$.
+    \item A path map $\mathrm{map} : \Path_A(a,b) \to \Path_B(\mathrm{obj}(a),
+      \mathrm{obj}(b))$.
+    \item Functoriality witnesses:
+      \begin{align*}
+        \mathrm{map}(\refl(a)) &= \refl(\mathrm{obj}(a)), \\
+        \mathrm{map}(p \comp q) &= \mathrm{map}(p) \comp \mathrm{map}(q).
+      \end{align*}
+  \end{itemize}
+\end{definition}
+
+\begin{proposition}\label{prop:congrArg-functor}
+  For any function $f : A \to B$, the pair $(\mathrm{obj} = f,\;
+  \mathrm{map} = f_*)$ is an equality functor. The functoriality
+  witnesses hold as strict equalities by \cref{thm:congrArg-functor}.
+\end{proposition}
+
+\section{Rewrite Lifts}
+\label{sec:rewrite-lifts}
+
+A \emph{rewrite lift} transports not only paths but also the rewrite
+structure from one type to another.
+
+\begin{definition}[Rewrite Lift]\label{def:rewrite-lift}
+  A \emph{rewrite lift} from $A$ to $B$ consists of:
+  \begin{itemize}
+    \item An object map $\mathrm{obj} : A \to B$.
+    \item A path map $\mathrm{mapPath} : \Path_A(a,b) \to
+      \Path_B(\mathrm{obj}(a), \mathrm{obj}(b))$.
+    \item A step map: $\Step(p, q) \implies \Step(\mathrm{mapPath}(p),
+      \mathrm{mapPath}(q))$.
+  \end{itemize}
+\end{definition}
+
+\begin{theorem}\label{thm:lift-rw-rweq}
+  Any rewrite lift transports both $\Rw$ and $\RwEq$:
+  \begin{enumerate}[label=(\roman*)]
+    \item $p \rews q$ implies $\mathrm{mapPath}(p) \rews \mathrm{mapPath}(q)$.
+    \item $p \rweq q$ implies $\mathrm{mapPath}(p) \rweq \mathrm{mapPath}(q)$.
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  Part~(i) by induction on the $\Rw$ derivation, using the step map at
+  each tail step. Part~(ii) by induction on the $\RwEq$ derivation, using
+  (i) for the step case and the closure properties of $\RwEq$.
+\end{proof}
+
+\begin{proposition}\label{prop:canonical-lifts}
+  Each of the following produces a canonical rewrite lift:
+  \begin{enumerate}[label=(\roman*)]
+    \item Any function $f : A \to B$ (via $\congrArgOp(f, -)$).
+    \item Any context $C : \Context(A, B)$ (via $C[-]$).
+    \item Any binary context $K : \BiContext(A, B, C)$ with a fixed
+      argument (via $K.\mapLeft(-, b)$ or $K.\mapRight(a, -)$).
+    \item Any dependent context $C : \DepContext(A, B)$ (via $C.\mathrm{map}$).
+  \end{enumerate}
+\end{proposition}
+
+\begin{proof}
+  In each case, the step map is provided by the corresponding structural
+  closure rule (\ref{rule:context-congr-closure}) from Group~VIII.
+\end{proof}
+
+Rewrite lifts compose: if $L_1 : A \to B$ and $L_2 : B \to C$ are rewrite
+lifts, their composition $L_2 \circ L_1$ is a rewrite lift from $A$ to $C$.
+This makes the collection of types with rewrite lifts into a category,
+which refines the category of types with equality functors.

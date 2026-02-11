@@ -1,0 +1,1342 @@
+%!TEX root = ../main.tex
+% Part II: Homotopy Theory (Chapters 6--10)
+% The Algebra of Computational Paths
+% Authors: Arthur Ferreira Ramos, Ruy J.G.B. de Queiroz, Anjolina G. de Oliveira
+
+% ==========================================================================
+%  CHAPTER 6 — Fundamental Groups and Loop Spaces
+% ==========================================================================
+
+\chapter{Fundamental Groups and Loop Spaces}\label{ch:fundamental-groups}
+
+We now turn from the algebraic and rewriting-theoretic foundations of
+computational paths to their homotopy-theoretic consequences. The
+central objects of study are the \emph{loop space} and the
+\emph{fundamental group}, which encode the 1-dimensional topology of
+a type through the algebraic structure of its self-paths.
+
+\section{Loop Spaces}\label{sec:loop-spaces}
+
+\begin{definition}[Loop space]\label{def:loop-space}
+Let $A$ be a type and $a : A$ a base point. The \emph{loop space} of
+$A$ at $a$ is
+\[
+  \Omega(A, a) \;=\; \Path_A(a, a),
+\]
+the type of computational paths from $a$ to itself. Elements of
+$\Omega(A, a)$ are called \emph{loops} at $a$.
+\end{definition}
+
+The loop space inherits three canonical operations from the path algebra:
+\begin{itemize}
+\item \textbf{Identity.} $\id = \refl(a)$, the reflexive loop with
+  empty trace.
+\item \textbf{Composition.} $p \cdot q = \trans(p, q)$, concatenation
+  of the underlying traces.
+\item \textbf{Inversion.} $p^{-1} = \symm(p)$, reversal of the trace.
+\end{itemize}
+
+By the monoid and involution laws established in Chapter~2, these operations
+satisfy:
+
+\begin{proposition}\label{prop:loop-space-laws}
+For all $p, q, r \in \Omega(A, a)$\textup{:}
+\begin{enumerate}
+\item[\textup{(i)}] $\id \cdot p = p$ and $p \cdot \id = p$,
+\item[\textup{(ii)}] $(p \cdot q) \cdot r = p \cdot (q \cdot r)$,
+\item[\textup{(iii)}] $p^{-1} \cdot p = \id$ and $p \cdot p^{-1} = \id$,
+\item[\textup{(iv)}] $(p^{-1})^{-1} = p$,
+\item[\textup{(v)}] $(p \cdot q)^{-1} = q^{-1} \cdot p^{-1}$.
+\end{enumerate}
+All equalities hold as strict structural equalities of \textup{\texttt{Path}} records.
+\end{proposition}
+
+\begin{remark}
+Proposition~\ref{prop:loop-space-laws} means that $\Omega(A, a)$ is a
+\emph{strict} group \emph{before} quotienting---a distinctive feature of
+the computational paths framework. In homotopy type theory, the loop
+space is only a group up to higher paths; here, the group laws are
+definitional by virtue of the list-based trace representation.
+\end{remark}
+
+\section{The Fundamental Group}\label{sec:fundamental-group}
+
+Although $\Omega(A, a)$ is already a strict group, two loops with
+different rewrite traces but the same underlying propositional equality
+represent ``the same homotopy class.'' The fundamental group identifies
+such loops.
+
+\begin{definition}[Loop quotient]\label{def:loop-quotient}
+The \emph{loop quotient} at $a$ is
+\[
+  \LoopQuot(A, a) \;=\; \PathRwQuot_A(a, a) \;=\;
+  \Omega(A, a)\, /\, {\approx},
+\]
+where $\approx$ denotes rewrite equality (\texttt{RwEq}).
+\end{definition}
+
+\begin{definition}[Fundamental group]\label{def:fundamental-group}
+The \emph{fundamental group} of $A$ at $a$ is
+\[
+  \pi_1(A, a) \;=\; \LoopQuot(A, a),
+\]
+equipped with multiplication $[p] \cdot [q] = [p \cdot q]$, identity
+$e = [\refl(a)]$, and inversion $[p]^{-1} = [p^{-1}]$.
+\end{definition}
+
+\begin{theorem}[Group axioms]\label{thm:pi1-group}
+$\pi_1(A, a)$ is a group: associativity, left and right identity, and
+left and right inverse all hold as strict equalities on the quotient.
+\end{theorem}
+
+\begin{proof}
+Each axiom is inherited from the corresponding strict identity on
+$\Omega(A, a)$ (Proposition~\ref{prop:loop-space-laws}), which
+descends to the quotient since the operations are well-defined with
+respect to $\approx$ (Theorem~3.6).
+\end{proof}
+
+The group $\pi_1(A,a)$ can equivalently be described via two
+intermediate structures that make the algebraic packaging explicit:
+
+\begin{definition}[Loop monoid and loop group]\label{def:loop-monoid-group}
+\hfill
+\begin{itemize}
+\item The \emph{loop monoid} $(\pi_1(A,a), \cdot, e)$ records
+  multiplication, identity, associativity, and unit laws.
+\item The \emph{loop group} extends the loop monoid with an inversion
+  operation and witnesses of the inverse laws.
+\end{itemize}
+\end{definition}
+
+\noindent
+Both structures are \emph{canonical}: they are constructed uniformly for any
+type $A$ and base point $a$, with no choices required.
+
+\subsection*{Power operations.}
+For applications to winding numbers (Chapter~\ref{ch:spaces}), we
+equip $\pi_1(A,a)$ with natural and integer powers:
+
+\begin{definition}\label{def:loop-powers}
+For $x \in \pi_1(A, a)$, define:
+\[
+  x^0 = e, \qquad x^{n+1} = x^n \cdot x, \qquad
+  x^{-n} = (x^n)^{-1} \;\text{ for } n > 0.
+\]
+\end{definition}
+
+\begin{proposition}[Power laws]\label{prop:zpow-laws}
+For all $x \in \pi_1(A, a)$ and $m, n \in \mathbb{Z}$\textup{:}
+\begin{enumerate}
+\item[\textup{(i)}] $x^{m+n} = x^m \cdot x^n$,
+\item[\textup{(ii)}] $x^{-n} = (x^n)^{-1}$,
+\item[\textup{(iii)}] $x^m \cdot x^n = x^n \cdot x^m$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Part~(i) is proved by integer induction, using the successor case
+$x^{n+1} = x^n \cdot x$ and the predecessor case
+$x^{n-1} = x^n \cdot x^{-1}$ as the inductive step. Part~(ii) follows
+from the definition of negative powers. Part~(iii) is an immediate
+consequence of (i) and the commutativity of integer addition.
+\end{proof}
+
+\section{Functoriality}\label{sec:pi1-functoriality}
+
+\begin{theorem}[Induced homomorphism]\label{thm:induced-pi1}
+Let $f : A \to B$ be a function and $a : A$. Then $f$ induces a group
+homomorphism
+\[
+  f_* : \pi_1(A, a) \longrightarrow \pi_1(B, f(a))
+\]
+defined on representatives by $f_*([p]) = [\congrArg(f, p)]$.
+\end{theorem}
+
+\begin{proof}
+The map $p \mapsto \congrArg(f, p)$ preserves $\approx$ since
+$\congrArg$ is compatible with the rewrite system
+(Theorem~3.6). Functoriality ($\congrArg(f, p \cdot q) =
+\congrArg(f, p) \cdot \congrArg(f, q)$) follows from Theorem~2.8.
+\end{proof}
+
+\begin{theorem}[Functorial laws]\label{thm:pi1-functor-laws}
+\hfill
+\begin{enumerate}
+\item[\textup{(i)}] $(\id_A)_* = \id_{\pi_1(A,a)}$.
+\item[\textup{(ii)}] $(g \circ f)_* = g_* \circ f_*$ for
+  $f : A \to B$ and $g : B \to C$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Part~(i) follows from $\congrArg(\id, p) \approx p$.
+Part~(ii) follows from $\congrArg(g \circ f, p) \approx
+\congrArg(g, \congrArg(f, p))$. Both are instances of rewrite rules
+in the rewrite system.
+\end{proof}
+
+\begin{theorem}[Product formula]\label{thm:pi1-product}
+For pointed types $(A, a)$ and $(B, b)$, there is a group isomorphism
+\[
+  \pi_1(A \times B,\, (a, b)) \;\cong\; \pi_1(A, a) \times \pi_1(B, b).
+\]
+\end{theorem}
+
+\begin{proof}
+The encoding map sends a loop $p$ in $A \times B$ to the pair
+$(\fst(p),\, \snd(p))$ of its component projections. The decoding map
+sends a pair $(p, q)$ to $\prodMk(p, q)$. Both maps respect $\approx$
+by the congruence properties of projections and pairing. The round-trip
+identities $\encode \circ \decode = \id$ and $\decode \circ \encode = \id$
+follow from the product $\beta$- and $\eta$-rules
+(Theorem~2.13).
+\end{proof}
+
+\section{The Fundamental Groupoid}\label{sec:fundamental-groupoid}
+
+The fundamental group captures loops at a single base point. To handle
+all points simultaneously, we pass to the fundamental groupoid.
+
+\begin{definition}[Fundamental groupoid]\label{def:fundamental-groupoid}
+The \emph{fundamental groupoid} $\Pi_1(A)$ has:
+\begin{itemize}
+\item \textbf{Objects}: points $a \in A$.
+\item \textbf{Morphisms}: $\Hom_{\Pi_1(A)}(a, b) = \PathRwQuot_A(a, b)$.
+\item \textbf{Composition}: path concatenation on the quotient.
+\item \textbf{Identity}: $\id_a = [\refl(a)]$.
+\item \textbf{Inverse}: $[p]^{-1} = [p^{-1}]$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}\label{thm:fundamental-groupoid-strict}
+$\Pi_1(A)$ is a strict groupoid: all axioms \textup{(}associativity,
+identity, inverse\textup{)} hold as definitional equalities on
+$\PathRwQuot$.
+\end{theorem}
+
+\begin{proof}
+This is the strict groupoid $\StrictGroupoid{.}\mathrm{quotient}(A)$ from
+Theorem~4.5, restricted to the morphism level.
+\end{proof}
+
+\begin{theorem}[Basepoint independence]\label{thm:basepoint-independence}
+Let $\gamma : \PathRwQuot_A(a, b)$ be a path class. Then conjugation
+by $\gamma$,
+\[
+  \varphi_\gamma : \pi_1(A, a) \xrightarrow{\;\sim\;} \pi_1(A, b),
+  \qquad \varphi_\gamma(\alpha) = \gamma^{-1} \cdot \alpha \cdot \gamma,
+\]
+is a group isomorphism, with inverse $\varphi_{\gamma^{-1}}$.
+\end{theorem}
+
+\begin{proof}
+That $\varphi_\gamma$ is a homomorphism (preserving identity,
+composition, and inversion) follows by direct computation using
+the strict groupoid laws. The cancellation identities
+$\varphi_{\gamma^{-1}} \circ \varphi_\gamma = \id$ and
+$\varphi_\gamma \circ \varphi_{\gamma^{-1}} = \id$ are verified by
+expanding the definition and applying the inverse and unit laws.
+\end{proof}
+
+\begin{theorem}[Functoriality of the groupoid]\label{thm:pi1-groupoid-functor}
+A function $f : A \to B$ induces a groupoid functor
+$\Pi_1(f) : \Pi_1(A) \to \Pi_1(B)$ defined by
+$\Pi_1(f)(a) = f(a)$ on objects and
+$\Pi_1(f)([p]) = [\congrArg(f, p)]$ on morphisms. This functor
+preserves identity and composition strictly.
+\end{theorem}
+
+\section{Higher Homotopy Groups and the Eckmann--Hilton Argument}%
+\label{sec:higher-homotopy}
+
+\begin{definition}[Iterated loop spaces]\label{def:iterated-loops}
+The \emph{iterated loop spaces} are defined by:
+\begin{gather*}
+  \Omega^0(A, a) = A, \qquad
+  \Omega^1(A, a) = \Path_A(a, a), \\
+  \Omega^2(A, a) = \Deriv_2(\refl(a), \refl(a)), \qquad
+  \Omega^3(A, a) = \Deriv_3(\refl_2, \refl_2),
+\end{gather*}
+where $\Deriv_k$ denotes $k$-cells in the weak $\omega$-groupoid tower.
+\end{definition}
+
+\begin{definition}[Higher homotopy groups]\label{def:higher-homotopy}
+The \emph{$n$-th homotopy group} is defined by:
+\begin{gather*}
+  \pi_1(A, a) = \Omega^1(A, a) / {\approx}, \\
+  \pi_2(A, a) = \Omega^2(A, a) / {\sim_3},
+\end{gather*}
+where $\alpha \sim_3 \beta$ iff there exists a 3-cell
+$\Deriv_3(\alpha, \beta)$. For $n \ge 3$, the contractibility of the
+tower at dimension $\ge 3$ (Theorem~5.7) implies that $\pi_n$
+collapses.
+\end{definition}
+
+The double loop space $\Omega^2(A,a)$ carries two distinct composition
+operations: \emph{vertical} composition (sequential concatenation of
+derivations) and \emph{horizontal} composition (induced by whiskering
+and path concatenation).
+
+\begin{definition}[Whiskering]\label{def:whiskering}
+Let $f : \Path_A(a,b)$ and $\alpha : p \approx q$ for
+$p, q : \Path_A(b,c)$.
+\begin{itemize}
+\item \emph{Left whiskering}: $f \triangleright \alpha$ is the
+  witness that $f \cdot p \approx f \cdot q$.
+\item \emph{Right whiskering}: $\alpha \triangleleft g$ is the
+  witness that $p \cdot g \approx q \cdot g$.
+\end{itemize}
+\emph{Horizontal composition} is defined as
+$\alpha \star \beta = (\alpha \triangleleft q') \circ_v
+(p \triangleright \beta)$.
+\end{definition}
+
+\begin{theorem}[Interchange law]\label{thm:interchange-EH}
+For 2-cells $\alpha_1, \alpha_2, \beta_1, \beta_2$ in
+$\Omega^2(A,a)$\textup{:}
+\[
+  (\alpha_1 \circ_v \alpha_2) \star (\beta_1 \circ_v \beta_2)
+  \;=\;
+  (\alpha_1 \star \beta_1) \circ_v (\alpha_2 \star \beta_2).
+\]
+At the level of derivations, the two sides are connected by a 3-cell
+$\MetaStep_3.\mathsf{interchange}$.
+\end{theorem}
+
+\begin{theorem}[Eckmann--Hilton]\label{thm:eckmann-hilton}
+On $\Omega^2(A,a)$, horizontal and vertical composition coincide
+and are commutative. In particular, $\pi_2(A,a)$ is an abelian group.
+\end{theorem}
+
+\begin{proof}
+The proof proceeds in three steps.
+
+\textbf{Step 1} (Whiskering by $\refl$ is trivial). Since
+$\trans(\refl(a), \refl(a))$ reduces definitionally to $\refl(a)$,
+both $\alpha \triangleleft \refl$ and $\refl \triangleright \beta$
+are connected to $\alpha$ and $\beta$ respectively by 3-cells.
+
+\textbf{Step 2} ($\star = \circ_v$). From Step~1:
+$\alpha \star \beta
+  = (\alpha \triangleleft \refl) \circ_v (\refl \triangleright \beta)
+  \sim_3 \alpha \circ_v \beta$.
+
+\textbf{Step 3} (Commutativity). By the interchange law
+(Theorem~\ref{thm:interchange}), $\alpha \star \beta \sim_3
+\beta \star \alpha$ (the alternative horizontal composition
+reverses the order). Combining with Step~2:
+$\alpha \circ_v \beta \sim_3 \beta \circ_v \alpha$. \qedhere
+\end{proof}
+
+\begin{corollary}\label{cor:pi-n-abelian}
+For every $n \ge 2$, $\pi_n(A, a)$ is abelian.
+\end{corollary}
+
+\begin{remark}[Naturality of coherence laws]
+The unit laws, associativity, and symmetry involution are all
+\emph{natural} with respect to rewriting: they commute with
+whiskering. Concretely, for the left unit law, the diagram
+$\refl \cdot p \xrightarrow{\refl \triangleright \alpha}
+\refl \cdot q$ over
+$p \xrightarrow{\alpha} q$ commutes: both composites through the
+naturality square (applying whiskering then the unit law, or the unit
+law then $\alpha$) are equal as $\RwEq$ witnesses, since both are
+proofs of the same proposition.
+\end{remark}
+
+
+% ==========================================================================
+%  CHAPTER 7 — Spaces and Their Fundamental Groups
+% ==========================================================================
+
+\chapter{Spaces and Their Fundamental Groups}\label{ch:spaces}
+
+With the fundamental group machinery in place, we compute $\pi_1$ for
+several classical spaces. Each space is modeled within the
+computational-paths framework using \emph{path expressions}---a
+syntactic calculus of formal generators and relations that captures the
+combinatorial essence of the space.
+
+\section{The Computational Circle \texorpdfstring{$S^1$}{S¹}}%
+\label{sec:circle}
+
+\begin{definition}[Circle]\label{def:circle}
+The \emph{computational circle} $S^1$ is a one-point type
+$\{*\}$ equipped with a formal loop generator via the path expression
+calculus.
+
+More precisely, define the type of \emph{circle path expressions} by
+the grammar:
+\[
+  e \;::=\; \lp \;\mid\; \refl(a) \;\mid\; e^{-1} \;\mid\;
+  e_1 \cdot e_2,
+\]
+where $\lp$ is a distinguished generator with source and target both
+equal to $* : S^1$.
+\end{definition}
+
+The circle path expressions carry a natural notion of \emph{winding
+number}:
+
+\begin{definition}[Winding number]\label{def:winding-number}
+The winding number $\wind : \text{CircleExpr}(*,*) \to \mathbb{Z}$ is
+defined recursively:
+\[
+  \wind(\lp) = 1, \quad \wind(\refl) = 0, \quad
+  \wind(e^{-1}) = -\wind(e), \quad
+  \wind(e_1 \cdot e_2) = \wind(e_1) + \wind(e_2).
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:winding-power}
+For all $n \in \mathbb{N}$,\, $\wind(\lp^n) = n$. For all
+$z \in \mathbb{Z}$,\, $\wind(\lp^z) = z$.
+\end{proposition}
+
+\begin{definition}[Circle loop quotient]\label{def:circle-pi1}
+Two loop expressions are identified if they have the same winding
+number:
+\[
+  \pi_1^{\text{expr}}(S^1, *) \;=\;
+  \text{CircleExpr}(*,*) \,/\, (\wind(e_1) = \wind(e_2)).
+\]
+\end{definition}
+
+\begin{theorem}\label{thm:pi1-circle}
+$\pi_1(S^1, *) \cong \mathbb{Z}$.
+\end{theorem}
+
+\begin{proof}
+The encoding map $\encode : \pi_1^{\text{expr}}(S^1,*) \to \mathbb{Z}$
+sends $[e] \mapsto \wind(e)$. The decoding map
+$\decode : \mathbb{Z} \to \pi_1^{\text{expr}}(S^1,*)$ sends
+$z \mapsto [\lp^z]$. These are inverse:
+\begin{itemize}
+\item $\encode \circ \decode$ is the identity on $\mathbb{Z}$ by
+  Proposition~\ref{prop:winding-power}.
+\item $\decode \circ \encode$ is the identity on the quotient: for any
+  expression $e$, the canonical power $\lp^{\wind(e)}$ has the same
+  winding number as $e$, hence they are identified.  \qedhere
+\end{itemize}
+\end{proof}
+
+\section{The Torus \texorpdfstring{$T^2$}{T²}}\label{sec:torus}
+
+\begin{definition}[Torus]\label{def:torus}
+The \emph{torus} is defined as the product of two circles:
+\[
+  T^2 \;=\; S^1 \times S^1.
+\]
+The base point is $(*_1, *_2)$, and the two fundamental loops are:
+\begin{align*}
+  \alpha &= \prodMk(\lp_1, \refl(*_2)), \\
+  \beta  &= \prodMk(\refl(*_1), \lp_2).
+\end{align*}
+\end{definition}
+
+\begin{theorem}\label{thm:pi1-torus}
+$\pi_1(T^2, (*,*)) \cong \mathbb{Z} \times \mathbb{Z}$.
+\end{theorem}
+
+\begin{proof}
+By the product formula (Theorem~\ref{thm:pi1-product}):
+$\pi_1(S^1 \times S^1) \cong \pi_1(S^1) \times \pi_1(S^1) \cong
+\mathbb{Z} \times \mathbb{Z}$.
+\end{proof}
+
+\begin{remark}
+The torus has an abelian fundamental group: $\alpha$ and $\beta$
+commute. This commutativity is automatic from the product
+construction---no additional relation needs to be imposed.
+\end{remark}
+
+\section{The Figure-Eight and Free Products}\label{sec:figure-eight}
+
+\begin{definition}[Wedge sum]\label{def:wedge}
+Let $(A, a_0)$ and $(B, b_0)$ be pointed types. The \emph{wedge sum}
+$A \vee B$ is the pushout:
+\[
+\begin{tikzcd}
+  \{*\} \ar[r, "a_0"] \ar[d, "b_0"'] & A \ar[d, "\inl"] \\
+  B \ar[r, "\inr"'] & A \vee B
+\end{tikzcd}
+\]
+with a glue path $\glue : \inl(a_0) = \inr(b_0)$.
+\end{definition}
+
+\begin{definition}[Figure-eight]\label{def:figure-eight}
+The \emph{figure-eight} is $S^1 \vee S^1$, the wedge sum of two
+circles at their base points. Its two generating loops are:
+\begin{align*}
+  a &= \inl_*(\lp_1), \\
+  b &= \glue \cdot \inr_*(\lp_2) \cdot \glue^{-1}.
+\end{align*}
+\end{definition}
+
+\begin{definition}[Free product words]\label{def:free-product-words}
+Given groups $G$ and $H$, a \emph{free product word} is a finite
+alternating sequence of non-identity elements from $G$ and $H$:
+\[
+  w = g_1 h_1 g_2 h_2 \cdots
+\]
+Multiplication is concatenation followed by reduction (cancelling
+adjacent same-side identities). The resulting group is the
+\emph{free product} $G * H$.
+\end{definition}
+
+\begin{theorem}\label{thm:pi1-figure-eight}
+$\pi_1(S^1 \vee S^1, *) \cong \mathbb{Z} * \mathbb{Z}$, the free
+product of $\mathbb{Z}$ with itself.
+\end{theorem}
+
+\begin{proof}
+The Seifert--van~Kampen theorem (Theorem~\ref{thm:svk} below) applied
+to the wedge decomposition gives
+$\pi_1(S^1 \vee S^1) \cong \pi_1(S^1) * \pi_1(S^1) \cong
+\mathbb{Z} * \mathbb{Z}$. Alternatively, a direct
+\emph{provenance-based} equivalence identifies loop classes with free
+product words over $\pi_1(S^1)$: each loop in the wedge is uniquely
+decomposed into segments lying in the left or right circle, yielding
+the free product structure.
+\end{proof}
+
+\begin{remark}
+The fundamental group $\mathbb{Z} * \mathbb{Z}$ is non-abelian: the
+loops $a$ and $b$ generate a free group on two generators. In
+particular, $a \cdot b \ne b \cdot a$ as elements of $\pi_1$.
+\end{remark}
+
+\begin{definition}[Bouquet of $n$ circles]\label{def:bouquet}
+The \emph{bouquet} $\bigvee_n S^1$ is the wedge of $n$ copies of
+$S^1$, all sharing a common base point.
+\end{definition}
+
+\begin{corollary}\label{cor:pi1-bouquet}
+$\pi_1\!\left(\bigvee_n S^1,\, *\right) \cong F_n$, the free group on
+$n$ generators.
+\end{corollary}
+
+\section{The Seifert--van Kampen Theorem}\label{sec:svk}
+
+The Seifert--van Kampen theorem is the principal computational tool
+for determining fundamental groups of spaces assembled from simpler
+pieces.
+
+\begin{definition}[Pushout]\label{def:pushout}
+Given functions $f : C \to A$ and $g : C \to B$, the \emph{pushout}
+$A \sqcup_C B$ is the type with constructors $\inl : A \to A \sqcup_C B$,
+$\inr : B \to A \sqcup_C B$, and a path constructor
+$\glue : \forall c : C,\; \inl(f(c)) = \inr(g(c))$.
+\end{definition}
+
+\begin{definition}[Amalgamated free product]\label{def:amalgamated}
+Given group homomorphisms $\varphi : K \to G$ and $\psi : K \to H$,
+the \emph{amalgamated free product} $G *_K H$ is the quotient of the
+free product $G * H$ by the normal closure of the relations
+$\varphi(k) = \psi(k)$ for all $k \in K$.
+\end{definition}
+
+\begin{theorem}[Seifert--van Kampen]\label{thm:svk}
+Let $f : C \to A$ and $g : C \to B$, and let $c_0 \in C$. There is an
+equivalence
+\[
+  \pi_1(A \sqcup_C B,\; \inl(f(c_0)))
+  \;\cong\;
+  \pi_1(A, f(c_0)) \;*_{\pi_1(C, c_0)}\; \pi_1(B, g(c_0)),
+\]
+where the amalgamation is along the induced homomorphisms
+$f_* : \pi_1(C, c_0) \to \pi_1(A, f(c_0))$ and
+$g_* : \pi_1(C, c_0) \to \pi_1(B, g(c_0))$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof follows the encode-decode method. One constructs an encoding
+of loops in the pushout as words in the amalgamated free product, and
+a decoding in the opposite direction, using the glue path to translate
+between the two sides. The key technical ingredients are:
+(i)~the naturality of the glue path with respect to loop rewriting,
+(ii)~the universal property of the pushout, and
+(iii)~the bijectivity of the resulting maps, established via
+the provenance decomposition of pushout paths.
+\end{proof}
+
+\begin{corollary}\label{cor:svk-wedge}
+For pointed types $(A, a_0)$ and $(B, b_0)$ with trivial
+$\pi_1(\{*\}) = 1$\textup{:}
+\[
+  \pi_1(A \vee B, *) \;\cong\; \pi_1(A, a_0) * \pi_1(B, b_0).
+\]
+\end{corollary}
+
+\section{Suspensions and Spheres}\label{sec:suspensions}
+
+\begin{definition}[Suspension]\label{def:suspension}
+The \emph{suspension} of a type $X$ is
+\[
+  \Sigma X = \{N, S\} \cup \{\merid(x) : N = S \mid x \in X\},
+\]
+with north pole $N$, south pole $S$, and a meridional path
+$\merid(x) : \Path(N, S)$ for each $x : X$.
+\end{definition}
+
+\begin{definition}[Suspension loop]\label{def:susp-loop}
+The canonical loop at the north pole induced by a point $x_0 \in X$ is
+\[
+  \sigma(x_0) = \merid(x_0) \cdot \merid(x_0)^{-1} : \Omega(\Sigma X, N).
+\]
+\end{definition}
+
+The Freudenthal suspension theorem provides the key bridge between
+loop spaces and suspensions:
+
+\begin{theorem}[Freudenthal suspension, preview]\label{thm:freudenthal-preview}
+There exists a natural map
+$\Omega(X, x_0) \to \Omega(\Sigma X, N)$ that sends each loop to its
+suspension and preserves the base point.
+\end{theorem}
+
+\begin{remark}
+The full Freudenthal theorem states that this map is an isomorphism
+on $\pi_n$ for $n < 2 \cdot \conn(X) + 1$, where $\conn(X)$ is the
+connectivity of $X$. The formalization records the map and its
+basepoint behavior; the connectivity bound is stated at the structural
+level.
+\end{remark}
+
+
+% ==========================================================================
+%  CHAPTER 8 — Fibrations, Covering Spaces, and Exact Sequences
+% ==========================================================================
+
+\chapter{Fibrations, Covering Spaces, and Exact Sequences}%
+\label{ch:fibrations}
+
+This chapter develops the theory of fibrations and covering spaces in
+the computational-paths framework and establishes the long exact
+sequence of homotopy groups.
+
+\section{Fibers of Maps}\label{sec:fibers}
+
+\begin{definition}[Homotopy fiber]\label{def:fiber}
+Let $f : A \to B$ and $b : B$. The \emph{fiber} of $f$ over $b$ is
+\[
+  \Fib(f, b) \;=\; \{a : A \mid f(a) = b\}
+  \;=\; \Sigma_{a : A}\, \Path_B(f(a),\, b).
+\]
+\end{definition}
+
+\begin{definition}[Type families as fibrations]\label{def:family-fibration}
+A type family $P : B \to \Type$ determines a fibration via the total
+space construction:
+\[
+  E = \Sigma_{b : B}\, P(b), \qquad \proj : E \to B, \quad
+  (b, p) \mapsto b.
+\]
+The fiber of $\proj$ over $b$ is canonically equivalent to $P(b)$:
+\[
+  \Fib(\proj, b) \;\simeq\; P(b).
+\]
+\end{definition}
+
+\section{Path Lifting}\label{sec:path-lifting}
+
+The fundamental property of fibrations is that paths in the base
+can be lifted to the total space.
+
+\begin{theorem}[Path lifting]\label{thm:path-lifting}
+Let $P : B \to \Type$ be a type family, $p : \Path_B(b_1, b_2)$ a
+path in the base, and $x : P(b_1)$ a point in the fiber over $b_1$.
+Then there exists a path
+\[
+  \widetilde{p}(x) \;:\; \Path_E\!\big((b_1, x),\; (b_2, \transport_P(p, x))\big)
+\]
+in the total space $E = \Sigma P$ that lifts $p$.
+\end{theorem}
+
+\begin{definition}[Fiber transport]\label{def:fiber-transport}
+The \emph{fiber transport} along $p : \Path_B(b_1, b_2)$ is the function
+\[
+  \transport_P(p) : P(b_1) \longrightarrow P(b_2)
+\]
+given by the path transport operation.
+\end{definition}
+
+\begin{proposition}[Transport composition]\label{prop:transport-composition}
+For paths $p : b_1 \leadsto b_2$ and $q : b_2 \leadsto b_3$ in $B$
+and $x : P(b_1)$\textup{:}
+\[
+  \transport_P(p \cdot q,\, x) \;=\;
+  \transport_P(q,\, \transport_P(p, x)).
+\]
+\end{proposition}
+
+\section{Fiber Sequences}\label{sec:fiber-sequences}
+
+\begin{definition}[Fiber sequence]\label{def:fiber-sequence}
+A \emph{fiber sequence} consists of types $F$, $E$, $B$ together with:
+\begin{itemize}
+\item a projection $\proj : E \to B$,
+\item base points $b_0 \in B$, $e_0 \in E$ with
+  $\proj(e_0) = b_0$,
+\item an equivalence $F \simeq \Fib(\proj, b_0)$.
+\end{itemize}
+The inclusion $\incl : F \hookrightarrow E$ sends a fiber element to
+its underlying point: $\incl(f) = (\text{toFiber}(f)).\text{point}$.
+\end{definition}
+
+\begin{definition}[Exactness]\label{def:exactness}
+A fiber sequence $F \xrightarrow{\incl} E \xrightarrow{\proj} B$ is
+\emph{exact at $E$} if:
+\begin{enumerate}
+\item $\proj(\incl(f)) = b_0$ for all $f \in F$
+  \textup{(}image $\subseteq$ kernel\textup{)};
+\item for every $e \in E$ with $\proj(e) = b_0$, there exists
+  $f \in F$ with $\incl(f) = e$
+  \textup{(}kernel $\subseteq$ image\textup{)}.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Canonical fiber sequence]\label{thm:canonical-fiber-seq}
+For any type family $P : B \to \Type$, base point $b \in B$, and
+$x_0 : P(b)$, there is an exact fiber sequence
+\[
+  P(b) \;\xrightarrow{\;\incl\;}\; \textstyle\Sigma P
+  \;\xrightarrow{\;\proj\;}\; B.
+\]
+\end{theorem}
+
+\section{The Connecting Map}\label{sec:connecting-map}
+
+\begin{definition}[Connecting map]\label{def:connecting-map}
+Let $P : B \to \Type$ be a type family, $b \in B$, and $x_0 : P(b)$.
+The \emph{connecting map}
+\[
+  \partial : \Omega(B, b) \longrightarrow P(b)
+\]
+sends a loop $\ell$ to $\transport_P(\ell,\, x_0)$.
+\end{definition}
+
+\begin{proposition}[Properties of the connecting map]\label{prop:connecting-map}
+\hfill
+\begin{enumerate}
+\item[\textup{(i)}] $\partial(\refl(b)) = x_0$.
+\item[\textup{(ii)}] $\partial(\ell_1 \cdot \ell_2) =
+  \partial_{x_1}(\ell_2)$ where $x_1 = \partial(\ell_1)$
+  \textup{(}i.e., the connecting map respects composition via iterated
+  transport\textup{)}.
+\item[\textup{(iii)}] $\partial$ respects $\approx$: if
+  $\ell_1 \approx \ell_2$ then $\partial(\ell_1) = \partial(\ell_2)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Part~(i) is immediate from $\transport(\refl, x_0) = x_0$. Part~(ii)
+follows from the transport composition law
+(Proposition~\ref{prop:transport-composition}). Part~(iii) holds
+because $\ell_1 \approx \ell_2$ implies $\ell_1.\toEq = \ell_2.\toEq$
+(soundness of $\approx$), and transport depends only on the
+underlying propositional equality.
+\end{proof}
+
+By Part~(iii), the connecting map descends to the quotient:
+
+\begin{corollary}\label{cor:connecting-on-pi1}
+There is a well-defined map
+$\partial : \pi_1(B, b) \to P(b)$ sending $[\ell] \mapsto
+\transport_P(\ell, x_0)$.
+\end{corollary}
+
+\section{Covering Spaces}\label{sec:covering-spaces}
+
+\begin{definition}[Covering space]\label{def:covering-space}
+A type family $P : A \to \Type$ is a \emph{covering space} of $A$
+if every fiber $P(a)$ is a \emph{set} (0-truncated): any two paths
+in $P(a)$ with the same endpoints are equal.
+\end{definition}
+
+\begin{theorem}[Unique path lifting]\label{thm:unique-lifting}
+For a covering space $P$, the fiber transport
+$\transport_P(p) : P(a) \to P(b)$ is injective for every path
+$p : a \leadsto b$.
+\end{theorem}
+
+\begin{proof}
+Given $\transport_P(p, x) = \transport_P(p, y)$, apply
+$\transport_P(p^{-1})$ to both sides and use the inverse law
+$\transport(p^{-1}, \transport(p, x)) = x$.
+\end{proof}
+
+\subsection*{The $\pi_1$-action on fibers.}
+
+\begin{definition}[Monodromy action]\label{def:monodromy}
+Let $P : A \to \Type$ be a type family and $a \in A$. The
+\emph{monodromy action} of $\pi_1(A, a)$ on the fiber $P(a)$ is the
+map
+\[
+  \mu : \pi_1(A, a) \times P(a) \longrightarrow P(a), \qquad
+  \mu([\ell], x) = \transport_P(\ell, x).
+\]
+\end{definition}
+
+\begin{proposition}\label{prop:monodromy-action}
+The monodromy action is a genuine group action:
+\begin{enumerate}
+\item[\textup{(i)}] $\mu(e, x) = x$
+  \textup{(}identity acts trivially\textup{)}.
+\item[\textup{(ii)}] $\mu(\alpha, \mu(\beta, x))
+  = \mu(\alpha \cdot \beta, x)$
+  \textup{(}compatibility with multiplication\textup{)}.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Part~(i) is the transport identity law. Part~(ii) is the transport
+composition law descending to the quotient.
+\end{proof}
+
+\subsection*{Deck transformations.}
+
+\begin{definition}[Deck transformation]\label{def:deck-transformation}
+A \emph{deck transformation} of a covering $P$ is an automorphism
+$\varphi : \Sigma P \to \Sigma P$ satisfying
+$\proj \circ \varphi = \proj$, together with an inverse.
+\end{definition}
+
+\begin{proposition}\label{prop:deck-group}
+Deck transformations form a group under composition, with identity
+$\id$ and the obvious associativity, identity, and inverse laws.
+\end{proposition}
+
+\section{The Hopf Fibration}\label{sec:hopf}
+
+\begin{definition}[Hopf fibration data]\label{def:hopf}
+The \emph{Hopf fibration} is recorded as a structure consisting of:
+\begin{itemize}
+\item A projection $\proj : S^3 \to S^2$.
+\item Base points $b_0 \in S^2$ and $e_0 \in S^3$ with
+  $\proj(e_0) = b_0$.
+\item A fiber equivalence $\Fib(\proj, b_0) \simeq S^1$.
+\end{itemize}
+\end{definition}
+
+\begin{theorem}\label{thm:hopf-fiber-seq}
+The Hopf data assembles into an exact fiber sequence
+\[
+  S^1 \;\longrightarrow\; S^3 \;\longrightarrow\; S^2.
+\]
+\end{theorem}
+
+\begin{remark}
+The Hopf fibration is the prototypical non-trivial fiber bundle. Its
+long exact sequence (Section~\ref{sec:les}) yields the classical
+relation $\pi_2(S^2) \cong \mathbb{Z}$ (via the connecting
+homomorphism and the fact that $\pi_1(S^1) \cong \mathbb{Z}$ and
+$\pi_1(S^3) = 0$).
+\end{remark}
+
+\section{The Long Exact Sequence of Homotopy Groups}%
+\label{sec:les}
+
+\begin{theorem}[Long exact sequence]\label{thm:les}
+For a type family $P : B \to \Type$ with base point $b \in B$ and
+$x_0 : P(b)$, there is a long exact sequence:
+\[
+  \cdots \;\to\; \pi_1(P(b), x_0)
+  \;\xrightarrow{\;\incl_*\;}\;
+  \pi_1\!\left(\textstyle\Sigma P,\, (b, x_0)\right)
+  \;\xrightarrow{\;\proj_*\;}\;
+  \pi_1(B, b)
+  \;\xrightarrow{\;\partial\;}\;
+  P(b).
+\]
+Exactness holds at each term:
+\begin{enumerate}
+\item[\textup{(i)}] \textup{At $\pi_1(\Sigma P)$}:
+  $\proj_*(\incl_*(\alpha)) = e$ for all
+  $\alpha \in \pi_1(P(b), x_0)$.
+\item[\textup{(ii)}] \textup{At $\pi_1(B)$}:
+  $\partial(\proj_*(\beta)) = x_0$ for all
+  $\beta \in \pi_1(\Sigma P, (b, x_0))$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\textbf{Exactness at $\pi_1(\Sigma P)$.}
+The inclusion $\incl$ embeds a fiber loop as a loop in $\Sigma P$
+that is constant in the base component. Applying $\proj_*$ to such a
+loop produces $\congrArg(\proj, \congrArg(\iota, \ell))$ where
+$\iota : P(b) \hookrightarrow \Sigma P$ is $x \mapsto (b, x)$. Since
+$\proj \circ \iota$ is the constant function $b$, this reduces to
+$\refl(b)$ up to $\approx$.
+
+\textbf{Exactness at $\pi_1(B)$.}
+For a loop $\ell$ in $\Sigma P$ at $(b, x_0)$, the connecting map
+applied to $\proj_*(\ell)$ computes $\transport(\proj_*(\ell), x_0)$.
+By the sigma-type path characterization, the base path of $\ell$ is
+$\proj_*(\ell)$ and the fiber path witnesses
+$\transport(\proj_*(\ell), x_0) = x_0$.
+\end{proof}
+
+\begin{remark}
+The induced maps $\incl_*$, $\proj_*$, and $\partial$ are all
+\emph{natural} in morphisms of fibrations: a map of fiber sequences
+induces a commutative ladder of long exact sequences. The naturality
+is formalized via the functoriality of $\pi_1$ (Theorem~\ref{thm:pi1-functor-laws})
+and the compatibility of transport with maps.
+\end{remark}
+
+\begin{theorem}[Simply connected base]\label{thm:sc-connecting}
+If the base $B$ is simply connected \textup{(}i.e.,
+$\pi_1(B, b) = \{e\}$\textup{)}, then the connecting map is trivial:
+$\partial(\ell) = x_0$ for all loops $\ell$ in $B$.
+\end{theorem}
+
+\begin{proof}
+Every loop $\ell$ is $\approx$-equivalent to $\refl(b)$, and
+$\partial(\refl(b)) = x_0$.
+\end{proof}
+
+
+% ==========================================================================
+%  CHAPTER 9 — The Hurewicz Theorem and Homological Algebra
+% ==========================================================================
+
+\chapter{The Hurewicz Theorem and Homological Algebra}\label{ch:hurewicz}
+
+This chapter connects the homotopy-theoretic invariant $\pi_1$ to the
+homological invariant $H_1$ via the Hurewicz theorem, and develops
+the algebraic machinery of abelianization.
+
+\section{Abelianization}\label{sec:abelianization}
+
+\begin{definition}[Commutator]\label{def:commutator}
+For elements $a, b$ in a group $(G, \cdot, {}^{-1}, e)$, the
+\emph{commutator} is
+\[
+  [a, b] = a \cdot b \cdot a^{-1} \cdot b^{-1}.
+\]
+\end{definition}
+
+\begin{definition}[Abelianization]\label{def:abelianization}
+The \emph{abelianization} of $G$ is the quotient
+\[
+  G^{\ab} = G \,/\, \langle [a, b] = e \mid a, b \in G \rangle.
+\]
+Concretely, $G^{\ab}$ is $G$ modulo the smallest congruence relation
+that includes:
+\begin{itemize}
+\item commutativity: $a \cdot b \sim b \cdot a$;
+\item congruence: $x \sim y$ implies $z \cdot x \sim z \cdot y$ and
+  $x \cdot z \sim y \cdot z$;
+\item the group laws (associativity, identity, inverse).
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[Commutators vanish]\label{thm:commutator-vanishes}
+In $G^{\ab}$, every commutator is trivial: $[a, b] = e$.
+\end{theorem}
+
+\begin{proof}
+We compute in $G^{\ab}$:
+\begin{align*}
+  [a, b] &= (a \cdot b) \cdot (a^{-1} \cdot b^{-1}) \\
+  &\sim (b \cdot a) \cdot (a^{-1} \cdot b^{-1})
+    &&\text{(commutativity of } a \cdot b\text{)} \\
+  &= b \cdot (a \cdot a^{-1}) \cdot b^{-1}
+    &&\text{(associativity)} \\
+  &= b \cdot e \cdot b^{-1}
+    &&\text{(inverse law)} \\
+  &= b \cdot b^{-1} = e.
+    &&\text{(identity and inverse)} \qedhere
+\end{align*}
+\end{proof}
+
+\begin{corollary}\label{cor:abelianization-commutative}
+$G^{\ab}$ is abelian: $[a] \cdot [b] = [b] \cdot [a]$ for all
+$a, b \in G$.
+\end{corollary}
+
+\section{The First Homology Group}\label{sec:H1}
+
+\begin{definition}[First homology]\label{def:H1}
+The \emph{first homology group} of a pointed type $(A, a)$ is defined
+as the abelianization of the fundamental group:
+\[
+  H_1(A) \;=\; \pi_1(A, a)^{\ab}.
+\]
+\end{definition}
+
+\begin{definition}[Hurewicz homomorphism]\label{def:hurewicz-map}
+The \emph{Hurewicz homomorphism}
+\[
+  h : \pi_1(A, a) \longrightarrow H_1(A)
+\]
+is the canonical quotient map to the abelianization.
+\end{definition}
+
+\begin{theorem}[Hurewicz theorem, dimension 1]\label{thm:hurewicz}
+For any pointed type $(A, a)$, the Hurewicz homomorphism induces an
+isomorphism
+\[
+  \pi_1(A, a)^{\ab} \;\cong\; H_1(A).
+\]
+\end{theorem}
+
+\begin{proof}
+This is tautological in our setup, since $H_1$ is defined as
+$\pi_1^{\ab}$. The mathematical content is that $H_1$ computed via
+singular homology agrees with $\pi_1^{\ab}$---a fact that in the
+topological setting requires the theory of singular chains and the
+identification of 1-cycles with loops.
+\end{proof}
+
+\begin{proposition}[Properties of the Hurewicz map]\label{prop:hurewicz-properties}
+\hfill
+\begin{enumerate}
+\item[\textup{(i)}] $h$ is surjective: every element of $H_1(A)$ is
+  $h(\alpha)$ for some $\alpha \in \pi_1(A, a)$.
+\item[\textup{(ii)}] $\ker(h) = [\pi_1, \pi_1]$: $h(\alpha) = e$ if
+  and only if $\alpha$ lies in the commutator subgroup.
+\item[\textup{(iii)}] $h$ is a group homomorphism:
+  $h(\alpha \cdot \beta) = h(\alpha) \cdot h(\beta)$.
+\end{enumerate}
+\end{proposition}
+
+\section{Computations}\label{sec:hurewicz-computations}
+
+\begin{example}[$H_1$ of the circle]
+Since $\pi_1(S^1) \cong \mathbb{Z}$ is already abelian,
+\[
+  H_1(S^1) \;\cong\; \mathbb{Z}^{\ab} \;\cong\; \mathbb{Z}.
+\]
+The abelianization of $\mathbb{Z}$ is $\mathbb{Z}$ itself: the
+abelianization relation on $\mathbb{Z}$ implies $x = y$ whenever it
+relates $x$ and $y$, as verified by induction on the relation.
+\end{example}
+
+\begin{example}[$H_1$ of the torus]
+Since $\pi_1(T^2) \cong \mathbb{Z} \times \mathbb{Z}$ is abelian,
+\[
+  H_1(T^2) \;\cong\; (\mathbb{Z} \times \mathbb{Z})^{\ab}
+  \;\cong\; \mathbb{Z} \times \mathbb{Z}.
+\]
+\end{example}
+
+\begin{example}[$H_1$ of the figure-eight]\label{ex:figure-eight-H1}
+The figure-eight has non-abelian $\pi_1 \cong \mathbb{Z} * \mathbb{Z}$.
+Its abelianization is:
+\[
+  H_1(S^1 \vee S^1) \;\cong\;
+  (\mathbb{Z} * \mathbb{Z})^{\ab} \;\cong\;
+  \mathbb{Z} \times \mathbb{Z}.
+\]
+The abelianization map $\mathbb{Z} * \mathbb{Z} \to
+\mathbb{Z} \times \mathbb{Z}$ sends a free product word to the pair
+of total exponents: a word with left-elements summing to $m$ and
+right-elements summing to $n$ maps to $(m, n)$.
+This is a homomorphism (it respects concatenation componentwise) and its
+kernel is precisely the commutator subgroup.
+
+This is a paradigmatic example where $\pi_1 \ne H_1$: the
+non-commutativity of the free product is ``killed'' by
+abelianization.
+\end{example}
+
+\begin{theorem}[Free product abelianization]\label{thm:free-product-ab}
+For any groups $G$ and $H$\textup{:}
+\[
+  (G * H)^{\ab} \;\cong\; G^{\ab} \times H^{\ab}.
+\]
+\end{theorem}
+
+\section{Simply Connected Spaces and $H_1$}\label{sec:sc-H1}
+
+\begin{definition}[Simply connected]\label{def:simply-connected}
+A type $A$ is \emph{simply connected} at $a$ if
+$\pi_1(A, a) = \{e\}$, i.e., every loop at $a$ is trivial in the
+rewrite quotient.
+\end{definition}
+
+\begin{theorem}\label{thm:sc-H1-trivial}
+If $A$ is simply connected at $a$, then $H_1(A) = \{0\}$.
+\end{theorem}
+
+\begin{proof}
+If $\pi_1(A, a)$ has a single element, then its abelianization also
+has a single element.
+\end{proof}
+
+\begin{corollary}[Detection principle]\label{cor:detection}
+If $H_1(A)$ contains a non-trivial element, then $\pi_1(A, a)$ is
+non-trivial. Equivalently, $H_1(A) \ne 0$ implies $A$ is not simply
+connected.
+\end{corollary}
+
+\section{Higher Hurewicz and Abelianization of Known Groups}%
+\label{sec:higher-hurewicz}
+
+\begin{theorem}[Higher Hurewicz, statement]\label{thm:higher-hurewicz}
+For $n \ge 2$ and $(n-1)$-connected $X$, there is an isomorphism
+\[
+  h_n : \pi_n(X, x_0) \;\xrightarrow{\;\sim\;}\; H_n(X).
+\]
+In particular\textup{:}
+\begin{itemize}
+\item For simply connected $X$: $\pi_2(X) \cong H_2(X)$.
+\item For spheres: $\pi_n(S^n) \cong H_n(S^n) \cong \mathbb{Z}$.
+\end{itemize}
+\end{theorem}
+
+\begin{remark}
+The higher Hurewicz theorem is stated at the structural level in the
+formalization. The computational-paths framework captures $\pi_n$ for
+$n = 1, 2$ concretely and records the higher statement as data.
+\end{remark}
+
+
+% ==========================================================================
+%  CHAPTER 10 — Advanced Homotopy Theory
+% ==========================================================================
+
+\chapter{Advanced Homotopy Theory}\label{ch:advanced}
+
+We conclude Part~II with a survey of the advanced homotopy-theoretic
+structures formalized in the computational-paths library, highlighting
+the interplay between the algebraic rewriting infrastructure and
+classical constructions.
+
+\section{Eilenberg--MacLane Spaces and Postnikov Towers}%
+\label{sec:EM-postnikov}
+
+\begin{definition}[Eilenberg--MacLane space]\label{def:EM-space}
+An \emph{Eilenberg--MacLane space} $K(G, n)$ for a group $G$ and
+$n \ge 1$ is a type satisfying:
+\[
+  \pi_k(K(G,n)) \;\cong\;
+  \begin{cases}
+    G & \text{if } k = n, \\
+    0 & \text{if } k \ne n.
+  \end{cases}
+\]
+\end{definition}
+
+\begin{definition}[Postnikov tower]\label{def:postnikov-tower}
+The \emph{Postnikov tower} of a type $A$ is a sequence of
+$n$-groupoid truncations:
+\[
+  \cdots \;\longrightarrow\; A_{\le n+1} \;\longrightarrow\;
+  A_{\le n} \;\longrightarrow\; \cdots \;\longrightarrow\;
+  A_{\le 1} \;\longrightarrow\; A_{\le 0}.
+\]
+The $n$-th Postnikov stage $A_{\le n}$ retains all cells of the
+$\omega$-groupoid tower up to dimension $n$ and collapses all higher
+cells to the trivial type.
+\end{definition}
+
+\begin{theorem}[Postnikov convergence]\label{thm:postnikov-convergence}
+\hfill
+\begin{enumerate}
+\item[\textup{(i)}] If $k \le n$, then the $k$-cells of stage $n$
+  agree with the $k$-cells of the full tower.
+\item[\textup{(ii)}] For $k \le n \le m$, the $k$-cells of stages
+  $n$ and $m$ are equal.
+\item[\textup{(iii)}] Stage $n$ kills $\pi_{n+1}$: the
+  $(n+1)$-cells at stage $n$ form the trivial type.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+All three properties follow from the definition of the truncation
+functor $\trunc_n$ on the $\omega$-groupoid cell types: for
+$k \le n$, $\trunc_n(\text{cells}(k)) = \text{cells}(k)$;
+for $k > n$, $\trunc_n(\text{cells}(k)) = \mathbf{1}$.
+\end{proof}
+
+\begin{remark}
+The 1-truncation of the Postnikov tower recovers the strict
+groupoid $\PathRwQuot$ (Theorem~5.11), connecting the truncation
+framework to the quotient construction of Part~I.
+\end{remark}
+
+\section{The Whitehead Theorem}\label{sec:whitehead}
+
+\begin{definition}[Weak equivalence]\label{def:weak-equiv}
+A function $f : A \to B$ is a \emph{weak homotopy equivalence} if the
+induced maps $f_* : \pi_n(A, a) \to \pi_n(B, f(a))$ are isomorphisms
+for all $n \ge 0$ and all base points $a \in A$.
+\end{definition}
+
+\begin{theorem}[Whitehead]\label{thm:whitehead}
+If $f : A \to B$ is a weak homotopy equivalence between types
+satisfying appropriate finiteness conditions \textup{(}CW
+approximability\textup{)}, then $f$ is a homotopy equivalence: there
+exists $g : B \to A$ with $g \circ f \sim \id_A$ and
+$f \circ g \sim \id_B$.
+\end{theorem}
+
+\begin{remark}
+The formalization packages the Whitehead theorem as a structure:
+given weak equivalence data (isomorphisms on all $\pi_n$) together
+with a candidate quasi-inverse, it produces a \texttt{SimpleEquiv}
+between the types. The induced map preserves the identity element
+and respects loop composition.
+\end{remark}
+
+\section{Spectral Sequences}\label{sec:spectral}
+
+The formalization includes the basic algebraic framework of spectral
+sequences, providing the language for more advanced computations.
+
+\begin{definition}[Pointed set with differential]\label{def:ptset}
+A \emph{pointed set} is a pair $(X, 0)$ where $0 \in X$ is a
+distinguished element. A \emph{morphism} of pointed sets is a function
+preserving the distinguished element. The \emph{zero morphism}
+sends everything to $0$.
+\end{definition}
+
+\begin{definition}[Spectral page]\label{def:spectral-page}
+A \emph{spectral page} with bound $N$ consists of:
+\begin{itemize}
+\item a bigraded family of pointed sets $E^{p,q}$ for
+  $0 \le p, q < N$;
+\item differentials $d : E^{p,q} \to E^{p,q}$ satisfying
+  $d \circ d = 0$ (the differential squares to the zero element).
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Spectral sequence]\label{def:spectral-seq}
+A \emph{spectral sequence} is a sequence of spectral pages
+$(E_r)_{r \ge 0}$ with connecting morphisms
+$E_r^{p,q} \to E_{r+1}^{p,q}$ between successive pages.
+\end{definition}
+
+\begin{definition}[Degeneration]\label{def:degeneration}
+A spectral sequence \emph{degenerates at page $r_0$} if all
+differentials on pages $r \ge r_0$ are zero morphisms.
+\end{definition}
+
+\begin{theorem}[Convergence for finite filtrations]\label{thm:ss-convergence}
+If a spectral sequence degenerates at page $r_0$, then for all
+$r \ge r_0$, all differentials are trivial and the terms stabilize.
+\end{theorem}
+
+\begin{definition}[Morphism of spectral sequences]\label{def:ss-morphism}
+A \emph{morphism} $\varphi : E \to F$ of spectral sequences consists
+of pointed-set morphisms $\varphi_r^{p,q} : E_r^{p,q} \to F_r^{p,q}$
+on each page, commuting with the differentials:
+$\varphi_r \circ d^E_r = d^F_r \circ \varphi_r$.
+\end{definition}
+
+\section{Further Formalized Structures}\label{sec:further}
+
+The computational-paths library formalizes a broad range of additional
+homotopy-theoretic structures, which we briefly survey.
+
+\subsection*{Cofiber and Puppe sequences.}
+The Barratt--Puppe sequence extends the fiber sequence to the cofiber
+side. For a map $f : A \to B$, the cofiber sequence
+\[
+  A \;\xrightarrow{f}\; B \;\longrightarrow\; \cofib(f)
+  \;\longrightarrow\; \Sigma A \;\longrightarrow\; \Sigma B
+  \;\longrightarrow\; \cdots
+\]
+is formalized with computational-path connecting maps at each stage.
+
+\subsection*{Mayer--Vietoris sequence.}
+For a pushout square, the Mayer--Vietoris exact sequence in homotopy
+groups is derived as a consequence of the Seifert--van~Kampen theorem
+and the long exact sequence machinery.
+
+\subsection*{Stable homotopy and spectra.}
+The colimit of iterated suspensions yields stable homotopy groups.
+The library formalizes:
+\begin{itemize}
+\item $\Omega$-spectra: sequences of types $(E_n)_{n \ge 0}$ with
+  equivalences $E_n \simeq \Omega E_{n+1}$;
+\item the stable homotopy category, via the stabilization of the
+  suspension map;
+\item stable stems and their relation to the Freudenthal theorem.
+\end{itemize}
+
+\subsection*{Characteristic classes.}
+The library includes structures for:
+\begin{itemize}
+\item Stiefel--Whitney classes $w_i$ for real vector bundles,
+\item Chern classes $c_i$ for complex vector bundles,
+\item Pontryagin classes $p_i$ for oriented real bundles.
+\end{itemize}
+These are defined as cohomology classes of classifying spaces and
+interact with the fibration theory of Chapter~\ref{ch:fibrations}.
+
+\subsection*{Operads and $A_\infty$-algebras.}
+The algebraic structure of iterated loop spaces is captured by
+operads. The formalization includes:
+\begin{itemize}
+\item the associahedron operad and its action on loop spaces,
+\item $A_\infty$-algebra structures arising from path composition,
+\item the recognition principle relating $n$-fold loop spaces to
+  algebras over the little $n$-cubes operad.
+\end{itemize}
+
+\subsection*{Rational homotopy theory.}
+The formalization records the rationalization functor and the
+connection between rational homotopy groups and Sullivan's minimal
+models, providing a bridge to the algebraic side of the theory.
+
+\subsection*{Additional structures.}
+The library also formalizes:
+\begin{itemize}
+\item K-theory (algebraic and topological),
+\item topological Hochschild homology (THH),
+\item Goodwillie calculus and polynomial functors,
+\item motivic and \'etale cohomology,
+\item surgery theory and bordism,
+\item model categories and Quillen adjunctions,
+\item higher topos theory and $\infty$-categories.
+\end{itemize}
+A comprehensive index mapping each structure to its Lean~4 module is
+provided in Appendix~B.
+
+\section{Summary of Part~II}\label{sec:part2-summary}
+
+Part~II has developed the homotopy theory of computational paths from
+the fundamental group through advanced topics. The key results are
+summarized in Table~\ref{tab:part2-summary}.
+
+\begin{table}[ht]
+\centering
+\caption{Summary of Part~II results.}\label{tab:part2-summary}
+\begin{tabular}{lll}
+\toprule
+\textbf{Result} & \textbf{Reference} & \textbf{Key equation} \\
+\midrule
+$\pi_1$ is a group & Thm.~\ref{thm:pi1-group} & strict group laws \\
+Product formula & Thm.~\ref{thm:pi1-product}
+  & $\pi_1(A \times B) \cong \pi_1(A) \times \pi_1(B)$ \\
+Eckmann--Hilton & Thm.~\ref{thm:eckmann-hilton}
+  & $\pi_n$ abelian for $n \ge 2$ \\
+$\pi_1(S^1) \cong \mathbb{Z}$ & Thm.~\ref{thm:pi1-circle}
+  & winding number isomorphism \\
+$\pi_1(T^2) \cong \mathbb{Z}^2$ & Thm.~\ref{thm:pi1-torus}
+  & product of circles \\
+$\pi_1(S^1 \vee S^1) \cong \mathbb{Z} * \mathbb{Z}$
+  & Thm.~\ref{thm:pi1-figure-eight} & free product \\
+Seifert--van Kampen & Thm.~\ref{thm:svk}
+  & $\pi_1$ of pushouts \\
+Long exact sequence & Thm.~\ref{thm:les}
+  & $\pi_1(F) \to \pi_1(E) \to \pi_1(B) \to P(b)$ \\
+Hurewicz theorem & Thm.~\ref{thm:hurewicz}
+  & $H_1 \cong \pi_1^{\ab}$ \\
+Whitehead theorem & Thm.~\ref{thm:whitehead}
+  & weak equiv $\Rightarrow$ homotopy equiv \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The computational-paths framework provides a distinctive perspective
+on all these results: the group, groupoid, and higher-categorical
+structures are \emph{derived} from the rewrite system on path traces,
+rather than being postulated as axioms. The rewriting infrastructure
+of Part~I directly produces the strict algebraic identities that make
+these homotopy-theoretic constructions possible.
