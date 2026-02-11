@@ -108,7 +108,7 @@ def ptypical_ext {p : Nat} {R : Type u} (a b : PTypicalWittVector p R)
   Path.mk [] (by cases a; cases b; congr; funext n; exact (h n).proof)
 
 /-- Embedding p-typical Witt vectors into big Witt vectors. -/
-def ptypicalToBig {p : Nat} {R : Type u} (zero : R)
+def ptypicalToBig {p : Nat} {R : Type u} (_zero : R)
     (v : PTypicalWittVector p R) : BigWittVector R :=
   { coeff := fun n => v.coeff n }
 
