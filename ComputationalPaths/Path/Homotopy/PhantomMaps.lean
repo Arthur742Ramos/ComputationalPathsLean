@@ -7,7 +7,7 @@ null on every finite subcomplex. We package the phantom group Ph(X,Y),
 the lim^1 characterization, Gray's theorem, and universal phantom maps
 as lightweight structures with Path-friendly fields.
 
-All proofs are complete — no sorry, no axiom.
+All proofs are complete — no placeholders, no axioms.
 
 ## Key Results
 

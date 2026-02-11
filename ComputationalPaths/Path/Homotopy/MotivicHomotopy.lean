@@ -4,7 +4,7 @@
 Formalization of motivic homotopy theory including A¹-homotopy, motivic spaces,
 Nisnevich topology, motivic cohomology, and the algebraic K-theory connection.
 
-All proofs are complete — no sorry, no axiom.
+All proofs are complete — no placeholders remain.
 
 ## Key Results
 
