@@ -272,6 +272,7 @@ import ComputationalPaths.Path.Homotopy.NilpotenceTheorem
 import ComputationalPaths.Path.Homotopy.SullivanConjecture
 import ComputationalPaths.Path.Homotopy.FormalGroupLaw
 import ComputationalPaths.Path.Algebra.SpectralAlgebra
+import ComputationalPaths.Path.Algebra.SpectralSequenceConvergence
 import ComputationalPaths.Path.Algebra.HomologicalStability
 import ComputationalPaths.Path.Algebra.StabilityTheorem
 import ComputationalPaths.Path.Homotopy.ParametrizedHomotopy
