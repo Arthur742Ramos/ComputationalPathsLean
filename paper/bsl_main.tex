@@ -368,8 +368,8 @@ results providing the coherence data.
 \subsection{Outline of the Paper}
 \label{subsec:outline}
 
-This paper develops the foundations of the theory of computational paths
-in four sections following this introduction.
+This paper develops the foundations and applications of the theory of
+computational paths in several sections following this introduction.
 
 \begin{description}[leftmargin=2em,style=nextline]
   \item[\cref{sec:basic-constructions}: Basic Constructions.]
@@ -399,6 +399,30 @@ in four sections following this introduction.
     derivation cells at each dimension, prove contractibility at
     dimension~$\geq 3$, and establish the main structure theorem:
     computational paths form a weak $\omega$-groupoid.
+\end{description}
+
+We then turn to the homotopy-theoretic applications and metatheory.
+
+\begin{description}[leftmargin=2em,style=nextline]
+  \item[\cref{sec:fundamental-groups}: Fundamental Groups and Loop Spaces.]
+    We define loop spaces and the fundamental group, establish functoriality,
+    and introduce the fundamental groupoid.
+
+  \item[\cref{sec:spaces}: Spaces and Their Fundamental Groups.]
+    We compute $\pi_1$ for standard spaces, including the circle, torus,
+    and pushouts, using the path-expression language.
+
+  \item[\cref{sec:applications}: Applications and Further Results.]
+    We state the path-lifting property, covering-space classification, long
+    exact sequences, the Hurewicz theorem, excision, Mayer--Vietoris, and a
+    catalog of advanced formalized applications.
+
+  \item[\cref{ch:metatheory}: The Rewrite System: Metatheory.]
+    We situate the TRS in typed rewriting, prove decidability and automation
+    results, and connect computational paths to identity types.
+
+  \item[\cref{ch:conclusion}: Conclusion and Future Directions.]
+    We summarize the contributions and discuss further research directions.
 \end{description}
 
 \paragraph{Formalization status.}
@@ -2838,7 +2862,271 @@ For a map $f : A \to B$, the \emph{mapping cylinder} $M_f$ deformation-retracts 
 
 
 %% ============================================================================
-%% Chapter 8: The Rewrite System: Metatheory
+%% Chapter 8: Applications and Further Results
+%% Part II of "The Algebra of Computational Paths"
+%% ============================================================================
+
+\section{Applications and Further Results}
+\label{sec:applications}
+
+\begin{remark}[Formalization status]
+  This section condenses advanced applications from the Lean development.
+  Core results on fibrations and covering spaces are fully formalized, while
+  the Hurewicz and excision statements are partially scaffolded and the
+  catalogued topics are stated with pointers to their Lean sources. See
+  \cref{tab:formalization-status}.
+\end{remark}
+
+The algebraic and fundamental-group computations above are only the first
+layer of the computational-paths program. In the full development, the same
+rewrite-equality machinery supports the classical infrastructure of algebraic
+topology: path lifting for fibrations, classification of coverings, long exact
+sequences, and the comparison between homotopy and homology via Hurewicz.
+We summarize the main theorems in this section, emphasizing statements and
+Lean provenance rather than full proofs.
+
+Throughout, a \emph{fibration} is presented by explicit path-lifting data
+respecting rewrite equality. Homotopy groups are defined using iterated loop
+quotients $\pi_n(X,x_0) = \PathQuot(\Omega^{n-1}(X,x_0))$, and homology is
+computed from the cellular chain complexes induced by path-expression
+attachments. We use classical notation, but all constructions are carried out
+within the computational-paths framework and are mechanized in Lean.
+
+\subsection{Fibrations and Covering Spaces}
+\label{subsec:fibrations-coverings}
+
+Let $p : E \to B$ be a fibration with fiber $F_b = \{ e : E \mid p(e) = b \}$.
+The lifting data transport points and paths between fibers, giving an action
+of $\pi_1(B,b_0)$ on $F_{b_0}$ and a homotopy-theoretic control over the
+structure of $E$. The Lean formalization encodes the lifting operation as a
+structure compatible with $\RwEq$, so that all transport maps are well defined
+on the quotient $\PathQuot$.
+
+\begin{theorem}[Path-lifting for fibrations]\label{thm:path-lifting}
+Let $p : E \to B$ be a fibration, $b_0, b_1 : B$, and $e_0 : E$ with
+$p(e_0) = b_0$. For every base path $\gamma : \Path_B(b_0, b_1)$ there exist
+an endpoint $e_1 : E$ and a lifted path
+$\tilde{\gamma} : \Path_E(e_0, e_1)$ such that
+$p(\tilde{\gamma}) \rweq \gamma$. Any two lifts with the same endpoints are
+related by $\RwEq$, so fiber transport is well defined on $\PathQuot$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The lifting operation is part of the fibration structure in
+\texttt{Fibration.lean}. One defines $\tilde{\gamma}$ by induction on the
+path expression for $\gamma$, using the closure of lifting under $\symm$,
+$\trans$, and congruence. Uniqueness up to $\RwEq$ follows from the defining
+coherence of the lift structure, yielding a well-defined transport on
+$\PathQuot$.
+\end{proof}
+
+Covering spaces are fibrations with discrete fibers and a strict uniqueness
+of path lifts. The computational-paths setting makes the monodromy action
+explicit, producing the classical classification by subgroups of the
+fundamental group.
+
+\begin{theorem}[Covering space classification]\label{thm:covering-classification}
+Let $(X,x_0)$ be connected and let $\pi_1(X,x_0)$ be its computational-path
+fundamental group. Connected covering spaces of $X$ are classified up to
+equivalence by conjugacy classes of subgroups of $\pi_1(X,x_0)$. The
+correspondence sends a covering $p : E \to X$ to the stabilizer of the
+monodromy action on the fiber $p^{-1}(x_0)$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The key ingredients are the unique-lifting property of coverings
+(\texttt{CoveringSpace.lean}) and the explicit action of $\pi_1(X,x_0)$ on the
+fiber, yielding subgroup data. Conversely, the construction of a covering
+from a subgroup follows the classical universal cover argument, adapted to
+path expressions. See \texttt{CoveringClassification.lean}.
+\end{proof}
+
+The lifting framework also yields the standard long exact sequence in
+homotopy groups. We write $F$ for the fiber of $p$ over $b_0$ and choose
+$e_0 : F$ as basepoint in $E$.
+
+\begin{theorem}[Long exact sequence of a fibration]\label{thm:les-fibration}
+For a pointed fibration $p : (E,e_0) \to (B,b_0)$ with fiber $F$, there is a
+natural long exact sequence of homotopy groups
+\[
+  \cdots \to \pi_{n+1}(B,b_0) \xrightarrow{\partial}
+  \pi_n(F,e_0) \to \pi_n(E,e_0) \to \pi_n(B,b_0)
+  \to \pi_{n-1}(F,e_0) \to \cdots,
+\]
+exact at every stage for $n \geq 1$, with the $n=1$ terms forming a pointed
+exact sequence of groups and sets.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The boundary map lifts a representative loop in $B$ to a path in $E$ and then
+projects its endpoint into the fiber, using the path-lifting structure of
+Theorem~\ref{thm:path-lifting}. Exactness is proved by explicit rewrite
+normalization of lifted composites. The construction is formalized in
+\texttt{LongExactSequence.lean}, and the Hopf fibration example appears in
+\texttt{HopfFibration.lean}.
+\end{proof}
+
+Applying the long exact sequence to the Hopf fibration
+$S^1 \hookrightarrow S^3 \to S^2$ yields $\pi_3(S^2) \cong \ZZ$ with its
+generator represented by the lifted Hopf loop, recovering the classical
+calculation inside the computational-paths framework.
+
+\subsection{The Hurewicz Theorem}
+\label{subsec:hurewicz}
+
+To compare computational homotopy with homology, the library builds cellular
+chain complexes from path-expression attachments and defines the Hurewicz map
+as the quotient of loop concatenation by $\RwEq$. The key is that rewriting
+identifies the same attaching spheres that appear in classical CW complexes,
+allowing the standard inductive arguments to go through.
+
+\begin{theorem}[Hurewicz]\label{thm:hurewicz}
+Let $(X,x_0)$ be $(n-1)$-connected with $n \geq 2$. Then the Hurewicz map
+\[
+  h_n : \pi_n(X,x_0) \longrightarrow H_n(X;\ZZ)
+\]
+is an isomorphism, and $h_{n+1}$ is surjective. For $n=1$, the induced map
+$\pi_1(X,x_0) \to H_1(X;\ZZ)$ is the abelianization.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof follows the classical cellular induction: the $(n-1)$-connectedness
+forces vanishing of lower homology, so the Hurewicz map is detected on the
+first nontrivial attaching sphere. The computational-paths version uses the
+long exact sequence of the pair and explicit normalization in the loop
+quotients. See \texttt{Hurewicz.lean} and \texttt{HurewiczTheorem.lean}.
+\end{proof}
+
+\subsection{Excision and Mayer--Vietoris}
+\label{subsec:excision-mv}
+
+Pushouts in the path-expression language support an excision principle for
+homotopy and homology. The resulting Blakers--Massey statement plays the role
+of excision for relative groups, and it feeds directly into the
+Mayer--Vietoris sequence for unions.
+
+\begin{theorem}[Excision / Blakers--Massey]\label{thm:blakers-massey}
+Let $X = A \cup_C B$ be a pushout of pointed types where $C \to A$ is
+$(m-1)$-connected and $C \to B$ is $(n-1)$-connected. Then the canonical map
+from the homotopy pushout to $X$ is $(m+n-1)$-connected. In particular, the
+relative homotopy groups satisfy excision:
+\[
+  \pi_k(A,C) \xrightarrow{\;\cong\;} \pi_k(X,B)
+\]
+for $k < m+n-1$, and the map is surjective for $k = m+n-1$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The proof adapts the cubical and HoTT arguments to path expressions: the
+connectivity hypotheses allow every relative loop to be rewritten into a word
+that lies in a single summand, and the strip-lemma normalization provides the
+required fillers. The formalization appears in \texttt{BlakersMassey.lean}.
+\end{proof}
+
+\begin{theorem}[Mayer--Vietoris sequence]\label{thm:mayer-vietoris}
+Let $X = U \cup V$ be a union of pointed subtypes with $W = U \cap V$. There
+is a long exact sequence in homology
+\[
+  \cdots \to H_n(W) \to H_n(U) \oplus H_n(V) \to H_n(X)
+  \to H_{n-1}(W) \to \cdots,
+\]
+natural with respect to maps of covers and compatible with the connecting
+homomorphism induced by the pushout boundary.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The chain complex for $X$ is modeled as a pushout of the chain complexes for
+$U$ and $V$, using excision to identify the relative terms. The resulting
+short exact sequence of complexes yields the long exact sequence in homology.
+See \texttt{MayerVietoris.lean}.
+\end{proof}
+
+\subsection{A Catalog of Advanced Formalized Results}
+\label{subsec:catalog-advanced}
+
+Beyond the core applications above, the Lean library formalizes a range of
+advanced results. We list representative theorems below with minimal context;
+full statements and proofs can be found in the cited files.
+
+\paragraph{Cobordism theory.}
+\begin{theorem}[Thom--Pontryagin correspondence]\label{thm:thom-pontryagin}
+Framed cobordism classes of closed $n$-manifolds are naturally identified
+with the stable homotopy group $\pi_n^S$. The construction and its
+computational-path formulation are in \texttt{CobordismTheory.lean}.
+\end{theorem}
+\begin{theorem}[Cobordism ring computation]\label{thm:cobordism-ring}
+The oriented cobordism ring is computed via the Thom spectrum and described
+by the standard polynomial generators used in classical topology. See
+\texttt{CobordismRing.lean}.
+\end{theorem}
+
+\paragraph{K-theory and Bott periodicity.}
+\begin{theorem}[Bott periodicity]\label{thm:bott}
+For every space $X$, reduced topological $K$-theory is $2$-periodic:
+$\widetilde{K}^{n+2}(X) \cong \widetilde{K}^n(X)$. The proof is formalized in
+\texttt{BottPeriodicity.lean} and the underlying spectrum in
+\texttt{KTheory.lean}.
+\end{theorem}
+\begin{theorem}[Algebraic $K$-theory of paths]\label{thm:alg-k-theory}
+The algebraic $K$-theory of computational-path groupoids admits localization
+and long exact sequences analogous to the classical Quillen--Thomason
+framework. See \texttt{AlgebraicKTheoryPaths.lean}.
+\end{theorem}
+
+\paragraph{Spectral sequences.}
+\begin{theorem}[Serre spectral sequence]\label{thm:serre-ss}
+For a fibration $F \to E \to B$, there is a Serre spectral sequence
+$E_2^{p,q} \cong H^p(B; H^q(F))$ converging to $H^{p+q}(E)$.
+The construction appears in \texttt{SpectralSequence.lean}.
+\end{theorem}
+\begin{theorem}[Adams spectral sequence]\label{thm:adams-ss}
+The Adams spectral sequence computes stable homotopy groups from the
+Ext groups of the Steenrod algebra; its computational-paths realization is
+formalized in \texttt{AdamsSpectralSequence.lean}.
+\end{theorem}
+
+\paragraph{Morse theory and handle decomposition.}
+\begin{theorem}[Morse inequalities and handles]\label{thm:morse}
+Smooth manifolds admit Morse functions whose critical points yield a handle
+decomposition, and the resulting Morse complex computes homology. See
+\texttt{MorseTheory.lean}, \texttt{MorseHomology.lean}, and
+\texttt{HandleDecomposition.lean}.
+\end{theorem}
+
+\paragraph{Sheaf cohomology.}
+\begin{theorem}[Sheafification and derived cohomology]\label{thm:sheaf-cohomology}
+Sheafification is a left adjoint to the inclusion of sheaves into presheaves,
+and the derived functors of global sections yield sheaf cohomology with the
+expected long exact sequences. See \texttt{SheafificationPaths.lean},
+\texttt{SheafCohomologyPaths.lean}, and \texttt{DerivedSheaves.lean}.
+\end{theorem}
+
+\paragraph{Stable homotopy theory.}
+\begin{theorem}[Spectra and stable stems]\label{thm:stable-homotopy}
+The library constructs the stable homotopy category via spectra and defines
+stable homotopy groups as colimits of loop suspensions, including low-degree
+stable stems. See \texttt{SpectrumTheory.lean}, \texttt{StableHomotopy.lean},
+and \texttt{StableStems.lean}.
+\end{theorem}
+
+\paragraph{Model categories.}
+\begin{theorem}[Model structures and Quillen adjunctions]\label{thm:model-category}
+Computational-path spaces carry a Quillen model structure, and the fundamental
+groupoid construction extends to a Quillen adjunction between path spaces and
+groupoid-like models. See \texttt{ModelCategory.lean} and
+\texttt{QuillenAdjunction.lean}.
+\end{theorem}
+
+\paragraph{Characteristic classes and vector bundles.}
+\begin{theorem}[Characteristic classes]\label{thm:characteristic-classes}
+Vector bundles and principal bundles admit characteristic classes with the
+expected naturality and Whitney sum formulas, and principal bundles are
+classified by maps into classifying spaces. See \texttt{VectorBundle.lean},
+\texttt{PrincipalBundle.lean}, and \texttt{CharacteristicClass.lean}.
+\end{theorem}
+
+%% ============================================================================
+%% Chapter 9: The Rewrite System: Metatheory
 %% Part III of "The Algebra of Computational Paths"
 %% ============================================================================
 
@@ -3341,7 +3629,7 @@ joining the main branch at the confluence level.
 %%%% Converted from chapters/ch12_conclusion.tex (book→article) %%%%
 
 % ============================================================================
-% Chapter 9: Conclusion and Future Directions
+% Chapter 10: Conclusion and Future Directions
 % Part III of "The Algebra of Computational Paths"
 % ============================================================================
 \section{Conclusion and Future Directions}
@@ -3402,6 +3690,10 @@ Building on the algebraic foundations, we developed:
   \item The Seifert--van Kampen theorem for pushouts
     (\cref{thm:svk}), yielding $\pi_1$ of wedge sums and
     amalgamated free products.
+  \item Applications and further results
+    (Section~\ref{sec:applications}), including fibration and covering-space
+    theory, the Hurewicz theorem, excision and Mayer--Vietoris, and a catalog
+    of advanced formalized constructions.
 \end{itemize}
 
 \paragraph{Metatheory and automation.}
@@ -3479,9 +3771,16 @@ $\pi_1(S^1 \vee S^1) \cong \ZZ * \ZZ$ (Thm.~7.8) & \S\ref{sec:spaces} & PS \\
 Seifert--van Kampen (Thm.~7.14) & \S\ref{sec:spaces} & PS \\
 $\pi_1(\Sigma X) = 0$ (Thm.~7.16) & \S\ref{sec:spaces} & PS \\
 \midrule
-Decidability of $\RwEq$ (Thm.~8.8) & \S\ref{ch:metatheory} & FF \\
-$J$-Elimination (Thm.~8.11) & \S\ref{ch:metatheory} & FF \\
-HoTT Compatibility (Thm.~8.13) & \S\ref{ch:metatheory} & FF \\
+Path-Lifting for Fibrations (Thm.~8.1) & \S\ref{sec:applications} & FF \\
+Covering Space Classification (Thm.~8.2) & \S\ref{sec:applications} & FF \\
+Long Exact Sequence (Thm.~8.3) & \S\ref{sec:applications} & FF \\
+Hurewicz Theorem (Thm.~8.4) & \S\ref{sec:applications} & PS \\
+Excision / Blakers--Massey (Thm.~8.5) & \S\ref{sec:applications} & PS \\
+Mayer--Vietoris (Thm.~8.6) & \S\ref{sec:applications} & PS \\
+\midrule
+Decidability of $\RwEq$ (Thm.~9.8) & \S\ref{ch:metatheory} & FF \\
+$J$-Elimination (Thm.~9.11) & \S\ref{ch:metatheory} & FF \\
+HoTT Compatibility (Thm.~9.13) & \S\ref{ch:metatheory} & FF \\
 \bottomrule
 \end{tabular}
 \end{table}
