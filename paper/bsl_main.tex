@@ -137,12 +137,12 @@ $\pi : a =_A b$ is a propositional equality and $s$ is a finite list of
 elementary rewrite steps. The space of computational paths is equipped with a
 confluent, terminating rewrite system whose 74~rules (the count of 74 follows
 from the distinct constructors in our formalization; the earlier convention of
-76 in~\cite{ramos18} counted two context-congruence rules that serve double
+76 in~\cite{RDQO18} counted two context-congruence rules that serve double
 duty) are organized into eight groups covering path algebra, type-former
 $\beta/\eta$-rules, transport,
 contexts, dependent contexts, bi-contexts, map congruence, and structural
 closure. We prove that this structure gives rise to weak $\omega$-groupoids in
-the sense of Batanin--Leinster~\cite{batanin98}, with contractibility beginning at
+the sense of Batanin--Leinster~\cite{Batanin98}, with contractibility beginning at
 dimension~3---the critical threshold that preserves non-trivial fundamental
 groups. The entire development is mechanically verified in a proof assistant.
 \end{abstract}
@@ -163,7 +163,7 @@ type theory, higher-dimensional algebra, formalization
   Equality}
 \label{subsec:curry-howard}
 
-In Martin-L\"of type theory~\cite{mltt84}, the \emph{identity type} $\IdA_A(a,b)$ captures
+In Martin-L\"of type theory~\cite{MartinLof84}, the \emph{identity type} $\IdA_A(a,b)$ captures
 propositional equality between elements $a,b : A$. Its sole introduction rule
 is reflexivity: the term $\refl(a) : \IdA_A(a,a)$ witnesses that every element
 is equal to itself. The elimination rule---\emph{path induction}, also known as
@@ -179,7 +179,7 @@ Proofs} (UIP) principle holds:
   \forall\, p, q : \IdA_A(a,b),\quad p =_{\IdA_A(a,b)} q.
 \end{equation}
 This axiom collapses the entire space of identity proofs to at most one element
-per pair of endpoints. From the perspective of homotopy type theory~\cite{hott13},
+per pair of endpoints. From the perspective of homotopy type theory~\cite{HoTTBook},
 UIP asserts that every type is a \emph{set} (a $0$-truncated type), precluding
 the rich higher-dimensional structure that identity types can carry in
 intensional type theory.
@@ -188,7 +188,7 @@ intensional type theory.
 \subsection{The Computational Paths Program}
 \label{subsec:comp-paths-program}
 
-Following de~Queiroz, de~Oliveira, and Ramos~\cite{dqor16, ramos18, ramos19}, we propose
+Following de~Queiroz, de~Oliveira, and Ramos~\cite{DQOR16, RDQO18, ramos19}, we propose
 that equality proofs carry \emph{computational content}: the sequence of
 rewriting steps that produced them. Even when the underlying logic satisfies
 UIP---so that the propositional equality $a =_A b$ is proof-irrelevant---the
@@ -339,10 +339,10 @@ higher-dimensional structure even in a proof-irrelevant setting:
 \label{subsec:related-work}
 
 Our work connects to several strands of research in type theory and
-higher-dimensional algebra~\cite{baez95}.
+higher-dimensional algebra~\cite{BaezDolan95}.
 
 \paragraph{Homotopy Type Theory.}
-The Univalent Foundations program~\cite{hott13} interprets types as spaces,
+The Univalent Foundations program~\cite{HoTTBook} interprets types as spaces,
 identity types as path spaces, and higher identity types as higher homotopy
 groups. In HoTT, the identity type \emph{itself} carries higher structure, and
 UIP is rejected. Our approach is complementary: we work \emph{within} a
@@ -350,7 +350,7 @@ UIP-satisfying type theory and build the higher structure externally via
 rewrite traces.
 
 \paragraph{Types as weak $\omega$-groupoids.}
-Lumsdaine~\cite{lumsdaine10} and van~den~Berg--Garner~\cite{vdberg11}
+Lumsdaine~\cite{Lumsdaine10} and van~den~Berg--Garner~\cite{vdBG11}
 independently showed that the tower of iterated identity types in intensional
 type theory carries the structure of a weak $\omega$-groupoid. Our
 \cref{thm:omega-groupoid} (\cref{ch:higher-dimensional}) establishes an
@@ -358,14 +358,14 @@ analogous result for computational paths, with the crucial difference that
 contractibility begins at dimension~3 rather than dimension~1.
 
 \paragraph{Cubical Type Theory.}
-Bezem, Coquand, and Huber~\cite{bezem14} introduced cubical sets as a
+Bezem, Coquand, and Huber~\cite{BeCH14} introduced cubical sets as a
 constructive model of HoTT. Computational paths offer an alternative
 computational semantics: where cubical paths are built from interval
-variables, computational paths are built from explicit rewrite steps.~\cite{cohen18}
+variables, computational paths are built from explicit rewrite steps.~\cite{CCHM18}
 
 \paragraph{Higher-Dimensional Rewriting.}
 The rewriting-theoretic perspective on higher algebra, developed by Burroni,
-M\'etayer, Lafont, and others~\cite{burroni93, metayer03, lafont09}, treats rewrite rules as generators of higher
+M\'etayer, Lafont, and others~\cite{Burroni93, Metayer03, lafont09}, treats rewrite rules as generators of higher
 cells. Our 74-rule rewrite system on paths (\cref{ch:rewrite-system}) can be
 seen as an instance of this paradigm, with the strip lemma and confluence
 results providing the coherence data.
@@ -1368,7 +1368,7 @@ Representative cases include:
 \end{theorem}
 
 \begin{proof}
-  By Newman's lemma~\cite{newman42}: a terminating relation is confluent
+  By Newman's lemma~\cite{Newman42}: a terminating relation is confluent
   if and only if it is locally confluent. Termination is established in
   \cref{thm:termination}, and local confluence follows from the strip
   lemma (\cref{thm:strip-lemma}).
@@ -2124,7 +2124,7 @@ The pattern continues uniformly:
 
 \begin{definition}[Weak $\omega$-Groupoid]\label{def:omega-gpd}
   A \emph{weak $\omega$-groupoid} (in the sense of Batanin--Leinster
-  \cite{leinster04}) on a type $A$ consists of:
+  \cite{Leinster04}) on a type $A$ consists of:
   \begin{itemize}
     \item Cells at every dimension: $\mathrm{Cell}_k(A)$ for $k \in \Nat$.
     \item Groupoid operations (identity, composition, inversion) at each
@@ -2284,7 +2284,7 @@ Having established the algebraic foundations and the higher-dimensional structur
   This section is fully formalized in Lean: the loop-space definitions and fundamental-group results are mechanically verified. See \cref{tab:formalization-status} for the section-by-section summary as we move into mixed-status applications.
 \end{remark}
 
-With the algebraic and higher-dimensional foundations established, we now turn to the homotopy-theoretic applications of computational paths.~\cite{hatcher02, may99} The central notion is the \emph{fundamental group}, which captures the structure of loops in a type up to rewrite equivalence. Throughout what follows, we work with the computational path structure $\mathrm{Path}_A(a,b)$ carrying explicit rewrite traces, modulo the rewrite equality $\mathrm{RwEq}$ developed in \cref{ch:rewrite-system}.
+With the algebraic and higher-dimensional foundations established, we now turn to the homotopy-theoretic applications of computational paths.~\cite{Hatcher02, May99} The central notion is the \emph{fundamental group}, which captures the structure of loops in a type up to rewrite equivalence. Throughout what follows, we work with the computational path structure $\mathrm{Path}_A(a,b)$ carrying explicit rewrite traces, modulo the rewrite equality $\mathrm{RwEq}$ developed in \cref{ch:rewrite-system}.
 
 \subsection{Loop Spaces}\label{subsec:loop-spaces}
 
@@ -2447,13 +2447,13 @@ The \emph{$n$-th homotopy group} is
 \[
   \pi_n(A, a) = \pi_0(\Omega^n(A, a)),
 \]
-where $\pi_0$ denotes path-connected components (the quotient by the relation of being connected by a path). For $n \geq 1$, this coincides with $\mathrm{LoopQuot}(\Omega^{n-1}(A, a),\, \mathsf{pt}_{n-1})$.~\cite{brunerie16}
+where $\pi_0$ denotes path-connected components (the quotient by the relation of being connected by a path). For $n \geq 1$, this coincides with $\mathrm{LoopQuot}(\Omega^{n-1}(A, a),\, \mathsf{pt}_{n-1})$.~\cite{Brunerie16}
 \end{definition}
 
 The group operations on $\pi_n(A,a)$ for $n \geq 1$ are inherited from the loop space structure of $\Omega^n(A,a)$: composition in $\Omega^n$ descends to multiplication in $\pi_n$, reflexivity gives the identity, and symmetry gives inversion.
 
 \begin{theorem}[Eckmann--Hilton]\label{thm:eckmann-hilton}
-For $n \geq 2$, the group $\pi_n(A, a)$ is abelian.~\cite{eckmann62}
+For $n \geq 2$, the group $\pi_n(A, a)$ is abelian.~\cite{EckHil62}
 \end{theorem}
 
 \begin{proof}
@@ -3518,7 +3518,7 @@ computational paths and the identity types of Homotopy Type Theory.
       given by the 74 rules of Section~\ref{ch:rewrite-system}.
   \end{enumerate}
   The rewrite system on $\Path_A(a, b)$ is thus a many-sorted first-order
-  TRS in the sense of Klop~\cite{klop92} and Terese~\cite{terese03}, with
+  TRS in the sense of Klop~\cite{Klop92} and Terese~\cite{Terese03}, with
   sorts indexed by pairs of elements.
 \end{definition}
 
@@ -3534,7 +3534,7 @@ computational paths and the identity types of Homotopy Type Theory.
     \item \textbf{Higher-order constructors.} The $\lamCongr$ and
       $\congrArgOp$ constructors take functions as arguments, making the
       system a \emph{higher-order} TRS in the sense of
-      Nipkow~\cite{nipkow91}.
+      Nipkow~\cite{Nipkow91}.
     \item \textbf{Proof-irrelevant semantics.} While the syntactic terms
       (path expressions) are first-order or higher-order, the semantic
       interpretation collapses via $\toEq$ to the proof-irrelevant
@@ -3545,7 +3545,7 @@ computational paths and the identity types of Homotopy Type Theory.
 
 \begin{definition}[The $\mathrm{LND}_{\mathrm{EQ}}$-TRS]\label{def:lndeq}
   The complete rewrite system is called the $\mathrm{LND}_{\mathrm{EQ}}$-TRS
-  (following the terminology of~\cite{ramos18}). The rules are enumerated
+  (following the terminology of~\cite{RDQO18}). The rules are enumerated
   using the mnemonic names of \cref{tab:lndeq-rules}.
 \end{definition}
 
@@ -4214,7 +4214,7 @@ The current framework uses \emph{list-based} traces (sequences of
 elementary steps). An alternative representation uses
 \emph{cubical} traces, where a path in dimension~$n$ is an $n$-cube
 with specified boundary. This would align computational paths more
-closely with cubical type theory~\cite{bezem14}, while retaining the
+closely with cubical type theory~\cite{BeCH14}, while retaining the
 rewrite-based computational content. The key challenge is defining the
 appropriate notion of ``cubical step'' and establishing confluence for
 the resulting system.
@@ -4250,7 +4250,7 @@ dependent type theories.
 \paragraph{Connections to higher-dimensional rewriting.}
 The rewrite rules on paths are themselves generators of 2-cells
 (derivations), and the critical-pair analysis produces 3-cells. This
-is an instance of Squier's theory~\cite{squier94} of higher-dimensional
+is an instance of Squier's theory~\cite{Squier94} of higher-dimensional
 rewriting, where the homotopical properties of a rewrite system
 (e.g., finite derivation type) are captured by higher-dimensional
 cells. Establishing a precise connection between the
@@ -4598,7 +4598,7 @@ ensuring that the rewrite relation is a congruence:
   $\mathrm{Step}$ relation in the formalization. Context congruence
   (R31) appears in both Group~IV as a context-specific rule and in
   Group~VIII as a structural closure principle; it corresponds to a single
-  constructor. The earlier convention of 76 in~\cite{ramos18} listed
+  constructor. The earlier convention of 76 in~\cite{RDQO18} listed
   certain rules in multiple groups for expository clarity.
 \end{remark}
 
