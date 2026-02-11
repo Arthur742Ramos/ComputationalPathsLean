@@ -299,3 +299,8 @@ import ComputationalPaths.Path.Algebra.MilnorKTheory
 import ComputationalPaths.Path.Algebra.SteinbergGroup
 import ComputationalPaths.Path.Topology.CobordismRing
 import ComputationalPaths.Path.Topology.CharacteristicNumbers
+import ComputationalPaths.Path.Topology.MorseHomology
+import ComputationalPaths.Path.Topology.HandleDecomposition
+import ComputationalPaths.Path.Topology.IntersectionForm
+import ComputationalPaths.Path.Topology.SurgeryTheory
+import ComputationalPaths.Path.Topology.FlowCategory
