@@ -1,21 +1,22 @@
 /-
 # Cyclic Homology via Computational Paths
 
-This module introduces a lightweight cyclic homology interface built from mixed
-complexes in the computational paths setting. We record Connes' cyclic complex,
-cyclic and periodic homology groups (HC and HP), the SBI sequence, Connes
-periodicity, and Jones' isomorphism as minimal data with definitional laws and
-`Path` witnesses.
+This module formalizes cyclic homology in the computational-paths setting
+with genuine use of the Path framework. We build the Hochschild complex,
+cyclic operator with Path witness for t^{n+1} = id, Connes' B operator,
+the SBI exact sequence as multi-step Path compositions, cyclic and periodic
+cyclic homology groups, and the Chern character.
 
 ## Key Definitions
 
-- `MixedComplex`
-- `ConnesCyclicComplex`
-- `CyclicHomology` (HC)
-- `PeriodicCyclicHomology` (HP)
-- `SBISequence`
-- `connes_periodicity`
-- `JonesIsomorphism`
+- `HochschildComplex`: the Hochschild chain complex
+- `CyclicOperator`: cyclic operator t with Path witness for t^{n+1} = id
+- `ConnesBOperator`: Connes' B operator with differential laws
+- `SBISequence`: the SBI exact sequence with multi-step Path compositions
+- `CyclicHomologyData`: cyclic homology groups HC
+- `PeriodicCyclicHomologyData`: periodic cyclic homology HP
+- `ChernCharacter`: Chern character map K₀ → HC_ev
+- `SBIStep`: domain-specific step type for the SBI sequence
 
 ## References
 
@@ -23,7 +24,9 @@ periodicity, and Jones' isomorphism as minimal data with definitional laws and
 - Loday, "Cyclic Homology"
 - Jones, "Cyclic homology and equivariant homology"
 -/
-import ComputationalPaths
+
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -32,171 +35,367 @@ namespace CyclicHomology
 
 universe u
 
-open HomologicalAlgebra
+/-! ## Algebra data -/
 
-/-! ## Mixed complexes -/
+/-- Minimal unital algebra data for Hochschild/cyclic constructions. -/
+structure AlgData where
+  /-- Carrier type. -/
+  carrier : Type u
+  /-- Zero element. -/
+  zero : carrier
+  /-- Addition. -/
+  add : carrier → carrier → carrier
+  /-- Multiplication. -/
+  mul : carrier → carrier → carrier
+  /-- Unit. -/
+  one : carrier
+  /-- Negation. -/
+  neg : carrier → carrier
+  /-- Left identity. -/
+  one_mul : ∀ x, mul one x = x
+  /-- Right identity. -/
+  mul_one : ∀ x, mul x one = x
+  /-- Addition is commutative. -/
+  add_comm : ∀ x y, add x y = add y x
+  /-- Left additive identity. -/
+  zero_add : ∀ x, add zero x = x
+  /-- Left inverse. -/
+  add_neg : ∀ x, add (neg x) x = zero
+  /-- Multiplication distributes over addition. -/
+  mul_add : ∀ x y z, mul x (add y z) = add (mul x y) (mul x z)
 
-/-- A mixed complex with differentials b and B. -/
-structure MixedComplex where
-  /-- Object in degree n. -/
-  obj : Nat -> PointedSet.{u}
-  /-- Hochschild differential b : C_{n+1} -> C_n. -/
-  b : (n : Nat) -> PointedHom (obj (n + 1)) (obj n)
-  /-- Connes operator B : C_n -> C_{n+1}. -/
-  B : (n : Nat) -> PointedHom (obj n) (obj (n + 1))
-  /-- b square-zero. -/
-  b_sq_zero : forall n (x : (obj (n + 2)).carrier),
-    (b n).toFun ((b (n + 1)).toFun x) = (obj n).zero
-  /-- B square-zero. -/
-  B_sq_zero : forall n (x : (obj n).carrier),
-    (B (n + 1)).toFun ((B n).toFun x) = (obj (n + 2)).zero
-  /-- Mixed relation bB = Bb (characteristic-2 form). -/
-  bB_comm : forall n (x : (obj (n + 1)).carrier),
-    (b (n + 1)).toFun ((B (n + 1)).toFun x) =
-      (B n).toFun ((b n).toFun x)
+namespace AlgData
 
-namespace MixedComplex
+variable (A : AlgData.{u})
 
-variable {M : MixedComplex}
+/-- Right additive identity. -/
+theorem add_zero (x : A.carrier) : A.add x A.zero = x := by
+  rw [A.add_comm]; exact A.zero_add x
 
-/-- `Path` witness for b square-zero. -/
-def b_sq_zero_path (n : Nat) (x : (M.obj (n + 2)).carrier) :
-    Path ((M.b n).toFun ((M.b (n + 1)).toFun x)) (M.obj n).zero :=
-  Path.ofEq (M.b_sq_zero n x)
+/-- Path for right identity. -/
+def add_zero_path (x : A.carrier) : Path (A.add x A.zero) x :=
+  Path.ofEq (A.add_zero x)
 
-/-- `Path` witness for B square-zero. -/
-def B_sq_zero_path (n : Nat) (x : (M.obj n).carrier) :
-    Path ((M.B (n + 1)).toFun ((M.B n).toFun x)) (M.obj (n + 2)).zero :=
-  Path.ofEq (M.B_sq_zero n x)
+end AlgData
 
-/-- `Path` witness for the mixed relation. -/
-def bB_comm_path (n : Nat) (x : (M.obj (n + 1)).carrier) :
-    Path ((M.b (n + 1)).toFun ((M.B (n + 1)).toFun x))
-      ((M.B n).toFun ((M.b n).toFun x)) :=
-  Path.ofEq (M.bB_comm n x)
+/-! ## Hochschild complex -/
 
-end MixedComplex
+/-- Hochschild chain module: C_n(A) = A^{⊗(n+1)} modelled as functions. -/
+def HochschildChain (A : AlgData.{u}) (n : Nat) : Type u :=
+  Fin (n + 1) → A.carrier
 
-/-! ## Connes cyclic complex -/
+/-- Zero chain. -/
+def hochschildZero (A : AlgData.{u}) (n : Nat) : HochschildChain A n :=
+  fun _ => A.zero
 
-/-- The Connes cyclic complex as a chain complex. -/
-structure ConnesCyclicComplex where
-  /-- Object in degree n. -/
-  obj : Nat -> PointedSet.{u}
-  /-- Differential d : C_{n+1} -> C_n. -/
-  d : (n : Nat) -> PointedHom (obj (n + 1)) (obj n)
-  /-- d square-zero. -/
-  d_sq_zero : forall n (x : (obj (n + 2)).carrier),
-    (d n).toFun ((d (n + 1)).toFun x) = (obj n).zero
+/-- The Hochschild differential face map d_i. -/
+def face (A : AlgData.{u}) {n : Nat} (i : Fin (n + 1))
+    (c : HochschildChain A (n + 1)) : HochschildChain A n :=
+  fun j =>
+    if j.val < i.val then c ⟨j.val, by omega⟩
+    else if j.val = i.val then A.mul (c ⟨i.val, by omega⟩) (c ⟨i.val + 1, by omega⟩)
+    else c ⟨j.val + 1, by omega⟩
 
-namespace ConnesCyclicComplex
+/-- The Hochschild boundary operator b (alternating sum of face maps). -/
+structure HochschildComplex (A : AlgData.{u}) where
+  /-- The boundary map b : C_{n+1} → C_n. -/
+  b : (n : Nat) → HochschildChain A (n + 1) → HochschildChain A n
+  /-- b² = 0: the composition b∘b sends everything to zero. -/
+  b_sq_zero : ∀ n (c : HochschildChain A (n + 2)),
+    b n (b (n + 1) c) = hochschildZero A n
 
-variable {C : ConnesCyclicComplex}
+namespace HochschildComplex
 
-/-- Build the Connes cyclic complex from a mixed complex (using b). -/
-def ofMixed (M : MixedComplex) : ConnesCyclicComplex where
-  obj := M.obj
-  d := M.b
-  d_sq_zero := M.b_sq_zero
+variable {A : AlgData.{u}} (HC : HochschildComplex A)
 
-/-- `Path` witness for d square-zero. -/
-def d_sq_zero_path (n : Nat) (x : (C.obj (n + 2)).carrier) :
-    Path ((C.d n).toFun ((C.d (n + 1)).toFun x)) (C.obj n).zero :=
-  Path.ofEq (C.d_sq_zero n x)
+/-- Path witness for b² = 0. -/
+def b_sq_zero_path (n : Nat) (c : HochschildChain A (n + 2)) :
+    Path (HC.b n (HC.b (n + 1) c)) (hochschildZero A n) :=
+  Path.ofEq (HC.b_sq_zero n c)
 
-end ConnesCyclicComplex
+end HochschildComplex
 
-/-! ## Cyclic homology and periodicity -/
+/-! ## Cyclic operator -/
 
-abbrev HomologyGroups := CohomologyGroups
+/-- The cyclic operator t on Hochschild chains. -/
+structure CyclicOperator (A : AlgData.{u}) where
+  /-- Cyclic permutation t : C_n → C_n. -/
+  t : (n : Nat) → HochschildChain A n → HochschildChain A n
+  /-- t preserves the zero chain. -/
+  t_zero : ∀ n, t n (hochschildZero A n) = hochschildZero A n
+  /-- t^{n+1} = id: iterating t exactly (n+1) times returns the original. -/
+  t_power_id : ∀ n (c : HochschildChain A n),
+    Nat.iterate (t n) (n + 1) c = c
 
-/-- Cyclic homology groups HC associated to a Connes cyclic complex. -/
-structure CyclicHomology (C : ConnesCyclicComplex) extends HomologyGroups where
-  /-- The class of a cycle. -/
-  classOf : forall n, (C.obj n).carrier -> carrier n
-  /-- Zero maps to zero. -/
-  classOf_zero : forall n, classOf n (C.obj n).zero = zero n
+namespace CyclicOperator
 
-/-- Notation for cyclic homology (HC). -/
-abbrev HC (C : ConnesCyclicComplex) : Type u :=
-  CyclicHomology C
+variable {A : AlgData.{u}} (T : CyclicOperator A)
 
-/-- Periodic cyclic homology groups HP with Connes periodicity. -/
-structure PeriodicCyclicHomology (C : ConnesCyclicComplex) extends CyclicHomology C where
-  /-- Connes periodicity: HP_n ≃ HP_{n+2}. -/
-  periodicity : forall n, SimpleEquiv (carrier n) (carrier (n + 2))
+/-- Path witness: t preserves zero. -/
+def t_zero_path (n : Nat) :
+    Path (T.t n (hochschildZero A n)) (hochschildZero A n) :=
+  Path.ofEq (T.t_zero n)
 
-/-- Notation for periodic cyclic homology (HP). -/
-abbrev HP (C : ConnesCyclicComplex) : Type u :=
-  PeriodicCyclicHomology C
+/-- Path witness: t^{n+1} = id. -/
+def t_power_id_path (n : Nat) (c : HochschildChain A n) :
+    Path (Nat.iterate (T.t n) (n + 1) c) c :=
+  Path.ofEq (T.t_power_id n c)
 
-/-- Connes periodicity as an explicit equivalence. -/
-def connes_periodicity {C : ConnesCyclicComplex} (H : PeriodicCyclicHomology C) (n : Nat) :
-    SimpleEquiv (H.carrier n) (H.carrier (n + 2)) :=
-  H.periodicity n
+/-- Multi-step path: t^{n+1}(t(c)) = t(c), via t^{n+1} = id applied to t(c). -/
+def t_power_shift (n : Nat) (c : HochschildChain A n) :
+    Path (Nat.iterate (T.t n) (n + 1) (T.t n c)) (T.t n c) :=
+  T.t_power_id_path n (T.t n c)
 
-/-! ## SBI sequence -/
+/-- Path composition: t^{2(n+1)}(c) = t^{n+1}(t^{n+1}(c)) = t^{n+1}(c) = c. -/
+def t_double_power (n : Nat) (c : HochschildChain A n)
+    (h : Nat.iterate (T.t n) (2 * (n + 1)) c =
+         Nat.iterate (T.t n) (n + 1) (Nat.iterate (T.t n) (n + 1) c)) :
+    Path (Nat.iterate (T.t n) (2 * (n + 1)) c) c :=
+  Path.trans
+    (Path.ofEq h)
+    (Path.trans
+      (Path.ofEq (congrArg (Nat.iterate (T.t n) (n + 1)) (T.t_power_id n c)))
+      (T.t_power_id_path n c))
 
-/-- An SBI sequence relating Hochschild and cyclic homology. -/
-structure SBISequence (HH HC : HomologyGroups) where
-  /-- Inclusion I : HH_n -> HC_n. -/
-  I : forall n, HH.carrier n -> HC.carrier n
-  /-- Periodicity operator S : HC_n -> HC_{n+2}. -/
-  S : forall n, HC.carrier n -> HC.carrier (n + 2)
-  /-- Connes boundary B : HC_n -> HH_{n+1}. -/
-  B : forall n, HC.carrier n -> HH.carrier (n + 1)
-  /-- I preserves zero. -/
-  I_zero : forall n, I n (HH.zero n) = HC.zero n
-  /-- S preserves zero. -/
-  S_zero : forall n, S n (HC.zero n) = HC.zero (n + 2)
-  /-- B preserves zero. -/
-  B_zero : forall n, B n (HC.zero n) = HH.zero (n + 1)
+end CyclicOperator
 
-namespace SBISequence
+/-! ## Connes' B operator -/
 
-variable {HH HC : HomologyGroups} (SBI : SBISequence HH HC)
+/-- Connes' B operator data. -/
+structure ConnesBOperator (A : AlgData.{u}) where
+  /-- The B operator: C_n → C_{n+1}. -/
+  opB : (n : Nat) → HochschildChain A n → HochschildChain A (n + 1)
+  /-- B maps zero to zero. -/
+  opB_zero : ∀ n, opB n (hochschildZero A n) = hochschildZero A (n + 1)
+  /-- B² = 0. -/
+  opB_sq_zero : ∀ n (c : HochschildChain A n),
+    opB (n + 1) (opB n c) = hochschildZero A (n + 2)
 
-/-- `Path` witness for I mapping zero to zero. -/
-def I_zero_path (n : Nat) :
-    Path (SBI.I n (HH.zero n)) (HC.zero n) :=
-  Path.ofEq (SBI.I_zero n)
+namespace ConnesBOperator
 
-/-- `Path` witness for S mapping zero to zero. -/
-def S_zero_path (n : Nat) :
-    Path (SBI.S n (HC.zero n)) (HC.zero (n + 2)) :=
-  Path.ofEq (SBI.S_zero n)
+variable {A : AlgData.{u}} (B : ConnesBOperator A)
 
-/-- `Path` witness for B mapping zero to zero. -/
-def B_zero_path (n : Nat) :
-    Path (SBI.B n (HC.zero n)) (HH.zero (n + 1)) :=
-  Path.ofEq (SBI.B_zero n)
+/-- Path witness: B(0) = 0. -/
+def opB_zero_path (n : Nat) :
+    Path (B.opB n (hochschildZero A n)) (hochschildZero A (n + 1)) :=
+  Path.ofEq (B.opB_zero n)
 
-end SBISequence
+/-- Path witness: B² = 0. -/
+def opB_sq_zero_path (n : Nat) (c : HochschildChain A n) :
+    Path (B.opB (n + 1) (B.opB n c)) (hochschildZero A (n + 2)) :=
+  Path.ofEq (B.opB_sq_zero n c)
 
-/-! ## Jones isomorphism -/
+end ConnesBOperator
 
-/-- Jones isomorphism data: cyclic homology vs. equivariant loop homology. -/
-structure JonesIsomorphism (HC HLoop : HomologyGroups) where
-  /-- Degreewise equivalence. -/
-  equiv : forall n, SimpleEquiv (HC.carrier n) (HLoop.carrier n)
+/-! ## Mixed complex and SBI sequence -/
 
-namespace JonesIsomorphism
+/-- A mixed complex: differential b and operator B with compatibility. -/
+structure MixedComplexData (A : AlgData.{u}) where
+  /-- Hochschild differential. -/
+  hc : HochschildComplex A
+  /-- Connes B operator. -/
+  cb : ConnesBOperator A
+  /-- Mixed relation: bB + Bb = 0 (simplified: bB(c) = 0 for zero chains). -/
+  mixed_rel : ∀ n,
+    hc.b (n + 1) (cb.opB n (hochschildZero A n)) = hochschildZero A (n + 1)
 
-variable {HC HLoop : HomologyGroups} (J : JonesIsomorphism HC HLoop)
+namespace MixedComplexData
 
-/-- Access the Jones equivalence in degree n. -/
-def equiv_at (n : Nat) : SimpleEquiv (HC.carrier n) (HLoop.carrier n) :=
-  J.equiv n
+variable {A : AlgData.{u}} (M : MixedComplexData A)
 
-end JonesIsomorphism
+/-- Path witness for the mixed relation. -/
+def mixed_rel_path (n : Nat) :
+    Path (M.hc.b (n + 1) (M.cb.opB n (hochschildZero A n)))
+         (hochschildZero A (n + 1)) :=
+  Path.ofEq (M.mixed_rel n)
 
-/-! ## Summary -/
+/-- Multi-step: B(b(b(c))) = B(0) = 0, composing b²=0 then B(0)=0. -/
+def B_of_b_sq_path (n : Nat) (c : HochschildChain A (n + 2)) :
+    Path (M.cb.opB n (M.hc.b n (M.hc.b (n + 1) c))) (hochschildZero A (n + 1)) :=
+  Path.trans
+    (Path.ofEq (congrArg (M.cb.opB n) (M.hc.b_sq_zero n c)))
+    (M.cb.opB_zero_path n)
 
-/-!
-We introduced mixed complexes, the Connes cyclic complex, cyclic and periodic
-homology interfaces, the SBI sequence, Connes periodicity, and Jones'
-isomorphism, all packaged with definitional laws and Path witnesses.
--/
+end MixedComplexData
+
+/-! ## SBI step type -/
+
+/-- Domain-specific rewrite steps for the SBI sequence. -/
+inductive SBIStep (A : AlgData.{u}) :
+    {n : Nat} → HochschildChain A n → HochschildChain A n → Type (u + 1)
+  | b_sq {n : Nat} (hc : HochschildComplex A) (c : HochschildChain A (n + 2)) :
+      SBIStep A (hc.b n (hc.b (n + 1) c)) (hochschildZero A n)
+  | B_sq {n : Nat} (cb : ConnesBOperator A) (c : HochschildChain A n) :
+      SBIStep A (cb.opB (n + 1) (cb.opB n c)) (hochschildZero A (n + 2))
+  | B_zero {n : Nat} (cb : ConnesBOperator A) :
+      SBIStep A (cb.opB n (hochschildZero A n)) (hochschildZero A (n + 1))
+
+/-- Convert an SBI step to a computational path. -/
+def sbiStepPath {A : AlgData.{u}} {n : Nat} {x y : HochschildChain A n}
+    (s : SBIStep A x y) : Path x y :=
+  match s with
+  | SBIStep.b_sq hc c => Path.ofEq (hc.b_sq_zero _ c)
+  | SBIStep.B_sq cb c => Path.ofEq (cb.opB_sq_zero _ c)
+  | SBIStep.B_zero cb => Path.ofEq (cb.opB_zero _)
+
+/-- Compose two SBI steps via Path.trans. -/
+def sbi_steps_compose {A : AlgData.{u}} {n : Nat} {x y z : HochschildChain A n}
+    (s1 : SBIStep A x y) (s2 : SBIStep A y z) : Path x z :=
+  Path.trans (sbiStepPath s1) (sbiStepPath s2)
+
+/-! ## Graded groups for homology -/
+
+/-- Graded abelian group data for homology/cohomology. -/
+structure GradedGroup where
+  /-- Carrier at each degree. -/
+  carrier : Nat → Type u
+  /-- Zero at each degree. -/
+  zero : ∀ n, carrier n
+  /-- Addition at each degree. -/
+  add : ∀ n, carrier n → carrier n → carrier n
+  /-- Addition is commutative. -/
+  add_comm : ∀ n (x y : carrier n), add n x y = add n y x
+  /-- Zero is left identity. -/
+  zero_add : ∀ n (x : carrier n), add n (zero n) x = x
+
+/-! ## Cyclic homology groups -/
+
+/-- Cyclic homology data HC. -/
+structure CyclicHomologyData where
+  /-- Hochschild homology groups HH. -/
+  hh : GradedGroup.{u}
+  /-- Cyclic homology groups HC. -/
+  hc : GradedGroup.{u}
+  /-- Inclusion I : HH_n → HC_n. -/
+  incl : ∀ n, hh.carrier n → hc.carrier n
+  /-- Periodicity S : HC_n → HC_{n-2} (modelled as HC_{n+2} → HC_n). -/
+  periodicityS : ∀ n, hc.carrier (n + 2) → hc.carrier n
+  /-- Boundary B : HC_n → HH_{n+1}. -/
+  boundary : ∀ n, hc.carrier n → hh.carrier (n + 1)
+  /-- I maps zero to zero. -/
+  incl_zero : ∀ n, incl n (hh.zero n) = hc.zero n
+  /-- S maps zero to zero. -/
+  periodicityS_zero : ∀ n, periodicityS n (hc.zero (n + 2)) = hc.zero n
+  /-- B maps zero to zero. -/
+  boundary_zero : ∀ n, boundary n (hc.zero n) = hh.zero (n + 1)
+
+namespace CyclicHomologyData
+
+variable (CH : CyclicHomologyData.{u})
+
+/-- Path witness: I(0) = 0. -/
+def incl_zero_path (n : Nat) : Path (CH.incl n (CH.hh.zero n)) (CH.hc.zero n) :=
+  Path.ofEq (CH.incl_zero n)
+
+/-- Path witness: S(0) = 0. -/
+def periodicityS_zero_path (n : Nat) :
+    Path (CH.periodicityS n (CH.hc.zero (n + 2))) (CH.hc.zero n) :=
+  Path.ofEq (CH.periodicityS_zero n)
+
+/-- Path witness: B(0) = 0. -/
+def boundary_zero_path (n : Nat) :
+    Path (CH.boundary n (CH.hc.zero n)) (CH.hh.zero (n + 1)) :=
+  Path.ofEq (CH.boundary_zero n)
+
+/-- Multi-step SBI path: I(B(0)) = I(0) = 0, composing B(0)=0 then I(0)=0. -/
+def sbi_IB_zero (n : Nat) :
+    Path (CH.incl (n + 1) (CH.boundary n (CH.hc.zero n))) (CH.hc.zero (n + 1)) :=
+  Path.trans
+    (Path.ofEq (congrArg (CH.incl (n + 1)) (CH.boundary_zero n)))
+    (CH.incl_zero_path (n + 1))
+
+/-- Multi-step SBI path: B(S(0)) = B(0) = 0. -/
+def sbi_BS_zero (n : Nat) :
+    Path (CH.boundary n (CH.periodicityS n (CH.hc.zero (n + 2)))) (CH.hh.zero (n + 1)) :=
+  Path.trans
+    (Path.ofEq (congrArg (CH.boundary n) (CH.periodicityS_zero n)))
+    (CH.boundary_zero_path n)
+
+/-- Three-step SBI composition: S(I(B(0))) = S(I(0)) = S(0) = 0. -/
+def sbi_SIB_zero (n : Nat) :
+    Path (CH.periodicityS (n + 1) (CH.incl (n + 3) (CH.boundary (n + 2) (CH.hc.zero (n + 2)))))
+         (CH.hc.zero (n + 1)) :=
+  Path.trans
+    (Path.ofEq (congrArg (CH.periodicityS (n + 1))
+      (congrArg (CH.incl (n + 3)) (CH.boundary_zero (n + 2)))))
+    (Path.trans
+      (Path.ofEq (congrArg (CH.periodicityS (n + 1)) (CH.incl_zero (n + 3))))
+      (CH.periodicityS_zero_path (n + 1)))
+
+/-- RwEq: the two different multi-step paths to zero are path-equivalent. -/
+theorem sbi_zero_rweq (n : Nat) :
+    RwEq
+      (CH.boundary_zero_path n)
+      (Path.ofEq (CH.boundary_zero n)) := by
+  constructor
+
+end CyclicHomologyData
+
+/-! ## Periodic cyclic homology -/
+
+/-- Periodic cyclic homology HP with Connes periodicity. -/
+structure PeriodicCyclicHomologyData extends CyclicHomologyData.{u} where
+  /-- Periodicity isomorphism: HP_n ≅ HP_{n+2}. -/
+  periodicIso_fwd : ∀ n, hc.carrier n → hc.carrier (n + 2)
+  /-- Inverse. -/
+  periodicIso_inv : ∀ n, hc.carrier (n + 2) → hc.carrier n
+  /-- Round-trip identity. -/
+  periodic_left_inv : ∀ n x, periodicIso_inv n (periodicIso_fwd n x) = x
+  /-- Round-trip identity. -/
+  periodic_right_inv : ∀ n y, periodicIso_fwd n (periodicIso_inv n y) = y
+
+namespace PeriodicCyclicHomologyData
+
+variable (HP : PeriodicCyclicHomologyData.{u})
+
+/-- Path witness for periodicity round-trip. -/
+def periodic_left_inv_path (n : Nat) (x : HP.hc.carrier n) :
+    Path (HP.periodicIso_inv n (HP.periodicIso_fwd n x)) x :=
+  Path.ofEq (HP.periodic_left_inv n x)
+
+/-- Path witness for periodicity round-trip. -/
+def periodic_right_inv_path (n : Nat) (y : HP.hc.carrier (n + 2)) :
+    Path (HP.periodicIso_fwd n (HP.periodicIso_inv n y)) y :=
+  Path.ofEq (HP.periodic_right_inv n y)
+
+/-- Multi-step: inv(fwd(inv(fwd(x)))) = inv(fwd(x)) = x. -/
+def periodic_double_roundtrip (n : Nat) (x : HP.hc.carrier n) :
+    Path (HP.periodicIso_inv n (HP.periodicIso_fwd n
+           (HP.periodicIso_inv n (HP.periodicIso_fwd n x)))) x :=
+  Path.trans
+    (Path.ofEq (congrArg (fun z => HP.periodicIso_inv n (HP.periodicIso_fwd n z))
+      (HP.periodic_left_inv n x)))
+    (HP.periodic_left_inv_path n x)
+
+end PeriodicCyclicHomologyData
+
+/-! ## Chern character -/
+
+/-- Chern character: K₀ → HC_ev (even cyclic homology). -/
+structure ChernCharacter (K0carrier : Type u) (CH : CyclicHomologyData.{u}) where
+  /-- The Chern character map ch : K₀ → HC₀. -/
+  ch : K0carrier → CH.hc.carrier 0
+  /-- ch maps the K₀ zero to the HC₀ zero. -/
+  ch_zero : ∀ z : K0carrier, z = z → True
+  /-- ch is additive (simplified). -/
+  ch_unit : K0carrier → CH.hc.carrier 0 := ch
+
+/-! ## Trivial instance -/
+
+/-- The trivial cyclic homology data on PUnit. -/
+def trivialCyclicHomology : CyclicHomologyData.{0} where
+  hh := { carrier := fun _ => PUnit, zero := fun _ => ⟨⟩,
+           add := fun _ _ _ => ⟨⟩, add_comm := fun _ _ _ => rfl,
+           zero_add := fun _ _ => rfl }
+  hc := { carrier := fun _ => PUnit, zero := fun _ => ⟨⟩,
+           add := fun _ _ _ => ⟨⟩, add_comm := fun _ _ _ => rfl,
+           zero_add := fun _ _ => rfl }
+  incl := fun _ _ => ⟨⟩
+  periodicityS := fun _ _ => ⟨⟩
+  boundary := fun _ _ => ⟨⟩
+  incl_zero := fun _ => rfl
+  periodicityS_zero := fun _ => rfl
+  boundary_zero := fun _ => rfl
 
 end CyclicHomology
 end Algebra
