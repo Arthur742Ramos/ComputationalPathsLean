@@ -365,3 +365,8 @@ import ComputationalPaths.Path.Algebra.SymmetricFunctions
 import ComputationalPaths.Path.Algebra.PosetTopology
 import ComputationalPaths.Path.Algebra.CoxeterGroups
 import ComputationalPaths.Path.Algebra.CombHopfAlgebras
+import ComputationalPaths.Path.Algebra.CondensedSets
+import ComputationalPaths.Path.Algebra.LiquidTensor
+import ComputationalPaths.Path.Algebra.BornologicalSpaces
+import ComputationalPaths.Path.Algebra.DerivedComplete
+import ComputationalPaths.Path.Algebra.AnalyticGeometry
