@@ -127,9 +127,9 @@ inductive LocStep : {A : Type u} → {a b : A} → Path a b → Path a b → Pro
   | localize_refl _ _ => simp
   | localize_trans _ _ _ => simp
   | localize_symm _ _ => simp
-  | symm_congr _ ih => simp [ih]
-  | trans_congr_left _ _ ih => simp [ih]
-  | trans_congr_right _ _ ih => simp [ih]
+  | symm_congr _ ih => simp_all
+  | trans_congr_left _ _ ih => simp_all
+  | trans_congr_right _ _ ih => simp_all
 
 /-! ## Ore Conditions -/
 

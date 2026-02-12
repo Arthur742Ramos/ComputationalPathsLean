@@ -215,9 +215,9 @@ inductive HTTStep : {A : Type u} → {a b : A} → Path a b → Path a b → Pro
   | transport_refl _ => simp
   | ap_refl _ _ => simp
   | equiv_id _ => rfl
-  | symm_congr _ ih => simp [ih]
-  | trans_congr_left _ _ ih => simp [ih]
-  | trans_congr_right _ _ ih => simp [ih]
+  | symm_congr _ ih => simp_all
+  | trans_congr_left _ _ ih => simp_all
+  | trans_congr_right _ _ ih => simp_all
 
 /-! ## Encode-Decode -/
 

@@ -116,9 +116,9 @@ inductive ToposStep : {A : Type u} → {a b : A} → Path a b → Path a b → P
   induction h with
   | descent_refl_beta _ _ _ => rfl
   | cocycle_coherence _ _ _ _ => rfl
-  | symm_congr _ ih => simp [ih]
-  | trans_congr_left _ _ ih => simp [ih]
-  | trans_congr_right _ _ ih => simp [ih]
+  | symm_congr _ ih => simp_all
+  | trans_congr_left _ _ ih => simp_all
+  | trans_congr_right _ _ ih => simp_all
 
 /-! ## Giraud Axioms -/
 

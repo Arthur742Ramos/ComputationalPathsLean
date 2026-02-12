@@ -161,9 +161,9 @@ inductive ModalStep : {A : Type u} → {a b : A} → Path a b → Path a b → P
   induction h with
   | idempotent _ _ => rfl
   | lex_prod _ _ => rfl
-  | symm_congr _ ih => simp [ih]
-  | trans_congr_left _ _ ih => simp [ih]
-  | trans_congr_right _ _ ih => simp [ih]
+  | symm_congr _ ih => simp_all
+  | trans_congr_left _ _ ih => simp_all
+  | trans_congr_right _ _ ih => simp_all
 
 /-! ## Flat and Sharp Modalities -/
 
@@ -247,10 +247,10 @@ theorem flat_counit_unit_rweq {A : Type u}
 /-- Modal type is fixed: composing unit and inverse gives identity. -/
 theorem isModal_fixed_rweq {A : Type u}
     (M : ModalityFull) (hA : IsModal M A) :
-    ∃ (inv : M.op A → A),
+    ∃ (_f : M.op A → A),
       ∀ a : A, RwEq (Path.refl a) (Path.refl a) := by
-  obtain ⟨inv, _⟩ := hA
-  exact ⟨inv, fun _ => RwEq.refl _⟩
+  obtain ⟨_inv, _⟩ := hA
+  exact ⟨_inv, fun _a => RwEq.refl _⟩
 
 /-- Connected type: any two points are connected. -/
 theorem connected_path_rweq {A : Type u} {n : Nat}

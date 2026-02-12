@@ -68,7 +68,7 @@ def pathVCategory (A : Type u) : VCategory where
   Hom := fun a b => Path a b
   comp := fun f g => Path.trans g f
   id := fun a => Path.refl a
-  assoc := fun f g h => by simp [Path.trans_assoc]
+  assoc := fun _f _g _h => by simp_all
   left_unit := fun f => by simp
   right_unit := fun f => by simp
 
@@ -183,9 +183,9 @@ inductive EnrichedStep : {A : Type u} → {a b : A} → Path a b → Path a b �
   | comp_id_left _ => rfl
   | comp_id_right _ => rfl
   | comp_assoc _ _ _ => rfl
-  | symm_congr _ ih => simp [ih]
-  | trans_congr_left _ _ ih => simp [ih]
-  | trans_congr_right _ _ ih => simp [ih]
+  | symm_congr _ ih => simp_all
+  | trans_congr_left _ _ ih => simp_all
+  | trans_congr_right _ _ ih => simp_all
 
 /-! ## Day Convolution -/
 
@@ -248,7 +248,7 @@ structure EnrichedYoneda (C : VCategory) where
 def mkEnrichedYoneda (C : VCategory) : EnrichedYoneda C where
   forward := fun α => α _ (C.id _)
   forward_def := fun _ => rfl
-  backward := fun act x b f => act f x
+  backward := fun act x _b f => act f x
   roundtrip := fun _ act_id x => act_id x
 
 /-! ## RwEq Coherence Theorems -/
