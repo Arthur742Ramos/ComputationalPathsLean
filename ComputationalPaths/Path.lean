@@ -206,6 +206,7 @@ import ComputationalPaths.Path.InfinityGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.GroupStructures
+import ComputationalPaths.Path.Algebra.LFunctions
 import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
 import ComputationalPaths.Path.Algebra.StableModule
@@ -219,6 +220,10 @@ import ComputationalPaths.Path.Algebra.BarComplex
 import ComputationalPaths.Path.Algebra.Abelianization
 import ComputationalPaths.Path.Algebra.KTheory
 import ComputationalPaths.Path.Algebra.WaldhausenKTheory
+import ComputationalPaths.Path.Algebra.IwasawaTheory
+import ComputationalPaths.Path.Algebra.ClassFieldTheory
+import ComputationalPaths.Path.Algebra.GaloisRepresentations
+import ComputationalPaths.Path.Algebra.ModularFormsPaths
 import ComputationalPaths.Path.Algebra.FreeGroupProperties
 import ComputationalPaths.Path.Homotopy.HurewiczTheorem
 import ComputationalPaths.Path.Homotopy.SerreModC

@@ -1,0 +1,198 @@
+/-
+# Iwasawa Theory via Computational Paths
+
+This module records the basic objects of Iwasawa theory in the computational
+paths setting: Zp-extensions, Iwasawa algebras, characteristic ideals, and
+p-adic L-functions. The main conjecture is expressed as a `Path` between
+analytic and algebraic elements, together with an `RwEq` stability witness.
+
+## Key Results
+
+- `ZpExtension`, `IwasawaAlgebra`, `IwasawaModule`
+- `CharacteristicIdeal`, `muInvariant`, `lambdaInvariant`
+- `CyclotomicUnits`, `PadicLFunction`
+- `mainConjecturePath`, `mainConjecture_rwEq`
+
+## References
+
+- Iwasawa, "On Z_l-extensions of number fields"
+- Washington, "Introduction to Cyclotomic Fields"
+- Mazur-Wiles, "Class fields of abelian extensions of Q"
+-/
+
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace IwasawaTheory
+
+universe u v
+
+/-! ## Zp-extensions -/
+
+/-- A Zp-extension as a tower with a path-compatible projection. -/
+structure ZpExtension (K : Type u) where
+  /-- The layers of the Zp-tower. -/
+  layer : Nat -> Type u
+  /-- A distinguished base element. -/
+  base : layer 0
+  /-- The extension map to the next layer. -/
+  next : ∀ n, layer n -> layer (n + 1)
+  /-- Projection (norm) back down the tower. -/
+  proj : ∀ n, layer (n + 1) -> layer n
+  /-- Projection after extension is the identity, witnessed by a `Path`. -/
+  proj_next : ∀ n x, Path (proj n (next n x)) x
+
+/-- A compatible element in every layer of a Zp-extension. -/
+structure ZpTowerPoint {K : Type u} (E : ZpExtension K) where
+  /-- Elements of each layer. -/
+  elem : ∀ n, E.layer n
+  /-- Compatibility with the projection maps. -/
+  compat : ∀ n, Path (E.proj n (elem (n + 1))) (elem n)
+
+/-! ## Iwasawa algebras and modules -/
+
+/-- The Iwasawa algebra Zp[[Gamma]] with path-level associativity. -/
+structure IwasawaAlgebra (Gamma : Type u) where
+  /-- The carrier type. -/
+  carrier : Type v
+  /-- Additive zero. -/
+  zero : carrier
+  /-- Multiplicative unit. -/
+  one : carrier
+  /-- Addition. -/
+  add : carrier -> carrier -> carrier
+  /-- Multiplication. -/
+  mul : carrier -> carrier -> carrier
+  /-- Associativity of multiplication. -/
+  mul_assoc : ∀ a b c, Path (mul (mul a b) c) (mul a (mul b c))
+  /-- Left unit law. -/
+  one_mul : ∀ a, Path (mul one a) a
+  /-- Right unit law. -/
+  mul_one : ∀ a, Path (mul a one) a
+
+namespace IwasawaAlgebra
+
+variable {Gamma : Type u}
+
+/-- Powers in an Iwasawa algebra. -/
+def pow (A : IwasawaAlgebra Gamma) : Nat -> A.carrier -> A.carrier
+  | 0, _ => A.one
+  | n + 1, x => A.mul x (pow A n x)
+
+/-- The zeroth power is the unit, as a computational path. -/
+def pow_zero (A : IwasawaAlgebra Gamma) (x : A.carrier) :
+    Path (pow A 0 x) A.one := Path.refl _
+
+end IwasawaAlgebra
+
+/-- A left module over the Iwasawa algebra. -/
+structure IwasawaModule {Gamma : Type u} (A : IwasawaAlgebra Gamma) where
+  /-- The carrier type. -/
+  carrier : Type v
+  /-- Scalar action. -/
+  action : A.carrier -> carrier -> carrier
+  /-- Action of the unit. -/
+  action_one : ∀ x, Path (action A.one x) x
+  /-- Compatibility with multiplication. -/
+  action_mul : ∀ a b x, Path (action (A.mul a b) x) (action a (action b x))
+
+/-! ## Characteristic ideals and invariants -/
+
+/-- The characteristic ideal of a torsion Iwasawa module. -/
+structure CharacteristicIdeal {Gamma : Type u} (A : IwasawaAlgebra Gamma) where
+  /-- A chosen generator. -/
+  generator : A.carrier
+  /-- The mu-invariant. -/
+  mu : Nat
+  /-- The lambda-invariant. -/
+  lambda : Nat
+
+/-- The mu-invariant of a characteristic ideal. -/
+def muInvariant {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (C : CharacteristicIdeal A) : Nat := C.mu
+
+/-- The lambda-invariant of a characteristic ideal. -/
+def lambdaInvariant {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (C : CharacteristicIdeal A) : Nat := C.lambda
+
+/-- The chosen characteristic element. -/
+def characteristicElement {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (C : CharacteristicIdeal A) : A.carrier := C.generator
+
+/-- The invariants are stable under reflexive paths. -/
+def muInvariant_rfl {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (C : CharacteristicIdeal A) : Path (muInvariant C) (muInvariant C) :=
+  Path.refl _
+
+/-! ## Cyclotomic units and p-adic L-functions -/
+
+/-- Cyclotomic units along a Zp-extension. -/
+structure CyclotomicUnits {K : Type u} (E : ZpExtension K) where
+  /-- A unit in each layer. -/
+  unit : ∀ n, E.layer n
+  /-- Norm maps between layers. -/
+  norm : ∀ n, E.layer (n + 1) -> E.layer n
+  /-- Norms preserve the chosen units. -/
+  norm_unit : ∀ n, Path (norm n (unit (n + 1))) (unit n)
+
+/-- A p-adic L-function in the Iwasawa algebra. -/
+structure PadicLFunction {Gamma : Type u} (A : IwasawaAlgebra Gamma) where
+  /-- Coefficients in the Iwasawa algebra. -/
+  coeff : Nat -> A.carrier
+  /-- The special value element. -/
+  special : A.carrier
+  /-- Special value equals the zeroth coefficient. -/
+  special_coeff : Path special (coeff 0)
+
+/-! ## Main conjecture -/
+
+/-- Data for the Iwasawa main conjecture. -/
+structure MainConjectureData {Gamma : Type u} (A : IwasawaAlgebra Gamma) where
+  /-- The characteristic ideal. -/
+  characteristic : CharacteristicIdeal A
+  /-- The p-adic L-function. -/
+  pAdicL : PadicLFunction A
+  /-- The analytic element. -/
+  analyticElement : A.carrier
+  /-- The algebraic element. -/
+  algebraicElement : A.carrier
+  /-- Identify the analytic element with the special value. -/
+  analytic_def : Path analyticElement pAdicL.special
+  /-- Identify the algebraic element with the characteristic generator. -/
+  algebraic_def : Path algebraicElement characteristic.generator
+  /-- The main conjecture path. -/
+  mainPath : Path analyticElement algebraicElement
+
+/-- Main conjecture as a path between analytic and algebraic elements. -/
+def mainConjecture {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (D : MainConjectureData A) : Path D.analyticElement D.algebraicElement :=
+  D.mainPath
+
+/-- The main conjecture expressed between special value and characteristic element. -/
+def mainConjecturePath {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (D : MainConjectureData A) :
+    Path D.pAdicL.special D.characteristic.generator :=
+  Path.trans (Path.symm D.analytic_def) (Path.trans D.mainPath D.algebraic_def)
+
+/-- RwEq stability of the main conjecture path. -/
+theorem mainConjecture_rwEq {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (D : MainConjectureData A) :
+    RwEq (Path.trans (Path.refl D.pAdicL.special) (mainConjecturePath D))
+      (mainConjecturePath D) := by
+  exact rweq_cmpA_refl_left (mainConjecturePath D)
+
+/-! ## Summary -/
+
+/-!
+We introduced computational-path data structures for Zp-extensions, the Iwasawa
+algebra, characteristic ideals, p-adic L-functions, and cyclotomic units, and
+expressed the main conjecture as both a `Path` and a stable `RwEq` witness.
+-/
+
+end IwasawaTheory
+end Algebra
+end Path
+end ComputationalPaths
