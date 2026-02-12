@@ -370,3 +370,7 @@ import ComputationalPaths.Path.Algebra.LiquidTensor
 import ComputationalPaths.Path.Algebra.BornologicalSpaces
 import ComputationalPaths.Path.Algebra.DerivedComplete
 import ComputationalPaths.Path.Algebra.AnalyticGeometry
+import ComputationalPaths.Path.Algebra.EtaleCohomology
+import ComputationalPaths.Path.Algebra.pAdicHodge
+import ComputationalPaths.Path.Algebra.AbelianVarieties
+import ComputationalPaths.Path.Algebra.ShimuraVarieties
