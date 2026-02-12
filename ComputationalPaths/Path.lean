@@ -63,6 +63,7 @@ import ComputationalPaths.Path.HigherCoherenceDerived
 import ComputationalPaths.Path.WhiskerOperations
 import ComputationalPaths.Path.HigherPathOperations
 import ComputationalPaths.Path.HigherGroupoidCoherence
+import ComputationalPaths.Path.LFunctions
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.LoopSpaceAlgebra
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
@@ -223,6 +224,7 @@ import ComputationalPaths.Path.Algebra.WaldhausenKTheory
 import ComputationalPaths.Path.Algebra.IwasawaTheory
 import ComputationalPaths.Path.Algebra.ClassFieldTheory
 import ComputationalPaths.Path.Algebra.GaloisRepresentations
+import ComputationalPaths.Path.Algebra.GaloisRepresentation
 import ComputationalPaths.Path.Algebra.ModularFormsPaths
 import ComputationalPaths.Path.Algebra.FreeGroupProperties
 import ComputationalPaths.Path.Homotopy.HurewiczTheorem

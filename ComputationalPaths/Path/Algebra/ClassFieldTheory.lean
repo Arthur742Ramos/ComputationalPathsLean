@@ -1,42 +1,136 @@
 /-
 # Class Field Theory via Computational Paths
-
 This module sketches class field theory data in the computational-paths
-setting. We model ideles, idele class groups, Artin reciprocity as a Path
-witness, local/global compatibility, and a Hilbert class field package.
-Reciprocity composition is expressed using `Path.trans`.
-
+setting. We model number fields and ideal class groups with Path witnesses,
+Artin reciprocity as Path equivalences, local/global class field theory, and
+Hilbert class fields. Path composition is expressed using `Path.trans`.
 ## Key Definitions
-- `IdeleData`, `IdeleClassGroup`
-- `LocalClassFieldTheory`, `GlobalClassFieldTheory`
-- `LocalGlobalClassFieldTheory`, `HilbertClassField`
-- `ClassFieldStep` for reciprocity rewrites
-
+- `PathEquiv`, `IdealClassGroup`, `ArtinReciprocity`
+- `LocalClassFieldTheory`, `GlobalClassFieldTheory`, `LocalGlobalClassFieldTheory`
+- `HilbertClassField`, `NumberTheoreticStep`
 ## References
 - Artin-Tate, "Class Field Theory"
 - Neukirch, "Class Field Theory"
 -/
-
 import ComputationalPaths.Path.Basic
-import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
 namespace Algebra
 namespace ClassFieldTheory
 
-universe u
+universe u v w
+
+/-! ## Path equivalences -/
+
+/-- Path-based equivalence with computational-path inverses. -/
+structure PathEquiv (α : Type u) (β : Type v) where
+  /-- Forward map. -/
+  toFun : α → β
+  /-- Inverse map. -/
+  invFun : β → α
+  /-- Left inverse expressed as a path. -/
+  left_inv : ∀ x : α, Path (invFun (toFun x)) x
+  /-- Right inverse expressed as a path. -/
+  right_inv : ∀ y : β, Path (toFun (invFun y)) y
+
+namespace PathEquiv
+
+variable {α : Type u} {β : Type v} {γ : Type w}
+
+/-- Symmetry of a path equivalence. -/
+def symm (e : PathEquiv α β) : PathEquiv β α where
+  toFun := e.invFun
+  invFun := e.toFun
+  left_inv := e.right_inv
+  right_inv := e.left_inv
+
+/-- Identity path equivalence. -/
+def refl (α : Type u) : PathEquiv α α where
+  toFun := id
+  invFun := id
+  left_inv := fun x => Path.refl x
+  right_inv := fun x => Path.refl x
+
+/-- Composition of path equivalences. -/
+def comp (e : PathEquiv α β) (f : PathEquiv β γ) : PathEquiv α γ where
+  toFun := fun x => f.toFun (e.toFun x)
+  invFun := fun z => e.invFun (f.invFun z)
+  left_inv := fun x =>
+    Path.trans
+      (Path.congrArg e.invFun (f.left_inv (e.toFun x)))
+      (e.left_inv x)
+  right_inv := fun z =>
+    Path.trans
+      (Path.congrArg f.toFun (e.right_inv (f.invFun z)))
+      (f.right_inv z)
+
+end PathEquiv
+
+/-! ## Number fields and ideals -/
+
+/-- Minimal number field data used for ideal class groups. -/
+structure NumberField where
+  carrier : Type u
+  one : carrier
+  mul : carrier → carrier → carrier
+
+/-- A toy ideal of a number field. -/
+structure Ideal (K : NumberField.{u}) where
+  elem : K.carrier
+
+namespace Ideal
+
+variable {K : NumberField.{u}}
+
+/-- The unit ideal. -/
+def one (K : NumberField.{u}) : Ideal K :=
+  ⟨K.one⟩
+
+/-- Multiplication of ideals via the field multiplication. -/
+def mul (I J : Ideal K) : Ideal K :=
+  ⟨K.mul I.elem J.elem⟩
+
+end Ideal
+
+/-! ## Ideal class groups -/
+
+/-- Ideal class group with Path witnesses for quotient and multiplication. -/
+structure IdealClassGroup (K : NumberField.{u}) where
+  carrier : Type u
+  one : carrier
+  mul : carrier → carrier → carrier
+  inv : carrier → carrier
+  classOf : Ideal K → carrier
+  class_one : Path (classOf (Ideal.one K)) one
+  class_mul : ∀ I J, Path (classOf (Ideal.mul I J)) (mul (classOf I) (classOf J))
+  repr : carrier → Ideal K
+  repr_classOf : ∀ I, Path (repr (classOf I)) I
+  classOf_repr : ∀ c, Path (classOf (repr c)) c
+
+namespace IdealClassGroup
+
+variable {K : NumberField.{u}} (C : IdealClassGroup K)
+
+/-- Path equivalence between ideals and their classes. -/
+def pathEquiv : PathEquiv (Ideal K) C.carrier where
+  toFun := C.classOf
+  invFun := C.repr
+  left_inv := C.repr_classOf
+  right_inv := C.classOf_repr
+
+end IdealClassGroup
 
 /-! ## Ideles and class groups -/
 
-/-- Minimal data for ideles. -/
+/-- Minimal data for ideles with Path unit laws. -/
 structure IdeleData where
   carrier : Type u
   one : carrier
   mul : carrier → carrier → carrier
   inv : carrier → carrier
-  mul_one : ∀ x, mul x one = x
-  one_mul : ∀ x, mul one x = x
+  mul_one : ∀ x, Path (mul x one) x
+  one_mul : ∀ x, Path (mul one x) x
 
 namespace IdeleData
 
@@ -44,11 +138,11 @@ variable (I : IdeleData)
 
 /-- Path witness: x * 1 = x for ideles. -/
 def mul_one_path (x : I.carrier) : Path (I.mul x I.one) x :=
-  Path.ofEq (I.mul_one x)
+  I.mul_one x
 
 /-- Path witness: 1 * x = x for ideles. -/
 def one_mul_path (x : I.carrier) : Path (I.mul I.one x) x :=
-  Path.ofEq (I.one_mul x)
+  I.one_mul x
 
 end IdeleData
 
@@ -68,20 +162,22 @@ structure IdeleClassGroup (I : IdeleData.{u}) where
 structure LocalFieldData where
   ideles : IdeleData.{u}
 
-/-- Global field data with ideles and class group. -/
+/-- Global field data with ideles, idele class groups, and ideal classes. -/
 structure GlobalFieldData where
+  field : NumberField.{u}
   ideles : IdeleData.{u}
   ideleClass : IdeleClassGroup ideles
+  idealClass : IdealClassGroup field
 
 /-! ## Abelian Galois groups -/
 
-/-- Abelianized Galois group data. -/
+/-- Abelianized Galois group data with Path unit laws. -/
 structure AbelianGaloisGroup where
   carrier : Type u
   one : carrier
   mul : carrier → carrier → carrier
-  mul_one : ∀ x, mul x one = x
-  one_mul : ∀ x, mul one x = x
+  mul_one : ∀ x, Path (mul x one) x
+  one_mul : ∀ x, Path (mul one x) x
 
 namespace AbelianGaloisGroup
 
@@ -89,13 +185,20 @@ variable (G : AbelianGaloisGroup)
 
 /-- Path witness: x * 1 = x in the Galois group. -/
 def mul_one_path (x : G.carrier) : Path (G.mul x G.one) x :=
-  Path.ofEq (G.mul_one x)
+  G.mul_one x
 
 /-- Path witness: 1 * x = x in the Galois group. -/
 def one_mul_path (x : G.carrier) : Path (G.mul G.one x) x :=
-  Path.ofEq (G.one_mul x)
+  G.one_mul x
 
 end AbelianGaloisGroup
+
+/-! ## Artin reciprocity -/
+
+/-- Artin reciprocity as a Path equivalence for ideal class groups. -/
+structure ArtinReciprocity (K : GlobalFieldData.{u}) (G : AbelianGaloisGroup.{u}) where
+  reciprocity : PathEquiv K.idealClass.carrier G.carrier
+  reciprocity_one : Path (reciprocity.toFun K.idealClass.one) G.one
 
 /-! ## Local and global class field theory -/
 
@@ -123,8 +226,36 @@ structure LocalGlobalClassFieldTheory (K : LocalFieldData.{u}) (L : GlobalFieldD
 /-- Hilbert class field data packaged with reciprocity. -/
 structure HilbertClassField (K : GlobalFieldData.{u}) (G : AbelianGaloisGroup.{u}) where
   classField : Type u
-  artinData : GlobalClassFieldTheory K G
-  hilbert_reciprocity : Path (artinData.artin K.ideleClass.one) G.one
+  reciprocity : ArtinReciprocity K G
+  hilbert_reciprocity : Path (reciprocity.reciprocity.toFun K.idealClass.one) G.one
+
+/-! ## Number-theoretic rewrite steps -/
+
+/-- Domain-specific steps used to record number-theoretic rewrites. -/
+inductive NumberTheoreticStep :
+    {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+  | principal {A : Type u} {a b : A} (p q : Path a b)
+      (h : p.proof = q.proof) : NumberTheoreticStep p q
+  | local_step {A : Type u} {a b : A} (p q : Path a b)
+      (h : p.proof = q.proof) : NumberTheoreticStep p q
+  | global_step {A : Type u} {a b : A} (p q : Path a b)
+      (h : p.proof = q.proof) : NumberTheoreticStep p q
+  | artin_step {A : Type u} {a b : A} (p q : Path a b)
+      (h : p.proof = q.proof) : NumberTheoreticStep p q
+
+/-- Number-theoretic steps preserve the underlying equality. -/
+theorem NumberTheoreticStep_sound {A : Type u} {a b : A} {p q : Path a b}
+    (h : NumberTheoreticStep p q) : p.proof = q.proof := by
+  cases h with
+  | principal h => exact h
+  | local_step h => exact h
+  | global_step h => exact h
+  | artin_step h => exact h
+
+/-- Compose two computational paths using `Path.trans`. -/
+def numberTheoreticStepCompose {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) : Path a c :=
+  Path.trans p q
 
 /-! ## Reciprocity rewrite steps -/
 
@@ -145,7 +276,7 @@ def classFieldStepPath {A : GlobalClassFieldTheory K G} {x y : G.carrier}
   match s with
   | ClassFieldStep.artin_one => A.artin_one
   | ClassFieldStep.artin_mul x y => A.artin_mul x y
-  | ClassFieldStep.mul_one x => Path.ofEq (G.mul_one x)
+  | ClassFieldStep.mul_one x => G.mul_one x
 
 /-- Compose two class field steps using `Path.trans`. -/
 def classFieldStepCompose {A : GlobalClassFieldTheory K G} {x y z : G.carrier}
@@ -166,13 +297,14 @@ def reciprocity_unit_path (C : LocalGlobalClassFieldTheory Kloc Kglob G0) :
       (Path.congrArg C.globalCFT.artin C.embed_one)
       (C.globalCFT.artin_one))
 
-/-- RwEq example: composing reciprocity with a reflexive path is equivalent. -/
-theorem reciprocity_unit_rweq (C : LocalGlobalClassFieldTheory Kloc Kglob G0) :
-    RwEq
-      (Path.trans (reciprocity_unit_path (C := C)) (Path.refl G0.one))
-      (reciprocity_unit_path (C := C)) := by
-  apply rweq_of_eq
-  simp
+/-! ## Summary -/
+
+/-!
+We packaged class field theory data using computational paths: ideal class groups,
+Artin reciprocity as path equivalences, local/global reciprocity, Hilbert class
+fields, and number-theoretic rewrite steps with explicit `Path.trans`
+compositions.
+-/
 
 end ClassFieldTheory
 end Algebra

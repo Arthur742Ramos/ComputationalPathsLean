@@ -8,10 +8,11 @@ analytic and algebraic elements, together with an `RwEq` stability witness.
 
 ## Key Results
 
-- `ZpExtension`, `IwasawaAlgebra`, `IwasawaModule`
+- `ZpExtension`, `IwasawaAlgebra`, `IwasawaModule`, `IwasawaModuleHom`
 - `CharacteristicIdeal`, `muInvariant`, `lambdaInvariant`
 - `CyclotomicUnits`, `PadicLFunction`
-- `mainConjecturePath`, `mainConjecture_rwEq`
+- `MainConjectureData`, `mainConjecturePath`, `mainConjecture_rwEq`
+- `IwasawaStep`
 
 ## References
 
@@ -99,6 +100,56 @@ structure IwasawaModule {Gamma : Type u} (A : IwasawaAlgebra Gamma) where
   /-- Compatibility with multiplication. -/
   action_mul : ∀ a b x, Path (action (A.mul a b) x) (action a (action b x))
 
+/-! ## Module relations -/
+
+/-- A morphism of Iwasawa modules with a path-level action law. -/
+structure IwasawaModuleHom {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (M N : IwasawaModule A) where
+  /-- Underlying map. -/
+  toFun : M.carrier -> N.carrier
+  /-- Compatibility with scalar action. -/
+  map_action : ∀ a x, Path (toFun (M.action a x)) (N.action a (toFun x))
+
+namespace IwasawaModuleHom
+
+variable {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+variable {M N P : IwasawaModule A}
+
+/-- Identity morphism of Iwasawa modules. -/
+def id (M : IwasawaModule A) : IwasawaModuleHom M M :=
+  { toFun := fun x => x
+    map_action := by
+      intro a x
+      exact Path.refl _ }
+
+/-- Composition of Iwasawa module morphisms. -/
+def comp (g : IwasawaModuleHom N P) (f : IwasawaModuleHom M N) :
+    IwasawaModuleHom M P :=
+  { toFun := fun x => g.toFun (f.toFun x)
+    map_action := by
+      intro a x
+      exact Path.trans
+        (Path.congrArg g.toFun (f.map_action a x))
+        (g.map_action a (f.toFun x)) }
+
+end IwasawaModuleHom
+
+namespace IwasawaModule
+
+variable {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+
+/-- Action respects paths in the algebra. -/
+def actionPath (M : IwasawaModule A) {a b : A.carrier} (p : Path a b)
+    (x : M.carrier) : Path (M.action a x) (M.action b x) :=
+  Path.congrArg (fun t => M.action t x) p
+
+/-- Reflexive action path. -/
+def actionPath_refl (M : IwasawaModule A) (a : A.carrier) (x : M.carrier) :
+    Path (M.action a x) (M.action a x) :=
+  actionPath M (Path.refl a) x
+
+end IwasawaModule
+
 /-! ## Characteristic ideals and invariants -/
 
 /-- The characteristic ideal of a torsion Iwasawa module. -/
@@ -184,12 +235,40 @@ theorem mainConjecture_rwEq {Gamma : Type u} {A : IwasawaAlgebra Gamma}
       (mainConjecturePath D) := by
   exact rweq_cmpA_refl_left (mainConjecturePath D)
 
+/-! ## IwasawaStep rewrite relation -/
+
+/-- Rewrite steps for Iwasawa theory. -/
+inductive IwasawaStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+  /-- Tower (norm) simplification. -/
+  | tower {A : Type u} {a : A} (p : Path a a) :
+      IwasawaStep p (Path.refl a)
+  /-- Module-action transport step. -/
+  | module_action {A : Type u} {a b : A} (p q : Path a b)
+      (h : p.proof = q.proof) : IwasawaStep p q
+  /-- Characteristic ideal comparison step. -/
+  | characteristic {A : Type u} {a b : A} (p q : Path a b)
+      (h : p.proof = q.proof) : IwasawaStep p q
+  /-- Main conjecture comparison step. -/
+  | main_conjecture {A : Type u} {a b : A} (p q : Path a b)
+      (h : p.proof = q.proof) : IwasawaStep p q
+
+/-- IwasawaStep is sound: preserves the underlying equality. -/
+theorem IwasawaStep_sound {A : Type u} {a b : A} {p q : Path a b}
+    (h : IwasawaStep p q) : p.proof = q.proof := by
+  cases h with
+  | tower _ => rfl
+  | module_action _ _ h => exact h
+  | characteristic _ _ h => exact h
+  | main_conjecture _ _ h => exact h
+
 /-! ## Summary -/
 
 /-!
 We introduced computational-path data structures for Zp-extensions, the Iwasawa
-algebra, characteristic ideals, p-adic L-functions, and cyclotomic units, and
-expressed the main conjecture as both a `Path` and a stable `RwEq` witness.
+algebra, characteristic ideals, p-adic L-functions, and cyclotomic units, added
+module morphisms with action paths, expressed the main conjecture as both a
+`Path` and a stable `RwEq` witness, and recorded an `IwasawaStep` rewrite
+relation.
 -/
 
 end IwasawaTheory
