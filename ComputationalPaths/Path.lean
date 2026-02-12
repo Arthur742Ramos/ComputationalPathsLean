@@ -360,3 +360,8 @@ import ComputationalPaths.Path.Algebra.CompletionPaths
 import ComputationalPaths.Path.Algebra.SchemeMorphisms
 import ComputationalPaths.Path.Algebra.CoherentSheaves
 import ComputationalPaths.Path.Algebra.HomologicalDimension
+import ComputationalPaths.Path.Algebra.MatroidPaths
+import ComputationalPaths.Path.Algebra.SymmetricFunctions
+import ComputationalPaths.Path.Algebra.PosetTopology
+import ComputationalPaths.Path.Algebra.CoxeterGroups
+import ComputationalPaths.Path.Algebra.CombHopfAlgebras
