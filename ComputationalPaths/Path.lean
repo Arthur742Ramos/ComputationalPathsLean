@@ -64,6 +64,8 @@ import ComputationalPaths.Path.WhiskerOperations
 import ComputationalPaths.Path.HigherPathOperations
 import ComputationalPaths.Path.HigherGroupoidCoherence
 import ComputationalPaths.Path.LFunctions
+import ComputationalPaths.Path.AdditiveNumberTheory
+import ComputationalPaths.Path.RiemannZeta
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.LoopSpaceAlgebra
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
