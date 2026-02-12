@@ -393,3 +393,8 @@ import ComputationalPaths.Path.Topology.DiscreteTopology
 import ComputationalPaths.Path.Topology.TopologicalData
 import ComputationalPaths.Path.Topology.SimplicialComplexes
 import ComputationalPaths.Path.Topology.CWComplexPaths
+import ComputationalPaths.Path.Topology.ConformalFieldTheory
+import ComputationalPaths.Path.Topology.StringTopology
+import ComputationalPaths.Path.Topology.GaugeTheoryPaths
+import ComputationalPaths.Path.Topology.MirrorSymmetry
+import ComputationalPaths.Path.Topology.TopologicalInsulators
