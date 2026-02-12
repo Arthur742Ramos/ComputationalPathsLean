@@ -333,3 +333,8 @@ import ComputationalPaths.Path.Algebra.LieAlgebraReps
 import ComputationalPaths.Path.Algebra.CategoryO
 import ComputationalPaths.Path.Algebra.QuantumGroupReps
 import ComputationalPaths.Path.Algebra.GeometricRepTheory
+import ComputationalPaths.Path.Algebra.ModelCategories
+import ComputationalPaths.Path.Algebra.StableCategories
+import ComputationalPaths.Path.Algebra.DGCategories
+import ComputationalPaths.Path.Algebra.SimplicialHomotopyTheory
+import ComputationalPaths.Path.Algebra.TorsionTheory
