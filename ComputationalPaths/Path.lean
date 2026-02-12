@@ -338,3 +338,8 @@ import ComputationalPaths.Path.Algebra.StableCategories
 import ComputationalPaths.Path.Algebra.DGCategories
 import ComputationalPaths.Path.Algebra.SimplicialHomotopyTheory
 import ComputationalPaths.Path.Algebra.TorsionTheory
+import ComputationalPaths.Path.Algebra.LocalCohomology
+import ComputationalPaths.Path.Algebra.CompletionPaths
+import ComputationalPaths.Path.Algebra.SchemeMorphisms
+import ComputationalPaths.Path.Algebra.CoherentSheaves
+import ComputationalPaths.Path.Algebra.HomologicalDimension
