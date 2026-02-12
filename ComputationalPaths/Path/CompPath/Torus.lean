@@ -24,6 +24,9 @@ abbrev Torus : Type u := Circle.{u} × Circle.{u}
 /-- Base point on the torus. -/
 noncomputable abbrev torusBase : Torus.{u} := (circleBase.{u}, circleBase.{u})
 
+/-- Raw loop space of the torus at `torusBase`. -/
+abbrev torusLoopSpace : Type u := LoopSpace Torus.{u} torusBase
+
 /-- Loop around the first circle factor. -/
 noncomputable def torusLoop1 : Path (A := Torus.{u}) torusBase torusBase :=
   Path.prodMk (circleLoop.{u}) (Path.refl (circleBase.{u}))

@@ -214,14 +214,19 @@ instance instSubsingleton_pointedMap_sigma_omegaEq (X Y : Pointed) :
   infer_instance
  
 /-! ## Adjunction maps -/
- 
+
 noncomputable section
- 
+
+/-- Suspension-to-loop map returning a computational path witness. -/
+def suspToLoopPath {X Y : Pointed} (f : PointedMap (sigmaPointed X) Y) :
+    X.carrier → LoopSpace Y.carrier Y.pt :=
+  adjMap (X := X.carrier) X.pt f.toFun f.map_pt
+
 /-- Suspension-to-loop map (propositional loops). -/
 def suspToLoopEq {X Y : Pointed} (f : PointedMap (sigmaPointed X) Y) :
     PointedMap X (omegaEqPointed Y) where
   toFun := fun x =>
-    LiftEq.mk (adjMap (X := X.carrier) X.pt f.toFun f.map_pt x).toEq
+    LiftEq.mk (suspToLoopPath f x).toEq
   map_pt := by
     apply Subsingleton.elim
  
@@ -237,6 +242,13 @@ def loopEqToSusp {X Y : Pointed} (g : PointedMap X (omegaEqPointed Y)) :
         | glue x =>
             exact (g.toFun x).toEq)
   map_pt := rfl
+
+/-- `Path` witness of the loop-to-suspension glue. -/
+def loopEqToSusp_glue_path {X Y : Pointed} (g : PointedMap X (omegaEqPointed Y))
+    (x : X.carrier) :
+    Path ((loopEqToSusp g).toFun (Suspension.north (X := X.carrier)))
+      ((loopEqToSusp g).toFun (Suspension.south (X := X.carrier))) :=
+  loopSpaceEqToPath (g.toFun x)
  
 /-! ## Adjunction equivalence -/
  
@@ -265,18 +277,39 @@ def counit (Y : Pointed) :
 end
  
 /-! ## Naturality -/
- 
+
 /-- Naturality of the unit. -/
-theorem unit_naturality {X Y : Pointed} (f : PointedMap X Y) :
+noncomputable def unit_naturality {X Y : Pointed} (f : PointedMap X Y) :
     PointedMap.comp (omegaEqFunctor.map (sigmaFunctor.map f)) (unit X) =
       PointedMap.comp (unit Y) f := by
-  apply Subsingleton.elim
- 
+  apply PointedMap.ext
+  apply funext
+  intro x
+  change (omegaEqFunctor.map (sigmaFunctor.map f) |>.comp (unit X)).toFun x =
+    ((unit Y).comp f).toFun x
+  simp only [omegaEqFunctor, sigmaFunctor, unit, suspLoopAdjunction, suspToLoopEq,
+    omegaEqMap, sigmaMap, omegaEqPointed, PointedMap.comp, PointedMap.id]
+  apply @Subsingleton.elim _ (instSubsingleton_loopSpaceEq _)
+
 /-- Naturality of the counit. -/
-theorem counit_naturality {X Y : Pointed} (f : PointedMap X Y) :
+noncomputable def counit_naturality {X Y : Pointed} (f : PointedMap X Y) :
     PointedMap.comp f (counit X) =
       PointedMap.comp (counit Y) (sigmaFunctor.map (omegaEqFunctor.map f)) := by
-  apply Subsingleton.elim
+  apply PointedMap.ext
+  apply funext
+  intro x
+  have hx : x = (sigmaPointed (omegaEqPointed X)).pt :=
+    Subsingleton.elim _ _
+  have h_left : (PointedMap.comp f (counit X)).toFun x = Y.pt := by
+    have h_base := (PointedMap.comp f (counit X)).map_pt
+    simpa [hx] using h_base
+  have h_right :
+      Y.pt =
+        (PointedMap.comp (counit Y) (sigmaFunctor.map (omegaEqFunctor.map f))).toFun x := by
+    have h_base := (PointedMap.comp (counit Y)
+      (sigmaFunctor.map (omegaEqFunctor.map f))).map_pt
+    simpa [hx] using h_base.symm
+  exact h_left.trans h_right
  
 /-- Package the adjunction data for Sigma and OmegaEq. -/
 structure PointedAdjunction (F G : PointedFunctor) where

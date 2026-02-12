@@ -9,6 +9,7 @@ manipulations used in the proof that `pi_1(S^1) ~= Z`.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.Quot
 
 set_option maxHeartbeats 1000000
@@ -57,7 +58,22 @@ variable {A : Type u} {a : A}
 /-- Two loop witnesses at the base point are RwEq-equivalent. -/
 theorem inv_comp_rweq (p : LoopSpace A a) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl a) := by
-  exact rweq_cmpA_inv_left (p := p)
+  exact rweq_of_step (Step.symm_trans (A := A) (p := p))
+
+/-- Right cancellation for loops. -/
+theorem comp_inv_rweq (p : LoopSpace A a) :
+    RwEq (Path.trans p (Path.symm p)) (Path.refl a) := by
+  exact rweq_of_step (Step.trans_symm (A := A) (p := p))
+
+/-- Associativity of loop composition up to RwEq. -/
+theorem comp_assoc_rweq (p q r : LoopSpace A a) :
+    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) := by
+  exact rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r))
+
+/-- Inverse involution for loops up to RwEq. -/
+theorem inv_inv_rweq (p : LoopSpace A a) :
+    RwEq (Path.symm (Path.symm p)) p := by
+  exact rweq_of_step (Step.symm_symm (A := A) (p := p))
 
 end LoopSpace
 

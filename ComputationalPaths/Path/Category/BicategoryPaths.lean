@@ -78,6 +78,18 @@ composition. -/
       vcomp (hcomp η₁ θ₁) (hcomp η₂ θ₂) := by
   exact Eq.symm (interchange (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂))
 
+/-- RwEq interchange law: horizontal (`rweq_trans_congr`) and vertical
+composition commute. -/
+@[simp] theorem interchange_rweq
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : Path2Cell (A := A) f₀ f₁)
+    (η₂ : Path2Cell (A := A) f₁ f₂)
+    (θ₁ : Path2Cell (A := A) g₀ g₁)
+    (θ₂ : Path2Cell (A := A) g₁ g₂) :
+    rweq_trans_congr (rweq_trans η₁ η₂) (rweq_trans θ₁ θ₂) =
+      rweq_trans (rweq_trans_congr η₁ θ₁) (rweq_trans_congr η₂ θ₂) := by
+  apply Subsingleton.elim
+
 /-! ## Coherence laws -/
 
 /-- Pentagon coherence for the associator 2-cell. -/

@@ -524,26 +524,6 @@ def substSigma {A : Type u} {B : A → Type v}
 
 end Sigma
 
-section Dependent
-
-variable {A : Type u} {B : A → Type v}
-variable (f : ∀ x : A, B x)
-variable {a b : A}
-
-/-- Apply a dependent function to a path, yielding the transported result. -/
-@[simp] def apd (p : Path a b) :
-    Path (transport (A := A) (D := fun x => B x) p (f a)) (f b) := by
-  cases p with
-  | mk steps h =>
-      cases h
-      simpa [transport] using (refl (f a))
-
-@[simp] theorem apd_refl (a : A) :
-    apd (f := f) (refl a) = refl (f a) := by
-  simp [apd, transport]
-
-end Dependent
-
 section Function
 
 variable {A : Type u} {B : Type v}

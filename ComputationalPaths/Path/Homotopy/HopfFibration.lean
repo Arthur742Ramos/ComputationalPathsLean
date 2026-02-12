@@ -91,6 +91,19 @@ def hopfFiberEquiv_fwd_roundtrip_path (data : HopfFibrationData) (x : S1) :
 abbrev hopfFiber (data : HopfFibrationData) : Type u :=
   Fiber data.proj data.base
 
+/-- Transport in Hopf fibers along a base path. -/
+def hopfFiberTransport (data : HopfFibrationData) {b₁ b₂ : S2} (p : Path b₁ b₂) :
+    Fiber data.proj b₁ → Fiber data.proj b₂ :=
+  Path.transport (D := fun b => Fiber data.proj b) p
+
+/-- Fiber transport along composite paths composes via `Path.trans`. -/
+theorem hopfFiberTransport_trans (data : HopfFibrationData) {b₁ b₂ b₃ : S2}
+    (p : Path b₁ b₂) (q : Path b₂ b₃) (x : Fiber data.proj b₁) :
+    hopfFiberTransport data (Path.trans p q) x =
+      hopfFiberTransport data q (hopfFiberTransport data p x) := by
+  simpa [hopfFiberTransport] using
+    (Path.transport_trans (D := fun b => Fiber data.proj b) p q x)
+
 /-- The Hopf fiber sequence `S¹ → S³ → S²`. -/
 def hopfFiberSeq (data : HopfFibrationData) : FiberSeq S1 S3 S2 where
   proj := data.proj

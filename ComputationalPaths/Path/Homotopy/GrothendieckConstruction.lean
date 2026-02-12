@@ -36,6 +36,27 @@ abbrev FundamentalGroupoidTypeFunctor (A : Type u) : Type (u + 1) :=
 abbrev FibrationFamily (A : Type u) : Type (u + 1) :=
   A → Type u
 
+/-! ## Fiber transport -/
+
+/-- Transport along base paths in a fibration family. -/
+def transportFiber {A : Type u} (P : FibrationFamily A) {a b : A}
+    (p : Path a b) (x : P a) : P b :=
+  Path.transport p x
+
+/-- Transport along reflexive paths is the identity. -/
+@[simp] theorem transportFiber_refl {A : Type u} (P : FibrationFamily A)
+    (a : A) (x : P a) :
+    transportFiber P (Path.refl a) x = x := by
+  rfl
+
+/-- Transport is functorial with respect to path composition. -/
+@[simp] theorem transportFiber_trans {A : Type u} (P : FibrationFamily A)
+    {a b c : A} (p : Path a b) (q : Path b c) (x : P a) :
+    transportFiber P (Path.trans p q) x =
+      transportFiber P q (transportFiber P p x) := by
+  unfold transportFiber
+  simpa using (Path.transport_trans (D := P) p q x)
+
 /-! ## Category of elements -/
 
 /-- The total space (category of elements) of a type-valued functor. -/

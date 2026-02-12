@@ -13,6 +13,8 @@ between `π₁(T²)` and `ℤ × ℤ`.
 
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.CircleCompPath
+import ComputationalPaths.Path.Rewrite.Normalization
+import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 set_option maxHeartbeats 1000000
@@ -106,6 +108,141 @@ noncomputable instance instHasTorusPiOneEncode_ofCircle :
             (Path.ofEq (circleDecode_circlePiOneEncode x1))
             (Path.ofEq (circleDecode_circlePiOneEncode x2))
 
+/-
+## Loop-space commutator
+-/
+
+/-- The torus commutator loop `aba⁻¹b⁻¹` built from `torusLoop1` and `torusLoop2`. -/
+noncomputable def torusCommutator : torusLoopSpace :=
+  Path.trans
+    (Path.trans (Path.trans torusLoop1 torusLoop2) (Path.symm torusLoop1))
+    (Path.symm torusLoop2)
+
+private theorem commutator_refl_right_rw {A : Type u} {a : A}
+    (p : LoopSpace A a) :
+    Rw
+      (Path.trans (Path.trans (Path.trans p (Path.refl a)) (Path.symm p))
+        (Path.symm (Path.refl a)))
+      (Path.refl a) := by
+  -- (p ⬝ refl) ⬝ p⁻¹ ⬝ refl⁻¹  →  (p ⬝ refl) ⬝ p⁻¹ ⬝ refl  (symm_refl on tail)
+  -- →  (p ⬝ refl) ⬝ p⁻¹         (trans_refl_right)
+  -- →  p ⬝ p⁻¹                   (trans_congr_left . trans_refl_right)
+  -- →  refl                       (trans_symm)
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_right
+      (Path.trans (Path.trans p (Path.refl a)) (Path.symm p))
+      (Step.symm_refl a))
+  apply rw_trans
+  · exact rw_of_step (Step.trans_refl_right _)
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_left (Path.symm p) (Step.trans_refl_right p))
+  exact rw_of_step (Step.trans_symm p)
+
+private theorem commutator_refl_left_rw {A : Type u} {a : A}
+    (p : LoopSpace A a) :
+    Rw
+      (Path.trans (Path.trans (Path.trans (Path.refl a) p) (Path.symm (Path.refl a)))
+        (Path.symm p))
+      (Path.refl a) := by
+  -- (refl ⬝ p) ⬝ refl⁻¹ ⬝ p⁻¹  →  (refl ⬝ p) ⬝ refl ⬝ p⁻¹  (symm_refl in inner)
+  -- →  (refl ⬝ p) ⬝ p⁻¹         (trans_refl_right in inner, then congr)
+  -- →  p ⬝ p⁻¹                   (trans_refl_left)
+  -- →  refl                       (trans_symm)
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_left (Path.symm p)
+      (Step.trans_congr_right (Path.trans (Path.refl a) p) (Step.symm_refl a)))
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_left (Path.symm p)
+      (Step.trans_refl_right (Path.trans (Path.refl a) p)))
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_left (Path.symm p)
+      (Step.trans_refl_left p))
+  exact rw_of_step (Step.trans_symm p)
+
+private theorem commutator_refl_right_rweq {A : Type u} {a : A}
+    (p : LoopSpace A a) :
+    RwEq
+      (Path.trans (Path.trans (Path.trans p (Path.refl a)) (Path.symm p))
+        (Path.symm (Path.refl a)))
+      (Path.refl a) :=
+  rweq_of_rw (commutator_refl_right_rw (A := A) (a := a) p)
+
+private theorem commutator_refl_left_rweq {A : Type u} {a : A}
+    (p : LoopSpace A a) :
+    RwEq
+      (Path.trans (Path.trans (Path.trans (Path.refl a) p) (Path.symm (Path.refl a)))
+        (Path.symm p))
+      (Path.refl a) :=
+  rweq_of_rw (commutator_refl_left_rw (A := A) (a := a) p)
+
+/-! ### Component-wise commutator reduction -/
+
+private theorem torusCommutator_fst_refl :
+    RwEq (Path.fst torusCommutator) (Path.refl circleBase) := by
+  -- fst distributes over trans/symm (congrArg_trans, congrArg_symm are @[simp])
+  -- then fst(prodMk p q) ≈ p (rweq_fst_prodMk)
+  -- finally the commutator with refl reduces to refl
+  unfold torusCommutator
+  simp only [Path.fst, congrArg_trans, congrArg_symm]
+  apply rweq_trans
+  · apply rweq_trans_congr
+    · apply rweq_trans_congr
+      · apply rweq_trans_congr
+        · exact rweq_fst_prodMk circleLoop (Path.refl circleBase)
+        · exact rweq_fst_prodMk (Path.refl circleBase) circleLoop
+      · exact rweq_symm_congr (rweq_fst_prodMk circleLoop (Path.refl circleBase))
+    · exact rweq_symm_congr (rweq_fst_prodMk (Path.refl circleBase) circleLoop)
+  · exact commutator_refl_right_rweq circleLoop
+
+private theorem torusCommutator_snd_refl :
+    RwEq (Path.snd torusCommutator) (Path.refl circleBase) := by
+  unfold torusCommutator
+  simp only [Path.snd, congrArg_trans, congrArg_symm]
+  apply rweq_trans
+  · apply rweq_trans_congr
+    · apply rweq_trans_congr
+      · apply rweq_trans_congr
+        · exact rweq_snd_prodMk circleLoop (Path.refl circleBase)
+        · exact rweq_snd_prodMk (Path.refl circleBase) circleLoop
+      · exact rweq_symm_congr (rweq_snd_prodMk circleLoop (Path.refl circleBase))
+    · exact rweq_symm_congr (rweq_snd_prodMk (Path.refl circleBase) circleLoop)
+  · exact commutator_refl_left_rweq circleLoop
+
+/-- The torus commutator is rewrite-equivalent to the reflexive loop. -/
+theorem torusCommutator_rweq_refl :
+    RwEq torusCommutator (Path.refl torusBase) := by
+  have h_eta : RwEq torusCommutator
+      (Path.prodMk (Path.fst torusCommutator) (Path.snd torusCommutator)) :=
+    rweq_symm (rweq_prod_eta torusCommutator)
+  have h_prod : RwEq
+      (Path.prodMk (Path.fst torusCommutator) (Path.snd torusCommutator))
+      (Path.prodMk (Path.refl circleBase) (Path.refl circleBase)) :=
+    rweq_map2_of_rweq (f := Prod.mk) torusCommutator_fst_refl torusCommutator_snd_refl
+  have h_refl : Path.prodMk (Path.refl circleBase) (Path.refl circleBase) =
+      Path.refl torusBase :=
+    Path.prodMk_refl_refl circleBase circleBase
+  exact rweq_trans h_eta (rweq_trans h_prod (rweq_of_eq h_refl))
+
+/-- Two partial commutator reductions (canceling either component first). -/
+noncomputable def torusCommutatorReduceFst : torusLoopSpace :=
+  Path.prodMk (Path.refl circleBase) (Path.snd torusCommutator)
+
+noncomputable def torusCommutatorReduceSnd : torusLoopSpace :=
+  Path.prodMk (Path.fst torusCommutator) (Path.refl circleBase)
+
+/-- The two partial reductions are rewrite-equivalent. -/
+theorem torusCommutator_reduction_equiv :
+    RwEq torusCommutatorReduceFst torusCommutatorReduceSnd := by
+  have h_left : RwEq torusCommutatorReduceFst
+      (Path.prodMk (Path.refl circleBase) (Path.refl circleBase)) :=
+    rweq_map2_of_rweq (f := Prod.mk)
+      (rweq_refl (Path.refl circleBase)) torusCommutator_snd_refl
+  have h_right : RwEq torusCommutatorReduceSnd
+      (Path.prodMk (Path.refl circleBase) (Path.refl circleBase)) :=
+    rweq_map2_of_rweq (f := Prod.mk)
+      torusCommutator_fst_refl (rweq_refl (Path.refl circleBase))
+  exact rweq_trans h_left (rweq_symm h_right)
+
 
 
 /-- Fundamental group of the torus is equivalent to `ℤ × ℤ`. -/
@@ -119,6 +256,24 @@ noncomputable def torusPiOneEquivIntProd [HasTorusPiOneEncode] :
   right_inv := by
     intro z
     simpa using (torusPiOneEncode_torusDecode (z := z))
+
+/-- Step-normalized path witnesses for the torus π₁ equivalence. -/
+noncomputable def torusPiOneEquivIntProdNormalized [HasTorusPiOneEncode] :
+    PathSimpleEquiv torusPiOne (Int × Int) where
+  toFun := torusPiOneEncode
+  invFun := torusDecode
+  left_inv := by
+    intro x
+    exact
+      normalize (A := torusPiOne)
+        (a := torusDecode (torusPiOneEncode x)) (b := x)
+        (torusDecode_torusPiOneEncode (x := x))
+  right_inv := by
+    intro z
+    exact
+      normalize (A := Int × Int)
+        (a := torusPiOneEncode (torusDecode z)) (b := z)
+        (torusPiOneEncode_torusDecode (z := z))
 
 /-- Eq-based equivalence for downstream developments. -/
 noncomputable def torusPiOneEquivIntProdSimple [HasTorusPiOneEncode] :
