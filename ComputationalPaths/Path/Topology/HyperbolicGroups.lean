@@ -42,9 +42,9 @@ structure MetricData (X : Type u) where
   /-- Distance function. -/
   dist : X → X → Nat
   /-- Distance is zero iff equal. -/
-  dist_self : ∀ x, dist x x = 0
+  dist_self : ∀ x, Path (dist x x) 0
   /-- Symmetry. -/
-  dist_comm : ∀ x y, dist x y = dist y x
+  dist_comm : ∀ x y, Path (dist x y) (dist y x)
   /-- Triangle inequality. -/
   dist_triangle : ∀ x y z, dist x z ≤ dist x y + dist y z
 
@@ -56,10 +56,26 @@ variable {X : Type u} (M : MetricData X)
 def gromovProduct (e x y : X) : Nat :=
   (M.dist e x + M.dist e y - M.dist x y) / 2
 
+/-- Coerce the reflexive path of distances to an equality. -/
+@[simp] theorem dist_self_eq (x : X) : M.dist x x = 0 :=
+  Path.toEq (M.dist_self x)
+
+/-- Coerce the symmetry path of distances to an equality. -/
+theorem dist_comm_eq (x y : X) : M.dist x y = M.dist y x :=
+  Path.toEq (M.dist_comm x y)
+
 /-- The Gromov product is symmetric. -/
-theorem gromovProduct_comm (e x y : X) :
-    M.gromovProduct e x y = M.gromovProduct e y x := by
-  simp [gromovProduct, M.dist_comm x y, Nat.add_comm (M.dist e x) (M.dist e y)]
+def gromovProduct_comm (e x y : X) :
+    Path (M.gromovProduct e x y) (M.gromovProduct e y x) := by
+  apply Path.ofEq
+  simp [gromovProduct, dist_comm_eq (M:=M) x y,
+    Nat.add_comm (M.dist e x) (M.dist e y)]
+
+/-- Symmetry of the Gromov product yields a loop by path composition. -/
+def gromovProduct_comm_loop (e x y : X) :
+    Path (M.gromovProduct e x y) (M.gromovProduct e x y) :=
+  Path.trans (gromovProduct_comm (M:=M) e x y)
+    (Path.symm (gromovProduct_comm (M:=M) e x y))
 
 end MetricData
 
@@ -85,9 +101,9 @@ structure GeodesicSegment {X : Type u} (M : MetricData X) (x y : X) where
   /-- Points along the segment. -/
   point : Fin (len + 1) → X
   /-- Start is x. -/
-  start_eq : point ⟨0, Nat.zero_lt_succ _⟩ = x
+  start_eq : Path (point ⟨0, Nat.zero_lt_succ _⟩) x
   /-- End is y. -/
-  end_eq : point ⟨len, Nat.lt_succ_of_le (Nat.le_refl _)⟩ = y
+  end_eq : Path (point ⟨len, Nat.lt_succ_of_le (Nat.le_refl _)⟩) y
   /-- Consecutive points are distance 1 apart. -/
   consecutive : ∀ (i : Fin len),
     M.dist (point ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩)

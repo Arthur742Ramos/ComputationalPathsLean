@@ -41,9 +41,10 @@ structure GeodesicRay {X : Type u} (M : MetricData X) (basepoint : X) where
   /-- Points along the ray. -/
   point : Nat → X
   /-- The ray starts at the basepoint. -/
-  start_eq : point 0 = basepoint
+  start_eq : Path (point 0) basepoint
   /-- The ray is a geodesic: distance equals parameter distance. -/
-  isGeodesic : ∀ m n, M.dist (point m) (point n) = if m ≤ n then n - m else m - n
+  isGeodesic : ∀ m n,
+    Path (M.dist (point m) (point n)) (if m ≤ n then n - m else m - n)
 
 /-- A geodesic ray diverges to infinity. -/
 theorem ray_diverges {X : Type u} {M : MetricData X} {basepoint : X}
@@ -51,8 +52,8 @@ theorem ray_diverges {X : Type u} {M : MetricData X} {basepoint : X}
     ∀ N : Nat, ∃ n : Nat, M.dist basepoint (r.point n) ≥ N := by
   intro N
   refine ⟨N, ?_⟩
-  have h := r.isGeodesic 0 N
-  rw [r.start_eq] at h
+  have h := Path.toEq (r.isGeodesic 0 N)
+  rw [Path.toEq r.start_eq] at h
   simp at h
   omega
 
@@ -76,9 +77,9 @@ theorem rayEquiv_refl {X : Type u} {M : MetricData X} {basepoint : X}
     (r : GeodesicRay M basepoint) : RayEquiv M basepoint r r := by
   intro N
   refine ⟨N, fun n hn => ?_⟩
-  simp [MetricData.gromovProduct, M.dist_self]
-  have h := r.isGeodesic 0 n
-  rw [r.start_eq] at h
+  simp [MetricData.gromovProduct]
+  have h := Path.toEq (r.isGeodesic 0 n)
+  rw [Path.toEq r.start_eq] at h
   simp at h
   omega
 
@@ -88,7 +89,9 @@ theorem rayEquiv_symm {X : Type u} {M : MetricData X} {basepoint : X}
     RayEquiv M basepoint r₁ r₂ → RayEquiv M basepoint r₂ r₁ := by
   intro h N
   obtain ⟨n₀, hn₀⟩ := h N
-  exact ⟨n₀, fun n hn => by rw [M.gromovProduct_comm]; exact hn₀ n hn⟩
+  exact ⟨n₀, fun n hn => by
+    rw [Path.toEq (M.gromovProduct_comm basepoint (r₂.point n) (r₁.point n))]
+    exact hn₀ n hn⟩
 
 /-! ## Gromov Boundary as a Type -/
 
@@ -107,6 +110,18 @@ theorem equiv_boundary_eq {X : Type u} {M : MetricData X} {basepoint : X}
     {r₁ r₂ : GeodesicRay M basepoint} (h : RayEquiv M basepoint r₁ r₂) :
     toBoundaryClass r₁ = toBoundaryClass r₂ :=
   Quot.sound h
+
+/-- Convert boundary equivalence into a computational path. -/
+def equiv_boundary_path {X : Type u} {M : MetricData X} {basepoint : X}
+    {r₁ r₂ : GeodesicRay M basepoint} (h : RayEquiv M basepoint r₁ r₂) :
+    Path (toBoundaryClass r₁) (toBoundaryClass r₂) :=
+  Path.ofEq (equiv_boundary_eq h)
+
+/-- Path composition turns boundary equivalence into a loop. -/
+def boundary_class_loop {X : Type u} {M : MetricData X} {basepoint : X}
+    {r₁ r₂ : GeodesicRay M basepoint} (h : RayEquiv M basepoint r₁ r₂) :
+    Path (toBoundaryClass r₁) (toBoundaryClass r₁) :=
+  Path.trans (equiv_boundary_path h) (Path.symm (equiv_boundary_path h))
 
 /-! ## Topology on the Boundary -/
 

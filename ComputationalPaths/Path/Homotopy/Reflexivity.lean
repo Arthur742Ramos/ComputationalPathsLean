@@ -74,4 +74,11 @@ example {A B : Type u} (f : A → B) (a : A) :
 example {A B : Type u} (f : A → B) :
     Path.lamCongr (fun x => Path.refl (f x)) = Path.refl f := rfl
 
+/-! ## RwEq example -/
+
+/-- Double symmetry gives a second path witness that is RwEq to the original. -/
+theorem rweq_symm_symm {A : Type u} {a b : A} (p : Path a b) :
+    RwEq (Path.symm (Path.symm p)) p := by
+  exact rweq_ss (p := p)
+
 end ComputationalPaths.Path

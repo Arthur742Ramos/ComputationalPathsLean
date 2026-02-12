@@ -190,6 +190,28 @@ def OperadMorphism.comp_assoc_path {O P Q R : CleanOperad}
          (OperadMorphism.comp (OperadMorphism.comp h g) f) :=
   Path.refl _
 
+/-- Path-valued left identity for operad morphism composition. -/
+def OperadMorphism.comp_id_left_path {O P : CleanOperad}
+    (f : OperadMorphism O P) :
+    Path (OperadMorphism.comp (OperadMorphism.id P) f) f :=
+  Path.ofEq (OperadMorphism.id_comp_law f)
+
+/-- Path-valued right identity for operad morphism composition. -/
+def OperadMorphism.comp_id_right_path {O P : CleanOperad}
+    (f : OperadMorphism O P) :
+    Path (OperadMorphism.comp f (OperadMorphism.id O)) f :=
+  Path.ofEq (OperadMorphism.comp_id_law f)
+
+/-- Coherence from associativity and unit laws. -/
+def OperadMorphism.comp_assoc_unit_path {O Q R : CleanOperad}
+    (h : OperadMorphism Q R) (f : OperadMorphism O Q) :
+    Path (OperadMorphism.comp h (OperadMorphism.comp (OperadMorphism.id Q) f))
+         (OperadMorphism.comp h f) :=
+  Path.trans
+    (OperadMorphism.comp_assoc_path h (OperadMorphism.id Q) f)
+    (Path.ofEq (by
+      simp [OperadMorphism.comp_id_law]))
+
 /-! ## Operadic module -/
 
 /-- A module over an operad O: a type M with an action of O that is compatible

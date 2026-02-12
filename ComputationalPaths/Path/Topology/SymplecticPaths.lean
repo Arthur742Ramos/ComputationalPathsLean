@@ -27,6 +27,7 @@ a closed non-degenerate 2-form ω:
 import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -157,6 +158,28 @@ def HamiltonianIsotopic (M : SymplecticManifold.{u})
     (f g : Symplectomorphism M M) : Prop :=
   ∃ _ : HamiltonianIsotopy M, True
 
+/-! ## Path composition and Hamiltonian isotopy -/
+
+/-- A computational path between symplectomorphisms, modelling isotopy. -/
+abbrev SymplectoPath (M : SymplecticManifold.{u})
+    (f g : Symplectomorphism M M) : Type u :=
+  Path f g
+
+/-- `Path.trans` composes Hamiltonian-isotopy paths. -/
+def hamiltonianIsotopy_compose {M : SymplecticManifold.{u}}
+    {f g h : Symplectomorphism M M}
+    (p : SymplectoPath M f g) (q : SymplectoPath M g h) :
+    SymplectoPath M f h :=
+  Path.trans p q
+
+/-! ## Rewrite-equivalence example -/
+
+/-- Two syntactic symplectic paths are rewrite-equivalent. -/
+theorem symplectoPath_rweq_refl (M : SymplecticManifold.{u})
+    (f : Symplectomorphism M M) :
+    RwEq (Path.trans (Path.refl f) (Path.refl f)) (Path.refl f) := by
+  exact rweq_cmpA_refl_left (p := Path.refl f)
+
 /-! ## Darboux Theorem -/
 
 /-- A Darboux chart: a local symplectomorphism to standard form. -/
@@ -238,6 +261,7 @@ We formalized the core structures of symplectic geometry:
 - Symplectic forms and symplectic manifolds
 - Symplectomorphisms with group structure (id, comp, inv)
 - Hamiltonian vector fields and Hamiltonian isotopy
+- Path composition for Hamiltonian-isotopy paths and a rewrite-equivalence example
 - The Darboux theorem statement
 - Symplectic capacity properties
 - The Gromov nonsqueezing theorem statement

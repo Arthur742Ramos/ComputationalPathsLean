@@ -11,6 +11,7 @@ triangle identities for nested concatenations.
 - `trans_triangle`: Triangle identity for units.
 - `trans_refl_left_assoc`: Remove a left unit inside nested concatenation.
 - `trans_refl_right_assoc`: Remove a right unit inside nested concatenation.
+- `trans_unit_swap`: Left- and right-unit insertions are RwEq-equivalent.
 
 ## References
 - Mac Lane, Categories for the Working Mathematician.
@@ -55,6 +56,14 @@ theorem trans_refl_left_assoc (p : Path a b) (q : Path b c) :
 theorem trans_refl_right_assoc (p : Path a b) (q : Path b c) :
     RwEq (trans p (trans (refl b) q)) (trans p q) := by
   exact rweq_trans_congr_right p (PathAlgebraDerived.rweq_refl_trans q)
+
+/-! ## RwEq examples -/
+
+/-- Two different unit insertions for a path are RwEq-equivalent. -/
+theorem trans_unit_swap (p : Path a b) :
+    RwEq (trans (refl a) p) (trans p (refl b)) := by
+  apply rweq_trans (rweq_cmpA_refl_left (p := p))
+  exact rweq_symm (rweq_cmpA_refl_right (p := p))
 
 /-! ## Summary -/
 

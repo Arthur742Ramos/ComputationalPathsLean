@@ -63,6 +63,31 @@ structure CobordismCategory where
   /-- Right unit law for disjoint union. -/
   tensor_right_unit : (X : Obj) → Path (tensorObj X tensorUnit) X
 
+/-! ## Cobordism rewrite steps -/
+
+/-- Domain-specific rewrite steps for cobordism gluing. -/
+inductive TQFTStep (C : CobordismCategory.{u, v}) :
+    {X Y : C.Obj} → C.Hom X Y → C.Hom X Y → Type (max u v)
+  | assoc {W X Y Z : C.Obj} (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
+      TQFTStep C (C.comp (C.comp f g) h) (C.comp f (C.comp g h))
+  | left_id {X Y : C.Obj} (f : C.Hom X Y) :
+      TQFTStep C (C.comp (C.id X) f) f
+  | right_id {X Y : C.Obj} (f : C.Hom X Y) :
+      TQFTStep C (C.comp f (C.id Y)) f
+
+/-- Interpret a cobordism step as a computational path. -/
+def tqftStepPath {C : CobordismCategory.{u, v}} {X Y : C.Obj} {f g : C.Hom X Y} :
+    TQFTStep C f g → Path f g
+  | TQFTStep.assoc f g h => C.assoc f g h
+  | TQFTStep.left_id f => C.left_id f
+  | TQFTStep.right_id f => C.right_id f
+
+/-- Compose two cobordism steps into a single path. -/
+def tqft_steps_compose {C : CobordismCategory.{u, v}} {X Y : C.Obj}
+    {f g h : C.Hom X Y} (s1 : TQFTStep C f g) (s2 : TQFTStep C g h) :
+    Path f h :=
+  Path.trans (tqftStepPath s1) (tqftStepPath s2)
+
 /-! ## TQFT functors -/
 
 /-- A TQFT functor between cobordism categories (monoidality is in the axioms). -/

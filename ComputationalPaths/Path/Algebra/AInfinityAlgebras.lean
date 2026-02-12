@@ -88,6 +88,11 @@ def HigherMul.m1_zero_path {A : Type u} (hm : HigherMul A) :
     Path (hm.m 1 (fun _ => hm.zero)) hm.zero :=
   Path.ofEq hm.m1_zero
 
+/-- A-infinity relation m₁² = 0 as a composed path. -/
+def HigherMul.m1_squared_to_zero_path {A : Type u} (hm : HigherMul A) (x : A) :
+    Path (hm.m 1 (fun _ => hm.m 1 (fun _ => x))) hm.zero :=
+  Path.trans (hm.m1_squared_path x) hm.m1_zero_path
+
 /-! ## Stasheff identities -/
 
 /-- Stasheff identity data: the relations among higher multiplications. -/

@@ -19,6 +19,7 @@ and fundamental domains, amalgamated free products and HNN extensions.
 - Scott and Wall, *Topological Methods in Group Theory*
 -/
 
+import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.CompPath.PushoutPaths
 
@@ -170,9 +171,28 @@ structure BSTreeAction (G : Type u) (S : StrictGroup G) (T : BSTree) where
   /-- Action on edges. -/
   actEdge : GroupAction G S T.Edge
   /-- Source map is equivariant. -/
-  act_src : ∀ g e, actVertex.act g (T.graph.src e) = T.graph.src (actEdge.act g e)
+  act_src :
+    ∀ g e, Path (actVertex.act g (T.graph.src e)) (T.graph.src (actEdge.act g e))
   /-- Target map is equivariant. -/
-  act_tgt : ∀ g e, actVertex.act g (T.graph.tgt e) = T.graph.tgt (actEdge.act g e)
+  act_tgt :
+    ∀ g e, Path (actVertex.act g (T.graph.tgt e)) (T.graph.tgt (actEdge.act g e))
+
+/-- Edge identifications yield computational paths in the fundamental group. -/
+def bsEdgeIdentPath {G : BSGraph.{u}} (H : BSGraphOfGroups G)
+    (e : G.Edge) (h : H.edgeGroup e) (pre suf : BSWord G H.vertexGroup) :
+    Path
+      (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.src e) (H.srcInclusion e h)] ++ suf))
+      (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.tgt e) (H.tgtInclusion e h)] ++ suf)) :=
+  Path.ofEq (Quot.sound (BSRel.edge_ident (H:=H) e h pre suf))
+
+/-- Composing the edge-identification path with its inverse yields a loop. -/
+def bsEdgeIdentLoop {G : BSGraph.{u}} (H : BSGraphOfGroups G)
+    (e : G.Edge) (h : H.edgeGroup e) (pre suf : BSWord G H.vertexGroup) :
+    Path
+      (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.src e) (H.srcInclusion e h)] ++ suf))
+      (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.src e) (H.srcInclusion e h)] ++ suf)) :=
+  Path.trans (bsEdgeIdentPath H e h pre suf)
+    (Path.symm (bsEdgeIdentPath H e h pre suf))
 
 /-- A fundamental domain for a tree action. -/
 structure BSFundamentalDomain {G : Type u} {S : StrictGroup G} {T : BSTree}

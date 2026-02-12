@@ -21,6 +21,7 @@ computational paths in the resulting graph.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -115,6 +116,34 @@ def wordAction (P : GroupPresentation) (v : CayleyVertex P) :
   | [] => v
   | g :: rest => wordAction P (vertexMul P v g) rest
 
+/-! ## Path composition for word actions -/
+
+/-- Compose two adjacent generator steps into a length-two word path. -/
+def composeAdjacentWord2 (P : GroupPresentation) {v w u : CayleyVertex P}
+    (p : Adjacent P v w) (q : Adjacent P w u) :
+    Path (wordAction P v [p.1, q.1]) u := by
+  cases p with
+  | mk g pg =>
+    cases q with
+    | mk h qg =>
+      have step : Path (vertexMul P (vertexMul P v g) h) (vertexMul P w h) :=
+        Path.congrArg (fun x => vertexMul P x h) pg
+      have composed : Path (vertexMul P (vertexMul P v g) h) u :=
+        Path.trans step qg
+      simpa [wordAction] using composed
+
+/-- Concatenating words corresponds to composing actions by `Path.trans`. -/
+def wordAction_append_path (P : GroupPresentation) (v : CayleyVertex P)
+    (w1 w2 : Word P.Gen) :
+    Path (wordAction P v (w1 ++ w2)) (wordAction P (wordAction P v w1) w2) :=
+  match w1 with
+  | [] =>
+      by
+        simpa [wordAction] using (Path.refl (wordAction P v w2))
+  | g :: rest =>
+      by
+        simpa [wordAction] using (wordAction_append_path P (vertexMul P v g) rest w2)
+
 /-- Two words are equivalent if they give the same Cayley vertex. -/
 def WordPathEq (P : GroupPresentation) (w1 w2 : Word P.Gen) : Type u :=
   Path (wordToVertex P w1) (wordToVertex P w2)
@@ -123,6 +152,22 @@ def WordPathEq (P : GroupPresentation) (w1 w2 : Word P.Gen) : Type u :=
 def rel_to_WordPathEq (P : GroupPresentation) {w1 w2 : Word P.Gen}
     (h : P.Rel w1 w2) : WordPathEq P w1 w2 :=
   Path.ofEq (Quot.sound h)
+
+/-! ## Word path composition -/
+
+/-- `Path.trans` composes word paths in the Cayley graph. -/
+def wordPathEq_trans (P : GroupPresentation) {w1 w2 w3 : Word P.Gen}
+    (p : WordPathEq P w1 w2) (q : WordPathEq P w2 w3) : WordPathEq P w1 w3 :=
+  Path.trans p q
+
+/-! ## Rewrite-equivalence example -/
+
+/-- Two syntactically different word paths are rewrite-equivalent. -/
+theorem wordPath_rweq_refl (P : GroupPresentation) (w : Word P.Gen) :
+    RwEq
+      (Path.trans (Path.refl (wordToVertex P w)) (Path.refl (wordToVertex P w)))
+      (Path.refl (wordToVertex P w)) := by
+  exact rweq_cmpA_refl_left (p := Path.refl (wordToVertex P w))
 
 /-! ## Word metric and geodesics -/
 
@@ -171,8 +216,9 @@ end CayleyGraphAutomorphism
 
 /-
 We introduced group presentations and Cayley graphs in the computational-paths
-framework, defined adjacency and word-based paths, and packaged a word metric,
-geodesic condition, and adjacency-preserving automorphisms.
+framework, added path-composition lemmas for word actions and word paths, and
+packaged a word metric, geodesic condition, adjacency-preserving automorphisms,
+and a simple rewrite-equivalence example.
 -/
 
 end CayleyGraphPaths

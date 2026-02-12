@@ -61,6 +61,15 @@ def id (M : MetricData X) : QuasiIsometricMap M M 1 0 where
     intro x₁ x₂
     simp [Nat.one_mul]
 
+/-- The identity map yields a computational path on points. -/
+def id_path (M : MetricData X) (x : X) :
+    Path ((id M).toFun x) x :=
+  Path.ofEq rfl
+
+/-- Composing the identity path with its inverse gives a loop. -/
+def id_path_loop (M : MetricData X) (x : X) : Path x x :=
+  Path.trans (Path.symm (id_path (M:=M) x)) (id_path (M:=M) x)
+
 end QuasiIsometricMap
 
 /-! ## Quasi-Isometry (with quasi-inverse) -/
@@ -80,6 +89,16 @@ structure QuasiIsometry {X : Type u} {Y : Type v}
   forward_backward : ∀ y, MY.dist (forward.toFun (backward.toFun y)) y ≤ coarseBound
   /-- Backward then forward is coarsely the identity. -/
   backward_forward : ∀ x, MX.dist (backward.toFun (forward.toFun x)) x ≤ coarseBound
+
+/-- Symmetry of distance yields a loop along a quasi-isometry round-trip. -/
+def forward_backward_dist_loop {X : Type u} {Y : Type v}
+    {MX : MetricData X} {MY : MetricData Y} {lam eps : Nat}
+    (qi : QuasiIsometry MX MY lam eps) (y : Y) :
+    Path (MY.dist (qi.forward.toFun (qi.backward.toFun y)) y)
+      (MY.dist (qi.forward.toFun (qi.backward.toFun y)) y) :=
+  Path.trans
+    (MY.dist_comm (qi.forward.toFun (qi.backward.toFun y)) y)
+    (Path.symm (MY.dist_comm (qi.forward.toFun (qi.backward.toFun y)) y))
 
 /-! ## Quasi-Isometry Invariants -/
 
@@ -155,7 +174,7 @@ structure Net {X : Type u} (M : MetricData X) (R : Nat) where
 structure SeparatedNet {X : Type u} (M : MetricData X) (R : Nat)
     extends Net M R where
   /-- Separation property: distinct net points are at least R apart. -/
-  separated : ∀ p q, isNetPoint p → isNetPoint q → M.dist p q < R → p = q
+  separated : ∀ p q, isNetPoint p → isNetPoint q → M.dist p q < R → Path p q
 
 /-! ## Milnor-Švarc Lemma (Statement) -/
 
@@ -168,7 +187,7 @@ def MilnorSvarcLemma
     (MX : MetricData X)
     (G : Type u)
     (act : G → X → X)
-    (_isom : ∀ g x₁ x₂, MX.dist (act g x₁) (act g x₂) = MX.dist x₁ x₂)
+    (_isom : ∀ g x₁ x₂, Path (MX.dist (act g x₁) (act g x₂)) (MX.dist x₁ x₂))
     (_cocompact : ∃ R : Nat, ∀ x, ∃ g, MX.dist x (act g x) ≤ R) :
     Prop :=
   ∃ (lam eps : Nat) (MG : MetricData G),
@@ -182,9 +201,9 @@ def QuasiGeodesicStability {X : Type u} (H : DeltaHyperbolic X)
     (lam eps : Nat) : Prop :=
   ∃ R : Nat,
     ∀ (qg₁ qg₂ : QuasiGeodesic H.toMetricData lam eps),
-      qg₁.point ⟨0, Nat.zero_lt_succ _⟩ = qg₂.point ⟨0, Nat.zero_lt_succ _⟩ →
-      qg₁.point ⟨qg₁.len, Nat.lt_succ_of_le (Nat.le_refl _)⟩ =
-        qg₂.point ⟨qg₂.len, Nat.lt_succ_of_le (Nat.le_refl _)⟩ →
+      Path (qg₁.point ⟨0, Nat.zero_lt_succ _⟩) (qg₂.point ⟨0, Nat.zero_lt_succ _⟩) →
+      Path (qg₁.point ⟨qg₁.len, Nat.lt_succ_of_le (Nat.le_refl _)⟩)
+        (qg₂.point ⟨qg₂.len, Nat.lt_succ_of_le (Nat.le_refl _)⟩) →
       ∀ (i : Fin (qg₁.len + 1)),
         ∃ (j : Fin (qg₂.len + 1)),
           H.toMetricData.dist (qg₁.point i) (qg₂.point j) ≤ R

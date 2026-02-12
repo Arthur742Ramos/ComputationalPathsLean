@@ -52,6 +52,13 @@ variable {A : Type u} {a : A}
 @[simp] theorem comp_id (p : LoopSpace A a) : comp p id = p := by
   simp [id, comp]
 
+/-! ## RwEq examples -/
+
+/-- Two loop witnesses at the base point are RwEq-equivalent. -/
+theorem inv_comp_rweq (p : LoopSpace A a) :
+    RwEq (Path.trans (Path.symm p) p) (Path.refl a) := by
+  exact rweq_cmpA_inv_left (p := p)
+
 end LoopSpace
 
 namespace LoopQuot
