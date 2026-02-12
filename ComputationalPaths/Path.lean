@@ -318,3 +318,8 @@ import ComputationalPaths.Path.Algebra.AInfinityAlgebras
 import ComputationalPaths.Path.Algebra.DeformationTheory
 import ComputationalPaths.Path.Algebra.LInfinityAlgebras
 import ComputationalPaths.Path.Algebra.KoszulDuality
+import ComputationalPaths.Path.CompPath.TraceExtraction
+import ComputationalPaths.Path.CompPath.KleinBottleStep
+import ComputationalPaths.Path.CompPath.LensSpaceStep
+import ComputationalPaths.Path.CompPath.ProjectivePlaneStep
+import ComputationalPaths.Path.CompPath.CoherenceTrace
