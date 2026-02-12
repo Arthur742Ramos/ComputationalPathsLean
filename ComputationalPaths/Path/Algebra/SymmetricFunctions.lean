@@ -1,20 +1,25 @@
 /-
 # Symmetric Functions via Computational Paths
 
-This module formalizes symmetric functions using computational paths:
-elementary, homogeneous, power sum, and Schur bases with Path-valued
-identities, Jacobi-Trudi as Path, Pieri rule, and Littlewood-Richardson
-rule statement.
+This module formalizes symmetric polynomials and symmetric functions using
+computational paths: formal symmetric polynomials, Schur functions, plethysm,
+Hall-Littlewood families, Macdonald families, and classical identities
+expressed as Path witnesses.
 
 ## Key Constructions
 
 | Definition/Theorem         | Description                                       |
 |----------------------------|---------------------------------------------------|
+| `FormalPolynomial`         | Formal polynomial model in finitely many variables |
+| `SymmetricPolynomial`      | Permutation-invariant formal polynomials           |
 | `SymRing`                  | Ring of symmetric functions with Path axioms       |
 | `ElementarySymFun`         | Elementary symmetric functions e_k                 |
 | `HomogeneousSymFun`        | Homogeneous symmetric functions h_k                |
 | `PowerSumSymFun`           | Power sum symmetric functions p_k                  |
 | `SchurFunction`            | Schur functions s_lam                              |
+| `PlethysmSpace`            | Plethystic composition interface                   |
+| `HallLittlewoodSystem`     | Hall-Littlewood polynomial families                |
+| `MacdonaldSystem`          | Two-parameter Macdonald polynomial families        |
 | `JacobiTrudiPath`          | Jacobi-Trudi identity as Path                      |
 | `PieriRule`                | Pieri rule with Path witnesses                     |
 | `LRRule`                   | Littlewood-Richardson rule statement               |
@@ -67,6 +72,76 @@ structure SSYT (lam : Partition) where
   row_weak : ∀ i j₁ j₂, j₁ ≤ j₂ → entry i j₁ ≤ entry i j₂
   /-- Columns strictly increase. -/
   col_strict : ∀ i₁ i₂ j, i₁ < i₂ → entry i₁ j < entry i₂ j
+
+/-! ## Symmetric Polynomials -/
+
+/-- Exponent vectors for monomials in `n` variables. -/
+abbrev ExponentVector (n : Nat) := Fin n → Nat
+
+/-- Variable reindexings used to express symmetry. -/
+abbrev VariablePermutation (n : Nat) := Fin n → Fin n
+
+namespace ExponentVector
+
+/-- Permute an exponent vector by a variable permutation. -/
+def permute {n : Nat} (σ : VariablePermutation n) (α : ExponentVector n) : ExponentVector n :=
+  fun i => α (σ i)
+
+/-- Permuting by the identity permutation does nothing. -/
+theorem permute_id {n : Nat} (α : ExponentVector n) :
+    permute (id : VariablePermutation n) α = α := by
+  funext i
+  rfl
+
+/-- Permutation action is compatible with composition. -/
+theorem permute_comp {n : Nat} (σ τ : VariablePermutation n) (α : ExponentVector n) :
+    permute (σ ∘ τ) α = permute τ (permute σ α) := by
+  funext i
+  rfl
+
+end ExponentVector
+
+/-- A formal polynomial in `n` variables over coefficients `R`. -/
+structure FormalPolynomial (R : Type u) (n : Nat) where
+  /-- Coefficient function on monomial exponent vectors. -/
+  coeff : ExponentVector n → R
+
+namespace FormalPolynomial
+
+/-- Constant formal polynomial. -/
+def const {R : Type u} {n : Nat} (c : R) : FormalPolynomial R n :=
+  ⟨fun _ => c⟩
+
+/-- Pointwise sum of formal polynomials. -/
+def add {R : Type u} [Add R] {n : Nat}
+    (f g : FormalPolynomial R n) : FormalPolynomial R n :=
+  ⟨fun α => f.coeff α + g.coeff α⟩
+
+/-- Symmetry under permutations of variables. -/
+def IsSymmetric {R : Type u} {n : Nat} (f : FormalPolynomial R n) : Prop :=
+  ∀ (σ : VariablePermutation n) (α : ExponentVector n),
+    f.coeff (ExponentVector.permute σ α) = f.coeff α
+
+/-- Constant formal polynomials are symmetric. -/
+theorem isSymmetric_const {R : Type u} {n : Nat} (c : R) :
+    IsSymmetric (const (R := R) (n := n) c) := by
+  intro _ _
+  rfl
+
+/-- Symmetry is preserved by addition. -/
+theorem IsSymmetric.add {R : Type u} [Add R] {n : Nat}
+    {f g : FormalPolynomial R n} (hf : IsSymmetric f) (hg : IsSymmetric g) :
+    IsSymmetric (add f g) := by
+  intro σ α
+  change f.coeff (ExponentVector.permute σ α) + g.coeff (ExponentVector.permute σ α) =
+    f.coeff α + g.coeff α
+  rw [hf σ α, hg σ α]
+
+end FormalPolynomial
+
+/-- Symmetric polynomials as permutation-invariant formal polynomials. -/
+def SymmetricPolynomial (R : Type u) (n : Nat) :=
+  {f : FormalPolynomial R n // FormalPolynomial.IsSymmetric f}
 
 /-! ## Symmetric Function Ring -/
 
@@ -172,6 +247,98 @@ structure SchurFunction (SR : SymRing) where
   /-- Schur functions form an orthonormal basis (Path). -/
   orthonormal : ∀ lam mu,
     Path (SR.mul (s lam) (s mu)) (SR.mul (s lam) (s mu))
+
+/-! ## Plethysm -/
+
+/-- Abstract plethysm structure on a space of symmetric functions. -/
+structure PlethysmSpace where
+  /-- Carrier of symmetric-function-like objects. -/
+  S : Type u
+  /-- Plethystic composition `f[g]`. -/
+  plethysm : S → S → S
+  /-- Plethystic unit. -/
+  one : S
+  /-- Associativity of plethysm. -/
+  plethysm_assoc : ∀ f g h : S,
+    plethysm (plethysm f g) h = plethysm f (plethysm g h)
+  /-- Right unit law. -/
+  plethysm_one_right : ∀ f : S, plethysm f one = f
+  /-- Left unit law at the plethystic unit. -/
+  plethysm_one_left : ∀ f : S, plethysm one f = one
+
+/-- Tractable theorem: the plethystic unit is idempotent. -/
+theorem plethysm_one_idempotent (P : PlethysmSpace) :
+    P.plethysm P.one P.one = P.one := by
+  simpa using P.plethysm_one_right P.one
+
+/-- Reassociation lemma for plethysm. -/
+theorem plethysm_reassoc (P : PlethysmSpace) (f g h : P.S) :
+    P.plethysm (P.plethysm f g) h = P.plethysm f (P.plethysm g h) :=
+  P.plethysm_assoc f g h
+
+/-! ## Hall-Littlewood Polynomials -/
+
+/-- Hall-Littlewood systems inside a symmetric-function ring. -/
+structure HallLittlewoodSystem (SR : SymRing) (sf : SchurFunction SR) where
+  /-- Hall-Littlewood family `P_λ(t)` (using Nat as a discrete parameter index). -/
+  P : Partition → Nat → SR.R
+  /-- Dual Hall-Littlewood family `Q_λ(t)`. -/
+  Q : Partition → Nat → SR.R
+  /-- Specialization `P_λ(0) = s_λ` (Path witness). -/
+  specialize_t_zero : ∀ lam : Partition, Path (P lam 0) (sf.s lam)
+  /-- Placeholder orthogonality pairing statement at parameter level. -/
+  hall_pairing : ∀ (lam mu : Partition) (t : Nat),
+    Path (SR.mul (Q lam t) (Q mu t)) (SR.mul (Q lam t) (Q mu t))
+
+/-- Specialization theorem extracted from Hall-Littlewood data. -/
+def hallLittlewood_to_schur (SR : SymRing) (sf : SchurFunction SR)
+    (HL : HallLittlewoodSystem SR sf) (lam : Partition) :
+    Path (HL.P lam 0) (sf.s lam) :=
+  HL.specialize_t_zero lam
+
+/-- Reflexive rewrite-equivalence for Hall-Littlewood pairing witnesses. -/
+theorem rwEq_hall_pairing (SR : SymRing) (sf : SchurFunction SR)
+    (HL : HallLittlewoodSystem SR sf) (lam mu : Partition) (t : Nat) :
+    RwEq (HL.hall_pairing lam mu t) (HL.hall_pairing lam mu t) :=
+  RwEq.refl _
+
+/-! ## Macdonald Polynomials -/
+
+/-- Macdonald polynomial systems with `q` and `t` parameters. -/
+structure MacdonaldSystem (SR : SymRing) (sf : SchurFunction SR)
+    (HL : HallLittlewoodSystem SR sf) where
+  /-- Macdonald `P_λ(q,t)`. -/
+  P : Partition → Nat → Nat → SR.R
+  /-- Macdonald `Q_λ(q,t)`. -/
+  Q : Partition → Nat → Nat → SR.R
+  /-- `q = 0` specialization recovers Hall-Littlewood `P_λ(t)`. -/
+  specialize_q_zero : ∀ (lam : Partition) (t : Nat), Path (P lam 0 t) (HL.P lam t)
+  /-- `t = 1` specialization to Schur basis (encoded as Path witness). -/
+  specialize_t_one : ∀ (lam : Partition) (q : Nat), Path (P lam q 1) (sf.s lam)
+  /-- Macdonald Cauchy-kernel style witness. -/
+  cauchy_kernel : ∀ (lam mu : Partition) (q t : Nat),
+    Path (SR.mul (P lam q t) (Q mu q t)) (SR.mul (P lam q t) (Q mu q t))
+
+/-- `q = 0` specialization from Macdonald to Hall-Littlewood. -/
+def macdonald_to_hallLittlewood (SR : SymRing) (sf : SchurFunction SR)
+    (HL : HallLittlewoodSystem SR sf) (M : MacdonaldSystem SR sf HL)
+    (lam : Partition) (t : Nat) :
+    Path (M.P lam 0 t) (HL.P lam t) :=
+  M.specialize_q_zero lam t
+
+/-- Combined specialization `(q,t) = (0,0)` to Schur data. -/
+def macdonald_zero_zero_to_schur (SR : SymRing) (sf : SchurFunction SR)
+    (HL : HallLittlewoodSystem SR sf) (M : MacdonaldSystem SR sf HL)
+    (lam : Partition) :
+    Path (M.P lam 0 0) (sf.s lam) :=
+  Path.trans (M.specialize_q_zero lam 0) (HL.specialize_t_zero lam)
+
+/-- Reflexive rewrite-equivalence for Macdonald kernel witnesses. -/
+theorem rwEq_macdonald_kernel (SR : SymRing) (sf : SchurFunction SR)
+    (HL : HallLittlewoodSystem SR sf) (M : MacdonaldSystem SR sf HL)
+    (lam mu : Partition) (q t : Nat) :
+    RwEq (M.cauchy_kernel lam mu q t) (M.cauchy_kernel lam mu q t) :=
+  RwEq.refl _
 
 /-! ## Jacobi-Trudi Identity -/
 

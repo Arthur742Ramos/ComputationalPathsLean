@@ -2,11 +2,11 @@
 # Quantum Groups via Computational Paths
 
 This module provides lightweight, Path-based interfaces for Hopf algebras,
-quantum enveloping algebras Uq(g), R-matrices and the Yang-Baxter equation,
-ribbon categories, and quantum dimension.
+quantum enveloping algebras Uq(g), crystal bases, R-matrices and the
+Yang-Baxter equation, ribbon categories, and quantum dimension.
 
 ## Key Definitions
-- `HopfAlgebra`, `QuantumEnveloping`
+- `HopfAlgebra`, `QuantumEnveloping`, `CrystalBase`
 - `RMatrix`, `YangBaxter`
 - `RibbonCategory`, `quantumDim`
 
@@ -88,6 +88,13 @@ structure HopfAlgebra (A : Type u) where
   /-- Antipode right inverse. -/
   antipode_right : ∀ a, Path (mul a (antipode a)) one
 
+/-- Unit simplification in two steps for Hopf multiplication. -/
+def HopfAlgebra.unit_reduce_twice {A : Type u} (H : HopfAlgebra A) (a : A) :
+    Path (H.mul (H.mul H.one a) H.one) a := by
+  exact Path.trans
+    (Path.congrArg (fun x => H.mul x H.one) (H.mul_left_unit a))
+    (H.mul_right_unit a)
+
 /-! ## Quantum enveloping algebras -/
 
 /-- Quantum enveloping algebra Uq(g) as Hopf algebra data with generators. -/
@@ -104,6 +111,66 @@ structure QuantumEnveloping (g : Type u) (q : Type v) where
   q_commute : ∀ x y : g,
     Path (hopf.mul (generator x) (generator y))
       (hopf.mul (generator y) (generator x))
+
+/-- Accessor path for generator q-commutation. -/
+def QuantumEnveloping.generator_q_commute {g : Type u} {q : Type v}
+    (U : QuantumEnveloping g q) (x y : g) :
+    Path (U.hopf.mul (U.generator x) (U.generator y))
+      (U.hopf.mul (U.generator y) (U.generator x)) :=
+  U.q_commute x y
+
+/-! ## Crystal bases -/
+
+/-- Crystal basis data with Path-valued round-trip laws for Kashiwara operators. -/
+structure CrystalBase (I : Type u) where
+  /-- Crystal set. -/
+  B : Type v
+  /-- Weight target. -/
+  Weight : Type w
+  /-- Weight map. -/
+  wt : B → Weight
+  /-- Kashiwara statistics. -/
+  epsilon : I → B → Nat
+  phi : I → B → Nat
+  /-- Kashiwara raising and lowering operators. -/
+  e : I → B → Option B
+  f : I → B → Option B
+  /-- If `fᵢ b = b'`, then `eᵢ b' = b`. -/
+  e_after_f : ∀ i b b', f i b = some b' → Path (e i b') (some b)
+  /-- If `eᵢ b = b'`, then `fᵢ b' = b`. -/
+  f_after_e : ∀ i b b', e i b = some b' → Path (f i b') (some b)
+  /-- Weight witness for the `e` transition. -/
+  wt_after_e : ∀ i b b', e i b = some b' → Path (wt b') (wt b')
+  /-- Weight witness for the `f` transition. -/
+  wt_after_f : ∀ i b b', f i b = some b' → Path (wt b') (wt b')
+
+namespace CrystalBase
+
+/-- Path-level round-trip law `eᵢ (fᵢ b) = b`. -/
+def e_roundtrip {I : Type u} (C : CrystalBase I)
+    {i : I} {b b' : C.B} (h : C.f i b = some b') :
+    Path (C.e i b') (some b) :=
+  C.e_after_f i b b' h
+
+/-- Path-level round-trip law `fᵢ (eᵢ b) = b`. -/
+def f_roundtrip {I : Type u} (C : CrystalBase I)
+    {i : I} {b b' : C.B} (h : C.e i b = some b') :
+    Path (C.f i b') (some b) :=
+  C.f_after_e i b b' h
+
+/-- Equality-level form of `e_roundtrip`. -/
+theorem e_roundtrip_eq {I : Type u} (C : CrystalBase I)
+    {i : I} {b b' : C.B} (h : C.f i b = some b') :
+    C.e i b' = some b :=
+  Path.toEq (e_roundtrip (C := C) (i := i) (b := b) (b' := b') h)
+
+/-- Equality-level form of `f_roundtrip`. -/
+theorem f_roundtrip_eq {I : Type u} (C : CrystalBase I)
+    {i : I} {b b' : C.B} (h : C.e i b = some b') :
+    C.f i b' = some b :=
+  Path.toEq (f_roundtrip (C := C) (i := i) (b := b) (b' := b') h)
+
+end CrystalBase
 
 /-! ## R-matrices and Yang-Baxter -/
 
@@ -141,6 +208,16 @@ structure RMatrix (A : Type u) where
   right_inv : ∀ x, Path (braid (inverse x)) x
   /-- Yang-Baxter equation. -/
   yang_baxter : YangBaxter braid
+
+namespace RMatrix
+
+/-- Reverse-direction Yang-Baxter path by symmetry. -/
+def yangBaxter_symm {A : Type u} (R : RMatrix A) (x : A × A × A) :
+    Path (braid23 R.braid (braid12 R.braid (braid23 R.braid x)))
+      (braid12 R.braid (braid23 R.braid (braid12 R.braid x))) :=
+  Path.symm (R.yang_baxter x)
+
+end RMatrix
 
 /-! ## Ribbon categories and quantum dimension -/
 

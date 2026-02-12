@@ -355,7 +355,9 @@ import ComputationalPaths.Path.CompPath.ProjectivePlaneStep
 import ComputationalPaths.Path.CompPath.CoherenceTrace
 import ComputationalPaths.Path.Algebra.RepTheoryPaths
 import ComputationalPaths.Path.Algebra.LieAlgebraReps
+import ComputationalPaths.Path.Algebra.LieAlgebras
 import ComputationalPaths.Path.Algebra.CategoryO
+import ComputationalPaths.Path.Algebra.QuantumGroups
 import ComputationalPaths.Path.Algebra.QuantumGroupReps
 import ComputationalPaths.Path.Algebra.GeometricRepTheory
 import ComputationalPaths.Path.Algebra.ModelCategories
