@@ -38,7 +38,7 @@ structure Sieve where
 namespace Sieve
 
 /-- Coe a sieve to its membership predicate. -/
-instance : CoeeFun Sieve (fun _ => Nat → Prop) where
+instance : CoeFun Sieve (fun _ => Nat → Prop) where
   coe := Sieve.carrier
 
 /-- The full sieve (all natural numbers). -/
