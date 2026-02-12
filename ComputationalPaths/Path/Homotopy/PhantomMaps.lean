@@ -205,6 +205,10 @@ def universalPhantomMap_trivial (X : Pointed.{u}) : UniversalPhantomMap X :=
     factor := fun _ _ => trivial
     unique := trivial }
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 /-!

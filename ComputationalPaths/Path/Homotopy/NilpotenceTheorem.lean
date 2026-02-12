@@ -95,6 +95,10 @@ abbrev TypeNComplex (p : Prime) (n : Nat) : Type (u + 1) :=
 abbrev VnSelfMap (p : Prime) (n : Nat) : Type (u + 1) :=
   ChromaticHomotopy.PeriodicityData.{u} p n
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- We packaged finite p-local spectra, suspension self-maps, MU_+ nilpotence,

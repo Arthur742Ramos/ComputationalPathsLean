@@ -149,6 +149,9 @@ theorem piN_sphere_finite_odd (n k : Nat) (_hk : Odd k) (_hneq : n = k → False
     IsFinite (HigherHomotopy.PiN n (Sphere k) a) := by
   exact True.intro
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- We introduced Serre classes, C-isomorphisms, mod C Hurewicz/Whitehead data,

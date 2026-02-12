@@ -158,6 +158,9 @@ theorem svk_amalgamation_square (γ : π₁(C, c₀)) :
 
 end SVK
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary
 
 We show that `SimpleEquiv` composition is functorial, the induced map on π₁

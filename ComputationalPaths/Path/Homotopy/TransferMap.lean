@@ -12,6 +12,9 @@ namespace Path
 namespace Homotopy
 namespace TransferMap
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 /-!

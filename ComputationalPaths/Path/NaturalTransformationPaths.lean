@@ -223,6 +223,9 @@ def fundamentalGroupoidFunctorCategory (A : Type u) (B : Type u) :
     intro F G η
     exact FundamentalGroupoidNatTrans.vcomp_id (η := η)
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 /-!

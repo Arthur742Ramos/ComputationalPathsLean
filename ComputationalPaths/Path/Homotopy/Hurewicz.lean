@@ -496,6 +496,10 @@ theorem H1_nontrivial_implies_pi1_nontrivial {A : Type u} {a : A}
   have := simply_connected_H1_trivial hsc h
   exact hne this
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary
 
 This module establishes the Hurewicz theorem:

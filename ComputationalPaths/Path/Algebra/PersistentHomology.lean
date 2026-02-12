@@ -279,6 +279,9 @@ structure CechFiltration (I : Type u) (X : Type v) where
   /-- Cech condition (placeholder). -/
   cech_condition : True
 
+private def pathAnchor {A : Type u} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 /-!

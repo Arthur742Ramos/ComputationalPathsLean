@@ -247,6 +247,10 @@ noncomputable abbrev infinitySeifertVanKampen (c0 : C)
 
 end SeifertVanKampen
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 /-!

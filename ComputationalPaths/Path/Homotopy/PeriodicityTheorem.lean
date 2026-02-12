@@ -129,6 +129,10 @@ structure BousfieldClassFiltration (p : Prime) where
   /-- The family detects vanishing. -/
   conservative : True
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- We recorded data-level formulations of Hopkins-Smith periodicity, the thick

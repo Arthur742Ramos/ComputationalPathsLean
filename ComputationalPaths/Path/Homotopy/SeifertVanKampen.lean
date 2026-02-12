@@ -42,4 +42,8 @@ noncomputable abbrev seifertVanKampenEquiv (c0 : C)
     (A := A) (B := B) (C := C) (f := f) (g := g) c0
 
 end Path
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end ComputationalPaths

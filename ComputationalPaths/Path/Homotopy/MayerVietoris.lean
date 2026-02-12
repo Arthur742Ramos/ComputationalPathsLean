@@ -141,6 +141,10 @@ theorem mvExactAtPieces
     mv_amalgamate (A := A) (B := B) (C := C) (f := f) (g := g) c₀ γ
   simp [mvFold, mvConnecting, h]
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary
 
 We define the Mayer-Vietoris connecting and folding maps for a pushout cover

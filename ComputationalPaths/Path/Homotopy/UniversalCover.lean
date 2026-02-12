@@ -125,6 +125,9 @@ structure of π₁(A, a₀): identity maps to identity. -/
 theorem deck_pi1_identity (a₀ : A) :
     (deckId a₀).toFun (univBase a₀) = univBase a₀ := rfl
 
+private def pathAnchor {B : Type} (b : B) : Path b b :=
+  Path.refl b
+
 end UniversalCover
 end Path
 end ComputationalPaths

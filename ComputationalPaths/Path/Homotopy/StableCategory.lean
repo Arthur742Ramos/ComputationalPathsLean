@@ -224,6 +224,9 @@ structure LongExactFromTriangle (TC : TriangulatedCategory.{u})
   exact : ∀ (n : Nat), TC.cat.comp (map n) (map (n + 1)) =
     TC.cat.zero (term n) (term (n + 2))
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end StableCategory
 end Homotopy
 end Path

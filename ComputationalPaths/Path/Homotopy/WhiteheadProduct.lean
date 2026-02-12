@@ -39,6 +39,9 @@ def whiteheadProduct {m n : Nat} {A : Type u} {a : A} :
 /-- Bracket notation for the Whitehead product. -/
 notation "[" x ", " y "]" => whiteheadProduct x y
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end WhiteheadProduct
 end Homotopy
 end Path

@@ -37,6 +37,8 @@ def intCoeffs : CoefficientSystem where
   add := (· + ·)
   zero := 0
 
+private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+
 end UniversalCoefficient
 end Algebra
 end Path

@@ -121,6 +121,10 @@ def fibrationEquiv {P : B → Type u} (b : B) :
     SimpleEquiv (HomotopyFiber (@Total.proj B P) b) (P b) :=
   fiberEquivFamily (P := P) b
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary
 
 We defined homotopy fibers as fibers of maps, packaged the associated fiber

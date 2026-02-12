@@ -162,6 +162,9 @@ theorem stableStem8_generators : ∀ x : StableStem8,
 theorem stableStem9_generators : ∀ x : StableStem9, 
     ∃ a b c : Z2, x = (a, b, c) := fun (a, b, c) => ⟨a, b, c, rfl⟩
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end StableStems
 end Path
 end ComputationalPaths

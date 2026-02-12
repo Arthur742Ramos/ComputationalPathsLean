@@ -30,6 +30,9 @@ theorem confluence_eval_of_steps
     Confluence.Join (A := A) (a := a) (b := b) (eval q) (eval r) :=
   eval_join_of_steps (A := A) (a := a) (b := b) hq hr
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end ConfluenceProofPathExpr
 end Rewrite
 end Path

@@ -332,4 +332,8 @@ structure GiraudTheorem (T : InfinityTopos) where
 end HigherTopos
 end Homotopy
 end Path
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end ComputationalPaths

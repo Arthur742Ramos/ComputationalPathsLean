@@ -62,6 +62,10 @@ noncomputable def pathOmegaSpectrum (X : Pointed) : OmegaSpectrum where
   structureMap := fun n =>
     basepointMap (iteratedLoopPointed n X) (loopPointed (iteratedLoopPointed (n + 1) X))
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 /-!

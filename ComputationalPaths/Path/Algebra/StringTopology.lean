@@ -147,6 +147,8 @@ def bracket (G : GoldmanBracket Surface) : G.loopClass → G.loopClass → G.loo
 
 end GoldmanBracket
 
+private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+
 /-! ## Summary -/
 
 /-!

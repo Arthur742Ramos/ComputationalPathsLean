@@ -172,6 +172,10 @@ def SpectrumEquiv.refl (E : SpectrumObject) : SpectrumEquiv E E where
   left_inv := fun _ _ => rfl
   right_inv := fun _ _ => rfl
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 end InfiniteLoopSpace

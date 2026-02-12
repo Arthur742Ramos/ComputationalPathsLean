@@ -196,6 +196,10 @@ structure RightFibrationData (S T : SSetData) where
     ∃ (sFiller : HornFiller S n k horn),
       map.map (n + 1) sFiller.simplex = tFiller.simplex
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary
 
 We defined quasi-categories as inner Kan complexes, implemented composition

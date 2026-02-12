@@ -145,6 +145,10 @@ structure ReedyModelStructure (C : ReedyCategory) (A : Type v) where
   /-- Fibrations detected by matching objects (abstract). -/
   fibration_matching : True
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 /-!

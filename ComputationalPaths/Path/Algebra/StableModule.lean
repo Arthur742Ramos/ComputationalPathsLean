@@ -324,6 +324,8 @@ def trivial (k : Type u) (G : Type v) (Fk : FieldData k) (S : StrictGroup G)
 
 end CarlsonRankVariety
 
+private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+
 /-! ## Summary -/
 
 /-!

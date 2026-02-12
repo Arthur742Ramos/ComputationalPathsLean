@@ -11,3 +11,12 @@ import ComputationalPaths.Path.Basic.Congruence
 import ComputationalPaths.Path.Basic.Globular
 import ComputationalPaths.Path.Basic.UIP
 
+namespace ComputationalPaths
+namespace Path
+
+universe u
+
+private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+
+end Path
+end ComputationalPaths

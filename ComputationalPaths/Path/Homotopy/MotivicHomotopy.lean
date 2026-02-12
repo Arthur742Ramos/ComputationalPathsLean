@@ -231,6 +231,10 @@ structure MGL where
   /-- MGL represents algebraic cobordism. -/
   represents_cobordism : True
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- We have formalized:

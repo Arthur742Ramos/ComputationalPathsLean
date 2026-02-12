@@ -238,6 +238,10 @@ structure Acyclization (C : Category.{u}) (E : HomologyTheory.{u}) where
   /-- The acyclic part is E-acyclic. -/
   isAcyclic : ∀ (_ : C.Obj), True
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- We have formalized:

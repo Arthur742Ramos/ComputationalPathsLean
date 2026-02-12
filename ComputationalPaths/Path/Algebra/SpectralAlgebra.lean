@@ -212,6 +212,8 @@ def trivialTHH : THH (⟨
   circleAction := trivial
   dennisTruce := trivial
 
+private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+
 /-! ## Summary -/
 
 -- We have formalized:

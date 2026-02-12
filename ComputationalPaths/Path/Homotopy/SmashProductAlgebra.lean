@@ -138,6 +138,9 @@ structure SpectrumSmash (E F : SpectrumTheory.Spectrum) where
     (E.level n).carrier → (F.level m).carrier →
     (result.level (n + m)).carrier
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- We have formalized:

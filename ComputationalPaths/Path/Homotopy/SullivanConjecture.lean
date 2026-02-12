@@ -199,6 +199,9 @@ def sullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
   unstableModule := U
   t_characterization := trivial
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- We recorded data-level structures for the Sullivan conjecture, including

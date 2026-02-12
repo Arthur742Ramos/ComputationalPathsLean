@@ -249,6 +249,10 @@ structure FiberwiseEuler (B : Type u) (V : VectorBundle B) where
   /-- Vanishing condition: Euler class vanishes iff the bundle has a section. -/
   vanishing : True
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- We have formalized:

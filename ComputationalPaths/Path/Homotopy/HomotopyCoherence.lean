@@ -183,6 +183,10 @@ structure WConstructionData (C : SmallCatData) where
   /-- Coherence of the W-construction (abstract). -/
   coherence : True
  
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
  
 /-!

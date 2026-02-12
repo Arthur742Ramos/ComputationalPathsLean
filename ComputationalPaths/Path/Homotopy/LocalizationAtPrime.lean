@@ -145,6 +145,10 @@ def fractureTheorem (X : HomotopyType.{u}) (p : Prime) : FractureTheorem X p whe
   square := trivialArithmeticSquare X p
   pullback := trivialArithmeticPullback X p
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 /-!

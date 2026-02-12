@@ -194,6 +194,8 @@ structure ExtendedPoincareDuality (M : ClosedManifold) (E : ExtendedPersistence 
   /-- Complement is involutive. -/
   complement_involutive : forall k : Nat, complement (complement k) = k
 
+private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+
 /-! ## Summary
 
 We introduced zigzag persistence modules, interval decomposition data, a diamond

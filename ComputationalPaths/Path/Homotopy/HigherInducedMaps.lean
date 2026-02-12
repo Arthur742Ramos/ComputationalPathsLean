@@ -141,6 +141,10 @@ Using the long exact sequence, we can derive homotopy groups. Here's the templat
 - By exactness: π₁₅(S⁸) ≃ ℤ
 -/
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary
 
 This module provides structure-based infrastructure for:

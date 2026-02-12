@@ -75,4 +75,8 @@ noncomputable def piOneProdPunitEquiv {A : Type u} (a : A) :
     (Truncation.IsSet.punitSet)
 
 end Path
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end ComputationalPaths

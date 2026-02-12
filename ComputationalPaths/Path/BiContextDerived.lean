@@ -11,6 +11,10 @@ namespace ComputationalPaths
 namespace Path
 namespace BiContextDerived
 
+universe u
+
+private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+
 /-! ## Summary -/
 
 /-!

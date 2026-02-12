@@ -132,6 +132,9 @@ def primeTwo : ChromaticHomotopy.Prime :=
 def heightOneAtTwo : ChromaticHeightOneSS primeTwo :=
   trivialHeightOneSS primeTwo
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- This module packages stable stems with placeholders for the image of J,

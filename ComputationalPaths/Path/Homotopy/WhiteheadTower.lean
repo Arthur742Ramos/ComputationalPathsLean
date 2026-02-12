@@ -167,6 +167,9 @@ theorem stage_two_description :
       desc = "Stage 2 = 2-connected cover, fiber = K(π₂, 1)" :=
   ⟨_, rfl⟩
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end WhiteheadTower
 end Path
 end ComputationalPaths

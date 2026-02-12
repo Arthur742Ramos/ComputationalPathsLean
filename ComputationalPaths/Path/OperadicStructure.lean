@@ -150,6 +150,9 @@ theorem associahedron_k4 {A : Type u} {a : A}
   simp [assocTreeLeft, assocTreeRight, AssocOp.act, AssocTree.eval, Vec.of4,
     Vec.split, LoopSpace.comp]
 
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end OperadicStructure
 end Path
 end ComputationalPaths

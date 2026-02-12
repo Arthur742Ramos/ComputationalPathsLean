@@ -170,4 +170,8 @@ variable {A : Type u} {a : A}
 end LoopGroupAlgebra
 end Homotopy
 end Path
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 end ComputationalPaths

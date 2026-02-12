@@ -260,6 +260,10 @@ def evenSphereCDGA (n : Nat) : CDGA where
   diff := fun _ _ => ()
   diff_sq := fun _ _ => rfl
 
+
+private def pathAnchor {A : Type} (a : A) : Path a a :=
+  Path.refl a
+
 /-! ## Summary -/
 
 -- We have formalized:
