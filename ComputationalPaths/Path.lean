@@ -379,3 +379,8 @@ import ComputationalPaths.Path.Topology.FormalGroupLaws
 import ComputationalPaths.Path.Topology.SpectraAlgebra
 import ComputationalPaths.Path.Topology.AdamsSpectralSeq
 import ComputationalPaths.Path.Topology.StableStems
+import ComputationalPaths.Path.Category.HigherTopos
+import ComputationalPaths.Path.Category.LocalizationPaths
+import ComputationalPaths.Path.Category.EnrichedCategories
+import ComputationalPaths.Path.Logic.HomotopyTypeTheory
+import ComputationalPaths.Path.Logic.ModalHoTT
