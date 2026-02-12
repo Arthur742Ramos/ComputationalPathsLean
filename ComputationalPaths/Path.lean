@@ -313,3 +313,8 @@ import ComputationalPaths.Path.Algebra.BassSerrePaths
 import ComputationalPaths.Path.Topology.HyperbolicGroups
 import ComputationalPaths.Path.Topology.QuasiIsometry
 import ComputationalPaths.Path.Topology.GromovBoundary
+import ComputationalPaths.Path.Algebra.OperadPaths
+import ComputationalPaths.Path.Algebra.AInfinityAlgebras
+import ComputationalPaths.Path.Algebra.DeformationTheory
+import ComputationalPaths.Path.Algebra.LInfinityAlgebras
+import ComputationalPaths.Path.Algebra.KoszulDuality
