@@ -1,4 +1,4 @@
-/-!
+/- 
 # Lie algebras: core formalization interface
 
 This module collects standard Lie-theoretic notions from Mathlib in one place:

@@ -215,9 +215,9 @@ structure PowerSumSymFun (SR : SymRing) where
   /-- p_k for each k ≥ 1. -/
   p : Nat → SR.R
   /-- Newton's identity relating p, e, and h. -/
-  newton_identity_e : ∀ (ef : ElementarySymFun SR) (n : Nat),
+  newton_identity_e : ∀ (_ef : ElementarySymFun SR) (n : Nat),
     Path (p (n + 1)) (p (n + 1))
-  newton_identity_h : ∀ (hf : HomogeneousSymFun SR) (n : Nat),
+  newton_identity_h : ∀ (_hf : HomogeneousSymFun SR) (n : Nat),
     Path (p (n + 1)) (p (n + 1))
   /-- p_k for partitions. -/
   p_part : Partition → SR.R
@@ -349,12 +349,12 @@ structure JacobiTrudiPath (SR : SymRing)
   jacobi_trudi : ∀ (lam : Partition),
     Path (sf.s lam) (sf.s lam)
   /-- Dual Jacobi-Trudi: s_lam = det(e_{lam'_i - i + j}) (Path). -/
-  dual_jacobi_trudi : ∀ (ef : ElementarySymFun SR) (lam : Partition),
+  dual_jacobi_trudi : ∀ (_ef : ElementarySymFun SR) (lam : Partition),
     Path (sf.s lam) (sf.s lam)
 
 /-- Path.trans: Jacobi-Trudi composed with dual. -/
 def jt_dual_compose (SR : SymRing) (sf : SchurFunction SR) (hf : HomogeneousSymFun SR)
-    (jt : JacobiTrudiPath SR sf hf) (ef : ElementarySymFun SR) (lam : Partition) :
+    (jt : JacobiTrudiPath SR sf hf) (_ef : ElementarySymFun SR) (lam : Partition) :
     Path (sf.s lam) (sf.s lam) :=
   Path.trans (jt.jacobi_trudi lam) (Path.symm (jt.jacobi_trudi lam))
 
