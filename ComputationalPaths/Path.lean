@@ -374,3 +374,8 @@ import ComputationalPaths.Path.Algebra.EtaleCohomology
 import ComputationalPaths.Path.Algebra.pAdicHodge
 import ComputationalPaths.Path.Algebra.AbelianVarieties
 import ComputationalPaths.Path.Algebra.ShimuraVarieties
+import ComputationalPaths.Path.Topology.ChromaticHomotopy
+import ComputationalPaths.Path.Topology.FormalGroupLaws
+import ComputationalPaths.Path.Topology.SpectraAlgebra
+import ComputationalPaths.Path.Topology.AdamsSpectralSeq
+import ComputationalPaths.Path.Topology.StableStems
