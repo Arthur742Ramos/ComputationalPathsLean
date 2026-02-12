@@ -388,3 +388,8 @@ import ComputationalPaths.Path.Category.LocalizationPaths
 import ComputationalPaths.Path.Category.EnrichedCategories
 import ComputationalPaths.Path.Logic.HomotopyTypeTheory
 import ComputationalPaths.Path.Logic.ModalHoTT
+import ComputationalPaths.Path.Topology.PersistentHomology
+import ComputationalPaths.Path.Topology.DiscreteTopology
+import ComputationalPaths.Path.Topology.TopologicalData
+import ComputationalPaths.Path.Topology.SimplicialComplexes
+import ComputationalPaths.Path.Topology.CWComplexPaths
