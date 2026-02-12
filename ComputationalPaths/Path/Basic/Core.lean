@@ -612,6 +612,38 @@ theorem transport_app {P Q : A → Type v} (f : ∀ x, P x → Q x)
       have h := steps_map_id (A := A) steps
       simp [congrArg, h]
 
+/-! ## Transport–composition naturality -/
+
+/-- Transport along a path composes with `trans` in the expected way:
+`transport (trans p q) = transport q ∘ transport p`. This is the definitional
+content already shown in `transport_trans`; we record a curried version for
+downstream convenience. -/
+theorem transport_compose_eq {D : A → Sort v} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    (fun x => transport (D := D) (trans p q) x) =
+      (fun x => transport (D := D) q (transport (D := D) p x)) := by
+  funext x
+  exact transport_trans (D := D) p q x
+
+/-- Naturality square for transport: applying `f` after transport along
+`p` equals transporting the codomain along `congrArg f p` after `f`. -/
+theorem transport_naturality {D E : A → Type v}
+    (f : ∀ x, D x → E x) {a b : A} (p : Path a b) (d : D a) :
+    transport (D := E) p (f a d) = f b (transport (D := D) p d) :=
+  transport_app f p d
+
+/-- `apd` along `refl` yields `refl` at the propositional level. -/
+@[simp] theorem apd_refl_toEq {B : A → Type v} (f : ∀ x, B x)
+    (a : A) : (apd (B := B) f (refl a)).toEq = rfl := by
+  simp [transport]
+
+/-- Transport is an equivalence: the inverse is transport along `symm p`. -/
+theorem transport_equiv {D : A → Sort v} {a b : A} (p : Path a b) :
+    Function.LeftInverse
+      (transport (D := D) (symm p))
+      (transport (D := D) p) :=
+  fun x => transport_symm_left (D := D) p x
+
 end Path
 
 end ComputationalPaths

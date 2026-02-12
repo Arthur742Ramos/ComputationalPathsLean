@@ -140,6 +140,56 @@ We assembled a lightweight bicategory layer for computational paths, providing
 explicit 2-cell operations, interchange, and basic coherence/naturality laws.
 -/
 
+/-! ## RwEq whiskering -/
+
+/-- Left whiskering for Path2Cell: precomposing a 2-cell with a 1-cell. -/
+@[simp] def whiskerLeft' (f : Path a b) {g h : Path b c}
+    (η : Path2Cell (A := A) g h) :
+    Path2Cell (A := A) (Path.trans f g) (Path.trans f h) :=
+  TwoCell.whiskerLeft (A := A) (a := a) (b := b) (c := c) f η
+
+/-- Right whiskering for Path2Cell: postcomposing a 2-cell with a 1-cell. -/
+@[simp] def whiskerRight' {f g : Path a b} (h : Path b c)
+    (η : Path2Cell (A := A) f g) :
+    Path2Cell (A := A) (Path.trans f h) (Path.trans g h) :=
+  TwoCell.whiskerRight (A := A) (a := a) (b := b) (c := c) h η
+
+/-- Whiskering distributes over vertical composition (left). -/
+@[simp] theorem whiskerLeft_vcomp (f : Path a b) {g h k : Path b c}
+    (η : Path2Cell (A := A) g h) (θ : Path2Cell (A := A) h k) :
+    whiskerLeft' (A := A) f (vcomp η θ) = vcomp (whiskerLeft' f η) (whiskerLeft' f θ) := by
+  apply Subsingleton.elim
+
+/-- Whiskering distributes over vertical composition (right). -/
+@[simp] theorem whiskerRight_vcomp {f g h : Path a b} (k : Path b c)
+    (η : Path2Cell (A := A) f g) (θ : Path2Cell (A := A) g h) :
+    whiskerRight' (A := A) k (vcomp η θ) = vcomp (whiskerRight' k η) (whiskerRight' k θ) := by
+  apply Subsingleton.elim
+
+/-- RwEq interchange: horizontal and vertical composition commute. -/
+@[simp] theorem rweq_interchange
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : Path2Cell (A := A) f₀ f₁)
+    (η₂ : Path2Cell (A := A) f₁ f₂)
+    (θ₁ : Path2Cell (A := A) g₀ g₁)
+    (θ₂ : Path2Cell (A := A) g₁ g₂) :
+    vcomp (hcomp η₁ θ₁) (hcomp η₂ θ₂) =
+      hcomp (vcomp η₁ η₂) (vcomp θ₁ θ₂) :=
+  interchange (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)
+
+/-- Associator naturality: given 2-cells `η : p ⇒ p'`, `θ : q ⇒ q'`,
+`ψ : r ⇒ r'`, the associator is natural in all three arguments.
+Both composites yield the same 2-cell
+`(p ⬝ q) ⬝ r ⇒ p' ⬝ (q' ⬝ r')`. -/
+theorem assoc_naturality {p p' : Path a b} {q q' : Path b c} {r r' : Path c d}
+    (η : Path2Cell (A := A) p p') (θ : Path2Cell (A := A) q q')
+    (ψ : Path2Cell (A := A) r r') :
+    vcomp (hcomp (hcomp η θ) ψ)
+      (TwoCell.assoc p' q' r') =
+      vcomp (TwoCell.assoc p q r)
+        (hcomp η (hcomp θ ψ)) := by
+  apply Subsingleton.elim
+
 end Category
 end Path
 end ComputationalPaths

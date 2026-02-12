@@ -152,6 +152,36 @@ def hopfFiberSeq_exact_path (data : HopfFibrationData) (f : S1) :
       data.base :=
   (hopfFiberSeq data).proj_incl f
 
+/-- Fiber transport along a composite base path decomposes. -/
+theorem hopfFiberTransport_trans_path (data : HopfFibrationData)
+    {b₁ b₂ b₃ : S2}
+    (p : Path b₁ b₂) (q : Path b₂ b₃) (x : Fiber data.proj b₁) :
+    hopfFiberTransport data (Path.trans p q) x =
+      hopfFiberTransport data q (hopfFiberTransport data p x) :=
+  hopfFiberTransport_trans data p q x
+
+/-- Fiber transport along the reflexive path is the identity. -/
+@[simp] theorem hopfFiberTransport_refl (data : HopfFibrationData)
+    {b : S2} (x : Fiber data.proj b) :
+    hopfFiberTransport data (Path.refl b) x = x := by
+  simp [hopfFiberTransport, Path.transport]
+
+/-- Fiber transport along `symm p` is a left inverse of transport along `p`. -/
+theorem hopfFiberTransport_symm_left (data : HopfFibrationData)
+    {b₁ b₂ : S2} (p : Path b₁ b₂) (x : Fiber data.proj b₁) :
+    hopfFiberTransport data (Path.symm p)
+      (hopfFiberTransport data p x) = x := by
+  unfold hopfFiberTransport
+  exact Path.transport_symm_left (D := fun b => Fiber data.proj b) p x
+
+/-- Fiber transport along `symm p` is a right inverse of transport along `p`. -/
+theorem hopfFiberTransport_symm_right (data : HopfFibrationData)
+    {b₁ b₂ : S2} (p : Path b₁ b₂) (y : Fiber data.proj b₂) :
+    hopfFiberTransport data p
+      (hopfFiberTransport data (Path.symm p) y) = y := by
+  unfold hopfFiberTransport
+  exact Path.transport_symm_right (D := fun b => Fiber data.proj b) p y
+
 /-- The induced map on `π₁` from the Hopf projection. -/
 noncomputable def hopfInducedPi1Map (data : HopfFibrationData) :
     π₁(S3, data.baseTotal) → π₁(S2, data.base) :=

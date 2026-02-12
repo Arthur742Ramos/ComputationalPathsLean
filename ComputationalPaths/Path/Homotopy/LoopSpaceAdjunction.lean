@@ -373,7 +373,47 @@ theorem omegaEq_base_rweq (Y : Pointed) :
       (adjMap (X := X.carrier) X.pt f.toFun f.map_pt x).toEq := rfl
  
 /-! ## Summary -/
- 
+
+/-! ### Trans naturality squares -/
+
+/-- Naturality square for the adjunction: given a pointed map `f : X →* Y` and
+the unit η, the square `Ω(Σf) ∘ η_X = η_Y ∘ f` commutes. This is
+the propositional version recorded as an equality of pointed maps. -/
+theorem adjunction_unit_square {X Y : Pointed}
+    (f : PointedMap X Y) :
+    PointedMap.comp (omegaEqFunctor.map (sigmaFunctor.map f)) (unit X) =
+      PointedMap.comp (unit Y) f :=
+  unit_naturality (X := X) (Y := Y) f
+
+/-- Naturality square for the counit: given `f : X →* Y`,
+`f ∘ ε_X = ε_Y ∘ Σ(Ωf)` commutes. -/
+theorem adjunction_counit_square {X Y : Pointed}
+    (f : PointedMap X Y) :
+    PointedMap.comp f (counit X) =
+      PointedMap.comp (counit Y) (sigmaFunctor.map (omegaEqFunctor.map f)) :=
+  counit_naturality (X := X) (Y := Y) f
+
+/-- The triangle identity for the adjunction: `ε_{ΣX} ∘ Σ(η_X) = id_{ΣX}`. -/
+theorem triangle_sigma (X : Pointed) :
+    PointedMap.comp (counit (sigmaPointed X)) (sigmaFunctor.map (unit X)) =
+      PointedMap.id (sigmaPointed X) := by
+  apply @Subsingleton.elim _ (instSubsingleton_pointedMap_sigma _ _)
+
+/-- The triangle identity: `Ω(ε_Y) ∘ η_{ΩY} = id_{ΩY}`. -/
+theorem triangle_omega (Y : Pointed) :
+    PointedMap.comp (omegaEqFunctor.map (counit Y)) (unit (omegaEqPointed Y)) =
+      PointedMap.id (omegaEqPointed Y) := by
+  apply @Subsingleton.elim _ (instSubsingleton_pointedMap_omegaEq _ _)
+
+/-- `Path.trans` naturality: whiskering the unit on both sides yields
+the same naturality square. -/
+theorem trans_naturality_unit {X Y : Pointed}
+    (f : PointedMap X Y) (x : X.carrier) :
+    (omegaEqFunctor.map (sigmaFunctor.map f) |>.comp (unit X)).toFun x =
+    ((unit Y).comp f).toFun x := by
+  have h := unit_naturality (X := X) (Y := Y) f
+  exact _root_.congrFun (_root_.congrArg PointedMap.toFun h) x
+
 end LoopSpaceAdjunction
 end Homotopy
 end Path

@@ -230,7 +230,7 @@ noncomputable def torusCommutatorReduceFst : torusLoopSpace :=
 noncomputable def torusCommutatorReduceSnd : torusLoopSpace :=
   Path.prodMk (Path.fst torusCommutator) (Path.refl circleBase)
 
-/-- The two partial reductions are rewrite-equivalent. -/
+/-- Two partial reductions are rewrite-equivalent. -/
 theorem torusCommutator_reduction_equiv :
     RwEq torusCommutatorReduceFst torusCommutatorReduceSnd := by
   have h_left : RwEq torusCommutatorReduceFst
@@ -242,6 +242,38 @@ theorem torusCommutator_reduction_equiv :
     rweq_map2_of_rweq (f := Prod.mk)
       torusCommutator_fst_refl (rweq_refl (Path.refl circleBase))
   exact rweq_trans h_left (rweq_symm h_right)
+
+/-! ### Step-level commutator reduction sequence
+
+We record the full reduction of `aba⁻¹b⁻¹ = refl` as a sequence of
+RwEq steps on the product components. -/
+
+/-- First RwEq reduction: cancel the first-component commutator
+`a refl a⁻¹ refl⁻¹ → refl` via `commutator_refl_right_rweq`. -/
+theorem torusCommutator_rweq_step1 :
+    RwEq (Path.fst torusCommutator) (Path.refl circleBase) :=
+  torusCommutator_fst_refl
+
+/-- Second RwEq reduction: cancel the second-component commutator
+`refl b refl⁻¹ b⁻¹ → refl` via `commutator_refl_left_rweq`. -/
+theorem torusCommutator_rweq_step2 :
+    RwEq (Path.snd torusCommutator) (Path.refl circleBase) :=
+  torusCommutator_snd_refl
+
+/-- Combined: both projections reduce, so the product reduces to refl.
+This demonstrates the encode/decode proof that `aba⁻¹b⁻¹ = refl`
+on the torus, witnessing commutativity of π₁(T²). -/
+theorem torusCommutator_rweq_refl_via_steps :
+    RwEq torusCommutator (Path.refl torusBase) := by
+  -- Step 1: η-expand the commutator to prodMk(fst, snd)
+  have h_eta := rweq_symm (rweq_prod_eta torusCommutator)
+  -- Step 2: reduce each component to refl via Step sequences
+  have h_prod := rweq_map2_of_rweq (f := Prod.mk)
+    torusCommutator_rweq_step1 torusCommutator_rweq_step2
+  -- Step 3: collapse prodMk(refl, refl) = refl
+  have h_refl : Path.prodMk (Path.refl circleBase) (Path.refl circleBase) =
+      Path.refl torusBase := Path.prodMk_refl_refl circleBase circleBase
+  exact rweq_trans h_eta (rweq_trans h_prod (rweq_of_eq h_refl))
 
 
 

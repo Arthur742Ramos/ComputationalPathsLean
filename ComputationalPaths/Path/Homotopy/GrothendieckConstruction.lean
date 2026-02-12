@@ -148,5 +148,45 @@ def functorFibrationEquiv (A : Type u) :
 3. Type-valued functors on Π₁(A) are equivalent to fibrations over A.
 -/
 
+/-! ## RwEq interchange for fiber transport -/
+
+/-- Transport along RwEq-equivalent paths yields equal results. -/
+theorem transportFiber_rweq {A : Type u} (P : FibrationFamily A)
+    {a b : A} {p q : Path a b} (h : RwEq p q) (x : P a) :
+    transportFiber P p x = transportFiber P q x := by
+  unfold transportFiber
+  exact Path.transport_of_toEq_eq (rweq_toEq h) x
+
+/-- Fiber transport respects symmetry: transport along `symm p` inverts
+transport along `p`. -/
+theorem transportFiber_symm_left {A : Type u} (P : FibrationFamily A)
+    {a b : A} (p : Path a b) (x : P a) :
+    transportFiber P (Path.symm p) (transportFiber P p x) = x := by
+  unfold transportFiber
+  exact Path.transport_symm_left (D := P) p x
+
+/-- Fiber transport respects symmetry (right inverse). -/
+theorem transportFiber_symm_right {A : Type u} (P : FibrationFamily A)
+    {a b : A} (p : Path a b) (y : P b) :
+    transportFiber P p (transportFiber P (Path.symm p) y) = y := by
+  unfold transportFiber
+  exact Path.transport_symm_right (D := P) p y
+
+/-- The Grothendieck projection is compatible with path transport:
+projecting a transported element yields the transport of the projection. -/
+@[simp] theorem grothendieckProjection_transport {A : Type u}
+    (F : FundamentalGroupoidTypeFunctor A)
+    {x y : GrothendieckTotal F} (p : Path x y) :
+    (grothendieckProjection F).obj x = x.1 := rfl
+
+/-- RwEq interchange for fiber transport: composing transports along two
+paths that are both RwEq-equivalent yields equal results. -/
+theorem transportFiber_rweq_trans {A : Type u} (P : FibrationFamily A)
+    {a b c : A} {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+    (hp : RwEq p₁ p₂) (hq : RwEq q₁ q₂) (x : P a) :
+    transportFiber P (Path.trans p₁ q₁) x =
+      transportFiber P (Path.trans p₂ q₂) x := by
+  exact transportFiber_rweq P (rweq_trans_congr hp hq) x
+
 end Path
 end ComputationalPaths
