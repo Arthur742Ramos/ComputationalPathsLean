@@ -323,6 +323,10 @@ import ComputationalPaths.Path.Topology.KnotInvariants
 import ComputationalPaths.Path.Topology.ChernSimons
 import ComputationalPaths.Path.Topology.ContactStructures
 import ComputationalPaths.Path.Topology.FloerHomology
+import ComputationalPaths.Path.Topology.RicciFlow
+import ComputationalPaths.Path.Topology.YangMillsPaths
+import ComputationalPaths.Path.Topology.HodgeTheory
+import ComputationalPaths.Path.Topology.IndexTheoryPaths
 import ComputationalPaths.Path.Topology.SymplecticPaths
 import ComputationalPaths.Path.Topology.MoserTheorem
 import ComputationalPaths.Path.Topology.LagrangianPaths
