@@ -10,6 +10,15 @@ rev = "v4.24.0"
 [[lean_lib]]
 name = "ComputationalPaths"
 
+[[lean_lib]]
+name = "Kan"
+
+[[lean_lib]]
+name = "Equivalence"
+
+[[lean_lib]]
+name = "Operad"
+
 [[lean_exe]]
 name = "computational_paths"
 root = "Main"
