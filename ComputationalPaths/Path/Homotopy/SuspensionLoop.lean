@@ -195,7 +195,13 @@ theorem adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
       RwEq (Path.trans (Path.ofEq hf.symm) (Path.ofEq hf)) (Path.refl Y.pt) := by
     -- `symm (ofEq hf.symm) = ofEq hf` definitionally.
     simpa using rweq_cmpA_inv_right (Path.ofEq hf.symm)
-  exact RwEq.trans h_outer h_end
+  have h_total :
+      RwEq
+        (Path.trans (Path.ofEq hf.symm)
+          (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf))))
+        (Path.refl Y.pt) :=
+    RwEq.trans h_outer h_end
+  simpa [adjMap, q] using h_total
 
 /-- The adjunction map sends basepoint to refl when the input sends north to the basepoint.
     Proof: When x = x₀, the path goes Y.pt → f(north) → f(south) → f(north) → Y.pt,

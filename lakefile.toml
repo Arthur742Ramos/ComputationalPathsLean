@@ -40,6 +40,9 @@ name = "Simplicial"
 [[lean_lib]]
 name = "InfinityCategory"
 
+[[lean_lib]]
+name = "Factorization"
+
 [[lean_exe]]
 name = "computational_paths"
 root = "Main"

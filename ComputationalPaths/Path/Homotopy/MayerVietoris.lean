@@ -85,7 +85,9 @@ theorem mv_amalgamate
           (CompPath.pushoutPiOneInr (A := A) (B := B) (C := C) (f := f) (g := g) c₀
             (mvRight (g := g) c₀ γ))
           (Quot.mk _ (Path.refl (Pushout.inl (f c₀)))) := by
-    simpa [CompPath.pushoutDecode_consLeft, CompPath.pushoutDecode_consRight,
+    simpa [mvLeft, mvRight, CompPath.piOneFmap, CompPath.piOneGmap,
+      CompPath.pushoutPiOneInl, CompPath.pushoutPiOneInr,
+      CompPath.pushoutDecode_consLeft, CompPath.pushoutDecode_consRight,
       CompPath.pushoutDecode] using h
   have hleft :
       CompPath.piOneMul
