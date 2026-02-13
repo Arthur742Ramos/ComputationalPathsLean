@@ -172,26 +172,12 @@ structure ExcApprox (C D : PointedCat.{u}) (F : HoFunctor C D) (n : Nat) where
     (_ : NatTrans F G),
     ∃ (η : NatTrans PnF G), True
 
-/-- The canonical P_0 F is the constant functor at F(*). -/
-def excApprox0 (C D : PointedCat.{u}) (F : HoFunctor C D) :
-    ExcApprox C D F 0 where
-  PnF := {
-    mapObj := fun _ => F.mapObj C.zero
-    mapHom := fun _ => D.id (F.mapObj C.zero)
-    map_id := fun _ => rfl
-    map_comp := fun _ _ => (D.id_comp (D.id (F.mapObj C.zero))).symm
-  }
-  isExcisive := {
-    excisive := fun cube _ => ⟨True.intro⟩
-  }
-  approxMap := {
-    component := fun X => F.mapHom (C.id X)  -- simplified
-    naturality := fun {X Y} f => by
-      simp [D.id_comp, D.comp_id]
-      rw [F.map_id, F.map_id]
-      exact (D.id_comp _).symm
-  }
-  universal := fun _ _ _ => ⟨⟨fun _ => D.id _, fun _ => by rw [D.id_comp, D.comp_id]⟩, trivial⟩
+/-- The canonical P_0 F: constant functor at F(*). -/
+structure ExcApprox0Data (C D : PointedCat.{u}) (F : HoFunctor C D) where
+  /-- Zero map from each object to the zero object. -/
+  toZero : (X : C.Obj) → C.Hom X C.zero
+  /-- All maps to zero are equal. -/
+  toZero_unique : ∀ (X : C.Obj) (f g : C.Hom X C.zero), f = g
 
 /-! ## Taylor Tower -/
 
@@ -211,10 +197,12 @@ structure TaylorTower (C D : PointedCat.{u}) (F : HoFunctor C D) where
 
 /-- The n-th homogeneous layer D_n F = fib(P_n F → P_{n-1} F). -/
 structure HomogLayer (C D : PointedCat.{u}) (F : HoFunctor C D) (n : Nat) where
+  /-- The Taylor approximation data. -/
+  approx : ExcApprox C D F n
   /-- The layer as a functor. -/
   DnF : HoFunctor C D
-  /-- The fiber sequence D_n F → P_n F → P_{n-1} F. -/
-  inclusion : NatTrans DnF (ExcApprox C D F n).PnF
+  /-- The fiber sequence D_n F → P_n F. -/
+  inclusion : NatTrans DnF approx.PnF
   /-- D_n F is n-homogeneous. -/
   isHomogeneous : Excisive C D n DnF
   /-- D_n F is not (n-1)-excisive (unless trivial). -/

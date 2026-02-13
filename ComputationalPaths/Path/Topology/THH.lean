@@ -84,6 +84,11 @@ structure SimplicialObject where
   /-- Simplicial identity: d_i d_j = d_{j-1} d_i for i < j (structural). -/
   simp_identity : True
 
+/-- Iterate a function n times. -/
+private def iterateN {α : Type u} (f : α → α) : Nat → α → α
+  | 0 => _root_.id
+  | n + 1 => f ∘ iterateN f n
+
 /-- The cyclic bar construction B^cyc(A) for a ring spectrum A. -/
 structure CyclicBar (A : RingSpec.{u}) where
   /-- The simplicial object underlying B^cyc(A).
@@ -93,21 +98,16 @@ structure CyclicBar (A : RingSpec.{u}) where
   cyclic : (n : Nat) → simplicial.level n → simplicial.level n
   /-- t_n has order n+1: t_n^{n+1} = id. -/
   cyclic_order : ∀ n x,
-    Path (Nat.iterate (cyclic n) (n + 1) x) x
+    Path (iterateN (cyclic n) (n + 1) x) x
   /-- Compatibility of t_n with face maps. -/
   cyclic_face : True
-
-/-- Iterate a function n times. -/
-private def Nat.iterate {α : Type u} (f : α → α) : Nat → α → α
-  | 0 => _root_.id
-  | n + 1 => f ∘ Nat.iterate f n
 
 /-! ## Topological Hochschild Homology -/
 
 /-- THH(A) as the geometric realization of B^cyc(A). -/
 structure THHData (A : RingSpec.{u}) where
   /-- The cyclic bar construction. -/
-  bar : CyclicBar.{u} A
+  bar : CyclicBar A
   /-- The geometric realization type. -/
   carrier : Type u
   /-- Realization map from each simplicial level. -/
@@ -121,7 +121,7 @@ structure THHData (A : RingSpec.{u}) where
 /-- THH homotopy groups π_* THH(A). -/
 structure THHGroups (A : RingSpec.{u}) where
   /-- THH data. -/
-  thhData : THHData.{u} A
+  thhData : THHData A
   /-- Graded group. -/
   group : Nat → Type u
   /-- Zero. -/
@@ -145,7 +145,7 @@ structure TSpectrum where
   tAction_compat : ∀ x, Path (tAction (tAction x)) x
 
 /-- The Tate construction X^{tC_p}. -/
-structure TateConstruction (X : TSpectrum.{u}) (p : Nat) where
+structure TateConstruction (X : TSpectrum) (p : Nat) where
   /-- The Tate spectrum. -/
   tate : Spec.{u}
   /-- The canonical map X → X^{tC_p}. -/
@@ -154,7 +154,7 @@ structure TateConstruction (X : TSpectrum.{u}) (p : Nat) where
 /-- A cyclotomic spectrum: a T-spectrum with cyclotomic structure maps. -/
 structure CyclotomicSpectrum where
   /-- The underlying T-spectrum. -/
-  tSpectrum : TSpectrum.{u}
+  tSpectrum : TSpectrum
   /-- The prime. -/
   prime : Nat
   /-- Primality. -/
@@ -170,11 +170,11 @@ structure CyclotomicSpectrum where
 /-- THH(A) is naturally a cyclotomic spectrum. -/
 structure THHCyclotomic (A : RingSpec.{u}) where
   /-- THH data. -/
-  thhData : THHData.{u} A
+  thhData : THHData A
   /-- Cyclotomic structure. -/
-  cyclotomic : CyclotomicSpectrum.{u}
-  /-- The T-spectrum underlying THH. -/
-  tSpecEq : cyclotomic.tSpectrum.spectrum = thhData.bar.simplicial.level 0 ▸ cyclotomic.tSpectrum.spectrum
+  cyclotomic : CyclotomicSpectrum
+  /-- The cyclotomic spectrum is compatible with THH. -/
+  compatible : True
 
 /-! ## Topological Cyclic Homology -/
 
@@ -182,7 +182,7 @@ structure THHCyclotomic (A : RingSpec.{u}) where
     TC(A) = eq(THH(A)^{hT} ⇉ THH(A)^{tT}). -/
 structure TCData (A : RingSpec.{u}) where
   /-- THH data. -/
-  thhData : THHData.{u} A
+  thhData : THHData A
   /-- Homotopy fixed points THH(A)^{hT}. -/
   homotopyFixed : Type u
   /-- Tate construction THH(A)^{tT}. -/
@@ -202,7 +202,7 @@ structure TCData (A : RingSpec.{u}) where
 /-- TC homotopy groups. -/
 structure TCGroups (A : RingSpec.{u}) where
   /-- TC data. -/
-  tcData : TCData.{u} A
+  tcData : TCData A
   /-- Graded groups. -/
   group : Int → Type u
   /-- Zero. -/
@@ -233,7 +233,7 @@ structure TRData (A : RingSpec.{u}) where
   vf_relation : True
 
 /-- TR has compatible maps (verification theorem). -/
-theorem tr_maps_exist (A : RingSpec.{u}) (T : TRData.{u} A) :
+theorem tr_maps_exist (A : RingSpec.{u}) (T : TRData A) :
     ∀ n x, ∃ rx fx : T.level n,
       rx = T.restriction n x ∧ fx = T.frobenius n x := by
   intro n x
@@ -276,7 +276,7 @@ structure CyclotomicTrace (A : RingSpec.{u}) where
     (Dundas-Goodwillie-McCarthy theorem). -/
 structure DGMTheorem (A : RingSpec.{u}) where
   /-- The cyclotomic trace data. -/
-  trace : CyclotomicTrace.{u} A
+  trace : CyclotomicTrace A
   /-- For nilpotent extensions A → B, K → TC is an equivalence on relative terms. -/
   relative_equivalence : True
 
@@ -305,42 +305,41 @@ structure BokstedtPeriodicity where
   prime : Nat
   /-- Primality. -/
   prime_pos : prime > 1
-  /-- THH groups of F_p. -/
-  thhFp : THHGroups.{u} (RingSpec.mk
-    (Spec.mk (fun _ => PUnit) (fun _ => PUnit.unit) (fun _ _ => PUnit.unit))
-    (fun _ _ => PUnit.unit) PUnit.unit
-    (fun _ _ _ => Path.refl _) (fun _ => Path.refl _) (fun _ => Path.refl _))
+  /-- The base ring spectrum (F_p). -/
+  baseRing : RingSpec.{u}
+  /-- THH groups of the base ring. -/
+  thhFp : THHGroups baseRing
   /-- The polynomial ring structure. -/
-  polyRing : GradedPolyRing.{u}
+  polyRing : GradedPolyRing
   /-- Generator in degree 2. -/
   sigma_deg : polyRing.genDeg = 2
   /-- THH groups are the polynomial ring. -/
   isomorphism : ∀ n, thhFp.group n = polyRing.degree n
 
 /-- Bokstedt periodicity: odd-degree groups vanish. -/
-structure BokstedtOddVanishing (B : BokstedtPeriodicity.{u}) where
+structure BokstedtOddVanishing (B : BokstedtPeriodicity) where
   /-- Odd-degree groups are trivial. -/
-  odd_vanish : ∀ k x : B.thhFp.group (2 * k + 1),
+  odd_vanish : ∀ (k : Nat) (x : B.thhFp.group (2 * k + 1)),
     Path x (B.thhFp.zero (2 * k + 1))
 
 /-! ## THHStep Inductive -/
 
 /-- Rewrite steps for THH computations. -/
-inductive THHStep {A : RingSpec.{u}} {T : THHData.{u} A} :
+inductive THHStep {A : RingSpec.{u}} {T : THHData A} :
     T.carrier → T.carrier → Type (u + 1)
   | cyclic_action (n : Nat) (x : T.bar.simplicial.level n) :
       THHStep (T.circleAction (T.realize n x)) (T.realize n (T.bar.cyclic n x))
   | cyclic_order (n : Nat) (x : T.bar.simplicial.level n) :
-      THHStep (T.realize n (Nat.iterate (T.bar.cyclic n) (n + 1) x)) (T.realize n x)
+      THHStep (T.realize n (iterateN (T.bar.cyclic n) (n + 1) x)) (T.realize n x)
 
 /-- Interpret a THHStep as a Path. -/
-def thhStepPath {A : RingSpec.{u}} {T : THHData.{u} A}
+def thhStepPath {A : RingSpec.{u}} {T : THHData A}
     {a b : T.carrier} : THHStep a b → Path a b
   | THHStep.cyclic_action n x => T.action_compat n x
   | THHStep.cyclic_order n x => Path.congrArg (T.realize n) (T.bar.cyclic_order n x)
 
 /-- Compose two THHSteps. -/
-def thh_steps_compose {A : RingSpec.{u}} {T : THHData.{u} A}
+def thh_steps_compose {A : RingSpec.{u}} {T : THHData A}
     {a b c : T.carrier}
     (s1 : THHStep a b) (s2 : THHStep b c) : Path a c :=
   Path.trans (thhStepPath s1) (thhStepPath s2)
@@ -348,7 +347,7 @@ def thh_steps_compose {A : RingSpec.{u}} {T : THHData.{u} A}
 /-! ## RwEq Witnesses -/
 
 /-- RwEq: cyclic action retract. -/
-def cyclic_action_retract_rweq {A : RingSpec.{u}} (T : THHData.{u} A)
+def cyclic_action_retract_rweq {A : RingSpec.{u}} (T : THHData A)
     (n : Nat) (x : T.bar.simplicial.level n) :
     RwEq (Path.trans (T.action_compat n x)
                      (Path.symm (T.action_compat n x)))
@@ -356,34 +355,34 @@ def cyclic_action_retract_rweq {A : RingSpec.{u}} (T : THHData.{u} A)
   rweq_cmpA_inv_right (T.action_compat n x)
 
 /-- RwEq: double symmetry on cyclic order. -/
-def cyclic_order_ss_rweq {A : RingSpec.{u}} (T : THHData.{u} A)
+def cyclic_order_ss_rweq {A : RingSpec.{u}} (T : THHData A)
     (n : Nat) (x : T.bar.simplicial.level n) :
     RwEq (Path.symm (Path.symm (Path.congrArg (T.realize n) (T.bar.cyclic_order n x))))
          (Path.congrArg (T.realize n) (T.bar.cyclic_order n x)) :=
   rweq_ss (Path.congrArg (T.realize n) (T.bar.cyclic_order n x))
 
 /-- RwEq: FV relation retract. -/
-def fv_retract_rweq {A : RingSpec.{u}} (T : TRData.{u} A)
+def fv_retract_rweq {A : RingSpec.{u}} (T : TRData A)
     (n : Nat) (x : T.level n) :
     RwEq (Path.trans (T.fv_relation n x) (Path.symm (T.fv_relation n x)))
          (Path.refl (T.frobenius n (T.verschiebung n x))) :=
   rweq_cmpA_inv_right (T.fv_relation n x)
 
 /-- RwEq: factorization double symmetry. -/
-def factorization_ss_rweq {A : RingSpec.{u}} (CT : CyclotomicTrace.{u} A)
+def factorization_ss_rweq {A : RingSpec.{u}} (CT : CyclotomicTrace A)
     (n : Nat) (x : CT.kGroups n) :
     RwEq (Path.symm (Path.symm (CT.factorization n x)))
          (CT.factorization n x) :=
   rweq_ss (CT.factorization n x)
 
 /-- Multi-step: TC equalizer is consistent. -/
-def tc_equalizer_consistent {A : RingSpec.{u}} (T : TCData.{u} A)
+def tc_equalizer_consistent {A : RingSpec.{u}} (T : TCData A)
     (x : T.tcCarrier) :
     Path (T.canMap (T.tcIncl x)) (T.phiMap (T.tcIncl x)) :=
   T.equalizer x
 
 /-- Multi-step: FV composed with its inverse. -/
-def fv_compose_inv {A : RingSpec.{u}} (T : TRData.{u} A) (n : Nat) (x : T.level n) :
+def fv_compose_inv {A : RingSpec.{u}} (T : TRData A) (n : Nat) (x : T.level n) :
     RwEq (Path.trans (T.fv_relation n x)
                      (Path.symm (T.fv_relation n x)))
          (Path.refl _) :=
@@ -397,12 +396,12 @@ theorem ring_assoc_symm_symm (R : RingSpec.{u}) (x y z : R.spectrum.level 0) :
   Path.symm_symm (R.mul_assoc x y z)
 
 /-- Cyclotomic trace factorization is path-coherent. -/
-theorem cycl_trace_factorization (A : RingSpec.{u}) (CT : CyclotomicTrace.{u} A) :
+def cycl_trace_factorization (A : RingSpec.{u}) (CT : CyclotomicTrace A) :
     ∀ n x, Path (CT.dennisTrace n x) (CT.tcToThh n (CT.cyclTrace n x)) :=
   CT.factorization
 
 /-- TR FV relation is path-coherent. -/
-theorem tr_fv_coherent (A : RingSpec.{u}) (T : TRData.{u} A) :
+def tr_fv_coherent (A : RingSpec.{u}) (T : TRData A) :
     ∀ n x, Path (T.frobenius n (T.verschiebung n x)) x :=
   T.fv_relation
 

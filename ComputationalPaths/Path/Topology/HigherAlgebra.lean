@@ -292,18 +292,12 @@ inductive HAStep {R : EInfAlgebra.{u}} {M : ModSpec.{u} R} :
       HAStep (M.action (R.mul r s) m) (M.action r (M.action s m))
   | action_unit (m : M.spectrum.level 0) :
       HAStep (M.action R.unit m) m
-  | mul_comm (x y : R.spectrum.level 0) :
-      HAStep (R.mul x y) (R.mul y x)
 
 /-- Interpret an HAStep as a Path. -/
 def haStepPath {R : EInfAlgebra.{u}} {M : ModSpec.{u} R}
     {a b : M.spectrum.level 0} : HAStep a b → Path a b
   | HAStep.action_assoc r s m => M.action_assoc r s m
   | HAStep.action_unit m => M.action_unit m
-  | HAStep.mul_comm x y =>
-      -- This requires that M.action on mul commutes; we use the R-commutativity
-      -- path transported through the action. In the module case we can compose paths.
-      Path.refl _  -- The mul_comm step witnesses identity on M.spectrum.level 0
 
 /-- Compose two HASteps into a Path. -/
 def ha_steps_compose {R : EInfAlgebra.{u}} {M : ModSpec.{u} R}
@@ -358,7 +352,7 @@ structure FreeEnAlgebra (n : Nat) (X : Spec.{u}) where
       there exists a unique E_n map Free_n(X) → A. -/
   universal : ∀ (A : EnAlgebra.{u} n) (f : X.level 0 → A.spectrum.level 0),
     ∃ g : algebra.spectrum.level 0 → A.spectrum.level 0,
-      ∀ x, Path (g (inclusion x)) (f x)
+      ∀ x, g (inclusion x) = f x
 
 /-! ## Thom Spectrum as E_n Algebra -/
 

@@ -10,11 +10,10 @@ inductive with RwEq witnesses. No sorry, no axiom.
 
 Chromatic convergence is the fundamental structural theorem of chromatic homotopy:
 - **Chromatic convergence**: X ≃ holim_n L_n X for finite p-local spectra
-- **Monochromatic layers**: M_n X = fib(L_n X → L_{n-1} X)
+- **Monochromatic layers**: M_{n+1} X = fib(L_{n+1} X → L_n X)
 - **Thick subcategory theorem** (Hopkins-Smith): thick subcategories of finite
   p-local spectra are classified by type n
-- **Nilpotence theorem** (Devinatz-Hopkins-Smith): a map f is nilpotent iff
-  K(n)_*(f) = 0 for all n
+- **Nilpotence theorem** (Devinatz-Hopkins-Smith): nilpotence detected by K(n)
 - **Telescopic localization**: L_n^f X via finite type n spectra
 
 ## References
@@ -143,8 +142,7 @@ structure ChromaticTower (X : Spec.{u}) where
 
 /-! ## Monochromatic Layers -/
 
-/-- The n-th monochromatic layer M_n X = fib(L_n X → L_{n-1} X).
-    We formalize M_{n+1} X = fib(L_{n+1} X → L_n X) to avoid Nat subtraction. -/
+/-- The (n+1)-th monochromatic layer M_{n+1} X = fib(L_{n+1} X → L_n X). -/
 structure MonochromaticLayer (n : Nat) (X : Spec.{u}) where
   /-- The chromatic tower data. -/
   tower : ChromaticTower.{u} X
@@ -157,22 +155,26 @@ structure MonochromaticLayer (n : Nat) (X : Spec.{u}) where
     Path ((tower.towerMap n).map k (inclusion.map k x))
          ((tower.loc n).localized.base k)
 
-/-- Monochromatic layer is K(n)-local. -/
+/-- Monochromatic layer is K(n+1)-local. -/
 structure MonochromaticIsKnLocal (n : Nat) (X : Spec.{u}) extends
     MonochromaticLayer.{u} n X where
   /-- The Morava K-theory. -/
   kTheory : MoravaK.{u}
   /-- Heights match. -/
-  height_eq : kTheory.height = n
+  height_eq : kTheory.height = n + 1
 
-/-- The smash product decomposition: L_n X ≃ L_{K(n)} L_n X. -/
+/-- K(n)-localization of L_n X. -/
 structure SmashLocalization (n : Nat) (X : Spec.{u}) where
-  /-- The L_{K(n)} localization of L_n X. -/
+  /-- The chromatic localization. -/
+  chromLoc : ChromaticLoc.{u} n X
+  /-- The K(n)-local spectrum. -/
   knLocal : Spec.{u}
-  /-- The equivalence forward map. -/
-  equiv_fwd : SpecMap (ChromaticLoc.mk (Spec.mk (fun _ => PUnit) (fun _ => PUnit.unit) (fun _ _ => PUnit.unit)) (SpecMap.mk (fun _ _ => PUnit.unit) (fun _ => rfl)) True).localized knLocal
-  /-- This is an equivalence. -/
-  isEquiv : True
+  /-- Forward equivalence. -/
+  equiv_fwd : SpecMap chromLoc.localized knLocal
+  /-- Backward equivalence. -/
+  equiv_bwd : SpecMap knLocal chromLoc.localized
+  /-- Left inverse. -/
+  left_inv : ∀ k x, Path (equiv_bwd.map k (equiv_fwd.map k x)) x
 
 /-! ## Chromatic Convergence Theorem -/
 
@@ -193,9 +195,9 @@ structure HolimChromatic (X : Spec.{u}) where
 structure ChromConvTheorem (X : Spec.{u}) where
   /-- The homotopy limit data. -/
   holimData : HolimChromatic.{u} X
-  /-- The comparison map X → holim_n L_n X. -/
+  /-- The comparison map X → holim. -/
   compMap : SpecMap X holimData.holim
-  /-- The comparison is an equivalence: inverse. -/
+  /-- The comparison inverse. -/
   compInv : SpecMap holimData.holim X
   /-- Left inverse. -/
   left_inv : ∀ k x, Path (compInv.map k (compMap.map k x)) x
@@ -203,67 +205,58 @@ structure ChromConvTheorem (X : Spec.{u}) where
   right_inv : ∀ k x, Path (compMap.map k (compInv.map k x)) x
 
 /-- Chromatic convergence equivalence. -/
-def chromatic_conv_equiv (C : ChromConvTheorem.{u}) :
+def chromatic_conv_equiv {X : Spec.{u}} (C : ChromConvTheorem X) :
     ∀ k x, Path (C.compInv.map k (C.compMap.map k x)) x :=
   C.left_inv
 
 /-! ## ChromConvStep Inductive -/
 
-/-- Rewrite steps for chromatic convergence. -/
-inductive ChromConvStep {T : ChromConvTheorem.{u}} :
-    {k : Nat} → T.holimData.holim.level k → T.holimData.holim.level k → Type (u + 1)
-  | convergence_retract (k : Nat) (x : (spectrum : Spec.{u}).level k)
-      (hx : T.compMap.map k x = T.compMap.map k x) :
-      ChromConvStep (T.compMap.map k (T.compInv.map k (T.compMap.map k x)))
-                    (T.compMap.map k x)
-  | tower_compat (n k : Nat) (x : T.holimData.holim.level k) :
-      ChromConvStep
-        ((T.holimData.tower.towerMap n).map k ((T.holimData.proj (n + 1)).map k x))
-        ((T.holimData.proj n).map k x)
+/-- Rewrite steps for chromatic convergence at the source spectrum level. -/
+inductive ChromConvStep {X : Spec.{u}} {T : ChromConvTheorem X} :
+    {k : Nat} → X.level k → X.level k → Type (u + 1)
+  | left_retract (k : Nat) (x : X.level k) :
+      ChromConvStep (T.compInv.map k (T.compMap.map k x)) x
 
 /-- Interpret a ChromConvStep as a Path. -/
-def chromConvStepPath {T : ChromConvTheorem.{u}}
-    {k : Nat} {a b : T.holimData.holim.level k} :
-    ChromConvStep a b → Path a b
-  | ChromConvStep.convergence_retract k x _ =>
-      Path.congrArg (T.compMap.map k) (T.right_inv k (T.compMap.map k x))
-  | ChromConvStep.tower_compat n k x =>
-      T.holimData.proj_compat n k x
+def chromConvStepPath {X : Spec.{u}} (T : ChromConvTheorem X)
+    {k : Nat} {a b : X.level k} :
+    @ChromConvStep _ T k a b → Path a b
+  | ChromConvStep.left_retract k x =>
+      T.left_inv k x
 
 /-- Compose two ChromConvSteps into a Path. -/
-def chromconv_steps_compose {T : ChromConvTheorem.{u}}
-    {k : Nat} {a b c : T.holimData.holim.level k}
-    (s1 : ChromConvStep a b) (s2 : ChromConvStep b c) : Path a c :=
-  Path.trans (chromConvStepPath s1) (chromConvStepPath s2)
+def chromconv_steps_compose {X : Spec.{u}} (T : ChromConvTheorem X)
+    {k : Nat} {a b c : X.level k}
+    (s1 : @ChromConvStep _ T k a b) (s2 : @ChromConvStep _ T k b c) : Path a c :=
+  Path.trans (chromConvStepPath T s1) (chromConvStepPath T s2)
 
 /-! ## RwEq Witnesses -/
 
-/-- RwEq: convergence retract followed by inverse. -/
-def convergence_retract_rweq (C : ChromConvTheorem.{u}) (k : Nat)
-    (x : (C.holimData.tower.loc 0).localized.level k)
-    (hx : (C.holimData.proj 0).map k = (C.holimData.proj 0).map k) :
-    RwEq (Path.trans (Path.refl x) (Path.refl x))
-         (Path.refl x) :=
-  rweq_cmpA_refl_left (Path.refl x)
+/-- RwEq: left_inv retract followed by its inverse. -/
+def left_inv_retract_rweq {X : Spec.{u}} (C : ChromConvTheorem X)
+    (k : Nat) (x : X.level k) :
+    RwEq (Path.trans (C.left_inv k x) (Path.symm (C.left_inv k x)))
+         (Path.refl (C.compInv.map k (C.compMap.map k x))) :=
+  rweq_cmpA_inv_right (C.left_inv k x)
 
 /-- RwEq: double symmetry on left_inv. -/
-def conv_left_inv_ss (C : ChromConvTheorem.{u}) (k : Nat)
-    (x : (C.holimData.tower.loc 0).localized.level k) :
-    RwEq (Path.symm (Path.symm (Path.refl x)))
-         (Path.refl x) :=
-  rweq_ss (Path.refl x)
+def left_inv_ss_rweq {X : Spec.{u}} (C : ChromConvTheorem X)
+    (k : Nat) (x : X.level k) :
+    RwEq (Path.symm (Path.symm (C.left_inv k x)))
+         (C.left_inv k x) :=
+  rweq_ss (C.left_inv k x)
 
 /-- RwEq: tower compatibility retracts. -/
-def tower_compat_rweq (C : ChromConvTheorem.{u}) (n k : Nat)
-    (x : C.holimData.holim.level k) :
+def tower_compat_rweq {X : Spec.{u}} (C : ChromConvTheorem X)
+    (n k : Nat) (x : C.holimData.holim.level k) :
     RwEq (Path.trans (C.holimData.proj_compat n k x)
                      (Path.symm (C.holimData.proj_compat n k x)))
          (Path.refl _) :=
   rweq_cmpA_inv_right (C.holimData.proj_compat n k x)
 
-/-- RwEq: convergence left-right composite. -/
-def conv_left_right_rweq (C : ChromConvTheorem.{u}) (k : Nat)
-    (x : C.holimData.holim.level k) :
+/-- RwEq: right_inv double symmetry. -/
+def conv_right_inv_ss {X : Spec.{u}} (C : ChromConvTheorem X)
+    (k : Nat) (x : C.holimData.holim.level k) :
     RwEq (Path.symm (Path.symm (C.right_inv k x)))
          (C.right_inv k x) :=
   rweq_ss (C.right_inv k x)
@@ -292,24 +285,22 @@ structure TypeClassification where
   /-- Type n means K(0), ..., K(n-1) vanish. -/
   type_meaning : True
 
-/-- Hopkins-Smith theorem: thick subcategories are classified by chromatic type.
-    The thick subcategories form a chain C_0 ⊇ C_1 ⊇ C_2 ⊇ ... -/
+/-- Hopkins-Smith theorem: thick subcategories are classified by chromatic type. -/
 structure ThickClassificationTheorem where
   /-- The prime. -/
   prime : Nat
-  /-- Classification: thick subcats → Nat ∪ {∞}. -/
+  /-- Classification: thick subcats → Nat. -/
   classify : ThickSubcat.{u} → Nat
   /-- C_n = {X | type(X) ≥ n}. -/
   is_Cn : ∀ (C : ThickSubcat.{u}), classify C ≥ 0
   /-- The chain is nested. -/
-  nested : ∀ m n : Nat, m ≤ n →
-    ∀ X : Spec.{u}, True
+  nested : ∀ m n : Nat, m ≤ n → True
 
 /-! ## Nilpotence Theorem -/
 
 /-- A self-map of a finite spectrum. -/
 structure SelfMap (X : Spec.{u}) where
-  /-- The map f : Σ^d X → X (at each level). -/
+  /-- The map f at each level. -/
   map : (k : Nat) → X.level k → X.level k
   /-- Periodicity degree. -/
   degree : Nat
@@ -321,26 +312,24 @@ structure VnPeriodic (n : Nat) (X : Spec.{u}) extends SelfMap.{u} X where
   /-- K(m)_*(f) = 0 for m ≠ n. -/
   km_zero : ∀ m, m ≠ n → True
 
-/-- Nilpotence theorem (Devinatz-Hopkins-Smith):
-    A ring spectrum map f : R → S is nilpotent iff MU_*(f) = 0. -/
+/-- Nilpotence theorem (Devinatz-Hopkins-Smith). -/
 structure NilpotenceTheorem where
   /-- The prime. -/
   prime : Nat
-  /-- A ring spectrum element (in π_* R). -/
+  /-- A ring spectrum element. -/
   element : Type u
   /-- MU-homology. -/
   mu_homology : element → Type u
   /-- Nilpotence iff MU vanishing. -/
   nilpotent_iff_mu_zero : True
 
-/-- Periodicity theorem: every type n finite p-local spectrum admits
-    a v_n self-map. -/
+/-- Periodicity theorem: type n spectra admit v_n self-maps. -/
 structure PeriodicityTheorem where
   /-- The prime. -/
   prime : Nat
   /-- prime_pos. -/
   prime_pos : prime > 1
-  /-- For each type n spectrum, there exists a v_n self-map. -/
+  /-- Existence of v_n self-maps. -/
   exists_vn_map : ∀ (n : Nat) (X : Spec.{u}),
     ∃ d : Nat, ∃ f : (k : Nat) → X.level k → X.level k, True
 
@@ -348,7 +337,7 @@ structure PeriodicityTheorem where
 
 /-- Telescopic localization L_n^f X using a finite type n spectrum. -/
 structure TelescopicLoc (n : Nat) (X : Spec.{u}) where
-  /-- A type n finite spectrum used for localization. -/
+  /-- A type n finite spectrum. -/
   typeNSpec : Spec.{u}
   /-- The v_n self-map. -/
   vnMap : SelfMap.{u} typeNSpec
@@ -356,18 +345,15 @@ structure TelescopicLoc (n : Nat) (X : Spec.{u}) where
   telescope : Spec.{u}
   /-- The localized spectrum. -/
   localized : Spec.{u}
-  /-- Map to the chromatic localization. -/
-  toChromatic : SpecMap localized (ChromaticLoc.mk
-    (Spec.mk (fun _ => PUnit) (fun _ => PUnit.unit) (fun _ _ => PUnit.unit))
-    (SpecMap.mk (fun _ _ => PUnit.unit) (fun _ => rfl)) True).localized
+  /-- Map from X. -/
+  locMap : SpecMap X localized
 
-/-- Telescope conjecture: L_n^f = L_n for all n.
-    (Known true for n = 0, 1; open for n ≥ 2.) -/
+/-- Telescope conjecture: L_n^f = L_n for all n. -/
 structure TelescopeConjecture (n : Nat) (X : Spec.{u}) where
   /-- Telescopic localization. -/
-  telLoc : TelescopicLoc.{u} n X
+  telLoc : TelescopicLoc n X
   /-- Chromatic localization. -/
-  chromLoc : ChromaticLoc.{u} n X
+  chromLoc : ChromaticLoc n X
   /-- The comparison map. -/
   comparison : SpecMap telLoc.localized chromLoc.localized
   /-- The conjecture: comparison is an equivalence. -/
@@ -383,13 +369,13 @@ def specEquiv_refl (E : Spec.{u}) : SpecEquiv E E where
   right_inv := fun _ _ => Path.refl _
 
 /-- Double symmetry on spectrum equivalence left_inv. -/
-theorem specEquiv_left_inv_ss (E : Spec.{u}) (k : Nat) (x : E.level k) :
+def specEquiv_left_inv_ss (E : Spec.{u}) (k : Nat) (x : E.level k) :
     Path.symm (Path.symm ((specEquiv_refl E).left_inv k x)) =
     (specEquiv_refl E).left_inv k x :=
   Path.symm_symm ((specEquiv_refl E).left_inv k x)
 
 /-- Chromatic convergence provides a consistent inverse system. -/
-theorem chromatic_tower_consistent (X : Spec.{u}) (T : ChromaticTower.{u} X) :
+def chromatic_tower_consistent (X : Spec.{u}) (T : ChromaticTower.{u} X) :
     ∀ n k (x : X.level k),
       Path ((T.towerMap n).map k ((T.loc (n + 1)).locMap.map k x))
            ((T.loc n).locMap.map k x) :=
