@@ -98,6 +98,9 @@ name = "Log"
 name = "RepStability"
 
 [[lean_lib]]
+name = "HomologicalStability"
+
+[[lean_lib]]
 name = "Intersection"
 
 [[lean_lib]]
