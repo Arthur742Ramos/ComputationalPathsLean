@@ -1,4 +1,4 @@
-/-!
+ /-
 # Stack Condition via Computational Rewriting
 
 This module records stack-condition coherence with explicit rewrite witnesses.
@@ -13,6 +13,8 @@ namespace Sheaf
 namespace StackCondition
 
 universe u
+
+open Path
 
 /-- Descent transport data indexed by computational paths. -/
 structure DescentTransition (Idx : Type u) (Fiber : Idx → Type u) where
@@ -42,18 +44,15 @@ theorem transport_assoc {A : Type u} {a b c d : A}
 theorem transport_cancel_normalize {A : Type u} {a b c : A}
     (p : Path a b) (q : Path a c) :
     RwEq (Path.trans (Path.trans p (Path.symm p)) q) q := by
-  calc
-    Path.trans (Path.trans p (Path.symm p)) q
-        ≈ Path.trans (Path.refl a) q := by
-          exact rweq_trans_congr_left q (rweq_of_step (Step.trans_symm p))
-    _ ≈ q := by
-          exact rweq_of_step (Step.trans_refl_left q)
+  exact rweq_trans
+    (rweq_trans_congr_left q (rweq_of_step (Step.trans_symm p)))
+    (rweq_of_step (Step.trans_refl_left q))
 
 /-- The rewrite witness induces the expected propositional equality. -/
 theorem transport_cancel_sound {A : Type u} {a b c : A}
     (p : Path a b) (q : Path a c) :
     Path.toEq (Path.trans (Path.trans p (Path.symm p)) q) = Path.toEq q := by
-  simpa using rweq_toEq (transport_cancel_normalize p q)
+  exact rweq_toEq (transport_cancel_normalize p q)
 
 end StackCondition
 end Sheaf

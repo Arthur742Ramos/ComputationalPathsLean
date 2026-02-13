@@ -178,6 +178,21 @@ def derived_homology_comp_path
     Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n)) :=
   Path.trans (GeneralizedHomologyTheory.map_comp_path E g f n) (Path.refl _)
 
+/-- Combined derived cross-module dependency, composing Category and Homology
+path witnesses. -/
+def derived_cross_module_dependencies
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c)
+    (E : GeneralizedHomologyTheory.{u, v})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    RwEq (L.preserves_product (Path.trans p q))
+      (Path.trans (L.preserves_product p) (L.preserves_product q)) ∧
+    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) :=
+  ⟨
+    rweq_trans (derived_localization_comp_path L p q) (RwEq.refl _),
+    ⟨Path.trans (derived_homology_comp_path E g f n) (Path.refl _)⟩
+  ⟩
+
 /-! ## Summary
 
 We introduced data-level definitions for derived categories, derived functors,

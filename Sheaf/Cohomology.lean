@@ -1,4 +1,4 @@
-/-!
+ /-
 # Sheaf Cohomology via Computational Rewriting
 
 This module uses explicit rewrite witnesses for cohomological path
@@ -12,6 +12,8 @@ namespace Sheaf
 namespace Cohomology
 
 universe u
+
+open Path
 
 /-- A minimal Cech-style cochain complex with path-valued `d²` witness. -/
 structure CechComplex (A : Type u) where
@@ -33,12 +35,9 @@ theorem boundary_contracts {A : Type u} {a b : A} (p : Path a b) :
 /-- Unit insertion followed by contraction gives a rewrite-normal form. -/
 theorem boundary_unit_contracts {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans (boundary p) (Path.refl a)) (Path.refl a) := by
-  calc
-    Path.trans (boundary p) (Path.refl a)
-        ≈ boundary p := by
-          exact rweq_of_step (Step.trans_refl_right (boundary p))
-    _ ≈ Path.refl a := by
-          exact rweq_of_step (Step.trans_symm p)
+  exact rweq_trans
+    (rweq_of_step (Step.trans_refl_right (boundary p)))
+    (rweq_of_step (Step.trans_symm p))
 
 /-- Reassociation witness for triple composites in connecting morphisms. -/
 theorem connecting_assoc {A : Type u} {a b c d : A}
@@ -49,7 +48,7 @@ theorem connecting_assoc {A : Type u} {a b c d : A}
 /-- Soundness of boundary contraction at the underlying equality level. -/
 theorem boundary_contracts_sound {A : Type u} {a b : A} (p : Path a b) :
     Path.toEq (boundary p) = Path.toEq (Path.refl a) := by
-  simpa using rweq_toEq (boundary_contracts p)
+  exact rweq_toEq (boundary_contracts p)
 
 end Cohomology
 end Sheaf

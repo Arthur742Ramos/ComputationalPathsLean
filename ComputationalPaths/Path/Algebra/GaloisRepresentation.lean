@@ -110,8 +110,18 @@ def action_on_one (rep : ContinuousGaloisRepresentation Γ V) (g : Γ.carrier) (
 def action_assoc (rep : ContinuousGaloisRepresentation Γ V) (g h k : Γ.carrier) (v : V) :
     Path (rep.action (Γ.group.mul (Γ.group.mul g h) k) v)
       (rep.action g (rep.action h (rep.action k v))) :=
+  let assocStep : Step Γ.carrier :=
+    Step.mk (Γ.group.mul (Γ.group.mul g h) k)
+      (Γ.group.mul g (Γ.group.mul h k))
+      (Γ.group.mul_assoc g h k)
+  let assocPath : Path (Γ.group.mul (Γ.group.mul g h) k)
+      (Γ.group.mul g (Γ.group.mul h k)) :=
+    Path.mk [assocStep] assocStep.proof
+  let assocChain : Path (Γ.group.mul (Γ.group.mul g h) k)
+      (Γ.group.mul g (Γ.group.mul h k)) :=
+    Path.trans assocPath (Path.refl _)
   Path.trans
-    (Path.congrArg (fun x => rep.action x v) (Path.ofEq (Γ.group.mul_assoc g h k)))
+    (Path.congrArg (fun x => rep.action x v) assocChain)
     (Path.trans
       (rep.action_mul g (Γ.group.mul h k) v)
       (Path.congrArg (rep.action g) (rep.action_mul h k v)))

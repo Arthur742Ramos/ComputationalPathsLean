@@ -61,6 +61,74 @@ structure TwoCategory (Obj : Type u) extends WeakBicategory (Obj := Obj) where
       (θ₁ : TwoCell g₀ g₁) (θ₂ : TwoCell g₁ g₂),
       vcomp (hcomp η₁ θ₁) (hcomp η₂ θ₂) =
         hcomp (vcomp η₁ η₂) (vcomp θ₁ θ₂)
+  /-- Pentagon coherence: the two standard composites of associators are equal. -/
+  pentagon_path :
+    ∀ {a b c d e : Obj}
+      (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e),
+      vcomp
+        (vcomp (whiskerRight k (assoc f g h))
+               (assoc f (comp g h) k))
+        (whiskerLeft f (assoc g h k)) =
+      vcomp (assoc (comp f g) h k) (assoc f g (comp h k))
+  /-- Triangle coherence: the two standard composites are equal. -/
+  triangle_path :
+    ∀ {a b c : Obj} (f : Hom a b) (g : Hom b c),
+      vcomp
+        (assoc f (id₁ b) g)
+        (whiskerLeft f (leftUnitor g)) =
+      whiskerRight g (rightUnitor f)
+
+namespace TwoCategory
+
+variable {Obj : Type u}
+
+/-- Left route of Mac Lane's pentagon in a `TwoCategory`. -/
+def pentagonLeftRoute (C : TwoCategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) (k : C.Hom d e) :
+    C.TwoCell (C.comp (C.comp (C.comp f g) h) k)
+      (C.comp f (C.comp g (C.comp h k))) :=
+  C.vcomp
+    (C.vcomp (C.whiskerRight k (C.assoc f g h))
+      (C.assoc f (C.comp g h) k))
+    (C.whiskerLeft f (C.assoc g h k))
+
+/-- Right route of Mac Lane's pentagon in a `TwoCategory`. -/
+def pentagonRightRoute (C : TwoCategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) (k : C.Hom d e) :
+    C.TwoCell (C.comp (C.comp (C.comp f g) h) k)
+      (C.comp f (C.comp g (C.comp h k))) :=
+  C.vcomp (C.assoc (C.comp f g) h k) (C.assoc f g (C.comp h k))
+
+/-- Left route of Mac Lane's triangle in a `TwoCategory`. -/
+def triangleLeftRoute (C : TwoCategory (Obj := Obj))
+    {a b c : Obj} (f : C.Hom a b) (g : C.Hom b c) :
+    C.TwoCell (C.comp (C.comp f (C.id₁ b)) g) (C.comp f g) :=
+  C.vcomp
+    (C.assoc f (C.id₁ b) g)
+    (C.whiskerLeft f (C.leftUnitor g))
+
+/-- Right route of Mac Lane's triangle in a `TwoCategory`. -/
+def triangleRightRoute (C : TwoCategory (Obj := Obj))
+    {a b c : Obj} (f : C.Hom a b) (g : C.Hom b c) :
+    C.TwoCell (C.comp (C.comp f (C.id₁ b)) g) (C.comp f g) :=
+  C.whiskerRight g (C.rightUnitor f)
+
+/-- Explicit equality witness for the pentagon identity. -/
+def pentagonPath (C : TwoCategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) (k : C.Hom d e) :
+    pentagonLeftRoute C f g h k = pentagonRightRoute C f g h k :=
+  C.pentagon_path f g h k
+
+/-- Explicit equality witness for the triangle identity. -/
+def trianglePath (C : TwoCategory (Obj := Obj))
+    {a b c : Obj} (f : C.Hom a b) (g : C.Hom b c) :
+    triangleLeftRoute C f g = triangleRightRoute C f g :=
+  C.triangle_path f g
+
+end TwoCategory
 
 /-! ## Path 2-category -/
 
@@ -106,6 +174,12 @@ def pathTwoCategory (A : Type u) : TwoCategory (Obj := A) where
         (f₀ := f₀) (f₁ := f₁) (f₂ := f₂)
         (g₀ := g₀) (g₁ := g₁) (g₂ := g₂)
         (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)
+  pentagon_path := by
+    intro a b c d e f g h k
+    apply Subsingleton.elim
+  triangle_path := by
+    intro a b c f g
+    apply Subsingleton.elim
 
 /-- The underlying bicategory of the path 2-category is the standard path bicategory. -/
 @[simp] theorem pathTwoCategory_to_weakBicategory (A : Type u) :

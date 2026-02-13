@@ -1,4 +1,4 @@
-/-!
+/-
 # Bicategory coherence via computational paths
 
 This module provides bicategorical coherence data where 2-cells are explicit
@@ -77,4 +77,3 @@ def triangleIdentity (f : Hom a b) (g : Hom b c) :
 end Bicategory
 end HigherCategory
 end ComputationalPaths
-

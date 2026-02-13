@@ -1,10 +1,12 @@
-/-!
-# Higher Route 2-cells for Fiber Sequences
-
-This module packages path-of-path coherence for canonical fiber-sequence routes.
--/
-
 import ComputationalPaths.Path.Homotopy.Fibration
+import ComputationalPaths.Path.Homotopy.Loops
+
+/-!
+# Fiber-sequence higher-path routes
+
+This module packages 2-cell witnesses showing that alternate computational
+routes in fiber-sequence constructions are connected.
+-/
 
 namespace ComputationalPaths
 namespace Path
@@ -13,33 +15,38 @@ namespace FiberSequence
 
 universe u
 
-variable {F E B : Type u}
+/-- A 2-cell between parallel computational paths. -/
+abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Prop := RwEq p q
 
-/-- Left- and right-unit computational routes for `proj ∘ incl` are connected by a 2-cell. -/
-theorem proj_incl_unit_routes_2cell
-    (seq : Fibration.FiberSeq F E B) (f : F) :
-    RwEq
-      (Path.trans (Path.refl (seq.proj (seq.incl f))) (seq.proj_incl f))
-      (Path.trans (seq.proj_incl f) (Path.refl seq.baseB)) := by
-  have h₁ :
-      RwEq
-        (Path.trans (Path.refl (seq.proj (seq.incl f))) (seq.proj_incl f))
-        (seq.proj_incl f) :=
-    rweq_cmpA_refl_left (seq.proj_incl f)
-  have h₂ :
-      RwEq
-        (Path.trans (seq.proj_incl f) (Path.refl seq.baseB))
-        (seq.proj_incl f) :=
-    rweq_cmpA_refl_right (seq.proj_incl f)
-  exact rweq_trans h₁ (rweq_symm h₂)
+/-- Projection in a fiber sequence preserves the associator 2-cell on loops. -/
+theorem proj_assoc_two_cell {F E B : Type u}
+    (seq : Fibration.FiberSeq F E B) {e : E}
+    (p q r : LoopSpace E e) :
+    TwoCell
+      (Fibration.inducedLoopMap seq.proj e (Path.trans (Path.trans p q) r))
+      (Fibration.inducedLoopMap seq.proj e (Path.trans p (Path.trans q r))) := by
+  unfold Fibration.inducedLoopMap
+  exact rweq_context_map_of_rweq ⟨seq.proj⟩ (rweq_tt p q r)
 
-/-- Two computational boundary routes for a composed base loop coincide as a path. -/
-theorem connecting_map_routes_path {P : B → Type u}
+/-- Fiber inclusion also preserves the same 2-cell route. -/
+theorem incl_assoc_two_cell {F E B : Type u}
+    (seq : Fibration.FiberSeq F E B) {f₀ : F}
+    (p q r : LoopSpace F f₀) :
+    TwoCell
+      (Fibration.inducedLoopMap (Fibration.FiberSeq.incl seq) f₀
+        (Path.trans (Path.trans p q) r))
+      (Fibration.inducedLoopMap (Fibration.FiberSeq.incl seq) f₀
+        (Path.trans p (Path.trans q r))) := by
+  unfold Fibration.inducedLoopMap Fibration.FiberSeq.incl
+  exact rweq_context_map_of_rweq ⟨fun f => (seq.toFiber f).point⟩ (rweq_tt p q r)
+
+/-- Connecting-map composition has two equal computational routes. -/
+noncomputable def connectingMap_trans_path {B : Type u} {P : B → Type u}
     (b : B) (x₀ : P b) (l₁ l₂ : LoopSpace B b) :
     Path
       (Fibration.connectingMap₁ b x₀ (Path.trans l₁ l₂))
       (Fibration.connectingMap₁ b (Fibration.connectingMap₁ b x₀ l₁) l₂) :=
-  Path.ofEq (Fibration.connectingMap₁_trans b x₀ l₁ l₂)
+  Path.ofEq (Fibration.connectingMap₁_trans (P := P) b x₀ l₁ l₂)
 
 end FiberSequence
 end Homotopy

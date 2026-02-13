@@ -1,56 +1,59 @@
-/-!
-# Higher Route 2-cells for Loop Spaces
-
-This module records rewrite-equivalence 2-cells between alternate loop
-composition routes.
--/
-
 import ComputationalPaths.Path.Homotopy.Loops
+
+/-!
+# Loop-space path-of-path routes
+
+This module isolates explicit 2-cells connecting alternative
+parenthesizations of iterated loop composition.
+-/
 
 namespace ComputationalPaths
 namespace Path
 namespace Homotopy
-namespace LoopSpaceRoutes
+namespace LoopSpace
 
 universe u
 
-variable {A : Type u} {a : A}
+/-- Local alias for ordinary loops. -/
+abbrev BaseLoop (A : Type u) (a : A) : Type u :=
+  ComputationalPaths.Path.LoopSpace A a
 
-/-- The two parenthesizations of triple loop composition are connected by a 2-cell. -/
-theorem assoc_routes_2cell (p q r : LoopSpace A a) :
-    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
-  rweq_tt p q r
+/-- A 2-cell between parallel computational paths. -/
+abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Prop := RwEq p q
 
-/-- Left- and right-whiskered unit routes are connected by a 2-cell. -/
-theorem whisker_unit_routes_2cell (p q : LoopSpace A a) :
-    RwEq
-      (Path.trans (Path.refl a) (Path.trans p q))
-      (Path.trans (Path.trans p q) (Path.refl a)) := by
-  have h₁ :
-      RwEq
-        (Path.trans (Path.refl a) (Path.trans p q))
-        (Path.trans p q) :=
-    rweq_cmpA_refl_left (Path.trans p q)
-  have h₂ :
-      RwEq
-        (Path.trans (Path.trans p q) (Path.refl a))
-        (Path.trans p q) :=
-    rweq_cmpA_refl_right (Path.trans p q)
-  exact rweq_trans h₁ (rweq_symm h₂)
+/-- Left-associated route through four loop composites. -/
+def routeLeft {A : Type u} {a : A} (p q r s : BaseLoop A a) : BaseLoop A a :=
+  Path.trans (Path.trans (Path.trans p q) r) s
 
-/-- Cancellation followed by right-unit normalizes to reflexivity through a 2-cell chain. -/
-theorem inverse_cancellation_routes_2cell (p : LoopSpace A a) :
-    RwEq
-      (Path.trans (Path.trans p (Path.symm p)) (Path.refl a))
-      (Path.refl a) := by
-  have h₁ :
-      RwEq
-        (Path.trans (Path.trans p (Path.symm p)) (Path.refl a))
-        (Path.trans (Path.refl a) (Path.refl a)) :=
-    rweq_trans_congr_left (Path.refl a) (rweq_cmpA_inv_right p)
-  exact rweq_trans h₁ (rweq_cmpA_refl_left (Path.refl a))
+/-- Middle route through four loop composites. -/
+def routeMiddle {A : Type u} {a : A} (p q r s : BaseLoop A a) : BaseLoop A a :=
+  Path.trans p (Path.trans (Path.trans q r) s)
 
-end LoopSpaceRoutes
+/-- Right-associated route through four loop composites. -/
+def routeRight {A : Type u} {a : A} (p q r s : BaseLoop A a) : BaseLoop A a :=
+  Path.trans p (Path.trans q (Path.trans r s))
+
+/-- The first rerouting step (left to middle) is a 2-cell. -/
+theorem left_to_middle_two_cell {A : Type u} {a : A}
+    (p q r s : BaseLoop A a) :
+    TwoCell (routeLeft p q r s) (routeMiddle p q r s) := by
+  exact RwEq.trans
+    (rweq_trans_congr_left s (rweq_tt p q r))
+    (rweq_tt p (Path.trans q r) s)
+
+/-- The second rerouting step (middle to right) is a 2-cell. -/
+theorem middle_to_right_two_cell {A : Type u} {a : A}
+    (p q r s : BaseLoop A a) :
+    TwoCell (routeMiddle p q r s) (routeRight p q r s) :=
+  rweq_trans_congr_right p (rweq_tt q r s)
+
+/-- Any two standard routes from left-associated to right-associated coincide up to a 2-cell. -/
+theorem left_to_right_two_cell {A : Type u} {a : A}
+    (p q r s : BaseLoop A a) :
+    TwoCell (routeLeft p q r s) (routeRight p q r s) := by
+  exact RwEq.trans (left_to_middle_two_cell p q r s) (middle_to_right_two_cell p q r s)
+
+end LoopSpace
 end Homotopy
 end Path
 end ComputationalPaths

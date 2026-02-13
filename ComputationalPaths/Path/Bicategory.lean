@@ -19,6 +19,30 @@ namespace Path
 
 universe u
 
+/-- A higher coherence cell carried by a computational path between lifted
+witnesses. We use `PLift` so the construction works uniformly for cells living
+in any sort (including `Prop`). -/
+abbrev CellPath {α : Sort u} (x y : α) : Type u :=
+  Path (PLift.up x) (PLift.up y)
+
+namespace CellPath
+
+variable {α : Sort u} {x y z : α}
+
+/-- Identity higher cell. -/
+@[simp] def refl (x : α) : CellPath x x :=
+  Path.refl (PLift.up x)
+
+/-- Turn an equality into a computational-path witness. -/
+@[simp] def ofEq (h : x = y) : CellPath x y :=
+  Path.ofEq (h ▸ rfl)
+
+/-- Vertical composition of higher cells. -/
+@[simp] def comp (η : CellPath x y) (θ : CellPath y z) : CellPath x z :=
+  Path.trans η θ
+
+end CellPath
+
 /-- Two-cells between computational paths `p` and `q` are rewrite equalities
 `RwEq p q`.  These witnesses match the algebraic 2-arrows usually written
 `A_{2rw}(a,b)` in the computational-path literature. -/
@@ -30,6 +54,27 @@ namespace TwoCell
 
 variable {A : Type u}
 variable {a b c d : A}
+
+/-- 3-cells between parallel 2-cells are computational paths between lifted
+witnesses. -/
+abbrev ThreeCell {p q : Path a b}
+    (η θ : TwoCell (A := A) (a := a) (b := b) p q) : Type :=
+  CellPath η θ
+
+namespace ThreeCell
+
+@[simp] def refl {p q : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q) :
+    ThreeCell (A := A) (a := a) (b := b) η η :=
+  CellPath.refl η
+
+@[simp] def ofEq {p q : Path a b}
+    {η θ : TwoCell (A := A) (a := a) (b := b) p q}
+    (h : η = θ) :
+    ThreeCell (A := A) (a := a) (b := b) η θ :=
+  CellPath.ofEq h
+
+end ThreeCell
 
 /-- Identity 2-cell on a computational path. -/
 @[simp] def id (p : Path a b) : TwoCell (A := A) (a := a) (b := b) p p :=
@@ -137,6 +182,77 @@ up to a rewrite-equality 2-cell. -/
       (Path.trans (Path.trans p (Path.refl b)) q)
       (Path.trans p q) := by
   exact rweq_trans_congr_left (q := q) (rweq_cmpA_refl_right p)
+
+/-- Left route of Mac Lane's pentagon, built by vertical composition of
+associator 2-cells and whiskering. -/
+@[simp] def pentagonLeftRoute
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c)
+    (r : Path c d) (s : Path d e) :
+    TwoCell (A := A) (a := a) (b := e)
+      (Path.trans (Path.trans (Path.trans p q) r) s)
+      (Path.trans p (Path.trans q (Path.trans r s))) :=
+  comp
+    (comp
+      (whiskerRight (A := A) (a := a) (b := d) (c := e)
+        (h := s) (assoc (A := A) (a := a) (b := b) (c := c) (d := d) p q r))
+      (assoc (A := A) (a := a) (b := b) (c := d) (d := e)
+        p (Path.trans q r) s))
+    (whiskerLeft (A := A) (a := a) (b := b) (c := e)
+      (f := p) (assoc (A := A) (a := b) (b := c) (c := d) (d := e) q r s))
+
+/-- Right route of Mac Lane's pentagon. -/
+@[simp] def pentagonRightRoute
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c)
+    (r : Path c d) (s : Path d e) :
+    TwoCell (A := A) (a := a) (b := e)
+      (Path.trans (Path.trans (Path.trans p q) r) s)
+      (Path.trans p (Path.trans q (Path.trans r s))) :=
+  comp
+    (assoc (A := A) (a := a) (b := c) (c := d) (d := e)
+      (Path.trans p q) r s)
+    (assoc (A := A) (a := a) (b := b) (c := c) (d := e)
+      p q (Path.trans r s))
+
+/-- Left route of Mac Lane's triangle. -/
+@[simp] def triangleLeftRoute
+    {a b c : A} (p : Path a b) (q : Path b c) :
+    TwoCell (A := A) (a := a) (b := c)
+      (Path.trans (Path.trans p (Path.refl b)) q)
+      (Path.trans p q) :=
+  comp
+    (assoc (A := A) (a := a) (b := b) (c := b) (d := c)
+      p (Path.refl b) q)
+    (whiskerLeft (A := A) (a := a) (b := b) (c := c)
+      (f := p) (leftUnitor (A := A) (a := b) (b := c) q))
+
+/-- Right route of Mac Lane's triangle. -/
+@[simp] def triangleRightRoute
+    {a b c : A} (p : Path a b) (q : Path b c) :
+    TwoCell (A := A) (a := a) (b := c)
+      (Path.trans (Path.trans p (Path.refl b)) q)
+      (Path.trans p q) :=
+  whiskerRight (A := A) (a := a) (b := b) (c := c)
+    (h := q) (rightUnitor (A := A) (a := a) (b := b) p)
+
+/-- Pentagon coherence promoted to a computational-path 3-cell. -/
+@[simp] def pentagonCoherence
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c)
+    (r : Path c d) (s : Path d e) :
+    ThreeCell (A := A) (a := a) (b := e)
+      (pentagonLeftRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s)
+      (pentagonRightRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s) := by
+  exact ThreeCell.ofEq (by apply Subsingleton.elim)
+
+/-- Triangle coherence promoted to a computational-path 3-cell. -/
+@[simp] def triangleCoherence
+    {a b c : A} (p : Path a b) (q : Path b c) :
+    ThreeCell (A := A) (a := a) (b := c)
+      (triangleLeftRoute (A := A) (a := a) (b := b) (c := c) p q)
+      (triangleRightRoute (A := A) (a := a) (b := b) (c := c) p q) := by
+  exact ThreeCell.ofEq (by apply Subsingleton.elim)
 
 /-- The two standard ways of composing four 2-cells coincide.  Since
 `TwoCell` values live in `Prop`, the equality follows from proof

@@ -1,11 +1,12 @@
-/-!
-# Higher Route 2-cells for Homotopy Groups
-
-This module records explicit higher-path witnesses (`RwEq` / 2-cells) connecting
-different computational routes that start and end at the same loops.
--/
-
 import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
+import ComputationalPaths.Path.Homotopy.Loops
+
+/-!
+# Higher-path routes for homotopy groups
+
+This module records explicit 2-cells (`RwEq`) showing that different
+computational routes between the same loop endpoints are connected.
+-/
 
 namespace ComputationalPaths
 namespace Path
@@ -14,32 +15,37 @@ namespace HomotopyGroup
 
 universe u
 
-variable {A : Type u} {a : A}
+/-- A 2-cell between parallel computational paths. -/
+abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Prop := RwEq p q
 
-/-- Two associativity routes for triple loop composition are connected by a 2-cell. -/
-theorem pi1_assoc_routes_2cell (p q r : LoopSpace A a) :
-    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
-  rweq_tt p q r
+/-- Associative rerouting of loop composition gives a canonical 2-cell. -/
+theorem loop_assoc_two_cell {A : Type u} {a : A}
+    (p q r : LoopSpace A a) :
+    TwoCell (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
+  LoopSpace.comp_assoc_rweq (A := A) (a := a) p q r
 
-/-- The unit-then-cancel route contracts to reflexivity via a 2-cell. -/
-theorem pi1_unit_inverse_routes_2cell (p : LoopSpace A a) :
-    RwEq
-      (Path.trans (Path.trans (Path.refl a) p) (Path.symm p))
-      (Path.refl a) := by
-  have h₁ :
-      RwEq
-        (Path.trans (Path.trans (Path.refl a) p) (Path.symm p))
-        (Path.trans p (Path.symm p)) :=
-    rweq_trans_congr_left (Path.symm p) (rweq_cmpA_refl_left p)
-  exact rweq_trans h₁ (rweq_cmpA_inv_right p)
+/-- The two standard cancellation routes are connected by a 2-cell. -/
+theorem cancellation_route_two_cell {A : Type u} {a : A}
+    (p : LoopSpace A a) :
+    TwoCell
+      (Path.trans (Path.trans p (Path.symm p)) p)
+      (Path.trans p (Path.trans (Path.symm p) p)) :=
+  rweq_tt p (Path.symm p) p
 
-/-- In `π₂`, vertical and horizontal routes are connected by a higher 2-cell witness. -/
-theorem pi2_vertical_horizontal_routes_2cell
-    (α β : HigherHomotopy.Loop2Space A a) :
-    HigherHomotopy.Loop2Eq
-      (HigherHomotopy.Loop2Space.vcomp α β)
-      (HigherHomotopy.Loop2Space.hcomp α β) :=
-  HigherHomotopy.eckmann_hilton_vcomp_eq_hcomp α β
+/-- Whiskering cancellation on the right contracts back to `p`. -/
+theorem cancellation_contracts_two_cell {A : Type u} {a : A}
+    (p : LoopSpace A a) :
+    TwoCell (Path.trans p (Path.trans (Path.symm p) p)) p := by
+  refine RwEq.trans ?_ (rweq_cmpA_refl_right p)
+  exact rweq_trans_congr_right p (LoopSpace.loop_cancel_left (A := A) (a := a) p)
+
+/-- Higher homotopy multiplication is path-associative (`n ≥ 2`). -/
+def piN_mul_assoc_path {X : Type u} (n : Nat) [Nat.AtLeastTwo n] (x : X)
+    (α β γ : HigherHomotopyGroups.PiN n X x) :
+    Path
+      (HigherHomotopyGroups.piN_mul n x (HigherHomotopyGroups.piN_mul n x α β) γ)
+      (HigherHomotopyGroups.piN_mul n x α (HigherHomotopyGroups.piN_mul n x β γ)) :=
+  HigherHomotopyGroups.piN_mul_assoc (n := n) (x := x) α β γ
 
 end HomotopyGroup
 end Homotopy

@@ -1,4 +1,4 @@
-/-!
+/-
 # 2-category infrastructure via computational paths
 
 This module builds a path-based 2-category interface on top of
@@ -74,4 +74,3 @@ def triangleIdentity (f : Hom a b) (g : Hom b c) :
 end TwoCategory
 end HigherCategory
 end ComputationalPaths
-

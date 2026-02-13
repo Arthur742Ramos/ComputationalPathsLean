@@ -1,4 +1,4 @@
-/-!
+/-
 # Gray-category coherence via computational paths
 
 This module packages Gray-style coherence data by treating 3-cells as primitive
@@ -44,9 +44,10 @@ def triangle3 (f : Hom a b) (g : Hom b c) :
 
 /-- Any pentagon 3-cell contracts to the canonical one by a computational 4-cell. -/
 def pentagonContraction (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e)
-    (Π : ThreeCell (Bicategory.pentagonLeftPath f g h k) (Bicategory.pentagonRightPath f g h k)) :
-    FourCell (pentagon3 f g h k) Π :=
-  contractibility₄ (pentagon3 f g h k) Π
+    (piCell : ThreeCell (Bicategory.pentagonLeftPath f g h k)
+      (Bicategory.pentagonRightPath f g h k)) :
+    FourCell (pentagon3 f g h k) piCell :=
+  contractibility₄ (pentagon3 f g h k) piCell
 
 /-- Any triangle 3-cell contracts to the canonical one by a computational 4-cell. -/
 def triangleContraction (f : Hom a b) (g : Hom b c)

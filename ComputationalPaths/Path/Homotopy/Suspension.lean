@@ -1,53 +1,62 @@
-/-!
-# Higher Route 2-cells for Suspension Loops
-
-This module adds explicit rewrite-equivalence witnesses connecting alternate
-computational routes built from suspension meridians.
--/
-
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
+
+/-!
+# Suspension higher-path routes
+
+This module records 2-cells connecting alternative computational routes that
+appear in suspension-loop constructions.
+-/
 
 namespace ComputationalPaths
 namespace Path
 namespace Homotopy
 namespace Suspension
 
+open SuspensionLoop
+
 universe u
 
-variable {X : Type u}
+/-- A 2-cell between parallel computational paths. -/
+abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Prop := RwEq p q
 
-/-- Meridian-based loop from north to north using points `x` and `y`. -/
-abbrev meridianLoop (x y : X) :
-    LoopSpace (SuspensionLoop.Suspension X) (SuspensionLoop.Suspension.north (X := X)) :=
-  Path.trans
-    (SuspensionLoop.Suspension.merid (X := X) x)
-    (Path.symm (SuspensionLoop.Suspension.merid (X := X) y))
+/-- The adjunction basepoint loop contracts to reflexivity through a 2-cell. -/
+theorem adjMap_basepoint_two_cell {X : Type u} (x₀ : X) {Y : Pointed}
+    (f : SuspensionLoop.Suspension X → Y.carrier)
+    (hf : f (SuspensionLoop.Suspension.north (X := X)) = Y.pt) :
+    TwoCell (adjMap x₀ f hf x₀) (Path.refl Y.pt) :=
+  adjMap_basepoint_rweq x₀ f hf
 
-/-- Inserting a right unit on the first meridian route yields a 2-cell-equivalent loop. -/
-theorem meridian_right_unit_route_2cell (x y : X) :
-    RwEq
+/-- Rebracketing a whiskered meridian cancellation yields a 2-cell in `ΣX`. -/
+theorem meridian_whisker_assoc_two_cell {X : Type u} (x y : X) :
+    TwoCell
       (Path.trans
         (Path.trans
           (SuspensionLoop.Suspension.merid (X := X) x)
-          (Path.refl (SuspensionLoop.Suspension.south (X := X))))
-        (Path.symm (SuspensionLoop.Suspension.merid (X := X) y)))
-      (meridianLoop (X := X) x y) := by
-  have h :
-      RwEq
+          (Path.symm (SuspensionLoop.Suspension.merid (X := X) x)))
+        (SuspensionLoop.Suspension.merid (X := X) y))
+      (Path.trans
+        (SuspensionLoop.Suspension.merid (X := X) x)
+        (Path.trans
+          (Path.symm (SuspensionLoop.Suspension.merid (X := X) x))
+          (SuspensionLoop.Suspension.merid (X := X) y))) :=
+  rweq_tt
+    (SuspensionLoop.Suspension.merid (X := X) x)
+    (Path.symm (SuspensionLoop.Suspension.merid (X := X) x))
+    (SuspensionLoop.Suspension.merid (X := X) y)
+
+/-- The whiskered cancellation route contracts to the direct meridian route. -/
+theorem meridian_whisker_contracts_two_cell {X : Type u} (x y : X) :
+    TwoCell
+      (Path.trans
         (Path.trans
           (SuspensionLoop.Suspension.merid (X := X) x)
-          (Path.refl (SuspensionLoop.Suspension.south (X := X))))
-        (SuspensionLoop.Suspension.merid (X := X) x) :=
-    rweq_cmpA_refl_right (SuspensionLoop.Suspension.merid (X := X) x)
+          (Path.symm (SuspensionLoop.Suspension.merid (X := X) x)))
+        (SuspensionLoop.Suspension.merid (X := X) y))
+      (SuspensionLoop.Suspension.merid (X := X) y) := by
+  refine RwEq.trans ?_ (rweq_cmpA_refl_left (SuspensionLoop.Suspension.merid (X := X) y))
   exact rweq_trans_congr_left
-    (Path.symm (SuspensionLoop.Suspension.merid (X := X) y)) h
-
-/-- The meridian loop with equal endpoints contracts to reflexivity by a 2-cell. -/
-theorem meridian_cancel_routes_2cell (x : X) :
-    RwEq
-      (meridianLoop (X := X) x x)
-      (Path.refl (SuspensionLoop.Suspension.north (X := X))) :=
-  rweq_cmpA_inv_right (SuspensionLoop.Suspension.merid (X := X) x)
+    (SuspensionLoop.Suspension.merid (X := X) y)
+    (rweq_cmpA_inv_right (SuspensionLoop.Suspension.merid (X := X) x))
 
 end Suspension
 end Homotopy

@@ -59,6 +59,8 @@ import ComputationalPaths.Path.SimplicialHomotopy
 import ComputationalPaths.Path.DoubleGroupoid
 import ComputationalPaths.Path.DoubleCategoryPaths
 import ComputationalPaths.Path.TwoCategory
+import ComputationalPaths.Path.GrayCategory
+import ComputationalPaths.Path.Tricategory
 import ComputationalPaths.Path.HigherCoherenceDerived
 import ComputationalPaths.Path.WhiskerOperations
 import ComputationalPaths.Path.HigherPathOperations

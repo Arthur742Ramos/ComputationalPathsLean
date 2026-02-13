@@ -1,4 +1,4 @@
-/-!
+ /-
 # Descent via Computational Rewriting
 
 Descent coherence is expressed with explicit `Step`-based normalization,
@@ -13,9 +13,11 @@ namespace Descent
 
 universe u
 
+open Path
+
 /-- A descent datum with path-level cocycle witnesses. -/
-structure DescentDatum (Idx : Type u) (Obj : Idx → Type u) where
-  sec : (i : Idx) → Obj i
+structure DescentDatum (Idx : Type u) (Obj : Type u) where
+  sec : Idx → Obj
   overlap : {i j : Idx} → Path i j → Path (sec i) (sec j)
   overlap_refl : ∀ (i : Idx),
     Path (overlap (Path.refl i)) (Path.refl (sec i))
@@ -42,18 +44,15 @@ theorem cancel_right_inverse {A : Type u} {a b : A} (p : Path a b) :
 theorem whisker_cancel {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq (Path.trans (Path.trans (Path.symm p) p) q) q := by
-  calc
-    Path.trans (Path.trans (Path.symm p) p) q
-        ≈ Path.trans (Path.refl b) q := by
-          exact rweq_trans_congr_left q (rweq_of_step (Step.symm_trans p))
-    _ ≈ q := by
-          exact rweq_of_step (Step.trans_refl_left q)
+  exact rweq_trans
+    (rweq_trans_congr_left q (rweq_of_step (Step.symm_trans p)))
+    (rweq_of_step (Step.trans_refl_left q))
 
 /-- Soundness of whiskered cancellation at the propositional layer. -/
 theorem whisker_cancel_sound {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Path.toEq (Path.trans (Path.trans (Path.symm p) p) q) = Path.toEq q := by
-  simpa using rweq_toEq (whisker_cancel p q)
+  exact rweq_toEq (whisker_cancel p q)
 
 end Descent
 end Sheaf

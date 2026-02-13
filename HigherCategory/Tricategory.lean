@@ -1,4 +1,4 @@
-/-!
+/-
 # Tricategory coherence via computational paths
 
 This module lifts bicategorical pentagon/triangle coherence to tricategorical
@@ -44,9 +44,10 @@ def triangleIdentity (f : Hom a b) (g : Hom b c) :
 
 /-- Pentagonator: any pentagon witness is connected to the canonical one by a 4-cell. -/
 def pentagonator (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e)
-    (Π : ThreeCell (Bicategory.pentagonLeftPath f g h k) (Bicategory.pentagonRightPath f g h k)) :
-    FourCell (pentagonIdentity f g h k) Π :=
-  GrayCategory.pentagonContraction f g h k Π
+    (piCell : ThreeCell (Bicategory.pentagonLeftPath f g h k)
+      (Bicategory.pentagonRightPath f g h k)) :
+    FourCell (pentagonIdentity f g h k) piCell :=
+  GrayCategory.pentagonContraction f g h k piCell
 
 /-- Triangleator: any triangle witness is connected to the canonical one by a 4-cell. -/
 def triangleator (f : Hom a b) (g : Hom b c)
@@ -56,17 +57,18 @@ def triangleator (f : Hom a b) (g : Hom b c)
 
 /-- Any two pentagonators are connected by a 5-cell (level-5 contractibility). -/
 def pentagonatorHigher (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e)
-    (Π : ThreeCell (Bicategory.pentagonLeftPath f g h k) (Bicategory.pentagonRightPath f g h k))
-    (M₁ M₂ : FourCell (pentagonIdentity f g h k) Π) :
-    DerivationHigh 0 M₁ M₂ :=
-  contractibilityHigh 0 M₁ M₂
+    (piCell : ThreeCell (Bicategory.pentagonLeftPath f g h k)
+      (Bicategory.pentagonRightPath f g h k))
+    (m1 m2 : FourCell (pentagonIdentity f g h k) piCell) :
+    DerivationHigh 0 m1 m2 :=
+  contractibilityHigh 0 m1 m2
 
 /-- Any two triangleators are connected by a 5-cell (level-5 contractibility). -/
 def triangleatorHigher (f : Hom a b) (g : Hom b c)
     (tau : ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g))
-    (M₁ M₂ : FourCell (triangleIdentity f g) tau) :
-    DerivationHigh 0 M₁ M₂ :=
-  contractibilityHigh 0 M₁ M₂
+    (m1 m2 : FourCell (triangleIdentity f g) tau) :
+    DerivationHigh 0 m1 m2 :=
+  contractibilityHigh 0 m1 m2
 
 end Tricategory
 end HigherCategory
