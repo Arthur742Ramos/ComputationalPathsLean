@@ -330,8 +330,8 @@ def represent_compose_rweq {C : StableHoCat.{u}} {F : ContraFunctor.{u} C}
 
 /-- Multi-step construction: Brown uniqueness equivalence is coherent. -/
 def brown_unique_equiv_path {C : StableHoCat.{u}}
-    {A B : C.Obj}
-    (left_inv : Path (C.comp (e : C.Hom A B) (f : C.Hom B A)) (C.id A))
+    {A B : C.Obj} {e : C.Hom A B} {f : C.Hom B A}
+    (left_inv : Path (C.comp e f) (C.id A))
     (_right_inv : Path (C.comp f e) (C.id B)) :
     RwEq (Path.symm (Path.symm left_inv)) left_inv :=
   rweq_ss left_inv
@@ -399,7 +399,7 @@ theorem specmap_id_comp {E F : Spec.{u}} (f : SpecMap E F) :
   fun _ _ => rfl
 
 /-- d² = 0 implies the differential on the next page is well-defined. -/
-theorem adams_d_squared_implies_next_page (r : Nat) (D : AdamsDifferential.{u} r) :
+def adams_d_squared_implies_next_page (r : Nat) (D : AdamsDifferential.{u} r) :
     ∀ s t (x : D.page.entry s t),
       Path (D.differential (s + r) (t + r - 1) (D.differential s t x))
            (D.page.zero (s + r + r) (t + r - 1 + r - 1)) :=

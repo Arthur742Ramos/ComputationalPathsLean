@@ -143,19 +143,19 @@ structure ChromaticTower (X : Spec.{u}) where
 
 /-! ## Monochromatic Layers -/
 
-/-- The n-th monochromatic layer M_n X = fib(L_n X → L_{n-1} X). -/
+/-- The n-th monochromatic layer M_n X = fib(L_n X → L_{n-1} X).
+    We formalize M_{n+1} X = fib(L_{n+1} X → L_n X) to avoid Nat subtraction. -/
 structure MonochromaticLayer (n : Nat) (X : Spec.{u}) where
   /-- The chromatic tower data. -/
   tower : ChromaticTower.{u} X
-  /-- The fiber spectrum M_n X. -/
+  /-- The fiber spectrum M_{n+1} X. -/
   fiber : Spec.{u}
-  /-- Inclusion into L_n X. -/
-  inclusion : SpecMap fiber (tower.loc n).localized
+  /-- Inclusion into L_{n+1} X. -/
+  inclusion : SpecMap fiber (tower.loc (n + 1)).localized
   /-- Fiber property: inclusion composed with tower map is trivial. -/
   fiber_prop : ∀ k (x : fiber.level k),
-    n > 0 →
-    Path ((tower.towerMap (n - 1)).map k (inclusion.map k x))
-         ((tower.loc (n - 1)).localized.base k)
+    Path ((tower.towerMap n).map k (inclusion.map k x))
+         ((tower.loc n).localized.base k)
 
 /-- Monochromatic layer is K(n)-local. -/
 structure MonochromaticIsKnLocal (n : Nat) (X : Spec.{u}) extends
