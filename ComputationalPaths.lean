@@ -12,8 +12,10 @@ import Deformation.PathInfrastructure
 import Cobordism.PathInfrastructure
 import Arithmetic.PathInfrastructure
 import Langlands.PathInfrastructure
+import Anabelian.PathInfrastructure
 import Factorization.PathInfrastructure
 import Perfectoid.PathInfrastructure
+import Padic.PathInfrastructure
 import GRT.PathInfrastructure
 import InfinityCategory.PathInfrastructure
 import Condensed.PathInfrastructure
@@ -22,3 +24,5 @@ import Mirror.PathInfrastructure
 import NCG.PathInfrastructure
 import VertexAlgebra.PathInfrastructure
 import Tropical.PathInfrastructure
+import Hodge.PathInfrastructure
+import Log.PathInfrastructure

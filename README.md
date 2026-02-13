@@ -167,7 +167,9 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`Chromatic/PathInfrastructure.lean`](Chromatic/PathInfrastructure.lean) — chromatic filtration and Morava K-theory periodicity packaged as explicit computational `Path.Step`/`RwEq` witnesses.
 - [`InfinityCategory/PathInfrastructure.lean`](InfinityCategory/PathInfrastructure.lean) — quasi-category and Segal-space composition APIs with explicit `Path.Step` witnesses (`QuasiCategoryPaths`, `SegalSpacePaths`) and derived `RwEq` coherence lemmas.
 - [`Perfectoid/PathInfrastructure.lean`](Perfectoid/PathInfrastructure.lean) — tilting equivalences and almost mathematics packaged as path-preserving constructions with explicit `Path.Step`/`RwEq` normalization witnesses.
+- [`Padic/PathInfrastructure.lean`](Padic/PathInfrastructure.lean) — perfectoid-space tilting and p-divisible-group compatibilities packaged with explicit `Path.Step`/`RwEq` witnesses.
 - [`Tropical/PathInfrastructure.lean`](Tropical/PathInfrastructure.lean) — tropical curve balancing and valuation/tropicalization coherence packaged with explicit `Path.Step` and derived `RwEq` normalization lemmas.
+- [`Hodge/PathInfrastructure.lean`](Hodge/PathInfrastructure.lean) — mixed Hodge filtrations and period-map transport packaged with domain-specific `Path.Step` witnesses and derived `RwEq` normalizations.
 - [`GRT/PathInfrastructure.lean`](GRT/PathInfrastructure.lean) — geometric representation theory path infrastructure exposing perverse sheaf and D-module computational witnesses.
 - [`Langlands/PathInfrastructure.lean`](Langlands/PathInfrastructure.lean) — local and geometric Langlands path infrastructure exposing Step-based compatibility and spectral coherence witnesses.
 

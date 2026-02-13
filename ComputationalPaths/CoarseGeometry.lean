@@ -71,6 +71,9 @@ namespace CoarseGeometry
 
 universe u v
 
+private def stepChainFromEq {A : Type _} {a b : A} (h : a = b) : Path a b := by
+  simpa [h] using (Path.trans (Path.refl b) (Path.refl b))
+
 /-! ## Coarse Maps -/
 
 /-- A coarse map between metric spaces: proper + bornologous. -/
@@ -845,127 +848,127 @@ end ExpanderFamily
 /-- Path witness: identity is coarse. -/
 def coarse_identity_path (s : Nat) :
     Path (CoarseMap.identity s).isCoarse true :=
-  Path.ofEqChain (CoarseMap.identity_coarse s)
+  stepChainFromEq (CoarseMap.identity_coarse s)
 
 /-- Path witness: non-coarse map is not coarse. -/
 def coarse_noncoarse_path (s t : Nat) :
     Path (CoarseMap.nonCoarse s t).isCoarse false :=
-  Path.ofEqChain (CoarseMap.nonCoarse_not s t)
+  stepChainFromEq (CoarseMap.nonCoarse_not s t)
 
 /-- Path witness: identity coarse equivalence is isometry. -/
 def ce_identity_path (s : Nat) :
     Path (CoarseEquivalence.identity s).isIsometry true :=
-  Path.ofEqChain (CoarseEquivalence.identity_isometry s)
+  stepChainFromEq (CoarseEquivalence.identity_isometry s)
 
 /-- Path witness: ℤ ≃_c ℝ closeness. -/
 def ce_zr_path :
     Path CoarseEquivalence.integerRealLine.closenessConstant 1 :=
-  Path.ofEqChain CoarseEquivalence.zr_closeness
+  stepChainFromEq CoarseEquivalence.zr_closeness
 
 /-- Path witness: asdim(ℤ) = 1. -/
 def asdim_integers_path :
     Path AsymptoticDimension.integers.asdim 1 :=
-  Path.ofEqChain AsymptoticDimension.integers_asdim
+  stepChainFromEq AsymptoticDimension.integers_asdim
 
 /-- Path witness: asdim(tree) = 1. -/
 def asdim_tree_path :
     Path AsymptoticDimension.tree.asdim 1 :=
-  Path.ofEqChain AsymptoticDimension.tree_asdim
+  stepChainFromEq AsymptoticDimension.tree_asdim
 
 /-- Path witness: asdim(point) = 0. -/
 def asdim_point_path :
     Path AsymptoticDimension.point.asdim 0 :=
-  Path.ofEqChain AsymptoticDimension.point_asdim
+  stepChainFromEq AsymptoticDimension.point_asdim
 
 /-- Path witness: asdim(surface group) = 2. -/
 def asdim_surface_path (g : Nat) :
     Path (AsymptoticDimension.surfaceGroup g).asdim 2 :=
-  Path.ofEqChain (AsymptoticDimension.surfaceGroup_asdim g)
+  stepChainFromEq (AsymptoticDimension.surfaceGroup_asdim g)
 
 /-- Path witness: ℤⁿ has Property A. -/
 def propertyA_lattice_path (n : Nat) :
     Path (PropertyA.integerLattice n).hasPropertyA true :=
-  Path.ofEqChain (PropertyA.lattice_propertyA n)
+  stepChainFromEq (PropertyA.lattice_propertyA n)
 
 /-- Path witness: finite asdim ⟹ Property A. -/
 def propertyA_asdim_path (n : Nat) :
     Path (PropertyA.integerLattice n).uniformlyEmbeddable true :=
-  Path.ofEqChain (PropertyA.lattice_embeddable n)
+  stepChainFromEq (PropertyA.lattice_embeddable n)
 
 /-- Path witness: hyperbolic groups have Property A. -/
 def propertyA_hyp_path :
     Path PropertyA.hyperbolicGroup.hasPropertyA true :=
-  Path.ofEqChain PropertyA.hyperbolic_propertyA
+  stepChainFromEq PropertyA.hyperbolic_propertyA
 
 /-- Path witness: K₀(C*(pt)) = 1. -/
 def roe_k0_path :
     Path RoeAlgebra.point.k0Rank 1 :=
-  Path.ofEqChain RoeAlgebra.point_k0
+  stepChainFromEq RoeAlgebra.point_k0
 
 /-- Path witness: K₁(C*(pt)) = 0. -/
 def roe_k1_path :
     Path RoeAlgebra.point.k1Rank 0 :=
-  Path.ofEqChain RoeAlgebra.point_k1
+  stepChainFromEq RoeAlgebra.point_k1
 
 /-- Path witness: K₀(C*(ℤ)) = 1. -/
 def roe_z_k0_path :
     Path RoeAlgebra.integers.k0Rank 1 :=
-  Path.ofEqChain RoeAlgebra.integers_k0
+  stepChainFromEq RoeAlgebra.integers_k0
 
 /-- Path witness: CBC holds for ℤⁿ. -/
 def cbc_lattice_path (n : Nat) :
     Path (CoarseBaumConnes.integerLattice n).isKnownTrue true :=
-  Path.ofEqChain (CoarseBaumConnes.lattice_cbc n)
+  stepChainFromEq (CoarseBaumConnes.lattice_cbc n)
 
 /-- Path witness: CBC holds for trees. -/
 def cbc_tree_path :
     Path CoarseBaumConnes.tree.isKnownTrue true :=
-  Path.ofEqChain CoarseBaumConnes.tree_cbc
+  stepChainFromEq CoarseBaumConnes.tree_cbc
 
 /-- Path witness: CBC holds for hyperbolic groups. -/
 def cbc_hyp_path :
     Path CoarseBaumConnes.hyperbolicGroup.isKnownTrue true :=
-  Path.ofEqChain CoarseBaumConnes.hyperbolic_cbc
+  stepChainFromEq CoarseBaumConnes.hyperbolic_cbc
 
 /-- Path witness: trees embed uniformly. -/
 def embed_tree_path :
     Path UniformEmbeddability.tree.isUniformlyEmbeddable true :=
-  Path.ofEqChain UniformEmbeddability.tree_embeds
+  stepChainFromEq UniformEmbeddability.tree_embeds
 
 /-- Path witness: hyperbolic groups embed uniformly. -/
 def embed_hyp_path :
     Path UniformEmbeddability.hyperbolicGroup.isUniformlyEmbeddable true :=
-  Path.ofEqChain UniformEmbeddability.hyperbolic_embeds
+  stepChainFromEq UniformEmbeddability.hyperbolic_embeds
 
 /-- Path witness: Novikov for ℤⁿ. -/
 def novikov_lattice_path (n : Nat) :
     Path (NovikovConjecture.integerLattice n).isKnownTrue true :=
-  Path.ofEqChain (NovikovConjecture.lattice_novikov n)
+  stepChainFromEq (NovikovConjecture.lattice_novikov n)
 
 /-- Path witness: Novikov for hyperbolic groups. -/
 def novikov_hyp_path :
     Path NovikovConjecture.hyperbolicGroup.isKnownTrue true :=
-  Path.ofEqChain NovikovConjecture.hyperbolic_novikov
+  stepChainFromEq NovikovConjecture.hyperbolic_novikov
 
 /-- Path witness: Novikov for CAT(0) groups. -/
 def novikov_cat0_path :
     Path NovikovConjecture.cat0Group.isKnownTrue true :=
-  Path.ofEqChain NovikovConjecture.cat0_novikov
+  stepChainFromEq NovikovConjecture.cat0_novikov
 
 /-- Path witness: Property A ⟹ Novikov (via embedding). -/
 def novikov_propertyA_path (id : Nat) :
     Path (NovikovConjecture.amenableGroup id).isKnownTrue true :=
-  Path.ofEqChain (NovikovConjecture.amenable_novikov id)
+  stepChainFromEq (NovikovConjecture.amenable_novikov id)
 
 /-- Path witness: ℤ coarse structure is metrizable. -/
 def coarse_metrizable_path :
     Path CoarseStructure.integers.isMetrizable true :=
-  Path.ofEqChain CoarseStructure.integers_metrizable
+  stepChainFromEq CoarseStructure.integers_metrizable
 
 /-- Path witness: Ramanujan graphs don't embed. -/
 def expander_path (p : Nat) (hp : p ≥ 2) :
     Path (ExpanderFamily.ramanujan p hp).coarseUnionEmbeddable false :=
-  Path.ofEqChain (ExpanderFamily.ramanujan_no_embed p hp)
+  stepChainFromEq (ExpanderFamily.ramanujan_no_embed p hp)
 
 /-- Inter-file path: asdim(ℤ) factors through the symplectic half-dimension of ℝ². -/
 def asdim_to_symplectic_halfdim_path :

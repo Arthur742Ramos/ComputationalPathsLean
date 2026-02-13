@@ -50,6 +50,9 @@ name = "Arithmetic"
 name = "Langlands"
 
 [[lean_lib]]
+name = "Anabelian"
+
+[[lean_lib]]
 name = "Simplicial"
 
 [[lean_lib]]
@@ -62,7 +65,13 @@ name = "Factorization"
 name = "Perfectoid"
 
 [[lean_lib]]
+name = "Padic"
+
+[[lean_lib]]
 name = "Tropical"
+
+[[lean_lib]]
+name = "Hodge"
 
 [[lean_lib]]
 name = "GRT"
