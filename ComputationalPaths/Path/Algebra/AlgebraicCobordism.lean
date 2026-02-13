@@ -71,12 +71,12 @@ structure CommRing (R : Type u) where
 /-- Path witnessing associativity of addition. -/
 def CommRing.add_assoc_path {R : Type u} (Ri : CommRing R) (a b c : R) :
     Path (Ri.add (Ri.add a b) c) (Ri.add a (Ri.add b c)) :=
-  Path.ofEq (Ri.add_assoc a b c)
+  Path.stepChain (Ri.add_assoc a b c)
 
 /-- Path witnessing commutativity of addition. -/
 def CommRing.add_comm_path {R : Type u} (Ri : CommRing R) (a b : R) :
     Path (Ri.add a b) (Ri.add b a) :=
-  Path.ofEq (Ri.add_comm a b)
+  Path.stepChain (Ri.add_comm a b)
 
 /-- A formal power series in two variables over R (truncated at degree n).
     We represent by the list of coefficients a_{ij}. -/

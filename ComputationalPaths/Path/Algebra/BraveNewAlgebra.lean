@@ -81,7 +81,7 @@ def SpectrumMor.comp {E F G : Spectrum.{u}} (α : SpectrumMor E F) (β : Spectru
   mapLevel := fun n x => β.mapLevel n (α.mapLevel n x)
   map_bond := fun n x =>
     Path.trans
-      (Path.ofEq (_root_.congrArg (β.mapLevel (n + 1)) (α.map_bond n x).proof))
+      (Path.stepChain (_root_.congrArg (β.mapLevel (n + 1)) (α.map_bond n x).proof))
       (β.map_bond n (α.mapLevel n x))
 
 /-- Composition with identity on the right. -/
@@ -152,11 +152,11 @@ def EInftyMor.comp {R S T : EInftyRing.{u}} (f : EInftyMor R S) (g : EInftyMor S
   specMap := SpectrumMor.comp f.specMap g.specMap
   map_mul := fun x y =>
     Path.trans
-      (Path.ofEq (_root_.congrArg (g.specMap.mapLevel 0) (f.map_mul x y).proof))
+      (Path.stepChain (_root_.congrArg (g.specMap.mapLevel 0) (f.map_mul x y).proof))
       (g.map_mul (f.specMap.mapLevel 0 x) (f.specMap.mapLevel 0 y))
   map_unit :=
     Path.trans
-      (Path.ofEq (_root_.congrArg (g.specMap.mapLevel 0) f.map_unit.proof))
+      (Path.stepChain (_root_.congrArg (g.specMap.mapLevel 0) f.map_unit.proof))
       g.map_unit
 
 /-- Composition with identity. -/
@@ -201,7 +201,7 @@ def ModuleMor.comp {R : EInftyRing.{u}} {M N P : ModuleSpectrum R}
   specMap := SpectrumMor.comp f.specMap g.specMap
   linear := fun r x =>
     Path.trans
-      (Path.ofEq (_root_.congrArg (g.specMap.mapLevel 0) (f.linear r x).proof))
+      (Path.stepChain (_root_.congrArg (g.specMap.mapLevel 0) (f.linear r x).proof))
       (g.linear r (f.specMap.mapLevel 0 x))
 
 /-! ## Smash Product -/

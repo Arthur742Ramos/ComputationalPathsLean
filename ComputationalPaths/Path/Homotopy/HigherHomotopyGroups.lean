@@ -76,7 +76,7 @@ def piN_mul_assoc (n : Nat) [Nat.AtLeastTwo n] {x : X}
       | succ n =>
           cases n with
           | zero =>
-              exact Path.ofEq
+              exact Path.stepChain
                 (HigherHomotopy.PiTwo.mul_assoc (A := X) (a := x) a b c)
           | succ _ =>
               cases a
@@ -97,7 +97,7 @@ def piN_one_mul (n : Nat) [Nat.AtLeastTwo n] {x : X}
       | succ n =>
           cases n with
           | zero =>
-              exact Path.ofEq
+              exact Path.stepChain
                 (HigherHomotopy.PiTwo.id_mul (A := X) (a := x) a)
           | succ _ =>
               cases a
@@ -116,7 +116,7 @@ def piN_mul_one (n : Nat) [Nat.AtLeastTwo n] {x : X}
       | succ n =>
           cases n with
           | zero =>
-              exact Path.ofEq
+              exact Path.stepChain
                 (HigherHomotopy.PiTwo.mul_id (A := X) (a := x) a)
           | succ _ =>
               cases a
@@ -135,7 +135,7 @@ def piN_inv_mul_self (n : Nat) [Nat.AtLeastTwo n] {x : X}
       | succ n =>
           cases n with
           | zero =>
-              exact Path.ofEq
+              exact Path.stepChain
                 (HigherHomotopy.PiTwo.mul_left_inv (A := X) (a := x) a)
           | succ _ =>
               cases a
@@ -154,7 +154,7 @@ def piN_mul_inv_self (n : Nat) [Nat.AtLeastTwo n] {x : X}
       | succ n =>
           cases n with
           | zero =>
-              exact Path.ofEq
+              exact Path.stepChain
                 (HigherHomotopy.PiTwo.mul_right_inv (A := X) (a := x) a)
           | succ _ =>
               cases a
@@ -173,7 +173,7 @@ def piN_mul_comm (n : Nat) [Nat.AtLeastTwo n] {x : X}
       | succ n =>
           cases n with
           | zero =>
-              exact Path.ofEq
+              exact Path.stepChain
                 (HigherHomotopy.piTwo_comm (A := X) (a := x) a b)
           | succ _ =>
               cases a

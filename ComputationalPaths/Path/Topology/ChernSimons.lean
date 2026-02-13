@@ -85,7 +85,7 @@ def gaugePath_to_orbit (T : ConnectionSpace B G S) {A B : T.Conn}
 def gaugePath_refl (T : ConnectionSpace B G S) (A : T.Conn) :
     GaugePath T A A := by
   refine ⟨S.one, ?_⟩
-  exact Path.ofEq (T.action.act_one A)
+  exact Path.stepChain (T.action.act_one A)
 
 /-- Symmetry of gauge paths. -/
 def gaugePath_symm (T : ConnectionSpace B G S) {A B : T.Conn} :
@@ -99,7 +99,7 @@ def gaugePath_symm (T : ConnectionSpace B G S) {A B : T.Conn} :
         simp [hAB]
       _ = T.action.act (S.mul (S.inv g) g) A := (T.action.act_mul _ _ _).symm
       _ = A := by simp [S.mul_left_inv, T.action.act_one]
-  exact ⟨S.inv g, Path.ofEq hBA⟩
+  exact ⟨S.inv g, Path.stepChain hBA⟩
 
 /-- Transitivity of gauge paths. -/
 def gaugePath_trans (T : ConnectionSpace B G S) {A B C : T.Conn} :
@@ -113,7 +113,7 @@ def gaugePath_trans (T : ConnectionSpace B G S) {A B C : T.Conn} :
       T.action.act h B = T.action.act h (T.action.act g A) := by simp [hAB]
       _ = T.action.act (S.mul h g) A := (T.action.act_mul _ _ _).symm
   refine ⟨S.mul h g, ?_⟩
-  exact Path.trans (Path.ofEq hmul.symm) q
+  exact Path.trans (Path.stepChain hmul.symm) q
 
 /-- Chern-Simons functional respects gauge paths. -/
 def cs_gauge_path (T : ConnectionSpace B G S) {A B : T.Conn}

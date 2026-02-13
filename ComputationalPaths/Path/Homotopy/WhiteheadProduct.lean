@@ -204,7 +204,7 @@ def whitehead_id_id_path {A : Type u} {a : A} :
     Path
       (whiteheadProduct (m := 1) (n := 1) (A := A) (a := a) (piN_one 1 a) (piN_one 1 a))
       (piN_one 1 a) :=
-  Path.ofEq (whitehead_self_pi1 (piN_one 1 a))
+  Path.stepChain (whitehead_self_pi1 (piN_one 1 a))
 
 /-- Path witness that the Whitehead product equals the commutator. -/
 def whitehead_commutator_path {A : Type u} {a : A}
@@ -223,7 +223,7 @@ def whitehead_conj_path {A : Type u} {a : A}
       (whiteheadProduct (m := 1) (n := 1)
         (LoopGroupAlgebra.conj (A := A) (a := a) g x)
         (LoopGroupAlgebra.conj (A := A) (a := a) g y)) :=
-  Path.ofEq (whitehead_conj_invariant g x y)
+  Path.stepChain (whitehead_conj_invariant g x y)
 
 /-! ## Power Operations and Whitehead Products -/
 
@@ -310,7 +310,7 @@ We developed the Whitehead product on computational-path homotopy groups:
 3. **Antisymmetry**: graded sign computations
 4. **Conjugation**: compatibility with the conjugation action
 5. **Algebra structure**: `WhiteheadAlgebra` packaging product and laws
-6. **Path coherence**: `Path.ofEq` witnesses for all key identities
+6. **Path coherence**: `Path.stepChain` witnesses for all key identities
 7. **Power operations**: interaction with loop group powers
 8. **Naturality**: structure for natural transformations
 9. **Lower central series**: iterated Whitehead products

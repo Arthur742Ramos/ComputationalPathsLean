@@ -181,13 +181,13 @@ namespace AdamsOperation
 def psi_one_path {M : Type u} {S : StrictMonoid M}
     (A : AdamsOperation S) (x : KTheory.K0 S) :
     Path (A.psi 1 x) x :=
-  Path.ofEq (A.psi_one x)
+  Path.stepChain (A.psi_one x)
 
 /-- Path-typed psi^0 on zero. -/
 def psi_zero_path {M : Type u} {S : StrictMonoid M}
     (A : AdamsOperation S) :
     Path (A.psi 0 (KTheory.zero S)) (KTheory.zero S) :=
-  Path.ofEq A.psi_zero
+  Path.stepChain A.psi_zero
 
 /-- The trivial Adams operation: all psi^k are the identity. -/
 def trivial {M : Type u} (S : StrictMonoid M) : AdamsOperation S where
@@ -220,7 +220,7 @@ namespace CannibalisticClass
 def psi_thom_path {K B E V M : Type u} {S : StrictMonoid M}
     (C : CannibalisticClass (K := K) (B := B) (E := E) (V := V) (S := S)) :
     Path (C.adams.psi C.k C.thomClass) C.cannibalistic :=
-  Path.ofEq C.psi_thom
+  Path.stepChain C.psi_thom
 
 /-- Trivial cannibalistic class built from the zero Thom class. -/
 def trivial {K B E V M : Type u} (S : StrictMonoid M)

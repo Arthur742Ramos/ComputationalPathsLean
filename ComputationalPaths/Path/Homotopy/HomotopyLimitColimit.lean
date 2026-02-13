@@ -61,7 +61,7 @@ def of_eq {X : Type x} {f : A → C} {g : B → C}
     HomotopyCone (X := X) f g :=
   { left := left
     right := right
-    comm := fun x => Path.ofEq (_root_.congrArg (fun k => k x) h) }
+    comm := fun x => Path.stepChain (_root_.congrArg (fun k => k x) h) }
 
 /-- Convert a homotopy cone into a pullback cone. -/
 def toPullbackCone {X : Type x} {f : A → C} {g : B → C}
@@ -134,7 +134,7 @@ def of_eq {X : Type x} {f : C → A} {g : C → B}
     HomotopyCocone (X := X) f g :=
   { inl := inl
     inr := inr
-    comm := fun c => Path.ofEq (_root_.congrArg (fun k => k c) h) }
+    comm := fun c => Path.stepChain (_root_.congrArg (fun k => k c) h) }
 
 /-- Convert the homotopy commutativity into propositional equality. -/
 def commEq {X : Type x} {f : C → A} {g : C → B}

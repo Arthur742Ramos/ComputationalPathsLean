@@ -35,7 +35,7 @@ def equiv_leftInvPath {A : Type u} {F : PathContraFunctor A}
     (R : ContraRepresentable A F) (b : A) (x : F.obj b) :
     ComputationalPaths.Path
       ((R.equiv b).invFun ((R.equiv b).toFun x)) x :=
-  ComputationalPaths.Path.ofEq ((R.equiv b).left_inv x)
+  ComputationalPaths.Path.stepChain ((R.equiv b).left_inv x)
 
 /-- Path-typed right inverse for a representability equivalence. -/
 def equiv_rightInvPath {A : Type u} {F : PathContraFunctor A}
@@ -43,7 +43,7 @@ def equiv_rightInvPath {A : Type u} {F : PathContraFunctor A}
     (y : FundamentalGroupoid.Hom A b R.obj) :
     ComputationalPaths.Path
       ((R.equiv b).toFun ((R.equiv b).invFun y)) y :=
-  ComputationalPaths.Path.ofEq ((R.equiv b).right_inv y)
+  ComputationalPaths.Path.stepChain ((R.equiv b).right_inv y)
 
 /-- Path-typed naturality of a representability equivalence. -/
 def equiv_naturalityPath {A : Type u} {F : PathContraFunctor A}
@@ -52,7 +52,7 @@ def equiv_naturalityPath {A : Type u} {F : PathContraFunctor A}
     ComputationalPaths.Path
       ((R.equiv b).toFun (F.map p x))
       (FundamentalGroupoid.comp' A p ((R.equiv c).toFun x)) :=
-  ComputationalPaths.Path.ofEq (R.naturality (p := p) (x := x))
+  ComputationalPaths.Path.stepChain (R.naturality (p := p) (x := x))
 
 /-- Brown representability expressed as a Path-typed inverse law. -/
 def brown_representability_path {A : Type u} {F : PathContraFunctor A}

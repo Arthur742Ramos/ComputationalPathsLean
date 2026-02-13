@@ -190,7 +190,7 @@ structure DualSteenrodAlgebra where
 /-- Path witness for ξ_k degree. -/
 def xi_degree_path (D : DualSteenrodAlgebra) (k : Nat) :
     Path (D.xi_degree k) (2^k - 1) :=
-  Path.ofEq (D.xi_degree_eq k)
+  Path.stepChain (D.xi_degree_eq k)
 
 /-! ## Milnor Basis -/
 

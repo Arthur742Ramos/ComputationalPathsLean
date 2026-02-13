@@ -53,7 +53,7 @@ abbrev stiefelManifoldLoopSpace (n k : Nat) : Type u :=
 
 /-- Fundamental loop at the Stiefel manifold basepoint. -/
 @[simp] def stiefelManifoldLoop (n k : Nat) : stiefelManifoldLoopSpace n k :=
-  Path.ofEqChain rfl
+  Path.stepChainChain rfl
 
 /-- Iterate the fundamental loop `m` times. -/
 @[simp] def stiefelManifoldLoopPow (n k : Nat) : Nat → stiefelManifoldLoopSpace n k

@@ -78,9 +78,9 @@ def DiamondStep.toPath {X : Type u} {a b : X}
   match s with
   | .proetale_desc _ => Path.refl _
   | .v_cover _ => Path.refl _
-  | .geometric_point _ _ h => Path.ofEq h
+  | .geometric_point _ _ h => Path.stepChain h
   | .fiber_product _ => Path.refl _
-  | .quotient _ _ h => Path.ofEq h
+  | .quotient _ _ h => Path.stepChain h
 
 /-! ## Pro-Étale Site -/
 

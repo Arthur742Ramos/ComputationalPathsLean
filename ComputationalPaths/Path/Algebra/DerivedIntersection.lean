@@ -88,7 +88,7 @@ def ChainMor.comp {E F G : ChainComplex.{u}} (α : ChainMor E F) (β : ChainMor 
   fZero := β.fZero ∘ α.fZero
   commutes := fun x =>
     Path.trans
-      (Path.ofEq (_root_.congrArg β.fZero (α.commutes x).proof))
+      (Path.stepChain (_root_.congrArg β.fZero (α.commutes x).proof))
       (β.commutes (α.fmOne x))
 
 /-- Chain morphism composition is associative via Path. -/
@@ -300,9 +300,9 @@ def GysinMap.comp {X Y Z : Scheme.{u}}
   gysin := G₂.gysin ∘ G₁.gysin
   gysin_add := fun a b =>
     Path.trans
-      (Path.ofEq (_root_.congrArg G₂.gysin (G₁.gysin_add a b).proof))
+      (Path.stepChain (_root_.congrArg G₂.gysin (G₁.gysin_add a b).proof))
       (G₂.gysin_add (G₁.gysin a) (G₁.gysin b))
-  gysin_zero := Path.trans (Path.ofEq (_root_.congrArg G₂.gysin G₁.gysin_zero.proof)) G₂.gysin_zero
+  gysin_zero := Path.trans (Path.stepChain (_root_.congrArg G₂.gysin G₁.gysin_zero.proof)) G₂.gysin_zero
   codim := G₁.codim + G₂.codim
 
 /-- Gysin composition is associative via Path. -/

@@ -65,7 +65,7 @@ def id (M : MetricData X) : QuasiIsometricMap M M 1 0 where
 /-- The identity map yields a computational path on points. -/
 def id_path (M : MetricData X) (x : X) :
     Path ((id M).toFun x) x :=
-  Path.ofEqChain rfl
+  Path.stepChainChain rfl
 
 /-- Composing the identity path with its inverse gives a loop. -/
 def id_path_loop (M : MetricData X) (x : X) : Path x x :=

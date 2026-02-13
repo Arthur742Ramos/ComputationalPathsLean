@@ -139,7 +139,7 @@ def mappedFacePath (F : PathPreservingSSetMap S T)
     (i : Fin (n + 2)) (hi : i ≠ k) :
     Path (T.face n i (F.fillMappedHorn kan n k horn).simplex)
          ((F.mapHorn horn).faces i hi) :=
-  Path.ofEq ((F.fillMappedHorn kan n k horn).face_match i hi)
+  Path.stepChain ((F.fillMappedHorn kan n k horn).face_match i hi)
 
 /-- A direct `Step` witness for normalization of transported face paths. -/
 theorem mappedFacePath_step (F : PathPreservingSSetMap S T)

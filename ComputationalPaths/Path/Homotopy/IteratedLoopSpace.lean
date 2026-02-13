@@ -163,7 +163,7 @@ structure GroupCompletion (X : Pointed) where
 def GroupCompletion.inv_left_path {X : Pointed} (G : GroupCompletion X)
     (y : G.completion.carrier) :
     Path (G.completionMul (G.inv y) y) G.completion.pt :=
-  Path.ofEq (G.inv_left y)
+  Path.stepChain (G.inv_left y)
 
 /-- The trivial group completion of a single point. -/
 def GroupCompletion.trivial : GroupCompletion { carrier := Unit, pt := () } where

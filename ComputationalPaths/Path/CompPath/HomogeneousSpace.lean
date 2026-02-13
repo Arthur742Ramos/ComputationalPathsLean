@@ -47,7 +47,7 @@ def orbitPath_to_orbit (A : GroupAction G S X) {x y : X} (h : OrbitPath A x y) :
 def orbitPath_refl (A : GroupAction G S X) (x : X) :
     OrbitPath A x x := by
   refine ⟨S.one, ?_⟩
-  exact Path.ofEq (GroupAction.act_one' A x)
+  exact Path.stepChain (GroupAction.act_one' A x)
 
 /-- Symmetry of orbit paths. -/
 def orbitPath_symm (A : GroupAction G S X) {x y : X} :
@@ -60,7 +60,7 @@ def orbitPath_symm (A : GroupAction G S X) {x y : X} :
       A.act (S.inv g) y = A.act (S.inv g) (A.act g x) := by simp [hxy]
       _ = A.act (S.mul (S.inv g) g) x := (A.act_mul _ _ _).symm
       _ = x := by simp [S.mul_left_inv, A.act_one]
-  exact ⟨S.inv g, Path.ofEq hsymm⟩
+  exact ⟨S.inv g, Path.stepChain hsymm⟩
 
 /-- Transitivity of orbit paths. -/
 def orbitPath_trans (A : GroupAction G S X) {x y z : X} :
@@ -74,7 +74,7 @@ def orbitPath_trans (A : GroupAction G S X) {x y z : X} :
       A.act h y = A.act h (A.act g x) := by simp [hxy]
       _ = A.act (S.mul h g) x := (A.act_mul _ _ _).symm
   refine ⟨S.mul h g, ?_⟩
-  exact Path.trans (Path.ofEq hmul.symm) q
+  exact Path.trans (Path.stepChain hmul.symm) q
 
 end OrbitPath
 

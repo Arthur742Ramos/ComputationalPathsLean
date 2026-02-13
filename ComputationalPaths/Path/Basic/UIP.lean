@@ -89,8 +89,10 @@ same endpoints always have the same `toEq`. -/
 /-- Proof irrelevance: `ofEq` always produces the same path regardless
 of which equality proof is supplied. -/
 @[simp] theorem ofEq_proof_irrelevance {A : Type u} {a b : A}
-    (h₁ h₂ : a = b) : Path.ofEq h₁ = Path.ofEq h₂ :=
-  Path.ofEq_eq_ofEq h₁ h₂
+    (h₁ h₂ : a = b) : Path.stepChain h₁ = Path.stepChain h₂ := by
+  cases h₁
+  cases h₂
+  simp [Path.stepChain]
 
 /-! ## Path contractibility -/
 
@@ -148,12 +150,12 @@ theorem path_eq_iff_steps_eq {A : Type u} {a b : A}
 
 /-- The step list of `ofEq` is a singleton. -/
 @[simp] theorem ofEq_steps_singleton' {A : Type u} {a b : A} (h : a = b) :
-    (Path.ofEq h).steps = [Step.mk a b h] := rfl
+    (Path.stepChain h).steps = [Step.mk a b h] := rfl
 
 /-- `refl a` and `ofEq rfl` are distinguished by their step lists. -/
 theorem refl_ofEq_steps_ne {A : Type u} (a : A) :
-    (Path.refl a).steps ≠ (Path.ofEq (rfl : a = a)).steps := by
-  simp [Path.refl, Path.ofEq]
+    (Path.refl a).steps ≠ (Path.stepChain (rfl : a = a)).steps := by
+  simp [Path.refl, Path.stepChain]
 
 /-! ## Transport and UIP interaction -/
 
@@ -218,7 +220,7 @@ theorem congrArg_preserves_ne_stepLoop {A : Type u} {B : Type v} (f : A → B)
 /-- `congrArg f` preserves the refl-vs-ofEq distinction. -/
 theorem congrArg_preserves_ne {A : Type u} {B : Type v} (f : A → B)
     (a : A) :
-    Path.congrArg f (Path.refl a) ≠ Path.congrArg f (Path.ofEq (rfl : a = a)) := by
+    Path.congrArg f (Path.refl a) ≠ Path.congrArg f (Path.stepChain (rfl : a = a)) := by
   intro h
   exact congrArg_preserves_ne_stepLoop f a h
 
@@ -243,7 +245,7 @@ theorem not_uip_image {A : Type u} {B : Type u} (f : A → B)
 
 /-- `ofEq` has exactly one step. -/
 @[simp] theorem stepCount_ofEq {A : Type u} {a b : A} (h : a = b) :
-    stepCount (Path.ofEq h) = 1 := rfl
+    stepCount (Path.stepChain h) = 1 := rfl
 
 /-- Step count of a concatenation is the sum of the step counts. -/
 @[simp] theorem stepCount_trans {A : Type u} {a b c : A}
@@ -274,7 +276,7 @@ theorem path_ne_trans_stepLoop {A : Type u} {a : A}
 /-- A path `p` and `trans p (ofEq rfl)` always differ (when a = b). -/
 theorem path_ne_trans_ofEq_rfl {A : Type u} {a : A}
     (p : Path a a) :
-    p ≠ Path.trans p (Path.ofEq (rfl : a = a)) := by
+    p ≠ Path.trans p (Path.stepChain (rfl : a = a)) := by
   simpa [stepLoop] using path_ne_trans_stepLoop (A := A) (a := a) p
 
 /-! ## Step count preserving operations -/

@@ -183,7 +183,7 @@ inductive HTTStep : {A : Type u} → {a b : A} → Path a b → Path a b → Pro
   /-- Transport along refl is identity. -/
   | transport_refl {A : Type u} {B : A → Type u} {a : A} (x : B a) :
       HTTStep
-        (Path.ofEq (show Path.transport (Path.refl a) x = x from rfl))
+        (Path.stepChain (show Path.transport (Path.refl a) x = x from rfl))
         (Path.refl x)
   /-- ap on refl is refl. -/
   | ap_refl {A B : Type u} (f : A → B) (a : A) :

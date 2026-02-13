@@ -64,18 +64,18 @@ namespace BrouwerDegreeData
 /-- `Path` witnessing that the identity has degree 1. -/
 def degree_id_path (D : BrouwerDegreeData X) :
     ComputationalPaths.Path (D.degree (ContinuousMap.id X)) 1 :=
-  ComputationalPaths.Path.ofEq D.degree_id
+  ComputationalPaths.Path.stepChain D.degree_id
 
 /-- `Path` witnessing that constant maps have degree 0. -/
 def degree_const_path (D : BrouwerDegreeData X) (x : X) :
     ComputationalPaths.Path (D.degree (ContinuousMap.const X x)) 0 :=
-  ComputationalPaths.Path.ofEq (D.degree_const x)
+  ComputationalPaths.Path.stepChain (D.degree_const x)
 
 /-- `Path` witnessing homotopy invariance of the degree. -/
 def degree_homotopy_path (D : BrouwerDegreeData X) {f g : C(X, X)}
     (h : ContinuousMap.Homotopic f g) :
     ComputationalPaths.Path (D.degree f) (D.degree g) :=
-  ComputationalPaths.Path.ofEq (D.homotopy_invariant h)
+  ComputationalPaths.Path.stepChain (D.homotopy_invariant h)
 
 /-- Maps without fixed points have degree zero. -/
 theorem degree_of_no_fixed_point (D : BrouwerDegreeData X) (f : C(X, X))
@@ -90,7 +90,7 @@ theorem degree_of_no_fixed_point (D : BrouwerDegreeData X) (f : C(X, X))
 def degree_of_no_fp_path (D : BrouwerDegreeData X) (f : C(X, X))
     (h : ∀ x, f x ≠ x) :
     ComputationalPaths.Path (D.degree f) 0 :=
-  ComputationalPaths.Path.ofEq (degree_of_no_fixed_point D f h)
+  ComputationalPaths.Path.stepChain (degree_of_no_fixed_point D f h)
 
 /-- A nonzero degree forces a fixed point. -/
 theorem fixed_point_of_degree_ne_zero (D : BrouwerDegreeData X) (f : C(X, X))

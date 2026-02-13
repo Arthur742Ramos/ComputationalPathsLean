@@ -53,7 +53,7 @@ def toPath {W : WeightFunctorPathData} {a b : Nat}
   | unit =>
       exact W.unitPath
   | reassociate X Y Z =>
-      exact Path.ofEqChain (Nat.add_assoc (W.weight X) (W.weight Y) (W.weight Z))
+      exact Path.stepChain (Nat.add_assoc (W.weight X) (W.weight Y) (W.weight Z))
 
 /-- Primitive right-unit normalization step for any weight rewrite path. -/
 def normalizeStep {W : WeightFunctorPathData} {a b : Nat}
@@ -137,14 +137,14 @@ end WeightFunctorPathData
 def dominantTensorPath (X Y : HeckeObject) :
     Path ((convolution X Y).dominantCoweight)
       (X.dominantCoweight + Y.dominantCoweight) := by
-  refine Path.ofEqChain ?_
+  refine Path.stepChain ?_
   cases X
   cases Y
   simp [convolution]
 
 /-- Unit path for the dominant-coweight weight functor. -/
 def dominantUnitPath : Path unitObj.dominantCoweight 0 := by
-  refine Path.ofEqChain ?_
+  refine Path.stepChain ?_
   simp [unitObj]
 
 /-- Canonical dominant-coweight weight functor for geometric Satake paths. -/

@@ -64,28 +64,28 @@ variable (E : GeneralizedHomologyTheory.{u, v})
 /-- Path witness that maps preserve zero. -/
 def map_zero_path {X Y : PtdType.{u}} (f : PtdMap X Y) (n : Nat) :
     Path (E.map f n (E.zero X n)) (E.zero Y n) :=
-  Path.ofEq (E.map_zero f n)
+  Path.stepChain (E.map_zero f n)
 
 /-- Path witness for identity functoriality. -/
 def map_id_path (X : PtdType.{u}) (n : Nat) :
     Path (E.map (PtdMap.id X) n) _root_.id :=
-  Path.ofEq (E.map_id X n)
+  Path.stepChain (E.map_id X n)
 
 /-- Path witness for composition. -/
 def map_comp_path {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
     Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n)) :=
-  Path.ofEq (E.map_comp g f n)
+  Path.stepChain (E.map_comp g f n)
 
 /-- Path witness for the suspension round-trip (left inverse). -/
 def suspension_roundtrip_path (X : PtdType.{u}) (n : Nat) (x : E.H X n) :
     Path ((E.suspensionIso X n).invFun ((E.suspensionIso X n).toFun x)) x :=
-  Path.ofEq ((E.suspensionIso X n).left_inv x)
+  Path.stepChain ((E.suspensionIso X n).left_inv x)
 
 /-- Path witness for the forward round-trip. -/
 def suspension_fwd_roundtrip_path (X : PtdType.{u}) (n : Nat)
     (y : E.H (E.susp X) (n + 1)) :
     Path ((E.suspensionIso X n).toFun ((E.suspensionIso X n).invFun y)) y :=
-  Path.ofEq ((E.suspensionIso X n).right_inv y)
+  Path.stepChain ((E.suspensionIso X n).right_inv y)
 
 end GeneralizedHomologyTheory
 

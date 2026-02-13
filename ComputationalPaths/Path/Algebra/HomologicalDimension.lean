@@ -142,7 +142,7 @@ def ProjectiveData.zeroProj {R : Type u} {ring : RData R} :
       map_zero := Path.refl _
       map_add := fun _ _ =>
         -- goal: Path mM.zero (mM.add mM.zero mM.zero)
-        Path.ofEq ((mM.add_zero mM.zero).symm) }
+        Path.stepChain ((mM.add_zero mM.zero).symm) }
   lift_comm := fun _ _ g f _ _ =>
     Path.trans g.map_zero (Path.symm f.map_zero)
 

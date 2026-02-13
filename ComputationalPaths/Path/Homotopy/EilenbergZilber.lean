@@ -76,7 +76,7 @@ theorem shuffleSign_zero : shuffleSign 0 = 1 := by
 
 /-- `Path`-typed sign of zero inversions. -/
 def shuffleSign_zeroPath : Path (shuffleSign 0) (1 : Int) :=
-  Path.ofEq shuffleSign_zero
+  Path.stepChain shuffleSign_zero
 
 /-- The sign is always ±1. -/
 theorem shuffleSign_sq (k : Nat) :
@@ -87,7 +87,7 @@ theorem shuffleSign_sq (k : Nat) :
 /-- `Path`-typed sign squaring. -/
 def shuffleSign_sqPath (k : Nat) :
     Path (shuffleSign k * shuffleSign k) (1 : Int) :=
-  Path.ofEq (shuffleSign_sq k)
+  Path.stepChain (shuffleSign_sq k)
 
 /-- The product of signs corresponds to addition of inversions mod 2. -/
 theorem shuffleSign_mul (a b : Nat)

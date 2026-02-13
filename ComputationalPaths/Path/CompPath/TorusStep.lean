@@ -97,16 +97,16 @@ noncomputable instance instHasTorusPiOneEncode_ofCircle :
     | mk z1 z2 =>
         exact
           Path.prodMk
-            (Path.ofEq (circlePiOneEncode_circleDecode z1))
-            (Path.ofEq (circlePiOneEncode_circleDecode z2))
+            (Path.stepChain (circlePiOneEncode_circleDecode z1))
+            (Path.stepChain (circlePiOneEncode_circleDecode z2))
   torusDecode_encode := by
     intro x
     cases x with
     | mk x1 x2 =>
         exact
           Path.prodMk
-            (Path.ofEq (circleDecode_circlePiOneEncode x1))
-            (Path.ofEq (circleDecode_circlePiOneEncode x2))
+            (Path.stepChain (circleDecode_circlePiOneEncode x1))
+            (Path.stepChain (circleDecode_circlePiOneEncode x2))
 
 /-
 ## Loop-space commutator

@@ -125,7 +125,7 @@ theorem joinMap_id {X Y : Type u} (z : JoinSpace X Y) :
 /-- Path witness: joinMap id id is the identity. -/
 def joinMap_id_path {X Y : Type u} (z : JoinSpace X Y) :
     Path (joinMap (id : X → X) (id : Y → Y) z) z :=
-  Path.ofEq (joinMap_id z)
+  Path.stepChain (joinMap_id z)
 
 /-! ## Symmetry of the join -/
 
@@ -159,7 +159,7 @@ theorem joinSymmMap_involutive {X Y : Type u} (z : JoinSpace X Y) :
 /-- Path witness of the double symmetry involution. -/
 def joinSymmMap_involutive_path {X Y : Type u} (z : JoinSpace X Y) :
     Path (joinSymmMap (joinSymmMap z)) z :=
-  Path.ofEq (joinSymmMap_involutive z)
+  Path.stepChain (joinSymmMap_involutive z)
 
 /-! ## Join with unit -/
 
@@ -184,7 +184,7 @@ instance joinUnit_connected {X : Type u} [Nonempty X] :
     IsPathConnected (JoinUnit X) where
   base := joinUnitConePoint X
   connected := fun z =>
-    Path.ofEq (by
+    Path.stepChain (by
       refine Quot.inductionOn z ?_
       intro s
       cases s with

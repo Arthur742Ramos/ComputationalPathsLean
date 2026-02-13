@@ -64,7 +64,7 @@ theorem hurewiczPreservesOne {G H : Type u} (hd : HurewiczData G H) :
 /-- `Path`-typed identity preservation. -/
 def hurewiczPreservesOnePath {G H : Type u} (hd : HurewiczData G H) :
     Path (hd.toFun hd.oneG) hd.oneH :=
-  Path.ofEq hd.map_one
+  Path.stepChain hd.map_one
 
 /-- The Hurewicz map is a homomorphism. -/
 theorem hurewiczHom {G H : Type u} (hd : HurewiczData G H) (a b : G) :
@@ -74,7 +74,7 @@ theorem hurewiczHom {G H : Type u} (hd : HurewiczData G H) (a b : G) :
 /-- `Path`-typed homomorphism law. -/
 def hurewiczHomPath {G H : Type u} (hd : HurewiczData G H) (a b : G) :
     Path (hd.toFun (hd.mulG a b)) (hd.mulH (hd.toFun a) (hd.toFun b)) :=
-  Path.ofEq (hd.map_mul a b)
+  Path.stepChain (hd.map_mul a b)
 
 /-! ## Naturality -/
 
@@ -94,7 +94,7 @@ def hurewiczNaturalPath {G G' H H' : Type u}
     {fG : G → G'} {fH : H → H'}
     (nat : HurewiczNatural hd hd' fG fH) (x : G) :
     Path (fH (hd.toFun x)) (hd'.toFun (fG x)) :=
-  Path.ofEq (nat.comm x)
+  Path.stepChain (nat.comm x)
 
 /-- Naturality for the identity map. -/
 theorem hurewiczNatural_id {G H : Type u} (hd : HurewiczData G H) :
@@ -126,7 +126,7 @@ structure NConnected (n : ℕ) (G : ℕ → Type u) (one : (k : ℕ) → G k) : 
 def nConnectedPath {n : ℕ} {G : ℕ → Type u} {one : (k : ℕ) → G k}
     (hc : NConnected n G one) (k : ℕ) (hk : k ≤ n) (x : G k) :
     Path x (one k) :=
-  Path.ofEq (hc.trivial_below k hk x)
+  Path.stepChain (hc.trivial_below k hk x)
 
 /-- The higher Hurewicz theorem: for an (n-1)-connected space,
 the Hurewicz map at dimension n is a bijection.
@@ -143,12 +143,12 @@ structure HurewiczIso (G H : Type u) extends HurewiczData G H where
 /-- `Path`-typed left inverse. -/
 def hurewiczIso_leftInvPath {G H : Type u} (hi : HurewiczIso G H) (x : G) :
     Path (hi.invFun (hi.toFun x)) x :=
-  Path.ofEq (hi.left_inv x)
+  Path.stepChain (hi.left_inv x)
 
 /-- `Path`-typed right inverse. -/
 def hurewiczIso_rightInvPath {G H : Type u} (hi : HurewiczIso G H) (y : H) :
     Path (hi.toFun (hi.invFun y)) y :=
-  Path.ofEq (hi.right_inv y)
+  Path.stepChain (hi.right_inv y)
 
 /-- An isomorphism gives surjectivity. -/
 theorem hurewiczIso_surj {G H : Type u} (hi : HurewiczIso G H) :
@@ -167,7 +167,7 @@ theorem hurewiczIso_inj {G H : Type u} (hi : HurewiczIso G H) :
 def hurewiczIso_injPath {G H : Type u} (hi : HurewiczIso G H)
     (x y : G) (hp : Path (hi.toFun x) (hi.toFun y)) :
     Path x y :=
-  Path.ofEq (hurewiczIso_inj hi x y hp.proof)
+  Path.stepChain (hurewiczIso_inj hi x y hp.proof)
 
 /-! ## Composition with Abelianization -/
 

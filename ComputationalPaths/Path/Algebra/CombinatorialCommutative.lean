@@ -136,7 +136,7 @@ def faceRingSimplex (n : Nat) (Δ : SimplicialComplex n) (hpure : Δ.dim = n - 1
     squarefree := trivial
   }
   krullDim := n
-  dim_path := Path.ofEq (by omega)
+  dim_path := Path.stepChain (by omega)
 
 /-! ## h-Vector -/
 
@@ -339,31 +339,31 @@ def krullDimChain (n : Nat) (Δ : SimplicialComplex n)
     f = (4, 6, 4), h = (1, 1, 1, 1), sum = 4 = numFacets. -/
 def hVecTetrahedronBoundary :
     Path (1 + 1 + 1 + 1) 4 :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Multi-step: Euler characteristic from f-vector.
     χ = f₀ - f₁ + f₂ = V - E + F, via explicit arithmetic. -/
 def eulerFromFVec (f0 f1 f2 : Nat) (h : f0 + f2 = f1 + 2) :
     Path ((f0 : Int) - f1 + f2) 2 :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Three-step: g-theorem verification for octahedron boundary.
     h = (1, 3, 3, 1), g = (1, 2), which is an M-sequence. -/
 def gTheoremOctahedron :
     Path (1 + 3 + 3 + 1) 8 :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Multi-step: Alexander duality dimension.
     dim(Δ) + dim(Δ∨) + 2 = n, chained with complex dimension. -/
 def alexanderDimChain (n dΔ dΔv : Nat) (h : dΔ + dΔv + 2 = n) :
     Path (dΔ + dΔv + 2) n :=
-  Path.ofEq h
+  Path.stepChain h
 
 /-- Face ring dimension chain: generators → ideal → quotient → dimension. -/
 def faceRingDimChain (n numGen dim : Nat) (h : dim = n - numGen)
     (hle : numGen ≤ n) :
     Path (dim + numGen) n :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 end CombinatorialCommutative
 end Algebra

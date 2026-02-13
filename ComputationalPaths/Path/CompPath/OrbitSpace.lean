@@ -88,7 +88,7 @@ def orbitMap (H : Subgroup G S) : G → OrbitSpace (S := S) H :=
 /-- Path in `G/H` induced by left multiplication by a subgroup element. -/
 def orbitPath (H : Subgroup G S) (h : SubgroupCarrier H) (x : G) :
     Path (orbitMap (S := S) H x) (orbitMap (S := S) H (S.mul h.1 x)) :=
-  Path.ofEq (EquivariantPaths.orbitMap_act (A := subgroupLeftAction (S := S) H) h x)
+  Path.stepChain (EquivariantPaths.orbitMap_act (A := subgroupLeftAction (S := S) H) h x)
 
 /-- Path in `G/H` induced by left multiplication by a member of `H`. -/
 def orbitPath_of_mem (H : Subgroup G S) {h : G} (hh : H.carrier h) (x : G) :

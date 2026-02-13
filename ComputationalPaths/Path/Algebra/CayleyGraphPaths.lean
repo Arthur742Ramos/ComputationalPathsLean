@@ -151,7 +151,7 @@ def WordPathEq (P : GroupPresentation) (w1 w2 : Word P.Gen) : Type u :=
 /-- A relation witness induces a computational path between vertices. -/
 def rel_to_WordPathEq (P : GroupPresentation) {w1 w2 : Word P.Gen}
     (h : P.Rel w1 w2) : WordPathEq P w1 w2 :=
-  Path.ofEq (Quot.sound h)
+  Path.stepChain (Quot.sound h)
 
 /-! ## Word path composition -/
 

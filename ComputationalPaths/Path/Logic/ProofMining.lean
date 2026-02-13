@@ -146,7 +146,7 @@ structure ProofTheoreticBound where
 /-- Path from bound validity to True. -/
 def bound_path (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
     Path (b.property k n : Prop) True :=
-  Path.ofEq (by
+  Path.stepChain (by
     simp only [eq_iff_iff]
     exact ⟨fun _ => trivial, fun _ => b.valid k n hn⟩)
 
@@ -181,7 +181,7 @@ structure MetastabilityWitness where
 /-- Metastability Path. -/
 def metastability_path (w : MetastabilityWitness) :
     Path (w.interval_start = w.interval_start : Prop) True :=
-  Path.ofEq (by simp)
+  Path.stepChain (by simp)
 
 /-! ## Herbrand Analysis -/
 
@@ -195,7 +195,7 @@ structure HerbrandWitness where
 /-- Herbrand as Path to True. -/
 def herbrand_path (h : HerbrandWitness) :
     Path (∃ w, w ∈ h.witnesses ∧ h.property h.challenge w : Prop) True :=
-  Path.ofEq (by
+  Path.stepChain (by
     simp only [eq_iff_iff]
     exact ⟨fun _ => trivial, fun _ => h.valid⟩)
 

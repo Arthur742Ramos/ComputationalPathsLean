@@ -194,7 +194,7 @@ def filler_unique_path (mk : MinimalKanData S) (n : Nat)
     (f1 f2 : HornFiller S n k horn)
     (hk : S.face n k f1.simplex = S.face n k f2.simplex) :
     Path f1.simplex f2.simplex :=
-  Path.ofEq (filler_unique mk n k horn f1 f2 hk)
+  Path.stepChain (filler_unique mk n k horn f1 f2 hk)
 
 end MinimalKanData
 

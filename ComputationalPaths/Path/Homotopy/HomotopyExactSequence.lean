@@ -49,7 +49,7 @@ noncomputable def exact_at_totalSpace {B : Type u} {P : B → Type u} (b : B) (x
           ((longExactSequencePi1 (P := P) b x₀).incl_star α))
         (Quot.mk _ (Path.refl b)) := by
   intro α
-  exact Path.ofEq ((longExactSequencePi1 (P := P) b x₀).exact_at_E α)
+  exact Path.stepChain ((longExactSequencePi1 (P := P) b x₀).exact_at_E α)
 
 /-- Exactness at the base term of the π₁ long exact sequence. -/
 noncomputable def exact_at_base {B : Type u} {P : B → Type u} (b : B) (x₀ : P b) :
@@ -59,7 +59,7 @@ noncomputable def exact_at_base {B : Type u} {P : B → Type u} (b : B) (x₀ : 
           ((longExactSequencePi1 (P := P) b x₀).proj_star β))
         x₀ := by
   intro β
-  exact Path.ofEq ((longExactSequencePi1 (P := P) b x₀).exact_at_B β)
+  exact Path.stepChain ((longExactSequencePi1 (P := P) b x₀).exact_at_B β)
 
 /-! ## Summary
 

@@ -93,7 +93,7 @@ variable {A : Type u} {P : A → Type u}
 /-- Canonical path witnessing that transport along `refl` computes to identity. -/
 def transportReflPath {a : A} (u : P a) :
     Path (Path.transport (A := A) (D := P) (Path.refl a) u) u :=
-  Path.ofEq (A := P a)
+  Path.stepChain (A := P a)
     (a := Path.transport (A := A) (D := P) (Path.refl a) u)
     (b := u)
     (Path.transport_refl (A := A) (D := P) (a := a) (x := u))

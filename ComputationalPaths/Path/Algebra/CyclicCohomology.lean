@@ -78,7 +78,7 @@ def cochainPath_refl {n : Nat} (f : CyclicCochain A n) : CochainPath f f :=
 def cochainPath_ofEq {n : Nat} {f g : CyclicCochain A n} (h : f = g) :
     CochainPath f g := by
   intro x
-  exact Path.ofEq (by simpa using _root_.congrArg (fun k => k x) h)
+  exact Path.stepChain (by simpa using _root_.congrArg (fun k => k x) h)
 
 /-! ## Iteration -/
 
@@ -112,17 +112,17 @@ variable {A : Type u} {Alg : CyclicAlgebra A} (C : CyclicComplex A Alg)
 /-- Path witness of the square-zero law. -/
 def b_sq_zero_path (n : Nat) (f : CyclicCochain A n) :
     Path (C.b (n + 1) (C.b n f)) (cochainZero (Alg := Alg) (n + 2)) :=
-  Path.ofEq (C.b_sq_zero n f)
+  Path.stepChain (C.b_sq_zero n f)
 
 /-- Path witness of the cyclicity order law. -/
 def t_order_path (n : Nat) (f : CyclicCochain A n) :
     Path (iterate (C.t n) (n + 1) f) f :=
-  Path.ofEq (C.t_order n f)
+  Path.stepChain (C.t_order n f)
 
 /-- Path witness of compatibility between t and b. -/
 def t_comm_b_path (n : Nat) (f : CyclicCochain A n) :
     Path (C.t (n + 1) (C.b n f)) (C.b n (C.t n f)) :=
-  Path.ofEq (C.t_comm_b n f)
+  Path.stepChain (C.t_comm_b n f)
 
 end CyclicComplex
 

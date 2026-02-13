@@ -60,7 +60,7 @@ def trivial (X : PointedSet.{u}) : BarComplex.{u} where
   d := fun _ => zeroHom X X
   d_comp_zero := by
     intro n
-    apply Path.ofEq
+    apply Path.stepChain
     apply PointedHom.ext
     rfl
 
@@ -74,12 +74,12 @@ def trivial (X : PointedSet.{u}) : BarResolution X where
   d := fun _ => zeroHom X X
   d_comp_zero := by
     intro n
-    apply Path.ofEq
+    apply Path.stepChain
     apply PointedHom.ext
     rfl
   augmentation := PointedHom.id X
   augmentation_zero := by
-    apply Path.ofEq
+    apply Path.stepChain
     simpa using (PointedHom.id_comp (zeroHom X X))
 
 end BarResolution

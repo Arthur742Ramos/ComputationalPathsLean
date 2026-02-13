@@ -128,9 +128,9 @@ def trivialSimpMappingSpace (A : Type u) : SimpMappingSpace A where
   mapSpace := fun a b => SimpSetData.const (Path a b)
   id_simplex := fun a => Path.refl a
   comp_simplex := fun f g => Path.trans f g
-  id_left := fun f => Path.ofEqChain (Path.trans_refl_left f)
-  id_right := fun f => Path.ofEqChain (Path.trans_refl_right f)
-  assoc := fun f g h => Path.ofEqChain (Path.trans_assoc f g h)
+  id_left := fun f => Path.stepChain (Path.trans_refl_left f)
+  id_right := fun f => Path.stepChain (Path.trans_refl_right f)
+  assoc := fun f g h => Path.stepChain (Path.trans_assoc f g h)
 
 /-! ## Tensoring and cotensoring -/
 
@@ -359,7 +359,7 @@ def trivial_simp_mc_mapping_refl (A : Type u) (a : A) :
     Path ((trivialSimpMappingSpace A).comp_simplex
             (Path.refl a) (Path.refl a))
          (Path.refl a) :=
-  Path.ofEqChain (Path.trans_refl_left (Path.refl a))
+  Path.stepChain (Path.trans_refl_left (Path.refl a))
 
 end SimplicialModelCategories
 end Topology

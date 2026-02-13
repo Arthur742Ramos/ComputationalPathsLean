@@ -173,7 +173,7 @@ def suslin_complementarity_path {X : Type u} {τ : TopologyData X}
   -- want: analytic_pred x = ¬ coanalytic_pred x
   -- i.e. S x = ¬ (¬ S x) = S x  — but that's classical
   -- We use Path.trans through S x
-  Path.ofEq (by
+  Path.stepChain (by
     have h₁ := (sw.analytic_eq x).proof
     have h₂ := (sw.coanalytic_eq x).proof
     rw [h₁, h₂]
@@ -192,7 +192,7 @@ structure PolishSpace (X : Type u) extends TopologyData X where
 def density_path {X : Type u} (P : PolishSpace X)
     (U : X → Prop) (hU : P.isOpen U) (hne : ∃ x, U x) :
     Path (∃ n, U (P.dense_seq n) : Prop) True :=
-  Path.ofEq (by
+  Path.stepChain (by
     simp only [eq_iff_iff]
     exact ⟨fun _ => trivial, fun _ => P.density U hU hne⟩)
 

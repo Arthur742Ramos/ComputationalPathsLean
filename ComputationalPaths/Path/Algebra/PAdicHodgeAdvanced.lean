@@ -88,7 +88,7 @@ def PadicHodgeStep.toPath {R : Type u} {a b : R}
   | .phi_action _ => Path.refl _
   | .gamma_action _ => Path.refl _
   | .sen_operator _ => Path.refl _
-  | .prismatic_comparison _ _ h => Path.ofEq h
+  | .prismatic_comparison _ _ h => Path.stepChain h
 
 /-! ## (φ,Γ)-modules -/
 

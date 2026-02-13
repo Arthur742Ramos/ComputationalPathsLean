@@ -119,7 +119,7 @@ def SSetMap.comp {X Y Z : SSet.{u}} (f : SSetMap X Y) (g : SSetMap Y Z) : SSetMa
   mapLevel := fun n x => g.mapLevel n (f.mapLevel n x)
   map_face := fun i x =>
     Path.trans
-      (Path.ofEq (_root_.congrArg (g.mapLevel _) (f.map_face i x).proof))
+      (Path.stepChain (_root_.congrArg (g.mapLevel _) (f.map_face i x).proof))
       (g.map_face i (f.mapLevel _ x))
 
 /-- A simplicial presheaf on a site. -/

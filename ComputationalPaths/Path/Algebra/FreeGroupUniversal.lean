@@ -39,13 +39,13 @@ abbrev freeGroupUniversal : (α → G) ≃ (_root_.FreeGroup α →* G) :=
 /-- The universal lift agrees with the generator map on `FreeGroup.of`. -/
 def freeGroupUniversal_apply_of (f : α → G) (a : α) :
     Path (freeGroupUniversal (α := α) (G := G) f (_root_.FreeGroup.of a)) (f a) := by
-  exact Path.ofEq (_root_.FreeGroup.lift_apply_of (f := f) (x := a))
+  exact Path.stepChain (_root_.FreeGroup.lift_apply_of (f := f) (x := a))
 
 /-- Uniqueness: a homomorphism out of a free group is determined by its values on generators. -/
 def freeGroupUniversal_unique (f : α → G) (g : _root_.FreeGroup α →* G)
     (hg : ∀ a, Path (g (_root_.FreeGroup.of a)) (f a)) :
     Path g (freeGroupUniversal (α := α) (G := G) f) := by
-  refine Path.ofEq ?_
+  refine Path.stepChain ?_
   ext x
   exact _root_.FreeGroup.lift_unique (f := f) g (fun a => (hg a).toEq)
 
@@ -74,14 +74,14 @@ def piOneFreeGroupLift {ι : Type v} (f : ι → π₁(A, a)) :
 /-- The free-group lift to `π₁(A, a)` agrees with the generator map. -/
 def piOneFreeGroupLift_of {ι : Type v} (f : ι → π₁(A, a)) (i : ι) :
     Path (piOneFreeGroupLift (A := A) (a := a) f (_root_.FreeGroup.of i)) (f i) := by
-  exact Path.ofEq (_root_.FreeGroup.lift_apply_of (f := f) (x := i))
+  exact Path.stepChain (_root_.FreeGroup.lift_apply_of (f := f) (x := i))
 
 /-- Uniqueness of the free-group lift into `π₁(A, a)`. -/
 def piOneFreeGroupLift_unique {ι : Type v} (f : ι → π₁(A, a))
     (g : _root_.FreeGroup ι →* π₁(A, a))
     (hg : ∀ i, Path (g (_root_.FreeGroup.of i)) (f i)) :
     Path g (piOneFreeGroupLift (A := A) (a := a) f) := by
-  refine Path.ofEq ?_
+  refine Path.stepChain ?_
   ext x
   exact _root_.FreeGroup.lift_unique (f := f) g (fun i => (hg i).toEq)
 

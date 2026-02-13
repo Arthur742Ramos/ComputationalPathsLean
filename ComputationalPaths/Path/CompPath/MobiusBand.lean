@@ -106,7 +106,7 @@ structure OrientationReversal (S : Type u) (base : S) where
 /-- The core loop of the Möbius band reverses orientation. -/
 noncomputable def mobiusBandOrientationReversal :
     OrientationReversal MobiusBand.{u} mobiusBandBase where
-  loop := Path.ofEqChain rfl
+  loop := Path.stepChainChain rfl
   reverses := true
 
 /-! ## Boundary Circle -/
@@ -151,7 +151,7 @@ abbrev mobiusBandLoopSpace : Type u := Path (A := MobiusBand.{u}) mobiusBandBase
 
 /-- The core loop of the Möbius band. -/
 noncomputable def mobiusBandCoreLoop : mobiusBandLoopSpace.{u} :=
-  Path.ofEq (circleLoopEq)
+  Path.stepChain (circleLoopEq)
 
 /-- The trivial loop at the base point. -/
 noncomputable def mobiusBandReflLoop : mobiusBandLoopSpace.{u} :=

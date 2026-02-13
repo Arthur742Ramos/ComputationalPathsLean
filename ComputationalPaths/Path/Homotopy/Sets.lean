@@ -39,7 +39,7 @@ def AxiomK (A : Type u) : Prop :=
 
 This is provable because, when `A` has exactly one element, every base rewrite
 step in a loop can be replaced by the unique reflexive step at the basepoint,
-and `Path.ofEq rfl` rewrites to `Path.refl` (see `Homotopy/Reflexivity.lean`). -/
+and `Path.stepChain rfl` rewrites to `Path.refl` (see `Homotopy/Reflexivity.lean`). -/
 theorem axiomK_of_subsingleton (A : Type u) [Subsingleton A] : AxiomK A := by
   intro a p
   have step_eq_refl (s : ComputationalPaths.Step A) :
@@ -69,8 +69,8 @@ theorem axiomK_of_subsingleton (A : Type u) [Subsingleton A] : AxiomK A := by
               step_eq_refl s
             have hpath :
                 Path.mk ([s] : List (ComputationalPaths.Step A)) (rfl : a = a) =
-                  Path.ofEq (A := A) (a := a) (b := a) (rfl : a = a) := by
-              simp [Path.ofEq, hs]
+                  Path.stepChain (A := A) (a := a) (b := a) (rfl : a = a) := by
+              simp [Path.stepChain, hs]
             exact RwEq.trans (rweq_of_eq hpath) (rweq_ofEq_rfl_refl a)
           have htrans :
               RwEq

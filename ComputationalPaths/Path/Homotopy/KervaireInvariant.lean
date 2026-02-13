@@ -52,7 +52,7 @@ theorem kappa_eq_zero (n : Nat) (a : Sphere (2 * n + 1))
 def kappa_path_zero (n : Nat) (a : Sphere (2 * n + 1))
     (α : HigherHomotopyGroups.PiN (4 * n + 2) (Sphere (2 * n + 1)) a) :
     Path (kappa n a α) 0 :=
-  Path.ofEq (kappa_eq_zero n a α)
+  Path.stepChain (kappa_eq_zero n a α)
 
 /-! ## Theta elements -/
 

@@ -110,7 +110,7 @@ end MutationPathData
 def trivialSeedPathData : SeedPathData PUnit PUnit where
   exchangeMatrix := fun _ _ => 0
   vars := fun _ => PUnit.unit
-  skewPath := fun _ _ => Path.ofEq (by simp)
+  skewPath := fun _ _ => Path.stepChain (by simp)
 
 /-- Trivial mutation package over the trivial seed. -/
 def trivialMutationPathData : MutationPathData trivialSeedPathData where

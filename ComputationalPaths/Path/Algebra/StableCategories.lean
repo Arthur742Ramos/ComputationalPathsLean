@@ -66,8 +66,8 @@ structure StableSuspension (C : PreAdditiveCategory.{u}) where
 def StableSuspension.ofShift (C : PreAdditiveCategory.{u})
     (T : ShiftFunctor C) : StableSuspension C where
   shift := T
-  shift_id_path := fun X => Path.ofEq (T.shift_id X)
-  shift_comp_path := fun f g => Path.ofEq (T.shift_comp f g)
+  shift_id_path := fun X => Path.stepChain (T.shift_id X)
+  shift_comp_path := fun f g => Path.stepChain (T.shift_comp f g)
 
 /-! ## Desuspension -/
 
@@ -100,8 +100,8 @@ def ExactTrianglePath.ofExact {C : PreAdditiveCategory.{u}}
     {T : ShiftFunctor C} (Tr : Triangle C T)
     (ex : ExactTriangle Tr) : ExactTrianglePath C T where
   tri := Tr
-  gf_zero_path := Path.ofEq ex.gf_zero
-  hg_zero_path := Path.ofEq ex.hg_zero
+  gf_zero_path := Path.stepChain ex.gf_zero
+  hg_zero_path := Path.stepChain ex.hg_zero
 
 /-! ## Octahedral axiom as Path -/
 

@@ -147,15 +147,15 @@ structure DoldKanPath where
     Path ((equiv.Γ (equiv.N S)).carrier n) (S.carrier n)
 
 /-- Build a DoldKanPath from DoldKanEquivalenceData. -/
-def DoldKanPath.ofEquiv (dk : DoldKanEquivalenceData.{u}) :
+def DoldKanPath.stepChainuiv (dk : DoldKanEquivalenceData.{u}) :
     DoldKanPath.{u} where
   equiv := dk
-  NΓ_path := fun C n => Path.ofEq (dk.NΓ_carrier C n)
-  ΓN_path := fun S n => Path.ofEq (dk.ΓN_carrier S n)
+  NΓ_path := fun C n => Path.stepChain (dk.NΓ_carrier C n)
+  ΓN_path := fun S n => Path.stepChain (dk.ΓN_carrier S n)
 
 /-- The trivial Dold-Kan Path equivalence. -/
 def trivialDoldKanPath : DoldKanPath.{u} :=
-  DoldKanPath.ofEquiv trivialDoldKan
+  DoldKanPath.stepChainuiv trivialDoldKan
 
 /-! ## Simplicial model structure -/
 

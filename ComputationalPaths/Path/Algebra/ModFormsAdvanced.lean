@@ -78,7 +78,7 @@ def ModFormAdvStep.toPath {R : Type u} {a b : R}
   match s with
   | .hecke_mult _ _ => Path.refl _
   | .atkin_lehner _ => Path.refl _
-  | .q_expand _ _ h => Path.ofEq h
+  | .q_expand _ _ h => Path.stepChain h
   | .rankin_selberg _ => Path.refl _
 
 /-! ## Modular form basics -/

@@ -47,14 +47,14 @@ abbrev stageCells (A : Type u) (n k : Nat) : Type u :=
 /-- If `k ≤ n`, the `k`-cells in stage `n` agree with the full tower. -/
 def stageCells_eq_of_le {A : Type u} {n k : Nat} (h : k ≤ n) :
     Path (stageCells A n k) (cellType A k) := by
-  refine Path.ofEq ?_
+  refine Path.stepChain ?_
   simp [stageCells, nTruncation, compPathTruncation, truncCell, h]
 
 /-- Tower convergence: once `k` is below the stage, all later stages agree on `k`-cells. -/
 def tower_converges {A : Type u} {k n m : Nat} (hkn : k ≤ n) (hnm : n ≤ m) :
     Path (stageCells A n k) (stageCells A m k) := by
   have hkm : k ≤ m := Nat.le_trans hkn hnm
-  refine Path.ofEq ?_
+  refine Path.stepChain ?_
   simp [stageCells, nTruncation, compPathTruncation, truncCell, hkn, hkm]
 
 /-! ## Killing homotopy groups -/
@@ -63,7 +63,7 @@ def tower_converges {A : Type u} {k n m : Nat} (hkn : k ≤ n) (hnm : n ≤ m) :
 def stageCells_eq_punit_of_lt {A : Type u} {n k : Nat} (h : n < k) :
     Path (stageCells A n k) PUnit := by
   have hk : ¬ k ≤ n := Nat.not_le_of_gt h
-  refine Path.ofEq ?_
+  refine Path.stepChain ?_
   simp [stageCells, nTruncation, compPathTruncation, truncCell, hk]
 
 /-- Each stage kills the next homotopy group: `(n+1)`-cells are `PUnit`. -/

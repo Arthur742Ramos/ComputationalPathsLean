@@ -57,12 +57,12 @@ structure GroupData (G : Type u) where
 /-- Path-valued left identity. -/
 def GroupData.one_mul_path {G : Type u} (D : GroupData G) (x : G) :
     Path (D.mul D.one x) x :=
-  Path.ofEq (D.one_mul x)
+  Path.stepChain (D.one_mul x)
 
 /-- Path-valued associativity. -/
 def GroupData.mul_assoc_path {G : Type u} (D : GroupData G) (x y z : G) :
     Path (D.mul (D.mul x y) z) (D.mul x (D.mul y z)) :=
-  Path.ofEq (D.mul_assoc x y z)
+  Path.stepChain (D.mul_assoc x y z)
 
 /-! ## Central Extensions -/
 
@@ -117,7 +117,7 @@ def TwoCocycle.trivial (G : Type u) (A : Type v) (gd : GroupData G)
   normalized_left := fun _ => Path.refl _
   normalized_right := fun _ => Path.refl _
   cocycle_cond := fun _ _ _ => by
-    apply Path.ofEq
+    apply Path.stepChain
     simp [ad.one_mul, ad.mul_one]
 
 /-! ## 2-Coboundaries -/

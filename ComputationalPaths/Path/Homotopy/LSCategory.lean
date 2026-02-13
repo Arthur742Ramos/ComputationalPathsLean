@@ -84,7 +84,7 @@ variable {X : Type u} {n : Nat}
 /-- Path witness for the covering equation. -/
 def cover_path (C : LSCover X n) (x : X) :
     Path ((C.sets (C.cover x).1).incl (C.cover x).2) x :=
-  Path.ofEq (C.cover_eq x)
+  Path.stepChain (C.cover_eq x)
 
 end LSCover
 
@@ -175,7 +175,7 @@ variable {X : Type u} {n : Nat}
 /-- Path witness for the section equation. -/
 def section_path (g : GaneaFibration X n) (x : X) :
     Path (g.proj (g.sectionMap x)) x :=
-  Path.ofEq (g.sectionMap_eq x)
+  Path.stepChain (g.sectionMap_eq x)
 
 end GaneaFibration
 

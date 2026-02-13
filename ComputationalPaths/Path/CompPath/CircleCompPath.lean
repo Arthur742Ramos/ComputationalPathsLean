@@ -223,7 +223,7 @@ noncomputable def circleLoopEq : circleBase = circleBase :=
 
 /-- Alias for the fundamental loop path. -/
 @[simp] noncomputable def circleLoop : Path circleBase circleBase :=
-  Path.ofEqChain circleLoopEq
+  Path.stepChainChain circleLoopEq
 
 /-- Alias for the loop z-power at the path level. -/
 @[simp] noncomputable def circleLoopPathZPow : Int → Path circleBase circleBase := by

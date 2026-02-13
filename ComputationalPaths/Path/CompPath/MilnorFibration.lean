@@ -114,12 +114,12 @@ def inv (m : MilnorMonodromy mf) : MilnorFiber mf → MilnorFiber mf :=
 /-- Path witness for the left inverse law of monodromy. -/
 def leftInvPath (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
     Path (m.inv (m.map x)) x :=
-  Path.ofEq (m.action.left_inv x)
+  Path.stepChain (m.action.left_inv x)
 
 /-- Path witness for the right inverse law of monodromy. -/
 def rightInvPath (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
     Path (m.map (m.inv x)) x :=
-  Path.ofEq (m.action.right_inv x)
+  Path.stepChain (m.action.right_inv x)
 
 end MilnorMonodromy
 

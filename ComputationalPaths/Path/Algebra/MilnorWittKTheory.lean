@@ -118,12 +118,12 @@ theorem monomialDegree_eta {k : Type u} :
 /-- Path witnessing that a symbol has degree 1. -/
 def symbol_degree_path {k : Type u} (u : k) :
     Path (monomialDegree [MWGenerator.symbol u]) 1 :=
-  Path.ofEq (monomialDegree_symbol u)
+  Path.stepChain (monomialDegree_symbol u)
 
 /-- Path witnessing that η has degree -1. -/
 def eta_degree_path (k : Type u) :
     Path (monomialDegree [MWGenerator.eta (k := k)]) (-1) :=
-  Path.ofEq monomialDegree_eta
+  Path.stepChain monomialDegree_eta
 
 /-! ## Milnor-Witt K-Group -/
 
@@ -365,7 +365,7 @@ def steinberg_neg_diag_composite (k : Type u) (F : MWField k) (n : Int)
     (K : KMWGroup k F n) (u : k)
     (h : F.oneMinus u = F.negUnit u) :
     Path (K.symbolMap [u, F.oneMinus u]) (K.symbolMap [u, F.negUnit u]) :=
-  Path.ofEq (by rw [h])
+  Path.stepChain (by rw [h])
 
 /-- Composite Path: [u, 1-u] = 0 = [u, -u] via trans when 1-u = -u. -/
 def steinberg_via_neg (k : Type u) (F : MWField k) (n : Int)

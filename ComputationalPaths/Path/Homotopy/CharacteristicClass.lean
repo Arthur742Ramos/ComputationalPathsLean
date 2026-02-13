@@ -127,7 +127,7 @@ theorem universal_roundtrip (ub : UniversalBundleData G) (b : ub.BG)
 def universal_roundtrip_path (ub : UniversalBundleData G) (b : ub.BG)
     (x : Fibration.Fiber ub.proj b) :
     Path ((ub.fiberEquiv b).invFun ((ub.fiberEquiv b).toFun x)) x :=
-  Path.ofEq (universal_roundtrip ub b x)
+  Path.stepChain (universal_roundtrip ub b x)
 
 end UniversalBundleData
 
@@ -232,7 +232,7 @@ variable {𝔤 R : Type u}
 /-- `Path`-typed cwMap_const. -/
 def cwMap_const_path (cw : ChernWeilData 𝔤 R) (r : R) :
     Path (cw.cwMap (InvariantPolynomial.const r)) r :=
-  Path.ofEq (cw.cwMap_const r)
+  Path.stepChain (cw.cwMap_const r)
 
 end ChernWeilData
 

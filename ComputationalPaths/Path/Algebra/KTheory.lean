@@ -34,7 +34,7 @@ open HomologicalAlgebra
 universe u
 
 private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
-  Path.ofEqChain h
+  Path.stepChainChain h
 
 /-! ## Formal pairs and stabilization -/
 

@@ -111,8 +111,8 @@ def StableShiftData.ofShift (C : PreAdditiveCategory.{u})
     (unshift_shift : ∀ X : C.Obj, Path (unshift (T.shiftObj X)) X) :
     StableShiftData C where
   shift := T
-  shift_id_path := fun X => Path.ofEq (T.shift_id X)
-  shift_comp_path := fun f g => Path.ofEq (T.shift_comp f g)
+  shift_id_path := fun X => Path.stepChain (T.shift_id X)
+  shift_comp_path := fun f g => Path.stepChain (T.shift_comp f g)
   unshift := unshift
   shift_unshift := shift_unshift
   unshift_shift := unshift_shift
@@ -147,8 +147,8 @@ def ExactTriangleData.ofZeroComposites
   triangle := T
   exact_at_Y := hgf
   exact_at_Z := hhg
-  gf_zero_path := Path.ofEq hgf
-  hg_zero_path := Path.ofEq hhg
+  gf_zero_path := Path.stepChain hgf
+  hg_zero_path := Path.stepChain hhg
 
 /-! ## Rotation of exact triangles -/
 

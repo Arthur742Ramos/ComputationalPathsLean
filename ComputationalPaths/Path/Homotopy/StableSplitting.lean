@@ -98,8 +98,8 @@ structure PtdEquiv (X Y : PtdType.{u}) where
 def PtdEquiv.refl (X : PtdType.{u}) : PtdEquiv X X where
   toMap := PtdMap.id X
   invMap := PtdMap.id X
-  left_inv := Path.ofEq (PtdMap.id_comp (PtdMap.id X))
-  right_inv := Path.ofEq (PtdMap.comp_id (PtdMap.id X))
+  left_inv := Path.stepChain (PtdMap.id_comp (PtdMap.id X))
+  right_inv := Path.stepChain (PtdMap.comp_id (PtdMap.id X))
 
 /-! ## Stable splitting data -/
 

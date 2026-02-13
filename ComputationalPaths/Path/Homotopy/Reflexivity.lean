@@ -16,9 +16,9 @@ In our Lean implementation, this corresponds to:
 - Every path `p : Path a a` with `p.toEq = rfl` is `RwEq` to `Path.refl a`
 
 This follows from:
-1. `Step.canon`: Any path p steps to `Path.ofEq p.toEq`
-2. `rweq_canon`: `RwEq p (Path.ofEq p.toEq)`
-3. When `p.toEq = rfl`: `RwEq (Path.ofEq rfl) (Path.refl a)` via `rweq_canon.symm`
+1. `Step.canon`: Any path p steps to `Path.stepChain p.toEq`
+2. `rweq_canon`: `RwEq p (Path.stepChain p.toEq)`
+3. When `p.toEq = rfl`: `RwEq (Path.stepChain rfl) (Path.refl a)` via `rweq_canon.symm`
 
 ## Definitional Rules
 
@@ -37,7 +37,7 @@ namespace ComputationalPaths.Path
 
 universe u
 
-/-- `Path.ofEq rfl` rewrites to `Path.refl`.
+/-- `Path.stepChain rfl` rewrites to `Path.refl`.
 
 These two paths represent the same identity operation:
 - `refl a` has an empty step list `[]`
@@ -47,7 +47,7 @@ We can relate them via the primitive rewrite rule `Step.transport_refl_beta`,
 instantiated with a constant family. This avoids the unsound global
 canonicalization rule (`Step.canon`). -/
 theorem rweq_ofEq_rfl_refl {A : Type u} (a : A) :
-    RwEq (Path.ofEq (rfl : a = a)) (Path.refl a) := by
+    RwEq (Path.stepChain (rfl : a = a)) (Path.refl a) := by
   -- `transport (refl ⋆) a = a` is definitional for the constant family `fun _ => A`.
   simpa using
     (RwEq.step <|

@@ -435,7 +435,7 @@ def higher_cw_both_additive (M : DiffCrossedModule2)
                          (HCW.cwMapH (HCW.sourceH.add R S)))
          (HCW.targetAdd (HCW.targetAdd (HCW.cwMapG P) (HCW.cwMapG Q))
                          (HCW.targetAdd (HCW.cwMapH R) (HCW.cwMapH S))) :=
-  Path.ofEq (by rw [(HCW.pres_add_G P Q).proof, (HCW.pres_add_H R S).proof])
+  Path.stepChain (by rw [(HCW.pres_add_G P Q).proof, (HCW.pres_add_H R S).proof])
 
 /-- ½p₁ doubles to p₁. -/
 def halfP1_double (P : PontryaginClasses) (hp : HalfP1 P) :

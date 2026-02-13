@@ -75,9 +75,9 @@ def AdicStep.toPath {R : Type u} {a b : R}
     (s : AdicStep R a b) : Path a b :=
   match s with
   | .valuation_bound _ => Path.refl _
-  | .rational_loc _ _ h => Path.ofEq h
+  | .rational_loc _ _ h => Path.stepChain h
   | .completion _ => Path.refl _
-  | .restriction _ _ h => Path.ofEq h
+  | .restriction _ _ h => Path.stepChain h
   | .topology _ => Path.refl _
 
 /-! ## Huber Rings -/

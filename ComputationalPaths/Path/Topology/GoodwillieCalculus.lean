@@ -329,7 +329,7 @@ def goodwillieStepPath {C D : PointedCat.{u}}
     {a b : D.Hom (F.mapObj X) (F.mapObj X)} :
     GoodwillieStep a b → Path a b
   | GoodwillieStep.approx_retract tc => tc.left_inv
-  | GoodwillieStep.functor_id X => Path.ofEq (F.map_id X)
+  | GoodwillieStep.functor_id X => Path.stepChain (F.map_id X)
 
 /-- Compose two GoodwillieSteps. -/
 def goodwillie_steps_compose {C D : PointedCat.{u}}
@@ -359,9 +359,9 @@ def convergence_ss_rweq {C D : PointedCat.{u}}
 /-- RwEq: functor identity path is self-consistent. -/
 def functor_id_rweq {C D : PointedCat.{u}}
     (F : HoFunctor C D) (X : C.Obj) :
-    RwEq (Path.trans (Path.ofEq (F.map_id X)) (Path.symm (Path.ofEq (F.map_id X))))
+    RwEq (Path.trans (Path.stepChain (F.map_id X)) (Path.symm (Path.stepChain (F.map_id X))))
          (Path.refl (F.mapHom (C.id X))) :=
-  rweq_cmpA_inv_right (Path.ofEq (F.map_id X))
+  rweq_cmpA_inv_right (Path.stepChain (F.map_id X))
 
 /-- Multi-step: Taylor tower transition compatibility. -/
 def taylor_transition_path (C D : PointedCat.{u})

@@ -67,7 +67,7 @@ theorem dist_comm_eq (x y : X) : M.dist x y = M.dist y x :=
 /-- The Gromov product is symmetric. -/
 def gromovProduct_comm (e x y : X) :
     Path (M.gromovProduct e x y) (M.gromovProduct e y x) := by
-  apply Path.ofEq
+  apply Path.stepChain
   simp [gromovProduct, dist_comm_eq (M:=M) x y,
     Nat.add_comm (M.dist e x) (M.dist e y)]
 

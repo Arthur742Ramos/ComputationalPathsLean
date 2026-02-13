@@ -63,7 +63,7 @@ def trivial : InjectiveObject unitPointed where
   lift := by
     intro A B f mono g
     refine ⟨zeroHom B unitPointed, ?_⟩
-    apply Path.ofEq
+    apply Path.stepChain
     apply PointedHom.ext
     funext x
     cases g.toFun x

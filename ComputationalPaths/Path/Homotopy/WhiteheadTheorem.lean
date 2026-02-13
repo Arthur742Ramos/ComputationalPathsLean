@@ -68,13 +68,13 @@ theorem piOneInduced_ofLoop (f : A → B) (a₀ : A) (l : LoopSpace A a₀) :
 def simpleEquiv_left_path {α : Type u} {β : Type v}
     (e : SimpleEquiv α β) (x : α) :
     Path (e.invFun (e.toFun x)) x :=
-  Path.ofEq (e.left_inv x)
+  Path.stepChain (e.left_inv x)
 
 /-- `Path` witness for the right inverse of a `SimpleEquiv`. -/
 def simpleEquiv_right_path {α : Type u} {β : Type v}
     (e : SimpleEquiv α β) (y : β) :
     Path (e.toFun (e.invFun y)) y :=
-  Path.ofEq (e.right_inv y)
+  Path.stepChain (e.right_inv y)
 
 /-! ## Weak equivalence data -/
 

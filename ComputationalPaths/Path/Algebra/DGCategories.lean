@@ -124,7 +124,7 @@ def DGFunctor.map_diff_path {C D : DGCategory.{u}} (F : DGFunctor C D)
     {X Y : C.Obj} (n : Int) (f : (C.Hom X Y).component n) :
     Path (F.mapHom (n + 1) (C.diff n f))
          (D.diff n (F.mapHom n f)) :=
-  Path.ofEq (F.map_diff n f)
+  Path.stepChain (F.map_diff n f)
 
 /-- Identity DG functor. -/
 def DGFunctor.id (C : DGCategory.{u}) : DGFunctor C C where

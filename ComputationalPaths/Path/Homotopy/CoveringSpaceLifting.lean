@@ -47,7 +47,7 @@ theorem proj_pathLift_trans {P : A → Type u} {a b c : A}
     Path.congrArg proj
         (Path.trans (pathLift (P := P) p x)
           (pathLift (P := P) q (fiberTransport p x))) =
-      Path.trans (Path.ofEq p.toEq) (Path.ofEq q.toEq) := by
+      Path.trans (Path.stepChain p.toEq) (Path.stepChain q.toEq) := by
   calc
     Path.congrArg proj
         (Path.trans (pathLift (P := P) p x)
@@ -56,19 +56,19 @@ theorem proj_pathLift_trans {P : A → Type u} {a b c : A}
           (Path.congrArg proj (pathLift (P := P) p x))
           (Path.congrArg proj (pathLift (P := P) q (fiberTransport p x))) := by
           simp
-    _ = Path.trans (Path.ofEq p.toEq) (Path.ofEq q.toEq) := by
+    _ = Path.trans (Path.stepChain p.toEq) (Path.stepChain q.toEq) := by
           rw [proj_pathLift_ofEq, proj_pathLift_ofEq]
 
 /-- The projection of a reversed lifted path is the reversed projection. -/
 theorem proj_pathLift_symm {P : A → Type u} {a b : A}
     (p : Path a b) (x : P a) :
     Path.congrArg proj (Path.symm (pathLift (P := P) p x)) =
-      Path.symm (Path.ofEq p.toEq) := by
+      Path.symm (Path.stepChain p.toEq) := by
   calc
     Path.congrArg proj (Path.symm (pathLift (P := P) p x)) =
         Path.symm (Path.congrArg proj (pathLift (P := P) p x)) := by
           simp
-    _ = Path.symm (Path.ofEq p.toEq) := by
+    _ = Path.symm (Path.stepChain p.toEq) := by
           rw [proj_pathLift_ofEq]
 
 /-! ## Transport along Quotient Paths -/

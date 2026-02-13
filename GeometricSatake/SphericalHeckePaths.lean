@@ -41,20 +41,20 @@ def supportRadius (X : HeckeObject) : Nat :=
 
 /-- Left unit path for spherical convolution. -/
 def leftUnitPath (X : HeckeObject) : Path (convolution unitObj X) X := by
-  refine Path.ofEqChain ?_
+  refine Path.stepChain ?_
   cases X
   simp [unitObj, convolution]
 
 /-- Right unit path for spherical convolution. -/
 def rightUnitPath (X : HeckeObject) : Path (convolution X unitObj) X := by
-  refine Path.ofEqChain ?_
+  refine Path.stepChain ?_
   cases X
   simp [unitObj, convolution]
 
 /-- Associativity path for spherical convolution. -/
 def assocPath (X Y Z : HeckeObject) :
     Path (convolution (convolution X Y) Z) (convolution X (convolution Y Z)) := by
-  refine Path.ofEqChain ?_
+  refine Path.stepChain ?_
   cases X
   cases Y
   cases Z
@@ -71,7 +71,7 @@ def fusionNormalizePath (X Y : HeckeObject) :
 def supportRadiusConvolutionPath (X Y : HeckeObject) :
     Path (supportRadius (convolution X Y))
       ((X.dominantCoweight + Y.dominantCoweight) + (X.multiplicity * Y.multiplicity)) :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Domain-specific rewrite relation for spherical Hecke coherence. -/
 inductive SphericalHeckeRewrite : HeckeObject → HeckeObject → Type

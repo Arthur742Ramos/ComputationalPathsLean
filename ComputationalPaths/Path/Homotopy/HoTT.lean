@@ -134,7 +134,7 @@ variable {P : A → Type v} {x y : A}
 
 /-- Transport phrased with propositional equality, implemented via path transport. -/
 def transportEq (p : x = y) (u : P x) : P y :=
-  transport (A := A) (P := P) (Path.ofEq p) u
+  transport (A := A) (P := P) (Path.stepChain p) u
 
 @[simp] theorem transportEq_refl (u : P x) :
     transportEq (P := P) (p := rfl) (u := u) = u :=
@@ -152,9 +152,9 @@ def transportEq (p : x = y) (u : P x) : P y :=
       transportEq (P := P) (p := p.toEq) (u := u) := by
   have :
       transport (A := A) (P := P) p u =
-        transport (A := A) (P := P) (Path.ofEq p.toEq) u :=
+        transport (A := A) (P := P) (Path.stepChain p.toEq) u :=
     Path.transport_of_toEq_eq (A := A) (D := P)
-      (p := p) (q := Path.ofEq (A := A) (a := x) (b := y) p.toEq)
+      (p := p) (q := Path.stepChain (A := A) (a := x) (b := y) p.toEq)
       (h := rfl) (x := u)
   simpa [transportEq] using this
 

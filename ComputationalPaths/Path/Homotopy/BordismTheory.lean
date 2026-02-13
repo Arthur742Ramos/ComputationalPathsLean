@@ -151,7 +151,7 @@ def bordismClassDisjointUnion {n : Nat}
 /-- Path witness: disjoint union preserves dimension. -/
 def disjointUnion_dim_path {n : Nat} (c₁ c₂ : BordismClass.{u} n) :
     Path (bordismClassDisjointUnion c₁ c₂).representative.dim n :=
-  Path.ofEq c₁.dim_eq
+  Path.stepChain c₁.dim_eq
 
 /-- Disjoint union is commutative up to bordism. -/
 theorem disjointUnion_comm {n : Nat} (c₁ c₂ : BordismClass.{u} n) :
@@ -262,7 +262,7 @@ def product_dim_path {m n : Nat}
     Path
       (bordismClassProduct c₁ c₂).representative.dim
       (m + n) :=
-  Path.ofEq (bordismClassProduct c₁ c₂).dim_eq
+  Path.stepChain (bordismClassProduct c₁ c₂).dim_eq
 
 /-- Product with the point is identity up to dimension. -/
 def bordismClassPoint : BordismClass.{u} 0 where
@@ -299,7 +299,7 @@ def dimensionInvariant (n : Nat) : BordismInvariant.{u} n (R := Nat) where
 /-- Path witness: dimension invariant is constant on classes. -/
 def dimension_constant_path {n : Nat} (c : BordismClass.{u} n) :
     Path ((dimensionInvariant.{u} n).val c) n :=
-  Path.ofEq c.dim_eq
+  Path.stepChain c.dim_eq
 
 /-! ## Euler Characteristic as Invariant -/
 

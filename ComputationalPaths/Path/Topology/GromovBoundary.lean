@@ -115,7 +115,7 @@ theorem equiv_boundary_eq {X : Type u} {M : MetricData X} {basepoint : X}
 def equiv_boundary_path {X : Type u} {M : MetricData X} {basepoint : X}
     {r₁ r₂ : GeodesicRay M basepoint} (h : RayEquiv M basepoint r₁ r₂) :
     Path (toBoundaryClass r₁) (toBoundaryClass r₂) :=
-  Path.ofEq (equiv_boundary_eq h)
+  Path.stepChain (equiv_boundary_eq h)
 
 /-- Path composition turns boundary equivalence into a loop. -/
 def boundary_class_loop {X : Type u} {M : MetricData X} {basepoint : X}

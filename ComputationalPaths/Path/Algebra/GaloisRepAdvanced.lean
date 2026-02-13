@@ -98,7 +98,7 @@ def GaloisRepAdvStep.toPath {V : Type u} {a b : V}
   match s with
   | .modularity _ => Path.refl _
   | .deformation _ => Path.refl _
-  | .selmer _ _ h => Path.ofEq h
+  | .selmer _ _ h => Path.stepChain h
   | .taylor_wiles _ => Path.refl _
 
 /-! ## Galois representation data -/
@@ -174,7 +174,7 @@ variable {K : Type u}
 /-- Multi-step: dimension is 2 (from residual). -/
 def dim_is_two (M : ModularityLiftingData K) (h : M.residual.module.dimension = 2) :
     Path M.lift.module.dimension 2 :=
-  Path.trans M.dim_compat (Path.ofEq h)
+  Path.trans M.dim_compat (Path.stepChain h)
 
 end ModularityLiftingData
 

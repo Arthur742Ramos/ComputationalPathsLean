@@ -87,7 +87,7 @@ theorem face_const (x : X) (n : Nat) (i : Fin (n + 2)) :
 /-- `Path`-typed face of constant. -/
 def face_const_path (x : X) (n : Nat) (i : Fin (n + 2)) :
     Path (face i (const x (n + 1))) (const x n) :=
-  Path.ofEq (face_const x n i)
+  Path.stepChain (face_const x n i)
 
 /-- Degeneracy of a constant simplex is constant. -/
 theorem degen_const (x : X) (n : Nat) (i : Fin (n + 1)) :
@@ -98,7 +98,7 @@ theorem degen_const (x : X) (n : Nat) (i : Fin (n + 1)) :
 /-- `Path`-typed degeneracy of constant. -/
 def degen_const_path (x : X) (n : Nat) (i : Fin (n + 1)) :
     Path (degen i (const x n)) (const x (n + 1)) :=
-  Path.ofEq (degen_const x n i)
+  Path.stepChain (degen_const x n i)
 
 end SingularSimplex
 
@@ -149,7 +149,7 @@ def face_face_path {X : Type u} {n : Nat}
             (SingularSimplex.face ⟨j + 1, by omega⟩ σ))
          (SingularSimplex.face ⟨j, by omega⟩
             (SingularSimplex.face ⟨i, by omega⟩ σ)) :=
-  Path.ofEq (face_face_identity σ i j hi hj hij)
+  Path.stepChain (face_face_identity σ i j hi hj hij)
 
 /-- ∂² = 0 structure: the signed face maps cancel pairwise. -/
 structure BoundarySquareZero (X : Type u) where
@@ -191,7 +191,7 @@ def singularMap_face_path {X Y : Type u} (f : X → Y) (n : Nat)
     (i : Fin (n + 2)) (σ : SingularSimplex X (n + 1)) :
     Path (singularMap f n (SingularSimplex.face i σ))
          (SingularSimplex.face i (singularMap f (n + 1) σ)) :=
-  Path.ofEq (singularMap_face f n i σ)
+  Path.stepChain (singularMap_face f n i σ)
 
 /-- The singular map preserves degeneracy maps. -/
 theorem singularMap_degen {X Y : Type u} (f : X → Y) (n : Nat)
@@ -211,7 +211,7 @@ theorem singularMap_id {X : Type u} (n : Nat) (σ : SingularSimplex X n) :
 /-- `Path`-typed identity. -/
 def singularMap_id_path {X : Type u} (n : Nat) (σ : SingularSimplex X n) :
     Path (singularMap id n σ) σ :=
-  Path.ofEq (singularMap_id n σ)
+  Path.stepChain (singularMap_id n σ)
 
 /-- Composition of maps induces composition on singular simplices. -/
 theorem singularMap_comp {X Y Z : Type u} (f : X → Y) (g : Y → Z)
@@ -224,7 +224,7 @@ theorem singularMap_comp {X Y Z : Type u} (f : X → Y) (g : Y → Z)
 def singularMap_comp_path {X Y Z : Type u} (f : X → Y) (g : Y → Z)
     (n : Nat) (σ : SingularSimplex X n) :
     Path (singularMap g n (singularMap f n σ)) (singularMap (g ∘ f) n σ) :=
-  Path.ofEq (singularMap_comp f g n σ)
+  Path.stepChain (singularMap_comp f g n σ)
 
 /-! ## Summary
 

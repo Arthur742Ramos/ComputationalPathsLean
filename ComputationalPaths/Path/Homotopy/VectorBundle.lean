@@ -117,11 +117,11 @@ theorem smul_zero_vec (a : K) : vs.add (vs.smul a vs.zero) vs.zero = vs.smul a v
 
 /-- `Path`-typed zero_add. -/
 def zero_add_path (v : V) : Path (vs.add vs.zero v) v :=
-  Path.ofEq (vs.zero_add v)
+  Path.stepChain (vs.zero_add v)
 
 /-- `Path`-typed one_smul. -/
 def one_smul_path (v : V) : Path (vs.smul vs.scalars.one v) v :=
-  Path.ofEq (vs.one_smul v)
+  Path.stepChain (vs.one_smul v)
 
 end VectorSpace
 
@@ -166,12 +166,12 @@ def id (vs : VectorSpace K V) : LinearIso vs vs where
 /-- `Path`-typed left inverse. -/
 def left_inv_path (iso : LinearIso vs ws) (v : V) :
     Path (iso.bwd.toFun (iso.fwd.toFun v)) v :=
-  Path.ofEq (iso.left_inv v)
+  Path.stepChain (iso.left_inv v)
 
 /-- `Path`-typed right inverse. -/
 def right_inv_path (iso : LinearIso vs ws) (w : W) :
     Path (iso.fwd.toFun (iso.bwd.toFun w)) w :=
-  Path.ofEq (iso.right_inv w)
+  Path.stepChain (iso.right_inv w)
 
 end LinearIso
 
@@ -232,7 +232,7 @@ variable {B E : Type u} {proj : E → B}
 /-- `Path`-typed section property. -/
 def section_proj_path (s : BundleSection proj) (b : B) :
     Path (proj (s.toFun b)) b :=
-  Path.ofEq (s.section_proj b)
+  Path.stepChain (s.section_proj b)
 
 end BundleSection
 
@@ -248,7 +248,7 @@ def zeroSection {K B E V : Type u}
 def zeroSection_proj_path {K B E V : Type u}
     (vb : VectorBundleData K B E V) (b : B) :
     Path (vb.bundle.proj ((zeroSection vb).toFun b)) b :=
-  Path.ofEq ((zeroSection vb).section_proj b)
+  Path.stepChain ((zeroSection vb).section_proj b)
 
 /-! ## Direct Sum Bundle
 
@@ -317,7 +317,7 @@ theorem proj_fst (ds : DirectSumBundle K B V W) (b : B) (v : V) (w : W) :
 /-- `Path`-typed projection. -/
 def proj_fst_path (ds : DirectSumBundle K B V W) (b : B) (v : V) (w : W) :
     Path (ds.proj (b, v, w)) b :=
-  Path.ofEq (ds.proj_fst b v w)
+  Path.stepChain (ds.proj_fst b v w)
 
 end DirectSumBundle
 

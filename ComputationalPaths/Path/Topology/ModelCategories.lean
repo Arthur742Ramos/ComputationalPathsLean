@@ -234,7 +234,7 @@ def trivialFunctorialFact (A : Type u) : FunctorialFactSystem A where
   mid := fun {_ b} _ => b
   leftFact := fun p => p
   rightFact := fun {_ b} _ => Path.refl b
-  factor_path := fun p => Path.ofEqChain (Path.trans_refl_right p)
+  factor_path := fun p => Path.stepChain (Path.trans_refl_right p)
   left_natural := fun _ _ => trivial
 
 /-! ## Model category data -/
@@ -390,8 +390,8 @@ def trivialHFC (A : Type u) (M : ModelCatData A) : HomotopyFunctionComplex A M w
   hom := fun a b => Path a b
   comp_map := fun f g => Path.trans f g
   id_elem := fun a => Path.refl a
-  id_left := fun f => Path.ofEqChain (Path.trans_refl_left f)
-  id_right := fun f => Path.ofEqChain (Path.trans_refl_right f)
+  id_left := fun f => Path.stepChain (Path.trans_refl_left f)
+  id_right := fun f => Path.stepChain (Path.trans_refl_right f)
 
 /-! ## Coherence theorems -/
 

@@ -70,20 +70,20 @@ structure HopfFibrationData where
 /-- `Path` witnessing the base-projection condition. -/
 def hopfBaseProj_path (data : HopfFibrationData) :
     ComputationalPaths.Path (data.proj data.baseTotal) data.base :=
-  ComputationalPaths.Path.ofEq data.base_proj
+  ComputationalPaths.Path.stepChain data.base_proj
 
 /-- `Path` witnessing that the fiber equivalence round-trip is the identity. -/
 def hopfFiberEquiv_roundtrip_path (data : HopfFibrationData)
     (x : Fiber data.proj data.base) :
     ComputationalPaths.Path
       (data.fiberEquiv.invFun (data.fiberEquiv.toFun x)) x :=
-  ComputationalPaths.Path.ofEq (data.fiberEquiv.left_inv x)
+  ComputationalPaths.Path.stepChain (data.fiberEquiv.left_inv x)
 
 /-- `Path` witnessing the forward round-trip of the fiber equivalence. -/
 def hopfFiberEquiv_fwd_roundtrip_path (data : HopfFibrationData) (x : S1) :
     ComputationalPaths.Path
       (data.fiberEquiv.toFun (data.fiberEquiv.invFun x)) x :=
-  ComputationalPaths.Path.ofEq (data.fiberEquiv.right_inv x)
+  ComputationalPaths.Path.stepChain (data.fiberEquiv.right_inv x)
 
 /-! ## Fiber sequence package -/
 
@@ -109,7 +109,7 @@ def hopfFiberSeq (data : HopfFibrationData) : FiberSeq S1 S3 S2 where
   proj := data.proj
   baseB := data.base
   baseE := data.baseTotal
-  base_proj := Path.ofEq data.base_proj
+  base_proj := Path.stepChain data.base_proj
   toFiber := data.fiberEquiv.invFun
   fromFiber := data.fiberEquiv.toFun
   left_inv := data.fiberEquiv.right_inv
@@ -143,7 +143,7 @@ def hopfFiberSeq_exact (data : HopfFibrationData) :
     have h'' : (hopfFiberSeq data).incl
         ((hopfFiberSeq data).fromFiber ⟨e, h.toEq⟩) = e := by
       simpa [FiberSeq.incl] using _root_.congrArg Fiber.point h'
-    exact Path.ofEq h''
+    exact Path.stepChain h''
 
 /-- `Path` witnessing exactness: incl composed with proj yields the base. -/
 def hopfFiberSeq_exact_path (data : HopfFibrationData) (f : S1) :

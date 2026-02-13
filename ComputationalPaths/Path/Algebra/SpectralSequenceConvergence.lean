@@ -98,27 +98,27 @@ def trivialSpectralPage (r : Nat) : SpectralPage.{0} r where
   term := fun _ _ => PUnit
   zero := fun _ _ => PUnit.unit
   d := fun _ _ _ => PUnit.unit
-  d_squared_zero := fun _ _ _ => Path.ofEqChain rfl
+  d_squared_zero := fun _ _ _ => Path.stepChain rfl
 
 /-- The trivial convergence data for PUnit. -/
 def trivialConvergence (r : Nat) :
     Convergence punitFiltration (r := r) (trivialSpectralPage r) where
   compare := fun _ _ _ => ⟨PUnit.unit, True.intro⟩
-  compare_path := fun _ _ {_ _} _ => Path.ofEqChain rfl
+  compare_path := fun _ _ {_ _} _ => Path.stepChain rfl
 
 /-- The trivial edge homomorphism for PUnit. -/
 def trivialEdgeHomomorphism (r : Nat) :
     EdgeHomomorphism punitFiltration (r := r) (trivialSpectralPage r) where
   map := fun _ _ => PUnit.unit
   respects_filtration := fun _ _ => True.intro
-  map_path := fun _ {_ _} _ => Path.ofEqChain rfl
+  map_path := fun _ {_ _} _ => Path.stepChain rfl
 
 /-- The trivial page successor for PUnit. -/
 def trivialPageSuccessor (r : Nat) :
     PageSuccessor (trivialSpectralPage r) where
   next := trivialSpectralPage (r + 1)
   proj := fun _ _ _ => PUnit.unit
-  proj_zero := fun _ _ => Path.ofEqChain rfl
+  proj_zero := fun _ _ => Path.stepChain rfl
 
 /-! ## Summary
 

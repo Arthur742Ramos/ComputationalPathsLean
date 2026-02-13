@@ -118,7 +118,7 @@ def SimplicialRing.face_add_path (R : SimplicialRing) (n : Nat) (i : Fin (n + 2)
     (a b : R.carrier (n + 1)) :
     Path (R.face n i ((R.ring (n + 1)).add a b))
          ((R.ring n).add (R.face n i a) (R.face n i b)) :=
-  Path.ofEq (R.face_add n i a b)
+  Path.stepChain (R.face_add n i a b)
 
 /-- π₀ of a simplicial ring (coequalizer of d₀ and d₁). -/
 def pi0Ring (R : SimplicialRing) : Type u :=

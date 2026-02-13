@@ -371,7 +371,7 @@ def metabolic_sum_zero (R : Type u) (Ri : RingWithInvolution R)
     (G : GWGroup R Ri) (M₁ M₂ : MetabolicForm R Ri) :
     Path (G.add (G.classOf M₁.form) (G.classOf M₂.form)) G.zero :=
   Path.trans
-    (Path.ofEq (by rw [(G.metabolic_zero M₁).proof]))
+    (Path.stepChain (by rw [(G.metabolic_zero M₁).proof]))
     (Path.trans
       (G.zero_add (G.classOf M₂.form))
       (G.metabolic_zero M₂))

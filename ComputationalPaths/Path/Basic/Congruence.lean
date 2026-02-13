@@ -371,7 +371,7 @@ variable {b1 : B a1} {b2 : B a2}
 @[simp] def sigmaMk (p : Path a1 a2)
     (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
     Path (Sigma.mk a1 b1) (Sigma.mk a2 b2) :=
-  Path.ofEq <| by
+  Path.stepChain <| by
     classical
     cases p with
     | mk steps1 h1 =>
@@ -391,7 +391,7 @@ variable {b1 : B a1} {b2 : B a2}
     Path
       (transport (A := A) (D := fun a => B a) (sigmaFst (B := B) p) b1)
       b2 :=
-  Path.ofEq <| by
+  Path.stepChain <| by
     classical
     cases p with
     | mk steps h =>
@@ -412,7 +412,7 @@ variable {b1 : B a1} {b2 : B a2}
         (fun z : B a2 =>
           Path.transport (A := A) (D := fun a => B a) (Path.symm p) z)
         q))
-    (Path.ofEq
+    (Path.stepChain
       (A := B a1)
       (a :=
         Path.transport (A := A) (D := fun a => B a) (Path.symm p)
@@ -425,7 +425,7 @@ variable {b1 : B a1} {b2 : B a2}
     (p : Path a1 a2)
     (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
     sigmaSnd (B := B) (sigmaMk (B := B) p q) =
-      Path.ofEq
+      Path.stepChain
         (A := B a2)
         (a := transport (A := A) (D := fun a => B a)
               (sigmaFst (B := B) (sigmaMk (B := B) p q)) b1)
@@ -437,7 +437,7 @@ variable {b1 : B a1} {b2 : B a2}
       cases q with
       | mk steps2 h2 =>
           cases h2
-          simp [sigmaSnd, sigmaMk, sigmaFst, Path.ofEq, transport]
+          simp [sigmaSnd, sigmaMk, sigmaFst, Path.stepChain, transport]
 
 @[simp] theorem transport_sigmaMk_fst
     {D : A → Sort w}

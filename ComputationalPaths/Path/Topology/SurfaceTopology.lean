@@ -279,7 +279,7 @@ def genus_invariant (_S : ClosedSurface.{u})
   have h1 := g1_eq.toEq
   have h2 := g2_eq.toEq
   have h3 := same_euler_genus.toEq
-  exact Path.ofEq (by omega)
+  exact Path.stepChain (by omega)
 
 /-- Crosscap number for non-orientable surfaces. -/
 structure CrosscapNumber (S : ClosedSurface.{u}) where

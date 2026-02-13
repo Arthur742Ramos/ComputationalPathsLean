@@ -67,7 +67,7 @@ def coproductPathEncode {x y : Coproduct A B} (p : Path x y) :
   | inl a =>
       cases y with
       | inl a' =>
-          exact Path.ofEq (Sum.inl.injEq a a' ▸ p.toEq)
+          exact Path.stepChain (Sum.inl.injEq a a' ▸ p.toEq)
       | inr b =>
           exact absurd p.toEq (sum_inl_ne_inr (A := A) (B := B) a b)
   | inr b =>
@@ -75,7 +75,7 @@ def coproductPathEncode {x y : Coproduct A B} (p : Path x y) :
       | inl a =>
           exact absurd p.toEq (sum_inr_ne_inl (A := A) (B := B) b a)
       | inr b' =>
-          exact Path.ofEq (Sum.inr.injEq b b' ▸ p.toEq)
+          exact Path.stepChain (Sum.inr.injEq b b' ▸ p.toEq)
 
 /-- Decode a coproduct path code back to a path in the coproduct. -/
 def coproductPathDecode {x y : Coproduct A B}

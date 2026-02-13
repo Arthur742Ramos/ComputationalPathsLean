@@ -79,9 +79,9 @@ def PrismaticStep.toPath {R : Type u} {a b : R}
     (s : PrismaticStep R a b) : Path a b :=
   match s with
   | .delta_map _ => Path.refl _
-  | .frobenius_lift _ _ h => Path.ofEq h
+  | .frobenius_lift _ _ h => Path.stepChain h
   | .nygaard_filt _ => Path.refl _
-  | .comparison _ _ h => Path.ofEq h
+  | .comparison _ _ h => Path.stepChain h
   | .breuil_kisin _ => Path.refl _
 
 /-! ## δ-Rings -/

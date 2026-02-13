@@ -138,13 +138,13 @@ def EnAlgebra.trivial (n : Nat) : EnAlgebra n where
 /-- Path-valued unit law. -/
 def EnAlgebra.unit_act_path {n : Nat} (A : EnAlgebra n) (x : A.carrier) :
     Path (A.act (identityCube n) (fun _ => x)) x :=
-  Path.ofEq (A.unit_act x)
+  Path.stepChain (A.unit_act x)
 
 /-- Path-valued equivariance. -/
 def EnAlgebra.equivariant_path {n : Nat} (A : EnAlgebra n)
     {k : Nat} (σ : Perm k) (c : EnSpace n k) (xs : Fin k → A.carrier) :
     Path (A.act (enAction n σ c) xs) (A.act c (xs ∘ σ.invFun)) :=
-  Path.ofEq (A.equivariant σ c xs)
+  Path.stepChain (A.equivariant σ c xs)
 
 /-! ## Connection to recognition principle -/
 
@@ -167,7 +167,7 @@ structure EnRecognitionData (n : Nat) where
 /-- Path-valued left inverse. -/
 def EnRecognitionData.left_inv_path {n : Nat} (d : EnRecognitionData n) (x : d.algebra.carrier) :
     Path (d.fromTarget (d.toTarget x)) x :=
-  Path.ofEq (d.left_inv x)
+  Path.stepChain (d.left_inv x)
 
 /-! ## Morphisms of En-algebras -/
 

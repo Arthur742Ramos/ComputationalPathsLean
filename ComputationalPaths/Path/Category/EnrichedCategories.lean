@@ -150,19 +150,19 @@ inductive EnrichedStep : {A : Type u} → {a b : A} → Path a b → Path a b �
   /-- Enriched composition with identity on left reduces. -/
   | comp_id_left {C : VCategory} {a b : C.Obj} (f : C.Hom a b) :
       EnrichedStep
-        (Path.ofEq (C.left_unit f))
-        (Path.ofEq (C.left_unit f))
+        (Path.stepChain (C.left_unit f))
+        (Path.stepChain (C.left_unit f))
   /-- Enriched composition with identity on right reduces. -/
   | comp_id_right {C : VCategory} {a b : C.Obj} (f : C.Hom a b) :
       EnrichedStep
-        (Path.ofEq (C.right_unit f))
-        (Path.ofEq (C.right_unit f))
+        (Path.stepChain (C.right_unit f))
+        (Path.stepChain (C.right_unit f))
   /-- Associativity of enriched composition. -/
   | comp_assoc {C : VCategory} {a b c d : C.Obj}
       (f : C.Hom c d) (g : C.Hom b c) (h : C.Hom a b) :
       EnrichedStep
-        (Path.ofEq (C.assoc f g h))
-        (Path.ofEq (C.assoc f g h))
+        (Path.stepChain (C.assoc f g h))
+        (Path.stepChain (C.assoc f g h))
   /-- Congruence under symm. -/
   | symm_congr {A : Type u} {a b : A} {p q : Path a b} :
       EnrichedStep p q → EnrichedStep (Path.symm p) (Path.symm q)

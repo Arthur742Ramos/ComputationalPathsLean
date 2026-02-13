@@ -139,10 +139,10 @@ def SCRMor.id (R : SimplicialRing.{u}) : SCRMor R R where
 def SCRMor.comp {R S T : SimplicialRing.{u}} (f : SCRMor R S) (g : SCRMor S T) : SCRMor R T where
   toFun := g.toFun ∘ f.toFun
   map_mul := fun a b =>
-    Path.trans (Path.ofEq (_root_.congrArg g.toFun (f.map_mul a b).proof)) (g.map_mul (f.toFun a) (f.toFun b))
+    Path.trans (Path.stepChain (_root_.congrArg g.toFun (f.map_mul a b).proof)) (g.map_mul (f.toFun a) (f.toFun b))
   map_add := fun a b =>
-    Path.trans (Path.ofEq (_root_.congrArg g.toFun (f.map_add a b).proof)) (g.map_add (f.toFun a) (f.toFun b))
-  map_one := Path.trans (Path.ofEq (_root_.congrArg g.toFun f.map_one.proof)) g.map_one
+    Path.trans (Path.stepChain (_root_.congrArg g.toFun (f.map_add a b).proof)) (g.map_add (f.toFun a) (f.toFun b))
+  map_one := Path.trans (Path.stepChain (_root_.congrArg g.toFun f.map_one.proof)) g.map_one
 
 /-- Composing with identity on the right is identity. -/
 def SCRMor.comp_id {R S : SimplicialRing.{u}} (f : SCRMor R S) :

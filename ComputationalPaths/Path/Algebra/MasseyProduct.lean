@@ -167,7 +167,7 @@ def zero_mem_indeterminacy_path {R : GradedRing}
     (inp : TripleMasseyInput R) :
     Path (R.mul (inp.p + inp.q) inp.r (R.zero (inp.p + inp.q)) inp.c)
       (R.zero ((inp.p + inp.q) + inp.r)) :=
-  Path.ofEq (R.mul_zero_left (inp.p + inp.q) inp.r inp.c)
+  Path.stepChain (R.mul_zero_left (inp.p + inp.q) inp.r inp.c)
 
 /-! ## Summary -/
 

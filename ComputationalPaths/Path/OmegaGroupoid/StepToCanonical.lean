@@ -12,7 +12,7 @@ canonical p q := .vcomp (deriv₂_to_normal p) (.inv (deriv₂_to_normal q))
 ```
 
 where `deriv₂_to_normal p := .step (Step.canon p)` used a canonicalization step
-`Step.canon : ∀ p, Step p (Path.ofEq p.toEq)`.
+`Step.canon : ∀ p, Step p (Path.stepChain p.toEq)`.
 
 **This approach was abandoned** because `Step.canon` caused all paths with the same
 `toEq` to become RwEq, collapsing π₁(S¹) to be trivial (contradicting π₁(S¹) ≃ ℤ).

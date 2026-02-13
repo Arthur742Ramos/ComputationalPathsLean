@@ -73,19 +73,19 @@ variable {M : GradedF2Module} (D : DyerLashofData M)
 /-- Path witness for Q^s preserving zero. -/
 def Q_zero_path (s n : Nat) :
     Path (D.Q s n (M.zero n)) (M.zero (n + s)) :=
-  Path.ofEq (D.Q_zero s n)
+  Path.stepChain (D.Q_zero s n)
 
 /-- Path witness for Q^s preserving addition. -/
 def Q_add_path (s n : Nat) (x y : M.carrier n) :
     Path (D.Q s n (M.add n x y))
       (M.add (n + s) (D.Q s n x) (D.Q s n y)) :=
-  Path.ofEq (D.Q_add s n x y)
+  Path.stepChain (D.Q_add s n x y)
 
 /-- Path witness for Q^0 = id. -/
 def Q_zero_id_path (n : Nat) (x : M.carrier n) :
     Path (D.Q 0 n x)
       (_root_.cast (_root_.congrArg M.carrier (Nat.add_zero n).symm) x) :=
-  Path.ofEq (D.Q_zero_id n x)
+  Path.stepChain (D.Q_zero_id n x)
 
 end DyerLashofData
 

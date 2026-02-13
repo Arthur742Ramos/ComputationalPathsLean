@@ -245,10 +245,10 @@ def DGLieMor.comp {L M N : DGLie.{u}} (f : DGLieMor L M) (g : DGLieMor M N) :
     DGLieMor L N where
   toFun := g.toFun ∘ f.toFun
   map_bracket := fun x y =>
-    Path.trans (Path.ofEq (_root_.congrArg g.toFun (f.map_bracket x y).proof))
+    Path.trans (Path.stepChain (_root_.congrArg g.toFun (f.map_bracket x y).proof))
               (g.map_bracket (f.toFun x) (f.toFun y))
   map_diff := fun x =>
-    Path.trans (Path.ofEq (_root_.congrArg g.toFun (f.map_diff x).proof))
+    Path.trans (Path.stepChain (_root_.congrArg g.toFun (f.map_diff x).proof))
               (g.map_diff (f.toFun x))
 
 /-! ## Koszul Duality -/

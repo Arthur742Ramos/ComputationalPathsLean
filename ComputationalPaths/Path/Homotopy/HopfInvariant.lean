@@ -53,7 +53,7 @@ theorem hopfInvariant_eq_zero (n : Nat) (a : Sphere n)
 def hopfInvariant_path_zero (n : Nat) (a : Sphere n)
     (α : HigherHomotopy.PiN (2 * n - 1) (Sphere n) a) :
     ComputationalPaths.Path (hopfInvariant n a α) 0 :=
-  ComputationalPaths.Path.ofEq (hopfInvariant_eq_zero n a α)
+  ComputationalPaths.Path.stepChain (hopfInvariant_eq_zero n a α)
 
 /-! ## Hopf map -/
 
@@ -84,7 +84,7 @@ theorem hopfInvariant_eta_eq (H : HopfInvariantData data) :
 /-- `Path` witness for `H(eta) = 1`. -/
 def hopfInvariant_eta_path (H : HopfInvariantData data) :
     ComputationalPaths.Path (H.hopfInvariant (eta data)) 1 :=
-  ComputationalPaths.Path.ofEq H.hopfInvariant_eta
+  ComputationalPaths.Path.stepChain H.hopfInvariant_eta
 
 end HopfInvariantData
 

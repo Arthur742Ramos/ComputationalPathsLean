@@ -69,16 +69,16 @@ theorem inv_pt : G.inv X.pt = X.pt := by
 
 /-- `Path` witness that unit laws hold. -/
 def mul_pt_left_path (x : X.carrier) : Path (G.mul X.pt x) x :=
-  Path.ofEq (G.mul_pt_left x)
+  Path.stepChain (G.mul_pt_left x)
 
 /-- `Path` witness for right unit. -/
 def mul_pt_right_path (x : X.carrier) : Path (G.mul x X.pt) x :=
-  Path.ofEq (G.mul_pt_right x)
+  Path.stepChain (G.mul_pt_right x)
 
 /-- `Path` witness for associativity. -/
 def mul_assoc_path (x y z : X.carrier) :
     Path (G.mul (G.mul x y) z) (G.mul x (G.mul y z)) :=
-  Path.ofEq (G.mul_assoc x y z)
+  Path.stepChain (G.mul_assoc x y z)
 
 end GroupLikeE1Space
 

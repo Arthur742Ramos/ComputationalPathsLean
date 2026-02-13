@@ -63,19 +63,19 @@ variable {A : Type u} (Alg : HochschildAlgebra A)
 
 /-- `Path` witness for left additive identity. -/
 def add_zero_path (x : A) : Path (Alg.add Alg.zero x) x :=
-  Path.ofEq (Alg.add_zero x)
+  Path.stepChain (Alg.add_zero x)
 
 /-- `Path` witness for additive inverse. -/
 def add_left_neg_path (x : A) : Path (Alg.add (Alg.neg x) x) Alg.zero :=
-  Path.ofEq (Alg.add_left_neg x)
+  Path.stepChain (Alg.add_left_neg x)
 
 /-- `Path` witness for left multiplicative identity. -/
 def one_mul_path (x : A) : Path (Alg.mul Alg.one x) x :=
-  Path.ofEq (Alg.one_mul x)
+  Path.stepChain (Alg.one_mul x)
 
 /-- `Path` witness for right multiplicative identity. -/
 def mul_one_path (x : A) : Path (Alg.mul x Alg.one) x :=
-  Path.ofEq (Alg.mul_one x)
+  Path.stepChain (Alg.mul_one x)
 
 end HochschildAlgebra
 
@@ -130,7 +130,7 @@ variable {A : Type u} {Alg : HochschildAlgebra A} (D : HochschildDifferential A 
 /-- Path witness of the square-zero law. -/
 def d_sq_zero_path (n : Nat) (f : HochschildCochain A n) :
     Path (D.d (n + 1) (D.d n f)) (cochainZero (Alg := Alg) (n + 2)) :=
-  Path.ofEq (D.d_sq_zero n f)
+  Path.stepChain (D.d_sq_zero n f)
 
 end HochschildDifferential
 

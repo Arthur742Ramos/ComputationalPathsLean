@@ -47,7 +47,7 @@ def sumEncode {a₀ : A} {x : Sum A B} (p : Path (Sum.inl a₀) x) : sumCode a�
       -- p : Path (Sum.inl a₀) (Sum.inl a)
       -- We need Path a₀ a
       -- p.toEq : Sum.inl a₀ = Sum.inl a
-      exact Path.ofEq (Sum.inl.injEq a₀ a ▸ p.toEq)
+      exact Path.stepChain (Sum.inl.injEq a₀ a ▸ p.toEq)
   | inr b =>
       -- p : Path (Sum.inl a₀) (Sum.inr b)
       -- p.toEq : Sum.inl a₀ = Sum.inr b, which is impossible
@@ -69,7 +69,7 @@ def sumCodeR (b₀ : B) : Sum A B → Type u
 def sumEncodeR {b₀ : B} {x : Sum A B} (p : Path (Sum.inr b₀ : Sum A B) x) : sumCodeR b₀ x := by
   cases x with
   | inl a => exact absurd p.toEq (sum_inr_ne_inl b₀ a)
-  | inr b => exact Path.ofEq (Sum.inr.injEq b₀ b ▸ p.toEq)
+  | inr b => exact Path.stepChain (Sum.inr.injEq b₀ b ▸ p.toEq)
 
 def sumDecodeR {b₀ : B} {x : Sum A B} (c : sumCodeR b₀ x) : Path (Sum.inr b₀ : Sum A B) x := by
   cases x with

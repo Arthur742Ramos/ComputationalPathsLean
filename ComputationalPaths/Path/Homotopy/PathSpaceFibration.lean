@@ -93,7 +93,7 @@ def loopSpaceEquivFiber (A : Type u) (a : A) :
 /-- Map from propositional loops to computational loops. -/
 def loopSpaceEqToPath {A : Type u} {a : A} :
     LoopSpaceEq A a → LoopSpace A a :=
-  fun p => Path.ofEq p.toEq
+  fun p => Path.stepChain p.toEq
 
 @[simp] theorem loopSpaceEqToPath_toEq {A : Type u} {a : A}
     (p : LoopSpaceEq A a) :

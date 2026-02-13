@@ -50,6 +50,9 @@ name = "Descent"
 name = "Etale"
 
 [[lean_lib]]
+name = "Crystalline"
+
+[[lean_lib]]
 name = "Deformation"
 
 [[lean_lib]]
@@ -92,7 +95,13 @@ name = "Factorization"
 name = "Perfectoid"
 
 [[lean_lib]]
+name = "PerfectoidCohomology"
+
+[[lean_lib]]
 name = "Padic"
+
+[[lean_lib]]
+name = "Prismatic"
 
 [[lean_lib]]
 name = "Tropical"

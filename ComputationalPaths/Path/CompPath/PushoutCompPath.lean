@@ -85,7 +85,7 @@ def inr (b : B) : PushoutCompPath A B C f g :=
 
 /-- The gluing path: `inl (f c)` is identified with `inr (g c)`. -/
 def glue (c : C) : Path (inl (f c) : PushoutCompPath A B C f g) (inr (g c)) :=
-  Path.ofEqChain <|
+  Path.stepChainChain <|
     Quot.sound (PushoutCompPathRel.glue (A := A) (B := B) (C := C) (f := f) (g := g) c)
 
 /-- Inverse of the gluing path. -/

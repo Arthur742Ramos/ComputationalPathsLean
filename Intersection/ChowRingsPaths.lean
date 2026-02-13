@@ -95,14 +95,14 @@ def trivialChowRingPathData : ChowRingPathData Nat where
   add := Nat.add
   mul := Nat.mul
   grade := fun _ => 0
-  addCommPath := fun x y => Path.ofEq (Nat.add_comm x y)
-  addCommStep := fun x y => Path.Step.trans_refl_right (Path.ofEq (Nat.add_comm x y))
-  mulAssocPath := fun x y z => Path.ofEq (Nat.mul_assoc x y z)
-  mulAssocStep := fun x y z => Path.Step.trans_refl_left (Path.ofEq (Nat.mul_assoc x y z))
+  addCommPath := fun x y => Path.stepChain (Nat.add_comm x y)
+  addCommStep := fun x y => Path.Step.trans_refl_right (Path.stepChain (Nat.add_comm x y))
+  mulAssocPath := fun x y z => Path.stepChain (Nat.mul_assoc x y z)
+  mulAssocStep := fun x y z => Path.Step.trans_refl_left (Path.stepChain (Nat.mul_assoc x y z))
   gradeAddPath := fun _ _ => Path.refl 0
   gradeAddStep := fun _ _ => Path.Step.trans_refl_right (Path.refl 0)
-  intersectCommPath := fun x y => Path.ofEq (Nat.mul_comm x y)
-  intersectCommStep := fun x y => Path.Step.trans_refl_left (Path.ofEq (Nat.mul_comm x y))
+  intersectCommPath := fun x y => Path.stepChain (Nat.mul_comm x y)
+  intersectCommStep := fun x y => Path.Step.trans_refl_left (Path.stepChain (Nat.mul_comm x y))
 
 end Intersection
 end ComputationalPaths

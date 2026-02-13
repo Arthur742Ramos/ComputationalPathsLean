@@ -59,12 +59,12 @@ def uniqueUpToHomotopy (X Y : MooreSpace G n) : Homotopy X Y :=
 /-- `Path` witness for the pi_n round-trip. -/
 def roundtrip_path (X : MooreSpace G n) (x : PiN X) :
     ComputationalPaths.Path (X.piNEquiv.invFun (X.piNEquiv.toFun x)) x :=
-  ComputationalPaths.Path.ofEq (X.piNEquiv.left_inv x)
+  ComputationalPaths.Path.stepChain (X.piNEquiv.left_inv x)
 
 /-- `Path` witness for the forward round-trip. -/
 def fwdRoundtrip_path (X : MooreSpace G n) (y : G) :
     ComputationalPaths.Path (X.piNEquiv.toFun (X.piNEquiv.invFun y)) y :=
-  ComputationalPaths.Path.ofEq (X.piNEquiv.right_inv y)
+  ComputationalPaths.Path.stepChain (X.piNEquiv.right_inv y)
 
 /-! ## Summary -/
 

@@ -103,7 +103,7 @@ theorem configurationSpace_zero_unique (A : Type u) (c : ConfigurationSpace A 0)
 /-- Path witness of uniqueness of the empty configuration. -/
 def configurationSpace_zero_unique_path (A : Type u) (c : ConfigurationSpace A 0) :
     Path c (configurationSpaceEmpty A) :=
-  Path.ofEq (configurationSpace_zero_unique A c)
+  Path.stepChain (configurationSpace_zero_unique A c)
 
 /-! ## Singleton configuration -/
 
@@ -225,7 +225,7 @@ theorem uConfigurationSpace_zero_unique (A : Type u)
 def uConfigurationSpace_zero_unique_path (A : Type u)
     (x y : UConfigurationSpace A 0) :
     Path x y :=
-  Path.ofEq (uConfigurationSpace_zero_unique A x y)
+  Path.stepChain (uConfigurationSpace_zero_unique A x y)
 
 /-! ## Diagonal detection -/
 

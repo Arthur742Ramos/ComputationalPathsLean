@@ -36,7 +36,7 @@ namespace ClusterAlgebras
 universe u v
 
 private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
-  Path.ofEqChain h
+  Path.stepChainChain h
 
 /-! ## Exchange Matrices -/
 

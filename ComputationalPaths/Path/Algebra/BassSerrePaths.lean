@@ -183,7 +183,7 @@ def bsEdgeIdentPath {G : BSGraph.{u}} (H : BSGraphOfGroups G)
     Path
       (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.src e) (H.srcInclusion e h)] ++ suf))
       (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.tgt e) (H.tgtInclusion e h)] ++ suf)) :=
-  Path.ofEq (Quot.sound (BSRel.edge_ident (H:=H) e h pre suf))
+  Path.stepChain (Quot.sound (BSRel.edge_ident (H:=H) e h pre suf))
 
 /-- Composing the edge-identification path with its inverse yields a loop. -/
 def bsEdgeIdentLoop {G : BSGraph.{u}} (H : BSGraphOfGroups G)

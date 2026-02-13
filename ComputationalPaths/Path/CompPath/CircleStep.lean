@@ -34,8 +34,8 @@ class HasCirclePiOneEncode : Type u where
 /-- Canonical instance for the circle computation. -/
 noncomputable instance instHasCirclePiOneEncode : HasCirclePiOneEncode where
   encode := circlePiOneEncode
-  encode_circleDecode := fun z => Path.ofEq (circlePiOneEncode_circleDecode z)
-  circleDecode_encode := fun x => Path.ofEq (circleDecode_circlePiOneEncode x)
+  encode_circleDecode := fun z => Path.stepChain (circlePiOneEncode_circleDecode z)
+  circleDecode_encode := fun x => Path.stepChain (circleDecode_circlePiOneEncode x)
 
 /-- Winding-number map specialised to the computational circle. -/
 @[simp] noncomputable def circlePiOneEncode' [HasCirclePiOneEncode] : circlePiOne → Int :=
@@ -65,7 +65,7 @@ noncomputable def circlePiOneEquivInt :
 
 noncomputable def circlePiOneEncode_decode (z : Int) :
     Path (circlePiOneEncode (circleDecode z)) z :=
-  Path.ofEq (circlePiOneEncode_circleDecode z)
+  Path.stepChain (circlePiOneEncode_circleDecode z)
 
 end Path
 end ComputationalPaths

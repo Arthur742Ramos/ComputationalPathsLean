@@ -64,7 +64,7 @@ def Monochromatic.restrict {X : Type u} {k : Nat}
 /-- Pigeonhole principle (Path from statement to True). -/
 def pigeonhole_path (n : Nat) (f : Fin (n + 1) → Fin n) (_ : 0 < n) :
     Path (∃ i j : Fin (n + 1), i ≠ j ∧ f i = f j : Prop) True :=
-  Path.ofEq (by
+  Path.stepChain (by
     simp only [eq_iff_iff]
     exact ⟨fun _ => trivial, fun _ => by
       -- f cannot be injective: |Fin (n+1)| > |Fin n|
@@ -147,7 +147,7 @@ structure WellQuasiOrder (X : Type u) where
 /-- WQO property as Path to True. -/
 def wqo_path {X : Type u} (W : WellQuasiOrder X) (f : Nat → X) :
     Path (∃ i j : Nat, i < j ∧ W.le (f i) (f j) : Prop) True :=
-  Path.ofEq (by simp only [eq_iff_iff]; exact ⟨fun _ => trivial, fun _ => W.wqo f⟩)
+  Path.stepChain (by simp only [eq_iff_iff]; exact ⟨fun _ => trivial, fun _ => W.wqo f⟩)
 
 /-- WQO reflexive path. -/
 def wqo_refl_path {X : Type u} (W : WellQuasiOrder X) (f : Nat → X) :
@@ -166,7 +166,7 @@ structure KruskalData (L : Type u) where
 def kruskal_path {L : Type u} (K : KruskalData L)
     (f : Nat → FiniteTree L) :
     Path (∃ i j, i < j ∧ TreeEmbed L K.label_le (f i) (f j) : Prop) True :=
-  Path.ofEq (by simp only [eq_iff_iff]; exact ⟨fun _ => trivial, fun _ => K.tree_wqo f⟩)
+  Path.stepChain (by simp only [eq_iff_iff]; exact ⟨fun _ => trivial, fun _ => K.tree_wqo f⟩)
 
 /-- Ramsey multiplicity. -/
 structure RamseyMultiplicity where

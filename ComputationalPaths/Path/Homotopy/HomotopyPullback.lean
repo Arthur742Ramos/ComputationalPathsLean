@@ -47,7 +47,7 @@ def of_eq {X Y Z P : Type u} {f : X → Z} {g : Y → Z}
     (h : (fun p => f (p1 p)) = (fun p => g (p2 p))) :
     HomotopyPullbackSquare f g p1 p2 where
   comm := fun p =>
-    Path.ofEq (_root_.congrArg (fun k => k p) h)
+    Path.stepChain (_root_.congrArg (fun k => k p) h)
 
 /-- Homotopy pullback squares are symmetric in composition order. -/
 def symm {X Y Z P : Type u} {f : X → Z} {g : Y → Z}

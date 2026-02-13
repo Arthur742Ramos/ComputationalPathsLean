@@ -55,7 +55,7 @@ def Fiber.point {f : A → B} {b : B} (x : Fiber f b) : A :=
 
 /-- The proof that a fiber element maps to the base point. -/
 def Fiber.prop {f : A → B} {b : B} (x : Fiber f b) : Path (f x.point) b :=
-  Path.ofEq x.property
+  Path.stepChain x.property
 
 /-- Construct a fiber element. -/
 def Fiber.mk {f : A → B} {b : B} (a : A) (h : Path (f a) b) : Fiber f b :=
@@ -76,7 +76,7 @@ def Total.proj {P : B → Type u} : Total P → B := Sigma.fst
 /-- The fiber of Total.proj over b is equivalent to P(b). -/
 def fiberEquivFamily {P : B → Type u} (b : B) :
     SimpleEquiv (Fiber (@Total.proj B P) b) (P b) where
-  toFun := fun ⟨⟨_, p⟩, h⟩ => Path.transport (Path.ofEq h) p
+  toFun := fun ⟨⟨_, p⟩, h⟩ => Path.transport (Path.stepChain h) p
   invFun := fun p => Fiber.mk (f := @Total.proj B P) (b := b) ⟨b, p⟩ (Path.refl b)
   left_inv := fun ⟨⟨_, _⟩, h⟩ => by subst h; rfl
   right_inv := fun _ => rfl
@@ -200,7 +200,7 @@ def canonicalFiberSeq {P : B → Type u} (b : B) (x₀ : P b) :
   toFiber := fun p => Fiber.mk (f := @Total.proj B P) (b := b) ⟨b, p⟩ (Path.refl b)
   fromFiber := fun x =>
     match x with
-    | ⟨⟨b', p⟩, h⟩ => Path.transport (Path.ofEq h) p
+    | ⟨⟨b', p⟩, h⟩ => Path.transport (Path.stepChain h) p
   left_inv := fun _ => rfl
   right_inv := fun x =>
     match x with

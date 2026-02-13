@@ -284,7 +284,7 @@ def DerivedNatTrans.id
     (F : LeftDerivedFunctor C D DC DD) :
     DerivedNatTrans F F where
   component := fun X => D.id (F.obj X)
-  naturality := fun f => Path.ofEq (by rw [D.comp_id, D.id_comp])
+  naturality := fun f => Path.stepChain (by rw [D.comp_id, D.id_comp])
 
 /-- Composition of natural transformations. -/
 def DerivedNatTrans.comp
@@ -297,7 +297,7 @@ def DerivedNatTrans.comp
   naturality := fun {X Y} f => by
     have hα := (α.naturality f).toEq
     have hβ := (β.naturality f).toEq
-    apply Path.ofEq
+    apply Path.stepChain
     calc
       D.comp (F.mapHom f) (D.comp (α.component Y) (β.component Y))
           = D.comp (D.comp (F.mapHom f) (α.component Y)) (β.component Y) := by
@@ -358,7 +358,7 @@ def chainMap_comp_assoc {C : PreAdditiveCategory.{u}}
            (ChainMap.comp f (ChainMap.comp g h) |>.component n) := by
   intro n
   simp [ChainMap.comp]
-  exact Path.ofEq (C.assoc _ _ _)
+  exact Path.stepChain (C.assoc _ _ _)
 
 /-- Identity chain map is a left identity. -/
 def chainMap_id_comp {C : PreAdditiveCategory.{u}}
@@ -368,7 +368,7 @@ def chainMap_id_comp {C : PreAdditiveCategory.{u}}
            (f.component n) := by
   intro n
   simp [ChainMap.comp, ChainMap.id]
-  exact Path.ofEq (C.id_comp _)
+  exact Path.stepChain (C.id_comp _)
 
 /-- Identity chain map is a right identity. -/
 def chainMap_comp_id {C : PreAdditiveCategory.{u}}
@@ -378,7 +378,7 @@ def chainMap_comp_id {C : PreAdditiveCategory.{u}}
            (f.component n) := by
   intro n
   simp [ChainMap.comp, ChainMap.id]
-  exact Path.ofEq (C.comp_id _)
+  exact Path.stepChain (C.comp_id _)
 
 /-- Derived natural transformation composition is associative. -/
 def derivedNatTrans_assoc
@@ -392,7 +392,7 @@ def derivedNatTrans_assoc
            (DerivedNatTrans.comp α (DerivedNatTrans.comp β γ) |>.component X) := by
   intro X
   simp [DerivedNatTrans.comp]
-  exact Path.ofEq (D.assoc _ _ _)
+  exact Path.stepChain (D.assoc _ _ _)
 
 /-- Multi-step derivedstep composition is sound. -/
 theorem derivedstep_multi_sound {A : Type u} {a b : A}

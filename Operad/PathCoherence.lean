@@ -6,7 +6,7 @@ import ComputationalPaths.Path.Rewrite.RwEq
 This module packages operadic composition laws directly as rewrite paths.
 Associativity and unit laws are provided as `Rw`/`RwEq` witnesses built from
 LND_EQ-TRS rewrite rules (`Step.trans_assoc`, `Step.trans_refl_*`), not by
-wrapping propositional equalities with `Path.ofEq`.
+wrapping propositional equalities with `Path.stepChain`.
 -/
 
 namespace ComputationalPaths

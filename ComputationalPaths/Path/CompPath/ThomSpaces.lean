@@ -74,7 +74,7 @@ variable {K B Total V : Type u} {bundle : VectorBundleData K B Total V}
 /-- `Path`-typed witness that the Thom degree equals the rank. -/
 def degreePath (O : BundleOrientation H bundle) :
     Path O.thomClass.degree bundle.rank :=
-  Path.ofEq O.degree_eq_rank
+  Path.stepChain O.degree_eq_rank
 
 end BundleOrientation
 
@@ -106,7 +106,7 @@ variable {K B Total V : Type u} {bundle : VectorBundleData K B Total V} {b0 : B}
 /-- `Path`-typed witness of degree alignment for the Thom isomorphism. -/
 def degreePath (T : OrientedThomIsomorphism H bundle b0) :
     Path T.isomorphism.degree bundle.rank :=
-  Path.ofEq T.degree_eq_rank
+  Path.stepChain T.degree_eq_rank
 
 /-- Heterogeneous witness that the Thom class matches the orientation class. -/
 def classPath (T : OrientedThomIsomorphism H bundle b0) :

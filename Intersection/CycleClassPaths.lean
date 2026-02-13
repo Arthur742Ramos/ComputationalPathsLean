@@ -88,8 +88,8 @@ def trivialCycleClassPathData :
     CycleClassPathData Nat Nat trivialChowRingPathData where
   cycleClass := fun z => z
   rationalEq := fun z z' => z = z'
-  rationalEqPath := fun h => Path.ofEq h
-  rationalEqStep := fun h => Path.Step.trans_refl_right (Path.ofEq h)
+  rationalEqPath := fun h => Path.stepChain h
+  rationalEqStep := fun h => Path.Step.trans_refl_right (Path.stepChain h)
   addCycle := Nat.add
   addClassPath := fun z w => Path.refl (z + w)
   addClassStep := fun z w => Path.Step.trans_refl_left (Path.refl (z + w))

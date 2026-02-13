@@ -100,7 +100,7 @@ inductive FoundationStep : {A : Type u} → {a b : A} → Path a b → Path a b 
 
 /-- Build a genuine multi-step path by composing β/η/J-shaped segments. -/
 def foundational_multistep_path {A : Type u} {a b : A} (h : a = b) : Path a b :=
-  let core : Path a b := Path.ofEqChain h
+  let core : Path a b := Path.stepChain h
   Path.trans
     (Path.trans (Path.refl a) core)
     (Path.trans (Path.symm (Path.refl b)) (Path.refl b))
@@ -108,8 +108,8 @@ def foundational_multistep_path {A : Type u} {a b : A} (h : a = b) : Path a b :=
 /-- Coherence: the multi-step witness is rewrite-equivalent to the core step. -/
 @[simp] theorem foundational_multistep_path_rweq
     {A : Type u} {a b : A} (h : a = b) :
-    Path.RwEq (foundational_multistep_path h) (Path.ofEqChain h) := by
-  let core : Path a b := Path.ofEqChain h
+    Path.RwEq (foundational_multistep_path h) (Path.stepChain h) := by
+  let core : Path a b := Path.stepChain h
   change
     Path.RwEq
       (Path.trans (Path.trans (Path.refl a) core)
@@ -297,7 +297,7 @@ def constructor_path (idt : IdentityTypeData) :
   foundational_multistep_path idt.constructor_eq
 
 @[simp] theorem identity_j_path_coherence (idt : IdentityTypeData) :
-    Path.RwEq (identity_j_path idt) (Path.ofEqChain idt.jCompute_zero) := by
+    Path.RwEq (identity_j_path idt) (Path.stepChain idt.jCompute_zero) := by
   simpa [identity_j_path] using foundational_multistep_path_rweq idt.jCompute_zero
 
 end IdentityTypeData
@@ -372,7 +372,7 @@ def pi_subst_path (pt : PiTypeData) :
   foundational_multistep_path pt.subst_zero
 
 @[simp] theorem pi_beta_path_coherence (pt : PiTypeData) :
-    Path.RwEq (pi_beta_path pt) (Path.ofEqChain pt.beta_zero) := by
+    Path.RwEq (pi_beta_path pt) (Path.stepChain pt.beta_zero) := by
   simpa [pi_beta_path] using foundational_multistep_path_rweq pt.beta_zero
 
 end PiTypeData
@@ -456,7 +456,7 @@ def sigma_result_path (st : SigmaTypeData) :
   foundational_multistep_path st.result_eq
 
 @[simp] theorem sigma_eta_path_coherence (st : SigmaTypeData) :
-    Path.RwEq (sigma_eta_path st) (Path.ofEqChain st.eta_zero) := by
+    Path.RwEq (sigma_eta_path st) (Path.stepChain st.eta_zero) := by
   simpa [sigma_eta_path] using foundational_multistep_path_rweq st.eta_zero
 
 end SigmaTypeData

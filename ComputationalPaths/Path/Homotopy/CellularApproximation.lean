@@ -103,7 +103,7 @@ def cellularApprox_comp {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
         (Path.congrArg ag.map (cellularApprox_path_at af x))
         (Path.trans
           (cellularApprox_path_at ag (f x))
-          (Path.ofEqChain rfl)) }
+          (Path.stepChain rfl)) }
 
 /-- The composed approximation map is the composition of the individual maps. -/
 theorem cellularApprox_comp_map_eq {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
@@ -159,20 +159,20 @@ theorem cellular_top_skeleton {f : ContinuousMap X Y}
 def cellular_id_skeleton_path (n : ENat) (x : X)
     (_hx : x ∈ CWComplex.skeleton (C := C) n) :
     Path (ContinuousMap.id X x) x :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Path witness for composition of cellular maps at a point. -/
 def cellular_comp_path {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
     (x : X) :
     Path ((g.comp f) x) (g (f x)) :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Composition of cellular maps is associative at points. -/
 def cellular_comp_assoc_path {W : Type u} [TopologicalSpace W] [T2Space W]
     {f : ContinuousMap X Y} {g : ContinuousMap Y Z} {h : ContinuousMap Z W}
     (x : X) :
     Path ((h.comp (g.comp f)) x) (((h.comp g).comp f) x) :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 end CellularApproximationTheory
 end Path

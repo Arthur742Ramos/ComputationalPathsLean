@@ -57,12 +57,12 @@ abbrev smash_baseR (X Y : PtdType.{u}) (y : Y.carrier) :
 /-- Path witness for collapsing (x, y0) to the smash basepoint. -/
 def smash_baseL_path (X Y : PtdType.{u}) (x : X.carrier) :
     Path (smashMk X Y x Y.pt) (Smash X Y).pt :=
-  Path.ofEq (smash_baseL X Y x)
+  Path.stepChain (smash_baseL X Y x)
 
 /-- Path witness for collapsing (x0, y) to the smash basepoint. -/
 def smash_baseR_path (X Y : PtdType.{u}) (y : Y.carrier) :
     Path (smashMk X Y X.pt y) (Smash X Y).pt :=
-  Path.ofEq (smash_baseR X Y y)
+  Path.stepChain (smash_baseR X Y y)
 
 end CompPath
 end Path

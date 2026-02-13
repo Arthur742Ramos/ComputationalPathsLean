@@ -103,17 +103,17 @@ def CRNeg (x : ConstructiveReal) : ConstructiveReal where
 /-- Commutativity of addition (num component). -/
 def add_comm_num (x y : ConstructiveReal) (n : Nat) :
     Path ((CRAdd x y).seq n).num ((CRAdd y x).seq n).num :=
-  Path.ofEq (by simp [CRAdd, CRat.add]; omega)
+  Path.stepChain (by simp [CRAdd, CRat.add]; omega)
 
 /-- Commutativity of addition (den component). -/
 def add_comm_den (x y : ConstructiveReal) (n : Nat) :
     Path ((CRAdd x y).seq n).den ((CRAdd y x).seq n).den :=
-  Path.ofEq (by simp [CRAdd, CRat.add]; exact Nat.mul_comm _ _)
+  Path.stepChain (by simp [CRAdd, CRat.add]; exact Nat.mul_comm _ _)
 
 /-- Full path for addition commutativity. -/
 def add_comm_path (x y : ConstructiveReal) :
     Path (CRAdd x y).seq (CRAdd y x).seq :=
-  Path.ofEq (by
+  Path.stepChain (by
     funext n; simp only [CRAdd, CRat.add]
     congr 1
     · omega
@@ -122,7 +122,7 @@ def add_comm_path (x y : ConstructiveReal) :
 /-- Zero right identity. -/
 def add_zero_num (x : ConstructiveReal) (n : Nat) :
     Path ((CRAdd x CRZero).seq n).num (x.seq n).num :=
-  Path.ofEq (by simp [CRAdd, CRZero, CRat.add, CRat.zero])
+  Path.stepChain (by simp [CRAdd, CRZero, CRat.add, CRat.zero])
 
 /-! ## Convergence -/
 

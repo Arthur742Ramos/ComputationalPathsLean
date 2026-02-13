@@ -153,7 +153,7 @@ def freePathSpace_reverse_source_path {A : Type u} (p : FreePathSpace A) :
     Path
       (freePathSpaceSource (freePathSpaceReverse (freePathSpaceReverse p)))
       (freePathSpaceSource p) :=
-  Path.ofEq (freePathSpace_reverse_reverse_eq p)
+  Path.stepChain (freePathSpace_reverse_reverse_eq p)
 
 /-! ## Based Path Space as a Fiber -/
 
@@ -161,7 +161,7 @@ def freePathSpace_reverse_source_path {A : Type u} (p : FreePathSpace A) :
 def basedPathSpace_as_fiber (A : Type u) (a : A) :
     PathSpace A a → Fiber freePathSpaceSource a :=
   fun ⟨y, p⟩ =>
-    ⟨⟨a, y, Path.ofEq p.toEq⟩, rfl⟩
+    ⟨⟨a, y, Path.stepChain p.toEq⟩, rfl⟩
 
 /-- Path witness: the based path space embedding preserves the source. -/
 def basedPathSpace_fiber_source (A : Type u) (a : A) :

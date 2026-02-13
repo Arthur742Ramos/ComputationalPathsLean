@@ -80,18 +80,18 @@ variable (C : SmallCatData)
 /-- `Path`-typed left identity. -/
 def id_comp_path {a b : C.Obj} (f : C.Hom a b) :
     Path (C.comp (C.id a) f) f :=
-  Path.ofEq (C.id_comp f)
+  Path.stepChain (C.id_comp f)
 
 /-- `Path`-typed right identity. -/
 def comp_id_path {a b : C.Obj} (f : C.Hom a b) :
     Path (C.comp f (C.id b)) f :=
-  Path.ofEq (C.comp_id f)
+  Path.stepChain (C.comp_id f)
 
 /-- `Path`-typed associativity. -/
 def comp_assoc_path {a b c d : C.Obj}
     (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) :
     Path (C.comp (C.comp f g) h) (C.comp f (C.comp g h)) :=
-  Path.ofEq (C.comp_assoc f g h)
+  Path.stepChain (C.comp_assoc f g h)
 
 end SmallCatData
 
@@ -182,7 +182,7 @@ variable (adj : NerveAdjunctionData)
 /-- `Path`-typed unit naturality. -/
 def unit_natural_path (S : SSetData) (n : Nat) (x : S.obj n) :
     Path (adj.unitMap S n x) x :=
-  Path.ofEq (adj.unit_natural S n x)
+  Path.stepChain (adj.unit_natural S n x)
 
 end NerveAdjunctionData
 
@@ -220,12 +220,12 @@ variable (G : GroupoidData)
 /-- `Path`-typed left inverse. -/
 def inv_comp_path {a b : G.Obj} (f : G.Hom a b) :
     Path (G.comp (G.inv f) f) (G.id b) :=
-  Path.ofEq (G.inv_comp f)
+  Path.stepChain (G.inv_comp f)
 
 /-- `Path`-typed right inverse. -/
 def comp_inv_path {a b : G.Obj} (f : G.Hom a b) :
     Path (G.comp f (G.inv f)) (G.id a) :=
-  Path.ofEq (G.comp_inv f)
+  Path.stepChain (G.comp_inv f)
 
 /-- Inverse of identity is identity. -/
 theorem inv_id (a : G.Obj) : G.inv (G.id a) = G.id a := by
@@ -244,7 +244,7 @@ theorem inv_id (a : G.Obj) : G.inv (G.id a) = G.id a := by
 
 /-- `Path`-typed inverse of identity. -/
 def inv_id_path (a : G.Obj) : Path (G.inv (G.id a)) (G.id a) :=
-  Path.ofEq (G.inv_id a)
+  Path.stepChain (G.inv_id a)
 
 /-- Inverse of inverse is the original. -/
 theorem inv_inv {a b : G.Obj} (f : G.Hom a b) : G.inv (G.inv f) = f := by

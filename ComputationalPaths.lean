@@ -10,6 +10,7 @@ import Chromatic.PathInfrastructure
 import Topos.PathCoherence
 import Descent.PathCoherence
 import Etale.PathInfrastructure
+import Crystalline.PathInfrastructure
 import Deformation.PathInfrastructure
 import DerivedCategories.PathInfrastructure
 import Moduli.PathInfrastructure
@@ -22,7 +23,9 @@ import Anabelian.PathInfrastructure
 import Birational.PathInfrastructure
 import Factorization.PathInfrastructure
 import Perfectoid.PathInfrastructure
+import PerfectoidCohomology.PathInfrastructure
 import Padic.PathInfrastructure
+import Prismatic.PathInfrastructure
 import GRT.PathInfrastructure
 import GIT.PathInfrastructure
 import InfinityCategory.PathInfrastructure

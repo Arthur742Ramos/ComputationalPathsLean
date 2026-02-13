@@ -45,23 +45,23 @@ def intToFreeGroupOne_eq_genPow_path (k : Int) :
 def freeGroupOneToInt_mul_path (x y : BouquetFreeGroup 1) :
     Path (freeGroupOneToInt (BouquetFreeGroup.mul x y))
       (freeGroupOneToInt x + freeGroupOneToInt y) :=
-  Path.ofEq (freeGroupOneToInt_mul x y)
+  Path.stepChain (freeGroupOneToInt_mul x y)
 
 /-- Path witness for powers in F1 under the Int encoding. -/
 def freeGroupOneToInt_pow_path (x : BouquetFreeGroup 1) (k : Nat) :
     Path (freeGroupOneToInt (BouquetFreeGroup.pow (n := 1) x k))
       ((Int.ofNat k) * freeGroupOneToInt x) :=
-  Path.ofEq (freeGroupOneToInt_pow x k)
+  Path.stepChain (freeGroupOneToInt_pow x k)
 
 /-- Path witness of the Int -> F1 -> Int round-trip. -/
 def freeGroupOneToInt_intToFreeGroupOne_path (k : Int) :
     Path (freeGroupOneToInt (intToFreeGroupOne k)) k :=
-  Path.ofEq (freeGroupOneToInt_intToFreeGroupOne k)
+  Path.stepChain (freeGroupOneToInt_intToFreeGroupOne k)
 
 /-- Path witness of the F1 -> Int -> F1 round-trip. -/
 def intToFreeGroupOne_freeGroupOneToInt_path (x : BouquetFreeGroup 1) :
     Path (intToFreeGroupOne (freeGroupOneToInt x)) x := by
-  refine Path.ofEq ?_
+  refine Path.stepChain ?_
   refine Quot.inductionOn x ?_
   intro w
   simp [freeGroupOneToInt]

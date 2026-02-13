@@ -117,10 +117,10 @@ def AlgebraOverOperadPathData.ofOperadAlgebra
     AlgebraOverOperadPathData O alg.carrier where
   act := alg.act
   unitActionPath := unitPath
-  equivariantPath := fun σ θ xs => Path.ofEq (alg.equivariant σ θ xs)
+  equivariantPath := fun σ θ xs => Path.stepChain (alg.equivariant σ θ xs)
   unitActionStep := fun x => OperadAlgebraStep.right_unit (unitPath x)
   equivariantStep := fun σ θ xs =>
-    OperadAlgebraStep.left_unit (Path.ofEq (alg.equivariant σ θ xs))
+    OperadAlgebraStep.left_unit (Path.stepChain (alg.equivariant σ θ xs))
 
 /-- Path-preserving morphism between operadic algebras. -/
 structure OperadAlgebraMorphismPathData

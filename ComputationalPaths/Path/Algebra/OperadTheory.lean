@@ -102,12 +102,12 @@ variable (O : CleanOperad)
 /-- `Path`-valued action identity. -/
 def action_id_path {n : Nat} (x : O.ops n) :
     Path (O.action (Perm.id n) x) x :=
-  Path.ofEq (O.action_id x)
+  Path.stepChain (O.action_id x)
 
 /-- `Path`-valued action composition. -/
 def action_comp_path {n : Nat} (σ τ : Perm n) (x : O.ops n) :
     Path (O.action (Perm.comp σ τ) x) (O.action σ (O.action τ x)) :=
-  Path.ofEq (O.action_comp σ τ x)
+  Path.stepChain (O.action_comp σ τ x)
 
 /-- The trivial operad: one operation at each arity with trivial action. -/
 def trivial : CleanOperad where

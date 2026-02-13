@@ -65,12 +65,12 @@ structure InverseSystem where
 /-- Path-valued left identity. -/
 def InverseSystem.one_mul_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
     Path (S.mul n (S.one n) x) x :=
-  Path.ofEq (S.one_mul n x)
+  Path.stepChain (S.one_mul n x)
 
 /-- Path-valued associativity. -/
 def InverseSystem.mul_assoc_path (S : InverseSystem) (n : Nat) (x y z : S.obj n) :
     Path (S.mul n (S.mul n x y) z) (S.mul n x (S.mul n y z)) :=
-  Path.ofEq (S.mul_assoc n x y z)
+  Path.stepChain (S.mul_assoc n x y z)
 
 /-! ## Profinite Groups -/
 

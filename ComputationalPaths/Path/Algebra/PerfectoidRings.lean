@@ -78,9 +78,9 @@ def PerfectoidStep.toPath {R : Type u} {a b : R}
   match s with
   | .frobenius_lift _ => Path.refl _
   | .tilt_proj _ => Path.refl _
-  | .theta_map _ _ h => Path.ofEq h
+  | .theta_map _ _ h => Path.stepChain h
   | .almost_zero _ => Path.refl _
-  | .sharp_map _ _ h => Path.ofEq h
+  | .sharp_map _ _ h => Path.stepChain h
 
 /-! ## Valuation data -/
 
@@ -267,7 +267,7 @@ def zero_almostZero (AM : AlmostMathData R rR) : AM.almostZero rR.zero := by
   intro ε _
   exact Path.trans (rR.mul_comm ε rR.zero)
     (Path.trans
-      (by exact Path.ofEqChain rfl)  -- mul zero ε
+      (by exact Path.stepChain rfl)  -- mul zero ε
       (Path.refl _))
 
 end AlmostMathData

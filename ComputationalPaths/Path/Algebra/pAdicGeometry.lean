@@ -93,10 +93,10 @@ def pAdicGeomStep.toPath {V : Type u} {a b : V}
     (s : pAdicGeomStep V a b) : Path a b :=
   match s with
   | .period_ring _ => Path.refl _
-  | .galois_action _ _ h => Path.ofEq h
+  | .galois_action _ _ h => Path.stepChain h
   | .frobenius _ => Path.refl _
   | .monodromy _ => Path.refl _
-  | .filtration _ _ h => Path.ofEq h
+  | .filtration _ _ h => Path.stepChain h
   | .sen_operator _ => Path.refl _
 
 /-! ## p-adic Field Data -/

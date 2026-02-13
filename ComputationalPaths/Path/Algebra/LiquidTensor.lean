@@ -197,7 +197,7 @@ def banachToLiquid (B : BanachData.{u}) : PLiquidData.{u} where
   complete := B.complete
   p_summable := fun _seq _ => B.group.zero
   complete_path := fun _ cauchy =>
-    Path.ofEq (B.add_neg (B.complete _ cauchy))
+    Path.stepChain (B.add_neg (B.complete _ cauchy))
 
 /-! ## Exact Sequences of Liquid Modules -/
 
@@ -272,7 +272,7 @@ def banach_to_liquid_addneg (B : BanachData.{u})
     (x : (banachToLiquid B).group.carrier) :
     Path ((banachToLiquid B).group.add x ((banachToLiquid B).group.neg x))
       (banachToLiquid B).group.zero :=
-  Path.ofEq (B.add_neg x)
+  Path.stepChain (B.add_neg x)
 
 end LiquidTensor
 end Algebra

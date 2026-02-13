@@ -161,11 +161,11 @@ noncomputable def kleinBottleLoopBEq : kleinBottleBase = kleinBottleBase :=
 
 /-- Loop A at the path level. -/
 @[simp] noncomputable def kleinBottleLoopA : Path kleinBottleBase kleinBottleBase :=
-  Path.ofEq kleinBottleLoopAEq
+  Path.stepChain kleinBottleLoopAEq
 
 /-- Loop B at the path level. -/
 @[simp] noncomputable def kleinBottleLoopB : Path kleinBottleBase kleinBottleBase :=
-  Path.ofEq kleinBottleLoopBEq
+  Path.stepChain kleinBottleLoopBEq
 
 /-- Integer iteration of loop A at the path level. -/
 @[simp] noncomputable def kleinBottleLoopAPathZPow :

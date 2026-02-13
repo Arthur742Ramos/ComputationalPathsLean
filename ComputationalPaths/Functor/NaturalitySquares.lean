@@ -34,7 +34,7 @@ abbrev leftThenBottom {a b : A} (p : Path a b) (x : F.obj a) : G.obj b :=
 /-- Naturality gives an explicit path witness that the square commutes. -/
 private def naturalityCore {a b : A} (p : Path a b) (x : F.obj a) :
     Path (topThenRight (η := η) p x) (leftThenBottom (η := η) p x) :=
-  Path.ofEqChain (η.naturality (p := p) (x := x))
+  Path.stepChainChain (η.naturality (p := p) (x := x))
 
 /-- Naturality square witness with an explicit Step-normalizable chain. -/
 def naturalityWitness {a b : A} (p : Path a b) (x : F.obj a) :

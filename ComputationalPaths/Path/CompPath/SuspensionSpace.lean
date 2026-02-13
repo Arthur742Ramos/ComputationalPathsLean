@@ -229,12 +229,12 @@ theorem suspConnectivity_value (X : Type u) :
 /-- Path coherence: north pole is in the suspension. -/
 def suspNorth_ofEq (X : Type u) :
     Path (suspNorth X) (suspNorth X) :=
-  Path.ofEqChain rfl
+  Path.stepChainChain rfl
 
 /-- Path coherence: south pole is in the suspension. -/
 def suspSouth_ofEq (X : Type u) :
     Path (suspSouth X) (suspSouth X) :=
-  Path.ofEqChain rfl
+  Path.stepChainChain rfl
 
 /-- Path coherence: two meridians through the same point are equal. -/
 def suspMerid_eq (x : X) :

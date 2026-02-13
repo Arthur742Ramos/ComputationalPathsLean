@@ -143,7 +143,7 @@ noncomputable def jamesToLoop_base (X : SuspensionLoop.Pointed) :
     Path
       (jamesToLoop X (jamesBase X))
       (Path.refl (Suspension.north (X := X.carrier))) := by
-  apply Path.ofEq
+  apply Path.stepChain
   simp [jamesToLoop, jamesBase, loopOfList, reduceList]
 
 /-- Concatenation in the James construction maps to loop composition. -/
@@ -151,7 +151,7 @@ noncomputable def jamesToLoop_mul (X : SuspensionLoop.Pointed) (a b : JamesConst
     Path
       (jamesToLoop X (jamesMul X a b))
       (LoopSpace.comp (jamesToLoop X a) (jamesToLoop X b)) := by
-  apply Path.ofEq
+  apply Path.stepChain
   refine Quot.inductionOn a ?_
   intro l1
   refine Quot.inductionOn b ?_

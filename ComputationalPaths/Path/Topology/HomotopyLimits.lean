@@ -108,7 +108,7 @@ def constDiagram {A : Type v} (I : DiagramShape.{u}) (a : A) : Diagram I A where
   morph := fun {i j} (_ : I.Arrow i j) => Path.refl a
   morph_id := fun _ => Path.refl (Path.refl a)
   morph_comp := fun {i j k} (_ : I.Arrow i j) (_ : I.Arrow j k) =>
-    Path.ofEqChain ((Path.trans_refl_left (Path.refl a)).symm)
+    Path.stepChain ((Path.trans_refl_left (Path.refl a)).symm)
 
 /-- A cone over a diagram D with vertex X. -/
 structure HoLimCone {I : DiagramShape.{u}} {A : Type v}
@@ -309,7 +309,7 @@ def MayerVietorisData.ofSquare {A : Type v}
   bot := g
   left := h
   right := k
-  comm := Path.ofEqChain hcomm
+  comm := Path.stepChain hcomm
 
 /-! ## Coherence theorems -/
 
@@ -329,7 +329,7 @@ def cone_compose {I : DiagramShape.{u}} {A : Type v}
           Path.trans f (Path.trans (c.leg i) (D.morph g)) =
             Path.trans f (c.leg j) := by
         exact _root_.congrArg (fun p => Path.trans f p) hcEq
-      exact Path.ofEqChain (hassoc.trans hmap) }
+      exact Path.stepChain (hassoc.trans hmap) }
 
 /-- Cone leg refl is sound. -/
 theorem cone_leg_refl {I : DiagramShape.{u}} {A : Type v}

@@ -268,7 +268,7 @@ def tropicalHyperplane (n : Nat) (_hn : n > 0)
   dim := n - 1
   dim_eq_rank := Path.refl (n - 1)
   codim := 1
-  codim_formula := Path.ofEq (by omega)
+  codim_formula := Path.stepChain (by omega)
 
 /-- Tropical Grassmannian: parameter space for tropical linear spaces. -/
 structure TropicalGrassmannian (n r : Nat) where
@@ -282,7 +282,7 @@ structure TropicalGrassmannian (n r : Nat) where
 /-- Gr(2,n) has a nice fan structure. -/
 def tropGr2n (n : Nat) (_hn : n ≥ 2) : TropicalGrassmannian n 2 where
   dim := 2 * (n - 2)
-  dim_formula := Path.ofEq (by omega)
+  dim_formula := Path.stepChain (by omega)
   numPlucker := n * (n - 1) / 2
 
 /-! ## Matroid Polytopes -/

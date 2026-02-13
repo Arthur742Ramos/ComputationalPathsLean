@@ -233,7 +233,7 @@ def nerve_lemma {A : Type u} {C : Cover A} (h : GoodCover C) :
 /-- The left inverse of the nerve lemma as a computational path. -/
 def nerve_lemma_path {A : Type u} {C : Cover A} (h : GoodCover C) (a : A) :
     Path (h.nerveEquiv.invFun (h.nerveEquiv.toFun a)) a :=
-  Path.ofEq (h.nerveEquiv.left_inv a)
+  Path.stepChain (h.nerveEquiv.left_inv a)
 
 /-- Convergence along refinement chains. -/
 theorem mapper_convergence {A B : Type u} {C D E : Cover A} (f : B -> A)

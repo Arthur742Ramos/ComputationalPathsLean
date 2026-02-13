@@ -52,8 +52,8 @@ def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α
     PathSimpleEquiv α β :=
   { toFun := e.toFun
     invFun := e.invFun
-    left_inv := fun x => Path.ofEq (e.left_inv x)
-    right_inv := fun y => Path.ofEq (e.right_inv y) }
+    left_inv := fun x => Path.stepChain (e.left_inv x)
+    right_inv := fun y => Path.stepChain (e.right_inv y) }
 
 /-! ## Recognition data -/
 

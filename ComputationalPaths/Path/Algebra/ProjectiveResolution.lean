@@ -73,7 +73,7 @@ def projectiveUnit : Projective (unitPointedSet.{u}) := by
   refine ⟨zeroHom unitPointedSet A, ?_⟩
   intro x
   cases x
-  exact Path.ofEq (by
+  exact Path.stepChain (by
     have hleft :
         (PointedHom.comp f (zeroHom unitPointedSet A)).toFun PUnit.unit = B.zero := by
       simp [PointedHom.comp, zeroHom, f.map_zero]

@@ -171,8 +171,8 @@ def orbitConePn (n : Nat) (_hn : n > 0) (tv : ToricVarietyData n)
     (_htv : tv.fan.numCones > 0) :
     OrbitConeCorrespondence n tv where
   orbit_dim := fun i => n - (tv.fan.cones i).dim
-  dim_formula := fun i => Path.ofEq (by have := (tv.fan.cones i).dim_le; omega)
-  dense_orbit := fun i h => Path.ofEq (by omega)
+  dim_formula := fun i => Path.stepChain (by have := (tv.fan.cones i).dim_le; omega)
+  dense_orbit := fun i h => Path.stepChain (by omega)
   inclusion_reversal := trivial
 
 /-! ## Toric Divisors -/
@@ -239,7 +239,7 @@ def momentMapP1 (tv : ToricVarietyData 1) (hfan : tv.fan.numRays = 2) :
   polytope_dim := 1
   dim_path := Path.refl 1
   numFacets := 2
-  facet_ray_path := Path.ofEq hfan.symm
+  facet_ray_path := Path.stepChain hfan.symm
   surjective := trivial
 
 /-! ## Toric Morphisms -/
@@ -292,20 +292,20 @@ structure ToricChowRing (n : Nat) (tv : ToricVarietyData n) where
     dim(O(σ)) = n - dim(σ), dim(O({0})) = n, transitivity. -/
 def orbitDimChain (n : Nat) (d : Nat) (hd : d ≤ n) :
     Path ((n - d) + d) n :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Multi-step: fan face dimension descent.
     dim(τ) ≤ dim(σ) ≤ n, with explicit Path composition. -/
 def fanFaceDescent (n d1 d2 : Nat) (h1 : d1 ≤ d2) (h2 : d2 ≤ n) :
     Path (d1 + (n - d1)) n :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Multi-step: moment polytope ↔ fan duality.
     Vertices of Δ ↔ maximal cones of Σ. -/
 def momentFanDuality (_n numVerts numMaxCones : Nat)
     (h : numVerts = numMaxCones) :
     Path numVerts numMaxCones :=
-  Path.ofEq h
+  Path.stepChain h
 
 /-- Three-step chain: dim toric variety = rank lattice = dim fan = n. -/
 def toricDimChain (n : Nat) (tv : ToricVarietyData n) :

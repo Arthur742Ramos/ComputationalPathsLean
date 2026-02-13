@@ -62,7 +62,7 @@ variable {M : SteenrodOperations.GradedF2Module.{u}} (S : CartanData M)
 /-- Path witness of the Cartan formula. -/
 def cartan_formula_path (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.sq k (p + q) (S.cup p q x y)) (S.cartanSum k p q x y) :=
-  Path.ofEq (S.cartan_formula k p q x y)
+  Path.stepChain (S.cartan_formula k p q x y)
 
 /-- Symmetric path: from Cartan sum back to Sq^k of the cup product. -/
 def cartan_formula_path_symm (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
@@ -172,7 +172,7 @@ def cup_assoc_path (p q r : Nat)
     (x : M.carrier p) (y : M.carrier q) (z : M.carrier r) :
     Path (S.cup (p + q) r (S.cup p q x y) z)
       (S.cup_assoc_target p q r x y z) :=
-  Path.ofEq (S.cup_assoc_left p q r x y z)
+  Path.stepChain (S.cup_assoc_left p q r x y z)
 
 end CartanAssocData
 
@@ -192,7 +192,7 @@ variable {M : SteenrodOperations.GradedF2Module.{u}} (S : CartanCommData M)
 /-- Path witness of cup product commutativity. -/
 def cup_comm_path (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.cup p q x y) (S.cup_comm_target p q x y) :=
-  Path.ofEq (S.cup_comm_eq p q x y)
+  Path.stepChain (S.cup_comm_eq p q x y)
 
 end CartanCommData
 
@@ -221,12 +221,12 @@ variable {M : SteenrodOperations.GradedF2Module.{u}} (S : CartanUnitData M)
 /-- Path witness of the left unit law. -/
 def cup_unit_left_path (n : Nat) (x : M.carrier n) :
     Path (S.cup 0 n S.unit x) (S.cup_unit_left_target n x) :=
-  Path.ofEq (S.cup_unit_left n x)
+  Path.stepChain (S.cup_unit_left n x)
 
 /-- Path witness of the right unit law. -/
 def cup_unit_right_path (n : Nat) (x : M.carrier n) :
     Path (S.cup n 0 x S.unit) (S.cup_unit_right_target n x) :=
-  Path.ofEq (S.cup_unit_right n x)
+  Path.stepChain (S.cup_unit_right n x)
 
 /-- Cartan formula for Sq^k applied to unit ∪ x. -/
 def cartan_unit_left_path (k n : Nat) (x : M.carrier n) :

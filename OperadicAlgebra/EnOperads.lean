@@ -96,11 +96,11 @@ def EnOperadAlgebraPathData.ofEnAlgebra
   EnOperadAlgebraPathData.ofBase n
     { act := A.act
       unitActionPath := fun x => LittleCubesOperad.EnAlgebra.unit_act_path A x
-      equivariantPath := fun σ θ xs => Path.ofEq (A.equivariant σ θ xs)
+      equivariantPath := fun σ θ xs => Path.stepChain (A.equivariant σ θ xs)
       unitActionStep := fun x =>
         OperadAlgebraStep.right_unit (LittleCubesOperad.EnAlgebra.unit_act_path A x)
       equivariantStep := fun σ θ xs =>
-        OperadAlgebraStep.left_unit (Path.ofEq (A.equivariant σ θ xs)) }
+        OperadAlgebraStep.left_unit (Path.stepChain (A.equivariant σ θ xs)) }
 
 /-- Trivial `E_n`-operad algebra path data on `Unit`. -/
 def EnOperadAlgebraPathData.trivial (n : Nat) : EnOperadAlgebraPathData n Unit :=

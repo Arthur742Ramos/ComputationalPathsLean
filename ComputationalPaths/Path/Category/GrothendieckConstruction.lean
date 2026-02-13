@@ -44,7 +44,7 @@ theorem totalPathLiftEq {P : A → Type u}
 def totalPathLift {P : A → Type u}
     {a b : A} (p : Path a b) (x : P a) :
     Path (Sigma.mk a x : Σ c, P c) (Sigma.mk b (p.proof ▸ x)) :=
-  Path.ofEq (totalPathLiftEq p.proof x)
+  Path.stepChain (totalPathLiftEq p.proof x)
 
 /-- Lift of the reflexive path has the correct source and target. -/
 theorem totalPathLift_refl_toEq {P : A → Type u}

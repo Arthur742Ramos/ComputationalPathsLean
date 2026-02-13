@@ -46,8 +46,8 @@ variable {A : Type u} {B : Type v}
   simp [map]
 
 @[simp] theorem map_ofEq (C : Context A B) {a b : A} (h : a = b) :
-    map C (Path.ofEq (A := A) (a := a) (b := b) h) =
-      Path.ofEq (A := B)
+    map C (Path.stepChain (A := A) (a := a) (b := b) h) =
+      Path.stepChain (A := B)
         (a := C.fill a) (b := C.fill b)
         (_root_.congrArg C.fill h) := by
   cases h
@@ -265,7 +265,7 @@ is equivalent to mapping the symmetric witness and transporting the result. -/
       (Path.transport (A := A) (D := fun a => B a) p (C.fill a₁)) :=
   Path.trans
     (Path.symm
-      (Path.ofEq
+      (Path.stepChain
         (A := B a₂)
         (a :=
           Path.transport (A := A) (D := fun a => B a) p

@@ -75,7 +75,7 @@ The key insight is that p.toEq : a = b can be used to construct
 an equality between the sigma types, which then lifts to a Path. -/
 noncomputable def pathLift {P : A → Type u} {a b : A} (p : Path a b) (x : P a) :
     Path (TotalPoint a x) (TotalPoint b (fiberTransport p x)) :=
-  Path.ofEq (by
+  Path.stepChain (by
     -- We need: ⟨a, x⟩ = ⟨b, transport p x⟩
     -- Using p.toEq : a = b
     cases p.toEq
@@ -93,7 +93,7 @@ projection is the base path.
 /-- The lifted path projects to the canonical `ofEq` path in the base. -/
 theorem proj_pathLift_ofEq {P : A → Type u} {a b : A}
     (p : Path a b) (x : P a) :
-    Path.congrArg proj (pathLift (P := P) p x) = Path.ofEq p.toEq := by
+    Path.congrArg proj (pathLift (P := P) p x) = Path.stepChain p.toEq := by
   cases p with
   | mk steps proof =>
     cases proof
@@ -101,7 +101,7 @@ theorem proj_pathLift_ofEq {P : A → Type u} {a b : A}
 
 /-- Lifting along reflexivity produces the canonical `ofEq` path. -/
 theorem pathLift_refl_ofEq {P : A → Type u} {a : A} (x : P a) :
-    pathLift (P := P) (Path.refl a) x = Path.ofEq (by rfl) := by
+    pathLift (P := P) (Path.refl a) x = Path.stepChain (by rfl) := by
   rfl
 
 /-! ## Transport Composition in Fibers -/
@@ -217,7 +217,7 @@ noncomputable def fiberLoopPath {P : A → Type u} {a : A} (l : LoopSpace A a) (
 /-- The projection of the fiber-loop path is the canonical `ofEq` loop. -/
 theorem proj_fiberLoopPath_ofEq {P : A → Type u} {a : A}
     (l : LoopSpace A a) (x : P a) :
-    Path.congrArg proj (fiberLoopPath (P := P) l x) = Path.ofEq l.toEq := by
+    Path.congrArg proj (fiberLoopPath (P := P) l x) = Path.stepChain l.toEq := by
   simpa [fiberLoopPath] using proj_pathLift_ofEq (P := P) l x
 
 /-! ## Deck Transformations

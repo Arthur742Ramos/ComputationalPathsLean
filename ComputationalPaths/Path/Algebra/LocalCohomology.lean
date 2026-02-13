@@ -150,7 +150,7 @@ def localCoh_zero_vanish {R : Type u} {ring : CommRingData R}
     (depth_pos : H.carrier 0 → H.carrier 0)
     (h : ∀ y, depth_pos y = H.zero 0) :
     Path (depth_pos x) (H.zero 0) :=
-  Path.ofEq (h x)
+  Path.stepChain (h x)
 
 /-! ## Depth -/
 

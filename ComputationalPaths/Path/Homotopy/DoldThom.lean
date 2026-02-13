@@ -75,7 +75,7 @@ theorem symmProdInfAdd_fst {X : Type u}
 def symmProdInfAdd_fst_path {X : Type u}
     (a b : SymmetricProductInfinity X) :
     ComputationalPaths.Path (symmProdInfAdd a b).1 (a.1 + b.1) :=
-  ComputationalPaths.Path.ofEq (symmProdInfAdd_fst a b)
+  ComputationalPaths.Path.stepChain (symmProdInfAdd_fst a b)
 
 /-- Associativity of the degree component of symmetric product addition. -/
 theorem symmProdInfAdd_fst_assoc {X : Type u}
@@ -90,7 +90,7 @@ def symmProdInfAdd_fst_assoc_path {X : Type u}
     ComputationalPaths.Path
       (symmProdInfAdd (symmProdInfAdd a b) c).1
       (symmProdInfAdd a (symmProdInfAdd b c)).1 :=
-  ComputationalPaths.Path.ofEq (symmProdInfAdd_fst_assoc a b c)
+  ComputationalPaths.Path.stepChain (symmProdInfAdd_fst_assoc a b c)
 
 /-! ## Dold-Thom data -/
 
@@ -121,14 +121,14 @@ def doldThomRoundtrip_path {X : Type u}
     (D : DoldThomSpace X) (n : ℕ) (x : symmProdInfPi n X) :
     ComputationalPaths.Path
       ((D.equivalence n).invFun ((D.equivalence n).toFun x)) x :=
-  ComputationalPaths.Path.ofEq ((D.equivalence n).left_inv x)
+  ComputationalPaths.Path.stepChain ((D.equivalence n).left_inv x)
 
 /-- `Path` witnessing the forward round-trip. -/
 def doldThomFwdRoundtrip_path {X : Type u}
     (D : DoldThomSpace X) (n : ℕ) (y : D.homology n) :
     ComputationalPaths.Path
       ((D.equivalence n).toFun ((D.equivalence n).invFun y)) y :=
-  ComputationalPaths.Path.ofEq ((D.equivalence n).right_inv y)
+  ComputationalPaths.Path.stepChain ((D.equivalence n).right_inv y)
 
 /-! ## Summary
 
