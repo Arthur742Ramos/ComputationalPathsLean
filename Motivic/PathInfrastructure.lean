@@ -62,7 +62,7 @@ def mkA1PathInfrastructure
 
 /-- Canonical A¹-invariance infrastructure for the identity projection/section. -/
 def idA1PathInfrastructure (X : Type u) :
-    A1PathInfrastructure X PUnit :=
+    A1PathInfrastructure X PUnit.{1} :=
   mkA1PathInfrastructure
     (proj := fun p => p.1)
     (sec := fun x => (x, PUnit.unit))
@@ -74,7 +74,7 @@ theorem id_retract_rweq (X : Type u) (x : X) :
     RwEq
       (Path.trans ((idA1PathInfrastructure X).retractPath x) (Path.refl x))
       ((idA1PathInfrastructure X).retractPath x) :=
-  A1PathInfrastructure.retract_rweq (A1 := PUnit) (M := idA1PathInfrastructure X) x
+  (idA1PathInfrastructure X).retract_rweq x
 
 end Motivic
 end ComputationalPaths
