@@ -404,3 +404,8 @@ import ComputationalPaths.Path.Topology.StringTopology
 import ComputationalPaths.Path.Topology.GaugeTheoryPaths
 import ComputationalPaths.Path.Topology.MirrorSymmetry
 import ComputationalPaths.Path.Topology.TopologicalInsulators
+import ComputationalPaths.Path.Topology.ModelCategories
+import ComputationalPaths.Path.Topology.DerivedCategories
+import ComputationalPaths.Path.Topology.HomotopyLimits
+import ComputationalPaths.Path.Topology.SimplicialModelCategories
+import ComputationalPaths.Path.Topology.StableModelCategories
