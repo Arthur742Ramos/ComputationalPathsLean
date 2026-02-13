@@ -62,6 +62,21 @@ namespace QuantumGroupReps
 
 universe u v w
 
+/-- Build a multi-step computational witness from an equality using
+`refl`, `symm`, `trans`, `congr`, associativity-shaped composition, and units. -/
+private def multi_step_path {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  let leftRefl : Path a a := Path.mk [Step.mk a a rfl] rfl
+  let rightRefl : Path b b := Path.mk [Step.mk b b rfl] rfl
+  let core : Path a b := Path.congrArg (fun x => x) (Path.mk [Step.mk a b h] h)
+  let leftUnit : Path a a := Path.trans leftRefl (Path.symm leftRefl)
+  let rightUnit : Path b b := Path.trans rightRefl rightRefl
+  let leftAssoc : Path a b := Path.trans (Path.trans leftUnit core) rightUnit
+  let rightAssoc : Path a b := Path.trans leftUnit (Path.trans core rightUnit)
+  have _assoc : leftAssoc = rightAssoc := by
+    exact Path.trans_assoc leftUnit core rightUnit
+  exact leftAssoc
+
+
 /-! ## Quantum Group Representation Data -/
 
 /-- A finite-dimensional representation of U_q(𝔤) for generic q.
@@ -133,7 +148,7 @@ def slnStandard (n : Nat) (hn : n ≥ 2) : QuantumRepData where
 /-- Path: quantum dim = classical dim. -/
 def dim_path (qrd : QuantumRepData) :
     Path qrd.repDim qrd.classicalDim :=
-  Path.ofEq qrd.dim_eq
+  multi_step_path qrd.dim_eq
 
 end QuantumRepData
 
@@ -224,12 +239,12 @@ def slnStandardCrystal (n : Nat) (hn : n ≥ 2) : CrystalBaseData where
 /-- Path: |B| = dim V. -/
 def crystal_dim_path (cbd : CrystalBaseData) :
     Path cbd.crystalSize cbd.repDim :=
-  Path.ofEq cbd.crystal_eq_dim
+  multi_step_path cbd.crystal_eq_dim
 
 /-- Path: colors = rank. -/
 def colors_path (cbd : CrystalBaseData) :
     Path cbd.numColors cbd.rank :=
-  Path.ofEq cbd.colors_eq
+  multi_step_path cbd.colors_eq
 
 end CrystalBaseData
 
@@ -293,17 +308,17 @@ def slnNegative (n : Nat) (hn : n ≥ 2) (d : Nat) (hd : d > 0) :
 /-- Path: positivity. -/
 def positivity_path (cbd : CanonicalBasisData) :
     Path cbd.positivityObstruction 0 :=
-  Path.ofEq cbd.positivity
+  multi_step_path cbd.positivity
 
 /-- Path: canonical = global crystal. -/
 def bases_path (cbd : CanonicalBasisData) :
     Path cbd.equalsGlobalCrystal true :=
-  Path.ofEq cbd.bases_agree
+  multi_step_path cbd.bases_agree
 
 /-- Path: bar-invariance. -/
 def bar_path (cbd : CanonicalBasisData) :
     Path cbd.barInvarianceObstruction 0 :=
-  Path.ofEq cbd.bar_invariant
+  multi_step_path cbd.bar_invariant
 
 end CanonicalBasisData
 
@@ -391,12 +406,12 @@ def slnStdStd (n : Nat) (hn : n ≥ 2) : TensorProductData where
 /-- Path: tensor dimension formula. -/
 def tensor_dim_path (tpd : TensorProductData) :
     Path tpd.tensorDim (tpd.dimLambda * tpd.dimMu) :=
-  Path.ofEq tpd.tensor_eq
+  multi_step_path tpd.tensor_eq
 
 /-- Path: decomposition completeness. -/
 def decomp_path (tpd : TensorProductData) :
     Path tpd.sumSummandDims tpd.tensorDim :=
-  Path.ofEq tpd.decomp_eq
+  multi_step_path tpd.decomp_eq
 
 end TensorProductData
 
@@ -485,17 +500,17 @@ def slnGeneral (n : Nat) (hn : n ≥ 2) (k : Nat) (hk : k ≥ 2) :
 /-- Path: Yang-Baxter equation. -/
 def yang_baxter_path (rmd : RMatrixRepData) :
     Path rmd.yangBaxterObstruction 0 :=
-  Path.ofEq rmd.yang_baxter
+  multi_step_path rmd.yang_baxter
 
 /-- Path: tensor power dimension. -/
 def tensorPower_path (rmd : RMatrixRepData) :
     Path rmd.tensorPowerDim (rmd.repDim ^ rmd.numFactors) :=
-  Path.ofEq rmd.tensorPower_eq
+  multi_step_path rmd.tensorPower_eq
 
 /-- Path: braid generators = numFactors - 1. -/
 def braid_gens_path (rmd : RMatrixRepData) :
     Path rmd.numBraidGens (rmd.numFactors - 1) :=
-  Path.ofEq rmd.braid_gens_eq
+  multi_step_path rmd.braid_gens_eq
 
 end RMatrixRepData
 
@@ -576,17 +591,17 @@ def slnLevel1 (n : Nat) (hn : n ≥ 2) : KLEquivalenceData where
 /-- Path: KL equivalence. -/
 def kl_path (kle : KLEquivalenceData) :
     Path kle.klObstruction 0 :=
-  Path.ofEq kle.kl_equiv
+  multi_step_path kle.kl_equiv
 
 /-- Path: ℓ = k + h^∨. -/
 def ell_path (kle : KLEquivalenceData) :
     Path kle.ell (kle.level + kle.dualCoxeter) :=
-  Path.ofEq kle.ell_eq
+  multi_step_path kle.ell_eq
 
 /-- Path: equivalence on simples. -/
 def equiv_path (kle : KLEquivalenceData) :
     Path kle.numSimples kle.numIntegrable :=
-  Path.ofEq kle.equiv_simples
+  multi_step_path kle.equiv_simples
 
 end KLEquivalenceData
 
@@ -646,12 +661,12 @@ def sl2 (n : Nat) : QuantumDimensionData where
 /-- Path: specialization to q = 1. -/
 def specialization_path (qdd : QuantumDimensionData) :
     Path qdd.specialization_q1_obstruction 0 :=
-  Path.ofEq qdd.specialization
+  multi_step_path qdd.specialization
 
 /-- Path: trivial quantum dim = 1. -/
 def trivial_path (qdd : QuantumDimensionData) :
     Path qdd.trivialQuantumDim 1 :=
-  Path.ofEq qdd.trivial_eq
+  multi_step_path qdd.trivial_eq
 
 end QuantumDimensionData
 
@@ -721,17 +736,17 @@ def slnLevel1 (n : Nat) (hn : n ≥ 2) : FusionRuleData where
 /-- Path: Verlinde formula. -/
 def verlinde_path (frd : FusionRuleData) :
     Path frd.verlindeObstruction 0 :=
-  Path.ofEq frd.verlinde
+  multi_step_path frd.verlinde
 
 /-- Path: modularity. -/
 def modular_path (frd : FusionRuleData) :
     Path frd.isModular true :=
-  Path.ofEq frd.modular_holds
+  multi_step_path frd.modular_holds
 
 /-- Path: fusion rank = numPrimaries. -/
 def fusion_rank_path (frd : FusionRuleData) :
     Path frd.fusionRank frd.numPrimaries :=
-  Path.ofEq frd.fusion_rank_eq
+  multi_step_path frd.fusion_rank_eq
 
 end FusionRuleData
 
@@ -745,7 +760,7 @@ def master_quantum_classical_dim_path :
 /-- Master: crystal basis |B| = dim V for sl(2). -/
 def master_crystal_dim_path :
     Path (CrystalBaseData.sl2Crystal 3).crystalSize 4 :=
-  Path.ofEq (by simp [CrystalBaseData.sl2Crystal])
+  multi_step_path (by simp [CrystalBaseData.sl2Crystal])
 
 /-- Master: canonical basis positivity for sl(2). -/
 def master_positivity_path :
@@ -755,7 +770,7 @@ def master_positivity_path :
 /-- Master: tensor product dim for sl(2), V(1)⊗V(1). -/
 def master_sl2_tensor_path :
     Path (TensorProductData.sl2Tensor 1 1).tensorDim 4 :=
-  Path.ofEq (by simp [TensorProductData.sl2Tensor])
+  multi_step_path (by simp [TensorProductData.sl2Tensor])
 
 /-- Master: Yang-Baxter for sl(2). -/
 def master_yang_baxter_path :
@@ -770,7 +785,7 @@ def master_kl_sl2_path :
 /-- Master: sl(2) level 1 fusion has 2 primaries. -/
 def master_fusion_sl2_path :
     Path (FusionRuleData.sl2 1 (by omega)).numPrimaries 2 :=
-  Path.ofEq (by simp [FusionRuleData.sl2])
+  multi_step_path (by simp [FusionRuleData.sl2])
 
 /-- Master: Verlinde formula for sl(2) level 2. -/
 def master_verlinde_path :

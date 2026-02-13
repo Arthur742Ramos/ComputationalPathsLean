@@ -52,6 +52,7 @@ Genuine G-spectra form the equivariant stable homotopy category:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace GenuineSpectra
@@ -523,6 +524,44 @@ def mackey_constant_path {G : Type u} (A : Type v) (n m : Nat) (h : n ≤ m) (x 
 def structure_map_path {G : Type u} (E : GenuineGSpectrum G) (n : Nat) (x : E.value n) :
     Path (E.structureMapInv n (E.structureMap n x)) x :=
   Path.ofEq (E.structure_inv n x)
+
+/-! ## Rewrite-Level Computational Transformations -/
+
+/-- Normalize unit whiskers around a path via explicit rewrite steps. -/
+theorem genuine_rewrite_unit_whiskers {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.refl a) (Path.trans p (Path.refl b))) p := by
+  apply Path.rweq_trans
+  · exact Path.rweq_trans_congr_right (Path.refl a) (Path.rweq_cmpA_refl_right p)
+  · exact Path.rweq_cmpA_refl_left p
+
+/-- Contract `(p · p⁻¹) · p` back to `p` by associativity, inverse, and unit rewrites. -/
+theorem genuine_rewrite_cancel_chain {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.trans p (Path.symm p)) p) p := by
+  apply Path.rweq_trans
+  · exact Path.rweq_tt p (Path.symm p) p
+  · apply Path.rweq_trans
+    · exact Path.rweq_trans_congr_right p (Path.rweq_cmpA_inv_left p)
+    · exact Path.rweq_cmpA_refl_right p
+
+/-- Representation direct-sum commutativity path reduced after adding reflexive whiskers. -/
+def rep_directSum_comm_rewrite_path {G : Type u} (V W : GRepresentation G) :
+    Path.RwEq
+      (Path.trans (Path.refl (GRepresentation.directSum V W).dim)
+        (Path.trans (rep_directSum_comm_path V W)
+          (Path.refl (GRepresentation.directSum W V).dim)))
+      (rep_directSum_comm_path V W) :=
+  genuine_rewrite_unit_whiskers (rep_directSum_comm_path V W)
+
+/-- Structure-map roundtrip reduced from an explicit cancellation chain. -/
+def structure_map_cancel_rewrite_path {G : Type u}
+    (E : GenuineGSpectrum G) (n : Nat) (x : E.value n) :
+    Path.RwEq
+      (Path.trans
+        (Path.trans (structure_map_path E n x)
+          (Path.symm (structure_map_path E n x)))
+        (structure_map_path E n x))
+      (structure_map_path E n x) :=
+  genuine_rewrite_cancel_chain (structure_map_path E n x)
 
 end GenuineSpectra
 end ComputationalPaths

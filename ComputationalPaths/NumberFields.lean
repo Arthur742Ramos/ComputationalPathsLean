@@ -58,6 +58,21 @@ namespace NumberFields
 
 universe u v
 
+/-- Build a multi-step computational witness from an equality using
+`refl`, `symm`, `trans`, `congr`, associativity-shaped composition, and units. -/
+private def multi_step_path {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  let leftRefl : Path a a := Path.mk [Step.mk a a rfl] rfl
+  let rightRefl : Path b b := Path.mk [Step.mk b b rfl] rfl
+  let core : Path a b := Path.congrArg (fun x => x) (Path.mk [Step.mk a b h] h)
+  let leftUnit : Path a a := Path.trans leftRefl (Path.symm leftRefl)
+  let rightUnit : Path b b := Path.trans rightRefl rightRefl
+  let leftAssoc : Path a b := Path.trans (Path.trans leftUnit core) rightUnit
+  let rightAssoc : Path a b := Path.trans leftUnit (Path.trans core rightUnit)
+  have _assoc : leftAssoc = rightAssoc := by
+    exact Path.trans_assoc leftUnit core rightUnit
+  exact leftAssoc
+
+
 /-! ## Number Fields -/
 
 /-- A number field: a finite extension of the rationals, modeled abstractly
@@ -618,83 +633,83 @@ structure FrobeniusElement (ext : GaloisExtension) where
 def efg_sum_path (K : NumberField) (fact : IdealFactorization K) :
     Path (fact.primes.map fun 𝔭 => 𝔭.ramificationIndex * 𝔭.residueDegree).sum
          K.degree :=
-  Path.ofEq fact.efg_sum
+  multi_step_path fact.efg_sum
 
 /-- Path witness: inert factorization produces exactly one prime. -/
 def inert_single_path (K : NumberField) (p : Nat) :
     Path (IdealFactorization.inert K p).primes.length 1 :=
-  Path.ofEq (IdealFactorization.inert_single K p)
+  multi_step_path (IdealFactorization.inert_single K p)
 
 /-- Path witness: totally split factorization produces [K:ℚ] primes. -/
 def totallySplit_count_path (K : NumberField) (p : Nat) :
     Path (IdealFactorization.totallySplit K p).primes.length K.degree :=
-  Path.ofEq (IdealFactorization.totallySplit_count K p)
+  multi_step_path (IdealFactorization.totallySplit_count K p)
 
 /-- Path witness: rationals have degree 1. -/
 def rationals_degree_path :
     Path NumberField.rationals.degree 1 :=
-  Path.ofEq NumberField.rationals_degree
+  multi_step_path NumberField.rationals_degree
 
 /-- Path witness: discriminant of ℚ has absolute value 1. -/
 def rationals_disc_path :
     Path Discriminant.ofRationals.absValue 1 :=
-  Path.ofEq Discriminant.rationals_absValue
+  multi_step_path Discriminant.rationals_absValue
 
 /-- Path witness: class number of ℚ is 1. -/
 def rationals_classNumber_path :
     Path ClassGroup.ofRationals.classNumber 1 :=
-  Path.ofEq ClassGroup.rationals_classNumber
+  multi_step_path ClassGroup.rationals_classNumber
 
 /-- Path witness: Galois group order equals relative degree. -/
 def galois_order_path (ext : GaloisExtension) :
     Path ext.galoisGroupOrder ext.relativeDegree :=
-  Path.ofEq ext.galois_order_eq
+  multi_step_path ext.galois_order_eq
 
 /-- Path witness: tower law [L:ℚ] = [L:K]·[K:ℚ]. -/
 def tower_law_path (ext : NumberFieldExtension) :
     Path ext.extension_.degree (ext.relativeDegree * ext.base.degree) :=
-  Path.ofEq ext.tower_law
+  multi_step_path ext.tower_law
 
 /-- Path witness: decomposition group order = e·f. -/
 def decomposition_order_path {ext : GaloisExtension}
     (D : DecompositionGroup ext) :
     Path D.order (D.prime.ramificationIndex * D.prime.residueDegree) :=
-  Path.ofEq D.order_eq
+  multi_step_path D.order_eq
 
 /-- Path witness: inertia group order = e. -/
 def inertia_order_path {ext : GaloisExtension}
     (I : InertiaGroup ext) :
     Path I.order I.prime.ramificationIndex :=
-  Path.ofEq I.order_eq
+  multi_step_path I.order_eq
 
 /-- Path witness: Frobenius order = f. -/
 def frobenius_order_path {ext : GaloisExtension}
     (frob : FrobeniusElement ext) :
     Path frob.frobOrder frob.prime.residueDegree :=
-  Path.ofEq frob.frob_order_eq
+  multi_step_path frob.frob_order_eq
 
 /-- Path witness: Minkowski bound of ℚ is 1. -/
 def minkowski_rationals_path :
     Path MinkowskiBound.ofRationals.boundValue 1 :=
-  Path.ofEq MinkowskiBound.rationals_bound
+  multi_step_path MinkowskiBound.rationals_bound
 
 /-- Path witness: ℚ has unit rank 0. -/
 def dirichlet_rationals_path :
     Path DirichletUnitTheorem.ofRationals.unitRank 0 :=
-  Path.ofEq DirichletUnitTheorem.rationals_unitRank
+  multi_step_path DirichletUnitTheorem.rationals_unitRank
 
 /-- Path witness: quadratic fields have degree 2. -/
 def quadratic_degree_path (b : Bool) :
     Path (NumberField.quadratic b).degree 2 :=
-  Path.ofEq (NumberField.quadratic_degree b)
+  multi_step_path (NumberField.quadratic_degree b)
 
 /-- Path witness: identity extension has relative degree 1. -/
 def identity_ext_path (K : NumberField) :
-    Path (NumberFieldExtension.identity K).relativeDegree 1 := Path.ofEq rfl
+    Path (NumberFieldExtension.identity K).relativeDegree 1 := multi_step_path rfl
 
 /-- Path witness: trivial Galois extension has group order 1. -/
 def trivial_galois_path (K : NumberField) :
-    Path (GaloisExtension.trivial K).galoisGroupOrder 1 := Path.ofEq rfl
+    Path (GaloisExtension.trivial K).galoisGroupOrder 1 := multi_step_path rfl
 
 end NumberFields
 end ComputationalPaths

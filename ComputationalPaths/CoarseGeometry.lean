@@ -63,6 +63,7 @@ ignoring local behavior:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.SymplecticManifolds
 
 namespace ComputationalPaths
 namespace CoarseGeometry
@@ -964,6 +965,19 @@ def coarse_metrizable_path :
 def expander_path (p : Nat) (hp : p ≥ 2) :
     Path (ExpanderFamily.ramanujan p hp).coarseUnionEmbeddable false :=
   Path.ofEq (ExpanderFamily.ramanujan_no_embed p hp)
+
+/-- Inter-file path: asdim(ℤ) factors through the symplectic half-dimension of ℝ². -/
+def asdim_to_symplectic_halfdim_path :
+    Path AsymptoticDimension.integers.asdim
+         (SymplecticManifolds.SymplecticData.standard 1).halfDim :=
+  Path.trans asdim_integers_path
+    (Path.symm (SymplecticManifolds.standard_halfDim_path 1))
+
+/-- Inter-file path: CBC(tree) factors through Θ₃ triviality. -/
+def cbc_tree_to_theta3_path :
+    Path CoarseBaumConnes.tree.isKnownTrue
+         ExoticSpheres.ExoticGroup.theta3.isTrivial :=
+  Path.symm (ExoticSpheres.theta3_factor_through_true cbc_tree_path)
 
 end CoarseGeometry
 end ComputationalPaths

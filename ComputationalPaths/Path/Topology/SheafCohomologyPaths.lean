@@ -15,6 +15,7 @@ long exact sequences, and the Leray spectral sequence structure.
 
 import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
+import ComputationalPaths.Path.HigherPathInduction
 
 namespace ComputationalPaths
 namespace Path
@@ -189,6 +190,26 @@ structure LeraySpectralSequence {U : OpenCover.{u, v}} (S : Sheaf U) where
 def leray_converges {U : OpenCover.{u, v}} {S : Sheaf U}
     (L : LeraySpectralSequence S) (n : Nat) : Path n n :=
   L.converges n
+
+/-- Rewrite-equivalent convergence witnesses induce equivalent transports. -/
+def leray_converges_transport {U : OpenCover.{u, v}} {S : Sheaf U}
+    (L : LeraySpectralSequence S) (n : Nat) {q : Path n n}
+    (h : RwEq (L.converges n) q) :
+    Path (transport (D := fun m : Nat => Path n m) (L.converges n) (Path.refl n))
+         (transport (D := fun m : Nat => Path n m) q (Path.refl n)) :=
+  HigherPathInduction.transport_path_of_rweq
+    (D := fun m : Nat => Path n m)
+    (p := L.converges n) (q := q) h (Path.refl n)
+
+/-- Composition of transport witnesses along two Leray convergence rewrites. -/
+def leray_converges_transport_comp {U : OpenCover.{u, v}} {S : Sheaf U}
+    (L : LeraySpectralSequence S) (n : Nat) {q r : Path n n}
+    (h₁ : RwEq (L.converges n) q) (h₂ : RwEq q r) :
+    Path (transport (D := fun m : Nat => Path n m) (L.converges n) (Path.refl n))
+         (transport (D := fun m : Nat => Path n m) r (Path.refl n)) :=
+  HigherPathInduction.transport_path_of_rweq_comp
+    (D := fun m : Nat => Path n m)
+    (p := L.converges n) (q := q) (r := r) h₁ h₂ (Path.refl n)
 
 end SheafCohomologyPaths
 end Topology

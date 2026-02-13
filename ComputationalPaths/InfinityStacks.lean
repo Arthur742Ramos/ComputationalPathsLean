@@ -39,6 +39,7 @@ using `Path` witnesses.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace InfinityStacks
@@ -308,6 +309,16 @@ def descent_equiv {S : SiteData} (F : InfinityStack S) (X : S.Obj)
     (d : DescentDatum S F.toSimplicialPresheaf X) :
     Path (F.effective X d) (F.effective X d) :=
   Path.refl _
+
+/-! ## Higher Path Coherence (2-Cells) -/
+
+/-- Coherence 2-cell: the unit-expanded path and the direct path are connected
+by a higher path witness (`RwEq`). -/
+theorem infinity_unit_inserted_two_cell {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.refl a) (Path.trans p (Path.refl b))) p := by
+  exact Path.rweq_trans
+    (Path.rweq_cmpA_refl_left (Path.trans p (Path.refl b)))
+    (Path.rweq_cmpA_refl_right p)
 
 end InfinityStacks
 end ComputationalPaths

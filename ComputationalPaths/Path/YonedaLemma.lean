@@ -104,6 +104,24 @@ def yoneda {A : Type u} (F : PathFunctor (A := A)) (a : A) :
     intro x
     exact (F.map_id a x).toEq
 
+/-- Naturality of a representable natural transformation at the identity witness. -/
+def yonedaNaturalityPath {A : Type u} {F : PathFunctor (A := A)} {a b : A}
+    (η : PathNatTrans (representable A a) F) (p : Path a b) :
+    Path (F.map p (η.app a (Path.refl a))) (η.app b p) := by
+  refine Path.ofEq ?_
+  have h := η.naturality (p := p) (x := Path.refl a)
+  simpa [representable, Path.trans_refl_left] using h
+
+/-- Compose two representable legs and evaluate via Yoneda naturality. -/
+def yonedaNaturalityComposePath {A : Type u} {F : PathFunctor (A := A)}
+    {a b c : A} (η : PathNatTrans (representable A a) F)
+    (p : Path a b) (q : Path b c) :
+    Path (F.map q (F.map p (η.app a (Path.refl a))))
+         (η.app c (Path.trans p q)) := by
+  exact Path.trans
+    (Path.symm (F.map_comp (p := p) (q := q) (x := η.app a (Path.refl a))))
+    (yonedaNaturalityPath (η := η) (p := Path.trans p q))
+
 /-! ## Yoneda embedding -/
 
 /-- Yoneda embedding on objects. -/

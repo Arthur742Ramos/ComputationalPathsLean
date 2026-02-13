@@ -25,6 +25,8 @@ The Adams spectral sequence computes stable homotopy groups from algebra:
 import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.YonedaLemma
+import ComputationalPaths.Path.HigherPathInduction
 
 namespace ComputationalPaths
 namespace Path
@@ -193,6 +195,53 @@ def adams_steps_compose {E : BiGraded.{u}} {s t : Nat}
     (s1 : AdamsStep a b) (s2 : AdamsStep b c) : Path a c :=
   Path.trans (adamsStepPath s1) (adamsStepPath s2)
 
+/-! ## Cross-module Path Witness Infrastructure -/
+
+/-- Path witnesses driving spectral sequence differential computations. -/
+structure SpectralPathWitness (r : Nat) (P : SSPage.{u} r) where
+  /-- Canonical witness `d_r(0) = 0`. -/
+  diffZeroWitness : ∀ {s t},
+    Path (P.differential (P.groups.zero s (t + r)))
+         (P.groups.zero (s + r) t)
+  /-- Rewrite-equivalent differential-zero witnesses transport identically. -/
+  diffZeroTransport :
+    ∀ {s t}
+      {p q : Path (P.differential (P.groups.zero s (t + r)))
+                  (P.groups.zero (s + r) t)},
+      RwEq p q →
+      Path
+        (transport
+          (D := fun y : P.groups.group (s + r) t =>
+            Path (P.differential (P.groups.zero s (t + r))) y)
+          p
+          (Path.refl (P.differential (P.groups.zero s (t + r)))))
+        (transport
+          (D := fun y : P.groups.group (s + r) t =>
+            Path (P.differential (P.groups.zero s (t + r))) y)
+          q
+          (Path.refl (P.differential (P.groups.zero s (t + r)))))
+
+/-- Build the canonical witness package from `SSPage.diff_zero`. -/
+def canonicalSpectralPathWitness (r : Nat) (P : SSPage.{u} r) :
+    SpectralPathWitness r P where
+  diffZeroWitness := fun {s t} => P.diff_zero
+  diffZeroTransport := by
+    intro s t p q h
+    exact HigherPathInduction.transport_path_of_rweq
+      (D := fun y : P.groups.group (s + r) t =>
+        Path (P.differential (P.groups.zero s (t + r))) y)
+      (p := p) (q := q) h
+      (Path.refl (P.differential (P.groups.zero s (t + r))))
+
+/-- Yoneda-driven composition of witness paths for spectral constructions. -/
+def yoneda_spectral_composition
+    {A : Type u} {F : PathFunctor (A := A)} {a b c : A}
+    (η : PathNatTrans (representable A a) F)
+    (p : Path a b) (q : Path b c) :
+    Path (F.map q (F.map p (η.app a (Path.refl a))))
+         (η.app c (Path.trans p q)) :=
+  yonedaNaturalityComposePath (η := η) p q
+
 /-! ## Summary -/
 
 /-- Bigraded addition is commutative. -/
@@ -202,10 +251,11 @@ def bigraded_add_comm (E : BiGraded.{u}) {s t : Nat}
   E.add_comm x y
 
 /-- Differential preserves zero. -/
-def diff_preserves_zero (r : Nat) (P : SSPage.{u} r) {s t : Nat} :
+def diff_preserves_zero (r : Nat) (P : SSPage.{u} r)
+    (W : SpectralPathWitness r P := canonicalSpectralPathWitness r P) {s t : Nat} :
     Path (P.differential (P.groups.zero s (t + r)))
          (P.groups.zero (s + r) t) :=
-  P.diff_zero
+  W.diffZeroWitness
 
 end AdamsSpectralSeq
 end Topology

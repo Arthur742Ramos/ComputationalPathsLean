@@ -57,6 +57,7 @@ algebraic geometry and analysis:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace DModules
@@ -605,6 +606,41 @@ def relDim_path (dop : DModuleOperationData) :
   Path.ofEq dop.relDim_eq
 
 end DModuleOperationData
+
+/-! ## Rewrite-Level Computational Transformations -/
+
+/-- Normalize unit whiskers around a path via explicit rewrite steps. -/
+theorem dmodule_rewrite_unit_whiskers {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.refl a) (Path.trans p (Path.refl b))) p := by
+  apply Path.rweq_trans
+  · exact Path.rweq_trans_congr_right (Path.refl a) (Path.rweq_cmpA_refl_right p)
+  · exact Path.rweq_cmpA_refl_left p
+
+/-- Contract `(p · p⁻¹) · p` back to `p` by associativity, inverse, and unit rewrites. -/
+theorem dmodule_rewrite_cancel_chain {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.trans p (Path.symm p)) p) p := by
+  apply Path.rweq_trans
+  · exact Path.rweq_tt p (Path.symm p) p
+  · apply Path.rweq_trans
+    · exact Path.rweq_trans_congr_right p (Path.rweq_cmpA_inv_left p)
+    · exact Path.rweq_cmpA_refl_right p
+
+/-- De Rham length path reduced after adding explicit reflexive whiskers. -/
+def deRham_length_rewrite_path (drd : DeRhamFunctorData) :
+    Path.RwEq
+      (Path.trans (Path.refl drd.complexLength)
+        (Path.trans drd.complex_length_path (Path.refl (drd.varietyDim + 1))))
+      drd.complex_length_path :=
+  dmodule_rewrite_unit_whiskers drd.complex_length_path
+
+/-- RH equivalence coherence reduced from an explicit cancellation chain. -/
+def rh_equiv_cancel_rewrite_path (rhd : RiemannHilbertData) :
+    Path.RwEq
+      (Path.trans
+        (Path.trans rhd.rh_equiv_path (Path.symm rhd.rh_equiv_path))
+        rhd.rh_equiv_path)
+      rhd.rh_equiv_path :=
+  dmodule_rewrite_cancel_chain rhd.rh_equiv_path
 
 /-! ## Master Coherence Paths -/
 

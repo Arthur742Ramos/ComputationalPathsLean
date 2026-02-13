@@ -54,6 +54,7 @@ An elementary topos (Lawvere–Tierney) is a category satisfying:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace ElementaryTopos
@@ -467,6 +468,16 @@ variable {E : ElementaryTopos} (lt : LawvereTierneyTopology E)
 theorem topology_idem : E.comp lt.j lt.j = lt.j := lt.j_idem
 
 end LawvereTierneyTopology
+
+/-! ## Higher Path Coherence (2-Cells) -/
+
+/-- Coherence 2-cell: the unit-expanded path and the direct path are connected
+by a higher path witness (`RwEq`). -/
+theorem elementary_unit_inserted_two_cell {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.refl a) (Path.trans p (Path.refl b))) p := by
+  exact Path.rweq_trans
+    (Path.rweq_cmpA_refl_left (Path.trans p (Path.refl b)))
+    (Path.rweq_cmpA_refl_right p)
 
 end ElementaryTopos
 end ComputationalPaths

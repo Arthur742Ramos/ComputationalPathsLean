@@ -46,6 +46,7 @@ equivalent to the category of sheaves on some site:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace GrothendieckTopos
@@ -454,6 +455,16 @@ structure ComparisonLemma (C : SmallCat) (J : GrothendieckTopology C) where
     ∃ (G : PresheafData C), ∀ (X : C.Obj),
     X ∈ subcat_obj →
     ∀ (s : G.sections X), ∃ (t : F.presheaf.sections X), True
+
+/-! ## Higher Path Coherence (2-Cells) -/
+
+/-- Coherence 2-cell: the unit-expanded path and the direct path are connected
+by a higher path witness (`RwEq`). -/
+theorem grothendieck_unit_inserted_two_cell {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.refl a) (Path.trans p (Path.refl b))) p := by
+  exact Path.rweq_trans
+    (Path.rweq_cmpA_refl_left (Path.trans p (Path.refl b)))
+    (Path.rweq_cmpA_refl_right p)
 
 end GrothendieckTopos
 end ComputationalPaths

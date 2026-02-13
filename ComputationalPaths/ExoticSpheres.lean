@@ -764,5 +764,15 @@ def bp8_exhausts_path :
     Path BPSubgroup.bp8.order BPSubgroup.bp8.thetaOrder :=
   Path.ofEq BPSubgroup.bp8_exhausts
 
+/-- Bridge any boolean witness through Θ₃ triviality. -/
+def theta3_factor_through_true {b : Bool} (p : Path b true) :
+    Path ExoticGroup.theta3.isTrivial b :=
+  Path.trans theta3_trivial_path (Path.symm p)
+
+/-- Bridge any Euler-characteristic witness through Milnor χ = 0. -/
+def milnor_euler_factor_through_zero {z : Int} (p : Path z 0) :
+    Path MilnorSphere.original.eulerChar z :=
+  Path.trans milnor_euler_path (Path.symm p)
+
 end ExoticSpheres
 end ComputationalPaths

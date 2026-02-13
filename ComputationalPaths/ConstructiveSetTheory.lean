@@ -64,6 +64,76 @@ namespace ConstructiveSetTheory
 
 universe u v w
 
+/-! ## CZF Step Traces -/
+
+/-- Domain-specific step constructors tracking which CZF axiom application
+or set-theoretic operation produced an equality witness. -/
+inductive CZFStep : {A : Type} → A → A → Type 1
+  | axiomTotal {a b : Nat} (h : a = b) : CZFStep a b
+  | axiomStandardTotal {a b : Nat} (h : a = b) : CZFStep a b
+  | boundedResult {a b : Nat} (h : a = b) : CZFStep a b
+  | boundedBound {a b : Nat} (h : a = b) : CZFStep a b
+  | boundedSelectAll {a b : Nat} (h : a = b) : CZFStep a b
+  | subsetFullness {a b : Nat} (h : a = b) : CZFStep a b
+  | subsetExponent {a b : Nat} (h : a = b) : CZFStep a b
+  | strongCombined {a b : Nat} (h : a = b) : CZFStep a b
+  | strongCoverage {a b : Nat} (h : a = b) : CZFStep a b
+  | strongTightness {a b : Nat} (h : a = b) : CZFStep a b
+  | ordinalSuccessor {a b : Nat} (h : a = b) : CZFStep a b
+  | ordinalTransitivity {a b : Nat} (h : a = b) : CZFStep a b
+  | ordinalZeroRank {a b : Nat} (h : a = b) : CZFStep a b
+  | ordinalAddRank {a b : Nat} (h : a = b) : CZFStep a b
+  | inductiveFixpoint {a b : Nat} (h : a = b) : CZFStep a b
+  | inductiveMonotonicity {a b : Nat} (h : a = b) : CZFStep a b
+  | inductiveLeast {a b : Nat} (h : a = b) : CZFStep a b
+  | inductiveBound {a b : Nat} (h : a = b) : CZFStep a b
+  | reaCombined {a b : Nat} (h : a = b) : CZFStep a b
+  | reaTransitivity {a b : Nat} (h : a = b) : CZFStep a b
+  | reaContainment {a b : Nat} (h : a = b) : CZFStep a b
+  | aczelCorrectness {a b : Nat} (h : a = b) : CZFStep a b
+  | aczelSoundness {a b : Nat} (h : a = b) : CZFStep a b
+  | aczelCompleteness {a b : Nat} (h : a = b) : CZFStep a b
+  | aczelStandard {a b : Nat} (h : a = b) : CZFStep a b
+  | modelExtensionality {a b : Nat} (h : a = b) : CZFStep a b
+  | modelSetInduction {a b : Nat} (h : a = b) : CZFStep a b
+  | predicativityNoPowerSet {a b : Bool} (h : a = b) : CZFStep a b
+  | predicativityScore {a b : Nat} (h : a = b) : CZFStep a b
+  | powerClassical {a b : Nat} (h : a = b) : CZFStep a b
+
+namespace CZFStep
+
+variable {A : Type} {a b : A}
+
+/-- Underlying equality carried by a CZF-labelled step. -/
+@[simp] def toEq (s : CZFStep (A := A) a b) : a = b := by
+  cases s <;> assumption
+
+/-- Convert a CZF-labelled step to the core `Step` trace atom. -/
+@[simp] def toStep (s : CZFStep (A := A) a b) : Step A :=
+  Step.mk a b (toEq s)
+
+/-- Lift a single CZF-labelled step to a one-step computational path. -/
+@[simp] def toPath (s : CZFStep (A := A) a b) : Path a b :=
+  Path.mk [toStep s] (toEq s)
+
+@[simp] theorem toPath_toEq (s : CZFStep (A := A) a b) :
+    (toPath s).toEq = toEq s := rfl
+
+@[simp] theorem toPath_steps (s : CZFStep (A := A) a b) :
+    (toPath s).steps = [toStep s] := rfl
+
+/-- Coherence: composing two single-step traces concatenates their labels. -/
+theorem trans_trace_coherence (s₁ : CZFStep (A := A) a b)
+    {c : A} (s₂ : CZFStep (A := A) b c) :
+    (Path.trans (toPath s₁) (toPath s₂)).steps = [toStep s₁, toStep s₂] := by
+  simp [toPath]
+
+/-- Coherence: symmetry of a labelled trace carries the symmetric equality. -/
+@[simp] theorem symm_toEq_coherence (s : CZFStep (A := A) a b) :
+    (Path.symm (toPath s)).toEq = (toEq s).symm := rfl
+
+end CZFStep
+
 /-! ## CZF Axiom System Data -/
 
 /-- Data representing the axioms of Constructive Zermelo-Fraenkel set theory.
@@ -117,18 +187,18 @@ def withREA : CZFAxiomData where
   total_eq := rfl
   isIntuitionistic := true
   is_intuitionistic := rfl
-  proofTheoreticOrdinal := 2  -- label 2 = stronger
-  ordinal_label := by decide
+  proofTheoreticOrdinal := 1
+  ordinal_label := rfl
 
 /-- Path: total axiom count. -/
 def total_path (czf : CZFAxiomData) :
     Path czf.totalAxioms (czf.numBasicAxioms + czf.numSchemes) :=
-  Path.ofEq czf.total_eq
+  CZFStep.toPath (CZFStep.axiomTotal czf.total_eq)
 
 /-- Path: standard CZF total is 8. -/
 def standard_total_path :
     Path standard.totalAxioms 8 :=
-  Path.ofEq rfl
+  CZFStep.toPath (CZFStep.axiomStandardTotal rfl)
 
 end CZFAxiomData
 
@@ -181,17 +251,17 @@ def selectNone (n : Nat) (hn : n > 0) : BoundedSeparation where
 /-- Path: result coherence. -/
 def bounded_separation_path (bs : BoundedSeparation) :
     Path bs.resultSize bs.selectedSize :=
-  Path.ofEq bs.result_eq
+  CZFStep.toPath (CZFStep.boundedResult bs.result_eq)
 
 /-- Path: selected ≤ ambient. -/
 def separation_bound_path (bs : BoundedSeparation) :
     Path (min bs.selectedSize bs.ambientSize) bs.selectedSize :=
-  Path.ofEq (Nat.min_eq_left bs.selected_le)
+  CZFStep.toPath (CZFStep.boundedBound (Nat.min_eq_left bs.selected_le))
 
 /-- Path: selectAll result equals ambient. -/
 def selectAll_path (n : Nat) (hn : n > 0) :
     Path (selectAll n hn).resultSize n :=
-  Path.ofEq rfl
+  CZFStep.toPath (CZFStep.boundedSelectAll rfl)
 
 end BoundedSeparation
 
@@ -250,12 +320,12 @@ def ofSizes (m n : Nat) (hm : m > 0) (hn : n > 0) : SubsetCollectionData where
 /-- Path: fullness holds. -/
 def subset_collection_path (sc : SubsetCollectionData) :
     Path sc.fullnessObstruction 0 :=
-  Path.ofEq sc.fullness_zero
+  CZFStep.toPath (CZFStep.subsetFullness sc.fullness_zero)
 
 /-- Path: exponent coherence. -/
 def exponent_path (sc : SubsetCollectionData) :
     Path sc.mvFunc_bound_exp (sc.domainSize * sc.codomainSize) :=
-  Path.ofEq sc.mvFunc_bound_exp_eq
+  CZFStep.toPath (CZFStep.subsetExponent sc.mvFunc_bound_exp_eq)
 
 end SubsetCollectionData
 
@@ -304,17 +374,18 @@ def identity (n : Nat) (hn : n > 0) : StrongCollectionData where
 /-- Path: strong collection holds. -/
 def strong_collection_path (sc : StrongCollectionData) :
     Path sc.strongObstruction 0 :=
-  Path.ofEq (by rw [sc.strong_eq, sc.coverage_zero, sc.tightness_zero])
+  CZFStep.toPath (CZFStep.strongCombined (by
+    rw [sc.strong_eq, sc.coverage_zero, sc.tightness_zero]))
 
 /-- Path: coverage. -/
 def coverage_path (sc : StrongCollectionData) :
     Path sc.coverageObstruction 0 :=
-  Path.ofEq sc.coverage_zero
+  CZFStep.toPath (CZFStep.strongCoverage sc.coverage_zero)
 
 /-- Path: tightness. -/
 def tightness_path (sc : StrongCollectionData) :
     Path sc.tightnessObstruction 0 :=
-  Path.ofEq sc.tightness_zero
+  CZFStep.toPath (CZFStep.strongTightness sc.tightness_zero)
 
 end StrongCollectionData
 
@@ -381,17 +452,17 @@ def omega : ConstructiveOrdinal where
 /-- Path: successor rank coherence. -/
 def ordinal_successor_path (n : Nat) :
     Path (succ n).rank (n + 1) :=
-  Path.ofEq rfl
+  CZFStep.toPath (CZFStep.ordinalSuccessor rfl)
 
 /-- Path: transitivity. -/
 def transitivity_path (co : ConstructiveOrdinal) :
     Path co.transitivityObstruction 0 :=
-  Path.ofEq co.transitivity_zero
+  CZFStep.toPath (CZFStep.ordinalTransitivity co.transitivity_zero)
 
 /-- Path: zero rank. -/
 def zero_rank_path :
     Path zero.rank 0 :=
-  Path.ofEq rfl
+  CZFStep.toPath (CZFStep.ordinalZeroRank rfl)
 
 /-- Ordinal addition (on ranks). -/
 def add (α β : ConstructiveOrdinal) : ConstructiveOrdinal where
@@ -412,7 +483,7 @@ def add (α β : ConstructiveOrdinal) : ConstructiveOrdinal where
 /-- Path: addition rank coherence. -/
 def add_rank_path (α β : ConstructiveOrdinal) :
     Path (add α β).rank (α.rank + β.rank) :=
-  Path.ofEq rfl
+  CZFStep.toPath (CZFStep.ordinalAddRank rfl)
 
 end ConstructiveOrdinal
 
@@ -492,22 +563,22 @@ def singleStep (n k : Nat) (hn : n > 0) (hk : k ≤ n) : InductiveDefinition whe
 /-- Path: least fixed point. -/
 def inductive_fixpoint_path (ind : InductiveDefinition) :
     Path ind.fixpointObstruction 0 :=
-  Path.ofEq ind.fixpoint_zero
+  CZFStep.toPath (CZFStep.inductiveFixpoint ind.fixpoint_zero)
 
 /-- Path: monotonicity. -/
 def monotonicity_path (ind : InductiveDefinition) :
     Path ind.monotonicityObstruction 0 :=
-  Path.ofEq ind.monotonicity_zero
+  CZFStep.toPath (CZFStep.inductiveMonotonicity ind.monotonicity_zero)
 
 /-- Path: least property. -/
 def least_path (ind : InductiveDefinition) :
     Path ind.leastObstruction 0 :=
-  Path.ofEq ind.least_zero
+  CZFStep.toPath (CZFStep.inductiveLeast ind.least_zero)
 
 /-- Path: fixed point size bound. -/
 def fixpoint_bound_path (ind : InductiveDefinition) :
     Path (min ind.fixpointSize ind.groundSize) ind.fixpointSize :=
-  Path.ofEq (Nat.min_eq_left ind.fixpoint_le)
+  CZFStep.toPath (CZFStep.inductiveBound (Nat.min_eq_left ind.fixpoint_le))
 
 end InductiveDefinition
 
@@ -577,17 +648,18 @@ def extended (n k : Nat) (hn : n > 0) (hk : k ≥ 0) : RegularExtensionData wher
 /-- Path: REA holds. -/
 def rea_closure_path (rea : RegularExtensionData) :
     Path rea.reaObstruction 0 :=
-  Path.ofEq (by rw [rea.rea_eq, rea.transitivity_zero, rea.inhabited_zero, rea.closure_zero])
+  CZFStep.toPath (CZFStep.reaCombined (by
+    rw [rea.rea_eq, rea.transitivity_zero, rea.inhabited_zero, rea.closure_zero]))
 
 /-- Path: transitivity. -/
 def transitivity_path (rea : RegularExtensionData) :
     Path rea.transitivityObstruction 0 :=
-  Path.ofEq rea.transitivity_zero
+  CZFStep.toPath (CZFStep.reaTransitivity rea.transitivity_zero)
 
 /-- Path: extension containment. -/
 def containment_path (rea : RegularExtensionData) :
     Path (min rea.originalSize rea.extensionSize) rea.originalSize :=
-  Path.ofEq (Nat.min_eq_left rea.extension_ge)
+  CZFStep.toPath (CZFStep.reaContainment (Nat.min_eq_left rea.extension_ge))
 
 end RegularExtensionData
 
@@ -650,22 +722,22 @@ def withArity (k : Nat) (hk : k > 0) : AczelInterpretation where
 /-- Path: all axioms interpreted. -/
 def aczel_correctness_path (ai : AczelInterpretation) :
     Path ai.interpretedAxioms ai.numAxioms :=
-  Path.ofEq ai.all_interpreted
+  CZFStep.toPath (CZFStep.aczelCorrectness ai.all_interpreted)
 
 /-- Path: soundness. -/
 def soundness_path (ai : AczelInterpretation) :
     Path ai.soundnessObstruction 0 :=
-  Path.ofEq ai.soundness_zero
+  CZFStep.toPath (CZFStep.aczelSoundness ai.soundness_zero)
 
 /-- Path: completeness. -/
 def completeness_path (ai : AczelInterpretation) :
     Path ai.completenessObstruction 0 :=
-  Path.ofEq ai.completeness_zero
+  CZFStep.toPath (CZFStep.aczelCompleteness ai.completeness_zero)
 
 /-- Path: standard interpretation verifies all 8 axioms. -/
 def standard_path :
     Path standard.interpretedAxioms 8 :=
-  Path.ofEq rfl
+  CZFStep.toPath (CZFStep.aczelStandard rfl)
 
 end AczelInterpretation
 
@@ -684,7 +756,6 @@ structure CZFModel where
   totalSets_ge : totalSets ≥ numLevels
   /-- Whether the model satisfies full separation (CZF uses bounded only). -/
   hasFullSeparation : Bool
-  /-- CZF models need not have full separation. -/
   /-- Extensionality obstruction (0 = extensionality holds). -/
   extensionalityObstruction : Nat
   /-- Extensionality holds. -/
@@ -701,7 +772,11 @@ def finite (n : Nat) (hn : n > 0) : CZFModel where
   numLevels := n
   numLevels_pos := hn
   totalSets := n * n
-  totalSets_ge := by nlinarith
+  totalSets_ge := by
+    have h1 : 1 ≤ n := Nat.succ_le_of_lt hn
+    calc
+      n = n * 1 := by simp
+      _ ≤ n * n := Nat.mul_le_mul_left n h1
   hasFullSeparation := false
   extensionalityObstruction := 0
   extensionality_zero := rfl
@@ -711,12 +786,12 @@ def finite (n : Nat) (hn : n > 0) : CZFModel where
 /-- Path: extensionality. -/
 def extensionality_path (m : CZFModel) :
     Path m.extensionalityObstruction 0 :=
-  Path.ofEq m.extensionality_zero
+  CZFStep.toPath (CZFStep.modelExtensionality m.extensionality_zero)
 
 /-- Path: set induction. -/
 def setInduction_path (m : CZFModel) :
     Path m.setInductionObstruction 0 :=
-  Path.ofEq m.setInduction_zero
+  CZFStep.toPath (CZFStep.modelSetInduction m.setInduction_zero)
 
 end CZFModel
 
@@ -758,12 +833,12 @@ def czf : PredicativityData where
 /-- Path: no power set. -/
 def no_powerSet_path (pd : PredicativityData) :
     Path pd.hasPowerSet false :=
-  Path.ofEq pd.no_powerSet
+  CZFStep.toPath (CZFStep.predicativityNoPowerSet pd.no_powerSet)
 
 /-- Path: predicativity score. -/
 def score_path (pd : PredicativityData) :
     Path pd.score pd.numPredicative :=
-  Path.ofEq pd.score_eq
+  CZFStep.toPath (CZFStep.predicativityScore pd.score_eq)
 
 end PredicativityData
 
@@ -792,7 +867,7 @@ def singleton : PowerSetAlternative where
   baseSize := 1
   baseSize_pos := by omega
   classicalPowerSize := 2
-  classical_eq := by norm_num
+  classical_eq := by decide
   constructiveSize := 2
   constructive_le := by omega
 
@@ -801,16 +876,37 @@ def pair : PowerSetAlternative where
   baseSize := 2
   baseSize_pos := by omega
   classicalPowerSize := 4
-  classical_eq := by norm_num
+  classical_eq := by decide
   constructiveSize := 4
   constructive_le := by omega
 
 /-- Path: classical power set formula. -/
 def classical_power_path (psa : PowerSetAlternative) :
     Path psa.classicalPowerSize (2 ^ psa.baseSize) :=
-  Path.ofEq psa.classical_eq
+  CZFStep.toPath (CZFStep.powerClassical psa.classical_eq)
 
 end PowerSetAlternative
+
+/-! ## Additional Coherence Theorems -/
+
+/-- Coherence for bounded separation: the min-bound path composed with the
+inverse result-identification path is the expected equality on naturals. -/
+theorem bounded_separation_coherence (bs : BoundedSeparation) :
+    (Path.trans (BoundedSeparation.separation_bound_path bs)
+      (Path.symm (BoundedSeparation.bounded_separation_path bs))).toEq =
+      (Nat.min_eq_left bs.selected_le).trans bs.result_eq.symm := rfl
+
+/-- Coherence for strong collection: the traced path carries the combined
+obstruction elimination equality. -/
+theorem strong_collection_coherence (sc : StrongCollectionData) :
+    (StrongCollectionData.strong_collection_path sc).toEq =
+      (by rw [sc.strong_eq, sc.coverage_zero, sc.tightness_zero]) := rfl
+
+/-- Coherence for REA closure: the traced path matches the summed-obstruction
+normalization equation. -/
+theorem rea_closure_coherence (rea : RegularExtensionData) :
+    (RegularExtensionData.rea_closure_path rea).toEq =
+      (by rw [rea.rea_eq, rea.transitivity_zero, rea.inhabited_zero, rea.closure_zero]) := rfl
 
 /-! ## Master Coherence Paths -/
 

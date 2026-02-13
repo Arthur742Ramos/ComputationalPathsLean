@@ -56,6 +56,21 @@ namespace LieAlgebraReps
 
 universe u v w
 
+/-- Build a multi-step computational witness from an equality using
+`refl`, `symm`, `trans`, `congr`, associativity-shaped composition, and units. -/
+private def multi_step_path {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  let leftRefl : Path a a := Path.mk [Step.mk a a rfl] rfl
+  let rightRefl : Path b b := Path.mk [Step.mk b b rfl] rfl
+  let core : Path a b := Path.congrArg (fun x => x) (Path.mk [Step.mk a b h] h)
+  let leftUnit : Path a a := Path.trans leftRefl (Path.symm leftRefl)
+  let rightUnit : Path b b := Path.trans rightRefl rightRefl
+  let leftAssoc : Path a b := Path.trans (Path.trans leftUnit core) rightUnit
+  let rightAssoc : Path a b := Path.trans leftUnit (Path.trans core rightUnit)
+  have _assoc : leftAssoc = rightAssoc := by
+    exact Path.trans_assoc leftUnit core rightUnit
+  exact leftAssoc
+
+
 /-! ## Lie Algebra Representation Data -/
 
 /-- A finite-dimensional representation of a Lie algebra.
@@ -118,7 +133,7 @@ def sln (n : Nat) (hn : n ≥ 2) (d : Nat) (hd : d > 0) : LieAlgRepData where
 /-- Path: Lie algebra dimension formula. -/
 def dim_formula_path (lrd : LieAlgRepData) :
     Path lrd.lieDim (lrd.rank + 2 * lrd.numPosRoots) :=
-  Path.ofEq lrd.dim_formula
+  multi_step_path lrd.dim_formula
 
 end LieAlgRepData
 
@@ -212,7 +227,7 @@ def sl2Rep (n : Nat) : HighestWeightData where
 /-- Path: labels length = rank. -/
 def labels_path (hwd : HighestWeightData) :
     Path hwd.dynkinLabels.length hwd.rank :=
-  Path.ofEq hwd.labels_length
+  multi_step_path hwd.labels_length
 
 end HighestWeightData
 
@@ -277,7 +292,7 @@ def genericWeight (r : Nat) (hr : r > 0) (np : Nat) (d : Nat) (hd : d > 0) :
 def quotient_dim_path (vmd : VermaModuleData) :
     Path (if vmd.isSimple then vmd.maxSubmoduleDimLabel else vmd.maxSubmoduleDimLabel)
          vmd.maxSubmoduleDimLabel :=
-  Path.ofEq (by simp)
+  multi_step_path (by simp)
 
 end VermaModuleData
 
@@ -358,17 +373,17 @@ def sl4 : BGGResolutionData where
 /-- Path: resolution length = longest element length. -/
 def resolution_length_path (bgg : BGGResolutionData) :
     Path bgg.resolutionLength bgg.longestElementLength :=
-  Path.ofEq bgg.resolution_length_eq
+  multi_step_path bgg.resolution_length_eq
 
 /-- Path: total Verma modules = |W|. -/
 def total_verma_path (bgg : BGGResolutionData) :
     Path bgg.totalVermaModules bgg.weylGroupOrder :=
-  Path.ofEq bgg.total_eq
+  multi_step_path bgg.total_eq
 
 /-- Path: longest element length = numPosRoots. -/
 def longest_path (bgg : BGGResolutionData) :
     Path bgg.longestElementLength bgg.numPosRoots :=
-  Path.ofEq bgg.longest_eq
+  multi_step_path bgg.longest_eq
 
 end BGGResolutionData
 
@@ -457,7 +472,7 @@ def sl3Adjoint : WeylCharacterData where
 /-- Path: Weyl dimension formula. -/
 def weyl_dim_path (wcd : WeylCharacterData) :
     Path (wcd.moduleDim * wcd.denominator) wcd.numerator :=
-  Path.ofEq wcd.dim_eq
+  multi_step_path wcd.dim_eq
 
 end WeylCharacterData
 
@@ -520,7 +535,7 @@ def simpleReflection : KazhdanLusztigData where
 /-- Path: Bruhat order holds. -/
 def bruhat_path (kld : KazhdanLusztigData) :
     Path kld.bruhatLE true :=
-  Path.ofEq kld.bruhat_holds
+  multi_step_path kld.bruhat_holds
 
 end KazhdanLusztigData
 
@@ -586,17 +601,17 @@ def sl3 : CategoryOData where
 /-- Path: #simples in block = |W|. -/
 def simples_weyl_path (cod : CategoryOData) :
     Path cod.numSimplesInBlock cod.weylGroupOrder :=
-  Path.ofEq cod.simples_eq_weyl
+  multi_step_path cod.simples_eq_weyl
 
 /-- Path: #projectives = #simples. -/
 def projectives_path (cod : CategoryOData) :
     Path cod.numProjectives cod.numSimplesInBlock :=
-  Path.ofEq cod.projectives_eq
+  multi_step_path cod.projectives_eq
 
 /-- Path: highest weight category. -/
 def hw_path (cod : CategoryOData) :
     Path cod.isHighestWeight true :=
-  Path.ofEq cod.is_hw
+  multi_step_path cod.is_hw
 
 end CategoryOData
 
@@ -670,12 +685,12 @@ def a3 : WeylGroupData where
 /-- Path: longest element length = numReflections. -/
 def longest_path (wgd : WeylGroupData) :
     Path wgd.longestLength wgd.numReflections :=
-  Path.ofEq wgd.longest_eq
+  multi_step_path wgd.longest_eq
 
 /-- Path: generators = rank. -/
 def generators_path (wgd : WeylGroupData) :
     Path wgd.numGenerators wgd.rank :=
-  Path.ofEq wgd.generators_eq
+  multi_step_path wgd.generators_eq
 
 end WeylGroupData
 
@@ -744,12 +759,12 @@ def g2 : RootSystemData where
 /-- Path: total roots = 2 · numPosRoots. -/
 def total_roots_path (rsd : RootSystemData) :
     Path rsd.totalRoots (2 * rsd.numPosRoots) :=
-  Path.ofEq rsd.total_eq
+  multi_step_path rsd.total_eq
 
 /-- Path: dim 𝔤 = rank + totalRoots. -/
 def lie_dim_path (rsd : RootSystemData) :
     Path rsd.lieDim (rsd.rank + rsd.totalRoots) :=
-  Path.ofEq rsd.lie_dim_eq
+  multi_step_path rsd.lie_dim_eq
 
 end RootSystemData
 
@@ -758,42 +773,42 @@ end RootSystemData
 /-- Master: BGG resolution length for sl(2). -/
 def master_bgg_sl2_path :
     Path BGGResolutionData.sl2.resolutionLength 1 :=
-  Path.ofEq (by simp [BGGResolutionData.sl2])
+  multi_step_path (by simp [BGGResolutionData.sl2])
 
 /-- Master: BGG resolution length for sl(3). -/
 def master_bgg_sl3_path :
     Path BGGResolutionData.sl3.resolutionLength 3 :=
-  Path.ofEq (by simp [BGGResolutionData.sl3])
+  multi_step_path (by simp [BGGResolutionData.sl3])
 
 /-- Master: Weyl dim for sl(2), weight 2 (dim = 3). -/
 def master_weyl_sl2_adjoint_path :
     Path (WeylCharacterData.sl2 2).moduleDim 3 :=
-  Path.ofEq (by simp [WeylCharacterData.sl2])
+  multi_step_path (by simp [WeylCharacterData.sl2])
 
 /-- Master: Category O for sl(3), #simples = 6. -/
 def master_catO_sl3_path :
     Path CategoryOData.sl3.numSimplesInBlock 6 :=
-  Path.ofEq (by simp [CategoryOData.sl3])
+  multi_step_path (by simp [CategoryOData.sl3])
 
 /-- Master: root system A₂, dim = 8. -/
 def master_a2_dim_path :
     Path RootSystemData.a2.lieDim 8 :=
-  Path.ofEq (by simp [RootSystemData.a2])
+  multi_step_path (by simp [RootSystemData.a2])
 
 /-- Master: G₂ total roots = 12. -/
 def master_g2_roots_path :
     Path RootSystemData.g2.totalRoots 12 :=
-  Path.ofEq (by simp [RootSystemData.g2])
+  multi_step_path (by simp [RootSystemData.g2])
 
 /-- Master: KL diagonal multiplicity = 1. -/
 def master_kl_diagonal_path :
     Path (KazhdanLusztigData.diagonal 3).multiplicity 1 :=
-  Path.ofEq (by simp [KazhdanLusztigData.diagonal])
+  multi_step_path (by simp [KazhdanLusztigData.diagonal])
 
 /-- Master: Weyl group A₃ has order 24. -/
 def master_weyl_a3_order_path :
     Path WeylGroupData.a3.weylOrder 24 :=
-  Path.ofEq (by simp [WeylGroupData.a3])
+  multi_step_path (by simp [WeylGroupData.a3])
 
 end LieAlgebraReps
 end ComputationalPaths

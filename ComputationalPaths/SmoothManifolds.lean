@@ -59,6 +59,7 @@ topology and geometry:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.ExoticSpheres
 
 namespace ComputationalPaths
 namespace SmoothManifolds
@@ -932,6 +933,19 @@ def sphere_b0_path (n : Nat) (hn : n > 0) :
 def torus_euler_path :
     Path SmoothManifold.torus2.eulerChar 0 :=
   Path.ofEq SmoothManifold.torus2_euler
+
+/-- Inter-file path: S¹ Euler characteristic factors through Milnor χ = 0. -/
+def sphere1_to_milnor_euler_path :
+    Path (SmoothManifold.sphere 1 (by omega)).eulerChar
+         ExoticSpheres.MilnorSphere.original.eulerChar :=
+  Path.symm (ExoticSpheres.milnor_euler_factor_through_zero sphere1_euler_path)
+
+/-- Inter-file path: Θ₃ triviality factors through S³ orientability. -/
+def theta3_to_sphere3_orientable_path :
+    Path ExoticSpheres.ExoticGroup.theta3.isTrivial
+         (SmoothManifold.sphere 3 (by omega)).isOrientable :=
+  ExoticSpheres.theta3_factor_through_true
+    (Path.ofEq (SmoothManifold.sphere_orientable 3 (by omega)))
 
 end SmoothManifolds
 end ComputationalPaths

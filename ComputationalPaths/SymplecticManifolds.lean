@@ -51,6 +51,7 @@ closed, non-degenerate 2-form:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.SmoothManifolds
 
 namespace ComputationalPaths
 namespace SymplecticManifolds
@@ -639,6 +640,25 @@ def jacobi_trivial_path :
           PoissonBracket.JacobiIdentity.trivial.v2 +
           PoissonBracket.JacobiIdentity.trivial.v3) 0 :=
   Path.ofEq PoissonBracket.JacobiIdentity.trivial_sum
+
+/-- Inter-file path: symplectic dimension factors through smooth tangent dimension. -/
+def symplectic_dim_via_smooth_tangent_path (n : Nat) (hn : n > 0) :
+    Path (SymplecticData.standard n).fullDim
+         (SmoothManifolds.TangentBundle.ofDim n hn).totalDim :=
+  Path.trans (standard_dim_path n) (Path.symm (SmoothManifolds.tangent_dim_path n hn))
+
+/-- Inter-file path: Poisson self-bracket factors through S¹ Euler characteristic. -/
+def poisson_to_sphere1_euler_path (d : SymplecticData) :
+    Path (PoissonBracket.selfBracket d).value
+         (SmoothManifolds.SmoothManifold.sphere 1 (by omega)).eulerChar :=
+  Path.trans (poisson_self_bracket_path d) (Path.symm SmoothManifolds.sphere1_euler_path)
+
+/-- Inter-file path: Poisson self-bracket factors through the smooth→exotic Euler bridge. -/
+def poisson_to_milnor_euler_path (d : SymplecticData) :
+    Path (PoissonBracket.selfBracket d).value
+         ExoticSpheres.MilnorSphere.original.eulerChar :=
+  Path.trans (poisson_to_sphere1_euler_path d)
+    SmoothManifolds.sphere1_to_milnor_euler_path
 
 end SymplecticManifolds
 end ComputationalPaths

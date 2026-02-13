@@ -85,6 +85,20 @@ theorem transport_of_rweq {a b : A} {D : A → Sort v}
     transport (D := D) p x = transport (D := D) q x := by
   exact transport_of_toEq_eq (D := D) (p := p) (q := q) (h := rweq_toEq h) x
 
+/-- Rewrite-equivalent paths induce path-equivalent transported terms. -/
+def transport_path_of_rweq {a b : A} {D : A → Type v}
+    {p q : Path a b} (h : RwEq p q) (x : D a) :
+    Path (transport (D := D) p x) (transport (D := D) q x) :=
+  Path.ofEq (transport_of_rweq (D := D) (p := p) (q := q) h x)
+
+/-- Compose transport witnesses along two rewrite equalities. -/
+def transport_path_of_rweq_comp {a b : A} {D : A → Type v}
+    {p q r : Path a b} (h₁ : RwEq p q) (h₂ : RwEq q r) (x : D a) :
+    Path (transport (D := D) p x) (transport (D := D) r x) :=
+  Path.trans
+    (transport_path_of_rweq (D := D) (p := p) (q := q) h₁ x)
+    (transport_path_of_rweq (D := D) (p := q) (q := r) h₂ x)
+
 /-! ## Summary -/
 
 /-!

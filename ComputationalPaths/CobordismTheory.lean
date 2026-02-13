@@ -55,6 +55,7 @@ of bounding a manifold one dimension higher:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace CobordismTheory
@@ -734,6 +735,41 @@ def ring_comm_path (a b : Nat) :
 def rp2_dim_path :
     Path CobordismClass.rp2.dim 2 :=
   Path.ofEq CobordismClass.rp2_dim
+
+/-! ## Rewrite-Level Computational Transformations -/
+
+/-- Normalize unit whiskers around a path via explicit rewrite steps. -/
+theorem cobordism_rewrite_unit_whiskers {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.refl a) (Path.trans p (Path.refl b))) p := by
+  apply Path.rweq_trans
+  · exact Path.rweq_trans_congr_right (Path.refl a) (Path.rweq_cmpA_refl_right p)
+  · exact Path.rweq_cmpA_refl_left p
+
+/-- Contract `(p · p⁻¹) · p` back to `p` by associativity, inverse, and unit rewrites. -/
+theorem cobordism_rewrite_cancel_chain {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.trans p (Path.symm p)) p) p := by
+  apply Path.rweq_trans
+  · exact Path.rweq_tt p (Path.symm p) p
+  · apply Path.rweq_trans
+    · exact Path.rweq_trans_congr_right p (Path.rweq_cmpA_inv_left p)
+    · exact Path.rweq_cmpA_refl_right p
+
+/-- Thom isomorphism path reduced after adding explicit reflexive whiskers. -/
+def thom_iso_rewrite_path (ts : ThomSpectrum) :
+    Path.RwEq
+      (Path.trans (Path.refl ts.unorientedRank)
+        (Path.trans (thom_iso_path ts) (Path.refl ts.homotopyRank)))
+      (thom_iso_path ts) :=
+  cobordism_rewrite_unit_whiskers (thom_iso_path ts)
+
+/-- Ring-unit coherence reduced from an explicit cancellation chain. -/
+def ring_unit_rewrite_path (cr : CobordismRing) :
+    Path.RwEq
+      (Path.trans
+        (Path.trans (ring_unit_path cr) (Path.symm (ring_unit_path cr)))
+        (ring_unit_path cr))
+      (ring_unit_path cr) :=
+  cobordism_rewrite_cancel_chain (ring_unit_path cr)
 
 end CobordismTheory
 end ComputationalPaths

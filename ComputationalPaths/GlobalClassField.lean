@@ -56,6 +56,21 @@ namespace GlobalClassField
 
 universe u v
 
+/-- Build a multi-step computational witness from an equality using
+`refl`, `symm`, `trans`, `congr`, associativity-shaped composition, and units. -/
+private def multi_step_path {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  let leftRefl : Path a a := Path.mk [Step.mk a a rfl] rfl
+  let rightRefl : Path b b := Path.mk [Step.mk b b rfl] rfl
+  let core : Path a b := Path.congrArg (fun x => x) (Path.mk [Step.mk a b h] h)
+  let leftUnit : Path a a := Path.trans leftRefl (Path.symm leftRefl)
+  let rightUnit : Path b b := Path.trans rightRefl rightRefl
+  let leftAssoc : Path a b := Path.trans (Path.trans leftUnit core) rightUnit
+  let rightAssoc : Path a b := Path.trans leftUnit (Path.trans core rightUnit)
+  have _assoc : leftAssoc = rightAssoc := by
+    exact Path.trans_assoc leftUnit core rightUnit
+  exact leftAssoc
+
+
 /-! ## Places of a Number Field -/
 
 /-- A place of a number field: either archimedean or non-archimedean. -/
@@ -482,123 +497,123 @@ structure GlobalLocalCompatibility where
 /-- Path witness: idele multiplication is associative. -/
 def idele_mul_assoc_path (x y z : Idele) :
     Path (Idele.mul (Idele.mul x y) z) (Idele.mul x (Idele.mul y z)) :=
-  Path.ofEq (Idele.mul_assoc x y z)
+  multi_step_path (Idele.mul_assoc x y z)
 
 /-- Path witness: idele right identity. -/
 def idele_mul_one_path (x : Idele) :
     Path (Idele.mul x Idele.one) x :=
-  Path.ofEq (Idele.mul_one x)
+  multi_step_path (Idele.mul_one x)
 
 /-- Path witness: idele left identity. -/
 def idele_one_mul_path (x : Idele) :
     Path (Idele.mul Idele.one x) x :=
-  Path.ofEq (Idele.one_mul x)
+  multi_step_path (Idele.one_mul x)
 
 /-- Path witness: idele multiplication is commutative. -/
 def idele_mul_comm_path (x y : Idele) :
     Path (Idele.mul x y) (Idele.mul y x) :=
-  Path.ofEq (Idele.mul_comm x y)
+  multi_step_path (Idele.mul_comm x y)
 
 /-- Path witness: idele class group multiplication is associative. -/
 def class_mul_assoc_path (a b c : IdeleClassGroup) :
     Path (IdeleClassGroup.mul (IdeleClassGroup.mul a b) c)
          (IdeleClassGroup.mul a (IdeleClassGroup.mul b c)) :=
-  Path.ofEq (IdeleClassGroup.mul_assoc a b c)
+  multi_step_path (IdeleClassGroup.mul_assoc a b c)
 
 /-- Path witness: idele class group right identity. -/
 def class_mul_identity_path (a : IdeleClassGroup) :
     Path (IdeleClassGroup.mul a IdeleClassGroup.identity) a :=
-  Path.ofEq (IdeleClassGroup.mul_identity a)
+  multi_step_path (IdeleClassGroup.mul_identity a)
 
 /-- Path witness: Artin reciprocity. -/
 def artin_reciprocity_path (ar : ArtinReciprocity) :
     Path ar.normGroup.index ar.galoisOrder :=
-  Path.ofEq ar.reciprocity
+  multi_step_path ar.reciprocity
 
 /-- Path witness: trivial reciprocity has order 1. -/
 def trivial_reciprocity_path :
     Path ArtinReciprocity.trivial.galoisOrder 1 :=
-  Path.ofEq ArtinReciprocity.trivial_order
+  multi_step_path ArtinReciprocity.trivial_order
 
 /-- Path witness: existence theorem degree = index. -/
 def existence_degree_path (et : ExistenceTheorem) :
     Path et.extensionDegree et.subgroupIndex :=
-  Path.ofEq et.degree_eq
+  multi_step_path et.degree_eq
 
 /-- Path witness: trivial existence theorem has degree 1. -/
 def trivial_existence_path :
     Path ExistenceTheorem.trivial.extensionDegree 1 :=
-  Path.ofEq ExistenceTheorem.trivial_degree
+  multi_step_path ExistenceTheorem.trivial_degree
 
 /-- Path witness: Chebotarev density numerator. -/
 def chebotarev_num_path (cd : ChebotarevDensity) :
     Path cd.densityNum cd.conjugacyClass.size :=
-  Path.ofEq cd.num_eq
+  multi_step_path cd.num_eq
 
 /-- Path witness: Chebotarev density denominator. -/
 def chebotarev_den_path (cd : ChebotarevDensity) :
     Path cd.densityDen cd.galoisOrder :=
-  Path.ofEq cd.den_eq
+  multi_step_path cd.den_eq
 
 /-- Path witness: identity class density numerator = 1. -/
 def identity_density_num_path (n : Nat) (hn : n > 0) :
     Path (ChebotarevDensity.identityClass n hn).densityNum 1 :=
-  Path.ofEq (ChebotarevDensity.identityClass_num n hn)
+  multi_step_path (ChebotarevDensity.identityClass_num n hn)
 
 /-- Path witness: identity class density denominator = n. -/
 def identity_density_den_path (n : Nat) (hn : n > 0) :
     Path (ChebotarevDensity.identityClass n hn).densityDen n :=
-  Path.ofEq (ChebotarevDensity.identityClass_den n hn)
+  multi_step_path (ChebotarevDensity.identityClass_den n hn)
 
 /-- Path witness: trivial Artin L-function has dimension 1. -/
 def trivial_artin_dim_path (n : Nat) (hn : n > 0) :
     Path (ArtinLFunction.trivial n hn).representation.dimension 1 :=
-  Path.ofEq (ArtinLFunction.trivial_dim n hn)
+  multi_step_path (ArtinLFunction.trivial_dim n hn)
 
 /-- Path witness: ℚ has class number 1 (from formula). -/
 def rationals_class_path :
     Path ClassNumberFormula.ofRationals.classNumber 1 :=
-  Path.ofEq ClassNumberFormula.rationals_classNumber
+  multi_step_path ClassNumberFormula.rationals_classNumber
 
 /-- Path witness: ℚ has 2 roots of unity. -/
 def rationals_roots_path :
     Path ClassNumberFormula.ofRationals.rootsOfUnity 2 :=
-  Path.ofEq ClassNumberFormula.rationals_roots
+  multi_step_path ClassNumberFormula.rationals_roots
 
 /-- Path witness: Dedekind zeta has conductor 0. -/
 def dedekind_zeta_conductor_path :
     Path HeckeLFunction.dedekindZeta.character.conductorExponent 0 :=
-  Path.ofEq HeckeLFunction.dedekindZeta_conductor
+  multi_step_path HeckeLFunction.dedekindZeta_conductor
 
 /-- Path witness: trivial norm group has index 1. -/
 def trivial_norm_index_path :
     Path trivialNormGroup.index 1 :=
-  Path.ofEq trivialNormGroup_index
+  multi_step_path trivialNormGroup_index
 
 /-- Path witness: norm group index equals extension degree. -/
 def norm_index_path (ng : NormGroup) :
     Path ng.index ng.extensionDegree :=
-  Path.ofEq ng.index_eq
+  multi_step_path ng.index_eq
 
 /-- Path witness: a real place is archimedean. -/
 def real_archimedean_path (i : Nat) :
     Path (Place.real i).isArchimedean true :=
-  Path.ofEq (Place.real_is_archimedean i)
+  multi_step_path (Place.real_is_archimedean i)
 
 /-- Path witness: a finite place is finite. -/
 def finite_place_path (i p : Nat) :
     Path (Place.finite i p).isFinite true :=
-  Path.ofEq (Place.finite_is_finite i p)
+  multi_step_path (Place.finite_is_finite i p)
 
 /-- Path witness: global-local compatibility. -/
 def global_local_path (glc : GlobalLocalCompatibility) :
     Path glc.globalRestriction glc.localMap :=
-  Path.ofEq glc.compatible
+  multi_step_path glc.compatible
 
 /-- Path witness: Artin map matches Galois order. -/
 def artin_map_order_path (ar : ArtinReciprocity) :
     Path ar.artinMap.galoisOrder ar.galoisOrder :=
-  Path.ofEq ar.artin_matches
+  multi_step_path ar.artin_matches
 
 end GlobalClassField
 end ComputationalPaths

@@ -54,6 +54,7 @@ measuring their consistency strength:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace OrdinalAnalysis
@@ -227,20 +228,57 @@ def omegaPowerPlusK (α k : Nat) (hk : k > 0) : CantorNormalForm where
   orderingObstruction := 0
   ordering_zero := rfl
 
+/-- Primitive CNF rewrite steps used to build traced path witnesses. -/
+inductive CantorNFStep : Nat → Nat → Type
+  | uniqueness_zero (cnf : CantorNormalForm) :
+      CantorNFStep cnf.uniquenessObstruction 0
+  | ordering_zero (cnf : CantorNormalForm) :
+      CantorNFStep cnf.orderingObstruction 0
+  | omega_terms :
+      CantorNFStep omega.numTerms 1
+
+/-- Convert a CNF rewrite step into an explicit computational-path trace. -/
+def CantorNFStep.toPath {a b : Nat} : CantorNFStep a b → Path a b
+  | .uniqueness_zero cnf =>
+      Path.mk [ComputationalPaths.Step.mk cnf.uniquenessObstruction 0 cnf.uniqueness_zero]
+        cnf.uniqueness_zero
+  | .ordering_zero cnf =>
+      Path.mk [ComputationalPaths.Step.mk cnf.orderingObstruction 0 cnf.ordering_zero]
+        cnf.ordering_zero
+  | .omega_terms =>
+      Path.mk [ComputationalPaths.Step.mk omega.numTerms 1 rfl] rfl
+
+/-- RwEq coherence: right unit for traced CNF paths. -/
+theorem CantorNFStep.refl_right_rweq {a b : Nat} (s : CantorNFStep a b) :
+    Path.RwEq (Path.trans (CantorNFStep.toPath s) (Path.refl b)) (CantorNFStep.toPath s) :=
+  Path.rweq_cmpA_refl_right (CantorNFStep.toPath s)
+
+/-- RwEq coherence: inverse cancellation for traced CNF paths. -/
+theorem CantorNFStep.inv_left_rweq {a b : Nat} (s : CantorNFStep a b) :
+    Path.RwEq (Path.trans (Path.symm (CantorNFStep.toPath s)) (CantorNFStep.toPath s))
+      (Path.refl b) :=
+  Path.rweq_cmpA_inv_left (CantorNFStep.toPath s)
+
 /-- Path: CNF uniqueness. -/
 def cnf_uniqueness_path (cnf : CantorNormalForm) :
     Path cnf.uniquenessObstruction 0 :=
-  Path.ofEq cnf.uniqueness_zero
+  CantorNFStep.toPath (CantorNFStep.uniqueness_zero cnf)
 
 /-- Path: CNF ordering. -/
 def cnf_ordering_path (cnf : CantorNormalForm) :
     Path cnf.orderingObstruction 0 :=
-  Path.ofEq cnf.ordering_zero
+  CantorNFStep.toPath (CantorNFStep.ordering_zero cnf)
 
 /-- Path: omega CNF has 1 term. -/
 def omega_terms_path :
     Path omega.numTerms 1 :=
-  Path.ofEq rfl
+  CantorNFStep.toPath CantorNFStep.omega_terms
+
+/-- Coherence: CNF uniqueness trace cancels with its inverse. -/
+theorem cnf_uniqueness_coherence (cnf : CantorNormalForm) :
+    Path.RwEq (Path.trans (Path.symm (cnf_uniqueness_path cnf)) (cnf_uniqueness_path cnf))
+      (Path.refl 0) :=
+  CantorNFStep.inv_left_rweq (CantorNFStep.uniqueness_zero cnf)
 
 end CantorNormalForm
 
@@ -322,20 +360,59 @@ def general (α β : Nat) (r : Nat) : VeblenFunction where
   normalObstruction := 0
   normal_zero := rfl
 
+/-- Primitive Veblen rewrite steps used to build traced path witnesses. -/
+inductive VeblenStep : Nat → Nat → Type
+  | fixpoint_zero (vf : VeblenFunction) :
+      VeblenStep vf.fixpointObstruction 0
+  | continuity_zero (vf : VeblenFunction) :
+      VeblenStep vf.continuityObstruction 0
+  | normal_zero (vf : VeblenFunction) :
+      VeblenStep vf.normalObstruction 0
+
+/-- Convert a Veblen rewrite step into an explicit computational-path trace. -/
+def VeblenStep.toPath {a b : Nat} : VeblenStep a b → Path a b
+  | .fixpoint_zero vf =>
+      Path.mk [ComputationalPaths.Step.mk vf.fixpointObstruction 0 vf.fixpoint_zero]
+        vf.fixpoint_zero
+  | .continuity_zero vf =>
+      Path.mk [ComputationalPaths.Step.mk vf.continuityObstruction 0 vf.continuity_zero]
+        vf.continuity_zero
+  | .normal_zero vf =>
+      Path.mk [ComputationalPaths.Step.mk vf.normalObstruction 0 vf.normal_zero]
+        vf.normal_zero
+
+/-- RwEq coherence: right unit for traced Veblen paths. -/
+theorem VeblenStep.refl_right_rweq {a b : Nat} (s : VeblenStep a b) :
+    Path.RwEq (Path.trans (VeblenStep.toPath s) (Path.refl b)) (VeblenStep.toPath s) :=
+  Path.rweq_cmpA_refl_right (VeblenStep.toPath s)
+
+/-- RwEq coherence: inverse cancellation for traced Veblen paths. -/
+theorem VeblenStep.inv_left_rweq {a b : Nat} (s : VeblenStep a b) :
+    Path.RwEq (Path.trans (Path.symm (VeblenStep.toPath s)) (VeblenStep.toPath s))
+      (Path.refl b) :=
+  Path.rweq_cmpA_inv_left (VeblenStep.toPath s)
+
 /-- Path: Veblen fixed point property. -/
 def veblen_fixpoint_path (vf : VeblenFunction) :
     Path vf.fixpointObstruction 0 :=
-  Path.ofEq vf.fixpoint_zero
+  VeblenStep.toPath (VeblenStep.fixpoint_zero vf)
 
 /-- Path: Veblen continuity. -/
 def veblen_continuity_path (vf : VeblenFunction) :
     Path vf.continuityObstruction 0 :=
-  Path.ofEq vf.continuity_zero
+  VeblenStep.toPath (VeblenStep.continuity_zero vf)
 
 /-- Path: Veblen normality. -/
 def veblen_normal_path (vf : VeblenFunction) :
     Path vf.normalObstruction 0 :=
-  Path.ofEq vf.normal_zero
+  VeblenStep.toPath (VeblenStep.normal_zero vf)
+
+/-- Coherence: Veblen fixed-point trace cancels with its inverse. -/
+theorem veblen_fixpoint_coherence (vf : VeblenFunction) :
+    Path.RwEq
+      (Path.trans (Path.symm (veblen_fixpoint_path vf)) (veblen_fixpoint_path vf))
+      (Path.refl 0) :=
+  VeblenStep.inv_left_rweq (VeblenStep.fixpoint_zero vf)
 
 end VeblenFunction
 

@@ -59,6 +59,7 @@ Cyclic homology is the noncommutative analogue of de Rham cohomology:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace CyclicHomology
@@ -754,6 +755,42 @@ def dennis_trace_path (dt : DennisTrace) :
   Path.ofEq (Nat.min_eq_left dt.image_bound)
 
 end DennisTrace
+
+/-! ## Rewrite-Level Computational Transformations -/
+
+/-- Normalize unit whiskers around a path via explicit rewrite steps. -/
+theorem cyclic_rewrite_unit_whiskers {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.refl a) (Path.trans p (Path.refl b))) p := by
+  apply Path.rweq_trans
+  · exact Path.rweq_trans_congr_right (Path.refl a) (Path.rweq_cmpA_refl_right p)
+  · exact Path.rweq_cmpA_refl_left p
+
+/-- Contract `(p · p⁻¹) · p` back to `p` by associativity, inverse, and unit rewrites. -/
+theorem cyclic_rewrite_cancel_chain {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.trans p (Path.symm p)) p) p := by
+  apply Path.rweq_trans
+  · exact Path.rweq_tt p (Path.symm p) p
+  · apply Path.rweq_trans
+    · exact Path.rweq_trans_congr_right p (Path.rweq_cmpA_inv_left p)
+    · exact Path.rweq_cmpA_refl_right p
+
+/-- SBI exactness path reduced after adding explicit reflexive whiskers. -/
+def sbi_exactness_rewrite_path (sbi : SBISequenceData) :
+    Path.RwEq
+      (Path.trans (Path.refl (sbi.imageI + sbi.imageS))
+        (Path.trans sbi.sbi_exactness_path (Path.refl sbi.hcDim)))
+      sbi.sbi_exactness_path :=
+  cyclic_rewrite_unit_whiskers sbi.sbi_exactness_path
+
+/-- Hochschild `b² = 0` path reduced from an explicit cancellation chain. -/
+def boundary_squared_rewrite_path (hc : HochschildChain) :
+    Path.RwEq
+      (Path.trans
+        (Path.trans hc.hochschild_boundary_squared_path
+          (Path.symm hc.hochschild_boundary_squared_path))
+        hc.hochschild_boundary_squared_path)
+      hc.hochschild_boundary_squared_path :=
+  cyclic_rewrite_cancel_chain hc.hochschild_boundary_squared_path
 
 /-! ## Compilation of Coherence Paths -/
 

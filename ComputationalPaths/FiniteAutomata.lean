@@ -125,20 +125,46 @@ def binary (n : Nat) (hn : n > 0) (f : Nat) (hf : f ≤ n) : DFAData where
   isComplete := true
   complete_eq := rfl
 
-/-- Path: transitions = states × alphabet. -/
+/-- Step constructors tracing transition-count normalization. -/
+inductive TransitionTraceStep (d : DFAData) : Type
+  | unfold
+  | applyTransitionEquation
+
+namespace TransitionTraceStep
+
+/-- Interpret transition trace syntax as primitive computational steps. -/
+def toStep {d : DFAData} : TransitionTraceStep d → ComputationalPaths.Step Nat
+  | unfold =>
+      ComputationalPaths.Step.mk d.numTransitions d.numTransitions rfl
+  | applyTransitionEquation =>
+      ComputationalPaths.Step.mk d.numTransitions
+        (d.numStates * d.alphabetSize) d.transitions_eq
+
+/-- Two-step trace: unfold, then apply transition-count equation. -/
+def trace (d : DFAData) : List (ComputationalPaths.Step Nat) :=
+  [toStep (d := d) unfold, toStep (d := d) applyTransitionEquation]
+
+end TransitionTraceStep
+
+/-- Step-traced path: transitions = states × alphabet. -/
 def transition_path (d : DFAData) :
     Path d.numTransitions (d.numStates * d.alphabetSize) :=
-  Path.ofEq d.transitions_eq
+  Path.mk (TransitionTraceStep.trace d) d.transitions_eq
 
 /-- Path: DFA is complete. -/
 def complete_path (d : DFAData) :
     Path d.isComplete true :=
   Path.ofEq d.complete_eq
 
-/-- Path: trivial DFA has 2 transitions. -/
+/-- Path: trivial DFA has 2 transitions (via traced transition steps). -/
 def trivial_transition_path :
     Path trivial.numTransitions 2 :=
-  Path.ofEq trivial.transitions_eq
+  Path.mk (TransitionTraceStep.trace trivial) trivial.transitions_eq
+
+/-- Coherence of the traced transition path with the defining equation. -/
+theorem transition_trace_coherence (d : DFAData) :
+    (transition_path d).toEq = d.transitions_eq :=
+  rfl
 
 end DFAData
 
@@ -243,15 +269,67 @@ def worstCase (n : Nat) (hn : n > 0) : SubsetConstructionData where
   blowup := 2 ^ n
   blowup_eq := rfl
 
-/-- Path: language equivalence. -/
+/-- Step constructors tracing language-equivalence preservation. -/
+inductive LanguageTraceStep (sc : SubsetConstructionData) : Type
+  | unfold
+  | certify
+
+namespace LanguageTraceStep
+
+/-- Interpret language trace syntax as primitive computational steps. -/
+def toStep {sc : SubsetConstructionData} :
+    LanguageTraceStep sc → ComputationalPaths.Step Bool
+  | unfold =>
+      ComputationalPaths.Step.mk sc.languageEqual sc.languageEqual rfl
+  | certify =>
+      ComputationalPaths.Step.mk sc.languageEqual true sc.language_eq
+
+/-- Two-step trace: unfold language flag, then certify equivalence. -/
+def trace (sc : SubsetConstructionData) : List (ComputationalPaths.Step Bool) :=
+  [toStep (sc := sc) unfold, toStep (sc := sc) certify]
+
+end LanguageTraceStep
+
+/-- Step constructors tracing subset-construction blowup accounting. -/
+inductive BlowupTraceStep (sc : SubsetConstructionData) : Type
+  | unfold
+  | identify
+
+namespace BlowupTraceStep
+
+/-- Interpret blowup trace syntax as primitive computational steps. -/
+def toStep {sc : SubsetConstructionData} :
+    BlowupTraceStep sc → ComputationalPaths.Step Nat
+  | unfold =>
+      ComputationalPaths.Step.mk sc.blowup sc.blowup rfl
+  | identify =>
+      ComputationalPaths.Step.mk sc.blowup sc.dfaStates sc.blowup_eq
+
+/-- Two-step trace: unfold blowup counter, then identify with DFA states. -/
+def trace (sc : SubsetConstructionData) : List (ComputationalPaths.Step Nat) :=
+  [toStep (sc := sc) unfold, toStep (sc := sc) identify]
+
+end BlowupTraceStep
+
+/-- Step-traced path: language equivalence. -/
 def language_path (sc : SubsetConstructionData) :
     Path sc.languageEqual true :=
-  Path.ofEq sc.language_eq
+  Path.mk (LanguageTraceStep.trace sc) sc.language_eq
 
-/-- Path: blowup factor. -/
+/-- Step-traced path: blowup factor. -/
 def blowup_path (sc : SubsetConstructionData) :
     Path sc.blowup sc.dfaStates :=
-  Path.ofEq sc.blowup_eq
+  Path.mk (BlowupTraceStep.trace sc) sc.blowup_eq
+
+/-- Coherence of the traced language path with language correctness. -/
+theorem language_trace_coherence (sc : SubsetConstructionData) :
+    (language_path sc).toEq = sc.language_eq :=
+  rfl
+
+/-- Coherence of the traced blowup path with blowup correctness. -/
+theorem blowup_trace_coherence (sc : SubsetConstructionData) :
+    (blowup_path sc).toEq = sc.blowup_eq :=
+  rfl
 
 end SubsetConstructionData
 

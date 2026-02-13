@@ -45,6 +45,7 @@ sheaves on profinite sets to obtain a well-behaved category:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace CondensedSets
@@ -468,6 +469,16 @@ def CondensedSet.inl (X Y : CondensedSet) : CondensedSet.Hom X (CondensedSet.cop
 def CondensedSet.inr (X Y : CondensedSet) : CondensedSet.Hom Y (CondensedSet.coprod X Y) where
   app := fun _ y => Sum.inr y
   naturality := fun _ _ => Path.refl _
+
+/-! ## Higher Path Coherence (2-Cells) -/
+
+/-- Coherence 2-cell: the unit-expanded path and the direct path are connected
+by a higher path witness (`RwEq`). -/
+theorem condensed_unit_inserted_two_cell {A : Type u} {a b : A} (p : Path a b) :
+    Path.RwEq (Path.trans (Path.refl a) (Path.trans p (Path.refl b))) p := by
+  exact Path.rweq_trans
+    (Path.rweq_cmpA_refl_left (Path.trans p (Path.refl b)))
+    (Path.rweq_cmpA_refl_right p)
 
 end CondensedSets
 end ComputationalPaths

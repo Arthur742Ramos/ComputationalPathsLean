@@ -27,6 +27,8 @@ Brown representability connects cohomology theories to spectra:
 import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.YonedaLemma
+import ComputationalPaths.Path.HigherPathInduction
 
 namespace ComputationalPaths
 namespace Path
@@ -398,12 +400,59 @@ theorem specmap_id_comp {E F : Spec.{u}} (f : SpecMap E F) :
     ∀ n x, (SpecMap.comp f (SpecMap.id E)).map n x = f.map n x :=
   fun _ _ => rfl
 
+/-- Path witnesses used by Brown-level Adams spectral computations. -/
+structure BrownAdamsPathWitness (r : Nat) (D : AdamsDifferential.{u} r) where
+  /-- Primary witness `d_r ∘ d_r = 0`. -/
+  dSquaredWitness :
+    ∀ s t (x : D.page.entry s t),
+      Path (D.differential (s + r) (t + r - 1) (D.differential s t x))
+           (D.page.zero (s + r + r) (t + r - 1 + r - 1))
+  /-- Rewrite-equivalent `d_r² = 0` witnesses induce equal transports. -/
+  dSquaredTransport :
+    ∀ s t (x : D.page.entry s t)
+      {p q : Path (D.differential (s + r) (t + r - 1) (D.differential s t x))
+                  (D.page.zero (s + r + r) (t + r - 1 + r - 1))},
+      RwEq p q →
+      Path
+        (transport
+          (D := fun y : D.page.entry (s + r + r) (t + r - 1 + r - 1) =>
+            Path (D.differential (s + r) (t + r - 1) (D.differential s t x)) y)
+          p
+          (Path.refl (D.differential (s + r) (t + r - 1) (D.differential s t x))))
+        (transport
+          (D := fun y : D.page.entry (s + r + r) (t + r - 1 + r - 1) =>
+            Path (D.differential (s + r) (t + r - 1) (D.differential s t x)) y)
+          q
+          (Path.refl (D.differential (s + r) (t + r - 1) (D.differential s t x))))
+
+/-- Canonical Brown-level Adams witnesses from `AdamsDifferential`. -/
+def canonicalBrownAdamsPathWitness (r : Nat) (D : AdamsDifferential.{u} r) :
+    BrownAdamsPathWitness r D where
+  dSquaredWitness := D.d_squared_zero
+  dSquaredTransport := by
+    intro s t x p q h
+    exact HigherPathInduction.transport_path_of_rweq
+      (D := fun y : D.page.entry (s + r + r) (t + r - 1 + r - 1) =>
+        Path (D.differential (s + r) (t + r - 1) (D.differential s t x)) y)
+      (p := p) (q := q) h
+      (Path.refl (D.differential (s + r) (t + r - 1) (D.differential s t x)))
+
+/-- Yoneda-based composition helper reused by Adams-style witnesses. -/
+def yoneda_brown_path_composition
+    {A : Type u} {F : PathFunctor (A := A)} {a b c : A}
+    (η : PathNatTrans (representable A a) F)
+    (p : Path a b) (q : Path b c) :
+    Path (F.map q (F.map p (η.app a (Path.refl a))))
+         (η.app c (Path.trans p q)) :=
+  yonedaNaturalityComposePath (η := η) p q
+
 /-- d² = 0 implies the differential on the next page is well-defined. -/
-def adams_d_squared_implies_next_page (r : Nat) (D : AdamsDifferential.{u} r) :
+def adams_d_squared_implies_next_page (r : Nat) (D : AdamsDifferential.{u} r)
+    (W : BrownAdamsPathWitness r D := canonicalBrownAdamsPathWitness r D) :
     ∀ s t (x : D.page.entry s t),
       Path (D.differential (s + r) (t + r - 1) (D.differential s t x))
            (D.page.zero (s + r + r) (t + r - 1 + r - 1)) :=
-  D.d_squared_zero
+  W.dSquaredWitness
 
 end BrownRepresentability
 end Topology
