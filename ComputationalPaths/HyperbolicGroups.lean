@@ -796,115 +796,120 @@ end DehnFunction
 
 /-! ## Path Coherence Witnesses -/
 
+private def stepChainWitness {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  Path.trans
+    (Path.mk [ComputationalPaths.Step.mk a b h] h)
+    (Path.refl b)
+
 /-- Path witness: trees are 0-hyperbolic. -/
 def tree_zero_hyperbolic_path :
     Path DeltaHyperbolicSpace.simplicialTree.delta 0 :=
-  Path.ofEqChain DeltaHyperbolicSpace.tree_is_zero_hyperbolic
+  stepChainWitness DeltaHyperbolicSpace.tree_is_zero_hyperbolic
 
 /-- Path witness: free group Cayley graph is 0-hyperbolic. -/
 def freeGroup_zero_hyperbolic_path :
     Path DeltaHyperbolicSpace.freeGroupCayley.delta 0 :=
-  Path.ofEqChain DeltaHyperbolicSpace.freeGroup_zero_hyperbolic
+  stepChainWitness DeltaHyperbolicSpace.freeGroup_zero_hyperbolic
 
 /-- Path witness: ℍ² is geodesic. -/
 def h2_geodesic_path :
     Path DeltaHyperbolicSpace.hyperbolicPlane.isGeodesic true :=
-  Path.ofEqChain DeltaHyperbolicSpace.hyperbolicPlane_geodesic
+  stepChainWitness DeltaHyperbolicSpace.hyperbolicPlane_geodesic
 
 /-- Path witness: ℍ² has dimension 2. -/
 def h2_dim_path :
     Path DeltaHyperbolicSpace.hyperbolicPlane.dimension 2 :=
-  Path.ofEqChain DeltaHyperbolicSpace.hyperbolicPlane_dim
+  stepChainWitness DeltaHyperbolicSpace.hyperbolicPlane_dim
 
 /-- Path witness: Gromov product δ = 0 in trees. -/
 def gromov_tree_path :
     Path GromovProduct.tree.delta 0 :=
-  Path.ofEqChain GromovProduct.tree_delta_zero
+  stepChainWitness GromovProduct.tree_delta_zero
 
 /-- Path witness: ∂ℍ² is compact. -/
 def boundary_compact_path :
     Path BoundaryAtInfinity.hyperbolicPlane.isCompact true :=
-  Path.ofEqChain BoundaryAtInfinity.h2_boundary_compact
+  stepChainWitness BoundaryAtInfinity.h2_boundary_compact
 
 /-- Path witness: ∂ℍ² has dimension 1. -/
 def boundary_dim_path :
     Path BoundaryAtInfinity.hyperbolicPlane.boundaryDim 1 :=
-  Path.ofEqChain BoundaryAtInfinity.h2_boundary_dim
+  stepChainWitness BoundaryAtInfinity.h2_boundary_dim
 
 /-- Path witness: Morse constant in trees is 0. -/
 def morse_tree_path :
     Path MorseLemma.treeGeodesic.morseConstant 0 :=
-  Path.ofEqChain MorseLemma.tree_geodesic_morse
+  stepChainWitness MorseLemma.tree_geodesic_morse
 
 /-- Path witness: Morse lemma is finite in ℍ². -/
 def morse_finite_path :
     Path MorseLemma.h2QuasiGeodesic.isFinite true :=
-  Path.ofEqChain MorseLemma.h2_morse_finite
+  stepChainWitness MorseLemma.h2_morse_finite
 
 /-- Path witness: F₂ is 0-hyperbolic. -/
 def freeGroup2_delta_path :
     Path HyperbolicGroup.freeGroup2.delta 0 :=
-  Path.ofEqChain HyperbolicGroup.freeGroup2_delta
+  stepChainWitness HyperbolicGroup.freeGroup2_delta
 
 /-- Path witness: F₂ has solvable word problem. -/
 def freeGroup2_word_path :
     Path HyperbolicGroup.freeGroup2.wordProblemSolvable true :=
-  Path.ofEqChain HyperbolicGroup.freeGroup2_word_problem
+  stepChainWitness HyperbolicGroup.freeGroup2_word_problem
 
 /-- Path witness: F₂ is torsion-free. -/
 def freeGroup2_torsion_path :
     Path HyperbolicGroup.freeGroup2.isTorsionFree true :=
-  Path.ofEqChain HyperbolicGroup.freeGroup2_torsion_free
+  stepChainWitness HyperbolicGroup.freeGroup2_torsion_free
 
 /-- Path witness: C'(1/6) implies hyperbolicity. -/
 def small_cancellation_path :
     Path SmallCancellation.example_c16.isHyperbolic true :=
-  Path.ofEqChain SmallCancellation.c16_is_hyperbolic
+  stepChainWitness SmallCancellation.c16_is_hyperbolic
 
 /-- Path witness: C'(1/4) does not imply hyperbolicity. -/
 def c14_not_hyperbolic_path :
     Path SmallCancellation.example_c14.isHyperbolic false :=
-  Path.ofEqChain SmallCancellation.c14_not_hyperbolic
+  stepChainWitness SmallCancellation.c14_not_hyperbolic
 
 /-- Path witness: Dehn algorithm for F₂ terminates. -/
 def dehn_freeGroup2_path :
     Path DehnAlgorithm.freeGroup2.terminates true :=
-  Path.ofEqChain DehnAlgorithm.freeGroup2_terminates
+  stepChainWitness DehnAlgorithm.freeGroup2_terminates
 
 /-- Path witness: Dehn algorithm for F₂ is linear. -/
 def dehn_linear_path :
     Path DehnAlgorithm.freeGroup2.timeComplexityClass 1 :=
-  Path.ofEqChain DehnAlgorithm.freeGroup2_linear
+  stepChainWitness DehnAlgorithm.freeGroup2_linear
 
 /-- Path witness: ℤ² does not admit Dehn's algorithm. -/
 def dehn_z2_path :
     Path DehnAlgorithm.integerLattice2.terminates false :=
-  Path.ofEqChain DehnAlgorithm.z2_no_dehn
+  stepChainWitness DehnAlgorithm.z2_no_dehn
 
 /-- Path witness: ℤ² is not hyperbolic. -/
 def z2_not_hyp_path :
     Path NonHyperbolicGroup.integerLattice2.isHyperbolic false :=
-  Path.ofEqChain NonHyperbolicGroup.z2_not_hyperbolic
+  stepChainWitness NonHyperbolicGroup.z2_not_hyperbolic
 
 /-- Path witness: SL₂(ℤ) is hyperbolic. -/
 def sl2z_hyp_path :
     Path NonHyperbolicGroup.sl2z.isHyperbolic true :=
-  Path.ofEqChain NonHyperbolicGroup.sl2z_hyperbolic
+  stepChainWitness NonHyperbolicGroup.sl2z_hyperbolic
 
 /-- Path witness: F₂ has linear Dehn function. -/
 def dehn_function_linear_path :
     Path DehnFunction.freeGroup2.isLinear true :=
-  Path.ofEqChain DehnFunction.freeGroup2_linear
+  stepChainWitness DehnFunction.freeGroup2_linear
 
 /-- Path witness: ℤ² has non-linear Dehn function. -/
 def dehn_function_z2_path :
     Path DehnFunction.integerLattice2.isLinear false :=
-  Path.ofEqChain DehnFunction.z2_not_linear
+  stepChainWitness DehnFunction.z2_not_linear
 
 /-- Path witness: Heisenberg has cubic Dehn function. -/
 def dehn_function_heisenberg_path :
     Path DehnFunction.heisenberg.dehnFunctionType 3 :=
-  Path.ofEqChain DehnFunction.heisenberg_cubic
+  stepChainWitness DehnFunction.heisenberg_cubic
 
 end HyperbolicGroups
 end ComputationalPaths

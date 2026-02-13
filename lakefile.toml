@@ -38,10 +38,16 @@ name = "VertexAlgebra"
 name = "Descent"
 
 [[lean_lib]]
+name = "Deformation"
+
+[[lean_lib]]
 name = "Cobordism"
 
 [[lean_lib]]
 name = "Arithmetic"
+
+[[lean_lib]]
+name = "Langlands"
 
 [[lean_lib]]
 name = "Simplicial"
@@ -66,6 +72,12 @@ name = "DAG"
 
 [[lean_lib]]
 name = "Quantum"
+
+[[lean_lib]]
+name = "Mirror"
+
+[[lean_lib]]
+name = "NCG"
 
 [[lean_exe]]
 name = "computational_paths"

@@ -169,6 +169,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`Perfectoid/PathInfrastructure.lean`](Perfectoid/PathInfrastructure.lean) — tilting equivalences and almost mathematics packaged as path-preserving constructions with explicit `Path.Step`/`RwEq` normalization witnesses.
 - [`Tropical/PathInfrastructure.lean`](Tropical/PathInfrastructure.lean) — tropical curve balancing and valuation/tropicalization coherence packaged with explicit `Path.Step` and derived `RwEq` normalization lemmas.
 - [`GRT/PathInfrastructure.lean`](GRT/PathInfrastructure.lean) — geometric representation theory path infrastructure exposing perverse sheaf and D-module computational witnesses.
+- [`Langlands/PathInfrastructure.lean`](Langlands/PathInfrastructure.lean) — local and geometric Langlands path infrastructure exposing Step-based compatibility and spectral coherence witnesses.
 
 ## Bicategory & weak 2-groupoid API
 

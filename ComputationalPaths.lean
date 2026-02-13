@@ -8,13 +8,17 @@ import Motivic.PathInfrastructure
 import Chromatic.PathInfrastructure
 import Topos.PathCoherence
 import Descent.PathCoherence
+import Deformation.PathInfrastructure
 import Cobordism.PathInfrastructure
 import Arithmetic.PathInfrastructure
+import Langlands.PathInfrastructure
 import Factorization.PathInfrastructure
 import Perfectoid.PathInfrastructure
 import GRT.PathInfrastructure
 import InfinityCategory.PathInfrastructure
 import Condensed.PathInfrastructure
 import Quantum.PathInfrastructure
+import Mirror.PathInfrastructure
+import NCG.PathInfrastructure
 import VertexAlgebra.PathInfrastructure
 import Tropical.PathInfrastructure

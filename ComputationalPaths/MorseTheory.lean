@@ -739,145 +739,150 @@ end PerfectMorse
 
 /-! ## Path Witnesses for Morse Theory Coherences -/
 
+private def stepChainWitness {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  Path.trans
+    (Path.mk [ComputationalPaths.Step.mk a b h] h)
+    (Path.refl b)
+
 /-- Path witness: minimum has index 0. -/
 def minimum_index_path (id : Nat) (val : Int) (dim : Nat) :
     Path (CriticalPoint.minimum id val dim).morseIndex 0 :=
-  Path.ofEqChain (CriticalPoint.minimum_index id val dim)
+  stepChainWitness (CriticalPoint.minimum_index id val dim)
 
 /-- Path witness: maximum has index n. -/
 def maximum_index_path (id : Nat) (val : Int) (dim : Nat) :
     Path (CriticalPoint.maximum id val dim).morseIndex dim :=
-  Path.ofEqChain (CriticalPoint.maximum_index id val dim)
+  stepChainWitness (CriticalPoint.maximum_index id val dim)
 
 /-- Path witness: index + co-index = n. -/
 def index_coindex_path (p : CriticalPoint) :
     Path (p.morseIndex + p.coIndex) p.ambientDim :=
-  Path.ofEqChain (CriticalPoint.index_coindex p)
+  stepChainWitness (CriticalPoint.index_coindex p)
 
 /-- Path witness: minimum co-index. -/
 def minimum_coindex_path (id : Nat) (val : Int) (dim : Nat) :
     Path (CriticalPoint.minimum id val dim).coIndex dim :=
-  Path.ofEqChain (CriticalPoint.minimum_coindex id val dim)
+  stepChainWitness (CriticalPoint.minimum_coindex id val dim)
 
 /-- Path witness: maximum co-index. -/
 def maximum_coindex_path (id : Nat) (val : Int) (dim : Nat) :
     Path (CriticalPoint.maximum id val dim).coIndex 0 :=
-  Path.ofEqChain (CriticalPoint.maximum_coindex id val dim)
+  stepChainWitness (CriticalPoint.maximum_coindex id val dim)
 
 /-- Path witness: circle height count. -/
 def circle_count_path :
     Path MorseFunction.circleHeight.numCritical 2 :=
-  Path.ofEqChain MorseFunction.circleHeight_count
+  stepChainWitness MorseFunction.circleHeight_count
 
 /-- Path witness: torus height count. -/
 def torus_count_path :
     Path MorseFunction.torusHeight.numCritical 4 :=
-  Path.ofEqChain MorseFunction.torusHeight_count
+  stepChainWitness MorseFunction.torusHeight_count
 
 /-- Path witness: minimum Morse lemma negative signs. -/
 def minimum_neg_path (val : Int) (dim : Nat) :
     Path (MorseLemma.atMinimum val dim).numNegative 0 :=
-  Path.ofEqChain (MorseLemma.minimum_neg val dim)
+  stepChainWitness (MorseLemma.minimum_neg val dim)
 
 /-- Path witness: maximum Morse lemma negative signs. -/
 def maximum_neg_path (val : Int) (dim : Nat) :
     Path (MorseLemma.atMaximum val dim).numNegative dim :=
-  Path.ofEqChain (MorseLemma.maximum_neg val dim)
+  stepChainWitness (MorseLemma.maximum_neg val dim)
 
 /-- Path witness: total signs = dimension. -/
 def total_signs_path (ml : MorseLemma) :
     Path (ml.numNegative + ml.numPositive) ml.ambientDim :=
-  Path.ofEqChain (MorseLemma.total_signs ml)
+  stepChainWitness (MorseLemma.total_signs ml)
 
 /-- Path witness: trivial Morse complex. -/
 def trivial_morse_path :
     Path MorseComplex.trivial.morseFunction.numCritical 0 :=
-  Path.ofEqChain MorseComplex.trivial_count
+  stepChainWitness MorseComplex.trivial_count
 
 /-- Path witness: trivial Morse homology rank. -/
 def trivial_morse_rank_path (k : Nat) :
     Path (MorseHomology.trivial k).rank 0 :=
-  Path.ofEqChain (MorseHomology.trivial_rank k)
+  stepChainWitness (MorseHomology.trivial_rank k)
 
 /-- Path witness: Morse ≅ singular for a point. -/
 def point_iso_path :
     Path MorseSingularIso.point.morseRank MorseSingularIso.point.singularRank :=
-  Path.ofEqChain MorseSingularIso.point_iso
+  stepChainWitness MorseSingularIso.point_iso
 
 /-- Path witness: S² Euler characteristic. -/
 def sphere2_euler_path :
     Path HandleDecomposition.sphere2.eulerChar 2 :=
-  Path.ofEqChain HandleDecomposition.sphere2_euler
+  stepChainWitness HandleDecomposition.sphere2_euler
 
 /-- Path witness: T² Euler characteristic. -/
 def torus2_euler_path :
     Path HandleDecomposition.torus2.eulerChar 0 :=
-  Path.ofEqChain HandleDecomposition.torus2_euler
+  stepChainWitness HandleDecomposition.torus2_euler
 
 /-- Path witness: strong Morse S² Euler. -/
 def strong_sphere2_path :
     Path StrongMorseInequality.sphere2.eulerChar 2 :=
-  Path.ofEqChain StrongMorseInequality.sphere2_euler
+  stepChainWitness StrongMorseInequality.sphere2_euler
 
 /-- Path witness: strong Morse T² Euler. -/
 def strong_torus2_path :
     Path StrongMorseInequality.torus2.eulerChar 0 :=
-  Path.ofEqChain StrongMorseInequality.torus2_euler
+  stepChainWitness StrongMorseInequality.torus2_euler
 
 /-- Path witness: Witten undeformed parameter. -/
 def witten_undeformed_path (f : MorseFunction) :
     Path (WittenDeformation.undeformed f).parameter 0 :=
-  Path.ofEqChain (WittenDeformation.undeformed_param f)
+  stepChainWitness (WittenDeformation.undeformed_param f)
 
 /-- Path witness: Witten deformed parameter. -/
 def witten_deformed_path (f : MorseFunction) (t : Nat) :
     Path (WittenDeformation.deformed f t).parameter t :=
-  Path.ofEqChain (WittenDeformation.deformed_param f t)
+  stepChainWitness (WittenDeformation.deformed_param f t)
 
 /-- Path witness: Morse–Bott critical dimension for Morse. -/
 def morse_bott_critdim_path (f : MorseFunction) (i : Nat) :
     Path ((MorseBott.asMorse f).critDim i) 0 :=
-  Path.ofEqChain (MorseBott.asMorse_critDim f i)
+  stepChainWitness (MorseBott.asMorse_critDim f i)
 
 /-- Path witness: Morse–Bott S² count. -/
 def morse_bott_sphere2_path :
     Path MorseBott.sphere2.numCritSubmanifolds 2 :=
-  Path.ofEqChain MorseBott.sphere2_count
+  stepChainWitness MorseBott.sphere2_count
 
 /-- Path witness: 0-handle index. -/
 def zero_handle_path (dim : Nat) :
     Path (HandleData.zero_handle dim).index 0 :=
-  Path.ofEqChain (HandleData.zero_handle_index dim)
+  stepChainWitness (HandleData.zero_handle_index dim)
 
 /-- Path witness: n-handle index. -/
 def top_handle_path (dim : Nat) :
     Path (HandleData.top_handle dim).index dim :=
-  Path.ofEqChain (HandleData.top_handle_index dim)
+  stepChainWitness (HandleData.top_handle_index dim)
 
 /-- Path witness: empty gradient flow count. -/
 def empty_flow_path (sIdx tIdx : Nat) :
     Path (GradientFlowLine.empty sIdx tIdx).count 0 :=
-  Path.ofEqChain (GradientFlowLine.empty_count sIdx tIdx)
+  stepChainWitness (GradientFlowLine.empty_count sIdx tIdx)
 
 /-- Path witness: circle Morse complex count. -/
 def circle_complex_path :
     Path MorseComplex.circle.morseFunction.numCritical 2 :=
-  Path.ofEqChain MorseComplex.circle_count
+  stepChainWitness MorseComplex.circle_count
 
 /-- Path witness: lacunary S². -/
 def lacunary_sphere2_path :
     Path LacunaryPrinciple.sphere2.all_even true :=
-  Path.ofEqChain LacunaryPrinciple.sphere2_even
+  stepChainWitness LacunaryPrinciple.sphere2_even
 
 /-- Path witness: perfect S² count. -/
 def perfect_sphere2_path :
     Path PerfectMorse.sphere2.morseFunction.numCritical 2 :=
-  Path.ofEqChain PerfectMorse.sphere2_count
+  stepChainWitness PerfectMorse.sphere2_count
 
 /-- Path witness: Morse–Bott circle action critical dimension. -/
 def circle_action_critdim_path (i : Nat) :
     Path (MorseBott.circleAction.critDim i) 1 :=
-  Path.ofEqChain (MorseBott.circleAction_critDim i)
+  stepChainWitness (MorseBott.circleAction_critDim i)
 
 end MorseTheory
 end ComputationalPaths

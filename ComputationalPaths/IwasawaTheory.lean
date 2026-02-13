@@ -650,137 +650,142 @@ end KidaFormula
 
 /-! ## Path Witnesses -/
 
+private def stepChainWitness {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  Path.trans
+    (Path.mk [ComputationalPaths.Step.mk a b h] h)
+    (Path.refl b)
+
 /-- Path witness: distinguished polynomial linear has degree 1. -/
 def linear_degree_path :
     Path DistinguishedPolynomial.linear.degree 1 :=
-  Path.ofEqChain DistinguishedPolynomial.linear_degree
+  stepChainWitness DistinguishedPolynomial.linear_degree
 
 /-- Path witness: cyclotomic distinguished polynomial has degree 1. -/
 def cyclotomic_degree_path (p : Nat) :
     Path (DistinguishedPolynomial.cyclotomic p).degree 1 :=
-  Path.ofEqChain (DistinguishedPolynomial.cyclotomic_degree p)
+  stepChainWitness (DistinguishedPolynomial.cyclotomic_degree p)
 
 /-- Path witness: Iwasawa algebra has Krull dimension 2. -/
 def krull_dim_path (p : Nat) (hp : p ≥ 2) :
     Path (IwasawaAlgebra.standard p hp).krullDim 2 :=
-  Path.ofEqChain (IwasawaAlgebra.standard_krull p hp)
+  stepChainWitness (IwasawaAlgebra.standard_krull p hp)
 
 /-- Path witness: Λ_2 has prime 2. -/
 def lambda2_prime_path :
     Path IwasawaAlgebra.lambda2.prime 2 :=
-  Path.ofEqChain IwasawaAlgebra.lambda2_prime
+  stepChainWitness IwasawaAlgebra.lambda2_prime
 
 /-- Path witness: Λ_3 has prime 3. -/
 def lambda3_prime_path :
     Path IwasawaAlgebra.lambda3.prime 3 :=
-  Path.ofEqChain IwasawaAlgebra.lambda3_prime
+  stepChainWitness IwasawaAlgebra.lambda3_prime
 
 /-- Path witness: free module has given rank. -/
 def free_rank_path (Λ : IwasawaAlgebra) (r : Nat) :
     Path (LambdaModule.free Λ r).rank r :=
-  Path.ofEqChain (LambdaModule.free_rank Λ r)
+  stepChainWitness (LambdaModule.free_rank Λ r)
 
 /-- Path witness: p-torsion module has rank 0. -/
 def pTorsion_rank_path (Λ : IwasawaAlgebra) (m : Nat) :
     Path (LambdaModule.pTorsion Λ m).rank 0 :=
-  Path.ofEqChain (LambdaModule.pTorsion_rank Λ m)
+  stepChainWitness (LambdaModule.pTorsion_rank Λ m)
 
 /-- Path witness: p-torsion module is torsion. -/
 def pTorsion_is_torsion_path (Λ : IwasawaAlgebra) (m : Nat) :
     Path (LambdaModule.pTorsion Λ m).isTorsion true :=
-  Path.ofEqChain (LambdaModule.pTorsion_isTorsion Λ m)
+  stepChainWitness (LambdaModule.pTorsion_isTorsion Λ m)
 
 /-- Path witness: f-torsion module has rank 0. -/
 def fTorsion_rank_path (Λ : IwasawaAlgebra) (f : DistinguishedPolynomial)
     (n : Nat) : Path (LambdaModule.fTorsion Λ f n).rank 0 :=
-  Path.ofEqChain (LambdaModule.fTorsion_rank Λ f n)
+  stepChainWitness (LambdaModule.fTorsion_rank Λ f n)
 
 /-- Path witness: trivial structure theorem has μ = 0. -/
 def trivial_mu_path (Λ : IwasawaAlgebra) :
     Path (StructureTheorem.trivial Λ).muInvariant 0 :=
-  Path.ofEqChain (StructureTheorem.trivial_mu Λ)
+  stepChainWitness (StructureTheorem.trivial_mu Λ)
 
 /-- Path witness: trivial structure theorem has λ = 0. -/
 def trivial_lambda_path (Λ : IwasawaAlgebra) :
     Path (StructureTheorem.trivial Λ).lambdaInvariant 0 :=
-  Path.ofEqChain (StructureTheorem.trivial_lambda Λ)
+  stepChainWitness (StructureTheorem.trivial_lambda Λ)
 
 /-- Path witness: unit characteristic ideal has exponent 0. -/
 def unit_char_path (Λ : IwasawaAlgebra) :
     Path (CharacteristicIdeal.unit Λ).pExponent 0 :=
-  Path.ofEqChain (CharacteristicIdeal.unit_pExponent Λ)
+  stepChainWitness (CharacteristicIdeal.unit_pExponent Λ)
 
 /-- Path witness: unit characteristic ideal has degree 0. -/
 def unit_char_degree_path (Λ : IwasawaAlgebra) :
     Path (CharacteristicIdeal.unit Λ).totalDegree 0 :=
-  Path.ofEqChain (CharacteristicIdeal.unit_totalDegree Λ)
+  stepChainWitness (CharacteristicIdeal.unit_totalDegree Λ)
 
 /-- Path witness: Ferrero-Washington μ = 0. -/
 def ferrero_washington_path (Λ : IwasawaAlgebra) :
     Path (FerreroWashington.standard Λ).mu.value 0 :=
-  Path.ofEqChain (FerreroWashington.standard_mu Λ)
+  stepChainWitness (FerreroWashington.standard_mu Λ)
 
 /-- Path witness: main conjecture μ-invariants match. -/
 def main_conjecture_mu_path (Λ : IwasawaAlgebra)
     (mc : IwasawaMainConjecture Λ) :
     Path mc.algebraicMu mc.analyticMu :=
-  Path.ofEqChain mc.mu_eq
+  stepChainWitness mc.mu_eq
 
 /-- Path witness: main conjecture λ-invariants match. -/
 def main_conjecture_lambda_path (Λ : IwasawaAlgebra)
     (mc : IwasawaMainConjecture Λ) :
     Path mc.algebraicLambda mc.analyticLambda :=
-  Path.ofEqChain mc.lambda_eq
+  stepChainWitness mc.lambda_eq
 
 /-- Path witness: Kubota-Leopoldt is KL. -/
 def kl_path (p : Nat) (hp : p ≥ 2) :
     Path (PAdicLFunction.kubotaLeopoldt p hp).isKubotaLeopoldt true :=
-  Path.ofEqChain (PAdicLFunction.kl_is_kl p hp)
+  stepChainWitness (PAdicLFunction.kl_is_kl p hp)
 
 /-- Path witness: KL has conductor 1. -/
 def kl_conductor_path (p : Nat) (hp : p ≥ 2) :
     Path (PAdicLFunction.kubotaLeopoldt p hp).conductor 1 :=
-  Path.ofEqChain (PAdicLFunction.kl_conductor p hp)
+  stepChainWitness (PAdicLFunction.kl_conductor p hp)
 
 /-- Path witness: cyclotomic ℤ_p-extension is cyclotomic. -/
 def cyclotomic_ext_path (p : Nat) (hp : p ≥ 2) :
     Path (ZpExtension.cyclotomic p hp).isCyclotomic true :=
-  Path.ofEqChain (ZpExtension.cyclotomic_is_cyclotomic p hp)
+  stepChainWitness (ZpExtension.cyclotomic_is_cyclotomic p hp)
 
 /-- Path witness: cyclotomic extension has correct prime. -/
 def cyclotomic_prime_path (p : Nat) (hp : p ≥ 2) :
     Path (ZpExtension.cyclotomic p hp).prime p :=
-  Path.ofEqChain (ZpExtension.cyclotomic_prime p hp)
+  stepChainWitness (ZpExtension.cyclotomic_prime p hp)
 
 /-- Path witness: trivial Selmer group has μ = 0. -/
 def selmer_mu_path (Λ : IwasawaAlgebra) :
     Path (SelmerGroup.trivial Λ).muInvariant 0 :=
-  Path.ofEqChain (SelmerGroup.trivial_mu Λ)
+  stepChainWitness (SelmerGroup.trivial_mu Λ)
 
 /-- Path witness: trivial Selmer group has λ = 0. -/
 def selmer_lambda_path (Λ : IwasawaAlgebra) :
     Path (SelmerGroup.trivial Λ).lambdaInvariant 0 :=
-  Path.ofEqChain (SelmerGroup.trivial_lambda Λ)
+  stepChainWitness (SelmerGroup.trivial_lambda Λ)
 
 /-- Path witness: Kida's formula trivial gives λ_L = 0. -/
 def kida_trivial_path (p : Nat) (hp : p ≥ 3) :
     Path (KidaFormula.trivial p hp).lambda_L 0 :=
-  Path.ofEqChain (KidaFormula.trivial_lambda_L p hp)
+  stepChainWitness (KidaFormula.trivial_lambda_L p hp)
 
 /-- Path witness: Λ-element addition leading val is symmetric. -/
 def lambda_add_comm_path {Λ : IwasawaAlgebra} (a b : LambdaElement Λ) :
     Path (LambdaElement.add a b).leadingVal (LambdaElement.add b a).leadingVal :=
-  Path.ofEqChain (LambdaElement.add_leadingVal_comm a b)
+  stepChainWitness (LambdaElement.add_leadingVal_comm a b)
 
 /-- Path witness: cyclotomic units base level is 0. -/
 def cyclotomic_unit_base_path (p : Nat) (hp : p ≥ 2) (idx : Nat) (hi : idx > 0) :
     Path (CyclotomicUnit.base p hp idx hi).level 0 :=
-  Path.ofEqChain (CyclotomicUnit.base_level p hp idx hi)
+  stepChainWitness (CyclotomicUnit.base_level p hp idx hi)
 
 /-- Path witness: p-primary characteristic ideal exponent. -/
 def pPrimary_char_path (Λ : IwasawaAlgebra) (m : Nat) :
     Path (CharacteristicIdeal.pPrimary Λ m).pExponent m :=
-  Path.ofEqChain (CharacteristicIdeal.pPrimary_exp Λ m)
+  stepChainWitness (CharacteristicIdeal.pPrimary_exp Λ m)
 
 end IwasawaTheory
 end ComputationalPaths
