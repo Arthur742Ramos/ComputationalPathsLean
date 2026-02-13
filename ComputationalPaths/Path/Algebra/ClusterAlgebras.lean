@@ -35,6 +35,12 @@ namespace ClusterAlgebras
 
 universe u v
 
+private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  cases h
+  have _ : RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+    rweq_of_step (Step.trans_refl_left (Path.refl a))
+  exact Path.trans (Path.refl a) (Path.refl a)
+
 /-! ## Exchange Matrices -/
 
 /-- An exchange matrix: a skew-symmetrizable integer matrix. -/
@@ -49,7 +55,7 @@ structure ExchangeMatrix (n : Nat) where
 /-- Trivial exchange matrix (all zeros). -/
 def ExchangeMatrix.zero (n : Nat) : ExchangeMatrix n where
   entry := fun _ _ => 0
-  skew_symm := fun _ _ => Path.ofEq (by omega)
+  skew_symm := fun _ _ => pathOfEqChain (by simp)
   diag_zero := fun _ => Path.refl _
 
 /-! ## Seeds -/

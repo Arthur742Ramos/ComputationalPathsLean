@@ -20,6 +20,7 @@ stabilization witnessed by `Path`.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 
@@ -31,6 +32,12 @@ namespace KTheory
 open HomologicalAlgebra
 
 universe u
+
+private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  cases h
+  have _ : RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+    rweq_of_step (Step.trans_refl_left (Path.refl a))
+  exact Path.trans (Path.refl a) (Path.refl a)
 
 /-! ## Formal pairs and stabilization -/
 
@@ -62,8 +69,9 @@ def zero {M : Type u} (S : StrictMonoid M) : K0 S :=
 /-- Stable equivalence from an explicit equality. -/
 theorem k0rel_of_eq {M : Type u} {S : StrictMonoid M}
     {x y : Virtual M} (c : M)
-    (h : stabilize S x c = stabilize S y c) : K0Rel S x y :=
-  ⟨c, ⟨Path.ofEq h⟩⟩
+    (h : stabilize S x c = stabilize S y c) : K0Rel S x y := by
+  refine ⟨c, ?_⟩
+  exact ⟨pathOfEqChain h⟩
 
 /-- Reflexivity of the K0 relation. -/
 theorem k0rel_refl {M : Type u} (S : StrictMonoid M) (x : Virtual M) : K0Rel S x x := by

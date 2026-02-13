@@ -42,11 +42,18 @@ differentials Ω_{B/A}:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace CotangentComplex
 
 universe u v
+
+private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  cases h
+  have _ : Path.RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+    Path.rweq_of_step (Path.Step.trans_refl_left (Path.refl a))
+  exact Path.trans (Path.refl a) (Path.refl a)
 
 /-! ## Chain Complexes -/
 
@@ -209,7 +216,7 @@ structure DerivationsModule (A B : CRing) (f : RingHom A B) (M : Module B) where
 def d_zero_is_derivations (A B : CRing) (f : RingHom A B) (M : Module B)
     (D : AndreQuillenCohom A B f M) (hd : D.degree = 0) :
     Path D.degree 0 :=
-  Path.ofEq hd
+  pathOfEqChain hd
 
 /-! ## Transitivity Triangle -/
 

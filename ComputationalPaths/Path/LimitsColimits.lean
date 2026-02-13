@@ -115,6 +115,28 @@ def productConeEquiv {X : Type w} :
         cases g
         rfl
 
+/-- Path witness for the product η-law from the universal property. -/
+def productCone_eta_path {X : Type w} (h : Hom X (Product A B)) :
+    Path (productConeInv (A := A) (B := B) (X := X)
+        (productConeMap (A := A) (B := B) h)) h :=
+  Path.ofEq ((productConeEquiv (A := A) (B := B) (X := X)).left_inv h)
+
+/-- Uniqueness of product mediating maps as a computational path. -/
+def productCone_unique_path {X : Type w} {h₁ h₂ : Hom X (Product A B)}
+    (hc : productConeMap (A := A) (B := B) h₁ =
+        productConeMap (A := A) (B := B) h₂) :
+    Path h₁ h₂ := by
+  have η₁ := productCone_eta_path (A := A) (B := B) (X := X) h₁
+  have η₂ := productCone_eta_path (A := A) (B := B) (X := X) h₂
+  have middle :
+      Path
+        (productConeInv (A := A) (B := B) (X := X)
+          (productConeMap (A := A) (B := B) h₁))
+        (productConeInv (A := A) (B := B) (X := X)
+          (productConeMap (A := A) (B := B) h₂)) :=
+    Path.congrArg (productConeInv (A := A) (B := B) (X := X)) (Path.ofEq hc)
+  exact Path.trans (Path.symm η₁) (Path.trans middle η₂)
+
 end Products
 
 /-! ## Equalizers (limits) -/
@@ -175,6 +197,30 @@ def equalizerForkEquiv {X : Type w} {f g : Hom A B} :
     | mk h p =>
         cases h
         rfl
+
+/-- Path witness for the equalizer η-law from the universal property. -/
+def equalizerFork_eta_path {X : Type w} {f g : Hom A B}
+    (k : Hom X (Equalizer f g)) :
+    Path (equalizerForkInv (f := f) (g := g) (X := X)
+        (equalizerForkMap (f := f) (g := g) k)) k :=
+  Path.ofEq ((equalizerForkEquiv (f := f) (g := g) (X := X)).left_inv k)
+
+/-- Uniqueness of equalizer mediating maps as a computational path. -/
+def equalizerFork_unique_path {X : Type w} {f g : Hom A B}
+    {k₁ k₂ : Hom X (Equalizer f g)}
+    (hc : equalizerForkMap (f := f) (g := g) k₁ =
+        equalizerForkMap (f := f) (g := g) k₂) :
+    Path k₁ k₂ := by
+  have η₁ := equalizerFork_eta_path (f := f) (g := g) (X := X) k₁
+  have η₂ := equalizerFork_eta_path (f := f) (g := g) (X := X) k₂
+  have middle :
+      Path
+        (equalizerForkInv (f := f) (g := g) (X := X)
+          (equalizerForkMap (f := f) (g := g) k₁))
+        (equalizerForkInv (f := f) (g := g) (X := X)
+          (equalizerForkMap (f := f) (g := g) k₂)) :=
+    Path.congrArg (equalizerForkInv (f := f) (g := g) (X := X)) (Path.ofEq hc)
+  exact Path.trans (Path.symm η₁) (Path.trans middle η₂)
 
 end Equalizers
 
@@ -250,6 +296,29 @@ def coproductCoconeEquiv {X : Type w} :
         cases f
         cases g
         rfl
+
+/-- Path witness for the coproduct η-law from the universal property. -/
+def coproductCocone_eta_path {X : Type w} (h : Hom (Coproduct A B) X) :
+    Path (coproductCoconeInv (A := A) (B := B) (X := X)
+        (coproductCoconeMap (A := A) (B := B) h)) h :=
+  Path.ofEq ((coproductCoconeEquiv (A := A) (B := B) (X := X)).left_inv h)
+
+/-- Uniqueness of coproduct mediating maps as a computational path. -/
+def coproductCocone_unique_path {X : Type w}
+    {h₁ h₂ : Hom (Coproduct A B) X}
+    (hc : coproductCoconeMap (A := A) (B := B) h₁ =
+        coproductCoconeMap (A := A) (B := B) h₂) :
+    Path h₁ h₂ := by
+  have η₁ := coproductCocone_eta_path (A := A) (B := B) (X := X) h₁
+  have η₂ := coproductCocone_eta_path (A := A) (B := B) (X := X) h₂
+  have middle :
+      Path
+        (coproductCoconeInv (A := A) (B := B) (X := X)
+          (coproductCoconeMap (A := A) (B := B) h₁))
+        (coproductCoconeInv (A := A) (B := B) (X := X)
+          (coproductCoconeMap (A := A) (B := B) h₂)) :=
+    Path.congrArg (coproductCoconeInv (A := A) (B := B) (X := X)) (Path.ofEq hc)
+  exact Path.trans (Path.symm η₁) (Path.trans middle η₂)
 
 end Coproducts
 
@@ -331,6 +400,30 @@ def coequalizerCoconeEquiv {X : Type w} {f g : Hom A B} :
     apply PathAlgebraHom.ext
     intro b
     rfl
+
+/-- Path witness for the coequalizer η-law from the universal property. -/
+def coequalizerCocone_eta_path {X : Type w} {f g : Hom A B}
+    (h : Hom (Coequalizer f g) X) :
+    Path (coequalizerCoconeInv (f := f) (g := g) (X := X)
+        (coequalizerCoconeMap (f := f) (g := g) h)) h :=
+  Path.ofEq ((coequalizerCoconeEquiv (f := f) (g := g) (X := X)).left_inv h)
+
+/-- Uniqueness of coequalizer mediating maps as a computational path. -/
+def coequalizerCocone_unique_path {X : Type w} {f g : Hom A B}
+    {h₁ h₂ : Hom (Coequalizer f g) X}
+    (hc : coequalizerCoconeMap (f := f) (g := g) h₁ =
+        coequalizerCoconeMap (f := f) (g := g) h₂) :
+    Path h₁ h₂ := by
+  have η₁ := coequalizerCocone_eta_path (f := f) (g := g) (X := X) h₁
+  have η₂ := coequalizerCocone_eta_path (f := f) (g := g) (X := X) h₂
+  have middle :
+      Path
+        (coequalizerCoconeInv (f := f) (g := g) (X := X)
+          (coequalizerCoconeMap (f := f) (g := g) h₁))
+        (coequalizerCoconeInv (f := f) (g := g) (X := X)
+          (coequalizerCoconeMap (f := f) (g := g) h₂)) :=
+    Path.congrArg (coequalizerCoconeInv (f := f) (g := g) (X := X)) (Path.ofEq hc)
+  exact Path.trans (Path.symm η₁) (Path.trans middle η₂)
 
 end Coequalizers
 

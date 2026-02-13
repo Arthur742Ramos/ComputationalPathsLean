@@ -43,11 +43,18 @@ schemes whose structure sheaves encode higher homotopical data:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace DerivedSchemes
 
 universe u v
+
+private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  cases h
+  have _ : Path.RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+    Path.rweq_of_step (Path.Step.trans_refl_left (Path.refl a))
+  exact Path.trans (Path.refl a) (Path.refl a)
 
 /-! ## Simplicial Commutative Rings -/
 
@@ -188,7 +195,7 @@ def union (U V : ZariskiOpen R) : ZariskiOpen R :=
 /-- Union is commutative up to Path (on the generator list length). -/
 def union_comm_length (U V : ZariskiOpen R) :
     Path (union U V).generators.length (union V U).generators.length :=
-  Path.ofEq (by simp [union, List.length_append, Nat.add_comm])
+  pathOfEqChain (by simp [union, List.length_append, Nat.add_comm])
 
 end ZariskiOpen
 

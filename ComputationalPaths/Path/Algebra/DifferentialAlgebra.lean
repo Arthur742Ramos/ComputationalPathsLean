@@ -35,6 +35,12 @@ namespace DifferentialAlgebra
 
 universe u v
 
+private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  cases h
+  have _ : RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+    rweq_of_step (Step.trans_refl_left (Path.refl a))
+  exact Path.trans (Path.refl a) (Path.refl a)
+
 /-! ## Graded Algebras -/
 
 /-- A graded module with addition and zero at each degree. -/
@@ -57,7 +63,7 @@ structure GrModule where
 /-- Path-valued zero_add. -/
 def GrModule.zero_add_path (M : GrModule) (n : Int) (x : M.obj n) :
     Path (M.add n (M.zero n) x) x :=
-  Path.ofEq (M.zero_add n x)
+  pathOfEqChain (M.zero_add n x)
 
 /-- A graded algebra: graded module with multiplication. -/
 structure GradedAlgebra extends GrModule where
