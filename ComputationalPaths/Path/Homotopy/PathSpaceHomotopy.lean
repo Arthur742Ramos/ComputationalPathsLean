@@ -88,7 +88,7 @@ def basedPathSpaceDeformationRetract (A : Type u) (a : A) :
 /-- Path witness: the deformation retract at the basepoint is reflexive. -/
 theorem deformationRetract_base_toEq (A : Type u) (a : A) :
     (basedPathSpaceDeformationRetract A a (pathSpaceBase A a)).toEq = rfl := by
-  simp [basedPathSpaceDeformationRetract, pathSpaceContr, PathSpaceFibration.pathSpaceContr]
+  simp
 
 /-! ## Free Path Space -/
 

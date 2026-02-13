@@ -106,7 +106,7 @@ def MorseFunction.toHandleDecomposition {A : Type u} (mf : MorseFunction A) :
   handles := mf.criticalPoints.map (fun ⟨_, idx⟩ => HandleData.mk idx 0)
   levelOrdered := by
     intro i j _
-    simp [HandleData.mk]
+    simp
 
 /-- The total number of handles equals the number of critical points. -/
 theorem MorseFunction.handle_count_eq_critical_count {A : Type u}

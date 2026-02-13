@@ -324,7 +324,7 @@ def cone_compose {I : DiagramShape.{u}} {A : Type v}
       have hassoc :
           Path.trans (Path.trans f (c.leg i)) (D.morph g) =
             Path.trans f (Path.trans (c.leg i) (D.morph g)) := by
-        simpa using (Path.trans_assoc f (c.leg i) (D.morph g))
+        simp
       have hmap :
           Path.trans f (Path.trans (c.leg i) (D.morph g)) =
             Path.trans f (c.leg j) := by
@@ -377,7 +377,7 @@ theorem bk_face_degen_sound {A : Type v}
     (Path.trans (BK.degen j) (BK.face j)).toEq =
       (Path.refl (BK.cosimpObj i (n + 1))).toEq :=
   by
-    simpa using congrArg Path.toEq (BK.face_degen j).toEq
+    simp
 
 end HomotopyLimits
 end Topology

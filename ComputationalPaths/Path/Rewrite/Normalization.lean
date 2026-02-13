@@ -88,7 +88,7 @@ structure NormalForm (A : Type u) (a b : A) where
 @[simp] theorem normalize_toEq {A : Type u} {a b : A}
     (p : Path a b) :
     (normalize p).toEq = p.toEq := by
-  simp [normalize]
+  simp
 
 /-- All paths with the same endpoints normalize to the same path. -/
 theorem normalize_eq {A : Type u} {a b : A}
@@ -140,13 +140,13 @@ theorem normalize_eq {A : Type u} {a b : A}
 @[simp] theorem normalize_mapLeft {B : Type u} {C : Type u}
     (f : A → B → C) {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
     normalize (mapLeft f p b) = mapLeft f (normalize p) b := by
-  simp [Path.mapLeft, normalize_congrArg]
+  simp [Path.mapLeft]
 
 /-- Normalization commutes with `mapRight`. -/
 @[simp] theorem normalize_mapRight {B : Type u} {C : Type u}
     (f : A → B → C) (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
     normalize (mapRight f a p) = mapRight f a (normalize p) := by
-  simp [Path.mapRight, normalize_congrArg]
+  simp [Path.mapRight]
 
 /-! ## Normal forms as representatives -/
 
@@ -208,7 +208,7 @@ theorem not_isNormal_trans_ofEq {A : Type u} {a b c : A}
   cases p with
   | mk steps proof =>
     cases proof
-    simp [normalize, transport]
+    simp [transport]
 
 /-- Substitution through a path equals substitution through its normalization. -/
 @[simp] theorem subst_normalize {D : A → Sort v} {a b : A}
@@ -217,7 +217,7 @@ theorem not_isNormal_trans_ofEq {A : Type u} {a b c : A}
   cases p with
   | mk steps proof =>
     cases proof
-    simp [normalize, subst, transport]
+    simp [subst, transport]
 
 /-! ## Normalization of compound paths -/
 
@@ -267,7 +267,7 @@ def NormalForm.toEq {A : Type u} {a b : A} (nf : NormalForm A a b) :
 theorem NormalForm.toEq_unique {A : Type u} {a b : A}
     (nf₁ nf₂ : NormalForm A a b) :
     nf₁.toEq = nf₂.toEq := by
-  simp [NormalForm.toEq]
+  simp
 
 end Path
 end ComputationalPaths

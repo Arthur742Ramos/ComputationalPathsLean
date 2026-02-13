@@ -100,17 +100,17 @@ theorem normalize_eq_ofEq_toEq (p : Path a b) :
 /-- Normalizing preserves toEq. -/
 theorem normalize_toEq_invariant (p : Path a b) :
     (normalize p).toEq = p.toEq := by
-  simp [normalize]
+  simp
 
 /-- Normalizing a trans, then taking toEq, equals composing the toEqs. -/
 theorem normalize_trans_toEq (p : Path a b) (q : Path b c) :
     (normalize (Path.trans p q)).toEq = p.toEq.trans q.toEq := by
-  simp [normalize]
+  simp
 
 /-- Normalizing a symm, then taking toEq, equals symm of toEq. -/
 theorem normalize_symm_toEq (p : Path a b) :
     (normalize (Path.symm p)).toEq = p.toEq.symm := by
-  simp [normalize]
+  simp
 
 /-! ## Normalization and path identity laws -/
 
@@ -239,7 +239,7 @@ theorem normalize_congrArg' {B : Type v} (f : A → B) (p : Path a b) :
 /-- Normalizing a mapped path preserves the mapped toEq. -/
 theorem normalize_congrArg_toEq {B : Type v} (f : A → B) (p : Path a b) :
     (normalize (Path.congrArg f p)).toEq = _root_.congrArg f p.toEq := by
-  simp [normalize]
+  simp
 
 /-! ## NormalForm operations -/
 
@@ -296,13 +296,13 @@ theorem normalForm_toEq_unique (nf₁ nf₂ : Path.NormalForm A a b) :
 theorem transport_normalize_eq {D : A → Sort v} (p : Path a b) (x : D a) :
     Path.transport (D := D) (normalize p) x = Path.transport (D := D) p x := by
   cases p with
-  | mk steps proof => cases proof; simp [normalize, Path.transport]
+  | mk steps proof => cases proof; simp [Path.transport]
 
 /-- Subst through `normalize p` equals subst through `p`. -/
 theorem subst_normalize_eq {D : A → Sort v} (x : D a) (p : Path a b) :
     Path.subst (D := D) x (normalize p) = Path.subst (D := D) x p := by
   cases p with
-  | mk steps proof => cases proof; simp [normalize, Path.subst, Path.transport]
+  | mk steps proof => cases proof; simp [Path.subst, Path.transport]
 
 /-! ## Normal form round-trip -/
 

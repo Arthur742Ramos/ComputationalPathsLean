@@ -63,8 +63,7 @@ noncomputable def monodromy (C : CoveringSpace.Covering A) (a : A) :
     (g h : EtalePiOne A a) (x : C.fiber a) :
     monodromy (A := A) C a g (monodromy (A := A) C a h x) =
       monodromy (A := A) C a (PiOne.mul g h) x := by
-  simpa [monodromy, PiOne.mul] using
-    (CoveringSpace.fiberAction_comp (P := C.fiber) (a := a) (α := g) (β := h) (x := x))
+  simp [monodromy, PiOne.mul]
 
 /-- Monodromy packaged as a strict group action. -/
 noncomputable def monodromyAction (C : CoveringSpace.Covering A) (a : A) :
@@ -145,22 +144,19 @@ def galoisComp (C : CoveringSpace.Covering A) :
 /-- Right identity for deck composition. -/
 @[simp] theorem galoisComp_id (C : CoveringSpace.Covering A) (f : GaloisGroup (A := A) C) :
     galoisComp (A := A) C f (galoisId (A := A) C) = f := by
-  simpa [galoisComp, galoisId] using
-    (CoveringSpace.DeckTransformation.comp_id (P := C.fiber) f)
+  simp [galoisComp, galoisId]
 
 /-- Left identity for deck composition. -/
 @[simp] theorem galoisId_comp (C : CoveringSpace.Covering A) (f : GaloisGroup (A := A) C) :
     galoisComp (A := A) C (galoisId (A := A) C) f = f := by
-  simpa [galoisComp, galoisId] using
-    (CoveringSpace.DeckTransformation.id_comp (P := C.fiber) f)
+  simp [galoisComp, galoisId]
 
 /-- Associativity of deck composition. -/
 @[simp] theorem galoisComp_assoc (C : CoveringSpace.Covering A)
     (f g h : GaloisGroup (A := A) C) :
     galoisComp (A := A) C (galoisComp (A := A) C f g) h =
       galoisComp (A := A) C f (galoisComp (A := A) C g h) := by
-  simpa [galoisComp] using
-    (CoveringSpace.DeckTransformation.comp_assoc (P := C.fiber) f g h)
+  simp [galoisComp]
 
 /-! ## Summary -/
 

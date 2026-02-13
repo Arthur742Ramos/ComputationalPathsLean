@@ -186,7 +186,7 @@ theorem nerve_map_refl {A : Type u} (C : Cover A) (s : Nerve C) :
   cases s with
   | mk indices point witness =>
       apply Simplex.ext
-      · simpa [nerveMap, simplexMap, CoverRefinement.refl]
+      · simp [nerveMap, simplexMap, CoverRefinement.refl]
       · rfl
 
 /-- Nerve maps compose along refinement composition. -/
@@ -196,7 +196,7 @@ theorem nerve_map_comp {A : Type u} {C D E : Cover A}
   cases x with
   | mk indices point witness =>
       apply Simplex.ext
-      · simpa [nerveMap, simplexMap, CoverRefinement.comp, List.map_map]
+      · simp [nerveMap, simplexMap, CoverRefinement.comp, List.map_map]
       · rfl
 
 /-- Mapper map is identity for the identity refinement. -/

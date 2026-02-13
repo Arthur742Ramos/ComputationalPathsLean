@@ -197,7 +197,7 @@ noncomputable def commutatorClass : FigureEightPiOne :=
 /-- The commutator toEq is rfl (since base = base). -/
 theorem commutator_toEq :
     commutator.toEq = (rfl : base = base) := by
-  simp [commutator, loopAInv, loopBInv]
+  simp
 
 /-! ## Triple compositions -/
 

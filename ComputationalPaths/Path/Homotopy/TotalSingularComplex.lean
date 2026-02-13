@@ -206,7 +206,7 @@ theorem singularMap_degen {X Y : Type u} (f : X → Y) (n : Nat)
 theorem singularMap_id {X : Type u} (n : Nat) (σ : SingularSimplex X n) :
     singularMap id n σ = σ := by
   ext j
-  simp [singularMap, Function.comp]
+  simp [singularMap]
 
 /-- `Path`-typed identity. -/
 def singularMap_id_path {X : Type u} (n : Nat) (σ : SingularSimplex X n) :

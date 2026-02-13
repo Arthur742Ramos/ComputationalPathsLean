@@ -183,8 +183,7 @@ theorem cwApproximation_homotopy_refl_toEq
     {f : ContinuousMap X Y}
     (a : CWApproximationData (C := C) (D := D) f) (x : X) :
     (cwApproximation_homotopy_refl (C := C) (D := D) a x).toEq = rfl := by
-  simp [cwApproximation_homotopy_refl, cwApproximation_homotopy,
-        cwApproximation_path]
+  simp
 
 /-! ## Approximation of Inclusions -/
 
@@ -205,7 +204,7 @@ theorem cwApproximation_id_map :
 /-- The identity approximation homotopy is reflexive. -/
 theorem cwApproximation_id_path_toEq (x : X) :
     (cwApproximation_path (cwApproximation_id (C := C)) x).toEq = rfl := by
-  simp [cwApproximation_path, cwApproximation_id, cwApproximation_of_cellular,
+  simp [cwApproximation_id, cwApproximation_of_cellular,
         cellularApproximation_of_cellular]
 
 /-! ## Relative CW Approximation -/

@@ -24,6 +24,7 @@ namespace Rewrite
 
 universe u
 
+set_option linter.unusedVariables false in
 /-- Syntactic path expressions for the core groupoid fragment. -/
 inductive PathExpr : {A : Type u} → {a b : A} → Type (u + 1)
   | atom {A : Type u} {a b : A} (p : Path a b) :
@@ -135,7 +136,7 @@ theorem eval_rw {A : Type u} {a b : A}
     Path.Rw (A := A) (a := a) (b := b) (eval p) (eval q) := by
   induction h with
   | refl =>
-      simpa using (Path.Rw.refl (eval p))
+      exact (Path.Rw.refl (eval p))
   | tail h step ih =>
       cases step
 

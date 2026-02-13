@@ -45,8 +45,7 @@ variable {A : Type u} {a b : A}
 @[simp] theorem normalize_eq_of_toEq (p q : Path a b) :
     normalize (A := A) (a := a) (b := b) p =
       normalize (A := A) (a := a) (b := b) q := by
-  simpa [normalize] using
-    (HigherPathInduction.ofEq_toEq_eq (A := A) (a := a) (b := b) p q)
+  simp [normalize]
 
 /-- Equality of normal forms is decidable (in fact, always true). -/
 def normalize_decidable (p q : Path a b) :
