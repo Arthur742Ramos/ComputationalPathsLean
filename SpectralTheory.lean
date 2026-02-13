@@ -21,6 +21,7 @@ They wrap existing Mathlib definitions and theorems.
 import Mathlib.Analysis.Normed.Algebra.Spectrum
 import Mathlib.Analysis.CStarAlgebra.Spectrum
 import Mathlib.Analysis.InnerProductSpace.Spectrum
+import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Basic
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Unital
 
 open scoped NNReal ENNReal
@@ -35,7 +36,7 @@ namespace SpectralTheory
 section SpectrumBasics
 
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
-variable {A : Type*} [NormedRing A] [NormedAlgebra 𝕜 A]
+variable {A : Type*} [NormedRing A] [NormedAlgebra 𝕜 A] [CompleteSpace A]
 
 /-- The **spectrum** of an element `a` in a Banach algebra: the set of `k : 𝕜` such that
 `a - k • 1` is not invertible. -/
@@ -71,38 +72,32 @@ end SpectrumBasics
 
 section SpectralRadius
 
-variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
-variable {A : Type*} [NormedRing A] [NormedAlgebra 𝕜 A]
+variable (𝕜 : Type*) [NontriviallyNormedField 𝕜]
+variable (A : Type*) [NormedRing A] [NormedAlgebra 𝕜 A] [CompleteSpace A]
 
 /-- The **spectral radius** of `a`: the supremum of `‖k‖` for `k ∈ spectrum 𝕜 a`. -/
 abbrev spectralRadiusOf (a : A) : ℝ≥0∞ := spectralRadius 𝕜 a
 
 /-- The spectral radius of zero is zero. -/
-theorem spectralRadius_zero : spectralRadiusOf (0 : A) = 0 :=
+theorem spectralRadius_zero' : spectralRadiusOf 𝕜 A (0 : A) = 0 :=
   spectrum.spectralRadius_zero (𝕜 := 𝕜) (A := A)
 
 /-- The spectral radius is bounded by the norm (for normed algebras with `‖1‖ = 1`). -/
-theorem spectralRadius_le_nnnorm [NormOneClass A] (a : A) :
-    spectralRadiusOf a ≤ ‖a‖₊ :=
+theorem spectralRadius_le_nnnorm' [NormOneClass A] (a : A) :
+    spectralRadiusOf 𝕜 A a ≤ ‖a‖₊ :=
   spectrum.spectralRadius_le_nnnorm a
 
-/-- **Spectral radius formula** (one step): `spectralRadius(aⁿ) ≤ spectralRadius(a)ⁿ`. -/
-theorem spectralRadius_pow_le (a : A) (n : ℕ) (hn : n ≠ 0) :
-    spectralRadiusOf (a ^ n) ≤ spectralRadiusOf a ^ n :=
+/-- **Spectral mapping for powers**: `spectralRadius(a)ⁿ ≤ spectralRadius(aⁿ)`. -/
+theorem spectralRadius_pow_le' (a : A) (n : ℕ) (hn : n ≠ 0) :
+    spectralRadiusOf 𝕜 A a ^ n ≤ spectralRadiusOf 𝕜 A (a ^ n) :=
   spectrum.spectralRadius_pow_le a n hn
 
-/-- **Gelfand's formula**: `spectralRadius(a) ≤ liminf ‖aⁿ‖^{1/n}`. -/
-theorem spectralRadius_le_liminf (a : A) :
-    spectralRadiusOf a ≤ Filter.liminf (fun n : ℕ => (‖a ^ n‖₊ : ℝ≥0∞) ^ (1 / n : ℝ))
-      Filter.atTop :=
-  spectrum.spectralRadius_le_liminf_pow_nnnorm_pow_one_div a
-
 /-- The spectrum is bounded (in the bornological sense). -/
-theorem spectrum_isBounded (a : A) : Bornology.IsBounded (spectrumOf a) :=
+theorem spectrum_isBounded' (a : A) : Bornology.IsBounded (spectrumOf (𝕜 := 𝕜) a) :=
   spectrum.isBounded a
 
 /-- The spectrum of an element in a proper space is compact. -/
-theorem spectrum_isCompact [ProperSpace 𝕜] (a : A) : IsCompact (spectrumOf a) :=
+theorem spectrum_isCompact' [ProperSpace 𝕜] (a : A) : IsCompact (spectrumOf (𝕜 := 𝕜) a) :=
   spectrum.isCompact a
 
 end SpectralRadius
@@ -113,7 +108,6 @@ section SelfAdjointSpectral
 
 variable {𝕜 : Type*} [RCLike 𝕜]
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
-variable [FiniteDimensional 𝕜 E]
 variable {T : E →ₗ[𝕜] E}
 
 /-- Self-adjoint (symmetric) operators have real eigenvalues. -/
@@ -127,6 +121,8 @@ theorem selfAdjoint_eigenspaces_orthogonal (hT : T.IsSymmetric) :
     OrthogonalFamily 𝕜 (fun μ => (Module.End.eigenspace T μ))
       (fun μ => (Module.End.eigenspace T μ).subtypeₗᵢ) :=
   hT.orthogonalFamily_eigenspaces
+
+variable [FiniteDimensional 𝕜 E]
 
 /-- The orthogonal complement of the sum of all eigenspaces of a self-adjoint operator
 on a finite-dimensional space is trivial. -/
@@ -194,12 +190,12 @@ theorem unitary_spectrum_subset_circle (u : unitary A) :
 
 /-- For a self-adjoint element of a C*-algebra, the spectral radius equals the norm. -/
 theorem selfAdjoint_spectralRadius_eq_nnnorm {a : A} (ha : IsSelfAdjoint a) :
-    spectralRadiusOf (𝕜 := ℂ) a = ‖a‖₊ :=
+    spectralRadius ℂ a = ‖a‖₊ :=
   ha.spectralRadius_eq_nnnorm
 
 /-- For a star-normal element of a C*-algebra, the spectral radius equals the norm. -/
 theorem starNormal_spectralRadius_eq_nnnorm (a : A) [IsStarNormal a] :
-    spectralRadiusOf (𝕜 := ℂ) a = ‖a‖₊ :=
+    spectralRadius ℂ a = ‖a‖₊ :=
   IsStarNormal.spectralRadius_eq_nnnorm a
 
 end CStarSpectrum
@@ -208,14 +204,12 @@ end CStarSpectrum
 
 section FunctionalCalculus
 
-variable {R A : Type*} [CommSemiring R] [StarRing R] [MetricSpace R]
-  [TopologicalSemiring R] [ContinuousStar R] [TopologicalSpace A] [Ring A]
-  [StarRing A] [Algebra R A] [Nontrivial A] [T2Space A]
-  {p : A → Prop} [ContinuousFunctionalCalculus R A p]
+variable {A : Type*} [CStarAlgebra A]
 
-/-- The **continuous functional calculus**: given `f : R → R` continuous on `spectrum R a`
-and `a : A` satisfying `p a`, produce the element `f(a) ∈ A`. -/
-abbrev cfcApply (f : R → R) (a : A) : A := cfc f a
+/-- The **continuous functional calculus** for a normal element: given `f` continuous on
+`spectrum ℂ a` and `a : A` star-normal, produce `f(a) ∈ A`.
+This uses the `cfc` from Mathlib's ContinuousFunctionalCalculus API. -/
+abbrev cfcApply (f : ℂ → ℂ) (a : A) [IsStarNormal a] : A := cfc f a
 
 end FunctionalCalculus
 

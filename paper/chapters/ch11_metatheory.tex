@@ -5,7 +5,7 @@
 \chapter{The Rewrite System: Metatheory}
 \label{ch:metatheory}
 
-In Part~I (Chapter~\ref{ch:rewrite-system}), we introduced the 76-rule
+In Part~I (Chapter~\ref{ch:rewrite-system}), we introduced the 75-rule
 rewrite system on computational paths, established its soundness,
 normalization properties, termination, and confluence, and constructed
 the quotient $\PathQuot$. In this chapter, we examine the rewrite system
@@ -27,7 +27,7 @@ computational paths and the identity types of Homotopy Type Theory.
     \item A set of \emph{typed terms} (path expressions), well-typed by
       their source and target.
     \item A \emph{reduction relation} $\rew$ on terms of the same sort,
-      given by the 76 rules of Chapter~\ref{ch:rewrite-system}.
+      given by the 75 rules of Chapter~\ref{ch:rewrite-system}.
   \end{enumerate}
   The rewrite system on $\Path_A(a, b)$ is thus a many-sorted first-order
   TRS in the sense of Klop~\cite{Klop92} and Terese~\cite{Terese03}, with
@@ -175,7 +175,7 @@ The key property of $\mathrm{PathExpr}$ is that it separates the
 \subsection{Rewriting on PathExpr}
 
 The single-step and multi-step rewrite relations lift from $\Path$ to
-$\mathrm{PathExpr}$, with the same 76 rules applied syntactically. The
+$\mathrm{PathExpr}$, with the same 75 rules applied syntactically. The
 critical property is that evaluation commutes with rewriting:
 
 \begin{theorem}[Evaluation Preserves Rewriting]\label{thm:eval-rw}
@@ -260,7 +260,7 @@ the left-hand side of another, or the same term matches two distinct rules.
   $p \rew q_2$.
 \end{definition}
 
-The 76 rules generate a finite (though large) set of critical pairs.
+The 75 rules generate a finite (though large) set of critical pairs.
 The principal families of critical pairs are:
 
 \begin{enumerate}[label=(\arabic*)]
@@ -357,7 +357,7 @@ proofs involving rewrite equality:
       $q \rweq p$, via $\RwEq.\mathrm{symm}$.
     \item \texttt{path\_simp}: applies the $\mathtt{simp}$ tactic with the
       library of $\RwEq$ lemmas (registered as \texttt{@[simp]}
-      attributes on all 76 rules and their derived consequences).
+      attributes on all 75 rules and their derived consequences).
     \item \texttt{path\_trans h}: applies transitivity with an
       intermediate path from hypothesis~$h$.
     \item \texttt{path\_congr\_left h} / \texttt{path\_congr\_right h}:
@@ -466,7 +466,7 @@ the \texttt{Rewrite} directory:
 \toprule
 \textbf{Module} & \textbf{Contents} \\
 \midrule
-\texttt{Step.lean} & The 76-rule \texttt{Step} inductive type and soundness proof \\
+\texttt{Step.lean} & The 75-rule \texttt{Step} inductive type and soundness proof \\
 \texttt{Rw.lean} & Reflexive--transitive closure $\Rw$ \\
 \texttt{RwEq.lean} & Rewrite equality $\RwEq$ and all congruence lemmas \\
 \texttt{Normalization.lean} & Normal forms and the $\normalize$ function \\

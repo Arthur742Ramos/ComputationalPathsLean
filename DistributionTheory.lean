@@ -99,7 +99,7 @@ section SchwartzDerivatives
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
 variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
-variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
+variable {𝕜 : Type*} [RCLike 𝕜]
 variable [NormedSpace 𝕜 F] [SMulCommClass ℝ 𝕜 F]
 
 /-- The Fréchet derivative as a continuous linear map on Schwartz space:
@@ -127,7 +127,7 @@ variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
 
 /-- A compactly supported smooth function can be promoted to a Schwartz function. -/
 abbrev compactlySupportedToSchwartz {f : E → F}
-    (h₁ : HasCompactSupport f) (h₂ : ContDiff ℝ ⊤ f) : 𝓢(E, F) :=
+    (h₁ : HasCompactSupport f) (h₂ : ContDiff ℝ (⊤ : ℕ∞) f) : 𝓢(E, F) :=
   h₁.toSchwartzMap h₂
 
 end TestFunctions
@@ -155,7 +155,7 @@ theorem fourierTransformSchwartz_apply (f : 𝓢(V, E)) :
 
 /-- The **Fourier transform** on Schwartz space is a continuous linear *equivalence*
 (i.e., it is an isomorphism of topological vector spaces). -/
-abbrev fourierTransformEquiv : 𝓢(V, E) ≃L[𝕜] 𝓢(V, E) :=
+abbrev fourierTransformEquiv [CompleteSpace E] : 𝓢(V, E) ≃L[𝕜] 𝓢(V, E) :=
   SchwartzMap.fourierTransformCLE 𝕜
 
 end FourierSchwartz
@@ -227,14 +227,15 @@ end SobolevInequality
 section SchwartzIntegration
 
 variable {D : Type*} [NormedAddCommGroup D] [NormedSpace ℝ D]
-  [MeasurableSpace D] [BorelSpace D] [FiniteDimensional ℝ D]
+  [MeasurableSpace D] [BorelSpace D] [SecondCountableTopology D] [FiniteDimensional ℝ D]
 variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [CompleteSpace V]
-variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
+variable {𝕜 : Type*} [RCLike 𝕜]
   [NormedSpace 𝕜 V] [SMulCommClass ℝ 𝕜 V]
 
 /-- Integration of Schwartz functions is a continuous linear map `𝓢(D, V) →L[𝕜] V`. -/
-abbrev integralSchwartzCLM : 𝓢(D, V) →L[𝕜] V :=
-  SchwartzMap.integralCLM 𝕜
+abbrev integralSchwartzCLM {μ : MeasureTheory.Measure D}
+    [μ.HasTemperateGrowth] : 𝓢(D, V) →L[𝕜] V :=
+  SchwartzMap.integralCLM 𝕜 μ
 
 end SchwartzIntegration
 

@@ -22,7 +22,8 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.InnerProductSpace.Dual
 import Mathlib.Analysis.InnerProductSpace.Orthogonal
 import Mathlib.Analysis.InnerProductSpace.Orthonormal
-import Mathlib.Analysis.InnerProductSpace.Projection
+import Mathlib.Analysis.InnerProductSpace.Projection.Basic
+import Mathlib.Analysis.InnerProductSpace.Projection.Submodule
 import Mathlib.Analysis.InnerProductSpace.l2Space
 
 open scoped NNReal
@@ -71,10 +72,12 @@ theorem norm_sq_eq_inner (x : E) :
     ‖x‖ * ‖x‖ = RCLike.re (innerProduct (𝕜 := 𝕜) x x) :=
   (inner_self_eq_norm_mul_norm (𝕜 := 𝕜) x).symm
 
-/-- The **parallelogram law**: ‖x + y‖² + ‖x - y‖² = 2(‖x‖² + ‖y‖²). -/
-theorem parallelogram_law' (x y : E) :
-    ‖x + y‖ * ‖x + y‖ + ‖x - y‖ * ‖x - y‖ = 2 * (‖x‖ * ‖x‖ + ‖y‖ * ‖y‖) :=
-  parallelogram_law_with_norm 𝕜 x y
+/-- The **parallelogram law**: ‖x + y‖₊² + ‖x - y‖₊² = 2(‖x‖₊² + ‖y‖₊²).
+Uses NNNorm version which doesn't require explicit scalar field. -/
+theorem parallelogram_law_nnnorm (𝕜' : Type*) [RCLike 𝕜'] {E' : Type*}
+    [NormedAddCommGroup E'] [InnerProductSpace 𝕜' E'] (x y : E') :
+    ‖x + y‖₊ * ‖x + y‖₊ + ‖x - y‖₊ * ‖x - y‖₊ = 2 * (‖x‖₊ * ‖x‖₊ + ‖y‖₊ * ‖y‖₊) :=
+  parallelogram_law_with_nnnorm 𝕜' x y
 
 end InnerProductBasics
 
@@ -120,7 +123,9 @@ variable {𝕜 : Type*} [RCLike 𝕜]
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [CompleteSpace E]
 
 /-- The remainder of the orthogonal projection is in the orthogonal complement. -/
-theorem projection_remainder_mem_orthogonal (K : Submodule 𝕜 E) [CompleteSpace K] (x : E) :
+theorem projection_remainder_mem_orthogonal {𝕜' : Type*} [RCLike 𝕜']
+    {E' : Type*} [NormedAddCommGroup E'] [InnerProductSpace 𝕜' E']
+    (K : Submodule 𝕜' E') [CompleteSpace K] (x : E') :
     x - ↑(K.orthogonalProjection x) ∈ Kᗮ :=
   K.sub_starProjection_mem_orthogonal x
 

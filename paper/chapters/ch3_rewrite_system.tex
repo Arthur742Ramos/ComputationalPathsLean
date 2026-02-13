@@ -17,7 +17,7 @@ these additional identities.
 
 \begin{definition}[Single-Step Rewrite]\label{def:step-rewrite}
   The relation $\rew$ on $\Path_A(a,b)$ is the smallest relation closed under
-  the 76 rules organized into eight groups below. We write
+  the 75 rules organized into eight groups below. We write
   $\Step(p, q)$ or $p \rew q$ to denote that $p$ rewrites to $q$ in one step.
 \end{definition}
 
@@ -236,7 +236,7 @@ all operations:
 \end{theorem}
 
 \begin{proof}
-  By induction on the derivation of $\Step(p, q)$. Each of the 76 rules
+  By induction on the derivation of $\Step(p, q)$. Each of the 75 rules
   preserves the proof field because all path operations are designed to be
   sound with respect to the underlying propositional equality. The structural
   closure rules follow by the induction hypothesis.
@@ -397,7 +397,7 @@ rewriting setting.
 \end{theorem}
 
 \begin{proof}
-  By case analysis on the 76 rules. Each rule either reduces the symbol
+  By case analysis on the 75 rules. Each rule either reduces the symbol
   rank or maintains the rank while strictly decreasing the aggregate weight.
 \end{proof}
 
@@ -422,7 +422,7 @@ rewriting setting.
   and $p \rews r'$, we obtain a join of $q$ and $r'$ at some $m'$.
   We then perform a \emph{critical pair analysis}: for each pair of
   overlapping rules that could apply to~$r'$, we exhibit an explicit
-  join. The analysis covers all pairs among the 76 rules.
+  join. The analysis covers all pairs among the 75 rules.
 \end{proof}
 
 The critical pair analysis is the most technically demanding part of the

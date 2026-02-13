@@ -1,5 +1,5 @@
 % ============================================================================
-% The Algebra of Computational Paths — Complete Paper
+% The Calculus of Computational Paths — Complete Paper
 % ============================================================================
 % Compile with: pdflatex main && bibtex main && pdflatex main && pdflatex main
 % ============================================================================
@@ -144,13 +144,13 @@
 \newcommand{\trans}{\operatorname{trans}}
 
 % ============================================================================
-\title{\textbf{The Algebra of Computational Paths}\\[6pt]
+\title{\textbf{The Calculus of Computational Paths}\\[6pt]
   \large A Lean~4 Formalization of Rewrite-Trace Equality,\\
   Weak $\omega$-Groupoids, and Homotopy Theory}
 
 \author{
-  Arthur Ferreira Ramos\thanks{Centro de Inform\'atica, Universidade Federal
-    de Pernambuco, Recife, Brazil. \texttt{afr@cin.ufpe.br}}
+  Arthur Freitas Ramos\thanks{Centro de Inform\'atica, Universidade Federal
+    de Pernambuco, Recife, Brazil. \texttt{arfreita@microsoft.com}}
   \and
   Ruy J.\,G.\,B.\ de Queiroz\footnotemark[1]
   \and
@@ -170,7 +170,7 @@ type carry explicit rewrite traces recording the sequence of elementary steps
 by which they were derived. A computational path from $a$ to~$b$ in a type~$A$
 is a pair $(s, \pi)$ where $\pi : a =_A b$ is a propositional equality and
 $s$ is a finite list of elementary rewrite steps. The space of computational
-paths is equipped with a confluent, terminating rewrite system whose 76~rules
+paths is equipped with a confluent, terminating rewrite system whose 75~rules
 are organized into eight groups covering path algebra, type-former
 $\beta/\eta$-rules, transport, contexts, dependent contexts, bi-contexts, map
 congruence, and structural closure. We prove that this structure gives rise to
@@ -183,8 +183,8 @@ exact sequence of homotopy groups, the Hurewicz theorem, spectral sequences, and
 computations of fundamental groups for standard spaces including the circle
 ($\pi_1(S^1) \cong \mathbb{Z}$), torus ($\mathbb{Z} \times \mathbb{Z}$),
 figure-eight ($\mathbb{Z} * \mathbb{Z}$), Klein bottle, projective spaces, and
-lens spaces. The entire development is formalized in Lean~4 (302~files,
-60,860~lines, 1,710~definitions, 885~theorems, 701~structures).
+lens spaces. The entire development is formalized in Lean~4 (516~files,
+113,024~lines, 3,258~definitions, 1,466~theorems, 2,711~structures).
 \end{abstract}
 
 % --- Table of Contents ---

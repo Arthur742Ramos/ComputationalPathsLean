@@ -25,7 +25,7 @@ traces are distinct combinatorial objects that support a rich algebraic
 structure (\cref{thm:non-uip}).
 
 \paragraph{A confluent, terminating rewrite system.}
-The 76 rules of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS
+The 75 rules of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS
 (Chapter~\ref{ch:rewrite-system}), organized into eight groups---path
 algebra, type-former $\beta$/$\eta$-rules, transport, contexts,
 dependent contexts, bi-contexts, map congruence, and structural
@@ -86,12 +86,12 @@ The entire development is formalized in Lean~4, comprising:
 \toprule
 \textbf{Metric} & \textbf{Count} \\
 \midrule
-Lean 4 source files & 302 \\
-Total lines of code & 60,860 \\
-Definitions (\texttt{def}, \texttt{noncomputable def}) & 1,710 \\
-Theorems (\texttt{theorem}) & 885 \\
-Structures (\texttt{structure}) & 701 \\
-Inductive types (\texttt{inductive}) & 69 \\
+Lean 4 source files & 516 \\
+Total lines of code & 113,024 \\
+Definitions (\texttt{def}, \texttt{noncomputable def}) & 3,258 \\
+Theorems (\texttt{theorem}) & 1,466 \\
+Structures (\texttt{structure}) & 2,711 \\
+Inductive types (\texttt{inductive}) & 190 \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -123,7 +123,7 @@ Several design choices shaped the formalization:
 \paragraph{Proof automation.}
 The \texttt{path\_simp} tactic (Section~\ref{sec:decidability}) proved
 essential for managing the combinatorial complexity of the rewrite system.
-With all 76 rules and their congruence variants registered as
+With all 75 rules and their congruence variants registered as
 \texttt{@[simp]} lemmas, \texttt{path\_simp} resolves most $\RwEq$ goals
 automatically. For more complex goals, the dedicated tactics
 (\texttt{path\_trans}, \texttt{path\_congr\_left/right},
@@ -213,7 +213,7 @@ homotopy theory (e.g., Blakers--Massey, the James construction, the
 Hopf invariant) would demonstrate the power of the framework.
 
 \paragraph{Scaling the formalization.}
-The current formalization of 60,860 lines covers a substantial portion
+The current formalization of 113,024 lines covers a substantial portion
 of basic algebraic topology. Scaling to more advanced topics
 (e.g., stable homotopy theory, chromatic homotopy theory, derived
 algebraic geometry) will require:

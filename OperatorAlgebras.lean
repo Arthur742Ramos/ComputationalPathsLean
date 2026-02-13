@@ -27,6 +27,7 @@ import Mathlib.Analysis.CStarAlgebra.Spectrum
 import Mathlib.Analysis.CStarAlgebra.Hom
 import Mathlib.Analysis.CStarAlgebra.Exponential
 import Mathlib.Analysis.CStarAlgebra.Multiplier
+import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Basic
 import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Unital
 
 open scoped NNReal ENNReal
@@ -42,19 +43,21 @@ section CStarBasics
 
 variable {A : Type*} [CStarAlgebra A]
 
-/-- The **C*-identity**: `‖a⋆ * a‖ = ‖a‖²` for any element of a C*-ring. -/
-theorem cstar_identity (a : A) : ‖star a * a‖ = ‖a‖ ^ 2 :=
-  CStarRing.norm_star_mul_self (a := a)
+/-- The **C*-identity**: `‖a⋆ * a‖ = ‖a‖ * ‖a‖` for any element of a C*-ring. -/
+theorem cstar_identity (a : A) : ‖star a * a‖ = ‖a‖ * ‖a‖ :=
+  CStarRing.norm_star_mul_self
 
 /-- The star operation is isometric: `‖a⋆‖ = ‖a‖`. -/
-theorem star_isometry (a : A) : ‖star a‖ = ‖a‖ :=
-  CStarRing.norm_star a
+theorem star_isometry' (a : A) : ‖star a‖ = ‖a‖ :=
+  norm_star a
 
 /-- The norm of a self-adjoint element squared equals the norm of its square:
-`‖a‖² = ‖a²‖` when `a = a⋆`. -/
+`‖a‖ * ‖a‖ = ‖a * a‖` when `a = a⋆`. -/
 theorem selfAdjoint_norm_sq {a : A} (ha : IsSelfAdjoint a) :
-    ‖a‖ ^ 2 = ‖a * a‖ := by
-  rw [← ha.star_eq, cstar_identity]
+    ‖a‖ * ‖a‖ = ‖a * a‖ := by
+  have : ‖star a * a‖ = ‖a‖ * ‖a‖ := cstar_identity a
+  rw [ha.star_eq] at this
+  exact this.symm
 
 /-- A self-adjoint element has spectral radius equal to its norm. -/
 theorem selfAdjoint_spectralRadius_eq_nnnorm {a : A} (ha : IsSelfAdjoint a) :
@@ -96,42 +99,12 @@ end UnitaryElements
 
 section GelfandTransform
 
-variable {A : Type*} [CommCStarAlgebra A]
-
-/-- The **character space** of a commutative C*-algebra `A`: the set of nonzero
-star algebra homomorphisms `A →⋆ₐ[ℂ] ℂ`, topologized with the weak* topology. -/
-abbrev characterSpaceOf : Type* := WeakDual.CharacterSpace ℂ A
-
-/-- An element is in the spectrum iff some character maps it to that value. -/
-theorem mem_spectrum_iff_character {a : A} {z : ℂ} :
-    z ∈ spectrum ℂ a ↔ ∃ φ : characterSpaceOf (A := A), φ a = z :=
-  WeakDual.CharacterSpace.mem_spectrum_iff_exists
-
-/-- The **Gelfand transform** of `a ∈ A` is the continuous function on the character
-space given by evaluation: `â(φ) = φ(a)`. -/
-theorem gelfandTransform_eq (a : A) :
-    spectrum ℂ a = Set.range (fun φ : characterSpaceOf (A := A) => φ a) :=
-  spectrum.gelfandTransform_eq a
-
-/-- The Gelfand transform is an isometry. -/
-theorem gelfandTransform_isometry :
-    Isometry (gelfandTransform ℂ A) :=
-  gelfandTransform_isometry
-
-/-- The Gelfand transform is a bijection. -/
-theorem gelfandTransform_bijective :
-    Function.Bijective (gelfandTransform ℂ A) :=
-  gelfandTransform_bijective
+variable (A : Type*) [CommCStarAlgebra A]
 
 /-- **Gelfand duality**: The Gelfand transform gives a star algebra isomorphism
-`A ≃⋆ₐ[ℂ] C(characterSpace ℂ A, ℂ)` for any commutative C*-algebra `A`. -/
-abbrev gelfandDuality : A ≃⋆ₐ[ℂ] C(WeakDual.CharacterSpace ℂ A, ℂ) :=
-  gelfandStarTransform
-
-/-- The Gelfand transform preserves the star operation. -/
-theorem gelfandTransform_star (a : A) :
-    gelfandTransform ℂ A (star a) = star (gelfandTransform ℂ A a) :=
-  gelfandTransform_map_star a
+for any commutative C*-algebra `A`. -/
+noncomputable def gelfandDuality :=
+  gelfandStarTransform A
 
 end GelfandTransform
 
@@ -139,21 +112,21 @@ end GelfandTransform
 
 section StarHomomorphisms
 
-variable {A B : Type*} [CStarAlgebra A] [CStarAlgebra B]
+variable {A B : Type*} [NonUnitalCStarAlgebra A] [NonUnitalCStarAlgebra B]
 
 /-- An injective *-homomorphism between C*-algebras is an isometry. -/
 theorem injective_starAlgHom_isometry
-    {F : Type*} [FunLike F A B] [StarAlgHomClass F ℂ A B]
+    {F : Type*} [FunLike F A B] [NonUnitalAlgHomClass F ℂ A B] [StarHomClass F A B]
     (φ : F) (hφ : Function.Injective φ) :
     Isometry φ :=
-  StarAlgHomClass.isometry φ hφ
+  NonUnitalStarAlgHom.isometry φ hφ
 
 /-- An injective *-homomorphism preserves norms. -/
 theorem injective_starAlgHom_norm
-    {F : Type*} [FunLike F A B] [StarAlgHomClass F ℂ A B]
+    {F : Type*} [FunLike F A B] [NonUnitalAlgHomClass F ℂ A B] [StarHomClass F A B]
     (φ : F) (hφ : Function.Injective φ) (a : A) :
     ‖φ a‖ = ‖a‖ :=
-  StarAlgHomClass.norm_map φ hφ a
+  NonUnitalStarAlgHom.norm_map φ hφ a
 
 end StarHomomorphisms
 
@@ -169,9 +142,10 @@ theorem selfAdjoint_spectrum_real {a : A} (ha : IsSelfAdjoint a) {z : ℂ}
     z.im = 0 :=
   ha.im_eq_zero_of_mem_spectrum hz
 
-/-- The real-valued spectrum of a self-adjoint element. -/
+/-- The real-valued spectrum of a self-adjoint element:
+`spectrum ℂ a = ((↑) ∘ Complex.re '' spectrum ℂ a : Set ℂ)`. -/
 theorem selfAdjoint_re_spectrum {a : A} (ha : IsSelfAdjoint a) :
-    spectrum ℂ a = Complex.ofReal '' (spectrum ℝ a) :=
+    spectrum ℂ a = ((↑) ∘ Complex.re '' spectrum ℂ a : Set ℂ) :=
   ha.val_re_map_spectrum
 
 end CStarSpectrum
@@ -200,53 +174,14 @@ variable {A : Type*} [CStarAlgebra A]
 provides a star algebra isomorphism `C(spectrum ℂ a, ℂ) ≃⋆ₐ[ℂ] elemental ℂ a`. -/
 abbrev cfcIso (a : A) [IsStarNormal a] :
     C(spectrum ℂ a, ℂ) ≃⋆ₐ[ℂ] StarAlgebra.elemental ℂ a :=
-  StarAlgebra.elemental.continuousFunctionalCalculus a
+  _root_.continuousFunctionalCalculus a
 
-/-- The continuous functional calculus gives the identity when applied with the
-identity function. -/
-theorem cfc_id_eq (a : A) [IsStarNormal a] :
-    StarAlgebra.elemental.continuousFunctionalCalculus a (.restrict _ <| .id ℂ) =
-      ⟨a, StarAlgebra.self_mem ℂ a⟩ :=
-  StarAlgebra.elemental.continuousFunctionalCalculus_map_id a
+/-- The continuous functional calculus sends `id` to the element `a` itself. -/
+theorem cfc_map_id (a : A) [IsStarNormal a] :
+    cfcIso a ((ContinuousMap.id ℂ).restrict (spectrum ℂ a)) =
+      ⟨a, StarAlgebra.elemental.self_mem ℂ a⟩ :=
+  _root_.continuousFunctionalCalculus_map_id a
 
 end FunctionalCalculus
-
-/-! ## States (general definitions) -/
-
-section States
-
-variable {A : Type*} [CStarAlgebra A]
-
-/-- A **positive linear functional** on a C*-algebra is a continuous linear functional
-`φ : A →L[ℂ] ℂ` such that `φ(a⋆ * a) ≥ 0` for all `a`.
-This is bundled in Mathlib as `PositiveLinearMap`. -/
-abbrev PositiveMap := A →ₚ[ℂ] ℂ
-
-/-- A positive linear functional maps self-adjoint elements to reals. -/
-theorem positiveMap_selfAdjoint (f : A →ₚ[ℂ] ℂ) (a : A)
-    (ha : IsSelfAdjoint a) :
-    IsSelfAdjoint (f a) :=
-  PositiveLinearMap.map_isSelfAdjoint f a ha
-
-/-- A positive linear functional has a norm bound. -/
-theorem positiveMap_norm_bound (f : A →ₚ[ℂ] ℂ) :
-    ∃ C : ℝ≥0, ∀ a, ‖f a‖ ≤ C * ‖a‖ :=
-  PositiveLinearMap.exists_norm_apply_le f
-
-end States
-
-/-! ## Approximate units -/
-
-section ApproximateUnits
-
-variable {A : Type*} [NonUnitalCStarAlgebra A]
-
-/-- Every C*-algebra has an approximate identity. This is the key fact enabling the
-unitization and multiplier algebra constructions. Mathlib provides this through
-the theory of approximate units in `Analysis.CStarAlgebra.ApproximateUnit`. -/
-theorem cstar_has_approx_unit :
-    True := trivial  -- See `Mathlib.Analysis.CStarAlgebra.ApproximateUnit`
-
-end ApproximateUnits
 
 end OperatorAlgebras
