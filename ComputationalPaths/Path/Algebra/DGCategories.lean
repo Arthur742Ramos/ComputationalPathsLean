@@ -24,6 +24,8 @@ DG categories, and derived DG category data.
 
 import ComputationalPaths.Path.Homotopy.StableCategory
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Category.LocalizationPaths
+import ComputationalPaths.Path.Homotopy.GeneralizedHomology
 
 namespace ComputationalPaths
 namespace Path
@@ -31,6 +33,9 @@ namespace Algebra
 namespace DGCategories
 
 open Homotopy.StableCategory
+open Category.LocalizationPaths
+open Homotopy.GeneralizedHomology
+open PointedMapCategory
 
 universe u v
 
@@ -231,6 +236,25 @@ structure DGEnhancement where
   objCorr : dgCat.Obj → triCat.cat.Obj
   /-- The correspondence is surjective. -/
   surj : ∀ Y : triCat.cat.Obj, ∃ X : dgCat.Obj, objCorr X = Y
+
+/-! ## Cross-module path dependencies -/
+
+/-- DG localization composition coherence inherited from
+`Category/LocalizationPaths`. -/
+def dg_localization_comp_path
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c) :
+    RwEq (L.preserves_product (Path.trans p q))
+         (Path.trans (L.preserves_product p) (L.preserves_product q)) :=
+  rweq_trans (left_exact_preserves_comp_rweq L p q) (RwEq.refl _)
+
+/-- DG homology functor composition coherence inherited from
+`Homology/GeneralizedHomology`. -/
+def dg_homology_comp_path
+    (E : GeneralizedHomologyTheory.{u, v})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n)) :=
+  Path.trans (GeneralizedHomologyTheory.map_comp_path E g f n) (Path.refl _)
 
 /-! ## RwEq lemmas -/
 

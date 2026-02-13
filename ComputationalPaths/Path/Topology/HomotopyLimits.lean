@@ -102,6 +102,14 @@ structure Diagram (I : DiagramShape.{u}) (A : Type v) where
 
 /-! ## Homotopy limit cones -/
 
+/-- The constant diagram at `a`. -/
+def constDiagram {A : Type v} (I : DiagramShape.{u}) (a : A) : Diagram I A where
+  obj := fun _ => a
+  morph := fun {i j} (_ : I.Arrow i j) => Path.refl a
+  morph_id := fun _ => Path.refl (Path.refl a)
+  morph_comp := fun {i j k} (_ : I.Arrow i j) (_ : I.Arrow j k) =>
+    Path.ofEq (by simp [Path.trans])
+
 /-- A cone over a diagram D with vertex X. -/
 structure HoLimCone {I : DiagramShape.{u}} {A : Type v}
     (D : Diagram I A) (X : A) where
@@ -113,10 +121,10 @@ structure HoLimCone {I : DiagramShape.{u}} {A : Type v}
 
 /-- The identity cone for a constant diagram. -/
 def HoLimCone.const {A : Type v} (I : DiagramShape.{u}) (a : A) :
-    HoLimCone (Diagram.mk (fun _ => a) (fun _ => Path.refl a)
-      (fun _ => Path.refl _) (fun _ _ => Path.ofEq (by simp))) a where
+    HoLimCone (constDiagram I a) a where
   leg := fun _ => Path.refl a
-  coherence := fun _ => Path.ofEq (by simp)
+  coherence := fun {i j} (_ : I.Arrow i j) => by
+    simpa [constDiagram, Path.trans] using (Path.refl (Path.refl a))
 
 /-- A homotopy limit: a cone together with its universal property. -/
 structure HoLimData {I : DiagramShape.{u}} {A : Type v}
@@ -127,7 +135,7 @@ structure HoLimData {I : DiagramShape.{u}} {A : Type v}
   cone : HoLimCone D vertex
   /-- Universal property: factoring through the limit. -/
   factor : ∀ (Y : A) (c : HoLimCone D Y),
-    ∃ h : Path Y vertex,
+    Σ h : Path Y vertex,
       ∀ i : I.Idx, Path (Path.trans h (cone.leg i)) (c.leg i)
   /-- Uniqueness (up to Path). -/
   unique : ∀ (Y : A) (h₁ h₂ : Path Y vertex),
@@ -156,7 +164,7 @@ structure HoColimData {I : DiagramShape.{u}} {A : Type v}
   cocone : HoColimCocone D vertex
   /-- Universal property: factoring out of the colimit. -/
   factor : ∀ (Y : A) (c : HoColimCocone D Y),
-    ∃ h : Path vertex Y,
+    Σ h : Path vertex Y,
       ∀ i : I.Idx, Path (Path.trans (cocone.leg i) h) (c.leg i)
   /-- Uniqueness (up to Path). -/
   unique : ∀ (Y : A) (h₁ h₂ : Path vertex Y),
@@ -179,20 +187,20 @@ structure HomotopyPullbackData (X A B C : Type v)
   /-- Universal property: any compatible triple factors through X. -/
   factor : ∀ (Y : Type v) (a : Y → A) (b : Y → B)
     (h : ∀ y : Y, Path (f (a y)) (g (b y))),
-    ∃ u : Y → X,
-      (∀ y : Y, Path (pr₁ (u y)) (a y)) ∧
+    Σ u : Y → X,
+      (∀ y : Y, Path (pr₁ (u y)) (a y)) ×
       (∀ y : Y, Path (pr₂ (u y)) (b y))
 
 /-- Trivial homotopy pullback (product with diagonal). -/
 def trivialHoPullback (A B C : Type v)
     (f : A → C) (g : B → C) :
-    HomotopyPullbackData (Σ (a : A) (b : B), f a = g b) A B C f g where
+    HomotopyPullbackData (Σ (a : A) (b : B), Path (f a) (g b)) A B C f g where
   pr₁ := fun ⟨a, _, _⟩ => a
   pr₂ := fun ⟨_, b, _⟩ => b
-  homotopy := fun ⟨_, _, h⟩ => Path.ofEq h
+  homotopy := fun ⟨_, _, h⟩ => h
   factor := fun _ a b h =>
-    ⟨fun y => ⟨a y, b y, (h y).toEq⟩,
-     fun _ => Path.refl _, fun _ => Path.refl _⟩
+    ⟨fun y => ⟨a y, b y, h y⟩,
+     ⟨fun _ => Path.refl _, fun _ => Path.refl _⟩⟩
 
 /-! ## Homotopy pushouts -/
 
@@ -208,8 +216,8 @@ structure HomotopyPushoutData (X A B C : Type v)
   /-- Universal property. -/
   factor : ∀ (Y : Type v) (a : A → Y) (b : B → Y)
     (h : ∀ c : C, Path (a (f c)) (b (g c))),
-    ∃ u : X → Y,
-      (∀ x : A, Path (u (inl x)) (a x)) ∧
+    Σ u : X → Y,
+      (∀ x : A, Path (u (inl x)) (a x)) ×
       (∀ x : B, Path (u (inr x)) (b x))
 
 /-! ## Bousfield–Kan formula data -/
@@ -231,9 +239,10 @@ structure BousfieldKanData (A : Type v) where
     Path (Path.trans (degen j) (face j)) (Path.refl (cosimpObj i (n + 1)))
 
 /-- The totalization (homotopy limit) given Bousfield–Kan data. -/
-def BousfieldKanData.totalization {A : Type v}
-    (BK : BousfieldKanData A) : A :=
-  BK.cosimpObj (Classical.arbitrary BK.shape.Idx) 0
+noncomputable def BousfieldKanData.totalization {A : Type v}
+    (BK : BousfieldKanData A) [Nonempty BK.shape.Idx] : A := by
+  classical
+  exact BK.cosimpObj (Classical.choice ‹Nonempty BK.shape.Idx›) 0
 
 /-! ## Telescopic homotopy colimits -/
 
@@ -255,13 +264,15 @@ structure TelData (A : Type v) where
 def TelData.ofSequence {A : Type v}
     (seq : Nat → A) (colim : A)
     (map : ∀ n, Path (seq n) (seq (n + 1)))
-    (incl : ∀ n, Path (seq n) colim) :
+    (incl : ∀ n, Path (seq n) colim)
+    (compat : ∀ n : Nat,
+      Path (Path.trans (map n) (incl (n + 1))) (incl n)) :
     TelData A where
   seq := seq
   map := map
   colim := colim
   incl := incl
-  compat := fun n => Path.ofEq (by simp)
+  compat := compat
 
 /-! ## Mayer–Vietoris data -/
 
@@ -288,7 +299,7 @@ def MayerVietorisData.ofSquare {A : Type v}
     {a b c d : A}
     (f : Path a b) (g : Path c d)
     (h : Path a c) (k : Path b d)
-    (hcomm : (Path.trans f k).toEq = (Path.trans h g).toEq) :
+    (hcomm : Path.trans f k = Path.trans h g) :
     MayerVietorisData A where
   topLeft := a
   topRight := b
@@ -303,14 +314,22 @@ def MayerVietorisData.ofSquare {A : Type v}
 /-! ## Coherence theorems -/
 
 /-- Cone composition: composing a cone with a map yields a cone. -/
-theorem cone_compose {I : DiagramShape.{u}} {A : Type v}
+def cone_compose {I : DiagramShape.{u}} {A : Type v}
     {D : Diagram I A} {X Y : A}
     (c : HoLimCone D X) (f : Path Y X) :
     HoLimCone D Y :=
   { leg := fun i => Path.trans f (c.leg i)
     coherence := fun {i j} g => by
-      have hc := c.coherence g
-      exact Path.ofEq (by simp; exact hc.toEq) }
+      have hcEq : Path.trans (c.leg i) (D.morph g) = c.leg j := (c.coherence g).toEq
+      have hassoc :
+          Path.trans (Path.trans f (c.leg i)) (D.morph g) =
+            Path.trans f (Path.trans (c.leg i) (D.morph g)) := by
+        simpa using (Path.trans_assoc f (c.leg i) (D.morph g))
+      have hmap :
+          Path.trans f (Path.trans (c.leg i) (D.morph g)) =
+            Path.trans f (c.leg j) := by
+        exact _root_.congrArg (fun p => Path.trans f p) hcEq
+      exact Path.ofEq (hassoc.trans hmap) }
 
 /-- Cone leg refl is sound. -/
 theorem cone_leg_refl {I : DiagramShape.{u}} {A : Type v}
@@ -334,7 +353,7 @@ theorem holimstep_multi_sound {A : Type u} {a b : A}
   RwEq.trans (holimstep_rweq h1) (holimstep_rweq h2)
 
 /-- Mayer–Vietoris commutativity is symmetric. -/
-theorem mayerVietoris_symm {A : Type v}
+def mayerVietoris_symm {A : Type v}
     (MV : MayerVietorisData A) :
     Path (Path.trans MV.left MV.bot) (Path.trans MV.top MV.right) :=
   Path.symm MV.comm
@@ -357,7 +376,8 @@ theorem bk_face_degen_sound {A : Type v}
     (j : Fin (n + 1)) :
     (Path.trans (BK.degen j) (BK.face j)).toEq =
       (Path.refl (BK.cosimpObj i (n + 1))).toEq :=
-  (BK.face_degen j).toEq
+  by
+    simpa using congrArg Path.toEq (BK.face_degen j).toEq
 
 end HomotopyLimits
 end Topology

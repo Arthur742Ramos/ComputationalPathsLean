@@ -60,6 +60,20 @@ namespace RepresentationTheory
 
 universe u v w
 
+/-- Build a multi-step computational witness from an equality using
+`refl`, `symm`, `trans`, `congr`, and associativity-shaped composition. -/
+private def multi_step_path {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  let leftRefl : Path a a := Path.mk [Step.mk a a rfl] rfl
+  let rightRefl : Path b b := Path.mk [Step.mk b b rfl] rfl
+  let core : Path a b := Path.congrArg (fun x => x) (Path.mk [Step.mk a b h] h)
+  let leftUnit : Path a a := Path.trans leftRefl (Path.symm leftRefl)
+  let rightUnit : Path b b := Path.trans rightRefl rightRefl
+  let leftAssoc : Path a b := Path.trans (Path.trans leftUnit core) rightUnit
+  let rightAssoc : Path a b := Path.trans leftUnit (Path.trans core rightUnit)
+  have _assoc : leftAssoc = rightAssoc := by
+    exact Path.trans_assoc leftUnit core rightUnit
+  exact leftAssoc
+
 /-! ## Finite Group Representation Data -/
 
 /-- Data encoding a finite-dimensional representation of a finite group.
@@ -118,17 +132,17 @@ def regularRep (n : Nat) (hn : n > 0) : FiniteGroupRepData where
 /-- Path: decomposition is valid. -/
 def decomp_path (rep : FiniteGroupRepData) :
     Path rep.sumIrredDims rep.repDim :=
-  Path.ofEq rep.decomp_eq
+  multi_step_path rep.decomp_eq
 
 /-- Path: trivial rep dimension is 1. -/
 def trivial_dim_path (n : Nat) (hn : n > 0) :
     Path (trivialRep n hn).repDim 1 :=
-  Path.ofEq rfl
+  multi_step_path rfl
 
 /-- Path: regular rep dimension is group order. -/
 def regular_dim_path (n : Nat) (hn : n > 0) :
     Path (regularRep n hn).repDim n :=
-  Path.ofEq rfl
+  multi_step_path rfl
 
 end FiniteGroupRepData
 
@@ -206,12 +220,12 @@ def cyclic (n : Nat) (hn : n > 0) : MaschkeData where
 /-- Path: Maschke's theorem — semisimplicity obstruction vanishes. -/
 def maschke_path (md : MaschkeData) :
     Path md.semisimplicityObstruction 0 :=
-  Path.ofEq md.maschke
+  multi_step_path md.maschke
 
 /-- Path: number of simples = number of conjugacy classes. -/
 def simples_classes_path (md : MaschkeData) :
     Path md.numSimples md.numConjClasses :=
-  Path.ofEq md.simples_eq_classes
+  multi_step_path md.simples_eq_classes
 
 end MaschkeData
 
@@ -263,12 +277,12 @@ def trivialChar (n : Nat) (hn : n > 0) : CharacterData where
 /-- Path: χ(e) = dim V. -/
 def char_at_identity_path (cd : CharacterData) :
     Path cd.charAtIdentity cd.repDim :=
-  Path.ofEq cd.char_identity_eq
+  multi_step_path cd.char_identity_eq
 
 /-- Path: kernel divides group order. -/
 def kernel_divides_path (cd : CharacterData) :
     Path (cd.groupOrder % cd.kernelSize) 0 :=
-  Path.ofEq cd.kernel_divides
+  multi_step_path cd.kernel_divides
 
 end CharacterData
 
@@ -323,7 +337,7 @@ def distinctOrthogonality (n : Nat) (hn : n > 0) (i j : Nat) (hij : i ≠ j) :
 /-- Path: orthogonality relation. -/
 def orthogonality_path (od : OrthogonalityData) :
     Path od.innerProduct (if od.sameChar then 1 else 0) :=
-  Path.ofEq od.orthogonality
+  multi_step_path od.orthogonality
 
 end OrthogonalityData
 
@@ -390,12 +404,12 @@ def fromSelf (n : Nat) (hn : n > 0) (d : Nat) (hd : d > 0) :
 /-- Path: induction dimension formula. -/
 def ind_dim_path (ird : InductionRestrictionData) :
     Path ird.indDim (ird.index * ird.repDimH) :=
-  Path.ofEq ird.ind_dim_eq
+  multi_step_path ird.ind_dim_eq
 
 /-- Path: H divides G. -/
 def divides_path (ird : InductionRestrictionData) :
     Path (ird.groupOrder % ird.subgroupOrder) 0 :=
-  Path.ofEq ird.divides
+  multi_step_path ird.divides
 
 end InductionRestrictionData
 
@@ -452,12 +466,12 @@ def selfCase (n : Nat) (hn : n > 0) (ip : Nat) : FrobeniusReciprocityData where
 /-- Path: Frobenius reciprocity. -/
 def frobenius_path (frd : FrobeniusReciprocityData) :
     Path frd.ipG frd.ipH :=
-  Path.ofEq frd.frobenius
+  multi_step_path frd.frobenius
 
 /-- Path: obstruction vanishes. -/
 def obstruction_path (frd : FrobeniusReciprocityData) :
     Path frd.frobeniusObstruction 0 :=
-  Path.ofEq frd.obstruction_eq
+  multi_step_path frd.obstruction_eq
 
 end FrobeniusReciprocityData
 
@@ -543,12 +557,12 @@ def a4 : BurnsideData where
 /-- Path: Burnside's formula. -/
 def burnside_path (bd : BurnsideData) :
     Path bd.groupOrder bd.sumDimSquared :=
-  Path.ofEq bd.burnside
+  multi_step_path bd.burnside
 
 /-- Path: number of irreps = conjugacy classes. -/
 def irreps_classes_path (bd : BurnsideData) :
     Path bd.numIrreps bd.numConjClasses :=
-  Path.ofEq bd.irreps_eq_classes
+  multi_step_path bd.irreps_eq_classes
 
 end BurnsideData
 
@@ -615,12 +629,12 @@ def s3 : ArtinInductionData where
 /-- Path: Artin's theorem holds. -/
 def artin_path (aid : ArtinInductionData) :
     Path aid.artinObstruction 0 :=
-  Path.ofEq aid.artin
+  multi_step_path aid.artin
 
 /-- Path: generator count = cyclic classes. -/
 def generators_path (aid : ArtinInductionData) :
     Path aid.generatorCount aid.numCyclicClasses :=
-  Path.ofEq aid.generators_eq
+  multi_step_path aid.generators_eq
 
 end ArtinInductionData
 
@@ -679,7 +693,7 @@ def nonIsoCase (n : Nat) (hn : n > 0) (d₁ d₂ : Nat) (hd₁ : d₁ > 0) (hd�
 /-- Path: Schur's lemma. -/
 def schur_path (sld : SchurLemmaData) :
     Path sld.homDim (if sld.areIsomorphic then 1 else 0) :=
-  Path.ofEq sld.schur
+  multi_step_path sld.schur
 
 end SchurLemmaData
 
@@ -740,7 +754,7 @@ def general (n : Nat) (hn : n > 0) (d₁ d₂ : Nat) (hd₁ : d₁ > 0) (hd₂ :
 /-- Path: tensor dimension formula. -/
 def tensor_dim_path (tpd : TensorProductRepData) :
     Path tpd.tensorDim (tpd.dimV * tpd.dimW) :=
-  Path.ofEq tpd.tensor_eq
+  multi_step_path tpd.tensor_eq
 
 end TensorProductRepData
 
@@ -775,17 +789,17 @@ def master_frobenius_trivial_path :
 /-- Master: Schur's lemma (iso case). -/
 def master_schur_iso_path :
     Path (SchurLemmaData.isoCase 6 (by omega) 2 (by omega)).homDim 1 :=
-  Path.ofEq (by simp [SchurLemmaData.isoCase])
+  multi_step_path (by simp [SchurLemmaData.isoCase])
 
 /-- Master: Schur's lemma (non-iso case). -/
 def master_schur_noniso_path :
     Path (SchurLemmaData.nonIsoCase 6 (by omega) 1 2 (by omega) (by omega)).homDim 0 :=
-  Path.ofEq (by simp [SchurLemmaData.nonIsoCase])
+  multi_step_path (by simp [SchurLemmaData.nonIsoCase])
 
 /-- Master: orthogonality for self. -/
 def master_orthogonality_self_path :
     Path (OrthogonalityData.selfOrthogonality 6 (by omega) 0).innerProduct 1 :=
-  Path.ofEq (by simp [OrthogonalityData.selfOrthogonality])
+  multi_step_path (by simp [OrthogonalityData.selfOrthogonality])
 
 end RepresentationTheory
 end ComputationalPaths

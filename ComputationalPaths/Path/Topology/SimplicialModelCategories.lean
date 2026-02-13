@@ -71,7 +71,7 @@ theorem simpmcstep_rweq {A : Type u} {a b : A} {p q : Path a b}
   | map_comp_cancel p => exact rweq_of_step (Step.trans_symm p)
   | map_symm_cancel p => exact rweq_of_step (Step.symm_trans p)
   | enrichment_assoc p q r => exact rweq_of_step (Step.trans_assoc p q r)
-  | tensor_unit p => exact rweq_of_step (Step.trans_refl_left p)
+  | tensor_unit _ => exact rweq_of_step (Step.trans_refl_left (p := _))
 
 /-! ## Simplicial set data -/
 
@@ -128,9 +128,10 @@ def trivialSimpMappingSpace (A : Type u) : SimpMappingSpace A where
   mapSpace := fun a b => SimpSetData.const (Path a b)
   id_simplex := fun a => Path.refl a
   comp_simplex := fun f g => Path.trans f g
-  id_left := fun f => Path.ofEq (by simp)
-  id_right := fun f => Path.ofEq (by simp)
-  assoc := fun f g h => Path.ofEq (by simp)
+  id_left := fun f => Path.ofEq (by cases f <;> simp [Path.trans, Path.refl])
+  id_right := fun f => Path.ofEq (by cases f <;> simp [Path.trans, Path.refl])
+  assoc := fun f g h => Path.ofEq (by
+    cases f <;> cases g <;> cases h <;> simp [Path.trans, List.append_assoc])
 
 /-! ## Tensoring and cotensoring -/
 
@@ -213,10 +214,10 @@ structure SimpQuillenAdj {A : Type u} {B : Type v}
     M.cof p → N.cof (leftMap p)
   /-- Enriched compatibility: mapping spaces are compatible. -/
   map_compat : ∀ (a : A) (b : B),
-    Path (N.mapping.mapSpace (leftObj a) b |>.simplices 0 → 
-          M.mapping.mapSpace a (rightObj b) |>.simplices 0 → Prop)
-         (N.mapping.mapSpace (leftObj a) b |>.simplices 0 →
-          M.mapping.mapSpace a (rightObj b) |>.simplices 0 → Prop)
+    Path (((N.mapping.mapSpace (leftObj a) b).simplices 0 →
+          ((M.mapping.mapSpace a (rightObj b)).simplices 0 → Prop)))
+         (((N.mapping.mapSpace (leftObj a) b).simplices 0 →
+          ((M.mapping.mapSpace a (rightObj b)).simplices 0 → Prop)))
 
 /-! ## Derived mapping spaces -/
 
@@ -239,14 +240,15 @@ structure DerivedMapSpace (A : Type u) (M : SimpModelCatData A) where
          (M.mapping.mapSpace (cofRepl a) (fibRepl b) |>.simplices 0 → Prop)
 
 /-- Trivial derived mapping space (identity replacements). -/
-def trivialDerivedMapSpace (A : Type u) (M : SimpModelCatData A) :
+def trivialDerivedMapSpace (A : Type u) (M : SimpModelCatData A)
+    (hweq_refl : ∀ a : A, M.weq (Path.ofEq (show a = a from rfl))) :
     DerivedMapSpace A M where
   cofRepl := id
   fibRepl := id
   cofRepl_weq := fun a => by
-    exact path_is_weak_equivalence _
+    simpa [id] using hweq_refl a
   fibRepl_weq := fun a => by
-    exact path_is_weak_equivalence _
+    simpa [id] using hweq_refl a
   derivedMap := M.mapping.mapSpace
   derivedMap_eq := fun a b => Path.refl _
 
@@ -282,7 +284,7 @@ structure SimplicialFraming (A : Type u) (M : SimpModelCatData A) where
   /-- Simplicial identity. -/
   face_degen : ∀ (X : A) {n : Nat} (j : Fin (n + 1)),
     Path (Path.trans (degen X j) (face X (Fin.castSucc j)))
-         (Path.refl (simpObj X (n + 1)))
+         (Path.refl (simpObj X n))
   /-- The 0-th level is the original object. -/
   level_zero : ∀ (X : A), Path (simpObj X 0) X
 
@@ -350,15 +352,15 @@ theorem simp_framing_id {A : Type u} {M : SimpModelCatData A}
     (SF : SimplicialFraming A M) (X : A) {n : Nat}
     (j : Fin (n + 1)) :
     RwEq (Path.trans (SF.degen X j) (SF.face X (Fin.castSucc j)))
-         (Path.refl (SF.simpObj X (n + 1))) := by
+         (Path.refl (SF.simpObj X n)) := by
   exact rweq_of_eq (SF.face_degen X j).toEq
 
 /-- Trivial simplicial model category has reflexive mapping spaces. -/
-theorem trivial_simp_mc_mapping_refl (A : Type u) (a : A) :
+def trivial_simp_mc_mapping_refl (A : Type u) (a : A) :
     Path ((trivialSimpMappingSpace A).comp_simplex
             (Path.refl a) (Path.refl a))
          (Path.refl a) :=
-  Path.ofEq (by simp)
+  Path.ofEq (Path.trans_refl_left (Path.refl a))
 
 end SimplicialModelCategories
 end Topology

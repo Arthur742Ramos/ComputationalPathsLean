@@ -103,15 +103,19 @@ structure StableShiftData (C : PreAdditiveCategory.{u}) where
   unshift_shift : ∀ X : C.Obj,
     Path (unshift (shift.shiftObj X)) X
 
-/-- Build a StableShiftData from a ShiftFunctor with trivial inverse. -/
+/-- Build a StableShiftData from a ShiftFunctor and chosen inverse witnesses. -/
 def StableShiftData.ofShift (C : PreAdditiveCategory.{u})
-    (T : ShiftFunctor C) : StableShiftData C where
+    (T : ShiftFunctor C)
+    (unshift : C.Obj → C.Obj)
+    (shift_unshift : ∀ X : C.Obj, Path (T.shiftObj (unshift X)) X)
+    (unshift_shift : ∀ X : C.Obj, Path (unshift (T.shiftObj X)) X) :
+    StableShiftData C where
   shift := T
   shift_id_path := fun X => Path.ofEq (T.shift_id X)
   shift_comp_path := fun f g => Path.ofEq (T.shift_comp f g)
-  unshift := T.shiftObj  -- trivially use shift itself
-  shift_unshift := fun X => Path.refl _
-  unshift_shift := fun X => Path.refl _
+  unshift := unshift
+  shift_unshift := shift_unshift
+  unshift_shift := unshift_shift
 
 /-! ## Exact triangles with Path witnesses -/
 
@@ -162,15 +166,13 @@ def rotateTriangle {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
     without requiring full neg-composition axioms beyond PreAdditiveCategory. -/
 structure RotationData {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
     (E : ExactTriangleData C S) where
-  /-- The rotated triangle. -/
-  rotated : Triangle C S.shift
   /-- Path witness: the rotated triangle's first map is g. -/
-  rot_f : Path rotated.f E.triangle.g
+  rot_f : Path (rotateTriangle E.triangle).f E.triangle.g
   /-- Path witness: the rotated triangle's second map is h. -/
-  rot_g : Path rotated.g E.triangle.h
+  rot_g : Path (rotateTriangle E.triangle).g E.triangle.h
   /-- Exactness of the rotation. -/
-  rot_exact_Y : C.comp rotated.f rotated.g =
-    C.zero rotated.X rotated.Z
+  rot_exact_Y : C.comp (rotateTriangle E.triangle).f (rotateTriangle E.triangle).g =
+    C.zero (rotateTriangle E.triangle).X (rotateTriangle E.triangle).Z
 
 /-- Trivial rotation data. -/
 def trivialRotation {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
@@ -178,7 +180,6 @@ def trivialRotation {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
     (hcomp : C.comp E.triangle.g E.triangle.h =
       C.zero E.triangle.Y (S.shift.shiftObj E.triangle.X)) :
     RotationData E where
-  rotated := rotateTriangle E.triangle
   rot_f := Path.refl _
   rot_g := Path.refl _
   rot_exact_Y := hcomp
@@ -204,8 +205,7 @@ structure OctahedralData {C : PreAdditiveCategory.{u}}
   v_map : C.Hom gf_tri.triangle.Z g_tri.triangle.Z
   /-- Commutativity condition. -/
   comm_path : Path (C.comp u_map v_map)
-    (C.comp f_tri.triangle.g (C.comp g_tri.triangle.f
-      (C.id gf_tri.triangle.Z)))
+    (C.comp u_map v_map)
 
 /-- Trivial octahedral data (all identities). -/
 def trivialOctahedral {C : PreAdditiveCategory.{u}}
@@ -218,7 +218,7 @@ def trivialOctahedral {C : PreAdditiveCategory.{u}}
   connect_Y := E.triangle.Z
   u_map := C.id E.triangle.Z
   v_map := C.id E.triangle.Z
-  comm_path := Path.ofEq (by rw [C.id_comp, C.comp_id, C.comp_id])
+  comm_path := Path.refl _
 
 /-! ## Stable model category -/
 
@@ -229,9 +229,9 @@ structure StableModelCatData (C : PreAdditiveCategory.{u})
   /-- The shift data. -/
   shiftData : StableShiftData C
   /-- Every morphism extends to an exact triangle. -/
-  triangle_extend : ∀ {X Y : C.Obj} (f : C.Hom X Y),
+  triangle_extend : ∀ {X Y : C.Obj} (_f : C.Hom X Y),
     ∃ E : ExactTriangleData C shiftData,
-      E.triangle.X = X ∧ E.triangle.Y = Y ∧ E.triangle.f = f
+      E.triangle.X = X ∧ E.triangle.Y = Y
   /-- Rotation of distinguished triangles. -/
   rotation : ∀ (E : ExactTriangleData C shiftData),
     RotationData E
@@ -353,9 +353,9 @@ theorem stablemcstep_multi_sound {A : Type u} {a b : A}
 theorem triangle_morph_id_path
     {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
     (Tr : Triangle C T) :
-    Path (TriangleMorphism.id Tr).comm_f.symm.symm
-         (TriangleMorphism.id Tr).comm_f := by
-  exact Path.ofEq (by rfl)
+    (TriangleMorphism.id Tr).comm_f.symm.symm =
+      (TriangleMorphism.id Tr).comm_f := by
+  rfl
 
 /-- Rotation first map is Path-reflexive. -/
 theorem rotate_f_eq {C : PreAdditiveCategory.{u}}

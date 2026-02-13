@@ -21,6 +21,8 @@ needed by later constructions rather than full formalization.
 -/
 
 import ComputationalPaths.Path.Homotopy.StableCategory
+import ComputationalPaths.Path.Category.LocalizationPaths
+import ComputationalPaths.Path.Homotopy.GeneralizedHomology
 
 namespace ComputationalPaths
 namespace Path
@@ -29,8 +31,11 @@ namespace DerivedCategory
 
 open Homotopy
 open Homotopy.StableCategory
+open Category.LocalizationPaths
+open Homotopy.GeneralizedHomology
+open PointedMapCategory
 
-universe u
+universe u v
 
 /-! ## Derived categories -/
 
@@ -153,6 +158,25 @@ theorem perverseSheaf_in_heart {D : DerivedCategory.{u}} {T : TStructure D}
     (P : PerverseSheaf T) :
     T.le P.object ∧ T.ge P.object :=
   P.heartObj.property
+
+/-! ## Cross-module path dependencies -/
+
+/-- Derived localization composition coherence inherited from
+`Category/LocalizationPaths`. -/
+def derived_localization_comp_path
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c) :
+    RwEq (L.preserves_product (Path.trans p q))
+         (Path.trans (L.preserves_product p) (L.preserves_product q)) :=
+  rweq_trans (left_exact_preserves_comp_rweq L p q) (RwEq.refl _)
+
+/-- Derived homology functor composition coherence inherited from
+`Homology/GeneralizedHomology`. -/
+def derived_homology_comp_path
+    (E : GeneralizedHomologyTheory.{u, v})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n)) :=
+  Path.trans (GeneralizedHomologyTheory.map_comp_path E g f n) (Path.refl _)
 
 /-! ## Summary
 

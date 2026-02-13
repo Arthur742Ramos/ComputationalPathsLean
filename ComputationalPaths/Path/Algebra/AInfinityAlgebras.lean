@@ -24,11 +24,17 @@ using Path-based coherence witnesses.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Category.LocalizationPaths
+import ComputationalPaths.Path.Homotopy.GeneralizedHomology
 
 namespace ComputationalPaths
 namespace Path
 namespace Algebra
 namespace AInfinityAlgebras
+
+open Category.LocalizationPaths
+open Homotopy.GeneralizedHomology
+open PointedMapCategory
 
 universe u v w
 
@@ -390,6 +396,25 @@ def AInfinityFunctor.comp {C D E : AInfinityCategory}
     rw [G.map_m1, F.map_m1]
   map_zero := fun a b => by
     rw [F.map_zero, G.map_zero]
+
+/-! ## Cross-module path dependencies -/
+
+/-- A∞ localization composition coherence inherited from
+`Category/LocalizationPaths`. -/
+def aInfinity_localization_comp_path
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c) :
+    RwEq (L.preserves_product (Path.trans p q))
+         (Path.trans (L.preserves_product p) (L.preserves_product q)) :=
+  rweq_trans (left_exact_preserves_comp_rweq L p q) (RwEq.refl _)
+
+/-- A∞ homology functor composition coherence inherited from
+`Homology/GeneralizedHomology`. -/
+def aInfinity_homology_comp_path
+    (E : GeneralizedHomologyTheory.{u, w})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n)) :=
+  Path.trans (GeneralizedHomologyTheory.map_comp_path E g f n) (Path.refl _)
 
 /-! ## Associahedra Face Structure -/
 

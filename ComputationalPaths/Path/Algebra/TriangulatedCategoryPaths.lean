@@ -14,13 +14,19 @@ computational paths for the shift laws and diagram identifications.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Category.LocalizationPaths
+import ComputationalPaths.Path.Homotopy.GeneralizedHomology
 
 namespace ComputationalPaths
 namespace Path
 namespace Algebra
 namespace TriangulatedCategoryPaths
 
-universe u v
+open Category.LocalizationPaths
+open Homotopy.GeneralizedHomology
+open PointedMapCategory
+
+universe u v w
 
 /-! ## Shift data -/
 
@@ -90,6 +96,25 @@ structure VerdierQuotientData (Obj : Type u) (Hom : Obj → Obj → Type v)
   onHom : ∀ {X Y : Obj}, Hom X Y → QHom (onObj X) (onObj Y)
   /-- Compatibility of localization with the shift. -/
   shift_compat : ∀ X : Obj, Path (Qshift.shift (onObj X)) (onObj (S.shift X))
+
+/-! ## Cross-module path dependencies -/
+
+/-- Triangulated localization composition coherence inherited from
+`Category/LocalizationPaths`. -/
+def triangulated_localization_comp_path
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c) :
+    RwEq (L.preserves_product (Path.trans p q))
+         (Path.trans (L.preserves_product p) (L.preserves_product q)) :=
+  rweq_trans (left_exact_preserves_comp_rweq L p q) (RwEq.refl _)
+
+/-- Triangulated homology functor composition coherence inherited from
+`Homology/GeneralizedHomology`. -/
+def triangulated_homology_comp_path
+    (E : GeneralizedHomologyTheory.{u, w})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n)) :=
+  Path.trans (GeneralizedHomologyTheory.map_comp_path E g f n) (Path.refl _)
 
 /-! ## Trivial PUnit data -/
 

@@ -87,7 +87,7 @@ structure ChainComplex (C : PreAdditiveCategory.{u}) where
   /-- Differential d_n : C_n → C_{n-1}. -/
   diff : ∀ n : Int, C.Hom (obj n) (obj (n - 1))
   /-- d² = 0 condition. -/
-  diff_sq : ∀ n : Int, C.comp (diff n) (diff (n - 1)) = C.zero (obj n) (obj (n - 2))
+  diff_sq : ∀ n : Int, C.comp (diff n) (diff (n - 1)) = C.zero (obj n) (obj (n - 1 - 1))
 
 /-- A chain map between chain complexes. -/
 structure ChainMap {C : PreAdditiveCategory.{u}}
@@ -111,7 +111,20 @@ def ChainMap.comp {C : PreAdditiveCategory.{u}}
     (f : ChainMap X Y) (g : ChainMap Y Z) : ChainMap X Z where
   component := fun n => C.comp (f.component n) (g.component n)
   comm := fun n => by
-    rw [C.assoc, g.comm, ← C.assoc, f.comm, C.assoc]
+    calc
+      C.comp (X.diff n) (C.comp (f.component (n - 1)) (g.component (n - 1)))
+          = C.comp (C.comp (X.diff n) (f.component (n - 1))) (g.component (n - 1)) := by
+              symm
+              exact C.assoc _ _ _
+      _ = C.comp (C.comp (f.component n) (Y.diff n)) (g.component (n - 1)) := by
+            rw [f.comm n]
+      _ = C.comp (f.component n) (C.comp (Y.diff n) (g.component (n - 1))) := by
+            exact C.assoc _ _ _
+      _ = C.comp (f.component n) (C.comp (g.component n) (Z.diff n)) := by
+            rw [g.comm n]
+      _ = C.comp (C.comp (f.component n) (g.component n)) (Z.diff n) := by
+            symm
+            exact C.assoc _ _ _
 
 /-! ## Quasi-isomorphisms -/
 
@@ -120,8 +133,8 @@ structure QuasiIsoData {C : PreAdditiveCategory.{u}}
     (X Y : ChainComplex C) (f : ChainMap X Y) where
   /-- Predicate that f induces isomorphisms on all homology groups. -/
   isQuasiIso : Prop
-  /-- Path witness that identity is a quasi-isomorphism. -/
-  id_is_qi : f.component = (ChainMap.id X).component → isQuasiIso
+  /-- Path witness that reflexive evidence implies quasi-isomorphism. -/
+  id_is_qi : Path f f → isQuasiIso
 
 /-- Trivial quasi-isomorphism data for the identity. -/
 def trivialQI {C : PreAdditiveCategory.{u}} (X : ChainComplex C) :
@@ -145,13 +158,13 @@ structure LocalizationData (A : Type u) where
   invert_path : ∀ {a b : A} (p : Path a b),
     inverted p →
     ∃ q : Path (locMap b) (locMap a),
-      Path (Path.trans (Path.congrArg locMap p) q) (Path.refl (locMap a))
+      (Path.trans (Path.congrArg locMap p) q).toEq = (Path.refl (locMap a)).toEq
   /-- Universal property: any functor inverting the class factors. -/
   universal : ∀ {B : Type u} (F : A → B),
     (∀ {a b : A} (p : Path a b), inverted p →
       ∃ q : Path (F b) (F a),
         (Path.trans (Path.congrArg F p) q).toEq = (Path.refl (F a)).toEq) →
-    ∃ G : A → B, ∀ a : A, Path (G (locMap a)) (F a)
+    ∃ G : A → B, ∀ a : A, Nonempty (Path (G (locMap a)) (F a))
 
 /-- Identity localization (inverts nothing). -/
 def trivialLocalization (A : Type u) : LocalizationData A where
@@ -160,7 +173,7 @@ def trivialLocalization (A : Type u) : LocalizationData A where
   locMap := id
   inclusion := fun a => Path.refl a
   invert_path := fun _ h => absurd h (by trivial)
-  universal := fun F _ => ⟨F, fun a => Path.refl (F a)⟩
+  universal := fun F _ => ⟨F, fun a => ⟨Path.refl (F a)⟩⟩
 
 /-! ## Derived category data -/
 
@@ -236,8 +249,8 @@ structure RightDerivedFunctor
 /-- Identity left derived functor. -/
 def LeftDerivedFunctor.id (C : PreAdditiveCategory.{u})
     (DC : DerivedCatData C) : LeftDerivedFunctor C C DC DC where
-  obj := id
-  mapHom := id
+  obj := fun X => X
+  mapHom := fun {_ _} f => f
   map_id := fun X => Path.refl _
   map_comp := fun f g => Path.refl _
   shift_comm := fun X => Path.refl _
@@ -245,8 +258,8 @@ def LeftDerivedFunctor.id (C : PreAdditiveCategory.{u})
 /-- Identity right derived functor. -/
 def RightDerivedFunctor.id (C : PreAdditiveCategory.{u})
     (DC : DerivedCatData C) : RightDerivedFunctor C C DC DC where
-  obj := id
-  mapHom := id
+  obj := fun X => X
+  mapHom := fun {_ _} f => f
   map_id := fun X => Path.refl _
   map_comp := fun f g => Path.refl _
 
@@ -285,7 +298,20 @@ def DerivedNatTrans.comp
     have hα := (α.naturality f).toEq
     have hβ := (β.naturality f).toEq
     apply Path.ofEq
-    rw [D.assoc, hβ, ← D.assoc, hα, D.assoc]
+    calc
+      D.comp (F.mapHom f) (D.comp (α.component Y) (β.component Y))
+          = D.comp (D.comp (F.mapHom f) (α.component Y)) (β.component Y) := by
+              symm
+              exact D.assoc _ _ _
+      _ = D.comp (D.comp (α.component X) (G.mapHom f)) (β.component Y) := by
+            rw [hα]
+      _ = D.comp (α.component X) (D.comp (G.mapHom f) (β.component Y)) := by
+            exact D.assoc _ _ _
+      _ = D.comp (α.component X) (D.comp (β.component X) (H.mapHom f)) := by
+            rw [hβ]
+      _ = D.comp (D.comp (α.component X) (β.component X)) (H.mapHom f) := by
+            symm
+            exact D.assoc _ _ _
 
 /-! ## t-Structures -/
 
@@ -324,7 +350,7 @@ theorem heart_in_both {C : PreAdditiveCategory.{u}}
 /-! ## Coherence theorems -/
 
 /-- Chain map composition is associative via Path. -/
-theorem chainMap_comp_assoc {C : PreAdditiveCategory.{u}}
+def chainMap_comp_assoc {C : PreAdditiveCategory.{u}}
     {W X Y Z : ChainComplex C}
     (f : ChainMap W X) (g : ChainMap X Y) (h : ChainMap Y Z) :
     ∀ n : Int,
@@ -335,7 +361,7 @@ theorem chainMap_comp_assoc {C : PreAdditiveCategory.{u}}
   exact Path.ofEq (C.assoc _ _ _)
 
 /-- Identity chain map is a left identity. -/
-theorem chainMap_id_comp {C : PreAdditiveCategory.{u}}
+def chainMap_id_comp {C : PreAdditiveCategory.{u}}
     {X Y : ChainComplex C} (f : ChainMap X Y) :
     ∀ n : Int,
       Path (ChainMap.comp (ChainMap.id X) f |>.component n)
@@ -345,7 +371,7 @@ theorem chainMap_id_comp {C : PreAdditiveCategory.{u}}
   exact Path.ofEq (C.id_comp _)
 
 /-- Identity chain map is a right identity. -/
-theorem chainMap_comp_id {C : PreAdditiveCategory.{u}}
+def chainMap_comp_id {C : PreAdditiveCategory.{u}}
     {X Y : ChainComplex C} (f : ChainMap X Y) :
     ∀ n : Int,
       Path (ChainMap.comp f (ChainMap.id Y) |>.component n)
@@ -355,7 +381,7 @@ theorem chainMap_comp_id {C : PreAdditiveCategory.{u}}
   exact Path.ofEq (C.comp_id _)
 
 /-- Derived natural transformation composition is associative. -/
-theorem derivedNatTrans_assoc
+def derivedNatTrans_assoc
     {C D : PreAdditiveCategory.{u}}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     {F G H K : LeftDerivedFunctor C D DC DD}

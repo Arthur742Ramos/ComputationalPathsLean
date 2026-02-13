@@ -61,6 +61,20 @@ namespace GaloisCohomology
 
 universe u v w
 
+/-- Build a multi-step computational witness from an equality using
+`refl`, `symm`, `trans`, `congr`, and associativity-shaped composition. -/
+private def multi_step_path {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  let leftRefl : Path a a := Path.mk [Step.mk a a rfl] rfl
+  let rightRefl : Path b b := Path.mk [Step.mk b b rfl] rfl
+  let core : Path a b := Path.congrArg (fun x => x) (Path.mk [Step.mk a b h] h)
+  let leftUnit : Path a a := Path.trans leftRefl (Path.symm leftRefl)
+  let rightUnit : Path b b := Path.trans rightRefl rightRefl
+  let leftAssoc : Path a b := Path.trans (Path.trans leftUnit core) rightUnit
+  let rightAssoc : Path a b := Path.trans leftUnit (Path.trans core rightUnit)
+  have _assoc : leftAssoc = rightAssoc := by
+    exact Path.trans_assoc leftUnit core rightUnit
+  exact leftAssoc
+
 /-! ## Profinite Groups -/
 
 /-- A finite quotient of a profinite group. -/
@@ -520,109 +534,109 @@ end ShafarevichTateGroup
 /-- Path witness: trivial profinite group has order 1. -/
 def trivial_profinite_path (n : Nat) :
     Path (ProfiniteGroup.trivial.quotients n).order 1 :=
-  Path.ofEq (ProfiniteGroup.trivial_order n)
+  multi_step_path (ProfiniteGroup.trivial_order n)
 
 /-- Path witness: H^0 has degree 0. -/
 def h0_degree_path (G : ProfiniteGroup) (M : DiscreteModule) (s : Nat) :
     Path (GroupCohomology.h0 G M s).degree 0 :=
-  Path.ofEq (GroupCohomology.h0_degree G M s)
+  multi_step_path (GroupCohomology.h0_degree G M s)
 
 /-- Path witness: trivial group cohomology has order 1. -/
 def trivial_cohom_path (M : DiscreteModule) (n : Nat) (hn : n ≥ 1) :
     Path (GroupCohomology.trivial_higher M n hn).cohomologyOrder 1 :=
-  Path.ofEq (GroupCohomology.trivial_higher_order M n hn)
+  multi_step_path (GroupCohomology.trivial_higher_order M n hn)
 
 /-- Path witness: inflation-restriction degree consistency. -/
 def inflation_degree_path (im : InflationMap) :
     Path im.source.degree im.target.degree :=
-  Path.ofEq im.degree_eq
+  multi_step_path im.degree_eq
 
 /-- Path witness: restriction degree consistency. -/
 def restriction_degree_path (rm : RestrictionMap) :
     Path rm.source.degree rm.target.degree :=
-  Path.ofEq rm.degree_eq
+  multi_step_path rm.degree_eq
 
 /-- Path witness: Tate cohomology periodicity for cyclic groups. -/
 def tate_periodicity_path (n : Nat) (hn : n > 0) (deg : Int) :
     Path (TateCohomology.cyclic_on_cyclic n hn deg).tateCohomOrder
          (TateCohomology.cyclic_on_cyclic n hn (deg + 2)).tateCohomOrder :=
-  Path.ofEq (TateCohomology.cyclic_periodicity n hn deg)
+  multi_step_path (TateCohomology.cyclic_periodicity n hn deg)
 
 /-- Path witness: trivial Tate cohomology has order 1. -/
 def trivial_tate_path (M : DiscreteModule) (deg : Int) :
     Path (TateCohomology.trivial_group M deg).tateCohomOrder 1 :=
-  Path.ofEq (TateCohomology.trivial_order M deg)
+  multi_step_path (TateCohomology.trivial_order M deg)
 
 /-- Path witness: Herbrand quotient of cyclic is balanced. -/
 def herbrand_cyclic_path (n : Nat) (hn : n > 0) :
     Path (HerbrandQuotient.cyclic_trivial n hn).h0_order
          (HerbrandQuotient.cyclic_trivial n hn).hm1_order :=
-  Path.ofEq (HerbrandQuotient.cyclic_h0_eq_hm1 n hn)
+  multi_step_path (HerbrandQuotient.cyclic_h0_eq_hm1 n hn)
 
 /-- Path witness: local Brauer group is local. -/
 def brauer_local_path (id : Nat) :
     Path (BrauerGroup.ofLocal id).isLocal true :=
-  Path.ofEq (BrauerGroup.local_isLocal id)
+  multi_step_path (BrauerGroup.local_isLocal id)
 
 /-- Path witness: global Brauer group is global. -/
 def brauer_global_path (id : Nat) :
     Path (BrauerGroup.ofGlobal id).isGlobal true :=
-  Path.ofEq (BrauerGroup.global_isGlobal id)
+  multi_step_path (BrauerGroup.global_isGlobal id)
 
 /-- Path witness: Hasse principle holds for quadrics. -/
 def quadric_hasse_path :
     Path HasseLocalGlobal.quadric.principleHolds true :=
-  Path.ofEq HasseLocalGlobal.quadric_holds
+  multi_step_path HasseLocalGlobal.quadric_holds
 
 /-- Path witness: Selmer's cubic violates Hasse principle. -/
 def selmer_fails_path :
     Path HasseLocalGlobal.selmerCubic.principleHolds false :=
-  Path.ofEq HasseLocalGlobal.selmer_fails
+  multi_step_path HasseLocalGlobal.selmer_fails
 
 /-- Path witness: trivial Poitou-Tate H⁰ degree. -/
 def poitou_tate_h0_path (G : ProfiniteGroup) :
     Path (PoitouTateSequence.trivial G).h0.degree 0 :=
-  Path.ofEq (PoitouTateSequence.trivial_h0_degree G)
+  multi_step_path (PoitouTateSequence.trivial_h0_degree G)
 
 /-- Path witness: trivial Poitou-Tate H¹ degree. -/
 def poitou_tate_h1_path (G : ProfiniteGroup) :
     Path (PoitouTateSequence.trivial G).h1.degree 1 :=
-  Path.ofEq (PoitouTateSequence.trivial_h1_degree G)
+  multi_step_path (PoitouTateSequence.trivial_h1_degree G)
 
 /-- Path witness: local Tate duality degree sum. -/
 def local_tate_degree_path (ltd : LocalTateDuality) :
     Path (ltd.source.degree + ltd.dual.degree) 2 :=
-  Path.ofEq ltd.degree_sum
+  multi_step_path ltd.degree_sum
 
 /-- Path witness: trivial Ш has order 1. -/
 def trivial_sha_path :
     Path ShafarevichTateGroup.trivial.order 1 :=
-  Path.ofEq ShafarevichTateGroup.trivial_order
+  multi_step_path ShafarevichTateGroup.trivial_order
 
 /-- Path witness: trivial Ш is finite. -/
 def trivial_sha_finite_path :
     Path ShafarevichTateGroup.trivial.isProvenFinite true :=
-  Path.ofEq ShafarevichTateGroup.trivial_finite
+  multi_step_path ShafarevichTateGroup.trivial_finite
 
 /-- Path witness: inflation-restriction H¹ quotient degree. -/
 def infl_restr_h1q_path :
     Path InflationRestrictionSequence.trivial.h1_quotient.degree 1 :=
-  Path.ofEq InflationRestrictionSequence.trivial_h1q_degree
+  multi_step_path InflationRestrictionSequence.trivial_h1q_degree
 
 /-- Path witness: inflation-restriction H¹ full degree. -/
 def infl_restr_h1f_path :
     Path InflationRestrictionSequence.trivial.h1_full.degree 1 :=
-  Path.ofEq InflationRestrictionSequence.trivial_h1f_degree
+  multi_step_path InflationRestrictionSequence.trivial_h1f_degree
 
 /-- Path witness: integers module is infinite. -/
 def integers_infinite_path :
     Path DiscreteModule.integers.isFinite false :=
-  Path.ofEq DiscreteModule.integers_infinite
+  multi_step_path DiscreteModule.integers_infinite
 
 /-- Path witness: cyclic module is finite. -/
 def cyclic_finite_path (n : Nat) :
     Path (DiscreteModule.cyclicMod n).isFinite true :=
-  Path.ofEq (DiscreteModule.cyclic_finite n)
+  multi_step_path (DiscreteModule.cyclic_finite n)
 
 end GaloisCohomology
 end ComputationalPaths

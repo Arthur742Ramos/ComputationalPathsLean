@@ -67,6 +67,7 @@ import ComputationalPaths.Path.LFunctions
 import ComputationalPaths.Path.AdditiveNumberTheory
 import ComputationalPaths.Path.RiemannZeta
 import ComputationalPaths.Path.Homotopy.Loops
+import ComputationalPaths.Path.Homotopy.LoopSpace
 import ComputationalPaths.Path.Homotopy.LoopSpaceAlgebra
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.FundamentalGroupPresentation
@@ -76,6 +77,7 @@ import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
 import ComputationalPaths.Path.Homotopy.SamelsonProduct
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
+import ComputationalPaths.Path.Homotopy.HomotopyGroup
 import ComputationalPaths.Path.Homotopy.EckmannHilton
 import ComputationalPaths.Path.Homotopy.AbelianFundamentalGroup
 import ComputationalPaths.Path.Homotopy.OmegaTwoCoherence
@@ -103,6 +105,7 @@ import ComputationalPaths.Path.Homotopy.CoveringPathLifting
 import ComputationalPaths.Path.Homotopy.GroupoidCovering
 import ComputationalPaths.Path.Homotopy.GaloisTheoryCovers
 import ComputationalPaths.Path.Homotopy.Fibration
+import ComputationalPaths.Path.Homotopy.FiberSequence
 import ComputationalPaths.Path.Homotopy.QuillenAdjunction
 import ComputationalPaths.Path.Homotopy.ModelCategoryExamples
 import ComputationalPaths.Path.Homotopy.HopfFibration
@@ -123,6 +126,7 @@ import ComputationalPaths.Path.Homotopy.BarrattPuppe
 import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.HigherInducedMaps
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
+import ComputationalPaths.Path.Homotopy.Suspension
 import ComputationalPaths.Path.Homotopy.SuspensionTheorems
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
 import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
