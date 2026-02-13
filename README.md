@@ -78,6 +78,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - **Path simplification tactics**: 29 tactics including `path_simp`, `path_auto`, `path_normalize`, `path_beta`, `path_eta`, plus structural tactics (`path_inv_inv`, `path_inv_distr`, `path_cancel_left/right`, `path_then_cancel_left/right`) and congruence tactics (`path_congr_symm`, `path_congrArg`) for automated RwEq reasoning.
 - **Free group abelianization** (axiom-free): Constructive proof that F_n^ab ≃ ℤⁿ with full encode-decode equivalence.
 - **Covering space theory**: Total spaces, path lifting, π₁-action on fibers, universal cover, deck transformations.
+- **Simplicial path coherence**: `Simplicial/PathCoherence.lean` transports horns and horn fillers along path-preserving simplicial maps, with explicit `Path.Step`/`RwEq` witnesses for mapped-face normalization and image Kan/inner-Kan conditions.
 - **Confluence of LND_EQ-TRS**: Complete proof that the computational path rewrite system is confluent via Newman's Lemma (local confluence + termination). Critical pair analysis for all core path algebra rules including the challenging inverse-related pairs.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Computational-path circle interface + π₁(S¹) ≃ ℤ via winding number (requires `HasCirclePiOneEncode`; optional raw-loop interface `HasCircleLoopDecode` is derivable).
@@ -162,6 +163,8 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
 - [`Topos/SubobjectClassifierPaths.lean`](Topos/SubobjectClassifierPaths.lean) — subobject classifier data and classifying-square coherence stated directly with `Path`/`RwEq`.
 - [`Topos/InternalLogicPaths.lean`](Topos/InternalLogicPaths.lean) — internal logic over `1 ⟶ Ω` truth values with conjunction/implication coherence as computational paths.
+- [`Chromatic/PathInfrastructure.lean`](Chromatic/PathInfrastructure.lean) — chromatic filtration and Morava K-theory periodicity packaged as explicit computational `Path.Step`/`RwEq` witnesses.
+- [`InfinityCategory/PathInfrastructure.lean`](InfinityCategory/PathInfrastructure.lean) — quasi-category and Segal-space composition APIs with explicit `Path.Step` witnesses (`QuasiCategoryPaths`, `SegalSpacePaths`) and derived `RwEq` coherence lemmas.
 
 ## Bicategory & weak 2-groupoid API
 

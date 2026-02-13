@@ -161,7 +161,7 @@ noncomputable def realProjective2CompPathLoopEq :
 /-- RP^2 loop generator at the Path level. -/
 @[simp] noncomputable def realProjective2CompPathLoop :
     Path realProjective2CompPathBase realProjective2CompPathBase :=
-  Path.ofEq realProjective2CompPathLoopEq
+  Path.ofEqChain realProjective2CompPathLoopEq
 
 /-- Iterate the RP^2 loop at the Path level. -/
 @[simp] noncomputable def realProjective2CompPathLoopPathPow :

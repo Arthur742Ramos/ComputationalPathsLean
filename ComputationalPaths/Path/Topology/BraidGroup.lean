@@ -83,7 +83,7 @@ structure BraidRepresentation (n : Nat) (B : ArtinBraidGroup n) where
 def map_mul_path {n : Nat} {B : ArtinBraidGroup n}
     (R : BraidRepresentation n B) (x y : B.data.Braid) :
     Path (R.toFun (B.data.mul x y)) (R.targetGroup.mul (R.toFun x) (R.toFun y)) :=
-  Path.ofEq (R.map_mul x y)
+  Path.ofEqChain (R.map_mul x y)
 
 /-! ## Burau and Lawrence-Krammer Representations -/
 

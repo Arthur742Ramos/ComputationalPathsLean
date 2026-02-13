@@ -55,7 +55,7 @@ def id (X : Pointed) : PathPointedMap X X where
 /-- View a `PointedMap` as a `PathPointedMap`. -/
 def ofPointedMap (f : PointedMap X Y) : PathPointedMap X Y where
   toFun := f.toFun
-  map_pt := Path.ofEq f.map_pt
+  map_pt := Path.ofEqChain f.map_pt
 
 /-- Forget a `PathPointedMap` into a `PointedMap`. -/
 def toPointedMap (f : PathPointedMap X Y) : PointedMap X Y where

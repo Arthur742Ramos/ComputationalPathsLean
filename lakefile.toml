@@ -26,10 +26,19 @@ name = "Topos"
 name = "Motivic"
 
 [[lean_lib]]
+name = "Chromatic"
+
+[[lean_lib]]
 name = "Descent"
 
 [[lean_lib]]
 name = "Cobordism"
+
+[[lean_lib]]
+name = "Simplicial"
+
+[[lean_lib]]
+name = "InfinityCategory"
 
 [[lean_exe]]
 name = "computational_paths"
