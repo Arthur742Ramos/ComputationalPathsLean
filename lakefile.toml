@@ -32,6 +32,9 @@ name = "Chromatic"
 name = "Condensed"
 
 [[lean_lib]]
+name = "VertexAlgebra"
+
+[[lean_lib]]
 name = "Descent"
 
 [[lean_lib]]
@@ -53,7 +56,16 @@ name = "Factorization"
 name = "Perfectoid"
 
 [[lean_lib]]
+name = "Tropical"
+
+[[lean_lib]]
+name = "GRT"
+
+[[lean_lib]]
 name = "DAG"
+
+[[lean_lib]]
+name = "Quantum"
 
 [[lean_exe]]
 name = "computational_paths"

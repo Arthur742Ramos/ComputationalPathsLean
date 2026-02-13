@@ -30,12 +30,23 @@ are judgmentally equal, echoing the uniqueness of identity proofs principle. -/
 def UIP (A : Type u) : Prop :=
   ∀ {a b : A}, ∀ (p q : Path a b), p = q
 
+/-- A one-step reflexive loop built explicitly from a singleton `Step` list. -/
+@[simp] def stepLoop {A : Type u} (a : A) : Path a a :=
+  Path.mk (A := A) (a := a) (b := a) [Step.mk a a rfl] rfl
+
+/-- `refl` and the one-step loop are distinct because their step lists differ. -/
+theorem refl_ne_stepLoop {A : Type u} (a : A) :
+    Path.refl a ≠ stepLoop a := by
+  intro h
+  have hs := congrArg Path.steps h
+  simp [stepLoop, Path.refl] at hs
+
 /-- A type with an inhabited path space witnesses non-`UIP`: the empty path and
 the explicit reflexive rewrite remain distinct. -/
 theorem not_uip_of_inhabited {A : Type u} (a : A) : ¬ UIP A := by
   intro h
-  have := h (p := Path.refl a) (q := Path.ofEq (rfl : a = a))
-  exact Path.refl_ne_ofEq (A := A) a this
+  have := h (p := Path.refl a) (q := stepLoop a)
+  exact refl_ne_stepLoop (A := A) a this
 
 /-- As soon as a type is nonempty we can pick a witness and derive
 `¬ UIP A` from the inhabited case. -/
@@ -54,8 +65,8 @@ def PathK (A : Type u) : Prop :=
 theorem not_pathK_of_nonempty {A : Type u} (hA : Nonempty A) : ¬ PathK A := by
   intro hK
   obtain ⟨a⟩ := hA
-  have : Path.ofEq (rfl : a = a) = Path.refl a := hK _
-  exact Path.refl_ne_ofEq a this.symm
+  have : stepLoop a = Path.refl a := hK _
+  exact refl_ne_stepLoop a this.symm
 
 /-- K fails for any inhabited type. -/
 theorem not_pathK_of_inhabited {A : Type u} (a : A) : ¬ PathK A := by
@@ -168,41 +179,48 @@ reflecting proof-irrelevance of the underlying equality. -/
 /-- In `Nat`, there exist two distinct paths from 0 to 0. -/
 theorem nat_two_distinct_loops :
     ∃ (p q : Path (0 : Nat) 0), p ≠ q := by
-  exact ⟨Path.refl 0, Path.ofEq rfl, Path.refl_ne_ofEq 0⟩
+  exact ⟨Path.refl 0, stepLoop 0, refl_ne_stepLoop 0⟩
 
 /-- In `Bool`, there exist two distinct paths from `true` to `true`. -/
 theorem bool_two_distinct_loops :
     ∃ (p q : Path true true), p ≠ q :=
-  ⟨Path.refl true, Path.ofEq rfl, Path.refl_ne_ofEq true⟩
+  ⟨Path.refl true, stepLoop true, refl_ne_stepLoop true⟩
 
 /-- The path space between any point and itself always has at least two
 distinct elements, as long as the type is inhabited. -/
 theorem loop_space_not_subsingleton {A : Type u} (a : A) :
     ¬ Subsingleton (Path a a) := by
   intro ⟨h⟩
-  exact Path.refl_ne_ofEq a (h (Path.refl a) (Path.ofEq rfl))
+  exact refl_ne_stepLoop a (h (Path.refl a) (stepLoop a))
 
 /-- For any type, distinct paths can be constructed by concatenation. -/
 theorem three_distinct_loops {A : Type u} (a : A) :
     ∃ (p q r : Path a a), p ≠ q ∧ q ≠ r ∧ p ≠ r := by
-  refine ⟨Path.refl a, Path.ofEq rfl, Path.trans (Path.ofEq rfl) (Path.ofEq rfl), ?_, ?_, ?_⟩
-  · exact Path.refl_ne_ofEq a
+  refine ⟨Path.refl a, stepLoop a, Path.trans (stepLoop a) (stepLoop a), ?_, ?_, ?_⟩
+  · exact refl_ne_stepLoop a
   · intro h
     have := congrArg Path.steps h
-    simp [Path.ofEq, Path.trans] at this
+    simp [stepLoop, Path.trans] at this
   · intro h
     have := congrArg Path.steps h
-    simp [Path.refl, Path.trans, Path.ofEq] at this
+    simp [Path.refl, Path.trans, stepLoop] at this
 
 /-! ## Congruence and UIP -/
+
+/-- `congrArg f` preserves the refl-vs-ofEq distinction. -/
+theorem congrArg_preserves_ne_stepLoop {A : Type u} {B : Type v} (f : A → B)
+    (a : A) :
+    Path.congrArg f (Path.refl a) ≠ Path.congrArg f (stepLoop a) := by
+  intro h
+  have := congrArg Path.steps h
+  simp [Path.congrArg, Path.refl, stepLoop, Step.map] at this
 
 /-- `congrArg f` preserves the refl-vs-ofEq distinction. -/
 theorem congrArg_preserves_ne {A : Type u} {B : Type v} (f : A → B)
     (a : A) :
     Path.congrArg f (Path.refl a) ≠ Path.congrArg f (Path.ofEq (rfl : a = a)) := by
   intro h
-  have := congrArg Path.steps h
-  simp [Path.congrArg, Path.refl, Path.ofEq, Step.map] at this
+  exact congrArg_preserves_ne_stepLoop f a h
 
 /-- UIP failure is preserved by arbitrary functions: if we have non-UIP for
 `A`, then `B` is also non-UIP whenever there is a function `A → B`. -/
@@ -210,8 +228,8 @@ theorem not_uip_image {A : Type u} {B : Type u} (f : A → B)
     (hA : Nonempty A) : ¬ UIP B := by
   obtain ⟨a⟩ := hA
   intro hB
-  have := hB (Path.congrArg f (Path.refl a)) (Path.congrArg f (Path.ofEq (rfl : a = a)))
-  exact congrArg_preserves_ne f a this
+  have := hB (Path.congrArg f (Path.refl a)) (Path.congrArg f (stepLoop a))
+  exact congrArg_preserves_ne_stepLoop f a this
 
 /-! ## Step counting -/
 
@@ -247,11 +265,17 @@ theorem ne_of_stepCount_ne {A : Type u} {a b : A}
   exact h (congrArg stepCount heq)
 
 /-- A path `p` and `trans p (ofEq rfl)` always differ (when a = b). -/
+theorem path_ne_trans_stepLoop {A : Type u} {a : A}
+    (p : Path a a) :
+    p ≠ Path.trans p (stepLoop a) := by
+  apply ne_of_stepCount_ne
+  simp
+
+/-- A path `p` and `trans p (ofEq rfl)` always differ (when a = b). -/
 theorem path_ne_trans_ofEq_rfl {A : Type u} {a : A}
     (p : Path a a) :
     p ≠ Path.trans p (Path.ofEq (rfl : a = a)) := by
-  apply ne_of_stepCount_ne
-  simp
+  simpa [stepLoop] using path_ne_trans_stepLoop (A := A) (a := a) p
 
 /-! ## Step count preserving operations -/
 
@@ -264,7 +288,7 @@ theorem path_ne_trans_ofEq_rfl {A : Type u} {a : A}
 /-- Helper: n-fold concatenation of `ofEq rfl` loops. -/
 def nfoldLoop {A : Type u} (a : A) : Nat → Path a a
   | 0 => Path.refl a
-  | n + 1 => Path.trans (nfoldLoop a n) (Path.ofEq (rfl : a = a))
+  | n + 1 => Path.trans (nfoldLoop a n) (stepLoop a)
 
 /-- The step count of an n-fold concatenation of `ofEq rfl` loops. -/
 theorem stepCount_nfoldLoop {A : Type u} (a : A) (n : Nat) :
@@ -273,7 +297,8 @@ theorem stepCount_nfoldLoop {A : Type u} (a : A) (n : Nat) :
   | zero => rfl
   | succ n ih =>
     unfold nfoldLoop
-    rw [stepCount_trans, stepCount_ofEq, ih]
+    rw [stepCount_trans, ih]
+    simp [stepCount, stepLoop]
 
 /-! ## Path space cardinality -/
 

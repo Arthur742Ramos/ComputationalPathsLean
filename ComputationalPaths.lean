@@ -12,5 +12,9 @@ import Cobordism.PathInfrastructure
 import Arithmetic.PathInfrastructure
 import Factorization.PathInfrastructure
 import Perfectoid.PathInfrastructure
+import GRT.PathInfrastructure
 import InfinityCategory.PathInfrastructure
 import Condensed.PathInfrastructure
+import Quantum.PathInfrastructure
+import VertexAlgebra.PathInfrastructure
+import Tropical.PathInfrastructure
