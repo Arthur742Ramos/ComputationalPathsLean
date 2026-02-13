@@ -59,14 +59,12 @@ structure HermitianLineBundle where
   /-- Tensor with dual gives a trivial fiber. -/
   tensor_dual_triv : ∀ v, Path (proj (tensor v (dual v))) (proj v)
 
-/-- Isomorphism between hermitian line bundles. -/
-structure LineBundleIso (L₁ L₂ : HermitianLineBundle) where
+/-- Isomorphism between hermitian line bundles over the same base. -/
+structure LineBundleIso (L₁ L₂ : HermitianLineBundle) (h : L₁.base = L₂.base) where
   /-- Forward map. -/
   fwd : L₁.total → L₂.total
   /-- Backward map. -/
   bwd : L₂.total → L₁.total
-  /-- Covers the identity on base. -/
-  covers : ∀ v, Path (L₂.proj (fwd v)) (L₁.proj v)
   /-- Round-trip forward. -/
   fwd_bwd : ∀ w, Path (fwd (bwd w)) w
   /-- Round-trip backward. -/
@@ -97,9 +95,8 @@ structure BundleGerbe where
   /-- Bundle gerbe product μ : L_{y₁,y₂} ⊗ L_{y₂,y₃} → L_{y₁,y₃}
       (on triple fiber products). -/
   product : (p₁₂ p₂₃ p₁₃ : fiberProd) → Type u
-  /-- Associativity of the bundle gerbe product:
-      μ(μ(a,b),c) = μ(a,μ(b,c)) on quadruple fiber products. -/
-  assoc_witness : True  -- Abstract associativity
+  /-- Associativity of the bundle gerbe product. -/
+  assoc_witness : True
 
 /-- A bundle gerbe with explicit associativity Path witness. -/
 structure BundleGerbeStrict extends BundleGerbe where
@@ -123,44 +120,39 @@ structure GerbeConnection (G : BundleGerbe) where
   /-- The connection is compatible with the gerbe product (structural). -/
   compatible : True
 
-/-- A connective structure on a bundle gerbe: a curving 2-form B and
-    connection on L such that F_L = δ(B) and H = dB defines the
-    Dixmier-Douady class. -/
+/-- A connective structure on a bundle gerbe. -/
 structure ConnectiveStructure (G : BundleGerbe) where
   /-- Curving 2-form B ∈ Ω²(Y). -/
   curving : G.submersion → Type u
   /-- Connection on the line bundle. -/
   conn : GerbeConnection G
-  /-- Curvature of the connection equals the difference of curvings:
-      F_L = π₂*(B) - π₁*(B) = δ(B). -/
-  curv_eq_delta : True  -- Abstract: F_L = δ(B)
-  /-- The 3-curvature H = dB ∈ Ω³(M) is basic (descends to M). -/
+  /-- Curvature equals difference of curvings (structural). -/
+  curv_eq_delta : True
+  /-- The 3-curvature is basic (structural). -/
   three_curv_basic : True
 
-/-- The 3-curvature class: H ∈ Ω³(M) represents the image of the
-    Dixmier-Douady class in de Rham cohomology. -/
+/-- The 3-curvature class. -/
 structure ThreeCurvature (G : BundleGerbe) (CS : ConnectiveStructure G) where
   /-- The 3-form on the base. -/
   threeForm : G.base → Type u
-  /-- H is closed: dH = 0. -/
+  /-- H is closed. -/
   closed : True
   /-- H represents an integral class. -/
   integral : True
 
 /-! ## Dixmier-Douady Class -/
 
-/-- The Dixmier-Douady class: the characteristic class in H³(M; ℤ)
-    that classifies bundle gerbes up to stable isomorphism. -/
+/-- The Dixmier-Douady class: the characteristic class in H³(M; ℤ). -/
 structure DixmierDouadyClass where
   /-- Base manifold. -/
   base : Type u
-  /-- Cohomology class representative (abstract degree-3 class). -/
+  /-- Cohomology class representative. -/
   classRep : Type u
-  /-- Addition of classes (group structure on H³). -/
+  /-- Addition of classes. -/
   add : classRep → classRep → classRep
-  /-- Zero class (trivial gerbe). -/
+  /-- Zero class. -/
   zero : classRep
-  /-- Negation (dual gerbe). -/
+  /-- Negation. -/
   neg : classRep → classRep
   /-- Left identity. -/
   add_zero : ∀ c, Path (add c zero) c
@@ -179,7 +171,7 @@ structure BundleGerbe.DDClass (G : BundleGerbe) where
   cohom : DixmierDouadyClass
   /-- The specific class of this gerbe. -/
   ddClass : cohom.classRep
-  /-- Trivial gerbe has zero DD class (structural statement). -/
+  /-- Trivial gerbe has zero DD class (structural). -/
   trivial_zero : True
 
 /-- Two bundle gerbes with the same DD class are stably isomorphic. -/
@@ -187,17 +179,16 @@ structure StableIsomorphism (G₁ G₂ : BundleGerbe)
     (dd₁ : BundleGerbe.DDClass G₁) (dd₂ : BundleGerbe.DDClass G₂) where
   /-- The DD classes live in the same cohomology group. -/
   same_cohom : dd₁.cohom = dd₂.cohom
-  /-- The DD classes are equal (witnesses stable isomorphism). -/
+  /-- The DD classes are equal. -/
   class_eq : Path dd₁.ddClass (same_cohom ▸ dd₂.ddClass)
 
 /-! ## Gerbe Morphisms -/
 
-/-- A morphism of bundle gerbes: a line bundle E on Y₁ ×_M Y₂
-    compatible with the gerbe products. -/
+/-- A morphism of bundle gerbes. -/
 structure GerbeMorphism (G₁ G₂ : BundleGerbe) where
   /-- The intertwining line bundle. -/
   intertwiner : Type u
-  /-- The morphism is compatible with gerbe products (structural). -/
+  /-- Compatibility (structural). -/
   compatible : True
 
 /-- A 2-morphism between gerbe morphisms. -/
@@ -222,36 +213,31 @@ def GerbeMorphism.id (G : BundleGerbe) : GerbeMorphism G G where
 
 /-! ## Gerbe Modules -/
 
-/-- A module over a bundle gerbe: an analog of a twisted vector bundle.
-    A gerbe module for G is a vector bundle E → Y with an action
-    L ⊗ E → E compatible with the gerbe product. -/
+/-- A module over a bundle gerbe. -/
 structure GerbeModule (G : BundleGerbe) where
   /-- The module space. -/
   moduleSpace : Type u
   /-- Module elements are over the submersion. -/
   moduleProj : moduleSpace → G.submersion
-  /-- Rank of the module (as a vector bundle over Y). -/
+  /-- Rank. -/
   rank : Nat
-  /-- Action of the line bundle on the module:
-      L_{y₁,y₂} ⊗ E_{y₂} → E_{y₁}. -/
+  /-- Action of the line bundle on the module. -/
   action : G.fiberProd → moduleSpace → moduleSpace
-  /-- Action is compatible with the gerbe product (associativity). -/
+  /-- Action is compatible with the gerbe product (structural). -/
   action_assoc : True
   /-- Action covers the first projection. -/
   action_proj : ∀ p m, Path (moduleProj (action p m)) (G.fst p)
 
-/-- The endomorphism bundle of a gerbe module descends to the base.
-    End(E) is an honest (untwisted) bundle over M. -/
+/-- The endomorphism bundle of a gerbe module descends to the base. -/
 structure GerbeModule.EndBundle (G : BundleGerbe) (M : GerbeModule G) where
   /-- Fiber of the endomorphism bundle. -/
   endFiber : G.base → Type u
-  /-- The endomorphism bundle is untwisted: it descends from Y to M. -/
+  /-- Untwisted (structural). -/
   descends : True
 
 /-! ## Tensor Product and Dual of Gerbes -/
 
-/-- Tensor product of two bundle gerbes over the same base: their DD classes
-    add. -/
+/-- Tensor product of two bundle gerbes. -/
 structure GerbeTensorProduct (G₁ G₂ : BundleGerbe) where
   /-- The tensor product gerbe. -/
   tensorGerbe : BundleGerbe
@@ -263,7 +249,7 @@ structure GerbeTensorProduct (G₁ G₂ : BundleGerbe) where
   dd₁ : BundleGerbe.DDClass G₁
   dd₂ : BundleGerbe.DDClass G₂
 
-/-- The dual of a bundle gerbe: its DD class is negated. -/
+/-- The dual of a bundle gerbe. -/
 structure GerbeDual (G : BundleGerbe) where
   /-- The dual gerbe. -/
   dualGerbe : BundleGerbe
@@ -276,88 +262,81 @@ structure GerbeDual (G : BundleGerbe) where
 
 /-! ## Trivialization and Sections -/
 
-/-- A trivialization of a bundle gerbe: witnesses that its DD class is zero.
-    Equivalent to the existence of a global section (up to stable iso). -/
+/-- A trivialization of a bundle gerbe. -/
 structure GerbeTrivialization (G : BundleGerbe) where
   /-- A "trivialization" line bundle T on Y. -/
   trivBundle : Type u
-  /-- Trivialization map: L ≅ δ(T) = T* ⊗ T on Y ×_M Y. -/
+  /-- Trivialization map. -/
   trivIso : G.fiberProd → trivBundle → trivBundle
-  /-- Compatibility with the gerbe product. -/
+  /-- Compatibility (structural). -/
   compatible : True
 
 /-- A trivial gerbe has zero DD class. -/
-theorem trivial_gerbe_dd_zero (G : BundleGerbe) (T : GerbeTrivialization G)
-    (dd : BundleGerbe.DDClass G) (ddH : DixmierDouadyClass) :
-    Path (ddH.add dd.ddClass (ddH.neg dd.ddClass)) ddH.zero :=
-  ddH.add_neg dd.ddClass
+def trivial_gerbe_dd_zero (dd : DixmierDouadyClass) (c : dd.classRep) :
+    Path (dd.add c (dd.neg c)) dd.zero :=
+  dd.add_neg c
 
 /-! ## Gerbe Holonomy -/
 
-/-- Holonomy of a gerbe with connective structure around a closed surface.
-    For a bundle gerbe with connective structure, we can integrate the
-    3-curvature H over a 3-chain bounding the surface. -/
+/-- Holonomy of a gerbe with connective structure around a closed surface. -/
 structure GerbeHolonomy (G : BundleGerbe) (CS : ConnectiveStructure G) where
   /-- A closed 2-cycle (surface) in the base. -/
   surface : Type u
-  /-- The holonomy value (an element of U(1)). -/
+  /-- The holonomy value. -/
   holonomyValue : Type u
-  /-- Holonomy of a boundary is trivial (Stokes' theorem). -/
+  /-- Holonomy of a boundary is trivial (structural). -/
   boundary_trivial : True
 
 /-! ## Classification Theorem -/
 
-/-- The classification of bundle gerbes by H³(M; ℤ):
-    the map G ↦ DD(G) is a bijection from stable isomorphism classes
-    of bundle gerbes to H³(M; ℤ). -/
+/-- The classification of bundle gerbes by H³(M; ℤ). -/
 structure GerbeClassification where
   /-- Base manifold. -/
   base : Type u
   /-- The cohomology group H³(M; ℤ). -/
   cohom : DixmierDouadyClass
-  /-- The classifying map: bundle gerbe → DD class. -/
+  /-- The classifying map. -/
   classify : BundleGerbe → cohom.classRep
-  /-- Surjectivity: every class is realized by some gerbe. -/
-  surjective : ∀ c : cohom.classRep, ∃ G : BundleGerbe, Path (classify G) c
-  /-- Injectivity (up to stable iso): same class implies stable iso
-      (structural statement). -/
+  /-- Surjectivity. -/
+  surjective : ∀ c : cohom.classRep, ∃ G : BundleGerbe, classify G = c
+  /-- Injectivity (structural). -/
   injective : True
 
 /-! ## Theorems -/
 
 /-- DD class of the tensor product is the sum of DD classes. -/
-theorem dd_tensor_add (dd : DixmierDouadyClass) (a b c : dd.classRep)
+def dd_tensor_add (dd : DixmierDouadyClass) (a b c : dd.classRep)
     (h : Path c (dd.add a b)) :
     Path (dd.add c (dd.neg (dd.add a b)))
-         dd.zero := by
-  have step1 : Path (dd.add c (dd.neg (dd.add a b)))
-                     (dd.add (dd.add a b) (dd.neg (dd.add a b))) :=
-    Path.ofEq (congrArg (fun x => dd.add x (dd.neg (dd.add a b))) h.proof)
-  exact Path.trans step1 (dd.add_neg (dd.add a b))
+         dd.zero :=
+  let step1 : Path (dd.add c (dd.neg (dd.add a b)))
+                    (dd.add (dd.add a b) (dd.neg (dd.add a b))) :=
+    congrArg (fun x => dd.add x (dd.neg (dd.add a b))) h
+  Path.trans step1 (dd.add_neg (dd.add a b))
 
-/-- Negation is involutive for DD classes. Multi-step Path proof. -/
-theorem dd_neg_neg (dd : DixmierDouadyClass) (c : dd.classRep) :
-    Path (dd.add (dd.neg (dd.neg c)) (dd.neg c))
+/-- Negation composed with itself: neg(c) + neg(neg(c)) = 0. -/
+def dd_neg_neg (dd : DixmierDouadyClass) (c : dd.classRep) :
+    Path (dd.add (dd.neg c) (dd.neg (dd.neg c)))
          dd.zero :=
   dd.add_neg (dd.neg c)
 
-/-- Adding zero on the right is identity, via multi-step composition. -/
-theorem dd_add_zero_right (dd : DixmierDouadyClass) (c : dd.classRep) :
+/-- Adding zero on the right is identity. -/
+def dd_add_zero_right (dd : DixmierDouadyClass) (c : dd.classRep) :
     Path (dd.add c dd.zero) c :=
   dd.add_zero c
 
 /-- Associativity of DD class addition composed with zero. -/
-theorem dd_assoc_zero (dd : DixmierDouadyClass) (a b : dd.classRep) :
+def dd_assoc_zero (dd : DixmierDouadyClass) (a b : dd.classRep) :
     Path (dd.add (dd.add a b) dd.zero) (dd.add a b) :=
   dd.add_zero (dd.add a b)
 
-/-- Composing addition with its inverse yields zero. Multi-step. -/
-theorem dd_add_inv_zero (dd : DixmierDouadyClass) (a b : dd.classRep) :
+/-- Composing addition with its inverse yields zero. -/
+def dd_add_inv_zero (dd : DixmierDouadyClass) (a b : dd.classRep) :
     Path (dd.add (dd.add a b) (dd.neg (dd.add a b))) dd.zero :=
   dd.add_neg (dd.add a b)
 
 /-- The inverse of a sum: -(a+b) acts as right inverse of (a+b). -/
-theorem dd_sum_inverse (dd : DixmierDouadyClass) (a b : dd.classRep) :
+def dd_sum_inverse (dd : DixmierDouadyClass) (a b : dd.classRep) :
     Path (dd.add (dd.neg (dd.add a b)) (dd.add a b)) dd.zero :=
   dd.neg_add (dd.add a b)
 

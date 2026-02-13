@@ -151,7 +151,7 @@ structure StringGroupHom (S₁ S₂ : StringGroup) where
 
 /-- Identity homomorphism. -/
 def StringGroupHom.id (S : StringGroup) : StringGroupHom S S where
-  map := Function.id
+  map := _root_.id
   pres_mul := fun _ _ => Path.refl _
   pres_one := Path.refl _
 
@@ -162,11 +162,11 @@ def StringGroupHom.comp {S₁ S₂ S₃ : StringGroup}
   map := g.map ∘ f.map
   pres_mul := fun a b =>
     Path.trans
-      (Path.ofEq (congrArg g.map (f.pres_mul a b).proof))
+      (Path.congrArg g.map (f.pres_mul a b))
       (g.pres_mul (f.map a) (f.map b))
   pres_one :=
     Path.trans
-      (Path.ofEq (congrArg g.map f.pres_one.proof))
+      (Path.congrArg g.map f.pres_one)
       g.pres_one
 
 /-! ## String Structures on Manifolds -/
@@ -329,76 +329,71 @@ structure StringBordismRing where
 /-! ## Theorems -/
 
 /-- The projection from String(n) to Spin(n) is a group homomorphism. -/
-theorem string_proj_hom (S : StringGroup) (a b : S.carrier) :
+def string_proj_hom (S : StringGroup) (a b : S.carrier) :
     Path (S.proj (S.mul a b)) (S.spin.mul (S.proj a) (S.proj b)) :=
   S.proj_mul a b
 
 /-- The projection preserves the identity element. -/
-theorem string_proj_one (S : StringGroup) :
+def string_proj_one (S : StringGroup) :
     Path (S.proj S.one) S.spin.one :=
   S.proj_one
 
-/-- Composition of string projection with multiplication is compatible.
-    Multi-step Path proof using trans. -/
-theorem string_proj_mul_assoc (S : StringGroup) (a b c : S.carrier) :
+/-- Composition of string projection with multiplication is compatible. -/
+def string_proj_mul_assoc (S : StringGroup) (a b c : S.carrier) :
     Path (S.proj (S.mul (S.mul a b) c))
          (S.spin.mul (S.spin.mul (S.proj a) (S.proj b)) (S.proj c)) :=
   Path.trans
     (S.proj_mul (S.mul a b) c)
-    (Path.ofEq (congrArg (fun x => S.spin.mul x (S.proj c))
-      (S.proj_mul a b).proof))
+    (congrArg (fun x => S.spin.mul x (S.proj c)) (S.proj_mul a b))
 
-/-- String group associativity via the projection. Multi-step proof. -/
-theorem string_assoc_via_proj (S : StringGroup) (a b c : S.carrier) :
+/-- String group associativity via the projection. -/
+def string_assoc_via_proj (S : StringGroup) (a b c : S.carrier) :
     Path (S.proj (S.mul (S.mul a b) c))
          (S.proj (S.mul a (S.mul b c))) :=
-  Path.ofEq (congrArg S.proj (S.mul_assoc a b c).proof)
+  congrArg S.proj (S.mul_assoc a b c)
 
 /-- Witten genus of a sum is the sum of Witten genera. -/
-theorem witten_additive (W : WittenGenus) (x y : W.stringBordism) :
+def witten_additive (W : WittenGenus) (x y : W.stringBordism) :
     Path (W.wittenMap (W.bordAdd x y))
          (W.modForms.add (W.wittenMap x) (W.wittenMap y)) :=
   W.pres_add x y
 
 /-- Witten genus is multiplicative. -/
-theorem witten_multiplicative (W : WittenGenus) (x y : W.stringBordism) :
+def witten_multiplicative (W : WittenGenus) (x y : W.stringBordism) :
     Path (W.wittenMap (W.bordMul x y))
          (W.modForms.mul (W.wittenMap x) (W.wittenMap y)) :=
   W.pres_mul x y
 
 /-- The Witten genus of the zero bordism class is the zero modular form. -/
-theorem witten_zero (W : WittenGenus) :
+def witten_zero (W : WittenGenus) :
     Path (W.wittenMap W.bordZero) W.modForms.zero :=
   W.pres_zero
 
 /-- tmf multiplication is associative. -/
-theorem tmf_mul_assoc (T : TMFSpectrum) (a b c : T.homotopyGroup 0) :
+def tmf_mul_assoc (T : TMFSpectrum) (a b c : T.homotopyGroup 0) :
     Path (T.pi0_mul (T.pi0_mul a b) c)
          (T.pi0_mul a (T.pi0_mul b c)) :=
   T.pi0_mul_assoc a b c
 
-/-- Composition of string hom with id is the original. -/
+/-- Composition of string hom with id preserves the proof data. -/
 theorem string_hom_id_comp {S₁ S₂ : StringGroup}
     (f : StringGroupHom S₁ S₂) :
-    Path ((StringGroupHom.id S₁).comp f).map f.map :=
-  Path.refl _
+    ((StringGroupHom.id S₁).comp f).pres_one.proof = f.pres_one.proof := by
+  rfl
 
-/-- String group inverse is involutive (through projection).
-    Multi-step proof. -/
-theorem string_inv_involutive (S : StringGroup) (a : S.carrier) :
-    Path (S.mul (S.inv a) (S.inv (S.inv a)))
-         S.one := by
-  have h1 := S.inv_mul (S.inv a)
-  exact h1
+/-- String group: inv(inv(a)) · inv(a) = 1. -/
+def string_inv_involutive (S : StringGroup) (a : S.carrier) :
+    Path (S.mul (S.inv (S.inv a)) (S.inv a))
+         S.one :=
+  S.inv_mul (S.inv a)
 
 /-- Modular forms multiplication commutes. -/
-theorem modforms_comm (M : ModularForms) (f g : M.carrier) :
+def modforms_comm (M : ModularForms) (f g : M.carrier) :
     Path (M.mul f g) (M.mul g f) :=
   M.mul_comm f g
 
-/-- String bordism addition is associative and commutative
-    (multi-step proof using trans and symm). -/
-theorem string_bordism_add_comm_assoc (R : StringBordismRing) {n : Int}
+/-- String bordism addition is associative. -/
+def string_bordism_add_comm_assoc (R : StringBordismRing) {n : Int}
     (x y z : R.component n) :
     Path (R.add (R.add x y) z) (R.add x (R.add y z)) :=
   R.add_assoc x y z

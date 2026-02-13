@@ -108,8 +108,7 @@ structure InterchangeLaw (G : Strict2Group) where
 
 /-- A crossed module (G, H, ∂, α): a group homomorphism ∂ : H → G together
     with an action α of G on H, satisfying the equivariance and Peiffer
-    identity conditions. Every crossed module gives rise to a strict 2-group
-    and vice versa. -/
+    identity conditions. -/
 structure CrossedModule where
   /-- The base group G. -/
   G : Type u
@@ -127,6 +126,16 @@ structure CrossedModule where
   mulH : H → H → H
   oneH : H
   invH : H → H
+  /-- G group axioms. -/
+  mulG_assoc : ∀ a b c, mulG (mulG a b) c = mulG a (mulG b c)
+  oneG_mulG : ∀ a, mulG oneG a = a
+  mulG_oneG : ∀ a, mulG a oneG = a
+  invG_mulG : ∀ a, mulG (invG a) a = oneG
+  mulG_invG : ∀ a, mulG a (invG a) = oneG
+  /-- H group axioms. -/
+  mulH_assoc : ∀ a b c, mulH (mulH a b) c = mulH a (mulH b c)
+  oneH_mulH : ∀ a, mulH oneH a = a
+  mulH_oneH : ∀ a, mulH a oneH = a
   /-- ∂ is a group homomorphism. -/
   boundary_mul : ∀ h₁ h₂, Path (boundary (mulH h₁ h₂)) (mulG (boundary h₁) (boundary h₂))
   /-- ∂ preserves the identity. -/
@@ -142,8 +151,7 @@ structure CrossedModule where
   peiffer : ∀ h₁ h₂,
     Path (act (boundary h₁) h₂) (mulH (mulH h₁ h₂) (invH h₁))
 
-/-- The kernel of the boundary map forms a G-module (abelian group with
-    G-action). This is the "band" of the associated gerbe. -/
+/-- The kernel of the boundary map forms a G-module. -/
 structure CrossedModule.KernelModule (M : CrossedModule) where
   /-- Carrier of the kernel. -/
   carrier : Type u
@@ -151,14 +159,13 @@ structure CrossedModule.KernelModule (M : CrossedModule) where
   incl : carrier → M.H
   /-- Elements in the kernel satisfy ∂(h) = 1. -/
   in_kernel : ∀ k, Path (M.boundary (incl k)) M.oneG
-  /-- The kernel is abelian under the restricted multiplication. -/
+  /-- The kernel is abelian. -/
   abelian : ∀ k₁ k₂,
     Path (M.mulH (incl k₁) (incl k₂)) (M.mulH (incl k₂) (incl k₁))
 
 /-! ## Differential Crossed Modules -/
 
-/-- A differential crossed module (𝔤, 𝔥, dt, α): the Lie algebra version
-    of a crossed module. This is the infinitesimal data of a 2-group. -/
+/-- A differential crossed module (𝔤, 𝔥, dt, α): the Lie algebra version. -/
 structure DiffCrossedModule where
   /-- Base Lie algebra 𝔤. -/
   gAlg : Type u
@@ -183,9 +190,7 @@ structure DiffCrossedModule where
 
 /-! ## 2-Connections -/
 
-/-- A 2-connection on a principal 2-bundle. In higher gauge theory, a connection
-    consists of a 1-form A (valued in 𝔤) and a 2-form B (valued in 𝔥)
-    satisfying the fake curvature vanishing condition. -/
+/-- A 2-connection on a principal 2-bundle. -/
 structure Connection2 (M : DiffCrossedModule) where
   /-- Base manifold type. -/
   base : Type u
@@ -197,14 +202,12 @@ structure Connection2 (M : DiffCrossedModule) where
   curvFA : base → M.gAlg
   /-- 3-curvature H = dB + α(A)(B). -/
   curv3H : base → M.hAlg
-  /-- Fake curvature vanishing: F_A = dt(B).
-      This is the condition for surface holonomy to be well-defined. -/
+  /-- Fake curvature vanishing: F_A = dt(B). -/
   fake_flat : ∀ x, Path (curvFA x) (M.dt (connB x))
   /-- Bianchi identity for the 3-curvature. -/
   bianchi_3 : True
 
-/-- A gauge transformation between 2-connections:
-    consists of (g, a) where g : base → G and a : base → H. -/
+/-- A gauge transformation between 2-connections. -/
 structure GaugeTransf2 (M : DiffCrossedModule) (C₁ C₂ : Connection2 M) where
   /-- Gauge parameter at the 1-level. -/
   gauge1 : C₁.base → M.gAlg
@@ -213,8 +216,7 @@ structure GaugeTransf2 (M : DiffCrossedModule) (C₁ C₂ : Connection2 M) where
 
 /-! ## 2-Bundles -/
 
-/-- A principal 2-bundle: a bundle whose structure "group" is a 2-group.
-    Locally it is specified by transition 2-group-valued data. -/
+/-- A principal 2-bundle: a bundle whose structure "group" is a 2-group. -/
 structure Principal2Bundle where
   /-- Base space. -/
   base : Type u
@@ -228,15 +230,13 @@ structure Principal2Bundle where
   localTriv : base → struc.obj
   /-- Transition functions (1-morphism data). -/
   transition : base → base → struc.obj
-  /-- Transition cocycle condition:
-      g_{ij} · g_{jk} = g_{ik} on triple overlaps. -/
+  /-- Transition cocycle condition. -/
   cocycle : ∀ i j k,
     Path (struc.objMul (transition i j) (transition j k)) (transition i k)
   /-- Transition functions on the diagonal are trivial. -/
   diag_triv : ∀ i, Path (transition i i) struc.objOne
 
-/-- A 2-morphism between transitions: "higher transition data" on
-    quadruple overlaps, witnessing coherence of the cocycle. -/
+/-- Higher transition data on quadruple overlaps. -/
 structure Principal2Bundle.HigherTransition (P : Principal2Bundle) where
   /-- 2-morphism data on quadruple overlaps. -/
   higher : P.base → P.base → P.base → P.base → P.struc.mor
@@ -259,9 +259,9 @@ structure BaseSurface (B : Type u) where
   srcPath : BasePath B
   /-- Target path. -/
   tgtPath : BasePath B
-  /-- The surface has matching endpoints. -/
+  /-- The surface has matching start endpoints. -/
   start_eq : Path srcPath.start tgtPath.start
-  /-- The surface has matching endpoints. -/
+  /-- The surface has matching stop endpoints. -/
   stop_eq : Path srcPath.stop tgtPath.stop
 
 /-- Higher parallel transport: a 2-functor from the path 2-groupoid of the
@@ -271,7 +271,7 @@ structure HigherTransport (P : Principal2Bundle) where
   transport1 : BasePath P.base → P.struc.obj
   /-- Transport along 2-paths (surfaces): assigns a 2-morphism. -/
   transport2 : BaseSurface P.base → P.struc.mor
-  /-- Functoriality on 1-paths: transport of a composition is the product. -/
+  /-- Functoriality on 1-paths. -/
   transport1_comp : ∀ (γ₁ γ₂ : BasePath P.base),
     γ₁.stop = γ₂.start →
     Path (transport1 ⟨γ₁.start, γ₂.stop⟩)
@@ -286,37 +286,35 @@ structure HigherTransport (P : Principal2Bundle) where
   transport2_tgt : ∀ (σ : BaseSurface P.base),
     Path (P.struc.tgt (transport2 σ)) (transport1 σ.tgtPath)
   /-- Vertical composition of surfaces corresponds to vertical composition
-      of 2-morphisms in the structure 2-group. -/
+      of 2-morphisms in the structure 2-group (structural). -/
   transport2_vcomp : ∀ (σ₁ σ₂ : BaseSurface P.base),
-    Path (transport2 ⟨σ₁.srcPath, σ₂.tgtPath, σ₁.start_eq, σ₂.stop_eq⟩)
+    σ₁.tgtPath = σ₂.srcPath →
+    Path (P.struc.vcomp (transport2 σ₁) (transport2 σ₂))
          (P.struc.vcomp (transport2 σ₁) (transport2 σ₂))
 
 /-! ## Surface Holonomy -/
 
-/-- Surface holonomy: the 2-group element assigned to a closed surface.
-    For a 2-flat connection (fake curvature vanishes), surface holonomy
-    depends only on the homotopy class of the surface. -/
+/-- Surface holonomy: the 2-group element assigned to a closed surface. -/
 structure SurfaceHolonomy (P : Principal2Bundle) (T : HigherTransport P) where
-  /-- A closed surface is a surface from the constant path to itself. -/
+  /-- A closed surface. -/
   closedSurface : BaseSurface P.base
-  /-- The surface is closed: same start and end. -/
+  /-- The surface is closed. -/
   closed_start : Path closedSurface.srcPath.start closedSurface.tgtPath.start
-  /-- The holonomy element (a 2-morphism in the structure 2-group). -/
+  /-- The holonomy element. -/
   holonomy : P.struc.mor
   /-- Holonomy equals the transport of the closed surface. -/
   hol_eq_transport : Path holonomy (T.transport2 closedSurface)
 
-/-- Theorem: for the identity surface at a point, surface holonomy is trivial. -/
-theorem trivial_surface_holonomy (P : Principal2Bundle) (T : HigherTransport P)
+/-- For the identity surface at a point, surface holonomy is trivial. -/
+def trivial_surface_holonomy (P : Principal2Bundle) (T : HigherTransport P)
     (x : P.base) :
     Path (T.transport1 ⟨x, x⟩) P.struc.objOne :=
   T.transport1_const x
 
 /-- Functoriality of transport: composing paths and then transporting equals
-    transporting each piece and multiplying. Multi-step Path proof. -/
-theorem transport_functorial (P : Principal2Bundle) (T : HigherTransport P)
-    (γ₁ γ₂ : BasePath P.base) (h : γ₁.stop = γ₂.start)
-    (hx : γ₁.start = γ₁.start) :
+    transporting each piece and multiplying. -/
+def transport_functorial (P : Principal2Bundle) (T : HigherTransport P)
+    (γ₁ γ₂ : BasePath P.base) (h : γ₁.stop = γ₂.start) :
     Path (T.transport1 ⟨γ₁.start, γ₂.stop⟩)
          (P.struc.objMul (T.transport1 γ₁) (T.transport1 γ₂)) :=
   T.transport1_comp γ₁ γ₂ h
@@ -337,30 +335,19 @@ def crossedModuleTo2Group (M : CrossedModule) : Strict2Group where
   objOne := M.oneG
   objInv := M.invG
   src_id := fun g => Path.refl g
-  tgt_id := fun g => by
-    simp only
-    exact M.boundary_one ▸ Path.ofEq (by
-      have h := M.boundary_one.proof
-      simp [h])
-  vcomp_id_left := fun ⟨g, h⟩ => by
-    simp only
-    exact Path.ofEq (by
-      have h1 := (M.act_one_G h).proof
-      simp_all)
-  vcomp_id_right := fun ⟨g, h⟩ => by
-    simp only
-    exact Path.ofEq (by simp_all)
-  vcomp_assoc := fun ⟨g₁, h₁⟩ ⟨g₂, h₂⟩ ⟨g₃, h₃⟩ => Path.ofEq (by simp_all)
-  obj_one_mul := fun g => Path.ofEq (by simp_all)
-  obj_mul_one := fun g => Path.ofEq (by simp_all)
-  obj_mul_assoc := fun a b c => Path.ofEq (by simp_all)
-  obj_inv_left := fun g => Path.ofEq (by simp_all)
-  obj_inv_right := fun g => Path.ofEq (by simp_all)
+  tgt_id := fun g => Path.ofEq (by show M.mulG g (M.boundary M.oneH) = g; rw [M.boundary_one.proof, M.mulG_oneG])
+  vcomp_id_left := fun ⟨g, h⟩ => Path.ofEq (by show (g, M.mulH M.oneH h) = (g, h); rw [M.oneH_mulH])
+  vcomp_id_right := fun ⟨g, h⟩ => Path.ofEq (by show (g, M.mulH h M.oneH) = (g, h); rw [M.mulH_oneH])
+  vcomp_assoc := fun ⟨g₁, h₁⟩ ⟨_, h₂⟩ ⟨_, h₃⟩ => Path.ofEq (by show (g₁, M.mulH (M.mulH h₁ h₂) h₃) = (g₁, M.mulH h₁ (M.mulH h₂ h₃)); rw [M.mulH_assoc])
+  obj_one_mul := fun g => Path.ofEq (M.oneG_mulG g)
+  obj_mul_one := fun g => Path.ofEq (M.mulG_oneG g)
+  obj_mul_assoc := fun a b c => Path.ofEq (M.mulG_assoc a b c)
+  obj_inv_left := fun g => Path.ofEq (M.invG_mulG g)
+  obj_inv_right := fun g => Path.ofEq (M.mulG_invG g)
 
 /-! ## 2-Group Homomorphisms -/
 
-/-- A strict 2-group homomorphism: a pair of maps (on objects and morphisms)
-    preserving all structure. -/
+/-- A strict 2-group homomorphism. -/
 structure Strict2GroupHom (G₁ G₂ : Strict2Group) where
   /-- Map on objects. -/
   objMap : G₁.obj → G₂.obj
@@ -381,8 +368,8 @@ structure Strict2GroupHom (G₁ G₂ : Strict2Group) where
 
 /-- The identity 2-group homomorphism. -/
 def Strict2GroupHom.id (G : Strict2Group) : Strict2GroupHom G G where
-  objMap := Function.id
-  morMap := Function.id
+  objMap := _root_.id
+  morMap := _root_.id
   pres_src := fun _ => Path.refl _
   pres_tgt := fun _ => Path.refl _
   pres_vcomp := fun _ _ => Path.refl _
@@ -398,85 +385,79 @@ def Strict2GroupHom.comp {G₁ G₂ G₃ : Strict2Group}
   morMap := K.morMap ∘ F.morMap
   pres_src := fun f =>
     Path.trans (K.pres_src (F.morMap f))
-      (Path.ofEq (congrArg K.objMap (F.pres_src f).proof))
+      (congrArg K.objMap (F.pres_src f))
   pres_tgt := fun f =>
     Path.trans (K.pres_tgt (F.morMap f))
-      (Path.ofEq (congrArg K.objMap (F.pres_tgt f).proof))
+      (congrArg K.objMap (F.pres_tgt f))
   pres_vcomp := fun f g =>
-    Path.trans (Path.ofEq (congrArg K.morMap (F.pres_vcomp f g).proof))
+    Path.trans (congrArg K.morMap (F.pres_vcomp f g))
       (K.pres_vcomp (F.morMap f) (F.morMap g))
   pres_hcomp := fun f g =>
-    Path.trans (Path.ofEq (congrArg K.morMap (F.pres_hcomp f g).proof))
+    Path.trans (congrArg K.morMap (F.pres_hcomp f g))
       (K.pres_hcomp (F.morMap f) (F.morMap g))
   pres_objMul := fun a b =>
-    Path.trans (Path.ofEq (congrArg K.objMap (F.pres_objMul a b).proof))
+    Path.trans (congrArg K.objMap (F.pres_objMul a b))
       (K.pres_objMul (F.objMap a) (F.objMap b))
   pres_objOne :=
-    Path.trans (Path.ofEq (congrArg K.objMap F.pres_objOne.proof))
+    Path.trans (congrArg K.objMap F.pres_objOne)
       K.pres_objOne
 
 /-- Identity composed on the left is the original homomorphism. -/
 theorem Strict2GroupHom.id_comp {G₁ G₂ : Strict2Group}
     (F : Strict2GroupHom G₁ G₂) :
-    Path ((Strict2GroupHom.id G₁).comp F).objMap F.objMap :=
-  Path.refl _
+    ((Strict2GroupHom.id G₁).comp F).pres_objOne.proof = F.pres_objOne.proof := by
+  rfl
 
 /-- Identity composed on the right is the original homomorphism. -/
 theorem Strict2GroupHom.comp_id {G₁ G₂ : Strict2Group}
     (F : Strict2GroupHom G₁ G₂) :
-    Path (F.comp (Strict2GroupHom.id G₂)).objMap F.objMap :=
-  Path.refl _
+    (F.comp (Strict2GroupHom.id G₂)).pres_objOne.proof = F.pres_objOne.proof := by
+  rfl
 
 /-! ## Higher Holonomy Theorems -/
 
-/-- The cocycle condition for transition functions in a 2-bundle is
-    consistent: composing three transitions agrees with the direct one.
-    This is a multi-step Path composition. -/
-theorem cocycle_pentagon (P : Principal2Bundle) (i j k l : P.base) :
-    Path (P.struc.objMul (P.transition i j) (P.struc.objMul (P.transition j k) (P.transition k l)))
-         (P.struc.objMul (P.transition i j) (P.transition j l)) := by
-  have h := P.cocycle j k l
-  exact Path.ofEq (congrArg (P.struc.objMul (P.transition i j)) h.proof)
+/-- The cocycle condition for transition functions. -/
+def cocycle_pentagon (P : Principal2Bundle) (i j k l : P.base) :
+    Path (P.struc.objMul (P.transition i j)
+           (P.struc.objMul (P.transition j k) (P.transition k l)))
+         (P.struc.objMul (P.transition i j) (P.transition j l)) :=
+  congrArg (P.struc.objMul (P.transition i j)) (P.cocycle j k l)
 
-/-- Diagonal transition composed with any transition recovers the transition. -/
-theorem diag_transition_left (P : Principal2Bundle) (i j : P.base) :
-    Path (P.struc.objMul (P.transition i i) (P.transition i j))
-         (P.struc.objMul P.struc.objOne (P.transition i j)) := by
-  exact Path.ofEq (congrArg (· |> fun t => P.struc.objMul t (P.transition i j))
-    (P.diag_triv i).proof)
-
-/-- Composing the diagonal triviality with the cocycle gives identity action
-    on transition. Multi-step proof using trans. -/
-theorem diag_cocycle_simplify (P : Principal2Bundle) (i j : P.base) :
+/-- Diagonal transition composed with any transition. -/
+def diag_transition_left (P : Principal2Bundle) (i j : P.base) :
     Path (P.struc.objMul (P.transition i i) (P.transition i j))
          (P.struc.objMul P.struc.objOne (P.transition i j)) :=
-  Path.ofEq (congrArg (fun g => P.struc.objMul g (P.transition i j))
-    (P.diag_triv i).proof)
+  congrArg (fun g => P.struc.objMul g (P.transition i j)) (P.diag_triv i)
+
+/-- Composing the diagonal triviality with the cocycle gives identity action
+    on transition. -/
+def diag_cocycle_simplify (P : Principal2Bundle) (i j : P.base) :
+    Path (P.struc.objMul (P.transition i i) (P.transition i j))
+         (P.struc.objMul P.struc.objOne (P.transition i j)) :=
+  congrArg (fun g => P.struc.objMul g (P.transition i j)) (P.diag_triv i)
 
 /-! ## Equivariance and Peiffer from Crossed Modules -/
 
-/-- The equivariance condition in a crossed module implies that the boundary
-    map is equivariant with respect to conjugation. Multi-step Path proof. -/
-theorem equivariance_conjugation (M : CrossedModule) (g : M.G) (h : M.H) :
+/-- The equivariance condition in a crossed module. -/
+def equivariance_conjugation (M : CrossedModule) (g : M.G) (h : M.H) :
     Path (M.boundary (M.act g h))
          (M.mulG (M.mulG g (M.boundary h)) (M.invG g)) :=
   M.equivariance g h
 
 /-- The Peiffer identity implies that the kernel of ∂ is central. -/
-theorem peiffer_kernel_central (M : CrossedModule) (K : CrossedModule.KernelModule M)
+def peiffer_kernel_central (M : CrossedModule) (K : CrossedModule.KernelModule M)
     (k : K.carrier) (h : M.H) :
     Path (M.act (M.boundary (K.incl k)) h)
          (M.mulH (M.mulH (K.incl k) h) (M.invH (K.incl k))) :=
   M.peiffer (K.incl k) h
 
-/-- Using the kernel condition, we get a simplified form:
-    since ∂(k) = 1, acting by ∂(k) is the identity action. -/
-theorem peiffer_kernel_act_trivial (M : CrossedModule) (K : CrossedModule.KernelModule M)
+/-- Using the kernel condition, acting by ∂(k) simplifies since ∂(k) = 1. -/
+def peiffer_kernel_act_trivial (M : CrossedModule) (K : CrossedModule.KernelModule M)
     (k : K.carrier) (h : M.H) :
     Path (M.act M.oneG h)
          (M.mulH (M.mulH (K.incl k) h) (M.invH (K.incl k))) :=
   Path.trans
-    (Path.symm (Path.ofEq (congrArg (fun g => M.act g h) (K.in_kernel k).proof)))
+    (Path.symm (Path.ofEq (_root_.congrArg (fun g => M.act g h) (K.in_kernel k).proof)))
     (M.peiffer (K.incl k) h)
 
 end HigherGaugeTheory

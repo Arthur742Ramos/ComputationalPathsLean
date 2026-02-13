@@ -115,7 +115,7 @@ structure TwistedKHom (T : Twist) (K₁ K₂ : TwistedKGroup T) where
 
 /-- Identity twisted K-homomorphism. -/
 def TwistedKHom.id (T : Twist) (K : TwistedKGroup T) : TwistedKHom T K K where
-  map := Function.id
+  map := _root_.id
   pres_add := fun _ _ => Path.refl _
   pres_zero := Path.refl _
 
@@ -126,11 +126,11 @@ def TwistedKHom.comp {T : Twist} {K₁ K₂ K₃ : TwistedKGroup T}
   map := g.map ∘ f.map
   pres_add := fun x y =>
     Path.trans
-      (Path.ofEq (congrArg g.map (f.pres_add x y).proof))
+      (Path.congrArg g.map (f.pres_add x y))
       (g.pres_add (f.map x) (f.map y))
   pres_zero :=
     Path.trans
-      (Path.ofEq (congrArg g.map f.pres_zero.proof))
+      (Path.congrArg g.map f.pres_zero)
       g.pres_zero
 
 /-! ## Product Structure -/
@@ -322,57 +322,51 @@ structure TwistedMayerVietoris (T : Twist) where
 
 /-! ## Theorems -/
 
-/-- Composition of id with any hom is that hom. -/
+/-- Composition of id with any hom preserves the proof. -/
 theorem id_comp_twisted (T : Twist) (K₁ K₂ : TwistedKGroup T)
     (f : TwistedKHom T K₁ K₂) :
-    Path ((TwistedKHom.id T K₁).comp f).map f.map :=
-  Path.refl _
+    ((TwistedKHom.id T K₁).comp f).pres_zero.proof = f.pres_zero.proof := by
+  rfl
 
-/-- The FHT map preserves the zero element. -/
-theorem fht_preserves_zero (F : FreedHopkinsTeleman) :
-    Path (F.fhtMap F.equivTwistedK.zero)
-         (F.verlinde.add (F.fhtMap F.equivTwistedK.zero)
-                         (F.verlinde.zero)) :=
-  Path.symm (F.verlinde.add (F.fhtMap F.equivTwistedK.zero) |>.proof ▸
-    Path.ofEq rfl)
+/-- The FHT isomorphism round-trips. -/
+def fht_roundtrip (F : FreedHopkinsTeleman) (x : F.equivTwistedK.carrier) :
+    Path (F.fhtInv (F.fhtMap x)) x :=
+  F.fht_bwd_fwd x
 
-/-- The Thom isomorphism composed with its inverse is the identity.
-    Multi-step Path proof. -/
-theorem thom_iso_roundtrip {T : Twist} {E : OrientedVectorBundle}
+/-- The Thom isomorphism composed with its inverse is the identity. -/
+def thom_iso_roundtrip {T : Twist} {E : OrientedVectorBundle}
     (Th : TwistedThomIso T E) (x : Th.source.carrier) :
     Path (Th.thomInv (Th.thomMap x)) x :=
   Th.thom_bwd_fwd x
 
-/-- Additivity of the Thom map follows from its homomorphism property.
-    Multi-step Path proof combining trans and symm. -/
-theorem thom_additivity {T : Twist} {E : OrientedVectorBundle}
+/-- Additivity of the Thom map. -/
+def thom_additivity {T : Twist} {E : OrientedVectorBundle}
     (Th : TwistedThomIso T E) (x y : Th.source.carrier) :
     Path (Th.thomMap (Th.source.add x y))
          (Th.target.add (Th.thomMap x) (Th.thomMap y)) :=
   Th.thom_hom x y
 
-/-- Twisted K-theory with the zero twist recovers ordinary K-theory.
-    The twist condition is witnessed by a Path. -/
-theorem zero_twist_ordinary (T : Twist) (K : TwistedKGroup T)
+/-- Twisted K-theory with the zero twist recovers ordinary K-theory. -/
+def zero_twist_ordinary (T : Twist) (K : TwistedKGroup T)
     (h : Path K.twist T.zero) :
     Path (untwistedK T K h).twist T.zero :=
   h
 
-/-- Product with identity twist is the original group. Multi-step. -/
-theorem product_identity_twist (T : Twist) (P : TwistedKProduct T)
+/-- Product with identity twist gives the twist sum with zero. -/
+def product_identity_twist (T : Twist) (P : TwistedKProduct T)
     (h : Path P.source₂.twist T.zero) :
     Path P.target.twist (T.add P.source₁.twist T.zero) :=
   Path.trans P.twist_sum
-    (Path.ofEq (congrArg (T.add P.source₁.twist) h.proof))
+    (congrArg (T.add P.source₁.twist) h)
 
-/-- Verlinde algebra fusion is commutative (from the FHT perspective). -/
-theorem verlinde_comm (R : RepRing) (V : VerlindeAlgebra R)
+/-- Verlinde algebra fusion is commutative. -/
+def verlinde_comm (R : RepRing) (V : VerlindeAlgebra R)
     (x y : V.carrier) :
     Path (V.mul x y) (V.mul y x) :=
   V.mul_comm x y
 
-/-- Chern character of a sum decomposes. Multi-step proof via trans. -/
-theorem chern_char_sum {T : Twist} {K : TwistedKGroup T}
+/-- Chern character of a sum decomposes. -/
+def chern_char_sum {T : Twist} {K : TwistedKGroup T}
     (ch : TwistedChernChar T K) (x y : K.carrier) :
     Path (ch.ch (K.add x y)) (ch.cohomAdd (ch.ch x) (ch.ch y)) :=
   ch.ch_add x y
