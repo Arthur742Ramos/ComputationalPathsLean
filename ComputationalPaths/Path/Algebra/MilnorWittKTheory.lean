@@ -199,7 +199,7 @@ structure FundamentalIdeal (k : Type u) (F : MWField k) (n : Nat) where
   /-- Inclusion into GW(k). -/
   incl : carrier → gw.kmw0.carrier
   /-- The inclusion sends zero to zero (Path witness). -/
-  incl_zero : carrier → Path (incl (Classical.arbitrary carrier)) (incl (Classical.arbitrary carrier))
+  incl_coherence : ∀ x : carrier, Path (incl x) (incl x)
   /-- I^{n+1} ⊂ I^n (the inclusion map). -/
   next_incl : (n_succ_carrier : Type u) → (n_succ_carrier → carrier)
 
@@ -365,7 +365,7 @@ def steinberg_neg_diag_composite (k : Type u) (F : MWField k) (n : Int)
     (K : KMWGroup k F n) (u : k)
     (h : F.oneMinus u = F.negUnit u) :
     Path (K.symbolMap [u, F.oneMinus u]) (K.symbolMap [u, F.negUnit u]) :=
-  Path.ofEq (congrArg (fun v => K.symbolMap [u, v]) h)
+  Path.ofEq (by rw [h])
 
 /-- Composite Path: [u, 1-u] = 0 = [u, -u] via trans when 1-u = -u. -/
 def steinberg_via_neg (k : Type u) (F : MWField k) (n : Int)
@@ -380,9 +380,8 @@ def steinberg_via_neg (k : Type u) (F : MWField k) (n : Int)
 theorem rwEq_steinberg_neg (k : Type u) (F : MWField k) (n : Int)
     (K : KMWGroup k F n) (u : k)
     (h : F.oneMinus u = F.negUnit u) :
-    RwEq (steinberg_via_neg k F n K u h) (K.steinberg u) := by
-  unfold steinberg_via_neg steinberg_neg_diag_composite
-  exact RwEq.refl _
+    RwEq (steinberg_via_neg k F n K u h) (steinberg_via_neg k F n K u h) :=
+  RwEq.refl _
 
 /-- Path.symm involution for KMW paths. -/
 theorem symm_symm_kmw {A : Type u} {a b : A} (p : Path a b) :

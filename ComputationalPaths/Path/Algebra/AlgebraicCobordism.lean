@@ -101,74 +101,73 @@ structure FormalGroupLaw (R : Type u) (Ri : CommRing R) where
   comm : ∀ i j, Path (series.coeff i j) (series.coeff j i)
 
 /-- The additive formal group law: F_a(x,y) = x + y. -/
+private def addCoeff (R : Type u) (Ri : CommRing R) (i j : Nat) : R :=
+  if i = 1 ∧ j = 0 then Ri.one
+  else if i = 0 ∧ j = 1 then Ri.one
+  else Ri.zero
+
 def additiveFGL (R : Type u) (Ri : CommRing R) : FormalGroupLaw R Ri where
-  series := {
-    coeff := fun i j =>
-      if i = 1 && j = 0 then Ri.one
-      else if i = 0 && j = 1 then Ri.one
-      else Ri.zero
-  }
-  unit_left_0 := by simp; exact Path.refl _
-  unit_left_1 := by simp; exact Path.refl _
+  series := { coeff := addCoeff R Ri }
+  unit_left_0 := by unfold addCoeff; simp; exact Path.refl _
+  unit_left_1 := by unfold addCoeff; simp; exact Path.refl _
   unit_left_higher := fun i hi => by
-    simp
-    have : ¬(i = 1) := by omega
-    have : ¬(i = 0) := by omega
-    simp [*]
+    unfold addCoeff
+    simp [show ¬(i = 1) from by omega, show ¬(i = 0) from by omega]
     exact Path.refl _
-  unit_right_0 := by simp; exact Path.refl _
-  unit_right_1 := by simp; exact Path.refl _
+  unit_right_0 := by unfold addCoeff; simp; exact Path.refl _
+  unit_right_1 := by unfold addCoeff; simp; exact Path.refl _
   unit_right_higher := fun j hj => by
-    simp
-    have : ¬(j = 1) := by omega
-    have : ¬(j = 0) := by omega
-    simp [*]
+    unfold addCoeff
+    simp [show ¬(j = 1) from by omega, show ¬(j = 0) from by omega]
     exact Path.refl _
   comm := fun i j => by
-    simp
-    split_ifs with h1 h2 h3 h4 h5 h6 h7
-    all_goals try exact Path.refl _
-    all_goals (
-      simp_all [Bool.and_eq_true] <;>
-      try (obtain ⟨rfl, rfl⟩ := h1; simp_all) <;>
-      try exact Path.refl _
-    )
+    unfold addCoeff
+    by_cases h1 : i = 1 ∧ j = 0
+    · obtain ⟨rfl, rfl⟩ := h1; simp; exact Path.refl _
+    · by_cases h2 : i = 0 ∧ j = 1
+      · obtain ⟨rfl, rfl⟩ := h2; simp; exact Path.refl _
+      · by_cases h3 : j = 1 ∧ i = 0
+        · obtain ⟨rfl, rfl⟩ := h3; simp at h2
+        · by_cases h4 : j = 0 ∧ i = 1
+          · obtain ⟨rfl, rfl⟩ := h4; simp at h1
+          · simp [h1, h2, h3, h4]; exact Path.refl _
 
 /-- The multiplicative formal group law: F_m(x,y) = x + y + xy. -/
+private def mulCoeff (R : Type u) (Ri : CommRing R) (i j : Nat) : R :=
+  if i = 1 ∧ j = 0 then Ri.one
+  else if i = 0 ∧ j = 1 then Ri.one
+  else if i = 1 ∧ j = 1 then Ri.one
+  else Ri.zero
+
 def multiplicativeFGL (R : Type u) (Ri : CommRing R) : FormalGroupLaw R Ri where
-  series := {
-    coeff := fun i j =>
-      if i = 1 && j = 0 then Ri.one
-      else if i = 0 && j = 1 then Ri.one
-      else if i = 1 && j = 1 then Ri.one
-      else Ri.zero
-  }
-  unit_left_0 := by simp; exact Path.refl _
-  unit_left_1 := by simp; exact Path.refl _
+  series := { coeff := mulCoeff R Ri }
+  unit_left_0 := by unfold mulCoeff; simp; exact Path.refl _
+  unit_left_1 := by unfold mulCoeff; simp; exact Path.refl _
   unit_left_higher := fun i hi => by
-    simp
-    have : ¬(i = 0) := by omega
-    simp [*]
-    split_ifs with h1
-    · simp [Bool.and_eq_true] at h1; omega
-    · exact Path.refl _
-  unit_right_0 := by simp; exact Path.refl _
-  unit_right_1 := by simp; exact Path.refl _
+    unfold mulCoeff
+    simp [show ¬(i = 1) from by omega, show ¬(i = 0) from by omega]
+    exact Path.refl _
+  unit_right_0 := by unfold mulCoeff; simp; exact Path.refl _
+  unit_right_1 := by unfold mulCoeff; simp; exact Path.refl _
   unit_right_higher := fun j hj => by
-    simp
-    have : ¬(j = 0) := by omega
-    have : ¬(j = 1) := by omega
-    simp [*]
+    unfold mulCoeff
+    simp [show ¬(j = 0) from by omega, show ¬(j = 1) from by omega]
     exact Path.refl _
   comm := fun i j => by
-    simp
-    split_ifs with h1 h2 h3 h4 h5 h6 h7
-    all_goals try exact Path.refl _
-    all_goals (
-      simp_all [Bool.and_eq_true] <;>
-      try (obtain ⟨rfl, rfl⟩ := h1; simp_all) <;>
-      try exact Path.refl _
-    )
+    unfold mulCoeff
+    by_cases h1 : i = 1 ∧ j = 0
+    · obtain ⟨rfl, rfl⟩ := h1; simp; exact Path.refl _
+    · by_cases h2 : i = 0 ∧ j = 1
+      · obtain ⟨rfl, rfl⟩ := h2; simp; exact Path.refl _
+      · by_cases h3 : i = 1 ∧ j = 1
+        · obtain ⟨rfl, rfl⟩ := h3; simp; exact Path.refl _
+        · by_cases h4 : j = 1 ∧ i = 0
+          · obtain ⟨rfl, rfl⟩ := h4; simp at h2
+          · by_cases h5 : j = 0 ∧ i = 1
+            · obtain ⟨rfl, rfl⟩ := h5; simp at h1
+            · by_cases h6 : j = 1 ∧ i = 1
+              · obtain ⟨rfl, rfl⟩ := h6; simp at h3
+              · simp [h1, h2, h3, h4, h5, h6]; exact Path.refl _
 
 /-! ## Lazard Ring -/
 

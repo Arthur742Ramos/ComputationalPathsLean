@@ -119,14 +119,12 @@ def Bidegree.add (d₁ d₂ : Bidegree) : Bidegree :=
 
 /-- Bidegree addition is commutative. -/
 theorem Bidegree.add_comm (d₁ d₂ : Bidegree) : d₁.add d₂ = d₂.add d₁ := by
-  simp [Bidegree.add]
-  constructor <;> omega
+  simp [Bidegree.add]; constructor <;> omega
 
 /-- Bidegree addition is associative. -/
 theorem Bidegree.add_assoc (d₁ d₂ d₃ : Bidegree) :
     (d₁.add d₂).add d₃ = d₁.add (d₂.add d₃) := by
-  simp [Bidegree.add]
-  constructor <;> omega
+  simp [Bidegree.add]; constructor <;> omega
 
 /-- Path witnessing commutativity of bidegree addition. -/
 def bidegree_add_comm_path (d₁ d₂ : Bidegree) :
@@ -289,7 +287,6 @@ structure TateTwist (X : PtScheme.{u}) where
 theorem suspension_shift (p q : Int) :
     (motivicSphere (p + 1) q).degree = (motivicSphere p q).degree.add simplicialCircleDeg := by
   simp [motivicSphere, Bidegree.add, simplicialCircleDeg]
-  constructor <;> omega
 
 /-- Path witnessing the suspension degree shift. -/
 def suspension_shift_path (p q : Int) :
@@ -302,7 +299,6 @@ theorem tate_twist_shift (p q : Int) :
     (motivicSphere (p + 1) (q + 1)).degree =
       (motivicSphere p q).degree.add algebraicCircleDeg := by
   simp [motivicSphere, Bidegree.add, algebraicCircleDeg]
-  constructor <;> omega
 
 /-- Path witnessing the Tate twist degree shift. -/
 def tate_twist_path (p q : Int) :
@@ -427,16 +423,14 @@ theorem rwEq_bidegree_comm (d₁ d₂ : Bidegree) :
 /-- Multi-step Path: suspension ∘ Tate twist computes correctly. -/
 def suspension_tate_composite_path (p q : Int) :
     Path (motivicSphere (p + 2) (q + 1)).degree
-         ((motivicSphere p q).degree.add (simplicialCircleDeg.add algebraicCircleDeg)) := by
-  simp [motivicSphere, Bidegree.add, simplicialCircleDeg, algebraicCircleDeg]
-  constructor <;> omega
+         ((motivicSphere p q).degree.add (simplicialCircleDeg.add algebraicCircleDeg)) :=
+  Path.ofEq (by simp [motivicSphere, Bidegree.add, simplicialCircleDeg, algebraicCircleDeg])
 
 /-- Composite Path: double suspension adds (2, 0) to bidegree. -/
 def double_suspension_path (p q : Int) :
     Path (motivicSphere (p + 2) q).degree
-         ((motivicSphere p q).degree.add ⟨2, 0⟩) := by
-  simp [motivicSphere, Bidegree.add]
-  constructor <;> omega
+         ((motivicSphere p q).degree.add ⟨2, 0⟩) :=
+  Path.ofEq (by show Bidegree.mk (p + 2) q = Bidegree.mk (p + 2) (q + 0); congr 1; omega)
 
 /-- RwEq: smash product commutativity for motivic spheres. -/
 theorem rwEq_smash_comm (S₁ S₂ : MotivicSphere.{u}) :
@@ -450,9 +444,8 @@ theorem rwEq_smash_comm (S₁ S₂ : MotivicSphere.{u}) :
 /-- Multi-step Path: smash associativity via trans composition. -/
 def smash_assoc_trans_path (S₁ S₂ S₃ : MotivicSphere.{u}) :
     Path ((smashSphere (smashSphere S₁ S₂) S₃).degree)
-         ((smashSphere S₁ (smashSphere S₂ S₃)).degree) := by
-  simp [smashSphere, Bidegree.add]
-  constructor <;> omega
+         ((smashSphere S₁ (smashSphere S₂ S₃)).degree) :=
+  Path.ofEq (by simp [smashSphere, Bidegree.add]; constructor <;> omega)
 
 /-- The smash associativity coherence as a composed Path. -/
 def smash_assoc_coherence (S₁ S₂ S₃ : MotivicSphere.{u}) :
@@ -460,7 +453,7 @@ def smash_assoc_coherence (S₁ S₂ S₃ : MotivicSphere.{u}) :
          (S₁.degree.add (S₂.degree.add S₃.degree)) :=
   Path.trans
     (smash_assoc_trans_path S₁ S₂ S₃)
-    (Path.ofEq (by simp [smashSphere, Bidegree.add]; constructor <;> omega))
+    (Path.ofEq (by simp [smashSphere, Bidegree.add]))
 
 /-- RwEq for smash associativity coherence. -/
 theorem rwEq_smash_assoc (S₁ S₂ S₃ : MotivicSphere.{u}) :

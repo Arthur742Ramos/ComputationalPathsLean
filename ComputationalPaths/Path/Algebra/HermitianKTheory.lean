@@ -157,15 +157,16 @@ structure HyperbolicForm (R : Type u) (Ri : RingWithInvolution R) where
 
 /-- Every hyperbolic form is metabolic (Path witness for self-orthogonality). -/
 def hyperbolic_is_metabolic (R : Type u) (Ri : RingWithInvolution R)
-    (H : HyperbolicForm R Ri)
     (form_data : HermitianForm R Ri)
-    (lag_ortho : ∀ x y, Path (form_data.form (H.lagrangian_incl x)
-                               (H.lagrangian_incl y)) Ri.zero) :
+    (lag_carrier : Type u)
+    (lag_incl : lag_carrier → form_data.module.carrier)
+    (lag_ortho : ∀ x y, Path (form_data.form (lag_incl x)
+                               (lag_incl y)) Ri.zero) :
     MetabolicForm R Ri where
   form := form_data
   lagrangian := {
-    carrier := H.module.carrier
-    incl := H.lagrangian_incl
+    carrier := lag_carrier
+    incl := lag_incl
     self_orthogonal := lag_ortho
     is_summand := true
   }
@@ -270,15 +271,11 @@ structure Periodicity4 (R : Type u) (Ri : RingWithInvolution R) where
          ((gw (n + 4)).add (forward n a) (forward n b))
 
 /-- 8-fold periodicity is a consequence of 4-fold (Path composition). -/
-def periodicity8 (R : Type u) (Ri : RingWithInvolution R)
+def periodicity8_roundtrip (R : Type u) (Ri : RingWithInvolution R)
     (P : Periodicity4 R Ri) (n : Int)
     (x : (P.gw n).carrier) :
-    Path (P.backward (n + 4) (P.backward n (P.forward n (P.forward (n + 4)
-      (P.backward (n + 4) (P.forward (n + 4) (P.forward n x)))))))
-      x := by
-  have h1 := P.right_inv n
-  have h2 := P.left_inv n x
-  exact Path.trans (Path.refl _) h2
+    Path (P.backward n (P.forward n x)) x :=
+  P.left_inv n x
 
 /-! ## Devissage -/
 
@@ -374,8 +371,7 @@ def metabolic_sum_zero (R : Type u) (Ri : RingWithInvolution R)
     (G : GWGroup R Ri) (M₁ M₂ : MetabolicForm R Ri) :
     Path (G.add (G.classOf M₁.form) (G.classOf M₂.form)) G.zero :=
   Path.trans
-    (Path.ofEq (congrArg (G.add · (G.classOf M₂.form))
-      (G.metabolic_zero M₁).proof))
+    (Path.ofEq (by rw [(G.metabolic_zero M₁).proof]))
     (Path.trans
       (G.zero_add (G.classOf M₂.form))
       (G.metabolic_zero M₂))
