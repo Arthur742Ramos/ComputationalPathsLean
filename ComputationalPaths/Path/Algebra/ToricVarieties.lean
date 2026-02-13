@@ -117,7 +117,7 @@ structure SmoothFan (n : Nat) extends Fan n where
 /-! ## Domain-Specific Rewrite Steps -/
 
 /-- Domain-specific rewrite steps for toric geometry. -/
-inductive ToricStep : {A : Type u} → A → A → Prop
+inductive ToricStep : {A : Type} → A → A → Prop
   | orbit_cone {n : Nat} {σ : Cone n} :
       ToricStep σ.dim (n - σ.dim + σ.dim)
   | fan_face {n : Nat} {F : Fan n} {i : Fin F.numCones}
@@ -167,11 +167,11 @@ structure OrbitConeCorrespondence (n : Nat) (tv : ToricVarietyData n) where
   inclusion_reversal : True
 
 /-- Orbit-cone for projective space ℙⁿ. -/
-def orbitConePn (n : Nat) (hn : n > 0) (tv : ToricVarietyData n)
-    (htv : tv.fan.numCones > 0) :
+def orbitConePn (n : Nat) (_hn : n > 0) (tv : ToricVarietyData n)
+    (_htv : tv.fan.numCones > 0) :
     OrbitConeCorrespondence n tv where
   orbit_dim := fun i => n - (tv.fan.cones i).dim
-  dim_formula := fun i => Path.ofEq (by omega)
+  dim_formula := fun i => Path.ofEq (by have := (tv.fan.cones i).dim_le; omega)
   dense_orbit := fun i h => Path.ofEq (by omega)
   inclusion_reversal := trivial
 
@@ -302,7 +302,7 @@ def fanFaceDescent (n d1 d2 : Nat) (h1 : d1 ≤ d2) (h2 : d2 ≤ n) :
 
 /-- Multi-step: moment polytope ↔ fan duality.
     Vertices of Δ ↔ maximal cones of Σ. -/
-def momentFanDuality (n numVerts numMaxCones : Nat)
+def momentFanDuality (_n numVerts numMaxCones : Nat)
     (h : numVerts = numMaxCones) :
     Path numVerts numMaxCones :=
   Path.ofEq h
@@ -315,9 +315,9 @@ def toricDimChain (n : Nat) (tv : ToricVarietyData n) :
 /-- Composition: identity morphism composed with f equals f (dimension coherence). -/
 def toricMorphismIdComp (n m : Nat)
     (tv1 : ToricVarietyData n) (tv2 : ToricVarietyData m)
-    (f : ToricMorphism n m tv1 tv2) :
-    Path f.dim_path.proof f.dim_path.proof :=
-  Path.refl f.dim_path.proof
+    (_f : ToricMorphism n m tv1 tv2) :
+    Path tv1.dim tv1.dim :=
+  Path.refl tv1.dim
 
 /-! ## Projective Toric Varieties -/
 

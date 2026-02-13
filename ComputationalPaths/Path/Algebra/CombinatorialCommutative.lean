@@ -86,7 +86,7 @@ structure PureComplex (n : Nat) extends SimplicialComplex n where
 /-! ## Domain-Specific Rewrite Steps -/
 
 /-- Domain-specific rewrite steps for combinatorial commutative algebra. -/
-inductive CombCommStep : {A : Type u} → A → A → Prop
+inductive CombCommStep : {A : Type} → A → A → Prop
   | euler_char {n : Nat} {Δ : SimplicialComplex n}
       {fv : ComplexFVector n Δ} :
       CombCommStep fv.totalFaces fv.totalFaces
@@ -128,7 +128,7 @@ structure FaceRing (n : Nat) (Δ : SimplicialComplex n) where
   dim_path : Path krullDim (Δ.dim + 1)
 
 /-- Face ring of a simplex is a polynomial ring (no relations). -/
-def faceRingSimplex (n : Nat) (Δ : SimplicialComplex n) (hpure : Δ.dim = n - 1) :
+def faceRingSimplex (n : Nat) (Δ : SimplicialComplex n) (hpure : Δ.dim = n - 1) (hn : n > 0) :
     FaceRing n Δ where
   ideal := {
     numGenerators := 0
@@ -316,7 +316,7 @@ structure AlexanderDual (n : Nat) (Δ : SimplicialComplex n) where
 structure AlexanderDualityTheorem (n : Nat) (Δ : SimplicialComplex n) where
   dual : AlexanderDual n Δ
   /-- H̃_i(Δ) ≅ H̃^{n-i-3}(Δ∨): encoded as dimension equality. -/
-  betti_relation : ∀ (i : Nat) (hi : i ≤ Δ.dim),
+  betti_relation : ∀ (i : Nat) (_hi : i ≤ Δ.dim),
     Path i i
 
 /-! ## Multi-step Constructions -/

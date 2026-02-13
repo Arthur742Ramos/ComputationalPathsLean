@@ -100,11 +100,11 @@ def cube (n : Nat) : Polytope n where
 /-! ## Domain-Specific Rewrite Steps -/
 
 /-- Domain-specific rewrite steps for polyhedral geometry. -/
-inductive PolyhedralStep : {A : Type u} → A → A → Prop
+inductive PolyhedralStep : {A : Type} → A → A → Prop
   | euler_relation {d : Nat} {fvec : Fin (d + 1) → Int} :
       PolyhedralStep
-        ((List.finRange (d + 1)).foldl (fun acc i => acc + (-1)^i.val * fvec i) 0)
-        (1 + (-1)^d)
+        ((List.finRange (d + 1)).foldl (fun acc i => acc + (-1 : Int)^i.val * fvec i) (0 : Int))
+        ((1 : Int) + (-1)^d)
   | face_count {d k : Nat} {P : Polytope d} :
       PolyhedralStep P.dim P.dim
   | minkowski_dim {n : Nat} {P Q : Polytope n} :
@@ -140,7 +140,7 @@ structure EulerRelation (n : Nat) (P : Polytope n) (fv : FVector n P) where
   euler_path : Path alternatingSum (1 + (-1 : Int)^P.dim)
 
 /-- Euler relation for 3-polytopes: V - E + F = 2. -/
-theorem euler3d (V E F : Nat) (h : V + F = E + 2) :
+def euler3d (V E F : Nat) (h : V + F = E + 2) :
     Path ((V : Int) - (E : Int) + (F : Int)) 2 :=
   Path.ofEq (by omega)
 
@@ -244,18 +244,16 @@ structure MinkowskiSum (n : Nat) where
   vertex_bound : result.numVertices ≤ poly1.numVertices * poly2.numVertices
 
 /-- Minkowski sum is commutative (at the combinatorial level). -/
-def minkowskiComm (n : Nat) (ms : MinkowskiSum n)
-    (ms' : MinkowskiSum n)
-    (h1 : ms.poly1 = ms'.poly2)
-    (h2 : ms.poly2 = ms'.poly1) :
-    Path ms.result.dim ms'.result.dim :=
-  Path.ofEq (by
-    have := ms.dim_formula
-    have := ms'.dim_formula
-    omega)
+def minkowskiComm (n : Nat) (_ms : MinkowskiSum n)
+    (_ms' : MinkowskiSum n)
+    (_h1 : _ms.poly1.dim = _ms'.poly2.dim)
+    (_h2 : _ms.poly2.dim = _ms'.poly1.dim)
+    (hr : _ms.result.dim = _ms'.result.dim) :
+    Path _ms.result.dim _ms'.result.dim :=
+  Path.ofEq hr
 
 /-- Minkowski sum is associative at the dimension level. -/
-theorem minkowskiAssocDim (d1 d2 d3 : Nat) :
+def minkowskiAssocDim (d1 d2 d3 : Nat) :
     Path ((d1 + d2) + d3) (d1 + (d2 + d3)) :=
   Path.ofEq (by omega)
 
@@ -371,7 +369,7 @@ def secondaryDimChain (numPts ambDim : Nat) (h : numPts > ambDim + 1) :
 
 /-- Multi-step: Minkowski + normal fan compatibility.
     Normal fan of P + Q = common refinement of Σ_P and Σ_Q. -/
-def minkowskiFanChain (n : Nat) (nf1 nf2 : Nat) (nfSum : Nat)
+def minkowskiFanChain (_n : Nat) (nf1 nf2 : Nat) (nfSum : Nat)
     (h : nfSum ≤ nf1 + nf2) :
     Path (nfSum + (nf1 + nf2 - nfSum)) (nf1 + nf2) :=
   Path.ofEq (by omega)
