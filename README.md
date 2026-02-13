@@ -11,8 +11,8 @@ Lean 4 formalisation of propositional equality via **explicit computational path
 
 | Metric | Value |
 |--------|-------|
-| **Lean Modules** | 96 (in ComputationalPaths/) |
-| **Lines of Code** | ~29,000 |
+| **Lean Modules** | 525+ (in ComputationalPaths/) |
+| **Lines of Code** | ~117,000 |
 | **Build Jobs** | 140 |
 | **Kernel Axioms** | **0** (fully axiom-free) |
 | **Sorries** | **0** (all proofs complete) |

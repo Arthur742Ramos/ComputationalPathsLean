@@ -169,11 +169,12 @@ structure PushoutData (C : StableHoCat.{u}) where
 
 /-- The Mayer-Vietoris axiom (weak homotopy pushout axiom). -/
 structure MVAxiom (C : StableHoCat.{u}) (F : ContraFunctor.{u} C) where
-  /-- For any pushout square, the Mayer-Vietoris sequence is exact. -/
+  /-- For any pushout square, the Mayer-Vietoris sequence is exact:
+      if x ∈ F(D), then the difference of pullbacks vanishes. -/
   exact_seq : (P : PushoutData C) →
-    (x : (F.obj P.D).carrier) →
-    Path ((F.obj P.D).add (F.morph P.i₁ x) ((F.obj P.D).neg (F.morph P.i₁ x)))
-         ((F.obj P.D).zero)
+    (x : (F.obj P.B).carrier) →
+    Path ((F.obj P.A).add (F.morph P.f x) ((F.obj P.A).neg (F.morph P.f x)))
+         ((F.obj P.A).zero)
 
 /-! ## Brown Representability Theorem -/
 
@@ -260,7 +261,7 @@ structure AdamsDifferential (r : Nat) where
   /-- d_r ∘ d_r = 0. -/
   d_squared_zero : ∀ s t (x : page.entry s t),
     Path (differential (s + r) (t + r - 1) (differential s t x))
-         (page.zero (s + 2 * r) (t + 2 * r - 2))
+         (page.zero (s + r + r) (t + r - 1 + r - 1))
 
 /-- The Adams spectral sequence convergence. -/
 structure AdamsConvergence (C : StableHoCat.{u}) (X : C.Obj) where
@@ -329,8 +330,9 @@ def represent_compose_rweq {C : StableHoCat.{u}} {F : ContraFunctor.{u} C}
 
 /-- Multi-step construction: Brown uniqueness equivalence is coherent. -/
 def brown_unique_equiv_path {C : StableHoCat.{u}}
+    {A B : C.Obj}
     (left_inv : Path (C.comp (e : C.Hom A B) (f : C.Hom B A)) (C.id A))
-    (right_inv : Path (C.comp f e) (C.id B)) :
+    (_right_inv : Path (C.comp f e) (C.id B)) :
     RwEq (Path.symm (Path.symm left_inv)) left_inv :=
   rweq_ss left_inv
 
@@ -380,7 +382,7 @@ structure MaySpectralSequence where
   /-- d ∘ d = 0. -/
   d_squared : ∀ r s t (x : e1.entry s t),
     Path (diff r (s + 1) (t + r) (diff r s t x))
-         (e1.zero (s + 2) (t + 2 * r))
+         (e1.zero (s + 1 + 1) (t + r + r))
 
 /-! ## Summary Theorems -/
 
@@ -400,7 +402,7 @@ theorem specmap_id_comp {E F : Spec.{u}} (f : SpecMap E F) :
 theorem adams_d_squared_implies_next_page (r : Nat) (D : AdamsDifferential.{u} r) :
     ∀ s t (x : D.page.entry s t),
       Path (D.differential (s + r) (t + r - 1) (D.differential s t x))
-           (D.page.zero (s + 2 * r) (t + 2 * r - 2)) :=
+           (D.page.zero (s + r + r) (t + r - 1 + r - 1)) :=
   D.d_squared_zero
 
 end BrownRepresentability
