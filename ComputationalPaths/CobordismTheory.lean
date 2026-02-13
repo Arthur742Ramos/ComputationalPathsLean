@@ -62,6 +62,15 @@ namespace CobordismTheory
 
 universe u v w
 
+private def stepChainOfEq {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  let core :=
+    Path.Step.symm
+      (Path.Step.symm
+        (Path.Step.congr_comp (fun x : A => x) (fun x : A => x) (Path.stepChain h)))
+  Path.Step.unit_right
+    (Path.Step.unit_left
+      (Path.Step.assoc (Path.Step.refl a) core (Path.Step.refl b)))
+
 /-! ## Cobordism Relation -/
 
 /-- Cobordism data: a compact (n+1)-manifold W with ∂W = M ⊔ N.
@@ -641,100 +650,100 @@ end CharacteristicNumbers
 /-- Cobordism dimension path: dim(W) = dim(∂W) + 1. -/
 def cobordism_boundary_path (cd : CobordismData) :
     Path cd.cobordismDim (cd.boundaryDim + 1) :=
-  Path.ofEqChain cd.dim_eq
+  stepChainOfEq cd.dim_eq
 
 /-- Thom's isomorphism path: rank Ω_n^O = rank π_n(MO). -/
 def thom_iso_path (ts : ThomSpectrum) :
     Path ts.unorientedRank ts.homotopyRank :=
-  Path.ofEqChain ts.thom_iso
+  stepChainOfEq ts.thom_iso
 
 /-- P-T isomorphism path. -/
 def pt_iso_path (pt : PontryaginThom) :
     Path pt.framedRank pt.stableRank :=
-  Path.ofEqChain pt.pt_iso
+  stepChainOfEq pt.pt_iso
 
 /-- Cobordism ring unit path. -/
 def ring_unit_path (cr : CobordismRing) :
     Path cr.hasUnit true :=
-  Path.ofEqChain cr.unit_exists
+  stepChainOfEq cr.unit_exists
 
 /-- Oriented cobordism rank decomposition path. -/
 def oriented_rank_path (oc : OrientedCobordism) :
     Path oc.totalRank (oc.freeRank + oc.torsionOrder) :=
-  Path.ofEqChain oc.rank_eq
+  stepChainOfEq oc.rank_eq
 
 /-- Reflexive cobordism Euler path. -/
 def reflexive_euler_path (n : Nat) (eM : Int) :
     Path (CobordismData.reflexive n eM).eulerM
          (CobordismData.reflexive n eM).eulerN :=
-  Path.ofEqChain (CobordismData.reflexive_euler n eM)
+  stepChainOfEq (CobordismData.reflexive_euler n eM)
 
 /-- Trivial class Euler path. -/
 def trivial_euler_path (n : Nat) :
     Path (CobordismClass.trivial n).eulerChar 0 :=
-  Path.ofEqChain (CobordismClass.trivial_euler n)
+  stepChainOfEq (CobordismClass.trivial_euler n)
 
 /-- Ω_1^O vanishing path. -/
 def omega1_vanish_path :
     Path ThomSpectrum.degree1.unorientedRank 0 :=
-  Path.ofEqChain ThomSpectrum.degree1_trivial
+  stepChainOfEq ThomSpectrum.degree1_trivial
 
 /-- Ω_3^O vanishing path. -/
 def omega3_vanish_path :
     Path ThomSpectrum.degree3.unorientedRank 0 :=
-  Path.ofEqChain ThomSpectrum.degree3_trivial
+  stepChainOfEq ThomSpectrum.degree3_trivial
 
 /-- Ω_2^O generator path. -/
 def omega2_rank_path :
     Path ThomSpectrum.degree2.unorientedRank 1 :=
-  Path.ofEqChain ThomSpectrum.degree2_rank
+  stepChainOfEq ThomSpectrum.degree2_rank
 
 /-- Oriented low-degree vanishing paths. -/
 def oriented_vanish1_path :
     Path OrientedCobordism.degree1.totalRank 0 :=
-  Path.ofEqChain OrientedCobordism.low_vanishing_1
+  stepChainOfEq OrientedCobordism.low_vanishing_1
 
 def oriented_vanish2_path :
     Path OrientedCobordism.degree2.totalRank 0 :=
-  Path.ofEqChain OrientedCobordism.low_vanishing_2
+  stepChainOfEq OrientedCobordism.low_vanishing_2
 
 def oriented_vanish3_path :
     Path OrientedCobordism.degree3.totalRank 0 :=
-  Path.ofEqChain OrientedCobordism.low_vanishing_3
+  stepChainOfEq OrientedCobordism.low_vanishing_3
 
 /-- Oriented Ω_4 generator path. -/
 def oriented_omega4_path :
     Path OrientedCobordism.degree4.freeRank 1 :=
-  Path.ofEqChain OrientedCobordism.degree4_free
+  stepChainOfEq OrientedCobordism.degree4_free
 
 /-- Wall generator degree paths. -/
 def wall_gen0_path :
     Path (WallClassification.upTo16.generatorDeg 0) 4 :=
-  Path.ofEqChain WallClassification.gen0_deg
+  stepChainOfEq WallClassification.gen0_deg
 
 def wall_gen1_path :
     Path (WallClassification.upTo16.generatorDeg 1) 8 :=
-  Path.ofEqChain WallClassification.gen1_deg
+  stepChainOfEq WallClassification.gen1_deg
 
 /-- Surgery L-group paths. -/
 def surgery_l0_path :
     Path ((SurgerySequence.trivialGroup 8 (by omega)).lGroupValue 0) 1 :=
-  Path.ofEqChain SurgerySequence.l0_rank
+  stepChainOfEq SurgerySequence.l0_rank
 
 def surgery_l1_path :
     Path ((SurgerySequence.trivialGroup 5 (by omega)).lGroupValue 1) 0 :=
-  Path.ofEqChain SurgerySequence.l1_rank
+  stepChainOfEq SurgerySequence.l1_rank
 
 /-- Ring commutativity path. -/
 def ring_comm_path (a b : Nat) :
     Path (CobordismRing.productDegree a b)
          (CobordismRing.productDegree b a) :=
-  Path.ofEqChain (CobordismRing.product_comm a b)
+  stepChainOfEq (CobordismRing.product_comm a b)
 
 /-- RP² dimension path. -/
 def rp2_dim_path :
     Path CobordismClass.rp2.dim 2 :=
-  Path.ofEqChain CobordismClass.rp2_dim
+  stepChainOfEq CobordismClass.rp2_dim
 
 /-! ## Rewrite-Level Computational Transformations -/
 

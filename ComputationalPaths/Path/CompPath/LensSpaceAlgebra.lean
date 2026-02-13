@@ -10,7 +10,7 @@ model π₁(L(p,q)) ≅ ℤ/p from the LensSpace module and add:
 - Covering space degree data
 - Loop power coherence
 - SimpleEquiv coherence
-- Path.ofEq coherence witnesses throughout
+- Path.stepChain coherence witnesses throughout
 -/
 
 import ComputationalPaths.Path.CompPath.LensSpace
@@ -62,12 +62,12 @@ theorem zpAdd_zero_left (p : Nat) (hp : p > 0) (a : Zp p) :
 /-- Path witness for right identity. -/
 def zpAdd_zero_right_path (p : Nat) (hp : p > 0) (a : Zp p) :
     Path (zpAdd p hp a (zpZero p hp)) a :=
-  Path.ofEq (zpAdd_zero_right p hp a)
+  Path.stepChain (zpAdd_zero_right p hp a)
 
 /-- Path witness for left identity. -/
 def zpAdd_zero_left_path (p : Nat) (hp : p > 0) (a : Zp p) :
     Path (zpAdd p hp (zpZero p hp) a) a :=
-  Path.ofEq (zpAdd_zero_left p hp a)
+  Path.stepChain (zpAdd_zero_left p hp a)
 
 /-- Commutativity of ℤ/p addition. -/
 theorem zpAdd_comm (p : Nat) (hp : p > 0) (a b : Zp p) :
@@ -78,7 +78,7 @@ theorem zpAdd_comm (p : Nat) (hp : p > 0) (a b : Zp p) :
 /-- Path witness for commutativity. -/
 def zpAdd_comm_path (p : Nat) (hp : p > 0) (a b : Zp p) :
     Path (zpAdd p hp a b) (zpAdd p hp b a) :=
-  Path.ofEq (zpAdd_comm p hp a b)
+  Path.stepChain (zpAdd_comm p hp a b)
 
 /-- Associativity of ℤ/p addition. -/
 theorem zpAdd_assoc (p : Nat) (hp : p > 0) (a b c : Zp p) :
@@ -90,7 +90,7 @@ theorem zpAdd_assoc (p : Nat) (hp : p > 0) (a b c : Zp p) :
 /-- Path witness for associativity. -/
 def zpAdd_assoc_path (p : Nat) (hp : p > 0) (a b c : Zp p) :
     Path (zpAdd p hp (zpAdd p hp a b) c) (zpAdd p hp a (zpAdd p hp b c)) :=
-  Path.ofEq (zpAdd_assoc p hp a b c)
+  Path.stepChain (zpAdd_assoc p hp a b c)
 
 /-! ## Multiplication on ℤ/p -/
 
@@ -106,7 +106,7 @@ theorem zpMul_zero_right (p : Nat) (hp : p > 0) (a : Zp p) :
 /-- Path witness for multiplication by zero. -/
 def zpMul_zero_path (p : Nat) (hp : p > 0) (a : Zp p) :
     Path (zpMul p hp a (zpZero p hp)) (zpZero p hp) :=
-  Path.ofEq (zpMul_zero_right p hp a)
+  Path.stepChain (zpMul_zero_right p hp a)
 
 /-- Commutativity of ℤ/p multiplication. -/
 theorem zpMul_comm (p : Nat) (hp : p > 0) (a b : Zp p) :
@@ -117,7 +117,7 @@ theorem zpMul_comm (p : Nat) (hp : p > 0) (a b : Zp p) :
 /-- Path witness for multiplicative commutativity. -/
 def zpMul_comm_path (p : Nat) (hp : p > 0) (a b : Zp p) :
     Path (zpMul p hp a b) (zpMul p hp b a) :=
-  Path.ofEq (zpMul_comm p hp a b)
+  Path.stepChain (zpMul_comm p hp a b)
 
 /-! ## Lens space loop group structure -/
 
@@ -146,12 +146,12 @@ theorem loopMul_id_right (p q : Nat) (α : lensSpaceLoopSpace p q) :
 /-- Path witness for left identity. -/
 def loopMul_id_left_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
     Path (loopMul p q (loopId p q) α) α :=
-  Path.ofEq (loopMul_id_left p q α)
+  Path.stepChain (loopMul_id_left p q α)
 
 /-- Path witness for right identity. -/
 def loopMul_id_right_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
     Path (loopMul p q α (loopId p q)) α :=
-  Path.ofEq (loopMul_id_right p q α)
+  Path.stepChain (loopMul_id_right p q α)
 
 /-- Associativity of loop multiplication. -/
 theorem loopMul_assoc (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
@@ -162,7 +162,7 @@ theorem loopMul_assoc (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
 def loopMul_assoc_path (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
     Path (loopMul p q (loopMul p q α β) γ)
          (loopMul p q α (loopMul p q β γ)) :=
-  Path.ofEq (loopMul_assoc p q α β γ)
+  Path.stepChain (loopMul_assoc p q α β γ)
 
 /-- Left inverse for loops (at the toEq level). -/
 theorem loopMul_inv_left_toEq (p q : Nat) (α : lensSpaceLoopSpace p q) :
@@ -183,7 +183,7 @@ theorem loopInv_mul (p q : Nat) (α β : lensSpaceLoopSpace p q) :
 def loopInv_mul_path (p q : Nat) (α β : lensSpaceLoopSpace p q) :
     Path (loopInv p q (loopMul p q α β))
          (loopMul p q (loopInv p q β) (loopInv p q α)) :=
-  Path.ofEq (loopInv_mul p q α β)
+  Path.stepChain (loopInv_mul p q α β)
 
 /-- Double inverse. -/
 theorem loopInv_inv (p q : Nat) (α : lensSpaceLoopSpace p q) :
@@ -193,7 +193,7 @@ theorem loopInv_inv (p q : Nat) (α : lensSpaceLoopSpace p q) :
 /-- Path for double inverse. -/
 def loopInv_inv_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
     Path (loopInv p q (loopInv p q α)) α :=
-  Path.ofEq (loopInv_inv p q α)
+  Path.stepChain (loopInv_inv p q α)
 
 /-! ## Specific lens spaces -/
 
@@ -207,7 +207,7 @@ theorem rp3_h1_order : zpAdd 2 (by omega) rp3AsLens_h1 rp3AsLens_h1 = zpZero 2 (
 /-- Path witness for H₁(RP³) having order 2. -/
 def rp3_h1_order_path :
     Path (zpAdd 2 (by omega) rp3AsLens_h1 rp3AsLens_h1) (zpZero 2 (by omega)) :=
-  Path.ofEq rp3_h1_order
+  Path.stepChain rp3_h1_order
 
 /-- L(3,1): a lens space with ℤ/3 fundamental group. -/
 def l31_h1 : Zp 3 := ⟨1, by omega⟩
@@ -222,7 +222,7 @@ theorem l31_h1_order :
 def l31_h1_order_path :
     Path (zpAdd 3 (by omega) (zpAdd 3 (by omega) l31_h1 l31_h1) l31_h1)
          (zpZero 3 (by omega)) :=
-  Path.ofEq l31_h1_order
+  Path.stepChain l31_h1_order
 
 /-- L(5,1): generator of ℤ/5 has order 5. -/
 def l51_gen : Zp 5 := ⟨1, by omega⟩
@@ -239,7 +239,7 @@ def l51_order_path :
     Path (zpAdd 5 (by omega) (zpAdd 5 (by omega) (zpAdd 5 (by omega)
       (zpAdd 5 (by omega) l51_gen l51_gen) l51_gen) l51_gen) l51_gen)
     (zpZero 5 (by omega)) :=
-  Path.ofEq l51_order
+  Path.stepChain l51_order
 
 /-! ## Covering space data -/
 
@@ -288,13 +288,13 @@ theorem lensSpaceLoopPow_zero (p q : Nat) :
 /-- Path witness for loop power zero. -/
 def lensSpaceLoopPow_zero_path (p q : Nat) :
     Path (lensSpaceLoopPow p q 0) (Path.refl (lensSpaceBase p q)) :=
-  Path.ofEq (lensSpaceLoopPow_zero p q)
+  Path.stepChain (lensSpaceLoopPow_zero p q)
 
 /-- Path witness for loop power successor. -/
 def lensSpaceLoopPow_succ_path (p q n : Nat) :
     Path (lensSpaceLoopPow p q (n + 1))
          (Path.trans (lensSpaceLoop p q) (lensSpaceLoopPow p q n)) :=
-  Path.ofEq (lensSpaceLoopPow_succ p q n)
+  Path.stepChain (lensSpaceLoopPow_succ p q n)
 
 /-- Loop decode at zero gives refl. -/
 theorem lensSpaceDecodePath_zero (p q : Nat) (_hp : p > 0) :
@@ -305,7 +305,7 @@ theorem lensSpaceDecodePath_zero (p q : Nat) (_hp : p > 0) :
 def lensSpaceDecodePath_zero_path (p q : Nat) (hp : p > 0) :
     Path (lensSpaceDecodePath p q (zpZero p hp))
          (Path.refl (lensSpaceBase p q)) :=
-  Path.ofEq (lensSpaceDecodePath_zero p q hp)
+  Path.stepChain (lensSpaceDecodePath_zero p q hp)
 
 /-! ## SimpleEquiv coherence -/
 

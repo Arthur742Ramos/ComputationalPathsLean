@@ -76,7 +76,7 @@ theorem exact_implies_closed {Ω : GradedSpace.{u}} (D : Differential Ω)
 def exact_implies_closed_path {Ω : GradedSpace.{u}} (D : Differential Ω)
     (ω : Ω.Carrier) (hω : isExact D ω) :
     Path (D.d ω) Ω.zero :=
-  Path.ofEq (exact_implies_closed D ω hω)
+  Path.stepChain (exact_implies_closed D ω hω)
 
 /-- Zero is always closed. -/
 theorem zero_isClosed {Ω : GradedSpace.{u}} (D : Differential Ω) :
@@ -86,7 +86,7 @@ theorem zero_isClosed {Ω : GradedSpace.{u}} (D : Differential Ω) :
 /-- Path witness for zero being closed. -/
 def zero_isClosed_path {Ω : GradedSpace.{u}} (D : Differential Ω) :
     Path (D.d Ω.zero) Ω.zero :=
-  Path.ofEq D.d_zero
+  Path.stepChain D.d_zero
 
 /-- Zero is exact (trivially: d(0) = 0). -/
 theorem zero_isExact {Ω : GradedSpace.{u}} (D : Differential Ω) :
@@ -96,7 +96,7 @@ theorem zero_isExact {Ω : GradedSpace.{u}} (D : Differential Ω) :
 /-- d² = 0 as a path. -/
 def d_squared_path {Ω : GradedSpace.{u}} (D : Differential Ω) (ω : Ω.Carrier) :
     Path (D.d (D.d ω)) Ω.zero :=
-  Path.ofEq (D.d_squared ω)
+  Path.stepChain (D.d_squared ω)
 
 /-- d applied to an exact form gives zero. -/
 theorem d_of_exact_is_zero {Ω : GradedSpace.{u}} (D : Differential Ω)
@@ -147,7 +147,7 @@ def deRhamH_add_zero_right_path {Ω : GradedSpace.{u}} (D : Differential Ω)
     (a : DeRhamH Ω D)
     (h : isClosed D (Ω.add a.representative Ω.zero)) :
     Path (deRhamH_add D a (deRhamH_zero D) h).representative a.representative :=
-  Path.ofEq (deRhamH_add_zero_right D a h)
+  Path.stepChain (deRhamH_add_zero_right D a h)
 
 /-- Adding zero on the left preserves the representative. -/
 theorem deRhamH_add_zero_left {Ω : GradedSpace.{u}} (D : Differential Ω)
@@ -161,7 +161,7 @@ def deRhamH_add_zero_left_path {Ω : GradedSpace.{u}} (D : Differential Ω)
     (a : DeRhamH Ω D)
     (h : isClosed D (Ω.add Ω.zero a.representative)) :
     Path (deRhamH_add D (deRhamH_zero D) a h).representative a.representative :=
-  Path.ofEq (deRhamH_add_zero_left D a h)
+  Path.stepChain (deRhamH_add_zero_left D a h)
 
 /-! ## Betti numbers -/
 
@@ -192,7 +192,7 @@ theorem pointEuler : eulerCharacteristic pointBetti = 1 := by
 
 /-- Path witness for χ(point) = 1. -/
 def pointEuler_path : Path (eulerCharacteristic pointBetti) 1 :=
-  Path.ofEq pointEuler
+  Path.stepChain pointEuler
 
 /-- Betti data for S¹: b₀ = 1, b₁ = 1, all others zero. -/
 def circleBetti : BettiData where
@@ -206,7 +206,7 @@ theorem circleEuler : eulerCharacteristic circleBetti = 0 := by
 
 /-- Path witness for χ(S¹) = 0. -/
 def circleEuler_path : Path (eulerCharacteristic circleBetti) 0 :=
-  Path.ofEq circleEuler
+  Path.stepChain circleEuler
 
 /-- Betti data for S²: b₀ = 1, b₁ = 0, b₂ = 1. -/
 def sphere2Betti : BettiData where
@@ -220,7 +220,7 @@ theorem sphere2Euler : eulerCharacteristic sphere2Betti = 2 := by
 
 /-- Path witness for χ(S²) = 2. -/
 def sphere2Euler_path : Path (eulerCharacteristic sphere2Betti) 2 :=
-  Path.ofEq sphere2Euler
+  Path.stepChain sphere2Euler
 
 /-- Betti data for T² (torus): b₀ = 1, b₁ = 2, b₂ = 1. -/
 def torusBetti : BettiData where
@@ -234,7 +234,7 @@ theorem torusEuler : eulerCharacteristic torusBetti = 0 := by
 
 /-- Path witness for χ(T²) = 0. -/
 def torusEuler_path : Path (eulerCharacteristic torusBetti) 0 :=
-  Path.ofEq torusEuler
+  Path.stepChain torusEuler
 
 /-! ## Genus-g surface Betti numbers -/
 
@@ -259,17 +259,17 @@ theorem surfaceBetti_b2 (g : Nat) : (surfaceBetti g).betti 2 = 1 := by
 /-- Path coherence for b₀. -/
 def surfaceBetti_b0_path (g : Nat) :
     Path ((surfaceBetti g).betti 0) 1 :=
-  Path.ofEq (surfaceBetti_b0 g)
+  Path.stepChain (surfaceBetti_b0 g)
 
 /-- Path coherence for b₁. -/
 def surfaceBetti_b1_path (g : Nat) :
     Path ((surfaceBetti g).betti 1) (2 * g) :=
-  Path.ofEq (surfaceBetti_b1 g)
+  Path.stepChain (surfaceBetti_b1 g)
 
 /-- Path coherence for b₂. -/
 def surfaceBetti_b2_path (g : Nat) :
     Path ((surfaceBetti g).betti 2) 1 :=
-  Path.ofEq (surfaceBetti_b2 g)
+  Path.stepChain (surfaceBetti_b2 g)
 
 /-- Higher Betti numbers of a surface vanish. -/
 theorem surfaceBetti_vanish (g : Nat) (k : Nat) (hk : k > 2) :
@@ -279,7 +279,7 @@ theorem surfaceBetti_vanish (g : Nat) (k : Nat) (hk : k > 2) :
 /-- Path for higher Betti vanishing. -/
 def surfaceBetti_vanish_path (g : Nat) (k : Nat) (hk : k > 2) :
     Path ((surfaceBetti g).betti k) 0 :=
-  Path.ofEq (surfaceBetti_vanish g k hk)
+  Path.stepChain (surfaceBetti_vanish g k hk)
 
 /-! ## Morphisms of differential complexes -/
 
@@ -308,7 +308,7 @@ def chainMap_closed_path {Ω₁ Ω₂ : GradedSpace.{u}}
     (f : ChainMap Ω₁ Ω₂ D₁ D₂) (ω : Ω₁.Carrier)
     (hω : isClosed D₁ ω) :
     Path (D₂.d (f.φ ω)) Ω₂.zero :=
-  Path.ofEq (chainMap_preserves_closed f ω hω)
+  Path.stepChain (chainMap_preserves_closed f ω hω)
 
 /-- A chain map induces a map on cohomology. -/
 def chainMapOnH {Ω₁ Ω₂ : GradedSpace.{u}}
@@ -332,7 +332,7 @@ def chainMapOnH_zero_path {Ω₁ Ω₂ : GradedSpace.{u}}
     (f : ChainMap Ω₁ Ω₂ D₁ D₂) :
     Path (chainMapOnH f (deRhamH_zero D₁)).representative
          (deRhamH_zero D₂).representative :=
-  Path.ofEq (chainMapOnH_zero f)
+  Path.stepChain (chainMapOnH_zero f)
 
 /-! ## Identity chain map -/
 
@@ -352,7 +352,7 @@ theorem idChainMap_onH {Ω : GradedSpace.{u}} (D : Differential Ω)
 def idChainMap_onH_path {Ω : GradedSpace.{u}} (D : Differential Ω)
     (c : DeRhamH Ω D) :
     Path (chainMapOnH (idChainMap Ω D) c).representative c.representative :=
-  Path.ofEq (idChainMap_onH D c)
+  Path.stepChain (idChainMap_onH D c)
 
 /-! ## Composition of chain maps -/
 
@@ -385,7 +385,7 @@ def compChainMap_onH_path {Ω₁ Ω₂ Ω₃ : GradedSpace.{u}}
     (c : DeRhamH Ω₁ D₁) :
     Path (chainMapOnH (compChainMap f g) c).representative
          (chainMapOnH g (chainMapOnH f c)).representative :=
-  Path.ofEq (compChainMap_onH f g c)
+  Path.stepChain (compChainMap_onH f g c)
 
 /-- Identity composed with f is f. -/
 theorem idChainMap_comp {Ω₁ Ω₂ : GradedSpace.{u}}

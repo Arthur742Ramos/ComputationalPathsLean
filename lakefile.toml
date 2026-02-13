@@ -47,6 +47,9 @@ name = "Descent"
 name = "Deformation"
 
 [[lean_lib]]
+name = "DerivedCategories"
+
+[[lean_lib]]
 name = "Moduli"
 
 [[lean_lib]]
@@ -101,6 +104,9 @@ name = "RepStability"
 name = "HomologicalStability"
 
 [[lean_lib]]
+name = "SpectralSequence"
+
+[[lean_lib]]
 name = "Intersection"
 
 [[lean_lib]]
@@ -125,7 +131,13 @@ name = "Mirror"
 name = "SymplecticDuality"
 
 [[lean_lib]]
+name = "Floer"
+
+[[lean_lib]]
 name = "NCG"
+
+[[lean_lib]]
+name = "OperadicAlgebra"
 
 [[lean_exe]]
 name = "computational_paths"

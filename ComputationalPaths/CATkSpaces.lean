@@ -903,97 +903,97 @@ end RightAngledArtinGroup
 /-- Path witness: ℝ² is simply connected. -/
 def euclidean_sc_path :
     Path ModelSpace.euclideanPlane.isSimplyConnected true :=
-  Path.ofEqChain ModelSpace.euclidean_simply_connected
+  stepChainOfEq ModelSpace.euclidean_simply_connected
 
 /-- Path witness: S² is compact. -/
 def sphere_compact_path :
     Path ModelSpace.sphere2.isCompact true :=
-  Path.ofEqChain ModelSpace.sphere_compact
+  stepChainOfEq ModelSpace.sphere_compact
 
 /-- Path witness: trees are CAT(0). -/
 def tree_cat0_path :
     Path CATkSpace.tree.curvatureType CurvatureType.zero :=
-  Path.ofEqChain CATkSpace.tree_cat0
+  stepChainOfEq CATkSpace.tree_cat0
 
 /-- Path witness: trees have unique geodesics. -/
 def cat0_unique_geodesic_path :
     Path CATkSpace.tree.uniqueGeodesics true :=
-  Path.ofEqChain CATkSpace.tree_unique_geodesics
+  stepChainOfEq CATkSpace.tree_unique_geodesics
 
 /-- Path witness: ℍ² has unique geodesics. -/
 def h2_unique_path :
     Path CATkSpace.hyperbolicPlane.uniqueGeodesics true :=
-  Path.ofEqChain CATkSpace.h2_unique_geodesics
+  stepChainOfEq CATkSpace.h2_unique_geodesics
 
 /-- Path witness: S² lacks unique geodesics. -/
 def s2_nonunique_path :
     Path CATkSpace.sphere2.uniqueGeodesics false :=
-  Path.ofEqChain CATkSpace.s2_not_unique
+  stepChainOfEq CATkSpace.s2_not_unique
 
 /-- Path witness: ℝⁿ has convex distance. -/
 def euclidean_convex_path (n : Nat) :
     Path (CAT0Space.euclidean n).convexDistance true :=
-  Path.ofEqChain (CAT0Space.euclidean_convex n)
+  stepChainOfEq (CAT0Space.euclidean_convex n)
 
 /-- Path witness: trees are contractible. -/
 def tree_contractible_path :
     Path CAT0Space.tree.isContractible true :=
-  Path.ofEqChain CAT0Space.tree_contractible
+  stepChainOfEq CAT0Space.tree_contractible
 
 /-- Path witness: Cartan-Hadamard for flat torus. -/
 def cartan_hadamard_path :
     Path CartanHadamard.flatTorus.coverIsCAT0 true :=
-  Path.ofEqChain CartanHadamard.flatTorus_cover_cat0
+  stepChainOfEq CartanHadamard.flatTorus_cover_cat0
 
 /-- Path witness: flat torus cover is contractible. -/
 def cartan_hadamard_contractible_path :
     Path CartanHadamard.flatTorus.coverIsContractible true :=
-  Path.ofEqChain CartanHadamard.flatTorus_cover_contractible
+  stepChainOfEq CartanHadamard.flatTorus_cover_contractible
 
 /-- Path witness: ℤ² on ℝ² has a flat. -/
 def flat_torus_path :
     Path FlatTorusTheorem.z2OnR2.flatExists true :=
-  Path.ofEqChain FlatTorusTheorem.z2_flat
+  stepChainOfEq FlatTorusTheorem.z2_flat
 
 /-- Path witness: SL₂ tree is CAT(0). -/
 def building_cat0_path (p : Nat) (hp : p ≥ 2) :
     Path (BruhatTitsBuilding.sl2Tree p hp).isCAT0 true :=
-  Path.ofEqChain (BruhatTitsBuilding.sl2_cat0 p hp)
+  stepChainOfEq (BruhatTitsBuilding.sl2_cat0 p hp)
 
 /-- Path witness: SL₃ building is CAT(0). -/
 def building_sl3_path (p : Nat) (hp : p ≥ 2) :
     Path (BruhatTitsBuilding.sl3Building p hp).isCAT0 true :=
-  Path.ofEqChain (BruhatTitsBuilding.sl3_cat0 p hp)
+  stepChainOfEq (BruhatTitsBuilding.sl3_cat0 p hp)
 
 /-- Path witness: tree is CAT(0) cube complex. -/
 def cube_tree_path :
     Path CAT0CubeComplex.tree.isCAT0 true :=
-  Path.ofEqChain CAT0CubeComplex.tree_cat0
+  stepChainOfEq CAT0CubeComplex.tree_cat0
 
 /-- Path witness: tree cube complex has dimension 1. -/
 def cube_tree_dim_path :
     Path CAT0CubeComplex.tree.dimension 1 :=
-  Path.ofEqChain CAT0CubeComplex.tree_dim
+  stepChainOfEq CAT0CubeComplex.tree_dim
 
 /-- Path witness: Sageev construction for surfaces. -/
 def sageev_surface_path :
     Path SageevConstruction.surfaceGroupSplitting.resultIsCAT0 true :=
-  Path.ofEqChain SageevConstruction.surface_cat0
+  stepChainOfEq SageevConstruction.surface_cat0
 
 /-- Path witness: Sageev surface action cocompact. -/
 def sageev_cocompact_path :
     Path SageevConstruction.surfaceGroupSplitting.actionIsCocompact true :=
-  Path.ofEqChain SageevConstruction.surface_cocompact
+  stepChainOfEq SageevConstruction.surface_cocompact
 
 /-- Path witness: RAAGs act on cube complexes. -/
 def raag_cube_path (n : Nat) :
     Path (RightAngledArtinGroup.freeGroup n).actsOnCubeComplex true :=
-  Path.ofEqChain (RightAngledArtinGroup.freeGroup_cube n)
+  stepChainOfEq (RightAngledArtinGroup.freeGroup_cube n)
 
 /-- Path witness: hyperplane in tree separates. -/
 def hyperplane_separates_path :
     Path Hyperplane.treeHyperplane.isSeparating true :=
-  Path.ofEqChain Hyperplane.tree_separates
+  stepChainOfEq Hyperplane.tree_separates
 
 end CATkSpaces
 end ComputationalPaths

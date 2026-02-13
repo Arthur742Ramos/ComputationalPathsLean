@@ -60,12 +60,12 @@ structure GradedModule where
 /-- Path witness for additive left identity. -/
 def GradedModule.addZeroLeftPath (M : GradedModule) (n : Int) (x : M.carrier n) :
     Path (M.add n (M.zero n) x) x :=
-  Path.ofEq (M.add_zero_left n x)
+  Path.stepChain (M.add_zero_left n x)
 
 /-- Path witness for additive right identity. -/
 def GradedModule.addZeroRightPath (M : GradedModule) (n : Int) (x : M.carrier n) :
     Path (M.add n x (M.zero n)) x :=
-  Path.ofEq (M.add_zero_right n x)
+  Path.stepChain (M.add_zero_right n x)
 
 /-! ## Stasheff Associahedra -/
 
@@ -139,17 +139,17 @@ structure AInfinityAlgebra extends GradedModule where
 /-- Path witness for the differential condition m₁² = 0. -/
 def AInfinityAlgebra.m1SquaredPath (A : AInfinityAlgebra) (x : A.carrier 0) :
     Path (A.m 1 (fun _ => A.m 1 (fun _ => x))) (A.zero 0) :=
-  Path.ofEq (A.m1_squared x)
+  Path.stepChain (A.m1_squared x)
 
 /-- Path witness for m₁(0) = 0. -/
 def AInfinityAlgebra.m1ZeroPath (A : AInfinityAlgebra) :
     Path (A.m 1 (fun _ => A.zero 0)) (A.zero 0) :=
-  Path.ofEq A.m1_zero
+  Path.stepChain A.m1_zero
 
 /-- Path witness for left zero of m₂. -/
 def AInfinityAlgebra.m2ZeroLeftPath (A : AInfinityAlgebra) (y : A.carrier 0) :
     Path (A.m 2 (fun i => if i.val = 0 then A.zero 0 else y)) (A.zero 0) :=
-  Path.ofEq (A.m2_zero_left y)
+  Path.stepChain (A.m2_zero_left y)
 
 /-! ## Strict Associative Algebras as A∞ Algebras -/
 
@@ -186,7 +186,7 @@ structure StrictAssociative (A : Type u) where
 def StrictAssociative.mulAssocPath {A : Type u} (S : StrictAssociative A)
     (x y z : A) :
     Path (S.mul (S.mul x y) z) (S.mul x (S.mul y z)) :=
-  Path.ofEq (S.mul_assoc x y z)
+  Path.stepChain (S.mul_assoc x y z)
 
 /-- Convert a strict associative algebra to an A∞ algebra.
     Only m₂ is nontrivial; m₁ = 0, m_n = 0 for n ≥ 3. -/
@@ -233,13 +233,13 @@ def AInfinityMorphism.f1ChainPath {A B : AInfinityAlgebra}
     (φ : AInfinityMorphism A B) (x : A.carrier 0) :
     Path (B.m 1 (fun _ => φ.f 1 (fun _ => x)))
          (φ.f 1 (fun _ => A.m 1 (fun _ => x))) :=
-  Path.ofEq (φ.f1_chain x)
+  Path.stepChain (φ.f1_chain x)
 
 /-- Path witness for zero preservation. -/
 def AInfinityMorphism.f1ZeroPath {A B : AInfinityAlgebra}
     (φ : AInfinityMorphism A B) :
     Path (φ.f 1 (fun _ => A.zero 0)) (B.zero 0) :=
-  Path.ofEq φ.f1_zero
+  Path.stepChain φ.f1_zero
 
 /-- The identity A∞ morphism. -/
 def AInfinityMorphism.id (A : AInfinityAlgebra) : AInfinityMorphism A A where
@@ -285,7 +285,7 @@ structure DeformationRetractData where
 /-- Path witness for the retraction condition. -/
 def DeformationRetractData.piIdPath (D : DeformationRetractData) (x : D.target.carrier 0) :
     Path (D.proj (D.incl x)) x :=
-  Path.ofEq (D.pi_id x)
+  Path.stepChain (D.pi_id x)
 
 /-- The homotopy transfer theorem: given a deformation retract from
     an A∞ algebra, the target inherits an A∞ structure. -/
@@ -307,7 +307,7 @@ structure HomotopyTransfer extends DeformationRetractData where
 /-- Path witness for transferred differential. -/
 def HomotopyTransfer.m1SquaredPath (T : HomotopyTransfer) (x : T.target.carrier 0) :
     Path (T.transferred_m1 (T.transferred_m1 x)) (T.target.zero 0) :=
-  Path.ofEq (T.transferred_m1_squared x)
+  Path.stepChain (T.transferred_m1_squared x)
 
 /-! ## Minimal Models -/
 
@@ -319,7 +319,7 @@ structure MinimalAInfinity extends AInfinityAlgebra where
 /-- Path witness for minimality. -/
 def MinimalAInfinity.m1IsZeroPath (M : MinimalAInfinity) (x : M.carrier 0) :
     Path (M.m 1 (fun _ => x)) (M.zero 0) :=
-  Path.ofEq (M.m1_is_zero x)
+  Path.stepChain (M.m1_is_zero x)
 
 /-- In a minimal A∞ algebra, the m₁² = 0 condition is automatic. -/
 theorem MinimalAInfinity.m1_squared_auto (M : MinimalAInfinity) (x : M.carrier 0) :
@@ -359,7 +359,7 @@ structure AInfinityCategory where
 def AInfinityCategory.m1SquaredPath (C : AInfinityCategory)
     {a b : C.Obj} (f : C.Hom a b) :
     Path (C.m1 (C.m1 f)) (C.zero_hom a b) :=
-  Path.ofEq (C.m1_squared f)
+  Path.stepChain (C.m1_squared f)
 
 /-- An A∞ functor between A∞ categories. -/
 structure AInfinityFunctor (C D : AInfinityCategory) where
@@ -377,7 +377,7 @@ structure AInfinityFunctor (C D : AInfinityCategory) where
 def AInfinityFunctor.mapM1Path {C D : AInfinityCategory}
     (F : AInfinityFunctor C D) {a b : C.Obj} (f : C.Hom a b) :
     Path (D.m1 (F.map f)) (F.map (C.m1 f)) :=
-  Path.ofEq (F.map_m1 f)
+  Path.stepChain (F.map_m1 f)
 
 /-- The identity A∞ functor. -/
 def AInfinityFunctor.id (C : AInfinityCategory) : AInfinityFunctor C C where

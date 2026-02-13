@@ -11,7 +11,7 @@ We develop:
 - Double coset formulas (Mackey decomposition)
 - Transfer and restriction composition
 - Index formulas
-- Path.ofEq coherence witnesses throughout
+- Path.stepChain coherence witnesses throughout
 -/
 
 import ComputationalPaths.Path.Homotopy.HoTT
@@ -78,7 +78,7 @@ def deckComp_assoc_path {X : Type u} {cov : FiniteCovering X}
     (d₁ d₂ d₃ : DeckTransformation cov) :
     Path (deckComp (deckComp d₁ d₂) d₃)
          (deckComp d₁ (deckComp d₂ d₃)) :=
-  Path.ofEq (deckComp_assoc d₁ d₂ d₃)
+  Path.stepChain (deckComp_assoc d₁ d₂ d₃)
 
 /-- Left identity for deck composition. -/
 theorem deckComp_id_left {X : Type u} {cov : FiniteCovering X}
@@ -90,7 +90,7 @@ theorem deckComp_id_left {X : Type u} {cov : FiniteCovering X}
 def deckComp_id_left_path {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) :
     Path (deckComp (deckId cov) d) d :=
-  Path.ofEq (deckComp_id_left d)
+  Path.stepChain (deckComp_id_left d)
 
 /-- Right identity for deck composition. -/
 theorem deckComp_id_right {X : Type u} {cov : FiniteCovering X}
@@ -102,7 +102,7 @@ theorem deckComp_id_right {X : Type u} {cov : FiniteCovering X}
 def deckComp_id_right_path {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) :
     Path (deckComp d (deckId cov)) d :=
-  Path.ofEq (deckComp_id_right d)
+  Path.stepChain (deckComp_id_right d)
 
 /-- The identity deck transformation commutes via reflexivity. -/
 theorem deckId_commutes_eq {X : Type u} (cov : FiniteCovering X)
@@ -143,7 +143,7 @@ def transferLoop_refl_path {X : Type u} {x₀ : X}
     (lift : LoopAt X x₀ → LoopAt cov.TotalSpace cov.baseLift)
     (h : lift (Path.refl x₀) = Path.refl cov.baseLift) :
     Path (transferLoop cov lift (Path.refl x₀)) (Path.refl cov.baseLift) :=
-  Path.ofEq h
+  Path.stepChain h
 
 /-! ## Norm map -/
 
@@ -203,7 +203,7 @@ theorem normIterate_commutes {X : Type u} {cov : FiniteCovering X}
 def normIterate_commutes_path {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) (n : Nat) (e : cov.TotalSpace) :
     Path (cov.proj (normIterate d n e)) (cov.proj e) :=
-  Path.ofEq (normIterate_commutes d n e)
+  Path.stepChain (normIterate_commutes d n e)
 
 /-! ## Index and degree -/
 
@@ -239,7 +239,7 @@ theorem doubleCovering_index {X : Type u} (cov : DoubleCovering X) :
 /-- Path for double covering index. -/
 def doubleCovering_index_path {X : Type u} (cov : DoubleCovering X) :
     Path (coveringIndex cov.toFiniteCovering) 2 :=
-  Path.ofEq (doubleCovering_index cov)
+  Path.stepChain (doubleCovering_index cov)
 
 /-! ## Transfer composition formula -/
 
@@ -330,7 +330,7 @@ theorem coveringMorphismComp_id_right {X : Type u} {c₁ c₂ : FiniteCovering X
 def coveringMorphismComp_id_path {X : Type u} {c₁ c₂ : FiniteCovering X}
     (f : CoveringMorphism c₁ c₂) :
     Path (coveringMorphismComp f (coveringMorphismId c₂)) f :=
-  Path.ofEq (coveringMorphismComp_id_right f)
+  Path.stepChain (coveringMorphismComp_id_right f)
 
 /-- Composition with identity on the left. -/
 theorem coveringMorphismComp_id_left {X : Type u} {c₁ c₂ : FiniteCovering X}
@@ -342,7 +342,7 @@ theorem coveringMorphismComp_id_left {X : Type u} {c₁ c₂ : FiniteCovering X}
 def coveringMorphismComp_id_left_path {X : Type u} {c₁ c₂ : FiniteCovering X}
     (f : CoveringMorphism c₁ c₂) :
     Path (coveringMorphismComp (coveringMorphismId c₁) f) f :=
-  Path.ofEq (coveringMorphismComp_id_left f)
+  Path.stepChain (coveringMorphismComp_id_left f)
 
 /-- Associativity of covering morphism composition. -/
 theorem coveringMorphismComp_assoc {X : Type u}
@@ -360,7 +360,7 @@ def coveringMorphismComp_assoc_path {X : Type u}
     (h : CoveringMorphism c₃ c₄) :
     Path (coveringMorphismComp (coveringMorphismComp f g) h)
          (coveringMorphismComp f (coveringMorphismComp g h)) :=
-  Path.ofEq (coveringMorphismComp_assoc f g h)
+  Path.stepChain (coveringMorphismComp_assoc f g h)
 
 /-! ## Euler characteristic and transfer -/
 
@@ -377,7 +377,7 @@ theorem transferEuler_zero {X : Type u} (cov : FiniteCovering X) :
 /-- Path for transfer of zero. -/
 def transferEuler_zero_path {X : Type u} (cov : FiniteCovering X) :
     Path (transferEuler cov 0) 0 :=
-  Path.ofEq (transferEuler_zero (cov := cov))
+  Path.stepChain (transferEuler_zero (cov := cov))
 
 /-- Transfer of trivial covering preserves Euler characteristic. -/
 theorem transferEuler_trivial (X : Type u) (chi : Int) :
@@ -387,7 +387,7 @@ theorem transferEuler_trivial (X : Type u) (chi : Int) :
 /-- Path for trivial transfer. -/
 def transferEuler_trivial_path (X : Type u) (chi : Int) :
     Path (transferEuler (trivialCovering X) chi) chi :=
-  Path.ofEq (transferEuler_trivial X chi)
+  Path.stepChain (transferEuler_trivial X chi)
 
 /-! ## HoTT-style transfer witnesses -/
 
@@ -411,7 +411,7 @@ def transferAp_refl_path {X : Type u} {x₀ : X}
     (cov : PointedCovering X x₀)
     (liftFun : X → cov.TotalSpace) :
     Path (transferAp cov liftFun (Path.refl x₀)) (Path.refl (liftFun x₀)) :=
-  Path.ofEq (transferAp_refl cov liftFun)
+  Path.stepChain (transferAp_refl cov liftFun)
 
 /-- Transfer ap distributes over trans. -/
 theorem transferAp_trans {X : Type u} {x₀ : X}
@@ -430,7 +430,7 @@ def transferAp_trans_path {X : Type u} {x₀ : X}
     Path (transferAp cov liftFun (Path.trans p q))
          (Path.trans (transferAp cov liftFun p)
                      (transferAp cov liftFun q)) :=
-  Path.ofEq (transferAp_trans cov liftFun p q)
+  Path.stepChain (transferAp_trans cov liftFun p q)
 
 /-- Transfer ap commutes with symm. -/
 theorem transferAp_symm {X : Type u} {x₀ : X}
@@ -448,7 +448,7 @@ def transferAp_symm_path {X : Type u} {x₀ : X}
     (p : Path x₀ x₀) :
     Path (transferAp cov liftFun (Path.symm p))
          (Path.symm (transferAp cov liftFun p)) :=
-  Path.ofEq (transferAp_symm cov liftFun p)
+  Path.stepChain (transferAp_symm cov liftFun p)
 
 end TransferMap
 end Homotopy

@@ -74,23 +74,23 @@ variable {G : Type u} (grp : GroupData G)
 /-- `Path`-typed associativity. -/
 def mul_assoc_path (a b c : G) :
     Path (grp.mul (grp.mul a b) c) (grp.mul a (grp.mul b c)) :=
-  Path.ofEq (grp.mul_assoc a b c)
+  Path.stepChain (grp.mul_assoc a b c)
 
 /-- `Path`-typed left identity. -/
 def e_mul_path (a : G) : Path (grp.mul grp.e a) a :=
-  Path.ofEq (grp.e_mul a)
+  Path.stepChain (grp.e_mul a)
 
 /-- `Path`-typed right identity. -/
 def mul_e_path (a : G) : Path (grp.mul a grp.e) a :=
-  Path.ofEq (grp.mul_e a)
+  Path.stepChain (grp.mul_e a)
 
 /-- `Path`-typed left inverse. -/
 def inv_mul_path (a : G) : Path (grp.mul (grp.inv a) a) grp.e :=
-  Path.ofEq (grp.inv_mul a)
+  Path.stepChain (grp.inv_mul a)
 
 /-- `Path`-typed right inverse. -/
 def mul_inv_path (a : G) : Path (grp.mul a (grp.inv a)) grp.e :=
-  Path.ofEq (grp.mul_inv a)
+  Path.stepChain (grp.mul_inv a)
 
 /-- Inverse of identity is identity. -/
 theorem inv_e : grp.inv grp.e = grp.e := by
@@ -131,12 +131,12 @@ variable {G P : Type u}
 /-- `Path`-typed action by identity. -/
 def act_e_path (ga : GAction G P) (p : P) :
     Path (ga.act p ga.grp.e) p :=
-  Path.ofEq (ga.act_e p)
+  Path.stepChain (ga.act_e p)
 
 /-- `Path`-typed action associativity. -/
 def act_mul_path (ga : GAction G P) (p : P) (g h : G) :
     Path (ga.act (ga.act p g) h) (ga.act p (ga.grp.mul g h)) :=
-  Path.ofEq (ga.act_mul p g h)
+  Path.stepChain (ga.act_mul p g h)
 
 /-- Action by inverse is a left inverse. -/
 theorem act_inv_act (ga : GAction G P) (p : P) (g : G) :
@@ -171,7 +171,7 @@ variable {G P B : Type u}
 /-- `Path`-typed fiber preservation. -/
 def proj_act_path (pb : PrincipalBundleData G P B) (p : P) (g : G) :
     Path (pb.proj (pb.action.act p g)) (pb.proj p) :=
-  Path.ofEq (pb.proj_act p g)
+  Path.stepChain (pb.proj_act p g)
 
 /-- Acting by the identity preserves the point. -/
 theorem act_id (pb : PrincipalBundleData G P B) (p : P) :
@@ -181,7 +181,7 @@ theorem act_id (pb : PrincipalBundleData G P B) (p : P) :
 /-- `Path`-typed act_id. -/
 def act_id_path (pb : PrincipalBundleData G P B) (p : P) :
     Path (pb.action.act p pb.action.grp.e) p :=
-  Path.ofEq (pb.act_id p)
+  Path.stepChain (pb.act_id p)
 
 end PrincipalBundleData
 
@@ -259,7 +259,7 @@ def assocProj_wd_path (ab : AssociatedBundleData G P B F)
     (x y : AssociatedTotal P F)
     (h : associatedRel ab.principal.action ab.fiberAction x y) :
     Path (ab.assocProj x) (ab.assocProj y) :=
-  Path.ofEq (ab.assocProj_wd x y h)
+  Path.stepChain (ab.assocProj_wd x y h)
 
 end AssociatedBundleData
 
@@ -316,13 +316,13 @@ def comp (pb : PrincipalBundleData G P B)
 /-- `Path`-typed fiber preservation. -/
 def preserves_fiber_path (φ : GaugeTransformation G P B) (p : P) :
     Path (φ.bundle.proj (φ.toFun p)) (φ.bundle.proj p) :=
-  Path.ofEq (φ.preserves_fiber p)
+  Path.stepChain (φ.preserves_fiber p)
 
 /-- `Path`-typed equivariance. -/
 def equivariant_path (φ : GaugeTransformation G P B) (p : P) (g : G) :
     Path (φ.toFun (φ.bundle.action.act p g))
       (φ.bundle.action.act (φ.toFun p) g) :=
-  Path.ofEq (φ.equivariant p g)
+  Path.stepChain (φ.equivariant p g)
 
 /-- The identity gauge transformation acts trivially. -/
 theorem id_toFun (pb : PrincipalBundleData G P B) (p : P) :
@@ -363,12 +363,12 @@ variable {G P B : Type u}
 def lift_proj_path (conn : ConnectionData G P B) (p : P) (b : B)
     (γ : Path (conn.bundle.proj p) b) :
     Path (conn.bundle.proj (conn.horizLift p b γ)) b :=
-  Path.ofEq (conn.lift_proj p b γ)
+  Path.stepChain (conn.lift_proj p b γ)
 
 /-- `Path`-typed lift of reflexivity. -/
 def lift_refl_path (conn : ConnectionData G P B) (p : P) :
     Path (conn.horizLift p (conn.bundle.proj p) (Path.refl (conn.bundle.proj p))) p :=
-  Path.ofEq (conn.lift_refl p)
+  Path.stepChain (conn.lift_refl p)
 
 end ConnectionData
 

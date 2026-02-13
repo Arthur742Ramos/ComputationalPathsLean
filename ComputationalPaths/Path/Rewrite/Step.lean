@@ -85,7 +85,7 @@ namespace Path
 
 open scoped Quot
 
-universe u
+universe u v w
 
 /-- A single rewrite step between computational paths.
 
@@ -833,6 +833,38 @@ inductive Step :
   | trans_congr_right {A : Type u} {a b c : A}
       (p : Path a b) {q r : Path b c} :
       Step (A := A) q r → Step (A := A) (Path.trans p q) (Path.trans p r)
+
+/-- Step-oriented path constructor for reflexivity. -/
+@[simp] def Step.refl {A : Type u} (a : A) : Path a a :=
+  Path.refl a
+
+/-- Step-oriented path constructor for symmetry. -/
+@[simp] def Step.symm {A : Type u} {a b : A} (p : Path a b) : Path b a :=
+  Path.symm p
+
+/-- Step-oriented path constructor for composition. -/
+@[simp] def Step.trans {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) : Path a c :=
+  Path.trans p q
+
+/-- Step-oriented congruence for composition of functions. -/
+@[simp] def Step.congr_comp {A : Type u} {B : Type v} {C : Type w}
+    (f : A → B) (g : B → C) {a b : A} (p : Path a b) :
+    Path (g (f a)) (g (f b)) :=
+  Path.congrArg g (Path.congrArg f p)
+
+/-- Step-oriented right-associated composition. -/
+@[simp] def Step.assoc {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) : Path a d :=
+  Step.trans p (Step.trans q r)
+
+/-- Step-oriented left unit insertion. -/
+@[simp] def Step.unit_left {A : Type u} {a b : A} (p : Path a b) : Path a b :=
+  Step.trans (Step.refl a) p
+
+/-- Step-oriented right unit insertion. -/
+@[simp] def Step.unit_right {A : Type u} {a b : A} (p : Path a b) : Path a b :=
+  Step.trans p (Step.refl b)
 
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr

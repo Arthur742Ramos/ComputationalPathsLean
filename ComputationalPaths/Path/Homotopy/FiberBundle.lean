@@ -97,12 +97,12 @@ theorem model_roundtrip (bd : FiberBundleData B E F) (b : B)
 def fiber_roundtrip_path (bd : FiberBundleData B E F) (b : B)
     (x : Fiber bd.proj b) :
     Path (bd.modelToFiber b (bd.fiberToModel b x)) x :=
-  Path.ofEq (fiber_roundtrip bd b x)
+  Path.stepChain (fiber_roundtrip bd b x)
 
 /-- `Path`-typed round-trip from model. -/
 def model_roundtrip_path (bd : FiberBundleData B E F) (b : B)
     (f : F) : Path (bd.fiberToModel b (bd.modelToFiber b f)) f :=
-  Path.ofEq (model_roundtrip bd b f)
+  Path.stepChain (model_roundtrip bd b f)
 
 end FiberBundleData
 
@@ -150,12 +150,12 @@ def toFiberBundleData (lt : LocalTrivializationSimple B E F) :
 def left_inv_path (lt : LocalTrivializationSimple B E F) (b : B)
     (x : Fiber lt.proj b) :
     Path (lt.untrivialize b (lt.trivialize b x)) x :=
-  Path.ofEq (lt.left_inv b x)
+  Path.stepChain (lt.left_inv b x)
 
 /-- `Path`-typed right inverse. -/
 def right_inv_path (lt : LocalTrivializationSimple B E F) (b : B)
     (f : F) : Path (lt.trivialize b (lt.untrivialize b f)) f :=
-  Path.ofEq (lt.right_inv b f)
+  Path.stepChain (lt.right_inv b f)
 
 end LocalTrivializationSimple
 
@@ -232,12 +232,12 @@ theorem inv_comp (t : TransitionFunction F) :
 /-- `Path`-typed id_comp. -/
 def id_comp_path (t : TransitionFunction F) (f : F) :
     Path ((comp id t).toFun f) (t.toFun f) :=
-  Path.ofEq (id_comp t f)
+  Path.stepChain (id_comp t f)
 
 /-- `Path`-typed comp_inv. -/
 def comp_inv_path (t : TransitionFunction F) (f : F) :
     Path ((comp t (inv t)).toFun f) f :=
-  Path.ofEq (comp_inv t f)
+  Path.stepChain (comp_inv t f)
 
 end TransitionFunction
 
@@ -279,7 +279,7 @@ structure CocycleData (F : Type u) where
 /-- `Path`-typed cocycle condition. -/
 def transition_cocycle {F : Type u} (cd : CocycleData F) (f : F) :
     Path (cd.g13.toFun f) ((TransitionFunction.comp cd.g12 cd.g23).toFun f) :=
-  Path.ofEq (cd.cocycle f)
+  Path.stepChain (cd.cocycle f)
 
 /-- Trivial cocycle data where all transitions are identity. -/
 def trivialCocycle (F : Type u) : CocycleData F where
@@ -377,7 +377,7 @@ theorem trivialBundle_transition (B : Type u) (F : Type u) (b : B) :
 def trivialBundle_transition_path (B : Type u) (F : Type u) (b : B) (f : F) :
     Path ((trivialBundle B F).fiberToModel b
       ((trivialBundle B F).modelToFiber b f)) f :=
-  Path.ofEq (trivialBundle_transition B F b f)
+  Path.stepChain (trivialBundle_transition B F b f)
 
 /-! ## Pullback Bundle
 
@@ -421,7 +421,7 @@ def pullbackBundle {A : Type u} {B : Type u} {E : Type u} {F : Type u}
 def pullbackBundle_roundtrip_path {A : Type u} {B : Type u} {E : Type u} {F : Type u}
     (f : A → B) (bd : FiberBundleData B E F) (a : A) (x : Fiber (pullbackProj f bd.proj) a) :
     Path ((pullbackBundle f bd).modelToFiber a ((pullbackBundle f bd).fiberToModel a x)) x :=
-  Path.ofEq ((pullbackBundle f bd).fiber_roundtrip a x)
+  Path.stepChain ((pullbackBundle f bd).fiber_roundtrip a x)
 
 /-! ## Summary
 

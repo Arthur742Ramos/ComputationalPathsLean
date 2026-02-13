@@ -86,10 +86,10 @@ namespace F2
   cases a <;> rfl
 
 def add_comm_path (a b : F2) : Path (add a b) (add b a) :=
-  Path.ofEq (add_comm a b)
+  Path.stepChain (add_comm a b)
 
 def add_self_path (a : F2) : Path (add a a) zero :=
-  Path.ofEq (add_self a)
+  Path.stepChain (add_self a)
 
 end F2
 
@@ -120,12 +120,12 @@ theorem MotBidegree.add_assoc (d₁ d₂ d₃ : MotBidegree) :
 /-- Path witnessing bidegree commutativity. -/
 def MotBidegree.add_comm_path (d₁ d₂ : MotBidegree) :
     Path (d₁.add d₂) (d₂.add d₁) :=
-  Path.ofEq (MotBidegree.add_comm d₁ d₂)
+  Path.stepChain (MotBidegree.add_comm d₁ d₂)
 
 /-- Path witnessing bidegree associativity. -/
 def MotBidegree.add_assoc_path (d₁ d₂ d₃ : MotBidegree) :
     Path ((d₁.add d₂).add d₃) (d₁.add (d₂.add d₃)) :=
-  Path.ofEq (MotBidegree.add_assoc d₁ d₂ d₃)
+  Path.stepChain (MotBidegree.add_assoc d₁ d₂ d₃)
 
 /-- The bidegree of the simplicial Sq^i: (2i, i). -/
 def sqBidegree (i : Nat) : MotBidegree := ⟨2 * i, i⟩
@@ -148,7 +148,7 @@ theorem sq_compose_bidegree (i j : Nat) :
 /-- Path witnessing the Sq composition bidegree. -/
 def sq_compose_bidegree_path (i j : Nat) :
     Path ((sqBidegree i).add (sqBidegree j)) (sqBidegree (i + j)) :=
-  Path.ofEq (sq_compose_bidegree i j)
+  Path.stepChain (sq_compose_bidegree i j)
 
 /-! ## Bigraded ℤ/2-Modules -/
 
@@ -185,17 +185,17 @@ theorem add_zero_val (p q : Int) (x : M.carrier p q) :
 /-- Path witnessing zero is left identity. -/
 def zero_add_path (p q : Int) (x : M.carrier p q) :
     Path (M.add p q (M.zero p q) x) x :=
-  Path.ofEq (M.zero_add p q x)
+  Path.stepChain (M.zero_add p q x)
 
 /-- Path witnessing x + 0 = x. -/
 def add_zero_path (p q : Int) (x : M.carrier p q) :
     Path (M.add p q x (M.zero p q)) x :=
-  Path.ofEq (M.add_zero_val p q x)
+  Path.stepChain (M.add_zero_val p q x)
 
 /-- Path witnessing x + x = 0 (char 2). -/
 def add_self_path (p q : Int) (x : M.carrier p q) :
     Path (M.add p q x x) (M.zero p q) :=
-  Path.ofEq (M.add_self p q x)
+  Path.stepChain (M.add_self p q x)
 
 end MotivicGradedModule
 
@@ -223,13 +223,13 @@ variable {M : MotivicGradedModule.{u}} (S : MotivicSteenrodData M)
 /-- Path witnessing Sq^i maps zero to zero. -/
 def sq_zero_path (i : Nat) (p q : Int) :
     Path (S.sq i p q (M.zero p q)) (M.zero _ _) :=
-  Path.ofEq (S.sq_map_zero i p q)
+  Path.stepChain (S.sq_map_zero i p q)
 
 /-- Path witnessing additivity of Sq^i. -/
 def sq_add_path (i : Nat) (p q : Int) (x y : M.carrier p q) :
     Path (S.sq i p q (M.add p q x y))
          (M.add _ _ (S.sq i p q x) (S.sq i p q y)) :=
-  Path.ofEq (S.sq_map_add i p q x y)
+  Path.stepChain (S.sq_map_add i p q x y)
 
 /-- Sq^i(x) + Sq^i(x) = 0 (char 2). -/
 theorem sq_add_self (i : Nat) (p q : Int) (x : M.carrier p q) :
@@ -239,7 +239,7 @@ theorem sq_add_self (i : Nat) (p q : Int) (x : M.carrier p q) :
 /-- Path witnessing Sq^i(x) + Sq^i(x) = 0. -/
 def sq_add_self_path (i : Nat) (p q : Int) (x : M.carrier p q) :
     Path (M.add _ _ (S.sq i p q x) (S.sq i p q x)) (M.zero _ _) :=
-  Path.ofEq (S.sq_add_self i p q x)
+  Path.stepChain (S.sq_add_self i p q x)
 
 /-- Composite Path: Sq^i(x + x) = Sq^i(x) + Sq^i(x) = 0. -/
 def sq_of_add_self_path (i : Nat) (p q : Int) (x : M.carrier p q) :
@@ -275,8 +275,8 @@ def bockstein_zero_chain {M : MotivicGradedModule.{u}}
     Path (B.beta (p + 1) q (B.beta p q (M.zero p q)))
          (M.zero (p + 1 + 1) q) :=
   Path.trans
-    (Path.ofEq (by rw [B.beta_zero p q]))
-    (Path.ofEq (B.beta_zero (p + 1) q))
+    (Path.stepChain (by rw [B.beta_zero p q]))
+    (Path.stepChain (B.beta_zero (p + 1) q))
 
 /-! ## Motivic Adem Relations -/
 
@@ -355,7 +355,7 @@ theorem motAdemDegree_append (w₁ w₂ : MotAdemWord) :
 /-- Path witnessing degree additivity. -/
 def motAdemDegree_append_path (w₁ w₂ : MotAdemWord) :
     Path (motAdemDegree (w₁ ++ w₂)) (motAdemDegree w₁ + motAdemDegree w₂) :=
-  Path.ofEq (motAdemDegree_append w₁ w₂)
+  Path.stepChain (motAdemDegree_append w₁ w₂)
 
 /-- A motivic Adem relation: for Sq^a Sq^b with 0 < a < 2b. -/
 structure MotivicAdemRelation where
@@ -375,7 +375,7 @@ theorem MotivicAdemRelation.degree_lhs (r : MotivicAdemRelation) :
 /-- Path witnessing the Adem LHS degree. -/
 def MotivicAdemRelation.degree_lhs_path (r : MotivicAdemRelation) :
     Path (motAdemDegree r.lhs) (r.a + r.b) :=
-  Path.ofEq r.degree_lhs
+  Path.stepChain r.degree_lhs
 
 /-! ## Motivic Milnor Basis -/
 
@@ -400,7 +400,7 @@ theorem milnorDegree_singleton (r i : Nat) :
 /-- Path witnessing singleton degree. -/
 def milnor_singleton_path (r i : Nat) :
     Path (milnorDegree [r] i) (r * 2^i) :=
-  Path.ofEq (milnorDegree_singleton r i)
+  Path.stepChain (milnorDegree_singleton r i)
 
 /-- Milnor basis element data. -/
 structure MilnorBasisElement where
@@ -444,7 +444,7 @@ theorem add_terms_length (a b : F2MotLinComb) :
 
 def add_terms_length_path (a b : F2MotLinComb) :
     Path (add a b).terms.length (a.terms.length + b.terms.length) :=
-  Path.ofEq (add_terms_length a b)
+  Path.stepChain (add_terms_length a b)
 
 end F2MotLinComb
 
@@ -479,7 +479,7 @@ def sq_zero_unit_path : Path (sq 0) (mk (F2MotLinComb.single [0])) :=
 def sq_char2_path (i : Nat) :
     Path (mk (F2MotLinComb.add (F2MotLinComb.single [i]) (F2MotLinComb.single [i])))
          zero :=
-  Path.ofEq (Quot.sound (MotSteenrodRel.char2 [i]))
+  Path.stepChain (Quot.sound (MotSteenrodRel.char2 [i]))
 
 end MotSteenrodAlgebra
 
@@ -581,7 +581,7 @@ theorem symm_symm_motivic_ops {A : Type u} {a b : A} (p : Path a b) :
 def sq_compose_coherence (i j k : Nat) :
     Path ((sqBidegree i).add ((sqBidegree j).add (sqBidegree k)))
          (sqBidegree (i + j + k)) :=
-  Path.ofEq (by
+  Path.stepChain (by
     simp only [sqBidegree, MotBidegree.add, MotBidegree.mk.injEq]
     omega)
 

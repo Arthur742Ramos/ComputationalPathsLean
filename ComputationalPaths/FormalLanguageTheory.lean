@@ -80,6 +80,15 @@ namespace FormalLanguageTheory
 
 open Path
 
+private def stepChainOfEq {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  let core :=
+    Path.Step.symm
+      (Path.Step.symm
+        (Path.Step.congr_comp (fun x : A => x) (fun x : A => x) (Path.stepChain h)))
+  Path.Step.unit_right
+    (Path.Step.unit_left
+      (Path.Step.assoc (Path.Step.refl a) core (Path.Step.refl b)))
+
 /-! ## Chomsky Hierarchy Levels -/
 
 /-- Data for a single level of the Chomsky hierarchy. -/
@@ -156,7 +165,7 @@ def recursivelyEnumerable : ChomskyLevelData where
 /-- Path: automaton type matches level. -/
 def automaton_path (cl : ChomskyLevelData) :
     Path cl.automatonType cl.level :=
-  Path.ofEqChain cl.automaton_eq
+  stepChainOfEq cl.automaton_eq
 
 end ChomskyLevelData
 
@@ -209,17 +218,17 @@ def standard : ChomskyHierarchyData where
 /-- Path: number of levels. -/
 def levels_path (ch : ChomskyHierarchyData) :
     Path ch.numLevels 4 :=
-  Path.ofEqChain ch.levels_eq
+  stepChainOfEq ch.levels_eq
 
 /-- Path: strictness. -/
 def strict_path (ch : ChomskyHierarchyData) :
     Path ch.isStrict true :=
-  Path.ofEqChain ch.strict_eq
+  stepChainOfEq ch.strict_eq
 
 /-- Path: containment obstruction. -/
 def obstruction_path (ch : ChomskyHierarchyData) :
     Path ch.containmentObstruction 0 :=
-  Path.ofEqChain ch.obstruction_eq
+  stepChainOfEq ch.obstruction_eq
 
 end ChomskyHierarchyData
 
@@ -308,7 +317,7 @@ def closure_count_path (ct : ClosureTableData) :
        (if ct.complementClosed then 1 else 0) +
        (if ct.concatClosed then 1 else 0) +
        (if ct.starClosed then 1 else 0)) :=
-  Path.ofEqChain ct.closure_eq
+  stepChainOfEq ct.closure_eq
 
 end ClosureTableData
 
@@ -505,12 +514,12 @@ def ofSize (n k : Nat) (hk : k > 0) : AutomaticStructureData where
 /-- Path: number of automata. -/
 def automata_path (asd : AutomaticStructureData) :
     Path asd.numAutomata (asd.numRelations + 1) :=
-  Path.ofEqChain asd.automata_eq
+  stepChainOfEq asd.automata_eq
 
 /-- Path: FO decidability. -/
 def fo_decidable_path (asd : AutomaticStructureData) :
     Path asd.foDecidable true :=
-  Path.ofEqChain asd.fo_decidable_eq
+  stepChainOfEq asd.fo_decidable_eq
 
 end AutomaticStructureData
 
@@ -590,17 +599,17 @@ def ndTopDown : TreeAutomatonData where
 /-- Path: complement closure. -/
 def complement_path (ta : TreeAutomatonData) :
     Path ta.complementClosed true :=
-  Path.ofEqChain ta.complement_eq
+  stepChainOfEq ta.complement_eq
 
 /-- Path: intersection closure. -/
 def intersection_path (ta : TreeAutomatonData) :
     Path ta.intersectionClosed true :=
-  Path.ofEqChain ta.intersection_eq
+  stepChainOfEq ta.intersection_eq
 
 /-- Path: union closure. -/
 def union_path (ta : TreeAutomatonData) :
     Path ta.unionClosed true :=
-  Path.ofEqChain ta.union_eq
+  stepChainOfEq ta.union_eq
 
 end TreeAutomatonData
 
@@ -678,7 +687,7 @@ def tropical : WeightedAutomatonData where
 /-- Path: max transitions. -/
 def max_path (wa : WeightedAutomatonData) :
     Path wa.maxTransitions (wa.numStates ^ 2 * wa.alphabetSize) :=
-  Path.ofEqChain wa.max_eq
+  stepChainOfEq wa.max_eq
 
 end WeightedAutomatonData
 
@@ -719,12 +728,12 @@ def simple : MSOTreeData where
 /-- Path: complexity. -/
 def complexity_path (mso : MSOTreeData) :
     Path mso.totalComplexity (mso.numSetQuantifiers + mso.numIndividualQuantifiers) :=
-  Path.ofEqChain mso.complexity_eq
+  stepChainOfEq mso.complexity_eq
 
 /-- Path: decidability (Rabin). -/
 def decidable_path (mso : MSOTreeData) :
     Path mso.isDecidable true :=
-  Path.ofEqChain mso.decidable_eq
+  stepChainOfEq mso.decidable_eq
 
 end MSOTreeData
 
@@ -772,12 +781,12 @@ def nonStarFree : StarFreeData where
 /-- Path: McNaughton-Papert. -/
 def mp_path (sf : StarFreeData) :
     Path sf.isStarFree sf.isFODefinable :=
-  Path.ofEqChain sf.mcnaughton_papert
+  stepChainOfEq sf.mcnaughton_papert
 
 /-- Path: Schützenberger. -/
 def schutz_path (sf : StarFreeData) :
     Path sf.isStarFree sf.isAperiodic :=
-  Path.ofEqChain sf.schutzenberger
+  stepChainOfEq sf.schutzenberger
 
 end StarFreeData
 
@@ -835,12 +844,12 @@ def csVsRE : LanguageComparisonData where
 /-- Path: separation. -/
 def separation_path (lc : LanguageComparisonData) :
     Path lc.hasSeparation true :=
-  Path.ofEqChain lc.separation_eq
+  stepChainOfEq lc.separation_eq
 
 /-- Path: containment. -/
 def containment_path (lc : LanguageComparisonData) :
     Path lc.containmentHolds true :=
-  Path.ofEqChain lc.containment_eq
+  stepChainOfEq lc.containment_eq
 
 end LanguageComparisonData
 
@@ -865,19 +874,19 @@ def master_hierarchy_obstruction_path :
 def master_regular_closure_path :
     Path ClosureTableData.regular.numClosureProps 5 := by
   have h := ClosureTableData.regular.closure_eq
-  exact Path.ofEqChain h
+  exact stepChainOfEq h
 
 /-- Master: CFL closure properties (3 of 5). -/
 def master_cfl_closure_path :
     Path ClosureTableData.contextFree.numClosureProps 3 := by
   have h := ClosureTableData.contextFree.closure_eq
-  exact Path.ofEqChain h
+  exact stepChainOfEq h
 
 /-- Master: RE closure properties (4 of 5). -/
 def master_re_closure_path :
     Path ClosureTableData.recursivelyEnumerable.numClosureProps 4 := by
   have h := ClosureTableData.recursivelyEnumerable.closure_eq
-  exact Path.ofEqChain h
+  exact stepChainOfEq h
 
 /-- Master: automatic structure FO decidability. -/
 def master_automatic_fo_path :

@@ -9,6 +9,7 @@ import Chromatic.PathInfrastructure
 import Topos.PathCoherence
 import Descent.PathCoherence
 import Deformation.PathInfrastructure
+import DerivedCategories.PathInfrastructure
 import Moduli.PathInfrastructure
 import Cobordism.PathInfrastructure
 import TFT.PathInfrastructure
@@ -30,6 +31,7 @@ import Quantum.PathInfrastructure
 import KacMoody.PathInfrastructure
 import Mirror.PathInfrastructure
 import SymplecticDuality.PathInfrastructure
+import Floer.PathInfrastructure
 import NCG.PathInfrastructure
 import VertexAlgebra.PathInfrastructure
 import Tropical.PathInfrastructure
@@ -38,3 +40,4 @@ import Log.PathInfrastructure
 import RepStability.PathInfrastructure
 import HomologicalStability.PathInfrastructure
 import Intersection.PathInfrastructure
+import OperadicAlgebra.PathInfrastructure

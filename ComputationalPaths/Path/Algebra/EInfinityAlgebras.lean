@@ -73,13 +73,13 @@ structure SymmetricAction (n : Nat) (X : Type u) where
 def SymmetricAction.actIdPath {n : Nat} {X : Type u}
     (A : SymmetricAction n X) (x : X) :
     Path (A.act (FinPerm.id n) x) x :=
-  Path.ofEq (A.act_id x)
+  Path.stepChain (A.act_id x)
 
 /-- Path witness for action composition. -/
 def SymmetricAction.actCompPath {n : Nat} {X : Type u}
     (A : SymmetricAction n X) (σ τ : FinPerm n) (x : X) :
     Path (A.act (FinPerm.comp σ τ) x) (A.act σ (A.act τ x)) :=
-  Path.ofEq (A.act_comp σ τ x)
+  Path.stepChain (A.act_comp σ τ x)
 
 /-! ## E∞ Operads -/
 
@@ -102,7 +102,7 @@ structure EInfinityOperad where
 /-- Path witness for contractibility. -/
 def EInfinityOperad.contractPath (O : EInfinityOperad) (n : Nat) (x : O.space n) :
     Path x (O.basepoint n) :=
-  Path.ofEq (O.contract n x)
+  Path.stepChain (O.contract n x)
 
 /-- All elements in an E∞ operad space are path-connected. -/
 theorem EInfinityOperad.connected (O : EInfinityOperad) (n : Nat)
@@ -112,7 +112,7 @@ theorem EInfinityOperad.connected (O : EInfinityOperad) (n : Nat)
 /-- Path witnessing connectivity. -/
 def EInfinityOperad.connectedPath (O : EInfinityOperad) (n : Nat)
     (x y : O.space n) : Path x y :=
-  Path.ofEq (O.connected n x y)
+  Path.stepChain (O.connected n x y)
 
 /-! ## E∞ Algebras -/
 
@@ -134,14 +134,14 @@ structure EInfinityAlgebra (O : EInfinityOperad) where
 def EInfinityAlgebra.actIdentityPath {O : EInfinityOperad}
     (A : EInfinityAlgebra O) (x : A.carrier) :
     Path (A.act 1 O.identity (fun _ => x)) x :=
-  Path.ofEq (A.act_identity x)
+  Path.stepChain (A.act_identity x)
 
 /-- Path witness for equivariance. -/
 def EInfinityAlgebra.actEquivariantPath {O : EInfinityOperad}
     (A : EInfinityAlgebra O) (n : Nat) (σ : FinPerm n)
     (θ : O.space n) (xs : Fin n → A.carrier) :
     Path (A.act n ((O.symAction n).act σ θ) xs) (A.act n θ (xs ∘ σ.toFun)) :=
-  Path.ofEq (A.act_equivariant n σ θ xs)
+  Path.stepChain (A.act_equivariant n σ θ xs)
 
 /-- Binary multiplication from the E∞ structure. -/
 def EInfinityAlgebra.mul {O : EInfinityOperad} (A : EInfinityAlgebra O)
@@ -164,7 +164,7 @@ def EInfinityAlgebra.mulHomotopyCommPath {O : EInfinityOperad}
     (x y : A.carrier) :
     Path (A.act 2 θ₁ (fun i => if i.val = 0 then x else y))
          (A.act 2 θ₂ (fun i => if i.val = 0 then x else y)) :=
-  Path.ofEq (A.mul_homotopy_comm θ₁ θ₂ x y)
+  Path.stepChain (A.mul_homotopy_comm θ₁ θ₂ x y)
 
 /-! ## E∞ Ring Spectra -/
 
@@ -182,7 +182,7 @@ structure Spectrum where
 /-- Path witness for structure map preserving basepoint. -/
 def Spectrum.structureMapBasePath (S : Spectrum) (n : Nat) :
     Path (S.structureMap n (S.base n)) (S.base (n + 1)) :=
-  Path.ofEq (S.structureMap_base n)
+  Path.stepChain (S.structureMap_base n)
 
 /-- An E∞ ring spectrum: a spectrum with E∞ multiplication. -/
 structure EInfinityRingSpectrum extends Spectrum where
@@ -217,19 +217,19 @@ structure EInfinityRingSpectrum extends Spectrum where
 def EInfinityRingSpectrum.mulAddPath (R : EInfinityRingSpectrum)
     (x y z : R.level 0) :
     Path (R.mul x (R.add y z)) (R.add (R.mul x y) (R.mul x z)) :=
-  Path.ofEq (R.mul_add x y z)
+  Path.stepChain (R.mul_add x y z)
 
 /-- Path witness for left zero. -/
 def EInfinityRingSpectrum.mulZeroPath (R : EInfinityRingSpectrum)
     (x : R.level 0) :
     Path (R.mul x R.zero) R.zero :=
-  Path.ofEq (R.mul_zero x)
+  Path.stepChain (R.mul_zero x)
 
 /-- Path witness for multiplicative unitality. -/
 def EInfinityRingSpectrum.mulOnePath (R : EInfinityRingSpectrum)
     (x : R.level 0) :
     Path (R.mul x R.one) x :=
-  Path.ofEq (R.mul_one x)
+  Path.stepChain (R.mul_one x)
 
 /-! ## Recognition Principle -/
 
@@ -260,7 +260,7 @@ structure GrouplikeEInfinity (O : EInfinityOperad) extends EInfinitySpace O wher
 def GrouplikeEInfinity.invLeftPath {O : EInfinityOperad}
     (G : GrouplikeEInfinity O) (x : G.carrier) :
     Path (G.mul (G.inv x) x) G.base :=
-  Path.ofEq (G.inv_left x)
+  Path.stepChain (G.inv_left x)
 
 /-- The recognition principle (May's theorem):
     a grouplike E∞ space is an infinite loop space.
@@ -306,7 +306,7 @@ structure EInfinityMonoid (O : EInfinityOperad) extends EInfinitySpace O where
 def EInfinityMonoid.mulAssocPath {O : EInfinityOperad}
     (M : EInfinityMonoid O) (x y z : M.carrier) :
     Path (M.mul (M.mul x y) z) (M.mul x (M.mul y z)) :=
-  Path.ofEq (M.mul_assoc x y z)
+  Path.stepChain (M.mul_assoc x y z)
 
 /-- Group completion of an E∞ monoid: formally adjoin inverses. -/
 structure GroupCompletion (O : EInfinityOperad) (M : EInfinityMonoid O) where
@@ -337,13 +337,13 @@ structure GroupCompletion (O : EInfinityOperad) (M : EInfinityMonoid O) where
 def GroupCompletion.inclMulPath {O : EInfinityOperad} {M : EInfinityMonoid O}
     (G : GroupCompletion O M) (x y : M.carrier) :
     Path (G.incl (M.mul x y)) (G.mul (G.incl x) (G.incl y)) :=
-  Path.ofEq (G.incl_mul x y)
+  Path.stepChain (G.incl_mul x y)
 
 /-- Path witness for left inverse in group completion. -/
 def GroupCompletion.invLeftPath {O : EInfinityOperad} {M : EInfinityMonoid O}
     (G : GroupCompletion O M) (x : G.carrier) :
     Path (G.mul (G.inv x) x) G.one :=
-  Path.ofEq (G.inv_left x)
+  Path.stepChain (G.inv_left x)
 
 /-! ## Barratt-Priddy-Quillen Theorem -/
 
@@ -371,7 +371,7 @@ structure StableHomotopy where
 /-- Path witness for stable homotopy group addition identity. -/
 def StableHomotopy.addZeroPath (S : StableHomotopy) (n : Int) (x : S.group n) :
     Path (S.add n (S.zero n) x) x :=
-  Path.ofEq (S.add_zero n x)
+  Path.stepChain (S.add_zero n x)
 
 /-- The Barratt-Priddy-Quillen theorem: the group completion of
     ∐_n BΣ_n is equivalent to Ω∞Σ∞S⁰ (the infinite loop space of the sphere spectrum).
@@ -409,7 +409,7 @@ structure Stabilization where
 /-- Path witness for stabilization preserving base. -/
 def Stabilization.stabilizeBasePath (S : Stabilization) :
     Path (S.stabilize S.base) S.stabilizedBase :=
-  Path.ofEq S.stabilize_base
+  Path.stepChain S.stabilize_base
 
 /-- The colimit of E_n stabilizations gives E∞. -/
 theorem stabilization_colimit_is_einf : True := trivial

@@ -59,6 +59,15 @@ namespace SymplecticManifolds
 
 universe u v w
 
+private def stepChainOfEq {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  let core :=
+    Path.Step.symm
+      (Path.Step.symm
+        (Path.Step.congr_comp (fun x : A => x) (fun x : A => x) (Path.stepChain h)))
+  Path.Step.unit_right
+    (Path.Step.unit_left
+      (Path.Step.assoc (Path.Step.refl a) core (Path.Step.refl b)))
+
 /-! ## Symplectic Data -/
 
 /-- Symplectic data on a 2n-dimensional manifold: the half-dimension n,
@@ -543,104 +552,104 @@ end MoserStability
 /-- Path witness: standard symplectic data dimension. -/
 def standard_dim_path (n : Nat) :
     Path (SymplecticData.standard n).fullDim (2 * n) :=
-  Path.ofEqChain (SymplecticData.standard_dim n)
+  stepChainOfEq (SymplecticData.standard_dim n)
 
 /-- Path witness: standard half-dimension. -/
 def standard_halfDim_path (n : Nat) :
     Path (SymplecticData.standard n).halfDim n :=
-  Path.ofEqChain (SymplecticData.standard_halfDim n)
+  stepChainOfEq (SymplecticData.standard_halfDim n)
 
 /-- Path witness: dimension is even. -/
 def dim_even_path (ω : SymplecticData) :
     Path ω.fullDim (2 * ω.halfDim) :=
-  Path.ofEqChain (SymplecticData.dim_even ω)
+  stepChainOfEq (SymplecticData.dim_even ω)
 
 /-- Path witness: self-pairing vanishes. -/
 def symplectic_self_zero_path (ω : SymplecticEval) (i : Nat) :
     Path (ω.eval i i) 0 :=
-  Path.ofEqChain (SymplecticEval.eval_self_zero ω i)
+  stepChainOfEq (SymplecticEval.eval_self_zero ω i)
 
 /-- Path witness: zero form evaluates to zero. -/
 def zero_form_path (d : SymplecticData) (i j : Nat) :
     Path ((SymplecticEval.zeroForm d).eval i j) 0 :=
-  Path.ofEqChain (SymplecticEval.zero_eval d i j)
+  stepChainOfEq (SymplecticEval.zero_eval d i j)
 
 /-- Path witness: identity Darboux chart canonical eval. -/
 def identity_darboux_path (n : Nat) (i : Nat) :
     Path ((DarbouxChart.identity n).canonical_eval i) 1 :=
-  Path.ofEqChain (DarbouxChart.identity_eval n i)
+  stepChainOfEq (DarbouxChart.identity_eval n i)
 
 /-- Path witness: identity symplectomorphism preserves indices. -/
 def id_symplecto_path (ω : SymplecticData) (i : Nat) :
     Path ((Symplectomorphism.id ω).mapIdx i) i :=
-  Path.ofEqChain (Symplectomorphism.id_mapIdx ω i)
+  stepChainOfEq (Symplectomorphism.id_mapIdx ω i)
 
 /-- Path witness: identity inverse. -/
 def id_inv_path (ω : SymplecticData) (i : Nat) :
     Path ((Symplectomorphism.id ω).invIdx i) i :=
-  Path.ofEqChain (Symplectomorphism.id_invIdx ω i)
+  stepChainOfEq (Symplectomorphism.id_invIdx ω i)
 
 /-- Path witness: zero Hamiltonian components. -/
 def zero_hamiltonian_path (d : SymplecticData) (i : Nat) :
     Path ((HamiltonianVectorField.zero d).components i) 0 :=
-  Path.ofEqChain (HamiltonianVectorField.zero_components d i)
+  stepChainOfEq (HamiltonianVectorField.zero_components d i)
 
 /-- Path witness: Poisson self-bracket is zero. -/
 def poisson_self_bracket_path (d : SymplecticData) :
     Path (PoissonBracket.selfBracket d).value 0 :=
-  Path.ofEqChain (PoissonBracket.selfBracket_zero d)
+  stepChainOfEq (PoissonBracket.selfBracket_zero d)
 
 /-- Path witness: zero moment map vanishes. -/
 def moment_zero_path (d : SymplecticData) (ld α i : Nat) :
     Path ((MomentMap.zero d ld).value α i) 0 :=
-  Path.ofEqChain (MomentMap.zero_value d ld α i)
+  stepChainOfEq (MomentMap.zero_value d ld α i)
 
 /-- Path witness: Lagrangian dimension is half the ambient dimension. -/
 def lagrangian_dim_path (L : LagrangianSubmanifold) :
     Path (2 * L.lagDim) L.ambient.fullDim :=
-  Path.ofEqChain (LagrangianSubmanifold.lagrangian_dim_half L)
+  stepChainOfEq (LagrangianSubmanifold.lagrangian_dim_half L)
 
 /-- Path witness: zero section dimension. -/
 def zero_section_dim_path (n : Nat) :
     Path (LagrangianSubmanifold.zeroSection n).lagDim n :=
-  Path.ofEqChain (LagrangianSubmanifold.zeroSection_dim n)
+  stepChainOfEq (LagrangianSubmanifold.zeroSection_dim n)
 
 /-- Path witness: cotangent fiber dimension. -/
 def cotangent_fiber_dim_path (n : Nat) :
     Path (LagrangianSubmanifold.cotangentFiber n).lagDim n :=
-  Path.ofEqChain (LagrangianSubmanifold.cotangentFiber_dim n)
+  stepChainOfEq (LagrangianSubmanifold.cotangentFiber_dim n)
 
 /-- Path witness: linear capacity. -/
 def linear_capacity_path (r : Nat) :
     Path (SymplecticCapacity.linear.value r) r :=
-  Path.ofEqChain (SymplecticCapacity.linear_value r)
+  stepChainOfEq (SymplecticCapacity.linear_value r)
 
 /-- Path witness: Gromov equal radii. -/
 def gromov_equal_path (r : Nat) :
     Path (GromovNonSqueezing.equal r).ballRadius (GromovNonSqueezing.equal r).cylinderRadius :=
-  Path.ofEqChain (GromovNonSqueezing.equal_radii r)
+  stepChainOfEq (GromovNonSqueezing.equal_radii r)
 
 /-- Path witness: trivial reduction half-dimension. -/
 def trivial_reduction_path (d : SymplecticData) :
     Path (MarsdenWeinsteinReduction.trivial d).reducedHalfDim d.halfDim :=
-  Path.ofEqChain (MarsdenWeinsteinReduction.trivial_halfDim d)
+  stepChainOfEq (MarsdenWeinsteinReduction.trivial_halfDim d)
 
 /-- Path witness: Weinstein neighborhood dimension. -/
 def weinstein_nbhd_path (n : Nat) :
     Path (WeinsteinNeighborhood.ofZeroSection n).cotangentDim (2 * n) :=
-  Path.ofEqChain (WeinsteinNeighborhood.ofZeroSection_dim n)
+  stepChainOfEq (WeinsteinNeighborhood.ofZeroSection_dim n)
 
 /-- Path witness: Moser stability identity. -/
 def moser_identity_path (d : SymplecticData) :
     Path (MoserStability.identity d).source (MoserStability.identity d).target :=
-  Path.ofEqChain (MoserStability.identity_eq d)
+  stepChainOfEq (MoserStability.identity_eq d)
 
 /-- Path witness: Jacobi identity sum. -/
 def jacobi_trivial_path :
     Path (PoissonBracket.JacobiIdentity.trivial.v1 +
           PoissonBracket.JacobiIdentity.trivial.v2 +
           PoissonBracket.JacobiIdentity.trivial.v3) 0 :=
-  Path.ofEqChain PoissonBracket.JacobiIdentity.trivial_sum
+  stepChainOfEq PoissonBracket.JacobiIdentity.trivial_sum
 
 /-- Inter-file path: symplectic dimension factors through smooth tangent dimension. -/
 def symplectic_dim_via_smooth_tangent_path (n : Nat) (hn : n > 0) :
