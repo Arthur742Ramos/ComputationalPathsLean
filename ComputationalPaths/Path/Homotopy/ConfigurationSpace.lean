@@ -165,7 +165,7 @@ theorem config_action_id {A : Type u} {n : Nat}
 def config_action_id_path {A : Type u} {n : Nat}
     (c : OrderedConfig A n) :
     Path (config_permutation_action (Perm.id n) c) c :=
-  Path.ofEq (config_action_id c)
+  Path.stepChain (config_action_id c)
 
 /-! ## Unordered Configuration Spaces -/
 
@@ -202,7 +202,7 @@ theorem toUnordered_perm {A : Type u} {n : Nat}
 def toUnordered_perm_path {A : Type u} {n : Nat}
     (σ : Perm n) (c : OrderedConfig A n) :
     Path (toUnordered (config_permutation_action σ c)) (toUnordered c) :=
-  Path.ofEq (toUnordered_perm σ c)
+  Path.stepChain (toUnordered_perm σ c)
 
 /-! ## Fadell-Neuwirth Fibration -/
 
@@ -233,7 +233,7 @@ theorem fn_proj_extends (fn : FadellNeuwirthData A n)
 def fn_proj_path (fn : FadellNeuwirthData A n)
     (c : OrderedConfig A (n + 1)) :
     Path (fn.proj c) (forgetLast c) :=
-  Path.ofEq (fn.fn_proj_extends c)
+  Path.stepChain (fn.fn_proj_extends c)
 
 end FadellNeuwirthData
 
@@ -291,19 +291,19 @@ def far_comm_path (bg : BraidGroupData n) (fc : FarCommutativity bg)
     (i j : Fin (n - 1))
     (h : i.val + 2 ≤ j.val ∨ j.val + 2 ≤ i.val) :
     Path (bg.mul (bg.gen i) (bg.gen j)) (bg.mul (bg.gen j) (bg.gen i)) :=
-  Path.ofEq (fc.far_comm i j h)
+  Path.stepChain (fc.far_comm i j h)
 
 /-- `Path`-typed braid relation. -/
 def braid_rel_path (bg : BraidGroupData n) (br : BraidRelation bg)
     (i j : Fin (n - 1)) (h : j.val = i.val + 1) :
     Path (bg.mul (bg.mul (bg.gen i) (bg.gen j)) (bg.gen i))
          (bg.mul (bg.mul (bg.gen j) (bg.gen i)) (bg.gen j)) :=
-  Path.ofEq (br.braid_rel i j h)
+  Path.stepChain (br.braid_rel i j h)
 
 /-- `Path`-typed associativity. -/
 def mul_assoc_path (bg : BraidGroupData n) (a b c : bg.Braid) :
     Path (bg.mul (bg.mul a b) c) (bg.mul a (bg.mul b c)) :=
-  Path.ofEq (bg.mul_assoc a b c)
+  Path.stepChain (bg.mul_assoc a b c)
 
 end BraidGroupData
 
@@ -331,7 +331,7 @@ variable {n : Nat}
 /-- `Path`-typed inclusion of identity. -/
 def incl_e_path (pb : PureBraidGroupData n) :
     Path (pb.incl pb.e) pb.braid.e :=
-  Path.ofEq pb.incl_e
+  Path.stepChain pb.incl_e
 
 end PureBraidGroupData
 
@@ -355,7 +355,7 @@ variable {n : Nat}
 /-- `Path`-typed configuration identification. -/
 def config_path (pc : PlaneConfigData n) :
     Path pc.config (OrderedConfig pc.Plane n) :=
-  Path.ofEq pc.config_eq
+  Path.stepChain pc.config_eq
 
 end PlaneConfigData
 

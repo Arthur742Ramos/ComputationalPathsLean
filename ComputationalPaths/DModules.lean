@@ -134,7 +134,7 @@ def genericCoherent (n : Nat) (hn : n > 0) (d : Nat) (hd1 : d ≥ n)
 /-- Path: characteristic variety dimension. -/
 def charVar_path (dm : DModuleData) (h : dm.isHolonomic = true) :
     Path dm.charVarDim dm.varietyDim :=
-  Path.ofEqChain (dm.holonomic_iff.mp h)
+  Path.stepChain (dm.holonomic_iff.mp h)
 
 end DModuleData
 
@@ -193,12 +193,12 @@ def nonFlat (n : Nat) (hn : n > 0) (r : Nat) (hr : r > 0) :
 /-- Path: flatness of a flat connection. -/
 def flat_path (cd : ConnectionData) (h : cd.isFlat = true) :
     Path cd.curvatureObstruction 0 :=
-  Path.ofEqChain (cd.flat_iff.mp h)
+  Path.stepChain (cd.flat_iff.mp h)
 
 /-- Path: trivial connection is flat. -/
 def trivial_flat_path (n : Nat) (hn : n > 0) (r : Nat) (hr : r > 0) :
     Path (trivial n hn r hr).curvatureObstruction 0 :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 end ConnectionData
 
@@ -264,7 +264,7 @@ def flatConnectionDR (n : Nat) (hn : n > 0) (r : Nat) (hr : r > 0) :
 /-- Path: complex length formula. -/
 def complex_length_path (drd : DeRhamFunctorData) :
     Path drd.complexLength (drd.varietyDim + 1) :=
-  Path.ofEqChain drd.complex_length_eq
+  Path.stepChain drd.complex_length_eq
 
 end DeRhamFunctorData
 
@@ -322,12 +322,12 @@ def onSurface (n : Nat) (hn : n > 0) : RiemannHilbertData where
 /-- Path: RH equivalence. -/
 def rh_equiv_path (rhd : RiemannHilbertData) :
     Path rhd.rhObstruction 0 :=
-  Path.ofEqChain rhd.rh_equiv
+  Path.stepChain rhd.rh_equiv
 
 /-- Path: bijection on simples. -/
 def rh_bijection_path (rhd : RiemannHilbertData) :
     Path rhd.numSimpleDModules rhd.numSimplePerverse :=
-  Path.ofEqChain rhd.rh_bijection
+  Path.stepChain rhd.rh_bijection
 
 end RiemannHilbertData
 
@@ -389,17 +389,17 @@ def deltaModule (n : Nat) (hn : n > 0) : HolonomicData where
 /-- Path: holonomicity. -/
 def holonomic_path (hd : HolonomicData) :
     Path hd.charVarDim hd.varietyDim :=
-  Path.ofEqChain hd.holonomic
+  Path.stepChain hd.holonomic
 
 /-- Path: cotangent dim = 2n. -/
 def cotangent_path (hd : HolonomicData) :
     Path hd.cotangentDim (2 * hd.varietyDim) :=
-  Path.ofEqChain hd.cotangent_eq
+  Path.stepChain hd.cotangent_eq
 
 /-- Path: codimension = dim X. -/
 def codim_path (hd : HolonomicData) :
     Path hd.codimension hd.varietyDim :=
-  Path.ofEqChain hd.codim_eq
+  Path.stepChain hd.codim_eq
 
 end HolonomicData
 
@@ -462,12 +462,12 @@ def withStrata (n : Nat) (hn : n > 0) (k : Nat) (c : Nat) (hc : c ≤ n) :
 /-- Path: regularity. -/
 def regular_path (rsd : RegularSingData) (h : rsd.isRegular = true) :
     Path rsd.regularityObstruction 0 :=
-  Path.ofEqChain (rsd.regular_iff.mp h)
+  Path.stepChain (rsd.regular_iff.mp h)
 
 /-- Path: holonomic. -/
 def holonomic_path (rsd : RegularSingData) :
     Path rsd.isHolonomic true :=
-  Path.ofEqChain rsd.holonomic_holds
+  Path.stepChain rsd.holonomic_holds
 
 end RegularSingData
 
@@ -543,7 +543,7 @@ def icComplex (n : Nat) (hn : n > 0) (k : Nat) (hk : k > 0) :
 /-- Path: open stratum dimension. -/
 def openStratum_path (psd : PerverseSheafData) :
     Path psd.openStratumDim psd.varietyDim :=
-  Path.ofEqChain psd.openStratum_eq
+  Path.stepChain psd.openStratum_eq
 
 end PerverseSheafData
 
@@ -603,7 +603,7 @@ def projection (m n : Nat) (hm : m > 0) (hn : n > 0) :
 /-- Path: relative dimension. -/
 def relDim_path (dop : DModuleOperationData) :
     Path dop.relativeDim ((dop.sourceDim : Int) - (dop.targetDim : Int)) :=
-  Path.ofEqChain dop.relDim_eq
+  Path.stepChain dop.relDim_eq
 
 end DModuleOperationData
 
@@ -677,12 +677,12 @@ def master_perverse_stratum_path :
 /-- Master: closed embedding relative dimension. -/
 def master_embedding_relDim_path :
     Path (DModuleOperationData.closedEmbedding 1 3 (by omega) (by omega) (by omega)).relativeDim (-2) :=
-  Path.ofEqChain (by simp [DModuleOperationData.closedEmbedding])
+  Path.stepChain (by simp [DModuleOperationData.closedEmbedding])
 
 /-- Master: structure sheaf regularity. -/
 def master_regularity_path :
     Path (RegularSingData.structureSheaf 2 (by omega)).regularityObstruction 0 :=
-  Path.ofEqChain (by simp [RegularSingData.structureSheaf])
+  Path.stepChain (by simp [RegularSingData.structureSheaf])
 
 end DModules
 end ComputationalPaths

@@ -57,17 +57,17 @@ theorem HSpace.mul_base (h : HSpace X) :
 /-- Path witness for the left unit law. -/
 def HSpace.mul_left_path (h : HSpace X) (x : X.carrier) :
     Path (h.mul.toFun (X.pt, x)) x :=
-  Path.ofEq (h.mul_left_unit x)
+  Path.stepChain (h.mul_left_unit x)
 
 /-- Path witness for the right unit law. -/
 def HSpace.mul_right_path (h : HSpace X) (x : X.carrier) :
     Path (h.mul.toFun (x, X.pt)) x :=
-  Path.ofEq (h.mul_right_unit x)
+  Path.stepChain (h.mul_right_unit x)
 
 /-- Path witness for the basepoint law. -/
 def HSpace.mul_base_path (h : HSpace X) :
     Path (h.mul.toFun (X.pt, X.pt)) X.pt :=
-  Path.ofEq (HSpace.mul_base h)
+  Path.stepChain (HSpace.mul_base h)
 
 /-- Associativity data for an H-space. -/
 structure HSpaceAssoc (X : PtdType.{u}) extends HSpace X where
@@ -79,7 +79,7 @@ structure HSpaceAssoc (X : PtdType.{u}) extends HSpace X where
 def HSpaceAssoc.mul_assoc_path (h : HSpaceAssoc X) (x y z : X.carrier) :
     Path (h.mul.toFun (h.mul.toFun (x, y), z))
       (h.mul.toFun (x, h.mul.toFun (y, z))) :=
-  Path.ofEq (h.mul_assoc x y z)
+  Path.stepChain (h.mul_assoc x y z)
 
 /-! ## Co-H-spaces -/
 
@@ -99,12 +99,12 @@ structure CoHSpace (X : PtdType.{u}) where
 /-- Path witness for the left counit law. -/
 def CoHSpace.left_inv_path (h : CoHSpace X) :
     Path (PtdMap.comp h.counit_left h.comul) (PtdMap.id X) :=
-  Path.ofEq h.left_inv
+  Path.stepChain h.left_inv
 
 /-- Path witness for the right counit law. -/
 def CoHSpace.right_inv_path (h : CoHSpace X) :
     Path (PtdMap.comp h.counit_right h.comul) (PtdMap.id X) :=
-  Path.ofEq h.right_inv
+  Path.stepChain h.right_inv
 
 /-! ## Hopf theorem data -/
 
@@ -147,13 +147,13 @@ theorem jamesSplitting_toLoop {X : SuspensionLoop.Pointed} (data : JamesSplittin
 def jamesSplitting_left_path {X : SuspensionLoop.Pointed} (data : JamesSplittingData X)
     (j : JamesConstruction.JamesConstruction X) :
     Path (data.splitEquiv.invFun (data.splitEquiv.toFun j)) j :=
-  Path.ofEq (data.splitEquiv.left_inv j)
+  Path.stepChain (data.splitEquiv.left_inv j)
 
 /-- Path witness for the right inverse in the James splitting. -/
 def jamesSplitting_right_path {X : SuspensionLoop.Pointed} (data : JamesSplittingData X)
     (l : jamesLoop X) :
     Path (data.splitEquiv.toFun (data.splitEquiv.invFun l)) l :=
-  Path.ofEq (data.splitEquiv.right_inv l)
+  Path.stepChain (data.splitEquiv.right_inv l)
 
 /-! ## Summary -/
 

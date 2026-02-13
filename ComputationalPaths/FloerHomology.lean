@@ -487,57 +487,57 @@ def floer_d2_path (k : Int) (i j : Nat) :
     Path (matMul (FloerComplex.trivial.differential k).matrix
                  (FloerComplex.trivial.differential (k - 1)).matrix
                  (FloerComplex.trivial.differential k).targetSize i j) 0 :=
-  Path.ofEqChain (FloerComplex.trivial_d2 k i j)
+  Path.stepChain (FloerComplex.trivial_d2 k i j)
 
 /-- Path witness: Floer differential degree shift. -/
 def floer_deg_shift_path (k : Int) :
     Path (FloerDifferential.zero k).targetDeg (k - 1) :=
-  Path.ofEqChain (FloerDifferential.zero_deg_shift k)
+  Path.stepChain (FloerDifferential.zero_deg_shift k)
 
 /-- Path witness: PSS isomorphism. -/
 def pss_iso_path (k : Int) :
     Path (PSSMap.trivial k).floerRank (PSSMap.trivial k).quantumRank :=
-  Path.ofEqChain (PSSMap.trivial_iso k)
+  Path.stepChain (PSSMap.trivial_iso k)
 
 /-- Path witness: Arnold conjecture for a point. -/
 def arnold_point_path :
     Path ArnoldConjecture.point.numFixedPoints 1 :=
-  Path.ofEqChain ArnoldConjecture.point_fixed
+  Path.stepChain ArnoldConjecture.point_fixed
 
 /-- Path witness: continuation map preserves rank. -/
 def continuation_rank_path (n : Nat) :
     Path (ContinuationMap.identity n).sourceRank (ContinuationMap.identity n).targetRank :=
-  Path.ofEqChain (ContinuationMap.identity_rank n)
+  Path.stepChain (ContinuationMap.identity_rank n)
 
 /-- Path witness: continuation map diagonal. -/
 def continuation_diag_path (n : Nat) (i : Nat) :
     Path ((ContinuationMap.identity n).matrix i i) 1 :=
-  Path.ofEqChain (ContinuationMap.identity_diag n i)
+  Path.stepChain (ContinuationMap.identity_diag n i)
 
 /-- Path witness: empty moduli space count. -/
 def empty_moduli_path (s t : Nat) :
     Path (ModuliSpace.empty s t).count 0 :=
-  Path.ofEqChain (ModuliSpace.empty_count s t)
+  Path.stepChain (ModuliSpace.empty_count s t)
 
 /-- Path witness: energy = action for strips. -/
 def energy_action_path (E : StripEnergy) :
     Path E.energy E.actionDiff :=
-  Path.ofEqChain (StripEnergy.energy_action E)
+  Path.stepChain (StripEnergy.energy_action E)
 
 /-- Path witness: zero strip energy. -/
 def zero_energy_path :
     Path StripEnergy.zero.energy 0 :=
-  Path.ofEqChain StripEnergy.zero_energy
+  Path.stepChain StripEnergy.zero_energy
 
 /-- Path witness: Arnold conjecture for T². -/
 def arnold_torus_path :
     Path ArnoldConjecture.torus2.numFixedPoints 4 :=
-  Path.ofEqChain ArnoldConjecture.torus2_fixed
+  Path.stepChain ArnoldConjecture.torus2_fixed
 
 /-- Path witness: trivial Floer homology rank. -/
 def trivial_floer_rank_path (k : Int) :
     Path (FloerHomologyGroup.trivial k).rank 0 :=
-  Path.ofEqChain (FloerHomologyGroup.trivial_rank k)
+  Path.stepChain (FloerHomologyGroup.trivial_rank k)
 
 end FloerHomology
 end ComputationalPaths

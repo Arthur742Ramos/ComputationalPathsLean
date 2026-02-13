@@ -81,6 +81,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - **Simplicial path coherence**: `Simplicial/PathCoherence.lean` transports horns and horn fillers along path-preserving simplicial maps, with explicit `Path.Step`/`RwEq` witnesses for mapped-face normalization and image Kan/inner-Kan conditions.
 - **Confluence of LND_EQ-TRS**: Complete proof that the computational path rewrite system is confluent via Newman's Lemma (local confluence + termination). Critical pair analysis for all core path algebra rules including the challenging inverse-related pairs.
 - **Geometric representation theory paths**: `GRT/PerverseSheafPaths.lean` and `GRT/DModulePaths.lean` package perverse sheaf and D-module constructions with explicit `Path.Step`/`RwEq` computational witnesses.
+- **Etale cohomology paths**: `Etale/EtaleSitePaths.lean` and `Etale/EtaleComparisonPaths.lean` package etale-site and comparison-theorem data with path-preserving constructions and explicit `Path.Step`/`RwEq` witnesses.
 - Loop quotients and π₁(A, a) as rewrite classes with strict group laws.
 - Computational-path circle interface + π₁(S¹) ≃ ℤ via winding number (requires `HasCirclePiOneEncode`; optional raw-loop interface `HasCircleLoopDecode` is derivable).
 - Completed proof π₁(S¹) ≃ ℤ using an encode–decode argument with quotient→equality reduction.
@@ -172,6 +173,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`Tropical/PathInfrastructure.lean`](Tropical/PathInfrastructure.lean) — tropical curve balancing and valuation/tropicalization coherence packaged with explicit `Path.Step` and derived `RwEq` normalization lemmas.
 - [`Cluster/PathInfrastructure.lean`](Cluster/PathInfrastructure.lean) — cluster seed and mutation interfaces with explicit `Path.Step` witnesses for exchange-relation and involutivity normalization.
 - [`Hodge/PathInfrastructure.lean`](Hodge/PathInfrastructure.lean) — mixed Hodge filtrations and period-map transport packaged with domain-specific `Path.Step` witnesses and derived `RwEq` normalizations.
+- [`Etale/PathInfrastructure.lean`](Etale/PathInfrastructure.lean) — etale-site and etale/singular comparison packages with path-preserving transports and explicit `Path.Step`/`RwEq` normalization lemmas.
 - [`GRT/PathInfrastructure.lean`](GRT/PathInfrastructure.lean) — geometric representation theory path infrastructure exposing perverse sheaf and D-module computational witnesses.
 - [`KacMoody/PathInfrastructure.lean`](KacMoody/PathInfrastructure.lean) — infinite-dimensional Kac-Moody Lie and Weyl-group interfaces with explicit `Path.Step` witnesses for Serre, braid, and action normalizations.
 - [`Langlands/PathInfrastructure.lean`](Langlands/PathInfrastructure.lean) — local and geometric Langlands path infrastructure exposing Step-based compatibility and spectral coherence witnesses.

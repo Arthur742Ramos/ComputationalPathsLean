@@ -863,77 +863,77 @@ end PoincareDuality
 /-- dim(TM) = 2 dim(M) coherence path. -/
 def tangent_dim_path (n : Nat) (hn : n > 0) :
     Path ((TangentBundle.ofDim n hn).totalDim) (2 * n) :=
-  Path.ofEqChain (TangentBundle.tangent_total_dim n hn)
+  Path.stepChain (TangentBundle.tangent_total_dim n hn)
 
 /-- d² = 0 coherence path. -/
 def d_squared_zero_path (ed : ExteriorDerivative) :
     Path ed.d_squared_zero true :=
-  Path.ofEqChain ed.d_sq
+  Path.stepChain ed.d_sq
 
 /-- Cartan formula: both terms have the same degree. -/
 def cartan_formula_path (cf : CartanFormula) :
     Path cf.dAfterInteriorDeg cf.interiorAfterDDeg :=
-  Path.ofEqChain (CartanFormula.both_terms_same_degree cf)
+  Path.stepChain (CartanFormula.both_terms_same_degree cf)
 
 /-- Stokes: form degree = boundary dimension. -/
 def stokes_path (sd : StokesData) :
     Path sd.formDegree sd.boundaryDim :=
-  Path.ofEqChain (StokesData.stokes_consistency sd)
+  Path.stepChain (StokesData.stokes_consistency sd)
 
 /-- Poincaré lemma: Betti number vanishes. -/
 def poincare_lemma_path (pl : PoincareLemma) :
     Path pl.bettiVanishes 0 :=
-  Path.ofEqChain pl.betti_zero
+  Path.stepChain pl.betti_zero
 
 /-- Poincaré duality: b_k = b_{n-k}. -/
 def poincare_duality_path (pd : PoincareDuality) :
     Path pd.betti_k pd.betti_dual :=
-  Path.ofEqChain pd.duality
+  Path.stepChain pd.duality
 
 /-- S² Euler characteristic path. -/
 def sphere2_euler_path :
     Path (SmoothManifold.sphere 2 (by omega)).eulerChar 2 :=
-  Path.ofEqChain SmoothManifold.sphere2_euler
+  Path.stepChain SmoothManifold.sphere2_euler
 
 /-- S¹ Euler characteristic path. -/
 def sphere1_euler_path :
     Path (SmoothManifold.sphere 1 (by omega)).eulerChar 0 :=
-  Path.ofEqChain SmoothManifold.sphere1_euler
+  Path.stepChain SmoothManifold.sphere1_euler
 
 /-- Lie derivative preserves degree path. -/
 def lie_preserves_degree_path (ld : LieDerivative) :
     Path ld.resultDegree ld.formDegree :=
-  Path.ofEqChain ld.degree_preserved
+  Path.stepChain ld.degree_preserved
 
 /-- ℝ^n Euler characteristic path. -/
 def euclidean_euler_path (n : Nat) (hn : n > 0) :
     Path (SmoothManifold.euclideanSpace n hn).eulerChar 1 :=
-  Path.ofEqChain (SmoothManifold.euclidean_euler n hn)
+  Path.stepChain (SmoothManifold.euclidean_euler n hn)
 
 /-- Connected b_0 = 1 path. -/
 def connected_b0_path (n : Nat) (hn : n > 0) :
     Path (DeRhamCohomology.connected_h0 n hn).bettiNumber 1 :=
-  Path.ofEqChain (DeRhamCohomology.connected_b0 n hn)
+  Path.stepChain (DeRhamCohomology.connected_b0 n hn)
 
 /-- Poincaré duality degree sum path. -/
 def degree_sum_path (pd : PoincareDuality) :
     Path (pd.degree + pd.dualDegree) pd.dim :=
-  Path.ofEqChain (PoincareDuality.degree_sum pd)
+  Path.stepChain (PoincareDuality.degree_sum pd)
 
 /-- Transition map inverse involution path. -/
 def transition_inverse_path (t : TransitionMap) :
     Path (t.inverse.inverse).sourceId t.sourceId :=
-  Path.ofEqChain (TransitionMap.inverse_inverse_source t)
+  Path.stepChain (TransitionMap.inverse_inverse_source t)
 
 /-- Sphere b_0 path. -/
 def sphere_b0_path (n : Nat) (hn : n > 0) :
     Path ((SmoothManifold.sphere n hn).betti 0) 1 :=
-  Path.ofEqChain (SmoothManifold.sphere_betti_zero n hn)
+  Path.stepChain (SmoothManifold.sphere_betti_zero n hn)
 
 /-- Torus Euler characteristic path. -/
 def torus_euler_path :
     Path SmoothManifold.torus2.eulerChar 0 :=
-  Path.ofEqChain SmoothManifold.torus2_euler
+  Path.stepChain SmoothManifold.torus2_euler
 
 /-- Inter-file path: S¹ Euler characteristic factors through Milnor χ = 0. -/
 def sphere1_to_milnor_euler_path :
@@ -946,7 +946,7 @@ def theta3_to_sphere3_orientable_path :
     Path ExoticSpheres.ExoticGroup.theta3.isTrivial
          (SmoothManifold.sphere 3 (by omega)).isOrientable :=
   ExoticSpheres.theta3_factor_through_true
-    (Path.ofEqChain (SmoothManifold.sphere_orientable 3 (by omega)))
+    (Path.stepChain (SmoothManifold.sphere_orientable 3 (by omega)))
 
 end SmoothManifolds
 end ComputationalPaths

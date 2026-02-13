@@ -682,88 +682,88 @@ theorem theta7_times_theta11 :
 /-- |Θ_7| = 28 path. -/
 def theta7_order_path :
     Path ExoticGroup.theta7.order 28 :=
-  Path.ofEqChain ExoticGroup.theta7_order
+  Path.stepChain ExoticGroup.theta7_order
 
 /-- |Θ_11| = 992 path. -/
 def theta11_order_path :
     Path ExoticGroup.theta11.order 992 :=
-  Path.ofEqChain ExoticGroup.theta11_order
+  Path.stepChain ExoticGroup.theta11_order
 
 /-- |Θ_15| = 16256 path. -/
 def theta15_order_path :
     Path ExoticGroup.theta15.order 16256 :=
-  Path.ofEqChain ExoticGroup.theta15_order
+  Path.stepChain ExoticGroup.theta15_order
 
 /-- bP_8 order path. -/
 def bp8_order_path :
     Path BPSubgroup.bp8.order 28 :=
-  Path.ofEqChain BPSubgroup.bp8_order
+  Path.stepChain BPSubgroup.bp8_order
 
 /-- bP_12 order path. -/
 def bp12_order_path :
     Path BPSubgroup.bp12.order 992 :=
-  Path.ofEqChain BPSubgroup.bp12_order
+  Path.stepChain BPSubgroup.bp12_order
 
 /-- bP_16 order path. -/
 def bp16_order_path :
     Path BPSubgroup.bp16.order 8128 :=
-  Path.ofEqChain BPSubgroup.bp16_order
+  Path.stepChain BPSubgroup.bp16_order
 
 /-- Milnor sphere dimension path. -/
 def milnor_dim_path :
     Path MilnorSphere.original.dim 7 :=
-  Path.ofEqChain MilnorSphere.dim_is_7
+  Path.stepChain MilnorSphere.dim_is_7
 
 /-- Milnor sphere bundle decomposition path. -/
 def milnor_bundle_path :
     Path MilnorSphere.original.dim
          (MilnorSphere.original.fiberDim + MilnorSphere.original.baseDim) :=
-  Path.ofEqChain MilnorSphere.bundle_decomp
+  Path.stepChain MilnorSphere.bundle_decomp
 
 /-- Milnor sphere Euler path. -/
 def milnor_euler_path :
     Path MilnorSphere.original.eulerChar 0 :=
-  Path.ofEqChain MilnorSphere.euler_zero
+  Path.stepChain MilnorSphere.euler_zero
 
 /-- J-homomorphism image order in degree 3. -/
 def j3_image_path :
     Path JHomomorphism.j3.imageOrder 24 :=
-  Path.ofEqChain JHomomorphism.j3_image_order
+  Path.stepChain JHomomorphism.j3_image_order
 
 /-- J-homomorphism image order in degree 7. -/
 def j7_image_path :
     Path JHomomorphism.j7.imageOrder 240 :=
-  Path.ofEqChain JHomomorphism.j7_image_order
+  Path.stepChain JHomomorphism.j7_image_order
 
 /-- Adams e₃ denominator path. -/
 def adams_e3_path :
     Path AdamsEInvariant.e3.denominator 24 :=
-  Path.ofEqChain AdamsEInvariant.e3_denom
+  Path.stepChain AdamsEInvariant.e3_denom
 
 /-- K-M exact sequence for n=7 path. -/
 def km7_theta_path :
     Path KervaireMilnor.km7.thetaOrder 28 :=
-  Path.ofEqChain KervaireMilnor.km7_theta
+  Path.stepChain KervaireMilnor.km7_theta
 
 /-- K-M bP₈ path. -/
 def km7_bp_path :
     Path KervaireMilnor.km7.bpOrder 28 :=
-  Path.ofEqChain KervaireMilnor.km7_bp
+  Path.stepChain KervaireMilnor.km7_bp
 
 /-- Standard sphere index path. -/
 def standard_index_path (n : Nat) (hn : n ≥ 1) :
     Path (ExoticSphere.standard n hn).thetaIndex 0 :=
-  Path.ofEqChain (ExoticSphere.standard_index n hn)
+  Path.stepChain (ExoticSphere.standard_index n hn)
 
 /-- Θ₃ triviality path (Poincaré conjecture). -/
 def theta3_trivial_path :
     Path ExoticGroup.theta3.isTrivial true :=
-  Path.ofEqChain ExoticGroup.theta3_trivial
+  Path.stepChain ExoticGroup.theta3_trivial
 
 /-- bP₈ exhaustion path. -/
 def bp8_exhausts_path :
     Path BPSubgroup.bp8.order BPSubgroup.bp8.thetaOrder :=
-  Path.ofEqChain BPSubgroup.bp8_exhausts
+  Path.stepChain BPSubgroup.bp8_exhausts
 
 /-- Bridge any boolean witness through Θ₃ triviality. -/
 def theta3_factor_through_true {b : Bool} (p : Path b true) :

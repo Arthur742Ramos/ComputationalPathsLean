@@ -6,3 +6,5 @@ import SpectralSequence.Pages
 import SpectralSequence.Differentials
 import SpectralSequence.Convergence
 import SpectralSequence.AdamsSequence
+import SpectralSequence.LeraySerreSequence
+import SpectralSequence.AtiyahHirzebruchSequence

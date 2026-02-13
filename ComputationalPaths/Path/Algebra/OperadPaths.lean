@@ -61,13 +61,13 @@ structure ColoredOperad (C : Type u) where
 def ColoredOperad.comp_id_left_path {C : Type u} (O : ColoredOperad C)
     {inputs : List C} {output : C} (f : O.ops inputs output) :
     Path (O.comp (context := []) (O.idOp output) f) f :=
-  Path.ofEq (O.comp_id_left f)
+  Path.stepChain (O.comp_id_left f)
 
 /-- Path-valued right unit law. -/
 def ColoredOperad.comp_id_right_path {C : Type u} (O : ColoredOperad C)
     {c : C} {output : C} (f : O.ops [c] output) :
     Path (O.comp (context := []) f (O.idOp c)) f :=
-  Path.ofEq (O.comp_id_right f)
+  Path.stepChain (O.comp_id_right f)
 
 /-! ## Non-symmetric operads -/
 
@@ -89,11 +89,11 @@ structure NSOperad where
 /-- Path-valued unit laws for non-symmetric operads. -/
 def NSOperad.gamma_unit_left_path (O : NSOperad) {k : Nat} (f : O.ops k) :
     Path (O.gamma O.unit (fun _ => ⟨k, f⟩)) ⟨k, f⟩ :=
-  Path.ofEq (O.gamma_unit_left f)
+  Path.stepChain (O.gamma_unit_left f)
 
 def NSOperad.gamma_unit_right_path (O : NSOperad) {n : Nat} (f : O.ops n) :
     Path (O.gamma f (fun _ => ⟨1, O.unit⟩)) ⟨n, f⟩ :=
-  Path.ofEq (O.gamma_unit_right f)
+  Path.stepChain (O.gamma_unit_right f)
 
 /-! ## Associahedra / Stasheff polytopes -/
 
@@ -194,13 +194,13 @@ def OperadMorphism.comp_assoc_path {O P Q R : CleanOperad}
 def OperadMorphism.comp_id_left_path {O P : CleanOperad}
     (f : OperadMorphism O P) :
     Path (OperadMorphism.comp (OperadMorphism.id P) f) f :=
-  Path.ofEq (OperadMorphism.id_comp_law f)
+  Path.stepChain (OperadMorphism.id_comp_law f)
 
 /-- Path-valued right identity for operad morphism composition. -/
 def OperadMorphism.comp_id_right_path {O P : CleanOperad}
     (f : OperadMorphism O P) :
     Path (OperadMorphism.comp f (OperadMorphism.id O)) f :=
-  Path.ofEq (OperadMorphism.comp_id_law f)
+  Path.stepChain (OperadMorphism.comp_id_law f)
 
 /-- Coherence from associativity and unit laws. -/
 def OperadMorphism.comp_assoc_unit_path {O Q R : CleanOperad}
@@ -209,7 +209,7 @@ def OperadMorphism.comp_assoc_unit_path {O Q R : CleanOperad}
          (OperadMorphism.comp h f) :=
   Path.trans
     (OperadMorphism.comp_assoc_path h (OperadMorphism.id Q) f)
-    (Path.ofEq (by
+    (Path.stepChain (by
       simp [OperadMorphism.comp_id_law]))
 
 /-! ## Operadic module -/
@@ -236,11 +236,11 @@ structure OperadModule (O : CleanOperad) where
 /-- Path-valued addition-zero laws. -/
 def OperadModule.add_zero_left_path {O : CleanOperad} (M : OperadModule O) (x : M.carrier) :
     Path (M.add M.zero x) x :=
-  Path.ofEq (M.add_zero_left x)
+  Path.stepChain (M.add_zero_left x)
 
 def OperadModule.add_zero_right_path {O : CleanOperad} (M : OperadModule O) (x : M.carrier) :
     Path (M.add x M.zero) x :=
-  Path.ofEq (M.add_zero_right x)
+  Path.stepChain (M.add_zero_right x)
 
 end OperadPaths
 end Algebra

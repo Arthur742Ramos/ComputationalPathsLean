@@ -169,12 +169,12 @@ variable {G : Type u}
 /-- Path witness for structure map round-trip. -/
 def structure_roundtrip_path (E : GenuineGSpectrum G) (n : Nat) (x : E.value n) :
     Path (E.structureMapInv n (E.structureMap n x)) x :=
-  Path.ofEqChain (E.structure_inv n x)
+  Path.stepChain (E.structure_inv n x)
 
 /-- Path witness for inverse structure map round-trip. -/
 def inv_structure_roundtrip_path (E : GenuineGSpectrum G) (n : Nat) (y : E.value (n + 1)) :
     Path (E.structureMap n (E.structureMapInv n y)) y :=
-  Path.ofEqChain (E.inv_structure n y)
+  Path.stepChain (E.inv_structure n y)
 
 /-- Double suspension. -/
 def doubleSuspend (E : GenuineGSpectrum G) (n : Nat) (x : E.value n) :
@@ -376,7 +376,7 @@ structure GeometricFixedComposition (G : Type u) where
 /-- Path witness for level equation. -/
 def level_eq_path (c : GeometricFixedComposition G) :
     Path c.combined (c.level1 + c.level2) :=
-  Path.ofEqChain c.level_eq
+  Path.stepChain c.level_eq
 
 end GeometricFixedPoint
 
@@ -410,13 +410,13 @@ def standard : LMSAxioms G where
 /-- Path witness for suspension isomorphism. -/
 def suspension_iso_path (ax : LMSAxioms G) (V : GRepresentation G) :
     Path (V.dim + 0) V.dim :=
-  Path.ofEqChain (ax.suspensionIso V)
+  Path.stepChain (ax.suspensionIso V)
 
 /-- Path witness for Spanier-Whitehead duality. -/
 def sw_duality_path (ax : LMSAxioms G) (V : GRepresentation G)
     (univDim : Nat) (h : V.dim ≤ univDim) :
     Path (univDim - V.dim + V.dim) univDim :=
-  Path.ofEqChain (ax.swDuality V univDim h)
+  Path.stepChain (ax.swDuality V univDim h)
 
 end LMSAxioms
 
@@ -443,7 +443,7 @@ variable {G : Type u}
 /-- Path witness for the Mackey axiom. -/
 def mackey_path (M : MackeyFunctor G) (n : Nat) (x : M.value n) :
     Path (M.restrict n n (Nat.le_refl n) x) x :=
-  Path.ofEqChain (M.mackey_axiom n x)
+  Path.stepChain (M.mackey_axiom n x)
 
 /-- The constant Mackey functor on a type A. -/
 def constant (A : Type v) : MackeyFunctor G where
@@ -496,34 +496,34 @@ end EquivariantStableHomotopy
 /-- Path witness: direct sum of representations is commutative in dimension. -/
 def rep_directSum_comm_path {G : Type u} (V W : GRepresentation G) :
     Path (GRepresentation.directSum V W).dim (GRepresentation.directSum W V).dim :=
-  Path.ofEqChain (GRepresentation.directSum_comm_dim V W)
+  Path.stepChain (GRepresentation.directSum_comm_dim V W)
 
 /-- Path witness: direct sum of representations is associative in dimension. -/
 def rep_directSum_assoc_path {G : Type u} (U V W : GRepresentation G) :
     Path (GRepresentation.directSum (GRepresentation.directSum U V) W).dim
          (GRepresentation.directSum U (GRepresentation.directSum V W)).dim :=
-  Path.ofEqChain (GRepresentation.directSum_assoc_dim U V W)
+  Path.stepChain (GRepresentation.directSum_assoc_dim U V W)
 
 /-- Path witness: RO(G) addition is commutative. -/
 def rog_add_comm_path {G : Type u} (a b : ROGElement G) :
     Path (ROGElement.add a b) (ROGElement.add b a) :=
-  Path.ofEqChain (ROGElement.add_comm a b)
+  Path.stepChain (ROGElement.add_comm a b)
 
 /-- Path witness: RO(G) addition is associative. -/
 def rog_add_assoc_path {G : Type u} (a b c : ROGElement G) :
     Path (ROGElement.add (ROGElement.add a b) c)
          (ROGElement.add a (ROGElement.add b c)) :=
-  Path.ofEqChain (ROGElement.add_assoc a b c)
+  Path.stepChain (ROGElement.add_assoc a b c)
 
 /-- Path witness: Mackey functor constant restriction. -/
 def mackey_constant_path {G : Type u} (A : Type v) (n m : Nat) (h : n ≤ m) (x : A) :
     Path ((MackeyFunctor.constant (G := G) A).restrict n m h x) x :=
-  Path.ofEqChain (MackeyFunctor.constant_restrict A n m h x)
+  Path.stepChain (MackeyFunctor.constant_restrict A n m h x)
 
 /-- Path witness: structure map round-trip. -/
 def structure_map_path {G : Type u} (E : GenuineGSpectrum G) (n : Nat) (x : E.value n) :
     Path (E.structureMapInv n (E.structureMap n x)) x :=
-  Path.ofEqChain (E.structure_inv n x)
+  Path.stepChain (E.structure_inv n x)
 
 /-! ## Rewrite-Level Computational Transformations -/
 

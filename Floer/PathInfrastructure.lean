@@ -4,4 +4,5 @@ import Floer.FloerHomologyPaths
 import Floer.FukayaCategoryPaths
 import Floer.FloerComplex
 import Floer.GradedPaths
+import Floer.PseudoHolomorphicCurves
 import Floer.ModuliSpaces

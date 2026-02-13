@@ -26,6 +26,9 @@ name = "Topos"
 name = "Motivic"
 
 [[lean_lib]]
+name = "MotivicCohomology"
+
+[[lean_lib]]
 name = "Chromatic"
 
 [[lean_lib]]
@@ -42,6 +45,9 @@ name = "VertexAlgebra"
 
 [[lean_lib]]
 name = "Descent"
+
+[[lean_lib]]
+name = "Etale"
 
 [[lean_lib]]
 name = "Deformation"

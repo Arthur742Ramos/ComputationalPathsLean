@@ -5,9 +5,11 @@ import ComputationalPaths.Path
 import ComputationalPaths.SieveTheory
 import Simplicial.PathCoherence
 import Motivic.PathInfrastructure
+import MotivicCohomology.PathInfrastructure
 import Chromatic.PathInfrastructure
 import Topos.PathCoherence
 import Descent.PathCoherence
+import Etale.PathInfrastructure
 import Deformation.PathInfrastructure
 import DerivedCategories.PathInfrastructure
 import Moduli.PathInfrastructure

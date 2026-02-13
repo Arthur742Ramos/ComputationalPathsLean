@@ -45,8 +45,8 @@ def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α
     PathSimpleEquiv α β :=
   { toFun := e.toFun
     invFun := e.invFun
-    left_inv := fun x => Path.ofEq (e.left_inv x)
-    right_inv := fun y => Path.ofEq (e.right_inv y) }
+    left_inv := fun x => Path.stepChain (e.left_inv x)
+    right_inv := fun y => Path.stepChain (e.right_inv y) }
 
 /-! ## Rank bookkeeping -/
 
@@ -63,7 +63,7 @@ def freeGroupRank (n : Nat) : Nat := n
 /-- Rank formula base case: for F₁, the Nielsen-Schreier index formula collapses to 1. -/
 def freeGroup_rank_formula_one (k : Nat) :
     Path (freeGroupRank 1) (1 + k * (1 - 1)) := by
-  exact Path.ofEq (by simp [freeGroupRank])
+  exact Path.stepChain (by simp [freeGroupRank])
 
 /-! ## Nielsen-Schreier base case (F₁ is cyclic) -/
 
@@ -75,8 +75,8 @@ def freeGroupOneCyclic : BouquetFreeGroup 1 → Prop :=
 def intToFreeGroupOne_eq_genPow (k : Int) :
     Path (intToFreeGroupOne k) (BouquetFreeGroup.genPow Fin'B.fzero k) := by
   by_cases hk : k = 0
-  · exact Path.ofEq (by simp [intToFreeGroupOne, BouquetFreeGroup.genPow, hk])
-  · exact Path.ofEq (by simp [intToFreeGroupOne, BouquetFreeGroup.genPow, hk])
+  · exact Path.stepChain (by simp [intToFreeGroupOne, BouquetFreeGroup.genPow, hk])
+  · exact Path.stepChain (by simp [intToFreeGroupOne, BouquetFreeGroup.genPow, hk])
 
 /-- Nielsen-Schreier base case: every element of F₁ is a power of the generator. -/
 def freeGroupOne_is_cyclic (x : BouquetFreeGroup 1) :
@@ -87,7 +87,7 @@ def freeGroupOne_is_cyclic (x : BouquetFreeGroup 1) :
   have h :
       Path (Quot.mk (BouquetRel 1) w)
         (intToFreeGroupOne (bouquetWordOnePower w)) :=
-    Path.ofEq (bouquetWord_one_equiv_single w)
+    Path.stepChain (bouquetWord_one_equiv_single w)
   have h' :
       Path (intToFreeGroupOne (bouquetWordOnePower w))
         (BouquetFreeGroup.genPow Fin'B.fzero (bouquetWordOnePower w)) :=
@@ -159,7 +159,7 @@ def TorsionFree (n : Nat) : Type :=
 def torsionFree_zero : TorsionFree 0 := by
   intro x _ _ _
   have hsub : Subsingleton (BouquetFreeGroup 0) := bouquetFreeGroup_zero_subsingleton
-  exact Path.ofEq (hsub.elim _ _)
+  exact Path.stepChain (hsub.elim _ _)
 
 def torsionFree_one : TorsionFree 1 := by
   intro x k hk hpow
@@ -191,7 +191,7 @@ def torsionFree_one : TorsionFree 1 := by
       _ = intToFreeGroupOne 0 := by simp [hx]
       _ = BouquetFreeGroup.one (n := 1) := by
             simp [intToFreeGroupOne, BouquetFreeGroup.one]
-  exact Path.ofEq hxEq
+  exact Path.stepChain hxEq
 
 /-! ## Figure-eight and bouquet connections -/
 

@@ -164,17 +164,17 @@ def trivialBiGradedGroup : BiGradedGroup where
   zero := fun _ _ => ()
   add := fun _ _ _ _ => ()
   neg := fun _ _ _ => ()
-  add_assoc := fun _ _ _ _ _ => Path.ofEqChain rfl
-  zero_add := fun _ _ _ => Path.ofEqChain rfl
-  add_zero := fun _ _ _ => Path.ofEqChain rfl
-  add_left_neg := fun _ _ _ => Path.ofEqChain rfl
-  add_right_neg := fun _ _ _ => Path.ofEqChain rfl
+  add_assoc := fun _ _ _ _ _ => Path.stepChain rfl
+  zero_add := fun _ _ _ => Path.stepChain rfl
+  add_zero := fun _ _ _ => Path.stepChain rfl
+  add_left_neg := fun _ _ _ => Path.stepChain rfl
+  add_right_neg := fun _ _ _ => Path.stepChain rfl
 
 /-- The zero differential on the trivial group -/
 def trivialDifferential (r : Nat) : Differential trivialBiGradedGroup r where
   map := fun _ _ _ => ()
-  map_zero := fun _ _ => Path.ofEqChain rfl
-  map_add := fun _ _ _ _ => Path.ofEqChain rfl
+  map_zero := fun _ _ => Path.stepChain rfl
+  map_add := fun _ _ _ _ => Path.stepChain rfl
 
 /-- The trivial spectral sequence page -/
 def trivialPage (r : Nat) : SpectralSequencePage r where
@@ -183,7 +183,7 @@ def trivialPage (r : Nat) : SpectralSequencePage r where
 
 /-- The trivial page satisfies d ∘ d = 0 -/
 instance (r : Nat) : HasDifferentialSquaredZero (trivialPage r) where
-  d_squared_zero := fun _ _ _ => Path.ofEqChain rfl
+  d_squared_zero := fun _ _ _ => Path.stepChain rfl
 
 end AdamsSpectralSequence
 end Path

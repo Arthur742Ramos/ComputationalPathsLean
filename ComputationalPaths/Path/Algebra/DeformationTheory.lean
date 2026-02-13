@@ -76,7 +76,7 @@ def FormalPowerSeries.addFPS {R : Type u} (ring : FPSRing R)
 def FormalPowerSeries.add_zero_path {R : Type u} (ring : FPSRing R)
     (f : FormalPowerSeries R) :
     Path (FormalPowerSeries.addFPS ring (FormalPowerSeries.zeroFPS ring) f) f :=
-  Path.ofEq (by
+  Path.stepChain (by
     simp only [addFPS, zeroFPS]
     congr 1
     funext n
@@ -106,7 +106,7 @@ structure DGLA where
 /-- Path-valued d² = 0 for DGLAs. -/
 def DGLA.d_squared_path (L : DGLA) (n : Int) (x : L.obj n) :
     Path (L.d (n + 1) (L.d n x)) (L.zero (n + 1 + 1)) :=
-  Path.ofEq (L.d_squared n x)
+  Path.stepChain (L.d_squared n x)
 
 /-! ## Maurer-Cartan equation -/
 
@@ -122,7 +122,7 @@ structure MaurerCartanElement (L : DGLA) where
 def MaurerCartanElement.mc_path {L : DGLA} (mc : MaurerCartanElement L) :
     Path (L.add 2 (L.d 1 mc.element) (L.bracket 1 1 mc.element mc.element))
          (L.zero 2) :=
-  Path.ofEq mc.mc_eq
+  Path.stepChain mc.mc_eq
 
 /-! ## Formal deformation -/
 
@@ -138,7 +138,7 @@ structure FormalDeformation (R : Type u) (ring : FPSRing R) where
 def FormalDeformation.zeroth_path {R : Type u} {ring : FPSRing R}
     (def_ : FormalDeformation R ring) :
     Path (def_.corrections.coeff 0) ring.one :=
-  Path.ofEq def_.zeroth_order
+  Path.stepChain def_.zeroth_order
 
 /-! ## Deformation functor -/
 
@@ -176,7 +176,7 @@ structure TangentCohomology (L : DGLA) where
 def TangentCohomology.cocycle_path {L : DGLA} (T : TangentCohomology L)
     (x : L.obj 1) (hx : T.cocycle x) :
     Path (L.d 1 x) (L.zero 2) :=
-  Path.ofEq (T.cocycle_cond x hx)
+  Path.stepChain (T.cocycle_cond x hx)
 
 /-! ## Obstruction theory -/
 
@@ -193,7 +193,7 @@ structure ObstructionData (L : DGLA) where
 /-- Path-valued obstruction cocycle condition. -/
 def ObstructionData.cocycle_path {L : DGLA} (ob : ObstructionData L) :
     Path (L.d 2 ob.obstruction) (L.zero 3) :=
-  Path.ofEq ob.is_cocycle
+  Path.stepChain ob.is_cocycle
 
 /-! ## Kodaira-Spencer map -/
 
@@ -211,7 +211,7 @@ structure KodairaSpencerMap (L : DGLA) where
 def KodairaSpencerMap.image_cocycle_path {L : DGLA} (ks : KodairaSpencerMap L)
     (v : ks.tangentParam) :
     Path (L.d 1 (ks.ks v)) (L.zero 2) :=
-  Path.ofEq (ks.image_cocycle v)
+  Path.stepChain (ks.image_cocycle v)
 
 /-! ## Versal deformations -/
 
@@ -239,7 +239,7 @@ structure KuranishiSpace (L : DGLA) where
 def KuranishiSpace.on_space_path {L : DGLA} (K : KuranishiSpace L)
     (x : L.obj 1) (hx : K.ambient x) :
     Path (K.kuranishi_map x) (L.zero 2) :=
-  Path.ofEq (K.on_space x hx)
+  Path.stepChain (K.on_space x hx)
 
 /-! ## Gauge equivalence -/
 
@@ -255,7 +255,7 @@ structure GaugeEquivalence (L : DGLA) (α β : MaurerCartanElement L) where
 def GaugeEquivalence.gauge_path {L : DGLA} {α β : MaurerCartanElement L}
     (g : GaugeEquivalence L α β) :
     Path (L.add 1 α.element (L.d 0 g.gauge)) β.element :=
-  Path.ofEq g.gauge_action
+  Path.stepChain g.gauge_action
 
 end DeformationTheory
 end Algebra

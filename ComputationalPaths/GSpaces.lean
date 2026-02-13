@@ -598,24 +598,24 @@ def totalEuler {G : FiniteGroup} {X : GSpace G}
 /-- Action associativity as a Path. -/
 def action_assoc_path {G : FiniteGroup} (X : GSpace G) (g h : G.Carrier) (x : X.Space) :
     Path (X.act (G.mul g h) x) (X.act g (X.act h x)) :=
-  Path.ofEqChain (X.act_mul g h x)
+  Path.stepChain (X.act_mul g h x)
 
 /-- Equivariance as a Path. -/
 def equivariance_path {G : FiniteGroup} {X Y : GSpace G}
     (f : EquivariantMap X Y) (g : G.Carrier) (x : X.Space) :
     Path (f.toFun (X.act g x)) (Y.act g (f.toFun x)) :=
-  Path.ofEqChain (f.equivariant g x)
+  Path.stepChain (f.equivariant g x)
 
 /-- Identity action as a Path. -/
 def act_one_path {G : FiniteGroup} (X : GSpace G) (x : X.Space) :
     Path (X.act G.one x) x :=
-  Path.ofEqChain (X.act_one x)
+  Path.stepChain (X.act_one x)
 
 /-- Fixed point condition as a Path. -/
 def fixed_point_path {G : FiniteGroup} {X : GSpace G} {H : Subgroup G}
     (fp : FixedPointSpace X H) (h : G.Carrier) (hm : H.mem h) :
     Path (X.act h fp.point) fp.point :=
-  Path.ofEqChain (fp.fixed h hm)
+  Path.stepChain (fp.fixed h hm)
 
 /-- Composition of equivariant maps preserves equivariance (Path witness). -/
 def equiv_map_comp_path {G : FiniteGroup} {X Y Z : GSpace G}
@@ -623,23 +623,23 @@ def equiv_map_comp_path {G : FiniteGroup} {X Y Z : GSpace G}
     (g : G.Carrier) (x : X.Space) :
     Path ((EquivariantMap.comp f h).toFun (X.act g x))
          (Z.act g ((EquivariantMap.comp f h).toFun x)) :=
-  Path.ofEqChain ((EquivariantMap.comp f h).equivariant g x)
+  Path.stepChain ((EquivariantMap.comp f h).equivariant g x)
 
 /-- Orbit reflexivity as a Path. -/
 def orbit_refl_path {G : FiniteGroup} (X : GSpace G) (x : X.Space) :
     Path (X.act G.one x) x :=
-  Path.ofEqChain (X.act_one x)
+  Path.stepChain (X.act_one x)
 
 /-- Burnside ring addition is commutative (Path witness). -/
 def burnside_add_comm_path {G : FiniteGroup} (a b : BurnsideElement G) :
     Path (BurnsideRing.add a b) (BurnsideRing.add b a) :=
-  Path.ofEqChain (BurnsideRing.add_comm a b)
+  Path.stepChain (BurnsideRing.add_comm a b)
 
 /-- Burnside ring addition is associative (Path witness). -/
 def burnside_add_assoc_path {G : FiniteGroup} (a b c : BurnsideElement G) :
     Path (BurnsideRing.add (BurnsideRing.add a b) c)
          (BurnsideRing.add a (BurnsideRing.add b c)) :=
-  Path.ofEqChain (BurnsideRing.add_assoc a b c)
+  Path.stepChain (BurnsideRing.add_assoc a b c)
 
 end GSpaces
 end ComputationalPaths

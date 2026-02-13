@@ -53,11 +53,11 @@ structure GradedSpace where
 /-- Path-valued addition laws. -/
 def GradedSpace.add_zero_path (V : GradedSpace) (n : Int) (x : V.obj n) :
     Path (V.add n (V.zero n) x) x :=
-  Path.ofEq (V.add_zero n x)
+  Path.stepChain (V.add_zero n x)
 
 def GradedSpace.add_neg_path (V : GradedSpace) (n : Int) (x : V.obj n) :
     Path (V.add n (V.neg n x) x) (V.zero n) :=
-  Path.ofEq (V.add_neg n x)
+  Path.stepChain (V.add_neg n x)
 
 /-! ## Graded Lie algebras -/
 
@@ -76,12 +76,12 @@ structure GradedLieAlgebra extends GradedSpace where
 def GradedLieAlgebra.bracket_zero_left_path (L : GradedLieAlgebra)
     (m n : Int) (y : L.obj n) :
     Path (L.bracket m n (L.zero m) y) (L.zero (m + n)) :=
-  Path.ofEq (L.bracket_zero_left m n y)
+  Path.stepChain (L.bracket_zero_left m n y)
 
 def GradedLieAlgebra.bracket_zero_right_path (L : GradedLieAlgebra)
     (m n : Int) (x : L.obj m) :
     Path (L.bracket m n x (L.zero n)) (L.zero (m + n)) :=
-  Path.ofEq (L.bracket_zero_right m n x)
+  Path.stepChain (L.bracket_zero_right m n x)
 
 /-! ## L-infinity algebras -/
 
@@ -105,17 +105,17 @@ structure LInfinityData (A : Type u) where
 /-- Path-valued l₁² = 0. -/
 def LInfinityData.l1_squared_path {A : Type u} (L : LInfinityData A) (x : A) :
     Path (L.l 1 (fun _ => L.l 1 (fun _ => x))) (L.l 1 (fun _ => L.zero)) :=
-  Path.ofEq (L.l1_squared x)
+  Path.stepChain (L.l1_squared x)
 
 /-- Path-valued l₁(0) = 0. -/
 def LInfinityData.l1_zero_path {A : Type u} (L : LInfinityData A) :
     Path (L.l 1 (fun _ => L.zero)) L.zero :=
-  Path.ofEq L.l1_zero
+  Path.stepChain L.l1_zero
 
 /-- Path-valued addition identity. -/
 def LInfinityData.add_zero_path {A : Type u} (L : LInfinityData A) (x : A) :
     Path (L.add L.zero x) x :=
-  Path.ofEq (L.add_zero_left x)
+  Path.stepChain (L.add_zero_left x)
 
 /-! ## Generalized Jacobi identities -/
 
@@ -169,7 +169,7 @@ def MCElementLInf.mc_path {A : Type u} {L : LInfinityData A}
     (mc : MCElementLInf L) :
     Path (L.add (L.l 1 (fun _ => mc.element)) (L.l 2 (fun _ => mc.element)))
          L.zero :=
-  Path.ofEq mc.mc_truncated
+  Path.stepChain mc.mc_truncated
 
 /-! ## Twisting by MC elements -/
 
@@ -201,7 +201,7 @@ def HomotopyTransferData.retract_path {A : Type u} {B : Type v}
     {L : LInfinityData A}
     (H : @HomotopyTransferData A B L) (x : B) :
     Path (H.p (H.i x)) x :=
-  Path.ofEq (H.retract x)
+  Path.stepChain (H.retract x)
 
 /-! ## DGLA as L-infinity -/
 
@@ -242,7 +242,7 @@ def dglaToLInfinity {A : Type u} (L : DGLAData A) : LInfinityData A where
 /-- Path-valued d² = 0 for DGLAs. -/
 def DGLAData.d_squared_path {A : Type u} (L : DGLAData A) (x : A) :
     Path (L.d (L.d x)) L.zero :=
-  Path.ofEq (L.d_squared x)
+  Path.stepChain (L.d_squared x)
 
 /-! ## Strict morphisms -/
 
@@ -261,7 +261,7 @@ def StrictLInfinityMorphism.chain_map_path {A : Type u} {B : Type v}
     (φ : StrictLInfinityMorphism L M) (x : A) :
     Path (M.l 1 (fun _ => φ.f1 x))
          (φ.f1 (L.l 1 (fun _ => x))) :=
-  Path.ofEq (φ.chain_map x)
+  Path.stepChain (φ.chain_map x)
 
 end LInfinityAlgebras
 end Algebra

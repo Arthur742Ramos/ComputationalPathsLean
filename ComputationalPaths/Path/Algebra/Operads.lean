@@ -142,13 +142,13 @@ structure SymmetricOperad where
 /-- Path-valued action identity for symmetric operads. -/
 def SymmetricOperad.actionIdPath (O : SymmetricOperad) {n : Nat} (f : O.Ops n) :
     Path (O.action (Perm.id n) f) f :=
-  Path.ofEq (O.action_id f)
+  Path.stepChain (O.action_id f)
 
 /-- Path-valued action functoriality for symmetric operads. -/
 def SymmetricOperad.actionCompPath (O : SymmetricOperad) {n : Nat}
     (σ τ : Perm n) (f : O.Ops n) :
     Path (O.action (Perm.comp σ τ) f) (O.action σ (O.action τ f)) :=
-  Path.ofEq (O.action_comp σ τ f)
+  Path.stepChain (O.action_comp σ τ f)
 
 /-! ## Operad Algebras -/
 
@@ -167,13 +167,13 @@ structure OperadAlgebra (O : SymmetricOperad) (A : Type w) where
 def OperadAlgebra.actIdentityPath {O : SymmetricOperad} {A : Type w}
     (alg : OperadAlgebra O A) (x : A) :
     Path (alg.act O.identity (fun _ => x)) x :=
-  Path.ofEq (alg.act_identity x)
+  Path.stepChain (alg.act_identity x)
 
 /-- Path witness for algebra equivariance. -/
 def OperadAlgebra.actEquivariantPath {O : SymmetricOperad} {A : Type w}
     (alg : OperadAlgebra O A) {n : Nat} (σ : Perm n) (f : O.Ops n) (xs : Fin n → A) :
     Path (alg.act (O.action σ f) xs) (alg.act f (xs ∘ σ.toFun)) :=
-  Path.ofEq (alg.act_equivariant σ f xs)
+  Path.stepChain (alg.act_equivariant σ f xs)
 
 /-! ## Free Operad Construction -/
 
@@ -226,13 +226,13 @@ structure OperadMorphism (O P : SymmetricOperad) where
 def OperadMorphism.mapIdentityPath {O P : SymmetricOperad}
     (φ : OperadMorphism O P) :
     Path (φ.mapOps O.identity) P.identity :=
-  Path.ofEq φ.map_identity
+  Path.stepChain φ.map_identity
 
 /-- Path witness for preservation of symmetric action. -/
 def OperadMorphism.mapActionPath {O P : SymmetricOperad}
     (φ : OperadMorphism O P) {n : Nat} (σ : Perm n) (f : O.Ops n) :
     Path (φ.mapOps (O.action σ f)) (P.action σ (φ.mapOps f)) :=
-  Path.ofEq (φ.map_action σ f)
+  Path.stepChain (φ.map_action σ f)
 
 /-- The identity operad morphism. -/
 def OperadMorphism.id (O : SymmetricOperad) : OperadMorphism O O where
@@ -270,17 +270,17 @@ structure CompositionMap (A : Type u) where
 /-- Path witness for associativity. -/
 def CompositionMap.assocPath (M : CompositionMap A) (x y z : A) :
     Path (M.comp (M.comp x y) z) (M.comp x (M.comp y z)) :=
-  Path.ofEq (M.assoc x y z)
+  Path.stepChain (M.assoc x y z)
 
 /-- Path witness for left unitality. -/
 def CompositionMap.leftUnitPath (M : CompositionMap A) (x : A) :
     Path (M.comp M.unit x) x :=
-  Path.ofEq (M.left_unit x)
+  Path.stepChain (M.left_unit x)
 
 /-- Path witness for right unitality. -/
 def CompositionMap.rightUnitPath (M : CompositionMap A) (x : A) :
     Path (M.comp x M.unit) x :=
-  Path.ofEq (M.right_unit x)
+  Path.stepChain (M.right_unit x)
 
 /-- Pentagon coherence for composition maps:
     the two ways of reassociating four-fold compositions agree. -/
@@ -295,7 +295,7 @@ def CompositionMap.pentagonPath {A : Type u} (M : CompositionMap A)
     (a b c d : A) :
     Path (M.comp (M.comp (M.comp a b) c) d)
          (M.comp a (M.comp b (M.comp c d))) :=
-  Path.ofEq (M.pentagon a b c d)
+  Path.stepChain (M.pentagon a b c d)
 
 /-! ## Path-Valued Operadic Witnesses -/
 
@@ -360,7 +360,7 @@ structure AssociativeAlgebra (A : Type w) extends OperadAlgebra assocOperadSym A
 def AssociativeAlgebra.mulAssocPath {A : Type w} (alg : AssociativeAlgebra A)
     (x y z : A) :
     Path (alg.mul (alg.mul x y) z) (alg.mul x (alg.mul y z)) :=
-  Path.ofEq (alg.mul_assoc x y z)
+  Path.stepChain (alg.mul_assoc x y z)
 
 /-- An associative algebra gives a composition map. -/
 def AssociativeAlgebra.toCompositionMap {A : Type w} (alg : AssociativeAlgebra A) :

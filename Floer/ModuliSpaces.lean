@@ -1,6 +1,7 @@
 import ComputationalPaths.Path.Rewrite.RwEq
 import Floer.GradedPaths
 import Floer.FukayaCategoryPaths
+import Floer.PseudoHolomorphicCurves
 
 /-!
 # Floer theory paths: moduli spaces
@@ -18,12 +19,14 @@ namespace ModuliSpaces
 open Path
 open GradedPaths
 open FukayaCategoryPaths
+open PseudoHolomorphicCurves
 
 universe u
 
 /-- Domain-specific rewrite tags for moduli-space coherence moves. -/
 inductive ModuliStep : Type
   | stripBoundary
+  | pseudoStripBoundary
   | gluing
   | identityDegeneracy
   | dimensionDrop
@@ -33,10 +36,14 @@ inductive ModuliStep : Type
 structure ModuliSpacePathData (Obj Mor Gen : Type u) where
   fukaya : FukayaCategoryPathData Obj Mor
   graded : GradedFloerPathData Gen
+  pseudo : PseudoHolomorphicPathData Gen
   chordOf : Mor → Gen
   stripBoundaryPath :
     ∀ f : Mor,
       Path (chordOf (fukaya.mu1 f)) (graded.complex.differential (chordOf f))
+  pseudoCurvePath :
+    ∀ f : Mor,
+      Path (pseudo.strip (chordOf f)) (chordOf f)
   gluingPath :
     ∀ f g : Mor,
       Path (chordOf (fukaya.mu2 f g)) (graded.complex.continuation (chordOf g))
@@ -60,6 +67,15 @@ def boundaryAfterGluingPath (f g : Mor) :
       (M.graded.complex.differential (M.graded.complex.continuation (M.chordOf g))) :=
   Path.congrArg M.graded.complex.differential (M.gluingPath f g)
 
+/-- Pseudo-holomorphic strip transport into the strip-boundary equation. -/
+def stripToBoundaryPath (f : Mor) :
+    Path
+      (M.pseudo.strip (M.chordOf (M.fukaya.mu1 f)))
+      (M.graded.complex.differential (M.chordOf f)) :=
+  Path.trans
+    (M.pseudoCurvePath (M.fukaya.mu1 f))
+    (M.stripBoundaryPath f)
+
 /-- Step witness: right-unit normalization for strip-boundary paths. -/
 def stripBoundary_step (f : Mor) :
     Path.Step
@@ -76,6 +92,23 @@ def stripBoundary_step (f : Mor) :
         (Path.refl (M.graded.complex.differential (M.chordOf f))))
       (M.stripBoundaryPath f) :=
   rweq_of_step (M.stripBoundary_step f)
+
+/-- Step witness: right-unit normalization for pseudo strip-boundary transport. -/
+def stripToBoundary_step (f : Mor) :
+    Path.Step
+      (Path.trans
+        (M.stripToBoundaryPath f)
+        (Path.refl (M.graded.complex.differential (M.chordOf f))))
+      (M.stripToBoundaryPath f) :=
+  Path.Step.trans_refl_right (M.stripToBoundaryPath f)
+
+@[simp] theorem stripToBoundary_rweq (f : Mor) :
+    RwEq
+      (Path.trans
+        (M.stripToBoundaryPath f)
+        (Path.refl (M.graded.complex.differential (M.chordOf f))))
+      (M.stripToBoundaryPath f) :=
+  rweq_of_step (M.stripToBoundary_step f)
 
 /-- Step witness: right-unit normalization for gluing paths. -/
 def gluing_step (f g : Mor) :
@@ -149,14 +182,22 @@ def boundaryAfterGluing_step (f g : Mor) :
       (Path.refl M.graded.complex.zero) :=
   rweq_cmpA_inv_left (M.identityDegeneracyPath X)
 
+@[simp] theorem pseudoCurve_cancel_rweq (f : Mor) :
+    RwEq
+      (Path.trans (Path.symm (M.pseudoCurvePath f)) (M.pseudoCurvePath f))
+      (Path.refl (M.chordOf f)) :=
+  rweq_cmpA_inv_left (M.pseudoCurvePath f)
+
 end ModuliSpacePathData
 
 /-- Trivial model instantiating the moduli-space computational-path interface. -/
 def trivialModuliSpacePathData : ModuliSpacePathData PUnit PUnit PUnit where
   fukaya := FukayaCategoryPaths.trivialFukayaCategoryPathData
   graded := GradedPaths.trivialGradedFloerPathData
+  pseudo := PseudoHolomorphicCurves.trivialPseudoHolomorphicPathData
   chordOf := fun _ => PUnit.unit
   stripBoundaryPath := fun _ => Path.refl PUnit.unit
+  pseudoCurvePath := fun _ => Path.refl PUnit.unit
   gluingPath := fun _ _ => Path.refl PUnit.unit
   identityDegeneracyPath := fun _ => Path.refl PUnit.unit
   dimensionDropPath := fun _ => Path.refl 0

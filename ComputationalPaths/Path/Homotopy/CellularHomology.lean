@@ -49,7 +49,7 @@ structure ChainComplex where
 def boundary_squared_zero_path (C : ChainComplex) (n : Nat)
     (x : C.group (n + 2)) :
     Path (C.boundary n (C.boundary (n + 1) x)) (C.zero n) :=
-  Path.ofEq (C.boundary_sq n x)
+  Path.stepChain (C.boundary_sq n x)
 
 /-! ## Trivial chain complex -/
 
@@ -67,7 +67,7 @@ theorem trivialChainComplex_boundary_zero (n : Nat) (x : Unit) :
 /-- Path witness for trivial boundary. -/
 def trivialChainComplex_boundary_path (n : Nat) (x : Unit) :
     Path (trivialChainComplex.boundary n x) () :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-! ## Integer chain complex -/
 
@@ -94,7 +94,7 @@ def zeroIntChainComplex : IntChainComplex where
 /-- Path witness for the zero boundary. -/
 def zeroIntChainComplex_boundary_path (n : Nat) (x : Int) :
     Path (zeroIntChainComplex.boundary n x) 0 :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-! ## Homology via kernel/image -/
 
@@ -139,18 +139,18 @@ def eulerChar_empty : Int :=
 /-- Path witness: Euler characteristic of empty complex is zero. -/
 def eulerChar_empty_path :
     Path eulerChar_empty 0 :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- A point has Euler characteristic 1. -/
 def eulerChar_point :
     Path (eulerChar { dim := 0, rank := fun _ => 1 }) 1 :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Euler characteristic of an interval (1 vertex, 1 edge counted as
     dim 0 with rank 1, dim 1 with rank 0 for a single vertex). -/
 def eulerChar_segment :
     Path (eulerChar { dim := 1, rank := fun n => if n = 0 then 2 else if n = 1 then 1 else 0 }) 1 :=
-  Path.ofEq (by native_decide)
+  Path.stepChain (by native_decide)
 
 /-! ## Chain maps -/
 
@@ -168,7 +168,7 @@ structure ChainMap (C D : ChainComplex) where
 def chainMap_comm_path (C D : ChainComplex) (f : ChainMap C D)
     (n : Nat) (x : C.group (n + 1)) :
     Path (D.boundary n (f.map (n + 1) x)) (f.map n (C.boundary n x)) :=
-  Path.ofEq (f.comm n x)
+  Path.stepChain (f.comm n x)
 
 /-- Identity chain map. -/
 def chainMap_id (C : ChainComplex) : ChainMap C C where
@@ -192,13 +192,13 @@ def chainMap_comp {C D E : ChainComplex} (f : ChainMap C D) (g : ChainMap D E) :
 def chainMap_comp_id_path (C D : ChainComplex) (f : ChainMap C D)
     (n : Nat) (x : C.group n) :
     Path ((chainMap_comp f (chainMap_id D)).map n x) (f.map n x) :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Path witness: identity composed with a map is the map. -/
 def chainMap_id_comp_path (C D : ChainComplex) (f : ChainMap C D)
     (n : Nat) (x : C.group n) :
     Path ((chainMap_comp (chainMap_id C) f).map n x) (f.map n x) :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Associativity of chain map composition. -/
 def chainMap_comp_assoc_path {C D E F : ChainComplex}
@@ -206,7 +206,7 @@ def chainMap_comp_assoc_path {C D E F : ChainComplex}
     (n : Nat) (x : C.group n) :
     Path ((chainMap_comp (chainMap_comp f g) h).map n x)
       ((chainMap_comp f (chainMap_comp g h)).map n x) :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-! ## Chain maps preserve cycles and boundaries -/
 

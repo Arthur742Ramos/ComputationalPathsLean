@@ -1108,7 +1108,7 @@ theorem decode_encode_word (n : Nat) (w : BouquetWord n) :
 def decode_encode_word_path (n : Nat) (w : BouquetWord n) :
     Path (toAb (Quot.mk _ w))
       (toAb (Quot.mk _ (buildWordRec n (wordToIntPow w)))) :=
-  Path.ofEq (decode_encode_word n w)
+  Path.stepChain (decode_encode_word n w)
 
 /-- The encode direction: wordToIntPow (buildWordRec n v) = v.
     This shows that building a word from a vector and then extracting exponents gives back the vector. -/
@@ -1157,7 +1157,7 @@ def intPowToFreeGroupAb {n : Nat} : IntPow n → FreeGroupAb n :=
 /-- Path version of `encode_decode_word`. -/
 def encode_decode_word_path (n : Nat) (v : Fin n → Int) :
     Path (wordToIntPow (buildWordRec n v)) v :=
-  Path.ofEq (encode_decode_word n v)
+  Path.stepChain (encode_decode_word n v)
 
 /-- The encode-decode round-trip: freeGroupAbToIntPow (intPowToFreeGroupAb v) = v.
     This follows from encode_decode_word. -/
@@ -1168,7 +1168,7 @@ theorem freeGroup_ab_left_inv {n : Nat} (v : IntPow n) :
 
 def freeGroup_ab_left_inv_path {n : Nat} (v : IntPow n) :
     Path (freeGroupAbToIntPow (intPowToFreeGroupAb v)) v :=
-  Path.ofEq (freeGroup_ab_left_inv v)
+  Path.stepChain (freeGroup_ab_left_inv v)
 
 /-- The decode-encode round-trip: intPowToFreeGroupAb (freeGroupAbToIntPow x) = x.
     This follows from decode_encode_word via quotient induction. -/
@@ -1187,7 +1187,7 @@ theorem freeGroup_ab_right_inv {n : Nat} (x : FreeGroupAb n) :
 
 def freeGroup_ab_right_inv_path {n : Nat} (x : FreeGroupAb n) :
     Path (intPowToFreeGroupAb (freeGroupAbToIntPow x)) x :=
-  Path.ofEq (freeGroup_ab_right_inv x)
+  Path.stepChain (freeGroup_ab_right_inv x)
 
 /-- **Main Theorem**: F_n^ab ≃ ℤⁿ
 
@@ -1215,7 +1215,7 @@ The abelianization of a free product is the direct product of abelianizations.
 def freeProduct_ab_prod {_G _H : Type u} :
     -- (G * H)^ab ≃ G^ab × H^ab
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-! ## Surface Groups
 
@@ -1227,13 +1227,13 @@ For the orientable surface of genus g:
 def surfaceGroup_ab (_g : Nat) :
     -- π₁(Σ_g)^ab ≃ ℤ^{2g}
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-- For g ≥ 2, the surface group is non-abelian. -/
 def surfaceGroup_nonAbelian (_g : Nat) (_hg : _g ≥ 2) :
     -- π₁(Σ_g) is not abelian
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-! ## Klein Bottle
 
@@ -1248,13 +1248,13 @@ def IntTimesZ2 : Type := Int × Fin 2
 def kleinBottle_ab :
     -- π₁(K)^ab ≃ ℤ × ℤ/2ℤ
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-- The Klein bottle group is non-abelian. -/
 def kleinBottle_nonAbelian :
     -- ℤ ⋊ ℤ is not abelian
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-! ## First Homology
 
@@ -1265,31 +1265,31 @@ By Hurewicz, H₁(X) ≃ π₁(X)^ab for path-connected X.
 def circle_H1 :
     -- H₁(S¹) ≃ π₁(S¹)^ab ≃ ℤ^ab ≃ ℤ
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-- H₁(torus) ≃ ℤ² -/
 def torus_H1 :
     -- H₁(T²) ≃ π₁(T²)^ab ≃ (ℤ × ℤ)^ab ≃ ℤ × ℤ
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-- H₁(figure-eight) ≃ ℤ² -/
 def figureEight_H1 :
     -- H₁(S¹ ∨ S¹) ≃ π₁(S¹ ∨ S¹)^ab ≃ (ℤ * ℤ)^ab ≃ ℤ × ℤ
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-- H₁(orientable surface) ≃ ℤ^{2g} -/
 def orientableSurface_H1 (_g : Nat) :
     -- H₁(Σ_g) ≃ π₁(Σ_g)^ab ≃ ℤ^{2g}
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-- H₁(Klein bottle) ≃ ℤ × ℤ/2ℤ -/
 def kleinBottle_H1 :
     -- H₁(K) ≃ π₁(K)^ab ≃ ℤ × ℤ/2ℤ
     Path True True := by
-  exact Path.ofEqChain (rfl : True = True)
+  exact Path.stepChain (rfl : True = True)
 
 /-! ## Summary
 

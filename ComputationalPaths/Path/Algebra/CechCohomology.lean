@@ -11,7 +11,7 @@ We define:
 - Mayer-Vietoris type results for Čech cohomology
 - Path coherence witnesses throughout
 
-All definitions use `Path.ofEq` for structural coherence in the
+All definitions use `Path.stepChain` for structural coherence in the
 computational-path setting.
 -/
 
@@ -179,7 +179,7 @@ theorem cechH0Const_zero_eq {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
 /-- Path witness for constant section coherence. -/
 def cechH0Const_zero_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
     Path (cechH0Const U G G.zero).section_ (zeroCochain0 U G) :=
-  Path.ofEq (cechH0Const_zero_eq U G)
+  Path.stepChain (cechH0Const_zero_eq U G)
 
 /-! ## Coboundary of zero is zero -/
 
@@ -192,7 +192,7 @@ theorem coboundary0_zero {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
 /-- Path witness for δ⁰(0) = 0. -/
 def coboundary0_zero_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
     Path (coboundary0 U G (zeroCochain0 U G)) (zeroCochain1 U G) :=
-  Path.ofEq (coboundary0_zero U G)
+  Path.stepChain (coboundary0_zero U G)
 
 /-! ## Linearity of δ⁰ -/
 
@@ -224,7 +224,7 @@ theorem refinePullback0_zero {X : Type u} {U V : OpenCover X} (r : Refinement U 
 def refinePullback0_zero_path {X : Type u} {U V : OpenCover X} (r : Refinement U V)
     (G : CechCoeff.{v}) :
     Path (refinePullback0 r G (zeroCochain0 V G)) (zeroCochain0 U G) :=
-  Path.ofEq (refinePullback0_zero r G)
+  Path.stepChain (refinePullback0_zero r G)
 
 /-- The pullback preserves addition. -/
 theorem refinePullback0_add {X : Type u} {U V : OpenCover X} (r : Refinement U V)
@@ -237,7 +237,7 @@ def refinePullback0_add_path {X : Type u} {U V : OpenCover X} (r : Refinement U 
     (G : CechCoeff.{v}) (f g : Cochain0 V G) :
     Path (refinePullback0 r G (addCochain0 V G f g))
          (addCochain0 U G (refinePullback0 r G f) (refinePullback0 r G g)) :=
-  Path.ofEq (refinePullback0_add r G f g)
+  Path.stepChain (refinePullback0_add r G f g)
 
 /-! ## Identity refinement -/
 
@@ -255,7 +255,7 @@ theorem idRefinement_pullback {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
 def idRefinement_pullback_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
     (f : Cochain0 U G) :
     Path (refinePullback0 (idRefinement U) G f) f :=
-  Path.ofEq (idRefinement_pullback U G f)
+  Path.stepChain (idRefinement_pullback U G f)
 
 /-! ## Composition of refinements -/
 
@@ -278,7 +278,7 @@ def compRefinement_pullback_path {X : Type u} {U V W : OpenCover X}
     (f : Cochain0 W G) :
     Path (refinePullback0 (compRefinement r s) G f)
          (refinePullback0 r G (refinePullback0 s G f)) :=
-  Path.ofEq (compRefinement_pullback r s G f)
+  Path.stepChain (compRefinement_pullback r s G f)
 
 /-! ## Čech cohomology of a point -/
 
@@ -303,7 +303,7 @@ theorem cechH0Point_unique (G : CechCoeff.{v}) (c : G.Carrier) :
 /-- Path witness for H⁰ uniqueness on a point. -/
 def cechH0Point_path (G : CechCoeff.{v}) (c : G.Carrier) :
     Path (cechH0Point G c).section_ (fun _ => c) :=
-  Path.ofEq (cechH0Point_unique G c)
+  Path.stepChain (cechH0Point_unique G c)
 
 /-! ## Naturality summary -/
 

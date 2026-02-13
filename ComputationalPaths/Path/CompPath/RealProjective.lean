@@ -111,32 +111,32 @@ noncomputable def rp2PiOneEquivZ2 : SimpleEquiv rp2PiOne Z2 where
 /-- Path coherence: the generator of π₁(RP²) has order 2. -/
 def rp2GeneratorOrder2 :
     Path (z2_add z2_one z2_one) z2_zero :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Path coherence: addition in Z/2 is involutive. -/
 def z2_add_involutive (a : Z2) :
     Path (z2_add a a) z2_zero :=
-  Path.ofEq (z2_add_self a)
+  Path.stepChain (z2_add_self a)
 
 /-- Path coherence: commutativity of Z/2 addition. -/
 def z2_comm_path (a b : Z2) :
     Path (z2_add a b) (z2_add b a) :=
-  Path.ofEq (z2_add_comm a b)
+  Path.stepChain (z2_add_comm a b)
 
 /-- Path coherence: associativity of Z/2 addition. -/
 def z2_assoc_path (a b c : Z2) :
     Path (z2_add (z2_add a b) c) (z2_add a (z2_add b c)) :=
-  Path.ofEq (z2_add_assoc a b c)
+  Path.stepChain (z2_add_assoc a b c)
 
 /-- Path coherence: left identity. -/
 def z2_zero_add_path (a : Z2) :
     Path (z2_add z2_zero a) a :=
-  Path.ofEq (z2_zero_add a)
+  Path.stepChain (z2_zero_add a)
 
 /-- Path coherence: right identity. -/
 def z2_add_zero_path (a : Z2) :
     Path (z2_add a z2_zero) a :=
-  Path.ofEq (z2_add_zero a)
+  Path.stepChain (z2_add_zero a)
 
 /-! ## Z/2 Multiplication -/
 
@@ -266,13 +266,13 @@ theorem rp2_total_rank :
 /-- Transport along the generator of π₁(RP²) is trivial on constant families. -/
 theorem rp2_transport_const (D : Type) (x : D) :
     Path.transport (D := fun _ : Z2 => D)
-      (Path.ofEq (z2_add_self z2_one)) x = x := by
+      (Path.stepChain (z2_add_self z2_one)) x = x := by
   simp [Path.transport]
 
 /-- Double application of the generator returns to identity, witnessed by a path. -/
 def rp2_double_loop_refl :
     Path (z2_add (z2_add z2_one z2_one) (z2_add z2_one z2_one)) z2_zero :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 end CompPath
 end Path

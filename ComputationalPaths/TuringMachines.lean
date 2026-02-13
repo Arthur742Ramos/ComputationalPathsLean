@@ -130,12 +130,12 @@ def binary (n : Nat) (hn : n ≥ 3) (t : Nat) (ht : t ≤ (n - 2) * 3) : TMData 
 /-- Path: max transitions formula. -/
 def max_transitions_path (tm : TMData) :
     Path tm.maxTransitions ((tm.numStates - 2) * tm.tapeAlphabetSize) :=
-  Path.ofEqChain tm.max_transitions_eq
+  Path.stepChain tm.max_transitions_eq
 
 /-- Path: minimal TM max transitions. -/
 def minimal_max_path :
     Path minimal.maxTransitions 3 :=
-  Path.ofEqChain minimal.max_transitions_eq
+  Path.stepChain minimal.max_transitions_eq
 
 end TMData
 
@@ -271,7 +271,7 @@ def nonhalting (n : Nat) : ComputationData where
 /-- Path: result consistency. -/
 def result_path (cd : ComputationData) :
     Path cd.result (if cd.halts = true then (if cd.accepts = true then 1 else 0) else 0) :=
-  Path.ofEqChain cd.result_eq
+  Path.stepChain cd.result_eq
 
 end ComputationData
 
@@ -318,7 +318,7 @@ def small : UTMData where
 /-- Path: universality. -/
 def universal_path (utm : UTMData) :
     Path utm.isUniversal true :=
-  Path.ofEqChain utm.universal_eq
+  Path.stepChain utm.universal_eq
 
 end UTMData
 
@@ -359,22 +359,22 @@ def standard : HaltingData where
 /-- Path: HALT is recognizable. -/
 def recognizable_path (hd : HaltingData) :
     Path hd.isRecognizable true :=
-  Path.ofEqChain hd.recognizable_eq
+  Path.stepChain hd.recognizable_eq
 
 /-- Path: HALT is not decidable. -/
 def undecidable_path (hd : HaltingData) :
     Path hd.isDecidable false :=
-  Path.ofEqChain hd.decidable_eq
+  Path.stepChain hd.decidable_eq
 
 /-- Path: co-HALT is not recognizable. -/
 def co_unrecognizable_path (hd : HaltingData) :
     Path hd.coRecognizable false :=
-  Path.ofEqChain hd.co_recognizable_eq
+  Path.stepChain hd.co_recognizable_eq
 
 /-- Path: diagonalization. -/
 def diag_path (hd : HaltingData) :
     Path hd.diagonalizationObstruction 0 :=
-  Path.ofEqChain hd.diag_eq
+  Path.stepChain hd.diag_eq
 
 end HaltingData
 
@@ -415,22 +415,22 @@ def standard : RiceData where
 /-- Path: property is non-trivial. -/
 def nontrivial_path (rd : RiceData) :
     Path rd.isTrivial false :=
-  Path.ofEqChain rd.nontrivial_eq
+  Path.stepChain rd.nontrivial_eq
 
 /-- Path: property is semantic. -/
 def semantic_path (rd : RiceData) :
     Path rd.isSemantic true :=
-  Path.ofEqChain rd.semantic_eq
+  Path.stepChain rd.semantic_eq
 
 /-- Path: undecidability. -/
 def undecidable_path (rd : RiceData) :
     Path rd.isDecidable false :=
-  Path.ofEqChain rd.undecidable_eq
+  Path.stepChain rd.undecidable_eq
 
 /-- Path: reduction. -/
 def reduction_path (rd : RiceData) :
     Path rd.reductionObstruction 0 :=
-  Path.ofEqChain rd.reduction_eq
+  Path.stepChain rd.reduction_eq
 
 end RiceData
 
@@ -498,12 +498,12 @@ def ofTapes (k : Nat) (hk : k > 0) (ms ss : Nat) (hms : ms ≥ 3) (hss : ss ≥ 
 /-- Path: language equivalence. -/
 def language_path (mt : MultiTapeData) :
     Path mt.languageEqual true :=
-  Path.ofEqChain mt.language_eq
+  Path.stepChain mt.language_eq
 
 /-- Path: quadratic overhead. -/
 def quadratic_path (mt : MultiTapeData) :
     Path mt.isQuadratic true :=
-  Path.ofEqChain mt.quadratic_eq
+  Path.stepChain mt.quadratic_eq
 
 end MultiTapeData
 
@@ -604,7 +604,7 @@ def haltToTotal : ReductionData where
 /-- Path: reduction obstruction. -/
 def obstruction_path (rd : ReductionData) (h : rd.reductionExists = true) :
     Path rd.obstruction 0 :=
-  Path.ofEqChain (rd.exists_obstruction h)
+  Path.stepChain (rd.exists_obstruction h)
 
 end ReductionData
 

@@ -59,23 +59,23 @@ variable {L : Type u} (A : LieAlgebra L)
 
 /-- Path witness for left additive identity. -/
 def add_zero_path (x : L) : Path (A.add A.zero x) x :=
-  Path.ofEq (A.add_zero x)
+  Path.stepChain (A.add_zero x)
 
 /-- Path witness for left additive inverse. -/
 def add_left_neg_path (x : L) : Path (A.add (A.neg x) x) A.zero :=
-  Path.ofEq (A.add_left_neg x)
+  Path.stepChain (A.add_left_neg x)
 
 /-- Path witness for bracket skew-symmetry. -/
 def bracket_skew_path (x y : L) :
     Path (A.bracket x y) (A.neg (A.bracket y x)) :=
-  Path.ofEq (A.bracket_skew x y)
+  Path.stepChain (A.bracket_skew x y)
 
 /-- Path witness for the Jacobi identity. -/
 def jacobi_path (x y z : L) :
     Path (A.add (A.bracket x (A.bracket y z))
       (A.add (A.bracket y (A.bracket z x)) (A.bracket z (A.bracket x y))))
       A.zero :=
-  Path.ofEq (A.jacobi x y z)
+  Path.stepChain (A.jacobi x y z)
 
 end LieAlgebra
 
@@ -114,22 +114,22 @@ variable {L : Type u} {M : Type v} {A : LieAlgebra L} (Mod : LieModule L M A)
 
 /-- Path witness for left additive identity in the module. -/
 def add_zero_path (m : M) : Path (Mod.add Mod.zero m) m :=
-  Path.ofEq (Mod.add_zero m)
+  Path.stepChain (Mod.add_zero m)
 
 /-- Path witness for left additive inverse in the module. -/
 def add_left_neg_path (m : M) : Path (Mod.add (Mod.neg m) m) Mod.zero :=
-  Path.ofEq (Mod.add_left_neg m)
+  Path.stepChain (Mod.add_left_neg m)
 
 /-- Path witness for the action on zero. -/
 def action_zero_path (x : L) : Path (Mod.action x Mod.zero) Mod.zero :=
-  Path.ofEq (Mod.action_zero x)
+  Path.stepChain (Mod.action_zero x)
 
 /-- Path witness for the bracket-action compatibility. -/
 def action_bracket_path (x y : L) (m : M) :
     Path (Mod.action (A.bracket x y) m)
       (Mod.add (Mod.action x (Mod.action y m))
         (Mod.neg (Mod.action y (Mod.action x m)))) :=
-  Path.ofEq (Mod.action_bracket x y m)
+  Path.stepChain (Mod.action_bracket x y m)
 
 end LieModule
 
@@ -166,7 +166,7 @@ def cochainPath_refl {n : Nat} (f : LieCochain L M n) :
 def cochainPath_ofEq {n : Nat} {f g : LieCochain L M n} (h : f = g) :
     CochainPath f g := by
   intro x
-  exact Path.ofEq (by
+  exact Path.stepChain (by
     simpa using _root_.congrArg (fun k => k x) h)
 
 /-! ## Differentials and cocycles -/
@@ -188,7 +188,7 @@ variable {L : Type u} {M : Type v} {A : LieAlgebra L}
 /-- Path witness of the square-zero law. -/
 def d_sq_zero_path (n : Nat) (f : LieCochain L M n) :
     Path (D.d (n + 1) (D.d n f)) (cochainZero (Mod := Mod) (n + 2)) :=
-  Path.ofEq (D.d_sq_zero n f)
+  Path.stepChain (D.d_sq_zero n f)
 
 end LieDifferential
 

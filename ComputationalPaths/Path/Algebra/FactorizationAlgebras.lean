@@ -101,7 +101,7 @@ structure TargetCategory where
 def TargetCategory.compIdLeftPath (C : TargetCategory) {a b : C.Obj}
     (f : C.Hom a b) :
     Path (C.comp_hom (C.id_hom a) f) f :=
-  Path.ofEq (C.comp_id_left f)
+  Path.stepChain (C.comp_id_left f)
 
 /-- A prefactorization algebra on X valued in C: assigns an object to each
     open and structure maps for inclusions. -/
@@ -131,7 +131,7 @@ def Prefactorization.structureMapIdPath {X : Type u} {C : TargetCategory}
     (F : Prefactorization X C) {U : OpenSet X}
     (h : OpenSet.subset U U) :
     Path (F.structureMap h) (C.id_hom (F.obj U)) :=
-  Path.ofEq (F.structureMap_id h)
+  Path.stepChain (F.structureMap_id h)
 
 /-- Path witness for structure map composition. -/
 def Prefactorization.structureMapCompPath {X : Type u} {C : TargetCategory}
@@ -140,7 +140,7 @@ def Prefactorization.structureMapCompPath {X : Type u} {C : TargetCategory}
     (hUW : OpenSet.subset U W) :
     Path (C.comp_hom (F.structureMap hUV) (F.structureMap hVW))
          (F.structureMap hUW) :=
-  Path.ofEq (F.structureMap_comp hUV hVW hUW)
+  Path.stepChain (F.structureMap_comp hUV hVW hUW)
 
 /-! ## Factorization Algebras (Cosheaf Condition) -/
 
@@ -172,7 +172,7 @@ def PrefactorizationMorphism.naturalityPath {X : Type u} {C : TargetCategory}
     {U V : OpenSet X} (h : OpenSet.subset U V) :
     Path (C.comp_hom (φ.component U) (G.structureMap h))
          (C.comp_hom (F.structureMap h) (φ.component V)) :=
-  Path.ofEq (φ.naturality h)
+  Path.stepChain (φ.naturality h)
 
 /-- Identity morphism of prefactorization algebras. -/
 def PrefactorizationMorphism.id {X : Type u} {C : TargetCategory}
@@ -213,7 +213,7 @@ structure EuclideanSpace (n : Nat) where
 def EuclideanSpace.distSymmPath {n : Nat} (E : EuclideanSpace n)
     (p q : E.Point) :
     Path (E.dist p q) (E.dist q p) :=
-  Path.ofEq (E.dist_symm p q)
+  Path.stepChain (E.dist_symm p q)
 
 /-- An open disk in ℝⁿ. -/
 structure Disk {n : Nat} (E : EuclideanSpace n) where
@@ -240,7 +240,7 @@ structure EnAlgebra (n : Nat) where
 /-- Path witness for left unit. -/
 def EnAlgebra.mulUnitLeftPath {n : Nat} (A : EnAlgebra n) (x : A.carrier) :
     Path (A.mul A.unit x) x :=
-  Path.ofEq (A.mul_unit_left x)
+  Path.stepChain (A.mul_unit_left x)
 
 /-- The Lurie-Francis correspondence: locally constant factorization algebras
     on ℝⁿ are equivalent to E_n algebras.
@@ -258,7 +258,7 @@ structure EnAlgebraCorrespondence (n : Nat) (C : TargetCategory) where
 def EnAlgebraCorrespondence.roundTripPath {n : Nat} {C : TargetCategory}
     (corr : EnAlgebraCorrespondence n C) (A : EnAlgebra n) :
     Path (corr.fromFA (corr.toFA A)).carrier A.carrier :=
-  Path.ofEq (corr.roundTrip_carrier A)
+  Path.stepChain (corr.roundTrip_carrier A)
 
 /-! ## Ran Space -/
 
@@ -323,7 +323,7 @@ structure FactorizationHomology (M : Type u) (C : TargetCategory) where
 def FactorizationHomology.globalSectionsPath {M : Type u} {C : TargetCategory}
     (FH : FactorizationHomology M C) :
     Path FH.globalSections (FH.algebra.obj (OpenSet.whole M)) :=
-  Path.ofEq FH.globalSections_eq
+  Path.stepChain FH.globalSections_eq
 
 /-- Factorization homology is functorial in the manifold:
     an embedding f : M → N induces a map ∫_M A → ∫_N A. -/
@@ -381,7 +381,7 @@ structure VertexAlgebraData (C : TargetCategory) where
 def VertexAlgebraData.translationVacuumPath {C : TargetCategory}
     (V : VertexAlgebraData C) :
     Path (C.comp_hom V.vacuum V.translation) V.vacuum :=
-  Path.ofEq V.translation_vacuum
+  Path.stepChain V.translation_vacuum
 
 /-! ## Stratified Factorization Algebras -/
 

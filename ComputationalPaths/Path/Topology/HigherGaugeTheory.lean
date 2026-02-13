@@ -335,15 +335,15 @@ def crossedModuleTo2Group (M : CrossedModule) : Strict2Group where
   objOne := M.oneG
   objInv := M.invG
   src_id := fun g => Path.refl g
-  tgt_id := fun g => Path.ofEq (by show M.mulG g (M.boundary M.oneH) = g; rw [M.boundary_one.proof, M.mulG_oneG])
-  vcomp_id_left := fun ⟨g, h⟩ => Path.ofEq (by show (g, M.mulH M.oneH h) = (g, h); rw [M.oneH_mulH])
-  vcomp_id_right := fun ⟨g, h⟩ => Path.ofEq (by show (g, M.mulH h M.oneH) = (g, h); rw [M.mulH_oneH])
-  vcomp_assoc := fun ⟨g₁, h₁⟩ ⟨_, h₂⟩ ⟨_, h₃⟩ => Path.ofEq (by show (g₁, M.mulH (M.mulH h₁ h₂) h₃) = (g₁, M.mulH h₁ (M.mulH h₂ h₃)); rw [M.mulH_assoc])
-  obj_one_mul := fun g => Path.ofEq (M.oneG_mulG g)
-  obj_mul_one := fun g => Path.ofEq (M.mulG_oneG g)
-  obj_mul_assoc := fun a b c => Path.ofEq (M.mulG_assoc a b c)
-  obj_inv_left := fun g => Path.ofEq (M.invG_mulG g)
-  obj_inv_right := fun g => Path.ofEq (M.mulG_invG g)
+  tgt_id := fun g => Path.stepChain (by show M.mulG g (M.boundary M.oneH) = g; rw [M.boundary_one.proof, M.mulG_oneG])
+  vcomp_id_left := fun ⟨g, h⟩ => Path.stepChain (by show (g, M.mulH M.oneH h) = (g, h); rw [M.oneH_mulH])
+  vcomp_id_right := fun ⟨g, h⟩ => Path.stepChain (by show (g, M.mulH h M.oneH) = (g, h); rw [M.mulH_oneH])
+  vcomp_assoc := fun ⟨g₁, h₁⟩ ⟨_, h₂⟩ ⟨_, h₃⟩ => Path.stepChain (by show (g₁, M.mulH (M.mulH h₁ h₂) h₃) = (g₁, M.mulH h₁ (M.mulH h₂ h₃)); rw [M.mulH_assoc])
+  obj_one_mul := fun g => Path.stepChain (M.oneG_mulG g)
+  obj_mul_one := fun g => Path.stepChain (M.mulG_oneG g)
+  obj_mul_assoc := fun a b c => Path.stepChain (M.mulG_assoc a b c)
+  obj_inv_left := fun g => Path.stepChain (M.invG_mulG g)
+  obj_inv_right := fun g => Path.stepChain (M.mulG_invG g)
 
 /-! ## 2-Group Homomorphisms -/
 
@@ -457,7 +457,7 @@ def peiffer_kernel_act_trivial (M : CrossedModule) (K : CrossedModule.KernelModu
     Path (M.act M.oneG h)
          (M.mulH (M.mulH (K.incl k) h) (M.invH (K.incl k))) :=
   Path.trans
-    (Path.symm (Path.ofEq (_root_.congrArg (fun g => M.act g h) (K.in_kernel k).proof)))
+    (Path.symm (Path.stepChain (_root_.congrArg (fun g => M.act g h) (K.in_kernel k).proof)))
     (M.peiffer (K.incl k) h)
 
 end HigherGaugeTheory

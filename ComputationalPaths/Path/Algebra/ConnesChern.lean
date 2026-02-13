@@ -74,19 +74,19 @@ variable {A : AlgCarrier.{u}} (e : KClass A)
 
 /-- Path witness: e² = e. -/
 def idem_sq_path : Path (A.mul e.idem e.idem) e.idem :=
-  Path.ofEq e.idem_sq
+  Path.stepChain e.idem_sq
 
 /-- Multi-step: e³ = e²·e = e·e = e. -/
 def idem_cube_path : Path (A.mul (A.mul e.idem e.idem) e.idem) e.idem :=
   Path.trans
-    (Path.ofEq (congrArg (fun x => A.mul x e.idem) e.idem_sq))
+    (Path.stepChain (congrArg (fun x => A.mul x e.idem) e.idem_sq))
     e.idem_sq_path
 
 /-- Multi-step with assoc: e·(e·e) = e·e = e. -/
 def idem_cube_assoc_path : Path (A.mul e.idem (A.mul e.idem e.idem)) e.idem :=
   Path.trans
-    (Path.ofEq (congrArg (A.mul e.idem) e.idem_sq))
-    (Path.ofEq (A.mul_one e.idem ▸ A.mul_one e.idem ▸ e.idem_sq))
+    (Path.stepChain (congrArg (A.mul e.idem) e.idem_sq))
+    (Path.stepChain (A.mul_one e.idem ▸ A.mul_one e.idem ▸ e.idem_sq))
 
 end KClass
 
@@ -110,11 +110,11 @@ variable {A : AlgCarrier.{u}} {n : Nat} (φ : CyclicCocycle A n)
 def cyclic_path (args : Fin (n + 1) → A.carrier) :
     Path (φ.eval (fun i => args ⟨(i.val + 1) % (n + 1), Nat.mod_lt _ (by omega)⟩))
          (φ.eval args) :=
-  Path.ofEq (φ.cyclic args)
+  Path.stepChain (φ.cyclic args)
 
 /-- Path witness: φ(0,...,0) = 0. -/
 def eval_zero_path : Path (φ.eval (fun _ => A.zero)) 0 :=
-  Path.ofEq φ.eval_zero
+  Path.stepChain φ.eval_zero
 
 /-- Multi-step: applying cyclicity twice returns to original. -/
 def double_cyclic_path (args : Fin (n + 1) → A.carrier)
@@ -126,7 +126,7 @@ def double_cyclic_path (args : Fin (n + 1) → A.carrier)
     Path (φ.eval (fun i => args ⟨(i.val + 2) % (n + 1), Nat.mod_lt _ (by omega)⟩))
          (φ.eval args) :=
   Path.trans
-    (Path.ofEq (congrArg φ.eval h).symm)
+    (Path.stepChain (congrArg φ.eval h).symm)
     (Path.trans
       (φ.cyclic_path (fun i => args ⟨(i.val + 1) % (n + 1), Nat.mod_lt _ (by omega)⟩))
       (φ.cyclic_path args))
@@ -150,7 +150,7 @@ variable {A : AlgCarrier.{u}} (P : ConnesChernPairing A)
 /-- Path witness: pairing = evaluation. -/
 def pair_eval_path (e : KClass A) (n : Nat) (φ : CyclicCocycle A n) :
     Path (P.pair e n φ) (φ.eval (fun _ => e.idem)) :=
-  Path.ofEq (P.pair_eval e n φ)
+  Path.stepChain (P.pair_eval e n φ)
 
 /-- Multi-step: ⟨[e], [φ]⟩ = φ(e,...,e) = φ-cycled(e,...,e) since all args are e. -/
 def pair_cyclic_invariance (e : KClass A) (n : Nat) (φ : CyclicCocycle A n) :
@@ -189,7 +189,7 @@ variable {A : AlgCarrier.{u}} (IT : IndexTheorem A)
 /-- Path witness: index = pairing. -/
 def index_eq_pairing_path (e : KClass A) :
     Path (IT.fredholm.fredholmIdx e) (IT.pairing.pair e 0 IT.indexCocycle) :=
-  Path.ofEq (IT.index_eq_pairing e)
+  Path.stepChain (IT.index_eq_pairing e)
 
 /-- Multi-step: index(e) = ⟨e, φ⟩ = φ(e), composing index theorem then pairing eval. -/
 def index_computation_path (e : KClass A) :
@@ -222,19 +222,19 @@ variable {A : AlgCarrier.{u}} (CT : ConnesTraceTheorem A)
 /-- Path witness: Tr_ω(a) = Res(a). -/
 def trace_eq_residue_path (a : A.carrier) :
     Path (CT.dixmierTrace a) (CT.wodzickiResidue a) :=
-  Path.ofEq (CT.trace_eq_residue a)
+  Path.stepChain (CT.trace_eq_residue a)
 
 /-- Multi-step: Tr_ω(0) = Res(0) = 0. -/
 def trace_zero_path :
     Path (CT.dixmierTrace A.zero) 0 :=
   Path.trans
     (CT.trace_eq_residue_path A.zero)
-    (Path.ofEq CT.residue_zero)
+    (Path.stepChain CT.residue_zero)
 
 /-- RwEq: the direct trace_zero path and the composed path are equivalent. -/
 theorem trace_zero_rweq :
     RwEq
-      (Path.ofEq CT.trace_zero)
+      (Path.stepChain CT.trace_zero)
       (CT.trace_zero_path) := by
   constructor
 
@@ -259,11 +259,11 @@ variable {A : AlgCarrier.{u}} (LIF : LocalIndexFormula A)
 
 /-- Path witness: local index of zero is zero. -/
 def localIndex_zero_path : Path (LIF.localIndex A.zero) 0 :=
-  Path.ofEq LIF.localIndex_zero
+  Path.stepChain LIF.localIndex_zero
 
 /-- Path witness: each local component vanishes on zero. -/
 def component_zero_path (n : Nat) : Path (LIF.localComponent n A.zero) 0 :=
-  Path.ofEq (LIF.component_zero n)
+  Path.stepChain (LIF.component_zero n)
 
 end LocalIndexFormula
 

@@ -142,7 +142,7 @@ structure EulerRelation (n : Nat) (P : Polytope n) (fv : FVector n P) where
 /-- Euler relation for 3-polytopes: V - E + F = 2. -/
 def euler3d (V E F : Nat) (h : V + F = E + 2) :
     Path ((V : Int) - (E : Int) + (F : Int)) 2 :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-! ## Normal Fan -/
 
@@ -199,7 +199,7 @@ structure EhrhartData (n : Nat) (P : Polytope n) where
 /-- Ehrhart polynomial of the unit cube [0,1]^d. -/
 def ehrhartCube (d : Nat) (P : Polytope d) (hp : P.dim = d) : EhrhartData d P where
   d := d
-  d_eq := Path.ofEq hp.symm
+  d_eq := Path.stepChain hp.symm
   leadingCoeff := 1
   constantTerm := 1
   constant_one := Path.refl 1
@@ -250,12 +250,12 @@ def minkowskiComm (n : Nat) (_ms : MinkowskiSum n)
     (_h2 : _ms.poly2.dim = _ms'.poly1.dim)
     (hr : _ms.result.dim = _ms'.result.dim) :
     Path _ms.result.dim _ms'.result.dim :=
-  Path.ofEq hr
+  Path.stepChain hr
 
 /-- Minkowski sum is associative at the dimension level. -/
 def minkowskiAssocDim (d1 d2 d3 : Nat) :
     Path ((d1 + d2) + d3) (d1 + (d2 + d3)) :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Mixed volume of n polytopes in ℝⁿ. -/
 structure MixedVolume (n : Nat) where
@@ -312,7 +312,7 @@ def secondaryPolytopeLine (m : Nat) (hm : m ≥ 3) (A : PointConfiguration 1)
     SecondaryPolytope 1 A where
   numVertices := m - 1
   dim := m - 2
-  dim_formula := Path.ofEq (by omega)
+  dim_formula := Path.stepChain (by omega)
   vertex_triangulation := fun _ => ⟨1, fun _ _ => ⟨0, by omega⟩, trivial⟩
   numEdges := m - 2
 
@@ -354,25 +354,25 @@ structure DehnSommerville (n : Nat) (P : SimplicialPolytope n) where
 /-- Multi-step: Euler relation computation for tetrahedron.
     V = 4, E = 6, F = 4: 4 - 6 + 4 = 2. -/
 def eulerTetrahedron : Path ((4 : Int) - 6 + 4) 2 :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Multi-step: Euler relation for cube.
     V = 8, E = 12, F = 6: 8 - 12 + 6 = 2. -/
 def eulerCube : Path ((8 : Int) - 12 + 6) 2 :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Multi-step: dimension chain for secondary polytope.
     dim Σ(A) = |A| - dim(conv(A)) - 1, expanded in stages. -/
 def secondaryDimChain (numPts ambDim : Nat) (h : numPts > ambDim + 1) :
     Path (numPts - ambDim - 1 + (ambDim + 1)) numPts :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Multi-step: Minkowski + normal fan compatibility.
     Normal fan of P + Q = common refinement of Σ_P and Σ_Q. -/
 def minkowskiFanChain (_n : Nat) (nf1 nf2 : Nat) (nfSum : Nat)
     (h : nfSum ≤ nf1 + nf2) :
     Path (nfSum + (nf1 + nf2 - nfSum)) (nf1 + nf2) :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-- Multi-step: Pick's theorem verification for unit square.
     I = 0, B = 4, A = 1: 2·1 = 2·0 + 4 - 2 = 2. ✓ -/
@@ -380,13 +380,13 @@ def pickSquare : PickTheorem where
   interior := 0
   boundary := 4
   twiceArea := 2
-  pick_path := Path.ofEq (by omega)
+  pick_path := Path.stepChain (by omega)
 
 /-- Three-step: f-vector of simplex.
     f_k(Δ^d) = C(d+1, k+1), verified for d=3. -/
 def fvecTetrahedron :
     Path (4 + 6 + 4 + 1) 15 :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 end PolyhedralGeometry
 end Algebra

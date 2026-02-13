@@ -198,7 +198,7 @@ theorem add_closed (a b : AugmentationIdeal)
 /-- Path witness for augmentation ideal membership. -/
 def ideal_path (a : AugmentationIdeal) :
     Path a.element.virtualDim 0 :=
-  Path.ofEqChain a.vdim_zero
+  Path.stepChain a.vdim_zero
 
 end AugmentationIdeal
 
@@ -260,7 +260,7 @@ def trivialCase : AtiyahSegalCompletion where
 /-- Path witness for the completion isomorphism. -/
 def completion_iso_path (asc : AtiyahSegalCompletion) :
     Path (asc.filtrationLevel ≥ 0) True :=
-  Path.ofEqChain (by simp [asc.isoAtLevel])
+  Path.stepChain (by simp [asc.isoAtLevel])
 
 /-- The completion at level 0 is the identity. -/
 theorem level_zero_identity :
@@ -301,7 +301,7 @@ def c2Case : SegalConjecture where
 /-- Path witness for the Segal conjecture isomorphism. -/
 def segal_iso_path (sc : SegalConjecture) :
     Path (sc.mapDegree + 0) sc.mapDegree :=
-  Path.ofEqChain sc.isIsoAfterCompletion
+  Path.stepChain sc.isIsoAfterCompletion
 
 /-- C_2 Burnside rank. -/
 theorem c2_burnside_rank : c2Case.burnsideRank = 2 := rfl
@@ -337,7 +337,7 @@ def standard (n : Int) (sid gord : Nat) : BottPeriodicity where
 /-- Path witness for the period. -/
 def period_path (bp : BottPeriodicity) :
     Path bp.periodShift 2 :=
-  Path.ofEqChain bp.period_eq
+  Path.stepChain bp.period_eq
 
 /-- The Bott class β lives in degree -2. -/
 def bottClassDegree : Int := -2
@@ -390,7 +390,7 @@ def zeroBundleIso (deg : Int) : EquivariantThomIso where
 /-- Path witness for degree shift. -/
 def degree_shift_path (ti : EquivariantThomIso) :
     Path ti.targetDegree (ti.sourceDegree - 2 * ti.bundleDim) :=
-  Path.ofEqChain ti.degree_shift
+  Path.stepChain ti.degree_shift
 
 /-- Zero bundle doesn't shift degree. -/
 theorem zero_bundle_no_shift (deg : Int) :
@@ -414,7 +414,7 @@ structure ThomComposition where
 /-- Path witness for Thom composition. -/
 def thom_comp_path (tc : ThomComposition) :
     Path tc.combinedDim (tc.dim1 + tc.dim2) :=
-  Path.ofEqChain tc.dim_add
+  Path.stepChain tc.dim_add
 
 /-- Standard composition. -/
 def standardComp (d1 d2 : Nat) : ThomComposition where
@@ -448,7 +448,7 @@ def degree_zero : EquivariantChernChar where
 /-- Path witness for degree parity. -/
 def parity_path (ch : EquivariantChernChar) :
     Path (ch.kDegree % 2) (ch.hDegree % 2) :=
-  Path.ofEqChain ch.degree_parity
+  Path.stepChain ch.degree_parity
 
 end EquivariantChernChar
 
@@ -484,7 +484,7 @@ theorem psi1_idempotent (d : Nat) :
 /-- Path witness for ψ^1. -/
 def psi1_path (d : Nat) :
     Path (psi1.preservesDim d) d :=
-  Path.ofEqChain (psi1_preserves d)
+  Path.stepChain (psi1_preserves d)
 
 end AdamsOperation
 
@@ -494,37 +494,37 @@ end AdamsOperation
 def rep_ring_add_assoc_path (a b c : RepElement) :
     Path (RepElement.add (RepElement.add a b) c)
          (RepElement.add a (RepElement.add b c)) :=
-  Path.ofEqChain (RepElement.add_assoc a b c)
+  Path.stepChain (RepElement.add_assoc a b c)
 
 /-- Path witness: R(G) additive identity. -/
 def rep_ring_add_zero_path (a : RepElement) :
     Path (RepElement.add a RepElement.zero) a :=
-  Path.ofEqChain (RepElement.add_zero a)
+  Path.stepChain (RepElement.add_zero a)
 
 /-- Path witness: Bott periodicity period. -/
 def bott_periodicity_path (bp : BottPeriodicity) :
     Path bp.periodShift 2 :=
-  Path.ofEqChain bp.period_eq
+  Path.stepChain bp.period_eq
 
 /-- Path witness: Thom isomorphism degree shift. -/
 def thom_iso_path (ti : EquivariantThomIso) :
     Path ti.targetDegree (ti.sourceDegree - 2 * ti.bundleDim) :=
-  Path.ofEqChain ti.degree_shift
+  Path.stepChain ti.degree_shift
 
 /-- Path witness: Segal conjecture isomorphism. -/
 def segal_conjecture_path (sc : SegalConjecture) :
     Path (sc.mapDegree + 0) sc.mapDegree :=
-  Path.ofEqChain sc.isIsoAfterCompletion
+  Path.stepChain sc.isIsoAfterCompletion
 
 /-- Path witness: augmentation ideal membership. -/
 def augmentation_path (a : AugmentationIdeal) :
     Path a.element.virtualDim 0 :=
-  Path.ofEqChain a.vdim_zero
+  Path.stepChain a.vdim_zero
 
 /-- Path witness: Adams operation ψ^1 is identity. -/
 def adams_psi1_path (d : Nat) :
     Path (AdamsOperation.psi1.preservesDim d) d :=
-  Path.ofEqChain (AdamsOperation.psi1_preserves d)
+  Path.stepChain (AdamsOperation.psi1_preserves d)
 
 end EquivariantKTheory
 end ComputationalPaths
