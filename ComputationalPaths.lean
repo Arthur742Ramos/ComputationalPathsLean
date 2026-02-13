@@ -3,4 +3,7 @@
 import ComputationalPaths.Basic
 import ComputationalPaths.Path
 import ComputationalPaths.SieveTheory
+import Motivic.PathInfrastructure
 import Topos.PathCoherence
+import Descent.PathCoherence
+import Cobordism.PathInfrastructure

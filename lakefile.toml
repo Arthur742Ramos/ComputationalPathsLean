@@ -22,6 +22,15 @@ name = "Operad"
 [[lean_lib]]
 name = "Topos"
 
+[[lean_lib]]
+name = "Motivic"
+
+[[lean_lib]]
+name = "Descent"
+
+[[lean_lib]]
+name = "Cobordism"
+
 [[lean_exe]]
 name = "computational_paths"
 root = "Main"

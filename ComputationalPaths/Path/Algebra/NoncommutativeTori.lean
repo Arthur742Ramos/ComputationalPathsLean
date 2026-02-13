@@ -71,15 +71,15 @@ variable (A : StarAlgCarrier.{u})
 
 /-- Path witness: star(star(x)) = x. -/
 def star_star_path (x : A.carrier) : Path (A.star (A.star x)) x :=
-  Path.ofEq (A.star_star x)
+  Path.ofEqChain (A.star_star x)
 
 /-- Path witness: 1·x = x. -/
 def one_mul_path (x : A.carrier) : Path (A.mul A.one x) x :=
-  Path.ofEq (A.one_mul x)
+  Path.ofEqChain (A.one_mul x)
 
 /-- Path witness: x·1 = x. -/
 def mul_one_path (x : A.carrier) : Path (A.mul x A.one) x :=
-  Path.ofEq (A.mul_one x)
+  Path.ofEqChain (A.mul_one x)
 
 end StarAlgCarrier
 
@@ -115,28 +115,28 @@ variable {A : StarAlgCarrier.{u}} (P : UnitaryPair A)
 
 /-- Path witness for UV = λVU. -/
 def comm_rel_path : Path (A.mul P.U P.V) (A.mul P.phase (A.mul P.V P.U)) :=
-  Path.ofEq P.comm_rel
+  Path.ofEqChain P.comm_rel
 
 /-- Path witness: U*U = 1. -/
 def U_star_path : Path (A.mul (A.star P.U) P.U) A.one :=
-  Path.ofEq P.U_unitary.star_mul_self
+  Path.ofEqChain P.U_unitary.star_mul_self
 
 /-- Path witness: V*V = 1. -/
 def V_star_path : Path (A.mul (A.star P.V) P.V) A.one :=
-  Path.ofEq P.V_unitary.star_mul_self
+  Path.ofEqChain P.V_unitary.star_mul_self
 
 /-- Multi-step: U(U*U) = U·1 = U, via unitarity then right identity. -/
 def U_absorb_star (A : StarAlgCarrier.{u}) (P : UnitaryPair A) :
     Path (A.mul P.U (A.mul (A.star P.U) P.U)) P.U :=
   Path.trans
-    (Path.ofEq (congrArg (A.mul P.U) P.U_unitary.star_mul_self))
+    (Path.ofEqChain (congrArg (A.mul P.U) P.U_unitary.star_mul_self))
     (A.mul_one_path P.U)
 
 /-- Multi-step: V*(UV) = V*(λVU) = λ(V*V)U = λU. -/
 def comm_conjugate :
     Path (A.mul (A.star P.V) (A.mul P.U P.V))
          (A.mul (A.star P.V) (A.mul P.phase (A.mul P.V P.U))) :=
-  Path.ofEq (congrArg (A.mul (A.star P.V)) P.comm_rel)
+  Path.ofEqChain (congrArg (A.mul (A.star P.V)) P.comm_rel)
 
 end UnitaryPair
 
@@ -156,12 +156,12 @@ inductive NCTorusStep (A : StarAlgCarrier.{u}) (P : UnitaryPair A) :
 def ncTorusStepPath {A : StarAlgCarrier.{u}} {P : UnitaryPair A}
     {x y : A.carrier} (s : NCTorusStep A P x y) : Path x y :=
   match s with
-  | NCTorusStep.comm => Path.ofEq P.comm_rel
-  | NCTorusStep.u_star => Path.ofEq P.U_unitary.star_mul_self
-  | NCTorusStep.v_star => Path.ofEq P.V_unitary.star_mul_self
-  | NCTorusStep.phase_star => Path.ofEq P.phase_unitary.star_mul_self
-  | NCTorusStep.one_mul x => Path.ofEq (A.one_mul x)
-  | NCTorusStep.mul_one x => Path.ofEq (A.mul_one x)
+  | NCTorusStep.comm => Path.ofEqChain P.comm_rel
+  | NCTorusStep.u_star => Path.ofEqChain P.U_unitary.star_mul_self
+  | NCTorusStep.v_star => Path.ofEqChain P.V_unitary.star_mul_self
+  | NCTorusStep.phase_star => Path.ofEqChain P.phase_unitary.star_mul_self
+  | NCTorusStep.one_mul x => Path.ofEqChain (A.one_mul x)
+  | NCTorusStep.mul_one x => Path.ofEqChain (A.mul_one x)
 
 /-- Compose two NC torus steps. -/
 def ncTorus_steps_compose {A : StarAlgCarrier.{u}} {P : UnitaryPair A}
@@ -200,19 +200,19 @@ variable {T : NCTorusData.{u}} (τ : NCTorusTrace T)
 
 /-- Path witness: τ(1) = 1. -/
 def trace_one_path : Path (τ.trace T.alg.one) 1 :=
-  Path.ofEq τ.trace_one
+  Path.ofEqChain τ.trace_one
 
 /-- Path witness: τ(ab) = τ(ba). -/
 def trace_comm_path (a b : T.alg.carrier) :
     Path (τ.trace (T.alg.mul a b)) (τ.trace (T.alg.mul b a)) :=
-  Path.ofEq (τ.trace_comm a b)
+  Path.ofEqChain (τ.trace_comm a b)
 
 /-- Multi-step: τ(1·a) = τ(a) = τ(a·1), via one_mul then trace_comm. -/
 def trace_unit_absorb (a : T.alg.carrier) :
     Path (τ.trace (T.alg.mul T.alg.one a)) (τ.trace (T.alg.mul a T.alg.one)) :=
   Path.trans
-    (Path.ofEq (congrArg τ.trace (T.alg.one_mul a)))
-    (Path.ofEq (congrArg τ.trace (T.alg.mul_one a)).symm)
+    (Path.ofEqChain (congrArg τ.trace (T.alg.one_mul a)))
+    (Path.ofEqChain (congrArg τ.trace (T.alg.mul_one a)).symm)
 
 end NCTorusTrace
 
@@ -259,7 +259,7 @@ variable {T1 T2 : NCTorusData.{u}} (M : NCTorusMorita T1 T2)
 /-- Path witness for bimodule associativity. -/
 def act_assoc_path (a : T1.alg.carrier) (m : M.bimod) (b : T2.alg.carrier) :
     Path (M.rightAct (M.leftAct a m) b) (M.leftAct a (M.rightAct m b)) :=
-  Path.ofEq (M.act_assoc a m b)
+  Path.ofEqChain (M.act_assoc a m b)
 
 end NCTorusMorita
 
@@ -290,23 +290,23 @@ variable {T : NCTorusData.{u}} {K : NCTorusKTheory T} (PV : PimsnerVoiculescu T 
 
 /-- Path witness: i*(0) = 0. -/
 def i_star_zero_path : Path (PV.i_star_k0 K.k0_zero) K.k0_zero :=
-  Path.ofEq PV.i_star_k0_zero
+  Path.ofEqChain PV.i_star_k0_zero
 
 /-- Path witness: ∂(0) = 0. -/
 def boundary_zero_path : Path (PV.boundary K.k1_zero) K.k0_zero :=
-  Path.ofEq PV.boundary_zero
+  Path.ofEqChain PV.boundary_zero
 
 /-- Multi-step: i*(1-α*)(0) = i*(0) = 0. -/
 def exact_k0_multi_path :
     Path (PV.i_star_k0 (PV.one_minus_alpha_k0 K.k0_zero)) K.k0_zero :=
-  Path.ofEq PV.exact_at_k0_zero
+  Path.ofEqChain PV.exact_at_k0_zero
 
 /-- RwEq: the direct exactness path equals the two-step composition. -/
 theorem pv_exact_rweq
     (h : PV.one_minus_alpha_k0 K.k0_zero = K.k0_zero) :
     RwEq
-      (Path.ofEq PV.exact_at_k0_zero)
-      (Path.trans (Path.ofEq (congrArg PV.i_star_k0 h))
+      (Path.ofEqChain PV.exact_at_k0_zero)
+      (Path.trans (Path.ofEqChain (congrArg PV.i_star_k0 h))
                   (PV.i_star_zero_path)) := by
   constructor
 

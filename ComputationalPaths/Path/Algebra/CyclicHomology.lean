@@ -74,7 +74,7 @@ theorem add_zero (x : A.carrier) : A.add x A.zero = x := by
 
 /-- Path for right identity. -/
 def add_zero_path (x : A.carrier) : Path (A.add x A.zero) x :=
-  Path.ofEq (A.add_zero x)
+  Path.ofEqChain (A.add_zero x)
 
 end AlgData
 
@@ -111,7 +111,7 @@ variable {A : AlgData.{u}} (HC : HochschildComplex A)
 /-- Path witness for b² = 0. -/
 def b_sq_zero_path (n : Nat) (c : HochschildChain A (n + 2)) :
     Path (HC.b n (HC.b (n + 1) c)) (hochschildZero A n) :=
-  Path.ofEq (HC.b_sq_zero n c)
+  Path.ofEqChain (HC.b_sq_zero n c)
 
 end HochschildComplex
 
@@ -134,12 +134,12 @@ variable {A : AlgData.{u}} (T : CyclicOperator A)
 /-- Path witness: t preserves zero. -/
 def t_zero_path (n : Nat) :
     Path (T.t n (hochschildZero A n)) (hochschildZero A n) :=
-  Path.ofEq (T.t_zero n)
+  Path.ofEqChain (T.t_zero n)
 
 /-- Path witness: t^{n+1} = id. -/
 def t_power_id_path (n : Nat) (c : HochschildChain A n) :
     Path (Nat.iterate (T.t n) (n + 1) c) c :=
-  Path.ofEq (T.t_power_id n c)
+  Path.ofEqChain (T.t_power_id n c)
 
 /-- Multi-step path: t^{n+1}(t(c)) = t(c), via t^{n+1} = id applied to t(c). -/
 def t_power_shift (n : Nat) (c : HochschildChain A n) :
@@ -152,9 +152,9 @@ def t_double_power (n : Nat) (c : HochschildChain A n)
          Nat.iterate (T.t n) (n + 1) (Nat.iterate (T.t n) (n + 1) c)) :
     Path (Nat.iterate (T.t n) (2 * (n + 1)) c) c :=
   Path.trans
-    (Path.ofEq h)
+    (Path.ofEqChain h)
     (Path.trans
-      (Path.ofEq (congrArg (Nat.iterate (T.t n) (n + 1)) (T.t_power_id n c)))
+      (Path.ofEqChain (congrArg (Nat.iterate (T.t n) (n + 1)) (T.t_power_id n c)))
       (T.t_power_id_path n c))
 
 end CyclicOperator
@@ -178,12 +178,12 @@ variable {A : AlgData.{u}} (B : ConnesBOperator A)
 /-- Path witness: B(0) = 0. -/
 def opB_zero_path (n : Nat) :
     Path (B.opB n (hochschildZero A n)) (hochschildZero A (n + 1)) :=
-  Path.ofEq (B.opB_zero n)
+  Path.ofEqChain (B.opB_zero n)
 
 /-- Path witness: B² = 0. -/
 def opB_sq_zero_path (n : Nat) (c : HochschildChain A n) :
     Path (B.opB (n + 1) (B.opB n c)) (hochschildZero A (n + 2)) :=
-  Path.ofEq (B.opB_sq_zero n c)
+  Path.ofEqChain (B.opB_sq_zero n c)
 
 end ConnesBOperator
 
@@ -207,13 +207,13 @@ variable {A : AlgData.{u}} (M : MixedComplexData A)
 def mixed_rel_path (n : Nat) :
     Path (M.hc.b (n + 1) (M.cb.opB n (hochschildZero A n)))
          (hochschildZero A (n + 1)) :=
-  Path.ofEq (M.mixed_rel n)
+  Path.ofEqChain (M.mixed_rel n)
 
 /-- Multi-step: B(b(b(c))) = B(0) = 0, composing b²=0 then B(0)=0. -/
 def B_of_b_sq_path (n : Nat) (c : HochschildChain A (n + 2)) :
     Path (M.cb.opB n (M.hc.b n (M.hc.b (n + 1) c))) (hochschildZero A (n + 1)) :=
   Path.trans
-    (Path.ofEq (congrArg (M.cb.opB n) (M.hc.b_sq_zero n c)))
+    (Path.ofEqChain (congrArg (M.cb.opB n) (M.hc.b_sq_zero n c)))
     (M.cb.opB_zero_path n)
 
 end MixedComplexData
@@ -234,9 +234,9 @@ inductive SBIStep (A : AlgData.{u}) :
 def sbiStepPath {A : AlgData.{u}} {n : Nat} {x y : HochschildChain A n}
     (s : SBIStep A x y) : Path x y :=
   match s with
-  | SBIStep.b_sq hc c => Path.ofEq (hc.b_sq_zero _ c)
-  | SBIStep.B_sq cb c => Path.ofEq (cb.opB_sq_zero _ c)
-  | SBIStep.B_zero cb => Path.ofEq (cb.opB_zero _)
+  | SBIStep.b_sq hc c => Path.ofEqChain (hc.b_sq_zero _ c)
+  | SBIStep.B_sq cb c => Path.ofEqChain (cb.opB_sq_zero _ c)
+  | SBIStep.B_zero cb => Path.ofEqChain (cb.opB_zero _)
 
 /-- Compose two SBI steps via Path.trans. -/
 def sbi_steps_compose {A : AlgData.{u}} {n : Nat} {x y z : HochschildChain A n}
@@ -285,30 +285,30 @@ variable (CH : CyclicHomologyData.{u})
 
 /-- Path witness: I(0) = 0. -/
 def incl_zero_path (n : Nat) : Path (CH.incl n (CH.hh.zero n)) (CH.hc.zero n) :=
-  Path.ofEq (CH.incl_zero n)
+  Path.ofEqChain (CH.incl_zero n)
 
 /-- Path witness: S(0) = 0. -/
 def periodicityS_zero_path (n : Nat) :
     Path (CH.periodicityS n (CH.hc.zero (n + 2))) (CH.hc.zero n) :=
-  Path.ofEq (CH.periodicityS_zero n)
+  Path.ofEqChain (CH.periodicityS_zero n)
 
 /-- Path witness: B(0) = 0. -/
 def boundary_zero_path (n : Nat) :
     Path (CH.boundary n (CH.hc.zero n)) (CH.hh.zero (n + 1)) :=
-  Path.ofEq (CH.boundary_zero n)
+  Path.ofEqChain (CH.boundary_zero n)
 
 /-- Multi-step SBI path: I(B(0)) = I(0) = 0, composing B(0)=0 then I(0)=0. -/
 def sbi_IB_zero (n : Nat) :
     Path (CH.incl (n + 1) (CH.boundary n (CH.hc.zero n))) (CH.hc.zero (n + 1)) :=
   Path.trans
-    (Path.ofEq (congrArg (CH.incl (n + 1)) (CH.boundary_zero n)))
+    (Path.ofEqChain (congrArg (CH.incl (n + 1)) (CH.boundary_zero n)))
     (CH.incl_zero_path (n + 1))
 
 /-- Multi-step SBI path: B(S(0)) = B(0) = 0. -/
 def sbi_BS_zero (n : Nat) :
     Path (CH.boundary n (CH.periodicityS n (CH.hc.zero (n + 2)))) (CH.hh.zero (n + 1)) :=
   Path.trans
-    (Path.ofEq (congrArg (CH.boundary n) (CH.periodicityS_zero n)))
+    (Path.ofEqChain (congrArg (CH.boundary n) (CH.periodicityS_zero n)))
     (CH.boundary_zero_path n)
 
 /-- Three-step SBI composition: S(I(B(0))) = S(I(0)) = S(0) = 0. -/
@@ -316,17 +316,17 @@ def sbi_SIB_zero (n : Nat) :
     Path (CH.periodicityS (n + 1) (CH.incl (n + 3) (CH.boundary (n + 2) (CH.hc.zero (n + 2)))))
          (CH.hc.zero (n + 1)) :=
   Path.trans
-    (Path.ofEq (congrArg (CH.periodicityS (n + 1))
+    (Path.ofEqChain (congrArg (CH.periodicityS (n + 1))
       (congrArg (CH.incl (n + 3)) (CH.boundary_zero (n + 2)))))
     (Path.trans
-      (Path.ofEq (congrArg (CH.periodicityS (n + 1)) (CH.incl_zero (n + 3))))
+      (Path.ofEqChain (congrArg (CH.periodicityS (n + 1)) (CH.incl_zero (n + 3))))
       (CH.periodicityS_zero_path (n + 1)))
 
 /-- RwEq: the two different multi-step paths to zero are path-equivalent. -/
 theorem sbi_zero_rweq (n : Nat) :
     RwEq
       (CH.boundary_zero_path n)
-      (Path.ofEq (CH.boundary_zero n)) := by
+      (Path.ofEqChain (CH.boundary_zero n)) := by
   constructor
 
 end CyclicHomologyData
@@ -351,19 +351,19 @@ variable (HP : PeriodicCyclicHomologyData.{u})
 /-- Path witness for periodicity round-trip. -/
 def periodic_left_inv_path (n : Nat) (x : HP.hc.carrier n) :
     Path (HP.periodicIso_inv n (HP.periodicIso_fwd n x)) x :=
-  Path.ofEq (HP.periodic_left_inv n x)
+  Path.ofEqChain (HP.periodic_left_inv n x)
 
 /-- Path witness for periodicity round-trip. -/
 def periodic_right_inv_path (n : Nat) (y : HP.hc.carrier (n + 2)) :
     Path (HP.periodicIso_fwd n (HP.periodicIso_inv n y)) y :=
-  Path.ofEq (HP.periodic_right_inv n y)
+  Path.ofEqChain (HP.periodic_right_inv n y)
 
 /-- Multi-step: inv(fwd(inv(fwd(x)))) = inv(fwd(x)) = x. -/
 def periodic_double_roundtrip (n : Nat) (x : HP.hc.carrier n) :
     Path (HP.periodicIso_inv n (HP.periodicIso_fwd n
            (HP.periodicIso_inv n (HP.periodicIso_fwd n x)))) x :=
   Path.trans
-    (Path.ofEq (congrArg (fun z => HP.periodicIso_inv n (HP.periodicIso_fwd n z))
+    (Path.ofEqChain (congrArg (fun z => HP.periodicIso_inv n (HP.periodicIso_fwd n z))
       (HP.periodic_left_inv n x)))
     (HP.periodic_left_inv_path n x)
 
