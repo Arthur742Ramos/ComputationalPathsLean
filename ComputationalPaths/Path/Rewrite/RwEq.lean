@@ -269,7 +269,7 @@ instantiated with a constant family, plus the usual `trans` congruence rules. -/
       -- Now `p = Path.mk steps rfl`.
       -- We show that any list of reflexive steps in the codomain rewrites to `refl`.
       -- The key base rewrite is `ofEq rfl ▷ refl`, which is `transport_refl_beta`.
-      have hOfEq : RwEq (Path.ofEq (rfl : b = b)) (Path.refl b) := by
+      have hOfEq : RwEq (Path.stepChain (rfl : b = b)) (Path.refl b) := by
         simpa using
           (RwEq.step <|
             Step.transport_refl_beta (A := PUnit) (B := fun _ : PUnit => B)
@@ -291,7 +291,7 @@ instantiated with a constant family, plus the usual `trans` congruence rules. -/
                     Path.congrArg (fun _ : A => b)
                         (Path.mk (A := A) (a := a₁) (b := a₁)
                           (ComputationalPaths.Step.mk src src rfl :: tail) rfl) =
-                      Path.trans (Path.ofEq (rfl : b = b))
+                      Path.trans (Path.stepChain (rfl : b = b))
                         (Path.congrArg (fun _ : A => b)
                           (Path.mk (A := A) (a := a₁) (b := a₁) tail rfl)) := by
                   rfl
@@ -326,11 +326,11 @@ instantiated with a constant family, plus the usual `trans` congruence rules. -/
 @[simp] theorem rweq_mapLeft_ofEq {B : Type v} {C : Type w}
     (f : A → B → C) {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
     RwEq (Path.mapLeft (A := A) (B := B) (C := C) f
-        (Path.ofEq (A := A) (a := a₁) (b := a₂) h) b)
-      (Path.ofEq (A := C) (a := f a₁ b) (b := f a₂ b)
+        (Path.stepChain (A := A) (a := a₁) (b := a₂) h) b)
+      (Path.stepChain (A := C) (a := f a₁ b) (b := f a₂ b)
         (_root_.congrArg (fun x => f x b) h)) :=
   rweq_of_eq (by
-    simp [Path.mapLeft, Path.ofEq, Path.congrArg, List.map])
+    simp [Path.mapLeft, Path.stepChain, Path.congrArg, List.map])
 
 @[simp] theorem rweq_mapRight_trans {B : Type v} {C : Type w}
     {b1 b2 b3 : B} (f : A → B → C)
@@ -347,11 +347,11 @@ instantiated with a constant family, plus the usual `trans` congruence rules. -/
 @[simp] theorem rweq_mapRight_ofEq {B : Type v} {C : Type w}
     (f : A → B → C) (a : A) {b₁ b₂ : B} (h : b₁ = b₂) :
     RwEq (Path.mapRight (A := A) (B := B) (C := C) f a
-          (Path.ofEq (A := B) (a := b₁) (b := b₂) h))
-      (Path.ofEq (A := C) (a := f a b₁) (b := f a b₂)
+          (Path.stepChain (A := B) (a := b₁) (b := b₂) h))
+      (Path.stepChain (A := C) (a := f a b₁) (b := f a b₂)
         (_root_.congrArg (f a) h)) :=
   rweq_of_eq (by
-    simp [Path.mapRight, Path.ofEq, Path.congrArg, List.map])
+    simp [Path.mapRight, Path.stepChain, Path.congrArg, List.map])
 
 @[simp] theorem rweq_map2_trans
     {A₁ : Type u} {B : Type u}
@@ -645,7 +645,7 @@ instantiated with a constant family, plus the usual `trans` congruence rules. -/
     {A : Type u} {B : A → Type u}
     {a : A} (x : B a) :
     RwEq
-      (Path.ofEq (A := B a)
+      (Path.stepChain (A := B a)
         (a := transport (A := A) (D := fun t => B t)
                 (Path.refl a) x)
         (b := x)
@@ -792,7 +792,7 @@ instantiated with a constant family, plus the usual `trans` congruence rules. -/
     RwEq
       (Path.congrArg Sigma.fst
         (Path.sigmaMk (B := B) p q))
-      (Path.ofEq (A := A) p.toEq) :=
+      (Path.stepChain (A := A) p.toEq) :=
   rweq_of_step (Step.sigma_fst_beta (A := A) (B := B) p q)
 
 @[simp] theorem rweq_sigma_snd_beta {A : Type u} {B : A → Type u}
@@ -801,7 +801,7 @@ instantiated with a constant family, plus the usual `trans` congruence rules. -/
     (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
     RwEq
       (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
-      (Path.ofEq
+      (Path.stepChain
         (A := B a2)
         (a := transport (A := A) (D := fun a => B a)
               (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q)) b1)
@@ -908,7 +908,7 @@ instantiated with a constant family, plus the usual `trans` congruence rules. -/
     (a : A) (b : B a) :
     RwEq
       (Path.sigmaMk (B := B) (Path.refl a)
-        (Path.ofEq (A := B a) (a := b) (b := b) rfl))
+        (Path.stepChain (A := B a) (a := b) (b := b) rfl))
       (Path.refl (Sigma.mk a b)) := by
   classical
   have hfst :
@@ -918,7 +918,7 @@ instantiated with a constant family, plus the usual `trans` congruence rules. -/
     simp [Path.congrArg, Path.refl]
   have hsnd :
       Path.sigmaSnd (B := B) (Path.refl (Sigma.mk a b)) =
-        Path.ofEq (A := B a) (a := b) (b := b) rfl := by
+        Path.stepChain (A := B a) (a := b) (b := b) rfl := by
     unfold Path.sigmaSnd
     simp [transport, Path.refl]
   have h :=

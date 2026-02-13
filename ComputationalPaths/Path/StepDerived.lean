@@ -24,12 +24,12 @@ variable {a b c d : A}
 
 /-- Symmetry of a reflexivity path built via `ofEq rfl` reduces to `ofEq rfl`. -/
 theorem symm_ofEq_rfl (a : A) :
-    Path.symm (Path.ofEq (rfl : a = a)) = Path.ofEq rfl := by
-  simp [Path.symm, Path.ofEq]
+    Path.symm (Path.stepChain (rfl : a = a)) = Path.stepChain rfl := by
+  simp [Path.symm, Path.stepChain]
 
 /-- Double symmetry of `ofEq` recovers the original `ofEq`. -/
 theorem symm_symm_ofEq (h : a = b) :
-    Path.symm (Path.symm (Path.ofEq h)) = Path.ofEq h := by
+    Path.symm (Path.symm (Path.stepChain h)) = Path.stepChain h := by
   simp
 
 /-- Composing a path with its own inverse produces a path whose `toEq` is `rfl`. -/
@@ -170,7 +170,7 @@ theorem rw_symm_refl (a : A) :
 
 /-- `ofEq h` for any `h : a = a` rewrites to `ofEq rfl`. -/
 theorem rweq_ofEq_rfl_eq_refl (h : a = a) :
-    RwEq (Path.ofEq h) (Path.ofEq rfl) := by
+    RwEq (Path.stepChain h) (Path.stepChain rfl) := by
   have : h = rfl := rfl
   subst this
   exact RwEq.refl _
@@ -202,14 +202,14 @@ theorem rweq_congrArg_of_rweq' {B : Type u} (f : A → B) {p q : Path a b}
 
 /-- Transport along `ofEq rfl` is the identity. -/
 theorem transport_ofEq_rfl {D : A → Sort v} (x : D a) :
-    Path.transport (Path.ofEq (rfl : a = a)) x = x := by
+    Path.transport (Path.stepChain (rfl : a = a)) x = x := by
   simp [Path.transport]
 
 /-- Transport along `trans (ofEq h₁) (ofEq h₂)` equals sequential transport. -/
 theorem transport_ofEq_trans {D : A → Sort v}
     (h₁ : a = b) (h₂ : b = c) (x : D a) :
-    Path.transport (Path.trans (Path.ofEq h₁) (Path.ofEq h₂)) x =
-      Path.transport (Path.ofEq h₂) (Path.transport (Path.ofEq h₁) x) := by
+    Path.transport (Path.trans (Path.stepChain h₁) (Path.stepChain h₂)) x =
+      Path.transport (Path.stepChain h₂) (Path.transport (Path.stepChain h₁) x) := by
   cases h₁; cases h₂; rfl
 
 /-! ## Rw interaction with symmetry congruence -/
@@ -258,20 +258,20 @@ theorem rw_trans_right_of_rw (r : Path a b) {p q : Path b c}
 example : Path (0 : Nat) 0 := Path.refl 0
 
 /-- The path `ofEq (Nat.add_zero 0)` from `0 + 0` to `0`. -/
-example : Path (0 + 0) 0 := Path.ofEq (Nat.add_zero 0)
+example : Path (0 + 0) 0 := Path.stepChain (Nat.add_zero 0)
 
 /-- Symmetry of a concrete arithmetic identity. -/
-example : Path 0 (0 + 0) := Path.symm (Path.ofEq (Nat.add_zero 0))
+example : Path 0 (0 + 0) := Path.symm (Path.stepChain (Nat.add_zero 0))
 
 /-- Composing two concrete arithmetic identities. -/
 example : Path (0 + 0 + 0) 0 :=
   Path.trans
-    (Path.ofEq (Nat.add_zero (0 + 0)))
-    (Path.ofEq (Nat.add_zero 0))
+    (Path.stepChain (Nat.add_zero (0 + 0)))
+    (Path.stepChain (Nat.add_zero 0))
 
 /-- The groupoid inverse law holds concretely for any `ofEq`. -/
 example (h : a = b) :
-    (Path.trans (Path.ofEq h) (Path.symm (Path.ofEq h))).toEq = rfl := by
+    (Path.trans (Path.stepChain h) (Path.symm (Path.stepChain h))).toEq = rfl := by
   simp
 
 /-- Double symmetry toEq at the concrete level. -/

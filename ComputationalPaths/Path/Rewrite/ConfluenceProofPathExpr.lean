@@ -110,7 +110,7 @@ def eval_deterministic_path
     {p q r : PathExpr (A := A) (a := a) (b := b)}
     (hq : PathExpr.Rw p q) (hr : PathExpr.Rw p r) :
     Path (PathExpr.eval q) (PathExpr.eval r) :=
-  Path.ofEq (eval_deterministic hq hr)
+  Path.stepChain (eval_deterministic hq hr)
 
 /-! ## Step determinism -/
 
@@ -181,7 +181,7 @@ def eval_trans_rw_left_path
     (h : PathExpr.Rw p q) :
     Path (Path.trans (PathExpr.eval p) (PathExpr.eval r))
          (Path.trans (PathExpr.eval q) (PathExpr.eval r)) :=
-  Path.ofEq (eval_trans_rw_left r h)
+  Path.stepChain (eval_trans_rw_left r h)
 
 /-- Path witness for right rewriting in trans. -/
 def eval_trans_rw_right_path
@@ -191,7 +191,7 @@ def eval_trans_rw_right_path
     (h : PathExpr.Rw q r) :
     Path (Path.trans (PathExpr.eval p) (PathExpr.eval q))
          (Path.trans (PathExpr.eval p) (PathExpr.eval r)) :=
-  Path.ofEq (eval_trans_rw_right p h)
+  Path.stepChain (eval_trans_rw_right p h)
 
 /-! ## Normal form agreement -/
 

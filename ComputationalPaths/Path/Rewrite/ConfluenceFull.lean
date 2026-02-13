@@ -117,7 +117,7 @@ theorem normalize_symm (p : Path a b) :
 
 /-- Normal form of refl is ofEq rfl. -/
 theorem normalize_refl (x : A) :
-    Path.normalize (Path.refl x) = Path.ofEq (rfl : x = x) := by
+    Path.normalize (Path.refl x) = Path.stepChain (rfl : x = x) := by
   simp
 
 /-! ## Characterization of Rw -/

@@ -53,6 +53,9 @@ name = "Langlands"
 name = "Anabelian"
 
 [[lean_lib]]
+name = "Birational"
+
+[[lean_lib]]
 name = "Simplicial"
 
 [[lean_lib]]
@@ -77,6 +80,12 @@ name = "Hodge"
 name = "Log"
 
 [[lean_lib]]
+name = "RepStability"
+
+[[lean_lib]]
+name = "Intersection"
+
+[[lean_lib]]
 name = "GRT"
 
 [[lean_lib]]
@@ -87,6 +96,9 @@ name = "Quantum"
 
 [[lean_lib]]
 name = "Mirror"
+
+[[lean_lib]]
+name = "SymplecticDuality"
 
 [[lean_lib]]
 name = "NCG"

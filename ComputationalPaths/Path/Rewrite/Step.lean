@@ -196,7 +196,7 @@ inductive Step :
       Step (A := A)
         (Path.congrArg Sigma.fst
         (Path.sigmaMk (B := B) p q))
-        (Path.ofEq (A := A) p.toEq)
+        (Path.stepChain (A := A) p.toEq)
   /-- Rule 17: Sigma second projection β-rule. Extracts the second component path. -/
   | sigma_snd_beta
     {A₀ : Type u} {B : A₀ → Type u}
@@ -206,7 +206,7 @@ inductive Step :
         Path (transport (A := A₀) (D := fun a => B a) p b1) b2) :
       Step (A := B a2)
         (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
-        (Path.ofEq
+        (Path.stepChain
           (A := B a2)
           (a := transport (A := A₀) (D := fun a => B a)
                 (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q)) b1)
@@ -283,7 +283,7 @@ inductive Step :
     {A : Type u} {B : A → Type u}
       {a : A} (x : B a) :
       Step (A := B a)
-        (Path.ofEq (A := B a)
+        (Path.stepChain (A := B a)
           (a := transport (A := A) (D := fun t => B t)
                   (Path.refl a) x)
           (b := x)
@@ -296,7 +296,7 @@ inductive Step :
         {a₁ a₂ a₃ : A}
         (p : Path a₁ a₂) (q : Path a₂ a₃) (x : B a₁) :
         Step (A := B a₃)
-          (Path.ofEq (A := B a₃)
+          (Path.stepChain (A := B a₃)
             (a := Path.transport (A := A) (D := fun t => B t)
                     (Path.trans p q) x)
             (b := Path.transport (A := A) (D := fun t => B t) q
@@ -318,7 +318,7 @@ inductive Step :
       {A : Type u} {B : A → Type u}
         {a₁ a₂ : A} (p : Path a₁ a₂) (x : B a₁) :
         Step (A := B a₁)
-          (Path.ofEq (A := B a₁)
+          (Path.stepChain (A := B a₁)
             (a := Path.transport (A := A) (D := fun t => B t)
                     (Path.symm p)
                     (Path.transport (A := A) (D := fun t => B t) p x))
@@ -342,7 +342,7 @@ inductive Step :
       {A : Type u} {B : A → Type u}
         {a₁ a₂ : A} (p : Path a₁ a₂) (y : B a₂) :
         Step (A := B a₂)
-          (Path.ofEq (A := B a₂)
+          (Path.stepChain (A := B a₂)
             (a := Path.transport (A := A) (D := fun t => B t) p
                     (Path.transport (A := A) (D := fun t => B t)
                       (Path.symm p) y))
@@ -370,7 +370,7 @@ inductive Step :
         (q : Path (transport (A := A) (D := fun a => B a) p b₁) b₂)
         (x : D a₁) :
         Step (A := D a₂)
-          (Path.ofEq (A := D a₂)
+          (Path.stepChain (A := D a₂)
             (a := transport (A := Sigma B)
                     (D := fun z => D z.fst) (Path.sigmaMk (B := B) p q) x)
             (b := transport (A := A) (D := D) p x)
@@ -396,7 +396,7 @@ inductive Step :
         (q : Path (transport (A := A) (D := fun a => B a) p b₁) b₂)
         (x : D a₁ b₁) :
         Step (A := D a₂ b₂)
-          (Path.ofEq (A := D a₂ b₂)
+          (Path.stepChain (A := D a₂ b₂)
             (a := transport (A := Sigma B)
                     (D := fun z => D z.fst z.snd)
                     (Path.sigmaMk (B := B) p q) x)
@@ -423,7 +423,7 @@ inductive Step :
         (q : Path (transport (A := A) (D := fun a => B a) p b₁) b₂)
         (x : D a₁ b₁) :
         Step (A := D a₂ b₂)
-          (Path.ofEq (A := D a₂ b₂)
+          (Path.stepChain (A := D a₂ b₂)
             (a := transport (A := Sigma B)
                     (D := fun z => D z.fst z.snd)
                     (Path.sigmaMk (B := B) p q) x)
@@ -811,16 +811,16 @@ inductive Step :
       (f : A → B → A) {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
       Step (A := A)
         (Path.mapLeft (A := A) (B := B) (C := A) f
-          (Path.ofEq (A := A) (a := a₁) (b := a₂) h) b)
-        (Path.ofEq (A := A) (a := f a₁ b) (b := f a₂ b)
+          (Path.stepChain (A := A) (a := a₁) (b := a₂) h) b)
+        (Path.stepChain (A := A) (a := f a₁ b) (b := f a₂ b)
           (_root_.congrArg (fun x => f x b) h))
   /-- Rule 72: Right map with propositional equality. -/
   | mapRight_ofEq
     {A : Type u} (f : A → A → A) (a : A) {b₁ b₂ : A} (h : b₁ = b₂) :
       Step (A := A)
         (Path.mapRight (A := A) (B := A) (C := A) f a
-          (Path.ofEq (A := A) (a := b₁) (b := b₂) h))
-        (Path.ofEq (A := A) (a := f a b₁) (b := f a b₂)
+          (Path.stepChain (A := A) (a := b₁) (b := b₂) h))
+        (Path.stepChain (A := A) (a := f a b₁) (b := f a b₂)
           (_root_.congrArg (f a) h))
   /-- Rule 73: Symmetry congruence (structural). If `p ▷ q` then `symm(p) ▷ symm(q)`. -/
   | symm_congr {A : Type u} {a b : A} {p q : Path a b} :

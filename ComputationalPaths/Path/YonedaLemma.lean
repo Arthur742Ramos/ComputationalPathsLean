@@ -77,10 +77,10 @@ def representable (A : Type u) (a : A) : PathFunctor (A := A) where
   map := fun {b c} p q => Path.trans q p
   map_id := by
     intro b q
-    exact Path.ofEq (Path.trans_refl_right q)
+    exact Path.stepChain (Path.trans_refl_right q)
   map_comp := by
     intro b c d p q r
-    exact Path.ofEq (Path.trans_assoc r p q).symm
+    exact Path.stepChain (Path.trans_assoc r p q).symm
 
 /-! ## Yoneda lemma -/
 
@@ -108,7 +108,7 @@ def yoneda {A : Type u} (F : PathFunctor (A := A)) (a : A) :
 def yonedaNaturalityPath {A : Type u} {F : PathFunctor (A := A)} {a b : A}
     (η : PathNatTrans (representable A a) F) (p : Path a b) :
     Path (F.map p (η.app a (Path.refl a))) (η.app b p) := by
-  refine Path.ofEq ?_
+  refine Path.stepChain ?_
   have h := η.naturality (p := p) (x := Path.refl a)
   simpa [representable, Path.trans_refl_left] using h
 

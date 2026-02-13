@@ -20,7 +20,7 @@ constructions.
 `RwEq` is a specific computational rewrite relation (not propositional equality
 of paths). Two paths `p q : Path a b` may share the same `toEq` without being
 `RwEq`-related. The `normalize` function collapses all paths to the canonical
-single-step `Path.ofEq p.toEq`, but `normalize p` and `p` are generally
+single-step `Path.stepChain p.toEq`, but `normalize p` and `p` are generally
 *different* paths (different step lists).
 
 ## References
@@ -69,30 +69,30 @@ theorem normalize_normalPath (x : PathRwQuot A a b) :
 /-- Normal form of a composition. -/
 theorem normalize_trans_eq (p : Path a b) (q : Path b c) :
     normalize (A := A) (a := a) (b := c) (Path.trans p q) =
-      Path.ofEq (p.toEq.trans q.toEq) := by
+      Path.stepChain (p.toEq.trans q.toEq) := by
   simp [normalize]
 
 /-- Normal form of a symmetry. -/
 theorem normalize_symm_eq (p : Path a b) :
     normalize (A := A) (a := b) (b := a) (Path.symm p) =
-      Path.ofEq p.toEq.symm := by
+      Path.stepChain p.toEq.symm := by
   simp [normalize]
 
 /-- Normal form of refl. -/
 theorem normalize_refl_eq (a : A) :
     normalize (A := A) (a := a) (b := a) (Path.refl a) =
-      Path.ofEq (rfl : a = a) := by
+      Path.stepChain (rfl : a = a) := by
   simp [normalize]
 
 /-- Normal form of ofEq. -/
 theorem normalize_ofEq_eq (h : a = b) :
-    normalize (A := A) (a := a) (b := b) (Path.ofEq h) =
-      Path.ofEq h := by
+    normalize (A := A) (a := a) (b := b) (Path.stepChain h) =
+      Path.stepChain h := by
   simp [normalize]
 
-/-- The normal form is always Path.ofEq of the toEq. -/
+/-- The normal form is always Path.stepChain of the toEq. -/
 theorem normalize_eq_ofEq_toEq (p : Path a b) :
-    normalize p = Path.ofEq p.toEq := by
+    normalize p = Path.stepChain p.toEq := by
   simp [normalize]
 
 /-! ## Normalization toEq preservation -/
@@ -270,7 +270,7 @@ theorem normalForm_eq (nf₁ nf₂ : Path.NormalForm A a b) :
 
 /-- Build a NormalForm from a propositional equality. -/
 def normalForm_ofEq (h : a = b) : Path.NormalForm A a b :=
-  ⟨Path.ofEq h, Path.isNormal_ofEq h⟩
+  ⟨Path.stepChain h, Path.isNormal_ofEq h⟩
 
 /-- Build a NormalForm by normalizing any path. -/
 def normalForm_ofPath (p : Path a b) : Path.NormalForm A a b :=
@@ -319,7 +319,7 @@ theorem normalize_of_isNormal {p : Path a b} (h : Path.IsNormal p) :
 
 /-- The normal form of `ofEq p.toEq` is the canonical `ofEq`. -/
 theorem normalize_ofEq_toEq' (p : Path a b) :
-    normalize (Path.ofEq p.toEq) = Path.ofEq p.toEq := by
+    normalize (Path.stepChain p.toEq) = Path.stepChain p.toEq := by
   simp [normalize]
 
 /-! ## Composition of NormalForm operations -/

@@ -172,6 +172,8 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`Hodge/PathInfrastructure.lean`](Hodge/PathInfrastructure.lean) — mixed Hodge filtrations and period-map transport packaged with domain-specific `Path.Step` witnesses and derived `RwEq` normalizations.
 - [`GRT/PathInfrastructure.lean`](GRT/PathInfrastructure.lean) — geometric representation theory path infrastructure exposing perverse sheaf and D-module computational witnesses.
 - [`Langlands/PathInfrastructure.lean`](Langlands/PathInfrastructure.lean) — local and geometric Langlands path infrastructure exposing Step-based compatibility and spectral coherence witnesses.
+- [`Birational/PathInfrastructure.lean`](Birational/PathInfrastructure.lean) — birational flips/flops and path-preserving minimal-model-program constructions with explicit `Path`/`RwEq` witnesses.
+- [`SymplecticDuality/PathInfrastructure.lean`](SymplecticDuality/PathInfrastructure.lean) — 3d mirror-symmetry and Coulomb-branch interfaces with domain-specific `Step` tags plus `Path.Step`/`RwEq` normalization lemmas.
 
 ## Bicategory & weak 2-groupoid API
 

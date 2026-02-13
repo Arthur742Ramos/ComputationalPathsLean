@@ -153,14 +153,14 @@ def quotient (A : Type u) : StrictCategory A where
   assoc := by
     intro a b c d p q r
     exact
-      Path.ofEq (PathRwQuot.trans_assoc (A := A) (a := a) (b := b)
+      Path.stepChain (PathRwQuot.trans_assoc (A := A) (a := a) (b := b)
         (c := c) (d := d) p q r)
   left_id := by
     intro a b p
-    exact Path.ofEq (PathRwQuot.trans_refl_left (A := A) (a := a) (b := b) p)
+    exact Path.stepChain (PathRwQuot.trans_refl_left (A := A) (a := a) (b := b) p)
   right_id := by
     intro a b p
-    exact Path.ofEq (PathRwQuot.trans_refl_right (A := A) (a := a) (b := b) p)
+    exact Path.stepChain (PathRwQuot.trans_refl_right (A := A) (a := a) (b := b) p)
 
 structure IsIso (C : StrictCategory A) {a b : A}
     (f : PathRwQuot A a b) where
@@ -215,10 +215,10 @@ def quotient (A : Type u) : StrictGroupoid A where
   inv := fun p => PathRwQuot.symm (A := A) p
   left_inv := by
     intro a b p
-    exact Path.ofEq (PathRwQuot.symm_trans (A := A) (a := a) (b := b) p)
+    exact Path.stepChain (PathRwQuot.symm_trans (A := A) (a := a) (b := b) p)
   right_inv := by
     intro a b p
-    exact Path.ofEq (PathRwQuot.trans_symm (A := A) (a := a) (b := b) p)
+    exact Path.stepChain (PathRwQuot.trans_symm (A := A) (a := a) (b := b) p)
 
 theorem quotient_isGroupoid (A : Type u) :
     StrictCategory.IsGroupoid (A := A)

@@ -13,6 +13,7 @@ import Cobordism.PathInfrastructure
 import Arithmetic.PathInfrastructure
 import Langlands.PathInfrastructure
 import Anabelian.PathInfrastructure
+import Birational.PathInfrastructure
 import Factorization.PathInfrastructure
 import Perfectoid.PathInfrastructure
 import Padic.PathInfrastructure
@@ -21,8 +22,11 @@ import InfinityCategory.PathInfrastructure
 import Condensed.PathInfrastructure
 import Quantum.PathInfrastructure
 import Mirror.PathInfrastructure
+import SymplecticDuality.PathInfrastructure
 import NCG.PathInfrastructure
 import VertexAlgebra.PathInfrastructure
 import Tropical.PathInfrastructure
 import Hodge.PathInfrastructure
 import Log.PathInfrastructure
+import RepStability.PathInfrastructure
+import Intersection.PathInfrastructure

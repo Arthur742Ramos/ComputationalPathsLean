@@ -386,7 +386,7 @@ variable {A : Type u} {B : A → Type u}
     (q : Path (Path.transport (A := A) (D := fun a => B a) p b₁) b₂) : Instantiation :=
   { rule := Rule.mxsigmaFst
     , p := Path.congrArg Sigma.fst (Path.sigmaMk (B := B) p q)
-    , q := Path.ofEq (A := A) p.toEq
+    , q := Path.stepChain (A := A) p.toEq
     , step := Step.sigma_fst_beta (A := A) (B := B)
         (p := p) (q := q) }
 
@@ -395,7 +395,7 @@ variable {A : Type u} {B : A → Type u}
     (q : Path (Path.transport (A := A) (D := fun a => B a) p b₁) b₂) : Instantiation :=
   { rule := Rule.mxsigmaSnd
     , p := Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q)
-    , q := Path.ofEq (A := B a₂)
+    , q := Path.stepChain (A := B a₂)
         (a := Path.transport (A := A) (D := fun a => B a)
                 (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q)) b₁)
         (b := b₂) q.toEq

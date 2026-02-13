@@ -83,11 +83,11 @@ variable {A : Type u} {a b c : A}
 @[simp] theorem rw_mapLeft_ofEq {B : Type v} {C : Type w}
     (f : A → B → C) {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
     Rw (Path.mapLeft (A := A) (B := B) (C := C) f
-          (Path.ofEq (A := A) (a := a₁) (b := a₂) h) b)
-      (Path.ofEq (A := C) (a := f a₁ b) (b := f a₂ b)
+          (Path.stepChain (A := A) (a := a₁) (b := a₂) h) b)
+      (Path.stepChain (A := C) (a := f a₁ b) (b := f a₂ b)
         (_root_.congrArg (fun x => f x b) h)) :=
   rw_of_eq (by
-    simp [Path.mapLeft, Path.ofEq, Path.congrArg, List.map])
+    simp [Path.mapLeft, Path.stepChain, Path.congrArg, List.map])
 
 @[simp] theorem rw_mapRight_trans {B : Type v} {C : Type w}
     {b1 b2 b3 : B} (f : A → B → C)
@@ -104,11 +104,11 @@ variable {A : Type u} {a b c : A}
 @[simp] theorem rw_mapRight_ofEq {B : Type v} {C : Type w}
     (f : A → B → C) (a : A) {b₁ b₂ : B} (h : b₁ = b₂) :
     Rw (Path.mapRight (A := A) (B := B) (C := C) f a
-          (Path.ofEq (A := B) (a := b₁) (b := b₂) h))
-      (Path.ofEq (A := C) (a := f a b₁) (b := f a b₂)
+          (Path.stepChain (A := B) (a := b₁) (b := b₂) h))
+      (Path.stepChain (A := C) (a := f a b₁) (b := f a b₂)
         (_root_.congrArg (f a) h)) :=
   rw_of_eq (by
-    simp [Path.mapRight, Path.ofEq, Path.congrArg, List.map])
+    simp [Path.mapRight, Path.stepChain, Path.congrArg, List.map])
 
 @[simp] theorem rw_map2_trans
     {A₁ : Type u} {B : Type u}
@@ -161,7 +161,7 @@ variable {A : Type u} {a b c : A}
     {A : Type u} {B : A → Type u}
     {a : A} (x : B a) :
     Rw
-      (Path.ofEq (A := B a)
+      (Path.stepChain (A := B a)
         (a := transport (A := A) (D := fun t => B t)
                 (Path.refl a) x)
         (b := x)
@@ -602,7 +602,7 @@ end RewriteLift
     Rw
       (Path.congrArg Sigma.fst
         (Path.sigmaMk (B := B) p q))
-      (Path.ofEq (A := A) p.toEq) :=
+      (Path.stepChain (A := A) p.toEq) :=
   rw_of_step (Step.sigma_fst_beta (A := A) (B := B) p q)
 
 @[simp] theorem rw_sigma_snd_beta {A : Type u} {B : A → Type u}
@@ -611,7 +611,7 @@ end RewriteLift
     (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
     Rw
       (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
-      (Path.ofEq
+      (Path.stepChain
         (A := B a2)
         (a := transport (A := A) (D := fun a => B a)
               (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q)) b1)

@@ -223,14 +223,14 @@ theorem mapRight_toEq (K : BiContext A B C)
 /-- `mapLeft` on `ofEq h` gives `ofEq (congrArg _ h)` at toEq. -/
 theorem mapLeft_ofEq_toEq (K : BiContext A B C)
     {a₁ a₂ : A} (h : a₁ = a₂) (b : B) :
-    (BiContext.mapLeft K (Path.ofEq h) b).toEq =
+    (BiContext.mapLeft K (Path.stepChain h) b).toEq =
       _root_.congrArg (fun a => K.fill a b) h := by
   simp
 
 /-- `mapRight` on `ofEq h` gives `ofEq (congrArg _ h)` at toEq. -/
 theorem mapRight_ofEq_toEq (K : BiContext A B C)
     (a : A) {b₁ b₂ : B} (h : b₁ = b₂) :
-    (BiContext.mapRight K a (Path.ofEq h)).toEq =
+    (BiContext.mapRight K a (Path.stepChain h)).toEq =
       _root_.congrArg (fun b => K.fill a b) h := by
   simp
 

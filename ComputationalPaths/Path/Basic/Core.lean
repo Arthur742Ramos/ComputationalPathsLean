@@ -108,7 +108,12 @@ semantic equality; the trace `steps` does not affect `toEq`. -/
 @[simp] def ofEq (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
+/-- Path consisting of a single explicit step-chain witness. -/
+@[simp] def stepChain (h : a = b) : Path a b :=
+  Path.mk [Step.mk a b h] h
+
 @[simp] theorem toEq_ofEq (h : a = b) : toEq (ofEq h) = h := rfl
+@[simp] theorem toEq_stepChain (h : a = b) : toEq (stepChain h) = h := rfl
 
 /-- Paths built from two equality witnesses are definitionally equal.
 This reflects proof irrelevance (UIP) for Lean's `Eq` in `Prop`. -/

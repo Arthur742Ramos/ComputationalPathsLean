@@ -233,7 +233,7 @@ theorem normalize_toEq_invariant (p : Path a b) :
 
 /-- Normal paths are exactly the `ofEq` paths. -/
 theorem isNormal_iff_eq_ofEq (p : Path a b) :
-    IsNormal p ↔ p = Path.ofEq p.toEq :=
+    IsNormal p ↔ p = Path.stepChain p.toEq :=
   Iff.rfl
 
 /-- All paths between the same endpoints normalize to the same thing. -/
@@ -303,8 +303,8 @@ def stripWidth {A : Type u} {a b : A} (p : Path a b) : Nat :=
 @[simp] theorem stripWidth_refl (x : A) : stripWidth (Path.refl x) = 0 := by
   simp [stripWidth]
 
-@[simp] theorem stripWidth_ofEq (h : a = b) : stripWidth (Path.ofEq h) = 1 := by
-  simp [stripWidth, Path.ofEq]
+@[simp] theorem stripWidth_ofEq (h : a = b) : stripWidth (Path.stepChain h) = 1 := by
+  simp [stripWidth, Path.stepChain]
 
 @[simp] theorem stripWidth_normalize (p : Path a b) :
     stripWidth (Path.normalize p) = 1 := by
@@ -321,7 +321,7 @@ def stripWidth {A : Type u} {a b : A} (p : Path a b) : Nat :=
 /-- A normal path has width exactly 1. -/
 theorem stripWidth_of_isNormal {p : Path a b} (h : IsNormal p) :
     stripWidth p = 1 := by
-  unfold IsNormal at h; rw [h]; simp [stripWidth, Path.ofEq]
+  unfold IsNormal at h; rw [h]; simp [stripWidth, Path.stepChain]
 
 /-- Width is monotone under Rw: rewriting can only change width
 (but the toEq is preserved). -/

@@ -30,19 +30,19 @@ variable {A : Type u} {a b c : A}
 /-! ## Normal forms and normalization -/
 
 def IsNormal {A : Type u} {a b : A} (p : Path a b) : Prop :=
-  p = Path.ofEq p.toEq
+  p = Path.stepChain p.toEq
 
 @[simp] theorem isNormal_iff {A : Type u} {a b : A} (p : Path a b) :
-    IsNormal (A := A) (a := a) (b := b) p ↔ p = Path.ofEq p.toEq :=
+    IsNormal (A := A) (a := a) (b := b) p ↔ p = Path.stepChain p.toEq :=
   Iff.rfl
 
 @[simp] theorem isNormal_ofEq {A : Type u} {a b : A} (h : a = b) :
-    IsNormal (A := A) (a := a) (b := b) (Path.ofEq (A := A) (a := a) (b := b) h) := by
+    IsNormal (A := A) (a := a) (b := b) (Path.stepChain (A := A) (a := a) (b := b) h) := by
   unfold IsNormal
   simp
 
 @[simp] def normalize {A : Type u} {a b : A} (p : Path a b) : Path a b :=
-  Path.ofEq (A := A) (a := a) (b := b) p.toEq
+  Path.stepChain (A := A) (a := a) (b := b) p.toEq
 
 @[simp] theorem normalize_isNormal {A : Type u} {a b : A}
     (p : Path a b) :
@@ -76,13 +76,13 @@ structure NormalForm (A : Type u) (a b : A) where
     (p : Path a b) :
     (normalize (A := A) (a := a) (b := b) p).steps =
       [Step.mk a b p.toEq] := by
-  simp [normalize, Path.ofEq]
+  simp [normalize, Path.stepChain]
 
 /-- Normalized paths always have exactly one step. -/
 @[simp] theorem normalize_steps_length {A : Type u} {a b : A}
     (p : Path a b) :
     (normalize p).steps.length = 1 := by
-  simp [normalize, Path.ofEq]
+  simp [normalize, Path.stepChain]
 
 /-- The toEq of a normalized path is the same as the original. -/
 @[simp] theorem normalize_toEq {A : Type u} {a b : A}
@@ -197,7 +197,7 @@ theorem not_isNormal_trans_ofEq {A : Type u} {a b c : A}
   -- hn : (ofEq rfl).trans (ofEq rfl) = ofEq rfl
   -- The LHS has 2 steps, the RHS has 1 step
   have hsteps := _root_.congrArg Path.steps hn
-  simp [Path.trans, Path.ofEq] at hsteps
+  simp [Path.trans, Path.stepChain] at hsteps
 
 /-! ## Transport through normalization -/
 
@@ -234,7 +234,7 @@ theorem normalize_symm_eq_symm_normalize {A : Type u} {a b : A}
   cases p with
   | mk steps proof =>
     cases proof
-    simp [normalize, Path.symm, Path.ofEq, Step.symm]
+    simp [normalize, Path.symm, Path.stepChain, Step.symm]
 
 /-- All normalized loops at a point are equal. -/
 theorem normalize_loop_unique {A : Type u} {a : A}
@@ -246,7 +246,7 @@ theorem normalize_loop_unique {A : Type u} {a : A}
 /-- Build a normal form from a propositional equality. -/
 def NormalForm.ofEqForm {A : Type u} {a b : A} (h : a = b) :
     NormalForm A a b :=
-  ⟨Path.ofEq h, isNormal_ofEq h⟩
+  ⟨Path.stepChain h, isNormal_ofEq h⟩
 
 /-- Build a normal form by normalizing any path. -/
 def NormalForm.ofPath {A : Type u} {a b : A} (p : Path a b) :

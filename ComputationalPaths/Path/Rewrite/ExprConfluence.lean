@@ -82,7 +82,7 @@ def join_eval_path {A : Type u} {a b : A}
     {p q : PathExpr (A := A) (a := a) (b := b)}
     (J : Join (A := A) (a := a) (b := b) p q) :
     Path (eval p) (eval q) :=
-  Path.ofEq (join_eval_eq J)
+  Path.stepChain (join_eval_eq J)
 
 /-! ## Meet properties -/
 
@@ -228,7 +228,7 @@ theorem eval_invariant_rw {A : Type u} {a b : A}
 def eval_invariant_rw_path {A : Type u} {a b : A}
     {p q : PathExpr (A := A) (a := a) (b := b)}
     (h : Rw p q) : Path (eval p) (eval q) :=
-  Path.ofEq (eval_invariant_rw h)
+  Path.stepChain (eval_invariant_rw h)
 
 /-- Eval is invariant under Step. -/
 theorem eval_invariant_step {A : Type u} {a b : A}

@@ -34,7 +34,7 @@ theorem rweq_sigmaFst_sigmaMk {a₁ a₂ : A}
     (q : Path
       (Path.transport (A := A) (D := fun a => B a) p b₁) b₂) :
     RwEq (Path.sigmaFst (Path.sigmaMk (A := A) (B := B) p q))
-         (Path.ofEq p.toEq) :=
+         (Path.stepChain p.toEq) :=
   rweq_sigma_fst_beta (A := A) (B := B) (p := p) (q := q)
 
 /-- Second projection β-rule. -/
@@ -44,7 +44,7 @@ theorem rweq_sigmaSnd_sigmaMk {a₁ a₂ : A}
     (q : Path
       (Path.transport (A := A) (D := fun a => B a) p b₁) b₂) :
     RwEq (Path.sigmaSnd (Path.sigmaMk (A := A) (B := B) p q))
-         (Path.ofEq q.toEq) :=
+         (Path.stepChain q.toEq) :=
   rweq_sigma_snd_beta (A := A) (B := B) (p := p) (q := q)
 
 /-! ## Product β-rules -/
@@ -96,7 +96,7 @@ theorem toEq_prodMk_components {α β : Type u} {a₁ a₂ : α} {b₁ b₂ : β
 /-- `sigmaMk (refl a) (refl (transport refl b))` has `toEq = rfl`. -/
 theorem sigmaMk_refl_toEq (a : A) (b : B a) :
     (Path.sigmaMk (Path.refl a)
-      (Path.ofEq (show Path.transport (Path.refl a) b = b from rfl))).toEq =
+      (Path.stepChain (show Path.transport (Path.refl a) b = b from rfl))).toEq =
         rfl := by
   simp
 

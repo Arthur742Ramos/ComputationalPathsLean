@@ -57,8 +57,8 @@ def complexity (p : Path a b) : Nat := p.steps.length
   simp [complexity]
 
 /-- ofEq has complexity 1. -/
-@[simp] theorem complexity_ofEq (h : a = b) : complexity (Path.ofEq h) = 1 := by
-  simp [complexity, Path.ofEq]
+@[simp] theorem complexity_ofEq (h : a = b) : complexity (Path.stepChain h) = 1 := by
+  simp [complexity, Path.stepChain]
 
 /-- Normalize always has complexity 1. -/
 @[simp] theorem complexity_normalize (p : Path a b) :

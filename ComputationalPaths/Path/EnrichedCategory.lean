@@ -91,7 +91,7 @@ def pathGroupoidEnriched_assoc (A : Type u) {a b c d : A}
     Path
       ((pathGroupoidEnriched A).comp ((pathGroupoidEnriched A).comp p q) r)
       ((pathGroupoidEnriched A).comp p ((pathGroupoidEnriched A).comp q r)) := by
-  refine Path.ofEq ?_
+  refine Path.stepChain ?_
   simp [pathGroupoidEnriched, weakBicategory]
 
 /-- Pentagon coherence for path composition in the enriched path category. -/
@@ -102,7 +102,7 @@ def pathGroupoidEnriched_pentagon (A : Type u) {a b c d e : A}
         ((pathGroupoidEnriched A).comp p q) r) s)
       ((pathGroupoidEnriched A).comp p
         ((pathGroupoidEnriched A).comp q ((pathGroupoidEnriched A).comp r s))) := by
-  refine Path.ofEq ?_
+  refine Path.stepChain ?_
   simp [pathGroupoidEnriched, weakBicategory]
 
 end PathEnriched

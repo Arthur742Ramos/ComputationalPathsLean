@@ -78,7 +78,7 @@ def trans {a b c : A} :
 
 /-- Coerce a propositional equality to the path quotient. -/
 @[simp] def ofEq {a b : A} (h : a = b) : PathRwQuot A a b :=
-  Quot.mk _ (Path.ofEq h)
+  Quot.mk _ (Path.stepChain h)
 
 /-- Forget the rewrite trace and recover the underlying equality. -/
 def toEq {a b : A} : PathRwQuot A a b → a = b :=
@@ -214,7 +214,7 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
   simp
 
 @[simp] def normalPath {a b : A} (x : PathRwQuot A a b) : Path a b :=
-  Path.ofEq (A := A) (a := a) (b := b) (toEq x)
+  Path.stepChain (A := A) (a := a) (b := b) (toEq x)
 
 @[simp] theorem normalPath_isNormal {a b : A}
     (x : PathRwQuot A a b) :
@@ -383,7 +383,7 @@ namespace PathRwQuot
     (a : A) (b : B a) :
     (Quot.mk _
         (Path.sigmaMk (B := B) (Path.refl a)
-          (Path.ofEq (A := B a) (a := b) (b := b) rfl)) :
+          (Path.stepChain (A := B a) (a := b) (b := b) rfl)) :
         PathRwQuot (Sigma B) (Sigma.mk a b) (Sigma.mk a b)) =
       PathRwQuot.refl (A := Sigma B) (Sigma.mk a b) := by
   apply Quot.sound
@@ -462,9 +462,9 @@ variable {C}
   change
     Quot.mk _
         (Context.map (A := A) (B := B) C
-          (Path.ofEq (A := A) (a := a) (b := b) h)) =
+          (Path.stepChain (A := A) (a := a) (b := b) h)) =
       Quot.mk _
-        (Path.ofEq (A := B)
+        (Path.stepChain (A := B)
           (a := C.fill a) (b := C.fill b)
           (_root_.congrArg C.fill h))
   apply Quot.sound
@@ -670,7 +670,7 @@ variable {K}
         (_root_.congrArg (fun a => K.fill a b) h) := by
   change Quot.mk _
       (BiContext.mapLeft (A := A) (B := B) (C := C) K
-        (Path.ofEq (A := A) (a := a₁) (b := a₂) h) b) = _
+        (Path.stepChain (A := A) (a := a₁) (b := a₂) h) b) = _
   apply Quot.sound
   exact rweq_of_eq
     (by
@@ -688,7 +688,7 @@ variable {K}
         (_root_.congrArg (K.fill a) h) := by
   change Quot.mk _
       (BiContext.mapRight (A := A) (B := B) (C := C) K a
-        (Path.ofEq (A := B) (a := b₁) (b := b₂) h)) = _
+        (Path.stepChain (A := B) (a := b₁) (b := b₂) h)) = _
   apply Quot.sound
   exact rweq_of_eq
     (by

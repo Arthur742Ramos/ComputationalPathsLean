@@ -35,7 +35,7 @@ variable {α : Sort u} {x y z : α}
 
 /-- Turn an equality into a computational-path witness. -/
 @[simp] def ofEq (h : x = y) : CellPath x y :=
-  Path.ofEq (h ▸ rfl)
+  Path.stepChain (h ▸ rfl)
 
 /-- Vertical composition of higher cells. -/
 @[simp] def comp (η : CellPath x y) (θ : CellPath y z) : CellPath x z :=
@@ -72,7 +72,7 @@ namespace ThreeCell
     {η θ : TwoCell (A := A) (a := a) (b := b) p q}
     (h : η = θ) :
     ThreeCell (A := A) (a := a) (b := b) η θ :=
-  CellPath.ofEq h
+  CellPath.stepChain h
 
 end ThreeCell
 

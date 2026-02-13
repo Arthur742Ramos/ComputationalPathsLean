@@ -35,8 +35,8 @@ theorem transport_symm_symm {D : A → Type v}
 /-- Transport along `ofEq (Eq.symm h)` equals transport along `symm (ofEq h)`. -/
 theorem transport_ofEq_symm_eq {D : A → Type v}
     {a b : A} (h : a = b) (y : D b) :
-    Path.transport (Path.ofEq h.symm) y =
-      Path.transport (Path.symm (Path.ofEq h)) y := by
+    Path.transport (Path.stepChain h.symm) y =
+      Path.transport (Path.symm (Path.stepChain h)) y := by
   cases h
   rfl
 
@@ -132,26 +132,26 @@ def transport_symm_symm_path {D : A → Type v}
     {a b : A} (p : Path a b) (x : D a) :
     Path (Path.transport (Path.symm (Path.symm p)) x)
          (Path.transport p x) :=
-  Path.ofEq (transport_symm_symm p x)
+  Path.stepChain (transport_symm_symm p x)
 
 /-- The `ofEq` witness for transport along a composite path. -/
 def transport_trans_path {D : A → Type v}
     {a b c : A} (p : Path a b) (q : Path b c) (x : D a) :
     Path (Path.transport (Path.trans p q) x)
          (Path.transport q (Path.transport p x)) :=
-  Path.ofEq (Path.transport_trans p q x)
+  Path.stepChain (Path.transport_trans p q x)
 
 /-- The `ofEq` witness for left-cancellation of transport. -/
 def transport_cancel_left_path {D : A → Type v}
     {a b : A} (p : Path a b) (x : D a) :
     Path (Path.transport (Path.symm p) (Path.transport p x)) x :=
-  Path.ofEq (Path.transport_symm_left p x)
+  Path.stepChain (Path.transport_symm_left p x)
 
 /-- The `ofEq` witness for right-cancellation of transport. -/
 def transport_cancel_right_path {D : A → Type v}
     {a b : A} (p : Path a b) (y : D b) :
     Path (Path.transport p (Path.transport (Path.symm p) y)) y :=
-  Path.ofEq (Path.transport_symm_right p y)
+  Path.stepChain (Path.transport_symm_right p y)
 
 /-! ## Transport interaction with congrArg -/
 
@@ -203,21 +203,21 @@ theorem transport_symm_symm_eq {D : A → Type v}
 
 /-- Transport along `ofEq rfl` is the identity, stated for `ofEq`. -/
 theorem transport_ofEq_rfl_eq {D : A → Type v} (a : A) (x : D a) :
-    Path.transport (Path.ofEq (rfl : a = a)) x = x := by
+    Path.transport (Path.stepChain (rfl : a = a)) x = x := by
   rfl
 
 /-- Transport along the composition of two `ofEq` paths. -/
 theorem transport_ofEq_ofEq_trans {D : A → Type v}
     {a b c : A} (h₁ : a = b) (h₂ : b = c) (x : D a) :
-    Path.transport (Path.trans (Path.ofEq h₁) (Path.ofEq h₂)) x =
-      Path.transport (Path.ofEq h₂) (Path.transport (Path.ofEq h₁) x) := by
+    Path.transport (Path.trans (Path.stepChain h₁) (Path.stepChain h₂)) x =
+      Path.transport (Path.stepChain h₂) (Path.transport (Path.stepChain h₁) x) := by
   cases h₁; cases h₂; rfl
 
 /-- Subst along two `ofEq` paths decomposes. -/
 theorem subst_ofEq_ofEq_trans {D : A → Type v}
     {a b c : A} (h₁ : a = b) (h₂ : b = c) (x : D a) :
-    Path.subst x (Path.trans (Path.ofEq h₁) (Path.ofEq h₂)) =
-      Path.subst (Path.subst x (Path.ofEq h₁)) (Path.ofEq h₂) := by
+    Path.subst x (Path.trans (Path.stepChain h₁) (Path.stepChain h₂)) =
+      Path.subst (Path.subst x (Path.stepChain h₁)) (Path.stepChain h₂) := by
   cases h₁; cases h₂; rfl
 
 end TransportDerived

@@ -79,28 +79,28 @@ lemma hornFiller_spec {S : SSet.{u}} [KanComplex S]
 noncomputable def hornFillerPath {S : SSet.{u}} [KanComplex S]
     {n : ℕ} {i : Fin (n + 2)} (σ₀ : (Λ[n + 1, i] : SSet) ⟶ S) :
     ComputationalPaths.Path σ₀ (Λ[n + 1, i].ι ≫ hornFiller (S := S) (σ₀ := σ₀)) :=
-  ComputationalPaths.Path.ofEq (hornFiller_spec σ₀)
+  ComputationalPaths.Path.stepChain (hornFiller_spec σ₀)
 
 /-- Commutativity of simplicial homotopy groups as a `Path` (for n ≥ 2). -/
 noncomputable def simplicialPiN_comm_path (n : ℕ) [Nat.AtLeastTwo n]
     (S : SSet.{u}) (x : SSet.toTop.obj S)
     (a b : SimplicialPiN n S x) :
     ComputationalPaths.Path (a * b) (b * a) :=
-  ComputationalPaths.Path.ofEq (mul_comm a b)
+  ComputationalPaths.Path.stepChain (mul_comm a b)
 
 /-- Associativity of simplicial homotopy groups as a `Path`. -/
 noncomputable def simplicialPiN_assoc_path (n : ℕ) [Nat.AtLeastTwo n]
     (S : SSet.{u}) (x : SSet.toTop.obj S)
     (a b c : SimplicialPiN n S x) :
     ComputationalPaths.Path (a * b * c) (a * (b * c)) :=
-  ComputationalPaths.Path.ofEq (mul_assoc a b c)
+  ComputationalPaths.Path.stepChain (mul_assoc a b c)
 
 /-- Inverse law in simplicial homotopy groups as a `Path`. -/
 noncomputable def simplicialPiN_inv_path (n : ℕ) [Nat.AtLeastTwo n]
     (S : SSet.{u}) (x : SSet.toTop.obj S)
     (a : SimplicialPiN n S x) :
     ComputationalPaths.Path (a * a⁻¹) 1 :=
-  ComputationalPaths.Path.ofEq (mul_inv_cancel a)
+  ComputationalPaths.Path.stepChain (mul_inv_cancel a)
 
 /-! ## Summary
 

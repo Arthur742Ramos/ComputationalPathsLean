@@ -163,7 +163,7 @@ def eval_join_normalize_path
     {p q : Path a b}
     (J : Confluence.Join (A := A) (a := a) (b := b) p q) :
     Path (normalize p) (normalize q) :=
-  Path.ofEq (eval_join_normalize_agree J)
+  Path.stepChain (eval_join_normalize_agree J)
 
 /-! ## Quotient compatibility -/
 
