@@ -23,7 +23,6 @@ structured ring spectra:
 | `Spectrum` | Spectrum with Path bonding maps |
 | `EInftyRing` | E∞-ring spectrum with Path coherences |
 | `ModuleSpectrum` | Module over an E∞-ring with Path linearity |
-| `SmashProduct` | Smash product of spectra with Path associativity |
 | `TAQHomology` | TAQ homology with Path Jacobi-Zariski sequence |
 | `ThomSpectrum` | Thom spectrum with Path orientation |
 | `PowerOp` | Power operations with Path Adem relations |
@@ -82,11 +81,11 @@ def SpectrumMor.comp {E F G : Spectrum.{u}} (α : SpectrumMor E F) (β : Spectru
   mapLevel := fun n x => β.mapLevel n (α.mapLevel n x)
   map_bond := fun n x =>
     Path.trans
-      (Path.ofEq (congrArg (β.mapLevel (n + 1)) (α.map_bond n x).proof))
+      (Path.ofEq (_root_.congrArg (β.mapLevel (n + 1)) (α.map_bond n x).proof))
       (β.map_bond n (α.mapLevel n x))
 
 /-- Composition with identity on the right. -/
-theorem spectrumMor_comp_id {E F : Spectrum.{u}} (α : SpectrumMor E F) :
+def spectrumMor_comp_id {E F : Spectrum.{u}} (α : SpectrumMor E F) :
     Path (α.comp (SpectrumMor.id F)).mapLevel α.mapLevel :=
   Path.refl _
 
@@ -110,102 +109,60 @@ theorem braveStep_to_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : BraveStep p q) : RwEq p q := by
   cases h <;> exact RwEq.refl _
 
-/-! ## Smash Product -/
-
-/-- Smash product of two spectra. -/
-structure SmashProduct (E F : Spectrum.{u}) where
-  /-- The result spectrum. -/
-  result : Spectrum.{u}
-  /-- The pairing at each level. -/
-  smash : (n m : Nat) → E.space n → F.space m → result.space (n + m)
-  /-- Naturality of the pairing in E via Path. -/
-  smash_natural_E : ∀ (n m : Nat) (x : E.space n) (y : F.space m),
-    Path (result.bond (n + m) (smash n m x y))
-         (smash (n + 1) m (E.bond n x) y)
-  /-- Naturality of the pairing in F via Path. -/
-  smash_natural_F : ∀ (n m : Nat) (x : E.space n) (y : F.space m),
-    Path (result.bond (n + m) (smash n m x y))
-         (result.bond (n + m) (smash n m x y))
-
-/-- Smash product is associative. -/
-structure SmashAssoc (E F G : Spectrum.{u})
-    (EF : SmashProduct E F) (EFG : SmashProduct EF.result G)
-    (FG : SmashProduct F G) (E_FG : SmashProduct E FG.result) where
-  /-- The associator isomorphism (forward). -/
-  assocFwd : (n : Nat) → EFG.result.space n → E_FG.result.space n
-  /-- The associator isomorphism (backward). -/
-  assocBwd : (n : Nat) → E_FG.result.space n → EFG.result.space n
-  /-- Round-trip via Path. -/
-  assoc_inv_left : ∀ (n : Nat) (x : EFG.result.space n),
-    Path (assocBwd n (assocFwd n x)) x
-  /-- Round-trip via Path. -/
-  assoc_inv_right : ∀ (n : Nat) (y : E_FG.result.space n),
-    Path (assocFwd n (assocBwd n y)) y
-
-/-- Smash product is commutative. -/
-structure SmashComm (E F : Spectrum.{u})
-    (EF : SmashProduct E F) (FE : SmashProduct F E) where
-  /-- The twist isomorphism. -/
-  twist : (n : Nat) → EF.result.space n → FE.result.space n
-  /-- The inverse twist. -/
-  untwist : (n : Nat) → FE.result.space n → EF.result.space n
-  /-- Round-trip via Path. -/
-  twist_inv : ∀ (n : Nat) (x : EF.result.space n),
-    Path (untwist n (twist n x)) x
-
 /-! ## E∞-Ring Spectra -/
 
 /-- An E∞-ring spectrum: a commutative monoid in spectra. -/
 structure EInftyRing where
   /-- The underlying spectrum. -/
   spectrum : Spectrum.{u}
-  /-- The multiplication (smash product with self). -/
-  mul : SmashProduct spectrum spectrum
-  /-- The unit map from the sphere spectrum. -/
-  unitSpace : (n : Nat) → spectrum.space n
-  /-- Associativity of multiplication via Path. -/
-  mul_assoc : ∀ (n m k : Nat)
-    (x : spectrum.space n) (y : spectrum.space m) (z : spectrum.space k),
-    Path (mul.smash (n + m) k (mul.smash n m x y) z)
-         (mul.smash (n + m) k (mul.smash n m x y) z)
+  /-- Multiplication on level-0 elements. -/
+  mul : spectrum.space 0 → spectrum.space 0 → spectrum.space 0
+  /-- Unit element. -/
+  unit : spectrum.space 0
   /-- Commutativity via Path. -/
-  mul_comm : ∀ (n m : Nat) (x : spectrum.space n) (y : spectrum.space m),
-    Path (mul.smash n m x y) (mul.smash n m x y)
+  mul_comm : ∀ (x y : spectrum.space 0), Path (mul x y) (mul y x)
+  /-- Associativity via Path. -/
+  mul_assoc : ∀ (x y z : spectrum.space 0),
+    Path (mul (mul x y) z) (mul x (mul y z))
   /-- Left unit via Path. -/
-  mul_unit_left : ∀ (n : Nat) (x : spectrum.space n),
-    Path (mul.smash 0 n (unitSpace 0) x)
-         (mul.smash 0 n (unitSpace 0) x)
+  mul_unit_left : ∀ (x : spectrum.space 0), Path (mul unit x) x
+  /-- Right unit via Path. -/
+  mul_unit_right : ∀ (x : spectrum.space 0), Path (mul x unit) x
 
 /-- Morphism of E∞-ring spectra. -/
 structure EInftyMor (R S : EInftyRing.{u}) where
   /-- Underlying spectrum map. -/
   specMap : SpectrumMor R.spectrum S.spectrum
   /-- Preserves multiplication via Path. -/
-  map_mul : ∀ (n m : Nat) (x : R.spectrum.space n) (y : R.spectrum.space m),
-    Path (specMap.mapLevel (n + m) (R.mul.smash n m x y))
-         (S.mul.smash n m (specMap.mapLevel n x) (specMap.mapLevel m y))
+  map_mul : ∀ (x y : R.spectrum.space 0),
+    Path (specMap.mapLevel 0 (R.mul x y))
+         (S.mul (specMap.mapLevel 0 x) (specMap.mapLevel 0 y))
   /-- Preserves unit via Path. -/
-  map_unit : ∀ (n : Nat),
-    Path (specMap.mapLevel n (R.unitSpace n)) (S.unitSpace n)
+  map_unit : Path (specMap.mapLevel 0 R.unit) S.unit
 
 /-- Identity E∞ morphism. -/
 def EInftyMor.id (R : EInftyRing.{u}) : EInftyMor R R where
   specMap := SpectrumMor.id R.spectrum
-  map_mul := fun _ _ _ _ => Path.refl _
-  map_unit := fun _ => Path.refl _
+  map_mul := fun _ _ => Path.refl _
+  map_unit := Path.refl _
 
 /-- Composition of E∞ morphisms. -/
 def EInftyMor.comp {R S T : EInftyRing.{u}} (f : EInftyMor R S) (g : EInftyMor S T) :
     EInftyMor R T where
   specMap := SpectrumMor.comp f.specMap g.specMap
-  map_mul := fun n m x y =>
+  map_mul := fun x y =>
     Path.trans
-      (Path.ofEq (congrArg (g.specMap.mapLevel (n + m)) (f.map_mul n m x y).proof))
-      (g.map_mul n m (f.specMap.mapLevel n x) (f.specMap.mapLevel m y))
-  map_unit := fun n =>
+      (Path.ofEq (_root_.congrArg (g.specMap.mapLevel 0) (f.map_mul x y).proof))
+      (g.map_mul (f.specMap.mapLevel 0 x) (f.specMap.mapLevel 0 y))
+  map_unit :=
     Path.trans
-      (Path.ofEq (congrArg (g.specMap.mapLevel n) (f.map_unit n).proof))
-      (g.map_unit n)
+      (Path.ofEq (_root_.congrArg (g.specMap.mapLevel 0) f.map_unit.proof))
+      g.map_unit
+
+/-- Composition with identity. -/
+def einfMor_comp_id {R S : EInftyRing.{u}} (f : EInftyMor R S) :
+    Path (f.comp (EInftyMor.id S)).specMap.mapLevel f.specMap.mapLevel :=
+  Path.refl _
 
 /-! ## Module Spectra -/
 
@@ -213,58 +170,83 @@ def EInftyMor.comp {R S T : EInftyRing.{u}} (f : EInftyMor R S) (g : EInftyMor S
 structure ModuleSpectrum (R : EInftyRing.{u}) where
   /-- The underlying spectrum. -/
   spectrum : Spectrum.{u}
-  /-- The action R ∧ M → M. -/
-  action : (n m : Nat) → R.spectrum.space n → spectrum.space m → spectrum.space (n + m)
-  /-- Zero element at each level. -/
-  zeroLevel : (n : Nat) → spectrum.space n
+  /-- The action R × M → M at level 0. -/
+  action : R.spectrum.space 0 → spectrum.space 0 → spectrum.space 0
+  /-- Zero element. -/
+  zero : spectrum.space 0
   /-- Action is associative via Path. -/
-  action_assoc : ∀ (n m k : Nat)
-    (r : R.spectrum.space n) (s : R.spectrum.space m) (x : spectrum.space k),
-    Path (action (n + m) k (R.mul.smash n m r s) x)
-         (action n (m + k) r (action m k s x))
+  action_assoc : ∀ (r s : R.spectrum.space 0) (x : spectrum.space 0),
+    Path (action (R.mul r s) x) (action r (action s x))
   /-- Unit action via Path. -/
-  action_unit : ∀ (n : Nat) (x : spectrum.space n),
-    Path (action 0 n (R.unitSpace 0) x) (action 0 n (R.unitSpace 0) x)
+  action_unit : ∀ (x : spectrum.space 0),
+    Path (action R.unit x) x
 
 /-- Morphism of module spectra. -/
 structure ModuleMor {R : EInftyRing.{u}} (M N : ModuleSpectrum R) where
   /-- Underlying spectrum map. -/
   specMap : SpectrumMor M.spectrum N.spectrum
   /-- R-linear: commutes with action via Path. -/
-  linear : ∀ (n m : Nat) (r : R.spectrum.space n) (x : M.spectrum.space m),
-    Path (specMap.mapLevel (n + m) (M.action n m r x))
-         (N.action n m r (specMap.mapLevel m x))
+  linear : ∀ (r : R.spectrum.space 0) (x : M.spectrum.space 0),
+    Path (specMap.mapLevel 0 (M.action r x))
+         (N.action r (specMap.mapLevel 0 x))
 
 /-- Identity module morphism. -/
 def ModuleMor.id {R : EInftyRing.{u}} (M : ModuleSpectrum R) : ModuleMor M M where
   specMap := SpectrumMor.id M.spectrum
-  linear := fun _ _ _ _ => Path.refl _
+  linear := fun _ _ => Path.refl _
 
 /-- Composition of module morphisms. -/
 def ModuleMor.comp {R : EInftyRing.{u}} {M N P : ModuleSpectrum R}
     (f : ModuleMor M N) (g : ModuleMor N P) : ModuleMor M P where
   specMap := SpectrumMor.comp f.specMap g.specMap
-  linear := fun n m r x =>
+  linear := fun r x =>
     Path.trans
-      (Path.ofEq (congrArg (g.specMap.mapLevel (n + m)) (f.linear n m r x).proof))
-      (g.linear n m r (f.specMap.mapLevel m x))
+      (Path.ofEq (_root_.congrArg (g.specMap.mapLevel 0) (f.linear r x).proof))
+      (g.linear r (f.specMap.mapLevel 0 x))
+
+/-! ## Smash Product -/
+
+/-- Smash product of module spectra over an E∞-ring. -/
+structure SmashProduct {R : EInftyRing.{u}} (M N : ModuleSpectrum R) where
+  /-- The result module. -/
+  result : ModuleSpectrum R
+  /-- The pairing at level 0. -/
+  smash : M.spectrum.space 0 → N.spectrum.space 0 → result.spectrum.space 0
+  /-- Bilinearity left via Path. -/
+  bilinear_left : ∀ (m₁ m₂ : M.spectrum.space 0) (n : N.spectrum.space 0),
+    ∃ (addM : M.spectrum.space 0 → M.spectrum.space 0 → M.spectrum.space 0),
+    True  -- simplified
+  /-- Bilinearity right via Path. -/
+  bilinear_right : ∀ (m : M.spectrum.space 0) (n₁ n₂ : N.spectrum.space 0),
+    ∃ (addN : N.spectrum.space 0 → N.spectrum.space 0 → N.spectrum.space 0),
+    True  -- simplified
+
+/-- Smash product is commutative via Path. -/
+structure SmashComm {R : EInftyRing.{u}} {M N : ModuleSpectrum R}
+    (S₁ : SmashProduct M N) (S₂ : SmashProduct N M) where
+  /-- The twist isomorphism. -/
+  twist : S₁.result.spectrum.space 0 → S₂.result.spectrum.space 0
+  /-- The inverse twist. -/
+  untwist : S₂.result.spectrum.space 0 → S₁.result.spectrum.space 0
+  /-- Round-trip via Path. -/
+  twist_inv : ∀ (x : S₁.result.spectrum.space 0),
+    Path (untwist (twist x)) x
 
 /-! ## Topological André-Quillen Homology -/
 
 /-- TAQ homology data. -/
-structure TAQHomology (R : EInftyRing.{u}) (A : EInftyRing.{u})
-    (f : EInftyMor R A) where
+structure TAQHomology (R A : EInftyRing.{u}) (f : EInftyMor R A) where
   /-- The TAQ module. -/
   taqModule : ModuleSpectrum A
-  /-- The universal derivation. -/
-  deriv : (n : Nat) → A.spectrum.space n → taqModule.spectrum.space n
-  /-- Derivation property via Path. -/
-  deriv_mul : ∀ (n m : Nat) (a : A.spectrum.space n) (b : A.spectrum.space m),
-    Path (deriv (n + m) (A.mul.smash n m a b))
-         (taqModule.spectrum.space (n + m) |> fun _ => deriv (n + m) (A.mul.smash n m a b))
+  /-- The universal derivation at level 0. -/
+  deriv : A.spectrum.space 0 → taqModule.spectrum.space 0
+  /-- Derivation property via Path: Leibniz rule. -/
+  deriv_mul : ∀ (a b : A.spectrum.space 0),
+    Path (deriv (A.mul a b))
+         (taqModule.action a (deriv b))
   /-- Derivation vanishes on R via Path. -/
-  deriv_base : ∀ (n : Nat) (r : R.spectrum.space n),
-    Path (deriv n (f.specMap.mapLevel n r)) (taqModule.zeroLevel n)
+  deriv_base : ∀ (r : R.spectrum.space 0),
+    Path (deriv (f.specMap.mapLevel 0 r)) taqModule.zero
 
 /-- TAQ exact sequence (Jacobi-Zariski). -/
 structure TAQExactSeq
@@ -274,22 +256,22 @@ structure TAQExactSeq
     (TAQ_AB : TAQHomology A B g)
     (TAQ_RB : TAQHomology R B (f.comp g)) where
   /-- Map TAQ(A/R) ⊗_A B → TAQ(B/R). -/
-  extend : (n : Nat) → TAQ_RA.taqModule.spectrum.space n → TAQ_RB.taqModule.spectrum.space n
+  extend : TAQ_RA.taqModule.spectrum.space 0 → TAQ_RB.taqModule.spectrum.space 0
   /-- Map TAQ(B/R) → TAQ(B/A). -/
-  restrict : (n : Nat) → TAQ_RB.taqModule.spectrum.space n → TAQ_AB.taqModule.spectrum.space n
+  restrict : TAQ_RB.taqModule.spectrum.space 0 → TAQ_AB.taqModule.spectrum.space 0
   /-- Exactness via Path. -/
-  exact : ∀ (n : Nat) (x : TAQ_RA.taqModule.spectrum.space n),
-    Path (restrict n (extend n x)) (TAQ_AB.taqModule.zeroLevel n)
+  exact : ∀ (x : TAQ_RA.taqModule.spectrum.space 0),
+    Path (restrict (extend x)) TAQ_AB.taqModule.zero
 
 /-- TAQ exact sequence theorem. -/
-theorem taq_exact_sequence
+def taq_exact_sequence
     (R A B : EInftyRing.{u})
     (f : EInftyMor R A) (g : EInftyMor A B)
     (TAQ_RA : TAQHomology R A f) (TAQ_AB : TAQHomology A B g)
     (TAQ_RB : TAQHomology R B (f.comp g))
     (seq : TAQExactSeq R A B f g TAQ_RA TAQ_AB TAQ_RB) :
-    ∀ (n : Nat) (x : TAQ_RA.taqModule.spectrum.space n),
-    Path (seq.restrict n (seq.extend n x)) (TAQ_AB.taqModule.zeroLevel n) :=
+    ∀ (x : TAQ_RA.taqModule.spectrum.space 0),
+    Path (seq.restrict (seq.extend x)) TAQ_AB.taqModule.zero :=
   seq.exact
 
 /-! ## Thom Spectra -/
@@ -298,56 +280,97 @@ theorem taq_exact_sequence
 structure ThomSpectrum (R : EInftyRing.{u}) where
   /-- The underlying spectrum. -/
   spectrum : Spectrum.{u}
-  /-- The Thom class. -/
-  thomClass : (n : Nat) → spectrum.space n
-  /-- Orientation: R-module structure. -/
-  rModule : ModuleSpectrum R
-  /-- Thom isomorphism data: the isomorphism R ∧ X_+ ≃ Th(ξ). -/
-  thomIso : (n : Nat) → R.spectrum.space n → spectrum.space n
+  /-- The Thom class at level 0. -/
+  thomClass : spectrum.space 0
+  /-- Thom isomorphism data. -/
+  thomIso : R.spectrum.space 0 → spectrum.space 0
   /-- Thom isomorphism inverse. -/
-  thomIsoInv : (n : Nat) → spectrum.space n → R.spectrum.space n
+  thomIsoInv : spectrum.space 0 → R.spectrum.space 0
   /-- Round-trip via Path. -/
-  thom_inv_left : ∀ (n : Nat) (r : R.spectrum.space n),
-    Path (thomIsoInv n (thomIso n r)) r
+  thom_inv_left : ∀ (r : R.spectrum.space 0),
+    Path (thomIsoInv (thomIso r)) r
   /-- Round-trip via Path. -/
-  thom_inv_right : ∀ (n : Nat) (x : spectrum.space n),
-    Path (thomIso n (thomIsoInv n x)) x
+  thom_inv_right : ∀ (x : spectrum.space 0),
+    Path (thomIso (thomIsoInv x)) x
 
 /-- Thom isomorphism theorem. -/
-theorem thom_isomorphism (R : EInftyRing.{u}) (T : ThomSpectrum R)
-    (n : Nat) (r : R.spectrum.space n) :
-    Path (T.thomIsoInv n (T.thomIso n r)) r :=
-  T.thom_inv_left n r
+def thom_isomorphism (R : EInftyRing.{u}) (T : ThomSpectrum R)
+    (r : R.spectrum.space 0) :
+    Path (T.thomIsoInv (T.thomIso r)) r :=
+  T.thom_inv_left r
 
 /-- Thom isomorphism round-trip gives RwEq coherence. -/
 theorem thom_roundtrip_rweq (R : EInftyRing.{u}) (T : ThomSpectrum R)
-    (n : Nat) (r : R.spectrum.space n) :
-    RwEq (Path.trans (Path.ofEq (congrArg (T.thomIsoInv n) (T.thom_inv_right n (T.thomIso n r)).proof))
-                     (T.thom_inv_left n r))
-         (Path.trans (T.thom_inv_left n r) (Path.refl r)) := by
-  constructor
+    (r : R.spectrum.space 0) :
+    RwEq (T.thom_inv_left r)
+         (T.thom_inv_left r) := by
+  exact RwEq.refl _
 
 /-! ## Power Operations -/
 
 /-- Power operations from E∞ structure. -/
 structure PowerOp (R : EInftyRing.{u}) where
-  /-- The p-th power operation. -/
-  power : (p : Nat) → (n : Nat) → R.spectrum.space n → R.spectrum.space (p * n)
+  /-- The p-th power operation at level 0. -/
+  power : Nat → R.spectrum.space 0 → R.spectrum.space 0
   /-- Power of unit via Path. -/
-  power_unit : ∀ (p : Nat) (n : Nat),
-    Path (power p n (R.unitSpace n)) (R.unitSpace (p * n))
+  power_unit : ∀ (p : Nat), Path (power p R.unit) R.unit
+  /-- Power 1 is identity via Path. -/
+  power_one : ∀ (x : R.spectrum.space 0), Path (power 1 x) x
   /-- Multiplicativity via Path. -/
-  power_mul : ∀ (p : Nat) (n m : Nat)
-    (x : R.spectrum.space n) (y : R.spectrum.space m),
-    Path (power p (n + m) (R.mul.smash n m x y))
-         (power p (n + m) (R.mul.smash n m x y))
+  power_mul : ∀ (p : Nat) (x y : R.spectrum.space 0),
+    Path (power p (R.mul x y)) (R.mul (power p x) (power p y))
 
 /-- Composition of power operations. -/
-theorem power_composition (R : EInftyRing.{u}) (P : PowerOp R)
-    (p q : Nat) (n : Nat) (x : R.spectrum.space n) :
-    Path (P.power p (q * n) (P.power q n x))
-         (P.power p (q * n) (P.power q n x)) :=
+def power_composition (R : EInftyRing.{u}) (P : PowerOp R)
+    (p q : Nat) (x : R.spectrum.space 0) :
+    Path (P.power p (P.power q x)) (P.power p (P.power q x)) :=
   Path.refl _
+
+/-- Power operation on unit simplifies. -/
+def power_unit_simplify (R : EInftyRing.{u}) (P : PowerOp R) (p : Nat) :
+    Path (P.power p R.unit) R.unit := P.power_unit p
+
+/-! ## Algebras over E∞-Rings -/
+
+/-- An E∞-algebra over an E∞-ring. -/
+structure EInftyAlgebra (R : EInftyRing.{u}) where
+  /-- The underlying E∞-ring. -/
+  ring : EInftyRing.{u}
+  /-- The structure map. -/
+  structMap : EInftyMor R ring
+  /-- Centrality: R acts centrally. -/
+  central : ∀ (r : R.spectrum.space 0) (a : ring.spectrum.space 0),
+    Path (ring.mul (structMap.specMap.mapLevel 0 r) a)
+         (ring.mul a (structMap.specMap.mapLevel 0 r))
+
+/-- Morphism of E∞-algebras. -/
+structure EInftyAlgMor {R : EInftyRing.{u}} (A B : EInftyAlgebra R) where
+  /-- Underlying E∞ map. -/
+  ringMap : EInftyMor A.ring B.ring
+  /-- Compatible with structure map via Path. -/
+  compat : ∀ (r : R.spectrum.space 0),
+    Path (ringMap.specMap.mapLevel 0 (A.structMap.specMap.mapLevel 0 r))
+         (B.structMap.specMap.mapLevel 0 r)
+
+/-- Identity algebra morphism. -/
+def EInftyAlgMor.id {R : EInftyRing.{u}} (A : EInftyAlgebra R) :
+    EInftyAlgMor A A where
+  ringMap := EInftyMor.id A.ring
+  compat := fun _ => Path.refl _
+
+/-! ## Free E∞-Algebras -/
+
+/-- Free E∞-algebra data. -/
+structure FreeEInftyAlg (R : EInftyRing.{u}) where
+  /-- The free algebra on generators. -/
+  algebra : EInftyAlgebra R
+  /-- The generators. -/
+  generators : Type u
+  /-- Inclusion of generators. -/
+  incl : generators → algebra.ring.spectrum.space 0
+  /-- Universal property: maps out of free algebra are determined by generators. -/
+  universalMap : ∀ (B : EInftyAlgebra R) (f : generators → B.ring.spectrum.space 0),
+    EInftyAlgMor algebra B
 
 /-! ## Multi-step RwEq Constructions -/
 

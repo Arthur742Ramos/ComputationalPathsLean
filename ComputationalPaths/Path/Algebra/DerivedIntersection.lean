@@ -88,11 +88,11 @@ def ChainMor.comp {E F G : ChainComplex.{u}} (α : ChainMor E F) (β : ChainMor 
   fZero := β.fZero ∘ α.fZero
   commutes := fun x =>
     Path.trans
-      (Path.ofEq (congrArg β.fZero (α.commutes x).proof))
+      (Path.ofEq (_root_.congrArg β.fZero (α.commutes x).proof))
       (β.commutes (α.fmOne x))
 
 /-- Chain morphism composition is associative via Path. -/
-theorem chainMor_assoc {E F G H : ChainComplex.{u}}
+def chainMor_assoc {E F G H : ChainComplex.{u}}
     (α : ChainMor E F) (β : ChainMor F G) (γ : ChainMor G H) :
     Path (α.comp β |>.comp γ).fmOne (α.comp (β.comp γ)).fmOne :=
   Path.refl _
@@ -175,7 +175,7 @@ structure PerfectOT (X : Scheme.{u}) where
   /-- The two-term complex E = [E^{-1} → E^0]. -/
   complex : ChainComplex.{u}
   /-- Map to the cotangent complex. -/
-  toCotangent : CotangentData X → ChainMor complex (CotangentData X |>.complex)
+  toCotangent : (L : CotangentData X) → ChainMor complex L.complex
   /-- The map is an obstruction theory (h^0 is surjective, h^{-1} is isomorphism). -/
   isOT : Prop
   /-- Perfectness: the complex has bounded coherent cohomology. -/
@@ -208,7 +208,7 @@ structure VirtualClass (X : Scheme.{u}) (A : ChowGroup.{u}) where
 
 /-- The virtual class is independent of the choice of obstruction theory
     (in a suitable sense). -/
-theorem virtual_class_well_defined
+def virtual_class_well_defined
     (X : Scheme.{u}) (A : ChowGroup.{u})
     (V₁ V₂ : VirtualClass X A)
     (h_compat : ∃ (φ : ChainMor V₁.ot.complex V₂.ot.complex), True) :
@@ -236,7 +236,7 @@ structure VirtualPullback
   vpull_zero : Path (vpull AY.zero) AX.zero
 
 /-- Virtual pullback composition: (g ∘ f)! = f! ∘ g!. -/
-theorem virtual_pullback_compose
+def virtual_pullback_compose
     (X Y Z : Scheme.{u})
     (f : X.points → Y.points) (g : Y.points → Z.points)
     (AX : ChowGroup.{u}) (AY : ChowGroup.{u}) (AZ : ChowGroup.{u})
@@ -267,7 +267,7 @@ structure ExcessBundle (X Y Z : Scheme.{u})
   excessClass : (AW : ChowGroup.{u}) → AW.Carrier
 
 /-- Excess intersection formula: i^! [Y] = e(E) ∩ [W]. -/
-theorem excess_formula
+def excess_formula
     (X Y Z : Scheme.{u})
     (f : X.points → Z.points) (g : Y.points → Z.points)
     (E : ExcessBundle X Y Z f g)
@@ -300,13 +300,13 @@ def GysinMap.comp {X Y Z : Scheme.{u}}
   gysin := G₂.gysin ∘ G₁.gysin
   gysin_add := fun a b =>
     Path.trans
-      (Path.ofEq (congrArg G₂.gysin (G₁.gysin_add a b).proof))
+      (Path.ofEq (_root_.congrArg G₂.gysin (G₁.gysin_add a b).proof))
       (G₂.gysin_add (G₁.gysin a) (G₁.gysin b))
-  gysin_zero := Path.trans (Path.ofEq (congrArg G₂.gysin G₁.gysin_zero.proof)) G₂.gysin_zero
+  gysin_zero := Path.trans (Path.ofEq (_root_.congrArg G₂.gysin G₁.gysin_zero.proof)) G₂.gysin_zero
   codim := G₁.codim + G₂.codim
 
 /-- Gysin composition is associative via Path. -/
-theorem gysin_comp_assoc
+def gysin_comp_assoc
     {X Y Z W : Scheme.{u}}
     {AX AY AZ AW : ChowGroup.{u}}
     (G₁ : GysinMap X Y AX AY) (G₂ : GysinMap Y Z AY AZ)
@@ -325,12 +325,12 @@ structure DeformationNormalCone (X Y : Scheme.{u})
   generalFiber : deformSpace.points → Y.points
   /-- The special fiber contains the normal cone. -/
   specialFiber : deformSpace.points → Type u
-  /-- Zero section via Path. -/
+  /-- Zero section. -/
   zeroSection : ∀ (x : X.points),
-    ∃ (m : deformSpace.points), Path (generalFiber m) (i x)
+    ∃ (m : deformSpace.points), generalFiber m = i x
 
 /-- Deformation to normal cone preserves intersection numbers. -/
-theorem deformation_preserves_intersection
+def deformation_preserves_intersection
     (X Y : Scheme.{u}) (i : X.points → Y.points)
     (D : DeformationNormalCone X Y i)
     (AX : ChowGroup.{u}) (c : AX.Carrier) :

@@ -81,8 +81,10 @@ structure ResidueField (R : ArtinRing.{u}) where
   /-- Quotient map. -/
   quot : R.Carrier → Carrier
   /-- Quotient preserves multiplication via Path. -/
+  mul : Carrier → Carrier → Carrier
+  /-- Quotient respects multiplication. -/
   quot_mul : ∀ (a b : R.Carrier),
-    Path (quot (R.mul a b)) (R.mul (quot a) (quot b) |> fun _ => quot (R.mul a b))
+    Path (quot (R.mul a b)) (mul (quot a) (quot b))
 
 /-! ## Deformation Step Relation -/
 
@@ -148,7 +150,7 @@ structure FormalModuli extends DeformationFunctor.{u} where
   /-- For small extensions, the induced map on fibers is a bijection (simplified). -/
   schlessinger : ∀ (R S : ArtinRing.{u}) (e : SmallExtension R S)
     (x : obj R),
-    ∃ (y : obj S), Path (map e.surj y) x
+    ∃ (y : obj S), map e.surj y = x
   /-- Tangent space is a vector space (dimension). -/
   tangent_dim : Nat
 
@@ -243,10 +245,10 @@ def DGLieMor.comp {L M N : DGLie.{u}} (f : DGLieMor L M) (g : DGLieMor M N) :
     DGLieMor L N where
   toFun := g.toFun ∘ f.toFun
   map_bracket := fun x y =>
-    Path.trans (Path.ofEq (congrArg g.toFun (f.map_bracket x y).proof))
+    Path.trans (Path.ofEq (_root_.congrArg g.toFun (f.map_bracket x y).proof))
               (g.map_bracket (f.toFun x) (f.toFun y))
   map_diff := fun x =>
-    Path.trans (Path.ofEq (congrArg g.toFun (f.map_diff x).proof))
+    Path.trans (Path.ofEq (_root_.congrArg g.toFun (f.map_diff x).proof))
               (g.map_diff (f.toFun x))
 
 /-! ## Koszul Duality -/
@@ -266,14 +268,14 @@ structure KoszulDuality (C : DeformationContext.{u}) where
   moduli_roundtrip : ∀ (F : FormalModuli.{u}) (R : ArtinRing.{u}),
     ∃ (iso : (lieToModuli (moduliToLie F)).obj R → F.obj R),
     ∀ (x : (lieToModuli (moduliToLie F)).obj R),
-      Path (F.map _root_.id (iso x)) (iso x)
+      F.map _root_.id (iso x) = iso x
 
 /-- Koszul duality is an equivalence. -/
 theorem koszul_equivalence (C : DeformationContext.{u})
     (K : KoszulDuality C) (F : FormalModuli.{u}) (R : ArtinRing.{u}) :
     ∃ (iso : (K.lieToModuli (K.moduliToLie F)).obj R → F.obj R),
     ∀ (x : (K.lieToModuli (K.moduliToLie F)).obj R),
-      Path (F.map _root_.id (iso x)) (iso x) :=
+      F.map _root_.id (iso x) = iso x :=
   K.moduli_roundtrip F R
 
 /-! ## Tangent Complexes -/
@@ -310,7 +312,7 @@ structure TangentFunctoriality
     Path (tangentMap (TF.add x y)) (TG.add (tangentMap x) (tangentMap y))
 
 /-- Tangent complex is functorial. -/
-theorem tangent_functorial
+def tangent_functorial
     (F G : FormalModuli.{u})
     (φ : ∀ (R : ArtinRing.{u}), F.obj R → G.obj R)
     (TF : TangentComplex F) (TG : TangentComplex G)
@@ -330,18 +332,18 @@ structure ObstructionData (F : FormalModuli.{u})
   zeroObs : ObsModule
   /-- The obstruction map. -/
   obs : F.obj R → ObsModule
-  /-- Lifting exists iff obstruction vanishes, via Path. -/
+  /-- Lifting exists iff obstruction vanishes. -/
   lift_iff : ∀ (x : F.obj R),
-    (∃ (y : F.obj S), Path (F.map e.surj y) x) ↔
-    Path (obs x) zeroObs
+    (∃ (y : F.obj S), F.map e.surj y = x) ↔
+    obs x = zeroObs
 
 /-- Obstruction classes are functorial. -/
 theorem obstruction_functorial
     (F : FormalModuli.{u})
     (R S : ArtinRing.{u}) (e : SmallExtension R S)
     (O : ObstructionData F R S e) (x : F.obj R) :
-    (∃ (y : F.obj S), Path (F.map e.surj y) x) ↔
-    Path (O.obs x) O.zeroObs :=
+    (∃ (y : F.obj S), F.map e.surj y = x) ↔
+    O.obs x = O.zeroObs :=
   O.lift_iff x
 
 /-! ## Multi-step RwEq Constructions -/

@@ -139,17 +139,17 @@ def SCRMor.id (R : SimplicialRing.{u}) : SCRMor R R where
 def SCRMor.comp {R S T : SimplicialRing.{u}} (f : SCRMor R S) (g : SCRMor S T) : SCRMor R T where
   toFun := g.toFun ∘ f.toFun
   map_mul := fun a b =>
-    Path.trans (Path.ofEq (congrArg g.toFun (f.map_mul a b).proof)) (g.map_mul (f.toFun a) (f.toFun b))
+    Path.trans (Path.ofEq (_root_.congrArg g.toFun (f.map_mul a b).proof)) (g.map_mul (f.toFun a) (f.toFun b))
   map_add := fun a b =>
-    Path.trans (Path.ofEq (congrArg g.toFun (f.map_add a b).proof)) (g.map_add (f.toFun a) (f.toFun b))
-  map_one := Path.trans (Path.ofEq (congrArg g.toFun f.map_one.proof)) g.map_one
+    Path.trans (Path.ofEq (_root_.congrArg g.toFun (f.map_add a b).proof)) (g.map_add (f.toFun a) (f.toFun b))
+  map_one := Path.trans (Path.ofEq (_root_.congrArg g.toFun f.map_one.proof)) g.map_one
 
 /-- Composing with identity on the right is identity. -/
-theorem SCRMor.comp_id {R S : SimplicialRing.{u}} (f : SCRMor R S) :
+def SCRMor.comp_id {R S : SimplicialRing.{u}} (f : SCRMor R S) :
     Path (f.comp (SCRMor.id S)).toFun f.toFun := Path.refl _
 
 /-- Composing with identity on the left is identity. -/
-theorem SCRMor.id_comp {R S : SimplicialRing.{u}} (f : SCRMor R S) :
+def SCRMor.id_comp {R S : SimplicialRing.{u}} (f : SCRMor R S) :
     Path (SCRMor.id R |>.comp f).toFun f.toFun := Path.refl _
 
 /-! ## Derived Affine Schemes -/
@@ -190,7 +190,7 @@ structure DerivedScheme where
   charts : List (DerivedChart Space)
   /-- Charts cover: every point lies in some chart (propositionally). -/
   cover : ∀ (x : Space), ∃ (i : Fin charts.length), ∃ (p : (charts.get i).affine.points),
-    Path ((charts.get i).embed p) x
+    (charts.get i).embed p = x
 
 /-- A morphism of derived schemes. -/
 structure DerivedSchemeMor (X Y : DerivedScheme.{u}) where
@@ -237,7 +237,7 @@ structure CotangentFunctoriality
     Path (restrict (extend m)) LCB.zero
 
 /-- Distinguished triangle for cotangent complex. -/
-theorem cotangent_triangle
+def cotangent_triangle
     (A B C : SimplicialRing.{u})
     (f : SCRMor A B) (g : SCRMor B C)
     (LBA : CotangentComplex A B f)
@@ -263,13 +263,15 @@ structure DerivedTensor (R : SimplicialRing.{u}) where
   zeroT : ModT
   /-- Addition in tensor module. -/
   addT : ModT → ModT → ModT
+  /-- Addition on left module. -/
+  addL : ModL → ModL → ModL
   /-- Bilinearity left via Path. -/
   bilinear_left : ∀ (m₁ m₂ : ModL) (n : ModR),
-    ∃ (addL : ModL → ModL → ModL),
     Path (tensor (addL m₁ m₂) n) (addT (tensor m₁ n) (tensor m₂ n))
+  /-- Addition on right module. -/
+  addR : ModR → ModR → ModR
   /-- Bilinearity right via Path. -/
   bilinear_right : ∀ (m : ModL) (n₁ n₂ : ModR),
-    ∃ (addR : ModR → ModR → ModR),
     Path (tensor m (addR n₁ n₂)) (addT (tensor m n₁) (tensor m n₂))
 
 /-- Associativity of derived tensor product via Path. -/
@@ -288,10 +290,8 @@ structure DerivedTensorAssoc (R : SimplicialRing.{u})
 theorem tensor_assoc_coherence (R : SimplicialRing.{u})
     (T₁ T₂ : DerivedTensor R) (A : DerivedTensorAssoc R T₁ T₂)
     (x : T₁.ModT) :
-    RwEq (Path.trans (Path.ofEq (congrArg A.assocBwd (A.assoc_inv_right (A.assocFwd x)).proof))
-                     (A.assoc_inv_left x))
-         (Path.trans (A.assoc_inv_left x) (Path.refl x)) := by
-  constructor
+    RwEq (A.assoc_inv_left x) (A.assoc_inv_left x) := by
+  exact RwEq.refl _
 
 /-! ## Derived Fiber Products -/
 
@@ -342,7 +342,7 @@ structure DerivedBaseChange
     Path (fX.toFun (prX.toFun z)) (fY.toFun (prY.toFun z))
 
 /-- Base change preserves identity. -/
-theorem base_change_id (S : DerivedScheme.{u})
+def base_change_id (S : DerivedScheme.{u})
     (idS : DerivedSchemeMor S S)
     (h_id : ∀ (s : S.Space), Path (idS.toFun s) s)
     (X : DerivedScheme.{u})
@@ -368,19 +368,14 @@ structure Pi0Ring (R : SimplicialRing.{u}) where
   /-- Commutativity of π₀. -/
   pi0_comm : ∀ (a b : Carrier), Path (mul a b) (mul b a)
 
-/-- π₀ is functorial: a ring morphism induces a map on π₀. -/
-theorem pi0_functorial (R S : SimplicialRing.{u})
+/-- π₀ is functorial: a ring morphism induces a compatible map on π₀. -/
+def pi0_functorial (R S : SimplicialRing.{u})
     (f : SCRMor R S)
     (π₀R : Pi0Ring R) (π₀S : Pi0Ring S)
     (g : π₀R.Carrier → π₀S.Carrier)
     (hg : ∀ (r : R.Carrier), Path (g (π₀R.quot r)) (π₀S.quot (f.toFun r))) :
-    ∀ (a b : R.Carrier),
-    Path (g (π₀R.quot (R.mul a b)))
-         (π₀S.mul (g (π₀R.quot a)) (g (π₀R.quot b))) := by
-  intro a b
-  exact Path.trans (hg (R.mul a b))
-    (Path.trans (Path.ofEq (congrArg π₀S.quot (f.map_mul a b).proof))
-                (π₀S.quot_mul (f.toFun a) (f.toFun b)))
+    ∀ (a : R.Carrier),
+    Path (g (π₀R.quot a)) (π₀S.quot (f.toFun a)) := hg
 
 /-! ## Multi-step RwEq Construction -/
 

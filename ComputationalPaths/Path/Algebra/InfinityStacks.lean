@@ -119,7 +119,7 @@ def SSetMap.comp {X Y Z : SSet.{u}} (f : SSetMap X Y) (g : SSetMap Y Z) : SSetMa
   mapLevel := fun n x => g.mapLevel n (f.mapLevel n x)
   map_face := fun i x =>
     Path.trans
-      (Path.ofEq (congrArg (g.mapLevel _) (f.map_face i x).proof))
+      (Path.ofEq (_root_.congrArg (g.mapLevel _) (f.map_face i x).proof))
       (g.map_face i (f.mapLevel _ x))
 
 /-- A simplicial presheaf on a site. -/
@@ -226,12 +226,12 @@ structure ArtinNStack (C : Site.{u}) (n : Nat) extends InfinityStack C where
   trunc_bound : Path truncLevel n
 
 /-- Every Artin 0-stack is an algebraic space. -/
-theorem artin_0_is_algebraic_space (C : Site.{u})
+def artin_0_is_algebraic_space (C : Site.{u})
     (X : ArtinNStack C 0) :
     Path X.truncLevel 0 := X.trunc_bound
 
 /-- Artin n-stacks are (n+1)-truncated. -/
-theorem artin_truncation (C : Site.{u}) (n : Nat) (X : ArtinNStack C n) :
+def artin_truncation (C : Site.{u}) (n : Nat) (X : ArtinNStack C n) :
     Path X.truncLevel n := X.trunc_bound
 
 /-! ## Geometric Stacks -/
@@ -241,7 +241,7 @@ structure GeometricStack (C : Site.{u}) extends ArtinNStack C 1 where
   /-- Diagonal is representable (simplified). -/
   diag_repr : ∀ (X Y : C.Obj) (f : C.Hom X atlas) (g : C.Hom Y atlas),
     ∃ (P : C.Obj) (pX : C.Hom P X) (pY : C.Hom P Y),
-    Path (C.comp pX f) (C.comp pY g)
+    C.comp pX f = C.comp pY g
   /-- Diagonal is quasi-compact. -/
   diag_qc : Prop
 
@@ -249,7 +249,7 @@ structure GeometricStack (C : Site.{u}) extends ArtinNStack C 1 where
 theorem geometric_diagonal (C : Site.{u}) (F : GeometricStack C)
     (X Y : C.Obj) (f : C.Hom X F.atlas) (g : C.Hom Y F.atlas) :
     ∃ (P : C.Obj) (pX : C.Hom P X) (pY : C.Hom P Y),
-    Path (C.comp pX f) (C.comp pY g) :=
+    C.comp pX f = C.comp pY g :=
   F.diag_repr X Y f g
 
 /-! ## Mapping Stacks -/
