@@ -1,4 +1,4 @@
-/-!
+/- 
 # Categorical equivalences as path equivalences
 
 This module packages categorical-equivalence style data directly in
@@ -52,12 +52,13 @@ structure CategoricalEquivalence (C : Type u) (D : Type v)
         (Path.congrArg F (unitIso x).inv)
         (counitIso (F x)).hom
 
-/-- Equivalence between types with inverse laws tracked up to `RwEq`. -/
-structure RwPathEquiv (α : Type u) (β : Type v) where
-  toFun : α → β
-  invFun : β → α
-  left_inv : ∀ x : α, RwEq (invFun (toFun x)) x
-  right_inv : ∀ y : β, RwEq (toFun (invFun y)) y
+/-- Equivalence between two path spaces with inverse laws tracked up to `RwEq`. -/
+structure RwPathEquiv {A : Type u} {B : Type v}
+    (a₁ a₂ : A) (b₁ b₂ : B) where
+  toFun : Path a₁ a₂ → Path b₁ b₂
+  invFun : Path b₁ b₂ → Path a₁ a₂
+  left_inv : ∀ p : Path a₁ a₂, RwEq (invFun (toFun p)) p
+  right_inv : ∀ q : Path b₁ b₂, RwEq (toFun (invFun q)) q
 
 section InducedPathEquivalence
 
@@ -65,7 +66,7 @@ variable {C : Type u} {D : Type v}
 variable {F : C → D} {G : D → C}
 
 /-- Forward action on paths induced by `F`. -/
-def mapPath (E : CategoricalEquivalence C D F G) {x y : C} :
+def mapPath (_E : CategoricalEquivalence C D F G) {x y : C} :
     Path x y → Path (F x) (F y) :=
   fun p => Path.congrArg F p
 
@@ -204,7 +205,7 @@ theorem map_unmap_rweq (E : CategoricalEquivalence C D F G) {x y : C}
 
 /-- Categorical equivalences induce equivalences on path spaces. -/
 def inducedPathEquiv (E : CategoricalEquivalence C D F G) (x y : C) :
-    RwPathEquiv (Path x y) (Path (F x) (F y)) where
+    RwPathEquiv x y (F x) (F y) where
   toFun := mapPath E
   invFun := unmapPath E
   left_inv := unmap_map_rweq (E := E)

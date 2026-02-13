@@ -25,6 +25,7 @@ conditions and algebraic laws are witnessed by `Path` values.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -266,7 +267,7 @@ def zero_almostZero (AM : AlmostMathData R rR) : AM.almostZero rR.zero := by
   intro ε _
   exact Path.trans (rR.mul_comm ε rR.zero)
     (Path.trans
-      (by exact Path.ofEq rfl)  -- mul zero ε
+      (by exact Path.ofEqChain rfl)  -- mul zero ε
       (Path.refl _))
 
 end AlmostMathData

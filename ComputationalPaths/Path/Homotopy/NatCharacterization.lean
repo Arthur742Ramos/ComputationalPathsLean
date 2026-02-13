@@ -22,6 +22,7 @@ identities and induction principles.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -88,7 +89,7 @@ def zero_add_path (n : Nat) : Path (0 + n) n :=
 
 /-- Path witness: n + 1 = succ n. -/
 def add_one_path (n : Nat) : Path (n + 1) (Nat.succ n) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Path witness: 1 + n = succ n. -/
 def one_add_path (n : Nat) : Path (1 + n) (Nat.succ n) :=
@@ -147,20 +148,20 @@ def right_distrib_path (a b c : Nat) : Path ((a + b) * c) (a * c + b * c) :=
 /-! ## Concrete path examples -/
 
 /-- Path witness: 2 + 3 = 5. -/
-def two_plus_three : Path (2 + 3) 5 := Path.ofEq rfl
+def two_plus_three : Path (2 + 3) 5 := Path.ofEqChain rfl
 
 /-- Path witness: 3 * 4 = 12. -/
-def three_times_four : Path (3 * 4) 12 := Path.ofEq rfl
+def three_times_four : Path (3 * 4) 12 := Path.ofEqChain rfl
 
 /-- Path witness: 0 + 0 = 0. -/
-def zero_plus_zero : Path (0 + 0) 0 := Path.ofEq rfl
+def zero_plus_zero : Path (0 + 0) 0 := Path.ofEqChain rfl
 
 /-- Path witness: 1 * 1 = 1. -/
-def one_times_one : Path (1 * 1) 1 := Path.ofEq rfl
+def one_times_one : Path (1 * 1) 1 := Path.ofEqChain rfl
 
 /-- Path witness: (2 + 3) * 4 = 2 * 4 + 3 * 4. -/
 def distrib_example : Path ((2 + 3) * 4) (2 * 4 + 3 * 4) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-! ## Transport along Nat paths -/
 
@@ -237,12 +238,12 @@ def induction_step {P : Nat → Type u}
 /-- The recursor on Nat produces coherent paths. -/
 def nat_rec_zero_path {C : Type u} (c0 : C) (cs : Nat → C → C) :
     Path (Nat.rec c0 cs 0) c0 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- The recursor on Nat at the successor step. -/
 def nat_rec_succ_path {C : Type u} (c0 : C) (cs : Nat → C → C) (n : Nat) :
     Path (Nat.rec c0 cs (Nat.succ n)) (cs n (Nat.rec c0 cs n)) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-! ## Summary
 

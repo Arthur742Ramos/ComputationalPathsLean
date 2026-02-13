@@ -22,6 +22,7 @@ group, as well as the Galois correspondence for normal coverings.
 -/
 
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -161,7 +162,7 @@ def fiberTransport_trans_path {P : A → Type u} {a b c : A}
 /-- Path witness: transport along reflexivity is identity. -/
 def fiberTransport_refl_path {P : A → Type u} {a : A} (x : P a) :
     Path (fiberTransport (Path.refl a) x) x :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Path witness: transport along symm then forward is identity. -/
 def fiberTransport_symm_cancel_path {P : A → Type u} {a b : A}

@@ -24,6 +24,7 @@ the Milnor-Švarc lemma.
 
 import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Topology.HyperbolicGroups
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -64,7 +65,7 @@ def id (M : MetricData X) : QuasiIsometricMap M M 1 0 where
 /-- The identity map yields a computational path on points. -/
 def id_path (M : MetricData X) (x : X) :
     Path ((id M).toFun x) x :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Composing the identity path with its inverse gives a loop. -/
 def id_path_loop (M : MetricData X) (x : X) : Path x x :=

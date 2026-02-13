@@ -14,6 +14,7 @@ Tor/Ext computation data with dimension shifts and bounds, using Path-valued law
 -/
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -109,7 +110,7 @@ namespace TorData
 def trivial : TorData.{u} where
   obj := fun _ _ _ => punitPointed
   mapMor := fun _ _ => PointedHom.id punitPointed
-  map_id := fun _ _ _ => Path.ofEq rfl
+  map_id := fun _ _ _ => Path.ofEqChain rfl
 
 end TorData
 
@@ -120,8 +121,8 @@ def trivial : ExtData.{u} where
   obj := fun _ _ _ => punitPointed
   map_left := fun _ => PointedHom.id punitPointed
   map_right := fun _ => PointedHom.id punitPointed
-  map_left_id := fun _ _ _ => Path.ofEq rfl
-  map_right_id := fun _ _ _ => Path.ofEq rfl
+  map_left_id := fun _ _ _ => Path.ofEqChain rfl
+  map_right_id := fun _ _ _ => Path.ofEqChain rfl
 
 end ExtData
 
@@ -130,7 +131,7 @@ namespace DimensionShift
 /-- The trivial dimension shift for the trivial Tor data. -/
 def trivial : DimensionShift (TorData.trivial.{u}) where
   shift := fun _ _ _ => PointedHom.id punitPointed
-  shift_natural := fun _ {_ _} {_ _} _ _ => Path.ofEq rfl
+  shift_natural := fun _ {_ _} {_ _} _ _ => Path.ofEqChain rfl
 
 end DimensionShift
 

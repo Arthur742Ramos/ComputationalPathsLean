@@ -17,6 +17,7 @@ with functoriality laws witnessed by computational `Path`s.
 
 import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -61,7 +62,7 @@ def trivial : TorFunctor.{u, v, w} where
     exact PointedHom.id torTrivialObj
   map_id := by
     intro A B
-    exact Path.ofEq rfl
+    exact Path.ofEqChain rfl
   map_comp := by
     intro A A' A'' B B' B'' f g h k
     apply Path.ofEq

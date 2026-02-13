@@ -24,6 +24,7 @@ computational-path circle and reuse the existing π₁ encoding.
 
 import ComputationalPaths.Path.CompPath.CircleCompPath
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -105,7 +106,7 @@ structure OrientationReversal (S : Type u) (base : S) where
 /-- The core loop of the Möbius band reverses orientation. -/
 noncomputable def mobiusBandOrientationReversal :
     OrientationReversal MobiusBand.{u} mobiusBandBase where
-  loop := Path.ofEq rfl
+  loop := Path.ofEqChain rfl
   reverses := true
 
 /-! ## Boundary Circle -/

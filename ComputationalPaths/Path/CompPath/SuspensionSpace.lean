@@ -25,6 +25,7 @@ paths.
 -/
 
 import ComputationalPaths.Path.CompPath.PushoutCompPath
+import ComputationalPaths.Path.Rewrite.RwEq
 
 set_option linter.unusedSimpArgs false
 
@@ -228,12 +229,12 @@ theorem suspConnectivity_value (X : Type u) :
 /-- Path coherence: north pole is in the suspension. -/
 def suspNorth_ofEq (X : Type u) :
     Path (suspNorth X) (suspNorth X) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Path coherence: south pole is in the suspension. -/
 def suspSouth_ofEq (X : Type u) :
     Path (suspSouth X) (suspSouth X) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Path coherence: two meridians through the same point are equal. -/
 def suspMerid_eq (x : X) :

@@ -22,6 +22,7 @@ to the integers.
 -/
 
 import ComputationalPaths.Path.Algebra.NielsenSchreier
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -47,7 +48,7 @@ def rankFormula_coherence (k : Nat) :
 /-- The rank is definitionally 1. -/
 def freeGroupOne_rank_is_one :
     Path (freeGroupRank 1) 1 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- The rank formula coherence composes with rank-is-one. -/
 theorem rankFormula_coherence_eq (k : Nat) :

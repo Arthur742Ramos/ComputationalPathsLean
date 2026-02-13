@@ -35,43 +35,87 @@ structure CategoricalEquivalence (C : Type u) (D : Type v) where
 
 namespace CategoricalEquivalence
 
+/-- Primitive computational step witnessing right-cancellation of the unit. -/
+theorem unit_hom_inv_step (E : CategoricalEquivalence C D) (x : C) :
+    Path.Step (Path.trans (E.unit x) (Path.symm (E.unit x))) (Path.refl x) :=
+  Path.Step.trans_symm (E.unit x)
+
+/-- Primitive computational step witnessing left-cancellation of the unit. -/
+theorem unit_inv_hom_step (E : CategoricalEquivalence C D) (x : C) :
+    Path.Step (Path.trans (Path.symm (E.unit x)) (E.unit x))
+      (Path.refl (E.invFun (E.toFun x))) :=
+  Path.Step.symm_trans (E.unit x)
+
+/-- Primitive computational step witnessing right-cancellation of the counit. -/
+theorem counit_hom_inv_step (E : CategoricalEquivalence C D) (y : D) :
+    Path.Step (Path.trans (E.counit y) (Path.symm (E.counit y)))
+      (Path.refl (E.toFun (E.invFun y))) :=
+  Path.Step.trans_symm (E.counit y)
+
+/-- Primitive computational step witnessing left-cancellation of the counit. -/
+theorem counit_inv_hom_step (E : CategoricalEquivalence C D) (y : D) :
+    Path.Step (Path.trans (Path.symm (E.counit y)) (E.counit y)) (Path.refl y) :=
+  Path.Step.symm_trans (E.counit y)
+
 /-- Unit component composed with its inverse contracts by a concrete rewrite. -/
 theorem unit_hom_inv_rw (E : CategoricalEquivalence C D) (x : C) :
     Rw (Path.trans (E.unit x) (Path.symm (E.unit x))) (Path.refl x) :=
-  rw_cmpA_inv_right (E.unit x)
+  rw_of_step (E.unit_hom_inv_step x)
 
 /-- Inverse of the unit component composed with the unit contracts by rewrite. -/
 theorem unit_inv_hom_rw (E : CategoricalEquivalence C D) (x : C) :
     Rw (Path.trans (Path.symm (E.unit x)) (E.unit x))
       (Path.refl (E.invFun (E.toFun x))) :=
-  rw_cmpA_inv_left (E.unit x)
+  rw_of_step (E.unit_inv_hom_step x)
 
 /-- Counit component composed with its inverse contracts by a concrete rewrite. -/
 theorem counit_hom_inv_rw (E : CategoricalEquivalence C D) (y : D) :
     Rw (Path.trans (E.counit y) (Path.symm (E.counit y)))
       (Path.refl (E.toFun (E.invFun y))) :=
-  rw_cmpA_inv_right (E.counit y)
+  rw_of_step (E.counit_hom_inv_step y)
 
 /-- Inverse of the counit component composed with the counit contracts by rewrite. -/
 theorem counit_inv_hom_rw (E : CategoricalEquivalence C D) (y : D) :
     Rw (Path.trans (Path.symm (E.counit y)) (E.counit y)) (Path.refl y) :=
-  rw_cmpA_inv_left (E.counit y)
+  rw_of_step (E.counit_inv_hom_step y)
+
+/-- Unit cancellation promoted from primitive steps to rewrite equivalence. -/
+theorem unit_hom_inv_rweq (E : CategoricalEquivalence C D) (x : C) :
+    RwEq (Path.trans (E.unit x) (Path.symm (E.unit x))) (Path.refl x) :=
+  rweq_of_step (E.unit_hom_inv_step x)
+
+/-- Unit inverse cancellation promoted from primitive steps to rewrite equivalence. -/
+theorem unit_inv_hom_rweq (E : CategoricalEquivalence C D) (x : C) :
+    RwEq (Path.trans (Path.symm (E.unit x)) (E.unit x))
+      (Path.refl (E.invFun (E.toFun x))) :=
+  rweq_of_step (E.unit_inv_hom_step x)
+
+/-- Counit cancellation promoted from primitive steps to rewrite equivalence. -/
+theorem counit_hom_inv_rweq (E : CategoricalEquivalence C D) (y : D) :
+    RwEq (Path.trans (E.counit y) (Path.symm (E.counit y)))
+      (Path.refl (E.toFun (E.invFun y))) :=
+  rweq_of_step (E.counit_hom_inv_step y)
+
+/-- Counit inverse cancellation promoted from primitive steps to rewrite equivalence. -/
+theorem counit_inv_hom_rweq (E : CategoricalEquivalence C D) (y : D) :
+    RwEq (Path.trans (Path.symm (E.counit y)) (E.counit y)) (Path.refl y) :=
+  rweq_of_step (E.counit_inv_hom_step y)
 
 /-- Computational witness that the unit component is a path isomorphism. -/
 def unitIsoWitness (E : CategoricalEquivalence C D) (x : C) :
     PathIso x (E.invFun (E.toFun x)) where
   hom := E.unit x
   inv := Path.symm (E.unit x)
-  hom_inv := rweq_of_rw (E.unit_hom_inv_rw x)
-  inv_hom := rweq_of_rw (E.unit_inv_hom_rw x)
+  hom_inv := E.unit_hom_inv_rweq x
+  inv_hom := E.unit_inv_hom_rweq x
 
 /-- Computational witness that the counit component is a path isomorphism. -/
 def counitIsoWitness (E : CategoricalEquivalence C D) (y : D) :
     PathIso (E.toFun (E.invFun y)) y where
   hom := E.counit y
   inv := Path.symm (E.counit y)
-  hom_inv := rweq_of_rw (E.counit_hom_inv_rw y)
-  inv_hom := rweq_of_rw (E.counit_inv_hom_rw y)
+  hom_inv := E.counit_hom_inv_rweq y
+  inv_hom := E.counit_inv_hom_rweq y
 
 end CategoricalEquivalence
 

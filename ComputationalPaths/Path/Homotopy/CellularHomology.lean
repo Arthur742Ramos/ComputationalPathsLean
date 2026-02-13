@@ -20,6 +20,7 @@ algebraic properties of the cellular chain complex using `Path` witnesses.
 -/
 
 import ComputationalPaths.Path.Homotopy.CWComplexHomotopy
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -66,7 +67,7 @@ theorem trivialChainComplex_boundary_zero (n : Nat) (x : Unit) :
 /-- Path witness for trivial boundary. -/
 def trivialChainComplex_boundary_path (n : Nat) (x : Unit) :
     Path (trivialChainComplex.boundary n x) () :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-! ## Integer chain complex -/
 
@@ -93,7 +94,7 @@ def zeroIntChainComplex : IntChainComplex where
 /-- Path witness for the zero boundary. -/
 def zeroIntChainComplex_boundary_path (n : Nat) (x : Int) :
     Path (zeroIntChainComplex.boundary n x) 0 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-! ## Homology via kernel/image -/
 
@@ -138,12 +139,12 @@ def eulerChar_empty : Int :=
 /-- Path witness: Euler characteristic of empty complex is zero. -/
 def eulerChar_empty_path :
     Path eulerChar_empty 0 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- A point has Euler characteristic 1. -/
 def eulerChar_point :
     Path (eulerChar { dim := 0, rank := fun _ => 1 }) 1 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Euler characteristic of an interval (1 vertex, 1 edge counted as
     dim 0 with rank 1, dim 1 with rank 0 for a single vertex). -/
@@ -191,13 +192,13 @@ def chainMap_comp {C D E : ChainComplex} (f : ChainMap C D) (g : ChainMap D E) :
 def chainMap_comp_id_path (C D : ChainComplex) (f : ChainMap C D)
     (n : Nat) (x : C.group n) :
     Path ((chainMap_comp f (chainMap_id D)).map n x) (f.map n x) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Path witness: identity composed with a map is the map. -/
 def chainMap_id_comp_path (C D : ChainComplex) (f : ChainMap C D)
     (n : Nat) (x : C.group n) :
     Path ((chainMap_comp (chainMap_id C) f).map n x) (f.map n x) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Associativity of chain map composition. -/
 def chainMap_comp_assoc_path {C D E F : ChainComplex}
@@ -205,7 +206,7 @@ def chainMap_comp_assoc_path {C D E F : ChainComplex}
     (n : Nat) (x : C.group n) :
     Path ((chainMap_comp (chainMap_comp f g) h).map n x)
       ((chainMap_comp f (chainMap_comp g h)).map n x) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-! ## Chain maps preserve cycles and boundaries -/
 

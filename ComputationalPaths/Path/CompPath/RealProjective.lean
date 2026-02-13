@@ -24,6 +24,7 @@ fundamental group is Z/2. We encode Z/2 as Bool with xor.
 
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.CompPath.PushoutCompPath
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -110,7 +111,7 @@ noncomputable def rp2PiOneEquivZ2 : SimpleEquiv rp2PiOne Z2 where
 /-- Path coherence: the generator of π₁(RP²) has order 2. -/
 def rp2GeneratorOrder2 :
     Path (z2_add z2_one z2_one) z2_zero :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Path coherence: addition in Z/2 is involutive. -/
 def z2_add_involutive (a : Z2) :
@@ -271,7 +272,7 @@ theorem rp2_transport_const (D : Type) (x : D) :
 /-- Double application of the generator returns to identity, witnessed by a path. -/
 def rp2_double_loop_refl :
     Path (z2_add (z2_add z2_one z2_one) (z2_add z2_one z2_one)) z2_zero :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 end CompPath
 end Path

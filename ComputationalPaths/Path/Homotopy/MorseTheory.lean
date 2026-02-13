@@ -26,6 +26,7 @@ reflecting the classical CW decomposition of manifolds.
 -/
 
 import ComputationalPaths.Path.Homotopy.HoTT
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -131,7 +132,7 @@ def sublevel_retraction_path {A : Type u} {mf : MorseFunction A}
     (_h_no_crit : ∀ cp ∈ mf.criticalPoints, ¬(c₁ ≤ mf.f cp.1 ∧ mf.f cp.1 ≤ c₂))
     (x : sublevelSet mf.f c₁) :
     Path (sublevelInclusion (Nat.le_refl c₁) x) x :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-! ## Handle Attachment at Critical Points -/
 
@@ -258,7 +259,7 @@ def sublevelInclusion_functorial_path {A : Type u} {f : A → Nat}
     Path
       (sublevelInclusion h₂ (sublevelInclusion h₁ x))
       (sublevelInclusion (Nat.le_trans h₁ h₂) x) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Path witness for handle decomposition count invariance. -/
 def handle_count_path {hd : HandleDecomposition} {k : Nat} :

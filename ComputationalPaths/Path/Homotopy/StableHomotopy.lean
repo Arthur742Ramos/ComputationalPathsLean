@@ -21,6 +21,7 @@ adjunction, and expose the basic stable stems as stable homotopy groups.
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
 import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
 import ComputationalPaths.Path.Homotopy.StableStems
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -127,7 +128,7 @@ noncomputable def stableAdjunction_succ (n : Nat) (X Y : Pointed) :
       (pathSimpleEquivComp
         (loopSpaceSuspensionAdjunction (X := iteratedSigmaPointed n X) (Y := Y))
         (stableAdjunction n X (omegaEqPointed Y))) :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-! ## Stable homotopy groups of spheres (basic stems) -/
 
@@ -146,15 +147,15 @@ def StablePi : Nat → Type
 
 /-- pi_s_1 is Z2. -/
 def stablePi_one_def : Path (StablePi 1) StableStems.Z2 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- pi_s_2 is Z2. -/
 def stablePi_two_def : Path (StablePi 2) StableStems.Z2 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- pi_s_3 is Z24. -/
 def stablePi_three_def : Path (StablePi 3) StableStems.Z24 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- pi_s_4 is trivial. -/
 def stablePi_four_trivial : ∀ x : StablePi 4, Path x () := fun x =>
@@ -166,7 +167,7 @@ def stablePi_five_trivial : ∀ x : StablePi 5, Path x () := fun x =>
 
 /-- pi_s_7 is Z240. -/
 def stablePi_seven_def : Path (StablePi 7) StableStems.Z240 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- The eta class has order two in the first stable stem. -/
 def stablePi_one_two_torsion :

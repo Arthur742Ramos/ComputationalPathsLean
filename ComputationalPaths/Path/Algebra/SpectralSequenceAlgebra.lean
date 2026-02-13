@@ -19,6 +19,7 @@ highlighting Path-valued identities for differentials and morphisms.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -183,18 +184,18 @@ def trivialBigradedAbelianGroup : BigradedAbelianGroup where
   zero := fun _ _ => PUnit.unit
   add := fun _ _ _ _ => PUnit.unit
   neg := fun _ _ _ => PUnit.unit
-  add_assoc := fun _ _ _ _ _ => Path.ofEq rfl
-  add_comm := fun _ _ _ _ => Path.ofEq rfl
-  zero_add := fun _ _ _ => Path.ofEq rfl
-  add_zero := fun _ _ _ => Path.ofEq rfl
-  add_left_neg := fun _ _ _ => Path.ofEq rfl
-  add_right_neg := fun _ _ _ => Path.ofEq rfl
+  add_assoc := fun _ _ _ _ _ => Path.ofEqChain rfl
+  add_comm := fun _ _ _ _ => Path.ofEqChain rfl
+  zero_add := fun _ _ _ => Path.ofEqChain rfl
+  add_zero := fun _ _ _ => Path.ofEqChain rfl
+  add_left_neg := fun _ _ _ => Path.ofEqChain rfl
+  add_right_neg := fun _ _ _ => Path.ofEqChain rfl
 
 /-- The zero differential on the trivial group. -/
 def trivialDifferential (r : Nat) : Differential trivialBigradedAbelianGroup r where
   map := fun _ _ _ => PUnit.unit
-  map_zero := fun _ _ => Path.ofEq rfl
-  map_add := fun _ _ _ _ => Path.ofEq rfl
+  map_zero := fun _ _ => Path.ofEqChain rfl
+  map_add := fun _ _ _ _ => Path.ofEqChain rfl
 
 /-- The trivial spectral sequence page. -/
 def trivialPage (r : Nat) : SpectralPage r where
@@ -203,7 +204,7 @@ def trivialPage (r : Nat) : SpectralPage r where
 
 /-- The trivial page satisfies d ∘ d = 0. -/
 instance (r : Nat) : HasDifferentialSquaredZero (trivialPage r) where
-  d_squared_zero := fun _ _ _ => Path.ofEq rfl
+  d_squared_zero := fun _ _ _ => Path.ofEqChain rfl
 
 /-- The trivial spectral sequence. -/
 def trivialSpectralSequence : SpectralSequence where

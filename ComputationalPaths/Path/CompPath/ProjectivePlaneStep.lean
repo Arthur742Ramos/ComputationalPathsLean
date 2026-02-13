@@ -43,7 +43,7 @@ open Step
 abbrev rp2LoopSpace : Type := Path (A := RealProjective2) rp2Base rp2Base
 
 /-- The fundamental loop. -/
-@[simp] def rp2Loop : rp2LoopSpace := Path.ofEq rfl
+@[simp] def rp2Loop : rp2LoopSpace := Path.ofEqChain rfl
 
 /-- Loop squared: `loop ⬝ loop`. -/
 @[simp] noncomputable def rp2LoopSquared : rp2LoopSpace :=

@@ -13,6 +13,7 @@ Path-level loop data for compatibility with the computational-path interface.
 
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.CompPath.PushoutCompPath
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -54,7 +55,7 @@ abbrev lensSpaceLoopSpace (p q : Nat) : Type u :=
 
 /-- Fundamental loop at the basepoint. -/
 @[simp] def lensSpaceLoop (p q : Nat) : lensSpaceLoopSpace p q :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Iterate the fundamental loop `n` times. -/
 @[simp] def lensSpaceLoopPow (p q : Nat) : Nat → lensSpaceLoopSpace p q

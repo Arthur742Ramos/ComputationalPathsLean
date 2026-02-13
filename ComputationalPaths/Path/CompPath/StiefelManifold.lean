@@ -22,6 +22,7 @@ import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -52,7 +53,7 @@ abbrev stiefelManifoldLoopSpace (n k : Nat) : Type u :=
 
 /-- Fundamental loop at the Stiefel manifold basepoint. -/
 @[simp] def stiefelManifoldLoop (n k : Nat) : stiefelManifoldLoopSpace n k :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 /-- Iterate the fundamental loop `m` times. -/
 @[simp] def stiefelManifoldLoopPow (n k : Nat) : Nat → stiefelManifoldLoopSpace n k

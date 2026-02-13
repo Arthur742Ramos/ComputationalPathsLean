@@ -20,6 +20,7 @@ complexes and express functoriality/universality through `Path` witnesses.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -129,7 +130,7 @@ def LeftDerivedFunctor.trivial : LeftDerivedFunctor.{u} where
   resolution := fun _ => unitComplex
   augment := fun _ => zeroHom unitPointed unitPointed
   map := fun _ => ChainMap3.id unitComplex
-  map_id := fun _ => Path.ofEq rfl
+  map_id := fun _ => Path.ofEqChain rfl
 
 /-- The trivial right derived functor. -/
 def RightDerivedFunctor.trivial : RightDerivedFunctor.{u} where
@@ -137,7 +138,7 @@ def RightDerivedFunctor.trivial : RightDerivedFunctor.{u} where
   coresolution := fun _ => unitComplex
   coaugment := fun _ => zeroHom unitPointed unitPointed
   map := fun _ => ChainMap3.id unitComplex
-  map_id := fun _ => Path.ofEq rfl
+  map_id := fun _ => Path.ofEqChain rfl
 
 /-! ## Summary
 

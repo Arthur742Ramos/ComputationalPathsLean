@@ -218,7 +218,7 @@ def spectralStepPath {H : HilbertData.{u}} {x y : H.carrier}
   match s with
   | SpectralStep.dirac_zero _ D => Path.ofEq D.dirac_zero
   | SpectralStep.repr_one _ A v => Path.ofEq (A.repr_one v)
-  | _ => Path.ofEq rfl
+  | _ => Path.ofEqChain rfl
 
 /-- Compose two spectral steps. -/
 def spectral_steps_compose {H : HilbertData.{u}} {x y z : H.carrier}
