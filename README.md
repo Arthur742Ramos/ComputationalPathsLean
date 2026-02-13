@@ -169,8 +169,10 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`Perfectoid/PathInfrastructure.lean`](Perfectoid/PathInfrastructure.lean) — tilting equivalences and almost mathematics packaged as path-preserving constructions with explicit `Path.Step`/`RwEq` normalization witnesses.
 - [`Padic/PathInfrastructure.lean`](Padic/PathInfrastructure.lean) — perfectoid-space tilting and p-divisible-group compatibilities packaged with explicit `Path.Step`/`RwEq` witnesses.
 - [`Tropical/PathInfrastructure.lean`](Tropical/PathInfrastructure.lean) — tropical curve balancing and valuation/tropicalization coherence packaged with explicit `Path.Step` and derived `RwEq` normalization lemmas.
+- [`Cluster/PathInfrastructure.lean`](Cluster/PathInfrastructure.lean) — cluster seed and mutation interfaces with explicit `Path.Step` witnesses for exchange-relation and involutivity normalization.
 - [`Hodge/PathInfrastructure.lean`](Hodge/PathInfrastructure.lean) — mixed Hodge filtrations and period-map transport packaged with domain-specific `Path.Step` witnesses and derived `RwEq` normalizations.
 - [`GRT/PathInfrastructure.lean`](GRT/PathInfrastructure.lean) — geometric representation theory path infrastructure exposing perverse sheaf and D-module computational witnesses.
+- [`KacMoody/PathInfrastructure.lean`](KacMoody/PathInfrastructure.lean) — infinite-dimensional Kac-Moody Lie and Weyl-group interfaces with explicit `Path.Step` witnesses for Serre, braid, and action normalizations.
 - [`Langlands/PathInfrastructure.lean`](Langlands/PathInfrastructure.lean) — local and geometric Langlands path infrastructure exposing Step-based compatibility and spectral coherence witnesses.
 - [`Birational/PathInfrastructure.lean`](Birational/PathInfrastructure.lean) — birational flips/flops and path-preserving minimal-model-program constructions with explicit `Path`/`RwEq` witnesses.
 - [`SymplecticDuality/PathInfrastructure.lean`](SymplecticDuality/PathInfrastructure.lean) — 3d mirror-symmetry and Coulomb-branch interfaces with domain-specific `Step` tags plus `Path.Step`/`RwEq` normalization lemmas.

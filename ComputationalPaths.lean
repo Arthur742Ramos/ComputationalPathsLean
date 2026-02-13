@@ -14,6 +14,7 @@ import Cobordism.PathInfrastructure
 import TFT.PathInfrastructure
 import Arithmetic.PathInfrastructure
 import Langlands.PathInfrastructure
+import GeometricSatake.PathInfrastructure
 import Anabelian.PathInfrastructure
 import Birational.PathInfrastructure
 import Factorization.PathInfrastructure
@@ -23,7 +24,10 @@ import GRT.PathInfrastructure
 import GIT.PathInfrastructure
 import InfinityCategory.PathInfrastructure
 import Condensed.PathInfrastructure
+import Categorification.PathInfrastructure
+import Cluster.PathInfrastructure
 import Quantum.PathInfrastructure
+import KacMoody.PathInfrastructure
 import Mirror.PathInfrastructure
 import SymplecticDuality.PathInfrastructure
 import NCG.PathInfrastructure

@@ -139,17 +139,17 @@ def bachmannHoward (n : Nat) (hn : n > 0) : OrdinalNotation where
 /-- Path: well-ordering. -/
 def wellOrder_path (on_ : OrdinalNotation) :
     Path on_.wellOrderObstruction 0 :=
-  Path.ofEqChain on_.wellOrder_zero
+  Path.stepChain on_.wellOrder_zero
 
 /-- Path: comparison decidability. -/
 def comparison_path (on_ : OrdinalNotation) :
     Path on_.comparisonObstruction 0 :=
-  Path.ofEqChain on_.comparison_zero
+  Path.stepChain on_.comparison_zero
 
 /-- Path: recursiveness. -/
 def recursiveness_path (on_ : OrdinalNotation) :
     Path on_.recursivenessObstruction 0 :=
-  Path.ofEqChain on_.recursiveness_zero
+  Path.stepChain on_.recursiveness_zero
 
 end OrdinalNotation
 
@@ -461,22 +461,22 @@ def standard : BachmannHoward where
 /-- Path: BH label coherence. -/
 def bachmann_howard_path (bh : BachmannHoward) :
     Path bh.ordinalLabel 3 :=
-  Path.ofEqChain bh.label_eq
+  Path.stepChain bh.label_eq
 
 /-- Path: countability. -/
 def countability_path (bh : BachmannHoward) :
     Path bh.countabilityObstruction 0 :=
-  Path.ofEqChain bh.countability_zero
+  Path.stepChain bh.countability_zero
 
 /-- Path: well-ordering. -/
 def wellOrder_path (bh : BachmannHoward) :
     Path bh.wellOrderObstruction 0 :=
-  Path.ofEqChain bh.wellOrder_zero
+  Path.stepChain bh.wellOrder_zero
 
 /-- Path: admissibility. -/
 def admissibility_path (bh : BachmannHoward) :
     Path bh.admissibilityObstruction 0 :=
-  Path.ofEqChain bh.admissibility_zero
+  Path.stepChain bh.admissibility_zero
 
 end BachmannHoward
 
@@ -546,17 +546,17 @@ def psi_0_OmegaOmega_BH : CollapsingFunction where
 /-- Path: collapsing to countable. -/
 def collapsing_countable_path (cf : CollapsingFunction) :
     Path cf.countableObstruction 0 :=
-  Path.ofEqChain cf.countable_zero
+  Path.stepChain cf.countable_zero
 
 /-- Path: monotonicity. -/
 def collapsing_monotone_path (cf : CollapsingFunction) :
     Path cf.monotonicityObstruction 0 :=
-  Path.ofEqChain cf.monotonicity_zero
+  Path.stepChain cf.monotonicity_zero
 
 /-- Path: output bound. -/
 def collapsing_bound_path (cf : CollapsingFunction) :
     Path cf.boundObstruction 0 :=
-  Path.ofEqChain cf.bound_zero
+  Path.stepChain cf.bound_zero
 
 end CollapsingFunction
 
@@ -632,27 +632,27 @@ def pra : ProofTheoreticOrdinal where
 /-- Path: PA ordinal is ε₀ (label 10). -/
 def pa_ordinal_path :
     Path pa.ordinalLabel 10 :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Path: ATR₀ ordinal is Γ₀ (label 20). -/
 def atr_ordinal_path :
     Path atr0.ordinalLabel 20 :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Path: Π¹₁-CA₀ ordinal is BH (label 30). -/
 def pi11CA0_ordinal_path :
     Path pi11CA0.ordinalLabel 30 :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 /-- Path: consistency. -/
 def consistency_path (pto : ProofTheoreticOrdinal) :
     Path pto.consistencyObstruction 0 :=
-  Path.ofEqChain pto.consistency_zero
+  Path.stepChain pto.consistency_zero
 
 /-- Path: independence. -/
 def independence_path (pto : ProofTheoreticOrdinal) :
     Path pto.independenceObstruction 0 :=
-  Path.ofEqChain pto.independence_zero
+  Path.stepChain pto.independence_zero
 
 end ProofTheoreticOrdinal
 
@@ -722,17 +722,17 @@ def forGamma0 : FundamentalSequence where
 /-- Path: strictly increasing. -/
 def increase_path (fs : FundamentalSequence) :
     Path fs.increaseObstruction 0 :=
-  Path.ofEqChain fs.increase_zero
+  Path.stepChain fs.increase_zero
 
 /-- Path: supremum. -/
 def supremum_path (fs : FundamentalSequence) :
     Path fs.supremumObstruction 0 :=
-  Path.ofEqChain fs.supremum_zero
+  Path.stepChain fs.supremum_zero
 
 /-- Path: uniqueness. -/
 def uniqueness_path (fs : FundamentalSequence) :
     Path fs.uniquenessObstruction 0 :=
-  Path.ofEqChain fs.uniqueness_zero
+  Path.stepChain fs.uniqueness_zero
 
 end FundamentalSequence
 
@@ -797,12 +797,12 @@ def f_omega : GrowingHierarchy where
 /-- Path: definability. -/
 def definability_path (gh : GrowingHierarchy) :
     Path gh.definabilityObstruction 0 :=
-  Path.ofEqChain gh.definability_zero
+  Path.stepChain gh.definability_zero
 
 /-- Path: dominance. -/
 def dominance_path (gh : GrowingHierarchy) :
     Path gh.dominanceObstruction 0 :=
-  Path.ofEqChain gh.dominance_zero
+  Path.stepChain gh.dominance_zero
 
 end GrowingHierarchy
 
@@ -847,12 +847,12 @@ def epsilon1 : EpsilonNumber where
 /-- Path: fixed point. -/
 def fixedPoint_path (en : EpsilonNumber) :
     Path en.fixedPointObstruction 0 :=
-  Path.ofEqChain en.fixedPoint_zero
+  Path.stepChain en.fixedPoint_zero
 
 /-- Path: Veblen connection. -/
 def veblen_path (en : EpsilonNumber) :
     Path en.veblenObstruction 0 :=
-  Path.ofEqChain en.veblen_zero
+  Path.stepChain en.veblen_zero
 
 end EpsilonNumber
 
@@ -911,7 +911,7 @@ def one_plus_omega : OrdinalArithmetic where
 /-- Non-commutativity witness: 1 + ω ≠ ω + 1. -/
 def noncomm_witness :
     Path one_plus_omega.commObstruction 1 :=
-  Path.ofEqChain rfl
+  Path.stepChain rfl
 
 end OrdinalArithmetic
 

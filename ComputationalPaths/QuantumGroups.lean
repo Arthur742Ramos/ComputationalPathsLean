@@ -127,17 +127,17 @@ def trivial : HopfAlgebraData where
 /-- Path: antipode is an anti-homomorphism (S(ab) = S(b)S(a)). -/
 def hopf_antipode_path (ha : HopfAlgebraData) :
     Path ha.antipodeAntiHomRank 0 :=
-  Path.ofEqChain ha.antipode_antiHom
+  Path.stepChain ha.antipode_antiHom
 
 /-- Path: counit of identity is 1. -/
 def hopf_counit_path (ha : HopfAlgebraData) :
     Path ha.counitValue 1 :=
-  Path.ofEqChain ha.counit_id
+  Path.stepChain ha.counit_id
 
 /-- Path: comultiplication dimension. -/
 def comult_dim_path (ha : HopfAlgebraData) :
     Path ha.comultDim (ha.algDim ^ 2) :=
-  Path.ofEqChain ha.comultDim_eq
+  Path.stepChain ha.comultDim_eq
 
 /-- Tensor product of Hopf algebras. -/
 def tensor (h1 h2 : HopfAlgebraData) : HopfAlgebraData where
@@ -199,7 +199,7 @@ def classical : QuantumParameter := generic 1
 /-- Path: root of unity order validity. -/
 def root_order_path (qp : QuantumParameter) (h : qp.isRootOfUnity = true) :
     Path (min 2 qp.rootOrder) 2 :=
-  Path.ofEqChain (Nat.min_eq_left (qp.rootOrder_valid h))
+  Path.stepChain (Nat.min_eq_left (qp.rootOrder_valid h))
 
 end QuantumParameter
 
@@ -252,12 +252,12 @@ def sl2 : RMatrixData where
 /-- Path: Yang-Baxter equation satisfied. -/
 def yang_baxter_path (rm : RMatrixData) :
     Path rm.ybObstruction 0 :=
-  Path.ofEqChain rm.yb_satisfied
+  Path.stepChain rm.yb_satisfied
 
 /-- Path: matrix size formula. -/
 def matrix_size_path (rm : RMatrixData) :
     Path rm.matrixSize (rm.vecDim ^ 2) :=
-  Path.ofEqChain rm.matrixSize_eq
+  Path.stepChain rm.matrixSize_eq
 
 /-- Tensor product R-matrix: R on V ⊗ W with dim(V ⊗ W) = dim V · dim W. -/
 def tensorProduct (r1 r2 : RMatrixData) : RMatrixData where
@@ -346,17 +346,17 @@ def rankR (r : Nat) (hr : r > 0) : QuantumEnvelopingData where
 /-- Path: q-Serre relations. -/
 def quantum_serre_path (qe : QuantumEnvelopingData) :
     Path qe.serreObstruction 0 :=
-  Path.ofEqChain qe.serre_satisfied
+  Path.stepChain qe.serre_satisfied
 
 /-- Path: number of generators = 3 * rank. -/
 def num_generators_path (qe : QuantumEnvelopingData) :
     Path qe.numGenerators (3 * qe.rank) :=
-  Path.ofEqChain qe.numGen_eq
+  Path.stepChain qe.numGen_eq
 
 /-- Path: Cartan diagonal = 2. -/
 def cartan_diag_path (qe : QuantumEnvelopingData) (i : Nat) (hi : i < qe.rank) :
     Path (qe.cartanMatrix i i) 2 :=
-  Path.ofEqChain (qe.cartan_diag i hi)
+  Path.stepChain (qe.cartan_diag i hi)
 
 /-- Dimension of U_q(𝔤) at root of unity of order ℓ: dim = ℓ^{|Φ⁺|} · r
 where |Φ⁺| is the number of positive roots. -/
@@ -422,17 +422,17 @@ def adjoint (h : Nat) (hh : h > 0) : ComoduleAlgebra where
 /-- Path: coassociativity. -/
 def comodule_coassociativity_path (ca : ComoduleAlgebra) :
     Path ca.coassocObstruction 0 :=
-  Path.ofEqChain ca.coassoc_zero
+  Path.stepChain ca.coassoc_zero
 
 /-- Path: counit compatibility. -/
 def comodule_counit_path (ca : ComoduleAlgebra) :
     Path ca.counitObstruction 0 :=
-  Path.ofEqChain ca.counit_zero
+  Path.stepChain ca.counit_zero
 
 /-- Path: coaction dimension formula. -/
 def coaction_dim_path (ca : ComoduleAlgebra) :
     Path ca.coactionDim (ca.hopfDim * ca.algDim) :=
-  Path.ofEqChain ca.coactionDim_eq
+  Path.stepChain ca.coactionDim_eq
 
 end ComoduleAlgebra
 
@@ -485,17 +485,17 @@ def trivial : DrinfeldDouble where
 /-- Path: dim D(H) = (dim H)². -/
 def drinfeld_double_dimension_path (dd : DrinfeldDouble) :
     Path dd.doubleDim (dd.hopfDim ^ 2) :=
-  Path.ofEqChain dd.doubleDim_eq
+  Path.stepChain dd.doubleDim_eq
 
 /-- Path: quasitriangularity. -/
 def quasitriangular_path (dd : DrinfeldDouble) :
     Path dd.isQuasitriangular true :=
-  Path.ofEqChain dd.always_qt
+  Path.stepChain dd.always_qt
 
 /-- Path: R-matrix dimension. -/
 def r_matrix_dim_path (dd : DrinfeldDouble) :
     Path dd.rMatrixDim dd.doubleDim :=
-  Path.ofEqChain dd.rMatrixDim_eq
+  Path.stepChain dd.rMatrixDim_eq
 
 /-- The category of D(H)-modules is a braided monoidal category.
 The number of irreducible representations equals the number of
@@ -557,12 +557,12 @@ def uqsl2Reps (n : Nat) (hn : n > 0) : BraidedCategoryData where
 /-- Path: hexagon axiom. -/
 def braided_hexagon_path (bc : BraidedCategoryData) :
     Path bc.hexagonObstruction 0 :=
-  Path.ofEqChain bc.hexagon_zero
+  Path.stepChain bc.hexagon_zero
 
 /-- Path: symmetric braiding order. -/
 def symmetric_order_path (bc : BraidedCategoryData) (h : bc.isSymmetric = true) :
     Path bc.symmetricOrder 2 :=
-  Path.ofEqChain (bc.symmetric_order h)
+  Path.stepChain (bc.symmetric_order h)
 
 /-- Tensor product dimension: dim(V ⊗ W) = dim(V) * dim(W). -/
 def tensorDim (bc : BraidedCategoryData) (i j : Nat) : Nat :=
@@ -619,12 +619,12 @@ def rankR (r : Nat) (hr : r > 0) : QuantumCasimir where
 /-- Path: Casimir centrality. -/
 def quantum_casimir_path (qc : QuantumCasimir) :
     Path qc.centralityObstruction 0 :=
-  Path.ofEqChain qc.centrality_zero
+  Path.stepChain qc.centrality_zero
 
 /-- Path: number of terms bound. -/
 def casimir_terms_path (qc : QuantumCasimir) :
     Path (min qc.rank qc.numTerms) qc.rank :=
-  Path.ofEqChain (Nat.min_eq_left qc.numTerms_ge)
+  Path.stepChain (Nat.min_eq_left qc.numTerms_ge)
 
 end QuantumCasimir
 
@@ -658,7 +658,7 @@ def symmetric (n : Nat) (hn : n > 0) : RibbonCategoryData where
 /-- Path: twist compatibility. -/
 def ribbon_twist_path (rc : RibbonCategoryData) :
     Path rc.twistCompatObstruction 0 :=
-  Path.ofEqChain rc.twist_compat
+  Path.stepChain rc.twist_compat
 
 end RibbonCategoryData
 
@@ -697,7 +697,7 @@ def sl2Fund : QuantumDimension where
 /-- Path: classical limit coherence. -/
 def classical_limit_path (qd : QuantumDimension) :
     Path qd.classicalLimit qd.classicalDim :=
-  Path.ofEqChain qd.classicalLimit_eq
+  Path.stepChain qd.classicalLimit_eq
 
 end QuantumDimension
 

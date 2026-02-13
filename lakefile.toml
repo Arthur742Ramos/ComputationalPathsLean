@@ -32,6 +32,12 @@ name = "Chromatic"
 name = "Condensed"
 
 [[lean_lib]]
+name = "Categorification"
+
+[[lean_lib]]
+name = "Cluster"
+
+[[lean_lib]]
 name = "VertexAlgebra"
 
 [[lean_lib]]
@@ -54,6 +60,9 @@ name = "Arithmetic"
 
 [[lean_lib]]
 name = "Langlands"
+
+[[lean_lib]]
+name = "GeometricSatake"
 
 [[lean_lib]]
 name = "Anabelian"
@@ -102,6 +111,9 @@ name = "DAG"
 
 [[lean_lib]]
 name = "Quantum"
+
+[[lean_lib]]
+name = "KacMoody"
 
 [[lean_lib]]
 name = "Mirror"
