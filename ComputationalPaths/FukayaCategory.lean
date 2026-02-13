@@ -513,102 +513,102 @@ end DerivedFukayaObject
 /-- Path witness: μ¹ has degree shift 1. -/
 def mu1_degree_path :
     Path AInfinityMaps.mu1.degreeShift 1 :=
-  Path.ofEqChain AInfinityMaps.mu1_degree
+  Path.stepChainChain AInfinityMaps.mu1_degree
 
 /-- Path witness: μ² has degree shift 0. -/
 def mu2_degree_path :
     Path AInfinityMaps.mu2.degreeShift 0 :=
-  Path.ofEqChain AInfinityMaps.mu2_degree
+  Path.stepChainChain AInfinityMaps.mu2_degree
 
 /-- Path witness: μ³ has degree shift -1. -/
 def mu3_degree_path :
     Path AInfinityMaps.mu3.degreeShift (-1) :=
-  Path.ofEqChain AInfinityMaps.mu3_degree
+  Path.stepChainChain AInfinityMaps.mu3_degree
 
 /-- Path witness: μ¹ has arity 1. -/
 def mu1_arity_path :
     Path AInfinityMaps.mu1.arity 1 :=
-  Path.ofEqChain AInfinityMaps.mu1_arity
+  Path.stepChainChain AInfinityMaps.mu1_arity
 
 /-- Path witness: standard brane data grading. -/
 def standard_brane_path :
     Path BraneData.standard.grading 0 :=
-  Path.ofEqChain BraneData.standard_grading
+  Path.stepChainChain BraneData.standard_grading
 
 /-- Path witness: standard brane data rank. -/
 def standard_rank_path :
     Path BraneData.standard.localSystemRank 1 :=
-  Path.ofEqChain BraneData.standard_rank
+  Path.stepChainChain BraneData.standard_rank
 
 /-- Path witness: zero Floer cochain generators. -/
 def zero_floer_path (L₀ L₁ : FukayaObject) :
     Path (FloerCochain.zero L₀ L₁).numGenerators 0 :=
-  Path.ofEqChain (FloerCochain.zero_generators L₀ L₁)
+  Path.stepChainChain (FloerCochain.zero_generators L₀ L₁)
 
 /-- Path witness: empty Fukaya category. -/
 def empty_fukaya_path :
     Path FukayaCat.empty.numObjects 0 :=
-  Path.ofEqChain FukayaCat.empty_objects
+  Path.stepChainChain FukayaCat.empty_objects
 
 /-- Path witness: HMS for torus/elliptic curve. -/
 def torus_hms_path :
     Path MirrorPair.torusElliptic.fukRank MirrorPair.torusElliptic.cohRank :=
-  Path.ofEqChain MirrorPair.torus_hms
+  Path.stepChainChain MirrorPair.torus_hms
 
 /-- Path witness: K3 HMS. -/
 def k3_hms_path :
     Path MirrorPair.k3Mirror.fukRank MirrorPair.k3Mirror.cohRank :=
-  Path.ofEqChain MirrorPair.k3_hms
+  Path.stepChainChain MirrorPair.k3_hms
 
 /-- Path witness: zero Maslov index. -/
 def zero_maslov_path (L : FukayaObject) :
     Path (MaslovIndex.zero L).indexValue 0 :=
-  Path.ofEqChain (MaslovIndex.zero_value L)
+  Path.stepChainChain (MaslovIndex.zero_value L)
 
 /-- Path witness: bigon has 2 sides. -/
 def bigon_sides_path :
     Path PolygonCount.bigon.numSides 2 :=
-  Path.ofEqChain PolygonCount.bigon_sides
+  Path.stepChainChain PolygonCount.bigon_sides
 
 /-- Path witness: triangle has 3 sides. -/
 def triangle_sides_path :
     Path PolygonCount.triangle.numSides 3 :=
-  Path.ofEqChain PolygonCount.triangle_sides
+  Path.stepChainChain PolygonCount.triangle_sides
 
 /-- Path witness: quadrilateral has 4 sides. -/
 def quad_sides_path :
     Path PolygonCount.quadrilateral.numSides 4 :=
-  Path.ofEqChain PolygonCount.quad_sides
+  Path.stepChainChain PolygonCount.quad_sides
 
 /-- Path witness: K3 Euler characteristic. -/
 def k3_euler_path :
     Path MirrorPair.k3Mirror.eulerX 24 :=
-  Path.ofEqChain MirrorPair.k3_euler
+  Path.stepChainChain MirrorPair.k3_euler
 
 /-- Path witness: shift by zero preserves grading. -/
 def shift_zero_path (b : BraneData) :
     Path (b.shift 0).grading b.grading :=
-  Path.ofEqChain (BraneData.shift_zero_grading b)
+  Path.stepChainChain (BraneData.shift_zero_grading b)
 
 /-- Path witness: d = 1 A∞ relation arity. -/
 def d1_arity_path :
     Path AInfinityRelation.d1_relation.arity 1 :=
-  Path.ofEqChain AInfinityRelation.d1_arity
+  Path.stepChainChain AInfinityRelation.d1_arity
 
 /-- Path witness: d = 1 relation sum is zero. -/
 def d1_sum_path :
     Path AInfinityRelation.d1_relation.termSum 0 :=
-  Path.ofEqChain AInfinityRelation.d1_sum_zero
+  Path.stepChainChain AInfinityRelation.d1_sum_zero
 
 /-- Path witness: d = 2 relation sum is zero. -/
 def d2_sum_path :
     Path AInfinityRelation.d2_relation.termSum 0 :=
-  Path.ofEqChain AInfinityRelation.d2_sum_zero
+  Path.stepChainChain AInfinityRelation.d2_sum_zero
 
 /-- Path witness: single derived object component count. -/
 def single_derived_path (L : FukayaObject) :
     Path (DerivedFukayaObject.ofSingle L).numComponents 1 :=
-  Path.ofEqChain (DerivedFukayaObject.single_components L)
+  Path.stepChainChain (DerivedFukayaObject.single_components L)
 
 end FukayaCategory
 end ComputationalPaths

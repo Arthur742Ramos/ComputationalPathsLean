@@ -157,12 +157,12 @@ namespace OrthogonalSpectrum
 /-- Path witness for round-trip. -/
 def roundtrip_path (E : OrthogonalSpectrum) (n : Nat) (x : E.value n) :
     Path (E.adjointMap n (E.structureMap n x)) x :=
-  Path.ofEqChain (E.roundtrip n x)
+  Path.stepChainChain (E.roundtrip n x)
 
 /-- Path witness for reverse round-trip. -/
 def reverse_roundtrip_path (E : OrthogonalSpectrum) (n : Nat) (y : E.value (n + 1)) :
     Path (E.structureMap n (E.adjointMap n y)) y :=
-  Path.ofEqChain (E.reverseRoundtrip n y)
+  Path.stepChainChain (E.reverseRoundtrip n y)
 
 /-- Iterated structure map: X(n) → X(n+k). -/
 def iterStructureMap (E : OrthogonalSpectrum) : (n k : Nat) → E.value n → E.value (n + k)
@@ -225,7 +225,7 @@ def commutes_path {E F : OrthogonalSpectrum} (f : OrthSpecMap E F)
     (n : Nat) (x : E.value n) :
     Path (f.levelMap (n + 1) (E.structureMap n x))
          (F.structureMap n (f.levelMap n x)) :=
-  Path.ofEqChain (f.commutes n x)
+  Path.stepChainChain (f.commutes n x)
 
 end OrthSpecMap
 
@@ -337,17 +337,17 @@ def initial (E : OrthogonalSpectrum) : UltraCommMonoid where
 /-- Path witness for commutativity. -/
 def comm_path (M : UltraCommMonoid) :
     Path (M.multId + M.unitId) (M.unitId + M.multId) :=
-  Path.ofEqChain M.commutative
+  Path.stepChainChain M.commutative
 
 /-- Path witness for associativity. -/
 def assoc_path (M : UltraCommMonoid) :
     Path (M.multId + (M.multId + M.unitId)) ((M.multId + M.multId) + M.unitId) :=
-  Path.ofEqChain M.associative
+  Path.stepChainChain M.associative
 
 /-- Path witness for unit law. -/
 def unit_path (M : UltraCommMonoid) :
     Path (M.unitId + 0) M.unitId :=
-  Path.ofEqChain M.unit_law
+  Path.stepChainChain M.unit_law
 
 /-- Maps of ultra-commutative monoids. -/
 structure UltraCommMap (M N : UltraCommMonoid) where
@@ -387,12 +387,12 @@ def standard (E : OrthogonalSpectrum) : GlobalKTheory where
 /-- Path witness for Bott periodicity. -/
 def bott_path (K : GlobalKTheory) :
     Path K.period 2 :=
-  Path.ofEqChain K.period_eq
+  Path.stepChainChain K.period_eq
 
 /-- Path witness for trivial group rank. -/
 def trivial_rank_path (K : GlobalKTheory) :
     Path (K.fixedPointRank 1) 1 :=
-  Path.ofEqChain K.trivial_rank
+  Path.stepChainChain K.trivial_rank
 
 /-- Global K-theory is an ultra-commutative monoid. -/
 def toUltraComm (K : GlobalKTheory) : UltraCommMonoid where
@@ -454,7 +454,7 @@ theorem mo_thom_dim (E : OrthogonalSpectrum) :
 /-- Path witness for Thom class dimension. -/
 def thom_dim_path (T : GlobalThomSpectrum) :
     Path T.thomClassDim (if T.isComplex then 2 else 1) :=
-  Path.ofEqChain T.thom_dim
+  Path.stepChainChain T.thom_dim
 
 /-- Orientation: a map MU_gl → E in the global stable category. -/
 structure GlobalOrientation (T : GlobalThomSpectrum) where
@@ -554,7 +554,7 @@ namespace Orbispace
 /-- Path witness for restriction reflexivity. -/
 def restrict_refl_path (O : Orbispace) (n : Nat) (x : O.value n) :
     Path (O.restrict n n (Nat.le_refl n) x) x :=
-  Path.ofEqChain (O.restrict_refl n x)
+  Path.stepChainChain (O.restrict_refl n x)
 
 /-- The constant orbispace on a type A. -/
 def constant (A : Type v) : Orbispace where
@@ -607,7 +607,7 @@ def trivial : ParsummableCategory where
 /-- Path witness for strict symmetry. -/
 def strict_symm_path (P : ParsummableCategory) :
     Path (P.numObjects + 0) P.numObjects :=
-  Path.ofEqChain P.strictSymmetric
+  Path.stepChainChain P.strictSymmetric
 
 end ParsummableCategory
 
@@ -617,45 +617,45 @@ end ParsummableCategory
 def ips_directSum_comm_path (V W : InnerProductSpace) :
     Path (InnerProductSpace.directSum V W).dim
          (InnerProductSpace.directSum W V).dim :=
-  Path.ofEqChain (InnerProductSpace.directSum_comm_dim V W)
+  Path.stepChainChain (InnerProductSpace.directSum_comm_dim V W)
 
 /-- Path witness: inner product space direct sum is associative in dimension. -/
 def ips_directSum_assoc_path (U V W : InnerProductSpace) :
     Path (InnerProductSpace.directSum (InnerProductSpace.directSum U V) W).dim
          (InnerProductSpace.directSum U (InnerProductSpace.directSum V W)).dim :=
-  Path.ofEqChain (InnerProductSpace.directSum_assoc_dim U V W)
+  Path.stepChainChain (InnerProductSpace.directSum_assoc_dim U V W)
 
 /-- Path witness: orthogonal spectrum round-trip. -/
 def orth_structure_path (E : OrthogonalSpectrum) (n : Nat) (x : E.value n) :
     Path (E.adjointMap n (E.structureMap n x)) x :=
-  Path.ofEqChain (E.roundtrip n x)
+  Path.stepChainChain (E.roundtrip n x)
 
 /-- Path witness: global K-theory Bott periodicity. -/
 def global_k_bott_path (K : GlobalKTheory) :
     Path K.period 2 :=
-  Path.ofEqChain K.period_eq
+  Path.stepChainChain K.period_eq
 
 /-- Path witness: global Thom spectrum orientation. -/
 def global_thom_orient_path (T : GlobalThomSpectrum) :
     Path T.thomClassDim (if T.isComplex then 2 else 1) :=
-  Path.ofEqChain T.thom_dim
+  Path.stepChainChain T.thom_dim
 
 /-- Path witness: ultra-commutative monoid commutativity. -/
 def ultra_comm_path (M : UltraCommMonoid) :
     Path (M.multId + M.unitId) (M.unitId + M.multId) :=
-  Path.ofEqChain M.commutative
+  Path.stepChainChain M.commutative
 
 /-- Path witness: orbispace restriction reflexivity. -/
 def orbispace_restrict_path (O : Orbispace) (n : Nat) (x : O.value n) :
     Path (O.restrict n n (Nat.le_refl n) x) x :=
-  Path.ofEqChain (O.restrict_refl n x)
+  Path.stepChainChain (O.restrict_refl n x)
 
 /-- Path witness: orthogonal spectrum map commutativity. -/
 def orth_map_comm_path {E F : OrthogonalSpectrum} (f : OrthSpecMap E F)
     (n : Nat) (x : E.value n) :
     Path (f.levelMap (n + 1) (E.structureMap n x))
          (F.structureMap n (f.levelMap n x)) :=
-  Path.ofEqChain (f.commutes n x)
+  Path.stepChainChain (f.commutes n x)
 
 end GlobalHomotopy
 end ComputationalPaths

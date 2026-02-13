@@ -181,15 +181,15 @@ def tropicalSemiringTropVal : TropicalSemiring where
   mul := TropVal.tmul
   zero := TropVal.tzero
   one := TropVal.tone
-  add_assoc := fun a b c => Path.ofEq (TropVal.tadd_assoc a b c)
-  add_comm := fun a b => Path.ofEq (TropVal.tadd_comm a b)
-  zero_add := fun a => Path.ofEq (TropVal.tzero_tadd a)
-  mul_assoc := fun a b c => Path.ofEq (TropVal.tmul_assoc a b c)
-  one_mul := fun a => Path.ofEq (TropVal.tone_tmul a)
-  mul_one := fun a => Path.ofEq (TropVal.tmul_tone a)
-  left_distrib := fun a b c => Path.ofEq (TropVal.tmul_tadd_distrib a b c)
-  zero_mul := fun a => Path.ofEq (TropVal.tzero_tmul a)
-  add_idem := fun a => Path.ofEq (TropVal.tadd_idem a)
+  add_assoc := fun a b c => Path.stepChain (TropVal.tadd_assoc a b c)
+  add_comm := fun a b => Path.stepChain (TropVal.tadd_comm a b)
+  zero_add := fun a => Path.stepChain (TropVal.tzero_tadd a)
+  mul_assoc := fun a b c => Path.stepChain (TropVal.tmul_assoc a b c)
+  one_mul := fun a => Path.stepChain (TropVal.tone_tmul a)
+  mul_one := fun a => Path.stepChain (TropVal.tmul_tone a)
+  left_distrib := fun a b c => Path.stepChain (TropVal.tmul_tadd_distrib a b c)
+  zero_mul := fun a => Path.stepChain (TropVal.tzero_tmul a)
+  add_idem := fun a => Path.stepChain (TropVal.tadd_idem a)
 
 /-! ## Domain-Specific Rewrite Steps -/
 
@@ -296,7 +296,7 @@ def tropicalTree (v e : Nat) (lengths : Fin e → Int) (hpos : ∀ i, lengths i 
   edgeLengths := lengths
   lengths_pos := hpos
   genus := 0
-  genus_path := Path.ofEq (by omega)
+  genus_path := Path.stepChain (by omega)
 
 /-- Degree of a tropical curve (sum of directions at infinity). -/
 structure TropicalDegree (C : TropicalCurve) where
@@ -365,7 +365,7 @@ def stableIntersection_comm (n : Nat)
     (si : StableIntersection n) :
     Path (si.variety1.dim + si.variety2.dim)
          (si.variety2.dim + si.variety1.dim) :=
-  Path.ofEq (by omega)
+  Path.stepChain (by omega)
 
 /-! ## Tropical Bézout's Theorem -/
 
@@ -401,14 +401,14 @@ structure TropicalModuli (n : Nat) where
 def tropModuli04 : TropicalModuli 4 where
   n_ge_three := by omega
   dim := 1
-  dim_formula := Path.ofEq (by omega)
+  dim_formula := Path.stepChain (by omega)
   numMaxCones := 3
 
 /-- M_{0,5} has dimension 2. -/
 def tropModuli05 : TropicalModuli 5 where
   n_ge_three := by omega
   dim := 2
-  dim_formula := Path.ofEq (by omega)
+  dim_formula := Path.stepChain (by omega)
   numMaxCones := 15
 
 /-! ## Fundamental Theorem of Tropical Geometry -/
@@ -430,15 +430,15 @@ structure FundamentalThmData (n : Nat) where
     (a ⊕ b) ⊕ c = a ⊕ (b ⊕ c) via explicit steps. -/
 def tropAssocChain (a b c : TropVal) :
     Path (TropVal.tadd (TropVal.tadd a b) c) (TropVal.tadd a (TropVal.tadd b c)) :=
-  Path.ofEq (TropVal.tadd_assoc a b c)
+  Path.stepChain (TropVal.tadd_assoc a b c)
 
 /-- Multi-step: distributivity + idempotency.
     a ⊙ (b ⊕ b) = (a ⊙ b) ⊕ (a ⊙ b) = a ⊙ b. -/
 def tropDistribIdem (a b : TropVal) :
     Path (TropVal.tmul a (TropVal.tadd b b)) (TropVal.tmul a b) :=
   Path.trans
-    (Path.ofEq (TropVal.tmul_tadd_distrib a b b))
-    (Path.ofEq (TropVal.tadd_idem (TropVal.tmul a b)))
+    (Path.stepChain (TropVal.tmul_tadd_distrib a b b))
+    (Path.stepChain (TropVal.tadd_idem (TropVal.tmul a b)))
 
 /-- Multi-step chain: zero absorption + identity.
     0 ⊙ a ⊕ 1 ⊙ a = 0 ⊕ a = a. -/
@@ -447,18 +447,18 @@ def tropZeroIdentChain (a : TropVal) :
          a :=
   Path.trans
     (Path.congrArg (fun x => TropVal.tadd x (TropVal.tmul TropVal.tone a))
-      (Path.ofEq (TropVal.tzero_tmul a)))
+      (Path.stepChain (TropVal.tzero_tmul a)))
     (Path.trans
       (Path.congrArg (fun x => TropVal.tadd TropVal.tzero x)
-        (Path.ofEq (TropVal.tone_tmul a)))
-      (Path.ofEq (TropVal.tzero_tadd a)))
+        (Path.stepChain (TropVal.tone_tmul a)))
+      (Path.stepChain (TropVal.tzero_tadd a)))
 
 /-- Associativity + commutativity chain: (a ⊕ b) ⊕ c = (b ⊕ a) ⊕ c = b ⊕ (a ⊕ c). -/
 def tropCommAssocChain (a b c : TropVal) :
     Path (TropVal.tadd (TropVal.tadd a b) c) (TropVal.tadd b (TropVal.tadd a c)) :=
   Path.trans
-    (Path.congrArg (fun x => TropVal.tadd x c) (Path.ofEq (TropVal.tadd_comm a b)))
-    (Path.ofEq (TropVal.tadd_assoc b a c))
+    (Path.congrArg (fun x => TropVal.tadd x c) (Path.stepChain (TropVal.tadd_comm a b)))
+    (Path.stepChain (TropVal.tadd_assoc b a c))
 
 /-! ## Tropical Intersection Number Computation -/
 

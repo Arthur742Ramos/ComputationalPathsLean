@@ -146,8 +146,8 @@ noncomputable def adjMap {X : Type u} (x₀ : X) {Y : Pointed}
   -- q : Path (f north) (f south)
   -- We need a loop at Y.pt = f(north)
   Path.trans
-    (Path.ofEq hf.symm)
-    (Path.trans p (Path.trans (Path.symm q) (Path.ofEq hf)))
+    (Path.stepChain hf.symm)
+    (Path.trans p (Path.trans (Path.symm q) (Path.stepChain hf)))
 
 /-- **Adjunction basepoint axiom**: The adjunction map sends the basepoint to refl.
     When x = x₀, the path hf.symm · p · p⁻¹ · hf collapses to refl by:
@@ -166,39 +166,39 @@ theorem adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
   -- Simplify the middle segment: q · q⁻¹ · hf ≈ hf.
   have h_mid :
       RwEq
-        (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf)))
-        (Path.ofEq hf) := by
+        (Path.trans q (Path.trans (Path.symm q) (Path.stepChain hf)))
+        (Path.stepChain hf) := by
     -- Reassociate to (q · q⁻¹) · hf, cancel, then drop refl.
     have hassoc :
         RwEq
-          (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf)))
-          (Path.trans (Path.trans q (Path.symm q)) (Path.ofEq hf)) :=
-      rweq_symm (rweq_tt q (Path.symm q) (Path.ofEq hf))
+          (Path.trans q (Path.trans (Path.symm q) (Path.stepChain hf)))
+          (Path.trans (Path.trans q (Path.symm q)) (Path.stepChain hf)) :=
+      rweq_symm (rweq_tt q (Path.symm q) (Path.stepChain hf))
     have hcancel :
         RwEq
-          (Path.trans (Path.trans q (Path.symm q)) (Path.ofEq hf))
-          (Path.trans (Path.refl (f Suspension.north)) (Path.ofEq hf)) :=
-      rweq_trans_congr_left (Path.ofEq hf) (rweq_cmpA_inv_right q)
+          (Path.trans (Path.trans q (Path.symm q)) (Path.stepChain hf))
+          (Path.trans (Path.refl (f Suspension.north)) (Path.stepChain hf)) :=
+      rweq_trans_congr_left (Path.stepChain hf) (rweq_cmpA_inv_right q)
     have hdrop :
-        RwEq (Path.trans (Path.refl (f Suspension.north)) (Path.ofEq hf)) (Path.ofEq hf) :=
-      rweq_cmpA_refl_left (Path.ofEq hf)
+        RwEq (Path.trans (Path.refl (f Suspension.north)) (Path.stepChain hf)) (Path.stepChain hf) :=
+      rweq_cmpA_refl_left (Path.stepChain hf)
     exact RwEq.trans (RwEq.trans hassoc hcancel) hdrop
   -- Use the middle simplification inside the outer concatenation.
   have h_outer :
       RwEq
-        (Path.trans (Path.ofEq hf.symm)
-          (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf))))
-        (Path.trans (Path.ofEq hf.symm) (Path.ofEq hf)) :=
-    rweq_trans_congr_right (Path.ofEq hf.symm) h_mid
+        (Path.trans (Path.stepChain hf.symm)
+          (Path.trans q (Path.trans (Path.symm q) (Path.stepChain hf))))
+        (Path.trans (Path.stepChain hf.symm) (Path.stepChain hf)) :=
+    rweq_trans_congr_right (Path.stepChain hf.symm) h_mid
   -- Finally, hf.symm · hf is a loop inverse pair, hence refl.
   have h_end :
-      RwEq (Path.trans (Path.ofEq hf.symm) (Path.ofEq hf)) (Path.refl Y.pt) := by
+      RwEq (Path.trans (Path.stepChain hf.symm) (Path.stepChain hf)) (Path.refl Y.pt) := by
     -- `symm (ofEq hf.symm) = ofEq hf` definitionally.
-    simpa using rweq_cmpA_inv_right (Path.ofEq hf.symm)
+    simpa using rweq_cmpA_inv_right (Path.stepChain hf.symm)
   have h_total :
       RwEq
-        (Path.trans (Path.ofEq hf.symm)
-          (Path.trans q (Path.trans (Path.symm q) (Path.ofEq hf))))
+        (Path.trans (Path.stepChain hf.symm)
+          (Path.trans q (Path.trans (Path.symm q) (Path.stepChain hf))))
         (Path.refl Y.pt) :=
     RwEq.trans h_outer h_end
   simpa [adjMap, q] using h_total

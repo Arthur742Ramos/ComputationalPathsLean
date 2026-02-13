@@ -11,7 +11,7 @@ witnesses. We model:
 - Surface-specific results about π₂
 - Suspension and wedge sum operations
 
-All results are formalized with Path.ofEq coherence witnessing the
+All results are formalized with Path.stepChain coherence witnessing the
 computational-path structure.
 -/
 
@@ -123,20 +123,20 @@ theorem pi2Comp_assoc {A : Type} {a : A}
 def pi2Comp_id_left_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Comp pi2Id α) α :=
-  Path.ofEq (pi2Comp_id_left α)
+  Path.stepChain (pi2Comp_id_left α)
 
 /-- Coherence path for right identity. -/
 def pi2Comp_id_right_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Comp α pi2Id) α :=
-  Path.ofEq (pi2Comp_id_right α)
+  Path.stepChain (pi2Comp_id_right α)
 
 /-- Coherence path for associativity. -/
 def pi2Comp_assoc_path {A : Type} {a : A}
     (α β γ : Pi2 A a) :
     Path (pi2Comp (pi2Comp α β) γ)
          (pi2Comp α (pi2Comp β γ)) :=
-  Path.ofEq (pi2Comp_assoc α β γ)
+  Path.stepChain (pi2Comp_assoc α β γ)
 
 /-- Left inverse at toEq level. -/
 theorem pi2Comp_inv_left_toEq {A : Type} {a : A}
@@ -160,7 +160,7 @@ theorem pi2Inv_id {A : Type} {a : A} :
 /-- Path for inverse of identity. -/
 def pi2Inv_id_path {A : Type} {a : A} :
     Path (pi2Inv (pi2Id (A := A) (a := a))) (pi2Id (A := A) (a := a)) :=
-  Path.ofEq pi2Inv_id
+  Path.stepChain pi2Inv_id
 
 /-- Inverse distributes over composition (reverses order). -/
 theorem pi2Inv_comp {A : Type} {a : A}
@@ -172,7 +172,7 @@ theorem pi2Inv_comp {A : Type} {a : A}
 def pi2Inv_comp_path {A : Type} {a : A}
     (α β : Pi2 A a) :
     Path (pi2Inv (pi2Comp α β)) (pi2Comp (pi2Inv β) (pi2Inv α)) :=
-  Path.ofEq (pi2Inv_comp α β)
+  Path.stepChain (pi2Inv_comp α β)
 
 /-- Double inverse is identity. -/
 theorem pi2Inv_inv {A : Type} {a : A}
@@ -184,7 +184,7 @@ theorem pi2Inv_inv {A : Type} {a : A}
 def pi2Inv_inv_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Inv (pi2Inv α)) α :=
-  Path.ofEq (pi2Inv_inv α)
+  Path.stepChain (pi2Inv_inv α)
 
 /-! ## Functoriality of π₂ -/
 
@@ -202,7 +202,7 @@ theorem pi2Map_refl {A B : Type} {a : A} (f : A → B) :
 def pi2Map_refl_path {A B : Type} {a : A} (f : A → B) :
     Path (pi2Map f (pi2Id (A := A) (a := a)))
          (pi2Id (A := B) (a := f a)) :=
-  Path.ofEq (pi2Map_refl f)
+  Path.stepChain (pi2Map_refl f)
 
 /-- π₂ map distributes over composition. -/
 theorem pi2Map_comp {A B : Type} {a : A} (f : A → B)
@@ -217,7 +217,7 @@ def pi2Map_comp_path {A B : Type} {a : A} (f : A → B)
     (α β : Pi2 A a) :
     Path (pi2Map f (pi2Comp α β))
          (pi2Comp (pi2Map f α) (pi2Map f β)) :=
-  Path.ofEq (pi2Map_comp f α β)
+  Path.stepChain (pi2Map_comp f α β)
 
 /-- π₂ map commutes with inversion. -/
 theorem pi2Map_inv {A B : Type} {a : A} (f : A → B)
@@ -230,7 +230,7 @@ theorem pi2Map_inv {A B : Type} {a : A} (f : A → B)
 def pi2Map_inv_path {A B : Type} {a : A} (f : A → B)
     (α : Pi2 A a) :
     Path (pi2Map f (pi2Inv α)) (pi2Inv (pi2Map f α)) :=
-  Path.ofEq (pi2Map_inv f α)
+  Path.stepChain (pi2Map_inv f α)
 
 /-- Composition of π₂ maps: (g ∘ f)_* = g_* ∘ f_*. -/
 theorem pi2Map_comp_fun {A B C : Type} {a : A} (f : A → B) (g : B → C)
@@ -243,7 +243,7 @@ theorem pi2Map_comp_fun {A B C : Type} {a : A} (f : A → B) (g : B → C)
 def pi2Map_comp_fun_path {A B C : Type} {a : A} (f : A → B) (g : B → C)
     (α : Pi2 A a) :
     Path (pi2Map (fun x => g (f x)) α) (pi2Map g (pi2Map f α)) :=
-  Path.ofEq (pi2Map_comp_fun f g α)
+  Path.stepChain (pi2Map_comp_fun f g α)
 
 /-- π₂ map for the identity function. -/
 theorem pi2Map_id_fun {A : Type} {a : A}
@@ -259,7 +259,7 @@ theorem pi2Map_id_fun {A : Type} {a : A}
 def pi2Map_id_fun_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Map (fun x : A => x) α) α :=
-  Path.ofEq (pi2Map_id_fun α)
+  Path.stepChain (pi2Map_id_fun α)
 
 /-! ## Product formulas for π₂ -/
 
@@ -289,13 +289,13 @@ theorem pi2ProdSnd_refl {A B : Type} {a : A} {b : B} :
 def pi2ProdFst_coherence {A B : Type} {a : A} {b : B} :
     Path (pi2ProdFst (Path.refl (Path.refl (a, b))))
          (Path.refl (Path.refl a)) :=
-  Path.ofEq pi2ProdFst_refl
+  Path.stepChain pi2ProdFst_refl
 
 /-- Coherence: snd projection preserves path structure. -/
 def pi2ProdSnd_coherence {A B : Type} {a : A} {b : B} :
     Path (pi2ProdSnd (Path.refl (Path.refl (a, b))))
          (Path.refl (Path.refl b)) :=
-  Path.ofEq pi2ProdSnd_refl
+  Path.stepChain pi2ProdSnd_refl
 
 /-- Fst projection is a homomorphism. -/
 theorem pi2ProdFst_comp {A B : Type} {a : A} {b : B}
@@ -316,14 +316,14 @@ def pi2ProdFst_comp_path {A B : Type} {a : A} {b : B}
     (α β : Pi2 (A × B) (a, b)) :
     Path (pi2ProdFst (pi2Comp α β))
          (pi2Comp (pi2ProdFst α) (pi2ProdFst β)) :=
-  Path.ofEq (pi2ProdFst_comp α β)
+  Path.stepChain (pi2ProdFst_comp α β)
 
 /-- Coherence for Snd homomorphism. -/
 def pi2ProdSnd_comp_path {A B : Type} {a : A} {b : B}
     (α β : Pi2 (A × B) (a, b)) :
     Path (pi2ProdSnd (pi2Comp α β))
          (pi2Comp (pi2ProdSnd α) (pi2ProdSnd β)) :=
-  Path.ofEq (pi2ProdSnd_comp α β)
+  Path.stepChain (pi2ProdSnd_comp α β)
 
 /-- Fst projection commutes with inversion. -/
 theorem pi2ProdFst_inv {A B : Type} {a : A} {b : B}
@@ -405,7 +405,7 @@ def suspPi2Map_comp_path {A : Type} {a : A}
     (α β : Pi2 A a) :
     Path (suspPi2Map (pi2Comp α β))
          (pi2Comp (suspPi2Map (A := A) α) (suspPi2Map (A := A) β)) :=
-  Path.ofEq (suspPi2Map_comp α β)
+  Path.stepChain (suspPi2Map_comp α β)
 
 /-- Suspension map preserves inversion. -/
 theorem suspPi2Map_inv {A : Type} {a : A}
@@ -420,7 +420,7 @@ def suspPi2Map_inv_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (suspPi2Map (pi2Inv α))
          (pi2Inv (suspPi2Map (A := A) α)) :=
-  Path.ofEq (suspPi2Map_inv α)
+  Path.stepChain (suspPi2Map_inv α)
 
 /-! ## Wedge sum and π₂ -/
 
@@ -536,7 +536,7 @@ theorem pi2Iterate_one {A : Type} {a : A}
 def pi2Iterate_one_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Iterate α 1) α :=
-  Path.ofEq (pi2Iterate_one α)
+  Path.stepChain (pi2Iterate_one α)
 
 /-- Iterate two equals self composed with self. -/
 theorem pi2Iterate_two {A : Type} {a : A}
@@ -549,7 +549,7 @@ theorem pi2Iterate_two {A : Type} {a : A}
 def pi2Iterate_two_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Iterate α 2) (pi2Comp α α) :=
-  Path.ofEq (pi2Iterate_two α)
+  Path.stepChain (pi2Iterate_two α)
 
 /-! ## Constant map on π₂ -/
 
