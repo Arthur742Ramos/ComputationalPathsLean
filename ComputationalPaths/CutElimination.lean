@@ -61,6 +61,7 @@ Cut elimination is the central theorem of structural proof theory:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace CutElimination
@@ -125,22 +126,22 @@ def lj : SequentCalculus where
 /-- Path: soundness. -/
 def soundness_path (sc : SequentCalculus) :
     Path sc.soundnessObstruction 0 :=
-  Path.ofEq sc.soundness_zero
+  Path.ofEqChain sc.soundness_zero
 
 /-- Path: completeness. -/
 def completeness_path (sc : SequentCalculus) :
     Path sc.completenessObstruction 0 :=
-  Path.ofEq sc.completeness_zero
+  Path.ofEqChain sc.completeness_zero
 
 /-- Path: total rules. -/
 def total_rules_path (sc : SequentCalculus) :
     Path sc.totalRules (sc.numLogicalRules + sc.numStructuralRules) :=
-  Path.ofEq sc.total_eq
+  Path.ofEqChain sc.total_eq
 
 /-- Path: LK total is 14. -/
 def lk_total_path :
     Path lk.totalRules 14 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 end SequentCalculus
 
@@ -219,7 +220,7 @@ def cut : StructuralRule where
 /-- Path: cut is admissible (eliminable). -/
 def cut_admissible_path :
     Path cut.admissibilityObstruction 0 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 end StructuralRule
 
@@ -284,7 +285,7 @@ def minimal : CutRule where
 /-- Path: conclusion bound for propositional cut. -/
 def prop_conclusion_path :
     Path (min propositional.conclusionSize (propositional.leftPremiseSize + propositional.rightPremiseSize - 1)) propositional.conclusionSize :=
-  Path.ofEq (by simp [propositional])
+  Path.ofEqChain (by simp [propositional])
 
 end CutRule
 
@@ -421,12 +422,12 @@ theorem cut_reduction_steps_terminal (ce : CutEliminationData) :
 /-- Path: termination. -/
 def termination_path (ce : CutEliminationData) :
     Path ce.terminationObstruction 0 :=
-  Path.ofEq ce.termination_zero
+  Path.ofEqChain ce.termination_zero
 
 /-- Path: result size bound. -/
 def result_bound_path (ce : CutEliminationData) :
     Path (min ce.originalSize ce.resultSize) ce.originalSize :=
-  Path.ofEq (Nat.min_eq_left ce.result_ge)
+  Path.ofEqChain (Nat.min_eq_left ce.result_ge)
 
 end CutEliminationData
 
@@ -487,12 +488,12 @@ def compound (n d : Nat) (hn : n > 0) : SubformulaProperty where
 /-- Path: subformula property. -/
 def subformula_path (sp : SubformulaProperty) :
     Path sp.nonSubformulas 0 :=
-  Path.ofEq sp.subformula_zero
+  Path.ofEqChain sp.subformula_zero
 
 /-- Path: analyticity. -/
 def analyticity_path (sp : SubformulaProperty) :
     Path sp.analyticityObstruction 0 :=
-  Path.ofEq sp.analyticity_zero
+  Path.ofEqChain sp.analyticity_zero
 
 end SubformulaProperty
 
@@ -547,12 +548,12 @@ def multiInstance (n : Nat) (hn : n ≥ 1) (d : Nat) : HerbrandData where
 /-- Path: Herbrand theorem (tautology). -/
 def herbrand_path (hd : HerbrandData) :
     Path hd.tautologyObstruction 0 :=
-  Path.ofEq hd.tautology_zero
+  Path.ofEqChain hd.tautology_zero
 
 /-- Path: Skolem functions. -/
 def skolem_path (hd : HerbrandData) :
     Path hd.skolemObstruction 0 :=
-  Path.ofEq hd.skolem_zero
+  Path.ofEqChain hd.skolem_zero
 
 end HerbrandData
 
@@ -630,22 +631,22 @@ def general (a b c cv : Nat) (ha : a > 0) (hb : b > 0) : InterpolationData where
 /-- Path: interpolation theorem. -/
 def interpolation_path (id_ : InterpolationData) :
     Path id_.interpolationObstruction 0 :=
-  Path.ofEq (by rw [id_.interpolation_eq, id_.variable_zero, id_.leftValid_zero, id_.rightValid_zero])
+  Path.ofEqChain (by rw [id_.interpolation_eq, id_.variable_zero, id_.leftValid_zero, id_.rightValid_zero])
 
 /-- Path: variable condition. -/
 def variable_path (id_ : InterpolationData) :
     Path id_.variableObstruction 0 :=
-  Path.ofEq id_.variable_zero
+  Path.ofEqChain id_.variable_zero
 
 /-- Path: left validity. -/
 def left_valid_path (id_ : InterpolationData) :
     Path id_.leftValidObstruction 0 :=
-  Path.ofEq id_.leftValid_zero
+  Path.ofEqChain id_.leftValid_zero
 
 /-- Path: right validity. -/
 def right_valid_path (id_ : InterpolationData) :
     Path id_.rightValidObstruction 0 :=
-  Path.ofEq id_.rightValid_zero
+  Path.ofEqChain id_.rightValid_zero
 
 end InterpolationData
 
@@ -695,27 +696,27 @@ def standard : GentzenConsistency where
 /-- Path: PA is consistent. -/
 def gentzen_consistency_path (gc : GentzenConsistency) :
     Path gc.consistencyObstruction 0 :=
-  Path.ofEq gc.consistency_zero
+  Path.ofEqChain gc.consistency_zero
 
 /-- Path: independence of TI(ε₀). -/
 def independence_path (gc : GentzenConsistency) :
     Path gc.independenceObstruction 0 :=
-  Path.ofEq gc.independence_zero
+  Path.ofEqChain gc.independence_zero
 
 /-- Path: Gödel's second. -/
 def goedel_path (gc : GentzenConsistency) :
     Path gc.goedelObstruction 0 :=
-  Path.ofEq gc.goedel_zero
+  Path.ofEqChain gc.goedel_zero
 
 /-- Path: theory is PA. -/
 def theory_path (gc : GentzenConsistency) :
     Path gc.theoryLabel 1 :=
-  Path.ofEq gc.theory_eq
+  Path.ofEqChain gc.theory_eq
 
 /-- Path: ordinal is ε₀. -/
 def ordinal_path (gc : GentzenConsistency) :
     Path gc.inductionOrdinal 10 :=
-  Path.ofEq gc.ordinal_eq
+  Path.ofEqChain gc.ordinal_eq
 
 end GentzenConsistency
 
@@ -775,7 +776,7 @@ def singleCutLJ : ProofSizeBlowup where
 /-- Path: no blowup for cut-free proofs. -/
 def no_blowup_path (calc_type : Nat) :
     Path (noCuts calc_type).blowupExponent 0 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 end ProofSizeBlowup
 
@@ -837,12 +838,12 @@ def cutFree (n : Nat) (hn : n ≥ 1) (d : Nat) (hd : d ≥ 1) (hdn : d ≤ n) :
 /-- Path: proof correctness. -/
 def correctness_path (sp : SequentProof) :
     Path sp.correctnessObstruction 0 :=
-  Path.ofEq sp.correctness_zero
+  Path.ofEqChain sp.correctness_zero
 
 /-- Path: axiom proof has 0 cuts. -/
 def axiom_cutfree_path :
     Path axiomProof.numCutApps 0 :=
-  Path.ofEq rfl
+  Path.ofEqChain rfl
 
 end SequentProof
 

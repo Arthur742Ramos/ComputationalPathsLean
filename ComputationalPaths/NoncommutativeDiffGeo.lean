@@ -58,6 +58,7 @@ functions C^∞(M) by an arbitrary (possibly noncommutative) algebra A:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace NoncommutativeDiffGeo
@@ -143,7 +144,7 @@ def nc_differential_squared_path (ω : NCDifferentialForm) :
 /-- Path: form space dimension formula. -/
 def formSpaceDim_path (ω : NCDifferentialForm) :
     Path ω.formSpaceDim (ω.algDim ^ (ω.degree + 1)) :=
-  Path.ofEq ω.formSpaceDim_eq
+  Path.ofEqChain ω.formSpaceDim_eq
 
 /-- Wedge product of forms: degree is additive. -/
 def wedge (ω₁ ω₂ : NCDifferentialForm) (h : ω₁.algDim = ω₂.algDim) :
@@ -197,7 +198,7 @@ def flat (r d : Nat) (hr : r > 0) (hd : d > 0) : NCConnection where
 /-- Path: connection dimension. -/
 def conn_dim_path (c : NCConnection) :
     Path c.connDim (c.moduleRank * c.algDim ^ 2) :=
-  Path.ofEq c.connDim_eq
+  Path.ofEqChain c.connDim_eq
 
 /-- Gauge-transformed connection: ∇^g = g∇g⁻¹ preserves the module rank. -/
 def gaugeTransform (c : NCConnection) : NCConnection where
@@ -265,17 +266,17 @@ def flat (r d : Nat) (hr : r > 0) (hd : d > 0) : CurvatureData where
 /-- Path: curvature degree = 2. -/
 def curvature_degree_path (cd : CurvatureData) :
     Path cd.curvatureDegree 2 :=
-  Path.ofEq cd.curvatureDegree_eq
+  Path.ofEqChain cd.curvatureDegree_eq
 
 /-- Path: Bianchi identity ∇F = 0. -/
 def curvature_bianchi_path (cd : CurvatureData) :
     Path cd.bianchiRank 0 :=
-  Path.ofEq cd.bianchi_zero
+  Path.ofEqChain cd.bianchi_zero
 
 /-- Curvature dimension formula path. -/
 def curvature_dim_path (cd : CurvatureData) :
     Path cd.curvatureDim (cd.moduleRank ^ 2 * cd.algDim ^ 3) :=
-  Path.ofEq cd.curvatureDim_eq
+  Path.ofEqChain cd.curvatureDim_eq
 
 /-- Gauge-transformed curvature: F^g = gFg⁻¹ preserves all structure. -/
 def gaugeTransform (cd : CurvatureData) : CurvatureData where
@@ -350,12 +351,12 @@ def deg2 (d : Nat) (hd : d > 0) (val : Int) : ChernConnesCharacter where
 /-- Path: integrality of Chern character. -/
 def chern_connes_integrality_path (cc : ChernConnesCharacter) :
     Path (cc.charValueNum % Int.ofNat cc.charValueDen) 0 :=
-  Path.ofEq cc.integrality
+  Path.ofEqChain cc.integrality
 
 /-- Path: character degree is even. -/
 def char_degree_even_path (cc : ChernConnesCharacter) :
     Path (cc.charDegree % 2) 0 :=
-  Path.ofEq cc.charDegree_even
+  Path.ofEqChain cc.charDegree_even
 
 /-- The integral Chern character value. -/
 def integralValue (cc : ChernConnesCharacter) : Int :=
@@ -415,12 +416,12 @@ def standard (d p : Nat) (hd : d > 0) : NCDeRhamComplex where
 /-- Path: d² = 0 in de Rham complex. -/
 def de_rham_d_squared_path (dr : NCDeRhamComplex) (n : Nat) :
     Path (dr.dSquaredRank n) 0 :=
-  Path.ofEq (dr.dSquared_zero n)
+  Path.ofEqChain (dr.dSquared_zero n)
 
 /-- Path: de Rham complex dimension formula. -/
 def de_rham_dim_path (dr : NCDeRhamComplex) (n : Nat) (hn : n < dr.complexLength) :
     Path (dr.dim n) (dr.algDim ^ (n + 1)) :=
-  Path.ofEq (dr.dim_formula n hn)
+  Path.ofEqChain (dr.dim_formula n hn)
 
 /-- Euler characteristic of the complex. -/
 def eulerChar (dr : NCDeRhamComplex) : Int :=
@@ -433,7 +434,7 @@ def eulerChar (dr : NCDeRhamComplex) : Int :=
 /-- Path: cohomology bounded by forms. -/
 def de_rham_cohomology_path (dr : NCDeRhamComplex) (n : Nat) (hn : n < dr.complexLength) :
     Path (min (dr.cohomDim n) (dr.dim n)) (dr.cohomDim n) :=
-  Path.ofEq (Nat.min_eq_left (dr.cohom_bound n hn))
+  Path.ofEqChain (Nat.min_eq_left (dr.cohom_bound n hn))
 
 end NCDeRhamComplex
 
@@ -484,7 +485,7 @@ For trace-class T, the partial sums converge, so dividing by log(N)
 gives 0 in the limit. -/
 def dixmier_trace_vanishing_path (dt : DixmierTrace) (h : dt.traceValue = 0) :
     Path dt.traceValue 0 :=
-  Path.ofEq h
+  Path.ofEqChain h
 
 /-- Path: Dixmier trace vanishes on commutators.
 For T₁T₂ - T₂T₁ ∈ L^{(1,∞)}, Tr_ω([T₁, T₂]) = 0.
@@ -548,7 +549,7 @@ def dim4 (vol : Nat) (hvol : vol > 0) : ConnesTraceData where
 /-- Path: Connes' trace theorem formula. -/
 def connes_trace_theorem_path (ctd : ConnesTraceData) :
     Path ctd.traceValue (ctd.constNum * ctd.volume) :=
-  Path.ofEq ctd.trace_formula
+  Path.ofEqChain ctd.trace_formula
 
 /-- Wodzicki residue data. -/
 def wodzickiResidue (ctd : ConnesTraceData) : Nat := ctd.traceValue
@@ -662,12 +663,12 @@ def matrix (d n : Nat) (hd : d > 0) (hn : n > 0) : MoritaEquivalence where
 /-- Path: P ⊗ Q = A dimension. -/
 def morita_pq_path (me : MoritaEquivalence) :
     Path (me.pRank * me.qRank) me.dimA :=
-  Path.ofEq me.tensor_pq
+  Path.ofEqChain me.tensor_pq
 
 /-- Path: Q ⊗ P = B dimension. -/
 def morita_qp_path (me : MoritaEquivalence) :
     Path (me.qRank * me.pRank) me.dimB :=
-  Path.ofEq me.tensor_qp
+  Path.ofEqChain me.tensor_qp
 
 /-- Morita equivalence preserves K-theory (at the dimension level). -/
 theorem morita_k_equiv (me : MoritaEquivalence) :
@@ -719,12 +720,12 @@ def discrete (n : Nat) (hn : n ≥ 2) : SpectralDistance where
 /-- Path: distance symmetry. -/
 def distance_symm_path (sd : SpectralDistance) (i j : Nat) :
     Path (sd.distance i j) (sd.distance j i) :=
-  Path.ofEq (sd.distance_symm i j)
+  Path.ofEqChain (sd.distance_symm i j)
 
 /-- Path: reflexivity. -/
 def distance_refl_path (sd : SpectralDistance) (i : Nat) :
     Path (sd.distance i i) 0 :=
-  Path.ofEq (sd.distance_refl i)
+  Path.ofEqChain (sd.distance_refl i)
 
 end SpectralDistance
 

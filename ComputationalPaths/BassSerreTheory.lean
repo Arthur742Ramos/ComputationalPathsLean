@@ -64,6 +64,7 @@ Bass-Serre theory studies groups acting on trees and their splittings:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace BassSerreTheory
@@ -884,132 +885,132 @@ end JSJDecomposition
 /-- Path witness: segment is a tree. -/
 def segment_tree_path :
     Path FiniteGraph.segment.isTree true :=
-  Path.ofEq FiniteGraph.segment_tree
+  Path.ofEqChain FiniteGraph.segment_tree
 
 /-- Path witness: loop is not a tree. -/
 def loop_not_tree_path :
     Path FiniteGraph.loop.isTree false :=
-  Path.ofEq FiniteGraph.loop_not_tree
+  Path.ofEqChain FiniteGraph.loop_not_tree
 
 /-- Path witness: single vertex Euler char = 1. -/
 def euler_vertex_path :
     Path FiniteGraph.singleVertex.eulerChar 1 :=
-  Path.ofEq FiniteGraph.singleVertex_euler
+  Path.ofEqChain FiniteGraph.singleVertex_euler
 
 /-- Path witness: triangle Euler char = 0. -/
 def euler_triangle_path :
     Path FiniteGraph.triangle.eulerChar 0 :=
-  Path.ofEq FiniteGraph.triangle_euler
+  Path.ofEqChain FiniteGraph.triangle_euler
 
 /-- Path witness: trivial π₁ has order 1. -/
 def pi1_trivial_path :
     Path FundamentalGroupGoG.trivial.order 1 :=
-  Path.ofEq FundamentalGroupGoG.trivial_order
+  Path.ofEqChain FundamentalGroupGoG.trivial_order
 
 /-- Path witness: free group π₁ is free. -/
 def pi1_free_path :
     Path FundamentalGroupGoG.freeGroupRank1.isFree true :=
-  Path.ofEq FundamentalGroupGoG.freeGroup_isFree
+  Path.ofEqChain FundamentalGroupGoG.freeGroup_isFree
 
 /-- Path witness: free product tree has correct stabilizers. -/
 def bs_tree_stab_path :
     Path BassSerreTree.freeProductTree.vertexStabilizersAreVertexGroups true :=
-  Path.ofEq BassSerreTree.freeProduct_stab
+  Path.ofEqChain BassSerreTree.freeProduct_stab
 
 /-- Path witness: HNN tree action is without inversion. -/
 def hnn_tree_path :
     Path BassSerreTree.hnnTree.actionWithoutInversion true :=
-  Path.ofEq BassSerreTree.hnn_no_inversion
+  Path.ofEqChain BassSerreTree.hnn_no_inversion
 
 /-- Path witness: ℤ/2 * ℤ/3 is a free product. -/
 def amalgam_free_path :
     Path AmalgamatedFreeProduct.z2_star_z3.isFreeProduct true :=
-  Path.ofEq AmalgamatedFreeProduct.z2z3_free
+  Path.ofEqChain AmalgamatedFreeProduct.z2z3_free
 
 /-- Path witness: ℤ/2 * ℤ/3 is infinite. -/
 def amalgam_infinite_path :
     Path AmalgamatedFreeProduct.z2_star_z3.isInfinite true :=
-  Path.ofEq AmalgamatedFreeProduct.z2z3_infinite
+  Path.ofEqChain AmalgamatedFreeProduct.z2z3_infinite
 
 /-- Path witness: SL₂(ℤ) is not a free product. -/
 def sl2z_not_free_path :
     Path AmalgamatedFreeProduct.sl2z.isFreeProduct false :=
-  Path.ofEq AmalgamatedFreeProduct.sl2z_not_free
+  Path.ofEqChain AmalgamatedFreeProduct.sl2z_not_free
 
 /-- Path witness: SL₂(ℤ) amalgam order = 2. -/
 def sl2z_amalgam_path :
     Path AmalgamatedFreeProduct.sl2z.aOrder 2 :=
-  Path.ofEq AmalgamatedFreeProduct.sl2z_amalgam_order
+  Path.ofEqChain AmalgamatedFreeProduct.sl2z_amalgam_order
 
 /-- Path witness: ℤ HNN is infinite. -/
 def hnn_integers_path :
     Path HNNExtension.integers.extensionOrder 0 :=
-  Path.ofEq HNNExtension.integers_infinite
+  Path.ofEqChain HNNExtension.integers_infinite
 
 /-- Path witness: ℤ stable letter infinite order. -/
 def hnn_stable_path :
     Path HNNExtension.integers.stableLetterInfiniteOrder true :=
-  Path.ofEq HNNExtension.integers_stable
+  Path.ofEqChain HNNExtension.integers_stable
 
 /-- Path witness: BS(1,2) is ascending. -/
 def bs12_ascending_path :
     Path HNNExtension.bs12.isAscending true :=
-  Path.ofEq HNNExtension.bs12_ascending
+  Path.ofEqChain HNNExtension.bs12_ascending
 
 /-- Path witness: ℤ has 2 ends. -/
 def stallings_integers_path :
     Path StallingsTheorem.integers.numberOfEnds 2 :=
-  Path.ofEq StallingsTheorem.integers_ends
+  Path.ofEqChain StallingsTheorem.integers_ends
 
 /-- Path witness: ℤ splits over finite (Stallings). -/
 def stallings_split_path :
     Path StallingsTheorem.integers.splitsOverFinite true :=
-  Path.ofEq StallingsTheorem.integers_splits
+  Path.ofEqChain StallingsTheorem.integers_splits
 
 /-- Path witness: ℤ² has 1 end (Stallings). -/
 def stallings_z2_path :
     Path StallingsTheorem.integerLattice2.numberOfEnds 1 :=
-  Path.ofEq StallingsTheorem.z2_one_end
+  Path.ofEqChain StallingsTheorem.z2_one_end
 
 /-- Path witness: ℤ² doesn't split (Stallings). -/
 def stallings_z2_nosplit_path :
     Path StallingsTheorem.integerLattice2.splitsOverFinite false :=
-  Path.ofEq StallingsTheorem.z2_no_split
+  Path.ofEqChain StallingsTheorem.z2_no_split
 
 /-- Path witness: ℤ is accessible. -/
 def accessibility_integers_path :
     Path Accessibility.integers.isAccessible true :=
-  Path.ofEq Accessibility.integers_accessible
+  Path.ofEqChain Accessibility.integers_accessible
 
 /-- Path witness: ℤ² is accessible (depth 0). -/
 def accessibility_z2_depth_path :
     Path Accessibility.integerLattice2.decompositionDepth 0 :=
-  Path.ofEq Accessibility.z2_depth
+  Path.ofEqChain Accessibility.z2_depth
 
 /-- Path witness: ℤ² has trivial JSJ. -/
 def jsj_z2_path :
     Path JSJDecomposition.integerLattice2.isTrivial true :=
-  Path.ofEq JSJDecomposition.z2_trivial
+  Path.ofEqChain JSJDecomposition.z2_trivial
 
 /-- Path witness: JSJ is canonical. -/
 def jsj_canonical_path :
     Path JSJDecomposition.integerLattice2.isCanonical true :=
-  Path.ofEq JSJDecomposition.z2_canonical
+  Path.ofEqChain JSJDecomposition.z2_canonical
 
 /-- Path witness: surface group JSJ nontrivial. -/
 def jsj_surface_path (g : Nat) :
     Path (JSJDecomposition.surfaceGroup g).isTrivial false :=
-  Path.ofEq (JSJDecomposition.surface_nontrivial g)
+  Path.ofEqChain (JSJDecomposition.surface_nontrivial g)
 
 /-- Path witness: two-piece JSJ has 2 vertices. -/
 def jsj_twopiece_path :
     Path JSJDecomposition.twopiece.numVertexGroups 2 :=
-  Path.ofEq JSJDecomposition.twopiece_vertices
+  Path.ofEqChain JSJDecomposition.twopiece_vertices
 
 /-- Path witness: two-piece JSJ has 1 edge. -/
 def jsj_twopiece_edge_path :
     Path JSJDecomposition.twopiece.numEdgeGroups 1 :=
-  Path.ofEq JSJDecomposition.twopiece_edges
+  Path.ofEqChain JSJDecomposition.twopiece_edges
 
 end BassSerreTheory
 end ComputationalPaths

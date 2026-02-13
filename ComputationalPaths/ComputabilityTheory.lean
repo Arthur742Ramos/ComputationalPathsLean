@@ -70,6 +70,7 @@ computation:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace ComputabilityTheory
@@ -157,12 +158,12 @@ def exponentiation : PrimRecData where
 /-- Path: total complexity. -/
 def complexity_path (pr : PrimRecData) :
     Path pr.totalComplexity (pr.numCompositions + pr.recursionDepth) :=
-  Path.ofEq pr.complexity_eq
+  Path.ofEqChain pr.complexity_eq
 
 /-- Path: totality. -/
 def total_path (pr : PrimRecData) :
     Path pr.isTotal true :=
-  Path.ofEq pr.total_eq
+  Path.ofEqChain pr.total_eq
 
 end PrimRecData
 
@@ -214,12 +215,12 @@ def withMu (n : Nat) (baseComp : Nat) : PartialRecData where
 /-- Path: complexity. -/
 def complexity_path (prd : PartialRecData) :
     Path prd.totalComplexity (prd.primRecComplexity + prd.numMuOperators) :=
-  Path.ofEq prd.complexity_eq
+  Path.ofEqChain prd.complexity_eq
 
 /-- Path: partial recursive. -/
 def partial_rec_path (prd : PartialRecData) :
     Path prd.isPartialRecursive true :=
-  Path.ofEq prd.partial_rec_eq
+  Path.ofEqChain prd.partial_rec_eq
 
 end PartialRecData
 
@@ -314,12 +315,12 @@ def forSuccessor : KleeneRecursionData where
 /-- Path: fixed point validity. -/
 def fixed_point_path (krd : KleeneRecursionData) :
     Path krd.isFixedPoint true :=
-  Path.ofEq krd.fixed_point_eq
+  Path.ofEqChain krd.fixed_point_eq
 
 /-- Path: obstruction. -/
 def obstruction_path (krd : KleeneRecursionData) :
     Path krd.obstruction 0 :=
-  Path.ofEq krd.obstruction_eq
+  Path.ofEqChain krd.obstruction_eq
 
 end KleeneRecursionData
 
@@ -379,17 +380,17 @@ def general (m n : Nat) (hm : m > 0) (hn : n > 0) : SMNData where
 /-- Path: arity. -/
 def arity_path (smn : SMNData) :
     Path smn.totalArity (smn.numParams + smn.numArgs) :=
-  Path.ofEq smn.arity_eq
+  Path.ofEqChain smn.arity_eq
 
 /-- Path: s is total. -/
 def s_total_path (smn : SMNData) :
     Path smn.sIsTotal true :=
-  Path.ofEq smn.s_total_eq
+  Path.ofEqChain smn.s_total_eq
 
 /-- Path: s is injective. -/
 def s_injective_path (smn : SMNData) :
     Path smn.sIsInjective true :=
-  Path.ofEq smn.s_injective_eq
+  Path.ofEqChain smn.s_injective_eq
 
 end SMNData
 
@@ -447,17 +448,17 @@ def atLevel (n : Nat) : PostTheoremData where
 /-- Path: Post's theorem. -/
 def post_path (ptd : PostTheoremData) :
     Path ptd.postHolds true :=
-  Path.ofEq ptd.post_eq
+  Path.ofEqChain ptd.post_eq
 
 /-- Path: number of jumps. -/
 def jumps_path (ptd : PostTheoremData) :
     Path ptd.numJumps ptd.level :=
-  Path.ofEq ptd.jumps_eq
+  Path.ofEqChain ptd.jumps_eq
 
 /-- Path: strictness. -/
 def strict_path (ptd : PostTheoremData) :
     Path ptd.isStrict true :=
-  Path.ofEq ptd.strict_eq
+  Path.ofEqChain ptd.strict_eq
 
 end PostTheoremData
 
@@ -537,17 +538,17 @@ def sigmaAt (n : Nat) : ArithHierarchyData where
 /-- Path: quantifier alternations. -/
 def alternations_path (ah : ArithHierarchyData) :
     Path ah.quantifierAlternations ah.level :=
-  Path.ofEq ah.alternations_eq
+  Path.ofEqChain ah.alternations_eq
 
 /-- Path: strictness. -/
 def strict_path (ah : ArithHierarchyData) :
     Path ah.strictContainment true :=
-  Path.ofEq ah.strict_eq
+  Path.ofEqChain ah.strict_eq
 
 /-- Path: delta is meet. -/
 def delta_path (ah : ArithHierarchyData) :
     Path ah.deltaIsMeet true :=
-  Path.ofEq ah.delta_eq
+  Path.ofEqChain ah.delta_eq
 
 end ArithHierarchyData
 
@@ -668,12 +669,12 @@ def ofArity (n : Nat) (hn : n > 0) : EnumerationData where
 /-- Path: universal arity. -/
 def universal_arity_path (ed : EnumerationData) :
     Path ed.universalArity (ed.arity + 1) :=
-  Path.ofEq ed.universal_arity_eq
+  Path.ofEqChain ed.universal_arity_eq
 
 /-- Path: effectivity. -/
 def effective_path (ed : EnumerationData) :
     Path ed.isEffective true :=
-  Path.ofEq ed.effective_eq
+  Path.ofEqChain ed.effective_eq
 
 end EnumerationData
 
@@ -717,7 +718,7 @@ def nonREProperty : RiceShapiroData where
 /-- Path: RE obstruction. -/
 def obstruction_path (rs : RiceShapiroData) (h : rs.propertyIsRE = true) :
     Path rs.obstruction 0 :=
-  Path.ofEq (rs.re_obstruction h)
+  Path.ofEqChain (rs.re_obstruction h)
 
 end RiceShapiroData
 

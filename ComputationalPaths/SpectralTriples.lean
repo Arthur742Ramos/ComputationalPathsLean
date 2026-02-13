@@ -57,6 +57,7 @@ A spectral triple (A, H, D) encodes noncommutative Riemannian geometry:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace SpectralTriples
@@ -175,12 +176,12 @@ theorem domainDim_mono (rc : RegularityCondition) (j k : Nat) (hjk : j ≤ k) :
 /-- Path: regularity order coherence. -/
 def regularity_order_path (rc : RegularityCondition) :
     Path rc.baseDim (rc.domainDim 0) :=
-  Path.ofEq rc.base_eq
+  Path.ofEqChain rc.base_eq
 
 /-- Path: domain nesting at level k. -/
 def domain_nesting_path (rc : RegularityCondition) (k : Nat) :
     Path (min (rc.domainDim (k + 1)) (rc.domainDim k)) (rc.domainDim (k + 1)) :=
-  Path.ofEq (Nat.min_eq_left (rc.nested k))
+  Path.ofEqChain (Nat.min_eq_left (rc.nested k))
 
 end RegularityCondition
 
@@ -222,13 +223,13 @@ def linear (p : Nat) (hp : p > 0) : SummabilityData where
 def summability_bound_path (sd : SummabilityData) (n : Nat) :
     Path (min (sd.zetaPartialSum n) ((n + 1) ^ sd.spectralDim))
          (sd.zetaPartialSum n) :=
-  Path.ofEq (Nat.min_eq_left (sd.growth_bound n))
+  Path.ofEqChain (Nat.min_eq_left (sd.growth_bound n))
 
 /-- Path: partial sum monotonicity. -/
 def partial_sum_mono_path (sd : SummabilityData) (n : Nat) :
     Path (min (sd.zetaPartialSum n) (sd.zetaPartialSum (n + 1)))
          (sd.zetaPartialSum n) :=
-  Path.ofEq (Nat.min_eq_left (sd.partialSum_mono n))
+  Path.ofEqChain (Nat.min_eq_left (sd.partialSum_mono n))
 
 end SummabilityData
 
@@ -280,7 +281,7 @@ def regularityAxiom (p : Nat) (hp : p > 0) : ConnesAxiom where
 /-- Path: axiom dimension consistency. -/
 def connes_axiom_dim_path (a b : ConnesAxiom) (h : a.dim = b.dim) :
     Path a.dim b.dim :=
-  Path.ofEq h
+  Path.ofEqChain h
 
 /-- Full set of Connes axioms for a given dimension. -/
 def fullAxiomSet (p : Nat) (hp : p > 0) : List ConnesAxiom :=
@@ -305,7 +306,7 @@ theorem fullAxiomSet_length (p : Nat) (hp : p > 0) :
 /-- Path: axiom set has 7 elements. -/
 def connes_axiom_consistency_path (p : Nat) (hp : p > 0) :
     Path (fullAxiomSet p hp).length 7 :=
-  Path.ofEq (fullAxiomSet_length p hp)
+  Path.ofEqChain (fullAxiomSet_length p hp)
 
 end ConnesAxiom
 
@@ -435,7 +436,7 @@ def ko_dimension_mod8_path (kod : KODimensionData) :
 /-- Path: KO-dimension is less than 8. -/
 def ko_dim_bound_path (kod : KODimensionData) :
     Path (min kod.koDim 8) kod.koDim :=
-  Path.ofEq (Nat.min_eq_left (Nat.le_of_lt kod.koDim_lt))
+  Path.ofEqChain (Nat.min_eq_left (Nat.le_of_lt kod.koDim_lt))
 
 end KODimensionData
 
@@ -484,17 +485,17 @@ def dim4 : RealSpectralTriple where
 /-- Path: real structure sign consistency. -/
 def real_structure_signs_path (rst : RealSpectralTriple) :
     Path (rst.koDim.signs.epsilon * rst.koDim.signs.epsilon) 1 :=
-  Path.ofEq (KOSignData.epsilon_sq rst.koDim.signs)
+  Path.ofEqChain (KOSignData.epsilon_sq rst.koDim.signs)
 
 /-- Path: grading squares to 1 for even triples. -/
 def grading_path (rst : RealSpectralTriple) (h : rst.isEven = true) :
     Path rst.gradingSquared 1 :=
-  Path.ofEq (rst.grading_eq h)
+  Path.ofEqChain (rst.grading_eq h)
 
 /-- Path: real order is 2. -/
 def real_order_path (rst : RealSpectralTriple) :
     Path rst.realOrder 2 :=
-  Path.ofEq rst.realOrder_eq
+  Path.ofEqChain rst.realOrder_eq
 
 end RealSpectralTriple
 
@@ -534,12 +535,12 @@ def dim4 : SpectralDimensionData where
 /-- Path: full dimension = 2 * half dimension. -/
 def spectral_dimension_path (sdd : SpectralDimensionData) :
     Path sdd.fullDim (2 * sdd.halfDim) :=
-  Path.ofEq sdd.dim_eq
+  Path.ofEqChain sdd.dim_eq
 
 /-- Path: summability dimension matches geometric dimension. -/
 def summability_dimension_path (sdd : SpectralDimensionData) :
     Path sdd.summability.spectralDim sdd.fullDim :=
-  Path.ofEq sdd.dim_match
+  Path.ofEqChain sdd.dim_match
 
 end SpectralDimensionData
 
@@ -581,7 +582,7 @@ def negEigenvalue (es : EigenvalueSymmetry) (k : Nat) : Int :=
 /-- Path: eigenvalue symmetry (λ + (-λ) = 0). -/
 def dirac_eigenvalue_symmetry_path (es : EigenvalueSymmetry) (k : Nat) :
     Path (Int.ofNat (es.posEigenvalue k) + es.negEigenvalue k) 0 :=
-  Path.ofEq (by simp [negEigenvalue]; omega)
+  Path.ofEqChain (by simp [negEigenvalue]; omega)
 
 /-- Total number of eigenvalues (counting ± pairs and possible zero). -/
 def totalEigenvalues (es : EigenvalueSymmetry) (hasZero : Bool) : Nat :=
@@ -590,7 +591,7 @@ def totalEigenvalues (es : EigenvalueSymmetry) (hasZero : Bool) : Nat :=
 /-- Path: total eigenvalue count coherence. -/
 def total_eigenvalue_path (es : EigenvalueSymmetry) :
     Path (es.totalEigenvalues false) (2 * es.numPairs) :=
-  Path.ofEq (by simp [totalEigenvalues])
+  Path.ofEqChain (by simp [totalEigenvalues])
 
 end EigenvalueSymmetry
 
@@ -636,17 +637,17 @@ def sign_table_period_path (n : Nat) :
 /-- Path: ε² = 1 for all KO-dimensions. -/
 def sign_table_path (n : Nat) :
     Path ((signTable n).epsilon * (signTable n).epsilon) 1 :=
-  Path.ofEq (KOSignData.epsilon_sq (signTable n))
+  Path.ofEqChain (KOSignData.epsilon_sq (signTable n))
 
 /-- Path: ε'² = 1 for all KO-dimensions. -/
 def sign_table_prime_path (n : Nat) :
     Path ((signTable n).epsilonPrime * (signTable n).epsilonPrime) 1 :=
-  Path.ofEq (KOSignData.epsilonPrime_sq (signTable n))
+  Path.ofEqChain (KOSignData.epsilonPrime_sq (signTable n))
 
 /-- Path: ε''² = 1 for all KO-dimensions. -/
 def sign_table_double_prime_path (n : Nat) :
     Path ((signTable n).epsilonDoublePrime * (signTable n).epsilonDoublePrime) 1 :=
-  Path.ofEq (KOSignData.epsilonDoublePrime_sq (signTable n))
+  Path.ofEqChain (KOSignData.epsilonDoublePrime_sq (signTable n))
 
 /-! ## Commutative Case: Riemannian Manifold Recovery -/
 
@@ -681,12 +682,12 @@ def dim4 : CommutativeReconstruction where
 /-- Path: all 7 axioms satisfied for commutative case. -/
 def reconstruction_path (cr : CommutativeReconstruction) :
     Path cr.axiomsSatisfied 7 :=
-  Path.ofEq cr.all_axioms
+  Path.ofEqChain cr.all_axioms
 
 /-- Path: spinor rank formula. -/
 def spinor_rank_path (cr : CommutativeReconstruction) :
     Path cr.spinorRank (2 ^ (cr.manifoldDim / 2)) :=
-  Path.ofEq cr.spinorRank_eq
+  Path.ofEqChain cr.spinorRank_eq
 
 end CommutativeReconstruction
 
@@ -726,7 +727,7 @@ def dim4 (cutoff : Nat) (hc : cutoff > 0) : SpectralAction where
 /-- Path: number of terms coherence. -/
 def spectral_action_terms_path (sa : SpectralAction) :
     Path sa.numTerms (sa.dim / 2 + 1) :=
-  Path.ofEq sa.numTerms_eq
+  Path.ofEqChain sa.numTerms_eq
 
 end SpectralAction
 
@@ -768,7 +769,7 @@ def trivialOdd : FredholmModule where
 /-- Path: odd Fredholm modules have index 0. -/
 def fredholm_index_odd_path (fm : FredholmModule) (h : fm.isEven = false) :
     Path fm.index 0 :=
-  Path.ofEq (fm.index_parity h)
+  Path.ofEqChain (fm.index_parity h)
 
 /-- Direct sum of Fredholm modules. -/
 def directSum (f g : FredholmModule) (h : f.isEven = g.isEven) : FredholmModule where
@@ -816,7 +817,7 @@ def all_signs_square_path (n : Nat) :
   have h1 := KOSignData.epsilon_sq (signTable n)
   have h2 := KOSignData.epsilonPrime_sq (signTable n)
   have h3 := KOSignData.epsilonDoublePrime_sq (signTable n)
-  exact Path.ofEq (by omega)
+  exact Path.ofEqChain (by omega)
 
 end SpectralTriples
 end ComputationalPaths

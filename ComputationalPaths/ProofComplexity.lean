@@ -63,6 +63,7 @@ with deep connections to computational complexity:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace ProofComplexity
@@ -147,17 +148,17 @@ def cuttingPlanes : ProofSystem where
 /-- Path: soundness. -/
 def soundness_path (ps : ProofSystem) :
     Path ps.soundnessObstruction 0 :=
-  Path.ofEq ps.soundness_zero
+  Path.ofEqChain ps.soundness_zero
 
 /-- Path: completeness. -/
 def completeness_path (ps : ProofSystem) :
     Path ps.completenessObstruction 0 :=
-  Path.ofEq ps.completeness_zero
+  Path.ofEqChain ps.completeness_zero
 
 /-- Path: verifiability. -/
 def verifiability_path (ps : ProofSystem) :
     Path ps.verifiabilityObstruction 0 :=
-  Path.ofEq ps.verifiability_zero
+  Path.ofEqChain ps.verifiability_zero
 
 end ProofSystem
 
@@ -218,17 +219,17 @@ def expanded : FregeSystem where
 /-- Path: Frege soundness. -/
 def frege_soundness_path (fs : FregeSystem) :
     Path fs.soundnessObstruction 0 :=
-  Path.ofEq fs.soundness_zero
+  Path.ofEqChain fs.soundness_zero
 
 /-- Path: p-equivalence. -/
 def frege_pequiv_path (fs : FregeSystem) :
     Path fs.pequivObstruction 0 :=
-  Path.ofEq fs.pequiv_zero
+  Path.ofEqChain fs.pequiv_zero
 
 /-- Path: total rules. -/
 def frege_total_path (fs : FregeSystem) :
     Path fs.totalRules (fs.numAxiomSchemes + fs.numInferenceRules) :=
-  Path.ofEq fs.total_eq
+  Path.ofEqChain fs.total_eq
 
 end FregeSystem
 
@@ -286,12 +287,12 @@ def withExtensions (k : Nat) : ExtendedFrege where
 /-- Path: EF simulates Frege. -/
 def ef_simulates_frege_path (ef : ExtendedFrege) :
     Path ef.simulatesFrege 0 :=
-  Path.ofEq ef.simFrege_zero
+  Path.ofEqChain ef.simFrege_zero
 
 /-- Path: total rules. -/
 def ef_total_path (ef : ExtendedFrege) :
     Path ef.totalRules (ef.baseRules + 1) :=
-  Path.ofEq ef.total_eq
+  Path.ofEqChain ef.total_eq
 
 end ExtendedFrege
 
@@ -351,12 +352,12 @@ def general (n m : Nat) (hn : n > 0) (hm : m > 0) (w : Nat) (hw : w ≤ n) :
 /-- Path: resolution refutation completeness. -/
 def resolution_refutation_path (rs : ResolutionSystem) :
     Path rs.completenessObstruction 0 :=
-  Path.ofEq rs.completeness_zero
+  Path.ofEqChain rs.completeness_zero
 
 /-- Path: width bound. -/
 def width_bound_path (rs : ResolutionSystem) :
     Path (min rs.maxWidth rs.numVariables) rs.maxWidth :=
-  Path.ofEq (Nat.min_eq_left rs.width_le)
+  Path.ofEqChain (Nat.min_eq_left rs.width_le)
 
 end ResolutionSystem
 
@@ -420,12 +421,12 @@ def exponential (n : Nat) (hn : n > 0) : ProofLength where
 /-- Path: lower bound verified. -/
 def lower_bound_path (pl : ProofLength) :
     Path pl.lowerBoundObstruction 0 :=
-  Path.ofEq pl.lowerBound_zero
+  Path.ofEqChain pl.lowerBound_zero
 
 /-- Path: depth ≤ length. -/
 def depth_le_path (pl : ProofLength) :
     Path (min pl.proofDepth pl.proofLength) pl.proofDepth :=
-  Path.ofEq (Nat.min_eq_left pl.depth_le)
+  Path.ofEqChain (Nat.min_eq_left pl.depth_le)
 
 end ProofLength
 
@@ -501,12 +502,12 @@ def noSpeedup (n : Nat) (hn : n > 0) : SpeedUpData where
 /-- Path: exponential speed-up. -/
 def speedup_exponential_path (su : SpeedUpData) :
     Path su.speedupObstruction 0 :=
-  Path.ofEq su.speedup_zero
+  Path.ofEqChain su.speedup_zero
 
 /-- Path: speed-up bound. -/
 def speedup_bound_path (su : SpeedUpData) :
     Path (min su.strongLength su.weakLength) su.strongLength :=
-  Path.ofEq (Nat.min_eq_left su.speedup)
+  Path.ofEqChain (Nat.min_eq_left su.speedup)
 
 end SpeedUpData
 
@@ -572,17 +573,17 @@ def php (n : Nat) (hn : n > 0) : PropTranslation where
 /-- Path: translation soundness. -/
 def translation_soundness_path (pt : PropTranslation) :
     Path pt.soundnessObstruction 0 :=
-  Path.ofEq pt.soundness_zero
+  Path.ofEqChain pt.soundness_zero
 
 /-- Path: translation faithfulness. -/
 def translation_faithfulness_path (pt : PropTranslation) :
     Path pt.faithfulnessObstruction 0 :=
-  Path.ofEq pt.faithfulness_zero
+  Path.ofEqChain pt.faithfulness_zero
 
 /-- Path: poly-time computability. -/
 def translation_polytime_path (pt : PropTranslation) :
     Path pt.polytimeObstruction 0 :=
-  Path.ofEq pt.polytime_zero
+  Path.ofEqChain pt.polytime_zero
 
 end PropTranslation
 
@@ -663,17 +664,17 @@ def s2 (i : Nat) : BoundedArithmetic where
 /-- Path: bounded arithmetic soundness. -/
 def bounded_arithmetic_path (ba : BoundedArithmetic) :
     Path ba.soundnessObstruction 0 :=
-  Path.ofEq ba.soundness_zero
+  Path.ofEqChain ba.soundness_zero
 
 /-- Path: definability. -/
 def definability_path (ba : BoundedArithmetic) :
     Path ba.definabilityObstruction 0 :=
-  Path.ofEq ba.definability_zero
+  Path.ofEqChain ba.definability_zero
 
 /-- Path: conservation. -/
 def conservation_path (ba : BoundedArithmetic) :
     Path ba.conservationObstruction 0 :=
-  Path.ofEq ba.conservation_zero
+  Path.ofEqChain ba.conservation_zero
 
 end BoundedArithmetic
 
@@ -739,12 +740,12 @@ def fregeSimulatesResolution : CookTheorem where
 /-- Path: Cook simulation. -/
 def cook_simulation_path (ct : CookTheorem) :
     Path ct.simulationObstruction 0 :=
-  Path.ofEq ct.simulation_zero
+  Path.ofEqChain ct.simulation_zero
 
 /-- Path: polynomial bound. -/
 def cook_polynomial_path (ct : CookTheorem) :
     Path ct.polynomialObstruction 0 :=
-  Path.ofEq ct.polynomial_zero
+  Path.ofEqChain ct.polynomial_zero
 
 end CookTheorem
 
@@ -789,12 +790,12 @@ def pv : FeasibleArithmetic where
 /-- Path: characterization. -/
 def feasible_characterization_path (fa : FeasibleArithmetic) :
     Path fa.characterizationObstruction 0 :=
-  Path.ofEq fa.characterization_zero
+  Path.ofEqChain fa.characterization_zero
 
 /-- Path: conservativity. -/
 def feasible_conservativity_path (fa : FeasibleArithmetic) :
     Path fa.conservativityObstruction 0 :=
-  Path.ofEq fa.conservativity_zero
+  Path.ofEqChain fa.conservativity_zero
 
 end FeasibleArithmetic
 
@@ -847,7 +848,7 @@ def tseitin (n : Nat) (hn : n > 0) : LowerBound where
 /-- Path: lower bound verified. -/
 def lower_bound_verified_path (lb : LowerBound) :
     Path lb.verificationObstruction 0 :=
-  Path.ofEq lb.verification_zero
+  Path.ofEqChain lb.verification_zero
 
 end LowerBound
 
@@ -901,12 +902,12 @@ def efStricterThanRes : SimulationSeparation where
 /-- Path: simulation verified. -/
 def simulation_verified_path (ss : SimulationSeparation) :
     Path ss.verificationObstruction 0 :=
-  Path.ofEq ss.verification_zero
+  Path.ofEqChain ss.verification_zero
 
 /-- Path: p-equivalence. -/
 def pequiv_path (ss : SimulationSeparation) :
     Path ss.pEquivalent (ss.aSimulatesB && ss.bSimulatesA) :=
-  Path.ofEq ss.pequiv_eq
+  Path.ofEqChain ss.pequiv_eq
 
 end SimulationSeparation
 

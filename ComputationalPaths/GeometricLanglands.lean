@@ -52,6 +52,7 @@ Langlands correspondence from number theory to algebraic geometry:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace GeometricLanglands
@@ -140,17 +141,17 @@ def bn (n : Nat) (hn : n > 0) : LanglandsDualData where
 /-- Path: dual rank = rank. -/
 def dual_rank_path (ldd : LanglandsDualData) :
     Path ldd.numPosRootsDual ldd.numPosRootsG :=
-  Path.ofEq ldd.roots_eq
+  Path.ofEqChain ldd.roots_eq
 
 /-- Path: dimensions match. -/
 def dim_match_path (ldd : LanglandsDualData) :
     Path ldd.dimG ldd.dimDual :=
-  Path.ofEq ldd.dim_match
+  Path.ofEqChain ldd.dim_match
 
 /-- Path: dimension formula for G. -/
 def dimG_path (ldd : LanglandsDualData) :
     Path ldd.dimG (ldd.rank + 2 * ldd.numPosRootsG) :=
-  Path.ofEq ldd.dimG_eq
+  Path.ofEqChain ldd.dimG_eq
 
 end LanglandsDualData
 
@@ -215,12 +216,12 @@ def gln (n : Nat) (hn : n > 0) (g : Nat) (hg : g > 0) :
 /-- Path: eigensheaf property. -/
 def eigensheaf_path (hed : HeckeEigensheafData) :
     Path hed.isEigensheaf true :=
-  Path.ofEq hed.eigensheaf_holds
+  Path.ofEqChain hed.eigensheaf_holds
 
 /-- Path: Hecke obstruction vanishes. -/
 def hecke_path (hed : HeckeEigensheafData) :
     Path hed.heckeObstruction 0 :=
-  Path.ofEq hed.hecke_vanishes
+  Path.ofEqChain hed.hecke_vanishes
 
 end HeckeEigensheafData
 
@@ -302,22 +303,22 @@ def general (r : Nat) (hr : r > 0) (k : Nat) (hk : k > 0) :
 /-- Path: Satake equivalence. -/
 def satake_path (gsd : GeometricSatakeData) :
     Path gsd.satakeObstruction 0 :=
-  Path.ofEq gsd.satake
+  Path.ofEqChain gsd.satake
 
 /-- Path: bijection on simples. -/
 def satake_bijection_path (gsd : GeometricSatakeData) :
     Path gsd.numOrbits gsd.numDominantWeights :=
-  Path.ofEq gsd.satake_bijection
+  Path.ofEqChain gsd.satake_bijection
 
 /-- Path: tensor equivalence. -/
 def tensor_path (gsd : GeometricSatakeData) :
     Path gsd.isTensorEquiv true :=
-  Path.ofEq gsd.tensor_holds
+  Path.ofEqChain gsd.tensor_holds
 
 /-- Path: convolution = tensor. -/
 def convolution_path (gsd : GeometricSatakeData) :
     Path gsd.convolutionObstruction 0 :=
-  Path.ofEq gsd.convolution_eq
+  Path.ofEqChain gsd.convolution_eq
 
 end GeometricSatakeData
 
@@ -368,17 +369,17 @@ def gl1 (g : Nat) (hg : g > 0) : AutomorphicSheafData where
 /-- Path: automorphic property. -/
 def automorphic_path (asd : AutomorphicSheafData) :
     Path asd.automorphicObstruction 0 :=
-  Path.ofEq asd.automorphic
+  Path.ofEqChain asd.automorphic
 
 /-- Path: D-module property. -/
 def dmodule_path (asd : AutomorphicSheafData) :
     Path asd.isDModule true :=
-  Path.ofEq asd.dmodule_holds
+  Path.ofEqChain asd.dmodule_holds
 
 /-- Path: Hecke eigensheaf property. -/
 def hecke_path (asd : AutomorphicSheafData) :
     Path asd.isHeckeEigen true :=
-  Path.ofEq asd.hecke_holds
+  Path.ofEqChain asd.hecke_holds
 
 end AutomorphicSheafData
 
@@ -448,12 +449,12 @@ def gl2 (g : Nat) (hg : g ≥ 2) : SpectralDecompData where
 /-- Path: spectral decomposition. -/
 def spectral_path (sdd : SpectralDecompData) :
     Path sdd.spectralObstruction 0 :=
-  Path.ofEq sdd.spectral
+  Path.ofEqChain sdd.spectral
 
 /-- Path: generic fiber. -/
 def generic_fiber_path (sdd : SpectralDecompData) :
     Path sdd.numGenericFibers 1 :=
-  Path.ofEq sdd.generic_fiber_eq
+  Path.ofEqChain sdd.generic_fiber_eq
 
 end SpectralDecompData
 
@@ -523,17 +524,17 @@ def general (r : Nat) (hr : r > 0) (n : Nat) (hn : n > 0) (g : Nat) :
 /-- Path: base dimension. -/
 def baseDim_path (bdg : BDGrassmannianData) :
     Path bdg.baseDim bdg.numPoints :=
-  Path.ofEq bdg.baseDim_eq
+  Path.ofEqChain bdg.baseDim_eq
 
 /-- Path: factorization property. -/
 def factorization_path (bdg : BDGrassmannianData) :
     Path bdg.hasFactorization true :=
-  Path.ofEq bdg.factorization_holds
+  Path.ofEqChain bdg.factorization_holds
 
 /-- Path: factorization formula. -/
 def factorization_eq_path (bdg : BDGrassmannianData) :
     Path bdg.disjointFiberLabel (bdg.numPoints * bdg.diagonalFiberLabel) :=
-  Path.ofEq bdg.factorization_eq
+  Path.ofEqChain bdg.factorization_eq
 
 end BDGrassmannianData
 
@@ -588,17 +589,17 @@ def gl2 (g : Nat) (hg : g ≥ 2) : HitchinData where
 /-- Path: cotangent dimension. -/
 def cotangent_path (hd : HitchinData) :
     Path hd.cotangentDim (2 * hd.bunDim) :=
-  Path.ofEq hd.cotangent_eq
+  Path.ofEqChain hd.cotangent_eq
 
 /-- Path: Hitchin base = bunDim (Lagrangian). -/
 def hitchin_base_path (hd : HitchinData) :
     Path hd.hitchinBaseDim hd.bunDim :=
-  Path.ofEq hd.hitchin_base_eq
+  Path.ofEqChain hd.hitchin_base_eq
 
 /-- Path: generic fiber is abelian. -/
 def fiber_abelian_path (hd : HitchinData) :
     Path hd.genericFiberAbelian true :=
-  Path.ofEq hd.fiber_abelian
+  Path.ofEqChain hd.fiber_abelian
 
 end HitchinData
 
@@ -642,7 +643,7 @@ def master_automorphic_gl1_path :
 /-- Master: SL(2) dual dim = 3. -/
 def master_sl2_dim_path :
     Path LanglandsDualData.sl2.dimG 3 :=
-  Path.ofEq (by simp [LanglandsDualData.sl2])
+  Path.ofEqChain (by simp [LanglandsDualData.sl2])
 
 end GeometricLanglands
 end ComputationalPaths

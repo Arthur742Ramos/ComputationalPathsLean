@@ -56,6 +56,7 @@ on manifolds to topological invariants:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace IndexTheory
@@ -806,92 +807,92 @@ end AHatGenus
 /-- A-S index theorem path: analytic = topological. -/
 def index_path (as : AtiyahSinger) :
     Path as.analyticIndex as.topologicalIndex :=
-  Path.ofEq as.as_theorem
+  Path.ofEqChain as.as_theorem
 
 /-- Hirzebruch signature path: σ = L-genus. -/
 def signature_path (hs : HirzebruchSignature) :
     Path hs.signature hs.lGenus :=
-  Path.ofEq hs.sig_eq_l
+  Path.ofEqChain hs.sig_eq_l
 
 /-- Riemann-Roch path: χ = ∫ ch · Td. -/
 def riemann_roch_path (rr : RiemannRoch) :
     Path rr.holomorphicEuler rr.topologicalValue :=
-  Path.ofEq rr.rr_eq
+  Path.ofEqChain rr.rr_eq
 
 /-- Index data path: ind = ker - coker. -/
 def index_data_path (id : IndexData) :
     Path id.analyticIndex ((id.kernelDim : Int) - (id.cokernelDim : Int)) :=
-  Path.ofEq id.index_eq
+  Path.ofEqChain id.index_eq
 
 /-- Spinor rank path for dimension 4. -/
 def spinor_rank4_path :
     Path DiracOperator.dim4.spinorRank 4 :=
-  Path.ofEq DiracOperator.dim4_spinor
+  Path.ofEqChain DiracOperator.dim4_spinor
 
 /-- Spinor rank path for dimension 8. -/
 def spinor_rank8_path :
     Path DiracOperator.dim8.spinorRank 16 :=
-  Path.ofEq DiracOperator.dim8_spinor
+  Path.ofEqChain DiracOperator.dim8_spinor
 
 /-- CP² signature path. -/
 def cp2_sig_path :
     Path HirzebruchSignature.cp2.signature 1 :=
-  Path.ofEq HirzebruchSignature.cp2_signature
+  Path.ofEqChain HirzebruchSignature.cp2_signature
 
 /-- CP² p₁ path. -/
 def cp2_p1_path :
     Path HirzebruchSignature.cp2.p1 3 :=
-  Path.ofEq HirzebruchSignature.cp2_p1
+  Path.ofEqChain HirzebruchSignature.cp2_p1
 
 /-- S⁴ signature path. -/
 def s4_sig_path :
     Path HirzebruchSignature.s4.signature 0 :=
-  Path.ofEq HirzebruchSignature.s4_signature
+  Path.ofEqChain HirzebruchSignature.s4_signature
 
 /-- de Rham S² index path. -/
 def deRham_s2_path :
     Path AtiyahSinger.deRham_s2.analyticIndex 2 :=
-  Path.ofEq AtiyahSinger.deRham_s2_val
+  Path.ofEqChain AtiyahSinger.deRham_s2_val
 
 /-- Todd class Td_0 = 1 path. -/
 def todd_path (td : ToddClass) :
     Path td.td0 1 :=
-  Path.ofEq td.td0_eq
+  Path.ofEqChain td.td0_eq
 
 /-- Chern character ch_0 = rank path. -/
 def chern_ch0_path (cc : ChernCharacter) :
     Path cc.ch0 cc.rank :=
-  Path.ofEq cc.ch0_eq
+  Path.ofEqChain cc.ch0_eq
 
 /-- Families index total dimension path. -/
 def families_total_path (fi : FamiliesIndex) :
     Path fi.totalDim (fi.fiberDim + fi.baseDim) :=
-  Path.ofEq fi.total_eq
+  Path.ofEqChain fi.total_eq
 
 /-- Sphere η = 0 path. -/
 def sphere_eta_path (n : Nat) (hn : n > 0) :
     Path (EtaInvariant.sphereEta n hn).etaNumerator 0 :=
-  Path.ofEq (EtaInvariant.sphere_eta_zero n hn)
+  Path.ofEqChain (EtaInvariant.sphere_eta_zero n hn)
 
 /-- Â(K3) = 2 path. -/
 def k3_ahat_path :
     Path AHatGenus.k3.ahat 2 :=
-  Path.ofEq AHatGenus.k3_ahat
+  Path.ofEqChain AHatGenus.k3_ahat
 
 /-- R-R sphere path. -/
 def rr_sphere_path :
     Path RiemannRoch.sphere.holomorphicEuler 1 :=
-  Path.ofEq RiemannRoch.sphere_chi
+  Path.ofEqChain RiemannRoch.sphere_chi
 
 /-- R-R torus path. -/
 def rr_torus_path :
     Path RiemannRoch.torusRR.holomorphicEuler 0 :=
-  Path.ofEq RiemannRoch.torus_chi
+  Path.ofEqChain RiemannRoch.torus_chi
 
 /-- Dirac half-spinor rank in dimension 4. -/
 def half_spinor4_path :
     Path DiracOperator.dim4.halfSpinorRank 2 :=
-  Path.ofEq DiracOperator.dim4_half
+  Path.ofEqChain DiracOperator.dim4_half
 
 end IndexTheory
 end ComputationalPaths

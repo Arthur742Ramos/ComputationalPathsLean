@@ -68,6 +68,7 @@ the second level of the Chomsky hierarchy:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace ContextFreeGrammars
@@ -126,7 +127,7 @@ def ofSize (n m r : Nat) (hn : n > 0) (hm : m > 0) (hr : r > 0) : CFGData where
 /-- Path: total symbols. -/
 def total_path (cfg : CFGData) :
     Path cfg.totalSymbols (cfg.numNonterminals + cfg.numTerminals) :=
-  Path.ofEq cfg.total_eq
+  Path.ofEqChain cfg.total_eq
 
 end CFGData
 
@@ -217,12 +218,12 @@ def singleLeaf : ParseTreeData where
 /-- Path: total nodes. -/
 def total_path (pt : ParseTreeData) :
     Path pt.totalNodes (pt.numInternalNodes + pt.numLeaves) :=
-  Path.ofEq pt.total_eq
+  Path.ofEqChain pt.total_eq
 
 /-- Path: yield length. -/
 def yield_path (pt : ParseTreeData) :
     Path pt.yieldLength pt.numLeaves :=
-  Path.ofEq pt.yield_eq
+  Path.ofEqChain pt.yield_eq
 
 end ParseTreeData
 
@@ -290,12 +291,12 @@ def alreadyCNF (r n : Nat) (hr : r > 0) (hn : n > 0) : ChomskyNFData where
 /-- Path: CNF valid. -/
 def cnf_valid_path (cnf : ChomskyNFData) :
     Path cnf.isInCNF true :=
-  Path.ofEq cnf.cnf_valid
+  Path.ofEqChain cnf.cnf_valid
 
 /-- Path: language preserved. -/
 def preserved_path (cnf : ChomskyNFData) :
     Path cnf.languagePreserved true :=
-  Path.ofEq cnf.preserved_eq
+  Path.ofEqChain cnf.preserved_eq
 
 end ChomskyNFData
 
@@ -351,12 +352,12 @@ def singleChar (g : Nat) (hg : g > 0) (accepted : Bool) : CYKData where
 /-- Path: table entries. -/
 def table_path (cyk : CYKData) :
     Path cyk.tableEntries (cyk.stringLength * (cyk.stringLength + 1) / 2) :=
-  Path.ofEq cyk.table_eq
+  Path.ofEqChain cyk.table_eq
 
 /-- Path: time complexity. -/
 def time_path (cyk : CYKData) :
     Path cyk.timeComplexity (cyk.stringLength ^ 3 * cyk.grammarSize) :=
-  Path.ofEq cyk.time_eq
+  Path.ofEqChain cyk.time_eq
 
 end CYKData
 
@@ -415,12 +416,12 @@ def exampleAnBnCn : CFLPumpingData where
 /-- Path: decomposition. -/
 def decomposition_path (pl : CFLPumpingData) :
     Path (pl.uLength + pl.vLength + pl.xLength + pl.yLength + pl.zLength) pl.stringLength :=
-  Path.ofEq pl.decomposition_eq
+  Path.ofEqChain pl.decomposition_eq
 
 /-- Path: pumping property. -/
 def pump_path (pl : CFLPumpingData) :
     Path pl.canPump true :=
-  Path.ofEq pl.pump_eq
+  Path.ofEqChain pl.pump_eq
 
 /-- Pumped string length for pumping i times. -/
 def pumpedLength (pl : CFLPumpingData) (i : Nat) : Nat :=
@@ -431,7 +432,7 @@ def pumped_one_path (pl : CFLPumpingData) :
     Path (pl.pumpedLength 1) pl.stringLength := by
   unfold pumpedLength
   simp [Nat.one_mul]
-  exact Path.ofEq pl.decomposition_eq
+  exact Path.ofEqChain pl.decomposition_eq
 
 end CFLPumpingData
 
@@ -529,12 +530,12 @@ def anbnEquiv : PDAEquivalenceData where
 /-- Path: language equivalence. -/
 def language_path (pe : PDAEquivalenceData) :
     Path pe.languageEqual true :=
-  Path.ofEq pe.language_eq
+  Path.ofEqChain pe.language_eq
 
 /-- Path: direction obstruction. -/
 def direction_path (pe : PDAEquivalenceData) :
     Path pe.directionObstruction 0 :=
-  Path.ofEq pe.direction_eq
+  Path.ofEqChain pe.direction_eq
 
 end PDAEquivalenceData
 
@@ -590,7 +591,7 @@ def example4 : OgdenData where
 /-- Path: Ogden property. -/
 def ogden_path (od : OgdenData) :
     Path od.ogdenHolds true :=
-  Path.ofEq od.ogden_eq
+  Path.ofEqChain od.ogden_eq
 
 end OgdenData
 
@@ -692,12 +693,12 @@ def example57 : GrammarTransformData where
 /-- Path: language preserved. -/
 def preserved_path (gt : GrammarTransformData) :
     Path gt.languagePreserved true :=
-  Path.ofEq gt.preserved_eq
+  Path.ofEqChain gt.preserved_eq
 
 /-- Path: transformation obstruction. -/
 def obstruction_path (gt : GrammarTransformData) :
     Path gt.obstruction 0 :=
-  Path.ofEq gt.obstruction_eq
+  Path.ofEqChain gt.obstruction_eq
 
 end GrammarTransformData
 
@@ -750,17 +751,17 @@ def standard : CFLClosureData where
 /-- Path: union closed. -/
 def union_path (cc : CFLClosureData) :
     Path cc.unionClosed true :=
-  Path.ofEq cc.union_eq
+  Path.ofEqChain cc.union_eq
 
 /-- Path: intersection NOT closed. -/
 def intersection_path (cc : CFLClosureData) :
     Path cc.intersectionClosed false :=
-  Path.ofEq cc.intersection_eq
+  Path.ofEqChain cc.intersection_eq
 
 /-- Path: number of closed operations. -/
 def closed_ops_path (cc : CFLClosureData) :
     Path cc.numClosedOps 3 :=
-  Path.ofEq cc.closed_ops_eq
+  Path.ofEqChain cc.closed_ops_eq
 
 end CFLClosureData
 

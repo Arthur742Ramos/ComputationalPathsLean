@@ -52,6 +52,7 @@ The HHR norm is central to the resolution of the Kervaire invariant problem:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace NormMap
@@ -90,7 +91,7 @@ def trivial (d : Nat) : IndexedSmash where
 /-- Path witness for the dimension equation. -/
 def dim_path (s : IndexedSmash) :
     Path s.totalDim (s.cosetCount * s.factorDim) :=
-  Path.ofEq s.dim_eq
+  Path.ofEqChain s.dim_eq
 
 /-- Trivial indexed smash has correct dimension. -/
 theorem trivial_dim (d : Nat) : (trivial d).totalDim = d := rfl
@@ -135,7 +136,7 @@ def identity (d : Nat) : NormFunctor where
 /-- Path witness for norm dimension. -/
 def norm_dim_path (N : NormFunctor) :
     Path N.outputDim (N.index * N.inputDim) :=
-  Path.ofEq N.dim_eq
+  Path.ofEqChain N.dim_eq
 
 /-- Identity norm preserves dimension. -/
 theorem identity_preserves_dim (d : Nat) :
@@ -155,7 +156,7 @@ structure IteratedNorm where
 /-- Path witness for iterated norm index. -/
 def iterated_index_path (it : IteratedNorm) :
     Path it.combinedIndex (it.norm1.index * it.norm2.index) :=
-  Path.ofEq it.index_mul
+  Path.ofEqChain it.index_mul
 
 end NormFunctor
 
@@ -188,7 +189,7 @@ def trivial (d : Nat) : NormRestrictionAdj where
 /-- Path witness for triangle identity. -/
 def triangle1_path (adj : NormRestrictionAdj) :
     Path (adj.unitId + adj.counitId ≥ adj.unitId) True :=
-  Path.ofEq (by simp)
+  Path.ofEqChain (by simp)
 
 end NormRestrictionAdj
 
@@ -230,7 +231,7 @@ def mk' (idx dimX dimY : Nat) : NormMultiplicativity where
 /-- Path witness for multiplicativity. -/
 def multiplicative_path (m : NormMultiplicativity) :
     Path m.normSmashDim m.smashNormDim :=
-  Path.ofEq m.multiplicative
+  Path.ofEqChain m.multiplicative
 
 /-- Multiplicativity with zero. -/
 theorem mult_zero (idx : Nat) :
@@ -267,7 +268,7 @@ def trivial : SliceCell where
 /-- Path witness for degree equation. -/
 def degree_path (c : SliceCell) :
     Path c.sliceDegree (c.dim * c.regRepMult) :=
-  Path.ofEq c.degree_eq
+  Path.ofEqChain c.degree_eq
 
 end SliceCell
 
@@ -292,7 +293,7 @@ def trivial : SliceFiltration where
 /-- Path witness for base level. -/
 def base_path (f : SliceFiltration) :
     Path (f.levels 0) 0 :=
-  Path.ofEq f.base
+  Path.ofEqChain f.base
 
 /-- The n-th slice section P^n_n X. -/
 def sliceSection (f : SliceFiltration) (n : Nat) : Nat :=
@@ -340,12 +341,12 @@ structure Differential where
 /-- Path witness for target p-degree. -/
 def diff_targetP_path (d : Differential) :
     Path d.targetP (d.sourceP + d.page) :=
-  Path.ofEq d.targetP_eq
+  Path.ofEqChain d.targetP_eq
 
 /-- Path witness for target q-degree. -/
 def diff_targetQ_path (d : Differential) :
     Path d.targetQ (d.sourceQ - d.page + 1) :=
-  Path.ofEq d.targetQ_eq
+  Path.ofEqChain d.targetQ_eq
 
 end SliceSS
 
@@ -418,7 +419,7 @@ def mk' (d : Nat) : DetectionTheorem where
 /-- Path witness for dimension preservation. -/
 def dim_path (dt : DetectionTheorem) :
     Path dt.hfpsDim dt.gfpDim :=
-  Path.ofEq dt.dim_preserved
+  Path.ofEqChain dt.dim_preserved
 
 /-- Detection at dimension 0. -/
 theorem detection_zero : (mk' 0).hfpsDim = 0 := rfl
@@ -498,7 +499,7 @@ theorem theta3_stem : theta3.stemDim = 14 := rfl
 /-- Path witness for stem dimension. -/
 def stem_path (k : KervaireInvariant) :
     Path k.stemDim (2^(k.j+1) - 2) :=
-  Path.ofEq k.stem_eq
+  Path.ofEqChain k.stem_eq
 
 end KervaireInvariant
 
@@ -507,32 +508,32 @@ end KervaireInvariant
 /-- Path witness: indexed smash dimension. -/
 def indexed_smash_dim_path (s : IndexedSmash) :
     Path s.totalDim (s.cosetCount * s.factorDim) :=
-  Path.ofEq s.dim_eq
+  Path.ofEqChain s.dim_eq
 
 /-- Path witness: norm functor dimension. -/
 def norm_dim_path (N : NormFunctor) :
     Path N.outputDim (N.index * N.inputDim) :=
-  Path.ofEq N.dim_eq
+  Path.ofEqChain N.dim_eq
 
 /-- Path witness: norm multiplicativity. -/
 def norm_multiplicative_path (m : NormMultiplicativity) :
     Path m.normSmashDim m.smashNormDim :=
-  Path.ofEq m.multiplicative
+  Path.ofEqChain m.multiplicative
 
 /-- Path witness: slice filtration base. -/
 def slice_base_path (f : SliceFiltration) :
     Path (f.levels 0) 0 :=
-  Path.ofEq f.base
+  Path.ofEqChain f.base
 
 /-- Path witness: gap theorem bound. -/
 def gap_bound_path (gt : GapTheorem) (p : Nat) (hp : p ∈ gt.gapPositions) :
     Path (p < gt.groupOrder) True :=
-  Path.ofEq (by simp [gt.gaps_valid p hp])
+  Path.ofEqChain (by simp [gt.gaps_valid p hp])
 
 /-- Path witness: detection theorem dimension. -/
 def detection_dim_path (dt : DetectionTheorem) :
     Path dt.hfpsDim dt.gfpDim :=
-  Path.ofEq dt.dim_preserved
+  Path.ofEqChain dt.dim_preserved
 
 end NormMap
 end ComputationalPaths

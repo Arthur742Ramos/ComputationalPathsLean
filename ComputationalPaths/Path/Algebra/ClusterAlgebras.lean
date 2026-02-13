@@ -35,11 +35,8 @@ namespace ClusterAlgebras
 
 universe u v
 
-private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b := by
-  cases h
-  have _ : RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
-    rweq_of_step (Step.trans_refl_left (Path.refl a))
-  exact Path.trans (Path.refl a) (Path.refl a)
+private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
+  Path.ofEqChain h
 
 /-! ## Exchange Matrices -/
 

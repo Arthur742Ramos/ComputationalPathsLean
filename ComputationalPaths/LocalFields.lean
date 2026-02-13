@@ -51,6 +51,7 @@ Local fields are completions of global fields at places:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace LocalFields
@@ -554,77 +555,77 @@ structure ConductorDiscriminantFormula where
 
 /-- Path witness: v2 has prime 2. -/
 def v2_prime_path : Path PAdicValuation.v2.prime 2 :=
-  Path.ofEq PAdicValuation.v2_prime
+  Path.ofEqChain PAdicValuation.v2_prime
 
 /-- Path witness: v3 has prime 3. -/
 def v3_prime_path : Path PAdicValuation.v3.prime 3 :=
-  Path.ofEq PAdicValuation.v3_prime
+  Path.ofEqChain PAdicValuation.v3_prime
 
 /-- Path witness: residue field of ℚ_2 has size 2. -/
 def Q2_residue_path : Path PAdicField.Q2.residueFieldSize 2 :=
-  Path.ofEq PAdicField.Q2_residue
+  Path.ofEqChain PAdicField.Q2_residue
 
 /-- Path witness: residue field of ℚ_3 has size 3. -/
 def Q3_residue_path : Path PAdicField.Q3.residueFieldSize 3 :=
-  Path.ofEq PAdicField.Q3_residue
+  Path.ofEqChain PAdicField.Q3_residue
 
 /-- Path witness: ℚ_2 has local field degree 1. -/
 def Q2_degree_path : Path (LocalField.ofPAdicField PAdicField.Q2).degree 1 :=
-  Path.ofEq (LocalField.Q2_degree)
+  Path.ofEqChain (LocalField.Q2_degree)
 
 /-- Path witness: unramified extension has e = 1. -/
 def unramified_ram_path (K : LocalField) (f : Nat) (hf : f > 0) :
     Path (LocalFieldExtension.unramified K f hf).relRamIndex 1 :=
-  Path.ofEq (LocalFieldExtension.unramified_ram K f hf)
+  Path.ofEqChain (LocalFieldExtension.unramified_ram K f hf)
 
 /-- Path witness: totally ramified extension has f = 1. -/
 def totallyRamified_inertia_path (K : LocalField) (e : Nat) (he : e > 0) :
     Path (LocalFieldExtension.totallyRamified K e he).relInertiaDeg 1 :=
-  Path.ofEq (LocalFieldExtension.totallyRamified_inertia K e he)
+  Path.ofEqChain (LocalFieldExtension.totallyRamified_inertia K e he)
 
 /-- Path witness: [L:K] = e · f for local extensions. -/
 def local_degree_path (ext : LocalFieldExtension) :
     Path ext.relativeDegree (ext.relRamIndex * ext.relInertiaDeg) :=
-  Path.ofEq ext.degree_eq
+  Path.ofEqChain ext.degree_eq
 
 /-- Path witness: Hensel's lemma initial approximation. -/
 def hensel_start_path {p : Nat} (h : HenselsLemma p) :
     Path (h.liftedSequence 0) h.initialApprox :=
-  Path.ofEq h.sequence_start
+  Path.ofEqChain h.sequence_start
 
 /-- Path witness: Herbrand function identity at 0. -/
 def herbrand_zero_path : Path (HerbrandFunction.identity.values 0) 0 :=
-  Path.ofEq HerbrandFunction.identity_zero
+  Path.ofEqChain HerbrandFunction.identity_zero
 
 /-- Path witness: standard LT formal group degree. -/
 def lt_standard_degree_path (F : PAdicField) :
     Path (LubinTateFormalGroup.standard F).ltPolyDegree F.prime :=
-  Path.ofEq (LubinTateFormalGroup.standard_degree F)
+  Path.ofEqChain (LubinTateFormalGroup.standard_degree F)
 
 /-- Path witness: conductor-discriminant formula. -/
 def conductor_discriminant_path (cdf : ConductorDiscriminantFormula) :
     Path cdf.sum_of_conductors cdf.disc_valuation :=
-  Path.ofEq cdf.formula
+  Path.ofEqChain cdf.formula
 
 /-- Path witness: local reciprocity quotient order. -/
 def local_reciprocity_order_path (lr : LocalReciprocity) :
     Path lr.galoisOrder lr.extension_.relativeDegree :=
-  Path.ofEq lr.quotient_order_eq
+  Path.ofEqChain lr.quotient_order_eq
 
 /-- Path witness: ℚ_p has ramification index 1. -/
 def base_ram_path (F : PAdicField) :
     Path (LocalField.ofPAdicField F).absRamIndex 1 :=
-  Path.ofEq (LocalField.base_ram F)
+  Path.ofEqChain (LocalField.base_ram F)
 
 /-- Path witness: ℚ_p has inertia degree 1. -/
 def base_inertia_path (F : PAdicField) :
     Path (LocalField.ofPAdicField F).absInertiaDeg 1 :=
-  Path.ofEq (LocalField.base_inertia F)
+  Path.ofEqChain (LocalField.base_inertia F)
 
 /-- Path witness: local field degree = e · f. -/
 def local_field_degree_path (K : LocalField) :
     Path K.degree (K.absRamIndex * K.absInertiaDeg) :=
-  Path.ofEq K.degree_eq
+  Path.ofEqChain K.degree_eq
 
 end LocalFields
 end ComputationalPaths

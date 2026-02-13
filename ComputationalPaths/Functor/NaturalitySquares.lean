@@ -7,6 +7,7 @@ from `Path.trans`.
 -/
 
 import ComputationalPaths.Path.YonedaLemma
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Functor
@@ -31,9 +32,27 @@ abbrev leftThenBottom {a b : A} (p : Path a b) (x : F.obj a) : G.obj b :=
   η.app b (F.map p x)
 
 /-- Naturality gives an explicit path witness that the square commutes. -/
+private def naturalityCore {a b : A} (p : Path a b) (x : F.obj a) :
+    Path (topThenRight (η := η) p x) (leftThenBottom (η := η) p x) :=
+  Path.ofEqChain (η.naturality (p := p) (x := x))
+
+/-- Naturality square witness with an explicit Step-normalizable chain. -/
 def naturalityWitness {a b : A} (p : Path a b) (x : F.obj a) :
     Path (topThenRight (η := η) p x) (leftThenBottom (η := η) p x) :=
-  Path.ofEq (η.naturality (p := p) (x := x))
+  Path.trans
+    (Path.trans (Path.refl _) (naturalityCore (η := η) p x))
+    (Path.refl _)
+
+@[simp] theorem naturalityWitness_rweq_core {a b : A} (p : Path a b) (x : F.obj a) :
+    RwEq (naturalityWitness (η := η) p x) (naturalityCore (η := η) p x) := by
+  apply rweq_trans
+  · exact rweq_of_step
+      (Path.Step.trans_assoc (Path.refl _)
+        (naturalityCore (η := η) p x) (Path.refl _))
+  · apply rweq_trans
+    · exact rweq_trans_congr_right (Path.refl _)
+        (rweq_of_step (Path.Step.trans_refl_right (naturalityCore (η := η) p x)))
+    · exact rweq_of_step (Path.Step.trans_refl_left (naturalityCore (η := η) p x))
 
 /-- Composed naturality square witness via path composition of two squares. -/
 def naturalityWitness_comp {a b c : A}

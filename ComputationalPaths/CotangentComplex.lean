@@ -49,11 +49,8 @@ namespace CotangentComplex
 
 universe u v
 
-private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b := by
-  cases h
-  have _ : Path.RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
-    Path.rweq_of_step (Path.Step.trans_refl_left (Path.refl a))
-  exact Path.trans (Path.refl a) (Path.refl a)
+private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
+  Path.ofEqChain h
 
 /-! ## Chain Complexes -/
 

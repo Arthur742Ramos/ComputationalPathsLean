@@ -73,6 +73,7 @@ needed to recognize or generate them:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace FormalLanguageTheory
@@ -155,7 +156,7 @@ def recursivelyEnumerable : ChomskyLevelData where
 /-- Path: automaton type matches level. -/
 def automaton_path (cl : ChomskyLevelData) :
     Path cl.automatonType cl.level :=
-  Path.ofEq cl.automaton_eq
+  Path.ofEqChain cl.automaton_eq
 
 end ChomskyLevelData
 
@@ -208,17 +209,17 @@ def standard : ChomskyHierarchyData where
 /-- Path: number of levels. -/
 def levels_path (ch : ChomskyHierarchyData) :
     Path ch.numLevels 4 :=
-  Path.ofEq ch.levels_eq
+  Path.ofEqChain ch.levels_eq
 
 /-- Path: strictness. -/
 def strict_path (ch : ChomskyHierarchyData) :
     Path ch.isStrict true :=
-  Path.ofEq ch.strict_eq
+  Path.ofEqChain ch.strict_eq
 
 /-- Path: containment obstruction. -/
 def obstruction_path (ch : ChomskyHierarchyData) :
     Path ch.containmentObstruction 0 :=
-  Path.ofEq ch.obstruction_eq
+  Path.ofEqChain ch.obstruction_eq
 
 end ChomskyHierarchyData
 
@@ -307,7 +308,7 @@ def closure_count_path (ct : ClosureTableData) :
        (if ct.complementClosed then 1 else 0) +
        (if ct.concatClosed then 1 else 0) +
        (if ct.starClosed then 1 else 0)) :=
-  Path.ofEq ct.closure_eq
+  Path.ofEqChain ct.closure_eq
 
 end ClosureTableData
 
@@ -504,12 +505,12 @@ def ofSize (n k : Nat) (hk : k > 0) : AutomaticStructureData where
 /-- Path: number of automata. -/
 def automata_path (asd : AutomaticStructureData) :
     Path asd.numAutomata (asd.numRelations + 1) :=
-  Path.ofEq asd.automata_eq
+  Path.ofEqChain asd.automata_eq
 
 /-- Path: FO decidability. -/
 def fo_decidable_path (asd : AutomaticStructureData) :
     Path asd.foDecidable true :=
-  Path.ofEq asd.fo_decidable_eq
+  Path.ofEqChain asd.fo_decidable_eq
 
 end AutomaticStructureData
 
@@ -589,17 +590,17 @@ def ndTopDown : TreeAutomatonData where
 /-- Path: complement closure. -/
 def complement_path (ta : TreeAutomatonData) :
     Path ta.complementClosed true :=
-  Path.ofEq ta.complement_eq
+  Path.ofEqChain ta.complement_eq
 
 /-- Path: intersection closure. -/
 def intersection_path (ta : TreeAutomatonData) :
     Path ta.intersectionClosed true :=
-  Path.ofEq ta.intersection_eq
+  Path.ofEqChain ta.intersection_eq
 
 /-- Path: union closure. -/
 def union_path (ta : TreeAutomatonData) :
     Path ta.unionClosed true :=
-  Path.ofEq ta.union_eq
+  Path.ofEqChain ta.union_eq
 
 end TreeAutomatonData
 
@@ -677,7 +678,7 @@ def tropical : WeightedAutomatonData where
 /-- Path: max transitions. -/
 def max_path (wa : WeightedAutomatonData) :
     Path wa.maxTransitions (wa.numStates ^ 2 * wa.alphabetSize) :=
-  Path.ofEq wa.max_eq
+  Path.ofEqChain wa.max_eq
 
 end WeightedAutomatonData
 
@@ -718,12 +719,12 @@ def simple : MSOTreeData where
 /-- Path: complexity. -/
 def complexity_path (mso : MSOTreeData) :
     Path mso.totalComplexity (mso.numSetQuantifiers + mso.numIndividualQuantifiers) :=
-  Path.ofEq mso.complexity_eq
+  Path.ofEqChain mso.complexity_eq
 
 /-- Path: decidability (Rabin). -/
 def decidable_path (mso : MSOTreeData) :
     Path mso.isDecidable true :=
-  Path.ofEq mso.decidable_eq
+  Path.ofEqChain mso.decidable_eq
 
 end MSOTreeData
 
@@ -771,12 +772,12 @@ def nonStarFree : StarFreeData where
 /-- Path: McNaughton-Papert. -/
 def mp_path (sf : StarFreeData) :
     Path sf.isStarFree sf.isFODefinable :=
-  Path.ofEq sf.mcnaughton_papert
+  Path.ofEqChain sf.mcnaughton_papert
 
 /-- Path: Schützenberger. -/
 def schutz_path (sf : StarFreeData) :
     Path sf.isStarFree sf.isAperiodic :=
-  Path.ofEq sf.schutzenberger
+  Path.ofEqChain sf.schutzenberger
 
 end StarFreeData
 
@@ -834,12 +835,12 @@ def csVsRE : LanguageComparisonData where
 /-- Path: separation. -/
 def separation_path (lc : LanguageComparisonData) :
     Path lc.hasSeparation true :=
-  Path.ofEq lc.separation_eq
+  Path.ofEqChain lc.separation_eq
 
 /-- Path: containment. -/
 def containment_path (lc : LanguageComparisonData) :
     Path lc.containmentHolds true :=
-  Path.ofEq lc.containment_eq
+  Path.ofEqChain lc.containment_eq
 
 end LanguageComparisonData
 
@@ -864,19 +865,19 @@ def master_hierarchy_obstruction_path :
 def master_regular_closure_path :
     Path ClosureTableData.regular.numClosureProps 5 := by
   have h := ClosureTableData.regular.closure_eq
-  exact Path.ofEq h
+  exact Path.ofEqChain h
 
 /-- Master: CFL closure properties (3 of 5). -/
 def master_cfl_closure_path :
     Path ClosureTableData.contextFree.numClosureProps 3 := by
   have h := ClosureTableData.contextFree.closure_eq
-  exact Path.ofEq h
+  exact Path.ofEqChain h
 
 /-- Master: RE closure properties (4 of 5). -/
 def master_re_closure_path :
     Path ClosureTableData.recursivelyEnumerable.numClosureProps 4 := by
   have h := ClosureTableData.recursivelyEnumerable.closure_eq
-  exact Path.ofEq h
+  exact Path.ofEqChain h
 
 /-- Master: automatic structure FO decidability. -/
 def master_automatic_fo_path :

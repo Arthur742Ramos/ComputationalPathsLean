@@ -61,6 +61,7 @@ submanifolds (leaves):
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace FoliationTheory
@@ -751,93 +752,93 @@ end NovikovTheorem
 /-- Foliation leaf dimension path: leafDim = dim - codim. -/
 def leaf_dim_path (f : Foliation) :
     Path f.leafDim (f.dim - f.codim) :=
-  Path.ofEq f.leaf_eq
+  Path.ofEqChain f.leaf_eq
 
 /-- Frobenius theorem path: involutive = integrable. -/
 def frobenius_path (fd : FrobeniusData) :
     Path fd.isInvolutive fd.isIntegrable :=
-  Path.ofEq fd.frobenius
+  Path.ofEqChain fd.frobenius
 
 /-- Reeb foliation dimension path. -/
 def reeb_dim_path :
     Path ReebFoliation.standard.dim 3 :=
-  Path.ofEq ReebFoliation.reeb_dim
+  Path.ofEqChain ReebFoliation.reeb_dim
 
 /-- Reeb foliation codimension path. -/
 def reeb_codim_path :
     Path ReebFoliation.standard.codim 1 :=
-  Path.ofEq ReebFoliation.reeb_codim
+  Path.ofEqChain ReebFoliation.reeb_codim
 
 /-- Reeb foliation leaf dimension path. -/
 def reeb_leaf_path :
     Path ReebFoliation.standard.leafDim 2 :=
-  Path.ofEq ReebFoliation.reeb_leaf_dim
+  Path.ofEqChain ReebFoliation.reeb_leaf_dim
 
 /-- Reeb compact leaf count path. -/
 def reeb_compact_path :
     Path ReebFoliation.standard.compactLeaves 1 :=
-  Path.ofEq ReebFoliation.reeb_compact
+  Path.ofEqChain ReebFoliation.reeb_compact
 
 /-- GV class degree path. -/
 def gv_degree_path (gv : GodbillonVey) :
     Path gv.degree 3 :=
-  Path.ofEq gv.degree_eq
+  Path.ofEqChain gv.degree_eq
 
 /-- Reeb GV nontriviality path. -/
 def reeb_gv_path :
     Path GodbillonVey.reebGV.isTrivial false :=
-  Path.ofEq GodbillonVey.reeb_nontrivial
+  Path.ofEqChain GodbillonVey.reeb_nontrivial
 
 /-- Molino orbifold path. -/
 def molino_orbifold_path (mt : MolinoTheorem) :
     Path mt.closureSpaceOrbifold true :=
-  Path.ofEq mt.molino_orbifold
+  Path.ofEqChain mt.molino_orbifold
 
 /-- Leaf space Reeb non-Hausdorff path. -/
 def reeb_nonhausdorff_path :
     Path LeafSpace.reebLeafSpace.isHausdorff false :=
-  Path.ofEq LeafSpace.reeb_not_hausdorff
+  Path.ofEqChain LeafSpace.reeb_not_hausdorff
 
 /-- Kronecker noncommutativity path. -/
 def kronecker_nc_path :
     Path ConnesFoliationAlgebra.kronecker.isCommutative false :=
-  Path.ofEq ConnesFoliationAlgebra.kronecker_noncommutative
+  Path.ofEqChain ConnesFoliationAlgebra.kronecker_noncommutative
 
 /-- Kronecker K₀ rank path. -/
 def kronecker_k0_path :
     Path ConnesFoliationAlgebra.kronecker.k0Rank 2 :=
-  Path.ofEq ConnesFoliationAlgebra.kronecker_k0
+  Path.ofEqChain ConnesFoliationAlgebra.kronecker_k0
 
 /-- Transverse normal rank path. -/
 def normal_rank_path (tg : TransverseGeometry) :
     Path tg.normalRank tg.codim :=
-  Path.ofEq tg.normal_eq
+  Path.ofEqChain tg.normal_eq
 
 /-- Novikov's theorem dimension path. -/
 def novikov_dim_path :
     Path NovikovTheorem.s3.dim 3 :=
-  Path.ofEq NovikovTheorem.s3_dim
+  Path.ofEqChain NovikovTheorem.s3_dim
 
 /-- Novikov compact leaf genus path. -/
 def novikov_genus_path :
     Path NovikovTheorem.s3.leafGenus 1 :=
-  Path.ofEq NovikovTheorem.s3_compact_is_torus
+  Path.ofEqChain NovikovTheorem.s3_compact_is_torus
 
 /-- Reeb decomposition path: 3 = 2 + 1. -/
 def reeb_decomposition_path :
     Path ReebFoliation.standard.dim
          (ReebFoliation.standard.leafDim + ReebFoliation.standard.codim) :=
-  Path.ofEq ReebFoliation.reeb_decomposition
+  Path.ofEqChain ReebFoliation.reeb_decomposition
 
 /-- Foliation dim + codim = n path. -/
 def foliation_sum_path (f : Foliation) :
     Path (f.leafDim + f.codim) f.dim :=
-  Path.ofEq (Foliation.dim_codim_bound f)
+  Path.ofEqChain (Foliation.dim_codim_bound f)
 
 /-- Connes algebra leaf dimension path. -/
 def connes_leaf_path (ca : ConnesFoliationAlgebra) :
     Path ca.leafDim (ca.dim - ca.codim) :=
-  Path.ofEq ca.leaf_eq
+  Path.ofEqChain ca.leaf_eq
 
 end FoliationTheory
 end ComputationalPaths

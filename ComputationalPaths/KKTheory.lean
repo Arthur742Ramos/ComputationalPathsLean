@@ -57,6 +57,7 @@ KK-theory is the bivariant K-theory for C*-algebras:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace KKTheory
@@ -204,12 +205,12 @@ def neg (g : KKGroup) : KKGroup where
 def zero_add_path (g : KKGroup) :
     Path ((add (zero g.sourceDim g.targetDim g.sourceDim_pos g.targetDim_pos) g rfl rfl).classIndex)
          g.classIndex :=
-  Path.ofEq (by simp [add, zero])
+  Path.ofEqChain (by simp [add, zero])
 
 /-- Path: g + (-g) = 0. -/
 def add_neg_path (g : KKGroup) :
     Path ((add g (neg g) rfl rfl).classIndex) 0 :=
-  Path.ofEq (by simp [add, neg]; omega)
+  Path.ofEqChain (by simp [add, neg]; omega)
 
 end KKGroup
 
@@ -272,23 +273,23 @@ def withIdentity (s t : Nat) (hs : s > 0) (ht : t > 0) (idx : Int) :
 /-- Path: product index coherence. -/
 def product_index_path (kp : KasparovProduct) :
     Path kp.productIndex (kp.leftIndex * kp.rightIndex) :=
-  Path.ofEq kp.product_eq
+  Path.ofEqChain kp.product_eq
 
 /-- Path: associativity of the Kasparov product (index level).
 (x ⊗ y) ⊗ z has index (x·y)·z = x·(y·z) = x ⊗ (y ⊗ z). -/
 def kasparov_product_associativity_path (a b c : Int) :
     Path (a * b * c) (a * (b * c)) :=
-  Path.ofEq (Int.mul_assoc a b c)
+  Path.ofEqChain (Int.mul_assoc a b c)
 
 /-- Path: identity element for product. -/
 def product_identity_path (idx : Int) :
     Path (idx * 1) idx :=
-  Path.ofEq (Int.mul_one idx)
+  Path.ofEqChain (Int.mul_one idx)
 
 /-- Path: left identity for product. -/
 def product_left_identity_path (idx : Int) :
     Path (1 * idx) idx :=
-  Path.ofEq (Int.one_mul idx)
+  Path.ofEqChain (Int.one_mul idx)
 
 end KasparovProduct
 
@@ -354,17 +355,17 @@ def shift (bp : BottPeriodicityKK) : BottPeriodicityKK where
 /-- Path: Bott periodicity (period = 2). -/
 def bott_periodicity_path (bp : BottPeriodicityKK) :
     Path bp.period 2 :=
-  Path.ofEq bp.period_eq
+  Path.ofEqChain bp.period_eq
 
 /-- Path: Bott element is a generator. -/
 def bott_generator_path (bp : BottPeriodicityKK) :
     Path bp.bottIndex 1 :=
-  Path.ofEq bp.bottIndex_eq
+  Path.ofEqChain bp.bottIndex_eq
 
 /-- Path: double shift multiplies dimension by 4. -/
 def double_shift_path (bp : BottPeriodicityKK) :
     Path (shift (shift bp)).shiftedTargetDim (bp.shiftedTargetDim * 4) :=
-  Path.ofEq (by simp [shift, Nat.mul_assoc])
+  Path.ofEqChain (by simp [shift, Nat.mul_assoc])
 
 end BottPeriodicityKK
 
@@ -409,12 +410,12 @@ def free (hom kk : Nat) (h : kk = hom) : UCTData where
 /-- Path: UCT exactness. -/
 def uct_exactness_path (uct : UCTData) :
     Path uct.kkDim (uct.extDim + uct.homDim) :=
-  Path.ofEq uct.uct_ses
+  Path.ofEqChain uct.uct_ses
 
 /-- Path: for free groups, Ext = 0 so KK = Hom. -/
 def uct_free_path (hom : Nat) :
     Path (free hom hom rfl).kkDim (free hom hom rfl).homDim :=
-  Path.ofEq (by simp [free])
+  Path.ofEqChain (by simp [free])
 
 end UCTData
 
@@ -451,7 +452,7 @@ def invertible : FredholmIndexData where
 /-- Path: Fredholm index formula. -/
 def fredholm_index_path (fi : FredholmIndexData) :
     Path fi.index (Int.ofNat fi.kernelDim - Int.ofNat fi.cokernelDim) :=
-  Path.ofEq fi.index_eq
+  Path.ofEqChain fi.index_eq
 
 /-- Direct sum of Fredholm operators: index is additive. -/
 def directSum (f1 f2 : FredholmIndexData) : FredholmIndexData where
@@ -534,12 +535,12 @@ def freeGroup (rank : Nat) (hr : rank > 0) : BaumConnesData where
 /-- Path: assembly map coherence for verified groups. -/
 def baum_connes_assembly_path (bc : BaumConnesData) (h : bc.isIso = true) :
     Path bc.topKRank bc.anaKRank :=
-  Path.ofEq (bc.iso_eq h).1
+  Path.ofEqChain (bc.iso_eq h).1
 
 /-- Path: assembly rank equals source rank for isomorphisms. -/
 def assembly_rank_path (bc : BaumConnesData) (h : bc.isIso = true) :
     Path bc.assemblyRank bc.topKRank :=
-  Path.ofEq (bc.iso_eq h).2
+  Path.ofEqChain (bc.iso_eq h).2
 
 end BaumConnesData
 
@@ -589,12 +590,12 @@ def withInverse (d : Nat) (hd : d > 0) (idx : Int) (hidx : idx * idx = 1) :
 /-- Path: β ⊗ α = 1. -/
 def dirac_dual_dirac_path (ddd : DiracDualDirac) :
     Path ddd.productIndex 1 :=
-  Path.ofEq ddd.product_eq
+  Path.ofEqChain ddd.product_eq
 
 /-- Path: product is multiplicative. -/
 def product_mult_path (ddd : DiracDualDirac) :
     Path ddd.productIndex (ddd.dualDiracIndex * ddd.diracIndex) :=
-  Path.ofEq ddd.product_mult
+  Path.ofEqChain ddd.product_mult
 
 end DiracDualDirac
 
@@ -643,12 +644,12 @@ def identity (d : Nat) (hd : d > 0) (idx : Int) : KKComposition where
 /-- Path: composition is associative (at index level). -/
 def kk_composition_path (a b c : Int) :
     Path (a * b * c) (a * (b * c)) :=
-  Path.ofEq (Int.mul_assoc a b c)
+  Path.ofEqChain (Int.mul_assoc a b c)
 
 /-- Path: identity composition. -/
 def identity_composition_path (idx : Int) :
     Path (idx * 1) idx :=
-  Path.ofEq (Int.mul_one idx)
+  Path.ofEqChain (Int.mul_one idx)
 
 end KKComposition
 

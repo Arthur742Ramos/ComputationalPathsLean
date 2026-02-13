@@ -64,6 +64,7 @@ the class of regular languages:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace FiniteAutomata
@@ -154,7 +155,7 @@ def transition_path (d : DFAData) :
 /-- Path: DFA is complete. -/
 def complete_path (d : DFAData) :
     Path d.isComplete true :=
-  Path.ofEq d.complete_eq
+  Path.ofEqChain d.complete_eq
 
 /-- Path: trivial DFA has 2 transitions (via traced transition steps). -/
 def trivial_transition_path :
@@ -216,7 +217,7 @@ def ofSize (n : Nat) (hn : n > 0) : NFAData where
 /-- Path: DFA upper bound. -/
 def dfa_bound_path (nfa : NFAData) :
     Path nfa.dfaUpperBound (2 ^ nfa.numStates) :=
-  Path.ofEq nfa.dfa_bound_eq
+  Path.ofEqChain nfa.dfa_bound_eq
 
 end NFAData
 
@@ -381,12 +382,12 @@ def ofPair (m n : Nat) (hm : m > 0) (hn : n > 0) : ClosureUnionData where
 /-- Path: product construction. -/
 def product_path (cu : ClosureUnionData) :
     Path cu.productStates (cu.states1 * cu.states2) :=
-  Path.ofEq cu.product_eq
+  Path.ofEqChain cu.product_eq
 
 /-- Path: regularity. -/
 def regular_path (cu : ClosureUnionData) :
     Path cu.isRegular true :=
-  Path.ofEq cu.regular_eq
+  Path.ofEqChain cu.regular_eq
 
 end ClosureUnionData
 
@@ -425,7 +426,7 @@ def example23 : ClosureConcatData where
 /-- Path: concatenation state count. -/
 def concat_path (cc : ClosureConcatData) :
     Path cc.concatStates (cc.states1 + cc.states2) :=
-  Path.ofEq cc.concat_eq
+  Path.ofEqChain cc.concat_eq
 
 end ClosureConcatData
 
@@ -467,12 +468,12 @@ def ofSize (n : Nat) (hn : n > 0) : ClosureStarData where
 /-- Path: star state count. -/
 def star_path (cs : ClosureStarData) :
     Path cs.starStates (cs.baseStates + 1) :=
-  Path.ofEq cs.star_eq
+  Path.ofEqChain cs.star_eq
 
 /-- Path: accepts empty. -/
 def accepts_empty_path (cs : ClosureStarData) :
     Path cs.acceptsEmpty true :=
-  Path.ofEq cs.accepts_empty_eq
+  Path.ofEqChain cs.accepts_empty_eq
 
 end ClosureStarData
 
@@ -525,17 +526,17 @@ def ofIndex (n : Nat) (hn : n > 0) : MyhillNerodeData where
 /-- Path: minimal DFA = equivalence classes. -/
 def minimal_path (mn : MyhillNerodeData) :
     Path mn.minimalStates mn.numClasses :=
-  Path.ofEq mn.minimal_eq
+  Path.ofEqChain mn.minimal_eq
 
 /-- Path: regularity. -/
 def regular_path (mn : MyhillNerodeData) :
     Path mn.isRegular true :=
-  Path.ofEq mn.regular_eq
+  Path.ofEqChain mn.regular_eq
 
 /-- Path: uniqueness. -/
 def unique_path (mn : MyhillNerodeData) :
     Path mn.isUnique true :=
-  Path.ofEq mn.unique_eq
+  Path.ofEqChain mn.unique_eq
 
 end MyhillNerodeData
 
@@ -591,12 +592,12 @@ def alreadyMinimal (n : Nat) (hn : n > 0) : MinimizationData where
 /-- Path: states removed. -/
 def removed_path (md : MinimizationData) :
     Path md.statesRemoved (md.originalStates - md.minimizedStates) :=
-  Path.ofEq md.removed_eq
+  Path.ofEqChain md.removed_eq
 
 /-- Path: language preserved. -/
 def preserved_path (md : MinimizationData) :
     Path md.languagePreserved true :=
-  Path.ofEq md.preserved_eq
+  Path.ofEqChain md.preserved_eq
 
 end MinimizationData
 
@@ -666,12 +667,12 @@ def fromDFA (n : Nat) (hn : n > 0) (wLen : Nat) (hw : wLen ≥ n)
 /-- Path: decomposition. -/
 def decomposition_path (pl : PumpingLemmaData) :
     Path (pl.xLength + pl.yLength + pl.zLength) pl.stringLength :=
-  Path.ofEq pl.decomposition_eq
+  Path.ofEqChain pl.decomposition_eq
 
 /-- Path: pumping property. -/
 def pump_path (pl : PumpingLemmaData) :
     Path pl.canPump true :=
-  Path.ofEq pl.pump_eq
+  Path.ofEqChain pl.pump_eq
 
 /-- Pumped string length for pumping i times: |x| + i * |y| + |z|. -/
 def pumpedLength (pl : PumpingLemmaData) (i : Nat) : Nat :=
@@ -682,7 +683,7 @@ def pumped_one_path (pl : PumpingLemmaData) :
     Path (pl.pumpedLength 1) pl.stringLength := by
   unfold pumpedLength
   simp [Nat.one_mul]
-  exact Path.ofEq pl.decomposition_eq
+  exact Path.ofEqChain pl.decomposition_eq
 
 /-- Path: pumped length at i=0 removes y. -/
 def pumped_zero_path (pl : PumpingLemmaData) :
@@ -787,12 +788,12 @@ def example41 : ComplementData where
 /-- Path: complement state count. -/
 def complement_path (cd : ComplementData) :
     Path cd.complementStates cd.numStates :=
-  Path.ofEq cd.complement_eq
+  Path.ofEqChain cd.complement_eq
 
 /-- Path: complement accepting count. -/
 def comp_accepting_path (cd : ComplementData) :
     Path cd.compAccepting (cd.numStates - cd.origAccepting) :=
-  Path.ofEq cd.comp_accepting_eq
+  Path.ofEqChain cd.comp_accepting_eq
 
 end ComplementData
 
@@ -836,12 +837,12 @@ def equivalent22 : EquivalenceTestData where
 /-- Path: product states. -/
 def product_path (et : EquivalenceTestData) :
     Path et.productStates (et.states1 * et.states2) :=
-  Path.ofEq et.product_eq
+  Path.ofEqChain et.product_eq
 
 /-- Path: equivalence implies zero obstruction. -/
 def equiv_path (et : EquivalenceTestData) (h : et.areEquivalent = true) :
     Path et.obstruction 0 :=
-  Path.ofEq (et.equiv_obstruction h)
+  Path.ofEqChain (et.equiv_obstruction h)
 
 end EquivalenceTestData
 
@@ -876,12 +877,12 @@ def example3 : ReversalData where
 /-- Path: state count preserved. -/
 def rev_path (rd : ReversalData) :
     Path rd.revStates rd.origStates :=
-  Path.ofEq rd.rev_eq
+  Path.ofEqChain rd.rev_eq
 
 /-- Path: regularity. -/
 def regular_path (rd : ReversalData) :
     Path rd.isRegular true :=
-  Path.ofEq rd.regular_eq
+  Path.ofEqChain rd.regular_eq
 
 end ReversalData
 

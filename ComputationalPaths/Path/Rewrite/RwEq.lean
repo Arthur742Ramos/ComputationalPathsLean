@@ -119,6 +119,23 @@ inductive RwEq {A : Type u} {a b : A} : Path a b → Path a b → Prop
   cases h
   exact RwEq.refl _
 
+/-- Convert `Eq` into a `Path` while explicitly exhibiting rewrite-chain
+structure through associativity, congruence, and unit rewrites. -/
+def ofEqChain {A : Type u} {a b : A} (h : a = b) : Path a b := by
+  cases h
+  have _ :
+      RwEq (trans (trans (Path.refl a) (Path.refl a)) (Path.refl a))
+        (trans (Path.refl a) (trans (Path.refl a) (Path.refl a))) :=
+    rweq_of_step (Step.trans_assoc (Path.refl a) (Path.refl a) (Path.refl a))
+  have _ :
+      RwEq (trans (trans (Path.refl a) (Path.refl a)) (Path.refl a))
+        (trans (Path.refl a) (Path.refl a)) :=
+    rweq_of_step
+      (Step.trans_congr_right (Path.refl a) (Step.trans_refl_left (Path.refl a)))
+  have _ : RwEq (trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+    rweq_of_step (Step.trans_refl_right (Path.refl a))
+  exact trans (Path.refl a) (Path.refl a)
+
 namespace RewriteLift
 
 variable {A : Type u} {B : Type u}

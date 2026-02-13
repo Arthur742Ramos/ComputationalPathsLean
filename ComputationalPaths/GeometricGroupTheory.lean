@@ -55,6 +55,7 @@ objects via their Cayley graphs and the word metric:
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace GeometricGroupTheory
@@ -844,129 +845,129 @@ end NumberOfEnds
 /-- Path witness: Cayley graph integer line has degree 2. -/
 def cayley_degree_path :
     Path CayleyGraph.integerLine.vertexDegree 2 :=
-  Path.ofEq CayleyGraph.integerLine_degree
+  Path.ofEqChain CayleyGraph.integerLine_degree
 
 /-- Path witness: free group tree has degree 4. -/
 def cayley_tree_degree_path :
     Path CayleyGraph.freeGroupTree.vertexDegree 4 :=
-  Path.ofEq CayleyGraph.freeGroupTree_degree
+  Path.ofEqChain CayleyGraph.freeGroupTree_degree
 
 /-- Path witness: Cayley graph of S₃ has 6 vertices. -/
 def cayley_s3_path :
     Path CayleyGraph.symmetricS3.numVertices 6 :=
-  Path.ofEq CayleyGraph.s3_vertices
+  Path.ofEqChain CayleyGraph.s3_vertices
 
 /-- Path witness: ℤ word metric is symmetric. -/
 def word_metric_symmetric_path :
     Path WordMetric.integers.isSymmetric true :=
-  Path.ofEq WordMetric.integers_symmetric
+  Path.ofEqChain WordMetric.integers_symmetric
 
 /-- Path witness: identity QI is an isometry. -/
 def qi_identity_path (s : Nat) :
     Path (QuasiIsometry.identity s).isIsometry true :=
-  Path.ofEq (QuasiIsometry.identity_isIsometry s)
+  Path.ofEqChain (QuasiIsometry.identity_isIsometry s)
 
 /-- Path witness: QI composition of isometries has L = 1. -/
 def qi_composition_path (s : Nat) :
     Path (QuasiIsometry.isometry_comp s).composedL 1 :=
-  Path.ofEq (QuasiIsometry.isometry_comp_L s)
+  Path.ofEqChain (QuasiIsometry.isometry_comp_L s)
 
 /-- Path witness: ℤ ≃_QI ℝ via Švarc-Milnor. -/
 def svarc_milnor_integers_path :
     Path SvarcMilnor.integersOnLine.isQuasiIsometric true :=
-  Path.ofEq SvarcMilnor.integers_qi_line
+  Path.ofEqChain SvarcMilnor.integers_qi_line
 
 /-- Path witness: ℤ² ≃_QI ℝ² via Švarc-Milnor. -/
 def svarc_milnor_lattice_path :
     Path SvarcMilnor.latticeOnPlane.isQuasiIsometric true :=
-  Path.ofEq SvarcMilnor.lattice_qi_plane
+  Path.ofEqChain SvarcMilnor.lattice_qi_plane
 
 /-- Path witness: ℤ has polynomial growth of degree 1. -/
 def growth_integers_path :
     Path GrowthFunction.integers.growthType (.polynomial 1) :=
-  Path.ofEq GrowthFunction.integers_polynomial
+  Path.ofEqChain GrowthFunction.integers_polynomial
 
 /-- Path witness: F₂ has exponential growth. -/
 def growth_freeGroup2_path :
     Path GrowthFunction.freeGroup2.growthType .exponential :=
-  Path.ofEq GrowthFunction.freeGroup2_exponential
+  Path.ofEqChain GrowthFunction.freeGroup2_exponential
 
 /-- Path witness: Grigorchuk group has intermediate growth. -/
 def growth_grigorchuk_path :
     Path GrowthFunction.grigorchuk.growthType .intermediate :=
-  Path.ofEq GrowthFunction.grigorchuk_intermediate
+  Path.ofEqChain GrowthFunction.grigorchuk_intermediate
 
 /-- Path witness: Heisenberg group polynomial degree 4. -/
 def growth_heisenberg_path :
     Path GrowthFunction.heisenberg.growthType (.polynomial 4) :=
-  Path.ofEq GrowthFunction.heisenberg_polynomial
+  Path.ofEqChain GrowthFunction.heisenberg_polynomial
 
 /-- Path witness: Gromov's theorem for ℤ. -/
 def gromov_growth_path :
     Path GromovPolynomialGrowth.integers.hasPolynomialGrowth
          GromovPolynomialGrowth.integers.isVirtuallyNilpotent :=
-  Path.ofEq GromovPolynomialGrowth.integers_gromov
+  Path.ofEqChain GromovPolynomialGrowth.integers_gromov
 
 /-- Path witness: Gromov's theorem for F₂. -/
 def gromov_free_path :
     Path GromovPolynomialGrowth.freeGroup2.hasPolynomialGrowth
          GromovPolynomialGrowth.freeGroup2.isVirtuallyNilpotent :=
-  Path.ofEq GromovPolynomialGrowth.freeGroup2_gromov
+  Path.ofEqChain GromovPolynomialGrowth.freeGroup2_gromov
 
 /-- Path witness: ℤ is amenable. -/
 def amenable_integers_path :
     Path AmenableGroup.integers.isAmenable true :=
-  Path.ofEq AmenableGroup.integers_amenable
+  Path.ofEqChain AmenableGroup.integers_amenable
 
 /-- Path witness: F₂ is not amenable. -/
 def amenable_freeGroup2_path :
     Path AmenableGroup.freeGroup2.isAmenable false :=
-  Path.ofEq AmenableGroup.freeGroup2_not_amenable
+  Path.ofEqChain AmenableGroup.freeGroup2_not_amenable
 
 /-- Path witness: Grigorchuk group is amenable. -/
 def amenable_grigorchuk_path :
     Path AmenableGroup.grigorchuk.isAmenable true :=
-  Path.ofEq AmenableGroup.grigorchuk_amenable
+  Path.ofEqChain AmenableGroup.grigorchuk_amenable
 
 /-- Path witness: BS(1,2) is amenable. -/
 def amenable_bs12_path :
     Path AmenableGroup.bs12.isAmenable true :=
-  Path.ofEq AmenableGroup.bs12_amenable
+  Path.ofEqChain AmenableGroup.bs12_amenable
 
 /-- Path witness: Følner sequence for ℤ. -/
 def folner_integers_path :
     Path FolnerSequence.integers.witnessesAmenability true :=
-  Path.ofEq FolnerSequence.integers_amenable
+  Path.ofEqChain FolnerSequence.integers_amenable
 
 /-- Path witness: ℤ has 2 ends. -/
 def ends_integers_path :
     Path NumberOfEnds.integers.ends 2 :=
-  Path.ofEq NumberOfEnds.integers_two_ends
+  Path.ofEqChain NumberOfEnds.integers_two_ends
 
 /-- Path witness: ℤ² has 1 end. -/
 def ends_lattice2_path :
     Path NumberOfEnds.integerLattice2.ends 1 :=
-  Path.ofEq NumberOfEnds.lattice2_one_end
+  Path.ofEqChain NumberOfEnds.lattice2_one_end
 
 /-- Path witness: S₃ has 0 ends. -/
 def ends_s3_path :
     Path NumberOfEnds.symmetricS3.ends 0 :=
-  Path.ofEq NumberOfEnds.s3_zero_ends
+  Path.ofEqChain NumberOfEnds.s3_zero_ends
 
 /-- Path witness: ℤ is virtually ℤ. -/
 def integers_virtuallyZ_path :
     Path NumberOfEnds.integers.isVirtuallyZ true :=
-  Path.ofEq NumberOfEnds.integers_virtuallyZ
+  Path.ofEqChain NumberOfEnds.integers_virtuallyZ
 
 /-- Path witness: growth type is QI-invariant. -/
 def qi_invariant_growth_path :
     Path QIInvariant.growthType.isQIInvariant true :=
-  Path.ofEq QIInvariant.growthType_invariant
+  Path.ofEqChain QIInvariant.growthType_invariant
 
 /-- Path witness: amenability is QI-invariant. -/
 def qi_invariant_amenable_path :
     Path QIInvariant.amenability.isQIInvariant true :=
-  Path.ofEq QIInvariant.amenability_invariant
+  Path.ofEqChain QIInvariant.amenability_invariant
 
 end GeometricGroupTheory
 end ComputationalPaths
