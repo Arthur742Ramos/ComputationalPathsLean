@@ -64,8 +64,7 @@ theorem toEq_unique {a b : A} (p q : Path a b) : p.toEq = q.toEq := by
 /-- Canonical `ofEq` witnesses coincide for any two paths with the same endpoints. -/
 @[simp] theorem ofEq_toEq_eq {a b : A} (p q : Path a b) :
     Path.stepChain p.toEq = Path.stepChain q.toEq := by
-  exact
-    Path.stepChain_eq_ofEq (a := a) (b := b) (h₁ := p.toEq) (h₂ := q.toEq)
+  rw [toEq_unique p q]
 
 /-! ## Transport and rewrite equality -/
 

@@ -72,7 +72,7 @@ namespace ThreeCell
     {η θ : TwoCell (A := A) (a := a) (b := b) p q}
     (h : η = θ) :
     ThreeCell (A := A) (a := a) (b := b) η θ :=
-  CellPath.stepChain h
+  CellPath.ofEq h
 
 end ThreeCell
 
