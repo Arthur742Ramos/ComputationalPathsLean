@@ -261,7 +261,7 @@ def regular : ClosureTableData where
   concatClosed := true
   starClosed := true
   numClosureProps := 5
-  closure_eq := by omega
+  closure_eq := by simp
 
 /-- Context-free languages: 3 out of 5. -/
 def contextFree : ClosureTableData where
@@ -273,7 +273,7 @@ def contextFree : ClosureTableData where
   concatClosed := true
   starClosed := true
   numClosureProps := 3
-  closure_eq := by omega
+  closure_eq := by simp
 
 /-- Context-sensitive languages: all 5. -/
 def contextSensitive : ClosureTableData where
@@ -285,7 +285,7 @@ def contextSensitive : ClosureTableData where
   concatClosed := true
   starClosed := true
   numClosureProps := 5
-  closure_eq := by omega
+  closure_eq := by simp
 
 /-- RE languages: 4 out of 5 (not complement). -/
 def recursivelyEnumerable : ClosureTableData where
@@ -297,7 +297,7 @@ def recursivelyEnumerable : ClosureTableData where
   concatClosed := true
   starClosed := true
   numClosureProps := 4
-  closure_eq := by omega
+  closure_eq := by simp
 
 /-- Path: closure count. -/
 def closure_count_path (ct : ClosureTableData) :

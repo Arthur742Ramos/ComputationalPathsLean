@@ -645,7 +645,7 @@ def ambiguous2 (n r : Nat) (hn : n > 0) (hr : r > 0) : AmbiguityData where
   inherent_implies := fun h => by simp at h
   minParseTrees := 2
   minParseTrees_pos := by omega
-  ambiguous_iff := by omega
+  ambiguous_iff := by constructor; intro; omega; intro; rfl
 
 end AmbiguityData
 
