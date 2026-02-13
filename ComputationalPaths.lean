@@ -9,7 +9,9 @@ import Chromatic.PathInfrastructure
 import Topos.PathCoherence
 import Descent.PathCoherence
 import Deformation.PathInfrastructure
+import Moduli.PathInfrastructure
 import Cobordism.PathInfrastructure
+import TFT.PathInfrastructure
 import Arithmetic.PathInfrastructure
 import Langlands.PathInfrastructure
 import Anabelian.PathInfrastructure
@@ -18,6 +20,7 @@ import Factorization.PathInfrastructure
 import Perfectoid.PathInfrastructure
 import Padic.PathInfrastructure
 import GRT.PathInfrastructure
+import GIT.PathInfrastructure
 import InfinityCategory.PathInfrastructure
 import Condensed.PathInfrastructure
 import Quantum.PathInfrastructure
@@ -29,4 +32,5 @@ import Tropical.PathInfrastructure
 import Hodge.PathInfrastructure
 import Log.PathInfrastructure
 import RepStability.PathInfrastructure
+import HomologicalStability.PathInfrastructure
 import Intersection.PathInfrastructure

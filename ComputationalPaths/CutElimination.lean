@@ -68,6 +68,10 @@ namespace CutElimination
 
 universe u v w
 
+private def pathOfEqStepChain {A : Type _} {a b : A} (h : a = b) : Path a b := by
+  cases h
+  exact Path.trans (Path.refl a) (Path.refl a)
+
 /-! ## Sequent Calculus -/
 
 /-- Data for a sequent calculus. We track the type (LK = classical,
@@ -126,22 +130,22 @@ def lj : SequentCalculus where
 /-- Path: soundness. -/
 def soundness_path (sc : SequentCalculus) :
     Path sc.soundnessObstruction 0 :=
-  Path.ofEqChain sc.soundness_zero
+  pathOfEqStepChain sc.soundness_zero
 
 /-- Path: completeness. -/
 def completeness_path (sc : SequentCalculus) :
     Path sc.completenessObstruction 0 :=
-  Path.ofEqChain sc.completeness_zero
+  pathOfEqStepChain sc.completeness_zero
 
 /-- Path: total rules. -/
 def total_rules_path (sc : SequentCalculus) :
     Path sc.totalRules (sc.numLogicalRules + sc.numStructuralRules) :=
-  Path.ofEqChain sc.total_eq
+  pathOfEqStepChain sc.total_eq
 
 /-- Path: LK total is 14. -/
 def lk_total_path :
     Path lk.totalRules 14 :=
-  Path.ofEqChain rfl
+  pathOfEqStepChain rfl
 
 end SequentCalculus
 
@@ -220,7 +224,7 @@ def cut : StructuralRule where
 /-- Path: cut is admissible (eliminable). -/
 def cut_admissible_path :
     Path cut.admissibilityObstruction 0 :=
-  Path.ofEqChain rfl
+  pathOfEqStepChain rfl
 
 end StructuralRule
 
@@ -285,7 +289,7 @@ def minimal : CutRule where
 /-- Path: conclusion bound for propositional cut. -/
 def prop_conclusion_path :
     Path (min propositional.conclusionSize (propositional.leftPremiseSize + propositional.rightPremiseSize - 1)) propositional.conclusionSize :=
-  Path.ofEqChain (by simp [propositional])
+  pathOfEqStepChain (by simp [propositional])
 
 end CutRule
 
@@ -422,12 +426,12 @@ theorem cut_reduction_steps_terminal (ce : CutEliminationData) :
 /-- Path: termination. -/
 def termination_path (ce : CutEliminationData) :
     Path ce.terminationObstruction 0 :=
-  Path.ofEqChain ce.termination_zero
+  pathOfEqStepChain ce.termination_zero
 
 /-- Path: result size bound. -/
 def result_bound_path (ce : CutEliminationData) :
     Path (min ce.originalSize ce.resultSize) ce.originalSize :=
-  Path.ofEqChain (Nat.min_eq_left ce.result_ge)
+  pathOfEqStepChain (Nat.min_eq_left ce.result_ge)
 
 end CutEliminationData
 
@@ -488,12 +492,12 @@ def compound (n d : Nat) (hn : n > 0) : SubformulaProperty where
 /-- Path: subformula property. -/
 def subformula_path (sp : SubformulaProperty) :
     Path sp.nonSubformulas 0 :=
-  Path.ofEqChain sp.subformula_zero
+  pathOfEqStepChain sp.subformula_zero
 
 /-- Path: analyticity. -/
 def analyticity_path (sp : SubformulaProperty) :
     Path sp.analyticityObstruction 0 :=
-  Path.ofEqChain sp.analyticity_zero
+  pathOfEqStepChain sp.analyticity_zero
 
 end SubformulaProperty
 
@@ -548,12 +552,12 @@ def multiInstance (n : Nat) (hn : n ≥ 1) (d : Nat) : HerbrandData where
 /-- Path: Herbrand theorem (tautology). -/
 def herbrand_path (hd : HerbrandData) :
     Path hd.tautologyObstruction 0 :=
-  Path.ofEqChain hd.tautology_zero
+  pathOfEqStepChain hd.tautology_zero
 
 /-- Path: Skolem functions. -/
 def skolem_path (hd : HerbrandData) :
     Path hd.skolemObstruction 0 :=
-  Path.ofEqChain hd.skolem_zero
+  pathOfEqStepChain hd.skolem_zero
 
 end HerbrandData
 
@@ -631,22 +635,22 @@ def general (a b c cv : Nat) (ha : a > 0) (hb : b > 0) : InterpolationData where
 /-- Path: interpolation theorem. -/
 def interpolation_path (id_ : InterpolationData) :
     Path id_.interpolationObstruction 0 :=
-  Path.ofEqChain (by rw [id_.interpolation_eq, id_.variable_zero, id_.leftValid_zero, id_.rightValid_zero])
+  pathOfEqStepChain (by rw [id_.interpolation_eq, id_.variable_zero, id_.leftValid_zero, id_.rightValid_zero])
 
 /-- Path: variable condition. -/
 def variable_path (id_ : InterpolationData) :
     Path id_.variableObstruction 0 :=
-  Path.ofEqChain id_.variable_zero
+  pathOfEqStepChain id_.variable_zero
 
 /-- Path: left validity. -/
 def left_valid_path (id_ : InterpolationData) :
     Path id_.leftValidObstruction 0 :=
-  Path.ofEqChain id_.leftValid_zero
+  pathOfEqStepChain id_.leftValid_zero
 
 /-- Path: right validity. -/
 def right_valid_path (id_ : InterpolationData) :
     Path id_.rightValidObstruction 0 :=
-  Path.ofEqChain id_.rightValid_zero
+  pathOfEqStepChain id_.rightValid_zero
 
 end InterpolationData
 
@@ -696,27 +700,27 @@ def standard : GentzenConsistency where
 /-- Path: PA is consistent. -/
 def gentzen_consistency_path (gc : GentzenConsistency) :
     Path gc.consistencyObstruction 0 :=
-  Path.ofEqChain gc.consistency_zero
+  pathOfEqStepChain gc.consistency_zero
 
 /-- Path: independence of TI(ε₀). -/
 def independence_path (gc : GentzenConsistency) :
     Path gc.independenceObstruction 0 :=
-  Path.ofEqChain gc.independence_zero
+  pathOfEqStepChain gc.independence_zero
 
 /-- Path: Gödel's second. -/
 def goedel_path (gc : GentzenConsistency) :
     Path gc.goedelObstruction 0 :=
-  Path.ofEqChain gc.goedel_zero
+  pathOfEqStepChain gc.goedel_zero
 
 /-- Path: theory is PA. -/
 def theory_path (gc : GentzenConsistency) :
     Path gc.theoryLabel 1 :=
-  Path.ofEqChain gc.theory_eq
+  pathOfEqStepChain gc.theory_eq
 
 /-- Path: ordinal is ε₀. -/
 def ordinal_path (gc : GentzenConsistency) :
     Path gc.inductionOrdinal 10 :=
-  Path.ofEqChain gc.ordinal_eq
+  pathOfEqStepChain gc.ordinal_eq
 
 end GentzenConsistency
 
@@ -776,7 +780,7 @@ def singleCutLJ : ProofSizeBlowup where
 /-- Path: no blowup for cut-free proofs. -/
 def no_blowup_path (calc_type : Nat) :
     Path (noCuts calc_type).blowupExponent 0 :=
-  Path.ofEqChain rfl
+  pathOfEqStepChain rfl
 
 end ProofSizeBlowup
 
@@ -838,12 +842,12 @@ def cutFree (n : Nat) (hn : n ≥ 1) (d : Nat) (hd : d ≥ 1) (hdn : d ≤ n) :
 /-- Path: proof correctness. -/
 def correctness_path (sp : SequentProof) :
     Path sp.correctnessObstruction 0 :=
-  Path.ofEqChain sp.correctness_zero
+  pathOfEqStepChain sp.correctness_zero
 
 /-- Path: axiom proof has 0 cuts. -/
 def axiom_cutfree_path :
     Path axiomProof.numCutApps 0 :=
-  Path.ofEqChain rfl
+  pathOfEqStepChain rfl
 
 end SequentProof
 

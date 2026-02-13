@@ -41,7 +41,13 @@ name = "Descent"
 name = "Deformation"
 
 [[lean_lib]]
+name = "Moduli"
+
+[[lean_lib]]
 name = "Cobordism"
+
+[[lean_lib]]
+name = "TFT"
 
 [[lean_lib]]
 name = "Arithmetic"
@@ -87,6 +93,9 @@ name = "Intersection"
 
 [[lean_lib]]
 name = "GRT"
+
+[[lean_lib]]
+name = "GIT"
 
 [[lean_lib]]
 name = "DAG"
