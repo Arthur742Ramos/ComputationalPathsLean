@@ -107,8 +107,8 @@ end SingularSimplex
 /-- The singular complex of X as an `SSetData`. -/
 def singularComplex (X : Type u) : SSetData where
   obj := fun n => SingularSimplex X n
-  face := fun n i σ => SingularSimplex.face i σ
-  degen := fun n i σ => SingularSimplex.degen i σ
+  face := fun _n i σ => SingularSimplex.face i σ
+  degen := fun _n i σ => SingularSimplex.degen i σ
 
 /-- The singular complex applied to a point gives a constant simplicial set. -/
 theorem singularComplex_const (X : Type u) (x : X) (n : Nat) (i : Fin (n + 2)) :
@@ -154,8 +154,8 @@ def face_face_path {X : Type u} {n : Nat}
 /-- ∂² = 0 structure: the signed face maps cancel pairwise. -/
 structure BoundarySquareZero (X : Type u) where
   /-- For each pair (i,j) with i ≤ j, the corresponding terms in ∂² cancel. -/
-  cancel : ∀ (n : Nat) (σ : SingularSimplex X (n + 2))
-    (i j : Nat) (hi : i < n + 2) (hj : j < n + 2) (hij : i ≤ j),
+  cancel : ∀ (n : Nat) (_σ : SingularSimplex X (n + 2))
+    (i j : Nat) (_hi : i < n + 2) (_hj : j < n + 2) (_hij : i ≤ j),
     boundarySign i * boundarySign (j + 1) +
     boundarySign j * boundarySign i = 0
 

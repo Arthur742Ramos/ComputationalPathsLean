@@ -144,15 +144,15 @@ structure LiftingData {A : Type u}
     (iab : Path a b) (pcd : Path c d),
     iClass iab → pClass pcd →
     (Path.trans f pcd).toEq = (Path.trans iab g).toEq →
-    ∃ h : Path b c,
+    ∃ _h : Path b c,
       True
   /-- Path witness that the lift is compatible. -/
   lift_path : ∀ {a b c d : A}
     (f : Path a c) (g : Path b d)
     (iab : Path a b) (pcd : Path c d)
-    (hi : iClass iab) (hp : pClass pcd)
-    (hcomm : (Path.trans f pcd).toEq = (Path.trans iab g).toEq),
-    ∃ h : Path b c,
+    (_hi : iClass iab) (_hp : pClass pcd)
+    (_hcomm : (Path.trans f pcd).toEq = (Path.trans iab g).toEq),
+    ∃ _h : Path b c,
       True
 
 /-! ## Retract arguments -/
@@ -226,7 +226,7 @@ structure FunctorialFactSystem (A : Type u) where
   factor_path : ∀ {a b : A} (p : Path a b),
     Path (Path.trans (leftFact p) (rightFact p)) p
   /-- Functoriality on left factor. -/
-  left_natural : ∀ {a b c : A} (p : Path a b) (q : Path b c),
+  left_natural : ∀ {a b c : A} (_p : Path a b) (_q : Path b c),
     True
 
 /-- Identity factorization: factors through b via (p, refl). -/
@@ -301,7 +301,7 @@ structure CofibrantGeneration (A : Type u) (M : ModelCatData A) where
         (⟨a', b', i⟩ : Σ (a b : A), Path a b) = x →
         True  -- abstract RLP condition
   /-- Trivial fibrations are exactly RLP w.r.t. generating cofibrations. -/
-  trivFib_rlp : ∀ {a b : A} (p : Path a b),
+  trivFib_rlp : ∀ {a b : A} (_p : Path a b),
     True
 
 /-! ## Quillen adjunctions -/
@@ -396,7 +396,7 @@ def trivialHFC (A : Type u) (M : ModelCatData A) : HomotopyFunctionComplex A M w
 /-! ## Coherence theorems -/
 
 /-- Factorization paths compose correctly. -/
-theorem factorization_compose {A : Type u} (M : ModelCatData A)
+theorem factorization_compose {A : Type u} (_M : ModelCatData A)
     {a b c : A} (f : Path a b) (g : Path b c) :
     ∃ (d : A) (l : Path a d) (r : Path d c),
       (Path.trans l r).toEq = (Path.trans f g).toEq := by
@@ -422,7 +422,7 @@ theorem mcstep_multi_sound {A : Type u} {a b : A}
 
 /-- Retract of identity is identity. -/
 theorem retract_of_refl {A : Type u} {a c d : A}
-    (g : Path c d) (R : RetractDiagram (Path.refl a) g) :
+    (g : Path c d) (_R : RetractDiagram (Path.refl a) g) :
     True := by
   trivial
 

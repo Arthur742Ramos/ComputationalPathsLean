@@ -211,7 +211,7 @@ structure NormElem (S : SimplicialAbelianGroup) (n : Nat) where
 /-- The normalized chain complex data. -/
 structure NormalizedChainComplex (S : SimplicialAbelianGroup) where
   /-- Elements of the normalized complex at each level. -/
-  elem : ∀ n, Type u
+  elem : ∀ _n, Type u
   /-- Abelian group structure at each level. -/
   grp : ∀ n, AbelianGroupData (elem n)
   /-- The boundary map ∂_n : N_n → N_{n-1} (using d_0 restricted). -/

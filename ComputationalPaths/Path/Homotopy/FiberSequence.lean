@@ -46,7 +46,7 @@ noncomputable def connectingMap_trans_path {B : Type u} {P : B → Type u}
     Path
       (Fibration.connectingMap₁ b x₀ (Path.trans l₁ l₂))
       (Fibration.connectingMap₁ b (Fibration.connectingMap₁ b x₀ l₁) l₂) :=
-  Path.stepChainChain (Fibration.connectingMap₁_trans (P := P) b x₀ l₁ l₂)
+  Path.stepChain (Fibration.connectingMap₁_trans (P := P) b x₀ l₁ l₂)
 
 end FiberSequence
 end Homotopy

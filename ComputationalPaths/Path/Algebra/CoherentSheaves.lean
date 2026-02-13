@@ -108,7 +108,7 @@ structure SheafMorphism {X : SpaceData.{u}}
 def SheafMorphism.zeroMap {X : SpaceData.{u}}
     (F G : CoherentSheaf X) : SheafMorphism F G where
   onSections := fun U hU _ => G.zero U hU
-  map_zero := fun U hU => Path.refl _
+  map_zero := fun _U _hU => Path.refl _
 
 /-- An exact sequence of coherent sheaves 0 → F → G → H → 0. -/
 structure SheafExactSeq {X : SpaceData.{u}}
@@ -139,7 +139,7 @@ structure SheafCohomology {X : SpaceData.{u}} (F : CoherentSheaf X) where
 /-- Path witness that H^0 = global sections. -/
 def cohomology_zero_global {X : SpaceData.{u}} {F : CoherentSheaf X}
     (H : SheafCohomology F) (hU : X.isOpen (fun _ => True))
-    (equiv : H.carrier 0 → F.section_ (fun _ => True) hU)
+    (_equiv : H.carrier 0 → F.section_ (fun _ => True) hU)
     (_invEquiv : F.section_ (fun _ => True) hU → H.carrier 0) :
     True := trivial
 

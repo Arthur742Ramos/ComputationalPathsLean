@@ -80,9 +80,9 @@ structure RingSpectrum where
 /-- Associativity data for a ring spectrum. -/
 structure RingSpectrumAssoc (R : RingSpectrum) where
   assoc : ∀ (a b c : Nat)
-    (x : (R.spectrum.level a).carrier)
-    (y : (R.spectrum.level b).carrier)
-    (z : (R.spectrum.level c).carrier),
+    (_x : (R.spectrum.level a).carrier)
+    (_y : (R.spectrum.level b).carrier)
+    (_z : (R.spectrum.level c).carrier),
     True
 
 /-! ## Commutative ring spectra -/
@@ -91,8 +91,8 @@ structure RingSpectrumAssoc (R : RingSpectrum) where
 structure CommRingSpectrum extends RingSpectrum where
   /-- Commutativity of multiplication. -/
   comm : ∀ (n m : Nat)
-    (x : (spectrum.level n).carrier)
-    (y : (spectrum.level m).carrier),
+    (_x : (spectrum.level n).carrier)
+    (_y : (spectrum.level m).carrier),
     True
 
 /-! ## Module spectra -/

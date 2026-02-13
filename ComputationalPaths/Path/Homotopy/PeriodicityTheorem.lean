@@ -58,7 +58,7 @@ structure HopkinsSmithPeriodicity (p : Prime) (n : Nat) where
 
 /-- Trivial periodicity witness choosing identity maps. -/
 def hopkinsSmithPeriodicity (p : Prime) (n : Nat) : HopkinsSmithPeriodicity p n where
-  vnSelfMap := fun X =>
+  vnSelfMap := fun _X =>
     { selfMap := fun x => x
       period := 1
       induces_iso := trivial

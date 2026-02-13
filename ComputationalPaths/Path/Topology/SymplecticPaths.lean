@@ -155,7 +155,7 @@ structure HamiltonianIsotopy (M : SymplecticManifold.{u}) where
 /-- Two symplectomorphisms are Hamiltonian isotopic if connected by
     a Hamiltonian isotopy. -/
 def HamiltonianIsotopic (M : SymplecticManifold.{u})
-    (f g : Symplectomorphism M M) : Prop :=
+    (_f _g : Symplectomorphism M M) : Prop :=
   ∃ _ : HamiltonianIsotopy M, True
 
 /-! ## Path composition and Hamiltonian isotopy -/
@@ -217,9 +217,9 @@ structure SymplecticCapacity where
   monotone : ∀ M N : SymplecticManifold.{u},
     (M.carrier → N.carrier) → cap M ≤ cap N
   /-- Normalization on the ball. -/
-  ball_cap : ∀ n r : Nat, True
+  ball_cap : ∀ _n _r : Nat, True
   /-- Normalization on the cylinder. -/
-  cylinder_cap : ∀ n r : Nat, True
+  cylinder_cap : ∀ _n _r : Nat, True
 
 /-! ## Gromov Nonsqueezing -/
 

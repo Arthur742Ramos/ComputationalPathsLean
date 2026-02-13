@@ -176,7 +176,7 @@ theorem transportFiber_symm_right {A : Type u} (P : FibrationFamily A)
 projecting a transported element yields the transport of the projection. -/
 @[simp] theorem grothendieckProjection_transport {A : Type u}
     (F : FundamentalGroupoidTypeFunctor A)
-    {x y : GrothendieckTotal F} (p : Path x y) :
+    {x y : GrothendieckTotal F} (_p : Path x y) :
     (grothendieckProjection F).obj x = x.1 := rfl
 
 /-- RwEq interchange for fiber transport: composing transports along two

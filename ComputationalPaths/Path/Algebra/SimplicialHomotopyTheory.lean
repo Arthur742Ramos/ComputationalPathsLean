@@ -79,7 +79,7 @@ structure Horn (S : SimplicialSetData.{u}) (n : Nat) (k : Fin (n + 2)) where
 /-- Kan condition with Path-valued filler witness. -/
 structure KanConditionPath (S : SimplicialSetData.{u}) where
   /-- Every horn has a filler. -/
-  filler : ∀ (n : Nat) (k : Fin (n + 2)) (h : Horn S n k),
+  filler : ∀ (n : Nat) (k : Fin (n + 2)) (_h : Horn S n k),
     S.simplex (n + 1)
   /-- The filler extends the horn. -/
   filler_extends : ∀ (n : Nat) (k : Fin (n + 2)) (h : Horn S n k)
@@ -184,8 +184,8 @@ structure SimplicialModelStructure where
   /-- A predicate for fibrations (Kan fibrations). -/
   isFib : SimplicialSetData.{u} → SimplicialSetData.{u} → Prop
   /-- Factorization: any map factors as cofibration then trivial fibration. -/
-  factor_cof_tfib : ∀ (S T : SimplicialSetData.{u}),
-    ∃ U : SimplicialSetData.{u}, True
+  factor_cof_tfib : ∀ (_S _T : SimplicialSetData.{u}),
+    ∃ _U : SimplicialSetData.{u}, True
 
 /-- The trivial simplicial model structure. -/
 def trivialSimplicialModel : SimplicialModelStructure.{u} where

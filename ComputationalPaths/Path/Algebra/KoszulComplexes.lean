@@ -205,7 +205,7 @@ structure RegularSequence {R : Type u} {M : Type v}
   /-- The sequence of elements. -/
   seq : List R
   /-- Each xᵢ is regular on M/(x₁,...,xᵢ₋₁)M (abstractly). -/
-  regular_at_stage : ∀ i : Fin seq.length, True
+  regular_at_stage : ∀ _i : Fin seq.length, True
   /-- The sequence is non-degenerate. -/
   nondegenerate : seq.length > 0 ∨ True
 

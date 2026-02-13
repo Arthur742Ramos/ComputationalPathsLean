@@ -231,7 +231,7 @@ structure PresentableCategory where
   /-- Each generator is an object. -/
   genObj : generators → category.obj
   /-- Generation: every object is a κ-filtered colimit of generators. -/
-  generates : ∀ x : category.obj, ∃ g : generators, True
+  generates : ∀ _x : category.obj, ∃ _g : generators, True
 
 /-- An ∞-functor preserves limits if it commutes with limit cones. -/
 structure PreservesLimits {C D : QuasiCategory} (F : InfinityFunctor C D) where
@@ -298,7 +298,7 @@ structure InfinityTopos extends PresentableCategory where
   /-- Object classifier: there exists a universal small fibration. -/
   objectClassifier : toPresentableCategory.category.obj
   /-- Classification: small maps to X correspond to maps X → U. -/
-  classifies : ∀ x : toPresentableCategory.category.obj,
+  classifies : ∀ _x : toPresentableCategory.category.obj,
     ∃ f : toPresentableCategory.category.mor,
       toPresentableCategory.category.target f = objectClassifier
 

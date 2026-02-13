@@ -190,7 +190,7 @@ def EMSpaceData.basePointPath {G : Type u} {n : Nat}
 
 /-- Step chain: the isomorphism composes with group operations. -/
 def EMSpaceData.isoAddChain {G : Type u} {n : Nat}
-    (K : EMSpaceData G n) (x y : K.space)
+    (K : EMSpaceData G n) (x _y : K.space)
     (h : K.pi_n_iso x = K.abelian.add (K.pi_n_iso x) K.abelian.zero) :
     Path (K.pi_n_iso x) (K.abelian.add (K.pi_n_iso x) K.abelian.zero) :=
   Path.stepChain h
@@ -245,7 +245,7 @@ structure PostnikovStageData (X : Type u) (n : Nat) where
   /-- Truncation map X → X⟨n⟩. -/
   truncation : X → stage
   /-- Truncation maps base to base. -/
-  truncation_base : ∀ x : X, True
+  truncation_base : ∀ _x : X, True
   /-- π_k(X⟨n⟩) ≅ π_k(X) for k ≤ n. -/
   pi_iso_low : ∀ k, k ≤ n → True
   /-- π_k(X⟨n⟩) = 0 for k > n. -/
@@ -329,7 +329,7 @@ structure KInvariantData (X : Type u) (n : Nat) where
   /-- The k-invariant class. -/
   k_class : stage_n.stage → pi_group
   /-- The k-invariant measures the failure to split. -/
-  k_obstruction : ∀ x : stage_n.stage, True
+  k_obstruction : ∀ _x : stage_n.stage, True
 
 /-- Path witness for k-invariant at basepoint. -/
 theorem KInvariantData.basepointEq {X : Type u} {n : Nat}

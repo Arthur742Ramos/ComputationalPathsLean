@@ -236,7 +236,7 @@ structure StableModelCatData (C : PreAdditiveCategory.{u})
   rotation : ∀ (E : ExactTriangleData C shiftData),
     RotationData E
   /-- Octahedral axiom holds. -/
-  octahedral : ∀ (E : ExactTriangleData C shiftData),
+  octahedral : ∀ (_E : ExactTriangleData C shiftData),
     OctahedralData (S := shiftData)
 
 /-! ## Triangulated structure from stable model category -/
@@ -270,7 +270,7 @@ def triangulatedFromStable
   exact_is_dist := fun _ => trivial
   rot_dist := fun _ _ => trivial
   iso_dist := fun _ _ _ _ => trivial
-  rot_path := fun T _ => Path.refl _
+  rot_path := fun _T _ => Path.refl _
 
 /-! ## Stable equivalences -/
 
@@ -304,9 +304,9 @@ def stableEquivId
     (SM : StableModelCatData C) : StableEquivData C C SM SM where
   obj := id
   mapHom := id
-  map_id := fun X => Path.refl _
-  map_comp := fun f g => Path.refl _
-  shift_comm := fun X => Path.refl _
+  map_id := fun _X => Path.refl _
+  map_comp := fun _f _g => Path.refl _
+  shift_comm := fun _X => Path.refl _
   preserves_exact := fun E => ⟨E, rfl, rfl⟩
 
 /-! ## Coherence theorems -/

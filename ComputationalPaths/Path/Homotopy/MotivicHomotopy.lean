@@ -128,7 +128,7 @@ def A1Homotopy.refl (X : MotivicSpace.{u}) : A1Homotopy X X where
 /-- An A¹-invariant presheaf: F(X) ≅ F(X × A¹). -/
 structure A1Invariant (F : Presheaf.{u}) where
   /-- The projection X × A¹ → X induces an isomorphism on sections. -/
-  invariance : ∀ (X : Scheme.{u}), True
+  invariance : ∀ (_X : Scheme.{u}), True
 
 /-! ## Motivic spheres -/
 
@@ -211,7 +211,7 @@ structure MotivicSpectrum where
   /-- Levelwise motivic spaces. -/
   level : Nat → MotivicSpace.{u}
   /-- Structure maps. -/
-  structureMap : ∀ (n : Nat), True
+  structureMap : ∀ (_n : Nat), True
 
 /-- The stable motivic homotopy category. -/
 structure StableMotivicCategory where

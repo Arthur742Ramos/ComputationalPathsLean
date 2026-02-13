@@ -112,10 +112,6 @@ semantic equality; the trace `steps` does not affect `toEq`. -/
 @[simp] def stepChain (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
-/-- Alias for `stepChain`, used across the codebase. -/
-@[simp] abbrev stepChainChain (h : a = b) : Path a b :=
-  stepChain h
-
 @[simp] theorem toEq_ofEq (h : a = b) : toEq (ofEq h) = h := rfl
 @[simp] theorem toEq_stepChain (h : a = b) : toEq (stepChain h) = h := rfl
 

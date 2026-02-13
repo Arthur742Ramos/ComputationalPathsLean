@@ -211,14 +211,14 @@ def trivialLeftDerived {A : Type u} {B : Type v}
     (M : MCat A) (N : MCat B) (Q : QuillenPair M N) :
     TotalLeftDerived M N Q where
   obj := Q.leftObj
-  obj_path := fun a => Path.refl _
+  obj_path := fun _a => Path.refl _
 
 /-- Every Quillen pair yields trivial total right derived functors. -/
 def trivialRightDerived {A : Type u} {B : Type v}
     (M : MCat A) (N : MCat B) (Q : QuillenPair M N) :
     TotalRightDerived M N Q where
   obj := Q.rightObj
-  obj_path := fun b => Path.refl _
+  obj_path := fun _b => Path.refl _
 
 /-! ## RwEq-based model step lemmas -/
 

@@ -77,7 +77,7 @@ structure DiscreteMorseFunction (K : CellComplex) where
   morse_condition : True
 
 /-- A cell is critical if it has no exceptional face or coface. -/
-def isCritical (K : CellComplex) (f : DiscreteMorseFunction K) (c : Cell) : Prop :=
+def isCritical (K : CellComplex) (_f : DiscreteMorseFunction K) (c : Cell) : Prop :=
   c ∈ K.cells ∧ True  -- the Morse condition ensures at most one exception
 
 /-- The set of critical cells. -/

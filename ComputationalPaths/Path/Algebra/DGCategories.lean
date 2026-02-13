@@ -69,7 +69,7 @@ structure GradedHom (G H : GradedType.{u}) (n : Int) where
 /-- The zero graded morphism. -/
 def GradedHom.zero (G H : GradedType.{u}) (n : Int)
     [∀ k, Inhabited (H.component k)] : GradedHom G H n where
-  map := fun k _ => default
+  map := fun _k _ => default
 
 /-! ## DG category -/
 

@@ -125,7 +125,7 @@ structure ThickSubcategory (p : Prime) where
   extension_closed : True
 
 /-- The thick subcategory C_n of spectra of type ≥ n. -/
-def thickCN (p : Prime) (n : Nat) : ThickSubcategory.{u} p where
+def thickCN (p : Prime) (_n : Nat) : ThickSubcategory.{u} p where
   objects := fun _ => True
   retract_closed := trivial
   extension_closed := trivial
@@ -150,7 +150,7 @@ structure NilpotenceData where
   /-- The self-map. -/
   selfMap : carrier → carrier
   /-- Nilpotence condition: some iterate is null. -/
-  nilpotent : ∃ (k : Nat), True
+  nilpotent : ∃ (_k : Nat), True
   /-- Detection: K(n) detects nilpotence. -/
   detected : True
 

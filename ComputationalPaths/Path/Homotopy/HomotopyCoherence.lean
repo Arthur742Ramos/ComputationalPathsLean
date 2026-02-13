@@ -103,9 +103,9 @@ structure AInfinityFunctor (C D : AInfinityCategory) where
   /-- Morphism map. -/
   mapHom : ∀ {X Y : C.Obj}, C.Hom X Y → D.Hom (mapObj X) (mapObj Y)
   /-- Preservation of units (recorded abstractly). -/
-  map_unit : ∀ X : C.Obj, True
+  map_unit : ∀ _X : C.Obj, True
   /-- Preservation of higher compositions (abstract). -/
-  map_comp : ∀ {n : Nat} (chain : AInfinityChain C.Obj C.Hom n), True
+  map_comp : ∀ {n : Nat} (_chain : AInfinityChain C.Obj C.Hom n), True
  
 /-- Identity A-infinity functor. -/
 def AInfinityFunctor.id (C : AInfinityCategory) : AInfinityFunctor C C where

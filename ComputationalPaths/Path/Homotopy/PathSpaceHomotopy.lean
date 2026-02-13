@@ -49,7 +49,7 @@ def pathSpaceAllPaths (A : Type u) (a : A)
 /-- The based path space has a unique element up to path
     (any two elements are path-connected). -/
 theorem pathSpace_connected (A : Type u) (a : A) :
-    ∀ (x y : PathSpace A a), ∃ p : Path x y, True :=
+    ∀ (x y : PathSpace A a), ∃ _p : Path x y, True :=
   fun x y => ⟨pathSpaceAllPaths A a x y, trivial⟩
 
 /-! ## Evaluation map as a fibration -/
@@ -242,7 +242,7 @@ def pathSpace_eval_coherence {A : Type u} {a : A}
 /-- Path witness: the deformation retract is compatible with
     the evaluation map. -/
 def deformationRetract_eval_coherence {A : Type u} {a : A}
-    (x : PathSpace A a) :
+    (_x : PathSpace A a) :
     Path
       (pathSpaceEval (pathSpaceBase A a))
       a :=

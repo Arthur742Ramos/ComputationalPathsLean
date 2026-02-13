@@ -103,7 +103,7 @@ def trivialWeakFactorizationSystem (A : Type u) : WeakFactorizationSystemPaths A
         composePath := ?_
         rightUnitStep := ?_
         leftUnitStep := ?_ }
-    · exact Path.stepChainChain (Path.trans_refl_right f)
+    · exact Path.stepChain (Path.trans_refl_right f)
     · exact Path.Step.trans_refl_right (Path.trans f (Path.refl b))
     · exact Path.Step.trans_refl_left (Path.trans f (Path.refl b))
   left_closed_trans := fun _ _ _ _ => trivial

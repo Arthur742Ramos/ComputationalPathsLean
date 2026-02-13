@@ -219,7 +219,7 @@ variable {A : Type u} {n : Nat}
 
 /-- The fiber of the FN projection over a configuration c is the set of
     points in A that are distinct from all points in c. -/
-def fiberDescription (fn : FadellNeuwirthData A n)
+def fiberDescription (_fn : FadellNeuwirthData A n)
     (c : OrderedConfig A n) : Type u :=
   { a : A // ∀ (i : Fin n), Path (c.val i) a → False }
 

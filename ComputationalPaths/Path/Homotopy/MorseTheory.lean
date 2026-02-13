@@ -128,11 +128,11 @@ def sublevel_path_of_no_critical {A : Type u} {mf : MorseFunction A}
 /-- Path witness for the canonical retraction of the upper sublevel set
     back to the lower one (when no critical points intervene). -/
 def sublevel_retraction_path {A : Type u} {mf : MorseFunction A}
-    {c₁ c₂ : Nat} (h_le : c₁ ≤ c₂)
+    {c₁ c₂ : Nat} (_h_le : c₁ ≤ c₂)
     (_h_no_crit : ∀ cp ∈ mf.criticalPoints, ¬(c₁ ≤ mf.f cp.1 ∧ mf.f cp.1 ≤ c₂))
     (x : sublevelSet mf.f c₁) :
     Path (sublevelInclusion (Nat.le_refl c₁) x) x :=
-  Path.stepChainChain rfl
+  Path.stepChain rfl
 
 /-! ## Handle Attachment at Critical Points -/
 
@@ -259,7 +259,7 @@ def sublevelInclusion_functorial_path {A : Type u} {f : A → Nat}
     Path
       (sublevelInclusion h₂ (sublevelInclusion h₁ x))
       (sublevelInclusion (Nat.le_trans h₁ h₂) x) :=
-  Path.stepChainChain rfl
+  Path.stepChain rfl
 
 /-- Path witness for handle decomposition count invariance. -/
 def handle_count_path {hd : HandleDecomposition} {k : Nat} :

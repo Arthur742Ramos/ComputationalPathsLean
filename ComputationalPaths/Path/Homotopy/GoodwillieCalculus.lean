@@ -148,7 +148,7 @@ def zeroApprox (C D : PointedCategory.{u})
   isExcisive := { excisive := fun _ _ => trivial }
   approxMap := {
     component := fun X => toTerminal (F.mapObj X)
-    naturality := fun {X Y} _ =>
+    naturality := fun {_X _Y} _ =>
       terminal_unique _ _ _
   }
   universal := fun _ _ _ => trivial
@@ -207,9 +207,9 @@ structure IdentityDerivatives (C : PointedCategory.{u}) where
   /-- ∂_1 Id ≃ S (the sphere spectrum). -/
   first_deriv : True
   /-- ∂_n Id has a Σ_n-action. -/
-  symmetric_action : ∀ (n : Nat), True
+  symmetric_action : ∀ (_n : Nat), True
   /-- ∂_n Id ≃ partition complex (Arone–Mahowald). -/
-  partition_complex : ∀ (n : Nat), True
+  partition_complex : ∀ (_n : Nat), True
 
 /-- The chain rule for Goodwillie calculus:
     ∂_n(G ∘ F) is computed from ∂_k G and ∂_j F. -/

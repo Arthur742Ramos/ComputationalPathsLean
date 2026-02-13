@@ -55,7 +55,7 @@ abbrev lensSpaceLoopSpace (p q : Nat) : Type u :=
 
 /-- Fundamental loop at the basepoint. -/
 @[simp] def lensSpaceLoop (p q : Nat) : lensSpaceLoopSpace p q :=
-  Path.stepChainChain rfl
+  Path.stepChain rfl
 
 /-- Iterate the fundamental loop `n` times. -/
 @[simp] def lensSpaceLoopPow (p q : Nat) : Nat → lensSpaceLoopSpace p q

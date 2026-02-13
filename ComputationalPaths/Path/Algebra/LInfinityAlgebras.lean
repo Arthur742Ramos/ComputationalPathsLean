@@ -123,7 +123,7 @@ def LInfinityData.add_zero_path {A : Type u} (L : LInfinityData A) (x : A) :
     of ±l_p(l_q(−),−) vanishes. -/
 structure GeneralizedJacobi {A : Type u} (L : LInfinityData A) where
   /-- For each n and inputs, the generalized Jacobi identity holds. -/
-  jacobi : ∀ (n : Nat) (inputs : Fin n → A), True
+  jacobi : ∀ (n : Nat) (_inputs : Fin n → A), True
 
 /-! ## L-infinity morphisms -/
 

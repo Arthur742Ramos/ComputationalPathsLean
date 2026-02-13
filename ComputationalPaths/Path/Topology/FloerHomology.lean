@@ -133,7 +133,7 @@ structure GradientFlow (M : FloerData.{u}) where
   /-- Energy of a flow line. -/
   energy : ∀ (γm γp : PeriodicOrbit M), flowLine γm γp → Nat
   /-- Energy identity: E(u) = A_H(γ₋) - A_H(γ₊). -/
-  energy_identity : ∀ (γm γp : PeriodicOrbit M) (u : flowLine γm γp),
+  energy_identity : ∀ (γm γp : PeriodicOrbit M) (_u : flowLine γm γp),
     True  -- energy = action(γ₋) - action(γ₊)
 
 /-- A Floer step: a morphism in the Floer flow category. -/
@@ -149,7 +149,7 @@ structure FloerStep (M : FloerData.{u})
 /-- Composition of Floer steps via gluing. -/
 def FloerStep.comp {M : FloerData.{u}}
     {γ₁ γ₂ γ₃ : PeriodicOrbit M}
-    (s₁ : FloerStep M γ₁ γ₂) (s₂ : FloerStep M γ₂ γ₃) :
+    (s₁ : FloerStep M γ₁ γ₂) (_s₂ : FloerStep M γ₂ γ₃) :
     FloerStep M γ₁ γ₃ where
   solution := {
     solutions := s₁.solution.solutions

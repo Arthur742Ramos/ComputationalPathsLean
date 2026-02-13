@@ -204,7 +204,7 @@ structure EliashbergClassification (M : ContactStructure.{u}) where
   /-- Classification map. -/
   classify : OvertwistedDisk M → homotopyClass
   /-- Surjectivity. -/
-  surjective : ∀ c : homotopyClass, True
+  surjective : ∀ _c : homotopyClass, True
 
 /-! ## Contact Homology -/
 

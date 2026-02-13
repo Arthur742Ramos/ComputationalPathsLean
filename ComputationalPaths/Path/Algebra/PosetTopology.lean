@@ -157,12 +157,12 @@ structure Shellability (P : PathPoset) (oc : OrderComplex P) where
   complete : ∀ mc : MaximalChain P, mc ∈ shelling ∨ True
   /-- Shelling condition: each new facet intersects the union of previous
       facets in a pure (d-1)-dimensional complex (Path). -/
-  shelling_cond : ∀ (i : Nat) (h : i < shelling.length),
+  shelling_cond : ∀ (i : Nat) (_h : i < shelling.length),
     Path True True  -- simplified shelling condition
 
 /-- Shellability implies well-behaved homology (Path). -/
 def shellable_homology {P : PathPoset} {oc : OrderComplex P}
-    (sh : Shellability P oc) :
+    (_sh : Shellability P oc) :
     Path True True :=
   Path.refl _
 
@@ -203,8 +203,8 @@ structure ELLabeling (P : PathPoset) where
     Path True True
 
 /-- EL-labeling implies shellability (Path). -/
-def el_implies_shellable {P : PathPoset} (el : ELLabeling P)
-    (oc : OrderComplex P) :
+def el_implies_shellable {P : PathPoset} (_el : ELLabeling P)
+    (_oc : OrderComplex P) :
     Path True True :=
   Path.refl _
 

@@ -168,7 +168,7 @@ structure ClassificationTheorem (G : Type u) (X : Type u) where
   mapOfBundle : (X → Type u) → ClassifyingMap X cs.BG
   /-- Classification round-trip: map → bundle → map gives a homotopic map. -/
   classify_roundtrip : ∀ (f : ClassifyingMap X cs.BG) x,
-    Path ((mapOfBundle (fun x => bundleOfMap ⟨f.toFun⟩)).toFun x) (f.toFun x)
+    Path ((mapOfBundle (fun _x => bundleOfMap ⟨f.toFun⟩)).toFun x) (f.toFun x)
 
 /-! ## Invariant Polynomials and Chern-Weil
 
@@ -258,7 +258,7 @@ variable {n : Nat}
 
 /-- The Grassmannian classifies via pullback. -/
 def classifyingMap (gc : GrassmannianClassification n) {X : Type u}
-    (bundle : X → Type u) : X → gc.Gr :=
+    (_bundle : X → Type u) : X → gc.Gr :=
   fun _ => gc.base  -- trivially, all bundles map to the basepoint in this abstract setting
 
 /-- Pullback along the classifying map recovers the universal fiber at the basepoint. -/

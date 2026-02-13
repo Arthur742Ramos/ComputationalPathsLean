@@ -75,8 +75,8 @@ structure SchemeMorphism (X Y : SchemeData.{u}) where
 /-- Identity morphism. -/
 def SchemeMorphism.id (X : SchemeData.{u}) : SchemeMorphism X X where
   onPoints := _root_.id
-  preimage_open := fun U hU => hU
-  pullback := fun hU s => s
+  preimage_open := fun _U hU => hU
+  pullback := fun _hU s => s
 
 /-- Composition of scheme morphisms. -/
 def SchemeMorphism.comp {X Y Z : SchemeData.{u}}
@@ -107,7 +107,7 @@ structure BaseChange {X Y S : SchemeData.{u}}
   /-- Universal property: for any pair of compatible morphisms, a unique map exists. -/
   universal : ∀ (Z : SchemeData.{u})
     (h1 : SchemeMorphism Z X) (h2 : SchemeMorphism Z Y)
-    (hcomm : ∀ z, f.onPoints (h1.onPoints z) = g.onPoints (h2.onPoints z)),
+    (_hcomm : ∀ z, f.onPoints (h1.onPoints z) = g.onPoints (h2.onPoints z)),
     SchemeMorphism Z product
   /-- The universal map commutes with pr1. -/
   universal_pr1 : ∀ (Z : SchemeData.{u})
@@ -139,7 +139,7 @@ structure ProperMorphism {X Y : SchemeData.{u}}
   valuative : ∀ (V : ValuationRingData.{u})
     (yMap : V.carrier → Y.Point)
     (genPt : V.fracField → X.Point)
-    (compat : ∀ r, f.onPoints (genPt (V.incl r)) = yMap r),
+    (_compat : ∀ r, f.onPoints (genPt (V.incl r)) = yMap r),
     ∃ lift : V.carrier → X.Point,
       ∀ r, f.onPoints (lift r) = yMap r
 
@@ -201,7 +201,7 @@ structure ConstructibleSet (X : SchemeData.{u}) where
 structure ChevalleyTheorem {X Y : SchemeData.{u}}
     (f : SchemeMorphism X Y) where
   /-- The image of a constructible set is constructible. -/
-  image_constructible : ∀ (C : ConstructibleSet X),
+  image_constructible : ∀ (_C : ConstructibleSet X),
     ConstructibleSet Y
   /-- The membership of the image. -/
   image_mem : ∀ (C : ConstructibleSet X) (y : Y.Point),

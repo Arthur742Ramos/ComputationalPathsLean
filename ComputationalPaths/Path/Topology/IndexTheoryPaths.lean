@@ -218,7 +218,7 @@ structure FamiliesIndexTheorem (F : EllipticFamily) where
   /-- The topological formula for the families index (abstract). -/
   topological_formula : True
   /-- Specializes to AS at a point. -/
-  specialization : ∀ b : F.base, True
+  specialization : ∀ _b : F.base, True
 
 /-! ## K-Theory Index Map -/
 

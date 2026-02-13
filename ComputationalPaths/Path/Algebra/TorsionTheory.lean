@@ -67,7 +67,7 @@ structure TorsionPair (C : PreAdditiveCategory.{u}) where
   decomp : ∀ (X : C.Obj),
     ∃ (T F : C.Obj),
       torsion T ∧ torsFree F ∧
-      (∃ (i : C.Hom T X) (p : C.Hom X F), True)
+      (∃ (_i : C.Hom T X) (_p : C.Hom X F), True)
   /-- Torsion class is closed under quotients (recorded as data). -/
   torsion_quot : ∀ (T : C.Obj), torsion T → torsion T
   /-- Torsion-free class is closed under subobjects (recorded as data). -/
@@ -76,7 +76,7 @@ structure TorsionPair (C : PreAdditiveCategory.{u}) where
 /-- Path witness for orthogonality. -/
 def TorsionPair.orthogonal_path {C : PreAdditiveCategory.{u}}
     (tp : TorsionPair C) (T F : C.Obj)
-    (hT : tp.torsion T) (hF : tp.torsFree F) :
+    (_hT : tp.torsion T) (_hF : tp.torsFree F) :
     Path (C.Hom T F) (C.Hom T F) :=
   Path.refl _
 
@@ -94,11 +94,11 @@ structure CotorsionPair (C : PreAdditiveCategory.{u}) where
   /-- Every object has an approximation from the left. -/
   left_approx : ∀ (X : C.Obj),
     ∃ (L : C.Obj), leftClass L ∧
-      ∃ (f : C.Hom L X), True
+      ∃ (_f : C.Hom L X), True
   /-- Every object has an approximation from the right. -/
   right_approx : ∀ (X : C.Obj),
     ∃ (R : C.Obj), rightClass R ∧
-      ∃ (f : C.Hom X R), True
+      ∃ (_f : C.Hom X R), True
 
 /-- A complete cotorsion pair has enough injectives and projectives. -/
 structure CompleteCotorsionPair (C : PreAdditiveCategory.{u})
@@ -106,7 +106,7 @@ structure CompleteCotorsionPair (C : PreAdditiveCategory.{u})
   /-- Special left approximation. -/
   special_left : ∀ (X : C.Obj),
     ∃ (L R : C.Obj), leftClass L ∧ rightClass R ∧
-      ∃ (f : C.Hom L X) (g : C.Hom X R), True
+      ∃ (_f : C.Hom L X) (_g : C.Hom X R), True
 
 /-! ## Tilting theory -/
 
@@ -119,7 +119,7 @@ structure TiltingObject (C : PreAdditiveCategory.{u}) where
   /-- No higher self-extensions. -/
   no_self_ext : True
   /-- Generation property: T generates the category. -/
-  generates : ∀ (X : C.Obj), ∃ (n : Nat), True
+  generates : ∀ (_X : C.Obj), ∃ (_n : Nat), True
 
 /-- Tilting equivalence data. -/
 structure TiltingEquivalence
@@ -186,7 +186,7 @@ structure ExchangeRelation (CC : ClusterCategory.{u}) where
   /-- Target indecomposable (the mutation). -/
   tgt : CC.triCat.cat.Obj
   /-- Exchange triangles exist. -/
-  exchange_triangle : ∃ (Z : CC.triCat.cat.Obj)
+  exchange_triangle : ∃ (_Z : CC.triCat.cat.Obj)
     (Tr : Triangle CC.triCat.cat CC.triCat.shift),
     CC.triCat.distinguished Tr ∧ Tr.X = src ∧ Tr.Z = tgt
 

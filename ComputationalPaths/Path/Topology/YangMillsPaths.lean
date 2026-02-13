@@ -82,7 +82,7 @@ structure Curvature (G : LieGroup) (P : PrincipalBundle G)
 structure FlatConnection (G : LieGroup) (P : PrincipalBundle G) extends
     Connection G P where
   /-- Curvature vanishes. -/
-  flat : ∀ x : P.base, True  -- F_A(x) = 0
+  flat : ∀ _x : P.base, True  -- F_A(x) = 0
 
 /-! ## Gauge Transformations -/
 
@@ -115,8 +115,8 @@ structure GaugeAction (G : LieGroup) (P : PrincipalBundle G) where
   /-- The action map. -/
   act : GaugeTransformation G P → Connection G P → Connection G P
   /-- Equivariance of curvature: F_{g·A} = g F_A g⁻¹. -/
-  curvature_equivariant : ∀ (g : GaugeTransformation G P)
-    (A : Connection G P), True
+  curvature_equivariant : ∀ (_g : GaugeTransformation G P)
+    (_A : Connection G P), True
 
 /-- A Yang-Mills step: gauge-equivariant transformation of connections. -/
 structure YMStep (G : LieGroup) (P : PrincipalBundle G)
@@ -135,7 +135,7 @@ structure YangMillsFunctional (G : LieGroup) (P : PrincipalBundle G) where
   /-- YM is non-negative. -/
   nonneg : ∀ A, eval A ≥ 0
   /-- YM is gauge-invariant. -/
-  gauge_inv : ∀ (g : GaugeTransformation G P) (A : Connection G P),
+  gauge_inv : ∀ (_g : GaugeTransformation G P) (_A : Connection G P),
     True  -- eval (g · A) = eval A
 
 /-- The Yang-Mills equations: d_A *F_A = 0 (Euler-Lagrange of YM). -/

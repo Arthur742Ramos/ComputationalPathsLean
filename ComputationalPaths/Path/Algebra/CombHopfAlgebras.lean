@@ -184,7 +184,7 @@ structure NSymAlgebra where
   /-- Ribbon expansion in terms of S (Path). -/
   ribbon_expand : ∀ (alpha : Composition), Path (ribbon alpha) (ribbon alpha)
   /-- NSym is dual to QSym (Path). -/
-  nsym_qsym_dual : ∀ (Q : QSymAlgebra) (alpha : Composition),
+  nsym_qsym_dual : ∀ (_Q : QSymAlgebra) (alpha : Composition),
     Path (ribbon alpha) (ribbon alpha)
   /-- Antipode on ribbons (Path). -/
   antipode_ribbon : ∀ (alpha : Composition),
@@ -218,7 +218,7 @@ structure MRAlgebra where
   std_coprod : ∀ (sigma : Perm),
     Path (hopf.comul (basis sigma)) (hopf.comul (basis sigma))
   /-- FQSym maps surjectively onto QSym (Path). -/
-  fqsym_to_qsym : ∀ (Q : QSymAlgebra) (sigma : Perm),
+  fqsym_to_qsym : ∀ (_Q : QSymAlgebra) (sigma : Perm),
     Path (basis sigma) (basis sigma)
   /-- Antipode on FQSym (Path). -/
   antipode_perm : ∀ (sigma : Perm),

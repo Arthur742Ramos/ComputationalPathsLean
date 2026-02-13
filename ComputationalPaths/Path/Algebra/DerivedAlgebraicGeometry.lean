@@ -269,7 +269,7 @@ structure DerivedScheme where
   /-- Each cover element gives a derived affine. -/
   affineChart : cover → DerivedAffine
   /-- The charts cover the space. -/
-  isCover : space → ∃ c : cover, True
+  isCover : space → ∃ _c : cover, True
 
 /-- Morphism of derived schemes. -/
 structure DerivedSchemeMorphism (X Y : DerivedScheme) where

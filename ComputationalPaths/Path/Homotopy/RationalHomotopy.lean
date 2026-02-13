@@ -246,7 +246,7 @@ def RationalEquivalence.symm {A B : CDGA} (e : RationalEquivalence A B) :
 
 /-- The Sullivan model of an odd sphere S^{2n+1}: a single generator in
     degree 2n+1 with zero differential. -/
-def oddSphereCDGA (n : Nat) : CDGA where
+def oddSphereCDGA (_n : Nat) : CDGA where
   component := fun _ => Unit
   zero := fun _ => ()
   diff := fun _ _ => ()
@@ -254,7 +254,7 @@ def oddSphereCDGA (n : Nat) : CDGA where
 
 /-- The Sullivan model of an even sphere S^{2n}: generators in degrees 2n
     and 4n-1. -/
-def evenSphereCDGA (n : Nat) : CDGA where
+def evenSphereCDGA (_n : Nat) : CDGA where
   component := fun _ => Unit
   zero := fun _ => ()
   diff := fun _ _ => ()

@@ -77,9 +77,9 @@ structure HornData (S : SSetData) (n : Nat) (k : Fin (n + 2)) where
   faces : (i : Fin (n + 2)) → i ≠ k → S.obj n
   /-- Compatibility: shared faces agree.
       For i ≠ k and j ≠ k with i < j, d_i(face_j) = d_{j-1}(face_i). -/
-  compat : ∀ (i j : Fin (n + 2)) (hi : i ≠ k) (hj : j ≠ k),
+  compat : ∀ (i j : Fin (n + 2)) (_hi : i ≠ k) (_hj : j ≠ k),
     i.val < j.val →
-    ∀ (m : Nat) (hm : m + 1 = n),
+    ∀ (m : Nat) (_hm : m + 1 = n),
     True  -- Simplified compatibility; full simplicial identities would be complex
 
 /-- A horn filler: an (n+1)-simplex whose faces (except face k) match the horn. -/
@@ -102,7 +102,7 @@ def OuterHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
   k.val = 0 ∨ k.val = n + 1
 
 /-- Every horn is either inner or outer (when n ≥ 1). -/
-theorem inner_or_outer (n : Nat) (hn : n ≥ 1) (k : Fin (n + 2)) :
+theorem inner_or_outer (n : Nat) (_hn : n ≥ 1) (k : Fin (n + 2)) :
     InnerHorn n k ∨ OuterHorn n k := by
   by_cases h0 : k.val = 0
   · right; left; exact h0

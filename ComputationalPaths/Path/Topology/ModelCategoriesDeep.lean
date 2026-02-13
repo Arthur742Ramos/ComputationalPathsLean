@@ -229,9 +229,9 @@ structure ClosedModelData (A : Type u) where
     isCof i → isFib p → weq.isWeq i ∨ weq.isWeq p →
     True
   /-- MC4a: Factor as cofibration ∘ trivial fibration. -/
-  factor_cof_triv_fib : ∀ {a b : A} (f : Path a b), True
+  factor_cof_triv_fib : ∀ {a b : A} (_f : Path a b), True
   /-- MC4b: Factor as trivial cofibration ∘ fibration. -/
-  factor_triv_cof_fib : ∀ {a b : A} (f : Path a b), True
+  factor_triv_cof_fib : ∀ {a b : A} (_f : Path a b), True
 
 /-- Trivial closed model category: everything is everything. -/
 def trivialClosedModel (A : Type u) : ClosedModelData A where

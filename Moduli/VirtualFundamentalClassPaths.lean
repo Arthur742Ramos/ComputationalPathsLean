@@ -110,9 +110,9 @@ def trivialNatVirtualClass : VirtualFundamentalClassPathData Nat Nat where
   classOf := fun x => x
   expectedDim := fun _ => 0
   obstructionRank := fun x => x
-  mapClass := fun {x y} p => p
+  mapClass := fun {_x _y} p => p
   mapDim := fun {_ _} _ => Path.refl 0
-  mapRank := fun {x y} p => p
+  mapRank := fun {_x _y} p => p
 
 end Moduli
 end ComputationalPaths

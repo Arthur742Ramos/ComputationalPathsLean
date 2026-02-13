@@ -105,7 +105,7 @@ def K3_right : StasheffAssociahedron 3 where
   leaves_eq := rfl
 
 /-- Dimension of the associahedron K_n is n-2 for n ≥ 2. -/
-def associahedronDim (n : Nat) (h : n ≥ 2) : Nat := n - 2
+def associahedronDim (n : Nat) (_h : n ≥ 2) : Nat := n - 2
 
 /-- K_2 has dimension 0 (a point). -/
 theorem K2_dim : associahedronDim 2 (Nat.le_refl 2) = 0 := rfl

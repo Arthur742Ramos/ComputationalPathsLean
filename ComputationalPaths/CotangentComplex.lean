@@ -50,7 +50,7 @@ namespace CotangentComplex
 universe u v
 
 private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
-  Path.stepChainChain h
+  Path.stepChain h
 
 /-! ## Chain Complexes -/
 

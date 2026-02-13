@@ -59,9 +59,9 @@ structure GenuineGSpectrum (G : Type u) (S : StrictGroup G) where
   /-- Fixed-point spectra for each subgroup. -/
   fixedPointSpectrum : Subgroup G S → Algebra.SpectralAlgebra.Spectrum
   /-- Restriction compatibility (abstract). -/
-  restriction : ∀ {H K : Subgroup G S}, True
+  restriction : ∀ {_H _K : Subgroup G S}, True
   /-- Transfer compatibility (abstract). -/
-  transfer : ∀ {H K : Subgroup G S}, True
+  transfer : ∀ {_H _K : Subgroup G S}, True
 
 /-! ## Burnside ring -/
 
@@ -78,19 +78,19 @@ structure BurnsideRing (G : Type u) (S : StrictGroup G) where
   /-- Multiplication. -/
   mul : carrier → carrier → carrier
   /-- Additive commutativity (abstract). -/
-  add_comm : ∀ x y : carrier, True
+  add_comm : ∀ _x _y : carrier, True
   /-- Additive associativity (abstract). -/
-  add_assoc : ∀ x y z : carrier, True
+  add_assoc : ∀ _x _y _z : carrier, True
   /-- Additive identity (abstract). -/
-  add_zero : ∀ x : carrier, True
+  add_zero : ∀ _x : carrier, True
   /-- Multiplicative commutativity (abstract). -/
-  mul_comm : ∀ x y : carrier, True
+  mul_comm : ∀ _x _y : carrier, True
   /-- Multiplicative associativity (abstract). -/
-  mul_assoc : ∀ x y z : carrier, True
+  mul_assoc : ∀ _x _y _z : carrier, True
   /-- Multiplicative identity (abstract). -/
-  mul_one : ∀ x : carrier, True
+  mul_one : ∀ _x : carrier, True
   /-- Distributivity (abstract). -/
-  distrib : ∀ x y z : carrier, True
+  distrib : ∀ _x _y _z : carrier, True
 
 /-- The Burnside ring modeled as the constant Nat ring. -/
 def burnsideRing (G : Type u) (S : StrictGroup G) : BurnsideRing G S where
@@ -177,7 +177,7 @@ end ROCohomologyTheory
 structure TomDieckSplitting {G : Type u} {S : StrictGroup G}
     (E : GenuineGSpectrum G S) where
   /-- The splitting for each subgroup (abstract). -/
-  splitting : ∀ H : Subgroup G S, True
+  splitting : ∀ _H : Subgroup G S, True
 
 /-- Trivial tom Dieck splitting witness. -/
 def TomDieckSplitting.trivial {G : Type u} {S : StrictGroup G}

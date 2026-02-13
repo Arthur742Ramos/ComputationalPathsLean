@@ -209,7 +209,7 @@ def DerivedCatData.ofTriangulated {C : PreAdditiveCategory.{u}}
   shift_distinguished := fun _ _ => trivial
   id_triangle := fun _ => trivial
   iso_triangle := fun _ _ _ _ => trivial
-  rotate_path := fun T _ => Path.refl _
+  rotate_path := fun _T _ => Path.refl _
 
 /-! ## Derived functors -/
 
@@ -251,17 +251,17 @@ def LeftDerivedFunctor.id (C : PreAdditiveCategory.{u})
     (DC : DerivedCatData C) : LeftDerivedFunctor C C DC DC where
   obj := fun X => X
   mapHom := fun {_ _} f => f
-  map_id := fun X => Path.refl _
-  map_comp := fun f g => Path.refl _
-  shift_comm := fun X => Path.refl _
+  map_id := fun _X => Path.refl _
+  map_comp := fun _f _g => Path.refl _
+  shift_comm := fun _X => Path.refl _
 
 /-- Identity right derived functor. -/
 def RightDerivedFunctor.id (C : PreAdditiveCategory.{u})
     (DC : DerivedCatData C) : RightDerivedFunctor C C DC DC where
   obj := fun X => X
   mapHom := fun {_ _} f => f
-  map_id := fun X => Path.refl _
-  map_comp := fun f g => Path.refl _
+  map_id := fun _X => Path.refl _
+  map_comp := fun _f _g => Path.refl _
 
 /-! ## Natural transformations between derived functors -/
 
@@ -330,10 +330,10 @@ structure TStructureData (C : PreAdditiveCategory.{u})
     C.Hom X Y → C.Hom X Y  -- abstract: the hom is zero
   /-- Path witness: truncation functor τ^≥0 exists. -/
   truncation_ge : ∀ X : C.Obj,
-    ∃ Y : C.Obj, geZero Y ∧ ∃ f : C.Hom X Y, True
+    ∃ Y : C.Obj, geZero Y ∧ ∃ _f : C.Hom X Y, True
   /-- Path witness: truncation functor τ^≤0 exists. -/
   truncation_le : ∀ X : C.Obj,
-    ∃ Y : C.Obj, leZero Y ∧ ∃ f : C.Hom Y X, True
+    ∃ Y : C.Obj, leZero Y ∧ ∃ _f : C.Hom Y X, True
 
 /-- The heart of a t-structure. -/
 def TStructureData.heart {C : PreAdditiveCategory.{u}}

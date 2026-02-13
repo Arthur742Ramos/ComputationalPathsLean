@@ -233,7 +233,7 @@ structure GroupCompletionTheorem (M : Monoid.{u})
     (gH : GroupHomology.{u}) where
   gc : GroupCompletion M
   /-- The completion map induces an isomorphism on homology. -/
-  homologyIso : ∀ (k : Nat), True
+  homologyIso : ∀ (_k : Nat), True
 
 /-! ## Summary -/
 

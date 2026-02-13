@@ -171,11 +171,11 @@ structure KLPolynomial (M : CoxeterMatrix) (G : CoxeterGroup M)
   kl_diag : ∀ (one_poly : Poly), Path (kl G.one G.one) one_poly →
     Path (kl G.one G.one) one_poly
   /-- KL polynomial recursion (Path). -/
-  kl_recursion : ∀ (x y : G.W) (s : M.S),
+  kl_recursion : ∀ (x y : G.W) (_s : M.S),
     bo.bruhat x y →
     Path (kl x y) (kl x y)  -- simplified recursion
   /-- Positivity conjecture (now theorem): coefficients ≥ 0 (Path). -/
-  kl_positive : ∀ (x y : G.W), Path True True
+  kl_positive : ∀ (_x _y : G.W), Path True True
   /-- Symmetry P_{x,y} depends only on the interval [x,y] (Path). -/
   kl_interval : ∀ (x y : G.W), Path (kl x y) (kl x y)
 

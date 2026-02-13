@@ -141,7 +141,7 @@ This corresponds to circleLoop and represents the non-trivial element
 in π₁(SO(2)) ≃ ℤ. Going around once in SO(2) is not homotopic to staying
 at the identity, reflecting the fact that SO(2) is not simply connected. -/
 noncomputable def fullRotation : Path e e :=
-  (Path.stepChainChain rfl).trans (circleLoop.trans (Path.stepChainChain rfl))
+  (Path.stepChain rfl).trans (circleLoop.trans (Path.stepChain rfl))
 
 /-- **Main Theorem**: π₁(SO(2)) ≃ ℤ
 

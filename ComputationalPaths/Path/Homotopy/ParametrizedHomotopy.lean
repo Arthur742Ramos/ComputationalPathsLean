@@ -130,7 +130,7 @@ structure FiberwiseSmash {B : Type u} (E₁ E₂ : ExSpace B) where
   /-- The resulting ex-space. -/
   result : ExSpace B
   /-- On each fiber, the smash product is formed. -/
-  fiberwise_smash : ∀ (b : B), True
+  fiberwise_smash : ∀ (_b : B), True
 
 /-- Trivial fiberwise smash. -/
 def trivialFiberwiseSmash {B : Type u} (E₁ E₂ : ExSpace B) :
@@ -222,8 +222,8 @@ structure ThomIsomorphism (B : Type u) (V : VectorBundle B)
   /-- The Thom class in H^k(Th(V)). -/
   thomClass : Type u
   /-- The isomorphism. -/
-  forward : ∀ (n : Nat), Type u
-  backward : ∀ (n : Nat), Type u
+  forward : ∀ (_n : Nat), Type u
+  backward : ∀ (_n : Nat), Type u
   /-- Naturality. -/
   naturality : True
 

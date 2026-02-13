@@ -139,7 +139,7 @@ structure AdamsConvergence where
 /-- Strong convergence for connective spectra. -/
 structure StrongConvergence extends AdamsConvergence.{u} where
   /-- The filtration is finite in each degree. -/
-  finFiltration : ∀ n : Nat, ∃ N : Nat, True
+  finFiltration : ∀ _n : Nat, ∃ _N : Nat, True
   /-- Strong convergence (structural). -/
   isStrong : True
 

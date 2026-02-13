@@ -124,7 +124,7 @@ structure ProjectiveData {R : Type u} {ring : RData R}
     {P : Type v} (mP : MData ring P) where
   /-- For any surjection g : M → N and map f : P → N, a lift h : P → M exists. -/
   lift : ∀ {M N : Type v} (mM : MData ring M) (mN : MData ring N)
-    (g : MHom mM mN) (f : MHom mP mN)
+    (g : MHom mM mN) (_f : MHom mP mN)
     (_surj : ∀ n, ∃ m, g.toFun m = n),
     MHom mP mM
   /-- The lift commutes with g. -/
@@ -153,7 +153,7 @@ structure InjectiveData {R : Type u} {ring : RData R}
     {I : Type v} (mI : MData ring I) where
   /-- For any injection f : M → N and map g : M → I, an extension h : N → I exists. -/
   extend : ∀ {M N : Type v} (mM : MData ring M) (mN : MData ring N)
-    (f : MHom mM mN) (g : MHom mM mI)
+    (f : MHom mM mN) (_g : MHom mM mI)
     (_inj : ∀ x y, f.toFun x = f.toFun y → x = y),
     MHom mN mI
   /-- The extension commutes with f. -/

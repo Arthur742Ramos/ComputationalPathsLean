@@ -107,7 +107,7 @@ structure ChernSimonsInvariant (G : GaugeGroup.{u}) (P : GaugBundle G) where
   /-- CS functional value. -/
   cs : GaugeConnection G P → Int
   /-- Gauge invariance modulo integers: CS(A^g) = CS(A) mod ℤ. -/
-  gauge_invariance : ∀ (A : GaugeConnection G P) (g : G.carrier),
+  gauge_invariance : ∀ (A : GaugeConnection G P) (_g : G.carrier),
     Path (cs A) (cs A)
   /-- Variation formula: δCS = ∫ Tr(δA ∧ F_A) (structural). -/
   variation : True
@@ -252,7 +252,7 @@ structure AsymptoticExpansion (G : GaugeGroup.{u}) where
 
 /-- Gauge step composition is trivial (gauge orbit). -/
 def gauge_step_orbit {G : GaugeGroup.{u}} {P : GaugBundle G}
-    (A : GaugeConnection G P) (g h : G.carrier) :
+    (A : GaugeConnection G P) (_g _h : G.carrier) :
     Path A A :=
   Path.refl A
 

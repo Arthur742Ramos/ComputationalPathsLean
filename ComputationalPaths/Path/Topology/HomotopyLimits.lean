@@ -186,7 +186,7 @@ structure HomotopyPullbackData (X A B C : Type v)
   homotopy : ∀ x : X, Path (f (pr₁ x)) (g (pr₂ x))
   /-- Universal property: any compatible triple factors through X. -/
   factor : ∀ (Y : Type v) (a : Y → A) (b : Y → B)
-    (h : ∀ y : Y, Path (f (a y)) (g (b y))),
+    (_h : ∀ y : Y, Path (f (a y)) (g (b y))),
     Σ u : Y → X,
       (∀ y : Y, Path (pr₁ (u y)) (a y)) ×
       (∀ y : Y, Path (pr₂ (u y)) (b y))
@@ -215,7 +215,7 @@ structure HomotopyPushoutData (X A B C : Type v)
   glue : ∀ c : C, Path (inl (f c)) (inr (g c))
   /-- Universal property. -/
   factor : ∀ (Y : Type v) (a : A → Y) (b : B → Y)
-    (h : ∀ c : C, Path (a (f c)) (b (g c))),
+    (_h : ∀ c : C, Path (a (f c)) (b (g c))),
     Σ u : X → Y,
       (∀ x : A, Path (u (inl x)) (a x)) ×
       (∀ x : B, Path (u (inr x)) (b x))

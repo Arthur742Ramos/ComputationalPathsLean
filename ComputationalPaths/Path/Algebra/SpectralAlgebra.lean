@@ -62,7 +62,7 @@ structure StructuredRingSpectrum where
     ∃ y : spectrum.level (n + 0), y = mul n 0 x unit
   /-- Associativity (propositional). -/
   assoc : ∀ (a b c : Nat)
-    (x : spectrum.level a) (y : spectrum.level b) (z : spectrum.level c),
+    (_x : spectrum.level a) (_y : spectrum.level b) (_z : spectrum.level c),
     True
 
 /-- An A_∞ ring spectrum: a structured ring spectrum with higher coherences. -/
@@ -76,7 +76,7 @@ structure AInfinityRingSpectrum extends StructuredRingSpectrum.{u} where
 structure EInfinityRingSpectrum extends StructuredRingSpectrum.{u} where
   /-- Commutativity of multiplication (up to homotopy). -/
   comm : ∀ (n m : Nat)
-    (x : spectrum.level n) (y : spectrum.level m),
+    (_x : spectrum.level n) (_y : spectrum.level m),
     True
   /-- Higher commutativity coherences. -/
   higherComm : True
@@ -102,7 +102,7 @@ structure SpectrumModule (R : StructuredRingSpectrum.{u}) where
     ∃ y : spectrum.level (0 + m), y = act 0 m R.unit x
   /-- Associativity of the action (propositional). -/
   act_assoc : ∀ (a b c : Nat)
-    (r : R.spectrum.level a) (s : R.spectrum.level b) (x : spectrum.level c),
+    (_r : R.spectrum.level a) (_s : R.spectrum.level b) (_x : spectrum.level c),
     True
 
 /-- The free module on the ring spectrum itself. -/
@@ -139,7 +139,7 @@ structure GL1 (R : StructuredRingSpectrum.{u}) where
   /-- Inclusion into R_0. -/
   inclusion : carrier → R.spectrum.level 0
   /-- Every unit is invertible. -/
-  invertible : ∀ (u : carrier), True
+  invertible : ∀ (_u : carrier), True
 
 /-- BGL₁(R): the classifying space of GL₁(R) (abstract). -/
 structure BGL1 (R : StructuredRingSpectrum.{u}) where

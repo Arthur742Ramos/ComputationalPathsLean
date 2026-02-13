@@ -195,12 +195,12 @@ structure LubinTateDeformation where
   /-- The universal deformation. -/
   universalDeformation : FGL deformRing
   /-- Universality: any deformation factors through LT (structural). -/
-  universal : ∀ (R : Type u) (F : FGL R),
-    ∃ f : deformRing → R, True
+  universal : ∀ (R : Type u) (_F : FGL R),
+    ∃ _f : deformRing → R, True
 
 /-- Lubin-Tate deformation exists for any height. -/
 def lubinTate_exists (L : LubinTateDeformation.{u}) (R : Type u) (F : FGL R) :
-    ∃ f : L.deformRing → R, True :=
+    ∃ _f : L.deformRing → R, True :=
   L.universal R F
 
 /-! ## FGLStep Inductive -/

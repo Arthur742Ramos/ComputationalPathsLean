@@ -83,7 +83,7 @@ instance : Subsingleton Sphere2CompPath where
 
 /-- Any two points of S² are connected by a computational path. -/
 def sphere2CompPath_path (x y : Sphere2CompPath) : Path x y :=
-  Path.stepChainChain (Subsingleton.elim x y)
+  Path.stepChain (Subsingleton.elim x y)
 
 /-- The fundamental group of S² is trivial. -/
 theorem sphere2CompPath_pi1_trivial :

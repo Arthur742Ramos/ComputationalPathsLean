@@ -92,7 +92,7 @@ structure AdemRelation where
 
 /-- Adem coefficients: C(b-1-j, a-2j) mod 2. -/
 def ademCoeff (rel : AdemRelation) (j : Nat) : F2 :=
-  if h : rel.a ≥ 2 * j ∧ rel.b ≥ j + 1 then
+  if _h : rel.a ≥ 2 * j ∧ rel.b ≥ j + 1 then
     binomMod2 (rel.b - 1 - j) (rel.a - 2 * j)
   else
     F2.zero
@@ -153,8 +153,8 @@ structure SteenrodAlgebraData where
   /-- Right unit (Path-witnessed). -/
   mul_one : ∀ a, Path (mul a one) a
   /-- Adem relations hold in the algebra. -/
-  adem : ∀ (rel : AdemRelation),
-    ∃ rhs : carrier, True
+  adem : ∀ (_rel : AdemRelation),
+    ∃ _rhs : carrier, True
 
 /-- Path witness that Sq⁰ is the unit. -/
 theorem sq_zero_is_unit (A : SteenrodAlgebraData) :
@@ -212,7 +212,7 @@ structure MilnorBasis (A : SteenrodAlgebraData) where
   /-- Milnor basis elements are linearly independent:
       distinct sequences give distinct elements. -/
   independent : ∀ s₁ s₂ : MilnorSequence,
-    s₁ ≠ s₂ → ∀ p : Path (fromSequence s₁) (fromSequence s₂),
+    s₁ ≠ s₂ → ∀ _p : Path (fromSequence s₁) (fromSequence s₂),
     Path (A.add (fromSequence s₁) (fromSequence s₂)) A.zero
 
 /-! ## Cartan Formula in the Algebra -/
@@ -222,8 +222,8 @@ structure CartanFormula (M : GradedF2Module) (S : SteenrodData M) where
   /-- Product structure on M. -/
   mul : (m n : Nat) → M.carrier m → M.carrier n → M.carrier (m + n)
   /-- Cartan formula holds (Path-witnessed at the type level). -/
-  cartan : ∀ (m n k : Nat) (x : M.carrier m) (y : M.carrier n),
-    ∃ terms : List (M.carrier (m + n + k)), True
+  cartan : ∀ (m n k : Nat) (_x : M.carrier m) (_y : M.carrier n),
+    ∃ _terms : List (M.carrier (m + n + k)), True
 
 /-! ## Adem Relations: Specific Cases -/
 

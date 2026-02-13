@@ -49,7 +49,7 @@ structure DifferentialForms where
   /-- Exterior derivative d : Ωᵖ → Ωᵖ⁺¹. -/
   extDeriv : (p : Nat) → forms p → forms (p + 1)
   /-- d² = 0: composition of consecutive differentials is zero. -/
-  d_squared : ∀ (p : Nat) (ω : forms p), True  -- d(dω) = 0
+  d_squared : ∀ (p : Nat) (_ω : forms p), True  -- d(dω) = 0
 
 /-- The de Rham cohomology H^p_dR(M) = ker d / im d. -/
 structure DeRhamCohomology (Ω : DifferentialForms) where
@@ -69,7 +69,7 @@ structure HodgeStar (Ω : DifferentialForms) where
   /-- The star operator. -/
   star : (p : Nat) → Ω.forms p → Ω.forms (Ω.dim - p)
   /-- Involutivity: **ω = (-1)^{p(n-p)} ω (abstract sign). -/
-  star_star : ∀ (p : Nat) (ω : Ω.forms p), True
+  star_star : ∀ (p : Nat) (_ω : Ω.forms p), True
   /-- Non-degeneracy (abstract). -/
   nondegenerate : True
 
@@ -93,7 +93,7 @@ structure Codifferential (Ω : DifferentialForms) where
   /-- The codifferential. -/
   codiff : (p : Nat) → p > 0 → Ω.forms p → Ω.forms (p - 1)
   /-- δ² = 0. -/
-  codiff_squared : ∀ (p : Nat) (hp : p > 1) (hq : p > 0) (ω : Ω.forms p),
+  codiff_squared : ∀ (p : Nat) (_hp : p > 1) (_hq : p > 0) (_ω : Ω.forms p),
     True  -- δ(δω) = 0
 
 /-- The Hodge Laplacian Δ = dδ + δd : Ωᵖ → Ωᵖ. -/

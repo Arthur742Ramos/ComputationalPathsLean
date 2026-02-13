@@ -62,7 +62,7 @@ def trivial : TorFunctor.{u, v, w} where
     exact PointedHom.id torTrivialObj
   map_id := by
     intro A B
-    exact Path.stepChainChain rfl
+    exact Path.stepChain rfl
   map_comp := by
     intro A A' A'' B B' B'' f g h k
     apply Path.stepChain

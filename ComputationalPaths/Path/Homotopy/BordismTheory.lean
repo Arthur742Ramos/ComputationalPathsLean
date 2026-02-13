@@ -136,7 +136,7 @@ theorem bordismRel_trans {n : Nat} {c₁ c₂ c₃ : BordismClass.{u} n}
 /-! ## Disjoint Union Operation -/
 
 /-- Disjoint union of manifolds. -/
-def manifoldDisjointUnion (M N : Manifold.{u}) (h : M.dim = N.dim) :
+def manifoldDisjointUnion (M N : Manifold.{u}) (_h : M.dim = N.dim) :
     Manifold.{u} where
   carrier := M.carrier ⊕ N.carrier
   dim := M.dim

@@ -142,7 +142,7 @@ structure PinchingEstimate (flow : RicciFlowData) where
   /-- Pinching constant. -/
   pinchConst : Nat
   /-- Pinching is preserved. -/
-  pinching_preserved : ∀ (t : Nat), True
+  pinching_preserved : ∀ (_t : Nat), True
 
 /-! ## Perelman Entropy -/
 

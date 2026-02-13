@@ -110,7 +110,7 @@ structure OctahedralPath (TC : TriangulatedCategory.{u}) where
   /-- For composable morphisms, the octahedral diagram commutes. -/
   octahedral :
     ∀ {X Y Z : TC.cat.Obj}
-      (f : TC.cat.Hom X Y) (g : TC.cat.Hom Y Z)
+      (_f : TC.cat.Hom X Y) (_g : TC.cat.Hom Y Z)
       (Tf : Triangle TC.cat TC.shift)
       (_ : TC.distinguished Tf) (_ : Tf.X = X) (_ : Tf.Y = Y)
       (Tg : Triangle TC.cat TC.shift)
@@ -121,7 +121,7 @@ structure OctahedralPath (TC : TriangulatedCategory.{u}) where
 /-- The trivial octahedral axiom (using tr2_complete). -/
 def trivialOctahedral (TC : TriangulatedCategory.{u}) :
     OctahedralPath TC where
-  octahedral := fun f g Tf _ hX hY Tg _ _ _ =>
+  octahedral := fun f g _Tf _ _hX _hY _Tg _ _ _ =>
     let ⟨Z', g', h', dist⟩ := TC.tr2_complete (TC.cat.comp f g)
     ⟨⟨_, _, Z', TC.cat.comp f g, g', h'⟩, dist, rfl, rfl⟩
 

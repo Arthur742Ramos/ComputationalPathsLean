@@ -130,7 +130,7 @@ def LeftDerivedFunctor.trivial : LeftDerivedFunctor.{u} where
   resolution := fun _ => unitComplex
   augment := fun _ => zeroHom unitPointed unitPointed
   map := fun _ => ChainMap3.id unitComplex
-  map_id := fun _ => Path.stepChainChain rfl
+  map_id := fun _ => Path.stepChain rfl
 
 /-- The trivial right derived functor. -/
 def RightDerivedFunctor.trivial : RightDerivedFunctor.{u} where
@@ -138,7 +138,7 @@ def RightDerivedFunctor.trivial : RightDerivedFunctor.{u} where
   coresolution := fun _ => unitComplex
   coaugment := fun _ => zeroHom unitPointed unitPointed
   map := fun _ => ChainMap3.id unitComplex
-  map_id := fun _ => Path.stepChainChain rfl
+  map_id := fun _ => Path.stepChain rfl
 
 /-! ## Summary
 

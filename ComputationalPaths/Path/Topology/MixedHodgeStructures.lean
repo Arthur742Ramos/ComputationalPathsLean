@@ -146,7 +146,7 @@ structure MixedHodgeStructure (V : Type u) where
   /-- The Hodge filtration. -/
   hodgeFil : HodgeFiltration V
   /-- The graded pieces Gr^W_k carry pure Hodge structures of weight k. -/
-  graded_pure : ∀ (k : Int), ∃ (W : Type u), Nonempty (PureHodgeStructure W)
+  graded_pure : ∀ (_k : Int), ∃ (W : Type u), Nonempty (PureHodgeStructure W)
   /-- Compatibility: the Hodge filtration induces a Hodge filtration on each
       graded piece. -/
   compatibility : True
