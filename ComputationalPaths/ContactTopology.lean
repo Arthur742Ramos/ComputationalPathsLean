@@ -57,6 +57,15 @@ namespace ContactTopology
 
 universe u v w
 
+private def stepChainOfEq {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  let core :=
+    Path.Step.symm
+      (Path.Step.symm
+        (Path.Step.congr_comp (fun x : A => x) (fun x : A => x) (Path.stepChain h)))
+  Path.Step.unit_right
+    (Path.Step.unit_left
+      (Path.Step.assoc (Path.Step.refl a) core (Path.Step.refl b)))
+
 /-! ## Contact Data -/
 
 /-- Contact data on a (2n+1)-dimensional manifold:
@@ -461,92 +470,92 @@ end LegendreIsotopy
 /-- Path witness: contact dimension. -/
 def contact_dim_path (n : Nat) :
     Path (ContactData.standard n).fullDim (2 * n + 1) :=
-  Path.ofEqChain (ContactData.standard_dim n)
+  stepChainOfEq (ContactData.standard_dim n)
 
 /-- Path witness: standard structure is tight. -/
 def standard_tight_path (n : Nat) :
     Path (ContactData.standard n).isTight true :=
-  Path.ofEqChain (ContactData.standard_tight n)
+  stepChainOfEq (ContactData.standard_tight n)
 
 /-- Path witness: standard3 dimension. -/
 def standard3_dim_path :
     Path ContactData.standard3.fullDim 3 :=
-  Path.ofEqChain ContactData.standard3_dim
+  stepChainOfEq ContactData.standard3_dim
 
 /-- Path witness: standard5 dimension. -/
 def standard5_dim_path :
     Path ContactData.standard5.fullDim 5 :=
-  Path.ofEqChain ContactData.standard5_dim
+  stepChainOfEq ContactData.standard5_dim
 
 /-- Path witness: Legendrian zero section dimension. -/
 def legendrian_zero_path (n : Nat) :
     Path (LegendreSubmanifold.zeroSection n).legDim n :=
-  Path.ofEqChain (LegendreSubmanifold.zeroSection_dim n)
+  stepChainOfEq (LegendreSubmanifold.zeroSection_dim n)
 
 /-- Path witness: Legendrian dimension agreement. -/
 def legendrian_dim_path (L : LegendreSubmanifold) :
     Path L.legDim L.ambient.halfDim :=
-  Path.ofEqChain (LegendreSubmanifold.legendrian_dim L)
+  stepChainOfEq (LegendreSubmanifold.legendrian_dim L)
 
 /-- Path witness: unknot dimension. -/
 def unknot_dim_path :
     Path LegendreSubmanifold.unknot.legDim 1 :=
-  Path.ofEqChain LegendreSubmanifold.unknot_dim
+  stepChainOfEq LegendreSubmanifold.unknot_dim
 
 /-- Path witness: simple Reeb orbit period. -/
 def simple_orbit_path (R : ReebData) (idx : Int) :
     Path (ReebOrbit.simple R idx).period 1 :=
-  Path.ofEqChain (ReebOrbit.simple_period R idx)
+  stepChainOfEq (ReebOrbit.simple_period R idx)
 
 /-- Path witness: Weinstein conjecture standard period. -/
 def weinstein_period_path (n : Nat) :
     Path (WeinsteinConjecture.standard n).witnessPeriod 1 :=
-  Path.ofEqChain (WeinsteinConjecture.standard_period n)
+  stepChainOfEq (WeinsteinConjecture.standard_period n)
 
 /-- Path witness: standard filling is Stein. -/
 def stein_filling_path (n : Nat) :
     Path (SymplecticFilling.standardBall n).isStein true :=
-  Path.ofEqChain (SymplecticFilling.standardBall_stein n)
+  stepChainOfEq (SymplecticFilling.standardBall_stein n)
 
 /-- Path witness: filling dimension. -/
 def filling_dim_path (n : Nat) :
     Path (SymplecticFilling.standardBall n).fillingDim (2 * n + 2) :=
-  Path.ofEqChain (SymplecticFilling.standardBall_dim n)
+  stepChainOfEq (SymplecticFilling.standardBall_dim n)
 
 /-- Path witness: unknot tb = -1. -/
 def unknot_tb_path :
     Path ThurstonBennequin.unknotTB.tbValue (-1) :=
-  Path.ofEqChain ThurstonBennequin.unknot_tb_value
+  stepChainOfEq ThurstonBennequin.unknot_tb_value
 
 /-- Path witness: unknot rotation number. -/
 def unknot_rot_path :
     Path ThurstonBennequin.unknotTB.rotNumber 0 :=
-  Path.ofEqChain ThurstonBennequin.unknot_rot
+  stepChainOfEq ThurstonBennequin.unknot_rot
 
 /-- Path witness: Gray stability identity. -/
 def gray_identity_path (ξ : ContactData) :
     Path (GrayStability.identity ξ).initial (GrayStability.identity ξ).final :=
-  Path.ofEqChain (GrayStability.identity_eq ξ)
+  stepChainOfEq (GrayStability.identity_eq ξ)
 
 /-- Path witness: trivial contact homology generators. -/
 def trivial_ch_path :
     Path ContactHomologyComplex.trivial.numGenerators 0 :=
-  Path.ofEqChain ContactHomologyComplex.trivial_generators
+  stepChainOfEq ContactHomologyComplex.trivial_generators
 
 /-- Path witness: trivial linearized homology rank. -/
 def trivial_lch_path :
     Path LinearizedContactHomology.trivial.rank 0 :=
-  Path.ofEqChain LinearizedContactHomology.trivial_rank
+  stepChainOfEq LinearizedContactHomology.trivial_rank
 
 /-- Path witness: Legendrian isotopy identity. -/
 def legendrian_isotopy_path (L : LegendreSubmanifold) :
     Path (LegendreIsotopy.identity L).source (LegendreIsotopy.identity L).target :=
-  Path.ofEqChain (LegendreIsotopy.identity_eq L)
+  stepChainOfEq (LegendreIsotopy.identity_eq L)
 
 /-- Path witness: standard classification is tight. -/
 def standard_class_path (n : Nat) :
     Path (ContactClassification.standardTight n).isTight true :=
-  Path.ofEqChain (ContactClassification.standard_is_tight n)
+  stepChainOfEq (ContactClassification.standard_is_tight n)
 
 end ContactTopology
 end ComputationalPaths

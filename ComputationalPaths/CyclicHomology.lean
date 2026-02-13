@@ -66,6 +66,15 @@ namespace CyclicHomology
 
 universe u v w
 
+private def stepChainOfEq {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  let core :=
+    Path.Step.symm
+      (Path.Step.symm
+        (Path.Step.congr_comp (fun x : A => x) (fun x : A => x) (Path.stepChain h)))
+  Path.Step.unit_right
+    (Path.Step.unit_left
+      (Path.Step.assoc (Path.Step.refl a) core (Path.Step.refl b)))
+
 /-! ## Hochschild Chain Complex -/
 
 /-- Hochschild chain complex data: degree n, algebra dimension,
@@ -123,7 +132,7 @@ def hochschild_boundary_squared_path (hc : HochschildChain) :
 /-- Path: chain dimension formula. -/
 def chain_dim_path (hc : HochschildChain) :
     Path hc.chainDim (hc.algDim ^ (hc.degree + 1)) :=
-  Path.ofEqChain hc.chainDim_eq
+  stepChainOfEq hc.chainDim_eq
 
 /-- Shift degree by 1. -/
 def shift (hc : HochschildChain) : HochschildChain where
@@ -218,12 +227,12 @@ theorem cyclic_order_identity (co : CyclicOperator) :
 /-- Path: t^{n+1} = id. -/
 def cyclic_operator_order_path (co : CyclicOperator) :
     Path (co.sign ^ co.order) 1 :=
-  Path.ofEqChain (cyclic_order_identity co)
+  stepChainOfEq (cyclic_order_identity co)
 
 /-- Path: order = degree + 1. -/
 def order_path (co : CyclicOperator) :
     Path co.order (co.degree + 1) :=
-  Path.ofEqChain co.order_eq
+  stepChainOfEq co.order_eq
 
 /-- Sign squared equals 1. -/
 theorem sign_squared (co : CyclicOperator) : co.sign * co.sign = 1 := by
@@ -233,7 +242,7 @@ theorem sign_squared (co : CyclicOperator) : co.sign * co.sign = 1 := by
 /-- Path: sign² = 1. -/
 def sign_squared_path (co : CyclicOperator) :
     Path (co.sign * co.sign) 1 :=
-  Path.ofEqChain (sign_squared co)
+  stepChainOfEq (sign_squared co)
 
 end CyclicOperator
 
@@ -262,7 +271,7 @@ def atDegree (n : Nat) : NormOperator where
 /-- Path: number of terms. -/
 def norm_terms_path (no : NormOperator) :
     Path no.numTerms (no.degree + 1) :=
-  Path.ofEqChain no.numTerms_eq
+  stepChainOfEq no.numTerms_eq
 
 end NormOperator
 
@@ -307,17 +316,17 @@ def atDegree (n : Nat) : ConnesBOperator where
 /-- Path: B² = 0. -/
 def connes_b_squared_path (bo : ConnesBOperator) :
     Path bo.bSquaredRank 0 :=
-  Path.ofEqChain bo.bSquared_zero
+  stepChainOfEq bo.bSquared_zero
 
 /-- Path: bB + Bb = 0. -/
 def anticommutativity_path (bo : ConnesBOperator) :
     Path bo.anticommRank 0 :=
-  Path.ofEqChain bo.anticomm_zero
+  stepChainOfEq bo.anticomm_zero
 
 /-- Path: degree shift. -/
 def degree_shift_path (bo : ConnesBOperator) :
     Path bo.targetDeg (bo.sourceDeg + 1) :=
-  Path.ofEqChain bo.deg_shift
+  stepChainOfEq bo.deg_shift
 
 /-- Composing two B-operators yields rank 0 (B² = 0).
 We record the source degree and the fact that the composed rank is 0. -/
@@ -370,7 +379,7 @@ def deg2 (hhd hcd : Nat) (hle : hcd ≤ hhd * 2) : CyclicHomologyData where
 /-- Path: parity coherence. -/
 def parity_path (hd : CyclicHomologyData) :
     Path (hd.hcDegree % 2) (hd.hhDegree % 2) :=
-  Path.ofEqChain hd.parity_eq
+  stepChainOfEq hd.parity_eq
 
 end CyclicHomologyData
 
@@ -427,12 +436,12 @@ def trivial : SBISequenceData where
 /-- Path: exactness at HC_n. -/
 def sbi_exactness_path (sbi : SBISequenceData) :
     Path (sbi.imageI + sbi.imageS) sbi.hcDim :=
-  Path.ofEqChain sbi.exact_at_hc
+  stepChainOfEq sbi.exact_at_hc
 
 /-- Path: exactness at HC_{n-2}. -/
 def sbi_shift_exactness_path (sbi : SBISequenceData) :
     Path (sbi.imageS + sbi.imageB) sbi.hcShiftDim :=
-  Path.ofEqChain sbi.exact_at_shift
+  stepChainOfEq sbi.exact_at_shift
 
 /-- The alternating sum in SBI: dim(HH_n) - dim(HC_n) + dim(HC_{n-2}) - dim(HH_{n-1}).
 Exactness implies this Euler characteristic vanishes. -/
@@ -477,12 +486,12 @@ def trivial : NegativeCyclicData where
 /-- Path: filtration compatibility. -/
 def negative_cyclic_filtration_path (nc : NegativeCyclicData) :
     Path (min nc.filtrationLevel nc.degree) nc.filtrationLevel :=
-  Path.ofEqChain (Nat.min_eq_left nc.filtration_compat)
+  stepChainOfEq (Nat.min_eq_left nc.filtration_compat)
 
 /-- Path: comparison bound. -/
 def comparison_path (nc : NegativeCyclicData) :
     Path (min nc.hcNegDim (nc.hcDim + nc.hhDim)) nc.hcNegDim :=
-  Path.ofEqChain (Nat.min_eq_left nc.comparison_bound)
+  stepChainOfEq (Nat.min_eq_left nc.comparison_bound)
 
 end NegativeCyclicData
 
@@ -546,7 +555,7 @@ def periodicity_dim_path (hp : PeriodicCyclicData) :
 /-- Path: reduced degree is valid. -/
 def reduced_degree_path (hp : PeriodicCyclicData) :
     Path (min hp.reducedDegree 2) hp.reducedDegree :=
-  Path.ofEqChain (Nat.min_eq_left (Nat.le_of_lt hp.reduced_lt))
+  stepChainOfEq (Nat.min_eq_left (Nat.le_of_lt hp.reduced_lt))
 
 end PeriodicCyclicData
 
@@ -588,12 +597,12 @@ def trivial : LQTData where
 /-- Path: LQT isomorphism coherence. -/
 def loday_quillen_tsygan_path (lqt : LQTData) :
     Path lqt.hcDim lqt.lieDim :=
-  Path.ofEqChain lqt.lqt_iso
+  stepChainOfEq lqt.lqt_iso
 
 /-- Path: stability bound. -/
 def stability_path (lqt : LQTData) :
     Path (min (lqt.degree + 1) lqt.matrixSize) (lqt.degree + 1) :=
-  Path.ofEqChain (Nat.min_eq_left lqt.stability)
+  stepChainOfEq (Nat.min_eq_left lqt.stability)
 
 end LQTData
 
@@ -719,7 +728,7 @@ def k1 (deg : Nat) (hd : deg % 2 = 1) (r : Nat) : ConnesChernChar where
 /-- Path: parity coherence. -/
 def chern_parity_path (cc : ConnesChernChar) :
     Path (cc.targetDegree % 2) (cc.kIndex % 2) :=
-  Path.ofEqChain cc.parity_match
+  stepChainOfEq cc.parity_match
 
 end ConnesChernChar
 
@@ -752,7 +761,7 @@ def trivial : DennisTrace where
 /-- Path: image bound. -/
 def dennis_trace_path (dt : DennisTrace) :
     Path (min dt.imageRank (min dt.kRank dt.hhRank)) dt.imageRank :=
-  Path.ofEqChain (Nat.min_eq_left dt.image_bound)
+  stepChainOfEq (Nat.min_eq_left dt.image_bound)
 
 end DennisTrace
 

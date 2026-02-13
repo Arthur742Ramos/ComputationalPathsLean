@@ -120,14 +120,14 @@ def cone_step {X Y : Obj} (p : Path X Y) :
   TriangulatedStep.toStep (T.coneStep p)
 
 /-- Primitive step witness for right-cancellation in cone-style composites. -/
-def cone_right_step {X Y : Obj} (p : Path X Y) :
+def cone_right_step (_T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
     Path.Step
       (Path.trans p (Path.symm p))
       (Path.refl X) :=
   TriangulatedStep.toStep (TriangulatedStep.cone_cancel_right p)
 
 /-- Primitive step witness for associativity in triangulated composites. -/
-def assoc_step {W X Y Z : Obj}
+def assoc_step (_T : TriangulatedPaths Obj) {W X Y Z : Obj}
     (p : Path W X) (q : Path X Y) (r : Path Y Z) :
     Path.Step
       (Path.trans (Path.trans p q) r)
@@ -135,7 +135,7 @@ def assoc_step {W X Y Z : Obj}
   TriangulatedStep.toStep (TriangulatedStep.triangle_assoc p q r)
 
 /-- Primitive step witness for symmetry over composition. -/
-def symm_trans_step {X Y Z : Obj}
+def symm_trans_step (_T : TriangulatedPaths Obj) {X Y Z : Obj}
     (p : Path X Y) (q : Path Y Z) :
     Path.Step
       (Path.symm (Path.trans p q))
@@ -162,26 +162,26 @@ def symm_trans_step {X Y Z : Obj}
       (T.rotationPath h f g) :=
   rweq_of_step (T.rotation_step h f g)
 
-@[simp] theorem cone_rweq {X Y : Obj} (p : Path X Y) :
+@[simp] theorem cone_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans (Path.symm p) p)
       (Path.refl Y) :=
   rweq_of_step (T.cone_step p)
 
-@[simp] theorem cone_right_rweq {X Y : Obj} (p : Path X Y) :
+@[simp] theorem cone_right_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans p (Path.symm p))
       (Path.refl X) :=
   rweq_of_step (T.cone_right_step p)
 
-@[simp] theorem assoc_rweq {W X Y Z : Obj}
+@[simp] theorem assoc_rweq (T : TriangulatedPaths Obj) {W X Y Z : Obj}
     (p : Path W X) (q : Path X Y) (r : Path Y Z) :
     RwEq
       (Path.trans (Path.trans p q) r)
       (Path.trans p (Path.trans q r)) :=
   rweq_of_step (T.assoc_step p q r)
 
-@[simp] theorem symm_trans_rweq {X Y Z : Obj}
+@[simp] theorem symm_trans_rweq (T : TriangulatedPaths Obj) {X Y Z : Obj}
     (p : Path X Y) (q : Path Y Z) :
     RwEq
       (Path.symm (Path.trans p q))
@@ -196,23 +196,46 @@ theorem connect_unit_assoc_rweq {X Y Z : Obj}
         (Path.trans (Path.refl Z) (T.connect h f g))
         (Path.refl (T.shiftObj X)))
       (T.connect h f g) := by
-  refine rweq_trans ?_ ?_
-  exact T.assoc_rweq (Path.refl Z) (T.connect h f g) (Path.refl (T.shiftObj X))
-  refine rweq_trans ?_ ?_
-  exact rweq_trans_congr_right (Path.refl Z)
+  have h₁ :
+      RwEq
+        (Path.trans
+          (Path.trans (Path.refl Z) (T.connect h f g))
+          (Path.refl (T.shiftObj X)))
+        (Path.trans
+          (Path.refl Z)
+          (Path.trans (T.connect h f g) (Path.refl (T.shiftObj X)))) :=
+    T.assoc_rweq (Path.refl Z) (T.connect h f g) (Path.refl (T.shiftObj X))
+  have h₂ :
+      RwEq
+        (Path.trans
+          (Path.refl Z)
+          (Path.trans (T.connect h f g) (Path.refl (T.shiftObj X))))
+        (Path.trans (Path.refl Z) (T.connect h f g)) :=
+    rweq_trans_congr_right (Path.refl Z)
     (rweq_cmpA_refl_right (T.connect h f g))
-  exact T.connect_rweq h f g
+  have h₃ :
+      RwEq (Path.trans (Path.refl Z) (T.connect h f g)) (T.connect h f g) :=
+    T.connect_rweq h f g
+  exact rweq_trans h₁ (rweq_trans h₂ h₃)
 
 /-- Coherence: cone cancellation remains stable after appending a right unit. -/
-theorem cone_unit_assoc_rweq {X Y : Obj} (p : Path X Y) :
+theorem cone_unit_assoc_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans (Path.trans (Path.symm p) p) (Path.refl Y))
       (Path.refl Y) := by
-  refine rweq_trans ?_ ?_
-  exact T.assoc_rweq (Path.symm p) p (Path.refl Y)
-  refine rweq_trans ?_ ?_
-  exact rweq_trans_congr_right (Path.symm p) (rweq_cmpA_refl_right p)
-  exact T.cone_rweq p
+  have h₁ :
+      RwEq
+        (Path.trans (Path.trans (Path.symm p) p) (Path.refl Y))
+        (Path.trans (Path.symm p) (Path.trans p (Path.refl Y))) :=
+    T.assoc_rweq (Path.symm p) p (Path.refl Y)
+  have h₂ :
+      RwEq
+        (Path.trans (Path.symm p) (Path.trans p (Path.refl Y)))
+        (Path.trans (Path.symm p) p) :=
+    rweq_trans_congr_right (Path.symm p) (rweq_cmpA_refl_right p)
+  have h₃ : RwEq (Path.trans (Path.symm p) p) (Path.refl Y) :=
+    T.cone_rweq p
+  exact rweq_trans h₁ (rweq_trans h₂ h₃)
 
 end TriangulatedPaths
 

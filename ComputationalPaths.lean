@@ -41,3 +41,5 @@ import RepStability.PathInfrastructure
 import HomologicalStability.PathInfrastructure
 import Intersection.PathInfrastructure
 import OperadicAlgebra.PathInfrastructure
+import OperadicAlgebra.EnOperads
+import OperadicAlgebra.KoszulDuality

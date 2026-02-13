@@ -77,6 +77,15 @@ namespace ComputabilityTheory
 
 open Path
 
+private def stepChainOfEq {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  let core :=
+    Path.Step.symm
+      (Path.Step.symm
+        (Path.Step.congr_comp (fun x : A => x) (fun x : A => x) (Path.stepChain h)))
+  Path.Step.unit_right
+    (Path.Step.unit_left
+      (Path.Step.assoc (Path.Step.refl a) core (Path.Step.refl b)))
+
 /-! ## Primitive Recursive Functions -/
 
 /-- Primitive recursive function data. -/
@@ -158,12 +167,12 @@ def exponentiation : PrimRecData where
 /-- Path: total complexity. -/
 def complexity_path (pr : PrimRecData) :
     Path pr.totalComplexity (pr.numCompositions + pr.recursionDepth) :=
-  Path.ofEqChain pr.complexity_eq
+  stepChainOfEq pr.complexity_eq
 
 /-- Path: totality. -/
 def total_path (pr : PrimRecData) :
     Path pr.isTotal true :=
-  Path.ofEqChain pr.total_eq
+  stepChainOfEq pr.total_eq
 
 end PrimRecData
 
@@ -215,12 +224,12 @@ def withMu (n : Nat) (baseComp : Nat) : PartialRecData where
 /-- Path: complexity. -/
 def complexity_path (prd : PartialRecData) :
     Path prd.totalComplexity (prd.primRecComplexity + prd.numMuOperators) :=
-  Path.ofEqChain prd.complexity_eq
+  stepChainOfEq prd.complexity_eq
 
 /-- Path: partial recursive. -/
 def partial_rec_path (prd : PartialRecData) :
     Path prd.isPartialRecursive true :=
-  Path.ofEqChain prd.partial_rec_eq
+  stepChainOfEq prd.partial_rec_eq
 
 end PartialRecData
 
@@ -315,12 +324,12 @@ def forSuccessor : KleeneRecursionData where
 /-- Path: fixed point validity. -/
 def fixed_point_path (krd : KleeneRecursionData) :
     Path krd.isFixedPoint true :=
-  Path.ofEqChain krd.fixed_point_eq
+  stepChainOfEq krd.fixed_point_eq
 
 /-- Path: obstruction. -/
 def obstruction_path (krd : KleeneRecursionData) :
     Path krd.obstruction 0 :=
-  Path.ofEqChain krd.obstruction_eq
+  stepChainOfEq krd.obstruction_eq
 
 end KleeneRecursionData
 
@@ -380,17 +389,17 @@ def general (m n : Nat) (hm : m > 0) (hn : n > 0) : SMNData where
 /-- Path: arity. -/
 def arity_path (smn : SMNData) :
     Path smn.totalArity (smn.numParams + smn.numArgs) :=
-  Path.ofEqChain smn.arity_eq
+  stepChainOfEq smn.arity_eq
 
 /-- Path: s is total. -/
 def s_total_path (smn : SMNData) :
     Path smn.sIsTotal true :=
-  Path.ofEqChain smn.s_total_eq
+  stepChainOfEq smn.s_total_eq
 
 /-- Path: s is injective. -/
 def s_injective_path (smn : SMNData) :
     Path smn.sIsInjective true :=
-  Path.ofEqChain smn.s_injective_eq
+  stepChainOfEq smn.s_injective_eq
 
 end SMNData
 
@@ -448,17 +457,17 @@ def atLevel (n : Nat) : PostTheoremData where
 /-- Path: Post's theorem. -/
 def post_path (ptd : PostTheoremData) :
     Path ptd.postHolds true :=
-  Path.ofEqChain ptd.post_eq
+  stepChainOfEq ptd.post_eq
 
 /-- Path: number of jumps. -/
 def jumps_path (ptd : PostTheoremData) :
     Path ptd.numJumps ptd.level :=
-  Path.ofEqChain ptd.jumps_eq
+  stepChainOfEq ptd.jumps_eq
 
 /-- Path: strictness. -/
 def strict_path (ptd : PostTheoremData) :
     Path ptd.isStrict true :=
-  Path.ofEqChain ptd.strict_eq
+  stepChainOfEq ptd.strict_eq
 
 end PostTheoremData
 
@@ -538,17 +547,17 @@ def sigmaAt (n : Nat) : ArithHierarchyData where
 /-- Path: quantifier alternations. -/
 def alternations_path (ah : ArithHierarchyData) :
     Path ah.quantifierAlternations ah.level :=
-  Path.ofEqChain ah.alternations_eq
+  stepChainOfEq ah.alternations_eq
 
 /-- Path: strictness. -/
 def strict_path (ah : ArithHierarchyData) :
     Path ah.strictContainment true :=
-  Path.ofEqChain ah.strict_eq
+  stepChainOfEq ah.strict_eq
 
 /-- Path: delta is meet. -/
 def delta_path (ah : ArithHierarchyData) :
     Path ah.deltaIsMeet true :=
-  Path.ofEqChain ah.delta_eq
+  stepChainOfEq ah.delta_eq
 
 end ArithHierarchyData
 
@@ -669,12 +678,12 @@ def ofArity (n : Nat) (hn : n > 0) : EnumerationData where
 /-- Path: universal arity. -/
 def universal_arity_path (ed : EnumerationData) :
     Path ed.universalArity (ed.arity + 1) :=
-  Path.ofEqChain ed.universal_arity_eq
+  stepChainOfEq ed.universal_arity_eq
 
 /-- Path: effectivity. -/
 def effective_path (ed : EnumerationData) :
     Path ed.isEffective true :=
-  Path.ofEqChain ed.effective_eq
+  stepChainOfEq ed.effective_eq
 
 end EnumerationData
 
@@ -718,7 +727,7 @@ def nonREProperty : RiceShapiroData where
 /-- Path: RE obstruction. -/
 def obstruction_path (rs : RiceShapiroData) (h : rs.propertyIsRE = true) :
     Path rs.obstruction 0 :=
-  Path.ofEqChain (rs.re_obstruction h)
+  stepChainOfEq (rs.re_obstruction h)
 
 end RiceShapiroData
 

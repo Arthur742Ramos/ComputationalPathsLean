@@ -194,13 +194,30 @@ theorem trunc_ge_unit_assoc_rweq (X : Obj) :
         (Path.trans (S.truncGEUnit X) (Path.refl (S.truncGE X)))
         (Path.refl (S.truncGE X)))
       (S.truncGEUnit X) := by
-  refine rweq_trans ?_ ?_
-  exact tstructure_assoc_rweq
-    (S.truncGEUnit X) (Path.refl (S.truncGE X)) (Path.refl (S.truncGE X))
-  refine rweq_trans ?_ ?_
-  exact rweq_trans_congr_right (S.truncGEUnit X)
-    (tstructure_left_unit_rweq (Path.refl (S.truncGE X)))
-  exact S.trunc_ge_rweq X
+  have h₁ :
+      RwEq
+        (Path.trans
+          (Path.trans (S.truncGEUnit X) (Path.refl (S.truncGE X)))
+          (Path.refl (S.truncGE X)))
+        (Path.trans
+          (S.truncGEUnit X)
+          (Path.trans (Path.refl (S.truncGE X)) (Path.refl (S.truncGE X)))) :=
+    tstructure_assoc_rweq
+      (S.truncGEUnit X) (Path.refl (S.truncGE X)) (Path.refl (S.truncGE X))
+  have h₂ :
+      RwEq
+        (Path.trans
+          (S.truncGEUnit X)
+          (Path.trans (Path.refl (S.truncGE X)) (Path.refl (S.truncGE X))))
+        (Path.trans (S.truncGEUnit X) (Path.refl (S.truncGE X))) :=
+    rweq_trans_congr_right (S.truncGEUnit X)
+      (tstructure_left_unit_rweq (Path.refl (S.truncGE X)))
+  have h₃ :
+      RwEq
+        (Path.trans (S.truncGEUnit X) (Path.refl (S.truncGE X)))
+        (S.truncGEUnit X) :=
+    S.trunc_ge_rweq X
+  exact rweq_trans h₁ (rweq_trans h₂ h₃)
 
 /-- Coherence: truncation adjunction cancellation survives right-unit whiskering. -/
 theorem trunc_adjunction_unit_assoc_rweq (X : Obj) :
@@ -209,13 +226,30 @@ theorem trunc_adjunction_unit_assoc_rweq (X : Obj) :
         (Path.trans (Path.symm (S.truncGEUnit X)) (S.truncGEUnit X))
         (Path.refl (S.truncGE X)))
       (Path.refl (S.truncGE X)) := by
-  refine rweq_trans ?_ ?_
-  exact tstructure_assoc_rweq
-    (Path.symm (S.truncGEUnit X)) (S.truncGEUnit X) (Path.refl (S.truncGE X))
-  refine rweq_trans ?_ ?_
-  exact rweq_trans_congr_right (Path.symm (S.truncGEUnit X))
-    (S.trunc_ge_rweq X)
-  exact S.trunc_adjunction_rweq X
+  have h₁ :
+      RwEq
+        (Path.trans
+          (Path.trans (Path.symm (S.truncGEUnit X)) (S.truncGEUnit X))
+          (Path.refl (S.truncGE X)))
+        (Path.trans
+          (Path.symm (S.truncGEUnit X))
+          (Path.trans (S.truncGEUnit X) (Path.refl (S.truncGE X)))) :=
+    tstructure_assoc_rweq
+      (Path.symm (S.truncGEUnit X)) (S.truncGEUnit X) (Path.refl (S.truncGE X))
+  have h₂ :
+      RwEq
+        (Path.trans
+          (Path.symm (S.truncGEUnit X))
+          (Path.trans (S.truncGEUnit X) (Path.refl (S.truncGE X))))
+        (Path.trans (Path.symm (S.truncGEUnit X)) (S.truncGEUnit X)) :=
+    rweq_trans_congr_right (Path.symm (S.truncGEUnit X))
+      (S.trunc_ge_rweq X)
+  have h₃ :
+      RwEq
+        (Path.trans (Path.symm (S.truncGEUnit X)) (S.truncGEUnit X))
+        (Path.refl (S.truncGE X)) :=
+    S.trunc_adjunction_rweq X
+  exact rweq_trans h₁ (rweq_trans h₂ h₃)
 
 end TStructurePaths
 

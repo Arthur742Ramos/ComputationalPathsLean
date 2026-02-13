@@ -75,6 +75,15 @@ namespace ContextFreeGrammars
 
 open Path
 
+private def stepChainOfEq {A : Type _} {a b : A} (h : a = b) : Path a b :=
+  let core :=
+    Path.Step.symm
+      (Path.Step.symm
+        (Path.Step.congr_comp (fun x : A => x) (fun x : A => x) (Path.stepChain h)))
+  Path.Step.unit_right
+    (Path.Step.unit_left
+      (Path.Step.assoc (Path.Step.refl a) core (Path.Step.refl b)))
+
 /-! ## Context-Free Grammars -/
 
 /-- Configuration data for a context-free grammar. -/
@@ -127,7 +136,7 @@ def ofSize (n m r : Nat) (hn : n > 0) (hm : m > 0) (hr : r > 0) : CFGData where
 /-- Path: total symbols. -/
 def total_path (cfg : CFGData) :
     Path cfg.totalSymbols (cfg.numNonterminals + cfg.numTerminals) :=
-  Path.ofEqChain cfg.total_eq
+  stepChainOfEq cfg.total_eq
 
 end CFGData
 
@@ -218,12 +227,12 @@ def singleLeaf : ParseTreeData where
 /-- Path: total nodes. -/
 def total_path (pt : ParseTreeData) :
     Path pt.totalNodes (pt.numInternalNodes + pt.numLeaves) :=
-  Path.ofEqChain pt.total_eq
+  stepChainOfEq pt.total_eq
 
 /-- Path: yield length. -/
 def yield_path (pt : ParseTreeData) :
     Path pt.yieldLength pt.numLeaves :=
-  Path.ofEqChain pt.yield_eq
+  stepChainOfEq pt.yield_eq
 
 end ParseTreeData
 
@@ -291,12 +300,12 @@ def alreadyCNF (r n : Nat) (hr : r > 0) (hn : n > 0) : ChomskyNFData where
 /-- Path: CNF valid. -/
 def cnf_valid_path (cnf : ChomskyNFData) :
     Path cnf.isInCNF true :=
-  Path.ofEqChain cnf.cnf_valid
+  stepChainOfEq cnf.cnf_valid
 
 /-- Path: language preserved. -/
 def preserved_path (cnf : ChomskyNFData) :
     Path cnf.languagePreserved true :=
-  Path.ofEqChain cnf.preserved_eq
+  stepChainOfEq cnf.preserved_eq
 
 end ChomskyNFData
 
@@ -352,12 +361,12 @@ def singleChar (g : Nat) (hg : g > 0) (accepted : Bool) : CYKData where
 /-- Path: table entries. -/
 def table_path (cyk : CYKData) :
     Path cyk.tableEntries (cyk.stringLength * (cyk.stringLength + 1) / 2) :=
-  Path.ofEqChain cyk.table_eq
+  stepChainOfEq cyk.table_eq
 
 /-- Path: time complexity. -/
 def time_path (cyk : CYKData) :
     Path cyk.timeComplexity (cyk.stringLength ^ 3 * cyk.grammarSize) :=
-  Path.ofEqChain cyk.time_eq
+  stepChainOfEq cyk.time_eq
 
 end CYKData
 
@@ -416,12 +425,12 @@ def exampleAnBnCn : CFLPumpingData where
 /-- Path: decomposition. -/
 def decomposition_path (pl : CFLPumpingData) :
     Path (pl.uLength + pl.vLength + pl.xLength + pl.yLength + pl.zLength) pl.stringLength :=
-  Path.ofEqChain pl.decomposition_eq
+  stepChainOfEq pl.decomposition_eq
 
 /-- Path: pumping property. -/
 def pump_path (pl : CFLPumpingData) :
     Path pl.canPump true :=
-  Path.ofEqChain pl.pump_eq
+  stepChainOfEq pl.pump_eq
 
 /-- Pumped string length for pumping i times. -/
 def pumpedLength (pl : CFLPumpingData) (i : Nat) : Nat :=
@@ -432,7 +441,7 @@ def pumped_one_path (pl : CFLPumpingData) :
     Path (pl.pumpedLength 1) pl.stringLength := by
   unfold pumpedLength
   simp [Nat.one_mul]
-  exact Path.ofEqChain pl.decomposition_eq
+  exact stepChainOfEq pl.decomposition_eq
 
 end CFLPumpingData
 
@@ -530,12 +539,12 @@ def anbnEquiv : PDAEquivalenceData where
 /-- Path: language equivalence. -/
 def language_path (pe : PDAEquivalenceData) :
     Path pe.languageEqual true :=
-  Path.ofEqChain pe.language_eq
+  stepChainOfEq pe.language_eq
 
 /-- Path: direction obstruction. -/
 def direction_path (pe : PDAEquivalenceData) :
     Path pe.directionObstruction 0 :=
-  Path.ofEqChain pe.direction_eq
+  stepChainOfEq pe.direction_eq
 
 end PDAEquivalenceData
 
@@ -591,7 +600,7 @@ def example4 : OgdenData where
 /-- Path: Ogden property. -/
 def ogden_path (od : OgdenData) :
     Path od.ogdenHolds true :=
-  Path.ofEqChain od.ogden_eq
+  stepChainOfEq od.ogden_eq
 
 end OgdenData
 
@@ -693,12 +702,12 @@ def example57 : GrammarTransformData where
 /-- Path: language preserved. -/
 def preserved_path (gt : GrammarTransformData) :
     Path gt.languagePreserved true :=
-  Path.ofEqChain gt.preserved_eq
+  stepChainOfEq gt.preserved_eq
 
 /-- Path: transformation obstruction. -/
 def obstruction_path (gt : GrammarTransformData) :
     Path gt.obstruction 0 :=
-  Path.ofEqChain gt.obstruction_eq
+  stepChainOfEq gt.obstruction_eq
 
 end GrammarTransformData
 
@@ -751,17 +760,17 @@ def standard : CFLClosureData where
 /-- Path: union closed. -/
 def union_path (cc : CFLClosureData) :
     Path cc.unionClosed true :=
-  Path.ofEqChain cc.union_eq
+  stepChainOfEq cc.union_eq
 
 /-- Path: intersection NOT closed. -/
 def intersection_path (cc : CFLClosureData) :
     Path cc.intersectionClosed false :=
-  Path.ofEqChain cc.intersection_eq
+  stepChainOfEq cc.intersection_eq
 
 /-- Path: number of closed operations. -/
 def closed_ops_path (cc : CFLClosureData) :
     Path cc.numClosedOps 3 :=
-  Path.ofEqChain cc.closed_ops_eq
+  stepChainOfEq cc.closed_ops_eq
 
 end CFLClosureData
 
