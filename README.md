@@ -165,6 +165,7 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`Topos/InternalLogicPaths.lean`](Topos/InternalLogicPaths.lean) — internal logic over `1 ⟶ Ω` truth values with conjunction/implication coherence as computational paths.
 - [`Chromatic/PathInfrastructure.lean`](Chromatic/PathInfrastructure.lean) — chromatic filtration and Morava K-theory periodicity packaged as explicit computational `Path.Step`/`RwEq` witnesses.
 - [`InfinityCategory/PathInfrastructure.lean`](InfinityCategory/PathInfrastructure.lean) — quasi-category and Segal-space composition APIs with explicit `Path.Step` witnesses (`QuasiCategoryPaths`, `SegalSpacePaths`) and derived `RwEq` coherence lemmas.
+- [`Perfectoid/PathInfrastructure.lean`](Perfectoid/PathInfrastructure.lean) — tilting equivalences and almost mathematics packaged as path-preserving constructions with explicit `Path.Step`/`RwEq` normalization witnesses.
 
 ## Bicategory & weak 2-groupoid API
 

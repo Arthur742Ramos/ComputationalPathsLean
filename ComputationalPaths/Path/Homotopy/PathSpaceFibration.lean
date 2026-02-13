@@ -72,7 +72,8 @@ def pathSpaceContr (A : Type u) (a : A) : IsContr (PathSpace A a) :=
       | mk x p =>
         cases p with
         | mk p =>
-          exact Path.ofEq (by cases p; rfl) }
+          cases p
+          exact Path.refl _ }
 
 /-! ## Loop space as a fiber -/
 

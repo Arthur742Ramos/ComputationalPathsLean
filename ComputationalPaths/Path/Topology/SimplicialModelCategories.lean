@@ -128,10 +128,9 @@ def trivialSimpMappingSpace (A : Type u) : SimpMappingSpace A where
   mapSpace := fun a b => SimpSetData.const (Path a b)
   id_simplex := fun a => Path.refl a
   comp_simplex := fun f g => Path.trans f g
-  id_left := fun f => Path.ofEq (by cases f <;> simp [Path.trans, Path.refl])
-  id_right := fun f => Path.ofEq (by cases f <;> simp [Path.trans, Path.refl])
-  assoc := fun f g h => Path.ofEq (by
-    cases f <;> cases g <;> cases h <;> simp [Path.trans, List.append_assoc])
+  id_left := fun f => Path.ofEqChain (Path.trans_refl_left f)
+  id_right := fun f => Path.ofEqChain (Path.trans_refl_right f)
+  assoc := fun f g h => Path.ofEqChain (Path.trans_assoc f g h)
 
 /-! ## Tensoring and cotensoring -/
 
@@ -229,9 +228,9 @@ structure DerivedMapSpace (A : Type u) (M : SimpModelCatData A) where
   /-- Fibrant replacement functor on objects. -/
   fibRepl : A → A
   /-- Cofibrant replacement is a weak equivalence. -/
-  cofRepl_weq : ∀ a : A, M.weq (Path.ofEq (show cofRepl a = cofRepl a from rfl))
+  cofRepl_weq : ∀ a : A, M.weq (Path.refl (cofRepl a))
   /-- Fibrant replacement is a weak equivalence. -/
-  fibRepl_weq : ∀ a : A, M.weq (Path.ofEq (show fibRepl a = fibRepl a from rfl))
+  fibRepl_weq : ∀ a : A, M.weq (Path.refl (fibRepl a))
   /-- The derived mapping space. -/
   derivedMap : A → A → SimpSetData.{u}
   /-- Derived mapping space is the mapping space between replacements. -/
@@ -241,7 +240,7 @@ structure DerivedMapSpace (A : Type u) (M : SimpModelCatData A) where
 
 /-- Trivial derived mapping space (identity replacements). -/
 def trivialDerivedMapSpace (A : Type u) (M : SimpModelCatData A)
-    (hweq_refl : ∀ a : A, M.weq (Path.ofEq (show a = a from rfl))) :
+    (hweq_refl : ∀ a : A, M.weq (Path.refl a)) :
     DerivedMapSpace A M where
   cofRepl := id
   fibRepl := id
@@ -360,7 +359,7 @@ def trivial_simp_mc_mapping_refl (A : Type u) (a : A) :
     Path ((trivialSimpMappingSpace A).comp_simplex
             (Path.refl a) (Path.refl a))
          (Path.refl a) :=
-  Path.ofEq (Path.trans_refl_left (Path.refl a))
+  Path.ofEqChain (Path.trans_refl_left (Path.refl a))
 
 end SimplicialModelCategories
 end Topology

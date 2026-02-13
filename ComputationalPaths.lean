@@ -9,5 +9,8 @@ import Chromatic.PathInfrastructure
 import Topos.PathCoherence
 import Descent.PathCoherence
 import Cobordism.PathInfrastructure
+import Arithmetic.PathInfrastructure
 import Factorization.PathInfrastructure
+import Perfectoid.PathInfrastructure
 import InfinityCategory.PathInfrastructure
+import Condensed.PathInfrastructure

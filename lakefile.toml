@@ -29,10 +29,16 @@ name = "Motivic"
 name = "Chromatic"
 
 [[lean_lib]]
+name = "Condensed"
+
+[[lean_lib]]
 name = "Descent"
 
 [[lean_lib]]
 name = "Cobordism"
+
+[[lean_lib]]
+name = "Arithmetic"
 
 [[lean_lib]]
 name = "Simplicial"
@@ -42,6 +48,12 @@ name = "InfinityCategory"
 
 [[lean_lib]]
 name = "Factorization"
+
+[[lean_lib]]
+name = "Perfectoid"
+
+[[lean_lib]]
+name = "DAG"
 
 [[lean_exe]]
 name = "computational_paths"
