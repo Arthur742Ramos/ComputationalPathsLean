@@ -415,3 +415,8 @@ import ComputationalPaths.Path.Topology.DerivedCategories
 import ComputationalPaths.Path.Topology.HomotopyLimits
 import ComputationalPaths.Path.Topology.SimplicialModelCategories
 import ComputationalPaths.Path.Topology.StableModelCategories
+import ComputationalPaths.Path.Topology.MixedHodgeStructures
+import ComputationalPaths.Path.Algebra.CharacterVarieties
+import ComputationalPaths.Path.Topology.EilenbergMacLanePostnikov
+import ComputationalPaths.Path.Algebra.KoszulComplexes
+import ComputationalPaths.Path.Topology.ModelCategoriesDeep
