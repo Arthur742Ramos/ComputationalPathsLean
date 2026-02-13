@@ -74,6 +74,9 @@ name = "Tropical"
 name = "Hodge"
 
 [[lean_lib]]
+name = "Log"
+
+[[lean_lib]]
 name = "GRT"
 
 [[lean_lib]]
