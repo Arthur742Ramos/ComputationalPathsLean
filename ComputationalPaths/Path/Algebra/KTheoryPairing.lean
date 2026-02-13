@@ -36,6 +36,23 @@ namespace KTheoryPairing
 
 universe u
 
+private def pathOfEqStepChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
+  let core : Path a b := Path.ofEqChain h
+  Path.trans (Path.trans (Path.refl a) core) (Path.refl b)
+
+private theorem pathOfEqStepChain_rweq {A : Type u} {a b : A} (h : a = b) :
+    RwEq (pathOfEqStepChain h) (Path.ofEqChain h) := by
+  let core : Path a b := Path.ofEqChain h
+  change RwEq (Path.trans (Path.trans (Path.refl a) core) (Path.refl b)) core
+  apply rweq_trans
+  · exact rweq_of_step (Step.trans_assoc (Path.refl a) core (Path.refl b))
+  · apply rweq_trans
+    · exact
+        rweq_trans_congr_right (Path.refl a)
+          (rweq_of_step (Step.trans_refl_right core))
+    · exact rweq_of_step (Step.trans_refl_left core)
+
+
 /-! ## Basic algebra data -/
 
 /-- Minimal algebra data for K-theory constructions. -/
@@ -106,11 +123,11 @@ variable {A : KAlgData.{u}} (K : K0Data A)
 
 /-- Path witness: [0] = 0 in K₀. -/
 def classOf_zero_path : Path (K.classOf A.zero) K.zero :=
-  Path.ofEq K.classOf_zero
+  pathOfEqStepChain K.classOf_zero
 
 /-- Path: add is commutative. -/
 def add_comm_path (x y : K.carrier) : Path (K.add x y) (K.add y x) :=
-  Path.ofEq (K.add_comm x y)
+  pathOfEqStepChain (K.add_comm x y)
 
 end K0Data
 
@@ -137,7 +154,7 @@ variable {A : KAlgData.{u}} (K : K1Data A)
 
 /-- Path witness: [1] = 0 in K₁. -/
 def classOf_one_path : Path (K.classOf A.one) K.zero :=
-  Path.ofEq K.classOf_one
+  pathOfEqStepChain K.classOf_one
 
 end K1Data
 
@@ -172,27 +189,27 @@ variable {A : KAlgData.{u}} (FM : FredholmModule A)
 
 /-- Path witness: F(0) = 0. -/
 def fredholm_zero_path : Path (FM.fredholm FM.hZero) FM.hZero :=
-  Path.ofEq FM.fredholm_zero
+  pathOfEqStepChain FM.fredholm_zero
 
 /-- Path witness: γ² = id. -/
 def grading_sq_path (v : FM.hilbert) : Path (FM.grading (FM.grading v)) v :=
-  Path.ofEq (FM.grading_sq v)
+  pathOfEqStepChain (FM.grading_sq v)
 
 /-- Path witness: F²(0) = 0. -/
 def fredholm_sq_zero_path : Path (FM.fredholm (FM.fredholm FM.hZero)) FM.hZero :=
-  Path.ofEq FM.fredholm_sq_zero
+  pathOfEqStepChain FM.fredholm_sq_zero
 
 /-- Multi-step: F(F(F(0))) = F(F(0)) = F(0) = 0, three steps via fredholm_zero. -/
 def fredholm_cube_zero_path :
     Path (FM.fredholm (FM.fredholm (FM.fredholm FM.hZero))) FM.hZero :=
   Path.trans
-    (Path.ofEq (congrArg FM.fredholm FM.fredholm_sq_zero))
+    (pathOfEqStepChain (_root_.congrArg FM.fredholm FM.fredholm_sq_zero))
     FM.fredholm_zero_path
 
 /-- Path for [F, π(a)](0) = 0. -/
 def comm_compact_path (a : A.carrier) :
     Path (FM.fredholm (FM.repr a FM.hZero)) (FM.repr a (FM.fredholm FM.hZero)) :=
-  Path.ofEq (FM.comm_compact a)
+  pathOfEqStepChain (FM.comm_compact a)
 
 end FredholmModule
 
@@ -217,12 +234,12 @@ variable {A : KAlgData.{u}} (IP : IndexPairing A)
 
 /-- Path witness: index(0) = 0. -/
 def index_zero_path : Path (IP.index IP.k0.zero) 0 :=
-  Path.ofEq IP.index_zero
+  pathOfEqStepChain IP.index_zero
 
 /-- Path witness: index is additive. -/
 def index_add_path (x y : IP.k0.carrier) :
     Path (IP.index (IP.k0.add x y)) (IP.index x + IP.index y) :=
-  Path.ofEq (IP.index_add x y)
+  pathOfEqStepChain (IP.index_add x y)
 
 /-- Multi-step: index(x + 0) = index(x) + index(0) = index(x) + 0 = index(x).
     Uses Path.trans three times. -/
@@ -232,14 +249,14 @@ def index_add_zero_path (x : IP.k0.carrier)
   Path.trans
     (IP.index_add_path x IP.k0.zero)
     (Path.trans
-      (Path.ofEq (congrArg (IP.index x + ·) IP.index_zero))
-      (Path.ofEq (Nat.add_zero (IP.index x))))
+      (pathOfEqStepChain (_root_.congrArg (IP.index x + ·) IP.index_zero))
+      (pathOfEqStepChain (Nat.add_zero (IP.index x))))
 
 /-- RwEq: the direct index(x+0)=index(x) vs the multi-step are path-equivalent. -/
 theorem index_add_zero_rweq (x : IP.k0.carrier)
     (h : IP.k0.add x IP.k0.zero = x) :
     RwEq
-      (Path.ofEq (congrArg IP.index h))
+      (pathOfEqStepChain (_root_.congrArg IP.index h))
       (IP.index_add_zero_path x h) := by
   constructor
 
@@ -270,12 +287,12 @@ variable {A B : KAlgData.{u}} (K : KasparovPair A B)
 
 /-- Path witness: F(0) = 0. -/
 def operatorF_zero_path : Path (K.operatorF K.modZero) K.modZero :=
-  Path.ofEq K.operatorF_zero
+  pathOfEqStepChain K.operatorF_zero
 
 /-- Path witness for bimodule associativity. -/
 def act_assoc_path (a : A.carrier) (m : K.modCarrier) (b : B.carrier) :
     Path (K.rightAct (K.leftAct a m) b) (K.leftAct a (K.rightAct m b)) :=
-  Path.ofEq (K.act_assoc a m b)
+  pathOfEqStepChain (K.act_assoc a m b)
 
 end KasparovPair
 
@@ -296,7 +313,7 @@ variable {A B C : KAlgData.{u}} (KP : KasparovProduct A B C)
 
 /-- Path witness for product preserving zero. -/
 def product_zero_path : Path (KP.product.operatorF KP.product.modZero) KP.product.modZero :=
-  Path.ofEq KP.product_zero
+  pathOfEqStepChain KP.product_zero
 
 end KasparovProduct
 
@@ -328,18 +345,18 @@ variable {A : KAlgData.{u}} (BP : BottPeriodicity A)
 /-- Path witness: β⁻¹(β(x)) = x. -/
 def bott_left_inv_path (n : Nat) (x : BP.kGroup n) :
     Path (BP.bottInv n (BP.bottFwd n x)) x :=
-  Path.ofEq (BP.bott_left_inv n x)
+  pathOfEqStepChain (BP.bott_left_inv n x)
 
 /-- Path witness: β(β⁻¹(y)) = y. -/
 def bott_right_inv_path (n : Nat) (y : BP.kGroup (n + 2)) :
     Path (BP.bottFwd n (BP.bottInv n y)) y :=
-  Path.ofEq (BP.bott_right_inv n y)
+  pathOfEqStepChain (BP.bott_right_inv n y)
 
 /-- Multi-step: β⁻¹(β(β⁻¹(β(x)))) = β⁻¹(β(x)) = x. Double Bott periodicity. -/
 def double_bott_path (n : Nat) (x : BP.kGroup n) :
     Path (BP.bottInv n (BP.bottFwd n (BP.bottInv n (BP.bottFwd n x)))) x :=
   Path.trans
-    (Path.ofEq (congrArg (fun z => BP.bottInv n (BP.bottFwd n z))
+    (pathOfEqStepChain (_root_.congrArg (fun z => BP.bottInv n (BP.bottFwd n z))
       (BP.bott_left_inv n x)))
     (BP.bott_left_inv_path n x)
 
@@ -347,8 +364,8 @@ def double_bott_path (n : Nat) (x : BP.kGroup n) :
 def bott_zero_roundtrip (n : Nat) :
     Path (BP.bottInv n (BP.bottFwd n (BP.kZero n))) (BP.kZero n) :=
   Path.trans
-    (Path.ofEq (congrArg (BP.bottInv n) (BP.bottFwd_zero n)))
-    (Path.ofEq (BP.bottInv_zero n))
+    (pathOfEqStepChain (_root_.congrArg (BP.bottInv n) (BP.bottFwd_zero n)))
+    (pathOfEqStepChain (BP.bottInv_zero n))
 
 /-- RwEq: the roundtrip path and the direct left_inv path are equivalent. -/
 theorem bott_zero_rweq (n : Nat) :
@@ -400,28 +417,28 @@ variable {A : KAlgData.{u}} (S : SixTermExact A)
 
 /-- Path witness: i₀(0) = 0. -/
 def i0_zero_path : Path (S.i0 S.z0I) S.z0A :=
-  Path.ofEq S.i0_zero
+  pathOfEqStepChain S.i0_zero
 
 /-- Path witness: idx(0) = 0. -/
 def idx_zero_path : Path (S.idx S.z1Q) S.z0I :=
-  Path.ofEq S.idx_zero
+  pathOfEqStepChain S.idx_zero
 
 /-- Multi-step: going around half the sequence on zeros.
     j₀(i₀(0)) = j₀(0) = 0, two steps. -/
 def half_sequence_zero :
     Path (S.j0 (S.i0 S.z0I)) S.z0Q :=
   Path.trans
-    (Path.ofEq (congrArg S.j0 S.i0_zero))
-    (Path.ofEq S.j0_zero)
+    (pathOfEqStepChain (_root_.congrArg S.j0 S.i0_zero))
+    (pathOfEqStepChain S.j0_zero)
 
 /-- Multi-step: exp(j₀(i₀(0))) = exp(j₀(0)) = exp(0) = 0, three steps. -/
 def third_sequence_zero :
     Path (S.exp (S.j0 (S.i0 S.z0I))) S.z1I :=
   Path.trans
-    (Path.ofEq (congrArg S.exp (congrArg S.j0 S.i0_zero)))
+    (pathOfEqStepChain (_root_.congrArg S.exp (_root_.congrArg S.j0 S.i0_zero)))
     (Path.trans
-      (Path.ofEq (congrArg S.exp S.j0_zero))
-      (Path.ofEq S.exp_zero))
+      (pathOfEqStepChain (_root_.congrArg S.exp S.j0_zero))
+      (pathOfEqStepChain S.exp_zero))
 
 /-- Full six-step path: going around the entire sequence on zeros.
     i₁(exp(j₀(i₀(idx(j₁(0)))))) = 0 (all maps preserve zero). -/
@@ -433,17 +450,17 @@ def full_sequence_zero
     (h5 : S.exp S.z0Q = S.z1I)
     (h6 : S.i1 S.z1I = S.z1A) :
     Path (S.i1 (S.exp (S.j0 (S.i0 (S.idx (S.j1 S.z1A)))))) S.z1A :=
-  Path.trans (Path.ofEq (congrArg (fun x => S.i1 (S.exp (S.j0 (S.i0 (S.idx x))))) h1))
-    (Path.trans (Path.ofEq (congrArg (fun x => S.i1 (S.exp (S.j0 (S.i0 x)))) h2))
-      (Path.trans (Path.ofEq (congrArg (fun x => S.i1 (S.exp (S.j0 x))) h3))
-        (Path.trans (Path.ofEq (congrArg (fun x => S.i1 (S.exp x)) h4))
-          (Path.trans (Path.ofEq (congrArg S.i1 h5))
-            (Path.ofEq h6)))))
+  Path.trans (pathOfEqStepChain (_root_.congrArg (fun x => S.i1 (S.exp (S.j0 (S.i0 (S.idx x))))) h1))
+    (Path.trans (pathOfEqStepChain (_root_.congrArg (fun x => S.i1 (S.exp (S.j0 (S.i0 x)))) h2))
+      (Path.trans (pathOfEqStepChain (_root_.congrArg (fun x => S.i1 (S.exp (S.j0 x))) h3))
+        (Path.trans (pathOfEqStepChain (_root_.congrArg (fun x => S.i1 (S.exp x)) h4))
+          (Path.trans (pathOfEqStepChain (_root_.congrArg S.i1 h5))
+            (pathOfEqStepChain h6)))))
 
 /-- RwEq: direct exactness path vs two-step composition. -/
 theorem exact_rweq :
     RwEq
-      (Path.ofEq S.exact_ji_zero)
+      (pathOfEqStepChain S.exact_ji_zero)
       (S.half_sequence_zero) := by
   constructor
 

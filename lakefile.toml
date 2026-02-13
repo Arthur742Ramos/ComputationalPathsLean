@@ -19,6 +19,9 @@ name = "Equivalence"
 [[lean_lib]]
 name = "Operad"
 
+[[lean_lib]]
+name = "Topos"
+
 [[lean_exe]]
 name = "computational_paths"
 root = "Main"

@@ -160,6 +160,8 @@ to preserve rewrite information while keeping equality proof-irrelevant.
 - [`ComputationalPaths/Path/CompPath/SphereCompPath.lean`](ComputationalPaths/Path/CompPath/SphereCompPath.lean) — the 2-sphere S² as suspension of S¹, with π₁(S²) ≅ 1 via SVK. Also defines S³ for the Hopf fibration.
 - Wedge encode/decode is now integrated in `ComputationalPaths/Path/CompPath/PushoutPaths.lean` via `wedgeFundamentalGroupEquiv_of_decode_bijective`.
 - [`ComputationalPaths/Path/Homotopy/HoTT.lean`](ComputationalPaths/Path/Homotopy/HoTT.lean) — homotopy/groupoid lemmas (reflexivity, symmetry, transitivity for identities) expressed via computational paths and exported to `Eq`.
+- [`Topos/SubobjectClassifierPaths.lean`](Topos/SubobjectClassifierPaths.lean) — subobject classifier data and classifying-square coherence stated directly with `Path`/`RwEq`.
+- [`Topos/InternalLogicPaths.lean`](Topos/InternalLogicPaths.lean) — internal logic over `1 ⟶ Ω` truth values with conjunction/implication coherence as computational paths.
 
 ## Bicategory & weak 2-groupoid API
 

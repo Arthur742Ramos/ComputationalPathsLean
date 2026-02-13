@@ -30,6 +30,23 @@ namespace NatCharacterization
 
 universe u
 
+private def pathOfEqStepChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
+  let core : Path a b := Path.ofEqChain h
+  Path.trans (Path.trans (Path.refl a) core) (Path.refl b)
+
+private theorem pathOfEqStepChain_rweq {A : Type u} {a b : A} (h : a = b) :
+    RwEq (pathOfEqStepChain h) (Path.ofEqChain h) := by
+  let core : Path a b := Path.ofEqChain h
+  change RwEq (Path.trans (Path.trans (Path.refl a) core) (Path.refl b)) core
+  apply rweq_trans
+  · exact rweq_of_step (Step.trans_assoc (Path.refl a) core (Path.refl b))
+  · apply rweq_trans
+    · exact
+        rweq_trans_congr_right (Path.refl a)
+          (rweq_of_step (Step.trans_refl_right core))
+    · exact rweq_of_step (Step.trans_refl_left core)
+
+
 /-! ## Discreteness of Nat -/
 
 /-- The natural numbers are discrete: any path between naturals yields
@@ -39,7 +56,7 @@ def natPathToEq {m n : Nat} (p : Path m n) : m = n :=
 
 /-- Construct a path between naturals from a propositional equality. -/
 def natPathOfEq {m n : Nat} (h : m = n) : Path m n :=
-  Path.ofEq h
+  pathOfEqStepChain h
 
 /-- All paths between the same naturals agree at the propositional level (UIP). -/
 theorem nat_path_toEq_unique {m n : Nat} (p q : Path m n) : p.toEq = q.toEq := by
@@ -54,12 +71,12 @@ def natRefl (n : Nat) : Path n n :=
 /-- Path from n to succ of predecessor for positive n. -/
 def succ_pred_path (n : Nat) (h : 0 < n) :
     Path n (Nat.succ (Nat.pred n)) :=
-  Path.ofEq (Nat.succ_pred_eq_of_pos h).symm
+  pathOfEqStepChain (Nat.succ_pred_eq_of_pos h).symm
 
 /-- Path witness: succ is injective. -/
 def succ_injective_path {m n : Nat} (h : Nat.succ m = Nat.succ n) :
     Path m n :=
-  Path.ofEq (Nat.succ.inj h)
+  pathOfEqStepChain (Nat.succ.inj h)
 
 /-- Path witness: succ of n is not zero. -/
 def succ_ne_zero_absurd {A : Type u} (n : Nat) (h : Nat.succ n = 0) : A :=
@@ -81,11 +98,11 @@ def succ_congrArg {m n : Nat} (p : Path m n) :
 
 /-- Path witness: n + 0 = n. -/
 def add_zero_path (n : Nat) : Path (n + 0) n :=
-  Path.ofEq (Nat.add_zero n)
+  pathOfEqStepChain (Nat.add_zero n)
 
 /-- Path witness: 0 + n = n. -/
 def zero_add_path (n : Nat) : Path (0 + n) n :=
-  Path.ofEq (Nat.zero_add n)
+  pathOfEqStepChain (Nat.zero_add n)
 
 /-- Path witness: n + 1 = succ n. -/
 def add_one_path (n : Nat) : Path (n + 1) (Nat.succ n) :=
@@ -93,57 +110,57 @@ def add_one_path (n : Nat) : Path (n + 1) (Nat.succ n) :=
 
 /-- Path witness: 1 + n = succ n. -/
 def one_add_path (n : Nat) : Path (1 + n) (Nat.succ n) :=
-  Path.ofEq (Nat.succ_eq_add_one n ▸ Nat.add_comm 1 n ▸ rfl)
+  pathOfEqStepChain (Nat.succ_eq_add_one n ▸ Nat.add_comm 1 n ▸ rfl)
 
 /-- Path witness: addition is commutative. -/
 def add_comm_path (m n : Nat) : Path (m + n) (n + m) :=
-  Path.ofEq (Nat.add_comm m n)
+  pathOfEqStepChain (Nat.add_comm m n)
 
 /-- Path witness: addition is associative. -/
 def add_assoc_path (a b c : Nat) : Path (a + b + c) (a + (b + c)) :=
-  Path.ofEq (Nat.add_assoc a b c)
+  pathOfEqStepChain (Nat.add_assoc a b c)
 
 /-- Path witness: succ distributes over addition on the left. -/
 def succ_add_path (m n : Nat) : Path (Nat.succ m + n) (Nat.succ (m + n)) :=
-  Path.ofEq (Nat.succ_add m n)
+  pathOfEqStepChain (Nat.succ_add m n)
 
 /-- Path witness: succ distributes over addition on the right. -/
 def add_succ_path (m n : Nat) : Path (m + Nat.succ n) (Nat.succ (m + n)) :=
-  Path.ofEq (Nat.add_succ m n)
+  pathOfEqStepChain (Nat.add_succ m n)
 
 /-! ## Multiplication paths -/
 
 /-- Path witness: n * 0 = 0. -/
 def mul_zero_path (n : Nat) : Path (n * 0) 0 :=
-  Path.ofEq (Nat.mul_zero n)
+  pathOfEqStepChain (Nat.mul_zero n)
 
 /-- Path witness: 0 * n = 0. -/
 def zero_mul_path (n : Nat) : Path (0 * n) 0 :=
-  Path.ofEq (Nat.zero_mul n)
+  pathOfEqStepChain (Nat.zero_mul n)
 
 /-- Path witness: n * 1 = n. -/
 def mul_one_path (n : Nat) : Path (n * 1) n :=
-  Path.ofEq (Nat.mul_one n)
+  pathOfEqStepChain (Nat.mul_one n)
 
 /-- Path witness: 1 * n = n. -/
 def one_mul_path (n : Nat) : Path (1 * n) n :=
-  Path.ofEq (Nat.one_mul n)
+  pathOfEqStepChain (Nat.one_mul n)
 
 /-- Path witness: multiplication is commutative. -/
 def mul_comm_path (m n : Nat) : Path (m * n) (n * m) :=
-  Path.ofEq (Nat.mul_comm m n)
+  pathOfEqStepChain (Nat.mul_comm m n)
 
 /-- Path witness: multiplication is associative. -/
 def mul_assoc_path (a b c : Nat) : Path (a * b * c) (a * (b * c)) :=
-  Path.ofEq (Nat.mul_assoc a b c)
+  pathOfEqStepChain (Nat.mul_assoc a b c)
 
 /-- Path witness: left distributivity. -/
 def left_distrib_path (a b c : Nat) : Path (a * (b + c)) (a * b + a * c) :=
-  Path.ofEq (Nat.left_distrib a b c)
+  pathOfEqStepChain (Nat.left_distrib a b c)
 
 /-- Path witness: right distributivity. -/
 def right_distrib_path (a b c : Nat) : Path ((a + b) * c) (a * c + b * c) :=
-  Path.ofEq (Nat.right_distrib a b c)
+  pathOfEqStepChain (Nat.right_distrib a b c)
 
 /-! ## Concrete path examples -/
 
@@ -196,7 +213,7 @@ def nat_transport_zero_add {P : Nat → Type u} (n : Nat) (x : P (0 + n)) :
 /-- Decidable equality of naturals lifts to decidable path existence. -/
 def natPathDecEq (m n : Nat) : Decidable (Nonempty (Path m n)) :=
   if h : m = n then
-    isTrue ⟨Path.ofEq h⟩
+    isTrue ⟨pathOfEqStepChain h⟩
   else
     isFalse (fun ⟨p⟩ => h p.toEq)
 
@@ -210,13 +227,13 @@ theorem nat_path_ne {m n : Nat} (h : m ≠ n) : ¬ Nonempty (Path m n) :=
 def add_congr {m m' n n' : Nat}
     (pm : Path m m') (pn : Path n n') :
     Path (m + n) (m' + n') :=
-  Path.ofEq (by rw [pm.toEq, pn.toEq])
+  pathOfEqStepChain (by rw [pm.toEq, pn.toEq])
 
 /-- Congruence: if m = m' and n = n', then m * n = m' * n'. -/
 def mul_congr {m m' n n' : Nat}
     (pm : Path m m') (pn : Path n n') :
     Path (m * n) (m' * n') :=
-  Path.ofEq (by rw [pm.toEq, pn.toEq])
+  pathOfEqStepChain (by rw [pm.toEq, pn.toEq])
 
 /-- Congruence of successor. -/
 def succ_congr {m n : Nat} (p : Path m n) :

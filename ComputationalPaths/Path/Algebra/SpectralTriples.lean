@@ -37,6 +37,23 @@ namespace SpectralTriples
 
 universe u
 
+private def pathOfEqStepChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
+  let core : Path a b := Path.ofEqChain h
+  Path.trans (Path.trans (Path.refl a) core) (Path.refl b)
+
+private theorem pathOfEqStepChain_rweq {A : Type u} {a b : A} (h : a = b) :
+    RwEq (pathOfEqStepChain h) (Path.ofEqChain h) := by
+  let core : Path a b := Path.ofEqChain h
+  change RwEq (Path.trans (Path.trans (Path.refl a) core) (Path.refl b)) core
+  apply rweq_trans
+  · exact rweq_of_step (Step.trans_assoc (Path.refl a) core (Path.refl b))
+  · apply rweq_trans
+    · exact
+        rweq_trans_congr_right (Path.refl a)
+          (rweq_of_step (Step.trans_refl_right core))
+    · exact rweq_of_step (Step.trans_refl_left core)
+
+
 /-! ## Hilbert space data -/
 
 /-- Minimal Hilbert space structure: carrier with inner product and zero. -/
@@ -68,11 +85,11 @@ theorem add_zero (x : H.carrier) : H.add x H.zero = x := by
 
 /-- Path witness: x + 0 = x. -/
 def add_zero_path (x : H.carrier) : Path (H.add x H.zero) x :=
-  Path.ofEq (H.add_zero x)
+  pathOfEqStepChain (H.add_zero x)
 
 /-- Path witness for inner product symmetry. -/
 def inner_comm_path (x y : H.carrier) : Path (H.inner x y) (H.inner y x) :=
-  Path.ofEq (H.inner_comm x y)
+  pathOfEqStepChain (H.inner_comm x y)
 
 end HilbertData
 
@@ -110,15 +127,15 @@ variable {H : HilbertData.{u}} (A : CStarData H)
 /-- Path witness: π(ab)v = π(a)(π(b)v). -/
 def repr_mul_path (a b : A.alg) (v : H.carrier) :
     Path (A.repr (A.mul a b) v) (A.repr a (A.repr b v)) :=
-  Path.ofEq (A.repr_mul a b v)
+  pathOfEqStepChain (A.repr_mul a b v)
 
 /-- Path witness: π(1)v = v. -/
 def repr_one_path (v : H.carrier) : Path (A.repr A.one v) v :=
-  Path.ofEq (A.repr_one v)
+  pathOfEqStepChain (A.repr_one v)
 
 /-- Path witness: star is involutive. -/
 def star_star_path (a : A.alg) : Path (A.star (A.star a)) a :=
-  Path.ofEq (A.star_star a)
+  pathOfEqStepChain (A.star_star a)
 
 /-- Multi-step path: π(1·a)v = π(a)v via π(1)(π(a)v) = π(a)v. -/
 def repr_one_mul_path (a : A.alg) (v : H.carrier)
@@ -126,7 +143,7 @@ def repr_one_mul_path (a : A.alg) (v : H.carrier)
     Path (A.repr (A.mul A.one a) v) (A.repr a v) :=
   Path.trans
     (A.repr_mul_path A.one a v)
-    (Path.ofEq (congrArg (· ) (A.repr_one (A.repr a v))))
+    (pathOfEqStepChain (_root_.congrArg (· ) (A.repr_one (A.repr a v))))
 
 end CStarData
 
@@ -152,12 +169,12 @@ variable {H : HilbertData.{u}} (D : DiracData H)
 
 /-- Path witness: D(0) = 0. -/
 def dirac_zero_path : Path (D.dirac H.zero) H.zero :=
-  Path.ofEq D.dirac_zero
+  pathOfEqStepChain D.dirac_zero
 
 /-- Path witness for self-adjointness. -/
 def self_adjoint_path (x y : H.carrier) (hx : D.inDomain x) (hy : D.inDomain y) :
     Path (H.inner (D.dirac x) y) (H.inner x (D.dirac y)) :=
-  Path.ofEq (D.self_adjoint x y hx hy)
+  pathOfEqStepChain (D.self_adjoint x y hx hy)
 
 end DiracData
 
@@ -191,11 +208,11 @@ variable (T : SpectralTriple)
 /-- Path witness for bounded commutator. -/
 def comm_bounded_path (a : T.algebra.alg) :
     Path (commutator T.algebra T.diracOp a T.hilbert.zero) T.hilbert.zero :=
-  Path.ofEq (T.comm_bounded a)
+  pathOfEqStepChain (T.comm_bounded a)
 
 /-- Path witness: resolvent maps zero to zero. -/
 def resolvent_zero_path : Path (T.resolvent T.hilbert.zero) T.hilbert.zero :=
-  Path.ofEq T.resolvent_zero
+  pathOfEqStepChain T.resolvent_zero
 
 end SpectralTriple
 
@@ -216,8 +233,8 @@ inductive SpectralStep : {H : HilbertData.{u}} → H.carrier → H.carrier → T
 def spectralStepPath {H : HilbertData.{u}} {x y : H.carrier}
     (s : @SpectralStep u H x y) : Path x y :=
   match s with
-  | SpectralStep.dirac_zero _ D => Path.ofEq D.dirac_zero
-  | SpectralStep.repr_one _ A v => Path.ofEq (A.repr_one v)
+  | SpectralStep.dirac_zero _ D => pathOfEqStepChain D.dirac_zero
+  | SpectralStep.repr_one _ A v => pathOfEqStepChain (A.repr_one v)
   | _ => Path.ofEqChain rfl
 
 /-- Compose two spectral steps. -/
@@ -246,12 +263,12 @@ variable (G : GradedSpectralTriple.{u})
 /-- Path witness: γ² = id. -/
 def gamma_sq_path (v : G.hilbert.carrier) :
     Path (G.gamma (G.gamma v)) v :=
-  Path.ofEq (G.gamma_sq v)
+  pathOfEqStepChain (G.gamma_sq v)
 
 /-- Path witness: γ commutes with representation. -/
 def gamma_repr_path (a : G.algebra.alg) (v : G.hilbert.carrier) :
     Path (G.gamma (G.algebra.repr a v)) (G.algebra.repr a (G.gamma v)) :=
-  Path.ofEq (G.gamma_repr a v)
+  pathOfEqStepChain (G.gamma_repr a v)
 
 end GradedSpectralTriple
 
@@ -276,18 +293,18 @@ variable (R : RealSpectralTriple.{u})
 
 /-- Path witness: J(0) = 0. -/
 def chargeConj_zero_path : Path (R.chargeConj R.hilbert.zero) R.hilbert.zero :=
-  Path.ofEq R.chargeConj_zero
+  pathOfEqStepChain R.chargeConj_zero
 
 /-- Path witness: J² = id. -/
 def chargeConj_sq_path (v : R.hilbert.carrier) :
     Path (R.chargeConj (R.chargeConj v)) v :=
-  Path.ofEq (R.chargeConj_sq v)
+  pathOfEqStepChain (R.chargeConj_sq v)
 
 /-- Path witness for order-zero condition. -/
 def order_zero_path (a : R.algebra.alg) (v : R.hilbert.carrier) :
     Path (R.algebra.repr a (R.chargeConj (R.chargeConj v)))
          (R.chargeConj (R.chargeConj (R.algebra.repr a v))) :=
-  Path.ofEq (R.order_zero a v)
+  pathOfEqStepChain (R.order_zero a v)
 
 end RealSpectralTriple
 
@@ -316,29 +333,29 @@ variable (F : FullSpectralTriple.{u})
 def grading_real_interaction (v : F.hilbert.carrier) :
     Path (F.chargeConj (F.gamma (F.gamma v))) (F.gamma (F.gamma (F.chargeConj v))) :=
   Path.trans
-    (Path.ofEq (congrArg F.chargeConj (F.gamma_sq v)))
+    (pathOfEqStepChain (_root_.congrArg F.chargeConj (F.gamma_sq v)))
     (Path.trans
-      (Path.ofEq (F.chargeConj_sq v).symm)
+      (pathOfEqStepChain (F.chargeConj_sq v).symm)
       (Path.trans
-        (Path.ofEq (congrArg (fun w => F.chargeConj (F.chargeConj w)) rfl))
-        (Path.ofEq (F.gamma_sq (F.chargeConj v)).symm)))
+        (pathOfEqStepChain (_root_.congrArg (fun w => F.chargeConj (F.chargeConj w)) rfl))
+        (pathOfEqStepChain (F.gamma_sq (F.chargeConj v)).symm)))
 
 /-- RwEq witness: the two paths J(γ²v)→v are path-equivalent. -/
 theorem grading_real_rweq (v : F.hilbert.carrier) :
     RwEq
-      (Path.trans (Path.ofEq (congrArg F.chargeConj (F.gamma_sq v)))
-                  (Path.ofEq (F.chargeConj_sq v)))
-      (Path.ofEq (by rw [F.gamma_sq, F.chargeConj_sq] : F.chargeConj (F.gamma (F.gamma v)) = v)) := by
+      (Path.trans (pathOfEqStepChain (_root_.congrArg F.chargeConj (F.gamma_sq v)))
+                  (pathOfEqStepChain (F.chargeConj_sq v)))
+      (pathOfEqStepChain (by rw [F.gamma_sq, F.chargeConj_sq] : F.chargeConj (F.gamma (F.gamma v)) = v)) := by
   constructor
 
 /-- Multi-step: γJJv → γv → JJγv, showing γ commutes past J². -/
 def gamma_past_chargeConj_sq (v : F.hilbert.carrier) :
     Path (F.gamma (F.chargeConj (F.chargeConj v))) (F.chargeConj (F.chargeConj (F.gamma v))) :=
   Path.trans
-    (Path.ofEq (congrArg F.gamma (F.chargeConj_sq v)))
+    (pathOfEqStepChain (_root_.congrArg F.gamma (F.chargeConj_sq v)))
     (Path.trans
-      (Path.ofEq (F.chargeConj_sq (F.gamma v)).symm)
-      (Path.ofEq (congrArg (fun w => F.chargeConj (F.chargeConj w))
+      (pathOfEqStepChain (F.chargeConj_sq (F.gamma v)).symm)
+      (pathOfEqStepChain (_root_.congrArg (fun w => F.chargeConj (F.chargeConj w))
         (F.gamma_chargeConj_comm v).symm).symm))
 
 end FullSpectralTriple

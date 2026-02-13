@@ -3,3 +3,4 @@
 import ComputationalPaths.Basic
 import ComputationalPaths.Path
 import ComputationalPaths.SieveTheory
+import Topos.PathCoherence
