@@ -9,150 +9,57 @@ rev = "v4.24.0"
 
 [[lean_lib]]
 name = "ComputationalPaths"
-
-[[lean_lib]]
-name = "Kan"
-
-[[lean_lib]]
-name = "Equivalence"
-
-[[lean_lib]]
-name = "Operad"
-
-[[lean_lib]]
-name = "Topos"
-
-[[lean_lib]]
-name = "Motivic"
-
-[[lean_lib]]
-name = "MotivicCohomology"
-
-[[lean_lib]]
-name = "Chromatic"
-
-[[lean_lib]]
-name = "Condensed"
-
-[[lean_lib]]
-name = "Categorification"
-
-[[lean_lib]]
-name = "Cluster"
-
-[[lean_lib]]
-name = "VertexAlgebra"
-
-[[lean_lib]]
-name = "Descent"
-
-[[lean_lib]]
-name = "Etale"
-
-[[lean_lib]]
-name = "Crystalline"
-
-[[lean_lib]]
-name = "Deformation"
-
-[[lean_lib]]
-name = "DerivedCategories"
-
-[[lean_lib]]
-name = "Moduli"
-
-[[lean_lib]]
-name = "Cobordism"
-
-[[lean_lib]]
-name = "TFT"
-
-[[lean_lib]]
-name = "Arithmetic"
-
-[[lean_lib]]
-name = "Langlands"
-
-[[lean_lib]]
-name = "GeometricSatake"
-
-[[lean_lib]]
-name = "Anabelian"
-
-[[lean_lib]]
-name = "Birational"
-
-[[lean_lib]]
-name = "Simplicial"
-
-[[lean_lib]]
-name = "InfinityCategory"
-
-[[lean_lib]]
-name = "Factorization"
-
-[[lean_lib]]
-name = "Perfectoid"
-
-[[lean_lib]]
-name = "PerfectoidCohomology"
-
-[[lean_lib]]
-name = "Padic"
-
-[[lean_lib]]
-name = "Prismatic"
-
-[[lean_lib]]
-name = "Tropical"
-
-[[lean_lib]]
-name = "Hodge"
-
-[[lean_lib]]
-name = "Log"
-
-[[lean_lib]]
-name = "RepStability"
-
-[[lean_lib]]
-name = "HomologicalStability"
-
-[[lean_lib]]
-name = "SpectralSequence"
-
-[[lean_lib]]
-name = "Intersection"
-
-[[lean_lib]]
-name = "GRT"
-
-[[lean_lib]]
-name = "GIT"
-
-[[lean_lib]]
-name = "DAG"
-
-[[lean_lib]]
-name = "Quantum"
-
-[[lean_lib]]
-name = "KacMoody"
-
-[[lean_lib]]
-name = "Mirror"
-
-[[lean_lib]]
-name = "SymplecticDuality"
-
-[[lean_lib]]
-name = "Floer"
-
-[[lean_lib]]
-name = "NCG"
-
-[[lean_lib]]
-name = "OperadicAlgebra"
+roots = [
+  "ComputationalPaths",
+  "Kan",
+  "Equivalence",
+  "Operad",
+  "Topos",
+  "Motivic",
+  "MotivicCohomology",
+  "Chromatic",
+  "Condensed",
+  "Categorification",
+  "Cluster",
+  "VertexAlgebra",
+  "Descent",
+  "Etale",
+  "Crystalline",
+  "Deformation",
+  "DerivedCategories",
+  "Moduli",
+  "Cobordism",
+  "TFT",
+  "Arithmetic",
+  "Langlands",
+  "GeometricSatake",
+  "Anabelian",
+  "Birational",
+  "Simplicial",
+  "InfinityCategory",
+  "Factorization",
+  "Perfectoid",
+  "PerfectoidCohomology",
+  "Padic",
+  "Prismatic",
+  "Tropical",
+  "Hodge",
+  "Log",
+  "RepStability",
+  "HomologicalStability",
+  "SpectralSequence",
+  "Intersection",
+  "GRT",
+  "GIT",
+  "DAG",
+  "Quantum",
+  "KacMoody",
+  "Mirror",
+  "SymplecticDuality",
+  "Floer",
+  "NCG",
+  "OperadicAlgebra",
+]
 
 [[lean_exe]]
 name = "computational_paths"
