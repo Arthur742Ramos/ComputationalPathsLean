@@ -238,5 +238,4 @@ Expr-level system, and note that this suffices for the thesis. -/
 
 -- Let me provide the cleanest version of this.
 
-end KnuthBendix
 end ComputationalPaths.Path.Rewrite.KnuthBendix
