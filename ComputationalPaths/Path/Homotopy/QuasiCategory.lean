@@ -229,8 +229,8 @@ theorem homotopyCategory_id_comp (C : QuasiCategory) {a b : C.obj}
     (homotopyCategory C).id_comp f = trivial := by sorry
 
 /-- The nerve of a category satisfies the inner Kan condition (Joyal). -/
-theorem nerve_is_quasiCategory (Cat : SmallCatData) (N : NerveQuasiCategory Cat) :
-    InnerKanProperty N.nerveData.sset := by sorry
+theorem nerve_is_quasiCategory_prop (Cat : SmallCatData) (N : NerveQuasiCategory Cat) :
+    Nonempty (InnerKanProperty N.nerveData.sset) := by sorry
 
 /-- Left fibrations are stable under pullback. -/
 theorem left_fibration_pullback {S T U : SSetData}

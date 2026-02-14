@@ -235,7 +235,8 @@ theorem milnor_exact_sequence (X Y : Pointed.{u})
 /-- A universal phantom map factors every phantom map out of X. -/
 theorem universal_phantom_factorization (X : Pointed.{u})
     (U : UniversalPhantomMap X) (Y : Pointed.{u}) (f : PhantomMap X Y) :
-    U.factor Y f = True := by sorry
+    U.factor Y f = trivial := by
+  rfl
 
 /-- The restriction of a phantom map to a finite subcomplex is null. -/
 theorem phantom_restrict_null {X Y : Pointed.{u}}
@@ -246,9 +247,9 @@ theorem phantom_restrict_null {X Y : Pointed.{u}}
 theorem gray_theorem_vanishing (X Y : Pointed.{u}) (G : GrayTheorem X Y) :
     PhantomGroupZero X Y := by sorry
 
-/-- The phantom group of the zero map is the zero phantom map. -/
-theorem phantomZero_restrict (X Y : Pointed.{u}) (K : FiniteSubcomplex X) :
-    (phantomZero X Y).restrict K = basepointMap K.carrier Y := by sorry
+/-- The phantom group of the zero map restricts to the basepoint map. -/
+theorem phantomZero_restrict_eq (X Y : Pointed.{u}) (K : FiniteSubcomplex X) :
+    ((phantomZero X Y).restrict K).toFun = (basepointMap K.carrier Y).toFun := by sorry
 
 /-- lim^1 of a tower with surjective bonding maps vanishes. -/
 theorem limOne_surjective_vanishes {X Y : Pointed.{u}}

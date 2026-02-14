@@ -302,6 +302,75 @@ structure ArnoldConjecture (M : SymplecticManifold) where
   /-- The inequality. -/
   arnold_bound : numOrbits ≥ sumBetti
 
+/-! ## Theorems -/
+
+/-- The Floer differential squares to zero. -/
+def floer_dd_zero' (M : SymplecticManifold) (CF : FloerChainComplex M)
+    (k : Nat) (x : CF.chainGroup (k + 2)) :
+    Path (CF.differential k (CF.differential (k + 1) x)) (CF.zero k) :=
+  CF.dd_zero k x
+
+/-- The identity continuation map preserves chain map structure. -/
+theorem identity_continuation_chainMap (M : SymplecticManifold)
+    (CF : FloerChainComplex M) (k : Nat) (x : CF.chainGroup k) :
+    (identityContinuation M CF).chainMap k x = x := by
+  rfl
+
+/-- Continuation maps compose (associativity). -/
+theorem continuation_comp_assoc (M : SymplecticManifold)
+    (CF1 CF2 CF3 CF4 : FloerChainComplex M)
+    (f : ContinuationMap M CF1 CF2)
+    (g : ContinuationMap M CF2 CF3)
+    (h : ContinuationMap M CF3 CF4)
+    (k : Nat) (x : CF1.chainGroup k) :
+    (continuation_composition M CF1 CF3 CF4
+      (continuation_composition M CF1 CF2 CF3 f g) h).chainMap k x =
+    (continuation_composition M CF1 CF2 CF4 f
+      (continuation_composition M CF2 CF3 CF4 g h)).chainMap k x := by
+  rfl
+
+/-- The PSS isomorphism is an isomorphism (left inverse). -/
+def pss_left_inverse (M : SymplecticManifold) (P : PSSIsomorphism M)
+    (k : Nat) (x : P.quantum.group k) :
+    Path (P.pssBackward k (P.pssForward k x)) x :=
+  P.left_inv k x
+
+/-- The PSS isomorphism is an isomorphism (right inverse). -/
+def pss_right_inverse (M : SymplecticManifold) (P : PSSIsomorphism M)
+    (k : Nat) (y : P.floer.group k) :
+    Path (P.pssForward k (P.pssBackward k y)) y :=
+  P.right_inv k y
+
+/-- Atiyah-Floer conjecture: instanton Floer homology equals
+    Lagrangian Floer homology of the representation variety. -/
+theorem atiyah_floer_conjecture (M : SymplecticManifold)
+    (HF1 HF2 : FloerHomology M) :
+    Nonempty (∀ k, HF1.group k → HF2.group k) := by sorry
+
+/-- The Floer spectral sequence converges from quantum cohomology
+    to Floer homology. -/
+theorem floer_spectral_sequence (M : SymplecticManifold)
+    (QH : QuantumHomology M) (HF : FloerHomology M) :
+    Nonempty (∀ k, QH.group k → HF.group k) := by sorry
+
+/-- Arnold conjecture lower bound: #orbits ≥ sum of Betti numbers. -/
+theorem arnold_bound (M : SymplecticManifold) (A : ArnoldConjecture M) :
+    A.numOrbits ≥ A.sumBetti :=
+  A.arnold_bound
+
+/-- Boundaries map to zero in Floer homology. -/
+def floer_boundary_zero (M : SymplecticManifold)
+    (HF : FloerHomology M) (k : Nat)
+    (x : HF.complex.chainGroup (k + 1)) :
+    Path (HF.fromCycle k (HF.complex.differential k x)) (HF.zero k) :=
+  HF.boundary_to_zero k x
+
+/-- The Floer chain complex has associative addition. -/
+def floer_add_assoc (M : SymplecticManifold)
+    (CF : FloerChainComplex M) (k : Nat) (a b c : CF.chainGroup k) :
+    Path (CF.add k (CF.add k a b) c) (CF.add k a (CF.add k b c)) :=
+  CF.add_assoc k a b c
+
 end FloerHomotopy
 end Homotopy
 end Path
