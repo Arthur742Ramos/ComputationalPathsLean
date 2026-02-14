@@ -115,6 +115,41 @@ def trans_congr {p p' q q' : Expr} (h₁ : CRTC p p') (h₂ : CRTC q q') :
   (trans_congr_left q h₁).trans (trans_congr_right p' h₂)
 end CRTC
 
+/-! ## CRTCN: Reflexive-Transitive Closure with Step Counts -/
+
+inductive CRTCN : Nat → Expr → Expr → Prop where
+  | refl (a : Expr) : CRTCN 0 a a
+  | head {n : Nat} {a b c : Expr} :
+      CStep a b → CRTCN n b c → CRTCN (n + 1) a c
+
+namespace CRTCN
+
+theorem single {a b : Expr} (h : CStep a b) : CRTCN 1 a b := by
+  simpa [Nat.zero_add] using (CRTCN.head h (CRTCN.refl b))
+
+theorem toCRTC {n : Nat} {a b : Expr} (h : CRTCN n a b) : CRTC a b := by
+  induction h with
+  | refl a => exact .refl a
+  | head s _ ih => exact .head s ih
+
+theorem trans {m n : Nat} {a b c : Expr}
+    (h₁ : CRTCN m a b) (h₂ : CRTCN n b c) : CRTCN (m + n) a c := by
+  induction h₁ generalizing n c with
+  | refl a =>
+      simpa using h₂
+  | @head m a b d s h ih =>
+      have ih' : CRTCN (m + n) b c := ih h₂
+      simpa [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using (CRTCN.head s ih')
+
+theorem ofCRTC {a b : Expr} (h : CRTC a b) : ∃ n, CRTCN n a b := by
+  induction h with
+  | refl a => exact ⟨0, .refl a⟩
+  | head s _ ih =>
+      rcases ih with ⟨n, hn⟩
+      exact ⟨n + 1, .head s hn⟩
+
+end CRTCN
+
 /-! ## Termination of CStep
 
 CStep terminates under the same lexicographic measure `(weight, leftWeight)`
@@ -593,6 +628,22 @@ theorem reach_canon (e : Expr) : CRTC e (canon e) := by
     exact (CRTC.trans_congr ih₁ ih₂).trans
       (reach_append (toRW e₁) (toRW e₂) (toRW_reduced e₁) (toRW_reduced e₂))
 
+/-! ## Step-Count Bounds to Canonical Forms -/
+
+theorem reach_canon_steps_exists (e : Expr) : ∃ n, CRTCN n e (canon e) := by
+  exact CRTCN.ofCRTC (reach_canon e)
+
+noncomputable def normalFormSteps (e : Expr) : Nat :=
+  Classical.choose (reach_canon_steps_exists e)
+
+theorem normalFormSteps_spec (e : Expr) :
+    CRTCN (normalFormSteps e) e (canon e) :=
+  Classical.choose_spec (reach_canon_steps_exists e)
+
+theorem reach_canon_steps_bounded (e : Expr) :
+    ∃ n, n ≤ normalFormSteps e ∧ CRTCN n e (canon e) := by
+  exact ⟨normalFormSteps e, Nat.le_refl _, normalFormSteps_spec e⟩
+
 /-! ## Main Confluence Theorem
 
 The central result: the completed groupoid TRS (`CStep`) is confluent.
@@ -620,6 +671,30 @@ theorem confluence (a b c : Expr)
   have heq : toRW b = toRW c := by rw [← hb, hc]
   have : canon b = canon c := by unfold canon; rw [heq]
   exact ⟨canon b, reach_canon b, this ▸ reach_canon c⟩
+
+theorem confluence_with_step_counts (a b c : Expr)
+    (hab : CRTC a b) (hac : CRTC a c) :
+    ∃ d n₁ n₂, CRTCN n₁ b d ∧ CRTCN n₂ c d := by
+  have hb : toRW a = toRW b := toRW_invariant_rtc hab
+  have hc : toRW a = toRW c := toRW_invariant_rtc hac
+  have hcanon : canon b = canon c := by
+    unfold canon
+    rw [← hb, hc]
+  exact ⟨canon b, normalFormSteps b, normalFormSteps c,
+    normalFormSteps_spec b, hcanon.symm ▸ normalFormSteps_spec c⟩
+
+theorem confluence_with_step_bounds (a b c : Expr)
+    (hab : CRTC a b) (hac : CRTC a c) :
+    ∃ d n₁ n₂, n₁ ≤ normalFormSteps b ∧ n₂ ≤ normalFormSteps c ∧
+      CRTCN n₁ b d ∧ CRTCN n₂ c d := by
+  have hb : toRW a = toRW b := toRW_invariant_rtc hab
+  have hc : toRW a = toRW c := toRW_invariant_rtc hac
+  have hcanon : canon b = canon c := by
+    unfold canon
+    rw [← hb, hc]
+  refine ⟨canon b, normalFormSteps b, normalFormSteps c, Nat.le_refl _, Nat.le_refl _, ?_, ?_⟩
+  · exact normalFormSteps_spec b
+  · exact hcanon.symm ▸ normalFormSteps_spec c
 
 /-- Local confluence as a corollary. -/
 theorem local_confluence (a b c : Expr)
@@ -660,6 +735,26 @@ theorem church_rosser (e₁ e₂ : Expr)
   have : canon e₁ = canon e₂ := by unfold canon; rw [h]
   exact ⟨canon e₁, reach_canon e₁, this ▸ reach_canon e₂⟩
 
+theorem church_rosser_explicit (e₁ e₂ : Expr)
+    (h : toRW e₁ = toRW e₂) :
+    ∃ d n₁ n₂, CRTCN n₁ e₁ d ∧ CRTCN n₂ e₂ d := by
+  have hcanon : canon e₁ = canon e₂ := by
+    unfold canon
+    rw [h]
+  exact ⟨canon e₁, normalFormSteps e₁, normalFormSteps e₂,
+    normalFormSteps_spec e₁, hcanon.symm ▸ normalFormSteps_spec e₂⟩
+
+theorem church_rosser_explicit_bounded (e₁ e₂ : Expr)
+    (h : toRW e₁ = toRW e₂) :
+    ∃ d n₁ n₂, n₁ ≤ normalFormSteps e₁ ∧ n₂ ≤ normalFormSteps e₂ ∧
+      CRTCN n₁ e₁ d ∧ CRTCN n₂ e₂ d := by
+  have hcanon : canon e₁ = canon e₂ := by
+    unfold canon
+    rw [h]
+  refine ⟨canon e₁, normalFormSteps e₁, normalFormSteps e₂, Nat.le_refl _, Nat.le_refl _, ?_, ?_⟩
+  · exact normalFormSteps_spec e₁
+  · exact hcanon.symm ▸ normalFormSteps_spec e₂
+
 /-- The free group interpretation completely characterizes the equivalence:
     `toRW e₁ = toRW e₂` if and only if `e₁` and `e₂` are joinable under CStep. -/
 theorem toRW_characterizes_joinability (e₁ e₂ : Expr) :
@@ -668,6 +763,30 @@ theorem toRW_characterizes_joinability (e₁ e₂ : Expr) :
   · exact church_rosser e₁ e₂
   · rintro ⟨d, h₁, h₂⟩
     rw [toRW_invariant_rtc h₁, toRW_invariant_rtc h₂]
+
+/-! ## Diamond Property and Confluence -/
+
+def Diamond {α : Type _} (R : α → α → Prop) : Prop :=
+  ∀ a b c, R a b → R a c → ∃ d, RTC R b d ∧ RTC R c d
+
+theorem diamond_implies_local_confluence {α : Type _} {R : α → α → Prop}
+    (hdiamond : Diamond R) :
+    ∀ a b c, R a b → R a c → ∃ d, RTC R b d ∧ RTC R c d :=
+  hdiamond
+
+theorem diamond_implies_confluence_of_termination {α : Type _} {R : α → α → Prop}
+    (wf : WellFounded (fun y x => R x y))
+    (hdiamond : Diamond R) :
+    ∀ a b c, RTC R a b → RTC R a c → ∃ d, RTC R b d ∧ RTC R c d :=
+  GroupoidTRS.newman_lemma wf (diamond_implies_local_confluence hdiamond)
+
+theorem cstep_diamond_implies_confluence (hdiamond : Diamond CStep) :
+    ∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d :=
+  diamond_implies_confluence_of_termination cstep_termination hdiamond
+
+theorem cstep_confluence_via_diamond :
+    ∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d :=
+  cstep_diamond_implies_confluence local_confluence
 
 /-! ## Bridge to Path-Level Rewriting
 

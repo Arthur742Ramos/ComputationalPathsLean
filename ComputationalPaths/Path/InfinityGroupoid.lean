@@ -143,6 +143,64 @@ theorem truncationTower_cells_eq_of_le {n m k : Nat} (h : n ≤ m) (hk : k ≤ n
   simpa [truncationTower, compPathTruncation] using
     truncation_functorial_step (A := A) h hk
 
+/-- At stable dimensions, tower cells agree with the original cell type. -/
+theorem truncationTower_cells_eq_cellType_of_le {n k : Nat} (hk : k ≤ n) :
+    (truncationTower A n).cells k = cellType A k := by
+  simpa [truncationTower, compPathTruncation] using
+    truncCell_eq_cellType_of_le (A := A) n k hk
+
+/-- Above the truncation cutoff, tower cells collapse to `PUnit`. -/
+theorem truncationTower_cells_eq_punit_of_gt {n k : Nat} (hk : n < k) :
+    (truncationTower A n).cells k = PUnit := by
+  simpa [truncationTower, compPathTruncation] using
+    truncCell_eq_punit_of_gt (A := A) n k hk
+
+/-- Functoriality along `n ≤ m ≤ l` identifies levels `m` and `l` below `n`. -/
+theorem truncation_functorial_middle {n m l k : Nat}
+    (h₁ : n ≤ m) (h₂ : m ≤ l) (hk : k ≤ n) :
+    truncCell A l k = truncCell A m k := by
+  have hkm : k ≤ m := Nat.le_trans hk h₁
+  have hkl : k ≤ l := Nat.le_trans hkm h₂
+  simp [truncCell, hkm, hkl]
+
+/-- Functoriality along `n ≤ m` is invertible below level `n`. -/
+theorem truncation_functorial_step_symm {n m k : Nat} (h : n ≤ m) (hk : k ≤ n) :
+    truncCell A n k = truncCell A m k :=
+  (truncation_functorial_step (A := A) h hk).symm
+
+/-- Middle-level functoriality is invertible on stable dimensions. -/
+theorem truncation_functorial_middle_symm {n m l k : Nat}
+    (h₁ : n ≤ m) (h₂ : m ≤ l) (hk : k ≤ n) :
+    truncCell A m k = truncCell A l k :=
+  (truncation_functorial_middle (A := A) h₁ h₂ hk).symm
+
+/-- Tower-level functoriality along `n ≤ m` is invertible on stable dimensions. -/
+theorem truncationTower_cells_eq_of_le_symm {n m k : Nat} (h : n ≤ m) (hk : k ≤ n) :
+    (truncationTower A n).cells k = (truncationTower A m).cells k :=
+  (truncationTower_cells_eq_of_le (A := A) h hk).symm
+
+/-- Truncating exactly at level `n` preserves the `n`-cells. -/
+theorem truncCell_eq_cellType_self (n : Nat) :
+    truncCell A n n = cellType A n :=
+  truncCell_eq_cellType_of_le (A := A) n n (Nat.le_refl n)
+
+/-- At successor dimension, the `n`-truncation has already collapsed to `PUnit`. -/
+theorem truncCell_eq_punit_succ (n : Nat) :
+    truncCell A n (n + 1) = PUnit :=
+  truncCell_eq_punit_of_gt (A := A) n (n + 1) (Nat.lt_succ_self n)
+
+/-- In the truncation tower, `n`-cells at level `n` agree with the original cell tower. -/
+theorem truncationTower_cells_eq_cellType_self (n : Nat) :
+    (truncationTower A n).cells n = cellType A n := by
+  simpa using
+    truncationTower_cells_eq_cellType_of_le (A := A) (n := n) (k := n) (Nat.le_refl n)
+
+/-- In the truncation tower, cells at level `n+1` are collapsed at stage `n`. -/
+theorem truncationTower_cells_eq_punit_succ (n : Nat) :
+    (truncationTower A n).cells (n + 1) = PUnit := by
+  simpa using
+    truncationTower_cells_eq_punit_of_gt (A := A) (n := n) (k := n + 1) (Nat.lt_succ_self n)
+
 /-! ## Kan fillers for the truncation tower -/
 
 /-- Canonical Kan filler at truncation level `n`. -/
@@ -158,6 +216,16 @@ theorem truncationTower_kan_condition (n : Nat) :
 theorem truncationTowerKanFiller_eq_coherenceAt (n : Nat) :
     truncationTowerKanFiller (A := A) n = coherenceAt (A := A) n := by
   rfl
+
+/-- The tower Kan filler is definitionally the truncation coherence field. -/
+theorem truncationTowerKanFiller_eq_tower_coherence (n : Nat) :
+    truncationTowerKanFiller (A := A) n = (truncationTower A n).coherence := by
+  rfl
+
+/-- Kan fillers exist uniformly at every truncation level. -/
+theorem truncationTower_kan_condition_all :
+    ∀ n : Nat, Nonempty (CoherenceAt (A := A) n) :=
+  fun n => truncationTower_kan_condition (A := A) n
 
 /-- The Kan condition is stable under successor levels in the truncation tower. -/
 theorem truncationTower_kan_condition_succ (n : Nat) :
@@ -182,6 +250,42 @@ theorem truncationTower_kan_high (n : Nat)
     (c₁ c₂ : Derivation₄ m₁ m₂) :
     Nonempty (DerivationHigh n c₁ c₂) :=
   ⟨truncationTowerKanFiller (A := A) (n + 4) c₁ c₂⟩
+
+/-- The canonical infinity-groupoid satisfies the Kan condition in every dimension. -/
+theorem compPathInfinityGroupoid_kan_condition (n : Nat) :
+    Nonempty (CoherenceAt (A := A) n) :=
+  ⟨(compPathInfinityGroupoid A).coherence n⟩
+
+/-- Every level-2 filler is connected to the canonical tower filler by a 4-cell. -/
+theorem truncationTower_kan₂_connected_to_canonical {a b : A} {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) (m : Derivation₃ d₁ d₂) :
+    Nonempty (Derivation₄ m (truncationTowerKanFiller (A := A) 2 d₁ d₂)) :=
+  ⟨contractibility₄ m (truncationTowerKanFiller (A := A) 2 d₁ d₂)⟩
+
+/-- Every level-3 filler is connected to the canonical tower filler by a higher cell. -/
+theorem truncationTower_kan₃_connected_to_canonical {a b : A} {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} (m₁ m₂ : Derivation₃ d₁ d₂)
+    (c : Derivation₄ m₁ m₂) :
+    Nonempty (DerivationHigh 0 c (truncationTowerKanFiller (A := A) 3 m₁ m₂)) :=
+  ⟨contractibilityHigh 0 c (truncationTowerKanFiller (A := A) 3 m₁ m₂)⟩
+
+/-- The canonical level-2 Kan filler is coherently reflexive. -/
+theorem truncationTower_kan₂_canonical_reflexive {a b : A} {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) :
+    Nonempty
+      (Derivation₄
+        (truncationTowerKanFiller (A := A) 2 d₁ d₂)
+        (truncationTowerKanFiller (A := A) 2 d₁ d₂)) :=
+  ⟨Derivation₄.refl (truncationTowerKanFiller (A := A) 2 d₁ d₂)⟩
+
+/-- The canonical level-3 Kan filler is coherently reflexive at higher level. -/
+theorem truncationTower_kan₃_canonical_reflexive {a b : A} {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} (m₁ m₂ : Derivation₃ d₁ d₂) :
+    Nonempty
+      (DerivationHigh 0
+        (truncationTowerKanFiller (A := A) 3 m₁ m₂)
+        (truncationTowerKanFiller (A := A) 3 m₁ m₂)) :=
+  ⟨DerivationHigh.refl (truncationTowerKanFiller (A := A) 3 m₁ m₂)⟩
 
 /-! ## Adjacent truncation levels -/
 
@@ -214,6 +318,39 @@ theorem adjacent_truncations_cells_equiv {n k : Nat} (hk : k ≤ n) :
     Nonempty ((truncationTower A n).cells k → (truncationTower A (n + 1)).cells k) ∧
       Nonempty ((truncationTower A (n + 1)).cells k → (truncationTower A n).cells k) := by
   simpa [truncationTower, compPathTruncation] using adjacent_truncCell_equiv (A := A) hk
+
+/-- Adjacent-level stability identifies the lower truncation with the original cell tower. -/
+theorem adjacent_truncCell_eq_cellType {n k : Nat} (hk : k ≤ n) :
+    truncCell A n k = cellType A k :=
+  truncCell_eq_cellType_of_le (A := A) n k hk
+
+/-- Adjacent-level stability also identifies the successor truncation with the original cells. -/
+theorem adjacent_truncCell_succ_eq_cellType {n k : Nat} (hk : k ≤ n) :
+    truncCell A (n + 1) k = cellType A k := by
+  have hk' : k ≤ n + 1 := Nat.le_trans hk (Nat.le_succ n)
+  simpa using truncCell_eq_cellType_of_le (A := A) (n := n + 1) (k := k) hk'
+
+/-- Adjacent-level agreement can be obtained by comparison through `cellType`. -/
+theorem adjacent_truncCell_eq_via_cellType {n k : Nat} (hk : k ≤ n) :
+    truncCell A n k = truncCell A (n + 1) k := by
+  calc
+    truncCell A n k = cellType A k := adjacent_truncCell_eq_cellType (A := A) hk
+    _ = truncCell A (n + 1) k := (adjacent_truncCell_succ_eq_cellType (A := A) hk).symm
+
+/-- The lower adjacent truncation level is equivalent to `cellType` on stable dimensions. -/
+theorem adjacent_truncCell_equiv_cellType {n k : Nat} (hk : k ≤ n) :
+    Nonempty (truncCell A n k → cellType A k) ∧
+      Nonempty (cellType A k → truncCell A n k) := by
+  let e : truncCell A n k = cellType A k := adjacent_truncCell_eq_cellType (A := A) hk
+  exact ⟨⟨Eq.mp e⟩, ⟨Eq.mp e.symm⟩⟩
+
+/-- The successor adjacent truncation level is equivalent to `cellType` on stable dimensions. -/
+theorem adjacent_truncCell_succ_equiv_cellType {n k : Nat} (hk : k ≤ n) :
+    Nonempty (truncCell A (n + 1) k → cellType A k) ∧
+      Nonempty (cellType A k → truncCell A (n + 1) k) := by
+  let e : truncCell A (n + 1) k = cellType A k :=
+    adjacent_truncCell_succ_eq_cellType (A := A) hk
+  exact ⟨⟨Eq.mp e⟩, ⟨Eq.mp e.symm⟩⟩
 
 /-! ## Coherence interchange laws -/
 
@@ -266,6 +403,38 @@ theorem coherence_interchange_hcomp_symm
         (hcomp α β)) := by
   simpa [hcomp] using coherence_interchange_law_symm (A := A) α β
 
+/-- Interchange in horizontal-composition form has a canonical witness. -/
+theorem coherenceInterchange_hcomp_form
+    {a b c : A} {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty
+      (Derivation₃
+        (hcomp α β)
+        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) := by
+  exact ⟨by simpa [hcomp] using coherenceInterchange (A := A) α β⟩
+
+/-- Symmetric interchange in horizontal-composition form has a canonical witness. -/
+theorem coherenceInterchange_hcomp_form_symm
+    {a b c : A} {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty
+      (Derivation₃
+        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))
+        (hcomp α β)) := by
+  rcases coherenceInterchange_hcomp_form (A := A) α β with ⟨m⟩
+  exact ⟨.inv m⟩
+
+/-- Any two horizontal-form interchange witnesses are connected by a 4-cell. -/
+theorem coherence_interchange_hcomp_connected
+    {a b c : A} {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g')
+    (m₁ m₂ :
+      Derivation₃
+        (hcomp α β)
+        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :
+    Nonempty (Derivation₄ m₁ m₂) :=
+  ⟨contractibility₄ m₁ m₂⟩
+
 /-- Any interchange witness is coherently connected to the canonical one. -/
 theorem coherence_interchange_contractible
     {a b c : A} {f f' : Path a b} {g g' : Path b c}
@@ -287,6 +456,51 @@ theorem coherence_interchange_connected
         (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :
     Nonempty (Derivation₄ m₁ m₂) :=
   ⟨contractibility₄ m₁ m₂⟩
+
+/-- Interchange connectivity is symmetric. -/
+theorem coherence_interchange_connected_symm
+    {a b c : A} {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g')
+    (m₁ m₂ :
+      Derivation₃
+        (Derivation₂.vcomp (whiskerRight α g) (whiskerLeft f' β))
+        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :
+    Nonempty (Derivation₄ m₂ m₁) := by
+  rcases coherence_interchange_connected (A := A) α β m₁ m₂ with ⟨c⟩
+  exact ⟨Derivation₄.inv c⟩
+
+/-- The canonical interchange witness is connected to itself by reflexivity. -/
+theorem coherenceInterchange_self_connected
+    {a b c : A} {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty
+      (Derivation₄
+        (coherenceInterchange (A := A) α β)
+        (coherenceInterchange (A := A) α β)) :=
+  ⟨Derivation₄.refl (coherenceInterchange (A := A) α β)⟩
+
+/-- The canonical interchange witness is coherently connected to its inverse. -/
+theorem coherenceInterchange_connected_to_inverse
+    {a b c : A} {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty
+      (Derivation₄
+        (coherenceInterchange (A := A) α β)
+        (Derivation₃.inv (coherenceInterchange (A := A) α β))) :=
+  ⟨contractibility₄ _ _⟩
+
+/-- Any horizontal-form interchange witness is connected to the canonical one. -/
+theorem coherence_interchange_hcomp_contractible
+    {a b c : A} {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g')
+    (m :
+      Derivation₃
+        (hcomp α β)
+        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :
+    Nonempty
+      (Derivation₄ m (by simpa [hcomp] using coherenceInterchange (A := A) α β)) := by
+  refine ⟨contractibility₄ m ?_⟩
+  simpa [hcomp] using coherenceInterchange (A := A) α β
 
 /-! ## Summary -/
 

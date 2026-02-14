@@ -151,6 +151,38 @@ variable {i : Instantiation}
     IsNormal (normalize i.p) ∧ IsNormal (normalize i.q) :=
   ⟨i.source_isNormal, i.target_isNormal⟩
 
+@[simp] theorem rw_sound_symm (i : Instantiation) :
+    i.q.toEq = i.p.toEq :=
+  i.rw_sound.symm
+
+@[simp] theorem rweq_sound_symm (i : Instantiation) :
+    i.q.toEq = i.p.toEq :=
+  i.rweq_sound.symm
+
+@[simp] theorem normalize_source_toEq (i : Instantiation) :
+    (normalize i.p).toEq = i.p.toEq :=
+  normalize_toEq i.p
+
+@[simp] theorem normalize_target_toEq (i : Instantiation) :
+    (normalize i.q).toEq = i.q.toEq :=
+  normalize_toEq i.q
+
+@[simp] theorem normalize_toEq_agree (i : Instantiation) :
+    (normalize i.p).toEq = (normalize i.q).toEq := by
+  simpa [normalize_toEq] using i.rweq_sound
+
+@[simp] theorem complete_sound_rw_pair (i : Instantiation) :
+    Rw (A := _) i.p i.q ∧ i.p.toEq = i.q.toEq :=
+  ⟨i.toRw, i.rw_sound⟩
+
+@[simp] theorem complete_sound_rweq_pair (i : Instantiation) :
+    RwEq (A := _) i.p i.q ∧ i.p.toEq = i.q.toEq :=
+  ⟨i.toRwEq, i.rweq_sound⟩
+
+@[simp] theorem termination_bundle (i : Instantiation) :
+    IsNormal (normalize i.p) ∧ IsNormal (normalize i.q) ∧ normalize i.p = normalize i.q :=
+  ⟨i.source_isNormal, i.target_isNormal, i.normalize_eq⟩
+
 end Instantiation
 
 /- Smart constructors producing tagged steps for the primitive rules. -/
@@ -702,6 +734,233 @@ end Builder
     normalize (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q =
       normalize (Builder.instLrr (A := A) (p := Path.trans q r)).q :=
   normalize_of_rweq (critical_pair_tt_lrr_via_peak (A := A) (q := q) (r := r))
+
+/-- Critical-pair join witness in the existential shape consumed by local confluence proofs. -/
+theorem critical_pair_tt_rrr_join_exists {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    ∃ s,
+      Rw (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q s ∧
+      Rw (Builder.instRrr (A := A) (p := Path.trans p q)).q s := by
+  refine ⟨Path.trans p q, ?_, ?_⟩
+  · change Rw (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q)
+    exact Rw.tail (Rw.refl _)
+      (Step.trans_congr_right (p := p) (Step.trans_refl_right (p := q)))
+  · exact Rw.refl _
+
+/-- Companion existential join witness for the left-unit critical pair. -/
+theorem critical_pair_tt_lrr_join_exists {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    ∃ s,
+      Rw (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q s ∧
+      Rw (Builder.instLrr (A := A) (p := Path.trans q r)).q s := by
+  refine ⟨Path.trans q r, ?_, ?_⟩
+  · change Rw (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r)
+    exact rw_of_step (Step.trans_refl_left (p := Path.trans q r))
+  · exact Rw.refl _
+
+/-- Critical pair `tt/rrr` with explicit join plus the shared `toEq` invariant. -/
+theorem critical_pair_tt_rrr_join_toEq {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    ∃ s,
+      Rw (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q s ∧
+      Rw (Builder.instRrr (A := A) (p := Path.trans p q)).q s ∧
+      (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q.toEq =
+        (Builder.instRrr (A := A) (p := Path.trans p q)).q.toEq := by
+  rcases critical_pair_tt_rrr_join_exists (A := A) (p := p) (q := q) with ⟨s, hs₁, hs₂⟩
+  exact ⟨s, hs₁, hs₂, critical_pair_tt_rrr_toEq (A := A) (p := p) (q := q)⟩
+
+/-- Critical pair `tt/lrr` with explicit join plus the shared `toEq` invariant. -/
+theorem critical_pair_tt_lrr_join_toEq {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    ∃ s,
+      Rw (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q s ∧
+      Rw (Builder.instLrr (A := A) (p := Path.trans q r)).q s ∧
+      (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q.toEq =
+        (Builder.instLrr (A := A) (p := Path.trans q r)).q.toEq := by
+  rcases critical_pair_tt_lrr_join_exists (A := A) (q := q) (r := r) with ⟨s, hs₁, hs₂⟩
+  exact ⟨s, hs₁, hs₂, critical_pair_tt_lrr_toEq (A := A) (q := q) (r := r)⟩
+
+@[simp] theorem critical_pair_tt_rrr_normal_targets {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    IsNormal (normalize (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q) ∧
+      IsNormal (normalize (Builder.instRrr (A := A) (p := Path.trans p q)).q) := by
+  exact ⟨normalize_isNormal _, normalize_isNormal _⟩
+
+@[simp] theorem critical_pair_tt_lrr_normal_targets {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    IsNormal (normalize (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q) ∧
+      IsNormal (normalize (Builder.instLrr (A := A) (p := Path.trans q r)).q) := by
+  exact ⟨normalize_isNormal _, normalize_isNormal _⟩
+
+/-- Soundness/completeness/termination package for the `tt/rrr` overlap. -/
+theorem critical_pair_tt_rrr_sound_complete_termination {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq
+      (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
+      (Builder.instRrr (A := A) (p := Path.trans p q)).q ∧
+      (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q.toEq =
+        (Builder.instRrr (A := A) (p := Path.trans p q)).q.toEq ∧
+      normalize (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q =
+        normalize (Builder.instRrr (A := A) (p := Path.trans p q)).q ∧
+      IsNormal (normalize (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q) ∧
+      IsNormal (normalize (Builder.instRrr (A := A) (p := Path.trans p q)).q) := by
+  refine ⟨critical_pair_tt_rrr_via_peak (A := A) (p := p) (q := q), ?_, ?_, ?_, ?_⟩
+  · exact critical_pair_tt_rrr_toEq (A := A) (p := p) (q := q)
+  · exact critical_pair_tt_rrr_normalize (A := A) (p := p) (q := q)
+  · exact normalize_isNormal _
+  · exact normalize_isNormal _
+
+/-- Soundness/completeness/termination package for the `tt/lrr` overlap. -/
+theorem critical_pair_tt_lrr_sound_complete_termination {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    RwEq
+      (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
+      (Builder.instLrr (A := A) (p := Path.trans q r)).q ∧
+      (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q.toEq =
+        (Builder.instLrr (A := A) (p := Path.trans q r)).q.toEq ∧
+      normalize (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q =
+        normalize (Builder.instLrr (A := A) (p := Path.trans q r)).q ∧
+      IsNormal (normalize (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q) ∧
+      IsNormal (normalize (Builder.instLrr (A := A) (p := Path.trans q r)).q) := by
+  refine ⟨critical_pair_tt_lrr_via_peak (A := A) (q := q) (r := r), ?_, ?_, ?_, ?_⟩
+  · exact critical_pair_tt_lrr_toEq (A := A) (q := q) (r := r)
+  · exact critical_pair_tt_lrr_normalize (A := A) (q := q) (r := r)
+  · exact normalize_isNormal _
+  · exact normalize_isNormal _
+
+/-- Bridge theorem in the shape used by `ConfluenceProof.local_confluence_tt_rrr`. -/
+theorem confluence_bridge_tt_rrr_join_exists {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    ∃ s, Rw (Path.trans p (Path.trans q (Path.refl c))) s ∧ Rw (Path.trans p q) s := by
+  simpa [Builder.instTt, Builder.instRrr] using
+    (critical_pair_tt_rrr_join_exists (A := A) (p := p) (q := q))
+
+/-- Bridge theorem in the shape used by `ConfluenceProof.local_confluence_tt_lrr`. -/
+theorem confluence_bridge_tt_lrr_join_exists {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    ∃ s, Rw (Path.trans (Path.refl a) (Path.trans q r)) s ∧ Rw (Path.trans q r) s := by
+  simpa [Builder.instTt, Builder.instLrr] using
+    (critical_pair_tt_lrr_join_exists (A := A) (q := q) (r := r))
+
+/-- Soundness bridge for the `tt/rrr` critical pair in direct path form. -/
+@[simp] theorem confluence_bridge_tt_rrr_toEq {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    (Path.trans p (Path.trans q (Path.refl c))).toEq = (Path.trans p q).toEq := by
+  simpa [Builder.instTt, Builder.instRrr] using
+    (critical_pair_tt_rrr_toEq (A := A) (p := p) (q := q))
+
+/-- Soundness bridge for the `tt/lrr` critical pair in direct path form. -/
+@[simp] theorem confluence_bridge_tt_lrr_toEq {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    (Path.trans (Path.refl a) (Path.trans q r)).toEq = (Path.trans q r).toEq := by
+  simpa [Builder.instTt, Builder.instLrr] using
+    (critical_pair_tt_lrr_toEq (A := A) (q := q) (r := r))
+
+/-! ## Soundness/completeness/termination refinements for confluence bridges -/
+
+/-- Completeness extraction from the `tt/rrr` join witness. -/
+theorem critical_pair_tt_rrr_join_rweq {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq
+      (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
+      (Builder.instRrr (A := A) (p := Path.trans p q)).q := by
+  rcases critical_pair_tt_rrr_join_exists (A := A) (p := p) (q := q) with ⟨s, hs₁, hs₂⟩
+  exact rweq_trans (rweq_of_rw hs₁) (rweq_symm (rweq_of_rw hs₂))
+
+/-- Completeness extraction from the `tt/lrr` join witness. -/
+theorem critical_pair_tt_lrr_join_rweq {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    RwEq
+      (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
+      (Builder.instLrr (A := A) (p := Path.trans q r)).q := by
+  rcases critical_pair_tt_lrr_join_exists (A := A) (q := q) (r := r) with ⟨s, hs₁, hs₂⟩
+  exact rweq_trans (rweq_of_rw hs₁) (rweq_symm (rweq_of_rw hs₂))
+
+/-- Soundness recovered from the `tt/rrr` join witness. -/
+@[simp] theorem critical_pair_tt_rrr_join_soundness {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q.toEq =
+      (Builder.instRrr (A := A) (p := Path.trans p q)).q.toEq :=
+  rweq_toEq (critical_pair_tt_rrr_join_rweq (A := A) (p := p) (q := q))
+
+/-- Soundness recovered from the `tt/lrr` join witness. -/
+@[simp] theorem critical_pair_tt_lrr_join_soundness {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q.toEq =
+      (Builder.instLrr (A := A) (p := Path.trans q r)).q.toEq :=
+  rweq_toEq (critical_pair_tt_lrr_join_rweq (A := A) (q := q) (r := r))
+
+/-- Termination-facing consequence: the shared join can always be normalized (`tt/rrr`). -/
+theorem critical_pair_tt_rrr_join_termination {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    ∃ s,
+      Rw (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q s ∧
+      Rw (Builder.instRrr (A := A) (p := Path.trans p q)).q s ∧
+      IsNormal (normalize s) := by
+  rcases critical_pair_tt_rrr_join_exists (A := A) (p := p) (q := q) with ⟨s, hs₁, hs₂⟩
+  exact ⟨s, hs₁, hs₂, normalize_isNormal s⟩
+
+/-- Termination-facing consequence: the shared join can always be normalized (`tt/lrr`). -/
+theorem critical_pair_tt_lrr_join_termination {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    ∃ s,
+      Rw (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q s ∧
+      Rw (Builder.instLrr (A := A) (p := Path.trans q r)).q s ∧
+      IsNormal (normalize s) := by
+  rcases critical_pair_tt_lrr_join_exists (A := A) (q := q) (r := r) with ⟨s, hs₁, hs₂⟩
+  exact ⟨s, hs₁, hs₂, normalize_isNormal s⟩
+
+/-- Direct bridge package in the shape consumed by the main confluence development (`tt/rrr`). -/
+theorem confluence_bridge_tt_rrr_sound_complete {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    (∃ s, Rw (Path.trans p (Path.trans q (Path.refl c))) s ∧ Rw (Path.trans p q) s) ∧
+    RwEq (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q) ∧
+    (Path.trans p (Path.trans q (Path.refl c))).toEq = (Path.trans p q).toEq := by
+  refine ⟨confluence_bridge_tt_rrr_join_exists (A := A) (p := p) (q := q), ?_, ?_⟩
+  · simpa [Builder.instTt, Builder.instRrr] using
+      (critical_pair_tt_rrr_join_rweq (A := A) (p := p) (q := q))
+  · exact confluence_bridge_tt_rrr_toEq (A := A) (p := p) (q := q)
+
+/-- Direct bridge package in the shape consumed by the main confluence development (`tt/lrr`). -/
+theorem confluence_bridge_tt_lrr_sound_complete {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    (∃ s, Rw (Path.trans (Path.refl a) (Path.trans q r)) s ∧ Rw (Path.trans q r) s) ∧
+    RwEq (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r) ∧
+    (Path.trans (Path.refl a) (Path.trans q r)).toEq = (Path.trans q r).toEq := by
+  refine ⟨confluence_bridge_tt_lrr_join_exists (A := A) (q := q) (r := r), ?_, ?_⟩
+  · simpa [Builder.instTt, Builder.instLrr] using
+      (critical_pair_tt_lrr_join_rweq (A := A) (q := q) (r := r))
+  · exact confluence_bridge_tt_lrr_toEq (A := A) (q := q) (r := r)
+
+/-- Termination bridge in direct path form (`tt/rrr`). -/
+@[simp] theorem confluence_bridge_tt_rrr_normalize {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    normalize (Path.trans p (Path.trans q (Path.refl c))) = normalize (Path.trans p q) := by
+  simpa [Builder.instTt, Builder.instRrr] using
+    (critical_pair_tt_rrr_normalize (A := A) (p := p) (q := q))
+
+/-- Termination bridge in direct path form (`tt/lrr`). -/
+@[simp] theorem confluence_bridge_tt_lrr_normalize {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    normalize (Path.trans (Path.refl a) (Path.trans q r)) = normalize (Path.trans q r) := by
+  simpa [Builder.instTt, Builder.instLrr] using
+    (critical_pair_tt_lrr_normalize (A := A) (q := q) (r := r))
+
+/-- Normality payload in direct path form (`tt/rrr`). -/
+@[simp] theorem confluence_bridge_tt_rrr_normal_targets {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    IsNormal (normalize (Path.trans p (Path.trans q (Path.refl c)))) ∧
+      IsNormal (normalize (Path.trans p q)) := by
+  simpa [Builder.instTt, Builder.instRrr] using
+    (critical_pair_tt_rrr_normal_targets (A := A) (p := p) (q := q))
+
+/-- Normality payload in direct path form (`tt/lrr`). -/
+@[simp] theorem confluence_bridge_tt_lrr_normal_targets {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    IsNormal (normalize (Path.trans (Path.refl a) (Path.trans q r))) ∧
+      IsNormal (normalize (Path.trans q r)) := by
+  simpa [Builder.instTt, Builder.instLrr] using
+    (critical_pair_tt_lrr_normal_targets (A := A) (q := q) (r := r))
 
 end LNDEQ
 end Rewrite

@@ -60,6 +60,22 @@ def AlgebraicCycleData.add (c₁ c₂ : AlgebraicCycleData α) : AlgebraicCycleD
 def AlgebraicCycleData.degree (c : AlgebraicCycleData α) : Int :=
   c.multiplicities.foldl (· + ·) 0
 
+theorem algebraicCycle_zero_degree (x : α) (codim : Nat) :
+    (AlgebraicCycleData.zero x codim).degree = 0 := by
+  simp [AlgebraicCycleData.zero, AlgebraicCycleData.degree]
+
+theorem algebraicCycle_add_components {α : Type u}
+    (c₁ c₂ : AlgebraicCycleData α) :
+    (AlgebraicCycleData.add c₁ c₂).components = c₁.components ++ c₂.components := rfl
+
+theorem algebraicCycle_add_multiplicities {α : Type u}
+    (c₁ c₂ : AlgebraicCycleData α) :
+    (AlgebraicCycleData.add c₁ c₂).multiplicities = c₁.multiplicities ++ c₂.multiplicities := rfl
+
+theorem algebraicCycle_add_isEffective {α : Type u}
+    (c₁ c₂ : AlgebraicCycleData α) :
+    (AlgebraicCycleData.add c₁ c₂).isEffective = (c₁.isEffective && c₂.isEffective) := rfl
+
 -- ============================================================================
 -- Section 2: Rational Equivalence and Chow Groups
 -- ============================================================================
@@ -105,6 +121,9 @@ def chowToKTheoryPath {α : Type u} (hcg : HigherChowGroupData α) :
     Path hcg hcg :=
   Path.refl hcg
 
+theorem higherChow_classical_simplicialDegree (ch : ChowGroupData α) :
+    (HigherChowGroupData.classical ch).simplicialDegree = 0 := rfl
+
 -- ============================================================================
 -- Section 4: Cycle Maps
 -- ============================================================================
@@ -123,10 +142,29 @@ def CycleMapData.classMap (ch : ChowGroupData α) : CycleMapData α :=
   { source := ch, targetCohomDegree := 2 * ch.codimension,
     targetCoefficients := "Z_l", isInjective := false, isSurjective := false }
 
+/-- Comparison map from cycle classes to singular cohomology over `ℂ`. -/
+def CycleMapData.singularComparison (ch : ChowGroupData α) : CycleMapData α :=
+  { (CycleMapData.classMap ch) with targetCoefficients := "Z" }
+
+theorem cycleMap_classMap_even_degree (ch : ChowGroupData α) :
+    (CycleMapData.classMap ch).targetCohomDegree = 2 * ch.codimension := rfl
+
+theorem cycleMap_singularComparison_source (ch : ChowGroupData α) :
+    (CycleMapData.singularComparison ch).source = ch := rfl
+
+theorem cycleMap_singularComparison_even_degree (ch : ChowGroupData α) :
+    (CycleMapData.singularComparison ch).targetCohomDegree = 2 * ch.codimension := rfl
+
+theorem cycleMap_singularComparison_coefficients (ch : ChowGroupData α) :
+    (CycleMapData.singularComparison ch).targetCoefficients = "Z" := rfl
+
 /-- Path witnessing functoriality of cycle map -/
 def cycleMapFunctorialPath {α : Type u} (cm : CycleMapData α) :
     Path cm cm :=
   Path.refl cm
+
+theorem cycleMapFunctorialPath_refl {α : Type u} (cm : CycleMapData α) :
+    cycleMapFunctorialPath cm = Path.refl cm := rfl
 
 -- ============================================================================
 -- Section 5: Bloch–Kato Conjecture

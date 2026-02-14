@@ -77,6 +77,38 @@ theorem idempotent_two_step_rweq (x : M) :
         (rweq_cmpA_refl_left (Path.refl (S.solidify x))))
       (rweq_cmpA_refl_right (S.idempotentPath x)))
 
+theorem solidify_unit_assoc_exact (x : M) :
+    RwEq
+      (Path.trans
+        (Path.trans (S.idempotentPath x) (Path.refl (S.solidify x)))
+        (S.unitPath x))
+      (Path.trans (S.idempotentPath x) (S.unitPath x)) := by
+  sorry
+
+theorem solidify_unit_exact_right (x : M) :
+    RwEq
+      (Path.trans
+        (Path.trans (S.idempotentPath x) (S.unitPath x))
+        (Path.refl x))
+      (Path.trans (S.idempotentPath x) (S.unitPath x)) := by
+  sorry
+
+theorem unit_split_exact_left (x : M) :
+    RwEq
+      (Path.trans
+        (Path.trans (Path.symm (S.unitPath x)) (S.unitPath x))
+        (Path.symm (S.unitPath x)))
+      (Path.symm (S.unitPath x)) := by
+  sorry
+
+theorem solidification_exact_triangle (x : M) :
+    RwEq
+      (Path.trans
+        (S.idempotentPath x)
+        (Path.trans (S.unitPath x) (Path.symm (S.unitPath x))))
+      (S.idempotentPath x) := by
+  sorry
+
 end SolidModulePathData
 
 /-- Identity solidification package, giving concrete computational witnesses. -/

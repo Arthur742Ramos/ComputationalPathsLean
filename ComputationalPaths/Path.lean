@@ -40,6 +40,7 @@ import ComputationalPaths.Path.OperadicStructure
 import ComputationalPaths.Path.SymmetricMonoidal
 import ComputationalPaths.Path.NaturalitySquares
 import ComputationalPaths.Path.NaturalTransformationPaths
+import ComputationalPaths.Path.Functor
 import ComputationalPaths.Path.YonedaLemma
 import ComputationalPaths.Path.BrownRepresentability
 import ComputationalPaths.Path.KanExtension
@@ -385,6 +386,7 @@ import ComputationalPaths.Path.Algebra.PosetTopology
 import ComputationalPaths.Path.Algebra.CoxeterGroups
 import ComputationalPaths.Path.Algebra.CombHopfAlgebras
 import ComputationalPaths.Path.Algebra.CondensedSets
+import ComputationalPaths.Path.Algebra.CondensedMath
 import ComputationalPaths.Path.Algebra.LiquidTensor
 import ComputationalPaths.Path.Algebra.BornologicalSpaces
 import ComputationalPaths.Path.Algebra.DerivedComplete

@@ -19,6 +19,7 @@ adjunction, and expose the basic stable stems as stable homotopy groups.
 -/
 
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
+import ComputationalPaths.Path.Homotopy.FreudenthalSuspension
 import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
 import ComputationalPaths.Path.Homotopy.StableStems
 import ComputationalPaths.Path.Rewrite.RwEq
@@ -129,6 +130,89 @@ noncomputable def stableAdjunction_succ (n : Nat) (X Y : Pointed) :
         (loopSpaceSuspensionAdjunction (X := iteratedSigmaPointed n X) (Y := Y))
         (stableAdjunction n X (omegaEqPointed Y))) :=
   Path.stepChain rfl
+
+/-! ## Stable equivalences, Freudenthal suspension, and Spanier-Whitehead duality -/
+
+/-- Stable equivalence data from iterated suspension-loop adjunctions. -/
+abbrev StableEquiv (X Y : Pointed) :=
+  (n : Nat) → PathSimpleEquiv (PointedMap (iteratedSigmaPointed n X) Y)
+    (PointedMap X (iteratedOmegaEqPointed n Y))
+
+/-- The stabilized adjunction provides a stable equivalence. -/
+theorem stableAdjunction_stableEquiv (X Y : Pointed) : StableEquiv X Y :=
+  fun n => stableAdjunction n X Y
+
+/-- Degree-zero stabilized adjunction is the identity equivalence. -/
+theorem stableAdjunction_zero (X Y : Pointed) :
+    Path (stableAdjunction 0 X Y) (pathSimpleEquivRefl (PointedMap X Y)) :=
+  Path.stepChain rfl
+
+/-- Left inverse law for each stabilized equivalence level. -/
+theorem stableAdjunction_left_inverse (n : Nat) (X Y : Pointed)
+    (f : PointedMap (iteratedSigmaPointed n X) Y) :
+    Path ((stableAdjunction n X Y).invFun ((stableAdjunction n X Y).toFun f)) f :=
+  (stableAdjunction n X Y).left_inv f
+
+/-- Right inverse law for each stabilized equivalence level. -/
+theorem stableAdjunction_right_inverse (n : Nat) (X Y : Pointed)
+    (g : PointedMap X (iteratedOmegaEqPointed n Y)) :
+    Path ((stableAdjunction n X Y).toFun ((stableAdjunction n X Y).invFun g)) g :=
+  (stableAdjunction n X Y).right_inv g
+
+/-- Freudenthal preview sends the reflexive loop to the suspension base loop. -/
+theorem freudenthal_preview_basepoint (X : Pointed) :
+    Path
+      ((FreudenthalSuspension.freudenthalPreview X).toFun (Path.refl X.pt))
+      (FreudenthalSuspension.suspBaseLoop (X := X.carrier) X.pt) :=
+  (FreudenthalSuspension.freudenthalPreview X).basepoint
+
+/-- The Freudenthal preview map is definitionally the suspension map. -/
+theorem freudenthal_preview_toFun_def (X : Pointed) :
+    Path (FreudenthalSuspension.freudenthalPreview X).toFun
+      (FreudenthalSuspension.suspensionMap (X := X.carrier) X.pt) :=
+  Path.stepChain rfl
+
+/-- Basepoint path witness for the suspension map in Freudenthal preview form. -/
+theorem freudenthal_suspensionMap_basepoint (X : Pointed) :
+    Path
+      (FreudenthalSuspension.suspensionMap (X := X.carrier) X.pt (Path.refl X.pt))
+      (FreudenthalSuspension.suspBaseLoop (X := X.carrier) X.pt) :=
+  FreudenthalSuspension.suspensionMap_basepoint (X := X.carrier) X.pt
+
+/-- Spanier-Whitehead duality data encoded by stable equivalences. -/
+structure SpanierWhiteheadDuality (X : Pointed) where
+  dual : Pointed
+  stableEquiv : StableEquiv X dual
+
+/-- Canonical self-duality witness induced by stabilized adjunction. -/
+noncomputable def canonicalSpanierWhiteheadDuality (X : Pointed) :
+    SpanierWhiteheadDuality X where
+  dual := X
+  stableEquiv := fun n => stableAdjunction n X X
+
+/-- Canonical Spanier-Whitehead duality has dual object equal to X. -/
+theorem canonicalSWDuality_dual (X : Pointed) :
+    Path (canonicalSpanierWhiteheadDuality X).dual X :=
+  Path.stepChain rfl
+
+/-- Canonical Spanier-Whitehead duality specializes to stable adjunction. -/
+theorem canonicalSWDuality_level (n : Nat) (X : Pointed) :
+    Path ((canonicalSpanierWhiteheadDuality X).stableEquiv n) (stableAdjunction n X X) :=
+  Path.stepChain rfl
+
+/-- Left inverse law for canonical Spanier-Whitehead duality. -/
+theorem canonicalSWDuality_left_inverse (n : Nat) (X : Pointed)
+    (f : PointedMap (iteratedSigmaPointed n X) X) :
+    Path (((canonicalSpanierWhiteheadDuality X).stableEquiv n).invFun
+      (((canonicalSpanierWhiteheadDuality X).stableEquiv n).toFun f)) f :=
+  ((canonicalSpanierWhiteheadDuality X).stableEquiv n).left_inv f
+
+/-- Right inverse law for canonical Spanier-Whitehead duality. -/
+theorem canonicalSWDuality_right_inverse (n : Nat) (X : Pointed)
+    (g : PointedMap X (iteratedOmegaEqPointed n X)) :
+    Path (((canonicalSpanierWhiteheadDuality X).stableEquiv n).toFun
+      (((canonicalSpanierWhiteheadDuality X).stableEquiv n).invFun g)) g :=
+  ((canonicalSpanierWhiteheadDuality X).stableEquiv n).right_inv g
 
 /-! ## Stable homotopy groups of spheres (basic stems) -/
 

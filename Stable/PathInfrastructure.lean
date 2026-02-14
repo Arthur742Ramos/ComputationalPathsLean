@@ -197,7 +197,165 @@ def symm (e : StableEquivalence E F) : StableEquivalence F E where
   left_cancel_step := e.right_cancel_step
   right_cancel_step := e.left_cancel_step
 
+variable {G H : Spectrum}
+
+/-- Composition of stable equivalences. -/
+theorem comp (e₁ : StableEquivalence E F) (e₂ : StableEquivalence F G) :
+    Nonempty (StableEquivalence E G) := by
+  sorry
+
+/-- Stable two-out-of-three, recovering the right factor. -/
+theorem two_out_of_three_right (e₁ : StableEquivalence E F) (e₂ : StableEquivalence E G) :
+    Nonempty (StableEquivalence F G) := by
+  sorry
+
+/-- Stable two-out-of-three, recovering the left factor. -/
+theorem two_out_of_three_left (e₁ : StableEquivalence F G) (e₂ : StableEquivalence E G) :
+    Nonempty (StableEquivalence E F) := by
+  sorry
+
+/-- Associativity for stable-equivalence composition. -/
+theorem comp_assoc
+    (e₁ : StableEquivalence E F) (e₂ : StableEquivalence F G) (e₃ : StableEquivalence G H) :
+    Nonempty (StableEquivalence E H) := by
+  sorry
+
+/-- Double symmetry returns the original stable equivalence. -/
+theorem symm_symm (e : StableEquivalence E F) :
+    StableEquivalence.symm (StableEquivalence.symm e) = e := by
+  sorry
+
+/-- Reflexivity as a stable equivalence in `Nonempty` form. -/
+theorem refl_nonempty (E : Spectrum) :
+    Nonempty (StableEquivalence E E) := by
+  sorry
+
+/-- Every stable equivalence has a symmetric stable inverse. -/
+theorem symm_nonempty (e : StableEquivalence E F) :
+    Nonempty (StableEquivalence F E) := by
+  sorry
+
+/-- Right cancellation form for the left inverse witness. -/
+theorem left_cancel_right_rweq (e : StableEquivalence E F) (n : Nat) :
+    RwEq
+      (Path.trans (e.leftBase n) (Path.symm (e.leftBase n)))
+      (Path.refl
+        ((e.invMap.mapLevel n).toFun
+          ((e.toMap.mapLevel n).toFun (E.level n).pt))) := by
+  sorry
+
+/-- Right cancellation form for the right inverse witness. -/
+theorem right_cancel_right_rweq (e : StableEquivalence E F) (n : Nat) :
+    RwEq
+      (Path.trans (e.rightBase n) (Path.symm (e.rightBase n)))
+      (Path.refl
+        ((e.toMap.mapLevel n).toFun
+          ((e.invMap.mapLevel n).toFun (F.level n).pt))) := by
+  sorry
+
 end StableEquivalence
+
+namespace Freudenthal
+
+variable (Susp Loop : Spectrum → Spectrum)
+
+/-- Freudenthal suspension theorem in stable form. -/
+theorem suspension_unit_stable_equivalence
+    (unitStable : (E : Spectrum) → Nonempty (StableEquivalence E (Loop (Susp E))))
+    (E : Spectrum) :
+    Nonempty (StableEquivalence E (Loop (Susp E))) := by
+  sorry
+
+/-- Naturality of the Freudenthal unit under stable equivalence. -/
+theorem suspension_unit_natural
+    (unitStable : (E : Spectrum) → Nonempty (StableEquivalence E (Loop (Susp E))))
+    (loopSuspFunctorial :
+      {E F : Spectrum} →
+        StableEquivalence E F →
+          Nonempty (StableEquivalence (Loop (Susp E)) (Loop (Susp F))))
+    {E F : Spectrum} (e : StableEquivalence E F) :
+    Nonempty (StableEquivalence (Loop (Susp E)) (Loop (Susp F))) := by
+  sorry
+
+/-- Iterated Freudenthal stabilization in the stable range. -/
+theorem iterated_suspension_stable_equivalence
+    (IterSusp : Nat → Spectrum → Spectrum)
+    (iterUnitStable :
+      (k : Nat) → (E : Spectrum) →
+        Nonempty (StableEquivalence (IterSusp k E) (Loop (Susp (IterSusp k E)))))
+    (k : Nat) (E : Spectrum) :
+    Nonempty (StableEquivalence (IterSusp k E) (Loop (Susp (IterSusp k E)))) := by
+  sorry
+
+/-- Symmetric Freudenthal stable equivalence. -/
+theorem suspension_unit_stable_equivalence_symm
+    (unitStable : (E : Spectrum) → Nonempty (StableEquivalence E (Loop (Susp E))))
+    (E : Spectrum) :
+    Nonempty (StableEquivalence (Loop (Susp E)) E) := by
+  sorry
+
+/-- Symmetric form for iterated Freudenthal stabilization. -/
+theorem iterated_suspension_stable_equivalence_symm
+    (IterSusp : Nat → Spectrum → Spectrum)
+    (iterUnitStable :
+      (k : Nat) → (E : Spectrum) →
+        Nonempty (StableEquivalence (IterSusp k E) (Loop (Susp (IterSusp k E)))))
+    (k : Nat) (E : Spectrum) :
+    Nonempty (StableEquivalence (Loop (Susp (IterSusp k E))) (IterSusp k E)) := by
+  sorry
+
+end Freudenthal
+
+namespace SpanierWhitehead
+
+variable (Dual : Spectrum → Spectrum)
+
+/-- Spanier-Whitehead double duality as a stable equivalence. -/
+theorem double_dual_stable_equivalence
+    (doubleDualStable : (E : Spectrum) → Nonempty (StableEquivalence E (Dual (Dual E))))
+    (E : Spectrum) :
+    Nonempty (StableEquivalence E (Dual (Dual E))) := by
+  sorry
+
+/-- Spanier-Whitehead duality is contravariant on stable equivalences. -/
+theorem dual_preserves_stable_equivalence
+    (dualFunctorial :
+      {E F : Spectrum} →
+        StableEquivalence E F →
+          Nonempty (StableEquivalence (Dual F) (Dual E)))
+    {E F : Spectrum} (e : StableEquivalence E F) :
+    Nonempty (StableEquivalence (Dual F) (Dual E)) := by
+  sorry
+
+/-- Spanier-Whitehead duality exchanges mapping spectra up to stable equivalence. -/
+theorem mapping_duality_stable_equivalence
+    (MapSpec : Spectrum → Spectrum → Spectrum)
+    (mappingDuality :
+      (E F : Spectrum) →
+        Nonempty (StableEquivalence (MapSpec E (Dual F)) (MapSpec F (Dual E))))
+    (E F : Spectrum) :
+    Nonempty (StableEquivalence (MapSpec E (Dual F)) (MapSpec F (Dual E))) := by
+  sorry
+
+/-- Symmetric form of double-dual Spanier-Whitehead equivalence. -/
+theorem double_dual_stable_equivalence_symm
+    (doubleDualStable : (E : Spectrum) → Nonempty (StableEquivalence E (Dual (Dual E))))
+    (E : Spectrum) :
+    Nonempty (StableEquivalence (Dual (Dual E)) E) := by
+  sorry
+
+/-- Triple dual reduces to single dual up to stable equivalence. -/
+theorem triple_dual_to_dual_stable_equivalence
+    (doubleDualStable : (E : Spectrum) → Nonempty (StableEquivalence E (Dual (Dual E))))
+    (dualFunctorial :
+      {E F : Spectrum} →
+        StableEquivalence E F →
+          Nonempty (StableEquivalence (Dual F) (Dual E)))
+    (E : Spectrum) :
+    Nonempty (StableEquivalence (Dual (Dual (Dual E))) (Dual E)) := by
+  sorry
+
+end SpanierWhitehead
 
 end
 

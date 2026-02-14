@@ -995,6 +995,44 @@ theorem tier_pairwise_orthogonal_symm :
   intro t₁ t₂ hne
   exact tier_pairwise_orthogonal t₂ t₁ (fun h => hne h.symm)
 
+theorem tier_pairwise_disjoint :
+    ∀ t₁ t₂ : RewriteTier, t₁ ≠ t₂ →
+      ∀ g : RuleGroup, g ∈ tierGroups t₁ → g ∈ tierGroups t₂ → False := by
+  intro t₁ t₂ hne g hg₁ hg₂
+  exact (tier_pairwise_orthogonal t₁ t₂ hne g hg₁) hg₂
+
+theorem tier_pairwise_disjoint_symm :
+    ∀ t₁ t₂ : RewriteTier, t₁ ≠ t₂ →
+      ∀ g : RuleGroup, g ∈ tierGroups t₂ → g ∈ tierGroups t₁ → False := by
+  intro t₁ t₂ hne
+  exact tier_pairwise_disjoint t₂ t₁ (fun h => hne h.symm)
+
+theorem tier_group_membership_conflict :
+    ∀ {t₁ t₂ : RewriteTier} {g : RuleGroup},
+      t₁ ≠ t₂ → g ∈ tierGroups t₁ → g ∉ tierGroups t₂ := by
+  intro t₁ t₂ g hne hg
+  exact tier_pairwise_orthogonal t₁ t₂ hne g hg
+
+theorem tier_group_unique_owner :
+    ∀ {t₁ t₂ : RewriteTier} {g : RuleGroup},
+      g ∈ tierGroups t₁ → g ∈ tierGroups t₂ → t₁ = t₂ := by
+  intro t₁ t₂ g hg₁ hg₂
+  by_cases hEq : t₁ = t₂
+  · exact hEq
+  · exfalso
+    exact (tier_pairwise_orthogonal t₁ t₂ hEq g hg₁) hg₂
+
+theorem tier_distinct_layers_orthogonal :
+    ∀ {t₁ t₂ : RewriteTier}, t₁ ≠ t₂ → TierOrthogonal t₁ t₂ := by
+  intro t₁ t₂ hne
+  exact tier_pairwise_orthogonal t₁ t₂ hne
+
+theorem tier_distinct_layers_disjoint :
+    ∀ {t₁ t₂ : RewriteTier} {g : RuleGroup},
+      t₁ ≠ t₂ → g ∈ tierGroups t₁ → g ∈ tierGroups t₂ → False := by
+  intro t₁ t₂ g hne hg₁ hg₂
+  exact tier_pairwise_disjoint t₁ t₂ hne g hg₁ hg₂
+
 def critical_pair_tt_rrr_joinable {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Confluence.Join
@@ -1049,95 +1087,192 @@ def critical_pair_trans_congr_commute_joinable {A : Type u} {a b c : A}
       (Path.trans p₁ q₂) :=
   ConfluenceProof.commute_trans_left_right (A := A) hp hq
 
+theorem critical_pair_tt_rrr_is_joinable {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Nonempty (Confluence.Join
+      (Path.trans p (Path.trans q (Path.refl c)))
+      (Path.trans p q)) := by
+  exact ⟨critical_pair_tt_rrr_joinable (A := A) p q⟩
+
+theorem critical_pair_tt_lrr_is_joinable {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    Nonempty (Confluence.Join
+      (Path.trans (Path.refl a) (Path.trans q r))
+      (Path.trans q r)) := by
+  exact ⟨critical_pair_tt_lrr_joinable (A := A) q r⟩
+
+theorem critical_pair_tt_tt_is_joinable {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    Nonempty (Confluence.Join
+      (Path.trans (Path.trans p (Path.trans q r)) s)
+      (Path.trans (Path.trans p q) (Path.trans r s))) := by
+  exact ⟨critical_pair_tt_tt_joinable (A := A) p q r s⟩
+
+theorem critical_pair_ss_sr_is_joinable {A : Type u} (a : A) :
+    Nonempty (Confluence.Join (Path.refl a) (Path.symm (Path.refl a))) := by
+  exact ⟨critical_pair_ss_sr_joinable (A := A) a⟩
+
+theorem critical_pair_ss_stss_is_joinable {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Nonempty (Confluence.Join
+      (Path.trans p q)
+      (Path.symm (Path.trans (Path.symm q) (Path.symm p)))) := by
+  exact ⟨critical_pair_ss_stss_joinable (A := A) p q⟩
+
+theorem critical_pair_tt_ts_is_joinable {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path a c) :
+    Nonempty (Confluence.Join
+      (Path.trans p (Path.trans (Path.symm p) q))
+      (Path.trans (Path.refl a) q)) := by
+  exact ⟨critical_pair_tt_ts_joinable (A := A) p q⟩
+
+theorem critical_pair_tt_st_is_joinable {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Nonempty (Confluence.Join
+      (Path.trans (Path.symm p) (Path.trans p q))
+      (Path.trans (Path.refl b) q)) := by
+  exact ⟨critical_pair_tt_st_joinable (A := A) p q⟩
+
+theorem critical_pair_trans_congr_commute_is_joinable {A : Type u} {a b c : A}
+    {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+    (hp : Step p₁ p₂) (hq : Step q₁ q₂) :
+    Nonempty (Confluence.Join
+      (Path.trans p₂ q₁)
+      (Path.trans p₁ q₂)) := by
+  exact ⟨critical_pair_trans_congr_commute_joinable (A := A) hp hq⟩
+
 /-- Joinability certificate for all core critical-pair families. -/
 def criticalPairJoinabilityCertificate : Prop :=
   (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
-      Confluence.Join (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q)) ∧
+      Nonempty (Confluence.Join (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q))) ∧
   (∀ {A : Type u} {a b c : A} (q : Path a b) (r : Path b c),
-      Confluence.Join (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r)) ∧
+      Nonempty (Confluence.Join (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r))) ∧
   (∀ {A : Type u} {a b c d e : A} (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e),
-      Confluence.Join
+      Nonempty (Confluence.Join
         (Path.trans (Path.trans p (Path.trans q r)) s)
-        (Path.trans (Path.trans p q) (Path.trans r s))) ∧
+        (Path.trans (Path.trans p q) (Path.trans r s)))) ∧
   (∀ {A : Type u} (a : A),
-      Confluence.Join (Path.refl a) (Path.symm (Path.refl a))) ∧
+      Nonempty (Confluence.Join (Path.refl a) (Path.symm (Path.refl a)))) ∧
   (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
-      Confluence.Join (Path.trans p q) (Path.symm (Path.trans (Path.symm q) (Path.symm p)))) ∧
+      Nonempty (Confluence.Join (Path.trans p q) (Path.symm (Path.trans (Path.symm q) (Path.symm p))))) ∧
   (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path a c),
-      Confluence.Join (Path.trans p (Path.trans (Path.symm p) q)) (Path.trans (Path.refl a) q)) ∧
+      Nonempty (Confluence.Join (Path.trans p (Path.trans (Path.symm p) q)) (Path.trans (Path.refl a) q))) ∧
   (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
-      Confluence.Join (Path.trans (Path.symm p) (Path.trans p q)) (Path.trans (Path.refl b) q)) ∧
+      Nonempty (Confluence.Join (Path.trans (Path.symm p) (Path.trans p q)) (Path.trans (Path.refl b) q))) ∧
   (∀ {A : Type u} {a b c : A} {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
       (_ : Step p₁ p₂) (_ : Step q₁ q₂),
-      Confluence.Join (Path.trans p₂ q₁) (Path.trans p₁ q₂))
+      Nonempty (Confluence.Join (Path.trans p₂ q₁) (Path.trans p₁ q₂)))
 
 theorem critical_pair_joinability_certificate :
     criticalPairJoinabilityCertificate := by
   refine ⟨?_, ?_⟩
-  · intro {A} {a} {b} {c} p q
-    exact critical_pair_tt_rrr_joinable (A := A) p q
+  · intro A a b c p q
+    exact ⟨critical_pair_tt_rrr_joinable (A := A) p q⟩
   · refine ⟨?_, ?_⟩
-    · intro {A} {a} {b} {c} q r
-      exact critical_pair_tt_lrr_joinable (A := A) q r
+    · intro A a b c q r
+      exact ⟨critical_pair_tt_lrr_joinable (A := A) q r⟩
     · refine ⟨?_, ?_⟩
-      · intro {A} {a} {b} {c} {d} {e} p q r s
-        exact critical_pair_tt_tt_joinable (A := A) p q r s
+      · intro A a b c d e p q r s
+        exact ⟨critical_pair_tt_tt_joinable (A := A) p q r s⟩
       · refine ⟨?_, ?_⟩
-        · intro {A} a
-          exact critical_pair_ss_sr_joinable (A := A) a
+        · intro A a
+          exact ⟨critical_pair_ss_sr_joinable (A := A) a⟩
         · refine ⟨?_, ?_⟩
-          · intro {A} {a} {b} {c} p q
-            exact critical_pair_ss_stss_joinable (A := A) p q
+          · intro A a b c p q
+            exact ⟨critical_pair_ss_stss_joinable (A := A) p q⟩
           · refine ⟨?_, ?_⟩
-            · intro {A} {a} {b} {c} p q
-              exact critical_pair_tt_ts_joinable (A := A) p q
+            · intro A a b c p q
+              exact ⟨critical_pair_tt_ts_joinable (A := A) p q⟩
             · refine ⟨?_, ?_⟩
-              · intro {A} {a} {b} {c} p q
-                exact critical_pair_tt_st_joinable (A := A) p q
-              · intro {A} {a} {b} {c} {p₁} {p₂} {q₁} {q₂} hp hq
-                exact critical_pair_trans_congr_commute_joinable (A := A) hp hq
+              · intro A a b c p q
+                exact ⟨critical_pair_tt_st_joinable (A := A) p q⟩
+              · intro A a b c p₁ p₂ q₁ q₂ hp hq
+                exact ⟨critical_pair_trans_congr_commute_joinable (A := A) hp hq⟩
 
 theorem critical_pair_certificate_tt_rrr {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
-    Confluence.Join (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q) := by
+    Nonempty (Confluence.Join (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q)) := by
   exact critical_pair_joinability_certificate.1 p q
 
 theorem critical_pair_certificate_tt_lrr {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
-    Confluence.Join (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r) := by
+    Nonempty (Confluence.Join (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r)) := by
   exact critical_pair_joinability_certificate.2.1 q r
 
 theorem critical_pair_certificate_tt_tt {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
-    Confluence.Join
+    Nonempty (Confluence.Join
       (Path.trans (Path.trans p (Path.trans q r)) s)
-      (Path.trans (Path.trans p q) (Path.trans r s)) := by
+      (Path.trans (Path.trans p q) (Path.trans r s))) := by
   exact critical_pair_joinability_certificate.2.2.1 p q r s
 
 theorem critical_pair_certificate_ss_sr {A : Type u} (a : A) :
-    Confluence.Join (Path.refl a) (Path.symm (Path.refl a)) := by
+    Nonempty (Confluence.Join (Path.refl a) (Path.symm (Path.refl a))) := by
   exact critical_pair_joinability_certificate.2.2.2.1 a
 
 theorem critical_pair_certificate_ss_stss {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
-    Confluence.Join (Path.trans p q) (Path.symm (Path.trans (Path.symm q) (Path.symm p))) := by
+    Nonempty (Confluence.Join (Path.trans p q) (Path.symm (Path.trans (Path.symm q) (Path.symm p)))) := by
   exact critical_pair_joinability_certificate.2.2.2.2.1 p q
 
 theorem critical_pair_certificate_tt_ts {A : Type u} {a b c : A}
     (p : Path a b) (q : Path a c) :
-    Confluence.Join (Path.trans p (Path.trans (Path.symm p) q)) (Path.trans (Path.refl a) q) := by
+    Nonempty (Confluence.Join (Path.trans p (Path.trans (Path.symm p) q)) (Path.trans (Path.refl a) q)) := by
   exact critical_pair_joinability_certificate.2.2.2.2.2.1 p q
 
 theorem critical_pair_certificate_tt_st {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
-    Confluence.Join (Path.trans (Path.symm p) (Path.trans p q)) (Path.trans (Path.refl b) q) := by
+    Nonempty (Confluence.Join (Path.trans (Path.symm p) (Path.trans p q)) (Path.trans (Path.refl b) q)) := by
   exact critical_pair_joinability_certificate.2.2.2.2.2.2.1 p q
 
 theorem critical_pair_certificate_trans_congr_commute {A : Type u} {a b c : A}
     {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (hp : Step p₁ p₂) (hq : Step q₁ q₂) :
-    Confluence.Join (Path.trans p₂ q₁) (Path.trans p₁ q₂) := by
+    Nonempty (Confluence.Join (Path.trans p₂ q₁) (Path.trans p₁ q₂)) := by
   exact critical_pair_joinability_certificate.2.2.2.2.2.2.2 hp hq
+
+theorem critical_pair_groupoid_families_joinable :
+    (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
+      Nonempty (Confluence.Join (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q))) ∧
+    (∀ {A : Type u} {a b c : A} (q : Path a b) (r : Path b c),
+      Nonempty (Confluence.Join (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r))) ∧
+    (∀ {A : Type u} {a b c d e : A} (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e),
+      Nonempty (Confluence.Join
+        (Path.trans (Path.trans p (Path.trans q r)) s)
+        (Path.trans (Path.trans p q) (Path.trans r s)))) := by
+  refine ⟨?_, ?_⟩
+  · intro A a b c p q
+    exact critical_pair_certificate_tt_rrr (A := A) p q
+  · refine ⟨?_, ?_⟩
+    · intro A a b c q r
+      exact critical_pair_certificate_tt_lrr (A := A) q r
+    · intro A a b c d e p q r s
+      exact critical_pair_certificate_tt_tt (A := A) p q r s
+
+theorem critical_pair_symmetry_families_joinable :
+    (∀ {A : Type u} (a : A), Nonempty (Confluence.Join (Path.refl a) (Path.symm (Path.refl a)))) ∧
+    (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
+      Nonempty (Confluence.Join (Path.trans p q) (Path.symm (Path.trans (Path.symm q) (Path.symm p))))) := by
+  refine ⟨?_, ?_⟩
+  · intro A a
+    exact critical_pair_certificate_ss_sr (A := A) a
+  · intro A a b c p q
+    exact critical_pair_certificate_ss_stss (A := A) p q
+
+theorem critical_pair_cancellation_families_joinable :
+    (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path a c),
+      Nonempty (Confluence.Join (Path.trans p (Path.trans (Path.symm p) q)) (Path.trans (Path.refl a) q))) ∧
+    (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
+      Nonempty (Confluence.Join (Path.trans (Path.symm p) (Path.trans p q)) (Path.trans (Path.refl b) q))) := by
+  refine ⟨?_, ?_⟩
+  · intro A a b c p q
+    exact critical_pair_certificate_tt_ts (A := A) p q
+  · intro A a b c p q
+    exact critical_pair_certificate_tt_st (A := A) p q
+
+theorem critical_pair_all_families_joinable :
+    criticalPairJoinabilityCertificate := by
+  exact critical_pair_joinability_certificate
 
 theorem modular_confluence_certificate :
     tierOrthogonalityCertificate ∧ criticalPairJoinabilityCertificate := by
@@ -1164,6 +1299,28 @@ theorem modular_confluence_from_tier_analysis {A : Type u} {a b : A} {p q r : Pa
     (hpq : Rw p q) (hpr : Rw p r) :
     q.toEq = r.toEq :=
   modular_confluence_from_layers tier_orthogonality_certificate hpq hpr
+
+theorem modular_confluence_from_orthogonality_and_joinability
+    {A : Type u} {a b : A} {p q r : Path a b}
+    (_hOrth : tierOrthogonalityCertificate)
+    (_hJoin : criticalPairJoinabilityCertificate)
+    (hpq : Rw p q) (hpr : Rw p r) :
+    q.toEq = r.toEq := by
+  exact modular_confluence_toEq hpq hpr
+
+theorem modular_confluence_from_modular_certificate {A : Type u} {a b : A} {p q r : Path a b}
+    (hpq : Rw p q) (hpr : Rw p r) :
+    q.toEq = r.toEq := by
+  exact modular_confluence_from_certificate (A := A) (a := a) (b := b) (p := p) (q := q) (r := r)
+    (modular_confluence_certificate.{u}) hpq hpr
+
+theorem modular_confluence_from_modular_components {A : Type u} {a b : A} {p q r : Path a b}
+    (hpq : Rw p q) (hpr : Rw p r) :
+    q.toEq = r.toEq := by
+  exact modular_confluence_from_orthogonality_and_joinability
+    (A := A) (a := a) (b := b) (p := p) (q := q) (r := r)
+    (modular_confluence_certificate.{u}).1
+    (modular_confluence_certificate.{u}).2 hpq hpr
 
 /-!
 ## Orthogonality Matrix

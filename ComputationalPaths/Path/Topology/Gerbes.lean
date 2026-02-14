@@ -410,6 +410,56 @@ theorem dd_classification_refl
     Nonempty (Path (C.classify G) (C.classify G)) :=
   ⟨Path.refl _⟩
 
+/-! ## Additional Path Properties -/
+
+/-- Left identity for DD class addition, packaged as a path witness. -/
+theorem dd_zero_add_path
+    (dd : DixmierDouadyClass) (c : dd.classRep) :
+    Nonempty (Path (dd.add dd.zero c) c) :=
+  ⟨dd.zero_add c⟩
+
+/-- Right identity for DD class addition, packaged as a path witness. -/
+theorem dd_add_zero_path
+    (dd : DixmierDouadyClass) (c : dd.classRep) :
+    Nonempty (Path (dd.add c dd.zero) c) :=
+  ⟨dd.add_zero c⟩
+
+/-- Right inverse law in path form for DD classes. -/
+theorem dd_add_neg_path
+    (dd : DixmierDouadyClass) (c : dd.classRep) :
+    Nonempty (Path (dd.add c (dd.neg c)) dd.zero) :=
+  ⟨dd.add_neg c⟩
+
+/-- Left inverse law in path form for DD classes. -/
+theorem dd_neg_add_path
+    (dd : DixmierDouadyClass) (c : dd.classRep) :
+    Nonempty (Path (dd.add (dd.neg c) c) dd.zero) :=
+  ⟨dd.neg_add c⟩
+
+/-- Associativity witness for DD class addition in `Nonempty` form. -/
+theorem dd_add_assoc_path
+    (dd : DixmierDouadyClass) (a b c : dd.classRep) :
+    Nonempty (Path (dd.add (dd.add a b) c) (dd.add a (dd.add b c))) :=
+  ⟨dd.add_assoc a b c⟩
+
+/-- Associativity law of strict gerbe multiplication as a path witness. -/
+theorem bundle_gerbe_strict_mu_assoc_path
+    (G : BundleGerbeStrict) (p q r : G.fiberProd) :
+    Nonempty (Path (G.mu (G.mu p q) r) (G.mu p (G.mu q r))) :=
+  ⟨G.mu_assoc p q r⟩
+
+/-- Left unit law of strict gerbe multiplication as a path witness. -/
+theorem bundle_gerbe_strict_mu_unit_left_path
+    (G : BundleGerbeStrict) (p : G.fiberProd) :
+    Nonempty (Path (G.mu (G.mu_unit (G.fst p)) p) p) :=
+  ⟨G.mu_unit_left p⟩
+
+/-- Right unit law of strict gerbe multiplication as a path witness. -/
+theorem bundle_gerbe_strict_mu_unit_right_path
+    (G : BundleGerbeStrict) (p : G.fiberProd) :
+    Nonempty (Path (G.mu p (G.mu_unit (G.snd p))) p) :=
+  ⟨G.mu_unit_right p⟩
+
 end Gerbes
 end Topology
 end Path

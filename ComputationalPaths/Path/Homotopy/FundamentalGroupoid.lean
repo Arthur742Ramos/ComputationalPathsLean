@@ -60,6 +60,8 @@ This makes Π₁ a functor from Type to the category of groupoids.
 
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.Homotopy.SeifertVanKampen
+import ComputationalPaths.Path.Homotopy.CoveringClassification
 import ComputationalPaths.Path.Rewrite.Quot
 
 namespace ComputationalPaths
@@ -338,7 +340,183 @@ theorem inducedPiOneMap_idFun (a : A) (α : π₁(A, a)) :
     inducedPiOneMap id a α = α :=
   PathRwQuot.congrArg_id A a a α
 
+/-- Functoriality respects path reversal in the fundamental groupoid. -/
+theorem fundamentalGroupoidMap_inv (f : A → B) {a b : A}
+    (p : FundamentalGroupoid.Hom A a b) :
+    fundamentalGroupoidMap f (FundamentalGroupoid.inv' A p) =
+      FundamentalGroupoid.inv' B (fundamentalGroupoidMap f p) := by
+  unfold fundamentalGroupoidMap FundamentalGroupoid.inv'
+  simpa using (PathRwQuot.congrArg_symm A B f p)
+
+/-- Composition of functions composes induced maps on groupoid morphisms. -/
+theorem fundamentalGroupoidMap_compFun {C : Type u}
+    (f : A → B) (g : B → C) {a a' : A}
+    (p : FundamentalGroupoid.Hom A a a') :
+    fundamentalGroupoidMap g (fundamentalGroupoidMap f p) =
+      fundamentalGroupoidMap (g ∘ f) p := by
+  unfold fundamentalGroupoidMap
+  simpa using (PathRwQuot.congrArg_comp A B C f g p)
+
+/-- The induced map on π₁ preserves loop composition. -/
+theorem inducedPiOneMap_comp (f : A → B) (a : A)
+    (α β : π₁(A, a)) :
+    inducedPiOneMap f a (LoopQuot.comp α β) =
+      LoopQuot.comp (inducedPiOneMap f a α) (inducedPiOneMap f a β) := by
+  unfold inducedPiOneMap fundamentalGroupoidMap LoopQuot.comp
+  simpa using (PathRwQuot.congrArg_trans A B f α β)
+
+/-- The induced map on π₁ preserves loop inversion. -/
+theorem inducedPiOneMap_inv (f : A → B) (a : A)
+    (α : π₁(A, a)) :
+    inducedPiOneMap f a (LoopQuot.inv α) =
+      LoopQuot.inv (inducedPiOneMap f a α) := by
+  unfold inducedPiOneMap fundamentalGroupoidMap LoopQuot.inv FundamentalGroupoid.inv'
+  simpa using (PathRwQuot.congrArg_symm A B f α)
+
+/-- Composition of functions composes induced maps on π₁. -/
+theorem inducedPiOneMap_compFun {C : Type u}
+    (f : A → B) (g : B → C) (a : A) (α : π₁(A, a)) :
+    inducedPiOneMap g (f a) (inducedPiOneMap f a α) =
+      inducedPiOneMap (g ∘ f) a α :=
+  fundamentalGroupoidMap_compFun (A := A) (B := B) (C := C) f g α
+
+/-- Functorial maps commute with basepoint conjugation. -/
+theorem fundamentalGroupoidMap_conjugateByPath (f : A → B) {a b : A}
+    (p : FundamentalGroupoid.Hom A a b) (α : π₁(A, a)) :
+    fundamentalGroupoidMap f (conjugateByPath p α) =
+      conjugateByPath (fundamentalGroupoidMap f p) (fundamentalGroupoidMap f α) := by
+  unfold conjugateByPath fundamentalGroupoidMap
+  simp [FundamentalGroupoid.comp', FundamentalGroupoid.inv']
+
+/-- Naturality of basepoint transport with respect to induced maps. -/
+theorem inducedPiOneMap_conjugateByPath (f : A → B) {a b : A}
+    (p : FundamentalGroupoid.Hom A a b) (α : π₁(A, a)) :
+    inducedPiOneMap f b (conjugateByPath p α) =
+      conjugateByPath (fundamentalGroupoidMap f p) (inducedPiOneMap f a α) := by
+  simpa [inducedPiOneMap] using
+    fundamentalGroupoidMap_conjugateByPath (A := A) (B := B) f p α
+
 end Functoriality
+
+/-! ## Seifert-van Kampen at the Path-Level Groupoid Interface -/
+
+section VanKampenPathLevel
+
+open CompPath
+
+variable {A : Type u} {B : Type u} {C : Type u}
+variable {f : C → A} {g : C → B}
+
+/-- Path-level Seifert-van Kampen equivalence, expressed on automorphisms in Π₁. -/
+noncomputable def vanKampenPathLevelEquiv (c0 : C)
+    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c0]
+    [HasPushoutSVKEncodeQuot A B C f g c0]
+    [HasPushoutSVKDecodeEncode A B C f g c0]
+    [HasPushoutSVKEncodeDecode A B C f g c0] :
+    SimpleEquiv
+      (FundamentalGroupoid.Hom (Pushout A B C f g) (Pushout.inl (f c0)) (Pushout.inl (f c0)))
+      (AmalgamatedFreeProduct
+        (PiOne A (f c0))
+        (PiOne B (g c0))
+        (PiOne C c0)
+        (piOneFmap (A := A) (C := C) (f := f) (c₀ := c0))
+        (piOneGmap (B := B) (C := C) (g := g) (c₀ := c0))) := by
+  simpa [piOne_eq_hom] using
+    (seifertVanKampenEquiv (A := A) (B := B) (C := C) (f := f) (g := g) c0)
+
+/-- Left inverse law for the path-level Seifert-van Kampen equivalence. -/
+theorem vanKampenPathLevelEquiv_left_inv (c0 : C)
+    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c0]
+    [HasPushoutSVKEncodeQuot A B C f g c0]
+    [HasPushoutSVKDecodeEncode A B C f g c0]
+    [HasPushoutSVKEncodeDecode A B C f g c0]
+    (x : FundamentalGroupoid.Hom (Pushout A B C f g) (Pushout.inl (f c0)) (Pushout.inl (f c0))) :
+    (vanKampenPathLevelEquiv (A := A) (B := B) (C := C) (f := f) (g := g) c0).invFun
+      ((vanKampenPathLevelEquiv (A := A) (B := B) (C := C) (f := f) (g := g) c0).toFun x) = x :=
+  (vanKampenPathLevelEquiv (A := A) (B := B) (C := C) (f := f) (g := g) c0).left_inv x
+
+/-- Right inverse law for the path-level Seifert-van Kampen equivalence. -/
+theorem vanKampenPathLevelEquiv_right_inv (c0 : C)
+    [Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c0]
+    [HasPushoutSVKEncodeQuot A B C f g c0]
+    [HasPushoutSVKDecodeEncode A B C f g c0]
+    [HasPushoutSVKEncodeDecode A B C f g c0]
+    (y : AmalgamatedFreeProduct
+      (PiOne A (f c0))
+      (PiOne B (g c0))
+      (PiOne C c0)
+      (piOneFmap (A := A) (C := C) (f := f) (c₀ := c0))
+      (piOneGmap (B := B) (C := C) (g := g) (c₀ := c0))) :
+    (vanKampenPathLevelEquiv (A := A) (B := B) (C := C) (f := f) (g := g) c0).toFun
+      ((vanKampenPathLevelEquiv (A := A) (B := B) (C := C) (f := f) (g := g) c0).invFun y) = y :=
+  (vanKampenPathLevelEquiv (A := A) (B := B) (C := C) (f := f) (g := g) c0).right_inv y
+
+end VanKampenPathLevel
+
+/-! ## Covering-Space Correspondence on Fundamental Groupoid Automorphisms -/
+
+section CoveringCorrespondence
+
+open CoveringSpace
+open CoveringClassification
+
+variable {A : Type u}
+
+/-- Predicate on Π₁-automorphisms: the loop class lifts to the chosen fiber point. -/
+def coveringLoopLiftsHom {P : A → Type u} {a : A}
+    (pc : PointedCovering P a) :
+    FundamentalGroupoid.Hom A a a → Prop :=
+  Quot.lift
+    (fun l => coveringLoopLifts pc l)
+    (fun _ _ h =>
+      propext (coveringLoopLifts_respects_rweq (pc := pc) h))
+
+@[simp] theorem coveringLoopLiftsHom_mk {P : A → Type u} {a : A}
+    (pc : PointedCovering P a) (l : LoopSpace A a) :
+    coveringLoopLiftsHom pc (Quot.mk _ l) = coveringLoopLifts pc l := rfl
+
+/-- The identity automorphism always lifts for a pointed covering. -/
+theorem coveringLoopLiftsHom_id {P : A → Type u} {a : A}
+    (pc : PointedCovering P a) :
+    coveringLoopLiftsHom pc (FundamentalGroupoid.id' A a) := by
+  simpa [coveringLoopLiftsHom, FundamentalGroupoid.id'] using
+    (coveringLoopLifts_refl (pc := pc))
+
+/-- Liftability is closed under inverse in the automorphism group of Π₁. -/
+theorem coveringLoopLiftsHom_inv {P : A → Type u} {a : A}
+    (pc : PointedCovering P a) (l : FundamentalGroupoid.Hom A a a) :
+    coveringLoopLiftsHom pc l →
+      coveringLoopLiftsHom pc (FundamentalGroupoid.inv' A l) := by
+  induction l using Quot.ind with
+  | _ p =>
+      intro hl
+      simpa [coveringLoopLiftsHom, FundamentalGroupoid.inv'] using
+        (coveringLoopLifts_symm (pc := pc) (l := p) hl)
+
+/-- Liftability is closed under composition in the automorphism group of Π₁. -/
+theorem coveringLoopLiftsHom_comp {P : A → Type u} {a : A}
+    (pc : PointedCovering P a)
+    (l₁ l₂ : FundamentalGroupoid.Hom A a a) :
+    coveringLoopLiftsHom pc l₁ →
+      coveringLoopLiftsHom pc l₂ →
+      coveringLoopLiftsHom pc (FundamentalGroupoid.comp' A l₁ l₂) := by
+  induction l₁ using Quot.ind with
+  | _ p =>
+      induction l₂ using Quot.ind with
+      | _ q =>
+          intro h₁ h₂
+          simpa [coveringLoopLiftsHom, FundamentalGroupoid.comp'] using
+            (coveringLoopLifts_trans (pc := pc) (l₁ := p) (l₂ := q) h₁ h₂)
+
+/-- Compatibility with rewrite-equivalent representatives at the loop level. -/
+theorem coveringLoopLiftsHom_of_rweq {P : A → Type u} {a : A}
+    (pc : PointedCovering P a) {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) :
+    coveringLoopLiftsHom pc (Quot.mk _ l₁) ↔
+      coveringLoopLiftsHom pc (Quot.mk _ l₂) := by
+  simpa [coveringLoopLiftsHom] using
+    (coveringLoopLifts_respects_rweq (pc := pc) h)
+
+end CoveringCorrespondence
 
 /-! ## Summary
 

@@ -774,6 +774,271 @@ theorem exchange_law_coherence {f f' : Path a b} {g g' : Path b c}
   refine ⟨⟨.step (.interchange α β), ?_⟩⟩
   exact contractibility₄ _ _
 
+/-! ### Additional Functoriality Laws -/
+
+@[simp] theorem cell_tower_functor_whiskerLeft_identity
+    (f : Path a b) (p : Path b c) :
+    whiskerLeft f (Derivation₂.refl p) = Derivation₂.refl (Path.trans f p) := rfl
+
+@[simp] theorem cell_tower_functor_whiskerRight_identity
+    (p : Path a b) (g : Path b c) :
+    whiskerRight (Derivation₂.refl p) g = Derivation₂.refl (Path.trans p g) := rfl
+
+@[simp] theorem cell_tower_functor_whiskerLeft_vcomp
+    (f : Path a b) {p q r : Path b c}
+    (α : Derivation₂ p q) (β : Derivation₂ q r) :
+    whiskerLeft f (Derivation₂.vcomp α β) =
+      Derivation₂.vcomp (whiskerLeft f α) (whiskerLeft f β) := rfl
+
+@[simp] theorem cell_tower_functor_whiskerRight_vcomp
+    {p q r : Path a b} (α : Derivation₂ p q) (β : Derivation₂ q r) (g : Path b c) :
+    whiskerRight (Derivation₂.vcomp α β) g =
+      Derivation₂.vcomp (whiskerRight α g) (whiskerRight β g) := rfl
+
+theorem cell_tower_functor_hcomp_identity_contractible
+    (p : Path a b) (q : Path b c) :
+    Nonempty (Derivation₃ (hcomp (Derivation₂.refl p) (Derivation₂.refl q))
+      (Derivation₂.refl (Path.trans p q))) := by
+  refine ⟨?_⟩
+  dsimp [hcomp, whiskerLeft, whiskerRight]
+  exact Derivation₃.step (MetaStep₃.vcomp_refl_left (Derivation₂.refl (Path.trans p q)))
+
+/-! ### Additional Truncation and Contractibility Results -/
+
+@[simp] theorem trunc₃_contractibility₃ {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) :
+    trunc₃ (contractibility₃ d₁ d₂) =
+      Derivation₃.toRwEqEq (contractibility₃ d₁ d₂) := rfl
+
+@[simp] theorem trunc₄_contractibility₄ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (m₁ m₂ : Derivation₃ d₁ d₂) :
+    trunc₄ (contractibility₄ m₁ m₂) =
+      Derivation₄.toRwEqEq (contractibility₄ m₁ m₂) := rfl
+
+theorem batanin_contractible₃_loop_constructive {p : Path a b} (d : Derivation₂ p p) :
+    Nonempty (Derivation₃ d (Derivation₂.refl p)) :=
+  ⟨loop_contract d⟩
+
+theorem batanin_contractible₄_loop_constructive {p q : Path a b}
+    {d : Derivation₂ p q} (m : Derivation₃ d d) :
+    Nonempty (Derivation₄ m (Derivation₃.refl d)) :=
+  ⟨loop_contract₄ m⟩
+
+theorem batanin_contractible_high_loop_constructive {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} {m : Derivation₃ d₁ d₂}
+    (n : Nat) (c : Derivation₄ m m) :
+    Nonempty (DerivationHigh n c (Derivation₄.refl m)) :=
+  ⟨loop_contract_high n c⟩
+
+/-! ### Additional Exchange-Law Consequences -/
+
+theorem trunc₃_preserves_exchange {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty ((hcomp α β).toRwEq =
+      (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')).toRwEq) := by
+  refine ⟨?_⟩
+  exact trunc₃ (Derivation₃.step (MetaStep₃.interchange α β))
+
+theorem exchange_law_two_sided_witness {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty (Sigma (fun _ : Derivation₃ (hcomp α β)
+      (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')) =>
+        Derivation₃
+          (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')) (hcomp α β))) := by
+  refine ⟨⟨Derivation₃.step (MetaStep₃.interchange α β), ?_⟩⟩
+  exact Derivation₃.inv (Derivation₃.step (MetaStep₃.interchange α β))
+
+theorem exchange_law_roundtrip_contractible₄ {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty (Derivation₄
+      (Derivation₃.vcomp
+        (Derivation₃.step (MetaStep₃.interchange α β))
+        (Derivation₃.inv (Derivation₃.step (MetaStep₃.interchange α β))))
+      (Derivation₃.refl (hcomp α β))) := by
+  exact ⟨contractibility₄ _ _⟩
+
+/-! ### Further Deepening Results -/
+
+@[simp] theorem cell_tower_functor_whiskerLeft_inv
+    (f : Path a b) {p q : Path b c} (α : Derivation₂ p q) :
+    whiskerLeft f (Derivation₂.inv α) = Derivation₂.inv (whiskerLeft f α) := rfl
+
+@[simp] theorem cell_tower_functor_whiskerRight_inv
+    {p q : Path a b} (α : Derivation₂ p q) (g : Path b c) :
+    whiskerRight (Derivation₂.inv α) g = Derivation₂.inv (whiskerRight α g) := rfl
+
+theorem cell_tower_functor_hcomp_refl_left (f : Path a b) {g g' : Path b c}
+    (β : Derivation₂ g g') :
+    Nonempty (Derivation₃ (hcomp (Derivation₂.refl f) β) (whiskerLeft f β)) := by
+  refine ⟨?_⟩
+  simpa [hcomp, whiskerRight] using
+    (Derivation₃.step (MetaStep₃.vcomp_refl_left (whiskerLeft f β)))
+
+theorem cell_tower_functor_hcomp_refl_right {f f' : Path a b}
+    (α : Derivation₂ f f') (g : Path b c) :
+    Nonempty (Derivation₃ (hcomp α (Derivation₂.refl g)) (whiskerRight α g)) := by
+  refine ⟨?_⟩
+  simpa [hcomp, whiskerLeft] using
+    (Derivation₃.step (MetaStep₃.vcomp_refl_right (whiskerRight α g)))
+
+theorem trunc₃_contractibility_inv_preserved {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) :
+    trunc₃ (contractibility₃ d₁ d₂) =
+      trunc₃ (Derivation₃.inv (contractibility₃ d₂ d₁)) :=
+  trunc₃_preserves_coherence
+    (m₁ := contractibility₃ d₁ d₂)
+    (m₂ := Derivation₃.inv (contractibility₃ d₂ d₁))
+
+theorem trunc₄_contractibility_inv_preserved {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} (m₁ m₂ : Derivation₃ d₁ d₂) :
+    trunc₄ (contractibility₄ m₁ m₂) =
+      trunc₄ (Derivation₄.inv (contractibility₄ m₂ m₁)) :=
+  trunc₄_preserves_coherence
+    (c₁ := contractibility₄ m₁ m₂)
+    (c₂ := Derivation₄.inv (contractibility₄ m₂ m₁))
+
+theorem truncation_preserves_exchange_contractibility {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    trunc₃ (Derivation₃.step (MetaStep₃.interchange α β)) =
+      trunc₃ (contractibility₃ (hcomp α β)
+        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :=
+  trunc₃_preserves_coherence
+    (m₁ := Derivation₃.step (MetaStep₃.interchange α β))
+    (m₂ := contractibility₃ (hcomp α β)
+      (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')))
+
+theorem batanin_contractible₃_with_center {p q : Path a b}
+    (center : Derivation₂ p q) (d : Derivation₂ p q) :
+    Nonempty (Derivation₃ center d) :=
+  ⟨contractibility₃ center d⟩
+
+theorem batanin_contractible₄_with_center {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} (center : Derivation₃ d₁ d₂) (m : Derivation₃ d₁ d₂) :
+    Nonempty (Derivation₄ center m) :=
+  ⟨contractibility₄ center m⟩
+
+theorem batanin_contractible_high_with_center {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} {m₁ m₂ : Derivation₃ d₁ d₂}
+    (n : Nat) (center : Derivation₄ m₁ m₂) (c : Derivation₄ m₁ m₂) :
+    Nonempty (DerivationHigh n center c) :=
+  ⟨contractibilityHigh n center c⟩
+
+theorem exchange_law_contractible_to_canonical {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty (Derivation₄
+      (Derivation₃.step (MetaStep₃.interchange α β))
+      (contractibility₃ (hcomp α β)
+        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')))) :=
+  ⟨contractibility₄ _ _⟩
+
+theorem exchange_law_symm_contractible_to_canonical {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty (Derivation₄
+      (Derivation₃.inv (Derivation₃.step (MetaStep₃.interchange α β)))
+      (contractibility₃
+        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')) (hcomp α β))) :=
+  ⟨contractibility₄ _ _⟩
+
+/-! ### Cell-Tower Functoriality Deepening -/
+
+@[simp] theorem cell_tower_functor_whiskerLeft_toRwEq_refl
+    (f : Path a b) (p : Path b c) :
+    Derivation₂.toRwEq (whiskerLeft f (Derivation₂.refl p)) =
+      RwEq.refl (Path.trans f p) := rfl
+
+@[simp] theorem cell_tower_functor_whiskerRight_toRwEq_refl
+    (p : Path a b) (g : Path b c) :
+    Derivation₂.toRwEq (whiskerRight (Derivation₂.refl p) g) =
+      RwEq.refl (Path.trans p g) := rfl
+
+@[simp] theorem cell_tower_functor_hcomp_toRwEq_via_whiskers
+    {p p' : Path a b} {q q' : Path b c}
+    (α : Derivation₂ p p') (β : Derivation₂ q q') :
+    Derivation₂.toRwEq (hcomp α β) =
+      RwEq.trans
+        (Derivation₂.toRwEq (whiskerRight α q))
+        (Derivation₂.toRwEq (whiskerLeft p' β)) := rfl
+
+/-! ### Truncation-Coherence Deepening -/
+
+theorem trunc₃_inv_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (m : Derivation₃ d₁ d₂) :
+    trunc₃ (Derivation₃.inv m) = trunc₃ m :=
+  Subsingleton.elim _ _
+
+theorem trunc₄_inv_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    {m₁ m₂ : Derivation₃ d₁ d₂} (c : Derivation₄ m₁ m₂) :
+    trunc₄ (Derivation₄.inv c) = trunc₄ c :=
+  Subsingleton.elim _ _
+
+theorem trunc₃_vcomp_to_contractible {p q : Path a b}
+    {d₁ d₂ d₃ : Derivation₂ p q}
+    (m₁ : Derivation₃ d₁ d₂) (m₂ : Derivation₃ d₂ d₃) :
+    trunc₃ (Derivation₃.vcomp m₁ m₂) = trunc₃ (contractibility₃ d₁ d₃) :=
+  trunc₃_preserves_coherence
+    (m₁ := Derivation₃.vcomp m₁ m₂)
+    (m₂ := contractibility₃ d₁ d₃)
+
+theorem trunc₄_to_contractible {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (m₁ m₂ : Derivation₃ d₁ d₂) (c : Derivation₄ m₁ m₂) :
+    trunc₄ c = trunc₄ (contractibility₄ m₁ m₂) :=
+  trunc₄_preserves_coherence
+    (c₁ := c)
+    (c₂ := contractibility₄ m₁ m₂)
+
+/-! ### Constructive Batanin Contractibility Deepening -/
+
+theorem batanin_contractible₃_to_canonical_center {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) (m : Derivation₃ d₁ d₂) :
+    Nonempty (Derivation₄ m (contractibility₃ d₁ d₂)) :=
+  ⟨contractibility₄ m (contractibility₃ d₁ d₂)⟩
+
+theorem batanin_contractible₄_to_canonical_center {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} (m₁ m₂ : Derivation₃ d₁ d₂)
+    (c : Derivation₄ m₁ m₂) (n : Nat) :
+    Nonempty (DerivationHigh n c (contractibility₄ m₁ m₂)) :=
+  ⟨contractibilityHigh n c (contractibility₄ m₁ m₂)⟩
+
+theorem batanin_contractible_high_roundtrip_constructive {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} {m₁ m₂ : Derivation₃ d₁ d₂}
+    (n : Nat) (c₁ c₂ : Derivation₄ m₁ m₂) :
+    Nonempty (Sigma (fun _ : DerivationHigh n c₁ c₂ => DerivationHigh n c₂ c₁)) := by
+  refine ⟨contractibilityHigh n c₁ c₂, ?_⟩
+  exact DerivationHigh.inv (contractibilityHigh n c₁ c₂)
+
+/-! ### Exchange-Law Deepening -/
+
+theorem exchange_law_forward_backward_contractible₄ {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty (Derivation₄
+      (Derivation₃.vcomp
+        (Derivation₃.step (MetaStep₃.interchange α β))
+        (Derivation₃.inv (Derivation₃.step (MetaStep₃.interchange α β))))
+      (contractibility₃ (hcomp α β) (hcomp α β))) :=
+  ⟨contractibility₄ _ _⟩
+
+theorem exchange_law_truncation_forward_backward {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    trunc₃
+      (Derivation₃.vcomp
+        (Derivation₃.step (MetaStep₃.interchange α β))
+        (Derivation₃.inv (Derivation₃.step (MetaStep₃.interchange α β)))) =
+      trunc₃ (contractibility₃ (hcomp α β) (hcomp α β)) :=
+  trunc₃_preserves_coherence
+    (m₁ := Derivation₃.vcomp
+      (Derivation₃.step (MetaStep₃.interchange α β))
+      (Derivation₃.inv (Derivation₃.step (MetaStep₃.interchange α β))))
+    (m₂ := contractibility₃ (hcomp α β) (hcomp α β))
+
+theorem exchange_law_high_contractible_to_canonical {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') (n : Nat)
+    (c₁ c₂ : Derivation₄
+      (Derivation₃.step (MetaStep₃.interchange α β))
+      (contractibility₃ (hcomp α β)
+        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')))) :
+    Nonempty (DerivationHigh n c₁ c₂) :=
+  ⟨contractibilityHigh n c₁ c₂⟩
+
 end DerivedTheorems
 
 /-! ## Summary

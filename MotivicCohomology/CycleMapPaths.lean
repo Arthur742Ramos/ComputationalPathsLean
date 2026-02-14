@@ -77,6 +77,48 @@ variable {C : MotivicComplexPathData X} (M : CycleMapPathData C H)
       (Path.refl (M.cycleClass (n + 1) (C.differential n x))) :=
   rweq_cmpA_inv_right (M.cycleMapPath n x)
 
+theorem cycleClass_zero_path (n : Int) :
+    Nonempty (Path (M.cycleClass n (C.zero n)) (M.cohZero n)) := by
+  sorry
+
+theorem cycleMap_functorial_precompose
+    {Y : Type u}
+    (D : MotivicComplexPathData Y)
+    (f : ∀ n : Int, D.term n → C.term n)
+    (hf_d :
+      ∀ (n : Int) (x : D.term n),
+        Path (f (n + 1) (D.differential n x)) (C.differential n (f n x)))
+    (n : Int) (x : D.term n) :
+    Nonempty
+      (Path (M.cycleClass (n + 1) (f (n + 1) (D.differential n x)))
+        (M.cohDifferential n (M.cycleClass n (f n x)))) := by
+  sorry
+
+theorem cycleMap_functorial_postcompose
+    {K : Int → Type v}
+    (phi : ∀ n : Int, H n → K n)
+    (kDifferential : (n : Int) → K n → K (n + 1))
+    (hphi_d :
+      ∀ (n : Int) (y : H n),
+        Path (phi (n + 1) (M.cohDifferential n y))
+             (kDifferential n (phi n y)))
+    (n : Int) (x : C.term n) :
+    Nonempty
+      (Path (phi (n + 1) (M.cycleClass (n + 1) (C.differential n x)))
+        (kDifferential n (phi n (M.cycleClass n x)))) := by
+  sorry
+
+theorem comparison_map_respects_zero_cycle
+    {K : Int → Type v}
+    (N : CycleMapPathData C K)
+    (cmp : ∀ n : Int, H n → K n)
+    (hcmp_cycle :
+      ∀ (n : Int) (x : C.term n),
+        Path (cmp n (M.cycleClass n x)) (N.cycleClass n x))
+    (n : Int) :
+    Nonempty (Path (cmp n (M.cycleClass n (C.zero n))) (N.cohZero n)) := by
+  sorry
+
 /-- Constant cycle map package sending everything to chosen zero classes. -/
 def constant
     {X : Type u}

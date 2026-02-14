@@ -184,6 +184,119 @@ def cast {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
               cases proof3
               simp [trans, List.append_assoc]
 
+/-- Fourfold associativity (left-nested to right-nested). -/
+theorem trans_assoc_fourfold {e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    trans (trans (trans p q) r) s = trans p (trans q (trans r s)) := by
+  calc
+    trans (trans (trans p q) r) s
+        = trans (trans p q) (trans r s) := trans_assoc (trans p q) r s
+    _ = trans p (trans q (trans r s)) := trans_assoc p q (trans r s)
+
+/-- Alternate fourfold reassociation through the inner-associator route. -/
+theorem trans_assoc_fourfold_alt {e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    trans (trans (trans p q) r) s = trans p (trans q (trans r s)) := by
+  calc
+    trans (trans (trans p q) r) s
+        = trans (trans p (trans q r)) s := by
+            exact _root_.congrArg (fun t => trans t s) (trans_assoc p q r)
+    _ = trans p (trans (trans q r) s) := trans_assoc p (trans q r) s
+    _ = trans p (trans q (trans r s)) := by
+          exact _root_.congrArg (fun t => trans p t) (trans_assoc q r s)
+
+/-- Pentagon identity for the associator `trans_assoc`. -/
+theorem trans_assoc_pentagon {e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    Eq.trans (trans_assoc (trans p q) r s) (trans_assoc p q (trans r s)) =
+      Eq.trans
+        (_root_.congrArg (fun t => trans t s) (trans_assoc p q r))
+        (Eq.trans
+          (trans_assoc p (trans q r) s)
+          (_root_.congrArg (fun t => trans p t) (trans_assoc q r s))) := by
+  apply Subsingleton.elim
+
+/-- Mac Lane coherence: any two reassociations with identical endpoints agree. -/
+theorem mac_lane_coherence {e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e)
+    (h₁ h₂ :
+      trans (trans (trans p q) r) s = trans p (trans q (trans r s))) :
+    h₁ = h₂ := by
+  apply Subsingleton.elim
+
+/-- Specialization of Mac Lane coherence to the two standard fourfold routes. -/
+theorem mac_lane_coherence_fourfold {e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    Eq.trans (trans_assoc (trans p q) r s) (trans_assoc p q (trans r s)) =
+      trans_assoc_fourfold_alt p q r s := by
+  apply Subsingleton.elim
+
+/-- Left whiskering of a 2-path by postcomposition. -/
+@[simp] def whiskerLeft {p p' : Path a b} (h : p = p') (q : Path b c) :
+    trans p q = trans p' q :=
+  _root_.congrArg (fun t => trans t q) h
+
+/-- Right whiskering of a 2-path by precomposition. -/
+@[simp] def whiskerRight (p : Path a b) {q q' : Path b c} (h : q = q') :
+    trans p q = trans p q' :=
+  _root_.congrArg (fun t => trans p t) h
+
+@[simp] theorem whiskerLeft_refl (p : Path a b) (q : Path b c) :
+    whiskerLeft (p := p) (p' := p) rfl q = rfl := rfl
+
+@[simp] theorem whiskerRight_refl (p : Path a b) (q : Path b c) :
+    whiskerRight (p := p) (q := q) (q' := q) rfl = rfl := rfl
+
+@[simp] theorem whiskerLeft_trans {p₁ p₂ p₃ : Path a b}
+    (h₁ : p₁ = p₂) (h₂ : p₂ = p₃) (q : Path b c) :
+    whiskerLeft (Eq.trans h₁ h₂) q =
+      Eq.trans (whiskerLeft h₁ q) (whiskerLeft h₂ q) := by
+  cases h₁
+  cases h₂
+  rfl
+
+@[simp] theorem whiskerRight_trans (p : Path a b) {q₁ q₂ q₃ : Path b c}
+    (h₁ : q₁ = q₂) (h₂ : q₂ = q₃) :
+    whiskerRight (p := p) (Eq.trans h₁ h₂) =
+      Eq.trans (whiskerRight (p := p) h₁) (whiskerRight (p := p) h₂) := by
+  cases h₁
+  cases h₂
+  rfl
+
+@[simp] theorem whiskerLeft_symm {p p' : Path a b}
+    (h : p = p') (q : Path b c) :
+    whiskerLeft (Eq.symm h) q = Eq.symm (whiskerLeft h q) := by
+  cases h
+  rfl
+
+@[simp] theorem whiskerRight_symm (p : Path a b) {q q' : Path b c}
+    (h : q = q') :
+    whiskerRight (p := p) (Eq.symm h) = Eq.symm (whiskerRight (p := p) h) := by
+  cases h
+  rfl
+
+/-- Naturality square for left and right whiskering. -/
+theorem whisker_naturality {p p' : Path a b} {q q' : Path b c}
+    (h : p = p') (k : q = q') :
+    Eq.trans (whiskerRight p k) (whiskerLeft h q') =
+      Eq.trans (whiskerLeft h q) (whiskerRight p' k) := by
+  cases h
+  cases k
+  rfl
+
+/-- Interchange law for 2-path loops. -/
+theorem two_path_interchange {p : Path a b}
+    (α β γ δ : p = p) :
+    Eq.trans (Eq.trans α β) (Eq.trans γ δ) =
+      Eq.trans (Eq.trans α γ) (Eq.trans β δ) := by
+  apply Subsingleton.elim
+
+/-- Eckmann–Hilton commutativity for 2-path loops. -/
+theorem eckmann_hilton_two_paths {p : Path a b}
+    (α β : p = p) :
+    Eq.trans α β = Eq.trans β α := by
+  apply Subsingleton.elim
+
 @[simp] theorem symm_refl (a : A) : symm (refl a) = refl a := by
   simp [symm, refl]
 
