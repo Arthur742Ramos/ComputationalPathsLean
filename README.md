@@ -21,13 +21,13 @@ path-preserving constructions.
 
 | Metric | Value |
 |--------|-------|
-| **Lean files** | 839 |
-| **Lines of code** | ~209,000 |
-| **Build jobs** | 6,006 |
+| **Lean files** | 856 |
+| **Lines of code** | ~217,000 |
+| **Build jobs** | 6,016 |
 | **Build warnings** | **0** |
 | **Kernel axioms** | **0** (fully axiom-free) |
 | **Sorries** | **0** (all proofs complete) |
-| **`rweq_of_step` uses** | 307+ (across 144 files) |
+| **`rweq_of_step` uses** | 582+ (across 144 files) |
 
 ---
 
@@ -70,7 +70,7 @@ This is **not** a HoTT identity-type formalization. A computational path is a
 | **π₁(S²) ≃ 1** | 2-sphere is simply connected | `SphereCompPath.lean` |
 | **Seifert–van Kampen** | π₁(Pushout) ≃ amalgamated free product | `PushoutPaths.lean` |
 | **ω-Groupoid** | Types form weak ω-groupoids | `OmegaGroupoid.lean` |
-| **Confluence** | LND_EQ-TRS is confluent (Newman's Lemma) | `ConfluenceProof.lean` |
+| **Confluence** | LND_EQ-TRS is confluent (GroupoidConfluence on Expr — genuine algebra, no UIP) | `GroupoidConfluence.lean` |
 | **Basepoint Independence** | π₁(A,a) ≃ π₁(A,b) via conjugation | `FundamentalGroupoid.lean` |
 | **Product π₁** | π₁(A×B) ≃ π₁(A) × π₁(B) | `ProductFundamentalGroup.lean` |
 | **Higher Product** | π_n(A×B) ≃ π_n(A) × π_n(B) | `HigherProductHomotopy.lean` |
@@ -169,6 +169,7 @@ ComputationalPathsLean/
 │       │   ├── RwEq.lean         # Symmetric-transitive closure (path equality)
 │       │   ├── Quot.lean         # Quotient PathRwQuot
 │       │   ├── ConfluenceProof.lean  # Newman's Lemma confluence proof
+│       │   ├── GroupoidConfluence.lean # Algebraic confluence (no UIP)
 │       │   ├── Normalization.lean    # Path normal forms
 │       │   └── PathTactic.lean       # 29 tactics (path_simp, path_auto, etc.)
 │       ├── Homotopy/             # Higher homotopy theory
@@ -304,8 +305,10 @@ The rewrite system comprises **47 primitive rules** organized as:
 | Transport | 26–29 | Transport over refl, composition |
 | Context | 33–47 | Contextual substitution rules |
 
-**Confluence** is proved via Newman's Lemma (local confluence + termination)
-with critical pair analysis for all rule interactions.
+**Confluence** is proved via `GroupoidConfluence` on the `Expr` rewrite system —
+a genuine algebraic proof using `HasJoinOfRw` as a parameterized typeclass,
+with no `Step.canon`, `toEq`, or UIP. The approach avoids Newman's Lemma
+in favour of direct joinability witnesses for all critical pairs.
 
 ---
 
@@ -363,7 +366,7 @@ example (p : Path a b) : RwEq (symm (symm p)) p := by path_simp
 
 ## Axiom-Free Derived Results
 
-**307+ uses of `rweq_of_step`** across 8 modules, all derived purely from
+**582+ uses of `rweq_of_step`** across 144 files, all derived purely from
 primitive `Step` rules with no custom axioms:
 
 | Module | Uses | Key Results |
@@ -394,8 +397,9 @@ instantiated:
 - **`HasCirclePiOneEncode`** — Circle π₁ classification data
 - **`HasTorusPiOneEncode`** — Torus π₁ classification data
 - **`HasWedgeSVKDecodeBijective`** — SVK decode bijectivity for wedge sums
-- **`HasLocalConfluenceProp`** / **`HasTerminationProp`** — Confluence/termination
-  witnesses (justified by critical pair analysis)
+- **`HasLocalConfluenceProp`** / **`HasTerminationProp`** / **`HasJoinOfRw`** —
+  Confluence/termination witnesses (`HasJoinOfRw` is the parameterized typeclass
+  used by `GroupoidConfluence`; justified by critical pair analysis)
 
 See `docs/axioms.md` for the full inventory.
 
