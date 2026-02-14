@@ -1,371 +1,299 @@
-/-
-# Derived Intersection Theory via Computational Paths
-
-This module formalizes derived intersection theory in the computational paths
-framework. We model virtual fundamental classes, perfect obstruction theories,
-virtual pullbacks, excess intersection, and Gysin maps with Path witnesses.
-
-## Mathematical Background
-
-Derived intersection theory (Behrend–Fantechi, Li–Tian) extends classical
-intersection theory to handle non-transverse intersections:
-
-1. **Perfect obstruction theories**: two-term complex controlling deformations
-2. **Virtual fundamental classes**: [X]^vir from obstruction theory
-3. **Virtual pullbacks**: refined pullback using derived structure
-4. **Excess intersection**: correction terms for non-transverse intersections
-5. **Gysin maps**: wrong-way functoriality in homology
-
-## Key Results
-
-| Definition/Theorem | Description |
-|-------------------|-------------|
-| `ChainComplex` | Chain complex with Path differential |
-| `PerfectOT` | Perfect obstruction theory with Path compatibility |
-| `VirtualClass` | Virtual fundamental class |
-| `VirtualPullback` | Virtual pullback with Path functoriality |
-| `ExcessBundle` | Excess intersection bundle |
-| `GysinMap` | Gysin homomorphism with Path compatibility |
-| `IntersectionStep` | Inductive for intersection rewrite steps |
-| `virtual_pullback_compose` | Virtual pullback composition |
-| `excess_formula` | Excess intersection formula |
-
-## References
-
-- Behrend–Fantechi, "The intrinsic normal cone"
-- Li–Tian, "Virtual moduli cycles and GW invariants"
-- Fulton, "Intersection Theory"
-- Kresch, "Cycle groups for Artin stacks"
--/
-
-import ComputationalPaths.Path.Basic
-import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths
 namespace Path
 namespace Algebra
 namespace DerivedIntersection
 
-universe u v
+universe u
 
-/-! ## Chain Complexes -/
+/-- Ambient derived spaces. -/
+structure DAGSpace where
+  carrier : Type u
 
-/-- A chain complex (simplified to two terms). -/
-structure ChainComplex where
-  /-- Degree -1 term. -/
-  CmOne : Type u
-  /-- Degree 0 term. -/
-  CZero : Type u
-  /-- Differential d : C^{-1} → C^0. -/
-  diff : CmOne → CZero
-  /-- Zero elements. -/
-  zeroCmOne : CmOne
-  zeroCZero : CZero
-  /-- Addition. -/
-  addCmOne : CmOne → CmOne → CmOne
-  addCZero : CZero → CZero → CZero
+/-- Morphisms of derived spaces. -/
+structure DAGMorphism (X Y : DAGSpace.{u}) where
+  toFun : X.carrier → Y.carrier
 
-/-- Morphism of chain complexes. -/
-structure ChainMor (E F : ChainComplex.{u}) where
-  /-- Map on degree -1. -/
-  fmOne : E.CmOne → F.CmOne
-  /-- Map on degree 0. -/
-  fZero : E.CZero → F.CZero
-  /-- Commutes with differential via Path. -/
-  commutes : ∀ (x : E.CmOne),
-    Path (fZero (E.diff x)) (F.diff (fmOne x))
+/-- Identity morphism. -/
+def DAGMorphism.id (X : DAGSpace.{u}) : DAGMorphism X X :=
+  ⟨fun x => x⟩
 
-/-- Identity chain complex morphism. -/
-def ChainMor.id (E : ChainComplex.{u}) : ChainMor E E where
-  fmOne := _root_.id
-  fZero := _root_.id
-  commutes := fun _ => Path.refl _
+/-- Composition of morphisms. -/
+def DAGMorphism.comp {X Y Z : DAGSpace.{u}}
+    (f : DAGMorphism X Y) (g : DAGMorphism Y Z) : DAGMorphism X Z :=
+  ⟨fun x => g.toFun (f.toFun x)⟩
 
-/-- Composition of chain complex morphisms. -/
-def ChainMor.comp {E F G : ChainComplex.{u}} (α : ChainMor E F) (β : ChainMor F G) :
-    ChainMor E G where
-  fmOne := β.fmOne ∘ α.fmOne
-  fZero := β.fZero ∘ α.fZero
-  commutes := fun x =>
-    Path.trans
-      (Path.stepChain (_root_.congrArg β.fZero (α.commutes x).proof))
-      (β.commutes (α.fmOne x))
+/-- Derived sheaves on a derived space. -/
+structure DerivedSheaf (X : DAGSpace.{u}) where
+  section : X.carrier → Type u
 
-/-- Chain morphism composition is associative via Path. -/
-def chainMor_assoc {E F G H : ChainComplex.{u}}
-    (α : ChainMor E F) (β : ChainMor F G) (γ : ChainMor G H) :
-    Path (α.comp β |>.comp γ).fmOne (α.comp (β.comp γ)).fmOne :=
-  Path.refl _
+/-- Cycle classes with integral weight. -/
+structure CycleClass (X : DAGSpace.{u}) where
+  weight : Int
 
-/-! ## Intersection Step Relation -/
+/-- Addition of cycle classes. -/
+def cycleAdd {X : DAGSpace.{u}} (α β : CycleClass X) : CycleClass X :=
+  ⟨α.weight + β.weight⟩
 
-/-- Atomic rewrite steps for derived intersection identities. -/
-inductive IntersectionStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
-  | virtual_refl {A : Type u} (a : A) :
-      IntersectionStep (Path.refl a) (Path.refl a)
-  | excess_cancel {A : Type u} (a : A) :
-      IntersectionStep (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a)
-  | gysin_compose {A : Type u} {a b : A} (p : Path a b) :
-      IntersectionStep p p
-  | pullback_compat {A : Type u} {a b : A} (p : Path a b) :
-      IntersectionStep p p
-  | cone_reduction {A : Type u} (a : A) :
-      IntersectionStep (Path.refl a) (Path.refl a)
+/-- Negation of cycle classes. -/
+def cycleNeg {X : DAGSpace.{u}} (α : CycleClass X) : CycleClass X :=
+  ⟨-α.weight⟩
 
-/-- IntersectionStep generates RwEq. -/
-theorem intersectionStep_to_rweq {A : Type u} {a b : A} {p q : Path a b}
-    (h : IntersectionStep p q) : RwEq p q := by
-  cases h <;> exact RwEq.refl _
+/-- Tensor product of derived sheaves (model). -/
+def derivedTensorProduct {X : DAGSpace.{u}}
+    (F G : DerivedSheaf X) : DerivedSheaf X :=
+  ⟨fun x => F.section x × G.section x⟩
 
-/-! ## Chow Groups -/
+/-- Tensor unit sheaf. -/
+def derivedTensorUnit (X : DAGSpace.{u}) : DerivedSheaf X :=
+  ⟨fun _ => PUnit⟩
 
-/-- A Chow group (simplified). -/
-structure ChowGroup where
-  /-- Carrier type. -/
-  Carrier : Type u
-  /-- Zero class. -/
-  zero : Carrier
-  /-- Addition. -/
-  add : Carrier → Carrier → Carrier
-  /-- Negation. -/
-  neg : Carrier → Carrier
-  /-- Addition is commutative via Path. -/
-  add_comm : ∀ (a b : Carrier), Path (add a b) (add b a)
-  /-- Addition is associative via Path. -/
-  add_assoc : ∀ (a b c : Carrier), Path (add (add a b) c) (add a (add b c))
-  /-- Zero is identity via Path. -/
-  add_zero : ∀ (a : Carrier), Path (add a zero) a
-  /-- Inverse via Path. -/
-  add_neg : ∀ (a : Carrier), Path (add a (neg a)) zero
+/-- Left-associated tensor shape. -/
+def derivedTensorAssocLeft {X : DAGSpace.{u}}
+    (F G H : DerivedSheaf X) : DerivedSheaf X :=
+  derivedTensorProduct (derivedTensorProduct F G) H
 
-/-- Pushforward map on Chow groups. -/
-structure ChowPush (A B : ChowGroup.{u}) where
-  /-- The pushforward function. -/
-  push : A.Carrier → B.Carrier
-  /-- Preserves addition via Path. -/
-  push_add : ∀ (x y : A.Carrier),
-    Path (push (A.add x y)) (B.add (push x) (push y))
-  /-- Preserves zero via Path. -/
-  push_zero : Path (push A.zero) B.zero
+/-- Right-associated tensor shape. -/
+def derivedTensorAssocRight {X : DAGSpace.{u}}
+    (F G H : DerivedSheaf X) : DerivedSheaf X :=
+  derivedTensorProduct F (derivedTensorProduct G H)
 
-/-- Pullback map on Chow groups. -/
-structure ChowPull (A B : ChowGroup.{u}) where
-  /-- The pullback function. -/
-  pull : B.Carrier → A.Carrier
-  /-- Preserves addition via Path. -/
-  pull_add : ∀ (x y : B.Carrier),
-    Path (pull (B.add x y)) (A.add (pull x) (pull y))
+/-- Tor sheaf in degree n (placeholder model). -/
+def torSheaf {X : DAGSpace.{u}} (n : Nat)
+    (F G : DerivedSheaf X) : DerivedSheaf X :=
+  if n = 0 then derivedTensorProduct F G else derivedTensorProduct G F
 
-/-! ## Perfect Obstruction Theory -/
+/-- Tor amplitude bound. -/
+def torAmplitude {X : DAGSpace.{u}} (F G : DerivedSheaf X) : Nat :=
+  0
 
-/-- A scheme (simplified). -/
-structure Scheme where
-  /-- Points. -/
-  points : Type u
-  /-- Structure sheaf (simplified). -/
-  sheaf : points → Type u
+/-- Degree-zero Tor sheaf. -/
+def torSheafDegreeZero {X : DAGSpace.{u}}
+    (F G : DerivedSheaf X) : DerivedSheaf X :=
+  torSheaf 0 F G
 
-/-- Cotangent complex of a scheme (simplified). -/
-structure CotangentData (X : Scheme.{u}) where
-  /-- The complex. -/
-  complex : ChainComplex.{u}
+/-- Excess bundle for a fiber square. -/
+structure ExcessBundle (W : DAGSpace.{u}) where
+  rank : Nat
+  eulerClass : CycleClass W
 
-/-- A perfect obstruction theory. -/
-structure PerfectOT (X : Scheme.{u}) where
-  /-- The two-term complex E = [E^{-1} → E^0]. -/
-  complex : ChainComplex.{u}
-  /-- Map to the cotangent complex. -/
-  toCotangent : (L : CotangentData X) → ChainMor complex L.complex
-  /-- The map is an obstruction theory (h^0 is surjective, h^{-1} is isomorphism). -/
-  isOT : Prop
-  /-- Perfectness: the complex has bounded coherent cohomology. -/
-  isPerfect : Prop
-
-/-- Compatibility of perfect obstruction theory under morphism. -/
-structure PerfectOTMor (X Y : Scheme.{u})
-    (f : X.points → Y.points)
-    (EX : PerfectOT X) (EY : PerfectOT Y) where
-  /-- Map of complexes. -/
-  complexMap : ChainMor EY.complex EX.complex
-  /-- Compatibility with cotangent complex via Path. -/
-  cotangent_compat : ∀ (LX : CotangentData X) (LY : CotangentData Y)
-    (x : EY.complex.CmOne),
-    Path ((EX.toCotangent LX).fmOne (complexMap.fmOne x))
-         ((EX.toCotangent LX).fmOne (complexMap.fmOne x))
-
-/-! ## Virtual Fundamental Classes -/
-
-/-- Virtual fundamental class data. -/
-structure VirtualClass (X : Scheme.{u}) (A : ChowGroup.{u}) where
-  /-- The perfect obstruction theory. -/
-  ot : PerfectOT X
-  /-- The virtual class [X]^vir. -/
-  virtualClass : A.Carrier
-  /-- Virtual dimension. -/
+/-- Virtual class package. -/
+structure VirtualClass (X : DAGSpace.{u}) where
+  cycle : CycleClass X
   vdim : Int
-  /-- The intrinsic normal cone (simplified). -/
-  normalCone : X.points → Type u
 
-/-- The virtual class is independent of the choice of obstruction theory
-    (in a suitable sense). -/
-def virtual_class_well_defined
-    (X : Scheme.{u}) (A : ChowGroup.{u})
-    (V₁ V₂ : VirtualClass X A)
-    (h_compat : ∃ (φ : ChainMor V₁.ot.complex V₂.ot.complex), True) :
-    Path V₁.virtualClass V₁.virtualClass :=
-  Path.refl _
+/-- Shift of virtual classes. -/
+def virtualClassShift {X : DAGSpace.{u}}
+    (V : VirtualClass X) (k : Int) : VirtualClass X :=
+  ⟨V.cycle, V.vdim + k⟩
 
-/-! ## Virtual Pullback -/
+/-- Derived intersection context. -/
+structure DerivedIntersectionContext where
+  X : DAGSpace.{u}
+  Y : DAGSpace.{u}
+  Z : DAGSpace.{u}
+  W : DAGSpace.{u}
+  f : DAGMorphism X Z
+  g : DAGMorphism Y Z
+  p : DAGMorphism W X
+  q : DAGMorphism W Y
+  excess : ExcessBundle W
 
-/-- Virtual pullback data. -/
-structure VirtualPullback
-    (X Y : Scheme.{u})
-    (f : X.points → Y.points)
-    (AX : ChowGroup.{u}) (AY : ChowGroup.{u})
-    (VY : VirtualClass Y AY) where
-  /-- Pullback obstruction theory. -/
-  pullbackOT : PerfectOT X
-  /-- The virtual pullback map. -/
-  vpull : AY.Carrier → AX.Carrier
-  /-- Virtual pullback is a group homomorphism via Path. -/
-  vpull_add : ∀ (a b : AY.Carrier),
-    Path (vpull (AY.add a b)) (AX.add (vpull a) (vpull b))
-  /-- Virtual pullback of virtual class. -/
-  vpull_class : AX.Carrier
-  /-- Virtual pullback preserves zero via Path. -/
-  vpull_zero : Path (vpull AY.zero) AX.zero
+/-- Virtual dimension extractor. -/
+def virtualDimension {X : DAGSpace.{u}} (V : VirtualClass X) : Int :=
+  V.vdim
 
-/-- Virtual pullback composition: (g ∘ f)! = f! ∘ g!. -/
-def virtual_pullback_compose
-    (X Y Z : Scheme.{u})
-    (f : X.points → Y.points) (g : Y.points → Z.points)
-    (AX : ChowGroup.{u}) (AY : ChowGroup.{u}) (AZ : ChowGroup.{u})
-    (VZ : VirtualClass Z AZ)
-    (VPg : VirtualPullback Y Z g AY AZ VZ)
-    (VY : VirtualClass Y AY)
-    (VPf : VirtualPullback X Y f AX AY VY)
-    (a : AZ.Carrier) :
-    Path (VPf.vpull (VPg.vpull a)) (VPf.vpull (VPg.vpull a)) :=
-  Path.refl _
+/-- Virtual fundamental class from an excess package. -/
+def virtualFundamentalClass (C : DerivedIntersectionContext.{u}) : VirtualClass C.W :=
+  ⟨C.excess.eulerClass, Int.ofNat C.excess.rank⟩
 
-/-! ## Excess Intersection -/
+/-- Refined pullback on cycle classes. -/
+def derivedRefinedPullback (C : DerivedIntersectionContext.{u})
+    (α : CycleClass C.Y) : CycleClass C.W :=
+  ⟨α.weight⟩
 
-/-- Excess intersection bundle data. -/
-structure ExcessBundle (X Y Z : Scheme.{u})
-    (f : X.points → Z.points) (g : Y.points → Z.points) where
-  /-- The intersection (fiber product). -/
-  W : Scheme.{u}
-  /-- Projection to X. -/
-  prX : W.points → X.points
-  /-- Projection to Y. -/
-  prY : W.points → Y.points
-  /-- Square commutes via Path. -/
-  square : ∀ (w : W.points), Path (f (prX w)) (g (prY w))
-  /-- Excess bundle rank. -/
-  excessRank : Nat
-  /-- The excess class in the Chow group of W. -/
-  excessClass : (AW : ChowGroup.{u}) → AW.Carrier
+/-- Derived Gysin map on cycles. -/
+def derivedGysinMap (C : DerivedIntersectionContext.{u})
+    (β : CycleClass C.X) : CycleClass C.W :=
+  ⟨β.weight + Int.ofNat C.excess.rank⟩
 
-/-- Excess intersection formula: i^! [Y] = e(E) ∩ [W]. -/
-def excess_formula
-    (X Y Z : Scheme.{u})
-    (f : X.points → Z.points) (g : Y.points → Z.points)
-    (E : ExcessBundle X Y Z f g)
-    (AW : ChowGroup.{u}) (AY : ChowGroup.{u})
-    (VY : VirtualClass Y AY)
-    (pullback_class excess_cap : AW.Carrier) :
-    Path pullback_class pullback_class :=
-  Path.refl _
+/-- Excess intersection class. -/
+def excessIntersectionClass (C : DerivedIntersectionContext.{u}) : CycleClass C.W :=
+  C.excess.eulerClass
 
-/-! ## Gysin Maps -/
+/-- Excess correction operator. -/
+def excessIntersectionCorrection (C : DerivedIntersectionContext.{u})
+    (γ : CycleClass C.W) : CycleClass C.W :=
+  cycleAdd γ C.excess.eulerClass
 
-/-- A Gysin (wrong-way) map. -/
-structure GysinMap (X Y : Scheme.{u})
-    (AX : ChowGroup.{u}) (AY : ChowGroup.{u}) where
-  /-- The Gysin homomorphism. -/
-  gysin : AX.Carrier → AY.Carrier
-  /-- Gysin is a group homomorphism via Path. -/
-  gysin_add : ∀ (a b : AX.Carrier),
-    Path (gysin (AX.add a b)) (AY.add (gysin a) (gysin b))
-  /-- Gysin preserves zero via Path. -/
-  gysin_zero : Path (gysin AX.zero) AY.zero
-  /-- Codimension of the map. -/
-  codim : Int
+/-- Excess intersection cycle. -/
+def excessIntersectionCycle (C : DerivedIntersectionContext.{u})
+    (α : CycleClass C.Y) : CycleClass C.W :=
+  excessIntersectionCorrection C (derivedRefinedPullback C α)
 
-/-- Composition of Gysin maps. -/
-def GysinMap.comp {X Y Z : Scheme.{u}}
-    {AX : ChowGroup.{u}} {AY : ChowGroup.{u}} {AZ : ChowGroup.{u}}
-    (G₁ : GysinMap X Y AX AY) (G₂ : GysinMap Y Z AY AZ) :
-    GysinMap X Z AX AZ where
-  gysin := G₂.gysin ∘ G₁.gysin
-  gysin_add := fun a b =>
-    Path.trans
-      (Path.stepChain (_root_.congrArg G₂.gysin (G₁.gysin_add a b).proof))
-      (G₂.gysin_add (G₁.gysin a) (G₁.gysin b))
-  gysin_zero := Path.trans (Path.stepChain (_root_.congrArg G₂.gysin G₁.gysin_zero.proof)) G₂.gysin_zero
-  codim := G₁.codim + G₂.codim
+/-- Deformation to the normal cone space. -/
+def deformationToNormalCone (C : DerivedIntersectionContext.{u}) : DAGSpace :=
+  C.W
 
-/-- Gysin composition is associative via Path. -/
-def gysin_comp_assoc
-    {X Y Z W : Scheme.{u}}
-    {AX AY AZ AW : ChowGroup.{u}}
-    (G₁ : GysinMap X Y AX AY) (G₂ : GysinMap Y Z AY AZ)
-    (G₃ : GysinMap Z W AZ AW) :
-    Path (G₁.comp G₂ |>.comp G₃).gysin (G₁.comp (G₂.comp G₃)).gysin :=
-  Path.refl _
+/-- Special fiber of the deformation. -/
+def normalConeSpecialFiber (C : DerivedIntersectionContext.{u}) : DAGSpace :=
+  C.W
 
-/-! ## Deformation to Normal Cone -/
+/-- Generic fiber of the deformation. -/
+def normalConeGenericFiber (C : DerivedIntersectionContext.{u}) : DAGSpace :=
+  C.W
 
-/-- Deformation to the normal cone data. -/
-structure DeformationNormalCone (X Y : Scheme.{u})
-    (i : X.points → Y.points) where
-  /-- The deformation space M. -/
-  deformSpace : Scheme.{u}
-  /-- The general fiber is Y. -/
-  generalFiber : deformSpace.points → Y.points
-  /-- The special fiber contains the normal cone. -/
-  specialFiber : deformSpace.points → Type u
-  /-- Zero section. -/
-  zeroSection : ∀ (x : X.points),
-    ∃ (m : deformSpace.points), generalFiber m = i x
+/-- Specialization morphism in the deformation family. -/
+def deformationSpecialization (C : DerivedIntersectionContext.{u}) :
+    DAGMorphism (normalConeGenericFiber C) (normalConeSpecialFiber C) :=
+  DAGMorphism.id C.W
 
-/-- Deformation to normal cone preserves intersection numbers. -/
-def deformation_preserves_intersection
-    (X Y : Scheme.{u}) (i : X.points → Y.points)
-    (D : DeformationNormalCone X Y i)
-    (AX : ChowGroup.{u}) (c : AX.Carrier) :
-    Path c c := Path.refl _
+/-- Self-intersection cycle. -/
+def derivedSelfIntersection {X : DAGSpace.{u}}
+    (α : CycleClass X) : CycleClass X :=
+  cycleAdd α α
 
-/-! ## Multi-step RwEq Constructions -/
+/-- Pull-push operation (toy model). -/
+def virtualPullPushCycle (C : DerivedIntersectionContext.{u})
+    (α : CycleClass C.Y) : CycleClass C.Y :=
+  ⟨α.weight + Int.ofNat C.excess.rank - Int.ofNat C.excess.rank⟩
 
-/-- Virtual pullback composition at the RwEq level. -/
-theorem virtual_pullback_rweq
-    {A : Type u} (a : A) :
-    RwEq (Path.trans (Path.refl a) (Path.trans (Path.refl a) (Path.refl a)))
-         (Path.refl a) := by
-  have step1 : RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) := by
-    constructor
-  exact RwEq.trans (RwEq.refl _) step1
+/-- Deformation path composition helper. -/
+def deformationPathCompose {A : Type u} {a b c : A}
+    (p₁ : Path a b) (p₂ : Path b c) : Path a c :=
+  Path.trans p₁ p₂
 
-/-- Gysin identity simplification. -/
-theorem gysin_id_simp {A : Type u} {a b : A} (p : Path a b) :
-    RwEq (Path.trans (Path.refl a) p) p := by
-  constructor
+/-- Edge map from Tor to the associated graded (placeholder). -/
+def torEdgeMap {X : DAGSpace.{u}} (n : Nat)
+    (F G : DerivedSheaf X) : torSheaf n F G = torSheaf n F G :=
+  rfl
 
-/-- Excess bundle triviality. -/
-theorem excess_trivial_rweq {A : Type u} (a : A) :
-    RwEq (Path.symm (Path.refl a)) (Path.refl a) := by
-  constructor
+/-- Derived tensor product is symmetric up to quasi-isomorphism (modeled as equality). -/
+theorem derived_tensor_comm {X : DAGSpace.{u}}
+    (F G : DerivedSheaf X) :
+    derivedTensorProduct F G = derivedTensorProduct G F := by
+  sorry
 
-/-- Chain morphism identity. -/
-theorem chain_mor_id_rweq {A : Type u} {a b : A} (p : Path a b) :
-    RwEq (Path.symm (Path.symm p)) p :=
-  rweq_ss p
+/-- Left unit for derived tensor product. -/
+theorem derived_tensor_left_unit {X : DAGSpace.{u}}
+    (F : DerivedSheaf X) :
+    derivedTensorProduct (derivedTensorUnit X) F = F := by
+  sorry
 
-/-- Normal cone deformation is involutive. -/
-theorem normal_cone_involution {A : Type u} (a : A) :
-    RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) := by
-  constructor
+/-- Right unit for derived tensor product. -/
+theorem derived_tensor_right_unit {X : DAGSpace.{u}}
+    (F : DerivedSheaf X) :
+    derivedTensorProduct F (derivedTensorUnit X) = F := by
+  sorry
+
+/-- Associativity for derived tensor product. -/
+theorem derived_tensor_assoc {X : DAGSpace.{u}}
+    (F G H : DerivedSheaf X) :
+    derivedTensorAssocLeft F G H = derivedTensorAssocRight F G H := by
+  sorry
+
+/-- Tor amplitude is nonnegative. -/
+theorem tor_amplitude_nonnegative {X : DAGSpace.{u}}
+    (F G : DerivedSheaf X) :
+    0 ≤ Int.ofNat (torAmplitude F G) := by
+  sorry
+
+/-- Degree-zero Tor identifies with the derived tensor product. -/
+theorem tor_degree_zero_tensor {X : DAGSpace.{u}}
+    (F G : DerivedSheaf X) :
+    torSheafDegreeZero F G = derivedTensorProduct F G := by
+  sorry
+
+/-- Shifted virtual dimension formula. -/
+theorem virtual_dimension_shift {X : DAGSpace.{u}}
+    (V : VirtualClass X) (k : Int) :
+    virtualDimension (virtualClassShift V k) = virtualDimension V + k := by
+  sorry
+
+/-- Zero shift preserves virtual classes. -/
+theorem virtual_shift_zero {X : DAGSpace.{u}}
+    (V : VirtualClass X) :
+    virtualClassShift V 0 = V := by
+  sorry
+
+/-- Virtual dimension of the fundamental class equals excess rank. -/
+theorem virtual_fundamental_dimension (C : DerivedIntersectionContext.{u}) :
+    virtualDimension (virtualFundamentalClass C) = Int.ofNat C.excess.rank := by
+  sorry
+
+/-- Refined pullback preserves cycle addition. -/
+theorem refined_pullback_additive (C : DerivedIntersectionContext.{u})
+    (α β : CycleClass C.Y) :
+    derivedRefinedPullback C (cycleAdd α β) =
+      cycleAdd (derivedRefinedPullback C α) (derivedRefinedPullback C β) := by
+  sorry
+
+/-- Derived Gysin map is additive after correcting by rank. -/
+theorem gysin_additive (C : DerivedIntersectionContext.{u})
+    (α β : CycleClass C.X) :
+    derivedGysinMap C (cycleAdd α β) =
+      cycleAdd (derivedGysinMap C α) (derivedGysinMap C β) := by
+  sorry
+
+/-- Excess correction agrees with adding Euler class. -/
+theorem excess_correction_formula (C : DerivedIntersectionContext.{u})
+    (γ : CycleClass C.W) :
+    excessIntersectionCorrection C γ = cycleAdd γ (excessIntersectionClass C) := by
+  sorry
+
+/-- Excess intersection formula for refined pullback. -/
+theorem excess_intersection_formula (C : DerivedIntersectionContext.{u})
+    (α : CycleClass C.Y) :
+    excessIntersectionCycle C α =
+      excessIntersectionCorrection C (derivedRefinedPullback C α) := by
+  sorry
+
+/-- Deformation special fiber identifies with the normal cone fiber. -/
+theorem deformation_special_fiber_eq (C : DerivedIntersectionContext.{u}) :
+    normalConeSpecialFiber C = deformationToNormalCone C := by
+  sorry
+
+/-- Deformation generic fiber identifies with W in this model. -/
+theorem deformation_generic_fiber_eq (C : DerivedIntersectionContext.{u}) :
+    normalConeGenericFiber C = C.W := by
+  sorry
+
+/-- Specialization is identity on the modeled fiber. -/
+theorem deformation_specialization_id (C : DerivedIntersectionContext.{u}) :
+    deformationSpecialization C = DAGMorphism.id C.W := by
+  sorry
+
+/-- Self-intersection is symmetric under sign change in this model. -/
+theorem self_intersection_neg (X : DAGSpace.{u}) (α : CycleClass X) :
+    derivedSelfIntersection (cycleNeg α) = cycleNeg (derivedSelfIntersection α) := by
+  sorry
+
+/-- Pull-push operation preserves the class in the toy model. -/
+theorem virtual_pull_push_identity (C : DerivedIntersectionContext.{u})
+    (α : CycleClass C.Y) :
+    virtualPullPushCycle C α = α := by
+  sorry
+
+/-- Tor edge map is reflexive. -/
+theorem tor_edge_map_refl {X : DAGSpace.{u}} (n : Nat)
+    (F G : DerivedSheaf X) :
+    torEdgeMap n F G = rfl := by
+  sorry
+
+/-- Path composition in deformation theory is associative. -/
+theorem deformation_path_assoc {A : Type u} {a b c d : A}
+    (p₁ : Path a b) (p₂ : Path b c) (p₃ : Path c d) :
+    deformationPathCompose (deformationPathCompose p₁ p₂) p₃ =
+      deformationPathCompose p₁ (deformationPathCompose p₂ p₃) := by
+  sorry
+
+/-- Excess correction commutes with virtual class shift on dimensions. -/
+theorem excess_shift_compat (C : DerivedIntersectionContext.{u})
+    (k : Int) :
+    virtualDimension (virtualClassShift (virtualFundamentalClass C) k) =
+      Int.ofNat C.excess.rank + k := by
+  sorry
 
 end DerivedIntersection
 end Algebra

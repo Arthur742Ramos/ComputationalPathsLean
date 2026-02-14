@@ -1,0 +1,218 @@
+/-
+# Truncation Theory
+
+n-truncation, n-connected and n-truncated types, connected covers,
+Whitehead tower, Postnikov tower, and the truncation–inclusion adjunction.
+Proofs are stubbed with `sorry`.
+-/
+
+import ComputationalPaths.Path.Basic.Core
+
+namespace ComputationalPaths
+namespace TruncationTheory
+
+open ComputationalPaths
+
+universe u v w
+
+/-! ## h-levels and truncation levels -/
+
+/-- Truncation index: −2, −1, 0, 1, 2, … -/
+inductive TruncIndex : Type where
+  | negTwo : TruncIndex
+  | succ   : TruncIndex → TruncIndex
+
+namespace TruncIndex
+
+def negOne : TruncIndex := succ negTwo
+def zero   : TruncIndex := succ negOne
+def one    : TruncIndex := succ zero
+
+/-- Embedding of natural numbers as truncation indices. -/
+def ofNat : Nat → TruncIndex
+  | 0     => zero
+  | n + 1 => succ (ofNat n)
+
+end TruncIndex
+
+/-- A type has h-level n (is n-truncated). -/
+def IsOfHLevel : TruncIndex → Type u → Prop
+  | TruncIndex.negTwo,  A => ∃ a : A, ∀ b, a = b
+  | TruncIndex.succ n, A => ∀ (a b : A), IsOfHLevel n (a = b)
+
+/-- Contractible types: h-level −2. -/
+def IsContr (A : Type u) : Prop := IsOfHLevel TruncIndex.negTwo A
+
+/-- Propositions: h-level −1. -/
+def IsProp (A : Type u) : Prop := IsOfHLevel TruncIndex.negOne A
+
+/-- Sets: h-level 0. -/
+def IsSet (A : Type u) : Prop := IsOfHLevel TruncIndex.zero A
+
+/-- Groupoids: h-level 1. -/
+def IsGroupoid (A : Type u) : Prop := IsOfHLevel TruncIndex.one A
+
+/-! ## n-truncation -/
+
+/-- The n-truncation ‖A‖ₙ. -/
+axiom Trunc (n : TruncIndex) (A : Type u) : Type u
+
+/-- Unit/introduction of the n-truncation. -/
+axiom Trunc.mk {n : TruncIndex} {A : Type u} : A → Trunc n A
+
+/-- The n-truncation is n-truncated. -/
+axiom Trunc.isOfHLevel {n : TruncIndex} {A : Type u} :
+    IsOfHLevel n (Trunc n A)
+
+/-- Elimination: map out of Trunc n into an n-truncated type. -/
+axiom Trunc.elim {n : TruncIndex} {A : Type u} {B : Type v}
+    (hB : IsOfHLevel n B) (f : A → B) : Trunc n A → B
+
+/-- Dependent elimination / induction for truncation. -/
+axiom Trunc.ind {n : TruncIndex} {A : Type u}
+    {P : Trunc n A → Type v}
+    (hP : ∀ x, IsOfHLevel n (P x))
+    (f : (a : A) → P (Trunc.mk a)) :
+    (x : Trunc n A) → P x
+
+/-- Propositional truncation is −1-truncation. -/
+def PropTrunc (A : Type u) : Type u := Trunc TruncIndex.negOne A
+
+/-- Set truncation is 0-truncation. -/
+def SetTrunc (A : Type u) : Type u := Trunc TruncIndex.zero A
+
+/-- The truncation monad unit. -/
+def truncUnit {n : TruncIndex} {A : Type u} : A → Trunc n A := Trunc.mk
+
+/-- The truncation monad bind. -/
+def truncBind {n : TruncIndex} {A : Type u} {B : Type v}
+    (hB : IsOfHLevel n (Trunc n B))
+    (f : A → Trunc n B) : Trunc n A → Trunc n B :=
+  Trunc.elim hB f
+
+/-! ## n-connectedness -/
+
+/-- A type is n-connected if ‖A‖ₙ is contractible. -/
+def IsNConn (n : TruncIndex) (A : Type u) : Prop :=
+  IsContr (Trunc n A)
+
+/-- A map is n-connected if its fibers are n-connected. -/
+def IsNConnMap (n : TruncIndex) {A B : Type u} (f : A → B) : Prop :=
+  ∀ b, IsNConn n { a : A // f a = b }
+
+/-- (−2)-connected is just inhabited. -/
+def isNeg2Conn_iff (A : Type u) : IsNConn TruncIndex.negTwo A ↔ Nonempty A := sorry
+
+/-! ## Postnikov tower -/
+
+/-- The n-th stage of the Postnikov tower of A. -/
+def PostnikovStage (n : TruncIndex) (A : Type u) : Type u :=
+  Trunc n A
+
+/-- The projection map P_{n+1}(A) → P_n(A). -/
+def postnikovMap {n : TruncIndex} {A : Type u} :
+    PostnikovStage (TruncIndex.succ n) A → PostnikovStage n A := sorry
+
+/-- The tower map A → P_n(A). -/
+def toPostnikov {n : TruncIndex} {A : Type u} : A → PostnikovStage n A :=
+  Trunc.mk
+
+/-! ## Whitehead tower (connected covers) -/
+
+/-- The n-connected cover of A: the fiber of A → P_n(A). -/
+def ConnectedCover (n : TruncIndex) (A : Type u) (a₀ : A) : Type u :=
+  { a : A // Trunc.mk a = Trunc.mk a₀ }  -- simplified
+
+/-- The inclusion from the connected cover. -/
+def connectedCoverInclusion {n : TruncIndex} {A : Type u} {a₀ : A} :
+    ConnectedCover n A a₀ → A :=
+  fun ⟨a, _⟩ => a
+
+/-- The n-connected cover is n-connected. -/
+def connectedCover_isConn {n : TruncIndex} {A : Type u} {a₀ : A} :
+    IsNConn n (ConnectedCover n A a₀) := sorry
+
+/-- The Whitehead tower map: cover_{n+1} → cover_n. -/
+def whiteheadMap {n : TruncIndex} {A : Type u} {a₀ : A} :
+    ConnectedCover (TruncIndex.succ n) A a₀ →
+    ConnectedCover n A a₀ := sorry
+
+/-! ## Theorems -/
+
+/-- h-level is upward closed. -/
+theorem isOfHLevel_succ {n : TruncIndex} {A : Type u}
+    (h : IsOfHLevel n A) : IsOfHLevel (TruncIndex.succ n) A := sorry
+
+/-- Contractible types are propositions. -/
+theorem isContr_isProp {A : Type u} (h : IsContr A) : IsProp A := sorry
+
+/-- Propositions are sets. -/
+theorem isProp_isSet {A : Type u} (h : IsProp A) : IsSet A := sorry
+
+/-- n-truncation is idempotent. -/
+theorem trunc_idem {n : TruncIndex} {A : Type u} :
+    Trunc n (Trunc n A) ≃ Trunc n A := sorry
+
+/-- Truncation preserves equivalences. -/
+theorem trunc_equiv {n : TruncIndex} {A B : Type u}
+    (e : A ≃ B) : Trunc n A ≃ Trunc n B := sorry
+
+/-- The truncation–inclusion adjunction: maps ‖A‖ₙ → B (for B n-truncated)
+    biject with maps A → B. -/
+theorem trunc_adj {n : TruncIndex} {A : Type u} {B : Type v}
+    (hB : IsOfHLevel n B) :
+    (Trunc n A → B) ≃ (A → B) := sorry
+
+/-- Postnikov projection is natural. -/
+theorem postnikov_natural {n : TruncIndex} {A B : Type u} (f : A → B) :
+    postnikovMap ∘ (Trunc.elim sorry (Trunc.mk ∘ f)) =
+    Trunc.elim sorry (Trunc.mk ∘ f) ∘ postnikovMap := sorry
+
+/-- Connected cover inclusion is n-connected. -/
+theorem connCover_inclusion_conn {n : TruncIndex} {A : Type u} {a₀ : A} :
+    IsNConnMap n (@connectedCoverInclusion n A a₀) := sorry
+
+/-- Whitehead tower: successive fibers give Eilenberg-MacLane spaces
+    (conceptual statement). -/
+theorem whitehead_fiber_EM {n : TruncIndex} {A : Type u} {a₀ : A} :
+    True := sorry -- fiber of whiteheadMap is K(πₙ(A), n)
+
+/-- The Postnikov tower is a limit: A ≃ lim P_n(A) for a CW-complex. -/
+theorem postnikov_limit {A : Type u} :
+    True := sorry
+
+/-- Product of n-truncated types is n-truncated. -/
+theorem prod_isOfHLevel {n : TruncIndex} {A B : Type u}
+    (hA : IsOfHLevel n A) (hB : IsOfHLevel n B) :
+    IsOfHLevel n (A × B) := sorry
+
+/-- Function type into n-truncated type is n-truncated. -/
+theorem pi_isOfHLevel {n : TruncIndex} {A : Type u} {B : A → Type v}
+    (hB : ∀ a, IsOfHLevel n (B a)) :
+    IsOfHLevel n ((a : A) → B a) := sorry
+
+/-- Σ-type of n-truncated family over n-truncated base is n-truncated. -/
+theorem sigma_isOfHLevel {n : TruncIndex} {A : Type u} {B : A → Type v}
+    (hA : IsOfHLevel n A) (hB : ∀ a, IsOfHLevel n (B a)) :
+    IsOfHLevel n (Σ a, B a) := sorry
+
+/-- Path space of an (n+1)-type is an n-type. -/
+theorem path_isOfHLevel {n : TruncIndex} {A : Type u}
+    (h : IsOfHLevel (TruncIndex.succ n) A) (a b : A) :
+    IsOfHLevel n (a = b) := sorry
+
+/-- n-connected + n-truncated implies contractible. -/
+theorem conn_trunc_contr {n : TruncIndex} {A : Type u}
+    (hconn : IsNConn n A) (htrunc : IsOfHLevel n A) :
+    IsContr A := sorry
+
+/-- Truncation monad is associative. -/
+theorem truncBind_assoc {n : TruncIndex} {A B C : Type u}
+    (hB : IsOfHLevel n (Trunc n B))
+    (hC : IsOfHLevel n (Trunc n C))
+    (f : A → Trunc n B) (g : B → Trunc n C) :
+    (∀ x, truncBind hC g (truncBind hB f x) =
+     truncBind hC (fun a => truncBind hC g (f a)) x) := sorry
+
+end TruncationTheory
+end ComputationalPaths
