@@ -837,7 +837,13 @@ inductive Step :
       Every path reduces to its canonical propositional-equality witness.
       This rule is sound because `toEq` extracts the underlying `Eq` proof,
       which is proof-irrelevant (UIP).  Adding it closes the rewrite system:
-      every path has a normal form, and confluence follows immediately. -/
+      every path has a normal form, and confluence follows immediately.
+
+      **Note**: This rule encodes UIP and is used for the `Path`-level
+      confluence proof (`ConfluenceProof.instHasConfluenceProp`).
+      The genuine algebraic confluence result — without this rule — is
+      proved in `GroupoidConfluence.lean` on abstract `Expr` syntax via
+      free group interpretation.  See `GroupoidConfluence.confluence`. -/
   | canon {A : Type u} {a b : A} (p : Path a b) :
       Step (A := A) p (Path.stepChain p.toEq)
 

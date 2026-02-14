@@ -5,6 +5,10 @@ This module packages the Prop-level local confluence interface used by the
 rewrite system and supplies supporting lemmas. The concrete instance is
 provided in `ConfluenceProof.lean` via `Step.canon` and full confluence.
 
+For the genuine algebraic confluence result (without `Step.canon` or UIP),
+see `GroupoidConfluence.lean`, which proves confluence of the completed
+groupoid TRS on abstract `Expr` syntax via free group interpretation.
+
 ## Strategy
 
 1. **Prop-level local confluence**: Provide `HasLocalConfluenceProp` and
@@ -94,7 +98,10 @@ a common descendant reachable by multi-step rewrites from both results.
 
 **Instance**: `ConfluenceProof.instLocalOfConfluence` provides a concrete
 instance, derived from the proved full confluence (`instHasConfluenceProp`)
-which uses `Step.canon` to join via the canonical normal form. -/
+which uses `Step.canon` to join via the canonical normal form.
+
+**Algebraic alternative**: For the UIP-free local confluence result on
+abstract `Expr` syntax, see `GroupoidConfluence.local_confluence`. -/
 class HasLocalConfluenceProp.{v} : Prop where
   local_confluence : ∀ {A : Type v} {a b : A} {p q r : Path a b}
     (_hq : Step p q) (_hr : Step p r), ∃ s, Rw q s ∧ Rw r s
