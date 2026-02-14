@@ -124,6 +124,22 @@ end ThreeCell
     comp (comp η₁ η₂) η₃ = comp η₁ (comp η₂ η₃) :=
   vcomp_assoc_eq (A := A) (a := a) (b := b) η₁ η₂ η₃
 
+/-- Step-based vertical functoriality with left-associated composition. -/
+@[simp] theorem vcomp_functorial_step_left {p q r s : Path a b}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) p q)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) q r)
+    (η₃ : TwoCell (A := A) (a := a) (b := b) r s) :
+    TwoCell (A := A) (a := a) (b := b) p s := by
+  exact rweq_trans (rweq_trans η₁ η₂) η₃
+
+/-- Step-based vertical functoriality with right-associated composition. -/
+@[simp] theorem vcomp_functorial_step_right {p q r s : Path a b}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) p q)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) q r)
+    (η₃ : TwoCell (A := A) (a := a) (b := b) r s) :
+    TwoCell (A := A) (a := a) (b := b) p s := by
+  exact rweq_trans η₁ (rweq_trans η₂ η₃)
+
 /-- Vertical composition is functorial in the first variable. -/
 @[simp] theorem vcomp_functorial_left_eq {p q r : Path a b}
     {η₁ η₂ : TwoCell (A := A) (a := a) (b := b) p q}
@@ -202,6 +218,42 @@ composition on both sides. -/
   apply rweq_trans
   · exact rweq_trans_congr_left (q := g₀) (rweq_trans η₁ η₂)
   · exact rweq_trans_congr_right f₂ (rweq_trans θ₁ θ₂)
+
+/-- Step-based horizontal functoriality witness. -/
+@[simp] theorem hcomp_functorial_step
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f₀ g₀) (Path.trans f₂ g₂) :=
+  hcomp_vcomp_naturality (A := A) (a := a) (b := b) (c := c) η₁ η₂ θ₁ θ₂
+
+/-- Step-based horizontal functoriality in the left variable. -/
+@[simp] theorem hcomp_functorial_left_step
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ : TwoCell (A := A) (a := b) (b := c) g₀ g₁) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f₀ g₀) (Path.trans f₂ g₁) := by
+  simpa using
+    (hcomp_vcomp_naturality (A := A) (a := a) (b := b) (c := c)
+      (f₀ := f₀) (f₁ := f₁) (f₂ := f₂)
+      (g₀ := g₀) (g₁ := g₁) (g₂ := g₁)
+      η₁ η₂ θ (id (A := A) (a := b) (b := c) g₁))
+
+/-- Step-based horizontal functoriality in the right variable. -/
+@[simp] theorem hcomp_functorial_right_step
+    {f₀ f₁ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f₀ g₀) (Path.trans f₁ g₂) := by
+  simpa using
+    (hcomp_vcomp_naturality (A := A) (a := a) (b := b) (c := c)
+      (f₀ := f₀) (f₁ := f₁) (f₂ := f₁)
+      (g₀ := g₀) (g₁ := g₁) (g₂ := g₂)
+      η (id (A := A) (a := a) (b := b) f₁) θ₁ θ₂)
 
 /-- Horizontal composition preserves identity 2-cells in both arguments. -/
 @[simp] theorem hcomp_id_eq (f : Path a b) (g : Path b c) :
@@ -337,9 +389,30 @@ then vertically, useful for establishing the interchange equality. -/
     (comp (A := A) (a := a) (b := b) η₁ η₂)
     (comp (A := A) (a := b) (b := c) θ₁ θ₂)
 
-/-- Pentagon coherence: any four composable computational paths associate to
-the same composite up to a rewrite-equality 2-cell. -/
-@[simp] theorem pentagon
+/-- Interchange composite as a canonical step-based 2-cell. -/
+@[simp] theorem interchange_step_two_cell
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f₀ g₀) (Path.trans f₂ g₂) :=
+  interchange (A := A) (a := a) (b := b) (c := c)
+    (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)
+
+/-- Alternative interchange composite as a canonical step-based 2-cell. -/
+@[simp] theorem interchange'_step_two_cell
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f₀ g₀) (Path.trans f₂ g₂) :=
+  interchange' (A := A) (a := a) (b := b) (c := c)
+    (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)
+
+/-- Step-based pentagon coherence chain. -/
+@[simp] theorem pentagon_step
     {a b c d e : A}
     (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) :
@@ -349,6 +422,17 @@ the same composite up to a rewrite-equality 2-cell. -/
   apply rweq_trans (rweq_trans_congr_left (q := s) (rweq_tt p q r))
   apply rweq_trans (rweq_tt p (Path.trans q r) s)
   exact rweq_trans_congr_right p (rweq_tt q r s)
+
+/-- Pentagon coherence: any four composable computational paths associate to
+the same composite up to a rewrite-equality 2-cell. -/
+@[simp] theorem pentagon
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c)
+    (r : Path c d) (s : Path d e) :
+    TwoCell (A := A) (a := a) (b := e)
+      (Path.trans (Path.trans (Path.trans p q) r) s)
+      (Path.trans p (Path.trans q (Path.trans r s))) := by
+  exact pentagon_step (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s
 
 /-- Triangle coherence: inserting a reflexive path behaves as the identity
 up to a rewrite-equality 2-cell. -/

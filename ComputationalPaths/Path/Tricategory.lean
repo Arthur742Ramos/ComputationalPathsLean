@@ -193,6 +193,72 @@ def pathTricategory (A : Type u) : Tricategory (Obj := A) where
       T.vcomp (T.hcomp η₁ θ₁) (T.hcomp η₂ θ₂) :=
   GrayCategory.gray_tensor_functorial T.toGrayCategory η₁ η₂ θ₁ θ₂
 
+/-- Tricategories inherit Gray interchange with identity on the left. -/
+@[simp] theorem tricategory_gray_interchange_id_left
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} {f : T.Hom a b} {g₀ g₁ g₂ : T.Hom b c}
+    (θ₁ : T.TwoCell g₀ g₁) (θ₂ : T.TwoCell g₁ g₂) :
+    T.vcomp (T.hcomp (T.id₂ f) θ₁) (T.hcomp (T.id₂ f) θ₂) =
+      T.hcomp (T.id₂ f) (T.vcomp θ₁ θ₂) :=
+  GrayCategory.gray_interchange_id_left T.toGrayCategory θ₁ θ₂
+
+/-- Tricategories inherit Gray interchange with identity on the right. -/
+@[simp] theorem tricategory_gray_interchange_id_right
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ f₂ : T.Hom a b} {g : T.Hom b c}
+    (η₁ : T.TwoCell f₀ f₁) (η₂ : T.TwoCell f₁ f₂) :
+    T.vcomp (T.hcomp η₁ (T.id₂ g)) (T.hcomp η₂ (T.id₂ g)) =
+      T.hcomp (T.vcomp η₁ η₂) (T.id₂ g) :=
+  GrayCategory.gray_interchange_id_right T.toGrayCategory η₁ η₂
+
+/-- Tricategories inherit Gray interchange units. -/
+@[simp] theorem tricategory_gray_interchange_units
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} (f : T.Hom a b) (g : T.Hom b c) :
+    T.hcomp (T.id₂ f) (T.id₂ g) =
+      T.vcomp (T.hcomp (T.id₂ f) (T.id₂ g))
+        (T.hcomp (T.id₂ f) (T.id₂ g)) :=
+  (GrayCategory.gray_interchange_units T.toGrayCategory f g).symm
+
+/-- Tricategories inherit Gray tensor naturality. -/
+@[simp] theorem tricategory_gray_tensor_naturality
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ : T.Hom a b} {g₀ g₁ : T.Hom b c}
+    (η : T.TwoCell f₀ f₁) (θ : T.TwoCell g₀ g₁) :
+    T.vcomp (T.whiskerRight g₀ η) (T.whiskerLeft f₁ θ) =
+      T.hcomp η θ :=
+  GrayCategory.gray_tensor_naturality T.toGrayCategory η θ
+
+/-- Tricategories inherit the dual Gray tensor naturality orientation. -/
+@[simp] theorem tricategory_gray_tensor_naturality'
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ : T.Hom a b} {g₀ g₁ : T.Hom b c}
+    (η : T.TwoCell f₀ f₁) (θ : T.TwoCell g₀ g₁) :
+    T.vcomp (T.whiskerLeft f₀ θ) (T.whiskerRight g₁ η) =
+      T.hcomp η θ :=
+  GrayCategory.gray_tensor_naturality' T.toGrayCategory η θ
+
+/-- Explicit one-step coherence cell witnessing Gray interchange. -/
+@[simp] def tricategory_gray_interchange_path
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ f₂ : T.Hom a b} {g₀ g₁ g₂ : T.Hom b c}
+    (η₁ : T.TwoCell f₀ f₁) (η₂ : T.TwoCell f₁ f₂)
+    (θ₁ : T.TwoCell g₀ g₁) (θ₂ : T.TwoCell g₁ g₂) :
+    CellPath
+      (T.vcomp (T.hcomp η₁ θ₁) (T.hcomp η₂ θ₂))
+      (T.hcomp (T.vcomp η₁ η₂) (T.vcomp θ₁ θ₂)) :=
+  Tricategory.coherencePath (tricategory_gray_interchange_eq T η₁ η₂ θ₁ θ₂)
+
+/-- The explicit Gray interchange coherence is carried by one rewrite step. -/
+@[simp] theorem tricategory_gray_interchange_path_steps
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ f₂ : T.Hom a b} {g₀ g₁ g₂ : T.Hom b c}
+    (η₁ : T.TwoCell f₀ f₁) (η₂ : T.TwoCell f₁ f₂)
+    (θ₁ : T.TwoCell g₀ g₁) (θ₂ : T.TwoCell g₁ g₂) :
+    (tricategory_gray_interchange_path T η₁ η₂ θ₁ θ₂).steps =
+      [Tricategory.coherenceStep (tricategory_gray_interchange_eq T η₁ η₂ θ₁ θ₂)] :=
+  Tricategory.coherencePath_steps (tricategory_gray_interchange_eq T η₁ η₂ θ₁ θ₂)
+
 /-- Global tricategorical coherence: pentagonator, triangulator, and interchange. -/
 def tricategory_coherence_theorem
     (T : Tricategory (Obj := Obj))
@@ -212,9 +278,34 @@ def tricategory_coherence_theorem
       (T.vcomp (T.hcomp η₁ θ₁) (T.hcomp η₂ θ₂))
       (T.hcomp (T.vcomp η₁ η₂) (T.vcomp θ₁ θ₂)) := by
   refine ⟨Tricategory.pentagonatorPath T f g h k, Tricategory.triangulatorPath T f' g', ?_⟩
-  exact CellPath.ofEq (tricategory_gray_interchange_eq T η₁ η₂ θ₁ θ₂)
+  exact tricategory_gray_interchange_path T η₁ η₂ θ₁ θ₂
+
+/-- The interchange component in `tricategory_coherence_theorem` is one explicit step. -/
+@[simp] theorem tricategory_coherence_theorem_interchange_steps
+    (T : Tricategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e)
+    {a' b' c' : Obj} (f' : T.Hom a' b') (g' : T.Hom b' c')
+    {x y z : Obj} {u₀ u₁ u₂ : T.Hom x y} {v₀ v₁ v₂ : T.Hom y z}
+    (η₁ : T.TwoCell u₀ u₁) (η₂ : T.TwoCell u₁ u₂)
+    (θ₁ : T.TwoCell v₀ v₁) (θ₂ : T.TwoCell v₁ v₂) :
+    (tricategory_coherence_theorem T f g h k f' g' η₁ η₂ θ₁ θ₂).2.2.steps =
+      [Tricategory.coherenceStep (tricategory_gray_interchange_eq T η₁ η₂ θ₁ θ₂)] := by
+  rfl
 
 /-- Pentagonator naturality with respect to right unit composition. -/
+@[simp] theorem tricategory_pentagon_naturality_eq
+    (T : Tricategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e) :
+    CellPath.comp
+      (Tricategory.pentagonatorPath T f g h k)
+      (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k)) =
+    Tricategory.pentagonatorPath T f g h k := by
+  simpa [CellPath.comp, CellPath.refl] using
+    (Path.trans_refl_right (Tricategory.pentagonatorPath T f g h k))
+
+ /-- Pentagonator naturality with respect to right unit composition. -/
 @[simp] def tricategory_pentagon_naturality
     (T : Tricategory (Obj := Obj))
     {a b c d e : Obj}
@@ -223,12 +314,30 @@ def tricategory_coherence_theorem
       (CellPath.comp
         (Tricategory.pentagonatorPath T f g h k)
         (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k)))
-      (Tricategory.pentagonatorPath T f g h k) := by
-  exact CellPath.ofEq (by
-    simpa [CellPath.comp, CellPath.refl] using
-      (Path.trans_refl_right (Tricategory.pentagonatorPath T f g h k)))
+      (Tricategory.pentagonatorPath T f g h k) :=
+  Tricategory.coherencePath (tricategory_pentagon_naturality_eq T f g h k)
+
+/-- Pentagonator naturality is carried by one explicit rewrite step. -/
+@[simp] theorem tricategory_pentagon_naturality_steps
+    (T : Tricategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e) :
+    (tricategory_pentagon_naturality T f g h k).steps =
+      [Tricategory.coherenceStep (tricategory_pentagon_naturality_eq T f g h k)] :=
+  Tricategory.coherencePath_steps (tricategory_pentagon_naturality_eq T f g h k)
 
 /-- Triangulator naturality with respect to right unit composition. -/
+@[simp] theorem tricategory_triangle_naturality_eq
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} (f : T.Hom a b) (g : T.Hom b c) :
+    CellPath.comp
+      (Tricategory.triangulatorPath T f g)
+      (CellPath.refl (GrayCategory.trianglePath T.toGrayCategory f g)) =
+    Tricategory.triangulatorPath T f g := by
+  simpa [CellPath.comp, CellPath.refl] using
+    (Path.trans_refl_right (Tricategory.triangulatorPath T f g))
+
+ /-- Triangulator naturality with respect to right unit composition. -/
 @[simp] def tricategory_triangle_naturality
     (T : Tricategory (Obj := Obj))
     {a b c : Obj} (f : T.Hom a b) (g : T.Hom b c) :
@@ -236,12 +345,51 @@ def tricategory_coherence_theorem
       (CellPath.comp
         (Tricategory.triangulatorPath T f g)
         (CellPath.refl (GrayCategory.trianglePath T.toGrayCategory f g)))
-      (Tricategory.triangulatorPath T f g) := by
-  exact CellPath.ofEq (by
-    simpa [CellPath.comp, CellPath.refl] using
-      (Path.trans_refl_right (Tricategory.triangulatorPath T f g)))
+      (Tricategory.triangulatorPath T f g) :=
+  Tricategory.coherencePath (tricategory_triangle_naturality_eq T f g)
+
+/-- Triangulator naturality is carried by one explicit rewrite step. -/
+@[simp] theorem tricategory_triangle_naturality_steps
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} (f : T.Hom a b) (g : T.Hom b c) :
+    (tricategory_triangle_naturality T f g).steps =
+      [Tricategory.coherenceStep (tricategory_triangle_naturality_eq T f g)] :=
+  Tricategory.coherencePath_steps (tricategory_triangle_naturality_eq T f g)
 
 /-- Pentagonator and triangulator compositions are coherent under reassociation. -/
+@[simp] theorem tricategory_coherence_pentagon_eq
+    (T : Tricategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e) :
+    CellPath.comp
+      (CellPath.comp
+        (Tricategory.pentagonatorPath T f g h k)
+        (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k)))
+      (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k)) =
+    CellPath.comp
+      (Tricategory.pentagonatorPath T f g h k)
+      (CellPath.comp
+        (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k))
+        (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k))) := by
+  simp [CellPath.comp]
+
+/-- Triangulator reassociation equation used in tricategory coherence. -/
+@[simp] theorem tricategory_coherence_triangle_eq
+    (T : Tricategory (Obj := Obj))
+    {a' b' c' : Obj} (f' : T.Hom a' b') (g' : T.Hom b' c') :
+    CellPath.comp
+      (CellPath.comp
+        (Tricategory.triangulatorPath T f' g')
+        (CellPath.refl (GrayCategory.trianglePath T.toGrayCategory f' g')))
+      (CellPath.refl (GrayCategory.trianglePath T.toGrayCategory f' g')) =
+    CellPath.comp
+      (Tricategory.triangulatorPath T f' g')
+      (CellPath.comp
+        (CellPath.refl (GrayCategory.trianglePath T.toGrayCategory f' g'))
+        (CellPath.refl (GrayCategory.trianglePath T.toGrayCategory f' g'))) := by
+  simp [CellPath.comp]
+
+ /-- Pentagonator and triangulator compositions are coherent under reassociation. -/
 @[simp] def tricategory_coherence
     (T : Tricategory (Obj := Obj))
     {a b c d e : Obj}
@@ -269,12 +417,29 @@ def tricategory_coherence_theorem
         (Tricategory.triangulatorPath T f' g')
         (CellPath.comp
           (CellPath.refl (GrayCategory.trianglePath T.toGrayCategory f' g'))
-          (CellPath.refl (GrayCategory.trianglePath T.toGrayCategory f' g'))))) := by
-  refine ⟨?_, ?_⟩
-  · exact CellPath.ofEq (by
-      simp [CellPath.comp])
-  · exact CellPath.ofEq (by
-      simp [CellPath.comp])
+          (CellPath.refl (GrayCategory.trianglePath T.toGrayCategory f' g'))))) :=
+  ⟨Tricategory.coherencePath (tricategory_coherence_pentagon_eq T f g h k),
+    Tricategory.coherencePath (tricategory_coherence_triangle_eq T f' g')⟩
+
+/-- Pentagon component of `tricategory_coherence` is one explicit step. -/
+@[simp] theorem tricategory_coherence_pentagon_steps
+    (T : Tricategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e)
+    {a' b' c' : Obj} (f' : T.Hom a' b') (g' : T.Hom b' c') :
+    (tricategory_coherence T f g h k f' g').1.steps =
+      [Tricategory.coherenceStep (tricategory_coherence_pentagon_eq T f g h k)] := by
+  rfl
+
+/-- Triangle component of `tricategory_coherence` is one explicit step. -/
+@[simp] theorem tricategory_coherence_triangle_steps
+    (T : Tricategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e)
+    {a' b' c' : Obj} (f' : T.Hom a' b') (g' : T.Hom b' c') :
+    (tricategory_coherence T f g h k f' g').2.steps =
+      [Tricategory.coherenceStep (tricategory_coherence_triangle_eq T f' g')] := by
+  rfl
 
 /-- Tricategory interchange is symmetric with tensor functorial. -/
 @[simp] theorem tricategory_interchange_symmetric
@@ -336,6 +501,19 @@ def tricategory_coherence_theorem
       TwoCategory.trianglePath T.toGrayCategory.toTwoCategory f' g') := by
   constructor <;> rfl
 
+/-- Pentagonator with identity 1-cells has trivial right-unit composition equation. -/
+@[simp] theorem tricategory_unit_coherence_eq
+    (T : Tricategory (Obj := Obj)) (a : Obj) :
+    CellPath.comp
+      (Tricategory.pentagonatorPath T (T.id₁ a) (T.id₁ a) (T.id₁ a) (T.id₁ a))
+      (CellPath.refl
+        (GrayCategory.pentagonPath T.toGrayCategory
+          (T.id₁ a) (T.id₁ a) (T.id₁ a) (T.id₁ a))) =
+    Tricategory.pentagonatorPath T (T.id₁ a) (T.id₁ a) (T.id₁ a) (T.id₁ a) := by
+  simpa [CellPath.comp, CellPath.refl] using
+    (Path.trans_refl_right
+      (Tricategory.pentagonatorPath T (T.id₁ a) (T.id₁ a) (T.id₁ a) (T.id₁ a)))
+
 /-- Pentagonator with identity 1-cells has trivial right-unit composition. -/
 @[simp] def tricategory_unit_coherence
     (T : Tricategory (Obj := Obj)) (a : Obj) :
@@ -345,11 +523,34 @@ def tricategory_coherence_theorem
         (CellPath.refl
           (GrayCategory.pentagonPath T.toGrayCategory
             (T.id₁ a) (T.id₁ a) (T.id₁ a) (T.id₁ a))))
-      (Tricategory.pentagonatorPath T (T.id₁ a) (T.id₁ a) (T.id₁ a) (T.id₁ a)) := by
-  exact CellPath.ofEq (by
-    simpa [CellPath.comp, CellPath.refl] using
-      (Path.trans_refl_right
-        (Tricategory.pentagonatorPath T (T.id₁ a) (T.id₁ a) (T.id₁ a) (T.id₁ a))))
+      (Tricategory.pentagonatorPath T (T.id₁ a) (T.id₁ a) (T.id₁ a) (T.id₁ a)) :=
+  Tricategory.coherencePath (tricategory_unit_coherence_eq T a)
+
+/-- Unit coherence is carried by one explicit rewrite step. -/
+@[simp] theorem tricategory_unit_coherence_steps
+    (T : Tricategory (Obj := Obj)) (a : Obj) :
+    (tricategory_unit_coherence T a).steps =
+      [Tricategory.coherenceStep (tricategory_unit_coherence_eq T a)] :=
+  Tricategory.coherencePath_steps (tricategory_unit_coherence_eq T a)
+
+/-- Associativity equation for composing the pentagonator with unit 4-cells. -/
+@[simp] theorem tricategory_associator_coherence_eq
+    (T : Tricategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e) :
+    CellPath.comp
+      (CellPath.comp
+        (CellPath.refl
+          (TwoCategory.pentagonPath T.toGrayCategory.toTwoCategory f g h k))
+        (Tricategory.pentagonatorPath T f g h k))
+      (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k)) =
+    CellPath.comp
+      (CellPath.refl
+        (TwoCategory.pentagonPath T.toGrayCategory.toTwoCategory f g h k))
+      (CellPath.comp
+        (Tricategory.pentagonatorPath T f g h k)
+        (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k))) := by
+  simp [CellPath.comp]
 
 /-- Associativity coherence for composing the pentagonator with unit 4-cells. -/
 @[simp] def tricategory_associator_coherence
@@ -368,9 +569,17 @@ def tricategory_coherence_theorem
           (TwoCategory.pentagonPath T.toGrayCategory.toTwoCategory f g h k))
         (CellPath.comp
           (Tricategory.pentagonatorPath T f g h k)
-          (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k)))) := by
-  exact CellPath.ofEq (by
-    simp [CellPath.comp])
+          (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k)))) :=
+  Tricategory.coherencePath (tricategory_associator_coherence_eq T f g h k)
+
+/-- Associator coherence is carried by one explicit rewrite step. -/
+@[simp] theorem tricategory_associator_coherence_steps
+    (T : Tricategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e) :
+    (tricategory_associator_coherence T f g h k).steps =
+      [Tricategory.coherenceStep (tricategory_associator_coherence_eq T f g h k)] :=
+  Tricategory.coherencePath_steps (tricategory_associator_coherence_eq T f g h k)
 
 end Path
 end ComputationalPaths

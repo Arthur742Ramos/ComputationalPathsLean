@@ -130,6 +130,29 @@ theorem gray_tensor_assoc (G : GrayCategory (Obj := Obj))
           (G.vcomp θ₁ (G.vcomp θ₂ θ₃)) :=
         gray_interchange_assoc (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃
 
+/-- Associativity of the Gray tensor product in equation form. -/
+theorem gray_tensor_product_associative (G : GrayCategory (Obj := Obj))
+    {a b c : Obj}
+    {f₀ f₁ f₂ f₃ : G.Hom a b} {g₀ g₁ g₂ g₃ : G.Hom b c}
+    (η₁ : G.TwoCell f₀ f₁) (η₂ : G.TwoCell f₁ f₂) (η₃ : G.TwoCell f₂ f₃)
+    (θ₁ : G.TwoCell g₀ g₁) (θ₂ : G.TwoCell g₁ g₂) (θ₃ : G.TwoCell g₂ g₃) :
+    G.vcomp (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂)) (G.hcomp η₃ θ₃) =
+      G.hcomp (G.vcomp η₁ (G.vcomp η₂ η₃))
+        (G.vcomp θ₁ (G.vcomp θ₂ θ₃)) :=
+  gray_tensor_assoc (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃
+
+/-- The tensor-product associativity equation yields explicit 3-cell coherence data. -/
+theorem gray_tensor_product_associative_nonempty (G : GrayCategory (Obj := Obj))
+    {a b c : Obj}
+    {f₀ f₁ f₂ f₃ : G.Hom a b} {g₀ g₁ g₂ g₃ : G.Hom b c}
+    (η₁ : G.TwoCell f₀ f₁) (η₂ : G.TwoCell f₁ f₂) (η₃ : G.TwoCell f₂ f₃)
+    (θ₁ : G.TwoCell g₀ g₁) (θ₂ : G.TwoCell g₁ g₂) (θ₃ : G.TwoCell g₂ g₃) :
+    Nonempty (CellPath
+      (G.vcomp (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂)) (G.hcomp η₃ θ₃))
+      (G.hcomp (G.vcomp η₁ (G.vcomp η₂ η₃))
+        (G.vcomp θ₁ (G.vcomp θ₂ θ₃)))) :=
+  ⟨CellPath.ofEq (gray_tensor_product_associative (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃)⟩
+
 /-- Gray tensor (horizontal composition) is functorial: interchange swaps
 the direction of the 3-cell. -/
 theorem gray_tensor_functorial (G : GrayCategory (Obj := Obj))
@@ -149,6 +172,25 @@ theorem gray_interchange_eq (G : GrayCategory (Obj := Obj))
     G.vcomp (G.hcomp η₁ θ₁) (G.hcomp η₂ θ₂) =
       G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂) :=
   G.interchange η₁ η₂ θ₁ θ₂
+
+/-- Symmetric form of Gray interchange. -/
+theorem gray_interchange_eq_symm (G : GrayCategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ f₂ : G.Hom a b} {g₀ g₁ g₂ : G.Hom b c}
+    (η₁ : G.TwoCell f₀ f₁) (η₂ : G.TwoCell f₁ f₂)
+    (θ₁ : G.TwoCell g₀ g₁) (θ₂ : G.TwoCell g₁ g₂) :
+    G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂) =
+      G.vcomp (G.hcomp η₁ θ₁) (G.hcomp η₂ θ₂) :=
+  (G.interchange η₁ η₂ θ₁ θ₂).symm
+
+/-- Interchange always gives explicit 3-cell coherence data. -/
+theorem gray_interchange_nonempty (G : GrayCategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ f₂ : G.Hom a b} {g₀ g₁ g₂ : G.Hom b c}
+    (η₁ : G.TwoCell f₀ f₁) (η₂ : G.TwoCell f₁ f₂)
+    (θ₁ : G.TwoCell g₀ g₁) (θ₂ : G.TwoCell g₁ g₂) :
+    Nonempty (CellPath
+      (G.vcomp (G.hcomp η₁ θ₁) (G.hcomp η₂ θ₂))
+      (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂))) :=
+  ⟨G.interchangePath η₁ η₂ θ₁ θ₂⟩
 
 /-- Gray-categories inherit pentagon coherence from their underlying 2-category. -/
 def gray_pentagon_from_interchange (G : GrayCategory (Obj := Obj))
@@ -260,6 +302,58 @@ theorem gray_to_tricategory_coherence_data
   exact
     ⟨⟨gray_to_tricategory_coherence_pentagon G f g h k⟩,
       ⟨gray_to_tricategory_coherence_triangle G f' g'⟩⟩
+
+/-- Gray pentagon coherence supplies tricategory pentagonator data. -/
+theorem gray_to_tricategory_pentagon_nonempty
+    (G : GrayCategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : G.Hom a b) (g : G.Hom b c) (h : G.Hom c d) (k : G.Hom d e) :
+    Nonempty (CellPath
+      (TwoCategory.pentagonLeftRoute G.toTwoCategory f g h k)
+      (TwoCategory.pentagonRightRoute G.toTwoCategory f g h k)) :=
+  ⟨gray_to_tricategory_coherence_pentagon G f g h k⟩
+
+/-- Gray triangle coherence supplies tricategory triangulator data. -/
+theorem gray_to_tricategory_triangle_nonempty
+    (G : GrayCategory (Obj := Obj))
+    {a b c : Obj} (f : G.Hom a b) (g : G.Hom b c) :
+    Nonempty (CellPath
+      (TwoCategory.triangleLeftRoute G.toTwoCategory f g)
+      (TwoCategory.triangleRightRoute G.toTwoCategory f g)) :=
+  ⟨gray_to_tricategory_coherence_triangle G f g⟩
+
+/-- Gray interchange supplies the tricategorical interchange coherence cell. -/
+theorem gray_to_tricategory_interchange_nonempty
+    (G : GrayCategory (Obj := Obj))
+    {x y z : Obj} {u₀ u₁ u₂ : G.Hom x y} {v₀ v₁ v₂ : G.Hom y z}
+    (η₁ : G.TwoCell u₀ u₁) (η₂ : G.TwoCell u₁ u₂)
+    (θ₁ : G.TwoCell v₀ v₁) (θ₂ : G.TwoCell v₁ v₂) :
+    Nonempty (CellPath
+      (G.vcomp (G.hcomp η₁ θ₁) (G.hcomp η₂ θ₂))
+      (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂))) :=
+  ⟨G.interchangePath η₁ η₂ θ₁ θ₂⟩
+
+/-- A Gray-category provides all coherence cells needed for a tricategory interface. -/
+theorem gray_to_tricategory_full_coherence_data
+    (G : GrayCategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : G.Hom a b) (g : G.Hom b c) (h : G.Hom c d) (k : G.Hom d e)
+    {a' b' c' : Obj} (f' : G.Hom a' b') (g' : G.Hom b' c')
+    {x y z : Obj} {u₀ u₁ u₂ : G.Hom x y} {v₀ v₁ v₂ : G.Hom y z}
+    (η₁ : G.TwoCell u₀ u₁) (η₂ : G.TwoCell u₁ u₂)
+    (θ₁ : G.TwoCell v₀ v₁) (θ₂ : G.TwoCell v₁ v₂) :
+    Nonempty (CellPath
+      (TwoCategory.pentagonLeftRoute G.toTwoCategory f g h k)
+      (TwoCategory.pentagonRightRoute G.toTwoCategory f g h k))
+    ∧ Nonempty (CellPath
+      (TwoCategory.triangleLeftRoute G.toTwoCategory f' g')
+      (TwoCategory.triangleRightRoute G.toTwoCategory f' g'))
+    ∧ Nonempty (CellPath
+      (G.vcomp (G.hcomp η₁ θ₁) (G.hcomp η₂ θ₂))
+      (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂))) := by
+  refine ⟨gray_to_tricategory_pentagon_nonempty (G := G) f g h k, ?_⟩
+  refine ⟨gray_to_tricategory_triangle_nonempty (G := G) f' g', ?_⟩
+  exact gray_to_tricategory_interchange_nonempty (G := G) η₁ η₂ θ₁ θ₂
 
 end GrayCategory
 

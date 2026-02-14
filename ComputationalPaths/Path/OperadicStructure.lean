@@ -222,6 +222,32 @@ theorem loop_action_unit_right {A : Type u} {a : A}
   simpa [assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split, LoopSpace.comp] using
     (Homotopy.LoopSpaceAlgebra.comp_id_rweq (A := A) (a := a) p)
 
+/-- Associativity for nested binary operad action on loops. -/
+theorem loop_action_associativity_binary {A : Type u} {a : A}
+    (p q r : LoopSpace A a) :
+    RwEq (AssocOp.act assocTreeBinary
+      (Vec.of2 (AssocOp.act assocTreeBinary (Vec.of2 p q)) r))
+      (AssocOp.act assocTreeBinary
+        (Vec.of2 p (AssocOp.act assocTreeBinary (Vec.of2 q r)))) := by
+  simpa [assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split, LoopSpace.comp] using
+    (Homotopy.LoopSpaceAlgebra.comp_assoc_rweq (A := A) (a := a) p q r)
+
+/-- Left unit compatibility for binary operad action written via operad unit. -/
+theorem loop_action_unit_left_via_operad_unit {A : Type u} {a : A}
+    (p q : LoopSpace A a) :
+    RwEq (AssocOp.act assocTreeBinary
+      (Vec.of2 (AssocOp.act assocOperad.unit (Vec.singleton p)) q))
+      (AssocOp.act assocTreeBinary (Vec.of2 p q)) := by
+  exact rweq_of_eq rfl
+
+/-- Right unit compatibility for binary operad action written via operad unit. -/
+theorem loop_action_unit_right_via_operad_unit {A : Type u} {a : A}
+    (p q : LoopSpace A a) :
+    RwEq (AssocOp.act assocTreeBinary
+      (Vec.of2 p (AssocOp.act assocOperad.unit (Vec.singleton q))))
+      (AssocOp.act assocTreeBinary (Vec.of2 p q)) := by
+  exact rweq_of_eq rfl
+
 /-- Path composition gives the associativity and unit laws of an operad action. -/
 theorem path_composition_defines_operad {A : Type u} {a : A} :
     (∀ p q r : LoopSpace A a,
@@ -239,6 +265,25 @@ theorem path_composition_defines_operad {A : Type u} {a : A} :
       exact Homotopy.LoopSpaceAlgebra.id_comp_rweq (A := A) (a := a) p
     · intro p
       exact Homotopy.LoopSpaceAlgebra.comp_id_rweq (A := A) (a := a) p
+
+/-- Associativity law extracted from `path_composition_defines_operad`. -/
+theorem path_composition_operad_assoc {A : Type u} {a : A}
+    (p q r : LoopSpace A a) :
+    RwEq (LoopSpace.comp (LoopSpace.comp p q) r)
+      (LoopSpace.comp p (LoopSpace.comp q r)) :=
+  (path_composition_defines_operad (A := A) (a := a)).1 p q r
+
+/-- Left unit law extracted from `path_composition_defines_operad`. -/
+theorem path_composition_operad_unit_left {A : Type u} {a : A}
+    (p : LoopSpace A a) :
+    RwEq (LoopSpace.comp (LoopSpace.id (A := A) (a := a)) p) p :=
+  (path_composition_defines_operad (A := A) (a := a)).2.1 p
+
+/-- Right unit law extracted from `path_composition_defines_operad`. -/
+theorem path_composition_operad_unit_right {A : Type u} {a : A}
+    (p : LoopSpace A a) :
+    RwEq (LoopSpace.comp p (LoopSpace.id (A := A) (a := a))) p :=
+  (path_composition_defines_operad (A := A) (a := a)).2.2 p
 
 /-! ## Interchange with Symmetric Group Action -/
 
@@ -297,7 +342,7 @@ theorem symm2_act_comp_interchange {A : Type u} {a : A}
       (Symm2.actVec2 (Symm2.comp σ τ) (Vec.of2 p q)))
       (AssocOp.act assocTreeBinary
         (Symm2.actVec2 σ (Symm2.actVec2 τ (Vec.of2 p q)))) := by
-  cases σ <;> cases τ <;> exact RwEq.refl _
+  cases σ <;> cases τ <;> exact rweq_of_eq rfl
 
 /-- Interchange law between loop composition and the `S₂`-action on inputs. -/
 theorem loop_action_s2_interchange {A : Type u} {a : A}
@@ -311,6 +356,29 @@ theorem loop_action_s2_interchange {A : Type u} {a : A}
       LoopSpace.comp] using (RwEq.refl (AssocOp.act assocTreeBinary (Vec.of2 p q)))
   · simpa [Symm2.actVec2, assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split,
       LoopSpace.comp] using (RwEq.refl (AssocOp.act assocTreeBinary (Vec.of2 q p)))
+
+/-- Identity permutation leaves binary operad action unchanged. -/
+theorem loop_action_s2_interchange_id {A : Type u} {a : A}
+    (p q : LoopSpace A a) :
+    RwEq (AssocOp.act assocTreeBinary (Symm2.actVec2 Symm2.id (Vec.of2 p q)))
+      (AssocOp.act assocTreeBinary (Vec.of2 p q)) := by
+  exact rweq_of_eq rfl
+
+/-- Swap permutation interchanges binary operad action inputs. -/
+theorem loop_action_s2_interchange_swap {A : Type u} {a : A}
+    (p q : LoopSpace A a) :
+    RwEq (AssocOp.act assocTreeBinary (Symm2.actVec2 Symm2.swap (Vec.of2 p q)))
+      (AssocOp.act assocTreeBinary (Vec.of2 q p)) := by
+  exact rweq_of_eq rfl
+
+/-- Interchange for composed `S₂` actions on binary operad inputs. -/
+theorem loop_action_s2_interchange_comp {A : Type u} {a : A}
+    (σ τ : Symm2) (p q : LoopSpace A a) :
+    RwEq (AssocOp.act assocTreeBinary
+      (Symm2.actVec2 (Symm2.comp σ τ) (Vec.of2 p q)))
+      (AssocOp.act assocTreeBinary
+        (Symm2.actVec2 σ (Symm2.actVec2 τ (Vec.of2 p q)))) :=
+  symm2_act_comp_interchange (A := A) (a := a) σ τ p q
 
 /-- Operad action distributes over unit operations on binary composition. -/
 theorem loop_action_binary_distribute {A : Type u} {a : A}
