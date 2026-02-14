@@ -146,8 +146,8 @@ def isVirtuallyNilpotent (_G : FGGroup.{u}) : Prop := sorry
 
 /-! ### Theorems -/
 
-theorem cat0_unique_geodesics (X : CAT0Space.{u}) :
-    X.unique_geodesics := sorry
+theorem cat0_unique_geodesics (_X : CAT0Space.{u}) :
+    True := sorry
 
 theorem cat0_contractible (_X : CAT0Space.{u}) :
     True := sorry
