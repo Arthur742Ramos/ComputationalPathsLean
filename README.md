@@ -417,6 +417,44 @@ Configured via `lean-toolchain` and `lakefile.toml`.
 
 ---
 
+## API Documentation
+
+This project uses [doc-gen4](https://github.com/leanprover/doc-gen4) to generate
+browsable API documentation for all modules. The documentation setup lives in the
+`docbuild/` subdirectory (following the recommended nested-project pattern).
+
+### Generating Docs
+
+```bash
+cd docbuild
+
+# First time only — fetch doc-gen4 and its dependencies:
+MATHLIB_NO_CACHE_ON_UPDATE=1 lake update doc-gen4
+
+# Build docs for the main library (and all transitive imports):
+lake build ComputationalPaths:docs
+
+# For multiple libraries:
+lake build ComputationalPaths:docs Kan:docs Equivalence:docs
+```
+
+> **Note:** The full build generates documentation for Lean, Std, Mathlib, and all
+> project modules. For a Mathlib-dependent project of this size (~856 files), expect
+> the first build to take **several hours**. Subsequent incremental builds are faster.
+
+### Viewing Docs
+
+The generated site is at `docbuild/.lake/build/doc/index.html`. Due to browser
+same-origin policies, serve it via HTTP:
+
+```bash
+cd docbuild/.lake/build/doc
+python3 -m http.server 8000
+# Open http://localhost:8000 in your browser
+```
+
+---
+
 ## License
 
 MIT License — see [LICENSE](LICENSE).
