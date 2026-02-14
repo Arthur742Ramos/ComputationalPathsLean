@@ -600,28 +600,28 @@ def SCRingMor.comp_id_right_path {R S : SCRing} (f : SCRingMor R S) :
 /-- Cotangent complexes satisfy the Leibniz path in every simplicial degree. -/
 theorem cotangent_leibniz_path
     (L : CotangentMorphism) (n : Nat) (a b : L.baseRing.carrier n) :
-    Path (L.deriv n ((L.baseRing.ring n).mul a b))
-         (L.cotangent.add n
-            (L.cotangent.smul n a (L.deriv n b))
-            (L.cotangent.smul n b (L.deriv n a))) := by
+    Nonempty (Path (L.deriv n ((L.baseRing.ring n).mul a b))
+      (L.cotangent.add n
+        (L.cotangent.smul n a (L.deriv n b))
+        (L.cotangent.smul n b (L.deriv n a)))) := by
   sorry
 
 /-- Homotopy groups of cotangent complexes are reflexive as types. -/
 theorem cotangent_homotopy_level_refl
     (L : CotangentMorphism) (n : Nat) :
-    Path (L.homotopy n) (L.homotopy n) := by
+    Nonempty (Path (L.homotopy n) (L.homotopy n)) := by
   sorry
 
 /-- Deformation space is identified with π₀ of the cotangent mapping space. -/
 theorem deformation_t1_identification
     (D : DeformationObs) :
-    Path D.deformations (D.morph.homotopy 0) := by
+    Nonempty (Path D.deformations (D.morph.homotopy 0)) := by
   sorry
 
 /-- Obstruction space is identified with π₁ of the cotangent mapping space. -/
 theorem deformation_t2_identification
     (D : DeformationObs) :
-    Path D.obstructions (D.morph.homotopy 1) := by
+    Nonempty (Path D.obstructions (D.morph.homotopy 1)) := by
   sorry
 
 /-- Deformation-obstruction transport composes by transitivity. -/
@@ -629,20 +629,20 @@ theorem deformation_obstruction_transport
     (D : DeformationObs)
     (h1 : D.deformations = D.morph.homotopy 0)
     (h2 : D.morph.homotopy 0 = D.morph.homotopy 0) :
-    Path D.deformations (D.morph.homotopy 0) := by
+    Nonempty (Path D.deformations (D.morph.homotopy 0)) := by
   sorry
 
 /-- Formal moduli evaluations are contractible at every simplicial point. -/
 theorem formal_moduli_contractible_point
     (F : FormalModuliProblem) (k : ArtinianSCRing)
     (n : Nat) (x : (F.eval k).carrier n) :
-    Path x x := by
+    Nonempty (Path x x) := by
   sorry
 
 /-- Tangent complexes in formal moduli problems are reflexive by paths. -/
 theorem formal_moduli_tangent_reflexive
     (F : FormalModuliProblem) (k : ArtinianSCRing) :
-    Path (F.tangent k) (F.tangent k) := by
+    Nonempty (Path (F.tangent k) (F.tangent k)) := by
   sorry
 
 /-- Artin-Lurie diagonal representability condition holds pointwise. -/
@@ -662,14 +662,14 @@ theorem artin_lurie_finite_tor_bound
 theorem artin_lurie_roundtrip_zero_path
     (A : ArtinLurieRepresentability)
     (x : (A.fmp.eval A.baseRing).carrier 0) :
-    Path (A.inv_zero (A.equiv_zero x)) x := by
+    Nonempty (Path (A.inv_zero (A.equiv_zero x)) x) := by
   sorry
 
 /-- Derived intersection inclusions satisfy compatibility as a path. -/
 theorem derived_intersection_compatibility_path
     (D : DerivedIntersection) (R : SCRing) (n : Nat)
     (x : (D.intersection.eval R).carrier n) :
-    Path (D.incl1 R n (D.factor1 R n x)) (D.interIncl R n x) := by
+    Nonempty (Path (D.incl1 R n (D.factor1 R n x)) (D.interIncl R n x)) := by
   sorry
 
 /-- Existence theorem schema for derived moduli via Artin-Lurie data. -/

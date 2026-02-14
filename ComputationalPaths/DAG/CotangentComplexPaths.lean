@@ -127,7 +127,7 @@ theorem obstruction_lift_exists (n : Nat) (x : L.degree n) :
   sorry
 
 theorem obstruction_base_change_path (n : Nat) (x : L.degree n) :
-    Path (L.baseChange n x) (L.baseChange n x) := by
+    Nonempty (Path (L.baseChange n x) (L.baseChange n x)) := by
   sorry
 
 theorem obstruction_base_change_rweq (n : Nat) (x : L.degree n) :

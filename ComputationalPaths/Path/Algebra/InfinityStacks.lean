@@ -317,7 +317,7 @@ theorem descent_coherence_normal_form
 
 theorem atlas_truncation_witness
     (C : Site.{u}) (n : Nat) (X : ArtinNStack C n) :
-    Path X.truncLevel n := by
+    Nonempty (Path X.truncLevel n) := by
   sorry
 
 theorem atlas_rank_witness
@@ -360,8 +360,8 @@ theorem mapping_adjunction_component_path
     (Adj : MappingAdjunction C X Y M)
     (Z : InfinityStack C) (α : SPNatTrans Z.presheaf Y.presheaf)
     (U : C.Obj) (n : Nat) (s : (Z.presheaf.obj U).simplices n) :
-    Path ((Adj.bwd Z (Adj.fwd Z α)).component U |>.mapLevel n s)
-         (α.component U |>.mapLevel n s) := by
+    Nonempty (Path ((Adj.bwd Z (Adj.fwd Z α)).component U |>.mapLevel n s)
+                   (α.component U |>.mapLevel n s)) := by
   sorry
 
 /-! ## Multi-step RwEq Constructions -/

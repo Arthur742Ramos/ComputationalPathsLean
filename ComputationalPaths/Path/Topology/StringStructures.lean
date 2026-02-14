@@ -403,76 +403,76 @@ def string_bordism_add_comm_assoc (R : StringBordismRing) {n : Int}
 /-- The sigma orientation preserves multiplication on string bordism. -/
 theorem sigma_orientation_pres_mul_path
     (S : SigmaOrientation) (x y : S.witten.stringBordism) :
-    Path (S.orientMap (S.witten.bordMul x y))
-         (S.tmf.pi0_mul (S.orientMap x) (S.orientMap y)) := by
+    Nonempty (Path (S.orientMap (S.witten.bordMul x y))
+      (S.tmf.pi0_mul (S.orientMap x) (S.orientMap y))) := by
   sorry
 
 /-- The sigma orientation preserves the bordism unit. -/
 theorem sigma_orientation_pres_one_path
     (S : SigmaOrientation) :
-    Path (S.orientMap S.witten.bordOne) S.tmf.pi0_one := by
+    Nonempty (Path (S.orientMap S.witten.bordOne) S.tmf.pi0_one) := by
   sorry
 
 /-- The Witten genus is additive on string bordism classes. -/
 theorem witten_genus_additivity_theorem
     (W : WittenGenus) (x y : W.stringBordism) :
-    Path (W.wittenMap (W.bordAdd x y))
-         (W.modForms.add (W.wittenMap x) (W.wittenMap y)) := by
+    Nonempty (Path (W.wittenMap (W.bordAdd x y))
+      (W.modForms.add (W.wittenMap x) (W.wittenMap y))) := by
   sorry
 
 /-- The Witten genus is multiplicative on string bordism classes. -/
 theorem witten_genus_multiplicativity_theorem
     (W : WittenGenus) (x y : W.stringBordism) :
-    Path (W.wittenMap (W.bordMul x y))
-         (W.modForms.mul (W.wittenMap x) (W.wittenMap y)) := by
+    Nonempty (Path (W.wittenMap (W.bordMul x y))
+      (W.modForms.mul (W.wittenMap x) (W.wittenMap y))) := by
   sorry
 
 /-- The Witten genus sends the zero class to the zero modular form. -/
 theorem witten_genus_zero_theorem
     (W : WittenGenus) :
-    Path (W.wittenMap W.bordZero) W.modForms.zero := by
+    Nonempty (Path (W.wittenMap W.bordZero) W.modForms.zero) := by
   sorry
 
 /-- The Witten genus sends the bordism unit to the modular unit. -/
 theorem witten_genus_one_theorem
     (W : WittenGenus) :
-    Path (W.wittenMap W.bordOne) W.modForms.one := by
+    Nonempty (Path (W.wittenMap W.bordOne) W.modForms.one) := by
   sorry
 
 /-- Multiplication on π₀(tmf) is associative. -/
 theorem tmf_pi0_mul_assoc_theorem
     (T : TMFSpectrum) (a b c : T.homotopyGroup 0) :
-    Path (T.pi0_mul (T.pi0_mul a b) c) (T.pi0_mul a (T.pi0_mul b c)) := by
+    Nonempty (Path (T.pi0_mul (T.pi0_mul a b) c) (T.pi0_mul a (T.pi0_mul b c))) := by
   sorry
 
 /-- The multiplicative unit law in π₀(tmf). -/
 theorem tmf_pi0_mul_one_theorem
     (T : TMFSpectrum) (a : T.homotopyGroup 0) :
-    Path (T.pi0_mul a T.pi0_one) a := by
+    Nonempty (Path (T.pi0_mul a T.pi0_one) a) := by
   sorry
 
 /-- The additive unit law in π₀(tmf). -/
 theorem tmf_pi0_add_zero_theorem
     (T : TMFSpectrum) (a : T.homotopyGroup 0) :
-    Path (T.pi0_add a T.pi0_zero) a := by
+    Nonempty (Path (T.pi0_add a T.pi0_zero) a) := by
   sorry
 
 /-- Every sigma orientation value is path-reflexive in tmf. -/
 theorem string_orientation_tmf_connection
     (S : SigmaOrientation) (x : S.witten.stringBordism) :
-    Path (S.orientMap x) (S.orientMap x) := by
+    Nonempty (Path (S.orientMap x) (S.orientMap x)) := by
   sorry
 
 /-- String group projection is multiplicative. -/
 theorem string_projection_hom_theorem
     (G : StringGroup) (a b : G.carrier) :
-    Path (G.proj (G.mul a b)) (G.spin.mul (G.proj a) (G.proj b)) := by
+    Nonempty (Path (G.proj (G.mul a b)) (G.spin.mul (G.proj a) (G.proj b))) := by
   sorry
 
 /-- The Witten genus and sigma orientation agree on units into tmf. -/
 theorem witten_to_tmf_unit_theorem
     (S : SigmaOrientation) :
-    Path (S.orientMap S.witten.bordOne) S.tmf.pi0_one := by
+    Nonempty (Path (S.orientMap S.witten.bordOne) S.tmf.pi0_one) := by
   sorry
 
 end StringStructures

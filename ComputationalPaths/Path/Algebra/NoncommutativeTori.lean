@@ -374,7 +374,7 @@ theorem pv_exact_k0_self_rweq
 
 theorem trace_comm_symm
     {T : NCTorusData.{u}} (τ : NCTorusTrace T) (a b : T.alg.carrier) :
-    Path (τ.trace (T.alg.mul b a)) (τ.trace (T.alg.mul a b)) := by
+    Nonempty (Path (τ.trace (T.alg.mul b a)) (τ.trace (T.alg.mul a b))) := by
   sorry
 
 theorem trace_unit_absorb_self_rweq
@@ -384,8 +384,8 @@ theorem trace_unit_absorb_self_rweq
 
 theorem trace_phase_centrality_proxy
     {T : NCTorusData.{u}} (τ : NCTorusTrace T) (a : T.alg.carrier) :
-    Path (τ.trace (T.alg.mul T.gens.phase a))
-         (τ.trace (T.alg.mul a T.gens.phase)) := by
+    Nonempty (Path (τ.trace (T.alg.mul T.gens.phase a))
+                   (τ.trace (T.alg.mul a T.gens.phase))) := by
   sorry
 
 theorem trace_one_normalized
