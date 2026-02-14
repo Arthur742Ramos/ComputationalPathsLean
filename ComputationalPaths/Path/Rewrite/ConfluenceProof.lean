@@ -6,12 +6,18 @@ system and derives `HasJoinOfRw` unconditionally — no assumptions required.
 
 ## Termination
 
-The original aspiration was `Terminating = WellFounded (flip RwPlus)`,
-but some `Step` constructors produce identity rewrites (e.g.
-`symm_refl` maps `symm (refl a)` to `refl a`, and these are
-definitionally equal), making `RwPlus` reflexive.  A reflexive relation
-cannot be well-founded.  We therefore define `Terminating := True` and
-provide the trivial instance `instHasTerminationProp`.
+Termination is proved in `GroupoidTRS.lean` for the core groupoid fragment
+operating on abstract syntax (`GroupoidTRS.Expr`). The proof uses a
+lexicographic pair `(weight, leftWeight)` where:
+- `weight` is a polynomial interpretation (rules 1–7 strictly decrease it)
+- `leftWeight` handles associativity (rule 8 preserves weight but strictly
+  decreases leftWeight)
+
+At the semantic `Path` level, some `Step` constructors produce identity
+rewrites (e.g. `symm_refl` maps `symm(refl a)` to `refl a` — these are
+definitionally equal), making `RwPlus` reflexive. A reflexive relation
+cannot be well-founded. The termination result therefore lives on the
+*syntactic* `Expr` type, which is the mathematically correct level.
 
 ## Confluence
 
@@ -39,6 +45,7 @@ concrete instances — no assumptions.
 ## Main Results
 
 - `instHasTerminationProp`: **Proved** — `HasTerminationProp` instance
+  (genuine termination proof via `GroupoidTRS.Expr.termination`)
 - `instHasConfluenceProp`: **Proved** — full confluence instance
 - `instLocalOfConfluence`: **Proved** — local confluence instance
 - `confluence_prop`: Prop-level confluence (proved)
@@ -61,6 +68,7 @@ concrete instances — no assumptions.
 
 import ComputationalPaths.Path.Rewrite.Confluence
 import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
+import ComputationalPaths.Path.Rewrite.GroupoidTRS
 
 namespace ComputationalPaths
 namespace Path
@@ -418,22 +426,36 @@ theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
 
 /-- Termination of the rewrite system.
 
-Ideally `Terminating` would be `WellFounded (flip RwPlus)`, but some
-`Step` constructors produce identity rewrites (e.g. `trans_refl_left`
-maps a path to itself, and `symm_refl` maps `symm(refl a)` to `refl a`
-— these are definitionally equal), making `RwPlus` reflexive.
-A reflexive relation cannot be well-founded.
+The computational-paths TRS terminates when viewed at the syntactic level:
+the abstract groupoid rewrite system on `GroupoidTRS.Expr` (with rules
+`symm_refl`, `symm_symm`, `trans_refl_left/right`, `trans_symm`,
+`symm_trans`, `symm_trans_congr`, `trans_assoc`, and congruence closure)
+is well-founded. This is proved in `GroupoidTRS.lean` via the lexicographic
+measure `(weight, leftWeight)`.
 
-We define `Terminating := True` so that `HasTerminationProp` can be
-trivially instantiated. -/
-def Terminating : Prop := True
+At the semantic `Path` level, some `Step` constructors produce identity
+rewrites (since `Path` satisfies UIP on the underlying equality proof),
+making `RwPlus` reflexive and hence non-well-founded as a relation on
+`Path` values. The termination result therefore lives on the *syntactic*
+`Expr` type, which is the mathematically correct level for TRS termination.
+
+`Terminating` records that the abstract TRS terminates: specifically, that
+`GroupoidTRS.Expr.Step` is well-founded. -/
+def Terminating : Prop :=
+  WellFounded (fun q p : GroupoidTRS.Expr => GroupoidTRS.Expr.Step p q)
 
 class HasTerminationProp : Prop where
   termination_prop : Terminating
 
-/-- **`HasTerminationProp` instance.** -/
+/-- **`HasTerminationProp` instance** — proved via `GroupoidTRS.Expr.termination`.
+
+This is a genuine termination proof using the polynomial weight function
+`w(symm e) = 2·w(e) + 1`, `w(trans e₁ e₂) = w(e₁) + w(e₂) + 2`
+combined lexicographically with the left-association weight
+`lw(trans e₁ e₂) = lw(e₁) + lw(e₂) + size(e₁)`. Every rewrite step
+strictly decreases this measure. -/
 instance instHasTerminationProp : HasTerminationProp where
-  termination_prop := trivial
+  termination_prop := GroupoidTRS.Expr.termination
 
 theorem termination_prop_of [HasTerminationProp] :
     Terminating :=
