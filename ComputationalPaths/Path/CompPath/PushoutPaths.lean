@@ -2092,65 +2092,65 @@ theorem pushoutDecode_respects_amalg
     apply _root_.congrArg (piOneMul · (pushoutDecode c₀ rest))
     let path : Path (PushoutCompPath.inl (f c₀)) (PushoutCompPath.inl (f c₀)) :=
       (inlPath (congrArg f p)).symm.trans ((Pushout.glue c₀).trans (inrPath (congrArg g p) |>.trans (Pushout.glue c₀).symm))
-    
+
     -- The naturality lemma is: symm(f*p) . glue c₀ . g*p ≈ glue c₀
     -- But `p` here is a loop at c₀, so `c = c₀` and `glue c = glue c₀`.
     -- `HasGlueNaturalLoopRwEq.eq` gives:
     -- RwEq (symm (f*p) . glue c₀ . g*p) (glue c₀)
-    
+
     have h : RwEq ((inlPath (congrArg f p)).symm.trans ((Pushout.glue c₀).trans (inrPath (congrArg g p)))) (Pushout.glue c₀) :=
       HasGlueNaturalLoopRwEq.eq (A := A) (B := B) (C := C) (f := f) (g := g) (c₀ := c₀) c₀ p
-      
+
     have h' : RwEq path (Path.refl (PushoutCompPath.inl (f c₀))) := by
       -- Goal: symm(f*p) . glue c₀ . g*p . symm(glue c₀) ≈ refl
       -- We know: symm(f*p) . glue c₀ . g*p ≈ glue c₀
       -- So LHS ≈ glue c₀ . symm(glue c₀) ≈ refl
-      
+
       -- We need to associate the LHS to expose the subterm that matches `h`.
       -- path is: symm(f*p) . (glue . (g*p . symm(glue)))
       -- We want: (symm(f*p) . (glue . g*p)) . symm(glue)
-      
+
       -- Let L = symm(f*p), M = glue, R = g*p, S = symm(glue)
       -- path = L . (M . (R . S))
       -- h says: L . (M . R) ≈ M
-      
+
       -- Assoc: L . (M . (R . S)) ≈ L . ((M . R) . S)
       -- Using rweq_tt backwards (rweq_tt.symm)
       -- rweq_tt: trans (trans a b) c ≈ trans a (trans b c)
       -- symm: trans a (trans b c) ≈ trans (trans a b) c
-      
+
       -- Current term structure: trans L (trans M (trans R S))
       -- We want: trans (trans L (trans M R)) S
-      
+
       -- First, associate M . (R . S) to (M . R) . S inside
       -- trans L (trans M (trans R S)) ≈ trans L (trans (trans M R) S)
       apply rweq_trans (rweq_trans_congr_right _ (rweq_tt _ _ _).symm)
-      
+
       -- Now associate L . (K . S) to (L . K) . S
       -- trans L (trans (trans M R) S) ≈ trans (trans L (trans M R)) S
       apply rweq_trans (rweq_tt _ _ _).symm
-      
+
       -- Now use `h` on `trans L (trans M R)`
       -- trans (trans L (trans M R)) S ≈ trans M S
       apply rweq_trans (rweq_trans_congr_left _ h)
-      
+
       -- M . S ≈ refl
       apply rweq_cmpA_inv_right _
-      
+
     -- The goal of Quot.sound is: Setoid.r (inlPath (congrArg f p)) (...)
     -- This is `inlPath (congrArg f p) ≈ ...`
     -- But `h'` is `path ≈ refl`.
     -- path = symm(inlPath ...) . (...)
     -- So `symm(A) . B ≈ refl` implies `A ≈ B`.
-    
+
     -- We can use `rweq_of_trans_symm_refl_left` if it exists, or just manipulate `h'`.
     -- Or better, show `inlPath ...` is `symm (symm (inlPath ...))` then use congruences.
-    
+
     -- Let A = inlPath (congrArg f p)
     -- Let B = (glue . (g*p . symm(glue)))
     -- We have `symm A . B ≈ refl`.
     -- We want `A ≈ B`.
-    
+
     have h_final : RwEq (inlPath (congrArg f p)) ((Pushout.glue c₀).trans ((inrPath (congrArg g p)).trans (Pushout.glue c₀).symm)) := by
       -- A ≈ A . refl
       apply rweq_trans (rweq_cmpA_refl_right (inlPath (congrArg f p))).symm
@@ -2162,7 +2162,7 @@ theorem pushoutDecode_respects_amalg
       apply rweq_trans (rweq_trans_congr_left _ (rweq_cmpA_inv_right _))
       -- ≈ B
       apply rweq_cmpA_refl_left
-    
+
     apply Quot.sound
     exact h_final
 
@@ -2186,7 +2186,21 @@ class HasPushoutSVKDecodeEncode (A : Type u) (B : Type u) (C : Type u)
     ∀ p : LoopSpace (Pushout A B C f g) (Pushout.inl (f c₀)),
       pushoutDecode c₀ (pushoutEncodeQuotAxiom A B C f g c₀ (Quot.mk _ p)) = Quot.mk _ p
 
-/-- Round-trip law: `encode ∘ decode` gives an amalgamation-equivalent word. -/
+/-- Round-trip law: `encode ∘ decode` gives an amalgamation-equivalent word.
+
+**DEPRECATED**: This class is provably unsatisfiable for all types.
+`AmalgEquiv` preserves word length (it only swaps `singleLeft(i₁ h)` ↔
+`singleRight(i₂ h)`), while `pushoutDecode` maps words of different lengths
+to the same π₁ element (e.g. `nil` and `consLeft 0 nil` both decode to the
+identity). Therefore no `encodeQuot` function can satisfy
+`AmalgEquiv (encodeQuot (pushoutDecode w)) w` for all `w`.
+
+Use `HasPushoutSVKEncodeDecodeFull` instead, which quotients by
+`FullAmalgEquiv` (amalgamation + free group reduction).
+
+See `PushoutSVKInstances.hasPushoutSVKEncodeDecode_impossible_PUnit` for the
+formal impossibility proof. -/
+@[deprecated "Use HasPushoutSVKEncodeDecodeFull (FullAmalgEquiv) instead. Strict word-level encode∘decode=id is provably impossible." (since := "2026-02-13")]
 class HasPushoutSVKEncodeDecode (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeQuot A B C f g c₀] : Prop where
   encode_decode :
@@ -2780,7 +2794,7 @@ end FullSVK
 
 /-- Prop-level SVK interface: the *full* decode map (amalgamation + free reduction) is bijective.
 
-This is an “encode-free” assumption: given bijectivity of `pushoutDecodeFullAmalg`,
+This is an "encode-free" assumption: given bijectivity of `pushoutDecodeFullAmalg`,
 we can construct an `encode` map by classical choice and recover the full SVK equivalence. -/
 class HasPushoutSVKDecodeFullAmalgBijective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
@@ -2938,8 +2952,19 @@ theorem pushoutDecodeAmalg_injective (A : Type u) (B : Type u) (C : Type u)
 
 /-- Prop-level SVK interface: the *decode* map at the amalgamated free product level is bijective.
 
-This is a useful “encode-free” assumption: given bijectivity of `pushoutDecodeAmalg`,
-we can construct an `encode` map by classical choice and recover the SVK equivalence. -/
+**DEPRECATED**: This class is provably unsatisfiable for all types.
+`AmalgEquiv` preserves word length, so `Quot.mk nil` and
+`Quot.mk (consLeft 0 nil)` are distinct amalgam classes (word lengths 0 vs 1),
+yet both decode to the identity in π₁. Therefore `pushoutDecodeAmalg` is never
+injective and the bijectivity requirement cannot be satisfied.
+
+Use `HasPushoutSVKDecodeFullAmalgBijective` instead, which quotients by
+`FullAmalgEquiv` (amalgamation + free group reduction), collapsing
+`consLeft 0 nil` to `nil`.
+
+See `PushoutSVKInstances.hasPushoutSVKDecodeAmalgBijective_impossible_PUnit`
+for the formal impossibility proof. -/
+@[deprecated "Use HasPushoutSVKDecodeFullAmalgBijective instead. AmalgEquiv-level bijectivity is provably impossible due to word length preservation." (since := "2026-02-13")]
 class HasPushoutSVKDecodeAmalgBijective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
     [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] : Prop where
@@ -3024,7 +3049,7 @@ private def quotRel {α : Sort u} (r : α → α → Prop) (hr : Equivalence r) 
               exact Equivalence.trans hr (Equivalence.symm hr hab) ha
             · intro hb
               exact Equivalence.trans hr hab hb)
-     
+
 
 private theorem rel_of_quot_mk_eq {α : Sort u} {r : α → α → Prop} (hr : Equivalence r) {a b : α} :
     Quot.mk r a = Quot.mk r b → r a b := by
@@ -3482,7 +3507,22 @@ class HasWedgeSVKDecodeEncode (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
           (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit
           (wedgeEncodeQuotPrim (A := A) (B := B) a₀ b₀ (Quot.mk _ p)) = Quot.mk _ p
 
-/-- Round-trip law: `encode ∘ decode = id` on words (wedge case). -/
+/-- Round-trip law: `encode ∘ decode = id` on words (wedge case).
+
+**DEPRECATED**: This class is provably unsatisfiable for all types.
+The strict word-level round-trip `encodeQuot (pushoutDecode w) = w` requires
+`pushoutDecode` to be injective on raw `FreeProductWord`s, but `nil` and
+`consLeft 0 nil` both decode to the identity in π₁ while being structurally
+distinct words. Therefore no `encodeQuot` can return `nil` for one and
+`consLeft 0 nil` for the other.
+
+Use `HasPushoutSVKEncodeDecodeFull` (or `HasWedgeSVKEncodeDataFull` from
+`PushoutSVKInstances.lean`) instead, which uses `FullAmalgEquiv`.
+
+See `WedgeSVKCircleInstances.not_hasWedgeSVKEncodeDecode_Circle` and
+`PushoutSVKInstances.hasWedgeSVKEncodeData_impossible_PUnit` for the
+formal impossibility proofs. -/
+@[deprecated "Use HasPushoutSVKEncodeDecodeFull / HasWedgeSVKEncodeDataFull (FullAmalgEquiv) instead. Strict word equality is provably impossible." (since := "2026-02-13")]
 class HasWedgeSVKEncodeDecode (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
     [HasWedgeSVKEncodeQuot A B a₀ b₀] : Prop where
   encode_decode :

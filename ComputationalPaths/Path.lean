@@ -186,12 +186,15 @@ import ComputationalPaths.Path.CompPath.JoinSpace
 import ComputationalPaths.Path.CompPath.MappingCylinder
 import ComputationalPaths.Path.CompPath.MappingCone
 import ComputationalPaths.Path.CompPath.PushoutPaths
+import ComputationalPaths.Path.CompPath.PushoutSVKInstances
+import ComputationalPaths.Path.CompPath.WedgeSVKCircleInstances
 import ComputationalPaths.Path.CompPath.PullbackPaths
 import ComputationalPaths.Path.CompPath.VanKampenGeneralized
 import ComputationalPaths.Path.SeifertVanKampen
 import ComputationalPaths.Path.CompPath.SeifertVanKampenDerived
 import ComputationalPaths.Path.CompPath.FreeProductUniversal
 import ComputationalPaths.Path.CompPath.WedgeFreeProductDerived
+import ComputationalPaths.Path.CompPath.WedgeFreeProductUniversal
 import ComputationalPaths.Path.CompPath.FigureEight
 import ComputationalPaths.Path.CompPath.FigureEightStep
 import ComputationalPaths.Path.CompPath.BouquetN
