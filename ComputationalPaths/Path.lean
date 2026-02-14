@@ -316,6 +316,11 @@ import ComputationalPaths.Path.Category.GrothendieckConstruction
 import ComputationalPaths.Path.Algebra.AlgebraicKTheoryPaths
 import ComputationalPaths.Path.Algebra.MilnorKTheory
 import ComputationalPaths.Path.Algebra.SteinbergGroup
+import ComputationalPaths.Path.Algebra.CStarAlgebras
+import ComputationalPaths.Path.Algebra.VonNeumannAlgebras
+import ComputationalPaths.Path.Algebra.KKTheoryAdvanced
+import ComputationalPaths.Path.Algebra.OperatorSpaces
+import ComputationalPaths.Path.Algebra.QuantumInformation
 import ComputationalPaths.Path.Topology.CobordismRing
 import ComputationalPaths.Path.Topology.CharacteristicNumbers
 import ComputationalPaths.Path.Topology.MorseHomology
