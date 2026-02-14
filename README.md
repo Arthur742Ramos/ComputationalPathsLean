@@ -1,9 +1,6 @@
 # ComputationalPathsLean
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![Warnings](https://img.shields.io/badge/warnings-0-brightgreen)]()
-[![Axioms](https://img.shields.io/badge/kernel%20axioms-0-blue)]()
-[![Sorries](https://img.shields.io/badge/sorries-0-blue)]()
 [![Lean](https://img.shields.io/badge/Lean-4.24.0-orange)]()
 [![Mathlib](https://img.shields.io/badge/Mathlib-v4.24.0-blue)]()
 
@@ -21,13 +18,14 @@ path-preserving constructions.
 
 | Metric | Value |
 |--------|-------|
-| **Lean files** | 856 |
-| **Lines of code** | ~217,000 |
-| **Build jobs** | 6,016 |
-| **Build warnings** | **0** |
-| **Kernel axioms** | **0** (fully axiom-free) |
-| **Sorries** | **0** (all proofs complete) |
-| **`rweq_of_step` uses** | 582+ (across 144 files) |
+| **Lean files** | 785 |
+| **Lines of code** | ~184,000 |
+| **Theorems & lemmas** | 6,838 |
+| **Definitions, structures & classes** | 11,506 |
+| **Build jobs** | 6,024 |
+| **Build warnings** | 29 (lint style only; all `sorry` warnings are WIP stubs) |
+| **`rweq_of_step` uses** | 509 (across 139 files) |
+| **Architecture** | Single-root `ComputationalPaths/` tree |
 
 ---
 
@@ -155,9 +153,13 @@ The library covers an extensive range of mathematical areas, each with explicit
 
 ## Project Structure
 
+All library code lives under a **single root** — `ComputationalPaths/`. Previous
+external directories (Adjunction/, Anabelian/, Etale/, etc.) were consolidated
+into this tree in the single-root migration.
+
 ```
 ComputationalPathsLean/
-├── ComputationalPaths/           # Core library (632 files)
+├── ComputationalPaths/           # All library code (785 files)
 │   └── Path/
 │       ├── Basic/                # Path, Step, transport, congruence, Context
 │       │   ├── Core.lean         # Fundamental Path and Step structures
@@ -187,70 +189,37 @@ ComputationalPathsLean/
 │       │   └── ...
 │       ├── Algebra/              # Free group abelianization, path algebra
 │       ├── Topology/             # Topological applications
+│       ├── Anabelian/            # Anabelian geometry
+│       ├── Arithmetic/           # Arithmetic geometry
+│       ├── Birational/           # Birational geometry (MMP)
+│       ├── Chromatic/            # Chromatic homotopy theory
+│       ├── Cluster/              # Cluster algebras
+│       ├── Cobordism/            # Cobordism theory
+│       ├── Condensed/            # Condensed mathematics
+│       ├── Crystalline/          # Crystalline cohomology
+│       ├── DAG/                  # Derived algebraic geometry
+│       ├── Etale/                # Étale cohomology
+│       ├── Floer/                # Floer homology
+│       ├── Hodge/                # Hodge theory
+│       ├── KacMoody/             # Kac-Moody algebras
+│       ├── Langlands/            # Langlands program
+│       ├── Motivic/              # Motivic homotopy theory
+│       ├── Operad/               # Operads
+│       ├── Perfectoid/           # Perfectoid spaces
+│       ├── Prismatic/            # Prismatic cohomology
+│       ├── SpectralSequence/     # Spectral sequences
+│       ├── Stable/               # Stable homotopy theory
+│       ├── Topos/                # Topos theory
+│       ├── Tropical/             # Tropical geometry
 │       ├── Groupoid.lean         # Weak/strict groupoid structure
 │       ├── OmegaGroupoid.lean    # Weak ω-groupoid structure
 │       ├── Bicategory.lean       # Bicategory & weak 2-groupoid API
 │       ├── GroupoidDerived.lean   # 41 uses of rweq_of_step
 │       ├── PathAlgebraDerived.lean   # 22 uses of rweq_of_step
-│       └── StepDerived.lean      # 27 uses of rweq_of_step
-├── Adjunction/                   # Adjunction constructions
-├── Anabelian/                    # Anabelian geometry
-├── Arithmetic/                   # Arithmetic geometry
-├── Birational/                   # Birational geometry (MMP)
-├── Categorification/             # Categorification
-├── Chromatic/                    # Chromatic homotopy theory
-├── Cluster/                      # Cluster algebras
-├── Cobordism/                    # Cobordism theory
-├── Condensed/                    # Condensed mathematics
-├── Crystalline/                  # Crystalline cohomology
-├── DAG/                          # Derived algebraic geometry
-├── Deformation/                  # Deformation theory
-├── DerivedCategories/            # Derived categories
-├── Descent/                      # Descent theory
-├── Enriched/                     # Enriched categories
-├── Equivalence/                  # Equivalence constructions
-├── Etale/                        # Étale cohomology
-├── Factorization/                # Factorization systems
-├── Floer/                        # Floer homology
-├── GIT/                          # Geometric invariant theory
-├── GRT/                          # Geometric representation theory
-├── GeometricSatake/              # Geometric Satake
-├── HigherCategory/               # Higher category theory
-├── Hodge/                        # Hodge theory
-├── HomologicalStability/         # Homological stability
-├── InfinityCategory/             # ∞-categories
-├── Intersection/                 # Intersection theory
-├── KacMoody/                     # Kac-Moody algebras
-├── Kan/                          # Kan extensions
-├── Langlands/                    # Langlands program
-├── Localization/                 # Localization
-├── Log/                          # Log geometry
-├── Mirror/                       # Mirror symmetry
-├── Moduli/                       # Moduli spaces
-├── Monoidal/                     # Monoidal categories
-├── Motivic/                      # Motivic homotopy theory
-├── MotivicCohomology/            # Motivic cohomology
-├── NCG/                          # Noncommutative geometry
-├── Operad/                       # Operads
-├── OperadicAlgebra/              # Algebras over operads
-├── Padic/                        # p-adic methods
-├── Perfectoid/                   # Perfectoid spaces
-├── PerfectoidCohomology/         # Perfectoid cohomology
-├── Prismatic/                    # Prismatic cohomology
-├── Quantum/                      # Quantum topology
-├── RepStability/                 # Representation stability
-├── Sheaf/                        # Sheaf theory
-├── Simplicial/                   # Simplicial methods
-├── SpectralSequence/             # Spectral sequences
-├── Stable/                       # Stable homotopy theory
-├── SymplecticDuality/            # Symplectic duality
-├── Synthetic/                    # Synthetic homotopy theory
-├── TFT/                          # Topological field theories
-├── Topos/                        # Topos theory
-├── Tropical/                     # Tropical geometry
-├── TropicalGeometry/             # Tropical geometry (extended)
-├── VertexAlgebra/                # Vertex algebras
+│       ├── StepDerived.lean      # 27 uses of rweq_of_step
+│       └── ... (many more subdirectories)
 ├── Scripts/                      # Audit & analysis scripts
+├── docbuild/                     # doc-gen4 documentation build
 ├── docs/                         # Documentation
 └── paper/                        # Paper materials
 ```
@@ -366,7 +335,7 @@ example (p : Path a b) : RwEq (symm (symm p)) p := by path_simp
 
 ## Axiom-Free Derived Results
 
-**582+ uses of `rweq_of_step`** across 144 files, all derived purely from
+**509 uses of `rweq_of_step`** across 139 files, all derived purely from
 primitive `Step` rules with no custom axioms:
 
 | Module | Uses | Key Results |
