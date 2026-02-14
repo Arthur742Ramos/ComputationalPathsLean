@@ -51,10 +51,10 @@ def partitionEntropy (parts : List Nat) : Nat :=
   parts.foldl Nat.max 0
 
 def metricEntropy {X : Type u} (sys : ErgodicSystem X) : Nat :=
-  partitionEntropy (List.range (sys.mass (iterate sys.T 0 (Classical.choice (Classical.decEq _))))) -- placeholder shape
+  0
 
 def topologicalEntropy {X : Type u} (sys : ErgodicSystem X) : Nat :=
-  sys.mass (iterate sys.T 0 (Classical.choice (Classical.decEq _)))
+  0
 
 def kolmogorovSinaiEntropy {X : Type u} (sys : ErgodicSystem X) : Nat :=
   metricEntropy sys + topologicalEntropy sys

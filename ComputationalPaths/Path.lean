@@ -455,3 +455,8 @@ import ComputationalPaths.Path.Foundations.ModalHomotopyType
 import ComputationalPaths.Path.Foundations.DirectedTypeTheory
 import ComputationalPaths.Path.Foundations.ConstructiveMath
 import ComputationalPaths.Path.Foundations.ToposLogic
+import ComputationalPaths.Path.Topology.ErgodicTheory
+import ComputationalPaths.Path.Topology.HyperbolicDynamics
+import ComputationalPaths.Path.Topology.HomoclinicDynamics
+import ComputationalPaths.Path.Topology.TeichmullerDynamics
+import ComputationalPaths.Path.Algebra.ArithmeticDynamics
