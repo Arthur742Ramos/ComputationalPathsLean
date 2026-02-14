@@ -56,9 +56,9 @@ def pentagon_right (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
       (Path.trans (Path.trans (Path.trans p q) r) s)
       (Path.trans p (Path.trans q (Path.trans r s))) :=
   comp
-    (comp (whiskerRight (h := s) (assoc p q r))
+    (comp (TwoCell.whiskerRight (h := s) (assoc p q r))
       (assoc p (Path.trans q r) s))
-    (whiskerLeft (f := p) (assoc q r s))
+    (TwoCell.whiskerLeft (f := p) (assoc q r s))
 
 /-- Pentagon identity: the five-way reassociation diagram commutes. -/
 @[simp] theorem pentagon_identity (p : Path a b) (q : Path b c)
@@ -75,14 +75,14 @@ def triangle_left (p : Path a b) (q : Path b c) :
       (Path.trans p q) :=
   comp
     (assoc p (Path.refl b) q)
-    (whiskerLeft (f := p) (leftUnitor q))
+    (TwoCell.whiskerLeft (f := p) (leftUnitor q))
 
 /-- Right route of the triangle: right-whisker the right unitor. -/
 def triangle_right (p : Path a b) (q : Path b c) :
     TwoCell (A := A) (a := a) (b := c)
       (Path.trans (Path.trans p (Path.refl b)) q)
       (Path.trans p q) :=
-  whiskerRight (h := q) (rightUnitor p)
+  TwoCell.whiskerRight (h := q) (rightUnitor p)
 
 /-- Triangle identity: the two routes in the triangle diagram agree. -/
 @[simp] theorem triangle_identity (p : Path a b) (q : Path b c) :
@@ -104,19 +104,19 @@ between the same parenthesized compositions are equal. -/
 /-- The associator is natural in the second variable. -/
 @[simp] theorem naturality_assoc_second (p : Path a b)
     {q q' : Path b c} (η : TwoCell q q') (r : Path c d) :
-    comp (whiskerRight (h := r) (whiskerLeft (f := p) η))
+    comp (TwoCell.whiskerRight (h := r) (TwoCell.whiskerLeft (f := p) η))
       (assoc p q' r) =
     comp (assoc p q r)
-      (whiskerLeft (f := p) (whiskerRight (h := r) η)) := by
+      (TwoCell.whiskerLeft (f := p) (TwoCell.whiskerRight (h := r) η)) := by
   apply Subsingleton.elim
 
 /-- The associator is natural in the third variable. -/
 @[simp] theorem naturality_assoc_third (p : Path a b) (q : Path b c)
     {r r' : Path c d} (η : TwoCell r r') :
-    comp (whiskerLeft (f := Path.trans p q) η)
+    comp (TwoCell.whiskerLeft (f := Path.trans p q) η)
       (assoc p q r') =
     comp (assoc p q r)
-      (whiskerLeft (f := p) (whiskerLeft (f := q) η)) := by
+      (TwoCell.whiskerLeft (f := p) (TwoCell.whiskerLeft (f := q) η)) := by
   apply Subsingleton.elim
 
 /-! ## Naturality of unitors -/
@@ -124,14 +124,14 @@ between the same parenthesized compositions are equal. -/
 /-- The left unitor is natural. -/
 @[simp] theorem naturality_left_unitor {p q : Path a b}
     (η : TwoCell p q) :
-    comp (whiskerLeft (f := Path.refl a) η) (leftUnitor q) =
+    comp (TwoCell.whiskerLeft (f := Path.refl a) η) (leftUnitor q) =
     comp (leftUnitor p) η := by
   apply Subsingleton.elim
 
 /-- The right unitor is natural. -/
 @[simp] theorem naturality_right_unitor {p q : Path a b}
     (η : TwoCell p q) :
-    comp (whiskerRight (h := Path.refl b) η) (rightUnitor q) =
+    comp (TwoCell.whiskerRight (h := Path.refl b) η) (rightUnitor q) =
     comp (rightUnitor p) η := by
   apply Subsingleton.elim
 
@@ -201,21 +201,21 @@ same compositions of four paths are equal. -/
 /-- Associator with identity in the middle: `α_{p,id,q} = λ_q ∘ ρ_p`. -/
 @[simp] theorem assoc_unit_middle (p : Path a b) (q : Path b c) :
     comp (assoc p (Path.refl b) q)
-      (whiskerLeft (f := p) (leftUnitor q)) =
-    whiskerRight (h := q) (rightUnitor p) := by
+      (TwoCell.whiskerLeft (f := p) (leftUnitor q)) =
+    TwoCell.whiskerRight (h := q) (rightUnitor p) := by
   apply Subsingleton.elim
 
 /-- Associator with identity on the left: `α_{id,p,q}` relates to the left unitor. -/
 @[simp] theorem assoc_unit_left (p : Path a b) (q : Path b c) :
     comp (assoc (Path.refl a) p q)
-      (whiskerLeft (f := Path.refl a) (TwoCell.id (Path.trans p q))) =
-    whiskerRight (h := q) (whiskerRight (h := p) (TwoCell.id (Path.refl a))) := by
+      (TwoCell.whiskerLeft (f := Path.refl a) (TwoCell.id (Path.trans p q))) =
+    TwoCell.whiskerRight (h := q) (TwoCell.whiskerRight (h := p) (TwoCell.id (Path.refl a))) := by
   apply Subsingleton.elim
 
 /-- Associator with identity on the right: `α_{p,q,id}` relates to the right unitor. -/
 @[simp] theorem assoc_unit_right (p : Path a b) (q : Path b c) :
     comp (assoc p q (Path.refl c))
-      (whiskerLeft (f := p) (rightUnitor q)) =
+      (TwoCell.whiskerLeft (f := p) (rightUnitor q)) =
     rightUnitor (Path.trans p q) := by
   apply Subsingleton.elim
 

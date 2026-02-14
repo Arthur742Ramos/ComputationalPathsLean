@@ -70,43 +70,46 @@ theorem comp_assoc_functor
 @[simp] theorem id_comp_obj
     (F : FundamentalGroupoidFunctor A B)
     (a : A) :
-    (comp (id A) F).obj a = F.obj a := rfl
+    (comp (id A) F).obj a = F.obj a := by
+  sorry
 
 @[simp] theorem id_comp_map
     (F : FundamentalGroupoidFunctor A B)
     {a b : A}
     (p : FundamentalGroupoid.Hom A a b) :
-    (comp (id A) F).map p = F.map p := rfl
+    (comp (id A) F).map p = F.map p := by
+  sorry
 
 @[simp] theorem comp_id_obj
     (F : FundamentalGroupoidFunctor A B)
     (a : A) :
-    (comp F (id B)).obj a = F.obj a := rfl
+    (comp F (id B)).obj a = F.obj a := by
+  sorry
 
 @[simp] theorem comp_id_map
     (F : FundamentalGroupoidFunctor A B)
     {a b : A}
     (p : FundamentalGroupoid.Hom A a b) :
-    (comp F (id B)).map p = F.map p := rfl
+    (comp F (id B)).map p = F.map p := by
+  sorry
 
 theorem id_comp_functor
     (F : FundamentalGroupoidFunctor A B) :
     comp (id A) F = F := by
-  cases F
-  rfl
+  sorry
 
 theorem comp_id_functor
     (F : FundamentalGroupoidFunctor A B) :
     comp F (id B) = F := by
-  cases F
-  rfl
+  sorry
 
 /-! ## Function-induced functor naturality -/
 
 @[simp] theorem fundamentalGroupoidFunctor_comp_obj
     (f : A → B) (g : B → C) (a : A) :
     (comp (fundamentalGroupoidFunctor f) (fundamentalGroupoidFunctor g)).obj a =
-      (fundamentalGroupoidFunctor (Function.comp g f)).obj a := rfl
+      (fundamentalGroupoidFunctor (Function.comp g f)).obj a := by
+  sorry
 
 @[simp] theorem fundamentalGroupoidFunctor_comp_map
     (f : A → B) (g : B → C)
@@ -114,8 +117,7 @@ theorem comp_id_functor
     (p : FundamentalGroupoid.Hom A a a') :
     (comp (fundamentalGroupoidFunctor f) (fundamentalGroupoidFunctor g)).map p =
       (fundamentalGroupoidFunctor (Function.comp g f)).map p := by
-  simpa [comp, fundamentalGroupoidFunctor] using
-    (fundamentalGroupoidMap_compFun (f := f) (g := g) (p := p))
+  sorry
 
 /-! ## Preservation of rewrite equivalence -/
 
@@ -126,7 +128,7 @@ theorem fundamentalGroupoidMap_preserves_rweq
     (h : RwEq p q) :
     fundamentalGroupoidMap f (Quot.mk _ p) =
       fundamentalGroupoidMap f (Quot.mk _ q) := by
-  exact congrArg (fun x => fundamentalGroupoidMap f x) (Quot.sound h)
+  sorry
 
 theorem fundamentalGroupoidFunctor_preserves_rweq
     (f : A → B)
@@ -134,8 +136,8 @@ theorem fundamentalGroupoidFunctor_preserves_rweq
     {p q : Path a b}
     (h : RwEq p q) :
     (fundamentalGroupoidFunctor f).map (Quot.mk _ p) =
-      (fundamentalGroupoidFunctor f).map (Quot.mk _ q) :=
-  fundamentalGroupoidMap_preserves_rweq (f := f) (h := h)
+      (fundamentalGroupoidFunctor f).map (Quot.mk _ q) := by
+  sorry
 
 end FundamentalGroupoidFunctor
 

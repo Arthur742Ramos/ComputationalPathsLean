@@ -163,12 +163,12 @@ def pathTwoCategory (A : Type u) : TwoCategory (Obj := A) where
   hcomp_id_left := by
     intro a b c f g h η
     exact
-      (BicategoryDerived.hcomp_id_left (A := A) (a := a) (b := b) (c := c)
+      (BicategoryDerived.hcomp_id_left' (A := A) (a := a) (b := b) (c := c)
         (f := f) (g := g) (h := h) η)
   hcomp_id_right := by
     intro a b c f g h η
     exact
-      (BicategoryDerived.hcomp_id_right (A := A) (a := a) (b := b) (c := c)
+      (BicategoryDerived.hcomp_id_right' (A := A) (a := a) (b := b) (c := c)
         (f := f) (g := g) (h := h) η)
   interchange := by
     intro a b c f₀ f₁ f₂ g₀ g₁ g₂ η₁ η₂ θ₁ θ₂

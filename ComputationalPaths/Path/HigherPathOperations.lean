@@ -18,6 +18,8 @@ namespace ComputationalPaths
 namespace Path
 namespace HigherPathOperations
 
+open OmegaGroupoid
+
 universe u
 
 variable {A : Type u}
@@ -39,37 +41,37 @@ def godementInterchange {f f' : Path a b} {g g' : Path b c}
 def associatorNatural {f f' : Path a b} {g g' : Path b c} {h h' : Path c d}
     (alpha : Derivation₂ f f') (beta : Derivation₂ g g') (gamma : Derivation₂ h h') :
     Derivation₃
-      (Derivation₂.vcomp (OmegaGroupoid.hcomp (OmegaGroupoid.hcomp alpha beta) gamma) (OmegaGroupoid.associator f' g' h'))
-      (Derivation₂.vcomp (OmegaGroupoid.associator f g h) (OmegaGroupoid.hcomp alpha (OmegaGroupoid.hcomp beta gamma))) :=
-  OmegaGroupoid.contractibility₃ _ _
+      (Derivation₂.vcomp (OmegaGroupoid.hcomp (OmegaGroupoid.hcomp alpha beta) gamma) (associator f' g' h'))
+      (Derivation₂.vcomp (associator f g h) (OmegaGroupoid.hcomp alpha (OmegaGroupoid.hcomp beta gamma))) :=
+  contractibility₃ _ _
 
 /-- Naturality of the left unitor at the 3-cell level. -/
 def leftUnitorNatural {f g : Path a b} (alpha : Derivation₂ f g) :
     Derivation₃
       (Derivation₂.vcomp
-        (OmegaGroupoid.hcomp (Derivation₂.refl (Path.refl a)) alpha) (OmegaGroupoid.leftUnitor g))
-      (Derivation₂.vcomp (OmegaGroupoid.leftUnitor f) alpha) :=
-  OmegaGroupoid.contractibility₃ _ _
+        (OmegaGroupoid.hcomp (Derivation₂.refl (Path.refl a)) alpha) (leftUnitor g))
+      (Derivation₂.vcomp (leftUnitor f) alpha) :=
+  contractibility₃ _ _
 
 /-- Naturality of the right unitor at the 3-cell level. -/
 def rightUnitorNatural {f g : Path a b} (alpha : Derivation₂ f g) :
     Derivation₃
       (Derivation₂.vcomp
-        (OmegaGroupoid.hcomp alpha (Derivation₂.refl (Path.refl b))) (OmegaGroupoid.rightUnitor g))
-      (Derivation₂.vcomp (OmegaGroupoid.rightUnitor f) alpha) :=
-  OmegaGroupoid.contractibility₃ _ _
+        (OmegaGroupoid.hcomp alpha (Derivation₂.refl (Path.refl b))) (rightUnitor g))
+      (Derivation₂.vcomp (rightUnitor f) alpha) :=
+  contractibility₃ _ _
 
 /-! ## Pentagon and Triangle Coherence -/
 
 /-- Pentagon identity for associators as a 3-cell. -/
 def pentagonIdentity (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
-    Derivation₃ (OmegaGroupoid.pentagonLeft f g h k) (OmegaGroupoid.pentagonRight f g h k) :=
-  OmegaGroupoid.pentagonCoherence f g h k
+    Derivation₃ (pentagonLeft f g h k) (pentagonRight f g h k) :=
+  pentagonCoherence f g h k
 
 /-- Triangle identity for unitors as a 3-cell. -/
 def triangleIdentity (f : Path a b) (g : Path b c) :
-    Derivation₃ (OmegaGroupoid.triangleLeft f g) (OmegaGroupoid.triangleRight f g) :=
-  OmegaGroupoid.triangleCoherence f g
+    Derivation₃ (triangleLeft f g) (triangleRight f g) :=
+  triangleCoherence f g
 
 /-! ## Summary -/
 

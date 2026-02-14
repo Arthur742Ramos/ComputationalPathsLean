@@ -359,8 +359,8 @@ def coherenceInterchange
     {a b c : A} {f f' : Path a b} {g g' : Path b c}
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Derivation₃
-      (Derivation₂.vcomp (whiskerRight α g) (whiskerLeft f' β))
-      (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')) :=
+      (Derivation₂.vcomp (OmegaGroupoid.whiskerRight α g) (OmegaGroupoid.whiskerLeft f' β))
+      (Derivation₂.vcomp (OmegaGroupoid.whiskerLeft f β) (OmegaGroupoid.whiskerRight α g')) :=
   .step (.interchange α β)
 
 /-- Interchange coherence between horizontal and vertical composition of 2-cells. -/
@@ -369,9 +369,9 @@ theorem coherence_interchange_law
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Nonempty
       (Derivation₃
-        (Derivation₂.vcomp (whiskerRight α g) (whiskerLeft f' β))
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :=
-  ⟨coherenceInterchange (A := A) α β⟩
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerRight α g) (OmegaGroupoid.whiskerLeft f' β))
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerLeft f β) (OmegaGroupoid.whiskerRight α g'))) :=
+  ⟨coherenceInterchange α β⟩
 
 /-- Symmetric interchange coherence. -/
 theorem coherence_interchange_law_symm
@@ -379,9 +379,9 @@ theorem coherence_interchange_law_symm
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Nonempty
       (Derivation₃
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))
-        (Derivation₂.vcomp (whiskerRight α g) (whiskerLeft f' β))) :=
-  ⟨.inv (coherenceInterchange (A := A) α β)⟩
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerLeft f β) (OmegaGroupoid.whiskerRight α g'))
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerRight α g) (OmegaGroupoid.whiskerLeft f' β))) :=
+  ⟨.inv (coherenceInterchange α β)⟩
 
 /-- Interchange in horizontal-composition form. -/
 theorem coherence_interchange_hcomp
@@ -389,9 +389,10 @@ theorem coherence_interchange_hcomp
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Nonempty
       (Derivation₃
-        (hcomp α β)
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) := by
-  simpa [hcomp] using coherence_interchange_law (A := A) α β
+        (OmegaGroupoid.hcomp α β)
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerLeft f β) (OmegaGroupoid.whiskerRight α g'))) := by
+  simp only [OmegaGroupoid.hcomp]
+  exact coherence_interchange_law α β
 
 /-- Symmetric interchange in horizontal-composition form. -/
 theorem coherence_interchange_hcomp_symm
@@ -399,39 +400,19 @@ theorem coherence_interchange_hcomp_symm
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Nonempty
       (Derivation₃
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))
-        (hcomp α β)) := by
-  simpa [hcomp] using coherence_interchange_law_symm (A := A) α β
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerLeft f β) (OmegaGroupoid.whiskerRight α g'))
+        (OmegaGroupoid.hcomp α β)) := by
+  simp only [OmegaGroupoid.hcomp]
+  exact coherence_interchange_law_symm α β
 
-/-- Interchange in horizontal-composition form has a canonical witness. -/
-theorem coherenceInterchange_hcomp_form
-    {a b c : A} {f f' : Path a b} {g g' : Path b c}
-    (α : Derivation₂ f f') (β : Derivation₂ g g') :
-    Nonempty
-      (Derivation₃
-        (hcomp α β)
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) := by
-  exact ⟨by simpa [hcomp] using coherenceInterchange (A := A) α β⟩
-
-/-- Symmetric interchange in horizontal-composition form has a canonical witness. -/
-theorem coherenceInterchange_hcomp_form_symm
-    {a b c : A} {f f' : Path a b} {g g' : Path b c}
-    (α : Derivation₂ f f') (β : Derivation₂ g g') :
-    Nonempty
-      (Derivation₃
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))
-        (hcomp α β)) := by
-  rcases coherenceInterchange_hcomp_form (A := A) α β with ⟨m⟩
-  exact ⟨.inv m⟩
-
-/-- Any two horizontal-form interchange witnesses are connected by a 4-cell. -/
-theorem coherence_interchange_hcomp_connected
+/-- Any two interchange witnesses at the same type are connected by a 4-cell. -/
+theorem coherence_interchange_connected
     {a b c : A} {f f' : Path a b} {g g' : Path b c}
     (α : Derivation₂ f f') (β : Derivation₂ g g')
     (m₁ m₂ :
       Derivation₃
-        (hcomp α β)
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerRight α g) (OmegaGroupoid.whiskerLeft f' β))
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerLeft f β) (OmegaGroupoid.whiskerRight α g'))) :
     Nonempty (Derivation₄ m₁ m₂) :=
   ⟨contractibility₄ m₁ m₂⟩
 
@@ -441,33 +422,10 @@ theorem coherence_interchange_contractible
     (α : Derivation₂ f f') (β : Derivation₂ g g')
     (m :
       Derivation₃
-        (Derivation₂.vcomp (whiskerRight α g) (whiskerLeft f' β))
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :
-    Nonempty (Derivation₄ m (coherenceInterchange (A := A) α β)) :=
-  ⟨contractibility₄ m (coherenceInterchange (A := A) α β)⟩
-
-/-- Any two interchange witnesses are connected by a canonical 4-cell. -/
-theorem coherence_interchange_connected
-    {a b c : A} {f f' : Path a b} {g g' : Path b c}
-    (α : Derivation₂ f f') (β : Derivation₂ g g')
-    (m₁ m₂ :
-      Derivation₃
-        (Derivation₂.vcomp (whiskerRight α g) (whiskerLeft f' β))
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :
-    Nonempty (Derivation₄ m₁ m₂) :=
-  ⟨contractibility₄ m₁ m₂⟩
-
-/-- Interchange connectivity is symmetric. -/
-theorem coherence_interchange_connected_symm
-    {a b c : A} {f f' : Path a b} {g g' : Path b c}
-    (α : Derivation₂ f f') (β : Derivation₂ g g')
-    (m₁ m₂ :
-      Derivation₃
-        (Derivation₂.vcomp (whiskerRight α g) (whiskerLeft f' β))
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :
-    Nonempty (Derivation₄ m₂ m₁) := by
-  rcases coherence_interchange_connected (A := A) α β m₁ m₂ with ⟨c⟩
-  exact ⟨Derivation₄.inv c⟩
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerRight α g) (OmegaGroupoid.whiskerLeft f' β))
+        (Derivation₂.vcomp (OmegaGroupoid.whiskerLeft f β) (OmegaGroupoid.whiskerRight α g'))) :
+    Nonempty (Derivation₄ m (coherenceInterchange α β)) :=
+  ⟨contractibility₄ m (coherenceInterchange α β)⟩
 
 /-- The canonical interchange witness is connected to itself by reflexivity. -/
 theorem coherenceInterchange_self_connected
@@ -475,32 +433,9 @@ theorem coherenceInterchange_self_connected
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Nonempty
       (Derivation₄
-        (coherenceInterchange (A := A) α β)
-        (coherenceInterchange (A := A) α β)) :=
-  ⟨Derivation₄.refl (coherenceInterchange (A := A) α β)⟩
-
-/-- The canonical interchange witness is coherently connected to its inverse. -/
-theorem coherenceInterchange_connected_to_inverse
-    {a b c : A} {f f' : Path a b} {g g' : Path b c}
-    (α : Derivation₂ f f') (β : Derivation₂ g g') :
-    Nonempty
-      (Derivation₄
-        (coherenceInterchange (A := A) α β)
-        (Derivation₃.inv (coherenceInterchange (A := A) α β))) :=
-  ⟨contractibility₄ _ _⟩
-
-/-- Any horizontal-form interchange witness is connected to the canonical one. -/
-theorem coherence_interchange_hcomp_contractible
-    {a b c : A} {f f' : Path a b} {g g' : Path b c}
-    (α : Derivation₂ f f') (β : Derivation₂ g g')
-    (m :
-      Derivation₃
-        (hcomp α β)
-        (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))) :
-    Nonempty
-      (Derivation₄ m (by simpa [hcomp] using coherenceInterchange (A := A) α β)) := by
-  refine ⟨contractibility₄ m ?_⟩
-  simpa [hcomp] using coherenceInterchange (A := A) α β
+        (coherenceInterchange α β)
+        (coherenceInterchange α β)) :=
+  ⟨Derivation₄.refl (coherenceInterchange α β)⟩
 
 /-! ## Summary -/
 

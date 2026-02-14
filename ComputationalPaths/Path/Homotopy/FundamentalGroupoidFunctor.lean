@@ -92,7 +92,7 @@ theorem fundamentalGroupoidMap_idFun (A : Type u) {a b : A}
   simp [fundamentalGroupoidMap]
 
 /-- Composition of functions composes the induced morphism maps. -/
-theorem fundamentalGroupoidMap_compFun {A : Type u} {B : Type u} {C : Type u}
+theorem fundamentalGroupoidMap_compFun' {A : Type u} {B : Type u} {C : Type u}
     (f : A → B) (g : B → C) {a a' : A}
     (p : FundamentalGroupoid.Hom A a a') :
     fundamentalGroupoidMap g (fundamentalGroupoidMap f p) =
