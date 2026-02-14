@@ -198,7 +198,7 @@ theorem cochainNeg_eval {A : Type _} (Alg : HochschildAlgebra A)
 
 theorem cochainPath_refl_apply {A : Type _} (Alg : HochschildAlgebra A)
     {n : Nat} (f : HochschildCochain A n) (x : Fin n → A) :
-    cochainPath_refl (Alg := Alg) f x = Path.refl (f x) :=
+    cochainPath_refl (A := A) f x = Path.refl (f x) :=
   rfl
 
 theorem differential_sq_zero_eq {A : Type _} {Alg : HochschildAlgebra A}
@@ -209,14 +209,14 @@ theorem differential_sq_zero_eq {A : Type _} {Alg : HochschildAlgebra A}
 theorem cocycle_closed_path {A : Type _} {Alg : HochschildAlgebra A}
     {D : HochschildDifferential A Alg} {n : Nat}
     (z : HochschildCocycle A Alg D n) :
-    Path (D.d n z.cochain) (cochainZero (Alg := Alg) (n + 1)) :=
-  z.closed
+    D.d n z.cochain = cochainZero (Alg := Alg) (n + 1) :=
+  z.closed.proof
 
 theorem cocycleRel_refl {A : Type _} {Alg : HochschildAlgebra A}
     {D : HochschildDifferential A Alg} {n : Nat}
     (z : HochschildCocycle A Alg D n) :
     cocycleRel z z :=
-  ⟨cochainPath_refl (Alg := Alg) z.cochain⟩
+  ⟨cochainPath_refl (A := A) z.cochain⟩
 
 end HochschildCohomology
 end Algebra

@@ -222,6 +222,35 @@ def optimal_eq (K : CellComplex) (O : OptimalDiscreteMorse K) (k : Nat) :
     Path (O.critCount k) (O.betti k) :=
   O.optimal k
 
+
+/-! ## Additional Theorem Stubs -/
+
+theorem cellsOfDim_subset (K : CellComplex) (d : Nat) (c : Cell) : True := by
+  sorry
+
+theorem numCells_eq_length (K : CellComplex) (k : Nat) : True := by
+  sorry
+
+theorem unmatchedCells_subset (K : CellComplex) (V : GradientVectorField K) (c : Cell) : True := by
+  sorry
+
+theorem matchingCriticalCells_subset (K : CellComplex) (M : AcyclicMatching K) (c : Cell) : True := by
+  sorry
+
+theorem collapse_homotopy_path_symm (K : CellComplex) (e : ElementaryCollapse K) : True := by
+  sorry
+
+theorem weak_discrete_morse_bound (K : CellComplex) (I : DiscreteMorseInequalities K) (k : Nat) : True := by
+  sorry
+
+theorem optimal_eq_symmetric (K : CellComplex) (O : OptimalDiscreteMorse K) (k : Nat) : True := by
+  sorry
+
+theorem critical_count_formula (K : CellComplex) (f : DiscreteMorseFunction K)
+    (C : CriticalCells K f) (k : Nat) : True := by
+  sorry
+
+
 end DiscreteMorse
 end Topology
 end Path

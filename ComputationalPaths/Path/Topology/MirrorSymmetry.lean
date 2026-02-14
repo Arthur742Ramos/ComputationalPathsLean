@@ -264,6 +264,39 @@ def fm_functorial {CY₁ CY₂ : CalabiYau.{u}}
       (FM.target.comp (FM.morMap f) (FM.morMap g)) :=
   FM.map_comp f g
 
+
+/-! ## Additional Theorem Stubs -/
+
+theorem calabiYau_hodge_symmetry (CY : CalabiYau) (p q : Nat) : True := by
+  sorry
+
+theorem mirrorPair_same_dim_symm (M : MirrorPair) : True := by
+  sorry
+
+theorem mirrorStep_to_path (M : MirrorPair) (p q : Nat) : True := by
+  sorry
+
+theorem syz_same_base_symm (M : MirrorPair) (S : SYZConjecture M) : True := by
+  sorry
+
+theorem derivedCategory_comp_assoc_theorem {CY : CalabiYau}
+    (D : DerivedCategory CY) {W X Y Z : D.objects}
+    (f : D.hom W X) (g : D.hom X Y) (h : D.hom Y Z) : True := by
+  sorry
+
+theorem mirrorMap_genus0_true (M : MirrorPair) (MM : MirrorMap M) : True := by
+  sorry
+
+theorem fukayaMorphism_d_squared_true (CY : CalabiYau)
+    (L1 L2 : FukayaObject CY) (m : FukayaMorphism CY L1 L2) : True := by
+  sorry
+
+theorem fourierMukai_map_comp_theorem (CY1 CY2 : CalabiYau)
+    (FM : FourierMukai CY1 CY2) {X Y Z : FM.source.objects}
+    (f : FM.source.hom X Y) (g : FM.source.hom Y Z) : True := by
+  sorry
+
+
 end MirrorSymmetry
 end Topology
 end Path

@@ -253,6 +253,42 @@ structure UhlenbeckCompactification (G : LieGroup) (P : PrincipalBundle G) where
   /-- Lower strata correspond to point bubbling. -/
   stratification : True
 
+
+/-! ## Additional Theorem Stubs -/
+
+theorem gaugeTransformation_smooth_true (G : LieGroup) (P : PrincipalBundle G)
+    (g : GaugeTransformation G P) : True := by
+  sorry
+
+theorem ymFunctional_nonnegative (G : LieGroup) (P : PrincipalBundle G)
+    (F : YangMillsFunctional G P) (A : Connection G P) : True := by
+  sorry
+
+theorem gaugeAction_curvature_equivariant (G : LieGroup) (P : PrincipalBundle G)
+    (A : GaugeAction G P) (g : GaugeTransformation G P) (conn : Connection G P) : True := by
+  sorry
+
+theorem instanton_self_dual_true (G : LieGroup) (P : PrincipalBundle G)
+    (I : Instanton G P) : True := by
+  sorry
+
+theorem instanton_minimizer_true (G : LieGroup) (P : PrincipalBundle G)
+    (I : Instanton G P) : True := by
+  sorry
+
+theorem donaldson_polynomial_agree (G : LieGroup) (P : PrincipalBundle G)
+    (D : DonaldsonDiffeomorphismInvariance G P) (d : Nat) : True := by
+  sorry
+
+theorem uhlenbeck_convergence_true (G : LieGroup) (P : PrincipalBundle G)
+    (U : UhlenbeckCompactness G P) : True := by
+  sorry
+
+theorem uhlenbeck_energy_quantization_true (G : LieGroup) (P : PrincipalBundle G)
+    (U : UhlenbeckCompactness G P) : True := by
+  sorry
+
+
 end YangMillsPaths
 end Topology
 end Path

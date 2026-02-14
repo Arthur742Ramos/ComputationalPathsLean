@@ -223,8 +223,8 @@ theorem modularSTCube_def :
 theorem modularForm_transform_eval {H : Type _} {R : Type _}
     {data : ModularData H R} {k : Nat}
     (f : ModularForm data k) (w : ModularWord) (z : H) :
-    Path (f.toFun (data.action.act w z)) (data.weight k w z (f.toFun z)) :=
-  f.transform w z
+    f.toFun (data.action.act w z) = data.weight k w z (f.toFun z) :=
+  (f.transform w z).proof
 
 theorem qExpansion_eval {H : Type _} {R : Type _}
     (qmap : QExpansionMap H R) {data : ModularData H R} {k : Nat}
@@ -240,36 +240,35 @@ theorem qExpansion_congr_path {H : Type _} {R : Type _}
     (qmap : QExpansionMap H R) {data : ModularData H R} {k : Nat}
     {f g : ModularForm data k}
     (h : ∀ z, Path (f.toFun z) (g.toFun z)) (n : Nat) :
-    Path (qExpansion qmap f n) (qExpansion qmap g n) :=
-  qExpansion_congr qmap h n
+    qExpansion qmap f n = qExpansion qmap g n :=
+  (qExpansion_congr qmap h n).proof
 
 theorem hecke_commutes_path {H : Type _} {R : Type _}
     {data : ModularData H R} {k : Nat}
     (ops : HeckeOperators data k) (m n : Nat) (f : ModularForm data k) :
-    Path (ops.apply m (ops.apply n f)) (ops.apply n (ops.apply m f)) :=
-  ops.commutes m n f
+    ops.apply m (ops.apply n f) = ops.apply n (ops.apply m f) :=
+  (ops.commutes m n f).proof
 
 theorem eisenstein_constant_path {H : Type _} {R : Type _}
     {data : ModularData H R} {qmap : QExpansionMap H R}
     {coeff : CoeffData R} {k : Nat}
     (E : EisensteinSeries data qmap coeff k) :
-    Path (constantTerm (qExpansion qmap E.form)) coeff.one :=
-  E.constant_one
+    constantTerm (qExpansion qmap E.form) = coeff.one :=
+  E.constant_one.proof
 
 theorem cusp_constant_path {H : Type _} {R : Type _}
     {data : ModularData H R} {qmap : QExpansionMap H R}
     {coeff : CoeffData R} {k : Nat}
     (F : CuspForm data qmap coeff k) :
-    Path (constantTerm (qExpansion qmap F.form)) coeff.zero :=
-  F.constant_zero
+    constantTerm (qExpansion qmap F.form) = coeff.zero :=
+  F.constant_zero.proof
 
 theorem hecke_eigen_path_projection {H : Type _} {R : Type _}
     {data : ModularData H R} {k : Nat}
     {ops : HeckeOperators data k} {scalar : ScalarAction R}
     (f : HeckeEigenform data k ops scalar) (n : Nat) (z : H) :
-    Path ((ops.apply n f.form).toFun z)
-      (scalar.smul (f.eigenvalue n) (f.form.toFun z)) :=
-  f.eigen_path n z
+    (ops.apply n f.form).toFun z = scalar.smul (f.eigenvalue n) (f.form.toFun z) :=
+  (f.eigen_path n z).proof
 
 end ModularForms
 end Path

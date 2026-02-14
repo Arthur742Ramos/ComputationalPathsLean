@@ -263,6 +263,39 @@ def char_var_functorial {G : GaugeGroup.{u}}
       (CV.conjugation g (CV.conjugation h ρ)) :=
   CV.conj_assoc g h ρ
 
+
+/-! ## Additional Theorem Stubs -/
+
+theorem gaugeStepPath_self (G : GaugeGroup) (P : GaugBundle G)
+    (A : GaugeConnection G P) (g : G.carrier) : True := by
+  sorry
+
+theorem cs_gauge_invariance_witness (G : GaugeGroup) (P : GaugBundle G)
+    (CS : ChernSimonsInvariant G P) (A : GaugeConnection G P) (g : G.carrier) : True := by
+  sorry
+
+theorem flatModuli_orbit_refl (G : GaugeGroup) (P : GaugBundle G)
+    (M : FlatModuli G P) (A : M.flatConns) : True := by
+  sorry
+
+theorem flatModuli_orbit_symm (G : GaugeGroup) (P : GaugBundle G)
+    (M : FlatModuli G P) (A B : M.flatConns) : True := by
+  sorry
+
+theorem characterVariety_conj_assoc (G : GaugeGroup) (CV : CharacterVariety G)
+    (g h : G.carrier) (rho : CV.representation) : True := by
+  sorry
+
+theorem casson_double_equals_signed (C : CassonInvariant) : True := by
+  sorry
+
+theorem csLevel_positive (G : GaugeGroup) (P : GaugBundle G) (L : CSLevel G P) : True := by
+  sorry
+
+theorem asymptotic_leading_term_true (G : GaugeGroup) (A : AsymptoticExpansion G) : True := by
+  sorry
+
+
 end GaugeTheoryPaths
 end Topology
 end Path

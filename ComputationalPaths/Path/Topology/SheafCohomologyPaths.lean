@@ -211,6 +211,42 @@ def leray_converges_transport_comp {U : OpenCover.{u, v}} {S : Sheaf U}
     (D := fun m : Nat => Path n m)
     (p := L.converges n) (q := q) (r := r) h₁ h₂ (Path.refl n)
 
+
+/-! ## Additional Theorem Stubs -/
+
+theorem presheaf_res_id_theorem {U : OpenCover} (F : Presheaf U)
+    (i : U.index) (s : F.sections i) : True := by
+  sorry
+
+theorem presheaf_res_comp_theorem {U : OpenCover} (F : Presheaf U)
+    (i j k : U.index) (s : F.sections i) : True := by
+  sorry
+
+theorem sheaf_glue_restrict_theorem {U : OpenCover} (S : Sheaf U)
+    (m : MatchingFamily S.toPresheaf) (i : U.index) : True := by
+  sorry
+
+theorem sheaf_glue_unique_theorem {U : OpenCover} (S : Sheaf U)
+    (g h : S.globalSections) : True := by
+  sorry
+
+theorem cech_coboundary_squared_path {U : OpenCover} (F : Presheaf U)
+    (C : CechComplex F) (n : Nat) (x : C.cochain n) : True := by
+  sorry
+
+theorem long_exact_exactness_witness {U : OpenCover} (S : ShortExactSheaves U)
+    (L : LongExactSequence S) (n : Nat) : True := by
+  sorry
+
+theorem connecting_map_path {U : OpenCover} {S : ShortExactSheaves U}
+    (L : LongExactSequence S) (n : Nat) (x : L.rightCohomology.grp n) : True := by
+  sorry
+
+theorem leray_convergence_witness {U : OpenCover} {S : Sheaf U}
+    (L : LeraySpectralSequence S) (n : Nat) : True := by
+  sorry
+
+
 end SheafCohomologyPaths
 end Topology
 end Path

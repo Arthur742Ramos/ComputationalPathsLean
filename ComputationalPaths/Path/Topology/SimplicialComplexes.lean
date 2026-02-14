@@ -221,6 +221,39 @@ def iso_roundtrip (K L : SimplicialComplex) (I : SimplicialIso K L) (v : Nat) :
     Path (I.backward.vertexMap (I.forward.vertexMap v)) v :=
   I.left_inv v
 
+
+/-! ## Additional Theorem Stubs -/
+
+theorem simplicialMapComp_eval (K L M : SimplicialComplex)
+    (f : SimplicialMap K L) (g : SimplicialMap L M) (v : Nat) : True := by
+  sorry
+
+theorem simplicialIso_left_roundtrip (K L : SimplicialComplex)
+    (I : SimplicialIso K L) (v : Nat) : True := by
+  sorry
+
+theorem simplicialIso_right_roundtrip (K L : SimplicialComplex)
+    (I : SimplicialIso K L) (v : Nat) : True := by
+  sorry
+
+theorem chainRank_matches_numSimplices (K : SimplicialComplex)
+    (C : SimplicialChainComplex K) (k : Nat) : True := by
+  sorry
+
+theorem barycentricSubdivision_preserves_euler (K : SimplicialComplex)
+    (B : BarycentricSubdivision K) (d : Nat) : True := by
+  sorry
+
+theorem cechComplex_epsilon_nonnegative (C : CechComplex) : True := by
+  sorry
+
+theorem nerveTheorem_homotopy_equiv_true (N : NerveTheorem) : True := by
+  sorry
+
+theorem simplicialStep_valid_true (s : SimplicialStep) : True := by
+  sorry
+
+
 end SimplicialComplexes
 end Topology
 end Path

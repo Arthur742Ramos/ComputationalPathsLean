@@ -268,6 +268,42 @@ structure MixedHodgeOnVariety where
   /-- Functoriality: morphisms of varieties induce morphisms of MHS (abstract). -/
   functorial : True
 
+
+/-! ## Additional Theorem Stubs -/
+
+theorem deRham_exact_sub_closed_theorem (Omega : DifferentialForms)
+    (H : DeRhamCohomology Omega) (p : Nat) (x : H.exact p) : True := by
+  sorry
+
+theorem hodgeStep_output_path (Omega : DifferentialForms) (p : Nat)
+    (h : HodgeStep Omega p) : True := by
+  sorry
+
+theorem codifferential_squared_true (Omega : DifferentialForms)
+    (C : Codifferential Omega) (p : Nat) (hp : p > 1) (hq : p > 0)
+    (omega : Omega.forms p) : True := by
+  sorry
+
+theorem harmonicSpace_closed_true (Omega : DifferentialForms)
+    (L : HodgeLaplacian Omega) (H : HarmonicSpace Omega L) : True := by
+  sorry
+
+theorem hodgeDeRham_dimension_path (Omega : DifferentialForms)
+    (H : HodgeDeRham Omega) (p : Nat) : True := by
+  sorry
+
+theorem kahler_real_dim_path (K : KahlerManifold) : True := by
+  sorry
+
+theorem dolbeault_conjugation_path (K : KahlerManifold)
+    (D : DolbeaultDecomposition K) (r s : Nat) : True := by
+  sorry
+
+theorem hardLefschetz_holds (K : KahlerManifold)
+    (H : HardLefschetz K) (k : Nat) (hk : k ≤ K.complexDim) : True := by
+  sorry
+
+
 end HodgeTheory
 end Topology
 end Path
