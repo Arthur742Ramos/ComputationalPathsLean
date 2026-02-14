@@ -2200,7 +2200,6 @@ Use `HasPushoutSVKEncodeDecodeFull` instead, which quotients by
 
 See `PushoutSVKInstances.hasPushoutSVKEncodeDecode_impossible_PUnit` for the
 formal impossibility proof. -/
-@[deprecated "Use HasPushoutSVKEncodeDecodeFull (FullAmalgEquiv) instead. Strict word-level encode∘decode=id is provably impossible." (since := "2026-02-13")]
 class HasPushoutSVKEncodeDecode (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeQuot A B C f g c₀] : Prop where
   encode_decode :
@@ -2964,7 +2963,6 @@ Use `HasPushoutSVKDecodeFullAmalgBijective` instead, which quotients by
 
 See `PushoutSVKInstances.hasPushoutSVKDecodeAmalgBijective_impossible_PUnit`
 for the formal impossibility proof. -/
-@[deprecated "Use HasPushoutSVKDecodeFullAmalgBijective instead. AmalgEquiv-level bijectivity is provably impossible due to word length preservation." (since := "2026-02-13")]
 class HasPushoutSVKDecodeAmalgBijective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
     [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] : Prop where
@@ -3522,7 +3520,6 @@ Use `HasPushoutSVKEncodeDecodeFull` (or `HasWedgeSVKEncodeDataFull` from
 See `WedgeSVKCircleInstances.not_hasWedgeSVKEncodeDecode_Circle` and
 `PushoutSVKInstances.hasWedgeSVKEncodeData_impossible_PUnit` for the
 formal impossibility proofs. -/
-@[deprecated "Use HasPushoutSVKEncodeDecodeFull / HasWedgeSVKEncodeDataFull (FullAmalgEquiv) instead. Strict word equality is provably impossible." (since := "2026-02-13")]
 class HasWedgeSVKEncodeDecode (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
     [HasWedgeSVKEncodeQuot A B a₀ b₀] : Prop where
   encode_decode :
