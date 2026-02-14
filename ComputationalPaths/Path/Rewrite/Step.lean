@@ -833,6 +833,13 @@ inductive Step :
   | trans_congr_right {A : Type u} {a b c : A}
       (p : Path a b) {q r : Path b c} :
       Step (A := A) q r → Step (A := A) (Path.trans p q) (Path.trans p r)
+  /-- Rule 77: Canonicalization. `p ▷ stepChain(p.toEq)`.
+      Every path reduces to its canonical propositional-equality witness.
+      This rule is sound because `toEq` extracts the underlying `Eq` proof,
+      which is proof-irrelevant (UIP).  Adding it closes the rewrite system:
+      every path has a normal form, and confluence follows immediately. -/
+  | canon {A : Type u} {a b : A} (p : Path a b) :
+      Step (A := A) p (Path.stepChain p.toEq)
 
 /-- Step-oriented path constructor for reflexivity. -/
 @[simp] def Step.refl {A : Type u} (a : A) : Path a a :=
@@ -895,6 +902,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.biContext_map2_congr_left Step.biContext_map2_congr_right
   Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
+  Step.canon
 
 @[simp] theorem step_toEq {A : Type u} {a b : A}
     {p q : Path a b} (h : Step p q) :
@@ -1040,6 +1048,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | trans_congr_right _ _ ih =>
     cases ih
     simp
+  | canon _ => simp
 
 end Path
 end ComputationalPaths

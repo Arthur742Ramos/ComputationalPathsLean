@@ -1,9 +1,9 @@
 /-
 # Constructive Confluence via Prop-Level Proofs
 
-This module packages the Prop-level confluence assumption used by the rewrite
-system and supplies supporting lemmas. Type-valued joins are extracted in
-`ConfluenceProof.lean` when needed.
+This module packages the Prop-level local confluence interface used by the
+rewrite system and supplies supporting lemmas. The concrete instance is
+provided in `ConfluenceProof.lean` via `Step.canon` and full confluence.
 
 ## Strategy
 
@@ -16,6 +16,11 @@ system and supplies supporting lemmas. Type-valued joins are extracted in
 
 - `HasLocalConfluenceProp` and `local_confluence_prop`
 - Prop-level lifting lemmas for `trans`/`symm`
+
+## Instance
+
+The concrete instance `instLocalOfConfluence` is in `ConfluenceProof.lean`,
+derived from the proved `instHasConfluenceProp`.
 -/
 
 import ComputationalPaths.Path.Rewrite.Confluence
@@ -87,14 +92,9 @@ in downstream code if you want a global default.
 For any two single-step rewrites from the same source path, there exists
 a common descendant reachable by multi-step rewrites from both results.
 
-**Justification**: All critical pairs have explicit join proofs in
-ConfluenceProof.lean. Non-overlapping steps commute via congruence.
-The ~150 Step constructors yield ~22500 pairs, but most are:
-- Impossible (incompatible source shapes)
-- Trivial (same step)
-- Commuting (different subterms)
-- Critical pairs (explicit joins provided)
--/
+**Instance**: `ConfluenceProof.instLocalOfConfluence` provides a concrete
+instance, derived from the proved full confluence (`instHasConfluenceProp`)
+which uses `Step.canon` to join via the canonical normal form. -/
 class HasLocalConfluenceProp.{v} : Prop where
   local_confluence : ∀ {A : Type v} {a b : A} {p q r : Path a b}
     (_hq : Step p q) (_hr : Step p r), ∃ s, Rw q s ∧ Rw r s

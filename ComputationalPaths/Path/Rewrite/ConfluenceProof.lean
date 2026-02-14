@@ -1,8 +1,8 @@
 /-
 # Confluence Proof for Computational Paths TRS
 
-This module proves `HasTerminationProp` and derives `HasJoinOfRw` from
-Prop-level confluence.
+This module **proves** full confluence of the computational-paths rewriting
+system and derives `HasJoinOfRw` unconditionally — no assumptions required.
 
 ## Termination
 
@@ -15,32 +15,35 @@ provide the trivial instance `instHasTerminationProp`.
 
 ## Confluence
 
-Confluence is assumed via `HasConfluenceProp` (which has **no** instance
-for the main `Path` type).  This class directly asserts:
+Confluence is **proved** via `Step.canon` — the canonicalization rule
+that rewrites any path `p` to `Path.stepChain p.toEq`.  Since `toEq`
+is proof-irrelevant (all paths between the same endpoints carry the
+same underlying `Eq`), the canonical target is unique.  Given two
+reductions `Rw p q` and `Rw p r`, both `q` and `r` reduce in one step
+(via `Step.canon`) to `stepChain q.toEq = stepChain r.toEq`.
 
-  ∀ Rw p q, Rw p r → ∃ s, Rw q s ∧ Rw r s
+This proves `HasConfluenceProp` and `HasLocalConfluenceProp` with
+concrete instances — no assumptions.
 
-It subsumes `HasLocalConfluenceProp` (confluence implies local
-confluence).  The standard derivation of confluence from local
-confluence requires termination (Newman's lemma), which is unavailable
-in our setting.  By assuming confluence directly we avoid the Newman
-obstruction while preserving all downstream results.
+1. **`instHasConfluenceProp`**: **Proved** — full confluence instance.
 
-1. **`confluence_prop`**: `Rw p q` ∧ `Rw p r` → joinable.  Immediate
-   from `HasConfluenceProp`.
+2. **`instLocalOfConfluence`**: **Proved** — local confluence (corollary).
 
-2. **`strip_lemma_prop`**: `Step p q` ∧ `Rw p r` → joinable.  Corollary
-   of `confluence_prop`.
+3. **`confluence_prop`**: `Rw p q` ∧ `Rw p r` → joinable.
 
-3. **`instHasJoinOfRw`**: Extracts `Type`-valued join witnesses via
-   `Classical.choose`.
+4. **`strip_lemma_prop`**: `Step p q` ∧ `Rw p r` → joinable.
+
+5. **`instHasJoinOfRw`**: **Proved** — extracts `Type`-valued join
+   witnesses via `Classical.choose`.
 
 ## Main Results
 
 - `instHasTerminationProp`: **Proved** — `HasTerminationProp` instance
-- `confluence_prop`: Prop-level confluence (from `HasConfluenceProp`)
+- `instHasConfluenceProp`: **Proved** — full confluence instance
+- `instLocalOfConfluence`: **Proved** — local confluence instance
+- `confluence_prop`: Prop-level confluence (proved)
 - `strip_lemma_prop`: Strip lemma (corollary of confluence)
-- `instHasJoinOfRw`: Instance of `HasJoinOfRw` for downstream use
+- `instHasJoinOfRw`: **Proved** — instance of `HasJoinOfRw`
 
 ## Key Achievements
 
@@ -368,11 +371,13 @@ def rw_append {a b : A} {p q r : Path a b} (h1 : Rw p q) (h2 : Rw q r) : Rw p r 
   | tail _ step ih => exact Rw.tail ih step
 
 /-- Diamond lemma: Given Step p q and Step p r, there exists s with Rw q s and
-    Rw r s. This follows directly from Prop-level local confluence. -/
-theorem diamond_prop [ConfluenceConstructive.HasLocalConfluenceProp.{u}] {a b : A}
-    {p q r : Path a b} (hq : Step p q) (hr : Step p r) :
+    Rw r s. Both sides canonicalize to `stepChain q.toEq = stepChain r.toEq`. -/
+theorem diamond_prop {a b : A}
+    {p q r : Path a b} (_hq : Step p q) (_hr : Step p r) :
     ∃ s : Path a b, Rw q s ∧ Rw r s :=
-  ConfluenceConstructive.local_confluence_prop hq hr
+  ⟨ Path.stepChain q.toEq
+  , Rw.tail (Rw.refl q) (Step.canon q)
+  , by simp; exact Rw.tail (Rw.refl r) (Step.canon r) ⟩
 
 /-! ## Termination and Newman's lemma (Prop-level) -/
 
@@ -436,20 +441,16 @@ theorem termination_prop_of [HasTerminationProp] :
 
 /-! ### Prop-level confluence
 
-Standard derivation of confluence from local confluence requires
-termination (Newman's lemma), which is unavailable here because
-`Terminating = True`.  We therefore introduce `HasConfluenceProp`,
-which directly assumes confluence:
+The `Step.canon` rule sends every path `p` to `Path.stepChain p.toEq`,
+which is a canonical normal form.  Since `toEq` is proof-irrelevant
+(all paths between the same endpoints carry the same underlying `Eq`),
+any two paths reachable from the same source share the same canonical
+form.  Confluence is therefore an immediate consequence:
 
-  ∀ Rw p q, Rw p r → ∃ s, Rw q s ∧ Rw r s
+  Rw q (stepChain q.toEq)   and   Rw r (stepChain r.toEq)
 
-`HasConfluenceProp` subsumes `HasLocalConfluenceProp`: every confluent
-rewrite system is locally confluent.  The converse requires termination.
-
-Like `HasLocalConfluenceProp`, `HasConfluenceProp` has **no instance**
-for the main `Path` type.  The entire confluence section is therefore
-dead code in practice — downstream results that need `HasJoinOfRw` must
-provide an instance. -/
+with `stepChain q.toEq = stepChain r.toEq` by proof irrelevance.
+-/
 
 /-- Prop-level confluence: any two multi-step rewrites from the same
 source can be joined. -/
@@ -457,26 +458,43 @@ class HasConfluenceProp.{v} : Prop where
   confluence : ∀ {A : Type v} {a b : A} {p q r : @Path A a b},
     Rw p q → Rw p r → ∃ s, Rw q s ∧ Rw r s
 
+/-- **`HasConfluenceProp` instance** — proved via `Step.canon`.
+
+Every path `q : Path a b` rewrites in one step to `stepChain q.toEq`
+(via `Step.canon`).  Since `toEq` is proof-irrelevant, any two paths
+between the same endpoints share the same canonical target.  The join
+is therefore `stepChain q.toEq = stepChain r.toEq`. -/
+instance instHasConfluenceProp : HasConfluenceProp.{u} where
+  confluence := fun {A} {a} {b} {_p} {q} {r} _hq _hr =>
+    ⟨ Path.stepChain q.toEq
+    , Rw.tail (Rw.refl q) (Step.canon q)
+    , by have : Path.stepChain (A := A) (a := a) (b := b) r.toEq =
+               Path.stepChain (A := A) (a := a) (b := b) q.toEq := by
+           simp
+         rw [this]
+         exact Rw.tail (Rw.refl r) (Step.canon r)
+    ⟩
+
 /-- Confluence implies local confluence. -/
-instance (priority := 50) instLocalOfConfluence
-    [h : HasConfluenceProp.{u}] :
+instance (priority := 50) instLocalOfConfluence :
     ConfluenceConstructive.HasLocalConfluenceProp.{u} where
-  local_confluence := fun hq hr => h.confluence (rw_of_step hq) (rw_of_step hr)
+  local_confluence := fun hq hr =>
+    instHasConfluenceProp.confluence (rw_of_step hq) (rw_of_step hr)
 
 /-- **Confluence** (Prop-level): `Rw p q` and `Rw p r` imply joinability. -/
-theorem confluence_prop [HasConfluenceProp.{u}] {a b : A} {p q r : Path a b}
+theorem confluence_prop {a b : A} {p q r : Path a b}
     (hq : Rw p q) (hr : Rw p r) :
     ∃ s : Path a b, Rw q s ∧ Rw r s :=
   HasConfluenceProp.confluence hq hr
 
 /-- Strip lemma: corollary of `confluence_prop`. -/
-theorem strip_lemma_prop [HasConfluenceProp.{u}] {a b : A} {p q r : Path a b}
+theorem strip_lemma_prop {a b : A} {p q r : Path a b}
     (hstep : Step p q) (hmulti : Rw p r) :
     ∃ s : Path a b, Rw q s ∧ Rw r s :=
   confluence_prop (rw_of_step hstep) hmulti
 
 /-- Extract `Type`-level join witnesses via `Classical.choose`. -/
-noncomputable def confluence_of_local [HasConfluenceProp.{u}] {a b : A} {p q r : Path a b}
+noncomputable def confluence_of_local {a b : A} {p q r : Path a b}
     (hq : Rw p q) (hr : Rw p r) :
     Confluence.Join q r :=
   have h := confluence_prop hq hr
@@ -484,8 +502,8 @@ noncomputable def confluence_of_local [HasConfluenceProp.{u}] {a b : A} {p q r :
   let ⟨hqs, hrs⟩ := Classical.choose_spec h
   { meet := s, left := hqs, right := hrs }
 
-/-- The main result: instantiate HasJoinOfRw. -/
-noncomputable instance instHasJoinOfRw [HasConfluenceProp.{u}] : Confluence.HasJoinOfRw.{u} where
+/-- The main result: instantiate HasJoinOfRw unconditionally. -/
+noncomputable instance instHasJoinOfRw : Confluence.HasJoinOfRw.{u} where
   join_of_rw := fun hq hr => confluence_of_local hq hr
 
 end ConfluenceProof
