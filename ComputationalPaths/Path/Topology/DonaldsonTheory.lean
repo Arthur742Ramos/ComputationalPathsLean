@@ -218,24 +218,21 @@ structure ModuliSpace (G : LieGroup.{u}) (M : FourManifold.{u})
   /-- Dimension formula (abstract). -/
   dim_formula : True
 
-/-- The virtual dimension of the moduli space. -/
-def virtualDimension (G : LieGroup.{u}) (M : FourManifold.{u})
-    (P : PrincipalBundle G M) (k : Int) (b2p : Nat) : Int :=
-  8 * k - 3 * (1 + b2p)
+/-- The virtual dimension of the moduli space for SU(2) bundles. -/
+def virtualDimension (_b2p : Nat) (k : Int) : Int :=
+  8 * k - 3 * (1 + _b2p)
 
-/-- For SU(2) bundles with c₂ = k, the dimension is 8k - 3(1 + b₂⁺). -/
-def su2_moduli_dim (M : FourManifold.{u}) (k : Nat) :
-    Path (virtualDimension (G := { carrier := Unit, mul := fun _ _ => (), one := (),
-      inv := fun _ => (), one_mul := fun _ => Path.stepChain rfl,
-      mul_one := fun _ => Path.stepChain rfl,
-      inv_mul := fun _ => Path.stepChain rfl,
-      mul_inv := fun _ => Path.stepChain rfl,
-      mul_assoc := fun _ _ _ => Path.stepChain rfl })
-      M ({ totalSpace := Unit, proj := fun _ => Classical.arbitrary _,
-           fiber_iso := fun _ _ => (), proj_fiber := fun _ _ => Path.stepChain rfl,
-           chernClass := k }) k M.b2_plus)
-         (8 * k - 3 * (1 + M.b2_plus)) :=
+/-- Virtual dimension is linear in k. -/
+def virtualDim_stepChain (b2p : Nat) (k : Int) :
+    Path (virtualDimension b2p k) (8 * k - 3 * (1 + ↑b2p)) :=
   Path.stepChain rfl
+
+/-- Virtual dimension at k=0. -/
+def virtualDim_zero (b2p : Nat) :
+    Path (virtualDimension b2p 0) (-(3 * (1 + ↑b2p))) := by
+  unfold virtualDimension
+  simp
+  exact Path.stepChain rfl
 
 /-! ## Donaldson Invariants -/
 
