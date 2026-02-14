@@ -161,6 +161,42 @@ def assocTreeTripleLeft : AssocOp :=
 def assocTreeTripleRight : AssocOp :=
   AssocTree.node AssocTree.leaf (AssocTree.node AssocTree.leaf AssocTree.leaf)
 
+/-- Binary grafting is tree node formation. -/
+theorem assoc_operad_graft_binary (x y : AssocOp) :
+    assocOperad.graft assocTreeBinary (Vec.of2 x y) = AssocTree.node x y := by
+  rfl
+
+/-- Left-associated ternary grafting. -/
+theorem assoc_operad_graft_triple_left (x y z : AssocOp) :
+    assocOperad.graft assocTreeTripleLeft (Vec.of3 x y z) =
+      AssocTree.node (AssocTree.node x y) z := by
+  rfl
+
+/-- Right-associated ternary grafting. -/
+theorem assoc_operad_graft_triple_right (x y z : AssocOp) :
+    assocOperad.graft assocTreeTripleRight (Vec.of3 x y z) =
+      AssocTree.node x (AssocTree.node y z) := by
+  rfl
+
+/-- Associativity shape: left-nested binary graft equals left arity-3 graft. -/
+theorem assoc_operad_associativity_left_explicit (x y z : AssocOp) :
+    assocOperad.graft assocTreeBinary
+      (Vec.of2 (assocOperad.graft assocTreeBinary (Vec.of2 x y)) z) =
+    assocOperad.graft assocTreeTripleLeft (Vec.of3 x y z) := by
+  rfl
+
+/-- Associativity shape: right-nested binary graft equals right arity-3 graft. -/
+theorem assoc_operad_associativity_right_explicit (x y z : AssocOp) :
+    assocOperad.graft assocTreeBinary
+      (Vec.of2 x (assocOperad.graft assocTreeBinary (Vec.of2 y z))) =
+    assocOperad.graft assocTreeTripleRight (Vec.of3 x y z) := by
+  rfl
+
+/-- Unit operation acts as identity on loop inputs. -/
+theorem assoc_operad_action_unit {A : Type u} {a : A} (p : LoopSpace A a) :
+    AssocOp.act assocOperad.unit (Vec.singleton p) = p := by
+  rfl
+
 /-- Associativity law for the loop operad action. -/
 theorem loop_action_associativity {A : Type u} {a : A}
     (p q r : LoopSpace A a) :
@@ -175,7 +211,7 @@ theorem loop_action_unit_left {A : Type u} {a : A}
     (p : LoopSpace A a) :
     RwEq (AssocOp.act assocTreeBinary
       (Vec.of2 (LoopSpace.id (A := A) (a := a)) p)) p := by
-  simpa [assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, LoopSpace.comp] using
+  simpa [assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split, LoopSpace.comp] using
     (Homotopy.LoopSpaceAlgebra.id_comp_rweq (A := A) (a := a) p)
 
 /-- Right unit law for binary loop composition in the operad action. -/
@@ -183,7 +219,7 @@ theorem loop_action_unit_right {A : Type u} {a : A}
     (p : LoopSpace A a) :
     RwEq (AssocOp.act assocTreeBinary
       (Vec.of2 p (LoopSpace.id (A := A) (a := a)))) p := by
-  simpa [assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, LoopSpace.comp] using
+  simpa [assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split, LoopSpace.comp] using
     (Homotopy.LoopSpaceAlgebra.comp_id_rweq (A := A) (a := a) p)
 
 /-- Path composition gives the associativity and unit laws of an operad action. -/
@@ -239,6 +275,31 @@ theorem symm2_act_comp {α : Type u} (σ τ : Symm2) (x y : α) :
       Symm2.actVec2 σ (Symm2.actVec2 τ (Vec.of2 x y)) := by
   cases σ <;> cases τ <;> rfl
 
+/-- Left identity law for `S₂` composition. -/
+theorem symm2_comp_id_left (σ : Symm2) :
+    Symm2.comp Symm2.id σ = σ := by
+  rfl
+
+/-- Right identity law for `S₂` composition. -/
+theorem symm2_comp_id_right (σ : Symm2) :
+    Symm2.comp σ Symm2.id = σ := by
+  cases σ <;> rfl
+
+/-- Associativity law for `S₂` composition. -/
+theorem symm2_comp_assoc (σ τ υ : Symm2) :
+    Symm2.comp (Symm2.comp σ τ) υ = Symm2.comp σ (Symm2.comp τ υ) := by
+  cases σ <;> cases τ <;> cases υ <;> rfl
+
+/-- Interchange of binary operad action with composed symmetric action. -/
+theorem symm2_act_comp_interchange {A : Type u} {a : A}
+    (σ τ : Symm2) (p q : LoopSpace A a) :
+    RwEq (AssocOp.act assocTreeBinary
+      (Symm2.actVec2 (Symm2.comp σ τ) (Vec.of2 p q)))
+      (AssocOp.act assocTreeBinary
+        (Symm2.actVec2 σ (Symm2.actVec2 τ (Vec.of2 p q)))) := by
+  rw [symm2_act_comp (σ := σ) (τ := τ) (x := p) (y := q)]
+  exact RwEq.refl _
+
 /-- Interchange law between loop composition and the `S₂`-action on inputs. -/
 theorem loop_action_s2_interchange {A : Type u} {a : A}
     (σ : Symm2) (p q : LoopSpace A a) :
@@ -246,8 +307,11 @@ theorem loop_action_s2_interchange {A : Type u} {a : A}
       (match σ with
        | Symm2.id => AssocOp.act assocTreeBinary (Vec.of2 p q)
        | Symm2.swap => AssocOp.act assocTreeBinary (Vec.of2 q p)) := by
-  cases σ <;> simp [Symm2.actVec2, assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2,
-    LoopSpace.comp]
+  cases σ
+  · simpa [Symm2.actVec2, assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split,
+      LoopSpace.comp] using (RwEq.refl (AssocOp.act assocTreeBinary (Vec.of2 p q)))
+  · simpa [Symm2.actVec2, assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split,
+      LoopSpace.comp] using (RwEq.refl (AssocOp.act assocTreeBinary (Vec.of2 q p)))
 
 /-! ## Associahedron Coherence -/
 

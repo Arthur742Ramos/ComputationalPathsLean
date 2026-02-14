@@ -124,6 +124,24 @@ end ThreeCell
     comp (comp η₁ η₂) η₃ = comp η₁ (comp η₂ η₃) :=
   vcomp_assoc_eq (A := A) (a := a) (b := b) η₁ η₂ η₃
 
+/-- Vertical composition is functorial in the first variable. -/
+@[simp] theorem vcomp_functorial_left_eq {p q r : Path a b}
+    {η₁ η₂ : TwoCell (A := A) (a := a) (b := b) p q}
+    (θ : TwoCell (A := A) (a := a) (b := b) q r)
+    (hη : η₁ = η₂) :
+    comp η₁ θ = comp η₂ θ := by
+  cases hη
+  rfl
+
+/-- Vertical composition is functorial in the second variable. -/
+@[simp] theorem vcomp_functorial_right_eq {p q r : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q)
+    {θ₁ θ₂ : TwoCell (A := A) (a := a) (b := b) q r}
+    (hθ : θ₁ = θ₂) :
+    comp η θ₁ = comp η θ₂ := by
+  cases hθ
+  rfl
+
 /-- Left whiskering: precompose a 2-cell with a fixed 1-cell. -/
 @[simp] def whiskerLeft (f : Path a b) {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
@@ -220,6 +238,28 @@ composition on both sides. -/
     hcomp (A := A) (a := a) (b := b) (c := c)
       η (comp (A := A) (a := b) (b := c) θ₁ θ₂) := by
   apply Subsingleton.elim
+
+/-- Horizontal composition is functorial in the first variable as equality. -/
+@[simp] theorem hcomp_functorial_left_of_eq
+    {f₀ f₁ : Path a b} {g₀ g₁ : Path b c}
+    {η₁ η₂ : TwoCell (A := A) (a := a) (b := b) f₀ f₁}
+    (θ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (hη : η₁ = η₂) :
+    hcomp (A := A) (a := a) (b := b) (c := c) η₁ θ =
+      hcomp (A := A) (a := a) (b := b) (c := c) η₂ θ := by
+  cases hη
+  rfl
+
+/-- Horizontal composition is functorial in the second variable as equality. -/
+@[simp] theorem hcomp_functorial_right_of_eq
+    {f₀ f₁ : Path a b} {g₀ g₁ : Path b c}
+    (η : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    {θ₁ θ₂ : TwoCell (A := A) (a := b) (b := c) g₀ g₁}
+    (hθ : θ₁ = θ₂) :
+    hcomp (A := A) (a := a) (b := b) (c := c) η θ₁ =
+      hcomp (A := A) (a := a) (b := b) (c := c) η θ₂ := by
+  cases hθ
+  rfl
 
 /-- Associator 2-cell witnessing `((hg)f) ⇒ (h(gf))`. -/
 @[simp] def assoc (p : Path a b) (q : Path b c) (r : Path c d) :
@@ -404,6 +444,38 @@ horizontal composition of vertical composites. -/
         (comp (A := A) (a := b) (b := c) θ₁ θ₂) := by
   apply Subsingleton.elim
 
+/-- Interchange in canonical form: `interchange` equals horizontal composition
+of vertical composites. -/
+@[simp] theorem interchange_eq_hcomp_vcomp
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    interchange (A := A) (a := a) (b := b) (c := c)
+        (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂) =
+      hcomp (A := A) (a := a) (b := b) (c := c)
+        (comp (A := A) (a := a) (b := b) η₁ η₂)
+        (comp (A := A) (a := b) (b := c) θ₁ θ₂) := by
+  simpa [interchange] using
+    (interchange_law (A := A) (a := a) (b := b) (c := c) η₁ η₂ θ₁ θ₂)
+
+/-- The alternative interchange composite equals the vertical composite of
+horizontal composites. -/
+@[simp] theorem interchange'_eq_vcomp_hcomp
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    interchange' (A := A) (a := a) (b := b) (c := c)
+        (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂) =
+      comp
+        (hcomp (A := A) (a := a) (b := b) (c := c) η₁ θ₁)
+        (hcomp (A := A) (a := a) (b := b) (c := c) η₂ θ₂) := by
+  simpa [interchange'] using
+    (interchange_law (A := A) (a := a) (b := b) (c := c) η₁ η₂ θ₁ θ₂).symm
+
 /-- Explicit pentagon coherence as a canonical 2-cell. -/
 @[simp] theorem pentagon_coherence_two_cell
     {a b c d e : A}
@@ -436,20 +508,66 @@ horizontal composition of vertical composites. -/
     (r : Path c d) (s : Path d e) :
     ThreeCell (A := A) (a := a) (b := e)
       (pentagonLeftRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s)
-      (pentagonRightRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s) := by
-  exact ThreeCell.ofEq
-    (pentagon_left_route_eq_right_route (A := A)
-      (a := a) (b := b) (c := c) (d := d) (e := e) p q r s)
+      (pentagonRightRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s) :=
+  Path.stepChain
+    (_root_.congrArg PLift.up
+      (pentagon_left_route_eq_right_route (A := A)
+        (a := a) (b := b) (c := c) (d := d) (e := e) p q r s))
 
 /-- Triangle coherence promoted to a computational-path 3-cell. -/
 @[simp] def triangleCoherence
     {a b c : A} (p : Path a b) (q : Path b c) :
     ThreeCell (A := A) (a := a) (b := c)
       (triangleLeftRoute (A := A) (a := a) (b := b) (c := c) p q)
-      (triangleRightRoute (A := A) (a := a) (b := b) (c := c) p q) := by
-  exact ThreeCell.ofEq
-    (triangle_left_route_eq_right_route (A := A)
-      (a := a) (b := b) (c := c) p q)
+      (triangleRightRoute (A := A) (a := a) (b := b) (c := c) p q) :=
+  Path.stepChain
+    (_root_.congrArg PLift.up
+      (triangle_left_route_eq_right_route (A := A)
+        (a := a) (b := b) (c := c) p q))
+
+/-- The pentagon 3-cell is exactly the lifted route-equality step chain. -/
+@[simp] theorem pentagonCoherence_toEq
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c)
+    (r : Path c d) (s : Path d e) :
+    Path.toEq (pentagonCoherence (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s) =
+      _root_.congrArg PLift.up
+        (pentagon_left_route_eq_right_route (A := A)
+          (a := a) (b := b) (c := c) (d := d) (e := e) p q r s) := by
+  rfl
+
+/-- The triangle 3-cell is exactly the lifted route-equality step chain. -/
+@[simp] theorem triangleCoherence_toEq
+    {a b c : A} (p : Path a b) (q : Path b c) :
+    Path.toEq (triangleCoherence (A := A) (a := a) (b := b) (c := c) p q) =
+      _root_.congrArg PLift.up
+        (triangle_left_route_eq_right_route (A := A)
+          (a := a) (b := b) (c := c) p q) := by
+  rfl
+
+/-- Pentagon coherence is left-unital under 3-cell composition. -/
+@[simp] theorem pentagonCoherence_comp_left_refl
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c)
+    (r : Path c d) (s : Path d e) :
+    CellPath.comp
+      (CellPath.refl
+        (pentagonLeftRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s))
+      (pentagonCoherence (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s) =
+    pentagonCoherence (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s := by
+  simp [CellPath.comp, CellPath.refl]
+
+/-- Pentagon coherence is right-unital under 3-cell composition. -/
+@[simp] theorem pentagonCoherence_comp_right_refl
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c)
+    (r : Path c d) (s : Path d e) :
+    CellPath.comp
+      (pentagonCoherence (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s)
+      (CellPath.refl
+        (pentagonRightRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s)) =
+    pentagonCoherence (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s := by
+  simp [CellPath.comp, CellPath.refl]
 
 /-- The two standard ways of composing four 2-cells coincide.  Since
 `TwoCell` values live in `Prop`, the equality follows from proof

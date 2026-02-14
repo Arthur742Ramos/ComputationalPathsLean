@@ -202,7 +202,7 @@ theorem lifting_property {a b c d : A}
     ModelCategory.trivialCofibration (pathModelCategory A) i →
     (pathModelCategory A).fib p →
     (Path.trans f p).toEq = (Path.trans i g).toEq →
-    ∃ h : Path b c, True := by
+    ∃ _h : Path b c, True := by
   intro _ _ _
   exact ⟨Path.trans (Path.symm i) f, True.intro⟩
 
@@ -210,8 +210,8 @@ theorem lifting_property {a b c d : A}
 theorem retract_weq {a b c d : A}
     (f : Path a b) (g : Path c d)
     (s : Path a c) (r : Path c a) (s' : Path b d) (r' : Path d b)
-    (hs : Rw (Path.trans s r) (Path.refl a))
-    (hs' : Rw (Path.trans s' r') (Path.refl b)) :
+    (_hs : Rw (Path.trans s r) (Path.refl a))
+    (_hs' : Rw (Path.trans s' r') (Path.refl b)) :
     (pathModelCategory A).weq g →
     (pathModelCategory A).weq f := by
   intro _hg
