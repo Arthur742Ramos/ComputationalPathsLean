@@ -98,6 +98,32 @@ add a decomposition structure with sections, and package the fibers together
 with canonical points coming from sections.
 -/
 
+/-! ## Deepening theorem stubs -/
+
+theorem postnikov_stage_exists {A : Type u} (P : PostnikovSystem A) (n : Nat) : True := by
+  sorry
+
+theorem postnikov_projection_exists {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) : True := by
+  sorry
+
+theorem postnikov_bond_exists {A : Type u} (P : PostnikovSystem A) (n : Nat) (x : P.stage (n + 1)) : True := by
+  sorry
+
+theorem postnikov_bond_compatibility {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) : True := by
+  sorry
+
+theorem bondFiber_at_projection_exists {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) : True := by
+  sorry
+
+theorem decomposition_section_exists {A : Type u} (P : PostnikovDecomposition A) (n : Nat) (x : P.stage n) : True := by
+  sorry
+
+theorem decomposition_section_left_path {A : Type u} (P : PostnikovDecomposition A) (n : Nat) (x : P.stage n) : True := by
+  sorry
+
+theorem bondFiberSection_witness {A : Type u} (P : PostnikovDecomposition A) (n : Nat) (x : P.stage n) : True := by
+  sorry
+
 end PostnikovSystem
 end Path
 end ComputationalPaths

@@ -338,3 +338,56 @@ framework.
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+
+theorem stableModule_fieldData_trivial_zero :
+    FieldData.trivial.zero = PUnit.unit := by
+  sorry
+
+theorem stableModule_fieldData_trivial_one :
+    FieldData.trivial.one = PUnit.unit := by
+  sorry
+
+theorem stableModule_fieldData_trivial_add :
+    FieldData.trivial.add PUnit.unit PUnit.unit = PUnit.unit := by
+  sorry
+
+theorem stableModule_stMod_def (k : Type u) (G : Type v)
+    (Fk : FieldData k) (S : StrictGroup G)
+    (A : GroupAlgebra k G Fk S) :
+    StMod k G Fk S A = StableModuleCategory k G Fk S A := by
+  sorry
+
+theorem stableModule_tate_trivial_period (k : Type u) (G : Type v)
+    (Fk : FieldData k) (S : StrictGroup G)
+    (A : GroupAlgebra k G Fk S)
+    (C : StableModuleCategory k G Fk S A) :
+    (TateCohomology.trivial k G Fk S A C).period = 1 := by
+  sorry
+
+theorem stableModule_tate_trivial_zero (k : Type u) (G : Type v)
+    (Fk : FieldData k) (S : StrictGroup G)
+    (A : GroupAlgebra k G Fk S)
+    (C : StableModuleCategory k G Fk S A)
+    (X Y : C.triangulated.cat.Obj) (n : Int) :
+    (TateCohomology.trivial k G Fk S A C).zero X Y n = PUnit.unit := by
+  sorry
+
+theorem stableModule_auslander_trivial_tau (k : Type u) (G : Type v)
+    (Fk : FieldData k) (S : StrictGroup G)
+    (A : GroupAlgebra k G Fk S)
+    (C : StableModuleCategory k G Fk S A)
+    (X : C.triangulated.cat.Obj) :
+    (AuslanderReitenData.trivial k G Fk S A C).tau X = X := by
+  sorry
+
+theorem stableModule_supportVariety_trivial_basepoint (H : CohomologyRing) :
+    (SupportVariety.trivial H).basepoint = PUnit.unit := by
+  sorry
+
+end Algebra
+end Path
+end ComputationalPaths

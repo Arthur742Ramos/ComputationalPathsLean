@@ -162,3 +162,53 @@ end CyclicCohomology
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace CyclicCohomology
+
+theorem cyclicCohomology_cochainZero_apply {A : Type u} (Alg : CyclicAlgebra A)
+    (n : Nat) (x : Fin (n + 1) → A) :
+    cochainZero (Alg := Alg) n x = Alg.zero := by
+  sorry
+
+theorem cyclicCohomology_cochainAdd_apply {A : Type u} (Alg : CyclicAlgebra A)
+    (n : Nat) (f g : CyclicCochain A n) (x : Fin (n + 1) → A) :
+    cochainAdd (Alg := Alg) n f g x = Alg.add (f x) (g x) := by
+  sorry
+
+theorem cyclicCohomology_cochainNeg_apply {A : Type u} (Alg : CyclicAlgebra A)
+    (n : Nat) (f : CyclicCochain A n) (x : Fin (n + 1) → A) :
+    cochainNeg (Alg := Alg) n f x = Alg.neg (f x) := by
+  sorry
+
+theorem cyclicCohomology_cochainPath_refl_apply {A : Type u} (Alg : CyclicAlgebra A)
+    {n : Nat} (f : CyclicCochain A n) (x : Fin (n + 1) → A) :
+    cochainPath_refl (Alg := Alg) f x = Path.refl (f x) := by
+  sorry
+
+theorem cyclicCohomology_iterate_zero {α : Type u} (f : α → α) (x : α) :
+    iterate f 0 x = x := by
+  sorry
+
+theorem cyclicCohomology_iterate_succ {α : Type u} (f : α → α)
+    (n : Nat) (x : α) :
+    iterate f (n + 1) x = iterate f n (f x) := by
+  sorry
+
+theorem cyclicCohomology_b_sq_zero_path_eq {A : Type u} {Alg : CyclicAlgebra A}
+    (C : CyclicComplex A Alg) (n : Nat) (f : CyclicCochain A n) :
+    C.b_sq_zero_path n f = Path.stepChain (C.b_sq_zero n f) := by
+  sorry
+
+theorem cyclicCohomology_quotient_def {A : Type u} (Alg : CyclicAlgebra A)
+    (C : CyclicComplex A Alg) (n : Nat) :
+    CyclicCohomology A Alg C n =
+      Quot (cocycleRel (A := A) (Alg := Alg) (C := C) (n := n)) := by
+  sorry
+
+end CyclicCohomology
+end Algebra
+end Path
+end ComputationalPaths

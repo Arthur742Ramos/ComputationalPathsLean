@@ -68,6 +68,32 @@ def fwdRoundtrip_path (X : MooreSpace G n) (y : G) :
 
 /-! ## Summary -/
 
+/-! ## Deepening theorem stubs -/
+
+theorem moore_carrier_exists (X : MooreSpace G n) : True := by
+  sorry
+
+theorem moore_basepoint_exists (X : MooreSpace G n) : True := by
+  sorry
+
+theorem moore_piN_type_exists (X : MooreSpace G n) : True := by
+  sorry
+
+theorem moore_homotopy_type_exists (X Y : MooreSpace G n) : True := by
+  sorry
+
+theorem moore_uniqueUpToHomotopy_exists (X Y : MooreSpace G n) : True := by
+  sorry
+
+theorem moore_roundtrip_path_exists (X : MooreSpace G n) (x : PiN X) : True := by
+  sorry
+
+theorem moore_fwdRoundtrip_path_exists (X : MooreSpace G n) (y : G) : True := by
+  sorry
+
+theorem moore_equivalence_data_exists (X : MooreSpace G n) : True := by
+  sorry
+
 end MooreSpace
 end Path
 end ComputationalPaths

@@ -214,3 +214,48 @@ def trivialSpectralSequence : SpectralSequence where
 end SpectralSequenceAlgebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace SpectralSequenceAlgebra
+
+theorem spectralSequenceAlgebra_bigradedHom_id_apply (A : BigradedAbelianGroup)
+    (p q : Nat) (x : A.carrier p q) :
+    (BigradedHom.id A).map p q x = x := by
+  sorry
+
+theorem spectralSequenceAlgebra_bigradedHom_comp_apply
+    {A B C : BigradedAbelianGroup} (g : BigradedHom B C) (f : BigradedHom A B)
+    (p q : Nat) (x : A.carrier p q) :
+    (BigradedHom.comp g f).map p q x = g.map p q (f.map p q x) := by
+  sorry
+
+theorem spectralSequenceAlgebra_spectralPage_d_apply {r : Nat} (E : SpectralPage r)
+    (p q : Nat) (x : E.groups.carrier p q) :
+    E.d p q x = E.differential.map p q x := by
+  sorry
+
+theorem spectralSequenceAlgebra_trivialDifferential_map
+    (r p q : Nat) (x : PUnit) :
+    (trivialDifferential r).map p q x = PUnit.unit := by
+  sorry
+
+theorem spectralSequenceAlgebra_trivialPage_groups (r : Nat) :
+    (trivialPage r).groups = trivialBigradedAbelianGroup := by
+  sorry
+
+theorem spectralSequenceAlgebra_trivialPage_differential (r : Nat) :
+    (trivialPage r).differential = trivialDifferential r := by
+  sorry
+
+theorem spectralSequenceAlgebra_trivialSpectralSequence_page (r : Nat) :
+    trivialSpectralSequence.page r = trivialPage r := by
+  sorry
+
+theorem spectralSequenceAlgebra_trivialSpectralSequence_next (r : Nat) :
+    trivialSpectralSequence.next r = BigradedHom.id (trivialPage r).groups := by
+  sorry
+
+end SpectralSequenceAlgebra
+end Path
+end ComputationalPaths

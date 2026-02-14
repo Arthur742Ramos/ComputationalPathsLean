@@ -179,3 +179,56 @@ Path-valued transformation laws, q-expansions, and Hecke operators.
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+
+theorem modularFormsPaths_modularST_def :
+    modularST = ModularWord.mul ModularWord.S ModularWord.T := by
+  sorry
+
+theorem modularFormsPaths_modularSTCube_def :
+    modularSTCube = ModularWord.mul (ModularWord.mul modularST modularST) modularST := by
+  sorry
+
+theorem modularFormsPaths_step_mul_one_left (w : ModularWord) :
+    ModularStep (ModularWord.mul ModularWord.one w) w := by
+  sorry
+
+theorem modularFormsPaths_modularForm_step_def {H : Type u} {R : Type v}
+    {data : ModularData H R} {k : Nat}
+    (f : ModularForm data k) {w w'} (h : ModularStep w w') (z : H) :
+    modularForm_step f h z = Path.congrArg f.toFun (data.action.act_step h z) := by
+  sorry
+
+theorem modularFormsPaths_qExpansion_def {H : Type u} {R : Type v}
+    (qmap : QExpansionMap H R)
+    {data : ModularData H R} {k : Nat}
+    (f : ModularForm data k) :
+    qExpansion qmap f = qmap.qexp f.toFun := by
+  sorry
+
+theorem modularFormsPaths_qExpansion_congr_def {H : Type u} {R : Type v}
+    (qmap : QExpansionMap H R)
+    {data : ModularData H R} {k : Nat}
+    {f g : ModularForm data k}
+    (h : ∀ z, Path (f.toFun z) (g.toFun z)) :
+    qExpansion_congr qmap h = qmap.qexp_congr h := by
+  sorry
+
+theorem modularFormsPaths_constantTerm_def {R : Type u}
+    (q : QExpansion R) :
+    constantTerm q = q 0 := by
+  sorry
+
+theorem modularFormsPaths_hecke_comm_def {H : Type u} {R : Type v}
+    {data : ModularData H R} {k : Nat}
+    (ops : HeckeOperators data k)
+    (m n : Nat) (f : ModularForm data k) :
+    hecke_comm ops m n f = ops.commutes m n f := by
+  sorry
+
+end Algebra
+end Path
+end ComputationalPaths

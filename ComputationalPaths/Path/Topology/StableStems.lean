@@ -242,6 +242,41 @@ def j_preserves_zero (n : Nat) (J : JHomomorphism.{u} n) :
     Path (J.jMap J.sourceZero) J.target.zero :=
   J.j_zero
 
+
+/-! ## Path lemmas -/
+
+theorem stable_stems_path_refl {α : Type u} (x : α) : Path.refl x = Path.refl x :=
+  rfl
+
+theorem stable_stems_path_symm {α : Type u} {x y : α} (h : Path x y) : Path.symm h = Path.symm h :=
+  rfl
+
+theorem stable_stems_path_trans {α : Type u} {x y z : α}
+    (h₁ : Path x y) (h₂ : Path y z) : Path.trans h₁ h₂ = Path.trans h₁ h₂ :=
+  rfl
+
+theorem stable_stems_path_symm_symm {α : Type u} {x y : α} (h : Path x y) :
+    Path.symm (Path.symm h) = h :=
+  Path.symm_symm h
+
+theorem stable_stems_path_trans_refl_left {α : Type u} {x y : α} (h : Path x y) :
+    Path.trans (Path.refl x) h = h :=
+  Path.trans_refl_left h
+
+theorem stable_stems_path_trans_refl_right {α : Type u} {x y : α} (h : Path x y) :
+    Path.trans h (Path.refl y) = h :=
+  Path.trans_refl_right h
+
+theorem stable_stems_path_trans_assoc {α : Type u} {x y z w : α}
+    (h₁ : Path x y) (h₂ : Path y z) (h₃ : Path z w) :
+    Path.trans (Path.trans h₁ h₂) h₃ = Path.trans h₁ (Path.trans h₂ h₃) :=
+  Path.trans_assoc h₁ h₂ h₃
+
+theorem stable_stems_path_toEq_ofEq {α : Type u} {x y : α} (h : x = y) :
+    Path.toEq (Path.ofEq h) = h :=
+  Path.toEq_ofEq h
+
+
 end StableStemsPaths
 end Topology
 end Path

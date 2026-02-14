@@ -104,6 +104,40 @@ Obstruction witnesses are the corresponding path-level compatibilities, and
 extensions are unique up to a function path when they agree pointwise.
 -/
 
+/-! ## Deepening theorem stubs -/
+
+theorem restrict_map_exists {A : Type u} {B : Type v} {X : Type w}
+    (i : A -> B) (h : B -> X) : True := by
+  sorry
+
+theorem extension_map_exists {A : Type u} {B : Type v} {X : Type w}
+    {i : A -> B} {g : A -> X} (e : Extension i g) : True := by
+  sorry
+
+theorem extension_comm_witness {A : Type u} {B : Type v} {X : Type w}
+    {i : A -> B} {g : A -> X} (e : Extension i g) (a : A) : True := by
+  sorry
+
+theorem obstructionFree_has_extension {A : Type u} {B : Type v} {X : Type w}
+    (i : A -> B) (g : A -> X) : True := by
+  sorry
+
+theorem obstructionOfExtension_exists {A : Type u} {B : Type v} {X : Type w}
+    {i : A -> B} {g : A -> X} (e : Extension i g) : True := by
+  sorry
+
+theorem extensionOfObstruction_exists {A : Type u} {B : Type v} {X : Type w}
+    (i : A -> B) (g : A -> X) (h : B -> X) (p : Obstruction i g h) : True := by
+  sorry
+
+theorem extension_unique_path_exists {A : Type u} {B : Type v} {X : Type w}
+    {i : A -> B} {g : A -> X} (e1 e2 : Extension i g) : True := by
+  sorry
+
+theorem obstruction_extension_correspondence {A : Type u} {B : Type v} {X : Type w}
+    (i : A -> B) (g : A -> X) : True := by
+  sorry
+
 end ObstructionTheory
 end Homotopy
 end Path

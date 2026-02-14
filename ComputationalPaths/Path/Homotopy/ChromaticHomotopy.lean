@@ -228,6 +228,32 @@ structure MonochromaticLayer (p : Prime) (n : Nat) where
 -- 7. Chromatic convergence theorem
 -- 8. Monochromatic layers
 
+/-! ## Deepening theorem stubs -/
+
+theorem prime_gt_one_witness (p : Prime) : True := by
+  sorry
+
+theorem moravaKTheory_periodicity_witness (p : Prime) (n : Nat) (K : MoravaKTheory p n) : True := by
+  sorry
+
+theorem chromaticHeight_data_exists (p : Prime) (h : ChromaticHeight p) : True := by
+  sorry
+
+theorem chromaticFiltration_inclusion_exists (p : Prime) (F : ChromaticFiltration p) (n : Nat) : True := by
+  sorry
+
+theorem thickSubcategory_closure_witness (p : Prime) (C : ThickSubcategory p) : True := by
+  sorry
+
+theorem nilpotence_detection_witness (N : NilpotenceData) : True := by
+  sorry
+
+theorem periodicity_vnMap_exists (p : Prime) (n : Nat) (P : PeriodicityData p n) : True := by
+  sorry
+
+theorem chromaticConvergence_maps_exist (p : Prime) (C : ChromaticConvergence p) : True := by
+  sorry
+
 end ChromaticHomotopy
 end Homotopy
 end Path

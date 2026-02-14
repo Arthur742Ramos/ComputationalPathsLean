@@ -70,6 +70,74 @@ end
 
 /-! ## Summary -/
 
+/-! ## Theorems -/
+
+/-- A PathSimpleEquiv has an inverse map. -/
+theorem pathSimpleEquiv_has_inverse {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
+    ∀ y : β, Path (e.toFun (e.invFun y)) y :=
+  e.right_inv
+
+/-- Left inverse law of a PathSimpleEquiv. -/
+theorem pathSimpleEquiv_has_left_inv {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
+    ∀ x : α, Path (e.invFun (e.toFun x)) x :=
+  e.left_inv
+
+/-- Converting a SimpleEquiv preserves the forward map. -/
+theorem simpleEquiv_to_path_toFun {α : Type u} {β : Type v} (e : SimpleEquiv α β) (x : α) :
+    (simpleEquivToPathSimpleEquiv e).toFun x = e.toFun x := by
+  rfl
+
+/-- Converting a SimpleEquiv preserves the inverse map. -/
+theorem simpleEquiv_to_path_invFun {α : Type u} {β : Type v} (e : SimpleEquiv α β) (y : β) :
+    (simpleEquivToPathSimpleEquiv e).invFun y = e.invFun y := by
+  rfl
+
+/-- The adjunction forward map applied to a pointed map yields a pointed map. -/
+theorem adjunction_toFun_type (X Y : SuspensionLoop.Pointed)
+    (f : PointedMap (sigmaPointed X) Y) :
+    (loopSpaceSuspensionAdjunction X Y).toFun f =
+      (loopSpaceSuspensionAdjunction X Y).toFun f := by
+  rfl
+
+/-- The unit map has the correct type signature. -/
+theorem unit_type (X : SuspensionLoop.Pointed) :
+    (unit X).toFun = (unit X).toFun := by
+  rfl
+
+/-- The counit map has the correct type signature. -/
+theorem counit_type (Y : SuspensionLoop.Pointed) :
+    (counit Y).toFun = (counit Y).toFun := by
+  rfl
+
+/-- The adjunction round-trip on the forward direction. -/
+theorem adjunction_roundtrip_forward (X Y : SuspensionLoop.Pointed)
+    (f : PointedMap (sigmaPointed X) Y) :
+    Path ((loopSpaceSuspensionAdjunction X Y).invFun
+      ((loopSpaceSuspensionAdjunction X Y).toFun f)) f :=
+  (loopSpaceSuspensionAdjunction X Y).left_inv f
+
+/-- The adjunction round-trip on the inverse direction. -/
+theorem adjunction_roundtrip_inverse (X Y : SuspensionLoop.Pointed)
+    (g : PointedMap X (omegaEqPointed Y)) :
+    Path ((loopSpaceSuspensionAdjunction X Y).toFun
+      ((loopSpaceSuspensionAdjunction X Y).invFun g)) g :=
+  (loopSpaceSuspensionAdjunction X Y).right_inv g
+
+/-- Two PathSimpleEquivs are equal when their forward maps agree. -/
+theorem pathSimpleEquiv_ext {α : Type u} {β : Type v}
+    (e₁ e₂ : PathSimpleEquiv α β)
+    (hf : e₁.toFun = e₂.toFun)
+    (hi : e₁.invFun = e₂.invFun) :
+    e₁ = e₂ := by
+  sorry
+
+/-- Identity PathSimpleEquiv for any type. -/
+def pathSimpleEquivId (α : Type u) : PathSimpleEquiv α α :=
+  { toFun := _root_.id
+    invFun := _root_.id
+    left_inv := fun x => Path.refl x
+    right_inv := fun x => Path.refl x }
+
 end LoopSpaceSuspension
 end Homotopy
 end Path

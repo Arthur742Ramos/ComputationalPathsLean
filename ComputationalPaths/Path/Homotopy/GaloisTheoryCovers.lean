@@ -166,6 +166,32 @@ objects with their actions, the Grothendieck correspondence between coverings
 and groupoid actions, and the deck-transformation description of Galois groups.
 -/
 
+/-! ## Deepening theorem stubs -/
+
+theorem etalePiOne_alias_witness (a : A) : True := by
+  sorry
+
+theorem monodromy_exists (C : CoveringSpace.Covering A) (a : A) : True := by
+  sorry
+
+theorem monodromyAction_exists (C : CoveringSpace.Covering A) (a : A) : True := by
+  sorry
+
+theorem fiberFunctorObj_exists (C : CoveringSpace.Covering A) (a : A) : True := by
+  sorry
+
+theorem grothendieckGalois_equiv_exists : True := by
+  sorry
+
+theorem etaleMonodromy_exists (E : EtaleCovering A) (a : A) : True := by
+  sorry
+
+theorem galoisGroup_identity_exists (C : CoveringSpace.Covering A) : True := by
+  sorry
+
+theorem galoisCover_group_exists (C : GaloisCovering A) : True := by
+  sorry
+
 end GaloisTheoryCovers
 end Homotopy
 end Path

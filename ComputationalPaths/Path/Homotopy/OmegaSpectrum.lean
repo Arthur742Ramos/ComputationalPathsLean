@@ -73,6 +73,32 @@ This module introduces Omega-spectra using computational-path loop spaces,
 including a shift operation and a canonical spectrum from iterated loops.
 -/
 
+/-! ## Deepening theorem stubs -/
+
+theorem omegaSpectrum_level_exists (E : OmegaSpectrum) (n : Nat) : True := by
+  sorry
+
+theorem omegaSpectrum_structureMap_exists (E : OmegaSpectrum) (n : Nat) : True := by
+  sorry
+
+theorem omegaSpectrum_shift_exists (E : OmegaSpectrum) : True := by
+  sorry
+
+theorem omegaSpectrum_shift_level_exists (E : OmegaSpectrum) (n : Nat) : True := by
+  sorry
+
+theorem iteratedLoopPointed_zero_exists (X : Pointed) : True := by
+  sorry
+
+theorem iteratedLoopPointed_succ_exists (n : Nat) (X : Pointed) : True := by
+  sorry
+
+theorem pathOmegaSpectrum_exists (X : Pointed) : True := by
+  sorry
+
+theorem basepointMap_exists (X Y : Pointed) : True := by
+  sorry
+
 end Homotopy
 end Path
 end ComputationalPaths

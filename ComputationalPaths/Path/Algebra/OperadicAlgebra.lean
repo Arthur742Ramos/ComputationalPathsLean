@@ -196,3 +196,54 @@ end OperadicAlgebra
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace OperadicAlgebra
+
+theorem operadicAlgebra_trivialAlg_carrier
+    (O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad) :
+    (AlgOverOperad.trivial O).carrier = Unit := by
+  sorry
+
+theorem operadicAlgebra_trivialAlg_act
+    (O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad)
+    {n : Nat} (θ : O.ops n) (xs : Fin n → (AlgOverOperad.trivial O).carrier) :
+    (AlgOverOperad.trivial O).act θ xs = () := by
+  sorry
+
+theorem operadicAlgebra_associahedraOperad_unit_fixed :
+    associahedraOperad.unit = associahedraOperad.unit := by
+  sorry
+
+theorem operadicAlgebra_trivialEInfOperad_unit :
+    trivialEInfOperad.unit = () := by
+  sorry
+
+theorem operadicAlgebra_trivialEInfAlgebra_operad :
+    trivialEInfAlgebra.operad = trivialEInfOperad := by
+  sorry
+
+theorem operadicAlgebra_operadAlgMorphism_id_apply
+    {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
+    (A : AlgOverOperad O) (x : A.carrier) :
+    (OperadAlgMorphism.id A).toFun x = x := by
+  sorry
+
+theorem operadicAlgebra_operadAlgMorphism_comp_apply
+    {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
+    {A B C : AlgOverOperad O} (g : OperadAlgMorphism B C)
+    (f : OperadAlgMorphism A B) (x : A.carrier) :
+    (OperadAlgMorphism.comp g f).toFun x = g.toFun (f.toFun x) := by
+  sorry
+
+theorem operadicAlgebra_formality_d_zero (C : ChainData) (F : Formality C)
+    (n : Nat) (x : F.cohomologyChain.obj (n + 1)) :
+    F.cohomologyChain.d n x = F.cohomologyChain.zero n := by
+  sorry
+
+end OperadicAlgebra
+end Algebra
+end Path
+end ComputationalPaths

@@ -219,3 +219,57 @@ end MilnorKTheory
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace MilnorKTheory
+
+theorem milnorKTheory_oneMinus_spec {k : Type u}
+    (F : FieldUnits k) (a : k) :
+    F.add a (F.oneMinusFun a) = F.fieldOne := by
+  sorry
+
+theorem milnorKTheory_steinberg_trivial {k : Type u}
+    (F : FieldUnits k) (n : Nat) (K : KMilnor k F n)
+    (s : MilnorSymbol k n) (i j : Fin n)
+    (hij : i ≠ j) (h : F.add (s i) (s j) = F.fieldOne) :
+    Path (K.symbolMap s) K.grp.one := by
+  sorry
+
+theorem milnorKTheory_kMilnor0_left_inv {k : Type u}
+    (F : FieldUnits k) (I : KMilnor0Iso k F) (x : I.km0.carrier) :
+    I.backward (I.forward x) = x := by
+  sorry
+
+theorem milnorKTheory_kMilnor0_right_inv {k : Type u}
+    (F : FieldUnits k) (I : KMilnor0Iso k F) (y : I.intType) :
+    I.forward (I.backward y) = y := by
+  sorry
+
+theorem milnorKTheory_kMilnor1_left_inv {k : Type u}
+    (F : FieldUnits k) (I : KMilnor1Iso k F) (x : I.km1.carrier) :
+    I.backward (I.forward x) = x := by
+  sorry
+
+theorem milnorKTheory_matsumoto_left_inv {k : Type u}
+    (F : FieldUnits k) (M : MatsumotoTheorem k F) (x : M.milnorK2.carrier) :
+    M.inverse (M.compare x) = x := by
+  sorry
+
+theorem milnorKTheory_blochKato_left_inv {k : Type u}
+    (F : FieldUnits k) (n l : Nat)
+    (bk : BlochKatoTheorem k F n l) (x : bk.nr.modl) :
+    bk.inverse (bk.nr.normRes x) = x := by
+  sorry
+
+theorem milnorKTheory_bloch_kato_witness_apply {k : Type u}
+    (F : FieldUnits k) (n l : Nat)
+    (bk : BlochKatoTheorem k F n l) (x : bk.nr.modl) :
+    bloch_kato_witness k F n l bk x = bk.left_inv x := by
+  sorry
+
+end MilnorKTheory
+end Algebra
+end Path
+end ComputationalPaths

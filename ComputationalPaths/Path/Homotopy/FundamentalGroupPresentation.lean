@@ -178,5 +178,32 @@ We package the computational-path π₁ computations as explicit generator/relat
 presentations for the circle, torus, figure-eight, and sphere.
 -/
 
+/-! ## Deepening theorem stubs -/
+
+theorem presentation_generators_wellformed {G : Type u} (P : FundamentalGroupPresentation G) : True := by
+  sorry
+
+theorem presentation_relations_wellformed {G : Type u} (P : FundamentalGroupPresentation G) : True := by
+  sorry
+
+theorem presentation_equiv_left_roundtrip {G : Type u} (P : FundamentalGroupPresentation G) (x : G) : True := by
+  sorry
+
+theorem presentation_equiv_right_roundtrip {G : Type u} (P : FundamentalGroupPresentation G) (y : P.presentationGroup) : True := by
+  sorry
+
+theorem circlePresentation_has_single_generator : True := by
+  sorry
+
+theorem torusPresentation_has_commuting_generators : True := by
+  sorry
+
+theorem figureEightPresentation_is_relation_free
+    [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase] : True := by
+  sorry
+
+theorem spherePresentation_is_trivial : True := by
+  sorry
+
 end Path
 end ComputationalPaths

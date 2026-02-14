@@ -195,6 +195,41 @@ structure SheafRestriction {X : TopologicalSpace.{u}}
   /-- Comparison into the original presheaf. -/
   comparison : PresheafMorphism restricted F
 
+
+/-! ## Path lemmas -/
+
+theorem sheafification_paths_path_refl {α : Type u} (x : α) : Path.refl x = Path.refl x :=
+  rfl
+
+theorem sheafification_paths_path_symm {α : Type u} {x y : α} (h : Path x y) : Path.symm h = Path.symm h :=
+  rfl
+
+theorem sheafification_paths_path_trans {α : Type u} {x y z : α}
+    (h₁ : Path x y) (h₂ : Path y z) : Path.trans h₁ h₂ = Path.trans h₁ h₂ :=
+  rfl
+
+theorem sheafification_paths_path_symm_symm {α : Type u} {x y : α} (h : Path x y) :
+    Path.symm (Path.symm h) = h :=
+  Path.symm_symm h
+
+theorem sheafification_paths_path_trans_refl_left {α : Type u} {x y : α} (h : Path x y) :
+    Path.trans (Path.refl x) h = h :=
+  Path.trans_refl_left h
+
+theorem sheafification_paths_path_trans_refl_right {α : Type u} {x y : α} (h : Path x y) :
+    Path.trans h (Path.refl y) = h :=
+  Path.trans_refl_right h
+
+theorem sheafification_paths_path_trans_assoc {α : Type u} {x y z w : α}
+    (h₁ : Path x y) (h₂ : Path y z) (h₃ : Path z w) :
+    Path.trans (Path.trans h₁ h₂) h₃ = Path.trans h₁ (Path.trans h₂ h₃) :=
+  Path.trans_assoc h₁ h₂ h₃
+
+theorem sheafification_paths_path_toEq_ofEq {α : Type u} {x y : α} (h : x = y) :
+    Path.toEq (Path.ofEq h) = h :=
+  Path.toEq_ofEq h
+
+
 end SheafificationPaths
 end Topology
 end Path

@@ -218,3 +218,54 @@ end BassSerrePaths
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace BassSerrePaths
+
+theorem bassSerre_bsFundamentalGroup_def {G : BSGraph}
+    (H : BSGraphOfGroups G) :
+    BSFundamentalGroup H = Quot (BSRel H) := by
+  sorry
+
+theorem bassSerre_bsVertexInclusion_def {G : BSGraph}
+    {H : BSGraphOfGroups G} (v : G.Vertex) (g : H.vertexGroup v) :
+    bsVertexInclusion v g = Quot.mk (BSRel H) [BSLetter.ofVertex v g] := by
+  sorry
+
+theorem bassSerre_bsEdgeInclusion_def {G : BSGraph}
+    {H : BSGraphOfGroups G} (e : G.Edge) :
+    bsEdgeInclusion e = Quot.mk (BSRel H) [BSLetter.ofEdge e] := by
+  sorry
+
+theorem bassSerre_amalgamatedFreeProduct_def
+    (G₁ G₂ H : Type u) (i₁ : H → G₁) (i₂ : H → G₂) :
+    AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ =
+      CompPath.AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ := by
+  sorry
+
+theorem bassSerre_hnnExtension_def {G : Type u} (D : HNNData G) :
+    HNNExtension D = Quot (HNNRel D) := by
+  sorry
+
+theorem bassSerre_tree_vertex_def (T : BSTree) :
+    T.Vertex = T.graph.Vertex := by
+  sorry
+
+theorem bassSerre_tree_edge_def (T : BSTree) :
+    T.Edge = T.graph.Edge := by
+  sorry
+
+theorem bassSerre_bsEdgeIdentLoop_def {G : BSGraph}
+    (H : BSGraphOfGroups G) (e : G.Edge) (h : H.edgeGroup e)
+    (pre suf : BSWord G H.vertexGroup) :
+    bsEdgeIdentLoop H e h pre suf =
+      Path.trans (bsEdgeIdentPath H e h pre suf)
+        (Path.symm (bsEdgeIdentPath H e h pre suf)) := by
+  sorry
+
+end BassSerrePaths
+end Algebra
+end Path
+end ComputationalPaths

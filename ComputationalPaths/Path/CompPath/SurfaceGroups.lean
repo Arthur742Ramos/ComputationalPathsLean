@@ -186,3 +186,44 @@ def mobiusBandSurface : SurfaceData where
 end CompPath
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace CompPath
+
+theorem surfaceGroups_boundary_orientable (genus boundary : Nat) :
+    SurfaceClass.boundary (SurfaceClass.orientable genus boundary) = boundary := by
+  sorry
+
+theorem surfaceGroups_boundary_nonorientable (crosscaps boundary : Nat) :
+    SurfaceClass.boundary (SurfaceClass.nonorientable crosscaps boundary) = boundary := by
+  sorry
+
+theorem surfaceGroups_isOrientable_orientable (genus boundary : Nat) :
+    SurfaceClass.isOrientable (SurfaceClass.orientable genus boundary) = true := by
+  sorry
+
+theorem surfaceGroups_isOrientable_nonorientable (crosscaps boundary : Nat) :
+    SurfaceClass.isOrientable (SurfaceClass.nonorientable crosscaps boundary) = false := by
+  sorry
+
+theorem surfaceGroups_mappingClassComp_id_left (S : SurfaceData) (f : MappingClass S) :
+    mappingClassComp (mappingClassId S) f = f := by
+  sorry
+
+theorem surfaceGroups_mappingClassComp_id_right (S : SurfaceData) (f : MappingClass S) :
+    mappingClassComp f (mappingClassId S) = f := by
+  sorry
+
+theorem surfaceGroups_mappingClassInv_involutive (S : SurfaceData) (f : MappingClass S) :
+    mappingClassInv (mappingClassInv f) = f := by
+  sorry
+
+theorem surfaceGroups_dehnTwistPow_zero (S : SurfaceData) (D : DehnTwistData S)
+    (c : SurfaceCurve S) :
+    dehnTwistPow S D c 0 = mappingClassId S := by
+  sorry
+
+end CompPath
+end Path
+end ComputationalPaths

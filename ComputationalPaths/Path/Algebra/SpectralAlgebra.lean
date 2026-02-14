@@ -228,3 +228,48 @@ end SpectralAlgebra
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace SpectralAlgebra
+
+theorem spectralAlgebra_toAInfinity_spectrum (R : EInfinityRingSpectrum) :
+    (R.toAInfinity).spectrum = R.spectrum := by
+  sorry
+
+theorem spectralAlgebra_toAInfinity_mul (R : EInfinityRingSpectrum) :
+    (R.toAInfinity).mul = R.mul := by
+  sorry
+
+theorem spectralAlgebra_freeModule_spectrum (R : StructuredRingSpectrum) :
+    (R.freeModule).spectrum = R.spectrum := by
+  sorry
+
+theorem spectralAlgebra_freeModule_act (R : StructuredRingSpectrum) :
+    (R.freeModule).act = R.mul := by
+  sorry
+
+theorem spectralAlgebra_moduleMap_id_apply {R : StructuredRingSpectrum}
+    (M : SpectrumModule R) (n : Nat) (x : M.spectrum.level n) :
+    (ModuleMap.id M).map n x = x := by
+  sorry
+
+theorem spectralAlgebra_dyerLashof_identity_degree (R : EInfinityRingSpectrum) :
+    (DyerLashofOperation.identity R).degree = 0 := by
+  sorry
+
+theorem spectralAlgebra_dyerLashof_identity_basepoint (R : EInfinityRingSpectrum)
+    (k : Nat) :
+    (DyerLashofOperation.identity R).Q k (R.spectrum.basepoint k) =
+      R.spectrum.basepoint (k + 0) := by
+  sorry
+
+theorem spectralAlgebra_trivialTHH_dennisTruce :
+    trivialTHH.dennisTruce = True.intro := by
+  sorry
+
+end SpectralAlgebra
+end Algebra
+end Path
+end ComputationalPaths

@@ -192,3 +192,51 @@ end MotivicPaths
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace MotivicPaths
+
+theorem motivicPaths_toPath_source {X Y : Variety}
+    (C : CorrespondenceAsPath X Y) (c : C.corr.carrier) :
+    (C.toPath c).source = C.corr.source c := by
+  sorry
+
+theorem motivicPaths_toPath_target {X Y : Variety}
+    (C : CorrespondenceAsPath X Y) (c : C.corr.carrier) :
+    (C.toPath c).target = C.corr.target c := by
+  sorry
+
+theorem motivicPaths_toPath_witness {X Y : Variety}
+    (C : CorrespondenceAsPath X Y) (c : C.corr.carrier) :
+    (C.toPath c).witness = C.path c := by
+  sorry
+
+theorem motivicPaths_allWeights_weight_le (Obj : Type u)
+    (n : Int) (X : Obj) :
+    (WeightStructure.allWeights Obj).weight_le n X := by
+  sorry
+
+theorem motivicPaths_allWeights_weight_ge (Obj : Type u)
+    (n : Int) (X : Obj) :
+    (WeightStructure.allWeights Obj).weight_ge n X := by
+  sorry
+
+theorem motivicPaths_trivialDecomposition_motive {Obj : Type u} (m : Obj) :
+    (MotivicDecomposition.trivial m).motive = m := by
+  sorry
+
+theorem motivicPaths_tateTwist_zero_path {CM : ChowMotives}
+    (T : TateTwistData CM) (X : CM.obj) :
+    T.zero_path X = T.twist_zero X := by
+  sorry
+
+theorem motivicPaths_realisation_punit_onObj (CM : ChowMotives) (X : CM.obj) :
+    (RealisationFunctor.punit CM).onObj X = PUnit.unit := by
+  sorry
+
+end MotivicPaths
+end Algebra
+end Path
+end ComputationalPaths
