@@ -297,8 +297,7 @@ theorem symm2_act_comp_interchange {A : Type u} {a : A}
       (Symm2.actVec2 (Symm2.comp σ τ) (Vec.of2 p q)))
       (AssocOp.act assocTreeBinary
         (Symm2.actVec2 σ (Symm2.actVec2 τ (Vec.of2 p q)))) := by
-  rw [symm2_act_comp (σ := σ) (τ := τ) (x := p) (y := q)]
-  exact RwEq.refl _
+  cases σ <;> cases τ <;> exact RwEq.refl _
 
 /-- Interchange law between loop composition and the `S₂`-action on inputs. -/
 theorem loop_action_s2_interchange {A : Type u} {a : A}
@@ -312,6 +311,51 @@ theorem loop_action_s2_interchange {A : Type u} {a : A}
       LoopSpace.comp] using (RwEq.refl (AssocOp.act assocTreeBinary (Vec.of2 p q)))
   · simpa [Symm2.actVec2, assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split,
       LoopSpace.comp] using (RwEq.refl (AssocOp.act assocTreeBinary (Vec.of2 q p)))
+
+/-- Operad action distributes over unit operations on binary composition. -/
+theorem loop_action_binary_distribute {A : Type u} {a : A}
+    (p q r : LoopSpace A a) :
+    RwEq (LoopSpace.comp (LoopSpace.comp p q) r)
+      (LoopSpace.comp p (LoopSpace.comp q r)) := by
+  exact Homotopy.LoopSpaceAlgebra.comp_assoc_rweq (A := A) (a := a) p q r
+
+/-- The Stasheff K3 coherence (associativity) is captured by the operad action. -/
+theorem associahedron_k3 {A : Type u} {a : A}
+    (p q r : LoopSpace A a) :
+    RwEq (AssocOp.act assocTreeTripleLeft (Vec.of3 p q r))
+      (AssocOp.act assocTreeTripleRight (Vec.of3 p q r)) :=
+  loop_action_associativity p q r
+
+/-- Grafting unit leaves the binary tree unchanged. -/
+theorem assoc_operad_graft_unit_binary :
+    assocOperad.graft assocTreeBinary
+      (Vec.of2 AssocOp.unit AssocOp.unit) = assocTreeBinary := by
+  rfl
+
+/-- Operad action on singleton vector reduces to the identity map. -/
+theorem loop_action_singleton {A : Type u} {a : A} (p : LoopSpace A a) :
+    AssocOp.act AssocTree.leaf (Vec.singleton p) = p := by
+  rfl
+
+/-- Swap followed by swap on binary operad action returns to original. -/
+theorem loop_action_swap_involutive {A : Type u} {a : A}
+    (p q : LoopSpace A a) :
+    AssocOp.act assocTreeBinary
+      (Symm2.actVec2 Symm2.swap (Symm2.actVec2 Symm2.swap (Vec.of2 p q))) =
+    AssocOp.act assocTreeBinary (Vec.of2 p q) := by
+  rfl
+
+/-- Binary tree has arity 2. -/
+theorem assocTreeBinary_arity : AssocTree.arity assocTreeBinary = 2 := by
+  rfl
+
+/-- Left-associated triple tree has arity 3. -/
+theorem assocTreeTripleLeft_arity : AssocTree.arity assocTreeTripleLeft = 3 := by
+  rfl
+
+/-- Right-associated triple tree has arity 3. -/
+theorem assocTreeTripleRight_arity : AssocTree.arity assocTreeTripleRight = 3 := by
+  rfl
 
 /-! ## Associahedron Coherence -/
 

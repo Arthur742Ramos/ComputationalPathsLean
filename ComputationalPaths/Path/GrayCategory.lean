@@ -176,6 +176,59 @@ def gray_to_tricategory_coherence_triangle (G : GrayCategory (Obj := Obj))
       (TwoCategory.triangleRightRoute G.toTwoCategory f g) :=
   G.trianglePath f g
 
+/-- Gray interchange with left identity is whiskerLeft. -/
+theorem gray_interchange_id_left (G : GrayCategory (Obj := Obj))
+    {a b c : Obj} {f : G.Hom a b} {g₀ g₁ g₂ : G.Hom b c}
+    (θ₁ : G.TwoCell g₀ g₁) (θ₂ : G.TwoCell g₁ g₂) :
+    G.vcomp (G.hcomp (G.id₂ f) θ₁) (G.hcomp (G.id₂ f) θ₂) =
+      G.hcomp (G.id₂ f) (G.vcomp θ₁ θ₂) := by
+  rw [G.interchange (η₁ := G.id₂ f) (η₂ := G.id₂ f) (θ₁ := θ₁) (θ₂ := θ₂)]
+  rw [G.vcomp_left_id]
+
+/-- Gray interchange with right identity is whiskerRight. -/
+theorem gray_interchange_id_right (G : GrayCategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ f₂ : G.Hom a b} {g : G.Hom b c}
+    (η₁ : G.TwoCell f₀ f₁) (η₂ : G.TwoCell f₁ f₂) :
+    G.vcomp (G.hcomp η₁ (G.id₂ g)) (G.hcomp η₂ (G.id₂ g)) =
+      G.hcomp (G.vcomp η₁ η₂) (G.id₂ g) := by
+  rw [G.interchange (η₁ := η₁) (η₂ := η₂) (θ₁ := G.id₂ g) (θ₂ := G.id₂ g)]
+  rw [G.vcomp_left_id]
+
+/-- Gray interchange preserves units on both sides. -/
+theorem gray_interchange_units (G : GrayCategory (Obj := Obj))
+    {a b c : Obj} (f : G.Hom a b) (g : G.Hom b c) :
+    G.vcomp (G.hcomp (G.id₂ f) (G.id₂ g))
+        (G.hcomp (G.id₂ f) (G.id₂ g)) =
+      G.hcomp (G.id₂ f) (G.id₂ g) := by
+  have h := G.interchange (η₁ := G.id₂ f) (η₂ := G.id₂ f)
+    (θ₁ := G.id₂ g) (θ₂ := G.id₂ g)
+  rw [h, G.vcomp_left_id, G.vcomp_left_id]
+
+/-- Tensor naturality: hcomp is natural in both variables. -/
+theorem gray_tensor_naturality (G : GrayCategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ : G.Hom a b} {g₀ g₁ : G.Hom b c}
+    (η : G.TwoCell f₀ f₁) (θ : G.TwoCell g₀ g₁) :
+    G.vcomp (G.whiskerRight g₀ η) (G.whiskerLeft f₁ θ) =
+      G.hcomp η θ := by
+  calc G.vcomp (G.whiskerRight g₀ η) (G.whiskerLeft f₁ θ)
+      = G.vcomp (G.hcomp η (G.id₂ g₀)) (G.hcomp (G.id₂ f₁) θ) := by
+          rw [G.hcomp_id_left, G.hcomp_id_right]
+    _ = G.hcomp η θ := gray_interchange_unit G η θ
+
+/-- Tensor naturality (other direction): whiskerLeft then whiskerRight. -/
+theorem gray_tensor_naturality' (G : GrayCategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ : G.Hom a b} {g₀ g₁ : G.Hom b c}
+    (η : G.TwoCell f₀ f₁) (θ : G.TwoCell g₀ g₁) :
+    G.vcomp (G.whiskerLeft f₀ θ) (G.whiskerRight g₁ η) =
+      G.hcomp η θ := by
+  calc G.vcomp (G.whiskerLeft f₀ θ) (G.whiskerRight g₁ η)
+      = G.vcomp (G.hcomp (G.id₂ f₀) θ) (G.hcomp η (G.id₂ g₁)) := by
+          rw [G.hcomp_id_right, G.hcomp_id_left]
+    _ = G.hcomp (G.vcomp (G.id₂ f₀) η) (G.vcomp θ (G.id₂ g₁)) := by
+          rw [G.interchange]
+    _ = G.hcomp η θ := by
+          rw [G.vcomp_left_id, G.vcomp_right_id]
+
 /-- Gray pentagon data matches the tricategory-facing packaging. -/
 @[simp] theorem gray_to_tricategory_coherence_pentagon_eq
     (G : GrayCategory (Obj := Obj))

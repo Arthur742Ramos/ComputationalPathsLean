@@ -276,6 +276,54 @@ def tricategory_coherence_theorem
   · exact CellPath.ofEq (by
       simp [CellPath.comp])
 
+/-- Tricategory interchange is symmetric with tensor functorial. -/
+@[simp] theorem tricategory_interchange_symmetric
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} {f₀ f₁ f₂ : T.Hom a b} {g₀ g₁ g₂ : T.Hom b c}
+    (η₁ : T.TwoCell f₀ f₁) (η₂ : T.TwoCell f₁ f₂)
+    (θ₁ : T.TwoCell g₀ g₁) (θ₂ : T.TwoCell g₁ g₂) :
+    T.hcomp (T.vcomp η₁ η₂) (T.vcomp θ₁ θ₂) =
+      T.vcomp (T.hcomp η₁ θ₁) (T.hcomp η₂ θ₂) :=
+  GrayCategory.gray_tensor_functorial T.toGrayCategory η₁ η₂ θ₁ θ₂
+
+/-- Tricategory hcomp preserves identity on the left. -/
+@[simp] theorem tricategory_hcomp_id_left
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} {f g : T.Hom a b} (h : T.Hom b c)
+    (η : T.TwoCell f g) :
+    T.hcomp η (T.id₂ h) = T.whiskerRight h η :=
+  T.toGrayCategory.toTwoCategory.hcomp_id_left η
+
+/-- Tricategory hcomp preserves identity on the right. -/
+@[simp] theorem tricategory_hcomp_id_right
+    (T : Tricategory (Obj := Obj))
+    {a b c : Obj} (f : T.Hom a b) {g h : T.Hom b c}
+    (η : T.TwoCell g h) :
+    T.hcomp (T.id₂ f) η = T.whiskerLeft f η :=
+  T.toGrayCategory.toTwoCategory.hcomp_id_right η
+
+/-- Tricategory vertical composition is associative. -/
+@[simp] theorem tricategory_vcomp_assoc
+    (T : Tricategory (Obj := Obj))
+    {a b : Obj} {f g h i : T.Hom a b}
+    (η : T.TwoCell f g) (θ : T.TwoCell g h) (ι : T.TwoCell h i) :
+    T.vcomp (T.vcomp η θ) ι = T.vcomp η (T.vcomp θ ι) :=
+  T.toGrayCategory.toTwoCategory.vcomp_assoc η θ ι
+
+/-- Tricategory vertical composition left unit. -/
+@[simp] theorem tricategory_vcomp_left_id
+    (T : Tricategory (Obj := Obj))
+    {a b : Obj} {f g : T.Hom a b} (η : T.TwoCell f g) :
+    T.vcomp (T.id₂ f) η = η :=
+  T.toGrayCategory.toTwoCategory.vcomp_left_id η
+
+/-- Tricategory vertical composition right unit. -/
+@[simp] theorem tricategory_vcomp_right_id
+    (T : Tricategory (Obj := Obj))
+    {a b : Obj} {f g : T.Hom a b} (η : T.TwoCell f g) :
+    T.vcomp η (T.id₂ g) = η :=
+  T.toGrayCategory.toTwoCategory.vcomp_right_id η
+
 /-- Forgetting tricategorical 4-cells preserves pentagon and triangle coherence data. -/
 @[simp] theorem forgetful_to_grayCategory_preserves_coherence
     (T : Tricategory (Obj := Obj))

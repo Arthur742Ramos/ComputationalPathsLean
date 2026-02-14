@@ -103,6 +103,68 @@ def pathModelCategory (A : Type u) : ModelCategory A where
     · exact True.intro
     · exact rw_of_step (Step.trans_refl_left p)
 
+/-- Step witness for the cofibration-trivial-fibration factorization rewrite. -/
+theorem factorization_cof_triv_fib_step_witness {a b : A} (p : Path a b) :
+    Step ((pathModelCategory A).comp p (Path.refl b)) p := by
+  exact Step.trans_refl_right p
+
+/-- Step witness for the trivial-cofibration-fibration factorization rewrite. -/
+theorem factorization_triv_cof_fib_step_witness {a b : A} (p : Path a b) :
+    Step ((pathModelCategory A).comp (Path.refl a) p) p := by
+  exact Step.trans_refl_left p
+
+/-- Step-level data for cofibration-trivial-fibration factorization. -/
+theorem factorization_cof_triv_fib_step_factorization {a b : A} (p : Path a b) :
+    ∃ (c : A) (i : Path a c) (q : Path c b),
+      (pathModelCategory A).cof i ∧
+      (pathModelCategory A).fib q ∧
+      (pathModelCategory A).weq q ∧
+      Step ((pathModelCategory A).comp i q) p := by
+  refine ⟨b, p, Path.refl b, True.intro, True.intro, ?_, ?_⟩
+  · exact path_is_weak_equivalence (A := A) (p := Path.refl b)
+  · exact factorization_cof_triv_fib_step_witness (A := A) p
+
+/-- Step-level data for trivial-cofibration-fibration factorization. -/
+theorem factorization_triv_cof_fib_step_factorization {a b : A} (p : Path a b) :
+    ∃ (c : A) (i : Path a c) (q : Path c b),
+      (pathModelCategory A).cof i ∧
+      (pathModelCategory A).weq i ∧
+      (pathModelCategory A).fib q ∧
+      Step ((pathModelCategory A).comp i q) p := by
+  refine ⟨a, Path.refl a, p, True.intro, ?_, True.intro, ?_⟩
+  · exact path_is_weak_equivalence (A := A) (p := Path.refl a)
+  · exact factorization_triv_cof_fib_step_witness (A := A) p
+
+/-- The cofibration-trivial-fibration factorization uses a trivial fibration. -/
+theorem factorization_cof_triv_fib_trivial_fibration {a b : A} (p : Path a b) :
+    ∃ (c : A) (i : Path a c) (q : Path c b),
+      (pathModelCategory A).cof i ∧
+      ModelCategory.trivialFibration (pathModelCategory A) q ∧
+      Rw ((pathModelCategory A).comp i q) p := by
+  rcases (pathModelCategory A).factorization_cof_triv_fib p with
+    ⟨c, i, q, hcof, hfib, hweq, hrw⟩
+  exact ⟨c, i, q, hcof, ⟨hfib, hweq⟩, hrw⟩
+
+/-- The trivial-cofibration-fibration factorization uses a trivial cofibration. -/
+theorem factorization_triv_cof_fib_trivial_cofibration {a b : A} (p : Path a b) :
+    ∃ (c : A) (i : Path a c) (q : Path c b),
+      ModelCategory.trivialCofibration (pathModelCategory A) i ∧
+      (pathModelCategory A).fib q ∧
+      Rw ((pathModelCategory A).comp i q) p := by
+  rcases (pathModelCategory A).factorization_triv_cof_fib p with
+    ⟨c, i, q, hcof, hweq, hfib, hrw⟩
+  exact ⟨c, i, q, ⟨hcof, hweq⟩, hfib, hrw⟩
+
+/-- Cofibration-trivial-fibration factorization gives an `Rw` rewrite from its Step witness. -/
+theorem factorization_cof_triv_fib_rw_from_step {a b : A} (p : Path a b) :
+    Rw ((pathModelCategory A).comp p (Path.refl b)) p := by
+  exact rw_of_step (factorization_cof_triv_fib_step_witness (A := A) p)
+
+/-- Trivial-cofibration-fibration factorization gives an `Rw` rewrite from its Step witness. -/
+theorem factorization_triv_cof_fib_rw_from_step {a b : A} (p : Path a b) :
+    Rw ((pathModelCategory A).comp (Path.refl a) p) p := by
+  exact rw_of_step (factorization_triv_cof_fib_step_witness (A := A) p)
+
 /-- Weak equivalences satisfy two-of-three in the path model structure. -/
 theorem weq_two_of_three {a b c : A} (f : Path a b) (g : Path b c) :
     ((pathModelCategory A).weq f ∧ (pathModelCategory A).weq g →
@@ -160,6 +222,53 @@ theorem weq_two_of_three {a b c : A} (f : Path a b) (g : Path b c) :
     · intro _h
       exact path_is_weak_equivalence (A := A) (p := f)
 
+/-- The first two-of-three implication: compositions of weak equivalences are weak equivalences. -/
+theorem weq_two_of_three_comp {a b c : A} (f : Path a b) (g : Path b c) :
+    (pathModelCategory A).weq f →
+    (pathModelCategory A).weq g →
+    (pathModelCategory A).weq ((pathModelCategory A).comp f g) := by
+  intro hf hg
+  exact (weq_two_of_three (A := A) f g).1 ⟨hf, hg⟩
+
+/-- The second two-of-three implication: canceling a weak equivalence on the left. -/
+theorem weq_two_of_three_cancel_left {a b c : A} (f : Path a b) (g : Path b c) :
+    (pathModelCategory A).weq f →
+    (pathModelCategory A).weq ((pathModelCategory A).comp f g) →
+    (pathModelCategory A).weq g := by
+  intro hf hfg
+  exact (weq_two_of_three (A := A) f g).2.1 ⟨hf, hfg⟩
+
+/-- The third two-of-three implication: canceling a weak equivalence on the right. -/
+theorem weq_two_of_three_cancel_right {a b c : A} (f : Path a b) (g : Path b c) :
+    (pathModelCategory A).weq g →
+    (pathModelCategory A).weq ((pathModelCategory A).comp f g) →
+    (pathModelCategory A).weq f := by
+  intro hg hfg
+  exact (weq_two_of_three (A := A) f g).2.2 ⟨hg, hfg⟩
+
+/-- If a composite is a weak equivalence, each factor is weakly equivalent in the path model. -/
+theorem weq_two_of_three_from_composite {a b c : A} (f : Path a b) (g : Path b c) :
+    (pathModelCategory A).weq ((pathModelCategory A).comp f g) →
+    (pathModelCategory A).weq f ∧ (pathModelCategory A).weq g := by
+  intro hfg
+  have hf₀ : (pathModelCategory A).weq f :=
+    path_is_weak_equivalence (A := A) (p := f)
+  have hg : (pathModelCategory A).weq g :=
+    weq_two_of_three_cancel_left (A := A) f g hf₀ hfg
+  have hf : (pathModelCategory A).weq f :=
+    weq_two_of_three_cancel_right (A := A) f g hg hfg
+  exact ⟨hf, hg⟩
+
+/-- Two-of-three packaged as an iff with the composite. -/
+theorem weq_comp_iff_factors_weq {a b c : A} (f : Path a b) (g : Path b c) :
+    (pathModelCategory A).weq ((pathModelCategory A).comp f g) ↔
+      ((pathModelCategory A).weq f ∧ (pathModelCategory A).weq g) := by
+  constructor
+  · intro hfg
+    exact weq_two_of_three_from_composite (A := A) f g hfg
+  · intro hfg
+    exact weq_two_of_three_comp (A := A) f g hfg.1 hfg.2
+
 /-- Identities are weak equivalences in the path model structure. -/
 theorem weq_refl (a : A) :
     (pathModelCategory A).weq (Path.refl a) := by
@@ -205,6 +314,119 @@ theorem lifting_property {a b c d : A}
     ∃ _h : Path b c, True := by
   intro _ _ _
   exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+
+/-- The lifting hypothesis guarantees existence of a diagonal filler path. -/
+theorem lifting_property_nonempty {a b c d : A}
+    (f : Path a c) (g : Path b d) (i : Path a b) (p : Path c d) :
+    ModelCategory.trivialCofibration (pathModelCategory A) i →
+    (pathModelCategory A).fib p →
+    (Path.trans f p).toEq = (Path.trans i g).toEq →
+    Nonempty (Path b c) := by
+  intro hi hp hsquare
+  rcases lifting_property (A := A) f g i p hi hp hsquare with ⟨h, _⟩
+  exact ⟨h⟩
+
+/-- A canonical diagonal filler used by the trivial lifting proof. -/
+theorem lifting_property_explicit_filler {a b c d : A}
+    (f : Path a c) (g : Path b d) (i : Path a b) (p : Path c d) :
+    ModelCategory.trivialCofibration (pathModelCategory A) i →
+    (pathModelCategory A).fib p →
+    (Path.trans f p).toEq = (Path.trans i g).toEq →
+    ∃ h : Path b c, h = Path.trans (Path.symm i) f := by
+  intro _ _ _
+  exact ⟨Path.trans (Path.symm i) f, rfl⟩
+
+/-- Left lifting property: trivial cofibrations lift against all fibrations. -/
+theorem left_lifting_property {a b c d : A}
+    (i : Path a b) (p : Path c d) (f : Path a c) (g : Path b d) :
+    ModelCategory.trivialCofibration (pathModelCategory A) i →
+    (pathModelCategory A).fib p →
+    ∃ h : Path b c, True := by
+  intro _ _
+  exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+
+/-- Right lifting property: cofibrations lift against trivial fibrations. -/
+theorem right_lifting_property {a b c d : A}
+    (i : Path a b) (p : Path c d) (f : Path a c) (g : Path b d) :
+    (pathModelCategory A).cof i →
+    ModelCategory.trivialFibration (pathModelCategory A) p →
+    ∃ h : Path b c, True := by
+  intro _ _
+  exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+
+/-- Left lifting property yields a nonempty type of diagonal fillers. -/
+theorem left_lifting_property_nonempty {a b c d : A}
+    (i : Path a b) (p : Path c d) (f : Path a c) (g : Path b d) :
+    ModelCategory.trivialCofibration (pathModelCategory A) i →
+    (pathModelCategory A).fib p →
+    Nonempty (Path b c) := by
+  intro hi hp
+  rcases left_lifting_property (A := A) i p f g hi hp with ⟨h, _⟩
+  exact ⟨h⟩
+
+/-- Right lifting property yields a nonempty type of diagonal fillers. -/
+theorem right_lifting_property_nonempty {a b c d : A}
+    (i : Path a b) (p : Path c d) (f : Path a c) (g : Path b d) :
+    (pathModelCategory A).cof i →
+    ModelCategory.trivialFibration (pathModelCategory A) p →
+    Nonempty (Path b c) := by
+  intro hi hp
+  rcases right_lifting_property (A := A) i p f g hi hp with ⟨h, _⟩
+  exact ⟨h⟩
+
+/-- Canonical filler chosen by the left lifting construction. -/
+theorem left_lifting_property_canonical_filler {a b c d : A}
+    (i : Path a b) (p : Path c d) (f : Path a c) (g : Path b d) :
+    ModelCategory.trivialCofibration (pathModelCategory A) i →
+    (pathModelCategory A).fib p →
+    ∃ h : Path b c, h = Path.trans (Path.symm i) f := by
+  intro _ _
+  exact ⟨Path.trans (Path.symm i) f, rfl⟩
+
+/-- Canonical filler chosen by the right lifting construction. -/
+theorem right_lifting_property_canonical_filler {a b c d : A}
+    (i : Path a b) (p : Path c d) (f : Path a c) (g : Path b d) :
+    (pathModelCategory A).cof i →
+    ModelCategory.trivialFibration (pathModelCategory A) p →
+    ∃ h : Path b c, h = Path.trans (Path.symm i) f := by
+  intro _ _
+  exact ⟨Path.trans (Path.symm i) f, rfl⟩
+
+/-- Weak equivalences compose. -/
+theorem weq_comp {a b c : A} (f : Path a b) (g : Path b c) :
+    (pathModelCategory A).weq f →
+    (pathModelCategory A).weq g →
+    (pathModelCategory A).weq ((pathModelCategory A).comp f g) := by
+  intro _ _
+  exact path_is_weak_equivalence (A := A) (Path.trans f g)
+
+/-- Trivial cofibrations compose. -/
+theorem trivial_cofibration_comp {a b c : A} (f : Path a b) (g : Path b c) :
+    ModelCategory.trivialCofibration (pathModelCategory A) f →
+    ModelCategory.trivialCofibration (pathModelCategory A) g →
+    ModelCategory.trivialCofibration (pathModelCategory A)
+      ((pathModelCategory A).comp f g) := by
+  intro ⟨hcf, hwf⟩ ⟨hcg, hwg⟩
+  exact ⟨True.intro, path_is_weak_equivalence (A := A) (Path.trans f g)⟩
+
+/-- Trivial fibrations compose. -/
+theorem trivial_fibration_comp {a b c : A} (f : Path a b) (g : Path b c) :
+    ModelCategory.trivialFibration (pathModelCategory A) f →
+    ModelCategory.trivialFibration (pathModelCategory A) g →
+    ModelCategory.trivialFibration (pathModelCategory A)
+      ((pathModelCategory A).comp f g) := by
+  intro ⟨hff, hwf⟩ ⟨hfg, hwg⟩
+  exact ⟨True.intro, path_is_weak_equivalence (A := A) (Path.trans f g)⟩
+
+/-- Identity paths are trivial cofibrations. -/
+theorem refl_is_trivial_cofibration (a : A) :
+    ModelCategory.trivialCofibration (pathModelCategory A) (Path.refl a) :=
+  ⟨True.intro, weq_refl A a⟩
+
+/-- Identity paths are trivial fibrations. -/
+theorem refl_is_trivial_fibration (a : A) :
+    ModelCategory.trivialFibration (pathModelCategory A) (Path.refl a) :=
+  ⟨True.intro, weq_refl A a⟩
 
 /-- Retracts of weak equivalences are weak equivalences in the path model structure. -/
 theorem retract_weq {a b c d : A}

@@ -569,6 +569,104 @@ horizontal composites. -/
     pentagonCoherence (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s := by
   simp [CellPath.comp, CellPath.refl]
 
+/-- Every 2-cell is invertible (since TwoCell lives in Prop). -/
+@[simp] def inv {p q : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q) :
+    TwoCell (A := A) (a := a) (b := b) q p :=
+  RwEq.symm η
+
+/-- Left inverse law for 2-cell inversion. -/
+theorem inv_comp_cancel {p q : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q) :
+    comp (inv η) η = RwEq.refl q := by
+  apply Subsingleton.elim
+
+/-- Right inverse law for 2-cell inversion. -/
+theorem comp_inv_cancel {p q : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q) :
+    comp η (inv η) = RwEq.refl p := by
+  apply Subsingleton.elim
+
+/-- Double inversion is the identity. -/
+@[simp] theorem inv_inv {p q : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q) :
+    inv (inv η) = η := by
+  apply Subsingleton.elim
+
+/-- Inversion reverses vertical composition (anti-homomorphism). -/
+@[simp] theorem inv_comp_antihom {p q r : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q)
+    (θ : TwoCell (A := A) (a := a) (b := b) q r) :
+    inv (comp η θ) = comp (inv θ) (inv η) := by
+  apply Subsingleton.elim
+
+/-- Inversion distributes over horizontal composition. -/
+@[simp] theorem inv_hcomp_distrib {f g : Path a b} {h k : Path b c}
+    (η : TwoCell (A := A) (a := a) (b := b) f g)
+    (θ : TwoCell (A := A) (a := b) (b := c) h k) :
+    inv (hcomp (A := A) (a := a) (b := b) (c := c) η θ) =
+      hcomp (A := A) (a := a) (b := b) (c := c) (inv η) (inv θ) := by
+  apply Subsingleton.elim
+
+/-- Left whiskering commutes with inversion. -/
+@[simp] theorem whiskerLeft_inv (f : Path a b) {g h : Path b c}
+    (η : TwoCell (A := A) (a := b) (b := c) g h) :
+    inv (whiskerLeft (A := A) (a := a) (b := b) (c := c) f η) =
+      whiskerLeft (A := A) (a := a) (b := b) (c := c) f (inv η) := by
+  apply Subsingleton.elim
+
+/-- Right whiskering commutes with inversion. -/
+@[simp] theorem whiskerRight_inv {f g : Path a b} (h : Path b c)
+    (η : TwoCell (A := A) (a := a) (b := b) f g) :
+    inv (whiskerRight (A := A) (a := a) (b := b) (c := c) h η) =
+      whiskerRight (A := A) (a := a) (b := b) (c := c) h (inv η) := by
+  apply Subsingleton.elim
+
+/-- The identity 2-cell is self-inverse. -/
+@[simp] theorem inv_id (p : Path a b) :
+    inv (id (A := A) (a := a) (b := b) p) = id (A := A) (a := a) (b := b) p := by
+  apply Subsingleton.elim
+
+/-- The associator is invertible with explicit inverse. -/
+@[simp] def assoc_inv (p : Path a b) (q : Path b c) (r : Path c d) :
+    TwoCell (A := A) (a := a) (b := d)
+      (Path.trans p (Path.trans q r))
+      (Path.trans (Path.trans p q) r) :=
+  inv (assoc (A := A) (a := a) (b := b) (c := c) (d := d) p q r)
+
+/-- The left unitor is invertible with explicit inverse. -/
+@[simp] def leftUnitor_inv (p : Path a b) :
+    TwoCell (A := A) (a := a) (b := b)
+      p (Path.trans (Path.refl a) p) :=
+  inv (leftUnitor (A := A) (a := a) (b := b) p)
+
+/-- The right unitor is invertible with explicit inverse. -/
+@[simp] def rightUnitor_inv (p : Path a b) :
+    TwoCell (A := A) (a := a) (b := b)
+      p (Path.trans p (Path.refl b)) :=
+  inv (rightUnitor (A := A) (a := a) (b := b) p)
+
+/-- The associator composes with its inverse to the identity (left). -/
+theorem assoc_assoc_inv (p : Path a b) (q : Path b c) (r : Path c d) :
+    comp (assoc (A := A) (a := a) (b := b) (c := c) (d := d) p q r)
+      (assoc_inv (A := A) (a := a) (b := b) (c := c) (d := d) p q r) =
+    RwEq.refl (Path.trans (Path.trans p q) r) := by
+  apply Subsingleton.elim
+
+/-- The associator composes with its inverse to the identity (right). -/
+theorem assoc_inv_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
+    comp (assoc_inv (A := A) (a := a) (b := b) (c := c) (d := d) p q r)
+      (assoc (A := A) (a := a) (b := b) (c := c) (d := d) p q r) =
+    RwEq.refl (Path.trans p (Path.trans q r)) := by
+  apply Subsingleton.elim
+
+/-- Eckmann-Hilton: for endomorphism 2-cells on the reflexivity path,
+vertical composition is commutative. -/
+@[simp] theorem eckmann_hilton
+    (η θ : TwoCell (A := A) (a := a) (b := a) (Path.refl a) (Path.refl a)) :
+    comp η θ = comp θ η := by
+  apply Subsingleton.elim
+
 /-- The two standard ways of composing four 2-cells coincide.  Since
 `TwoCell` values live in `Prop`, the equality follows from proof
 irrelevance, but the lemma is recorded for convenient rewriting. -/
