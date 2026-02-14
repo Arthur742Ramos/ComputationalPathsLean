@@ -250,3 +250,51 @@ end HomologicalStability
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace HomologicalStability
+
+theorem trivialGroup_add_eval (x y : trivialGroup.carrier) :
+    trivialGroup.add x y = PUnit.unit :=
+  rfl
+
+theorem groupHom_id_apply (G : AbelianGroup) (x : G.carrier) :
+    (GroupHom.id G).toFun x = x :=
+  rfl
+
+theorem groupHom_comp_apply {G H K : AbelianGroup}
+    (g : GroupHom H K) (f : GroupHom G H) (x : G.carrier) :
+    (GroupHom.comp g f).toFun x = g.toFun (f.toFun x) :=
+  rfl
+
+theorem groupIso_refl_forward_apply (G : AbelianGroup) (x : G.carrier) :
+    (GroupIso.refl G).forward.toFun x = x :=
+  rfl
+
+theorem linearStableRange_bound_eq (S : StabilizationSequence) (n : Nat) :
+    (linearStableRange S).bound n = n :=
+  rfl
+
+theorem linearStableRange_mono' (S : StabilizationSequence) (k : Nat) :
+    (linearStableRange S).bound k ≤ (linearStableRange S).bound (k + 1) :=
+  Nat.le_succ k
+
+theorem linearStableRange_grows' (S : StabilizationSequence) (k : Nat) :
+    ∃ n, k ≤ (linearStableRange S).bound n :=
+  ⟨k, Nat.le_refl k⟩
+
+theorem symmetricGroup_bound_formula_apply {gH : GroupHomology}
+    (S : SymmetricGroupStability gH) (k : Nat) :
+    S.bound k = 2 * k :=
+  S.bound_formula k
+
+theorem groupCompletion_map_one_eq {M : Monoid} (gc : GroupCompletion M) :
+    gc.complMap M.one = gc.group.zero :=
+  gc.map_one
+
+end HomologicalStability
+end Algebra
+end Path
+end ComputationalPaths

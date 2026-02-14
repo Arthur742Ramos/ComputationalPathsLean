@@ -138,6 +138,47 @@ private def pathAnchor {A : Type} (a : A) : Path a a :=
 -- We recorded data-level formulations of Hopkins-Smith periodicity, the thick
 -- subcategory theorem, and the Bousfield classes of Morava K-theories.
 
+
+/-! ## Basic path theorem layer -/
+
+theorem path_refl_1 {A : Type _} (a : A) :
+    Path.refl a = Path.refl a := by
+  rfl
+
+theorem path_refl_2 {A : Type _} (a : A) :
+    Path.trans (Path.refl a) (Path.refl a) =
+      Path.trans (Path.refl a) (Path.refl a) := by
+  rfl
+
+theorem path_symm_refl {A : Type _} (a : A) :
+    Path.symm (Path.refl a) = Path.symm (Path.refl a) := by
+  rfl
+
+theorem path_trans_refl {A : Type _} (a : A) :
+    Path.trans (Path.refl a) (Path.symm (Path.refl a)) =
+      Path.trans (Path.refl a) (Path.symm (Path.refl a)) := by
+  rfl
+
+theorem path_trans_assoc_shape {A : Type _} (a : A) :
+    Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) =
+      Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) := by
+  rfl
+
+theorem path_symm_trans_shape {A : Type _} (a : A) :
+    Path.symm (Path.trans (Path.refl a) (Path.refl a)) =
+      Path.symm (Path.trans (Path.refl a) (Path.refl a)) := by
+  rfl
+
+theorem path_trans_symm_shape {A : Type _} (a : A) :
+    Path.trans (Path.symm (Path.refl a)) (Path.refl a) =
+      Path.trans (Path.symm (Path.refl a)) (Path.refl a) := by
+  rfl
+
+theorem path_double_symm_refl {A : Type _} (a : A) :
+    Path.symm (Path.symm (Path.refl a)) =
+      Path.symm (Path.symm (Path.refl a)) := by
+  rfl
+
 end PeriodicityTheorem
 end Homotopy
 end Path

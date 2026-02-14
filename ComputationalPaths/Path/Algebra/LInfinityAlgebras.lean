@@ -267,3 +267,56 @@ end LInfinityAlgebras
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace LInfinityAlgebras
+
+theorem graded_add_zero {V : GradedSpace} (n : Int) (x : V.obj n) :
+    V.add n (V.zero n) x = x :=
+  V.add_zero n x
+
+theorem graded_add_neg {V : GradedSpace} (n : Int) (x : V.obj n) :
+    V.add n (V.neg n x) x = V.zero n :=
+  V.add_neg n x
+
+theorem graded_bracket_zero_left {L : GradedLieAlgebra}
+    (m n : Int) (y : L.obj n) :
+    L.bracket m n (L.zero m) y = L.zero (m + n) :=
+  L.bracket_zero_left m n y
+
+theorem graded_bracket_zero_right {L : GradedLieAlgebra}
+    (m n : Int) (x : L.obj m) :
+    L.bracket m n x (L.zero n) = L.zero (m + n) :=
+  L.bracket_zero_right m n x
+
+theorem l1_squared_eq {A : Type _} (L : LInfinityData A) (x : A) :
+    L.l 1 (fun _ => L.l 1 (fun _ => x)) = L.l 1 (fun _ => L.zero) :=
+  L.l1_squared x
+
+theorem l1_zero_eq {A : Type _} (L : LInfinityData A) :
+    L.l 1 (fun _ => L.zero) = L.zero :=
+  L.l1_zero
+
+theorem l_add_zero_left {A : Type _} (L : LInfinityData A) (x : A) :
+    L.add L.zero x = x :=
+  L.add_zero_left x
+
+theorem mc_truncated_eq {A : Type _} {L : LInfinityData A} (mc : MCElementLInf L) :
+    L.add (L.l 1 (fun _ => mc.element)) (L.l 2 (fun _ => mc.element)) = L.zero :=
+  mc.mc_truncated
+
+theorem homotopy_transfer_retract {A : Type _} {B : Type _} {L : LInfinityData A}
+    (H : @HomotopyTransferData A B L) (x : B) :
+    H.p (H.i x) = x :=
+  H.retract x
+
+theorem dgla_d_squared_eq {A : Type _} (L : DGLAData A) (x : A) :
+    L.d (L.d x) = L.zero :=
+  L.d_squared x
+
+end LInfinityAlgebras
+end Algebra
+end Path
+end ComputationalPaths

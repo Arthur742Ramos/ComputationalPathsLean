@@ -167,3 +167,58 @@ end HochschildCohomology
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace HochschildCohomology
+
+theorem hochschild_add_zero {A : Type _} (Alg : HochschildAlgebra A) (x : A) :
+    Alg.add Alg.zero x = x :=
+  Alg.add_zero x
+
+theorem hochschild_mul_one {A : Type _} (Alg : HochschildAlgebra A) (x : A) :
+    Alg.mul x Alg.one = x :=
+  Alg.mul_one x
+
+theorem cochainZero_eval {A : Type _} (Alg : HochschildAlgebra A)
+    (n : Nat) (x : Fin n → A) :
+    cochainZero (Alg := Alg) n x = Alg.zero :=
+  rfl
+
+theorem cochainAdd_eval {A : Type _} (Alg : HochschildAlgebra A)
+    (n : Nat) (f g : HochschildCochain A n) (x : Fin n → A) :
+    cochainAdd (Alg := Alg) n f g x = Alg.add (f x) (g x) :=
+  rfl
+
+theorem cochainNeg_eval {A : Type _} (Alg : HochschildAlgebra A)
+    (n : Nat) (f : HochschildCochain A n) (x : Fin n → A) :
+    cochainNeg (Alg := Alg) n f x = Alg.neg (f x) :=
+  rfl
+
+theorem cochainPath_refl_apply {A : Type _} (Alg : HochschildAlgebra A)
+    {n : Nat} (f : HochschildCochain A n) (x : Fin n → A) :
+    cochainPath_refl (Alg := Alg) f x = Path.refl (f x) :=
+  rfl
+
+theorem differential_sq_zero_eq {A : Type _} {Alg : HochschildAlgebra A}
+    (D : HochschildDifferential A Alg) (n : Nat) (f : HochschildCochain A n) :
+    D.d (n + 1) (D.d n f) = cochainZero (Alg := Alg) (n + 2) :=
+  D.d_sq_zero n f
+
+theorem cocycle_closed_path {A : Type _} {Alg : HochschildAlgebra A}
+    {D : HochschildDifferential A Alg} {n : Nat}
+    (z : HochschildCocycle A Alg D n) :
+    Path (D.d n z.cochain) (cochainZero (Alg := Alg) (n + 1)) :=
+  z.closed
+
+theorem cocycleRel_refl {A : Type _} {Alg : HochschildAlgebra A}
+    {D : HochschildDifferential A Alg} {n : Nat}
+    (z : HochschildCocycle A Alg D n) :
+    cocycleRel z z :=
+  ⟨cochainPath_refl (Alg := Alg) z.cochain⟩
+
+end HochschildCohomology
+end Algebra
+end Path
+end ComputationalPaths

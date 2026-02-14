@@ -199,3 +199,55 @@ end LittleCubesOperad
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace LittleCubesOperad
+
+theorem identityCube_interval_lo (n : Nat) (i : Fin 1) (j : Fin n) :
+    (((identityCube n).cubes i).intervals j).lo = 0 :=
+  rfl
+
+theorem identityCube_interval_hi (n : Nat) (i : Fin 1) (j : Fin n) :
+    (((identityCube n).cubes i).intervals j).hi = 1 :=
+  rfl
+
+theorem enSpace_def (n k : Nat) :
+    EnSpace n k = LittleCubeConfig n k :=
+  rfl
+
+theorem rescaleInterval_lo (outer inner : SubInterval) :
+    (rescaleInterval outer inner).lo = outer.lo + inner.lo :=
+  rfl
+
+theorem rescaleInterval_hi (outer inner : SubInterval) :
+    (rescaleInterval outer inner).hi = outer.lo + inner.hi :=
+  rfl
+
+theorem composeEmbed_intervals {n : Nat} (outer inner : RectEmbed n) (i : Fin n) :
+    (composeEmbed outer inner).intervals i =
+      rescaleInterval (outer.intervals i) (inner.intervals i) :=
+  rfl
+
+theorem enAlgebra_trivial_carrier (n : Nat) :
+    (EnAlgebra.trivial n).carrier = Unit :=
+  rfl
+
+theorem enAlgebra_unit_act_eq {n : Nat} (A : EnAlgebra n) (x : A.carrier) :
+    A.act (identityCube n) (fun _ => x) = x :=
+  A.unit_act x
+
+theorem enRecognition_left_inv_eq {n : Nat}
+    (d : EnRecognitionData n) (x : d.algebra.carrier) :
+    d.fromTarget (d.toTarget x) = x :=
+  d.left_inv x
+
+theorem enAlgebraHom_id_apply {n : Nat} (A : EnAlgebra n) (x : A.carrier) :
+    (EnAlgebraHom.id A).toFun x = x :=
+  rfl
+
+end LittleCubesOperad
+end Algebra
+end Path
+end ComputationalPaths

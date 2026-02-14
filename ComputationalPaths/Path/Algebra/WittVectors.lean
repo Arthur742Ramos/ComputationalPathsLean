@@ -217,3 +217,57 @@ end WittVectors
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace WittVectors
+
+theorem ghostMapFn_apply {R : Type _} (g : GhostMap R)
+    (v : BigWittVector R) (n : Nat) :
+    ghostMapFn g v n = g.ghostComponent n v :=
+  rfl
+
+theorem ptypicalToBig_coeff {p : Nat} {R : Type _} (zero : R)
+    (v : PTypicalWittVector p R) (n : Nat) :
+    (ptypicalToBig zero v).coeff n = v.coeff n :=
+  rfl
+
+theorem iterFrob_zero_eq {p : Nat} {R : Type _} (F : FrobeniusOp p R)
+    (v : PTypicalWittVector p R) :
+    iterFrob F 0 v = v :=
+  rfl
+
+theorem iterFrob_succ_eq {p : Nat} {R : Type _} (F : FrobeniusOp p R)
+    (n : Nat) (v : PTypicalWittVector p R) :
+    iterFrob F (n + 1) v = F.frob (iterFrob F n v) :=
+  rfl
+
+theorem truncate_coeff {p : Nat} {n : Nat} {R : Type _}
+    (v : PTypicalWittVector p R) (i : Fin n) :
+    (truncate (p := p) (n := n) v).coeff i = v.coeff i.val :=
+  rfl
+
+theorem teich_recover_eq {p : Nat} {R : Type _}
+    (T : TeichmuellerLift p R) (r : R) :
+    teich_recover T r = T.teich_coeff_zero r :=
+  rfl
+
+theorem wittMap_preserves_eq {p : Nat} {R : Type _} {S : Type _}
+    (F : WittFunctoriality p R S) (v : PTypicalWittVector p R) (n : Nat) :
+    wittMap_preserves F v n = F.wittMap_coeff v n :=
+  rfl
+
+theorem wittFunctorialityId_ringMap {p : Nat} (R : Type _) (r : R) :
+    (wittFunctorialityId p R).ringMap r = r :=
+  rfl
+
+theorem wittFunctorialityId_wittMap {p : Nat} (R : Type _)
+    (v : PTypicalWittVector p R) :
+    (wittFunctorialityId p R).wittMap v = v :=
+  rfl
+
+end WittVectors
+end Algebra
+end Path
+end ComputationalPaths

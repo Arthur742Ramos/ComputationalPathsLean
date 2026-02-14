@@ -252,3 +252,65 @@ end FactorizationAlgebra
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace FactorizationAlgebra
+
+theorem diskFamily_empty_arity (S : FactorizationSite) (U : S.Open) :
+    (DiskFamily.empty S U).arity = 0 :=
+  rfl
+
+theorem prefactorization_emptyUnit_eq {S : FactorizationSite}
+    (A : PrefactorizationAlgebra S) {U : S.Open} :
+    A.emptyUnit (U := U) = A.empty_act A.unit :=
+  rfl
+
+theorem factorizationHom_id_apply {S : FactorizationSite}
+    (A : FactorizationAlgebra S) (U : S.Open) (x : A.value U) :
+    (FactorizationAlgebraHom.id A).toFun U x = x :=
+  rfl
+
+theorem factorizationHom_comp_apply {S : FactorizationSite}
+    {A B C : FactorizationAlgebra S}
+    (g : FactorizationAlgebraHom B C) (f : FactorizationAlgebraHom A B)
+    (U : S.Open) (x : A.value U) :
+    (FactorizationAlgebraHom.comp g f).toFun U x = g.toFun U (f.toFun U x) :=
+  rfl
+
+theorem locallyConstant_equiv_eq {S : FactorizationSite}
+    (A : LocallyConstantFA S) {U V : S.Open}
+    (hU : S.isDisk U) (hV : S.isDisk V) (hUV : S.incl U V) :
+    A.locallyConstant_equiv hU hV hUV = A.locally_constant hU hV hUV :=
+  rfl
+
+theorem locallyConstant_factorizationHomology_def {S : FactorizationSite}
+    (A : LocallyConstantFA S) :
+    A.factorizationHomology = A.algebra.value S.whole :=
+  rfl
+
+theorem factorizationHomology_def {S : FactorizationSite}
+    (A : FactorizationAlgebra S) :
+    factorizationHomology A = A.value S.whole :=
+  rfl
+
+theorem factorizationHomologyMap_apply {S : FactorizationSite}
+    {A B : FactorizationAlgebra S} (f : FactorizationAlgebraHom A B)
+    (x : factorizationHomology A) :
+    factorizationHomologyMap f x = f.toFun S.whole x :=
+  rfl
+
+theorem nonabelianDuality_trivial_target {S : FactorizationSite}
+    (A : LocallyConstantFA S) :
+    (NonabelianPoincareDuality.trivial A).target = factorizationHomology A.algebra :=
+  rfl
+
+theorem nonabelianDualityRn_trivial_target (n : Nat) (A : LocallyConstantFAOnRn n) :
+    (NonabelianPoincareDualityRn.trivial n A).target = factorizationHomologyRn A :=
+  rfl
+
+end FactorizationAlgebra
+end Algebra
+end Path
+end ComputationalPaths

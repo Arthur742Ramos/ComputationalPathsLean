@@ -261,3 +261,54 @@ end DeformationTheory
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace DeformationTheory
+
+theorem zeroFPS_coeff {R : Type _} (ring : FPSRing R) (n : Nat) :
+    (FormalPowerSeries.zeroFPS ring).coeff n = ring.zero :=
+  rfl
+
+theorem addFPS_coeff {R : Type _} (ring : FPSRing R)
+    (f g : FormalPowerSeries R) (n : Nat) :
+    (FormalPowerSeries.addFPS ring f g).coeff n = ring.add (f.coeff n) (g.coeff n) :=
+  rfl
+
+theorem dgla_d_squared {L : DGLA} (n : Int) (x : L.obj n) :
+    L.d (n + 1) (L.d n x) = L.zero (n + 1 + 1) :=
+  L.d_squared n x
+
+theorem mc_equation {L : DGLA} (mc : MaurerCartanElement L) :
+    L.add 2 (L.d 1 mc.element) (L.bracket 1 1 mc.element mc.element) = L.zero 2 :=
+  mc.mc_eq
+
+theorem formalDeformation_zeroth {R : Type _} {ring : FPSRing R}
+    (def_ : FormalDeformation R ring) :
+    def_.corrections.coeff 0 = ring.one :=
+  def_.zeroth_order
+
+theorem tangent_coboundary_is_cocycle {L : DGLA} (T : TangentCohomology L)
+    (x : L.obj 1) (hx : T.coboundary x) :
+    T.cocycle x :=
+  T.coboundary_is_cocycle x hx
+
+theorem obstruction_is_cocycle {L : DGLA} (ob : ObstructionData L) :
+    L.d 2 ob.obstruction = L.zero 3 :=
+  ob.is_cocycle
+
+theorem ks_image_cocycle {L : DGLA} (ks : KodairaSpencerMap L)
+    (v : ks.tangentParam) :
+    L.d 1 (ks.ks v) = L.zero 2 :=
+  ks.image_cocycle v
+
+theorem gauge_action_eq {L : DGLA} {α β : MaurerCartanElement L}
+    (g : GaugeEquivalence L α β) :
+    L.add 1 α.element (L.d 0 g.gauge) = β.element :=
+  g.gauge_action
+
+end DeformationTheory
+end Algebra
+end Path
+end ComputationalPaths

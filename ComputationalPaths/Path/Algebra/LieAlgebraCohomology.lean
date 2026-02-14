@@ -227,3 +227,63 @@ end LieAlgebraCohomology
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace LieAlgebraCohomology
+
+theorem lie_add_zero {L : Type _} (A : LieAlgebra L) (x : L) :
+    A.add A.zero x = x :=
+  A.add_zero x
+
+theorem lie_add_left_neg {L : Type _} (A : LieAlgebra L) (x : L) :
+    A.add (A.neg x) x = A.zero :=
+  A.add_left_neg x
+
+theorem lie_bracket_skew {L : Type _} (A : LieAlgebra L) (x y : L) :
+    A.bracket x y = A.neg (A.bracket y x) :=
+  A.bracket_skew x y
+
+theorem lie_jacobi {L : Type _} (A : LieAlgebra L) (x y z : L) :
+    A.add (A.bracket x (A.bracket y z))
+      (A.add (A.bracket y (A.bracket z x)) (A.bracket z (A.bracket x y))) = A.zero :=
+  A.jacobi x y z
+
+theorem module_add_zero {L : Type _} {M : Type _} {A : LieAlgebra L}
+    (Mod : LieModule L M A) (m : M) :
+    Mod.add Mod.zero m = m :=
+  Mod.add_zero m
+
+theorem module_action_zero {L : Type _} {M : Type _} {A : LieAlgebra L}
+    (Mod : LieModule L M A) (x : L) :
+    Mod.action x Mod.zero = Mod.zero :=
+  Mod.action_zero x
+
+theorem module_action_bracket {L : Type _} {M : Type _} {A : LieAlgebra L}
+    (Mod : LieModule L M A) (x y : L) (m : M) :
+    Mod.action (A.bracket x y) m =
+      Mod.add (Mod.action x (Mod.action y m)) (Mod.neg (Mod.action y (Mod.action x m))) :=
+  Mod.action_bracket x y m
+
+theorem cochainZero_eval {L : Type _} {M : Type _} {A : LieAlgebra L}
+    (Mod : LieModule L M A) (n : Nat) (x : Fin n → L) :
+    cochainZero (Mod := Mod) n x = Mod.zero :=
+  rfl
+
+theorem cochainAdd_eval {L : Type _} {M : Type _} {A : LieAlgebra L}
+    (Mod : LieModule L M A) (n : Nat)
+    (f g : LieCochain L M n) (x : Fin n → L) :
+    cochainAdd (Mod := Mod) n f g x = Mod.add (f x) (g x) :=
+  rfl
+
+theorem lieDifferential_sq_zero {L : Type _} {M : Type _} {A : LieAlgebra L}
+    {Mod : LieModule L M A} (D : LieDifferential L M A Mod)
+    (n : Nat) (f : LieCochain L M n) :
+    D.d (n + 1) (D.d n f) = cochainZero (Mod := Mod) (n + 2) :=
+  D.d_sq_zero n f
+
+end LieAlgebraCohomology
+end Algebra
+end Path
+end ComputationalPaths

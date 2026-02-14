@@ -207,3 +207,70 @@ Hecke operators with eigenform witnesses.
 end ModularForms
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace ModularForms
+
+theorem modularST_def :
+    modularST = ModularWord.mul ModularWord.S ModularWord.T :=
+  rfl
+
+theorem modularSTCube_def :
+    modularSTCube = ModularWord.mul (ModularWord.mul modularST modularST) modularST :=
+  rfl
+
+theorem modularForm_transform_eval {H : Type _} {R : Type _}
+    {data : ModularData H R} {k : Nat}
+    (f : ModularForm data k) (w : ModularWord) (z : H) :
+    Path (f.toFun (data.action.act w z)) (data.weight k w z (f.toFun z)) :=
+  f.transform w z
+
+theorem qExpansion_eval {H : Type _} {R : Type _}
+    (qmap : QExpansionMap H R) {data : ModularData H R} {k : Nat}
+    (f : ModularForm data k) (n : Nat) :
+    qExpansion qmap f n = qmap.qexp f.toFun n :=
+  rfl
+
+theorem constantTerm_def {R : Type _} (q : QExpansion R) :
+    constantTerm q = q 0 :=
+  rfl
+
+theorem qExpansion_congr_path {H : Type _} {R : Type _}
+    (qmap : QExpansionMap H R) {data : ModularData H R} {k : Nat}
+    {f g : ModularForm data k}
+    (h : ∀ z, Path (f.toFun z) (g.toFun z)) (n : Nat) :
+    Path (qExpansion qmap f n) (qExpansion qmap g n) :=
+  qExpansion_congr qmap h n
+
+theorem hecke_commutes_path {H : Type _} {R : Type _}
+    {data : ModularData H R} {k : Nat}
+    (ops : HeckeOperators data k) (m n : Nat) (f : ModularForm data k) :
+    Path (ops.apply m (ops.apply n f)) (ops.apply n (ops.apply m f)) :=
+  ops.commutes m n f
+
+theorem eisenstein_constant_path {H : Type _} {R : Type _}
+    {data : ModularData H R} {qmap : QExpansionMap H R}
+    {coeff : CoeffData R} {k : Nat}
+    (E : EisensteinSeries data qmap coeff k) :
+    Path (constantTerm (qExpansion qmap E.form)) coeff.one :=
+  E.constant_one
+
+theorem cusp_constant_path {H : Type _} {R : Type _}
+    {data : ModularData H R} {qmap : QExpansionMap H R}
+    {coeff : CoeffData R} {k : Nat}
+    (F : CuspForm data qmap coeff k) :
+    Path (constantTerm (qExpansion qmap F.form)) coeff.zero :=
+  F.constant_zero
+
+theorem hecke_eigen_path_projection {H : Type _} {R : Type _}
+    {data : ModularData H R} {k : Nat}
+    {ops : HeckeOperators data k} {scalar : ScalarAction R}
+    (f : HeckeEigenform data k ops scalar) (n : Nat) (z : H) :
+    Path ((ops.apply n f.form).toFun z)
+      (scalar.smul (f.eigenvalue n) (f.form.toFun z)) :=
+  f.eigen_path n z
+
+end ModularForms
+end Path
+end ComputationalPaths

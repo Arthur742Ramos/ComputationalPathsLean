@@ -293,3 +293,62 @@ end SpectralMackey
 end Algebra
 end Path
 end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace SpectralMackey
+
+theorem gsetHom_id_apply {G : Type _} {S : StrictGroup G}
+    (X : GSet G S) (x : X.carrier) :
+    (GSetHom.id X).toFun x = x :=
+  rfl
+
+theorem gsetHom_comp_apply {G : Type _} {S : StrictGroup G}
+    {X Y Z : GSet G S} (f : GSetHom X Y) (g : GSetHom Y Z)
+    (x : X.carrier) :
+    (GSetHom.comp f g).toFun x = g.toFun (f.toFun x) :=
+  rfl
+
+theorem finiteGSet_toGSet_carrier {G : Type _} {S : StrictGroup G}
+    (X : FiniteGSet G S) :
+    (X.toGSet).carrier = X.carrier :=
+  rfl
+
+theorem spectrumMap_id_apply (X : Spectrum) (n : Nat) (x : X.level n) :
+    (SpectrumMap.id X).map n x = x :=
+  rfl
+
+theorem spectrumMap_comp_apply {X Y Z : Spectrum}
+    (f : SpectrumMap X Y) (g : SpectrumMap Y Z) (n : Nat) (x : X.level n) :
+    (SpectrumMap.comp f g).map n x = g.map n (f.map n x) :=
+  rfl
+
+theorem dressFamily_full_carrier {G : Type _} (S : StrictGroup G)
+    (H : Subgroup G S) :
+    (DressFamily.full G S).carrier H :=
+  trivial
+
+theorem burnside_obj_eq {G : Type _} (S : StrictGroup G)
+    (X : FiniteGSet G S) :
+    (burnsideMackeyFunctor G S).obj X = Nat :=
+  rfl
+
+theorem burnside_res_apply {G : Type _} (S : StrictGroup G)
+    {X Y : FiniteGSet G S} (f : FiniteGSetHom X Y) (n : Nat) :
+    (burnsideMackeyFunctor G S).res f n = n :=
+  rfl
+
+theorem burnside_tr_apply {G : Type _} (S : StrictGroup G)
+    {X Y : FiniteGSet G S} (f : FiniteGSetHom X Y) (n : Nat) :
+    (burnsideMackeyFunctor G S).tr f n = n :=
+  rfl
+
+theorem burnsideDressInduction_holds {G : Type _} (S : StrictGroup G) :
+    (burnsideDressInduction G S).induction :=
+  trivial
+
+end SpectralMackey
+end Algebra
+end Path
+end ComputationalPaths
