@@ -211,10 +211,11 @@ def local_confluence_tt_rrr (p : Path a b) (q : Path b c) :
     Confluence.Join
       (Path.trans p (Path.trans q (Path.refl c)))  -- via trans_assoc
       (Path.trans p q)  -- via trans_refl_right
-  := by
-  rcases confluence_bridge_tt_rrr_join_exists (A := A) (p := p) (q := q) with
-    ⟨s, hs₁, hs₂⟩
-  exact { meet := s, left := hs₁, right := hs₂ }
+  :=
+  -- Both reach `p · q` via unit simplification
+  { meet := Path.trans p q
+  , left := Rw.tail (Rw.refl _) (Step.trans_congr_right p (Step.trans_refl_right q))
+  , right := Rw.refl _ }
 
 /-- Critical pair: `trans_assoc` vs `trans_refl_left`
     Source: `((refl · q) · r)`
@@ -225,10 +226,10 @@ def local_confluence_tt_lrr (q : Path a b) (r : Path b c) :
     Confluence.Join
       (Path.trans (Path.refl a) (Path.trans q r))  -- via trans_assoc
       (Path.trans q r)  -- via trans_refl_left
-  := by
-  rcases confluence_bridge_tt_lrr_join_exists (A := A) (q := q) (r := r) with
-    ⟨s, hs₁, hs₂⟩
-  exact { meet := s, left := hs₁, right := hs₂ }
+  :=
+  { meet := Path.trans q r
+  , left := Rw.tail (Rw.refl _) (Step.trans_refl_left (Path.trans q r))
+  , right := Rw.refl _ }
 
 /-- Critical pair: Nested associativity
     Source: `(((p · q) · r) · s)`

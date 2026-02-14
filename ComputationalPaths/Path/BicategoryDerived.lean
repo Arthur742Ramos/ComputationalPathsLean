@@ -25,8 +25,6 @@ namespace ComputationalPaths
 namespace Path
 namespace BicategoryDerived
 
-open TwoCell
-
 universe u
 
 variable {A : Type u}
@@ -35,67 +33,67 @@ variable {a b c d : A}
 /-! ## Whiskering Laws -/
 
 /-- Left whiskering preserves identity 2-cells. -/
-@[simp] theorem whiskerLeft_id (f : Path a b) (g : Path b c) :
-    whiskerLeft (A := A) (a := a) (b := b) (c := c) f (TwoCell.id g) =
+def whiskerLeft_id' (f : Path a b) (g : Path b c) :
+    TwoCell.whiskerLeft f (TwoCell.id (A := A) g) =
       TwoCell.id (Path.trans f g) := by
   apply Subsingleton.elim
 
 /-- Right whiskering preserves identity 2-cells. -/
-@[simp] theorem whiskerRight_id (f : Path a b) (g : Path b c) :
-    whiskerRight (A := A) (a := a) (b := b) (c := c) g (TwoCell.id f) =
+def whiskerRight_id' (f : Path a b) (g : Path b c) :
+    TwoCell.whiskerRight g (TwoCell.id (A := A) f) =
       TwoCell.id (Path.trans f g) := by
   apply Subsingleton.elim
 
 /-- Left whiskering distributes over vertical composition. -/
-@[simp] theorem whiskerLeft_comp {f : Path a b} {g h i : Path b c}
+def whiskerLeft_comp' {f : Path a b} {g h i : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h)
     (θ : TwoCell (A := A) (a := b) (b := c) h i) :
-    whiskerLeft (A := A) (a := a) (b := b) (c := c) f (comp η θ) =
-      comp (whiskerLeft (A := A) (a := a) (b := b) (c := c) f η)
-        (whiskerLeft (A := A) (a := a) (b := b) (c := c) f θ) := by
+    TwoCell.whiskerLeft f (TwoCell.comp η θ) =
+      TwoCell.comp (TwoCell.whiskerLeft f η)
+        (TwoCell.whiskerLeft f θ) := by
   apply Subsingleton.elim
 
 /-- Right whiskering distributes over vertical composition. -/
-@[simp] theorem whiskerRight_comp {f g h : Path a b} {k : Path b c}
+def whiskerRight_comp' {f g h : Path a b} {k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
     (θ : TwoCell (A := A) (a := a) (b := b) g h) :
-    whiskerRight (A := A) (a := a) (b := b) (c := c) k (comp η θ) =
-      comp (whiskerRight (A := A) (a := a) (b := b) (c := c) k η)
-        (whiskerRight (A := A) (a := a) (b := b) (c := c) k θ) := by
+    TwoCell.whiskerRight k (TwoCell.comp η θ) =
+      TwoCell.comp (TwoCell.whiskerRight k η)
+        (TwoCell.whiskerRight k θ) := by
   apply Subsingleton.elim
 
 /-! ## Horizontal Composition Laws -/
 
 /-- Horizontal composition with identity 2-cells on the left. -/
-@[simp] theorem hcomp_id_left {f g : Path a b} {h : Path b c}
+def hcomp_id_left' {f g : Path a b} {h : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g) :
-    hcomp (A := A) (a := a) (b := b) (c := c) η (TwoCell.id h) =
-      whiskerRight (A := A) (a := a) (b := b) (c := c) h η := by
+    TwoCell.hcomp η (TwoCell.id h) =
+      TwoCell.whiskerRight h η := by
   apply Subsingleton.elim
 
 /-- Horizontal composition with identity 2-cells on the right. -/
-@[simp] theorem hcomp_id_right {f : Path a b} {g h : Path b c}
+def hcomp_id_right' {f : Path a b} {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
-    hcomp (A := A) (a := a) (b := b) (c := c) (TwoCell.id f) η =
-      whiskerLeft (A := A) (a := a) (b := b) (c := c) f η := by
+    TwoCell.hcomp (TwoCell.id f) η =
+      TwoCell.whiskerLeft f η := by
   apply Subsingleton.elim
 
 /-- Interchange with identities collapses to whiskering. -/
-@[simp] theorem interchange_id_left {f g : Path a b} {h k : Path b c}
+def interchange_id_left' {f g : Path a b} {h k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
     (θ : TwoCell (A := A) (a := b) (b := c) h k) :
-    comp (hcomp (A := A) (a := a) (b := b) (c := c) η θ)
+    TwoCell.comp (TwoCell.hcomp η θ)
       (TwoCell.id (Path.trans g k)) =
-        hcomp (A := A) (a := a) (b := b) (c := c) η θ := by
+        TwoCell.hcomp η θ := by
   apply Subsingleton.elim
 
 /-- Interchange with identities collapses to whiskering (right). -/
-@[simp] theorem interchange_id_right {f g : Path a b} {h k : Path b c}
+def interchange_id_right' {f g : Path a b} {h k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
     (θ : TwoCell (A := A) (a := b) (b := c) h k) :
-    comp (TwoCell.id (Path.trans f h))
-      (hcomp (A := A) (a := a) (b := b) (c := c) η θ) =
-        hcomp (A := A) (a := a) (b := b) (c := c) η θ := by
+    TwoCell.comp (TwoCell.id (Path.trans f h))
+      (TwoCell.hcomp η θ) =
+        TwoCell.hcomp η θ := by
   apply Subsingleton.elim
 
 end BicategoryDerived

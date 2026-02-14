@@ -46,7 +46,7 @@ namespace ComputationalPaths
 namespace Path
 namespace EckmannHilton
 
-open OmegaGroupoid
+open OmegaGroupoid hiding whiskerLeft whiskerRight hcomp
 
 universe u
 
@@ -186,8 +186,8 @@ theorem interchangeRw
 def interchangeDeriv {f f' : Path a b} {g g' : Path b c}
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Derivation₃
-      (.vcomp (whiskerRight α g) (whiskerLeft f' β))
-      (.vcomp (whiskerLeft f β) (whiskerRight α g')) :=
+      (.vcomp (OmegaGroupoid.whiskerRight α g) (OmegaGroupoid.whiskerLeft f' β))
+      (.vcomp (OmegaGroupoid.whiskerLeft f β) (OmegaGroupoid.whiskerRight α g')) :=
   .step (.interchange α β)
 
 end InterchangeLaw
@@ -231,7 +231,7 @@ namespace OmegaTwo
     Equals `OmegaGroupoid.hcomp α β` definitionally.
     Since `trans (refl a) (refl a) ≡ refl a`, no transport is needed. -/
 @[reducible] def hcomp (α β : OmegaTwo A a) : OmegaTwo A a :=
-  Derivation₂.vcomp (whiskerRight α (Path.refl a)) (whiskerLeft (Path.refl a) β)
+  Derivation₂.vcomp (OmegaGroupoid.whiskerRight α (Path.refl a)) (OmegaGroupoid.whiskerLeft (Path.refl a) β)
 
 /-! ### Group Laws for Vertical Composition (witnessed by Derivation₃) -/
 
@@ -269,10 +269,10 @@ end OmegaSquared
 The proof proceeds in three steps:
 
 1. **Whiskering by refl is the identity**: The 3-cell `MetaStep₃.rweq_eq`
-   connects `whiskerRight α (refl a)` to `α`, since both produce the same
+   connects `OmegaGroupoid.whiskerRight α (refl a)` to `α`, since both produce the same
    `RwEq` proof (by proof irrelevance of `Prop`).
 
-2. **hcomp ≡₃ vcomp**: Since `hcomp α β = vcomp (whiskerRight α refl) (whiskerLeft refl β)`
+2. **hcomp ≡₃ vcomp**: Since `hcomp α β = vcomp (OmegaGroupoid.whiskerRight α refl) (OmegaGroupoid.whiskerLeft refl β)`
    and whiskering by refl is the identity, we get `hcomp α β ≡₃ vcomp α β`.
 
 3. **Commutativity**: By the interchange law, `hcomp α β ≡₃ hcomp' α β` where
@@ -286,41 +286,41 @@ variable {a : A}
 
 /-- Right whiskering by `refl` is connected to the identity by a 3-cell.
 
-    Both `whiskerRight α (refl a)` and `α` are derivations between the
+    Both `OmegaGroupoid.whiskerRight α (refl a)` and `α` are derivations between the
     reflexivity path and itself, producing identical `RwEq` proofs. -/
 def whiskerRight_refl_id (α : OmegaTwo A a) :
-    Derivation₃ (whiskerRight α (Path.refl a)) α :=
+    Derivation₃ (OmegaGroupoid.whiskerRight α (Path.refl a)) α :=
   .step (.rweq_eq rfl)
 
 /-- Left whiskering by `refl` is connected to the identity by a 3-cell. -/
 def whiskerLeft_refl_id (β : OmegaTwo A a) :
-    Derivation₃ (whiskerLeft (Path.refl a) β) β :=
+    Derivation₃ (OmegaGroupoid.whiskerLeft (Path.refl a) β) β :=
   .step (.rweq_eq rfl)
 
 /-- **Key lemma**: Horizontal composition reduces to vertical composition on Ω².
 
     `hcomp α β ≡₃ vcomp α β`
 
-    Since `hcomp α β` unfolds to `vcomp (whiskerRight α refl) (whiskerLeft refl β)`,
+    Since `hcomp α β` unfolds to `vcomp (OmegaGroupoid.whiskerRight α refl) (OmegaGroupoid.whiskerLeft refl β)`,
     and whiskering by `refl` is the identity up to 3-cells, we conclude by
     congruence of `vcomp` at level 3. -/
 def hcomp_eq_vcomp (α β : OmegaTwo A a) :
     Derivation₃ (OmegaTwo.hcomp α β) (OmegaTwo.vcomp α β) :=
   .vcomp
-    (Derivation₃.whiskerRight₃ (whiskerRight_refl_id α) (whiskerLeft (Path.refl a) β))
+    (Derivation₃.whiskerRight₃ (whiskerRight_refl_id α) (OmegaGroupoid.whiskerLeft (Path.refl a) β))
     (Derivation₃.whiskerLeft₃ α (whiskerLeft_refl_id β))
 
 /-- Alternative horizontal composition: left-whisker first, then right-whisker.
     This is the other diagonal of the interchange square. -/
 @[reducible] def hcomp' (α β : OmegaTwo A a) : OmegaTwo A a :=
-  Derivation₂.vcomp (whiskerLeft (Path.refl a) β) (whiskerRight α (Path.refl a))
+  Derivation₂.vcomp (OmegaGroupoid.whiskerLeft (Path.refl a) β) (OmegaGroupoid.whiskerRight α (Path.refl a))
 
 /-- Alternative horizontal composition reduces to reversed vertical composition:
     `hcomp' α β ≡₃ vcomp β α`. -/
 def hcomp'_eq_vcomp (α β : OmegaTwo A a) :
     Derivation₃ (hcomp' α β) (OmegaTwo.vcomp β α) :=
   .vcomp
-    (Derivation₃.whiskerRight₃ (whiskerLeft_refl_id β) (whiskerRight α (Path.refl a)))
+    (Derivation₃.whiskerRight₃ (whiskerLeft_refl_id β) (OmegaGroupoid.whiskerRight α (Path.refl a)))
     (Derivation₃.whiskerLeft₃ β (whiskerRight_refl_id α))
 
 /-- Interchange law specialized to Ω²: the two horizontal compositions

@@ -480,5 +480,113 @@ def comm_mul_path (R : CommCondensedRing) (S : ProfiniteSet)
     Path (R.mul S a b) (R.mul S b a) :=
   R.mul_comm S a b
 
+/-! ## Tensor, Exactness, and Derived-Functor Theorems -/
+
+theorem condensed_ring_mul_assoc_theorem
+    (R : CondensedRing) (S : ProfiniteSet)
+    (a b c : R.toAbGroup.underlying.sections S) :
+    Nonempty (Path (R.mul S (R.mul S a b) c) (R.mul S a (R.mul S b c))) := by
+  sorry
+
+theorem condensed_ring_restrict_mul_theorem
+    (R : CondensedRing) {S T : ProfiniteSet} (f : ProfiniteMap S T)
+    (a b : R.toAbGroup.underlying.sections T) :
+    Nonempty (Path (R.toAbGroup.underlying.restrict f (R.mul T a b))
+         (R.mul S (R.toAbGroup.underlying.restrict f a)
+            (R.toAbGroup.underlying.restrict f b))) := by
+  sorry
+
+theorem condensed_ring_restrict_one_theorem
+    (R : CondensedRing) {S T : ProfiniteSet} (f : ProfiniteMap S T) :
+    Nonempty (Path (R.toAbGroup.underlying.restrict f (R.one T)) (R.one S)) := by
+  sorry
+
+theorem condensed_module_one_smul_theorem
+    {R : CondensedRing} (M : CondensedModule R) (S : ProfiniteSet)
+    (m : M.toAbGroup.underlying.sections S) :
+    Nonempty (Path (M.smul S (R.one S) m) m) := by
+  sorry
+
+theorem condensed_module_smul_assoc_theorem
+    {R : CondensedRing} (M : CondensedModule R) (S : ProfiniteSet)
+    (r s : R.toAbGroup.underlying.sections S)
+    (m : M.toAbGroup.underlying.sections S) :
+    Nonempty (Path (M.smul S (R.mul S r s) m) (M.smul S r (M.smul S s m))) := by
+  sorry
+
+theorem condensed_module_restrict_smul_theorem
+    {R : CondensedRing} (M : CondensedModule R) {S T : ProfiniteSet}
+    (f : ProfiniteMap S T) (r : R.toAbGroup.underlying.sections T)
+    (m : M.toAbGroup.underlying.sections T) :
+    Nonempty (Path (M.toAbGroup.underlying.restrict f (M.smul T r m))
+         (M.smul S (R.toAbGroup.underlying.restrict f r)
+            (M.toAbGroup.underlying.restrict f m))) := by
+  sorry
+
+theorem condensed_tensor_bilinear_left_theorem
+    (R : CondensedRing) (M N : CondensedModule R)
+    (T : CondensedTensorProduct R M N) (S : ProfiniteSet)
+    (m₁ m₂ : M.toAbGroup.underlying.sections S)
+    (n : N.toAbGroup.underlying.sections S) :
+    Nonempty (Path (T.bilinear S (M.toAbGroup.add S m₁ m₂) n)
+         (T.result.toAbGroup.add S (T.bilinear S m₁ n) (T.bilinear S m₂ n))) := by
+  sorry
+
+theorem condensed_tensor_bilinear_right_theorem
+    (R : CondensedRing) (M N : CondensedModule R)
+    (T : CondensedTensorProduct R M N) (S : ProfiniteSet)
+    (m : M.toAbGroup.underlying.sections S)
+    (n₁ n₂ : N.toAbGroup.underlying.sections S) :
+    Nonempty (Path (T.bilinear S m (N.toAbGroup.add S n₁ n₂))
+         (T.result.toAbGroup.add S (T.bilinear S m n₁) (T.bilinear S m n₂))) := by
+  sorry
+
+theorem condensed_tensor_bilinear_smul_theorem
+    (R : CondensedRing) (M N : CondensedModule R)
+    (T : CondensedTensorProduct R M N) (S : ProfiniteSet)
+    (r : R.toAbGroup.underlying.sections S)
+    (m : M.toAbGroup.underlying.sections S)
+    (n : N.toAbGroup.underlying.sections S) :
+    Nonempty (Path (T.bilinear S (M.smul S r m) n)
+         (T.bilinear S m (N.smul S r n))) := by
+  sorry
+
+theorem condensed_tensor_commutativity_theorem
+    (R : CondensedRing) (M N : CondensedModule R)
+    (T : CondensedTensorProduct R M N) :
+    Nonempty (Path T.result.toAbGroup.underlying.sections
+         T.result.toAbGroup.underlying.sections) := by
+  sorry
+
+theorem tensor_hom_adjunction_forward_map
+    (A B C : CondensedAbGroup) (Adj : TensorHomAdjunction A B C) :
+    Nonempty (CondensedAbGroup.Hom A Adj.internalHom.hom) := by
+  sorry
+
+theorem solid_tensor_exactness_theorem
+    (R : CondensedRing) (M N : SolidModule R)
+    (T : SolidModule.SolidTensorProduct M N) (S : ProfiniteSet) :
+    Nonempty (Path (T.result_solid.solid_condition S) (fun m => m)) := by
+  sorry
+
+theorem liquid_completeness_theorem
+    (R : CondensedReals) (V : LiquidVectorSpace R)
+    (S : ProfiniteSet) (m : V.module.toAbGroup.underlying.sections S) :
+    Nonempty (Path (V.liquid_condition S m) m) := by
+  sorry
+
+theorem direct_sum_one_smul_theorem
+    {R : CondensedRing} (M N : CondensedModule R)
+    (S : ProfiniteSet)
+    (p : (CondensedModule.directSum M N).toAbGroup.underlying.sections S) :
+    Nonempty (Path ((CondensedModule.directSum M N).smul S (R.one S) p) p) := by
+  sorry
+
+theorem commutative_mul_symmetry_theorem
+    (R : CommCondensedRing) (S : ProfiniteSet)
+    (a b : R.toAbGroup.underlying.sections S) :
+    Nonempty (Path (R.mul S a b) (R.mul S b a)) := by
+  sorry
+
 end CondensedAlgebra
 end ComputationalPaths

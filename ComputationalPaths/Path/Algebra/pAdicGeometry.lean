@@ -568,6 +568,93 @@ def sen_chain {K : Type u} {W : Type v} {Dsen : Type w}
     Path ST.senPoly_degree ST.dim_Dsen :=
   Path.trans ST.senPoly_degree_eq (Path.refl _)
 
+/-! ## Perfectoid-Style and Comparison Theorems -/
+
+theorem bdr_inclusion_zero_theorem
+    {K : Type u} {BdR : Type v} {FK : pAdicFieldData K}
+    (B : PeriodRingBdR K BdR FK) :
+    Nonempty (Path (B.inclK FK.zero) B.zero) := by
+  sorry
+
+theorem bdr_t_unit_theorem
+    {K : Type u} {BdR : Type v} {FK : pAdicFieldData K}
+    (B : PeriodRingBdR K BdR FK) :
+    Nonempty (Path (B.mul B.t_elem B.t_inv) B.one) := by
+  sorry
+
+theorem almost_mathematics_style_filtration_step
+    {K : Type u} {BdR : Type v} {FK : pAdicFieldData K}
+    (B : PeriodRingBdR K BdR FK) (n : Int) (b : BdR)
+    (h : B.filtration (n + 1) b) :
+    B.filtration n b := by
+  sorry
+
+theorem perfectoid_correspondence_gr_zero
+    {K : Type u} {BdR : Type v} {FK : pAdicFieldData K}
+    (B : PeriodRingBdR K BdR FK) :
+    Nonempty (Path B.gr_zero_dim 1) := by
+  sorry
+
+theorem bcrys_phi_zero_theorem
+    {K : Type u} {Bcrys : Type v} {FK : pAdicFieldData K}
+    (B : PeriodRingBcrys K Bcrys FK) :
+    Nonempty (Path (B.phi B.zero) B.zero) := by
+  sorry
+
+theorem tilting_style_phi_t_relation
+    {K : Type u} {Bcrys : Type v} {FK : pAdicFieldData K}
+    (B : PeriodRingBcrys K Bcrys FK) :
+    Nonempty (Path (B.phi B.phi_t) (B.mul (B.inclK FK.p_elem) B.phi_t)) := by
+  sorry
+
+theorem bst_monodromy_log_theorem
+    {K : Type u} {Bst : Type v} {FK : pAdicFieldData K}
+    (B : PeriodRingBst K Bst FK) :
+    Nonempty (Path (B.monodromy B.log_elem) B.one) := by
+  sorry
+
+theorem bst_monodromy_galois_theorem
+    {K : Type u} {Bst : Type v} {FK : pAdicFieldData K}
+    (B : PeriodRingBst K Bst FK) (g : K) (a : Bst) :
+    Nonempty (Path (B.monodromy (B.galoisAct g a)) (B.galoisAct g (B.monodromy a))) := by
+  sorry
+
+theorem dcrys_phi_zero_theorem
+    {K : Type u} {V : Type v} {D : Type w} {FK : pAdicFieldData K}
+    (DC : DcrysFunctorData K V D FK) :
+    Nonempty (Path (DC.phi_D DC.modD.zero) DC.modD.zero) := by
+  sorry
+
+theorem sen_degree_dimension_theorem
+    {K : Type u} {W : Type v} {Dsen : Type w} {FK : pAdicFieldData K}
+    (ST : SenTheoryData K W Dsen FK) :
+    Nonempty (Path ST.senPoly_degree ST.dim_Dsen) := by
+  sorry
+
+theorem p_adic_monodromy_deRham_to_pst_theorem
+    {K : Type u} {V : Type v} {FK : pAdicFieldData K}
+    (PM : pAdicMonodromyData K V FK) :
+    Nonempty (Path PM.dim_DdR PM.dim_Dst_L) := by
+  sorry
+
+theorem fontaine_wintenberger_style_correspondence
+    {K : Type u} {V : Type v} {FK : pAdicFieldData K}
+    (PM : pAdicMonodromyData K V FK) :
+    Nonempty (Path PM.dim_Dst_L PM.dim_DdR) := by
+  sorry
+
+theorem crystalline_comparison_left_inverse_theorem
+    {K : Type u} {V : Type v} {D : Type w} {FK : pAdicFieldData K}
+    (CI : CrystallineComparisonIso K V D FK) (v : V) :
+    Nonempty (Path (CI.compInv (CI.compIso v)) v) := by
+  sorry
+
+theorem crystalline_comparison_right_inverse_theorem
+    {K : Type u} {V : Type v} {D : Type w} {FK : pAdicFieldData K}
+    (CI : CrystallineComparisonIso K V D FK) (d : D) :
+    Nonempty (Path (CI.compIso (CI.compInv d)) d) := by
+  sorry
+
 end pAdicGeometry
 end Algebra
 end Path

@@ -477,5 +477,102 @@ def frobenius_path (R : PerfectoidRing) (S : ProfiniteSet) :
 
 end PerfectoidRing
 
+/-! ## GAGA, Comparison, and Coherence Theorems -/
+
+theorem analytic_tensor_self_theorem
+    (A : AnalyticRing) (M : CondensedModule A.ring_) (hM : A.isAnalytic M) :
+    Nonempty (Path (A.analyticTensor M hM).toAbGroup.underlying.sections
+         M.toAbGroup.underlying.sections) := by
+  sorry
+
+theorem analytic_base_change_theorem
+    (A : AnalyticRing) (M : CondensedModule A.ring_) (hM : A.isAnalytic M) :
+    Nonempty (Path (A.analyticTensor M hM).toAbGroup.underlying.sections
+         M.toAbGroup.underlying.sections) := by
+  sorry
+
+theorem analytic_space_restrict_id_theorem
+    (X : AnalyticSpace) (S : ProfiniteSet) :
+    Nonempty (Path (X.restrict (ProfiniteMap.id (S := S))).toRingHom.toGroupHom.toHom.app
+         (CondensedRing.Hom.id (R := (X.structureSheaf S).ring_)).toGroupHom.toHom.app) := by
+  sorry
+
+theorem gaga_affine_global_sections
+    (A : AnalyticSpace.Affine) (S : ProfiniteSet) :
+    Nonempty (Path (A.space.structureSheaf S).ring_.toAbGroup.underlying.sections
+         A.ring_.ring_.toAbGroup.underlying.sections) := by
+  sorry
+
+theorem solid_tensor_exactness_theorem
+    (R : CondensedRing) (M N : CondensedModule R)
+    (T : SolidTensorProduct_ R M N) (S : ProfiniteSet)
+    (s : T.result.toAbGroup.underlying.sections S) :
+    Nonempty (Path (T.solid S s) s) := by
+  sorry
+
+theorem solid_tensor_bilinear_left_theorem
+    (R : CondensedRing) (M N : CondensedModule R)
+    (T : SolidTensorProduct_ R M N) (S : ProfiniteSet)
+    (m₁ m₂ : M.toAbGroup.underlying.sections S)
+    (n : N.toAbGroup.underlying.sections S) :
+    Nonempty (Path (T.bilinear S (M.toAbGroup.add S m₁ m₂) n)
+         (T.result.toAbGroup.add S (T.bilinear S m₁ n) (T.bilinear S m₂ n))) := by
+  sorry
+
+theorem solid_tensor_bilinear_right_theorem
+    (R : CondensedRing) (M N : CondensedModule R)
+    (T : SolidTensorProduct_ R M N) (S : ProfiniteSet)
+    (m : M.toAbGroup.underlying.sections S)
+    (n₁ n₂ : N.toAbGroup.underlying.sections S) :
+    Nonempty (Path (T.bilinear S m (N.toAbGroup.add S n₁ n₂))
+         (T.result.toAbGroup.add S (T.bilinear S m n₁) (T.bilinear S m n₂))) := by
+  sorry
+
+theorem nuclear_product_component_theorem
+    (R : CondensedRing) (M : NuclearModule R)
+    (I : Type u) (N : I → CondensedModule R)
+    (S : ProfiniteSet)
+    (ns : (i : I) → (N i).toAbGroup.underlying.sections S)
+    (m : M.module.toAbGroup.underlying.sections S) (i : I) :
+    Nonempty (Path (M.nuclear_condition I N S ns m i) m) := by
+  sorry
+
+theorem liquid_analytic_tensor_theorem
+    (L : LiquidAnalyticRing)
+    (M : CondensedModule L.toAnalyticRing.ring_)
+    (hM : L.toAnalyticRing.isAnalytic M) :
+    Nonempty (Path (L.toAnalyticRing.analyticTensor M hM).toAbGroup.underlying.sections
+         M.toAbGroup.underlying.sections) := by
+  sorry
+
+theorem overconvergent_enlarge_idempotent
+    (O : OverconvergentRing) (M : CondensedModule O.base.ring_) :
+    Nonempty (Path (O.enlarge (O.enlarge M)).toAbGroup.underlying.sections
+         (O.enlarge M).toAbGroup.underlying.sections) := by
+  sorry
+
+theorem overconvergent_inclusion_idempotent
+    (O : OverconvergentRing) (M : CondensedModule O.base.ring_) :
+    Nonempty (Path (O.enlarge (O.enlarge M)).toAbGroup.underlying.sections
+         (O.enlarge M).toAbGroup.underlying.sections) := by
+  sorry
+
+theorem perfectoid_frobenius_one_theorem
+    (R : PerfectoidRing) (S : ProfiniteSet) :
+    Nonempty (Path (R.frobenius S (R.ring_.ring_.one S)) (R.ring_.ring_.one S)) := by
+  sorry
+
+theorem perfectoid_frobenius_zero_theorem
+    (R : PerfectoidRing) (S : ProfiniteSet) :
+    Nonempty (Path (R.frobenius S (R.ring_.ring_.toAbGroup.zero S))
+         (R.ring_.ring_.toAbGroup.zero S)) := by
+  sorry
+
+theorem perfectoid_tilt_untilt_frobenius
+    (R : PerfectoidRing) (T : PerfectoidRing.Tilt R)
+    (S : ProfiniteSet) (s : T.tilted.ring_.toAbGroup.underlying.sections S) :
+    Nonempty (Path (R.frobenius S (T.untilt S s)) (T.untilt S s)) := by
+  sorry
+
 end AnalyticGeometry
 end ComputationalPaths

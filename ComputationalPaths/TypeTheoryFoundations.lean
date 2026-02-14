@@ -1037,9 +1037,9 @@ theorem consistency_obstruction_zero (mltt : MLTTData) :
     mltt.consistencyObstruction = 0 := by
   sorry
 
-/-- Weakening can be read as a path to zero type-checking obstruction. -/
+/-- Weakening can be read as existence of a path to zero type-checking obstruction. -/
 theorem weakening_path (mltt : MLTTData) :
-    Path mltt.typeCheckObstruction 0 := by
+    Nonempty (Path mltt.typeCheckObstruction 0) := by
   sorry
 
 /-- Substitution for Π-types is coherent in this presentation. -/
@@ -1059,7 +1059,7 @@ theorem pi_eta_subject_preservation (pt : PiTypeData) :
 
 /-- Π-substitution also yields a computational path witness. -/
 theorem pi_substitution_path (pt : PiTypeData) :
-    Path pt.substObstruction 0 := by
+    Nonempty (Path pt.substObstruction 0) := by
   sorry
 
 /-- Σ-projections preserve typing information. -/

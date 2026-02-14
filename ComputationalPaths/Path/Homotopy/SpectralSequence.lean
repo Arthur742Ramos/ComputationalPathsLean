@@ -121,25 +121,25 @@ def convergence_finite (bound : Nat) (ss : SpectralSeq.{u} bound)
       Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero :=
   hdeg r (Nat.zero_le r)
 
-theorem convergence_from_degeneration (bound : Nat) (ss : SpectralSeq.{u} bound)
+def convergence_from_degeneration (bound : Nat) (ss : SpectralSeq.{u} bound)
     (hdeg : Degenerates bound ss 0) (r : Nat) (p q : Fin bound)
     (x : ((ss.page r).term p q).carrier) :
     Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero :=
   convergence_finite bound ss hdeg r p q x
 
-theorem degeneration_monotone (bound : Nat) (ss : SpectralSeq.{u} bound)
+def degeneration_monotone (bound : Nat) (ss : SpectralSeq.{u} bound)
     {r₀ r₁ : Nat} (hdeg : Degenerates bound ss r₀) (h01 : r₀ ≤ r₁) :
     Degenerates bound ss r₁ := by
   intro r hr p q x
   exact hdeg r (Nat.le_trans h01 hr) p q x
 
-theorem convergence_at_page (bound : Nat) (ss : SpectralSeq.{u} bound)
+def convergence_at_page (bound : Nat) (ss : SpectralSeq.{u} bound)
     {r₀ r : Nat} (hdeg : Degenerates bound ss r₀) (hr : r₀ ≤ r)
     (p q : Fin bound) (x : ((ss.page r).term p q).carrier) :
     Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero :=
   hdeg r hr p q x
 
-theorem convergence_from_zero_at_page (bound : Nat) (ss : SpectralSeq.{u} bound)
+def convergence_from_zero_at_page (bound : Nat) (ss : SpectralSeq.{u} bound)
     (hdeg : Degenerates bound ss 0) (r : Nat) (p q : Fin bound)
     (x : ((ss.page r).term p q).carrier) :
     Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero :=
@@ -170,20 +170,20 @@ def SpectralMorphism.id {bound : Nat} (E : SpectralSeq.{u} bound) :
   maps := fun _ p q => PtMor.id ((E.page _).term p q)
   comm_diff := fun _ _ _ _ => Path.refl _
 
-theorem differential_naturality {bound : Nat} {E F : SpectralSeq.{u} bound}
+def differential_naturality {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ : SpectralMorphism E F) (r : Nat) (p q : Fin bound)
     (x : ((E.page r).term p q).carrier) :
     Path ((φ.maps r p q).toFun (((E.page r).diff p q).toFun x))
       (((F.page r).diff p q).toFun ((φ.maps r p q).toFun x)) :=
   φ.comm_diff r p q x
 
-theorem differential_naturality_zero {bound : Nat} {E F : SpectralSeq.{u} bound}
+def differential_naturality_zero {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ : SpectralMorphism E F) (r : Nat) (p q : Fin bound) :
     Path ((φ.maps r p q).toFun ((E.page r).term p q).zero)
       ((F.page r).term p q).zero :=
   (φ.maps r p q).map_zero
 
-theorem differential_naturality_twice {bound : Nat} {E F : SpectralSeq.{u} bound}
+def differential_naturality_twice {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ : SpectralMorphism E F) (r : Nat) (p q : Fin bound)
     (x : ((E.page r).term p q).carrier) :
     Path
@@ -201,7 +201,7 @@ theorem differential_naturality_twice {bound : Nat} {E F : SpectralSeq.{u} bound
     (F.page r).dd_zero p q (f.toFun x)
   exact Path.trans h₁ (Path.trans h₂ h₃)
 
-theorem comparison_on_differential_input {bound : Nat} {E F : SpectralSeq.{u} bound}
+def comparison_on_differential_input {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ ψ : SpectralMorphism E F) (r : Nat) (p q : Fin bound)
     (x : ((E.page r).term p q).carrier)
     (hcmp : ∀ y : ((E.page r).term p q).carrier,
@@ -210,7 +210,7 @@ theorem comparison_on_differential_input {bound : Nat} {E F : SpectralSeq.{u} bo
       ((ψ.maps r p q).toFun (((E.page r).diff p q).toFun x)) :=
   hcmp (((E.page r).diff p q).toFun x)
 
-theorem comparison_via_target_differentials {bound : Nat} {E F : SpectralSeq.{u} bound}
+def comparison_via_target_differentials {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ ψ : SpectralMorphism E F) (r : Nat) (p q : Fin bound)
     (x : ((E.page r).term p q).carrier)
     (hcmp : Path (((F.page r).diff p q).toFun ((φ.maps r p q).toFun x))

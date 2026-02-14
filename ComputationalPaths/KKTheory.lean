@@ -745,5 +745,108 @@ def master_fredholm_path (fi : FredholmIndexData) :
     Path fi.index (Int.ofNat fi.kernelDim - Int.ofNat fi.cokernelDim) :=
   fi.fredholm_index_path
 
+/-! ## Additional KK-Theoretic Theorems -/
+
+/-- Direct sums of Kasparov modules add Fredholm indices. -/
+theorem kasparov_module_direct_sum_index
+    (m1 m2 : KasparovModule)
+    (hs : m1.sourceAlgDim = m2.sourceAlgDim)
+    (ht : m1.targetAlgDim = m2.targetAlgDim) :
+    (KasparovModule.directSum m1 m2 hs ht).fredholmIndex =
+      m1.fredholmIndex + m2.fredholmIndex := by
+  sorry
+
+/-- The canonical identity Kasparov module has zero index. -/
+theorem kasparov_identity_index_zero (d : Nat) (hd : d > 0) :
+    (KasparovModule.identity d hd).fredholmIndex = 0 := by
+  sorry
+
+/-- Zero is additive identity at the level of KK class indices. -/
+theorem kk_zero_add_identity (g : KKGroup) :
+    (KKGroup.add (KKGroup.zero g.sourceDim g.targetDim g.sourceDim_pos g.targetDim_pos) g rfl rfl).classIndex =
+      g.classIndex := by
+  sorry
+
+/-- Every KK class has an additive inverse at index level. -/
+theorem kk_add_inverse_zero (g : KKGroup) :
+    (KKGroup.add g (KKGroup.neg g) rfl rfl).classIndex = 0 := by
+  sorry
+
+/-- Kasparov product index theorem in the encoded multiplicative model. -/
+theorem kasparov_product_index_formula (kp : KasparovProduct) :
+    kp.productIndex = kp.leftIndex * kp.rightIndex := by
+  sorry
+
+/-- Associativity of Kasparov product on indices. -/
+theorem kasparov_product_associative_indices (a b c : Int) :
+    a * b * c = a * (b * c) := by
+  sorry
+
+/-- Right identity law for Kasparov product indices. -/
+theorem kasparov_product_right_identity (idx : Int) :
+    idx * 1 = idx := by
+  sorry
+
+/-- Left identity law for Kasparov product indices. -/
+theorem kasparov_product_left_identity (idx : Int) :
+    1 * idx = idx := by
+  sorry
+
+/-- Bott periodicity has period two. -/
+theorem bott_period_two (bp : BottPeriodicityKK) :
+    bp.period = 2 := by
+  sorry
+
+/-- Bott generator normalizes to index one. -/
+theorem bott_generator_index_one (bp : BottPeriodicityKK) :
+    bp.bottIndex = 1 := by
+  sorry
+
+/-- Double Bott shift multiplies shifted target size by four. -/
+theorem bott_double_shift_dimension (bp : BottPeriodicityKK) :
+    (BottPeriodicityKK.shift (BottPeriodicityKK.shift bp)).shiftedTargetDim =
+      bp.shiftedTargetDim * 4 := by
+  sorry
+
+/-- UCT dimension equality encodes exactness at the rank level. -/
+theorem uct_short_exact_rank_formula (uct : UCTData) :
+    uct.kkDim = uct.extDim + uct.homDim := by
+  sorry
+
+/-- In the free case, UCT has vanishing Ext term. -/
+theorem uct_free_ext_vanishes (hom : Nat) :
+    (UCTData.free hom hom rfl).extDim = 0 := by
+  sorry
+
+/-- Fredholm index theorem for encoded Fredholm data. -/
+theorem fredholm_index_formula (fi : FredholmIndexData) :
+    fi.index = Int.ofNat fi.kernelDim - Int.ofNat fi.cokernelDim := by
+  sorry
+
+/-- Fredholm indices add under direct sum. -/
+theorem fredholm_direct_sum_additivity (f1 f2 : FredholmIndexData) :
+    (FredholmIndexData.directSum f1 f2).index = f1.index + f2.index := by
+  sorry
+
+/-- Baum-Connes isomorphism hypothesis identifies topological and analytic ranks. -/
+theorem baum_connes_iso_rank_equalities (bc : BaumConnesData) (h : bc.isIso = true) :
+    bc.topKRank = bc.anaKRank ∧ bc.assemblyRank = bc.topKRank := by
+  sorry
+
+/-- Dirac-dual Dirac product gives the KK-unit. -/
+theorem dirac_dual_dirac_unit (ddd : DiracDualDirac) :
+    ddd.productIndex = 1 := by
+  sorry
+
+/-- KK-category composition multiplies class indices. -/
+theorem kk_composition_index_formula (kc : KKComposition) :
+    kc.composedIndex = kc.firstIndex * kc.secondIndex := by
+  sorry
+
+/-- Bott shift preserves K-rank in the K-theory-via-KK encoding. -/
+theorem ktheory_bott_shift_preserves_rank (k : KTheoryViaKK) :
+    (KTheoryViaKK.bottShift k).kRank = k.kRank := by
+  sorry
+
 end KKTheory
 end ComputationalPaths

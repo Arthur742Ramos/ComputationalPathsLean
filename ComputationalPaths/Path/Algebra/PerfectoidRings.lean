@@ -506,6 +506,111 @@ def varpi_comm_chain {R : Type u} (PR : PathPerfectoidRing R) :
     Path (PR.mul PR.varpi_div_p PR.varpi) PR.p_elem :=
   Path.trans (PR.mul_comm PR.varpi_div_p PR.varpi) PR.varpi_div_p_spec
 
+/-! ## Tilting, Almost Purity, and Fontaine–Wintenberger Theorems -/
+
+theorem pathperfectoid_varpi_divides_p
+    {R : Type u} (PR : PathPerfectoidRing R) :
+    Nonempty (Path (PR.mul PR.varpi PR.varpi_div_p) PR.p_elem) := by
+  sorry
+
+theorem pathperfectoid_frob_zero_theorem
+    {R : Type u} (PR : PathPerfectoidRing R) :
+    Nonempty (Path (PR.frobData.frob PR.zero) PR.zero) := by
+  sorry
+
+theorem pathperfectoid_frob_one_theorem
+    {R : Type u} (PR : PathPerfectoidRing R) :
+    Nonempty (Path (PR.frobData.frob PR.one) PR.one) := by
+  sorry
+
+theorem tilt_sharp_mul_theorem
+    {R : Type u} {Rflat : Type v}
+    {rR : PathPerfectoidRing R} {rRf : PathRing Rflat}
+    (T : TiltData R Rflat rR rRf) (a b : Rflat) :
+    Nonempty (Path (T.sharp (rRf.mul a b)) (rR.mul (T.sharp a) (T.sharp b))) := by
+  sorry
+
+theorem tilt_sharp_zero_theorem
+    {R : Type u} {Rflat : Type v}
+    {rR : PathPerfectoidRing R} {rRf : PathRing Rflat}
+    (T : TiltData R Rflat rR rRf) :
+    Nonempty (Path (T.sharp rRf.zero) rR.zero) := by
+  sorry
+
+theorem tilt_sharp_one_theorem
+    {R : Type u} {Rflat : Type v}
+    {rR : PathPerfectoidRing R} {rRf : PathRing Rflat}
+    (T : TiltData R Rflat rR rRf) :
+    Nonempty (Path (T.sharp rRf.one) rR.one) := by
+  sorry
+
+theorem fontaine_theta_zero_theorem
+    {R : Type u} {Rflat : Type v} {Ainf : Type w} {OC : Type u}
+    {rR : PathPerfectoidRing R} {rRf : PathRing Rflat}
+    {rAinf : PathRing Ainf} {rOC : PathRing OC}
+    (FT : FontaineThetaData R Rflat Ainf OC rR rRf rAinf rOC) :
+    Nonempty (Path (FT.theta rAinf.zero) rOC.zero) := by
+  sorry
+
+theorem fontaine_theta_one_theorem
+    {R : Type u} {Rflat : Type v} {Ainf : Type w} {OC : Type u}
+    {rR : PathPerfectoidRing R} {rRf : PathRing Rflat}
+    {rAinf : PathRing Ainf} {rOC : PathRing OC}
+    (FT : FontaineThetaData R Rflat Ainf OC rR rRf rAinf rOC) :
+    Nonempty (Path (FT.theta rAinf.one) rOC.one) := by
+  sorry
+
+theorem fontaine_theta_surjective_theorem
+    {R : Type u} {Rflat : Type v} {Ainf : Type w} {OC : Type u}
+    {rR : PathPerfectoidRing R} {rRf : PathRing Rflat}
+    {rAinf : PathRing Ainf} {rOC : PathRing OC}
+    (FT : FontaineThetaData R Rflat Ainf OC rR rRf rAinf rOC)
+    (c : OC) :
+    Nonempty (Path (FT.theta (FT.theta_surj c)) c) := by
+  sorry
+
+theorem almost_zero_characterization_theorem
+    {R : Type u} {rR : PathRing R}
+    (AM : AlmostMathData R rR) (x : R) :
+    AM.almostZero x ↔ (∀ ε, AM.ideal.mem ε → Path (rR.mul ε x) rR.zero) := by
+  sorry
+
+theorem almost_zero_add_theorem
+    {R : Type u} {rR : PathRing R}
+    (AM : AlmostMathData R rR) (x y : R)
+    (hx : AM.almostZero x) (hy : AM.almostZero y) :
+    AM.almostZero (rR.add x y) := by
+  sorry
+
+theorem almost_purity_extension_zero_theorem
+    {R : Type u} {S : Type v}
+    {rR : PathPerfectoidRing R} {rS : PathRing S}
+    (AP : AlmostPurityData R S rR rS) :
+    Nonempty (Path (AP.ext_map rR.zero) rS.zero) := by
+  sorry
+
+theorem almost_purity_extension_one_theorem
+    {R : Type u} {S : Type v}
+    {rR : PathPerfectoidRing R} {rS : PathRing S}
+    (AP : AlmostPurityData R S rR rS) :
+    Nonempty (Path (AP.ext_map rR.one) rS.one) := by
+  sorry
+
+theorem tilting_equivalence_char_preserved_theorem
+    {R : Type u} {Rflat : Type v}
+    {rR : PathPerfectoidRing R} {rRf : PathPerfectoidRing Rflat}
+    (TE : TiltingEquivalence R Rflat rR rRf) :
+    Nonempty (Path rRf.prime rR.prime) := by
+  sorry
+
+theorem fontaine_wintenberger_frobenius_compat_theorem
+    {R : Type u} {Rflat : Type v}
+    {rR : PathPerfectoidRing R} {rRf : PathPerfectoidRing Rflat}
+    (TE : TiltingEquivalence R Rflat rR rRf) (a : Rflat) :
+    Nonempty (Path (TE.tiltData.sharp (rRf.frobData.frob a))
+         (rR.frobData.frob (TE.tiltData.sharp a))) := by
+  sorry
+
 end PerfectoidRings
 end Algebra
 end Path

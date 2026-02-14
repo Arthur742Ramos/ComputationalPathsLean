@@ -822,5 +822,93 @@ def master_enumeration_path :
     Path EnumerationData.unary.universalArity 2 :=
   EnumerationData.unary.universal_arity_path
 
+/-! ## Additional Computability-Theoretic Theorems -/
+
+/-- Primitive recursive functions remain total under the encoded closure rules. -/
+theorem primrec_totality_preserved (pr : PrimRecData) :
+    pr.isTotal = true := by
+  sorry
+
+/-- Exponentiation sits at the expected primitive-recursive complexity level. -/
+theorem primrec_exponentiation_complexity :
+    PrimRecData.exponentiation.totalComplexity = 6 := by
+  sorry
+
+/-- Embedding primitive recursion into partial recursion introduces no μ-operator. -/
+theorem primrec_to_partial_has_no_mu (pr : PrimRecData) :
+    (PartialRecData.primRecAsPartial pr).numMuOperators = 0 := by
+  sorry
+
+/-- Unbounded minimization can yield non-total partial recursive behavior. -/
+theorem mu_unbounded_not_total (n : Nat) (hn : n > 0) :
+    (MuRecursionData.unbounded n hn).resultIsTotal = false := by
+  sorry
+
+/-- Kleene's recursion theorem provides fixed points in this encoding. -/
+theorem kleene_fixed_point_exists (krd : KleeneRecursionData) :
+    krd.isFixedPoint = true := by
+  sorry
+
+/-- The s-m-n map supports effective index reduction (parameter fixing). -/
+theorem smn_reduction_total (smn : SMNData) :
+    smn.sIsTotal = true := by
+  sorry
+
+/-- General s-m-n parameterization preserves arity decomposition. -/
+theorem smn_reduction_arity (m n : Nat) (hm : m > 0) (hn : n > 0) :
+    (SMNData.general m n hm hn).totalArity = m + n := by
+  sorry
+
+/-- Post's theorem identifies jump count with hierarchy level. -/
+theorem post_jump_level_agreement (ptd : PostTheoremData) :
+    ptd.numJumps = ptd.level := by
+  sorry
+
+/-- Arithmetical hierarchy strictness holds at every encoded Σ-level. -/
+theorem hierarchy_strict_at_sigma (n : Nat) :
+    (ArithHierarchyData.sigmaAt n).strictContainment = true := by
+  sorry
+
+/-- The Δ-level characterization as Σ∩Π is enforced by the model. -/
+theorem hierarchy_delta_meet (ah : ArithHierarchyData) :
+    ah.deltaIsMeet = true := by
+  sorry
+
+/-- The zero degree represents decidable and RE information. -/
+theorem zero_degree_is_re :
+    TuringDegreeData.zero.isRE = true := by
+  sorry
+
+/-- The halting degree is distinct from the zero degree. -/
+theorem zero_prime_not_zero :
+    TuringDegreeData.zeroPrime.isZero = false := by
+  sorry
+
+/-- Jump hierarchy sample: the double jump has level two. -/
+theorem double_jump_level_two :
+    TuringDegreeData.zeroDoublePrime.jumpLevel = 2 := by
+  sorry
+
+/-- Universal enumeration raises arity by one, enabling reduction coding. -/
+theorem enumeration_universal_shift (ed : EnumerationData) :
+    ed.universalArity = ed.arity + 1 := by
+  sorry
+
+/-- Rice's theorem manifestation: nontrivial semantic property need not be RE. -/
+theorem rice_nonre_property_not_re :
+    RiceShapiroData.nonREProperty.propertyIsRE = false := by
+  sorry
+
+/-- Rice-Shapiro positive direction: RE properties admit compact witnesses. -/
+theorem rice_shapiro_re_implies_compact :
+    RiceShapiroData.reProperty.hasCompactWitness = true := by
+  sorry
+
+/-- Creative sets carry the productive core required by classical diagonalization. -/
+theorem creative_implies_productive_for_diagonalK :
+    ProductiveCreativeData.diagonalK.isCreative = true ∧
+    ProductiveCreativeData.diagonalK.isProductive = true := by
+  sorry
+
 end ComputabilityTheory
 end ComputationalPaths

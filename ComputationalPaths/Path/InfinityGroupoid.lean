@@ -24,7 +24,7 @@ namespace ComputationalPaths
 namespace Path
 namespace InfinityGroupoid
 
-open OmegaGroupoid
+open OmegaGroupoid hiding whiskerLeft whiskerRight hcomp
 
 universe u
 

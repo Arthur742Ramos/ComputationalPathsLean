@@ -139,41 +139,41 @@ abbrev StableEquiv (X Y : Pointed) :=
     (PointedMap X (iteratedOmegaEqPointed n Y))
 
 /-- The stabilized adjunction provides a stable equivalence. -/
-theorem stableAdjunction_stableEquiv (X Y : Pointed) : StableEquiv X Y :=
+def stableAdjunction_stableEquiv (X Y : Pointed) : StableEquiv X Y :=
   fun n => stableAdjunction n X Y
 
 /-- Degree-zero stabilized adjunction is the identity equivalence. -/
-theorem stableAdjunction_zero (X Y : Pointed) :
+def stableAdjunction_zero (X Y : Pointed) :
     Path (stableAdjunction 0 X Y) (pathSimpleEquivRefl (PointedMap X Y)) :=
   Path.stepChain rfl
 
 /-- Left inverse law for each stabilized equivalence level. -/
-theorem stableAdjunction_left_inverse (n : Nat) (X Y : Pointed)
+def stableAdjunction_left_inverse (n : Nat) (X Y : Pointed)
     (f : PointedMap (iteratedSigmaPointed n X) Y) :
     Path ((stableAdjunction n X Y).invFun ((stableAdjunction n X Y).toFun f)) f :=
   (stableAdjunction n X Y).left_inv f
 
 /-- Right inverse law for each stabilized equivalence level. -/
-theorem stableAdjunction_right_inverse (n : Nat) (X Y : Pointed)
+def stableAdjunction_right_inverse (n : Nat) (X Y : Pointed)
     (g : PointedMap X (iteratedOmegaEqPointed n Y)) :
     Path ((stableAdjunction n X Y).toFun ((stableAdjunction n X Y).invFun g)) g :=
   (stableAdjunction n X Y).right_inv g
 
 /-- Freudenthal preview sends the reflexive loop to the suspension base loop. -/
-theorem freudenthal_preview_basepoint (X : Pointed) :
+def freudenthal_preview_basepoint (X : Pointed) :
     Path
       ((FreudenthalSuspension.freudenthalPreview X).toFun (Path.refl X.pt))
       (FreudenthalSuspension.suspBaseLoop (X := X.carrier) X.pt) :=
   (FreudenthalSuspension.freudenthalPreview X).basepoint
 
 /-- The Freudenthal preview map is definitionally the suspension map. -/
-theorem freudenthal_preview_toFun_def (X : Pointed) :
+def freudenthal_preview_toFun_def (X : Pointed) :
     Path (FreudenthalSuspension.freudenthalPreview X).toFun
       (FreudenthalSuspension.suspensionMap (X := X.carrier) X.pt) :=
   Path.stepChain rfl
 
 /-- Basepoint path witness for the suspension map in Freudenthal preview form. -/
-theorem freudenthal_suspensionMap_basepoint (X : Pointed) :
+def freudenthal_suspensionMap_basepoint (X : Pointed) :
     Path
       (FreudenthalSuspension.suspensionMap (X := X.carrier) X.pt (Path.refl X.pt))
       (FreudenthalSuspension.suspBaseLoop (X := X.carrier) X.pt) :=
@@ -191,24 +191,24 @@ noncomputable def canonicalSpanierWhiteheadDuality (X : Pointed) :
   stableEquiv := fun n => stableAdjunction n X X
 
 /-- Canonical Spanier-Whitehead duality has dual object equal to X. -/
-theorem canonicalSWDuality_dual (X : Pointed) :
+def canonicalSWDuality_dual (X : Pointed) :
     Path (canonicalSpanierWhiteheadDuality X).dual X :=
   Path.stepChain rfl
 
 /-- Canonical Spanier-Whitehead duality specializes to stable adjunction. -/
-theorem canonicalSWDuality_level (n : Nat) (X : Pointed) :
+def canonicalSWDuality_level (n : Nat) (X : Pointed) :
     Path ((canonicalSpanierWhiteheadDuality X).stableEquiv n) (stableAdjunction n X X) :=
   Path.stepChain rfl
 
 /-- Left inverse law for canonical Spanier-Whitehead duality. -/
-theorem canonicalSWDuality_left_inverse (n : Nat) (X : Pointed)
+def canonicalSWDuality_left_inverse (n : Nat) (X : Pointed)
     (f : PointedMap (iteratedSigmaPointed n X) X) :
     Path (((canonicalSpanierWhiteheadDuality X).stableEquiv n).invFun
       (((canonicalSpanierWhiteheadDuality X).stableEquiv n).toFun f)) f :=
   ((canonicalSpanierWhiteheadDuality X).stableEquiv n).left_inv f
 
 /-- Right inverse law for canonical Spanier-Whitehead duality. -/
-theorem canonicalSWDuality_right_inverse (n : Nat) (X : Pointed)
+def canonicalSWDuality_right_inverse (n : Nat) (X : Pointed)
     (g : PointedMap X (iteratedOmegaEqPointed n X)) :
     Path (((canonicalSpanierWhiteheadDuality X).stableEquiv n).toFun
       (((canonicalSpanierWhiteheadDuality X).stableEquiv n).invFun g)) g :=
