@@ -381,6 +381,9 @@ import ComputationalPaths.Path.Algebra.SymplecticRepTheory
 import ComputationalPaths.Path.Algebra.ModelCategories
 import ComputationalPaths.Path.Algebra.StableCategories
 import ComputationalPaths.Path.Algebra.DGCategories
+import ComputationalPaths.Path.Algebra.AInfinityCategories
+import ComputationalPaths.Path.Algebra.TiltingTheory
+import ComputationalPaths.Path.Algebra.GorensteinHomological
 import ComputationalPaths.Path.Algebra.SimplicialHomotopyTheory
 import ComputationalPaths.Path.Algebra.TorsionTheory
 import ComputationalPaths.Path.Algebra.LocalCohomology

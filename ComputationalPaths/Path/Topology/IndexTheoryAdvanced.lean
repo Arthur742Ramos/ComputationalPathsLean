@@ -340,32 +340,32 @@ structure CoarseBaumConnes where
 /-! ## Theorems -/
 
 /-- Fredholm index is additive: ind(D₁ ⊕ D₂) = ind(D₁) + ind(D₂). -/
-theorem index_additive (D₁ D₂ : FredholmOperator) :
+def index_additive (D₁ D₂ : FredholmOperator) :
     Path (fredholmIndex D₁ + fredholmIndex D₂)
          ((D₁.dimKer + D₂.dimKer) - (D₁.dimCoker + D₂.dimCoker)) := sorry
 
 /-- Fredholm index is homotopy invariant. -/
-theorem index_homotopy_invariant (D₁ D₂ : FredholmOperator)
+def index_homotopy_invariant (D₁ D₂ : FredholmOperator)
     (_homotopy : True) :
     Path (fredholmIndex D₁) (fredholmIndex D₂) := sorry
 
 /-- APS index formula: ind = local - reduced eta. -/
-theorem aps_formula (aps : APSIndexTheorem) :
+def aps_formula (aps : APSIndexTheorem) :
     Path aps.apsIndex (aps.localIndex - reducedEta aps.boundaryEta) :=
   aps.aps_formula
 
 /-- Spectral flow is additive under concatenation. -/
-theorem spectral_flow_additive (sfa : SpectralFlowAdditivity) :
+def spectral_flow_additive (sfa : SpectralFlowAdditivity) :
     Path sfa.sfConcat (sfa.sf₁.sfValue + sfa.sf₂.sfValue) :=
   sfa.additive
 
 /-- Spectral flow equals difference of eta invariants. -/
-theorem sf_eq_eta_diff (p : OperatorPath) (sf : SpectralFlow p)
+def sf_eq_eta_diff (p : OperatorPath) (sf : SpectralFlow p)
     (η₀ η₁ : EtaInvariant) (_h : True) :
     Path sf.sfValue (η₁.etaValue - η₀.etaValue) := sorry
 
 /-- Families index theorem: ch(ind) = pushforward. -/
-theorem families_index_formula (fam : OperatorFamily) (fit : FamiliesIndexTheorem fam) :
+def families_index_formula (fam : OperatorFamily) (fit : FamiliesIndexTheorem fam) :
     Path fit.chernOfIndex fit.pushforward :=
   fit.families_formula
 
@@ -382,7 +382,7 @@ theorem adiabatic_limit_convergence (fam : OperatorFamily)
     (al : AdiabaticLimit fam) : True := al.converges
 
 /-- Connes index formula in noncommutative geometry. -/
-theorem connes_index_formula (cit : ConnesIndexTheorem) :
+def connes_index_formula (cit : ConnesIndexTheorem) :
     Path cit.pairingValue cit.localValue :=
   cit.connes_formula
 
@@ -403,7 +403,7 @@ theorem coarse_bc_finite_asdim (cbc : CoarseBaumConnes) (_fin_asdim : True) :
     True := cbc.isIso
 
 /-- Spectral flow vanishes for contractible loops of operators. -/
-theorem spectral_flow_contractible (p : OperatorPath) (sf : SpectralFlow p)
+def spectral_flow_contractible (p : OperatorPath) (sf : SpectralFlow p)
     (_contractible : True) : Path sf.sfValue 0 := sorry
 
 /-- Eta invariant changes by integers under gauge transformations. -/
@@ -411,9 +411,9 @@ theorem eta_gauge_integer (ei₁ ei₂ : EtaInvariant) (_gauge : True) :
     True := sorry
 
 /-- The reduced eta invariant is well-defined mod integers. -/
-theorem reduced_eta_well_defined (ei : EtaInvariant) :
-    Path (reducedEta ei) ((ei.etaValue + ei.operator.dimKer) / 2) := by
-  rfl
+def reduced_eta_well_defined (ei : EtaInvariant) :
+    Path (reducedEta ei) ((ei.etaValue + ei.operator.dimKer) / 2) :=
+  Path.refl _
 
 end IndexTheoryAdvanced
 end Topology

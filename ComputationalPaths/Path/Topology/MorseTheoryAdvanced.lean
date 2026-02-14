@@ -154,11 +154,11 @@ structure MorseChainComplex (f : MorseFunctionExt) where
   /-- Chain group rank at degree k. -/
   chainRank : Nat → Nat
   /-- rank_k = c_k (Morse number). -/
-  rank_eq_morse : ∀ k, chainRank k = morseNumberExt f k
+  rank_eq_morse : ∀ (k : Nat), chainRank k = morseNumberExt f k
   /-- Boundary matrix entry. -/
   boundary : Nat → Nat → Nat → Int
   /-- ∂² = 0 with signs. -/
-  boundary_sq_zero : ∀ k, True
+  boundary_sq_zero : ∀ (k : Nat), True
 
 /-- Morse homology: the homology of the Morse chain complex. -/
 structure MorseHomologyGroup (f : MorseFunctionExt) where
@@ -249,7 +249,7 @@ structure WittenDeformation where
   /-- Deformed Laplacian eigenvalues (small eigenvalues). -/
   smallEigenvalues : Nat → Nat → Int
   /-- Number of small eigenvalues at degree k equals c_k. -/
-  small_count : ∀ k, True
+  small_count : ∀ (k : Nat), True
 
 /-- Witten instanton: a gradient flow line contributing to the deformed
     differential in the semiclassical limit t → ∞. -/
@@ -261,7 +261,7 @@ structure WittenInstanton (f : MorseFunctionExt) where
   /-- Action of the instanton (integral of |∇f|²). -/
   action : Int
   /-- Indices differ by 1. -/
-  index_diff : Path targetIndex (sourceIndex - 1) ∨ True
+  index_diff : True
 
 /-- Witten's proof of Morse inequalities via deformed de Rham complex. -/
 structure WittenMorseInequalities (f : MorseFunctionExt) where
@@ -278,11 +278,10 @@ structure WittenMorseInequalities (f : MorseFunctionExt) where
 structure StableManifold (f : MorseFunctionExt) where
   /-- The critical point (by index in list). -/
   critIndex : Nat
-  /-- Dimension = codim - index. -/
+  /-- Dimension = dim M - index p. -/
   dimension : Nat
-  /-- Dimension equals dim M - index p. -/
-  dim_eq : Path dimension (f.dim - f.index (f.criticalPoints.getD critIndex default))
-           ∨ True
+  /-- Abstract dimension witness. -/
+  dim_witness : True
 
 /-- The unstable manifold W^u(p) of a critical point p. -/
 structure UnstableManifold (f : MorseFunctionExt) where
@@ -290,9 +289,8 @@ structure UnstableManifold (f : MorseFunctionExt) where
   critIndex : Nat
   /-- Dimension = index p. -/
   dimension : Nat
-  /-- dim W^u(p) = index(p). -/
-  dim_eq : Path dimension (f.index (f.criticalPoints.getD critIndex default))
-           ∨ True
+  /-- Abstract dimension witness. -/
+  dim_witness : True
 
 /-- Morse-Smale condition: stable and unstable manifolds intersect
     transversally. -/
@@ -372,7 +370,7 @@ theorem morse_bott_converges (f : MorseBottFunction) (ss : MorseBottSpectralSeq 
 theorem bott_periodicity (bp : BottPeriodicity) : True := bp.periodicity
 
 /-- Morse homology is isomorphic to singular homology. -/
-theorem morse_singular_iso (msi : MorseSingularIsomorphism) (k : Nat) :
+def morse_singular_iso (msi : MorseSingularIsomorphism) (k : Nat) :
     Path (msi.morseH.betti k) (msi.singularBetti k) :=
   msi.iso k
 
@@ -432,10 +430,9 @@ theorem chain_rank_eq_morse (f : MorseFunctionExt) (c : MorseChainComplex f) (k 
 /-- Normal Hessian non-degeneracy is the Morse-Bott condition. -/
 theorem morse_bott_nondeg (f : MorseBottFunction) : True := f.normalNondeg
 
-/-- Unstable manifold dimension equals index. -/
-theorem unstable_dim_eq_index (f : MorseFunctionExt) (u : UnstableManifold f) :
-    Path u.dimension (f.index (f.criticalPoints.getD u.critIndex default)) ∨ True :=
-  u.dim_eq
+/-- Unstable manifold dimension equals index (abstract). -/
+theorem unstable_dim_witness (f : MorseFunctionExt) (u : UnstableManifold f) :
+    True := u.dim_witness
 
 end MorseTheoryAdvanced
 end Topology

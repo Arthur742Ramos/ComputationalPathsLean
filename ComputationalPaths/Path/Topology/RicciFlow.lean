@@ -256,12 +256,12 @@ def RicciStep.identity (g : RiemannianMetric) : RicciStep g g where
   energy_decrease := trivial
 
 /-- Identity step is a left unit up to RwEq. -/
-theorem ricciStep_id_left (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
+def ricciStep_id_left (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
     RwEq (RicciStep.comp (RicciStep.identity g₀) s).step_eq s.step_eq := by
   simp [RicciStep.comp, RicciStep.identity]
 
 /-- Identity step is a right unit up to RwEq. -/
-theorem ricciStep_id_right (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
+def ricciStep_id_right (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
     RwEq (RicciStep.comp s (RicciStep.identity g₁)).step_eq s.step_eq := by
   simp [RicciStep.comp, RicciStep.identity]
 
