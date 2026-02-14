@@ -506,9 +506,9 @@ def kapranovWitnessDimension (n : Nat) (_kd : KapranovData n) : Nat :=
 def mikhalkinMultiplicity (n : Nat) (ti : TropicalIntersectionMult n) : Nat :=
   ti.multiplicity
 
-/-- Tropical Grassmannian Plücker count via its stored field. -/
-def tropicalGrassmannianPluckerCount (n r : Nat) (tg : TropicalGrassmannian n r) : Nat :=
-  tg.numPlucker
+/-- Tropical Grassmannian Plücker count proxy. -/
+def tropicalGrassmannianPluckerCount (_n _r : Nat) (numPlucker : Nat) : Nat :=
+  numPlucker
 
 /-- Tropical intersection weight from Bézout data. -/
 def tropicalIntersectionWeight (n : Nat) (tb : TropicalBezout n) : Nat :=
@@ -526,17 +526,17 @@ theorem kapranovWitnessDimension_refl (n : Nat) (kd : KapranovData n) :
 theorem mikhalkinMultiplicity_refl (n : Nat) (ti : TropicalIntersectionMult n) :
     mikhalkinMultiplicity n ti = mikhalkinMultiplicity n ti := rfl
 
-theorem tropicalGrassmannianPluckerCount_refl (n r : Nat) (tg : TropicalGrassmannian n r) :
-    tropicalGrassmannianPluckerCount n r tg = tropicalGrassmannianPluckerCount n r tg := rfl
+theorem tropicalGrassmannianPluckerCount_refl (n r : Nat) (numPlucker : Nat) :
+    tropicalGrassmannianPluckerCount n r numPlucker =
+      tropicalGrassmannianPluckerCount n r numPlucker := rfl
 
 theorem tropicalIntersectionWeight_refl (n : Nat) (tb : TropicalBezout n) :
     tropicalIntersectionWeight n tb = tropicalIntersectionWeight n tb := rfl
 
 theorem kapranovMikhalkin_bridge_path (n : Nat)
     (kd : KapranovData n) (ti : TropicalIntersectionMult n) :
-    Path (kapranovWitnessDimension n kd + mikhalkinMultiplicity n ti)
-         (kapranovWitnessDimension n kd + mikhalkinMultiplicity n ti) :=
-  Path.refl _
+    kapranovWitnessDimension n kd + mikhalkinMultiplicity n ti =
+      kapranovWitnessDimension n kd + mikhalkinMultiplicity n ti := rfl
 
 end TropicalGeometry
 end Algebra

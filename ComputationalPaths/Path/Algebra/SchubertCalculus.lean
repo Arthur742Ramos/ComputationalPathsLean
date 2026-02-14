@@ -1,4 +1,4 @@
-/-!
+ /-
 # Schubert Calculus via Computational Paths
 
 This module provides a computational-path oriented scaffold for Schubert
@@ -181,9 +181,8 @@ theorem schubertPolynomialSupport_rweq (n : Nat) (d : DoubleSchubertPolynomial n
   RwEq.refl _
 
 theorem petersonLamShimozono_path (n : Nat) (pls : PetersonLamShimozonoData n) :
-    Path (petersonTranslation n pls + affineSchubertDegree n pls)
-         (petersonTranslation n pls + affineSchubertDegree n pls) :=
-  Path.refl _
+    petersonTranslation n pls + affineSchubertDegree n pls =
+      petersonTranslation n pls + affineSchubertDegree n pls := rfl
 
 end SchubertCalculus
 end Algebra

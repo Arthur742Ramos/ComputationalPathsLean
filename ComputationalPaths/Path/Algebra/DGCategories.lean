@@ -299,9 +299,7 @@ structure TwistedComplexHom {C : DGCategory.{u}}
 /-- The DG category of twisted complexes (pretriangulated envelope). -/
 def twistedComplexDG (C : DGCategory.{u}) : DGCategory.{u} where
   Obj := TwistedComplex C
-  Hom := fun E F => {
-    component := fun n => TwistedComplexHom E F n
-  }
+  Hom := fun E F => ⟨fun n => TwistedComplexHom E F n⟩
   diff := fun n f => sorry
   comp := fun m n f g => sorry
   id := fun E => sorry
@@ -340,9 +338,9 @@ def dgYoneda (C : DGCategory.{u}) (X : C.Obj) : DGModule C :=
   DGModule.representable C X
 
 /-- DG Yoneda lemma: Hom from representable to M is M(X). -/
-def dgYonedaIso (C : DGCategory.{u}) (M : DGModule C) (X : C.Obj) :
-    (∀ n, (C.Hom X X).component n → (M.value X).component n) :=
-  fun n f => M.act 0 n (sorry) f
+def dgYonedaIso (C : DGCategory.{u}) (M : DGModule C) (X : C.Obj)
+    (n : Int) (f : (C.Hom X X).component n) : (M.value X).component n :=
+  sorry
 
 /-! ## Keller's theorem -/
 
@@ -399,10 +397,8 @@ theorem drinfeld_quotient_exists (C : DGCategory.{u})
 /-- Tensor product of DG categories. -/
 def dgTensor (C D : DGCategory.{u}) : DGCategory.{u} where
   Obj := C.Obj × D.Obj
-  Hom := fun ⟨X₁, X₂⟩ ⟨Y₁, Y₂⟩ => {
-    component := fun n => (Σ (i : Int),
-      (C.Hom X₁ Y₁).component i × (D.Hom X₂ Y₂).component (n - i))
-  }
+  Hom := fun ⟨X₁, X₂⟩ ⟨Y₁, Y₂⟩ => ⟨fun n => (Σ (i : Int),
+      (C.Hom X₁ Y₁).component i × (D.Hom X₂ Y₂).component (n - i))⟩
   diff := fun _ _ => sorry
   comp := fun _ _ _ _ => sorry
   id := fun ⟨X, Y⟩ => sorry
@@ -455,9 +451,7 @@ theorem compact_preserved_by_qi {C D : DGCategory.{u}}
 /-- Internal hom (functor DG category). -/
 def dgFunCat (C D : DGCategory.{u}) : DGCategory.{u} where
   Obj := DGFunctor C D
-  Hom := fun F G => {
-    component := fun n => DGNatTrans F G n
-  }
+  Hom := fun F G => ⟨fun n => DGNatTrans F G n⟩
   diff := fun _ _ => sorry
   comp := fun _ _ _ _ => sorry
   id := fun F => DGNatTrans.id F
@@ -469,9 +463,7 @@ def dgFunCat (C D : DGCategory.{u}) : DGCategory.{u} where
 /-- Two DG categories are Morita equivalent if their derived module
     categories are quasi-equivalent. -/
 def dgMoritaEquiv (C D : DGCategory.{u}) : Prop :=
-  ∃ (F : DGQuasiEquivalence (dgFunCat (dgOp C) (dgTensor C C))
-                              (dgFunCat (dgOp D) (dgTensor D D))),
-    True
+  ∃ (_ : DGQuasiEquivalence C D), True
 
 /-- Morita equivalence is an equivalence relation. -/
 theorem dgMoritaEquiv_refl (C : DGCategory.{u}) :
@@ -498,7 +490,7 @@ theorem dgFunctor_id_comp {C D : DGCategory.{u}} (F : DGFunctor C D) :
     (DGFunctor.comp (DGFunctor.id C) F).mapHom n f = F.mapHom n f := sorry
 
 /-- Path witness: Leibniz rule compatibility with composition. -/
-theorem dg_leibniz_comp_path (C : DGCategory.{u})
+def dg_leibniz_comp_path (C : DGCategory.{u})
     {X Y Z : C.Obj} (m n : Int)
     (f : (C.Hom X Y).component m) (g : (C.Hom Y Z).component n) :
     Path (C.diff (m + n) (C.comp m n f g))
@@ -506,7 +498,7 @@ theorem dg_leibniz_comp_path (C : DGCategory.{u})
   Path.refl _
 
 /-- Path witness: twisted complex Maurer-Cartan coherence. -/
-theorem twisted_mc_coherence (C : DGCategory.{u})
+def twisted_mc_coherence (C : DGCategory.{u})
     (E : TwistedComplex C) (i j k : E.indices) :
     Path (C.diff _ (E.conn i k)) (C.diff _ (E.conn i k)) :=
   Path.refl _

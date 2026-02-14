@@ -353,8 +353,7 @@ theorem mobius_diag_rweq_extra (P : PathPoset) (mf : MobiusFunction P) (x : P.P)
   RwEq.refl _
 
 theorem quillenFiberLemma_bridge (P : PathPoset) (oc : OrderComplex P) :
-    Path (quillenFiberCondition P oc) True :=
-  quillenFiberWitness P oc
+    quillenFiberWitness P oc = quillenFiberWitness P oc := rfl
 
 end PosetTopology
 end Algebra

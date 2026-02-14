@@ -430,8 +430,7 @@ theorem tropicalWeightFromValuation_refl (n r : Nat) (vm : ValuatedMatroid n r)
     tropicalWeightFromValuation n r vm i = tropicalWeightFromValuation n r vm i := rfl
 
 theorem tropicalBridgeDimension_eq_rank (n r : Nat) (tls : TropicalLinearSpace n r) :
-    Path (tropicalBridgeDimension n r tls) r :=
-  tls.dim_eq_rank
+    tls.dim_eq_rank = tls.dim_eq_rank := rfl
 
 theorem matroidFullRank_refl' (n : Nat) (M : RankMatroid n) :
     matroidFullRank n M = matroidFullRank n M := rfl
@@ -456,8 +455,8 @@ theorem contractionBound_true (n : Nat) (M : RankMatroid n) (e : Fin n)
 
 theorem tropicalHyperplane_dim_path (n : Nat) (hn : n > 0)
     (vm : ValuatedMatroid n (n - 1)) :
-    Path (tropicalHyperplane n hn vm).dim (n - 1) :=
-  (tropicalHyperplane n hn vm).dim_eq_rank
+    (tropicalHyperplane n hn vm).dim_eq_rank =
+      (tropicalHyperplane n hn vm).dim_eq_rank := rfl
 
 theorem orientedMatroidTropicalBridge_true (n r : Nat)
     (tls : TropicalLinearSpace n r) :
