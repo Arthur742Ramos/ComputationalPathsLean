@@ -35,7 +35,7 @@ def anosovProperty {X : Type u} (sys : HyperbolicSystem X) : Prop :=
   ∀ x, stableWeight sys x 1 ≤ unstableWeight sys x 1 + stableWeight sys x 1
 
 def structuralStabilityProperty {X : Type u} (sys : HyperbolicSystem X) : Prop :=
-  ∀ x, Path (iterate sys.F 1 x) (sys.F x)
+  ∀ x, iterate sys.F 1 x = sys.F x
 
 def smaleHorseshoeSymbolCount {X : Type u} (sys : HyperbolicSystem X) (x : X) : Nat :=
   stableWeight sys x 1 + unstableWeight sys x 1 + 1
@@ -109,11 +109,11 @@ theorem iterate_succ {X : Type u} (F : X → X) (n : Nat) (x : X) :
   sorry
 
 theorem stableWeight_self_path {X : Type u} (sys : HyperbolicSystem X) (x : X) (n : Nat) :
-    Path (stableWeight sys x n) (stableWeight sys x n) := by
+    stableWeight sys x n = stableWeight sys x n := by
   sorry
 
 theorem unstableWeight_self_path {X : Type u} (sys : HyperbolicSystem X) (x : X) (n : Nat) :
-    Path (unstableWeight sys x n) (unstableWeight sys x n) := by
+    unstableWeight sys x n = unstableWeight sys x n := by
   sorry
 
 theorem anosov_implies_structural_placeholder {X : Type u} (sys : HyperbolicSystem X) :

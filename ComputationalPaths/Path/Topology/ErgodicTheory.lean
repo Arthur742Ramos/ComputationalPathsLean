@@ -109,17 +109,17 @@ theorem birkhoffSum_zero {X : Type u} (T : X → X) (f : X → Nat) (x : X) :
 
 theorem birkhoffAverage_self_path {X : Type u} (sys : ErgodicSystem X)
     (f : X → Nat) (x : X) (n : Nat) :
-    Path (birkhoffAverage sys f x n) (birkhoffAverage sys f x n) := by
+    birkhoffAverage sys f x n = birkhoffAverage sys f x n := by
   sorry
 
 theorem vonNeumannAverage_self_path {X : Type u} (sys : ErgodicSystem X)
     (f : X → Nat) (x : X) (n : Nat) :
-    Path (vonNeumannAverage sys f x n) (vonNeumannAverage sys f x n) := by
+    vonNeumannAverage sys f x n = vonNeumannAverage sys f x n := by
   sorry
 
 theorem invariantObservable_refl {X : Type u} (sys : ErgodicSystem X)
     (f : X → Nat) (x : X) :
-    Path (invariantObservable sys f x) (invariantObservable sys f x) := by
+    invariantObservable sys f x = invariantObservable sys f x := by
   sorry
 
 theorem strongMixing_implies_weakMixing {X : Type u} (sys : ErgodicSystem X) :
@@ -172,12 +172,12 @@ theorem entropyProduction_nonnegative {X : Type u}
 
 theorem birkhoff_limit_reflexive {X : Type u} (sys : ErgodicSystem X)
     (f : X → Nat) (x : X) (n : Nat) :
-    Path (birkhoffLimit sys f x n) (birkhoffLimit sys f x n) := by
+    birkhoffLimit sys f x n = birkhoffLimit sys f x n := by
   sorry
 
 theorem vonNeumann_limit_reflexive {X : Type u} (sys : ErgodicSystem X)
     (f : X → Nat) (x : X) (n : Nat) :
-    Path (neumannLimit sys f x n) (neumannLimit sys f x n) := by
+    neumannLimit sys f x n = neumannLimit sys f x n := by
   sorry
 
 theorem spectralMultiplicity_nonnegative {X : Type u}

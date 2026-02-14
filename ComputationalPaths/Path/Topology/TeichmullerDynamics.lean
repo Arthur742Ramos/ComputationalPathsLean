@@ -97,7 +97,7 @@ def renormalizationEntropy {X : Type u} (sys : TeichmullerSystem X) (x : X) : Na
 def saddleConnectionCount {X : Type u} (sys : TeichmullerSystem X) (x : X) : Nat :=
   flatSurfaceArea sys x + cylinderDecompositionCount sys x
 
-def veechLatticeCovolume {X : Type u} (sys : TeichmullerSystem X) (x : X) : Nat :=
+abbrev veechLatticeCovolume {X : Type u} (sys : TeichmullerSystem X) (x : X) : Nat :=
   masurVeechVolume sys x + veechGroupRank sys x
 
 theorem iterate_zero {X : Type u} (F : X → X) (x : X) :
@@ -109,7 +109,7 @@ theorem iterate_succ {X : Type u} (F : X → X) (n : Nat) (x : X) :
   sorry
 
 theorem teichDistance_self_path {X : Type u} (sys : TeichmullerSystem X) (x y : X) :
-    Path (teichDistance sys x y) (teichDistance sys x y) := by
+    teichDistance sys x y = teichDistance sys x y := by
   sorry
 
 theorem mappingClassActionLength_nonnegative {X : Type u}

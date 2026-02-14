@@ -97,11 +97,11 @@ theorem iterate_succ {X : Type u} (F : X → X) (n : Nat) (x : X) :
   sorry
 
 theorem stableBranch_self_path {X : Type u} (sys : HomoclinicSystem X) (x : X) (n : Nat) :
-    Path (stableBranch sys x n) (stableBranch sys x n) := by
+    stableBranch sys x n = stableBranch sys x n := by
   sorry
 
 theorem unstableBranch_self_path {X : Type u} (sys : HomoclinicSystem X) (x : X) (n : Nat) :
-    Path (unstableBranch sys x n) (unstableBranch sys x n) := by
+    unstableBranch sys x n = unstableBranch sys x n := by
   sorry
 
 theorem transverse_implies_homoclinic_placeholder {X : Type u}

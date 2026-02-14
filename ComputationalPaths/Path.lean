@@ -460,3 +460,8 @@ import ComputationalPaths.Path.Topology.HyperbolicDynamics
 import ComputationalPaths.Path.Topology.HomoclinicDynamics
 import ComputationalPaths.Path.Topology.TeichmullerDynamics
 import ComputationalPaths.Path.Algebra.ArithmeticDynamics
+import ComputationalPaths.Path.Algebra.AnalyticNumberTheory
+import ComputationalPaths.Path.Algebra.AdditiveCombin
+import ComputationalPaths.Path.Algebra.AlgebraicCombinatorics
+import ComputationalPaths.Path.Topology.MicroLocalAnalysis
+import ComputationalPaths.Path.Topology.GeometricAnalysis
