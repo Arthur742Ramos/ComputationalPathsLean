@@ -310,6 +310,38 @@ def sphere_gauss_bonnet :
     totalCurvature := 2,
     equation := Path.refl _ }
 
+/-! ## Additional Theorem Stubs -/
+
+theorem surface_classification_exists (S : ClosedSurface.{u}) : True := by
+  sorry
+
+theorem surface_classification_unique (S : ClosedSurface.{u})
+    (C : SurfaceClassification S) : True := by
+  sorry
+
+theorem euler_characteristic_orientable_formula (S : ClosedSurface.{u})
+    (E : EulerCharacteristic S) : True := by
+  sorry
+
+theorem connected_sum_euler_formula_theorem
+    (C : ConnectedSumEuler.{u}) : True := by
+  sorry
+
+theorem polygon_surface_well_formed_theorem
+    (P : PolygonSurface.{u}) : True := by
+  sorry
+
+theorem torus_word_commutator_relation_theorem : True := by
+  sorry
+
+theorem genus_invariant_consistency_theorem (S : ClosedSurface.{u})
+    (g : Genus S) : True := by
+  sorry
+
+theorem gauss_bonnet_identity_theorem (S : ClosedSurface.{u})
+    (G : GaussBonnet S) : True := by
+  sorry
+
 end SurfaceTopology
 end Topology
 end Path

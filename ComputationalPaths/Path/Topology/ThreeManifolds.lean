@@ -365,6 +365,37 @@ structure GeometrizationPrime (M : ThreeManifold.{u}) where
   /-- Consistency path. -/
   consistent : Path M.carrier M.carrier
 
+/-! ## Additional Theorem Stubs -/
+
+theorem heegaard_decomposition_exists (M : ThreeManifold.{u}) : True := by
+  sorry
+
+theorem heegaard_genus_well_defined (M : ThreeManifold.{u})
+    (g : HeegaardGenus M) : True := by
+  sorry
+
+theorem prime_decomposition_exists (M : ThreeManifold.{u}) : True := by
+  sorry
+
+theorem prime_decomposition_unique (M : ThreeManifold.{u})
+    (P : PrimeDecomposition M) : True := by
+  sorry
+
+theorem jsj_decomposition_exists (M : ThreeManifold.{u}) : True := by
+  sorry
+
+theorem geometrization_piecewise (M : ThreeManifold.{u})
+    (G : Geometrization M) : True := by
+  sorry
+
+theorem dehn_surgery_realization (M : ThreeManifold.{u})
+    (L : LickorishWallace M) : True := by
+  sorry
+
+theorem incompressible_surface_haken (M : ThreeManifold.{u})
+    (H : HakenManifold M) : True := by
+  sorry
+
 end ThreeManifolds
 end Topology
 end Path

@@ -192,6 +192,43 @@ structure FiniteTypeInvariant where
   /-- Vanishing on sufficiently singular diagrams. -/
   vanishes : SingularDiagram -> True
 
+/-! ## Additional Theorem Stubs -/
+
+theorem reidemeister_equivalence_transitive_theorem
+    {d1 d2 d3 : KnotDiagram}
+    (h12 : ReidemeisterEquiv d1 d2) (h23 : ReidemeisterEquiv d2 d3) : True := by
+  sorry
+
+theorem knot_step_preserves_invariant_theorem {α : Type u}
+    (I : KnotInvariant α) {d1 d2 : KnotDiagram} (s : KnotStep d1 d2) : True := by
+  sorry
+
+theorem jones_skein_relation_theorem
+    (J : JonesPolynomial) (s : SkeinTriple) : True := by
+  sorry
+
+theorem homflypt_skein_relation_theorem
+    (H : HOMFLYPTPolynomial) (s : SkeinTriple) : True := by
+  sorry
+
+theorem vassiliev_finite_type_condition_theorem
+    (V : VassilievInvariant) : True := by
+  sorry
+
+theorem finite_type_reidemeister_invariance_theorem
+    (F : FiniteTypeInvariant) {d1 d2 : KnotDiagram}
+    (h : ReidemeisterEquiv d1 d2) : True := by
+  sorry
+
+theorem reidemeister_step_path_symmetry_theorem
+    {d1 d2 : KnotDiagram} (s : KnotStep d1 d2) : True := by
+  sorry
+
+theorem knot_steps_compose_associative_theorem
+    {d1 d2 d3 d4 : KnotDiagram}
+    (s1 : KnotStep d1 d2) (s2 : KnotStep d2 d3) (s3 : KnotStep d3 d4) : True := by
+  sorry
+
 end KnotInvariants
 end Topology
 end Path

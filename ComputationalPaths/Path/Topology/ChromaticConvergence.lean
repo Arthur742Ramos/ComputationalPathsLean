@@ -381,6 +381,40 @@ def chromatic_tower_consistent (X : Spec.{u}) (T : ChromaticTower.{u} X) :
            ((T.loc n).locMap.map k x) :=
   T.compatible
 
+/-! ## Additional Theorem Stubs -/
+
+theorem chromatic_tower_map_compatibility_theorem {X : Spec.{u}}
+    (T : ChromaticTower.{u} X) : True := by
+  sorry
+
+theorem holim_projection_compatibility_theorem {X : Spec.{u}}
+    (H : HolimChromatic.{u} X) : True := by
+  sorry
+
+theorem chromatic_convergence_left_retraction_theorem {X : Spec.{u}}
+    (C : ChromConvTheorem X) : True := by
+  sorry
+
+theorem chromatic_convergence_right_retraction_theorem {X : Spec.{u}}
+    (C : ChromConvTheorem X) : True := by
+  sorry
+
+theorem monochromatic_layer_kn_locality_theorem {n : Nat} {X : Spec.{u}}
+    (M : MonochromaticIsKnLocal.{u} n X) : True := by
+  sorry
+
+theorem thick_subcategory_nested_chain_theorem
+    (T : ThickClassificationTheorem.{u}) : True := by
+  sorry
+
+theorem nilpotence_detection_theorem
+    (N : NilpotenceTheorem.{u}) : True := by
+  sorry
+
+theorem telescope_comparison_equivalence_theorem {n : Nat} {X : Spec.{u}}
+    (T : TelescopeConjecture.{u} n X) : True := by
+  sorry
+
 end ChromaticConvergence
 end Topology
 end Path

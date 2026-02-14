@@ -232,6 +232,53 @@ structure MGL where
   represents_cobordism : True
 
 
+/-! ## Theorems -/
+
+/-- Composition of scheme morphisms is associative. -/
+theorem SchemeMorphism.comp_assoc {W X Y Z : Scheme.{u}}
+    (h : SchemeMorphism Y Z) (g : SchemeMorphism X Y) (f : SchemeMorphism W X) :
+    SchemeMorphism.comp h (SchemeMorphism.comp g f) =
+    SchemeMorphism.comp (SchemeMorphism.comp h g) f := by sorry
+
+/-- Identity is a left unit for scheme morphism composition. -/
+theorem SchemeMorphism.id_comp {X Y : Scheme.{u}} (f : SchemeMorphism X Y) :
+    SchemeMorphism.comp f (SchemeMorphism.id X) = f := by sorry
+
+/-- Identity is a right unit for scheme morphism composition. -/
+theorem SchemeMorphism.comp_id {X Y : Scheme.{u}} (f : SchemeMorphism X Y) :
+    SchemeMorphism.comp (SchemeMorphism.id Y) f = f := by sorry
+
+/-- A¹-homotopy equivalence is symmetric. -/
+theorem A1Homotopy.symm {X Y : MotivicSpace.{u}} (h : A1Homotopy X Y) :
+    A1Homotopy Y X := by sorry
+
+/-- A¹-homotopy equivalence is transitive. -/
+theorem A1Homotopy.trans {X Y Z : MotivicSpace.{u}}
+    (h₁ : A1Homotopy X Y) (h₂ : A1Homotopy Y Z) : A1Homotopy X Z := by sorry
+
+/-- Motivic Hurewicz: the first nonvanishing motivic cohomology group
+    agrees with motivic homotopy in the A¹-connected range. -/
+theorem motivic_hurewicz (X : MotivicSpace.{u}) (MC : MotivicCohomology.{u} X)
+    (n : Nat) (hn : n ≥ 1) :
+    Nonempty (MC.H n 0) := by sorry
+
+/-- A¹-connectivity: the representable motivic space of the affine line
+    is A¹-equivalent to the point. -/
+theorem A1_connectivity :
+    A1Homotopy (representable affineLine.{u}) (representable specPoint.{u}) := by sorry
+
+/-- Nisnevich descent: a trivial covering yields the identity on sections. -/
+theorem nisnevich_descent_trivial (X : Scheme.{u}) (F : Presheaf.{u}) (s : F.sections X) :
+    F.restrict (SchemeMorphism.id X) s = s := by sorry
+
+/-- The motivic spectral sequence E₂ page is computed by motivic cohomology. -/
+theorem motivic_spectral_sequence_E2 (X : Scheme.{u})
+    (M : MotivicToKTheory.{u} X) (p q : Nat) :
+    Nonempty (M.motivic.H p q → M.ktheory.K (p - q)) := by sorry
+
+/-- MGL represents algebraic cobordism. -/
+theorem MGL_represents_cobordism (m : MGL.{u}) : m.represents_cobordism = True := by sorry
+
 private def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 

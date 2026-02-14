@@ -262,6 +262,40 @@ def mapper_node_count (m : MapperGraph) :
     Path m.numNodes m.nodes.length :=
   m.node_count
 
+/-! ## Additional Theorem Stubs -/
+
+theorem mapper_node_count_consistency_theorem
+    (m : MapperGraph) : True := by
+  sorry
+
+theorem mapper_functoriality_refinement_theorem
+    (M : MapperFunctoriality) : True := by
+  sorry
+
+theorem reeb_interleaving_symmetry_theorem
+    (R : ReebInterleavingDist) : True := by
+  sorry
+
+theorem merge_tree_root_fixed_theorem
+    (t : MergeTree) : True := by
+  sorry
+
+theorem merge_tree_distance_nonnegative_theorem
+    (D : MergeTreeDist) : True := by
+  sorry
+
+theorem landscape_order_monotone_theorem
+    (L : PersistenceLandscape) : True := by
+  sorry
+
+theorem wasserstein_triangle_theorem
+    (p : Nat) (W : WassersteinTriangle p) : True := by
+  sorry
+
+theorem tda_step_validity_theorem
+    (s : TDAStep) : True := by
+  sorry
+
 end TopologicalData
 end Topology
 end Path

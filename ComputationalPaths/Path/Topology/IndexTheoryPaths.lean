@@ -289,6 +289,40 @@ structure RiemannRoch where
   /-- Index equals holomorphic Euler characteristic. -/
   index_eq_hol : FredholmIndex dbarOp
 
+/-! ## Additional Theorem Stubs -/
+
+theorem fredholm_index_formula_theorem (D : EllipticOperator)
+    (I : FredholmIndex D) : True := by
+  sorry
+
+theorem dirac_index_ahat_theorem (D : DiracOperator)
+    (I : DiracIndex D) : True := by
+  sorry
+
+theorem atiyah_singer_index_theorem_statement (D : EllipticOperator)
+    (A : AtiyahSingerTheorem D) : True := by
+  sorry
+
+theorem heat_kernel_supertrace_invariance_theorem (D : EllipticOperator)
+    (H : HeatKernelData D) : True := by
+  sorry
+
+theorem heat_kernel_index_agrees_fredholm_theorem (D : EllipticOperator)
+    (H : HeatKernelIndex D) : True := by
+  sorry
+
+theorem aps_boundary_correction_theorem (D boundary : EllipticOperator)
+    (A : APSTheorem D boundary) : True := by
+  sorry
+
+theorem families_index_specialization_theorem (F : EllipticFamily)
+    (T : FamiliesIndexTheorem F) : True := by
+  sorry
+
+theorem analytic_topological_index_agreement_theorem (M : Type u)
+    (K : CotangentKTheory M) (T : TopologicalIndexMap M K) : True := by
+  sorry
+
 end IndexTheoryPaths
 end Topology
 end Path

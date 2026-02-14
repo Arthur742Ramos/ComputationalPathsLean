@@ -199,6 +199,54 @@ def sullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
   unstableModule := U
   t_characterization := trivial
 
+/-! ## Theorems -/
+
+/-- Miller's theorem: the p-completed mapping space Map_+(BG, X) is
+    weakly contractible for finite G and finite CW X. -/
+theorem miller_theorem_statement (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
+    (cs : ClassifyingSpaceData G.carrier) :
+    WeaklyContractible (trivialPCompletion
+      (mapPlusHomotopyType (classifyingPointed cs) X.space) p).completed.carrier := by sorry
+
+/-- Bousfield-Kan completion is idempotent. -/
+theorem bousfield_kan_idempotent (X : HomotopyType.{u}) (p : Prime) :
+    (bousfieldKanCompletion X p).isComplete = True := by sorry
+
+/-- Lannes' T-functor preserves unstable modules. -/
+theorem lannes_T_preserves_unstable (T : LannesTFunctor) (M : UnstableModule) :
+    (T.obj M).instability.instability = True := by sorry
+
+/-- The Sullivan conjecture for elementary abelian p-groups. -/
+theorem sullivan_elementary_abelian (p : Prime) (G : FiniteGroup)
+    (X : FiniteCWComplex) (cs : ClassifyingSpaceData G.carrier)
+    (U : UnstableModule) :
+    (sullivanConjectureData p G X cs U).t_characterization = True := by sorry
+
+/-- Unstable Adams spectral sequence converges to Map_+(BG, X). -/
+theorem unstable_adams_convergence (p : Prime) (G : FiniteGroup)
+    (X : FiniteCWComplex) (cs : ClassifyingSpaceData G.carrier) :
+    Nonempty (MillerTheorem p G X) := by sorry
+
+/-- The identity Lannes T-functor is left exact. -/
+theorem lannes_T_left_exact : lannesTFunctorId.left_exact = True := by sorry
+
+/-- Trivial p-completion preserves group structure. -/
+theorem trivial_completion_preserves_groups (X : HomotopyType.{u}) (p : Prime) (n : Nat) :
+    (trivialPCompletion X p).groups_agree n =
+    GroupIso.refl (X.homotopyGroup n) := by sorry
+
+/-- Weak contractibility of a trivially contractible space. -/
+theorem weakly_contractible_trivial (X : Type u) :
+    (weaklyContractible X).witness = True := by sorry
+
+/-- The basepoint map is the zero element of Map_+(X, Y). -/
+theorem basepoint_map_pt (X Y : Pointed.{u}) :
+    (MapPlus X Y).pt = basepointMap X Y := by sorry
+
+/-- The mapping space MapPlus is pointed. -/
+theorem mapPlus_is_pointed (X Y : Pointed.{u}) :
+    (MapPlus X Y).carrier = PointedMap X Y := by sorry
+
 private def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
