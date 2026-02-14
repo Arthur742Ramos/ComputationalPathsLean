@@ -847,25 +847,6 @@ inductive Step :
   | trans_cancel_right {A : Type u} {a b c : A}
       (p : Path a b) (q : Path b c) :
       Step (A := A) (Path.trans (Path.symm p) (Path.trans p q)) q
-  /-- Rule 79: Step list reduction. Any path with a non-empty step list
-      can drop its head step.  Step lists are computational *witnesses* /
-      traces that record the construction history of a path.  Dropping
-      a step forgets one layer of this trace while preserving the
-      underlying equality proof.
-
-      Unlike the former `Step.canon` (which jumped directly to a
-      canonical form referencing `toEq`), this rule operates purely on
-      the step-list structure and does not reference equality proofs.
-
-      Together with proof irrelevance of `Eq` (which ensures all `Path a b`
-      values share the same `proof` field), repeated application of
-      `step_drop` normalises every path to `Path.mk [] h`, yielding
-      unique normal forms and hence confluence (see `ConfluenceProof.lean`). -/
-  | step_drop {A : Type u} {a b : A}
-      (s : ComputationalPaths.Step A) (rest : List (ComputationalPaths.Step A))
-      (h : a = b) :
-      Step (A := A) (Path.mk (s :: rest) h) (Path.mk rest h)
-
 /-- Step-oriented path constructor for reflexivity. -/
 @[simp] def Step.refl {A : Type u} (a : A) : Path a a :=
   Path.refl a
@@ -1075,7 +1056,6 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
     simp
   | trans_cancel_left _ _ => simp
   | trans_cancel_right _ _ => simp
-  | step_drop _ _ _ => simp
 
 end Path
 end ComputationalPaths

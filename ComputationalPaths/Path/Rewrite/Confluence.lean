@@ -42,8 +42,10 @@ structure Join {A : Type u} {a b : A}
   { meet := p, left := Rw.refl p, right := Rw.refl p }
 
 /-- **Confluence interface**: Given two rewrites from a common source, their
-targets can be joined. This is instantiated in `ConfluenceProof.lean` under
-termination and local confluence assumptions, so no new axioms are required. -/
+targets can be joined. This is parameterized as a typeclass. At the `Path`
+level, it is NOT globally instantiated (since `Path` has distinct normal
+forms with different step lists). For the genuine algebraic confluence on
+abstract `Expr` syntax, see `GroupoidConfluence.confluence`. -/
 class HasJoinOfRw : Type (u + 1) where
   join_of_rw {A : Type u} {a b : A}
       {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :

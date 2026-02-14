@@ -1,71 +1,53 @@
 /-
 # Confluence Proof for Computational Paths TRS
 
-This module **proves** full confluence of the computational-paths rewriting
-system and derives `HasJoinOfRw` unconditionally — no assumptions required.
+This module provides confluence results for the computational-paths rewriting
+system at two levels of abstraction.
 
-## Two Levels of Confluence
+## Confluence on `Expr` (the genuine algebraic result)
 
-There are two distinct confluence results in this project, operating at
-different levels of abstraction:
+The primary confluence result lives on `GroupoidTRS.Expr` — an **untyped**
+syntax tree where distinct terms are genuinely distinct.  The completed
+groupoid TRS (`CStep`: 10 rules + 3 congruences) is confluent, proved via
+a **semantic interpretation into the free group** (`GroupoidConfluence.lean`).
 
-### 1. Path-level confluence (this module)
+This proof:
+1. Defines `toRW : Expr → List Gen` mapping expressions to reduced words
+2. Shows `toRW` is invariant under `CStep`
+3. Shows every `Expr` reduces to a canonical form
+4. Derives confluence from the uniqueness of reduced words
 
-The `Path a b` type is a **structure** (in `Type`) carrying both a step trace
-(`steps : List (Step A)`) and an equality witness (`proof : a = b`).
-Different step traces produce genuinely distinct `Path` values (see
-`UIP.lean: not_uip_of_nonempty`).
+No `Step.canon`, no `toEq`, no UIP, no proof irrelevance.
 
-At this level, confluence of the `Rw` relation is proved via `step_drop`
-(Rule 77), which rewrites any path `p` to `Path.stepChain p.toEq`.
-Since `toEq` is proof-irrelevant (all equality proofs `a = b` are equal in
-Lean's `Prop`), the canonical target is unique: `stepChain q.toEq =
-stepChain r.toEq` for any `q r : Path a b`.
+## Path-level infrastructure
 
-This is a **valid** confluence proof, but it relies on UIP for the underlying
-`Eq` type.  It collapses all paths with the same endpoints to the same
-rewrite-equivalence class — a consequence of Lean's proof-irrelevant `Prop`.
+At the `Path a b` level, this module provides:
+- **Critical pair witnesses**: explicit join constructions for key overlaps
+  (associativity vs units, symmetry pairs, inverse law pairs)
+- **Commutation lemmas**: steps at disjoint positions commute
+- **Termination**: proved via `GroupoidTRS.Expr.termination`
+- **`rw_toEq`**: multi-step rewriting preserves the equality witness
 
-### 2. Expr-level confluence (GroupoidConfluence.lean)
+### Why confluence is NOT proved on `Path`
 
-The `GroupoidTRS.Expr` type is an **untyped** syntax tree where distinct
-terms are genuinely distinct.  The completed groupoid TRS (`CStep`: 10 rules
-+ 3 congruences) is confluent, proved via a **semantic interpretation into
-the free group**.
+The `Path a b` type is a **structure** (in `Type`) with `steps : List (Step A)`
+and `proof : a = b`.  Two paths with different step lists are genuinely
+distinct values (see `UIP.lean: not_uip_of_nonempty`).  The `Step` rewrite
+rules transform step lists according to groupoid laws, but `Path.mk [s] h`
+(a path with a single arbitrary element step) is a normal form — no `Step`
+rule matches it.  Since `Path.mk [] h` is also a normal form, there exist
+two distinct normal forms in `Path a a`, making confluence impossible at the
+`Path` level without a step-list erasure rule.
 
-This is the **genuine mathematical result**: confluence of the groupoid
-rewrite system as an algebraic property, independent of UIP or proof
-irrelevance.  The proof constructs an explicit homomorphism `toRW : Expr →
-List Gen` into reduced words, shows it is invariant under `CStep`, and
-derives confluence from the uniqueness of reduced words.
-
-See `GroupoidConfluence.confluence` for the statement and proof.
-
-## Termination
-
-Termination is proved in `GroupoidTRS.lean` for the core groupoid fragment
-operating on abstract syntax (`GroupoidTRS.Expr`). The proof uses a
-lexicographic pair `(weight, leftWeight)` where:
-- `weight` is a polynomial interpretation (rules 1–7 strictly decrease it)
-- `leftWeight` handles associativity (rule 8 preserves weight but strictly
-  decreases leftWeight)
-
-At the semantic `Path` level, some `Step` constructors produce identity
-rewrites (e.g. `symm_refl` maps `symm(refl a)` to `refl a` — these are
-definitionally equal), making `RwPlus` reflexive. A reflexive relation
-cannot be well-founded. The termination result therefore lives on the
-*syntactic* `Expr` type, which is the mathematically correct level.
+The genuine confluence result therefore lives on `Expr`, where it is a
+purely algebraic theorem about the groupoid TRS.
 
 ## Main Results
 
-- `instHasTerminationProp`: **Proved** — `HasTerminationProp` instance
-  (genuine termination proof via `GroupoidTRS.Expr.termination`)
-- `instHasConfluenceProp`: **Proved** — full confluence via `step_drop`
-- `instLocalOfConfluence`: **Proved** — local confluence (corollary)
-- `confluence_prop`: Prop-level confluence (proved)
-- `strip_lemma_prop`: Strip lemma (corollary of confluence)
-- `instHasJoinOfRw`: **Proved** — instance of `HasJoinOfRw`
-- `expr_confluence`: Bridge to the genuine algebraic confluence result
+- `instHasTerminationProp`: Proved — genuine termination via weight function
+- `instHasConfluencePropExpr`: Proved — confluence on `Expr` via free groups
+- `expr_confluence`, `expr_church_rosser`, `expr_unique_normal_forms`:
+  Bridge theorems connecting to `GroupoidConfluence`
 
 ## Key Achievements
 
@@ -290,16 +272,6 @@ def local_confluence_ss_sr (a : A) :
   }
 
 /-- Critical pair: `symm_trans_congr` vs `symm_symm`
-    Source: `symm(symm(q) · symm(p))`
-    Via symm_trans_congr: `symm(symm(p)) · symm(symm(q))`
-    The other direction applies symm_symm to the whole thing after recognizing
-    it as `symm(symm(p · q))` if we had gotten there via symm_trans_congr first.
-
-    Actually, let's reconsider. If we have `symm(p · q)`:
-    - Via symm_trans_congr: `symm(q) · symm(p)`
-    Then applying symm_symm doesn't directly apply.
-
-    The critical pair is when we have nested symms.
     Source: `symm(symm(p · q))`
     Via symm_symm: `p · q`
     Via symm_congr of symm_trans_congr: `symm(symm(q) · symm(p))`
@@ -333,9 +305,7 @@ variable {a b c : A}
     Source: `((p · symm(p)) · q)`
     Via assoc: `p · (symm(p) · q)`
     Via trans_symm on inner: `refl · q`
-    Join: Both reach `q`.
-    Path for left: `p · (symm(p) · q)` → `(p · symm(p)) · q` → `refl · q` → `q`
-    Path for right: `refl · q` → `q` -/
+    Join: Both reach `q`. -/
 def local_confluence_tt_ts (p : Path a b) (q : Path a c) :
     Confluence.Join
       (Path.trans p (Path.trans (Path.symm p) q))  -- via trans_assoc
@@ -354,9 +324,7 @@ def local_confluence_tt_ts (p : Path a b) (q : Path a c) :
     Source: `((symm(p) · p) · q)`
     Via assoc: `symm(p) · (p · q)`
     Via symm_trans on inner: `refl · q`
-    Join: Both reach `q`.
-    Path for left: `symm(p) · (p · q)` → `(symm(p) · p) · q` → `refl · q` → `q`
-    Path for right: `refl · q` → `q` -/
+    Join: Both reach `q`. -/
 def local_confluence_tt_st (p : Path a b) (q : Path b c) :
     Confluence.Join
       (Path.trans (Path.symm p) (Path.trans p q))  -- via trans_assoc
@@ -373,59 +341,24 @@ def local_confluence_tt_st (p : Path a b) (q : Path b c) :
 
 end Inverses
 
-/-! ## Local Confluence (Prop-Level Assumption)
+/-! ## Local Confluence Infrastructure
 
-Local confluence for our TRS is justified by critical pair analysis. We have
-explicit join witnesses for key path algebra overlaps above. Because `Step` is
+Local confluence for the TRS is justified by critical pair analysis. The
+explicit join witnesses above cover the key overlaps. Because `Step` is
 Prop-valued, exhaustive case analysis into `Type` is not directly possible.
 
-We therefore assume Prop-level local confluence via `HasLocalConfluenceProp`.
-The intended justification is:
-1. The critical pair proofs above (tt_rrr, tt_lrr, tt_tt, ss_sr, ss_stss, tt_ts, tt_st)
-2. Commutation of non-overlapping steps (commute_trans_left_right)
-3. Lifting lemmas for congruence (join_lift_trans_left/right, join_lift_symm)
--/
+The critical pair proofs above (tt_rrr, tt_lrr, tt_tt, ss_sr, ss_stss,
+tt_ts, tt_st) together with commutation of non-overlapping steps
+(commute_trans_left_right) and lifting lemmas (join_lift_trans_left/right,
+join_lift_symm) provide the evidence for local confluence. -/
 
-/-! ## Full Confluence from Local Confluence
+/-! ## Rw utilities -/
 
-We use a Prop-level Newman's lemma (termination + local confluence → confluence).
-`Classical.choose` is only used to produce `Type`-level join witnesses for
-downstream convenience.
--/
 /-- Transitivity for Rw (append two derivations). -/
 def rw_append {a b : A} {p q r : Path a b} (h1 : Rw p q) (h2 : Rw q r) : Rw p r := by
   induction h2 with
   | refl => exact h1
   | tail _ step ih => exact Rw.tail ih step
-
-/-- Every path rewrites to one with an empty step list.
-    Proof by induction on the step list length: `step_drop` removes
-    one step at a time until the list is empty. -/
-theorem rw_to_nil {a b : A} (p : Path a b) :
-    Rw p (Path.mk [] p.toEq) := by
-  cases p with
-  | mk steps proof =>
-    show Rw (Path.mk steps proof) (Path.mk [] proof)
-    induction steps with
-    | nil => exact Rw.refl _
-    | cons s rest ih =>
-      exact rw_append (rw_of_step (Step.step_drop s rest proof)) ih
-
-/-- Diamond lemma (local confluence): Given Step p q and Step p r,
-    there exists s with Rw q s and Rw r s.
-
-    **Proof**: Both `q` and `r` reduce to `Path.mk [] _` via
-    `rw_to_nil`.  Since all `Path a b` values share the same
-    `proof` field (proof irrelevance of `Eq`), the two normal
-    forms are identical. -/
-theorem diamond_prop {a b : A}
-    {p q r : Path a b} (_hq : Step p q) (_hr : Step p r) :
-    ∃ s : Path a b, Rw q s ∧ Rw r s :=
-  ⟨ Path.mk [] q.toEq
-  , rw_to_nil q
-  , by have : Path.mk (A := A) [] r.toEq = Path.mk [] q.toEq := by
-         simp
-       rw [this]; exact rw_to_nil r ⟩
 
 /-! ## Termination and Newman's lemma (Prop-level) -/
 
@@ -461,8 +394,6 @@ theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
         rcases hdata with ⟨r, hstep, hrq⟩
         refine Or.inr ⟨r, hstep, ?_⟩
         exact Rw.tail hrq step
-
-
 
 /-- Termination of the rewrite system.
 
@@ -501,28 +432,11 @@ theorem termination_prop_of [HasTerminationProp] :
     Terminating :=
   HasTerminationProp.termination_prop
 
-/-! ### Path-level confluence via toEq preservation
+/-! ### toEq preservation
 
 Every `Step` rule preserves `toEq` (proved in `step_toEq`).  Therefore,
-any multi-step `Rw` chain also preserves `toEq`.  Given two chains
-`Rw p q` and `Rw p r`, we have `q.toEq = p.toEq = r.toEq`.
-
-Since `Path a b` is a structure `{ steps : List (Step A), proof : a = b }`
-and the `proof` field is proof-irrelevant, paths differ only in their
-`steps` metadata.  The `Step` rewrite rules transform this metadata
-while preserving the underlying equality witness.
-
-**Confluence proof strategy**: We use the fact that `toEq` is a
-complete invariant for the rewrite system: all `Rw`-reachable paths
-from a given source share the same `toEq`, and the `steps` field
-is rewriting metadata that does not affect the mathematical content.
-The join is constructed by choosing an arbitrary common descendant
-(using Classical reasoning in `Prop`).
-
-For the genuine algebraic confluence of the groupoid TRS fragment — proved
-via free group interpretation without any appeal to proof irrelevance — see
-`GroupoidConfluence.lean`.
--/
+any multi-step `Rw` chain also preserves `toEq`.  This is a fundamental
+invariant of the rewriting system. -/
 
 /-- Multi-step rewriting preserves `toEq`. -/
 theorem rw_toEq {a b : A} {p q : Path a b} (h : Rw p q) :
@@ -531,93 +445,62 @@ theorem rw_toEq {a b : A} {p q : Path a b} (h : Rw p q) :
   | refl => rfl
   | tail _ step ih => exact ih.trans (step_toEq step)
 
-/-- Prop-level confluence: any two multi-step rewrites from the same
-source can be joined. -/
+/-! ### Confluence on Expr (the genuine algebraic result)
+
+Confluence is proved on `GroupoidTRS.Expr` — the abstract syntax type for
+path expressions. This is the genuine mathematical result, using free group
+interpretation. See `GroupoidConfluence.lean` for the full proof.
+
+At the `Path a b` level, confluence is NOT provable without a step-list
+erasure rule (like the removed `Step.canon` or `step_drop`), because
+`Path.mk [s] h` and `Path.mk [] h` are distinct normal forms in `Path a a`.
+The `Expr` level is the mathematically correct level for confluence.
+
+We redefine `HasConfluenceProp` to operate on `Expr`, reflecting this
+mathematical reality. -/
+
+/-- Prop-level confluence on `GroupoidTRS.Expr`: any two `CStep`-reductions
+from the same source can be joined. -/
+class HasConfluencePropExpr : Prop where
+  confluence : ∀ (a b c : GroupoidTRS.Expr),
+    GroupoidConfluence.CRTC a b → GroupoidConfluence.CRTC a c →
+    ∃ d, GroupoidConfluence.CRTC b d ∧ GroupoidConfluence.CRTC c d
+
+/-- **`HasConfluencePropExpr` instance** — proved via free group interpretation.
+
+The completed groupoid TRS (10 rules + 3 congruences) is confluent on
+abstract `Expr` syntax. The proof constructs an explicit homomorphism
+`toRW : Expr → List Gen` into reduced words, shows it is invariant under
+`CStep`, and derives confluence from the uniqueness of reduced words.
+
+No `Step.canon`, no `step_drop`, no UIP, no proof irrelevance. -/
+instance instHasConfluencePropExpr : HasConfluencePropExpr where
+  confluence := GroupoidConfluence.confluence
+
+/-! ### Path-level `HasConfluenceProp` (backward compatibility)
+
+For backward compatibility with downstream modules that expect a
+`HasConfluenceProp` class, we keep the definition but note that it
+operates on `Path` (where confluence requires the `HasJoinOfRw`
+assumption — which is NOT globally instantiated since `step_drop`
+has been removed).
+
+Downstream code using `[HasJoinOfRw]` as a parameter compiles
+correctly; it simply cannot be instantiated at the `Path` level
+without a step-erasure rule. -/
+
+/-- Prop-level confluence on `Path`: any two multi-step rewrites from the same
+source can be joined. This class is parameterized but NOT globally instantiated
+(confluence on `Path` requires step-list erasure). For the genuine algebraic
+confluence result, use `HasConfluencePropExpr` or `GroupoidConfluence.confluence`
+directly. -/
 class HasConfluenceProp.{v} : Prop where
   confluence : ∀ {A : Type v} {a b : A} {p q r : @Path A a b},
     Rw p q → Rw p r → ∃ s, Rw q s ∧ Rw r s
 
-/-- **Strip lemma**: if `Step p q` and `Rw p r`, then there exists `s`
-with `Rw q s` and `Rw r s`.
-
-Proof via `rw_to_nil`: both `q` and `r` reduce to `Path.mk [] _`,
-which is the same value by proof irrelevance. -/
-theorem strip_lemma_from_diamond {a b : A} {p q r : Path a b}
-    (_hstep : Step p q) (_hrw : Rw p r) :
-    ∃ s : Path a b, Rw q s ∧ Rw r s :=
-  ⟨ Path.mk [] q.toEq
-  , rw_to_nil q
-  , by have : Path.mk (A := A) [] r.toEq = Path.mk [] q.toEq := by
-         simp
-       rw [this]; exact rw_to_nil r ⟩
-
-/-- **`HasConfluenceProp` instance** — proved via `rw_to_nil`.
-
-Every path `p : Path a b` rewrites (via `step_drop`) to `Path.mk [] p.toEq`.
-Since `toEq` is proof-irrelevant, all `Path a b` values share the same
-normal form.  Given `Rw p q` and `Rw p r`, both `q` and `r` reduce to
-this common normal form.
-
-**Philosophical note**: The `step_drop` rule says "steps in the step
-list are computational witnesses / traces that can be forgotten."  This
-is NOT the same as UIP (which says "all proofs of `a = b` are equal"):
-- `step_drop` operates on the `steps : List (Step A)` field (in `Type`)
-- The `proof : a = b` field (in `Prop`) is untouched by `step_drop`
-- No canonical form is constructed from the equality proof
-
-The genuine algebraic confluence of the groupoid TRS — without any
-step-list erasure or proof irrelevance — is proved in
-`GroupoidConfluence.lean` via free group interpretation. -/
-instance instHasConfluenceProp : HasConfluenceProp.{u} where
-  confluence := fun {A} {a} {b} {_p} {q} {r} _hq _hr =>
-    ⟨ Path.mk [] q.toEq
-    , rw_to_nil q
-    , by have : Path.mk (A := A) [] r.toEq = Path.mk [] q.toEq := by
-           simp
-         rw [this]; exact rw_to_nil r ⟩
-
-/-- Confluence implies local confluence. -/
-instance (priority := 50) instLocalOfConfluence :
-    ConfluenceConstructive.HasLocalConfluenceProp.{u} where
-  local_confluence := fun hq hr =>
-    instHasConfluenceProp.confluence (rw_of_step hq) (rw_of_step hr)
-
-/-- **Confluence** (Prop-level): `Rw p q` and `Rw p r` imply joinability. -/
-theorem confluence_prop {a b : A} {p q r : Path a b}
-    (hq : Rw p q) (hr : Rw p r) :
-    ∃ s : Path a b, Rw q s ∧ Rw r s :=
-  HasConfluenceProp.confluence hq hr
-
-/-- Strip lemma: corollary of `confluence_prop`. -/
-theorem strip_lemma_prop {a b : A} {p q r : Path a b}
-    (hstep : Step p q) (hmulti : Rw p r) :
-    ∃ s : Path a b, Rw q s ∧ Rw r s :=
-  confluence_prop (rw_of_step hstep) hmulti
-
-/-- Extract `Type`-level join witnesses via `Classical.choose`. -/
-noncomputable def confluence_of_local {a b : A} {p q r : Path a b}
-    (hq : Rw p q) (hr : Rw p r) :
-    Confluence.Join q r :=
-  have h := confluence_prop hq hr
-  let s := Classical.choose h
-  let ⟨hqs, hrs⟩ := Classical.choose_spec h
-  { meet := s, left := hqs, right := hrs }
-
-/-- The main result: instantiate HasJoinOfRw unconditionally. -/
-noncomputable instance instHasJoinOfRw : Confluence.HasJoinOfRw.{u} where
-  join_of_rw := fun hq hr => confluence_of_local hq hr
-
 /-! ## Bridge to Algebraic Confluence (GroupoidConfluence)
 
-The `instHasConfluenceProp` above uses `step_drop`, which allows dropping
-steps from the step list.  This is a legitimate simplification rule: step
-lists are computational traces that can be forgotten without affecting the
-underlying equality.  Combined with proof irrelevance of `Eq` (which makes
-all `Path a b` values share the same `proof` field), `step_drop` ensures
-that all paths normalise to `Path.mk [] h`, yielding unique normal forms
-and hence confluence.
-
-The **genuine** algebraic confluence result lives in `GroupoidConfluence.lean`
+The genuine algebraic confluence result lives in `GroupoidConfluence.lean`
 on the abstract syntax type `GroupoidTRS.Expr`.  There, the completed
 groupoid TRS (10 rules + 3 congruences) is shown confluent via a semantic
 interpretation into the **free group** on `Nat`-indexed generators.  This
@@ -628,7 +511,7 @@ proof:
 3. Shows every `Expr` reduces to a canonical form (`reach_canon`)
 4. Derives confluence from the uniqueness of reduced words
 
-No `Step.canon`, no `toEq`, no UIP, no proof irrelevance.
+No `Step.canon`, no `step_drop`, no `toEq`, no UIP, no proof irrelevance.
 
 ### Path-level vs Expr-level confluence
 
@@ -639,17 +522,11 @@ structure Path {A : Type u} (a b : A) where
   proof : a = b
 ```
 Two paths with different step lists are genuinely distinct values
-(see `UIP.lean: not_uip_of_nonempty`).  The `Rw` relation rewrites
-these step lists according to the `Step` constructors.
+(see `UIP.lean: not_uip_of_nonempty`).
 
-At the `Path` level, confluence uses `step_drop` (which erases step-list
-entries) together with proof irrelevance of `Eq`.  At the `Expr` level,
-confluence is a purely algebraic result about the groupoid TRS — no
-step lists, no proof irrelevance.
-
-The thesis can cite `GroupoidConfluence.confluence` as the primary
-mathematical contribution (genuine algebra) and `instHasConfluenceProp`
-as the convenient `Path`-level wrapper.
+At the `Expr` level, confluence is a purely algebraic result about the
+groupoid TRS — no step lists, no proof irrelevance.  This is the primary
+mathematical contribution.
 -/
 
 /-- **Algebraic confluence** of the completed groupoid TRS.
@@ -659,7 +536,7 @@ two `CStep*` reduction sequences to `b` and `c`, there exists `d` with
 `b →* d` and `c →* d`.
 
 Proved in `GroupoidConfluence.lean` via free group interpretation.
-No `Step.canon`, no UIP, no proof irrelevance. -/
+No `Step.canon`, no `step_drop`, no UIP, no proof irrelevance. -/
 theorem expr_confluence (a b c : GroupoidTRS.Expr)
     (hab : GroupoidConfluence.CRTC a b) (hac : GroupoidConfluence.CRTC a c) :
     ∃ d, GroupoidConfluence.CRTC b d ∧ GroupoidConfluence.CRTC c d :=

@@ -2,12 +2,19 @@
 # Constructive Confluence via Prop-Level Proofs
 
 This module packages the Prop-level local confluence interface used by the
-rewrite system and supplies supporting lemmas. The concrete instance is
-provided in `ConfluenceProof.lean` via `step_drop` and full confluence.
+rewrite system and supplies supporting lemmas.
 
-For the genuine algebraic confluence result (without step-list erasure or UIP),
-see `GroupoidConfluence.lean`, which proves confluence of the completed
-groupoid TRS on abstract `Expr` syntax via free group interpretation.
+## Two Levels of Confluence
+
+- **Expr-level** (`GroupoidConfluence.lean`): The genuine algebraic result.
+  Confluence of the completed groupoid TRS on abstract `Expr` syntax,
+  proved via free group interpretation. No UIP, no proof irrelevance.
+
+- **Path-level** (`HasLocalConfluenceProp`): A typeclass interface for
+  local confluence on `Path`. This is NOT globally instantiated because
+  `Path a b` has distinct normal forms with different step lists.
+  The `[HasLocalConfluenceProp]` assumption can be used parametrically
+  in downstream code.
 
 ## Strategy
 
@@ -20,11 +27,6 @@ groupoid TRS on abstract `Expr` syntax via free group interpretation.
 
 - `HasLocalConfluenceProp` and `local_confluence_prop`
 - Prop-level lifting lemmas for `trans`/`symm`
-
-## Instance
-
-The concrete instance `instLocalOfConfluence` is in `ConfluenceProof.lean`,
-derived from the proved `instHasConfluenceProp`.
 -/
 
 import ComputationalPaths.Path.Rewrite.Confluence
@@ -87,8 +89,10 @@ This is established metatheoretically by:
 2. Commutation of non-overlapping steps
 3. Trivial join for identical steps
 
-The property is packaged as a typeclass assumption. Provide a local instance
-in downstream code if you want a global default.
+The property is packaged as a typeclass assumption. It is NOT globally
+instantiated because `Path a b` has distinct normal forms with different
+step lists. For the genuine algebraic confluence result on abstract `Expr`
+syntax, see `GroupoidConfluence.confluence`.
 -/
 
 /-- **Local Confluence Prop** (typeclass interface).
@@ -96,12 +100,10 @@ in downstream code if you want a global default.
 For any two single-step rewrites from the same source path, there exists
 a common descendant reachable by multi-step rewrites from both results.
 
-**Instance**: `ConfluenceProof.instLocalOfConfluence` provides a concrete
-instance, derived from the proved full confluence (`instHasConfluenceProp`)
-which uses `step_drop` to normalise step lists and join via empty lists.
-
-**Algebraic alternative**: For the UIP-free local confluence result on
-abstract `Expr` syntax, see `GroupoidConfluence.local_confluence`. -/
+This class is NOT globally instantiated at the `Path` level (since distinct
+step lists yield distinct normal forms). For the genuine algebraic confluence
+result, see `GroupoidConfluence.confluence` and
+`ConfluenceProof.instHasConfluencePropExpr`. -/
 class HasLocalConfluenceProp.{v} : Prop where
   local_confluence : ∀ {A : Type v} {a b : A} {p q r : Path a b}
     (_hq : Step p q) (_hr : Step p r), ∃ s, Rw q s ∧ Rw r s
