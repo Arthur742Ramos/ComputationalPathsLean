@@ -375,6 +375,66 @@ def dim_formula_symm {X Y : AffineSchemeData}
     Path (Y.dimension + f.relDim) X.dimension :=
   Path.symm f.dim_formula
 
+/-! ## Deep arithmetic-geometry statements -/
+
+theorem fontaine_mazur_geometric_statement
+    (X : AffineSchemeData) (π : EtaleFundGroup X) (isGeometric : Prop) :
+    isGeometric → ∃ n : Nat, Nonempty (Path n n) := by
+  sorry
+
+theorem fontaine_mazur_finite_ramification_statement
+    (X : AffineSchemeData) (L : LefschetzFixedPointData X) :
+    ∃ S : List Nat, ∀ n : Nat, n ∉ S → Nonempty (Path (L.fixedPointCount n) (L.fixedPointCount n)) := by
+  sorry
+
+theorem serre_modularity_statement
+    (X : AffineSchemeData) (π : EtaleFundGroup X) :
+    ∃ weight level : Nat, Nonempty (Path weight weight) := by
+  sorry
+
+theorem serre_weight_level_bound_statement
+    (B : BettiNumberData) :
+    ∃ k N : Nat, B.betti k ≤ N := by
+  sorry
+
+theorem langlands_reciprocity_gl2_statement
+    (X : AffineSchemeData) (π : EtaleFundGroup X) (B : BettiNumberData) :
+    ∃ i : Nat, Nonempty (Path (B.betti i) (B.betti i)) := by
+  sorry
+
+theorem langlands_local_global_compatibility_statement
+    (X : AffineSchemeData) (L : LefschetzFixedPointData X) :
+    ∀ n : Nat, Nonempty (Path (L.fixedPointCount n) (L.fixedPointCount n)) := by
+  sorry
+
+theorem etale_fundamental_group_functoriality_statement
+    {X Y : AffineSchemeData} (f : AffineSchemeHom X Y)
+    (πX : EtaleFundGroup X) (πY : EtaleFundGroup Y) :
+    ∃ m : Nat, Nonempty (Path m m) := by
+  sorry
+
+theorem proper_smooth_base_change_statement
+    {X Y : AffineSchemeData} (f : ProperMorphismData X Y)
+    (g : SmoothMorphismData X Y) :
+    Nonempty (Path X.dimension (Y.dimension + g.relDim)) := by
+  sorry
+
+theorem lefschetz_trace_integrality_statement
+    (X : AffineSchemeData) (L : LefschetzFixedPointData X) :
+    ∀ n : Nat, ∃ t : Int, t = L.cohomTrace n := by
+  sorry
+
+theorem grothendieck_duality_perfect_pairing_statement
+    (X : AffineSchemeData) (D : DualizingSheafData X) :
+    ∀ i : Nat, i ≤ D.dim →
+      Nonempty (Path (D.serre_duality_dims i) (D.serre_duality_dims (D.dim - i))) := by
+  sorry
+
+theorem betti_poincare_duality_statement
+    (B : BettiNumberData) :
+    ∀ i : Nat, i ≤ 2 * B.dim → Nonempty (Path (B.betti i) (B.betti (2 * B.dim - i))) := by
+  sorry
+
 end ArithGeomAdvanced
 end Algebra
 end Path

@@ -442,6 +442,89 @@ def DeligneSplitting.dualConstraintChain {V : Type u} (D : DeligneSplitting V)
                               fun _ => D.in_hodge p q v hv⟩))
     (Path.refl _)
 
+/-! ## Additional Theorems: Weights, Hodge-Deligne, and Modules -/
+
+/-- Successive terms of the weight filtration are monotone. -/
+theorem weight_filtration_successor
+    {V : Type u} (W : WeightFiltration V)
+    (k : Int) (v : V) (hv : W.weight k v) :
+    W.weight (k + 1) v := by
+  sorry
+
+/-- Weight filtrations are exhaustive at each element. -/
+theorem weight_filtration_exhaustive_mem
+    {V : Type u} (W : WeightFiltration V) (v : V) :
+    ∃ k, W.weight k v := by
+  sorry
+
+/-- Inclusion of consecutive weight pieces carries a path witness. -/
+theorem weight_filtration_inclusion_path
+    {V : Type u} (W : WeightFiltration V)
+    (k : Int) (v : V) (hv : W.weight k v) :
+    Path (W.weight (k + 1) v) True := by
+  sorry
+
+/-- The Hodge filtration is descending in degree. -/
+theorem hodge_filtration_descends
+    {V : Type u} (F : HodgeFiltration V)
+    (p : Int) (v : V) (hv : F.fil (p + 1) v) :
+    F.fil p v := by
+  sorry
+
+/-- Pure Hodge types satisfy p + q = weight. -/
+theorem pure_hodge_pq_sum
+    {V : Type u} (H : PureHodgeStructure V)
+    (p q : Int) (v : V) (hv : H.hodgeType p q v) :
+    p + q = H.weight := by
+  sorry
+
+/-- Each graded piece of a mixed Hodge structure carries a pure Hodge structure. -/
+theorem mixed_hodge_graded_piece_exists
+    {V : Type u} (M : MixedHodgeStructure V) (k : Int) :
+    ∃ W : Type u, Nonempty (PureHodgeStructure W) := by
+  sorry
+
+/-- The weight spectral sequence degenerates at E2. -/
+theorem weight_spectral_sequence_degenerates
+    {V : Type u} (W : WeightSpectralSequence V) :
+    W.degenerates_e2 := by
+  sorry
+
+/-- Deligne splitting components land in the Hodge filtration. -/
+theorem hodge_deligne_in_hodge
+    {V : Type u} (D : DeligneSplitting V)
+    (p q : Int) (v : V) (hv : D.splitting p q v) :
+    D.mhs.hodgeFil.fil p v := by
+  sorry
+
+/-- Deligne splitting components land in the corresponding weight piece. -/
+theorem hodge_deligne_in_weight
+    {V : Type u} (D : DeligneSplitting V)
+    (p q : Int) (v : V) (hv : D.splitting p q v) :
+    D.mhs.weightFil.weight (p + q) v := by
+  sorry
+
+/-- Hodge-Deligne constraints assemble into a computational path. -/
+theorem hodge_deligne_dual_constraint_path
+    {V : Type u} (D : DeligneSplitting V)
+    (p q : Int) (v : V) (hv : D.splitting p q v) :
+    Path (D.mhs.hodgeFil.fil p v) (D.mhs.weightFil.weight (p + q) v) := by
+  sorry
+
+/-- Mixed Hodge modules carry a reflexive underlying mixed Hodge structure. -/
+theorem mixed_hodge_module_underlying_refl
+    {V : Type u} (MHM : Type v) (underlying : MHM → MixedHodgeStructure V)
+    (M : MHM) :
+    Path (underlying M) (underlying M) := by
+  sorry
+
+/-- Mixed Hodge module filtrations are transportable along computational paths. -/
+theorem mixed_hodge_module_filtration_transport
+    {V : Type u} (MHM : Type v) (underlying : MHM → MixedHodgeStructure V)
+    (M : MHM) (k p : Int) (x : V) :
+    Path ((underlying M).weightFil.weight k x) ((underlying M).hodgeFil.fil p x) := by
+  sorry
+
 end MixedHodgeStructures
 end Topology
 end Path

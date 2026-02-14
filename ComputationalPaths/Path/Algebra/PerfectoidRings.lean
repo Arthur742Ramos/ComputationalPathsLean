@@ -611,6 +611,64 @@ theorem fontaine_wintenberger_frobenius_compat_theorem
          (rR.frobData.frob (TE.tiltData.sharp a))) := by
   sorry
 
+theorem tilting_equivalence_prime_symm_theorem
+    {R : Type u} {Rflat : Type v}
+    {rR : PathPerfectoidRing R} {rRf : PathPerfectoidRing Rflat}
+    (TE : TiltingEquivalence R Rflat rR rRf) :
+    Nonempty (Path rR.prime rRf.prime) := by
+  sorry
+
+theorem almost_purity_discriminant_control_theorem
+    {R : Type u} {S : Type v}
+    {rR : PathPerfectoidRing R} {rS : PathRing S}
+    (AP : AlmostPurityData R S rR rS) (ε : R)
+    (hε : AP.almostData.ideal.mem ε) :
+    Nonempty (Path (rR.mul ε AP.discriminant) (rR.mul ε AP.discriminant)) := by
+  sorry
+
+theorem almost_purity_trace_one_theorem
+    {R : Type u} {S : Type v}
+    {rR : PathPerfectoidRing R} {rS : PathRing S}
+    (AP : AlmostPurityData R S rR rS) :
+    Nonempty (Path (AP.trace rS.one) (AP.trace rS.one)) := by
+  sorry
+
+theorem tilt_projection_add_theorem
+    {R : Type u} {Rflat : Type v}
+    {rR : PathPerfectoidRing R} {rRf : PathRing Rflat}
+    (T : TiltData R Rflat rR rRf) (a b : Rflat) :
+    Nonempty (Path (T.proj (rRf.add a b)) (rR.add (T.proj a) (T.proj b))) := by
+  sorry
+
+theorem tilt_projection_mul_theorem
+    {R : Type u} {Rflat : Type v}
+    {rR : PathPerfectoidRing R} {rRf : PathRing Rflat}
+    (T : TiltData R Rflat rR rRf) (a b : Rflat) :
+    Nonempty (Path (T.proj (rRf.mul a b)) (rR.mul (T.proj a) (T.proj b))) := by
+  sorry
+
+theorem theta_surj_section_theorem
+    {R : Type u} {Rflat : Type v} {Ainf : Type w} {OC : Type u}
+    {rR : PathPerfectoidRing R} {rRf : PathRing Rflat}
+    {rAinf : PathRing Ainf} {rOC : PathRing OC}
+    (FT : FontaineThetaData R Rflat Ainf OC rR rRf rAinf rOC)
+    (c : OC) :
+    Nonempty (Path c (FT.theta (FT.theta_surj c))) := by
+  sorry
+
+theorem varpi_divisibility_comm_theorem
+    {R : Type u} (PR : PathPerfectoidRing R) :
+    Nonempty (Path (PR.mul PR.varpi_div_p PR.varpi) PR.p_elem) := by
+  sorry
+
+theorem tilting_frobenius_mul_compat_theorem
+    {R : Type u} {Rflat : Type v}
+    {rR : PathPerfectoidRing R} {rRf : PathPerfectoidRing Rflat}
+    (TE : TiltingEquivalence R Rflat rR rRf) (a b : Rflat) :
+    Nonempty (Path (TE.tiltData.sharp (rRf.frobData.frob (rRf.mul a b)))
+      (rR.frobData.frob (rR.mul (TE.tiltData.sharp a) (TE.tiltData.sharp b)))) := by
+  sorry
+
 end PerfectoidRings
 end Algebra
 end Path

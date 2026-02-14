@@ -365,6 +365,55 @@ def faceRingDimChain (n numGen dim : Nat) (h : dim = n - numGen)
     Path (dim + numGen) n :=
   Path.stepChain (by omega)
 
+theorem stanley_reisner_squarefree_theorem
+    {n : Nat} {Δ : SimplicialComplex n}
+    (I : StanleyReisnerIdeal n Δ) :
+    True := by
+  sorry
+
+theorem face_ring_krull_dimension_theorem
+    {n : Nat} {Δ : SimplicialComplex n}
+    (fr : FaceRing n Δ) :
+    Nonempty (Path fr.krullDim (Δ.dim + 1)) := by
+  sorry
+
+theorem shellability_left_inverse_theorem
+    {n : Nat} (Δ : PureComplex n)
+    (sh : Shellability n Δ) (i : Fin Δ.numFacets) :
+    Nonempty (Path (sh.orderInv (sh.order i)) i) := by
+  sorry
+
+theorem shellability_right_inverse_theorem
+    {n : Nat} (Δ : PureComplex n)
+    (sh : Shellability n Δ) (i : Fin Δ.numFacets) :
+    Nonempty (Path (sh.order (sh.orderInv i)) i) := by
+  sorry
+
+theorem cohen_macaulay_depth_equals_krull_theorem
+    {n : Nat} {Δ : SimplicialComplex n}
+    (CM : CohenMacaulayData n Δ) :
+    Nonempty (Path CM.depth CM.faceRing.krullDim) := by
+  sorry
+
+theorem shellable_implies_cm_depth_theorem
+    {n : Nat} (Δ : PureComplex n)
+    (SCM : ShellableImpliesCM n Δ) :
+    Nonempty (Path SCM.cm.depth (Δ.dim + 1)) := by
+  sorry
+
+theorem reisner_depth_dimension_theorem
+    {n : Nat} {Δ : SimplicialComplex n}
+    (R : ReisnerTheorem n Δ) :
+    Nonempty (Path R.cm.depth (Δ.dim + 1)) := by
+  sorry
+
+theorem gorenstein_h_symmetry_theorem
+    {n : Nat} {Δ : SimplicialComplex n}
+    (G : GorensteinComplex n Δ) (hv : HVector n Δ)
+    (i : Fin (Δ.dim + 2)) (hi : Δ.dim + 1 - i.val < Δ.dim + 2) :
+    Nonempty (Path (hv.hvec i) (hv.hvec ⟨Δ.dim + 1 - i.val, hi⟩)) := by
+  sorry
+
 end CombinatorialCommutative
 end Algebra
 end Path

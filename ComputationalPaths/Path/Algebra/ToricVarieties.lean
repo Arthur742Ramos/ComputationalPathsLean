@@ -328,6 +328,53 @@ structure ProjectiveToricVariety (n : Nat) extends CompleteToricVariety n where
   /-- The ample criterion is satisfied. -/
   ample : AmpleCriterion n toToricVarietyData
 
+theorem orbit_cone_dimension_theorem
+    {n : Nat} (tv : ToricVarietyData n)
+    (O : OrbitConeCorrespondence n tv) (i : Fin tv.fan.numCones) :
+    Nonempty (Path (O.orbit_dim i + (tv.fan.cones i).dim) n) := by
+  sorry
+
+theorem orbit_cone_dense_orbit_theorem
+    {n : Nat} (tv : ToricVarietyData n)
+    (O : OrbitConeCorrespondence n tv)
+    (i : Fin tv.fan.numCones) (h : (tv.fan.cones i).dim = 0) :
+    Nonempty (Path (O.orbit_dim i) n) := by
+  sorry
+
+theorem toric_variety_dimension_theorem
+    {n : Nat} (tv : ToricVarietyData n) :
+    Nonempty (Path tv.dim n) := by
+  sorry
+
+theorem complete_toric_normality_theorem
+    {n : Nat} (tv : CompleteToricVariety n) :
+    Nonempty (Path tv.dim n) := by
+  sorry
+
+theorem moment_map_facet_ray_theorem
+    {n : Nat} (tv : ToricVarietyData n)
+    (MM : MomentMapData n tv) :
+    Nonempty (Path MM.numFacets tv.fan.numRays) := by
+  sorry
+
+theorem toric_divisor_linear_refl_theorem
+    {n : Nat} (tv : ToricVarietyData n)
+    (D : ToricDivisor n tv) (r : Fin tv.fan.numRays) :
+    Nonempty (Path ((toricDivisorLinearEquivRefl n tv D).div1.coeffs r)
+      ((toricDivisorLinearEquivRefl n tv D).div2.coeffs r)) := by
+  sorry
+
+theorem fan_refinement_ray_preservation_theorem
+    {n : Nat} (F G : Fan n)
+    (_refine : Fin F.numCones → Fin G.numCones) :
+    Nonempty (Path F.numRays F.numRays) := by
+  sorry
+
+theorem projective_toric_ample_theorem
+    {n : Nat} (PT : ProjectiveToricVariety n) :
+    Nonempty (Path PT.dim n) := by
+  sorry
+
 end ToricVarieties
 end Algebra
 end Path

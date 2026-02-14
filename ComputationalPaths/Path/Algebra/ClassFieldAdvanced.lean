@@ -363,6 +363,54 @@ def reciprocity_roundtrip {R : Type u} {ring : PathRing R}
     Path (E.recMap (E.recInv b)) b :=
   Path.trans (E.right_inv b) (Path.refl _)
 
+theorem lubin_tate_endo_hom_theorem
+    {R : Type u} {ring : PathRing R}
+    (LT : LubinTateFormalGroup R ring) (x y : R) :
+    Nonempty (Path (LT.endoPi (LT.formalGroup.groupLaw x y))
+      (LT.formalGroup.groupLaw (LT.endoPi x) (LT.endoPi y))) := by
+  sorry
+
+theorem lubin_tate_endo_zero_theorem
+    {R : Type u} {ring : PathRing R}
+    (LT : LubinTateFormalGroup R ring) :
+    Nonempty (Path (LT.endoPi ring.zero) ring.zero) := by
+  sorry
+
+theorem explicit_local_reciprocity_hom_theorem
+    {R : Type u} {ring : PathRing R}
+    (E : ExplicitLocalReciprocity R ring) (a b : E.localUnits) :
+    Nonempty (Path (E.recMap (E.localGroup.mul a b))
+      (E.galoisGroup.mul (E.recMap a) (E.recMap b))) := by
+  sorry
+
+theorem explicit_local_reciprocity_roundtrip_theorem
+    {R : Type u} {ring : PathRing R}
+    (E : ExplicitLocalReciprocity R ring) (a : E.localUnits) :
+    Nonempty (Path (E.recInv (E.recMap a)) a) := by
+  sorry
+
+theorem local_class_field_index_degree_theorem
+    (E : ExistenceTheorem) :
+    Nonempty (Path E.normIndex E.extensionDegree) := by
+  sorry
+
+theorem local_class_field_degree_index_theorem
+    (E : ExistenceTheorem) :
+    Nonempty (Path E.extensionDegree E.normIndex) := by
+  sorry
+
+theorem conductor_discriminant_formula_theorem
+    (CD : ConductorDiscriminant) :
+    Nonempty (Path CD.discriminant CD.conductorProduct) := by
+  sorry
+
+theorem tate_functional_equation_theorem
+    {R : Type u} {ring : PathRing R}
+    (T : TateThesisData R ring) (χ : T.charType) :
+    Nonempty (Path (T.zetaIntegral χ)
+      (ring.mul (T.epsilon χ) (T.zetaIntegral (T.reflect χ)))) := by
+  sorry
+
 end ClassFieldAdvanced
 end Algebra
 end Path

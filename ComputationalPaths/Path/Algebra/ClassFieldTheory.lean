@@ -297,6 +297,94 @@ def reciprocity_unit_path (C : LocalGlobalClassFieldTheory Kloc Kglob G0) :
       (Path.congrArg C.globalCFT.artin C.embed_one)
       (C.globalCFT.artin_one))
 
+/-! ## Additional Theorems: Reciprocity and Existence -/
+
+/-- Artin reciprocity has a left inverse on ideal classes. -/
+theorem artin_reciprocity_left_inverse
+    {K : GlobalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (A : ArtinReciprocity K G) (x : K.idealClass.carrier) :
+    Path (A.reciprocity.invFun (A.reciprocity.toFun x)) x := by
+  sorry
+
+/-- Artin reciprocity has a right inverse on the abelianized Galois side. -/
+theorem artin_reciprocity_right_inverse
+    {K : GlobalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (A : ArtinReciprocity K G) (y : G.carrier) :
+    Path (A.reciprocity.toFun (A.reciprocity.invFun y)) y := by
+  sorry
+
+/-- The Artin map sends the principal class to the unit. -/
+theorem artin_reciprocity_unit_path
+    {K : GlobalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (A : ArtinReciprocity K G) :
+    Path (A.reciprocity.toFun K.idealClass.one) G.one := by
+  sorry
+
+/-- Local reciprocity sends idele units to the Galois unit. -/
+theorem local_artin_unit_path
+    {K : LocalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (L : LocalClassFieldTheory K G) :
+    Path (L.localArtin K.ideles.one) G.one := by
+  sorry
+
+/-- Global reciprocity sends idele class units to the Galois unit. -/
+theorem global_artin_unit_path
+    {K : GlobalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (A : GlobalClassFieldTheory K G) :
+    Path (A.artin K.ideleClass.one) G.one := by
+  sorry
+
+/-- Global reciprocity is multiplicative on idele classes. -/
+theorem global_artin_mul_path
+    {K : GlobalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (A : GlobalClassFieldTheory K G) (x y : K.ideleClass.carrier) :
+    Path (A.artin (K.ideleClass.mul x y)) (G.mul (A.artin x) (A.artin y)) := by
+  sorry
+
+/-- Local-global compatibility identifies local and global Artin images. -/
+theorem local_global_compatibility_path
+    {K : LocalFieldData.{u}} {L : GlobalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (C : LocalGlobalClassFieldTheory K L G) (x : K.ideles.carrier) :
+    Path (C.localCFT.localArtin x) (C.globalCFT.artin (C.embed x)) := by
+  sorry
+
+/-- The local unit embeds to the global idele class unit. -/
+theorem local_global_embed_unit_path
+    {K : LocalFieldData.{u}} {L : GlobalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (C : LocalGlobalClassFieldTheory K L G) :
+    Path (C.embed K.ideles.one) L.ideleClass.one := by
+  sorry
+
+/-- Local-global compatibility at the unit idele. -/
+theorem local_global_compatibility_unit
+    {K : LocalFieldData.{u}} {L : GlobalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (C : LocalGlobalClassFieldTheory K L G) :
+    Path (C.localCFT.localArtin K.ideles.one) (C.globalCFT.artin L.ideleClass.one) := by
+  sorry
+
+/-- Hilbert class field reciprocity identifies the principal class with the unit. -/
+theorem hilbert_class_field_unit_path
+    {K : GlobalFieldData.{u}} {G : AbelianGaloisGroup.{u}}
+    (H : HilbertClassField K G) :
+    Path (H.reciprocity.reciprocity.toFun K.idealClass.one) G.one := by
+  sorry
+
+/-- Existence theorem: reciprocity data produces a Hilbert class field package. -/
+theorem class_field_existence_theorem
+    (K : GlobalFieldData.{u}) (G : AbelianGaloisGroup.{u})
+    (A : ArtinReciprocity K G) :
+    ∃ H : HilbertClassField K G,
+      Path (H.reciprocity.reciprocity.toFun K.idealClass.one) G.one := by
+  sorry
+
+/-- Existence theorem for a local-global compatible class field theory package. -/
+theorem local_global_class_field_existence_theorem
+    (K : LocalFieldData.{u}) (L : GlobalFieldData.{u})
+    (G : AbelianGaloisGroup.{u}) :
+    ∃ C : LocalGlobalClassFieldTheory K L G,
+      Path (C.embed K.ideles.one) L.ideleClass.one := by
+  sorry
+
 /-! ## Summary -/
 
 /-!

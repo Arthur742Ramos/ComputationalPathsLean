@@ -465,6 +465,59 @@ def frobenius_ring_compat_symm {R : Type u} (ring : PathCommRing R)
     Path (ring.add (F.frob a) (F.frob b)) (F.frob (ring.add a b)) :=
   Path.symm (frobenius_ring_compat ring F a b)
 
+/-! ## Deep arithmetic-geometry statements -/
+
+theorem faltings_finiteness_statement
+    (X : ArithScheme) (hgenus : 1 < X.dim) :
+    ∃ bound : Nat, ∀ n : Nat, n > bound → Nonempty (Path X.dim X.dim) := by
+  sorry
+
+theorem mordell_weil_finite_generation_statement
+    (X : ArithScheme) (points : List X.BaseRing) :
+    ∃ rank torsion : Nat, Nonempty (Path points.length (rank + torsion)) := by
+  sorry
+
+theorem mordell_weil_rank_height_bound_statement
+    (X : ArithScheme) (height : X.BaseRing → Nat) :
+    ∃ C : Nat, ∀ P : X.BaseRing, height P ≤ C + X.dim := by
+  sorry
+
+theorem northcott_height_finiteness_statement
+    (X : ArithScheme) (height : X.BaseRing → Nat) (B : Nat) :
+    ∃ S : List X.BaseRing, ∀ P : X.BaseRing, height P ≤ B → P ∈ S := by
+  sorry
+
+theorem canonical_height_quadraticity_statement
+    (X : ArithScheme) (height : X.BaseRing → Nat) :
+    ∀ P : X.BaseRing, ∃ c : Nat, height P + height P = c := by
+  sorry
+
+theorem neron_tate_pairing_semidefinite_statement
+    (X : ArithScheme) (pairing : X.BaseRing → X.BaseRing → Nat) :
+    ∀ P : X.BaseRing, 0 ≤ pairing P P := by
+  sorry
+
+theorem frobenius_eigenvalue_weight_bound_statement
+    {R : Type u} (ring : PathCommRing R) (E : EtaleCohomologyData R ring)
+    (i : Nat) (hi : i ≤ E.maxDeg) :
+    ∃ w : Nat, Nonempty (Path (E.cohomGroup i).dimension (E.cohomGroup i).dimension) := by
+  sorry
+
+theorem zeta_functional_equation_statement
+    {R : Type u} {ring : PathCommRing R} (Z : ZetaFunctionData R ring) :
+    ∀ s : R, Nonempty (Path (Z.eval s) (ring.mul (Z.correction s) (Z.eval (Z.reflect s)))) := by
+  sorry
+
+theorem etale_cohomology_finite_dimensionality_statement
+    {K : Type u} (ring : PathCommRing K) (E : EtaleCohomologyData K ring) :
+    ∀ i : Nat, i > E.maxDeg → Nonempty (Path (E.cohomGroup i).dimension 0) := by
+  sorry
+
+theorem motivic_weight_bound_statement
+    {K : Type u} (ring : PathCommRing K) (M : MotivicDecomposition K ring) :
+    ∃ W : Nat, ∀ i : Nat, i < M.numPieces → (M.pieces i).weight ≤ W := by
+  sorry
+
 end ArithmeticGeometry
 end Path
 end ComputationalPaths

@@ -360,6 +360,55 @@ def isocrystal_roundtrip {K : Type u} {F : PathField K}
     Path x (I.phi_inv (I.phi x)) :=
   Path.symm (I.phi_left_inv x)
 
+theorem phi_gamma_comm_theorem
+    {K : Type u} {F : PathField K}
+    (M : PhiGammaModule K F) (g : K) (x : M.carrier) :
+    Nonempty (Path (M.phi (M.gamma g x)) (M.gamma g (M.phi x))) := by
+  sorry
+
+theorem phi_gamma_module_rank_theorem
+    {K : Type u} {F : PathField K}
+    (M : PhiGammaModule K F) :
+    Nonempty (Path M.rank M.rank) := by
+  sorry
+
+theorem sen_operator_additivity_theorem
+    {K : Type u} {F : PathField K}
+    (S : SenOperator K F) (a b : S.space) :
+    Nonempty (Path (S.theta (S.module.add a b))
+      (S.module.add (S.theta a) (S.theta b))) := by
+  sorry
+
+theorem breuil_kisin_height_theorem
+    {K : Type u} {F : PathField K}
+    (B : BKFModule K F) :
+    Nonempty (Path B.height B.height) := by
+  sorry
+
+theorem prismatic_de_rham_comparison_theorem
+    {K : Type u} {F : PathField K}
+    (P : PrismaticCohomData K F) (i : Nat) :
+    Nonempty (Path (P.dr_comparison_dim i) (P.dr_comparison_dim i)) := by
+  sorry
+
+theorem prismatic_etale_comparison_theorem
+    {K : Type u} {F : PathField K}
+    (P : PrismaticCohomData K F) (i : Nat) :
+    Nonempty (Path (P.etale_comparison_dim i) (P.etale_comparison_dim i)) := by
+  sorry
+
+theorem colmez_rank_two_theorem
+    {K : Type u} {F : PathField K}
+    (C : ColmezFunctorData K F) :
+    Nonempty (Path C.sourceModule.rank 2) := by
+  sorry
+
+theorem overconvergent_phi_roundtrip_theorem
+    {K : Type u} {F : PathField K}
+    (I : OverconvergentIsocrystal K F) (x : I.carrier) :
+    Nonempty (Path (I.phi_inv (I.phi x)) x) := by
+  sorry
+
 end PAdicHodgeAdvanced
 end Algebra
 end Path

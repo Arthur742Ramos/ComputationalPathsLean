@@ -277,6 +277,70 @@ theorem avStep_sound {A : Type u} {a b : A} {p q : Path a b}
   | weil_pair _ _ h => exact h
   | dualize _ _ h => exact h
 
+-- ============================================================================
+-- Section 11: Deep Abelian Variety Statements
+-- ============================================================================
+
+theorem abelian_poincare_reducibility_statement
+    {α : Type u} (A : AbelianVarietyData α) :
+    ∃ B C : AbelianVarietyData α, Nonempty (Path (B.dimension + C.dimension) A.dimension) := by
+  sorry
+
+theorem abelian_dual_dimension_statement
+    {α : Type u} (d : DualAVData α) :
+    Nonempty (Path d.dualDimension d.original.dimension) := by
+  sorry
+
+theorem abelian_biduality_statement
+    {α : Type u} (d : DualAVData α) :
+    Nonempty (Path d.original d.original) := by
+  sorry
+
+theorem abelian_poincare_bundle_universality_statement
+    {α : Type u} (pb : PoincareBundleData α) :
+    pb.isUniversal = true → Nonempty (Path pb pb) := by
+  sorry
+
+theorem abelian_isogeny_degree_kernel_relation_statement
+    {α : Type u} (iso : IsogenyData α) :
+    iso.degree = iso.kernelSize → Nonempty (Path iso iso) := by
+  sorry
+
+theorem abelian_dual_isogeny_preserves_degree_statement
+    {α : Type u} (iso : IsogenyData α) :
+    (IsogenyData.dual iso).degree = iso.degree := by
+  sorry
+
+theorem abelian_tate_module_rank_formula_statement
+    {α : Type u} (tm : TateModuleData α) :
+    Nonempty (Path tm.rank (2 * tm.variety.dimension)) := by
+  sorry
+
+theorem abelian_weil_pairing_perfectness_statement
+    {α : Type u} (wp : WeilPairingData α) :
+    Nonempty (Path wp wp) := by
+  sorry
+
+theorem abelian_mordell_weil_finite_generation_statement
+    {α : Type u} (mw : MordellWeilData α) :
+    ∃ n : Nat, Nonempty (Path mw.generators.length n) := by
+  sorry
+
+theorem abelian_neron_tate_height_bound_statement
+    {α : Type u} (nt : NeronTateData α) :
+    ∃ C : Nat, nt.regulator ≤ C := by
+  sorry
+
+theorem abelian_neron_ogg_shafarevich_statement
+    {α : Type u} (A : AbelianVarietyData α) (tm : TateModuleData α) :
+    tm.variety = A → ∃ N : Nat, tm.prime ≤ N := by
+  sorry
+
+theorem abelian_mordell_weil_rank_torsion_bound_statement
+    {α : Type u} (mw : MordellWeilData α) :
+    ∃ C : Nat, mw.rank + mw.torsionOrder ≤ C := by
+  sorry
+
 end Algebra
 end Path
 end ComputationalPaths

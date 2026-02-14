@@ -186,6 +186,49 @@ def dirichletFunctionalEquation (χ : DirichletCharacter) :
 def dirichletLAtOne (χ : DirichletCharacter) : SpecialValue (dirichletL χ) 1 :=
   SpecialValue.eval (dirichletL χ) 1
 
+theorem lfunction_euler_product_witness_theorem
+    {R : Type u} (L : LFunction R) :
+    Nonempty (Path L.series (EulerProduct.toSeries L.euler)) := by
+  sorry
+
+theorem functional_equation_witness_theorem
+    {R : Type u} {L : LFunction R}
+    (F : FunctionalEquation L) (s : R) :
+    Nonempty (Path (LFunction.value L s) (LFunction.value L (F.transform s))) := by
+  sorry
+
+theorem functional_equation_compose_theorem
+    {R : Type u} {L : LFunction R}
+    (f g : FunctionalEquation L) (s : R) :
+    Nonempty (Path (LFunction.value L s)
+      (LFunction.value L (g.transform (f.transform s)))) := by
+  sorry
+
+theorem analytic_continuation_trivial_theorem
+    {R : Type u} (L : LFunction R) (s : R) :
+    Nonempty (Path ((AnalyticContinuation.trivial L).extend s) (LFunction.value L s)) := by
+  sorry
+
+theorem special_value_eval_witness_theorem
+    {R : Type u} (L : LFunction R) (s : R) :
+    Nonempty (Path (SpecialValue.eval L s).value (LFunction.value L s)) := by
+  sorry
+
+theorem zeta_functional_equation_theorem
+    (s : Complex) :
+    Nonempty (Path (LFunction.value zeta s) (LFunction.value zeta (1 - s))) := by
+  sorry
+
+theorem dirichlet_euler_product_theorem
+    (χ : DirichletCharacter) :
+    Nonempty (Path (dirichletL χ).series (EulerProduct.toSeries (dirichletL χ).euler)) := by
+  sorry
+
+theorem dirichlet_special_value_at_one_theorem
+    (χ : DirichletCharacter) :
+    Nonempty (Path (dirichletLAtOne χ).value (LFunction.value (dirichletL χ) 1)) := by
+  sorry
+
 end Algebra
 end Path
 end ComputationalPaths

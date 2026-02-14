@@ -388,6 +388,49 @@ def fvecTetrahedron :
     Path (4 + 6 + 4 + 1) 15 :=
   Path.stepChain (by omega)
 
+theorem face_lattice_dimension_theorem
+    {n : Nat} {P : Polytope n} (F : Face n P) :
+    F.face.dim ≤ P.dim := by
+  sorry
+
+theorem fvector_vertex_count_theorem
+    {n : Nat} {P : Polytope n} (fv : FVector n P) :
+    Nonempty (Path (fv.fvec ⟨0, by omega⟩) P.numVertices) := by
+  sorry
+
+theorem euler_relation_formula_theorem
+    {n : Nat} {P : Polytope n} {fv : FVector n P}
+    (E : EulerRelation n P fv) :
+    Nonempty (Path E.alternatingSum (1 + (-1 : Int)^P.dim)) := by
+  sorry
+
+theorem euler_formula_3d_theorem
+    (V E F : Nat) (h : V + F = E + 2) :
+    Nonempty (Path ((V : Int) - (E : Int) + (F : Int)) 2) := by
+  sorry
+
+theorem normal_fan_vertex_correspondence_theorem
+    {n : Nat} {P : Polytope n} (NF : NormalFan n P) :
+    Nonempty (Path NF.numMaxCones P.numVertices) := by
+  sorry
+
+theorem normally_equivalent_ray_theorem
+    {n : Nat} (NE : NormallyEquivalent n) :
+    Nonempty (Path NE.fan1.numRays NE.fan2.numRays) := by
+  sorry
+
+theorem simplicial_simple_duality_theorem
+    {n : Nat} (D : SimplicialSimpleDuality n) :
+    Nonempty (Path D.simplicial.numVertices D.simple.numFacets) := by
+  sorry
+
+theorem dehn_sommerville_symmetry_theorem
+    {n : Nat} {P : SimplicialPolytope n}
+    (DS : DehnSommerville n P)
+    (i : Fin (P.dim + 1)) (hi : P.dim - i.val < P.dim + 1) :
+    Nonempty (Path (DS.hvec i) (DS.hvec ⟨P.dim - i.val, hi⟩)) := by
+  sorry
+
 end PolyhedralGeometry
 end Algebra
 end Path

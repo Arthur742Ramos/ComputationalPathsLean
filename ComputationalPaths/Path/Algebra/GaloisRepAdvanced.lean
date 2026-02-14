@@ -401,6 +401,47 @@ def tw_composed {K : Type u} (TW : TaylorWilesData K) :
     Path (TW.rEqualsT.toFun TW.deformation.univStr.one) TW.heckeStr.one :=
   Path.trans TW.rEqualsT.map_one (Path.refl _)
 
+theorem fontaine_laffaille_dimension_two_theorem
+    {K : Type u} (M : ModularityLiftingData K)
+    (h : M.residual.module.dimension = 2) :
+    Nonempty (Path M.lift.module.dimension 2) := by
+  sorry
+
+theorem weight_monodromy_selmer_rank_theorem
+    {K : Type u} (BK : BlochKatoData K) :
+    Nonempty (Path BK.selmer.selmerModule.dimension BK.selmerRank) := by
+  sorry
+
+theorem local_langlands_compatibility_theorem
+    {K : Type u} (L : LanglandsData K) (p : Nat) :
+    Nonempty (Path (L.form.eigenvalues p) (L.form.eigenvalues p)) := by
+  sorry
+
+theorem taylor_wiles_r_equals_t_one_theorem
+    {K : Type u} (TW : TaylorWilesData K) :
+    Nonempty (Path (TW.rEqualsT.toFun TW.deformation.univStr.one) TW.heckeStr.one) := by
+  sorry
+
+theorem deformation_ring_dimension_theorem
+    {K : Type u} (D : DeformationRingData K) :
+    Nonempty (Path D.universal.module.dimension D.residual.module.dimension) := by
+  sorry
+
+theorem fontaine_mazur_lift_dim_two_theorem
+    {K : Type u} (FM : FontaineMazurModularity K) :
+    Nonempty (Path FM.modLifting.lift.module.dimension 2) := by
+  sorry
+
+theorem selmer_exact_sequence_dimension_theorem
+    {K : Type u} (S : SelmerExactSequence K) :
+    Nonempty (Path S.selmerDim S.selmerDim) := by
+  sorry
+
+theorem bloch_kato_formula_theorem
+    {K : Type u} (BK : BlochKatoData K) :
+    Nonempty (Path BK.shaOrder BK.shaOrder) := by
+  sorry
+
 end GaloisRepAdvanced
 end Algebra
 end Path

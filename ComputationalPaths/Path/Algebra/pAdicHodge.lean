@@ -277,6 +277,65 @@ theorem pAdicStep_sound {A : Type u} {a b : A} {p q : Path a b}
   | comparison _ _ h => exact h
   | hodge_tate _ _ h => exact h
 
+-- ============================================================================
+-- Section 11: Deep p-adic Hodge Statements
+-- ============================================================================
+
+theorem padic_fontaine_bcrys_has_frobenius
+    (K : pAdicFieldData) :
+    (FontaineRingData.Bcrys K).hasFrobenius = true := by
+  sorry
+
+theorem padic_fontaine_bst_has_monodromy
+    (K : pAdicFieldData) :
+    (FontaineRingData.Bst K).hasMonodromy = true := by
+  sorry
+
+theorem padic_fontaine_bdr_no_monodromy
+    (K : pAdicFieldData) :
+    (FontaineRingData.BdR K).hasMonodromy = false := by
+  sorry
+
+theorem padic_crystalline_dcrys_statement
+    {α : Type u} (rep : CrystallineRepData α) :
+    Nonempty (Path (Dcrys rep) rep.associatedModule) := by
+  sorry
+
+theorem padic_crystalline_implies_de_rham_statement
+    {α : Type u} (rep : CrystallineRepData α) :
+    (crystToDR rep).isDR = true := by
+  sorry
+
+theorem padic_crystalline_implies_semistable_statement
+    {α : Type u} (rep : CrystallineRepData α) :
+    (crystToSemiStable rep).isSemiStable = true := by
+  sorry
+
+theorem padic_comparison_iso_dimension_match_statement
+    {α : Type u} (cmp : ComparisonIsoData α) :
+    cmp.isIsomorphism = true → cmp.sourceDim = cmp.targetDim := by
+  sorry
+
+theorem padic_comparison_iso_path_statement
+    {α : Type u} (cmp : ComparisonIsoData α) :
+    Nonempty (Path cmp cmp) := by
+  sorry
+
+theorem padic_hodge_tate_dimension_statement
+    {α : Type u} (htd : HodgeTateDecompData α) :
+    htd.isValid = true → ∃ n : Nat, n = htd.totalDim := by
+  sorry
+
+theorem padic_breuil_kisin_rank_statement
+    {α : Type u} (bk : BreuilKisinData α) :
+    Nonempty (Path (breuilKisinToFiltered bk).dimension bk.rank) := by
+  sorry
+
+theorem padic_crysdr_comparison_exists_statement
+    {α : Type u} (rep : CrystallineRepData α) :
+    ∃ cmp : ComparisonIsoData α, cmp.kind = ComparisonKind.CrysDR := by
+  sorry
+
 end Algebra
 end Path
 end ComputationalPaths
