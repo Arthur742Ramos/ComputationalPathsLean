@@ -256,6 +256,32 @@ theorem spectralSequenceAlgebra_trivialSpectralSequence_next (r : Nat) :
     trivialSpectralSequence.next r = BigradedHom.id (trivialPage r).groups := by
   sorry
 
+theorem spectralSequenceAlgebra_bigradedHom_comp_id_left
+    {A B : BigradedAbelianGroup} (f : BigradedHom A B) :
+    BigradedHom.comp (BigradedHom.id B) f = f := by
+  sorry
+
+theorem spectralSequenceAlgebra_bigradedHom_comp_id_right
+    {A B : BigradedAbelianGroup} (f : BigradedHom A B) :
+    BigradedHom.comp f (BigradedHom.id A) = f := by
+  sorry
+
+theorem spectralSequenceAlgebra_bigradedHom_comp_assoc
+    {A B C D : BigradedAbelianGroup}
+    (h : BigradedHom C D) (g : BigradedHom B C) (f : BigradedHom A B) :
+    BigradedHom.comp (BigradedHom.comp h g) f =
+    BigradedHom.comp h (BigradedHom.comp g f) := by
+  sorry
+
+theorem spectralSequenceAlgebra_spectralPageHom_id_apply
+    {r : Nat} (E : SpectralPage r) (p q : Nat) (x : E.groups.carrier p q) :
+    (SpectralPageHom.id E).map.map p q x = x := by
+  sorry
+
+theorem spectralSequenceAlgebra_trivialBigradedAbelianGroup_carrier
+    (p q : Nat) : trivialBigradedAbelianGroup.carrier p q = PUnit := by
+  sorry
+
 end SpectralSequenceAlgebra
 end Path
 end ComputationalPaths

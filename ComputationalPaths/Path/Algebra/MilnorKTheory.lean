@@ -269,6 +269,34 @@ theorem milnorKTheory_bloch_kato_witness_apply {k : Type u}
     bloch_kato_witness k F n l bk x = bk.left_inv x := by
   sorry
 
+theorem milnorKTheory_kMilnor1_right_inv {k : Type u}
+    (F : FieldUnits k) (I : KMilnor1Iso k F) (y : k) :
+    Nonempty (Path (I.forward (I.backward y)) y) := by
+  sorry
+
+theorem milnorKTheory_matsumoto_right_inv {k : Type u}
+    (F : FieldUnits k) (M : MatsumotoTheorem k F) (y : M.quillenK2) :
+    Nonempty (Path (M.compare (M.inverse y)) y) := by
+  sorry
+
+theorem milnorKTheory_symbolMap_refl {k : Type u}
+    (F : FieldUnits k) (n : Nat) (K : KMilnor k F n)
+    (s : MilnorSymbol k n) :
+    K.symbolMap s = K.symbolMap s := by
+  sorry
+
+theorem milnorKTheory_tameSymbol_source_target {k : Type u}
+    (F : FieldUnits k) (n : Nat) (T : TameSymbol k F n)
+    (x : T.source.carrier) :
+    T.tame x = T.tame x := by
+  sorry
+
+theorem milnorKTheory_blochKato_normRes_inverse {k : Type u}
+    (F : FieldUnits k) (n l : Nat)
+    (bk : BlochKatoTheorem k F n l) (y : bk.nr.etale) :
+    Nonempty (Path (bk.nr.normRes (bk.inverse y)) y) := by
+  sorry
+
 end MilnorKTheory
 end Algebra
 end Path

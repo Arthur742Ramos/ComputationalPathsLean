@@ -229,6 +229,34 @@ theorem modularFormsPaths_hecke_comm_def {H : Type u} {R : Type v}
     hecke_comm ops m n f = ops.commutes m n f := by
   sorry
 
+theorem modularFormsPaths_modularWord_mul_one_right (w : ModularWord) :
+    ModularWord.mul w ModularWord.one = w := by
+  sorry
+
+theorem modularFormsPaths_modularWord_mul_assoc (a b c : ModularWord) :
+    ModularWord.mul (ModularWord.mul a b) c =
+    ModularWord.mul a (ModularWord.mul b c) := by
+  sorry
+
+theorem modularFormsPaths_constantTerm_qExpansion {H : Type u} {R : Type v}
+    (qmap : QExpansionMap H R)
+    {data : ModularData H R} {k : Nat}
+    (f : ModularForm data k) :
+    constantTerm (qExpansion qmap f) = (qExpansion qmap f) 0 := by
+  sorry
+
+theorem modularFormsPaths_modularWord_S_squared :
+    ModularWord.mul ModularWord.S ModularWord.S =
+    ModularWord.mul ModularWord.S ModularWord.S := by
+  sorry
+
+theorem modularFormsPaths_qExpansion_injective {H : Type u} {R : Type v}
+    (qmap : QExpansionMap H R) {data : ModularData H R} {k : Nat}
+    (f g : ModularForm data k)
+    (h : qExpansion qmap f = qExpansion qmap g) :
+    ∀ (n : Nat), qExpansion qmap f n = qExpansion qmap g n := by
+  sorry
+
 end Algebra
 end Path
 end ComputationalPaths

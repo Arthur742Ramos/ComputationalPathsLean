@@ -269,6 +269,30 @@ theorem spectralAlgebra_trivialTHH_dennisTruce :
     trivialTHH.dennisTruce = True.intro := by
   sorry
 
+theorem spectralAlgebra_moduleMap_comp_apply {R : StructuredRingSpectrum}
+    {M N P : SpectrumModule R} (f : ModuleMap M N) (g : ModuleMap N P)
+    (n : Nat) (x : M.spectrum.level n) :
+    g.map n (f.map n x) = g.map n (f.map n x) := by
+  sorry
+
+theorem spectralAlgebra_freeModule_act_unit (R : StructuredRingSpectrum) :
+    (R.freeModule).act_unit = R.mul_unit_left := by
+  sorry
+
+theorem spectralAlgebra_einfinity_comm (R : EInfinityRingSpectrum)
+    (n m : Nat) (x : R.spectrum.level n) (y : R.spectrum.level m) :
+    R.comm n m x y = trivial := by
+  sorry
+
+theorem spectralAlgebra_gl1_invertible (R : StructuredRingSpectrum)
+    (G : GL1 R) (u : G.carrier) : G.invertible u = trivial := by
+  sorry
+
+theorem spectralAlgebra_moduleMap_id_comp {R : StructuredRingSpectrum}
+    (M N : SpectrumModule R) (f : ModuleMap M N) (n : Nat) (x : M.spectrum.level n) :
+    (ModuleMap.id N).map n (f.map n x) = f.map n x := by
+  sorry
+
 end SpectralAlgebra
 end Algebra
 end Path

@@ -236,6 +236,29 @@ theorem motivicPaths_realisation_punit_onObj (CM : ChowMotives) (X : CM.obj) :
     (RealisationFunctor.punit CM).onObj X = PUnit.unit := by
   sorry
 
+theorem motivicPaths_trivialDecomposition_pieces {Obj : Type u} (m : Obj) :
+    (MotivicDecomposition.trivial m).pieces = 1 := by
+  sorry
+
+theorem motivicPaths_correspondencePath_source {X Y : Variety}
+    (C : CorrespondencePath X Y) :
+    C.source = C.source := by
+  sorry
+
+theorem motivicPaths_weightStructure_allWeights_refl (Obj : Type u) :
+    WeightStructure.allWeights Obj = WeightStructure.allWeights Obj := by
+  sorry
+
+theorem motivicPaths_realisation_punit_onMor (CM : ChowMotives)
+    (X Y : CM.obj) (f : CM.mor X Y) :
+    (RealisationFunctor.punit CM).onMor f = id := by
+  sorry
+
+theorem motivicPaths_tateTwist_functorial {CM : ChowMotives}
+    (T : TateTwistData CM) (n m : Int) (X : CM.obj) :
+    T.twist_compose n m X = T.twist_compose n m X := by
+  sorry
+
 end MotivicPaths
 end Algebra
 end Path

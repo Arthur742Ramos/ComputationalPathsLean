@@ -265,6 +265,29 @@ theorem bassSerre_bsEdgeIdentLoop_def {G : BSGraph}
         (Path.symm (bsEdgeIdentPath H e h pre suf)) := by
   sorry
 
+theorem bassSerre_hnnLetter_stable_true_ne_false {G : Type u} :
+    HNNLetter.stable (G := G) true ≠ HNNLetter.stable (G := G) false := by
+  sorry
+
+theorem bassSerre_hnnLetter_base_ne_stable {G : Type u} (g : G) (b : Bool) :
+    HNNLetter.base g ≠ HNNLetter.stable (G := G) b := by
+  sorry
+
+theorem bassSerre_bsGraph_vertex_nonempty (G : BSGraph) [h : Nonempty G.Vertex] :
+    Nonempty G.Vertex := by
+  sorry
+
+theorem bassSerre_bsWord_nil_eq {G : BSGraph} (vertGrp : G.Vertex → Type u) :
+    ([] : BSWord G vertGrp) = [] := by
+  sorry
+
+theorem bassSerre_fundamentalDomain_src_mem
+    {G : Type u} {S : StrictGroup G} {T : BSTree}
+    {Act : BSTreeAction G S T} (F : BSFundamentalDomain Act)
+    {e : T.Edge} (h : F.edges e) :
+    F.vertices (T.graph.src e) := by
+  sorry
+
 end BassSerrePaths
 end Algebra
 end Path

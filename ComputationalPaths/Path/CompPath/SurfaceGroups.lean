@@ -224,6 +224,33 @@ theorem surfaceGroups_dehnTwistPow_zero (S : SurfaceData) (D : DehnTwistData S)
     dehnTwistPow S D c 0 = mappingClassId S := by
   sorry
 
+theorem surfaceGroups_eulerChar_sphere :
+    surfaceEulerChar (SurfaceClass.orientable 0 0) = 2 := by
+  sorry
+
+theorem surfaceGroups_eulerChar_torus :
+    surfaceEulerChar (SurfaceClass.orientable 1 0) = 0 := by
+  sorry
+
+theorem surfaceGroups_eulerChar_genus_g (g : Nat) :
+    surfaceEulerChar (SurfaceClass.orientable g 0) = 2 - 2 * Int.ofNat g := by
+  sorry
+
+theorem surfaceGroups_mappingClassComp_assoc (S : SurfaceData) (f g h : MappingClass S) :
+    mappingClassComp (mappingClassComp f g) h =
+    mappingClassComp f (mappingClassComp g h) := by
+  sorry
+
+theorem surfaceGroups_mappingClassInv_left (S : SurfaceData) (f : MappingClass S) :
+    mappingClassComp (mappingClassInv f) f = mappingClassId S := by
+  sorry
+
+theorem surfaceGroups_dehnTwistPow_succ (S : SurfaceData) (D : DehnTwistData S)
+    (c : SurfaceCurve S) (n : Nat) :
+    dehnTwistPow S D c (n + 1) =
+    mappingClassComp (dehnTwistPow S D c n) (dehnTwistPow S D c 1) := by
+  sorry
+
 end CompPath
 end Path
 end ComputationalPaths

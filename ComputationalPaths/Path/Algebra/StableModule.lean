@@ -388,6 +388,37 @@ theorem stableModule_supportVariety_trivial_basepoint (H : CohomologyRing) :
     (SupportVariety.trivial H).basepoint = PUnit.unit := by
   sorry
 
+theorem stableModule_fieldData_trivial_mul :
+    FieldData.trivial.mul PUnit.unit PUnit.unit = PUnit.unit := by
+  sorry
+
+theorem stableModule_fieldData_trivial_neg :
+    FieldData.trivial.neg PUnit.unit = PUnit.unit := by
+  sorry
+
+theorem stableModule_supportVariety_trivial_carrier (H : CohomologyRing) :
+    (SupportVariety.trivial H).carrier = PUnit := by
+  sorry
+
+theorem stableModule_tate_trivial_add_comm (k : Type u) (G : Type v)
+    (Fk : FieldData k) (S : StrictGroup G)
+    (A : GroupAlgebra k G Fk S)
+    (C : StableModuleCategory k G Fk S A)
+    (X Y : C.triangulated.cat.Obj) (n : Int)
+    (x y : (TateCohomology.trivial k G Fk S A C).group X Y n) :
+    (TateCohomology.trivial k G Fk S A C).add X Y n x y =
+    (TateCohomology.trivial k G Fk S A C).add X Y n y x := by
+  sorry
+
+theorem stableModule_auslander_trivial_tau_idempotent (k : Type u) (G : Type v)
+    (Fk : FieldData k) (S : StrictGroup G)
+    (A : GroupAlgebra k G Fk S)
+    (C : StableModuleCategory k G Fk S A)
+    (X : C.triangulated.cat.Obj) :
+    (AuslanderReitenData.trivial k G Fk S A C).tau
+      ((AuslanderReitenData.trivial k G Fk S A C).tau X) = X := by
+  sorry
+
 end Algebra
 end Path
 end ComputationalPaths

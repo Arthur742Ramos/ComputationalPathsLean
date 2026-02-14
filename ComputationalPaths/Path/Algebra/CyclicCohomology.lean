@@ -208,6 +208,31 @@ theorem cyclicCohomology_quotient_def {A : Type u} (Alg : CyclicAlgebra A)
       Quot (cocycleRel (A := A) (Alg := Alg) (C := C) (n := n)) := by
   sorry
 
+theorem cyclicCohomology_cochainAdd_comm {A : Type u} (Alg : CyclicAlgebra A)
+    (n : Nat) (f g : CyclicCochain A n) :
+    cochainAdd (Alg := Alg) n f g = cochainAdd (Alg := Alg) n g f := by
+  sorry
+
+theorem cyclicCohomology_cochainAdd_zero_left {A : Type u} (Alg : CyclicAlgebra A)
+    (n : Nat) (f : CyclicCochain A n) :
+    cochainAdd (Alg := Alg) n (cochainZero (Alg := Alg) n) f = f := by
+  sorry
+
+theorem cyclicCohomology_cochainAdd_neg_cancel {A : Type u} (Alg : CyclicAlgebra A)
+    (n : Nat) (f : CyclicCochain A n) :
+    cochainAdd (Alg := Alg) n f (cochainNeg (Alg := Alg) n f) =
+      cochainZero (Alg := Alg) n := by
+  sorry
+
+theorem cyclicCohomology_iterate_one {α : Type u} (f : α → α) (x : α) :
+    iterate f 1 x = f x := by
+  sorry
+
+theorem cyclicCohomology_cochainPath_ofEq_refl {A : Type u} (Alg : CyclicAlgebra A)
+    {n : Nat} (f : CyclicCochain A n) :
+    cochainPath_ofEq (Alg := Alg) (rfl : f = f) = cochainPath_refl (Alg := Alg) f := by
+  sorry
+
 end CyclicCohomology
 end Algebra
 end Path

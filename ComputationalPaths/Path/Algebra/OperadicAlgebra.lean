@@ -243,6 +243,35 @@ theorem operadicAlgebra_formality_d_zero (C : ChainData) (F : Formality C)
     F.cohomologyChain.d n x = F.cohomologyChain.zero n := by
   sorry
 
+theorem operadicAlgebra_operadAlgMorphism_comp_id_left
+    {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
+    {A B : AlgOverOperad O} (f : OperadAlgMorphism A B) :
+    OperadAlgMorphism.comp (OperadAlgMorphism.id B) f = f := by
+  sorry
+
+theorem operadicAlgebra_operadAlgMorphism_comp_id_right
+    {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
+    {A B : AlgOverOperad O} (f : OperadAlgMorphism A B) :
+    OperadAlgMorphism.comp f (OperadAlgMorphism.id A) = f := by
+  sorry
+
+theorem operadicAlgebra_operadAlgMorphism_comp_assoc
+    {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
+    {A B C D : AlgOverOperad O}
+    (h : OperadAlgMorphism C D) (g : OperadAlgMorphism B C) (f : OperadAlgMorphism A B) :
+    OperadAlgMorphism.comp (OperadAlgMorphism.comp h g) f =
+    OperadAlgMorphism.comp h (OperadAlgMorphism.comp g f) := by
+  sorry
+
+theorem operadicAlgebra_quasiIso_map_zero (C D : ChainData) (q : QuasiIso C D)
+    (n : Nat) : q.map n (C.zero n) = D.zero n := by
+  sorry
+
+theorem operadicAlgebra_trivialEInfAlgebra_act {n : Nat}
+    (θ : trivialEInfOperad.ops n) (xs : Fin n → trivialEInfAlgebra.algebra.carrier) :
+    trivialEInfAlgebra.algebra.act θ xs = () := by
+  sorry
+
 end OperadicAlgebra
 end Algebra
 end Path
