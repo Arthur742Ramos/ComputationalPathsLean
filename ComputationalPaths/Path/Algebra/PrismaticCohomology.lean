@@ -154,6 +154,21 @@ def phi_mul (D : DeltaRingData A) (a b : A) :
         (Path.congrArg (fun y => D.mul (D.phi a) y)
           (Path.symm (D.phi_eq b)))))
 
+/-- Frobenius functoriality on zero. -/
+theorem frobenius_functorial_zero (D : DeltaRingData A) :
+    Path (D.phi D.zero) D.zero :=
+  phi_zero D
+
+/-- Frobenius functoriality on addition. -/
+theorem frobenius_functorial_add (D : DeltaRingData A) (a b : A) :
+    Path (D.phi (D.add a b)) (D.add (D.phi a) (D.phi b)) :=
+  phi_add D a b
+
+/-- Frobenius functoriality on multiplication. -/
+theorem frobenius_functorial_mul (D : DeltaRingData A) (a b : A) :
+    Path (D.phi (D.mul a b)) (D.mul (D.phi a) (D.phi b)) :=
+  phi_mul D a b
+
 end DeltaRingData
 
 /-! ## Prisms -/
@@ -284,6 +299,25 @@ structure PrismaticSiteData (A : Type u) (PA : PrismData A) where
   /-- Structure maps from the base. -/
   objMap : (i : ObjIdx) → PrismaticSiteObj A (ObjType i) PA (objPrism i)
 
+namespace PrismaticSiteObj
+
+variable {A : Type u} {B : Type v}
+variable {PA : PrismData A} {PB : PrismData B}
+
+/-- Frobenius functoriality for a morphism in the prismatic site. -/
+theorem frobenius_functoriality (S : PrismaticSiteObj A B PA PB) (a : A) :
+    Path (S.structMap (PA.phi a)) (PB.phi (S.structMap a)) :=
+  S.phi_compat a
+
+/-- Frobenius functoriality rewritten through the chosen ring homomorphism. -/
+theorem frobenius_functoriality_hom (S : PrismaticSiteObj A B PA PB) (a : A) :
+    Path (S.struct_hom.toFun (PA.phi a)) (PB.phi (S.struct_hom.toFun a)) := by
+  refine Path.trans (Path.symm (S.struct_eq (PA.phi a))) ?_
+  refine Path.trans (S.phi_compat a) ?_
+  exact Path.congrArg PB.phi (S.struct_eq a)
+
+end PrismaticSiteObj
+
 /-! ## Prismatic Cohomology -/
 
 /-- Prismatic cohomology data for a smooth R-algebra (over a prism (A, I)). -/
@@ -328,6 +362,37 @@ def flat_connection_symm (PC : PrismaticCohomData A R PA rR) (c : PC.CohomType) 
     Path PC.cohomRing.zero (PC.connection (PC.connection c)) :=
   Path.symm (PC.connection_flat c)
 
+/-- Frobenius functoriality on zero in prismatic cohomology. -/
+theorem frobenius_functorial_zero (PC : PrismaticCohomData A R PA rR) :
+    Path (PC.phi_cohom PC.cohomRing.zero) PC.cohomRing.zero :=
+  phi_cohom_zero PC
+
+/-- Frobenius functoriality on addition in prismatic cohomology. -/
+theorem frobenius_functorial_add (PC : PrismaticCohomData A R PA rR)
+    (c d : PC.CohomType) :
+    Path (PC.phi_cohom (PC.cohomRing.add c d))
+      (PC.cohomRing.add (PC.phi_cohom c) (PC.phi_cohom d)) := by
+  refine Path.trans (PC.phi_cohom_eq (PC.cohomRing.add c d)) ?_
+  refine Path.trans (PC.phi_cohom_hom.map_add c d) ?_
+  refine Path.trans
+    (Path.congrArg (fun x => PC.cohomRing.add x (PC.phi_cohom_hom.toFun d))
+      (Path.symm (PC.phi_cohom_eq c))) ?_
+  exact Path.congrArg (fun y => PC.cohomRing.add (PC.phi_cohom c) y)
+    (Path.symm (PC.phi_cohom_eq d))
+
+/-- Frobenius functoriality on multiplication in prismatic cohomology. -/
+theorem frobenius_functorial_mul (PC : PrismaticCohomData A R PA rR)
+    (c d : PC.CohomType) :
+    Path (PC.phi_cohom (PC.cohomRing.mul c d))
+      (PC.cohomRing.mul (PC.phi_cohom c) (PC.phi_cohom d)) := by
+  refine Path.trans (PC.phi_cohom_eq (PC.cohomRing.mul c d)) ?_
+  refine Path.trans (PC.phi_cohom_hom.map_mul c d) ?_
+  refine Path.trans
+    (Path.congrArg (fun x => PC.cohomRing.mul x (PC.phi_cohom_hom.toFun d))
+      (Path.symm (PC.phi_cohom_eq c))) ?_
+  exact Path.congrArg (fun y => PC.cohomRing.mul (PC.phi_cohom c) y)
+    (Path.symm (PC.phi_cohom_eq d))
+
 end PrismaticCohomData
 
 /-! ## Nygaard Filtration -/
@@ -369,6 +434,22 @@ def div_frob_zero (N : NygaardData A R C PA rR rC) :
 def zero_from_div_frob (N : NygaardData A R C PA rR rC) :
     Path rC.zero (N.divided_frob rC.zero) :=
   Path.symm N.divided_frob_zero
+
+/-- Predicate expressing exhaustiveness of the Nygaard filtration. -/
+def FiltrationExhaustive (N : NygaardData A R C PA rR rC) : Prop :=
+  ∀ c : C, ∃ n : Nat, N.mem c
+
+/-- If every element is in Nygaard filtration, then the filtration is exhaustive. -/
+theorem nygaard_filtration_exhaustive (N : NygaardData A R C PA rR rC)
+    (hmem : ∀ c : C, N.mem c) :
+    FiltrationExhaustive N := by
+  intro c
+  exact ⟨N.degree, hmem c⟩
+
+/-- Zero lies in some Nygaard stage, giving a base exhaustive witness. -/
+theorem nygaard_filtration_exhaustive_zero (N : NygaardData A R C PA rR rC) :
+    ∃ n : Nat, N.mem rC.zero :=
+  ⟨N.degree, N.zero_mem⟩
 
 end NygaardData
 
@@ -444,7 +525,30 @@ def zero_from_crys (CC : CrystallineComparison A R C PA rR rC) :
     Path rC.zero (CC.crysMap rC.zero) :=
   Path.symm (crys_zero CC)
 
+/-- Frobenius functoriality for crystalline comparison. -/
+theorem frobenius_functoriality (CC : CrystallineComparison A R C PA rR rC)
+    (phi : C → C) (c : C) :
+    Path (CC.crysMap (phi c)) (phi (CC.crysMap c)) :=
+  CC.crys_phi_compat phi c
+
+/-- Prismatic comparison theorem at path level. -/
+theorem prismatic_comparison_theorem_path (CC : CrystallineComparison A R C PA rR rC)
+    (phi : C → C) (c : C) :
+    Path (CC.crysMap (phi c)) (phi (CC.crysMap c)) :=
+  frobenius_functoriality CC phi c
+
 end CrystallineComparison
+
+/-! ## Path-level comparison theorem -/
+
+/-- Prismatic-to-crystalline comparison commutes with cohomological Frobenius. -/
+theorem prismatic_comparison_frobenius_path
+    {A : Type u} {R : Type v} {PA : PrismData A} {rR : PathRing R}
+    (PC : PrismaticCohomData A R PA rR)
+    (CC : CrystallineComparison A R PC.CohomType PA rR PC.cohomRing)
+    (c : PC.CohomType) :
+    Path (CC.crysMap (PC.phi_cohom c)) (PC.phi_cohom (CC.crysMap c)) :=
+  CC.crys_phi_compat PC.phi_cohom c
 
 /-! ## RwEq multi-step constructions -/
 

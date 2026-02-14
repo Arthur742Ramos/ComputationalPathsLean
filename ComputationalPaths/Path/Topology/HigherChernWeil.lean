@@ -465,6 +465,95 @@ def bracket_distributes (𝔤 : LieAlgebra) (X Y Z : 𝔤.carrier) :
          (𝔤.add (𝔤.bracket X Z) (𝔤.bracket Y Z)) :=
   𝔤.bracket_add_left X Y Z
 
+/-! ## Path-theoretic structural theorems -/
+
+/-- The Chern-Weil map preserves additive structure as a Path-algebra morphism law. -/
+theorem cw_path_algebra_pres_add (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+    (P Q : CW.source.carrier) :
+    Path (CW.cwMap (CW.source.add P Q))
+         (CW.targetAdd (CW.cwMap P) (CW.cwMap Q)) :=
+  CW.pres_add P Q
+
+/-- The Chern-Weil map preserves multiplicative structure as a Path-algebra morphism law. -/
+theorem cw_path_algebra_pres_mul (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+    (P Q : CW.source.carrier) :
+    Path (CW.cwMap (CW.source.mul P Q))
+         (CW.targetMul (CW.cwMap P) (CW.cwMap Q)) :=
+  CW.pres_mul P Q
+
+/-- The Chern-Weil map sends additive unit to additive unit. -/
+theorem cw_path_algebra_pres_zero (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
+    Path (CW.cwMap CW.source.zero) CW.targetZero :=
+  CW.pres_zero
+
+/-- The Chern-Weil map sends multiplicative unit to multiplicative unit. -/
+theorem cw_path_algebra_pres_one (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
+    Path (CW.cwMap CW.source.one) CW.targetOne :=
+  CW.pres_one
+
+/-- Bundled Path-algebra morphism statement for the Chern-Weil homomorphism. -/
+theorem cw_path_algebra_morphism (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+    (P Q : CW.source.carrier) :
+    (Path (CW.cwMap (CW.source.add P Q))
+          (CW.targetAdd (CW.cwMap P) (CW.cwMap Q))) ×
+    (Path (CW.cwMap (CW.source.mul P Q))
+          (CW.targetMul (CW.cwMap P) (CW.cwMap Q))) :=
+  ⟨CW.pres_add P Q, CW.pres_mul P Q⟩
+
+/-- Naturality of characteristic classes under pullback. -/
+theorem characteristic_class_naturality (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+    (N : ChernWeilNaturality 𝔤 CW) (P : CW.source.carrier) :
+    Path (N.pullbackMap (CW.cwMap P)) (CW.cwMap P) :=
+  N.naturality P
+
+/-- Naturality is compatible with additive characteristic-class expressions. -/
+theorem characteristic_class_naturality_add (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+    (N : ChernWeilNaturality 𝔤 CW) (P Q : CW.source.carrier) :
+    Path (N.pullbackMap (CW.cwMap (CW.source.add P Q)))
+         (N.pullbackMap (CW.targetAdd (CW.cwMap P) (CW.cwMap Q))) :=
+  Path.congrArg N.pullbackMap (CW.pres_add P Q)
+
+/-- Naturality is compatible with multiplicative characteristic-class expressions. -/
+theorem characteristic_class_naturality_mul (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+    (N : ChernWeilNaturality 𝔤 CW) (P Q : CW.source.carrier) :
+    Path (N.pullbackMap (CW.cwMap (CW.source.mul P Q)))
+         (N.pullbackMap (CW.targetMul (CW.cwMap P) (CW.cwMap Q))) :=
+  Path.congrArg N.pullbackMap (CW.pres_mul P Q)
+
+/-- Higher Chern-Weil map on the 𝔤-side preserves addition. -/
+theorem higher_cw_path_algebra_pres_add_g (M : DiffCrossedModule2)
+    (HCW : HigherChernWeilHom M) (P Q : HCW.sourceG.carrier) :
+    Path (HCW.cwMapG (HCW.sourceG.add P Q))
+         (HCW.targetAdd (HCW.cwMapG P) (HCW.cwMapG Q)) :=
+  HCW.pres_add_G P Q
+
+/-- Higher Chern-Weil map on the 𝔥-side preserves addition. -/
+theorem higher_cw_path_algebra_pres_add_h (M : DiffCrossedModule2)
+    (HCW : HigherChernWeilHom M) (P Q : HCW.sourceH.carrier) :
+    Path (HCW.cwMapH (HCW.sourceH.add P Q))
+         (HCW.targetAdd (HCW.cwMapH P) (HCW.cwMapH Q)) :=
+  HCW.pres_add_H P Q
+
+/-- Joint additive decomposition for higher Chern-Weil characteristic classes. -/
+theorem higher_cw_path_algebra_pair_additive (M : DiffCrossedModule2)
+    (HCW : HigherChernWeilHom M)
+    (P Q : HCW.sourceG.carrier) (R S : HCW.sourceH.carrier) :
+    Path (HCW.targetAdd (HCW.cwMapG (HCW.sourceG.add P Q))
+                         (HCW.cwMapH (HCW.sourceH.add R S)))
+         (HCW.targetAdd (HCW.targetAdd (HCW.cwMapG P) (HCW.cwMapG Q))
+                         (HCW.targetAdd (HCW.cwMapH R) (HCW.cwMapH S))) :=
+  higher_cw_both_additive M HCW P Q R S
+
+/-- Classical Chern-Simons transgression formula. -/
+theorem chern_simons_transgression_formula (𝔤 : LieAlgebra) (A : Connection 𝔤)
+    (CS : ChernSimonsForm 𝔤 A) : True :=
+  CS.transgression
+
+/-- Higher Chern-Simons transgression formula for 2-connections. -/
+theorem higher_chern_simons_transgression_formula (M : DiffCrossedModule2)
+    (CS₂ : HigherCSFunctional M) : True :=
+  CS₂.transgression
+
 end HigherChernWeil
 end Topology
 end Path

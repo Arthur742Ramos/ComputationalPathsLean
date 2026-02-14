@@ -201,6 +201,36 @@ def one_val_symm (CV : ContinuousValuationData R HR) :
     Path CV.valueGroup.one_val (CV.val HR.one) :=
   Path.symm CV.val_one
 
+/-- The valuation of `0*a` factors through the zero value. -/
+theorem val_zero_mul_path (CV : ContinuousValuationData R HR) (a : R) :
+    Nonempty (Path (CV.val (HR.mul HR.zero a))
+      (CV.valueGroup.mul_val CV.valueGroup.zero_val (CV.val a))) := by
+  exact ⟨CV.val_zero_mul a⟩
+
+/-- The valuation of `1*a` simplifies to the valuation of `a`. -/
+theorem val_one_mul_path (CV : ContinuousValuationData R HR) (a : R) :
+    Nonempty (Path (CV.val (HR.mul HR.one a)) (CV.val a)) := by
+  exact ⟨CV.val_one_mul a⟩
+
+/-- Valuation of a square is multiplicative in the value group. -/
+theorem val_mul_self_path (CV : ContinuousValuationData R HR) (a : R) :
+    Nonempty (Path (CV.val (HR.mul a a)) (CV.valueGroup.mul_val (CV.val a) (CV.val a))) := by
+  exact ⟨CV.val_mul a a⟩
+
+/-- Valuation is path-invariant under swapping factors. -/
+theorem val_mul_comm_path (CV : ContinuousValuationData R HR) (a b : R) :
+    Nonempty (Path (CV.val (HR.mul a b)) (CV.val (HR.mul b a))) := by
+  exact ⟨Path.trans
+    (CV.val_mul a b)
+    (Path.trans
+      (CV.valueGroup.mul_comm (CV.val a) (CV.val b))
+      (Path.symm (CV.val_mul b a)))⟩
+
+/-- Ideal boundedness is witnessed by a path for each ideal element. -/
+theorem val_ideal_bound_path (CV : ContinuousValuationData R HR) (x : R)
+    (hx : HR.idealOfDef x) : Nonempty (Path (CV.val x) (CV.val x)) := by
+  exact ⟨CV.val_ideal_bound x hx⟩
+
 end ContinuousValuationData
 
 /-! ## Rational Subsets -/
@@ -316,6 +346,37 @@ def restrict_comp_witness (SP : StructurePresheafData R HR)
          ((SP.restrict_hom V W).toFun ((SP.restrict_hom U V).toFun a)) :=
   Path.trans (SP.restrict_comp U V W a) (Path.refl _)
 
+/-- Restriction preserves one. -/
+theorem restrict_one (SP : StructurePresheafData R HR)
+    (U V : RationalSubsetData R HR) :
+    Nonempty (Path (SP.restrict U V (SP.sections U).one) (SP.sections V).one) := by
+  exact ⟨Path.trans (SP.restrict_eq U V (SP.sections U).one) (SP.restrict_hom U V).map_one⟩
+
+/-- Sheaf identity axiom at path level. -/
+theorem sheaf_identity_path (SP : StructurePresheafData R HR)
+    (U : RationalSubsetData R HR) (a : R) :
+    Nonempty (Path ((SP.restrict_hom U U).toFun a) a) := by
+  exact ⟨SP.restrict_id U a⟩
+
+/-- Sheaf composition axiom at path level. -/
+theorem sheaf_comp_path (SP : StructurePresheafData R HR)
+    (U V W : RationalSubsetData R HR) (a : R) :
+    Nonempty (Path ((SP.restrict_hom U W).toFun a)
+         ((SP.restrict_hom V W).toFun ((SP.restrict_hom U V).toFun a))) := by
+  exact ⟨SP.restrict_comp U V W a⟩
+
+/-- Restricting zero to the same rational subset is pathwise identity. -/
+theorem sheaf_identity_on_zero (SP : StructurePresheafData R HR)
+    (U : RationalSubsetData R HR) :
+    Nonempty (Path (SP.restrict U U (SP.sections U).zero) (SP.sections U).zero) := by
+  exact ⟨Path.trans (SP.restrict_eq U U (SP.sections U).zero) (SP.restrict_id U (SP.sections U).zero)⟩
+
+/-- Restricting one to the same rational subset is pathwise identity. -/
+theorem sheaf_identity_on_one (SP : StructurePresheafData R HR)
+    (U : RationalSubsetData R HR) :
+    Nonempty (Path (SP.restrict U U (SP.sections U).one) (SP.sections U).one) := by
+  exact ⟨Path.trans (SP.restrict_eq U U (SP.sections U).one) (SP.restrict_id U (SP.sections U).one)⟩
+
 end StructurePresheafData
 
 /-! ## Adic Space -/
@@ -374,6 +435,34 @@ def morph_add (M : AdicMorphismData R S AR AS) (a b : R) :
 def zero_from_morph (M : AdicMorphismData R S AR AS) :
     Path AS.huberPair.zero (M.ringMap AR.huberPair.zero) :=
   Path.symm (morph_zero M)
+
+/-- The adic spectrum pullback preserves valuation paths at zero. -/
+theorem spa_functor_preserves_zero_path (M : AdicMorphismData R S AR AS)
+    (y : AS.spa.PointIdx) :
+    Nonempty (Path ((AS.spa.valuation y).val (M.ringMap AR.huberPair.zero))
+         ((AS.spa.valuation y).val AS.huberPair.zero)) := by
+  exact ⟨Path.congrArg ((AS.spa.valuation y).val) (M.morph_zero)⟩
+
+/-- The adic spectrum pullback preserves valuation paths at one. -/
+theorem spa_functor_preserves_one_path (M : AdicMorphismData R S AR AS)
+    (y : AS.spa.PointIdx) :
+    Nonempty (Path ((AS.spa.valuation y).val (M.ringMap AR.huberPair.one))
+         ((AS.spa.valuation y).val AS.huberPair.one)) := by
+  exact ⟨Path.congrArg ((AS.spa.valuation y).val) (M.morph_one)⟩
+
+/-- The adic spectrum pullback preserves valuation paths for addition. -/
+theorem spa_functor_preserves_add_path (M : AdicMorphismData R S AR AS)
+    (y : AS.spa.PointIdx) (a b : R) :
+    Nonempty (Path ((AS.spa.valuation y).val (M.ringMap (AR.huberPair.add a b)))
+         ((AS.spa.valuation y).val (AS.huberPair.add (M.ringMap a) (M.ringMap b)))) := by
+  exact ⟨Path.congrArg ((AS.spa.valuation y).val) (M.morph_add a b)⟩
+
+/-- The adic spectrum pullback preserves boundedness on plus-elements. -/
+theorem spa_functor_preserves_plus_bound_path (M : AdicMorphismData R S AR AS)
+    (y : AS.spa.PointIdx) (r : R) (hr : AR.huberPair.plus r) :
+    Nonempty (Path ((AS.spa.valuation y).val (M.ringMap r))
+         ((AS.spa.valuation y).val (M.ringMap r))) := by
+  exact ⟨AS.spa.bounded_on_plus y (M.ringMap r) (M.plus_compat r hr)⟩
 
 end AdicMorphismData
 

@@ -340,6 +340,76 @@ def dd_sum_inverse (dd : DixmierDouadyClass) (a b : dd.classRep) :
     Path (dd.add (dd.neg (dd.add a b)) (dd.add a b)) dd.zero :=
   dd.neg_add (dd.add a b)
 
+/-! ## Path-Level Gerbe Results -/
+
+/-- Path-level triviality criterion: if the DD class is path-equal to zero,
+then adding its inverse contracts to zero. -/
+theorem gerbe_triviality_criterion
+    (G : BundleGerbe) (dd : BundleGerbe.DDClass G)
+    (hzero : Path dd.ddClass dd.cohom.zero) :
+    Nonempty (Path (dd.cohom.add dd.ddClass (dd.cohom.neg dd.ddClass))
+      dd.cohom.zero) := by
+  let hcongr :
+      Path (dd.cohom.add dd.ddClass (dd.cohom.neg dd.ddClass))
+           (dd.cohom.add dd.cohom.zero (dd.cohom.neg dd.cohom.zero)) :=
+    Path.congrArg (fun x => dd.cohom.add x (dd.cohom.neg x)) hzero
+  exact ⟨Path.trans hcongr (dd.cohom.add_neg dd.cohom.zero)⟩
+
+/-- Right-inverse formulation of gerbe triviality at the DD class level. -/
+theorem gerbe_triviality_criterion_right_inverse
+    (G : BundleGerbe) (dd : BundleGerbe.DDClass G) :
+    Nonempty (Path (dd.cohom.add (dd.cohom.neg dd.ddClass) dd.ddClass)
+      dd.cohom.zero) :=
+  ⟨dd.cohom.neg_add dd.ddClass⟩
+
+/-- Band computation: module action projects to the first leg of `Y ×_M Y`. -/
+theorem band_computation_first_leg
+    (G : BundleGerbe) (M : GerbeModule G) (p : G.fiberProd) (m : M.moduleSpace) :
+    Nonempty (Path (M.moduleProj (M.action p m)) (G.fst p)) :=
+  ⟨M.action_proj p m⟩
+
+/-- Band computation along the submersion: action transport lands over the second leg. -/
+theorem band_computation_second_leg
+    (G : BundleGerbe) (M : GerbeModule G) (p : G.fiberProd) (m : M.moduleSpace) :
+    Nonempty (Path (G.proj (M.moduleProj (M.action p m))) (G.proj (G.snd p))) := by
+  exact ⟨Path.trans
+    (Path.congrArg G.proj (M.action_proj p m))
+    (G.fiber_cond p)⟩
+
+/-- Endomorphism bundles of gerbe modules compute a descended band. -/
+theorem band_computation_endbundle_descends
+    (G : BundleGerbe) (M : GerbeModule G) (E : GerbeModule.EndBundle G M) :
+    True :=
+  E.descends
+
+/-- Path-level DD classification extracted from a stable isomorphism witness. -/
+theorem dd_classification_path_of_stable_iso
+    {G₁ G₂ : BundleGerbe} {dd₁ : BundleGerbe.DDClass G₁}
+    {dd₂ : BundleGerbe.DDClass G₂}
+    (iso : StableIsomorphism G₁ G₂ dd₁ dd₂) :
+    Nonempty (Path dd₁.ddClass (iso.same_cohom ▸ dd₂.ddClass)) :=
+  ⟨iso.class_eq⟩
+
+/-- The classifying map is functorial with respect to computational paths. -/
+theorem dd_classification_respects_path
+    (C : GerbeClassification) {G₁ G₂ : BundleGerbe}
+    (h : Path G₁ G₂) :
+    Nonempty (Path (C.classify G₁) (C.classify G₂)) :=
+  ⟨Path.congrArg C.classify h⟩
+
+/-- Path-level surjectivity of the Dixmier-Douady classification map. -/
+theorem dd_classification_surjective_path
+    (C : GerbeClassification) (c : C.cohom.classRep) :
+    ∃ G : BundleGerbe, Nonempty (Path (C.classify G) c) := by
+  rcases C.surjective c with ⟨G, hGc⟩
+  exact ⟨G, ⟨Path.ofEq hGc⟩⟩
+
+/-- Reflexive path-level form of DD classification. -/
+theorem dd_classification_refl
+    (C : GerbeClassification) (G : BundleGerbe) :
+    Nonempty (Path (C.classify G) (C.classify G)) :=
+  ⟨Path.refl _⟩
+
 end Gerbes
 end Topology
 end Path

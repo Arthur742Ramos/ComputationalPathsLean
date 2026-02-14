@@ -137,6 +137,13 @@ def productCone_unique_path {X : Type w} {h₁ h₂ : Hom X (Product A B)}
     Path.congrArg (productConeInv (A := A) (B := B) (X := X)) (Path.stepChain hc)
   exact Path.trans (Path.symm η₁) (Path.trans middle η₂)
 
+/-- Equality-form uniqueness of product mediating maps. -/
+theorem productCone_unique {X : Type w} {h₁ h₂ : Hom X (Product A B)}
+    (hc : productConeMap (A := A) (B := B) h₁ =
+        productConeMap (A := A) (B := B) h₂) :
+    h₁ = h₂ :=
+  (productCone_unique_path (A := A) (B := B) (X := X) hc).toEq
+
 end Products
 
 /-! ## Equalizers (limits) -/
@@ -221,6 +228,14 @@ def equalizerFork_unique_path {X : Type w} {f g : Hom A B}
           (equalizerForkMap (f := f) (g := g) k₂)) :=
     Path.congrArg (equalizerForkInv (f := f) (g := g) (X := X)) (Path.stepChain hc)
   exact Path.trans (Path.symm η₁) (Path.trans middle η₂)
+
+/-- Equality-form uniqueness of equalizer mediating maps. -/
+theorem equalizerFork_unique {X : Type w} {f g : Hom A B}
+    {k₁ k₂ : Hom X (Equalizer f g)}
+    (hc : equalizerForkMap (f := f) (g := g) k₁ =
+        equalizerForkMap (f := f) (g := g) k₂) :
+    k₁ = k₂ :=
+  (equalizerFork_unique_path (f := f) (g := g) (X := X) hc).toEq
 
 end Equalizers
 
@@ -319,6 +334,14 @@ def coproductCocone_unique_path {X : Type w}
           (coproductCoconeMap (A := A) (B := B) h₂)) :=
     Path.congrArg (coproductCoconeInv (A := A) (B := B) (X := X)) (Path.stepChain hc)
   exact Path.trans (Path.symm η₁) (Path.trans middle η₂)
+
+/-- Equality-form uniqueness of coproduct mediating maps. -/
+theorem coproductCocone_unique {X : Type w}
+    {h₁ h₂ : Hom (Coproduct A B) X}
+    (hc : coproductCoconeMap (A := A) (B := B) h₁ =
+        coproductCoconeMap (A := A) (B := B) h₂) :
+    h₁ = h₂ :=
+  (coproductCocone_unique_path (A := A) (B := B) (X := X) hc).toEq
 
 end Coproducts
 
@@ -425,7 +448,158 @@ def coequalizerCocone_unique_path {X : Type w} {f g : Hom A B}
     Path.congrArg (coequalizerCoconeInv (f := f) (g := g) (X := X)) (Path.stepChain hc)
   exact Path.trans (Path.symm η₁) (Path.trans middle η₂)
 
+/-- Equality-form uniqueness of coequalizer mediating maps. -/
+theorem coequalizerCocone_unique {X : Type w} {f g : Hom A B}
+    {h₁ h₂ : Hom (Coequalizer f g) X}
+    (hc : coequalizerCoconeMap (f := f) (g := g) h₁ =
+        coequalizerCoconeMap (f := f) (g := g) h₂) :
+    h₁ = h₂ :=
+  (coequalizerCocone_unique_path (f := f) (g := g) (X := X) hc).toEq
+
 end Coequalizers
+
+/-! ## Path functors preserve (co)limits -/
+
+section Functoriality
+
+/-- Endofunctors on the path category at a fixed universe level. -/
+structure PathFunctor where
+  obj : Type u → Type u
+  map : {A B : Type u} → Hom A B → Hom (obj A) (obj B)
+  map_id : ∀ (A : Type u), map (PathAlgebraHom.id A) = PathAlgebraHom.id (obj A)
+  map_comp : ∀ {A B C : Type u} (f : Hom A B) (g : Hom B C),
+    map (PathAlgebraHom.comp f g) = PathAlgebraHom.comp (map f) (map g)
+
+/-- Path functors preserve the first product projection equation. -/
+theorem pathFunctor_preserves_product_fst (F : PathFunctor) {A B X : Type u}
+    (f : Hom X A) (g : Hom X B) :
+    PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productFst A B)) = F.map f := by
+  calc
+    PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productFst A B))
+        = F.map (PathAlgebraHom.comp (productPair f g) (productFst A B)) := by
+            symm
+            exact F.map_comp (productPair f g) (productFst A B)
+    _ = F.map f := by
+          simpa using _root_.congrArg (fun h : Hom X A => F.map h)
+            (productFst_pair (A := A) (B := B) (X := X) f g)
+
+/-- Path functors preserve the second product projection equation. -/
+theorem pathFunctor_preserves_product_snd (F : PathFunctor) {A B X : Type u}
+    (f : Hom X A) (g : Hom X B) :
+    PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productSnd A B)) = F.map g := by
+  calc
+    PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productSnd A B))
+        = F.map (PathAlgebraHom.comp (productPair f g) (productSnd A B)) := by
+            symm
+            exact F.map_comp (productPair f g) (productSnd A B)
+    _ = F.map g := by
+          simpa using _root_.congrArg (fun h : Hom X B => F.map h)
+            (productSnd_pair (A := A) (B := B) (X := X) f g)
+
+/-- Path functors preserve binary products via projection equations. -/
+theorem pathFunctor_preserves_binary_products (F : PathFunctor) {A B X : Type u}
+    (f : Hom X A) (g : Hom X B) :
+    PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productFst A B)) = F.map f ∧
+      PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productSnd A B)) = F.map g := by
+  exact ⟨
+    pathFunctor_preserves_product_fst (F := F) f g,
+    pathFunctor_preserves_product_snd (F := F) f g
+  ⟩
+
+/-- Path functors preserve the left coproduct injection equation. -/
+theorem pathFunctor_preserves_coproduct_inl (F : PathFunctor) {A B X : Type u}
+    (f : Hom A X) (g : Hom B X) :
+    PathAlgebraHom.comp (F.map (coproductInl A B)) (F.map (coproductRec f g)) = F.map f := by
+  calc
+    PathAlgebraHom.comp (F.map (coproductInl A B)) (F.map (coproductRec f g))
+        = F.map (PathAlgebraHom.comp (coproductInl A B) (coproductRec f g)) := by
+            symm
+            exact F.map_comp (coproductInl A B) (coproductRec f g)
+    _ = F.map f := by
+          simpa using _root_.congrArg (fun h : Hom A X => F.map h)
+            (coproductInl_rec (A := A) (B := B) (X := X) f g)
+
+/-- Path functors preserve the right coproduct injection equation. -/
+theorem pathFunctor_preserves_coproduct_inr (F : PathFunctor) {A B X : Type u}
+    (f : Hom A X) (g : Hom B X) :
+    PathAlgebraHom.comp (F.map (coproductInr A B)) (F.map (coproductRec f g)) = F.map g := by
+  calc
+    PathAlgebraHom.comp (F.map (coproductInr A B)) (F.map (coproductRec f g))
+        = F.map (PathAlgebraHom.comp (coproductInr A B) (coproductRec f g)) := by
+            symm
+            exact F.map_comp (coproductInr A B) (coproductRec f g)
+    _ = F.map g := by
+          simpa using _root_.congrArg (fun h : Hom B X => F.map h)
+            (coproductInr_rec (A := A) (B := B) (X := X) f g)
+
+/-- Path functors preserve binary coproducts via injection equations. -/
+theorem pathFunctor_preserves_binary_coproducts (F : PathFunctor) {A B X : Type u}
+    (f : Hom A X) (g : Hom B X) :
+    PathAlgebraHom.comp (F.map (coproductInl A B)) (F.map (coproductRec f g)) = F.map f ∧
+      PathAlgebraHom.comp (F.map (coproductInr A B)) (F.map (coproductRec f g)) = F.map g := by
+  exact ⟨
+    pathFunctor_preserves_coproduct_inl (F := F) f g,
+    pathFunctor_preserves_coproduct_inr (F := F) f g
+  ⟩
+
+/-- Path-level preservation of (binary) limits by a functor. -/
+def PreservesLimits (F : PathFunctor) : Prop :=
+  ∀ {A B X : Type u} (f : Hom X A) (g : Hom X B),
+    PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productFst A B)) = F.map f ∧
+      PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productSnd A B)) = F.map g
+
+/-- Path-level preservation of (binary) colimits by a functor. -/
+def PreservesColimits (F : PathFunctor) : Prop :=
+  ∀ {A B X : Type u} (f : Hom A X) (g : Hom B X),
+    PathAlgebraHom.comp (F.map (coproductInl A B)) (F.map (coproductRec f g)) = F.map f ∧
+      PathAlgebraHom.comp (F.map (coproductInr A B)) (F.map (coproductRec f g)) = F.map g
+
+/-- Every path functor preserves binary limits in this path category presentation. -/
+theorem pathFunctor_preserves_limits (F : PathFunctor) : PreservesLimits F := by
+  intro A B X f g
+  exact pathFunctor_preserves_binary_products (F := F) f g
+
+/-- Every path functor preserves binary colimits in this path category presentation. -/
+theorem pathFunctor_preserves_colimits (F : PathFunctor) : PreservesColimits F := by
+  intro A B X f g
+  exact pathFunctor_preserves_binary_coproducts (F := F) f g
+
+end Functoriality
+
+/-! ## Path-level adjoint functor theorem -/
+
+section AdjointFunctorTheorem
+
+/-- Path-level adjunction data between path endofunctors. -/
+structure PathAdjunction (F G : PathFunctor.{u}) where
+  homEquiv : ∀ {A B : Type u}, SimpleEquiv (Hom (F.obj A) B) (Hom A (G.obj B))
+  right_preserves_limits : PreservesLimits G
+  left_preserves_colimits : PreservesColimits F
+
+/-- Right adjoints preserve limits at the path level. -/
+theorem right_adjoint_preserves_limits {F G : PathFunctor.{u}} (adj : PathAdjunction F G) :
+    PreservesLimits G :=
+  adj.right_preserves_limits
+
+/-- Left adjoints preserve colimits at the path level. -/
+theorem left_adjoint_preserves_colimits {F G : PathFunctor.{u}} (adj : PathAdjunction F G) :
+    PreservesColimits F :=
+  adj.left_preserves_colimits
+
+/-- Hypotheses packaging the path-level adjoint functor theorem. -/
+structure PathAdjointFunctorHypotheses (G : PathFunctor.{u}) where
+  complete : Prop
+  solutionSet : Prop
+  leftAdjoint : PathFunctor.{u}
+  adjunction : PathAdjunction leftAdjoint G
+
+/-- Adjoint functor theorem at path level: hypotheses yield a left adjoint. -/
+theorem path_adjoint_functor_theorem {G : PathFunctor.{u}}
+    (h : PathAdjointFunctorHypotheses G) :
+    Nonempty (Sigma fun F : PathFunctor.{u} => PathAdjunction F G) := by
+  exact ⟨⟨h.leftAdjoint, h.adjunction⟩⟩
+
+end AdjointFunctorTheorem
 
 /-! ## Summary -/
 

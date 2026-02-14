@@ -68,6 +68,16 @@ This is the computational paths version of path lifting in fibers. -/
 def fiberTransport {P : A → Type u} {a b : A} (p : Path a b) : P a → P b :=
   Path.transport p
 
+/-- Explicit single-step path built directly from a `Step` witness. -/
+@[simp] def singleStepPath {a b : A} (h : a = b) : Path a b :=
+  Path.mk [ComputationalPaths.Step.mk a b h] h
+
+@[simp] theorem singleStepPath_toEq {a b : A} (h : a = b) :
+    (singleStepPath (A := A) h).toEq = h := rfl
+
+@[simp] theorem singleStepPath_eq_stepChain {a b : A} (h : a = b) :
+    singleStepPath (A := A) h = Path.stepChain h := rfl
+
 /-- Path lifting: a path in A from a to b and a point in P(a)
 determine a path in the total space.
 
@@ -75,12 +85,8 @@ The key insight is that p.toEq : a = b can be used to construct
 an equality between the sigma types, which then lifts to a Path. -/
 noncomputable def pathLift {P : A → Type u} {a b : A} (p : Path a b) (x : P a) :
     Path (TotalPoint a x) (TotalPoint b (fiberTransport p x)) :=
-  Path.stepChain (by
-    -- We need: ⟨a, x⟩ = ⟨b, transport p x⟩
-    -- Using p.toEq : a = b
+  singleStepPath (A := TotalSpace P) (by
     cases p.toEq
-    -- Now a = b, need: ⟨a, x⟩ = ⟨a, transport refl x⟩
-    -- Since transport refl = id, this is ⟨a, x⟩ = ⟨a, x⟩
     rfl)
 
 /-! ## Lifting Properties
@@ -90,19 +96,68 @@ in the fiber is chosen. The lifted path starts at the given point, and its
 projection is the base path.
 -/
 
-/-- The lifted path projects to the canonical `ofEq` path in the base. -/
-theorem proj_pathLift_ofEq {P : A → Type u} {a b : A}
+/-- The lifted path projects to the canonical single-step path in the base. -/
+theorem proj_pathLift_step {P : A → Type u} {a b : A}
     (p : Path a b) (x : P a) :
-    Path.congrArg proj (pathLift (P := P) p x) = Path.stepChain p.toEq := by
+    Path.congrArg proj (pathLift (P := P) p x) = singleStepPath (A := A) p.toEq := by
   cases p with
   | mk steps proof =>
     cases proof
     rfl
 
-/-- Lifting along reflexivity produces the canonical `ofEq` path. -/
+/-- Backward-compatible statement in terms of `Path.stepChain`. -/
+theorem proj_pathLift_ofEq {P : A → Type u} {a b : A}
+    (p : Path a b) (x : P a) :
+    Path.congrArg proj (pathLift (P := P) p x) = Path.stepChain p.toEq := by
+  simpa [singleStepPath_eq_stepChain] using proj_pathLift_step (P := P) p x
+
+/-- The projection of the canonical lift has the expected base equality. -/
+@[simp] theorem proj_pathLift_toEq {P : A → Type u} {a b : A}
+    (p : Path a b) (x : P a) :
+    (Path.congrArg proj (pathLift (P := P) p x)).toEq = p.toEq := by
+  exact _root_.congrArg Path.toEq (proj_pathLift_step (P := P) p x)
+
+/-- Lifting along reflexivity produces the canonical single-step path. -/
+theorem pathLift_refl_step {P : A → Type u} {a : A} (x : P a) :
+    pathLift (P := P) (Path.refl a) x = singleStepPath (A := TotalSpace P) (by rfl) := by
+  rfl
+
+/-- Backward-compatible statement in terms of `Path.stepChain`. -/
 theorem pathLift_refl_ofEq {P : A → Type u} {a : A} (x : P a) :
     pathLift (P := P) (Path.refl a) x = Path.stepChain (by rfl) := by
-  rfl
+  simpa [singleStepPath_eq_stepChain] using pathLift_refl_step (P := P) x
+
+/-- Unique path lifting: a lift with the same projected base path has
+the transported endpoint. -/
+theorem unique_path_lifting {P : A → Type u} {a b : A}
+    (p : Path a b) (x : P a) {y : P b}
+    (q : Path (TotalPoint a x) (TotalPoint b y))
+    (hproj : (Path.congrArg proj q).toEq = p.toEq) :
+    y = fiberTransport (P := P) p x := by
+  have hq :
+      fiberTransport (P := P) (Path.congrArg proj q) x = y := by
+    simpa [proj, TotalPoint, fiberTransport] using
+      (sigmaSnd (B := fun a => P a) q).toEq
+  have htransport :
+      fiberTransport (P := P) (Path.congrArg proj q) x =
+        fiberTransport (P := P) p x := by
+    exact Path.transport_of_toEq_eq hproj x
+  exact hq.symm.trans htransport
+
+/-- Endpoint uniqueness for two lifts of the same base path with the same start. -/
+theorem unique_path_lifting_endpoint {P : A → Type u} {a b : A}
+    (p : Path a b) (x : P a)
+    {y₁ y₂ : P b}
+    (q₁ : Path (TotalPoint a x) (TotalPoint b y₁))
+    (q₂ : Path (TotalPoint a x) (TotalPoint b y₂))
+    (hproj₁ : (Path.congrArg proj q₁).toEq = p.toEq)
+    (hproj₂ : (Path.congrArg proj q₂).toEq = p.toEq) :
+    y₁ = y₂ := by
+  have hy₁ : y₁ = fiberTransport (P := P) p x :=
+    unique_path_lifting (P := P) (p := p) (x := x) (q := q₁) hproj₁
+  have hy₂ : y₂ = fiberTransport (P := P) p x :=
+    unique_path_lifting (P := P) (p := p) (x := x) (q := q₂) hproj₂
+  exact hy₁.trans hy₂.symm
 
 /-! ## Transport Composition in Fibers -/
 
@@ -166,16 +221,37 @@ Given a loop at a and a point in P(a), transport gives another point in P(a). -/
 def loopAction {P : A → Type u} {a : A} (l : LoopSpace A a) (x : P a) : P a :=
   fiberTransport l x
 
-/-- The loop action respects RwEq.
-If two loops are RwEq, they induce the same action on fibers. -/
+/-- The loop action respects a single rewrite `Step`. -/
+theorem loopAction_respects_step {P : A → Type u} {a : A}
+    {l₁ l₂ : LoopSpace A a} (h : Path.Step l₁ l₂) (x : P a) :
+    loopAction l₁ x = loopAction l₂ x := by
+  unfold loopAction fiberTransport
+  exact Path.transport_of_toEq_eq (step_toEq h) x
+
+/-- Monodromy is well-defined at the `Step` level. -/
+theorem monodromy_step_well_defined {P : A → Type u} {a : A}
+    {l₁ l₂ : LoopSpace A a} (h : Path.Step l₁ l₂) (x : P a) :
+    loopAction l₁ x = loopAction l₂ x :=
+  loopAction_respects_step (P := P) h x
+
 theorem loopAction_respects_rweq {P : A → Type u} {a : A}
     {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) (x : P a) :
     loopAction l₁ x = loopAction l₂ x := by
-  -- Both loops have the same toEq, so transport is the same
-  unfold loopAction fiberTransport
-  -- The key is that l₁.toEq = l₂.toEq when l₁ ≈ l₂
-  have heq : l₁.toEq = l₂.toEq := rweq_toEq h
-  exact Path.transport_of_toEq_eq heq x
+  induction h with
+  | refl _ =>
+      rfl
+  | step hStep =>
+      exact loopAction_respects_step (P := P) hStep x
+  | symm _ ih =>
+      exact ih.symm
+  | trans _ _ ih₁ ih₂ =>
+      exact ih₁.trans ih₂
+
+/-- Monodromy is well-defined on rewrite-equivalent loops. -/
+theorem monodromy_rweq_well_defined {P : A → Type u} {a : A}
+    {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) (x : P a) :
+    loopAction l₁ x = loopAction l₂ x :=
+  loopAction_respects_rweq (P := P) h x
 
 /-- The fiber action descends to the quotient π₁(A, a). -/
 noncomputable def fiberAction {P : A → Type u} {a : A} :
@@ -214,11 +290,17 @@ noncomputable def fiberLoopPath {P : A → Type u} {a : A} (l : LoopSpace A a) (
     Path (TotalPoint a x) (TotalPoint a (loopAction l x)) := by
   simpa [loopAction] using pathLift (P := P) l x
 
-/-- The projection of the fiber-loop path is the canonical `ofEq` loop. -/
+/-- The projection of the fiber-loop path is the canonical single-step loop. -/
+theorem proj_fiberLoopPath_step {P : A → Type u} {a : A}
+    (l : LoopSpace A a) (x : P a) :
+    Path.congrArg proj (fiberLoopPath (P := P) l x) = singleStepPath (A := A) l.toEq := by
+  simpa [fiberLoopPath] using proj_pathLift_step (P := P) l x
+
+/-- Backward-compatible statement in terms of `Path.stepChain`. -/
 theorem proj_fiberLoopPath_ofEq {P : A → Type u} {a : A}
     (l : LoopSpace A a) (x : P a) :
     Path.congrArg proj (fiberLoopPath (P := P) l x) = Path.stepChain l.toEq := by
-  simpa [fiberLoopPath] using proj_pathLift_ofEq (P := P) l x
+  simpa [singleStepPath_eq_stepChain] using proj_fiberLoopPath_step (P := P) l x
 
 /-! ## Deck Transformations
 

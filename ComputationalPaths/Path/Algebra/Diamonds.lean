@@ -392,6 +392,111 @@ def perf_diamond_roundtrip {X : Type u}
     Path (PD.diamond.quotientMap x) x :=
   Path.trans (PD.quot_is_id x) (Path.refl _)
 
+/-! ## Theorems: diamond equivalence, v-descent, and tilting paths -/
+
+theorem diamond_equiv_is_equivalence {X : Type u} {Y : Type v}
+    (D : DiamondData X Y) :
+    (∀ y, D.equivRel.rel y y) ∧
+    (∀ y1 y2, D.equivRel.rel y1 y2 → D.equivRel.rel y2 y1) ∧
+    (∀ y1 y2 y3, D.equivRel.rel y1 y2 → D.equivRel.rel y2 y3 → D.equivRel.rel y1 y3) := by
+  refine ⟨?_, ?_⟩
+  · intro y
+    exact D.equivRel.refl_rel y
+  · refine ⟨?_, ?_⟩
+    · intro y1 y2 h
+      exact D.equivRel.symm_rel y1 y2 h
+    · intro y1 y2 y3 h12 h23
+      exact D.equivRel.trans_rel y1 y2 y3 h12 h23
+
+theorem diamond_equiv_refl {X : Type u} {Y : Type v}
+    (D : DiamondData X Y) (y : Y) :
+    D.equivRel.rel y y :=
+  D.equivRel.refl_rel y
+
+theorem diamond_equiv_symm {X : Type u} {Y : Type v}
+    (D : DiamondData X Y) {y1 y2 : Y}
+    (h : D.equivRel.rel y1 y2) :
+    D.equivRel.rel y2 y1 :=
+  D.equivRel.symm_rel y1 y2 h
+
+theorem diamond_equiv_trans {X : Type u} {Y : Type v}
+    (D : DiamondData X Y) {y1 y2 y3 : Y}
+    (h12 : D.equivRel.rel y1 y2) (h23 : D.equivRel.rel y2 y3) :
+    D.equivRel.rel y1 y3 :=
+  D.equivRel.trans_rel y1 y2 y3 h12 h23
+
+theorem diamond_equivalence {X : Type u} {Y : Type v}
+    (D : DiamondData X Y) {y1 y2 : Y}
+    (h : D.equivRel.rel y1 y2) :
+    Nonempty (Path (D.quotientMap y1) (D.quotientMap y2)) :=
+  ⟨D.quot_respects y1 y2 h⟩
+
+theorem diamond_quot_surj_path {X : Type u} {Y : Type v}
+    (D : DiamondData X Y) (x : X) :
+    Nonempty (Path (D.quotientMap (D.quot_surj x)) x) :=
+  ⟨D.quot_surj_spec x⟩
+
+theorem vtopology_cover_surj_path {X : Type u}
+    (VT : VTopologyData X) (i : VT.CoverIdx) (x : X) :
+    Nonempty (Path (VT.coverMap i (VT.cover_surj i x)) x) :=
+  ⟨VT.cover_surj_spec i x⟩
+
+/-- A v-sheaf on the v-site, with descent along chosen v-covers. -/
+structure VSheafData (X : Type u) (VT : VTopologyData X) where
+  section : X → Type v
+  pullback : (i : VT.CoverIdx) → (x : X) → section x →
+    section (VT.coverMap i (VT.cover_surj i x))
+  descend : (i : VT.CoverIdx) → (x : X) →
+    section (VT.coverMap i (VT.cover_surj i x)) → section x
+  descent_spec : (i : VT.CoverIdx) → (x : X) → (s : section x) →
+    Path (descend i x (pullback i x s)) s
+
+theorem vsheaf_satisfies_descent {X : Type u} {VT : VTopologyData X}
+    (VS : VSheafData X VT) :
+    ∀ (i : VT.CoverIdx) (x : X) (s : VS.section x),
+      Nonempty (Path (VS.descend i x (VS.pullback i x s)) s) := by
+  intro i x s
+  exact ⟨VS.descent_spec i x s⟩
+
+theorem vsheaf_descent_chain {X : Type u} {VT : VTopologyData X}
+    (VS : VSheafData X VT) (i : VT.CoverIdx) (x : X) (s : VS.section x) :
+    Nonempty (Path (VS.descend i x (VS.pullback i x s)) s) :=
+  ⟨Path.trans (VS.descent_spec i x s) (Path.refl _)⟩
+
+/-- A tilting equivalence with explicit preservation of computational paths. -/
+structure TiltingEquivalenceData (X : Type u) (Y : Type v) where
+  tilt : X → Y
+  untilt : Y → X
+  tilt_preserves_path : ∀ {a b : X}, Path a b → Path (tilt a) (tilt b)
+  untilt_preserves_path : ∀ {a b : Y}, Path a b → Path (untilt a) (untilt b)
+  tilt_untilt : ∀ y, Path (tilt (untilt y)) y
+  untilt_tilt : ∀ x, Path (untilt (tilt x)) x
+
+theorem tilting_equivalence_preserves_path_structure {X : Type u} {Y : Type v}
+    (TE : TiltingEquivalenceData X Y) {a b : X} (p : Path a b) :
+    Nonempty (Path (TE.tilt a) (TE.tilt b)) :=
+  ⟨TE.tilt_preserves_path p⟩
+
+theorem untilting_equivalence_preserves_path_structure {X : Type u} {Y : Type v}
+    (TE : TiltingEquivalenceData X Y) {a b : Y} (p : Path a b) :
+    Nonempty (Path (TE.untilt a) (TE.untilt b)) :=
+  ⟨TE.untilt_preserves_path p⟩
+
+theorem tilting_roundtrip_path {X : Type u} {Y : Type v}
+    (TE : TiltingEquivalenceData X Y) (x : X) :
+    Nonempty (Path (TE.untilt (TE.tilt x)) x) :=
+  ⟨TE.untilt_tilt x⟩
+
+theorem tilting_roundtrip_preserves_path {X : Type u} {Y : Type v}
+    (TE : TiltingEquivalenceData X Y) (x : X) :
+    Nonempty (Path (TE.tilt (TE.untilt (TE.tilt x))) (TE.tilt x)) :=
+  ⟨Path.congrArg TE.tilt (TE.untilt_tilt x)⟩
+
+theorem untilting_roundtrip_preserves_path {X : Type u} {Y : Type v}
+    (TE : TiltingEquivalenceData X Y) (y : Y) :
+    Nonempty (Path (TE.untilt (TE.tilt (TE.untilt y))) (TE.untilt y)) :=
+  ⟨Path.congrArg TE.untilt (TE.tilt_untilt y)⟩
+
 end Diamonds
 end Algebra
 end Path
