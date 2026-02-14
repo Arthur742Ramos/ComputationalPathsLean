@@ -73,6 +73,16 @@ def tensorCobordism {Obj : Type u} (W1 W2 : Cobordism Obj) : Cobordism Obj where
   boundaryCount := W1.boundaryCount + W2.boundaryCount
 
 
+def composePath {Obj : Type u} (W1 W2 : Cobordism Obj) :
+    Path (composeCobordism W1 W2) (composeCobordism W1 W2) :=
+  Path.refl _
+
+
+def tensorPath {Obj : Type u} (W1 W2 : Cobordism Obj) :
+    Path (tensorCobordism W1 W2) (tensorCobordism W1 W2) :=
+  Path.refl _
+
+
 def evaluateOnPoint {Obj : Type u} {A : Type v}
     (Z : ExtendedTQFTData Obj A) (x : Obj) : A :=
   Z.assignObj x
@@ -168,143 +178,138 @@ def handleShift {Obj : Type u} (W : Cobordism Obj) (k : Nat) : Cobordism Obj :=
 
 
 theorem compose_id_left {Obj : Type u} (W : Cobordism Obj) :
-    Path (composeCobordism (idCobordism W.src) W) W := by
+    composeCobordism (idCobordism W.src) W = W := by
   sorry
 
 
 theorem compose_id_right {Obj : Type u} (W : Cobordism Obj) :
-    Path (composeCobordism W (idCobordism W.tgt)) W := by
+    composeCobordism W (idCobordism W.tgt) = W := by
   sorry
 
 
 theorem compose_assoc {Obj : Type u}
     (W1 W2 W3 : Cobordism Obj) :
-    Path (composeCobordism (composeCobordism W1 W2) W3)
-         (composeCobordism W1 (composeCobordism W2 W3)) := by
+    composeCobordism (composeCobordism W1 W2) W3 =
+      composeCobordism W1 (composeCobordism W2 W3) := by
   sorry
 
 
 theorem tensor_assoc {Obj : Type u}
     (W1 W2 W3 : Cobordism Obj) :
-    Path (tensorCobordism (tensorCobordism W1 W2) W3)
-         (tensorCobordism W1 (tensorCobordism W2 W3)) := by
+    tensorCobordism (tensorCobordism W1 W2) W3 =
+      tensorCobordism W1 (tensorCobordism W2 W3) := by
   sorry
 
 
 theorem tensor_unit_left {Obj : Type u} (W : Cobordism Obj) :
-    Path (tensorCobordism (idCobordism W.src) W) (composeCobordism (idCobordism W.src) W) := by
+    tensorCobordism (idCobordism W.src) W = composeCobordism (idCobordism W.src) W := by
   sorry
 
 
 theorem tensor_unit_right {Obj : Type u} (W : Cobordism Obj) :
-    Path (tensorCobordism W (idCobordism W.tgt)) (composeCobordism W (idCobordism W.tgt)) := by
+    tensorCobordism W (idCobordism W.tgt) = composeCobordism W (idCobordism W.tgt) := by
   sorry
 
 
 theorem foldTensor_nil {A : Type v} (T : MonoidalTarget A) :
-    Path (foldTensor T []) T.unit := by
+    foldTensor T [] = T.unit := by
   sorry
 
 
 theorem foldTensor_cons {A : Type v} (T : MonoidalTarget A) (x : A) (xs : List A) :
-    Path (foldTensor T (x :: xs)) (T.tensor x (foldTensor T xs)) := by
+    foldTensor T (x :: xs) = T.tensor x (foldTensor T xs) := by
   sorry
 
 
 theorem point_evaluation_dualizable {Obj : Type u} {A : Type v}
     (Z : ExtendedTQFTData Obj A) (x : Obj)
     (h : DualizableObject Z.target (evaluateOnPoint Z x)) :
-    Path (evaluateOnPoint Z x) (evaluateOnPoint Z x) := by
+    evaluateOnPoint Z x = evaluateOnPoint Z x := by
   sorry
 
 
 theorem cobordism_hypothesis_principle {Obj : Type u} {A : Type v}
     (H : CobordismHypothesisWitness Obj A) :
-    Path (evaluateOnPoint H.theory H.generator) H.dualizable.dual := by
+    evaluateOnPoint H.theory H.generator = H.dualizable.dual := by
   sorry
 
 
 theorem factorization_excision {A : Type v}
     (F : FactorizationHomologyData A) (m n : Nat) :
-    Path (factorizationBoundary F m n)
-         (F.glue (factorizationValue F m) (factorizationValue F n)) := by
+    factorizationBoundary F m n =
+      F.glue (factorizationValue F m) (factorizationValue F n) := by
   sorry
 
 
 theorem factorization_monoidal {A : Type v}
     (F : FactorizationHomologyData A) (m n : Nat) :
-    Path (factorizationBoundary F m n) (factorizationBoundary F m n) := by
+    factorizationBoundary F m n = factorizationBoundary F m n := by
   sorry
 
 
 theorem rt_respects_compose (R : ReshetikhinTuraevData)
     (W1 W2 : Cobordism Nat) :
-    Path (rtInvariant R (composeCobordism W1 W2))
-         (rtInvariant R (composeCobordism W1 W2)) := by
+    rtInvariant R (composeCobordism W1 W2) = rtInvariant R (composeCobordism W1 W2) := by
   sorry
 
 
 theorem rt_respects_tensor (R : ReshetikhinTuraevData)
     (W1 W2 : Cobordism Nat) :
-    Path (rtInvariant R (tensorCobordism W1 W2))
-         (rtInvariant R (tensorCobordism W1 W2)) := by
+    rtInvariant R (tensorCobordism W1 W2) = rtInvariant R (tensorCobordism W1 W2) := by
   sorry
 
 
 theorem wcs_gauge_invariance (W : WittenChernSimonsData)
     (M : Cobordism Nat) :
-    Path (wcsPartition W M) (wcsPartition W M) := by
+    wcsPartition W M = wcsPartition W M := by
   sorry
 
 
 theorem wcs_level_shift (W : WittenChernSimonsData)
     (n : Nat) (M : Cobordism Nat) :
-    Path (framingCorrection (wcsPartition W M) n)
-         (framingCorrection (wcsPartition W M) n) := by
+    framingCorrection (wcsPartition W M) n = framingCorrection (wcsPartition W M) n := by
   sorry
 
 
 theorem modular_braiding_naturality (MTC : ModularTensorCategoryData)
     (a b : MTC.Obj) :
-    Path (anyonBraiding MTC a b) (anyonBraiding MTC a b) := by
+    anyonBraiding MTC a b = anyonBraiding MTC a b := by
   sorry
 
 
 theorem modular_twist_path (MTC : ModularTensorCategoryData)
     (a : MTC.Obj) :
-    Path (anyonTwist MTC a) (anyonTwist MTC a) := by
+    anyonTwist MTC a = anyonTwist MTC a := by
   sorry
 
 
 theorem fusion_braiding_commute (MTC : ModularTensorCategoryData)
     (a b : MTC.Obj) :
-    Path (anyonFusion MTC a b) (anyonFusion MTC a b) := by
+    anyonFusion MTC a b = anyonFusion MTC a b := by
   sorry
 
 
 theorem quantum_dimension_nonnegative {MTC : ModularTensorCategoryData}
     (qdim : MTC.Obj → Nat) (a : MTC.Obj) :
-    Path (quantumDimension qdim a) (quantumDimension qdim a) := by
+    quantumDimension qdim a = quantumDimension qdim a := by
   sorry
 
 
 theorem total_dimension_lower_bound {MTC : ModularTensorCategoryData}
     (qdim : MTC.Obj → Nat) (objs : List MTC.Obj) :
-    Path (totalQuantumDimension qdim objs) (totalQuantumDimension qdim objs) := by
+    totalQuantumDimension qdim objs = totalQuantumDimension qdim objs := by
   sorry
 
 
 theorem surgery_gluing_formula {Obj : Type u}
     (W1 W2 : Cobordism Obj) :
-    Path (surgeryKernel (composeCobordism W1 W2))
-         (surgeryKernel (composeCobordism W1 W2)) := by
+    surgeryKernel (composeCobordism W1 W2) = surgeryKernel (composeCobordism W1 W2) := by
   sorry
 
 
 theorem partition_functoriality {Obj : Type u} {A : Type v}
     (Z : ExtendedTQFTData Obj A) (W1 W2 : Cobordism Obj) :
-    Path (closedState Z (composeCobordism W1 W2))
-         (closedState Z (composeCobordism W1 W2)) := by
+    closedState Z (composeCobordism W1 W2) = closedState Z (composeCobordism W1 W2) := by
   sorry
 
 

@@ -27,7 +27,6 @@ structure LexModality (α : Type u) extends Modality α where
   preservesPullback : Prop
   preservesTerminal : Prop
 
-def lexUnderlying {α : Type u} (L : LexModality α) : Modality α := L.toModality
 def lexAct {α : Type u} (L : LexModality α) (x : α) : α := modalApply L.toModality x
 def lexPredicate {α : Type u} (L : LexModality α) : Prop :=
   L.preservesPullback ∧ L.preservesTerminal
@@ -38,8 +37,6 @@ structure OpenModality (α : Type u) extends Modality α where
 structure ClosedModality (α : Type u) extends Modality α where
   closes : α → Prop
 
-def openUnderlying {α : Type u} (O : OpenModality α) : Modality α := O.toModality
-def closedUnderlying {α : Type u} (C : ClosedModality α) : Modality α := C.toModality
 def openCore {α : Type u} (O : OpenModality α) (x : α) : α := modalApply O.toModality x
 def closedCore {α : Type u} (C : ClosedModality α) (x : α) : α := modalApply C.toModality x
 

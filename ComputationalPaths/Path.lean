@@ -324,6 +324,7 @@ import ComputationalPaths.Path.Topology.IntersectionForm
 import ComputationalPaths.Path.Topology.SurgeryTheory
 import ComputationalPaths.Path.Topology.FlowCategory
 import ComputationalPaths.Path.Topology.TQFTPaths
+import ComputationalPaths.Path.Topology.TQFT
 import ComputationalPaths.Path.Topology.ToposTheory
 import ComputationalPaths.Path.Topology.EtaleFundamentalGroup
 import ComputationalPaths.Path.Topology.ArithmeticTopology
@@ -334,6 +335,7 @@ import ComputationalPaths.Path.Topology.QuasiIsometry
 import ComputationalPaths.Path.Topology.GromovBoundary
 import ComputationalPaths.Path.Topology.BraidGroup
 import ComputationalPaths.Path.Topology.KnotInvariants
+import ComputationalPaths.Path.Topology.QuantumInvariants
 import ComputationalPaths.Path.Topology.ChernSimons
 import ComputationalPaths.Path.Topology.ContactStructures
 import ComputationalPaths.Path.Topology.FloerHomology
@@ -355,9 +357,11 @@ import ComputationalPaths.Path.Topology.HandleBody
 import ComputationalPaths.Path.Topology.FoliationsPaths
 import ComputationalPaths.Path.Algebra.OperadPaths
 import ComputationalPaths.Path.Algebra.AInfinityAlgebras
+import ComputationalPaths.Path.Algebra.VertexAlgebras
 import ComputationalPaths.Path.Algebra.DeformationTheory
 import ComputationalPaths.Path.Algebra.LInfinityAlgebras
 import ComputationalPaths.Path.Algebra.KoszulDuality
+import ComputationalPaths.Path.Algebra.HomologicalMirror
 import ComputationalPaths.Path.CompPath.TraceExtraction
 import ComputationalPaths.Path.CompPath.KleinBottleStep
 import ComputationalPaths.Path.CompPath.LensSpaceStep
@@ -411,6 +415,7 @@ import ComputationalPaths.Path.Topology.TopologicalData
 import ComputationalPaths.Path.Topology.SimplicialComplexes
 import ComputationalPaths.Path.Topology.CWComplexPaths
 import ComputationalPaths.Path.Topology.ConformalFieldTheory
+import ComputationalPaths.Path.Topology.QuantumFieldTheory
 import ComputationalPaths.Path.Topology.StringTopology
 import ComputationalPaths.Path.Topology.GaugeTheoryPaths
 import ComputationalPaths.Path.Topology.MirrorSymmetry
@@ -425,3 +430,8 @@ import ComputationalPaths.Path.Algebra.CharacterVarieties
 import ComputationalPaths.Path.Topology.EilenbergMacLanePostnikov
 import ComputationalPaths.Path.Algebra.KoszulComplexes
 import ComputationalPaths.Path.Topology.ModelCategoriesDeep
+import ComputationalPaths.Path.Foundations.CubicalTypeTheory
+import ComputationalPaths.Path.Foundations.ModalHomotopyType
+import ComputationalPaths.Path.Foundations.DirectedTypeTheory
+import ComputationalPaths.Path.Foundations.ConstructiveMath
+import ComputationalPaths.Path.Foundations.ToposLogic

@@ -43,20 +43,20 @@ def composeKan {A : Type u} (K : KanOperation A) (b : OpenBox A) : A := K.fill b
 def transportConst {A : Type u} {a b : A} (p : Path a b) : Unit :=
   Path.transport (D := fun _ : A => Unit) p ()
 
-structure GlueType (A : Type u) (B : Type v) where
+structure GlueType (A : Type u) (B : Type u) where
   toFun : A → B
   invFun : B → A
   sec : (b : B) → Path (toFun (invFun b)) b
   ret : (a : A) → Path (invFun (toFun a)) a
 
-def glueForward {A : Type u} {B : Type v} (G : GlueType A B) : A → B := G.toFun
-def glueBackward {A : Type u} {B : Type v} (G : GlueType A B) : B → A := G.invFun
-def glueRoundTripForward {A : Type u} {B : Type v} (G : GlueType A B) : Prop :=
+def glueForward {A : Type u} {B : Type u} (G : GlueType A B) : A → B := G.toFun
+def glueBackward {A : Type u} {B : Type u} (G : GlueType A B) : B → A := G.invFun
+def glueRoundTripForward {A : Type u} {B : Type u} (G : GlueType A B) : Prop :=
   ∀ b : B, G.toFun (G.invFun b) = b
-def glueRoundTripBackward {A : Type u} {B : Type v} (G : GlueType A B) : Prop :=
+def glueRoundTripBackward {A : Type u} {B : Type u} (G : GlueType A B) : Prop :=
   ∀ a : A, G.invFun (G.toFun a) = a
 
-structure CubicalUnivalence (A : Type u) (B : Type v) where
+structure CubicalUnivalence (A : Type u) (B : Type u) where
   glue : GlueType A B
   ua : A = B
 
@@ -137,12 +137,12 @@ theorem transportConst_eq_unit {A : Type u} {a b : A} (p : Path a b) :
   cases p
   rfl
 
-theorem glue_forward_backward {A : Type u} {B : Type v} (G : GlueType A B) :
+theorem glue_forward_backward {A : Type u} {B : Type u} (G : GlueType A B) :
     glueRoundTripForward G := by
   intro b
   exact (G.sec b).toEq
 
-theorem glue_backward_forward {A : Type u} {B : Type v} (G : GlueType A B) :
+theorem glue_backward_forward {A : Type u} {B : Type u} (G : GlueType A B) :
     glueRoundTripBackward G := by
   intro a
   exact (G.ret a).toEq

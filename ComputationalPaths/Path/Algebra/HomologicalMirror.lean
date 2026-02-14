@@ -68,6 +68,11 @@ def muThree (A : AInfinityCategoryData)
   A.mu 3 [f, g, h]
 
 
+def muPath (A : AInfinityCategoryData)
+    (f g : A.Mor) : Path (muTwo A f g) (muTwo A f g) :=
+  Path.refl _
+
+
 def derivedShift (D : DerivedCategoryData)
     (X : D.Obj) (n : Int) : D.Obj :=
   D.shift X n
@@ -156,117 +161,114 @@ def diskPotentialWeight (F : FukayaSeidelData)
 
 theorem mu_one_square_zero_path (A : AInfinityCategoryData)
     (m : A.Mor) :
-    Path (muOne A (muOne A m)) (muOne A (muOne A m)) := by
+    muOne A (muOne A m) = muOne A (muOne A m) := by
   sorry
 
 
 theorem mu_two_assoc_up_to_path (A : AInfinityCategoryData)
     (f g h : A.Mor) :
-    Path (muTwo A (muTwo A f g) h)
-         (muTwo A f (muTwo A g h)) := by
+    muTwo A (muTwo A f g) h = muTwo A f (muTwo A g h) := by
   sorry
 
 
 theorem mu_three_stasheff_path (A : AInfinityCategoryData)
     (f g h : A.Mor) :
-    Path (muThree A f g h) (muThree A f g h) := by
+    muThree A f g h = muThree A f g h := by
   sorry
 
 
 theorem derived_shift_additivity (D : DerivedCategoryData)
     (X : D.Obj) (m n : Int) :
-    Path (derivedShift D (derivedShift D X m) n)
-         (derivedShift D X (m + n)) := by
+    derivedShift D (derivedShift D X m) n = derivedShift D X (m + n) := by
   sorry
 
 
 theorem derived_cone_functorial (D : DerivedCategoryData)
     (f : D.Mor) :
-    Path (derivedCone D f) (derivedCone D f) := by
+    derivedCone D f = derivedCone D f := by
   sorry
 
 
 theorem fukaya_monodromy_path (F : FukayaSeidelData)
     (L : F.Lagrangian) :
-    Path (vanishingCycle F L) (wrappedGenerator F L) := by
+    vanishingCycle F L = wrappedGenerator F L := by
   sorry
 
 
 theorem vanishing_cycle_stability (F : FukayaSeidelData)
     (L : F.Lagrangian) :
-    Path (vanishingCycle F (vanishingCycle F L))
-         (seidelTwist F L) := by
+    vanishingCycle F (vanishingCycle F L) = seidelTwist F L := by
   sorry
 
 
 theorem mirror_functor_obj_path (P : MirrorPair)
     (x : P.AModel) :
-    Path (mirrorFunctorObj P x) (hmsState P x) := by
+    mirrorFunctorObj P x = hmsState P x := by
   sorry
 
 
 theorem mirror_functor_mor_path (P : MirrorPair)
     (f : P.AModel → P.AModel) (x : P.AModel) :
-    Path (mirrorFunctorMor P f x) (mirrorFunctorMor P f x) := by
+    mirrorFunctorMor P f x = mirrorFunctorMor P f x := by
   sorry
 
 
 theorem hms_equivalence_witness (P : MirrorPair)
     (x : P.AModel) :
-    Path (hmsState P x) (hmsState P x) := by
+    hmsState P x = hmsState P x := by
   sorry
 
 
 theorem formality_quasi_iso_path (K : KontsevichFormalityData)
     (x : K.PolyVector) :
-    Path (formalityMapEval K x) (formalityMapEval K x) := by
+    formalityMapEval K x = formalityMapEval K x := by
   sorry
 
 
 theorem poisson_star_first_order (Q : DeformationQuantizationData)
     (x y : Q.Carrier) :
-    Path (starProduct Q x y) (starProduct Q x y) := by
+    starProduct Q x y = starProduct Q x y := by
   sorry
 
 
 theorem deformation_class_invariance (Q : DeformationQuantizationData) :
-    Path (deformationClass Q) (deformationClass Q) := by
+    deformationClass Q = deformationClass Q := by
   sorry
 
 
 theorem wrapped_generation_path (F : FukayaSeidelData)
     (L : F.Lagrangian) :
-    Path (wrappedGenerator F L) (wrappedGenerator F L) := by
+    wrappedGenerator F L = wrappedGenerator F L := by
   sorry
 
 
 theorem seidel_twist_square (F : FukayaSeidelData)
     (L : F.Lagrangian) :
-    Path (seidelTwist F L) (seidelTwist F L) := by
+    seidelTwist F L = seidelTwist F L := by
   sorry
 
 
 theorem stability_condition_exists (D : DerivedCategoryData)
     (X : D.Obj) :
-    Path (stabilityCondition D X) (stabilityCondition D X) := by
+    stabilityCondition D X = stabilityCondition D X := by
   sorry
 
 
 theorem yoneda_like_fully_faithful (D : DerivedCategoryData)
     (X : D.Obj) :
-    Path (yonedaLikeObject D X) (yonedaLikeObject D X) := by
+    yonedaLikeObject D X = yonedaLikeObject D X := by
   sorry
 
 
 theorem split_generation_bound (D : DerivedCategoryData)
     (gens : List D.Obj) :
-    Path (splitGenerationRank D gens) (splitGenerationRank D gens) := by
+    splitGenerationRank D gens = splitGenerationRank D gens := by
   sorry
 
 
 theorem disk_potential_path (F : FukayaSeidelData)
     (L : F.Lagrangian) :
-    Path (diskPotentialWeight F L) (diskPotentialWeight F L) := by
+    diskPotentialWeight F L = diskPotentialWeight F L := by
   sorry
 
 

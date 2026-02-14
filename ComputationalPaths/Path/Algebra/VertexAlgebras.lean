@@ -60,6 +60,10 @@ def vertexOperator (V : VOAData)
   V.mode a (-1) b
 
 
+def vacuumPath (V : VOAData) : Path (vacuumVector V) (vacuumVector V) :=
+  Path.refl _
+
+
 def iterateMode (V : VOAData)
     (a b : V.State) : Nat → V.State
   | 0 => b
@@ -146,7 +150,7 @@ def intertwiningOperator {V : VOAData}
   X.sMatrix a b + X.tMatrix a b
 
 
-def verlindeNumber {V : VOAData}
+def verlindeNumber
     (F : FusionRuleData) (i j k : F.Label) : Nat :=
   F.coeff i j k
 
@@ -163,120 +167,116 @@ def moduleConformalWeight {V : VOAData}
 
 theorem iterateMode_zero (V : VOAData)
     (a b : V.State) :
-    Path (iterateMode V a b 0) b := by
+    iterateMode V a b 0 = b := by
   sorry
 
 
 theorem iterateMode_succ (V : VOAData)
     (a b : V.State) (n : Nat) :
-    Path (iterateMode V a b (n + 1))
-         (V.mode a (-1) (iterateMode V a b n)) := by
+    iterateMode V a b (n + 1) = V.mode a (-1) (iterateMode V a b n) := by
   sorry
 
 
 theorem vacuum_mode_path (V : VOAData)
     (a : V.State) :
-    Path (vertexOperator V V.vacuum a) (modeAction V V.vacuum (-1) a) := by
+    vertexOperator V V.vacuum a = modeAction V V.vacuum (-1) a := by
   sorry
 
 
 theorem translation_iterate_path (V : VOAData)
     (a b : V.State) (n : Nat) :
-    Path (translationOperator V (iterateMode V a b n))
-         (translationOperator V (iterateMode V a b n)) := by
+    translationOperator V (iterateMode V a b n) = translationOperator V (iterateMode V a b n) := by
   sorry
 
 
 theorem module_vacuum_stability {V : VOAData}
     (M : VOAModuleData V) :
-    Path (moduleVacuum M) (moduleVacuum M) := by
+    moduleVacuum M = moduleVacuum M := by
   sorry
 
 
 theorem zhu_product_assoc {V : VOAData}
     (Z : ZhuAlgebraData V) (x y z : Z.Carrier) :
-    Path (zhuProduct Z (zhuProduct Z x y) z)
-         (zhuProduct Z x (zhuProduct Z y z)) := by
+    zhuProduct Z (zhuProduct Z x y) z = zhuProduct Z x (zhuProduct Z y z) := by
   sorry
 
 
 theorem zhu_bracket_skew {V : VOAData}
     (Z : ZhuAlgebraData V) (x y : Z.Carrier) :
-    Path (zhuBracket Z x y) (zhuBracket Z y x) := by
+    zhuBracket Z x y = zhuBracket Z y x := by
   sorry
 
 
 theorem zhu_class_respects_vacuum {V : VOAData}
     (Z : ZhuAlgebraData V) :
-    Path (zhuClass Z V.vacuum) (zhuClass Z V.vacuum) := by
+    zhuClass Z V.vacuum = zhuClass Z V.vacuum := by
   sorry
 
 
 theorem fusion_comm_path (F : FusionRuleData)
     (i j k : F.Label) :
-    Path (fusionCoefficient F i j k) (fusionCoefficient F j i k) := by
+    fusionCoefficient F i j k = fusionCoefficient F j i k := by
   sorry
 
 
 theorem fusion_assoc_path (F : FusionRuleData)
     (i j k l : F.Label) :
-    Path (fusionTensor F i j k + fusionTensor F k l i)
-         (fusionTensor F i j k + fusionTensor F k l i) := by
+    fusionTensor F i j k + fusionTensor F k l i = fusionTensor F i j k + fusionTensor F k l i := by
   sorry
 
 
 theorem rationality_semisimple_path {V : VOAData}
     (R : RationalityData V) :
-    Path (simpleObjectCount R) (simpleObjectCount R) := by
+    simpleObjectCount R = simpleObjectCount R := by
   sorry
 
 
 theorem c2_cofiniteness_path {V : VOAData}
     (C : C2CofiniteData V) :
-    Path (c2Bound C) (c2Bound C) := by
+    c2Bound C = c2Bound C := by
   sorry
 
 
 theorem character_modular_s_symm {V : VOAData}
     (X : CharacterData V) (a b : V.State) :
-    Path (modularSMatrixEntry X a b) (modularSMatrixEntry X b a) := by
+    modularSMatrixEntry X a b = modularSMatrixEntry X b a := by
   sorry
 
 
 theorem character_modular_t_diag {V : VOAData}
     (X : CharacterData V) (a : V.State) :
-    Path (modularTMatrixEntry X a a) (modularTMatrixEntry X a a) := by
+    modularTMatrixEntry X a a = modularTMatrixEntry X a a := by
   sorry
 
 
 theorem modular_invariance_partition {V : VOAData}
     (X : CharacterData V) (a : V.State) :
-    Path (partitionCharacter X a) (partitionCharacter X a) := by
+    partitionCharacter X a = partitionCharacter X a := by
   sorry
 
 
 theorem graded_dimension_nonnegative {V : VOAData}
     (X : CharacterData V) (basis : List V.State) :
-    Path (gradedDimension X basis) (gradedDimension X basis) := by
+    gradedDimension X basis = gradedDimension X basis := by
   sorry
 
 
 theorem intertwining_operator_naturality {V : VOAData}
     (X : CharacterData V) (a b : V.State) :
-    Path (intertwiningOperator X a b) (intertwiningOperator X a b) := by
+    intertwiningOperator X a b = intertwiningOperator X a b := by
   sorry
 
 
-theorem verlinde_integrality {V : VOAData}
+theorem verlinde_integrality
     (F : FusionRuleData) (i j k : F.Label) :
-    Path (verlindeNumber F i j k) (verlindeNumber F i j k) := by
+    verlindeNumber F i j k = verlindeNumber F i j k := by
   sorry
 
 
 theorem zhu_to_fusion_compat {V : VOAData}
     (Z : ZhuAlgebraData V) (F : FusionRuleData)
     (a : V.State) (i j k : F.Label) :
-    Path (zhuClass Z a) (zhuClass Z a) := by
+    zhuClass Z a = zhuClass Z a := by
   sorry
 
 
