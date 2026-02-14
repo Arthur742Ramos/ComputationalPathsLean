@@ -374,6 +374,10 @@ import ComputationalPaths.Path.Algebra.CategoryO
 import ComputationalPaths.Path.Algebra.QuantumGroups
 import ComputationalPaths.Path.Algebra.QuantumGroupReps
 import ComputationalPaths.Path.Algebra.GeometricRepTheory
+import ComputationalPaths.Path.Algebra.QuantumGroupsAdv
+import ComputationalPaths.Path.Algebra.CategoricalRepTheory
+import ComputationalPaths.Path.Algebra.pAdicRepresentations
+import ComputationalPaths.Path.Algebra.SymplecticRepTheory
 import ComputationalPaths.Path.Algebra.ModelCategories
 import ComputationalPaths.Path.Algebra.StableCategories
 import ComputationalPaths.Path.Algebra.DGCategories
@@ -386,7 +390,11 @@ import ComputationalPaths.Path.Algebra.CoherentSheaves
 import ComputationalPaths.Path.Algebra.HomologicalDimension
 import ComputationalPaths.Path.Algebra.MatroidPaths
 import ComputationalPaths.Path.Algebra.SymmetricFunctions
+import ComputationalPaths.Path.Algebra.ClusterAlgebras
+import ComputationalPaths.Path.Algebra.MatroidTheory
 import ComputationalPaths.Path.Algebra.PosetTopology
+import ComputationalPaths.Path.Algebra.SchubertCalculus
+import ComputationalPaths.Path.Algebra.TropicalGeometry
 import ComputationalPaths.Path.Algebra.CoxeterGroups
 import ComputationalPaths.Path.Algebra.CombHopfAlgebras
 import ComputationalPaths.Path.Algebra.CondensedSets
@@ -430,6 +438,10 @@ import ComputationalPaths.Path.Algebra.CharacterVarieties
 import ComputationalPaths.Path.Topology.EilenbergMacLanePostnikov
 import ComputationalPaths.Path.Algebra.KoszulComplexes
 import ComputationalPaths.Path.Topology.ModelCategoriesDeep
+import ComputationalPaths.Path.Topology.IndexTheoryAdvanced
+import ComputationalPaths.Path.Topology.CharacterVarieties
+import ComputationalPaths.Path.Topology.MorseTheoryAdvanced
+import ComputationalPaths.Path.Topology.CalibrationGeometry
 import ComputationalPaths.Path.Foundations.CubicalTypeTheory
 import ComputationalPaths.Path.Foundations.ModalHomotopyType
 import ComputationalPaths.Path.Foundations.DirectedTypeTheory

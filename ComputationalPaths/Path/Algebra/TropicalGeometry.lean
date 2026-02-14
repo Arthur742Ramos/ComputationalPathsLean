@@ -27,6 +27,7 @@ intersection theory, all with explicit Path witnesses for coherence conditions.
 - Gathmann, "Tropical algebraic geometry"
 -/
 
+import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
 
@@ -486,6 +487,56 @@ structure DualSubdivision (n : Nat) where
   /-- Sum of cell volumes = total. -/
   volume_sum : Path totalVolume
     ((List.finRange numCells).foldl (fun acc i => acc + cell_volumes i) 0)
+
+/-! ## Newton Data and Correspondence Counters -/
+
+/-- Number of vertices in the Newton polygon proxy (via monomial count). -/
+def newtonPolygonVertexCount (n : Nat) (p : TropicalPolynomial n) : Nat :=
+  p.monomials.length
+
+/-- Perimeter weight proxy for the Newton polygon. -/
+def newtonPolygonPerimeterWeight (n : Nat) (p : TropicalPolynomial n) : Nat :=
+  p.monomials.length
+
+/-- Dimension witness extracted from Kapranov data. -/
+def kapranovWitnessDimension (n : Nat) (_kd : KapranovData n) : Nat :=
+  n
+
+/-- Mikhalkin multiplicity proxy at a tropical intersection point. -/
+def mikhalkinMultiplicity (n : Nat) (ti : TropicalIntersectionMult n) : Nat :=
+  ti.multiplicity
+
+/-- Tropical Grassmannian Plücker count via its stored field. -/
+def tropicalGrassmannianPluckerCount (n r : Nat) (tg : TropicalGrassmannian n r) : Nat :=
+  tg.numPlucker
+
+/-- Tropical intersection weight from Bézout data. -/
+def tropicalIntersectionWeight (n : Nat) (tb : TropicalBezout n) : Nat :=
+  tb.intersectionCount
+
+theorem newtonPolygonVertexCount_refl (n : Nat) (p : TropicalPolynomial n) :
+    newtonPolygonVertexCount n p = newtonPolygonVertexCount n p := rfl
+
+theorem newtonPolygonPerimeterWeight_refl (n : Nat) (p : TropicalPolynomial n) :
+    newtonPolygonPerimeterWeight n p = newtonPolygonPerimeterWeight n p := rfl
+
+theorem kapranovWitnessDimension_refl (n : Nat) (kd : KapranovData n) :
+    kapranovWitnessDimension n kd = kapranovWitnessDimension n kd := rfl
+
+theorem mikhalkinMultiplicity_refl (n : Nat) (ti : TropicalIntersectionMult n) :
+    mikhalkinMultiplicity n ti = mikhalkinMultiplicity n ti := rfl
+
+theorem tropicalGrassmannianPluckerCount_refl (n r : Nat) (tg : TropicalGrassmannian n r) :
+    tropicalGrassmannianPluckerCount n r tg = tropicalGrassmannianPluckerCount n r tg := rfl
+
+theorem tropicalIntersectionWeight_refl (n : Nat) (tb : TropicalBezout n) :
+    tropicalIntersectionWeight n tb = tropicalIntersectionWeight n tb := rfl
+
+theorem kapranovMikhalkin_bridge_path (n : Nat)
+    (kd : KapranovData n) (ti : TropicalIntersectionMult n) :
+    Path (kapranovWitnessDimension n kd + mikhalkinMultiplicity n ti)
+         (kapranovWitnessDimension n kd + mikhalkinMultiplicity n ti) :=
+  Path.refl _
 
 end TropicalGeometry
 end Algebra

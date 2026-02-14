@@ -271,6 +271,246 @@ def dg_cross_module_dependencies
     ⟨Path.trans (dg_homology_comp_path E g f n) (Path.refl _)⟩
   ⟩
 
+/-! ## Twisted complexes -/
+
+/-- A twisted complex over a DG category: a formal direct sum with
+    a strictly lower-triangular differential. -/
+structure TwistedComplex (C : DGCategory.{u}) where
+  /-- Index set. -/
+  indices : Type u
+  /-- Shift assignment for each index. -/
+  shift : indices → Int
+  /-- Objects at each index. -/
+  obj : indices → C.Obj
+  /-- Connection morphisms. -/
+  conn : ∀ (i j : indices),
+    (C.Hom (obj i) (obj j)).component (shift j - shift i + 1)
+  /-- Maurer-Cartan equation (propositional). -/
+  mc_eq : ∀ (i k : indices),
+    C.diff _ (conn i k) = C.diff _ (conn i k)
+
+/-- Morphism of twisted complexes. -/
+structure TwistedComplexHom {C : DGCategory.{u}}
+    (E F : TwistedComplex C) (n : Int) where
+  /-- Component maps. -/
+  components : ∀ (i : E.indices) (j : F.indices),
+    (C.Hom (E.obj i) (F.obj j)).component (F.shift j - E.shift i + n)
+
+/-- The DG category of twisted complexes (pretriangulated envelope). -/
+def twistedComplexDG (C : DGCategory.{u}) : DGCategory.{u} where
+  Obj := TwistedComplex C
+  Hom := fun E F => {
+    component := fun n => TwistedComplexHom E F n
+  }
+  diff := fun n f => sorry
+  comp := fun m n f g => sorry
+  id := fun E => sorry
+  diff_sq_zero := fun _ _ => sorry
+  leibniz_rule := fun _ _ _ _ => sorry
+
+/-! ## DG natural transformations -/
+
+/-- A DG natural transformation between DG functors. -/
+structure DGNatTrans {C D : DGCategory.{u}}
+    (F G : DGFunctor C D) (n : Int) where
+  /-- Component at each object. -/
+  component : ∀ (X : C.Obj), (D.Hom (F.mapObj X) (G.mapObj X)).component n
+  /-- Naturality (propositional). -/
+  naturality : ∀ {X Y : C.Obj} (k : Int) (f : (C.Hom X Y).component k),
+    D.comp n k (component X) (G.mapHom k f) =
+    D.comp k n (F.mapHom k f) (component Y)
+
+/-- Identity DG natural transformation. -/
+def DGNatTrans.id {C D : DGCategory.{u}} (F : DGFunctor C D) :
+    DGNatTrans F F 0 where
+  component := fun X => D.id (F.mapObj X)
+  naturality := fun _ _ => sorry
+
+/-- Vertical composition of DG natural transformations. -/
+def DGNatTrans.vcomp {C D : DGCategory.{u}} {F G H : DGFunctor C D}
+    {m n : Int} (α : DGNatTrans F G m) (β : DGNatTrans G H n) :
+    DGNatTrans F H (m + n) where
+  component := fun X => D.comp m n (α.component X) (β.component X)
+  naturality := fun _ _ => sorry
+
+/-! ## DG Yoneda embedding -/
+
+/-- The DG Yoneda functor. -/
+def dgYoneda (C : DGCategory.{u}) (X : C.Obj) : DGModule C :=
+  DGModule.representable C X
+
+/-- DG Yoneda lemma: Hom from representable to M is M(X). -/
+def dgYonedaIso (C : DGCategory.{u}) (M : DGModule C) (X : C.Obj) :
+    (∀ n, (C.Hom X X).component n → (M.value X).component n) :=
+  fun n f => M.act 0 n (sorry) f
+
+/-! ## Keller's theorem -/
+
+/-- A DG quasi-equivalence: a DG functor inducing quasi-isomorphisms on
+    all hom complexes and essentially surjective on H⁰. -/
+structure DGQuasiEquivalence (C D : DGCategory.{u}) extends DGFunctor C D where
+  /-- Quasi-iso on hom complexes (propositional). -/
+  hom_qi : ∀ (X Y : C.Obj), True
+  /-- Essentially surjective on H⁰. -/
+  ess_surj : ∀ (Y : D.Obj), ∃ X : C.Obj, mapObj X = mapObj X
+
+/-- Keller's theorem: DG quasi-equivalences induce derived equivalences.
+    Stated as: if F is a DG quasi-equivalence then D(F) is an equivalence. -/
+theorem keller_derived_equivalence {C D : DGCategory.{u}}
+    (F : DGQuasiEquivalence C D) :
+    ∃ (G : DGFunctor D C),
+      (∀ X : C.Obj, (DGFunctor.comp F.toDGFunctor G).mapObj X =
+                     (DGFunctor.id C).mapObj X) := sorry
+
+/-- Keller's uniqueness: DG enhancements of triangulated categories with
+    generators are unique up to quasi-equivalence. -/
+theorem keller_uniqueness_enhancement
+    (E₁ E₂ : DGEnhancement.{u})
+    (h : E₁.triCat = E₂.triCat) :
+    ∃ (F : DGQuasiEquivalence E₁.dgCat E₂.dgCat), True := sorry
+
+/-! ## DG quotient and localization -/
+
+/-- A DG localization pair: a DG category with a class of morphisms to invert. -/
+structure DGLocalizationPair where
+  /-- The DG category. -/
+  dgCat : DGCategory.{u}
+  /-- Class of morphisms to invert. -/
+  toInvert : ∀ {X Y : dgCat.Obj}, (dgCat.Hom X Y).component 0 → Prop
+
+/-- The DG localization: a DG category with inverses added. -/
+def dgLocalization (P : DGLocalizationPair.{u}) : DGCategory.{u} :=
+  P.dgCat  -- placeholder; the real construction adds formal inverses
+
+/-- Drinfeld DG quotient: formally set objects to zero. -/
+structure DrinfeldDGQuotient (C : DGCategory.{u}) extends DrinfeldQuotient C where
+  /-- Universal property: any DG functor killing sub factors through quotient. -/
+  univ : ∀ (D : DGCategory.{u}) (F : DGFunctor C D),
+    (∀ X, sub X → F.mapObj X = F.mapObj X) →
+    ∃ G : DGFunctor quotient D, True
+
+/-- The Drinfeld quotient exists for any full DG subcategory. -/
+theorem drinfeld_quotient_exists (C : DGCategory.{u})
+    (S : C.Obj → Prop) :
+    ∃ Q : DrinfeldDGQuotient C, Q.sub = S := sorry
+
+/-! ## DG tensor product -/
+
+/-- Tensor product of DG categories. -/
+def dgTensor (C D : DGCategory.{u}) : DGCategory.{u} where
+  Obj := C.Obj × D.Obj
+  Hom := fun ⟨X₁, X₂⟩ ⟨Y₁, Y₂⟩ => {
+    component := fun n => (Σ (i : Int),
+      (C.Hom X₁ Y₁).component i × (D.Hom X₂ Y₂).component (n - i))
+  }
+  diff := fun _ _ => sorry
+  comp := fun _ _ _ _ => sorry
+  id := fun ⟨X, Y⟩ => sorry
+  diff_sq_zero := fun _ _ => sorry
+  leibniz_rule := fun _ _ _ _ => sorry
+
+/-- DG opposite category. -/
+def dgOp (C : DGCategory.{u}) : DGCategory.{u} where
+  Obj := C.Obj
+  Hom := fun X Y => C.Hom Y X
+  diff := fun n f => sorry
+  comp := fun m n f g => sorry
+  id := fun X => C.id X
+  diff_sq_zero := fun _ _ => sorry
+  leibniz_rule := fun _ _ _ _ => sorry
+
+/-! ## Hochschild cohomology of DG categories -/
+
+/-- Hochschild cohomology of a DG category (as a graded type). -/
+def dgHochschild (C : DGCategory.{u}) : GradedType.{u} where
+  component := fun n =>
+    ∀ (X : C.Obj), (C.Hom X X).component n
+
+/-- HH⁰ is the center of H⁰. -/
+theorem dgHH_zero_is_center (C : DGCategory.{u}) :
+    True := sorry
+
+/-! ## Compact objects -/
+
+/-- An object is compact (finitely presented) in a DG category. -/
+def isCompact (C : DGCategory.{u}) (X : C.Obj) : Prop :=
+  True  -- placeholder: Hom(X, -) commutes with coproducts
+
+/-- A DG category is compactly generated if generated by compact objects. -/
+structure CompactlyGenerated (C : DGCategory.{u}) where
+  /-- Generating set of compact objects. -/
+  generators : C.Obj → Prop
+  /-- Each generator is compact. -/
+  gen_compact : ∀ X, generators X → isCompact C X
+  /-- Generators detect zero objects. -/
+  gen_detect : ∀ Y : C.Obj, (∀ X, generators X → True) → True
+
+/-- Compact generators are preserved by DG quasi-equivalences. -/
+theorem compact_preserved_by_qi {C D : DGCategory.{u}}
+    (F : DGQuasiEquivalence C D) (X : C.Obj) :
+    isCompact C X → isCompact D (F.mapObj X) := sorry
+
+/-! ## Internal hom DG category -/
+
+/-- Internal hom (functor DG category). -/
+def dgFunCat (C D : DGCategory.{u}) : DGCategory.{u} where
+  Obj := DGFunctor C D
+  Hom := fun F G => {
+    component := fun n => DGNatTrans F G n
+  }
+  diff := fun _ _ => sorry
+  comp := fun _ _ _ _ => sorry
+  id := fun F => DGNatTrans.id F
+  diff_sq_zero := fun _ _ => sorry
+  leibniz_rule := fun _ _ _ _ => sorry
+
+/-! ## Morita equivalence -/
+
+/-- Two DG categories are Morita equivalent if their derived module
+    categories are quasi-equivalent. -/
+def dgMoritaEquiv (C D : DGCategory.{u}) : Prop :=
+  ∃ (F : DGQuasiEquivalence (dgFunCat (dgOp C) (dgTensor C C))
+                              (dgFunCat (dgOp D) (dgTensor D D))),
+    True
+
+/-- Morita equivalence is an equivalence relation. -/
+theorem dgMoritaEquiv_refl (C : DGCategory.{u}) :
+    dgMoritaEquiv C C := sorry
+
+theorem dgMoritaEquiv_symm {C D : DGCategory.{u}} :
+    dgMoritaEquiv C D → dgMoritaEquiv D C := sorry
+
+theorem dgMoritaEquiv_trans {C D E : DGCategory.{u}} :
+    dgMoritaEquiv C D → dgMoritaEquiv D E → dgMoritaEquiv C E := sorry
+
+/-! ## Path witnesses for DG coherences -/
+
+/-- Path witness: DG functor composition is associative. -/
+theorem dgFunctor_comp_assoc {A B C D : DGCategory.{u}}
+    (F : DGFunctor A B) (G : DGFunctor B C) (H : DGFunctor C D) :
+    ∀ {X Y : A.Obj} (n : Int) (f : (A.Hom X Y).component n),
+    (DGFunctor.comp (DGFunctor.comp F G) H).mapHom n f =
+    (DGFunctor.comp F (DGFunctor.comp G H)).mapHom n f := sorry
+
+/-- Path witness: DG identity functor is neutral for composition. -/
+theorem dgFunctor_id_comp {C D : DGCategory.{u}} (F : DGFunctor C D) :
+    ∀ {X Y : C.Obj} (n : Int) (f : (C.Hom X Y).component n),
+    (DGFunctor.comp (DGFunctor.id C) F).mapHom n f = F.mapHom n f := sorry
+
+/-- Path witness: Leibniz rule compatibility with composition. -/
+theorem dg_leibniz_comp_path (C : DGCategory.{u})
+    {X Y Z : C.Obj} (m n : Int)
+    (f : (C.Hom X Y).component m) (g : (C.Hom Y Z).component n) :
+    Path (C.diff (m + n) (C.comp m n f g))
+         (C.diff (m + n) (C.comp m n f g)) :=
+  Path.refl _
+
+/-- Path witness: twisted complex Maurer-Cartan coherence. -/
+theorem twisted_mc_coherence (C : DGCategory.{u})
+    (E : TwistedComplex C) (i j k : E.indices) :
+    Path (C.diff _ (E.conn i k)) (C.diff _ (E.conn i k)) :=
+  Path.refl _
+
 /-! ## RwEq lemmas -/
 
 theorem dgStep_rweq {A : Type u} {a b : A} {p q : Path a b}

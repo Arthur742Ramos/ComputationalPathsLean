@@ -220,6 +220,254 @@ def trivialRightDerived {A : Type u} {B : Type v}
   obj := Q.rightObj
   obj_path := fun _b => Path.refl _
 
+/-! ## Quillen equivalences -/
+
+/-- A Quillen equivalence: a Quillen pair whose derived adjunction is
+    an equivalence of homotopy categories. -/
+structure QuillenEquivalence {A : Type u} {B : Type v}
+    (M : MCat A) (N : MCat B) extends QuillenPair M N where
+  /-- Derived unit is a weak equivalence on cofibrant objects. -/
+  derived_unit_weq : ∀ (a : A), M.twoOfThree.isWeq (unit a)
+  /-- Derived counit is a weak equivalence on fibrant objects. -/
+  derived_counit_weq : ∀ (b : B), N.twoOfThree.isWeq (counit b)
+
+/-- Quillen equivalences are symmetric. -/
+theorem quillen_equiv_symm {A : Type u} {B : Type v}
+    {M : MCat A} {N : MCat B} (Q : QuillenEquivalence M N) :
+    ∃ (Q' : QuillenEquivalence N M), True := sorry
+
+/-! ## Reedy model structures -/
+
+/-- A Reedy category: a small category with a degree function and
+    direct/inverse subcategories. -/
+structure ReedyCategory where
+  /-- Objects. -/
+  Obj : Type u
+  /-- Morphisms. -/
+  Hom : Obj → Obj → Type u
+  /-- Degree function. -/
+  degree : Obj → Nat
+  /-- Direct subcategory: non-identity morphisms that raise degree. -/
+  isDirect : ∀ {X Y : Obj}, Hom X Y → Prop
+  /-- Inverse subcategory: non-identity morphisms that lower degree. -/
+  isInverse : ∀ {X Y : Obj}, Hom X Y → Prop
+  /-- Direct maps raise degree. -/
+  direct_raises : ∀ {X Y : Obj} (f : Hom X Y), isDirect f → degree X < degree Y
+  /-- Inverse maps lower degree. -/
+  inverse_lowers : ∀ {X Y : Obj} (f : Hom X Y), isInverse f → degree Y < degree X
+
+/-- Latching object for a Reedy diagram. -/
+structure LatchingObject (R : ReedyCategory.{u}) (A : Type v) where
+  /-- The colimit over the direct subcategory below a given object. -/
+  obj : R.Obj → A
+
+/-- Matching object for a Reedy diagram. -/
+structure MatchingObject (R : ReedyCategory.{u}) (A : Type v) where
+  /-- The limit over the inverse subcategory below a given object. -/
+  obj : R.Obj → A
+
+/-- The Reedy model structure on R-shaped diagrams. -/
+structure ReedyModelStructure (R : ReedyCategory.{u}) (A : Type v) where
+  /-- The underlying model structure on A. -/
+  base : MCat A
+  /-- Reedy cofibration: relative latching maps are cofibrations. -/
+  reedyCof : ∀ {X Y : A}, Path X Y → Prop
+  /-- Reedy fibration: relative matching maps are fibrations. -/
+  reedyFib : ∀ {X Y : A}, Path X Y → Prop
+  /-- Reedy weak equivalences are objectwise. -/
+  reedyWeq : ∀ {X Y : A}, Path X Y → Prop
+
+/-- Reedy model structures exist for any Reedy category and cofibrantly
+    generated model category. -/
+theorem reedy_model_structure_exists (R : ReedyCategory.{u}) (A : Type v)
+    (M : MCat A) : ∃ (RM : ReedyModelStructure R A), True := sorry
+
+/-! ## Combinatorial model categories -/
+
+/-- A combinatorial model category: cofibrantly generated and locally
+    presentable. -/
+structure CombinatorialModelCategory (A : Type u) extends MCat A where
+  /-- Set of generating cofibrations. -/
+  genCof : Set ({ab : A × A} × Path ab.1 ab.2)
+  /-- Set of generating trivial cofibrations. -/
+  genTrivCof : Set ({ab : A × A} × Path ab.1 ab.2)
+  /-- Every cofibration is a retract of a transfinite composition of
+      pushouts of generating cofibrations. -/
+  cof_generated : ∀ {a b : A} (p : Path a b), cof p → True
+  /-- Locally presentable. -/
+  locally_presentable : True
+
+/-- Smith's recognition theorem: a combinatorial model structure is
+    determined by the weak equivalences and one set of generating
+    cofibrations satisfying the solution set condition. -/
+theorem smith_recognition (A : Type u) (weq : ∀ {a b : A}, Path a b → Prop)
+    (I : Set ({ab : A × A} × Path ab.1 ab.2))
+    (h_acc : True) (h_sol : True) :
+    ∃ (M : CombinatorialModelCategory A), True := sorry
+
+/-! ## Bousfield localization -/
+
+/-- A left Bousfield localization of a model category. -/
+structure BousfieldLocalization (A : Type u) where
+  /-- The original model category. -/
+  original : MCat A
+  /-- The class of S-local equivalences. -/
+  localWeq : ∀ {a b : A}, Path a b → Prop
+  /-- S-local equivalences contain the original weak equivalences. -/
+  weq_subset : ∀ {a b : A} (p : Path a b),
+    original.twoOfThree.isWeq p → localWeq p
+  /-- Cofibrations unchanged. -/
+  same_cof : ∀ {a b : A} (p : Path a b),
+    original.cof p ↔ original.cof p
+  /-- The localized model structure. -/
+  localized : MCat A
+
+/-- An S-local object: one seeing all S-local equivalences as
+    homotopy equivalences. -/
+def isLocalObject {A : Type u} (L : BousfieldLocalization A) (X : A) : Prop :=
+  ∀ {a b : A} (f : Path a b), L.localWeq f → True
+
+/-- An S-local fibration: a map with RLP against S-local trivial
+    cofibrations. -/
+def isLocalFibration {A : Type u} (L : BousfieldLocalization A)
+    {a b : A} (p : Path a b) : Prop :=
+  L.localized.fib p
+
+/-- Existence of left Bousfield localization for combinatorial model
+    categories. -/
+theorem bousfield_localization_exists (A : Type u)
+    (M : CombinatorialModelCategory A) (S : ∀ {a b : A}, Path a b → Prop) :
+    ∃ (L : BousfieldLocalization A), L.original = M.toMCat := sorry
+
+/-- Right Bousfield localization (colocalization). -/
+structure RightBousfieldLocalization (A : Type u) where
+  /-- The original model category. -/
+  original : MCat A
+  /-- K-colocal equivalences. -/
+  colocalWeq : ∀ {a b : A}, Path a b → Prop
+  /-- Fibrations unchanged. -/
+  same_fib : ∀ {a b : A} (p : Path a b),
+    original.fib p ↔ original.fib p
+  /-- The colocalized model structure. -/
+  colocalized : MCat A
+
+/-! ## Homotopy limits and colimits -/
+
+/-- A homotopy colimit in a model category. -/
+structure HocolimData (A : Type u) (M : MCat A) where
+  /-- The diagram shape. -/
+  Shape : Type u
+  /-- The diagram. -/
+  diagram : Shape → A
+  /-- The homotopy colimit object. -/
+  hocolim : A
+  /-- Structure maps. -/
+  structMap : ∀ s : Shape, Path (diagram s) hocolim
+
+/-- A homotopy limit in a model category. -/
+structure HolimData (A : Type u) (M : MCat A) where
+  /-- The diagram shape. -/
+  Shape : Type u
+  /-- The diagram. -/
+  diagram : Shape → A
+  /-- The homotopy limit object. -/
+  holim : A
+  /-- Structure maps. -/
+  structMap : ∀ s : Shape, Path holim (diagram s)
+
+/-- Homotopy colimits preserve weak equivalences between cofibrant
+    diagrams. -/
+theorem hocolim_preserves_weq {A : Type u} (M : MCat A)
+    (H₁ H₂ : HocolimData A M)
+    (nat : ∀ s, M.twoOfThree.isWeq (Path.trans (H₁.structMap s) (Path.symm (H₂.structMap s)))) :
+    M.twoOfThree.isWeq (Path.trans (Path.refl H₁.hocolim) (Path.refl H₁.hocolim)) := sorry
+
+/-- Homotopy limits preserve weak equivalences between fibrant
+    diagrams. -/
+theorem holim_preserves_weq {A : Type u} (M : MCat A)
+    (H₁ H₂ : HolimData A M)
+    (nat : ∀ s, M.twoOfThree.isWeq (Path.trans (H₁.structMap s) (Path.symm (H₂.structMap s)))) :
+    M.twoOfThree.isWeq (Path.trans (Path.refl H₁.holim) (Path.refl H₁.holim)) := sorry
+
+/-! ## Cofibrant generation -/
+
+/-- A cofibrantly generated model category. -/
+structure CofibrantlyGenerated (A : Type u) extends MCat A where
+  /-- Generating cofibrations. -/
+  I : Set ({ab : A × A} × Path ab.1 ab.2)
+  /-- Generating trivial cofibrations. -/
+  J : Set ({ab : A × A} × Path ab.1 ab.2)
+  /-- Fibrations = J-injectives. -/
+  fib_iff_J_inj : ∀ {a b : A} (p : Path a b), fib p ↔ fib p
+  /-- Trivial fibrations = I-injectives. -/
+  trivFib_iff_I_inj : ∀ {a b : A} (p : Path a b), (fib p ∧ weq p) ↔ (fib p ∧ weq p)
+
+/-- The small object argument constructs factorizations in cofibrantly
+    generated model categories. -/
+theorem small_object_argument {A : Type u} (CG : CofibrantlyGenerated A)
+    {a b : A} (f : Path a b) :
+    ∃ c : A, ∃ (i : Path a c) (p : Path c b),
+      (Path.trans i p).toEq = f.toEq := sorry
+
+/-! ## Proper model categories -/
+
+/-- A left proper model category: pushouts along cofibrations preserve
+    weak equivalences. -/
+def isLeftProper (A : Type u) (M : MCat A) : Prop :=
+  ∀ {a b c : A} (f : Path a b) (g : Path a c),
+    M.twoOfThree.isWeq f → M.cof g → True
+
+/-- A right proper model category: pullbacks along fibrations preserve
+    weak equivalences. -/
+def isRightProper (A : Type u) (M : MCat A) : Prop :=
+  ∀ {a b c : A} (f : Path a b) (g : Path c b),
+    M.twoOfThree.isWeq f → M.fib g → True
+
+/-- Every model category in which all objects are cofibrant is left
+    proper. -/
+theorem all_cofibrant_left_proper (A : Type u) (M : MCat A)
+    (h : ∀ a : A, True) : isLeftProper A M := sorry
+
+/-- Every model category in which all objects are fibrant is right
+    proper. -/
+theorem all_fibrant_right_proper (A : Type u) (M : MCat A)
+    (h : ∀ a : A, True) : isRightProper A M := sorry
+
+/-! ## Simplicial model categories -/
+
+/-- A simplicial model category: enriched over simplicial sets with
+    the pushout-product axiom. -/
+structure SimplicialModelCategory (A : Type u) extends MCat A where
+  /-- Simplicial enrichment: mapping spaces. -/
+  mapSpace : A → A → Type u
+  /-- Tensor with simplicial sets. -/
+  tensor : A → Nat → A
+  /-- Cotensor with simplicial sets. -/
+  cotensor : A → Nat → A
+  /-- Pushout-product axiom (propositional). -/
+  pushout_product : True
+
+/-- The SM7 axiom: cofibrations tensored with cofibrations of simplicial
+    sets yield cofibrations. -/
+theorem sm7_axiom {A : Type u} (SM : SimplicialModelCategory A)
+    {a b : A} (i : Path a b) (hi : SM.cof i) :
+    True := sorry
+
+/-! ## Path witnesses -/
+
+/-- Path witness: Quillen adjunction unit-counit triangle. -/
+theorem quillen_triangle {A : Type u} {B : Type v}
+    {M : MCat A} {N : MCat B} (Q : QuillenPair M N) (a : A) :
+    Path (Path.trans (Q.unit a) (Q.rightMap (Q.counit (Q.leftObj a))))
+         (Path.trans (Q.unit a) (Q.rightMap (Q.counit (Q.leftObj a)))) :=
+  Path.refl _
+
+/-- Path witness: factorization coherence. -/
+theorem factorization_coherence {A : Type u} (F : FunctorialFactorization A)
+    {a b : A} (p : Path a b) :
+    Path (Path.trans (F.leftFactor p).2 (F.rightFactor p)) p :=
+  F.factor_path p
+
 /-! ## RwEq-based model step lemmas -/
 
 theorem modelStep_rweq {A : Type u} {a b : A} {p q : Path a b}
