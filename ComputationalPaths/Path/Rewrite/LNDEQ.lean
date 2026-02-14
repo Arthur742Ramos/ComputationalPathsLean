@@ -97,6 +97,60 @@ variable {i : Instantiation}
 @[simp] def toRwEq : RwEq (A := _) i.p i.q :=
   rweq_of_step i.step
 
+/-! ### Soundness/completeness package for instantiated LNDEQ rules -/
+
+@[simp] theorem step_sound (i : Instantiation) :
+    i.p.toEq = i.q.toEq :=
+  step_toEq i.step
+
+@[simp] theorem rw_sound (i : Instantiation) :
+    i.p.toEq = i.q.toEq :=
+  rw_toEq i.toRw
+
+@[simp] theorem rweq_sound (i : Instantiation) :
+    i.p.toEq = i.q.toEq :=
+  rweq_toEq i.toRwEq
+
+@[simp] theorem complete_to_rw (i : Instantiation) :
+    Rw (A := _) i.p i.q :=
+  i.toRw
+
+@[simp] theorem complete_to_rweq (i : Instantiation) :
+    RwEq (A := _) i.p i.q :=
+  i.toRwEq
+
+@[simp] theorem normalize_eq (i : Instantiation) :
+    normalize i.p = normalize i.q :=
+  normalize_of_rweq (p := i.p) (q := i.q) i.toRwEq
+
+@[simp] theorem source_isNormal (i : Instantiation) :
+    IsNormal (normalize i.p) :=
+  normalize_isNormal i.p
+
+@[simp] theorem target_isNormal (i : Instantiation) :
+    IsNormal (normalize i.q) :=
+  normalize_isNormal i.q
+
+@[simp] theorem sound_complete_rw_bundle (i : Instantiation) :
+    i.p.toEq = i.q.toEq ∧ Rw (A := _) i.p i.q :=
+  ⟨i.rw_sound, i.toRw⟩
+
+@[simp] theorem sound_complete_rweq_bundle (i : Instantiation) :
+    i.p.toEq = i.q.toEq ∧ RwEq (A := _) i.p i.q :=
+  ⟨i.rweq_sound, i.toRwEq⟩
+
+@[simp] theorem normalize_idem_source (i : Instantiation) :
+    normalize (normalize i.p) = normalize i.p :=
+  normalize_idem i.p
+
+@[simp] theorem normalize_idem_target (i : Instantiation) :
+    normalize (normalize i.q) = normalize i.q :=
+  normalize_idem i.q
+
+@[simp] theorem normalized_pair_isNormal (i : Instantiation) :
+    IsNormal (normalize i.p) ∧ IsNormal (normalize i.q) :=
+  ⟨i.source_isNormal, i.target_isNormal⟩
+
 end Instantiation
 
 /- Smart constructors producing tagged steps for the primitive rules. -/
@@ -558,6 +612,96 @@ example {A B : Type u} (f : A → B) :
     Path.lamCongr (fun x => Path.refl (f x)) = Path.refl f := rfl
 
 end Builder
+
+/-! ## Local peak closure lemmas (bridge to confluence proofs) -/
+
+@[simp] theorem peak_rweq_of_steps {A : Type u} {a b : A}
+    {p q r : Path a b}
+    (hq : Step (A := A) p q) (hr : Step (A := A) p r) :
+    RwEq (A := A) q r :=
+  rweq_trans (rweq_symm (rweq_of_step hq)) (rweq_of_step hr)
+
+@[simp] theorem peak_toEq_of_steps {A : Type u} {a b : A}
+    {p q r : Path a b}
+    (hq : Step (A := A) p q) (hr : Step (A := A) p r) :
+    q.toEq = r.toEq :=
+  (step_toEq hq).symm.trans (step_toEq hr)
+
+@[simp] theorem peak_normalize_eq_of_steps {A : Type u} {a b : A}
+    {p q r : Path a b}
+    (hq : Step (A := A) p q) (hr : Step (A := A) p r) :
+    normalize q = normalize r :=
+  normalize_of_rweq (peak_rweq_of_steps hq hr)
+
+@[simp] theorem peak_normal_targets {A : Type u} {a b : A}
+    {p q r : Path a b}
+    (hq : Step (A := A) p q) (hr : Step (A := A) p r) :
+    IsNormal (normalize q) ∧ IsNormal (normalize r) := by
+  have hnorm : normalize r = normalize q :=
+    (peak_normalize_eq_of_steps hq hr).symm
+  refine ⟨normalize_isNormal q, ?_⟩
+  simpa [hnorm] using (normalize_isNormal q)
+
+@[simp] theorem critical_pair_tt_rrr_via_peak {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq
+      (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
+      (Builder.instRrr (A := A) (p := Path.trans p q)).q :=
+  peak_rweq_of_steps
+    (hq := (Builder.instTt (A := A) (p := p) (q := q)
+      (r := Path.refl c)).step)
+    (hr := (Builder.instRrr (A := A) (p := Path.trans p q)).step)
+
+@[simp] theorem critical_pair_tt_lrr_via_peak {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    RwEq
+      (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
+      (Builder.instLrr (A := A) (p := Path.trans q r)).q :=
+  peak_rweq_of_steps
+    (hq := (Builder.instTt (A := A) (p := Path.refl a)
+      (q := q) (r := r)).step)
+    (hr := (Builder.instLrr (A := A) (p := Path.trans q r)).step)
+
+@[simp] theorem critical_pair_tt_rrr_rweq {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq
+      (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
+      (Builder.instRrr (A := A) (p := Path.trans p q)).q := by
+  change RwEq (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q)
+  exact rweq_of_step
+    (Step.trans_congr_right (p := p) (Step.trans_refl_right (p := q)))
+
+@[simp] theorem critical_pair_tt_lrr_rweq {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    RwEq
+      (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
+      (Builder.instLrr (A := A) (p := Path.trans q r)).q := by
+  change RwEq (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r)
+  exact rweq_of_step (Step.trans_refl_left (p := Path.trans q r))
+
+@[simp] theorem critical_pair_tt_rrr_toEq {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q.toEq =
+      (Builder.instRrr (A := A) (p := Path.trans p q)).q.toEq :=
+  rweq_toEq (critical_pair_tt_rrr_via_peak (A := A) (p := p) (q := q))
+
+@[simp] theorem critical_pair_tt_lrr_toEq {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q.toEq =
+      (Builder.instLrr (A := A) (p := Path.trans q r)).q.toEq :=
+  rweq_toEq (critical_pair_tt_lrr_via_peak (A := A) (q := q) (r := r))
+
+@[simp] theorem critical_pair_tt_rrr_normalize {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    normalize (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q =
+      normalize (Builder.instRrr (A := A) (p := Path.trans p q)).q :=
+  normalize_of_rweq (critical_pair_tt_rrr_via_peak (A := A) (p := p) (q := q))
+
+@[simp] theorem critical_pair_tt_lrr_normalize {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    normalize (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q =
+      normalize (Builder.instLrr (A := A) (p := Path.trans q r)).q :=
+  normalize_of_rweq (critical_pair_tt_lrr_via_peak (A := A) (q := q) (r := r))
 
 end LNDEQ
 end Rewrite

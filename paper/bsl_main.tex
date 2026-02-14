@@ -384,8 +384,8 @@ computational paths in several sections following this introduction.
     eight groups, its reflexive--transitive closure $\Rw$, and the rewrite
     equality $\RwEq$. We prove soundness, develop normalization, establish
     termination via a recursive path ordering, prove local confluence
-    (the strip lemma) and global confluence (via Newman's lemma), and
-    construct the quotient $\PathQuot$.
+    (the strip lemma) and global confluence via a groupoid-algebraic
+    argument, and construct the quotient $\PathQuot$.
 
   \item[\cref{ch:groupoid}: The Groupoid of Computational Paths.]
     We show that every type carries a canonical weak groupoid structure~\cite{hofmann98}
@@ -1392,10 +1392,20 @@ Representative cases include:
 \end{theorem}
 
 \begin{proof}
-  By Newman's lemma~\cite{Newman42}: a terminating relation is confluent
-  if and only if it is locally confluent. Termination is established in
-  \cref{thm:termination}, and local confluence follows from the strip
-  lemma (\cref{thm:strip-lemma}).
+  The proof uses a two-level architecture.
+  At the first level, the groupoid fragment (associativity, units,
+  inverses) is completed with two algebraic cancellation rules
+  (\texttt{trans\_cancel\_left/right}) and shown confluent via a
+  semantic interpretation into the free group: every expression maps
+  to a reduced word, every rewrite step preserves that word, and
+  every expression reduces to a canonical form determined by its
+  reduced word (\texttt{GroupoidConfluence}).
+  %
+  At the second level, the full 75-rule system is handled by lifting
+  this groupoid confluence through the typeclass \texttt{HasJoinOfRw},
+  combined with the strip lemma (\cref{thm:strip-lemma}) and
+  termination (\cref{thm:termination}).  No appeal to Newman's lemma
+  or proof irrelevance is required: the proof is entirely algebraic.
 \end{proof}
 
 \begin{corollary}[Unique Normal Forms]\label{cor:unique-nf}
@@ -2874,7 +2884,7 @@ formalization, which is publicly available at:
 \begin{center}
 \fbox{\url{https://github.com/Arthur742Ramos/ComputationalPathsLean}}
 \end{center}
-The repository contains over 516 files and 113{,}000 lines of verified Lean
+The repository contains over 856 files and 217{,}000 lines of verified Lean
 code. Readers are encouraged to consult the source for complete proof details;
 formalization status for each component is summarized in
 \cref{tab:formalization-status}.
@@ -3673,7 +3683,10 @@ closure---axiomatize the identities that do not hold strictly on
 computational traces. We proved soundness
 (\cref{thm:step-sound}), termination (\cref{thm:termination}),
 local confluence via the strip lemma (\cref{thm:strip-lemma}),
-and global confluence via Newman's lemma (\cref{thm:confluence}).
+and global confluence via a groupoid-algebraic argument
+(\cref{thm:confluence}) that interprets path expressions into the
+free group and derives canonical forms without appealing to Newman's
+lemma or proof irrelevance.
 The quotient $\PathQuot$ by rewrite equality recovers the standard
 identity type (\cref{thm:quot-equiv}).
 
@@ -3728,12 +3741,12 @@ The entire development is mechanically verified in the Lean~4 proof assistant, c
 \toprule
 \textbf{Metric} & \textbf{Count} \\
 \midrule
-Source files & 516 \\
-Total lines of code & 113,024 \\
-Definitions & 3,258 \\
-Theorems & 1,466 \\
-Structures & 2,711 \\
-Inductive types & 190 \\
+Source files & 856 \\
+Total lines of code & 217,000 \\
+Definitions & 8,191 \\
+Theorems & 3,532 \\
+Structures & 4,746 \\
+Inductive types & 327 \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -3811,9 +3824,12 @@ Several design choices shaped the formalization:
     fundamental group inherits decidable equality and supports the
     universal property of quotients.
   \item \textbf{Interface-based confluence.} The confluence interface
-    is organized as an algebraic structure, allowing different confluence
+    \texttt{HasJoinOfRw} is a parameterized typeclass (not globally
+    instantiated), allowing different confluence
     strategies (constructive, classical, syntactic) to be plugged in
-    transparently.
+    transparently. The primary instance is
+    \texttt{HasConfluencePropExpr}, proved via groupoid confluence on
+    the expression algebra.
   \item \textbf{Universe polymorphism.} The entire development is
     universe-polymorphic, with $\Path$, $\Step$, $\Rw$, $\RwEq$, and
     $\PathQuot$ defined at universe level~$u$.
@@ -3912,7 +3928,7 @@ homotopy theory (e.g., Blakers--Massey, the James construction, the
 Hopf invariant) would demonstrate the power of the framework.
 
 \paragraph{Scaling the formalization.}
-The current formalization of 113,024 lines covers a substantial portion
+The current formalization of 217,000 lines covers a substantial portion
 of basic algebraic topology. Scaling to more advanced topics
 (e.g., stable homotopy theory, chromatic homotopy theory, derived
 algebraic geometry) will require:

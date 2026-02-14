@@ -142,4 +142,4 @@
 \contentsline {paragraph}{Function type rules.}{65}{section*.48}%
 \contentsline {paragraph}{Dependent application.}{65}{section*.49}%
 \contentsline {chapter}{\numberline {B}Index of Definitions and Theorems}{70}{appendix.B}%
-\contentsline {chapter}{\numberline {C}Dependency Graph}{73}{appendix.C}%
+\contentsline {chapter}{\numberline {C}Dependency Graph}{82}{appendix.C}%

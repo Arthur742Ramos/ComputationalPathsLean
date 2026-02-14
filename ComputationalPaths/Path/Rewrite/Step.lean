@@ -1057,5 +1057,387 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | trans_cancel_left _ _ => simp
   | trans_cancel_right _ _ => simp
 
+/-! ## Local joinability for critical overlaps -/
+
+/-- Reflexive-transitive closure of `Step`, used for critical-pair joins. -/
+inductive StepStar :
+  {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+  | refl {A : Type u} {a b : A} (p : Path a b) :
+      StepStar p p
+  | tail {A : Type u} {a b : A} {p q r : Path a b} :
+      StepStar p q → Step q r → StepStar p r
+
+namespace StepStar
+
+/-- Embed a single rewrite step in `StepStar`. -/
+def single {A : Type u} {a b : A} {p q : Path a b}
+    (h : Step p q) : StepStar p q :=
+  StepStar.tail (StepStar.refl p) h
+
+/-- Compose two single steps in `StepStar`. -/
+def two {A : Type u} {a b : A} {p q r : Path a b}
+    (h₁ : Step p q) (h₂ : Step q r) : StepStar p r :=
+  StepStar.tail (single h₁) h₂
+
+end StepStar
+
+/-- Two reducts are joinable when they have a common `StepStar` descendant. -/
+def Step.Joinable {A : Type u} {a b : A} (p q : Path a b) : Prop :=
+  ∃ r, StepStar p r ∧ StepStar q r
+
+/-- Determinism up to `toEq`: any two one-step reducts have equal semantic proof. -/
+theorem Step.deterministic {A : Type u} {a b : A} {p q r : Path a b}
+    (hq : Step p q) (hr : Step p r) :
+    q.toEq = r.toEq := by
+  exact (step_toEq hq).symm.trans (step_toEq hr)
+
+/-- Non-overlapping base case: `symm(refl)` has a unique semantic reduct. -/
+theorem Step.deterministic_symm_refl {A : Type u} (a : A) {q : Path a a}
+    (hq : Step (Path.symm (Path.refl a)) q) :
+    q.toEq = (Path.refl a).toEq := by
+  exact Step.deterministic (hq := hq) (hr := Step.symm_refl a)
+
+/-- Non-overlapping base case: `symm(symm(p))` has a unique semantic reduct. -/
+theorem Step.deterministic_symm_symm {A : Type u} {a b : A}
+    (p : Path a b) {q : Path a b}
+    (hq : Step (Path.symm (Path.symm p)) q) :
+    q.toEq = p.toEq := by
+  exact Step.deterministic (hq := hq) (hr := Step.symm_symm p)
+
+/-- Non-overlapping base case: `refl ∘ p` has a unique semantic reduct. -/
+theorem Step.deterministic_trans_refl_left {A : Type u} {a b : A}
+    (p : Path a b) {q : Path a b}
+    (hq : Step (Path.trans (Path.refl a) p) q) :
+    q.toEq = p.toEq := by
+  exact Step.deterministic (hq := hq) (hr := Step.trans_refl_left p)
+
+/-- Non-overlapping base case: `p ∘ refl` has a unique semantic reduct. -/
+theorem Step.deterministic_trans_refl_right {A : Type u} {a b : A}
+    (p : Path a b) {q : Path a b}
+    (hq : Step (Path.trans p (Path.refl b)) q) :
+    q.toEq = p.toEq := by
+  exact Step.deterministic (hq := hq) (hr := Step.trans_refl_right p)
+
+/-- Non-overlapping base case: `p ∘ symm(p)` has a unique semantic reduct. -/
+theorem Step.deterministic_trans_symm {A : Type u} {a b : A}
+    (p : Path a b) {q : Path a a}
+    (hq : Step (Path.trans p (Path.symm p)) q) :
+    q.toEq = (Path.refl a).toEq := by
+  exact Step.deterministic (hq := hq) (hr := Step.trans_symm p)
+
+/-- Non-overlapping base case: `symm(p) ∘ p` has a unique semantic reduct. -/
+theorem Step.deterministic_symm_trans {A : Type u} {a b : A}
+    (p : Path a b) {q : Path b b}
+    (hq : Step (Path.trans (Path.symm p) p) q) :
+    q.toEq = (Path.refl b).toEq := by
+  exact Step.deterministic (hq := hq) (hr := Step.symm_trans p)
+
+/-- Non-overlapping base case: left cancellation has a unique semantic reduct. -/
+theorem Step.deterministic_trans_cancel_left {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path a c) {r : Path a c}
+    (hr : Step (Path.trans p (Path.trans (Path.symm p) q)) r) :
+    r.toEq = q.toEq := by
+  exact Step.deterministic (hq := hr) (hr := Step.trans_cancel_left p q)
+
+/-- Non-overlapping base case: right cancellation has a unique semantic reduct. -/
+theorem Step.deterministic_trans_cancel_right {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) {r : Path b c}
+    (hr : Step (Path.trans (Path.symm p) (Path.trans p q)) r) :
+    r.toEq = q.toEq := by
+  exact Step.deterministic (hq := hr) (hr := Step.trans_cancel_right p q)
+
+theorem critical_pair_trans_assoc_trans_refl_left_joinable
+    {A : Type u} {a b c : A} (p : Path a b) (r : Path b c) :
+    Step.Joinable
+      (Path.trans (Path.refl a) (Path.trans p r))
+      (Path.trans p r) := by
+  refine ⟨Path.trans p r, ?_, ?_⟩
+  · exact StepStar.single (Step.trans_refl_left (Path.trans p r))
+  · exact StepStar.refl (Path.trans p r)
+
+theorem critical_pair_trans_assoc_trans_refl_right_joinable
+    {A : Type u} {a b c : A} (p : Path a b) (r : Path b c) :
+    Step.Joinable
+      (Path.trans p (Path.trans (Path.refl b) r))
+      (Path.trans p r) := by
+  refine ⟨Path.trans p r, ?_, ?_⟩
+  · exact StepStar.single
+      (Step.trans_congr_right p (Step.trans_refl_left r))
+  · exact StepStar.refl (Path.trans p r)
+
+theorem critical_pair_trans_assoc_trans_symm_joinable
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path a c) :
+    Step.Joinable
+      (Path.trans p (Path.trans (Path.symm p) q))
+      (Path.trans (Path.refl a) q) := by
+  refine ⟨q, ?_, ?_⟩
+  · exact StepStar.single (Step.trans_cancel_left p q)
+  · exact StepStar.single (Step.trans_refl_left q)
+
+theorem critical_pair_trans_assoc_symm_trans_joinable
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+    Step.Joinable
+      (Path.trans (Path.symm p) (Path.trans p q))
+      (Path.trans (Path.refl b) q) := by
+  refine ⟨q, ?_, ?_⟩
+  · exact StepStar.single (Step.trans_cancel_right p q)
+  · exact StepStar.single (Step.trans_refl_left q)
+
+theorem critical_pair_trans_assoc_trans_assoc_joinable
+    {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    Step.Joinable
+      (Path.trans (Path.trans p (Path.trans q r)) s)
+      (Path.trans (Path.trans p q) (Path.trans r s)) := by
+  refine ⟨Path.trans p (Path.trans q (Path.trans r s)), ?_, ?_⟩
+  · exact StepStar.two
+      (Step.trans_assoc p (Path.trans q r) s)
+      (Step.trans_congr_right p (Step.trans_assoc q r s))
+  · exact StepStar.single (Step.trans_assoc p q (Path.trans r s))
+
+theorem critical_pair_symm_congr_symm_symm_joinable
+    {A : Type u} {a b : A} {p p' : Path a b}
+    (hp : Step p p') :
+    Step.Joinable
+      (Path.symm (Path.symm p'))
+      p := by
+  refine ⟨p', ?_, ?_⟩
+  · exact StepStar.single (Step.symm_symm p')
+  · exact StepStar.single hp
+
+theorem critical_pair_symm_congr_symm_trans_congr_left_joinable
+    {A : Type u} {a b c : A}
+    {p p' : Path a b} {q : Path b c}
+    (hp : Step p p') :
+    Step.Joinable
+      (Path.symm (Path.trans p' q))
+      (Path.trans (Path.symm q) (Path.symm p)) := by
+  refine ⟨Path.trans (Path.symm q) (Path.symm p'), ?_, ?_⟩
+  · exact StepStar.single (Step.symm_trans_congr p' q)
+  · exact StepStar.single
+      (Step.trans_congr_right (Path.symm q) (Step.symm_congr hp))
+
+theorem critical_pair_symm_congr_symm_trans_congr_right_joinable
+    {A : Type u} {a b c : A}
+    {p : Path a b} {q q' : Path b c}
+    (hq : Step q q') :
+    Step.Joinable
+      (Path.symm (Path.trans p q'))
+      (Path.trans (Path.symm q) (Path.symm p)) := by
+  refine ⟨Path.trans (Path.symm q') (Path.symm p), ?_, ?_⟩
+  · exact StepStar.single (Step.symm_trans_congr p q')
+  · exact StepStar.single
+      (Step.trans_congr_left (Path.symm p) (Step.symm_congr hq))
+
+theorem critical_pair_trans_congr_left_right_joinable
+    {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (hp : Step p p') (hq : Step q q') :
+    Step.Joinable
+      (Path.trans p' q)
+      (Path.trans p q') := by
+  refine ⟨Path.trans p' q', ?_, ?_⟩
+  · exact StepStar.single (Step.trans_congr_right p' hq)
+  · exact StepStar.single (Step.trans_congr_left q' hp)
+
+theorem critical_pair_trans_congr_left_trans_assoc_joinable
+    {A : Type u} {a b c d : A}
+    {p p' : Path a b} {q : Path b c} {r : Path c d}
+    (hp : Step p p') :
+    Step.Joinable
+      (Path.trans (Path.trans p' q) r)
+      (Path.trans p (Path.trans q r)) := by
+  refine ⟨Path.trans p' (Path.trans q r), ?_, ?_⟩
+  · exact StepStar.single (Step.trans_assoc p' q r)
+  · exact StepStar.single (Step.trans_congr_left (Path.trans q r) hp)
+
+theorem critical_pair_trans_congr_right_trans_assoc_joinable
+    {A : Type u} {a b c d : A}
+    {p : Path a b} {q q' : Path b c} {r : Path c d}
+    (hq : Step q q') :
+    Step.Joinable
+      (Path.trans (Path.trans p q') r)
+      (Path.trans p (Path.trans q r)) := by
+  refine ⟨Path.trans p (Path.trans q' r), ?_, ?_⟩
+  · exact StepStar.single (Step.trans_assoc p q' r)
+  · exact StepStar.single
+      (Step.trans_congr_right p (Step.trans_congr_left r hq))
+
+theorem critical_pair_trans_assoc_trans_refl_inner_right_joinable
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+    Step.Joinable
+      (Path.trans p (Path.trans q (Path.refl c)))
+      (Path.trans p q) := by
+  refine ⟨Path.trans p q, ?_, ?_⟩
+  · exact StepStar.single
+      (Step.trans_congr_right p (Step.trans_refl_right q))
+  · exact StepStar.refl (Path.trans p q)
+
+theorem critical_pair_symm_symm_symm_refl_joinable
+    {A : Type u} (a : A) :
+    Step.Joinable (Path.refl a) (Path.symm (Path.refl a)) := by
+  refine ⟨Path.refl a, ?_, ?_⟩
+  · exact StepStar.refl (Path.refl a)
+  · exact StepStar.single (Step.symm_refl a)
+
+theorem critical_pair_symm_symm_symm_trans_congr_joinable
+    {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Step.Joinable
+      (Path.trans p q)
+      (Path.symm (Path.trans (Path.symm q) (Path.symm p))) := by
+  refine ⟨Path.trans p q, ?_, ?_⟩
+  · exact StepStar.refl (Path.trans p q)
+  · exact StepStar.tail
+      (StepStar.two
+        (Step.symm_trans_congr (Path.symm q) (Path.symm p))
+        (Step.trans_congr_left (Path.symm (Path.symm q))
+          (Step.symm_symm p)))
+      (Step.trans_congr_right p (Step.symm_symm q))
+
+theorem critical_pair_symm_trans_congr_trans_refl_left_joinable
+    {A : Type u} {a b : A} (p : Path a b) :
+    Step.Joinable
+      (Path.symm p)
+      (Path.trans (Path.symm p) (Path.symm (Path.refl a))) := by
+  refine ⟨Path.symm p, ?_, ?_⟩
+  · exact StepStar.refl (Path.symm p)
+  · exact StepStar.two
+      (Step.trans_congr_right (Path.symm p) (Step.symm_refl a))
+      (Step.trans_refl_right (Path.symm p))
+
+theorem critical_pair_symm_trans_congr_trans_refl_right_joinable
+    {A : Type u} {a b : A} (p : Path a b) :
+    Step.Joinable
+      (Path.symm p)
+      (Path.trans (Path.symm (Path.refl b)) (Path.symm p)) := by
+  refine ⟨Path.symm p, ?_, ?_⟩
+  · exact StepStar.refl (Path.symm p)
+  · exact StepStar.two
+      (Step.trans_congr_left (Path.symm p) (Step.symm_refl b))
+      (Step.trans_refl_left (Path.symm p))
+
+theorem critical_pair_trans_cancel_left_trans_refl_left_joinable
+    {A : Type u} {a c : A} (q : Path a c) :
+    Step.Joinable
+      q
+      (Path.trans (Path.symm (Path.refl a)) q) := by
+  refine ⟨q, ?_, ?_⟩
+  · exact StepStar.refl q
+  · exact StepStar.two
+      (Step.trans_congr_left q (Step.symm_refl a))
+      (Step.trans_refl_left q)
+
+theorem critical_pair_trans_cancel_right_symm_refl_joinable
+    {A : Type u} {a c : A} (q : Path a c) :
+    Step.Joinable
+      q
+      (Path.trans (Path.refl a) (Path.trans (Path.refl a) q)) := by
+  refine ⟨q, ?_, ?_⟩
+  · exact StepStar.refl q
+  · exact StepStar.tail
+      (StepStar.single (Step.trans_refl_left (Path.trans (Path.refl a) q)))
+      (Step.trans_refl_left q)
+
+/-! ## Lightweight complexity measure -/
+
+/-- Complexity of a path expression, measured by trace length. -/
+@[simp] def Step.complexity {A : Type u} {a b : A} (p : Path a b) : Nat :=
+  p.steps.length
+
+@[simp] theorem Step.complexity_symm {A : Type u} {a b : A} (p : Path a b) :
+    Step.complexity (Path.symm p) = Step.complexity p := by
+  simp [Step.complexity]
+
+@[simp] theorem Step.complexity_trans {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Step.complexity (Path.trans p q) = Step.complexity p + Step.complexity q := by
+  simp [Step.complexity]
+
+theorem Step.complexity_trans_refl_left_decreases
+    {A : Type u} {a b : A} (p : Path a b) :
+    Step.complexity p ≤ Step.complexity (Path.trans (Path.refl a) p) := by
+  simp [Step.complexity]
+
+theorem Step.complexity_trans_refl_right_decreases
+    {A : Type u} {a b : A} (p : Path a b) :
+    Step.complexity p ≤ Step.complexity (Path.trans p (Path.refl b)) := by
+  simp [Step.complexity]
+
+theorem Step.complexity_trans_assoc_preserved
+    {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    Step.complexity (Path.trans (Path.trans p q) r) =
+      Step.complexity (Path.trans p (Path.trans q r)) := by
+  simp [Step.complexity]
+
+theorem Step.complexity_trans_cancel_left_decreases
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path a c) :
+    Step.complexity q ≤
+      Step.complexity (Path.trans p (Path.trans (Path.symm p) q)) := by
+  simpa [Step.complexity, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using
+    (Nat.le_add_right q.steps.length (p.steps.length + p.steps.length))
+
+theorem Step.complexity_trans_cancel_right_decreases
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+    Step.complexity q ≤
+      Step.complexity (Path.trans (Path.symm p) (Path.trans p q)) := by
+  simpa [Step.complexity, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using
+    (Nat.le_add_right q.steps.length (p.steps.length + p.steps.length))
+
+theorem Step.complexity_trans_symm_decreases
+    {A : Type u} {a b : A} (p : Path a b) :
+    Step.complexity (Path.refl a) ≤
+      Step.complexity (Path.trans p (Path.symm p)) := by
+  simp [Step.complexity]
+
+theorem Step.complexity_symm_trans_decreases
+    {A : Type u} {a b : A} (p : Path a b) :
+    Step.complexity (Path.refl b) ≤
+      Step.complexity (Path.trans (Path.symm p) p) := by
+  simp [Step.complexity]
+
+theorem Step.complexity_trans_symm_strict
+    {A : Type u} {a b : A} (p : Path a b)
+    (hp : 0 < Step.complexity p) :
+    Step.complexity (Path.refl a) <
+      Step.complexity (Path.trans p (Path.symm p)) := by
+  have hpp : 0 < Step.complexity p + Step.complexity p := by
+    exact Nat.lt_of_lt_of_le hp (Nat.le_add_right (Step.complexity p) (Step.complexity p))
+  simpa [Step.complexity] using hpp
+
+theorem Step.complexity_symm_trans_strict
+    {A : Type u} {a b : A} (p : Path a b)
+    (hp : 0 < Step.complexity p) :
+    Step.complexity (Path.refl b) <
+      Step.complexity (Path.trans (Path.symm p) p) := by
+  have hpp : 0 < Step.complexity p + Step.complexity p := by
+    exact Nat.lt_of_lt_of_le hp (Nat.le_add_right (Step.complexity p) (Step.complexity p))
+  simpa [Step.complexity] using hpp
+
+theorem Step.complexity_trans_cancel_left_strict
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path a c)
+    (hp : 0 < Step.complexity p) :
+    Step.complexity q <
+      Step.complexity (Path.trans p (Path.trans (Path.symm p) q)) := by
+  have hpp : 0 < Step.complexity p + Step.complexity p := by
+    exact Nat.lt_of_lt_of_le hp (Nat.le_add_right (Step.complexity p) (Step.complexity p))
+  have hlt : Step.complexity q <
+      Step.complexity q + (Step.complexity p + Step.complexity p) :=
+    Nat.lt_add_of_pos_right hpp
+  simpa [Step.complexity, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hlt
+
+theorem Step.complexity_trans_cancel_right_strict
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path b c)
+    (hp : 0 < Step.complexity p) :
+    Step.complexity q <
+      Step.complexity (Path.trans (Path.symm p) (Path.trans p q)) := by
+  have hpp : 0 < Step.complexity p + Step.complexity p := by
+    exact Nat.lt_of_lt_of_le hp (Nat.le_add_right (Step.complexity p) (Step.complexity p))
+  have hlt : Step.complexity q <
+      Step.complexity q + (Step.complexity p + Step.complexity p) :=
+    Nat.lt_add_of_pos_right hpp
+  simpa [Step.complexity, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hlt
+
 end Path
 end ComputationalPaths

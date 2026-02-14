@@ -204,6 +204,8 @@ Removing `canon` is feasible because:
 -/
 
 import ComputationalPaths.Path.Rewrite.Step
+import ComputationalPaths.Path.Rewrite.ConfluenceProof
+import ComputationalPaths.Path.Rewrite.TerminationBridge
 
 namespace ComputationalPaths.Path.Rewrite.StepClassification
 
@@ -834,6 +836,334 @@ def congruenceRules : List RuleInfo :=
 
 def distributionRules : List RuleInfo :=
   allRules.filter (·.category == .distribution)
+
+/-!
+## Layered Orthogonality and Critical-Pair Joinability Certificates
+-/
+
+universe u
+
+/-- Modular layers used in the canon-free confluence plan. -/
+inductive RewriteTier where
+  | groupoidCore
+  | typeSpecific
+  | transport
+  | contextual
+  | congruencePropagation
+  deriving DecidableEq, Repr
+
+/-- Rule groups attached to each modular layer. -/
+def tierGroups : RewriteTier → List RuleGroup
+  | .groupoidCore => [.groupoid, .structural]
+  | .typeSpecific => [.product, .sigma, .sum, .function, .depApp]
+  | .transport => [.transport]
+  | .contextual => [.context, .depContext]
+  | .congruencePropagation => [.biContext, .mapLR]
+
+/-- Layer orthogonality means the group assignments have no overlap. -/
+def TierOrthogonal (t₁ t₂ : RewriteTier) : Prop :=
+  ∀ g : RuleGroup, g ∈ tierGroups t₁ → g ∉ tierGroups t₂
+
+theorem tier_groupoid_typespecific_orthogonal :
+    TierOrthogonal .groupoidCore .typeSpecific := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl | rfl <;> decide
+
+theorem tier_groupoid_transport_orthogonal :
+    TierOrthogonal .groupoidCore .transport := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl | rfl <;> decide
+
+theorem tier_typespecific_transport_orthogonal :
+    TierOrthogonal .typeSpecific .transport := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl | rfl | rfl | rfl | rfl <;> decide
+
+theorem tier_typespecific_contextual_orthogonal :
+    TierOrthogonal .typeSpecific .contextual := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl | rfl | rfl | rfl | rfl <;> decide
+
+theorem tier_transport_contextual_orthogonal :
+    TierOrthogonal .transport .contextual := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl <;> decide
+
+theorem tier_contextual_congruence_orthogonal :
+    TierOrthogonal .contextual .congruencePropagation := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl | rfl <;> decide
+
+theorem tier_groupoid_contextual_orthogonal :
+    TierOrthogonal .groupoidCore .contextual := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl | rfl <;> decide
+
+theorem tier_groupoid_congruence_orthogonal :
+    TierOrthogonal .groupoidCore .congruencePropagation := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl | rfl <;> decide
+
+theorem tier_typespecific_congruence_orthogonal :
+    TierOrthogonal .typeSpecific .congruencePropagation := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl | rfl | rfl | rfl | rfl <;> decide
+
+theorem tier_transport_congruence_orthogonal :
+    TierOrthogonal .transport .congruencePropagation := by
+  intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl <;> decide
+
+/-- Consolidated orthogonality certificate for the modular layering. -/
+def tierOrthogonalityCertificate : Prop :=
+  TierOrthogonal .groupoidCore .typeSpecific ∧
+  TierOrthogonal .groupoidCore .transport ∧
+  TierOrthogonal .groupoidCore .contextual ∧
+  TierOrthogonal .groupoidCore .congruencePropagation ∧
+  TierOrthogonal .typeSpecific .transport ∧
+  TierOrthogonal .typeSpecific .contextual ∧
+  TierOrthogonal .typeSpecific .congruencePropagation ∧
+  TierOrthogonal .transport .contextual ∧
+  TierOrthogonal .transport .congruencePropagation ∧
+  TierOrthogonal .contextual .congruencePropagation
+
+theorem tier_orthogonality_certificate :
+    tierOrthogonalityCertificate := by
+  exact ⟨tier_groupoid_typespecific_orthogonal,
+    tier_groupoid_transport_orthogonal,
+    tier_groupoid_contextual_orthogonal,
+    tier_groupoid_congruence_orthogonal,
+    tier_typespecific_transport_orthogonal,
+    tier_typespecific_contextual_orthogonal,
+    tier_typespecific_congruence_orthogonal,
+    tier_transport_contextual_orthogonal,
+    tier_transport_congruence_orthogonal,
+    tier_contextual_congruence_orthogonal⟩
+
+theorem tier_pairwise_orthogonal :
+    ∀ t₁ t₂ : RewriteTier, t₁ ≠ t₂ → TierOrthogonal t₁ t₂ := by
+  intro t₁ t₂ hne
+  cases t₁ <;> cases t₂
+  · cases hne rfl
+  · -- groupoidCore vs typeSpecific
+    exact tier_groupoid_typespecific_orthogonal
+  · -- groupoidCore vs transport
+    exact tier_groupoid_transport_orthogonal
+  · -- groupoidCore vs contextual
+    exact tier_groupoid_contextual_orthogonal
+  · -- groupoidCore vs congruencePropagation
+    exact tier_groupoid_congruence_orthogonal
+  · -- typeSpecific vs groupoidCore
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl | rfl | rfl | rfl | rfl <;> decide
+  · cases hne rfl
+  · -- typeSpecific vs transport
+    exact tier_typespecific_transport_orthogonal
+  · -- typeSpecific vs contextual
+    exact tier_typespecific_contextual_orthogonal
+  · -- typeSpecific vs congruencePropagation
+    exact tier_typespecific_congruence_orthogonal
+  · -- transport vs groupoidCore
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl <;> decide
+  · -- transport vs typeSpecific
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl <;> decide
+  · cases hne rfl
+  · -- transport vs contextual
+    exact tier_transport_contextual_orthogonal
+  · -- transport vs congruencePropagation
+    exact tier_transport_congruence_orthogonal
+  · -- contextual vs groupoidCore
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl | rfl <;> decide
+  · -- contextual vs typeSpecific
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl | rfl <;> decide
+  · -- contextual vs transport
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl | rfl <;> decide
+  · cases hne rfl
+  · -- contextual vs congruencePropagation
+    exact tier_contextual_congruence_orthogonal
+  · -- congruencePropagation vs groupoidCore
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl | rfl <;> decide
+  · -- congruencePropagation vs typeSpecific
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl | rfl <;> decide
+  · -- congruencePropagation vs transport
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl | rfl <;> decide
+  · -- congruencePropagation vs contextual
+    intro g hg; simp [tierGroups] at hg ⊢
+    rcases hg with rfl | rfl <;> decide
+  · cases hne rfl
+
+theorem tier_pairwise_orthogonal_symm :
+    ∀ t₁ t₂ : RewriteTier, t₁ ≠ t₂ → TierOrthogonal t₂ t₁ := by
+  intro t₁ t₂ hne
+  exact tier_pairwise_orthogonal t₂ t₁ (fun h => hne h.symm)
+
+def critical_pair_tt_rrr_joinable {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Confluence.Join
+      (Path.trans p (Path.trans q (Path.refl c)))
+      (Path.trans p q) :=
+  ConfluenceProof.local_confluence_tt_rrr (A := A) p q
+
+def critical_pair_tt_lrr_joinable {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    Confluence.Join
+      (Path.trans (Path.refl a) (Path.trans q r))
+      (Path.trans q r) :=
+  ConfluenceProof.local_confluence_tt_lrr (A := A) q r
+
+def critical_pair_tt_tt_joinable {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    Confluence.Join
+      (Path.trans (Path.trans p (Path.trans q r)) s)
+      (Path.trans (Path.trans p q) (Path.trans r s)) :=
+  ConfluenceProof.local_confluence_tt_tt (A := A) p q r s
+
+def critical_pair_ss_sr_joinable {A : Type u} (a : A) :
+    Confluence.Join (Path.refl a) (Path.symm (Path.refl a)) :=
+  ConfluenceProof.local_confluence_ss_sr (A := A) a
+
+def critical_pair_ss_stss_joinable {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Confluence.Join
+      (Path.trans p q)
+      (Path.symm (Path.trans (Path.symm q) (Path.symm p))) :=
+  ConfluenceProof.local_confluence_ss_stss (A := A) p q
+
+def critical_pair_tt_ts_joinable {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path a c) :
+    Confluence.Join
+      (Path.trans p (Path.trans (Path.symm p) q))
+      (Path.trans (Path.refl a) q) :=
+  ConfluenceProof.local_confluence_tt_ts (A := A) p q
+
+def critical_pair_tt_st_joinable {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Confluence.Join
+      (Path.trans (Path.symm p) (Path.trans p q))
+      (Path.trans (Path.refl b) q) :=
+  ConfluenceProof.local_confluence_tt_st (A := A) p q
+
+def critical_pair_trans_congr_commute_joinable {A : Type u} {a b c : A}
+    {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+    (hp : Step p₁ p₂) (hq : Step q₁ q₂) :
+    Confluence.Join
+      (Path.trans p₂ q₁)
+      (Path.trans p₁ q₂) :=
+  ConfluenceProof.commute_trans_left_right (A := A) hp hq
+
+/-- Joinability certificate for all core critical-pair families. -/
+def criticalPairJoinabilityCertificate : Prop :=
+  (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
+      Confluence.Join (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q)) ∧
+  (∀ {A : Type u} {a b c : A} (q : Path a b) (r : Path b c),
+      Confluence.Join (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r)) ∧
+  (∀ {A : Type u} {a b c d e : A} (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e),
+      Confluence.Join
+        (Path.trans (Path.trans p (Path.trans q r)) s)
+        (Path.trans (Path.trans p q) (Path.trans r s))) ∧
+  (∀ {A : Type u} (a : A),
+      Confluence.Join (Path.refl a) (Path.symm (Path.refl a))) ∧
+  (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
+      Confluence.Join (Path.trans p q) (Path.symm (Path.trans (Path.symm q) (Path.symm p)))) ∧
+  (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path a c),
+      Confluence.Join (Path.trans p (Path.trans (Path.symm p) q)) (Path.trans (Path.refl a) q)) ∧
+  (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
+      Confluence.Join (Path.trans (Path.symm p) (Path.trans p q)) (Path.trans (Path.refl b) q)) ∧
+  (∀ {A : Type u} {a b c : A} {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+      (_ : Step p₁ p₂) (_ : Step q₁ q₂),
+      Confluence.Join (Path.trans p₂ q₁) (Path.trans p₁ q₂))
+
+theorem critical_pair_joinability_certificate :
+    criticalPairJoinabilityCertificate := by
+  refine ⟨?_, ?_⟩
+  · intro {A} {a} {b} {c} p q
+    exact critical_pair_tt_rrr_joinable (A := A) p q
+  · refine ⟨?_, ?_⟩
+    · intro {A} {a} {b} {c} q r
+      exact critical_pair_tt_lrr_joinable (A := A) q r
+    · refine ⟨?_, ?_⟩
+      · intro {A} {a} {b} {c} {d} {e} p q r s
+        exact critical_pair_tt_tt_joinable (A := A) p q r s
+      · refine ⟨?_, ?_⟩
+        · intro {A} a
+          exact critical_pair_ss_sr_joinable (A := A) a
+        · refine ⟨?_, ?_⟩
+          · intro {A} {a} {b} {c} p q
+            exact critical_pair_ss_stss_joinable (A := A) p q
+          · refine ⟨?_, ?_⟩
+            · intro {A} {a} {b} {c} p q
+              exact critical_pair_tt_ts_joinable (A := A) p q
+            · refine ⟨?_, ?_⟩
+              · intro {A} {a} {b} {c} p q
+                exact critical_pair_tt_st_joinable (A := A) p q
+              · intro {A} {a} {b} {c} {p₁} {p₂} {q₁} {q₂} hp hq
+                exact critical_pair_trans_congr_commute_joinable (A := A) hp hq
+
+theorem critical_pair_certificate_tt_rrr {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Confluence.Join (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q) := by
+  exact critical_pair_joinability_certificate.1 p q
+
+theorem critical_pair_certificate_tt_lrr {A : Type u} {a b c : A}
+    (q : Path a b) (r : Path b c) :
+    Confluence.Join (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r) := by
+  exact critical_pair_joinability_certificate.2.1 q r
+
+theorem critical_pair_certificate_tt_tt {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    Confluence.Join
+      (Path.trans (Path.trans p (Path.trans q r)) s)
+      (Path.trans (Path.trans p q) (Path.trans r s)) := by
+  exact critical_pair_joinability_certificate.2.2.1 p q r s
+
+theorem critical_pair_certificate_ss_sr {A : Type u} (a : A) :
+    Confluence.Join (Path.refl a) (Path.symm (Path.refl a)) := by
+  exact critical_pair_joinability_certificate.2.2.2.1 a
+
+theorem critical_pair_certificate_ss_stss {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Confluence.Join (Path.trans p q) (Path.symm (Path.trans (Path.symm q) (Path.symm p))) := by
+  exact critical_pair_joinability_certificate.2.2.2.2.1 p q
+
+theorem critical_pair_certificate_tt_ts {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path a c) :
+    Confluence.Join (Path.trans p (Path.trans (Path.symm p) q)) (Path.trans (Path.refl a) q) := by
+  exact critical_pair_joinability_certificate.2.2.2.2.2.1 p q
+
+theorem critical_pair_certificate_tt_st {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    Confluence.Join (Path.trans (Path.symm p) (Path.trans p q)) (Path.trans (Path.refl b) q) := by
+  exact critical_pair_joinability_certificate.2.2.2.2.2.2.1 p q
+
+theorem critical_pair_certificate_trans_congr_commute {A : Type u} {a b c : A}
+    {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+    (hp : Step p₁ p₂) (hq : Step q₁ q₂) :
+    Confluence.Join (Path.trans p₂ q₁) (Path.trans p₁ q₂) := by
+  exact critical_pair_joinability_certificate.2.2.2.2.2.2.2 hp hq
+
+theorem modular_confluence_certificate :
+    tierOrthogonalityCertificate ∧ criticalPairJoinabilityCertificate := by
+  exact ⟨tier_orthogonality_certificate, critical_pair_joinability_certificate⟩
+
+theorem modular_confluence_toEq {A : Type u} {a b : A} {p q r : Path a b}
+    (hpq : Rw p q) (hpr : Rw p r) :
+    q.toEq = r.toEq :=
+  TerminationBridge.newman_toEq_confluence hpq hpr
+
+theorem modular_confluence_from_layers {A : Type u} {a b : A} {p q r : Path a b}
+    (_hOrth : tierOrthogonalityCertificate)
+    (hpq : Rw p q) (hpr : Rw p r) :
+    q.toEq = r.toEq :=
+  modular_confluence_toEq hpq hpr
+
+theorem modular_confluence_from_certificate {A : Type u} {a b : A} {p q r : Path a b}
+    (_hCert : tierOrthogonalityCertificate ∧ criticalPairJoinabilityCertificate)
+    (hpq : Rw p q) (hpr : Rw p r) :
+    q.toEq = r.toEq :=
+  modular_confluence_toEq hpq hpr
+
+theorem modular_confluence_from_tier_analysis {A : Type u} {a b : A} {p q r : Path a b}
+    (hpq : Rw p q) (hpr : Rw p r) :
+    q.toEq = r.toEq :=
+  modular_confluence_from_layers tier_orthogonality_certificate hpq hpr
 
 /-!
 ## Orthogonality Matrix

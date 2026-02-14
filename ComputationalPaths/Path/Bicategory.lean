@@ -35,7 +35,7 @@ variable {α : Sort u} {x y z : α}
 
 /-- Turn an equality into a computational-path witness. -/
 @[simp] def ofEq (h : x = y) : CellPath x y :=
-  Path.stepChain (h ▸ rfl)
+  Path.stepChain (_root_.congrArg PLift.up h)
 
 /-- Vertical composition of higher cells. -/
 @[simp] def comp (η : CellPath x y) (θ : CellPath y z) : CellPath x z :=
@@ -72,7 +72,7 @@ namespace ThreeCell
     {η θ : TwoCell (A := A) (a := a) (b := b) p q}
     (h : η = θ) :
     ThreeCell (A := A) (a := a) (b := b) η θ :=
-  CellPath.ofEq h
+  Path.stepChain (_root_.congrArg PLift.up h)
 
 end ThreeCell
 
@@ -88,17 +88,77 @@ end ThreeCell
     TwoCell (A := A) (a := a) (b := b) p r :=
   RwEq.trans η θ
 
+/-- Vertical composition can be iterated associatively using `RwEq.trans`. -/
+@[simp] theorem vcomp_assoc {p q r s : Path a b}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) p q)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) q r)
+    (η₃ : TwoCell (A := A) (a := a) (b := b) r s) :
+    TwoCell (A := A) (a := a) (b := b) p s := by
+  exact rweq_trans η₁ (rweq_trans η₂ η₃)
+
+/-- Vertical composition is associative as an equality of 2-cells. -/
+@[simp] theorem vcomp_assoc_eq {p q r s : Path a b}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) p q)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) q r)
+    (η₃ : TwoCell (A := A) (a := a) (b := b) r s) :
+    comp (comp η₁ η₂) η₃ = comp η₁ (comp η₂ η₃) := by
+  apply Subsingleton.elim
+
+/-- Left identity law for vertical composition. -/
+@[simp] theorem vcomp_id_left_eq {p q : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q) :
+    comp (id (A := A) (a := a) (b := b) p) η = η := by
+  apply Subsingleton.elim
+
+/-- Right identity law for vertical composition. -/
+@[simp] theorem vcomp_id_right_eq {p q : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q) :
+    comp η (id (A := A) (a := a) (b := b) q) = η := by
+  apply Subsingleton.elim
+
+/-- Vertical composition is functorial in the hom-category sense. -/
+@[simp] theorem vertical_functoriality {p q r s : Path a b}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) p q)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) q r)
+    (η₃ : TwoCell (A := A) (a := a) (b := b) r s) :
+    comp (comp η₁ η₂) η₃ = comp η₁ (comp η₂ η₃) :=
+  vcomp_assoc_eq (A := A) (a := a) (b := b) η₁ η₂ η₃
+
 /-- Left whiskering: precompose a 2-cell with a fixed 1-cell. -/
 @[simp] def whiskerLeft (f : Path a b) {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f h) :=
   rweq_trans_congr_right f η
 
+/-- Left whiskering distributes over vertical composition. -/
+@[simp] theorem whiskerLeft_comp (f : Path a b) {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (η₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f g₀) (Path.trans f g₂) := by
+  exact rweq_trans (rweq_trans_congr_right f η₁) (rweq_trans_congr_right f η₂)
+
 /-- Right whiskering: postcompose a 2-cell with a fixed 1-cell. -/
 @[simp] def whiskerRight {f g : Path a b} (h : Path b c)
     (η : TwoCell (A := A) (a := a) (b := b) f g) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f h) (Path.trans g h) :=
   rweq_trans_congr_left h η
+
+/-- Right whiskering distributes over vertical composition. -/
+@[simp] theorem whiskerRight_comp {f₀ f₁ f₂ : Path a b} (h : Path b c)
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f₀ h) (Path.trans f₂ h) := by
+  exact rweq_trans (rweq_trans_congr_left h η₁) (rweq_trans_congr_left h η₂)
+
+/-- Whiskering preserves identity 2-cells on the left. -/
+@[simp] theorem id2_whiskerLeft (f : Path a b) (g : Path b c) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f g) := by
+  exact rweq_trans_congr_right f (RwEq.refl g)
+
+/-- Whiskering preserves identity 2-cells on the right. -/
+@[simp] theorem id2_whiskerRight (f : Path a b) (g : Path b c) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f g) := by
+  exact rweq_trans_congr_left g (RwEq.refl f)
 
 /-- Horizontal composition of 2-cells.  This is the operation denoted
 `∘ₕ` (or `circ_h`) in many texts and is defined by first whiskering on the
@@ -112,6 +172,55 @@ right, then whiskering on the left. -/
     (whiskerRight (A := A) (a := a) (b := b) (c := c) (h := h) η)
     (whiskerLeft  (A := A) (a := a) (b := b) (c := c) (f := g) θ)
 
+/-- Naturality of horizontal composition with respect to vertical
+composition on both sides. -/
+@[simp] theorem hcomp_vcomp_naturality
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f₀ g₀) (Path.trans f₂ g₂) := by
+  apply rweq_trans
+  · exact rweq_trans_congr_left (q := g₀) (rweq_trans η₁ η₂)
+  · exact rweq_trans_congr_right f₂ (rweq_trans θ₁ θ₂)
+
+/-- Horizontal composition preserves identity 2-cells in both arguments. -/
+@[simp] theorem hcomp_id_eq (f : Path a b) (g : Path b c) :
+    hcomp (A := A) (a := a) (b := b) (c := c)
+      (id (A := A) (a := a) (b := b) f)
+      (id (A := A) (a := b) (b := c) g) =
+    id (A := A) (a := a) (b := c) (Path.trans f g) := by
+  apply Subsingleton.elim
+
+/-- Horizontal composition is functorial in the left variable. -/
+@[simp] theorem hcomp_functorial_left_eq
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ : TwoCell (A := A) (a := b) (b := c) g₀ g₁) :
+    comp
+      (hcomp (A := A) (a := a) (b := b) (c := c) η₁ θ)
+      (hcomp (A := A) (a := a) (b := b) (c := c)
+        η₂ (id (A := A) (a := b) (b := c) g₁)) =
+    hcomp (A := A) (a := a) (b := b) (c := c)
+      (comp (A := A) (a := a) (b := b) η₁ η₂) θ := by
+  apply Subsingleton.elim
+
+/-- Horizontal composition is functorial in the right variable. -/
+@[simp] theorem hcomp_functorial_right_eq
+    {f₀ f₁ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    comp
+      (hcomp (A := A) (a := a) (b := b) (c := c) η θ₁)
+      (hcomp (A := A) (a := a) (b := b) (c := c)
+        (id (A := A) (a := a) (b := b) f₁) θ₂) =
+    hcomp (A := A) (a := a) (b := b) (c := c)
+      η (comp (A := A) (a := b) (b := c) θ₁ θ₂) := by
+  apply Subsingleton.elim
+
 /-- Associator 2-cell witnessing `((hg)f) ⇒ (h(gf))`. -/
 @[simp] def assoc (p : Path a b) (q : Path b c) (r : Path c d) :
     TwoCell (A := A) (a := a) (b := d)
@@ -119,6 +228,21 @@ right, then whiskering on the left. -/
       (Path.trans p (Path.trans q r)) :=
   rweq_of_step (Step.trans_assoc (A := A)
     (a := a) (b := b) (c := c) (d := d) p q r)
+
+/-- Naturality of the associator under 2-cells in each argument. -/
+@[simp] theorem assoc_naturality
+    {p p' : Path a b} {q q' : Path b c} {r r' : Path c d}
+    (η : TwoCell (A := A) (a := a) (b := b) p p')
+    (θ : TwoCell (A := A) (a := b) (b := c) q q')
+    (ι : TwoCell (A := A) (a := c) (b := d) r r') :
+    TwoCell (A := A) (a := a) (b := d)
+      (Path.trans (Path.trans p q) r)
+      (Path.trans p' (Path.trans q' r')) := by
+  apply rweq_trans
+  · exact rweq_trans_congr_left (q := r) (rweq_trans_congr η θ)
+  apply rweq_trans
+  · exact rweq_trans_congr_right (Path.trans p' q') ι
+  · exact assoc (A := A) (a := a) (b := b) (c := c) (d := d) p' q' r'
 
 /-- Left unitor 2-cell witnessing `(1 ∘ f) ⇒ f`. -/
 @[simp] def leftUnitor (p : Path a b) :
@@ -131,6 +255,18 @@ right, then whiskering on the left. -/
     TwoCell (A := A) (a := a) (b := b)
       (Path.trans p (Path.refl b)) p :=
   rweq_of_step (Step.trans_refl_right (A := A) (a := a) (b := b) p)
+
+/-- Naturality of unitors along a 2-cell. -/
+@[simp] theorem unitor_naturality {p q : Path a b}
+    (η : TwoCell (A := A) (a := a) (b := b) p q) :
+    TwoCell (A := A) (a := a) (b := b)
+      (Path.trans (Path.refl a) p)
+      (Path.trans q (Path.refl b)) := by
+  apply rweq_trans
+  · exact rweq_of_step (Step.trans_refl_left (A := A) (a := a) (b := b) p)
+  apply rweq_trans
+  · exact η
+  · exact rweq_symm (rweq_of_step (Step.trans_refl_right (A := A) (a := a) (b := b) q))
 
 /-- Horizontal composition exchanges with vertical composition (the
 interchange law).  The statement produces the canonical 2-cell that
@@ -215,6 +351,15 @@ associator 2-cells and whiskering. -/
     (assoc (A := A) (a := a) (b := b) (c := c) (d := e)
       p q (Path.trans r s))
 
+/-- The two pentagon routes are equal as proofs of the same 2-cell statement. -/
+@[simp] theorem pentagon_left_route_eq_right_route
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c)
+    (r : Path c d) (s : Path d e) :
+    pentagonLeftRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s =
+      pentagonRightRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s := by
+  apply Subsingleton.elim
+
 /-- Left route of Mac Lane's triangle. -/
 @[simp] def triangleLeftRoute
     {a b c : A} (p : Path a b) (q : Path b c) :
@@ -236,6 +381,54 @@ associator 2-cells and whiskering. -/
   whiskerRight (A := A) (a := a) (b := b) (c := c)
     (h := q) (rightUnitor (A := A) (a := a) (b := b) p)
 
+/-- The two triangle routes are equal as proofs of the same 2-cell statement. -/
+@[simp] theorem triangle_left_route_eq_right_route
+    {a b c : A} (p : Path a b) (q : Path b c) :
+    triangleLeftRoute (A := A) (a := a) (b := b) (c := c) p q =
+      triangleRightRoute (A := A) (a := a) (b := b) (c := c) p q := by
+  apply Subsingleton.elim
+
+/-- Interchange law: vertical composition of horizontal composites agrees with
+horizontal composition of vertical composites. -/
+@[simp] theorem interchange_law
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    comp
+        (hcomp (A := A) (a := a) (b := b) (c := c) η₁ θ₁)
+        (hcomp (A := A) (a := a) (b := b) (c := c) η₂ θ₂) =
+      hcomp (A := A) (a := a) (b := b) (c := c)
+        (comp (A := A) (a := a) (b := b) η₁ η₂)
+        (comp (A := A) (a := b) (b := c) θ₁ θ₂) := by
+  apply Subsingleton.elim
+
+/-- Explicit pentagon coherence as a canonical 2-cell. -/
+@[simp] theorem pentagon_coherence_two_cell
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c)
+    (r : Path c d) (s : Path d e) :
+    TwoCell (A := A) (a := a) (b := e)
+      (Path.trans (Path.trans (Path.trans p q) r) s)
+      (Path.trans p (Path.trans q (Path.trans r s))) :=
+  pentagon (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s
+
+/-- Horizontal composition is functorial with respect to vertical composition. -/
+@[simp] theorem horizontal_functoriality
+    {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
+    (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
+    (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
+    (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
+    (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
+    comp
+        (hcomp (A := A) (a := a) (b := b) (c := c) η₁ θ₁)
+        (hcomp (A := A) (a := a) (b := b) (c := c) η₂ θ₂) =
+      hcomp (A := A) (a := a) (b := b) (c := c)
+        (comp (A := A) (a := a) (b := b) η₁ η₂)
+        (comp (A := A) (a := b) (b := c) θ₁ θ₂) :=
+  interchange_law (A := A) (a := a) (b := b) (c := c) η₁ η₂ θ₁ θ₂
+
 /-- Pentagon coherence promoted to a computational-path 3-cell. -/
 @[simp] def pentagonCoherence
     {a b c d e : A}
@@ -244,7 +437,9 @@ associator 2-cells and whiskering. -/
     ThreeCell (A := A) (a := a) (b := e)
       (pentagonLeftRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s)
       (pentagonRightRoute (A := A) (a := a) (b := b) (c := c) (d := d) (e := e) p q r s) := by
-  exact ThreeCell.ofEq (by apply Subsingleton.elim)
+  exact ThreeCell.ofEq
+    (pentagon_left_route_eq_right_route (A := A)
+      (a := a) (b := b) (c := c) (d := d) (e := e) p q r s)
 
 /-- Triangle coherence promoted to a computational-path 3-cell. -/
 @[simp] def triangleCoherence
@@ -252,7 +447,9 @@ associator 2-cells and whiskering. -/
     ThreeCell (A := A) (a := a) (b := c)
       (triangleLeftRoute (A := A) (a := a) (b := b) (c := c) p q)
       (triangleRightRoute (A := A) (a := a) (b := b) (c := c) p q) := by
-  exact ThreeCell.ofEq (by apply Subsingleton.elim)
+  exact ThreeCell.ofEq
+    (triangle_left_route_eq_right_route (A := A)
+      (a := a) (b := b) (c := c) p q)
 
 /-- The two standard ways of composing four 2-cells coincide.  Since
 `TwoCell` values live in `Prop`, the equality follows from proof
@@ -286,9 +483,7 @@ composite of vertical composites. -/
           (p := f₀) (q := f₁) (r := f₂) η₁ η₂)
         (comp (A := A) (a := b) (b := c)
           (p := g₀) (q := g₁) (r := g₂) θ₁ θ₂) := by
-  exact
-    (interchange_eq_interchange' (A := A) (a := a) (b := b) (c := c)
-      (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂))
+  exact interchange_law (A := A) (a := a) (b := b) (c := c) η₁ η₂ θ₁ θ₂
 
 end TwoCell
 

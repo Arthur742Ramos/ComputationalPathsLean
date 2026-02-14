@@ -645,6 +645,137 @@ def compPathOmegaGroupoid (A : Type u) : WeakOmegaGroupoid A where
   pentagon := pentagonCoherence
   triangle := triangleCoherence
 
+/-! ## Additional Derived Theorems -/
+
+section DerivedTheorems
+
+variable {a b c d e : A}
+
+/-! ### Functoriality of the Cell Tower -/
+
+@[simp] theorem cell_tower_functor_refl (p : Path a b) :
+    Derivation₂.toRwEq (.refl p) = RwEq.refl p := rfl
+
+@[simp] theorem cell_tower_functor_inv {p q : Path a b} (d : Derivation₂ p q) :
+    Derivation₂.toRwEq (.inv d) = RwEq.symm (Derivation₂.toRwEq d) := rfl
+
+@[simp] theorem cell_tower_functor_vcomp {p q r : Path a b}
+    (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) :
+    Derivation₂.toRwEq (.vcomp d₁ d₂) =
+      RwEq.trans (Derivation₂.toRwEq d₁) (Derivation₂.toRwEq d₂) := rfl
+
+theorem cell_tower_functor_whiskerLeft (f : Path a b) {p q : Path b c}
+    (α : Derivation₂ p q) :
+    Derivation₂.toRwEq (whiskerLeft f α) =
+      rweq_trans_congr_right f (Derivation₂.toRwEq α) := by
+  induction α with
+  | refl p => simp
+  | step s => simp
+  | inv α ih => simp
+  | vcomp α β ihα ihβ => simp
+
+theorem cell_tower_functor_whiskerRight {p q : Path a b}
+    (α : Derivation₂ p q) (g : Path b c) :
+    Derivation₂.toRwEq (whiskerRight α g) =
+      rweq_trans_congr_left g (Derivation₂.toRwEq α) := by
+  induction α with
+  | refl p => simp
+  | step s => simp
+  | inv α ih => simp
+  | vcomp α β ihα ihβ => simp
+
+theorem cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
+    (α : Derivation₂ p p') (β : Derivation₂ q q') :
+    Derivation₂.toRwEq (hcomp α β) =
+      RwEq.trans
+        (rweq_trans_congr_left q (Derivation₂.toRwEq α))
+        (rweq_trans_congr_right p' (Derivation₂.toRwEq β)) := by
+  simp
+
+/-! ### Truncation Preserves Coherence -/
+
+def trunc₃ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (m : Derivation₃ d₁ d₂) : d₁.toRwEq = d₂.toRwEq :=
+  Derivation₃.toRwEqEq m
+
+def trunc₄ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    {m₁ m₂ : Derivation₃ d₁ d₂}
+    (c : Derivation₄ m₁ m₂) :
+    Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
+      Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂ :=
+  Derivation₄.toRwEqEq c
+
+theorem trunc₃_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (m₁ m₂ : Derivation₃ d₁ d₂) :
+    trunc₃ m₁ = trunc₃ m₂ :=
+  Subsingleton.elim _ _
+
+theorem trunc₄_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    {m₁ m₂ : Derivation₃ d₁ d₂}
+    (c₁ c₂ : Derivation₄ m₁ m₂) :
+    trunc₄ c₁ = trunc₄ c₂ :=
+  Subsingleton.elim _ _
+
+theorem truncation_preserves_pentagon
+    (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
+    trunc₃ (pentagonCoherence f g h k) =
+      trunc₃ (contractibility₃ (pentagonLeft f g h k) (pentagonRight f g h k)) :=
+  trunc₃_preserves_coherence
+    (m₁ := pentagonCoherence f g h k)
+    (m₂ := contractibility₃ (pentagonLeft f g h k) (pentagonRight f g h k))
+
+theorem truncation_preserves_triangle
+    (f : Path a b) (g : Path b c) :
+    trunc₃ (triangleCoherence f g) =
+      trunc₃ (contractibility₃ (triangleLeft f g) (triangleRight f g)) :=
+  trunc₃_preserves_coherence
+    (m₁ := triangleCoherence f g)
+    (m₂ := contractibility₃ (triangleLeft f g) (triangleRight f g))
+
+/-! ### Constructive Batanin Contractibility -/
+
+theorem batanin_contractible₃_constructive {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) :
+    Nonempty (Derivation₃ d₁ d₂) :=
+  ⟨contractibility₃ d₁ d₂⟩
+
+theorem batanin_contractible₄_constructive {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (m₁ m₂ : Derivation₃ d₁ d₂) :
+    Nonempty (Derivation₄ m₁ m₂) :=
+  ⟨contractibility₄ m₁ m₂⟩
+
+theorem batanin_contractible_high_constructive {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} {m₁ m₂ : Derivation₃ d₁ d₂}
+    (n : Nat) (c₁ c₂ : Derivation₄ m₁ m₂) :
+    Nonempty (DerivationHigh n c₁ c₂) :=
+  ⟨contractibilityHigh n c₁ c₂⟩
+
+/-! ### Exchange Laws -/
+
+theorem exchange_law {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty (Derivation₃ (hcomp α β)
+      (.vcomp (whiskerLeft f β) (whiskerRight α g'))) :=
+  ⟨.step (.interchange α β)⟩
+
+theorem exchange_law_symm {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty (Derivation₃ (.vcomp (whiskerLeft f β) (whiskerRight α g')) (hcomp α β)) := by
+  rcases exchange_law α β with ⟨h⟩
+  exact ⟨.inv h⟩
+
+theorem exchange_law_coherence {f f' : Path a b} {g g' : Path b c}
+    (α : Derivation₂ f f') (β : Derivation₂ g g') :
+    Nonempty (Sigma (fun ex : Derivation₃ (hcomp α β)
+      (.vcomp (whiskerLeft f β) (whiskerRight α g')) =>
+        Derivation₄ ex
+          (contractibility₃ (hcomp α β)
+            (.vcomp (whiskerLeft f β) (whiskerRight α g'))))) := by
+  refine ⟨⟨.step (.interchange α β), ?_⟩⟩
+  exact contractibility₄ _ _
+
+end DerivedTheorems
+
 /-! ## Summary
 
 This module establishes the **complete** weak ω-groupoid structure:

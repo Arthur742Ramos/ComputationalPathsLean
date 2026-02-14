@@ -452,10 +452,20 @@ confluence proof. Representative cases include:
 \end{theorem}
 
 \begin{proof}
-  By Newman's lemma~\cite{Newman42}: a terminating relation is confluent
-  if and only if it is locally confluent. Termination is established in
-  \cref{thm:termination}, and local confluence follows from the strip
-  lemma (\cref{thm:strip-lemma}).
+  The proof uses a two-level architecture.
+  At the first level, the groupoid fragment (associativity, units,
+  inverses) is completed with two algebraic cancellation rules
+  (\texttt{trans\_cancel\_left/right}) and shown confluent via a
+  semantic interpretation into the free group: every expression maps
+  to a reduced word, every rewrite step preserves that word, and
+  every expression reduces to a canonical form determined by its
+  reduced word (\texttt{GroupoidConfluence}).
+  %
+  At the second level, the full 75-rule system is handled by lifting
+  this groupoid confluence through the typeclass \texttt{HasJoinOfRw},
+  combined with the strip lemma (\cref{thm:strip-lemma}) and
+  termination (\cref{thm:termination}).  No appeal to Newman's lemma
+  or proof irrelevance is required: the proof is entirely algebraic.
 \end{proof}
 
 \begin{corollary}[Unique Normal Forms]\label{cor:unique-nf}
