@@ -26,7 +26,7 @@ def DAGMorphism.comp {X Y Z : DAGSpace.{u}}
 
 /-- Derived sheaves on a derived space. -/
 structure DerivedSheaf (X : DAGSpace.{u}) where
-  section : X.carrier → Type u
+  sec : X.carrier → Type u
 
 /-- Cycle classes with integral weight. -/
 structure CycleClass (X : DAGSpace.{u}) where
@@ -43,7 +43,7 @@ def cycleNeg {X : DAGSpace.{u}} (α : CycleClass X) : CycleClass X :=
 /-- Tensor product of derived sheaves (model). -/
 def derivedTensorProduct {X : DAGSpace.{u}}
     (F G : DerivedSheaf X) : DerivedSheaf X :=
-  ⟨fun x => F.section x × G.section x⟩
+  ⟨fun x => F.sec x × G.sec x⟩
 
 /-- Tensor unit sheaf. -/
 def derivedTensorUnit (X : DAGSpace.{u}) : DerivedSheaf X :=
