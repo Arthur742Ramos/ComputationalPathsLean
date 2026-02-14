@@ -115,7 +115,7 @@ theorem base_change_double_rweq (n : Nat) (x : L.degree n) :
   sorry
 
 theorem obstruction_class_exists (n : Nat) :
-    ∃ obs : L.degree n, Path obs obs := by
+    ∃ obs : L.degree n, Nonempty (Path obs obs) := by
   sorry
 
 theorem obstruction_cycle_rweq (n : Nat) (obs : L.degree n) :
@@ -123,7 +123,7 @@ theorem obstruction_cycle_rweq (n : Nat) (obs : L.degree n) :
   sorry
 
 theorem obstruction_lift_exists (n : Nat) (x : L.degree n) :
-    ∃ y : L.degree (n + 1), Path y y := by
+    ∃ y : L.degree (n + 1), Nonempty (Path y y) := by
   sorry
 
 theorem obstruction_base_change_path (n : Nat) (x : L.degree n) :
