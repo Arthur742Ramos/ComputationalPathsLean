@@ -801,5 +801,63 @@ def master_orthogonality_self_path :
     Path (OrthogonalityData.selfOrthogonality 6 (by omega) 0).innerProduct 1 :=
   multi_step_path (by simp [OrthogonalityData.selfOrthogonality])
 
+/-! ## Core Theorems -/
+
+theorem maschke_semisimplicity (md : MaschkeData) :
+    md.semisimplicityObstruction = 0 := by
+  sorry
+
+theorem maschke_simples_eq_conjugacy_classes (md : MaschkeData) :
+    md.numSimples = md.numConjClasses := by
+  sorry
+
+theorem schur_hom_dimension_formula (sld : SchurLemmaData) :
+    sld.homDim = if sld.areIsomorphic then 1 else 0 := by
+  sorry
+
+theorem schur_iso_case_hom_one (sld : SchurLemmaData) (h : sld.areIsomorphic = true) :
+    sld.homDim = 1 := by
+  sorry
+
+theorem schur_noniso_case_hom_zero (sld : SchurLemmaData) (h : sld.areIsomorphic = false) :
+    sld.homDim = 0 := by
+  sorry
+
+theorem character_identity_value (cd : CharacterData) :
+    cd.charAtIdentity = cd.repDim := by
+  sorry
+
+theorem irreducible_character_norm_one (cd : CharacterData) (h : cd.isIrreducible = true) :
+    cd.innerProductSelf = 1 := by
+  sorry
+
+theorem character_orthogonality_relation (od : OrthogonalityData) :
+    od.innerProduct = if od.sameChar then 1 else 0 := by
+  sorry
+
+theorem orthogonality_self_inner_one (n i : Nat) (hn : n > 0) :
+    (OrthogonalityData.selfOrthogonality n hn i).innerProduct = 1 := by
+  sorry
+
+theorem induction_dimension_formula (ird : InductionRestrictionData) :
+    ird.indDim = ird.index * ird.repDimH := by
+  sorry
+
+theorem frobenius_reciprocity_identity (frd : FrobeniusReciprocityData) :
+    frd.ipG = frd.ipH := by
+  sorry
+
+theorem burnside_dimension_sum_formula (bd : BurnsideData) :
+    bd.groupOrder = bd.sumDimSquared := by
+  sorry
+
+theorem tensor_product_dimension_formula (tpd : TensorProductRepData) :
+    tpd.tensorDim = tpd.dimV * tpd.dimW := by
+  sorry
+
+theorem artin_induction_obstruction_vanishes (aid : ArtinInductionData) :
+    aid.artinObstruction = 0 := by
+  sorry
+
 end RepresentationTheory
 end ComputationalPaths

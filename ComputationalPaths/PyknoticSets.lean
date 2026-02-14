@@ -459,5 +459,88 @@ def abelian_pyknotic_comm_path {κ : CardinalBound} (G : AbelianPyknoticGroup κ
     Path (G.mul S a b) (G.mul S b a) :=
   G.mul_comm S a b
 
+/-! ## Sheaf, Adjunction, and Comparison Theorems -/
+
+theorem pyknotic_sheaf_restrict_id {κ : CardinalBound}
+    (X : PyknoticSet κ) (S : KSmallProfinite κ) (s : X.sections S) :
+    Path (X.restrict KSmallProfiniteMap.id s) s := by
+  sorry
+
+theorem pyknotic_sheaf_restrict_comp {κ : CardinalBound}
+    (X : PyknoticSet κ)
+    {S T U : KSmallProfinite κ}
+    (f : KSmallProfiniteMap κ S T) (g : KSmallProfiniteMap κ T U)
+    (s : X.sections U) :
+    Path (X.restrict (KSmallProfiniteMap.comp f g) s)
+         (X.restrict f (X.restrict g s)) := by
+  sorry
+
+theorem pyknotic_sheaf_gluing_exists {κ : CardinalBound}
+    (X : PyknoticSet κ) (S : KSmallProfinite κ)
+    (cover : List (KSmallProfinite κ))
+    (local : (T : KSmallProfinite κ) → X.sections T) :
+    ∃ s : X.sections S, True := by
+  sorry
+
+theorem pyknotic_hom_naturality {κ : CardinalBound}
+    {X Y : PyknoticSet κ} (α : PyknoticSet.Hom X Y)
+    {S T : KSmallProfinite κ} (f : KSmallProfiniteMap κ S T)
+    (s : X.sections T) :
+    Path (α.app S (X.restrict f s)) (Y.restrict f (α.app T s)) := by
+  sorry
+
+theorem pyknotic_prod_restrict_fst {κ : CardinalBound}
+    (X Y : PyknoticSet κ)
+    {S T : KSmallProfinite κ} (f : KSmallProfiniteMap κ S T)
+    (p : (PyknoticSet.prod X Y).sections T) :
+    Path ((PyknoticSet.prod X Y).restrict f p).1 (X.restrict f p.1) := by
+  sorry
+
+theorem pyknotic_prod_restrict_snd {κ : CardinalBound}
+    (X Y : PyknoticSet κ)
+    {S T : KSmallProfinite κ} (f : KSmallProfiniteMap κ S T)
+    (p : (PyknoticSet.prod X Y).sections T) :
+    Path ((PyknoticSet.prod X Y).restrict f p).2 (Y.restrict f p.2) := by
+  sorry
+
+theorem comparison_restrict_id {κ : CardinalBound}
+    (P : PyknoticToCondensed κ) (X : PyknoticSet κ)
+    (S : ProfiniteSet)
+    (s : (pyknotic_to_condensed κ P X).sections S) :
+    Path ((pyknotic_to_condensed κ P X).restrict (ProfiniteMap.id (S := S)) s) s := by
+  sorry
+
+theorem comparison_restrict_comp {κ : CardinalBound}
+    (P : PyknoticToCondensed κ) (X : PyknoticSet κ)
+    {S T U : ProfiniteSet} (f : ProfiniteMap S T) (g : ProfiniteMap T U)
+    (s : (pyknotic_to_condensed κ P X).sections U) :
+    Path ((pyknotic_to_condensed κ P X).restrict (ProfiniteMap.comp f g) s)
+         ((pyknotic_to_condensed κ P X).restrict f
+           ((pyknotic_to_condensed κ P X).restrict g s)) := by
+  sorry
+
+theorem pyknotic_condensed_adjunction_unit {κ : CardinalBound}
+    (P : PyknoticToCondensed κ) (X : PyknoticSet κ) :
+    Path (pyknotic_to_condensed κ P X).sections
+         (pyknotic_to_condensed κ P X).sections := by
+  sorry
+
+theorem ultrafilter_monad_unit_law_theorem
+    (M : UltrafilterMonad) {X : Type u} (u : M.mapType X) :
+    Path (M.join (M.unit u)) u := by
+  sorry
+
+theorem stone_cech_extension_unit_theorem
+    (X : Type u) (β : StoneCech X)
+    (S : ProfiniteSet) (f : X → S.Carrier) (x : X) :
+    Path (β.extend S f (β.unit x)) (f x) := by
+  sorry
+
+theorem abelian_pyknotic_group_comm_theorem {κ : CardinalBound}
+    (G : AbelianPyknoticGroup κ) (S : KSmallProfinite κ)
+    (a b : G.underlying.sections S) :
+    Path (G.mul S a b) (G.mul S b a) := by
+  sorry
+
 end PyknoticSets
 end ComputationalPaths

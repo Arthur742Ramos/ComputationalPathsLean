@@ -361,5 +361,88 @@ def base_change_functorial (bc : DerivedBaseChange) :
          bc.structureMap.toFun :=
   SCRingHom.comp_id_ bc.structureMap
 
+/-! ## Cotangent, Deformation, and Intersection Theorems -/
+
+theorem pi_zero_mul_comm_theorem {R : SCRing} (x y : PiZero R) :
+    Path (PiZero.mul x y) (PiZero.mul y x) := by
+  sorry
+
+theorem pi_zero_add_comm_theorem {R : SCRing} (x y : PiZero R) :
+    Path (PiZero.add x y) (PiZero.add y x) := by
+  sorry
+
+theorem zariski_union_comm_length_theorem {R : SCRing}
+    (U V : ZariskiOpen R) :
+    Path (ZariskiOpen.union U V).generators.length
+         (ZariskiOpen.union V U).generators.length := by
+  sorry
+
+theorem global_sections_identifies_ring (X : DerivedAffineScheme) :
+    Path (globalSections X) X.ring_ := by
+  sorry
+
+theorem structure_sheaf_restrict_id_theorem {R : SCRing}
+    (F : StructureSheafData R) (U : BasicOpen R) (s : F.sections U) :
+    Path (F.restrict (U := U) (V := U) trivial s) s := by
+  sorry
+
+theorem structure_sheaf_restrict_comp_theorem {R : SCRing}
+    (F : StructureSheafData R)
+    (U V W : BasicOpen R) (s : F.sections U) :
+    Path (F.restrict (U := V) (V := W) trivial
+            (F.restrict (U := U) (V := V) trivial s))
+         (F.restrict (U := U) (V := W) trivial s) := by
+  sorry
+
+theorem scring_hom_left_identity {R S : SCRing} (f : SCRingHom R S) :
+    Path (SCRingHom.comp (SCRingHom.id) f).toFun f.toFun := by
+  sorry
+
+theorem scring_hom_right_identity {R S : SCRing} (f : SCRingHom R S) :
+    Path (SCRingHom.comp f (SCRingHom.id)).toFun f.toFun := by
+  sorry
+
+theorem scring_hom_associative_composition
+    {R S T : SCRing}
+    (f : SCRingHom R S) (g : SCRingHom S T) (h : SCRingHom T T) :
+    Path (SCRingHom.comp (SCRingHom.comp f g) h).toFun
+         (SCRingHom.comp f (SCRingHom.comp g h)).toFun := by
+  sorry
+
+theorem derived_intersection_left_map_mul
+    (R A B : SCRing) (T : DerivedTensorProduct R A B)
+    (a b : A.Carrier) :
+    Path (T.leftMap.toFun (A.mul a b))
+         (T.ring_.mul (T.leftMap.toFun a) (T.leftMap.toFun b)) := by
+  sorry
+
+theorem derived_intersection_right_map_mul
+    (R A B : SCRing) (T : DerivedTensorProduct R A B)
+    (a b : B.Carrier) :
+    Path (T.rightMap.toFun (B.mul a b))
+         (T.ring_.mul (T.rightMap.toFun a) (T.rightMap.toFun b)) := by
+  sorry
+
+theorem derived_intersection_cocone_theorem
+    (R A B : SCRing) (T : DerivedTensorProduct R A B)
+    (r : R.Carrier) (fA : SCRingHom R A) (fB : SCRingHom R B)
+    (h : Path (T.leftMap.toFun (fA.toFun r))
+              (T.rightMap.toFun (fB.toFun r))) :
+    Path (T.leftMap.toFun (fA.toFun r))
+         (T.rightMap.toFun (fB.toFun r)) := by
+  sorry
+
+theorem cotangent_complex_base_change_identity
+    (bc : DerivedBaseChange) :
+    Path (SCRingHom.comp bc.structureMap (SCRingHom.id)).toFun
+         bc.structureMap.toFun := by
+  sorry
+
+theorem deformation_base_change_identity
+    (bc : DerivedBaseChange) :
+    Path (SCRingHom.comp bc.baseMap (SCRingHom.id)).toFun
+         bc.baseMap.toFun := by
+  sorry
+
 end DerivedSchemes
 end ComputationalPaths

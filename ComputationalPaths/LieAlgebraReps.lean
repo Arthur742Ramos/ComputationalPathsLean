@@ -810,5 +810,63 @@ def master_weyl_a3_order_path :
     Path WeylGroupData.a3.weylOrder 24 :=
   multi_step_path (by simp [WeylGroupData.a3])
 
+/-! ## Core Theorems -/
+
+theorem lie_dimension_root_decomposition (lrd : LieAlgRepData) :
+    lrd.lieDim = lrd.rank + 2 * lrd.numPosRoots := by
+  sorry
+
+theorem weight_space_dimension_bound (lrd : LieAlgRepData) :
+    lrd.numWeightSpaces ≤ lrd.repDim := by
+  sorry
+
+theorem highest_weight_label_count (hwd : HighestWeightData) :
+    hwd.dynkinLabels.length = hwd.rank := by
+  sorry
+
+theorem highest_weight_trivial_has_dimension_one (hwd : HighestWeightData)
+    (h : hwd.isTrivial = true) : hwd.moduleDim = 1 := by
+  sorry
+
+theorem highest_weight_trivial_labels_vanish (hwd : HighestWeightData)
+    (h : hwd.isTrivial = true) : hwd.dynkinLabels.all (· == 0) = true := by
+  sorry
+
+theorem verma_simple_iff_zero_submodule (vmd : VermaModuleData) :
+    vmd.isSimple = true ↔ vmd.maxSubmoduleDimLabel = 0 := by
+  sorry
+
+theorem bgg_resolution_length_formula (bgg : BGGResolutionData) :
+    bgg.resolutionLength = bgg.longestElementLength := by
+  sorry
+
+theorem bgg_total_verma_equals_weyl_order (bgg : BGGResolutionData) :
+    bgg.totalVermaModules = bgg.weylGroupOrder := by
+  sorry
+
+theorem weyl_dimension_formula_identity (wcd : WeylCharacterData) :
+    wcd.moduleDim * wcd.denominator = wcd.numerator := by
+  sorry
+
+theorem weyl_denominator_positive (wcd : WeylCharacterData) :
+    wcd.denominator > 0 := by
+  sorry
+
+theorem categoryO_simples_equal_weyl_order (cod : CategoryOData) :
+    cod.numSimplesInBlock = cod.weylGroupOrder := by
+  sorry
+
+theorem root_system_total_roots_formula (rsd : RootSystemData) :
+    rsd.totalRoots = 2 * rsd.numPosRoots := by
+  sorry
+
+theorem root_system_lie_dimension_formula (rsd : RootSystemData) :
+    rsd.lieDim = rsd.rank + rsd.totalRoots := by
+  sorry
+
+theorem kazhdan_lusztig_diagonal_multiplicity_one (kld : KazhdanLusztigData)
+    (h : kld.diagonal = true) : kld.multiplicity = 1 := by
+  sorry
+
 end LieAlgebraReps
 end ComputationalPaths

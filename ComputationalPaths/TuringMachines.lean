@@ -713,5 +713,65 @@ def master_multitape_quadratic_path :
     Path MultiTapeData.twoTape.isQuadratic true :=
   MultiTapeData.twoTape.quadratic_path
 
+/-! ## Core Theorems -/
+
+theorem halting_problem_undecidable :
+    HaltingData.standard.isDecidable = false := by
+  sorry
+
+theorem halting_problem_recognizable :
+    HaltingData.standard.isRecognizable = true := by
+  sorry
+
+theorem cohalting_not_recognizable :
+    HaltingData.standard.coRecognizable = false := by
+  sorry
+
+theorem halting_diagonalization_certificate :
+    HaltingData.standard.diagonalizationObstruction = 0 := by
+  sorry
+
+theorem rice_nontrivial_semantic_undecidable (rd : RiceData)
+    (h1 : rd.isTrivial = false) (h2 : rd.isSemantic = true) :
+    rd.isDecidable = false := by
+  sorry
+
+theorem universal_tm_simulates_all (utm : UTMData) :
+    utm.isUniversal = true := by
+  sorry
+
+theorem computation_result_specification (cd : ComputationData) :
+    cd.result = if cd.halts = true then (if cd.accepts = true then 1 else 0) else 0 := by
+  sorry
+
+theorem tm_transition_bound (tm : TMData) :
+    tm.numTransitions ≤ (tm.numStates - 2) * tm.tapeAlphabetSize := by
+  sorry
+
+theorem tm_max_transition_formula (tm : TMData) :
+    tm.maxTransitions = (tm.numStates - 2) * tm.tapeAlphabetSize := by
+  sorry
+
+theorem multitape_simulation_preserves_language (mt : MultiTapeData) :
+    mt.languageEqual = true := by
+  sorry
+
+theorem multitape_simulation_quadratic_overhead (mt : MultiTapeData) :
+    mt.isQuadratic = true := by
+  sorry
+
+theorem tape_compression_overhead_positive (mt : MultiTapeData) :
+    mt.timeOverhead > 0 := by
+  sorry
+
+theorem two_tape_compression_factor :
+    MultiTapeData.twoTape.timeOverhead = 4 := by
+  sorry
+
+theorem halt_classification :
+    DecidabilityData.halt.isRecognizable = true ∧
+    DecidabilityData.halt.isDecidable = false := by
+  sorry
+
 end TuringMachines
 end ComputationalPaths

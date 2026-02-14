@@ -826,5 +826,63 @@ def master_pda_direction_path :
     Path PDAEquivalenceData.anbnEquiv.directionObstruction 0 :=
   PDAEquivalenceData.anbnEquiv.direction_path
 
+/-! ## Core Theorems -/
+
+theorem cnf_conversion_produces_cnf (cnf : ChomskyNFData) :
+    cnf.isInCNF = true := by
+  sorry
+
+theorem cnf_conversion_preserves_language (cnf : ChomskyNFData) :
+    cnf.languagePreserved = true := by
+  sorry
+
+theorem cnf_nonterminal_monotone (cnf : ChomskyNFData) :
+    cnf.cnfNonterminals ≥ cnf.origNonterminals := by
+  sorry
+
+theorem cyk_table_size_formula (cyk : CYKData) :
+    cyk.tableEntries = cyk.stringLength * (cyk.stringLength + 1) / 2 := by
+  sorry
+
+theorem cyk_cubic_runtime_formula (cyk : CYKData) :
+    cyk.timeComplexity = cyk.stringLength ^ 3 * cyk.grammarSize := by
+  sorry
+
+theorem cyk_single_char_acceptance (g : Nat) (hg : g > 0) (accepted : Bool) :
+    (CYKData.singleChar g hg accepted).isInLanguage = accepted := by
+  sorry
+
+theorem pumping_decomposition_length (pl : CFLPumpingData) :
+    pl.uLength + pl.vLength + pl.xLength + pl.yLength + pl.zLength = pl.stringLength := by
+  sorry
+
+theorem pumping_nonempty_vy (pl : CFLPumpingData) :
+    pl.vLength + pl.yLength ≥ 1 := by
+  sorry
+
+theorem pumping_window_bounded (pl : CFLPumpingData) :
+    pl.vLength + pl.xLength + pl.yLength ≤ pl.pumpingLength := by
+  sorry
+
+theorem cfl_closed_under_union (cc : CFLClosureData) :
+    cc.unionClosed = true := by
+  sorry
+
+theorem cfl_closed_under_concat (cc : CFLClosureData) :
+    cc.concatClosed = true := by
+  sorry
+
+theorem cfl_closed_under_star (cc : CFLClosureData) :
+    cc.starClosed = true := by
+  sorry
+
+theorem pda_cfg_equivalence_correct (pe : PDAEquivalenceData) :
+    pe.languageEqual = true := by
+  sorry
+
+theorem ogden_marked_segment_nonempty (od : OgdenData) :
+    od.markedInVY ≥ 1 := by
+  sorry
+
 end ContextFreeGrammars
 end ComputationalPaths

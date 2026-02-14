@@ -645,5 +645,71 @@ def master_sl2_dim_path :
     Path LanglandsDualData.sl2.dimG 3 :=
   Path.stepChain (by simp [LanglandsDualData.sl2])
 
+/-! ## Core Theorems -/
+
+theorem langlands_dual_root_count (ldd : LanglandsDualData) :
+    ldd.numPosRootsDual = ldd.numPosRootsG := by
+  sorry
+
+theorem langlands_dual_dimension_match (ldd : LanglandsDualData) :
+    ldd.dimG = ldd.dimDual := by
+  sorry
+
+theorem langlands_dimension_formula_G (ldd : LanglandsDualData) :
+    ldd.dimG = ldd.rank + 2 * ldd.numPosRootsG := by
+  sorry
+
+theorem langlands_dimension_formula_dual (ldd : LanglandsDualData) :
+    ldd.dimDual = ldd.rank + 2 * ldd.numPosRootsDual := by
+  sorry
+
+theorem hecke_eigensheaf_property (hed : HeckeEigensheafData) :
+    hed.isEigensheaf = true := by
+  sorry
+
+theorem hecke_obstruction_vanishes (hed : HeckeEigensheafData) :
+    hed.heckeObstruction = 0 := by
+  sorry
+
+theorem satake_bijection_on_simples (gsd : GeometricSatakeData) :
+    gsd.numOrbits = gsd.numDominantWeights := by
+  sorry
+
+theorem satake_tensor_equivalence (gsd : GeometricSatakeData) :
+    gsd.isTensorEquiv = true := by
+  sorry
+
+theorem satake_obstruction_zero (gsd : GeometricSatakeData) :
+    gsd.satakeObstruction = 0 := by
+  sorry
+
+theorem satake_convolution_matches_tensor (gsd : GeometricSatakeData) :
+    gsd.convolutionObstruction = 0 := by
+  sorry
+
+theorem automorphic_is_dmodule (asd : AutomorphicSheafData) :
+    asd.isDModule = true := by
+  sorry
+
+theorem automorphic_is_hecke_eigen (asd : AutomorphicSheafData) :
+    asd.isHeckeEigen = true := by
+  sorry
+
+theorem spectral_decomposition_holds (sdd : SpectralDecompData) :
+    sdd.spectralObstruction = 0 := by
+  sorry
+
+theorem spectral_generic_fiber_is_one (sdd : SpectralDecompData) :
+    sdd.numGenericFibers = 1 := by
+  sorry
+
+theorem bd_factorization_formula (bdg : BDGrassmannianData) :
+    bdg.disjointFiberLabel = bdg.numPoints * bdg.diagonalFiberLabel := by
+  sorry
+
+theorem hitchin_lagrangian_dimension (hd : HitchinData) :
+    hd.hitchinBaseDim = hd.bunDim := by
+  sorry
+
 end GeometricLanglands
 end ComputationalPaths
