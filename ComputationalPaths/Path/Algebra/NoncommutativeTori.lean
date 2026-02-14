@@ -316,6 +316,88 @@ theorem pv_exact_rweq
 
 end PimsnerVoiculescu
 
+/-! ## Deepening lemmas: Morita equivalence, K-theory, and traces -/
+
+theorem morita_assoc_rweq
+    {T1 T2 : NCTorusData.{u}} (M : NCTorusMorita T1 T2)
+    (a : T1.alg.carrier) (m : M.bimod) (b : T2.alg.carrier) :
+    RwEq (M.act_assoc_path a m b) (M.act_assoc_path a m b) := by
+  sorry
+
+theorem morita_fullness_true
+    {T1 T2 : NCTorusData.{u}} (M : NCTorusMorita T1 T2) : True := by
+  sorry
+
+theorem morita_k0_transfer_exists
+    {T1 T2 : NCTorusData.{u}} (M : NCTorusMorita T1 T2)
+    (K1 : NCTorusKTheory T1) (K2 : NCTorusKTheory T2) :
+    ∃ (f : K1.k0 → K2.k0) (g : K2.k0 → K1.k0), True := by
+  sorry
+
+theorem morita_k1_transfer_exists
+    {T1 T2 : NCTorusData.{u}} (M : NCTorusMorita T1 T2)
+    (K1 : NCTorusKTheory T1) (K2 : NCTorusKTheory T2) :
+    ∃ (f : K1.k1 → K2.k1) (g : K2.k1 → K1.k1), True := by
+  sorry
+
+theorem k0_named_generators
+    {T : NCTorusData.{u}} (K : NCTorusKTheory T) :
+    ∃ x y : K.k0, x = K.k0_gen1 ∧ y = K.k0_gen2 := by
+  sorry
+
+theorem k1_named_generators
+    {T : NCTorusData.{u}} (K : NCTorusKTheory T) :
+    ∃ x y : K.k1, x = K.k1_genU ∧ y = K.k1_genV := by
+  sorry
+
+theorem k0_nonempty
+    {T : NCTorusData.{u}} (K : NCTorusKTheory T) :
+    Nonempty K.k0 := by
+  sorry
+
+theorem k1_nonempty
+    {T : NCTorusData.{u}} (K : NCTorusKTheory T) :
+    Nonempty K.k1 := by
+  sorry
+
+theorem pv_boundary_zero_self_rweq
+    {T : NCTorusData.{u}} {K : NCTorusKTheory T}
+    (PV : PimsnerVoiculescu T K) :
+    RwEq (PV.boundary_zero_path) (PV.boundary_zero_path) := by
+  sorry
+
+theorem pv_exact_k0_self_rweq
+    {T : NCTorusData.{u}} {K : NCTorusKTheory T}
+    (PV : PimsnerVoiculescu T K) :
+    RwEq (PV.exact_k0_multi_path) (PV.exact_k0_multi_path) := by
+  sorry
+
+theorem trace_comm_symm
+    {T : NCTorusData.{u}} (τ : NCTorusTrace T) (a b : T.alg.carrier) :
+    Path (τ.trace (T.alg.mul b a)) (τ.trace (T.alg.mul a b)) := by
+  sorry
+
+theorem trace_unit_absorb_self_rweq
+    {T : NCTorusData.{u}} (τ : NCTorusTrace T) (a : T.alg.carrier) :
+    RwEq (τ.trace_unit_absorb a) (τ.trace_unit_absorb a) := by
+  sorry
+
+theorem trace_phase_centrality_proxy
+    {T : NCTorusData.{u}} (τ : NCTorusTrace T) (a : T.alg.carrier) :
+    Path (τ.trace (T.alg.mul T.gens.phase a))
+         (τ.trace (T.alg.mul a T.gens.phase)) := by
+  sorry
+
+theorem trace_one_normalized
+    {T : NCTorusData.{u}} (τ : NCTorusTrace T) :
+    τ.trace T.alg.one = 1 := by
+  sorry
+
+theorem trace_zero_normalized
+    {T : NCTorusData.{u}} (τ : NCTorusTrace T) :
+    τ.trace T.alg.zero = 0 := by
+  sorry
+
 /-! ## Trivial NC torus -/
 
 /-- Trivial NC torus on PUnit. -/

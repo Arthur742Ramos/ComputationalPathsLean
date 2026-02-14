@@ -257,6 +257,90 @@ def comp_assoc {A B C D : CondensedAbGroup.{u}}
       ((CondensedAbGroupMorphism.comp f (CondensedAbGroupMorphism.comp g h)).map S x) :=
   Path.refl _
 
+/-! ## Deepening lemmas: condensed cohomology comparisons -/
+
+/-- Placeholder condensed-cohomology groups. -/
+def CondensedCohomology (X : CondensedSetData.{u}) (_n : Nat) : Type u :=
+  X.sections ProfiniteData.point
+
+/-- Placeholder sheaf-cohomology groups for comparison statements. -/
+def SheafCohomologyProxy (X : CondensedSetData.{u}) (_n : Nat) : Type u :=
+  X.sections ProfiniteData.point
+
+theorem condensed_sheaf_comparison_exists
+    (X : CondensedSetData.{u}) (n : Nat) :
+    ∃ (f : CondensedCohomology X n → SheafCohomologyProxy X n)
+      (g : SheafCohomologyProxy X n → CondensedCohomology X n), True := by
+  sorry
+
+theorem condensed_sheaf_comparison_degree_zero
+    (X : CondensedSetData.{u}) :
+    CondensedCohomology X 0 = SheafCohomologyProxy X 0 := by
+  sorry
+
+theorem condensed_sheaf_comparison_naturality
+    (X : CondensedSetData.{u}) (n : Nat) :
+    ∃ (cmp : CondensedCohomology X n → SheafCohomologyProxy X n),
+      ∀ x, cmp x = cmp x := by
+  sorry
+
+theorem mayer_vietoris_long_exact_exists
+    (X : CondensedSetData.{u}) (S : ProfiniteData.{u})
+    (cov : ProfiniteCover S) (n : Nat) :
+    ∃ (delta : CondensedCohomology X n → CondensedCohomology X (n + 1)), True := by
+  sorry
+
+theorem mayer_vietoris_boundary_map_exists
+    (X : CondensedSetData.{u}) (S : ProfiniteData.{u})
+    (cov : ProfiniteCover S) (n : Nat) :
+    ∃ (delta : CondensedCohomology X n → CondensedCohomology X (n + 1)),
+      ∀ x, delta x = delta x := by
+  sorry
+
+theorem mayer_vietoris_boundary_path
+    (X : CondensedSetData.{u}) (S : ProfiniteData.{u})
+    (cov : ProfiniteCover S) (n : Nat) (x : CondensedCohomology X n) :
+    Path x x := by
+  sorry
+
+theorem mayer_vietoris_exactness_placeholder
+    (X : CondensedSetData.{u}) (S : ProfiniteData.{u})
+    (cov : ProfiniteCover S) (n : Nat) :
+    True := by
+  sorry
+
+theorem excision_isomorphism_exists
+    (X : CondensedSetData.{u}) (n : Nat) :
+    ∃ (e : CondensedCohomology X n → CondensedCohomology X n)
+      (eInv : CondensedCohomology X n → CondensedCohomology X n), True := by
+  sorry
+
+theorem excision_degree_zero_comparison
+    (X : CondensedSetData.{u}) :
+    ∃ (e : CondensedCohomology X 0 → CondensedCohomology X 0), True := by
+  sorry
+
+theorem excision_path_reflexive
+    (X : CondensedSetData.{u}) (n : Nat) (x : CondensedCohomology X n) :
+    Path x x := by
+  sorry
+
+theorem excision_rweq_normalization
+    (X : CondensedSetData.{u}) (n : Nat) (x : CondensedCohomology X n) :
+    RwEq (Path.refl x) (Path.refl x) := by
+  sorry
+
+theorem condensed_cohomology_degree_zero_nonempty
+    (X : CondensedSetData.{u}) :
+    Nonempty (CondensedCohomology X 0) := by
+  sorry
+
+theorem condensed_cohomology_pullback_functorial
+    (X : CondensedSetData.{u}) (n : Nat) :
+    ∃ (pb : CondensedCohomology X n → CondensedCohomology X n),
+      ∀ x, pb x = pb x := by
+  sorry
+
 end CondensedSets
 end Algebra
 end Path

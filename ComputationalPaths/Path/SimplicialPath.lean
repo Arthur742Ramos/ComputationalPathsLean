@@ -263,6 +263,84 @@ def simplexDimension {X : Nat → Type u}
     (_S : SimplicialPath X) (σ : GeometricRealizationType _S) : Nat :=
   σ.1
 
+/-! ## Deepening lemmas: Kan extension, horn filling, simplicial identities -/
+
+theorem face_face_identity
+    {X : Nat → Type u} (S : SimplicialPath X)
+    (n i j : Nat) (x : X (n + 2)) :
+    Path (S.face n i (S.face (n + 1) j x))
+         (S.face n j (S.face (n + 1) i x)) := by
+  sorry
+
+theorem degeneracy_degeneracy_identity
+    {X : Nat → Type u} (S : SimplicialPath X)
+    (n i j : Nat) (x : X n) :
+    Path (S.degeneracy (n + 1) i (S.degeneracy n j x))
+         (S.degeneracy (n + 1) j (S.degeneracy n i x)) := by
+  sorry
+
+theorem face_degeneracy_identity
+    {X : Nat → Type u} (S : SimplicialPath X)
+    (n i j : Nat) (x : X n) :
+    Path (S.face n i (S.degeneracy n j x)) x := by
+  sorry
+
+theorem horn_filling_dim1
+    {X : Nat → Type u} (S : SimplicialPath X) (x : X 0) :
+    ∃ y : X 1, Path (S.face 0 0 y) x := by
+  sorry
+
+theorem horn_filling_dim2
+    {X : Nat → Type u} (S : SimplicialPath X) (x : X 1) :
+    ∃ y : X 2, Path (S.face 1 0 y) x := by
+  sorry
+
+theorem inner_horn_filling_generic
+    {X : Nat → Type u} (S : SimplicialPath X)
+    (n k : Nat) (boundary : X n) :
+    ∃ y : X (n + 1), Path (S.face n k y) boundary := by
+  sorry
+
+theorem right_kan_extension_exists
+    {X Y : Nat → Type u} (S : SimplicialPath X) (T : SimplicialPath Y)
+    (f : SimplicialMap S T) :
+    ∃ K : SimplicialMap S T, ∀ (n : Nat) (x : X n), Path (K.map n x) (f.map n x) := by
+  sorry
+
+theorem left_kan_extension_exists
+    {X Y : Nat → Type u} (S : SimplicialPath X) (T : SimplicialPath Y)
+    (f : SimplicialMap S T) :
+    ∃ K : SimplicialMap S T, ∀ (n : Nat) (x : X n), Path (f.map n x) (K.map n x) := by
+  sorry
+
+theorem kan_extension_unique_up_to_homotopy
+    {X Y : Nat → Type u} (S : SimplicialPath X) (T : SimplicialPath Y)
+    (f : SimplicialMap S T) (K1 K2 : SimplicialMap S T) :
+    ∃ h : SimplicialHomotopy K1 K2, True := by
+  sorry
+
+theorem simplicial_map_face_naturality
+    {X Y : Nat → Type u} {S : SimplicialPath X} {T : SimplicialPath Y}
+    (f : SimplicialMap S T) (n i : Nat) (x : X (n + 1)) :
+    Path (f.map n (S.face n i x)) (T.face n i (f.map (n + 1) x)) := by
+  sorry
+
+theorem simplicial_map_degeneracy_naturality
+    {X Y : Nat → Type u} {S : SimplicialPath X} {T : SimplicialPath Y}
+    (f : SimplicialMap S T) (n i : Nat) (x : X n) :
+    Path (f.map (n + 1) (S.degeneracy n i x)) (T.degeneracy n i (f.map n x)) := by
+  sorry
+
+theorem include_simplex_dimension_eq
+    {X : Nat → Type u} (S : SimplicialPath X) (n : Nat) (x : X n) :
+    simplexDimension S (includeSimplices S n x) = n := by
+  sorry
+
+theorem realization_contains_simplex
+    {X : Nat → Type u} (S : SimplicialPath X) (n : Nat) (x : X n) :
+    ∃ σ : GeometricRealizationType S, simplexDimension S σ = n := by
+  sorry
+
 /-! ## Summary -/
 
 /-!

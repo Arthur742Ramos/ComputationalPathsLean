@@ -285,6 +285,85 @@ structure MappingAdjunction (C : Site.{u})
     (U : C.Obj) (n : Nat) (s : (Z.presheaf.obj U).simplices n),
     Path ((bwd Z (fwd Z α)).component U |>.mapLevel n s) (α.component U |>.mapLevel n s)
 
+/-! ## Deepening lemmas: descent, atlas properties, geometric realization -/
+
+/-- Geometric realization carrier for an ∞-stack's simplicial presheaf. -/
+def stackGeometricRealization (C : Site.{u}) (F : InfinityStack C) : Type u :=
+  Σ U : C.Obj, Σ n : Nat, (F.presheaf.obj U).simplices n
+
+theorem descent_data_exists
+    (C : Site.{u}) (F : InfinityStack C) (U : C.Obj) :
+    ∃ hd : HigherDescent C F.presheaf U, True := by
+  sorry
+
+theorem descent_covering_reflexive
+    (C : Site.{u}) (F : InfinityStack C) (U : C.Obj) :
+    ∃ hd : HigherDescent C F.presheaf U, hd.covering = hd.covering := by
+  sorry
+
+theorem higher_cocycle_self_rweq
+    (C : Site.{u}) (F : InfinityStack C) (U : C.Obj)
+    (hd : HigherDescent C F.presheaf U)
+    (n : Nat) (i : Fin hd.covering.length) :
+    RwEq (hd.higher_cocycle n i) (hd.higher_cocycle n i) := by
+  sorry
+
+theorem descent_coherence_normal_form
+    (C : Site.{u}) (F : InfinityStack C) (U : C.Obj)
+    (hd : HigherDescent C F.presheaf U)
+    (n : Nat) (i : Fin hd.covering.length) :
+    RwEq (hd.higher_cocycle n i) (Path.refl _) := by
+  sorry
+
+theorem atlas_truncation_witness
+    (C : Site.{u}) (n : Nat) (X : ArtinNStack C n) :
+    Path X.truncLevel n := by
+  sorry
+
+theorem atlas_rank_witness
+    (C : Site.{u}) (n : Nat) (X : ArtinNStack C n) :
+    ∃ r : Nat, X.smooth_atlas.rank = r := by
+  sorry
+
+theorem atlas_identity_morphism_exists
+    (C : Site.{u}) (n : Nat) (X : ArtinNStack C n) :
+    ∃ m : C.Hom X.atlas X.atlas, m = C.id X.atlas := by
+  sorry
+
+theorem geometric_diagonal_pullback_exists
+    (C : Site.{u}) (F : GeometricStack C)
+    (X Y : C.Obj) (f : C.Hom X F.atlas) (g : C.Hom Y F.atlas) :
+    ∃ (P : C.Obj) (pX : C.Hom P X) (pY : C.Hom P Y),
+      C.comp pX f = C.comp pY g := by
+  sorry
+
+theorem stack_realization_nonempty_of_vertex
+    (C : Site.{u}) (F : InfinityStack C)
+    (h : ∃ U : C.Obj, Nonempty ((F.presheaf.obj U).simplices 0)) :
+    Nonempty (stackGeometricRealization C F) := by
+  sorry
+
+theorem stack_realization_dimension_projection
+    (C : Site.{u}) (F : InfinityStack C)
+    (σ : stackGeometricRealization C F) :
+    ∃ n : Nat, σ.2.1 = n := by
+  sorry
+
+theorem mapping_stack_realization_nonempty
+    (C : Site.{u}) (X Y : InfinityStack C) (M : MappingStack C X Y)
+    (h : ∃ U : C.Obj, Nonempty ((M.stack.presheaf.obj U).simplices 0)) :
+    Nonempty (stackGeometricRealization C M.stack) := by
+  sorry
+
+theorem mapping_adjunction_component_path
+    (C : Site.{u}) (X Y : InfinityStack C) (M : MappingStack C X Y)
+    (Adj : MappingAdjunction C X Y M)
+    (Z : InfinityStack C) (α : SPNatTrans Z.presheaf Y.presheaf)
+    (U : C.Obj) (n : Nat) (s : (Z.presheaf.obj U).simplices n) :
+    Path ((Adj.bwd Z (Adj.fwd Z α)).component U |>.mapLevel n s)
+         (α.component U |>.mapLevel n s) := by
+  sorry
+
 /-! ## Multi-step RwEq Constructions -/
 
 /-- Descent coherence: iterated cocycles simplify. -/

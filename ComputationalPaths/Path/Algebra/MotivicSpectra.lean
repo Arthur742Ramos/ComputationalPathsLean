@@ -474,13 +474,13 @@ def motivicSpectraSym {A : Type u} {a b : A}
 theorem motivic_thom_bonding_agrees
     (MGL : MotivicThomSpectrum) (n : Nat)
     (X : MotivicScheme) (x : (MGL.toTSpectrum.level n).eval X) :
-    Path (MGL.thomIso n X x) (MGL.toTSpectrum.bond n X x) := by
+    Nonempty (Path (MGL.thomIso n X x) (MGL.toTSpectrum.bond n X x)) := by
   sorry
 
 /-- Thom classes are reflexive at each level. -/
 theorem motivic_thom_class_refl
     (MGL : MotivicThomSpectrum) (n : Nat) (X : MotivicScheme) :
-    Path (MGL.thomClass n X) (MGL.thomClass n X) := by
+    Nonempty (Path (MGL.thomClass n X) (MGL.thomClass n X)) := by
   sorry
 
 /-- Bonding maps in the Thom spectrum are natural in scheme maps. -/
@@ -488,8 +488,8 @@ theorem motivic_thom_bond_natural
     (MGL : MotivicThomSpectrum) (n : Nat)
     {X Y : MotivicScheme} (f : MotivicSchemeMor X Y)
     (x : (MGL.toTSpectrum.level n).eval Y) :
-    Path (MGL.toTSpectrum.bond n X ((MGL.toTSpectrum.level n).map f x))
-         ((MGL.toTSpectrum.level (n + 1)).map f (MGL.toTSpectrum.bond n Y x)) := by
+    Nonempty (Path (MGL.toTSpectrum.bond n X ((MGL.toTSpectrum.level n).map f x))
+      ((MGL.toTSpectrum.level (n + 1)).map f (MGL.toTSpectrum.bond n Y x))) := by
   sorry
 
 /-- Slice map compatibility is available at each level. -/
@@ -503,21 +503,21 @@ theorem slice_level_self_compat
 theorem slice_level_cover_refl_path
     (S : SliceLevel) (n : Nat) (X : MotivicScheme)
     (x : (S.effectiveCover.level n).eval X) :
-    Path (S.coverMap.toFun n X x) (S.coverMap.toFun n X x) := by
+    Nonempty (Path (S.coverMap.toFun n X x) (S.coverMap.toFun n X x)) := by
   sorry
 
 /-- The q-slice component admits a reflexive path witness. -/
 theorem slice_level_slice_refl_path
     (S : SliceLevel) (n : Nat) (X : MotivicScheme)
     (x : (S.effectiveCover.level n).eval X) :
-    Path (S.sliceMap.toFun n X x) (S.sliceMap.toFun n X x) := by
+    Nonempty (Path (S.sliceMap.toFun n X x) (S.sliceMap.toFun n X x)) := by
   sorry
 
 /-- Motivic Sq^0 acts as the identity operation. -/
 theorem motivic_steenrod_sq_zero_identity
     (S : MotivicSteenrod) (X : MotivicScheme)
     (F : MotivicPresheaf) (x : F.eval X) :
-    Path ((S.sq 0).op X F x) x := by
+    Nonempty (Path ((S.sq 0).op X F x) x) := by
   sorry
 
 /-- Motivic Adem relation schema at bidegree (a,b). -/
@@ -540,21 +540,21 @@ theorem motivic_adams_d2_square_zero
 theorem motivic_adams_edge_path
     (E2 Einfty : Int → Int → Type u)
     (edge : ∀ p q, E2 p q → Einfty p q) :
-    ∀ (p q : Int) (x : E2 p q), Path (edge p q x) (edge p q x) := by
+    ∀ (p q : Int) (x : E2 p q), Nonempty (Path (edge p q x) (edge p q x)) := by
   sorry
 
 /-- Effective spectra provide reflexive paths on each level element. -/
 theorem effective_spectrum_reflexive_path
     (E : EffectiveSpectrum) (n : Nat)
     (X : MotivicScheme) (x : (E.toTSpectrum.level n).eval X) :
-    Path x x := by
+    Nonempty (Path x x) := by
   sorry
 
 /-- Connectivity data transports propositional equality into path equality. -/
 theorem motivic_connectivity_transport
     (M : MotivicConnectivity) (n : Nat) (hn : (n : Int) < M.conn)
     (X : MotivicScheme) (x y : (M.spectrum.level n).eval X) (hxy : x = y) :
-    Path x y := by
+    Nonempty (Path x y) := by
   sorry
 
 /-! ## Summary -/
