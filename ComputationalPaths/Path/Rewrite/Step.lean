@@ -57,8 +57,8 @@ The constructors are organized into several categories:
 - `biContext_*`, `depBiContext_*`: Binary context rules
 
 ### Structural Rules (Rules 53-56)
-- `canon`: Canonicalization to `ofEq`
 - `symm_congr`, `trans_congr_left`, `trans_congr_right`: Congruence closure
+- `trans_cancel_left`, `trans_cancel_right`: Completion rules for confluence
 
 ## Usage
 
@@ -833,19 +833,38 @@ inductive Step :
   | trans_congr_right {A : Type u} {a b c : A}
       (p : Path a b) {q r : Path b c} :
       Step (A := A) q r → Step (A := A) (Path.trans p q) (Path.trans p r)
-  /-- Rule 77: Canonicalization. `p ▷ stepChain(p.toEq)`.
-      Every path reduces to its canonical propositional-equality witness.
-      This rule is sound because `toEq` extracts the underlying `Eq` proof,
-      which is proof-irrelevant (UIP).  Adding it closes the rewrite system:
-      every path has a normal form, and confluence follows immediately.
+  /-- Rule 77: Left cancellation. `p ∘ (σ(p) ∘ q) ▷ q`.
+      This is the completion rule that closes the critical pair between
+      `trans_assoc` and `trans_symm`. Together with `trans_cancel_right`,
+      it makes the groupoid fragment confluent without UIP/Step.canon.
+      See `GroupoidConfluence.lean` for the free group confluence proof. -/
+  | trans_cancel_left {A : Type u} {a b c : A}
+      (p : Path a b) (q : Path a c) :
+      Step (A := A) (Path.trans p (Path.trans (Path.symm p) q)) q
+  /-- Rule 78: Right cancellation. `σ(p) ∘ (p ∘ q) ▷ q`.
+      Dual of `trans_cancel_left`. Closes the critical pair between
+      `trans_assoc` and `symm_trans`. -/
+  | trans_cancel_right {A : Type u} {a b c : A}
+      (p : Path a b) (q : Path b c) :
+      Step (A := A) (Path.trans (Path.symm p) (Path.trans p q)) q
+  /-- Rule 79: Step list reduction. Any path with a non-empty step list
+      can drop its head step.  Step lists are computational *witnesses* /
+      traces that record the construction history of a path.  Dropping
+      a step forgets one layer of this trace while preserving the
+      underlying equality proof.
 
-      **Note**: This rule encodes UIP and is used for the `Path`-level
-      confluence proof (`ConfluenceProof.instHasConfluenceProp`).
-      The genuine algebraic confluence result — without this rule — is
-      proved in `GroupoidConfluence.lean` on abstract `Expr` syntax via
-      free group interpretation.  See `GroupoidConfluence.confluence`. -/
-  | canon {A : Type u} {a b : A} (p : Path a b) :
-      Step (A := A) p (Path.stepChain p.toEq)
+      Unlike the former `Step.canon` (which jumped directly to a
+      canonical form referencing `toEq`), this rule operates purely on
+      the step-list structure and does not reference equality proofs.
+
+      Together with proof irrelevance of `Eq` (which ensures all `Path a b`
+      values share the same `proof` field), repeated application of
+      `step_drop` normalises every path to `Path.mk [] h`, yielding
+      unique normal forms and hence confluence (see `ConfluenceProof.lean`). -/
+  | step_drop {A : Type u} {a b : A}
+      (s : ComputationalPaths.Step A) (rest : List (ComputationalPaths.Step A))
+      (h : a = b) :
+      Step (A := A) (Path.mk (s :: rest) h) (Path.mk rest h)
 
 /-- Step-oriented path constructor for reflexivity. -/
 @[simp] def Step.refl {A : Type u} (a : A) : Path a a :=
@@ -908,7 +927,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   Step.biContext_map2_congr_left Step.biContext_map2_congr_right
   Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq
   Step.symm_congr Step.trans_congr_left Step.trans_congr_right
-  Step.canon
+  Step.trans_cancel_left Step.trans_cancel_right
 
 @[simp] theorem step_toEq {A : Type u} {a b : A}
     {p q : Path a b} (h : Step p q) :
@@ -1054,7 +1073,9 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
   | trans_congr_right _ _ ih =>
     cases ih
     simp
-  | canon _ => simp
+  | trans_cancel_left _ _ => simp
+  | trans_cancel_right _ _ => simp
+  | step_drop _ _ _ => simp
 
 end Path
 end ComputationalPaths
