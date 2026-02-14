@@ -104,39 +104,73 @@ Obstruction witnesses are the corresponding path-level compatibilities, and
 extensions are unique up to a function path when they agree pointwise.
 -/
 
-/-! ## Deepening theorem stubs -/
+/-! ## Theorems -/
 
-theorem restrict_map_exists {A : Type u} {B : Type v} {X : Type w}
-    (i : A -> B) (h : B -> X) : True := by
-  sorry
+/-- Restricting a map along `i` computes correctly. -/
+@[simp] theorem restrict_apply {A : Type u} {B : Type v} {X : Type w}
+    (i : A → B) (h : B → X) (a : A) :
+    restrict i h a = h (i a) := by
+  rfl
 
-theorem extension_map_exists {A : Type u} {B : Type v} {X : Type w}
-    {i : A -> B} {g : A -> X} (e : Extension i g) : True := by
-  sorry
+/-- An extension restricts to the original map via paths. -/
+def extension_restricts {A : Type u} {B : Type v} {X : Type w}
+    {i : A → B} {g : A → X} (e : Extension i g) (a : A) :
+    Path (e.map (i a)) (g a) :=
+  e.comm a
 
-theorem extension_comm_witness {A : Type u} {B : Type v} {X : Type w}
-    {i : A -> B} {g : A -> X} (e : Extension i g) (a : A) : True := by
-  sorry
+/-- An extension exists iff the problem is obstruction-free. -/
+theorem obstructionFree_iff_extension {A : Type u} {B : Type v} {X : Type w}
+    (i : A → B) (g : A → X) :
+    obstructionFree i g ↔ Nonempty (Extension i g) := by
+  exact Iff.rfl
 
-theorem obstructionFree_has_extension {A : Type u} {B : Type v} {X : Type w}
-    (i : A -> B) (g : A -> X) : True := by
-  sorry
+/-- Building an extension from an obstruction witness yields the original map. -/
+theorem extensionOfObstruction_map {A : Type u} {B : Type v} {X : Type w}
+    (i : A → B) (g : A → X) (h : B → X) (p : Obstruction i g h) :
+    (extensionOfObstruction i g h p).map = h := by
+  rfl
 
-theorem obstructionOfExtension_exists {A : Type u} {B : Type v} {X : Type w}
-    {i : A -> B} {g : A -> X} (e : Extension i g) : True := by
-  sorry
+/-- Extracting the obstruction from an extension built by extensionOfObstruction. -/
+theorem obstruction_roundtrip {A : Type u} {B : Type v} {X : Type w}
+    (i : A → B) (g : A → X) (h : B → X) (p : Obstruction i g h) :
+    obstructionOfExtension (extensionOfObstruction i g h p) =
+      Extension.restrict_path (extensionOfObstruction i g h p) := by
+  rfl
 
-theorem extensionOfObstruction_exists {A : Type u} {B : Type v} {X : Type w}
-    (i : A -> B) (g : A -> X) (h : B -> X) (p : Obstruction i g h) : True := by
-  sorry
+/-- Extension uniqueness: if two extensions agree pointwise, their maps are path-equal. -/
+def extension_unique_of_pointwise {A : Type u} {B : Type v} {X : Type w}
+    {i : A → B} {g : A → X} (e1 e2 : Extension i g)
+    (h : ∀ b, Path (e1.map b) (e2.map b)) :
+    Path e1.map e2.map :=
+  extension_unique e1 e2 h
 
-theorem extension_unique_path_exists {A : Type u} {B : Type v} {X : Type w}
-    {i : A -> B} {g : A -> X} (e1 e2 : Extension i g) : True := by
-  sorry
+/-- An extension provides a witness for obstruction-free. -/
+theorem extension_gives_obstructionFree {A : Type u} {B : Type v} {X : Type w}
+    {i : A → B} {g : A → X} (e : Extension i g) :
+    obstructionFree i g :=
+  ⟨e⟩
 
-theorem obstruction_extension_correspondence {A : Type u} {B : Type v} {X : Type w}
-    (i : A -> B) (g : A -> X) : True := by
-  sorry
+/-- The identity extension along `id` always exists. -/
+def extensionAlongId {A : Type u} {X : Type w} (g : A → X) : Extension _root_.id g where
+  map := g
+  comm := fun a => Path.refl (g a)
+
+/-- Extending along `id` is always obstruction-free. -/
+theorem obstructionFree_id {A : Type u} {X : Type w} (g : A → X) :
+    obstructionFree _root_.id g :=
+  ⟨extensionAlongId g⟩
+
+/-- The restrict of the identity extension is the original map. -/
+theorem extensionAlongId_restrict {A : Type u} {X : Type w} (g : A → X) :
+    (extensionAlongId g).map = g := by
+  rfl
+
+/-- Two extensions of the same map along the same `i` are unique up to Path. -/
+theorem extension_uniqueness_type {A : Type u} {B : Type v} {X : Type w}
+    {i : A → B} {g : A → X} (e1 e2 : Extension i g)
+    (h : ∀ b, e1.map b = e2.map b) :
+    e1.map = e2.map := by
+  exact funext h
 
 end ObstructionTheory
 end Homotopy

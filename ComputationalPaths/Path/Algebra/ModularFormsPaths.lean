@@ -193,7 +193,7 @@ theorem modularFormsPaths_modularSTCube_def :
   sorry
 
 theorem modularFormsPaths_step_mul_one_left (w : ModularWord) :
-    ModularStep (ModularWord.mul ModularWord.one w) w := by
+    Nonempty (ModularStep (ModularWord.mul ModularWord.one w) w) := by
   sorry
 
 theorem modularFormsPaths_modularForm_step_def {H : Type u} {R : Type v}

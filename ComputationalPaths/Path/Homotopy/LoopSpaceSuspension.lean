@@ -73,12 +73,12 @@ end
 /-! ## Theorems -/
 
 /-- A PathSimpleEquiv has an inverse map. -/
-theorem pathSimpleEquiv_has_inverse {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
+def pathSimpleEquiv_has_inverse {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
     ∀ y : β, Path (e.toFun (e.invFun y)) y :=
   e.right_inv
 
 /-- Left inverse law of a PathSimpleEquiv. -/
-theorem pathSimpleEquiv_has_left_inv {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
+def pathSimpleEquiv_has_left_inv {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
     ∀ x : α, Path (e.invFun (e.toFun x)) x :=
   e.left_inv
 
@@ -110,14 +110,14 @@ theorem counit_type (Y : SuspensionLoop.Pointed) :
   rfl
 
 /-- The adjunction round-trip on the forward direction. -/
-theorem adjunction_roundtrip_forward (X Y : SuspensionLoop.Pointed)
+def adjunction_roundtrip_forward (X Y : SuspensionLoop.Pointed)
     (f : PointedMap (sigmaPointed X) Y) :
     Path ((loopSpaceSuspensionAdjunction X Y).invFun
       ((loopSpaceSuspensionAdjunction X Y).toFun f)) f :=
   (loopSpaceSuspensionAdjunction X Y).left_inv f
 
 /-- The adjunction round-trip on the inverse direction. -/
-theorem adjunction_roundtrip_inverse (X Y : SuspensionLoop.Pointed)
+def adjunction_roundtrip_inverse (X Y : SuspensionLoop.Pointed)
     (g : PointedMap X (omegaEqPointed Y)) :
     Path ((loopSpaceSuspensionAdjunction X Y).toFun
       ((loopSpaceSuspensionAdjunction X Y).invFun g)) g :=

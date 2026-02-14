@@ -234,7 +234,7 @@ theorem milnorKTheory_steinberg_trivial {k : Type u}
     (F : FieldUnits k) (n : Nat) (K : KMilnor k F n)
     (s : MilnorSymbol k n) (i j : Fin n)
     (hij : i ≠ j) (h : F.add (s i) (s j) = F.fieldOne) :
-    Path (K.symbolMap s) K.grp.one := by
+    Nonempty (Path (K.symbolMap s) K.grp.one) := by
   sorry
 
 theorem milnorKTheory_kMilnor0_left_inv {k : Type u}

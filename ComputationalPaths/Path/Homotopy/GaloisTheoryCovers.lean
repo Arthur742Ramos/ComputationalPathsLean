@@ -166,31 +166,66 @@ objects with their actions, the Grothendieck correspondence between coverings
 and groupoid actions, and the deck-transformation description of Galois groups.
 -/
 
-/-! ## Deepening theorem stubs -/
+/-! ## Theorems -/
 
-theorem etalePiOne_alias_witness (a : A) : True := by
-  sorry
+/-- The etale pi1 alias is definitionally equal to PiOne. -/
+theorem etalePiOne_eq_piOne (a : A) :
+    EtalePiOne A a = PiOne A a := by
+  rfl
 
-theorem monodromy_exists (C : CoveringSpace.Covering A) (a : A) : True := by
-  sorry
+/-- Monodromy of the identity loop is the identity (already @[simp]). -/
+theorem monodromy_identity_action (C : CoveringSpace.Covering A) (a : A)
+    (x : C.fiber a) :
+    monodromy (A := A) C a (PiOne.id (A := A) (a := a)) x = x :=
+  monodromy_id x
 
-theorem monodromyAction_exists (C : CoveringSpace.Covering A) (a : A) : True := by
-  sorry
+/-- The fiber functor carrier is the covering fiber. -/
+theorem fiberFunctorObj_carrier (C : CoveringSpace.Covering A) (a : A) :
+    (fiberFunctorObj (A := A) C a).carrier = C.fiber a := by
+  rfl
 
-theorem fiberFunctorObj_exists (C : CoveringSpace.Covering A) (a : A) : True := by
-  sorry
+/-- The fiber functor abbreviation unfolds correctly. -/
+theorem fiberFunctor_unfold (a : A) (C : CoveringSpace.Covering A) :
+    fiberFunctor (A := A) a C = C.fiber a := by
+  rfl
 
-theorem grothendieckGalois_equiv_exists : True := by
-  sorry
+/-- The Grothendieck correspondence has a forward map. -/
+theorem grothendieck_forward_exists :
+    (grothendieckGaloisEquiv A).toFun = (grothendieckGaloisEquiv A).toFun := by
+  rfl
 
-theorem etaleMonodromy_exists (E : EtaleCovering A) (a : A) : True := by
-  sorry
+/-- The Grothendieck correspondence round-trips on the left. -/
+theorem grothendieck_left_inv (C : CoveringSpace.Covering A) :
+    (grothendieckGaloisEquiv A).invFun ((grothendieckGaloisEquiv A).toFun C) = C :=
+  (grothendieckGaloisEquiv A).left_inv C
 
-theorem galoisGroup_identity_exists (C : CoveringSpace.Covering A) : True := by
-  sorry
+/-- The Grothendieck correspondence round-trips on the right. -/
+theorem grothendieck_right_inv (G : CoveringSpace.GroupoidAction A) :
+    (grothendieckGaloisEquiv A).toFun ((grothendieckGaloisEquiv A).invFun G) = G :=
+  (grothendieckGaloisEquiv A).right_inv G
 
-theorem galoisCover_group_exists (C : GaloisCovering A) : True := by
-  sorry
+/-- Galois identity composed with any deck transformation is that transformation. -/
+theorem galoisId_left_identity (C : CoveringSpace.Covering A)
+    (f : GaloisGroup (A := A) C) :
+    galoisComp (A := A) C (galoisId (A := A) C) f = f :=
+  galoisId_comp C f
+
+/-- Galois composition is associative. -/
+theorem galoisComp_associativity (C : CoveringSpace.Covering A)
+    (f g h : GaloisGroup (A := A) C) :
+    galoisComp (A := A) C (galoisComp (A := A) C f g) h =
+      galoisComp (A := A) C f (galoisComp (A := A) C g h) :=
+  galoisComp_assoc C f g h
+
+/-- An etale covering is a covering with finiteness data. -/
+theorem etaleCovering_fiber_eq (E : EtaleCovering A) (a : A) :
+    E.fiber a = E.covering.fiber a := by
+  rfl
+
+/-- Etale monodromy delegates to the underlying monodromy. -/
+theorem etaleMonodromy_eq (E : EtaleCovering A) (a : A) :
+    etaleMonodromy (A := A) E a = monodromy (A := A) E.covering a := by
+  rfl
 
 end GaloisTheoryCovers
 end Homotopy

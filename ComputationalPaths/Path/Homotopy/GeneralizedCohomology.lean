@@ -141,20 +141,20 @@ theorem pathSimpleEquiv_comp_invFun {α β γ : Type u}
   sorry
 
 /-- Functoriality: map id is identity witnessed by Path. -/
-theorem cohomology_mapId_path (E : ReducedCohomologyTheory) (n : Nat) (X : Pointed)
+def cohomology_mapId_path (E : ReducedCohomologyTheory) (n : Nat) (X : Pointed)
     (x : E.cohomology n X) :
     Path (E.map n (PointedMap.id X) x) x :=
   E.mapId n X x
 
 /-- Functoriality: composition law witnessed by Path. -/
-theorem cohomology_mapComp_path (E : ReducedCohomologyTheory) (n : Nat)
+def cohomology_mapComp_path (E : ReducedCohomologyTheory) (n : Nat)
     {X Y Z : Pointed} (g : PointedMap Y Z) (f : PointedMap X Y)
     (x : E.cohomology n Z) :
     Path (E.map n f (E.map n g x)) (E.map n (PointedMap.comp g f) x) :=
   E.mapComp n g f x
 
-/-- The suspension isomorphism is a path equivalence. -/
-theorem cohomology_suspIso_left_inv (E : ReducedCohomologyTheory) (n : Nat) (X : Pointed)
+/-- The suspension isomorphism round-trips via path equivalence. -/
+def cohomology_suspIso_left_inv (E : ReducedCohomologyTheory) (n : Nat) (X : Pointed)
     (x : E.cohomology n (suspPointed X.carrier)) :
     Path ((E.suspIso n X).invFun ((E.suspIso n X).toFun x)) x :=
   (E.suspIso n X).left_inv x

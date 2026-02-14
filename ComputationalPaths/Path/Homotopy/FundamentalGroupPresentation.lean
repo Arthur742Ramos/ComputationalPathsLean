@@ -178,32 +178,60 @@ We package the computational-path π₁ computations as explicit generator/relat
 presentations for the circle, torus, figure-eight, and sphere.
 -/
 
-/-! ## Deepening theorem stubs -/
+/-! ## Theorems -/
 
-theorem presentation_generators_wellformed {G : Type u} (P : FundamentalGroupPresentation G) : True := by
-  sorry
+/-- A presentation's equivalence round-trips on the left. -/
+theorem presentation_left_inv {G : Type u} (P : FundamentalGroupPresentation G)
+    (x : G) :
+    P.equiv.invFun (P.equiv.toFun x) = x :=
+  P.equiv.left_inv x
 
-theorem presentation_relations_wellformed {G : Type u} (P : FundamentalGroupPresentation G) : True := by
-  sorry
+/-- A presentation's equivalence round-trips on the right. -/
+theorem presentation_right_inv {G : Type u} (P : FundamentalGroupPresentation G)
+    (y : P.presentationGroup) :
+    P.equiv.toFun (P.equiv.invFun y) = y :=
+  P.equiv.right_inv y
 
-theorem presentation_equiv_left_roundtrip {G : Type u} (P : FundamentalGroupPresentation G) (x : G) : True := by
-  sorry
+/-- The circle presentation has exactly one generator type. -/
+theorem circlePresentation_one_generator :
+    (circlePresentation.generators) = CircleGenerator := by
+  rfl
 
-theorem presentation_equiv_right_roundtrip {G : Type u} (P : FundamentalGroupPresentation G) (y : P.presentationGroup) : True := by
-  sorry
+/-- The circle presentation has no relations. -/
+theorem circlePresentation_no_relations :
+    (circlePresentation.relations) = PEmpty := by
+  rfl
 
-theorem circlePresentation_has_single_generator : True := by
-  sorry
+/-- The torus presentation has two generators. -/
+theorem torusPresentation_two_generators :
+    (torusPresentation.generators) = TorusGenerator := by
+  rfl
 
-theorem torusPresentation_has_commuting_generators : True := by
-  sorry
+/-- The torus presentation has one relation (commutativity). -/
+theorem torusPresentation_one_relation :
+    (torusPresentation.relations) = TorusRelation := by
+  rfl
 
-theorem figureEightPresentation_is_relation_free
-    [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase] : True := by
-  sorry
+/-- The sphere presentation has no generators. -/
+theorem spherePresentation_no_generators :
+    (spherePresentation.generators) = PEmpty := by
+  rfl
 
-theorem spherePresentation_is_trivial : True := by
-  sorry
+/-- The sphere presentation has no relations. -/
+theorem spherePresentation_no_relations :
+    (spherePresentation.relations) = PEmpty := by
+  rfl
+
+/-- The figure-eight presentation has no relations (free group). -/
+theorem figureEightPresentation_no_relations
+    [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase] :
+    (figureEightPresentation.relations) = PEmpty := by
+  rfl
+
+/-- intProdAdd is commutative. -/
+theorem intProdAdd_comm (x y : Int × Int) :
+    intProdAdd x y = intProdAdd y x := by
+  simp [intProdAdd, Int.add_comm]
 
 end Path
 end ComputationalPaths

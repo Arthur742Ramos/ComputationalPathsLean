@@ -98,31 +98,61 @@ add a decomposition structure with sections, and package the fibers together
 with canonical points coming from sections.
 -/
 
-/-! ## Deepening theorem stubs -/
+/-! ## Theorems -/
 
-theorem postnikov_stage_exists {A : Type u} (P : PostnikovSystem A) (n : Nat) : True := by
+/-- The canonical Postnikov system stages are all equal to `A`. -/
+@[simp] theorem postnikovSystem_stage (A : Type u) (n : Nat) :
+    (postnikovSystem A).stage n = A := by
+  rfl
+
+/-- The bond of the canonical system is the identity. -/
+theorem postnikovSystem_bond_id (A : Type u) (n : Nat) (a : A) :
+    (postnikovSystem A).bond n a = a := by
+  rfl
+
+/-- Bond compatibility in the canonical system is witnessed by refl. -/
+theorem postnikovSystem_bond_comm_is_refl (A : Type u) (n : Nat) (a : A) :
+    (postnikovSystem A).bond_comm n a = Path.refl a := by
+  rfl
+
+/-- The canonical decomposition section is the identity. -/
+theorem postnikovDecomposition_section_id (A : Type u) (n : Nat) (a : A) :
+    (postnikovDecomposition A).sectionMap n a = a := by
+  rfl
+
+/-- Section left-inverse in the canonical decomposition is refl. -/
+theorem postnikovDecomposition_section_left_is_refl (A : Type u) (n : Nat) (x : A) :
+    (postnikovDecomposition A).section_left n x = Path.refl x := by
+  rfl
+
+/-- The bond fiber at a canonical system projection is `Sigma` over a refl path. -/
+theorem bondFiber_canonical_type (A : Type u) (n : Nat) (a : A) :
+    bondFiber (postnikovSystem A) n a =
+      Sigma (fun y : A => Path y a) := by
+  rfl
+
+/-- The fiber section of the canonical decomposition yields the identity point. -/
+theorem bondFiberSection_canonical_fst (A : Type u) (n : Nat) (x : A) :
+    (bondFiberSection (postnikovDecomposition A) n x).1 = x := by
+  rfl
+
+/-- Two Postnikov systems over the same type with same data are equal. -/
+theorem postnikovSystem_ext {A : Type u} (P Q : PostnikovSystem A)
+    (hs : P.stage = Q.stage)
+    (hp : HEq P.proj Q.proj)
+    (hb : HEq P.bond Q.bond) :
+    P = Q := by
   sorry
 
-theorem postnikov_projection_exists {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) : True := by
-  sorry
+/-- The bondFiberAt unfolds to bondFiber at the projected point. -/
+theorem bondFiberAt_unfold {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) :
+    bondFiberAt P n a = bondFiber P n (P.proj n a) := by
+  rfl
 
-theorem postnikov_bond_exists {A : Type u} (P : PostnikovSystem A) (n : Nat) (x : P.stage (n + 1)) : True := by
-  sorry
-
-theorem postnikov_bond_compatibility {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) : True := by
-  sorry
-
-theorem bondFiber_at_projection_exists {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) : True := by
-  sorry
-
-theorem decomposition_section_exists {A : Type u} (P : PostnikovDecomposition A) (n : Nat) (x : P.stage n) : True := by
-  sorry
-
-theorem decomposition_section_left_path {A : Type u} (P : PostnikovDecomposition A) (n : Nat) (x : P.stage n) : True := by
-  sorry
-
-theorem bondFiberSection_witness {A : Type u} (P : PostnikovDecomposition A) (n : Nat) (x : P.stage n) : True := by
-  sorry
+/-- A decomposition extends a system: the underlying stages agree. -/
+theorem decomposition_extends_system {A : Type u} (D : PostnikovDecomposition A) (n : Nat) :
+    D.toPostnikovSystem.stage n = D.stage n := by
+  rfl
 
 end PostnikovSystem
 end Path
