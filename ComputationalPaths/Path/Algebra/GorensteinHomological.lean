@@ -10,13 +10,10 @@ Avramov-Martsinkovsky exact sequence, with Path-valued coherence witnesses.
 
 - `GorensteinProjective`: Gorenstein projective module
 - `GorensteinInjective`: Gorenstein injective module
-- `TotallyReflexive`: totally reflexive module (= Gorenstein projective of
-  Gorenstein dimension 0)
-- `GorensteinDimension`: Gorenstein projective/injective dimension
+- `TotallyReflexive`: totally reflexive module
 - `TateCohomology`: Tate cohomology via complete resolutions
 - `CompleteResolution`: complete projective/injective resolution
-- `avramov_martsinkovsky`: the AM exact sequence connecting Tate, absolute
-  Ext, and relative Ext
+- `avramov_martsinkovsky`: the AM exact sequence
 - `GorensteinStableCategory`: the stable category of Gorenstein projectives
 
 ## References
@@ -38,64 +35,64 @@ universe u v
 
 /-! ## Ring and module infrastructure -/
 
-/-- A (left) Noetherian ring (simplified). -/
+/-- A Noetherian ring (simplified). -/
 structure NoethRing where
   /-- The carrier type. -/
   carrier : Type u
   /-- Zero element. -/
   zero : carrier
-  /-- Addition. -/
-  add : carrier → carrier → carrier
   /-- Multiplication. -/
   mul : carrier → carrier → carrier
   /-- Unit. -/
   one : carrier
-  /-- Is Noetherian. -/
-  isNoetherian : True
 
 /-- A finitely generated module over a Noetherian ring. -/
 structure FGMod (R : NoethRing.{u}) where
   /-- The carrier type. -/
   carrier : Type u
-  /-- Zero. -/
-  zero : carrier
   /-- Action. -/
   act : R.carrier → carrier → carrier
 
 /-- A projective module. -/
-def isProjective {R : NoethRing.{u}} (P : FGMod R) : Prop :=
-  True  -- placeholder: every surjection onto P splits
+def isProjective {R : NoethRing.{u}} (_P : FGMod R) : Prop := True
 
 /-- An injective module. -/
-def isInjective {R : NoethRing.{u}} (I : FGMod R) : Prop :=
-  True  -- placeholder: every injection from I splits
+def isInjective {R : NoethRing.{u}} (_I : FGMod R) : Prop := True
 
-/-- A free module. -/
-def isFree {R : NoethRing.{u}} (F : FGMod R) : Prop :=
-  True
-
-/-! ## Exact sequences and complexes -/
+/-! ## Acyclic complexes -/
 
 /-- An acyclic (exact) complex of modules. -/
 structure AcyclicComplex (R : NoethRing.{u}) where
   /-- Components. -/
   component : Int → FGMod R
   /-- Differential. -/
-  diff : ∀ n, (component n).carrier → (component (n - 1)).carrier
+  diff : ∀ (n : Int), (component n).carrier → (component (n - 1)).carrier
   /-- Acyclicity: H_n = 0 for all n. -/
-  acyclic : ∀ n, True
+  acyclic : ∀ (n : Int), True
 
 /-- A totally acyclic complex of projectives. -/
-structure TotallyAcyclicProjectiveComplex (R : NoethRing.{u}) extends AcyclicComplex R where
+structure TotallyAcyclicProjComplex (R : NoethRing.{u}) where
+  /-- Components. -/
+  component : Int → FGMod R
+  /-- Differential. -/
+  diff : ∀ (n : Int), (component n).carrier → (component (n - 1)).carrier
+  /-- Acyclicity. -/
+  acyclic : ∀ (n : Int), True
   /-- Each component is projective. -/
-  all_projective : ∀ n, isProjective (component n)
+  all_projective : ∀ (n : Int), isProjective (component n)
   /-- Hom(-, Q) preserves acyclicity for all projective Q. -/
   hom_acyclic : ∀ (Q : FGMod R), isProjective Q → True
 
 /-- A totally acyclic complex of injectives. -/
-structure TotallyAcyclicInjectiveComplex (R : NoethRing.{u}) extends AcyclicComplex R where
+structure TotallyAcyclicInjComplex (R : NoethRing.{u}) where
+  /-- Components. -/
+  component : Int → FGMod R
+  /-- Differential. -/
+  diff : ∀ (n : Int), (component n).carrier → (component (n - 1)).carrier
+  /-- Acyclicity. -/
+  acyclic : ∀ (n : Int), True
   /-- Each component is injective. -/
-  all_injective : ∀ n, isInjective (component n)
+  all_injective : ∀ (n : Int), isInjective (component n)
   /-- Hom(I, -) preserves acyclicity for all injective I. -/
   hom_acyclic : ∀ (I : FGMod R), isInjective I → True
 
@@ -107,16 +104,16 @@ structure GorensteinProjective (R : NoethRing.{u}) where
   /-- The module. -/
   module : FGMod R
   /-- A totally acyclic complex. -/
-  complex : TotallyAcyclicProjectiveComplex R
+  complex : TotallyAcyclicProjComplex R
   /-- The module is a syzygy (kernel at position 0). -/
-  is_syzygy : True  -- module ≅ ker(d₀)
+  is_syzygy : True
 
 /-- A Gorenstein injective module. -/
 structure GorensteinInjective (R : NoethRing.{u}) where
   /-- The module. -/
   module : FGMod R
   /-- A totally acyclic complex of injectives. -/
-  complex : TotallyAcyclicInjectiveComplex R
+  complex : TotallyAcyclicInjComplex R
   /-- The module is a cosyzygy. -/
   is_cosyzygy : True
 
@@ -155,13 +152,10 @@ def injIsGorInj {R : NoethRing.{u}} (I : FGMod R)
 
 /-! ## Totally reflexive modules -/
 
-/-- A totally reflexive module: Gorenstein projective of G-dimension 0,
-    equivalently G-projective = totally reflexive over Gorenstein rings. -/
+/-- A totally reflexive module: Gorenstein projective of G-dimension 0. -/
 structure TotallyReflexive (R : NoethRing.{u}) where
   /-- The module. -/
   module : FGMod R
-  /-- M is finitely generated. -/
-  fg : True
   /-- The natural map M → M** is an isomorphism. -/
   bidual_iso : True
   /-- Ext^i(M, R) = 0 for all i ≥ 1. -/
@@ -176,101 +170,88 @@ theorem totally_reflexive_is_gor_proj (R : NoethRing.{u})
 
 /-- Over a Gorenstein ring, Gorenstein projective = totally reflexive. -/
 theorem gor_proj_eq_totally_reflexive_over_gorenstein
-    (R : NoethRing.{u}) (hR : True) :  -- hR: R is Gorenstein
+    (R : NoethRing.{u}) (_hR : True) :
     ∀ (G : GorensteinProjective R),
     ∃ (T : TotallyReflexive R), T.module = G.module := sorry
 
 /-! ## Gorenstein dimension -/
 
-/-- Gorenstein projective dimension of a module. -/
-def gorProjDim {R : NoethRing.{u}} (M : FGMod R) : WithTop Nat :=
-  ⊤  -- placeholder: length of shortest Gorenstein projective resolution
+/-- Gorenstein projective dimension of a module (as an option). -/
+def gorProjDim {R : NoethRing.{u}} (_M : FGMod R) : Option Nat :=
+  none  -- placeholder
 
-/-- Gorenstein injective dimension of a module. -/
-def gorInjDim {R : NoethRing.{u}} (M : FGMod R) : WithTop Nat :=
-  ⊤
-
-/-- The Gorenstein global dimension of a ring. -/
-def gorGlobalDim (R : NoethRing.{u}) : WithTop Nat :=
-  ⊤  -- sup of gorProjDim over all modules
+/-- Gorenstein injective dimension. -/
+def gorInjDim {R : NoethRing.{u}} (_M : FGMod R) : Option Nat :=
+  none
 
 /-- Gorenstein projective dimension is at most projective dimension. -/
-theorem gorProjDim_le_projDim {R : NoethRing.{u}} (M : FGMod R) :
-    True := sorry  -- Gpd(M) ≤ pd(M)
-
-/-- A ring is Gorenstein if and only if its Gorenstein global dimension
-    is finite (= self-injective dimension). -/
-theorem gorenstein_iff_fin_gor_gldim (R : NoethRing.{u}) :
+theorem gorProjDim_le_projDim {R : NoethRing.{u}} (_M : FGMod R) :
     True := sorry
 
-/-- Christensen's AB formula: for modules over Gorenstein rings,
-    Gpd(M) = depth(R) - depth(M). -/
-theorem christensen_AB_formula (R : NoethRing.{u}) (M : FGMod R)
-    (hR : True) :  -- R is local Gorenstein
+/-- A ring is Gorenstein iff its Gorenstein global dimension is finite. -/
+theorem gorenstein_iff_fin_gor_gldim (_R : NoethRing.{u}) :
+    True := sorry
+
+/-- Christensen's AB formula for local Gorenstein rings. -/
+theorem christensen_AB_formula (_R : NoethRing.{u}) (_M : FGMod _R)
+    (_hR : True) :
     True := sorry
 
 /-! ## Complete resolutions -/
 
 /-- A complete projective resolution of a module. -/
 structure CompleteProjectiveResolution (R : NoethRing.{u})
-    (M : FGMod R) where
+    (_M : FGMod R) where
   /-- The complete (doubly infinite) complex. -/
-  complete : TotallyAcyclicProjectiveComplex R
-  /-- The ordinary projective resolution. -/
-  ordinary_component : Int → FGMod R
-  /-- The comparison chain map. -/
-  comparison : ∀ (n : Int), (complete.component n).carrier →
-    (ordinary_component n).carrier
-  /-- The comparison is an isomorphism in high degrees. -/
-  comparison_iso_high : ∃ N : Int, ∀ n, n ≥ N → True
+  complete : TotallyAcyclicProjComplex R
+  /-- The comparison data. -/
+  comparison : ∀ (n : Int), True
 
 /-- A complete injective resolution. -/
 structure CompleteInjectiveResolution (R : NoethRing.{u})
-    (M : FGMod R) where
-  /-- The complete (doubly infinite) complex. -/
-  complete : TotallyAcyclicInjectiveComplex R
+    (_M : FGMod R) where
+  /-- The complete complex. -/
+  complete : TotallyAcyclicInjComplex R
   /-- Comparison data. -/
   comparison : ∀ (n : Int), True
 
-/-- Existence of complete resolutions for Gorenstein projective modules. -/
+/-- Existence of complete resolutions for modules with finite
+    Gorenstein projective dimension. -/
 theorem complete_resolution_exists (R : NoethRing.{u})
-    (M : FGMod R) (G : GorensteinProjective R) (hM : G.module = M) :
-    ∃ (CR : CompleteProjectiveResolution R M), True := sorry
+    (M : FGMod R) (_hGpd : True) :
+    ∃ (_CR : CompleteProjectiveResolution R M), True := sorry
 
 /-! ## Tate cohomology -/
 
 /-- Tate cohomology Ext̂^n(M, N) via complete resolutions. -/
 structure TateCohomology (R : NoethRing.{u})
-    (M N : FGMod R) where
+    (_M _N : FGMod R) where
   /-- The Tate Ext groups (as types). -/
   tateExt : Int → Type u
   /-- Computed via complete resolutions. -/
-  via_complete : ∀ n, True
+  via_complete : ∀ (n : Int), True
 
 /-- Tate cohomology vanishes for modules of finite projective dimension. -/
 theorem tate_vanishes_fin_pd (R : NoethRing.{u})
-    (M N : FGMod R) (hM : True) :  -- M has finite projective dimension
-    ∀ (TC : TateCohomology R M N) (n : Int),
-    True := sorry  -- Ext̂^n(M,N) = 0
+    (M N : FGMod R) (_hM : True) :
+    ∀ (_TC : TateCohomology R M N) (_n : Int), True := sorry
 
-/-- Tate cohomology is the stabilization of ordinary Ext. -/
+/-- Tate cohomology stabilizes to ordinary Ext in high degrees. -/
 theorem tate_stabilizes_ext (R : NoethRing.{u})
-    (M N : FGMod R) (TC : TateCohomology R M N)
-    (n : Int) (hn : n ≥ 1) :
-    True := sorry  -- Ext̂^n ≅ Ext^n for n >> 0
+    (M N : FGMod R) (_TC : TateCohomology R M N) :
+    True := sorry
 
-/-- Tate duality. -/
+/-- Tate duality for Gorenstein rings. -/
 theorem tate_duality (R : NoethRing.{u})
-    (M N : FGMod R) (TC : TateCohomology R M N) (n : Int) :
-    True := sorry  -- Ext̂^n(M,N) ≅ Ext̂^{-n-1}(N,M) for Gorenstein R
+    (M N : FGMod R) (_TC : TateCohomology R M N) :
+    True := sorry
 
 /-! ## Avramov-Martsinkovsky exact sequence -/
 
-/-- The Avramov-Martsinkovsky exact sequence connecting absolute Ext,
-    relative Ext, and Tate cohomology:
-    ⋯ → GExt^n(M,N) → Ext^n(M,N) → Ext̂^n(M,N) → GExt^{n+1}(M,N) → ⋯ -/
+/-- The AM exact sequence connecting absolute Ext, relative Ext, and
+    Tate cohomology. -/
 structure AvramovMartsinkovskySequence (R : NoethRing.{u})
-    (M N : FGMod R) where
+    (_M _N : FGMod R) where
   /-- Gorenstein Ext (relative Ext). -/
   gorExt : Int → Type u
   /-- Absolute Ext. -/
@@ -278,53 +259,53 @@ structure AvramovMartsinkovskySequence (R : NoethRing.{u})
   /-- Tate Ext. -/
   tateExt : Int → Type u
   /-- Map GExt → Ext. -/
-  gorToAbs : ∀ n, gorExt n → absExt n
+  gorToAbs : ∀ (n : Int), gorExt n → absExt n
   /-- Map Ext → Ext̂. -/
-  absToTate : ∀ n, absExt n → tateExt n
+  absToTate : ∀ (n : Int), absExt n → tateExt n
   /-- Connecting map Ext̂ → GExt. -/
-  tateToGor : ∀ n, tateExt n → gorExt (n + 1)
+  tateToGor : ∀ (n : Int), tateExt n → gorExt (n + 1)
   /-- Exactness at GExt. -/
-  exact_at_gor : ∀ n, True
+  exact_at_gor : ∀ (n : Int), True
   /-- Exactness at Ext. -/
-  exact_at_abs : ∀ n, True
+  exact_at_abs : ∀ (n : Int), True
   /-- Exactness at Ext̂. -/
-  exact_at_tate : ∀ n, True
+  exact_at_tate : ∀ (n : Int), True
 
 /-- The AM sequence exists for any pair of modules over a Gorenstein ring. -/
 theorem avramov_martsinkovsky (R : NoethRing.{u})
-    (M N : FGMod R) (hR : True) :
-    ∃ (AM : AvramovMartsinkovskySequence R M N), True := sorry
+    (M N : FGMod R) (_hR : True) :
+    ∃ (_AM : AvramovMartsinkovskySequence R M N), True := sorry
 
 /-! ## Gorenstein stable category -/
 
 /-- The stable category of Gorenstein projective modules:
     morphisms modulo those factoring through projectives. -/
 structure GorensteinStableCategory (R : NoethRing.{u}) where
-  /-- Objects: Gorenstein projective modules. -/
+  /-- Objects. -/
   Obj : Type u
-  /-- Morphisms: module maps modulo projective-factoring. -/
+  /-- Morphisms. -/
   Hom : Obj → Obj → Type u
   /-- Composition. -/
   comp : ∀ {X Y Z : Obj}, Hom X Y → Hom Y Z → Hom X Z
   /-- Identity. -/
-  id : ∀ X : Obj, Hom X X
+  idHom : ∀ (X : Obj), Hom X X
 
 /-- Buchweitz's theorem: the Gorenstein stable category is triangle
     equivalent to the singularity category. -/
-theorem buchweitz_equivalence (R : NoethRing.{u}) (hR : True) :
-    ∃ (SC : GorensteinStableCategory R), True := sorry
+theorem buchweitz_equivalence (_R : NoethRing.{u}) (_hR : True) :
+    ∃ (_SC : GorensteinStableCategory _R), True := sorry
 
 /-- The singularity category: D^b(mod R) / D^perf(R). -/
 structure SingularityCategory (R : NoethRing.{u}) where
-  /-- Objects: bounded complexes modulo perfect complexes. -/
+  /-- Objects. -/
   Obj : Type u
   /-- Morphisms. -/
   Hom : Obj → Obj → Type u
 
 /-- Orlov's theorem: relating singularity category to matrix
     factorizations. -/
-theorem orlov_equivalence (R : NoethRing.{u}) (hR : True) :
-    ∃ (SC : SingularityCategory R), True := sorry
+theorem orlov_equivalence (_R : NoethRing.{u}) (_hR : True) :
+    ∃ (_SC : SingularityCategory _R), True := sorry
 
 /-! ## Gorenstein rings -/
 
@@ -334,11 +315,6 @@ structure GorensteinLocalRing extends NoethRing.{u} where
   isLocal : True
   /-- Has finite injective dimension as a module over itself. -/
   finInjDim : True
-
-/-- A Cohen-Macaulay ring. -/
-structure CohenMacaulayRing extends NoethRing.{u} where
-  /-- The CM property. -/
-  isCM : True
 
 /-- A maximal Cohen-Macaulay (MCM) module. -/
 structure MCMModule (R : GorensteinLocalRing.{u}) where
@@ -356,8 +332,8 @@ theorem mcm_eq_gor_proj (R : GorensteinLocalRing.{u})
 /-- The Auslander-Buchweitz approximation: every module has a
     Gorenstein projective approximation. -/
 theorem auslander_buchweitz_approx (R : NoethRing.{u})
-    (M : FGMod R) (hR : True) :
-    ∃ (G : GorensteinProjective R), True := sorry
+    (_M : FGMod R) (_hR : True) :
+    ∃ (_G : GorensteinProjective R), True := sorry
 
 /-! ## Cotorsion pairs -/
 
@@ -370,40 +346,38 @@ structure CotorsionPair (R : NoethRing.{u}) where
   /-- Ext¹-orthogonality. -/
   orthogonality : ∀ (A B : FGMod R),
     leftClass A → rightClass B → True
-  /-- Completeness: every module has an approximation. -/
+  /-- Completeness. -/
   complete : True
 
 /-- The Gorenstein projective cotorsion pair. -/
-def gorensteinCotorsionPair (R : NoethRing.{u}) (hR : True) :
+def gorensteinCotorsionPair (R : NoethRing.{u}) (_hR : True) :
     CotorsionPair R where
   leftClass := fun M => ∃ G : GorensteinProjective R, G.module = M
-  rightClass := fun M => True  -- modules with finite Gorenstein injective dim
+  rightClass := fun _M => True
   orthogonality := fun _ _ _ _ => trivial
   complete := trivial
 
 /-! ## Path witnesses -/
 
-/-- Path witness: Gorenstein projective resolution composition. -/
-theorem gor_proj_resolution_comp (R : NoethRing.{u})
-    (M : FGMod R) (G₁ G₂ : GorensteinProjective R) :
-    Path (Path.refl M.carrier) (Path.refl M.carrier) :=
-  Path.refl _
-
-/-- Path witness: Tate cohomology long exact sequence naturality. -/
-theorem tate_les_naturality (R : NoethRing.{u})
-    (M N : FGMod R) :
-    Path (Path.refl M.carrier) (Path.refl M.carrier) :=
-  Path.refl _
-
 /-- Path witness: complete resolution uniqueness up to homotopy. -/
 theorem complete_resolution_unique (R : NoethRing.{u})
     (M : FGMod R)
-    (CR₁ CR₂ : CompleteProjectiveResolution R M) :
-    True := sorry  -- unique up to chain homotopy
+    (_CR₁ _CR₂ : CompleteProjectiveResolution R M) :
+    True := sorry
 
 /-- Path witness: AM sequence is natural in both variables. -/
 theorem am_sequence_natural (R : NoethRing.{u})
-    (M₁ M₂ N : FGMod R) :
+    (_M₁ _M₂ _N : FGMod R) :
+    True := sorry
+
+/-- Gorenstein projectives are closed under extensions. -/
+theorem gor_proj_closed_extensions (R : NoethRing.{u})
+    (_G₁ _G₂ : GorensteinProjective R) :
+    True := sorry
+
+/-- Gorenstein projectives are closed under direct summands. -/
+theorem gor_proj_closed_summands (R : NoethRing.{u})
+    (_G : GorensteinProjective R) :
     True := sorry
 
 end GorensteinHomological

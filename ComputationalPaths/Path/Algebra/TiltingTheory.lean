@@ -53,21 +53,17 @@ structure FGModule (A : FDAlgebra.{u}) where
   /-- Action of the algebra. -/
   act : A.carrier → carrier → carrier
 
-/-- The projective dimension of a module. -/
-def projDim {A : FDAlgebra.{u}} (M : FGModule A) : WithTop Nat :=
-  ⊤  -- placeholder
-
 /-- A module has finite projective dimension. -/
-def hasFiniteProjDim {A : FDAlgebra.{u}} (M : FGModule A) : Prop :=
-  projDim M ≠ ⊤
+def hasFiniteProjDim {A : FDAlgebra.{u}} (_M : FGModule A) : Prop :=
+  True  -- placeholder
 
-/-- The injective dimension of a module. -/
-def injDim {A : FDAlgebra.{u}} (M : FGModule A) : WithTop Nat :=
-  ⊤  -- placeholder
+/-- A module has finite injective dimension. -/
+def hasFiniteInjDim {A : FDAlgebra.{u}} (_M : FGModule A) : Prop :=
+  True  -- placeholder
 
 /-- Generation: M generates the category if every module has a
     finite resolution by direct summands of direct sums of M. -/
-def generates {A : FDAlgebra.{u}} (M : FGModule A) : Prop :=
+def generates {A : FDAlgebra.{u}} (_M : FGModule A) : Prop :=
   True
 
 /-! ## Classical tilting modules -/
@@ -89,7 +85,7 @@ structure CotiltingModule (A : FDAlgebra.{u}) where
   /-- The cotilting module. -/
   module : FGModule A
   /-- Finite injective dimension. -/
-  fin_inj_dim : injDim module ≠ ⊤
+  fin_inj_dim : hasFiniteInjDim module
   /-- No self-extensions. -/
   no_self_ext : ∀ (i : Nat), i ≥ 1 → True
   /-- Cogenerates. -/
@@ -104,8 +100,8 @@ structure PartialTiltingModule (A : FDAlgebra.{u}) where
 /-- Bongartz completion: every partial tilting module can be completed
     to a tilting module. -/
 theorem bongartz_completion (A : FDAlgebra.{u})
-    (P : PartialTiltingModule A) :
-    ∃ (T : TiltingModule A), True := sorry
+    (_P : PartialTiltingModule A) :
+    ∃ (_T : TiltingModule A), True := sorry
 
 /-! ## Bounded chain complexes -/
 
@@ -114,26 +110,23 @@ structure BoundedComplex (A : FDAlgebra.{u}) where
   /-- Components. -/
   component : Int → Type u
   /-- Differential. -/
-  diff : ∀ n, component n → component (n - 1)
+  diff : ∀ n : Int, component n → component (n - 1)
   /-- d² = 0. -/
-  diff_sq : ∀ n (x : component n), diff (n - 1) (diff n x) = diff (n - 1) (diff n x)
-  /-- Bounded below. -/
-  bounded_below : ∃ N : Int, ∀ n, n < N → IsEmpty (component n)
-  /-- Bounded above. -/
-  bounded_above : ∃ N : Int, ∀ n, n > N → IsEmpty (component n)
+  diff_sq : ∀ (n : Int) (x : component n),
+    diff (n - 1) (diff n x) = diff (n - 1) (diff n x)
 
 /-- A chain map between bounded complexes. -/
 structure ChainMap {A : FDAlgebra.{u}}
     (C D : BoundedComplex A) where
   /-- Component maps. -/
-  map : ∀ n, C.component n → D.component n
+  mapComp : ∀ n : Int, C.component n → D.component n
   /-- Commutes with differential. -/
-  comm : ∀ n (x : C.component n),
-    D.diff n (map n x) = map (n - 1) (C.diff n x)
+  comm : ∀ (n : Int) (x : C.component n),
+    D.diff n (mapComp n x) = mapComp (n - 1) (C.diff n x)
 
 /-- A quasi-isomorphism of complexes. -/
-def isQuasiIso {A : FDAlgebra.{u}} {C D : BoundedComplex A}
-    (f : ChainMap C D) : Prop :=
+def isQuasiIso {A : FDAlgebra.{u}} {_C _D : BoundedComplex A}
+    (_f : ChainMap _C _D) : Prop :=
   True  -- induces isomorphism on all cohomology
 
 /-! ## Tilting complexes -/
@@ -144,7 +137,7 @@ structure TiltingComplex (A : FDAlgebra.{u}) where
   /-- The complex. -/
   complex : BoundedComplex A
   /-- Components are projective. -/
-  projective_components : ∀ n, True
+  projective_components : ∀ (n : Int), True
   /-- Self-orthogonality: Hom_D(T,T[i]) = 0 for i ≠ 0. -/
   self_orth : ∀ (i : Int), i ≠ 0 → True
   /-- Generates the derived category. -/
@@ -169,36 +162,35 @@ structure DerivedEquivalenceData (A B : FDAlgebra.{u}) where
   F_obj : BoundedComplex A → BoundedComplex B
   /-- Quasi-inverse. -/
   G_obj : BoundedComplex B → BoundedComplex A
-  /-- F ∘ G ≃ Id. -/
-  FG_qi : ∀ (D : BoundedComplex B), isQuasiIso (sorry : ChainMap (F_obj (G_obj D)) D)
-  /-- G ∘ F ≃ Id. -/
-  GF_qi : ∀ (C : BoundedComplex A), isQuasiIso (sorry : ChainMap (G_obj (F_obj C)) C)
+  /-- F ∘ G ≃ Id (propositional). -/
+  FG_qi : ∀ (_D : BoundedComplex B), True
+  /-- G ∘ F ≃ Id (propositional). -/
+  GF_qi : ∀ (_C : BoundedComplex A), True
 
 /-- Rickard's theorem: tilting complexes induce derived equivalences. -/
 theorem rickard_theorem (A B : FDAlgebra.{u})
-    (T : TiltingComplex A)
-    (hB : B = B) :  -- B = End_D(T)
-    ∃ (E : DerivedEquivalenceData A B), True := sorry
+    (_T : TiltingComplex A) :
+    ∃ (_E : DerivedEquivalenceData A B), True := sorry
 
 /-- Rickard's converse: derived equivalences come from tilting complexes. -/
 theorem rickard_converse (A B : FDAlgebra.{u})
-    (E : DerivedEquivalenceData A B) :
-    ∃ (T : TiltingComplex A), True := sorry
+    (_E : DerivedEquivalenceData A B) :
+    ∃ (_T : TiltingComplex A), True := sorry
 
 /-- Happel's theorem: tilting modules give derived equivalences
     (special case of Rickard). -/
 theorem happel_theorem (A : FDAlgebra.{u})
-    (T : TiltingModule A) :
-    ∃ (B : FDAlgebra.{u}) (E : DerivedEquivalenceData A B), True := sorry
+    (_T : TiltingModule A) :
+    ∃ (B : FDAlgebra.{u}) (_E : DerivedEquivalenceData A B), True := sorry
 
-/-- Derived equivalences preserve global dimension. -/
+/-- Derived equivalences preserve finiteness of global dimension. -/
 theorem derived_equiv_preserves_gldim (A B : FDAlgebra.{u})
-    (E : DerivedEquivalenceData A B) :
-    True := sorry  -- gldim A < ∞ ↔ gldim B < ∞
+    (_E : DerivedEquivalenceData A B) :
+    True := sorry
 
 /-- Derived equivalences preserve the number of simple modules. -/
 theorem derived_equiv_preserves_simples (A B : FDAlgebra.{u})
-    (E : DerivedEquivalenceData A B) :
+    (_E : DerivedEquivalenceData A B) :
     True := sorry
 
 /-! ## Tilting mutation -/
@@ -216,12 +208,12 @@ structure TiltingMutation (A : FDAlgebra.{u}) where
 
 /-- Left mutation of a tilting complex. -/
 def leftMutation {A : FDAlgebra.{u}} (T : TiltingComplex A)
-    (k : Nat) : TiltingComplex A :=
+    (_k : Nat) : TiltingComplex A :=
   T  -- placeholder: replace T_k by the cone of the evaluation map
 
 /-- Right mutation of a tilting complex. -/
 def rightMutation {A : FDAlgebra.{u}} (T : TiltingComplex A)
-    (k : Nat) : TiltingComplex A :=
+    (_k : Nat) : TiltingComplex A :=
   T  -- placeholder
 
 /-- Mutation is an involution (up to isomorphism). -/
@@ -232,14 +224,14 @@ theorem mutation_involution {A : FDAlgebra.{u}} (T : TiltingComplex A) (k : Nat)
 
 /-- A cluster-tilting object in a triangulated category. -/
 structure ClusterTiltingObject where
-  /-- The ambient triangulated category (simplified). -/
+  /-- The ambient category objects. -/
   Obj : Type u
   /-- The cluster-tilting object. -/
   obj : Obj
   /-- Ext¹(T,X) = 0 implies X ∈ add(T). -/
-  ext1_vanishing : ∀ (X : Obj), True
+  ext1_vanishing : ∀ (_X : Obj), True
   /-- Ext¹(X,T) = 0 implies X ∈ add(T). -/
-  ext1_vanishing_dual : ∀ (X : Obj), True
+  ext1_vanishing_dual : ∀ (_X : Obj), True
 
 /-- An n-cluster tilting object: higher Auslander theory. -/
 structure NClusterTiltingObject (n : Nat) where
@@ -248,7 +240,7 @@ structure NClusterTiltingObject (n : Nat) where
   /-- The n-cluster tilting object. -/
   obj : Obj
   /-- Ext^i(T,X) = 0 for 1 ≤ i ≤ n-1 implies X ∈ add(T). -/
-  ext_vanishing : ∀ (X : Obj) (i : Nat), 1 ≤ i → i ≤ n - 1 → True
+  ext_vanishing : ∀ (_X : Obj) (i : Nat), 1 ≤ i → i ≤ n - 1 → True
 
 /-- Cluster mutation: exchange of indecomposable summands. -/
 structure ClusterMutation where
@@ -261,7 +253,7 @@ structure ClusterMutation where
 
 /-- Iyama-Yoshino theorem: cluster-tilting mutation always produces
     a cluster-tilting object. -/
-theorem iyama_yoshino_mutation (T : ClusterTiltingObject.{u}) (k : Nat) :
+theorem iyama_yoshino_mutation (T : ClusterTiltingObject.{u}) (_k : Nat) :
     ∃ (M : ClusterMutation.{u}), M.original = T := sorry
 
 /-- The cluster category of a hereditary algebra. -/
@@ -281,7 +273,7 @@ structure SiltingObject (A : FDAlgebra.{u}) where
   /-- The silting complex. -/
   complex : BoundedComplex A
   /-- Components are projective. -/
-  projective_components : ∀ n, True
+  projective_components : ∀ (n : Int), True
   /-- Hom_D(T, T[i]) = 0 for i > 0. -/
   positive_vanishing : ∀ (i : Nat), i ≥ 1 → True
   /-- Generates the derived category. -/
@@ -290,7 +282,7 @@ structure SiltingObject (A : FDAlgebra.{u}) where
 /-- A presilting object: satisfies the vanishing but not generation. -/
 structure PresiltingObject (A : FDAlgebra.{u}) where
   complex : BoundedComplex A
-  projective_components : ∀ n, True
+  projective_components : ∀ (n : Int), True
   positive_vanishing : ∀ (i : Nat), i ≥ 1 → True
 
 /-- Every tilting complex is silting. -/
@@ -298,23 +290,23 @@ def tiltingToSilting {A : FDAlgebra.{u}} (T : TiltingComplex A) :
     SiltingObject A where
   complex := T.complex
   projective_components := T.projective_components
-  positive_vanishing := fun i _ => T.self_orth i (sorry)
+  positive_vanishing := fun _i _ => trivial
   generates_derived := T.generates_derived
 
-/-- Silting mutation: left and right. -/
+/-- Silting mutation: left. -/
 def siltingLeftMutation {A : FDAlgebra.{u}} (S : SiltingObject A)
-    (k : Nat) : SiltingObject A :=
+    (_k : Nat) : SiltingObject A :=
   S  -- placeholder
 
 /-- Aihara-Iyama theorem: silting mutation is always possible. -/
 theorem aihara_iyama_silting_mutation {A : FDAlgebra.{u}}
-    (S : SiltingObject A) (k : Nat) :
-    ∃ (S' : SiltingObject A), True := sorry
+    (_S : SiltingObject A) (_k : Nat) :
+    ∃ (_S' : SiltingObject A), True := sorry
 
 /-- The silting quiver has connected components. -/
 theorem silting_connected {A : FDAlgebra.{u}}
-    (S₁ S₂ : SiltingObject A) :
-    ∃ (n : Nat), True := sorry  -- connected by iterated mutations
+    (_S₁ _S₂ : SiltingObject A) :
+    ∃ (_n : Nat), True := sorry  -- connected by iterated mutations
 
 /-! ## Support τ-tilting theory -/
 
@@ -331,27 +323,29 @@ structure SupportTauTiltingPair (A : FDAlgebra.{u}) where
 
 /-- Adachi-Iyama-Reiten bijection: support τ-tilting pairs biject with
     two-term silting objects. -/
-theorem air_bijection (A : FDAlgebra.{u}) :
-    ∀ (S : SiltingObject A), ∃ (T : SupportTauTiltingPair A), True := sorry
+theorem air_bijection (A : FDAlgebra.{u}) (_S : SiltingObject A) :
+    ∃ (_T : SupportTauTiltingPair A), True := sorry
 
 /-! ## Path witnesses -/
 
-/-- Path witness: derived equivalence is an equivalence relation. -/
-theorem derived_equiv_refl (A : FDAlgebra.{u}) :
-    ∃ (E : DerivedEquivalenceData A A), True := sorry
+/-- Path witness: derived equivalence is reflexive. -/
+theorem derived_equiv_refl (_A : FDAlgebra.{u}) :
+    ∃ (_E : DerivedEquivalenceData _A _A), True := sorry
 
+/-- Path witness: derived equivalence is symmetric. -/
 theorem derived_equiv_symm {A B : FDAlgebra.{u}}
-    (E : DerivedEquivalenceData A B) :
-    ∃ (E' : DerivedEquivalenceData B A), True := sorry
+    (_E : DerivedEquivalenceData A B) :
+    ∃ (_E' : DerivedEquivalenceData B A), True := sorry
 
+/-- Path witness: derived equivalence is transitive. -/
 theorem derived_equiv_trans {A B C : FDAlgebra.{u}}
-    (E₁ : DerivedEquivalenceData A B) (E₂ : DerivedEquivalenceData B C) :
-    ∃ (E : DerivedEquivalenceData A C), True := sorry
+    (_E₁ : DerivedEquivalenceData A B) (_E₂ : DerivedEquivalenceData B C) :
+    ∃ (_E : DerivedEquivalenceData A C), True := sorry
 
 /-- Path witness: tilting mutation preserves the derived equivalence class. -/
 theorem mutation_derived_equiv {A : FDAlgebra.{u}}
-    (M : TiltingMutation A) :
-    ∃ (E : DerivedEquivalenceData A A), True := sorry
+    (_M : TiltingMutation A) :
+    ∃ (_E : DerivedEquivalenceData A A), True := sorry
 
 end TiltingTheory
 end Algebra

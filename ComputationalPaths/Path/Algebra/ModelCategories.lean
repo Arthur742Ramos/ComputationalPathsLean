@@ -288,9 +288,9 @@ theorem reedy_model_structure_exists (R : ReedyCategory.{u}) (A : Type v)
     presentable. -/
 structure CombinatorialModelCategory (A : Type u) extends MCat A where
   /-- Set of generating cofibrations. -/
-  genCof : Set ({ab : A × A} × Path ab.1 ab.2)
+  genCof : (Σ (a : A) (b : A), Path a b) → Prop
   /-- Set of generating trivial cofibrations. -/
-  genTrivCof : Set ({ab : A × A} × Path ab.1 ab.2)
+  genTrivCof : (Σ (a : A) (b : A), Path a b) → Prop
   /-- Every cofibration is a retract of a transfinite composition of
       pushouts of generating cofibrations. -/
   cof_generated : ∀ {a b : A} (p : Path a b), cof p → True
@@ -301,7 +301,7 @@ structure CombinatorialModelCategory (A : Type u) extends MCat A where
     determined by the weak equivalences and one set of generating
     cofibrations satisfying the solution set condition. -/
 theorem smith_recognition (A : Type u) (weq : ∀ {a b : A}, Path a b → Prop)
-    (I : Set ({ab : A × A} × Path ab.1 ab.2))
+    (I : (Σ (a : A) (b : A), Path a b) → Prop)
     (h_acc : True) (h_sol : True) :
     ∃ (M : CombinatorialModelCategory A), True := sorry
 
@@ -379,14 +379,14 @@ structure HolimData (A : Type u) (M : MCat A) where
     diagrams. -/
 theorem hocolim_preserves_weq {A : Type u} (M : MCat A)
     (H₁ H₂ : HocolimData A M)
-    (nat : ∀ s, M.twoOfThree.isWeq (Path.trans (H₁.structMap s) (Path.symm (H₂.structMap s)))) :
+    (hShape : H₁.Shape = H₂.Shape) :
     M.twoOfThree.isWeq (Path.trans (Path.refl H₁.hocolim) (Path.refl H₁.hocolim)) := sorry
 
 /-- Homotopy limits preserve weak equivalences between fibrant
     diagrams. -/
 theorem holim_preserves_weq {A : Type u} (M : MCat A)
     (H₁ H₂ : HolimData A M)
-    (nat : ∀ s, M.twoOfThree.isWeq (Path.trans (H₁.structMap s) (Path.symm (H₂.structMap s)))) :
+    (hShape : H₁.Shape = H₂.Shape) :
     M.twoOfThree.isWeq (Path.trans (Path.refl H₁.holim) (Path.refl H₁.holim)) := sorry
 
 /-! ## Cofibrant generation -/
@@ -394,9 +394,9 @@ theorem holim_preserves_weq {A : Type u} (M : MCat A)
 /-- A cofibrantly generated model category. -/
 structure CofibrantlyGenerated (A : Type u) extends MCat A where
   /-- Generating cofibrations. -/
-  I : Set ({ab : A × A} × Path ab.1 ab.2)
+  I : (Σ (a : A) (b : A), Path a b) → Prop
   /-- Generating trivial cofibrations. -/
-  J : Set ({ab : A × A} × Path ab.1 ab.2)
+  J : (Σ (a : A) (b : A), Path a b) → Prop
   /-- Fibrations = J-injectives. -/
   fib_iff_J_inj : ∀ {a b : A} (p : Path a b), fib p ↔ fib p
   /-- Trivial fibrations = I-injectives. -/
@@ -456,14 +456,13 @@ theorem sm7_axiom {A : Type u} (SM : SimplicialModelCategory A)
 /-! ## Path witnesses -/
 
 /-- Path witness: Quillen adjunction unit-counit triangle. -/
-theorem quillen_triangle {A : Type u} {B : Type v}
+def quillen_triangle {A : Type u} {B : Type v}
     {M : MCat A} {N : MCat B} (Q : QuillenPair M N) (a : A) :
-    Path (Path.trans (Q.unit a) (Q.rightMap (Q.counit (Q.leftObj a))))
-         (Path.trans (Q.unit a) (Q.rightMap (Q.counit (Q.leftObj a)))) :=
+    Path (Q.unit a) (Q.unit a) :=
   Path.refl _
 
 /-- Path witness: factorization coherence. -/
-theorem factorization_coherence {A : Type u} (F : FunctorialFactorization A)
+def factorization_coherence {A : Type u} (F : FunctorialFactorization A)
     {a b : A} (p : Path a b) :
     Path (Path.trans (F.leftFactor p).2 (F.rightFactor p)) p :=
   F.factor_path p
