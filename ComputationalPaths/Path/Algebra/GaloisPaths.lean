@@ -11,6 +11,7 @@ normal/separable extensions. All coherence witnessed by `Path`.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import Mathlib.Tactic.ApplyFun
 
 namespace ComputationalPaths
 namespace Path

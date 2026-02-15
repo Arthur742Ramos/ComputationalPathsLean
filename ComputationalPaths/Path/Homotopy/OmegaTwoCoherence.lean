@@ -38,10 +38,10 @@ variable {A : Type u}
 variable {a b c d e : A}
 
 /-- Horizontal composition of identity 2-cells is the identity 2-cell. -/
-@[simp] theorem hcomp_id_id (f : Path a b) (g : Path b c) :
-    hcomp (TwoCell.id f) (TwoCell.id g) =
+theorem hcomp_id_id (f : Path a b) (g : Path b c) :
+    TwoCell.hcomp (TwoCell.id f) (TwoCell.id g) =
       TwoCell.id (Path.trans f g) := by
-  simp
+  simp [TwoCell.hcomp, TwoCell.id]
 
 /-- The RwEq-level pentagon yields a bicategory 2-cell. -/
 theorem pentagon_twoCell (p : Path a b) (q : Path b c)

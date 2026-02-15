@@ -91,20 +91,20 @@ theorem whiskerRight_respects_rweq {f g : Path a b} {h : Path b c}
 /-! ## Interchange Law -/
 
 /-- Interchange law for horizontal and vertical composition. -/
-@[simp] theorem interchange_law
+theorem interchange_law
     {f0 f1 f2 : Path a b} {g0 g1 g2 : Path b c}
     (eta1 : TwoCell (A := A) (a := a) (b := b) f0 f1)
     (eta2 : TwoCell (A := A) (a := a) (b := b) f1 f2)
     (theta1 : TwoCell (A := A) (a := b) (b := c) g0 g1)
     (theta2 : TwoCell (A := A) (a := b) (b := c) g1 g2) :
-    comp (hcomp (A := A) (a := a) (b := b) (c := c) eta1 theta1)
-        (hcomp (A := A) (a := a) (b := b) (c := c) eta2 theta2) =
-  hcomp (A := A) (a := a) (b := b) (c := c)
-        (comp (A := A) (a := a) (b := b)
+    TwoCell.comp (TwoCell.hcomp (A := A) (a := a) (b := b) (c := c) eta1 theta1)
+        (TwoCell.hcomp (A := A) (a := a) (b := b) (c := c) eta2 theta2) =
+  TwoCell.hcomp (A := A) (a := a) (b := b) (c := c)
+        (TwoCell.comp (A := A) (a := a) (b := b)
           (p := f0) (q := f1) (r := f2) eta1 eta2)
-        (comp (A := A) (a := b) (b := c)
+        (TwoCell.comp (A := A) (a := b) (b := c)
           (p := g0) (q := g1) (r := g2) theta1 theta2) := by
-  simp
+  simp [TwoCell.comp, TwoCell.hcomp]
 
 /-- Godement interchange: the two whiskering composites agree. -/
 @[simp] theorem godement_interchange

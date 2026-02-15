@@ -24,6 +24,7 @@ and bisimulation as path equivalence.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import Mathlib.Tactic.ByContra
 
 namespace ComputationalPaths
 namespace Path

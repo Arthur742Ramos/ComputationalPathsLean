@@ -188,12 +188,12 @@ same compositions of four paths are equal. -/
   apply Subsingleton.elim
 
 /-- Interchange law: horizontal composition distributes over vertical. -/
-@[simp] theorem interchange {p₁ p₂ p₃ : Path a b}
+theorem interchange {p₁ p₂ p₃ : Path a b}
     {q₁ q₂ q₃ : Path b c}
     (α : TwoCell p₁ p₂) (β : TwoCell p₂ p₃)
     (γ : TwoCell q₁ q₂) (δ : TwoCell q₂ q₃) :
-    comp (hcomp α γ) (hcomp β δ) =
-    hcomp (comp α β) (comp γ δ) := by
+    TwoCell.comp (TwoCell.hcomp α γ) (TwoCell.hcomp β δ) =
+    TwoCell.hcomp (TwoCell.comp α β) (TwoCell.comp γ δ) := by
   apply Subsingleton.elim
 
 /-! ## Unit coherence for associators -/
