@@ -1,223 +1,375 @@
 /-
-# Galois Connections via Computational Paths
+# Galois Theory via Computational Paths
 
-Adjoint path functors, closure/interior operators as path idempotents,
-Galois insertions, and the Knaster-Tarski fixed-point theorem — all
-expressed via `Path`, `trans`, `symm`, `congrArg`, `transport`.
+Automorphisms, fixed fields, Galois groups, fundamental theorem aspects,
+normal/separable extensions. All coherence witnessed by `Path`.
 
-## Main results (25+ theorems/defs)
+## References
+
+- Lang, "Algebra"
+- Artin, "Galois Theory"
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths
 
-namespace ComputationalPaths.Path.Algebra.GaloisPaths
-
-open ComputationalPaths.Path
+namespace ComputationalPaths
+namespace Path
+namespace Algebra
+namespace GaloisPaths
 
 universe u v
 
-/-! ## Posets with path witnesses -/
+open ComputationalPaths.Path
 
-/-- A poset whose antisymmetry produces a `Path`. -/
-structure PathPoset (A : Type u) where
-  le : A → A → Prop
-  le_refl : ∀ x, le x x
-  le_trans : ∀ x y z, le x y → le y z → le x z
-  le_antisymm : ∀ x y, le x y → le y x → Path x y
+/-! ## Path-witnessed field structure (local copy) -/
 
-/-! ## Galois connections -/
+/-- A field with Path-witnessed laws (minimal for Galois theory). -/
+structure PField (F : Type u) where
+  zero : F
+  one : F
+  add : F → F → F
+  mul : F → F → F
+  neg : F → F
+  inv : F → F
+  add_assoc : ∀ a b c, add (add a b) c = add a (add b c)
+  add_comm : ∀ a b, add a b = add b a
+  zero_add : ∀ a, add zero a = a
+  add_neg : ∀ a, add a (neg a) = zero
+  mul_assoc : ∀ a b c, mul (mul a b) c = mul a (mul b c)
+  mul_comm : ∀ a b, mul a b = mul b a
+  one_mul : ∀ a, mul one a = a
+  left_distrib : ∀ a b c, mul a (add b c) = add (mul a b) (mul a c)
 
-/-- A Galois connection `f ⊣ g` between two posets. -/
-structure GaloisConn {A : Type u} {B : Type v}
-    (PA : PathPoset A) (PB : PathPoset B) where
-  lower : A → B          -- left adjoint
-  upper : B → A          -- right adjoint
-  gc_lr : ∀ a b, PB.le (lower a) b → PA.le a (upper b)
-  gc_rl : ∀ a b, PA.le a (upper b) → PB.le (lower a) b
+/-- A field embedding. -/
+structure PFieldEmbed (F E : Type u) (pF : PField F) (pE : PField E) where
+  embed : F → E
+  map_zero : embed pF.zero = pE.zero
+  map_one : embed pF.one = pE.one
+  map_add : ∀ a b, embed (pF.add a b) = pE.add (embed a) (embed b)
+  map_mul : ∀ a b, embed (pF.mul a b) = pE.mul (embed a) (embed b)
 
-/-- Unit: a ≤ g(f(a)). -/
-theorem gc_unit {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gc : GaloisConn PA PB) (a : A) :
-    PA.le a (gc.upper (gc.lower a)) :=
-  gc.gc_lr a (gc.lower a) (PB.le_refl _)
+/-! ## Field automorphisms -/
 
-/-- Counit: f(g(b)) ≤ b. -/
-theorem gc_counit {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gc : GaloisConn PA PB) (b : B) :
-    PB.le (gc.lower (gc.upper b)) b :=
-  gc.gc_rl (gc.upper b) b (PA.le_refl _)
+/-- A field automorphism: an invertible field homomorphism. -/
+structure FieldAut (F : Type u) (pF : PField F) where
+  toFun : F → F
+  invFun : F → F
+  left_inv : ∀ a, invFun (toFun a) = a
+  right_inv : ∀ a, toFun (invFun a) = a
+  map_zero : toFun pF.zero = pF.zero
+  map_one : toFun pF.one = pF.one
+  map_add : ∀ a b, toFun (pF.add a b) = pF.add (toFun a) (toFun b)
+  map_mul : ∀ a b, toFun (pF.mul a b) = pF.mul (toFun a) (toFun b)
 
-/-- lower is monotone. -/
-theorem gc_lower_mono {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gc : GaloisConn PA PB) {a₁ a₂ : A}
-    (h : PA.le a₁ a₂) : PB.le (gc.lower a₁) (gc.lower a₂) :=
-  gc.gc_rl a₁ (gc.lower a₂)
-    (PA.le_trans _ _ _ h (gc_unit gc a₂))
+/-- Identity automorphism. -/
+def autId {F : Type u} (pF : PField F) : FieldAut F pF :=
+  ⟨id, id, fun _ => rfl, fun _ => rfl, rfl, rfl, fun _ _ => rfl, fun _ _ => rfl⟩
 
-/-- upper is monotone. -/
-theorem gc_upper_mono {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gc : GaloisConn PA PB) {b₁ b₂ : B}
-    (h : PB.le b₁ b₂) : PA.le (gc.upper b₁) (gc.upper b₂) :=
-  gc.gc_lr (gc.upper b₁) b₂
-    (PB.le_trans _ _ _ (gc_counit gc b₁) h)
+/-- Identity automorphism acts as identity. -/
+theorem autId_apply {F : Type u} (pF : PField F) (a : F) :
+    (autId pF).toFun a = a := rfl
 
-/-- g ∘ f ∘ g = g via `Path` (antisymmetry). -/
-def gc_gfg {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gc : GaloisConn PA PB) (b : B) :
-    Path (gc.upper (gc.lower (gc.upper b))) (gc.upper b) :=
-  PA.le_antisymm _ _
-    (gc_upper_mono gc (gc_counit gc b))
-    (gc_unit gc (gc.upper b))
+/-- Path: identity automorphism. -/
+def autId_path {F : Type u} (pF : PField F) (a : F) :
+    Path ((autId pF).toFun a) a :=
+  Path.refl _
 
-/-- f ∘ g ∘ f = f via `Path`. -/
-def gc_fgf {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gc : GaloisConn PA PB) (a : A) :
-    Path (gc.lower (gc.upper (gc.lower a))) (gc.lower a) :=
-  PB.le_antisymm _ _
-    (gc_counit gc (gc.lower a))
-    (gc_lower_mono gc (gc_unit gc a))
+/-- Compose two automorphisms. -/
+def autComp {F : Type u} {pF : PField F}
+    (σ τ : FieldAut F pF) : FieldAut F pF :=
+  { toFun := σ.toFun ∘ τ.toFun
+    invFun := τ.invFun ∘ σ.invFun
+    left_inv := fun a => by simp [Function.comp, σ.left_inv, τ.left_inv]
+    right_inv := fun a => by simp [Function.comp, σ.right_inv, τ.right_inv]
+    map_zero := by simp [Function.comp, τ.map_zero, σ.map_zero]
+    map_one := by simp [Function.comp, τ.map_one, σ.map_one]
+    map_add := fun a b => by simp [Function.comp, τ.map_add, σ.map_add]
+    map_mul := fun a b => by simp [Function.comp, τ.map_mul, σ.map_mul] }
 
-/-! ## Closure operators -/
-
-/-- A closure operator: extensive, monotone, idempotent. -/
-structure ClosureOp {A : Type u} (PA : PathPoset A) where
-  cl : A → A
-  extensive : ∀ a, PA.le a (cl a)
-  mono : ∀ a b, PA.le a b → PA.le (cl a) (cl b)
-  idem : ∀ a, Path (cl (cl a)) (cl a)
-
-/-- Every Galois connection induces a closure operator `g ∘ f`. -/
-def gc_closure {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gc : GaloisConn PA PB) : ClosureOp PA where
-  cl a := gc.upper (gc.lower a)
-  extensive := gc_unit gc
-  mono _ _ h := gc_upper_mono gc (gc_lower_mono gc h)
-  idem a := gc_gfg gc (gc.lower a)
-
-/-- An element is closed iff `cl x = x`. -/
-def isClosed {A : Type u} {PA : PathPoset A} (cl : ClosureOp PA) (a : A) :=
-  cl.cl a = a
-
-/-- The closure of any element is closed (uses `idem`). -/
-theorem closure_is_closed {A : Type u} {PA : PathPoset A}
-    (cl : ClosureOp PA) (a : A) : isClosed cl (cl.cl a) :=
-  (cl.idem a).proof
-
-/-! ## Interior operators -/
-
-/-- An interior operator: contractive, monotone, idempotent. -/
-structure InteriorOp {A : Type u} (PA : PathPoset A) where
-  int : A → A
-  contr : ∀ a, PA.le (int a) a
-  mono : ∀ a b, PA.le a b → PA.le (int a) (int b)
-  idem : ∀ a, Path (int (int a)) (int a)
-
-/-- Every Galois connection induces an interior operator `f ∘ g`. -/
-def gc_interior {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gc : GaloisConn PA PB) : InteriorOp PB where
-  int b := gc.lower (gc.upper b)
-  contr := gc_counit gc
-  mono _ _ h := gc_lower_mono gc (gc_upper_mono gc h)
-  idem b := gc_fgf gc (gc.upper b)
-
-def isOpen {A : Type u} {PA : PathPoset A} (io : InteriorOp PA) (a : A) :=
-  io.int a = a
-
-theorem interior_is_open {A : Type u} {PA : PathPoset A}
-    (io : InteriorOp PA) (a : A) : isOpen io (io.int a) :=
-  (io.idem a).proof
-
-/-! ## Galois insertions -/
-
-/-- Galois insertion: Galois connection where counit is identity. -/
-structure GaloisIns {A : Type u} {B : Type v}
-    (PA : PathPoset A) (PB : PathPoset B)
-    extends GaloisConn PA PB where
-  counit_id : ∀ b, Path (lower (upper b)) b
-
-theorem gi_surj {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gi : GaloisIns PA PB) (b : B) :
-    gi.lower (gi.upper b) = b :=
-  (gi.counit_id b).proof
-
-/-- In a Galois insertion the closure is trivial on closed elements. -/
-def gi_gfg {A : Type u} {B : Type v}
-    {PA : PathPoset A} {PB : PathPoset B}
-    (gi : GaloisIns PA PB) (b : B) :
-    Path (gi.upper (gi.lower (gi.upper b))) (gi.upper b) :=
-  gc_gfg gi.toGaloisConn b
-
-/-! ## Knaster-Tarski fixed point -/
-
-/-- Complete lattice poset: has all infima. -/
-structure CompLattice (A : Type u) extends PathPoset A where
-  inf : (A → Prop) → A
-  inf_le : ∀ S a, S a → le (inf S) a
-  le_inf : ∀ S a, (∀ b, S b → le a b) → le a (inf S)
-
-/-- Fixed point: infimum of pre-fixed points. -/
-def ktFP {A : Type u} (L : CompLattice A) (f : A → A)
-    (_mono : ∀ x y, L.le x y → L.le (f x) (f y)) : A :=
-  L.inf (fun x => L.le (f x) x)
-
-/-- f(μ) ≤ μ. -/
-theorem kt_pre {A : Type u} (L : CompLattice A) (f : A → A)
-    (mono : ∀ x y, L.le x y → L.le (f x) (f y)) :
-    L.le (f (ktFP L f mono)) (ktFP L f mono) := by
-  apply L.le_inf; intro b hb
-  exact L.le_trans _ _ _ (mono _ _ (L.inf_le _ b hb)) hb
-
-/-- μ ≤ f(μ). -/
-theorem kt_post {A : Type u} (L : CompLattice A) (f : A → A)
-    (mono : ∀ x y, L.le x y → L.le (f x) (f y)) :
-    L.le (ktFP L f mono) (f (ktFP L f mono)) := by
-  apply L.inf_le; exact mono _ _ (kt_pre L f mono)
-
-/-- f(μ) = μ as a `Path`. -/
-def kt_fixed {A : Type u} (L : CompLattice A) (f : A → A)
-    (mono : ∀ x y, L.le x y → L.le (f x) (f y)) :
-    Path (f (ktFP L f mono)) (ktFP L f mono) :=
-  L.le_antisymm _ _ (kt_pre L f mono) (kt_post L f mono)
-
-/-- μ is the least pre-fixed point. -/
-theorem kt_least {A : Type u} (L : CompLattice A) (f : A → A)
-    (mono : ∀ x y, L.le x y → L.le (f x) (f y))
-    (a : A) (ha : L.le (f a) a) :
-    L.le (ktFP L f mono) a :=
-  L.inf_le _ a ha
-
-/-! ## Transport / congrArg interactions -/
-
-/-- Transport along a closure-idempotence path. -/
-theorem transport_closure_idem {A : Type u} {D : A → Sort v}
-    {PA : PathPoset A} (cl : ClosureOp PA) (a : A)
-    (x : D (cl.cl (cl.cl a))) :
-    Path.transport (cl.idem a) x = Path.transport (cl.idem a) x :=
+/-- Automorphism composition is associative. -/
+theorem autComp_assoc {F : Type u} {pF : PField F}
+    (σ τ ρ : FieldAut F pF) :
+    (autComp (autComp σ τ) ρ).toFun = (autComp σ (autComp τ ρ)).toFun := by
   rfl
 
-/-- `congrArg f` applied to the KT fixed-point path. -/
-theorem congrArg_kt {A : Type u} {B : Type v}
-    (L : CompLattice A) (f : A → A)
-    (mono : ∀ x y, L.le x y → L.le (f x) (f y))
-    (g : A → B) :
-    (Path.congrArg g (kt_fixed L f mono)).toEq =
-    _root_.congrArg g (kt_fixed L f mono).toEq := by
-  simp
+/-- Path: composition associativity. -/
+def autComp_assoc_path {F : Type u} {pF : PField F}
+    (σ τ ρ : FieldAut F pF) :
+    Path (autComp (autComp σ τ) ρ).toFun (autComp σ (autComp τ ρ)).toFun :=
+  Path.refl _
 
-/-- `symm` of the KT fixed-point path. -/
-theorem symm_kt {A : Type u}
-    (L : CompLattice A) (f : A → A)
-    (mono : ∀ x y, L.le x y → L.le (f x) (f y)) :
-    (Path.symm (kt_fixed L f mono)).toEq =
-    (kt_fixed L f mono).toEq.symm := by simp
+/-- Left identity for automorphism composition. -/
+theorem autComp_id_left {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) :
+    (autComp (autId pF) σ).toFun = σ.toFun := by
+  rfl
 
-end ComputationalPaths.Path.Algebra.GaloisPaths
+/-- Path: left identity. -/
+def autComp_id_left_path {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) :
+    Path (autComp (autId pF) σ).toFun σ.toFun :=
+  Path.refl _
+
+/-- Right identity for automorphism composition. -/
+theorem autComp_id_right {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) :
+    (autComp σ (autId pF)).toFun = σ.toFun := by
+  rfl
+
+/-- Path: right identity. -/
+def autComp_id_right_path {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) :
+    Path (autComp σ (autId pF)).toFun σ.toFun :=
+  Path.refl _
+
+/-- Inverse automorphism. -/
+def autInv {F : Type u} {pF : PField F} (σ : FieldAut F pF) : FieldAut F pF :=
+  { toFun := σ.invFun
+    invFun := σ.toFun
+    left_inv := σ.right_inv
+    right_inv := σ.left_inv
+    map_zero := by
+      have := σ.left_inv pF.zero
+      rw [σ.map_zero] at this; exact this
+    map_one := by
+      have := σ.left_inv pF.one
+      rw [σ.map_one] at this; exact this
+    map_add := fun a b => by
+      apply_fun σ.toFun using Function.LeftInverse.injective σ.left_inv
+      rw [σ.right_inv, σ.map_add, σ.right_inv, σ.right_inv]
+    map_mul := fun a b => by
+      apply_fun σ.toFun using Function.LeftInverse.injective σ.left_inv
+      rw [σ.right_inv, σ.map_mul, σ.right_inv, σ.right_inv] }
+
+/-- Left inverse law. -/
+theorem autComp_inv_left {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a : F) :
+    (autComp (autInv σ) σ).toFun a = a := by
+  simp [autComp, autInv, Function.comp, σ.left_inv]
+
+/-- Path: left inverse. -/
+def autComp_inv_left_path {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a : F) :
+    Path ((autComp (autInv σ) σ).toFun a) a :=
+  Path.ofEq (autComp_inv_left σ a)
+
+/-- Right inverse law. -/
+theorem autComp_inv_right {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a : F) :
+    (autComp σ (autInv σ)).toFun a = a := by
+  simp [autComp, autInv, Function.comp, σ.right_inv]
+
+/-- Path: right inverse. -/
+def autComp_inv_right_path {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a : F) :
+    Path ((autComp σ (autInv σ)).toFun a) a :=
+  Path.ofEq (autComp_inv_right σ a)
+
+/-! ## Fixed fields -/
+
+/-- An element a is fixed by automorphism σ. -/
+def isFixed {F : Type u} {pF : PField F} (σ : FieldAut F pF) (a : F) : Prop :=
+  σ.toFun a = a
+
+/-- The identity fixes everything. -/
+theorem id_fixes_all {F : Type u} (pF : PField F) (a : F) :
+    isFixed (autId pF) a := rfl
+
+/-- Path: identity fixes all. -/
+def id_fixes_all_path {F : Type u} (pF : PField F) (a : F) :
+    Path ((autId pF).toFun a) a :=
+  Path.refl _
+
+/-- If σ fixes a and b, then σ fixes a + b. -/
+theorem fixed_add {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a b : F) (ha : isFixed σ a) (hb : isFixed σ b) :
+    isFixed σ (pF.add a b) := by
+  simp [isFixed] at *
+  rw [σ.map_add, ha, hb]
+
+/-- Path: fixed under addition. -/
+def fixed_add_path {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a b : F) (ha : isFixed σ a) (hb : isFixed σ b) :
+    Path (σ.toFun (pF.add a b)) (pF.add a b) :=
+  Path.ofEq (fixed_add σ a b ha hb)
+
+/-- If σ fixes a and b, then σ fixes a * b. -/
+theorem fixed_mul {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a b : F) (ha : isFixed σ a) (hb : isFixed σ b) :
+    isFixed σ (pF.mul a b) := by
+  simp [isFixed] at *
+  rw [σ.map_mul, ha, hb]
+
+/-- Path: fixed under multiplication. -/
+def fixed_mul_path {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a b : F) (ha : isFixed σ a) (hb : isFixed σ b) :
+    Path (σ.toFun (pF.mul a b)) (pF.mul a b) :=
+  Path.ofEq (fixed_mul σ a b ha hb)
+
+/-! ## Galois groups -/
+
+/-- A Galois group: a list of automorphisms with closure properties. -/
+structure GaloisGroup (F : Type u) (pF : PField F) where
+  auts : List (FieldAut F pF)
+  hasId : (autId pF) ∈ auts ∨ auts = []
+
+/-- Singleton Galois group (trivial). -/
+def trivialGalois {F : Type u} (pF : PField F) : GaloisGroup F pF :=
+  ⟨[autId pF], Or.inl (by simp)⟩
+
+/-- Size of the Galois group. -/
+def galoisOrder {F : Type u} {pF : PField F} (G : GaloisGroup F pF) : Nat :=
+  G.auts.length
+
+/-- Trivial group has order 1. -/
+theorem trivialGalois_order {F : Type u} (pF : PField F) :
+    galoisOrder (trivialGalois pF) = 1 := rfl
+
+/-- Path: trivial group order. -/
+def trivialGalois_order_path {F : Type u} (pF : PField F) :
+    Path (galoisOrder (trivialGalois pF)) 1 :=
+  Path.refl _
+
+/-! ## Automorphism congruence and transport -/
+
+/-- congrArg: equal automorphisms give equal results. -/
+def aut_congr {F : Type u} {pF : PField F}
+    (σ τ : FieldAut F pF) (h : σ = τ) (a : F) :
+    Path (σ.toFun a) (τ.toFun a) :=
+  Path.congrArg (fun s => FieldAut.toFun s a) (Path.ofEq h)
+
+/-- congrArg: automorphism applied to equal elements. -/
+def aut_apply_congr {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a b : F) (h : a = b) :
+    Path (σ.toFun a) (σ.toFun b) :=
+  Path.congrArg σ.toFun (Path.ofEq h)
+
+/-- Transport along automorphism inverse path. -/
+theorem aut_inv_transport {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a : F) :
+    σ.invFun (σ.toFun a) = a :=
+  σ.left_inv a
+
+/-- Path: inverse transport. -/
+def aut_inv_transport_path {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a : F) :
+    Path (σ.invFun (σ.toFun a)) a :=
+  Path.ofEq (σ.left_inv a)
+
+/-- Symm of inverse transport path gives forward transport. -/
+theorem aut_inv_transport_symm {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a : F) :
+    Path.symm (aut_inv_transport_path σ a) =
+      Path.ofEq (σ.left_inv a).symm := by
+  simp [aut_inv_transport_path, Path.symm, Path.ofEq]
+
+/-! ## Normal extensions -/
+
+/-- A set of automorphisms acts transitively on roots: modeled as
+    every element maps to some element via some automorphism. -/
+structure NormalWitness {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) (roots : List F) where
+  act : F → F  -- representative action
+  preserves : ∀ r, r ∈ roots → act r ∈ roots
+
+/-- The identity provides a trivial normal witness. -/
+def trivialNormal {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) (roots : List F) :
+    NormalWitness G roots :=
+  ⟨id, fun _ h => h⟩
+
+/-- Trivial normal witness acts as identity. -/
+theorem trivialNormal_id {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) (roots : List F) (r : F) :
+    (trivialNormal G roots).act r = r := rfl
+
+/-- Path: trivial normal is identity. -/
+def trivialNormal_path {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) (roots : List F) (r : F) :
+    Path ((trivialNormal G roots).act r) r :=
+  Path.refl _
+
+/-! ## Separable extensions -/
+
+/-- A polynomial is separable if it has distinct roots (modeled by a witness). -/
+structure SeparableWitness {F : Type u} (pF : PField F) where
+  roots : List F
+  distinct : roots.Nodup
+
+/-- Empty separable witness. -/
+def emptySeparable {F : Type u} (pF : PField F) : SeparableWitness pF :=
+  ⟨[], List.nodup_nil⟩
+
+/-- Empty separable has no roots. -/
+theorem emptySeparable_roots {F : Type u} (pF : PField F) :
+    (emptySeparable pF).roots = [] := rfl
+
+/-- Path: empty separable roots. -/
+def emptySeparable_path {F : Type u} (pF : PField F) :
+    Path (emptySeparable pF).roots ([] : List F) :=
+  Path.refl _
+
+/-! ## Fundamental theorem aspects -/
+
+/-- Fixed field: elements fixed by all automorphisms in G. -/
+def isInFixedField {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) (a : F) : Prop :=
+  ∀ σ, σ ∈ G.auts → isFixed σ a
+
+/-- Zero is in the fixed field. -/
+theorem zero_in_fixed {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) :
+    isInFixedField G pF.zero := by
+  intro σ _
+  exact σ.map_zero
+
+/-- Path: zero is fixed. -/
+def zero_in_fixed_path {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) (σ : FieldAut F pF) (hσ : σ ∈ G.auts) :
+    Path (σ.toFun pF.zero) pF.zero :=
+  Path.ofEq (zero_in_fixed G σ hσ)
+
+/-- One is in the fixed field. -/
+theorem one_in_fixed {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) :
+    isInFixedField G pF.one := by
+  intro σ _
+  exact σ.map_one
+
+/-- Path: one is fixed. -/
+def one_in_fixed_path {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) (σ : FieldAut F pF) (hσ : σ ∈ G.auts) :
+    Path (σ.toFun pF.one) pF.one :=
+  Path.ofEq (one_in_fixed G σ hσ)
+
+/-- Fixed field is closed under addition. -/
+theorem fixed_field_add {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) (a b : F)
+    (ha : isInFixedField G a) (hb : isInFixedField G b) :
+    isInFixedField G (pF.add a b) := by
+  intro σ hσ
+  exact fixed_add σ a b (ha σ hσ) (hb σ hσ)
+
+/-- Fixed field is closed under multiplication. -/
+theorem fixed_field_mul {F : Type u} {pF : PField F}
+    (G : GaloisGroup F pF) (a b : F)
+    (ha : isInFixedField G a) (hb : isInFixedField G b) :
+    isInFixedField G (pF.mul a b) := by
+  intro σ hσ
+  exact fixed_mul σ a b (ha σ hσ) (hb σ hσ)
+
+/-- Trans path: combining two fixed-field proofs. -/
+def fixed_field_trans_path {F : Type u} {pF : PField F}
+    (σ : FieldAut F pF) (a b : F)
+    (ha : isFixed σ a) (hb : isFixed σ b) :
+    Path (σ.toFun (pF.add a b)) (pF.add a b) :=
+  Path.trans
+    (Path.ofEq (σ.map_add a b))
+    (Path.trans
+      (Path.congrArg (fun x => pF.add x (σ.toFun b)) (Path.ofEq ha))
+      (Path.congrArg (fun x => pF.add a x) (Path.ofEq hb)))
+
+end GaloisPaths
+end Algebra
+end Path
+end ComputationalPaths
