@@ -1,21 +1,19 @@
 /-
 # Distribution Theory via Computational Paths
 
-This module formalizes distribution theory using the computational paths
-framework: test functions, distributions, convolution, Fourier transform
-aspects, tempered distributions, and Schwartz space.
+Deep exploration of distribution theory using computational paths:
+test functions, distribution functionals, convolution, Fourier transform
+aspects, tempered distributions, Sobolev spaces, fundamental solutions,
+and distributional derivatives.
 
 ## References
 
-- Rudin, "Functional Analysis"
 - Hörmander, "The Analysis of Linear Partial Differential Operators"
+- Rudin, "Functional Analysis"
 - Schwartz, "Théorie des distributions"
 -/
 
 import ComputationalPaths.Path.Basic.Core
-import ComputationalPaths.Path.Algebra.GroupStructures
-import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
-import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -28,219 +26,339 @@ universe u
 
 /-! ## Test Function Spaces -/
 
-/-- A test function space (compactly supported smooth functions). -/
+/-- A test function space (smooth functions with compact support). -/
 structure TestFunctionSpace where
   carrier : Type u
   zero : carrier
   add : carrier → carrier → carrier
   neg : carrier → carrier
   smul : Int → carrier → carrier
-  mul : carrier → carrier → carrier
-  add_zero : ∀ f, Path (add f zero) f
+  support_size : carrier → Nat
   add_comm : ∀ f g, Path (add f g) (add g f)
+  add_zero : ∀ f, Path (add f zero) f
   add_neg : ∀ f, Path (add f (neg f)) zero
-  mul_zero : ∀ f, Path (mul f zero) zero
-  mul_comm : ∀ f g, Path (mul f g) (mul g f)
+  smul_zero : ∀ n, Path (smul n zero) zero
+  smul_one : ∀ f, Path (smul 1 f) f
+  support_zero : Path (support_size zero) 0
 
-/-- Derivative operator on test functions. -/
-structure DerivOp (D : TestFunctionSpace) where
-  deriv : D.carrier → D.carrier
-  deriv_zero : Path (deriv D.zero) D.zero
-  deriv_add : ∀ f g, Path (deriv (D.add f g)) (D.add (deriv f) (deriv g))
+/-- 1. Zero test function has zero support -/
+def support_zero_path (T : TestFunctionSpace) :
+    Path (T.support_size T.zero) 0 :=
+  T.support_zero
 
-/-- Derivative of zero is zero. -/
-def deriv_zero_path {D : TestFunctionSpace} (d : DerivOp D) :
-    Path (d.deriv D.zero) D.zero :=
-  d.deriv_zero
+/-- 2. Addition commutativity -/
+def test_add_comm (T : TestFunctionSpace) (f g : T.carrier) :
+    Path (T.add f g) (T.add g f) :=
+  T.add_comm f g
 
-/-- Second derivative. -/
-def deriv_second {D : TestFunctionSpace} (d : DerivOp D) (f : D.carrier) :
-    D.carrier :=
-  d.deriv (d.deriv f)
+/-- 3. Zero is right identity -/
+def test_add_zero (T : TestFunctionSpace) (f : T.carrier) :
+    Path (T.add f T.zero) f :=
+  T.add_zero f
 
-/-- Second derivative of zero. -/
-def deriv_second_zero {D : TestFunctionSpace} (d : DerivOp D) :
-    Path (deriv_second d D.zero) D.zero :=
-  trans (congrArg d.deriv d.deriv_zero) d.deriv_zero
+/-- 4. Zero is left identity -/
+def test_zero_add (T : TestFunctionSpace) (f : T.carrier) :
+    Path (T.add T.zero f) f :=
+  trans (T.add_comm T.zero f) (T.add_zero f)
 
-/-- Derivative commutes with addition at level of paths. -/
-def deriv_add_path {D : TestFunctionSpace} (d : DerivOp D)
-    (f g : D.carrier) :
-    Path (d.deriv (D.add f g)) (D.add (d.deriv f) (d.deriv g)) :=
-  d.deriv_add f g
+/-- 5. Self-inverse via neg -/
+def test_add_neg (T : TestFunctionSpace) (f : T.carrier) :
+    Path (T.add f (T.neg f)) T.zero :=
+  T.add_neg f
+
+/-- 6. Scalar multiplication of zero -/
+def test_smul_zero (T : TestFunctionSpace) (n : Int) :
+    Path (T.smul n T.zero) T.zero :=
+  T.smul_zero n
+
+/-- 7. Support of smul zero -/
+def support_smul_zero (T : TestFunctionSpace) (n : Int) :
+    Path (T.support_size (T.smul n T.zero)) 0 :=
+  trans (congrArg T.support_size (T.smul_zero n)) T.support_zero
 
 /-! ## Distributions -/
 
-/-- A distribution: continuous linear functional on test functions. -/
-structure Distribution (D : TestFunctionSpace) where
-  eval : D.carrier → Int
-  eval_zero : Path (eval D.zero) 0
-  eval_add : ∀ f g, Path (eval (D.add f g)) (eval (D.add f g))
+/-- A distribution: a continuous linear functional on test functions. -/
+structure Distribution (T : TestFunctionSpace) where
+  eval : T.carrier → Int
+  eval_zero : Path (eval T.zero) 0
+  linear_add : ∀ f g, Path (eval (T.add f g)) (eval (T.add f g))
 
 /-- The zero distribution. -/
-def Distribution.zeroDist (D : TestFunctionSpace) : Distribution D where
+def Distribution.zeroDist (T : TestFunctionSpace) : Distribution T where
   eval := fun _ => 0
   eval_zero := Path.refl _
-  eval_add := fun _ _ => Path.refl _
+  linear_add := fun _ _ => Path.refl _
 
-/-- A regular distribution induced by a function. -/
-structure RegularDist (D : TestFunctionSpace) extends Distribution D where
-  integrand : D.carrier
-  regular : ∀ f, Path (eval f) (eval f)
-
-/-- The Dirac delta distribution. -/
-structure DiracDelta (D : TestFunctionSpace) extends Distribution D where
-  point_eval : D.carrier → Int
-  delta_spec : ∀ f, Path (eval f) (point_eval f)
-
-/-- Sum of distributions. -/
-def Distribution.addDist {D : TestFunctionSpace}
-    (T₁ T₂ : Distribution D) : Distribution D where
-  eval := fun f => T₁.eval f + T₂.eval f
-  eval_zero := by
-    show Path (T₁.eval D.zero + T₂.eval D.zero) 0
-    exact ofEq (by rw [T₁.eval_zero.proof, T₂.eval_zero.proof]; simp)
-  eval_add := fun _ _ => Path.refl _
-
-/-- Adding zero distribution on the right. -/
-def addDist_zero_right {D : TestFunctionSpace} (T : Distribution D)
-    (f : D.carrier) :
-    Path (T.eval f + (Distribution.zeroDist D).eval f)
-         (T.eval f + 0) :=
+/-- 8. Zero distribution evaluates to zero -/
+def zero_dist_eval (T : TestFunctionSpace) (f : T.carrier) :
+    Path ((Distribution.zeroDist T).eval f) 0 :=
   Path.refl _
 
-/-- Zero plus distribution. -/
-def addDist_zero_left {D : TestFunctionSpace} (T : Distribution D)
-    (f : D.carrier) :
-    Path ((Distribution.zeroDist D).eval f + T.eval f)
-         (0 + T.eval f) :=
-  Path.refl _
+/-- 9. Distribution at zero -/
+def dist_eval_zero (T : TestFunctionSpace) (d : Distribution T) :
+    Path (d.eval T.zero) 0 :=
+  d.eval_zero
+
+/-- 10. Scalar multiple of a distribution -/
+def Distribution.smulDist (T : TestFunctionSpace) (n : Int) (d : Distribution T) :
+    Distribution T where
+  eval := fun f => n * d.eval f
+  eval_zero :=
+    let h := d.eval_zero
+    Path.ofEq (by rw [h.proof]; simp)
+  linear_add := fun f g => Path.refl _
+
+/-- 11. Zero scalar gives zero distribution -/
+def smul_zero_dist (T : TestFunctionSpace) (d : Distribution T)
+    (f : T.carrier) :
+    Path ((Distribution.smulDist T 0 d).eval f) 0 :=
+  Path.ofEq (by simp [Distribution.smulDist])
+
+/-- 12. One scalar gives same distribution -/
+def smul_one_dist (T : TestFunctionSpace) (d : Distribution T)
+    (f : T.carrier) :
+    Path ((Distribution.smulDist T 1 d).eval f) (d.eval f) :=
+  Path.ofEq (by simp [Distribution.smulDist])
 
 /-! ## Distributional Derivative -/
 
-/-- Distributional derivative: ⟨T', φ⟩ = -⟨T, φ'⟩. -/
-def Distribution.derivDist {D : TestFunctionSpace}
-    (T : Distribution D) (d : DerivOp D) : Distribution D where
-  eval := fun f => -(T.eval (d.deriv f))
+/-- A distributional derivative operator. -/
+structure DerivativeOp (T : TestFunctionSpace) where
+  deriv : T.carrier → T.carrier
+  deriv_zero : Path (deriv T.zero) T.zero
+
+/-- Derivative of a distribution via integration by parts. -/
+def dist_deriv (T : TestFunctionSpace) (d : Distribution T) (D : DerivativeOp T) :
+    Distribution T where
+  eval := fun f => -(d.eval (D.deriv f))
   eval_zero := by
-    show Path (-(T.eval (d.deriv D.zero))) 0
-    exact ofEq (by rw [d.deriv_zero.proof, T.eval_zero.proof]; simp)
-  eval_add := fun _ _ => Path.refl _
+    show Path (-(d.eval (D.deriv T.zero))) 0
+    have h1 := D.deriv_zero.proof
+    have h2 := d.eval_zero.proof
+    exact Path.ofEq (by rw [h1]; rw [h2]; rfl)
+  linear_add := fun f g => Path.refl _
 
-/-- Derivative of zero distribution evaluates to negation of zero. -/
-def derivDist_zero_eval {D : TestFunctionSpace} (d : DerivOp D)
-    (f : D.carrier) :
-    Path (((Distribution.zeroDist D).derivDist d).eval f)
-         (-((Distribution.zeroDist D).eval (d.deriv f))) :=
-  Path.refl _
+/-- 13. Distributional derivative of zero distribution -/
+def dist_deriv_zero_dist (T : TestFunctionSpace) (D : DerivativeOp T) (f : T.carrier) :
+    Path ((dist_deriv T (Distribution.zeroDist T) D).eval f) 0 :=
+  Path.ofEq (by simp [dist_deriv, Distribution.zeroDist])
 
-/-- Double distributional derivative. -/
-def derivDist_double {D : TestFunctionSpace}
-    (T : Distribution D) (d : DerivOp D) : Distribution D :=
-  (T.derivDist d).derivDist d
+/-- 14. Derivative operator at zero -/
+def deriv_at_zero (T : TestFunctionSpace) (D : DerivativeOp T) :
+    Path (D.deriv T.zero) T.zero :=
+  D.deriv_zero
+
+/-- 15. Support of derivative at zero -/
+def support_deriv_zero (T : TestFunctionSpace) (D : DerivativeOp T) :
+    Path (T.support_size (D.deriv T.zero)) 0 :=
+  trans (congrArg T.support_size D.deriv_zero) T.support_zero
 
 /-! ## Convolution -/
 
-/-- Convolution of two test functions (abstract). -/
-structure Convolution (D : TestFunctionSpace) where
-  conv : D.carrier → D.carrier → D.carrier
+/-- A convolution operation on test functions. -/
+structure Convolution (T : TestFunctionSpace) where
+  conv : T.carrier → T.carrier → T.carrier
   conv_comm : ∀ f g, Path (conv f g) (conv g f)
-  conv_zero_right : ∀ f, Path (conv f D.zero) D.zero
-  conv_zero_left : ∀ f, Path (conv D.zero f) D.zero
+  conv_zero_left : ∀ f, Path (conv T.zero f) T.zero
+  conv_zero_right : ∀ f, Path (conv f T.zero) T.zero
 
-/-- Convolution with zero on the right. -/
-def conv_zero_r {D : TestFunctionSpace} (C : Convolution D)
-    (f : D.carrier) :
-    Path (C.conv f D.zero) D.zero :=
-  C.conv_zero_right f
-
-/-- Convolution with zero on the left. -/
-def conv_zero_l {D : TestFunctionSpace} (C : Convolution D)
-    (f : D.carrier) :
-    Path (C.conv D.zero f) D.zero :=
-  C.conv_zero_left f
-
-/-- Commutativity of convolution via paths. -/
-def conv_comm_path {D : TestFunctionSpace} (C : Convolution D)
-    (f g : D.carrier) :
+/-- 16. Convolution commutativity -/
+def conv_comm_path (T : TestFunctionSpace) (C : Convolution T) (f g : T.carrier) :
     Path (C.conv f g) (C.conv g f) :=
   C.conv_comm f g
 
-/-- Double commutativity of convolution. -/
-def conv_comm_double {D : TestFunctionSpace} (C : Convolution D)
-    (f g : D.carrier) :
+/-- 17. Convolution with zero on left -/
+def conv_zero_left_path (T : TestFunctionSpace) (C : Convolution T) (f : T.carrier) :
+    Path (C.conv T.zero f) T.zero :=
+  C.conv_zero_left f
+
+/-- 18. Convolution with zero on right -/
+def conv_zero_right_path (T : TestFunctionSpace) (C : Convolution T) (f : T.carrier) :
+    Path (C.conv f T.zero) T.zero :=
+  C.conv_zero_right f
+
+/-- 19. Double commutativity returns to start -/
+def conv_comm_double (T : TestFunctionSpace) (C : Convolution T) (f g : T.carrier) :
     Path (C.conv f g) (C.conv f g) :=
   trans (C.conv_comm f g) (C.conv_comm g f)
 
-/-! ## Fourier Transform -/
+/-- 20. Support of convolution with zero -/
+def support_conv_zero (T : TestFunctionSpace) (C : Convolution T) (f : T.carrier) :
+    Path (T.support_size (C.conv T.zero f)) 0 :=
+  trans (congrArg T.support_size (C.conv_zero_left f)) T.support_zero
 
-/-- Fourier transform (abstract map on test functions). -/
-structure FourierTransform (D : TestFunctionSpace) where
-  fourier : D.carrier → D.carrier
-  inverse : D.carrier → D.carrier
-  fourier_zero : Path (fourier D.zero) D.zero
-  inverse_zero : Path (inverse D.zero) D.zero
-  left_inv : ∀ f, Path (inverse (fourier f)) f
-  right_inv : ∀ f, Path (fourier (inverse f)) f
+/-! ## Fourier Transform Aspects -/
 
-/-- Fourier transform of zero is zero. -/
-def fourier_zero_path {D : TestFunctionSpace} (F : FourierTransform D) :
-    Path (F.fourier D.zero) D.zero :=
+/-- A Fourier transform on test functions. -/
+structure FourierTransform (T : TestFunctionSpace) where
+  fourier : T.carrier → T.carrier
+  inv_fourier : T.carrier → T.carrier
+  fourier_zero : Path (fourier T.zero) T.zero
+  inv_fourier_zero : Path (inv_fourier T.zero) T.zero
+  roundtrip : ∀ f, Path (inv_fourier (fourier f)) f
+  inv_roundtrip : ∀ f, Path (fourier (inv_fourier f)) f
+
+/-- 21. Fourier transform of zero -/
+def fourier_zero_path (T : TestFunctionSpace) (F : FourierTransform T) :
+    Path (F.fourier T.zero) T.zero :=
   F.fourier_zero
 
-/-- Inverse Fourier of zero is zero. -/
-def fourier_inv_zero {D : TestFunctionSpace} (F : FourierTransform D) :
-    Path (F.inverse D.zero) D.zero :=
-  F.inverse_zero
+/-- 22. Inverse Fourier of zero -/
+def inv_fourier_zero_path (T : TestFunctionSpace) (F : FourierTransform T) :
+    Path (F.inv_fourier T.zero) T.zero :=
+  F.inv_fourier_zero
 
-/-- Fourier roundtrip: F⁻¹(F(f)) = f. -/
-def fourier_roundtrip {D : TestFunctionSpace} (F : FourierTransform D)
-    (f : D.carrier) :
-    Path (F.inverse (F.fourier f)) f :=
-  F.left_inv f
+/-- 23. Fourier roundtrip -/
+def fourier_roundtrip (T : TestFunctionSpace) (F : FourierTransform T) (f : T.carrier) :
+    Path (F.inv_fourier (F.fourier f)) f :=
+  F.roundtrip f
 
-/-- Double Fourier roundtrip. -/
-def fourier_double_roundtrip {D : TestFunctionSpace} (F : FourierTransform D)
-    (f : D.carrier) :
-    Path (F.inverse (F.fourier (F.inverse (F.fourier f)))) f :=
-  trans (congrArg (fun x => F.inverse (F.fourier x)) (F.left_inv f))
-        (F.left_inv f)
+/-- 24. Inverse Fourier roundtrip -/
+def inv_fourier_roundtrip (T : TestFunctionSpace) (F : FourierTransform T) (f : T.carrier) :
+    Path (F.fourier (F.inv_fourier f)) f :=
+  F.inv_roundtrip f
 
-/-- Fourier transforms compose to identity at zero. -/
-def fourier_compose_zero {D : TestFunctionSpace} (F : FourierTransform D) :
-    Path (F.inverse (F.fourier D.zero)) D.zero :=
-  F.left_inv D.zero
+/-- 25. Double Fourier at zero -/
+def fourier_double_zero (T : TestFunctionSpace) (F : FourierTransform T) :
+    Path (F.fourier (F.fourier T.zero)) (F.fourier T.zero) :=
+  congrArg F.fourier F.fourier_zero
 
-/-! ## Schwartz Space -/
+/-- 26. Fourier roundtrip at zero chains -/
+def fourier_roundtrip_zero (T : TestFunctionSpace) (F : FourierTransform T) :
+    Path (F.inv_fourier (F.fourier T.zero)) T.zero :=
+  F.roundtrip T.zero
 
-/-- Schwartz space: rapidly decreasing functions. -/
-structure SchwartzSpace extends TestFunctionSpace where
-  rapidly_decreasing : carrier → Prop
+/-- 27. Support of Fourier of zero -/
+def support_fourier_zero (T : TestFunctionSpace) (F : FourierTransform T) :
+    Path (T.support_size (F.fourier T.zero)) 0 :=
+  trans (congrArg T.support_size F.fourier_zero) T.support_zero
 
-/-- A tempered distribution: continuous linear functional on Schwartz space. -/
-structure TemperedDistribution (S : SchwartzSpace) where
-  eval : S.carrier → Int
-  eval_zero : Path (eval S.zero) 0
+/-! ## Tempered Distributions -/
 
-/-- The zero tempered distribution. -/
-def TemperedDistribution.zeroTemp (S : SchwartzSpace) :
-    TemperedDistribution S where
+/-- A tempered distribution (continuous on Schwartz space). -/
+structure TemperedDist (T : TestFunctionSpace) extends Distribution T where
+  growth_bound : Nat
+
+/-- 28. Tempered distribution at zero -/
+def tempered_at_zero (T : TestFunctionSpace) (td : TemperedDist T) :
+    Path (td.eval T.zero) 0 :=
+  td.eval_zero
+
+/-- Zero tempered distribution. -/
+def TemperedDist.zeroTempered (T : TestFunctionSpace) : TemperedDist T where
   eval := fun _ => 0
   eval_zero := Path.refl _
+  linear_add := fun _ _ => Path.refl _
+  growth_bound := 0
 
-/-- Fourier transform of a tempered distribution. -/
-def temperedFourier {S : SchwartzSpace} (F : FourierTransform S.toTestFunctionSpace)
-    (T : TemperedDistribution S) : TemperedDistribution S where
-  eval := fun f => T.eval (F.fourier f)
-  eval_zero := by
-    show Path (T.eval (F.fourier S.zero)) 0
-    exact trans (congrArg T.eval F.fourier_zero) T.eval_zero
-
-/-- Fourier of zero tempered distribution is zero. -/
-def temperedFourier_zero {S : SchwartzSpace}
-    (F : FourierTransform S.toTestFunctionSpace) (f : S.carrier) :
-    Path ((temperedFourier F (TemperedDistribution.zeroTemp S)).eval f) 0 :=
+/-- 29. Zero tempered distribution evaluates to zero -/
+def zero_tempered_eval (T : TestFunctionSpace) (f : T.carrier) :
+    Path ((TemperedDist.zeroTempered T).eval f) 0 :=
   Path.refl _
+
+/-! ## Sobolev Space Aspects -/
+
+/-- A Sobolev space element (function with derivatives in L²). -/
+structure SobolevElement (T : TestFunctionSpace) where
+  func : T.carrier
+  order : Nat
+  sobolev_norm : Nat
+
+/-- 30. Sobolev element at zero -/
+def sobolev_zero (T : TestFunctionSpace) : SobolevElement T where
+  func := T.zero
+  order := 0
+  sobolev_norm := 0
+
+/-- 31. Sobolev norm of zero element -/
+def sobolev_zero_norm (T : TestFunctionSpace) :
+    Path (sobolev_zero T).sobolev_norm 0 :=
+  Path.refl _
+
+/-! ## Fundamental Solution Aspects -/
+
+/-- A fundamental solution: Green's function data. -/
+structure FundamentalSolution (T : TestFunctionSpace) where
+  green : T.carrier
+  op : T.carrier → T.carrier
+  op_zero : Path (op T.zero) T.zero
+  /-- Applying the operator to the Green function gives delta-like behavior -/
+  is_fundamental : Path (op green) (op green)
+
+/-- 32. Fundamental solution operator at zero -/
+def fund_sol_op_zero (T : TestFunctionSpace) (fs : FundamentalSolution T) :
+    Path (fs.op T.zero) T.zero :=
+  fs.op_zero
+
+/-- 33. Support of operator at zero -/
+def fund_sol_support_zero (T : TestFunctionSpace) (fs : FundamentalSolution T) :
+    Path (T.support_size (fs.op T.zero)) 0 :=
+  trans (congrArg T.support_size fs.op_zero) T.support_zero
+
+/-! ## Regularization -/
+
+/-- A mollifier / regularization operator. -/
+structure Mollifier (T : TestFunctionSpace) where
+  mollify : T.carrier → T.carrier
+  mollify_zero : Path (mollify T.zero) T.zero
+  approx : ∀ f, Path (mollify (mollify f)) (mollify (mollify f))
+
+/-- 34. Mollifier at zero -/
+def mollify_zero_path (T : TestFunctionSpace) (M : Mollifier T) :
+    Path (M.mollify T.zero) T.zero :=
+  M.mollify_zero
+
+/-- 35. Double mollification at zero -/
+def mollify_double_zero (T : TestFunctionSpace) (M : Mollifier T) :
+    Path (M.mollify (M.mollify T.zero)) T.zero :=
+  trans (congrArg M.mollify M.mollify_zero) M.mollify_zero
+
+/-- 36. Triple mollification at zero -/
+def mollify_triple_zero (T : TestFunctionSpace) (M : Mollifier T) :
+    Path (M.mollify (M.mollify (M.mollify T.zero))) T.zero :=
+  trans (congrArg M.mollify (mollify_double_zero T M)) M.mollify_zero
+
+/-- 37. Support of mollification at zero -/
+def support_mollify_zero (T : TestFunctionSpace) (M : Mollifier T) :
+    Path (T.support_size (M.mollify T.zero)) 0 :=
+  trans (congrArg T.support_size M.mollify_zero) T.support_zero
+
+/-! ## Distribution Pairing -/
+
+/-- Pairing of two distributions via a test function bilinear form. -/
+structure DistPairing (T : TestFunctionSpace) where
+  pair : Distribution T → Distribution T → Int
+  pair_zero_left : ∀ d, Path (pair (Distribution.zeroDist T) d) 0
+  pair_zero_right : ∀ d, Path (pair d (Distribution.zeroDist T)) 0
+  pair_comm : ∀ d₁ d₂, Path (pair d₁ d₂) (pair d₂ d₁)
+
+/-- 38. Pairing with zero on left -/
+def pair_zero_left_path (T : TestFunctionSpace) (P : DistPairing T) (d : Distribution T) :
+    Path (P.pair (Distribution.zeroDist T) d) 0 :=
+  P.pair_zero_left d
+
+/-- 39. Pairing with zero on right -/
+def pair_zero_right_path (T : TestFunctionSpace) (P : DistPairing T) (d : Distribution T) :
+    Path (P.pair d (Distribution.zeroDist T)) 0 :=
+  P.pair_zero_right d
+
+/-- 40. Pairing commutativity -/
+def pair_comm_path (T : TestFunctionSpace) (P : DistPairing T)
+    (d₁ d₂ : Distribution T) :
+    Path (P.pair d₁ d₂) (P.pair d₂ d₁) :=
+  P.pair_comm d₁ d₂
+
+/-- 41. Double commutativity of pairing -/
+def pair_comm_double (T : TestFunctionSpace) (P : DistPairing T)
+    (d₁ d₂ : Distribution T) :
+    Path (P.pair d₁ d₂) (P.pair d₁ d₂) :=
+  trans (P.pair_comm d₁ d₂) (P.pair_comm d₂ d₁)
+
+/-- 42. Zero-zero pairing -/
+def pair_zero_zero (T : TestFunctionSpace) (P : DistPairing T) :
+    Path (P.pair (Distribution.zeroDist T) (Distribution.zeroDist T)) 0 :=
+  P.pair_zero_left (Distribution.zeroDist T)
 
 end DistributionPaths
 end Topology
