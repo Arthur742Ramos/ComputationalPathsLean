@@ -169,6 +169,111 @@ def zero_mem_indeterminacy_path {R : GradedRing}
       (R.zero ((inp.p + inp.q) + inp.r)) :=
   Path.stepChain (R.mul_zero_left (inp.p + inp.q) inp.r inp.c)
 
+/-! ## Basic theorem interface -/
+
+theorem tripleMasseyInput_ab_zero {R : GradedRing}
+    (inp : TripleMasseyInput R) :
+    R.mul inp.p inp.q inp.a inp.b = R.zero (inp.p + inp.q) := by
+  sorry
+
+theorem tripleMasseyInput_bc_zero {R : GradedRing}
+    (inp : TripleMasseyInput R) :
+    R.mul inp.q inp.r inp.b inp.c = R.zero (inp.q + inp.r) := by
+  sorry
+
+theorem isTripleMasseyValue_iff {R : GradedRing}
+    (inp : TripleMasseyInput R)
+    (x : R.carrier ((inp.p + inp.q) + inp.r)) :
+    isTripleMasseyValue inp x ↔
+      ∃ sys : TripleMasseyDefSys R inp,
+        x = tripleMasseyValue sys := by
+  sorry
+
+theorem isTripleMasseyValue_of_definingSystem {R : GradedRing}
+    {inp : TripleMasseyInput R}
+    (sys : TripleMasseyDefSys R inp) :
+    isTripleMasseyValue inp (tripleMasseyValue sys) := by
+  sorry
+
+theorem tripleMasseyValue_eq_add {R : GradedRing}
+    {inp : TripleMasseyInput R}
+    (sys : TripleMasseyDefSys R inp) :
+    ∃ h : inp.p + (inp.q + inp.r) = (inp.p + inp.q) + inp.r,
+      tripleMasseyValue sys =
+        R.add ((inp.p + inp.q) + inp.r)
+          (R.mul (inp.p + inp.q) inp.r sys.s inp.c)
+          (h ▸ R.mul inp.p (inp.q + inp.r) inp.a sys.t) := by
+  sorry
+
+theorem MasseyIndeterminacy_iff {R : GradedRing}
+    (inp : TripleMasseyInput R)
+    (x : R.carrier ((inp.p + inp.q) + inp.r)) :
+    MasseyIndeterminacy inp x ↔
+      (∃ u : R.carrier (inp.q + inp.r),
+        let h : inp.p + (inp.q + inp.r) = (inp.p + inp.q) + inp.r := by omega
+        x = h ▸ R.mul inp.p (inp.q + inp.r) inp.a u) ∨
+      (∃ v : R.carrier (inp.p + inp.q),
+        x = R.mul (inp.p + inp.q) inp.r v inp.c) := by
+  sorry
+
+theorem indeterminacy_of_left_term {R : GradedRing}
+    (inp : TripleMasseyInput R)
+    (u : R.carrier (inp.q + inp.r)) :
+    MasseyIndeterminacy inp
+      (let h : inp.p + (inp.q + inp.r) = (inp.p + inp.q) + inp.r := by omega
+       h ▸ R.mul inp.p (inp.q + inp.r) inp.a u) := by
+  sorry
+
+theorem indeterminacy_of_right_term {R : GradedRing}
+    (inp : TripleMasseyInput R)
+    (v : R.carrier (inp.p + inp.q)) :
+    MasseyIndeterminacy inp
+      (R.mul (inp.p + inp.q) inp.r v inp.c) := by
+  sorry
+
+theorem zero_mem_indeterminacy_from_mul_zero_left {R : GradedRing}
+    (inp : TripleMasseyInput R) :
+    MasseyIndeterminacy inp
+      (R.mul (inp.p + inp.q) inp.r (R.zero (inp.p + inp.q)) inp.c) := by
+  sorry
+
+theorem zero_mem_indeterminacy_path_toEq {R : GradedRing}
+    (inp : TripleMasseyInput R) :
+    (zero_mem_indeterminacy_path inp).toEq =
+      R.mul_zero_left (inp.p + inp.q) inp.r inp.c := by
+  sorry
+
+theorem nontrivialMassey_isTripleMasseyValue {R : GradedRing}
+    (m : NontrivialMassey R) :
+    isTripleMasseyValue m.input m.representative := by
+  sorry
+
+theorem nontrivialMassey_representative_nonzero {R : GradedRing}
+    (m : NontrivialMassey R) :
+    m.representative ≠ R.zero ((m.input.p + m.input.q) + m.input.r) := by
+  sorry
+
+theorem MasseyCosetProperty_apply {R : GradedRing}
+    {inp : TripleMasseyInput R}
+    (hcoset : MasseyCosetProperty inp)
+    (sys1 sys2 : TripleMasseyDefSys R inp) :
+    MasseyIndeterminacy inp
+      (R.add ((inp.p + inp.q) + inp.r)
+        (tripleMasseyValue sys1)
+        (R.neg ((inp.p + inp.q) + inp.r) (tripleMasseyValue sys2))) := by
+  sorry
+
+theorem HigherMasseyInput_consecutive_zero_apply {R : GradedRing}
+    {n : Nat}
+    (inp : HigherMasseyInput R n)
+    (i : Fin n)
+    (hi : i.val + 1 < n) :
+    R.mul (inp.degree i) (inp.degree ⟨i.val + 1, hi⟩)
+      (inp.element i)
+      (inp.element ⟨i.val + 1, hi⟩) =
+    R.zero (inp.degree i + inp.degree ⟨i.val + 1, hi⟩) := by
+  sorry
+
 /-! ## Summary -/
 
 end MasseyProduct

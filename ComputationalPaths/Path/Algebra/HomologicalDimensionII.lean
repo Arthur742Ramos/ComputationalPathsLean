@@ -151,6 +151,107 @@ def trivialGlobalDimension (bound : Nat) :
   projective_bound := fun A => trivialProjectiveDimBound bound A
   injective_bound := fun B => trivialInjectiveDimBound bound B
 
+/-! ## Basic theorem interface -/
+
+theorem isZeroPointed_apply {A : PointedSet.{u}}
+    (hA : IsZeroPointed A) (x : A.carrier) :
+    Nonempty (Path x A.zero) := by
+  sorry
+
+theorem TorData.map_id_apply (T : TorData.{u})
+    (n : Nat) (A B : PointedSet.{u}) :
+    Nonempty
+      (Path (T.mapMor (n := n) (PointedHom.id A) (PointedHom.id B))
+        (PointedHom.id (T.obj n A B))) := by
+  sorry
+
+theorem ExtData.map_left_id_apply (E : ExtData.{u})
+    (n : Nat) (A B : PointedSet.{u}) :
+    Nonempty
+      (Path (E.map_left (n := n) (B := B) (PointedHom.id A))
+        (PointedHom.id (E.obj n A B))) := by
+  sorry
+
+theorem ExtData.map_right_id_apply (E : ExtData.{u})
+    (n : Nat) (A B : PointedSet.{u}) :
+    Nonempty
+      (Path (E.map_right (n := n) (A := A) (PointedHom.id B))
+        (PointedHom.id (E.obj n A B))) := by
+  sorry
+
+theorem DimensionShift.shift_natural_apply
+    (T : TorData.{u}) (S : DimensionShift T)
+    (n : Nat) {A A' : PointedSet.{u}} {B B' : PointedSet.{u}}
+    (f : PointedHom A A') (g : PointedHom B B') :
+    Nonempty
+      (Path
+        (PointedHom.comp (T.mapMor (n := n) f g) (S.shift n A B))
+        (PointedHom.comp (S.shift n A' B') (T.mapMor (n := Nat.succ n) f g))) := by
+  sorry
+
+theorem ProjectiveDimBound.vanish_apply
+    (T : TorData.{u}) (A : PointedSet.{u}) (bound n : Nat)
+    (pd : ProjectiveDimBound T A bound)
+    (B : PointedSet.{u}) (h : bound < n) :
+    Nonempty (IsZeroPointed (T.obj n A B)) := by
+  sorry
+
+theorem InjectiveDimBound.vanish_apply
+    (E : ExtData.{u}) (B : PointedSet.{u}) (bound n : Nat)
+    (idb : InjectiveDimBound E B bound)
+    (A : PointedSet.{u}) (h : bound < n) :
+    Nonempty (IsZeroPointed (E.obj n A B)) := by
+  sorry
+
+theorem GlobalDimension.projective_bound_apply
+    (T : TorData.{u}) (E : ExtData.{u}) (bound : Nat)
+    (gd : GlobalDimension T E bound) (A : PointedSet.{u}) :
+    Nonempty (ProjectiveDimBound T A bound) := by
+  sorry
+
+theorem GlobalDimension.injective_bound_apply
+    (T : TorData.{u}) (E : ExtData.{u}) (bound : Nat)
+    (gd : GlobalDimension T E bound) (B : PointedSet.{u}) :
+    Nonempty (InjectiveDimBound E B bound) := by
+  sorry
+
+theorem TorData.trivial_mapMor_eq_id
+    {n : Nat} {A A' : PointedSet.{u}} {B B' : PointedSet.{u}}
+    (f : PointedHom A A') (g : PointedHom B B') :
+    TorData.trivial.mapMor (n := n) f g = PointedHom.id punitPointed := by
+  sorry
+
+theorem TorData.trivial_map_id_apply
+    (n : Nat) (A B : PointedSet.{u}) :
+    Nonempty
+      (Path
+        (TorData.trivial.mapMor (n := n) (PointedHom.id A) (PointedHom.id B))
+        (PointedHom.id (TorData.trivial.obj n A B))) := by
+  sorry
+
+theorem ExtData.trivial_map_left_eq_id
+    {n : Nat} {A A' : PointedSet.{u}} {B : PointedSet.{u}}
+    (f : PointedHom A A') :
+    ExtData.trivial.map_left (n := n) (B := B) f = PointedHom.id punitPointed := by
+  sorry
+
+theorem ExtData.trivial_map_right_eq_id
+    {n : Nat} {A : PointedSet.{u}} {B B' : PointedSet.{u}}
+    (g : PointedHom B B') :
+    ExtData.trivial.map_right (n := n) (A := A) g = PointedHom.id punitPointed := by
+  sorry
+
+theorem DimensionShift.trivial_shift_eq_id
+    (n : Nat) (A B : PointedSet.{u}) :
+    DimensionShift.trivial.shift n A B = PointedHom.id punitPointed := by
+  sorry
+
+theorem trivialGlobalDimension_projective_bound_eq
+    (bound : Nat) (A : PointedSet.{u}) :
+    (trivialGlobalDimension bound).projective_bound A =
+      trivialProjectiveDimBound bound A := by
+  sorry
+
 end Algebra
 end Path
 end ComputationalPaths

@@ -248,6 +248,73 @@ structure RibbonCategory where
 def quantumDim (C : RibbonCategory) (X : C.Obj) : C.Dim :=
   C.qdim X
 
+/-! ## Basic theorem stubs -/
+
+theorem pairMul_fst {A : Type u} (mul : A → A → A) (x y : A × A) :
+    (pairMul mul x y).1 = mul x.1 y.1 := by
+  sorry
+
+theorem pairMul_snd {A : Type u} (mul : A → A → A) (x y : A × A) :
+    (pairMul mul x y).2 = mul x.2 y.2 := by
+  sorry
+
+theorem counitLeft_eq_snd {A : Type u} (counit : A → Unit) (x : A × A) :
+    counitLeft counit x = x.2 := by
+  sorry
+
+theorem counitRight_eq_fst {A : Type u} (counit : A → Unit) (x : A × A) :
+    counitRight counit x = x.1 := by
+  sorry
+
+theorem comulLeft_first_component {A : Type u} (comul : A → A × A) (a : A) :
+    (comulLeft comul a).1 = (comul (comul a).1).1 := by
+  sorry
+
+theorem comulRight_first_component {A : Type u} (comul : A → A × A) (a : A) :
+    (comulRight comul a).1 = (comul a).1 := by
+  sorry
+
+theorem HopfAlgebra.mul_assoc_path {A : Type u} (H : HopfAlgebra A) (a b c : A) :
+    H.mul (H.mul a b) c = H.mul a (H.mul b c) := by
+  sorry
+
+theorem HopfAlgebra.bialgebra_law_path {A : Type u} (H : HopfAlgebra A) (a b : A) :
+    H.comul (H.mul a b) = pairMul H.mul (H.comul a) (H.comul b) := by
+  sorry
+
+theorem HopfAlgebra.unit_reduce_twice_eq {A : Type u} (H : HopfAlgebra A) (a : A) :
+    H.mul (H.mul H.one a) H.one = a := by
+  sorry
+
+theorem QuantumEnveloping.generator_q_commute_path {g : Type u} {q : Type v}
+    (U : QuantumEnveloping g q) (x y : g) :
+    U.hopf.mul (U.generator x) (U.generator y) =
+      U.hopf.mul (U.generator y) (U.generator x) := by
+  sorry
+
+theorem QuantumEnveloping.generator_q_commute_symm {g : Type u} {q : Type v}
+    (U : QuantumEnveloping g q) (x y : g) :
+    U.hopf.mul (U.generator y) (U.generator x) =
+      U.hopf.mul (U.generator x) (U.generator y) := by
+  sorry
+
+theorem RMatrix.left_inv_eq {A : Type u} (R : RMatrix A) (x : A × A) :
+    R.inverse (R.braid x) = x := by
+  sorry
+
+theorem RMatrix.right_inv_eq {A : Type u} (R : RMatrix A) (x : A × A) :
+    R.braid (R.inverse x) = x := by
+  sorry
+
+theorem RMatrix.yang_baxter_path {A : Type u} (R : RMatrix A) (x : A × A × A) :
+    braid12 R.braid (braid23 R.braid (braid12 R.braid x)) =
+      braid23 R.braid (braid12 R.braid (braid23 R.braid x)) := by
+  sorry
+
+theorem quantumDim_unit_path (C : RibbonCategory) :
+    quantumDim C C.unit = C.dimOne := by
+  sorry
+
 end QuantumGroups
 end Algebra
 end Path

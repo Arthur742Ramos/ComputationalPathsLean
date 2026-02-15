@@ -232,6 +232,65 @@ def trivialQS0Homology : QS0Homology where
   poly := trivialPolynomial
   poly_eq := rfl
 
+/-! ## Additional theorem stubs -/
+
+theorem graded_mul_zero_left (A : GradedF2Algebra) (p q : Nat) (y : A.carrier q) :
+    A.mul p q (A.zero p) y = A.zero (p + q) := by
+  sorry
+
+theorem graded_mul_zero_right (A : GradedF2Algebra) (p q : Nat) (x : A.carrier p) :
+    A.mul p q x (A.zero q) = A.zero (p + q) := by
+  sorry
+
+theorem graded_mul_zero_both (A : GradedF2Algebra) (p q : Nat) :
+    A.mul p q (A.zero p) (A.zero q) = A.zero (p + q) := by
+  sorry
+
+theorem dyer_lashof_Q_zero {M : GradedF2Module} (D : DyerLashofData M) (s n : Nat) :
+    D.Q s n (M.zero n) = M.zero (n + s) := by
+  sorry
+
+theorem dyer_lashof_Q_add {M : GradedF2Module} (D : DyerLashofData M)
+    (s n : Nat) (x y : M.carrier n) :
+    D.Q s n (M.add n x y) = M.add (n + s) (D.Q s n x) (D.Q s n y) := by
+  sorry
+
+theorem dyer_lashof_Q_zero_id {M : GradedF2Module} (D : DyerLashofData M)
+    (n : Nat) (x : M.carrier n) :
+    D.Q 0 n x = _root_.cast (_root_.congrArg M.carrier (Nat.add_zero n).symm) x := by
+  sorry
+
+theorem dyer_lashof_Q_add_comm {M : GradedF2Module} (D : DyerLashofData M)
+    (s n : Nat) (x y : M.carrier n) :
+    D.Q s n (M.add n x y) = M.add (n + s) (D.Q s n y) (D.Q s n x) := by
+  sorry
+
+theorem dyer_lashof_Q_add_zero_left {M : GradedF2Module} (D : DyerLashofData M)
+    (s n : Nat) (x : M.carrier n) :
+    D.Q s n (M.add n (M.zero n) x) = D.Q s n x := by
+  sorry
+
+theorem kudo_transgression_naturality {M : GradedF2Module} {D : DyerLashofData M}
+    (K : KudoTransgression M D) (s n : Nat) (x : M.carrier n) :
+    Nonempty (Path (K.trans (n + s) (D.Q s n x)) (D.Q (s + 1) n x)) := by
+  sorry
+
+theorem araki_kudo_identifies_Q {M : GradedF2Module} {D : DyerLashofData M}
+    (A : ArakiKudoData M D) (s n : Nat) (x : M.carrier n) :
+    Nonempty (Path (A.ak s n x) (D.Q s n x)) := by
+  sorry
+
+theorem dl_degree_id (s : DLGenerator) : dl_degree s = s := by
+  sorry
+
+theorem qs0_is_polynomial_symm (H : QS0Homology) :
+    H.homology = H.poly.algebra := by
+  sorry
+
+theorem trivial_qs0_is_polynomial :
+    trivialQS0Homology.poly.algebra = trivialQS0Homology.homology := by
+  sorry
+
 /-! ## Summary -/
 
 end DyerLashofOperations
