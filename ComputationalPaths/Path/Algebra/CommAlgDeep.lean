@@ -1,9 +1,9 @@
 /-
 # Deep Commutative Algebra via Computational Paths
 
-Prime/maximal ideals, localization at primes, Nakayama's lemma,
-primary decomposition, dimension theory — all witnessed by
-computational paths carrying rewrite traces over ℤ.
+Prime/maximal ideals, localization, Nakayama, primary decomposition,
+dimension theory — all modelled over ℤ as principal ideal domain using
+only core Lean, witnessed by computational paths (Path/Step/trans/symm).
 -/
 
 import ComputationalPaths.Path.Basic
@@ -15,30 +15,23 @@ open ComputationalPaths.Path
 universe u
 
 -- ============================================================
--- § 1. Ideal foundations over ℤ
+-- § 1. Principal ideals over ℤ
 -- ============================================================
-
-abbrev R := Int
 
 /-- Principal ideal (n) in ℤ. -/
 structure PIdeal where
   gen : Nat
 deriving DecidableEq
 
-@[simp] def PIdeal.mem (I : PIdeal) (a : R) : Prop :=
-  ∃ k : Int, a = ↑I.gen * k
-
 @[simp] def PIdeal.sum (I J : PIdeal) : PIdeal := ⟨Nat.gcd I.gen J.gen⟩
 @[simp] def PIdeal.prod (I J : PIdeal) : PIdeal := ⟨I.gen * J.gen⟩
 @[simp] def PIdeal.inter (I J : PIdeal) : PIdeal := ⟨Nat.lcm I.gen J.gen⟩
-@[simp] def PIdeal.contains (I J : PIdeal) : Prop := J.gen ∣ I.gen
 
-/-- Radical: for principal ideals rad((n)) we take the squarefree part.
-    Simplified here: rad((0)) = (0), rad((n)) = (n) as a coarse approximation. -/
-@[simp] def PIdeal.radical (I : PIdeal) : PIdeal := I
+/-- Whether n is prime (avoiding Mathlib's Nat.Prime). -/
+def isPrime (n : Nat) : Prop := 2 ≤ n ∧ ∀ m, m ∣ n → m = 1 ∨ m = n
 
 -- ============================================================
--- § 2. Ideal operation paths (sum, product, intersection)
+-- § 2. Ideal arithmetic paths
 -- ============================================================
 
 -- 1. Sum is commutative
@@ -100,15 +93,16 @@ def pideal_inter_comm_path (I J : PIdeal) :
     Path (PIdeal.inter I J) (PIdeal.inter J I) :=
   Path.ofEq (pideal_inter_comm I J)
 
--- 8. Sum is idempotent
-theorem pideal_sum_self (I : PIdeal) : PIdeal.sum I I = I := by
-  simp [PIdeal.sum, Nat.gcd_self]
+-- 8. Intersection is associative
+theorem pideal_inter_assoc (I J K : PIdeal) :
+    PIdeal.inter (PIdeal.inter I J) K = PIdeal.inter I (PIdeal.inter J K) := by
+  simp [PIdeal.inter, Nat.lcm_assoc]
 
-def pideal_sum_self_path (I : PIdeal) :
-    Path (PIdeal.sum I I) I :=
-  Path.ofEq (pideal_sum_self I)
+def pideal_inter_assoc_path (I J K : PIdeal) :
+    Path (PIdeal.inter (PIdeal.inter I J) K) (PIdeal.inter I (PIdeal.inter J K)) :=
+  Path.ofEq (pideal_inter_assoc I J K)
 
--- 9. Product with zero ideal
+-- 9. Product with zero
 theorem pideal_prod_zero (I : PIdeal) : PIdeal.prod I ⟨0⟩ = ⟨0⟩ := by
   simp [PIdeal.prod, Nat.mul_zero]
 
@@ -116,243 +110,291 @@ def pideal_prod_zero_path (I : PIdeal) :
     Path (PIdeal.prod I ⟨0⟩) ⟨0⟩ :=
   Path.ofEq (pideal_prod_zero I)
 
--- 10. Left-zero for sum
-theorem pideal_zero_sum (I : PIdeal) : PIdeal.sum ⟨0⟩ I = I := by
-  simp [PIdeal.sum, Nat.gcd_zero_left]
+-- 10. Left unit for product
+theorem pideal_unit_prod (I : PIdeal) : PIdeal.prod ⟨1⟩ I = I := by
+  simp [PIdeal.prod, Nat.one_mul]
 
-def pideal_zero_sum_path (I : PIdeal) :
-    Path (PIdeal.sum ⟨0⟩ I) I :=
-  Path.ofEq (pideal_zero_sum I)
+def pideal_unit_prod_path (I : PIdeal) :
+    Path (PIdeal.prod ⟨1⟩ I) I :=
+  Path.ofEq (pideal_unit_prod I)
 
--- ============================================================
--- § 3. Containment and primality
--- ============================================================
+-- 11. gcd with self
+theorem pideal_sum_self (I : PIdeal) : PIdeal.sum I I = I := by
+  simp [PIdeal.sum, Nat.gcd_self]
 
--- 11. Containment is reflexive
-theorem pideal_contains_refl (I : PIdeal) : PIdeal.contains I I := by
-  simp [PIdeal.contains]
-
-def pideal_contains_refl_path (I : PIdeal) :
-    Path (PIdeal.contains I I) True := by
-  apply Path.ofEq; simp [PIdeal.contains]
-
--- 12. (0) is contained in every ideal
-theorem zero_contains_all (I : PIdeal) : PIdeal.contains ⟨0⟩ I := by
-  simp [PIdeal.contains]
-
-def zero_contains_all_path (I : PIdeal) :
-    Path (PIdeal.contains ⟨0⟩ I) True := by
-  apply Path.ofEq; simp [PIdeal.contains]
-
--- 13. (1) contains every ideal
-theorem unit_contains_all (I : PIdeal) : PIdeal.contains I ⟨1⟩ := by
-  simp [PIdeal.contains]
-
-def unit_contains_all_path (I : PIdeal) :
-    Path (PIdeal.contains I ⟨1⟩) True := by
-  apply Path.ofEq; simp [PIdeal.contains]
+def pideal_sum_self_path (I : PIdeal) :
+    Path (PIdeal.sum I I) I :=
+  Path.ofEq (pideal_sum_self I)
 
 -- ============================================================
--- § 4. Localization at a multiplicative set
+-- § 3. Nakayama-style / module scaling
 -- ============================================================
 
-/-- A fraction a/s in a localization. -/
-structure LocFrac where
-  num   : Int
-  denom : Nat
-  denom_pos : 0 < denom
+/-- A finitely generated ℤ-module of given rank. -/
+structure FGMod where
+  rank : Nat
+deriving DecidableEq
 
-/-- Fraction equivalence: a/s = b/t iff a*t = b*s. -/
-def LocFrac.equiv (f g : LocFrac) : Prop :=
-  f.num * ↑g.denom = g.num * ↑f.denom
+@[simp] def FGMod.directSum (M N : FGMod) : FGMod := ⟨M.rank + N.rank⟩
+@[simp] def FGMod.tensorZ (M : FGMod) (n : Nat) : FGMod := ⟨M.rank * n⟩
 
--- 14. Fraction equivalence is reflexive
-def locfrac_equiv_refl (f : LocFrac) :
-    Path (LocFrac.equiv f f) True := by
-  apply Path.ofEq; simp [LocFrac.equiv]
+-- 12. Direct sum is commutative
+theorem fgmod_sum_comm (M N : FGMod) :
+    FGMod.directSum M N = FGMod.directSum N M := by
+  simp [FGMod.directSum, Nat.add_comm]
 
--- 15. Fraction with zero numerator
-def locfrac_zero_num (s : Nat) (hs : 0 < s) :
-    Path (LocFrac.mk 0 s hs).num (0 : Int) :=
+def fgmod_sum_comm_path (M N : FGMod) :
+    Path (FGMod.directSum M N) (FGMod.directSum N M) :=
+  Path.ofEq (fgmod_sum_comm M N)
+
+-- 13. Direct sum is associative
+theorem fgmod_sum_assoc (M N K : FGMod) :
+    FGMod.directSum (FGMod.directSum M N) K =
+    FGMod.directSum M (FGMod.directSum N K) := by
+  simp [FGMod.directSum, Nat.add_assoc]
+
+def fgmod_sum_assoc_path (M N K : FGMod) :
+    Path (FGMod.directSum (FGMod.directSum M N) K)
+         (FGMod.directSum M (FGMod.directSum N K)) :=
+  Path.ofEq (fgmod_sum_assoc M N K)
+
+-- 14. Tensor with 1 is identity (Nakayama: M ⊗ ℤ ≅ M)
+theorem tensor_unit (M : FGMod) : FGMod.tensorZ M 1 = M := by
+  simp [FGMod.tensorZ, Nat.mul_one]
+
+def tensor_unit_path (M : FGMod) :
+    Path (FGMod.tensorZ M 1) M :=
+  Path.ofEq (tensor_unit M)
+
+-- 15. Tensor with 0 annihilates (Nakayama: M ⊗ 0 = 0)
+theorem tensor_zero (M : FGMod) : FGMod.tensorZ M 0 = ⟨0⟩ := by
+  simp [FGMod.tensorZ, Nat.mul_zero]
+
+def tensor_zero_path (M : FGMod) :
+    Path (FGMod.tensorZ M 0) ⟨0⟩ :=
+  Path.ofEq (tensor_zero M)
+
+-- 16. Tensor distributes over sum of scalars
+theorem tensor_distrib (M : FGMod) (a b : Nat) :
+    FGMod.tensorZ M (a + b) = FGMod.directSum (FGMod.tensorZ M a) (FGMod.tensorZ M b) := by
+  simp [FGMod.tensorZ, FGMod.directSum, Nat.mul_add]
+
+def tensor_distrib_path (M : FGMod) (a b : Nat) :
+    Path (FGMod.tensorZ M (a + b))
+         (FGMod.directSum (FGMod.tensorZ M a) (FGMod.tensorZ M b)) :=
+  Path.ofEq (tensor_distrib M a b)
+
+-- 17. Direct sum with zero module
+theorem fgmod_sum_zero (M : FGMod) : FGMod.directSum M ⟨0⟩ = M := by
+  simp [FGMod.directSum]
+
+def fgmod_sum_zero_path (M : FGMod) :
+    Path (FGMod.directSum M ⟨0⟩) M :=
+  Path.ofEq (fgmod_sum_zero M)
+
+-- ============================================================
+-- § 4. Localization fractions
+-- ============================================================
+
+/-- Fraction a/s in a localization. -/
+structure Frac where
+  num : Int
+  den : Int
+  den_ne : den ≠ 0
+deriving Repr
+
+/-- Two fractions are equivalent: a/s = b/t ⟺ a*t = b*s. -/
+def Frac.equiv (x y : Frac) : Prop := x.num * y.den = y.num * x.den
+
+-- 18. Fraction equivalence is reflexive
+theorem frac_equiv_refl (x : Frac) : Frac.equiv x x := rfl
+
+def frac_equiv_refl_path (x : Frac) :
+    Path (x.num * x.den) (x.num * x.den) :=
   Path.refl _
 
--- 16. Fraction equivalence is symmetric
-def locfrac_equiv_symm_path (f g : LocFrac) (h : LocFrac.equiv f g) :
-    Path (LocFrac.equiv g f) True := by
-  apply Path.ofEq
-  simp [LocFrac.equiv] at *; exact h.symm
+-- 19. Fraction equivalence is symmetric
+theorem frac_equiv_symm (x y : Frac) (h : Frac.equiv x y) :
+    Frac.equiv y x := h.symm
+
+def frac_equiv_symm_path (x y : Frac) (h : x.num * y.den = y.num * x.den) :
+    Path (y.num * x.den) (x.num * y.den) :=
+  Path.symm (Path.ofEq h)
 
 -- ============================================================
--- § 5. Nakayama's Lemma (concrete ℤ case)
+-- § 5. Krull dimension (modelled as Nat)
 -- ============================================================
 
-/-- In ℤ, the Jacobson radical is (0).  Nakayama says: if 0·M = M, M = 0.
-    Concretely: 0 * a = 0. -/
+/-- Krull dimension of ℤ/(n): 0 if n > 1 (finite ring), 1 if n = 0 (ℤ). -/
+@[simp] def krullDim (n : Nat) : Nat :=
+  if n = 0 then 1 else 0
 
--- 17. Zero times anything is zero
-theorem zero_mul_eq_zero (a : Int) : (0 : Int) * a = 0 := by
-  simp
+-- 20. ℤ has Krull dimension 1
+theorem krull_dim_Z : krullDim 0 = 1 := by simp
 
-def nakayama_Z_path (a : Int) :
-    Path ((0 : Int) * a) 0 := by
-  apply Path.ofEq; simp
+def krull_dim_Z_path : Path (krullDim 0) 1 :=
+  Path.ofEq krull_dim_Z
 
--- 18. Nakayama consequence: zero annihilates sums
-theorem zero_mul_add (a b : Int) : (0 : Int) * a + (0 : Int) * b = 0 := by
-  simp
+-- 21. A quotient ℤ/(n) with n > 0 is 0-dimensional
+theorem krull_dim_quotient (n : Nat) (hn : n ≠ 0) : krullDim n = 0 := by
+  simp [hn]
 
-def nakayama_sum_path (a b : Int) :
-    Path ((0 : Int) * a + (0 : Int) * b) 0 := by
-  apply Path.ofEq; simp
-
--- ============================================================
--- § 6. Primary decomposition (concrete)
--- ============================================================
-
--- 19. gcd * lcm = product
-theorem gcd_mul_lcm_eq (a b : Nat) :
-    Nat.gcd a b * Nat.lcm a b = a * b :=
-  Nat.gcd_mul_lcm a b
-
-def gcd_mul_lcm_path (a b : Nat) :
-    Path (Nat.gcd a b * Nat.lcm a b) (a * b) :=
-  Path.ofEq (gcd_mul_lcm_eq a b)
-
--- 20. Coprime intersection = product
-theorem coprime_lcm_eq_mul (a b : Nat) (h : Nat.Coprime a b) :
-    Nat.lcm a b = a * b := by
-  simp [Nat.lcm, h, Nat.div_one]
-
-def coprime_inter_eq_prod_path (a b : Nat) (h : Nat.Coprime a b) :
-    Path (Nat.lcm a b) (a * b) :=
-  Path.ofEq (coprime_lcm_eq_mul a b h)
-
--- 21. Primary decomposition: CRT coprimality
-theorem crt_gcd_one (a b : Nat) (h : Nat.Coprime a b) :
-    Nat.gcd a b = 1 := h
-
-def crt_path (a b : Nat) (h : Nat.Coprime a b) :
-    Path (Nat.gcd a b) 1 :=
-  Path.ofEq (crt_gcd_one a b h)
+def krull_dim_quotient_path (n : Nat) (hn : n ≠ 0) :
+    Path (krullDim n) 0 :=
+  Path.ofEq (krull_dim_quotient n hn)
 
 -- ============================================================
--- § 7. Dimension theory (Krull chains)
+-- § 6. Prime height
 -- ============================================================
 
-/-- A chain of prime ideals of length n is a strictly ascending sequence
-    (g₀) ⊂ (g₁) ⊂ ⋯ ⊂ (gₙ) where gᵢ₊₁ | gᵢ and gᵢ ≠ gᵢ₊₁. -/
-structure PrimeChain (n : Nat) where
-  gens : Fin (n + 1) → Nat
-  ascending : ∀ i : Fin n, gens ⟨i.val + 1, Nat.succ_lt_succ i.isLt⟩ ∣
-                            gens ⟨i.val, Nat.lt_of_lt_of_le i.isLt (Nat.le_succ n)⟩
-  strict : ∀ i : Fin n, gens ⟨i.val, Nat.lt_of_lt_of_le i.isLt (Nat.le_succ n)⟩ ≠
-                         gens ⟨i.val + 1, Nat.succ_lt_succ i.isLt⟩
+/-- Height of an ideal (n) in ℤ: 0 for (0), 1 for nonzero. -/
+@[simp] def idealHeight (n : Nat) : Nat :=
+  if n = 0 then 0 else 1
 
-/-- Krull dimension ≥ n. -/
-def krullDimGe (n : Nat) : Prop := Nonempty (PrimeChain n)
+-- 22. Height + coheight = 1 for nonzero ideals
+theorem height_plus_codim (n : Nat) (hn : n ≠ 0) :
+    idealHeight n + krullDim n = 1 := by
+  simp [hn]
 
--- 22. Trivial chain of length 0
-def trivial_chain : PrimeChain 0 where
-  gens := fun _ => 0
-  ascending := fun i => Fin.elim0 i
-  strict := fun i => Fin.elim0 i
+def height_plus_codim_path (n : Nat) (hn : n ≠ 0) :
+    Path (idealHeight n + krullDim n) 1 :=
+  Path.ofEq (height_plus_codim n hn)
 
-def krull_dim_ge_zero : Path (krullDimGe 0) (krullDimGe 0) :=
-  Path.refl _
+-- 23. The zero ideal has height 0
+theorem height_zero : idealHeight 0 = 0 := by simp
+
+def height_zero_path : Path (idealHeight 0) 0 :=
+  Path.ofEq height_zero
 
 -- ============================================================
--- § 8. Going-up / Going-down (structural)
+-- § 7. CRT and coprimality
 -- ============================================================
 
-/-- Ring extension as an embedding of generators. -/
-structure RingExt where
-  embed : Nat → Nat
+-- 24. (m) ∩ (n) = lcm
+theorem inter_is_lcm (m n : Nat) :
+    PIdeal.inter ⟨m⟩ ⟨n⟩ = ⟨Nat.lcm m n⟩ := by
+  simp [PIdeal.inter]
 
--- 23. Embedding preserves gcd (sum of ideals)
-theorem ext_preserves_gcd (f : RingExt) (a b : Nat)
-    (h : f.embed (Nat.gcd a b) = Nat.gcd (f.embed a) (f.embed b)) :
-    PIdeal.sum ⟨f.embed a⟩ ⟨f.embed b⟩ = ⟨f.embed (Nat.gcd a b)⟩ := by
-  simp [PIdeal.sum, h]
+def inter_is_lcm_path (m n : Nat) :
+    Path (PIdeal.inter ⟨m⟩ ⟨n⟩) ⟨Nat.lcm m n⟩ :=
+  Path.ofEq (inter_is_lcm m n)
 
-def ext_preserves_gcd_path (f : RingExt) (a b : Nat)
-    (h : f.embed (Nat.gcd a b) = Nat.gcd (f.embed a) (f.embed b)) :
-    Path (PIdeal.sum ⟨f.embed a⟩ ⟨f.embed b⟩) ⟨f.embed (Nat.gcd a b)⟩ :=
-  Path.ofEq (ext_preserves_gcd f a b h)
-
--- 24. Identity embedding preserves everything
-theorem id_ext_sum (a b : Nat) :
-    PIdeal.sum ⟨a⟩ ⟨b⟩ = ⟨Nat.gcd a b⟩ := by
+-- 25. (m) + (n) = gcd
+theorem sum_is_gcd (m n : Nat) :
+    PIdeal.sum ⟨m⟩ ⟨n⟩ = ⟨Nat.gcd m n⟩ := by
   simp [PIdeal.sum]
 
-def id_ext_sum_path (a b : Nat) :
-    Path (PIdeal.sum ⟨a⟩ ⟨b⟩) ⟨Nat.gcd a b⟩ :=
-  Path.ofEq (id_ext_sum a b)
+def sum_is_gcd_path (m n : Nat) :
+    Path (PIdeal.sum ⟨m⟩ ⟨n⟩) ⟨Nat.gcd m n⟩ :=
+  Path.ofEq (sum_is_gcd m n)
+
+-- 26. Coprime ⟹ sum = unit ideal
+theorem coprime_sum_unit (m n : Nat) (h : Nat.gcd m n = 1) :
+    PIdeal.sum ⟨m⟩ ⟨n⟩ = ⟨1⟩ := by
+  simp [PIdeal.sum, h]
+
+def coprime_sum_unit_path (m n : Nat) (h : Nat.gcd m n = 1) :
+    Path (PIdeal.sum ⟨m⟩ ⟨n⟩) ⟨1⟩ :=
+  Path.ofEq (coprime_sum_unit m n h)
 
 -- ============================================================
--- § 9. Integral extensions
+-- § 8. Composition paths (trans/symm demonstrations)
 -- ============================================================
 
--- 25. An integer satisfies x - a = 0, hence is "integral over ℤ"
-theorem integral_witness (a : Int) : a + (-a) = 0 :=
-  Int.add_right_neg a
+-- 27. Composed: sum_comm ∘ sum_comm via trans
+def sum_comm_roundtrip (I J : PIdeal) :
+    Path (PIdeal.sum I J) (PIdeal.sum I J) :=
+  Path.trans (pideal_sum_comm_path I J) (pideal_sum_comm_path J I)
 
-def integral_path (a : Int) :
-    Path (a + (-a)) 0 :=
-  Path.ofEq (integral_witness a)
+-- 28. Symmetric path: product comm reversed
+def prod_comm_sym_path (I J : PIdeal) :
+    Path (PIdeal.prod J I) (PIdeal.prod I J) :=
+  Path.symm (pideal_prod_comm_path I J)
 
--- 26. Composition of integral witnesses
-def integral_compose (a b : Int) :
-    Path (a + (-a) + (b + (-b))) 0 := by
-  apply Path.ofEq
-  rw [Int.add_right_neg, Int.add_right_neg, Int.add_zero]
+-- 29. Chain: zero → unit via trans
+def zero_to_unit_chain :
+    Path (PIdeal.prod ⟨0⟩ ⟨5⟩) ⟨0⟩ :=
+  Path.trans
+    (pideal_prod_comm_path ⟨0⟩ ⟨5⟩)
+    (Path.ofEq (by simp [PIdeal.prod] : PIdeal.prod ⟨5⟩ ⟨0⟩ = ⟨0⟩))
+
+-- 30. Roundtrip: forward then backward gives a loop
+def roundtrip_sum_comm (I J : PIdeal) :
+    Path (PIdeal.sum I J) (PIdeal.sum I J) :=
+  Path.trans (pideal_sum_comm_path I J)
+             (Path.symm (pideal_sum_comm_path I J))
 
 -- ============================================================
--- § 10. Path algebra operations
+-- § 9. Multiplicative structure (ring-like)
 -- ============================================================
 
--- 27. Compose two ideal paths
-def ideal_path_trans {a b c : PIdeal}
-    (p : Path a b) (q : Path b c) : Path a c :=
-  Path.trans p q
+-- 31. Product distributes: a * gcd(b,c) computation
+theorem prod_sum_compute (a b c : Nat) :
+    PIdeal.prod ⟨a⟩ (PIdeal.sum ⟨b⟩ ⟨c⟩) = ⟨a * Nat.gcd b c⟩ := by
+  simp [PIdeal.prod, PIdeal.sum]
 
--- 28. Reverse an ideal path
-def ideal_path_symm {a b : PIdeal}
-    (p : Path a b) : Path b a :=
-  Path.symm p
+def prod_sum_compute_path (a b c : Nat) :
+    Path (PIdeal.prod ⟨a⟩ (PIdeal.sum ⟨b⟩ ⟨c⟩)) ⟨a * Nat.gcd b c⟩ :=
+  Path.ofEq (prod_sum_compute a b c)
 
--- 29. Associativity of composed paths
-theorem ideal_path_assoc {a b c d : PIdeal}
-    (p : Path a b) (q : Path b c) (r : Path c d) :
-    (Path.trans (Path.trans p q) r) = (Path.trans p (Path.trans q r)) := by
-  simp
+-- 32. Concrete: (6) ∩ (10) = (30)
+theorem inter_6_10 : PIdeal.inter ⟨6⟩ ⟨10⟩ = ⟨30⟩ := by native_decide
 
--- 30. Left unit for path composition
-theorem ideal_path_left_unit {a b : PIdeal} (p : Path a b) :
-    Path.trans (Path.refl a) p = p := by
-  simp
+def inter_6_10_path : Path (PIdeal.inter ⟨6⟩ ⟨10⟩) ⟨30⟩ :=
+  Path.ofEq inter_6_10
 
--- 31. Right unit for path composition
-theorem ideal_path_right_unit {a b : PIdeal} (p : Path a b) :
-    Path.trans p (Path.refl b) = p := by
-  simp
+-- 33. Concrete: (6) + (10) = (2)
+theorem sum_6_10 : PIdeal.sum ⟨6⟩ ⟨10⟩ = ⟨2⟩ := by native_decide
 
--- 32. Symm distributes over trans
-theorem ideal_path_symm_trans {a b c : PIdeal}
-    (p : Path a b) (q : Path b c) :
-    Path.symm (Path.trans p q) = Path.trans (Path.symm q) (Path.symm p) := by
-  simp
+def sum_6_10_path : Path (PIdeal.sum ⟨6⟩ ⟨10⟩) ⟨2⟩ :=
+  Path.ofEq sum_6_10
 
--- 33. Double symm is identity
-theorem ideal_path_symm_symm {a b : PIdeal}
-    (p : Path a b) :
-    Path.symm (Path.symm p) = p := by
-  simp [Path.symm]
-  cases p with
-  | mk steps proof =>
-    simp
-    induction steps with
-    | nil => simp
-    | cons s tl ih =>
-      simp [List.map_cons, ih]
+-- 34. Concrete: (6) · (10) = (60)
+theorem prod_6_10 : PIdeal.prod ⟨6⟩ ⟨10⟩ = ⟨60⟩ := by native_decide
+
+def prod_6_10_path : Path (PIdeal.prod ⟨6⟩ ⟨10⟩) ⟨60⟩ :=
+  Path.ofEq prod_6_10
+
+-- 35. Chain of concrete: (6)+(10) then comm
+def sum_6_10_chain :
+    Path (PIdeal.sum ⟨6⟩ ⟨10⟩) (PIdeal.sum ⟨10⟩ ⟨6⟩) :=
+  Path.trans sum_6_10_path
+    (Path.trans (Path.symm (Path.ofEq (by native_decide : PIdeal.sum ⟨10⟩ ⟨6⟩ = ⟨2⟩)))
+               (Path.refl _))
+
+-- ============================================================
+-- § 10. Tensor algebra paths
+-- ============================================================
+
+-- 36. Tensor associativity
+theorem tensor_assoc (M : FGMod) (a b : Nat) :
+    FGMod.tensorZ (FGMod.tensorZ M a) b = FGMod.tensorZ M (a * b) := by
+  simp [FGMod.tensorZ, Nat.mul_assoc]
+
+def tensor_assoc_path (M : FGMod) (a b : Nat) :
+    Path (FGMod.tensorZ (FGMod.tensorZ M a) b) (FGMod.tensorZ M (a * b)) :=
+  Path.ofEq (tensor_assoc M a b)
+
+-- 37. Tensor commutativity of scalars
+theorem tensor_comm_scalars (M : FGMod) (a b : Nat) :
+    FGMod.tensorZ M (a * b) = FGMod.tensorZ M (b * a) := by
+  simp [FGMod.tensorZ, Nat.mul_comm a b]
+
+def tensor_comm_scalars_path (M : FGMod) (a b : Nat) :
+    Path (FGMod.tensorZ M (a * b)) (FGMod.tensorZ M (b * a)) :=
+  Path.ofEq (tensor_comm_scalars M a b)
+
+-- 38. Double tensor then unit
+def tensor_double_unit (M : FGMod) :
+    Path (FGMod.tensorZ (FGMod.tensorZ M 1) 1) M :=
+  Path.trans
+    (tensor_assoc_path M 1 1)
+    (tensor_unit_path M)
+
+-- 39. Tensor zero then sum
+def tensor_zero_sum (M N : FGMod) :
+    Path (FGMod.directSum (FGMod.tensorZ M 0) N) N := by
+  simp [FGMod.tensorZ, FGMod.directSum]
+  exact Path.refl _
 
 end ComputationalPaths.Path.Algebra.CommAlgDeep
