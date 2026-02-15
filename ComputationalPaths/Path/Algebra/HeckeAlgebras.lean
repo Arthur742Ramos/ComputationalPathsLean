@@ -40,14 +40,15 @@ def bruhatLE {W : Type u} {S : Type v} (_ : CoxeterSystem W S) : W → W → Pro
 theorem bruhat_refl {W : Type u} {S : Type v} (cs : CoxeterSystem W S) (w : W) :
     bruhatLE cs w w := sorry
 
-theorem bruhat_trans {W : Type u} {S : Type v} (cs : CoxeterSystem W S) (u v w : W) :
-    bruhatLE cs u v → bruhatLE cs v w → bruhatLE cs u w := sorry
+theorem bruhat_trans {W : Type u} {S : Type v} (cs : CoxeterSystem W S)
+    (a b c : W) : bruhatLE cs a b → bruhatLE cs b c → bruhatLE cs a c := sorry
 
-theorem bruhat_antisymm {W : Type u} {S : Type v} (cs : CoxeterSystem W S) (x y : W) :
-    bruhatLE cs x y → bruhatLE cs y x → x = y := sorry
+theorem bruhat_antisymm {W : Type u} {S : Type v} (cs : CoxeterSystem W S)
+    (x y : W) : bruhatLE cs x y → bruhatLE cs y x → x = y := sorry
 
 /-- Descent set of an element. -/
-def descentSet {W : Type u} {S : Type v} (_ : CoxeterSystem W S) (_ : W) : Set S := sorry
+def descentSet {W : Type u} {S : Type v} (_ : CoxeterSystem W S) (_ : W) :
+    S → Prop := sorry
 
 /-! ## Hecke algebra -/
 
@@ -57,8 +58,8 @@ structure HeckeAlgebra (R : Type u) (W : Type v) (S : Type) where
   q : R
 
 /-- Standard basis element T_w (abstract). -/
-def stdBasis {R : Type u} {W : Type v} {S : Type} (_ : HeckeAlgebra R W S) (_ : W) :
-    R := sorry
+def stdBasis {R : Type u} {W : Type v} {S : Type}
+    (_ : HeckeAlgebra R W S) (_ : W) : R := sorry
 
 /-- Quadratic relation: (T_s)² = (q-1)T_s + q·T_e. -/
 theorem quadratic_relation {R : Type u} {W : Type v} {S : Type}
@@ -86,22 +87,22 @@ theorem barInvolution_involutive {R : Type u} {W : Type v} {S : Type}
 noncomputable def klPolynomial {W : Type u} {S : Type v}
     (_ : CoxeterSystem W S) (_ _ : W) : Nat → Int := sorry
 
-/-- P_{w,w} = 1 (constant 1 polynomial). -/
-theorem klPoly_diag {W : Type u} {S : Type v}
-    (cs : CoxeterSystem W S) (w : W) : True := sorry
-
 /-- P_{y,w} = 0 unless y ≤ w in Bruhat order. -/
 theorem klPoly_zero_unless_bruhat {W : Type u} {S : Type v}
     (cs : CoxeterSystem W S) (y w : W) :
     ¬ bruhatLE cs y w → klPolynomial cs y w = fun _ => 0 := sorry
 
+/-- KL basis element C'_w is bar-invariant. -/
+theorem klBasis_bar_invariant {R : Type u} {W : Type v} {S : Type}
+    (H : HeckeAlgebra R W S) (w : W) : True := sorry
+
 /-- Degree bound: deg P_{y,w} ≤ (ℓ(w) - ℓ(y) - 1)/2. -/
 theorem klPoly_degree_bound {W : Type u} {S : Type v}
     (cs : CoxeterSystem W S) (y w : W) : True := sorry
 
-/-- KL basis element C'_w is bar-invariant. -/
-theorem klBasis_bar_invariant {R : Type u} {W : Type v} {S : Type}
-    (H : HeckeAlgebra R W S) (w : W) : True := sorry
+/-- P_{w,w} has constant term 1. -/
+theorem klPoly_diag {W : Type u} {S : Type v}
+    (cs : CoxeterSystem W S) (w : W) : True := sorry
 
 /-- Positivity: coefficients of KL polynomials are ≥ 0
 (proved by Elias-Williamson via Soergel bimodules). -/
@@ -113,7 +114,7 @@ theorem klPoly_positivity {W : Type u} {S : Type v}
 /-- A W-graph encodes the Hecke algebra action combinatorially. -/
 structure WGraph (S : Type u) where
   Vertex : Type v
-  I : Vertex → Set S
+  I : Vertex → S → Prop
   mu : Vertex → Vertex → Int
 
 /-- A W-graph representation gives a Hecke module. -/
@@ -142,9 +143,11 @@ def leftCellEquiv {W : Type u} {S : Type v} (cs : CoxeterSystem W S) (x y : W) :
 def rightCellEquiv {W : Type u} {S : Type v} (cs : CoxeterSystem W S) (x y : W) : Prop :=
   rightCellLE cs x y ∧ rightCellLE cs y x
 
-theorem leftCell_wGraph {W : Type u} {S : Type v} (cs : CoxeterSystem W S) : True := sorry
+theorem leftCell_wGraph {W : Type u} {S : Type v}
+    (cs : CoxeterSystem W S) : True := sorry
 
-theorem twoSidedCells_partition {W : Type u} {S : Type v} (cs : CoxeterSystem W S) : True := sorry
+theorem twoSidedCells_partition {W : Type u} {S : Type v}
+    (cs : CoxeterSystem W S) : True := sorry
 
 /-! ## Lusztig's a-function and asymptotic Hecke algebra -/
 

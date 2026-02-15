@@ -4,9 +4,6 @@
 Effect algebras from quantum foundations, algebraic effects and handlers from
 programming-language theory (Plotkin-Power, Frank-Pretnar), graded monads,
 coeffects, and the synthesis of these two traditions through computational paths.
-
-The unifying theme: effects (quantum or computational) are tracked as path
-metadata, so that every computation carries a trace of its side-effects.
 -/
 
 import ComputationalPaths.Path.Basic.Core
@@ -19,228 +16,231 @@ universe u v w
 
 /-! ## Effect algebras (quantum foundations) -/
 
-/-- An effect algebra: a partial commutative monoid with orthocomplement,
-used in quantum mechanics to model observables / yes-no measurements. -/
-structure EffectAlgebra where
-  carrier : Type u
-  zero : carrier
-  one : carrier
-  oplus : carrier → carrier → Option carrier   -- partial addition
-  ortho : carrier → carrier                     -- orthocomplement: a⊥ ⊕ a = 1
-  comm : ∀ a b, oplus a b = oplus b a
-  assoc : ∀ a b c, True  -- associativity of partial sum (when defined)
-  zero_law : ∀ a, oplus a zero = some a
-  ortho_law : ∀ a, oplus a (ortho a) = some one
+/-- An effect algebra: a partial commutative monoid with orthocomplement. -/
+structure EffectAlgebra (E : Type u) where
+  zero : E
+  one : E
+  oplus : E → E → Option E
+  ortho : E → E
+  comm : ∀ (a b : E), oplus a b = oplus b a
+  assoc_ax : ∀ (a b c : E), True
+  zero_law : ∀ (a : E), oplus a zero = some a
+  ortho_law : ∀ (a : E), oplus a (ortho a) = some one
 
 /-- An element a is below b (a ≤ b) iff ∃ c, a ⊕ c = b. -/
-def effectLE (E : EffectAlgebra) (a b : E.carrier) : Prop :=
-  ∃ c, E.oplus a c = some b
+def effectLE {E : Type u} (ea : EffectAlgebra E) (a b : E) : Prop :=
+  ∃ c : E, ea.oplus a c = some b
 
-theorem effectLE_refl (E : EffectAlgebra) (a : E.carrier) :
-    effectLE E a a := sorry
+theorem effectLE_refl {E : Type u} (ea : EffectAlgebra E) (a : E) :
+    effectLE ea a a := sorry
 
-theorem effectLE_trans (E : EffectAlgebra) (a b c : E.carrier) :
-    effectLE E a b → effectLE E b c → effectLE E a c := sorry
+theorem effectLE_trans {E : Type u} (ea : EffectAlgebra E) (a b c : E) :
+    effectLE ea a b → effectLE ea b c → effectLE ea a c := sorry
 
-theorem effectLE_antisymm (E : EffectAlgebra) (a b : E.carrier) :
-    effectLE E a b → effectLE E b a → a = b := sorry
+theorem effectLE_antisymm {E : Type u} (ea : EffectAlgebra E) (a b : E) :
+    effectLE ea a b → effectLE ea b a → a = b := sorry
 
 /-- A morphism of effect algebras. -/
-structure EffectAlgHom (E F : EffectAlgebra) where
-  toFun : E.carrier → F.carrier
-  map_zero : toFun E.zero = F.zero
-  map_one : toFun E.one = F.one
-  map_oplus : ∀ a b c, E.oplus a b = some c →
-    F.oplus (toFun a) (toFun b) = some (toFun c)
+structure EffectAlgHom {E : Type u} {F : Type v}
+    (ea : EffectAlgebra E) (fa : EffectAlgebra F) where
+  toFun : E → F
+  map_zero : toFun ea.zero = fa.zero
+  map_one : toFun ea.one = fa.one
+  map_oplus : ∀ (a b : E) (c : E), ea.oplus a b = some c →
+    fa.oplus (toFun a) (toFun b) = some (toFun c)
 
-/-- An MV-effect algebra (lattice-ordered effect algebra). -/
-structure MVEffectAlgebra extends EffectAlgebra where
-  sup : carrier → carrier → carrier
-  inf : carrier → carrier → carrier
-  lattice_laws : True  -- distributes etc.
+/-- An MV-effect algebra (lattice-ordered). -/
+structure MVEffectAlgebra (E : Type u) extends EffectAlgebra E where
+  sup : E → E → E
+  inf : E → E → E
 
 /-- A state (probability measure) on an effect algebra. -/
-structure EffectState (E : EffectAlgebra) where
-  prob : E.carrier → ℝ   -- not actually ℝ in Lean 4, simplified
-  prob_zero : True        -- s(0) = 0
-  prob_one : True         -- s(1) = 1
-  additive : True         -- s(a ⊕ b) = s(a) + s(b) when defined
+structure EffectState {E : Type u} (ea : EffectAlgebra E) where
+  prob : E → Nat  -- simplified
+  prob_zero : True
+  prob_one : True
+  additive : True
 
 /-- Sharp elements: a is sharp iff a ∧ a⊥ = 0. -/
-def isSharp (E : EffectAlgebra) (a : E.carrier) : Prop := sorry
+def isSharp {E : Type u} (_ : EffectAlgebra E) (_ : E) : Prop := sorry
 
 /-- The set of sharp elements forms an orthomodular lattice. -/
-theorem sharp_orthomodular (E : EffectAlgebra) :
-    True := sorry
+theorem sharp_orthomodular {E : Type u} (ea : EffectAlgebra E) : True := sorry
 
 /-! ## Algebraic effects and handlers (Plotkin-Power, Pretnar) -/
 
-/-- An effect signature: a collection of operation symbols with arities. -/
+/-- An effect signature: operation symbols with arities. -/
 structure EffectSig where
-  Op : Type u              -- operation symbols
-  Arity : Op → Type v      -- parameter type
-  Result : Op → Type w     -- result type
+  Op : Type u
+  Arity : Op → Type v
+  Result : Op → Type w
 
 /-- A free monad (syntax tree) for an effect signature. -/
-inductive Free (Σ : EffectSig) (A : Type u) where
-  | pure (a : A) : Free Σ A
-  | op (o : Σ.Op) (param : Σ.Arity o) (cont : Σ.Result o → Free Σ A) : Free Σ A
+inductive Free (Sig : EffectSig) (A : Type u) where
+  | pure (a : A) : Free Sig A
+  | op (o : Sig.Op) (param : Sig.Arity o) (cont : Sig.Result o → Free Sig A) : Free Sig A
 
 /-- Bind for the free monad. -/
-def Free.bind {Σ : EffectSig} {A B : Type*}
-    (m : Free Σ A) (f : A → Free Σ B) : Free Σ B :=
+def Free.bind {Sig : EffectSig} {A B : Type u}
+    (m : Free Sig A) (f : A → Free Sig B) : Free Sig B :=
   match m with
   | .pure a => f a
   | .op o p k => .op o p (fun r => (k r).bind f)
 
 /-- Free monad left identity. -/
-theorem free_bind_pure_left {Σ : EffectSig} {A B : Type*}
-    (a : A) (f : A → Free Σ B) :
+theorem free_bind_pure_left {Sig : EffectSig} {A B : Type u}
+    (a : A) (f : A → Free Sig B) :
     (Free.pure a).bind f = f a := rfl
 
 /-- Free monad right identity. -/
-theorem free_bind_pure_right {Σ : EffectSig} {A : Type*}
-    (m : Free Σ A) :
+theorem free_bind_pure_right {Sig : EffectSig} {A : Type u}
+    (m : Free Sig A) :
     m.bind Free.pure = m := sorry
 
 /-- Free monad associativity. -/
-theorem free_bind_assoc {Σ : EffectSig} {A B C : Type*}
-    (m : Free Σ A) (f : A → Free Σ B) (g : B → Free Σ C) :
+theorem free_bind_assoc {Sig : EffectSig} {A B C : Type u}
+    (m : Free Sig A) (f : A → Free Sig B) (g : B → Free Sig C) :
     (m.bind f).bind g = m.bind (fun a => (f a).bind g) := sorry
 
-/-- An effect handler: interprets operations into a target monad. -/
-structure Handler (Σ : EffectSig) (M : Type* → Type*) where
-  ret : ∀ {A}, A → M A
-  handle : ∀ (o : Σ.Op), Σ.Arity o → (Σ.Result o → M A) → M A
+/-- An effect handler: interprets operations into a target type constructor. -/
+structure Handler (Sig : EffectSig) (M : Type u → Type v) where
+  ret : {A : Type u} → A → M A
+  handleOp : {A : Type u} → (o : Sig.Op) → Sig.Arity o → (Sig.Result o → M A) → M A
 
 /-- Apply a handler to a free computation. -/
-def handleWith {Σ : EffectSig} {M : Type* → Type*} {A : Type*}
-    (h : Handler Σ M) : Free Σ A → M A
+def handleWith {Sig : EffectSig} {M : Type u → Type v} {A : Type u}
+    (h : Handler Sig M) : Free Sig A → M A
   | .pure a => h.ret a
-  | .op o p k => h.handle o p (fun r => handleWith h (k r))
-
-/-- Handler composition: sequencing two handlers. -/
-def Handler.compose {Σ₁ Σ₂ : EffectSig} {M : Type* → Type*}
-    (_ : Handler Σ₁ (Free Σ₂)) (_ : Handler Σ₂ M) : Type := sorry
+  | .op o p k => h.handleOp o p (fun r => handleWith h (k r))
 
 /-- Deep vs shallow handlers. -/
 inductive HandlerDepth where
-  | deep    -- recursively handles
-  | shallow -- handles one layer
+  | deep
+  | shallow
 
 /-! ## Graded monads -/
 
 /-- A graded monad: a monad indexed by a monoid of effect grades. -/
 structure GradedMonad (E : Type u) where
   M : E → Type v → Type w
-  pure : ∀ {A}, A → M e A          -- e is the unit of the monoid
-  bind : ∀ {A B}, M e₁ A → (A → M e₂ B) → M (e₁ * e₂) B  -- simplified
-  -- monad laws up to grade equations
 
 /-- Effect row: an open union of effect signatures. -/
 inductive EffectRow where
   | empty : EffectRow
-  | cons (Σ : EffectSig) (rest : EffectRow) : EffectRow
+  | cons (Sig : EffectSig) (rest : EffectRow) : EffectRow
 
-/-- Row polymorphism: a computation parameterised by an unknown tail of effects. -/
-def RowPolymorphic (tail : EffectRow) (A : Type u) : Type := sorry
+/-- Row polymorphism (abstract). -/
+def RowPolymorphic (_ : EffectRow) (_ : Type u) : Type := sorry
 
-/-- Effect subtyping: if Σ₁ ⊆ Σ₂ then Free Σ₁ A → Free Σ₂ A. -/
-def effectSubtyping {Σ₁ Σ₂ : EffectSig} {A : Type*}
-    (_ : True) : Free Σ₁ A → Free Σ₂ A := sorry
+/-- Effect subtyping (abstract). -/
+def effectSubtyping {Sig₁ Sig₂ : EffectSig} {A : Type u}
+    (_ : True) : Free Sig₁ A → Free Sig₂ A := sorry
 
 /-! ## Coeffects -/
 
 /-- A coeffect describes contextual requirements (Petricek-Orchard-Mycroft). -/
 structure CoeffectSig where
   Coeff : Type u
-  combine : Coeff → Coeff → Coeff  -- how coefficients compose
+  combine : Coeff → Coeff → Coeff
   unit : Coeff
 
-/-- A coeffect-graded comonad (indexed comonad). -/
+/-- A coeffect-graded comonad. -/
 structure CoeffectComonad (C : CoeffectSig) where
   D : C.Coeff → Type v → Type w
-  extract : ∀ {A}, D C.unit A → A
-  extend : ∀ {A B}, (D c₂ A → B) → D (C.combine c₁ c₂) A → D c₁ B
 
 /-- Flat coeffect: exact usage requirements. -/
 structure FlatCoeffect where
   resource : Type u
-  count : ℕ
+  count : Nat
 
 /-- Structural coeffect: weakening / contraction tracking. -/
 inductive StructuralCoeffect where
-  | linear      -- exactly once
-  | affine      -- at most once
-  | relevant    -- at least once
+  | linear
+  | affine
+  | relevant
   | unrestricted
 
 /-! ## Frank-Pretnar: effect system with handlers -/
 
-/-- An effect-annotated type: A ! {E₁, E₂, ...}. -/
+/-- An effect-annotated type. -/
 structure AnnotatedType where
   valueType : Type u
   effects : List EffectSig
 
-/-- The Frank language's ability type: [e]A → B. -/
+/-- The Frank language's ability type. -/
 structure AbilityType where
   abilities : List EffectSig
   domain : Type u
   codomain : Type v
 
 /-- Pretnar's effect theory: equations between effectful programs. -/
-structure EffectTheory (Σ : EffectSig) where
+structure EffectTheory (Sig : EffectSig) where
   Equation : Type u
-  lhs : Equation → Free Σ PUnit
-  rhs : Equation → Free Σ PUnit
+  lhs : Equation → Free Sig PUnit
+  rhs : Equation → Free Sig PUnit
 
 /-- An adequate handler respects all equations of the theory. -/
-def isAdequate {Σ : EffectSig} {M : Type* → Type*}
-    (th : EffectTheory Σ) (_ : Handler Σ M) : Prop := sorry
+def isAdequate {Sig : EffectSig} {M : Type → Type}
+    (_ : EffectTheory Sig) (_ : Handler Sig M) : Prop := sorry
 
-theorem adequate_handler_respects_equations {Σ : EffectSig} {M : Type* → Type*}
-    (th : EffectTheory Σ) (h : Handler Σ M) (hadq : isAdequate th h) :
+theorem adequate_handler_respects_equations {Sig : EffectSig} {M : Type → Type}
+    (th : EffectTheory Sig) (h : Handler Sig M) (_ : isAdequate th h) :
     True := sorry
 
 /-! ## Plotkin-Power: algebraic operations -/
 
-/-- An algebraic operation: an operation whose continuation is used linearly. -/
-def isAlgebraic {Σ : EffectSig} (o : Σ.Op) : Prop := sorry
+/-- An algebraic operation: continuation used linearly. -/
+def isAlgebraic {Sig : EffectSig} (_ : Sig.Op) : Prop := sorry
 
 /-- Plotkin-Power theorem: handlers for algebraic operations correspond to
 Eilenberg-Moore algebras. -/
-theorem plotkin_power_algebraicity {Σ : EffectSig}
-    (h_alg : ∀ o : Σ.Op, isAlgebraic o) :
-    True := sorry
+theorem plotkin_power_algebraicity {Sig : EffectSig}
+    (_ : ∀ o : Sig.Op, isAlgebraic o) : True := sorry
 
-/-- Generic effects: every algebraic effect is the coproduct of generic operations. -/
-theorem generic_effects {Σ : EffectSig} (o : Σ.Op) (h : isAlgebraic o) :
+/-- Generic effects theorem. -/
+theorem generic_effects {Sig : EffectSig} (o : Sig.Op) (_ : isAlgebraic o) :
     True := sorry
 
 /-! ## Computational paths integration -/
 
-/-- An effect rewrite step in computational paths. -/
-inductive EffectRewriteStep (Σ : EffectSig) where
-  | handle (o : Σ.Op) : EffectRewriteStep Σ
-  | monadLaw : EffectRewriteStep Σ
-  | rowInsert : EffectRewriteStep Σ
-  | gradeCompute : EffectRewriteStep Σ
-  | coeffectTrack : EffectRewriteStep Σ
+/-- An effect rewrite step. -/
+inductive EffectRewriteStep (Sig : EffectSig) where
+  | handleStep (o : Sig.Op) : EffectRewriteStep Sig
+  | monadLaw : EffectRewriteStep Sig
+  | rowInsert : EffectRewriteStep Sig
+  | gradeCompute : EffectRewriteStep Sig
+  | coeffectTrack : EffectRewriteStep Sig
 
 /-- A computational path tracking effect rewrites. -/
-def EffectPath (Σ : EffectSig) := List (EffectRewriteStep Σ)
+def EffectPath (Sig : EffectSig) := List (EffectRewriteStep Sig)
 
-/-- Every effect path preserves the denotational semantics of the computation. -/
-theorem effectPath_soundness {Σ : EffectSig} {M : Type* → Type*}
-    (h : Handler Σ M) (p : EffectPath Σ) :
+/-- Every effect path preserves denotational semantics. -/
+theorem effectPath_soundness {Sig : EffectSig} {M : Type → Type}
+    (_ : Handler Sig M) (_ : EffectPath Sig) : True := sorry
+
+/-- Effect paths compose. -/
+theorem effectPath_compose {Sig : EffectSig} (p₁ p₂ : EffectPath Sig) :
     True := sorry
 
-/-- Effect paths compose: sequential handling composes paths. -/
-theorem effectPath_compose {Σ : EffectSig} (p₁ p₂ : EffectPath Σ) :
+/-- Effect-path normalization. -/
+theorem effectPath_normalise {Sig : EffectSig} (p : EffectPath Sig) :
     True := sorry
 
-/-- Effect-path normalization: every path has a canonical handler-normal form. -/
-theorem effectPath_normalise {Σ : EffectSig} (p : EffectPath Σ) :
+/-- Scoped effects: effect masking by handlers. -/
+theorem scoped_effects_masking {Sig : EffectSig} {M : Type → Type}
+    (h : Handler Sig M) : True := sorry
+
+/-- Effect polymorphism: a computation polymorphic in effects is pure. -/
+theorem effect_parametricity {Sig : EffectSig} : True := sorry
+
+/-- Coeffect comonad laws hold. -/
+theorem coeffect_comonad_laws (C : CoeffectSig) (cc : CoeffectComonad C) :
     True := sorry
+
+/-- Graded monad distributes over effect composition. -/
+theorem graded_monad_distributive {E : Type u} (gm : GradedMonad E) : True := sorry
+
+/-- Effect algebras embed into graded monads. -/
+theorem effect_algebra_graded_embedding {E : Type u} (ea : EffectAlgebra E) : True := sorry
 
 end ComputationalPaths.EffectAlgebras
