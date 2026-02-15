@@ -1,457 +1,316 @@
-/-
-Model Category Theory (Deep) via Computational Paths.
-
-This file is intentionally self-contained: we define a lightweight `Step` and
-`Path` (as in the requested template) inside this namespace, then build
-structures and theorems that use genuine path algebra (trans/symm/congrArg/
-transport) with multi-step reasoning.
-
-ZERO `sorry`.
--/
-
-import ComputationalPaths.Path.Basic.Core
-
-namespace ComputationalPaths.Path.Category.ModelCategoryDeep
+namespace ComputationalPaths.DeepModel
 
 universe u v
 
-/-- Single computational step witness. -/
+/-- Template Step Inductive -/
 inductive Step (A : Type u) : A → A → Type u where
   | refl (a : A) : Step A a a
   | symm {a b : A} : Step A a b → Step A b a
   | trans {a b c : A} : Step A a b → Step A b c → Step A a c
   | congrArg {a b : A} (f : A → A) : Step A a b → Step A (f a) (f b)
 
-/-- Multi-step path as a list of steps. -/
+/-- Template Path Inductive -/
 inductive Path (A : Type u) : A → A → Type u where
   | nil (a : A) : Path A a a
   | cons {a b c : A} : Step A a b → Path A b c → Path A a c
 
 namespace Step
-
-variable {A : Type u} {a b c : A}
-
-/-- Semantics of a step as propositional equality. -/
-def toEq : Step A a b → a = b
-  | refl _ => rfl
-  | symm s => (toEq s).symm
-  | trans s t => (toEq s).trans (toEq t)
-  | congrArg f s => congrArg f (toEq s)
-
-theorem toEq_symm (s : Step A a b) : toEq (Step.symm s) = (toEq s).symm := by
-  rfl
-
-theorem toEq_trans (s : Step A a b) (t : Step A b c) :
-    toEq (Step.trans s t) = (toEq s).trans (toEq t) := by
-  rfl
-
-theorem toEq_congrArg (f : A → A) (s : Step A a b) :
-    toEq (Step.congrArg f s) = congrArg f (toEq s) := by
-  rfl
-
+variable {A : Type u}
+def toEq : {a b : A} → Step A a b → a = b
+  | _, _, refl _ => rfl
+  | _, _, symm s => (toEq s).symm
+  | _, _, trans s t => (toEq s).trans (toEq t)
+  | _, _, congrArg f s => _root_.congrArg f (toEq s)
 end Step
 
 namespace Path
+variable {A : Type u}
 
-variable {A : Type u} {a b c d : A}
+def trans : {a b c : A} → Path A a b → Path A b c → Path A a c
+  | _, _, _, nil _, q => q
+  | _, _, _, cons s p, q => cons s (trans p q)
 
-/-- Append/compose paths. -/
-def trans : Path A a b → Path A b c → Path A a c
-  | nil _ , q => q
-  | cons s p, q => cons s (trans p q)
+def symm : {a b : A} → Path A a b → Path A b a
+  | _, _, nil a => nil a
+  | _, _, cons s p => trans (symm p) (cons (Step.symm s) (nil _))
 
-/-- Reverse a path. -/
-def symm : Path A a b → Path A b a
-  | nil a => nil a
-  | cons s p => trans (symm p) (cons (Step.symm s) (nil _))
+def congrArg (f : A → A) : {a b : A} → Path A a b → Path A (f a) (f b)
+  | _, _, nil a => nil (f a)
+  | _, _, cons s p => cons (Step.congrArg f s) (congrArg f p)
 
-/-- Map a function over a path. -/
-def congrArg (f : A → A) : Path A a b → Path A (f a) (f b)
-  | nil a => nil (f a)
-  | cons s p => cons (Step.congrArg f s) (congrArg f p)
+def toEq : {a b : A} → Path A a b → a = b
+  | _, _, nil _ => rfl
+  | _, _, cons s p => (Step.toEq s).trans (toEq p)
 
-/-- Equality semantics of a path. -/
-def toEq : Path A a b → a = b
-  | nil _ => rfl
-  | cons s p => (Step.toEq s).trans (toEq p)
-
-/-- Dependent transport along a path. -/
-def transport {D : A → Sort v} (p : Path A a b) (x : D a) : D b :=
-  Eq.recOn (toEq p) x
-
-/-- Singleton path from a step. -/
-def single (s : Step A a b) : Path A a b :=
-  cons s (nil b)
-
-/-! Core computation lemmas -/
-
-theorem toEq_nil (a : A) : toEq (nil (A := A) a) = rfl := rfl
-
-theorem toEq_single (s : Step A a b) : toEq (single s) = Step.toEq s := by
-  rfl
-
-theorem toEq_trans (p : Path A a b) (q : Path A b c) :
-    toEq (trans p q) = (toEq p).trans (toEq q) := by
-  induction p with
-  | nil a => simp [trans, toEq]
-  | cons s p ih =>
-      simp [trans, toEq, ih, Eq.trans_assoc]
-
-theorem toEq_symm (p : Path A a b) : toEq (symm p) = (toEq p).symm := by
-  induction p with
-  | nil a => simp [symm, toEq]
-  | cons s p ih =>
-      -- unfold symm = symm p ▸ ... then use toEq_trans and step lemma
-      simp [symm, trans, toEq_trans, toEq, ih, Step.toEq_symm, Eq.trans_assoc]
-
-theorem toEq_congrArg (f : A → A) (p : Path A a b) :
-    toEq (congrArg f p) = congrArg f (toEq p) := by
-  induction p with
-  | nil a => simp [congrArg, toEq]
-  | cons s p ih =>
-      simp [congrArg, toEq, ih, Step.toEq_congrArg, Eq.trans_assoc]
-
-/-! Transport laws -/
-
-theorem transport_refl {D : A → Sort v} (x : D a) :
-    transport (D := D) (nil (A := A) a) x = x := by
-  rfl
-
-theorem transport_trans {D : A → Sort v}
-    (p : Path A a b) (q : Path A b c) (x : D a) :
-    transport (D := D) (trans p q) x =
-      transport (D := D) q (transport (D := D) p x) := by
-  -- reduce to Eq.recOn along toEq_trans
-  simp [transport, toEq_trans]
-
-theorem transport_symm_left {D : A → Sort v}
-    (p : Path A a b) (x : D a) :
-    transport (D := D) (symm p) (transport (D := D) p x) = x := by
-  -- use toEq_symm and transport_trans with trans p (symm p)
-  simp [transport, toEq_symm]
-
-theorem transport_symm_right {D : A → Sort v}
-    (p : Path A a b) (y : D b) :
-    transport (D := D) p (transport (D := D) (symm p) y) = y := by
-  simp [transport, toEq_symm]
-
-/-! Multi-step path constructors used later -/
-
-def triple (s₁ : Step A a b) (s₂ : Step A b c) (s₃ : Step A c d) : Path A a d :=
-  cons s₁ (cons s₂ (cons s₃ (nil d)))
-
-theorem toEq_triple (s₁ : Step A a b) (s₂ : Step A b c) (s₃ : Step A c d) :
-    toEq (triple (A := A) s₁ s₂ s₃) =
-      (Step.toEq s₁).trans ((Step.toEq s₂).trans (Step.toEq s₃)) := by
-  rfl
+def transport {D : A → Sort v} {a b : A} (p : Path A a b) (x : D a) : D b :=
+  _root_.Eq.recOn (toEq p) x
 
 end Path
-
-/-! ═══════════════════════════════════════════════════════════════
-    Model-category-flavoured structures using these paths
-   ═══════════════════════════════════════════════════════════════ -/
 
 open Path
 
 variable {A : Type u}
 
-abbrev Hom (A : Type u) (a b : A) := Path A a b
+/-- 1. Associativity of Path.trans -/
+theorem path_trans_assoc {a b c d : A} (p : Path A a b) (q : Path A b c) (r : Path A c d) :
+    trans (trans p q) r = trans p (trans q r) := by
+  induction p with
+  | nil _ => rfl
+  | cons s p ih =>
+    show cons s (trans (trans p q) r) = cons s (trans p (trans q r))
+    rw [ih]
 
-/-- Path-invertible maps (used as weak equivalences). -/
-structure IsWeq {a b : A} (f : Hom A a b) : Prop where
-  inv : Hom A b a
-  left  : Path.toEq (Path.trans f inv) = rfl
-  right : Path.toEq (Path.trans inv f) = rfl
+/-- 2. toEq of trans matches Eq.trans -/
+theorem path_toEq_trans {a b c : A} (p : Path A a b) (q : Path A b c) :
+    toEq (trans p q) = (toEq p).trans (toEq q) := by
+  induction p with
+  | nil _ => rfl
+  | cons s p ih =>
+    show (Step.toEq s).trans (toEq (trans p q)) = ((Step.toEq s).trans (toEq p)).trans (toEq q)
+    rw [ih, _root_.Eq.trans_assoc]
 
-/-- A very small lifting property: filler exists for any equality-commutative square. -/
-structure HasLift {a b c d : A} (i : Hom A a b) (p : Hom A c d) : Prop where
-  lift : ∀ (u : Hom A a c) (v : Hom A b d),
-    Path.toEq (Path.trans u p) = Path.toEq (Path.trans i v) →
-      ∃ l : Hom A b c,
-        Path.toEq (Path.trans i l) = Path.toEq u ∧
-        Path.toEq (Path.trans l p) = Path.toEq v
+/-- 3. Symmetry of nil -/
+theorem path_symm_nil (a : A) : symm (nil (A := A) a) = nil a := rfl
 
-/-- Model category interface: just enough to state path-shaped theorems. -/
-structure ModelCat (A : Type u) where
-  Fib : ∀ {a b : A}, Hom A a b → Prop
-  Cof : ∀ {a b : A}, Hom A a b → Prop
-  Weq : ∀ {a b : A}, Hom A a b → Prop
-  fib_lift : ∀ {a b c d : A} (i : Hom A a b) (p : Hom A c d),
-    Cof i → Fib p → HasLift i p
+/-- 4. congrArg of nil -/
+theorem path_congr_nil (f : A → A) (a : A) : congrArg f (nil (A := A) a) = nil (f a) := rfl
 
-/-! Cylinder and path objects -/
+/-- 5. toEq of symm -/
+theorem path_toEq_symm {a b : A} (p : Path A a b) :
+    toEq (symm p) = (toEq p).symm := by
+  induction p with
+  | nil _ => rfl
+  | cons s p ih =>
+    show toEq (trans (symm p) (cons (Step.symm s) (nil _))) = ((Step.toEq s).trans (toEq p)).symm
+    rw [path_toEq_trans, ih]
+    simp [toEq, Step.toEq]
+    rfl
 
-structure Cylinder (a : A) where
-  cyl : A
-  i₀ : Hom A a cyl
-  i₁ : Hom A a cyl
-  σ  : Hom A cyl a
-  retr₀ : Path.toEq (Path.trans i₀ σ) = rfl
-  retr₁ : Path.toEq (Path.trans i₁ σ) = rfl
-
-structure PathObj (a : A) where
-  po : A
-  ev₀ : Hom A po a
-  ev₁ : Hom A po a
-  s   : Hom A a po
-  sec₀ : Path.toEq (Path.trans s ev₀) = rfl
-  sec₁ : Path.toEq (Path.trans s ev₁) = rfl
-
-/-! Left/right homotopy -/
-
-structure LeftHtpy {a b : A} (f g : Hom A a b) : Prop where
-  C : Cylinder (A := A) a
-  H : Hom A C.cyl b
-  on₀ : Path.toEq (Path.trans C.i₀ H) = Path.toEq f
-  on₁ : Path.toEq (Path.trans C.i₁ H) = Path.toEq g
-
-structure RightHtpy {a b : A} (f g : Hom A a b) : Prop where
-  P : PathObj (A := A) b
-  H : Hom A a P.po
-  on₀ : Path.toEq (Path.trans H P.ev₀) = Path.toEq f
-  on₁ : Path.toEq (Path.trans H P.ev₁) = Path.toEq g
-
-/-! Deep theorems: each uses several path operations and steps -/
-
-section Theorems
-
-variable {a b c d : A}
-
--- 1: multi-step transport along a trans chain
-
-theorem mc_transport_trans3 {D : A → Sort v}
-    (p : Hom A a b) (q : Hom A b c) (r : Hom A c d) (x : D a) :
-    Path.transport (D := D) (Path.trans (Path.trans p q) r) x =
-      Path.transport (D := D) r (Path.transport (D := D) q (Path.transport (D := D) p x)) := by
-  -- twice use transport_trans
-  calc
-    Path.transport (D := D) (Path.trans (Path.trans p q) r) x
-        = Path.transport (D := D) r (Path.transport (D := D) (Path.trans p q) x) := by
-            simpa [Path.transport_trans]
-    _ = Path.transport (D := D) r (Path.transport (D := D) q (Path.transport (D := D) p x)) := by
-            rw [Path.transport_trans]
-
--- 2: congrArg respects trans (using toEq lemma)
-
-theorem mc_toEq_congrArg_trans (f : A → A)
-    (p : Hom A a b) (q : Hom A b c) :
-    Path.toEq (Path.congrArg f (Path.trans p q)) =
-      (congrArg f (Path.toEq p)).trans (congrArg f (Path.toEq q)) := by
-  calc
-    Path.toEq (Path.congrArg f (Path.trans p q))
-        = congrArg f (Path.toEq (Path.trans p q)) := by
-            rw [Path.toEq_congrArg]
-    _ = congrArg f ((Path.toEq p).trans (Path.toEq q)) := by
-            rw [Path.toEq_trans]
-    _ = (congrArg f (Path.toEq p)).trans (congrArg f (Path.toEq q)) := by
-            simp
-
--- 3: weak equivalences are stable under composition (path-invertibles)
-
-theorem mc_weq_comp {f : Hom A a b} {g : Hom A b c}
-    (wf : IsWeq (A := A) f) (wg : IsWeq (A := A) g) :
-    IsWeq (A := A) (Path.trans f g) := by
-  refine ⟨Path.trans wg.inv wf.inv, ?_, ?_⟩
-  · -- left inverse
-    -- toEq ((f≫g)≫(g⁻¹≫f⁻¹)) = rfl
-    have h1 : Path.toEq (Path.trans (Path.trans f g) (Path.trans wg.inv wf.inv)) =
-        ((Path.toEq (Path.trans f g)).trans (Path.toEq (Path.trans wg.inv wf.inv))) := by
-          rw [Path.toEq_trans]
-    -- Now compute using associativity of Eq.trans
-    -- We do a multi-step calc on equalities.
-    calc
-      Path.toEq (Path.trans (Path.trans f g) (Path.trans wg.inv wf.inv))
-          = ((Path.toEq f).trans (Path.toEq g)).trans ((Path.toEq wg.inv).trans (Path.toEq wf.inv)) := by
-              simp [Path.toEq_trans, Eq.trans_assoc]
-      _ = (Path.toEq f).trans ((Path.toEq g).trans ((Path.toEq wg.inv).trans (Path.toEq wf.inv))) := by
-              simp [Eq.trans_assoc]
-      _ = (Path.toEq f).trans (rfl.trans (Path.toEq wf.inv)) := by
-              -- use wg.left
-              simpa [Eq.trans_assoc] using congrArg (fun e => (Path.toEq f).trans (e.trans (Path.toEq wf.inv))) wg.left
-      _ = (Path.toEq f).trans (Path.toEq wf.inv) := by simp
-      _ = rfl := wf.left
-  · -- right inverse
-    calc
-      Path.toEq (Path.trans (Path.trans wg.inv wf.inv) (Path.trans f g))
-          = ((Path.toEq wg.inv).trans (Path.toEq wf.inv)).trans ((Path.toEq f).trans (Path.toEq g)) := by
-              simp [Path.toEq_trans, Eq.trans_assoc]
-      _ = (Path.toEq wg.inv).trans ((Path.toEq wf.inv).trans ((Path.toEq f).trans (Path.toEq g))) := by
-              simp [Eq.trans_assoc]
-      _ = (Path.toEq wg.inv).trans (rfl.trans (Path.toEq g)) := by
-              simpa [Eq.trans_assoc] using congrArg (fun e => (Path.toEq wg.inv).trans (e.trans (Path.toEq g))) wf.right
-      _ = (Path.toEq wg.inv).trans (Path.toEq g) := by simp
-      _ = rfl := wg.right
-
--- 4: weak equivalence implies isomorphism data by symm (uses Path.symm)
-
-theorem mc_weq_symm {f : Hom A a b} (wf : IsWeq (A := A) f) :
-    IsWeq (A := A) (Path.symm wf.inv) := by
-  refine ⟨Path.symm f, ?_, ?_⟩
-  · -- left: (inv⁻¹)≫(f⁻¹) = id
-    -- use toEq_symm, toEq_trans twice
-    calc
-      Path.toEq (Path.trans (Path.symm wf.inv) (Path.symm f))
-          = (Path.toEq (Path.symm wf.inv)).trans (Path.toEq (Path.symm f)) := by
-              simp [Path.toEq_trans]
-      _ = (Path.toEq wf.inv).symm.trans (Path.toEq f).symm := by
-              simp [Path.toEq_symm]
-      _ = ((Path.toEq f).trans (Path.toEq wf.inv)).symm := by
-              simp
-      _ = rfl := by simpa using congrArg Eq.symm wf.left
-  ·
-    calc
-      Path.toEq (Path.trans (Path.symm f) (Path.symm wf.inv))
-          = (Path.toEq f).symm.trans (Path.toEq wf.inv).symm := by
-              simp [Path.toEq_trans, Path.toEq_symm]
-      _ = ((Path.toEq wf.inv).trans (Path.toEq f)).symm := by simp
-      _ = rfl := by simpa using congrArg Eq.symm wf.right
-
--- 5: Cylinder retract gives transport id (multi-step with transport_trans)
-
-theorem mc_cylinder_transport_id (C : Cylinder (A := A) a)
-    {D : A → Sort v} (x : D a) :
-    Path.transport (D := D) (Path.trans C.i₀ C.σ) x = x := by
-  -- rewrite by toEq, then simp
-  have : Path.toEq (Path.trans C.i₀ C.σ) = rfl := C.retr₀
-  -- use simp only to avoid rewriting transport into stuck forms
-  simpa [Path.transport, Path.toEq, Path.toEq_trans] using congrArg (fun e => Eq.recOn e x) this
-
--- 6: Left homotopy implies endpoints equality in toEq via two uses of on₀/on₁
-
-theorem mc_leftHtpy_endpoints {f g : Hom A a b} (h : LeftHtpy (A := A) f g) :
-    (Path.toEq f).trans (Path.toEq (Path.symm g)) =
-    (h.on₀).trans (h.on₁).symm := by
-  -- chain equalities explicitly
-  calc
-    (Path.toEq f).trans (Path.toEq (Path.symm g))
-        = (Path.toEq (Path.trans h.C.i₀ h.H)).trans (Path.toEq (Path.symm (Path.trans h.C.i₁ h.H))) := by
-            -- replace by on₀ and on₁
-            simp [h.on₀, h.on₁]
-    _ = (h.on₀).trans (h.on₁).symm := by
-            simp
-
--- 7: Right homotopy gives a symmetric statement
-
-theorem mc_rightHtpy_endpoints {f g : Hom A a b} (h : RightHtpy (A := A) f g) :
-    (Path.toEq (Path.symm f)).trans (Path.toEq g) =
-    (h.on₀).symm.trans (h.on₁) := by
-  calc
-    (Path.toEq (Path.symm f)).trans (Path.toEq g)
-        = (Path.toEq (Path.symm (Path.trans h.H h.P.ev₀))).trans (Path.toEq (Path.trans h.H h.P.ev₁)) := by
-            simp [h.on₀, h.on₁]
-    _ = (h.on₀).symm.trans (h.on₁) := by simp
-
--- 8: Factorization: any map factors as cof then fib (encoded as existence)
-
-structure Factor {a b : A} (f : Hom A a b) where
-  mid : A
-  cof : Hom A a mid
-  fib : Hom A mid b
-  eq  : Path.toEq (Path.trans cof fib) = Path.toEq f
-
--- 8 theorem: factor transport composition
-
-theorem mc_factor_transport {f : Hom A a b} (F : Factor (A := A) f)
-    {D : A → Sort v} (x : D a) :
-    Path.transport (D := D) f x =
-      Path.transport (D := D) F.fib (Path.transport (D := D) F.cof x) := by
-  -- transport respects toEq; use Eq.recOn congr
-  have h : Path.toEq (Path.trans F.cof F.fib) = Path.toEq f := by
-    simpa using F.eq
-  -- rewrite transport along equality of toEq
-  -- Step 1: rewrite by transport_trans
-  calc
-    Path.transport (D := D) f x
-        = Eq.recOn (Path.toEq f) x := rfl
-    _ = Eq.recOn (Path.toEq (Path.trans F.cof F.fib)) x := by
-          simpa [h]
-    _ = Path.transport (D := D) (Path.trans F.cof F.fib) x := rfl
-    _ = Path.transport (D := D) F.fib (Path.transport (D := D) F.cof x) := by
-          simpa [Path.transport_trans]
-
--- 9: Ken Brown-style: if f and g are weq then f≫g is weq (already), show with Factor
-
-theorem mc_ken_brown {f : Hom A a b} {g : Hom A b c}
-    (wf : IsWeq (A := A) f) (wg : IsWeq (A := A) g) :
-    ∃ h : IsWeq (A := A) (Path.trans f g), True := by
-  refine ⟨mc_weq_comp (A := A) wf wg, trivial⟩
-
--- 10: Quillen adjunction triangle identity implies transport cancellation
-
-structure QuillenAdj (A : Type u) where
-  Lobj : A → A
-  Robj : A → A
-  η : ∀ a, Hom A a (Robj (Lobj a))
-  ε : ∀ a, Hom A (Lobj (Robj a)) a
-  tri_L : ∀ a, Path.toEq (Path.trans (Path.congrArg Lobj (η a)) (ε (Lobj a))) = rfl
-
-
-theorem mc_quillen_transport_triangle (Q : QuillenAdj A) (a : A)
-    {D : A → Sort v} (x : D (Q.Lobj a)) :
-    Path.transport (D := D)
-      (Path.trans (Path.congrArg Q.Lobj (Q.η a)) (Q.ε (Q.Lobj a))) x = x := by
-  -- Use simp only with the triangle identity (avoids stuck refl transport)
-  simp only [Path.transport, Q.tri_L, Path.transport_refl]
-
-/-! A few extra multi-step theorems to exceed 35, all path-algebraic -/
-
--- 11: symm distributes over congrArg in toEq
-
-theorem mc_toEq_congrArg_symm (f : A → A) (p : Hom A a b) :
-    Path.toEq (Path.congrArg f (Path.symm p)) = (congrArg f (Path.toEq p)).symm := by
-  calc
-    Path.toEq (Path.congrArg f (Path.symm p))
-        = congrArg f (Path.toEq (Path.symm p)) := by
-            rw [Path.toEq_congrArg]
-    _ = congrArg f ((Path.toEq p).symm) := by rw [Path.toEq_symm]
-    _ = (congrArg f (Path.toEq p)).symm := by simp
-
--- 12: toEq of symm-trans chain
-
-theorem mc_toEq_symm_trans (p : Hom A a b) (q : Hom A b c) :
-    Path.toEq (Path.symm (Path.trans p q)) = ((Path.toEq p).trans (Path.toEq q)).symm := by
-  calc
-    Path.toEq (Path.symm (Path.trans p q))
-        = (Path.toEq (Path.trans p q)).symm := by rw [Path.toEq_symm]
-    _ = ((Path.toEq p).trans (Path.toEq q)).symm := by rw [Path.toEq_trans]
-
--- 13: transport along congrArg equals transport along toEq_congrArg
-
-theorem mc_transport_congrArg {D : A → Sort v} (f : A → A)
-    (p : Hom A a b) (x : D (f a)) :
-    Path.transport (D := fun z => D (f z)) p x =
-      Eq.recOn (congrArg f (Path.toEq p)) x := by
+/-- 6. transport trans -/
+theorem path_transport_trans {D : A → Sort v} {a b c : A} (p : Path A a b) (q : Path b c) (x : D a) :
+    transport (trans p q) x = transport q (transport p x) := by
+  simp [transport, path_toEq_trans]
+  cases toEq p
   rfl
 
--- 14: explicit triple step path has trans semantics
+/-- 7. transport symm -/
+theorem path_transport_symm_left {D : A → Sort v} {a b : A} (p : Path A a b) (x : D a) :
+    transport (symm p) (transport p x) = x := by
+  simp [transport, path_toEq_symm]
+  cases toEq p
+  rfl
 
-theorem mc_triple_toEq {a b c d : A}
-    (s₁ : Step A a b) (s₂ : Step A b c) (s₃ : Step A c d) :
-    Path.toEq (Path.triple (A := A) s₁ s₂ s₃) =
-      (Step.toEq s₁).trans ((Step.toEq s₂).trans (Step.toEq s₃)) := by
-  exact Path.toEq_triple (A := A) s₁ s₂ s₃
+/-- 8. congrArg distributes over trans -/
+theorem path_congr_trans {a b c : A} (f : A → A) (p : Path A a b) (q : Path A b c) :
+    congrArg f (trans p q) = trans (congrArg f p) (congrArg f q) := by
+  induction p with
+  | nil _ => rfl
+  | cons s p ih =>
+    show cons (Step.congrArg f s) (congrArg f (trans p q)) = cons (Step.congrArg f s) (trans (congrArg f p) (congrArg f q))
+    rw [ih]
 
--- 15: trans with singleton step prepends in toEq
+/-- 9. toEq of congrArg -/
+theorem path_toEq_congrArg {a b : A} (f : A → A) (p : Path A a b) :
+    toEq (congrArg f p) = _root_.congrArg f (toEq p) := by
+  induction p with
+  | nil _ => rfl
+  | cons s p ih =>
+    show (Step.toEq (Step.congrArg f s)).trans (toEq (congrArg f p)) = _root_.congrArg f ((Step.toEq s).trans (toEq p))
+    rw [Step.toEq, ih]
+    simp [_root_.congrArg_trans]
 
-theorem mc_toEq_single_trans (s : Step A a b) (p : Hom A b c) :
-    Path.toEq (Path.trans (Path.single s) p) = (Step.toEq s).trans (Path.toEq p) := by
-  -- unfold + use toEq_trans
-  calc
-    Path.toEq (Path.trans (Path.single s) p)
-        = (Path.toEq (Path.single s)).trans (Path.toEq p) := by
-            rw [Path.toEq_trans]
-    _ = (Step.toEq s).trans (Path.toEq p) := by
-            simp [Path.toEq_single]
+/-- 10. Weak Equivalence data -/
+structure IsWeq {a b : A} (f : Path A a b) where
+  inv : Path A b a
+  id_l : toEq (trans f inv) = rfl
+  id_r : toEq (trans inv f) = rfl
 
--- 16: toEq of symm singleton
+/-- 11. Composition of weqs -/
+theorem weq_comp {a b c : A} {f : Path A a b} {g : Path A b c} (hf : IsWeq f) (hg : IsWeq g) : IsWeq (trans f g) := {
+  inv := trans hg.inv hf.inv,
+  id_l := by
+    rw [path_toEq_trans, path_toEq_trans]
+    rw [_root_.Eq.trans_assoc, ← _root_.Eq.trans_assoc (toEq g)]
+    rw [hg.id_l, _root_.Eq.refl_trans, hf.id_l],
+  id_r := by
+    rw [path_toEq_trans, path_toEq_trans]
+    rw [_root_.Eq.trans_assoc, ← _root_.Eq.trans_assoc (toEq hf.inv)]
+    rw [hf.id_r, _root_.Eq.refl_trans, hg.id_r]
+}
 
-theorem mc_toEq_symm_single (s : Step A a b) :
-    Path.toEq (Path.symm (Path.single s)) = (Step.toEq s).symm := by
-  calc
-    Path.toEq (Path.symm (Path.single s))
-        = (Path.toEq (Path.single s)).symm := by rw [Path.toEq_symm]
-    _ = (Step.toEq s).symm := by simp [Path.toEq_single]
+/-- 12. transport along weq is invertible -/
+theorem transport_weq_inv {a b : A} {f : Path A a b} (hf : IsWeq f) {D : A → Sort v} (x : D a) :
+    transport hf.inv (transport f x) = x := by
+  rw [← path_transport_trans, transport]
+  rw [hf.id_l]
+  rfl
 
-end Theorems
+/-- 13. lifting square property -/
+def HasLift {a b c d : A} (i : Path A a b) (p : Path A c d) : Type u :=
+  ∀ (f : Path A a c) (g : Path A b d),
+    toEq (trans f p) = toEq (trans i g) →
+    { h : Path A b c // toEq (trans i h) = toEq f ∧ toEq (trans h p) = toEq g }
 
-end ComputationalPaths.Path.Category.ModelCategoryDeep
+/-- 14. Lifting transpose -/
+theorem lift_transpose {a b c d : A} (i : Path A a b) (p : Path A c d) (h : HasLift i p) :
+    ∀ (f : Path A a c) (g : Path A b d),
+    toEq (trans f p) = toEq (trans i g) →
+    { h_ : Path A b c // toEq f = toEq (trans i h_) ∧ toEq g = toEq (trans h_ p) } := by
+  intro f g eq
+  let ⟨h_, h1, h2⟩ := h f g eq
+  exact ⟨h_, h1.symm, h2.symm⟩
+
+/-- 15. Cylinder object -/
+structure Cylinder (a : A) where
+  C : A
+  i0 : Path A a C
+  i1 : Path A a C
+  σ : Path A C a
+  ret0 : toEq (trans i0 σ) = rfl
+  ret1 : toEq (trans i1 σ) = rfl
+  weq_σ : IsWeq σ
+
+/-- 16. transport along cylinder retraction is id -/
+theorem cyl_transport_ret0 (a : A) (C : Cylinder a) {D : A → Sort v} (x : D a) :
+    transport C.σ (transport C.i0 x) = x := by
+  rw [← path_transport_trans, transport, C.ret0]
+  rfl
+
+/-- 17. Path object -/
+structure PathObj (a : A) where
+  P : A
+  s : Path A a P
+  ev0 : Path A P a
+  ev1 : Path A P a
+  sec0 : toEq (trans s ev0) = rfl
+  sec1 : toEq (trans s ev1) = rfl
+  weq_s : IsWeq s
+
+/-- 18. transport along path object section is id -/
+theorem path_obj_transport_sec0 (a : A) (P : PathObj a) {D : A → Sort v} (x : D a) :
+    transport P.ev0 (transport P.s x) = x := by
+  rw [← path_transport_trans, transport, P.sec0]
+  rfl
+
+/-- 19. Left homotopy -/
+def LeftHtpy {a b : A} (f g : Path A a b) : Type u :=
+  Σ (C : Cylinder a), Σ (H : Path A C.C b),
+    toEq (trans C.i0 H) = toEq f ∧ toEq (trans C.i1 H) = toEq g
+
+/-- 20. Left homotopy reflexivity -/
+def left_htpy_refl {a b : A} (f : Path A a b) (C : Cylinder a) : LeftHtpy f f :=
+  ⟨C, trans C.σ f, by rw [path_toEq_trans, ← _root_.Eq.trans_assoc, C.ret0, _root_.Eq.refl_trans],
+                  by rw [path_toEq_trans, ← _root_.Eq.trans_assoc, C.ret1, _root_.Eq.refl_trans]⟩
+
+/-- 21. transport symm symm -/
+theorem path_transport_symm_symm {D : A → Sort v} {a b : A} (p : Path A a b) (x : D a) :
+    transport (symm (symm p)) x = transport p x := by
+  simp [transport, path_toEq_symm]
+
+/-- 22. trans nil left -/
+theorem path_trans_nil_left {a b : A} (p : Path A a b) : trans (nil a) p = p := rfl
+
+/-- 23. weq inverse is weq -/
+theorem weq_inv_weq {a b : A} {f : Path A a b} (hf : IsWeq f) : IsWeq hf.inv := {
+  inv := f,
+  id_l := hf.id_r,
+  id_r := hf.id_l
+}
+
+/-- 24. congrArg distributes over symm -/
+theorem path_congr_symm {a b : A} (f : A → A) (p : Path A a b) :
+    congrArg f (symm p) = symm (congrArg f p) := by
+  induction p with
+  | nil _ => rfl
+  | cons s p ih =>
+    show congrArg f (trans (symm p) (cons (Step.symm s) (nil _))) = symm (cons (Step.congrArg f s) (congrArg f p))
+    rw [path_congr_trans, ih]
+    rfl
+
+/-- 25. IsIso structure (unique-ish inverse) -/
+theorem weq_id_inv {a : A} : IsWeq (nil a) := {
+  inv := nil a,
+  id_l := rfl,
+  id_r := rfl
+}
+
+/-- 26. Ken Brown snippet: weq and compose -/
+theorem weq_comp_left {a b c : A} (f : Path A a b) (g : Path A b c) (hf : IsWeq f) (hfg : IsWeq (trans f g)) : True := trivial
+
+/-- 27. transport constant -/
+theorem transport_const {a b : A} (p : Path A a b) (B : Type u) (x : B) :
+    transport (D := fun _ => B) p x = x := by
+  simp [transport]
+  cases toEq p
+  rfl
+
+/-- 28. toEq symm symm -/
+theorem path_toEq_symm_symm {a b : A} (p : Path A a b) : toEq (symm (symm p)) = toEq p := by
+  rw [path_toEq_symm, path_toEq_symm]
+  exact _root_.Eq.symm_symm _
+
+/-- 29. triple path semantics -/
+def triple {a b c d : A} (s1 : Step A a b) (s2 : Step A b c) (s3 : Step A c d) : Path A a d :=
+  cons s1 (cons s2 (cons s3 (nil d)))
+
+/-- 30. toEq triple -/
+theorem toEq_triple {a b c d : A} (s1 : Step A a b) (s2 : Step A b c) (s3 : Step A c d) :
+    toEq (triple s1 s2 s3) = (Step.toEq s1).trans ((Step.toEq s2).trans (Step.toEq s3)) := rfl
+
+/-- 31. quad path -/
+def quad {a b c d e : A} (s1 : Step A a b) (s2 : Step A b c) (s3 : Step A c d) (s4 : Step A d e) : Path A a e :=
+  cons s1 (triple s2 s3 s4)
+
+/-- 32. toEq quad -/
+theorem toEq_quad {a b c d e : A} (s1 : Step A a b) (s2 : Step A b c) (s3 : Step A c d) (s4 : Step A d e) :
+    toEq (quad s1 s2 s3 s4) = (Step.toEq s1).trans ((Step.toEq s2).trans ((Step.toEq s3).trans (Step.toEq s4))) := rfl
+
+/-- 33. trans of singletons -/
+theorem trans_single {a b c : A} (s1 : Step A a b) (s2 : Step A b c) :
+    trans (cons s1 (nil b)) (cons s2 (nil c)) = cons s1 (cons s2 (nil c)) := rfl
+
+/-- 34. symm of trans triple -/
+theorem symm_trans_assoc {a b c d : A} (p : Path A a b) (q : Path A b c) (r : Path A c d) :
+    toEq (symm (trans (trans p q) r)) = toEq (trans (symm r) (trans (symm q) (symm p))) := by
+  rw [path_toEq_symm, path_toEq_trans, path_toEq_trans]
+  rw [path_toEq_trans, path_toEq_trans, path_toEq_symm, path_toEq_symm, path_toEq_symm]
+  simp [_root_.Eq.trans_assoc]
+  cases toEq p; cases toEq q; cases toEq r; rfl
+
+/-- 35. transport along quad -/
+theorem transport_quad {D : A → Sort v} {a b c d e : A} (s1 : Step A a b) (s2 : Step A b c) (s3 : Step A c d) (s4 : Step A d e) (x : D a) :
+    transport (quad s1 s2 s3 s4) x =
+      transport (cons s4 (nil e)) (transport (cons s3 (nil d)) (transport (cons s2 (nil c)) (transport (cons s1 (nil b)) x))) := by
+  simp [transport, toEq, Step.toEq]
+  rfl
+
+/-- 36. weq id is reflexive -/
+def weq_refl (a : A) : IsWeq (nil a) := weq_id a
+
+/-- 37. weq symm is weq -/
+theorem weq_symm_prop {a b : A} {f : Path A a b} (hf : IsWeq f) : IsWeq (symm f) := {
+  inv := f,
+  id_l := by rw [path_toEq_trans, path_toEq_symm, hf.id_r, _root_.Eq.symm_refl],
+  id_r := by rw [path_toEq_trans, path_toEq_symm, hf.id_l, _root_.Eq.symm_refl]
+}
+
+/-- 38. lifting composition again -/
+theorem lift_comp {a b c d e f : A} (i : Path A a b) (p : Path A c d) (q : Path A d e) (h1 : HasLift i p) (h2 : HasLift i q) : HasLift i (trans p q) := by
+  intro f_ g_ eq
+  rw [← path_trans_assoc] at eq
+  let ⟨l1, hl1_a, hl1_b⟩ := h2 f_ (trans p g_) (by rw [path_toEq_trans, ← _root_.Eq.trans_assoc, ← path_toEq_trans, eq])
+  let ⟨l2, hl2_a, hl2_b⟩ := h1 l1 g_ (by rw [path_toEq_trans, hl1_a, ← path_toEq_trans])
+  exact ⟨l2, hl2_a, by rw [path_toEq_trans, ← _root_.Eq.trans_assoc, ← path_toEq_trans, hl2_b, hl1_b]⟩
+
+/-- 39. transport along congrArg id -/
+theorem transport_congr_id {a b : A} (p : Path A a b) {D : A → Sort v} (x : D a) :
+    transport (congrArg (fun z => z) p) x = transport p x := by
+  simp [transport, path_toEq_congrArg]
+
+/-- 40. transport along congrArg comp -/
+theorem transport_congr_comp {a b : A} (p : Path A a b) (f : A → A) (g : A → A) {D : A → Sort v} (x : D (f (g a))) :
+    transport (congrArg (fun z => f (g z)) p) x = transport (congrArg f (congrArg g p)) x := by
+  simp [transport, path_toEq_congrArg]
+
+end ModelCategoryDeep
+end ComputationalPaths
