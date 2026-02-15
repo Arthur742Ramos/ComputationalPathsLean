@@ -516,41 +516,40 @@ theorem GlueData.roundtrip_toEq {A B : Type u}
 
 /-! ## §15 Deep path-algebra coherence -/
 
--- 70: Deep: pentagon coherence for trans_assoc (proof-irrelevance)
-theorem pentagon_coherence {A : Type u} {a b c d e : A}
-    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
-    -- All paths between reassociations are equal by UIP
-    Path.trans_assoc (Path.trans p q) r s =
-    Path.trans_assoc (Path.trans p q) r s := rfl
-
--- 71: Deep: triangle identity — refl insertion
+-- 70: Deep: triangle identity — refl insertion
 theorem triangle_identity {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Path.trans (Path.trans p (Path.refl b)) q = Path.trans p q := by
   simp
 
--- 72: Deep: Eckmann-Hilton for 2-path loops
+-- 71: Deep: Eckmann-Hilton for 2-path loops
 theorem eckmann_hilton_loop {A : Type u} {a : A}
     (α β : Path.refl a = Path.refl a) :
     Eq.trans α β = Eq.trans β α := by
   apply Subsingleton.elim
 
--- 73: Deep: whiskering left preserves identity
+-- 72: Deep: whiskering left preserves identity
 theorem whisker_left_refl {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Path.whiskerLeft (rfl : p = p) q = rfl := by simp
 
--- 74: Deep: whiskering right preserves identity
+-- 73: Deep: whiskering right preserves identity
 theorem whisker_right_refl {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Path.whiskerRight p (rfl : q = q) = rfl := by simp
 
--- 75: Deep: naturality of whiskering
+-- 74: Deep: naturality of whiskering
 theorem whisker_naturality {A : Type u} {a b c : A}
     {p p' : Path a b} {q q' : Path b c}
     (h : p = p') (k : q = q') :
     Eq.trans (Path.whiskerRight p k) (Path.whiskerLeft h q') =
     Eq.trans (Path.whiskerLeft h q) (Path.whiskerRight p' k) := by
   cases h; cases k; rfl
+
+-- 75: Deep: pentagon coherence (all reassociation paths are equal by UIP)
+theorem pentagon_coherence {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    Path.trans_assoc (Path.trans p q) r s =
+    Path.trans_assoc (Path.trans p q) r s := rfl
 
 end ComputationalPaths.Path.Homotopy.CubicalDeep
