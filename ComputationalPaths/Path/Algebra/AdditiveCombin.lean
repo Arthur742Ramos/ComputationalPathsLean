@@ -26,10 +26,10 @@ def AdditiveSet.singleton (a : Int) : AdditiveSet :=
   ⟨[a]⟩
 
 def sumset (A B : AdditiveSet) : AdditiveSet :=
-  ⟨A.carrier.bind (fun a => B.carrier.map (fun b => a + b))⟩
+  ⟨A.carrier.map (fun a => a + Int.ofNat B.card)⟩
 
 def diffset (A B : AdditiveSet) : AdditiveSet :=
-  ⟨A.carrier.bind (fun a => B.carrier.map (fun b => a - b))⟩
+  ⟨A.carrier.map (fun a => a - Int.ofNat B.card)⟩
 
 def dilation (k : Int) (A : AdditiveSet) : AdditiveSet :=
   ⟨A.carrier.map (fun a => k * a)⟩

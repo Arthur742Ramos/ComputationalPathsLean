@@ -101,12 +101,12 @@ def sheafQuantizationWeight (F : SheafModel) (n : Nat) : Nat :=
 def microstalkRank (G : MicrolocalSheaf) (n : Nat) : Nat :=
   G.sheaf.stalk n
 
-def involutiveClosureMeasure (W : WavefrontSet) (n : Nat) : Nat :=
+noncomputable def involutiveClosureMeasure (W : WavefrontSet) (n : Nat) : Nat :=
   by
     classical
     exact if W.contains ⟨n, 0⟩ then n + 1 else 0
 
-def singularSupportSize (W : WavefrontSet) (N : Nat) : Nat :=
+noncomputable def singularSupportSize (W : WavefrontSet) (N : Nat) : Nat :=
   by
     classical
     exact (List.range N).foldl

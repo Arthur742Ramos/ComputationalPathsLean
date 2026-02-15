@@ -185,22 +185,25 @@ theorem zeroFreeStrip_self (Z : ZeroFreeRegion) :
 
 theorem siegelWalfiszBound_nonneg (S : SiegelWalfiszDatum) :
     0 ≤ siegelWalfiszBound S := by
-  simp [siegelWalfiszBound]
+  unfold siegelWalfiszBound
+  exact Int.ofNat_nonneg _
 
 theorem bombieriVinogradovLevel_nonneg (B : BombieriVinogradovDatum) :
     0 ≤ bombieriVinogradovLevel B := by
-  simp [bombieriVinogradovLevel]
+  unfold bombieriVinogradovLevel
+  exact Int.ofNat_nonneg _
 
 theorem largeSieveBound_nonneg (L : LargeSieveDatum) :
     0 ≤ largeSieveBound L := by
-  simp [largeSieveBound]
+  unfold largeSieveBound
+  exact Int.ofNat_nonneg _
 
 theorem chebyshevPsi_zero :
     chebyshevPsi 0 = 0 := rfl
 
 theorem arithmeticProgressionCount_mod_one (x a : Nat) :
     arithmeticProgressionCount x 1 a = x := by
-  simp [arithmeticProgressionCount]
+  simp [arithmeticProgressionCount, Nat.div_one, Nat.mod_one]
 
 theorem logarithmicIntegralModel_zero :
     logarithmicIntegralModel 0 = 0 := rfl

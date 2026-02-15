@@ -94,26 +94,26 @@ def crystalLower (C : CrystalNode) : CrystalNode :=
   { C with weight := C.weight }
 
 structure LRTableauData where
-  λ : Partition
-  μ : Partition
-  ν : Partition
+  lam : Partition
+  mu : Partition
+  nu : Partition
 
 def littlewoodRichardsonCoeff (L : LRTableauData) : Nat :=
-  L.λ.size + L.μ.size + L.ν.size
+  L.lam.size + L.mu.size + L.nu.size
 
 def plethysmCoeff (L : LRTableauData) : Nat :=
-  littlewoodRichardsonCoeff L + L.ν.length
+  littlewoodRichardsonCoeff L + L.nu.length
 
 structure MacdonaldDatum where
-  λ : Partition
+  lam : Partition
   q : Nat
   t : Nat
 
 def macdonaldSpecialization (M : MacdonaldDatum) : Nat :=
-  M.λ.size + M.q + M.t
+  M.lam.size + M.q + M.t
 
 def kostkaFoulkesModel (M : MacdonaldDatum) : Nat :=
-  M.λ.length + M.q
+  M.lam.length + M.q
 
 def hallInnerProductModel (P Q : Partition) : Nat :=
   P.size + Q.size
@@ -189,7 +189,8 @@ theorem hallInnerProductModel_symm (P Q : Partition) :
   simp [hallInnerProductModel, Nat.add_comm]
 
 theorem schurExpansionTerm_zero (P : Partition) :
-    schurExpansionTerm 0 P = 0 := rfl
+    schurExpansionTerm 0 P = 0 := by
+  simp [schurExpansionTerm]
 
 def rs_shape_path (R : RobinsonSchenstedPair) :
     Path (rsShapeAgreement R) (rsShapeAgreement R) :=
