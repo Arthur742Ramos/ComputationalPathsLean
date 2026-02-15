@@ -87,12 +87,12 @@ def join_idem_path (a : LatElem) : Path (join a a) a :=
 /-- Absorption: a ∧ (a ∨ b) = a. -/
 theorem absorption_meet_join (a b : LatElem) :
     meet a (join a b) = a := by
-  simp [meet, join, Nat.min_eq_left (Nat.le_max_left a.val b.val)]
+  simp [meet, join]
 
 /-- Absorption: a ∨ (a ∧ b) = a. -/
 theorem absorption_join_meet (a b : LatElem) :
     join a (meet a b) = a := by
-  simp [join, meet, Nat.max_eq_left (Nat.min_le_left a.val b.val)]
+  simp [join, meet]
 
 /-- Path for absorption law meet-join. -/
 def absorption_meet_join_path (a b : LatElem) :
@@ -109,10 +109,8 @@ def absorption_join_meet_path (a b : LatElem) :
 /-- Modular inequality: if a.val ≤ c.val then a ∨ (b ∧ c) = (a ∨ b) ∧ c. -/
 theorem modular_law (a b c : LatElem) (h : a.val ≤ c.val) :
     join a (meet b c) = meet (join a b) c := by
-  simp only [join, meet]
-  congr 1
-  exact Nat.max_min_distrib_right a.val b.val c.val ▸
-    (by omega : max a.val (min b.val c.val) = min (max a.val b.val) c.val)
+  simp only [join, meet, LatElem.mk.injEq]
+  omega
 
 /-- Path witnessing the modular law. -/
 def modular_law_path (a b c : LatElem) (h : a.val ≤ c.val) :
