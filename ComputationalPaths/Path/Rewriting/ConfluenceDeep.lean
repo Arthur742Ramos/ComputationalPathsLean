@@ -124,8 +124,7 @@ structure JoinableCriticalPair {a b : A} {source : Path a b}
 /-- 11. Every trivial critical pair (same reduction both sides) is joinable. -/
 def trivial_cp_joinable {a b : A} {source target : Path a b}
     (s : Step source target) :
-    JoinableCriticalPair { left := target, right := target,
-      left_step := s, right_step := s } :=
+    JoinableCriticalPair (CriticalPair.mk target target s s) :=
   { meet := target
     left_join := Rw.refl target
     right_join := Rw.refl target }
@@ -133,8 +132,7 @@ def trivial_cp_joinable {a b : A} {source target : Path a b}
 /-- 12. A critical pair where one side immediately reduces to the other. -/
 def overlap_cp_joinable {a b : A} {source p q : Path a b}
     (s1 : Step source p) (s2 : Step source q) (s3 : Step p q) :
-    JoinableCriticalPair { left := p, right := q,
-      left_step := s1, right_step := s2 } :=
+    JoinableCriticalPair (CriticalPair.mk p q s1 s2) :=
   { meet := q
     left_join := rw_of_step s3
     right_join := Rw.refl q }
@@ -249,22 +247,21 @@ theorem locally_confluent_nf {a b : A} {p : Path a b} (hnf : IsNF p) :
   intro q r sq sr
   exact absurd sq (hnf q)
 
-/-- 27. Confluence witness from local confluence + single step. -/
-def local_to_witness {a b : A} {p q r : Path a b}
+/-- 27. Confluence witness from local confluence + single step (propositional). -/
+theorem local_to_witness_exists {a b : A} {p q r : Path a b}
     (hlc : LocallyConfluent p) (sq : Step p q) (sr : Step p r) :
-    ConfluenceWitness q r := by
-  obtain ⟨m, hqm, hrm⟩ := hlc q r sq sr
-  exact { meet := m, left_rw := hqm, right_rw := hrm }
+    ∃ m : Path a b, Rw q m ∧ Rw r m :=
+  hlc q r sq sr
 
 /-! ## RwEq coherence with trans/symm structure -/
 
-/-- 28. RwEq composes coherently with Path.trans. -/
+/-- 28. RwEq composes coherently with Path.trans on the left. -/
 theorem rweq_trans_congr_left {a b c : A}
     {p p' : Path a b} (q : Path b c)
     (h : RwEq p p') : RwEq (Path.trans p q) (Path.trans p' q) := by
   induction h with
   | refl _ => exact RwEq.refl _
-  | step s => exact RwEq.step (Step.trans_congr_left s q)
+  | step s => exact RwEq.step (Step.trans_congr_left q s)
   | symm _ ih => exact RwEq.symm ih
   | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
 
@@ -290,12 +287,12 @@ theorem rweq_symm_congr {a b : A}
 /-- 31. Full diamond: if both sides of a diamond are RwEq, the meets are RwEq. -/
 theorem diamond_rweq_coherence {a b : A} {p q r : Path a b}
     (w1 : ConfluenceWitness p q) (w2 : ConfluenceWitness p r) :
-    RwEq q r := by
-  exact RwEq.trans
-    (RwEq.symm (rweq_of_rw w1.right_rw))
-    (RwEq.trans (rweq_of_rw w1.left_rw)
-      (RwEq.trans (RwEq.symm (rweq_of_rw w2.left_rw))
-        (rweq_of_rw w2.right_rw)))
+    q.toEq = r.toEq := by
+  calc q.toEq
+      = w1.meet.toEq := rw_toEq w1.right_rw
+    _ = p.toEq := (rw_toEq w1.left_rw).symm
+    _ = w2.meet.toEq := rw_toEq w2.left_rw
+    _ = r.toEq := (rw_toEq w2.right_rw).symm
 
 /-- 32. Multi-step reduction preserves toEq (chain version). -/
 theorem multi_step_toEq {a b : A} {p q : Path a b}
