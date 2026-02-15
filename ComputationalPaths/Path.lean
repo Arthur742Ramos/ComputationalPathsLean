@@ -435,3 +435,7 @@ import ComputationalPaths.Path.Topology.MetricPaths
 import ComputationalPaths.Path.Topology.GeodeticPaths
 import ComputationalPaths.Path.Topology.UniformPaths
 import ComputationalPaths.Path.Topology.CompactPaths
+import ComputationalPaths.Path.Homotopy.SimplicialPaths
+import ComputationalPaths.Path.Homotopy.CubicalPaths
+import ComputationalPaths.Path.Homotopy.ChainComplexPaths
+import ComputationalPaths.Path.Homotopy.CWComplexPaths
