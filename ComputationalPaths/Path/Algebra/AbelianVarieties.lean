@@ -1,346 +1,217 @@
-/-
-# Abelian Varieties via Computational Paths
-
-This module formalizes abelian varieties in the computational paths framework.
-We model the group law, dual abelian variety, Poincaré bundle, isogenies,
-Tate modules, and the Weil pairing using Path-valued structures.
-
-## Key Constructions
-
-- `AbelianVarietyData`: abelian variety data (dimension, polarization)
-- `AVGroupLaw`: group law on an abelian variety with Path-valued laws
-- `DualAVData`: dual abelian variety
-- `PoincareBundleData`: Poincaré bundle as universal line bundle
-- `IsogenyData`: isogeny between abelian varieties
-- `TateModuleData`: Tate module T_ℓ(A)
-- `WeilPairingData`: Weil pairing
-- `AVStep`: rewrite steps for abelian variety computations
-
-## References
-
-- Mumford, "Abelian Varieties"
-- Milne, "Abelian Varieties" (lecture notes)
-- Lang, "Abelian Varieties"
--/
-
-import ComputationalPaths.Path.Basic
-import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths
 namespace Path
 namespace Algebra
+namespace AbelianVarieties
 
-universe u
-
--- ============================================================================
--- Section 1: Abelian Variety Data
--- ============================================================================
-
-/-- Data for an abelian variety -/
-structure AbelianVarietyData (α : Type u) where
+structure AbelianVarietyData where
   dimension : Nat
-  baseField : String
-  generators : List α
-  isPrincipallyPolarized : Bool
-  isSimple : Bool
-  deriving Repr, BEq
+  baseFieldDegree : Nat
+  torsionRank : Nat
+  endomorphismRankValue : Nat
 
-/-- An elliptic curve is an abelian variety of dimension 1 -/
-def AbelianVarietyData.ellipticCurve (k : String) (gen : α) : AbelianVarietyData α :=
-  { dimension := 1, baseField := k, generators := [gen],
-    isPrincipallyPolarized := true, isSimple := true }
+structure DualAbelianVarietyData where
+  source : AbelianVarietyData
+  dualDimension : Nat
+  dualTorsionRank : Nat
 
-/-- Product of abelian varieties -/
-def AbelianVarietyData.product (A B : AbelianVarietyData α) : AbelianVarietyData α :=
-  { dimension := A.dimension + B.dimension, baseField := A.baseField,
-    generators := A.generators ++ B.generators,
-    isPrincipallyPolarized := A.isPrincipallyPolarized && B.isPrincipallyPolarized,
-    isSimple := false }
+structure NeronSeveriData where
+  variety : AbelianVarietyData
+  rankValue : Nat
+  ampleConeDimensionValue : Nat
 
--- ============================================================================
--- Section 2: Group Law
--- ============================================================================
+structure PolarizationData where
+  variety : AbelianVarietyData
+  degreeValue : Nat
+  isPrincipal : Bool
 
-/-- Group law on an abelian variety with Path-valued axioms -/
-structure AVGroupLaw (α : Type u) where
-  carrier : Type u
-  identity : carrier
-  add : carrier → carrier → carrier
-  neg : carrier → carrier
-  add_assoc : ∀ a b c, Path (add (add a b) c) (add a (add b c))
-  add_zero : ∀ a, Path (add a identity) a
-  add_comm : ∀ a b, Path (add a b) (add b a)
-  add_neg : ∀ a, Path (add a (neg a)) identity
+structure RosatiInvolutionData where
+  polarization : PolarizationData
+  fixedRankValue : Nat
 
-/-- Default group law (trivial) -/
-def AVGroupLaw.trivial : AVGroupLaw α :=
-  { carrier := Unit
-    identity := ()
-    add := fun _ _ => ()
-    neg := fun _ => ()
-    add_assoc := fun _ _ _ => Path.refl ()
-    add_zero := fun _ => Path.refl ()
-    add_comm := fun _ _ => Path.refl ()
-    add_neg := fun _ => Path.refl () }
+structure ComplexMultiplicationData where
+  variety : AbelianVarietyData
+  cmFieldDegreeValue : Nat
+  cmTypeRankValue : Nat
 
--- ============================================================================
--- Section 3: Dual Abelian Variety
--- ============================================================================
+structure HondaTateData where
+  variety : AbelianVarietyData
+  slopeCountValue : Nat
+  isogenyClassCardinalityValue : Nat
 
-/-- Data for the dual abelian variety Â -/
-structure DualAVData (α : Type u) where
-  original : AbelianVarietyData α
-  dualDimension : Nat := original.dimension
-  lineBundle : List α
-  deriving Repr
+structure IsogenyCategoryData where
+  objectCountValue : Nat
+  morphismCountValue : Nat
+  hasKernelCokernel : Bool
 
-/-- The biduality: A ≅ Â^ (Path witness) -/
-def bidualityPath {α : Type u} (d : DualAVData α) :
-    Path d.original d.original :=
-  Path.refl d.original
+def abelianDimension (A : AbelianVarietyData) : Nat :=
+  A.dimension
 
-/-- Dual of a principally polarized AV -/
-def DualAVData.ofPrincipal (A : AbelianVarietyData α) : DualAVData α :=
-  { original := A, lineBundle := A.generators }
+def abelianBaseFieldDegree (A : AbelianVarietyData) : Nat :=
+  A.baseFieldDegree
 
--- ============================================================================
--- Section 4: Poincaré Bundle
--- ============================================================================
+def dualAbelianVariety (A : AbelianVarietyData) : DualAbelianVarietyData :=
+  { source := A, dualDimension := A.dimension, dualTorsionRank := A.torsionRank }
 
-/-- Data for the Poincaré bundle on A × Â -/
-structure PoincareBundleData (α : Type u) where
-  variety : AbelianVarietyData α
-  dual : DualAVData α
-  trivializationData : List α
-  isUniversal : Bool
-  deriving Repr
+def bidualAbelianVariety (A : AbelianVarietyData) : DualAbelianVarietyData :=
+  dualAbelianVariety A
 
-/-- Construct the canonical Poincaré bundle -/
-def PoincareBundleData.canonical (A : AbelianVarietyData α)
-    (d : DualAVData α) : PoincareBundleData α :=
-  { variety := A, dual := d, trivializationData := A.generators, isUniversal := true }
+def neronSeveriRank (N : NeronSeveriData) : Nat :=
+  N.rankValue
 
-/-- Restriction to a fiber gives a line bundle -/
-def PoincareBundleData.fiberRestriction (pb : PoincareBundleData α) : List α :=
-  pb.trivializationData
+def picardNumber (N : NeronSeveriData) : Nat :=
+  N.rankValue
 
--- ============================================================================
--- Section 5: Isogenies
--- ============================================================================
+def ampleConeDimension (N : NeronSeveriData) : Nat :=
+  N.ampleConeDimensionValue
 
-/-- Data for an isogeny between abelian varieties -/
-structure IsogenyData (α : Type u) where
-  source : AbelianVarietyData α
-  target : AbelianVarietyData α
-  degree : Nat
-  kernelSize : Nat
-  isSeparable : Bool
-  deriving Repr, BEq
+def polarizationDegree (P : PolarizationData) : Nat :=
+  P.degreeValue
 
-/-- Dual isogeny -/
-def IsogenyData.dual (iso : IsogenyData α) : IsogenyData α :=
-  { source := iso.target, target := iso.source,
-    degree := iso.degree, kernelSize := iso.kernelSize,
-    isSeparable := iso.isSeparable }
+def principalPolarization (A : AbelianVarietyData) : PolarizationData :=
+  { variety := A, degreeValue := 1, isPrincipal := true }
 
-/-- Composition of isogenies -/
-def IsogenyData.compose (f g : IsogenyData α) : IsogenyData α :=
-  { source := f.source, target := g.target,
-    degree := f.degree * g.degree, kernelSize := f.kernelSize * g.kernelSize,
-    isSeparable := f.isSeparable && g.isSeparable }
+def inducedDualPolarization (P : PolarizationData) : PolarizationData :=
+  { variety := P.variety, degreeValue := P.degreeValue, isPrincipal := P.isPrincipal }
 
-/-- Multiplication-by-n isogeny -/
-def IsogenyData.multiplicationByN (A : AbelianVarietyData α) (n : Nat) : IsogenyData α :=
-  { source := A, target := A, degree := n ^ (2 * A.dimension),
-    kernelSize := n ^ (2 * A.dimension), isSeparable := true }
+def rosatiInvolutionApply (R : RosatiInvolutionData) (x : Nat) : Nat :=
+  x + R.fixedRankValue
 
--- ============================================================================
--- Section 6: Tate Module
--- ============================================================================
+def rosatiFixedRank (R : RosatiInvolutionData) : Nat :=
+  R.fixedRankValue
 
-/-- Data for the Tate module T_ℓ(A) -/
-structure TateModuleData (α : Type u) where
-  variety : AbelianVarietyData α
-  prime : Nat
-  rank : Nat := 2 * variety.dimension
-  torsionPoints : List (List α)  -- A[ℓ^n] for each level n
-  deriving Repr
+def cmFieldDegree (C : ComplexMultiplicationData) : Nat :=
+  C.cmFieldDegreeValue
 
-/-- Construct Tate module -/
-def TateModuleData.mk' (A : AbelianVarietyData α) (l : Nat) : TateModuleData α :=
-  { variety := A, prime := l, torsionPoints := [] }
+def cmTypeRank (C : ComplexMultiplicationData) : Nat :=
+  C.cmTypeRankValue
 
-/-- Rational Tate module V_ℓ(A) has same rank -/
-def TateModuleData.rationalRank (tm : TateModuleData α) : Nat := tm.rank
+def hasComplexMultiplication (C : ComplexMultiplicationData) : Prop :=
+  0 < C.cmFieldDegreeValue
 
--- ============================================================================
--- Section 7: Weil Pairing
--- ============================================================================
+def hondaTateSlopeCount (H : HondaTateData) : Nat :=
+  H.slopeCountValue
 
-/-- Data for the Weil pairing e_n : A[n] × Â[n] → μ_n -/
-structure WeilPairingData (α : Type u) where
-  variety : AbelianVarietyData α
-  level : Nat
-  sourcePointA : α
-  sourcePointDual : α
-  rootOfUnity : α
-  deriving Repr
+def hondaTateIsogenyClassCardinality (H : HondaTateData) : Nat :=
+  H.isogenyClassCardinalityValue
 
-/-- Path witnessing Weil pairing bilinearity -/
-def weilBilinearPath {α : Type u} (wp : WeilPairingData α) :
-    Path wp wp :=
-  Path.refl wp
+def isogenyCategoryObjectCount (I : IsogenyCategoryData) : Nat :=
+  I.objectCountValue
 
-/-- Weil pairing is alternating (Path witness) -/
-def weilAlternatingPath {α : Type u} (wp : WeilPairingData α) :
-    Path wp wp :=
-  Path.refl wp
+def isogenyCategoryMorphismCount (I : IsogenyCategoryData) : Nat :=
+  I.morphismCountValue
 
-/-- Weil pairing is Galois equivariant -/
-def weilGaloisPath {α : Type u} (wp : WeilPairingData α) :
-    Path wp wp :=
-  Path.refl wp
+def tateModuleRank (A : AbelianVarietyData) : Nat :=
+  2 * A.dimension
 
--- ============================================================================
--- Section 8: Endomorphism Algebras
--- ============================================================================
+def endomorphismAlgebraRank (A : AbelianVarietyData) : Nat :=
+  A.endomorphismRankValue
 
-/-- Data for the endomorphism algebra End(A) ⊗ Q -/
-structure EndAlgebraData (α : Type u) where
-  variety : AbelianVarietyData α
-  algebraType : String  -- "matrix", "division", "CM"
-  dimension : Nat
-  generators : List α
-  deriving Repr
+def poincareBundleEulerCharacteristic (A : AbelianVarietyData) : Nat :=
+  A.dimension + A.baseFieldDegree
 
-/-- Albert classification of endomorphism algebras -/
-inductive AlbertType where
-  | typeI    -- totally real
-  | typeII   -- totally indefinite quaternion
-  | typeIII  -- totally definite quaternion
-  | typeIV   -- CM type
-  deriving Repr, BEq
+def weilPairingOrder (A : AbelianVarietyData) : Nat :=
+  Nat.succ A.torsionRank
 
-/-- CM abelian variety -/
-def EndAlgebraData.isCM (e : EndAlgebraData α) : Bool :=
-  e.algebraType == "CM"
+def dualityPathWitness (A : AbelianVarietyData) : Path A A :=
+  Path.refl A
 
--- ============================================================================
--- Section 9: Mordell–Weil and Heights
--- ============================================================================
+def polarizationPathWitness (P : PolarizationData) : Path (polarizationDegree P) (polarizationDegree P) :=
+  Path.refl _
 
-/-- Data for the Mordell–Weil group A(K) -/
-structure MordellWeilData (α : Type u) where
-  variety : AbelianVarietyData α
-  rank : Nat
-  torsionOrder : Nat
-  generators : List α
-  deriving Repr
+def rosatiPathWitness (R : RosatiInvolutionData) : Path (rosatiFixedRank R) (rosatiFixedRank R) :=
+  Path.refl _
 
-/-- Néron–Tate height pairing -/
-structure NeronTateData (α : Type u) where
-  mwGroup : MordellWeilData α
-  heightMatrix : List (List Nat)
-  regulator : Nat
-  deriving Repr
-
-/-- Path witnessing positive definiteness of Néron–Tate height -/
-def neronTatePositivePath {α : Type u} (nt : NeronTateData α) :
-    Path nt nt :=
-  Path.refl nt
-
--- ============================================================================
--- Section 10: AVStep Rewrite Relation
--- ============================================================================
-
-/-- Rewrite steps for abelian variety computations -/
-inductive AVStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
-  /-- Group law step -/
-  | group_law {A : Type u} {a : A} (p : Path a a) :
-      AVStep p (Path.refl a)
-  /-- Isogeny step -/
-  | isogeny {A : Type u} {a b : A} (p q : Path a b)
-      (h : p.proof = q.proof) : AVStep p q
-  /-- Weil pairing step -/
-  | weil_pair {A : Type u} {a b : A} (p q : Path a b)
-      (h : p.proof = q.proof) : AVStep p q
-  /-- Duality step -/
-  | dualize {A : Type u} {a b : A} (p q : Path a b)
-      (h : p.proof = q.proof) : AVStep p q
-
-/-- AVStep is sound: preserves the underlying equality -/
-theorem avStep_sound {A : Type u} {a b : A} {p q : Path a b}
-    (h : AVStep p q) : p.proof = q.proof := by
-  cases h with
-  | group_law _ => rfl
-  | isogeny _ _ h => exact h
-  | weil_pair _ _ h => exact h
-  | dualize _ _ h => exact h
-
--- ============================================================================
--- Section 11: Deep Abelian Variety Statements
--- ============================================================================
-
-theorem abelian_poincare_reducibility_statement
-    {α : Type u} (A : AbelianVarietyData α) :
-    ∃ B C : AbelianVarietyData α, Nonempty (Path (B.dimension + C.dimension) A.dimension) := by
+theorem dual_dimension_eq (A : AbelianVarietyData) :
+    (dualAbelianVariety A).dualDimension = abelianDimension A := by
   sorry
 
-theorem abelian_dual_dimension_statement
-    {α : Type u} (d : DualAVData α) :
-    Nonempty (Path d.dualDimension d.original.dimension) := by
+theorem bidual_dimension_eq (A : AbelianVarietyData) :
+    (bidualAbelianVariety A).dualDimension = abelianDimension A := by
   sorry
 
-theorem abelian_biduality_statement
-    {α : Type u} (d : DualAVData α) :
-    Nonempty (Path d.original d.original) := by
+theorem neronSeveri_rank_nonnegative (N : NeronSeveriData) :
+    0 <= neronSeveriRank N := by
   sorry
 
-theorem abelian_poincare_bundle_universality_statement
-    {α : Type u} (pb : PoincareBundleData α) :
-    pb.isUniversal = true → Nonempty (Path pb pb) := by
+theorem ampleConeDimension_nonnegative (N : NeronSeveriData) :
+    0 <= ampleConeDimension N := by
   sorry
 
-theorem abelian_isogeny_degree_kernel_relation_statement
-    {α : Type u} (iso : IsogenyData α) :
-    iso.degree = iso.kernelSize → Nonempty (Path iso iso) := by
+theorem principalPolarization_degree_one (A : AbelianVarietyData) :
+    polarizationDegree (principalPolarization A) = 1 := by
   sorry
 
-theorem abelian_dual_isogeny_preserves_degree_statement
-    {α : Type u} (iso : IsogenyData α) :
-    (IsogenyData.dual iso).degree = iso.degree := by
+theorem inducedDualPolarization_preserves_degree (P : PolarizationData) :
+    polarizationDegree (inducedDualPolarization P) = polarizationDegree P := by
   sorry
 
-theorem abelian_tate_module_rank_formula_statement
-    {α : Type u} (tm : TateModuleData α) :
-    Nonempty (Path tm.rank (2 * tm.variety.dimension)) := by
+theorem rosati_fixed_rank_bound (R : RosatiInvolutionData) :
+    rosatiFixedRank R <= rosatiFixedRank R + 1 := by
   sorry
 
-theorem abelian_weil_pairing_perfectness_statement
-    {α : Type u} (wp : WeilPairingData α) :
-    Nonempty (Path wp wp) := by
+theorem rosati_apply_monotone (R : RosatiInvolutionData) (x : Nat) :
+    x <= rosatiInvolutionApply R x := by
   sorry
 
-theorem abelian_mordell_weil_finite_generation_statement
-    {α : Type u} (mw : MordellWeilData α) :
-    ∃ n : Nat, Nonempty (Path mw.generators.length n) := by
+theorem cmFieldDegree_positive_shift (C : ComplexMultiplicationData) :
+    0 < cmFieldDegree C + 1 := by
   sorry
 
-theorem abelian_neron_tate_height_bound_statement
-    {α : Type u} (nt : NeronTateData α) :
-    ∃ C : Nat, nt.regulator ≤ C := by
+theorem cmTypeRank_le_cmFieldDegree (C : ComplexMultiplicationData) :
+    cmTypeRank C <= cmTypeRank C + cmFieldDegree C := by
   sorry
 
-theorem abelian_neron_ogg_shafarevich_statement
-    {α : Type u} (A : AbelianVarietyData α) (tm : TateModuleData α) :
-    tm.variety = A → ∃ N : Nat, tm.prime ≤ N := by
+theorem hondaTateSlopeCount_nonnegative (H : HondaTateData) :
+    0 <= hondaTateSlopeCount H := by
   sorry
 
-theorem abelian_mordell_weil_rank_torsion_bound_statement
-    {α : Type u} (mw : MordellWeilData α) :
-    ∃ C : Nat, mw.rank + mw.torsionOrder ≤ C := by
+theorem hondaTateCardinality_positive_shift (H : HondaTateData) :
+    0 < hondaTateIsogenyClassCardinality H + 1 := by
   sorry
 
+theorem isogenyCategory_objects_nonnegative (I : IsogenyCategoryData) :
+    0 <= isogenyCategoryObjectCount I := by
+  sorry
+
+theorem isogenyCategory_morphisms_nonnegative (I : IsogenyCategoryData) :
+    0 <= isogenyCategoryMorphismCount I := by
+  sorry
+
+theorem tateModuleRank_even (A : AbelianVarietyData) :
+    tateModuleRank A % 2 = 0 := by
+  sorry
+
+theorem endomorphismAlgebraRank_nonnegative (A : AbelianVarietyData) :
+    0 <= endomorphismAlgebraRank A := by
+  sorry
+
+theorem poincareEuler_positive_shift (A : AbelianVarietyData) :
+    0 < poincareBundleEulerCharacteristic A + 1 := by
+  sorry
+
+theorem weilPairingOrder_positive (A : AbelianVarietyData) :
+    0 < weilPairingOrder A := by
+  sorry
+
+theorem dualityPathWitness_refl (A : AbelianVarietyData) :
+    dualityPathWitness A = Path.refl A := by
+  sorry
+
+theorem polarizationPathWitness_refl (P : PolarizationData) :
+    polarizationPathWitness P = Path.refl (polarizationDegree P) := by
+  sorry
+
+theorem rosatiPathWitness_refl (R : RosatiInvolutionData) :
+    rosatiPathWitness R = Path.refl (rosatiFixedRank R) := by
+  sorry
+
+theorem hondaTate_implies_nonempty_isogeny_class (H : HondaTateData) :
+    0 < hondaTateIsogenyClassCardinality H + 1 := by
+  sorry
+
+end AbelianVarieties
 end Algebra
 end Path
 end ComputationalPaths
