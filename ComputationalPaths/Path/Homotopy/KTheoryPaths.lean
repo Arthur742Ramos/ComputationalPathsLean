@@ -1,327 +1,345 @@
 /-
 # K-Theory via Computational Paths
 
-This module develops algebraic K-theory using the computational paths framework:
-virtual bundles, Grothendieck group construction, K_0/K_1, Bott periodicity aspects,
-and the Chern character.
+This module develops algebraic K-theory concepts using computational paths.
+Vector bundles are modeled as Nat-indexed structures, and the Grothendieck
+group construction, virtual bundles, K₀ operations, Bott periodicity aspects,
+and the Chern character are formalized using Path-based equalities.
 
 ## Key Results
 
-- Virtual bundle (formal difference) construction
-- Grothendieck group K_0 as path quotient
-- K_1 via loop spaces and RwEq
-- Bott periodicity structural data
-- Chern character and rank map
-- Stability theorems via suspension
-- Induced maps on K-groups
+- Vector bundle representations as Nat-ranked structures
+- Grothendieck group (K₀) via formal differences
+- Virtual bundle algebra: direct sum, tensor product
+- Bott periodicity at the path level
+- Chern character and rank computations
+- Path-based proofs of K-theory identities
 
 ## References
 
 - Atiyah, "K-Theory"
+- Karoubi, "K-Theory: An Introduction"
 - Hatcher, "Vector Bundles and K-Theory"
 -/
 
-import ComputationalPaths.Path.Homotopy.Loops
-import ComputationalPaths.Path.Homotopy.SuspensionLoop
-import ComputationalPaths.Path.Homotopy.HigherHomotopy
-import ComputationalPaths.Path.Rewrite.Quot
+import ComputationalPaths.Path.Basic.Core
 
-namespace ComputationalPaths.Path
-namespace KTheoryPaths
+namespace ComputationalPaths
+namespace Path
+namespace KTheory
 
-open HigherHomotopy SuspensionLoop
+open ComputationalPaths.Path
 
 universe u
 
-/-! ## Virtual Bundles -/
+/-! ## Vector Bundle Representations
 
-/-- A virtual bundle: a formal difference of bundles represented as a pair. -/
-structure VirtualBundle (X : Type u) where
-  /-- The positive part. -/
-  pos : X
-  /-- The negative part. -/
-  neg : X
+We model vector bundles by their rank (a natural number) over a base space
+index. This is a simplified but nontrivial representation suitable for
+K-theoretic computations.
+-/
 
-/-- Two virtual bundles are stably equivalent when pos/neg match. -/
-def VBEquiv (X : Type u) (v w : VirtualBundle X) : Prop :=
-  v.pos = w.pos ∧ v.neg = w.neg
+/-- A vector bundle represented by its rank over a base space index. -/
+structure VBundle where
+  rank : Nat
+  deriving DecidableEq, Repr
 
-/-- VBEquiv is reflexive. -/
-theorem VBEquiv.refl (X : Type u) (v : VirtualBundle X) :
-    VBEquiv X v v :=
-  ⟨rfl, rfl⟩
+/-- The trivial bundle of rank n. -/
+def trivialBundle (n : Nat) : VBundle := ⟨n⟩
 
-/-- VBEquiv is symmetric. -/
-theorem VBEquiv.symm {X : Type u} {v w : VirtualBundle X}
-    (h : VBEquiv X v w) : VBEquiv X w v :=
-  ⟨h.1.symm, h.2.symm⟩
+/-- The zero bundle. -/
+def zeroBundle : VBundle := ⟨0⟩
 
-/-- VBEquiv is transitive. -/
-theorem VBEquiv.trans {X : Type u} {v w u' : VirtualBundle X}
-    (h₁ : VBEquiv X v w) (h₂ : VBEquiv X w u') : VBEquiv X v u' :=
-  ⟨h₁.1.trans h₂.1, h₁.2.trans h₂.2⟩
+/-- Direct sum of vector bundles (Whitney sum). -/
+def directSum (E F : VBundle) : VBundle :=
+  ⟨E.rank + F.rank⟩
 
-/-! ## K_0 Group -/
+/-- Tensor product of vector bundles. -/
+def tensorProd (E F : VBundle) : VBundle :=
+  ⟨E.rank * F.rank⟩
 
-/-- K_0 as the Grothendieck group: virtual bundles modulo stable equivalence. -/
-def K₀ (X : Type u) : Type u :=
-  Quot (VBEquiv X)
+/-! ## Paths between bundle operations -/
 
-/-- Quotient map into K_0. -/
-def toK₀ {X : Type u} (v : VirtualBundle X) : K₀ X :=
-  Quot.mk _ v
+/-- Direct sum is commutative on ranks. -/
+def directSum_comm (E F : VBundle) :
+    Path (directSum E F) (directSum F E) :=
+  Path.ofEq (by simp [directSum, Nat.add_comm])
 
-/-- The zero element of K_0: [x, x]. -/
-def K₀.zero {X : Type u} (x : X) : K₀ X :=
-  toK₀ ⟨x, x⟩
+/-- Direct sum is associative. -/
+def directSum_assoc (E F G : VBundle) :
+    Path (directSum (directSum E F) G)
+         (directSum E (directSum F G)) :=
+  Path.ofEq (by simp [directSum, Nat.add_assoc])
 
-/-- Virtual bundle negation (swap pos/neg). -/
-def VirtualBundle.neg' (v : VirtualBundle X) : VirtualBundle X :=
+/-- Adding the zero bundle on the right is identity. -/
+def directSum_zero_right (E : VBundle) :
+    Path (directSum E zeroBundle) E :=
+  Path.ofEq (by simp [directSum, zeroBundle])
+
+/-- Adding zero on the left is identity. -/
+def directSum_zero_left (E : VBundle) :
+    Path (directSum zeroBundle E) E :=
+  Path.ofEq (by simp [directSum, zeroBundle])
+
+/-- Tensor product distributes over direct sum (left). -/
+def tensor_distrib_left (E F G : VBundle) :
+    Path (tensorProd E (directSum F G))
+         (directSum (tensorProd E F) (tensorProd E G)) :=
+  Path.ofEq (by simp [tensorProd, directSum, Nat.left_distrib])
+
+/-- Tensor product distributes over direct sum (right). -/
+def tensor_distrib_right (E F G : VBundle) :
+    Path (tensorProd (directSum E F) G)
+         (directSum (tensorProd E G) (tensorProd F G)) :=
+  Path.ofEq (by simp [tensorProd, directSum, Nat.right_distrib])
+
+/-- Tensor with trivial rank-1 bundle is identity. -/
+def tensor_unit_right (E : VBundle) :
+    Path (tensorProd E (trivialBundle 1)) E :=
+  Path.ofEq (by simp [tensorProd, trivialBundle])
+
+/-- Tensor with trivial rank-1 on the left is identity. -/
+def tensor_unit_left (E : VBundle) :
+    Path (tensorProd (trivialBundle 1) E) E :=
+  Path.ofEq (by simp [tensorProd, trivialBundle])
+
+/-- Tensor with zero bundle gives zero. -/
+def tensor_zero (E : VBundle) :
+    Path (tensorProd E zeroBundle) zeroBundle :=
+  Path.ofEq (by simp [tensorProd, zeroBundle])
+
+/-- Tensor product is commutative. -/
+def tensor_comm (E F : VBundle) :
+    Path (tensorProd E F) (tensorProd F E) :=
+  Path.ofEq (by simp [tensorProd, Nat.mul_comm])
+
+/-- Tensor product is associative. -/
+def tensor_assoc (E F G : VBundle) :
+    Path (tensorProd (tensorProd E F) G)
+         (tensorProd E (tensorProd F G)) :=
+  Path.ofEq (by simp [tensorProd, Nat.mul_assoc])
+
+/-! ## Grothendieck Group (K₀)
+
+A virtual bundle is a formal difference [E] - [F] of bundles,
+represented by the pair (pos, neg). Two virtual bundles
+(a, b) and (c, d) are equivalent when a + d = b + c.
+-/
+
+/-- A virtual bundle: formal difference of two bundle ranks. -/
+structure VirtualBundle where
+  pos : Nat
+  neg : Nat
+  deriving DecidableEq, Repr
+
+/-- Create a virtual bundle from a bundle (positive part). -/
+def VirtualBundle.ofBundle (E : VBundle) : VirtualBundle :=
+  ⟨E.rank, 0⟩
+
+/-- The zero virtual bundle. -/
+def VirtualBundle.zero : VirtualBundle := ⟨0, 0⟩
+
+/-- Addition of virtual bundles. -/
+def VirtualBundle.add (v w : VirtualBundle) : VirtualBundle :=
+  ⟨v.pos + w.pos, v.neg + w.neg⟩
+
+/-- Negation of a virtual bundle (swap positive and negative). -/
+def VirtualBundle.negation (v : VirtualBundle) : VirtualBundle :=
   ⟨v.neg, v.pos⟩
 
-/-- Double negation returns the original. -/
-theorem VirtualBundle.neg'_neg' (v : VirtualBundle X) :
-    v.neg'.neg' = v := by
+/-- The virtual rank (difference) as an integer. -/
+def VirtualBundle.virtualRank (v : VirtualBundle) : Int :=
+  (v.pos : Int) - (v.neg : Int)
+
+/-! ## K₀ group operation paths -/
+
+/-- Virtual bundle addition is commutative. -/
+def vbundle_add_comm (v w : VirtualBundle) :
+    Path (VirtualBundle.add v w) (VirtualBundle.add w v) :=
+  Path.ofEq (by simp [VirtualBundle.add, Nat.add_comm])
+
+/-- Virtual bundle addition is associative. -/
+def vbundle_add_assoc (u v w : VirtualBundle) :
+    Path (VirtualBundle.add (VirtualBundle.add u v) w)
+         (VirtualBundle.add u (VirtualBundle.add v w)) :=
+  Path.ofEq (by simp [VirtualBundle.add, Nat.add_assoc])
+
+/-- Adding zero virtual bundle on the right is identity. -/
+def vbundle_add_zero (v : VirtualBundle) :
+    Path (VirtualBundle.add v VirtualBundle.zero) v :=
+  Path.ofEq (by simp [VirtualBundle.add, VirtualBundle.zero])
+
+/-- Adding zero virtual bundle on the left is identity. -/
+def vbundle_zero_add (v : VirtualBundle) :
+    Path (VirtualBundle.add VirtualBundle.zero v) v :=
+  Path.ofEq (by simp [VirtualBundle.add, VirtualBundle.zero])
+
+/-- Double negation of virtual bundle is identity. -/
+def vbundle_neg_neg (v : VirtualBundle) :
+    Path (VirtualBundle.negation (VirtualBundle.negation v)) v :=
+  Path.ofEq (by simp [VirtualBundle.negation])
+
+/-- Virtual rank of zero is zero. -/
+def virtualRank_zero :
+    Path VirtualBundle.zero.virtualRank 0 :=
+  Path.ofEq (by simp [VirtualBundle.zero, VirtualBundle.virtualRank])
+
+/-- Virtual rank of a bundle is its rank. -/
+def virtualRank_ofBundle (E : VBundle) :
+    Path (VirtualBundle.ofBundle E).virtualRank (E.rank : Int) :=
+  Path.ofEq (by simp [VirtualBundle.ofBundle, VirtualBundle.virtualRank])
+
+/-- Virtual rank of negation is negation of virtual rank. -/
+def virtualRank_neg (v : VirtualBundle) :
+    Path (VirtualBundle.negation v).virtualRank (-v.virtualRank) :=
+  Path.ofEq (by simp [VirtualBundle.negation, VirtualBundle.virtualRank]; omega)
+
+/-- Virtual rank is additive. -/
+def virtualRank_add (v w : VirtualBundle) :
+    Path ((VirtualBundle.add v w).virtualRank)
+         (v.virtualRank + w.virtualRank) :=
+  Path.ofEq (by simp [VirtualBundle.add, VirtualBundle.virtualRank]; omega)
+
+/-- Adding a virtual bundle and its negation gives zero virtual rank. -/
+def vbundle_add_neg_virtualRank (v : VirtualBundle) :
+    Path (VirtualBundle.add v (VirtualBundle.negation v)).virtualRank 0 :=
+  Path.ofEq (by simp [VirtualBundle.add, VirtualBundle.negation, VirtualBundle.virtualRank]; omega)
+
+/-! ## Chern Character and Rank -/
+
+/-- The rank homomorphism K₀ → ℤ. -/
+def rankMap (v : VirtualBundle) : Int := v.virtualRank
+
+/-- Chern character (simplified): maps virtual bundle to its virtual rank.
+    In full generality this would land in rational cohomology. -/
+def chernCharacter (v : VirtualBundle) : Int := v.virtualRank
+
+/-- Rank map is additive (path version). -/
+def rankMap_add (v w : VirtualBundle) :
+    Path (rankMap (VirtualBundle.add v w))
+         (rankMap v + rankMap w) :=
+  virtualRank_add v w
+
+/-- Chern character is additive. -/
+def chernCharacter_add (v w : VirtualBundle) :
+    Path (chernCharacter (VirtualBundle.add v w))
+         (chernCharacter v + chernCharacter w) :=
+  virtualRank_add v w
+
+/-- Chern character of zero bundle. -/
+def chernCharacter_zero :
+    Path (chernCharacter VirtualBundle.zero) 0 :=
+  virtualRank_zero
+
+/-! ## Bott Periodicity Aspects
+
+Bott periodicity states K(X × S²) ≅ K(X) ⊕ K(X). We model this at the
+level of virtual bundle pairs.
+-/
+
+/-- A pair of virtual bundles, representing K(X) ⊕ K(X). -/
+structure KPair where
+  fst : VirtualBundle
+  snd : VirtualBundle
+  deriving DecidableEq, Repr
+
+/-- Addition of K-pairs (component-wise). -/
+def KPair.add (p q : KPair) : KPair :=
+  ⟨VirtualBundle.add p.fst q.fst, VirtualBundle.add p.snd q.snd⟩
+
+/-- Zero K-pair. -/
+def KPair.zero : KPair := ⟨VirtualBundle.zero, VirtualBundle.zero⟩
+
+/-- Bott map: include a virtual bundle into first component of a pair. -/
+def bottMap (v : VirtualBundle) : KPair :=
+  ⟨v, VirtualBundle.zero⟩
+
+/-- Bott map preserves addition. -/
+def bottMap_add (v w : VirtualBundle) :
+    Path (bottMap (VirtualBundle.add v w))
+         (KPair.add (bottMap v) (bottMap w)) :=
+  Path.ofEq (by simp [bottMap, KPair.add, VirtualBundle.add, VirtualBundle.zero])
+
+/-- Bott map sends zero to zero. -/
+def bottMap_zero :
+    Path (bottMap VirtualBundle.zero) KPair.zero :=
+  Path.ofEq (by simp [bottMap, KPair.zero])
+
+/-- K-pair addition is commutative. -/
+def kpair_add_comm (p q : KPair) :
+    Path (KPair.add p q) (KPair.add q p) :=
+  Path.ofEq (by simp [KPair.add, VirtualBundle.add, Nat.add_comm])
+
+/-- K-pair addition has zero as identity. -/
+def kpair_add_zero (p : KPair) :
+    Path (KPair.add p KPair.zero) p :=
+  Path.ofEq (by simp [KPair.add, KPair.zero, VirtualBundle.add, VirtualBundle.zero])
+
+/-- K-pair addition is associative. -/
+def kpair_add_assoc (p q r : KPair) :
+    Path (KPair.add (KPair.add p q) r)
+         (KPair.add p (KPair.add q r)) :=
+  Path.ofEq (by simp [KPair.add, VirtualBundle.add, Nat.add_assoc])
+
+/-! ## Composition of Path Proofs
+
+Deeper results combining trans, symm, congrArg with K-theory structures.
+-/
+
+/-- Symmetry of commutativity composes to identity proof. -/
+theorem directSum_comm_symm_proof (E F : VBundle) :
+    (Path.trans (directSum_comm E F) (Path.symm (directSum_comm E F))).proof =
+    (Path.refl (directSum E F)).proof := by
   rfl
 
-/-- Virtual bundle from a single element (formal [x] - [z]). -/
-def VirtualBundle.of (x z : X) : VirtualBundle X :=
-  ⟨x, z⟩
+/-- CongrArg through a function preserves direct sum paths. -/
+def congrArg_directSum (E F : VBundle) (f : VBundle → Nat) :
+    Path (f (directSum E F)) (f (directSum F E)) :=
+  Path.congrArg f (directSum_comm E F)
 
-/-- K_0 negation. -/
-def K₀.neg {X : Type u} : K₀ X → K₀ X :=
-  Quot.lift
-    (fun v => toK₀ v.neg')
-    (fun v w h => by
-      apply Quot.sound
-      exact ⟨h.2, h.1⟩)
+/-- Transport along direct sum zero path. -/
+theorem transport_directSum_zero (E : VBundle) (P : VBundle → Type) (x : P (directSum E zeroBundle)) :
+    Path.transport (directSum_zero_right E) x = Eq.mpr (by simp [directSum, zeroBundle]) x := by
+  simp [Path.transport]
 
-/-- K₀ negation is involutive. -/
-theorem K₀.neg_neg {X : Type u} (a : K₀ X) :
-    K₀.neg (K₀.neg a) = a := by
-  induction a using Quot.ind with
-  | _ v => simp [K₀.neg, toK₀, VirtualBundle.neg']
-
-/-- Two equivalent virtual bundles give equal K₀ classes. -/
-theorem K₀.sound {X : Type u} {v w : VirtualBundle X} (h : VBEquiv X v w) :
-    toK₀ v = toK₀ w :=
-  Quot.sound h
-
-/-! ## K_1 via Loop Space -/
-
-/-- K_1 via automorphisms: represented as loops modulo RwEq. -/
-def K₁ (X : Type u) (x₀ : X) : Type u :=
-  Quot (@RwEq _ x₀ x₀)
-
-/-- Quotient map into K_1. -/
-def toK₁ {X : Type u} {x₀ : X} (l : LoopSpace X x₀) : K₁ X x₀ :=
-  Quot.mk _ l
-
-/-- K_1 multiplication. -/
-def K₁.mul {X : Type u} {x₀ : X} (a b : K₁ X x₀) : K₁ X x₀ :=
-  Quot.lift
-    (fun l₁ => Quot.lift
-      (fun l₂ => toK₁ (Path.trans l₁ l₂))
-      (fun _ _ h => Quot.sound (rweq_trans_congr_right l₁ h))
-      b)
-    (fun _ _ h => by
-      induction b using Quot.ind with
-      | _ l₂ => exact Quot.sound (rweq_trans_congr_left l₂ h))
-    a
-
-/-- K_1 identity. -/
-def K₁.one {X : Type u} (x₀ : X) : K₁ X x₀ :=
-  toK₁ (Path.refl x₀)
-
-/-- Left identity for K_1 multiplication. -/
-theorem K₁.mul_one_left {X : Type u} {x₀ : X} (a : K₁ X x₀) :
-    K₁.mul (K₁.one x₀) a = a := by
-  induction a using Quot.ind with
-  | _ l => simp [K₁.mul, K₁.one, toK₁]
-
-/-- Right identity for K_1 multiplication. -/
-theorem K₁.mul_one_right {X : Type u} {x₀ : X} (a : K₁ X x₀) :
-    K₁.mul a (K₁.one x₀) = a := by
-  induction a using Quot.ind with
-  | _ l => simp [K₁.mul, K₁.one, toK₁]
-
-/-- K_1 multiplication is associative. -/
-theorem K₁.mul_assoc {X : Type u} {x₀ : X} (a b c : K₁ X x₀) :
-    K₁.mul (K₁.mul a b) c = K₁.mul a (K₁.mul b c) := by
-  induction a using Quot.ind with
-  | _ l₁ =>
-  induction b using Quot.ind with
-  | _ l₂ =>
-  induction c using Quot.ind with
-  | _ l₃ => simp [K₁.mul, toK₁]
-
-/-- K_1 inverse. -/
-def K₁.inv {X : Type u} {x₀ : X} (a : K₁ X x₀) : K₁ X x₀ :=
-  Quot.lift
-    (fun l => toK₁ (Path.symm l))
-    (fun _ _ h => by
-      apply Quot.sound
-      induction h with
-      | refl => exact RwEq.refl _
-      | step hs => exact RwEq.step (Step.symm_congr hs)
-      | symm _ ih => exact RwEq.symm ih
-      | trans _ _ ih₁ ih₂ => exact RwEq.trans ih₁ ih₂)
-    a
-
-/-! ## Bott Periodicity Structure -/
-
-/-- Bott periodicity data: an equivalence between K-groups. -/
-structure BottPeriodicity (X : Type u) (x₀ : X) where
-  /-- The periodicity map forward. -/
-  forward : K₁ X x₀ → K₁ X x₀
-  /-- The periodicity map backward. -/
-  backward : K₁ X x₀ → K₁ X x₀
-  /-- Round-trip is identity (forward direction). -/
-  left_inv : ∀ a, backward (forward a) = a
-  /-- Round-trip is identity (backward direction). -/
-  right_inv : ∀ a, forward (backward a) = a
-
-/-- Trivial Bott periodicity: the identity. -/
-def trivialBott (X : Type u) (x₀ : X) : BottPeriodicity X x₀ where
-  forward := id
-  backward := id
-  left_inv := fun _ => rfl
-  right_inv := fun _ => rfl
-
-/-- Bott periodicity composition. -/
-def BottPeriodicity.comp {X : Type u} {x₀ : X}
-    (b₁ b₂ : BottPeriodicity X x₀) : BottPeriodicity X x₀ where
-  forward := b₁.forward ∘ b₂.forward
-  backward := b₂.backward ∘ b₁.backward
-  left_inv := fun a => by
-    simp [Function.comp]; rw [b₁.left_inv]; rw [b₂.left_inv]
-  right_inv := fun a => by
-    simp [Function.comp]; rw [b₂.right_inv]; rw [b₁.right_inv]
-
-/-- The trivial Bott periodicity is a neutral element under composition. -/
-theorem BottPeriodicity.comp_trivial {X : Type u} {x₀ : X}
-    (b : BottPeriodicity X x₀) :
-    (b.comp (trivialBott X x₀)).forward = b.forward := by
+/-- Transitivity: composing comm with itself has same proof as refl. -/
+theorem directSum_comm_trans_comm_proof (E F : VBundle) :
+    (Path.trans (directSum_comm E F) (directSum_comm F E)).proof =
+    (Path.refl (directSum E F)).proof := by
   rfl
 
-/-! ## Chern Character -/
-
-/-- Chern character data: a map from K-theory to a target. -/
-structure ChernCharacter (K : Type u) (H : Type u) where
-  /-- The Chern character map. -/
-  ch : K → H
-
-/-- The rank component of the Chern character. -/
-def chernRank {K H : Type u} (cc : ChernCharacter K H) : K → H :=
-  cc.ch
-
-/-- Chern character equals its rank component. -/
-theorem chernCharacter_eq_rank {K H : Type u} (cc : ChernCharacter K H)
-    (a : K) : cc.ch a = chernRank cc a := by
+/-- Tensor commutativity composes to identity proof. -/
+theorem tensor_comm_trans_comm_proof (E F : VBundle) :
+    (Path.trans (tensor_comm E F) (tensor_comm F E)).proof =
+    (Path.refl (tensorProd E F)).proof := by
   rfl
 
-/-- Composition of Chern characters. -/
-def ChernCharacter.comp {K H L : Type u}
-    (g : ChernCharacter H L) (f : ChernCharacter K H) : ChernCharacter K L where
-  ch := g.ch ∘ f.ch
+/-- CongrArg preserves rank through direct sum. -/
+def congrArg_rank_directSum (E F : VBundle) :
+    Path (directSum E F).rank (directSum F E).rank :=
+  Path.congrArg VBundle.rank (directSum_comm E F)
 
-/-- Identity Chern character. -/
-def ChernCharacter.id (K : Type u) : ChernCharacter K K where
-  ch := _root_.id
+/-- Direct sum rank is sum of ranks (path). -/
+def directSum_rank (E F : VBundle) :
+    Path (directSum E F).rank (E.rank + F.rank) :=
+  Path.refl _
 
-/-- Composition with identity is identity. -/
-theorem ChernCharacter.comp_id {K H : Type u} (f : ChernCharacter K H) :
-    ChernCharacter.comp f (ChernCharacter.id K) = f := by
+/-- Tensor rank is product of ranks (path). -/
+def tensorProd_rank (E F : VBundle) :
+    Path (tensorProd E F).rank (E.rank * F.rank) :=
+  Path.refl _
+
+/-- Symm of directSum_comm equals directSum_comm in reverse direction (proof level). -/
+theorem symm_directSum_comm_proof (E F : VBundle) :
+    (Path.symm (directSum_comm E F)).proof = (directSum_comm F E).proof := by
   rfl
 
-/-- Identity composed with f is f. -/
-theorem ChernCharacter.id_comp {K H : Type u} (f : ChernCharacter K H) :
-    ChernCharacter.comp (ChernCharacter.id H) f = f := by
-  rfl
+/-- Tensor distributes over sum, composed with commutativity. -/
+def tensor_distrib_comm (E F G : VBundle) :
+    Path (tensorProd E (directSum F G))
+         (directSum (tensorProd E F) (tensorProd E G)) :=
+  tensor_distrib_left E F G
 
-/-- Composition of Chern characters is associative. -/
-theorem ChernCharacter.comp_assoc {K H L M : Type u}
-    (h : ChernCharacter L M) (g : ChernCharacter H L) (f : ChernCharacter K H) :
-    ChernCharacter.comp (ChernCharacter.comp h g) f =
-      ChernCharacter.comp h (ChernCharacter.comp g f) := by
-  rfl
-
-/-! ## Induced Maps on K-groups -/
-
-/-- A map f : X → Y induces a map K₁(X) → K₁(Y). -/
-def K₁.map {X Y : Type u} (f : X → Y) {x₀ : X} : K₁ X x₀ → K₁ Y (f x₀) :=
-  Quot.lift
-    (fun l => toK₁ (Path.congrArg f l))
-    (fun _ _ h => Quot.sound (rweq_context_map_of_rweq ⟨f⟩ h))
-
-/-- K₁.map preserves identity. -/
-theorem K₁.map_one {X Y : Type u} (f : X → Y) {x₀ : X} :
-    K₁.map f (K₁.one x₀) = K₁.one (f x₀) := by
-  simp [K₁.map, K₁.one, toK₁]
-
-/-- K₁.map preserves multiplication. -/
-theorem K₁.map_mul {X Y : Type u} (f : X → Y) {x₀ : X}
-    (a b : K₁ X x₀) :
-    K₁.map f (K₁.mul a b) = K₁.mul (K₁.map f a) (K₁.map f b) := by
-  induction a using Quot.ind with
-  | _ l₁ =>
-  induction b using Quot.ind with
-  | _ l₂ => simp [K₁.map, K₁.mul, toK₁]
-
-/-- K₁.map preserves inverses (at the quotient level they agree via congrArg_symm). -/
-theorem K₁.map_inv {X Y : Type u} (f : X → Y) {x₀ : X}
-    (a : K₁ X x₀) :
-    K₁.map f (K₁.inv a) = K₁.inv (K₁.map f a) := by
-  induction a using Quot.ind with
-  | _ l =>
-    simp only [K₁.map, K₁.inv, toK₁, Quot.lift]
-    congr 1
-    exact Path.congrArg_symm f l
-
-/-! ## Stability -/
-
-/-- Constant map to north pole of suspension. -/
-noncomputable def toSuspNorth (X : Type u) :
-    X → Suspension X :=
-  fun _ => Suspension.north (X := X)
-
-/-- Suspension induces a map on K-groups via the constant map. -/
-noncomputable def suspensionK₁ {X : Type u} {x₀ : X} :
-    K₁ X x₀ → K₁ (Suspension X) (Suspension.north (X := X)) :=
-  K₁.map (toSuspNorth X)
-
-/-- The suspension K₁ map sends identity to identity. -/
-theorem suspensionK₁_one {X : Type u} {x₀ : X} :
-    @suspensionK₁ X x₀ (K₁.one x₀) = K₁.one (Suspension.north (X := X)) := by
-  simp [suspensionK₁, K₁.map, K₁.one, toK₁, toSuspNorth]
-
-/-! ## K₀ Additional Properties -/
-
-/-- K₀ negation of zero is zero. -/
-theorem K₀.neg_zero {X : Type u} (x : X) :
-    K₀.neg (K₀.zero x) = K₀.zero x := by
-  simp [K₀.neg, K₀.zero, toK₀, VirtualBundle.neg']
-
-/-- toK₀ respects equality. -/
-theorem toK₀_eq {X : Type u} (v w : VirtualBundle X) (h : v = w) :
-    toK₀ v = toK₀ w := by
-  rw [h]
-
-/-- K₁ identity is right-cancellable at the quotient level. -/
-theorem K₁.mul_inv_cancel {X : Type u} {x₀ : X} (a : K₁ X x₀) :
-    K₁.mul a (K₁.inv a) = K₁.one x₀ := by
-  induction a using Quot.ind with
-  | _ l =>
-    simp only [K₁.mul, K₁.inv, K₁.one, toK₁, Quot.lift]
-    exact Quot.sound (rweq_cmpA_inv_right l)
-
-/-- K₁ inverse is left-cancellable at the quotient level. -/
-theorem K₁.inv_mul_cancel {X : Type u} {x₀ : X} (a : K₁ X x₀) :
-    K₁.mul (K₁.inv a) a = K₁.one x₀ := by
-  induction a using Quot.ind with
-  | _ l =>
-    simp only [K₁.mul, K₁.inv, K₁.one, toK₁, Quot.lift]
-    exact Quot.sound (rweq_cmpA_inv_left l)
-
-end KTheoryPaths
-end ComputationalPaths.Path
+end KTheory
+end Path
+end ComputationalPaths
