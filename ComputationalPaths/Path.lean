@@ -451,3 +451,5 @@ import ComputationalPaths.Path.HoTT.PathAlgebraDeep
 import ComputationalPaths.Path.HoTT.TransportDeep
 import ComputationalPaths.Path.HoTT.UnivalenceDeep
 import ComputationalPaths.Path.Rewriting.HigherRewritingDeep
+import ComputationalPaths.Path.Rewriting.KnuthBendixDeep
+import ComputationalPaths.Path.Rewriting.CoherenceDeep
