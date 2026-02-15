@@ -73,6 +73,128 @@ def triangleIdentity (f : Path a b) (g : Path b c) :
     Derivation₃ (triangleLeft f g) (triangleRight f g) :=
   triangleCoherence f g
 
+/-! ## Additional Theorem Statements -/
+
+theorem godementInterchange_eq_step {f f' : Path a b} {g g' : Path b c}
+    (alpha : Derivation₂ f f') (beta : Derivation₂ g g') :
+    godementInterchange alpha beta =
+      Derivation₃.step (MetaStep₃.interchange alpha beta) := by
+  sorry
+
+theorem godementInterchange_refl_left {f : Path a b} {g g' : Path b c}
+    (beta : Derivation₂ g g') :
+    Nonempty
+      (Derivation₃
+        (Derivation₂.vcomp
+          (OmegaGroupoid.whiskerRight (Derivation₂.refl f) g)
+          (OmegaGroupoid.whiskerLeft f beta))
+        (Derivation₂.vcomp
+          (OmegaGroupoid.whiskerLeft f beta)
+          (OmegaGroupoid.whiskerRight (Derivation₂.refl f) g'))) := by
+  sorry
+
+theorem godementInterchange_refl_right {f f' : Path a b} {g : Path b c}
+    (alpha : Derivation₂ f f') :
+    Nonempty
+      (Derivation₃
+        (Derivation₂.vcomp
+          (OmegaGroupoid.whiskerRight alpha g)
+          (OmegaGroupoid.whiskerLeft f' (Derivation₂.refl g)))
+        (Derivation₂.vcomp
+          (OmegaGroupoid.whiskerLeft f (Derivation₂.refl g))
+          (OmegaGroupoid.whiskerRight alpha g))) := by
+  sorry
+
+theorem godementInterchange_refl_both {f : Path a b} {g : Path b c} :
+    Nonempty
+      (Derivation₃
+        (Derivation₂.vcomp
+          (OmegaGroupoid.whiskerRight (Derivation₂.refl f) g)
+          (OmegaGroupoid.whiskerLeft f (Derivation₂.refl g)))
+        (Derivation₂.vcomp
+          (OmegaGroupoid.whiskerLeft f (Derivation₂.refl g))
+          (OmegaGroupoid.whiskerRight (Derivation₂.refl f) g))) := by
+  sorry
+
+theorem associatorNatural_eq_contractibility {f f' : Path a b} {g g' : Path b c} {h h' : Path c d}
+    (alpha : Derivation₂ f f') (beta : Derivation₂ g g') (gamma : Derivation₂ h h') :
+    associatorNatural alpha beta gamma =
+      contractibility₃
+        (Derivation₂.vcomp
+          (OmegaGroupoid.hcomp (OmegaGroupoid.hcomp alpha beta) gamma)
+          (associator f' g' h'))
+        (Derivation₂.vcomp
+          (associator f g h)
+          (OmegaGroupoid.hcomp alpha (OmegaGroupoid.hcomp beta gamma))) := by
+  sorry
+
+theorem associatorNatural_refl (f : Path a b) (g : Path b c) (h : Path c d) :
+    Nonempty
+      (Derivation₃
+        (Derivation₂.vcomp
+          (OmegaGroupoid.hcomp
+            (OmegaGroupoid.hcomp (Derivation₂.refl f) (Derivation₂.refl g))
+            (Derivation₂.refl h))
+          (associator f g h))
+        (Derivation₂.vcomp
+          (associator f g h)
+          (OmegaGroupoid.hcomp
+            (Derivation₂.refl f)
+            (OmegaGroupoid.hcomp (Derivation₂.refl g) (Derivation₂.refl h))))) := by
+  sorry
+
+theorem leftUnitorNatural_eq_contractibility {f g : Path a b} (alpha : Derivation₂ f g) :
+    leftUnitorNatural alpha =
+      contractibility₃
+        (Derivation₂.vcomp
+          (OmegaGroupoid.hcomp (Derivation₂.refl (Path.refl a)) alpha)
+          (leftUnitor g))
+        (Derivation₂.vcomp (leftUnitor f) alpha) := by
+  sorry
+
+theorem leftUnitorNatural_refl (f : Path a b) :
+    Nonempty
+      (Derivation₃
+        (Derivation₂.vcomp
+          (OmegaGroupoid.hcomp (Derivation₂.refl (Path.refl a)) (Derivation₂.refl f))
+          (leftUnitor f))
+        (Derivation₂.vcomp (leftUnitor f) (Derivation₂.refl f))) := by
+  sorry
+
+theorem rightUnitorNatural_eq_contractibility {f g : Path a b} (alpha : Derivation₂ f g) :
+    rightUnitorNatural alpha =
+      contractibility₃
+        (Derivation₂.vcomp
+          (OmegaGroupoid.hcomp alpha (Derivation₂.refl (Path.refl b)))
+          (rightUnitor g))
+        (Derivation₂.vcomp (rightUnitor f) alpha) := by
+  sorry
+
+theorem rightUnitorNatural_refl (f : Path a b) :
+    Nonempty
+      (Derivation₃
+        (Derivation₂.vcomp
+          (OmegaGroupoid.hcomp (Derivation₂.refl f) (Derivation₂.refl (Path.refl b)))
+          (rightUnitor f))
+        (Derivation₂.vcomp (rightUnitor f) (Derivation₂.refl f))) := by
+  sorry
+
+theorem pentagonIdentity_eq_coherence (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
+    pentagonIdentity f g h k = pentagonCoherence f g h k := by
+  sorry
+
+theorem pentagonIdentity_has_type (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
+    Nonempty (Derivation₃ (pentagonLeft f g h k) (pentagonRight f g h k)) := by
+  sorry
+
+theorem triangleIdentity_eq_coherence (f : Path a b) (g : Path b c) :
+    triangleIdentity f g = triangleCoherence f g := by
+  sorry
+
+theorem triangleIdentity_has_type (f : Path a b) (g : Path b c) :
+    Nonempty (Derivation₃ (triangleLeft f g) (triangleRight f g)) := by
+  sorry
+
 /-! ## Summary -/
 
 /-!

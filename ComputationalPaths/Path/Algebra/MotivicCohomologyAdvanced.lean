@@ -31,9 +31,52 @@ namespace Path
 namespace Algebra
 namespace MotivicCohomologyAdvanced
 
-open MotivicCohomology
-
 universe u
+
+namespace MotivicCohomology
+
+/-- A minimal stand-in for algebraic varieties. -/
+abbrev Variety := Type u
+
+/-- Closed subvarieties represented as predicates. -/
+abbrev ClosedSubvariety (X : Variety) := X → Prop
+
+/-- Placeholder higher Chow group package. -/
+structure BlochHigherChow (X : Variety) (p n : Nat) where
+  carrier : Type u
+  zero : carrier
+
+/-- Placeholder Milnor K-theory package. -/
+structure MilnorKTheory (k : Type u) where
+  level : Nat → Type u
+  zero : (n : Nat) → level n
+
+/-- Placeholder norm residue isomorphism package. -/
+structure NormResidueIsomorphism (k : Type u) (n : Nat) where
+  milnor : MilnorKTheory k
+  etale : Type u
+  compare : milnor.level n → etale
+  isIso : True
+
+/-- Placeholder Beilinson-Lichtenbaum comparison package. -/
+structure BeilinsonLichtenbaumComparison (X : Variety) where
+  motivic : Nat → Nat → Type u
+  etale : Nat → Nat → Type u
+  compare : (p q : Nat) → motivic p q → etale p q
+  isIso : True
+
+/-- Placeholder Bloch-Lichtenbaum spectral sequence package. -/
+structure BlochLichtenbaumSS (X : Variety) where
+  page : Nat → Nat → Nat → Type u
+
+/-- Trivial Milnor K-theory package. -/
+def trivialMilnorKTheory (k : Type u) : MilnorKTheory k :=
+  { level := fun _ => PUnit
+    zero := fun _ => PUnit.unit }
+
+end MotivicCohomology
+
+open MotivicCohomology
 
 /-! ## Re-exports -/
 
@@ -87,8 +130,8 @@ structure HigherChowProduct (X : Variety) (F : HigherChowFamily X) where
 def HigherChowProduct.trivial {X : Variety} (F : HigherChowFamily X) :
     HigherChowProduct X F :=
   { product := fun p q n m _ _ => (F.chow (p + q) (n + m)).zero
-    product_assoc := trivial
-    product_unital := trivial }
+    product_assoc := True.intro
+    product_unital := True.intro }
 
 /-! ## Milnor K-theory presentations -/
 
@@ -109,7 +152,7 @@ def trivialMilnorKTheoryPresentation (k : Type u) : MilnorKTheoryPresentation k 
   { milnor := M
     symbol := fun n _ => M.zero n
     symbol_zero := fun _ => rfl
-    steinberg_relation := trivial }
+    steinberg_relation := True.intro }
 
 /-! ## Norm residue and Beilinson-Lichtenbaum data -/
 
@@ -131,10 +174,10 @@ def trivialNormResiduePackage (k : Type u) (n : Nat) : NormResiduePackage k n :=
       { milnor := M
         etale := PUnit
         compare := fun _ => PUnit.unit
-        isIso := trivial }
+        isIso := True.intro }
     motivicTarget := PUnit
     toMotivic := fun _ => PUnit.unit
-    compatible := trivial }
+    compatible := True.intro }
 
 /-- Beilinson-Lichtenbaum comparison with an explicit range witness. -/
 structure BeilinsonLichtenbaumRange (X : Variety) where
@@ -149,12 +192,12 @@ def trivialBeilinsonLichtenbaumComparison (X : Variety) :
   { motivic := fun _ _ => PUnit
     etale := fun _ _ => PUnit
     compare := fun _ _ _ => PUnit.unit
-    isIso := trivial }
+    isIso := True.intro }
 
 /-- A trivial Beilinson-Lichtenbaum range package. -/
 def trivialBeilinsonLichtenbaumRange (X : Variety) : BeilinsonLichtenbaumRange X :=
   { comparison := trivialBeilinsonLichtenbaumComparison X
-    range_ok := trivial }
+    range_ok := True.intro }
 
 /-- Compatibility of norm residue with Beilinson-Lichtenbaum comparison. -/
 structure NormResidueBeilinson (k : Type u) (X : Variety) (n : Nat) where
@@ -170,7 +213,72 @@ def trivialNormResidueBeilinson (k : Type u) (X : Variety) (n : Nat) :
     NormResidueBeilinson k X n :=
   { normResidue := (trivialNormResiduePackage k n).normResidue
     comparison := trivialBeilinsonLichtenbaumComparison X
-    compatible := trivial }
+    compatible := True.intro }
+
+/-! ## Derived theorem stubs -/
+
+theorem higherChowZero_eq_zero {X : Variety} (F : HigherChowFamily X) (p n : Nat) :
+    higherChowZero F p n = (F.chow p n).zero := by
+  sorry
+
+theorem higherChowProduct_trivial_apply {X : Variety} (F : HigherChowFamily X)
+    (p q n m : Nat) (x : (F.chow p n).carrier) (y : (F.chow q m).carrier) :
+    (HigherChowProduct.trivial F).product p q n m x y = (F.chow (p + q) (n + m)).zero := by
+  sorry
+
+theorem higherChowProduct_trivial_assoc {X : Variety} (F : HigherChowFamily X) :
+    (HigherChowProduct.trivial F).product_assoc = True.intro := by
+  sorry
+
+theorem higherChowProduct_trivial_unital {X : Variety} (F : HigherChowFamily X) :
+    (HigherChowProduct.trivial F).product_unital = True.intro := by
+  sorry
+
+theorem trivialMilnor_symbol_zero (k : Type u) (n : Nat) :
+    (trivialMilnorKTheoryPresentation k).symbol n [] =
+      (trivialMilnorKTheoryPresentation k).milnor.zero n := by
+  sorry
+
+theorem trivialMilnor_symbol_any_list (k : Type u) (n : Nat) (xs : List k) :
+    (trivialMilnorKTheoryPresentation k).symbol n xs =
+      (trivialMilnorKTheoryPresentation k).milnor.zero n := by
+  sorry
+
+theorem trivialMilnor_steinberg_relation (k : Type u) :
+    (trivialMilnorKTheoryPresentation k).steinberg_relation = True.intro := by
+  sorry
+
+theorem trivialNormResiduePackage_toMotivic_const (k : Type u) (n : Nat)
+    (x y : (trivialNormResiduePackage k n).normResidue.milnor.level n) :
+    (trivialNormResiduePackage k n).toMotivic x =
+      (trivialNormResiduePackage k n).toMotivic y := by
+  sorry
+
+theorem trivialNormResiduePackage_compatible (k : Type u) (n : Nat) :
+    (trivialNormResiduePackage k n).compatible = True.intro := by
+  sorry
+
+theorem trivialBeilinsonLichtenbaumComparison_isIso (X : Variety) :
+    (trivialBeilinsonLichtenbaumComparison X).isIso = True.intro := by
+  sorry
+
+theorem trivialBeilinsonLichtenbaumRange_range_ok (X : Variety) :
+    (trivialBeilinsonLichtenbaumRange X).range_ok = True.intro := by
+  sorry
+
+theorem trivialNormResidueBeilinson_normResidue_eq (k : Type u) (X : Variety) (n : Nat) :
+    (trivialNormResidueBeilinson k X n).normResidue =
+      (trivialNormResiduePackage k n).normResidue := by
+  sorry
+
+theorem trivialNormResidueBeilinson_comparison_eq (k : Type u) (X : Variety) (n : Nat) :
+    (trivialNormResidueBeilinson k X n).comparison =
+      trivialBeilinsonLichtenbaumComparison X := by
+  sorry
+
+theorem trivialNormResidueBeilinson_compatible (k : Type u) (X : Variety) (n : Nat) :
+    (trivialNormResidueBeilinson k X n).compatible = True.intro := by
+  sorry
 
 /-! ## Summary -/
 

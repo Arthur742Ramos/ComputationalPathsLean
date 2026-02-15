@@ -177,6 +177,83 @@ def punitVerdier : VerdierQuotientData PUnit punitHom punitShift where
     intro _
     exact Path.refl PUnit.unit
 
+/-! ## Theorem stubs -/
+
+theorem shiftData_unshift_shift_path {Obj : Type u} (S : ShiftData Obj) (X : Obj) :
+    Nonempty (Path (S.unshift (S.shift X)) X) := by
+  sorry
+
+theorem shiftData_shift_unshift_path {Obj : Type u} (S : ShiftData Obj) (X : Obj) :
+    Nonempty (Path (S.shift (S.unshift X)) X) := by
+  sorry
+
+theorem shiftData_unshift_shift_symm {Obj : Type u} (S : ShiftData Obj) (X : Obj) :
+    Nonempty (Path X (S.unshift (S.shift X))) := by
+  sorry
+
+theorem triangleData_X_refl {Obj : Type u} {Hom : Obj → Obj → Type v}
+    {S : ShiftData Obj} (T : TriangleData Obj Hom S) :
+    Nonempty (Path T.X T.X) := by
+  sorry
+
+theorem triangleData_Y_refl {Obj : Type u} {Hom : Obj → Obj → Type v}
+    {S : ShiftData Obj} (T : TriangleData Obj Hom S) :
+    Nonempty (Path T.Y T.Y) := by
+  sorry
+
+theorem triangleData_Z_refl {Obj : Type u} {Hom : Obj → Obj → Type v}
+    {S : ShiftData Obj} (T : TriangleData Obj Hom S) :
+    Nonempty (Path T.Z T.Z) := by
+  sorry
+
+theorem octahedral_overlap_symm {Obj : Type u} {Hom : Obj → Obj → Type v}
+    {S : ShiftData Obj} (O : OctahedralData Obj Hom S) :
+    Nonempty (Path O.tri1.Z O.tri3.X) := by
+  sorry
+
+theorem verdier_shift_compat_path {Obj : Type u} {Hom : Obj → Obj → Type v}
+    {S : ShiftData Obj} (V : VerdierQuotientData Obj Hom S) (X : Obj) :
+    Nonempty (Path (V.Qshift.shift (V.onObj X)) (V.onObj (S.shift X))) := by
+  sorry
+
+theorem triangulated_localization_functoriality
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c) :
+    RwEq (L.preserves_product (Path.trans p q))
+      (Path.trans (L.preserves_product p) (L.preserves_product q)) := by
+  sorry
+
+theorem triangulated_homology_functoriality
+    (E : GeneralizedHomologyTheory.{u, w})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) := by
+  sorry
+
+theorem triangulated_cross_dependencies_left
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c)
+    (E : GeneralizedHomologyTheory.{u, w})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    RwEq (L.preserves_product (Path.trans p q))
+      (Path.trans (L.preserves_product p) (L.preserves_product q)) := by
+  sorry
+
+theorem triangulated_cross_dependencies_right
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c)
+    (E : GeneralizedHomologyTheory.{u, w})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) := by
+  sorry
+
+theorem punit_loop_trans_assoc (p q r : Path PUnit.unit PUnit.unit) :
+    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) := by
+  sorry
+
+theorem punit_loop_trans_comm (p q : Path PUnit.unit PUnit.unit) :
+    RwEq (Path.trans p q) (Path.trans q p) := by
+  sorry
+
 /-! ## Summary
 
 We introduced data-level triangulated category structures with Path-valued
