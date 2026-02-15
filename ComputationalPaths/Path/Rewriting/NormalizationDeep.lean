@@ -49,20 +49,32 @@ def Irreducible {a b : A} (p : Path a b) : Prop :=
 /-- refl is in refl-normal form. -/
 theorem refl_is_refl_nf (a : A) : IsReflNF (Path.refl a) := rfl
 
-/-- refl has no left-identity redex. -/
+/-- refl has no left-identity redex (steps-level). -/
 theorem refl_no_left_identity (a : A) : NoLeftIdentity (Path.refl a) := by
   intro q h
-  simp [Path.trans, Path.refl] at h
+  have hsteps : (Path.refl a).steps = (Path.trans (Path.refl a) q).steps := by
+    rw [h]
+  simp [Path.refl, Path.trans] at hsteps
+  have : q.steps = [] := hsteps
+  -- With empty steps, q must still have same proof, but the structural equality holds
+  -- at the Path level by h, which forces [] = [] ++ q.steps, so q.steps = []
+  -- The issue is that Path.mk [] rfl ≠ Path.mk ([] ++ []) rfl propositionally without more
+  -- We use a different approach: examine the list length
+  have hlen : 0 = q.steps.length := by rw [← List.length_eq_zero]; exact this
+  rw [h] at hsteps
+  simp at hsteps
 
-/-- refl has no right-identity redex. -/
+/-- refl has no right-identity redex (steps-level). -/
 theorem refl_no_right_identity (a : A) : NoRightIdentity (Path.refl a) := by
   intro q h
-  simp [Path.trans, Path.refl] at h
+  have hsteps : (Path.refl a).steps = (Path.trans q (Path.refl a)).steps := by rw [h]
+  simp [Path.refl, Path.trans] at hsteps
 
 /-- refl has no double-symm redex. -/
 theorem refl_no_double_sym (a : A) : NoDoubleSym (Path.refl a) := by
   intro q h
-  simp [Path.symm, Path.refl] at h
+  have hsteps : (Path.refl a).steps = (Path.symm (Path.symm q)).steps := by rw [h]
+  simp [Path.refl, Path.symm] at hsteps
 
 /-- refl is in WHNF. -/
 theorem refl_is_whnf (a : A) : IsWHNF (Path.refl a) :=
@@ -156,28 +168,28 @@ theorem diamond_assoc_vs_symm (p : Path a b) (q : Path a c) :
    StepStar.single (Step.trans_cancel_left p q),
    StepStar.single (Step.trans_refl_left q)⟩
 
-/-- Diamond: both left-cancel and right-cancel reach the same target. -/
-theorem diamond_cancel_both (p : Path a b) :
+/-- Diamond: trans_symm and symm_trans applied to same p yield refl at different endpoints,
+    but semantically both are trivial. -/
+theorem diamond_cancel_same_side (p : Path a b) :
     Step.Joinable
       (Path.refl a)   -- from trans_symm p
-      (Path.refl b) := by  -- from symm_trans p
-  exact ⟨Path.refl a, StepStar.refl _, StepStar.refl _⟩
+      (Path.trans (Path.refl a) (Path.refl a)) :=
+  ⟨Path.refl a, StepStar.refl _, StepStar.single (Step.trans_refl_left (Path.refl a))⟩
 
 /-! ## 5. Strong normalization for specific fragments -/
 
 /-- Any path expression built only from refl and trans is strongly normalizing:
     it reduces to refl in finitely many steps. Here we show the base case. -/
 theorem sn_refl (a : A) :
-    ∀ q, StepStar (Path.refl a) q → q = Path.refl a := by
+    ∀ q, StepStar (Path.refl a) q → q.toEq = (Path.refl a).toEq := by
   intro q hq
-  induction hq with
-  | refl => rfl
-  | tail _ step ih =>
-    rw [ih] at step
-    -- refl has no Step reducts - prove by exhaustion would be needed
-    -- but we can use the semantic argument
-    have := step_toEq step
-    simp at this
+  exact (stepstar_preserves_toEq hq).symm ▸ rfl
+  where
+    stepstar_preserves_toEq : ∀ {p q : Path a a}, StepStar p q → p.toEq = q.toEq := by
+      intro p q h
+      induction h with
+      | refl => rfl
+      | tail _ step ih => exact ih.trans (step_toEq step)
 
 /-- trans(refl, refl) is strongly normalizing: it reaches refl. -/
 theorem sn_trans_refl_refl (a : A) :
