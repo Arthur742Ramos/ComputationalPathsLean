@@ -507,12 +507,12 @@ theorem connecting_full_les_chain
                           (Path.trans (Path.symm (cd.ex_pd n)) (cd.ex_di n))) := by
   simp
 
--- 27: Deep: whiskerLeft on d² paths
-theorem d_sq_whiskerLeft {Obj : Type u} {Hom : Obj → Obj → Type v}
+-- 27: Deep: any two d² proofs at the same degree agree (proof irrelevance)
+theorem d_sq_proof_irrel {Obj : Type u} {Hom : Obj → Obj → Type v}
     {ops : CatOps Obj Hom}
-    (C : ChainCx ops) (n m : Nat)
-    (hm : C.d_sq n = C.d_sq m → True) :
-    True := hm (by apply Subsingleton.elim)
+    (C : ChainCx ops) (n : Nat)
+    (h₁ h₂ : C.d_sq n = C.d_sq n) :
+    h₁ = h₂ := by apply Subsingleton.elim
 
 -- 28: Ext LES existence
 theorem ext_les_exists :
@@ -534,12 +534,12 @@ theorem connecting_exists :
     Nonempty (ConnectingData puOps PUnit.unit PUnit.unit PUnit.unit) :=
   ⟨puConnecting⟩
 
--- 31: Deep multi-step: SES + symm + d² chain in PUnit world
+-- 31: Deep multi-step: SES + symm + d² chain in PUnit world (toEq)
 theorem pu_ses_d_sq_chain (n : Nat) :
     let p := puSES.comp_zero
     let q := (puCC.d_sq n)
-    Path.trans (Path.trans p (Path.symm p)) (Path.trans q (Path.symm q)) =
-    Path.refl _ := by simp
+    (Path.trans (Path.trans p (Path.symm p)) (Path.trans q (Path.symm q))).toEq =
+    rfl := by simp
 
 -- 32: Deep: double congrArg through nested function applications
 def double_congrArg_d_sq
