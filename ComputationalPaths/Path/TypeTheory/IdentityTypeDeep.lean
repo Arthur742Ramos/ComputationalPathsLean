@@ -187,14 +187,14 @@ theorem happly_refl {A : Type u} {B : A → Type v} (f : (a : A) → B a) (a : A
 /-- 26. Happly preserves trans. -/
 theorem happly_trans {A : Type u} {B : A → Type v} {f g h : (a : A) → B a}
     (p : Path f g) (q : Path g h) (a : A) :
-    happly (trans p q) a = trans (happly p a) (happly q a) :=
-  congrArg_trans (fun k => k a) p q
+    happly (trans p q) a = trans (happly p a) (happly q a) := by
+  simp only [happly, congrArg_trans]
 
 /-- 27. Happly preserves symm. -/
 theorem happly_symm {A : Type u} {B : A → Type v} {f g : (a : A) → B a}
     (p : Path f g) (a : A) :
-    happly (symm p) a = symm (happly p a) :=
-  congrArg_symm (fun k => k a) p
+    happly (symm p) a = symm (happly p a) := by
+  simp only [happly, congrArg_symm]
 
 /-! ## Equivalences -/
 
@@ -226,7 +226,7 @@ def invQInv {A B : Type u} {f : A → B} (ef : QInv f) : QInv ef.inv where
   leftInv := ef.rightInv
 
 /-- 31. Transport is an equivalence (deep proof). -/
-def transportQInv {A : Type u} {D : A → Type v} {a b : A}
+def transportQInv {A : Type u} {D : A → Type u} {a b : A}
     (p : Path a b) : QInv (transport (D := D) p) where
   inv := transport (D := D) (symm p)
   rightInv := fun y => Path.ofEq (transport_symm_right p y)
@@ -257,9 +257,9 @@ theorem symm_quad {A : Type u} {a b c d e : A}
 
 /-- 35. Based path space contractibility (propositional). -/
 theorem based_path_prop {A : Type u} (a : A) :
-    ∀ (bq : (b : A) × (a = b)),
-      (⟨a, rfl⟩ : (b : A) × (a = b)) = bq := by
-  intro ⟨b, h⟩; cases h; rfl
+    ∀ (bq : (b : A) × PLift (a = b)),
+      (⟨a, PLift.up rfl⟩ : (b : A) × PLift (a = b)) = bq := by
+  intro ⟨b, ⟨h⟩⟩; cases h; rfl
 
 end IdentityTypeDeep
 end TypeTheory
