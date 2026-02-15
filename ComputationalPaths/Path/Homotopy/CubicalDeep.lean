@@ -93,7 +93,7 @@ theorem Line.map_id_fn {A : Type u} {a b : A} (l : Line A a b) :
   simp [Line.map]
 
 /-- From a Path to a Line. -/
-def Line.ofPath {A : Type u} {a b : A} (p : Path a b) : Line A a b where
+def Line.ofPath {A : Type u} {a b : A} (_p : Path a b) : Line A a b where
   fn := fun i => if i = i0 then a else b
   bd0 := by simp [i0]
   bd1 := by

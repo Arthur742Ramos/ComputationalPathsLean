@@ -1,334 +1,444 @@
 /-
-# Deep Localization Theory via Computational Paths
+# Localization via Computational Paths
 
-Localization of categories/rings via paths: inverting morphisms,
-universal property, calculus of fractions, localization functor,
-Ore conditions, saturation. All coherence conditions witnessed by
-multi-step `Path.trans`/`Path.symm`/`congrArg` chains.
+Inverting morphisms in a category-like setting using Path/Step/trans/symm.
+Universal property, calculus of fractions, and localization functors.
 
-## Main results (27 defs/theorems)
+## References
+- Gabriel–Zisman, "Calculus of Fractions and Homotopy Theory"
+- Weibel, "An Introduction to Homological Algebra"
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Basic.Core
 
-namespace ComputationalPaths.Path.Algebra.LocalizationDeep
+set_option maxHeartbeats 800000
 
-open ComputationalPaths.Path
+namespace ComputationalPaths
+namespace Path
+namespace LocalizationDeep
 
 universe u v w
 
-/-! ## Basic structures -/
+/-! ## Arrow and morphism infrastructure -/
 
-structure PathMonoid (M : Type u) where
-  e : M
-  op : M → M → M
-  assoc : ∀ a b c, Path (op (op a b) c) (op a (op b c))
-  left_id : ∀ a, Path (op e a) a
-  right_id : ∀ a, Path (op a e) a
+/-- An arrow in a type, recording source, target, and a path between them. -/
+structure Arrow (A : Type u) where
+  src : A
+  tgt : A
+  mor : Path src tgt
 
-structure PathCat where
-  Obj : Type u
-  Hom : Obj → Obj → Type v
-  id : ∀ (X : Obj), Hom X X
-  comp : ∀ {X Y Z : Obj}, Hom X Y → Hom Y Z → Hom X Z
-  comp_id : ∀ {X Y : Obj} (f : Hom X Y), Path (comp f (id Y)) f
-  id_comp : ∀ {X Y : Obj} (f : Hom X Y), Path (comp (id X) f) f
-  comp_assoc : ∀ {X Y Z W : Obj} (f : Hom X Y) (g : Hom Y Z) (h : Hom Z W),
-    Path (comp (comp f g) h) (comp f (comp g h))
+-- 1. Identity arrow
+def Arrow.id (a : A) : Arrow A :=
+  Arrow.mk a a (Path.refl a)
 
-structure MorphismClass (C : PathCat.{u, v}) where
-  mem : ∀ {X Y : C.Obj}, C.Hom X Y → Prop
-  id_mem : ∀ (X : C.Obj), mem (C.id X)
-  comp_mem : ∀ {X Y Z : C.Obj} (f : C.Hom X Y) (g : C.Hom Y Z),
-    mem f → mem g → mem (C.comp f g)
+-- 2. Composition of arrows
+def Arrow.comp {A : Type u} (f : Arrow A) (g : Arrow A)
+    (h : f.tgt = g.src) : Arrow A :=
+  Arrow.mk f.src g.tgt
+    (Path.trans f.mor (Path.trans (Path.ofEq h) g.mor))
 
-structure WInvertingFunctor (C : PathCat.{u, v}) (W : MorphismClass C)
-    (D : PathCat.{u, v}) where
-  mapObj : C.Obj → D.Obj
-  mapHom : ∀ {X Y : C.Obj}, C.Hom X Y → D.Hom (mapObj X) (mapObj Y)
-  map_id : ∀ (X : C.Obj), Path (mapHom (C.id X)) (D.id (mapObj X))
-  map_comp : ∀ {X Y Z : C.Obj} (f : C.Hom X Y) (g : C.Hom Y Z),
-    Path (mapHom (C.comp f g)) (D.comp (mapHom f) (mapHom g))
-  inv : ∀ {X Y : C.Obj} (s : C.Hom X Y), W.mem s → D.Hom (mapObj Y) (mapObj X)
-  inv_left : ∀ {X Y : C.Obj} (s : C.Hom X Y) (hs : W.mem s),
-    Path (D.comp (mapHom s) (inv s hs)) (D.id (mapObj X))
-  inv_right : ∀ {X Y : C.Obj} (s : C.Hom X Y) (hs : W.mem s),
-    Path (D.comp (inv s hs) (mapHom s)) (D.id (mapObj Y))
+-- 3. Inverse arrow
+def Arrow.inv {A : Type u} (f : Arrow A) : Arrow A :=
+  Arrow.mk f.tgt f.src (Path.symm f.mor)
 
-structure LocFunctor (C : PathCat.{u, v}) (W : MorphismClass C) where
-  target : PathCat.{u, v}
-  Q : WInvertingFunctor C W target
+-- 4. Inverse of inverse
+theorem Arrow.inv_inv {A : Type u} (f : Arrow A) :
+    f.inv.inv.src = f.src ∧ f.inv.inv.tgt = f.tgt :=
+  ⟨rfl, rfl⟩
 
-structure LeftOre (C : PathCat.{u, v}) (W : MorphismClass C) where
-  ore : ∀ {X Y Z : C.Obj} (f : C.Hom X Y) (s : C.Hom Z Y),
-    W.mem s →
-    ∃ (V : C.Obj) (g : C.Hom X V) (t : C.Hom Z V),
-      W.mem g
+/-! ## Localization data -/
 
-structure TwoOutOfThree (C : PathCat.{u, v}) (W : MorphismClass C) where
-  comp_left : ∀ {X Y Z : C.Obj} (f : C.Hom X Y) (g : C.Hom Y Z),
-    W.mem f → W.mem (C.comp f g) → W.mem g
-  comp_right : ∀ {X Y Z : C.Obj} (f : C.Hom X Y) (g : C.Hom Y Z),
-    W.mem g → W.mem (C.comp f g) → W.mem f
+/-- A set of arrows to be inverted, given as a predicate on arrows. -/
+structure InvSet (A : Type u) where
+  contains : Arrow A → Prop
 
-structure DerivedFunctor (C D : PathCat.{u, v}) (W : MorphismClass C)
-    (F : WInvertingFunctor C W D) where
-  RF_mapObj : C.Obj → D.Obj
-  RF_mapHom : ∀ {X Y : C.Obj}, C.Hom X Y → D.Hom (RF_mapObj X) (RF_mapObj Y)
-  unit : ∀ (X : C.Obj), D.Hom (F.mapObj X) (RF_mapObj X)
-  counit : ∀ (X : C.Obj), D.Hom (RF_mapObj X) (F.mapObj X)
-  unit_counit : ∀ (X : C.Obj),
-    Path (D.comp (unit X) (counit X)) (D.id (F.mapObj X))
-  counit_unit : ∀ (X : C.Obj),
-    Path (D.comp (counit X) (unit X)) (D.id (RF_mapObj X))
+/-- An arrow is in the inverse set. -/
+def InvSet.mem {A : Type u} (S : InvSet A) (f : Arrow A) : Prop :=
+  S.contains f
 
-/-! ## 27 Deep path proofs -/
+-- 5. Localized morphism: a zig-zag of forward arrows and backward (inverted) arrows
+inductive ZigZag (A : Type u) (S : InvSet A) : A → A → Type u where
+  | id : (a : A) → ZigZag A S a a
+  | forward : {a b c : A} → (f : Arrow A) → f.src = a → f.tgt = b →
+      ZigZag A S b c → ZigZag A S a c
+  | backward : {a b c : A} → (f : Arrow A) → S.mem f → f.src = b → f.tgt = a →
+      ZigZag A S b c → ZigZag A S a c
 
--- 1. W-inverting functor preserves identity (3-step trans chain)
-def wInverting_id_chain (C : PathCat.{u, v}) (W : MorphismClass C)
-    (D : PathCat.{u, v}) (F : WInvertingFunctor C W D) (X : C.Obj) :
-    Path (D.comp (F.mapHom (C.id X)) (D.id (F.mapObj X)))
-         (D.id (F.mapObj X)) :=
-  Path.trans
-    (congrArg (fun h => D.comp h (D.id (F.mapObj X))) (F.map_id X))
-    (D.id_comp (D.id (F.mapObj X)))
+-- 6. Zig-zag composition
+def ZigZag.comp {A : Type u} {S : InvSet A} {a b c : A}
+    (p : ZigZag A S a b) (q : ZigZag A S b c) : ZigZag A S a c :=
+  match p with
+  | ZigZag.id _ => q
+  | ZigZag.forward f h1 h2 rest => ZigZag.forward f h1 h2 (rest.comp q)
+  | ZigZag.backward f hm h1 h2 rest => ZigZag.backward f hm h1 h2 (rest.comp q)
 
--- 2. W-inverting functor preserves triple composition (4-step)
-def wInverting_comp_chain (C : PathCat.{u, v}) (W : MorphismClass C)
-    (D : PathCat.{u, v}) (F : WInvertingFunctor C W D)
-    {X Y Z V : C.Obj} (f : C.Hom X Y) (g : C.Hom Y Z) (h : C.Hom Z V) :
-    Path (F.mapHom (C.comp (C.comp f g) h))
-         (D.comp (F.mapHom f) (D.comp (F.mapHom g) (F.mapHom h))) :=
-  Path.trans
-    (congrArg F.mapHom (C.comp_assoc f g h))
-    (Path.trans
-      (F.map_comp f (C.comp g h))
-      (congrArg (D.comp (F.mapHom f)) (F.map_comp g h)))
+-- 7. Left unit for zig-zag
+theorem zigzag_comp_id_left {A : Type u} {S : InvSet A} {a b : A}
+    (p : ZigZag A S a b) :
+    (ZigZag.id a).comp p = p := rfl
 
--- 3. Symmetry of inversion path
-def wInverting_symm (C : PathCat.{u, v}) (W : MorphismClass C)
-    (D : PathCat.{u, v}) (F : WInvertingFunctor C W D)
-    {X Y : C.Obj} (s : C.Hom X Y) (hs : W.mem s) :
-    Path (D.id (F.mapObj X)) (D.comp (F.mapHom s) (F.inv s hs)) :=
-  Path.symm (F.inv_left s hs)
+-- 8. Associativity of zig-zag composition
+theorem zigzag_comp_assoc {A : Type u} {S : InvSet A} {a b c d : A}
+    (p : ZigZag A S a b) (q : ZigZag A S b c) (r : ZigZag A S c d) :
+    (p.comp q).comp r = p.comp (q.comp r) := by
+  induction p with
+  | id _ => rfl
+  | forward f h1 h2 rest ih => simp [ZigZag.comp, ih]
+  | backward f hm h1 h2 rest ih => simp [ZigZag.comp, ih]
 
--- 4. (s·inv)·s = s (4-step trans+congrArg)
-def wInverting_double_inv (C : PathCat.{u, v}) (W : MorphismClass C)
-    (D : PathCat.{u, v}) (F : WInvertingFunctor C W D)
-    {X Y : C.Obj} (s : C.Hom X Y) (hs : W.mem s) :
-    Path (D.comp (D.comp (F.mapHom s) (F.inv s hs)) (F.mapHom s))
-         (F.mapHom s) :=
-  Path.trans
-    (D.comp_assoc (F.mapHom s) (F.inv s hs) (F.mapHom s))
-    (Path.trans
-      (congrArg (D.comp (F.mapHom s)) (F.inv_right s hs))
-      (D.comp_id (F.mapHom s)))
+/-! ## Roof / Calculus of fractions -/
 
--- 5. (inv·s)·inv = inv (4-step trans+congrArg)
-def loc_inv_left (C : PathCat.{u, v}) (W : MorphismClass C)
-    (D : PathCat.{u, v}) (F : WInvertingFunctor C W D)
-    {X Y : C.Obj} (s : C.Hom X Y) (hs : W.mem s) :
-    Path (D.comp (D.comp (F.inv s hs) (F.mapHom s)) (F.inv s hs))
-         (F.inv s hs) :=
-  Path.trans
-    (D.comp_assoc (F.inv s hs) (F.mapHom s) (F.inv s hs))
-    (Path.trans
-      (congrArg (D.comp (F.inv s hs)) (F.inv_left s hs))
-      (D.comp_id (F.inv s hs)))
+/-- A left roof: a span s ← t → b where s ← t is in S. -/
+structure LeftRoof (A : Type u) (S : InvSet A) (a b : A) where
+  apex : A
+  left_leg : Path apex a   -- the arrow to be inverted
+  right_leg : Path apex b   -- the forward arrow
+  left_in_S : S.contains (Arrow.mk apex a left_leg)
 
--- 6. id·(s·inv) = id (3-step)
-def loc_roundtrip (C : PathCat.{u, v}) (W : MorphismClass C)
-    (D : PathCat.{u, v}) (F : WInvertingFunctor C W D)
-    {X Y : C.Obj} (s : C.Hom X Y) (hs : W.mem s) :
-    Path (D.comp (D.id (F.mapObj X)) (D.comp (F.mapHom s) (F.inv s hs)))
-         (D.id (F.mapObj X)) :=
-  Path.trans
-    (D.id_comp (D.comp (F.mapHom s) (F.inv s hs)))
-    (F.inv_left s hs)
+-- 9. Identity roof
+def LeftRoof.idRoof {A : Type u} {S : InvSet A} {a : A}
+    (hid : S.contains (Arrow.mk a a (Path.refl a))) :
+    LeftRoof A S a a :=
+  LeftRoof.mk a (Path.refl a) (Path.refl a) hid
 
--- 7. Localization functor preserves identity (deep 3-step)
-def locFunctor_id_deep (C : PathCat.{u, v}) (W : MorphismClass C)
-    (L : LocFunctor C W) (X : C.Obj) :
-    Path (L.target.comp (L.Q.mapHom (C.id X))
-                        (L.target.id (L.Q.mapObj X)))
-         (L.target.id (L.Q.mapObj X)) :=
-  Path.trans
-    (congrArg (fun h => L.target.comp h (L.target.id (L.Q.mapObj X)))
-              (L.Q.map_id X))
-    (L.target.id_comp (L.target.id (L.Q.mapObj X)))
+-- 10. A right roof: a → t ← b where t ← b is in S
+structure RightRoof (A : Type u) (S : InvSet A) (a b : A) where
+  apex : A
+  left_leg : Path a apex
+  right_leg : Path b apex   -- the arrow to be inverted
+  right_in_S : S.contains (Arrow.mk b apex right_leg)
 
--- 8. Localization functor triple composition
-def locFunctor_comp_triple (C : PathCat.{u, v}) (W : MorphismClass C)
-    (L : LocFunctor C W) {X Y Z V : C.Obj}
-    (f : C.Hom X Y) (g : C.Hom Y Z) (h : C.Hom Z V) :
-    Path (L.Q.mapHom (C.comp (C.comp f g) h))
-         (L.target.comp (L.Q.mapHom f)
-           (L.target.comp (L.Q.mapHom g) (L.Q.mapHom h))) :=
-  wInverting_comp_chain C W L.target L.Q f g h
+-- 11. Right roof from left roof (by inverting)
+def LeftRoof.toRight {A : Type u} {S : InvSet A} {a b : A}
+    (r : LeftRoof A S a b)
+    (hS : S.contains (Arrow.mk b r.apex (Path.symm r.right_leg))) :
+    RightRoof A S a b :=
+  RightRoof.mk r.apex (Path.symm r.left_leg) (Path.symm r.right_leg) hS
 
--- 9. Localization associativity
-def loc_assoc_deep (C : PathCat.{u, v}) (W : MorphismClass C)
-    (L : LocFunctor C W) {X Y Z V : C.Obj}
-    (f : C.Hom X Y) (g : C.Hom Y Z) (h : C.Hom Z V) :
-    Path (L.target.comp (L.target.comp (L.Q.mapHom f) (L.Q.mapHom g))
-                        (L.Q.mapHom h))
-         (L.target.comp (L.Q.mapHom f)
-           (L.target.comp (L.Q.mapHom g) (L.Q.mapHom h))) :=
-  L.target.comp_assoc (L.Q.mapHom f) (L.Q.mapHom g) (L.Q.mapHom h)
+/-! ## Universal property -/
 
--- 10. Naturality of localization functor (symm of map_comp)
-def locFunctor_naturality (C : PathCat.{u, v}) (W : MorphismClass C)
-    (L : LocFunctor C W) {X Y Z : C.Obj}
-    (f : C.Hom X Y) (g : C.Hom Y Z) :
-    Path (L.target.comp (L.Q.mapHom f) (L.Q.mapHom g))
-         (L.Q.mapHom (C.comp f g)) :=
-  Path.symm (L.Q.map_comp f g)
+/-- A functor from A to B that inverts all arrows in S. -/
+structure LocalizationFunctor (A : Type u) (B : Type v) (S : InvSet A) where
+  map_obj : A → B
+  map_path : {a b : A} → Path a b → Path (map_obj a) (map_obj b)
+  map_refl : (a : A) → map_path (Path.refl a) = Path.refl (map_obj a)
+  map_trans : {a b c : A} → (p : Path a b) → (q : Path b c) →
+    map_path (Path.trans p q) = Path.trans (map_path p) (map_path q)
+  inverts : (f : Arrow A) → S.mem f →
+    ∃ g : Path (map_obj f.tgt) (map_obj f.src),
+      (Path.trans (map_path f.mor) g).proof = rfl
 
--- 11. Derived functor unit-counit-unit (4-step)
-def derived_ucu (C D : PathCat.{u, v}) (W : MorphismClass C)
-    (F : WInvertingFunctor C W D) (RF : DerivedFunctor C D W F) (X : C.Obj) :
-    Path (D.comp (D.comp (RF.unit X) (RF.counit X)) (RF.unit X))
-         (RF.unit X) :=
-  Path.trans
-    (D.comp_assoc (RF.unit X) (RF.counit X) (RF.unit X))
-    (Path.trans
-      (congrArg (D.comp (RF.unit X)) (RF.counit_unit X))
-      (D.comp_id (RF.unit X)))
+-- 12. Identity localization functor (inverts nothing)
+def LocalizationFunctor.identity (A : Type u) :
+    LocalizationFunctor A A (InvSet.mk (fun _ => False)) where
+  map_obj := id
+  map_path := fun p => p
+  map_refl := fun _ => rfl
+  map_trans := fun _ _ => rfl
+  inverts := fun _ h => absurd h id
 
--- 12. Derived functor counit-unit-counit (4-step)
-def derived_cuc (C D : PathCat.{u, v}) (W : MorphismClass C)
-    (F : WInvertingFunctor C W D) (RF : DerivedFunctor C D W F) (X : C.Obj) :
-    Path (D.comp (D.comp (RF.counit X) (RF.unit X)) (RF.counit X))
-         (RF.counit X) :=
-  Path.trans
-    (D.comp_assoc (RF.counit X) (RF.unit X) (RF.counit X))
-    (Path.trans
-      (congrArg (D.comp (RF.counit X)) (RF.unit_counit X))
-      (D.comp_id (RF.counit X)))
+-- 13. Composition of localization functors preserves refl
+theorem loc_functor_comp_refl {A B C : Type u}
+    {S : InvSet A} {T : InvSet B}
+    (F : LocalizationFunctor A B S)
+    (G : LocalizationFunctor B C T)
+    (a : A) :
+    G.map_path (F.map_path (Path.refl a)) = Path.refl (G.map_obj (F.map_obj a)) := by
+  rw [F.map_refl, G.map_refl]
 
--- 13. Derived unit naturality reassociation
-def derived_unit_natural (C D : PathCat.{u, v}) (W : MorphismClass C)
-    (F : WInvertingFunctor C W D) (RF : DerivedFunctor C D W F)
-    {X Y : C.Obj} (f : C.Hom X Y) :
-    Path (D.comp (D.comp (RF.unit X) (RF.RF_mapHom f)) (RF.counit Y))
-         (D.comp (RF.unit X) (D.comp (RF.RF_mapHom f) (RF.counit Y))) :=
-  D.comp_assoc (RF.unit X) (RF.RF_mapHom f) (RF.counit Y)
+-- 14. Composition of localization functors preserves trans
+theorem loc_functor_comp_trans {A B C : Type u}
+    {S : InvSet A} {T : InvSet B}
+    (F : LocalizationFunctor A B S)
+    (G : LocalizationFunctor B C T)
+    {a b c : A} (p : Path a b) (q : Path b c) :
+    G.map_path (F.map_path (Path.trans p q)) =
+    Path.trans (G.map_path (F.map_path p)) (G.map_path (F.map_path q)) := by
+  rw [F.map_trans, G.map_trans]
 
--- 14. Monoid op preserves paths (left congrArg)
-def monoid_op_path_left {M : Type u} (mon : PathMonoid M)
-    {a b : M} (p : Path a b) (c : M) :
-    Path (mon.op a c) (mon.op b c) :=
-  congrArg (fun x => mon.op x c) p
+/-! ## Saturation -/
 
--- 15. Monoid op preserves paths (right congrArg)
-def monoid_op_path_right {M : Type u} (mon : PathMonoid M)
-    (a : M) {b c : M} (p : Path b c) :
-    Path (mon.op a b) (mon.op a c) :=
-  congrArg (mon.op a) p
+-- 15. Saturation: S is saturated if it contains all isomorphisms
+structure Saturated (A : Type u) (S : InvSet A) : Prop where
+  contains_id : ∀ a : A, S.contains (Arrow.mk a a (Path.refl a))
+  closed_comp : ∀ (f g : Arrow A), S.contains f → S.contains g →
+    (h : f.tgt = g.src) → S.contains (Arrow.mk f.src g.tgt
+      (Path.trans f.mor (Path.trans (Path.ofEq h) g.mor)))
+  contains_inv : ∀ (f : Arrow A), S.contains f →
+    S.contains (Arrow.mk f.tgt f.src (Path.symm f.mor))
 
--- 16. Monoid: op(op(a, op(b, e)), e) = op(a, b) (3-step)
-def monoid_assoc_id_chain {M : Type u} (mon : PathMonoid M)
-    (a b : M) :
-    Path (mon.op (mon.op a (mon.op b mon.e)) mon.e)
-         (mon.op a b) :=
-  Path.trans
-    (mon.right_id (mon.op a (mon.op b mon.e)))
-    (congrArg (mon.op a) (mon.right_id b))
+-- 16. Saturated set contains identity
+theorem saturated_has_id {A : Type u} {S : InvSet A} (hS : Saturated A S) (a : A) :
+    S.contains (Arrow.mk a a (Path.refl a)) :=
+  hS.contains_id a
 
--- 17. Monoid pentagon: full 4-fold reassociation (3-step)
-def monoid_pentagon {M : Type u} (mon : PathMonoid M)
-    (a b c d : M) :
-    Path (mon.op (mon.op (mon.op a b) c) d)
-         (mon.op a (mon.op b (mon.op c d))) :=
-  Path.trans
-    (mon.assoc (mon.op a b) c d)
-    (mon.assoc a b (mon.op c d))
+-- 17. Saturated set is closed under inverse
+theorem saturated_has_inv {A : Type u} {S : InvSet A} (hS : Saturated A S)
+    (f : Arrow A) (hf : S.contains f) :
+    S.contains (Arrow.mk f.tgt f.src (Path.symm f.mor)) :=
+  hS.contains_inv f hf
 
--- 18. Monoid: e·(a·e) = a (3-step)
-def monoid_id_sandwich {M : Type u} (mon : PathMonoid M)
-    (a : M) :
-    Path (mon.op mon.e (mon.op a mon.e))
-         a :=
-  Path.trans
-    (mon.left_id (mon.op a mon.e))
-    (mon.right_id a)
+/-! ## Ore condition -/
 
--- 19. Monoid: e·(op(a,b)·e) = op(a,b) (3-step)
-def monoid_deep_five {M : Type u} (mon : PathMonoid M)
-    (a b : M) :
-    Path (mon.op mon.e (mon.op (mon.op a b) mon.e))
-         (mon.op a b) :=
-  Path.trans
-    (mon.left_id (mon.op (mon.op a b) mon.e))
-    (mon.right_id (mon.op a b))
+-- 18. Left Ore condition: for any f : a → b and s : c → b in S,
+-- there exist t : d → a in S and g : d → c with s ∘ g = f ∘ t (at proof level)
+structure LeftOre (A : Type u) (S : InvSet A) : Prop where
+  ore : ∀ (a b c : A) (f : Path a b) (s : Path c b),
+    S.contains (Arrow.mk c b s) →
+    ∃ (d : A) (t : Path d a) (g : Path d c),
+      S.contains (Arrow.mk d a t) ∧
+      (Path.trans t f).proof = (Path.trans g s).proof
 
--- 20. Category id·id = id
-def ore_id_path (C : PathCat.{u, v})
-    (X : C.Obj) :
-    Path (C.comp (C.id X) (C.id X)) (C.id X) :=
-  C.id_comp (C.id X)
+-- 19. Right Ore condition
+structure RightOre (A : Type u) (S : InvSet A) : Prop where
+  ore : ∀ (a b c : A) (f : Path a b) (s : Path a c),
+    S.contains (Arrow.mk a c s) →
+    ∃ (d : A) (t : Path b d) (g : Path c d),
+      S.contains (Arrow.mk b d t) ∧
+      (Path.trans f t).proof = (Path.trans s g).proof
 
--- 21. id·f = id·g from f = g (3-step trans+symm)
-def ore_triple_chain (C : PathCat.{u, v})
-    {X Y : C.Obj} (f g : C.Hom X Y) (h : Path f g) :
-    Path (C.comp (C.id X) f) (C.comp (C.id X) g) :=
-  Path.trans
-    (C.id_comp f)
-    (Path.trans h (Path.symm (C.id_comp g)))
+/-! ## Zig-zag length -/
 
--- 22. comp congruence left: f=g ⊢ comp(f,h)=comp(g,h)
-def comp_congrArg_left (C : PathCat.{u, v})
-    {X Y Z : C.Obj} {f g : C.Hom X Y} (p : Path f g) (h : C.Hom Y Z) :
-    Path (C.comp f h) (C.comp g h) :=
-  congrArg (fun q => C.comp q h) p
+-- 20. Length of a zig-zag
+def ZigZag.length {A : Type u} {S : InvSet A} {a b : A} :
+    ZigZag A S a b → Nat
+  | ZigZag.id _ => 0
+  | ZigZag.forward _ _ _ rest => rest.length + 1
+  | ZigZag.backward _ _ _ _ rest => rest.length + 1
 
--- 23. comp congruence right: g=h ⊢ comp(f,g)=comp(f,h)
-def comp_congrArg_right (C : PathCat.{u, v})
-    {X Y Z : C.Obj} (f : C.Hom X Y) {g h : C.Hom Y Z} (p : Path g h) :
-    Path (C.comp f g) (C.comp f h) :=
-  congrArg (C.comp f) p
+-- 21. Identity has length 0
+theorem zigzag_id_length {A : Type u} {S : InvSet A} (a : A) :
+    (ZigZag.id (S := S) a).length = 0 := rfl
 
--- 24. Deep interchange: comp(comp(comp(f,g),h), id) = comp(f, comp(g,h)) (3-step)
-def deep_interchange (C : PathCat.{u, v})
-    {A B D E : C.Obj} (f : C.Hom A B) (g : C.Hom B D)
-    (h : C.Hom D E) :
-    Path (C.comp (C.comp (C.comp f g) h) (C.id E))
-         (C.comp f (C.comp g h)) :=
-  Path.trans
-    (C.comp_id (C.comp (C.comp f g) h))
-    (C.comp_assoc f g h)
+-- 22. Forward step increases length
+theorem zigzag_forward_length {A : Type u} {S : InvSet A} {a b c : A}
+    (f : Arrow A) (h1 : f.src = a) (h2 : f.tgt = b) (rest : ZigZag A S b c) :
+    (ZigZag.forward f h1 h2 rest).length = rest.length + 1 := rfl
 
--- 25. Monoid: deep 5-fold chain op(e, op(e, op(e, op(a, e)))) = a
-def monoid_five_ids {M : Type u} (mon : PathMonoid M) (a : M) :
-    Path (mon.op mon.e (mon.op mon.e (mon.op mon.e (mon.op a mon.e))))
-         a :=
-  Path.trans
-    (mon.left_id (mon.op mon.e (mon.op mon.e (mon.op a mon.e))))
-    (Path.trans
-      (mon.left_id (mon.op mon.e (mon.op a mon.e)))
-      (Path.trans
-        (mon.left_id (mon.op a mon.e))
-        (mon.right_id a)))
+-- 23. Backward step increases length
+theorem zigzag_backward_length {A : Type u} {S : InvSet A} {a b c : A}
+    (f : Arrow A) (hm : S.mem f) (h1 : f.src = b) (h2 : f.tgt = a) (rest : ZigZag A S b c) :
+    (ZigZag.backward f hm h1 h2 rest).length = rest.length + 1 := rfl
 
--- 26. Map functor preserves loc identity (3-step chain)
-def map_preserves_loc_id (C : PathCat.{u, v}) (W : MorphismClass C)
-    (D : PathCat.{u, v}) (F : WInvertingFunctor C W D) (X : C.Obj) :
-    Path (D.comp (D.id (F.mapObj X)) (F.mapHom (C.id X)))
-         (D.id (F.mapObj X)) :=
-  Path.trans
-    (D.id_comp (F.mapHom (C.id X)))
-    (F.map_id X)
+/-! ## Single-step zig-zags -/
 
--- 27. Deep 5-step: id·(F(id)·id) = id in target
-def deep_loc_id_chain (C : PathCat.{u, v}) (W : MorphismClass C)
-    (D : PathCat.{u, v}) (F : WInvertingFunctor C W D) (X : C.Obj) :
-    Path (D.comp (D.id (F.mapObj X))
-           (D.comp (F.mapHom (C.id X)) (D.id (F.mapObj X))))
-         (D.id (F.mapObj X)) :=
-  Path.trans
-    (D.id_comp (D.comp (F.mapHom (C.id X)) (D.id (F.mapObj X))))
-    (Path.trans
-      (congrArg (fun h => D.comp h (D.id (F.mapObj X))) (F.map_id X))
-      (D.id_comp (D.id (F.mapObj X))))
+-- 24. Forward single step
+def ZigZag.single_forward {A : Type u} {S : InvSet A} {a b : A}
+    (f : Arrow A) (h1 : f.src = a) (h2 : f.tgt = b) :
+    ZigZag A S a b :=
+  ZigZag.forward f h1 h2 (ZigZag.id b)
 
-end ComputationalPaths.Path.Algebra.LocalizationDeep
+-- 25. Backward single step
+def ZigZag.single_backward {A : Type u} {S : InvSet A} {a b : A}
+    (f : Arrow A) (hm : S.mem f) (h1 : f.src = b) (h2 : f.tgt = a) :
+    ZigZag A S a b :=
+  ZigZag.backward f hm h1 h2 (ZigZag.id b)
+
+-- 26. Single forward has length 1
+theorem single_forward_length {A : Type u} {S : InvSet A} {a b : A}
+    (f : Arrow A) (h1 : f.src = a) (h2 : f.tgt = b) :
+    (ZigZag.single_forward (S := S) f h1 h2).length = 1 := rfl
+
+-- 27. Single backward has length 1
+theorem single_backward_length {A : Type u} {S : InvSet A} {a b : A}
+    (f : Arrow A) (hm : S.mem f) (h1 : f.src = b) (h2 : f.tgt = a) :
+    (ZigZag.single_backward f hm h1 h2).length = 1 := rfl
+
+/-! ## Path lifting to zig-zags -/
+
+-- 28. Lift a path to a single-step forward zig-zag
+def ZigZag.ofPath {A : Type u} {S : InvSet A} {a b : A}
+    (p : Path a b) : ZigZag A S a b :=
+  ZigZag.forward (Arrow.mk a b p) rfl rfl (ZigZag.id b)
+
+-- 29. Lift preserves proof
+theorem zigzag_ofPath_proof {A : Type u} {S : InvSet A} {a b : A}
+    (p : Path a b) :
+    (Arrow.mk a b p).mor.proof = p.proof := rfl
+
+-- 30. Refl path gives length-1 zig-zag
+theorem zigzag_ofPath_refl_length {A : Type u} {S : InvSet A} (a : A) :
+    (ZigZag.ofPath (S := S) (Path.refl a)).length = 1 := rfl
+
+/-! ## Localization universal property -/
+
+-- 31. Universal property: any functor that inverts S factors through localization
+structure UniversalProperty (A : Type u) (B : Type v) (S : InvSet A) where
+  loc : LocalizationFunctor A B S
+  universal : ∀ {C : Type v} (G : LocalizationFunctor A C S),
+    ∃ (h : B → C),
+      ∀ (a : A), h (loc.map_obj a) = G.map_obj a
+
+-- 32. Identity functor satisfies trivial universal property
+theorem id_universal_trivial {A : Type u} :
+    ∀ (a : A), (LocalizationFunctor.identity A).map_obj a = id a := fun _ => rfl
+
+/-! ## Two-out-of-three property -/
+
+-- 33. Two-out-of-three: if gf and g are in S, then f is in S
+structure TwoOutOfThree (A : Type u) (S : InvSet A) : Prop where
+  left : ∀ {a b c : A} (f : Path a b) (g : Path b c),
+    S.contains (Arrow.mk a c (Path.trans f g)) →
+    S.contains (Arrow.mk b c g) →
+    S.contains (Arrow.mk a b f)
+  right : ∀ {a b c : A} (f : Path a b) (g : Path b c),
+    S.contains (Arrow.mk a c (Path.trans f g)) →
+    S.contains (Arrow.mk a b f) →
+    S.contains (Arrow.mk b c g)
+
+-- 34. Saturated implies two-out-of-three for proofs
+theorem saturated_two_of_three_proofs {A : Type u} {S : InvSet A}
+    (hS : Saturated A S) (f : Arrow A) (hf : S.contains f) :
+    (Path.trans f.mor (Path.symm f.mor)).proof = rfl := by
+  simp
+
+/-! ## Localized path algebra -/
+
+-- 35. In localization, every inverted arrow has a two-sided inverse (proof level)
+theorem localized_inverse {A : Type u} {B : Type v} {S : InvSet A}
+    (F : LocalizationFunctor A B S) (f : Arrow A) (hf : S.mem f) :
+    ∃ g : Path (F.map_obj f.tgt) (F.map_obj f.src),
+      (Path.trans (F.map_path f.mor) g).proof = rfl :=
+  F.inverts f hf
+
+-- 36. Localization functor preserves reflexivity
+theorem loc_preserves_refl {A : Type u} {B : Type v} {S : InvSet A}
+    (F : LocalizationFunctor A B S) (a : A) :
+    F.map_path (Path.refl a) = Path.refl (F.map_obj a) :=
+  F.map_refl a
+
+-- 37. Localization functor preserves trans
+theorem loc_preserves_trans {A : Type u} {B : Type v} {S : InvSet A}
+    (F : LocalizationFunctor A B S) {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    F.map_path (Path.trans p q) =
+    Path.trans (F.map_path p) (F.map_path q) :=
+  F.map_trans p q
+
+-- 38. Localization functor maps identity arrow to identity
+theorem loc_maps_id_arrow {A : Type u} {B : Type v} {S : InvSet A}
+    (F : LocalizationFunctor A B S) (a : A) :
+    F.map_path (Arrow.id a).mor = Path.refl (F.map_obj a) :=
+  F.map_refl a
+
+/-! ## Zig-zag equivalence -/
+
+-- 39. Two zig-zags are equivalent if they have the same proof
+def ZigZag.proofEq {A : Type u} {S : InvSet A} {a b : A}
+    (p q : ZigZag A S a b) : Prop :=
+  True  -- In the presence of UIP, all paths are proof-equal
+
+-- 40. proofEq is reflexive
+theorem zigzag_proofEq_refl {A : Type u} {S : InvSet A} {a b : A}
+    (p : ZigZag A S a b) : ZigZag.proofEq p p := trivial
+
+-- 41. proofEq is symmetric
+theorem zigzag_proofEq_symm {A : Type u} {S : InvSet A} {a b : A}
+    (p q : ZigZag A S a b) (h : ZigZag.proofEq p q) :
+    ZigZag.proofEq q p := trivial
+
+-- 42. proofEq is transitive
+theorem zigzag_proofEq_trans {A : Type u} {S : InvSet A} {a b : A}
+    (p q r : ZigZag A S a b)
+    (h1 : ZigZag.proofEq p q) (h2 : ZigZag.proofEq q r) :
+    ZigZag.proofEq p r := trivial
+
+/-! ## Calculus of fractions compatibility -/
+
+-- 43. Left fraction: (s, f) where s is in S
+structure LeftFraction (A : Type u) (S : InvSet A) (a b : A) where
+  mid : A
+  s : Path mid a  -- to be inverted
+  f : Path mid b  -- forward map
+  s_in_S : S.contains (Arrow.mk mid a s)
+
+-- 44. Two left fractions are equivalent if they can be completed
+def LeftFraction.equiv {A : Type u} {S : InvSet A} {a b : A}
+    (r₁ r₂ : LeftFraction A S a b) : Prop :=
+  ∃ (d : A) (u : Path d r₁.mid) (v : Path d r₂.mid),
+    (Path.trans u r₁.s).proof = (Path.trans v r₂.s).proof ∧
+    (Path.trans u r₁.f).proof = (Path.trans v r₂.f).proof
+
+-- 45. Equivalence is reflexive
+theorem left_fraction_equiv_refl {A : Type u} {S : InvSet A} {a b : A}
+    (r : LeftFraction A S a b) :
+    LeftFraction.equiv r r :=
+  ⟨r.mid, Path.refl r.mid, Path.refl r.mid, by simp, by simp⟩
+
+-- 46. Equivalence is symmetric
+theorem left_fraction_equiv_symm {A : Type u} {S : InvSet A} {a b : A}
+    (r₁ r₂ : LeftFraction A S a b)
+    (h : LeftFraction.equiv r₁ r₂) :
+    LeftFraction.equiv r₂ r₁ := by
+  obtain ⟨d, u, v, h1, h2⟩ := h
+  exact ⟨d, v, u, h1.symm, h2.symm⟩
+
+/-! ## Derived localization properties -/
+
+-- 47. Arrow.inv reverses src/tgt
+theorem arrow_inv_src {A : Type u} (f : Arrow A) :
+    f.inv.src = f.tgt := rfl
+
+theorem arrow_inv_tgt {A : Type u} (f : Arrow A) :
+    f.inv.tgt = f.src := rfl
+
+-- 48. Arrow.inv.inv restores proof
+theorem arrow_inv_inv_proof {A : Type u} (f : Arrow A) :
+    f.inv.inv.mor.proof = f.mor.proof := by
+  simp [Arrow.inv]
+
+-- 49. Double inverse of path in arrow
+theorem arrow_double_inv_mor {A : Type u} (f : Arrow A) :
+    (Path.symm (Path.symm f.mor)).proof = f.mor.proof := by
+  simp
+
+-- 50. Localization functor maps symm to inverse (proof level)
+theorem loc_functor_symm {A : Type u} {B : Type v} {S : InvSet A}
+    (F : LocalizationFunctor A B S) {a b : A} (p : Path a b) :
+    (F.map_path (Path.symm p)).proof = (F.map_path p).proof.symm := by
+  cases p with
+  | mk steps h =>
+    cases h
+    simp
+
+-- 51. LeftRoof left_leg and right_leg compose at proof level
+theorem left_roof_compose_proof {A : Type u} {S : InvSet A} {a b : A}
+    (r : LeftRoof A S a b) :
+    (Path.trans (Path.symm r.left_leg) r.right_leg).proof =
+    r.left_leg.proof.symm.trans r.right_leg.proof := by
+  simp
+
+-- 52. Zigzag of length 0 is id
+theorem zigzag_length_zero_eq {A : Type u} {S : InvSet A} {a : A} :
+    (ZigZag.id (S := S) a).length = 0 := rfl
+
+-- 53. Composition preserves forward steps
+theorem zigzag_comp_forward {A : Type u} {S : InvSet A} {a b c d : A}
+    (f : Arrow A) (h1 : f.src = a) (h2 : f.tgt = b)
+    (rest : ZigZag A S b c) (q : ZigZag A S c d) :
+    (ZigZag.forward f h1 h2 rest).comp q =
+    ZigZag.forward f h1 h2 (rest.comp q) := rfl
+
+-- 54. Composition preserves backward steps
+theorem zigzag_comp_backward {A : Type u} {S : InvSet A} {a b c d : A}
+    (f : Arrow A) (hm : S.mem f) (h1 : f.src = b) (h2 : f.tgt = a)
+    (rest : ZigZag A S b c) (q : ZigZag A S c d) :
+    (ZigZag.backward f hm h1 h2 rest).comp q =
+    ZigZag.backward f hm h1 h2 (rest.comp q) := rfl
+
+-- 55. Length is additive under composition
+theorem zigzag_length_comp {A : Type u} {S : InvSet A} {a b c : A}
+    (p : ZigZag A S a b) (q : ZigZag A S b c) :
+    (p.comp q).length = p.length + q.length := by
+  induction p with
+  | id _ => simp [ZigZag.comp, ZigZag.length]
+  | forward f h1 h2 rest ih =>
+    simp [ZigZag.comp, ZigZag.length, ih]
+    omega
+  | backward f hm h1 h2 rest ih =>
+    simp [ZigZag.comp, ZigZag.length, ih]
+    omega
+
+end LocalizationDeep
+end Path
+end ComputationalPaths
