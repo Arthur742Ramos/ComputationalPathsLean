@@ -283,6 +283,81 @@ def trivialZeta : RiemannZeta PUnit PUnit :=
         inStrip := PUnit.unit
         witness := Path.refl _ } }
 
+/-! ## Basic theorem statements -/
+
+theorem critical_strip_reflect_four {S : Type u} (strip : CriticalStrip S) (s : S) :
+    Nonempty (Path (strip.reflect (strip.reflect (strip.reflect (strip.reflect s)))) s) := by
+  sorry
+
+theorem critical_line_reflect_in_strip {S : Type u} (strip : CriticalStrip S)
+    (line : CriticalLine S strip) (s : S) (hs : line.onLine s) :
+    Nonempty (strip.inStrip (strip.reflect s)) := by
+  sorry
+
+theorem zeta_zero_path_eq_witness {S : Type u} {V : Type v}
+    {Z : ZetaPresentation S V} {zero : V} (z : ZetaZero Z zero) :
+    ZetaZero.path z = z.witness := by
+  sorry
+
+theorem nontrivial_zero_reflect_point {S : Type u} {V : Type v}
+    {Z : ZetaPresentation S V} {zero : V} {strip : CriticalStrip S}
+    (eqn : ∀ s, Path (Z.eval s) (Z.eval (strip.reflect s)))
+    (z : NontrivialZero Z zero strip) :
+    (NontrivialZero.reflect eqn z).point = strip.reflect z.point := by
+  sorry
+
+theorem nontrivial_zero_reflect_witness {S : Type u} {V : Type v}
+    {Z : ZetaPresentation S V} {zero : V} {strip : CriticalStrip S}
+    (eqn : ∀ s, Path (Z.eval s) (Z.eval (strip.reflect s)))
+    (z : NontrivialZero Z zero strip) :
+    (NontrivialZero.reflect eqn z).witness =
+      Path.trans (Path.symm (eqn z.point)) z.witness := by
+  sorry
+
+theorem analytic_trivial_region_eq_punit {S : Type u} {V : Type v}
+    (Z : ZetaPresentation S V) (s : S) :
+    (AnalyticProperty.trivial Z).region s = PUnit := by
+  sorry
+
+theorem analytic_trivial_witness_refl {S : Type u} {V : Type v}
+    (Z : ZetaPresentation S V) (s : S)
+    (hs : (AnalyticProperty.trivial Z).region s) :
+    (AnalyticProperty.trivial Z).witness s hs = Path.refl (Z.eval s) := by
+  sorry
+
+theorem riemann_series_step_eq {S : Type u} {V : Type v} (Z : RiemannZeta S V) :
+    Z.seriesStep = ZetaStep.bySeries Z.zeta (Z.series.toLFunction) Z.seriesPath := by
+  sorry
+
+theorem riemann_euler_step_eq {S : Type u} {V : Type v} (Z : RiemannZeta S V) :
+    Z.eulerStep = ZetaStep.byEuler Z.zeta (Z.euler.toLFunction) Z.eulerPath := by
+  sorry
+
+theorem riemann_continuation_step_eq {S : Type u} {V : Type v} (Z : RiemannZeta S V) :
+    Z.continuationStep = ZetaStep.byContinuation Z.zeta Z.continuation Z.continuationPath := by
+  sorry
+
+theorem riemann_functional_equation_step_eq {S : Type u} {V : Type v}
+    (Z : RiemannZeta S V) :
+    Z.functionalEquationStep =
+      ZetaStep.byFunctionalEquation Z.completed Z.completed Z.strip.reflect
+        Z.functionalEquation := by
+  sorry
+
+theorem riemann_reflect_nontrivial_eq {S : Type u} {V : Type v}
+    (Z : RiemannZeta S V) (n : Nat) :
+    Z.reflectNontrivial n =
+      NontrivialZero.reflect (Z.zetaFunctionalEquation) (Z.nontrivialZero n) := by
+  sorry
+
+theorem trivial_strip_reflect_unit :
+    trivialStrip.reflect PUnit.unit = PUnit.unit := by
+  sorry
+
+theorem trivial_zeta_reflect_nontrivial_point (n : Nat) :
+    (trivialZeta.reflectNontrivial n).point = PUnit.unit := by
+  sorry
+
 /-! ## Summary -/
 
 /-!
