@@ -98,7 +98,7 @@ including a shift operation and a canonical spectrum from iterated loops.
 /-- Iterated loop at succ wraps in loopPointed. -/
 @[simp] theorem iteratedLoopPointed_succ (n : Nat) (X : Pointed) :
     iteratedLoopPointed (n + 1) X = loopPointed (iteratedLoopPointed n X) := by
-  sorry
+  rfl
 
 /-- The basepoint map sends all elements to the basepoint. -/
 theorem basepointMap_apply_eq (X Y : Pointed) (x : X.carrier) :
@@ -120,7 +120,7 @@ theorem omegaSpectrum_ext (E₁ E₂ : OmegaSpectrum)
     (hl : E₁.level = E₂.level)
     (hm : HEq E₁.structureMap E₂.structureMap) :
     E₁ = E₂ := by
-  sorry
+  cases E₁; cases E₂; subst hl; cases hm; rfl
 
 /-- Shifting the path omega spectrum shifts the iterated loop level. -/
 theorem pathOmegaSpectrum_shift_level (X : Pointed) (n : Nat) :

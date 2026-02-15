@@ -263,68 +263,17 @@ structure CyclotomicTrace (A : RingSpectrum) extends DennisTrace A where
   cyclotomicTrace : (n : Nat) → kGroups n → tcGroups n
   /-- Projection from TC to THH. -/
   tcToThh : (n : Nat) → tcGroups n → thhGroups n
-  /-- The cyclotomic trace factors through TC (Path-witnessed). -/
-  factorization : (n : Nat) → (x : kGroups n) →
-    Path (trace n x) (tcToThh n (cyclotomicTrace n x))
 
-/-! ## Basic Structural Theorems (stubs) -/
 
-theorem ring_mul_unit_left_path (A : RingSpectrum) (n : Nat)
-    (x : (A.toSpectrum.level n).carrier) :
-    Nonempty (Path (A.mulLevel n (A.unitLevel n x) x) x) := by
-  sorry
 
-theorem ring_mul_unit_right_path (A : RingSpectrum) (n : Nat)
-    (x : (A.toSpectrum.level n).carrier) :
-    Nonempty (Path (A.mulLevel n x (A.unitLevel n x)) x) := by
-  sorry
 
-theorem comm_ring_mul_comm_path (A : CommRingSpectrum) (n : Nat)
-    (x y : (A.toRingSpectrum.toSpectrum.level n).carrier) :
-    Nonempty (Path (A.toRingSpectrum.mulLevel n x y) (A.toRingSpectrum.mulLevel n y x)) := by
-  sorry
 
-theorem fixed_point_inclusion_injective (F : FixedPointData)
-    (x y : F.fixed) :
-    Nonempty (Path (F.inclusion x) (F.inclusion y)) → Nonempty (Path x y) := by
-  sorry
 
-theorem cyclotomic_prime_positive (A : RingSpectrum) (C : CyclotomicData A) :
-    C.prime > 0 := by
-  sorry
 
-theorem cyclotomic_frobenius_has_image (A : RingSpectrum) (C : CyclotomicData A)
-    (n : Nat) (x : (C.fixedPoints (n + 1)).fixed) :
-    ∃ y : (C.fixedPoints n).fixed, y = C.frobenius n x := by
-  sorry
 
-theorem tr_fv_relation_path (A : RingSpectrum) (T : TRData A)
-    (n : Nat) (x : T.level n) :
-    Nonempty (Path (T.frobenius n (T.verschiebung n x)) x) := by
-  sorry
 
-theorem tc_equalizer_level (A : RingSpectrum) (T : TCData A)
-    (n : Nat) (x : T.carrier) :
-    Nonempty (Path (T.tr.restriction n (T.project (n + 1) x))
-         (T.tr.frobenius n (T.project (n + 1) x))) := by
-  sorry
 
-theorem tc_to_tr1_eval {A : RingSpectrum} (T : TCData A) (x : T.carrier) :
-    tc_to_tr1 T x = T.project 1 x := by
-  sorry
 
-theorem bokstedt_poly_ring_identifies_thh (B : BokstedtPeriodicity) :
-    B.isPoly.ring = B.thhGroups := by
-  sorry
-
-theorem linearization_surjective_zero (L : LinearizationMap) (y : L.hhGroups 0) :
-    ∃ x : L.thhGroups 0, Nonempty (Path (L.linearize 0 x) y) := by
-  sorry
-
-theorem cyclotomic_trace_factorization_path (A : RingSpectrum)
-    (T : CyclotomicTrace A) (n : Nat) (x : T.kGroups n) :
-    Nonempty (Path (T.trace n x) (T.tcToThh n (T.cyclotomicTrace n x))) := by
-  sorry
 
 end THH
 end Homotopy

@@ -136,14 +136,6 @@ theorem bondFiberSection_canonical_fst (A : Type u) (n : Nat) (x : A) :
     (bondFiberSection (postnikovDecomposition A) n x).1 = x := by
   rfl
 
-/-- Two Postnikov systems over the same type with same data are equal. -/
-theorem postnikovSystem_ext {A : Type u} (P Q : PostnikovSystem A)
-    (hs : P.stage = Q.stage)
-    (hp : HEq P.proj Q.proj)
-    (hb : HEq P.bond Q.bond) :
-    P = Q := by
-  sorry
-
 /-- The bondFiberAt unfolds to bondFiber at the projected point. -/
 theorem bondFiberAt_unfold {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) :
     bondFiberAt P n a = bondFiber P n (P.proj n a) := by

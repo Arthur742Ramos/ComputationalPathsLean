@@ -287,15 +287,15 @@ def stablePi_nine_generators :
 
 theorem basepointMap_toFun_const (X Y : Pointed) (x : X.carrier) :
     (basepointMap X Y).toFun x = Y.pt := by
-  sorry
+  rfl
 
 theorem basepointMap_toFun_basepoint (X Y : Pointed) :
     (basepointMap X Y).toFun X.pt = Y.pt := by
-  sorry
+  rfl
 
 theorem omegaSpectrum_toSpectrum_level (E : OmegaSpectrum) (n : Nat) :
     (OmegaSpectrum.toSpectrum E).level n = E.level n := by
-  sorry
+  rfl
 
 theorem iteratedLoopPointed_zero_eq (X : Pointed) :
     iteratedLoopPointed 0 X = X := by
@@ -303,33 +303,33 @@ theorem iteratedLoopPointed_zero_eq (X : Pointed) :
 
 theorem iteratedLoopPointed_succ_eq (n : Nat) (X : Pointed) :
     iteratedLoopPointed (n + 1) X = loopPointed (iteratedLoopPointed n X) := by
-  sorry
+  rfl
 
 theorem pathOmegaSpectrum_level_eq (X : Pointed) (n : Nat) :
     (pathOmegaSpectrum X).level n = iteratedLoopPointed n X := by
-  sorry
+  rfl
 
 theorem pathSpectrum_eq_toSpectrum (X : Pointed) :
     pathSpectrum X = (pathOmegaSpectrum X).toSpectrum := by
-  sorry
+  rfl
 
 theorem pathSimpleEquivComp_toFun_assoc {α β γ δ : Type u}
     (e : PathSimpleEquiv α β) (f : PathSimpleEquiv β γ) (g : PathSimpleEquiv γ δ)
     (x : α) :
     (pathSimpleEquivComp (pathSimpleEquivComp e f) g).toFun x =
       g.toFun (f.toFun (e.toFun x)) := by
-  sorry
+  rfl
 
 theorem pathSimpleEquivComp_invFun_assoc {α β γ δ : Type u}
     (e : PathSimpleEquiv α β) (f : PathSimpleEquiv β γ) (g : PathSimpleEquiv γ δ)
     (z : δ) :
     (pathSimpleEquivComp (pathSimpleEquivComp e f) g).invFun z =
       e.invFun (f.invFun (g.invFun z)) := by
-  sorry
+  rfl
 
 theorem stableAdjunction_stableEquiv_apply_eq (X Y : Pointed) (n : Nat) :
     stableAdjunction_stableEquiv X Y n = stableAdjunction n X Y := by
-  sorry
+  rfl
 
 theorem stableAdjunction_zero_toFun_id (X Y : Pointed) (f : PointedMap X Y) :
     (stableAdjunction 0 X Y).toFun f = f := by
@@ -337,19 +337,19 @@ theorem stableAdjunction_zero_toFun_id (X Y : Pointed) (f : PointedMap X Y) :
 
 theorem canonicalSWDuality_level_eq (n : Nat) (X : Pointed) :
     ((canonicalSpanierWhiteheadDuality X).stableEquiv n) = stableAdjunction n X X := by
-  sorry
+  rfl
 
 theorem stablePi_one_eq_Z2 :
     StablePi 1 = StableStems.Z2 := by
-  sorry
+  rfl
 
 theorem stablePi_two_eq_Z2 :
     StablePi 2 = StableStems.Z2 := by
-  sorry
+  rfl
 
 theorem stablePi_three_eq_Z24 :
     StablePi 3 = StableStems.Z24 := by
-  sorry
+  rfl
 
 /-- Left round-trip for stable adjunction at level `n`, as a computational path. -/
 noncomputable def cp_stableAdjunction_left_path (n : Nat) (X Y : Pointed)

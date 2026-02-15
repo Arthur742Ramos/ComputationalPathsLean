@@ -87,61 +87,17 @@ def suspension_fwd_roundtrip_path (X : PtdType.{u}) (n : Nat)
     Path ((E.suspensionIso X n).toFun ((E.suspensionIso X n).invFun y)) y :=
   Path.stepChain ((E.suspensionIso X n).right_inv y)
 
-theorem map_zero_eq {X Y : PtdType.{u}} (f : PtdMap X Y) (n : Nat) :
-    E.map f n (E.zero X n) = E.zero Y n := by
-  sorry
 
-theorem map_id_apply (X : PtdType.{u}) (n : Nat) (x : E.H X n) :
-    E.map (PtdMap.id X) n x = x := by
-  sorry
 
-theorem map_comp_apply {X Y Z : PtdType.{u}}
-    (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) (x : E.H X n) :
-    E.map (PtdMap.comp g f) n x = E.map g n (E.map f n x) := by
-  sorry
 
-theorem map_zero_path_eq_stepChain {X Y : PtdType.{u}} (f : PtdMap X Y) (n : Nat) :
-    E.map_zero_path f n = Path.stepChain (E.map_zero f n) := by
-  sorry
 
-theorem map_id_path_eq_stepChain (X : PtdType.{u}) (n : Nat) :
-    E.map_id_path X n = Path.stepChain (E.map_id X n) := by
-  sorry
 
-theorem map_comp_path_eq_stepChain {X Y Z : PtdType.{u}}
-    (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
-    E.map_comp_path g f n = Path.stepChain (E.map_comp g f n) := by
-  sorry
 
-theorem suspension_roundtrip_eq (X : PtdType.{u}) (n : Nat) (x : E.H X n) :
-    (E.suspensionIso X n).invFun ((E.suspensionIso X n).toFun x) = x := by
-  sorry
 
-theorem suspension_fwd_roundtrip_eq (X : PtdType.{u}) (n : Nat)
-    (y : E.H (E.susp X) (n + 1)) :
-    (E.suspensionIso X n).toFun ((E.suspensionIso X n).invFun y) = y := by
-  sorry
 
-theorem suspension_roundtrip_path_eq_stepChain (X : PtdType.{u}) (n : Nat)
-    (x : E.H X n) :
-    E.suspension_roundtrip_path X n x =
-      Path.stepChain ((E.suspensionIso X n).left_inv x) := by
-  sorry
 
-theorem suspension_fwd_roundtrip_path_eq_stepChain (X : PtdType.{u}) (n : Nat)
-    (y : E.H (E.susp X) (n + 1)) :
-    E.suspension_fwd_roundtrip_path X n y =
-      Path.stepChain ((E.suspensionIso X n).right_inv y) := by
-  sorry
 
-theorem map_comp_zero_apply {X Y Z : PtdType.{u}}
-    (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
-    E.map (PtdMap.comp g f) n (E.zero X n) = E.zero Z n := by
-  sorry
 
-theorem map_id_zero (X : PtdType.{u}) (n : Nat) :
-    E.map (PtdMap.id X) n (E.zero X n) = E.zero X n := by
-  sorry
 
 end GeneralizedHomologyTheory
 
@@ -168,18 +124,8 @@ def trivialTheory : GeneralizedHomologyTheory.{u, v} where
   susp := fun X => X
   suspensionIso := fun _ _ => SimpleEquiv.refl _
 
-theorem trivialTheory_zero_eq_unit (X : PtdType.{u}) (n : Nat) :
-    trivialTheory.zero X n = PUnit.unit := by
-  sorry
 
-theorem trivialTheory_map_eq_unit {X Y : PtdType.{u}} (f : PtdMap X Y) (n : Nat)
-    (x : trivialTheory.H X n) :
-    trivialTheory.map f n x = PUnit.unit := by
-  sorry
 
-theorem trivialTheory_susp_eq (X : PtdType.{u}) :
-    trivialTheory.susp X = X := by
-  sorry
 
 /-! ## Summary
 

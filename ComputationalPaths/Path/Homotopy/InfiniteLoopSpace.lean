@@ -172,81 +172,20 @@ def SpectrumEquiv.refl (E : SpectrumObject) : SpectrumEquiv E E where
   left_inv := fun _ _ => rfl
   right_inv := fun _ _ => rfl
 
-/-- Zero-fold iteration is the identity on pointed spaces. -/
-theorem iteratedLoop_zero (X : Pointed) :
-    iteratedLoop 0 X = X := by
-  sorry
 
-/-- One-fold iteration recovers the loop space. -/
-theorem iteratedLoop_one (X : Pointed) :
-    iteratedLoop 1 X = loopPointed X := by
-  sorry
 
-/-- Iterated loops compose additively in the exponent. -/
-theorem iteratedLoop_add (m n : Nat) (X : Pointed) :
-    iteratedLoop (m + n) X = iteratedLoop m (iteratedLoop n X) := by
-  sorry
 
-/-- Iterated loops are insensitive to commutation of the exponent sum. -/
-theorem iteratedLoop_add_comm (m n : Nat) (X : Pointed) :
-    iteratedLoop (m + n) X = iteratedLoop (n + m) X := by
-  sorry
 
-/-- The chosen basepoint of Ω^n X is definitionally the pointed basepoint. -/
-theorem iteratedLoop_pt_eq (n : Nat) (X : Pointed) :
-    iteratedLoop_pt n X = (iteratedLoop n X).pt := by
-  sorry
 
-/-- The structure maps of the trivial infinite loop space are constant reflexivity. -/
-theorem trivialInfLoop_structureMap_apply (n : Nat) (u : Unit) :
-    (trivialInfLoop.structureMap n).toFun u = Path.refl () := by
-  sorry
 
-/-- Conversion from Ω-spectra preserves levels. -/
-theorem spectrumObject_ofOmega_level (E : Homotopy.OmegaSpectrum) (n : Nat) :
-    (SpectrumObject.ofOmega E).level n = E.level n := by
-  sorry
 
-/-- The underlying space of the induced infinite loop space is level zero. -/
-theorem omegaInfiniteFromSpectrum_space (E : SpectrumObject) :
-    (omegaInfiniteFromSpectrum E).space = E.level 0 := by
-  sorry
 
-/-- Constant spectra are levelwise constant. -/
-theorem constantSpectrumObject_level (X : Pointed) (n : Nat) :
-    (constantSpectrumObject X).level n = X := by
-  sorry
 
-/-- The trivial connective cover has the same underlying cover spectrum. -/
-theorem connectiveCover_trivial_cover (E : SpectrumObject) :
-    (ConnectiveCover.trivial E).cover = E := by
-  sorry
 
-/-- The trivial connective cover uses levelwise identity maps. -/
-theorem connectiveCover_trivial_map (E : SpectrumObject) (n : Nat) :
-    (ConnectiveCover.trivial E).map n = PointedMap.id (E.level n) := by
-  sorry
 
-/-- The trivial machine always outputs a levelwise-constant spectrum. -/
-theorem trivialMachine_apply_level (inp : MachineInput) (n : Nat) :
-    (trivialMachine.apply inp).level n = inp.input 0 := by
-  sorry
 
-/-- The zeroth-level comparison map of the trivial machine is pointwise identity. -/
-theorem trivialMachine_level_zero_map_apply (inp : MachineInput)
-    (x : (inp.input 0).carrier) :
-    (trivialMachine.level_zero_map inp).toFun x = x := by
-  sorry
 
-/-- Shifting by zero leaves a spectrum unchanged. -/
-theorem spectrum_shift_zero (E : SpectrumObject) :
-    E.shift 0 = E := by
-  sorry
 
-/-- `shiftedInfLoop` is the direct wrapper around `omegaInfiniteFromSpectrum`. -/
-theorem shiftedInfLoop_def (E : SpectrumObject) (k : Nat) :
-    shiftedInfLoop E k = omegaInfiniteFromSpectrum (E.shift k) := by
-  sorry
 
 
 private def pathAnchor {A : Type} (a : A) : Path a a :=

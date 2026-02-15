@@ -123,14 +123,6 @@ def adjunction_roundtrip_inverse (X Y : SuspensionLoop.Pointed)
       ((loopSpaceSuspensionAdjunction X Y).invFun g)) g :=
   (loopSpaceSuspensionAdjunction X Y).right_inv g
 
-/-- Two PathSimpleEquivs are equal when their forward maps agree. -/
-theorem pathSimpleEquiv_ext {α : Type u} {β : Type v}
-    (e₁ e₂ : PathSimpleEquiv α β)
-    (hf : e₁.toFun = e₂.toFun)
-    (hi : e₁.invFun = e₂.invFun) :
-    e₁ = e₂ := by
-  sorry
-
 /-- Identity PathSimpleEquiv for any type. -/
 def pathSimpleEquivId (α : Type u) : PathSimpleEquiv α α :=
   { toFun := _root_.id

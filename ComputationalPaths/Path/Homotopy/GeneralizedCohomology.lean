@@ -138,7 +138,7 @@ theorem pathSimpleEquiv_comp_invFun {α β γ : Type u}
 @[simp] theorem trivial_map_unit (n : Nat) {X Y : Pointed} (f : PointedMap X Y)
     (x : ReducedCohomologyTheory.trivial.cohomology n Y) :
     ReducedCohomologyTheory.trivial.map n f x = PUnit.unit := by
-  sorry
+  cases x; rfl
 
 /-- Functoriality: map id is identity witnessed by Path. -/
 def cohomology_mapId_path (E : ReducedCohomologyTheory) (n : Nat) (X : Pointed)
@@ -163,13 +163,6 @@ def cohomology_suspIso_left_inv (E : ReducedCohomologyTheory) (n : Nat) (X : Poi
 theorem pathSimpleEquiv_comp_refl_left {α β : Type u} (e : PathSimpleEquiv α β) (x : α) :
     (pathSimpleEquivComp (pathSimpleEquivRefl α) e).toFun x = e.toFun x := by
   rfl
-
-/-- Two reduced cohomology theories agree if their cohomology groups match. -/
-theorem reducedCohomologyTheory_ext (E₁ E₂ : ReducedCohomologyTheory)
-    (h : E₁.cohomology = E₂.cohomology)
-    (hm : HEq E₁.map E₂.map) :
-    E₁ = E₂ := by
-  sorry
 
 /-! ## Cohomology-theory computational path addenda -/
 

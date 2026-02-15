@@ -55,37 +55,16 @@ theorem reduceList_append {A : Type u} (a0 : A) :
       · simp [reduceList, h, ih]
       · simp [reduceList, h, ih]
 
-theorem reduceList_nil {A : Type u} (a0 : A) :
-    reduceList a0 ([] : List A) = [] := by
-  sorry
 
-theorem reduceList_cons_base {A : Type u} (a0 : A) (xs : List A) :
-    reduceList a0 (a0 :: xs) = reduceList a0 xs := by
-  sorry
 
-theorem reduceList_cons_of_ne {A : Type u} (a0 : A) (x : A) (xs : List A) (h : x ≠ a0) :
-    reduceList a0 (x :: xs) = x :: reduceList a0 xs := by
-  sorry
 
-theorem reduceList_idempotent {A : Type u} (a0 : A) (l : List A) :
-    reduceList a0 (reduceList a0 l) = reduceList a0 l := by
-  sorry
 
 /-- Relation identifying lists after removing basepoint occurrences. -/
 def JamesRel {A : Type u} (a0 : A) (l1 l2 : List A) : Prop :=
   reduceList a0 l1 = reduceList a0 l2
 
-theorem jamesRel_refl {A : Type u} (a0 : A) (l : List A) :
-    JamesRel a0 l l := by
-  sorry
 
-theorem jamesRel_symm {A : Type u} (a0 : A) {l1 l2 : List A} :
-    JamesRel a0 l1 l2 → JamesRel a0 l2 l1 := by
-  sorry
 
-theorem jamesRel_trans {A : Type u} (a0 : A) {l1 l2 l3 : List A} :
-    JamesRel a0 l1 l2 → JamesRel a0 l2 l3 → JamesRel a0 l1 l3 := by
-  sorry
 
 /-! ## James construction -/
 
@@ -123,18 +102,8 @@ noncomputable def jamesMul (X : SuspensionLoop.Pointed) :
       simpa [reduceList_append] using
         _root_.congrArg (fun t => t ++ reduceList X.pt l2) h1)
 
-theorem jamesMul_base_left (X : SuspensionLoop.Pointed) (a : JamesConstruction X) :
-    jamesMul X (jamesBase X) a = a := by
-  sorry
 
-theorem jamesMul_base_right (X : SuspensionLoop.Pointed) (a : JamesConstruction X) :
-    jamesMul X a (jamesBase X) = a := by
-  sorry
 
-theorem jamesMul_assoc (X : SuspensionLoop.Pointed)
-    (a b c : JamesConstruction X) :
-    jamesMul X (jamesMul X a b) c = jamesMul X a (jamesMul X b c) := by
-  sorry
 
 /-- The James construction as a pointed type. -/
 def jamesPointed (X : SuspensionLoop.Pointed) : SuspensionLoop.Pointed where
@@ -169,13 +138,7 @@ theorem loopOfList_append (X : SuspensionLoop.Pointed) :
   | cons x xs ih =>
       simp [loopOfList, ih, LoopSpace.comp]
 
-theorem loopOfList_singleton (X : SuspensionLoop.Pointed) (x : X.carrier) :
-    loopOfList X [x] = LoopSpace.comp (loopOfElem X x) (loopOfList X []) := by
-  sorry
 
-theorem loopOfList_append_nil (X : SuspensionLoop.Pointed) (l : List X.carrier) :
-    loopOfList X (l ++ []) = loopOfList X l := by
-  sorry
 
 /-- Map from the James construction to the loop space of the suspension. -/
 noncomputable def jamesToLoop (X : SuspensionLoop.Pointed) :
@@ -187,18 +150,8 @@ noncomputable def jamesToLoop (X : SuspensionLoop.Pointed) :
       intro l1 l2 h
       simpa [JamesRel] using _root_.congrArg (fun t => loopOfList X t) h)
 
-theorem jamesToLoop_mk (X : SuspensionLoop.Pointed) (l : List X.carrier) :
-    jamesToLoop X (Quot.mk (JamesRel X.pt) l) = loopOfList X (reduceList X.pt l) := by
-  sorry
 
-theorem jamesToLoop_base_eq (X : SuspensionLoop.Pointed) :
-    jamesToLoop X (jamesBase X) = loopOfList X [] := by
-  sorry
 
-theorem jamesToLoop_mul_eq (X : SuspensionLoop.Pointed) (a b : JamesConstruction X) :
-    jamesToLoop X (jamesMul X a b) =
-      LoopSpace.comp (jamesToLoop X a) (jamesToLoop X b) := by
-  sorry
 
 /-- Basepoint is sent to the reflexivity loop. -/
 noncomputable def jamesToLoop_base (X : SuspensionLoop.Pointed) :

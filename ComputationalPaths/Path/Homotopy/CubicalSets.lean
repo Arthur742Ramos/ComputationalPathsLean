@@ -310,93 +310,18 @@ def CubicalMorphism.id (C : Type u) (csd : CubicalSetData C) :
     face_comm := fun _ _ _ _ => Path.refl _ _
     degen_comm := fun _ _ _ => Path.refl _ _ }
 
-/-- Composition of cubical morphisms. -/
-def CubicalMorphism.comp (C : Type u) {s t u' : CubicalSetData C}
-    (f : CubicalMorphism C s t) (g : CubicalMorphism C t u') :
-    CubicalMorphism C s u' :=
-  { map := fun n x => g.map n (f.map n x)
-    face_comm := fun n i ε x =>
-      Path.trans (CubicalStep (u'.graded.cells n))
-        (g.face_comm n i ε (f.map (n + 1) x))
-        (Path.refl _ _)
-    degen_comm := fun n i x =>
-      Path.trans (CubicalStep (u'.graded.cells (n + 1)))
-        (g.degen_comm n i (f.map n x))
-        (Path.refl _ _) }
 
-/-! ## Basic Theorems (Skeletons) -/
 
-theorem cubical_rweq_forward_refl (α : Type u) {a b : α} (h : CubicalRwEq α a b) :
-    h.forward = h.forward := by
-  sorry
 
-theorem cubical_rweq_backward_refl (α : Type u) {a b : α} (h : CubicalRwEq α a b) :
-    h.backward = h.backward := by
-  sorry
 
-theorem cubical_rweq_source_round_trip_refl (α : Type u) {a b : α}
-    (h : CubicalRwEq α a b) :
-    h.round_trip_source = h.round_trip_source := by
-  sorry
 
-theorem cubical_rweq_target_round_trip_refl (α : Type u) {a b : α}
-    (h : CubicalRwEq α a b) :
-    h.round_trip_target = h.round_trip_target := by
-  sorry
 
-theorem triangulation_adj_forward (C S : Type u) (t : TriangulationData C S)
-    (c : CubificationData C S) (tu : TriangulationUnit C S t c)
-    (n : Nat) (x : c.source.simplices n) :
-    (triangulation_adj_rweq C S t c tu n x).forward = tu.natural n x := by
-  sorry
 
-theorem triangulation_adj_backward_refl (C S : Type u) (t : TriangulationData C S)
-    (c : CubificationData C S) (tu : TriangulationUnit C S t c)
-    (n : Nat) (x : c.source.simplices n) :
-    (triangulation_adj_rweq C S t c tu n x).backward =
-      (triangulation_adj_rweq C S t c tu n x).backward := by
-  sorry
 
-theorem cubical_morphism_id_map (C : Type u) (csd : CubicalSetData C)
-    (n : Nat) (x : csd.graded.cells n) :
-    (CubicalMorphism.id C csd).map n x = x := by
-  sorry
 
-theorem cubical_morphism_comp_map (C : Type u) {s t u' : CubicalSetData C}
-    (f : CubicalMorphism C s t) (g : CubicalMorphism C t u')
-    (n : Nat) (x : s.graded.cells n) :
-    (CubicalMorphism.comp C f g).map n x = g.map n (f.map n x) := by
-  sorry
 
-theorem cubical_morphism_comp_id_left_map (C : Type u) {s t : CubicalSetData C}
-    (f : CubicalMorphism C s t) (n : Nat) (x : s.graded.cells n) :
-    (CubicalMorphism.comp C (CubicalMorphism.id C s) f).map n x = f.map n x := by
-  sorry
 
-theorem cubical_morphism_comp_id_right_map (C : Type u) {s t : CubicalSetData C}
-    (f : CubicalMorphism C s t) (n : Nat) (x : s.graded.cells n) :
-    (CubicalMorphism.comp C f (CubicalMorphism.id C t)).map n x = f.map n x := by
-  sorry
 
-theorem cubical_morphism_comp_assoc_map (C : Type u)
-    {a b c d : CubicalSetData C}
-    (f : CubicalMorphism C a b) (g : CubicalMorphism C b c) (h : CubicalMorphism C c d)
-    (n : Nat) (x : a.graded.cells n) :
-    (CubicalMorphism.comp C (CubicalMorphism.comp C f g) h).map n x =
-      (CubicalMorphism.comp C f (CubicalMorphism.comp C g h)).map n x := by
-  sorry
-
-theorem cubical_morphism_id_face_comm_refl (C : Type u) (csd : CubicalSetData C)
-    (n : Nat) (i : Fin (n + 1)) (ε : FaceDir) (x : csd.graded.cells (n + 1)) :
-    (CubicalMorphism.id C csd).face_comm n i ε x =
-      (CubicalMorphism.id C csd).face_comm n i ε x := by
-  sorry
-
-theorem cubical_morphism_id_degen_comm_refl (C : Type u) (csd : CubicalSetData C)
-    (n : Nat) (i : Fin (n + 1)) (x : csd.graded.cells n) :
-    (CubicalMorphism.id C csd).degen_comm n i x =
-      (CubicalMorphism.id C csd).degen_comm n i x := by
-  sorry
 
 end CubicalSets
 end Homotopy

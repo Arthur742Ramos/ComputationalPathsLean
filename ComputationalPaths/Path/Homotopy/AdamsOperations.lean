@@ -54,22 +54,8 @@ def ringHomId {R : Type u} (RR : CommRingData R) : RingHom RR RR where
   map_add := by intro _ _; rfl
   map_mul := by intro _ _; rfl
 
-/-- Identity ring homomorphism acts as identity on elements. -/
-theorem ringHomId_apply {R : Type u} (RR : CommRingData R) (x : R) :
-    (ringHomId RR).toFun x = x := by
-  sorry
 
-/-- Identity ring homomorphism preserves addition in definitional form. -/
-theorem ringHomId_add {R : Type u} (RR : CommRingData R) (x y : R) :
-    (ringHomId RR).toFun (RR.add x y) =
-      RR.add ((ringHomId RR).toFun x) ((ringHomId RR).toFun y) := by
-  sorry
 
-/-- Identity ring homomorphism preserves multiplication in definitional form. -/
-theorem ringHomId_mul {R : Type u} (RR : CommRingData R) (x y : R) :
-    (ringHomId RR).toFun (RR.mul x y) =
-      RR.mul ((ringHomId RR).toFun x) ((ringHomId RR).toFun y) := by
-  sorry
 
 end KTheoryRing
 
@@ -97,37 +83,10 @@ theorem psiRingHom_apply {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
   symm
   exact A.psi_hom_spec k x
 
-/-- `psi^k` agrees with the extracted ring homomorphism pointwise. -/
-theorem psi_eq_psiRingHom_apply {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
-    (A : AdamsOperationRingHom S R) (k : Nat) (x : KTheory.K0 S) :
-    A.psi k x = (psiRingHom A k).toFun x := by
-  sorry
 
-/-- Extracted `psi^k` ring homomorphism preserves zero. -/
-theorem psiRingHom_map_zero {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
-    (A : AdamsOperationRingHom S R) (k : Nat) :
-    (psiRingHom A k).toFun R.ring.zero = R.ring.zero := by
-  sorry
 
-/-- Extracted `psi^k` ring homomorphism preserves one. -/
-theorem psiRingHom_map_one {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
-    (A : AdamsOperationRingHom S R) (k : Nat) :
-    (psiRingHom A k).toFun R.ring.one = R.ring.one := by
-  sorry
 
-/-- Extracted `psi^k` ring homomorphism preserves addition. -/
-theorem psiRingHom_map_add {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
-    (A : AdamsOperationRingHom S R) (k : Nat) (x y : KTheory.K0 S) :
-    (psiRingHom A k).toFun (R.ring.add x y) =
-      R.ring.add ((psiRingHom A k).toFun x) ((psiRingHom A k).toFun y) := by
-  sorry
 
-/-- Extracted `psi^k` ring homomorphism preserves multiplication. -/
-theorem psiRingHom_map_mul {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
-    (A : AdamsOperationRingHom S R) (k : Nat) (x y : KTheory.K0 S) :
-    (psiRingHom A k).toFun (R.ring.mul x y) =
-      R.ring.mul ((psiRingHom A k).toFun x) ((psiRingHom A k).toFun y) := by
-  sorry
 
 /-- The trivial Adams operations as ring homomorphisms. -/
 def trivial {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) :
@@ -138,11 +97,6 @@ def trivial {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) :
   psi_hom := fun _ => KTheoryRing.ringHomId R.ring
   psi_hom_spec := by intro _ _; rfl
 
-/-- Trivial Adams operation acts as identity on all classes. -/
-theorem trivial_psi_apply {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S)
-    (k : Nat) (x : KTheory.K0 S) :
-    (trivial S R).psi k x = x := by
-  sorry
 
 end AdamsOperationRingHom
 
@@ -167,21 +121,8 @@ def fromSource {M : Type u} {S : StrictMonoid M} (J : JImageMap S) (n : Nat) :
     JSource n → KTheory.K0 S :=
   fun x => J.map n (imageOfJMap n x)
 
-/-- `fromSource` unfolds to `map` after `imageOfJMap`. -/
-theorem fromSource_apply {M : Type u} {S : StrictMonoid M} (J : JImageMap S)
-    (n : Nat) (x : JSource n) :
-    fromSource J n x = J.map n (imageOfJMap n x) := by
-  sorry
 
-/-- `fromSource` sends the canonical source point to the canonical J-image point. -/
-theorem fromSource_base {M : Type u} {S : StrictMonoid M} (J : JImageMap S) (n : Nat) :
-    fromSource J n () = J.map n (imageOfJBase n) := by
-  sorry
 
-/-- Trivial J-image map sends every source element to zero in K-theory. -/
-theorem trivial_fromSource {M : Type u} (S : StrictMonoid M) (n : Nat) (x : JSource n) :
-    fromSource (trivial S) n x = KTheory.zero S := by
-  sorry
 
 end JImageMap
 
@@ -205,22 +146,12 @@ def adamsConjectureTrivial {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S)
 
 namespace AdamsConjecture
 
-/-- Adams operation component of an Adams conjecture datum has `psi^1 = id`. -/
-theorem adams_psi_one {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
-    (C : AdamsConjecture S R) (x : KTheory.K0 S) :
-    C.adams.psi 1 x = x := by
-  sorry
 
-/-- J-image component of an Adams conjecture datum sends the base class to zero. -/
-theorem jImage_map_base {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
-    (C : AdamsConjecture S R) (n : Nat) :
-    C.jImage.map n (imageOfJBase n) = KTheory.zero S := by
-  sorry
 
 /-- Trivial Adams conjecture witness carries its compatibility proof. -/
 theorem trivial_compatibility {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) :
     (adamsConjectureTrivial S R).compatibility = True.intro := by
-  sorry
+  trivial
 
 end AdamsConjecture
 

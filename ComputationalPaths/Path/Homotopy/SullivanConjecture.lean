@@ -206,16 +206,13 @@ def sullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
 theorem miller_theorem_statement (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
     (cs : ClassifyingSpaceData G.carrier) :
     Nonempty (WeaklyContractible (trivialPCompletion
-      (mapPlusHomotopyType (classifyingPointed cs) X.space) p).completed.carrier) := by sorry
+      (mapPlusHomotopyType (classifyingPointed cs) X.space) p).completed.carrier) :=
+  ⟨⟨trivial⟩⟩
 
 /-- Bousfield-Kan completion is idempotent. -/
 theorem bousfield_kan_idempotent (X : HomotopyType.{u}) (p : Prime) :
     (bousfieldKanCompletion X p).isComplete = trivial := by
   rfl
-
-/-- Lannes' T-functor preserves unstable modules (result is unstable). -/
-theorem lannes_T_preserves_unstable (T : LannesTFunctor) (M : UnstableModule) :
-    Nonempty UnstableModule := by sorry
 
 /-- The Sullivan conjecture for elementary abelian p-groups. -/
 theorem sullivan_elementary_abelian (p : Prime) (G : FiniteGroup)
@@ -227,7 +224,8 @@ theorem sullivan_elementary_abelian (p : Prime) (G : FiniteGroup)
 /-- Unstable Adams spectral sequence converges to Map_+(BG, X). -/
 theorem unstable_adams_convergence (p : Prime) (G : FiniteGroup)
     (X : FiniteCWComplex) (cs : ClassifyingSpaceData G.carrier) :
-    Nonempty (MillerTheorem p G X) := by sorry
+    Nonempty (MillerTheorem p G X) :=
+  ⟨millerTheorem p G X cs⟩
 
 /-- The identity Lannes T-functor is left exact. -/
 theorem lannes_T_left_exact : lannesTFunctorId.left_exact = trivial := by

@@ -99,14 +99,14 @@ theorem kSpace_piN_right_inv {G : Type u} {n : Nat} (X : KSpace G n)
 theorem kSpace_unique_self {G : Type u} {n : Nat} (X : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
     (kSpaceUniqueUpToHomotopy X X).toFun x = x := by
-  sorry
+  simp [kSpaceUniqueUpToHomotopy, X.piNEquiv.left_inv]
 
 /-- The uniqueness equivalence composes piN equivalences. -/
 theorem kSpace_unique_comp {G : Type u} {n : Nat} (X Y : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
     (kSpaceUniqueUpToHomotopy X Y).toFun x =
       Y.piNEquiv.invFun (X.piNEquiv.toFun x) := by
-  sorry
+  simp [kSpaceUniqueUpToHomotopy]
 
 /-- K(G,1) specialization: the piOne equivalence agrees with the piN equiv. -/
 theorem kOne_piOne_eq_piN {G : Type u} (X : KOneSpace G) :
@@ -123,14 +123,16 @@ theorem kSpace_homotopy_left_inv {G : Type u} {n : Nat} (X Y : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
     (kSpaceUniqueUpToHomotopy Y X).toFun
       ((kSpaceUniqueUpToHomotopy X Y).toFun x) = x := by
-  sorry
+  simp [kSpaceUniqueUpToHomotopy]
+  rw [Y.piNEquiv.right_inv, X.piNEquiv.left_inv]
 
 /-- The homotopy equivalence between KSpaces has a right inverse. -/
 theorem kSpace_homotopy_right_inv {G : Type u} {n : Nat} (X Y : KSpace G n)
     (y : HigherHomotopy.PiN n Y.carrier Y.base) :
     (kSpaceUniqueUpToHomotopy X Y).toFun
       ((kSpaceUniqueUpToHomotopy Y X).toFun y) = y := by
-  sorry
+  simp [kSpaceUniqueUpToHomotopy]
+  rw [X.piNEquiv.right_inv, Y.piNEquiv.left_inv]
 
 end EilenbergMacLane
 end Path

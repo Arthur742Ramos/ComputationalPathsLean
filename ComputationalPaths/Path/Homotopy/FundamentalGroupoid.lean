@@ -370,7 +370,8 @@ theorem inducedPiOneMap_inv (f : A → B) (a : A)
     (α : π₁(A, a)) :
     inducedPiOneMap f a (LoopQuot.inv α) =
       LoopQuot.inv (inducedPiOneMap f a α) := by
-  sorry
+  unfold inducedPiOneMap
+  exact fundamentalGroupoidMap_inv f α
 
 /-- Composition of functions composes induced maps on π₁. -/
 theorem inducedPiOneMap_compFun {C : Type u}

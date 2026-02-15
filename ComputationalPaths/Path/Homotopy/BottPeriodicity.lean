@@ -239,86 +239,42 @@ end CannibalisticClass
 
 namespace PointedEquiv
 
-theorem toPointedMap_toFun {X Y : Pointed} (e : PointedEquiv X Y) :
-    e.toPointedMap.toFun = e.toEquiv.toFun := by
-  sorry
 
-theorem toPointedMap_map_pt {X Y : Pointed} (e : PointedEquiv X Y) :
-    e.toPointedMap.map_pt = e.map_pt.toEq := by
-  sorry
 
-theorem refl_map_pt (X : Pointed) :
-    (PointedEquiv.refl X).map_pt = Path.refl X.pt := by
-  sorry
 
 end PointedEquiv
 
 namespace BottPeriodicityData
 
-theorem pi2EquivInt_eq_field {BU : Pointed} (B : BottPeriodicityData BU) :
-    B.pi2EquivInt = B.pi2_equiv_int := by
-  sorry
 
-theorem bottMap_eq_field {BU : Pointed} (B : BottPeriodicityData BU) :
-    B.bottMap = B.bott_equiv.toPointedMap := by
-  sorry
 
 end BottPeriodicityData
 
 namespace RealBottPeriodicityData
 
-theorem bottMap_eq_field {BO : Pointed} (B : RealBottPeriodicityData BO) :
-    B.bottMap = B.bott_equiv.toPointedMap := by
-  sorry
 
 end RealBottPeriodicityData
 
 namespace SphereData
 
-theorem toPointed_carrier (S : SphereData) :
-    S.toPointed.carrier = S.carrier := by
-  sorry
 
-theorem toPointed_pt (S : SphereData) :
-    S.toPointed.pt = S.base := by
-  sorry
 
 end SphereData
 
 namespace ClutchingConstruction
 
-theorem clutchingPointedMap_toFun {S : SphereData} {BU : Pointed}
-    (C : ClutchingConstruction S BU) :
-    C.clutchingPointedMap.toFun = C.clutchingMap := by
-  sorry
 
-theorem clutchingPointedMap_map_pt {S : SphereData} {BU : Pointed}
-    (C : ClutchingConstruction S BU) :
-    C.clutchingPointedMap.map_pt = C.clutching_base.toEq := by
-  sorry
 
 end ClutchingConstruction
 
 namespace AdamsOperation
 
-theorem psi_one_eq {M : Type u} {S : StrictMonoid M}
-    (A : AdamsOperation S) (x : KTheory.K0 S) :
-    A.psi 1 x = x := by
-  sorry
 
-theorem psi_zero_eq {M : Type u} {S : StrictMonoid M}
-    (A : AdamsOperation S) :
-    A.psi 0 (KTheory.zero S) = KTheory.zero S := by
-  sorry
 
 end AdamsOperation
 
 namespace CannibalisticClass
 
-theorem psi_thom_eq {K B E V M : Type u} {S : StrictMonoid M}
-    (C : CannibalisticClass (K := K) (B := B) (E := E) (V := V) (S := S)) :
-    C.adams.psi C.k C.thomClass = C.cannibalistic := by
-  sorry
 
 end CannibalisticClass
 

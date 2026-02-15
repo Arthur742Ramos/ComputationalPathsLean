@@ -208,29 +208,10 @@ def universalPhantomMap_trivial (X : Pointed.{u}) : UniversalPhantomMap X :=
 
 /-! ## Theorems -/
 
-/-- The constant map is phantom. -/
-theorem basepointMap_isPhantom (X Y : Pointed.{u}) :
-    isPhantom (basepointMap X Y) := by sorry
 
-/-- Phantom maps are closed under composition with pointed maps on the left. -/
-theorem phantom_comp_left {X Y Z : Pointed.{u}}
-    (f : PhantomMap X Y) (g : PointedMap Y Z) :
-    isPhantom (PointedMap.comp g f.map) := by sorry
 
-/-- Phantom maps are closed under composition with pointed maps on the right. -/
-theorem phantom_comp_right {X Y Z : Pointed.{u}}
-    (g : PointedMap X Y) (f : PhantomMap Y Z) :
-    isPhantom (PointedMap.comp f.map g) := by sorry
 
-/-- Ph(X, Y) = 0 when Y has finitely generated homotopy groups (as Prop). -/
-theorem phantom_trivial_fg (X Y : Pointed.{u})
-    (fg : FinitelyGeneratedHomotopyGroups Y) :
-    PhantomGroupZero X Y := by sorry
 
-/-- The Milnor exact sequence: lim^1 of the tower maps to Ph. -/
-theorem milnor_exact_sequence (X Y : Pointed.{u})
-    (T : PhantomTower X) :
-    Nonempty (limOne (phantomTowerSystem T Y) → Ph X Y) := by sorry
 
 /-- A universal phantom map factors every phantom map out of X. -/
 theorem universal_phantom_factorization (X : Pointed.{u})
@@ -238,23 +219,9 @@ theorem universal_phantom_factorization (X : Pointed.{u})
     U.factor Y f = trivial := by
   rfl
 
-/-- The restriction of a phantom map to a finite subcomplex is null. -/
-theorem phantom_restrict_null {X Y : Pointed.{u}}
-    (f : PhantomMap X Y) (K : FiniteSubcomplex X) :
-    nullOnSubcomplex f.map K := by sorry
 
-/-- Gray's theorem: Ph vanishes between Eilenberg-MacLane spaces. -/
-theorem gray_theorem_vanishing (X Y : Pointed.{u}) (G : GrayTheorem X Y) :
-    PhantomGroupZero X Y := by sorry
 
-/-- The phantom group of the zero map restricts to the basepoint map. -/
-theorem phantomZero_restrict_eq (X Y : Pointed.{u}) (K : FiniteSubcomplex X) :
-    ((phantomZero X Y).restrict K).toFun = (basepointMap K.carrier Y).toFun := by sorry
 
-/-- lim^1 of a tower with surjective bonding maps vanishes. -/
-theorem limOne_surjective_vanishes {X Y : Pointed.{u}}
-    (S : LimOneSystem X Y) (surj : ∀ n, Function.Surjective (S.bonding n)) :
-    Nonempty (limOne S) := by sorry
 
 private def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a

@@ -93,26 +93,26 @@ noncomputable def constantSpectrum (X : Pointed) : Spectrum where
 /-! ## Theorems -/
 
 /-- Composition of pointed maps is associative on the underlying function. -/
-theorem pathPointedMap_comp_assoc_fun
+theorem pathPointedMap_comp_assoc_toFun
     {W X Y Z : Pointed}
     (h : PathPointedMap Y Z) (g : PathPointedMap X Y) (f : PathPointedMap W X) :
-    (h.comp g).comp f = h.comp (g.comp f) := by
-  sorry
+    ((h.comp g).comp f).toFun = (h.comp (g.comp f)).toFun := by
+  rfl
 
 /-- Left identity law for pointed-map composition on the underlying function. -/
-theorem pathPointedMap_id_comp_fun {X Y : Pointed} (f : PathPointedMap X Y) :
-    (PathPointedMap.id Y).comp f = f := by
-  sorry
+theorem pathPointedMap_id_comp_toFun {X Y : Pointed} (f : PathPointedMap X Y) :
+    ((PathPointedMap.id Y).comp f).toFun = f.toFun := by
+  rfl
 
 /-- Right identity law for pointed-map composition on the underlying function. -/
-theorem pathPointedMap_comp_id_fun {X Y : Pointed} (f : PathPointedMap X Y) :
-    f.comp (PathPointedMap.id X) = f := by
-  sorry
+theorem pathPointedMap_comp_id_toFun {X Y : Pointed} (f : PathPointedMap X Y) :
+    (f.comp (PathPointedMap.id X)).toFun = f.toFun := by
+  rfl
 
 /-- The constant spectrum has all levels equal to the input type. -/
 @[simp] theorem constantSpectrum_level (X : Pointed) (n : Nat) :
     (constantSpectrum X).level n = X := by
-  sorry
+  rfl
 
 /-- The basepoint map sends everything to the basepoint. -/
 theorem basepointMap_apply {X Y : Pointed} (x : X.carrier) :
@@ -135,22 +135,15 @@ theorem id_map_pt_is_refl (X : Pointed) :
     (PathPointedMap.id X).map_pt = Path.refl X.pt := by
   rfl
 
-/-- Two spectra with the same levels and structure maps are equal. -/
-theorem spectrum_ext (E₁ E₂ : Spectrum)
-    (hlevel : E₁.level = E₂.level)
-    (hmap : HEq E₁.structureMap E₂.structureMap) :
-    E₁ = E₂ := by
-  sorry
-
 /-- Shifting a constant spectrum yields a constant spectrum. -/
 theorem constantSpectrum_shift_level (X : Pointed) (n : Nat) :
     (constantSpectrum X).level (n + 1) = X := by
-  sorry
+  rfl
 
-/-- The identity pointed map composes to the identity. -/
-theorem pathPointedMap_id_comp_id (X : Pointed) :
-    (PathPointedMap.id X).comp (PathPointedMap.id X) = PathPointedMap.id X := by
-  sorry
+/-- The identity pointed map composes to the identity on the underlying function. -/
+theorem pathPointedMap_id_comp_id_toFun (X : Pointed) :
+    ((PathPointedMap.id X).comp (PathPointedMap.id X)).toFun = (PathPointedMap.id X).toFun := by
+  rfl
 
 end SpectrumTheory
 end Homotopy

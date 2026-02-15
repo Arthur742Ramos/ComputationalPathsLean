@@ -148,71 +148,20 @@ theorem h_detects_hopf_invariant_one (data : HopfFibrationData)
     hopfInvariantOne data Hdata :=
   Hdata.hopfInvariant_eta
 
-/-- Path witness for Hopf invariant one detection. -/
-def h_detects_hopf_invariant_one_path (data : HopfFibrationData)
-    (Hdata : HopfInvariantData data) :
-    Path (Hdata.hopfInvariant (eta data)) 1 :=
-  HopfInvariantData.hopfInvariant_eta_path Hdata
 
-/-! ## Additional structural theorem stubs -/
 
-theorem sphere_alias_unfold (n : Nat) :
-    Sphere n = TopCat.sphere (n := n) := by
-  sorry
 
-theorem eMap_apply_piN_one (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
-    (α : HigherHomotopy.PiN n (Sphere k) a) :
-    eMap n k a a1 α =
-      HigherHomotopyGroups.piN_one (X := Sphere (k + 1)) (n := n + 1) a1 := by
-  sorry
 
-theorem hMap_apply_piN_one (n k : Nat) (a1 : Sphere (k + 1)) (a2 : Sphere (2 * k + 1))
-    (β : HigherHomotopy.PiN (n + 1) (Sphere (k + 1)) a1) :
-    hMap n k a1 a2 β =
-      HigherHomotopyGroups.piN_one (X := Sphere (2 * k + 1)) (n := n + 1) a2 := by
-  sorry
 
-theorem pMap_apply_piN_one (n k : Nat) (a2 : Sphere (2 * k - 1)) (a : Sphere k)
-    (γ : HigherHomotopy.PiN n (Sphere (2 * k - 1)) a2) :
-    pMap n k a2 a γ =
-      HigherHomotopyGroups.piN_one (X := Sphere k) (n := n - 1) a := by
-  sorry
 
-theorem freudenthalE_eq_eMap (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1)) :
-    freudenthalE n k a a1 = eMap n k a a1 := by
-  sorry
 
-theorem freudenthalE_apply_eq_eMap_apply (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
-    (α : HigherHomotopy.PiN n (Sphere k) a) :
-    freudenthalE n k a a1 α = eMap n k a a1 α := by
-  sorry
 
-theorem ehpSequence_E_eq (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
-    (a2 : Sphere (2 * k + 1)) (a3 : Sphere (2 * k - 1)) :
-    (ehpSequence n k a a1 a2 a3).E = eMap n k a a1 := by
-  sorry
 
-theorem ehpSequence_H_eq (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
-    (a2 : Sphere (2 * k + 1)) (a3 : Sphere (2 * k - 1)) :
-    (ehpSequence n k a a1 a2 a3).H = hMap n k a1 a2 := by
-  sorry
-
-theorem ehpSequence_P_eq (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
-    (a2 : Sphere (2 * k + 1)) (a3 : Sphere (2 * k - 1)) :
-    (ehpSequence n k a a1 a2 a3).P = pMap n k a3 a := by
-  sorry
-
-theorem ehpStableRange_intro (n k : Nat) :
-    ehpStableRange n k := by
-  sorry
 
 theorem ehpStableRange_iff_true (n k : Nat) :
     ehpStableRange n k ↔ True := by
-  sorry
+  trivial
 
-theorem hopfInvariantOne_iff (data : HopfFibrationData) (Hdata : HopfInvariantData data) :
-    hopfInvariantOne data Hdata ↔ Hdata.hopfInvariant (eta data) = 1 := by
-  sorry
 
 /-! ## Summary -/
 

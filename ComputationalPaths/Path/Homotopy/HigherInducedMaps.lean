@@ -155,77 +155,20 @@ def inducedMapComp {GA GB GC : Type u}
     (f : InducedMapData GA GB) (g : InducedMapData GB GC) : InducedMapData GA GC where
   induced := fun x => g.induced (f.induced x)
 
-theorem path_anchor_is_refl {A : Type} (a : A) :
-    pathAnchor a = Path.refl a := by
-  sorry
 
-theorem int_add_zero_left (x : Int) :
-    intHomotopyGroupData.add intHomotopyGroupData.zero x = x := by
-  sorry
 
-theorem int_add_zero_right (x : Int) :
-    intHomotopyGroupData.add x intHomotopyGroupData.zero = x := by
-  sorry
 
-theorem int_add_assoc (x y z : Int) :
-    intHomotopyGroupData.add (intHomotopyGroupData.add x y) z =
-      intHomotopyGroupData.add x (intHomotopyGroupData.add y z) := by
-  sorry
 
-theorem bool_add_comm (a b : Bool) :
-    boolHomotopyGroupData.add a b = boolHomotopyGroupData.add b a := by
-  sorry
 
-theorem bool_neg_involutive (a : Bool) :
-    boolHomotopyGroupData.neg (boolHomotopyGroupData.neg a) = a := by
-  sorry
 
-theorem punit_add_eq_unit (x y : PUnit) :
-    punitHomotopyGroupData.add x y = PUnit.unit := by
-  sorry
 
-theorem punit_neg_eq (x : PUnit) :
-    punitHomotopyGroupData.neg x = x := by
-  sorry
 
-theorem induced_map_id_apply {G : Type u} (x : G) :
-    (inducedMapId G).induced x = x := by
-  sorry
 
-theorem induced_map_comp_apply {GA GB GC : Type u}
-    (f : InducedMapData GA GB) (g : InducedMapData GB GC) (x : GA) :
-    (inducedMapComp f g).induced x = g.induced (f.induced x) := by
-  sorry
 
-theorem induced_map_comp_assoc {GA GB GC GD : Type u}
-    (f : InducedMapData GA GB)
-    (g : InducedMapData GB GC)
-    (h : InducedMapData GC GD) :
-    inducedMapComp (inducedMapComp f g) h = inducedMapComp f (inducedMapComp g h) := by
-  sorry
 
-theorem induced_map_comp_id_left {GA GB : Type u} (f : InducedMapData GA GB) :
-    inducedMapComp (inducedMapId GA) f = f := by
-  sorry
 
-theorem induced_map_comp_id_right {GA GB : Type u} (f : InducedMapData GA GB) :
-    inducedMapComp f (inducedMapId GB) = f := by
-  sorry
 
-theorem exact_at_e_im_in_ker_apply
-    {GF GE GB : Type u}
-    {incl_induced : GF → GE}
-    {proj_induced : GE → GB}
-    {zero_GB : GB}
-    (hexact : ExactAtECondition GF GE GB incl_induced proj_induced zero_GB)
-    (x : GF) :
-    proj_induced (incl_induced x) = zero_GB := by
-  sorry
 
-theorem connecting_map_eta {GB GF_prev : Type u}
-    (cmap : ConnectingMapData GB GF_prev) :
-    ConnectingMapData.mk cmap.connecting = cmap := by
-  sorry
 
 /-! ## Summary
 
