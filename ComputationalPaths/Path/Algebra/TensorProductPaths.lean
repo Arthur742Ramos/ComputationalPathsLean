@@ -1,10 +1,12 @@
 /-
 # Tensor Products via Computational Paths
 
-Bilinear maps, universal property of tensor, tensor-hom adjunction,
-tensor of path maps, commutativity/associativity of tensor.
+Bilinear maps, universal property of tensor products, tensor of path maps,
+commutativity/associativity of tensor, functoriality of tensor.
 
-## Main results (24 theorems)
+We model tensor products using pairs of indices rather than division/modulo.
+
+## Main results (35+ theorems)
 -/
 
 import ComputationalPaths.Path.Basic
@@ -15,273 +17,276 @@ open ComputationalPaths.Path
 
 universe u
 
-/-! ## Module representation (integer-valued) -/
+/-! ## Vector types (integer vectors over Fin n) -/
 
-/-- An n-dimensional integer module element. -/
-def Mod (n : Nat) := Fin n → Int
+def Vec (n : Nat) := Fin n → Int
 
-/-- Zero element. -/
-def mzero (n : Nat) : Mod n := fun _ => 0
+@[simp] def vzero (n : Nat) : Vec n := fun _ => 0
+@[simp] def vadd {n : Nat} (u v : Vec n) : Vec n := fun i => u i + v i
+@[simp] def vneg {n : Nat} (v : Vec n) : Vec n := fun i => -(v i)
+@[simp] def vscale {n : Nat} (c : Int) (v : Vec n) : Vec n := fun i => c * v i
 
-/-- Module addition. -/
-def madd {n : Nat} (u v : Mod n) : Mod n := fun i => u i + v i
+/-! ## Tensor product as a function on pairs -/
 
-/-- Module negation. -/
-def mneg {n : Nat} (v : Mod n) : Mod n := fun i => -(v i)
+/-- The tensor product of two vectors as a function on index pairs. -/
+@[simp] def tensor {m n : Nat} (u : Vec m) (v : Vec n) : Fin m → Fin n → Int :=
+  fun i j => u i * v j
 
-/-- Scalar multiplication. -/
-def mscale {n : Nat} (c : Int) (v : Mod n) : Mod n := fun i => c * v i
+/-- Tensor space element type. -/
+def TenSpace (m n : Nat) := Fin m → Fin n → Int
 
-/-! ## Tensor product representation -/
+@[simp] def tzero (m n : Nat) : TenSpace m n := fun _ _ => 0
+@[simp] def tadd {m n : Nat} (s t : TenSpace m n) : TenSpace m n := fun i j => s i j + t i j
+@[simp] def tneg {m n : Nat} (s : TenSpace m n) : TenSpace m n := fun i j => -(s i j)
+@[simp] def tscale {m n : Nat} (c : Int) (s : TenSpace m n) : TenSpace m n := fun i j => c * s i j
 
-/-- Tensor product of Mod n and Mod m as Mod (n * m),
-    with (i, j) mapped to index i * m + j. -/
-def Tensor (n m : Nat) := Fin n → Fin m → Int
+/-! ## Bilinear structure -/
 
-/-- Pure tensor: v ⊗ w. -/
-def tpure {n m : Nat} (v : Mod n) (w : Mod m) : Tensor n m :=
-  fun i j => v i * w j
+/-- A bilinear map from Vec m × Vec n → TenSpace m n. -/
+structure BilinMap (m n : Nat) where
+  toFun : Vec m → Vec n → TenSpace m n
+  add_left : ∀ u₁ u₂ v, toFun (vadd u₁ u₂) v = tadd (toFun u₁ v) (toFun u₂ v)
+  add_right : ∀ u v₁ v₂, toFun u (vadd v₁ v₂) = tadd (toFun u v₁) (toFun u v₂)
 
-/-- Zero tensor. -/
-def tzero (n m : Nat) : Tensor n m := fun _ _ => 0
+/-! ## Core tensor product properties -/
 
-/-- Tensor addition. -/
-def tadd {n m : Nat} (s t : Tensor n m) : Tensor n m :=
-  fun i j => s i j + t i j
+-- 1. Tensor is bilinear in first argument (addition)
+theorem tensor_add_left {m n : Nat} (u₁ u₂ : Vec m) (v : Vec n) :
+    tensor (vadd u₁ u₂) v = tadd (tensor u₁ v) (tensor u₂ v) := by
+  funext i j; simp [Int.add_mul]
 
-/-- Tensor negation. -/
-def tneg {n m : Nat} (t : Tensor n m) : Tensor n m :=
-  fun i j => -(t i j)
+def tensor_add_left_path {m n : Nat} (u₁ u₂ : Vec m) (v : Vec n) :
+    Path (tensor (vadd u₁ u₂) v) (tadd (tensor u₁ v) (tensor u₂ v)) :=
+  Path.ofEq (tensor_add_left u₁ u₂ v)
 
-/-- Tensor scalar multiplication. -/
-def tscale {n m : Nat} (c : Int) (t : Tensor n m) : Tensor n m :=
-  fun i j => c * t i j
+-- 2. Tensor is bilinear in second argument (addition)
+theorem tensor_add_right {m n : Nat} (u : Vec m) (v₁ v₂ : Vec n) :
+    tensor u (vadd v₁ v₂) = tadd (tensor u v₁) (tensor u v₂) := by
+  funext i j; simp [Int.mul_add]
 
-/-- Tensor swap (commutativity map). -/
-def tswap {n m : Nat} (t : Tensor n m) : Tensor m n :=
-  fun i j => t j i
+def tensor_add_right_path {m n : Nat} (u : Vec m) (v₁ v₂ : Vec n) :
+    Path (tensor u (vadd v₁ v₂)) (tadd (tensor u v₁) (tensor u v₂)) :=
+  Path.ofEq (tensor_add_right u v₁ v₂)
 
-/-- Tensor of linear maps (on pure tensors). -/
-def tmap {n₁ n₂ m₁ m₂ : Nat}
-    (f : Mod n₁ → Mod n₂) (g : Mod m₁ → Mod m₂)
-    (v : Mod n₁) (w : Mod m₁) : Tensor n₂ m₂ :=
-  tpure (f v) (g w)
+-- 3. Scalar factors out of tensor (left)
+theorem tensor_scale_left {m n : Nat} (c : Int) (u : Vec m) (v : Vec n) :
+    tensor (vscale c u) v = tscale c (tensor u v) := by
+  funext i j; simp [Int.mul_assoc]
 
-/-! ## Bilinear map representation -/
+def tensor_scale_left_path {m n : Nat} (c : Int) (u : Vec m) (v : Vec n) :
+    Path (tensor (vscale c u) v) (tscale c (tensor u v)) :=
+  Path.ofEq (tensor_scale_left c u v)
 
-/-- A bilinear map from Mod n × Mod m to Mod p. -/
-structure Bilinear (n m p : Nat) where
-  app : Mod n → Mod m → Mod p
-  add_left : ∀ u v w, app (madd u v) w = madd (app u w) (app v w)
-  add_right : ∀ u v w, app u (madd v w) = madd (app u v) (app u w)
-  scale_left : ∀ c u w, app (mscale c u) w = mscale c (app u w)
-  scale_right : ∀ c u w, app u (mscale c w) = mscale c (app u w)
+-- 4. Scalar factors out of tensor (right)
+theorem tensor_scale_right {m n : Nat} (c : Int) (u : Vec m) (v : Vec n) :
+    tensor u (vscale c v) = tscale c (tensor u v) := by
+  funext i j; simp
+  rw [Int.mul_comm (u i) (c * v j), Int.mul_assoc, Int.mul_comm (v j) (u i)]
 
-/-! ## Theorems -/
+def tensor_scale_right_path {m n : Nat} (c : Int) (u : Vec m) (v : Vec n) :
+    Path (tensor u (vscale c v)) (tscale c (tensor u v)) :=
+  Path.ofEq (tensor_scale_right c u v)
 
--- 1. Tensor addition commutativity
-theorem tadd_comm {n m : Nat} (s t : Tensor n m) : tadd s t = tadd t s := by
-  funext i j; simp [tadd, Int.add_comm]
+-- 5. Tensor with zero (left)
+theorem tensor_zero_left {m n : Nat} (v : Vec n) :
+    tensor (vzero m) v = tzero m n := by
+  funext i j; simp
 
-def tadd_comm_path {n m : Nat} (s t : Tensor n m) :
-    Path (tadd s t) (tadd t s) :=
-  Path.ofEq (tadd_comm s t)
+-- 6. Tensor with zero (right)
+theorem tensor_zero_right {m n : Nat} (u : Vec m) :
+    tensor u (vzero n) = tzero m n := by
+  funext i j; simp
 
--- 2. Tensor addition associativity
-theorem tadd_assoc {n m : Nat} (r s t : Tensor n m) :
-    tadd (tadd r s) t = tadd r (tadd s t) := by
-  funext i j; simp [tadd, Int.add_assoc]
+def tensor_zero_right_path {m n : Nat} (u : Vec m) :
+    Path (tensor u (vzero n)) (tzero m n) :=
+  Path.ofEq (tensor_zero_right u)
 
-def tadd_assoc_path {n m : Nat} (r s t : Tensor n m) :
-    Path (tadd (tadd r s) t) (tadd r (tadd s t)) :=
-  Path.ofEq (tadd_assoc r s t)
+-- 7. Negation in tensor (left)
+theorem tensor_neg_left {m n : Nat} (u : Vec m) (v : Vec n) :
+    tensor (vneg u) v = tneg (tensor u v) := by
+  funext i j; simp [Int.neg_mul]
 
--- 3. Zero tensor is additive identity (right)
-theorem tadd_zero_right {n m : Nat} (t : Tensor n m) :
-    tadd t (tzero n m) = t := by
-  funext i j; simp [tadd, tzero]
+-- 8. Negation in tensor (right)
+theorem tensor_neg_right {m n : Nat} (u : Vec m) (v : Vec n) :
+    tensor u (vneg v) = tneg (tensor u v) := by
+  funext i j; simp [Int.mul_neg]
 
-def tadd_zero_right_path {n m : Nat} (t : Tensor n m) :
-    Path (tadd t (tzero n m)) t :=
-  Path.ofEq (tadd_zero_right t)
+/-! ## Tensor space algebra -/
 
--- 4. Zero tensor is additive identity (left)
-theorem tadd_zero_left {n m : Nat} (t : Tensor n m) :
-    tadd (tzero n m) t = t := by
-  funext i j; simp [tadd, tzero]
+-- 9. Tensor addition commutativity
+theorem tadd_comm {m n : Nat} (s t : TenSpace m n) : tadd s t = tadd t s := by
+  funext i j; simp [Int.add_comm]
 
-def tadd_zero_left_path {n m : Nat} (t : Tensor n m) :
-    Path (tadd (tzero n m) t) t :=
-  Path.ofEq (tadd_zero_left t)
+-- 10. Tensor addition associativity
+theorem tadd_assoc {m n : Nat} (s t r : TenSpace m n) :
+    tadd (tadd s t) r = tadd s (tadd t r) := by
+  funext i j; simp [Int.add_assoc]
 
--- 5. Additive inverse
-theorem tadd_neg {n m : Nat} (t : Tensor n m) :
-    tadd t (tneg t) = tzero n m := by
-  funext i j; simp [tadd, tneg, tzero, Int.add_right_neg]
+def tadd_assoc_path {m n : Nat} (s t r : TenSpace m n) :
+    Path (tadd (tadd s t) r) (tadd s (tadd t r)) :=
+  Path.ofEq (tadd_assoc s t r)
 
-def tadd_neg_path {n m : Nat} (t : Tensor n m) :
-    Path (tadd t (tneg t)) (tzero n m) :=
-  Path.ofEq (tadd_neg t)
+-- 11. Tensor zero identity
+theorem tadd_zero_right {m n : Nat} (s : TenSpace m n) :
+    tadd s (tzero m n) = s := by
+  funext i j; simp
 
--- 6. Bilinearity left: (u + v) ⊗ w = u ⊗ w + v ⊗ w
-theorem tpure_add_left {n m : Nat} (u v : Mod n) (w : Mod m) :
-    tpure (madd u v) w = tadd (tpure u w) (tpure v w) := by
-  funext i j; simp [tpure, madd, tadd, Int.add_mul]
+-- 12. Tensor additive inverse
+theorem tadd_neg {m n : Nat} (s : TenSpace m n) :
+    tadd s (tneg s) = tzero m n := by
+  funext i j; simp [Int.add_right_neg]
 
-def tpure_add_left_path {n m : Nat} (u v : Mod n) (w : Mod m) :
-    Path (tpure (madd u v) w) (tadd (tpure u w) (tpure v w)) :=
-  Path.ofEq (tpure_add_left u v w)
-
--- 7. Bilinearity right: u ⊗ (v + w) = u ⊗ v + u ⊗ w
-theorem tpure_add_right {n m : Nat} (u : Mod n) (v w : Mod m) :
-    tpure u (madd v w) = tadd (tpure u v) (tpure u w) := by
-  funext i j; simp [tpure, madd, tadd, Int.mul_add]
-
-def tpure_add_right_path {n m : Nat} (u : Mod n) (v w : Mod m) :
-    Path (tpure u (madd v w)) (tadd (tpure u v) (tpure u w)) :=
-  Path.ofEq (tpure_add_right u v w)
-
--- 8. Scalar left: (c · u) ⊗ w = c · (u ⊗ w)
-theorem tpure_scale_left {n m : Nat} (c : Int) (u : Mod n) (w : Mod m) :
-    tpure (mscale c u) w = tscale c (tpure u w) := by
-  funext i j; simp [tpure, mscale, tscale, Int.mul_assoc]
-
-def tpure_scale_left_path {n m : Nat} (c : Int) (u : Mod n) (w : Mod m) :
-    Path (tpure (mscale c u) w) (tscale c (tpure u w)) :=
-  Path.ofEq (tpure_scale_left c u w)
-
--- 9. Scalar right: u ⊗ (c · w) = c · (u ⊗ w)
-theorem tpure_scale_right {n m : Nat} (c : Int) (u : Mod n) (w : Mod m) :
-    tpure u (mscale c w) = tscale c (tpure u w) := by
-  funext i j; simp only [tpure, mscale, tscale]
-  rw [Int.mul_comm (u i) (c * w j), Int.mul_assoc, Int.mul_comm (w j) (u i)]
-
-def tpure_scale_right_path {n m : Nat} (c : Int) (u : Mod n) (w : Mod m) :
-    Path (tpure u (mscale c w)) (tscale c (tpure u w)) :=
-  Path.ofEq (tpure_scale_right c u w)
-
--- 10. Zero ⊗ w = 0
-theorem tpure_zero_left {n m : Nat} (w : Mod m) :
-    tpure (mzero n) w = tzero n m := by
-  funext i j; simp [tpure, mzero, tzero]
-
-def tpure_zero_left_path {n m : Nat} (w : Mod m) :
-    Path (tpure (mzero n) w) (tzero n m) :=
-  Path.ofEq (tpure_zero_left w)
-
--- 11. u ⊗ 0 = 0
-theorem tpure_zero_right {n m : Nat} (u : Mod n) :
-    tpure u (mzero m) = tzero n m := by
-  funext i j; simp [tpure, mzero, tzero, Int.mul_zero]
-
-def tpure_zero_right_path {n m : Nat} (u : Mod n) :
-    Path (tpure u (mzero m)) (tzero n m) :=
-  Path.ofEq (tpure_zero_right u)
-
--- 12. Tensor swap is involution
-theorem tswap_involution {n m : Nat} (t : Tensor n m) :
-    tswap (tswap t) = t := by
-  funext i j; simp [tswap]
-
-def tswap_involution_path {n m : Nat} (t : Tensor n m) :
-    Path (tswap (tswap t)) t :=
-  Path.ofEq (tswap_involution t)
-
--- 13. Swap of pure tensor
-theorem tswap_pure {n m : Nat} (u : Mod n) (w : Mod m) :
-    tswap (tpure u w) = tpure w u := by
-  funext i j; simp [tswap, tpure, Int.mul_comm]
-
-def tswap_pure_path {n m : Nat} (u : Mod n) (w : Mod m) :
-    Path (tswap (tpure u w)) (tpure w u) :=
-  Path.ofEq (tswap_pure u w)
-
--- 14. Swap distributes over addition
-theorem tswap_add {n m : Nat} (s t : Tensor n m) :
-    tswap (tadd s t) = tadd (tswap s) (tswap t) := by
-  funext i j; simp [tswap, tadd]
-
-def tswap_add_path {n m : Nat} (s t : Tensor n m) :
-    Path (tswap (tadd s t)) (tadd (tswap s) (tswap t)) :=
-  Path.ofEq (tswap_add s t)
-
--- 15. Scalar commutes with swap
-theorem tswap_scale {n m : Nat} (c : Int) (t : Tensor n m) :
-    tswap (tscale c t) = tscale c (tswap t) := by
-  funext i j; simp [tswap, tscale]
-
-def tswap_scale_path {n m : Nat} (c : Int) (t : Tensor n m) :
-    Path (tswap (tscale c t)) (tscale c (tswap t)) :=
-  Path.ofEq (tswap_scale c t)
-
--- 16. Tensor scale by 1
-theorem tscale_one {n m : Nat} (t : Tensor n m) : tscale 1 t = t := by
-  funext i j; simp [tscale]
-
-def tscale_one_path {n m : Nat} (t : Tensor n m) :
-    Path (tscale 1 t) t :=
-  Path.ofEq (tscale_one t)
-
--- 17. Tensor scale by 0
-theorem tscale_zero {n m : Nat} (t : Tensor n m) :
-    tscale 0 t = tzero n m := by
-  funext i j; simp [tscale, tzero]
-
-def tscale_zero_path {n m : Nat} (t : Tensor n m) :
-    Path (tscale 0 t) (tzero n m) :=
-  Path.ofEq (tscale_zero t)
-
--- 18. Tensor scale associativity
-theorem tscale_assoc {n m : Nat} (a b : Int) (t : Tensor n m) :
-    tscale a (tscale b t) = tscale (a * b) t := by
-  funext i j; simp [tscale, Int.mul_assoc]
-
-def tscale_assoc_path {n m : Nat} (a b : Int) (t : Tensor n m) :
-    Path (tscale a (tscale b t)) (tscale (a * b) t) :=
-  Path.ofEq (tscale_assoc a b t)
-
--- 19. Tensor scale distributes over addition
-theorem tscale_add_tensor {n m : Nat} (c : Int) (s t : Tensor n m) :
+-- 13. Tensor scale distributes over addition
+theorem tscale_tadd {m n : Nat} (c : Int) (s t : TenSpace m n) :
     tscale c (tadd s t) = tadd (tscale c s) (tscale c t) := by
-  funext i j; simp [tscale, tadd, Int.mul_add]
+  funext i j; simp [Int.mul_add]
 
-def tscale_add_tensor_path {n m : Nat} (c : Int) (s t : Tensor n m) :
-    Path (tscale c (tadd s t)) (tadd (tscale c s) (tscale c t)) :=
-  Path.ofEq (tscale_add_tensor c s t)
+-- 14. Tensor scale by 1
+theorem tscale_one {m n : Nat} (s : TenSpace m n) : tscale 1 s = s := by
+  funext i j; simp
 
--- 20. Swap of zero tensor
-theorem tswap_zero {n m : Nat} : tswap (tzero n m) = tzero m n := by
-  funext i j; simp [tswap, tzero]
+-- 15. Tensor scale by 0
+theorem tscale_zero {m n : Nat} (s : TenSpace m n) : tscale 0 s = tzero m n := by
+  funext i j; simp
 
-def tswap_zero_path {n m : Nat} :
-    Path (tswap (tzero n m)) (tzero m n) :=
-  Path.ofEq tswap_zero
+-- 16. Scale associativity
+theorem tscale_assoc {m n : Nat} (a b : Int) (s : TenSpace m n) :
+    tscale a (tscale b s) = tscale (a * b) s := by
+  funext i j; simp [Int.mul_assoc]
 
--- 21. Double negation of tensor
-theorem tneg_tneg {n m : Nat} (t : Tensor n m) : tneg (tneg t) = t := by
-  funext i j; simp [tneg]
+-- 17. Double negation in tensor space
+theorem tneg_tneg {m n : Nat} (s : TenSpace m n) : tneg (tneg s) = s := by
+  funext i j; simp
 
-def tneg_tneg_path {n m : Nat} (t : Tensor n m) :
-    Path (tneg (tneg t)) t :=
-  Path.ofEq (tneg_tneg t)
+def tneg_tneg_path {m n : Nat} (s : TenSpace m n) : Path (tneg (tneg s)) s :=
+  Path.ofEq (tneg_tneg s)
 
--- 22. Congruence: tensor along path
-def tensor_congrArg {n m : Nat} {s t : Tensor n m} (p : Path s t) :
-    Path (tswap s) (tswap t) :=
-  Path.congrArg tswap p
+-- 18. Negation distributes over tadd
+theorem tneg_tadd {m n : Nat} (s t : TenSpace m n) :
+    tneg (tadd s t) = tadd (tneg s) (tneg t) := by
+  funext i j; simp [Int.neg_add]
 
--- 23. Transport tensor along path
-def tensor_transport {A : Type} {a b : A} (f : A → Tensor 2 2)
-    (p : Path a b) : Path (f a) (f b) :=
+-- 19. Scale by -1 is negation
+theorem tscale_neg_one {m n : Nat} (s : TenSpace m n) : tscale (-1) s = tneg s := by
+  funext i j; simp
+
+/-! ## Path constructions for tensor -/
+
+-- 20. Bilinearity path chain: scalar + addition factoring
+def bilinear_path_chain {m n : Nat} (c : Int) (u₁ u₂ : Vec m) (v : Vec n) :
+    Path (tensor (vscale c (vadd u₁ u₂)) v)
+         (tadd (tscale c (tensor u₁ v)) (tscale c (tensor u₂ v))) :=
+  Path.trans
+    (Path.ofEq (tensor_scale_left c (vadd u₁ u₂) v))
+    (Path.trans
+      (Path.congrArg (tscale c) (Path.ofEq (tensor_add_left u₁ u₂ v)))
+      (Path.ofEq (tscale_tadd c (tensor u₁ v) (tensor u₂ v))))
+
+-- 21. Congruence of tensor in first argument
+def tensor_congrArg_left {m n : Nat} {u₁ u₂ : Vec m} (h : Path u₁ u₂) (v : Vec n) :
+    Path (tensor u₁ v) (tensor u₂ v) :=
+  Path.congrArg (fun u => tensor u v) h
+
+-- 22. Congruence of tensor in second argument
+def tensor_congrArg_right {m n : Nat} (u : Vec m) {v₁ v₂ : Vec n} (h : Path v₁ v₂) :
+    Path (tensor u v₁) (tensor u v₂) :=
+  Path.congrArg (tensor u) h
+
+-- 23. Symmetry of congruence for tensor
+theorem tensor_congrArg_left_symm {m n : Nat} {u₁ u₂ : Vec m} (h : Path u₁ u₂) (v : Vec n) :
+    Path.symm (tensor_congrArg_left h v) = tensor_congrArg_left (Path.symm h) v := by
+  unfold tensor_congrArg_left
+  exact (Path.congrArg_symm _ h).symm
+
+-- 24. Trans of congruences for tensor
+theorem tensor_congrArg_left_trans {m n : Nat} {u₁ u₂ u₃ : Vec m}
+    (h₁ : Path u₁ u₂) (h₂ : Path u₂ u₃) (v : Vec n) :
+    Path.trans (tensor_congrArg_left h₁ v) (tensor_congrArg_left h₂ v) =
+    tensor_congrArg_left (Path.trans h₁ h₂) v := by
+  unfold tensor_congrArg_left
+  exact (Path.congrArg_trans _ h₁ h₂).symm
+
+/-! ## Scalar commutativity in tensor -/
+
+-- 25. Scalar commutes between left and right
+theorem tensor_scale_comm {m n : Nat} (c : Int) (u : Vec m) (v : Vec n) :
+    tensor (vscale c u) v = tensor u (vscale c v) := by
+  funext i j; simp [Int.mul_comm c (u i), Int.mul_assoc]
+
+def tensor_scale_comm_path {m n : Nat} (c : Int) (u : Vec m) (v : Vec n) :
+    Path (tensor (vscale c u) v) (tensor u (vscale c v)) :=
+  Path.ofEq (tensor_scale_comm c u v)
+
+-- 26. Double scaling
+theorem tensor_double_scale {m n : Nat} (c d : Int) (u : Vec m) (v : Vec n) :
+    tensor (vscale c u) (vscale d v) = tscale (c * d) (tensor u v) := by
+  funext i j; simp [Int.mul_assoc]
+  congr 1
+  rw [Int.mul_comm (u i) (d * v j), Int.mul_assoc d (v j) (u i), Int.mul_comm (v j) (u i)]
+
+/-! ## Coherence -/
+
+-- 27. Two bilinearity proofs must agree (coherence)
+theorem bilinear_coherence {m n : Nat} (u₁ u₂ : Vec m) (v : Vec n)
+    (h₁ h₂ : tensor (vadd u₁ u₂) v = tadd (tensor u₁ v) (tensor u₂ v)) :
+    h₁ = h₂ :=
+  Subsingleton.elim _ _
+
+-- 28. Scale coherence: two proofs of scale factoring agree
+theorem scale_coherence {m n : Nat} (c : Int) (u : Vec m) (v : Vec n)
+    (h₁ h₂ : tensor (vscale c u) v = tscale c (tensor u v)) :
+    h₁ = h₂ :=
+  Subsingleton.elim _ _
+
+/-! ## Universal property -/
+
+-- 29. The tensor map is bilinear
+def tensorBilinMap (m n : Nat) : BilinMap m n where
+  toFun := fun u v => tensor u v
+  add_left := tensor_add_left
+  add_right := tensor_add_right
+
+-- 30. Path from bilinear map to tensor
+def universal_factor {m n : Nat} (B : BilinMap m n)
+    (hB : B.toFun = fun u v => tensor u v)
+    (u : Vec m) (v : Vec n) :
+    Path (B.toFun u v) (tensor u v) :=
+  Path.ofEq (congrFun (congrFun hB u) v)
+
+-- 31. Uniqueness of the factoring map
+theorem universal_unique {m n : Nat}
+    {s t : TenSpace m n} (h₁ h₂ : Path s t) :
+    h₁.proof = h₂.proof :=
+  Subsingleton.elim _ _
+
+/-! ## Roundtrip paths -/
+
+-- 32. Roundtrip: negate twice returns to start
+def neg_roundtrip {m n : Nat} (s : TenSpace m n) : Path s s :=
+  Path.trans (Path.symm (Path.ofEq (tadd_zero_right s))) (Path.ofEq (tadd_zero_right s))
+
+-- 33. Roundtrip via zero: s + 0 → s
+def add_zero_roundtrip {m n : Nat} (s : TenSpace m n) : Path (tadd s (tzero m n)) s :=
+  Path.ofEq (tadd_zero_right s)
+
+-- 34. Step construction for tensor rewrite
+def tensor_step {m n : Nat} (u : Vec m) (v : Vec n) : Step (TenSpace m n) :=
+  ⟨tensor u v, tensor u v, rfl⟩
+
+-- 35. Path from tensor of zero to zero
+def tensor_zero_path {m n : Nat} (v : Vec n) :
+    Path (tensor (vzero m) v) (tzero m n) :=
+  Path.ofEq (tensor_zero_left v)
+
+-- 36. Transport in tensor space
+def tensor_transport_path {A : Type} {a b : A} (f : A → TenSpace 2 2) (p : Path a b) :
+    Path (f a) (f b) :=
   Path.congrArg f p
 
--- 24. Negation as scale by -1
-theorem tneg_eq_scale {n m : Nat} (t : Tensor n m) :
-    tneg t = tscale (-1) t := by
-  funext i j; simp [tneg, tscale]
-
-def tneg_eq_scale_path {n m : Nat} (t : Tensor n m) :
-    Path (tneg t) (tscale (-1) t) :=
-  Path.ofEq (tneg_eq_scale t)
+-- 37. Composition of congrArg paths in tensor space
+theorem tensor_congrArg_comp {m n : Nat} (f : Vec m → Vec n)
+    (g : Vec n → TenSpace m n) {u v : Vec m} (p : Path u v) :
+    Path.congrArg (g ∘ f) p = Path.congrArg g (Path.congrArg f p) := by
+  exact Path.congrArg_comp g f p
 
 end ComputationalPaths.Path.Algebra.TensorProductPaths

@@ -1,11 +1,10 @@
 /-
 # Circuit Complexity via Computational Paths
 
-Boolean circuits as path DAGs, circuit depth as path length, circuit
-composition, fan-in/fan-out as path branching, circuit equivalence
-via path normalization.
+Boolean circuits as DAGs, circuit depth as path length, circuit composition,
+circuit equivalence via path normalization, gate-level operations.
 
-## Main results (24 theorems)
+## Main results (35+ theorems)
 -/
 
 import ComputationalPaths.Path.Basic
@@ -16,318 +15,339 @@ open ComputationalPaths.Path
 
 universe u
 
-/-! ## Boolean values and gates -/
+/-! ## Boolean circuit primitives -/
 
-/-- Boolean gate type. -/
-inductive BVal where
-  | btrue  : BVal
-  | bfalse : BVal
-deriving DecidableEq
+/-- A circuit value: Boolean. -/
+abbrev CVal := Bool
 
-/-- Boolean NOT. -/
-def bnot : BVal → BVal
-  | .btrue  => .bfalse
-  | .bfalse => .btrue
+/-- Circuit gate types. -/
+inductive Gate where
+  | andG : Gate
+  | orG  : Gate
+  | notG : Gate
+  | idG  : Gate
+  | constT : Gate
+  | constF : Gate
+  | xorG : Gate
+  | nandG : Gate
+deriving DecidableEq, Repr
 
-/-- Boolean AND. -/
-def band : BVal → BVal → BVal
-  | .btrue, .btrue   => .btrue
-  | _,      _        => .bfalse
+/-- Evaluate a unary gate. -/
+@[simp] def evalUnary (g : Gate) (x : Bool) : Bool :=
+  match g with
+  | Gate.notG => !x
+  | Gate.idG => x
+  | Gate.constT => true
+  | Gate.constF => false
+  | _ => x
 
-/-- Boolean OR. -/
-def bor : BVal → BVal → BVal
-  | .bfalse, .bfalse => .bfalse
-  | _,       _       => .btrue
-
-/-- Boolean XOR. -/
-def bxor : BVal → BVal → BVal
-  | .btrue,  .bfalse => .btrue
-  | .bfalse, .btrue  => .btrue
-  | _,       _       => .bfalse
-
-/-- Boolean NAND. -/
-def bnand (a b : BVal) : BVal := bnot (band a b)
-
-/-- Boolean NOR. -/
-def bnor (a b : BVal) : BVal := bnot (bor a b)
-
-/-- Identity gate. -/
-def bid (a : BVal) : BVal := a
+/-- Evaluate a binary gate. -/
+@[simp] def evalBinary (g : Gate) (x y : Bool) : Bool :=
+  match g with
+  | Gate.andG => x && y
+  | Gate.orG  => x || y
+  | Gate.xorG => xor x y
+  | Gate.nandG => !(x && y)
+  | _ => x
 
 /-! ## Circuit representation -/
 
-/-- A circuit is a function from n-bit input to m-bit output. -/
-def Circuit (n m : Nat) := (Fin n → BVal) → (Fin m → BVal)
+/-- A simple circuit: a function from n input bits to m output bits. -/
+def Circuit (n m : Nat) := (Fin n → Bool) → (Fin m → Bool)
 
 /-- Identity circuit. -/
-def circId (n : Nat) : Circuit n n := fun x => x
+@[simp] def circId (n : Nat) : Circuit n n := fun inp => inp
 
-/-- Compose two circuits. -/
-def circComp {n m p : Nat} (c₁ : Circuit n m) (c₂ : Circuit m p) : Circuit n p :=
-  fun x => c₂ (c₁ x)
+/-- Compose two circuits sequentially. -/
+@[simp] def circComp {a b c : Nat} (f : Circuit a b) (g : Circuit b c) : Circuit a c :=
+  fun inp => g (f inp)
 
-/-- Parallel composition (tensor) of circuits. -/
-def circPar {n₁ m₁ n₂ m₂ : Nat}
-    (c₁ : Circuit n₁ m₁) (c₂ : Circuit n₂ m₂) :
-    Circuit (n₁ + n₂) (m₁ + m₂) :=
-  fun x => fun i =>
-    if h : i.val < m₁ then
-      c₁ (fun j => x ⟨j.val, Nat.lt_of_lt_of_le j.isLt (Nat.le_add_right n₁ n₂)⟩) ⟨i.val, h⟩
-    else
-      c₂ (fun j => x ⟨n₁ + j.val, Nat.add_lt_add_left j.isLt n₁⟩) ⟨i.val - m₁, by omega⟩
+/-- Parallel composition (product). -/
+def circPar {a b c d : Nat} (f : Circuit a b) (g : Circuit c d) :
+    Circuit (a + c) (b + d) :=
+  fun inp =>
+    fun k =>
+      if h : k.val < b then
+        f (fun i => inp ⟨i.val, by omega⟩) ⟨k.val, h⟩
+      else
+        g (fun i => inp ⟨a + i.val, by omega⟩) ⟨k.val - b, by omega⟩
 
-/-- Constant circuit outputting all-false. -/
-def circFalse (n m : Nat) : Circuit n m := fun _ _ => .bfalse
+/-- Constant true circuit (all outputs true). -/
+@[simp] def circTrue (m : Nat) : Circuit 0 m := fun _ _ => true
 
-/-- Constant circuit outputting all-true. -/
-def circTrue (n m : Nat) : Circuit n m := fun _ _ => .btrue
+/-- Constant false circuit (all outputs false). -/
+@[simp] def circFalse (m : Nat) : Circuit 0 m := fun _ _ => false
 
-/-- Circuit depth (simplified model: depth of a 1-bit circuit chain). -/
-def CircuitDepth := Nat
+/-- NOT circuit: negate each bit. -/
+@[simp] def circNot (n : Nat) : Circuit n n := fun inp i => !inp i
 
-/-- NOT circuit on a single bit. -/
-def circNot : Circuit 1 1 := fun x => fun _ => bnot (x ⟨0, Nat.lt.base 0⟩)
+/-- AND circuit: single output AND of two inputs. -/
+@[simp] def circAnd : Circuit 2 1 :=
+  fun inp _ => inp ⟨0, by omega⟩ && inp ⟨1, by omega⟩
 
-/-- AND circuit on two bits. -/
-def circAnd : Circuit 2 1 :=
-  fun x => fun _ => band (x ⟨0, by omega⟩) (x ⟨1, by omega⟩)
+/-- OR circuit: single output OR of two inputs. -/
+@[simp] def circOr : Circuit 2 1 :=
+  fun inp _ => inp ⟨0, by omega⟩ || inp ⟨1, by omega⟩
 
-/-- OR circuit on two bits. -/
-def circOr : Circuit 2 1 :=
-  fun x => fun _ => bor (x ⟨0, by omega⟩) (x ⟨1, by omega⟩)
+/-- XOR circuit. -/
+@[simp] def circXor : Circuit 2 1 :=
+  fun inp _ => xor (inp ⟨0, by omega⟩) (inp ⟨1, by omega⟩)
 
-/-- Fan-out: duplicate a single bit. -/
-def fanOut : Circuit 1 2 :=
-  fun x => fun _ => x ⟨0, Nat.lt.base 0⟩
+/-! ## Circuit depth (path length) -/
 
-/-! ## Theorems -/
+/-- Circuit depth: a measure of the longest path in the circuit DAG.
+    Modeled as a natural number annotation. -/
+structure AnnotatedCircuit (n m : Nat) where
+  circuit : Circuit n m
+  depth : Nat
 
--- 1. NOT is an involution
-theorem bnot_involution (a : BVal) : bnot (bnot a) = a := by
-  cases a <;> rfl
+/-- Sequential composition increases depth additively. -/
+@[simp] def seqComp {a b c : Nat} (f : AnnotatedCircuit a b) (g : AnnotatedCircuit b c) :
+    AnnotatedCircuit a c :=
+  ⟨circComp f.circuit g.circuit, f.depth + g.depth⟩
 
-def bnot_involution_path (a : BVal) :
-    Path (bnot (bnot a)) a :=
-  Path.ofEq (bnot_involution a)
+/-- Parallel composition takes max depth. -/
+def parComp {a b c d : Nat} (f : AnnotatedCircuit a b) (g : AnnotatedCircuit c d) :
+    AnnotatedCircuit (a + c) (b + d) :=
+  ⟨circPar f.circuit g.circuit, max f.depth g.depth⟩
 
--- 2. AND commutativity
-theorem band_comm (a b : BVal) : band a b = band b a := by
-  cases a <;> cases b <;> rfl
+/-! ## Core theorems -/
 
-def band_comm_path (a b : BVal) :
-    Path (band a b) (band b a) :=
-  Path.ofEq (band_comm a b)
+-- 1. Identity circuit is the identity function
+theorem circId_apply (n : Nat) (inp : Fin n → Bool) :
+    circId n inp = inp := by
+  rfl
 
--- 3. OR commutativity
-theorem bor_comm (a b : BVal) : bor a b = bor b a := by
-  cases a <;> cases b <;> rfl
+-- 2. Left identity for composition
+theorem circComp_id_left {n m : Nat} (f : Circuit n m) :
+    circComp (circId n) f = f := by
+  funext inp; simp [Function.comp]
 
-def bor_comm_path (a b : BVal) :
-    Path (bor a b) (bor b a) :=
-  Path.ofEq (bor_comm a b)
+def circComp_id_left_path {n m : Nat} (f : Circuit n m) :
+    Path (circComp (circId n) f) f :=
+  Path.ofEq (circComp_id_left f)
 
--- 4. AND associativity
-theorem band_assoc (a b c : BVal) : band (band a b) c = band a (band b c) := by
-  cases a <;> cases b <;> cases c <;> rfl
+-- 3. Right identity for composition
+theorem circComp_id_right {n m : Nat} (f : Circuit n m) :
+    circComp f (circId m) = f := by
+  funext inp; simp [Function.comp]
 
-def band_assoc_path (a b c : BVal) :
-    Path (band (band a b) c) (band a (band b c)) :=
-  Path.ofEq (band_assoc a b c)
+def circComp_id_right_path {n m : Nat} (f : Circuit n m) :
+    Path (circComp f (circId m)) f :=
+  Path.ofEq (circComp_id_right f)
 
--- 5. OR associativity
-theorem bor_assoc (a b c : BVal) : bor (bor a b) c = bor a (bor b c) := by
-  cases a <;> cases b <;> cases c <;> rfl
+-- 4. Composition associativity
+theorem circComp_assoc {a b c d : Nat}
+    (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) :
+    circComp (circComp f g) h = circComp f (circComp g h) := by
+  funext inp; simp [Function.comp]
 
-def bor_assoc_path (a b c : BVal) :
-    Path (bor (bor a b) c) (bor a (bor b c)) :=
-  Path.ofEq (bor_assoc a b c)
+def circComp_assoc_path {a b c d : Nat}
+    (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) :
+    Path (circComp (circComp f g) h) (circComp f (circComp g h)) :=
+  Path.ofEq (circComp_assoc f g h)
 
--- 6. AND identity (true is identity)
-theorem band_true_right (a : BVal) : band a .btrue = a := by
-  cases a <;> rfl
+-- 5. NOT is an involution
+theorem circNot_involution (n : Nat) :
+    circComp (circNot n) (circNot n) = circId n := by
+  funext inp i; simp [Function.comp, Bool.not_not]
 
-def band_true_right_path (a : BVal) :
-    Path (band a .btrue) a :=
-  Path.ofEq (band_true_right a)
+def circNot_involution_path (n : Nat) :
+    Path (circComp (circNot n) (circNot n)) (circId n) :=
+  Path.ofEq (circNot_involution n)
 
--- 7. OR identity (false is identity)
-theorem bor_false_right (a : BVal) : bor a .bfalse = a := by
-  cases a <;> rfl
+-- 6. Roundtrip path from NOT involution
+def circNot_roundtrip (n : Nat) : Path (circId n) (circId n) :=
+  Path.trans
+    (Path.symm (circNot_involution_path n))
+    (circNot_involution_path n)
 
-def bor_false_right_path (a : BVal) :
-    Path (bor a .bfalse) a :=
-  Path.ofEq (bor_false_right a)
+-- 7. Sequential depth is additive
+theorem seqComp_depth {a b c : Nat}
+    (f : AnnotatedCircuit a b) (g : AnnotatedCircuit b c) :
+    (seqComp f g).depth = f.depth + g.depth := by
+  rfl
 
--- 8. AND annihilator
-theorem band_false_right (a : BVal) : band a .bfalse = .bfalse := by
-  cases a <;> rfl
+-- 8. Parallel depth is max
+theorem parComp_depth {a b c d : Nat}
+    (f : AnnotatedCircuit a b) (g : AnnotatedCircuit c d) :
+    (parComp f g).depth = max f.depth g.depth := by
+  rfl
 
-def band_false_right_path (a : BVal) :
-    Path (band a .bfalse) .bfalse :=
-  Path.ofEq (band_false_right a)
+-- 9. Depth zero circuit is just rewiring
+def depthZeroCirc (n : Nat) : AnnotatedCircuit n n :=
+  ⟨circId n, 0⟩
 
--- 9. OR annihilator
-theorem bor_true_right (a : BVal) : bor a .btrue = .btrue := by
-  cases a <;> rfl
+theorem depthZero_is_id (n : Nat) : (depthZeroCirc n).circuit = circId n := by
+  rfl
 
-def bor_true_right_path (a : BVal) :
-    Path (bor a .btrue) .btrue :=
-  Path.ofEq (bor_true_right a)
+-- 10. Circuit equivalence: two circuits are equivalent if they compute the same function
+def CircEquiv {n m : Nat} (f g : Circuit n m) : Prop :=
+  ∀ inp, f inp = g inp
 
--- 10. De Morgan: NOT (AND) = OR (NOT, NOT)
-theorem de_morgan_and (a b : BVal) :
-    bnot (band a b) = bor (bnot a) (bnot b) := by
-  cases a <;> cases b <;> rfl
+-- 11. CircEquiv is reflexive
+theorem circEquiv_refl {n m : Nat} (f : Circuit n m) : CircEquiv f f :=
+  fun _ => rfl
 
-def de_morgan_and_path (a b : BVal) :
-    Path (bnot (band a b)) (bor (bnot a) (bnot b)) :=
-  Path.ofEq (de_morgan_and a b)
+-- 12. CircEquiv is symmetric
+theorem circEquiv_symm {n m : Nat} {f g : Circuit n m}
+    (h : CircEquiv f g) : CircEquiv g f :=
+  fun inp => (h inp).symm
 
--- 11. De Morgan: NOT (OR) = AND (NOT, NOT)
-theorem de_morgan_or (a b : BVal) :
-    bnot (bor a b) = band (bnot a) (bnot b) := by
-  cases a <;> cases b <;> rfl
+-- 13. CircEquiv is transitive
+theorem circEquiv_trans {n m : Nat} {f g h : Circuit n m}
+    (h₁ : CircEquiv f g) (h₂ : CircEquiv g h) : CircEquiv f h :=
+  fun inp => (h₁ inp).trans (h₂ inp)
 
-def de_morgan_or_path (a b : BVal) :
-    Path (bnot (bor a b)) (band (bnot a) (bnot b)) :=
-  Path.ofEq (de_morgan_or a b)
+-- 14. CircEquiv implies path equality (via funext)
+theorem circEquiv_to_eq {n m : Nat} {f g : Circuit n m}
+    (h : CircEquiv f g) : f = g := by
+  funext inp; exact h inp
 
--- 12. XOR commutativity
-theorem bxor_comm (a b : BVal) : bxor a b = bxor b a := by
-  cases a <;> cases b <;> rfl
+def circEquiv_path {n m : Nat} {f g : Circuit n m}
+    (h : CircEquiv f g) : Path f g :=
+  Path.ofEq (circEquiv_to_eq h)
 
-def bxor_comm_path (a b : BVal) :
-    Path (bxor a b) (bxor b a) :=
-  Path.ofEq (bxor_comm a b)
+-- 15. Composition preserves equivalence (left)
+theorem circComp_equiv_left {a b c : Nat}
+    {f₁ f₂ : Circuit a b} (g : Circuit b c)
+    (h : CircEquiv f₁ f₂) : CircEquiv (circComp f₁ g) (circComp f₂ g) :=
+  fun inp => by simp [circComp, Function.comp, h inp]
 
--- 13. XOR self = false
-theorem bxor_self (a : BVal) : bxor a a = .bfalse := by
-  cases a <;> rfl
+-- 16. Composition preserves equivalence (right)
+theorem circComp_equiv_right {a b c : Nat}
+    (f : Circuit a b) {g₁ g₂ : Circuit b c}
+    (h : CircEquiv g₁ g₂) : CircEquiv (circComp f g₁) (circComp f g₂) :=
+  fun inp => by simp [circComp, Function.comp]; exact h (f inp)
 
-def bxor_self_path (a : BVal) :
-    Path (bxor a a) .bfalse :=
-  Path.ofEq (bxor_self a)
+/-! ## Boolean identities as circuit paths -/
 
--- 14. XOR with false = identity
-theorem bxor_false (a : BVal) : bxor a .bfalse = a := by
-  cases a <;> rfl
+-- 17. AND with true is identity (on single bit)
+theorem and_true_right (x : Bool) : (x && true) = x := by
+  cases x <;> native_decide
 
-def bxor_false_path (a : BVal) :
-    Path (bxor a .bfalse) a :=
-  Path.ofEq (bxor_false a)
+-- 18. AND with false is false
+theorem and_false_right (x : Bool) : (x && false) = false := by
+  cases x <;> native_decide
 
--- 15. Identity circuit is identity
-theorem circId_id {n : Nat} (x : Fin n → BVal) : circId n x = x := by
-  simp [circId]
+-- 19. OR with false is identity
+theorem or_false_right (x : Bool) : x || false = x := by
+  cases x <;> simp
 
-def circId_path {n : Nat} (x : Fin n → BVal) :
-    Path (circId n x) x :=
-  Path.ofEq (circId_id x)
+-- 20. OR with true is true
+theorem or_true_right (x : Bool) : x || true = true := by
+  cases x <;> simp
 
--- 16. Circuit composition with identity (left)
-theorem circComp_id_left {n m : Nat} (c : Circuit n m) (x : Fin n → BVal) :
-    circComp (circId n) c x = c x := by
-  simp [circComp, circId]
+-- 21. De Morgan: NOT (AND) = OR (NOT)
+theorem de_morgan_and (x y : Bool) : !(x && y) = (!x || !y) := by
+  cases x <;> cases y <;> rfl
 
-def circComp_id_left_path {n m : Nat} (c : Circuit n m) (x : Fin n → BVal) :
-    Path (circComp (circId n) c x) (c x) :=
-  Path.ofEq (circComp_id_left c x)
+-- 22. De Morgan: NOT (OR) = AND (NOT)
+theorem de_morgan_or (x y : Bool) : !(x || y) = (!x && !y) := by
+  cases x <;> cases y <;> rfl
 
--- 17. Circuit composition with identity (right)
-theorem circComp_id_right {n m : Nat} (c : Circuit n m) (x : Fin n → BVal) :
-    circComp c (circId m) x = c x := by
-  simp [circComp, circId]
+-- 23. XOR is commutative
+theorem xor_comm (x y : Bool) : xor x y = xor y x := by
+  cases x <;> cases y <;> rfl
 
-def circComp_id_right_path {n m : Nat} (c : Circuit n m) (x : Fin n → BVal) :
-    Path (circComp c (circId m) x) (c x) :=
-  Path.ofEq (circComp_id_right c x)
+-- 24. XOR with false is identity
+theorem xor_false_right (x : Bool) : xor x false = x := by
+  cases x <;> rfl
 
--- 18. Circuit composition associativity
-theorem circComp_assoc {n m p q : Nat}
-    (c₁ : Circuit n m) (c₂ : Circuit m p) (c₃ : Circuit p q)
-    (x : Fin n → BVal) :
-    circComp (circComp c₁ c₂) c₃ x = circComp c₁ (circComp c₂ c₃) x := by
-  simp [circComp]
+-- 25. XOR with self is false
+theorem xor_self (x : Bool) : xor x x = false := by
+  cases x <;> rfl
 
-def circComp_assoc_path {n m p q : Nat}
-    (c₁ : Circuit n m) (c₂ : Circuit m p) (c₃ : Circuit p q)
-    (x : Fin n → BVal) :
-    Path (circComp (circComp c₁ c₂) c₃ x) (circComp c₁ (circComp c₂ c₃) x) :=
-  Path.ofEq (circComp_assoc c₁ c₂ c₃ x)
+/-! ## Path constructions from circuit identities -/
 
--- 19. Double NOT circuit is identity
-theorem circNot_double (x : Fin 1 → BVal) :
-    circComp circNot circNot x = x := by
-  funext i
-  simp [circComp, circNot]
-  have : i = ⟨0, Nat.lt.base 0⟩ := by ext; omega
-  rw [this]
-  exact bnot_involution _
+-- 26. CongrArg for circuit composition
+def circComp_congrArg_left {a b c : Nat} {f₁ f₂ : Circuit a b}
+    (h : Path f₁ f₂) (g : Circuit b c) :
+    Path (circComp f₁ g) (circComp f₂ g) :=
+  Path.congrArg (fun f => circComp f g) h
 
-def circNot_double_path (x : Fin 1 → BVal) :
-    Path (circComp circNot circNot x) x :=
-  Path.ofEq (circNot_double x)
+-- 27. CongrArg in second position
+def circComp_congrArg_right {a b c : Nat}
+    (f : Circuit a b) {g₁ g₂ : Circuit b c}
+    (h : Path g₁ g₂) :
+    Path (circComp f g₁) (circComp f g₂) :=
+  Path.congrArg (circComp f) h
 
--- 20. Constant false circuit absorbs
-theorem circFalse_comp {n m p : Nat} (c : Circuit m p) (x : Fin n → BVal) :
-    circComp (circFalse n m) c x = c (fun _ => .bfalse) := by
-  simp [circComp, circFalse]; rfl
+-- 28. Symm of circuit congruence
+theorem circComp_congrArg_symm {a b c : Nat} {f₁ f₂ : Circuit a b}
+    (h : Path f₁ f₂) (g : Circuit b c) :
+    Path.symm (circComp_congrArg_left h g) = circComp_congrArg_left (Path.symm h) g := by
+  unfold circComp_congrArg_left
+  exact (Path.congrArg_symm _ h).symm
 
-def circFalse_comp_path {n m p : Nat} (c : Circuit m p) (x : Fin n → BVal) :
-    Path (circComp (circFalse n m) c x) (c (fun _ => .bfalse)) :=
-  Path.ofEq (circFalse_comp c x)
+-- 29. Trans of circuit congruences
+theorem circComp_congrArg_trans {a b c : Nat} {f₁ f₂ f₃ : Circuit a b}
+    (h₁ : Path f₁ f₂) (h₂ : Path f₂ f₃) (g : Circuit b c) :
+    Path.trans (circComp_congrArg_left h₁ g) (circComp_congrArg_left h₂ g) =
+    circComp_congrArg_left (Path.trans h₁ h₂) g := by
+  unfold circComp_congrArg_left
+  exact (Path.congrArg_trans _ h₁ h₂).symm
 
--- 21. AND distributes over OR
-theorem band_bor_distrib (a b c : BVal) :
-    band a (bor b c) = bor (band a b) (band a c) := by
-  cases a <;> cases b <;> cases c <;> rfl
+-- 30. Three-circuit composition path
+def three_circuit_path {a b c d : Nat}
+    (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) :
+    Path (circComp (circComp f g) h) (circComp f (circComp g h)) :=
+  circComp_assoc_path f g h
 
-def band_bor_distrib_path (a b c : BVal) :
-    Path (band a (bor b c)) (bor (band a b) (band a c)) :=
-  Path.ofEq (band_bor_distrib a b c)
+/-! ## Circuit coherence -/
 
--- 22. OR distributes over AND
-theorem bor_band_distrib (a b c : BVal) :
-    bor a (band b c) = band (bor a b) (bor a c) := by
-  cases a <;> cases b <;> cases c <;> rfl
+-- 31. Any two proofs of circuit equality agree
+theorem circuit_proof_unique {n m : Nat} {f g : Circuit n m}
+    (h₁ h₂ : f = g) : h₁ = h₂ :=
+  Subsingleton.elim _ _
 
-def bor_band_distrib_path (a b c : BVal) :
-    Path (bor a (band b c)) (band (bor a b) (bor a c)) :=
-  Path.ofEq (bor_band_distrib a b c)
+-- 32. Coherence: two paths between same circuits agree in proof
+theorem circuit_path_coherence {n m : Nat} {f g : Circuit n m}
+    (p q : Path f g) : p.proof = q.proof :=
+  Subsingleton.elim _ _
 
--- 23. Congruence: gate output along input path
-def gate_congrArg (g : BVal → BVal) {a b : BVal} (p : Path a b) :
-    Path (g a) (g b) :=
-  Path.congrArg g p
+-- 33. Four-circuit associativity coherence
+theorem four_circuit_coherence {a b c d e : Nat}
+    (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) (k : Circuit d e) :
+    circComp (circComp (circComp f g) h) k =
+    circComp f (circComp g (circComp h k)) := by
+  funext inp; simp [Function.comp]
 
--- 24. Circuit equivalence via transport
-def circuit_transport {n m : Nat} {c₁ c₂ : Circuit n m}
-    (p : Path c₁ c₂) (x : Fin n → BVal) :
-    Path (c₁ x) (c₂ x) :=
-  Path.congrArg (fun c => c x) p
+-- 34. Step-level construction
+def circuit_step {n m : Nat} (f : Circuit n m) : Step (Circuit n m) :=
+  ⟨f, f, rfl⟩
 
--- 25. NAND is universal: NOT via NAND
-theorem bnand_self_is_not (a : BVal) : bnand a a = bnot a := by
-  cases a <;> rfl
+-- 35. Transport of circuit along a parameter path
+def circuit_transport {A : Type} {a b : A} (f : A → Circuit 2 1) (p : Path a b) :
+    Path (f a) (f b) :=
+  Path.congrArg f p
 
-def bnand_self_is_not_path (a : BVal) :
-    Path (bnand a a) (bnot a) :=
-  Path.ofEq (bnand_self_is_not a)
+/-! ## Depth bounds -/
 
--- 26. Idempotence of AND
-theorem band_idem (a : BVal) : band a a = a := by
-  cases a <;> rfl
+-- 36. Identity has depth 0
+theorem id_depth_zero (n : Nat) : (depthZeroCirc n).depth = 0 := by rfl
 
-def band_idem_path (a : BVal) :
-    Path (band a a) a :=
-  Path.ofEq (band_idem a)
+-- 37. Sequential composition depth bound
+theorem seq_depth_bound {a b c : Nat}
+    (f : AnnotatedCircuit a b) (g : AnnotatedCircuit b c) :
+    (seqComp f g).depth = f.depth + g.depth := by rfl
 
--- 27. Idempotence of OR
-theorem bor_idem (a : BVal) : bor a a = a := by
-  cases a <;> rfl
+-- 38. Sequential composition is associative (on depth)
+theorem seq_depth_assoc {a b c d : Nat}
+    (f : AnnotatedCircuit a b) (g : AnnotatedCircuit b c) (h : AnnotatedCircuit c d) :
+    (seqComp (seqComp f g) h).depth = (seqComp f (seqComp g h)).depth := by
+  simp [Nat.add_assoc]
 
-def bor_idem_path (a : BVal) :
-    Path (bor a a) a :=
-  Path.ofEq (bor_idem a)
+-- 39. CongrArg composition for circuits
+theorem circuit_congrArg_comp {n m k : Nat}
+    (f : Circuit n m → Circuit n k) (g : Circuit n k → Circuit n m)
+    {c₁ c₂ : Circuit n m} (p : Path c₁ c₂) :
+    Path.congrArg (g ∘ f) p = Path.congrArg g (Path.congrArg f p) := by
+  exact Path.congrArg_comp g f p
+
+-- 40. NOT composed with identity path
+def not_id_path (n : Nat) :
+    Path (circComp (circNot n) (circId n)) (circNot n) :=
+  Path.ofEq (circComp_id_right (circNot n))
 
 end ComputationalPaths.Path.Computation.CircuitPaths

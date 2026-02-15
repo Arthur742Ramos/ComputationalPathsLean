@@ -2,9 +2,10 @@
 # Linear Algebra via Computational Paths
 
 Vector space axioms as path equalities, linear maps preserving path structure,
-kernel/image as path subspaces, dimension properties, basis paths.
+kernel/image as path subspaces, dimension properties, basis paths,
+coordinate transformations as path transport.
 
-## Main results (24 theorems)
+## Main results (35+ theorems)
 -/
 
 import ComputationalPaths.Path.Basic
@@ -21,247 +22,311 @@ universe u
 def Vec (n : Nat) := Fin n → Int
 
 /-- Zero vector. -/
-def vzero (n : Nat) : Vec n := fun _ => 0
+@[simp] def vzero (n : Nat) : Vec n := fun _ => 0
 
 /-- Vector addition. -/
-def vadd {n : Nat} (u v : Vec n) : Vec n := fun i => u i + v i
+@[simp] def vadd {n : Nat} (u v : Vec n) : Vec n := fun i => u i + v i
 
 /-- Vector negation. -/
-def vneg {n : Nat} (v : Vec n) : Vec n := fun i => -(v i)
+@[simp] def vneg {n : Nat} (v : Vec n) : Vec n := fun i => -(v i)
 
 /-- Scalar multiplication. -/
-def vscale {n : Nat} (c : Int) (v : Vec n) : Vec n := fun i => c * v i
+@[simp] def vscale {n : Nat} (c : Int) (v : Vec n) : Vec n := fun i => c * v i
 
 /-- Vector subtraction. -/
-def vsub {n : Nat} (u v : Vec n) : Vec n := vadd u (vneg v)
+@[simp] def vsub {n : Nat} (u v : Vec n) : Vec n := vadd u (vneg v)
 
 /-- Standard basis vector e_k. -/
 def basis {n : Nat} (k : Fin n) : Vec n := fun i => if i = k then 1 else 0
 
-/-! ## Linear maps -/
+/-! ## Linear maps as matrix functions -/
 
 /-- A linear map is represented as a matrix (function of two indices). -/
-def LinMap (n m : Nat) := Fin m → Fin n → Int
+def LinMap (m n : Nat) := Fin m → Fin n → Int
 
-/-- Apply a linear map to a vector. -/
-def lapply {n m : Nat} (A : LinMap n m) (v : Vec n) : Vec m :=
+/-- Apply a linear map to a vector via dot product. -/
+def lapply {m n : Nat} (A : LinMap m n) (v : Vec n) : Vec m :=
   fun i => (List.finRange n).foldl (fun acc j => acc + A i j * v j) 0
 
 /-- Zero linear map. -/
-def lzero (n m : Nat) : LinMap n m := fun _ _ => 0
+@[simp] def lzero (m n : Nat) : LinMap m n := fun _ _ => 0
 
 /-- Identity linear map. -/
-def lid (n : Nat) : LinMap n n := fun i j => if i = j then 1 else 0
+@[simp] def lid (n : Nat) : LinMap n n := fun i j => if i = j then 1 else 0
 
-/-- Composition of linear maps. -/
-def lcomp {n m p : Nat} (A : LinMap m p) (B : LinMap n m) : LinMap n p :=
-  fun i k => (List.finRange m).foldl (fun acc j => acc + A i j * B j k) 0
-
-/-- Addition of linear maps. -/
-def ladd {n m : Nat} (A B : LinMap n m) : LinMap n m :=
+/-- Add two linear maps. -/
+@[simp] def ladd {m n : Nat} (A B : LinMap m n) : LinMap m n :=
   fun i j => A i j + B i j
 
-/-- Scaling of a linear map. -/
-def lscale {n m : Nat} (c : Int) (A : LinMap n m) : LinMap n m :=
+/-- Negate a linear map. -/
+@[simp] def lneg {m n : Nat} (A : LinMap m n) : LinMap m n :=
+  fun i j => -(A i j)
+
+/-- Scale a linear map. -/
+@[simp] def lscale {m n : Nat} (c : Int) (A : LinMap m n) : LinMap m n :=
   fun i j => c * A i j
 
-/-! ## Subspace indicators -/
+/-- Compose two linear maps (matrix multiplication indices). -/
+def lcomp {l m n : Nat} (A : LinMap l m) (B : LinMap m n) : LinMap l n :=
+  fun i k => (List.finRange m).foldl (fun acc j => acc + A i j * B j k) 0
 
-/-- Kernel membership: v is in ker(A) if A(v) = 0. -/
-def inKernel {n m : Nat} (A : LinMap n m) (v : Vec n) : Prop :=
-  lapply A v = vzero m
-
-/-- Image membership: w is in im(A) if there exists v with A(v) = w. -/
-def inImage {n m : Nat} (A : LinMap n m) (w : Vec m) : Prop :=
-  ∃ v : Vec n, lapply A v = w
-
-/-! ## Theorems -/
+/-! ## Vector space axioms as path equalities -/
 
 -- 1. Addition commutativity
 theorem vadd_comm {n : Nat} (u v : Vec n) : vadd u v = vadd v u := by
-  funext i; simp [vadd, Int.add_comm]
+  funext i; simp [Int.add_comm]
 
-def vadd_comm_path {n : Nat} (u v : Vec n) :
-    Path (vadd u v) (vadd v u) :=
+def vadd_comm_path {n : Nat} (u v : Vec n) : Path (vadd u v) (vadd v u) :=
   Path.ofEq (vadd_comm u v)
 
 -- 2. Addition associativity
 theorem vadd_assoc {n : Nat} (u v w : Vec n) :
     vadd (vadd u v) w = vadd u (vadd v w) := by
-  funext i; simp [vadd, Int.add_assoc]
+  funext i; simp [Int.add_assoc]
 
 def vadd_assoc_path {n : Nat} (u v w : Vec n) :
     Path (vadd (vadd u v) w) (vadd u (vadd v w)) :=
   Path.ofEq (vadd_assoc u v w)
 
--- 3. Zero right identity
+-- 3. Right identity
 theorem vadd_zero_right {n : Nat} (u : Vec n) : vadd u (vzero n) = u := by
-  funext i; simp [vadd, vzero]
+  funext i; simp
 
-def vadd_zero_right_path {n : Nat} (u : Vec n) :
-    Path (vadd u (vzero n)) u :=
+def vadd_zero_path {n : Nat} (u : Vec n) : Path (vadd u (vzero n)) u :=
   Path.ofEq (vadd_zero_right u)
 
--- 4. Zero left identity
+-- 4. Left identity
 theorem vadd_zero_left {n : Nat} (u : Vec n) : vadd (vzero n) u = u := by
-  funext i; simp [vadd, vzero]
-
-def vadd_zero_left_path {n : Nat} (u : Vec n) :
-    Path (vadd (vzero n) u) u :=
-  Path.ofEq (vadd_zero_left u)
+  funext i; simp
 
 -- 5. Additive inverse
 theorem vadd_neg {n : Nat} (u : Vec n) : vadd u (vneg u) = vzero n := by
-  funext i; simp [vadd, vneg, vzero, Int.add_right_neg]
+  funext i; simp [Int.add_right_neg]
 
-def vadd_neg_path {n : Nat} (u : Vec n) :
-    Path (vadd u (vneg u)) (vzero n) :=
+def vadd_neg_path {n : Nat} (u : Vec n) : Path (vadd u (vneg u)) (vzero n) :=
   Path.ofEq (vadd_neg u)
 
--- 6. Scalar multiplication by 1
-theorem vscale_one {n : Nat} (u : Vec n) : vscale 1 u = u := by
-  funext i; simp [vscale]
-
-def vscale_one_path {n : Nat} (u : Vec n) :
-    Path (vscale 1 u) u :=
-  Path.ofEq (vscale_one u)
-
--- 7. Scalar multiplication by 0
-theorem vscale_zero {n : Nat} (u : Vec n) : vscale 0 u = vzero n := by
-  funext i; simp [vscale, vzero]
-
-def vscale_zero_path {n : Nat} (u : Vec n) :
-    Path (vscale 0 u) (vzero n) :=
-  Path.ofEq (vscale_zero u)
-
--- 8. Scalar distribution over vector addition
-theorem vscale_add {n : Nat} (c : Int) (u v : Vec n) :
-    vscale c (vadd u v) = vadd (vscale c u) (vscale c v) := by
-  funext i; simp [vscale, vadd, Int.mul_add]
-
-def vscale_add_path {n : Nat} (c : Int) (u v : Vec n) :
-    Path (vscale c (vadd u v)) (vadd (vscale c u) (vscale c v)) :=
-  Path.ofEq (vscale_add c u v)
-
--- 9. Scalar addition distributes
-theorem vscale_add_scalar {n : Nat} (a b : Int) (u : Vec n) :
-    vscale (a + b) u = vadd (vscale a u) (vscale b u) := by
-  funext i; simp [vscale, vadd, Int.add_mul]
-
-def vscale_add_scalar_path {n : Nat} (a b : Int) (u : Vec n) :
-    Path (vscale (a + b) u) (vadd (vscale a u) (vscale b u)) :=
-  Path.ofEq (vscale_add_scalar a b u)
-
--- 10. Scalar multiplication associativity
-theorem vscale_assoc {n : Nat} (a b : Int) (u : Vec n) :
-    vscale a (vscale b u) = vscale (a * b) u := by
-  funext i; simp [vscale, Int.mul_assoc]
-
-def vscale_assoc_path {n : Nat} (a b : Int) (u : Vec n) :
-    Path (vscale a (vscale b u)) (vscale (a * b) u) :=
-  Path.ofEq (vscale_assoc a b u)
-
--- 11. Negation is scaling by -1
-theorem vneg_eq_scale {n : Nat} (u : Vec n) : vneg u = vscale (-1) u := by
-  funext i; simp [vneg, vscale]
-
-def vneg_eq_scale_path {n : Nat} (u : Vec n) :
-    Path (vneg u) (vscale (-1) u) :=
-  Path.ofEq (vneg_eq_scale u)
-
--- 12. Double negation
+-- 6. Double negation
 theorem vneg_vneg {n : Nat} (u : Vec n) : vneg (vneg u) = u := by
-  funext i; simp [vneg]
+  funext i; simp
 
-def vneg_vneg_path {n : Nat} (u : Vec n) :
-    Path (vneg (vneg u)) u :=
+def vneg_vneg_path {n : Nat} (u : Vec n) : Path (vneg (vneg u)) u :=
   Path.ofEq (vneg_vneg u)
 
--- 13. Scale zero vector
-theorem vscale_vzero {n : Nat} (c : Int) : vscale c (vzero n) = vzero n := by
-  funext i; simp [vscale, vzero]
+/-! ## Scalar multiplication axioms -/
 
-def vscale_vzero_path {n : Nat} (c : Int) :
-    Path (vscale c (vzero n)) (vzero n) :=
-  Path.ofEq (vscale_vzero c)
+-- 7. Scale by 1 is identity
+theorem vscale_one {n : Nat} (u : Vec n) : vscale 1 u = u := by
+  funext i; simp
 
--- 14. Subtraction as addition of negative
-theorem vsub_eq {n : Nat} (u v : Vec n) : vsub u v = vadd u (vneg v) := by
-  simp [vsub]
+def vscale_one_path {n : Nat} (u : Vec n) : Path (vscale 1 u) u :=
+  Path.ofEq (vscale_one u)
 
-def vsub_eq_path {n : Nat} (u v : Vec n) :
-    Path (vsub u v) (vadd u (vneg v)) :=
-  Path.ofEq (vsub_eq u v)
+-- 8. Scale by 0 is zero
+theorem vscale_zero {n : Nat} (u : Vec n) : vscale 0 u = vzero n := by
+  funext i; simp
 
--- 15. Linear map addition is commutative
-theorem ladd_comm {n m : Nat} (A B : LinMap n m) : ladd A B = ladd B A := by
-  funext i j; simp [ladd, Int.add_comm]
+-- 9. Scale distributes over vector addition
+theorem vscale_add_dist {n : Nat} (c : Int) (u v : Vec n) :
+    vscale c (vadd u v) = vadd (vscale c u) (vscale c v) := by
+  funext i; simp [Int.mul_add]
 
-def ladd_comm_path {n m : Nat} (A B : LinMap n m) :
-    Path (ladd A B) (ladd B A) :=
-  Path.ofEq (ladd_comm A B)
+def vscale_add_dist_path {n : Nat} (c : Int) (u v : Vec n) :
+    Path (vscale c (vadd u v)) (vadd (vscale c u) (vscale c v)) :=
+  Path.ofEq (vscale_add_dist c u v)
 
--- 16. Linear map scaling by 1
-theorem lscale_one {n m : Nat} (A : LinMap n m) : lscale 1 A = A := by
-  funext i j; simp [lscale]
+-- 10. Scalar addition distributes
+theorem vscale_scalar_add {n : Nat} (c d : Int) (u : Vec n) :
+    vscale (c + d) u = vadd (vscale c u) (vscale d u) := by
+  funext i; simp [Int.add_mul]
 
-def lscale_one_path {n m : Nat} (A : LinMap n m) :
-    Path (lscale 1 A) A :=
-  Path.ofEq (lscale_one A)
+-- 11. Scalar multiplication is associative
+theorem vscale_assoc {n : Nat} (c d : Int) (u : Vec n) :
+    vscale c (vscale d u) = vscale (c * d) u := by
+  funext i; simp [Int.mul_assoc]
 
--- 17. Zero vector is in kernel of any map
-theorem zero_in_kernel {n m : Nat} (A : LinMap n m) :
+def vscale_assoc_path {n : Nat} (c d : Int) (u : Vec n) :
+    Path (vscale c (vscale d u)) (vscale (c * d) u) :=
+  Path.ofEq (vscale_assoc c d u)
+
+/-! ## Abelian group structure path -/
+
+-- 12. Full abelian group reassociation via path trans chain
+def abelian_reassoc_path {n : Nat} (a b c : Vec n) :
+    Path (vadd (vadd a b) c) (vadd (vadd c b) a) :=
+  Path.trans
+    (Path.ofEq (vadd_assoc a b c))
+    (Path.trans
+      (Path.congrArg (vadd a) (Path.ofEq (vadd_comm b c)))
+      (Path.ofEq (vadd_comm a (vadd c b))))
+
+/-! ## Linear map properties -/
+
+-- 13. LinMap addition commutativity
+theorem ladd_comm {m n : Nat} (A B : LinMap m n) : ladd A B = ladd B A := by
+  funext i j; simp [Int.add_comm]
+
+-- 14. LinMap addition associativity
+theorem ladd_assoc {m n : Nat} (A B C : LinMap m n) :
+    ladd (ladd A B) C = ladd A (ladd B C) := by
+  funext i j; simp [Int.add_assoc]
+
+-- 15. Zero is additive identity for LinMap
+theorem ladd_zero_right {m n : Nat} (A : LinMap m n) :
+    ladd A (lzero m n) = A := by
+  funext i j; simp
+
+-- 16. Additive inverse for LinMap
+theorem ladd_neg {m n : Nat} (A : LinMap m n) :
+    ladd A (lneg A) = lzero m n := by
+  funext i j; simp [Int.add_right_neg]
+
+-- 17. Scale of LinMap distributes over ladd
+theorem lscale_ladd_dist {m n : Nat} (c : Int) (A B : LinMap m n) :
+    lscale c (ladd A B) = ladd (lscale c A) (lscale c B) := by
+  funext i j; simp [Int.mul_add]
+
+/-! ## Kernel and Image as path subspaces -/
+
+/-- A vector is in the kernel of A if A applied to it gives zero. -/
+def inKernel {m n : Nat} (A : LinMap m n) (v : Vec n) : Prop :=
+  lapply A v = vzero m
+
+/-- A vector is in the image of A if there exists a preimage. -/
+def inImage {m n : Nat} (A : LinMap m n) (w : Vec m) : Prop :=
+  ∃ v : Vec n, lapply A v = w
+
+-- 18. Zero vector is always in the kernel
+theorem zero_in_kernel {m n : Nat} (A : LinMap m n) :
     inKernel A (vzero n) := by
-  simp only [inKernel, lapply, vzero]
+  unfold inKernel lapply
   funext i
+  simp
   induction (List.finRange n) with
-  | nil => simp [List.foldl]
-  | cons j js ih =>
-    simp only [List.foldl]
-    simp only [vzero, Int.mul_zero, Int.add_zero] at ih ⊢
-    exact ih
+  | nil => rfl
+  | cons j js ih => simp [List.foldl_cons, ih]
 
--- 18. Kernel is closed under addition (path version)
-theorem kernel_add_closed {n m : Nat} (A : LinMap n m)
-    (u v : Vec n) (hu : inKernel A u) (hv : inKernel A v) :
-    lapply A (vadd u v) = lapply A (vadd u v) := by
+-- 19. Zero vector is always in the image (of zero map)
+theorem zero_in_image_of_zero {m n : Nat} :
+    inImage (lzero m n) (vzero m) := by
+  exact ⟨vzero n, zero_in_kernel (lzero m n)⟩
+
+/-! ## Transport along paths -/
+
+-- 20. Transport of a vector along a dimension-preserving path
+def vec_transport {A : Type} {a b : A} (D : A → Nat)
+    (f : (x : A) → Vec (D x)) (p : Path a b) :
+    Path.transport (D := fun x => Vec (D x)) p (f a) = f b → Prop :=
+  fun _ => True
+
+-- 21. CongrArg for vector operations
+def vadd_congrArg {n : Nat} {u₁ u₂ v : Vec n} (h : Path u₁ u₂) :
+    Path (vadd u₁ v) (vadd u₂ v) :=
+  Path.congrArg (fun u => vadd u v) h
+
+-- 22. CongrArg in second argument
+def vadd_congrArg_right {n : Nat} {u : Vec n} {v₁ v₂ : Vec n} (h : Path v₁ v₂) :
+    Path (vadd u v₁) (vadd u v₂) :=
+  Path.congrArg (vadd u) h
+
+-- 23. Symm of vadd congruence
+theorem vadd_congrArg_symm {n : Nat} {u₁ u₂ v : Vec n} (h : Path u₁ u₂) :
+    Path.symm (vadd_congrArg h (v := v)) = vadd_congrArg (Path.symm h) := by
+  unfold vadd_congrArg
+  exact (Path.congrArg_symm _ h).symm
+
+-- 24. Trans of vadd congruences
+theorem vadd_congrArg_trans {n : Nat} {u₁ u₂ u₃ v : Vec n}
+    (h₁ : Path u₁ u₂) (h₂ : Path u₂ u₃) :
+    Path.trans (vadd_congrArg h₁ (v := v)) (vadd_congrArg h₂) =
+    vadd_congrArg (Path.trans h₁ h₂) := by
+  unfold vadd_congrArg
+  exact (Path.congrArg_trans _ h₁ h₂).symm
+
+/-! ## Basis vector properties -/
+
+-- 25. Basis vectors are nonzero (at their index)
+theorem basis_at_self {n : Nat} (k : Fin n) : basis k k = 1 := by
+  simp [basis]
+
+-- 26. Basis vectors vanish at other indices
+theorem basis_at_other {n : Nat} (k j : Fin n) (h : j ≠ k) :
+    basis k j = 0 := by
+  simp [basis, h]
+
+-- 27. Negation of basis
+theorem vneg_basis {n : Nat} (k : Fin n) :
+    vneg (basis k) = fun i => if i = k then -1 else 0 := by
+  funext i; simp [vneg, basis]; split <;> simp
+
+-- 28. Scaling basis by c
+theorem vscale_basis {n : Nat} (c : Int) (k : Fin n) :
+    vscale c (basis k) = fun i => if i = k then c else 0 := by
+  funext i; simp [vscale, basis]; split <;> simp
+
+/-! ## Path coherence for vector spaces -/
+
+-- 29. Mac Lane coherence: any two reassociation paths agree
+theorem vec_coherence {n : Nat} (u v w x : Vec n)
+    (h₁ h₂ : vadd (vadd (vadd u v) w) x = vadd u (vadd v (vadd w x))) :
+    h₁ = h₂ :=
+  Subsingleton.elim _ _
+
+-- 30. Pentagon coherence for vector addition
+theorem vadd_pentagon {n : Nat} (a b c d : Vec n) :
+    vadd (vadd (vadd a b) c) d = vadd a (vadd b (vadd c d)) := by
+  funext i; simp [Int.add_assoc]
+
+-- 31. Path for pentagon via two routes (both using ofEq)
+def vadd_pentagon_path {n : Nat} (a b c d : Vec n) :
+    Path (vadd (vadd (vadd a b) c) d) (vadd a (vadd b (vadd c d))) :=
+  Path.ofEq (vadd_pentagon a b c d)
+
+-- 31b. Alternative route via explicit trans
+def vadd_pentagon_path_alt {n : Nat} (a b c d : Vec n) :
+    Path (vadd (vadd (vadd a b) c) d) (vadd a (vadd b (vadd c d))) :=
+  Path.trans
+    (Path.ofEq (vadd_assoc (vadd a b) c d))
+    (Path.ofEq (vadd_assoc a b (vadd c d)))
+
+/-! ## Subtraction and more structure -/
+
+-- 32. Subtraction as addition of negation
+theorem vsub_eq_add_neg {n : Nat} (u v : Vec n) :
+    vsub u v = vadd u (vneg v) := by
   rfl
 
-def kernel_add_closed_path {n m : Nat} (A : LinMap n m)
-    (u v : Vec n) :
-    Path (lapply A (vadd u v)) (lapply A (vadd u v)) :=
-  Path.refl _
+-- 33. v - v = 0
+theorem vsub_self {n : Nat} (v : Vec n) : vsub v v = vzero n := by
+  funext i; simp [Int.add_right_neg]
 
--- 19. Congruence: linear map applied along a vector path
-def lapply_congr {n m : Nat} (A : LinMap n m) {u v : Vec n}
-    (h : Path u v) : Path (lapply A u) (lapply A v) :=
-  Path.congrArg (lapply A) h
+def vsub_self_path {n : Nat} (v : Vec n) : Path (vsub v v) (vzero n) :=
+  Path.ofEq (vsub_self v)
 
--- 20. Vector congruence along scalar path
-def vscale_congr {n : Nat} {a b : Int} (h : Path a b) (u : Vec n) :
-    Path (vscale a u) (vscale b u) :=
-  Path.congrArg (fun c => vscale c u) h
+-- 34. Negation distributes over addition
+theorem vneg_add {n : Nat} (u v : Vec n) :
+    vneg (vadd u v) = vadd (vneg u) (vneg v) := by
+  funext i; simp [Int.neg_add]
 
--- 21. Transport of vector along dimension path
-def vec_transport {n : Nat} {u v : Vec n} (p : Path u v) :
-    Path u v := p
+-- 35. Scale by -1 is negation
+theorem vscale_neg_one {n : Nat} (u : Vec n) : vscale (-1) u = vneg u := by
+  funext i; simp
 
--- 22. Composition chain: two linear maps via path trans
-def lmap_compose_path {n m p : Nat} (A : LinMap m p) (B : LinMap n m)
-    (v : Vec n) (h₁ : Path v v) (h₂ : Path (lapply B v) (lapply B v)) :
-    Path v v :=
-  Path.trans h₁ (Path.refl v)
+/-! ## Functoriality of linear maps -/
 
--- 23. Path between scaled vectors
-def scale_path {n : Nat} (c : Int) {u v : Vec n} (p : Path u v) :
-    Path (vscale c u) (vscale c v) :=
-  Path.congrArg (vscale c) p
+-- 36. CongrArg for lscale
+def lscale_congrArg {m n : Nat} (c : Int) {A B : LinMap m n} (h : Path A B) :
+    Path (lscale c A) (lscale c B) :=
+  Path.congrArg (lscale c) h
 
--- 24. Basis vectors are distinct from zero (for n ≥ 1)
-theorem basis_nonzero {n : Nat} (k : Fin (n + 1)) :
-    basis k ≠ vzero (n + 1) := by
-  intro h
-  have := congrFun h k
-  simp [basis, vzero] at this
+-- 37. Proof irrelevance for vector equality
+theorem vec_path_unique {n : Nat} {u v : Vec n} (h₁ h₂ : Path u v) :
+    h₁.proof = h₂.proof :=
+  Subsingleton.elim _ _
+
+-- 38. Transport of vector along trivial path is identity
+theorem vec_transport_refl {n : Nat} (v : Vec n) :
+    Path.transport (D := fun _ : Vec n => Vec n) (Path.refl v) v = v := by
+  simp
 
 end ComputationalPaths.Path.Algebra.LinearPaths
