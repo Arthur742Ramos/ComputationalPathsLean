@@ -130,13 +130,12 @@ def EnrFunctor.ofCongrArg {B : Type u} (f : A → B) : EnrFunctor A B where
   obj := f
   map := fun p => Path.congrArg f p
   map_id := fun a => by simp [enrId, Path.congrArg]
-  map_comp := fun p q => by simp [enrComp, Path.congrArg_trans]
+  map_comp := fun p q => by simp [enrComp]
 
 /-- The enriched functor from congrArg preserves identity. -/
-theorem EnrFunctor.ofCongrArg_id :
-    (EnrFunctor.ofCongrArg (fun a : A => a)).map = fun {a b : A} (p : EnrHom A a b) => p := by
-  funext a b p
-  simp [EnrFunctor.ofCongrArg, Path.congrArg_id]
+theorem EnrFunctor.ofCongrArg_id_map (p : EnrHom A a b) :
+    (EnrFunctor.ofCongrArg (fun a : A => a)).map p = p := by
+  simp [EnrFunctor.ofCongrArg]
 
 /-! ## Enriched natural transformations -/
 
@@ -156,10 +155,13 @@ def EnrNatTrans.vcomp {B : Type u} {F G H : EnrFunctor A B}
     (α : EnrNatTrans F G) (β : EnrNatTrans G H) : EnrNatTrans F H where
   component := fun a => enrComp (α.component a) (β.component a)
   naturality := fun {a b} p => by
-    simp only [enrComp]
-    rw [Path.trans_assoc, α.naturality p]
-    rw [← Path.trans_assoc, β.naturality p]
-    rw [Path.trans_assoc]
+    have hα := α.naturality p
+    have hβ := β.naturality p
+    simp only [enrComp] at *
+    rw [← Path.trans_assoc]
+    rw [hα]
+    rw [Path.trans_assoc, hβ]
+    rw [← Path.trans_assoc]
 
 /-- The identity enriched natural transformation is a left identity for vcomp. -/
 theorem EnrNatTrans.vcomp_id_left {B : Type u} {F G : EnrFunctor A B}
