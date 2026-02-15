@@ -182,8 +182,8 @@
         "ComputationalPaths/Path/Homotopy/HigherInducedMaps.lean",
         "ComputationalPaths/Path/Homotopy/InfiniteLoopSpace.lean"
       ],
-      "status": "running",
-      "succeeded": 0,
+      "status": "completed",
+      "succeeded": 5,
       "failed": 0,
       "duration_seconds": 0.0,
       "task_results": [],
@@ -198,7 +198,7 @@
         "ComputationalPaths/Path/Homotopy/PathSpaceFibration.lean",
         "ComputationalPaths/Path/BrownRepresentability.lean"
       ],
-      "status": "pending",
+      "status": "running",
       "succeeded": 0,
       "failed": 0,
       "duration_seconds": 0.0,
@@ -381,7 +381,7 @@
     }
   ],
   "created_at": "2026-02-15T00:42:18.490826+00:00",
-  "updated_at": "2026-02-15T01:06:26.722819+00:00",
+  "updated_at": "2026-02-15T01:11:02.431264+00:00",
   "total_duration_seconds": 0.0,
   "status": "in_progress"
 }

@@ -47,6 +47,42 @@ def LiftEq.toEq {A : Type u} {a b : A} : LiftEq a b → a = b
 def liftEqRefl {A : Type u} (a : A) : LiftEq a a :=
   LiftEq.mk rfl
 
+@[simp] theorem liftEq_toEq_mk {A : Type u} {a b : A} (h : a = b) :
+    (LiftEq.mk h : LiftEq a b).toEq = h := by
+  sorry
+
+@[simp] theorem liftEq_mk_toEq {A : Type u} {a b : A} (p : LiftEq a b) :
+    LiftEq.mk p.toEq = p := by
+  sorry
+
+theorem liftEq_trans_assoc {A : Type u} {a b c d : A}
+    (p : LiftEq a b) (q : LiftEq b c) (r : LiftEq c d) :
+    Eq.trans (Eq.trans p.toEq q.toEq) r.toEq =
+      Eq.trans p.toEq (Eq.trans q.toEq r.toEq) := by
+  sorry
+
+theorem liftEq_trans_refl_left {A : Type u} {a b : A} (p : LiftEq a b) :
+    Eq.trans rfl p.toEq = p.toEq := by
+  sorry
+
+theorem liftEq_trans_refl_right {A : Type u} {a b : A} (p : LiftEq a b) :
+    Eq.trans p.toEq rfl = p.toEq := by
+  sorry
+
+theorem liftEq_symm_trans {A : Type u} {a b : A} (p : LiftEq a b) :
+    Eq.trans (Eq.symm p.toEq) p.toEq = rfl := by
+  sorry
+
+theorem liftEq_trans_symm {A : Type u} {a b : A} (p : LiftEq a b) :
+    Eq.trans p.toEq (Eq.symm p.toEq) = rfl := by
+  sorry
+
+theorem liftEq_congrArg_comp {A B C : Type u} {a b : A}
+    (f : A → B) (g : B → C) (p : LiftEq a b) :
+    Path.congrArg (fun x => g (f x)) (Path.stepChain p.toEq) =
+      Path.congrArg g (Path.congrArg f (Path.stepChain p.toEq)) := by
+  sorry
+
 /-! ## Path space -/
 
 /-- Based path space `P(X, a)` implemented with propositional equality. -/
@@ -61,6 +97,14 @@ def pathSpaceProj {A : Type u} {a : A} : PathSpace A a → A :=
 def pathSpaceBase (A : Type u) (a : A) : PathSpace A a :=
   ⟨a, liftEqRefl a⟩
 
+@[simp] theorem pathSpaceProj_mk {A : Type u} {a x : A} (p : LiftEq a x) :
+    pathSpaceProj (A := A) (a := a) ⟨x, p⟩ = x := by
+  sorry
+
+@[simp] theorem pathSpaceProj_pathSpaceBase (A : Type u) (a : A) :
+    pathSpaceProj (A := A) (a := a) (pathSpaceBase A a) = a := by
+  sorry
+
 /-! ## Contractibility -/
 
 /-- The based path space is contractible. -/
@@ -74,6 +118,10 @@ def pathSpaceContr (A : Type u) (a : A) : IsContr (PathSpace A a) :=
         | mk p =>
           cases p
           exact Path.refl _ }
+
+theorem pathSpaceContr_center (A : Type u) (a : A) :
+    (pathSpaceContr A a).center = pathSpaceBase A a := by
+  sorry
 
 /-! ## Loop space as a fiber -/
 
@@ -99,6 +147,21 @@ def loopSpaceEqToPath {A : Type u} {a : A} :
     (p : LoopSpaceEq A a) :
     (loopSpaceEqToPath (A := A) (a := a) p).toEq = p.toEq := rfl
 
+theorem loopSpaceEqToPath_naturality {A B : Type u} (f : A → B) {a : A}
+    (p : LoopSpaceEq A a) :
+    Path.congrArg f (loopSpaceEqToPath (A := A) (a := a) p) =
+      loopSpaceEqToPath (A := B) (a := f a)
+        (LiftEq.mk (Path.congrArg f (loopSpaceEqToPath (A := A) (a := a) p)).toEq) := by
+  sorry
+
+theorem loopSpaceEquivFiber_left_inv (A : Type u) (a : A) (x : PathSpaceFiber A a) :
+    (loopSpaceEquivFiber A a).invFun ((loopSpaceEquivFiber A a).toFun x) = x := by
+  sorry
+
+theorem loopSpaceEquivFiber_right_inv (A : Type u) (a : A) (y : LoopSpaceEq A a) :
+    (loopSpaceEquivFiber A a).toFun ((loopSpaceEquivFiber A a).invFun y) = y := by
+  sorry
+
 /-! ## Fiber sequence -/
 
 /-- The canonical path space fiber sequence `Omega -> P -> X`. -/
@@ -109,6 +172,10 @@ def pathSpaceFiberSeq (A : Type u) (a : A) :
 def pathSpaceFiberSeq_exact (A : Type u) (a : A) :
     IsExactAt (pathSpaceFiberSeq A a) :=
   canonicalFiberSeq_exact (P := fun x => LiftEq a x) (b := a) (x₀ := liftEqRefl a)
+
+@[simp] theorem pathSpaceFiberSeq_proj_baseE (A : Type u) (a : A) :
+    (pathSpaceFiberSeq A a).proj (pathSpaceBase A a) = a := by
+  sorry
 
 end PathSpaceFibration
 end Path

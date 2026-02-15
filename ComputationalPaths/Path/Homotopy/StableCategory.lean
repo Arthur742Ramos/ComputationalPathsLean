@@ -67,6 +67,21 @@ theorem ShiftFunctor.iterate_one {C : PreAdditiveCategory.{u}}
     (T : ShiftFunctor C) (X : C.Obj) :
     T.iterate 1 X = T.shiftObj X := rfl
 
+theorem ShiftFunctor.iterate_succ {C : PreAdditiveCategory.{u}}
+    (T : ShiftFunctor C) (n : Nat) (X : C.Obj) :
+    T.iterate (n + 1) X = T.shiftObj (T.iterate n X) := by
+  sorry
+
+theorem ShiftFunctor.iterate_two {C : PreAdditiveCategory.{u}}
+    (T : ShiftFunctor C) (X : C.Obj) :
+    T.iterate 2 X = T.shiftObj (T.shiftObj X) := by
+  sorry
+
+theorem ShiftFunctor.iterate_three {C : PreAdditiveCategory.{u}}
+    (T : ShiftFunctor C) (X : C.Obj) :
+    T.iterate 3 X = T.shiftObj (T.shiftObj (T.shiftObj X)) := by
+  sorry
+
 /-! ## Triangles -/
 
 /-- A triangle X → Y → Z → T(X) in a pre-additive category with shift. -/
@@ -114,6 +129,36 @@ def Triangle.rotate {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
   f := Tr.g
   g := Tr.h
   h := negShiftF
+
+theorem Triangle.rotate_X {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
+    (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
+    (Tr.rotate negShiftF).X = Tr.Y := by
+  sorry
+
+theorem Triangle.rotate_Y {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
+    (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
+    (Tr.rotate negShiftF).Y = Tr.Z := by
+  sorry
+
+theorem Triangle.rotate_Z {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
+    (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
+    (Tr.rotate negShiftF).Z = T.shiftObj Tr.X := by
+  sorry
+
+theorem Triangle.rotate_f {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
+    (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
+    (Tr.rotate negShiftF).f = Tr.g := by
+  sorry
+
+theorem Triangle.rotate_g {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
+    (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
+    (Tr.rotate negShiftF).g = Tr.h := by
+  sorry
+
+theorem Triangle.rotate_h {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
+    (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
+    (Tr.rotate negShiftF).h = negShiftF := by
+  sorry
 
 /-! ## Triangulated category -/
 
@@ -179,6 +224,15 @@ def ExactFunctor.id (TC : TriangulatedCategory.{u}) : ExactFunctor TC TC where
   map_comp := fun _ _ => rfl
   shift_comm := fun _ => rfl
 
+theorem ExactFunctor.id_mapObj (TC : TriangulatedCategory.{u}) (X : TC.cat.Obj) :
+    (ExactFunctor.id TC).mapObj X = X := by
+  sorry
+
+theorem ExactFunctor.id_mapHom (TC : TriangulatedCategory.{u}) {X Y : TC.cat.Obj}
+    (f : TC.cat.Hom X Y) :
+    (ExactFunctor.id TC).mapHom f = f := by
+  sorry
+
 /-- A stable equivalence. -/
 structure StableEquivalence (TC₁ TC₂ : TriangulatedCategory.{u}) where
   forward : ExactFunctor TC₁ TC₂
@@ -195,6 +249,14 @@ def StableEquivalence.refl (TC : TriangulatedCategory.{u}) :
   backward := ExactFunctor.id TC
   unit_obj := fun _ => rfl
   counit_obj := fun _ => rfl
+
+theorem StableEquivalence.refl_forward (TC : TriangulatedCategory.{u}) :
+    (StableEquivalence.refl TC).forward = ExactFunctor.id TC := by
+  sorry
+
+theorem StableEquivalence.refl_backward (TC : TriangulatedCategory.{u}) :
+    (StableEquivalence.refl TC).backward = ExactFunctor.id TC := by
+  sorry
 
 /-! ## Zero object -/
 
@@ -215,6 +277,16 @@ def periodicLES {TC : TriangulatedCategory.{u}} (Tr : Triangle TC.cat TC.shift) 
   | 1 => Tr.Y
   | 2 => Tr.Z
   | n + 3 => TC.shift.shiftObj (periodicLES Tr n)
+
+theorem periodicLES_three {TC : TriangulatedCategory.{u}}
+    (Tr : Triangle TC.cat TC.shift) :
+    periodicLES Tr 3 = TC.shift.shiftObj Tr.X := by
+  sorry
+
+theorem periodicLES_four {TC : TriangulatedCategory.{u}}
+    (Tr : Triangle TC.cat TC.shift) :
+    periodicLES Tr 4 = TC.shift.shiftObj Tr.Y := by
+  sorry
 
 /-- Long exact sequence data from a distinguished triangle. -/
 structure LongExactFromTriangle (TC : TriangulatedCategory.{u})
