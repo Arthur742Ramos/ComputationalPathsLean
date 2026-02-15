@@ -72,13 +72,12 @@ variable {F G : PathFunctor A}
 /-- From the left triangle, extract toEq = rfl. -/
 theorem counit_after_Funit_toEq (adj : PathAdjunction F G) (a : A) :
     (Path.trans (F.map (adj.unit a)) (adj.counit (F.obj a))).toEq = rfl := by
-  rw [adj.triangle_left a]; rfl
+  rw [adj.triangle_left a]
 
 /-- From the right triangle, extract toEq = rfl. -/
 theorem Gcounit_after_unit_toEq (adj : PathAdjunction F G) (a : A) :
     (Path.trans (adj.unit (G.obj a)) (G.map (adj.counit a))).toEq = rfl := by
-  have h := adj.triangle_right a
-  simp [h]
+  rw [adj.triangle_right a]
 
 /-- The unit is a section: composing with G applied to the left triangle yields refl.
     Multi-step via G.map_comp, triangle_left, G.map_id. -/
@@ -162,12 +161,12 @@ theorem transport_counit_roundtrip (e : AdjointEquiv F G)
     Multi-step: extract from unit_section. -/
 theorem GF_id_toEq (e : AdjointEquiv F G) (a : A) :
     (Path.trans (e.unit a) (e.unit_inv a)).toEq = rfl := by
-  have h := e.unit_section a; simp [h]
+  rw [e.unit_section a]
 
 /-- FG acts as identity on toEq via counit. -/
 theorem FG_id_toEq (e : AdjointEquiv F G) (a : A) :
     (Path.trans (e.counit_inv a) (e.counit a)).toEq = rfl := by
-  have h := e.counit_retraction a; simp [h]
+  rw [e.counit_retraction a]
 
 end AdjointEquiv
 
@@ -293,13 +292,13 @@ def homBijBwd {F G : PathFunctor A} (adj : PathAdjunction F G)
 theorem homBij_roundtrip_left_toEq {F G : PathFunctor A} (adj : PathAdjunction F G)
     {a b : A} (f : Path (F.obj a) b) :
     (homBijBwd adj (homBijFwd adj f)).toEq = f.toEq := by
-  simp [homBijFwd, homBijBwd]
+  unfold homBijBwd homBijFwd; simp
 
 /-- Round-trip fwd ∘ bwd on toEq level. -/
 theorem homBij_roundtrip_right_toEq {F G : PathFunctor A} (adj : PathAdjunction F G)
     {a b : A} (g : Path a (G.obj b)) :
     (homBijFwd adj (homBijBwd adj g)).toEq = g.toEq := by
-  simp [homBijFwd, homBijBwd]
+  unfold homBijFwd homBijBwd; simp
 
 /-! ## Transport along adjunction data -/
 
