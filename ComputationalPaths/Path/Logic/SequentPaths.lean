@@ -23,7 +23,7 @@ and the sub-formula property.
 - Girard, "Proofs and Types"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths
 namespace Path

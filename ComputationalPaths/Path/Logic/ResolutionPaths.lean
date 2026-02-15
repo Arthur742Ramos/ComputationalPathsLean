@@ -24,7 +24,7 @@ and completeness as path existence.
 - Leitsch, "The Resolution Calculus"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths
 namespace Path

@@ -152,7 +152,7 @@ theorem transport_symm_cancel' {D : A → Sort v}
 
 /-- A property of paths that depends only on the proof field: if it holds
 for the proof of `p`, it holds for `p`. -/
-theorem proof_based_ind {P : (a = b) → Prop}
+theorem proof_based_ind (p : Path a b) {P : (a = b) → Prop}
     (h : P p.proof) (q : Path a b) : P q.proof := by
   have : p.proof = q.proof := Subsingleton.elim _ _
   rwa [← this]

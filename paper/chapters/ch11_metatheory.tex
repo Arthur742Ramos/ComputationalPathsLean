@@ -454,6 +454,253 @@ the identity types of Homotopy Type Theory.
   the propositional level.
 \end{remark}
 
+\section{The J-Eliminator Derived from Contractibility}
+\label{sec:j-derivation}
+
+A central result of Homotopy Type Theory is the \emph{J-eliminator}
+(path induction), which states that in order to prove a property of all
+identity proofs $p : a =_A b$, it suffices to consider the reflexivity
+case $\refl_a : a =_A a$. In most presentations of HoTT, the
+J-eliminator is taken as a primitive axiom or inference rule. In our
+framework, J is \emph{derived as a theorem} from the contractibility of
+the based path space. This section presents the derivation in detail and
+develops its consequences.
+
+\subsection{Based Path Space Contractibility}
+
+\begin{definition}[Based Path Space]\label{def:based-path-space}
+  For $a : A$, the \emph{based path space} at $a$ is
+  \[
+    \mathrm{BasedPathSpace}(a) \;:=\; \Sigma_{y : A}\, \mathrm{PLift}(a =_A y),
+  \]
+  with \emph{center} $\mathrm{center}(a) := (a, \mathrm{PLift.up}(\refl_a))$.
+\end{definition}
+
+\begin{theorem}[Contractibility]\label{thm:based-contr}
+  For every $a : A$, the based path space $\mathrm{BasedPathSpace}(a)$ is
+  contractible: every element equals the center.
+  \[
+    \forall\, bp : \mathrm{BasedPathSpace}(a),\quad bp = \mathrm{center}(a).
+  \]
+  In particular, $\mathrm{BasedPathSpace}(a)$ is a \emph{subsingleton}.
+\end{theorem}
+
+\begin{proof}
+  Let $bp = (y, \mathrm{PLift.up}(h))$ where $h : a =_A y$. By cases on
+  $h$: when $h$ is $\refl_a$, we have $bp = (a, \mathrm{PLift.up}(\refl_a))
+  = \mathrm{center}(a)$ definitionally.
+\end{proof}
+
+\subsection{Derivation of J}
+
+\begin{theorem}[J-Eliminator from Contractibility]\label{thm:j-from-contr}
+  Given:
+  \begin{itemize}
+    \item A motive $C : (y : A) \to a =_A y \to \Sort_v$,
+    \item A base case $c : C\,a\,\refl_a$,
+    \item A target $y : A$ and proof $h : a =_A y$,
+  \end{itemize}
+  there exists a term $J\,C\,c\,h : C\,y\,h$, constructed by:
+  \begin{enumerate}[label=(\roman*)]
+    \item Forming the pair $(y, h) : \mathrm{BasedPathSpace}(a)$.
+    \item Using contractibility (\cref{thm:based-contr}) to identify
+      $(y, h)$ with $\mathrm{center}(a) = (a, \refl_a)$.
+    \item Transporting $c : C\,a\,\refl_a$ along this identification.
+  \end{enumerate}
+\end{theorem}
+
+\begin{theorem}[J Computation Rule]\label{thm:j-comp}
+  $J\,C\,c\,\refl_a = c$. That is, applying J to the reflexivity proof
+  returns the base case definitionally.
+\end{theorem}
+
+\begin{proof}
+  When $h = \refl_a$, the pair $(a, \refl_a)$ is already the center, so
+  the transport is trivial. In Lean~4: \texttt{J\_comp} is proved by \texttt{rfl}.
+\end{proof}
+
+\subsection{Operations Derived from J}
+
+The standard operations of HoTT are all derivable as special cases of J:
+
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Transport.} $\mathrm{transport}_B\,h\,x :=
+    J\,(\lambda\,y\,\_.\,B\,y)\,x\,h : B\,y$, with
+    $\mathrm{transport}_B\,\refl\,x = x$.
+  \item \textbf{Symmetry.} $J\,(\lambda\,y\,\_.\,y =_A a)\,\refl\,h :
+    y =_A a$, with $J\_\mathrm{symm}(\refl) = \refl$.
+  \item \textbf{Transitivity.} $J\,(\lambda\,c\,\_.\,a =_A c)\,h_1\,h_2
+    : a =_A c$, with $J\_\mathrm{trans}(\refl, \refl) = \refl$.
+  \item \textbf{Congruence (ap).} $J\,(\lambda\,y\,\_.\,f\,a =_B f\,y)\,\refl\,h :
+    f\,a =_B f\,y$, with $J\_\mathrm{ap}(\refl) = \refl$.
+  \item \textbf{Dependent application (apd).}
+    $J\_\mathrm{apd}\,f\,h : \mathrm{transport}_B\,h\,(f\,a) = f\,y$.
+  \item \textbf{Paulin-Mohring J.} A target-fixed variant
+    $J\_\mathrm{PM}$ is also derived, with computation rule
+    $J\_\mathrm{PM}\,C\,c\,\refl = c$.
+\end{enumerate}
+
+All computation rules hold definitionally (by \texttt{rfl} in Lean~4).
+
+\subsection{Uniqueness and Equivalences}
+
+\begin{theorem}[Uniqueness of J]\label{thm:j-unique}
+  Any two eliminators with the same computation rule agree on all inputs:
+  if $\mathrm{elim}_1(\refl) = c = \mathrm{elim}_2(\refl)$, then
+  $\mathrm{elim}_1(h) = \mathrm{elim}_2(h)$ for all $h : a =_A y$.
+\end{theorem}
+
+\begin{theorem}[Based $\Leftrightarrow$ Free Path Induction]\label{thm:based-free-equiv}
+  The based J-eliminator (fixing the source) and the free J-eliminator
+  (both endpoints vary) are interderivable, and both computation rules
+  hold.
+\end{theorem}
+
+\begin{theorem}[Contractibility $\Leftrightarrow$ J]\label{thm:contr-iff-j}
+  Contractibility of the based path space is \emph{equivalent} to the
+  existence of the J-eliminator. The round-trip constructions
+  $\mathrm{contr\_from\_J}$ and $\mathrm{J\_from\_contr}$ produce the
+  same center.
+\end{theorem}
+
+\subsection{Non-UIP, Failure of K, and Two-Level Structure}
+\label{sec:two-level}
+
+The computational paths framework exhibits a \emph{two-level type
+structure} that simultaneously supports J-elimination, non-UIP, and the
+refutation of Streicher's axiom K.
+
+\begin{theorem}[Non-UIP for Path]\label{thm:nonuip}
+  The type $\Path_A(a, a)$ has multiple distinct inhabitants. Define:
+  \begin{align*}
+    \mathrm{witness\_refl}(a) &:= \refl(a)
+      &&= \mathrm{Path.mk}([\,],\; \refl), \\
+    \mathrm{witness\_step}(a) &:= \mathrm{Path.mk}([\mathrm{Step.mk}\,a\,a\,\refl],\; \refl).
+  \end{align*}
+  These paths share the same proof field ($\refl$) but differ in their step
+  lists. In particular:
+  \[
+    \mathrm{witness\_refl}(a) \neq \mathrm{witness\_step}(a),
+  \]
+  witnessed by $\mathrm{congrArg}\,\Path.\mathrm{steps}$. Furthermore,
+  for each $n : \Nat$, the path $\mathrm{path\_n\_steps}(a, n)$ has
+  exactly $n$ steps, and distinct $n$ produce distinct paths, so the
+  loop space $\Path_A(a, a)$ is \emph{infinite}.
+\end{theorem}
+
+\begin{theorem}[Refutation of K for Path]\label{thm:no-K}
+  Streicher's axiom K for $\Path$---the statement that for every
+  $C : \Path_A(a, a) \to \Prop$ with $C(\refl(a))$, we have $C(p)$
+  for all loops $p$---is \emph{refutable}:
+  \[
+    \neg\, \forall\, (C : \Path_A(a,a) \to \Prop),\;
+    C(\refl(a)) \to \forall\, p,\; C(p).
+  \]
+  Instantiate $C(p) := (p = \refl(a))$ with $c := \refl$ to obtain
+  $\mathrm{witness\_step}(a) = \refl(a)$, contradicting \cref{thm:nonuip}.
+\end{theorem}
+
+\begin{theorem}[K Holds for Eq]\label{thm:K-for-eq}
+  In contrast, Streicher's K \emph{does} hold for Lean's built-in
+  $\Eq$ type (which lives in $\Prop$): for any $h : a =_A a$ and
+  $C : (a =_A a) \to \Prop$ with $C(\refl)$, we have $C(h)$.
+  This follows from the proof-irrelevance of $\Prop$.
+\end{theorem}
+
+\begin{definition}[Two-Level Structure]\label{def:two-level}
+  The computational paths framework has a \emph{two-level} type structure:
+  \begin{center}
+  \begin{tabular}{lcccc}
+    \toprule
+    \textbf{Level} & \textbf{Type} & \textbf{Universe} &
+      \textbf{Proof-Relevant?} & \textbf{UIP?} \\
+    \midrule
+    Outer (trace) & $\Path_A(a,b)$ & $\Type$ & Yes & No \\
+    Inner (semantic) & $a =_A b$ & $\Prop$ & No & Yes \\
+    Meta (Eq-on-Path) & $p =_{\Path} q$ & $\Prop$ & No & Yes \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  The inner level ($\Eq$) is proof-irrelevant and satisfies UIP and K.
+  The outer level ($\Path$) is proof-relevant---structurally distinct
+  step lists yield genuinely different paths---and refutes both UIP and K.
+  The meta level (Lean's $\Eq$ on $\Path$ terms) is again proof-irrelevant.
+\end{definition}
+
+\begin{theorem}[Fundamental Consistency]\label{thm:fundamental-consistency}
+  The following three properties hold \emph{simultaneously}:
+  \begin{enumerate}[label=(\roman*)]
+    \item \textbf{Non-UIP}: $\exists\, p, q : \Path_A(a,a),\; p \neq q$.
+    \item \textbf{J-validity}: For all motives $C$ and base cases $c$,
+      $J\,C\,c$ is well-defined and $J\,C\,c\,p = J\,C\,c\,q$ for any
+      two paths $p, q : \Path_A(a, b)$.
+    \item \textbf{$\neg$K}: Streicher's K is refuted for $\Path$.
+  \end{enumerate}
+  Moreover, the J-eliminator \emph{cannot distinguish} paths with different
+  step lists: $J\,C\,c\,(\mathrm{witness\_refl}(a)) =
+  J\,C\,c\,(\mathrm{witness\_step}(a))$, because J operates on the proof
+  field (which is identical) and is blind to the computational trace.
+\end{theorem}
+
+\begin{proof}
+  (i) is \cref{thm:nonuip}. (ii) follows from J acting on the
+  $\Eq$-level proof field, which is a subsingleton. (iii) is
+  \cref{thm:no-K}. Consistency is witnessed by
+  \texttt{fundamental\_consistency} in \texttt{JForPath.lean}.
+\end{proof}
+
+\begin{remark}[Computational Paths as a Model of HoTT Philosophy]
+\label{rem:hott-model}
+  The combination of \cref{thm:fundamental-consistency} means that
+  computational paths realize the core philosophical position of
+  Homotopy Type Theory---that identity types should be proof-relevant
+  with a valid J-eliminator but without Streicher's K---\emph{within}
+  the setting of Lean~4's type theory. The proof-relevant outer level
+  ($\Path$, in $\Type$) behaves like an HoTT identity type: J holds, K
+  fails, and distinct ``proofs of equality'' (paths with different step
+  lists) are genuinely different. The proof-irrelevant inner level
+  ($\Eq$, in $\Prop$) provides the semantic grounding: transport
+  depends only on the endpoint equality, not on the trace, ensuring that
+  the system remains well-founded and consistent with classical
+  reasoning. This two-level architecture is formalized as the
+  \texttt{TwoLevelSummary} structure in \texttt{JForPath.lean}, which
+  bundles all five key properties (non-UIP, J-validity, K-failure for
+  Path, K-success for Eq, transport well-definedness) into a single
+  witnessable record for any type~$A$.
+\end{remark}
+
+\subsection{Path-Level J and Transport Coherence}
+
+\begin{theorem}[Path-Level J]\label{thm:path-j}
+  The J-eliminator lifts to $\Path$: given $C : (y : A) \to a =_A y \to
+  \Sort_v$ and $c : C\,a\,\refl$, for any $p : \Path_A(a, y)$ we have
+  $\mathrm{PathJ}\,C\,c\,p : C\,y\,p.\mathrm{proof}$, with
+  $\mathrm{PathJ}\,C\,c\,(\refl(a)) = c$.
+\end{theorem}
+
+\begin{theorem}[Transport Coherence]\label{thm:transport-coherence}
+  Transport along any two paths with the same endpoints yields the same
+  result:
+  \[
+    \forall\, p, q : \Path_A(a, b),\;\forall\, x : B(a),\quad
+    \mathrm{transport}_B(p, x) = \mathrm{transport}_B(q, x).
+  \]
+  This is a direct consequence of the two-level structure: transport
+  depends only on the proof field, which is unique.
+\end{theorem}
+
+The formalization of this section spans two files:
+\begin{itemize}
+  \item \texttt{Path/HoTT/JDerivation.lean} (25~sections, 470+ lines):
+    the derivation of J from contractibility, all derived operations,
+    uniqueness, sigma-type J, higher J ($J_2$, $J_3$), and the full
+    contractibility$\Leftrightarrow$J equivalence.
+  \item \texttt{Path/HoTT/JForPath.lean} (27~sections, 530+ lines):
+    J for Path, non-UIP witnesses, K-refutation, two-level structure,
+    infinite loop space, groupoid laws, the fundamental consistency
+    theorem, and the \texttt{TwoLevelSummary} record.
+\end{itemize}
+
 \section{Module Organization and Dependency Structure}
 \label{sec:module-organization}
 
