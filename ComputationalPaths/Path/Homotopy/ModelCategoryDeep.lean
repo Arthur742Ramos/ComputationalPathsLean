@@ -23,8 +23,8 @@ universe u
 structure Arrow (X Y : Type u) where
   fn : X → Y
 
-@[simp] def Arrow.idArr (X : Type u) : Arrow X X := ⟨id⟩
-@[simp] def Arrow.comp {X Y Z : Type u} (f : Arrow X Y) (g : Arrow Y Z) :
+def Arrow.idArr (X : Type u) : Arrow X X := ⟨id⟩
+def Arrow.comp {X Y Z : Type u} (f : Arrow X Y) (g : Arrow Y Z) :
     Arrow X Z := ⟨g.fn ∘ f.fn⟩
 
 -- 1: WE structure
@@ -35,7 +35,9 @@ structure WE {X Y : Type u} (f : Arrow X Y) where
 
 -- 2: Identity is a WE
 def WE.idWE (X : Type u) : WE (Arrow.idArr X) where
-  inv := Arrow.idArr X; sect := fun y => Path.refl y; retr := fun x => Path.refl x
+  inv := Arrow.idArr X
+  sect := fun y => Path.refl y
+  retr := fun x => Path.refl x
 
 -- 3: Inverse of a WE
 def WE.symmWE {X Y : Type u} {f : Arrow X Y} (w : WE f) : WE w.inv where
@@ -106,17 +108,17 @@ structure Cof {A' B' : Type u} (i : Arrow A' B') where
 
 -- 10: Identity has RLP
 def Fib.ofId (X : Type u) : Fib (Arrow.idArr X) where
-  liftId := fun top bot sq =>
+  liftId := fun top _bot sq =>
     { lift := top
       upper := fun a => Path.refl (top.fn a)
       lower := fun b => sq b }
 
 -- 11: Identity has LLP
 def Cof.ofId (X : Type u) : Cof (Arrow.idArr X) where
-  liftId := fun top bot sq =>
+  liftId := fun top _bot sq =>
     { lift := top
       upper := fun a => Path.refl (top.fn a)
-      lower := fun b => Path.symm (sq b) }
+      lower := fun b => Path.trans (sq b) (Path.refl _) }
 
 -- ════════════════════════════════════════════════════════════════════════
 -- §4  Factorisation
@@ -155,31 +157,33 @@ def Factor.idFactor (X : Type u) : CWF_Factor (Arrow.idArr X) :=
 -- 17: Retract structure
 structure IsRetract {A' B' C' D' : Type u}
     (f : Arrow A' B') (g : Arrow C' D') where
-  iA : Arrow A' C';  rA : Arrow C' A'
-  iB : Arrow B' D';  rB : Arrow D' B'
-  retA : ∀ a, Path (rA.fn (iA.fn a)) a
-  retB : ∀ b, Path (rB.fn (iB.fn b)) b
-  sqTop : ∀ a, Path (g.fn (iA.fn a)) (iB.fn (f.fn a))
-  sqBot : ∀ c, Path (f.fn (rA.fn c)) (rB.fn (g.fn c))
+  inclA : Arrow A' C'
+  projA : Arrow C' A'
+  inclB : Arrow B' D'
+  projB : Arrow D' B'
+  retractA : ∀ a, Path (projA.fn (inclA.fn a)) a
+  retractB : ∀ b, Path (projB.fn (inclB.fn b)) b
+  topSq : ∀ a, Path (g.fn (inclA.fn a)) (inclB.fn (f.fn a))
+  botSq : ∀ c, Path (f.fn (projA.fn c)) (projB.fn (g.fn c))
 
 -- 18: Retract of a WE is a WE
 def WE.ofRetract {A' B' C' D' : Type u}
     {f : Arrow A' B'} {g : Arrow C' D'}
     (r : IsRetract f g) (wg : WE g) : WE f where
-  inv := Arrow.comp (Arrow.comp r.iB wg.inv) r.rA
+  inv := Arrow.comp (Arrow.comp r.inclB wg.inv) r.projA
   sect := fun b =>
     Path.trans
-      (r.sqBot (wg.inv.fn (r.iB.fn b)))
+      (r.botSq (wg.inv.fn (r.inclB.fn b)))
       (Path.trans
-        (Path.congrArg r.rB.fn (wg.sect (r.iB.fn b)))
-        (r.retB b))
+        (Path.congrArg r.projB.fn (wg.sect (r.inclB.fn b)))
+        (r.retractB b))
   retr := fun a =>
     Path.trans
-      (Path.congrArg r.rA.fn
+      (Path.congrArg r.projA.fn
         (Path.trans
-          (Path.congrArg wg.inv.fn (Path.symm (r.sqTop a)))
-          (wg.retr (r.iA.fn a))))
-      (r.retA a)
+          (Path.congrArg wg.inv.fn (Path.symm (r.topSq a)))
+          (wg.retr (r.inclA.fn a))))
+      (r.retractA a)
 
 -- ════════════════════════════════════════════════════════════════════════
 -- §6  Cylinder objects & left homotopy
@@ -188,32 +192,37 @@ def WE.ofRetract {A' B' C' D' : Type u}
 -- 19: Cylinder
 structure Cyl (X : Type u) where
   obj : Type u
-  i₀  : Arrow X obj;  i₁ : Arrow X obj;  p : Arrow obj X
-  pi₀ : ∀ x, Path (p.fn (i₀.fn x)) x
-  pi₁ : ∀ x, Path (p.fn (i₁.fn x)) x
+  inc0 : Arrow X obj
+  inc1 : Arrow X obj
+  proj : Arrow obj X
+  proj_inc0 : ∀ x, Path (proj.fn (inc0.fn x)) x
+  proj_inc1 : ∀ x, Path (proj.fn (inc1.fn x)) x
 
 -- 20: Trivial cylinder
 def Cyl.trivial (X : Type u) : Cyl X :=
-  { obj := X, i₀ := Arrow.idArr X, i₁ := Arrow.idArr X, p := Arrow.idArr X,
-    pi₀ := fun x => Path.refl x, pi₁ := fun x => Path.refl x }
+  { obj := X, inc0 := Arrow.idArr X, inc1 := Arrow.idArr X,
+    proj := Arrow.idArr X,
+    proj_inc0 := fun x => Path.refl x,
+    proj_inc1 := fun x => Path.refl x }
 
 -- 21: Left homotopy
 structure LHtpy {X Y : Type u} (f g : Arrow X Y) where
   cyl : Cyl X
   hmap : Arrow cyl.obj Y
-  hi₀ : ∀ x, Path (hmap.fn (cyl.i₀.fn x)) (f.fn x)
-  hi₁ : ∀ x, Path (hmap.fn (cyl.i₁.fn x)) (g.fn x)
+  at_inc0 : ∀ x, Path (hmap.fn (cyl.inc0.fn x)) (f.fn x)
+  at_inc1 : ∀ x, Path (hmap.fn (cyl.inc1.fn x)) (g.fn x)
 
 -- 22: Reflexivity of left homotopy
 def LHtpy.lrefl {X Y : Type u} (f : Arrow X Y) : LHtpy f f :=
   { cyl := Cyl.trivial X, hmap := f,
-    hi₀ := fun x => Path.refl _, hi₁ := fun x => Path.refl _ }
+    at_inc0 := fun _ => Path.refl _, at_inc1 := fun _ => Path.refl _ }
 
 -- 23: Symmetry of left homotopy
 def LHtpy.lsymm {X Y : Type u} {f g : Arrow X Y} (h : LHtpy f g) : LHtpy g f :=
-  { cyl := { obj := h.cyl.obj, i₀ := h.cyl.i₁, i₁ := h.cyl.i₀,
-              p := h.cyl.p, pi₀ := h.cyl.pi₁, pi₁ := h.cyl.pi₀ },
-    hmap := h.hmap, hi₀ := h.hi₁, hi₁ := h.hi₀ }
+  { cyl := { obj := h.cyl.obj, inc0 := h.cyl.inc1, inc1 := h.cyl.inc0,
+              proj := h.cyl.proj,
+              proj_inc0 := h.cyl.proj_inc1, proj_inc1 := h.cyl.proj_inc0 },
+    hmap := h.hmap, at_inc0 := h.at_inc1, at_inc1 := h.at_inc0 }
 
 -- ════════════════════════════════════════════════════════════════════════
 -- §7  Path objects & right homotopy
@@ -222,32 +231,34 @@ def LHtpy.lsymm {X Y : Type u} {f g : Arrow X Y} (h : LHtpy f g) : LHtpy g f :=
 -- 24: Path object
 structure PObj (Y : Type u) where
   obj : Type u
-  s  : Arrow Y obj;  d₀ : Arrow obj Y;  d₁ : Arrow obj Y
-  sd₀ : ∀ y, Path (d₀.fn (s.fn y)) y
-  sd₁ : ∀ y, Path (d₁.fn (s.fn y)) y
+  sec : Arrow Y obj
+  ev0 : Arrow obj Y
+  ev1 : Arrow obj Y
+  sec_ev0 : ∀ y, Path (ev0.fn (sec.fn y)) y
+  sec_ev1 : ∀ y, Path (ev1.fn (sec.fn y)) y
 
 -- 25: Trivial path object
 def PObj.trivial (Y : Type u) : PObj Y :=
-  { obj := Y, s := Arrow.idArr Y, d₀ := Arrow.idArr Y, d₁ := Arrow.idArr Y,
-    sd₀ := fun y => Path.refl y, sd₁ := fun y => Path.refl y }
+  { obj := Y, sec := Arrow.idArr Y, ev0 := Arrow.idArr Y, ev1 := Arrow.idArr Y,
+    sec_ev0 := fun y => Path.refl y, sec_ev1 := fun y => Path.refl y }
 
 -- 26: Right homotopy
 structure RHtpy {X Y : Type u} (f g : Arrow X Y) where
   po : PObj Y
   hmap : Arrow X po.obj
-  hd₀ : ∀ x, Path (po.d₀.fn (hmap.fn x)) (f.fn x)
-  hd₁ : ∀ x, Path (po.d₁.fn (hmap.fn x)) (g.fn x)
+  at_ev0 : ∀ x, Path (po.ev0.fn (hmap.fn x)) (f.fn x)
+  at_ev1 : ∀ x, Path (po.ev1.fn (hmap.fn x)) (g.fn x)
 
 -- 27: Reflexivity of right homotopy
 def RHtpy.rrefl {X Y : Type u} (f : Arrow X Y) : RHtpy f f :=
   { po := PObj.trivial Y, hmap := f,
-    hd₀ := fun x => Path.refl _, hd₁ := fun x => Path.refl _ }
+    at_ev0 := fun _ => Path.refl _, at_ev1 := fun _ => Path.refl _ }
 
 -- 28: Symmetry of right homotopy
 def RHtpy.rsymm {X Y : Type u} {f g : Arrow X Y} (h : RHtpy f g) : RHtpy g f :=
-  { po := { obj := h.po.obj, s := h.po.s, d₀ := h.po.d₁, d₁ := h.po.d₀,
-             sd₀ := h.po.sd₁, sd₁ := h.po.sd₀ },
-    hmap := h.hmap, hd₀ := h.hd₁, hd₁ := h.hd₀ }
+  { po := { obj := h.po.obj, sec := h.po.sec, ev0 := h.po.ev1, ev1 := h.po.ev0,
+             sec_ev0 := h.po.sec_ev1, sec_ev1 := h.po.sec_ev0 },
+    hmap := h.hmap, at_ev0 := h.at_ev1, at_ev1 := h.at_ev0 }
 
 -- ════════════════════════════════════════════════════════════════════════
 -- §8  Quillen adjunction & Ken Brown
@@ -268,12 +279,12 @@ structure LDerived {C D : Type u} (F : Arrow C D) where
   Q   : Arrow C C
   Qwe : WE Q
   LF  : Arrow C D
-  comp: ∀ c, Path (LF.fn c) (F.fn (Q.fn c))
+  compat : ∀ c, Path (LF.fn c) (F.fn (Q.fn c))
 
 -- 32: Trivial derived functor
 def LDerived.trivial {C D : Type u} (F : Arrow C D) : LDerived F :=
   { Q := Arrow.idArr C, Qwe := WE.idWE C, LF := F,
-    comp := fun c => Path.refl _ }
+    compat := fun _ => Path.refl _ }
 
 -- 33: Ken Brown's lemma (abstract)
 def kenBrown {C D : Type u} (F : Arrow C D)
@@ -322,7 +333,7 @@ theorem idWE_retr (X : Type u) (x : X) :
 
 -- 40
 theorem symmWE_invol {X Y : Type u} {f : Arrow X Y} (w : WE f) :
-    (WE.symmWE (WE.symmWE w)).inv = f := rfl
+    (WE.symmWE (WE.symmWE w)).inv = w.inv := rfl
 
 -- 41
 theorem compWE_inv_fn {X Y Z : Type u}
@@ -355,9 +366,9 @@ def CofRep.trivial (X : Type u) : CofRep X :=
   { QX := X, qmap := Arrow.idArr X, qwe := WE.idWE X }
 
 -- 46: Two fibrant replacements connected by WE
-def FibRep.compare {X : Type u} (r₁ r₂ : FibRep X) :
-    WE (Arrow.comp r₁.rwe.inv r₂.rmap) :=
-  WE.compWE (WE.symmWE r₁.rwe) r₂.rwe
+def FibRep.compare {X : Type u} (r1 r2 : FibRep X) :
+    WE (Arrow.comp r1.rwe.inv r2.rmap) :=
+  WE.compWE (WE.symmWE r1.rwe) r2.rwe
 
 -- ════════════════════════════════════════════════════════════════════════
 -- §12  Transfinite towers
@@ -410,24 +421,24 @@ def HFib.fromWE {X Y : Type u} {f : Arrow X Y} (w : WE f) (y : Y) :
 
 -- 55
 structure HEquiv {X Y : Type u} (f : Arrow X Y) where
-  inv : Arrow Y X
-  lh  : LHtpy (Arrow.comp inv f) (Arrow.idArr Y)
-  rh  : LHtpy (Arrow.comp f inv) (Arrow.idArr X)
+  einv : Arrow Y X
+  lh  : LHtpy (Arrow.comp einv f) (Arrow.idArr Y)
+  rh  : LHtpy (Arrow.comp f einv) (Arrow.idArr X)
 
 -- 56: WE gives homotopy equivalence
 def HEquiv.ofWE {X Y : Type u} (f : Arrow X Y) (w : WE f) : HEquiv f where
-  inv := w.inv
+  einv := w.inv
   lh := {
     cyl := Cyl.trivial Y
     hmap := Arrow.idArr Y
-    hi₀ := fun y => Path.symm (w.sect y)
-    hi₁ := fun y => Path.refl y
+    at_inc0 := fun y => Path.symm (w.sect y)
+    at_inc1 := fun y => Path.refl y
   }
   rh := {
     cyl := Cyl.trivial X
     hmap := Arrow.idArr X
-    hi₀ := fun x => Path.symm (w.retr x)
-    hi₁ := fun x => Path.refl x
+    at_inc0 := fun x => Path.symm (w.retr x)
+    at_inc1 := fun x => Path.refl x
   }
 
 -- 57: Identity homotopy equivalence
@@ -436,8 +447,8 @@ def HEquiv.ofId (X : Type u) : HEquiv (Arrow.idArr X) :=
 
 -- 58: Inverse homotopy equivalence
 def HEquiv.inv_hequiv {X Y : Type u} {f : Arrow X Y} (he : HEquiv f) :
-    HEquiv he.inv where
-  inv := f
+    HEquiv he.einv where
+  einv := f
   lh  := he.rh
   rh  := he.lh
 
@@ -445,21 +456,19 @@ def HEquiv.inv_hequiv {X Y : Type u} {f : Arrow X Y} (he : HEquiv f) :
 -- §15  Arrow composition coherence
 -- ════════════════════════════════════════════════════════════════════════
 
--- 59: comp associativity
-theorem Arrow.comp_assoc {W X Y Z : Type u}
-    (f : Arrow W X) (g : Arrow X Y) (h : Arrow Y Z) :
-    Arrow.comp (Arrow.comp f g) h = Arrow.comp f (Arrow.comp g h) := by
-  simp [Arrow.comp, Function.comp]
-
--- 60: comp with id left
+-- 59: comp with id left
 theorem Arrow.comp_idArr_left {X Y : Type u} (f : Arrow X Y) :
     Arrow.comp (Arrow.idArr X) f = f := by
-  simp [Arrow.comp, Arrow.idArr]
+  cases f; rfl
 
--- 61: comp with id right
+-- 60: comp with id right
 theorem Arrow.comp_idArr_right {X Y : Type u} (f : Arrow X Y) :
     Arrow.comp f (Arrow.idArr Y) = f := by
-  simp [Arrow.comp, Arrow.idArr]
+  cases f; rfl
+
+-- 61: LHtpy double symmetry
+theorem LHtpy.lsymm_lsymm {X Y : Type u} {f g : Arrow X Y} (h : LHtpy f g) :
+    h.lsymm.lsymm.at_inc0 = h.at_inc0 := rfl
 
 end ModelCategoryDeep
 end Path
