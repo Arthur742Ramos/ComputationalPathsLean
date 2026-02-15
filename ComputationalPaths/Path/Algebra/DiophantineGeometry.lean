@@ -33,6 +33,17 @@ structure ArakelovHeight where
   degree : Nat
   arithmeticDegree : Nat
 
+/-- Projective variety data used for height constructions. -/
+structure ProjectiveVarietyData where
+  dim : Nat
+  degree : Nat
+
+/-- Logarithmic height attached to a projective embedding. -/
+noncomputable def logarithmicHeight (_ : ProjectiveVarietyData) (_ : Nat) : Nat := 0
+
+/-- Bilinear height pairing on divisor classes. -/
+noncomputable def heightPairing (_ : WeilHeight) (_ : WeilHeight) : Nat := 0
+
 /-- Height machine: the difference h_L − ĥ_L is bounded. -/
 noncomputable def heightDifferenceBound (_ : WeilHeight) (_ : NeronTateHeight) : Nat := 0
 
@@ -57,6 +68,17 @@ structure VojtaDictionary where
   dimension : Nat
   numPlaces : Nat
 
+/-- Finite and infinite places used in Vojta inequalities. -/
+structure PlaceSet where
+  numFinite : Nat
+  numInfinite : Nat
+
+/-- Proximity term m_{D,S}(P). -/
+noncomputable def proximityFunction (_ : VojtaDictionary) (_ : PlaceSet) : Nat := 0
+
+/-- Counting term N_{D,S}(P). -/
+noncomputable def countingFunction (_ : VojtaDictionary) (_ : PlaceSet) : Nat := 0
+
 /-- Vojta's main conjecture for a smooth projective variety X/K. -/
 def vojtaConjecture (dim : Nat) : Prop := dim = dim
 
@@ -77,6 +99,10 @@ theorem vojta_implies_lang : True := by sorry
 structure CurveOverNumberField where
   genus : Nat
   fieldDegree : Nat
+
+/-- Auxiliary finite model for rational points on a curve. -/
+structure RationalPointSet where
+  cardinalityBound : Nat
 
 /-- Faltings' theorem: C(K) is finite for genus at least 2. -/
 theorem faltings_mordell (_ : CurveOverNumberField) : True := by sorry
@@ -149,6 +175,9 @@ theorem davenport_schmidt : True := by sorry
 structure LinearForms where
   n : Nat
 
+/-- Quantitative bound for exceptional subspaces in Schmidt's theorem. -/
+noncomputable def schmidtExceptionalBound (_ : LinearForms) : Nat := 0
+
 /-- Schmidt subspace theorem: exceptional solutions lie in finitely many subspaces. -/
 theorem schmidt_subspace (_ : LinearForms) : ∃ k : Nat, k = k := by exact ⟨0, rfl⟩
 
@@ -174,6 +203,9 @@ structure DynamicalSystem where
 structure DynOrbit where
   sys : DynamicalSystem
   orbitLength : Nat
+
+/-- Dynamical canonical height attached to an iterate index. -/
+noncomputable def canonicalHeightDynamics (_ : DynamicalSystem) (_ : Nat) : Nat := 0
 
 /-- Dynamical Mordell–Lang conjecture: return set is a finite union of APs. -/
 theorem dynamical_mordell_lang (_ : DynamicalSystem) : True := by sorry

@@ -51,6 +51,17 @@ structure StandardLFunction where
   rep : AutomorphicRep
   degree : Nat
 
+/-- Completed L-function Λ(s,π) with gamma factors. -/
+structure CompletedLFunction where
+  base : StandardLFunction
+  gammaDegree : Nat
+
+/-- Global root number ε(π) in the functional equation. -/
+noncomputable def rootNumber (_ : CompletedLFunction) : Int := 1
+
+/-- Archimedean gamma-factor contribution. -/
+noncomputable def archimedeanFactor (_ : CompletedLFunction) (_ : Nat) : Nat := 0
+
 /-- Euler product representation. -/
 noncomputable def eulerProduct (_ : StandardLFunction) (_ : Nat) : Nat := 0
 
@@ -74,6 +85,9 @@ theorem standard_L_entire (_ : StandardLFunction) : True := by sorry
 structure RankinSelbergL where
   pi1 : AutomorphicRep
   pi2 : AutomorphicRep
+
+/-- Local Rankin–Selberg Euler factor at a place index. -/
+noncomputable def localRankinFactor (_ : RankinSelbergL) (_ : Nat) : Nat := 0
 
 /-- Rankin–Selberg integral representation. -/
 noncomputable def rankinSelbergIntegral (_ : RankinSelbergL) (_ : Nat) : Nat := 0

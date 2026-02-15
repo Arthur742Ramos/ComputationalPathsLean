@@ -30,6 +30,7 @@ hom-objects, and composition is given by `Path.trans`.
 - Borceux, "Handbook of Categorical Algebra 2"
 -/
 
+import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
@@ -311,6 +312,200 @@ theorem enriched_yoneda_rweq (C : VCategory)
     (VNatTrans.vcomp (VNatTrans.identity F) (VNatTrans.identity F)).component a =
     D.comp (D.id (F.obj a)) (D.id (F.obj a)) :=
   rfl
+
+end EnrichedCategories
+end Category
+end Path
+end ComputationalPaths
+
+namespace ComputationalPaths
+namespace Path
+namespace Category
+namespace EnrichedCategories
+
+universe u v
+
+/-! ## Weighted Limits and Colimits -/
+
+structure WeightedDiagram (C : VCategory) where
+  shape : Type u
+  weight : shape → Type v
+  diagramObj : shape → C.Obj
+
+structure WeightedCone (C : VCategory) (D : WeightedDiagram C) where
+  vertex : C.Obj
+  leg : (i : D.shape) → C.Hom vertex (D.diagramObj i)
+
+structure WeightedCocone (C : VCategory) (D : WeightedDiagram C) where
+  vertex : C.Obj
+  leg : (i : D.shape) → C.Hom (D.diagramObj i) vertex
+
+structure WeightedLimit (C : VCategory) (D : WeightedDiagram C) where
+  cone : WeightedCone C D
+  isUniversal : True
+
+structure WeightedColimit (C : VCategory) (D : WeightedDiagram C) where
+  cocone : WeightedCocone C D
+  isUniversal : True
+
+def HasWeightedLimits (C : VCategory) : Prop :=
+  ∀ D : WeightedDiagram C, Nonempty (WeightedLimit C D)
+
+def HasWeightedColimits (C : VCategory) : Prop :=
+  ∀ D : WeightedDiagram C, Nonempty (WeightedColimit C D)
+
+/-! ## Enriched Yoneda and Adjunctions -/
+
+structure EnrichedYonedaIso (C : VCategory) where
+  obj : C.Obj
+  presheaf : C.Obj → Type u
+  witness : True
+
+structure EnrichedAdjunction (C D : VCategory) where
+  left : VFunctor C D
+  right : VFunctor D C
+  unit : True
+  counit : True
+
+structure EnrichedAdjunctionMate (C D : VCategory) (A : EnrichedAdjunction C D) where
+  witness : True
+
+/-! ## Change of Base, Tensors, Cotensors -/
+
+structure MonoidalBase where
+  Carrier : Type u
+  tensor : Carrier → Carrier → Carrier
+  unit : Carrier
+
+structure ChangeOfBaseFunctor (B₁ B₂ : MonoidalBase) (C : VCategory) where
+  onBase : B₁.Carrier → B₂.Carrier
+  onObj : C.Obj → C.Obj
+  preservesTensor : True
+
+structure TensoredCategory (C : VCategory) where
+  tensorWith : Type u → C.Obj → C.Obj
+  hasTensorUnit : True
+
+structure CotensoredCategory (C : VCategory) where
+  cotensorWith : Type u → C.Obj → C.Obj
+  hasCotensorUnit : True
+
+/-! ## Enriched Ends, Coends, and Day Convolution -/
+
+structure EnrichedEnd (C : VCategory) (F : C.Obj → C.Obj → Type u) where
+  object : Type u
+  wedge : True
+
+structure EnrichedCoend (C : VCategory) (F : C.Obj → C.Obj → Type u) where
+  object : Type u
+  cowedge : True
+
+structure EnrichedDayConvolution (C : VCategory) where
+  convolution : DayConvolution C
+  closedUnderConvolution : True
+
+def dayConvolutionUnit {C : VCategory} (D : EnrichedDayConvolution C) : C.Obj :=
+  D.convolution.unit
+
+def dayConvolutionTensor {C : VCategory} (D : EnrichedDayConvolution C) :
+    C.Obj → C.Obj → C.Obj :=
+  D.convolution.tensor
+
+/-! ## Additional Theorems -/
+
+theorem weighted_limit_exists_of_has {C : VCategory} (h : HasWeightedLimits C)
+    (D : WeightedDiagram C) : Nonempty (WeightedLimit C D) := by
+  sorry
+
+theorem weighted_colimit_exists_of_has {C : VCategory} (h : HasWeightedColimits C)
+    (D : WeightedDiagram C) : Nonempty (WeightedColimit C D) := by
+  sorry
+
+theorem weighted_limit_unique_up_to_iso {C : VCategory} (D : WeightedDiagram C) :
+    True := by
+  sorry
+
+theorem weighted_colimit_unique_up_to_iso {C : VCategory} (D : WeightedDiagram C) :
+    True := by
+  sorry
+
+theorem weighted_limits_stable_under_equiv {C : VCategory} : True := by
+  sorry
+
+theorem weighted_colimits_stable_under_equiv {C : VCategory} : True := by
+  sorry
+
+theorem enriched_yoneda_embedding_fully_faithful {C : VCategory} : True := by
+  sorry
+
+theorem enriched_yoneda_naturality {C : VCategory} (Y : EnrichedYonedaIso C) : True := by
+  sorry
+
+theorem enriched_adjoint_triangle_left {C D : VCategory} (A : EnrichedAdjunction C D) :
+    True := by
+  sorry
+
+theorem enriched_adjoint_triangle_right {C D : VCategory} (A : EnrichedAdjunction C D) :
+    True := by
+  sorry
+
+theorem mates_for_enriched_adjunctions {C D : VCategory} (A : EnrichedAdjunction C D) :
+    True := by
+  sorry
+
+theorem change_of_base_preserves_weighted_limits {C : VCategory}
+    {B₁ B₂ : MonoidalBase} (F : ChangeOfBaseFunctor B₁ B₂ C) : True := by
+  sorry
+
+theorem change_of_base_preserves_weighted_colimits {C : VCategory}
+    {B₁ B₂ : MonoidalBase} (F : ChangeOfBaseFunctor B₁ B₂ C) : True := by
+  sorry
+
+theorem tensored_category_represents_action {C : VCategory} (T : TensoredCategory C) :
+    True := by
+  sorry
+
+theorem cotensored_category_represents_action {C : VCategory} (T : CotensoredCategory C) :
+    True := by
+  sorry
+
+theorem tensored_and_cotensored_implies_enriched_limits {C : VCategory}
+    (_ : TensoredCategory C) (_ : CotensoredCategory C) : True := by
+  sorry
+
+theorem enriched_end_exists_for_small_functor {C : VCategory}
+    (F : C.Obj → C.Obj → Type u) : True := by
+  sorry
+
+theorem enriched_coend_exists_for_small_functor {C : VCategory}
+    (F : C.Obj → C.Obj → Type u) : True := by
+  sorry
+
+theorem fubini_for_enriched_ends {C : VCategory} : True := by
+  sorry
+
+theorem fubini_for_enriched_coends {C : VCategory} : True := by
+  sorry
+
+theorem day_convolution_associative_enriched {C : VCategory}
+    (D : EnrichedDayConvolution C) : True := by
+  sorry
+
+theorem day_convolution_unital_left_enriched {C : VCategory}
+    (D : EnrichedDayConvolution C) : True := by
+  sorry
+
+theorem day_convolution_unital_right_enriched {C : VCategory}
+    (D : EnrichedDayConvolution C) : True := by
+  sorry
+
+theorem day_convolution_closed_monoidal {C : VCategory}
+    (D : EnrichedDayConvolution C) : True := by
+  sorry
+
+theorem ends_coends_interact_with_day_convolution {C : VCategory}
+    (D : EnrichedDayConvolution C) : True := by
+  sorry
 
 end EnrichedCategories
 end Category

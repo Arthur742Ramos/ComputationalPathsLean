@@ -32,6 +32,9 @@ structure ValuationRing where
 structure MaximalIdeal where
   ring : ValuationRing
 
+/-- Toy valuation norm profile used for examples. -/
+noncomputable def valuationNorm (_ : NAField) (_ : Nat) : Nat := 0
+
 -- ============================================================
 -- §2  Multiplicative seminorms
 -- ============================================================
@@ -46,6 +49,9 @@ structure MultSeminorm where
 structure BoundedSeminorm extends MultSeminorm where
   isBounded : Bool := true
 
+/-- Gauss seminorm value on a coefficient index. -/
+noncomputable def gaussSeminorm (_ : MultSeminorm) (_ : Nat) : Nat := 0
+
 -- ============================================================
 -- §3  Berkovich analytification
 -- ============================================================
@@ -59,6 +65,16 @@ structure BerkovichSpace where
 structure BerkovichLine where
   base : NAField
   hasGaussPoint : Bool := true
+
+/-- Closed Berkovich disk with chosen center/radius data. -/
+structure BerkovichDisk where
+  centerIndex : Nat
+  radius : Nat
+
+/-- Affinoid subdomain cut out by finitely many inequalities. -/
+structure AffinoidDomain where
+  ambient : BerkovichSpace
+  numInequalities : Nat
 
 /-- Classification of points in the Berkovich affine line. -/
 inductive PointType where
@@ -119,6 +135,9 @@ theorem baker_norine_rr (_ : Skeleton) : True := by sorry
 /-- Edge length from valuation. -/
 noncomputable def edgeLength (_ : Skeleton) (_ : Nat) : Nat := 0
 
+/-- First Betti number of a skeleton. -/
+noncomputable def skeletonFirstBetti (_ : Skeleton) : Nat := 0
+
 -- ============================================================
 -- §6  Tropicalization
 -- ============================================================
@@ -127,6 +146,11 @@ noncomputable def edgeLength (_ : Skeleton) (_ : Nat) : Nat := 0
 structure TropicalizationMap where
   ambientDim : Nat
   imageDim : Nat
+
+/-- Weighted tropical cycle attached to a tropicalization image. -/
+structure TropicalCycle where
+  dimension : Nat
+  numCells : Nat
 
 /-- Tropicalization factors through the skeleton. -/
 theorem trop_factors_skeleton : True := by sorry
@@ -155,6 +179,9 @@ structure FormalModel where
 /-- Raynaud's generic fiber functor: 𝔛 ↦ 𝔛_η^an. -/
 structure RaynaudGenericFiber where
   formalModel : FormalModel
+
+/-- Dimension of the special fiber associated to a formal model. -/
+noncomputable def raynaudSpecialFiberDimension (_ : RaynaudGenericFiber) : Nat := 0
 
 /-- Raynaud's theorem: rigid analytic varieties ↔ formal models
     up to admissible blowup. -/

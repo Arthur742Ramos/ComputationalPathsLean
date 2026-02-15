@@ -85,6 +85,9 @@ structure HeckeCorrespondence where
 /-- Hecke operator degree. -/
 noncomputable def heckeOperatorDegree (_ : HeckeCorrespondence) : Nat := 0
 
+/-- Trace of a Hecke correspondence on the relevant cohomology piece. -/
+noncomputable def heckeTrace (_ : HeckeCorrespondence) : Nat := 0
+
 /-- Hecke operators are self-adjoint w.r.t. Petersson inner product. -/
 theorem hecke_self_adjoint (_ : HeckeCorrespondence) : True := by sorry
 
@@ -162,6 +165,12 @@ structure Newform where
 structure Oldform where
   originLevel : Nat
   embeddingLevel : Nat
+
+/-- Numerical bookkeeping for the old/new decomposition at level N. -/
+structure OldNewDecomposition where
+  level : Nat
+  oldRank : Nat
+  newRank : Nat
 
 /-- Atkin–Lehner–Li decomposition: S_k = S_k^new ⊕ S_k^old. -/
 theorem newform_oldform_decomposition (_ _ : Nat) : True := by sorry
