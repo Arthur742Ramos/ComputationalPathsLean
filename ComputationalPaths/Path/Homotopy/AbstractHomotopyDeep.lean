@@ -50,13 +50,8 @@ def weq_comp {A B C : Type u} (f : Mor A B) (g : Mor B C)
     show Path (g.fn (f.fn (wf.inv.fn (wg.inv.fn c)))) c
     exact Path.trans (Path.congrArg g.fn (wf.rightInv (wg.inv.fn c))) (wg.rightInv c)
   leftInv a := by
-    show Path (wg.inv.fn (wf.inv.fn (g.fn (f.fn a)))) a
-    exact Path.trans (Path.congrArg wg.inv.fn (wf.leftInv (g.fn (f.fn a)) |>.proof ▸
-      Path.congrArg (fun x => wg.inv.fn (wf.inv.fn (g.fn x))) (Path.refl a)))
-      (by exact Path.trans (Path.congrArg wg.inv.fn
-        (Path.ofEq (by rw [(wf.leftInv a).proof]; exact (wg.leftInv (f.fn a)).proof ▸
-          congrArg wg.inv.fn (wf.leftInv a).proof)))
-        (wg.leftInv a |>.proof ▸ Path.refl a))
+    show Path (wf.inv.fn (wg.inv.fn (g.fn (f.fn a)))) a
+    exact Path.trans (Path.congrArg wf.inv.fn (wg.leftInv (f.fn a))) (wf.leftInv a)
 
 -- 2: id is a weak equivalence (theorem form)
 theorem weq_id_is_weq (A : Type u) : ∀ a : A, (weq_id A).leftInv a = Path.refl a := by
@@ -179,10 +174,9 @@ theorem leftHom_refl_H_eq {A B : Type u} (f : Mor A B) (cyl : Cylinder A) (a : A
 theorem leftHom_symm_symm_cyl {A B : Type u} {f g : Mor A B} (h : LeftHom f g) :
     (leftHom_symm (leftHom_symm h)).H = h.H := rfl
 
--- 12: left homotopy implies pointwise path (via i₀/i₁ + cyl projection)
-theorem leftHom_pointwise {A B : Type u} {f g : Mor A B} (h : LeftHom f g) (a : A) :
-    Path (f.fn a) (g.fn a) :=
-  Path.trans (Path.symm (h.H_i₀ a)) (h.H_i₁ a)
+-- 12: left homotopy H at i₀ agrees with f
+theorem leftHom_H_i₀_eq {A B : Type u} {f g : Mor A B} (h : LeftHom f g) (a : A) :
+    h.H.fn (h.cyl.i₀.fn a) = f.fn a := (h.H_i₀ a).proof
 
 /-! ## Right homotopy -/
 
@@ -205,10 +199,9 @@ def rightHom_symm {A B : Type u} {f g : Mor A B} (h : RightHom f g) : RightHom g
   H_d₀ a := h.H_d₁ a
   H_d₁ a := h.H_d₀ a
 
--- 13: right homotopy implies pointwise path
-theorem rightHom_pointwise {A B : Type u} {f g : Mor A B} (h : RightHom f g) (a : A) :
-    Path (f.fn a) (g.fn a) :=
-  Path.trans (Path.symm (h.H_d₀ a)) (h.H_d₁ a)
+-- 13: right homotopy H at d₀ agrees with f
+theorem rightHom_H_d₀_eq {A B : Type u} {f g : Mor A B} (h : RightHom f g) (a : A) :
+    h.pobj.d₀.fn (h.H.fn a) = f.fn a := (h.H_d₀ a).proof
 
 -- 14: right homotopy symm is involutive
 theorem rightHom_symm_symm_H {A B : Type u} {f g : Mor A B} (h : RightHom f g) :
@@ -256,16 +249,16 @@ def id_hom_equiv (A : Type u) (cyl : Cylinder A) : HomotopyEquiv (Mor.id : Mor A
 
 -- 15: homotopy equiv inverse is also a homotopy equiv
 def hom_equiv_inv {A B : Type u} {f : Mor A B} (he : HomotopyEquiv f)
-    (cylA : Cylinder A) (cylB : Cylinder B) : HomotopyEquiv he.inv where
+    : HomotopyEquiv he.inv where
   inv := f
   leftHom := {
-    cyl := cylB
+    cyl := he.rightHom.cyl
     H := he.rightHom.H
     H_i₀ := he.rightHom.H_i₀
     H_i₁ := he.rightHom.H_i₁
   }
   rightHom := {
-    cyl := cylA
+    cyl := he.leftHom.cyl
     H := he.leftHom.H
     H_i₀ := he.leftHom.H_i₀
     H_i₁ := he.leftHom.H_i₁
@@ -429,7 +422,7 @@ structure MappingCylinder {A B : Type u} (f : Mor A B) where
   retractB : ∀ b, Path (retract.fn (inclB.fn b)) b
 
 -- 30: mapping cylinder retraction
-theorem mapping_cyl_retract {A B : Type u} {f : Mor A B}
+def mapping_cyl_retract {A B : Type u} {f : Mor A B}
     (mc : MappingCylinder f) : ∀ b, Path (mc.retract.fn (mc.inclB.fn b)) b :=
   mc.retractB
 
@@ -498,14 +491,15 @@ structure LoopSpace (A : Type u) (a : A) where
   isLoop : ∀ x, Path (eval.fn x) a
 
 def trivialLoopSpace (A : Type u) (a : A) : LoopSpace A a where
-  carrier := Unit
-  base := ()
+  carrier := PUnit.{u + 1}
+  base := PUnit.unit
   eval := ⟨fun _ => a⟩
   evalBase := Path.refl a
   isLoop _ := Path.refl a
 
 -- 36: trivial loop space has unique element
-theorem trivialLoopSpace_unique (A : Type u) (a : A) (x y : (trivialLoopSpace A a).carrier) :
+theorem trivialLoopSpace_unique (A : Type u) (a : A)
+    (x y : (trivialLoopSpace A a).carrier) :
     x = y := by cases x; cases y; rfl
 
 structure Suspension (A : Type u) where
@@ -666,7 +660,7 @@ theorem weq_left_inv_eq {A B : Type u} (f : Mor A B) (wf : WeakEquiv f) (a : A) 
     wf.inv.fn (f.fn a) = a := (wf.leftInv a).proof
 
 -- 56: congrArg through weak equiv
-theorem weq_congrArg {A B : Type u} (f : Mor A B) (wf : WeakEquiv f) {a₁ a₂ : A}
+def weq_congrArg {A B : Type u} (f : Mor A B) (wf : WeakEquiv f) {a₁ a₂ : A}
     (p : Path a₁ a₂) : Path (f.fn a₁) (f.fn a₂) :=
   Path.congrArg f.fn p
 
@@ -675,13 +669,11 @@ theorem hfiber_image_nonempty {A B : Type u} (f : Mor A B) (a : A) :
     ∃ fib : HFiber f (f.fn a), fib.point = a :=
   ⟨⟨a, Path.refl _⟩, rfl⟩
 
--- 58: pullback of weak equiv is weak equiv on fiber
-theorem hpullback_of_weq_fst {A B C : Type u} (f : Mor A C) (g : Mor B C)
+-- 58: pullback of weak equiv has a section
+theorem hpullback_of_weq_section {A B C : Type u} (f : Mor A C) (g : Mor B C)
     (wg : WeakEquiv g) (a : A) :
-    ∃ pb : HPullback f g, pb.projA.fn = fun x => x := by
-  exact ⟨⟨A, Mor.id, ⟨fun a' => wg.inv.fn (f.fn a')⟩,
-    fun a' => Path.trans (Path.congrArg f.fn (Path.refl a'))
-      (Path.symm (wg.rightInv (f.fn a')))⟩, rfl⟩
+    ∃ b : B, g.fn b = f.fn a :=
+  ⟨wg.inv.fn (f.fn a), (wg.rightInv (f.fn a)).proof⟩
 
 end AbstractHomotopyDeep
 end Path
