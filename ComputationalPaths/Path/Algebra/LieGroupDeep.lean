@@ -198,23 +198,21 @@ variable {G 𝔤 : Type u} {mul : G → G → G} {inv : G → G} {e : G}
          {add : 𝔤 → 𝔤 → 𝔤} {bracket : 𝔤 → 𝔤 → 𝔤} {zero : 𝔤} {neg : 𝔤 → 𝔤}
          {exp : 𝔤 → G} {Ad : G → 𝔤 → 𝔤} {killing : 𝔤 → 𝔤 → 𝔤}
 
-abbrev LP := @LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
-
-def trans : LP x y → LP y z → LP x z
+def trans : LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing y z →
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x z
   | .nil _, q => q
   | .cons s p, q => .cons s (trans p q)
 
-def symm : LP x y → LP y x
+def symm : LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing y x
   | .nil _ => .nil _
   | .cons s p => trans (symm p) (.cons (.symm s) (.nil _))
 
-def congrArg (f : G → G) : LP x y → LP (f x) (f y)
+def congrArg (f : G → G) : LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing (f x) (f y)
   | .nil _ => .nil _
   | .cons s p => .cons (.congrArg f s) (congrArg f p)
-
-def length : LP x y → Nat
-  | .nil _ => 0
-  | .cons _ p => 1 + length p
 
 end LiePath
 
@@ -223,17 +221,19 @@ namespace LieAlgPath
 variable {𝔤 : Type u} {add : 𝔤 → 𝔤 → 𝔤} {bracket : 𝔤 → 𝔤 → 𝔤} {zero : 𝔤}
          {neg : 𝔤 → 𝔤} {ad scale : 𝔤 → 𝔤 → 𝔤} {killing : 𝔤 → 𝔤 → 𝔤}
 
-abbrev LAP := @LieAlgPath 𝔤 add bracket zero neg ad scale killing
-
-def trans : LAP x y → LAP y z → LAP x z
+def trans : LieAlgPath 𝔤 add bracket zero neg ad scale killing x y →
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing y z →
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing x z
   | .nil _, q => q
   | .cons s p, q => .cons s (trans p q)
 
-def symm : LAP x y → LAP y x
+def symm : LieAlgPath 𝔤 add bracket zero neg ad scale killing x y →
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing y x
   | .nil _ => .nil _
   | .cons s p => trans (symm p) (.cons (.symm s) (.nil _))
 
-def congrArg (f : 𝔤 → 𝔤) : LAP x y → LAP (f x) (f y)
+def congrArg (f : 𝔤 → 𝔤) : LieAlgPath 𝔤 add bracket zero neg ad scale killing x y →
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (f x) (f y)
   | .nil _ => .nil _
   | .cons s p => .cons (.congrArg f s) (congrArg f p)
 
@@ -385,23 +385,17 @@ def lie_weyl_reflect (w : G) (X : 𝔤) :
       (mul (mul w (exp X)) (inv w)) (exp (Ad w X)) :=
   mk (.weyl_reflect w X)
 
--- 22: exp(X) * exp(-X) = e (3-step chain)
-def exp_cancel (X : 𝔤) :
+-- 22: exp right inverse
+def exp_right_inv (X : 𝔤) :
     LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
-      (mul (exp X) (exp (neg X))) e :=
-  (mk (.exp_add X (neg X))).trans
-    ((mk (.congrArg id (.exp_add X (neg X)))).symm.trans
-      ((mk (.exp_add X (neg X))).trans mk .exp_zero))
-
--- Let me simplify: use congrArg for the add_neg step
--- Actually exp(X + (-X)) needs to become exp(zero) in the algebra.
--- But we only have group-level steps. Let me use a different chain.
+      (mul (exp X) (inv (exp X))) e :=
+  mk (.mul_right_inv (exp X))
 
 -- 23: conjugation by e is identity (2-step)
 def conj_identity (X : 𝔤) :
     LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
-      (mul (mul e (exp X)) (inv e)) (exp X) :=
-  (mk (.congrArg (mul · (inv e)) (.mul_left_id (exp X)))).trans
+      (mul e (mul (exp X) e)) (exp X) :=
+  (mk (.mul_left_id (mul (exp X) e))).trans
     (mk (.mul_right_id (exp X)))
 
 -- 24: triple product associativity (2-step)
