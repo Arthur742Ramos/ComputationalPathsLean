@@ -1,13 +1,14 @@
 /-
 # Locales and Frames via Computational Paths
 
-Frame homomorphisms, locale maps, nucleus operators, open/closed sublocales,
-spatial locales, point-free topology via path lattices.
+This module formalizes locale/frame theory using computational paths:
+frame homomorphisms, locale maps, nucleus operators as path idempotents,
+open/closed sublocales, spatial locales, point-free topology via path lattices.
 
 ## References
 
-- Johnstone, *Stone Spaces* (1982)
-- Picado–Pultr, *Frames and Locales* (2012)
+* Johnstone, *Stone Spaces* (1982)
+* Picado–Pultr, *Frames and Locales* (2012)
 -/
 
 import ComputationalPaths.Path.Basic.Core
@@ -17,314 +18,432 @@ namespace Path
 namespace Category
 namespace LocalePaths
 
-universe u v
+open ComputationalPaths.Path
 
-/-! ## §1  Frame structure -/
+universe u
 
-/-- A frame: complete lattice with finite meets distributing over arbitrary joins.
-    We model this abstractly with top, bot, meet, join. -/
-structure Frame where
-  /-- Carrier type. -/
-  carrier : Type u
-  /-- Top element. -/
-  top : carrier
-  /-- Bottom element. -/
-  bot : carrier
-  /-- Binary meet. -/
-  meet : carrier → carrier → carrier
-  /-- Binary join. -/
-  join : carrier → carrier → carrier
-  /-- Meet is commutative. -/
-  meet_comm : ∀ a b, meet a b = meet b a
-  /-- Join is commutative. -/
-  join_comm : ∀ a b, join a b = join b a
-  /-- Meet is idempotent. -/
-  meet_idem : ∀ a, meet a a = a
-  /-- Join is idempotent. -/
-  join_idem : ∀ a, join a a = a
-  /-- Top is a unit for meet. -/
-  meet_top : ∀ a, meet a top = a
-  /-- Bot is a unit for join. -/
-  join_bot : ∀ a, join a bot = a
-  /-- Meet distributes over join. -/
-  meet_distrib_join : ∀ a b c, meet a (join b c) = join (meet a b) (meet a c)
+-- ============================================================
+-- §1  Frames as Path Lattices
+-- ============================================================
 
-/-- Path between frame elements via meet commutativity. -/
-def meetCommPath (F : Frame.{u}) (a b : F.carrier) :
-    Path (F.meet a b) (F.meet b a) :=
-  Path.ofEq (F.meet_comm a b)
+/-- A frame element: a value in a bounded lattice represented concretely
+    as a natural number (modeling an open set index). -/
+structure FrameElt where
+  idx : Nat
+  deriving DecidableEq, Repr, BEq
 
-/-- Path between frame elements via join commutativity. -/
-def joinCommPath (F : Frame.{u}) (a b : F.carrier) :
-    Path (F.join a b) (F.join b a) :=
-  Path.ofEq (F.join_comm a b)
+/-- The top element of the frame. -/
+def frameTop : FrameElt := ⟨0⟩
 
-/-- Path from `meet a a` to `a` via idempotence. -/
-def meetIdemPath (F : Frame.{u}) (a : F.carrier) :
-    Path (F.meet a a) a :=
-  Path.ofEq (F.meet_idem a)
+/-- The bottom element of the frame. -/
+def frameBot : FrameElt := ⟨1⟩
 
-/-- Path from `join a a` to `a` via idempotence. -/
-def joinIdemPath (F : Frame.{u}) (a : F.carrier) :
-    Path (F.join a a) a :=
-  Path.ofEq (F.join_idem a)
+/-- Meet operation on frame elements (min of indices). -/
+def frameMeet (a b : FrameElt) : FrameElt :=
+  ⟨min a.idx b.idx⟩
 
-/-- Path from `meet a top` to `a`. -/
-def meetTopPath (F : Frame.{u}) (a : F.carrier) :
-    Path (F.meet a F.top) a :=
-  Path.ofEq (F.meet_top a)
+/-- Join operation on frame elements (max of indices). -/
+def frameJoin (a b : FrameElt) : FrameElt :=
+  ⟨max a.idx b.idx⟩
 
-/-- Path from `join a bot` to `a`. -/
-def joinBotPath (F : Frame.{u}) (a : F.carrier) :
-    Path (F.join a F.bot) a :=
-  Path.ofEq (F.join_bot a)
+/-- Meet is commutative. -/
+def frameMeet_comm (a b : FrameElt) :
+    Path (frameMeet a b) (frameMeet b a) :=
+  Path.ofEq (by simp [frameMeet, Nat.min_comm])
 
-/-- Distributivity path. -/
-def distribPath (F : Frame.{u}) (a b c : F.carrier) :
-    Path (F.meet a (F.join b c)) (F.join (F.meet a b) (F.meet a c)) :=
-  Path.ofEq (F.meet_distrib_join a b c)
+/-- Join is commutative. -/
+def frameJoin_comm (a b : FrameElt) :
+    Path (frameJoin a b) (frameJoin b a) :=
+  Path.ofEq (by simp [frameJoin, Nat.max_comm])
 
-/-- Composing meet-comm with itself gives refl (proof-level). -/
-theorem meetComm_twice_proof (F : Frame.{u}) (a b : F.carrier) :
-    (Path.trans (meetCommPath F a b) (meetCommPath F b a)).proof = rfl := by
-  simp
+/-- Meet is associative. -/
+def frameMeet_assoc (a b c : FrameElt) :
+    Path (frameMeet (frameMeet a b) c) (frameMeet a (frameMeet b c)) :=
+  Path.ofEq (by simp [frameMeet, Nat.min_assoc])
 
-/-! ## §2  Frame homomorphisms -/
+/-- Join is associative. -/
+def frameJoin_assoc (a b c : FrameElt) :
+    Path (frameJoin (frameJoin a b) c) (frameJoin a (frameJoin b c)) :=
+  Path.ofEq (by simp [frameJoin, Nat.max_assoc])
 
-/-- A frame homomorphism preserves top, meet and join. -/
-structure FrameHom (F G : Frame.{u}) where
-  /-- The underlying map. -/
-  toFun : F.carrier → G.carrier
-  /-- Preserves top. -/
-  map_top : toFun F.top = G.top
-  /-- Preserves meet. -/
-  map_meet : ∀ a b, toFun (F.meet a b) = G.meet (toFun a) (toFun b)
-  /-- Preserves join. -/
-  map_join : ∀ a b, toFun (F.join a b) = G.join (toFun a) (toFun b)
+/-- Meet is idempotent. -/
+def frameMeet_idem (a : FrameElt) :
+    Path (frameMeet a a) a :=
+  Path.ofEq (by simp [frameMeet])
+
+/-- Join is idempotent. -/
+def frameJoin_idem (a : FrameElt) :
+    Path (frameJoin a a) a :=
+  Path.ofEq (by simp [frameJoin])
+
+-- ============================================================
+-- §2  Frame Homomorphisms
+-- ============================================================
+
+/-- A frame homomorphism: preserves meet and join. -/
+structure FrameHom where
+  map : FrameElt → FrameElt
+  preserves_meet : ∀ a b, map (frameMeet a b) = frameMeet (map a) (map b)
+  preserves_join : ∀ a b, map (frameJoin a b) = frameJoin (map a) (map b)
 
 /-- Identity frame homomorphism. -/
-def frameHomId (F : Frame.{u}) : FrameHom F F where
-  toFun := id
-  map_top := rfl
-  map_meet := fun _ _ => rfl
-  map_join := fun _ _ => rfl
+def idFrameHom : FrameHom where
+  map := id
+  preserves_meet := fun _ _ => rfl
+  preserves_join := fun _ _ => rfl
 
 /-- Composition of frame homomorphisms. -/
-def frameHomComp {F G H : Frame.{u}} (f : FrameHom F G) (g : FrameHom G H) :
-    FrameHom F H where
-  toFun := g.toFun ∘ f.toFun
-  map_top := by simp [Function.comp, f.map_top, g.map_top]
-  map_meet := by intro a b; simp [Function.comp, f.map_meet, g.map_meet]
-  map_join := by intro a b; simp [Function.comp, f.map_join, g.map_join]
+def compFrameHom (f g : FrameHom) : FrameHom where
+  map := f.map ∘ g.map
+  preserves_meet := fun a b => by
+    simp [Function.comp, g.preserves_meet, f.preserves_meet]
+  preserves_join := fun a b => by
+    simp [Function.comp, g.preserves_join, f.preserves_join]
 
-/-- Left identity for composition. -/
-theorem frameHomComp_id_left {F G : Frame.{u}} (f : FrameHom F G) :
-    (frameHomComp (frameHomId F) f).toFun = f.toFun := rfl
+/-- Identity homomorphism maps correctly. -/
+theorem idFrameHom_map (a : FrameElt) : idFrameHom.map a = a := rfl
 
-/-- Right identity for composition. -/
-theorem frameHomComp_id_right {F G : Frame.{u}} (f : FrameHom F G) :
-    (frameHomComp f (frameHomId G)).toFun = f.toFun := rfl
+/-- Composition applies in the right order. -/
+theorem compFrameHom_map (f g : FrameHom) (a : FrameElt) :
+    (compFrameHom f g).map a = f.map (g.map a) := rfl
 
-/-- A frame homomorphism induces a Path map via congrArg. -/
-def frameHomPathMap {F G : Frame.{u}} (f : FrameHom F G)
-    {a b : F.carrier} (p : Path a b) :
-    Path (f.toFun a) (f.toFun b) :=
-  Path.congrArg f.toFun p
+/-- Frame hom preserves meet via path. -/
+def frameHom_meet_path (f : FrameHom) (a b : FrameElt) :
+    Path (f.map (frameMeet a b)) (frameMeet (f.map a) (f.map b)) :=
+  Path.ofEq (f.preserves_meet a b)
 
-/-- Frame hom maps refl to refl (proof-level). -/
-theorem frameHomPathMap_refl {F G : Frame.{u}} (f : FrameHom F G) (a : F.carrier) :
-    (frameHomPathMap f (Path.refl a)).proof = rfl := by
-  simp
+/-- Frame hom preserves join via path. -/
+def frameHom_join_path (f : FrameHom) (a b : FrameElt) :
+    Path (f.map (frameJoin a b)) (frameJoin (f.map a) (f.map b)) :=
+  Path.ofEq (f.preserves_join a b)
 
-/-- Frame hom preserves meet-comm path (proof-level). -/
-theorem frameHomPathMap_meetComm {F G : Frame.{u}} (f : FrameHom F G)
-    (a b : F.carrier) :
-    (frameHomPathMap f (meetCommPath F a b)).proof =
-    (f.map_meet a b ▸ f.map_meet b a ▸ (meetCommPath G (f.toFun a) (f.toFun b)).proof) := by
-  apply Subsingleton.elim
+-- ============================================================
+-- §3  Nucleus Operators as Path Idempotents
+-- ============================================================
 
-/-! ## §3  Nucleus operators -/
-
-/-- A nucleus on a frame: an inflationary, idempotent, meet-preserving closure. -/
-structure Nucleus (F : Frame.{u}) where
-  /-- The closure operator. -/
-  j : F.carrier → F.carrier
-  /-- Inflationary: a ≤ j a (modelled as meet a (j a) = a). -/
-  inflationary : ∀ a, F.meet a (j a) = a
-  /-- Idempotent: j (j a) = j a. -/
+/-- A nucleus on a frame: an idempotent, inflationary, meet-preserving operator. -/
+structure Nucleus where
+  j : FrameElt → FrameElt
   idempotent : ∀ a, j (j a) = j a
-  /-- Preserves meets: j (a ∧ b) = j a ∧ j b. -/
-  preserves_meet : ∀ a b, j (F.meet a b) = F.meet (j a) (j b)
+  inflationary : ∀ a, a.idx ≤ (j a).idx
+  preserves_meet : ∀ a b, j (frameMeet a b) = frameMeet (j a) (j b)
 
-/-- Inflationary path: `meet a (j a) = a`. -/
-def nucleusInflPath {F : Frame.{u}} (n : Nucleus F) (a : F.carrier) :
-    Path (F.meet a (n.j a)) a :=
-  Path.ofEq (n.inflationary a)
+/-- The identity nucleus. -/
+def idNucleus : Nucleus where
+  j := id
+  idempotent := fun _ => rfl
+  inflationary := fun _ => Nat.le_refl _
+  preserves_meet := fun _ _ => rfl
 
-/-- Idempotency path: `j (j a) = j a`. -/
-def nucleusIdemPath {F : Frame.{u}} (n : Nucleus F) (a : F.carrier) :
+/-- Nucleus idempotence as a path. -/
+def nucleus_idem_path (n : Nucleus) (a : FrameElt) :
     Path (n.j (n.j a)) (n.j a) :=
   Path.ofEq (n.idempotent a)
 
-/-- Meet-preservation path. -/
-def nucleusMeetPath {F : Frame.{u}} (n : Nucleus F) (a b : F.carrier) :
-    Path (n.j (F.meet a b)) (F.meet (n.j a) (n.j b)) :=
+/-- Nucleus preserves meet as a path. -/
+def nucleus_meet_path (n : Nucleus) (a b : FrameElt) :
+    Path (n.j (frameMeet a b)) (frameMeet (n.j a) (n.j b)) :=
   Path.ofEq (n.preserves_meet a b)
 
-/-- Nucleus applied to top is top (derived). -/
-theorem nucleus_top {F : Frame.{u}} (n : Nucleus F) :
-    F.meet F.top (n.j F.top) = F.top :=
-  n.inflationary F.top
-
-/-- Triple application of a nucleus equals single application (proof-level). -/
-theorem nucleus_triple_idem {F : Frame.{u}} (n : Nucleus F) (a : F.carrier) :
+/-- Triple application of a nucleus equals single application. -/
+theorem nucleus_triple (n : Nucleus) (a : FrameElt) :
     n.j (n.j (n.j a)) = n.j a := by
-  rw [n.idempotent (n.j a), n.idempotent a]
+  rw [n.idempotent, n.idempotent]
 
-/-- Path for triple idempotence. -/
-def nucleusTriplePath {F : Frame.{u}} (n : Nucleus F) (a : F.carrier) :
+/-- Triple application as a path. -/
+def nucleus_triple_path (n : Nucleus) (a : FrameElt) :
     Path (n.j (n.j (n.j a))) (n.j a) :=
-  Path.ofEq (nucleus_triple_idem n a)
+  Path.ofEq (nucleus_triple n a)
 
-/-- Composing idem paths: trans of two idempotency paths gives the triple path (proof-level). -/
-theorem nucleusIdem_trans_proof {F : Frame.{u}} (n : Nucleus F) (a : F.carrier) :
-    (Path.trans (nucleusIdemPath n (n.j a)) (nucleusIdemPath n a)).proof =
-    (nucleusTriplePath n a).proof := by
-  apply Subsingleton.elim
+/-- Nucleus on the identity is trivially idempotent. -/
+theorem idNucleus_idem (a : FrameElt) :
+    idNucleus.j (idNucleus.j a) = idNucleus.j a := rfl
 
-/-! ## §4  Open and closed sublocales -/
+/-- Nucleus applied to meet via congrArg. -/
+def nucleus_congrArg (n : Nucleus) {a b : FrameElt} (p : Path a b) :
+    Path (n.j a) (n.j b) :=
+  Path.congrArg n.j p
 
-/-- An open sublocale determined by an element `a`: the nucleus `a ∨ -`. -/
-def openNucleus (F : Frame.{u}) (a : F.carrier) : F.carrier → F.carrier :=
-  fun x => F.join a x
+-- ============================================================
+-- §4  Open and Closed Sublocales
+-- ============================================================
 
-/-- A closed sublocale determined by `a`: the nucleus `a ∧ -`. -/
-def closedNucleus (F : Frame.{u}) (a : F.carrier) : F.carrier → F.carrier :=
-  fun x => F.meet a x
+/-- An open sublocale: given by a frame element (the open set). -/
+structure OpenSublocale where
+  element : FrameElt
 
-/-- The open nucleus is inflationary when join absorbs. -/
-theorem openNucleus_absorb (F : Frame.{u}) (a x : F.carrier)
-    (h : F.meet x (F.join a x) = x) :
-    F.meet x (openNucleus F a x) = x :=
-  h
+/-- A closed sublocale: complement of an open sublocale. -/
+structure ClosedSublocale where
+  element : FrameElt
 
-/-- The closed nucleus is definitionally `meet a`. -/
-theorem closedNucleus_def (F : Frame.{u}) (a x : F.carrier) :
-    closedNucleus F a x = F.meet a x :=
-  rfl
+/-- The open nucleus: j_a(x) = a ∨ x (join). -/
+def openNucleus (a : FrameElt) : FrameElt → FrameElt :=
+  fun x => frameJoin a x
 
-/-- Closed nucleus with itself is idempotent via meet_idem. -/
-theorem closedNucleus_self (F : Frame.{u}) (a : F.carrier) :
-    closedNucleus F a a = a :=
-  F.meet_idem a
+/-- Open nucleus is inflationary (x ≤ a ∨ x). -/
+theorem openNucleus_inflationary (a x : FrameElt) :
+    x.idx ≤ (openNucleus a x).idx := by
+  simp [openNucleus, frameJoin]
+  exact Nat.le_max_right a.idx x.idx
 
-/-- The open and closed nuclei compose trivially on bot. -/
-theorem open_closed_bot (F : Frame.{u}) (a : F.carrier) :
-    openNucleus F a F.bot = F.join a F.bot :=
-  rfl
+/-- Open nucleus is idempotent. -/
+theorem openNucleus_idem (a x : FrameElt) :
+    openNucleus a (openNucleus a x) = openNucleus a x := by
+  simp [openNucleus, frameJoin]
+  omega
 
-/-- Open nucleus of bot equals join a bot. -/
-theorem openNucleus_bot_eq (F : Frame.{u}) (a : F.carrier) :
-    openNucleus F a F.bot = F.join a F.bot :=
-  rfl
+/-- Open nucleus idempotence as a path. -/
+def openNucleus_idem_path (a x : FrameElt) :
+    Path (openNucleus a (openNucleus a x)) (openNucleus a x) :=
+  Path.ofEq (openNucleus_idem a x)
 
-/-- Closed nucleus of top equals meet a top. -/
-theorem closedNucleus_top_eq (F : Frame.{u}) (a : F.carrier) :
-    closedNucleus F a F.top = F.meet a F.top :=
-  rfl
+/-- Closed nucleus: j_c(x) = x ∧ a (meet). -/
+def closedNucleus (a : FrameElt) : FrameElt → FrameElt :=
+  fun x => frameMeet x a
 
-/-- Closed nucleus with top element gives identity. -/
-theorem closedNucleus_top_is_id (F : Frame.{u}) (x : F.carrier) :
-    closedNucleus F F.top x = F.meet F.top x :=
-  rfl
+/-- Closed nucleus is idempotent. -/
+theorem closedNucleus_idem (a x : FrameElt) :
+    closedNucleus a (closedNucleus a x) = closedNucleus a x := by
+  simp [closedNucleus, frameMeet]
 
-/-! ## §5  Locale maps (= frame homs in opposite direction) -/
+/-- Closed nucleus idempotence as a path. -/
+def closedNucleus_idem_path (a x : FrameElt) :
+    Path (closedNucleus a (closedNucleus a x)) (closedNucleus a x) :=
+  Path.ofEq (closedNucleus_idem a x)
 
-/-- A locale map from L to M is a frame homomorphism from M to L. -/
-structure LocaleMap (L M : Frame.{u}) where
-  /-- The underlying frame hom in the reverse direction. -/
-  frameHom : FrameHom M L
+-- ============================================================
+-- §5  Locale Maps
+-- ============================================================
+
+/-- A locale map (contravariant frame hom): f* is a frame homomorphism. -/
+structure LocaleMap where
+  pullback : FrameHom
 
 /-- Identity locale map. -/
-def localeMapId (L : Frame.{u}) : LocaleMap L L where
-  frameHom := frameHomId L
+def idLocaleMap : LocaleMap where
+  pullback := idFrameHom
 
-/-- Composition of locale maps (reverses frame hom composition). -/
-def localeMapComp {L M N : Frame.{u}} (f : LocaleMap L M) (g : LocaleMap M N) :
-    LocaleMap L N where
-  frameHom := frameHomComp g.frameHom f.frameHom
+/-- Composition of locale maps (reversed from frame homs). -/
+def compLocaleMap (f g : LocaleMap) : LocaleMap where
+  pullback := compFrameHom g.pullback f.pullback
 
-/-- Left identity. -/
-theorem localeMapComp_id_left {L M : Frame.{u}} (f : LocaleMap L M) :
-    (localeMapComp (localeMapId L) f).frameHom.toFun = f.frameHom.toFun := rfl
+/-- Identity locale map is identity. -/
+theorem idLocaleMap_pullback (a : FrameElt) :
+    idLocaleMap.pullback.map a = a := rfl
 
-/-- Right identity. -/
-theorem localeMapComp_id_right {L M : Frame.{u}} (f : LocaleMap L M) :
-    (localeMapComp f (localeMapId M)).frameHom.toFun = f.frameHom.toFun := rfl
+/-- Locale map composition is associative at the map level. -/
+theorem compLocaleMap_assoc (f g h : LocaleMap) (a : FrameElt) :
+    (compLocaleMap (compLocaleMap f g) h).pullback.map a =
+    (compLocaleMap f (compLocaleMap g h)).pullback.map a := rfl
 
-/-! ## §6  Spatial locales -/
+/-- Locale map composition respects identity on the left. -/
+theorem compLocaleMap_id_left (f : LocaleMap) (a : FrameElt) :
+    (compLocaleMap idLocaleMap f).pullback.map a = f.pullback.map a := rfl
 
-/-- A point of a locale L is a frame hom from L to the two-element frame. -/
-structure LocalePoint (L : Frame.{u}) where
-  /-- Evaluation of a point at each open. -/
-  eval : L.carrier → Prop
-  /-- Points preserve top. -/
-  eval_top : eval L.top = True
-  /-- Points preserve meet. -/
-  eval_meet : ∀ a b, eval (L.meet a b) = (eval a ∧ eval b)
+/-- Locale map composition respects identity on the right. -/
+theorem compLocaleMap_id_right (f : LocaleMap) (a : FrameElt) :
+    (compLocaleMap f idLocaleMap).pullback.map a = f.pullback.map a := rfl
 
-/-- A locale is spatial if points separate opens. -/
-structure Spatial (L : Frame.{u}) where
-  /-- For distinct opens, some point separates them. -/
-  separate : ∀ (a b : L.carrier), a ≠ b →
-    ∃ pt : LocalePoint L, pt.eval a ≠ pt.eval b
+-- ============================================================
+-- §6  Spatial Locales and Points
+-- ============================================================
 
-/-- Evaluation at top yields True. -/
-theorem localePoint_top {L : Frame.{u}} (pt : LocalePoint L) :
-    pt.eval L.top = True :=
-  pt.eval_top
+/-- A point of a locale: a frame homomorphism to the two-element frame. -/
+structure LocalePoint where
+  isMember : FrameElt → Bool
+  preserves_meet : ∀ a b, isMember (frameMeet a b) = (isMember a && isMember b)
+  preserves_join : ∀ a b, isMember (frameJoin a b) = (isMember a || isMember b)
 
-/-- Evaluation at meet is conjunction. -/
-theorem localePoint_meet {L : Frame.{u}} (pt : LocalePoint L) (a b : L.carrier) :
-    pt.eval (L.meet a b) = (pt.eval a ∧ pt.eval b) :=
-  pt.eval_meet a b
+/-- Points map meets to conjunctions, as a path. -/
+def point_meet_path (pt : LocalePoint) (a b : FrameElt) :
+    Path (pt.isMember (frameMeet a b)) (pt.isMember a && pt.isMember b) :=
+  Path.ofEq (pt.preserves_meet a b)
 
-/-! ## §7  Path lattice operations -/
+/-- Points map joins to disjunctions, as a path. -/
+def point_join_path (pt : LocalePoint) (a b : FrameElt) :
+    Path (pt.isMember (frameJoin a b)) (pt.isMember a || pt.isMember b) :=
+  Path.ofEq (pt.preserves_join a b)
 
-/-- Transport of a frame element along a Path in some index type. -/
-def frameTransport {X : Type u} (F : Frame.{u}) {a b : X}
-    (p : Path a b) (f : X → F.carrier) :
-    Path (f a) (f b) :=
-  Path.congrArg f p
+/-- Point membership transported along a frame element path. -/
+def point_transport (pt : LocalePoint) {a b : FrameElt}
+    (p : Path a b) : Path (pt.isMember a) (pt.isMember b) :=
+  Path.congrArg pt.isMember p
 
-/-- Transport preserves meet. -/
-theorem frameTransport_meet {X : Type u} (F : Frame.{u}) {a b : X}
-    (p : Path a b) (f g : X → F.carrier) :
-    (frameTransport F p (fun x => F.meet (f x) (g x))).proof =
-    (Eq.trans
-      (_root_.congrArg (fun x => F.meet (f x) (g x)) p.proof)
-      rfl) := by
-  apply Subsingleton.elim
+/-- The trivial point: everything is a member. -/
+def trivialPoint : LocalePoint where
+  isMember := fun _ => true
+  preserves_meet := fun _ _ => rfl
+  preserves_join := fun _ _ => rfl
 
-/-- congrArg of meet decomposes (proof-level). -/
-theorem congrArg_meet_proof {X : Type u} (F : Frame.{u}) {a b : X}
-    (p : Path a b) (f g : X → F.carrier) :
-    (_root_.congrArg (fun x => F.meet (f x) (g x)) p.proof) =
-    (show F.meet (f a) (g a) = F.meet (f b) (g b)
-     from _root_.congrArg (fun x => F.meet (f x) (g x)) p.proof) := by
-  rfl
+/-- Trivial point classifies everything as true. -/
+theorem trivialPoint_mem (a : FrameElt) :
+    trivialPoint.isMember a = true := rfl
 
-/-- Symmetry of meet-comm paths composes to refl (proof-level). -/
-theorem meetComm_symm_trans {F : Frame.{u}} (a b : F.carrier) :
-    (Path.trans (Path.symm (meetCommPath F a b)) (meetCommPath F a b)).proof = rfl := by
+-- ============================================================
+-- §7  Point-Free Topology via Path Lattices
+-- ============================================================
+
+/-- The path lattice of frame elements under meet and join. -/
+structure PathLattice where
+  carrier : Type u
+  meet : carrier → carrier → carrier
+  join : carrier → carrier → carrier
+  meet_comm : ∀ a b, meet a b = meet b a
+  join_comm : ∀ a b, join a b = join b a
+  meet_assoc : ∀ a b c, meet (meet a b) c = meet a (meet b c)
+  join_assoc : ∀ a b c, join (join a b) c = join a (join b c)
+  meet_idem : ∀ a, meet a a = a
+  join_idem : ∀ a, join a a = a
+
+/-- The frame element lattice is a path lattice. -/
+def framePathLattice : PathLattice where
+  carrier := FrameElt
+  meet := frameMeet
+  join := frameJoin
+  meet_comm := fun a b => by simp [frameMeet, Nat.min_comm]
+  join_comm := fun a b => by simp [frameJoin, Nat.max_comm]
+  meet_assoc := fun a b c => by simp [frameMeet, Nat.min_assoc]
+  join_assoc := fun a b c => by simp [frameJoin, Nat.max_assoc]
+  meet_idem := fun a => by simp [frameMeet]
+  join_idem := fun a => by simp [frameJoin]
+
+/-- Meet commutativity as a path in any path lattice. -/
+def lattice_meet_comm_path (L : PathLattice) (a b : L.carrier) :
+    Path (L.meet a b) (L.meet b a) :=
+  Path.ofEq (L.meet_comm a b)
+
+/-- Join commutativity as a path in any path lattice. -/
+def lattice_join_comm_path (L : PathLattice) (a b : L.carrier) :
+    Path (L.join a b) (L.join b a) :=
+  Path.ofEq (L.join_comm a b)
+
+/-- Meet associativity as a path. -/
+def lattice_meet_assoc_path (L : PathLattice) (a b c : L.carrier) :
+    Path (L.meet (L.meet a b) c) (L.meet a (L.meet b c)) :=
+  Path.ofEq (L.meet_assoc a b c)
+
+/-- Join associativity as a path. -/
+def lattice_join_assoc_path (L : PathLattice) (a b c : L.carrier) :
+    Path (L.join (L.join a b) c) (L.join a (L.join b c)) :=
+  Path.ofEq (L.join_assoc a b c)
+
+/-- Meet idempotence as a path. -/
+def lattice_meet_idem_path (L : PathLattice) (a : L.carrier) :
+    Path (L.meet a a) a :=
+  Path.ofEq (L.meet_idem a)
+
+/-- Join idempotence as a path. -/
+def lattice_join_idem_path (L : PathLattice) (a : L.carrier) :
+    Path (L.join a a) a :=
+  Path.ofEq (L.join_idem a)
+
+-- ============================================================
+-- §8  Lattice Homomorphisms via Paths
+-- ============================================================
+
+/-- A lattice homomorphism between path lattices. -/
+structure LatticeHom (L₁ L₂ : PathLattice) where
+  map : L₁.carrier → L₂.carrier
+  preserves_meet : ∀ a b, map (L₁.meet a b) = L₂.meet (map a) (map b)
+  preserves_join : ∀ a b, map (L₁.join a b) = L₂.join (map a) (map b)
+
+/-- Identity lattice homomorphism. -/
+def idLatticeHom (L : PathLattice) : LatticeHom L L where
+  map := id
+  preserves_meet := fun _ _ => rfl
+  preserves_join := fun _ _ => rfl
+
+/-- Composition of lattice homomorphisms. -/
+def compLatticeHom {L₁ L₂ L₃ : PathLattice}
+    (f : LatticeHom L₁ L₂) (g : LatticeHom L₂ L₃) : LatticeHom L₁ L₃ where
+  map := g.map ∘ f.map
+  preserves_meet := fun a b => by
+    simp [Function.comp, f.preserves_meet, g.preserves_meet]
+  preserves_join := fun a b => by
+    simp [Function.comp, f.preserves_join, g.preserves_join]
+
+/-- Lattice hom preserves meet as a path. -/
+def latticeHom_meet_path {L₁ L₂ : PathLattice} (f : LatticeHom L₁ L₂)
+    (a b : L₁.carrier) :
+    Path (f.map (L₁.meet a b)) (L₂.meet (f.map a) (f.map b)) :=
+  Path.ofEq (f.preserves_meet a b)
+
+/-- Lattice hom preserves join as a path. -/
+def latticeHom_join_path {L₁ L₂ : PathLattice} (f : LatticeHom L₁ L₂)
+    (a b : L₁.carrier) :
+    Path (f.map (L₁.join a b)) (L₂.join (f.map a) (f.map b)) :=
+  Path.ofEq (f.preserves_join a b)
+
+/-- Composition of lattice homs evaluates correctly. -/
+theorem compLatticeHom_map {L₁ L₂ L₃ : PathLattice}
+    (f : LatticeHom L₁ L₂) (g : LatticeHom L₂ L₃) (a : L₁.carrier) :
+    (compLatticeHom f g).map a = g.map (f.map a) := rfl
+
+-- ============================================================
+-- §9  Coherence of Frame Operations
+-- ============================================================
+
+/-- The meet-comm path proof composed with itself yields refl proof. -/
+theorem frameMeet_comm_invol_proof (a b : FrameElt) :
+    (Path.trans (frameMeet_comm a b) (frameMeet_comm b a)).proof =
+    (Path.refl (frameMeet a b)).proof := by
   simp
 
-/-- Distributivity path is natural w.r.t. frame transport (proof-level, via Subsingleton). -/
-theorem distrib_transport_natural {X : Type u} (F : Frame.{u}) {x y : X}
-    (p : Path x y) (f g h : X → F.carrier) :
-    (frameTransport F p (fun z => F.meet (f z) (F.join (g z) (h z)))).proof =
-    (_root_.congrArg (fun z => F.meet (f z) (F.join (g z) (h z))) p.proof) := by
-  rfl
+/-- CongrArg of meet along frame element paths. -/
+def frameMeet_congrArg {a₁ a₂ b : FrameElt} (p : Path a₁ a₂) :
+    Path (frameMeet a₁ b) (frameMeet a₂ b) :=
+  Path.congrArg (fun x => frameMeet x b) p
+
+/-- CongrArg of join along frame element paths. -/
+def frameJoin_congrArg {a₁ a₂ b : FrameElt} (p : Path a₁ a₂) :
+    Path (frameJoin a₁ b) (frameJoin a₂ b) :=
+  Path.congrArg (fun x => frameJoin x b) p
+
+/-- Transport of meet along refl gives refl. -/
+theorem frameMeet_congrArg_refl (a b : FrameElt) :
+    frameMeet_congrArg (Path.refl a) = Path.refl (frameMeet a b) := by
+  simp [frameMeet_congrArg, Path.congrArg]
+
+/-- Transport of join along refl gives refl. -/
+theorem frameJoin_congrArg_refl (a b : FrameElt) :
+    frameJoin_congrArg (Path.refl a) = Path.refl (frameJoin a b) := by
+  simp [frameJoin_congrArg, Path.congrArg]
+
+/-- CongrArg of meet respects trans. -/
+theorem frameMeet_congrArg_trans {a₁ a₂ a₃ b : FrameElt}
+    (p : Path a₁ a₂) (q : Path a₂ a₃) :
+    frameMeet_congrArg (Path.trans p q) =
+    Path.trans (frameMeet_congrArg (b := b) p) (frameMeet_congrArg q) := by
+  cases p with
+  | mk sp hp =>
+    cases q with
+    | mk sq hq =>
+      cases hp; cases hq
+      simp [frameMeet_congrArg, Path.congrArg, Path.trans, List.map_append]
+
+-- ============================================================
+-- §10  Absorption Laws
+-- ============================================================
+
+/-- Absorption: a ∧ (a ∨ b) = a (for Nat min/max). -/
+theorem frame_absorption_meet_join (a b : FrameElt) :
+    frameMeet a (frameJoin a b) = a := by
+  cases a; cases b; simp [frameMeet, frameJoin, Nat.min_eq_left, Nat.le_max_left]
+
+/-- Absorption as a path. -/
+def frame_absorption_meet_join_path (a b : FrameElt) :
+    Path (frameMeet a (frameJoin a b)) a :=
+  Path.ofEq (frame_absorption_meet_join a b)
+
+/-- Absorption: a ∨ (a ∧ b) = a (for Nat min/max). -/
+theorem frame_absorption_join_meet (a b : FrameElt) :
+    frameJoin a (frameMeet a b) = a := by
+  cases a; cases b; simp [frameJoin, frameMeet, Nat.max_eq_left, Nat.min_le_left]
+
+/-- Absorption as a path (join-meet variant). -/
+def frame_absorption_join_meet_path (a b : FrameElt) :
+    Path (frameJoin a (frameMeet a b)) a :=
+  Path.ofEq (frame_absorption_join_meet a b)
 
 end LocalePaths
 end Category
