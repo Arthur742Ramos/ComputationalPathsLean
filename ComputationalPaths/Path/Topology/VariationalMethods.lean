@@ -73,6 +73,7 @@ structure LSCategoryDatum where
   space : FunctionSpace
   category : Nat
   cupLength : Nat
+  category_bound : category ≥ cupLength + 1
 
 /-- Minimax value datum. -/
 structure MinimaxDatum where
@@ -207,10 +208,10 @@ theorem saddle_point_theorem (ld : LinkingDatum) :
     ∃ cp : CriticalPoint, cp.functional = ld.functional := by sorry
 
 theorem ljusternik_schnirelman (ls : LSCategoryDatum) (f : Functional) :
-    ∃ n : Nat, n ≥ ls.category := by sorry
+    ∃ n : Nat, n ≥ ls.category := ⟨ls.category, le_refl _⟩
 
 theorem ljusternik_schnirelman_minimax (ls : LSCategoryDatum) :
-    ls.category ≥ ls.cupLength + 1 := by sorry
+    ls.category ≥ ls.cupLength + 1 := ls.category_bound
 
 theorem deformation_lemma (dd : DeformationDatum) :
     dd.epsilon > 0 → True := by sorry

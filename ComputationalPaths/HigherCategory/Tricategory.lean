@@ -121,27 +121,27 @@ theorem triangleatorHigher_eq_contractibility (f : Hom a b) (g : Hom b c)
 theorem pentagonator_has_expected_type (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e)
     (piCell : ThreeCell (Bicategory.pentagonLeftPath f g h k)
       (Bicategory.pentagonRightPath f g h k)) :
-    Nonempty (FourCell (pentagonIdentity f g h k) piCell) := by
-  rfl
+    Nonempty (FourCell (pentagonIdentity f g h k) piCell) :=
+  ⟨pentagonator f g h k piCell⟩
 
 theorem triangleator_has_expected_type (f : Hom a b) (g : Hom b c)
     (tau : ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g)) :
-    Nonempty (FourCell (triangleIdentity f g) tau) := by
-  rfl
+    Nonempty (FourCell (triangleIdentity f g) tau) :=
+  ⟨triangleator f g tau⟩
 
 theorem pentagonatorHigher_has_expected_type (f : Hom a b) (g : Hom b c) (h : Hom c d)
     (k : Hom d e)
     (piCell : ThreeCell (Bicategory.pentagonLeftPath f g h k)
       (Bicategory.pentagonRightPath f g h k))
     (m1 m2 : FourCell (pentagonIdentity f g h k) piCell) :
-    Nonempty (DerivationHigh 0 m1 m2) := by
-  rfl
+    Nonempty (DerivationHigh 0 m1 m2) :=
+  ⟨pentagonatorHigher f g h k piCell m1 m2⟩
 
 theorem triangleatorHigher_has_expected_type (f : Hom a b) (g : Hom b c)
     (tau : ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g))
     (m1 m2 : FourCell (triangleIdentity f g) tau) :
-    Nonempty (DerivationHigh 0 m1 m2) := by
-  rfl
+    Nonempty (DerivationHigh 0 m1 m2) :=
+  ⟨triangleatorHigher f g tau m1 m2⟩
 
 end Tricategory
 end HigherCategory
