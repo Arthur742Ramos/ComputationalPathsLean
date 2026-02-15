@@ -120,23 +120,23 @@ end OrientedThomIsomorphism
 theorem thomSpace_alias_cast {K B Total V : Type u}
     (bundle : VectorBundleData K B Total V) (Th : ThomSpace bundle) :
     (show Homotopy.ThomSpectra.ThomSpace bundle from Th) = Th := by
-  sorry
+  rfl
 
 theorem thomClass_alias_cast (H : ReducedCohomologyTheory) {K B Total V : Type u}
     (bundle : VectorBundleData K B Total V) (Th : ThomSpace bundle)
     (uTh : ThomClass H bundle Th) :
     (show Homotopy.ThomSpectra.ThomClass H bundle Th from uTh) = uTh := by
-  sorry
+  rfl
 
 theorem thomIsomorphism_alias_cast (H : ReducedCohomologyTheory) {K B Total V : Type u}
     (bundle : VectorBundleData K B Total V) (Th : ThomSpace bundle) (b0 : B)
     (iso : ThomIsomorphism H bundle Th b0) :
     (show Homotopy.ThomSpectra.ThomIsomorphism H bundle Th b0 from iso) = iso := by
-  sorry
+  rfl
 
 theorem thomBasePointed_alias_eq (B : Type u) (b : B) :
     thomBasePointed B b = Homotopy.ThomSpectra.basePointed B b := by
-  sorry
+  rfl
 
 namespace BundleOrientation
 
@@ -145,15 +145,15 @@ variable {K B Total V : Type u} {bundle : VectorBundleData K B Total V}
 
 theorem degreePath_def (O : BundleOrientation H bundle) :
     degreePath O = Path.stepChain O.degree_eq_rank := by
-  sorry
+  rfl
 
 theorem degreePath_toEq (O : BundleOrientation H bundle) :
     Path.toEq (degreePath O) = O.degree_eq_rank := by
-  sorry
+  rfl
 
 theorem degree_eq_rank_from_path (O : BundleOrientation H bundle) :
-    O.thomClass.degree = bundle.rank := by
-  sorry
+    O.thomClass.degree = bundle.rank :=
+  O.degree_eq_rank
 
 end BundleOrientation
 
@@ -162,13 +162,13 @@ variable {K B Total V : Type u}
 
 theorem orientedVectorBundle_degree_eq_rank
     (E : OrientedVectorBundle H K B Total V) :
-    E.orientation.thomClass.degree = E.bundle.rank := by
-  sorry
+    E.orientation.thomClass.degree = E.bundle.rank :=
+  E.orientation.degree_eq_rank
 
 theorem orientedVectorBundle_degreePath_toEq
     (E : OrientedVectorBundle H K B Total V) :
     Path.toEq (BundleOrientation.degreePath E.orientation) = E.orientation.degree_eq_rank := by
-  sorry
+  rfl
 
 namespace OrientedThomIsomorphism
 
@@ -177,19 +177,19 @@ variable {K B Total V : Type u} {bundle : VectorBundleData K B Total V} {b0 : B}
 
 theorem degreePath_def (T : OrientedThomIsomorphism H bundle b0) :
     degreePath T = Path.stepChain T.degree_eq_rank := by
-  sorry
+  rfl
 
 theorem degreePath_toEq (T : OrientedThomIsomorphism H bundle b0) :
     Path.toEq (degreePath T) = T.degree_eq_rank := by
-  sorry
+  rfl
 
 theorem classPath_def (T : OrientedThomIsomorphism H bundle b0) :
     classPath T = T.class_eq := by
-  sorry
+  rfl
 
 theorem degree_eq_orientation_degree (T : OrientedThomIsomorphism H bundle b0) :
     T.isomorphism.degree = T.orientation.thomClass.degree := by
-  sorry
+  rw [T.degree_eq_rank, T.orientation.degree_eq_rank]
 
 end OrientedThomIsomorphism
 

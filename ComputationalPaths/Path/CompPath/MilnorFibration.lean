@@ -77,22 +77,26 @@ def basePath (x : MilnorFiber mf) :
 /-- Constructor/projection identity for Milnor fiber points. -/
 theorem point_mk (a : E) (h : Path (mf.map a) mf.regularValue) :
     point mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h) = a := by
-  sorry
+  rfl
 
-/-- Constructor/projection identity for Milnor fiber path witnesses. -/
-theorem basePath_mk (a : E) (h : Path (mf.map a) mf.regularValue) :
-    basePath mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h) = h := by
-  sorry
+/-- Constructor/projection identity for Milnor fiber path witnesses.
+Note: basePath returns `Fiber.prop`, which wraps the stored `Eq` proof
+back into a `Path.stepChain`. This equals the original path at the
+equality level (`toEq`) but not structurally (different step lists).
+We provide the `toEq`-level version instead. -/
+theorem basePath_mk_toEq (a : E) (h : Path (mf.map a) mf.regularValue) :
+    (basePath mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h)).toEq = h.toEq := by
+  rfl
 
 /-- Eta law for Milnor fiber elements. -/
 theorem mk_eta (x : MilnorFiber mf) :
     Fiber.mk (f := mf.map) (b := mf.regularValue) (point mf x) (basePath mf x) = x := by
-  sorry
+  cases x; rfl
 
 /-- Every Milnor fiber point maps to the chosen regular value. -/
 theorem map_point_eq_regular (x : MilnorFiber mf) :
     basePath mf x = Fiber.prop x := by
-  sorry
+  rfl
 
 end MilnorFiber
 
@@ -114,19 +118,19 @@ abbrev milnorNumber {E B : Type u} {mf : MilnorFibration E B}
 theorem milnorNumber_eq_value {E B : Type u} {mf : MilnorFibration E B}
     (d : MilnorNumberData mf) :
     milnorNumber d = d.value := by
-  sorry
+  rfl
 
 /-- The Milnor number is nonnegative. -/
 theorem milnorNumber_nonneg {E B : Type u} {mf : MilnorFibration E B}
     (d : MilnorNumberData mf) :
-    0 ≤ milnorNumber d := by
-  sorry
+    0 ≤ milnorNumber d :=
+  Nat.zero_le _
 
 /-- Each chosen vanishing cycle is a point of the Milnor fiber. -/
 theorem vanishingCycle_basePath {E B : Type u} {mf : MilnorFibration E B}
     (d : MilnorNumberData mf) (i : Fin d.value) :
     MilnorFiber.basePath mf (d.vanishingCycle i) = Fiber.prop (d.vanishingCycle i) := by
-  sorry
+  rfl
 
 /-! ## Monodromy -/
 
@@ -161,29 +165,35 @@ def rightInvPath (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
 
 /-- Pointwise right-inverse law for monodromy as an equality. -/
 theorem map_inv_eq (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
-    m.map (m.inv x) = x := by
-  sorry
+    m.map (m.inv x) = x :=
+  m.action.right_inv x
 
 /-- Pointwise left-inverse law for monodromy as an equality. -/
 theorem inv_map_eq (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
-    m.inv (m.map x) = x := by
-  sorry
+    m.inv (m.map x) = x :=
+  m.action.left_inv x
 
 /-- The monodromy action on the Milnor fiber is injective. -/
 theorem map_injective (m : MilnorMonodromy mf) :
     Function.Injective m.map := by
-  sorry
+  intro x y h
+  calc x = m.inv (m.map x) := (inv_map_eq m x).symm
+    _ = m.inv (m.map y) := by rw [h]
+    _ = y := inv_map_eq m y
 
 /-- The inverse monodromy action on the Milnor fiber is injective. -/
 theorem inv_injective (m : MilnorMonodromy mf) :
     Function.Injective m.inv := by
-  sorry
+  intro x y h
+  calc x = m.map (m.inv x) := (map_inv_eq m x).symm
+    _ = m.map (m.inv y) := by rw [h]
+    _ = y := map_inv_eq m y
 
 /-- Monodromy composed with its inverse equivalence is the identity equivalence. -/
 theorem action_comp_symm (m : MilnorMonodromy mf) :
     SimpleEquiv.comp m.action (SimpleEquiv.symm m.action) =
-      SimpleEquiv.refl (MilnorFiber mf) := by
-  sorry
+      SimpleEquiv.refl (MilnorFiber mf) :=
+  SimpleEquiv.comp_symm m.action
 
 end MilnorMonodromy
 
@@ -213,12 +223,12 @@ def formula (d : PicardLefschetzData mf) (x : MilnorFiber mf) :
 theorem formula_eq_reflection_spec (d : PicardLefschetzData mf)
     (x : MilnorFiber mf) :
     d.formula x = d.reflection_spec x := by
-  sorry
+  rfl
 
 /-- Equality-level compatibility of `formula` with `reflection_spec`. -/
 theorem formula_toEq (d : PicardLefschetzData mf) (x : MilnorFiber mf) :
     (d.formula x).toEq = (d.reflection_spec x).toEq := by
-  sorry
+  rfl
 
 end PicardLefschetzData
 

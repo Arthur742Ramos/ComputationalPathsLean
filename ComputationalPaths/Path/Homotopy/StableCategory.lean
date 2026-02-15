@@ -70,17 +70,17 @@ theorem ShiftFunctor.iterate_one {C : PreAdditiveCategory.{u}}
 theorem ShiftFunctor.iterate_succ {C : PreAdditiveCategory.{u}}
     (T : ShiftFunctor C) (n : Nat) (X : C.Obj) :
     T.iterate (n + 1) X = T.shiftObj (T.iterate n X) := by
-  sorry
+  rfl
 
 theorem ShiftFunctor.iterate_two {C : PreAdditiveCategory.{u}}
     (T : ShiftFunctor C) (X : C.Obj) :
     T.iterate 2 X = T.shiftObj (T.shiftObj X) := by
-  sorry
+  rfl
 
 theorem ShiftFunctor.iterate_three {C : PreAdditiveCategory.{u}}
     (T : ShiftFunctor C) (X : C.Obj) :
     T.iterate 3 X = T.shiftObj (T.shiftObj (T.shiftObj X)) := by
-  sorry
+  rfl
 
 /-! ## Triangles -/
 
@@ -132,33 +132,27 @@ def Triangle.rotate {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
 
 theorem Triangle.rotate_X {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
     (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
-    (Tr.rotate negShiftF).X = Tr.Y := by
-  sorry
+    (Tr.rotate negShiftF).X = Tr.Y := rfl
 
 theorem Triangle.rotate_Y {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
     (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
-    (Tr.rotate negShiftF).Y = Tr.Z := by
-  sorry
+    (Tr.rotate negShiftF).Y = Tr.Z := rfl
 
 theorem Triangle.rotate_Z {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
     (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
-    (Tr.rotate negShiftF).Z = T.shiftObj Tr.X := by
-  sorry
+    (Tr.rotate negShiftF).Z = T.shiftObj Tr.X := rfl
 
 theorem Triangle.rotate_f {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
     (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
-    (Tr.rotate negShiftF).f = Tr.g := by
-  sorry
+    (Tr.rotate negShiftF).f = Tr.g := rfl
 
 theorem Triangle.rotate_g {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
     (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
-    (Tr.rotate negShiftF).g = Tr.h := by
-  sorry
+    (Tr.rotate negShiftF).g = Tr.h := rfl
 
 theorem Triangle.rotate_h {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
     (Tr : Triangle C T) (negShiftF : C.Hom (T.shiftObj Tr.X) (T.shiftObj Tr.Y)) :
-    (Tr.rotate negShiftF).h = negShiftF := by
-  sorry
+    (Tr.rotate negShiftF).h = negShiftF := rfl
 
 /-! ## Triangulated category -/
 
@@ -226,12 +220,12 @@ def ExactFunctor.id (TC : TriangulatedCategory.{u}) : ExactFunctor TC TC where
 
 theorem ExactFunctor.id_mapObj (TC : TriangulatedCategory.{u}) (X : TC.cat.Obj) :
     (ExactFunctor.id TC).mapObj X = X := by
-  sorry
+  rfl
 
 theorem ExactFunctor.id_mapHom (TC : TriangulatedCategory.{u}) {X Y : TC.cat.Obj}
     (f : TC.cat.Hom X Y) :
     (ExactFunctor.id TC).mapHom f = f := by
-  sorry
+  rfl
 
 /-- A stable equivalence. -/
 structure StableEquivalence (TC₁ TC₂ : TriangulatedCategory.{u}) where
@@ -251,12 +245,10 @@ def StableEquivalence.refl (TC : TriangulatedCategory.{u}) :
   counit_obj := fun _ => rfl
 
 theorem StableEquivalence.refl_forward (TC : TriangulatedCategory.{u}) :
-    (StableEquivalence.refl TC).forward = ExactFunctor.id TC := by
-  sorry
+    (StableEquivalence.refl TC).forward = ExactFunctor.id TC := rfl
 
 theorem StableEquivalence.refl_backward (TC : TriangulatedCategory.{u}) :
-    (StableEquivalence.refl TC).backward = ExactFunctor.id TC := by
-  sorry
+    (StableEquivalence.refl TC).backward = ExactFunctor.id TC := rfl
 
 /-! ## Zero object -/
 
@@ -280,13 +272,11 @@ def periodicLES {TC : TriangulatedCategory.{u}} (Tr : Triangle TC.cat TC.shift) 
 
 theorem periodicLES_three {TC : TriangulatedCategory.{u}}
     (Tr : Triangle TC.cat TC.shift) :
-    periodicLES Tr 3 = TC.shift.shiftObj Tr.X := by
-  sorry
+    periodicLES Tr 3 = TC.shift.shiftObj Tr.X := rfl
 
 theorem periodicLES_four {TC : TriangulatedCategory.{u}}
     (Tr : Triangle TC.cat TC.shift) :
-    periodicLES Tr 4 = TC.shift.shiftObj Tr.Y := by
-  sorry
+    periodicLES Tr 4 = TC.shift.shiftObj Tr.Y := rfl
 
 /-- Long exact sequence data from a distinguished triangle. -/
 structure LongExactFromTriangle (TC : TriangulatedCategory.{u})

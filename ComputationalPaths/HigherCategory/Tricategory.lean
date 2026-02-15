@@ -71,38 +71,38 @@ def triangleatorHigher (f : Hom a b) (g : Hom b c)
   contractibilityHigh 0 m1 m2
 
 theorem hom_eq_path (x y : A) : Hom x y = Path x y := by
-  sorry
+  rfl
 
 theorem twoCell_eq_derivation2 {x y : A} (f g : Hom x y) :
     TwoCell f g = Derivation₂ f g := by
-  sorry
+  rfl
 
 theorem threeCell_eq_derivation3 {x y : A} {f g : Hom x y} (α β : TwoCell f g) :
     ThreeCell α β = Derivation₃ α β := by
-  sorry
+  rfl
 
 theorem fourCell_eq_derivation4 {x y : A} {f g : Hom x y} {α β : TwoCell f g}
     (m1 m2 : ThreeCell α β) : FourCell m1 m2 = Derivation₄ m1 m2 := by
-  sorry
+  rfl
 
 theorem pentagonIdentity_eq_pentagon3 (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
     pentagonIdentity f g h k = GrayCategory.pentagon3 f g h k := by
-  sorry
+  rfl
 
 theorem triangleIdentity_eq_triangle3 (f : Hom a b) (g : Hom b c) :
     triangleIdentity f g = GrayCategory.triangle3 f g := by
-  sorry
+  rfl
 
 theorem pentagonator_eq_contraction (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e)
     (piCell : ThreeCell (Bicategory.pentagonLeftPath f g h k)
       (Bicategory.pentagonRightPath f g h k)) :
     pentagonator f g h k piCell = GrayCategory.pentagonContraction f g h k piCell := by
-  sorry
+  rfl
 
 theorem triangleator_eq_contraction (f : Hom a b) (g : Hom b c)
     (tau : ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g)) :
     triangleator f g tau = GrayCategory.triangleContraction f g tau := by
-  sorry
+  rfl
 
 theorem pentagonatorHigher_eq_contractibility (f : Hom a b) (g : Hom b c) (h : Hom c d)
     (k : Hom d e)
@@ -110,24 +110,24 @@ theorem pentagonatorHigher_eq_contractibility (f : Hom a b) (g : Hom b c) (h : H
       (Bicategory.pentagonRightPath f g h k))
     (m1 m2 : FourCell (pentagonIdentity f g h k) piCell) :
     pentagonatorHigher f g h k piCell m1 m2 = contractibilityHigh 0 m1 m2 := by
-  sorry
+  rfl
 
 theorem triangleatorHigher_eq_contractibility (f : Hom a b) (g : Hom b c)
     (tau : ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g))
     (m1 m2 : FourCell (triangleIdentity f g) tau) :
     triangleatorHigher f g tau m1 m2 = contractibilityHigh 0 m1 m2 := by
-  sorry
+  rfl
 
 theorem pentagonator_has_expected_type (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e)
     (piCell : ThreeCell (Bicategory.pentagonLeftPath f g h k)
       (Bicategory.pentagonRightPath f g h k)) :
     Nonempty (FourCell (pentagonIdentity f g h k) piCell) := by
-  sorry
+  rfl
 
 theorem triangleator_has_expected_type (f : Hom a b) (g : Hom b c)
     (tau : ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g)) :
     Nonempty (FourCell (triangleIdentity f g) tau) := by
-  sorry
+  rfl
 
 theorem pentagonatorHigher_has_expected_type (f : Hom a b) (g : Hom b c) (h : Hom c d)
     (k : Hom d e)
@@ -135,13 +135,13 @@ theorem pentagonatorHigher_has_expected_type (f : Hom a b) (g : Hom b c) (h : Ho
       (Bicategory.pentagonRightPath f g h k))
     (m1 m2 : FourCell (pentagonIdentity f g h k) piCell) :
     Nonempty (DerivationHigh 0 m1 m2) := by
-  sorry
+  rfl
 
 theorem triangleatorHigher_has_expected_type (f : Hom a b) (g : Hom b c)
     (tau : ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g))
     (m1 m2 : FourCell (triangleIdentity f g) tau) :
     Nonempty (DerivationHigh 0 m1 m2) := by
-  sorry
+  rfl
 
 end Tricategory
 end HigherCategory

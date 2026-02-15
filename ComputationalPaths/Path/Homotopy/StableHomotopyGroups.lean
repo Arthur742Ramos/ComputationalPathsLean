@@ -156,7 +156,7 @@ theorem adamsEInvariant_elem (n : Nat) (x : StableStem n) :
 
 theorem adamsEInvariant_value (n : Nat) (x : StableStem n) :
     (adamsEInvariant n x).value = 0 := by
-  sorry
+  rfl
 
 theorem adamsEInvariantOfJ_def (n : Nat) :
     adamsEInvariantOfJ n = adamsEInvariant n (jHomomorphism n ()) := by

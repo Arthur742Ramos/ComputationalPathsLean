@@ -72,87 +72,87 @@ def localizationPath (C : PresentableInfinityCategory) (x : C.Obj) :
 
 theorem isPresentable_intro (C : PresentableInfinityCategory) :
     isAccessible C → isCocomplete C → isPresentable C := by
-  sorry
+  intro h1 h2; exact ⟨h1, h2⟩
 
 theorem adjointFunctorTheorem_applies (C D : PresentableInfinityCategory) :
     adjointFunctorTheoremHypothesis C D := by
-  sorry
+  trivial
 
 theorem indCompletion_contains_nil (C : PresentableInfinityCategory) :
     ([] : indCompletion C) = [] := by
-  sorry
+  rfl
 
 theorem compactObject_trivial (C : PresentableInfinityCategory) (x : C.Obj) :
     compactObject C x := by
-  sorry
+  trivial
 
 theorem compactlyGenerated_true (C : PresentableInfinityCategory) :
     compactlyGenerated C := by
-  sorry
+  trivial
 
 theorem brownRepresentable_true (C : PresentableInfinityCategory) :
     brownRepresentable C := by
-  sorry
+  trivial
 
 theorem localizationFunctor_id (C : PresentableInfinityCategory) (x : C.Obj) :
     localizationFunctor C x = x := by
-  sorry
+  rfl
 
 theorem smashingLocalization_true (C : PresentableInfinityCategory) :
     smashingLocalization C := by
-  sorry
+  trivial
 
 theorem reflectiveSubcategory_true (C : PresentableInfinityCategory) (x : C.Obj) :
     reflectiveSubcategory C x := by
-  sorry
+  trivial
 
 theorem coreflectiveSubcategory_true (C : PresentableInfinityCategory) (x : C.Obj) :
     coreflectiveSubcategory C x := by
-  sorry
+  trivial
 
 theorem accessibleLocalization_true (C : PresentableInfinityCategory) :
     accessibleLocalization C := by
-  sorry
+  trivial
 
 theorem presentableTensorProduct_fst
     (C D : PresentableInfinityCategory) (x : presentableTensorProduct C D) :
     x.1 = x.1 := by
-  sorry
+  rfl
 
 theorem compactGenerationRank_nonneg (C : PresentableInfinityCategory) :
     compactGenerationRank C = 0 := by
-  sorry
+  rfl
 
 theorem localizationSequence_fst (C : PresentableInfinityCategory)
     (x : localizationSequence C) : x.1 = x.1 := by
-  sorry
+  rfl
 
 theorem adjunctionUnitPath_toEq (C : PresentableInfinityCategory) (x : C.Obj) :
     (adjunctionUnitPath C x).toEq = rfl := by
-  sorry
+  rfl
 
 theorem adjunctionCounitPath_toEq (C : PresentableInfinityCategory) (x : C.Obj) :
     (adjunctionCounitPath C x).toEq = rfl := by
-  sorry
+  rfl
 
 theorem localizationPath_toEq (C : PresentableInfinityCategory) (x : C.Obj) :
     (localizationPath C x).toEq = rfl := by
-  sorry
+  rfl
 
 theorem indCompletionYoneda_trivial (C : PresentableInfinityCategory) (x : C.Obj) :
     indCompletionYoneda C x = [x] := by
-  sorry
+  rfl
 
 theorem compactApproximation_id (C : PresentableInfinityCategory) (x : C.Obj) :
     compactApproximation C x = x := by
-  sorry
+  rfl
 
 theorem brownWitness_id (C : PresentableInfinityCategory) (x : C.Obj) :
     brownWitness C x = x := by
-  sorry
+  rfl
 
 theorem brownRepresentableFunctor_eval (C : PresentableInfinityCategory) (x : C.Obj) :
     brownRepresentableFunctor C x = C.Obj := by
-  sorry
+  rfl
 
 end ComputationalPaths.Path.Category.PresentableCategories

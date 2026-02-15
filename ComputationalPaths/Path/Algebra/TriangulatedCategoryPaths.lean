@@ -180,54 +180,54 @@ def punitVerdier : VerdierQuotientData PUnit punitHom punitShift where
 /-! ## Theorem stubs -/
 
 theorem shiftData_unshift_shift_path {Obj : Type u} (S : ShiftData Obj) (X : Obj) :
-    Nonempty (Path (S.unshift (S.shift X)) X) := by
-  sorry
+    Nonempty (Path (S.unshift (S.shift X)) X) :=
+  ⟨Path.ofEq (S.unshift_shift X)⟩
 
 theorem shiftData_shift_unshift_path {Obj : Type u} (S : ShiftData Obj) (X : Obj) :
-    Nonempty (Path (S.shift (S.unshift X)) X) := by
-  sorry
+    Nonempty (Path (S.shift (S.unshift X)) X) :=
+  ⟨Path.ofEq (S.shift_unshift X)⟩
 
 theorem shiftData_unshift_shift_symm {Obj : Type u} (S : ShiftData Obj) (X : Obj) :
-    Nonempty (Path X (S.unshift (S.shift X))) := by
-  sorry
+    Nonempty (Path X (S.unshift (S.shift X))) :=
+  ⟨Path.symm (Path.ofEq (S.unshift_shift X))⟩
 
 theorem triangleData_X_refl {Obj : Type u} {Hom : Obj → Obj → Type v}
     {S : ShiftData Obj} (T : TriangleData Obj Hom S) :
-    Nonempty (Path T.X T.X) := by
-  sorry
+    Nonempty (Path T.X T.X) :=
+  ⟨Path.refl _⟩
 
 theorem triangleData_Y_refl {Obj : Type u} {Hom : Obj → Obj → Type v}
     {S : ShiftData Obj} (T : TriangleData Obj Hom S) :
-    Nonempty (Path T.Y T.Y) := by
-  sorry
+    Nonempty (Path T.Y T.Y) :=
+  ⟨Path.refl _⟩
 
 theorem triangleData_Z_refl {Obj : Type u} {Hom : Obj → Obj → Type v}
     {S : ShiftData Obj} (T : TriangleData Obj Hom S) :
-    Nonempty (Path T.Z T.Z) := by
-  sorry
+    Nonempty (Path T.Z T.Z) :=
+  ⟨Path.refl _⟩
 
 theorem octahedral_overlap_symm {Obj : Type u} {Hom : Obj → Obj → Type v}
     {S : ShiftData Obj} (O : OctahedralData Obj Hom S) :
-    Nonempty (Path O.tri1.Z O.tri3.X) := by
-  sorry
+    Nonempty (Path O.tri1.Z O.tri3.X) :=
+  ⟨Path.ofEq O.overlap⟩
 
 theorem verdier_shift_compat_path {Obj : Type u} {Hom : Obj → Obj → Type v}
     {S : ShiftData Obj} (V : VerdierQuotientData Obj Hom S) (X : Obj) :
-    Nonempty (Path (V.Qshift.shift (V.onObj X)) (V.onObj (S.shift X))) := by
-  sorry
+    Nonempty (Path (V.Qshift.shift (V.onObj X)) (V.onObj (S.shift X))) :=
+  ⟨Path.ofEq (V.shift_compat X)⟩
 
 theorem triangulated_localization_functoriality
     {C : Type u} (L : LeftExactLocalization C)
     {a b c : C} (p : Path a b) (q : Path b c) :
     RwEq (L.preserves_product (Path.trans p q))
-      (Path.trans (L.preserves_product p) (L.preserves_product q)) := by
-  sorry
+      (Path.trans (L.preserves_product p) (L.preserves_product q)) :=
+  L.preserves_product_trans p q
 
 theorem triangulated_homology_functoriality
     (E : GeneralizedHomologyTheory.{u, w})
     {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
-    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) := by
-  sorry
+    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) :=
+  ⟨Path.ofEq (E.map_comp g f n)⟩
 
 theorem triangulated_cross_dependencies_left
     {C : Type u} (L : LeftExactLocalization C)
@@ -236,23 +236,23 @@ theorem triangulated_cross_dependencies_left
     {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
     RwEq (L.preserves_product (Path.trans p q))
       (Path.trans (L.preserves_product p) (L.preserves_product q)) := by
-  sorry
+  L.preserves_product_trans p q
 
 theorem triangulated_cross_dependencies_right
     {C : Type u} (L : LeftExactLocalization C)
     {a b c : C} (p : Path a b) (q : Path b c)
     (E : GeneralizedHomologyTheory.{u, w})
     {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
-    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) := by
-  sorry
+    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) :=
+  ⟨Path.ofEq (E.map_comp g f n)⟩
 
 theorem punit_loop_trans_assoc (p q r : Path PUnit.unit PUnit.unit) :
-    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) := by
-  sorry
+    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
+  rweq_tt p q r
 
 theorem punit_loop_trans_comm (p q : Path PUnit.unit PUnit.unit) :
-    RwEq (Path.trans p q) (Path.trans q p) := by
-  sorry
+    RwEq (Path.trans p q) (Path.trans q p) :=
+  rweq_eckmann_hilton p q
 
 /-! ## Summary
 

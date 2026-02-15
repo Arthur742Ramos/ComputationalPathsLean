@@ -166,74 +166,74 @@ variable {A B C : Type u}
 
 theorem pathCategoryFunctor_id_obj (A : Type u) (a : A) :
     (PathCategoryFunctor.id A).obj a = a := by
-  sorry
+  rfl
 
 theorem pathCategoryFunctor_id_map (A : Type u) {a b : A} (p : Path a b) :
     (PathCategoryFunctor.id A).map p = p := by
-  sorry
+  rfl
 
 theorem pathCategoryFunctor_comp_obj (F : PathCategoryFunctor A B)
     (G : PathCategoryFunctor B C) (a : A) :
     (PathCategoryFunctor.comp F G).obj a = G.obj (F.obj a) := by
-  sorry
+  rfl
 
 theorem pathCategoryFunctor_comp_map (F : PathCategoryFunctor A B)
     (G : PathCategoryFunctor B C) {a b : A} (p : Path a b) :
     (PathCategoryFunctor.comp F G).map p = G.map (F.map p) := by
-  sorry
+  rfl
 
 theorem pathNatTrans_vcomp_app {X : Type u}
     {F G H : PathFunctor.{u, v} (A := X)}
     (η : PathNatTrans F G) (θ : PathNatTrans G H) (x : X) (u : F.obj x) :
     (PathNatTrans.vcomp η θ).app x u = θ.app x (η.app x u) := by
-  sorry
+  rfl
 
 theorem pathNatTrans_precompose_app {X Y : Type u}
     (F : PathCategoryFunctor X Y)
     {G H : PathFunctor.{u, v} (A := Y)}
     (η : PathNatTrans G H) (x : X) (u : G.obj (F.obj x)) :
     (PathNatTrans.precompose F η).app x u = η.app (F.obj x) u := by
-  sorry
+  rfl
 
 theorem precomposeIdEquiv_toFun_app (G M : PathFunctor.{u, v} (A := A))
     (η : PathNatTrans G M) (a : A) (x : G.obj a) :
     ((precomposeIdEquiv (G := G) (M := M)).toFun η).app a x = η.app a x := by
-  sorry
+  rfl
 
 theorem precomposeIdEquivDom_toFun_app (G M : PathFunctor.{u, v} (A := A))
     (η : PathNatTrans M G) (a : A) (x : M.obj a) :
     ((precomposeIdEquivDom (G := G) (M := M)).toFun η).app a x = η.app a x := by
-  sorry
+  rfl
 
 theorem leftKanAdjunction_eq_universal
     (F : PathCategoryFunctor A B) (G : PathFunctor.{u, v} (A := A))
     (L : LeftKanExtension F G) (M : PathFunctor.{u, v} (A := B)) :
     leftKanAdjunction (F := F) (G := G) L M = L.universal M := by
-  sorry
+  rfl
 
 theorem rightKanAdjunction_eq_universal
     (F : PathCategoryFunctor A B) (G : PathFunctor.{u, v} (A := A))
     (R : RightKanExtension F G) (M : PathFunctor.{u, v} (A := B)) :
     rightKanAdjunction (F := F) (G := G) R M = R.universal M := by
-  sorry
+  rfl
 
 theorem pointwiseLeftKanExtension_eq (F : PathCategoryFunctor A B)
     (G : PathFunctor.{u, v} (A := A)) :
     pointwiseLeftKanExtension (F := F) (G := G) = pointwiseLeftKan F G := by
-  sorry
+  rfl
 
 theorem pointwiseRightKanExtension_eq (F : PathCategoryFunctor A B)
     (G : PathFunctor.{u, v} (A := A)) :
     pointwiseRightKanExtension (F := F) (G := G) = pointwiseRightKan F G := by
-  sorry
+  rfl
 
 theorem leftKanExtension_id_lan (G : PathFunctor.{u, v} (A := A)) :
     (leftKanExtension_id (A := A) G).lan = G := by
-  sorry
+  rfl
 
 theorem rightKanExtension_id_ran (G : PathFunctor.{u, v} (A := A)) :
     (rightKanExtension_id (A := A) G).ran = G := by
-  sorry
+  rfl
 
 end BasicTheorems
 

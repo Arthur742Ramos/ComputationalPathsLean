@@ -299,7 +299,7 @@ theorem omegaSpectrum_toSpectrum_level (E : OmegaSpectrum) (n : Nat) :
 
 theorem iteratedLoopPointed_zero_eq (X : Pointed) :
     iteratedLoopPointed 0 X = X := by
-  sorry
+  rfl
 
 theorem iteratedLoopPointed_succ_eq (n : Nat) (X : Pointed) :
     iteratedLoopPointed (n + 1) X = loopPointed (iteratedLoopPointed n X) := by
@@ -333,7 +333,7 @@ theorem stableAdjunction_stableEquiv_apply_eq (X Y : Pointed) (n : Nat) :
 
 theorem stableAdjunction_zero_toFun_id (X Y : Pointed) (f : PointedMap X Y) :
     (stableAdjunction 0 X Y).toFun f = f := by
-  sorry
+  rfl
 
 theorem canonicalSWDuality_level_eq (n : Nat) (X : Pointed) :
     ((canonicalSpanierWhiteheadDuality X).stableEquiv n) = stableAdjunction n X X := by

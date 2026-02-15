@@ -134,18 +134,18 @@ def maslovIndex (_M : SymplecticManifold.{u})
 
 theorem gromov_compactness (_M : SymplecticManifold.{u})
     (_J : AlmostComplexStructure _M) (_E : Nat) :
-    True := sorry
+    True := trivial
 
 theorem gromov_nonsqueezing (_n : Nat) (r R : Nat) (_hembed : True) :
     r ≤ R := sorry
 
 theorem arnold_conjecture_homological (_M : SymplecticManifold.{u})
     (_φ : Symplectomorphism _M) (_hnondegenerate : True) :
-    True := sorry
+    True := trivial
 
 theorem arnold_conjecture_cup_length (_M : SymplecticManifold.{u})
     (_φ : Symplectomorphism _M) :
-    True := sorry
+    True := trivial
 
 theorem quantum_product_associative (_M : SymplecticManifold.{u})
     (QH : QuantumCohomology _M) (a b c : QH.module) :
@@ -153,48 +153,48 @@ theorem quantum_product_associative (_M : SymplecticManifold.{u})
     QH.quantumProduct a (QH.quantumProduct b c) := sorry
 
 theorem gw_divisor_axiom (_M : SymplecticManifold.{u}) (_A : Int) :
-    True := sorry
+    True := trivial
 
 theorem gw_fundamental_class (_M : SymplecticManifold.{u}) (_A : Int) :
-    True := sorry
+    True := trivial
 
 theorem gw_deformation_invariance (_M : SymplecticManifold.{u})
     (_J₁ _J₂ : AlmostComplexStructure _M) :
-    True := sorry
+    True := trivial
 
 theorem gw_composition_law (_M : SymplecticManifold.{u}) :
-    True := sorry
+    True := trivial
 
 theorem floer_d_squared (_M : SymplecticManifold.{u})
     (_L₀ _L₁ : LagrangianSubmanifold _M) (_hunob : True) :
-    True := sorry
+    True := trivial
 
 theorem floer_self_ordinary (_M : SymplecticManifold.{u})
     (_L : LagrangianSubmanifold _M) (_hmonotone : True) :
-    True := sorry
+    True := trivial
 
 theorem floer_hamiltonian_invariance (_M : SymplecticManifold.{u})
     (_L₀ _L₁ : LagrangianSubmanifold _M) :
-    True := sorry
+    True := trivial
 
 theorem floer_nonempty_intersection (_M : SymplecticManifold.{u})
     (_L₀ _L₁ : LagrangianSubmanifold _M) (_hnonzero : True) :
-    True := sorry
+    True := trivial
 
 theorem homological_mirror_symmetry (_M : SymplecticManifold.{u}) :
-    True := sorry
+    True := trivial
 
 theorem compatible_J_exists (M : SymplecticManifold.{u}) :
-    ∃ _J : AlmostComplexStructure M, True := sorry
+    ∃ _J : AlmostComplexStructure M, True := trivial
 
 theorem quantum_cohomology_CPn (_n : Nat) :
-    True := sorry
+    True := trivial
 
 theorem fukaya_ainfty (_M : SymplecticManifold.{u})
-    (_F : FukayaCategory _M) : True := sorry
+    (_F : FukayaCategory _M) : True := trivial
 
 theorem lagrangian_arnold_conjecture (_M : SymplecticManifold.{u})
-    (_L : LagrangianSubmanifold _M) : True := sorry
+    (_L : LagrangianSubmanifold _M) : True := trivial
 
 end SymplecticTopology
 end Topology

@@ -414,98 +414,98 @@ def dayConvolutionTensor {C : VCategory} (D : EnrichedDayConvolution C) :
 /-! ## Additional Theorems -/
 
 theorem weighted_limit_exists_of_has {C : VCategory} (h : HasWeightedLimits C)
-    (D : WeightedDiagram C) : Nonempty (WeightedLimit C D) := by
-  sorry
+    (D : WeightedDiagram C) : Nonempty (WeightedLimit C D) :=
+  h D
 
 theorem weighted_colimit_exists_of_has {C : VCategory} (h : HasWeightedColimits C)
-    (D : WeightedDiagram C) : Nonempty (WeightedColimit C D) := by
-  sorry
+    (D : WeightedDiagram C) : Nonempty (WeightedColimit C D) :=
+  h D
 
 theorem weighted_limit_unique_up_to_iso {C : VCategory} (D : WeightedDiagram C) :
     True := by
-  sorry
+  trivial
 
 theorem weighted_colimit_unique_up_to_iso {C : VCategory} (D : WeightedDiagram C) :
     True := by
-  sorry
+  trivial
 
 theorem weighted_limits_stable_under_equiv {C : VCategory} : True := by
-  sorry
+  trivial
 
 theorem weighted_colimits_stable_under_equiv {C : VCategory} : True := by
-  sorry
+  trivial
 
 theorem enriched_yoneda_embedding_fully_faithful {C : VCategory} : True := by
-  sorry
+  trivial
 
 theorem enriched_yoneda_naturality {C : VCategory} (Y : EnrichedYonedaIso C) : True := by
-  sorry
+  trivial
 
 theorem enriched_adjoint_triangle_left {C D : VCategory} (A : EnrichedAdjunction C D) :
     True := by
-  sorry
+  trivial
 
 theorem enriched_adjoint_triangle_right {C D : VCategory} (A : EnrichedAdjunction C D) :
     True := by
-  sorry
+  trivial
 
 theorem mates_for_enriched_adjunctions {C D : VCategory} (A : EnrichedAdjunction C D) :
     True := by
-  sorry
+  trivial
 
 theorem change_of_base_preserves_weighted_limits {C : VCategory}
     {B₁ B₂ : MonoidalBase} (F : ChangeOfBaseFunctor B₁ B₂ C) : True := by
-  sorry
+  trivial
 
 theorem change_of_base_preserves_weighted_colimits {C : VCategory}
     {B₁ B₂ : MonoidalBase} (F : ChangeOfBaseFunctor B₁ B₂ C) : True := by
-  sorry
+  trivial
 
 theorem tensored_category_represents_action {C : VCategory} (T : TensoredCategory C) :
     True := by
-  sorry
+  trivial
 
 theorem cotensored_category_represents_action {C : VCategory} (T : CotensoredCategory C) :
     True := by
-  sorry
+  trivial
 
 theorem tensored_and_cotensored_implies_enriched_limits {C : VCategory}
     (_ : TensoredCategory C) (_ : CotensoredCategory C) : True := by
-  sorry
+  trivial
 
 theorem enriched_end_exists_for_small_functor {C : VCategory}
     (F : C.Obj → C.Obj → Type u) : True := by
-  sorry
+  trivial
 
 theorem enriched_coend_exists_for_small_functor {C : VCategory}
     (F : C.Obj → C.Obj → Type u) : True := by
-  sorry
+  trivial
 
 theorem fubini_for_enriched_ends {C : VCategory} : True := by
-  sorry
+  trivial
 
 theorem fubini_for_enriched_coends {C : VCategory} : True := by
-  sorry
+  trivial
 
 theorem day_convolution_associative_enriched {C : VCategory}
     (D : EnrichedDayConvolution C) : True := by
-  sorry
+  trivial
 
 theorem day_convolution_unital_left_enriched {C : VCategory}
     (D : EnrichedDayConvolution C) : True := by
-  sorry
+  trivial
 
 theorem day_convolution_unital_right_enriched {C : VCategory}
     (D : EnrichedDayConvolution C) : True := by
-  sorry
+  trivial
 
 theorem day_convolution_closed_monoidal {C : VCategory}
     (D : EnrichedDayConvolution C) : True := by
-  sorry
+  trivial
 
 theorem ends_coends_interact_with_day_convolution {C : VCategory}
     (D : EnrichedDayConvolution C) : True := by
-  sorry
+  trivial
 
 /-! ## Computational-path enrichment integration -/
 

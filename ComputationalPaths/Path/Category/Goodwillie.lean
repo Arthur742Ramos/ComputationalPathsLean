@@ -75,94 +75,94 @@ def classificationPath (F : GoodwillieFunctor) (x : F.Obj) : Path x x := Path.re
 
 theorem polynomialApproximation_id (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
     polynomialApproximation F n x = F.map x := by
-  sorry
+  rfl
 
 theorem tower_stage_zero (F : GoodwillieFunctor) :
     goodwillieTower F 0 = goodwillieTowerStage F 0 := by
-  sorry
+  rfl
 
 theorem towerLimit_is_obj (F : GoodwillieFunctor) (x : F.Obj) :
     towerLimit F x = x := by
-  sorry
+  rfl
 
 theorem derivativeSpectrum_is_type (F : GoodwillieFunctor) (n : Nat) :
     derivativeSpectrum F n = F.Obj := by
-  sorry
+  rfl
 
 theorem crossEffect_is_type (F : GoodwillieFunctor) (n : Nat) :
     crossEffect F n = F.Obj := by
-  sorry
+  rfl
 
 theorem homogeneousLayer_is_obj (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
     homogeneousLayer F n x = x := by
-  sorry
+  rfl
 
 theorem classificationData_true (F : GoodwillieFunctor) (n : Nat) :
     classificationData F n := by
-  sorry
+  trivial
 
 theorem taylorCoefficient_eval (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
     taylorCoefficient F n x = x := by
-  sorry
+  rfl
 
 theorem linearization_id (F : GoodwillieFunctor) (x : F.Obj) :
     linearization F x = x := by
-  sorry
+  rfl
 
 theorem stabilization_id (F : GoodwillieFunctor) (x : F.Obj) :
     stabilization F x = x := by
-  sorry
+  rfl
 
 theorem delooping_id (F : GoodwillieFunctor) (x : F.Obj) :
     delooping F x = x := by
-  sorry
+  rfl
 
 theorem convergenceCondition_true (F : GoodwillieFunctor) :
     convergenceCondition F := by
-  sorry
+  trivial
 
 theorem analyticRadius_nonneg (F : GoodwillieFunctor) :
     analyticRadius F = 0 := by
-  sorry
+  rfl
 
 theorem excisiveComparisonMap_id (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
     excisiveComparisonMap F n x = x := by
-  sorry
+  rfl
 
 theorem fiberOfStage_refl (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
     fiberOfStage F n x = x := by
-  sorry
+  rfl
 
 theorem multilinearization_id (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
     multilinearization F n x = x := by
-  sorry
+  rfl
 
 theorem homogeneousClassification_true (F : GoodwillieFunctor) (n : Nat) :
     homogeneousClassification F n := by
-  sorry
+  trivial
 
 theorem derivativePath_toEq (F : GoodwillieFunctor) (n : Nat) :
     (derivativePath F n).toEq = rfl := by
-  sorry
+  rfl
 
 theorem crossEffectPath_toEq (F : GoodwillieFunctor) (n : Nat) :
     (crossEffectPath F n).toEq = rfl := by
-  sorry
+  rfl
 
 theorem homogeneousPath_toEq (F : GoodwillieFunctor) (x : F.Obj) :
     (homogeneousPath F x).toEq = rfl := by
-  sorry
+  rfl
 
 theorem towerPath_toEq (F : GoodwillieFunctor) (x : F.Obj) :
     (towerPath F x).toEq = rfl := by
-  sorry
+  rfl
 
 theorem classificationPath_toEq (F : GoodwillieFunctor) (x : F.Obj) :
     (classificationPath F x).toEq = rfl := by
-  sorry
+  rfl
 
 theorem stageShift_succ (F : GoodwillieFunctor) (n : Nat) :
     stageShift F n = Nat.succ n := by
-  sorry
+  rfl
 
 end ComputationalPaths.Path.Category.Goodwillie

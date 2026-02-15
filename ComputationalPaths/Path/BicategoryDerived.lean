@@ -101,12 +101,12 @@ def interchange_id_right' {f g : Path a b} {h k : Path b c}
 theorem whiskerLeft_id_theorem (f : Path a b) (g : Path b c) :
     TwoCell.whiskerLeft f (TwoCell.id (A := A) g) =
       TwoCell.id (Path.trans f g) := by
-  sorry
+  rfl
 
 theorem whiskerRight_id_theorem (f : Path a b) (g : Path b c) :
     TwoCell.whiskerRight g (TwoCell.id (A := A) f) =
       TwoCell.id (Path.trans f g) := by
-  sorry
+  rfl
 
 theorem whiskerLeft_comp_functorial {f : Path a b} {g h i : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h)
@@ -114,7 +114,7 @@ theorem whiskerLeft_comp_functorial {f : Path a b} {g h i : Path b c}
     TwoCell.whiskerLeft f (TwoCell.comp η θ) =
       TwoCell.comp (TwoCell.whiskerLeft f η)
         (TwoCell.whiskerLeft f θ) := by
-  sorry
+  rfl
 
 theorem whiskerRight_comp_functorial {f g h : Path a b} {k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
@@ -122,19 +122,19 @@ theorem whiskerRight_comp_functorial {f g h : Path a b} {k : Path b c}
     TwoCell.whiskerRight k (TwoCell.comp η θ) =
       TwoCell.comp (TwoCell.whiskerRight k η)
         (TwoCell.whiskerRight k θ) := by
-  sorry
+  rfl
 
 theorem hcomp_id_left_theorem {f g : Path a b} {h : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g) :
     TwoCell.hcomp η (TwoCell.id h) =
       TwoCell.whiskerRight h η := by
-  sorry
+  rfl
 
 theorem hcomp_id_right_theorem {f : Path a b} {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
     TwoCell.hcomp (TwoCell.id f) η =
       TwoCell.whiskerLeft f η := by
-  sorry
+  rfl
 
 theorem interchange_id_left_theorem {f g : Path a b} {h k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
@@ -142,7 +142,7 @@ theorem interchange_id_left_theorem {f g : Path a b} {h k : Path b c}
     TwoCell.comp (TwoCell.hcomp η θ)
       (TwoCell.id (Path.trans g k)) =
         TwoCell.hcomp η θ := by
-  sorry
+  rfl
 
 theorem interchange_id_right_theorem {f g : Path a b} {h k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
@@ -150,29 +150,29 @@ theorem interchange_id_right_theorem {f g : Path a b} {h k : Path b c}
     TwoCell.comp (TwoCell.id (Path.trans f h))
       (TwoCell.hcomp η θ) =
         TwoCell.hcomp η θ := by
-  sorry
+  rfl
 
 theorem whiskerLeft_id_theorem_symm (f : Path a b) (g : Path b c) :
     TwoCell.id (Path.trans f g) =
       TwoCell.whiskerLeft f (TwoCell.id (A := A) g) := by
-  sorry
+  rfl
 
 theorem whiskerRight_id_theorem_symm (f : Path a b) (g : Path b c) :
     TwoCell.id (Path.trans f g) =
       TwoCell.whiskerRight g (TwoCell.id (A := A) f) := by
-  sorry
+  rfl
 
 theorem hcomp_id_left_theorem_symm {f g : Path a b} {h : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g) :
     TwoCell.whiskerRight h η =
       TwoCell.hcomp η (TwoCell.id h) := by
-  sorry
+  rfl
 
 theorem hcomp_id_right_theorem_symm {f : Path a b} {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
     TwoCell.whiskerLeft f η =
       TwoCell.hcomp (TwoCell.id f) η := by
-  sorry
+  rfl
 
 end BicategoryDerived
 end Path

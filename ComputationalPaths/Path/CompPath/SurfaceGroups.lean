@@ -69,14 +69,14 @@ structure SurfaceData where
   /-- Chosen basepoint. -/
   basepoint : carrier
   /-- Classification tag. -/
-  class : SurfaceClass
+  surfClass : SurfaceClass
 
 /-- Fundamental group of a surface. -/
 abbrev surfaceGroup (S : SurfaceData) : Type u :=
   π₁(S.carrier, S.basepoint)
 
 /-- Strict group structure on the surface fundamental group. -/
-abbrev surfaceGroupStruct (S : SurfaceData) : PiOneGroup S.carrier S.basepoint :=
+abbrev surfaceGroupStruct (S : SurfaceData) : LoopGroup S.carrier S.basepoint :=
   PiOneGroup S.carrier S.basepoint
 
 /-- Raw loop space at the surface basepoint. -/
@@ -161,25 +161,25 @@ structure CurveComplex (S : SurfaceData) where
 def sphereSurface : SurfaceData where
   carrier := Sphere2CompPath
   basepoint := Sphere2CompPath.basepoint
-  class := SurfaceClass.orientable 0 0
+  surfClass := SurfaceClass.orientable 0 0
 
 /-- The torus as a surface datum. -/
-def torusSurface : SurfaceData where
+noncomputable def torusSurface : SurfaceData where
   carrier := _root_.ComputationalPaths.Path.Torus
   basepoint := _root_.ComputationalPaths.Path.torusBase
-  class := SurfaceClass.orientable 1 0
+  surfClass := SurfaceClass.orientable 1 0
 
 /-- The Klein bottle as a surface datum. -/
 def kleinBottleSurface : SurfaceData where
   carrier := KleinBottleCompPath
   basepoint := kleinBottleBase
-  class := SurfaceClass.nonorientable 2 0
+  surfClass := SurfaceClass.nonorientable 2 0
 
 /-- The Mobius band as a surface datum. -/
 def mobiusBandSurface : SurfaceData where
   carrier := MobiusBandCompPath
   basepoint := mobiusBandBase
-  class := SurfaceClass.nonorientable 1 1
+  surfClass := SurfaceClass.nonorientable 1 1
 
 /-! ## Summary -/
 
@@ -222,7 +222,7 @@ theorem surfaceGroups_mappingClassInv_involutive (S : SurfaceData) (f : MappingC
 theorem surfaceGroups_dehnTwistPow_zero (S : SurfaceData) (D : DehnTwistData S)
     (c : SurfaceCurve S) :
     dehnTwistPow S D c 0 = mappingClassId S := by
-  simp [dehnTwistPow, Algebra.StrictGroup.zpow]
+  simp [dehnTwistPow, Algebra.StrictGroup.zpow, mappingClassGroup]
 
 theorem surfaceGroups_eulerChar_sphere :
     surfaceEulerChar (SurfaceClass.orientable 0 0) = 2 := by
@@ -243,13 +243,17 @@ theorem surfaceGroups_mappingClassComp_assoc (S : SurfaceData) (f g h : MappingC
 
 theorem surfaceGroups_mappingClassInv_left (S : SurfaceData) (f : MappingClass S) :
     mappingClassComp (mappingClassInv f) f = mappingClassId S := by
-  simp [mappingClassComp, mappingClassInv, mappingClassId, SimpleEquiv.symm_comp]
+  simp only [mappingClassComp, mappingClassInv, mappingClassId]
+  have h := SimpleEquiv.symm_comp f
+  simp only [SimpleEquiv.comp, SimpleEquiv.symm, SimpleEquiv.refl] at h ⊢
+  exact h
 
 theorem surfaceGroups_dehnTwistPow_succ (S : SurfaceData) (D : DehnTwistData S)
     (c : SurfaceCurve S) (n : Nat) :
     dehnTwistPow S D c (n + 1) =
     mappingClassComp (dehnTwistPow S D c n) (dehnTwistPow S D c 1) := by
-  simp [dehnTwistPow, Algebra.StrictGroup.zpow, mappingClassComp]
+  simp only [dehnTwistPow, mappingClassComp]
+  simp only [Algebra.StrictGroup.zpow, Algebra.StrictGroup.pow]
   rfl
 
 end CompPath

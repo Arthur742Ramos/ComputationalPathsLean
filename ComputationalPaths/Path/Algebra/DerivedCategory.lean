@@ -197,63 +197,63 @@ def derived_cross_module_dependencies
 
 theorem cat_eq_triangulated_cat (D : DerivedCategory.{u}) :
     D.cat = D.triangulated.cat := by
-  sorry
+  rfl
 
 theorem shift_eq_triangulated_shift (D : DerivedCategory.{u}) :
     D.shift = D.triangulated.shift := by
-  sorry
+  rfl
 
 theorem leftDerived_eq_self {D E : DerivedCategory.{u}}
     (F : DerivedFunctor D E) :
     leftDerived F = F := by
-  sorry
+  rfl
 
 theorem rightDerived_eq_self {D E : DerivedCategory.{u}}
     (F : DerivedFunctor D E) :
     rightDerived F = F := by
-  sorry
+  rfl
 
 theorem leftDerived_eq_rightDerived {D E : DerivedCategory.{u}}
     (F : DerivedFunctor D E) :
     leftDerived F = rightDerived F := by
-  sorry
+  rfl
 
 theorem id_preserves_quasiIso {D : DerivedCategory.{u}}
     {X Y : D.triangulated.cat.Obj} (f : D.triangulated.cat.Hom X Y)
     (hf : D.quasiIso f) :
     D.quasiIso ((DerivedFunctor.id D).exact.mapHom f) := by
-  sorry
+  exact hf
 
 theorem trivial_le_all (D : DerivedCategory.{u}) (X : D.triangulated.cat.Obj) :
     (TStructure.trivial D).le X := by
-  sorry
+  trivial
 
 theorem trivial_ge_all (D : DerivedCategory.{u}) (X : D.triangulated.cat.Obj) :
     (TStructure.trivial D).ge X := by
-  sorry
+  trivial
 
 theorem trivial_truncLeft_eq (D : DerivedCategory.{u}) (X : D.triangulated.cat.Obj) :
     (TStructure.trivial D).truncLeft X = X := by
-  sorry
+  rfl
 
 theorem trivial_truncRight_eq (D : DerivedCategory.{u}) (X : D.triangulated.cat.Obj) :
     (TStructure.trivial D).truncRight X = X := by
-  sorry
+  rfl
 
 theorem perverse_object_eq_heartObj_val {D : DerivedCategory.{u}}
     {T : TStructure D} (P : PerverseSheaf T) :
     P.object = P.heartObj.val := by
-  sorry
+  rfl
 
 theorem perverse_object_le {D : DerivedCategory.{u}}
     {T : TStructure D} (P : PerverseSheaf T) :
     T.le P.object := by
-  sorry
+  exact P.heartObj.property.1
 
 theorem perverse_object_ge {D : DerivedCategory.{u}}
     {T : TStructure D} (P : PerverseSheaf T) :
     T.ge P.object := by
-  sorry
+  exact P.heartObj.property.2
 
 theorem derived_cross_module_dependencies_rweq
     {C : Type u} (L : LeftExactLocalization C)
@@ -261,16 +261,16 @@ theorem derived_cross_module_dependencies_rweq
     (E : GeneralizedHomologyTheory.{u, v})
     {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
     RwEq (L.preserves_product (Path.trans p q))
-      (Path.trans (L.preserves_product p) (L.preserves_product q)) := by
-  sorry
+      (Path.trans (L.preserves_product p) (L.preserves_product q)) :=
+  L.preserves_product_trans p q
 
 theorem derived_cross_module_dependencies_nonempty
     {C : Type u} (L : LeftExactLocalization C)
     {a b c : C} (p : Path a b) (q : Path b c)
     (E : GeneralizedHomologyTheory.{u, v})
     {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
-    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) := by
-  sorry
+    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) :=
+  ⟨Path.ofEq (E.map_comp g f n)⟩
 
 /-! ## Summary
 

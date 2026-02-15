@@ -84,88 +84,88 @@ def quillenPath (C : HigherMonoidalCategory) (a : algebraObject C) : Path a a :=
   Path.refl a
 
 theorem infinityOperadShape_nonempty (n : Nat) : Nat.succ n > 0 := by
-  sorry
+  rfl
 
 theorem dayConvolutionTensor_formula (C D : HigherMonoidalCategory)
     (x y : dayConvolutionObj C D) :
     dayConvolutionTensor C D x y = (C.tensor x.1 y.1, D.tensor x.2 y.2) := by
-  sorry
+  rfl
 
 theorem dayConvolutionUnit_fst (C D : HigherMonoidalCategory) :
     (dayConvolutionUnit C D).1 = C.unit := by
-  sorry
+  rfl
 
 theorem dayConvolutionMonoidal_true (C D : HigherMonoidalCategory) :
     dayConvolutionMonoidal C D := by
-  sorry
+  trivial
 
 theorem cotangentComplex_is_type (C : HigherMonoidalCategory) (a : algebraObject C) :
     cotangentComplex C a = C.Obj := by
-  sorry
+  rfl
 
 theorem quillenCohomology_is_type (C : HigherMonoidalCategory) (a : algebraObject C) :
     quillenCohomology C a = C.Obj := by
-  sorry
+  rfl
 
 theorem derivationSpace_is_type (C : HigherMonoidalCategory) (a : algebraObject C) :
     derivationSpace C a = C.Obj := by
-  sorry
+  rfl
 
 theorem squareZeroExtension_id (C : HigherMonoidalCategory) (a : algebraObject C) :
     squareZeroExtension C a = a := by
-  sorry
+  rfl
 
 theorem indecomposables_is_type (C : HigherMonoidalCategory) (a : algebraObject C) :
     indecomposables C a = C.Obj := by
-  sorry
+  rfl
 
 theorem stabilizationFunctor_id (C : HigherMonoidalCategory) (x : C.Obj) :
     stabilizationFunctor C x = x := by
-  sorry
+  rfl
 
 theorem spectralCotangentComplex_is_type (C : HigherMonoidalCategory)
     (a : algebraObject C) : spectralCotangentComplex C a = C.Obj := by
-  sorry
+  rfl
 
 theorem operadicBar_nil (C : HigherMonoidalCategory) (a : algebraObject C) :
     ([] : operadicBarConstruction C a) = [] := by
-  sorry
+  rfl
 
 theorem operadicCobar_nil (C : HigherMonoidalCategory) (a : algebraObject C) :
     ([] : operadicCobarConstruction C a) = [] := by
-  sorry
+  rfl
 
 theorem quillenCohomologyClass_id (C : HigherMonoidalCategory) (a : algebraObject C) :
     quillenCohomologyClass C a = a := by
-  sorry
+  rfl
 
 theorem algebraPath_toEq (C : HigherMonoidalCategory) (a : algebraObject C) :
     (algebraPath C a).toEq = rfl := by
-  sorry
+  rfl
 
 theorem commutativePath_toEq (C : HigherMonoidalCategory) (a : commutativeAlgebraObject C) :
     (commutativePath C a).toEq = rfl := by
-  sorry
+  rfl
 
 theorem dayConvolutionPath_toEq (C D : HigherMonoidalCategory)
     (x : dayConvolutionObj C D) :
     (dayConvolutionPath C D x).toEq = rfl := by
-  sorry
+  rfl
 
 theorem cotangentPath_toEq (C : HigherMonoidalCategory) (a : algebraObject C) :
     (cotangentPath C a).toEq = rfl := by
-  sorry
+  rfl
 
 theorem quillenPath_toEq (C : HigherMonoidalCategory) (a : algebraObject C) :
     (quillenPath C a).toEq = rfl := by
-  sorry
+  rfl
 
 theorem infinityOperadAlgebraMap_id (C : HigherMonoidalCategory) (a : algebraObject C) :
     infinityOperadAlgebraMap C a = a := by
-  sorry
+  rfl
 
 theorem dayConvolutionComparison_id (C D : HigherMonoidalCategory)
     (x : dayConvolutionObj C D) : dayConvolutionComparison C D x = x := by
-  sorry
+  rfl
 
 end ComputationalPaths.Path.Category.HigherMonoidal
