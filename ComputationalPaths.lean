@@ -48,3 +48,5 @@ import ComputationalPaths.Intersection.PathInfrastructure
 import ComputationalPaths.OperadicAlgebra.PathInfrastructure
 import ComputationalPaths.OperadicAlgebra.EnOperads
 import ComputationalPaths.OperadicAlgebra.KoszulDuality
+import ComputationalPaths.Path.Logic.DependentTypeDeep
+import ComputationalPaths.Path.Logic.LinearLogicDeep
