@@ -447,3 +447,5 @@ import ComputationalPaths.Path.TypeTheory.WTypePaths
 import ComputationalPaths.Path.TypeTheory.InductiveTypePaths
 import ComputationalPaths.Path.TypeTheory.IdentityTypePaths
 import ComputationalPaths.Path.TypeTheory.UnivalencePaths
+import ComputationalPaths.Path.HoTT.PathAlgebraDeep
+import ComputationalPaths.Path.Rewriting.HigherRewritingDeep
