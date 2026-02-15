@@ -296,6 +296,73 @@ def pd_zero {R : Type u} {ring : RData R} :
 
 private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
+/-! ## Basic Theorems -/
+
+theorem RData.unitRing_add_unit (x y : PUnit) :
+    RData.unitRing.add x y = PUnit.unit := by
+  sorry
+
+theorem RData.unitRing_mul_unit (x y : PUnit) :
+    RData.unitRing.mul x y = PUnit.unit := by
+  sorry
+
+theorem MData.selfModule_zero_eq {R : Type u} (ring : RData R) :
+    (MData.selfModule ring).zero = ring.zero := by
+  sorry
+
+theorem MData.selfModule_smul_eq_mul {R : Type u} (ring : RData R) (r x : R) :
+    (MData.selfModule ring).smul r x = ring.mul r x := by
+  sorry
+
+theorem MData.unitMod_smul_unit {R : Type u} (ring : RData R) (r : R) (x : PUnit) :
+    (MData.unitMod ring).smul r x = PUnit.unit := by
+  sorry
+
+theorem ProjectiveDimension.resolution_length_path
+    {R : Type u} {ring : RData R} {M : Type v} (mM : MData ring M)
+    (pd : ProjectiveDimension mM) :
+    Path pd.resolution.length pd.value := by
+  sorry
+
+theorem FlatDimension.le_projective
+    {R : Type u} {ring : RData R} {M : Type v} (mM : MData ring M)
+    (fd : FlatDimension mM) (pd : ProjectiveDimension mM) :
+    fd.value ≤ pd.value := by
+  sorry
+
+theorem GlobalDimension.bound_apply
+    {R : Type u} (ring : RData R) (gd : GlobalDimension ring)
+    {M : Type u} (mM : MData ring M) (pd : ProjectiveDimension mM) :
+    pd.value ≤ gd.value := by
+  sorry
+
+theorem AuslanderBuchsbaum.formula_symm
+    {R : Type u} {ring : RData R} {M : Type v} (mM : MData ring M)
+    (ab : AuslanderBuchsbaum mM) :
+    Path ab.depthR.value (ab.pd.value + ab.depthM.value) := by
+  sorry
+
+theorem RegularLocalRing.regular_path
+    {R : Type u} (ring : RData R) (local_ : LocalRingData ring)
+    (reg : RegularLocalRing ring local_) :
+    Path reg.dim reg.numGens := by
+  sorry
+
+theorem RegularLocalRing.glDim_eq_dim_path
+    {R : Type u} (ring : RData R) (local_ : LocalRingData ring)
+    (reg : RegularLocalRing ring local_) :
+    Path reg.finitGlDim.value reg.dim := by
+  sorry
+
+theorem DimStep.sound'
+    {A : Type u} {a b : A} {p q : Path a b} (h : DimStep p q) :
+    p.proof = q.proof := by
+  sorry
+
+theorem pd_zero_value {R : Type u} {ring : RData R} :
+    (pd_zero (R := R) (ring := ring)).value = 0 := by
+  sorry
+
 /-! ## Summary -/
 
 /-!

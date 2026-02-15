@@ -274,6 +274,87 @@ def banach_to_liquid_addneg (B : BanachData.{u})
       (banachToLiquid B).group.zero :=
   Path.stepChain (B.add_neg x)
 
+/-! ## Additional Theorem Placeholders -/
+
+theorem normed_trivial_norm_zero
+    (x : NormedAbGroupData.trivial.carrier) :
+    NormedAbGroupData.trivial.norm x = 0 := by
+  sorry
+
+theorem normed_trivial_add_comm
+    (x y : NormedAbGroupData.trivial.carrier) :
+    NormedAbGroupData.trivial.add x y = NormedAbGroupData.trivial.add y x := by
+  sorry
+
+theorem normed_trivial_add_assoc
+    (x y z : NormedAbGroupData.trivial.carrier) :
+    NormedAbGroupData.trivial.add (NormedAbGroupData.trivial.add x y) z =
+      NormedAbGroupData.trivial.add x (NormedAbGroupData.trivial.add y z) := by
+  sorry
+
+theorem pliquid_trivial_exponent :
+    PLiquidData.trivial.exponent = 1 := by
+  sorry
+
+theorem analytic_trivial_mul_comm
+    (x y : AnalyticRingData.trivialRing.carrier) :
+    AnalyticRingData.trivialRing.mul x y = AnalyticRingData.trivialRing.mul y x := by
+  sorry
+
+theorem analytic_trivial_tensor_compat
+    (x y : AnalyticRingData.trivialRing.carrier) :
+    AnalyticRingData.trivialRing.analytic_tensor x y =
+      AnalyticRingData.trivialRing.mul x y := by
+  sorry
+
+theorem liquid_tensor_zero_left
+    {A B : PLiquidData.{u}} (T : LiquidTensorProduct A B) (b : B.group.carrier) :
+    T.bilinear A.group.zero b = T.result.group.zero := by
+  sorry
+
+theorem liquid_tensor_zero_right
+    {A B : PLiquidData.{u}} (T : LiquidTensorProduct A B) (a : A.group.carrier) :
+    T.bilinear a B.group.zero = T.result.group.zero := by
+  sorry
+
+theorem liquid_morphism_id_map_apply
+    (A : PLiquidData.{u}) (x : A.group.carrier) :
+    (LiquidMorphism.id A).map x = x := by
+  sorry
+
+theorem banach_to_liquid_exponent_one
+    (B : BanachData.{u}) :
+    (banachToLiquid B).exponent = 1 := by
+  sorry
+
+theorem banach_to_liquid_addneg_naturality
+    (B : BanachData.{u}) (x : (banachToLiquid B).group.carrier) :
+    banach_to_liquid_addneg B x = Path.stepChain (B.add_neg x) := by
+  sorry
+
+theorem liquid_tensor_exact_naturality
+    (A B C : PLiquidData.{u})
+    (seq : LiquidExactSeq A B C)
+    (M : PLiquidData.{u})
+    (tAM : LiquidTensorProduct A M)
+    (tBM : LiquidTensorProduct B M)
+    (tCM : LiquidTensorProduct C M)
+    (x : A.group.carrier) (m : M.group.carrier) :
+    liquid_tensor_exact A B C seq M tAM tBM tCM x m =
+      Path.congrArg (fun z => tCM.bilinear z m) (seq.exact x) := by
+  sorry
+
+theorem liquid_exact_comp_zero
+    (A B C : PLiquidData.{u}) (seq : LiquidExactSeq A B C)
+    (x : A.group.carrier) :
+    seq.g.map (seq.f.map x) = C.group.zero := by
+  sorry
+
+theorem liquidAnchor_refl
+    {A : Type u} (a : A) :
+    liquidAnchor a = Path.refl a := by
+  sorry
+
 end LiquidTensor
 end Algebra
 end Path

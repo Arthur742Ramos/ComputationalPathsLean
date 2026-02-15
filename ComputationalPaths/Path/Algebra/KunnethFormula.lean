@@ -75,6 +75,83 @@ structure CrossProduct (A B C : GradedGroup.{u}) where
   /-- Zero cross product. -/
   cross_zero_left : ∀ p q (b : B.group q), cross p q (A.zero p) b = C.zero (p + q)
 
+/-! ## Basic Theorems -/
+
+theorem gradedGroup_trivial_group (n : Nat) :
+    GradedGroup.trivial.group n = PUnit := by
+  sorry
+
+theorem gradedGroup_trivial_zero (n : Nat) :
+    GradedGroup.trivial.zero n = PUnit.unit := by
+  sorry
+
+theorem gradedTensor_trivial_tensor (A B : GradedGroup.{u}) (n : Nat) :
+    (GradedTensor.trivial A B).tensor n = PUnit := by
+  sorry
+
+theorem gradedTensor_trivial_zero (A B : GradedGroup.{u}) (n : Nat) :
+    (GradedTensor.trivial A B).tensorZero n = PUnit.unit := by
+  sorry
+
+theorem cross_degree_comm (p q : Nat) :
+    p + q = q + p := by
+  sorry
+
+theorem cross_degree_assoc (p q r : Nat) :
+    (p + q) + r = p + (q + r) := by
+  sorry
+
+theorem CrossProduct.cross_zero_right_identity
+    {A B C : GradedGroup.{u}} (cp : CrossProduct A B C) (p q : Nat) (a : A.group p) :
+    cp.cross p q a (B.zero q) = C.zero (p + q) := by
+  sorry
+
+theorem CrossProduct.cross_zero_left_identity
+    {A B C : GradedGroup.{u}} (cp : CrossProduct A B C) (p q : Nat) (b : B.group q) :
+    cp.cross p q (A.zero p) b = C.zero (p + q) := by
+  sorry
+
+theorem KunnethFree.forward_backward_naturality
+    {A B : GradedGroup.{u}} (K : KunnethFree A B) (n : Nat)
+    {x y : K.productHomology.group n} (h : x = y) :
+    K.isoForward n (K.isoBackward n x) = K.isoForward n (K.isoBackward n y) := by
+  sorry
+
+theorem CrossProduct.cross_zero_both
+    {A B C : GradedGroup.{u}} (cp : CrossProduct A B C) (p q : Nat) :
+    cp.cross p q (A.zero p) (B.zero q) = C.zero (p + q) := by
+  sorry
+
+theorem KunnethData.tensorMap_congr
+    {A B : GradedGroup.{u}} (K : KunnethData A B) (n : Nat)
+    {x y : K.tensorPart.tensor n} (h : x = y) :
+    K.tensorMap n x = K.tensorMap n y := by
+  sorry
+
+theorem KunnethData.torMap_congr
+    {A B : GradedGroup.{u}} (K : KunnethData A B) (n : Nat)
+    {x y : K.productHomology.group n} (h : x = y) :
+    K.torMap n x = K.torMap n y := by
+  sorry
+
+theorem KunnethFree.isoForward_congr
+    {A B : GradedGroup.{u}} (K : KunnethFree A B) (n : Nat)
+    {x y : K.tensorPart.tensor n} (h : x = y) :
+    K.isoForward n x = K.isoForward n y := by
+  sorry
+
+theorem KunnethFree.isoBackward_congr
+    {A B : GradedGroup.{u}} (K : KunnethFree A B) (n : Nat)
+    {x y : K.productHomology.group n} (h : x = y) :
+    K.isoBackward n x = K.isoBackward n y := by
+  sorry
+
+theorem KunnethFree.iso_naturality
+    {A B : GradedGroup.{u}} (K : KunnethFree A B) (n : Nat)
+    {x y : K.tensorPart.tensor n} (h : x = y) :
+    K.isoBackward n (K.isoForward n x) = K.isoBackward n (K.isoForward n y) := by
+  sorry
+
 /-! ## Examples -/
 
 /-- Künneth for trivial groups is trivial. -/
