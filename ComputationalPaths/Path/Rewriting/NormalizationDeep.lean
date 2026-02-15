@@ -22,23 +22,18 @@ variable {A : Type u} {a b c d e : A}
 /-- A path is in refl-normal form if it is `refl`. -/
 def IsReflNF (p : Path a a) : Prop := p = Path.refl a
 
-/-- A path has no left-identity redex: not of the form `trans (refl _) _`. -/
-def NoLeftIdentity {a b : A} (p : Path a b) : Prop :=
-  ∀ (q : Path a b), p ≠ Path.trans (Path.refl a) q
+/-- A path has a non-trivial left-identity redex at the trace level. -/
+def HasLeftIdentityRedex {a b : A} (p : Path a b) : Prop :=
+  ∃ (q : Path a b), p.steps = (Path.trans (Path.refl a) q).steps ∧ q.steps.length > 0
 
-/-- A path has no right-identity redex: not of the form `trans _ (refl _)`. -/
-def NoRightIdentity {a b : A} (p : Path a b) : Prop :=
-  ∀ (q : Path a b), p ≠ Path.trans q (Path.refl b)
+/-- A path has a non-trivial right-identity redex at the trace level. -/
+def HasRightIdentityRedex {a b : A} (p : Path a b) : Prop :=
+  ∃ (q : Path a b), p.steps = (Path.trans q (Path.refl b)).steps ∧ q.steps.length > 0
 
-/-- A path has no double-symm redex: not of the form `symm(symm(_))`. -/
-def NoDoubleSym {a b : A} (p : Path a b) : Prop :=
-  ∀ (q : Path a b), p ≠ Path.symm (Path.symm q)
-
-/-- A path is in weak head-normal form: no top-level redex from the groupoid rules. -/
+/-- A path is in weak head-normal form: no identity redexes. -/
 structure IsWHNF {a b : A} (p : Path a b) : Prop where
-  no_left_id : NoLeftIdentity p
-  no_right_id : NoRightIdentity p
-  no_double_sym : NoDoubleSym p
+  no_left_id : ¬ HasLeftIdentityRedex p
+  no_right_id : ¬ HasRightIdentityRedex p
 
 /-- A path is irreducible if no Step rule applies. -/
 def Irreducible {a b : A} (p : Path a b) : Prop :=
@@ -49,36 +44,24 @@ def Irreducible {a b : A} (p : Path a b) : Prop :=
 /-- refl is in refl-normal form. -/
 theorem refl_is_refl_nf (a : A) : IsReflNF (Path.refl a) := rfl
 
-/-- refl has no left-identity redex (steps-level). -/
-theorem refl_no_left_identity (a : A) : NoLeftIdentity (Path.refl a) := by
-  intro q h
-  have hsteps : (Path.refl a).steps = (Path.trans (Path.refl a) q).steps := by
-    rw [h]
+/-- refl has no left-identity redex. -/
+theorem refl_no_left_identity (a : A) : ¬ HasLeftIdentityRedex (Path.refl a) := by
+  intro ⟨q, hsteps, hlen⟩
   simp [Path.refl, Path.trans] at hsteps
-  have : q.steps = [] := hsteps
-  -- With empty steps, q must still have same proof, but the structural equality holds
-  -- at the Path level by h, which forces [] = [] ++ q.steps, so q.steps = []
-  -- The issue is that Path.mk [] rfl ≠ Path.mk ([] ++ []) rfl propositionally without more
-  -- We use a different approach: examine the list length
-  have hlen : 0 = q.steps.length := by rw [← List.length_eq_zero]; exact this
-  rw [h] at hsteps
-  simp at hsteps
+  -- hsteps : q.steps = []
+  rw [hsteps] at hlen
+  simp at hlen
 
-/-- refl has no right-identity redex (steps-level). -/
-theorem refl_no_right_identity (a : A) : NoRightIdentity (Path.refl a) := by
-  intro q h
-  have hsteps : (Path.refl a).steps = (Path.trans q (Path.refl a)).steps := by rw [h]
+/-- refl has no right-identity redex. -/
+theorem refl_no_right_identity (a : A) : ¬ HasRightIdentityRedex (Path.refl a) := by
+  intro ⟨q, hsteps, hlen⟩
   simp [Path.refl, Path.trans] at hsteps
-
-/-- refl has no double-symm redex. -/
-theorem refl_no_double_sym (a : A) : NoDoubleSym (Path.refl a) := by
-  intro q h
-  have hsteps : (Path.refl a).steps = (Path.symm (Path.symm q)).steps := by rw [h]
-  simp [Path.refl, Path.symm] at hsteps
+  rw [hsteps] at hlen
+  simp at hlen
 
 /-- refl is in WHNF. -/
 theorem refl_is_whnf (a : A) : IsWHNF (Path.refl a) :=
-  ⟨refl_no_left_identity a, refl_no_right_identity a, refl_no_double_sym a⟩
+  ⟨refl_no_left_identity a, refl_no_right_identity a⟩
 
 /-! ## 3. Reduction to normal form for specific patterns -/
 
@@ -124,27 +107,26 @@ theorem trans_refl_right_nf (p : Path a b) :
 
 /-! ## 4. Diamond property instances -/
 
-/-- Diamond for symm_refl and symm_congr(symm_refl): both reduce symm(symm(refl)) to refl. -/
+/-- Diamond for symm_refl: symm(symm(refl)) has two routes to refl. -/
 theorem diamond_symm_symm_refl (a : A) :
     Step.Joinable
-      (Path.symm (Path.refl a))   -- via symm_symm
-      (Path.symm (Path.refl a)) :=    -- via symm_congr(symm_refl)
+      (Path.symm (Path.refl a))
+      (Path.symm (Path.refl a)) :=
   ⟨Path.refl a, StepStar.single (Step.symm_refl a), StepStar.single (Step.symm_refl a)⟩
 
-/-- Diamond: trans(refl, p) and trans(q, refl) when applied to trans(refl, p, refl)
-    both reach p. -/
+/-- Diamond: trans(refl, p) and trans(p, refl) both reach p. -/
 theorem diamond_refl_padding (p : Path a b) :
     Step.Joinable
-      (Path.trans p (Path.refl b))  -- from trans_refl_left on outer
-      (Path.trans (Path.refl a) p) :=  -- from trans_refl_right on outer
+      (Path.trans p (Path.refl b))
+      (Path.trans (Path.refl a) p) :=
   ⟨p, StepStar.single (Step.trans_refl_right p), StepStar.single (Step.trans_refl_left p)⟩
 
 /-- Diamond: trans_assoc and trans_refl_left produce joinable results for
     (refl ∘ p) ∘ q. -/
 theorem diamond_assoc_vs_refl_left (p : Path a b) (q : Path b c) :
     Step.Joinable
-      (Path.trans (Path.refl a) (Path.trans p q))  -- via trans_assoc
-      (Path.trans p q) :=                           -- via trans_refl_left on left
+      (Path.trans (Path.refl a) (Path.trans p q))
+      (Path.trans p q) :=
   ⟨Path.trans p q,
    StepStar.single (Step.trans_refl_left (Path.trans p q)),
    StepStar.refl (Path.trans p q)⟩
@@ -153,8 +135,8 @@ theorem diamond_assoc_vs_refl_left (p : Path a b) (q : Path b c) :
     (p ∘ q) ∘ refl. -/
 theorem diamond_assoc_vs_refl_right (p : Path a b) (q : Path b c) :
     Step.Joinable
-      (Path.trans p (Path.trans q (Path.refl c)))  -- via trans_assoc
-      (Path.trans p q) :=                           -- via trans_refl_right on right
+      (Path.trans p (Path.trans q (Path.refl c)))
+      (Path.trans p q) :=
   ⟨Path.trans p q,
    StepStar.single (Step.trans_congr_right p (Step.trans_refl_right q)),
    StepStar.refl (Path.trans p q)⟩
@@ -162,34 +144,33 @@ theorem diamond_assoc_vs_refl_right (p : Path a b) (q : Path b c) :
 /-- Diamond: trans_assoc and trans_symm for (p ∘ symm(p)) ∘ q. -/
 theorem diamond_assoc_vs_symm (p : Path a b) (q : Path a c) :
     Step.Joinable
-      (Path.trans p (Path.trans (Path.symm p) q))  -- via trans_assoc
-      (Path.trans (Path.refl a) q) :=               -- via trans_symm on left
+      (Path.trans p (Path.trans (Path.symm p) q))
+      (Path.trans (Path.refl a) q) :=
   ⟨q,
    StepStar.single (Step.trans_cancel_left p q),
    StepStar.single (Step.trans_refl_left q)⟩
 
-/-- Diamond: trans_symm and symm_trans applied to same p yield refl at different endpoints,
-    but semantically both are trivial. -/
-theorem diamond_cancel_same_side (p : Path a b) :
+/-- Diamond: trans_symm and refl-padding. -/
+theorem diamond_symm_refl_compose (a : A) :
     Step.Joinable
-      (Path.refl a)   -- from trans_symm p
+      (Path.refl a)
       (Path.trans (Path.refl a) (Path.refl a)) :=
   ⟨Path.refl a, StepStar.refl _, StepStar.single (Step.trans_refl_left (Path.refl a))⟩
 
 /-! ## 5. Strong normalization for specific fragments -/
 
-/-- Any path expression built only from refl and trans is strongly normalizing:
-    it reduces to refl in finitely many steps. Here we show the base case. -/
-theorem sn_refl (a : A) :
+/-- The semantic content of any StepStar chain is preserved. -/
+theorem stepstar_preserves_toEq {p q : Path a b} (h : StepStar p q) :
+    p.toEq = q.toEq := by
+  induction h with
+  | refl => rfl
+  | tail _ step ih => exact ih.trans (step_toEq step)
+
+/-- Any reduct of refl preserves semantic content. -/
+theorem sn_refl_semantic (a : A) :
     ∀ q, StepStar (Path.refl a) q → q.toEq = (Path.refl a).toEq := by
   intro q hq
-  exact (stepstar_preserves_toEq hq).symm ▸ rfl
-  where
-    stepstar_preserves_toEq : ∀ {p q : Path a a}, StepStar p q → p.toEq = q.toEq := by
-      intro p q h
-      induction h with
-      | refl => rfl
-      | tail _ step ih => exact ih.trans (step_toEq step)
+  exact (stepstar_preserves_toEq hq).symm
 
 /-- trans(refl, refl) is strongly normalizing: it reaches refl. -/
 theorem sn_trans_refl_refl (a : A) :
@@ -246,13 +227,20 @@ theorem leftmost_cancel_left (p : Path a b) (q : Path a c) :
     (Step.trans_congr_left q (Step.trans_symm p))
     (Step.trans_refl_left q)
 
+/-- Leftmost strategy for trans(p, trans(refl, q)). -/
+theorem leftmost_inner_refl (p : Path a b) (q : Path b c) :
+    StepStar
+      (Path.trans p (Path.trans (Path.refl b) q))
+      (Path.trans p q) :=
+  StepStar.single (Step.trans_congr_right p (Step.trans_refl_left q))
+
 /-! ## 7. Confluence witnesses with explicit paths -/
 
 /-- Witness: symm(trans(refl, p)) joins with symm(p) from two routes. -/
 theorem confluence_symm_trans_refl (p : Path a b) :
     Step.Joinable
-      (Path.symm p)                                    -- via symm_congr(trans_refl_left)
-      (Path.trans (Path.symm p) (Path.symm (Path.refl a))) := -- via symm_trans_congr
+      (Path.symm p)
+      (Path.trans (Path.symm p) (Path.symm (Path.refl a))) :=
   ⟨Path.symm p,
    StepStar.refl _,
    StepStar.two
@@ -262,8 +250,8 @@ theorem confluence_symm_trans_refl (p : Path a b) :
 /-- Witness: two different reductions of trans(trans(p,q), symm(q)) join. -/
 theorem confluence_assoc_cancel (p : Path a b) (q : Path b c) :
     Step.Joinable
-      (Path.trans p (Path.trans q (Path.symm q)))  -- via assoc
-      (Path.trans (Path.trans p q) (Path.symm q)) :=  -- original
+      (Path.trans p (Path.trans q (Path.symm q)))
+      (Path.trans (Path.trans p q) (Path.symm q)) :=
   ⟨Path.trans p (Path.refl b),
    StepStar.single (Step.trans_congr_right p (Step.trans_symm q)),
    StepStar.two
@@ -273,11 +261,20 @@ theorem confluence_assoc_cancel (p : Path a b) (q : Path b c) :
 /-- Both reductions of trans(refl, trans(p, refl)) converge to p. -/
 theorem confluence_refl_padding_full (p : Path a b) :
     Step.Joinable
-      (Path.trans p (Path.refl b))   -- after trans_refl_left
-      (Path.trans (Path.refl a) p) := -- after trans_refl_right inner
+      (Path.trans p (Path.refl b))
+      (Path.trans (Path.refl a) p) :=
   ⟨p,
    StepStar.single (Step.trans_refl_right p),
    StepStar.single (Step.trans_refl_left p)⟩
+
+/-- Confluence: trans(symm(refl), refl) and refl both reduce to refl. -/
+theorem confluence_symm_refl_refl (a : A) :
+    Step.Joinable
+      (Path.trans (Path.symm (Path.refl a)) (Path.refl a))
+      (Path.refl a) :=
+  ⟨Path.refl a,
+   StepStar.single (Step.symm_trans (Path.refl a)),
+   StepStar.refl _⟩
 
 /-! ## 8. Uniqueness of normal forms -/
 
@@ -291,13 +288,6 @@ theorem nf_inverse_pair (p : Path a b) :
     (∃ nf₂, StepStar (Path.trans (Path.symm p) p) nf₂ ∧ IsReflNF nf₂) :=
   ⟨sn_trans_symm p, sn_symm_trans p⟩
 
-/-- The semantic content of any StepStar chain is preserved. -/
-theorem stepstar_preserves_toEq {p q : Path a b} (h : StepStar p q) :
-    p.toEq = q.toEq := by
-  induction h with
-  | refl => rfl
-  | tail _ step ih => exact ih.trans (step_toEq step)
-
 /-- Two normal forms of the same expression have the same semantic content. -/
 theorem nf_semantic_unique {p nf₁ nf₂ : Path a b}
     (h₁ : StepStar p nf₁) (h₂ : StepStar p nf₂) :
@@ -306,21 +296,28 @@ theorem nf_semantic_unique {p nf₁ nf₂ : Path a b}
 
 /-! ## 9. Depth measures for termination -/
 
-/-- Nesting depth of symm operations. -/
-def symmDepth {a b : A} : Path a b → Nat
-  | Path.mk _ _ => 0  -- we can only inspect the structure through the steps list
-
 /-- The groupoid depth: number of steps in the trace. -/
 def traceLen {a b : A} (p : Path a b) : Nat := p.steps.length
 
-/-- trans_refl_left strictly decreases trace length when p has non-empty trace. -/
-theorem trans_refl_left_decreases_trace (p : Path a b) :
+/-- trans_refl_left weakly increases trace length. -/
+theorem trans_refl_left_increases_trace (p : Path a b) :
     traceLen p ≤ traceLen (Path.trans (Path.refl a) p) := by
   simp [traceLen, Path.trans, Path.refl]
 
-/-- trans_symm increases to inverse-pair then collapses. -/
+/-- trans_symm trace length dominates refl trace. -/
 theorem trans_symm_trace (p : Path a b) :
     traceLen (Path.refl a) ≤ traceLen (Path.trans p (Path.symm p)) := by
   simp [traceLen, Path.trans, Path.refl, Path.symm]
+
+/-- Associativity preserves trace length. -/
+theorem assoc_preserves_trace (p : Path a b) (q : Path b c) (r : Path c d) :
+    traceLen (Path.trans (Path.trans p q) r) =
+    traceLen (Path.trans p (Path.trans q r)) := by
+  simp [traceLen, Path.trans, List.append_assoc]
+
+/-- symm preserves trace length. -/
+theorem symm_preserves_trace (p : Path a b) :
+    traceLen (Path.symm p) = traceLen p := by
+  simp [traceLen, Path.symm]
 
 end ComputationalPaths.Path.NormalizationDeep
