@@ -274,6 +274,75 @@ def solid_tensor_zero (A : AbGroupData.{u})
     Path (st.result.add x (st.result.neg x)) st.result.zero :=
   st.solid x
 
+/-! ## Theorem Stubs -/
+
+theorem abGroupMorphism_id_toFun (A : AbGroupData.{u}) (x : A.carrier) :
+    (AbGroupMorphism.id A).toFun x = x := by
+  sorry
+
+theorem abGroupMorphism_id_map_zero (A : AbGroupData.{u}) :
+    Nonempty (Path ((AbGroupMorphism.id A).toFun A.zero) A.zero) := by
+  sorry
+
+theorem proSystem_constant_level (A : AbGroupData.{u}) (n : Nat) :
+    (ProSystemData.constant A).level n = A := by
+  sorry
+
+theorem proSystem_constant_transition_toFun (A : AbGroupData.{u}) (n : Nat)
+    (x : A.carrier) :
+    ((ProSystemData.constant A).transition n).toFun x = x := by
+  sorry
+
+theorem proLimit_morphism_compat_eq (sys : ProSystemData.{u}) (lim : ProLimit sys)
+    (n : Nat) :
+    proLimit_morphism_compat sys lim n = lim.compat n := by
+  sorry
+
+theorem derivedIAdic_derived_vanish_succ (R : AbGroupData.{u}) (I : IdealData R)
+    (powers : IdealPowerSystem R I) (dc : DerivedIAdicData R I powers) (n : Nat) :
+    Nonempty (Path dc.completion.zero dc.completion.zero) := by
+  sorry
+
+theorem ideal_zero_add_mem (R : AbGroupData.{u}) (I : IdealData R) {x : R.carrier}
+    (hx : I.mem x) : I.mem (R.add x R.zero) := by
+  sorry
+
+theorem ideal_neg_zero_mem (R : AbGroupData.{u}) (I : IdealData R) :
+    I.mem (R.neg R.zero) := by
+  sorry
+
+theorem solidTensor_result_add_comm (A B : AbGroupData.{u})
+    (st : SolidTensorData A B) (x y : st.result.carrier) :
+    st.result.add x y = st.result.add y x := by
+  sorry
+
+theorem nuclear_factor_zero (N : NuclearModuleData.{u}) :
+    Nonempty (Path (N.factor N.zero) N.zero) := by
+  sorry
+
+theorem nuclear_all_nuclear_bound (N : NuclearModuleData.{u}) (x : N.carrier) :
+    ∃ n : Nat, N.nuclearNorm x ≤ n := by
+  sorry
+
+theorem efimov_additivity_unit_left (K : EfimovKData.{u}) (x : K.objects) :
+    Nonempty
+      (Path (K.classMap (K.tensor K.unit x))
+        (K.K0.add (K.classMap K.unit) (K.classMap x))) := by
+  sorry
+
+theorem efimov_unit_zero_eq (K : EfimovKData.{u}) :
+    efimov_unit_zero K = K.unit_class := by
+  sorry
+
+theorem solid_tensor_zero_eq_solid (A : AbGroupData.{u}) (st : SolidTensorData A A)
+    (x : st.result.carrier) :
+    solid_tensor_zero A st x = st.solid x := by
+  sorry
+
+theorem derivedCompStep_of_proof_eq {A : Type u} {a b : A} (p q : Path a b)
+    (h : p.proof = q.proof) : DerivedCompStep p q := by
+  sorry
+
 end DerivedComplete
 end Algebra
 end Path

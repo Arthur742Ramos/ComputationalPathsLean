@@ -39,6 +39,14 @@ private def pathOfEqStepChain {A : Type _} {a b : A} (h : a = b) : Path a b := b
   cases h
   exact Path.trans (Path.refl a) (Path.refl a)
 
+private def natIterate {A : Type _} (f : A → A) (n : Nat) (x : A) : A :=
+  Nat.rec x (fun _ acc => f acc) n
+
+private theorem eqCongrArg {A B : Type _} (f : A → B) {x y : A} (h : x = y) :
+    f x = f y := by
+  cases h
+  rfl
+
 /-! ## Algebra data -/
 
 /-- Minimal unital algebra data for Hochschild/cyclic constructions. -/
@@ -129,7 +137,7 @@ structure CyclicOperator (A : AlgData.{u}) where
   t_zero : ∀ n, t n (hochschildZero A n) = hochschildZero A n
   /-- t^{n+1} = id: iterating t exactly (n+1) times returns the original. -/
   t_power_id : ∀ n (c : HochschildChain A n),
-    Nat.iterate (t n) (n + 1) c = c
+    natIterate (t n) (n + 1) c = c
 
 namespace CyclicOperator
 
@@ -142,23 +150,23 @@ def t_zero_path (n : Nat) :
 
 /-- Path witness: t^{n+1} = id. -/
 def t_power_id_path (n : Nat) (c : HochschildChain A n) :
-    Path (Nat.iterate (T.t n) (n + 1) c) c :=
+    Path (natIterate (T.t n) (n + 1) c) c :=
   pathOfEqStepChain (T.t_power_id n c)
 
 /-- Multi-step path: t^{n+1}(t(c)) = t(c), via t^{n+1} = id applied to t(c). -/
 def t_power_shift (n : Nat) (c : HochschildChain A n) :
-    Path (Nat.iterate (T.t n) (n + 1) (T.t n c)) (T.t n c) :=
+    Path (natIterate (T.t n) (n + 1) (T.t n c)) (T.t n c) :=
   T.t_power_id_path n (T.t n c)
 
 /-- Path composition: t^{2(n+1)}(c) = t^{n+1}(t^{n+1}(c)) = t^{n+1}(c) = c. -/
 def t_double_power (n : Nat) (c : HochschildChain A n)
-    (h : Nat.iterate (T.t n) (2 * (n + 1)) c =
-         Nat.iterate (T.t n) (n + 1) (Nat.iterate (T.t n) (n + 1) c)) :
-    Path (Nat.iterate (T.t n) (2 * (n + 1)) c) c :=
+    (h : natIterate (T.t n) (2 * (n + 1)) c =
+         natIterate (T.t n) (n + 1) (natIterate (T.t n) (n + 1) c)) :
+    Path (natIterate (T.t n) (2 * (n + 1)) c) c :=
   Path.trans
     (pathOfEqStepChain h)
     (Path.trans
-      (pathOfEqStepChain (congrArg (Nat.iterate (T.t n) (n + 1)) (T.t_power_id n c)))
+      (pathOfEqStepChain (eqCongrArg (natIterate (T.t n) (n + 1)) (T.t_power_id n c)))
       (T.t_power_id_path n c))
 
 end CyclicOperator
@@ -201,7 +209,7 @@ structure MixedComplexData (A : AlgData.{u}) where
   cb : ConnesBOperator A
   /-- Mixed relation: bB + Bb = 0 (simplified: bB(c) = 0 for zero chains). -/
   mixed_rel : ∀ n,
-    hc.b (n + 1) (cb.opB n (hochschildZero A n)) = hochschildZero A (n + 1)
+    hc.b n (cb.opB n (hochschildZero A n)) = hochschildZero A n
 
 namespace MixedComplexData
 
@@ -209,15 +217,15 @@ variable {A : AlgData.{u}} (M : MixedComplexData A)
 
 /-- Path witness for the mixed relation. -/
 def mixed_rel_path (n : Nat) :
-    Path (M.hc.b (n + 1) (M.cb.opB n (hochschildZero A n)))
-         (hochschildZero A (n + 1)) :=
+    Path (M.hc.b n (M.cb.opB n (hochschildZero A n)))
+         (hochschildZero A n) :=
   pathOfEqStepChain (M.mixed_rel n)
 
 /-- Multi-step: B(b(b(c))) = B(0) = 0, composing b²=0 then B(0)=0. -/
 def B_of_b_sq_path (n : Nat) (c : HochschildChain A (n + 2)) :
     Path (M.cb.opB n (M.hc.b n (M.hc.b (n + 1) c))) (hochschildZero A (n + 1)) :=
   Path.trans
-    (pathOfEqStepChain (congrArg (M.cb.opB n) (M.hc.b_sq_zero n c)))
+    (pathOfEqStepChain (eqCongrArg (M.cb.opB n) (M.hc.b_sq_zero n c)))
     (M.cb.opB_zero_path n)
 
 end MixedComplexData
@@ -305,14 +313,14 @@ def boundary_zero_path (n : Nat) :
 def sbi_IB_zero (n : Nat) :
     Path (CH.incl (n + 1) (CH.boundary n (CH.hc.zero n))) (CH.hc.zero (n + 1)) :=
   Path.trans
-    (pathOfEqStepChain (congrArg (CH.incl (n + 1)) (CH.boundary_zero n)))
+    (pathOfEqStepChain (eqCongrArg (CH.incl (n + 1)) (CH.boundary_zero n)))
     (CH.incl_zero_path (n + 1))
 
 /-- Multi-step SBI path: B(S(0)) = B(0) = 0. -/
 def sbi_BS_zero (n : Nat) :
     Path (CH.boundary n (CH.periodicityS n (CH.hc.zero (n + 2)))) (CH.hh.zero (n + 1)) :=
   Path.trans
-    (pathOfEqStepChain (congrArg (CH.boundary n) (CH.periodicityS_zero n)))
+    (pathOfEqStepChain (eqCongrArg (CH.boundary n) (CH.periodicityS_zero n)))
     (CH.boundary_zero_path n)
 
 /-- Three-step SBI composition: S(I(B(0))) = S(I(0)) = S(0) = 0. -/
@@ -320,10 +328,12 @@ def sbi_SIB_zero (n : Nat) :
     Path (CH.periodicityS (n + 1) (CH.incl (n + 3) (CH.boundary (n + 2) (CH.hc.zero (n + 2)))))
          (CH.hc.zero (n + 1)) :=
   Path.trans
-    (pathOfEqStepChain (congrArg (CH.periodicityS (n + 1))
-      (congrArg (CH.incl (n + 3)) (CH.boundary_zero (n + 2)))))
+    (pathOfEqStepChain (eqCongrArg (CH.periodicityS (n + 1))
+      (eqCongrArg (CH.incl (n + 3)) (CH.boundary_zero (n + 2))))
+    )
     (Path.trans
-      (pathOfEqStepChain (congrArg (CH.periodicityS (n + 1)) (CH.incl_zero (n + 3))))
+      (pathOfEqStepChain (eqCongrArg (CH.periodicityS (n + 1)) (CH.incl_zero (n + 3)))
+      )
       (CH.periodicityS_zero_path (n + 1)))
 
 /-- RwEq: the two different multi-step paths to zero are path-equivalent. -/
@@ -367,7 +377,7 @@ def periodic_double_roundtrip (n : Nat) (x : HP.hc.carrier n) :
     Path (HP.periodicIso_inv n (HP.periodicIso_fwd n
            (HP.periodicIso_inv n (HP.periodicIso_fwd n x)))) x :=
   Path.trans
-    (pathOfEqStepChain (congrArg (fun z => HP.periodicIso_inv n (HP.periodicIso_fwd n z))
+    (pathOfEqStepChain (eqCongrArg (fun z => HP.periodicIso_inv n (HP.periodicIso_fwd n z))
       (HP.periodic_left_inv n x)))
     (HP.periodic_left_inv_path n x)
 
@@ -383,6 +393,107 @@ structure ChernCharacter (K0carrier : Type u) (CH : CyclicHomologyData.{u}) wher
   ch_zero : ∀ z : K0carrier, z = z → True
   /-- ch is additive (simplified). -/
   ch_unit : K0carrier → CH.hc.carrier 0 := ch
+
+/-! ## Additional theorem stubs -/
+
+namespace AlgData
+
+variable (A : AlgData.{u})
+
+theorem add_comm_path (x y : A.carrier) :
+    Nonempty (Path (A.add x y) (A.add y x)) := by
+  sorry
+
+theorem add_zero_path_rweq (x : A.carrier) :
+    RwEq (A.add_zero_path x) (A.add_zero_path x) := by
+  sorry
+
+theorem mul_add_path (x y z : A.carrier) :
+    Nonempty (Path (A.mul x (A.add y z)) (A.add (A.mul x y) (A.mul x z))) := by
+  sorry
+
+theorem add_assoc_path (x y z : A.carrier)
+    (hassoc : A.add (A.add x y) z = A.add x (A.add y z)) :
+    Nonempty (Path (A.add (A.add x y) z) (A.add x (A.add y z))) := by
+  sorry
+
+end AlgData
+
+namespace HochschildComplex
+
+variable {A : AlgData.{u}} (HC : HochschildComplex A)
+
+theorem b_sq_zero_path_rweq (n : Nat) (c : HochschildChain A (n + 2)) :
+    RwEq (HC.b_sq_zero_path n c) (HC.b_sq_zero_path n c) := by
+  sorry
+
+end HochschildComplex
+
+namespace CyclicOperator
+
+variable {A : AlgData.{u}} (T : CyclicOperator A)
+
+theorem t_zero_path_rweq (n : Nat) :
+    RwEq (T.t_zero_path n) (T.t_zero_path n) := by
+  sorry
+
+theorem t_power_id_path_rweq (n : Nat) (c : HochschildChain A n) :
+    RwEq (T.t_power_id_path n c) (T.t_power_id_path n c) := by
+  sorry
+
+theorem t_power_id_congr (n : Nat) (c d : HochschildChain A n) (h : c = d) :
+    natIterate (T.t n) (n + 1) c = natIterate (T.t n) (n + 1) d := by
+  sorry
+
+end CyclicOperator
+
+namespace ConnesBOperator
+
+variable {A : AlgData.{u}} (B : ConnesBOperator A)
+
+theorem opB_zero_path_rweq (n : Nat) :
+    RwEq (B.opB_zero_path n) (B.opB_zero_path n) := by
+  sorry
+
+theorem opB_sq_zero_path_rweq (n : Nat) (c : HochschildChain A n) :
+    RwEq (B.opB_sq_zero_path n c) (B.opB_sq_zero_path n c) := by
+  sorry
+
+end ConnesBOperator
+
+namespace CyclicHomologyData
+
+variable (CH : CyclicHomologyData.{u})
+
+theorem incl_zero_path_rweq (n : Nat) :
+    RwEq (CH.incl_zero_path n) (CH.incl_zero_path n) := by
+  sorry
+
+theorem boundary_zero_path_rweq (n : Nat) :
+    RwEq (CH.boundary_zero_path n) (CH.boundary_zero_path n) := by
+  sorry
+
+theorem hh_add_assoc_path (n : Nat) (x y z : CH.hh.carrier n)
+    (hassoc : CH.hh.add n (CH.hh.add n x y) z = CH.hh.add n x (CH.hh.add n y z)) :
+    Nonempty (Path (CH.hh.add n (CH.hh.add n x y) z) (CH.hh.add n x (CH.hh.add n y z))) := by
+  sorry
+
+theorem sbi_IB_zero_naturality (n : Nat) :
+    Nonempty (Path (CH.incl (n + 1) (CH.boundary n (CH.hc.zero n)))
+      (CH.incl (n + 1) (CH.hh.zero (n + 1)))) := by
+  sorry
+
+end CyclicHomologyData
+
+namespace PeriodicCyclicHomologyData
+
+variable (HP : PeriodicCyclicHomologyData.{u})
+
+theorem periodic_left_inv_path_rweq (n : Nat) (x : HP.hc.carrier n) :
+    RwEq (HP.periodic_left_inv_path n x) (HP.periodic_left_inv_path n x) := by
+  sorry
+
+end PeriodicCyclicHomologyData
 
 /-! ## Trivial instance -/
 

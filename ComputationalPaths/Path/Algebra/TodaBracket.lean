@@ -60,6 +60,44 @@ def PtdHomotopyClass.comp {X Y Z : PtdType.{u}} :
         intro f; apply Quot.sound
         exact ⟨Path.congrArg (fun g' => PtdMap.comp g' f) hg⟩)
 
+/-- Every pointed map has a reflexive homotopy class witness. -/
+theorem ptdHomotopy_nonempty_refl {X Y : PtdType.{u}} (f : PtdMap X Y) :
+    Nonempty (PtdHomotopy f f) := by
+  sorry
+
+/-- Homotopy classes are symmetric at the witness level. -/
+theorem ptdHomotopy_nonempty_symm {X Y : PtdType.{u}} {f g : PtdMap X Y} :
+    Nonempty (PtdHomotopy f g) → Nonempty (PtdHomotopy g f) := by
+  sorry
+
+/-- Homotopy classes are transitive at the witness level. -/
+theorem ptdHomotopy_nonempty_trans {X Y : PtdType.{u}} {f g h : PtdMap X Y} :
+    Nonempty (PtdHomotopy f g) → Nonempty (PtdHomotopy g h) → Nonempty (PtdHomotopy f h) := by
+  sorry
+
+/-- Composition of represented classes is represented by map composition. -/
+theorem ptdHomotopyClass_comp_mk {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) :
+    PtdHomotopyClass.comp (PtdHomotopyClass.mk g) (PtdHomotopyClass.mk f) =
+      PtdHomotopyClass.mk (PtdMap.comp g f) := by
+  sorry
+
+/-- Composition on homotopy classes is associative. -/
+theorem ptdHomotopyClass_comp_assoc {V W X Y : PtdType.{u}}
+    (h : PtdHomotopyClass X Y) (g : PtdHomotopyClass W X) (f : PtdHomotopyClass V W) :
+    PtdHomotopyClass.comp h (PtdHomotopyClass.comp g f) =
+      PtdHomotopyClass.comp (PtdHomotopyClass.comp h g) f := by
+  sorry
+
+/-- Left identity for composition on homotopy classes. -/
+theorem ptdHomotopyClass_comp_id_left {X Y : PtdType.{u}} (f : PtdHomotopyClass X Y) :
+    PtdHomotopyClass.comp (PtdHomotopyClass.mk (PtdMap.id Y)) f = f := by
+  sorry
+
+/-- Right identity for composition on homotopy classes. -/
+theorem ptdHomotopyClass_comp_id_right {X Y : PtdType.{u}} (f : PtdHomotopyClass X Y) :
+    PtdHomotopyClass.comp f (PtdHomotopyClass.mk (PtdMap.id X)) = f := by
+  sorry
+
 /-! ## Toda brackets -/
 
 /-- The zero pointed map. -/
@@ -70,6 +108,16 @@ def zeroPtdMap (X Y : PtdType.{u}) : PtdMap X Y where
 /-- A composition is null-homotopic if it equals the zero map. -/
 def IsNullHomotopic {X Y : PtdType.{u}} (f : PtdMap X Y) : Prop :=
   Nonempty (PtdHomotopy f (zeroPtdMap X Y))
+
+/-- The zero pointed map is null-homotopic. -/
+theorem isNullHomotopic_zero (X Y : PtdType.{u}) :
+    IsNullHomotopic (zeroPtdMap X Y) := by
+  sorry
+
+/-- Precomposition with a zero map yields a null-homotopic map. -/
+theorem isNullHomotopic_comp_zero_left (X Y Z : PtdType.{u}) (f : PtdMap Y Z) :
+    IsNullHomotopic (PtdMap.comp f (zeroPtdMap X Y)) := by
+  sorry
 
 /-- Input data for a Toda bracket ⟨f, g, h⟩.
     We need f : Z → W, g : Y → Z, h : X → Y
@@ -115,6 +163,16 @@ def isTodaBracketValue (inp : TodaBracketInput) (cls : PtdHomotopyClass inp.X in
   ∃ ext : TodaExtension inp,
     cls = PtdHomotopyClass.mk ext.extension
 
+/-- Any explicit extension yields a Toda bracket value. -/
+theorem todaBracketValue_of_extension (inp : TodaBracketInput) (ext : TodaExtension inp) :
+    isTodaBracketValue inp (PtdHomotopyClass.mk ext.extension) := by
+  sorry
+
+/-- The Toda bracket predicate is exactly existence of extension data. -/
+theorem isTodaBracketValue_iff_exists (inp : TodaBracketInput) (cls : PtdHomotopyClass inp.X inp.W) :
+    isTodaBracketValue inp cls ↔ ∃ ext : TodaExtension inp, cls = PtdHomotopyClass.mk ext.extension := by
+  sorry
+
 /-! ## Indeterminacy -/
 
 /-- The indeterminacy predicate: a class is in f ∘ [X, Z] + [Y, W] ∘ h. -/
@@ -123,6 +181,23 @@ def isTodaIndeterminacy (inp : TodaBracketInput) (cls : PtdHomotopyClass inp.X i
     cls = PtdHomotopyClass.mk (PtdMap.comp inp.f α)) ∨
   (∃ β : PtdMap inp.Y inp.W,
     cls = PtdHomotopyClass.mk (PtdMap.comp β inp.h))
+
+/-- Any left-composite representative lies in Toda indeterminacy. -/
+theorem todaIndeterminacy_left (inp : TodaBracketInput) (α : PtdMap inp.X inp.Z) :
+    isTodaIndeterminacy inp (PtdHomotopyClass.mk (PtdMap.comp inp.f α)) := by
+  sorry
+
+/-- Any right-composite representative lies in Toda indeterminacy. -/
+theorem todaIndeterminacy_right (inp : TodaBracketInput) (β : PtdMap inp.Y inp.W) :
+    isTodaIndeterminacy inp (PtdHomotopyClass.mk (PtdMap.comp β inp.h)) := by
+  sorry
+
+/-- The two summands of indeterminacy can be swapped. -/
+theorem todaIndeterminacy_comm (inp : TodaBracketInput) (cls : PtdHomotopyClass inp.X inp.W) :
+    isTodaIndeterminacy inp cls ↔
+      (∃ β : PtdMap inp.Y inp.W, cls = PtdHomotopyClass.mk (PtdMap.comp β inp.h)) ∨
+      (∃ α : PtdMap inp.X inp.Z, cls = PtdHomotopyClass.mk (PtdMap.comp inp.f α)) := by
+  sorry
 
 /-- The zero class is in the indeterminacy. -/
 theorem zero_mem_toda_indeterminacy (inp : TodaBracketInput) :
@@ -162,6 +237,11 @@ def TodaJacobi.bracket_ghk (j : TodaJacobi) : TodaBracketInput where
   X := j.A; Y := j.B; Z := j.C; W := j.D
   f := j.g; g := j.h; h := j.k
   fg_null := j.gh_null; gh_null := j.hk_null
+
+/-- The first Jacobi bracket preserves the original triple of maps. -/
+theorem todaJacobi_bracket_fgh_maps (j : TodaJacobi) :
+    j.bracket_fgh.f = j.f ∧ j.bracket_fgh.g = j.g ∧ j.bracket_fgh.h = j.h := by
+  sorry
 
 /-! ## Summary -/
 

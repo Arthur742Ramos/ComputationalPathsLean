@@ -251,6 +251,82 @@ def smith_reflexive (S : SmithSpaceData.{u}) (x : S.carrier) :
     Path (S.add x (S.neg x)) S.zero :=
   S.add_neg_path x
 
+/-! ## Theorem Stubs -/
+
+theorem boundedMap_id_apply (X : BornologyData.{u}) (x : X.carrier) :
+    (BoundedMap.id X).toFun x = x := by
+  sorry
+
+theorem boundedMap_comp_apply {X Y Z : BornologyData.{u}}
+    (f : BoundedMap X Y) (g : BoundedMap Y Z) (x : X.carrier) :
+    (BoundedMap.comp f g).toFun x = g.toFun (f.toFun x) := by
+  sorry
+
+theorem boundedMap_comp_id_left_apply {X Y : BornologyData.{u}}
+    (f : BoundedMap X Y) (x : X.carrier) :
+    (BoundedMap.comp (BoundedMap.id X) f).toFun x = f.toFun x := by
+  sorry
+
+theorem boundedMap_comp_id_right_apply {X Y : BornologyData.{u}}
+    (f : BoundedMap X Y) (x : X.carrier) :
+    (BoundedMap.comp f (BoundedMap.id Y)).toFun x = f.toFun x := by
+  sorry
+
+theorem bounded_comp_assoc_apply_eq {X Y Z W : BornologyData.{u}}
+    (f : BoundedMap X Y) (g : BoundedMap Y Z) (h : BoundedMap Z W)
+    (x : X.carrier) :
+    ((BoundedMap.comp (BoundedMap.comp f g) h).toFun x) =
+      ((BoundedMap.comp f (BoundedMap.comp g h)).toFun x) := by
+  sorry
+
+theorem bounded_comp_assoc_refl {X Y Z W : BornologyData.{u}}
+    (f : BoundedMap X Y) (g : BoundedMap Y Z) (h : BoundedMap Z W)
+    (x : X.carrier) :
+    bounded_comp_assoc f g h x =
+      Path.refl ((BoundedMap.comp f (BoundedMap.comp g h)).toFun x) := by
+  sorry
+
+theorem bounded_id_left_refl {X Y : BornologyData.{u}} (f : BoundedMap X Y)
+    (x : X.carrier) :
+    bounded_id_left f x = Path.refl (f.toFun x) := by
+  sorry
+
+theorem trivialBorn_all_bounded (S : BornologyData.trivialBorn.carrier → Prop) :
+    BornologyData.trivialBorn.isBounded S := by
+  sorry
+
+theorem convex_trivial_add_left (x : ConvexBornData.trivialConvex.carrier) :
+    ConvexBornData.trivialConvex.add x ConvexBornData.trivialConvex.zero = x := by
+  sorry
+
+theorem complete_trivial_complete_eq_unit (seq : Nat → CompleteBornData.trivialComplete.carrier)
+    (h : ∀ n, CompleteBornData.trivialComplete.isBounded
+      (fun x => ∃ m, m ≥ n ∧ x = seq m)) :
+    CompleteBornData.trivialComplete.complete seq h = PUnit.unit := by
+  sorry
+
+theorem smith_reflexive_eq_add_neg_path (S : SmithSpaceData.{u}) (x : S.carrier) :
+    smith_reflexive S x = S.add_neg_path x := by
+  sorry
+
+theorem smith_trivial_compactDisk_true (x : SmithSpaceData.trivialSmith.carrier) :
+    SmithSpaceData.trivialSmith.compactDisk x := by
+  sorry
+
+theorem bornStep_sound_complete_conv {A : Type u} {a b : A} (p q : Path a b)
+    (h : p.proof = q.proof) :
+    bornStep_sound (BornStep.complete_conv p q h) = h := by
+  sorry
+
+theorem bornStep_sound_ind_limit {A : Type u} {a b : A} (p q : Path a b)
+    (h : p.proof = q.proof) :
+    bornStep_sound (BornStep.ind_limit p q h) = h := by
+  sorry
+
+theorem bornStep_sound_bounded_pres {A : Type u} {a : A} (p : Path a a) :
+    p.proof = (Path.refl a).proof := by
+  sorry
+
 end BornologicalSpaces
 end Algebra
 end Path

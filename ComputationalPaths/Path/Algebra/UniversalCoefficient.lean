@@ -239,6 +239,77 @@ noncomputable def UCTData.shiftEquivAt {M : CoefficientSystem.{u}}
     SimpleEquiv (uct.shift.homology n) (uct.shift.tensorPart n × uct.shift.torPart n) :=
   uct.shift.equivAt n
 
+/-! ## Theorem Stubs -/
+
+theorem coefficientHom_id_apply (A : CoefficientSystem.{u}) (x : A.carrier) :
+    (CoefficientHom.id A).toFun x = x := by
+  sorry
+
+theorem coefficientHom_comp_apply {A B C : CoefficientSystem.{u}}
+    (g : CoefficientHom B C) (f : CoefficientHom A B) (x : A.carrier) :
+    (CoefficientHom.comp g f).toFun x = g.toFun (f.toFun x) := by
+  sorry
+
+theorem coefficientHom_comp_id_left_apply {A B : CoefficientSystem.{u}}
+    (f : CoefficientHom A B) (x : A.carrier) :
+    (CoefficientHom.comp (CoefficientHom.id B) f).toFun x = f.toFun x := by
+  sorry
+
+theorem coefficientHom_comp_id_right_apply {A B : CoefficientSystem.{u}}
+    (f : CoefficientHom A B) (x : A.carrier) :
+    (CoefficientHom.comp f (CoefficientHom.id A)).toFun x = f.toFun x := by
+  sorry
+
+theorem coefficientHom_comp_assoc_apply {A B C D : CoefficientSystem.{u}}
+    (h : CoefficientHom C D) (g : CoefficientHom B C) (f : CoefficientHom A B)
+    (x : A.carrier) :
+    (CoefficientHom.comp h (CoefficientHom.comp g f)).toFun x =
+      (CoefficientHom.comp (CoefficientHom.comp h g) f).toFun x := by
+  sorry
+
+theorem uct_equivAt_toFun {M : CoefficientSystem.{u}} (uct : UCTData M) (n : Nat)
+    (x : uct.homology n) :
+    (uct.equivAt n).toFun x = uct.fwd n x := by
+  sorry
+
+theorem uct_equivAt_invFun {M : CoefficientSystem.{u}} (uct : UCTData M) (n : Nat)
+    (x : uct.tensorPart n × uct.torPart n) :
+    (uct.equivAt n).invFun x = uct.inv n x := by
+  sorry
+
+theorem uct_shift_homology_def {M : CoefficientSystem.{u}} (uct : UCTData M) (n : Nat) :
+    uct.shift.homology n = uct.homology (n + 1) := by
+  sorry
+
+theorem uct_shift_tensor_def {M : CoefficientSystem.{u}} (uct : UCTData M) (n : Nat) :
+    uct.shift.tensorPart n = uct.tensorPart (n + 1) := by
+  sorry
+
+theorem uct_shift2_homology_def {M : CoefficientSystem.{u}} (uct : UCTData M) (n : Nat) :
+    uct.shift2.homology n = uct.homology (n + 2) := by
+  sorry
+
+theorem uctTrivialTor_toUCTData_torPart {M : CoefficientSystem.{u}}
+    (uct : UCTTrivialTor M) (n : Nat) :
+    (uct.toUCTData.torPart n) = PUnit := by
+  sorry
+
+theorem uctTrivialTor_toUCTData_fwd_fst {M : CoefficientSystem.{u}}
+    (uct : UCTTrivialTor M) (n : Nat) (x : uct.homology n) :
+    (uct.toUCTData.fwd n x).1 = uct.fwd n x := by
+  sorry
+
+theorem uctTrivialTor_toUCTData_fwd_snd {M : CoefficientSystem.{u}}
+    (uct : UCTTrivialTor M) (n : Nat) (x : uct.homology n) :
+    (uct.toUCTData.fwd n x).2 = PUnit.unit := by
+  sorry
+
+theorem intCoeffs_zero_eq : intCoeffs.zero = (0 : Int) := by
+  sorry
+
+theorem z2Coeffs_zero_eq : z2Coeffs.zero = false := by
+  sorry
+
 private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
 end UniversalCoefficient
