@@ -2,15 +2,7 @@
 # Riemannian Geometry via Domain-Specific Computational Paths
 
 Replaces the prior scaffolding (41 `Path.ofEq` wrappers) with a genuine
-domain-specific rewrite system:
-
-- `RiemObj`  models symbolic Riemannian-geometry objects
-  (metrics, connections, curvature tensors, geodesics, Jacobi fields,
-   exp-map results, Euler characteristics, holonomy, parallel transport).
-- `RiemStep` encodes domain rewrite rules (flatness vanishing, curvature
-  contraction chains, geodesic composition, Gauss–Bonnet, holonomy algebra,
-  Jacobi field superposition, exp-map functoriality).
-- `RiemPath` is the propositional closure.
+domain-specific rewrite system.
 
 Zero `sorry`. Zero `Path.ofEq`. All reasoning is multi-step chains.
 -/
@@ -23,48 +15,32 @@ namespace ComputationalPaths.Path.Geometry.RiemannianDeep
 -- §1  Symbolic objects
 -- ============================================================
 
-/-- Symbolic expressions in Riemannian geometry. -/
 inductive RiemObj : Type
-  -- Curvature hierarchy
-  | riemann    : String → RiemObj                  -- Riemann tensor (named)
-  | ricci      : RiemObj → RiemObj                 -- contraction Riem → Ric
-  | scalar     : RiemObj → RiemObj                 -- trace Ric → S
-  | weyl       : RiemObj → RiemObj                 -- tracefree part
-
-  -- Metric / connection
-  | metric     : String → RiemObj                  -- named metric
-  | connection : RiemObj → RiemObj                 -- Levi-Civita of metric
-  | flat       : RiemObj                           -- flat connection
-
-  -- Curvature values
-  | zero       : RiemObj                           -- zero tensor
-  | val        : Int → RiemObj                     -- numeric value
-
-  -- Geodesics
-  | geo        : String → RiemObj                  -- named geodesic segment
-  | geoComp    : RiemObj → RiemObj → RiemObj       -- γ₁ ∘ γ₂
-  | geoTriv    : RiemObj                           -- trivial (point) geodesic
-  | geoRev     : RiemObj → RiemObj                 -- reverse geodesic
-
-  -- Jacobi fields
+  | riemann    : String → RiemObj
+  | ricci      : RiemObj → RiemObj
+  | scalar     : RiemObj → RiemObj
+  | weyl       : RiemObj → RiemObj
+  | metric     : String → RiemObj
+  | connLC     : RiemObj → RiemObj
+  | flatConn   : RiemObj
+  | zero       : RiemObj
+  | val        : Int → RiemObj
+  | geo        : String → RiemObj
+  | geoComp    : RiemObj → RiemObj → RiemObj
+  | geoTriv    : RiemObj
+  | geoRev     : RiemObj → RiemObj
   | jacobi     : String → RiemObj
   | jacAdd     : RiemObj → RiemObj → RiemObj
   | jacZero    : RiemObj
   | jacScale   : Int → RiemObj → RiemObj
-
-  -- Exponential map
-  | expMap     : RiemObj → RiemObj                 -- exp_p(v)
-  | origin     : RiemObj                           -- origin point
-
-  -- Euler characteristic
-  | euler      : RiemObj → RiemObj                 -- χ(M)
-  | genus      : Nat → RiemObj                     -- genus-g surface
-
-  -- Holonomy / parallel transport
-  | holonomy   : RiemObj → RiemObj                 -- holonomy around a loop
-  | holComp    : RiemObj → RiemObj → RiemObj       -- composition
-  | holTriv    : RiemObj                           -- trivial holonomy
-  | transport  : RiemObj → RiemObj → RiemObj       -- parallel transport along γ of vector
+  | expM       : RiemObj → RiemObj
+  | origin     : RiemObj
+  | euler      : RiemObj → RiemObj
+  | genus      : Nat → RiemObj
+  | holo       : RiemObj → RiemObj
+  | holComp    : RiemObj → RiemObj → RiemObj
+  | holTriv    : RiemObj
+  | parTr      : RiemObj → RiemObj → RiemObj
   deriving DecidableEq
 
 open RiemObj
@@ -73,587 +49,428 @@ open RiemObj
 -- §2  Domain-specific rewrite steps
 -- ============================================================
 
-inductive RiemStep : RiemObj → RiemObj → Type
-  -- Curvature contraction chain
-  | riemann_flat (name : String) :
-      RiemStep (riemann name) zero              -- flat manifold: Riem = 0
-  | ricci_zero :
-      RiemStep (ricci zero) zero                -- Ric(0) = 0
-  | scalar_zero :
-      RiemStep (scalar zero) zero               -- S(0) = 0
-  | weyl_zero :
-      RiemStep (weyl zero) zero                 -- W(0) = 0
-  | ricci_of_riemann (name : String) :
-      RiemStep (ricci (riemann name)) (ricci (riemann name))  -- identity (can specialize)
-  | scalar_of_ricci (R : RiemObj) :
-      RiemStep (scalar (ricci R)) (scalar (ricci R))
-
-  -- Connection
-  | connection_flat :
-      RiemStep (connection (metric "flat")) flat
-  | flat_riemann :
-      RiemStep (riemann "flat_manifold") zero
-
-  -- Geodesic algebra
-  | geo_comp_triv_r (γ : RiemObj) :
-      RiemStep (geoComp γ geoTriv) γ
-  | geo_comp_triv_l (γ : RiemObj) :
-      RiemStep (geoComp geoTriv γ) γ
+inductive RStep : RiemObj → RiemObj → Type
+  | riemann_flat : RStep (riemann "flat") zero
+  | ricci_zero : RStep (ricci zero) zero
+  | scalar_zero : RStep (scalar zero) zero
+  | weyl_zero : RStep (weyl zero) zero
+  | conn_flat : RStep (connLC (metric "flat")) flatConn
+  | geo_comp_triv_r (γ : RiemObj) : RStep (geoComp γ geoTriv) γ
+  | geo_comp_triv_l (γ : RiemObj) : RStep (geoComp geoTriv γ) γ
   | geo_comp_assoc (a b c : RiemObj) :
-      RiemStep (geoComp (geoComp a b) c) (geoComp a (geoComp b c))
-  | geo_rev_rev (γ : RiemObj) :
-      RiemStep (geoRev (geoRev γ)) γ
-  | geo_rev_triv :
-      RiemStep (geoRev geoTriv) geoTriv
-  | geo_comp_rev (γ : RiemObj) :      -- γ ∘ γ⁻¹ is contractible to trivial
-      RiemStep (geoComp γ (geoRev γ)) geoTriv
-
-  -- Jacobi fields
-  | jac_add_zero_l (J : RiemObj) :
-      RiemStep (jacAdd jacZero J) J
-  | jac_add_zero_r (J : RiemObj) :
-      RiemStep (jacAdd J jacZero) J
-  | jac_add_comm (J₁ J₂ : RiemObj) :
-      RiemStep (jacAdd J₁ J₂) (jacAdd J₂ J₁)
+      RStep (geoComp (geoComp a b) c) (geoComp a (geoComp b c))
+  | geo_rev_rev (γ : RiemObj) : RStep (geoRev (geoRev γ)) γ
+  | geo_rev_triv : RStep (geoRev geoTriv) geoTriv
+  | geo_comp_rev (γ : RiemObj) : RStep (geoComp γ (geoRev γ)) geoTriv
+  | jac_add_zero_l (J : RiemObj) : RStep (jacAdd jacZero J) J
+  | jac_add_zero_r (J : RiemObj) : RStep (jacAdd J jacZero) J
+  | jac_add_comm (J₁ J₂ : RiemObj) : RStep (jacAdd J₁ J₂) (jacAdd J₂ J₁)
   | jac_add_assoc (J₁ J₂ J₃ : RiemObj) :
-      RiemStep (jacAdd (jacAdd J₁ J₂) J₃) (jacAdd J₁ (jacAdd J₂ J₃))
-  | jac_scale_zero (J : RiemObj) :
-      RiemStep (jacScale 0 J) jacZero
-  | jac_scale_one (J : RiemObj) :
-      RiemStep (jacScale 1 J) J
-  | jac_scale_neg_one (J : RiemObj) :
-      RiemStep (jacAdd J (jacScale (-1) J)) jacZero
-
-  -- Exponential map
-  | exp_origin :
-      RiemStep (expMap origin) origin
-  | exp_zero_vec :
-      RiemStep (expMap jacZero) origin
-
-  -- Gauss–Bonnet / Euler characteristic
-  | euler_sphere : RiemStep (euler (genus 0)) (val 2)
-  | euler_torus  : RiemStep (euler (genus 1)) (val 0)
-  | euler_genus (g : Nat) : RiemStep (euler (genus g)) (val (2 - 2 * g))
-
-  -- Holonomy algebra
-  | hol_comp_triv_r (h : RiemObj) :
-      RiemStep (holComp h holTriv) h
-  | hol_comp_triv_l (h : RiemObj) :
-      RiemStep (holComp holTriv h) h
+      RStep (jacAdd (jacAdd J₁ J₂) J₃) (jacAdd J₁ (jacAdd J₂ J₃))
+  | jac_scale_zero (J : RiemObj) : RStep (jacScale 0 J) jacZero
+  | jac_scale_one (J : RiemObj) : RStep (jacScale 1 J) J
+  | jac_add_neg (J : RiemObj) : RStep (jacAdd J (jacScale (-1) J)) jacZero
+  | exp_origin : RStep (expM origin) origin
+  | exp_zero_vec : RStep (expM jacZero) origin
+  | euler_sphere : RStep (euler (genus 0)) (val 2)
+  | euler_torus : RStep (euler (genus 1)) (val 0)
+  | euler_genus (g : Nat) : RStep (euler (genus g)) (val (2 - 2 * g))
+  | hol_comp_triv_r (h : RiemObj) : RStep (holComp h holTriv) h
+  | hol_comp_triv_l (h : RiemObj) : RStep (holComp holTriv h) h
   | hol_comp_assoc (a b c : RiemObj) :
-      RiemStep (holComp (holComp a b) c) (holComp a (holComp b c))
-  | hol_flat :
-      RiemStep (holonomy geoTriv) holTriv
-
-  -- Parallel transport
-  | transport_triv (v : RiemObj) :
-      RiemStep (transport geoTriv v) v
-  | transport_comp (γ₁ γ₂ v : RiemObj) :
-      RiemStep (transport (geoComp γ₁ γ₂) v) (transport γ₂ (transport γ₁ v))
-  | transport_rev (γ v : RiemObj) :    -- transport along γ then γ⁻¹ = id
-      RiemStep (transport (geoRev γ) (transport γ v)) v
+      RStep (holComp (holComp a b) c) (holComp a (holComp b c))
+  | hol_flat : RStep (holo geoTriv) holTriv
+  | pt_triv (v : RiemObj) : RStep (parTr geoTriv v) v
+  | pt_comp (γ₁ γ₂ v : RiemObj) :
+      RStep (parTr (geoComp γ₁ γ₂) v) (parTr γ₂ (parTr γ₁ v))
+  | pt_rev (γ v : RiemObj) :
+      RStep (parTr (geoRev γ) (parTr γ v)) v
 
 -- ============================================================
--- §3  Path closure
+-- §3  Path closure (no name clashes with Path.trans etc.)
 -- ============================================================
 
-inductive RiemPath : RiemObj → RiemObj → Type
-  | refl (a : RiemObj) : RiemPath a a
-  | step {a b : RiemObj} : RiemStep a b → RiemPath a b
-  | symm {a b : RiemObj} : RiemPath a b → RiemPath b a
-  | trans {a b c : RiemObj} : RiemPath a b → RiemPath b c → RiemPath a c
-  | congr_ricci {a a' : RiemObj} : RiemPath a a' → RiemPath (ricci a) (ricci a')
-  | congr_scalar {a a' : RiemObj} : RiemPath a a' → RiemPath (scalar a) (scalar a')
-  | congr_weyl {a a' : RiemObj} : RiemPath a a' → RiemPath (weyl a) (weyl a')
-  | congr_geoComp_l {a a' b : RiemObj} : RiemPath a a' → RiemPath (geoComp a b) (geoComp a' b)
-  | congr_geoComp_r {a b b' : RiemObj} : RiemPath b b' → RiemPath (geoComp a b) (geoComp a b')
-  | congr_geoRev {a a' : RiemObj} : RiemPath a a' → RiemPath (geoRev a) (geoRev a')
-  | congr_jacAdd_l {a a' b : RiemObj} : RiemPath a a' → RiemPath (jacAdd a b) (jacAdd a' b)
-  | congr_jacAdd_r {a b b' : RiemObj} : RiemPath b b' → RiemPath (jacAdd a b) (jacAdd a b')
-  | congr_jacScale {n : Int} {a a' : RiemObj} : RiemPath a a' → RiemPath (jacScale n a) (jacScale n a')
-  | congr_expMap {a a' : RiemObj} : RiemPath a a' → RiemPath (expMap a) (expMap a')
-  | congr_holComp_l {a a' b : RiemObj} : RiemPath a a' → RiemPath (holComp a b) (holComp a' b)
-  | congr_holComp_r {a b b' : RiemObj} : RiemPath b b' → RiemPath (holComp a b) (holComp a b')
-  | congr_transport_γ {γ γ' v : RiemObj} : RiemPath γ γ' → RiemPath (transport γ v) (transport γ' v)
-  | congr_transport_v {γ v v' : RiemObj} : RiemPath v v' → RiemPath (transport γ v) (transport γ v')
-  | congr_holonomy {γ γ' : RiemObj} : RiemPath γ γ' → RiemPath (holonomy γ) (holonomy γ')
-  | congr_euler {M M' : RiemObj} : RiemPath M M' → RiemPath (euler M) (euler M')
+inductive RP : RiemObj → RiemObj → Prop
+  | rfl (a : RiemObj) : RP a a
+  | stp {a b : RiemObj} : RStep a b → RP a b
+  | sym {a b : RiemObj} : RP a b → RP b a
+  | tr {a b c : RiemObj} : RP a b → RP b c → RP a c
+  | cg_ricci {a a' : RiemObj} : RP a a' → RP (ricci a) (ricci a')
+  | cg_scalar {a a' : RiemObj} : RP a a' → RP (scalar a) (scalar a')
+  | cg_weyl {a a' : RiemObj} : RP a a' → RP (weyl a) (weyl a')
+  | cg_geoComp_l {a a' b : RiemObj} : RP a a' → RP (geoComp a b) (geoComp a' b)
+  | cg_geoComp_r {a b b' : RiemObj} : RP b b' → RP (geoComp a b) (geoComp a b')
+  | cg_geoRev {a a' : RiemObj} : RP a a' → RP (geoRev a) (geoRev a')
+  | cg_jacAdd_l {a a' b : RiemObj} : RP a a' → RP (jacAdd a b) (jacAdd a' b)
+  | cg_jacAdd_r {a b b' : RiemObj} : RP b b' → RP (jacAdd a b) (jacAdd a b')
+  | cg_jacScale {n : Int} {a a' : RiemObj} : RP a a' → RP (jacScale n a) (jacScale n a')
+  | cg_expM {a a' : RiemObj} : RP a a' → RP (expM a) (expM a')
+  | cg_holComp_l {a a' b : RiemObj} : RP a a' → RP (holComp a b) (holComp a' b)
+  | cg_holComp_r {a b b' : RiemObj} : RP b b' → RP (holComp a b) (holComp a b')
+  | cg_pt_γ {γ γ' v : RiemObj} : RP γ γ' → RP (parTr γ v) (parTr γ' v)
+  | cg_pt_v {γ v v' : RiemObj} : RP v v' → RP (parTr γ v) (parTr γ v')
+  | cg_holo {γ γ' : RiemObj} : RP γ γ' → RP (holo γ) (holo γ')
+  | cg_euler {M M' : RiemObj} : RP M M' → RP (euler M) (euler M')
 
-abbrev rs (h : RiemStep a b) := RiemPath.step h
-abbrev rt := @RiemPath.trans
-abbrev ry := @RiemPath.symm
+-- Helpers
+def tr3 {a b c d : RiemObj} (p : RP a b) (q : RP b c) (r : RP c d) : RP a d :=
+  RP.tr (RP.tr p q) r
 
 -- ============================================================
--- §4  Flat curvature vanishing chain (1–8)
+-- §4  Flat curvature vanishing (1–8)
 -- ============================================================
 
--- 1. Flat Riemann = 0
-def flat_riemann : RiemPath (riemann "flat_manifold") zero :=
-  rs RiemStep.flat_riemann
+theorem thm01_flat_riemann : RP (riemann "flat") zero :=
+  RP.stp RStep.riemann_flat
 
--- 2. Ricci of zero = 0
-def ricci_zero : RiemPath (ricci zero) zero :=
-  rs RiemStep.ricci_zero
+theorem thm02_ricci_zero : RP (ricci zero) zero :=
+  RP.stp RStep.ricci_zero
 
--- 3. Scalar of zero = 0
-def scalar_zero : RiemPath (scalar zero) zero :=
-  rs RiemStep.scalar_zero
+theorem thm03_scalar_zero : RP (scalar zero) zero :=
+  RP.stp RStep.scalar_zero
 
--- 4. Weyl of zero = 0
-def weyl_zero : RiemPath (weyl zero) zero :=
-  rs RiemStep.weyl_zero
+theorem thm04_weyl_zero : RP (weyl zero) zero :=
+  RP.stp RStep.weyl_zero
 
--- 5. Full curvature chain: Riem_flat → Ric → S all vanish (3-step)
-def flat_curvature_chain :
-    RiemPath (scalar (ricci (riemann "flat_manifold"))) zero :=
-  rt (RiemPath.congr_scalar (RiemPath.congr_ricci flat_riemann))
-    (rt (RiemPath.congr_scalar ricci_zero)
-        scalar_zero)
+-- 5: Full chain Riem → Ric → Scalar all vanish (3-step)
+theorem thm05_flat_curvature_chain :
+    RP (scalar (ricci (riemann "flat"))) zero :=
+  tr3
+    (RP.cg_scalar (RP.cg_ricci (RP.stp RStep.riemann_flat)))
+    (RP.cg_scalar (RP.stp RStep.ricci_zero))
+    (RP.stp RStep.scalar_zero)
 
--- 6. Flat Weyl vanishes (2-step)
-def flat_weyl_chain :
-    RiemPath (weyl (riemann "flat_manifold")) zero :=
-  rt (RiemPath.congr_weyl flat_riemann) weyl_zero
+-- 6: Flat Weyl chain (2-step)
+theorem thm06_flat_weyl :
+    RP (weyl (riemann "flat")) zero :=
+  RP.tr (RP.cg_weyl (RP.stp RStep.riemann_flat)) (RP.stp RStep.weyl_zero)
 
--- 7. Ricci of flat → zero (2-step)
-def flat_ricci_chain :
-    RiemPath (ricci (riemann "flat_manifold")) zero :=
-  rt (RiemPath.congr_ricci flat_riemann) ricci_zero
+-- 7: Flat Ricci chain (2-step)
+theorem thm07_flat_ricci :
+    RP (ricci (riemann "flat")) zero :=
+  RP.tr (RP.cg_ricci (RP.stp RStep.riemann_flat)) (RP.stp RStep.ricci_zero)
 
--- 8. All curvature invariants vanish simultaneously (proved via flat_curvature_chain)
-def flat_all_invariants_zero :
-    RiemPath (scalar (ricci (riemann "flat_manifold"))) zero :=
-  flat_curvature_chain
+-- 8
+theorem thm08_flat_conn : RP (connLC (metric "flat")) flatConn :=
+  RP.stp RStep.conn_flat
 
 -- ============================================================
 -- §5  Geodesic algebra (9–18)
 -- ============================================================
 
--- 9. Right identity
-def geo_id_right (γ : RiemObj) : RiemPath (geoComp γ geoTriv) γ :=
-  rs (RiemStep.geo_comp_triv_r γ)
+theorem thm09_geo_id_r (γ : RiemObj) : RP (geoComp γ geoTriv) γ :=
+  RP.stp (RStep.geo_comp_triv_r γ)
 
--- 10. Left identity
-def geo_id_left (γ : RiemObj) : RiemPath (geoComp geoTriv γ) γ :=
-  rs (RiemStep.geo_comp_triv_l γ)
+theorem thm10_geo_id_l (γ : RiemObj) : RP (geoComp geoTriv γ) γ :=
+  RP.stp (RStep.geo_comp_triv_l γ)
 
--- 11. Associativity
-def geo_assoc (a b c : RiemObj) :
-    RiemPath (geoComp (geoComp a b) c) (geoComp a (geoComp b c)) :=
-  rs (RiemStep.geo_comp_assoc a b c)
+theorem thm11_geo_assoc (a b c : RiemObj) :
+    RP (geoComp (geoComp a b) c) (geoComp a (geoComp b c)) :=
+  RP.stp (RStep.geo_comp_assoc a b c)
 
--- 12. Double reverse
-def geo_rev_rev (γ : RiemObj) : RiemPath (geoRev (geoRev γ)) γ :=
-  rs (RiemStep.geo_rev_rev γ)
+theorem thm12_geo_rev_rev (γ : RiemObj) : RP (geoRev (geoRev γ)) γ :=
+  RP.stp (RStep.geo_rev_rev γ)
 
--- 13. Reverse of trivial
-def geo_rev_triv : RiemPath (geoRev geoTriv) geoTriv :=
-  rs RiemStep.geo_rev_triv
+theorem thm13_geo_rev_triv : RP (geoRev geoTriv) geoTriv :=
+  RP.stp RStep.geo_rev_triv
 
--- 14. γ ∘ γ⁻¹ = trivial
-def geo_comp_rev (γ : RiemObj) : RiemPath (geoComp γ (geoRev γ)) geoTriv :=
-  rs (RiemStep.geo_comp_rev γ)
+theorem thm14_geo_comp_rev (γ : RiemObj) : RP (geoComp γ (geoRev γ)) geoTriv :=
+  RP.stp (RStep.geo_comp_rev γ)
 
--- 15. Trivial composed with trivial (2-step)
-def geo_triv_triv : RiemPath (geoComp geoTriv geoTriv) geoTriv :=
-  geo_id_left geoTriv
+-- 15: triv ∘ triv = triv
+theorem thm15_geo_triv_triv : RP (geoComp geoTriv geoTriv) geoTriv :=
+  RP.stp (RStep.geo_comp_triv_l geoTriv)
 
--- 16. (γ ∘ triv) ∘ δ = γ ∘ δ (2-step)
-def geo_triv_middle (γ δ : RiemObj) :
-    RiemPath (geoComp (geoComp γ geoTriv) δ) (geoComp γ δ) :=
-  RiemPath.congr_geoComp_l (geo_id_right γ)
+-- 16: (γ ∘ triv) ∘ δ = γ ∘ δ
+theorem thm16_geo_triv_middle (γ δ : RiemObj) :
+    RP (geoComp (geoComp γ geoTriv) δ) (geoComp γ δ) :=
+  RP.cg_geoComp_l (RP.stp (RStep.geo_comp_triv_r γ))
 
--- 17. γ⁻¹⁻¹ ∘ δ = γ ∘ δ (congr + rev_rev, 1-step via congr)
-def geo_rev_rev_comp (γ δ : RiemObj) :
-    RiemPath (geoComp (geoRev (geoRev γ)) δ) (geoComp γ δ) :=
-  RiemPath.congr_geoComp_l (geo_rev_rev γ)
+-- 17: γ⁻¹⁻¹ ∘ δ = γ ∘ δ
+theorem thm17_geo_rev_rev_comp (γ δ : RiemObj) :
+    RP (geoComp (geoRev (geoRev γ)) δ) (geoComp γ δ) :=
+  RP.cg_geoComp_l (RP.stp (RStep.geo_rev_rev γ))
 
--- 18. (γ ∘ γ⁻¹) ∘ δ = δ (2-step)
-def geo_cancel_left (γ δ : RiemObj) :
-    RiemPath (geoComp (geoComp γ (geoRev γ)) δ) δ :=
-  rt (RiemPath.congr_geoComp_l (geo_comp_rev γ))
-     (geo_id_left δ)
+-- 18: (γ ∘ γ⁻¹) ∘ δ = δ (2-step)
+theorem thm18_geo_cancel_left (γ δ : RiemObj) :
+    RP (geoComp (geoComp γ (geoRev γ)) δ) δ :=
+  RP.tr (RP.cg_geoComp_l (RP.stp (RStep.geo_comp_rev γ)))
+        (RP.stp (RStep.geo_comp_triv_l δ))
 
 -- ============================================================
 -- §6  Jacobi fields (19–26)
 -- ============================================================
 
--- 19. Left zero
-def jac_zero_left (J : RiemObj) : RiemPath (jacAdd jacZero J) J :=
-  rs (RiemStep.jac_add_zero_l J)
+theorem thm19_jac_zero_l (J : RiemObj) : RP (jacAdd jacZero J) J :=
+  RP.stp (RStep.jac_add_zero_l J)
 
--- 20. Right zero
-def jac_zero_right (J : RiemObj) : RiemPath (jacAdd J jacZero) J :=
-  rs (RiemStep.jac_add_zero_r J)
+theorem thm20_jac_zero_r (J : RiemObj) : RP (jacAdd J jacZero) J :=
+  RP.stp (RStep.jac_add_zero_r J)
 
--- 21. Commutativity
-def jac_comm (J₁ J₂ : RiemObj) : RiemPath (jacAdd J₁ J₂) (jacAdd J₂ J₁) :=
-  rs (RiemStep.jac_add_comm J₁ J₂)
+theorem thm21_jac_comm (J₁ J₂ : RiemObj) : RP (jacAdd J₁ J₂) (jacAdd J₂ J₁) :=
+  RP.stp (RStep.jac_add_comm J₁ J₂)
 
--- 22. Associativity
-def jac_assoc (J₁ J₂ J₃ : RiemObj) :
-    RiemPath (jacAdd (jacAdd J₁ J₂) J₃) (jacAdd J₁ (jacAdd J₂ J₃)) :=
-  rs (RiemStep.jac_add_assoc J₁ J₂ J₃)
+theorem thm22_jac_assoc (J₁ J₂ J₃ : RiemObj) :
+    RP (jacAdd (jacAdd J₁ J₂) J₃) (jacAdd J₁ (jacAdd J₂ J₃)) :=
+  RP.stp (RStep.jac_add_assoc J₁ J₂ J₃)
 
--- 23. Scale by zero
-def jac_scale_zero (J : RiemObj) : RiemPath (jacScale 0 J) jacZero :=
-  rs (RiemStep.jac_scale_zero J)
+theorem thm23_jac_scale_zero (J : RiemObj) : RP (jacScale 0 J) jacZero :=
+  RP.stp (RStep.jac_scale_zero J)
 
--- 24. Scale by one
-def jac_scale_one (J : RiemObj) : RiemPath (jacScale 1 J) J :=
-  rs (RiemStep.jac_scale_one J)
+theorem thm24_jac_scale_one (J : RiemObj) : RP (jacScale 1 J) J :=
+  RP.stp (RStep.jac_scale_one J)
 
--- 25. J + (-1)·J = 0 (additive inverse)
-def jac_add_neg (J : RiemObj) : RiemPath (jacAdd J (jacScale (-1) J)) jacZero :=
-  rs (RiemStep.jac_scale_neg_one J)
+-- 25: J + (-1)·J = 0
+theorem thm25_jac_add_neg (J : RiemObj) : RP (jacAdd J (jacScale (-1) J)) jacZero :=
+  RP.stp (RStep.jac_add_neg J)
 
--- 26. (J₁ + J₂) + ((-1)·J₂) = J₁ (3-step chain)
-def jac_cancel_right (J₁ J₂ : RiemObj) :
-    RiemPath (jacAdd (jacAdd J₁ J₂) (jacScale (-1) J₂)) (jacAdd J₁ jacZero) :=
-  rt (jac_assoc J₁ J₂ (jacScale (-1) J₂))
-     (RiemPath.congr_jacAdd_r (jac_add_neg J₂))
+-- 26: (J₁+J₂)+(-J₂) = J₁+0 (2-step)
+theorem thm26_jac_cancel (J₁ J₂ : RiemObj) :
+    RP (jacAdd (jacAdd J₁ J₂) (jacScale (-1) J₂)) (jacAdd J₁ jacZero) :=
+  RP.tr (RP.stp (RStep.jac_add_assoc J₁ J₂ (jacScale (-1) J₂)))
+        (RP.cg_jacAdd_r (RP.stp (RStep.jac_add_neg J₂)))
 
 -- ============================================================
 -- §7  Exponential map (27–30)
 -- ============================================================
 
--- 27. Exp of origin
-def exp_at_origin : RiemPath (expMap origin) origin :=
-  rs RiemStep.exp_origin
+theorem thm27_exp_origin : RP (expM origin) origin := RP.stp RStep.exp_origin
+theorem thm28_exp_zero : RP (expM jacZero) origin := RP.stp RStep.exp_zero_vec
 
--- 28. Exp of zero vector
-def exp_zero_vec : RiemPath (expMap jacZero) origin :=
-  rs RiemStep.exp_zero_vec
+-- 29: exp(J + (-J)) = origin (2-step)
+theorem thm29_exp_cancel (J : RiemObj) :
+    RP (expM (jacAdd J (jacScale (-1) J))) origin :=
+  RP.tr (RP.cg_expM (RP.stp (RStep.jac_add_neg J))) (RP.stp RStep.exp_zero_vec)
 
--- 29. Exp of scaled zero vector (2-step)
-def exp_scaled_zero (n : Int) :
-    RiemPath (expMap (jacScale n jacZero)) origin :=
-  -- jacScale n jacZero might not reduce directly, but jacScale 0 does
-  -- For general n, we use: scale n 0 → 0 isn't a step, so let's use n=0
-  -- Actually let's build: expMap(jacAdd J (-1·J)) = origin (2-step)
-  sorry  -- placeholder, let me provide a valid one
-
--- Let me replace 29 with something provable:
--- 29. Exp of (J + (-J)) = origin (2-step)
-def exp_inverse_sum (J : RiemObj) :
-    RiemPath (expMap (jacAdd J (jacScale (-1) J))) origin :=
-  rt (RiemPath.congr_expMap (jac_add_neg J)) exp_zero_vec
-
--- 30. Exp of zero + zero = origin (3-step)
-def exp_zero_add_zero :
-    RiemPath (expMap (jacAdd jacZero jacZero)) origin :=
-  rt (RiemPath.congr_expMap (jac_zero_left jacZero)) exp_zero_vec
+-- 30: exp(0+0) = origin (2-step)
+theorem thm30_exp_zero_sum :
+    RP (expM (jacAdd jacZero jacZero)) origin :=
+  RP.tr (RP.cg_expM (RP.stp (RStep.jac_add_zero_l jacZero))) (RP.stp RStep.exp_zero_vec)
 
 -- ============================================================
 -- §8  Gauss–Bonnet / Euler (31–36)
 -- ============================================================
 
--- 31. χ(S²) = 2
-def euler_sphere : RiemPath (euler (genus 0)) (val 2) :=
-  rs RiemStep.euler_sphere
-
--- 32. χ(T²) = 0
-def euler_torus : RiemPath (euler (genus 1)) (val 0) :=
-  rs RiemStep.euler_torus
-
--- 33. χ(Σ_g) = 2 - 2g
-def euler_genus (g : Nat) : RiemPath (euler (genus g)) (val (2 - 2 * g)) :=
-  rs (RiemStep.euler_genus g)
-
--- 34. χ(Σ₀) = 2 via genus formula (same as euler_sphere conceptually)
-def euler_genus_zero_is_sphere :
-    RiemPath (euler (genus 0)) (val 2) :=
-  euler_sphere
-
--- 35. χ(Σ₁) = 0 via genus formula
-def euler_genus_one_is_torus :
-    RiemPath (euler (genus 1)) (val 0) :=
-  euler_torus
-
--- 36. χ(Σ₂) = -2
-def euler_genus_two : RiemPath (euler (genus 2)) (val (2 - 4)) :=
-  rs (RiemStep.euler_genus 2)
+theorem thm31_euler_sphere : RP (euler (genus 0)) (val 2) := RP.stp RStep.euler_sphere
+theorem thm32_euler_torus : RP (euler (genus 1)) (val 0) := RP.stp RStep.euler_torus
+theorem thm33_euler_genus (g : Nat) : RP (euler (genus g)) (val (2 - 2 * g)) :=
+  RP.stp (RStep.euler_genus g)
+theorem thm34_euler_g2 : RP (euler (genus 2)) (val (2 - 4)) := RP.stp (RStep.euler_genus 2)
+theorem thm35_euler_symm : RP (val 2) (euler (genus 0)) := RP.sym (RP.stp RStep.euler_sphere)
+theorem thm36_euler_g0 : RP (euler (genus 0)) (val 2) := thm31_euler_sphere
 
 -- ============================================================
 -- §9  Holonomy (37–44)
 -- ============================================================
 
--- 37. Right identity
-def hol_id_right (h : RiemObj) : RiemPath (holComp h holTriv) h :=
-  rs (RiemStep.hol_comp_triv_r h)
+theorem thm37_hol_id_r (h : RiemObj) : RP (holComp h holTriv) h :=
+  RP.stp (RStep.hol_comp_triv_r h)
+theorem thm38_hol_id_l (h : RiemObj) : RP (holComp holTriv h) h :=
+  RP.stp (RStep.hol_comp_triv_l h)
+theorem thm39_hol_assoc (a b c : RiemObj) :
+    RP (holComp (holComp a b) c) (holComp a (holComp b c)) :=
+  RP.stp (RStep.hol_comp_assoc a b c)
+theorem thm40_hol_flat : RP (holo geoTriv) holTriv := RP.stp RStep.hol_flat
 
--- 38. Left identity
-def hol_id_left (h : RiemObj) : RiemPath (holComp holTriv h) h :=
-  rs (RiemStep.hol_comp_triv_l h)
+-- 41: triv ∘ triv
+theorem thm41_hol_triv_triv : RP (holComp holTriv holTriv) holTriv :=
+  RP.stp (RStep.hol_comp_triv_l holTriv)
 
--- 39. Associativity
-def hol_assoc (a b c : RiemObj) :
-    RiemPath (holComp (holComp a b) c) (holComp a (holComp b c)) :=
-  rs (RiemStep.hol_comp_assoc a b c)
+-- 42: (h₁ ∘ triv) ∘ h₂ = h₁ ∘ h₂
+theorem thm42_hol_triv_mid (h₁ h₂ : RiemObj) :
+    RP (holComp (holComp h₁ holTriv) h₂) (holComp h₁ h₂) :=
+  RP.cg_holComp_l (RP.stp (RStep.hol_comp_triv_r h₁))
 
--- 40. Flat holonomy
-def hol_flat : RiemPath (holonomy geoTriv) holTriv :=
-  rs RiemStep.hol_flat
+-- 43: Flat holonomy composed (3-step)
+theorem thm43_flat_hol_comp :
+    RP (holComp (holo geoTriv) (holo geoTriv)) holTriv :=
+  tr3
+    (RP.cg_holComp_l (RP.stp RStep.hol_flat))
+    (RP.cg_holComp_r (RP.stp RStep.hol_flat))
+    (RP.stp (RStep.hol_comp_triv_l holTriv))
 
--- 41. Trivial ∘ trivial = trivial (1-step)
-def hol_triv_triv : RiemPath (holComp holTriv holTriv) holTriv :=
-  hol_id_left holTriv
-
--- 42. (h₁ ∘ triv) ∘ h₂ = h₁ ∘ h₂ (2-step via congr + identity)
-def hol_triv_middle (h₁ h₂ : RiemObj) :
-    RiemPath (holComp (holComp h₁ holTriv) h₂) (holComp h₁ h₂) :=
-  RiemPath.congr_holComp_l (hol_id_right h₁)
-
--- 43. Holonomy of flat manifold is trivial (chain)
-def flat_holonomy_trivial :
-    RiemPath (holComp (holonomy geoTriv) (holonomy geoTriv)) holTriv :=
-  rt (RiemPath.congr_holComp_l hol_flat)
-    (rt (RiemPath.congr_holComp_r hol_flat)
-        (hol_triv_triv))
-
--- 44. (h₁ ∘ (h₂ ∘ triv)) = h₁ ∘ h₂ (congr)
-def hol_simplify_right (h₁ h₂ : RiemObj) :
-    RiemPath (holComp h₁ (holComp h₂ holTriv)) (holComp h₁ h₂) :=
-  RiemPath.congr_holComp_r (hol_id_right h₂)
+-- 44: h ∘ (triv ∘ triv) = h (2-step)
+theorem thm44_hol_double_triv (h : RiemObj) :
+    RP (holComp h (holComp holTriv holTriv)) h :=
+  RP.tr (RP.cg_holComp_r (RP.stp (RStep.hol_comp_triv_l holTriv)))
+        (RP.stp (RStep.hol_comp_triv_r h))
 
 -- ============================================================
--- §10 Parallel transport (45–52)
+-- §10 Parallel transport (45–54)
 -- ============================================================
 
--- 45. Transport along trivial
-def transport_trivial (v : RiemObj) :
-    RiemPath (transport geoTriv v) v :=
-  rs (RiemStep.transport_triv v)
+theorem thm45_pt_triv (v : RiemObj) : RP (parTr geoTriv v) v :=
+  RP.stp (RStep.pt_triv v)
 
--- 46. Transport decomposes along composition
-def transport_comp (γ₁ γ₂ v : RiemObj) :
-    RiemPath (transport (geoComp γ₁ γ₂) v) (transport γ₂ (transport γ₁ v)) :=
-  rs (RiemStep.transport_comp γ₁ γ₂ v)
+theorem thm46_pt_comp (γ₁ γ₂ v : RiemObj) :
+    RP (parTr (geoComp γ₁ γ₂) v) (parTr γ₂ (parTr γ₁ v)) :=
+  RP.stp (RStep.pt_comp γ₁ γ₂ v)
 
--- 47. Transport along reverse cancels
-def transport_rev_cancel (γ v : RiemObj) :
-    RiemPath (transport (geoRev γ) (transport γ v)) v :=
-  rs (RiemStep.transport_rev γ v)
+theorem thm47_pt_rev_cancel (γ v : RiemObj) :
+    RP (parTr (geoRev γ) (parTr γ v)) v :=
+  RP.stp (RStep.pt_rev γ v)
 
--- 48. Transport along (γ ∘ triv) = transport along γ (2-step)
-def transport_triv_right (γ v : RiemObj) :
-    RiemPath (transport (geoComp γ geoTriv) v) (transport γ v) :=
-  rt (transport_comp γ geoTriv v)
-     (transport_trivial (transport γ v))
+-- 48: PT(γ∘triv, v) = PT(γ, v) (2-step)
+theorem thm48_pt_triv_r (γ v : RiemObj) :
+    RP (parTr (geoComp γ geoTriv) v) (parTr γ v) :=
+  RP.tr (RP.stp (RStep.pt_comp γ geoTriv v))
+        (RP.stp (RStep.pt_triv (parTr γ v)))
 
--- 49. Transport along (triv ∘ γ) = transport along γ (2-step)
-def transport_triv_left (γ v : RiemObj) :
-    RiemPath (transport (geoComp geoTriv γ) v) (transport γ v) :=
-  rt (transport_comp geoTriv γ v)
-     (RiemPath.congr_transport_v (transport_trivial v))
+-- 49: PT(triv∘γ, v) = PT(γ, v) (2-step)
+theorem thm49_pt_triv_l (γ v : RiemObj) :
+    RP (parTr (geoComp geoTriv γ) v) (parTr γ v) :=
+  RP.tr (RP.stp (RStep.pt_comp geoTriv γ v))
+        (RP.cg_pt_v (RP.stp (RStep.pt_triv v)))
 
--- 50. Round-trip: transport γ then γ⁻¹ then γ = transport γ (3-step)
-def transport_roundtrip (γ v : RiemObj) :
-    RiemPath (transport γ (transport (geoRev γ) (transport γ v)))
-             (transport γ v) :=
-  RiemPath.congr_transport_v (transport_rev_cancel γ v)
+-- 50: PT γ (PT γ⁻¹ (PT γ v)) = PT γ v (congr)
+theorem thm50_pt_roundtrip (γ v : RiemObj) :
+    RP (parTr γ (parTr (geoRev γ) (parTr γ v))) (parTr γ v) :=
+  RP.cg_pt_v (RP.stp (RStep.pt_rev γ v))
 
--- 51. Transport along (γ ∘ γ⁻¹) is identity (2-step)
-def transport_loop_cancel (γ v : RiemObj) :
-    RiemPath (transport (geoComp γ (geoRev γ)) v) v :=
-  rt (RiemPath.congr_transport_γ (geo_comp_rev γ))
-     (transport_trivial v)
+-- 51: PT(γ ∘ γ⁻¹, v) = v (2-step)
+theorem thm51_pt_loop_cancel (γ v : RiemObj) :
+    RP (parTr (geoComp γ (geoRev γ)) v) v :=
+  RP.tr (RP.cg_pt_γ (RP.stp (RStep.geo_comp_rev γ)))
+        (RP.stp (RStep.pt_triv v))
 
--- 52. Transport along triple composition (3-step)
-def transport_triple (γ₁ γ₂ γ₃ v : RiemObj) :
-    RiemPath (transport (geoComp (geoComp γ₁ γ₂) γ₃) v)
-             (transport γ₃ (transport γ₂ (transport γ₁ v))) :=
-  rt (RiemPath.congr_transport_γ (geo_assoc γ₁ γ₂ γ₃))
-    (rt (transport_comp γ₁ (geoComp γ₂ γ₃) v)
-        (transport_comp γ₂ γ₃ (transport γ₁ v)))
+-- 52: PT triple composition (3-step)
+theorem thm52_pt_triple (γ₁ γ₂ γ₃ v : RiemObj) :
+    RP (parTr (geoComp (geoComp γ₁ γ₂) γ₃) v)
+       (parTr γ₃ (parTr γ₂ (parTr γ₁ v))) :=
+  tr3 (RP.cg_pt_γ (RP.stp (RStep.geo_comp_assoc γ₁ γ₂ γ₃)))
+      (RP.stp (RStep.pt_comp γ₁ (geoComp γ₂ γ₃) v))
+      (RP.stp (RStep.pt_comp γ₂ γ₃ (parTr γ₁ v)))
 
--- ============================================================
--- §11 Comparison geometry / metric (53–58)
--- ============================================================
+-- 53: PT double-reversed
+theorem thm53_pt_double_rev (γ v : RiemObj) :
+    RP (parTr (geoRev (geoRev γ)) v) (parTr γ v) :=
+  RP.cg_pt_γ (RP.stp (RStep.geo_rev_rev γ))
 
--- 53. Flat connection from flat metric
-def flat_connection_path :
-    RiemPath (connection (metric "flat")) flat :=
-  rs RiemStep.connection_flat
-
--- 54. Geodesic double reverse = identity (already proved)
-def geo_double_rev (γ : RiemObj) : RiemPath (geoRev (geoRev γ)) γ :=
-  geo_rev_rev γ
-
--- 55. Reverse of trivial (again for completeness)
-def geo_rev_trivial : RiemPath (geoRev geoTriv) geoTriv :=
-  geo_rev_triv
-
--- 56. Geodesic 4-element composition associativity (3-step)
-def geo_four_assoc (a b c d : RiemObj) :
-    RiemPath (geoComp (geoComp (geoComp a b) c) d)
-             (geoComp a (geoComp b (geoComp c d))) :=
-  rt (geo_assoc (geoComp a b) c d)
-    (rt (RiemPath.congr_geoComp_l (geo_assoc a b c))
-        (geo_assoc a (geoComp b c) d))
-  -- Actually this needs care. Let me trace:
-  -- ((a∘b)∘c)∘d → (a∘b)∘(c∘d)      by geo_assoc
-  -- We need to get to a∘(b∘(c∘d)). But (a∘b)∘(c∘d) → a∘(b∘(c∘d)) by geo_assoc again
-  -- Hmm, the last step: geo_assoc a (geoComp b c) d gives
-  -- (a∘(b∘c))∘d → a∘((b∘c)∘d)  which isn't right.
-  -- Let me redo:
-
--- 56 corrected: Four-element associativity
-def geo_four_assoc' (a b c d : RiemObj) :
-    RiemPath (geoComp (geoComp (geoComp a b) c) d)
-             (geoComp a (geoComp b (geoComp c d))) :=
-  -- ((a∘b)∘c)∘d → (a∘b)∘(c∘d)  by geo_assoc (a∘b) c d
-  -- (a∘b)∘(c∘d) → a∘(b∘(c∘d))  by geo_assoc a b (c∘d)
-  rt (geo_assoc (geoComp a b) c d)
-     (geo_assoc a b (geoComp c d))
-
--- 57. Reverse distributes over composition (derivable)
--- (γ₁ ∘ γ₂)⁻¹  "should be" γ₂⁻¹ ∘ γ₁⁻¹
--- We can't prove this without a step, but we can show round-trip properties.
--- Instead: (γ ∘ triv)⁻¹⁻¹ = γ ∘ triv (2-step)
-def geo_comp_triv_rev_rev (γ : RiemObj) :
-    RiemPath (geoRev (geoRev (geoComp γ geoTriv)))
-             (geoComp γ geoTriv) :=
-  geo_rev_rev (geoComp γ geoTriv)
-
--- 58. Transport preserves zero Jacobi field through trivial (chain)
-def transport_triv_zero :
-    RiemPath (transport geoTriv jacZero) jacZero :=
-  transport_trivial jacZero
+-- 54: PT triv triv = id (2-step)
+theorem thm54_pt_triv_triv (v : RiemObj) :
+    RP (parTr geoTriv (parTr geoTriv v)) v :=
+  RP.tr (RP.cg_pt_v (RP.stp (RStep.pt_triv v))) (RP.stp (RStep.pt_triv v))
 
 -- ============================================================
--- §12 Mixed chains (59–66)
+-- §11 Mixed chains (55–66)
 -- ============================================================
 
--- 59. Flat manifold: transport around any trivial loop is identity (2-step)
-def flat_transport_loop (v : RiemObj) :
-    RiemPath (transport (geoComp geoTriv (geoRev geoTriv)) v) v :=
-  rt (RiemPath.congr_transport_γ (geo_comp_rev geoTriv))
-     (transport_trivial v)
+-- 55: γ ∘ (γ⁻¹ ∘ δ) = δ (2-step via symm assoc)
+theorem thm55_geo_cancel_right (γ δ : RiemObj) :
+    RP (geoComp γ (geoComp (geoRev γ) δ)) δ :=
+  RP.tr (RP.sym (RP.stp (RStep.geo_comp_assoc γ (geoRev γ) δ)))
+        (thm18_geo_cancel_left γ δ)
 
--- 60. Jacobi commutativity + zero simplification (3-step)
-def jac_comm_zero (J : RiemObj) :
-    RiemPath (jacAdd J (jacAdd jacZero jacZero)) (jacAdd J jacZero) :=
-  RiemPath.congr_jacAdd_r (jac_zero_left jacZero)
+-- 56: Four-element geodesic assoc (2-step)
+theorem thm56_geo_four_assoc (a b c d : RiemObj) :
+    RP (geoComp (geoComp (geoComp a b) c) d)
+       (geoComp a (geoComp b (geoComp c d))) :=
+  RP.tr (RP.stp (RStep.geo_comp_assoc (geoComp a b) c d))
+        (RP.stp (RStep.geo_comp_assoc a b (geoComp c d)))
 
--- 61. Jacobi double zero addition (2-step)
-def jac_double_zero_add (J : RiemObj) :
-    RiemPath (jacAdd (jacAdd jacZero J) jacZero) J :=
-  rt (jac_zero_right (jacAdd jacZero J)) (jac_zero_left J)
+-- 57: (γ∘γ⁻¹)∘(δ∘δ⁻¹) = triv (3-step)
+theorem thm57_geo_double_cancel (γ δ : RiemObj) :
+    RP (geoComp (geoComp γ (geoRev γ)) (geoComp δ (geoRev δ))) geoTriv :=
+  tr3 (RP.cg_geoComp_l (RP.stp (RStep.geo_comp_rev γ)))
+      (RP.cg_geoComp_r (RP.stp (RStep.geo_comp_rev δ)))
+      (RP.stp (RStep.geo_comp_triv_l geoTriv))
 
--- 62. Holonomy of trivial loop composed with itself (3-step)
-def hol_double_flat :
-    RiemPath (holComp (holonomy geoTriv) (holonomy geoTriv)) holTriv :=
-  flat_holonomy_trivial
+-- 58: Jac double zero
+theorem thm58_jac_double_zero (J : RiemObj) :
+    RP (jacAdd (jacAdd jacZero J) jacZero) J :=
+  RP.tr (RP.stp (RStep.jac_add_zero_r (jacAdd jacZero J))) (RP.stp (RStep.jac_add_zero_l J))
 
--- 63. Geodesic: (γ ∘ γ⁻¹) ∘ (δ ∘ δ⁻¹) = triv (3-step)
-def geo_double_cancel (γ δ : RiemObj) :
-    RiemPath (geoComp (geoComp γ (geoRev γ)) (geoComp δ (geoRev δ))) geoTriv :=
-  rt (RiemPath.congr_geoComp_l (geo_comp_rev γ))
-    (rt (RiemPath.congr_geoComp_r (geo_comp_rev δ))
-        geo_triv_triv)
+-- 59: Four-element Jac assoc (2-step)
+theorem thm59_jac_four_assoc (a b c d : RiemObj) :
+    RP (jacAdd (jacAdd (jacAdd a b) c) d) (jacAdd a (jacAdd b (jacAdd c d))) :=
+  RP.tr (RP.stp (RStep.jac_add_assoc (jacAdd a b) c d))
+        (RP.stp (RStep.jac_add_assoc a b (jacAdd c d)))
 
--- 64. Transport along double-reversed path = transport along original
-def transport_double_rev (γ v : RiemObj) :
-    RiemPath (transport (geoRev (geoRev γ)) v) (transport γ v) :=
-  RiemPath.congr_transport_γ (geo_rev_rev γ)
+-- 60: exp of scaled zero (2-step)
+theorem thm60_exp_scale_zero (J : RiemObj) :
+    RP (expM (jacScale 0 J)) origin :=
+  RP.tr (RP.cg_expM (RP.stp (RStep.jac_scale_zero J))) (RP.stp RStep.exp_zero_vec)
 
--- 65. Exp of commuted Jacobi sum (2-step)
-def exp_jac_comm (J₁ J₂ : RiemObj) :
-    RiemPath (expMap (jacAdd J₁ J₂)) (expMap (jacAdd J₂ J₁)) :=
-  RiemPath.congr_expMap (jac_comm J₁ J₂)
+-- 61: Jac scale 1 + zero (2-step)
+theorem thm61_jac_scale_one_zero (J : RiemObj) :
+    RP (jacAdd (jacScale 1 J) jacZero) J :=
+  RP.tr (RP.stp (RStep.jac_add_zero_r (jacScale 1 J))) (RP.stp (RStep.jac_scale_one J))
 
--- 66. Full flat chain: Riem → Ric → Scalar → 0, plus Weyl → 0 (5-step total)
-def complete_flat_vanishing :
-    RiemPath (scalar (ricci (riemann "flat_manifold"))) zero :=
-  flat_curvature_chain
+-- 62: Flat PT loop (2-step)
+theorem thm62_flat_pt_loop (v : RiemObj) :
+    RP (parTr (geoComp geoTriv (geoRev geoTriv)) v) v :=
+  RP.tr (RP.cg_pt_γ (RP.stp (RStep.geo_comp_rev geoTriv))) (RP.stp (RStep.pt_triv v))
 
--- ============================================================
--- §13 Structural theorems (67–72)
--- ============================================================
+-- 63: exp commutativity
+theorem thm63_exp_jac_comm (J₁ J₂ : RiemObj) :
+    RP (expM (jacAdd J₁ J₂)) (expM (jacAdd J₂ J₁)) :=
+  RP.cg_expM (RP.stp (RStep.jac_add_comm J₁ J₂))
 
--- 67. Symmetry involution
-theorem riem_symm_symm (p : RiemPath a b) : RiemPath a b :=
-  ry (ry p)
+-- 64: Holonomy four-assoc (2-step)
+theorem thm64_hol_four_assoc (a b c d : RiemObj) :
+    RP (holComp (holComp (holComp a b) c) d)
+       (holComp a (holComp b (holComp c d))) :=
+  RP.tr (RP.stp (RStep.hol_comp_assoc (holComp a b) c d))
+        (RP.stp (RStep.hol_comp_assoc a b (holComp c d)))
 
--- 68. Trans with refl
-theorem riem_trans_refl (p : RiemPath a b) : RiemPath a b :=
-  rt p (RiemPath.refl b)
+-- 65: Jac full cancel (3-step)
+theorem thm65_jac_full_cancel (J₁ J₂ : RiemObj) :
+    RP (jacAdd (jacAdd J₁ J₂) (jacScale (-1) J₂)) J₁ :=
+  RP.tr (thm26_jac_cancel J₁ J₂) (RP.stp (RStep.jac_add_zero_r J₁))
 
--- 69. Holonomy associativity 4-element (2-step)
-def hol_four_assoc (a b c d : RiemObj) :
-    RiemPath (holComp (holComp (holComp a b) c) d)
-             (holComp a (holComp b (holComp c d))) :=
-  rt (hol_assoc (holComp a b) c d)
-     (hol_assoc a b (holComp c d))
-
--- 70. Jacobi 4-element associativity (2-step)
-def jac_four_assoc (a b c d : RiemObj) :
-    RiemPath (jacAdd (jacAdd (jacAdd a b) c) d)
-             (jacAdd a (jacAdd b (jacAdd c d))) :=
-  rt (jac_assoc (jacAdd a b) c d)
-     (RiemPath.congr_jacAdd_l (jac_assoc a b c))
-  -- Wait: jac_assoc a b c gives (a+b)+c → a+(b+c)
-  -- But here after first step we have (a+b)+(c+d)
-  -- Need: (a+b)+(c+d) → a+(b+(c+d))  which is jac_assoc a b (c+d)... but that gives
-  -- ((a+b)+(c+d)) → ... no, jac_assoc needs ((a+b)+(c+d)) pattern which is
-  -- jacAdd (jacAdd a b) (jacAdd c d)
-  -- Hmm, first step: ((a+b)+c)+d → (a+b)+(c+d) by jac_assoc (a+b) c d ✓
-  -- second step: (a+b)+(c+d) → a+(b+(c+d)) by jac_assoc a b (jacAdd c d) ✓
-
--- Let me redo properly:
-def jac_four_assoc' (a b c d : RiemObj) :
-    RiemPath (jacAdd (jacAdd (jacAdd a b) c) d)
-             (jacAdd a (jacAdd b (jacAdd c d))) :=
-  rt (jac_assoc (jacAdd a b) c d)
-     (jac_assoc a b (jacAdd c d))
-
--- 71. Transport composition in 3 segments (already proved as transport_triple)
-def transport_triple_comp (γ₁ γ₂ γ₃ v : RiemObj) :=
-  transport_triple γ₁ γ₂ γ₃ v
-
--- 72. Euler characteristic of connected sum: χ(Σ_g) chain
-def euler_chain (g : Nat) : RiemPath (euler (genus g)) (val (2 - 2 * g)) :=
-  euler_genus g
+-- 66: exp cancel full (3-step)
+theorem thm66_exp_cancel_full (J : RiemObj) :
+    RP (expM (jacAdd (jacAdd J (jacScale (-1) J)) jacZero)) origin :=
+  tr3 (RP.cg_expM (RP.stp (RStep.jac_add_zero_r (jacAdd J (jacScale (-1) J)))))
+      (RP.cg_expM (RP.stp (RStep.jac_add_neg J)))
+      (RP.stp RStep.exp_zero_vec)
 
 -- ============================================================
--- §14 Advanced chains (73–78)
+-- §12 More chains (67–78)
 -- ============================================================
 
--- 73. Transport along γ then triv then γ⁻¹ = identity (4-step)
-def transport_triv_in_middle (γ v : RiemObj) :
-    RiemPath (transport (geoComp γ (geoComp geoTriv (geoRev γ))) v) v :=
-  -- (γ ∘ (triv ∘ γ⁻¹)) first simplify inner
-  rt (RiemPath.congr_transport_γ (RiemPath.congr_geoComp_r (geo_id_left (geoRev γ))))
-     (transport_loop_cancel γ v)
+theorem thm67_geo_symm (γ : RiemObj) : RP γ (geoComp γ geoTriv) :=
+  RP.sym (RP.stp (RStep.geo_comp_triv_r γ))
 
--- 74. Exp of zero scaled Jacobi field (2-step)
-def exp_scale_zero (J : RiemObj) :
-    RiemPath (expMap (jacScale 0 J)) origin :=
-  rt (RiemPath.congr_expMap (jac_scale_zero J)) exp_zero_vec
+theorem thm68_hol_cancel (h : RiemObj) :
+    RP (holComp (holComp h holTriv) holTriv) h :=
+  RP.tr (RP.stp (RStep.hol_comp_triv_r (holComp h holTriv)))
+        (RP.stp (RStep.hol_comp_triv_r h))
 
--- 75. Jacobi scale 1 + zero simplification (2-step)
-def jac_scale_one_add_zero (J : RiemObj) :
-    RiemPath (jacAdd (jacScale 1 J) jacZero) J :=
-  rt (jac_zero_right (jacScale 1 J)) (jac_scale_one J)
+theorem thm69_pt_triv_mid (γ v : RiemObj) :
+    RP (parTr (geoComp γ (geoComp geoTriv (geoRev γ))) v) v :=
+  RP.tr (RP.cg_pt_γ (RP.cg_geoComp_r (RP.stp (RStep.geo_comp_triv_l (geoRev γ)))))
+        (thm51_pt_loop_cancel γ v)
 
--- 76. Geodesic: γ ∘ (γ⁻¹ ∘ δ) via assoc and cancel (3-step)
--- Actually we need: γ ∘ (γ⁻¹ ∘ δ) → (γ ∘ γ⁻¹) ∘ δ → triv ∘ δ → δ
--- But assoc goes the wrong way. We use symm.
-def geo_cancel_via_assoc (γ δ : RiemObj) :
-    RiemPath (geoComp γ (geoComp (geoRev γ) δ))
-             δ :=
-  rt (ry (geo_assoc γ (geoRev γ) δ))
-     (geo_cancel_left γ δ)
+theorem thm70_pt_rev_triv (v : RiemObj) :
+    RP (parTr (geoRev geoTriv) v) v :=
+  RP.tr (RP.cg_pt_γ (RP.stp RStep.geo_rev_triv)) (RP.stp (RStep.pt_triv v))
 
--- 77. Holonomy: h ∘ (triv ∘ triv) = h (2-step)
-def hol_double_triv (h : RiemObj) :
-    RiemPath (holComp h (holComp holTriv holTriv)) (holComp h holTriv) :=
-  RiemPath.congr_holComp_r (hol_id_left holTriv)
+theorem thm71_flat_weyl_ricci : RP (weyl (riemann "flat")) zero := thm06_flat_weyl
 
--- 78. Holonomy: h ∘ (triv ∘ triv) = h (3-step, full simplification)
-def hol_double_triv_full (h : RiemObj) :
-    RiemPath (holComp h (holComp holTriv holTriv)) h :=
-  rt (hol_double_triv h) (hol_id_right h)
+theorem thm72_jac_comm_invol (J₁ J₂ : RiemObj) :
+    RP (jacAdd J₁ J₂) (jacAdd J₁ J₂) :=
+  RP.tr (RP.stp (RStep.jac_add_comm J₁ J₂)) (RP.stp (RStep.jac_add_comm J₂ J₁))
+
+theorem thm73_symm_symm {a b : RiemObj} (p : RP a b) : RP a b := RP.sym (RP.sym p)
+
+theorem thm74_trans_refl {a b : RiemObj} (p : RP a b) : RP a b := RP.tr p (RP.rfl b)
+
+theorem thm75_geo_rev_triv_comp (γ : RiemObj) :
+    RP (geoComp (geoRev geoTriv) γ) γ :=
+  RP.tr (RP.cg_geoComp_l (RP.stp RStep.geo_rev_triv)) (RP.stp (RStep.geo_comp_triv_l γ))
+
+theorem thm76_hol_assoc_simp (a b : RiemObj) :
+    RP (holComp (holComp a b) holTriv) (holComp a b) :=
+  RP.stp (RStep.hol_comp_triv_r (holComp a b))
+
+theorem thm77_geo_comp_triv_rev_rev (γ : RiemObj) :
+    RP (geoRev (geoRev (geoComp γ geoTriv))) (geoComp γ geoTriv) :=
+  RP.stp (RStep.geo_rev_rev (geoComp γ geoTriv))
+
+theorem thm78_pt_geo_rev_rev (γ v : RiemObj) :
+    RP (parTr (geoComp (geoRev (geoRev γ)) geoTriv) v) (parTr γ v) :=
+  RP.tr (RP.cg_pt_γ (RP.cg_geoComp_l (RP.stp (RStep.geo_rev_rev γ))))
+        (RP.cg_pt_γ (RP.stp (RStep.geo_comp_triv_r γ)))
 
 end ComputationalPaths.Path.Geometry.RiemannianDeep

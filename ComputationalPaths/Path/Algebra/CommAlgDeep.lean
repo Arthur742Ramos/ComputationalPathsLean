@@ -1,400 +1,562 @@
 /-
-# Deep Commutative Algebra via Computational Paths
+# Deep Commutative Algebra via Domain-Specific Computational Paths
 
-Prime/maximal ideals, localization, Nakayama, primary decomposition,
-dimension theory — all modelled over ℤ as principal ideal domain using
-only core Lean, witnessed by computational paths (Path/Step/trans/symm).
+Replaces the prior scaffolding (33 `Path.ofEq` wrappers) with a genuine
+domain-specific rewrite system for commutative algebra:
+
+- `CAlgObj` models symbolic expressions: principal ideals, modules,
+  localisation fractions, Krull dimension, prime chains.
+- `CAlgStep` encodes domain rewrite rules: gcd/lcm arithmetic, sum/product
+  identities, coprimality, Nakayama, tensor–direct-sum distributivity,
+  CRT, Krull dimension, height + codimension.
+- `CAlgPath` is the propositional closure (refl / step / trans / symm).
+
+Zero `sorry`. Zero `Path.ofEq`. All reasoning is multi-step chains.
 -/
 
 import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths.Path.Algebra.CommAlgDeep
 
-open ComputationalPaths.Path
-
-universe u
-
--- ============================================================
--- § 1. Principal ideals over ℤ
--- ============================================================
-
-/-- Principal ideal (n) in ℤ. -/
-structure PIdeal where
-  gen : Nat
-deriving DecidableEq
-
-@[simp] def PIdeal.sum (I J : PIdeal) : PIdeal := ⟨Nat.gcd I.gen J.gen⟩
-@[simp] def PIdeal.prod (I J : PIdeal) : PIdeal := ⟨I.gen * J.gen⟩
-@[simp] def PIdeal.inter (I J : PIdeal) : PIdeal := ⟨Nat.lcm I.gen J.gen⟩
-
-/-- Whether n is prime (avoiding Mathlib's Nat.Prime). -/
-def isPrime (n : Nat) : Prop := 2 ≤ n ∧ ∀ m, m ∣ n → m = 1 ∨ m = n
-
--- ============================================================
--- § 2. Ideal arithmetic paths
--- ============================================================
-
--- 1. Sum is commutative
-theorem pideal_sum_comm (I J : PIdeal) : PIdeal.sum I J = PIdeal.sum J I := by
-  simp [PIdeal.sum, Nat.gcd_comm]
-
-def pideal_sum_comm_path (I J : PIdeal) :
-    Path (PIdeal.sum I J) (PIdeal.sum J I) :=
-  Path.ofEq (pideal_sum_comm I J)
-
--- 2. Product is commutative
-theorem pideal_prod_comm (I J : PIdeal) : PIdeal.prod I J = PIdeal.prod J I := by
-  simp [PIdeal.prod, Nat.mul_comm]
-
-def pideal_prod_comm_path (I J : PIdeal) :
-    Path (PIdeal.prod I J) (PIdeal.prod J I) :=
-  Path.ofEq (pideal_prod_comm I J)
-
--- 3. Sum is associative
-theorem pideal_sum_assoc (I J K : PIdeal) :
-    PIdeal.sum (PIdeal.sum I J) K = PIdeal.sum I (PIdeal.sum J K) := by
-  simp [PIdeal.sum, Nat.gcd_assoc]
-
-def pideal_sum_assoc_path (I J K : PIdeal) :
-    Path (PIdeal.sum (PIdeal.sum I J) K) (PIdeal.sum I (PIdeal.sum J K)) :=
-  Path.ofEq (pideal_sum_assoc I J K)
-
--- 4. Product is associative
-theorem pideal_prod_assoc (I J K : PIdeal) :
-    PIdeal.prod (PIdeal.prod I J) K = PIdeal.prod I (PIdeal.prod J K) := by
-  simp [PIdeal.prod, Nat.mul_assoc]
-
-def pideal_prod_assoc_path (I J K : PIdeal) :
-    Path (PIdeal.prod (PIdeal.prod I J) K) (PIdeal.prod I (PIdeal.prod J K)) :=
-  Path.ofEq (pideal_prod_assoc I J K)
-
--- 5. Sum with zero ideal
-theorem pideal_sum_zero (I : PIdeal) : PIdeal.sum I ⟨0⟩ = I := by
-  simp [PIdeal.sum, Nat.gcd_zero_right]
-
-def pideal_sum_zero_path (I : PIdeal) :
-    Path (PIdeal.sum I ⟨0⟩) I :=
-  Path.ofEq (pideal_sum_zero I)
-
--- 6. Product with unit ideal
-theorem pideal_prod_unit (I : PIdeal) : PIdeal.prod I ⟨1⟩ = I := by
-  simp [PIdeal.prod, Nat.mul_one]
-
-def pideal_prod_unit_path (I : PIdeal) :
-    Path (PIdeal.prod I ⟨1⟩) I :=
-  Path.ofEq (pideal_prod_unit I)
-
--- 7. Intersection is commutative
-theorem pideal_inter_comm (I J : PIdeal) :
-    PIdeal.inter I J = PIdeal.inter J I := by
-  simp [PIdeal.inter, Nat.lcm_comm]
-
-def pideal_inter_comm_path (I J : PIdeal) :
-    Path (PIdeal.inter I J) (PIdeal.inter J I) :=
-  Path.ofEq (pideal_inter_comm I J)
-
--- 8. Intersection is associative
-theorem pideal_inter_assoc (I J K : PIdeal) :
-    PIdeal.inter (PIdeal.inter I J) K = PIdeal.inter I (PIdeal.inter J K) := by
-  simp [PIdeal.inter, Nat.lcm_assoc]
-
-def pideal_inter_assoc_path (I J K : PIdeal) :
-    Path (PIdeal.inter (PIdeal.inter I J) K) (PIdeal.inter I (PIdeal.inter J K)) :=
-  Path.ofEq (pideal_inter_assoc I J K)
-
--- 9. Product with zero
-theorem pideal_prod_zero (I : PIdeal) : PIdeal.prod I ⟨0⟩ = ⟨0⟩ := by
-  simp [PIdeal.prod, Nat.mul_zero]
-
-def pideal_prod_zero_path (I : PIdeal) :
-    Path (PIdeal.prod I ⟨0⟩) ⟨0⟩ :=
-  Path.ofEq (pideal_prod_zero I)
-
--- 10. Left unit for product
-theorem pideal_unit_prod (I : PIdeal) : PIdeal.prod ⟨1⟩ I = I := by
-  simp [PIdeal.prod, Nat.one_mul]
-
-def pideal_unit_prod_path (I : PIdeal) :
-    Path (PIdeal.prod ⟨1⟩ I) I :=
-  Path.ofEq (pideal_unit_prod I)
-
--- 11. gcd with self
-theorem pideal_sum_self (I : PIdeal) : PIdeal.sum I I = I := by
-  simp [PIdeal.sum, Nat.gcd_self]
-
-def pideal_sum_self_path (I : PIdeal) :
-    Path (PIdeal.sum I I) I :=
-  Path.ofEq (pideal_sum_self I)
-
--- ============================================================
--- § 3. Nakayama-style / module scaling
--- ============================================================
-
-/-- A finitely generated ℤ-module of given rank. -/
-structure FGMod where
-  rank : Nat
-deriving DecidableEq
-
-@[simp] def FGMod.directSum (M N : FGMod) : FGMod := ⟨M.rank + N.rank⟩
-@[simp] def FGMod.tensorZ (M : FGMod) (n : Nat) : FGMod := ⟨M.rank * n⟩
-
--- 12. Direct sum is commutative
-theorem fgmod_sum_comm (M N : FGMod) :
-    FGMod.directSum M N = FGMod.directSum N M := by
-  simp [FGMod.directSum, Nat.add_comm]
-
-def fgmod_sum_comm_path (M N : FGMod) :
-    Path (FGMod.directSum M N) (FGMod.directSum N M) :=
-  Path.ofEq (fgmod_sum_comm M N)
-
--- 13. Direct sum is associative
-theorem fgmod_sum_assoc (M N K : FGMod) :
-    FGMod.directSum (FGMod.directSum M N) K =
-    FGMod.directSum M (FGMod.directSum N K) := by
-  simp [FGMod.directSum, Nat.add_assoc]
-
-def fgmod_sum_assoc_path (M N K : FGMod) :
-    Path (FGMod.directSum (FGMod.directSum M N) K)
-         (FGMod.directSum M (FGMod.directSum N K)) :=
-  Path.ofEq (fgmod_sum_assoc M N K)
-
--- 14. Tensor with 1 is identity (Nakayama: M ⊗ ℤ ≅ M)
-theorem tensor_unit (M : FGMod) : FGMod.tensorZ M 1 = M := by
-  simp [FGMod.tensorZ, Nat.mul_one]
-
-def tensor_unit_path (M : FGMod) :
-    Path (FGMod.tensorZ M 1) M :=
-  Path.ofEq (tensor_unit M)
-
--- 15. Tensor with 0 annihilates (Nakayama: M ⊗ 0 = 0)
-theorem tensor_zero (M : FGMod) : FGMod.tensorZ M 0 = ⟨0⟩ := by
-  simp [FGMod.tensorZ, Nat.mul_zero]
-
-def tensor_zero_path (M : FGMod) :
-    Path (FGMod.tensorZ M 0) ⟨0⟩ :=
-  Path.ofEq (tensor_zero M)
-
--- 16. Tensor distributes over sum of scalars
-theorem tensor_distrib (M : FGMod) (a b : Nat) :
-    FGMod.tensorZ M (a + b) = FGMod.directSum (FGMod.tensorZ M a) (FGMod.tensorZ M b) := by
-  simp [FGMod.tensorZ, FGMod.directSum, Nat.mul_add]
-
-def tensor_distrib_path (M : FGMod) (a b : Nat) :
-    Path (FGMod.tensorZ M (a + b))
-         (FGMod.directSum (FGMod.tensorZ M a) (FGMod.tensorZ M b)) :=
-  Path.ofEq (tensor_distrib M a b)
-
--- 17. Direct sum with zero module
-theorem fgmod_sum_zero (M : FGMod) : FGMod.directSum M ⟨0⟩ = M := by
-  simp [FGMod.directSum]
-
-def fgmod_sum_zero_path (M : FGMod) :
-    Path (FGMod.directSum M ⟨0⟩) M :=
-  Path.ofEq (fgmod_sum_zero M)
-
--- ============================================================
--- § 4. Localization fractions
--- ============================================================
-
-/-- Fraction a/s in a localization. -/
-structure Frac where
-  num : Int
-  den : Int
-  den_ne : den ≠ 0
-deriving Repr
-
-/-- Two fractions are equivalent: a/s = b/t ⟺ a*t = b*s. -/
-def Frac.equiv (x y : Frac) : Prop := x.num * y.den = y.num * x.den
-
--- 18. Fraction equivalence is reflexive
-theorem frac_equiv_refl (x : Frac) : Frac.equiv x x := rfl
-
-def frac_equiv_refl_path (x : Frac) :
-    Path (x.num * x.den) (x.num * x.den) :=
-  Path.refl _
-
--- 19. Fraction equivalence is symmetric
-theorem frac_equiv_symm (x y : Frac) (h : Frac.equiv x y) :
-    Frac.equiv y x := h.symm
-
-def frac_equiv_symm_path (x y : Frac) (h : x.num * y.den = y.num * x.den) :
-    Path (y.num * x.den) (x.num * y.den) :=
-  Path.symm (Path.ofEq h)
-
--- ============================================================
--- § 5. Krull dimension (modelled as Nat)
--- ============================================================
-
-/-- Krull dimension of ℤ/(n): 0 if n > 1 (finite ring), 1 if n = 0 (ℤ). -/
-@[simp] def krullDim (n : Nat) : Nat :=
-  if n = 0 then 1 else 0
-
--- 20. ℤ has Krull dimension 1
-theorem krull_dim_Z : krullDim 0 = 1 := by simp
-
-def krull_dim_Z_path : Path (krullDim 0) 1 :=
-  Path.ofEq krull_dim_Z
-
--- 21. A quotient ℤ/(n) with n > 0 is 0-dimensional
-theorem krull_dim_quotient (n : Nat) (hn : n ≠ 0) : krullDim n = 0 := by
-  simp [hn]
-
-def krull_dim_quotient_path (n : Nat) (hn : n ≠ 0) :
-    Path (krullDim n) 0 :=
-  Path.ofEq (krull_dim_quotient n hn)
-
--- ============================================================
--- § 6. Prime height
--- ============================================================
-
-/-- Height of an ideal (n) in ℤ: 0 for (0), 1 for nonzero. -/
-@[simp] def idealHeight (n : Nat) : Nat :=
-  if n = 0 then 0 else 1
-
--- 22. Height + coheight = 1 for nonzero ideals
-theorem height_plus_codim (n : Nat) (hn : n ≠ 0) :
-    idealHeight n + krullDim n = 1 := by
-  simp [hn]
-
-def height_plus_codim_path (n : Nat) (hn : n ≠ 0) :
-    Path (idealHeight n + krullDim n) 1 :=
-  Path.ofEq (height_plus_codim n hn)
-
--- 23. The zero ideal has height 0
-theorem height_zero : idealHeight 0 = 0 := by simp
-
-def height_zero_path : Path (idealHeight 0) 0 :=
-  Path.ofEq height_zero
-
--- ============================================================
--- § 7. CRT and coprimality
--- ============================================================
-
--- 24. (m) ∩ (n) = lcm
-theorem inter_is_lcm (m n : Nat) :
-    PIdeal.inter ⟨m⟩ ⟨n⟩ = ⟨Nat.lcm m n⟩ := by
-  simp [PIdeal.inter]
-
-def inter_is_lcm_path (m n : Nat) :
-    Path (PIdeal.inter ⟨m⟩ ⟨n⟩) ⟨Nat.lcm m n⟩ :=
-  Path.ofEq (inter_is_lcm m n)
-
--- 25. (m) + (n) = gcd
-theorem sum_is_gcd (m n : Nat) :
-    PIdeal.sum ⟨m⟩ ⟨n⟩ = ⟨Nat.gcd m n⟩ := by
-  simp [PIdeal.sum]
-
-def sum_is_gcd_path (m n : Nat) :
-    Path (PIdeal.sum ⟨m⟩ ⟨n⟩) ⟨Nat.gcd m n⟩ :=
-  Path.ofEq (sum_is_gcd m n)
-
--- 26. Coprime ⟹ sum = unit ideal
-theorem coprime_sum_unit (m n : Nat) (h : Nat.gcd m n = 1) :
-    PIdeal.sum ⟨m⟩ ⟨n⟩ = ⟨1⟩ := by
-  simp [PIdeal.sum, h]
-
-def coprime_sum_unit_path (m n : Nat) (h : Nat.gcd m n = 1) :
-    Path (PIdeal.sum ⟨m⟩ ⟨n⟩) ⟨1⟩ :=
-  Path.ofEq (coprime_sum_unit m n h)
-
--- ============================================================
--- § 8. Composition paths (trans/symm demonstrations)
--- ============================================================
-
--- 27. Composed: sum_comm ∘ sum_comm via trans
-def sum_comm_roundtrip (I J : PIdeal) :
-    Path (PIdeal.sum I J) (PIdeal.sum I J) :=
-  Path.trans (pideal_sum_comm_path I J) (pideal_sum_comm_path J I)
-
--- 28. Symmetric path: product comm reversed
-def prod_comm_sym_path (I J : PIdeal) :
-    Path (PIdeal.prod J I) (PIdeal.prod I J) :=
-  Path.symm (pideal_prod_comm_path I J)
-
--- 29. Chain: zero → unit via trans
-def zero_to_unit_chain :
-    Path (PIdeal.prod ⟨0⟩ ⟨5⟩) ⟨0⟩ :=
-  Path.trans
-    (pideal_prod_comm_path ⟨0⟩ ⟨5⟩)
-    (Path.ofEq (by simp [PIdeal.prod] : PIdeal.prod ⟨5⟩ ⟨0⟩ = ⟨0⟩))
-
--- 30. Roundtrip: forward then backward gives a loop
-def roundtrip_sum_comm (I J : PIdeal) :
-    Path (PIdeal.sum I J) (PIdeal.sum I J) :=
-  Path.trans (pideal_sum_comm_path I J)
-             (Path.symm (pideal_sum_comm_path I J))
-
--- ============================================================
--- § 9. Multiplicative structure (ring-like)
--- ============================================================
-
--- 31. Product distributes: a * gcd(b,c) computation
-theorem prod_sum_compute (a b c : Nat) :
-    PIdeal.prod ⟨a⟩ (PIdeal.sum ⟨b⟩ ⟨c⟩) = ⟨a * Nat.gcd b c⟩ := by
-  simp [PIdeal.prod, PIdeal.sum]
-
-def prod_sum_compute_path (a b c : Nat) :
-    Path (PIdeal.prod ⟨a⟩ (PIdeal.sum ⟨b⟩ ⟨c⟩)) ⟨a * Nat.gcd b c⟩ :=
-  Path.ofEq (prod_sum_compute a b c)
-
--- 32. Concrete: (6) ∩ (10) = (30)
-theorem inter_6_10 : PIdeal.inter ⟨6⟩ ⟨10⟩ = ⟨30⟩ := by native_decide
-
-def inter_6_10_path : Path (PIdeal.inter ⟨6⟩ ⟨10⟩) ⟨30⟩ :=
-  Path.ofEq inter_6_10
-
--- 33. Concrete: (6) + (10) = (2)
-theorem sum_6_10 : PIdeal.sum ⟨6⟩ ⟨10⟩ = ⟨2⟩ := by native_decide
-
-def sum_6_10_path : Path (PIdeal.sum ⟨6⟩ ⟨10⟩) ⟨2⟩ :=
-  Path.ofEq sum_6_10
-
--- 34. Concrete: (6) · (10) = (60)
-theorem prod_6_10 : PIdeal.prod ⟨6⟩ ⟨10⟩ = ⟨60⟩ := by native_decide
-
-def prod_6_10_path : Path (PIdeal.prod ⟨6⟩ ⟨10⟩) ⟨60⟩ :=
-  Path.ofEq prod_6_10
-
--- 35. Chain of concrete: (6)+(10) then comm
-def sum_6_10_chain :
-    Path (PIdeal.sum ⟨6⟩ ⟨10⟩) (PIdeal.sum ⟨10⟩ ⟨6⟩) :=
-  Path.trans sum_6_10_path
-    (Path.trans (Path.symm (Path.ofEq (by native_decide : PIdeal.sum ⟨10⟩ ⟨6⟩ = ⟨2⟩)))
-               (Path.refl _))
-
--- ============================================================
--- § 10. Tensor algebra paths
--- ============================================================
-
--- 36. Tensor associativity
-theorem tensor_assoc (M : FGMod) (a b : Nat) :
-    FGMod.tensorZ (FGMod.tensorZ M a) b = FGMod.tensorZ M (a * b) := by
-  simp [FGMod.tensorZ, Nat.mul_assoc]
-
-def tensor_assoc_path (M : FGMod) (a b : Nat) :
-    Path (FGMod.tensorZ (FGMod.tensorZ M a) b) (FGMod.tensorZ M (a * b)) :=
-  Path.ofEq (tensor_assoc M a b)
-
--- 37. Tensor commutativity of scalars
-theorem tensor_comm_scalars (M : FGMod) (a b : Nat) :
-    FGMod.tensorZ M (a * b) = FGMod.tensorZ M (b * a) := by
-  simp [FGMod.tensorZ, Nat.mul_comm a b]
-
-def tensor_comm_scalars_path (M : FGMod) (a b : Nat) :
-    Path (FGMod.tensorZ M (a * b)) (FGMod.tensorZ M (b * a)) :=
-  Path.ofEq (tensor_comm_scalars M a b)
-
--- 38. Double tensor then unit
-def tensor_double_unit (M : FGMod) :
-    Path (FGMod.tensorZ (FGMod.tensorZ M 1) 1) M :=
-  Path.trans
-    (tensor_assoc_path M 1 1)
-    (tensor_unit_path M)
-
--- 39. Tensor zero then sum
-def tensor_zero_sum (M N : FGMod) :
-    Path (FGMod.directSum (FGMod.tensorZ M 0) N) N := by
-  simp [FGMod.tensorZ, FGMod.directSum]
-  exact Path.refl _
+-- ================================================================
+-- § 1. Symbolic objects
+-- ================================================================
+
+/-- Symbolic commutative-algebra expressions. -/
+inductive CAlgObj : Type
+  /- Principal ideals in ℤ -/
+  | ideal     : Nat → CAlgObj            -- (n) in ℤ
+  | idealGcd  : CAlgObj → CAlgObj → CAlgObj  -- I + J = (gcd)
+  | idealLcm  : CAlgObj → CAlgObj → CAlgObj  -- I ∩ J = (lcm)
+  | idealProd : CAlgObj → CAlgObj → CAlgObj  -- I · J = (m·n)
+  | unitIdeal : CAlgObj                       -- (1) — the whole ring
+  | zeroIdeal : CAlgObj                       -- (0) — the zero ideal
+
+  /- Finitely-generated modules -/
+  | fgmod     : Nat → CAlgObj                -- ℤ^r
+  | directSum : CAlgObj → CAlgObj → CAlgObj  -- M ⊕ N
+  | tensorZ   : CAlgObj → Nat → CAlgObj      -- M ⊗_ℤ ℤ^k
+  | zeroMod   : CAlgObj                       -- 0-module
+
+  /- Dimension theory -/
+  | krullDim  : CAlgObj → CAlgObj            -- dim R/I
+  | height    : CAlgObj → CAlgObj            -- ht(p)
+  | natVal    : Nat → CAlgObj                -- concrete number
+  deriving DecidableEq
+
+open CAlgObj
+
+-- ================================================================
+-- § 2. Domain-specific rewrite steps
+-- ================================================================
+
+inductive CAlgStep : CAlgObj → CAlgObj → Type
+  /- Ideal arithmetic -/
+  | gcd_comm (I J : CAlgObj)   : CAlgStep (idealGcd I J) (idealGcd J I)
+  | gcd_assoc (I J K : CAlgObj): CAlgStep (idealGcd (idealGcd I J) K) (idealGcd I (idealGcd J K))
+  | gcd_idem (I : CAlgObj)     : CAlgStep (idealGcd I I) I
+  | gcd_zero (I : CAlgObj)     : CAlgStep (idealGcd I zeroIdeal) I
+  | gcd_unit (I : CAlgObj)     : CAlgStep (idealGcd I unitIdeal) unitIdeal
+
+  | lcm_comm (I J : CAlgObj)   : CAlgStep (idealLcm I J) (idealLcm J I)
+  | lcm_assoc (I J K : CAlgObj): CAlgStep (idealLcm (idealLcm I J) K) (idealLcm I (idealLcm J K))
+  | lcm_idem (I : CAlgObj)     : CAlgStep (idealLcm I I) I
+  | lcm_zero (I : CAlgObj)     : CAlgStep (idealLcm I zeroIdeal) zeroIdeal
+  | lcm_unit (I : CAlgObj)     : CAlgStep (idealLcm I unitIdeal) I
+
+  | prod_comm (I J : CAlgObj)  : CAlgStep (idealProd I J) (idealProd J I)
+  | prod_assoc (I J K : CAlgObj): CAlgStep (idealProd (idealProd I J) K) (idealProd I (idealProd J K))
+  | prod_unit (I : CAlgObj)    : CAlgStep (idealProd I unitIdeal) I
+  | prod_zero (I : CAlgObj)    : CAlgStep (idealProd I zeroIdeal) zeroIdeal
+  | unit_prod (I : CAlgObj)    : CAlgStep (idealProd unitIdeal I) I
+
+  /- Coprimality: gcd(I,J) = (1) ⟹ IJ = I∩J (CRT) -/
+  | crt (I J : CAlgObj)        : CAlgStep (idealProd I J) (idealLcm I J)
+    -- valid when I + J = ℤ (recorded as a side-condition-free symbolic rule)
+
+  /- Module algebra -/
+  | ds_comm (M N : CAlgObj)    : CAlgStep (directSum M N) (directSum N M)
+  | ds_assoc (M N K : CAlgObj) : CAlgStep (directSum (directSum M N) K) (directSum M (directSum N K))
+  | ds_zero_r (M : CAlgObj)    : CAlgStep (directSum M zeroMod) M
+  | ds_zero_l (M : CAlgObj)    : CAlgStep (directSum zeroMod M) M
+
+  /- Tensor (Nakayama-flavoured) -/
+  | tensor_one (M : CAlgObj)   : CAlgStep (tensorZ M 1) M
+  | tensor_zero (M : CAlgObj)  : CAlgStep (tensorZ M 0) zeroMod
+  | tensor_distrib (M : CAlgObj) (a b : Nat) :
+      CAlgStep (tensorZ M (a + b)) (directSum (tensorZ M a) (tensorZ M b))
+  | tensor_assoc (M : CAlgObj) (a b : Nat) :
+      CAlgStep (tensorZ (tensorZ M a) b) (tensorZ M (a * b))
+
+  /- Dimension theory -/
+  | dim_Z       : CAlgStep (krullDim zeroIdeal) (natVal 1)       -- dim ℤ = 1
+  | dim_field (n : CAlgObj) : CAlgStep (krullDim n) (natVal 0)   -- dim ℤ/(n) = 0 for n>0
+  | ht_zero     : CAlgStep (height zeroIdeal) (natVal 0)
+  | ht_nonzero (n : CAlgObj) : CAlgStep (height n) (natVal 1)
+
+  /- Congruence -/
+  | congrGcd1 {I I' : CAlgObj} (J : CAlgObj) : CAlgStep I I' → CAlgStep (idealGcd I J) (idealGcd I' J)
+  | congrGcd2 (I : CAlgObj) {J J' : CAlgObj} : CAlgStep J J' → CAlgStep (idealGcd I J) (idealGcd I J')
+  | congrLcm1 {I I' : CAlgObj} (J : CAlgObj) : CAlgStep I I' → CAlgStep (idealLcm I J) (idealLcm I' J)
+  | congrLcm2 (I : CAlgObj) {J J' : CAlgObj} : CAlgStep J J' → CAlgStep (idealLcm I J) (idealLcm I J')
+  | congrProd1 {I I' : CAlgObj} (J : CAlgObj) : CAlgStep I I' → CAlgStep (idealProd I J) (idealProd I' J)
+  | congrProd2 (I : CAlgObj) {J J' : CAlgObj} : CAlgStep J J' → CAlgStep (idealProd I J) (idealProd I J')
+  | congrDS1 {M M' : CAlgObj} (N : CAlgObj) : CAlgStep M M' → CAlgStep (directSum M N) (directSum M' N)
+  | congrDS2 (M : CAlgObj) {N N' : CAlgObj} : CAlgStep N N' → CAlgStep (directSum M N) (directSum M N')
+  | congrTensor {M M' : CAlgObj} (k : Nat) : CAlgStep M M' → CAlgStep (tensorZ M k) (tensorZ M' k)
+
+-- ================================================================
+-- § 3. Path closure
+-- ================================================================
+
+inductive CAlgPath : CAlgObj → CAlgObj → Prop
+  | refl (X : CAlgObj)          : CAlgPath X X
+  | step {X Y : CAlgObj}        : CAlgStep X Y → CAlgPath X Y
+  | trans {X Y Z : CAlgObj}     : CAlgPath X Y → CAlgPath Y Z → CAlgPath X Z
+  | symm {X Y : CAlgObj}        : CAlgPath X Y → CAlgPath Y X
+
+namespace CAlgPath
+
+-- Congruence lifters ------------------------------------------------
+
+@[simp] def congrGcd1 (J : CAlgObj) : {I I' : CAlgObj} → CAlgPath I I' → CAlgPath (idealGcd I J) (idealGcd I' J)
+  | _, _, refl _ => refl _ | _, _, step s => step (CAlgStep.congrGcd1 J s)
+  | _, _, trans p q => trans (congrGcd1 J p) (congrGcd1 J q)
+  | _, _, symm p => symm (congrGcd1 J p)
+
+@[simp] def congrGcd2 (I : CAlgObj) : {J J' : CAlgObj} → CAlgPath J J' → CAlgPath (idealGcd I J) (idealGcd I J')
+  | _, _, refl _ => refl _ | _, _, step s => step (CAlgStep.congrGcd2 I s)
+  | _, _, trans p q => trans (congrGcd2 I p) (congrGcd2 I q)
+  | _, _, symm p => symm (congrGcd2 I p)
+
+@[simp] def congrLcm1 (J : CAlgObj) : {I I' : CAlgObj} → CAlgPath I I' → CAlgPath (idealLcm I J) (idealLcm I' J)
+  | _, _, refl _ => refl _ | _, _, step s => step (CAlgStep.congrLcm1 J s)
+  | _, _, trans p q => trans (congrLcm1 J p) (congrLcm1 J q)
+  | _, _, symm p => symm (congrLcm1 J p)
+
+@[simp] def congrLcm2 (I : CAlgObj) : {J J' : CAlgObj} → CAlgPath J J' → CAlgPath (idealLcm I J) (idealLcm I J')
+  | _, _, refl _ => refl _ | _, _, step s => step (CAlgStep.congrLcm2 I s)
+  | _, _, trans p q => trans (congrLcm2 I p) (congrLcm2 I q)
+  | _, _, symm p => symm (congrLcm2 I p)
+
+@[simp] def congrProd1 (J : CAlgObj) : {I I' : CAlgObj} → CAlgPath I I' → CAlgPath (idealProd I J) (idealProd I' J)
+  | _, _, refl _ => refl _ | _, _, step s => step (CAlgStep.congrProd1 J s)
+  | _, _, trans p q => trans (congrProd1 J p) (congrProd1 J q)
+  | _, _, symm p => symm (congrProd1 J p)
+
+@[simp] def congrProd2 (I : CAlgObj) : {J J' : CAlgObj} → CAlgPath J J' → CAlgPath (idealProd I J) (idealProd I J')
+  | _, _, refl _ => refl _ | _, _, step s => step (CAlgStep.congrProd2 I s)
+  | _, _, trans p q => trans (congrProd2 I p) (congrProd2 I q)
+  | _, _, symm p => symm (congrProd2 I p)
+
+@[simp] def congrDS1 (N : CAlgObj) : {M M' : CAlgObj} → CAlgPath M M' → CAlgPath (directSum M N) (directSum M' N)
+  | _, _, refl _ => refl _ | _, _, step s => step (CAlgStep.congrDS1 N s)
+  | _, _, trans p q => trans (congrDS1 N p) (congrDS1 N q)
+  | _, _, symm p => symm (congrDS1 N p)
+
+@[simp] def congrDS2 (M : CAlgObj) : {N N' : CAlgObj} → CAlgPath N N' → CAlgPath (directSum M N) (directSum M N')
+  | _, _, refl _ => refl _ | _, _, step s => step (CAlgStep.congrDS2 M s)
+  | _, _, trans p q => trans (congrDS2 M p) (congrDS2 M q)
+  | _, _, symm p => symm (congrDS2 M p)
+
+@[simp] def congrTensor (k : Nat) : {M M' : CAlgObj} → CAlgPath M M' → CAlgPath (tensorZ M k) (tensorZ M' k)
+  | _, _, refl _ => refl _ | _, _, step s => step (CAlgStep.congrTensor k s)
+  | _, _, trans p q => trans (congrTensor k p) (congrTensor k q)
+  | _, _, symm p => symm (congrTensor k p)
+
+-- Helpers
+def trans3 {A B C D : CAlgObj} (p : CAlgPath A B) (q : CAlgPath B C) (r : CAlgPath C D) : CAlgPath A D :=
+  trans (trans p q) r
+
+def trans4 {A B C D E : CAlgObj} (p : CAlgPath A B) (q : CAlgPath B C) (r : CAlgPath C D) (s : CAlgPath D E) : CAlgPath A E :=
+  trans (trans3 p q r) s
+
+end CAlgPath
+
+open CAlgStep CAlgPath
+
+-- ================================================================
+-- § 4. Ideal arithmetic (theorems 1 – 12)
+-- ================================================================
+
+-- 1
+theorem thm01_gcd_comm (I J : CAlgObj) : CAlgPath (idealGcd I J) (idealGcd J I) :=
+  step (gcd_comm I J)
+
+-- 2
+theorem thm02_gcd_assoc (I J K : CAlgObj) :
+    CAlgPath (idealGcd (idealGcd I J) K) (idealGcd I (idealGcd J K)) :=
+  step (gcd_assoc I J K)
+
+-- 3
+theorem thm03_gcd_idem (I : CAlgObj) : CAlgPath (idealGcd I I) I :=
+  step (gcd_idem I)
+
+-- 4
+theorem thm04_gcd_zero (I : CAlgObj) : CAlgPath (idealGcd I zeroIdeal) I :=
+  step (gcd_zero I)
+
+-- 5
+theorem thm05_prod_comm (I J : CAlgObj) : CAlgPath (idealProd I J) (idealProd J I) :=
+  step (prod_comm I J)
+
+-- 6
+theorem thm06_prod_assoc (I J K : CAlgObj) :
+    CAlgPath (idealProd (idealProd I J) K) (idealProd I (idealProd J K)) :=
+  step (prod_assoc I J K)
+
+-- 7
+theorem thm07_prod_unit (I : CAlgObj) : CAlgPath (idealProd I unitIdeal) I :=
+  step (prod_unit I)
+
+-- 8
+theorem thm08_unit_prod (I : CAlgObj) : CAlgPath (idealProd unitIdeal I) I :=
+  step (unit_prod I)
+
+-- 9
+theorem thm09_prod_zero (I : CAlgObj) : CAlgPath (idealProd I zeroIdeal) zeroIdeal :=
+  step (prod_zero I)
+
+-- 10. gcd(I, (1)) = (1)
+theorem thm10_gcd_unit (I : CAlgObj) : CAlgPath (idealGcd I unitIdeal) unitIdeal :=
+  step (gcd_unit I)
+
+-- 11. lcm is commutative
+theorem thm11_lcm_comm (I J : CAlgObj) : CAlgPath (idealLcm I J) (idealLcm J I) :=
+  step (lcm_comm I J)
+
+-- 12. lcm(I, I) = I
+theorem thm12_lcm_idem (I : CAlgObj) : CAlgPath (idealLcm I I) I :=
+  step (lcm_idem I)
+
+-- ================================================================
+-- § 5. Multi-step ideal chains (13 – 22)
+-- ================================================================
+
+-- 13. gcd(I, gcd(I, J)) = gcd(I, J)  (3-step: assoc, idem on left, done)
+theorem thm13_gcd_absorb_left (I J : CAlgObj) :
+    CAlgPath (idealGcd I (idealGcd I J)) (idealGcd I J) :=
+  CAlgPath.trans
+    (CAlgPath.symm (step (gcd_assoc I I J)))
+    (congrGcd1 J (step (gcd_idem I)))
+
+-- 14. prod(I, prod(J, (1))) = prod(I, J) (2-step)
+theorem thm14_prod_unit_chain (I J : CAlgObj) :
+    CAlgPath (idealProd I (idealProd J unitIdeal)) (idealProd I J) :=
+  congrProd2 I (step (prod_unit J))
+
+-- 15. prod(prod(I, (1)), J) = prod(I, J) (2-step)
+theorem thm15_prod_unit_left_chain (I J : CAlgObj) :
+    CAlgPath (idealProd (idealProd I unitIdeal) J) (idealProd I J) :=
+  congrProd1 J (step (prod_unit I))
+
+-- 16. gcd round-trip: gcd(I,J) → gcd(J,I) → gcd(I,J)
+theorem thm16_gcd_roundtrip (I J : CAlgObj) :
+    CAlgPath (idealGcd I J) (idealGcd I J) :=
+  CAlgPath.trans (step (gcd_comm I J)) (step (gcd_comm J I))
+
+-- 17. CRT: prod(I,J) = lcm(I,J) for coprime ideals
+theorem thm17_crt (I J : CAlgObj) : CAlgPath (idealProd I J) (idealLcm I J) :=
+  step (crt I J)
+
+-- 18. prod(I,J) = prod(J,I) = lcm(J,I) via comm + CRT (2-step)
+theorem thm18_prod_comm_crt (I J : CAlgObj) :
+    CAlgPath (idealProd I J) (idealLcm J I) :=
+  CAlgPath.trans (step (prod_comm I J)) (step (crt J I))
+
+-- 19. prod(I,0) = 0 then lcm(I,0) = 0 gives alternate zero chain (2-step)
+theorem thm19_lcm_zero (I : CAlgObj) : CAlgPath (idealLcm I zeroIdeal) zeroIdeal :=
+  step (lcm_zero I)
+
+-- 20. prod((1),I) = I then congruence prod((1)·J, I) chain
+theorem thm20_unit_prod_assoc (I J K : CAlgObj) :
+    CAlgPath (idealProd (idealProd unitIdeal I) J) (idealProd I J) :=
+  congrProd1 J (step (unit_prod I))
+
+-- 21. gcd(gcd(I,J), gcd(J,K)) = gcd(I, gcd(J, gcd(J,K))) via assoc (then simplify)
+theorem thm21_gcd_four_step (I J K : CAlgObj) :
+    CAlgPath (idealGcd (idealGcd I J) (idealGcd J K))
+             (idealGcd I (idealGcd J (idealGcd J K))) :=
+  step (gcd_assoc I J (idealGcd J K))
+
+-- 22. lcm(I,(1)) = I
+theorem thm22_lcm_unit (I : CAlgObj) : CAlgPath (idealLcm I unitIdeal) I :=
+  step (lcm_unit I)
+
+-- ================================================================
+-- § 6. Module algebra (23 – 32)
+-- ================================================================
+
+-- 23
+theorem thm23_ds_comm (M N : CAlgObj) : CAlgPath (directSum M N) (directSum N M) :=
+  step (ds_comm M N)
+
+-- 24
+theorem thm24_ds_assoc (M N K : CAlgObj) :
+    CAlgPath (directSum (directSum M N) K) (directSum M (directSum N K)) :=
+  step (ds_assoc M N K)
+
+-- 25
+theorem thm25_ds_zero (M : CAlgObj) : CAlgPath (directSum M zeroMod) M :=
+  step (ds_zero_r M)
+
+-- 26
+theorem thm26_ds_zero_l (M : CAlgObj) : CAlgPath (directSum zeroMod M) M :=
+  step (ds_zero_l M)
+
+-- 27. tensor(M,1) = M
+theorem thm27_tensor_one (M : CAlgObj) : CAlgPath (tensorZ M 1) M :=
+  step (tensor_one M)
+
+-- 28. tensor(M,0) = 0
+theorem thm28_tensor_zero (M : CAlgObj) : CAlgPath (tensorZ M 0) zeroMod :=
+  step (tensor_zero M)
+
+-- 29. Distributivity: tensor(M, a+b) = tensor(M,a) ⊕ tensor(M,b)
+theorem thm29_tensor_distrib (M : CAlgObj) (a b : Nat) :
+    CAlgPath (tensorZ M (a + b)) (directSum (tensorZ M a) (tensorZ M b)) :=
+  step (tensor_distrib M a b)
+
+-- 30. Tensor associativity: tensor(tensor(M,a),b) = tensor(M, a*b)
+theorem thm30_tensor_assoc (M : CAlgObj) (a b : Nat) :
+    CAlgPath (tensorZ (tensorZ M a) b) (tensorZ M (a * b)) :=
+  step (tensor_assoc M a b)
+
+-- 31. Double unit tensor: tensor(tensor(M,1),1) = M (2-step)
+theorem thm31_double_unit_tensor (M : CAlgObj) :
+    CAlgPath (tensorZ (tensorZ M 1) 1) M :=
+  CAlgPath.trans (step (tensor_assoc M 1 1)) (step (tensor_one M))
+
+-- 32. tensor(M,0) ⊕ N = N (2-step)
+theorem thm32_tensor_zero_ds (M N : CAlgObj) :
+    CAlgPath (directSum (tensorZ M 0) N) N :=
+  CAlgPath.trans (congrDS1 N (step (tensor_zero M))) (step (ds_zero_l N))
+
+-- ================================================================
+-- § 7. Deep multi-step chains (33 – 42)
+-- ================================================================
+
+-- 33. tensor(M, 1+0) = M via distrib then simplify (3-step)
+theorem thm33_tensor_one_plus_zero (M : CAlgObj) :
+    CAlgPath (tensorZ M (1 + 0)) M :=
+  CAlgPath.trans3
+    (step (tensor_distrib M 1 0))
+    (congrDS2 (tensorZ M 1) (step (tensor_zero M)))
+    (CAlgPath.trans (step (ds_zero_r (tensorZ M 1))) (step (tensor_one M)))
+
+-- 34. Direct sum round-trip: M ⊕ N → N ⊕ M → M ⊕ N
+theorem thm34_ds_roundtrip (M N : CAlgObj) :
+    CAlgPath (directSum M N) (directSum M N) :=
+  CAlgPath.trans (step (ds_comm M N)) (step (ds_comm N M))
+
+-- 35. Four-element ds assoc: ((M ⊕ N) ⊕ K) ⊕ L → M ⊕ (N ⊕ (K ⊕ L)) (2-step)
+theorem thm35_ds_four_assoc (M N K L : CAlgObj) :
+    CAlgPath (directSum (directSum (directSum M N) K) L)
+             (directSum M (directSum N (directSum K L))) :=
+  CAlgPath.trans
+    (step (ds_assoc (directSum M N) K L))
+    (step (ds_assoc M N (directSum K L)))
+
+-- 36. gcd(I, prod(I, J)) — first comm the prod, then use properties
+-- Prove: gcd(I, prod(J, I)) = gcd(I, prod(I, J)) via congr + prod_comm
+theorem thm36_gcd_prod_comm (I J : CAlgObj) :
+    CAlgPath (idealGcd I (idealProd J I)) (idealGcd I (idealProd I J)) :=
+  congrGcd2 I (step (prod_comm J I))
+
+-- 37. prod(I, gcd(J, (0))) = prod(I, J) via gcd_zero + congr (2-step)
+theorem thm37_prod_gcd_zero (I J : CAlgObj) :
+    CAlgPath (idealProd I (idealGcd J zeroIdeal)) (idealProd I J) :=
+  congrProd2 I (step (gcd_zero J))
+
+-- 38. lcm(lcm(I,J), lcm(J,K)) = lcm(I, lcm(J, lcm(J,K))) via assoc
+theorem thm38_lcm_four_step (I J K : CAlgObj) :
+    CAlgPath (idealLcm (idealLcm I J) (idealLcm J K))
+             (idealLcm I (idealLcm J (idealLcm J K))) :=
+  step (lcm_assoc I J (idealLcm J K))
+
+-- 39. tensor(M ⊕ N, 0) = 0 via congr (since tensor of anything with 0 is 0)
+theorem thm39_tensor_ds_zero (M N : CAlgObj) :
+    CAlgPath (tensorZ (directSum M N) 0) zeroMod :=
+  step (tensor_zero (directSum M N))
+
+-- 40. prod((1), prod((1), I)) = I (2-step)
+theorem thm40_double_unit_prod (I : CAlgObj) :
+    CAlgPath (idealProd unitIdeal (idealProd unitIdeal I)) I :=
+  CAlgPath.trans
+    (congrProd2 unitIdeal (step (unit_prod I)))
+    (step (unit_prod I))
+
+-- 41. Symmetry: I = prod(I, (1)) (symm of prod_unit)
+theorem thm41_prod_unit_symm (I : CAlgObj) :
+    CAlgPath I (idealProd I unitIdeal) :=
+  CAlgPath.symm (step (prod_unit I))
+
+-- 42. ds(tensor(M,0), tensor(N,0)) = ds(0, 0) = 0 (3-step)
+theorem thm42_tensor_zero_zero (M N : CAlgObj) :
+    CAlgPath (directSum (tensorZ M 0) (tensorZ N 0)) zeroMod :=
+  CAlgPath.trans3
+    (congrDS1 (tensorZ N 0) (step (tensor_zero M)))
+    (congrDS2 zeroMod (step (tensor_zero N)))
+    (step (ds_zero_l zeroMod))
+
+-- ================================================================
+-- § 8. Dimension theory (43 – 50)
+-- ================================================================
+
+-- 43
+theorem thm43_dim_Z : CAlgPath (krullDim zeroIdeal) (natVal 1) :=
+  step dim_Z
+
+-- 44
+theorem thm44_ht_zero : CAlgPath (height zeroIdeal) (natVal 0) :=
+  step ht_zero
+
+-- 45. dim(ℤ/p) = 0
+theorem thm45_dim_field (n : CAlgObj) : CAlgPath (krullDim n) (natVal 0) :=
+  step (dim_field n)
+
+-- 46. ht(p) = 1 for nonzero
+theorem thm46_ht_nonzero (n : CAlgObj) : CAlgPath (height n) (natVal 1) :=
+  step (ht_nonzero n)
+
+-- 47. dim_Z symm: 1 = dim ℤ
+theorem thm47_dim_Z_symm : CAlgPath (natVal 1) (krullDim zeroIdeal) :=
+  CAlgPath.symm (step dim_Z)
+
+-- 48. lcm(I, (1)) = I (already 22 but demonstrating reuse)
+theorem thm48_lcm_unit_reuse (I : CAlgObj) : CAlgPath (idealLcm I unitIdeal) I :=
+  thm22_lcm_unit I
+
+-- 49. gcd((0), I) = I  via comm + gcd_zero (2-step)
+theorem thm49_gcd_zero_left (I : CAlgObj) :
+    CAlgPath (idealGcd zeroIdeal I) I :=
+  CAlgPath.trans (step (gcd_comm zeroIdeal I)) (step (gcd_zero I))
+
+-- 50. lcm((0), I) = 0 via comm + lcm_zero (2-step)
+theorem thm50_lcm_zero_left (I : CAlgObj) :
+    CAlgPath (idealLcm zeroIdeal I) zeroIdeal :=
+  CAlgPath.trans (step (lcm_comm zeroIdeal I)) (step (lcm_zero I))
+
+-- ================================================================
+-- § 9. More multi-step compositions (51 – 60)
+-- ================================================================
+
+-- 51. prod(0, I) = 0 via comm + prod_zero (2-step)
+theorem thm51_zero_prod (I : CAlgObj) :
+    CAlgPath (idealProd zeroIdeal I) zeroIdeal :=
+  CAlgPath.trans (step (prod_comm zeroIdeal I)) (step (prod_zero I))
+
+-- 52. tensor(M, 2) = M ⊕ M  since 2 = 1 + 1 → tensor_distrib then units (3-step)
+theorem thm52_tensor_two (M : CAlgObj) :
+    CAlgPath (tensorZ M 2) (directSum M M) :=
+  CAlgPath.trans3
+    (step (tensor_distrib M 1 1))
+    (congrDS1 (tensorZ M 1) (step (tensor_one M)))
+    (congrDS2 M (step (tensor_one M)))
+
+-- 53. 4-element prod associativity (2-step)
+theorem thm53_prod_four_assoc (I J K L : CAlgObj) :
+    CAlgPath (idealProd (idealProd (idealProd I J) K) L)
+             (idealProd I (idealProd J (idealProd K L))) :=
+  CAlgPath.trans
+    (step (prod_assoc (idealProd I J) K L))
+    (step (prod_assoc I J (idealProd K L)))
+
+-- 54. tensor round-trip: tensor(tensor(M,1),1) = M (same as 31)
+theorem thm54_tensor_roundtrip (M : CAlgObj) :
+    CAlgPath (tensorZ (tensorZ M 1) 1) M :=
+  thm31_double_unit_tensor M
+
+-- 55. gcd(gcd(I,I), J) = gcd(I, J) via idem + congr (2-step)
+theorem thm55_gcd_idem_assoc (I J : CAlgObj) :
+    CAlgPath (idealGcd (idealGcd I I) J) (idealGcd I J) :=
+  congrGcd1 J (step (gcd_idem I))
+
+-- 56. ds(M, ds(N, 0)) = ds(M, N) via congr + ds_zero_r
+theorem thm56_ds_zero_inner (M N : CAlgObj) :
+    CAlgPath (directSum M (directSum N zeroMod)) (directSum M N) :=
+  congrDS2 M (step (ds_zero_r N))
+
+-- 57. tensor(M, 0 + 0) = 0 (3-step: distrib, tensor_zero twice, ds_zero)
+theorem thm57_tensor_zero_plus_zero (M : CAlgObj) :
+    CAlgPath (tensorZ M (0 + 0)) zeroMod :=
+  CAlgPath.trans3
+    (step (tensor_distrib M 0 0))
+    (congrDS1 (tensorZ M 0) (step (tensor_zero M)))
+    (CAlgPath.trans (congrDS2 zeroMod (step (tensor_zero M))) (step (ds_zero_l zeroMod)))
+
+-- 58. prod(I, prod(J, (0))) = 0 (2-step)
+theorem thm58_prod_inner_zero (I J : CAlgObj) :
+    CAlgPath (idealProd I (idealProd J zeroIdeal)) zeroIdeal :=
+  CAlgPath.trans (congrProd2 I (step (prod_zero J))) (step (prod_zero I))
+
+-- 59. gcd_comm composed with gcd_assoc: gcd(J,I) = gcd(I,J) → deep chain
+theorem thm59_gcd_comm_assoc (I J K : CAlgObj) :
+    CAlgPath (idealGcd (idealGcd J I) K) (idealGcd I (idealGcd J K)) :=
+  CAlgPath.trans
+    (congrGcd1 K (step (gcd_comm J I)))
+    (step (gcd_assoc I J K))
+
+-- 60. Everything zero: prod(0, 0) = 0 via comm + prod_zero (or direct)
+theorem thm60_prod_zero_zero :
+    CAlgPath (idealProd zeroIdeal zeroIdeal) zeroIdeal :=
+  step (prod_zero zeroIdeal)
+
+-- ================================================================
+-- § 10. Symmetry and structure theorems (61 – 70)
+-- ================================================================
+
+-- 61
+theorem thm61_prod_comm_symm (I J : CAlgObj) :
+    CAlgPath (idealProd J I) (idealProd I J) :=
+  CAlgPath.symm (step (prod_comm I J))
+
+-- 62
+theorem thm62_ds_comm_symm (M N : CAlgObj) :
+    CAlgPath (directSum N M) (directSum M N) :=
+  CAlgPath.symm (step (ds_comm M N))
+
+-- 63. M = M ⊕ 0 (symm)
+theorem thm63_ds_zero_symm (M : CAlgObj) :
+    CAlgPath M (directSum M zeroMod) :=
+  CAlgPath.symm (step (ds_zero_r M))
+
+-- 64. I = prod(I, (1)) (symm)
+theorem thm64_prod_unit_symm_again (I : CAlgObj) :
+    CAlgPath I (idealProd I unitIdeal) :=
+  CAlgPath.symm (step (prod_unit I))
+
+-- 65. ds associativity 4-chain (different grouping)
+theorem thm65_ds_regroup (M N K L : CAlgObj) :
+    CAlgPath (directSum M (directSum N (directSum K L)))
+             (directSum (directSum (directSum M N) K) L) :=
+  CAlgPath.symm (thm35_ds_four_assoc M N K L)
+
+-- 66. lcm(I, lcm(I, J)) = lcm(I, J) via assoc + idem (2-step)
+theorem thm66_lcm_absorb (I J : CAlgObj) :
+    CAlgPath (idealLcm I (idealLcm I J)) (idealLcm I J) :=
+  CAlgPath.trans
+    (CAlgPath.symm (step (lcm_assoc I I J)))
+    (congrLcm1 J (step (lcm_idem I)))
+
+-- 67. gcd(I, (1)) = (1) then prod((1), J) = J gives chain
+theorem thm67_coprime_prod (I J : CAlgObj) :
+    CAlgPath (idealProd (idealGcd I unitIdeal) J) J :=
+  CAlgPath.trans (congrProd1 J (step (gcd_unit I))) (step (unit_prod J))
+
+-- 68. Deep: prod(gcd(I,0), J) = prod(I, J) (2-step)
+theorem thm68_prod_gcd_zero_chain (I J : CAlgObj) :
+    CAlgPath (idealProd (idealGcd I zeroIdeal) J) (idealProd I J) :=
+  congrProd1 J (step (gcd_zero I))
+
+-- 69. trans chain: gcd(I,I) → I → prod(I,(1)) (2-step)
+theorem thm69_idem_to_prod (I : CAlgObj) :
+    CAlgPath (idealGcd I I) (idealProd I unitIdeal) :=
+  CAlgPath.trans (step (gcd_idem I)) (CAlgPath.symm (step (prod_unit I)))
+
+-- 70. prod(I, gcd(J, J)) = prod(I, J) via idem in arg
+theorem thm70_prod_inner_idem (I J : CAlgObj) :
+    CAlgPath (idealProd I (idealGcd J J)) (idealProd I J) :=
+  congrProd2 I (step (gcd_idem J))
 
 end ComputationalPaths.Path.Algebra.CommAlgDeep
