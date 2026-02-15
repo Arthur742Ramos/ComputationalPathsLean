@@ -55,8 +55,7 @@ def unitOnAction {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
 
 @[simp] theorem unitOnAction_eq_unitActionPath
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
-    E.unitOnAction c xs = E.base.unitActionPath (E.base.act c xs) := by
-  sorry
+    E.unitOnAction c xs = E.base.unitActionPath (E.base.act c xs) := rfl
 
 /-- Round-trip loop formed from the unit-action witness on an output. -/
 def actionUnitRoundTrip {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
@@ -68,8 +67,7 @@ def actionUnitRoundTrip {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
 @[simp] theorem actionUnitRoundTrip_eq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     E.actionUnitRoundTrip c xs =
-      Path.trans (E.unitOnAction c xs) (Path.symm (E.unitOnAction c xs)) := by
-  sorry
+      Path.trans (E.unitOnAction c xs) (Path.symm (E.unitOnAction c xs)) := rfl
 
 @[simp] theorem action_unit_roundtrip_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
@@ -87,8 +85,8 @@ theorem action_unit_roundtrip_left_refl_rweq
         (Path.refl
           (E.base.act (LittleCubesOperad.identityCube n) (fun _ => E.base.act c xs)))
         (E.actionUnitRoundTrip c xs))
-      (E.actionUnitRoundTrip c xs) := by
-  sorry
+      (E.actionUnitRoundTrip c xs) :=
+  rweq_cmpA_refl_left (p := E.actionUnitRoundTrip c xs)
 
 theorem action_unit_roundtrip_right_refl_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
@@ -97,8 +95,8 @@ theorem action_unit_roundtrip_right_refl_rweq
         (E.actionUnitRoundTrip c xs)
         (Path.refl
           (E.base.act (LittleCubesOperad.identityCube n) (fun _ => E.base.act c xs))))
-      (E.actionUnitRoundTrip c xs) := by
-  sorry
+      (E.actionUnitRoundTrip c xs) :=
+  rweq_cmpA_refl_right (p := E.actionUnitRoundTrip c xs)
 
 theorem unit_on_action_assoc_with_refl
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
@@ -108,23 +106,23 @@ theorem unit_on_action_assoc_with_refl
         (Path.symm (E.unitOnAction c xs)))
       (Path.trans
         (E.unitOnAction c xs)
-        (Path.trans (Path.refl (E.base.act c xs)) (Path.symm (E.unitOnAction c xs)))) := by
-  sorry
+        (Path.trans (Path.refl (E.base.act c xs)) (Path.symm (E.unitOnAction c xs)))) :=
+  rweq_cmpA_assoc (p := E.unitOnAction c xs) (q := Path.refl _) (r := Path.symm (E.unitOnAction c xs))
 
 theorem unit_on_action_inverse_right_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     RwEq
       (Path.trans (E.unitOnAction c xs) (Path.symm (E.unitOnAction c xs)))
       (Path.refl
-        (E.base.act (LittleCubesOperad.identityCube n) (fun _ => E.base.act c xs))) := by
-  sorry
+        (E.base.act (LittleCubesOperad.identityCube n) (fun _ => E.base.act c xs))) :=
+  rweq_cmpA_inv_right (E.unitOnAction c xs)
 
 theorem unit_on_action_inverse_left_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     RwEq
       (Path.trans (Path.symm (E.unitOnAction c xs)) (E.unitOnAction c xs))
-      (Path.refl (E.base.act c xs)) := by
-  sorry
+      (Path.refl (E.base.act c xs)) :=
+  rweq_cmpA_inv_left (E.unitOnAction c xs)
 
 theorem iterated_unit_left_refl_rweq (x : A) :
     RwEq
@@ -133,8 +131,8 @@ theorem iterated_unit_left_refl_rweq (x : A) :
           (E.base.act (LittleCubesOperad.identityCube n) (fun _ =>
             E.base.act (LittleCubesOperad.identityCube n) (fun _ => x))))
         (E.iteratedUnitPath x))
-      (E.iteratedUnitPath x) := by
-  sorry
+      (E.iteratedUnitPath x) :=
+  rweq_cmpA_refl_left (p := E.iteratedUnitPath x)
 
 end EnOperadAlgebraPathData
 
@@ -178,7 +176,6 @@ def EnOperadAlgebraPathData.trivial (n : Nat) : EnOperadAlgebraPathData n Unit :
     (n : Nat) {A : Type u}
     (base : AlgebraOverOperadPathData (LittleCubesOperad.enOperad n) A) :
     (EnOperadAlgebraPathData.ofBase n base).base = base := by
-  sorry
 
 @[simp] theorem EnOperadAlgebraPathData.ofBase_iteratedUnitPath
     (n : Nat) {A : Type u}
@@ -188,19 +185,16 @@ def EnOperadAlgebraPathData.trivial (n : Nat) : EnOperadAlgebraPathData n Unit :
       Path.trans
         (base.unitActionPath (base.act (LittleCubesOperad.identityCube n) (fun _ => x)))
         (base.unitActionPath x) := by
-  sorry
 
 @[simp] theorem EnOperadAlgebraPathData.ofEnAlgebra_base_act
     (n : Nat)
     (A : LittleCubesOperad.EnAlgebra n)
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A.carrier) :
     (EnOperadAlgebraPathData.ofEnAlgebra n A).base.act c xs = A.act c xs := by
-  sorry
 
 @[simp] theorem EnOperadAlgebraPathData.trivial_base_act
     (n : Nat) {k : Nat} (c : EnSpace n k) (xs : Fin k → Unit) :
     (EnOperadAlgebraPathData.trivial n).base.act c xs = () := by
-  sorry
 
 end OperadicAlgebra
 end ComputationalPaths

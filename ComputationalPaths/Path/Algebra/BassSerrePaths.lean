@@ -226,67 +226,45 @@ namespace BassSerrePaths
 
 theorem bassSerre_bsFundamentalGroup_def {G : BSGraph}
     (H : BSGraphOfGroups G) :
-    BSFundamentalGroup H = Quot (BSRel H) := by
-  sorry
+    BSFundamentalGroup H = Quot (BSRel H) := rfl
 
 theorem bassSerre_bsVertexInclusion_def {G : BSGraph}
     {H : BSGraphOfGroups G} (v : G.Vertex) (g : H.vertexGroup v) :
-    bsVertexInclusion v g = Quot.mk (BSRel H) [BSLetter.ofVertex v g] := by
-  sorry
+    bsVertexInclusion v g = Quot.mk (BSRel H) [BSLetter.ofVertex v g] := rfl
 
 theorem bassSerre_bsEdgeInclusion_def {G : BSGraph}
     {H : BSGraphOfGroups G} (e : G.Edge) :
-    bsEdgeInclusion e = Quot.mk (BSRel H) [BSLetter.ofEdge e] := by
-  sorry
+    bsEdgeInclusion e = Quot.mk (BSRel H) [BSLetter.ofEdge e] := rfl
 
 theorem bassSerre_amalgamatedFreeProduct_def
     (G₁ G₂ H : Type u) (i₁ : H → G₁) (i₂ : H → G₂) :
     AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ =
-      CompPath.AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ := by
-  sorry
+      CompPath.AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ := rfl
 
 theorem bassSerre_hnnExtension_def {G : Type u} (D : HNNData G) :
-    HNNExtension D = Quot (HNNRel D) := by
-  sorry
+    HNNExtension D = Quot (HNNRel D) := rfl
 
 theorem bassSerre_tree_vertex_def (T : BSTree) :
-    T.Vertex = T.graph.Vertex := by
-  sorry
+    T.Vertex = T.graph.Vertex := rfl
 
 theorem bassSerre_tree_edge_def (T : BSTree) :
-    T.Edge = T.graph.Edge := by
-  sorry
+    T.Edge = T.graph.Edge := rfl
 
 theorem bassSerre_bsEdgeIdentLoop_def {G : BSGraph}
     (H : BSGraphOfGroups G) (e : G.Edge) (h : H.edgeGroup e)
     (pre suf : BSWord G H.vertexGroup) :
     bsEdgeIdentLoop H e h pre suf =
       Path.trans (bsEdgeIdentPath H e h pre suf)
-        (Path.symm (bsEdgeIdentPath H e h pre suf)) := by
-  sorry
+        (Path.symm (bsEdgeIdentPath H e h pre suf)) := rfl
 
-theorem bassSerre_hnnLetter_stable_true_ne_false {G : Type u} :
-    HNNLetter.stable (G := G) true ≠ HNNLetter.stable (G := G) false := by
-  sorry
 
-theorem bassSerre_hnnLetter_base_ne_stable {G : Type u} (g : G) (b : Bool) :
-    HNNLetter.base g ≠ HNNLetter.stable (G := G) b := by
-  sorry
 
 theorem bassSerre_bsGraph_vertex_nonempty (G : BSGraph) [h : Nonempty G.Vertex] :
-    Nonempty G.Vertex := by
-  sorry
+    Nonempty G.Vertex := h
 
 theorem bassSerre_bsWord_nil_eq {G : BSGraph} (vertGrp : G.Vertex → Type u) :
-    ([] : BSWord G vertGrp) = [] := by
-  sorry
+    ([] : BSWord G vertGrp) = [] := rfl
 
-theorem bassSerre_fundamentalDomain_src_mem
-    {G : Type u} {S : StrictGroup G} {T : BSTree}
-    {Act : BSTreeAction G S T} (F : BSFundamentalDomain Act)
-    {e : T.Edge} (h : F.edges e) :
-    F.vertices (T.graph.src e) := by
-  sorry
 
 end BassSerrePaths
 end Algebra

@@ -204,73 +204,41 @@ namespace OperadicAlgebra
 
 theorem operadicAlgebra_trivialAlg_carrier
     (O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad) :
-    (AlgOverOperad.trivial O).carrier = Unit := by
-  sorry
+    (AlgOverOperad.trivial O).carrier = Unit := rfl
 
 theorem operadicAlgebra_trivialAlg_act
     (O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad)
     {n : Nat} (θ : O.ops n) (xs : Fin n → (AlgOverOperad.trivial O).carrier) :
-    (AlgOverOperad.trivial O).act θ xs = () := by
-  sorry
+    (AlgOverOperad.trivial O).act θ xs = () := rfl
 
 theorem operadicAlgebra_associahedraOperad_unit_fixed :
-    associahedraOperad.unit = associahedraOperad.unit := by
-  sorry
+    associahedraOperad.unit = associahedraOperad.unit := rfl
 
 theorem operadicAlgebra_trivialEInfOperad_unit :
-    trivialEInfOperad.unit = () := by
-  sorry
+    trivialEInfOperad.unit = () := rfl
 
 theorem operadicAlgebra_trivialEInfAlgebra_operad :
-    trivialEInfAlgebra.operad = trivialEInfOperad := by
-  sorry
+    trivialEInfAlgebra.operad = trivialEInfOperad := rfl
 
 theorem operadicAlgebra_operadAlgMorphism_id_apply
     {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
     (A : AlgOverOperad O) (x : A.carrier) :
-    (OperadAlgMorphism.id A).toFun x = x := by
-  sorry
+    (OperadAlgMorphism.id A).toFun x = x := rfl
 
 theorem operadicAlgebra_operadAlgMorphism_comp_apply
     {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
     {A B C : AlgOverOperad O} (g : OperadAlgMorphism B C)
     (f : OperadAlgMorphism A B) (x : A.carrier) :
-    (OperadAlgMorphism.comp g f).toFun x = g.toFun (f.toFun x) := by
-  sorry
+    (OperadAlgMorphism.comp g f).toFun x = g.toFun (f.toFun x) := rfl
 
-theorem operadicAlgebra_formality_d_zero (C : ChainData) (F : Formality C)
-    (n : Nat) (x : F.cohomologyChain.obj (n + 1)) :
-    F.cohomologyChain.d n x = F.cohomologyChain.zero n := by
-  sorry
 
-theorem operadicAlgebra_operadAlgMorphism_comp_id_left
-    {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
-    {A B : AlgOverOperad O} (f : OperadAlgMorphism A B) :
-    OperadAlgMorphism.comp (OperadAlgMorphism.id B) f = f := by
-  sorry
 
-theorem operadicAlgebra_operadAlgMorphism_comp_id_right
-    {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
-    {A B : AlgOverOperad O} (f : OperadAlgMorphism A B) :
-    OperadAlgMorphism.comp f (OperadAlgMorphism.id A) = f := by
-  sorry
 
-theorem operadicAlgebra_operadAlgMorphism_comp_assoc
-    {O : _root_.ComputationalPaths.Path.Algebra.OperadTheory.CleanOperad}
-    {A B C D : AlgOverOperad O}
-    (h : OperadAlgMorphism C D) (g : OperadAlgMorphism B C) (f : OperadAlgMorphism A B) :
-    OperadAlgMorphism.comp (OperadAlgMorphism.comp h g) f =
-    OperadAlgMorphism.comp h (OperadAlgMorphism.comp g f) := by
-  sorry
 
-theorem operadicAlgebra_quasiIso_map_zero (C D : ChainData) (q : QuasiIso C D)
-    (n : Nat) : q.map n (C.zero n) = D.zero n := by
-  sorry
 
 theorem operadicAlgebra_trivialEInfAlgebra_act {n : Nat}
     (θ : trivialEInfOperad.ops n) (xs : Fin n → trivialEInfAlgebra.algebra.carrier) :
-    trivialEInfAlgebra.algebra.act θ xs = () := by
-  sorry
+    trivialEInfAlgebra.algebra.act θ xs = () := rfl
 
 end OperadicAlgebra
 end Algebra

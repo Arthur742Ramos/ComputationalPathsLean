@@ -72,48 +72,42 @@ def unit_right_one (x : A) : Path (S.mul [x, S.unit]) (S.mul [x]) :=
   S.unit_right [x]
 
 /-- Expansion of unary multiplication. -/
-theorem mul1_def (x : A) : S.mul1 x = S.mul [x] := by
-  sorry
+theorem mul1_def (x : A) : S.mul1 x = S.mul [x] := rfl
 
 /-- Expansion of binary multiplication. -/
-theorem mul2_def (x y : A) : S.mul2 x y = S.mul [x, y] := by
-  sorry
+theorem mul2_def (x y : A) : S.mul2 x y = S.mul [x, y] := rfl
 
 /-- Expansion of ternary multiplication. -/
-theorem mul3_def (x y z : A) : S.mul3 x y z = S.mul [x, y, z] := by
-  sorry
+theorem mul3_def (x y z : A) : S.mul3 x y z = S.mul [x, y, z] := rfl
 
 /-- Left unit law on the empty list specialization. -/
-theorem unit_left_nil : S.mul [S.unit] = S.mul ([] : List A) := by
-  sorry
+theorem unit_left_nil : S.mul [S.unit] = S.mul ([] : List A) :=
+  (S.unit_left []).toEq
 
 /-- Right unit law on the empty list specialization. -/
-theorem unit_right_nil : S.mul [S.unit] = S.mul ([] : List A) := by
-  sorry
+theorem unit_right_nil : S.mul [S.unit] = S.mul ([] : List A) :=
+  (S.unit_right []).toEq
 
 /-- Specialization of associativity to a singleton inserted term. -/
-theorem assoc_singleton (x : A) : S.mul [S.mul [x]] = S.mul [x] := by
-  sorry
+theorem assoc_singleton (x : A) : S.mul [S.mul [x]] = S.mul [x] :=
+  (S.assoc [] [x] []).toEq
 
 /-- Binary associator stated directly. -/
 theorem assoc_binary_left_nested (x y z : A) :
-    S.mul [S.mul [x, y], z] = S.mul [x, y, z] := by
-  sorry
+    S.mul [S.mul [x, y], z] = S.mul [x, y, z] :=
+  (S.assoc [] [x, y] [z]).toEq
 
 /-- `mul2_assoc` agrees with the underlying associator specialization. -/
 theorem mul2_assoc_eq_assoc (x y z : A) :
-    S.mul2_assoc x y z = S.assoc [] [x, y] [z] := by
-  sorry
+    S.mul2_assoc x y z = S.assoc [] [x, y] [z] := rfl
 
 /-- `unit_left_one` agrees with `unit_left` specialized to singleton lists. -/
 theorem unit_left_one_eq (x : A) :
-    S.unit_left_one x = S.unit_left [x] := by
-  sorry
+    S.unit_left_one x = S.unit_left [x] := rfl
 
 /-- `unit_right_one` agrees with `unit_right` specialized to singleton lists. -/
 theorem unit_right_one_eq (x : A) :
-    S.unit_right_one x = S.unit_right [x] := by
-  sorry
+    S.unit_right_one x = S.unit_right [x] := rfl
 
 end AInfinityAlgebra
 
@@ -141,18 +135,18 @@ instance : CoeFun (AInfinityHom A B S T) (fun _ => A → B) :=
 
 /-- Morphisms preserve nullary multiplication. -/
 theorem map_mul_nil (f : AInfinityHom A B S T) :
-    f (S.mul []) = T.mul ([] : List B) := by
-  sorry
+    f (S.mul []) = T.mul ([] : List B) :=
+  (f.map_mul []).toEq
 
 /-- Morphisms preserve unary multiplication. -/
 theorem map_mul_singleton (f : AInfinityHom A B S T) (x : A) :
-    f (S.mul [x]) = T.mul [f x] := by
-  sorry
+    f (S.mul [x]) = T.mul [f x] :=
+  (f.map_mul [x]).toEq
 
 /-- Morphisms preserve binary multiplication. -/
 theorem map_mul_pair (f : AInfinityHom A B S T) (x y : A) :
-    f (S.mul [x, y]) = T.mul [f x, f y] := by
-  sorry
+    f (S.mul [x, y]) = T.mul [f x, f y] :=
+  (f.map_mul [x, y]).toEq
 
 end AInfinityHom
 

@@ -91,20 +91,20 @@ def empty (M : LeftModule A) : Submodule M where
 /-- Submodule membership is stable under reflexive action. -/
 theorem mem_act_refl (S : Submodule M) {a : A} {x : M.carrier a}
     (hx : S.carrier a x) :
-    S.carrier a (M.act (Path.refl a) x) := by
-  sorry
+    S.carrier a (M.act (Path.refl a) x) :=
+  S.stable (Path.refl a) hx
 
 /-- Submodule membership is stable under composed actions. -/
 theorem mem_act_trans (S : Submodule M) {a b c : A}
     (p : Path a b) (q : Path b c) {x : M.carrier a}
     (hx : S.carrier a x) :
-    S.carrier c (M.act (Path.trans p q) x) := by
-  sorry
+    S.carrier c (M.act (Path.trans p q) x) :=
+  S.stable (Path.trans p q) hx
 
 /-- The empty submodule has no inhabitants. -/
 theorem empty_not_mem (a : A) (x : M.carrier a) :
-    ¬ (empty M).carrier a x := by
-  sorry
+    ¬ (empty M).carrier a x :=
+  False.elim
 
 /-- Restrict a left module to a submodule. -/
 def subtype (S : Submodule M) : LeftModule A where
@@ -155,26 +155,26 @@ def quotient {M : LeftModule A} (R : QuotientRel M) : LeftModule A where
 
 /-- Reflexive action can be read backwards as a naturality witness. -/
 theorem act_refl_backward (M : LeftModule A) (a : A) (x : M.carrier a) :
-    Nonempty (Path x (M.act (Path.refl a) x)) := by
-  sorry
+    Nonempty (Path x (M.act (Path.refl a) x)) :=
+  ⟨Path.symm (M.act_refl a x)⟩
 
 /-- The left action is functorial with respect to path composition. -/
 theorem act_trans_assoc (M : LeftModule A) {a b c : A} (p : Path a b) (q : Path b c)
     (x : M.carrier a) :
-    Nonempty (Path (M.act (Path.trans p q) x) (M.act q (M.act p x))) := by
-  sorry
+    Nonempty (Path (M.act (Path.trans p q) x) (M.act q (M.act p x))) :=
+  ⟨M.act_trans p q x⟩
 
 /-- Composing a path with reflexivity on the left does not change the action. -/
 theorem act_trans_refl_left (M : LeftModule A) {a b : A} (p : Path a b)
     (x : M.carrier a) :
-    Nonempty (Path (M.act (Path.trans (Path.refl a) p) x) (M.act p x)) := by
-  sorry
+    Nonempty (Path (M.act (Path.trans (Path.refl a) p) x) (M.act p x)) :=
+  ⟨Path.stepChain (congrArg (fun q => M.act q x) (Path.trans_refl_left p))⟩
 
 /-- Composing a path with reflexivity on the right does not change the action. -/
 theorem act_trans_refl_right (M : LeftModule A) {a b : A} (p : Path a b)
     (x : M.carrier a) :
-    Nonempty (Path (M.act (Path.trans p (Path.refl b)) x) (M.act p x)) := by
-  sorry
+    Nonempty (Path (M.act (Path.trans p (Path.refl b)) x) (M.act p x)) :=
+  ⟨Path.stepChain (congrArg (fun q => M.act q x) (Path.trans_refl_right p))⟩
 
 end LeftModule
 
@@ -245,20 +245,20 @@ def empty (M : RightModule A) : Submodule M where
 /-- Submodule membership is stable under reflexive action. -/
 theorem mem_act_refl (S : Submodule M) {a : A} {x : M.carrier a}
     (hx : S.carrier a x) :
-    S.carrier a (M.act (Path.refl a) x) := by
-  sorry
+    S.carrier a (M.act (Path.refl a) x) :=
+  S.stable (Path.refl a) hx
 
 /-- Submodule membership is stable under composed actions. -/
 theorem mem_act_trans (S : Submodule M) {a b c : A}
     (p : Path a b) (q : Path b c) {x : M.carrier c}
     (hx : S.carrier c x) :
-    S.carrier a (M.act (Path.trans p q) x) := by
-  sorry
+    S.carrier a (M.act (Path.trans p q) x) :=
+  S.stable (Path.trans p q) hx
 
 /-- The empty submodule has no inhabitants. -/
 theorem empty_not_mem (a : A) (x : M.carrier a) :
-    ¬ (empty M).carrier a x := by
-  sorry
+    ¬ (empty M).carrier a x :=
+  False.elim
 
 /-- Restrict a right module to a submodule. -/
 def subtype (S : Submodule M) : RightModule A where
@@ -309,26 +309,26 @@ def quotient {M : RightModule A} (R : QuotientRel M) : RightModule A where
 
 /-- Reflexive action can be read backwards as a naturality witness. -/
 theorem act_refl_backward (M : RightModule A) (a : A) (x : M.carrier a) :
-    Nonempty (Path x (M.act (Path.refl a) x)) := by
-  sorry
+    Nonempty (Path x (M.act (Path.refl a) x)) :=
+  ⟨Path.symm (M.act_refl a x)⟩
 
 /-- The right action is functorial with respect to path composition. -/
 theorem act_trans_assoc (M : RightModule A) {a b c : A} (p : Path a b) (q : Path b c)
     (x : M.carrier c) :
-    Nonempty (Path (M.act (Path.trans p q) x) (M.act p (M.act q x))) := by
-  sorry
+    Nonempty (Path (M.act (Path.trans p q) x) (M.act p (M.act q x))) :=
+  ⟨M.act_trans p q x⟩
 
 /-- Composing a path with reflexivity on the left does not change the action. -/
 theorem act_trans_refl_left (M : RightModule A) {a b : A} (p : Path a b)
     (x : M.carrier b) :
-    Nonempty (Path (M.act (Path.trans (Path.refl a) p) x) (M.act p x)) := by
-  sorry
+    Nonempty (Path (M.act (Path.trans (Path.refl a) p) x) (M.act p x)) :=
+  ⟨Path.stepChain (congrArg (fun q => M.act q x) (Path.trans_refl_left p))⟩
 
 /-- Composing a path with reflexivity on the right does not change the action. -/
 theorem act_trans_refl_right (M : RightModule A) {a b : A} (p : Path a b)
     (x : M.carrier b) :
-    Nonempty (Path (M.act (Path.trans p (Path.refl b)) x) (M.act p x)) := by
-  sorry
+    Nonempty (Path (M.act (Path.trans p (Path.refl b)) x) (M.act p x)) :=
+  ⟨Path.stepChain (congrArg (fun q => M.act q x) (Path.trans_refl_right p))⟩
 
 end RightModule
 
@@ -364,8 +364,8 @@ def tensor_rel {A : Type u} {R : RightModule.{u, v} A} {L : LeftModule.{u, w} A}
 theorem tensor_rel_symm {A : Type u} {R : RightModule.{u, v} A} {L : LeftModule.{u, w} A}
     {a b : A} (p : Path a b) (r : R.carrier b) (l : L.carrier a) :
     Nonempty (Path (tensorMk (r := r) (l := L.act p l))
-      (tensorMk (r := R.act p r) (l := l))) := by
-  sorry
+      (tensorMk (r := R.act p r) (l := l))) :=
+  ⟨Path.symm (tensor_rel p r l)⟩
 
 /-! ## Summary -/
 

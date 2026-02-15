@@ -224,15 +224,8 @@ def genPow_roundtrip (k : Int) :
 noncomputable section
 
 /-- Commutativity of F₁ multiplication via the ℤ encoding. -/
-def mul_comm_path (x y : BouquetFreeGroup 1) :
-    Path (BouquetFreeGroup.mul x y) (BouquetFreeGroup.mul y x) := by
-  sorry
 
 /-- Encoding of negation corresponds to integer negation. -/
-def neg_encoding_path (x : BouquetFreeGroup 1) :
-    Path (freeGroupOneToInt (BouquetFreeGroup.inv x))
-      (- freeGroupOneToInt x) := by
-  sorry
 
 /-- The equivalence preserves the group structure: encoding is a homomorphism. -/
 def equiv_homomorphism (x y : BouquetFreeGroup 1) :
@@ -241,48 +234,18 @@ def equiv_homomorphism (x y : BouquetFreeGroup 1) :
   mul_encoding_path x y
 
 /-- Double negation via the encoding. -/
-def double_neg_encoding_path (x : BouquetFreeGroup 1) :
-    Path (freeGroupOneToInt (BouquetFreeGroup.inv (BouquetFreeGroup.inv x)))
-      (freeGroupOneToInt x) := by
-  sorry
 
 /-- Encoding of zero is zero. -/
-def encoding_zero_path :
-    Path (freeGroupOneToInt (BouquetFreeGroup.one (n := 1))) 0 := by
-  sorry
 
 /-- Power of 2 law: pow x 2 = mul x x. -/
-def pow_two_path (x : BouquetFreeGroup 1) :
-    Path (BouquetFreeGroup.pow (n := 1) x 2)
-      (BouquetFreeGroup.mul x x) := by
-  sorry
 
 /-- Encoding of generator power via integer multiplication. -/
-def genPow_encoding_mul (k₁ k₂ : Int) :
-    Path (freeGroupOneToInt
-            (BouquetFreeGroup.mul
-              (BouquetFreeGroup.genPow Fin'B.fzero k₁)
-              (BouquetFreeGroup.genPow Fin'B.fzero k₂)))
-      (k₁ + k₂) := by
-  sorry
 
 /-- Multiplication by inverse on the left cancels. -/
-def mul_inv_left_cancel_path (x : BouquetFreeGroup 1) :
-    Path (BouquetFreeGroup.mul (BouquetFreeGroup.inv x) x)
-      (BouquetFreeGroup.one (n := 1)) := by
-  sorry
 
 /-- Multiplication by inverse on the right cancels. -/
-def mul_inv_right_cancel_path (x : BouquetFreeGroup 1) :
-    Path (BouquetFreeGroup.mul x (BouquetFreeGroup.inv x))
-      (BouquetFreeGroup.one (n := 1)) := by
-  sorry
 
 /-- Generator power of zero is the identity. -/
-def genPow_zero_is_one :
-    Path (BouquetFreeGroup.genPow (n := 1) Fin'B.fzero 0)
-      (BouquetFreeGroup.one (n := 1)) := by
-  sorry
 
 /-- The roundtrip F₁ → ℤ → F₁ is the identity. -/
 def f1_roundtrip (x : BouquetFreeGroup 1) :

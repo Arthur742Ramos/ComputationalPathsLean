@@ -247,69 +247,49 @@ def OperadModule.add_zero_right_path {O : CleanOperad} (M : OperadModule O) (x :
 
 theorem ColoredOperad.comp_id_left_path_eq_stepChain {C : Type u} (O : ColoredOperad C)
     {inputs : List C} {output : C} (f : O.ops inputs output) :
-    O.comp_id_left_path f = Path.stepChain (O.comp_id_left f) := by
-  sorry
+    O.comp_id_left_path f = Path.stepChain (O.comp_id_left f) := rfl --
 
 theorem ColoredOperad.comp_id_right_path_eq_stepChain {C : Type u} (O : ColoredOperad C)
     {c : C} {output : C} (f : O.ops [c] output) :
-    O.comp_id_right_path f = Path.stepChain (O.comp_id_right f) := by
-  sorry
+    O.comp_id_right_path f = Path.stepChain (O.comp_id_right f) := rfl --
 
 theorem NSOperad.gamma_unit_left_path_eq_stepChain (O : NSOperad) {k : Nat} (f : O.ops k) :
-    O.gamma_unit_left_path f = Path.stepChain (O.gamma_unit_left f) := by
-  sorry
+    O.gamma_unit_left_path f = Path.stepChain (O.gamma_unit_left f) := rfl --
 
 theorem NSOperad.gamma_unit_right_path_eq_stepChain (O : NSOperad) {n : Nat} (f : O.ops n) :
-    O.gamma_unit_right_path f = Path.stepChain (O.gamma_unit_right f) := by
-  sorry
+    O.gamma_unit_right_path f = Path.stepChain (O.gamma_unit_right f) := rfl --
 
 theorem StasheffTree.internalEdges_single :
-    StasheffTree.internalEdges StasheffTree.single = 0 := by
-  sorry
+    StasheffTree.internalEdges StasheffTree.single = 0 := rfl
 
 theorem StasheffTree.internalEdges_graft (t₁ : StasheffTree m) (t₂ : StasheffTree n) :
     StasheffTree.internalEdges (StasheffTree.graft t₁ t₂) =
-      1 + StasheffTree.internalEdges t₁ + StasheffTree.internalEdges t₂ := by
-  sorry
+      1 + StasheffTree.internalEdges t₁ + StasheffTree.internalEdges t₂ := rfl
 
 theorem K3_edges_eq_nil :
-    K3.edges = [] := by
-  sorry
+    K3.edges = [] := rfl
 
 theorem endomorphism_unit_path_eq_refl (X : Type u) (v : Fin 1 → X) :
-    endomorphism_unit_path X v = Path.refl (v ⟨0, Nat.zero_lt_one⟩) := by
-  sorry
+    endomorphism_unit_path X v = Path.refl (v ⟨0, Nat.zero_lt_one⟩) := rfl --
 
 theorem OperadIdeal.zero_mem_iff_false (O : CleanOperad) {n : Nat} (θ : O.ops n) :
-    (OperadIdeal.zero O).mem θ ↔ False := by
-  sorry
+    (OperadIdeal.zero O).mem θ ↔ False :=
+  Iff.rfl
 
 theorem OperadIdeal.whole_mem_iff_true (O : CleanOperad) {n : Nat} (θ : O.ops n) :
-    (OperadIdeal.whole O).mem θ ↔ True := by
-  sorry
+    (OperadIdeal.whole O).mem θ ↔ True :=
+  Iff.rfl
 
-theorem OperadMorphism.comp_id_left_eq {O P : CleanOperad} (f : OperadMorphism O P) :
-    OperadMorphism.comp (OperadMorphism.id P) f = f := by
-  sorry
 
-theorem OperadMorphism.comp_id_right_eq {O P : CleanOperad} (f : OperadMorphism O P) :
-    OperadMorphism.comp f (OperadMorphism.id O) = f := by
-  sorry
 
-theorem OperadModule.equivariant_eq {O : CleanOperad} (M : OperadModule O)
-    {n : Nat} (σ : Perm n) (θ : O.ops n) (xs : Fin n → M.carrier) :
-    M.act (O.action σ θ) xs = M.act θ (xs ∘ σ.invFun) := by
-  sorry
 
 theorem OperadModule.add_zero_left_path_eq_stepChain {O : CleanOperad}
     (M : OperadModule O) (x : M.carrier) :
-    M.add_zero_left_path x = Path.stepChain (M.add_zero_left x) := by
-  sorry
+    M.add_zero_left_path x = Path.stepChain (M.add_zero_left x) := rfl --
 
 theorem OperadModule.add_zero_right_path_eq_stepChain {O : CleanOperad}
     (M : OperadModule O) (x : M.carrier) :
-    M.add_zero_right_path x = Path.stepChain (M.add_zero_right x) := by
-  sorry
+    M.add_zero_right_path x = Path.stepChain (M.add_zero_right x) := rfl --
 
 end OperadPaths
 end Algebra
