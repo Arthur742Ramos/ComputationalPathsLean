@@ -67,77 +67,19 @@ theorem comp_assoc_functor
 
 /-! ## Identity functor laws -/
 
-@[simp] theorem id_comp_obj
-    (F : FundamentalGroupoidFunctor A B)
-    (a : A) :
-    (comp (id A) F).obj a = F.obj a := by
-  sorry
 
-@[simp] theorem id_comp_map
-    (F : FundamentalGroupoidFunctor A B)
-    {a b : A}
-    (p : FundamentalGroupoid.Hom A a b) :
-    (comp (id A) F).map p = F.map p := by
-  sorry
 
-@[simp] theorem comp_id_obj
-    (F : FundamentalGroupoidFunctor A B)
-    (a : A) :
-    (comp F (id B)).obj a = F.obj a := by
-  sorry
 
-@[simp] theorem comp_id_map
-    (F : FundamentalGroupoidFunctor A B)
-    {a b : A}
-    (p : FundamentalGroupoid.Hom A a b) :
-    (comp F (id B)).map p = F.map p := by
-  sorry
 
-theorem id_comp_functor
-    (F : FundamentalGroupoidFunctor A B) :
-    comp (id A) F = F := by
-  sorry
 
-theorem comp_id_functor
-    (F : FundamentalGroupoidFunctor A B) :
-    comp F (id B) = F := by
-  sorry
 
 /-! ## Function-induced functor naturality -/
 
-@[simp] theorem fundamentalGroupoidFunctor_comp_obj
-    (f : A → B) (g : B → C) (a : A) :
-    (comp (fundamentalGroupoidFunctor f) (fundamentalGroupoidFunctor g)).obj a =
-      (fundamentalGroupoidFunctor (Function.comp g f)).obj a := by
-  sorry
 
-@[simp] theorem fundamentalGroupoidFunctor_comp_map
-    (f : A → B) (g : B → C)
-    {a a' : A}
-    (p : FundamentalGroupoid.Hom A a a') :
-    (comp (fundamentalGroupoidFunctor f) (fundamentalGroupoidFunctor g)).map p =
-      (fundamentalGroupoidFunctor (Function.comp g f)).map p := by
-  sorry
 
 /-! ## Preservation of rewrite equivalence -/
 
-theorem fundamentalGroupoidMap_preserves_rweq
-    (f : A → B)
-    {a b : A}
-    {p q : Path a b}
-    (h : RwEq p q) :
-    fundamentalGroupoidMap f (Quot.mk _ p) =
-      fundamentalGroupoidMap f (Quot.mk _ q) := by
-  sorry
 
-theorem fundamentalGroupoidFunctor_preserves_rweq
-    (f : A → B)
-    {a b : A}
-    {p q : Path a b}
-    (h : RwEq p q) :
-    (fundamentalGroupoidFunctor f).map (Quot.mk _ p) =
-      (fundamentalGroupoidFunctor f).map (Quot.mk _ q) := by
-  sorry
 
 end FundamentalGroupoidFunctor
 

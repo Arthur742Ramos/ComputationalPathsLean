@@ -31,7 +31,6 @@ import ComputationalPaths.Path.Homotopy.LSCategory
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Algebra.TorFunctor
 import ComputationalPaths.Path.Algebra.BarComplex
-import ComputationalPaths.Path.Algebra.CohomologyRing
 
 namespace ComputationalPaths
 namespace Path

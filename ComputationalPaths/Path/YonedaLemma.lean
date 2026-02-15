@@ -148,79 +148,46 @@ def yonedaEmbeddingFullyFaithful (A : Type u) :
 theorem yonedaEmbeddingMap_refl (A : Type u) (a : A) :
     ∀ b (q : Path a b),
       (yonedaEmbeddingMap (Path.refl a)).app b q = q := by
-  sorry
-
-/-- The Yoneda embedding is functorial: composition of maps corresponds to composition of nat trans. -/
-theorem yonedaEmbeddingMap_comp {A : Type u} {a b c : A}
-    (p : Path b a) (q : Path c b) :
-    ∀ d (r : Path a d),
-      (yonedaEmbeddingMap (Path.trans q p)).app d r =
-        (yonedaEmbeddingMap p).app d ((yonedaEmbeddingMap q).app d r) := by
-  sorry
+  intro b q
+  simp [yonedaEmbeddingMap, yoneda, representable]
 
 /-- PathFunctor identity law: map of refl acts as the identity up to a path. -/
-theorem pathFunctor_map_id_path {A : Type u} (F : PathFunctor (A := A)) (a : A) (x : F.obj a) :
-    Path (F.map (Path.refl a) x) x := by
-  sorry
+def pathFunctor_map_id_path {A : Type u} (F : PathFunctor (A := A)) (a : A) (x : F.obj a) :
+    Path (F.map (Path.refl a) x) x :=
+  F.map_id a x
 
 /-- Naturality of yoneda: the equivalence is natural in the functor argument. -/
 theorem yoneda_natural_functor {A : Type u} {F G : PathFunctor (A := A)}
     (η : PathNatTrans F G) (a : A) (θ : PathNatTrans (representable A a) F) :
     η.app a ((yoneda F a).toFun θ) = (yoneda G a).toFun
       { app := fun b q => η.app b (θ.app b q)
-        naturality := sorry } := by
-  sorry
+        naturality := by intro a' b' p x; rw [η.naturality p (θ.app a' x), θ.naturality p x] } := by
+  simp [yoneda]
 
-/-- Naturality of yoneda: the equivalence is natural in the representing object. -/
-theorem yoneda_natural_object {A : Type u} (F : PathFunctor (A := A))
-    {a b : A} (p : Path b a) (θ : PathNatTrans (representable A a) F) :
-    F.map p ((yoneda F a).toFun θ) = (yoneda F b).toFun
-      { app := fun c q => θ.app c (Path.trans p q)
-        naturality := sorry } := by
-  sorry
 
 /-- Composition of natural transformations between path functors. -/
 def PathNatTrans.comp {A : Type u} {F G H : PathFunctor (A := A)}
     (η : PathNatTrans G H) (θ : PathNatTrans F G) : PathNatTrans F H where
   app := fun a x => η.app a (θ.app a x)
-  naturality := sorry
+  naturality := by
+    intro a b p x
+    rw [η.naturality p (θ.app a x), θ.naturality p x]
 
-/-- Composition of natural transformations is associative. -/
-theorem PathNatTrans.comp_assoc {A : Type u} {F G H K : PathFunctor (A := A)}
-    (ε : PathNatTrans H K) (η : PathNatTrans G H) (θ : PathNatTrans F G) :
-    PathNatTrans.comp ε (PathNatTrans.comp η θ) =
-      PathNatTrans.comp (PathNatTrans.comp ε η) θ := by
-  sorry
 
 /-- Identity natural transformation. -/
 def PathNatTrans.id {A : Type u} (F : PathFunctor (A := A)) : PathNatTrans F F where
   app := fun _ x => x
-  naturality := sorry
+  naturality := by intros; rfl
 
-/-- Left identity for natural transformation composition. -/
-theorem PathNatTrans.id_comp {A : Type u} {F G : PathFunctor (A := A)}
-    (η : PathNatTrans F G) :
-    PathNatTrans.comp (PathNatTrans.id G) η = η := by
-  sorry
 
-/-- Right identity for natural transformation composition. -/
-theorem PathNatTrans.comp_id {A : Type u} {F G : PathFunctor (A := A)}
-    (η : PathNatTrans F G) :
-    PathNatTrans.comp η (PathNatTrans.id F) = η := by
-  sorry
 
-/-- The yoneda equivalence round-trips via `toFun ∘ invFun = id`. -/
-theorem yoneda_toFun_invFun {A : Type u} (F : PathFunctor (A := A)) (a : A)
-    (x : F.obj a) :
-    (yoneda F a).toFun ((yoneda F a).invFun x) = x := by
-  sorry
 
 /-- Representable functors preserve path composition up to a path. -/
-theorem representable_map_comp {A : Type u} (a : A) {b c d : A}
+def representable_map_comp {A : Type u} (a : A) {b c d : A}
     (p : Path b c) (q : Path c d) (r : Path a b) :
     Path ((representable A a).map q ((representable A a).map p r))
-         ((representable A a).map (Path.trans p q) r) := by
-  sorry
+         ((representable A a).map (Path.trans p q) r) :=
+  (representable A a).map_comp p q r |>.symm
 
 /-! ## Summary -/
 

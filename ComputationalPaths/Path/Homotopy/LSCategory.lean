@@ -24,7 +24,6 @@ lightweight form consistent with other homotopy modules.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Homotopy.Truncation
-import ComputationalPaths.Path.Algebra.CohomologyRing
 
 namespace ComputationalPaths
 namespace Path

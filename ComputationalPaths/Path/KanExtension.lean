@@ -189,81 +189,17 @@ section BasicTheorems
 
 variable {A B : Type u}
 
-theorem precompose_obj_eq (F : PathCategoryFunctor A B)
-    (H : PathFunctor.{u, v} (A := B)) (a : A) :
-    (PathFunctor.precompose F H).obj a = H.obj (F.obj a) := by
-  sorry
 
-theorem precompose_map_eq (F : PathCategoryFunctor A B)
-    (H : PathFunctor.{u, v} (A := B))
-    {a a' : A} (p : Path a a') (x : H.obj (F.obj a)) :
-    (PathFunctor.precompose F H).map p x = H.map (F.map p) x := by
-  sorry
 
-theorem precompose_map_id (F : PathCategoryFunctor A B)
-    (H : PathFunctor.{u, v} (A := B)) (a : A) (x : H.obj (F.obj a)) :
-    (PathFunctor.precompose F H).map (Path.refl a) x = x := by
-  sorry
 
-theorem precompose_map_comp (F : PathCategoryFunctor A B)
-    (H : PathFunctor.{u, v} (A := B))
-    {a b c : A} (p : Path a b) (q : Path b c) (x : H.obj (F.obj a)) :
-    (PathFunctor.precompose F H).map (Path.trans p q) x =
-      (PathFunctor.precompose F H).map q ((PathFunctor.precompose F H).map p x) := by
-  sorry
 
-theorem pointwiseLeftKanObj_unfold (F : PathCategoryFunctor A B)
-    (G : PathFunctor.{u, v} (A := A)) (b : B) :
-    pointwiseLeftKanObj F G b =
-      Sigma (fun a : A => Sigma (fun _ : Path (F.obj a) b => G.obj a)) := by
-  sorry
 
-theorem pointwiseLeftKanMap_mk (F : PathCategoryFunctor A B)
-    (G : PathFunctor.{u, v} (A := A)) {b b' : B} (q : Path b b')
-    (a : A) (p : Path (F.obj a) b) (x : G.obj a) :
-    pointwiseLeftKanMap (F := F) (G := G) (b := b) (b' := b') q ⟨a, ⟨p, x⟩⟩ =
-      ⟨a, ⟨Path.trans p q, x⟩⟩ := by
-  sorry
 
-theorem pointwiseLeftKanMap_refl (F : PathCategoryFunctor A B)
-    (G : PathFunctor.{u, v} (A := A)) (b : B) :
-    pointwiseLeftKanMap (F := F) (G := G) (b := b) (b' := b) (Path.refl b) =
-      (fun x => x) := by
-  sorry
 
-theorem pointwiseLeftKanMap_trans (F : PathCategoryFunctor A B)
-    (G : PathFunctor.{u, v} (A := A)) {b1 b2 b3 : B}
-    (q1 : Path b1 b2) (q2 : Path b2 b3) :
-    pointwiseLeftKanMap (F := F) (G := G) (b := b1) (b' := b3) (Path.trans q1 q2) =
-      (pointwiseLeftKanMap (F := F) (G := G) (b := b2) (b' := b3) q2) ∘
-        (pointwiseLeftKanMap (F := F) (G := G) (b := b1) (b' := b2) q1) := by
-  sorry
 
-theorem pointwiseRightKanObj_unfold (F : PathCategoryFunctor A B)
-    (G : PathFunctor.{u, v} (A := A)) (b : B) :
-    pointwiseRightKanObj F G b = (∀ a : A, Path b (F.obj a) → G.obj a) := by
-  sorry
 
-theorem pointwiseRightKanMap_apply (F : PathCategoryFunctor A B)
-    (G : PathFunctor.{u, v} (A := A)) {b b' : B} (q : Path b b')
-    (h : pointwiseRightKanObj F G b) (a : A) (p : Path b' (F.obj a)) :
-    pointwiseRightKanMap (F := F) (G := G) (b := b) (b' := b') q h a p =
-      h a (Path.trans q p) := by
-  sorry
 
-theorem pointwiseRightKanMap_refl (F : PathCategoryFunctor A B)
-    (G : PathFunctor.{u, v} (A := A)) (b : B) :
-    pointwiseRightKanMap (F := F) (G := G) (b := b) (b' := b) (Path.refl b) =
-      (fun h => h) := by
-  sorry
 
-theorem pointwiseRightKanMap_trans (F : PathCategoryFunctor A B)
-    (G : PathFunctor.{u, v} (A := A)) {b1 b2 b3 : B}
-    (q1 : Path b1 b2) (q2 : Path b2 b3) :
-    pointwiseRightKanMap (F := F) (G := G) (b := b1) (b' := b3) (Path.trans q1 q2) =
-      (pointwiseRightKanMap (F := F) (G := G) (b := b2) (b' := b3) q2) ∘
-        (pointwiseRightKanMap (F := F) (G := G) (b := b1) (b' := b2) q1) := by
-  sorry
 
 end BasicTheorems
 

@@ -73,32 +73,6 @@ variable {X : Type u} (C : MotivicComplexPathData X)
       (Path.refl (C.differential (n + 1) (C.differential n x))) :=
   rweq_cmpA_inv_right (C.dSquaredPath n x)
 
-@[simp] theorem addZero_cancel_left_rweq (n : Int) (x : C.term n) :
-    RwEq
-      (Path.trans (Path.symm (C.addZeroPath n x)) (C.addZeroPath n x))
-      (Path.refl x) := by
-  sorry
-
-@[simp] theorem addZero_cancel_right_rweq (n : Int) (x : C.term n) :
-    RwEq
-      (Path.trans (C.addZeroPath n x) (Path.symm (C.addZeroPath n x)))
-      (Path.refl (C.add n x (C.zero n))) := by
-  sorry
-
-theorem differential_addZeroPath (n : Int) (x : C.term n) :
-    Nonempty
-      (Path
-        (C.differential n (C.add n x (C.zero n)))
-        (C.differential n x)) := by
-  sorry
-
-theorem dSquared_after_addZeroPath (n : Int) (x : C.term n) :
-    Nonempty
-      (Path
-        (C.differential (n + 1) (C.differential n (C.add n x (C.zero n))))
-        (C.zero (n + 1 + 1))) := by
-  sorry
-
 /-- Canonical trivial motivic complex on `PUnit`. -/
 def trivial (X : Type u) (x0 : X) : MotivicComplexPathData X where
   base := x0

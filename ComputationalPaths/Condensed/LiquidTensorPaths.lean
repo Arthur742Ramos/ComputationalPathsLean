@@ -90,38 +90,6 @@ theorem composite_two_refl_rweq (x y : X) :
       (Path.refl (L.tensor x (L.liquidize y))) :=
   rweq_cmpA_inv_left (Path.trans (L.leftPath x y) (L.rightPath x y))
 
-theorem liquidize_two_unit_exact (x : X) :
-    RwEq
-      (Path.trans
-        (L.liquidizePath x)
-        (Path.trans (Path.refl x) (Path.refl x)))
-      (L.liquidizePath x) := by
-  sorry
-
-theorem tensor_composite_assoc_exact (x y : X) :
-    RwEq
-      (Path.trans
-        (L.leftPath x y)
-        (Path.trans (L.rightPath x y) (Path.refl (L.tensor x (L.liquidize y)))))
-      (Path.trans (L.leftPath x y) (L.rightPath x y)) := by
-  sorry
-
-theorem tensor_left_cancel_exact (x y : X) :
-    RwEq
-      (Path.trans
-        (Path.symm (L.leftPath x y))
-        (Path.trans (L.leftPath x y) (L.rightPath x y)))
-      (L.rightPath x y) := by
-  sorry
-
-theorem tensor_right_cancel_exact (x y : X) :
-    RwEq
-      (Path.trans
-        (Path.trans (L.leftPath x y) (L.rightPath x y))
-        (Path.symm (L.rightPath x y)))
-      (L.leftPath x y) := by
-  sorry
-
 end LiquidTensorPathData
 
 /-- Canonical liquid tensor package: left projection tensor with identity

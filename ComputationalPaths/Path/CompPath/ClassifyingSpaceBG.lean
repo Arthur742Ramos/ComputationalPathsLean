@@ -24,7 +24,6 @@ import ComputationalPaths.Path.CompPath.DeloopingConstruction
 import ComputationalPaths.Path.CompPath.JoinSpace
 import ComputationalPaths.Path.Homotopy.LoopSpaceRecognition
 import ComputationalPaths.Path.Algebra.GroupStructures
-import ComputationalPaths.Path.Algebra.CohomologyRing
 
 namespace ComputationalPaths
 namespace Path

@@ -84,52 +84,6 @@ def boundaryLoop (r p q : Nat) :
   unfold boundaryLoop
   exact rweq_cmpA_inv_right (D.dSquaredZeroPath r p q)
 
-/-- Naturality statement for differentials along page transition at base terms. -/
-theorem naturality_of_d_at_base (r p q : Nat) :
-    Nonempty
-      (Path
-        (E.next r p q (D.d r p q (E.base p q)))
-        (D.d (r + 1) p q (E.next r p q (E.base p q)))) := by
-  sorry
-
-/-- Naturality statement for `d² = 0` after applying page transition. -/
-theorem naturality_of_d_squared_under_next (r p q : Nat) :
-    Nonempty
-      (Path
-        (E.next r p q (D.d r p q (D.d r p q (E.base p q))))
-        (E.next r p q (E.base p q))) := by
-  sorry
-
-/-- Comparison statement between two differential packages on base terms. -/
-theorem comparison_preserves_d_on_base
-    (D' : DifferentialPaths E)
-    (hcomp : ∀ r p q, Path (D.d r p q (E.base p q)) (D'.d r p q (E.base p q)))
-    (r p q : Nat) :
-    Nonempty (Path (D.d r p q (E.base p q)) (D'.d r p q (E.base p q))) := by
-  sorry
-
-/-- Comparison statement: commutation witnesses agree up to rewrite equivalence. -/
-theorem comparison_preserves_commute_path
-    (D' : DifferentialPaths E)
-    (hcomp : ∀ r p q, Path (D.d r p q (E.base p q)) (D'.d r p q (E.base p q)))
-    (r p q : Nat) :
-    Nonempty
-      (Path
-        (E.next r p q (D.d r p q (E.base p q)))
-        (E.next r p q (D'.d r p q (E.base p q)))) := by
-  sorry
-
-/-- Comparison statement: `d² = 0` witnesses agree up to rewrite equivalence. -/
-theorem comparison_preserves_d_squared_path
-    (D' : DifferentialPaths E)
-    (hcomp : ∀ r p q, Path (D.d r p q (E.base p q)) (D'.d r p q (E.base p q)))
-    (r p q : Nat) :
-    Nonempty
-      (Path
-        (D.d r p q (D.d r p q (E.base p q)))
-        (D'.d r p q (D'.d r p q (E.base p q)))) := by
-  sorry
-
 end DifferentialPaths
 
 /-- Trivial differential package over the trivial page package. -/

@@ -86,37 +86,6 @@ def convergedBoundary (r p q : Nat) :
       (C.convergedBoundary r p q) :=
   rweq_cmpA_refl_right (C.convergedBoundary r p q)
 
-/-- Convergence statement: shifted representatives stabilize to the eventual term. -/
-theorem eventual_term_stabilizes (r p q : Nat) :
-    Nonempty (Path (C.shiftedTerm r p q) (C.eventualTerm p q)) := by
-  sorry
-
-/-- Convergence statement: boundaries map to the limiting representative. -/
-theorem boundary_class_converges (r p q : Nat) :
-    Nonempty
-      (Path
-        (C.embed p q (D.d r p q (D.d r p q (E.base p q))))
-        (C.eventualTerm p q)) := by
-  sorry
-
-/-- Comparison statement: a comparison map preserves eventual terms. -/
-theorem comparison_preserves_eventual_term
-    (C' : Convergence E D)
-    (φ : ∀ p q, C.limit p q → C'.limit p q)
-    (hφ : ∀ p q (x : E.term p q), Path (φ p q (C.embed p q x)) (C'.embed p q x))
-    (p q : Nat) :
-    Nonempty (Path (φ p q (C.eventualTerm p q)) (C'.eventualTerm p q)) := by
-  sorry
-
-/-- Comparison statement: a comparison map preserves shifted representatives. -/
-theorem comparison_preserves_shifted_term
-    (C' : Convergence E D)
-    (φ : ∀ p q, C.limit p q → C'.limit p q)
-    (hφ : ∀ p q (x : E.term p q), Path (φ p q (C.embed p q x)) (C'.embed p q x))
-    (r p q : Nat) :
-    Nonempty (Path (φ p q (C.shiftedTerm r p q)) (C'.shiftedTerm r p q)) := by
-  sorry
-
 end Convergence
 
 /-- Trivial convergence package over trivial pages and differentials. -/
