@@ -372,6 +372,10 @@ import ComputationalPaths.Path.Algebra.TropicalGeometry
 import ComputationalPaths.Path.Algebra.CoxeterGroups
 import ComputationalPaths.Path.Algebra.CombHopfAlgebras
 import ComputationalPaths.Path.Algebra.EtaleCohomology
+import ComputationalPaths.Path.Algebra.ArithmeticPaths
+import ComputationalPaths.Path.Algebra.IntegerPaths
+import ComputationalPaths.Path.Algebra.PolynomialPaths
+import ComputationalPaths.Path.Algebra.MatrixPaths
 import ComputationalPaths.Path.Topology.ChromaticHomotopy
 import ComputationalPaths.Path.Topology.FormalGroupLaws
 import ComputationalPaths.Path.Topology.SpectraAlgebra
