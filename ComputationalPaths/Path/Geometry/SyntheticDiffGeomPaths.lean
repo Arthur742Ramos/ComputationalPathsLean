@@ -293,7 +293,7 @@ def exp_map_add (f : Nat → Nat) : (m n x : Nat) →
     rw [h]
     simp only [exp_map]
     have ih := (exp_map_add f m n x).proof
-    exact Path.ofEq (congrArg f ih)
+    exact Path.ofEq (by rw [ih])
 
 /-! ## Parallel Transport Composition -/
 
