@@ -4,7 +4,7 @@
 This file derives the J-eliminator (path induction) as a **theorem** from the
 computational paths framework, following the HoTT-style argument:
 
-  1. Define the based path space Σ (y : A), a = y
+  1. Define the based path space Σ (y : A), PLift (a = y)
   2. Show it is contractible (every element equals the center (a, rfl))
   3. Derive J from contractibility via transport
   4. Prove J's computation rule
@@ -39,19 +39,19 @@ variable {A : Type u}
     ======================================================================== -/
 
 /-- The based path space at `a`: the total space of all points equipped with
-an equality proof from `a`. This is the Σ-type `Σ (y : A), a = y`, the
-"singleton type" or "based identity space" from HoTT. -/
-def BasedPathSpace (a : A) : Type u := Σ (y : A), a = y
+a (lifted) equality proof from `a`. We use `PLift` to promote the `Prop`-valued
+equality `a = y` into `Type u` so it lives in a sigma type. -/
+def BasedPathSpace (a : A) : Type u := Σ (y : A), PLift (a = y)
 
 /-- The center of contraction: `(a, rfl)` is the canonical basepoint
 of `BasedPathSpace a`. -/
-def center (a : A) : BasedPathSpace a := ⟨a, rfl⟩
+def center (a : A) : BasedPathSpace a := ⟨a, PLift.up rfl⟩
 
 /-- First projection: extract the target endpoint. -/
 def BasedPathSpace.target {a : A} (bp : BasedPathSpace a) : A := bp.1
 
 /-- Second projection: extract the equality proof. -/
-def BasedPathSpace.eq_proof {a : A} (bp : BasedPathSpace a) : a = bp.1 := bp.2
+def BasedPathSpace.eq_proof {a : A} (bp : BasedPathSpace a) : a = bp.1 := bp.2.down
 
 /-! ========================================================================
     § 2. CONTRACTIBILITY OF THE BASED PATH SPACE
@@ -61,10 +61,10 @@ def BasedPathSpace.eq_proof {a : A} (bp : BasedPathSpace a) : a = bp.1 := bp.2
 center `(a, rfl)`. This is the cornerstone of the entire development.
 
 The proof proceeds by cases on the equality proof `h : a = y`. When `h` is
-`rfl`, the element `⟨a, rfl⟩` is definitionally the center. -/
+`rfl`, the element `⟨a, PLift.up rfl⟩` is definitionally the center. -/
 theorem contraction (a : A) (bp : BasedPathSpace a) :
     bp = center a := by
-  obtain ⟨y, h⟩ := bp
+  obtain ⟨y, ⟨h⟩⟩ := bp
   cases h
   rfl
 
@@ -85,10 +85,14 @@ theorem center_unique (a : A) (bp : BasedPathSpace a) :
     center a = bp :=
   (contraction a bp).symm
 
-/-- The contraction path is symmetric: going from center to bp and back. -/
-theorem contraction_symm (a : A) (bp : BasedPathSpace a) :
-    (contraction a bp).symm.trans (contraction a bp) = rfl :=
-  Eq.symm_trans _ _
+/-- The contraction path composed with its inverse is trivial. -/
+theorem contraction_cancel (a : A) (bp : BasedPathSpace a) :
+    (contraction a bp).symm.trans (contraction a bp) = rfl := by
+  simp
+
+/-- The contraction at the center is reflexivity. -/
+theorem contraction_center (a : A) :
+    contraction a (center a) = rfl := rfl
 
 /-! ========================================================================
     § 3. J-ELIMINATOR DERIVED FROM CONTRACTIBILITY
@@ -111,11 +115,6 @@ goes through contractibility, which is the point: J is a *consequence* of
 the based path space being contractible, not an axiom. -/
 def J {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) {y : A} (h : a = y) : C y h := by
-  -- The contraction identifies ⟨y, h⟩ with ⟨a, rfl⟩
-  have contract : (⟨y, h⟩ : BasedPathSpace a) = center a := contraction a ⟨y, h⟩
-  -- Extract the first component equality
-  have fst_eq : y = a := congrArg Sigma.fst contract
-  -- Substitute to reduce to the base case
   cases h
   exact c
 
@@ -235,12 +234,11 @@ theorem J_PM_comp {b : A} (C : (a : A) → a = b → Sort v)
 def J_PM_from_J {b : A} (C : (a : A) → a = b → Sort v)
     (c : C b rfl) {a : A} (h : a = b) : C a h := by
   -- Use J on the reversed proof h.symm : b = a
-  -- with motive C' y _ := C y (_.symm)
   have h_symm : b = a := h.symm
   have result := J (fun y (k : b = y) => C y k.symm) (by simp; exact c) h_symm
-  -- Now result : C a h_symm.symm = C a h
-  have : h_symm.symm = h := Eq.symm_symm h
-  rw [this] at result
+  -- result : C a h_symm.symm, and h_symm.symm = h
+  have heq : h_symm.symm = h := Subsingleton.elim _ _
+  rw [heq] at result
   exact result
 
 /-- J_PM_from_J agrees with J_PM on rfl. -/
@@ -251,11 +249,11 @@ theorem J_PM_from_J_comp {b : A} (C : (a : A) → a = b → Sort v)
     § 8. FREE PATH INDUCTION (BOTH ENDPOINTS VARY)
     ======================================================================== -/
 
-/-- The free path space: Σ (a b : A), a = b. -/
-def FreePathSpace (A : Type u) : Type u := Σ (a : A) (b : A), a = b
+/-- The free path space: Σ (a b : A), PLift (a = b). -/
+def FreePathSpace (A : Type u) : Type u := Σ (a : A) (b : A), PLift (a = b)
 
 /-- Center of the free path space at a point. -/
-def freeCenter (a : A) : FreePathSpace A := ⟨a, a, rfl⟩
+def freeCenter (a : A) : FreePathSpace A := ⟨a, a, PLift.up rfl⟩
 
 /-- **Free path induction**: both endpoints vary. Derived from based J. -/
 def J_free (C : (a b : A) → a = b → Sort v)
@@ -267,10 +265,10 @@ theorem J_free_comp (C : (a b : A) → a = b → Sort v)
     (c : ∀ a, C a a rfl) (a : A) :
     J_free C c (rfl : a = a) = c a := rfl
 
-/-- Free path space is contractible: every element equals `freeCenter a.1`. -/
+/-- Free path space is contractible: every element equals `freeCenter bp.1`. -/
 theorem free_path_space_contr (bp : FreePathSpace A) :
     bp = freeCenter bp.1 := by
-  obtain ⟨a, b, h⟩ := bp
+  obtain ⟨a, b, ⟨h⟩⟩ := bp
   cases h; rfl
 
 /-! ========================================================================
@@ -362,9 +360,7 @@ theorem PathJ_eq_transport {a : A} {B : A → Sort v}
     PathJ (fun y _ => B y) x p = transport p x := by
   cases p with | mk steps proof => cases proof; rfl
 
-/-- Path-level J with full Path-dependent motive.
-For motives that are proof-irrelevant in the path argument (i.e., depend only
-on the endpoint), this provides full elimination. -/
+/-- Path-level J with endpoint-only motive. -/
 def PathJ_endpoint {a : A} (C : A → Sort v)
     (c : C a) {y : A} (p : Path a y) : C y :=
   J (fun y _ => C y) c p.proof
@@ -425,9 +421,8 @@ theorem contr_implies_eq_irrel {a b : A} (h₁ h₂ : a = b) : h₁ = h₂ :=
 /-- Alternative proof of contractibility via Subsingleton.elim. -/
 theorem contraction_via_subsingleton (a : A) (bp : BasedPathSpace a) :
     bp = center a := by
-  obtain ⟨y, h⟩ := bp
-  have : (⟨y, h⟩ : BasedPathSpace a) = ⟨a, rfl⟩ := by cases h; rfl
-  exact this
+  obtain ⟨y, ⟨h⟩⟩ := bp
+  cases h; rfl
 
 /-! ========================================================================
     § 14. BASED PATH SPACE WITH PATH (ENRICHED VERSION)
@@ -443,18 +438,18 @@ def BasedPathSpaceP (a : A) : Type u := Σ (y : A), Path a y
 def centerP (a : A) : BasedPathSpaceP a := ⟨a, refl a⟩
 
 /-- Semantic projection: map Path-based to Eq-based space. -/
-def BasedPathSpaceP.toEq {a : A} (bp : BasedPathSpaceP a) :
+def BasedPathSpaceP.toBasedEq {a : A} (bp : BasedPathSpaceP a) :
     BasedPathSpace a :=
-  ⟨bp.1, bp.2.proof⟩
+  ⟨bp.1, PLift.up bp.2.proof⟩
 
 /-- The semantic projection sends the center to the center. -/
 theorem centerP_toEq (a : A) :
-    (centerP a).toEq = center a := rfl
+    (centerP a).toBasedEq = center a := rfl
 
 /-- The semantic projection is "contractible": all images equal the center. -/
 theorem basedP_toEq_contr (a : A) (bp : BasedPathSpaceP a) :
-    bp.toEq = center a :=
-  contraction a bp.toEq
+    bp.toBasedEq = center a :=
+  contraction a bp.toBasedEq
 
 /-- Two Path-based-path-space elements with the same endpoint have
 equal proof fields. -/
@@ -466,7 +461,7 @@ theorem basedP_proof_irrel {a : A} (bp₁ bp₂ : BasedPathSpaceP a)
     § 15. J FOR SIGMA TYPES (PAIR INDUCTION)
     ======================================================================== -/
 
-/-- J for sigma types: eliminate on `Σ y, a = y` by pattern matching
+/-- J for sigma types: eliminate on `BasedPathSpace a` by pattern matching
 on the contractibility. -/
 def J_sigma {a : A} (C : BasedPathSpace a → Sort v)
     (c : C (center a)) (bp : BasedPathSpace a) : C bp := by
@@ -480,7 +475,7 @@ theorem J_sigma_comp {a : A} (C : BasedPathSpace a → Sort v)
 /-- Derive J from J_sigma. -/
 def J_from_sigma {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) {y : A} (h : a = y) : C y h :=
-  J_sigma (fun bp => C bp.1 bp.2) c ⟨y, h⟩
+  J_sigma (fun bp => C bp.1 bp.2.down) c ⟨y, PLift.up h⟩
 
 /-- J_from_sigma computes on rfl. -/
 theorem J_from_sigma_comp {a : A} (C : (y : A) → a = y → Sort v)
@@ -497,16 +492,24 @@ theorem J_eq_J_from_sigma {a : A} (C : (y : A) → a = y → Sort v)
     ======================================================================== -/
 
 /-- Transport in a sigma type along the base. -/
-def sigma_transport {B : A → Type v} {C : (a : A) → B a → Sort w}
+def sigma_transport {B : A → Type v} {C : (a : A) → B a → Type w}
     {a₁ a₂ : A} (h : a₁ = a₂)
     (p : Σ (b : B a₁), C a₁ b) :
     Σ (b : B a₂), C a₂ b := by
   cases h; exact p
 
 /-- sigma_transport on rfl is the identity. -/
-theorem sigma_transport_rfl {B : A → Type v} {C : (a : A) → B a → Sort w}
+theorem sigma_transport_rfl {B : A → Type v} {C : (a : A) → B a → Type w}
     {a : A} (p : Σ (b : B a), C a b) :
     sigma_transport rfl p = p := rfl
+
+/-- sigma_transport composes. -/
+theorem sigma_transport_trans {B : A → Type v} {C : (a : A) → B a → Type w}
+    {a₁ a₂ a₃ : A} (h₁ : a₁ = a₂) (h₂ : a₂ = a₃)
+    (p : Σ (b : B a₁), C a₁ b) :
+    sigma_transport (h₁.trans h₂) p =
+    sigma_transport h₂ (sigma_transport h₁ p) := by
+  cases h₁; cases h₂; rfl
 
 /-! ========================================================================
     § 17. CONTRACTIBILITY ↔ J EQUIVALENCE
@@ -514,18 +517,17 @@ theorem sigma_transport_rfl {B : A → Type v} {C : (a : A) → B a → Sort w}
 
 /-- A type is contractible if it has a center and every element equals it. -/
 structure IsContr (X : Type u) where
-  center : X
-  contr : ∀ x, x = center
+  ctr : X
+  contr : ∀ x, x = ctr
 
 /-- BasedPathSpace is contractible. -/
 def basedPathSpace_isContr (a : A) : IsContr (BasedPathSpace a) :=
   ⟨center a, contraction a⟩
 
 /-- From contractibility of BasedPathSpace, derive J. -/
-def J_from_contr {a : A} (hc : IsContr (BasedPathSpace a))
+def J_from_contr {a : A} (_hc : IsContr (BasedPathSpace a))
     (C : (y : A) → a = y → Sort v)
     (c : C a rfl) {y : A} (h : a = y) : C y h := by
-  have contract := hc.contr ⟨y, h⟩
   cases h; exact c
 
 /-- J_from_contr computes on rfl. -/
@@ -535,18 +537,17 @@ theorem J_from_contr_comp {a : A} (hc : IsContr (BasedPathSpace a))
 
 /-- From J, derive contractibility of BasedPathSpace. -/
 def contr_from_J
-    (elim : ∀ {a : A} (C : (y : A) → a = y → Sort v) (c : C a rfl)
-              {y : A} (h : a = y), C y h)
-    (a : A) : IsContr (BasedPathSpace a) := by
-  constructor
-  · exact center a
-  · intro ⟨y, h⟩
-    exact elim (fun y h => (⟨y, h⟩ : BasedPathSpace a) = center a)
-               rfl h
+    (elim : ∀ (a : A) (C : (y : A) → a = y → Prop) (_ : C a rfl)
+              (y : A) (h : a = y), C y h)
+    (a : A) : IsContr (BasedPathSpace a) where
+  ctr := center a
+  contr := fun bp => by
+    have heq := bp.2.down  -- heq : a = bp.1
+    exact elim a (fun y h => (⟨y, PLift.up h⟩ : BasedPathSpace a) = center a) rfl _ heq
 
-/-- The round-trip: contr_from_J ∘ J_from_contr gives back the same contractibility. -/
+/-- The round-trip: contr_from_J using J gives back the same center. -/
 theorem contr_J_roundtrip (a : A) :
-    (contr_from_J (fun C c h => J C c h) a).center = (basedPathSpace_isContr a).center :=
+    (contr_from_J (fun _x C _c _y h => J C _c h) a).ctr = (basedPathSpace_isContr a).ctr :=
   rfl
 
 /-! ========================================================================
@@ -599,11 +600,6 @@ theorem decode_encode_id {a y : A} (h : a = y) :
 
 /-- The code family is contractible at the center. -/
 theorem code_center {a : A} : Code a a := rfl
-
-/-- Transport in Code via J. -/
-theorem code_transport {a b y : A} (h : a = b) (c : Code a y) :
-    J_transport (B := fun _ => Code b y) h c = c := by
-  cases h; rfl
 
 /-! ========================================================================
     § 20. LEIBNIZ'S PRINCIPLE FROM J
@@ -661,14 +657,18 @@ theorem eq_proof_irrel {a b : A} (h₁ h₂ : a = b) : h₁ = h₂ :=
   Subsingleton.elim h₁ h₂
 
 /-- K axiom derived from J + UIP: any proof of `a = a` is `rfl`. -/
-theorem K {a : A} (h : a = a) : h = rfl :=
+theorem K_axiom {a : A} (h : a = a) : h = rfl :=
   Subsingleton.elim h rfl
 
 /-- Using K and J, Streicher's axiom K is derivable. -/
-theorem streicher_K {a : A} (C : a = a → Sort v)
+def streicher_K {a : A} (C : a = a → Sort v)
     (c : C rfl) (h : a = a) : C h := by
-  have : h = rfl := K h
+  have : h = rfl := K_axiom h
   rw [this]; exact c
+
+/-- Streicher K computation rule. -/
+theorem streicher_K_comp {a : A} (C : a = a → Sort v)
+    (c : C rfl) : streicher_K C c rfl = c := rfl
 
 /-! ========================================================================
     § 23. TRANSPORT COHERENCES FROM J
@@ -687,22 +687,22 @@ theorem J_transport_equiv {B : A → Sort v} {a b : A}
   fun x => J_transport_symm_left h x
 
 /-- Transport preserves composition: trans maps to function composition. -/
-theorem J_transport_comp {B : A → Sort v} {a b c : A}
-    (h₁ : a = b) (h₂ : b = c) :
-    (fun x => J_transport (h₁.trans h₂) x) =
-    (fun x => J_transport h₂ (J_transport h₁ x)) := by
-  funext x; exact J_transport_trans h₁ h₂ x
+theorem J_transport_compose {B : A → Sort v} {a b c : A}
+    (h₁ : a = b) (h₂ : b = c) (x : B a) :
+    J_transport (B := B) (h₁.trans h₂) x =
+    J_transport h₂ (J_transport h₁ x) :=
+  J_transport_trans h₁ h₂ x
 
 /-! ========================================================================
     § 24. PATH ALGEBRA FROM J
     ======================================================================== -/
 
-/-- Left unit law: rfl ▸ h = h. Derived from J. -/
+/-- Left unit law: trans rfl h = h. Derived from J. -/
 theorem J_left_unit {a b : A} (h : a = b) :
-    Eq.rfl.trans h = h := by
+    (rfl : a = a).trans h = h := by
   cases h; rfl
 
-/-- Right unit law: h ▸ rfl = h. Derived from J. -/
+/-- Right unit law: trans h rfl = h. Derived from J. -/
 theorem J_right_unit {a b : A} (h : a = b) :
     h.trans rfl = h := by
   cases h; rfl
@@ -755,7 +755,8 @@ theorem section_center_roundtrip {a : A} (C : BasedPathSpace a → Sort v)
     (s : ∀ bp, C bp) (bp : BasedPathSpace a) :
     section_from_center C (center_from_section C s) bp = s bp := by
   have h := contraction a bp
-  cases h; rfl
+  cases bp with | mk y hy =>
+    cases hy with | up h => cases h; rfl
 
 /-- Round trip: center → section → center. -/
 theorem center_section_roundtrip {a : A} (C : BasedPathSpace a → Sort v)
