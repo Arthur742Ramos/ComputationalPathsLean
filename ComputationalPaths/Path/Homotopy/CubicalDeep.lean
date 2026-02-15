@@ -90,7 +90,7 @@ theorem Line.map_comp {A : Type u} {B : Type v} {C : Type w}
   simp [Line.map]
 
 -- 20: Path to Line
-def Line.ofPath {A : Type u} {a b : A} (p : Path a b) : Line A a b where
+def Line.ofPath {A : Type u} {a b : A} (_p : Path a b) : Line A a b where
   fn := fun i => if i = i0 then a else b
   bd0 := by simp
   bd1 := by simp [i0, i1]
@@ -275,7 +275,7 @@ theorem hcomp_assoc {A : Type u} {a b c d : A}
 
 -- 41: inverse
 theorem hcomp_symm_toEq {A : Type u} {a b : A} (p : Path a b) :
-    (hcomp p (Path.symm p)).toEq = rfl := by simp [hcomp]
+    (hcomp p (Path.symm p)).toEq = rfl := by simp
 
 /-! ## §8 n-Cubes -/
 
