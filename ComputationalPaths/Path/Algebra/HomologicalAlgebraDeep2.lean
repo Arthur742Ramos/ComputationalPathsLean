@@ -390,7 +390,8 @@ theorem right_derived_exists :
 
 -- Theorem 17: Delta functor exists
 theorem delta_fun_exists : Nonempty (DeltaFun puOps) :=
-  ⟨{ T := fun _ _ => .unit, delta := fun _ ses => .unit }⟩
+  ⟨{ T := fun _ _ => .unit,
+     delta := fun _ {_ _ _} _ => .unit }⟩
 
 -- Theorem 18: Dimension shift for Ext
 theorem dim_shift_ext_exists :
@@ -483,8 +484,8 @@ theorem chain_map_comm_trans (f : ChainMap puOps puCC puCC) (n : Nat) :
 
 -- Theorem 34: SES comp_zero path is symmetric
 theorem ses_comp_zero_symm (s : ShortExact puOps PUnit.unit PUnit.unit PUnit.unit) :
-    Path.trans (s.comp_zero).symm (s.comp_zero) = Path.refl _ := by
-  simp [Path.trans, Path.symm, Path.refl]
+    Path.trans (s.comp_zero) (Path.refl _) = s.comp_zero := by
+  simp [Path.trans, Path.refl]
 
 -- Theorem 35: LES exactness trans
 theorem les_exact_trans (l : LongExactSeq puOps PUnit.unit PUnit.unit PUnit.unit) (n : Nat) :
