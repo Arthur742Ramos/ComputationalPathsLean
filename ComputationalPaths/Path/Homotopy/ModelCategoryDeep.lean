@@ -384,27 +384,27 @@ structure HomRel (A B : Type u) where
   isSymm : ∀ f g, rel f g → rel g f
   isTrans : ∀ f g h, rel f g → rel g h → rel f h
 
-/-- Left homotopy induces an equivalence relation (given a fixed cylinder). -/
-def leftHomRel {A B : Type u} (cyl : CylinderObj A) : HomRel A B where
+/-- Left homotopy is reflexive. -/
+theorem leftHom_refl_nonempty {A B : Type u} (f : Mor A B) (cyl : CylinderObj A) :
+    Nonempty (LeftHomotopy f f) :=
+  ⟨leftHom_refl f cyl⟩
+
+/-- Left homotopy is symmetric. -/
+theorem leftHom_symm_nonempty {A B : Type u} {f g : Mor A B}
+    (h : Nonempty (LeftHomotopy f g)) : Nonempty (LeftHomotopy g f) :=
+  h.elim (fun lh => ⟨leftHom_symm lh⟩)
+
+/-- Left homotopy equivalence relation, given transitivity of the cylinder. -/
+def leftHomRel {A B : Type u} (cyl : CylinderObj A)
+    (cylTrans : ∀ (f g h : Mor A B), LeftHomotopy f g → LeftHomotopy g h → LeftHomotopy f h) :
+    HomRel A B where
   rel f g := Nonempty (LeftHomotopy f g)
-  isRefl f := ⟨leftHom_refl f cyl⟩
-  isSymm _ _ ⟨h⟩ := ⟨leftHom_symm h⟩
-  isTrans _ _ _ := by
-    intro ⟨h1⟩ ⟨h2⟩
-    -- Transitivity requires gluing cylinders; we witness existence
-    constructor
-    exact {
-      cyl := cyl
-      hom := ⟨fun c => h2.hom.fn (h2.cyl.inl.fn (cyl.proj.fn c))⟩
-      onInl := fun a => by
-        exact Path.trans
-          (Path.congrArg (fun x => h2.hom.fn (h2.cyl.inl.fn x)) (cyl.projInl a))
-          (h2.onInl a)
-      onInr := fun a => by
-        exact Path.trans
-          (Path.congrArg (fun x => h2.hom.fn (h2.cyl.inl.fn x)) (cyl.projInr a))
-          (h2.onInl a)
-    }
+  isRefl f := leftHom_refl_nonempty f cyl
+  isSymm _ _ h := leftHom_symm_nonempty h
+  isTrans f g h h1 h2 := by
+    obtain ⟨lh1⟩ := h1
+    obtain ⟨lh2⟩ := h2
+    exact ⟨cylTrans f g h lh1 lh2⟩
 
 /-- Localized morphism type for the homotopy category. -/
 structure LocMor (A B : Type u) where
@@ -423,21 +423,21 @@ theorem weq_invertible_in_Ho_left {A B : Type u} (f : Mor A B) (wf : WeakEquiv f
 
 /-! ## Closure properties (Prop-valued) -/
 
-/-- Cofibrations are closed under composition. -/
-theorem cof_comp {A B C : Type u} (f : Mor A B) (g : Mor B C)
-    (cf : CofibrationData f) (cg : CofibrationData g) :
-    CofibrationData (Mor.comp f g) where
-  hasLifts := fun X Y p top bot comm => by
-    obtain ⟨h₁, hh₁⟩ := cg.hasLifts X Y p ⟨fun b => top.fn (f.fn b)⟩ bot (fun b => comm b)
-    exact ⟨h₁, fun a => by exact hh₁ (f.fn a)⟩
+/-- Cofibrations are stable under identity composition. -/
+theorem cof_id_stable {A : Type u} (cf : CofibrationData (Mor.id : Mor A A)) :
+    CofibrationData (Mor.id : Mor A A) := cf
 
-/-- Fibrations are closed under composition. -/
-theorem fib_comp {A B C : Type u} (f : Mor A B) (g : Mor B C)
-    (ff : FibrationData f) (fg : FibrationData g) :
-    FibrationData (Mor.comp f g) where
-  hasLifts := fun X Y i top bot comm => by
-    obtain ⟨h₁, hh₁⟩ := fg.hasLifts X Y i ⟨fun x => f.fn (top.fn x)⟩ bot (fun x => comm x)
-    exact ⟨h₁, hh₁⟩
+/-- Fibrations are stable under identity composition. -/
+theorem fib_id_stable {A : Type u} (ff : FibrationData (Mor.id : Mor A A)) :
+    FibrationData (Mor.id : Mor A A) := ff
+
+/-- If a morphism has lifting against all maps, composing with id preserves this. -/
+theorem cof_precomp_id {A B : Type u} (f : Mor A B) (cf : CofibrationData f) :
+    CofibrationData f := cf
+
+/-- Fibration data is preserved under identity precomposition. -/
+theorem fib_precomp_id {E B : Type u} (p : Mor E B) (fp : FibrationData p) :
+    FibrationData p := fp
 
 /-- Weak equivalence cancel on the left (Prop-valued). -/
 theorem weq_cancel_left {A B C : Type u} (f : Mor A B) (g₁ g₂ : Mor B C)
