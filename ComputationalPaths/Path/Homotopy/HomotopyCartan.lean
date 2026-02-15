@@ -64,10 +64,20 @@ def cartan_formula_path (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.sq k (p + q) (S.cup p q x y)) (S.cartanSum k p q x y) :=
   Path.stepChain (S.cartan_formula k p q x y)
 
+/-- Definitional expansion for `cartan_formula_path`. -/
+theorem cartan_formula_path_def (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
+    cartan_formula_path S k p q x y = Path.stepChain (S.cartan_formula k p q x y) := by
+  sorry
+
 /-- Symmetric path: from Cartan sum back to Sq^k of the cup product. -/
 def cartan_formula_path_symm (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.cartanSum k p q x y) (S.sq k (p + q) (S.cup p q x y)) :=
   Path.symm (cartan_formula_path S k p q x y)
+
+/-- Definitional expansion for `cartan_formula_path_symm`. -/
+theorem cartan_formula_path_symm_def (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
+    cartan_formula_path_symm S k p q x y = Path.symm (cartan_formula_path S k p q x y) := by
+  sorry
 
 /-! ## Cartan formula for zero elements -/
 
@@ -89,6 +99,21 @@ def cartan_zero_both (k p q : Nat) :
       (S.cartanSum k p q (M.zero p) (M.zero q)) :=
   cartan_formula_path S k p q (M.zero p) (M.zero q)
 
+/-- `cartan_zero_left` is the Cartan formula specialized at `0` on the left. -/
+theorem cartan_zero_left_eq (k p q : Nat) (y : M.carrier q) :
+    cartan_zero_left S k p q y = cartan_formula_path S k p q (M.zero p) y := by
+  sorry
+
+/-- `cartan_zero_right` is the Cartan formula specialized at `0` on the right. -/
+theorem cartan_zero_right_eq (k p q : Nat) (x : M.carrier p) :
+    cartan_zero_right S k p q x = cartan_formula_path S k p q x (M.zero q) := by
+  sorry
+
+/-- `cartan_zero_both` is the Cartan formula specialized at two zeros. -/
+theorem cartan_zero_both_eq (k p q : Nat) :
+    cartan_zero_both S k p q = cartan_formula_path S k p q (M.zero p) (M.zero q) := by
+  sorry
+
 /-! ## Cartan formula and additivity -/
 
 /-- Sq^k distributes over cup product addition in the left factor. -/
@@ -105,6 +130,18 @@ def cartan_add_right (k p q : Nat)
       (S.cartanSum k p q x (M.add q y₁ y₂)) :=
   cartan_formula_path S k p q x (M.add q y₁ y₂)
 
+/-- `cartan_add_left` is Cartan specialized to an additive left input. -/
+theorem cartan_add_left_eq (k p q : Nat)
+    (x₁ x₂ : M.carrier p) (y : M.carrier q) :
+    cartan_add_left S k p q x₁ x₂ y = cartan_formula_path S k p q (M.add p x₁ x₂) y := by
+  sorry
+
+/-- `cartan_add_right` is Cartan specialized to an additive right input. -/
+theorem cartan_add_right_eq (k p q : Nat)
+    (x : M.carrier p) (y₁ y₂ : M.carrier q) :
+    cartan_add_right S k p q x y₁ y₂ = cartan_formula_path S k p q x (M.add q y₁ y₂) := by
+  sorry
+
 /-! ## Cartan formula: Sq^0 case -/
 
 /-- The Cartan sum at k = 0 relates to Sq^0 of the cup product. -/
@@ -112,6 +149,11 @@ def cartan_sq_zero (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.sq 0 (p + q) (S.cup p q x y))
       (S.cartanSum 0 p q x y) :=
   cartan_formula_path S 0 p q x y
+
+/-- `Sq^0` Cartan path is the `k = 0` specialization of the formula path. -/
+theorem cartan_sq_zero_eq (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
+    cartan_sq_zero S p q x y = cartan_formula_path S 0 p q x y := by
+  sorry
 
 /-! ## Instability in the Cartan formula -/
 
@@ -174,6 +216,12 @@ def cup_assoc_path (p q r : Nat)
       (S.cup_assoc_target p q r x y z) :=
   Path.stepChain (S.cup_assoc_left p q r x y z)
 
+/-- Definitional expansion for `cup_assoc_path`. -/
+theorem cup_assoc_path_def (p q r : Nat)
+    (x : M.carrier p) (y : M.carrier q) (z : M.carrier r) :
+    cup_assoc_path S p q r x y z = Path.stepChain (S.cup_assoc_left p q r x y z) := by
+  sorry
+
 end CartanAssocData
 
 /-- A graded algebra with a commutative cup product. -/
@@ -193,6 +241,11 @@ variable {M : SteenrodOperations.GradedF2Module.{u}} (S : CartanCommData M)
 def cup_comm_path (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.cup p q x y) (S.cup_comm_target p q x y) :=
   Path.stepChain (S.cup_comm_eq p q x y)
+
+/-- Definitional expansion for `cup_comm_path`. -/
+theorem cup_comm_path_def (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
+    cup_comm_path S p q x y = Path.stepChain (S.cup_comm_eq p q x y) := by
+  sorry
 
 end CartanCommData
 
@@ -227,6 +280,16 @@ def cup_unit_left_path (n : Nat) (x : M.carrier n) :
 def cup_unit_right_path (n : Nat) (x : M.carrier n) :
     Path (S.cup n 0 x S.unit) (S.cup_unit_right_target n x) :=
   Path.stepChain (S.cup_unit_right n x)
+
+/-- Definitional expansion for `cup_unit_left_path`. -/
+theorem cup_unit_left_path_def (n : Nat) (x : M.carrier n) :
+    cup_unit_left_path S n x = Path.stepChain (S.cup_unit_left n x) := by
+  sorry
+
+/-- Definitional expansion for `cup_unit_right_path`. -/
+theorem cup_unit_right_path_def (n : Nat) (x : M.carrier n) :
+    cup_unit_right_path S n x = Path.stepChain (S.cup_unit_right n x) := by
+  sorry
 
 /-- Cartan formula for Sq^k applied to unit ∪ x. -/
 def cartan_unit_left_path (k n : Nat) (x : M.carrier n) :

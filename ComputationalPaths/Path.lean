@@ -427,6 +427,10 @@ import ComputationalPaths.Path.Topology.StableStems
 import ComputationalPaths.Path.Category.HigherTopos
 import ComputationalPaths.Path.Category.LocalizationPaths
 import ComputationalPaths.Path.Category.EnrichedCategories
+import ComputationalPaths.Path.Category.TwoCategories
+import ComputationalPaths.Path.Category.ToposTheoryAdv
+import ComputationalPaths.Path.Category.AccessibleCategories
+import ComputationalPaths.Path.Category.ProfiniteCategories
 import ComputationalPaths.Path.Logic.HomotopyTypeTheory
 import ComputationalPaths.Path.Logic.ModalHoTT
 import ComputationalPaths.Path.Topology.PersistentHomology

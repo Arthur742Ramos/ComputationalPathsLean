@@ -187,11 +187,12 @@ structure Modification (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂} (α β : LaxNatTransformation B₁ B₂ F G) where
   component : (a : B₁.Obj) → B₂.TwoHom (α.component a) (β.component a)
 
-/-- Icon (identity-component oplax natural transformation). -/
+/-- Icon (identity-component oplax natural transformation).
+    Requires F and G to agree on objects. -/
 structure Icon (B₁ B₂ : BicategoryData) (F G : LaxFunctor B₁ B₂)
     (objEq : F.mapObj = G.mapObj) where
   component : {a b : B₁.Obj} → (f : B₁.Hom a b) →
-              B₂.TwoHom (F.mapHom f) (G.mapHom f)
+              B₂.TwoHom (F.mapHom f) (objEq ▸ G.mapHom f)
 
 -- ============================================================
 -- §5  Mates Correspondence
