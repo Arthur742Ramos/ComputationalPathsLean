@@ -439,3 +439,7 @@ import ComputationalPaths.Path.Homotopy.SimplicialPaths
 import ComputationalPaths.Path.Homotopy.CubicalPaths
 import ComputationalPaths.Path.Homotopy.ChainComplexPaths
 import ComputationalPaths.Path.Homotopy.CWComplexPaths
+import ComputationalPaths.Path.Category.OperadPaths
+import ComputationalPaths.Path.Category.MultiCategoryPaths
+import ComputationalPaths.Path.Category.DoubleCategoryPaths
+import ComputationalPaths.Path.Category.HigherCategoryPaths
