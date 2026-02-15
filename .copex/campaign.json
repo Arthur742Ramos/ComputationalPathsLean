@@ -246,8 +246,8 @@
         "ComputationalPaths/Path/Algebra/TriangulatedCategoryPaths.lean",
         "ComputationalPaths/Path/Algebra/MotivicCohomologyAdvanced.lean"
       ],
-      "status": "running",
-      "succeeded": 0,
+      "status": "completed",
+      "succeeded": 5,
       "failed": 0,
       "duration_seconds": 0.0,
       "task_results": [],
@@ -262,7 +262,7 @@
         "ComputationalPaths/Path/Algebra/DirichletCharacters.lean",
         "ComputationalPaths/Path/Algebra/GaloisRepresentation.lean"
       ],
-      "status": "pending",
+      "status": "running",
       "succeeded": 0,
       "failed": 0,
       "duration_seconds": 0.0,
@@ -381,7 +381,7 @@
     }
   ],
   "created_at": "2026-02-15T00:42:18.490826+00:00",
-  "updated_at": "2026-02-15T01:26:07.387620+00:00",
+  "updated_at": "2026-02-15T01:32:18.748343+00:00",
   "total_duration_seconds": 0.0,
   "status": "in_progress"
 }

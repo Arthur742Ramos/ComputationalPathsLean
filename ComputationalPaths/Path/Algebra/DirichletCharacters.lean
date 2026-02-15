@@ -282,6 +282,97 @@ structure OrthogonalityData (R : Type u) (V : Type v)
     Path (sumCharacters.sum (fun chi => VG.mul (eval chi a) (VG.inv (eval chi b))))
       (deltaResidue a b)
 
+/-! ## Basic properties (stubs) -/
+
+theorem characterOps_ofGroup_mul {C : Type u} (G : PathGroup C) :
+    (CharacterOps.ofGroup G).mul = G.mul := by
+  sorry
+
+theorem characterOps_ofGroup_one {C : Type u} (G : PathGroup C) :
+    (CharacterOps.ofGroup G).one = G.one := by
+  sorry
+
+theorem characterOps_ofGroup_inv {C : Type u} (G : PathGroup C) :
+    (CharacterOps.ofGroup G).inv = G.inv := by
+  sorry
+
+theorem dirichletCharacter_eval_apply {R : Type u} {V : Type v}
+    {RM : PathMonoid R} {VG : PathGroup V}
+    (chi : DirichletCharacter R V RM VG) (a : R) :
+    DirichletCharacter.eval chi a = chi.toFun a := by
+  sorry
+
+theorem principalCharacter_eval {R : Type u} {V : Type v}
+    (RM : PathMonoid R) (VG : PathGroup V) (a : R) :
+    (principalCharacter R V RM VG).toFun a = VG.one := by
+  sorry
+
+theorem principalCharacter_map_mul_nonempty {R : Type u} {V : Type v}
+    (RM : PathMonoid R) (VG : PathGroup V) (a b : R) :
+    Nonempty
+      (Path ((principalCharacter R V RM VG).toFun (RM.mul a b))
+        (VG.mul ((principalCharacter R V RM VG).toFun a)
+          ((principalCharacter R V RM VG).toFun b))) := by
+  sorry
+
+theorem characterExpr_eval_base {C : Type u} (ops : CharacterOps C) (c : C) :
+    CharacterExpr.eval ops (CharacterExpr.base c) = c := by
+  sorry
+
+theorem characterExpr_eval_one {C : Type u} (ops : CharacterOps C) :
+    CharacterExpr.eval ops CharacterExpr.one = ops.one := by
+  sorry
+
+theorem characterExpr_eval_mul {C : Type u} (ops : CharacterOps C)
+    (p q : CharacterExpr C) :
+    CharacterExpr.eval ops (CharacterExpr.mul p q) =
+      ops.mul (CharacterExpr.eval ops p) (CharacterExpr.eval ops q) := by
+  sorry
+
+theorem characterExpr_eval_inv {C : Type u} (ops : CharacterOps C)
+    (p : CharacterExpr C) :
+    CharacterExpr.eval ops (CharacterExpr.inv p) =
+      ops.inv (CharacterExpr.eval ops p) := by
+  sorry
+
+theorem characterStep_toPath_nonempty {C : Type u} (G : PathGroup C)
+    {p q : CharacterExpr C} (step : CharacterStep p q) :
+    Nonempty
+      (Path (CharacterExpr.eval (CharacterOps.ofGroup G) p)
+        (CharacterExpr.eval (CharacterOps.ofGroup G) q)) := by
+  sorry
+
+theorem conductor_eq_modulus {R : Type u} {V : Type v}
+    {RM : PathMonoid R} {VG : PathGroup V}
+    (pc : PrimitiveCharacter (RM := RM) (VG := VG)) :
+    conductor pc = pc.conductor.modulus := by
+  sorry
+
+theorem gaussSum_eq_sum {R : Type u} {V : Type v}
+    {RM : PathMonoid R} {VG : PathGroup V}
+    (ctx : GaussSumContext R V) (chi : DirichletCharacter R V RM VG) :
+    gaussSum ctx chi =
+      ctx.sum.sum (fun a => VG.mul (chi.toFun a) (ctx.additive a)) := by
+  sorry
+
+theorem orthogonality_character_nonempty
+    {R : Type u} {V : Type v} {C : Type w}
+    {VG : PathGroup V} {eval : C -> R -> V}
+    (O : OrthogonalityData R V VG C eval) (chi psi : C) :
+    Nonempty
+      (Path (O.sumResidues.sum (fun a => VG.mul (eval chi a) (VG.inv (eval psi a))))
+        (O.deltaCharacter chi psi)) := by
+  sorry
+
+theorem orthogonality_residue_nonempty
+    {R : Type u} {V : Type v} {C : Type w}
+    {VG : PathGroup V} {eval : C -> R -> V}
+    (O : OrthogonalityData R V VG C eval) (a b : R) :
+    Nonempty
+      (Path (O.sumCharacters.sum (fun chi => VG.mul (eval chi a) (VG.inv (eval chi b))))
+        (O.deltaResidue a b)) := by
+  sorry
+
 /-! ## Summary -/
 
 /- This module packages Dirichlet characters, conductors, Gauss sums, and

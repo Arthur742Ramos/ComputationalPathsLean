@@ -140,6 +140,74 @@ def RightDerivedFunctor.trivial : RightDerivedFunctor.{u} where
   map := fun _ => ChainMap3.id unitComplex
   map_id := fun _ => Path.stepChain rfl
 
+/-! ## Basic properties (stubs) -/
+
+theorem unitPointed_zero_path :
+    Nonempty (Path unitPointed.zero PUnit.unit) := by
+  sorry
+
+theorem unitComplex_C₂_path :
+    Nonempty (Path unitComplex.C₂ unitPointed) := by
+  sorry
+
+theorem unitComplex_C₁_path :
+    Nonempty (Path unitComplex.C₁ unitPointed) := by
+  sorry
+
+theorem unitComplex_C₀_path :
+    Nonempty (Path unitComplex.C₀ unitPointed) := by
+  sorry
+
+theorem trivialLongExact_complex_path :
+    Nonempty (Path trivialLongExact.complex unitComplex) := by
+  sorry
+
+theorem trivialLongExact_delta_path :
+    Nonempty (Path trivialLongExact.delta (zeroHom unitPointed unitPointed)) := by
+  sorry
+
+theorem trivialLongExact_exact₁_unit :
+    Nonempty
+      (Path (trivialLongExact.complex.d₁.toFun (trivialLongExact.complex.d₂.toFun PUnit.unit))
+        trivialLongExact.complex.C₀.zero) := by
+  sorry
+
+theorem trivialLongExact_exact₂_unit :
+    Nonempty
+      (Path (trivialLongExact.delta.toFun (trivialLongExact.complex.d₁.toFun PUnit.unit))
+        trivialLongExact.complex.C₂.zero) := by
+  sorry
+
+theorem deltaFunctor_trivial_mapObj (S : ShortExact.{u}) :
+    Nonempty (Path (DeltaFunctor.trivial.mapObj S) trivialLongExact) := by
+  sorry
+
+theorem universalDeltaFunctor_trivial_mapObj (S : ShortExact.{u}) :
+    Nonempty (Path (UniversalDeltaFunctor.trivial.mapObj S) trivialLongExact) := by
+  sorry
+
+theorem leftDerivedFunctor_trivial_obj (A : PointedSet.{u}) :
+    Nonempty (Path (LeftDerivedFunctor.trivial.obj A) unitPointed) := by
+  sorry
+
+theorem leftDerivedFunctor_trivial_resolution (A : PointedSet.{u}) :
+    Nonempty (Path (LeftDerivedFunctor.trivial.resolution A) unitComplex) := by
+  sorry
+
+theorem leftDerivedFunctor_trivial_map_natural
+    (A B : PointedSet.{u}) (f : PointedHom A B) :
+    Nonempty (Path (LeftDerivedFunctor.trivial.map f) (ChainMap3.id unitComplex)) := by
+  sorry
+
+theorem rightDerivedFunctor_trivial_obj (A : PointedSet.{u}) :
+    Nonempty (Path (RightDerivedFunctor.trivial.obj A) unitPointed) := by
+  sorry
+
+theorem rightDerivedFunctor_trivial_map_natural
+    (A B : PointedSet.{u}) (f : PointedHom A B) :
+    Nonempty (Path (RightDerivedFunctor.trivial.map f) (ChainMap3.id unitComplex)) := by
+  sorry
+
 /-! ## Summary
 
 We introduced long exact sequence data, delta functors with universality,

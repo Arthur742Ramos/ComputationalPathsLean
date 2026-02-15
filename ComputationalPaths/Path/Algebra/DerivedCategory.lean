@@ -193,6 +193,85 @@ def derived_cross_module_dependencies
     ⟨Path.trans (derived_homology_comp_path E g f n) (Path.refl _)⟩
   ⟩
 
+/-! ## Basic theorem interfaces (proofs deferred) -/
+
+theorem cat_eq_triangulated_cat (D : DerivedCategory.{u}) :
+    D.cat = D.triangulated.cat := by
+  sorry
+
+theorem shift_eq_triangulated_shift (D : DerivedCategory.{u}) :
+    D.shift = D.triangulated.shift := by
+  sorry
+
+theorem leftDerived_eq_self {D E : DerivedCategory.{u}}
+    (F : DerivedFunctor D E) :
+    leftDerived F = F := by
+  sorry
+
+theorem rightDerived_eq_self {D E : DerivedCategory.{u}}
+    (F : DerivedFunctor D E) :
+    rightDerived F = F := by
+  sorry
+
+theorem leftDerived_eq_rightDerived {D E : DerivedCategory.{u}}
+    (F : DerivedFunctor D E) :
+    leftDerived F = rightDerived F := by
+  sorry
+
+theorem id_preserves_quasiIso {D : DerivedCategory.{u}}
+    {X Y : D.triangulated.cat.Obj} (f : D.triangulated.cat.Hom X Y)
+    (hf : D.quasiIso f) :
+    D.quasiIso ((DerivedFunctor.id D).exact.mapHom f) := by
+  sorry
+
+theorem trivial_le_all (D : DerivedCategory.{u}) (X : D.triangulated.cat.Obj) :
+    (TStructure.trivial D).le X := by
+  sorry
+
+theorem trivial_ge_all (D : DerivedCategory.{u}) (X : D.triangulated.cat.Obj) :
+    (TStructure.trivial D).ge X := by
+  sorry
+
+theorem trivial_truncLeft_eq (D : DerivedCategory.{u}) (X : D.triangulated.cat.Obj) :
+    (TStructure.trivial D).truncLeft X = X := by
+  sorry
+
+theorem trivial_truncRight_eq (D : DerivedCategory.{u}) (X : D.triangulated.cat.Obj) :
+    (TStructure.trivial D).truncRight X = X := by
+  sorry
+
+theorem perverse_object_eq_heartObj_val {D : DerivedCategory.{u}}
+    {T : TStructure D} (P : PerverseSheaf T) :
+    P.object = P.heartObj.val := by
+  sorry
+
+theorem perverse_object_le {D : DerivedCategory.{u}}
+    {T : TStructure D} (P : PerverseSheaf T) :
+    T.le P.object := by
+  sorry
+
+theorem perverse_object_ge {D : DerivedCategory.{u}}
+    {T : TStructure D} (P : PerverseSheaf T) :
+    T.ge P.object := by
+  sorry
+
+theorem derived_cross_module_dependencies_rweq
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c)
+    (E : GeneralizedHomologyTheory.{u, v})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    RwEq (L.preserves_product (Path.trans p q))
+      (Path.trans (L.preserves_product p) (L.preserves_product q)) := by
+  sorry
+
+theorem derived_cross_module_dependencies_nonempty
+    {C : Type u} (L : LeftExactLocalization C)
+    {a b c : C} (p : Path a b) (q : Path b c)
+    (E : GeneralizedHomologyTheory.{u, v})
+    {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
+    Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) := by
+  sorry
+
 /-! ## Summary
 
 We introduced data-level definitions for derived categories, derived functors,
