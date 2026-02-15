@@ -407,29 +407,28 @@ theorem refl_natural {Γ Δ : Ctx} {A : Ty Γ} (a : Tm Γ A) (σ : Sub Δ Γ) :
 
 /-! ## J-eliminator -/
 
-/-- 46. J-eliminator: given a motive over paths and a case for refl,
-    eliminate any path via the underlying equality. -/
-def ctxJ {Γ : Ctx} {A : Ty Γ} {a : Tm Γ A}
+/-- 46. J-eliminator: given a motive over equalities and a case for refl,
+    eliminate any equality pointwise. -/
+noncomputable def ctxJ {Γ : Ctx} {A : Ty Γ} (a : Tm Γ A)
     (C : ∀ γ, ∀ b : A γ, a γ = b → Type w)
-    (d : ∀ γ, C γ (a γ) rfl)
-    (b : Tm Γ A) (p : ∀ γ, a γ = b γ) :
-    ∀ γ, C γ (b γ) (p γ) := by
-  intro γ; cases p γ; exact d γ
+    (d : ∀ γ, C γ (a γ) rfl) :
+    ∀ (γ : Γ) (b : A γ) (p : a γ = b), C γ b p :=
+  fun γ b p => by cases p; exact d γ
 
 /-- 47. J computes on refl (computation rule). -/
-theorem ctxJ_refl {Γ : Ctx} {A : Ty Γ} {a : Tm Γ A}
+theorem ctxJ_refl {Γ : Ctx} {A : Ty Γ} (a : Tm Γ A)
     (C : ∀ γ, ∀ b : A γ, a γ = b → Type w)
     (d : ∀ γ, C γ (a γ) rfl) (γ : Γ) :
-    ctxJ C d a (fun _ => rfl) γ = d γ := rfl
+    ctxJ a C d γ (a γ) rfl = d γ := rfl
 
 /-! ## Transport coherence with comprehension -/
 
-/-- 48. Transport in the extended context decomposes via projection. -/
-theorem transport_ext_proj {Γ : Ctx} {A B : Ty Γ} {γ₁ γ₂ : Γ}
-    {a₁ : A γ₁} {a₂ : A γ₂}
-    (p : Path γ₁ γ₂) (ha : transport (D := A) p a₁ = a₂)
-    (x : B γ₁) :
-    transport (D := B) p x = transport (D := B) p x := rfl
+/-- 48. Transport in weakened type via projection. -/
+theorem transport_wk_ty {Γ : Ctx} {A B : Ty Γ}
+    {x y : ctxExt Γ A} (p : Path x y) (v : wkTy A B x) :
+    transport (D := wkTy A B) p v =
+      transport (D := B) (congrArg (projSub A) p) v := by
+  cases p with | mk steps proof => cases proof; rfl
 
 /-- 49. congrArg for projSub extracts the first component. -/
 theorem congrArg_projSub {Γ : Ctx} {A : Ty Γ}
@@ -492,8 +491,8 @@ theorem extPair_natural {Γ Δ Θ : Ctx} {A : Ty Γ}
 theorem congrArg_comp_sub {Γ Δ Θ : Ctx} (σ : Sub Δ Γ) (τ : Sub Θ Δ)
     {θ₁ θ₂ : Θ} (p : Path θ₁ θ₂) :
     congrArg (compSub σ τ) p =
-      congrArg σ (congrArg τ p) := by
-  exact (congrArg_comp σ τ p).symm
+      congrArg σ (congrArg τ p) :=
+  congrArg_comp σ τ p
 
 end CwFDeep
 end TypeTheory
