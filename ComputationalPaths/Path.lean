@@ -443,3 +443,7 @@ import ComputationalPaths.Path.Category.OperadPaths
 import ComputationalPaths.Path.Category.MultiCategoryPaths
 import ComputationalPaths.Path.Category.DoubleCategoryPaths
 import ComputationalPaths.Path.Category.HigherCategoryPaths
+import ComputationalPaths.Path.TypeTheory.WTypePaths
+import ComputationalPaths.Path.TypeTheory.InductiveTypePaths
+import ComputationalPaths.Path.TypeTheory.IdentityTypePaths
+import ComputationalPaths.Path.TypeTheory.UnivalencePaths
