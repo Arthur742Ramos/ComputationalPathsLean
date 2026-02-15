@@ -18,14 +18,34 @@ path-preserving constructions.
 
 | Metric | Value |
 |--------|-------|
-| **Lean files** | 785 |
-| **Lines of code** | ~184,000 |
-| **Theorems & lemmas** | 6,838 |
-| **Definitions, structures & classes** | 11,506 |
-| **Build jobs** | 6,024 |
-| **Build warnings** | 29 (lint style only; all `sorry` warnings are WIP stubs) |
+| **Lean files** | 907 |
+| **Lines of code** | ~218,000 |
+| **Theorems & lemmas** | 10,783 |
+| **Definitions, structures & classes** | 15,241 |
 | **`rweq_of_step` uses** | 509 (across 139 files) |
 | **Architecture** | Single-root `ComputationalPaths/` tree |
+| **Expansion tooling** | [copex](https://github.com/openclawai/copex) v2.6.0 |
+
+### Domain Breakdown
+
+| Domain | Files | Theorems & Lemmas |
+|--------|------:|------------------:|
+| Algebra | 229 | 3,243 |
+| Homotopy | 177 | 1,705 |
+| Topology | 113 | 1,469 |
+| Rewrite system | 30 | 860 |
+| CompPath constructions | 51 | 678 |
+| Category theory | 20 | 450 |
+| Foundations | 15 | 343 |
+| Core & Basic | 10 | 244 |
+| Logic | 7 | 66 |
+| ω-Groupoid | 5 | 35 |
+| Advanced topics\* | 204 | — |
+
+\*Advanced topics (outside `Path/`): spectral sequences, perfectoid spaces,
+prismatic & crystalline cohomology, Floer homology, tropical geometry, operads,
+Langlands program, Kac–Moody algebras, étale cohomology, condensed mathematics,
+derived algebraic geometry, and more.
 
 ---
 
@@ -159,7 +179,7 @@ into this tree in the single-root migration.
 
 ```
 ComputationalPathsLean/
-├── ComputationalPaths/           # All library code (785 files)
+├── ComputationalPaths/           # All library code (907 files)
 │   └── Path/
 │       ├── Basic/                # Path, Step, transport, congruence, Context
 │       │   ├── Core.lean         # Fundamental Path and Step structures
@@ -408,7 +428,7 @@ lake build ComputationalPaths:docs Kan:docs Equivalence:docs
 ```
 
 > **Note:** The full build generates documentation for Lean, Std, Mathlib, and all
-> project modules. For a Mathlib-dependent project of this size (~856 files), expect
+> project modules. For a Mathlib-dependent project of this size (~907 files), expect
 > the first build to take **several hours**. Subsequent incremental builds are faster.
 
 ### Viewing Docs
