@@ -455,3 +455,5 @@ import ComputationalPaths.Path.HoTT.UnivalenceDeep
 import ComputationalPaths.Path.Rewriting.HigherRewritingDeep
 import ComputationalPaths.Path.Rewriting.KnuthBendixDeep
 import ComputationalPaths.Path.Rewriting.CoherenceDeep
+import ComputationalPaths.Path.Homotopy.CubicalDeep
+import ComputationalPaths.Path.Algebra.CompletionDeep
