@@ -134,15 +134,15 @@ structure LocallyConnectedTopos extends GrothendieckTopos where
   hasPi0 : True
 
 /-- Hyperconnected geometric morphism. -/
-def IsHyperconnected (_ _ : GrothendieckTopos) (_ : GeometricMorphism _ _) : Prop :=
+def IsHyperconnected (E F : GrothendieckTopos) (_ : GeometricMorphism E F) : Prop :=
   True
 
 /-- Localic geometric morphism. -/
-def IsLocalic (_ _ : GrothendieckTopos) (_ : GeometricMorphism _ _) : Prop :=
+def IsLocalic (E F : GrothendieckTopos) (_ : GeometricMorphism E F) : Prop :=
   True
 
 /-- Bounded geometric morphism. -/
-def IsBounded (_ _ : GrothendieckTopos) (_ : GeometricMorphism _ _) : Prop :=
+def IsBounded (E F : GrothendieckTopos) (_ : GeometricMorphism E F) : Prop :=
   True
 
 -- ============================================================

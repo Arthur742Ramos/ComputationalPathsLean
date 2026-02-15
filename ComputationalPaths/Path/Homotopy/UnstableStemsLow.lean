@@ -98,6 +98,62 @@ def pi4S2_equiv_z2 : SimpleEquiv Pi4S2 Z2 := SimpleEquiv.refl _
 /-- pi_5(S2) is Z/2. -/
 def pi5S2_equiv_z2 : SimpleEquiv Pi5S2 Z2 := SimpleEquiv.refl _
 
+/-! ## Derived identities and coherence stubs -/
+
+theorem eta_eq_one : eta = (1 : Pi3S2) := by
+  sorry
+
+theorem nu_eq_z2_one : nu = z2_one := by
+  sorry
+
+theorem sigma_eq_z2_one : sigma = z2_one := by
+  sorry
+
+theorem eta_normal_form_refl : eta_normal_form = Path.refl (1 : Pi3S2) := by
+  sorry
+
+theorem nu_normal_form_refl : nu_normal_form = Path.refl z2_one := by
+  sorry
+
+theorem sigma_normal_form_refl : sigma_normal_form = Path.refl z2_one := by
+  sorry
+
+theorem eta_normal_form_left_unit :
+    Path.trans (Path.refl eta) eta_normal_form = eta_normal_form := by
+  sorry
+
+theorem eta_normal_form_right_unit :
+    Path.trans eta_normal_form (Path.refl (1 : Pi3S2)) = eta_normal_form := by
+  sorry
+
+theorem eta_normal_form_inverse_left :
+    Path.trans (Path.symm eta_normal_form) eta_normal_form = Path.refl (1 : Pi3S2) := by
+  sorry
+
+theorem eta_normal_form_assoc :
+    Path.trans (Path.trans (Path.refl eta) eta_normal_form) (Path.refl (1 : Pi3S2)) =
+      Path.trans (Path.refl eta) (Path.trans eta_normal_form (Path.refl (1 : Pi3S2))) := by
+  sorry
+
+theorem eta_normal_form_congr_id :
+    Path.congrArg (fun x : Pi3S2 => x) eta_normal_form = eta_normal_form := by
+  sorry
+
+theorem eta_normal_form_congr_pi3_equiv :
+    Path.congrArg pi3S2_equiv_int.toFun eta_normal_form = Path.refl (1 : Int) := by
+  sorry
+
+theorem z2_add_comm (a b : Z2) : a + b = b + a := by
+  sorry
+
+theorem pi3S2_equiv_int_left_inv (x : Pi3S2) :
+    pi3S2_equiv_int.invFun (pi3S2_equiv_int.toFun x) = x := by
+  sorry
+
+theorem pi3S2_equiv_int_right_inv (x : Int) :
+    pi3S2_equiv_int.toFun (pi3S2_equiv_int.invFun x) = x := by
+  sorry
+
 /-! ## Summary -/
 
 end UnstableStemsLow

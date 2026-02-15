@@ -1,7 +1,7 @@
 /-
 # Berkovich Spaces via Computational Paths
 
-Berkovich analytification, non‐archimedean geometry, Berkovich curves,
+Berkovich analytification, non-archimedean geometry, Berkovich curves,
 tropicalization, skeleton, formal models, Raynaud generic fiber.
 All proofs use sorry.
 -/
@@ -15,18 +15,18 @@ open Path
 universe u
 
 -- ============================================================
--- §1  Non‐archimedean fields
+-- §1  Non-archimedean fields
 -- ============================================================
 
-/-- Non‐archimedean valued field data. -/
+/-- Non-archimedean valued field data. -/
 structure NAField where
   carrier : Type u
-  valuationRank : ℕ
+  valuationRank : Nat
 
 /-- Valuation ring 𝒪_K = {x : |x| ≤ 1}. -/
 structure ValuationRing where
   field : NAField
-  residueFieldChar : ℕ
+  residueFieldChar : Nat
 
 /-- Maximal ideal 𝔪 = {x : |x| < 1}. -/
 structure MaximalIdeal where
@@ -36,9 +36,9 @@ structure MaximalIdeal where
 -- §2  Multiplicative seminorms
 -- ============================================================
 
-/-- Multiplicative seminorm on a ring A extending a non‐archimedean abs. val. -/
+/-- Multiplicative seminorm on a ring A extending a non-archimedean abs value. -/
 structure MultSeminorm where
-  ringSize : ℕ     -- placeholder for the ring structure
+  ringSize : Nat
   isMultiplicative : Bool
   isUltrametric : Bool
 
@@ -52,8 +52,8 @@ structure BoundedSeminorm extends MultSeminorm where
 
 /-- Berkovich analytification of an affine variety Spec A. -/
 structure BerkovichSpace where
-  coordRing : Type u
-  numPoints : ℕ             -- placeholder for point set
+  coordRingSize : Nat
+  numPoints : Nat
 
 /-- Berkovich affine line 𝔸^{1,an}. -/
 structure BerkovichLine where
@@ -62,10 +62,10 @@ structure BerkovichLine where
 
 /-- Classification of points in the Berkovich affine line. -/
 inductive PointType where
-  | typeI    -- classical points from K
-  | typeII   -- supremum on a rational disk
-  | typeIII  -- supremum on an irrational disk
-  | typeIV   -- limit of nested disks with empty intersection
+  | typeI     -- classical points from K
+  | typeII    -- supremum on a rational disk
+  | typeIII   -- supremum on an irrational disk
+  | typeIV    -- limit of nested disks with empty intersection
 
 /-- Type I points are dense. -/
 theorem typeI_dense : True := by sorry
@@ -73,7 +73,7 @@ theorem typeI_dense : True := by sorry
 /-- Gauss point is type II with radius 1. -/
 theorem gauss_point_typeII : True := by sorry
 
-/-- Berkovich line is uniquely path‐connected. -/
+/-- Berkovich line is uniquely path-connected. -/
 theorem berkovich_line_path_connected : True := by sorry
 
 /-- Berkovich line is locally compact. -/
@@ -85,10 +85,10 @@ theorem berkovich_line_locally_compact : True := by sorry
 
 /-- Berkovich analytification of a smooth projective curve. -/
 structure BerkovichCurve where
-  genus : ℕ
+  genus : Nat
   base : NAField
 
-/-- The underlying topological space is a real tree (R‐tree). -/
+/-- The underlying topological space is a real tree (R-tree). -/
 theorem berkovich_curve_is_rtree (_ : BerkovichCurve) : True := by sorry
 
 /-- Retraction onto a finite graph (skeleton). -/
@@ -103,9 +103,9 @@ theorem berkovich_genus_formula (_ : BerkovichCurve) : True := by sorry
 
 /-- Skeleton Σ(X) ⊂ X^an: a finite metric graph. -/
 structure Skeleton where
-  numVertices : ℕ
-  numEdges : ℕ
-  genus : ℕ      -- first Betti number
+  numVertices : Nat
+  numEdges : Nat
+  genus : Nat     -- first Betti number
 
 /-- The skeleton is a strong deformation retract. -/
 theorem skeleton_deformation_retract (_ : Skeleton) : True := by sorry
@@ -116,8 +116,8 @@ theorem skeleton_from_semistable_model : True := by sorry
 /-- Baker–Norine: Riemann–Roch on the metric graph. -/
 theorem baker_norine_rr (_ : Skeleton) : True := by sorry
 
-/-- Edge lengths from valuations. -/
-noncomputable def edgeLength (_ : Skeleton) (_ : ℕ) : ℕ := 0
+/-- Edge length from valuation. -/
+noncomputable def edgeLength (_ : Skeleton) (_ : Nat) : Nat := 0
 
 -- ============================================================
 -- §6  Tropicalization
@@ -125,8 +125,8 @@ noncomputable def edgeLength (_ : Skeleton) (_ : ℕ) : ℕ := 0
 
 /-- Tropicalization map trop : X^an → ℝⁿ. -/
 structure TropicalizationMap where
-  ambientDim : ℕ
-  imageDim : ℕ
+  ambientDim : Nat
+  imageDim : Nat
 
 /-- Tropicalization factors through the skeleton. -/
 theorem trop_factors_skeleton : True := by sorry
@@ -149,15 +149,15 @@ theorem tropical_structure_theorem : True := by sorry
 
 /-- Formal scheme over 𝒪_K (formal model). -/
 structure FormalModel where
-  relativeDim : ℕ
+  relativeDim : Nat
   isSemistable : Bool
 
 /-- Raynaud's generic fiber functor: 𝔛 ↦ 𝔛_η^an. -/
 structure RaynaudGenericFiber where
   formalModel : FormalModel
 
-/-- Raynaud's theorem: rigid analytic varieties ↔ formal models up to
-    admissible blowup. -/
+/-- Raynaud's theorem: rigid analytic varieties ↔ formal models
+    up to admissible blowup. -/
 theorem raynaud_equivalence : True := by sorry
 
 /-- GAGA: coherent sheaves on X^an ↔ algebraic coherent sheaves on X. -/
@@ -170,7 +170,7 @@ theorem specialization_map : True := by sorry
 theorem semistable_reduction (_ : BerkovichCurve) : True := by sorry
 
 -- ============================================================
--- §8  Path‐algebraic structure
+-- §8  Path-algebraic structure
 -- ============================================================
 
 /-- Path between type II and type III via approximation. -/

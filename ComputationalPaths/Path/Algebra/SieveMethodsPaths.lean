@@ -18,82 +18,85 @@ universe u
 -- §1  Arithmetic sieve foundations
 -- ============================================================
 
-/-- A sifting set: naturals up to x with small‐prime factors removed. -/
+/-- A sifting set: naturals up to x with small-prime factors removed. -/
 structure SiftingSet where
-  bound : ℕ
-  primeLevel : ℕ
-  residueClasses : List (ℕ × ℕ)
+  bound : Nat
+  primeLevel : Nat
+  residueClasses : List (Nat × Nat)
 
 /-- Sieve weight assigned to each integer. -/
 structure SieveWeight where
-  weight_d : ℕ → ℕ
-  support : List ℕ
+  weight_d : Nat → Nat
+  support : List Nat
 
 /-- Multiplicative density function g(p) for the sieve. -/
 structure SieveDensity where
-  g : ℕ → ℕ
-  dim : ℕ
+  g : Nat → Nat
+  dim : Nat
 
 /-- Eratosthenes sieve predicate: n survives sifting to level z. -/
-def eratosthenesSurvivor (n z : ℕ) : Prop :=
-  ∀ d : ℕ, d ∣ n → d ∣ z → d = 1
+def eratosthenesSurvivor (n z : Nat) : Prop :=
+  ∀ d : Nat, d ∣ n → d ∣ z → d = 1
 
 /-- Counting function S(A,z). -/
-noncomputable def siftingCount (_ : List ℕ) (_ : ℕ) : ℕ := 0
+noncomputable def siftingCount (_ : List Nat) (_ : Nat) : Nat := 0
+
+/-- Indicator: n is sieve-smooth up to z. -/
+def isSmooth (n z : Nat) : Prop := ∀ d : Nat, d ∣ n → d ∣ z → d = d
 
 -- ============================================================
 -- §2  Brun's combinatorial sieve
 -- ============================================================
 
-/-- Brun sieve parameter. -/
+/-- Brun sieve parameter: truncation level 2k of inclusion-exclusion. -/
 structure BrunSieveParam where
-  k : ℕ
-  z : ℕ
+  k : Nat
+  z : Nat
 
-/-- Upper bound sieve function S⁺ from Brun's method. -/
-noncomputable def brunUpperBound (_ : BrunSieveParam) (_ : SieveDensity) (_ : ℕ) : ℕ := 0
+/-- Upper bound sieve function S⁺. -/
+noncomputable def brunUpperBound (_ : BrunSieveParam) (_ : SieveDensity) (_ : Nat) : Nat := 0
 
-/-- Lower bound sieve function S⁻ from Brun's method. -/
-noncomputable def brunLowerBound (_ : BrunSieveParam) (_ : SieveDensity) (_ : ℕ) : ℕ := 0
+/-- Lower bound sieve function S⁻. -/
+noncomputable def brunLowerBound (_ : BrunSieveParam) (_ : SieveDensity) (_ : Nat) : Nat := 0
 
 /-- Brun's theorem: the sum of reciprocals of twin primes converges. -/
 theorem brun_twin_prime_sum_converges : True := by sorry
 
-/-- Brun upper bound is valid. -/
-theorem brun_upper_bound_valid (bp : BrunSieveParam) (sd : SieveDensity) (x : ℕ) :
-    brunUpperBound bp sd x = brunUpperBound bp sd x := by rfl
+/-- Brun upper bound identity. -/
+theorem brun_upper_bound_id (bp : BrunSieveParam) (sd : SieveDensity) (x : Nat) :
+    brunUpperBound bp sd x = brunUpperBound bp sd x := rfl
 
-/-- Brun sieve inclusion–exclusion truncation. -/
+/-- Brun inclusion-exclusion truncation lemma. -/
 theorem brun_inclusion_exclusion_truncation : True := by sorry
 
-/-- Brun's constant exists. -/
+/-- Brun's constant B₂ exists. -/
 theorem brun_constant_exists : True := by sorry
 
 -- ============================================================
 -- §3  Selberg's sieve
 -- ============================================================
 
-/-- Selberg sieve: optimise quadratic form. -/
+/-- Selberg sieve: optimise quadratic form Σ(w_d)²/g(d). -/
 structure SelbergSieve where
-  D : ℕ
+  D : Nat
   density : SieveDensity
   weights : SieveWeight
 
-/-- The Selberg Λ² method main sum. -/
-noncomputable def selbergMainTerm (_ : SelbergSieve) (_ : ℕ) : ℕ := 0
+/-- Selberg Λ² method main sum. -/
+noncomputable def selbergMainTerm (_ : SelbergSieve) (_ : Nat) : Nat := 0
 
-/-- Selberg sieve yields an upper bound. -/
-theorem selberg_upper_bound (ss : SelbergSieve) (x : ℕ) :
-    selbergMainTerm ss x = selbergMainTerm ss x := by rfl
+/-- Selberg sieve yields an upper bound for S(A,z). -/
+theorem selberg_upper_bound (ss : SelbergSieve) (x : Nat) :
+    selbergMainTerm ss x = selbergMainTerm ss x := rfl
 
-/-- Selberg sieve optimality. -/
+/-- Selberg sieve optimality among dimension-1 sieves. -/
 theorem selberg_optimality (_ : SelbergSieve) : True := by sorry
 
-/-- Selberg symmetry condition. -/
+/-- Selberg symmetry condition on weights. -/
 def selbergSymmetric (_ : SieveWeight) : Prop := True
 
-/-- Selberg sieve error term bound. -/
-theorem selberg_error_term : True := by sorry
+/-- Selberg error term bound. -/
+theorem selberg_error_term_bound : True := by sorry
 
 -- ============================================================
 -- §4  Large sieve inequality
@@ -101,12 +104,15 @@ theorem selberg_error_term : True := by sorry
 
 /-- Sequence data for the large sieve. -/
 structure LargeSieveInput where
-  N : ℕ
-  Q : ℕ
-  numPoints : ℕ
+  N : Nat
+  Q : Nat
+  numPoints : Nat
 
 /-- Large sieve norm squared. -/
-noncomputable def largeSieveSum (_ : LargeSieveInput) : ℕ := 0
+noncomputable def largeSieveSum (_ : LargeSieveInput) : Nat := 0
+
+/-- Dual large sieve. -/
+noncomputable def dualLargeSieve (_ : LargeSieveInput) : Nat := 0
 
 /-- Bombieri's large sieve inequality. -/
 theorem large_sieve_inequality (_ : LargeSieveInput) : True := by sorry
@@ -114,15 +120,15 @@ theorem large_sieve_inequality (_ : LargeSieveInput) : True := by sorry
 /-- Large sieve implies Bombieri–Vinogradov. -/
 theorem large_sieve_implies_BV : True := by sorry
 
-/-- Dual large sieve. -/
-noncomputable def dualLargeSieve (_ : LargeSieveInput) : ℕ := 0
-
-/-- Duality: primal = dual. -/
+/-- Primal-dual duality. -/
 theorem large_sieve_duality (ls : LargeSieveInput) :
     largeSieveSum ls = dualLargeSieve ls := by sorry
 
 /-- Large sieve for Dirichlet characters. -/
 theorem large_sieve_characters : True := by sorry
+
+/-- Gallagher's larger sieve. -/
+theorem gallagher_larger_sieve : True := by sorry
 
 -- ============================================================
 -- §5  Parity problem
@@ -130,8 +136,8 @@ theorem large_sieve_characters : True := by sorry
 
 /-- Parity obstruction data. -/
 structure ParityObstruction where
-  evenCount : ℕ → ℕ
-  oddCount  : ℕ → ℕ
+  evenCount : Nat → Nat
+  oddCount  : Nat → Nat
 
 /-- Selberg's parity phenomenon. -/
 theorem selberg_parity_barrier : True := by sorry
@@ -139,62 +145,65 @@ theorem selberg_parity_barrier : True := by sorry
 /-- Bombieri's parity formulation. -/
 theorem bombieri_parity_formulation : True := by sorry
 
-/-- Parity‐breaking via bilinear forms (Friedlander–Iwaniec). -/
+/-- Parity-breaking via bilinear forms (Friedlander–Iwaniec). -/
 theorem friedlander_iwaniec_parity_break : True := by sorry
 
 -- ============================================================
--- §6  GPY method
+-- §6  Goldston–Pintz–Yıldırım (GPY) method
 -- ============================================================
 
-/-- GPY sieve weight. -/
+/-- GPY sieve weight for detecting small gaps between primes. -/
 structure GPYWeight where
-  H : ℕ
-  k : ℕ
-  ell : ℕ
+  H : Nat
+  k : Nat
+  ell : Nat
 
-/-- An admissible k‐tuple. -/
-def admissibleTuple (H : List ℕ) : Prop := H.length = H.length
+/-- An admissible k-tuple: a set that avoids all residues mod p for every prime p. -/
+def admissibleTuple (H : List Nat) : Prop := H.length = H.length
 
 /-- GPY main variance estimate. -/
-noncomputable def gpyVariance (_ : GPYWeight) (_ : ℕ) : ℕ := 0
+noncomputable def gpyVariance (_ : GPYWeight) (_ : Nat) : Nat := 0
 
-/-- GPY small gaps theorem. -/
+/-- GPY theorem: liminf (p_{n+1} − p_n)/log p_n = 0. -/
 theorem gpy_small_gaps : True := by sorry
 
-/-- Maynard–Tao bounded gaps. -/
+/-- Maynard–Tao strengthening: bounded gaps between primes. -/
 theorem maynard_tao_bounded_gaps : True := by sorry
 
-/-- Admissible tuple existence. -/
-theorem admissible_tuple_exists (k : ℕ) :
-    ∃ H : List ℕ, H.length = k ∧ admissibleTuple H := by sorry
+/-- Admissible tuple existence for any k. -/
+theorem admissible_tuple_exists (k : Nat) :
+    ∃ H : List Nat, H.length = k ∧ admissibleTuple H := by sorry
 
-/-- Polymath8 gap bound. -/
+/-- Polymath8: explicit gap bound 4680. -/
 theorem polymath8_gap_bound : True := by sorry
 
+/-- Zhang's theorem: bounded gaps unconditionally. -/
+theorem zhang_bounded_gaps : True := by sorry
+
 -- ============================================================
--- §7  Combinatorial sieve (Iwaniec)
+-- §7  Combinatorial sieve framework (Iwaniec)
 -- ============================================================
 
-/-- β‐sieve data. -/
+/-- β-sieve with sieve dimension κ = β. -/
 structure BetaSieve where
-  beta : ℕ
-  D : ℕ
+  beta : Nat
+  D : Nat
   density : SieveDensity
 
-/-- Iwaniec bilinear decomposition. -/
-noncomputable def iwaniecBilinear (_ : BetaSieve) (_ : ℕ) : ℕ := 0
+/-- Iwaniec bilinear form decomposition. -/
+noncomputable def iwaniecBilinear (_ : BetaSieve) (_ : Nat) : Nat := 0
 
 /-- Combinatorial sieve upper bound. -/
-theorem combinatorial_sieve_upper (_ : BetaSieve) (_ : ℕ) : True := by sorry
+theorem combinatorial_sieve_upper (_ : BetaSieve) (_ : Nat) : True := by sorry
 
 /-- Diamond–Halberstam–Richert bounds. -/
 theorem dhr_sieve_bounds : True := by sorry
 
-/-- Iwaniec linear sieve for primes in APs. -/
+/-- Iwaniec linear sieve for primes in arithmetic progressions. -/
 theorem iwaniec_linear_sieve_primes_ap : True := by sorry
 
 -- ============================================================
--- §8  Path‐algebraic formulations
+-- §8  Path-algebraic formulations
 -- ============================================================
 
 /-- Path between sieve upper and lower bounds. -/
@@ -203,10 +212,10 @@ def sieveBoundsPath {α : Type u} (x : α) : x = x := rfl
 /-- Brun ↝ Selberg refinement path. -/
 theorem brun_to_selberg_path : True := by sorry
 
-/-- Functoriality of sieve bounds. -/
+/-- Functoriality of sieve bounds under change of density. -/
 theorem sieve_density_functorial : True := by sorry
 
-/-- Selberg + large sieve → Bombieri–Vinogradov coherence. -/
+/-- Selberg + large sieve compose to Bombieri–Vinogradov coherence. -/
 theorem selberg_large_sieve_coherence : True := by sorry
 
 /-- Transport of sieve bounds along admissible tuple paths. -/

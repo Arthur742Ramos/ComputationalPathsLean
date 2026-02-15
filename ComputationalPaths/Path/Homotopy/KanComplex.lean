@@ -272,6 +272,79 @@ def rel_refl_path (kh : KanHomotopyGroupData S bp n) (σ : KanSphere S bp n) :
 
 end KanHomotopyGroupData
 
+/-! ## Additional Basic Properties -/
+
+section BasicProperties
+
+variable {S T : SSetData}
+variable {n : Nat}
+variable {k : Fin (n + 2)}
+
+theorem inner_horn_left_ineq (h : InnerHorn n k) : 0 < k.val := by
+  sorry
+
+theorem inner_horn_right_ineq (h : InnerHorn n k) : k.val < n + 1 := by
+  sorry
+
+theorem outer_horn_zero_or_top (h : OuterHorn n k) : k.val = 0 ∨ k.val = n + 1 := by
+  sorry
+
+theorem outer_horn_top_or_zero (h : OuterHorn n k) : k.val = n + 1 ∨ k.val = 0 := by
+  sorry
+
+theorem kan_to_inner_fill_eq (kan : KanFillerProperty S) (hInner : InnerHorn n k)
+    (horn : HornData S n k) :
+    (kanToInnerKan S kan).fill n k hInner horn = kan.fill n k horn := by
+  sorry
+
+theorem sset_map_face_naturality (f : SSetMap S T) (i : Fin (n + 2)) (x : S.obj (n + 1)) :
+    f.map n (S.face n i x) = T.face n i (f.map (n + 1) x) := by
+  sorry
+
+def sset_map_face_naturality_path (f : SSetMap S T) (i : Fin (n + 2)) (x : S.obj (n + 1)) :
+    Path (f.map n (S.face n i x)) (T.face n i (f.map (n + 1) x)) := by
+  sorry
+
+theorem minimal_kan_filler_unique_eq (mk : MinimalKanData S) (k : Fin (n + 2))
+    (horn : HornData S n k) (f1 f2 : HornFiller S n k horn)
+    (hk : S.face n k f1.simplex = S.face n k f2.simplex) :
+    f1.simplex = f2.simplex := by
+  sorry
+
+def minimal_kan_filler_unique_path (mk : MinimalKanData S) (k : Fin (n + 2))
+    (horn : HornData S n k) (f1 f2 : HornFiller S n k horn)
+    (hk : S.face n k f1.simplex = S.face n k f2.simplex) :
+    Path f1.simplex f2.simplex := by
+  sorry
+
+theorem basepoint_zero_eq (bp : SSetBasepoint S) : bp.baseN 0 = bp.base := by
+  sorry
+
+def basepoint_zero_path (bp : SSetBasepoint S) : Path (bp.baseN 0) bp.base := by
+  sorry
+
+theorem sphere_boundary_face_eq {bp : SSetBasepoint S} (σ : KanSphere S bp n) (i : Fin (n + 2)) :
+    S.face n i σ.simplex = bp.baseN n := by
+  sorry
+
+theorem kan_rel_symmetric {bp : SSetBasepoint S}
+    (kh : KanHomotopyGroupData S bp n) (σ τ : KanSphere S bp n)
+    (h : kh.rel σ τ) : kh.rel τ σ := by
+  sorry
+
+theorem kan_rel_transitive {bp : SSetBasepoint S}
+    (kh : KanHomotopyGroupData S bp n) (σ τ ρ : KanSphere S bp n)
+    (hστ : kh.rel σ τ) (hτρ : kh.rel τ ρ) : kh.rel σ ρ := by
+  sorry
+
+theorem kan_rel_quot_eq {bp : SSetBasepoint S}
+    (kh : KanHomotopyGroupData S bp n) (σ τ : KanSphere S bp n)
+    (h : kh.rel σ τ) :
+    Quot.mk kh.rel σ = Quot.mk kh.rel τ := by
+  sorry
+
+end BasicProperties
+
 /-! ## Summary
 
 We have formalized:

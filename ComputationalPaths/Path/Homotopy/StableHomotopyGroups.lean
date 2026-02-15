@@ -132,8 +132,70 @@ def primeTwo : ChromaticHomotopy.Prime :=
 def heightOneAtTwo : ChromaticHeightOneSS primeTwo :=
   trivialHeightOneSS primeTwo
 
+/-! ## Basic theorem stubs -/
+
+theorem stableStemBase_eq_unit (n : Nat) :
+    stableStemBase n = () := by
+  sorry
+
+theorem jHomomorphism_apply (n : Nat) (x : JSource n) :
+    jHomomorphism n x = stableStemBase n := by
+  sorry
+
+theorem imageOfJBase_elem (n : Nat) :
+    (imageOfJBase n).elem = stableStemBase n := by
+  sorry
+
+theorem imageOfJMap_elem (n : Nat) (x : JSource n) :
+    (imageOfJMap n x).elem = jHomomorphism n x := by
+  sorry
+
+theorem adamsEInvariant_elem (n : Nat) (x : StableStem n) :
+    (adamsEInvariant n x).elem = x := by
+  sorry
+
+theorem adamsEInvariant_value (n : Nat) (x : StableStem n) :
+    (adamsEInvariant n x).value = 0 := by
+  sorry
+
+theorem adamsEInvariantOfJ_def (n : Nat) :
+    adamsEInvariantOfJ n = adamsEInvariant n (jHomomorphism n ()) := by
+  sorry
+
+theorem alphaFamily_elem (k : Nat) :
+    (alphaFamily k).elem = stableStemBase (alphaStem k) := by
+  sorry
+
+theorem betaFamily_elem (k : Nat) :
+    (betaFamily k).elem = stableStemBase (betaStem k) := by
+  sorry
+
+theorem alphaStem_succ (k : Nat) :
+    alphaStem (k + 1) = alphaStem k + 2 := by
+  sorry
+
+theorem betaStem_succ (k : Nat) :
+    betaStem (k + 1) = betaStem k + 2 := by
+  sorry
+
+theorem trivialHeightOneSS_E2 (p : ChromaticHomotopy.Prime) :
+    (trivialHeightOneSS p).E2 = AdamsSpectralSequence.trivialPage 1 := by
+  sorry
+
+theorem trivialHeightOneSS_converges_to_stem (p : ChromaticHomotopy.Prime) :
+    (trivialHeightOneSS p).converges_to_stem = Unit := by
+  sorry
+
+theorem heightOneAtTwo_def :
+    heightOneAtTwo = trivialHeightOneSS primeTwo := by
+  sorry
+
 private def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
+
+theorem pathAnchor_eq_refl {A : Type} (a : A) :
+    pathAnchor a = Path.refl a := by
+  sorry
 
 /-! ## Summary -/
 
