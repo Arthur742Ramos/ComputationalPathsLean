@@ -114,6 +114,8 @@ import ComputationalPaths.Path.Homotopy.HopfInvariant
 import ComputationalPaths.Path.Homotopy.KervaireInvariant
 import ComputationalPaths.Path.Homotopy.HomotopyFiber
 import ComputationalPaths.Path.Homotopy.PathSpaceFibration
+import ComputationalPaths.Path.Homotopy.PathFibration
+import ComputationalPaths.Path.Homotopy.CoveringPaths
 import ComputationalPaths.Path.Homotopy.GaneaFibration
 import ComputationalPaths.Path.Homotopy.PathSpaceHomotopy
 import ComputationalPaths.Path.Homotopy.HomotopyCommutativeDiagram
