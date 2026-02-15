@@ -53,7 +53,7 @@ def AlgCycle.numComponents (c : AlgCycle) : Nat :=
 
 /-- Zero cycle has degree 0. -/
 theorem zero_degree (p : Nat) : (AlgCycle.zero p).degree = 0 := by
-  simp [AlgCycle.zero, AlgCycle.degree, List.foldl]
+  simp [AlgCycle.zero, AlgCycle.degree]
 
 /-- Zero cycle has no components. -/
 theorem zero_numComponents (p : Nat) : (AlgCycle.zero p).numComponents = 0 := by
@@ -148,7 +148,7 @@ def cycle_class_degree_path (ccm : CycleClassMap) :
 /-- Compatibility: cycle class of codim 0 maps to H^0. -/
 theorem cycle_class_codim_zero (ccm : CycleClassMap) (h : ccm.source_codim = 0) :
     ccm.target_degree = 0 := by
-  rw [ccm.degree_formula, h]; ring
+  rw [ccm.degree_formula, h]
 
 -- ============================================================================
 -- Section 4: Motivic Weight Filtration
