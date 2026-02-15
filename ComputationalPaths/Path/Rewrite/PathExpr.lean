@@ -88,6 +88,44 @@ def confluence_of_local
   subst heq_q; subst heq_r
   exact ⟨p, .refl p, .refl p⟩
 
+/-- Every Step strictly lowers complexity (vacuously true since Step is empty). -/
+theorem step_complexity_lt
+    {p q : PathExpr (A := A) a b} (h : Step p q) :
+    complexity q < complexity p := nomatch h
+
+/-- Transitive closure of Step. -/
+inductive RwPlus : PathExpr (A := A) a b →
+    PathExpr (A := A) a b → Prop where
+  | single {p q : PathExpr (A := A) a b} :
+      Step p q → RwPlus p q
+  | cons {p q r : PathExpr (A := A) a b} :
+      Step p q → RwPlus q r → RwPlus p r
+
+/-- Any non-empty rewrite chain lowers complexity (vacuously true). -/
+theorem rwPlus_complexity_lt
+    {p q : PathExpr (A := A) a b} (h : RwPlus p q) :
+    complexity q < complexity p := by
+  cases h with
+  | single hs => exact nomatch hs
+  | cons hs _ => exact nomatch hs
+
+/-- The rewrite system is terminating: no infinite chains. -/
+def Terminating (A : Type u) (a b : A) : Prop :=
+  ∀ p : PathExpr (A := A) a b,
+    Acc (fun q r => Step r q) p
+
+/-- The trivial system terminates because Step is empty. -/
+theorem terminating (A : Type u) (a b : A) :
+    Terminating A a b :=
+  fun p => Acc.intro p (fun _ h => nomatch h)
+
+/-- Evaluation preserves rewriting (Rw in PathExpr implies Rw in Path). -/
+theorem eval_rw {p q : PathExpr (A := A) a b}
+    (h : Rw p q) : Path.Rw (eval p) (eval q) := by
+  have heq := rw_eq_source h
+  subst heq
+  exact Path.Rw.refl (eval p)
+
 /-- Normalize an expression (identity in the trivial core). -/
 def normalize (e : PathExpr (A := A) a b) :
     PathExpr (A := A) a b := e
