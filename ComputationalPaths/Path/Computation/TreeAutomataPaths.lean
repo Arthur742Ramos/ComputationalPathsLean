@@ -43,7 +43,8 @@ def treeDepth {Sigma : Type u} : RTree Sigma → Nat
   | .node _ children => 1 + children.foldl (fun acc c => max acc (treeDepth c)) 0
 
 /-- Leaf has depth 0. -/
-theorem leaf_depth {Sigma : Type u} (a : Sigma) : treeDepth (RTree.leaf a) = 0 := rfl
+theorem leaf_depth {Sigma : Type u} (a : Sigma) : treeDepth (RTree.leaf a) = 0 := by
+  simp [treeDepth]
 
 /-- Tree yield: leaves read left to right. -/
 def treeYield {Sigma : Type u} : RTree Sigma → List Sigma
@@ -73,14 +74,14 @@ noncomputable def buAccepts {Q Sigma : Type u} (A : BUTreeAuto Q Sigma) (t : RTr
 /-- BFTA leaf run path. -/
 noncomputable def bu_leaf_run {Q Sigma : Type u} (A : BUTreeAuto Q Sigma) (a : Sigma) :
     Path (buRun A (RTree.leaf a)) (A.δLeaf a) := by
-  simp [buRun]
+  unfold buRun; exact Path.refl _
 
 /-- BFTA node run path. -/
 noncomputable def bu_node_run {Q Sigma : Type u} (A : BUTreeAuto Q Sigma)
     (f : Sigma) (children : List (RTree Sigma)) :
     Path (buRun A (RTree.node f children))
          (A.δNode f (children.map (buRun A))) := by
-  simp [buRun]
+  unfold buRun; exact Path.refl _
 
 /-! ## Top-Down Tree Automaton -/
 
@@ -125,6 +126,7 @@ noncomputable def product_bu_leaf {Q₁ Q₂ Sigma : Type u}
     Path (buRun (ProductBUTA A₁ A₂) (RTree.leaf a))
          (A₁.δLeaf a, A₂.δLeaf a) := by
   simp [buRun, ProductBUTA]
+  exact Path.refl _
 
 /-! ## Tree Rewriting as Paths -/
 
@@ -286,7 +288,8 @@ theorem rwEq_tree_symm {Sigma : Type u} {t₁ t₂ : RTree Sigma}
 
 /-- Leaf tree has singleton yield. -/
 theorem leaf_yield {Sigma : Type u} (a : Sigma) :
-    treeYield (RTree.leaf a) = [a] := rfl
+    treeYield (RTree.leaf a) = [a] := by
+  simp [treeYield]
 
 end TreeAutomataPaths
 end Computation
