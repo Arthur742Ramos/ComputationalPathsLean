@@ -26,6 +26,8 @@ import ComputationalPaths.Path.Rewrite.HigherRewriting
 import ComputationalPaths.Path.Rewrite.ExprConfluence
 import ComputationalPaths.Path.Rewrite.PathExprConfluence
 import ComputationalPaths.Path.Rewrite.ConfluenceProofPathExpr
+import ComputationalPaths.Path.Rewrite.StringRewriting
+import ComputationalPaths.Path.Rewrite.TermRewriting
 
 /-!
   This file serves as an umbrella import for the modular rewrite system.
