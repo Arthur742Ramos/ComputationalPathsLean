@@ -74,6 +74,26 @@ def basePath (x : MilnorFiber mf) :
     Path (mf.map (point mf x)) mf.regularValue :=
   Fiber.prop x
 
+/-- Constructor/projection identity for Milnor fiber points. -/
+theorem point_mk (a : E) (h : Path (mf.map a) mf.regularValue) :
+    point mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h) = a := by
+  sorry
+
+/-- Constructor/projection identity for Milnor fiber path witnesses. -/
+theorem basePath_mk (a : E) (h : Path (mf.map a) mf.regularValue) :
+    basePath mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h) = h := by
+  sorry
+
+/-- Eta law for Milnor fiber elements. -/
+theorem mk_eta (x : MilnorFiber mf) :
+    Fiber.mk (f := mf.map) (b := mf.regularValue) (point mf x) (basePath mf x) = x := by
+  sorry
+
+/-- Every Milnor fiber point maps to the chosen regular value. -/
+theorem map_point_eq_regular (x : MilnorFiber mf) :
+    basePath mf x = Fiber.prop x := by
+  sorry
+
 end MilnorFiber
 
 /-! ## Milnor number and vanishing cycles -/
@@ -89,6 +109,24 @@ structure MilnorNumberData {E B : Type u} (mf : MilnorFibration E B) where
 abbrev milnorNumber {E B : Type u} {mf : MilnorFibration E B}
     (d : MilnorNumberData mf) : Nat :=
   d.value
+
+/-- The `milnorNumber` abbreviation is definitionally the stored value. -/
+theorem milnorNumber_eq_value {E B : Type u} {mf : MilnorFibration E B}
+    (d : MilnorNumberData mf) :
+    milnorNumber d = d.value := by
+  sorry
+
+/-- The Milnor number is nonnegative. -/
+theorem milnorNumber_nonneg {E B : Type u} {mf : MilnorFibration E B}
+    (d : MilnorNumberData mf) :
+    0 ≤ milnorNumber d := by
+  sorry
+
+/-- Each chosen vanishing cycle is a point of the Milnor fiber. -/
+theorem vanishingCycle_basePath {E B : Type u} {mf : MilnorFibration E B}
+    (d : MilnorNumberData mf) (i : Fin d.value) :
+    MilnorFiber.basePath mf (d.vanishingCycle i) = Fiber.prop (d.vanishingCycle i) := by
+  sorry
 
 /-! ## Monodromy -/
 
@@ -121,6 +159,32 @@ def rightInvPath (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
     Path (m.map (m.inv x)) x :=
   Path.stepChain (m.action.right_inv x)
 
+/-- Pointwise right-inverse law for monodromy as an equality. -/
+theorem map_inv_eq (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
+    m.map (m.inv x) = x := by
+  sorry
+
+/-- Pointwise left-inverse law for monodromy as an equality. -/
+theorem inv_map_eq (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
+    m.inv (m.map x) = x := by
+  sorry
+
+/-- The monodromy action on the Milnor fiber is injective. -/
+theorem map_injective (m : MilnorMonodromy mf) :
+    Function.Injective m.map := by
+  sorry
+
+/-- The inverse monodromy action on the Milnor fiber is injective. -/
+theorem inv_injective (m : MilnorMonodromy mf) :
+    Function.Injective m.inv := by
+  sorry
+
+/-- Monodromy composed with its inverse equivalence is the identity equivalence. -/
+theorem action_comp_symm (m : MilnorMonodromy mf) :
+    SimpleEquiv.comp m.action (SimpleEquiv.symm m.action) =
+      SimpleEquiv.refl (MilnorFiber mf) := by
+  sorry
+
 end MilnorMonodromy
 
 /-! ## Picard-Lefschetz data -/
@@ -144,6 +208,17 @@ variable {E B : Type u} {mf : MilnorFibration E B}
 def formula (d : PicardLefschetzData mf) (x : MilnorFiber mf) :
     Path (d.monodromy.map x) (d.reflection x) :=
   d.reflection_spec x
+
+/-- `formula` is definitionally the stored reflection specification. -/
+theorem formula_eq_reflection_spec (d : PicardLefschetzData mf)
+    (x : MilnorFiber mf) :
+    d.formula x = d.reflection_spec x := by
+  sorry
+
+/-- Equality-level compatibility of `formula` with `reflection_spec`. -/
+theorem formula_toEq (d : PicardLefschetzData mf) (x : MilnorFiber mf) :
+    (d.formula x).toEq = (d.reflection_spec x).toEq := by
+  sorry
 
 end PicardLefschetzData
 
