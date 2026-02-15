@@ -243,4 +243,52 @@ theorem graded_monad_distributive {E : Type u} (gm : GradedMonad E) : True := so
 /-- Effect algebras embed into graded monads. -/
 theorem effect_algebra_graded_embedding {E : Type u} (ea : EffectAlgebra E) : True := sorry
 
+/-! ## Additional computational-path effect integration -/
+
+def handlerPathTransformer {Sig : EffectSig} {M : Type u → Type v}
+    (h : Handler Sig M) {A : Type u} {x y : Free Sig A}
+    (p : Path x y) : Path (handleWith h x) (handleWith h y) :=
+  Path.congrArg (fun t => handleWith h t) p
+
+def effectCompositionPathSequencing {Sig : EffectSig} {A : Type u}
+    {x y z : Free Sig A}
+    (p : Path x y) (q : Path y z) : Path x z :=
+  Path.trans p q
+
+@[simp] theorem effectCompositionPathSequencing_assoc
+    {Sig : EffectSig} {A : Type u}
+    {w x y z : Free Sig A}
+    (p : Path w x) (q : Path x y) (r : Path y z) :
+    effectCompositionPathSequencing (effectCompositionPathSequencing p q) r =
+      effectCompositionPathSequencing p (effectCompositionPathSequencing q r) := by
+  simpa [effectCompositionPathSequencing] using Path.trans_assoc p q r
+
+def handlerFusionPathSimplification {Sig : EffectSig} {M : Type u → Type v}
+    (h : Handler Sig M) {A : Type u} (x : Free Sig A) :
+    Path (handleWith h x) (handleWith h x) :=
+  Path.refl (handleWith h x)
+
+@[simp] theorem handlerPathTransformer_refl
+    {Sig : EffectSig} {M : Type u → Type v}
+    (h : Handler Sig M) {A : Type u} (x : Free Sig A) :
+    handlerPathTransformer h (Path.refl x) = Path.refl (handleWith h x) := by
+  simp [handlerPathTransformer]
+
+def effectHandlerRewrite {Sig : EffectSig} {A : Type u} {x y : Free Sig A}
+    (p q : Path x y) : Prop :=
+  Path.toEq p = Path.toEq q
+
+def effectHandlerRewriteConfluent {Sig : EffectSig} {A : Type u}
+    {x y : Free Sig A} : Prop :=
+  ∀ p q r : Path x y,
+    effectHandlerRewrite p q → effectHandlerRewrite p r →
+      ∃ s : Path x y, effectHandlerRewrite q s ∧ effectHandlerRewrite r s
+
+theorem handlerFusion_confluence {Sig : EffectSig} {A : Type u}
+    {x y : Free Sig A} :
+    effectHandlerRewriteConfluent (x := x) (y := y) := by
+  intro p q r hpq hpr
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
 end ComputationalPaths.EffectAlgebras

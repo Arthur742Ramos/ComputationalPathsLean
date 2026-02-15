@@ -207,6 +207,37 @@ theorem config_homological_stability (ch : ConfigHomology)
     (hk : ch.degree ≤ ch.config.numPoints / 2) :
     ch.rank ≥ 0 := by sorry
 
+
+
+/-! ## Computational path expansion: braid rewrites -/
+
+def braidRewriteStep (x y : OrderedConfig) (h : x = y) : Step OrderedConfig :=
+  Step.mk x y h
+
+def configurationTrajectoryPath (x y : OrderedConfig) (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def configurationRewrite {x y : OrderedConfig} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def configurationRewriteConfluent : Prop :=
+  ∀ {x y : OrderedConfig} (p q₁ q₂ : Path x y),
+    configurationRewrite p q₁ →
+    configurationRewrite p q₂ →
+    ∃ q₃ : Path x y, configurationRewrite q₁ q₃ ∧ configurationRewrite q₂ q₃
+
+theorem configurationRewrite_refl {x y : OrderedConfig} (p : Path x y) :
+    configurationRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem configurationRewrite_confluence : configurationRewriteConfluent := by
+  sorry
+
+theorem configurationRewrite_coherence {x y z w : OrderedConfig}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
 end ConfigurationSpaces
 end Topology
 end Path

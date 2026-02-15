@@ -405,6 +405,46 @@ theorem kappa_noncollapsing_positive (M : RiemannianManifold)
     K.kappa > 0 :=
   K.kappa_pos
 
+
+
+/-! ## Computational path expansion: flow rewrites -/
+
+section FlowRewrite
+
+variable {M : RiemannianManifold}
+
+def flowRewriteStep (x y : RicciFlow M)
+    (h : x = y) : Step (RicciFlow M) :=
+  Step.mk x y h
+
+def ricciFlowPathWitness (x y : RicciFlow M)
+    (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def flowRewrite {x y : RicciFlow M} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def flowRewriteConfluent : Prop :=
+  ∀ {x y : RicciFlow M} (p q₁ q₂ : Path x y),
+    flowRewrite p q₁ →
+    flowRewrite p q₂ →
+    ∃ q₃ : Path x y, flowRewrite q₁ q₃ ∧ flowRewrite q₂ q₃
+
+theorem flowRewrite_refl {x y : RicciFlow M} (p : Path x y) :
+    flowRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem flowRewrite_confluence {M : RiemannianManifold} :
+    flowRewriteConfluent (M := M) := by
+  sorry
+
+theorem flowRewrite_coherence {x y z w : RicciFlow M}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
+end FlowRewrite
+
 end GeometricFlows
 end Topology
 end Path

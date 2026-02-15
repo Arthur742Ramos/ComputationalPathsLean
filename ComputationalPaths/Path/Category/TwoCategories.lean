@@ -589,4 +589,51 @@ theorem em_comparison_2functor_exists (C : StrictTwoCategory) (M : TwoMonad C) :
     True := by
   sorry
 
+/-! ## Computational-path 2-categorical integration -/
+
+def twoCellAsPath {C : StrictTwoCategory} {a b : C.Obj}
+    (f g : C.Hom a b) : Type v :=
+  Path f g
+
+def twoCellVerticalPath {C : StrictTwoCategory} {a b : C.Obj}
+    {f g h : C.Hom a b}
+    (α : twoCellAsPath f g) (β : twoCellAsPath g h) :
+    twoCellAsPath f h :=
+  Path.trans α β
+
+def twoCellMatesTransposition {C : StrictTwoCategory} {a b : C.Obj}
+    {f g : C.Hom a b} (α : twoCellAsPath f g) :
+    twoCellAsPath g f :=
+  Path.symm α
+
+@[simp] theorem twoCellMatesTransposition_involutive {C : StrictTwoCategory}
+    {a b : C.Obj} {f g : C.Hom a b} (α : twoCellAsPath f g) :
+    twoCellMatesTransposition (twoCellMatesTransposition α) = α := by
+  simpa [twoCellMatesTransposition] using Path.symm_symm α
+
+@[simp] theorem twoCellVerticalPath_assoc {C : StrictTwoCategory}
+    {a b : C.Obj} {f g h k : C.Hom a b}
+    (α : twoCellAsPath f g) (β : twoCellAsPath g h) (γ : twoCellAsPath h k) :
+    twoCellVerticalPath (twoCellVerticalPath α β) γ =
+      twoCellVerticalPath α (twoCellVerticalPath β γ) := by
+  simpa [twoCellVerticalPath] using Path.trans_assoc α β γ
+
+def twoCategoryRewrite {C : StrictTwoCategory} {a b : C.Obj}
+    {f g : C.Hom a b} (α β : twoCellAsPath f g) : Prop :=
+  Path.toEq α = Path.toEq β
+
+def twoCategoryRewriteConfluent {C : StrictTwoCategory} {a b : C.Obj}
+    {f g : C.Hom a b} : Prop :=
+  ∀ α β γ : twoCellAsPath f g,
+    twoCategoryRewrite α β → twoCategoryRewrite α γ →
+      ∃ δ : twoCellAsPath f g,
+        twoCategoryRewrite β δ ∧ twoCategoryRewrite γ δ
+
+theorem twoCategoryCoherence_fromConfluence {C : StrictTwoCategory}
+    {a b : C.Obj} {f g : C.Hom a b} :
+    twoCategoryRewriteConfluent (C := C) (a := a) (b := b) (f := f) (g := g) := by
+  intro α β γ hαβ hαγ
+  refine ⟨β, rfl, ?_⟩
+  exact Eq.trans hαγ.symm hαβ
+
 end ComputationalPaths

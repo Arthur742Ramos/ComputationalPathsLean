@@ -412,4 +412,51 @@ theorem local_geometric_morphism_factorization
 theorem deligne_and_barr_are_compatible (E : GrothendieckTopos) : True := by
   sorry
 
+/-! ## Computational-path topos integration -/
+
+def geometricMorphismPathFunctor {E F : GrothendieckTopos}
+    (f g : GeometricMorphism E F) : Type _ :=
+  Path f g
+
+def geometricMorphismPathCompose {E F : GrothendieckTopos}
+    {f g h : GeometricMorphism E F}
+    (p : geometricMorphismPathFunctor f g)
+    (q : geometricMorphismPathFunctor g h) :
+    geometricMorphismPathFunctor f h :=
+  Path.trans p q
+
+def geometricMorphismPathInverse {E F : GrothendieckTopos}
+    {f g : GeometricMorphism E F}
+    (p : geometricMorphismPathFunctor f g) :
+    geometricMorphismPathFunctor g f :=
+  Path.symm p
+
+def classifyingToposUniversalPathSpace (T : GeometricTheory)
+    (_ : ClassifyingTopos T) : Type _ :=
+  (D : ClassifyingTopos T) → Path D D
+
+def classifyingToposUniversalPath_base (T : GeometricTheory)
+    (C : ClassifyingTopos T) :
+    classifyingToposUniversalPathSpace T C :=
+  fun D => Path.refl D
+
+def delignePathGeneration (E : GrothendieckTopos) : Type _ :=
+  (X : E.Obj) → Path X X
+
+def delignePathGeneration_base (E : GrothendieckTopos) :
+    delignePathGeneration E :=
+  fun X => Path.refl X
+
+def toposPathRewrite {E F : GrothendieckTopos} {f g : GeometricMorphism E F}
+    (p q : geometricMorphismPathFunctor f g) : Prop :=
+  Path.toEq p = Path.toEq q
+
+theorem toposPathRewrite_confluent {E F : GrothendieckTopos} {f g : GeometricMorphism E F}
+    (p q r : geometricMorphismPathFunctor f g)
+    (hpq : toposPathRewrite p q) (hpr : toposPathRewrite p r) :
+    ∃ s : geometricMorphismPathFunctor f g,
+      toposPathRewrite q s ∧ toposPathRewrite r s := by
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
 end ComputationalPaths

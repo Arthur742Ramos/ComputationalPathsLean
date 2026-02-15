@@ -230,4 +230,48 @@ theorem weil_naturality (S : SmoothToposData)
 theorem frobenius_weil (S : SmoothToposData)
     (W : WeilAlgebra S) : True := sorry
 
+/-! ## Additional computational-path SDG integration -/
+
+def infinitesimalPath {S : SmoothToposData} (d : InfD S) : Path d d :=
+  Path.refl d
+
+def infinitesimalPathCompose {S : SmoothToposData} {d : InfD S}
+    (p q : Path d d) : Path d d :=
+  Path.trans p q
+
+@[simp] theorem infinitesimalPathCompose_assoc {S : SmoothToposData} {d : InfD S}
+    (p q r : Path d d) :
+    infinitesimalPathCompose (infinitesimalPathCompose p q) r =
+      infinitesimalPathCompose p (infinitesimalPathCompose q r) := by
+  simpa [infinitesimalPathCompose] using Path.trans_assoc p q r
+
+def tangentVectorAsPath {S : SmoothToposData} {M : MicrolinearSpace S} {x : M.carrier}
+    (v w : tangentVectorAt S M x) : Type _ :=
+  Path v w
+
+def tangentVectorPathRefl {S : SmoothToposData} {M : MicrolinearSpace S} {x : M.carrier}
+    (v : tangentVectorAt S M x) : tangentVectorAsPath v v :=
+  Path.refl v
+
+def kockLawverePathAxiom (S : SmoothToposData) (KL : KockLawvereAxiom S)
+    (f : InfD S → S.R) : Path (KL.decompose f) (KL.decompose f) :=
+  Path.refl (KL.decompose f)
+
+def sdgPathRewrite {A : Type u} {a b : A} (p q : Path a b) : Prop :=
+  Path.toEq p = Path.toEq q
+
+theorem sdgPathRewrite_confluent {A : Type u} {a b : A}
+    (p q r : Path a b)
+    (hpq : sdgPathRewrite p q) (hpr : sdgPathRewrite p r) :
+    ∃ s : Path a b, sdgPathRewrite q s ∧ sdgPathRewrite r s := by
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
+def infinitesimalPathSystem (S : SmoothToposData) : Type _ :=
+  (d : InfD S) → Path d d
+
+def infinitesimalPathSystem_base (S : SmoothToposData) :
+    infinitesimalPathSystem S :=
+  fun d => Path.refl d
+
 end ComputationalPaths.SyntheticDiffGeo

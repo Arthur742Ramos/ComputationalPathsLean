@@ -351,6 +351,41 @@ theorem stablePi_three_eq_Z24 :
     StablePi 3 = StableStems.Z24 := by
   sorry
 
+/-- Left round-trip for stable adjunction at level `n`, as a computational path. -/
+noncomputable def cp_stableAdjunction_left_path (n : Nat) (X Y : Pointed)
+    (f : PointedMap (iteratedSigmaPointed n X) Y) :
+    Path ((stableAdjunction n X Y).invFun ((stableAdjunction n X Y).toFun f)) f :=
+  stableAdjunction_left_inverse n X Y f
+
+/-- Right round-trip for stable adjunction at level `n`, as a computational path. -/
+noncomputable def cp_stableAdjunction_right_path (n : Nat) (X Y : Pointed)
+    (g : PointedMap X (iteratedOmegaEqPointed n Y)) :
+    Path ((stableAdjunction n X Y).toFun ((stableAdjunction n X Y).invFun g)) g :=
+  stableAdjunction_right_inverse n X Y g
+
+/-- Levelwise identification of the path spectrum with its omega-spectrum source. -/
+noncomputable def cp_pathSpectrum_level_path (X : Pointed) (n : Nat) :
+    Path ((pathSpectrum X).level n) ((pathOmegaSpectrum X).toSpectrum.level n) :=
+  Path.stepChain rfl
+
+/-- Every stable stem element has a reflexive computational-path witness. -/
+def cp_stablePi_refl (n : Nat) (x : StablePi n) : Path x x :=
+  Path.refl x
+
+/-- Left round-trip for canonical Spanier-Whitehead duality data. -/
+noncomputable def cp_canonicalSW_left_path (n : Nat) (X : Pointed)
+    (f : PointedMap (iteratedSigmaPointed n X) X) :
+    Path (((canonicalSpanierWhiteheadDuality X).stableEquiv n).invFun
+      (((canonicalSpanierWhiteheadDuality X).stableEquiv n).toFun f)) f :=
+  canonicalSWDuality_left_inverse n X f
+
+/-- Right round-trip for canonical Spanier-Whitehead duality data. -/
+noncomputable def cp_canonicalSW_right_path (n : Nat) (X : Pointed)
+    (g : PointedMap X (iteratedOmegaEqPointed n X)) :
+    Path (((canonicalSpanierWhiteheadDuality X).stableEquiv n).toFun
+      (((canonicalSpanierWhiteheadDuality X).stableEquiv n).invFun g)) g :=
+  canonicalSWDuality_right_inverse n X g
+
 /-! ## Summary -/
 
 -- We defined spectra from path spaces, stabilized the suspension-loop adjunction,

@@ -268,6 +268,48 @@ theorem regular_completion_gives_eff (A : PCA.{u}) :
     ∃ (E : EffectiveTopos.{u, v}), True := by
   sorry
 
+/-! ## Computational-path realizability integration -/
+
+def realizabilityPathWitness {A : PCA.{u}} {X : Assembly.{u, v} A}
+    (x y : X.Carrier) : Type v :=
+  Path x y
+
+inductive PCAApplicationRewriteStep (A : PCA.{u}) : Type u where
+  | beta (f x : A.Carrier) : PCAApplicationRewriteStep A
+  | kRule (x : A.Carrier) : PCAApplicationRewriteStep A
+  | sRule (x : A.Carrier) : PCAApplicationRewriteStep A
+
+def pcaApplicationRewritePath (A : PCA.{u}) (a b : A.Carrier) :
+    Path (A.app a b) (A.app a b) :=
+  Path.refl (A.app a b)
+
+def effectiveToposMorphismPath {E : EffectiveTopos.{u, v}} {X Y : E.Obj}
+    (f g : E.Hom X Y) : Type _ :=
+  Path f g
+
+def effectiveToposMorphismComputablePath {E : EffectiveTopos.{u, v}} {X Y : E.Obj}
+    (f : E.Hom X Y) : effectiveToposMorphismPath f f :=
+  Path.refl f
+
+def effectiveToposMorphismPathTranspose {E : EffectiveTopos.{u, v}} {X Y : E.Obj}
+    {f g : E.Hom X Y} (p : effectiveToposMorphismPath f g) :
+    effectiveToposMorphismPath g f :=
+  Path.symm p
+
+def realizabilityRewrite {A : PCA.{u}} {X : Assembly.{u, v} A}
+    {x y : X.Carrier}
+    (p q : realizabilityPathWitness x y) : Prop :=
+  Path.toEq p = Path.toEq q
+
+theorem realizabilityRewrite_confluent {A : PCA.{u}} {X : Assembly.{u, v} A}
+    {x y : X.Carrier}
+    (p q r : realizabilityPathWitness x y)
+    (hpq : realizabilityRewrite p q) (hpr : realizabilityRewrite p r) :
+    ∃ s : realizabilityPathWitness x y,
+      realizabilityRewrite q s ∧ realizabilityRewrite r s := by
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
 end RealizabilityPaths
 end Foundations
 end Path

@@ -217,6 +217,37 @@ theorem fiberwise_round_trip_refl {alpha : Type u} {a b : alpha} (p : Path a b) 
     Path (fiberwiseRoundTrip p) (fiberwiseRoundTrip p) := by
   sorry
 
+
+
+/-! ## Computational path expansion: fiberwise rewriting -/
+
+def fiberwiseRewriteStep (x y : ParamSpace) (h : x = y) : Step ParamSpace :=
+  Step.mk x y h
+
+def fiberwisePathWitness (x y : ParamSpace) (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def fiberwiseRewrite {x y : ParamSpace} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def fiberwiseRewriteConfluent : Prop :=
+  ∀ {x y : ParamSpace} (p q₁ q₂ : Path x y),
+    fiberwiseRewrite p q₁ →
+    fiberwiseRewrite p q₂ →
+    ∃ q₃ : Path x y, fiberwiseRewrite q₁ q₃ ∧ fiberwiseRewrite q₂ q₃
+
+theorem fiberwiseRewrite_refl {x y : ParamSpace} (p : Path x y) :
+    fiberwiseRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem fiberwiseRewrite_confluence : fiberwiseRewriteConfluent := by
+  sorry
+
+theorem fiberwiseRewrite_coherence {x y z w : ParamSpace}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
 end ParametrizedHomotopy
 end Topology
 end Path

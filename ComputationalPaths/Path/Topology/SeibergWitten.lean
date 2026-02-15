@@ -350,6 +350,46 @@ theorem positive_scalar_implies_sw_zero (X : FourManifold)
     (SW : SWInvariant X) (psc : True) : True := by
   sorry
 
+
+
+/-! ## Computational path expansion: Seiberg-Witten rewrites -/
+
+section SWRewrite
+
+variable {X : FourManifold} {𝔰 : SpinCStructure X}
+
+def swRewriteStep (x y : SWConfiguration X 𝔰)
+    (h : x = y) : Step (SWConfiguration X 𝔰) :=
+  Step.mk x y h
+
+def swDeformationPath (x y : SWConfiguration X 𝔰)
+    (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def swRewrite {x y : SWConfiguration X 𝔰} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def swRewriteConfluent : Prop :=
+  ∀ {x y : SWConfiguration X 𝔰} (p q₁ q₂ : Path x y),
+    swRewrite p q₁ →
+    swRewrite p q₂ →
+    ∃ q₃ : Path x y, swRewrite q₁ q₃ ∧ swRewrite q₂ q₃
+
+theorem swRewrite_refl {x y : SWConfiguration X 𝔰} (p : Path x y) :
+    swRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem swRewrite_confluence {X : FourManifold} {𝔰 : SpinCStructure X} :
+    swRewriteConfluent (X := X) (𝔰 := 𝔰) := by
+  sorry
+
+theorem swRewrite_coherence {x y z w : SWConfiguration X 𝔰}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
+end SWRewrite
+
 end SeibergWitten
 end Topology
 end Path

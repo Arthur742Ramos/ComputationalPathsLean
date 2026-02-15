@@ -218,6 +218,37 @@ theorem rational_round_trip_refl {alpha : Type u} {a b : alpha} (p : Path a b) :
     Path (rationalRoundTrip p) (rationalRoundTrip p) := by
   sorry
 
+
+
+/-! ## Computational path expansion: Sullivan rewriting -/
+
+def quasiIsoRewriteStep (x y : SullivanModel) (h : x = y) : Step SullivanModel :=
+  Step.mk x y h
+
+def sullivanPathWitness (x y : SullivanModel) (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def sullivanRewrite {x y : SullivanModel} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def sullivanRewriteConfluent : Prop :=
+  ∀ {x y : SullivanModel} (p q₁ q₂ : Path x y),
+    sullivanRewrite p q₁ →
+    sullivanRewrite p q₂ →
+    ∃ q₃ : Path x y, sullivanRewrite q₁ q₃ ∧ sullivanRewrite q₂ q₃
+
+theorem sullivanRewrite_refl {x y : SullivanModel} (p : Path x y) :
+    sullivanRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem formality_confluence : sullivanRewriteConfluent := by
+  sorry
+
+theorem formality_coherence {x y z w : SullivanModel}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
 end RationalHomotopy
 end Topology
 end Path

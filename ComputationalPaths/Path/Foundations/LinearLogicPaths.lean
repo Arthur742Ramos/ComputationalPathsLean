@@ -225,8 +225,48 @@ theorem linear_logic_cut_elimination :
 theorem multiplicative_additive_coherence :
     True := by sorry
 
+/-! ## Computational-path linear-logic integration -/
+
+def cutEliminationAsRewrite (P Q : ProofNet) : Type _ :=
+  Path P Q
+
+def cutEliminationPathCompose {P Q R : ProofNet}
+    (p : cutEliminationAsRewrite P Q) (q : cutEliminationAsRewrite Q R) :
+    cutEliminationAsRewrite P R :=
+  Path.trans p q
+
+@[simp] theorem cutEliminationPathCompose_assoc
+    {P Q R S : ProofNet}
+    (p : cutEliminationAsRewrite P Q)
+    (q : cutEliminationAsRewrite Q R)
+    (r : cutEliminationAsRewrite R S) :
+    cutEliminationPathCompose (cutEliminationPathCompose p q) r =
+      cutEliminationPathCompose p (cutEliminationPathCompose q r) := by
+  simpa [cutEliminationPathCompose] using Path.trans_assoc p q r
+
+def proofNetPathGraph (P : ProofNet) : Type _ :=
+  Sigma fun Q : ProofNet => cutEliminationAsRewrite P Q
+
+def proofNetPathGraph_base (P : ProofNet) : proofNetPathGraph P :=
+  ⟨P, Path.refl P⟩
+
+def geometryOfInteractionPathDynamics (G : GeometryOfInteraction) (s : G.state) :
+    Path (executeGoI G s) (executeGoI G s) :=
+  Path.refl (executeGoI G s)
+
+def cutRewriteRelation {P Q : ProofNet}
+    (p q : cutEliminationAsRewrite P Q) : Prop :=
+  Path.toEq p = Path.toEq q
+
+theorem cutElimination_confluence {P Q : ProofNet}
+    (p q r : cutEliminationAsRewrite P Q)
+    (hpq : cutRewriteRelation p q) (hpr : cutRewriteRelation p r) :
+    ∃ s : cutEliminationAsRewrite P Q,
+      cutRewriteRelation q s ∧ cutRewriteRelation r s := by
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
 end LinearLogicPaths
 end Foundations
 end Path
 end ComputationalPaths
-

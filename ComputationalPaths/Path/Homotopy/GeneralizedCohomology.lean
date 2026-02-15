@@ -171,6 +171,42 @@ theorem reducedCohomologyTheory_ext (E₁ E₂ : ReducedCohomologyTheory)
     E₁ = E₂ := by
   sorry
 
+/-! ## Cohomology-theory computational path addenda -/
+
+/-- The zero class in any degree carries a reflexive computational path. -/
+def zero_class_path (E : ReducedCohomologyTheory) (n : Nat) (X : Pointed) :
+    Path (E.zero n X) (E.zero n X) :=
+  Path.refl _
+
+/-- Identity functoriality on the zero class, recorded as a computational path. -/
+def map_zero_id_path (E : ReducedCohomologyTheory) (n : Nat) (X : Pointed) :
+    Path (E.map n (PointedMap.id X) (E.zero n X)) (E.zero n X) :=
+  E.mapId n X (E.zero n X)
+
+/-- Left suspension round-trip for any class. -/
+def suspIso_left_path (E : ReducedCohomologyTheory) (n : Nat) (X : Pointed)
+    (x : E.cohomology n (suspPointed X.carrier)) :
+    Path ((E.suspIso n X).invFun ((E.suspIso n X).toFun x)) x :=
+  (E.suspIso n X).left_inv x
+
+/-- Right suspension round-trip for any class. -/
+def suspIso_right_path (E : ReducedCohomologyTheory) (n : Nat) (X : Pointed)
+    (y : E.cohomology (n + 1) X) :
+    Path ((E.suspIso n X).toFun ((E.suspIso n X).invFun y)) y :=
+  (E.suspIso n X).right_inv y
+
+/-- Right identity for composition of path equivalences. -/
+theorem pathSimpleEquiv_comp_refl_right {α β : Type u} (e : PathSimpleEquiv α β) (x : α) :
+    (pathSimpleEquivComp e (pathSimpleEquivRefl β)).toFun x = e.toFun x := by
+  rfl
+
+/-- In the trivial theory, mapped zero classes are computationally reflexive. -/
+def trivial_zero_map_path (n : Nat) {X Y : Pointed} (f : PointedMap X Y) :
+    Path
+      (ReducedCohomologyTheory.trivial.map n f (ReducedCohomologyTheory.trivial.zero n Y))
+      (ReducedCohomologyTheory.trivial.zero n X) :=
+  Path.refl _
+
 end GeneralizedCohomology
 end Homotopy
 end Path

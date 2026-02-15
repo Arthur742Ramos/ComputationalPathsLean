@@ -182,6 +182,39 @@ theorem triadConnectivityStatement_invariant {A B C : Type u} {f : C → A} {g :
     triadConnectivityStatement T₂ k l := by
   sorry
 
+/-! ## Computational-path connectivity routes -/
+
+/-- Left-associated route for connectivity composites. -/
+def connectivityRouteLeft {A : Type u} {a : A} (p q r : Path a a) : Path a a :=
+  Path.trans (Path.trans p q) r
+
+/-- Right-associated route for connectivity composites. -/
+def connectivityRouteRight {A : Type u} {a : A} (p q r : Path a a) : Path a a :=
+  Path.trans p (Path.trans q r)
+
+/-- Reassociation of connectivity routes is witnessed by rewrite equivalence. -/
+theorem connectivity_route_two_cell {A : Type u} {a : A} (p q r : Path a a) :
+    RwEq (connectivityRouteLeft p q r) (connectivityRouteRight p q r) :=
+  rweq_tt p q r
+
+/-- The sharp connectivity bound is itself represented by a computational path. -/
+def sharp_bound_path (k l : Nat) :
+    Path (sharpTriadConnectivityBound k l) (k + l) :=
+  Path.stepChain rfl
+
+/-- Any triad connectivity statement carries a reflexive computational-path witness. -/
+def triad_connectivity_refl_path {A B C : Type u} {f : C → A} {g : C → B}
+    (T : Triad A B C f g) (k l : Nat) :
+    Path (triadConnectivityStatement T k l) (triadConnectivityStatement T k l) :=
+  Path.refl _
+
+/-- Barratt-Whitehead products have reflexive computational-path witnesses. -/
+def barratt_whitehead_refl_path {m n : Nat} {A : Type u} {a : A}
+    (x : HigherHomotopyGroups.PiN m A a) (y : HigherHomotopyGroups.PiN n A a) :
+    Path (WhiteheadProduct.whiteheadProduct x y)
+      (WhiteheadProduct.whiteheadProduct x y) :=
+  Path.refl _
+
 /-! ## Summary
 
 We package sharp Blakers-Massey triad data, a sharp connectivity statement, and

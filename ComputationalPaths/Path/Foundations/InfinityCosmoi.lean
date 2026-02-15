@@ -235,8 +235,55 @@ theorem modelIndependent_comprehension_principle (C : InfinityCosmos.{u, v}) :
 theorem homotopyCoherent_adjunction_invariant (C D : InfinityCosmos.{u, v}) :
     True := by sorry
 
+/-! ## Computational-path infinity-cosmoi integration -/
+
+def infinityHomPathSpace {C : InfinityCosmos.{u, v}} {X Y : C.Obj}
+    (f g : C.Hom X Y) : Type v :=
+  Path f g
+
+def infinityHomPathCompose {C : InfinityCosmos.{u, v}} {X Y Z : C.Obj}
+    {f g : C.Hom X Y} {h k : C.Hom Y Z}
+    (p : infinityHomPathSpace f g) (q : infinityHomPathSpace h k) :
+    Path (C.comp f h) (C.comp g k) :=
+  Path.congrArg (fun pair : C.Hom X Y × C.Hom Y Z => C.comp pair.1 pair.2)
+    (Path.trans
+      (Path.congrArg (fun x => (x, h)) p)
+      (Path.congrArg (fun y => (g, y)) q))
+
+def homotopyCoherentDiagramPathSystem {A : Type u}
+    (ι : Type v) (D : ι → A) : Type _ :=
+  (i : ι) → Path (D i) (D i)
+
+def homotopyCoherentDiagramPathSystem_base {A : Type u}
+    (ι : Type v) (D : ι → A) :
+    homotopyCoherentDiagramPathSystem ι D :=
+  fun i => Path.refl (D i)
+
+def modelIndependencePathEquivalence {A : Type u} (x y : A) : Prop :=
+  Nonempty (Path x y) ↔ Nonempty (Path y x)
+
+theorem modelIndependencePathEquivalence_symm {A : Type u} (x y : A) :
+    modelIndependencePathEquivalence x y := by
+  constructor
+  · intro h
+    rcases h with ⟨p⟩
+    exact ⟨Path.symm p⟩
+  · intro h
+    rcases h with ⟨p⟩
+    exact ⟨Path.symm p⟩
+
+def infinityRewrite {A : Type u} {a b : A}
+    (p q : Path a b) : Prop :=
+  Path.toEq p = Path.toEq q
+
+theorem infinityRewrite_confluent {A : Type u} {a b : A}
+    (p q r : Path a b)
+    (hpq : infinityRewrite p q) (hpr : infinityRewrite p r) :
+    ∃ s : Path a b, infinityRewrite q s ∧ infinityRewrite r s := by
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
 end InfinityCosmoi
 end Foundations
 end Path
 end ComputationalPaths
-

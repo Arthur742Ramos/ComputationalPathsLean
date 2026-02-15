@@ -423,6 +423,43 @@ def pullbackBundle_roundtrip_path {A : Type u} {B : Type u} {E : Type u} {F : Ty
     Path ((pullbackBundle f bd).modelToFiber a ((pullbackBundle f bd).fiberToModel a x)) x :=
   Path.stepChain ((pullbackBundle f bd).fiber_roundtrip a x)
 
+/-! ## Additional computational-path bundle laws -/
+
+/-- Identity transition map acts as a computational path witness. -/
+def transition_id_toFun_path {F : Type u} (f : F) :
+    Path (TransitionFunction.id.toFun f) f :=
+  Path.stepChain rfl
+
+/-- Composition of transition maps is computationally tracked by a path witness. -/
+def transition_comp_toFun_path {F : Type u}
+    (g h : TransitionFunction F) (f : F) :
+    Path ((TransitionFunction.comp g h).toFun f) (g.toFun (h.toFun f)) :=
+  Path.stepChain rfl
+
+/-- Inverse-then-map transition route contracts to identity by computational path. -/
+def transition_inv_comp_toFun_path {F : Type u}
+    (t : TransitionFunction F) (f : F) :
+    Path ((TransitionFunction.comp (TransitionFunction.inv t) t).toFun f) f :=
+  Path.stepChain (TransitionFunction.inv_comp t f)
+
+/-- Map-then-inverse transition route contracts to identity by computational path. -/
+def transition_comp_inv_toFun_path {F : Type u}
+    (t : TransitionFunction F) (f : F) :
+    Path ((TransitionFunction.comp t (TransitionFunction.inv t)).toFun f) f :=
+  Path.stepChain (TransitionFunction.comp_inv t f)
+
+/-- Trivial bundle fibers satisfy round-trip by computational path. -/
+def trivialBundle_fiber_roundtrip_path₂ (B : Type u) (F : Type u) (b : B)
+    (x : Fiber (trivialBundle B F).proj b) :
+    Path ((trivialBundle B F).modelToFiber b ((trivialBundle B F).fiberToModel b x)) x :=
+  (trivialBundle B F).fiber_roundtrip_path b x
+
+/-- Pullback bundle model points satisfy round-trip by computational path. -/
+def pullbackBundle_model_roundtrip_path {A : Type u} {B : Type u} {E : Type u} {F : Type u}
+    (f : A → B) (bd : FiberBundleData B E F) (a : A) (y : F) :
+    Path ((pullbackBundle f bd).fiberToModel a ((pullbackBundle f bd).modelToFiber a y)) y :=
+  Path.stepChain ((pullbackBundle f bd).model_roundtrip a y)
+
 /-! ## Summary
 
 We have formalized:

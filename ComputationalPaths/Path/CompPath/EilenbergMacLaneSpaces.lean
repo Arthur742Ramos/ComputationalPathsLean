@@ -219,8 +219,48 @@ theorem trivialKInvariant_is_pointed {A G : Type u} (n : Nat)
     (trivialKInvariant n P a X).kInvariantMap.map_pt = rfl := by
   sorry
 
-/-! ## Summary -/
+/-! ## Computational-path Eilenberg-MacLane addenda -/
 
+/-- Basepoint preservation in loop-space recognition as a computational path. -/
+def LoopSpaceProperty.loopBase_path {G : Type u} {n : Nat}
+    {X : KSpace G (n + 1)} (P : LoopSpaceProperty G n X) :
+    Path (P.loopEquiv.toFun (Path.refl X.base)) P.loopSpace.base :=
+  Path.stepChain P.loopBase
+
+/-- Left inverse of the loop-space equivalence as a computational path. -/
+def LoopSpaceProperty.loopEquiv_left_inv_path {G : Type u} {n : Nat}
+    {X : KSpace G (n + 1)} (P : LoopSpaceProperty G n X)
+    (l : LoopSpace X.carrier X.base) :
+    Path (P.loopEquiv.invFun (P.loopEquiv.toFun l)) l :=
+  Path.stepChain (P.loopEquiv.left_inv l)
+
+/-- Representability sends basepoint maps to zero via computational paths. -/
+def CohomologyRepresentability.eval_base_path
+    {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
+    (n : Nat) (X : Pointed) :
+    Path (R.eval n (basepointMap X (R.space n))) (H.zero n X) :=
+  Path.stepChain (R.eval_base n X)
+
+/-- k-invariant basepoint condition as a computational path. -/
+def PostnikovKInvariant.kMap_base_path {A : Type u} {G : Type u} {n : Nat}
+    (K : PostnikovKInvariant A G n) :
+    Path (K.kMap (K.system.proj n K.base)) K.kSpace.base :=
+  Path.stepChain K.kMap_base
+
+/-- Pointed k-invariant map preserves basepoints as a computational path. -/
+def PostnikovKInvariant.kInvariantMap_base_path {A : Type u} {G : Type u} {n : Nat}
+    (K : PostnikovKInvariant A G n) :
+    Path ((K.kInvariantMap).toFun (K.system.proj n K.base)) K.kSpace.base :=
+  Path.stepChain K.kMap_base
+
+/-- The trivial k-invariant sends stage basepoints to the Eilenberg-MacLane basepoint. -/
+def trivialKInvariant_kMap_base_path {A : Type u} {G : Type u} (n : Nat)
+    (P : PostnikovSystem.PostnikovSystem A) (a : A) (X : KSpace G (n + 2)) :
+    Path ((trivialKInvariant n P a X).kMap (P.proj n a)) X.base :=
+  Path.stepChain rfl
+
+/-! ## Summary -/
+ 
 end CompPath
 end Path
 end ComputationalPaths

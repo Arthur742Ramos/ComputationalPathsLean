@@ -213,8 +213,49 @@ theorem probabilistic_powerdomain_models_effects :
 theorem domain_theory_computational_adequacy :
     True := by sorry
 
+/-! ## Computational-path domain-theory integration -/
+
+def approximationChainPaths {D : Dcpo.{u, v}}
+    (chain : Nat → D.Carrier) : Type _ :=
+  (n : Nat) → Path (chain n) (chain n)
+
+def approximationChainPaths_base {D : Dcpo.{u, v}}
+    (chain : Nat → D.Carrier) :
+    approximationChainPaths chain :=
+  fun n => Path.refl (chain n)
+
+def scottContinuousPathPreservation {D E : Dcpo.{u, v}}
+    (f : ContinuousMap D E) {x y : D.Carrier}
+    (p : Path x y) : Path (f.fn x) (f.fn y) :=
+  Path.congrArg f.fn p
+
+@[simp] theorem scottContinuousPathPreservation_trans {D E : Dcpo.{u, v}}
+    (f : ContinuousMap D E) {x y z : D.Carrier}
+    (p : Path x y) (q : Path y z) :
+    scottContinuousPathPreservation f (Path.trans p q) =
+      Path.trans (scottContinuousPathPreservation f p)
+        (scottContinuousPathPreservation f q) := by
+  simpa [scottContinuousPathPreservation] using Path.congrArg_trans f.fn p q
+
+def fixedPointPathLimit {D : Dcpo.{u, v}} (x : D.Carrier) : Path x x :=
+  Path.refl x
+
+def domainPathRewrite {A : Type u} {x y : A}
+    (p q : Path x y) : Prop :=
+  Path.toEq p = Path.toEq q
+
+def domainPathRewriteConfluent {A : Type u} {x y : A} : Prop :=
+  ∀ p q r : Path x y,
+    domainPathRewrite p q → domainPathRewrite p r →
+      ∃ s : Path x y, domainPathRewrite q s ∧ domainPathRewrite r s
+
+theorem domainPathRewrite_confluent {A : Type u} {x y : A} :
+    domainPathRewriteConfluent (x := x) (y := y) := by
+  intro p q r hpq hpr
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
 end DomainTheory
 end Foundations
 end Path
 end ComputationalPaths
-

@@ -191,8 +191,57 @@ theorem dinaturalitySquare_commutes {A : Type u} (S : DinaturalitySquare A) :
 theorem modified_parametric_model_completeness (M : ParametricModel.{u}) :
     True := by sorry
 
+/-! ## Computational-path parametricity integration -/
+
+def parametricRelationAsPath {A : Type u}
+    (_R : Relation A A) (x y : A) : Type u :=
+  Path x y
+
+def reynoldsAbstractionPathLift {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) : Path a c :=
+  Path.trans p q
+
+@[simp] theorem reynoldsAbstractionPathLift_assoc {A : Type u}
+    {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    reynoldsAbstractionPathLift (reynoldsAbstractionPathLift p q) r =
+      reynoldsAbstractionPathLift p (reynoldsAbstractionPathLift q r) := by
+  simpa [reynoldsAbstractionPathLift] using Path.trans_assoc p q r
+
+def freeTheoremPathConsequence {A : Type u} (F : FreeTheorem A)
+    {x y : A} (p : Path x y) : Prop :=
+  F.statement x → F.statement y
+
+theorem freeTheoremPathConsequence_of_path {A : Type u}
+    (F : FreeTheorem A) {x y : A} (p : Path x y)
+    (hx : F.statement x) :
+    F.statement y := by
+  cases p with
+  | mk _ proof =>
+      cases proof
+      simpa using hx
+
+def parametricRewrite {A : Type u} {x y : A}
+    (p q : Path x y) : Prop :=
+  Path.toEq p = Path.toEq q
+
+def parametricRewriteConfluent {A : Type u} {x y : A} : Prop :=
+  ∀ p q r : Path x y,
+    parametricRewrite p q → parametricRewrite p r →
+      ∃ s : Path x y, parametricRewrite q s ∧ parametricRewrite r s
+
+theorem parametricRewrite_confluent {A : Type u} {x y : A} :
+    parametricRewriteConfluent (x := x) (y := y) := by
+  intro p q r hpq hpr
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
+theorem relationalTransport_path_inverse {A : Type u} {a b : A}
+    (p : Path a b) :
+    relationalTransport (relationalTransport p) = p := by
+  simpa [relationalTransport] using Path.symm_symm p
+
 end ParametricityPaths
 end Foundations
 end Path
 end ComputationalPaths
-

@@ -198,6 +198,39 @@ theorem cobordism_op_preservation (co : CobordismOperation)
     (h : co.degree ≥ 0) :
     co.target.dimension ≥ 0 := by sorry
 
+
+
+/-! ## Computational path expansion: cobordism rewrites -/
+
+def cobordismRewriteStep (x y : OrientedCobordism)
+    (h : x = y) : Step OrientedCobordism :=
+  Step.mk x y h
+
+def cobordismPathWitness (x y : OrientedCobordism)
+    (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def cobordismRewrite {x y : OrientedCobordism} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def cobordismRewriteConfluent : Prop :=
+  ∀ {x y : OrientedCobordism} (p q₁ q₂ : Path x y),
+    cobordismRewrite p q₁ →
+    cobordismRewrite p q₂ →
+    ∃ q₃ : Path x y, cobordismRewrite q₁ q₃ ∧ cobordismRewrite q₂ q₃
+
+theorem cobordismRewrite_refl {x y : OrientedCobordism} (p : Path x y) :
+    cobordismRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem cobordismRewrite_confluence : cobordismRewriteConfluent := by
+  sorry
+
+theorem cobordismRewrite_coherence {x y z w : OrientedCobordism}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
 end CobordismAdvanced
 end Topology
 end Path

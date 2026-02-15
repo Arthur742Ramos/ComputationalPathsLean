@@ -507,6 +507,59 @@ theorem ends_coends_interact_with_day_convolution {C : VCategory}
     (D : EnrichedDayConvolution C) : True := by
   sorry
 
+/-! ## Computational-path enrichment integration -/
+
+def enrichedHomPathSpace {C : VCategory} (x y : C.Obj) : Type u :=
+  Path x y
+
+def enrichedComposeAsPath {C : VCategory} {x y z : C.Obj}
+    (p : enrichedHomPathSpace x y) (q : enrichedHomPathSpace y z) :
+    enrichedHomPathSpace x z :=
+  Path.trans p q
+
+@[simp] theorem enrichedComposeAsPath_assoc {C : VCategory}
+    {w x y z : C.Obj}
+    (p : enrichedHomPathSpace w x)
+    (q : enrichedHomPathSpace x y)
+    (r : enrichedHomPathSpace y z) :
+    enrichedComposeAsPath (enrichedComposeAsPath p q) r =
+      enrichedComposeAsPath p (enrichedComposeAsPath q r) := by
+  simpa [enrichedComposeAsPath] using Path.trans_assoc p q r
+
+@[simp] theorem enrichedComposeAsPath_id_left {C : VCategory}
+    {x y : C.Obj} (p : enrichedHomPathSpace x y) :
+    enrichedComposeAsPath (Path.refl x) p = p := by
+  simpa [enrichedComposeAsPath] using Path.trans_refl_left p
+
+@[simp] theorem enrichedComposeAsPath_id_right {C : VCategory}
+    {x y : C.Obj} (p : enrichedHomPathSpace x y) :
+    enrichedComposeAsPath p (Path.refl y) = p := by
+  simpa [enrichedComposeAsPath] using Path.trans_refl_right p
+
+def enrichedYonedaPathRepresentable {C : VCategory} (x : C.Obj) :
+    (y : C.Obj) → Type u :=
+  fun y => enrichedHomPathSpace y x
+
+def enrichedYonedaRepresenter {C : VCategory} (x : C.Obj) :
+    enrichedYonedaPathRepresentable x x :=
+  Path.refl x
+
+def enrichedHomRewrite {C : VCategory} {x y : C.Obj}
+    (p q : enrichedHomPathSpace x y) : Prop :=
+  Path.toEq p = Path.toEq q
+
+def enrichedHomRewriteConfluent {C : VCategory} {x y : C.Obj} : Prop :=
+  ∀ p q r : enrichedHomPathSpace x y,
+    enrichedHomRewrite p q → enrichedHomRewrite p r →
+      ∃ s : enrichedHomPathSpace x y,
+        enrichedHomRewrite q s ∧ enrichedHomRewrite r s
+
+theorem enrichedHomRewrite_confluent {C : VCategory} {x y : C.Obj} :
+    enrichedHomRewriteConfluent (C := C) (x := x) (y := y) := by
+  intro p q r hpq hpr
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
 end EnrichedCategories
 end Category
 end Path

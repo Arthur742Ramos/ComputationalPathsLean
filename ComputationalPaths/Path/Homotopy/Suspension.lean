@@ -58,6 +58,61 @@ theorem meridian_whisker_contracts_two_cell {X : Type u} (x y : X) :
     (SuspensionLoop.Suspension.merid (X := X) y)
     (rweq_cmpA_inv_right (SuspensionLoop.Suspension.merid (X := X) x))
 
+/-! ## Suspension as a path pushout -/
+
+/-- A pushout loop in `ΣX` built from two meridians. -/
+def pushoutLoop {X : Type u} (x y : X) :
+    Path (SuspensionLoop.Suspension.north (X := X)) (SuspensionLoop.Suspension.north (X := X)) :=
+  Path.trans
+    (SuspensionLoop.Suspension.merid (X := X) x)
+    (Path.symm (SuspensionLoop.Suspension.merid (X := X) y))
+
+/-- Degenerate pushout loop using the same meridian in opposite directions. -/
+def pushoutLoopDegenerate {X : Type u} (x : X) :
+    Path (SuspensionLoop.Suspension.north (X := X)) (SuspensionLoop.Suspension.north (X := X)) :=
+  pushoutLoop x x
+
+/-- Degenerate pushout loop contracts to reflexivity via inverse cancellation. -/
+theorem pushoutLoopDegenerate_two_cell {X : Type u} (x : X) :
+    TwoCell (pushoutLoopDegenerate (X := X) x)
+      (Path.refl (SuspensionLoop.Suspension.north (X := X))) := by
+  simpa [pushoutLoopDegenerate, pushoutLoop]
+    using (rweq_cmpA_inv_right (SuspensionLoop.Suspension.merid (X := X) x))
+
+/-- Left-whiskered degenerate pushout loop contracts to the target meridian. -/
+theorem pushout_whisker_contracts_two_cell {X : Type u} (x y : X) :
+    TwoCell
+      (Path.trans (pushoutLoopDegenerate (X := X) x)
+        (SuspensionLoop.Suspension.merid (X := X) y))
+      (SuspensionLoop.Suspension.merid (X := X) y) := by
+  refine RwEq.trans ?_ (rweq_cmpA_refl_left (SuspensionLoop.Suspension.merid (X := X) y))
+  exact rweq_trans_congr_left
+    (SuspensionLoop.Suspension.merid (X := X) y)
+    (pushoutLoopDegenerate_two_cell (X := X) x)
+
+/-- Rebracketing of pushout-loop composition is a 2-cell. -/
+theorem pushout_assoc_two_cell {X : Type u} (x y z : X) :
+    TwoCell
+      (Path.trans
+        (Path.trans
+          (SuspensionLoop.Suspension.merid (X := X) x)
+          (Path.symm (SuspensionLoop.Suspension.merid (X := X) y)))
+        (SuspensionLoop.Suspension.merid (X := X) z))
+      (Path.trans
+        (SuspensionLoop.Suspension.merid (X := X) x)
+        (Path.trans
+          (Path.symm (SuspensionLoop.Suspension.merid (X := X) y))
+          (SuspensionLoop.Suspension.merid (X := X) z))) :=
+  rweq_tt
+    (SuspensionLoop.Suspension.merid (X := X) x)
+    (Path.symm (SuspensionLoop.Suspension.merid (X := X) y))
+    (SuspensionLoop.Suspension.merid (X := X) z)
+
+/-- Pushout loops carry reflexive computational paths. -/
+def pushoutLoop_path {X : Type u} (x y : X) :
+    Path (pushoutLoop x y) (pushoutLoop x y) :=
+  Path.refl _
+
 end Suspension
 end Homotopy
 end Path

@@ -412,4 +412,40 @@ theorem condensed_pyknotic_comparison_theorem
 theorem light_condensed_enhancement_exists : hasLightCondensedEnhancement := by
   sorry
 
+/-! ## Computational-path profinite integration -/
+
+def proObjectInversePathSystem (Obj : Type u) (P : ProObject Obj) : Type _ :=
+  (i : P.index) → Path (P.objects i) (P.objects i)
+
+def proObjectInversePathSystem_base (Obj : Type u) (P : ProObject Obj) :
+    proObjectInversePathSystem Obj P :=
+  fun i => Path.refl (P.objects i)
+
+def profiniteCompletionPathCompletion (G : Type u) (C : ProfiniteCompletion G) :
+    Path C C :=
+  Path.refl C
+
+def stoneDualityPathSpace (B : BoolAlg) : Type _ :=
+  Path (StoneSpace (ClopenAlgebra (StoneSpace B))) (StoneSpace B)
+
+def stoneDualityPathWitness (B : BoolAlg) : stoneDualityPathSpace B := by
+  rfl
+
+def proObjectPathCompose (Obj : Type u) (P : ProObject Obj) (i : P.index)
+    (p q : Path (P.objects i) (P.objects i)) :
+    Path (P.objects i) (P.objects i) :=
+  Path.trans p q
+
+def profinitePathRewrite {Obj : Type u} {x y : Obj}
+    (p q : Path x y) : Prop :=
+  Path.toEq p = Path.toEq q
+
+theorem profinitePathRewrite_confluent {Obj : Type u} {x y : Obj}
+    (p q r : Path x y)
+    (hpq : profinitePathRewrite p q) (hpr : profinitePathRewrite p r) :
+    ∃ s : Path x y,
+      profinitePathRewrite q s ∧ profinitePathRewrite r s := by
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
 end ComputationalPaths

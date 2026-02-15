@@ -167,6 +167,38 @@ theorem stage_two_description :
       desc = "Stage 2 = 2-connected cover, fiber = K(π₂, 1)" :=
   ⟨_, rfl⟩
 
+/-! ## Computational-path tower laws -/
+
+/-- Stage-map action is tracked by a computational path. -/
+def stageMap_path (A : Type u) (n : Nat) (x : (WhiteheadStage A (n + 1)).cover) :
+    Path ((stageMap A n).toFun x) x :=
+  Path.stepChain rfl
+
+/-- Bond-map action is tracked by a computational path. -/
+def towerBond_path (A : Type u) (n : Nat) (x : A) :
+    Path (((whiteheadTower A).bond n).toFun x) x :=
+  Path.stepChain (tower_bond_comm A n x)
+
+/-- Two successive bond maps contract by computational path. -/
+def towerBond_comp_path (A : Type u) (n : Nat) (x : A) :
+    Path (((whiteheadTower A).bond n).toFun (((whiteheadTower A).bond (n + 1)).toFun x)) x :=
+  Path.stepChain (tower_bond_comp A n x)
+
+/-- The canonical point in each tower fiber projects back by computational path. -/
+def towerFiber_base_path (A : Type u) (n : Nat) (a : A) :
+    Path (towerFiber_inhabited A n a).val a :=
+  Path.stepChain rfl
+
+/-- Any stage cover identifies with the ambient space by computational path. -/
+def stageCover_path (A : Type u) (n : Nat) :
+    Path ((WhiteheadStage A n).cover) A :=
+  Path.stepChain (stage_cover_eq A n)
+
+/-- Stage zero identifies with the ambient space by computational path. -/
+def stageZero_path (A : Type u) :
+    Path ((WhiteheadStage A 0).cover) A :=
+  Path.stepChain (stage_zero_is_space A)
+
 private def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 

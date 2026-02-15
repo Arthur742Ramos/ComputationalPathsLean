@@ -53,6 +53,47 @@ theorem left_to_right_two_cell {A : Type u} {a : A}
     TwoCell (routeLeft p q r s) (routeRight p q r s) := by
   exact RwEq.trans (left_to_middle_two_cell p q r s) (middle_to_right_two_cell p q r s)
 
+/-! ## Unit, inverse, and iterated-path routes -/
+
+/-- Left-unit route for loops. -/
+def leftUnitRoute {A : Type u} {a : A} (p : BaseLoop A a) : BaseLoop A a :=
+  Path.trans (Path.refl a) p
+
+/-- Right-unit route for loops. -/
+def rightUnitRoute {A : Type u} {a : A} (p : BaseLoop A a) : BaseLoop A a :=
+  Path.trans p (Path.refl a)
+
+/-- Left unit contraction is a 2-cell. -/
+theorem left_unit_two_cell {A : Type u} {a : A} (p : BaseLoop A a) :
+    TwoCell (leftUnitRoute p) p :=
+  rweq_cmpA_refl_left p
+
+/-- Right unit contraction is a 2-cell. -/
+theorem right_unit_two_cell {A : Type u} {a : A} (p : BaseLoop A a) :
+    TwoCell (rightUnitRoute p) p :=
+  rweq_cmpA_refl_right p
+
+/-- Left inverse cancellation is a 2-cell. -/
+theorem inverse_left_two_cell {A : Type u} {a : A} (p : BaseLoop A a) :
+    TwoCell (Path.trans (Path.symm p) p) (Path.refl a) :=
+  rweq_cmpA_inv_left p
+
+/-- Right inverse cancellation is a 2-cell. -/
+theorem inverse_right_two_cell {A : Type u} {a : A} (p : BaseLoop A a) :
+    TwoCell (Path.trans p (Path.symm p)) (Path.refl a) :=
+  rweq_cmpA_inv_right p
+
+/-- Pointed data for iterated loop/path spaces. -/
+def iteratedLoopPointedData {A : Type u} (a : A) : Nat → Sigma fun X : Type u => X
+  | 0 => ⟨A, a⟩
+  | n + 1 =>
+      let prev := iteratedLoopPointedData a n
+      ⟨LoopSpace prev.1 prev.2, Path.refl prev.2⟩
+
+/-- The `n`-fold iterated loop space is an iterated path space. -/
+abbrev iteratedPathSpace {A : Type u} (a : A) (n : Nat) : Type u :=
+  (iteratedLoopPointedData a n).1
+
 end LoopSpace
 end Homotopy
 end Path

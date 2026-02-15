@@ -71,6 +71,38 @@ def stage_kills_next {A : Type u} (n : Nat) :
     Path (stageCells A n (n + 1)) PUnit := by
   exact stageCells_eq_punit_of_lt (A := A) (n := n) (k := n + 1) (Nat.lt_succ_self n)
 
+/-! ## Computational-path exactness addenda -/
+
+/-- Any fixed stage-cell type carries a reflexive computational path. -/
+def stage_refl_path (A : Type u) (n k : Nat) :
+    Path (stageCells A n k) (stageCells A n k) :=
+  Path.refl _
+
+/-- Stage comparison to the ambient `k`-cells as a computational path. -/
+def stage_exact_path {A : Type u} {n k : Nat} (h : k ≤ n) :
+    Path (stageCells A n k) (cellType A k) :=
+  stageCells_eq_of_le h
+
+/-- Transition between Postnikov stages on fixed cells, as a computational path. -/
+def stage_transition_path {A : Type u} {k n m : Nat} (hkn : k ≤ n) (hnm : n ≤ m) :
+    Path (stageCells A n k) (stageCells A m k) :=
+  tower_converges hkn hnm
+
+/-- The next layer is killed at each Postnikov stage, as a computational path. -/
+def next_stage_killed_path {A : Type u} (n : Nat) :
+    Path (stageCells A n (n + 1)) PUnit :=
+  stage_kills_next (A := A) n
+
+/-- Each Postnikov stage in the tower has a reflexive computational witness. -/
+def tower_stage_refl_path (A : Type u) (n : Nat) :
+    Path (postnikovTower A n) (postnikovTower A n) :=
+  Path.refl _
+
+/-- Each truncation stage has a reflexive computational witness. -/
+def truncation_stage_refl_path (A : Type u) (n : Nat) :
+    Path (nTruncation A n) (nTruncation A n) :=
+  Path.refl _
+
 /-! ## Summary
 
 We define Postnikov stages as the canonical `n`-groupoid truncations of the

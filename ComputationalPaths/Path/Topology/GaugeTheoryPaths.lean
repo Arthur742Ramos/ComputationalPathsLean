@@ -437,6 +437,46 @@ theorem casson_eq_half_signed (C : CassonInvariant) :
 theorem floer_exact_triangle_exists (G : GaugeGroup) : True := by
   sorry
 
+
+
+/-! ## Computational path expansion: holonomy rewrites -/
+
+section HolonomyRewrite
+
+variable {G : GaugeGroup} {P : PrincipalBundle G}
+
+def holonomyRewriteStep (x y : Connection G P)
+    (h : x = y) : Step (Connection G P) :=
+  Step.mk x y h
+
+def holonomyPathWitness (x y : Connection G P)
+    (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def holonomyRewrite {x y : Connection G P} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def holonomyRewriteConfluent : Prop :=
+  ∀ {x y : Connection G P} (p q₁ q₂ : Path x y),
+    holonomyRewrite p q₁ →
+    holonomyRewrite p q₂ →
+    ∃ q₃ : Path x y, holonomyRewrite q₁ q₃ ∧ holonomyRewrite q₂ q₃
+
+theorem holonomyRewrite_refl {x y : Connection G P} (p : Path x y) :
+    holonomyRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem holonomyRewrite_confluence {G : GaugeGroup} {P : PrincipalBundle G} :
+    holonomyRewriteConfluent (G := G) (P := P) := by
+  sorry
+
+theorem holonomyRewrite_coherence {x y z w : Connection G P}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
+end HolonomyRewrite
+
 end GaugeTheoryPaths
 end Topology
 end Path

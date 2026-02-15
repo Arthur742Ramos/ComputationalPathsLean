@@ -230,6 +230,37 @@ theorem spectral_loop_fold_refl {alpha : Type u} {a b : alpha} (p : Path a b) :
     Path (spectralLoopFold p) (spectralLoopFold p) := by
   sorry
 
+
+
+/-! ## Computational path expansion: spectral rewriting -/
+
+def spectralRewriteStep (x y : SerreSS) (h : x = y) : Step SerreSS :=
+  Step.mk x y h
+
+def spectralPagePath (x y : SerreSS) (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def spectralRewrite {x y : SerreSS} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def spectralRewriteConfluent : Prop :=
+  ∀ {x y : SerreSS} (p q₁ q₂ : Path x y),
+    spectralRewrite p q₁ →
+    spectralRewrite p q₂ →
+    ∃ q₃ : Path x y, spectralRewrite q₁ q₃ ∧ spectralRewrite q₂ q₃
+
+theorem spectralRewrite_refl {x y : SerreSS} (p : Path x y) :
+    spectralRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem spectralRewrite_confluence : spectralRewriteConfluent := by
+  sorry
+
+theorem spectralRewrite_coherence {x y z w : SerreSS}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
 end SpectralSequencesAdv
 end Topology
 end Path

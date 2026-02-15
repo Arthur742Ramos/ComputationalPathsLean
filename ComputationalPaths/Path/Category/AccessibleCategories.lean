@@ -369,4 +369,57 @@ theorem sketchability_iff_makkai_pare (κ : RegularCardinal)
     isAccessibleSketchable κ C ↔ True := by
   sorry
 
+/-! ## Computational-path accessibility integration -/
+
+def filteredColimitPathLimit {κ : RegularCardinal}
+    (C : AccessibleCategory κ) (X Y : C.Obj) : Type _ :=
+  Path X Y
+
+def filteredColimitPathCompose {κ : RegularCardinal}
+    {C : AccessibleCategory κ} {X Y Z : C.Obj}
+    (p : filteredColimitPathLimit C X Y)
+    (q : filteredColimitPathLimit C Y Z) :
+    filteredColimitPathLimit C X Z :=
+  Path.trans p q
+
+def filteredColimitPathId {κ : RegularCardinal}
+    {C : AccessibleCategory κ} (X : C.Obj) :
+    filteredColimitPathLimit C X X :=
+  Path.refl X
+
+@[simp] theorem filteredColimitPathCompose_assoc {κ : RegularCardinal}
+    {C : AccessibleCategory κ} {W X Y Z : C.Obj}
+    (p : filteredColimitPathLimit C W X)
+    (q : filteredColimitPathLimit C X Y)
+    (r : filteredColimitPathLimit C Y Z) :
+    filteredColimitPathCompose (filteredColimitPathCompose p q) r =
+      filteredColimitPathCompose p (filteredColimitPathCompose q r) := by
+  simpa [filteredColimitPathCompose] using Path.trans_assoc p q r
+
+def indObjectPathCompletion (Obj : Type u) (I : IndCategory Obj) : Type _ :=
+  (x : I.indObj) → Path x x
+
+def indObjectPathCompletion_base (Obj : Type u) (I : IndCategory Obj) :
+    indObjectPathCompletion Obj I :=
+  fun x => Path.refl x
+
+def accessiblePathRewrite {κ : RegularCardinal} {C : AccessibleCategory κ}
+    {X Y : C.Obj}
+    (p q : filteredColimitPathLimit C X Y) : Prop :=
+  Path.toEq p = Path.toEq q
+
+def accessiblePathRewriteConfluent {κ : RegularCardinal} {C : AccessibleCategory κ}
+    {X Y : C.Obj} : Prop :=
+  ∀ p q r : filteredColimitPathLimit C X Y,
+    accessiblePathRewrite p q → accessiblePathRewrite p r →
+      ∃ s : filteredColimitPathLimit C X Y,
+        accessiblePathRewrite q s ∧ accessiblePathRewrite r s
+
+theorem accessiblePathRewrite_confluent {κ : RegularCardinal}
+    {C : AccessibleCategory κ} {X Y : C.Obj} :
+    accessiblePathRewriteConfluent (C := C) (X := X) (Y := Y) := by
+  intro p q r hpq hpr
+  refine ⟨q, rfl, ?_⟩
+  exact Eq.trans hpr.symm hpq
+
 end ComputationalPaths

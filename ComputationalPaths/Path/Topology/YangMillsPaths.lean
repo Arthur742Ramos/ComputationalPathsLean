@@ -461,6 +461,46 @@ theorem deformation_complex_elliptic (G : LieGroup) (P : PrincipalBundle G)
     (A : Connection G P) (D : DeformationComplex G P A) : True := by
   sorry
 
+
+
+/-! ## Computational path expansion: gauge rewrites -/
+
+section GaugeRewrite
+
+variable {G : LieGroup} {P : PrincipalBundle G}
+
+def gaugeRewriteStep (x y : Connection G P)
+    (h : x = y) : Step (Connection G P) :=
+  Step.mk x y h
+
+def gaugePathWitness (x y : Connection G P)
+    (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def gaugeRewrite {x y : Connection G P} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def gaugeRewriteConfluent : Prop :=
+  ∀ {x y : Connection G P} (p q₁ q₂ : Path x y),
+    gaugeRewrite p q₁ →
+    gaugeRewrite p q₂ →
+    ∃ q₃ : Path x y, gaugeRewrite q₁ q₃ ∧ gaugeRewrite q₂ q₃
+
+theorem gaugeRewrite_refl {x y : Connection G P} (p : Path x y) :
+    gaugeRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem gaugeRewrite_confluence {G : LieGroup} {P : PrincipalBundle G} :
+    gaugeRewriteConfluent (G := G) (P := P) := by
+  sorry
+
+theorem gaugeRewrite_coherence {x y z w : Connection G P}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
+end GaugeRewrite
+
 end YangMillsPaths
 end Topology
 end Path

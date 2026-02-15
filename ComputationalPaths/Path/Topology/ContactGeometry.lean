@@ -430,6 +430,46 @@ theorem stabilisation_decreases_tb (cs : ContactStructure)
 theorem giroux_stabilisation_invariance : True := by
   sorry
 
+
+
+/-! ## Computational path expansion: Legendrian rewrites -/
+
+section LegendrianRewrite
+
+variable {cs : ContactStructure}
+
+def legendrianRewriteStep (x y : LegendrianKnot cs)
+    (h : x = y) : Step (LegendrianKnot cs) :=
+  Step.mk x y h
+
+def legendrianIsotopyPath (x y : LegendrianKnot cs)
+    (h : x = y) : Path x y :=
+  Path.stepChain h
+
+def legendrianRewrite {x y : LegendrianKnot cs} (p q : Path x y) : Prop :=
+  ∃ r : Path y y, q = Path.trans p r
+
+def legendrianRewriteConfluent : Prop :=
+  ∀ {x y : LegendrianKnot cs} (p q₁ q₂ : Path x y),
+    legendrianRewrite p q₁ →
+    legendrianRewrite p q₂ →
+    ∃ q₃ : Path x y, legendrianRewrite q₁ q₃ ∧ legendrianRewrite q₂ q₃
+
+theorem legendrianRewrite_refl {x y : LegendrianKnot cs} (p : Path x y) :
+    legendrianRewrite p (Path.trans p (Path.refl y)) := by
+  exact ⟨Path.refl y, rfl⟩
+
+theorem legendrianRewrite_confluence {cs : ContactStructure} :
+    legendrianRewriteConfluent (cs := cs) := by
+  sorry
+
+theorem legendrianRewrite_coherence {x y z w : LegendrianKnot cs}
+    (p : Path x y) (q : Path y z) (r : Path z w) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  simpa using Path.trans_assoc p q r
+
+end LegendrianRewrite
+
 end ContactGeometry
 end Topology
 end Path
