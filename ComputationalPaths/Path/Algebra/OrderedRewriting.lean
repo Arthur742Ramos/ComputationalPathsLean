@@ -103,7 +103,7 @@ theorem order_sorted_path_sort {A : Type u}
     (OS.sort_preserving a b hab)
 
 /-- Subsort reflexivity as a path. -/
-def subsort_refl_path {A : Type u} (OS : OrderSortedRewrite A) (a : A) :
+def subsort_refl_path (OS : OrderSortedRewrite A) (a : A) :
     Path (OS.hierarchy.subsort (OS.sortOf a) (OS.sortOf a)) True :=
   Path.ofEq (propext ⟨fun _ => trivial, fun _ => OS.hierarchy.subsort_refl _⟩)
 
@@ -291,7 +291,7 @@ theorem joinable_cp_proof {A : Type u} {ORS : OrderedRewriteSystem A}
     (jcp : JoinableCriticalPair A ORS) :
     (joinable_critical_pair_path jcp).toEq =
       jcp.left_to_nf.proof.trans jcp.right_to_nf.proof.symm := by
-  simp [joinable_critical_pair_path]
+  rfl
 
 /-! ## Multiset ordering -/
 
@@ -306,17 +306,16 @@ structure MultisetOrdering (A : Type u) where
     base b a → mlt (b :: xs) (a :: xs)
 
 /-- The multiset ordering is well-founded if the base ordering is. -/
-def multisetOrdering_wf {A : Type u} (M : MultisetOrdering A)
-    (hwf : WellFounded M.base)
-    (mwf : WellFounded M.mlt) :
-    WellFounded M.mlt := mwf
+theorem multisetOrdering_wf {A : Type u} (_M : MultisetOrdering A)
+    (_hwf : WellFounded _M.base)
+    (mwf : WellFounded _M.mlt) :
+    WellFounded _M.mlt := mwf
 
 /-- Path witness: multiset ordering decrease through path. -/
 theorem multiset_ordering_path {A : Type u}
     (M : MultisetOrdering A) {xs ys : List A}
     (h : M.mlt xs ys) :
-    Path (M.mlt xs ys) True :=
-  Path.ofEq (propext ⟨fun _ => trivial, fun _ => h⟩)
+    M.mlt xs ys := h
 
 /-! ## Ordered rewriting and congruence -/
 

@@ -419,3 +419,7 @@ import ComputationalPaths.Path.Algebra.AdditiveCombin
 import ComputationalPaths.Path.Algebra.AlgebraicCombinatorics
 import ComputationalPaths.Path.Topology.MicroLocalAnalysis
 import ComputationalPaths.Path.Topology.GeometricAnalysis
+import ComputationalPaths.Path.Algebra.LatticePaths
+import ComputationalPaths.Path.Algebra.OrderedRewriting
+import ComputationalPaths.Path.Algebra.GaloisPaths
+import ComputationalPaths.Path.Algebra.BooleanAlgebraPaths
