@@ -386,6 +386,10 @@ import ComputationalPaths.Path.Category.AccessibleCategories
 import ComputationalPaths.Path.Category.ProfiniteCategories
 import ComputationalPaths.Path.Logic.HomotopyTypeTheory
 import ComputationalPaths.Path.Logic.ModalHoTT
+import ComputationalPaths.Path.Logic.SequentPaths
+import ComputationalPaths.Path.Logic.NaturalDeductionPaths
+import ComputationalPaths.Path.Logic.ResolutionPaths
+import ComputationalPaths.Path.Logic.ModalPaths
 import ComputationalPaths.Path.Topology.PersistentHomology
 import ComputationalPaths.Path.Topology.DiscreteTopology
 import ComputationalPaths.Path.Topology.TopologicalData
