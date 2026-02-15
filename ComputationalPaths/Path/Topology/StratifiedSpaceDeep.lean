@@ -274,10 +274,10 @@ def ic_trunc_compose (n m : Nat) (s : ICSheafStalk) :
       (ICSheafStalk.truncated (min n m) s) :=
   .cons .icTruncCompose (.nil _)
 
-def ic_norm_then_shift (n : Nat) (s : ICSheafStalk) :
-    StratPath ICSheafStalk s (ICSheafStalk.shifted n (ICSheafStalk.truncated 0 s)) :=
-  (ic_normalization s).trans
-    (.cons (.symm (.icShift)) (.cons (.icShift) (.nil _)))
+def ic_norm_then_trunc (_n : Nat) (s : ICSheafStalk) :
+    StratPath ICSheafStalk (ICSheafStalk.truncated 0 s)
+      (ICSheafStalk.truncated 0 (ICSheafStalk.truncated 0 s)) :=
+  .cons (.congrArg (ICSheafStalk.truncated 0) (.icNormalization)) (.nil _)
 
 def ic_double_norm (s : ICSheafStalk) :
     StratPath ICSheafStalk s (ICSheafStalk.truncated (min 0 0) s) :=
