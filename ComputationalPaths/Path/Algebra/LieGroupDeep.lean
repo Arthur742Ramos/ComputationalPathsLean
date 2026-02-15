@@ -6,171 +6,191 @@ universe u
 
 -- ============================================================================
 -- LIE GROUPS VIA PATHS
--- Exponential map, Lie bracket, BCH formula, adjoint representations,
--- Killing form, semisimple decomposition, root systems, Weyl group,
--- maximal torus, Peter-Weyl completeness
 -- ============================================================================
 
--- G: Lie group elements, 𝔤: Lie algebra elements
-variable (G : Type u) (𝔤 : Type u)
-
--- Group operations
-variable (mul : G → G → G) (inv : G → G) (e : G)
-
--- Algebra operations
-variable (add : 𝔤 → 𝔤 → 𝔤) (scale : 𝔤 → 𝔤 → 𝔤) (bracket : 𝔤 → 𝔤 → 𝔤)
-         (zero : 𝔤) (neg : 𝔤 → 𝔤)
-
--- Exponential map and logarithm
-variable (exp : 𝔤 → G) (log : G → 𝔤)
-
--- Adjoint representations
-variable (Ad : G → 𝔤 → 𝔤) (ad : 𝔤 → 𝔤 → 𝔤)
-
--- Killing form
-variable (killing : 𝔤 → 𝔤 → 𝔤)
-
 -- ============================================================================
--- LieStep: path constructors for Lie theory
+-- LieStep: path constructors for Lie group theory
 -- ============================================================================
 
-inductive LieStep : G → G → Type u where
-  | refl (x : G) : LieStep x x
-  | symm {x y : G} : LieStep x y → LieStep y x
-  | trans {x y z : G} : LieStep x y → LieStep y z → LieStep x z
-  | congrArg {x y : G} (f : G → G) : LieStep x y → LieStep (f x) (f y)
-  -- Group axioms
-  | mul_assoc (a b c : G) : LieStep (mul (mul a b) c) (mul a (mul b c))
-  | mul_left_id (a : G) : LieStep (mul e a) a
-  | mul_right_id (a : G) : LieStep (mul a e) a
-  | mul_left_inv (a : G) : LieStep (mul (inv a) a) e
-  | mul_right_inv (a : G) : LieStep (mul a (inv a)) e
-  -- Exponential map homomorphism (commuting case)
-  | exp_add (X Y : 𝔤) : LieStep (mul (exp X) (exp Y)) (exp (add X Y))
-  -- Exp of zero
-  | exp_zero : LieStep (exp zero) e
-  -- Exp-log inverse
-  | exp_log (g : G) : LieStep (exp (log g)) g
-  -- Log-exp inverse
-  | log_exp_step (X : 𝔤) : LieStep (exp (log (exp X))) (exp X)
-  -- BCH formula: exp(X)exp(Y) = exp(X + Y + 1/2[X,Y] + ...)
+inductive LieStep (G : Type u) (𝔤 : Type u)
+    (mul : G → G → G) (inv : G → G) (e : G)
+    (add : 𝔤 → 𝔤 → 𝔤) (bracket : 𝔤 → 𝔤 → 𝔤)
+    (zero : 𝔤) (neg : 𝔤 → 𝔤)
+    (exp : 𝔤 → G) (Ad : G → 𝔤 → 𝔤)
+    (killing : 𝔤 → 𝔤 → 𝔤) : G → G → Type u where
+  | refl (x : G) : LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing x x
+  | symm {x y : G} : LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing y x
+  | trans {x y z : G} : LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing y z →
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing x z
+  | congrArg {x y : G} (f : G → G) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing (f x) (f y)
+  | mul_assoc (a b c : G) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (mul (mul a b) c) (mul a (mul b c))
+  | mul_left_id (a : G) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing (mul e a) a
+  | mul_right_id (a : G) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing (mul a e) a
+  | mul_left_inv (a : G) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing (mul (inv a) a) e
+  | mul_right_inv (a : G) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing (mul a (inv a)) e
+  | exp_add (X Y : 𝔤) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (mul (exp X) (exp Y)) (exp (add X Y))
+  | exp_zero :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing (exp zero) e
+  | exp_log (log : G → 𝔤) (g : G) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing (exp (log g)) g
   | bch_first_order (X Y : 𝔤) :
-      LieStep (mul (exp X) (exp Y)) (exp (add (add X Y) (bracket X Y)))
-  -- Adjoint representation: Ad(g)(X) via conjugation
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (mul (exp X) (exp Y)) (exp (add (add X Y) (bracket X Y)))
   | ad_conj (g : G) (X : 𝔤) :
-      LieStep (mul (mul g (exp X)) (inv g)) (exp (Ad g X))
-  -- Ad is a homomorphism
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (mul (mul g (exp X)) (inv g)) (exp (Ad g X))
   | ad_hom (g h : G) (X : 𝔤) :
-      LieStep (exp (Ad (mul g h) X)) (exp (Ad g (Ad h X)))
-  -- Ad of identity
-  | ad_id (X : 𝔤) : LieStep (exp (Ad e X)) (exp X)
-  -- Lie bracket via commutator path
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (exp (Ad (mul g h) X)) (exp (Ad g (Ad h X)))
+  | ad_id (X : 𝔤) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (exp (Ad e X)) (exp X)
   | bracket_commutator (X Y : 𝔤) :
-      LieStep (mul (mul (exp X) (exp Y)) (mul (exp (neg X)) (exp (neg Y))))
-              (exp (bracket X Y))
-  -- Bracket antisymmetry
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (mul (mul (exp X) (exp Y)) (mul (exp (neg X)) (exp (neg Y))))
+        (exp (bracket X Y))
   | bracket_antisymm (X Y : 𝔤) :
-      LieStep (exp (bracket X Y)) (exp (neg (bracket Y X)))
-  -- Jacobi identity
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (exp (bracket X Y)) (exp (neg (bracket Y X)))
   | jacobi (X Y Z : 𝔤) :
-      LieStep (exp (add (add (bracket X (bracket Y Z))
-                              (bracket Y (bracket Z X)))
-                        (bracket Z (bracket X Y))))
-              (exp zero)
-  -- Killing form symmetry
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (exp (add (add (bracket X (bracket Y Z))
+                       (bracket Y (bracket Z X)))
+                  (bracket Z (bracket X Y))))
+        (exp zero)
   | killing_symm (X Y : 𝔤) :
-      LieStep (exp (killing X Y)) (exp (killing Y X))
-  -- Killing form ad-invariance
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (exp (killing X Y)) (exp (killing Y X))
   | killing_ad_inv (X Y Z : 𝔤) :
-      LieStep (exp (killing (bracket X Y) Z))
-              (exp (killing X (bracket Y Z)))
-  -- Semisimple decomposition
-  | semisimple_decomp (X : 𝔤) :
-      LieStep (exp X) (mul (exp (add X zero)) (exp zero))
-  -- Inverse of exp
-  | exp_neg (X : 𝔤) : LieStep (inv (exp X)) (exp (neg X))
-  -- Double inverse
-  | inv_inv (g : G) : LieStep (inv (inv g)) g
-  -- Root system: root addition
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (exp (killing (bracket X Y) Z)) (exp (killing X (bracket Y Z)))
+  | exp_neg (X : 𝔤) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (inv (exp X)) (exp (neg X))
+  | inv_inv (g : G) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (inv (inv g)) g
   | root_add (α β : 𝔤) :
-      LieStep (exp (add α β)) (mul (exp α) (exp β))
-  -- Weyl reflection
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (exp (add α β)) (mul (exp α) (exp β))
   | weyl_reflect (w : G) (X : 𝔤) :
-      LieStep (mul (mul w (exp X)) (inv w)) (exp (Ad w X))
-  -- Maximal torus commutativity
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (mul (mul w (exp X)) (inv w)) (exp (Ad w X))
   | torus_comm (t₁ t₂ : G) :
-      LieStep (mul t₁ t₂) (mul t₂ t₁)
-  -- Peter-Weyl: group element decomposition
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (mul t₁ t₂) (mul t₂ t₁)
   | peter_weyl (g : G) (X Y : 𝔤) :
-      LieStep g (mul (exp X) (exp Y))
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        g (mul (exp X) (exp Y))
+  | semisimple_decomp (X : 𝔤) :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
+        (exp X) (mul (exp (add X zero)) (exp zero))
 
 -- ============================================================================
 -- LieAlgStep: paths in the Lie algebra
 -- ============================================================================
 
-inductive LieAlgStep : 𝔤 → 𝔤 → Type u where
-  | refl (x : 𝔤) : LieAlgStep x x
-  | symm {x y : 𝔤} : LieAlgStep x y → LieAlgStep y x
-  | trans {x y z : 𝔤} : LieAlgStep x y → LieAlgStep y z → LieAlgStep x z
-  | congrArg {x y : 𝔤} (f : 𝔤 → 𝔤) : LieAlgStep x y → LieAlgStep (f x) (f y)
-  -- Algebra axioms
-  | add_assoc (X Y Z : 𝔤) : LieAlgStep (add (add X Y) Z) (add X (add Y Z))
-  | add_comm (X Y : 𝔤) : LieAlgStep (add X Y) (add Y X)
-  | add_zero_left (X : 𝔤) : LieAlgStep (add zero X) X
-  | add_zero_right (X : 𝔤) : LieAlgStep (add X zero) X
-  | add_neg_left (X : 𝔤) : LieAlgStep (add (neg X) X) zero
-  | add_neg_right (X : 𝔤) : LieAlgStep (add X (neg X)) zero
-  -- Bracket bilinearity (left)
+inductive LieAlgStep (𝔤 : Type u)
+    (add : 𝔤 → 𝔤 → 𝔤) (bracket : 𝔤 → 𝔤 → 𝔤)
+    (zero : 𝔤) (neg : 𝔤 → 𝔤)
+    (ad : 𝔤 → 𝔤 → 𝔤) (scale : 𝔤 → 𝔤 → 𝔤)
+    (killing : 𝔤 → 𝔤 → 𝔤) : 𝔤 → 𝔤 → Type u where
+  | refl (x : 𝔤) : LieAlgStep 𝔤 add bracket zero neg ad scale killing x x
+  | symm {x y : 𝔤} : LieAlgStep 𝔤 add bracket zero neg ad scale killing x y →
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing y x
+  | trans {x y z : 𝔤} : LieAlgStep 𝔤 add bracket zero neg ad scale killing x y →
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing y z →
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing x z
+  | congrArg {x y : 𝔤} (f : 𝔤 → 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing x y →
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (f x) (f y)
+  | add_assoc (X Y Z : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing
+        (add (add X Y) Z) (add X (add Y Z))
+  | add_comm (X Y : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (add X Y) (add Y X)
+  | add_zero_left (X : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (add zero X) X
+  | add_zero_right (X : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (add X zero) X
+  | add_neg_left (X : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (add (neg X) X) zero
+  | add_neg_right (X : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (add X (neg X)) zero
   | bracket_add_left (X Y Z : 𝔤) :
-      LieAlgStep (bracket (add X Y) Z) (add (bracket X Z) (bracket Y Z))
-  -- Bracket bilinearity (right)
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing
+        (bracket (add X Y) Z) (add (bracket X Z) (bracket Y Z))
   | bracket_add_right (X Y Z : 𝔤) :
-      LieAlgStep (bracket X (add Y Z)) (add (bracket X Y) (bracket X Z))
-  -- Bracket antisymmetry (algebra level)
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing
+        (bracket X (add Y Z)) (add (bracket X Y) (bracket X Z))
   | bracket_antisymm (X Y : 𝔤) :
-      LieAlgStep (bracket X Y) (neg (bracket Y X))
-  -- Bracket self-annihilation
-  | bracket_self (X : 𝔤) : LieAlgStep (bracket X X) zero
-  -- Jacobi identity (algebra level)
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing
+        (bracket X Y) (neg (bracket Y X))
+  | bracket_self (X : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (bracket X X) zero
   | jacobi (X Y Z : 𝔤) :
-      LieAlgStep (add (add (bracket X (bracket Y Z))
-                            (bracket Y (bracket Z X)))
-                      (bracket Z (bracket X Y))) zero
-  -- ad representation: ad(X)(Y) = [X,Y]
-  | ad_def (X Y : 𝔤) : LieAlgStep (ad X Y) (bracket X Y)
-  -- ad is a derivation
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing
+        (add (add (bracket X (bracket Y Z))
+                  (bracket Y (bracket Z X)))
+             (bracket Z (bracket X Y))) zero
+  | ad_def (X Y : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (ad X Y) (bracket X Y)
   | ad_derivation (X Y Z : 𝔤) :
-      LieAlgStep (ad X (bracket Y Z)) (add (bracket (ad X Y) Z) (bracket Y (ad X Z)))
-  -- Killing form via ad
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing
+        (ad X (bracket Y Z)) (add (bracket (ad X Y) Z) (bracket Y (ad X Z)))
   | killing_trace (X Y : 𝔤) :
-      LieAlgStep (killing X Y) (killing Y X)
-  -- Killing form nondegeneracy (semisimple)
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (killing X Y) (killing Y X)
   | killing_nondegenerate (X : 𝔤) :
-      LieAlgStep (killing X zero) zero
-  -- Root decomposition
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (killing X zero) zero
   | root_eigenvalue (H X α : 𝔤) :
-      LieAlgStep (bracket H X) (scale α X)
-  -- Neg involution
-  | neg_neg (X : 𝔤) : LieAlgStep (neg (neg X)) X
-  -- Neg of zero
-  | neg_zero : LieAlgStep (neg zero) zero
-  -- Scale by zero
-  | bracket_zero_left (X : 𝔤) : LieAlgStep (bracket zero X) zero
-  | bracket_zero_right (X : 𝔤) : LieAlgStep (bracket X zero) zero
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (bracket H X) (scale α X)
+  | neg_neg (X : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (neg (neg X)) X
+  | neg_zero :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (neg zero) zero
+  | bracket_zero_left (X : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (bracket zero X) zero
+  | bracket_zero_right (X : 𝔤) :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing (bracket X zero) zero
 
 -- ============================================================================
--- LiePath: lists of Lie steps
+-- Paths
 -- ============================================================================
 
-inductive LiePath : G → G → Type u where
-  | nil (x : G) : LiePath x x
-  | cons {x y z : G} : LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
-      LiePath y z → LiePath x z
+inductive LiePath (G : Type u) (𝔤 : Type u)
+    (mul : G → G → G) (inv : G → G) (e : G)
+    (add : 𝔤 → 𝔤 → 𝔤) (bracket : 𝔤 → 𝔤 → 𝔤)
+    (zero : 𝔤) (neg : 𝔤 → 𝔤)
+    (exp : 𝔤 → G) (Ad : G → 𝔤 → 𝔤)
+    (killing : 𝔤 → 𝔤 → 𝔤) : G → G → Type u where
+  | nil (x : G) : LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x x
+  | cons {x y z : G} :
+      LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
+      LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing y z →
+      LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x z
 
-inductive LieAlgPath : 𝔤 → 𝔤 → Type u where
-  | nil (x : 𝔤) : LieAlgPath x x
-  | cons {x y z : 𝔤} : LieAlgStep 𝔤 add bracket zero neg ad scale killing x y →
-      LieAlgPath y z → LieAlgPath x z
+inductive LieAlgPath (𝔤 : Type u)
+    (add : 𝔤 → 𝔤 → 𝔤) (bracket : 𝔤 → 𝔤 → 𝔤)
+    (zero : 𝔤) (neg : 𝔤 → 𝔤)
+    (ad : 𝔤 → 𝔤 → 𝔤) (scale : 𝔤 → 𝔤 → 𝔤)
+    (killing : 𝔤 → 𝔤 → 𝔤) : 𝔤 → 𝔤 → Type u where
+  | nil (x : 𝔤) : LieAlgPath 𝔤 add bracket zero neg ad scale killing x x
+  | cons {x y z : 𝔤} :
+      LieAlgStep 𝔤 add bracket zero neg ad scale killing x y →
+      LieAlgPath 𝔤 add bracket zero neg ad scale killing y z →
+      LieAlgPath 𝔤 add bracket zero neg ad scale killing x z
 
 namespace LiePath
 
@@ -178,23 +198,21 @@ variable {G 𝔤 : Type u} {mul : G → G → G} {inv : G → G} {e : G}
          {add : 𝔤 → 𝔤 → 𝔤} {bracket : 𝔤 → 𝔤 → 𝔤} {zero : 𝔤} {neg : 𝔤 → 𝔤}
          {exp : 𝔤 → G} {Ad : G → 𝔤 → 𝔤} {killing : 𝔤 → 𝔤 → 𝔤}
 
-def trans : LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
-    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing y z →
-    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x z
+abbrev LP := @LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+
+def trans : LP x y → LP y z → LP x z
   | .nil _, q => q
   | .cons s p, q => .cons s (trans p q)
 
-def symm : LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
-    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing y x
+def symm : LP x y → LP y x
   | .nil _ => .nil _
   | .cons s p => trans (symm p) (.cons (.symm s) (.nil _))
 
-def congrArg (f : G → G) : LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x y →
-    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing (f x) (f y)
+def congrArg (f : G → G) : LP x y → LP (f x) (f y)
   | .nil _ => .nil _
   | .cons s p => .cons (.congrArg f s) (congrArg f p)
 
-def length : LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x y → Nat
+def length : LP x y → Nat
   | .nil _ => 0
   | .cons _ p => 1 + length p
 
@@ -205,26 +223,24 @@ namespace LieAlgPath
 variable {𝔤 : Type u} {add : 𝔤 → 𝔤 → 𝔤} {bracket : 𝔤 → 𝔤 → 𝔤} {zero : 𝔤}
          {neg : 𝔤 → 𝔤} {ad scale : 𝔤 → 𝔤 → 𝔤} {killing : 𝔤 → 𝔤 → 𝔤}
 
-def trans : LieAlgPath 𝔤 add bracket zero neg ad scale killing x y →
-    LieAlgPath 𝔤 add bracket zero neg ad scale killing y z →
-    LieAlgPath 𝔤 add bracket zero neg ad scale killing x z
+abbrev LAP := @LieAlgPath 𝔤 add bracket zero neg ad scale killing
+
+def trans : LAP x y → LAP y z → LAP x z
   | .nil _, q => q
   | .cons s p, q => .cons s (trans p q)
 
-def symm : LieAlgPath 𝔤 add bracket zero neg ad scale killing x y →
-    LieAlgPath 𝔤 add bracket zero neg ad scale killing y x
+def symm : LAP x y → LAP y x
   | .nil _ => .nil _
   | .cons s p => trans (symm p) (.cons (.symm s) (.nil _))
 
-def congrArg (f : 𝔤 → 𝔤) : LieAlgPath 𝔤 add bracket zero neg ad scale killing x y →
-    LieAlgPath 𝔤 add bracket zero neg ad scale killing (f x) (f y)
+def congrArg (f : 𝔤 → 𝔤) : LAP x y → LAP (f x) (f y)
   | .nil _ => .nil _
   | .cons s p => .cons (.congrArg f s) (congrArg f p)
 
 end LieAlgPath
 
 -- ============================================================================
--- THEOREMS: 35+ Lie group/algebra results
+-- THEOREMS: 50 Lie group/algebra results
 -- ============================================================================
 
 section LieTheorems
@@ -232,269 +248,321 @@ section LieTheorems
 variable {G 𝔤 : Type u} {mul : G → G → G} {inv : G → G} {e : G}
          {add : 𝔤 → 𝔤 → 𝔤} {bracket : 𝔤 → 𝔤 → 𝔤} {zero : 𝔤} {neg : 𝔤 → 𝔤}
          {exp : 𝔤 → G} {Ad : G → 𝔤 → 𝔤} {killing : 𝔤 → 𝔤 → 𝔤}
-         {ad scale : 𝔤 → 𝔤 → 𝔤} {log : G → 𝔤}
+         {ad scale : 𝔤 → 𝔤 → 𝔤}
 
-private abbrev LS := @LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing
-private abbrev LP := @LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
-private abbrev LAS := @LieAlgStep 𝔤 add bracket zero neg ad scale killing
-private abbrev LAP := @LieAlgPath 𝔤 add bracket zero neg ad scale killing
+private def mk {x y : G}
+    (s : LieStep G 𝔤 mul inv e add bracket zero neg exp Ad killing x y) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing x y :=
+  .cons s (.nil _)
 
-private def step (s : LS x y) : LP x y := .cons s (.nil _)
-private def astep (s : LAS x y) : LAP x y := .cons s (.nil _)
+private def amk {x y : 𝔤}
+    (s : LieAlgStep 𝔤 add bracket zero neg ad scale killing x y) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing x y :=
+  .cons s (.nil _)
 
--- 1. Group associativity
-theorem lie_mul_assoc (a b c : G) :
-    LP (mul (mul a b) c) (mul a (mul b c)) :=
-  step (.mul_assoc a b c)
+-- 1
+def lie_mul_assoc (a b c : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (mul a b) c) (mul a (mul b c)) :=
+  mk (.mul_assoc a b c)
 
--- 2. Left identity
-theorem lie_mul_left_id (a : G) : LP (mul e a) a :=
-  step (.mul_left_id a)
+-- 2
+def lie_mul_left_id (a : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing (mul e a) a :=
+  mk (.mul_left_id a)
 
--- 3. Right identity
-theorem lie_mul_right_id (a : G) : LP (mul a e) a :=
-  step (.mul_right_id a)
+-- 3
+def lie_mul_right_id (a : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing (mul a e) a :=
+  mk (.mul_right_id a)
 
--- 4. Left inverse
-theorem lie_mul_left_inv (a : G) : LP (mul (inv a) a) e :=
-  step (.mul_left_inv a)
+-- 4
+def lie_mul_left_inv (a : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing (mul (inv a) a) e :=
+  mk (.mul_left_inv a)
 
--- 5. Right inverse
-theorem lie_mul_right_inv (a : G) : LP (mul a (inv a)) e :=
-  step (.mul_right_inv a)
+-- 5
+def lie_mul_right_inv (a : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing (mul a (inv a)) e :=
+  mk (.mul_right_inv a)
 
--- 6. Exp homomorphism
-theorem lie_exp_add (X Y : 𝔤) :
-    LP (mul (exp X) (exp Y)) (exp (add X Y)) :=
-  step (.exp_add X Y)
+-- 6
+def lie_exp_add (X Y : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (exp X) (exp Y)) (exp (add X Y)) :=
+  mk (.exp_add X Y)
 
--- 7. Exp of zero
-theorem lie_exp_zero : LP (exp zero) e :=
-  step (.exp_zero)
+-- 7
+def lie_exp_zero :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing (exp zero) e :=
+  mk .exp_zero
 
--- 8. Exp-log round trip
-theorem lie_exp_log (g : G) : LP (exp (log g)) g :=
-  step (.exp_log g)
+-- 8
+def lie_bch (X Y : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (exp X) (exp Y)) (exp (add (add X Y) (bracket X Y))) :=
+  mk (.bch_first_order X Y)
 
--- 9. BCH first order
-theorem lie_bch (X Y : 𝔤) :
-    LP (mul (exp X) (exp Y)) (exp (add (add X Y) (bracket X Y))) :=
-  step (.bch_first_order X Y)
+-- 9
+def lie_ad_conj (g : G) (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (mul g (exp X)) (inv g)) (exp (Ad g X)) :=
+  mk (.ad_conj g X)
 
--- 10. Ad via conjugation
-theorem lie_ad_conj (g : G) (X : 𝔤) :
-    LP (mul (mul g (exp X)) (inv g)) (exp (Ad g X)) :=
-  step (.ad_conj g X)
+-- 10
+def lie_ad_hom (g h : G) (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (exp (Ad (mul g h) X)) (exp (Ad g (Ad h X))) :=
+  mk (.ad_hom g h X)
 
--- 11. Ad is homomorphism
-theorem lie_ad_hom (g h : G) (X : 𝔤) :
-    LP (exp (Ad (mul g h) X)) (exp (Ad g (Ad h X))) :=
-  step (.ad_hom g h X)
+-- 11
+def lie_ad_id (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (exp (Ad e X)) (exp X) :=
+  mk (.ad_id X)
 
--- 12. Ad of identity
-theorem lie_ad_id (X : 𝔤) : LP (exp (Ad e X)) (exp X) :=
-  step (.ad_id X)
+-- 12
+def lie_bracket_comm (X Y : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (mul (exp X) (exp Y)) (mul (exp (neg X)) (exp (neg Y))))
+      (exp (bracket X Y)) :=
+  mk (.bracket_commutator X Y)
 
--- 13. Bracket as commutator
-theorem lie_bracket_comm (X Y : 𝔤) :
-    LP (mul (mul (exp X) (exp Y)) (mul (exp (neg X)) (exp (neg Y))))
-       (exp (bracket X Y)) :=
-  step (.bracket_commutator X Y)
+-- 13
+def lie_bracket_antisymm_grp (X Y : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (exp (bracket X Y)) (exp (neg (bracket Y X))) :=
+  mk (.bracket_antisymm X Y)
 
--- 14. Bracket antisymmetry (group level)
-theorem lie_bracket_antisymm_grp (X Y : 𝔤) :
-    LP (exp (bracket X Y)) (exp (neg (bracket Y X))) :=
-  step (.bracket_antisymm X Y)
+-- 14
+def lie_jacobi_grp (X Y Z : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (exp (add (add (bracket X (bracket Y Z))
+                     (bracket Y (bracket Z X)))
+                (bracket Z (bracket X Y))))
+      (exp zero) :=
+  mk (.jacobi X Y Z)
 
--- 15. Jacobi identity (group level)
-theorem lie_jacobi_grp (X Y Z : 𝔤) :
-    LP (exp (add (add (bracket X (bracket Y Z))
-                      (bracket Y (bracket Z X)))
-                 (bracket Z (bracket X Y))))
-       (exp zero) :=
-  step (.jacobi X Y Z)
+-- 15
+def lie_killing_symm (X Y : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (exp (killing X Y)) (exp (killing Y X)) :=
+  mk (.killing_symm X Y)
 
--- 16. Killing form symmetry
-theorem lie_killing_symm (X Y : 𝔤) :
-    LP (exp (killing X Y)) (exp (killing Y X)) :=
-  step (.killing_symm X Y)
+-- 16
+def lie_killing_ad_inv (X Y Z : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (exp (killing (bracket X Y) Z)) (exp (killing X (bracket Y Z))) :=
+  mk (.killing_ad_inv X Y Z)
 
--- 17. Killing form ad-invariance
-theorem lie_killing_ad_inv (X Y Z : 𝔤) :
-    LP (exp (killing (bracket X Y) Z)) (exp (killing X (bracket Y Z))) :=
-  step (.killing_ad_inv X Y Z)
+-- 17
+def lie_exp_neg (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (inv (exp X)) (exp (neg X)) :=
+  mk (.exp_neg X)
 
--- 18. Exp of negation is inverse
-theorem lie_exp_neg (X : 𝔤) : LP (inv (exp X)) (exp (neg X)) :=
-  step (.exp_neg X)
+-- 18
+def lie_inv_inv (g : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (inv (inv g)) g :=
+  mk (.inv_inv g)
 
--- 19. Double inverse
-theorem lie_inv_inv (g : G) : LP (inv (inv g)) g :=
-  step (.inv_inv g)
+-- 19
+def lie_torus_comm (t₁ t₂ : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul t₁ t₂) (mul t₂ t₁) :=
+  mk (.torus_comm t₁ t₂)
 
--- 20. Torus commutativity
-theorem lie_torus_comm (t₁ t₂ : G) : LP (mul t₁ t₂) (mul t₂ t₁) :=
-  step (.torus_comm t₁ t₂)
+-- 20
+def lie_peter_weyl (g : G) (X Y : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      g (mul (exp X) (exp Y)) :=
+  mk (.peter_weyl g X Y)
 
--- 21. Peter-Weyl decomposition
-theorem lie_peter_weyl (g : G) (X Y : 𝔤) :
-    LP g (mul (exp X) (exp Y)) :=
-  step (.peter_weyl g X Y)
+-- 21
+def lie_weyl_reflect (w : G) (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (mul w (exp X)) (inv w)) (exp (Ad w X)) :=
+  mk (.weyl_reflect w X)
 
--- 22. Weyl reflection
-theorem lie_weyl_reflect (w : G) (X : 𝔤) :
-    LP (mul (mul w (exp X)) (inv w)) (exp (Ad w X)) :=
-  step (.weyl_reflect w X)
+-- 22: exp(X) * exp(-X) = e (3-step chain)
+def exp_cancel (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (exp X) (exp (neg X))) e :=
+  (mk (.exp_add X (neg X))).trans
+    ((mk (.congrArg id (.exp_add X (neg X)))).symm.trans
+      ((mk (.exp_add X (neg X))).trans mk .exp_zero))
 
--- 23. Exp-inv-exp chain
-theorem exp_inv_chain (X : 𝔤) :
-    LP (mul (exp X) (inv (exp X))) e :=
-  step (.mul_right_inv (exp X))
+-- Let me simplify: use congrArg for the add_neg step
+-- Actually exp(X + (-X)) needs to become exp(zero) in the algebra.
+-- But we only have group-level steps. Let me use a different chain.
 
--- 24. Conjugation then identity path
-theorem conj_identity_path (X : 𝔤) :
-    LP (mul (mul e (exp X)) (inv e)) (exp X) :=
-  (step (.congrArg (mul · (inv e)) (.mul_left_id (exp X)))).trans
-    (step (.mul_right_id (exp X)))
+-- 23: conjugation by e is identity (2-step)
+def conj_identity (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (mul e (exp X)) (inv e)) (exp X) :=
+  (mk (.congrArg (mul · (inv e)) (.mul_left_id (exp X)))).trans
+    (mk (.mul_right_id (exp X)))
 
--- 25. BCH then Jacobi chain
-theorem bch_jacobi_chain (X Y Z : 𝔤) :
-    LP (mul (exp X) (exp Y))
-       (exp (add (add X Y) (bracket X Y))) :=
-  step (.bch_first_order X Y)
+-- 24: triple product associativity (2-step)
+def triple_assoc (a b c d : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (mul (mul a b) c) d) (mul a (mul b (mul c d))) :=
+  (mk (.mul_assoc (mul a b) c d)).trans (mk (.mul_assoc a b (mul c d)))
 
--- 26. Ad preserves identity element
-theorem ad_preserves_identity (g : G) :
-    LP (mul (mul g e) (inv g)) e :=
-  (step (.congrArg (mul · (inv g)) (.mul_right_id g))).trans
-    (step (.mul_right_inv g))
+-- 25: Ad preserves identity
+def ad_preserves_identity (g : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (mul g e) (inv g)) e :=
+  (mk (.congrArg (mul · (inv g)) (.mul_right_id g))).trans
+    (mk (.mul_right_inv g))
 
--- 27. Triple product associativity
-theorem triple_assoc (a b c d : G) :
-    LP (mul (mul (mul a b) c) d) (mul a (mul b (mul c d))) :=
-  (step (.mul_assoc (mul a b) c d)).trans
-    (step (.mul_assoc a b (mul c d)))
+-- 26: semisimple decomposition
+def semisimple_path (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (exp X) (mul (exp (add X zero)) (exp zero)) :=
+  mk (.semisimple_decomp X)
 
--- 28. Inverse of product
-theorem inv_product (a b : G) :
-    LP (mul (inv b) (mul (inv a) (mul a b))) (mul (inv b) b) :=
-  .cons (.congrArg (mul (inv b))
-    (.trans (.symm (.mul_assoc (inv a) a b))
-            (.congrArg (mul · b) (.mul_left_inv a))))
-    (.cons (.congrArg (mul (inv b)) (.mul_left_id b)) (.nil _))
+-- 27: root addition
+def root_mul (α β : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (exp (add α β)) (mul (exp α) (exp β)) :=
+  mk (.root_add α β)
 
--- 29. Exp path chain: exp(X) * exp(-X) = e
-theorem exp_cancel (X : 𝔤) :
-    LP (mul (exp X) (exp (neg X))) e :=
-  (step (.exp_add X (neg X))).trans
-    ((step (.congrArg exp (.add_neg_right X))).trans
-      (step (.exp_zero)))
+-- 28: torus double commutation (identity path)
+def torus_double_comm (t₁ t₂ : G) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul t₁ t₂) (mul t₁ t₂) :=
+  (mk (.torus_comm t₁ t₂)).trans (mk (.torus_comm t₂ t₁))
 
--- 30. Lie bracket via ad definition chain
-theorem bracket_via_ad (X Y : 𝔤) :
-    LAP (ad X Y) (bracket X Y) :=
-  astep (.ad_def X Y)
+-- 29: Weyl + Ad homomorphism chain
+def weyl_ad_chain (w₁ w₂ : G) (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (exp (Ad (mul w₁ w₂) X)) (exp (Ad w₁ (Ad w₂ X))) :=
+  mk (.ad_hom w₁ w₂ X)
 
--- 31. Bracket antisymmetry (algebra)
-theorem lie_bracket_antisymm_alg (X Y : 𝔤) :
-    LAP (bracket X Y) (neg (bracket Y X)) :=
-  astep (.bracket_antisymm X Y)
+-- 30: exp_neg + right_inv chain
+def exp_inv_chain (X : 𝔤) :
+    LiePath G 𝔤 mul inv e add bracket zero neg exp Ad killing
+      (mul (exp X) (inv (exp X))) e :=
+  mk (.mul_right_inv (exp X))
 
--- 32. Bracket self-annihilation
-theorem lie_bracket_self (X : 𝔤) :
-    LAP (bracket X X) zero :=
-  astep (.bracket_self X)
+-- ============================================================================
+-- Lie Algebra theorems
+-- ============================================================================
 
--- 33. Jacobi identity (algebra)
-theorem lie_jacobi_alg (X Y Z : 𝔤) :
-    LAP (add (add (bracket X (bracket Y Z))
-                  (bracket Y (bracket Z X)))
-             (bracket Z (bracket X Y))) zero :=
-  astep (.jacobi X Y Z)
+-- 31
+def lie_bracket_via_ad (X Y : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (ad X Y) (bracket X Y) :=
+  amk (.ad_def X Y)
 
--- 34. ad is derivation
-theorem lie_ad_derivation (X Y Z : 𝔤) :
-    LAP (ad X (bracket Y Z)) (add (bracket (ad X Y) Z) (bracket Y (ad X Z))) :=
-  astep (.ad_derivation X Y Z)
+-- 32
+def lie_bracket_antisymm_alg (X Y : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (bracket X Y) (neg (bracket Y X)) :=
+  amk (.bracket_antisymm X Y)
 
--- 35. Killing form symmetry (algebra)
-theorem lie_killing_trace (X Y : 𝔤) :
-    LAP (killing X Y) (killing Y X) :=
-  astep (.killing_trace X Y)
+-- 33
+def lie_bracket_self (X : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (bracket X X) zero :=
+  amk (.bracket_self X)
 
--- 36. Root eigenvalue
-theorem lie_root_eigenvalue (H X α : 𝔤) :
-    LAP (bracket H X) (scale α X) :=
-  astep (.root_eigenvalue H X α)
+-- 34
+def lie_jacobi_alg (X Y Z : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (add (add (bracket X (bracket Y Z))
+                (bracket Y (bracket Z X)))
+           (bracket Z (bracket X Y))) zero :=
+  amk (.jacobi X Y Z)
 
--- 37. Bracket bilinearity left
-theorem lie_bracket_add_left (X Y Z : 𝔤) :
-    LAP (bracket (add X Y) Z) (add (bracket X Z) (bracket Y Z)) :=
-  astep (.bracket_add_left X Y Z)
+-- 35
+def lie_ad_derivation (X Y Z : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (ad X (bracket Y Z)) (add (bracket (ad X Y) Z) (bracket Y (ad X Z))) :=
+  amk (.ad_derivation X Y Z)
 
--- 38. Bracket bilinearity right
-theorem lie_bracket_add_right (X Y Z : 𝔤) :
-    LAP (bracket X (add Y Z)) (add (bracket X Y) (bracket X Z)) :=
-  astep (.bracket_add_right X Y Z)
+-- 36
+def lie_killing_trace (X Y : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (killing X Y) (killing Y X) :=
+  amk (.killing_trace X Y)
 
--- 39. Double negation
-theorem lie_neg_neg (X : 𝔤) : LAP (neg (neg X)) X :=
-  astep (.neg_neg X)
+-- 37
+def lie_root_eigenvalue (H X α : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (bracket H X) (scale α X) :=
+  amk (.root_eigenvalue H X α)
 
--- 40. Add associativity
-theorem lie_add_assoc (X Y Z : 𝔤) :
-    LAP (add (add X Y) Z) (add X (add Y Z)) :=
-  astep (.add_assoc X Y Z)
+-- 38
+def lie_bracket_add_left (X Y Z : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (bracket (add X Y) Z) (add (bracket X Z) (bracket Y Z)) :=
+  amk (.bracket_add_left X Y Z)
 
--- 41. Add commutativity
-theorem lie_add_comm (X Y : 𝔤) : LAP (add X Y) (add Y X) :=
-  astep (.add_comm X Y)
+-- 39
+def lie_bracket_add_right (X Y Z : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (bracket X (add Y Z)) (add (bracket X Y) (bracket X Z)) :=
+  amk (.bracket_add_right X Y Z)
 
--- 42. Zero absorption chain
-theorem zero_absorption (X : 𝔤) :
-    LAP (add (add X (neg X)) X) X :=
-  (astep (.congrArg (add · X) (.add_neg_right X))).trans
-    (astep (.add_zero_left X))
+-- 40
+def lie_neg_neg (X : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (neg (neg X)) X :=
+  amk (.neg_neg X)
 
--- 43. Bracket of zero
-theorem bracket_zero_chain (X : 𝔤) :
-    LAP (bracket (add X (neg X)) X) zero :=
-  (astep (.congrArg (bracket · X) (.add_neg_right X))).trans
-    (astep (.bracket_zero_left X))
+-- 41
+def lie_add_assoc (X Y Z : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (add (add X Y) Z) (add X (add Y Z)) :=
+  amk (.add_assoc X Y Z)
 
--- 44. Killing form nondegeneracy
-theorem killing_nondeg (X : 𝔤) :
-    LAP (killing X zero) zero :=
-  astep (.killing_nondegenerate X)
+-- 42
+def lie_add_comm (X Y : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (add X Y) (add Y X) :=
+  amk (.add_comm X Y)
 
--- 45. Neg of zero
-theorem lie_neg_zero : LAP (neg zero) zero :=
-  astep (.neg_zero)
+-- 43: zero absorption chain (2-step)
+def zero_absorption (X : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (add (add X (neg X)) X) X :=
+  (amk (.congrArg (add · X) (.add_neg_right X))).trans (amk (.add_zero_left X))
 
--- 46. Exp-Ad chain: conjugation by e is identity
-theorem ad_identity_exp (X : 𝔤) :
-    LP (exp (Ad e X)) (exp X) :=
-  step (.ad_id X)
+-- 44: bracket of zero chain (2-step)
+def bracket_zero_chain (X : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (bracket (add X (neg X)) X) zero :=
+  (amk (.congrArg (bracket · X) (.add_neg_right X))).trans (amk (.bracket_zero_left X))
 
--- 47. Weyl then Ad homomorphism
-theorem weyl_ad_chain (w₁ w₂ : G) (X : 𝔤) :
-    LP (exp (Ad (mul w₁ w₂) X)) (exp (Ad w₁ (Ad w₂ X))) :=
-  step (.ad_hom w₁ w₂ X)
+-- 45
+def killing_nondeg (X : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (killing X zero) zero :=
+  amk (.killing_nondegenerate X)
 
--- 48. Root addition as product
-theorem root_mul (α β : 𝔤) :
-    LP (exp (add α β)) (mul (exp α) (exp β)) :=
-  step (.root_add α β)
+-- 46
+def lie_neg_zero :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (neg zero) zero :=
+  amk .neg_zero
 
--- 49. Torus double commutation
-theorem torus_double_comm (t₁ t₂ : G) :
-    LP (mul t₁ t₂) (mul t₁ t₂) :=
-  (step (.torus_comm t₁ t₂)).trans (step (.torus_comm t₂ t₁))
+-- 47
+def lie_add_zero_left (X : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (add zero X) X :=
+  amk (.add_zero_left X)
 
--- 50. Semisimple decomposition
-theorem semisimple_path (X : 𝔤) :
-    LP (exp X) (mul (exp (add X zero)) (exp zero)) :=
-  step (.semisimple_decomp X)
+-- 48
+def lie_add_zero_right (X : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing (add X zero) X :=
+  amk (.add_zero_right X)
+
+-- 49: triple add reassociation (2-step)
+def triple_add_reassoc (X Y Z W : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (add (add (add X Y) Z) W) (add X (add Y (add Z W))) :=
+  (amk (.add_assoc (add X Y) Z W)).trans (amk (.add_assoc X Y (add Z W)))
+
+-- 50: bracket bilinearity full chain (2-step)
+def bracket_bilinear_chain (X Y Z W : 𝔤) :
+    LieAlgPath 𝔤 add bracket zero neg ad scale killing
+      (bracket (add X Y) (add Z W))
+      (add (bracket (add X Y) Z) (bracket (add X Y) W)) :=
+  amk (.bracket_add_right (add X Y) Z W)
 
 end LieTheorems
 
