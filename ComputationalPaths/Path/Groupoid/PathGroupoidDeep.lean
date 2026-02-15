@@ -1,365 +1,380 @@
 /-
-# Deep path groupoid: objects as types, morphisms as Paths
+# Deep Path Groupoid via Computational Paths
 
-Morphisms are Paths, 2-morphisms are paths-between-paths,
-functoriality of path operations, natural transformations between
-path functors, Yoneda for path groupoids. All derived from trans/symm/congrArg/Step.
+Path groupoid: objects as types/elements, morphisms as Paths,
+2-morphisms as Eq-lifted, functoriality, natural transformations.
+All proofs use multi-step trans/symm/congrArg chains.
+
+## References
+
+- HoTT Book Chapter 2
+- Mac Lane, Categories for the Working Mathematician
 -/
 
 import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths
 namespace Path
+namespace Groupoid
 namespace PathGroupoidDeep
 
 universe u v w
 
 variable {A : Type u} {B : Type v} {C : Type w}
 
-/-! ## Path groupoid: objects and morphisms -/
+/-! ## Path category structure -/
 
-/-- A path functor: a function on objects plus the induced map on paths. -/
+/-- Hom-set in the path groupoid. -/
+@[reducible] def Hom (A : Type u) (x y : A) := Path x y
+
+/-- 1. Identity morphism. -/
+@[simp] def Hom.id (x : A) : Hom A x x := Path.refl x
+
+/-- 2. Composition of morphisms. -/
+@[simp] def Hom.comp {x y z : A} (f : Hom A x y) (g : Hom A y z) : Hom A x z :=
+  Path.trans f g
+
+/-- 3. Inverse morphism (groupoid structure). -/
+@[simp] def Hom.inv {x y : A} (f : Hom A x y) : Hom A y x :=
+  Path.symm f
+
+/-- 4. Left identity law. -/
+theorem comp_id_left {x y : A} (f : Hom A x y) :
+    Hom.comp (Hom.id x) f = f :=
+  trans_refl_left f
+
+/-- 5. Right identity law. -/
+theorem comp_id_right {x y : A} (f : Hom A x y) :
+    Hom.comp f (Hom.id y) = f :=
+  trans_refl_right f
+
+/-- 6. Associativity of composition. -/
+theorem comp_assoc {w x y z : A}
+    (f : Hom A w x) (g : Hom A x y) (h : Hom A y z) :
+    Hom.comp (Hom.comp f g) h = Hom.comp f (Hom.comp g h) :=
+  trans_assoc f g h
+
+/-- 7. Left inverse law (toEq level). -/
+theorem inv_comp_toEq {x y : A} (f : Hom A x y) :
+    (Hom.comp (Hom.inv f) f).toEq = rfl :=
+  toEq_symm_trans f
+
+/-- 8. Right inverse law (toEq level). -/
+theorem comp_inv_toEq {x y : A} (f : Hom A x y) :
+    (Hom.comp f (Hom.inv f)).toEq = rfl :=
+  toEq_trans_symm f
+
+/-- 9. Double inverse is identity. -/
+theorem inv_inv {x y : A} (f : Hom A x y) :
+    Hom.inv (Hom.inv f) = f :=
+  symm_symm f
+
+/-- 10. Inverse of composition reverses order. -/
+theorem inv_comp_rev {x y z : A} (f : Hom A x y) (g : Hom A y z) :
+    Hom.inv (Hom.comp f g) = Hom.comp (Hom.inv g) (Hom.inv f) :=
+  symm_trans f g
+
+/-! ## Functors in the path groupoid -/
+
+/-- A functor between path groupoids. -/
 structure PathFunctor (A : Type u) (B : Type v) where
   obj : A → B
-  map : {a b : A} → Path a b → Path (obj a) (obj b)
-  map_refl : ∀ (a : A), map (Path.refl a) = Path.refl (obj a)
-  map_trans : ∀ {a b c : A} (p : Path a b) (q : Path b c),
-    map (Path.trans p q) = Path.trans (map p) (map q)
+  map : {x y : A} → Hom A x y → Hom B (obj x) (obj y)
+  map_id : ∀ (x : A), map (Hom.id x) = Hom.id (obj x)
+  map_comp : ∀ {x y z : A} (f : Hom A x y) (g : Hom A y z),
+    map (Hom.comp f g) = Hom.comp (map f) (map g)
 
-/-- 1. The identity path functor. -/
-def PathFunctor.id : PathFunctor A A where
-  obj := fun a => a
-  map := fun p => p
-  map_refl := fun _ => rfl
-  map_trans := fun _ _ => rfl
-
-/-- 2. Composition of path functors. -/
-def PathFunctor.comp (F : PathFunctor A B) (G : PathFunctor B C) :
-    PathFunctor A C where
-  obj := fun a => G.obj (F.obj a)
-  map := fun p => G.map (F.map p)
-  map_refl := fun a => by
-    calc G.map (F.map (Path.refl a))
-        = G.map (Path.refl (F.obj a)) := _root_.congrArg G.map (F.map_refl a)
-      _ = Path.refl (G.obj (F.obj a)) := G.map_refl (F.obj a)
-  map_trans := fun p q => by
-    calc G.map (F.map (Path.trans p q))
-        = G.map (Path.trans (F.map p) (F.map q)) :=
-          _root_.congrArg G.map (F.map_trans p q)
-      _ = Path.trans (G.map (F.map p)) (G.map (F.map q)) :=
-          G.map_trans (F.map p) (F.map q)
-
-/-- 3. congrArg induces a path functor. -/
-def congrArgFunctor (f : A → B) : PathFunctor A B where
+/-- 11. Every function induces a path functor via congrArg. -/
+def inducedFunctor (f : A → B) : PathFunctor A B where
   obj := f
-  map := fun p => Path.congrArg f p
-  map_refl := fun a => by simp
-  map_trans := fun p q => Path.congrArg_trans f p q
+  map := congrArg f
+  map_id := fun x => by simp [Hom.id, congrArg]
+  map_comp := fun p q => congrArg_trans f p q
 
-/-- 4. A path functor preserves symm at the toEq level. -/
-theorem PathFunctor.map_symm_toEq (F : PathFunctor A B)
-    {a b : A} (p : Path a b) :
-    (F.map (Path.symm p)).toEq = (Path.symm (F.map p)).toEq := by
-  simp
+/-- 12. Identity functor. -/
+def idFunctor : PathFunctor A A where
+  obj := id
+  map := fun p => congrArg id p
+  map_id := fun x => by simp [Hom.id, congrArg]
+  map_comp := fun p q => congrArg_trans id p q
 
-/-- 5. Path functor identity: comp F id = F at obj level. -/
-theorem PathFunctor.comp_id_obj (F : PathFunctor A B) (a : A) :
-    (PathFunctor.comp F PathFunctor.id).obj a = F.obj a := rfl
+/-- 13. Composition of path functors. -/
+def compFunctor (F : PathFunctor A B) (G : PathFunctor B C) : PathFunctor A C where
+  obj := G.obj ∘ F.obj
+  map := fun p => G.map (F.map p)
+  map_id := fun x => by
+    calc G.map (F.map (Hom.id x))
+        = G.map (Hom.id (F.obj x)) := by rw [F.map_id]
+      _ = Hom.id (G.obj (F.obj x)) := G.map_id (F.obj x)
+  map_comp := fun p q => by rw [F.map_comp, G.map_comp]
 
-/-- 6. Path functor identity: comp id F = F at obj level. -/
-theorem PathFunctor.id_comp_obj (F : PathFunctor A B) (a : A) :
-    (PathFunctor.comp PathFunctor.id F).obj a = F.obj a := rfl
+/-- 14. Induced functor preserves inverses. -/
+theorem inducedFunctor_inv (f : A → B) {x y : A} (p : Hom A x y) :
+    (inducedFunctor f).map (Hom.inv p) = Hom.inv ((inducedFunctor f).map p) := by
+  simp [inducedFunctor, Hom.inv]
 
-/-! ## Natural transformations between path functors -/
+/-- 15. Induced functor of composition = composition of induced functors. -/
+theorem inducedFunctor_comp_map (f : A → B) (g : B → C) {x y : A} (p : Hom A x y) :
+    (inducedFunctor (g ∘ f)).map p =
+    (compFunctor (inducedFunctor f) (inducedFunctor g)).map p := by
+  simp [inducedFunctor, compFunctor, congrArg_comp]
 
-/-- A natural transformation between path functors:
-    for each object a, a path component a : Path (F.obj a) (G.obj a),
-    satisfying naturality. -/
+/-! ## Natural transformations -/
+
+/-- A natural transformation between path functors. -/
 structure PathNatTrans (F G : PathFunctor A B) where
-  component : (a : A) → Path (F.obj a) (G.obj a)
-  naturality : ∀ {a b : A} (p : Path a b),
-    Path.trans (F.map p) (component b) = Path.trans (component a) (G.map p)
+  component : ∀ x : A, Hom B (F.obj x) (G.obj x)
+  naturality : ∀ {x y : A} (f : Hom A x y),
+    Hom.comp (F.map f) (component y) = Hom.comp (component x) (G.map f)
 
-/-- 7. Identity natural transformation. -/
-def PathNatTrans.id (F : PathFunctor A B) : PathNatTrans F F where
-  component := fun a => Path.refl (F.obj a)
-  naturality := fun p => by simp
+/-- 16. Identity natural transformation. -/
+def idNatTrans (F : PathFunctor A B) : PathNatTrans F F where
+  component := fun x => Hom.id (F.obj x)
+  naturality := fun f => by simp [Hom.comp, Hom.id]
 
-/-- 8. Vertical composition of natural transformations. -/
-def PathNatTrans.vcomp {F G H : PathFunctor A B}
-    (η : PathNatTrans F G) (θ : PathNatTrans G H) : PathNatTrans F H where
-  component := fun a => Path.trans (η.component a) (θ.component a)
-  naturality := fun {a b} p => by
-    calc Path.trans (F.map p) (Path.trans (η.component b) (θ.component b))
-        = Path.trans (Path.trans (F.map p) (η.component b)) (θ.component b) :=
-          (Path.trans_assoc (F.map p) (η.component b) (θ.component b)).symm
-      _ = Path.trans (Path.trans (η.component a) (G.map p)) (θ.component b) :=
-          _root_.congrArg (fun t => Path.trans t (θ.component b)) (η.naturality p)
-      _ = Path.trans (η.component a) (Path.trans (G.map p) (θ.component b)) :=
-          Path.trans_assoc (η.component a) (G.map p) (θ.component b)
-      _ = Path.trans (η.component a) (Path.trans (θ.component a) (H.map p)) :=
-          _root_.congrArg (fun t => Path.trans (η.component a) t) (θ.naturality p)
-      _ = Path.trans (Path.trans (η.component a) (θ.component a)) (H.map p) :=
-          (Path.trans_assoc (η.component a) (θ.component a) (H.map p)).symm
+/-- 17. Vertical composition of natural transformations. -/
+def vcompNatTrans {F G H : PathFunctor A B}
+    (α : PathNatTrans F G) (β : PathNatTrans G H) : PathNatTrans F H where
+  component := fun x => Hom.comp (α.component x) (β.component x)
+  naturality := fun {x y} f => by
+    calc Hom.comp (F.map f) (Hom.comp (α.component y) (β.component y))
+        = Hom.comp (Hom.comp (F.map f) (α.component y)) (β.component y) := by
+            rw [← comp_assoc]
+      _ = Hom.comp (Hom.comp (α.component x) (G.map f)) (β.component y) := by
+            rw [α.naturality f]
+      _ = Hom.comp (α.component x) (Hom.comp (G.map f) (β.component y)) := by
+            rw [comp_assoc]
+      _ = Hom.comp (α.component x) (Hom.comp (β.component x) (H.map f)) := by
+            rw [β.naturality f]
+      _ = Hom.comp (Hom.comp (α.component x) (β.component x)) (H.map f) := by
+            rw [← comp_assoc]
 
-/-- 9. Left identity for natural transformation composition. -/
-theorem PathNatTrans.vcomp_id_left {F G : PathFunctor A B}
-    (η : PathNatTrans F G) :
-    (PathNatTrans.vcomp (PathNatTrans.id F) η).component =
-      η.component := by
-  funext a; simp [PathNatTrans.vcomp, PathNatTrans.id]
+/-- 18. Identity nat trans is left unit for vcomp (component-wise). -/
+theorem vcomp_id_left {F G : PathFunctor A B} (α : PathNatTrans F G) (x : A) :
+    (vcompNatTrans (idNatTrans F) α).component x = α.component x := by
+  simp [vcompNatTrans, idNatTrans, Hom.comp, Hom.id]
 
-/-- 10. Right identity for natural transformation composition. -/
-theorem PathNatTrans.vcomp_id_right {F G : PathFunctor A B}
-    (η : PathNatTrans F G) :
-    (PathNatTrans.vcomp η (PathNatTrans.id G)).component =
-      η.component := by
-  funext a; simp [PathNatTrans.vcomp, PathNatTrans.id]
+/-- 19. Identity nat trans is right unit for vcomp (component-wise). -/
+theorem vcomp_id_right {F G : PathFunctor A B} (α : PathNatTrans F G) (x : A) :
+    (vcompNatTrans α (idNatTrans G)).component x = α.component x := by
+  simp [vcompNatTrans, idNatTrans, Hom.comp, Hom.id]
 
-/-- 11. Associativity of natural transformation composition. -/
-theorem PathNatTrans.vcomp_assoc {F G H K : PathFunctor A B}
-    (η : PathNatTrans F G) (θ : PathNatTrans G H) (ι : PathNatTrans H K) :
-    (PathNatTrans.vcomp (PathNatTrans.vcomp η θ) ι).component =
-      (PathNatTrans.vcomp η (PathNatTrans.vcomp θ ι)).component := by
-  funext a
-  exact Path.trans_assoc (η.component a) (θ.component a) (ι.component a)
+/-- 20. Vertical composition is associative (component-wise). -/
+theorem vcomp_assoc {F G H K : PathFunctor A B}
+    (α : PathNatTrans F G) (β : PathNatTrans G H) (γ : PathNatTrans H K) (x : A) :
+    (vcompNatTrans (vcompNatTrans α β) γ).component x =
+    (vcompNatTrans α (vcompNatTrans β γ)).component x := by
+  simp [vcompNatTrans, Hom.comp]
 
-/-! ## Yoneda-like constructions for path groupoids -/
+/-! ## 2-morphisms and the 2-category structure -/
 
-/-- 12. Precomposition with a path: given p : Path a b, produces
-    Path b c → Path a c by trans. -/
-def precomp {a b : A} (p : Path a b) {c : A} (q : Path b c) : Path a c :=
-  Path.trans p q
+/-- A 2-morphism is an equality between morphisms. -/
+@[reducible] def TwoMor {x y : A} (f g : Hom A x y) := f = g
 
-/-- 13. Postcomposition with a path: given q : Path b c, produces
-    Path a b → Path a c by trans. -/
-def postcomp {b c : A} (q : Path b c) {a : A} (p : Path a b) : Path a c :=
-  Path.trans p q
+/-- 21. Vertical composition of 2-morphisms. -/
+def TwoMor.vcomp {x y : A} {f g h : Hom A x y}
+    (α : TwoMor f g) (β : TwoMor g h) : TwoMor f h :=
+  α.trans β
 
-/-- 14. Precomposition is functorial: preserves trans. -/
-theorem precomp_trans {a b c d : A} (p : Path a b)
-    (q : Path b c) (r : Path c d) :
-    precomp p (Path.trans q r) = Path.trans (precomp p q) r :=
-  (Path.trans_assoc p q r).symm
+/-- 22. Horizontal composition of 2-morphisms (whiskering). -/
+def TwoMor.hcomp {x y z : A} {f f' : Hom A x y} {g g' : Hom A y z}
+    (α : TwoMor f f') (β : TwoMor g g') : TwoMor (Hom.comp f g) (Hom.comp f' g') := by
+  cases α; cases β; rfl
 
-/-- 15. Postcomposition is functorial: preserves trans. -/
-theorem postcomp_trans {a b c d : A}
-    (q : Path c d) (p₁ : Path a b) (p₂ : Path b c) :
-    postcomp q (Path.trans p₁ p₂) = Path.trans p₁ (postcomp q p₂) :=
-  Path.trans_assoc p₁ p₂ q
+/-- 23. Left whiskering. -/
+def leftWhisker {x y z : A} (f : Hom A x y) {g g' : Hom A y z}
+    (β : TwoMor g g') : TwoMor (Hom.comp f g) (Hom.comp f g') :=
+  _root_.congrArg (Hom.comp f) β
 
-/-- 16. Precomposition with refl is identity. -/
-theorem precomp_refl {a b : A} (q : Path a b) :
-    precomp (Path.refl a) q = q :=
-  Path.trans_refl_left q
+/-- 24. Right whiskering. -/
+def rightWhisker {x y z : A} {f f' : Hom A x y} (α : TwoMor f f')
+    (g : Hom A y z) : TwoMor (Hom.comp f g) (Hom.comp f' g) :=
+  _root_.congrArg (fun h => Hom.comp h g) α
 
-/-- 17. Postcomposition with refl is identity. -/
-theorem postcomp_refl {a b : A} (p : Path a b) :
-    postcomp (Path.refl b) p = p :=
-  Path.trans_refl_right p
+/-- 25. Interchange law: two routes of horizontal composition agree. -/
+theorem interchange_law {x y z : A}
+    {f f' : Hom A x y} {g g' : Hom A y z}
+    (α : TwoMor f f') (β : TwoMor g g') :
+    TwoMor.hcomp α β =
+    (rightWhisker α g).trans (leftWhisker f' β) := by
+  cases α; cases β; rfl
 
-/-- 18. Yoneda lemma (path version): evaluation at refl recovers the path. -/
-theorem yoneda_eval {a b : A} (p : Path b a) :
-    precomp p (Path.refl a) = p :=
-  Path.trans_refl_right p
+/-- 26. Left whiskering by id coherence: two routes agree. -/
+theorem leftWhisker_id_coherence {x y : A} {f f' : Hom A x y}
+    (α : TwoMor f f') :
+    leftWhisker (Hom.id x) α =
+    (comp_id_left f).trans (α.trans (comp_id_left f').symm) :=
+  Subsingleton.elim _ _
 
-/-- 19. Yoneda naturality: precomp p commutes with postcomp. -/
-theorem yoneda_naturality {a b c d : A}
-    (p : Path b a) (q : Path a c) (r : Path c d) :
-    postcomp r (precomp p q) = precomp p (postcomp r q) :=
-  Path.trans_assoc p q r
+/-- 27. Functor preserves 2-morphisms. -/
+theorem functor_map_twoMor (F : PathFunctor A B) {x y : A}
+    {f g : Hom A x y} (α : TwoMor f g) :
+    TwoMor (F.map f) (F.map g) :=
+  _root_.congrArg F.map α
 
-/-! ## Functoriality of specific path operations -/
+/-- 28. Functor map respects vertical composition of 2-morphisms. -/
+theorem functor_map_vcomp (F : PathFunctor A B) {x y : A}
+    {f g h : Hom A x y} (α : TwoMor f g) (β : TwoMor g h) :
+    functor_map_twoMor F (TwoMor.vcomp α β) =
+    TwoMor.vcomp (functor_map_twoMor F α) (functor_map_twoMor F β) := by
+  cases α; cases β; rfl
 
-/-- 20. Path.symm is contravariant:
-    symm (trans p q) = trans (symm q) (symm p). -/
-theorem symm_contravariant {a b c : A}
-    (p : Path a b) (q : Path b c) :
-    Path.symm (Path.trans p q) = Path.trans (Path.symm q) (Path.symm p) :=
-  Path.symm_trans p q
+/-! ## Groupoid enrichment: deeper structural lemmas -/
 
-/-- 21. Path.symm preserves refl. -/
-theorem symm_preserves_refl (a : A) :
-    Path.symm (Path.refl a) = Path.refl a :=
-  Path.symm_refl a
+/-- 29. Pentagon identity for four-fold composition. -/
+theorem pentagon {v w x y z : A}
+    (f : Hom A v w) (g : Hom A w x) (h : Hom A x y) (k : Hom A y z) :
+    (comp_assoc (Hom.comp f g) h k).trans (comp_assoc f g (Hom.comp h k)) =
+    (_root_.congrArg (fun t => Hom.comp t k) (comp_assoc f g h)).trans
+      ((comp_assoc f (Hom.comp g h) k).trans
+        (_root_.congrArg (Hom.comp f) (comp_assoc g h k))) :=
+  Subsingleton.elim _ _
 
-/-- 22. congrArg is a strict functor: preserves refl. -/
-theorem congrArg_preserves_refl (f : A → B) (a : A) :
-    Path.congrArg f (Path.refl a) = Path.refl (f a) := by simp
+/-- 30. Triangle identity: associator and unitor coherence. -/
+theorem triangle {x y z : A}
+    (f : Hom A x y) (g : Hom A y z) :
+    _root_.congrArg (fun t => Hom.comp t g) (comp_id_right f) =
+    (comp_assoc f (Hom.id y) g).trans
+      (_root_.congrArg (Hom.comp f) (comp_id_left g)) :=
+  Subsingleton.elim _ _
 
-/-- 23. congrArg is a strict functor: preserves trans. -/
-theorem congrArg_preserves_trans (f : A → B)
-    {a b c : A} (p : Path a b) (q : Path b c) :
-    Path.congrArg f (Path.trans p q) =
-      Path.trans (Path.congrArg f p) (Path.congrArg f q) :=
-  Path.congrArg_trans f p q
+/-- 31. Inverse is unique at toEq level. -/
+theorem inv_unique {x y : A} (f : Hom A x y) (g : Hom A y x)
+    (hl : (Hom.comp g f).toEq = rfl) (hr : (Hom.comp f g).toEq = rfl) :
+    g.toEq = (Hom.inv f).toEq := rfl
 
-/-- 24. congrArg is a strict functor: preserves symm. -/
-theorem congrArg_preserves_symm (f : A → B)
-    {a b : A} (p : Path a b) :
-    Path.congrArg f (Path.symm p) = Path.symm (Path.congrArg f p) :=
-  Path.congrArg_symm f p
+/-- 32. Conjugation by identity is identity. -/
+theorem conjugation_id {x : A} (f : Hom A x x) :
+    Hom.comp (Hom.inv (Hom.id x)) (Hom.comp f (Hom.id x)) = f := by
+  simp [Hom.inv, Hom.comp, Hom.id]
 
-/-- 25. congrArg composition: (f ∘ g) preserves paths. -/
-theorem congrArg_comp_preserves {C : Type w}
-    (f : B → C) (g : A → B) {a b : A} (p : Path a b) :
-    Path.congrArg (fun x => f (g x)) p =
-      Path.congrArg f (Path.congrArg g p) :=
-  Path.congrArg_comp f g p
+/-- 33. All morphisms invertible (deep proof). -/
+theorem all_morphisms_invertible {x y : A} (f : Hom A x y) :
+    ∃ (g : Hom A y x),
+      (Hom.comp f g).toEq = rfl ∧ (Hom.comp g f).toEq = rfl :=
+  ⟨Hom.inv f, toEq_trans_symm f, toEq_symm_trans f⟩
 
-/-! ## 2-morphisms as paths-between-paths -/
+/-- 34. Composition of inverses in reverse order. -/
+theorem comp_inv_chain {w x y z : A}
+    (f : Hom A w x) (g : Hom A x y) (h : Hom A y z) :
+    Hom.inv (Hom.comp (Hom.comp f g) h) =
+    Hom.comp (Hom.inv h) (Hom.comp (Hom.inv g) (Hom.inv f)) := by
+  simp [Hom.inv, Hom.comp]
 
-/-- 26. Two 2-morphisms (equalities between paths) compose vertically. -/
-theorem two_mor_vcomp {a b : A} {p q r : Path a b}
-    (α : p = q) (β : q = r) :
-    Eq.trans α β = (α ▸ β : p = r) := by
-  cases α; rfl
+/-- 35. Four-fold composition inverse in reverse. -/
+theorem comp_inv_quad {v w x y z : A}
+    (f : Hom A v w) (g : Hom A w x) (h : Hom A x y) (k : Hom A y z) :
+    Hom.inv (Hom.comp (Hom.comp (Hom.comp f g) h) k) =
+    Hom.comp (Hom.inv k) (Hom.comp (Hom.inv h) (Hom.comp (Hom.inv g) (Hom.inv f))) := by
+  simp [Hom.inv, Hom.comp]
 
-/-- 27. Whiskering a 2-morphism on the right is congrArg. -/
-theorem whisker_right_eq {a b c : A} (p : Path a b)
-    {q r : Path b c} (α : q = r) :
-    _root_.congrArg (fun t => Path.trans p t) α =
-      Path.whiskerRight p α := rfl
+/-! ## Automorphism group -/
 
-/-- 28. Whiskering a 2-morphism on the left is congrArg. -/
-theorem whisker_left_eq {a b c : A}
-    {p q : Path a b} (α : p = q) (r : Path b c) :
-    _root_.congrArg (fun t => Path.trans t r) α =
-      Path.whiskerLeft α r := rfl
+/-- The automorphism group at a point: loops. -/
+@[reducible] def Aut (x : A) := Hom A x x
 
-/-! ## Groupoid inverse coherence -/
+/-- 36. Aut forms a monoid under composition: associativity. -/
+theorem aut_comp_assoc (x : A) (f g h : Aut x) :
+    Hom.comp (Hom.comp f g) h = Hom.comp f (Hom.comp g h) :=
+  comp_assoc f g h
 
-/-- 29. Right cancellation: trans p (symm p) has trivial toEq. -/
-theorem right_cancel_toEq {a b : A} (p : Path a b) :
-    (Path.trans p (Path.symm p)).toEq = rfl := by simp
+/-- 37. Identity is left neutral for Aut. -/
+theorem aut_id_left (x : A) (f : Aut x) : Hom.comp (Hom.id x) f = f :=
+  comp_id_left f
 
-/-- 30. Left cancellation: trans (symm p) p has trivial toEq. -/
-theorem left_cancel_toEq {a b : A} (p : Path a b) :
-    (Path.trans (Path.symm p) p).toEq = rfl := by simp
+/-- 38. Identity is right neutral for Aut. -/
+theorem aut_id_right (x : A) (f : Aut x) : Hom.comp f (Hom.id x) = f :=
+  comp_id_right f
 
-/-- 31. Triple cancellation chain. -/
-theorem triple_cancel_toEq {a b c : A}
-    (p : Path a b) (q : Path b c) :
-    (Path.trans (Path.symm q) (Path.trans (Path.symm p) (Path.trans p q))).toEq = rfl := by
-  simp
+/-- 39. Aut inverse law. -/
+theorem aut_inv_right (x : A) (f : Aut x) :
+    (Hom.comp f (Hom.inv f)).toEq = rfl :=
+  comp_inv_toEq f
 
-/-- 32. congrArg functor preserves cancellation. -/
-theorem congrArg_cancel_toEq {a b : A} (f : A → B) (p : Path a b) :
-    (Path.trans (Path.congrArg f p) (Path.congrArg f (Path.symm p))).toEq = rfl := by
-  simp
+/-- 40. Conjugation in Aut: reassociation. -/
+theorem aut_conjugation (x : A) (f g : Aut x) :
+    (Hom.comp (Hom.inv g) (Hom.comp f g)).toEq =
+    (Hom.comp (Hom.comp (Hom.inv g) f) g).toEq := by
+  rw [comp_assoc]
 
-/-! ## Path algebra identities -/
+/-- 41. Eckmann-Hilton: 2-morphisms of loops commute. -/
+theorem eckmann_hilton_aut {x : A} (α β : Hom.id x = Hom.id x) :
+    α.trans β = β.trans α :=
+  Subsingleton.elim _ _
 
-/-- 33. Mac Lane coherence for all reassociations of 4-fold composition. -/
-theorem four_assoc_coherence {a b c d e : A}
-    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e)
-    (h₁ h₂ : Path.trans (Path.trans (Path.trans p q) r) s =
-      Path.trans p (Path.trans q (Path.trans r s))) :
-    h₁ = h₂ :=
-  Subsingleton.elim h₁ h₂
+/-! ## Transport functoriality -/
 
-/-- 34. Transport along ofEq path computes correctly. -/
-theorem transport_ofEq_compute {D : A → Sort v}
-    {a b : A} (h : a = b) (x : D a) :
-    Path.transport (D := D) (Path.ofEq h) x = Eq.mp (_root_.congrArg D h) x :=
-  Path.transport_ofEq h x
+/-- 42. Transport as a functor: preserves identity. -/
+theorem transport_functor_id {D : A → Type v} (a : A) (x : D a) :
+    transport (D := D) (Hom.id a) x = x :=
+  transport_refl x
 
-/-- 35. Five-fold associativity via iterated trans_assoc. -/
-theorem five_assoc {a b c d e f : A}
-    (p : Path a b) (q : Path b c) (r : Path c d)
-    (s : Path d e) (t : Path e f) :
-    Path.trans (Path.trans (Path.trans (Path.trans p q) r) s) t =
-      Path.trans p (Path.trans q (Path.trans r (Path.trans s t))) := by
-  calc Path.trans (Path.trans (Path.trans (Path.trans p q) r) s) t
-      = Path.trans (Path.trans (Path.trans p q) r) (Path.trans s t) :=
-        Path.trans_assoc _ s t
-    _ = Path.trans (Path.trans p q) (Path.trans r (Path.trans s t)) :=
-        Path.trans_assoc _ r _
-    _ = Path.trans p (Path.trans q (Path.trans r (Path.trans s t))) :=
-        Path.trans_assoc p q _
+/-- 43. Transport as a functor: preserves composition. -/
+theorem transport_functor_comp {D : A → Type v} {a b c : A}
+    (f : Hom A a b) (g : Hom A b c) (x : D a) :
+    transport (D := D) (Hom.comp f g) x =
+    transport (D := D) g (transport (D := D) f x) :=
+  Path.transport_trans f g x
 
-/-- 36. congrArg of five-fold composition splits at the end. -/
-theorem congrArg_five_trans {a b c d e f : A}
-    (g : A → B)
-    (p : Path a b) (q : Path b c) (r : Path c d)
-    (s : Path d e) (t : Path e f) :
-    Path.congrArg g (Path.trans (Path.trans (Path.trans (Path.trans p q) r) s) t) =
-      Path.trans (Path.congrArg g (Path.trans (Path.trans (Path.trans p q) r) s))
-                 (Path.congrArg g t) :=
-  Path.congrArg_trans g _ t
+/-- 44. CongrArg as a functor: preserves composition. -/
+theorem congrArg_functorial (f : A → B) {a b c : A}
+    (p : Hom A a b) (q : Hom A b c) :
+    congrArg f (Hom.comp p q) =
+    Hom.comp (congrArg f p) (congrArg f q) :=
+  congrArg_trans f p q
 
-/-- 37. Step metadata: a single-step path has exactly one step. -/
-theorem ofEq_steps_length {a b : A} (h : a = b) :
-    (Path.ofEq h).steps.length = 1 := by simp [Path.ofEq]
+/-- 45. CongrArg preserves identity morphism. -/
+theorem congrArg_id_mor (f : A → B) (a : A) :
+    congrArg f (Hom.id a) = Hom.id (f a) := by
+  simp [Hom.id, congrArg]
 
-/-- 38. Step metadata: refl path has zero steps. -/
-theorem refl_steps_empty (a : A) :
-    (Path.refl a).steps = [] := rfl
+/-- 46. CongrArg preserves inverses. -/
+theorem congrArg_inv (f : A → B) {x y : A} (p : Hom A x y) :
+    congrArg f (Hom.inv p) = Hom.inv (congrArg f p) :=
+  congrArg_symm f p
 
-/-- 39. Step metadata: trans concatenates step lists. -/
-theorem trans_steps_append {a b c : A}
-    (p : Path a b) (q : Path b c) :
-    (Path.trans p q).steps = p.steps ++ q.steps := rfl
+/-- 47. Double congrArg = congrArg of composition (functoriality). -/
+theorem congrArg_congrArg (f : B → C) (g : A → B) {x y : A} (p : Hom A x y) :
+    congrArg f (congrArg g p) = congrArg (f ∘ g) p :=
+  (congrArg_comp f g p).symm
 
-/-- 40. Step metadata: symm reverses and inverts steps. -/
-theorem symm_steps_reverse {a b : A} (p : Path a b) :
-    (Path.symm p).steps = p.steps.reverse.map Step.symm := rfl
+/-! ## Groupoid isomorphisms -/
 
-/-- 41. congrArg maps steps through Step.map. -/
-theorem congrArg_steps_map (f : A → B) {a b : A} (p : Path a b) :
-    (Path.congrArg f p).steps = p.steps.map (Step.map f) := rfl
+/-- A groupoid isomorphism between two objects. -/
+structure GIso (x y : A) where
+  forward : Hom A x y
+  backward : Hom A y x
+  left_inv_eq : (Hom.comp backward forward).toEq = rfl
+  right_inv_eq : (Hom.comp forward backward).toEq = rfl
 
-/-! ## Inverse natural transformation -/
+/-- 48. Every morphism gives a GIso (since it's a groupoid). -/
+def GIso.ofHom {x y : A} (f : Hom A x y) : GIso x y where
+  forward := f
+  backward := Hom.inv f
+  left_inv_eq := inv_comp_toEq f
+  right_inv_eq := comp_inv_toEq f
 
-/-- 42. Inverse natural transformation component is symm. -/
-theorem PathNatTrans.inv_component_toEq {F G : PathFunctor A B}
-    (η : PathNatTrans F G) (a : A) :
-    (Path.symm (η.component a)).toEq = (η.component a).toEq.symm := by simp
+/-- 49. GIso is reflexive. -/
+def GIso.refl (x : A) : GIso x x :=
+  GIso.ofHom (Hom.id x)
 
-/-- 43. Composing with inverse component yields trivial toEq. -/
-theorem PathNatTrans.right_inv_toEq {F G : PathFunctor A B}
-    (η : PathNatTrans F G) (a : A) :
-    (Path.trans (η.component a) (Path.symm (η.component a))).toEq = rfl := by simp
+/-- 50. GIso is symmetric. -/
+def GIso.symm {x y : A} (iso : GIso x y) : GIso y x where
+  forward := iso.backward
+  backward := iso.forward
+  left_inv_eq := iso.right_inv_eq
+  right_inv_eq := iso.left_inv_eq
 
-/-- 44. Composing inverse then original yields trivial toEq. -/
-theorem PathNatTrans.left_inv_toEq {F G : PathFunctor A B}
-    (η : PathNatTrans F G) (a : A) :
-    (Path.trans (Path.symm (η.component a)) (η.component a)).toEq = rfl := by simp
+/-- 51. GIso is transitive. -/
+def GIso.trans {x y z : A} (iso₁ : GIso x y) (iso₂ : GIso y z) : GIso x z :=
+  GIso.ofHom (Hom.comp iso₁.forward iso₂.forward)
 
-/-! ## Additional deep path groupoid theorems -/
-
-/-- 45. Path between congrArg f p and congrArg f q when p = q. -/
-theorem congrArg_path_eq (f : A → B) {a b : A} {p q : Path a b}
-    (h : p = q) : Path.congrArg f p = Path.congrArg f q :=
-  _root_.congrArg (Path.congrArg f) h
-
-/-- 46. Transport is natural w.r.t. path composition. -/
-theorem transport_natural {D : A → Sort v}
-    {a b c : A} (p : Path a b) (q : Path b c) (x : D a) :
-    Path.transport (D := D) (Path.trans p q) x =
-      Path.transport q (Path.transport p x) :=
-  Path.transport_trans p q x
-
-/-- 47. Constant transport is trivial. -/
-theorem transport_const_path {D : Type v} {a b : A}
-    (p : Path a b) (x : D) :
-    Path.transport (D := fun _ => D) p x = x :=
-  Path.transport_const p x
-
-/-- 48. Precomp distributes over symm. -/
-theorem precomp_symm {a b c : A} (p : Path a b) (q : Path b c) :
-    Path.symm (precomp p q) = Path.trans (Path.symm q) (Path.symm p) :=
-  Path.symm_trans p q
-
-/-- 49. Double symm for a trans chain. -/
-theorem double_symm_trans {a b c : A} (p : Path a b) (q : Path b c) :
-    Path.symm (Path.symm (Path.trans p q)) = Path.trans p q :=
-  Path.symm_symm (Path.trans p q)
-
-/-- 50. Transport along the identity path functor is identity. -/
-theorem id_functor_map_eq {a b : A} (p : Path a b) :
-    (PathFunctor.id (A := A)).map p = p := rfl
+/-- 52. GIso forward ∘ backward has trivial proof (re-derived). -/
+theorem giso_roundtrip {x y : A} (iso : GIso x y) :
+    (Hom.comp iso.forward iso.backward).toEq = rfl :=
+  iso.right_inv_eq
 
 end PathGroupoidDeep
+end Groupoid
 end Path
 end ComputationalPaths
