@@ -163,7 +163,7 @@ theorem feedback_succ (f : Path a a → Path a a) (n : Nat) :
 /-- Dinaturality: trace is natural with respect to pre/post-composition.
 For a path map f and endomorphism g, Tr(f ∘ g) relates naturally. -/
 theorem dinaturality (f : Path a a → Path a a)
-    (h : ∀ p : Path a a, f p = f (Path.refl a)) :
+    (_h : ∀ p : Path a a, f p = f (Path.refl a)) :
     PathTrace f = f (Path.refl a) := rfl
 
 /-- Naturality of trace with respect to path equality. -/
@@ -179,7 +179,8 @@ theorem trace_congrArg {B : Type u} (f : A → B)
     (g : Path a a → Path a a)
     (hg : g (Path.refl a) = Path.refl a) :
     Path.congrArg f (PathTrace g) = Path.refl (f a) := by
-  simp [PathTrace, hg]
+  show Path.congrArg f (g (Path.refl a)) = Path.refl (f a)
+  rw [hg]; rfl
 
 /-- Trace of composition with refl on the right. -/
 theorem trace_trans_refl_right (f : Path a a → Path a a)
