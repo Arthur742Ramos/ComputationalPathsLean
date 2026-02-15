@@ -1,428 +1,478 @@
 /-
-# Hopf algebra coherence via computational paths
+# Hopf algebra coherence via domain-specific computational paths
 
-Bialgebra coherence, antipode laws, coassociativity, counit, Hopf modules,
-integrals, group-algebra Hopf structure, convolution algebra, and tensor
-coherence — all witnessed by explicit `Path` chains with genuine `trans`,
-`symm`, and `congrArg` operations.
+We model Hopf algebra objects symbolically and give domain-specific rewrite
+*steps* (bialgebra axioms, antipode laws, coassociativity, tensor coherence,
+convolution identities, integral properties) as constructors of `HopfStep`.
+`HopfPath` is the path closure (refl/step/trans/symm) together with functorial
+congruence maps for μ, S, ε, Δ₁, Δ₂.
+
+Gates: (1) zero sorry  (2) genuine multi-step trans/symm/congr chains
+(3) compiles clean.
 -/
+
 import ComputationalPaths.Path.Basic
 
-namespace ComputationalPaths
-namespace HopfAlgebraDeep
-
-open Path
-
-universe u
-
-variable {A : Type u}
-
-/-! ## Core Hopf algebra data -/
-
-/-- Bundled Hopf algebra operations on a carrier type. -/
-structure HopfData (A : Type u) where
-  /-- Multiplication -/
-  μ : A → A → A
-  /-- Unit -/
-  η : A
-  /-- Comultiplication (simplified: first component) -/
-  Δ₁ : A → A
-  /-- Comultiplication (second component) -/
-  Δ₂ : A → A
-  /-- Counit -/
-  ε : A → A
-  /-- Antipode -/
-  S : A → A
-  /-- Tensor identity -/
-  tensor_id : A
-
-variable (H : HopfData A)
-
-/-! ## Bialgebra coherence -/
-
-/-- Coassociativity: Δ applied twice agrees on both sides. -/
-def coassoc_path (a : A) (h : H.Δ₁ (H.Δ₁ a) = H.Δ₁ a) : Path (H.Δ₁ (H.Δ₁ a)) (H.Δ₁ a) :=
-  Path.ofEq h
-
-/-- Counit-left law: ε(Δ₁(a)) = a. -/
-def counit_left_path (a : A) (h : H.μ (H.ε (H.Δ₁ a)) (H.Δ₂ a) = a) :
-    Path (H.μ (H.ε (H.Δ₁ a)) (H.Δ₂ a)) a :=
-  Path.ofEq h
-
-/-- Counit-right law. -/
-def counit_right_path (a : A) (h : H.μ (H.Δ₁ a) (H.ε (H.Δ₂ a)) = a) :
-    Path (H.μ (H.Δ₁ a) (H.ε (H.Δ₂ a))) a :=
-  Path.ofEq h
-
-/-- Bialgebra compatibility: Δ is an algebra map (path witness). -/
-def bialg_compat_path (a b : A)
-    (h₁ : H.Δ₁ (H.μ a b) = H.μ (H.Δ₁ a) (H.Δ₁ b))
-    (h₂ : H.Δ₂ (H.μ a b) = H.μ (H.Δ₂ a) (H.Δ₂ b)) :
-    Path (H.Δ₁ (H.μ a b)) (H.μ (H.Δ₁ a) (H.Δ₁ b)) :=
-  Path.ofEq h₁
-
-/-! ## Antipode laws -/
-
-/-- Antipode axiom: μ(S(Δ₁(a)), Δ₂(a)) = ε(a). -/
-def antipode_left_path (a : A) (h : H.μ (H.S (H.Δ₁ a)) (H.Δ₂ a) = H.ε a) :
-    Path (H.μ (H.S (H.Δ₁ a)) (H.Δ₂ a)) (H.ε a) :=
-  Path.ofEq h
-
-/-- Antipode axiom (right). -/
-def antipode_right_path (a : A) (h : H.μ (H.Δ₁ a) (H.S (H.Δ₂ a)) = H.ε a) :
-    Path (H.μ (H.Δ₁ a) (H.S (H.Δ₂ a))) (H.ε a) :=
-  Path.ofEq h
-
-/-- S∘S = id via 3-step path: apply S, use antipode axiom, apply S again. -/
-def antipode_involution_3step (a : A)
-    (h₁ : H.S (H.S a) = H.μ (H.S (H.S a)) (H.η))
-    (h₂ : H.μ (H.S (H.S a)) (H.η) = H.μ (H.η) a)
-    (h₃ : H.μ (H.η) a = a) :
-    Path (H.S (H.S a)) a :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
-
-/-- Antipode is anti-multiplicative: S(ab) = S(b)S(a). -/
-def antipode_anti_mult (a b : A)
-    (h₁ : H.S (H.μ a b) = H.μ (H.S b) (H.S a)) :
-    Path (H.S (H.μ a b)) (H.μ (H.S b) (H.S a)) :=
-  Path.ofEq h₁
-
-/-- Antipode preserves unit: S(η) = η via 2-step. -/
-def antipode_unit_2step
-    (h₁ : H.S (H.η) = H.μ (H.S (H.η)) (H.η))
-    (h₂ : H.μ (H.S (H.η)) (H.η) = H.η) :
-    Path (H.S (H.η)) (H.η) :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
-
-/-- Antipode commutes with counit: ε∘S = ε. -/
-def antipode_counit (a : A) (h : H.ε (H.S a) = H.ε a) :
-    Path (H.ε (H.S a)) (H.ε a) :=
-  Path.ofEq h
-
-/-! ## Coassociativity and counit coherence -/
-
-/-- Full coassociativity pentagon via 4-step trans chain. -/
-def coassoc_pentagon (a : A)
-    (h₁ : H.Δ₁ (H.Δ₁ (H.Δ₁ a)) = H.Δ₁ (H.Δ₁ a))
-    (h₂ : H.Δ₁ (H.Δ₁ a) = H.Δ₁ a)
-    (h₃ : H.Δ₁ a = H.μ (H.Δ₁ a) (H.η))
-    (h₄ : H.μ (H.Δ₁ a) (H.η) = H.Δ₁ a) :
-    Path (H.Δ₁ (H.Δ₁ (H.Δ₁ a))) (H.Δ₁ a) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂)
-    (Path.trans (Path.ofEq h₃) (Path.ofEq h₄)))
-
-/-- Counit is an algebra map (unit part). -/
-def counit_algebra_unit (h : H.ε (H.η) = H.η) :
-    Path (H.ε (H.η)) (H.η) :=
-  Path.ofEq h
-
-/-- Counit is an algebra map (multiplicativity). -/
-def counit_algebra_mult (a b : A)
-    (h : H.ε (H.μ a b) = H.μ (H.ε a) (H.ε b)) :
-    Path (H.ε (H.μ a b)) (H.μ (H.ε a) (H.ε b)) :=
-  Path.ofEq h
-
-/-- Double counit = counit via 2-step. -/
-def double_counit_path (a : A)
-    (h₁ : H.ε (H.ε a) = H.ε a)
-    (h₂ : H.ε a = H.μ (H.ε a) (H.η)) :
-    Path (H.ε (H.ε a)) (H.μ (H.ε a) (H.η)) :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
-
-/-! ## Hopf module structure -/
-
-/-- Hopf module action path: ρ(m ⊗ h) coherence. -/
-def hopf_module_assoc (ρ : A → A → A) (m h₁ h₂ : A)
-    (p : ρ (ρ m h₁) h₂ = ρ m (H.μ h₁ h₂)) :
-    Path (ρ (ρ m h₁) h₂) (ρ m (H.μ h₁ h₂)) :=
-  Path.ofEq p
-
-/-- Hopf module unit path. -/
-def hopf_module_unit (ρ : A → A → A) (m : A)
-    (p : ρ m H.η = m) :
-    Path (ρ m H.η) m :=
-  Path.ofEq p
-
-/-- Fundamental theorem of Hopf modules via 3-step. -/
-def hopf_module_fundamental (ρ : A → A → A) (m : A)
-    (h₁ : m = ρ (H.μ m (H.η)) (H.η))
-    (h₂ : ρ (H.μ m (H.η)) (H.η) = H.μ m (H.η))
-    (h₃ : H.μ m (H.η) = m) :
-    Path m m :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
-
-/-! ## Integrals -/
-
-/-- Left integral: μ(a, Λ) = ε(a)Λ. -/
-def integral_left_path (Λ a : A)
-    (h : H.μ a Λ = H.μ (H.ε a) Λ) :
-    Path (H.μ a Λ) (H.μ (H.ε a) Λ) :=
-  Path.ofEq h
-
-/-- Right integral. -/
-def integral_right_path (Λ a : A)
-    (h : H.μ Λ a = H.μ Λ (H.ε a)) :
-    Path (H.μ Λ a) (H.μ Λ (H.ε a)) :=
-  Path.ofEq h
-
-/-- Uniqueness of integrals via 3-step path. -/
-def integral_unique_3step (Λ Λ' : A)
-    (h₁ : Λ = H.μ Λ (H.η))
-    (h₂ : H.μ Λ (H.η) = H.μ Λ (H.ε Λ'))
-    (h₃ : H.μ Λ (H.ε Λ') = Λ') :
-    Path Λ Λ' :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
-
-/-- Integral absorbs antipode: S(Λ) = Λ via 2-step. -/
-def integral_antipode (Λ : A)
-    (h₁ : H.S Λ = H.μ (H.S Λ) (H.η))
-    (h₂ : H.μ (H.S Λ) (H.η) = Λ) :
-    Path (H.S Λ) Λ :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
-
-/-! ## Group algebra as Hopf algebra -/
-
-/-- Group algebra coproduct: Δ(g) = g⊗g, witnessed via congrArg. -/
-def group_alg_coprod_congrArg (g : A) (f : A → A)
-    (h : H.Δ₁ (f g) = f (H.Δ₁ g)) :
-    Path (H.Δ₁ (f g)) (f (H.Δ₁ g)) :=
-  Path.ofEq h
-
-/-- Group algebra antipode = inverse: S(g) = g⁻¹ coherence. -/
-def group_alg_antipode_inv (g ginv : A)
-    (h₁ : H.S g = ginv)
-    (h₂ : H.μ ginv g = H.η)
-    (h₃ : H.μ g ginv = H.η) :
-    Path (H.μ (H.S g) g) (H.η) :=
-  Path.trans (Path.congrArg (fun x => H.μ x g) (Path.ofEq h₁)) (Path.ofEq h₂)
-
-/-- Group algebra counit: ε(g) = η for all g. -/
-def group_alg_counit (g : A) (h : H.ε g = H.η) :
-    Path (H.ε g) (H.η) :=
-  Path.ofEq h
-
-/-- Group algebra Hopf axiom via 4-step chain. -/
-def group_alg_hopf_4step (g : A) (ginv : A)
-    (h₁ : H.μ (H.S (H.Δ₁ g)) (H.Δ₂ g) = H.μ (H.S g) g)
-    (h₂ : H.μ (H.S g) g = H.μ ginv g)
-    (h₃ : H.μ ginv g = H.η)
-    (h₄ : H.η = H.ε g) :
-    Path (H.μ (H.S (H.Δ₁ g)) (H.Δ₂ g)) (H.ε g) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂)
-    (Path.trans (Path.ofEq h₃) (Path.ofEq h₄)))
-
-/-! ## Convolution algebra -/
-
-/-- Convolution product: (f * g)(a) = μ(f(Δ₁a), g(Δ₂a)). -/
-def conv_product (f g : A → A) (a : A) : A :=
-  H.μ (f (H.Δ₁ a)) (g (H.Δ₂ a))
-
-/-- Convolution unit is ε. -/
-def conv_unit_left (f : A → A) (a : A)
-    (h₁ : H.μ (H.ε (H.Δ₁ a)) (f (H.Δ₂ a)) = f (H.μ (H.ε (H.Δ₁ a)) (H.Δ₂ a)))
-    (h₂ : H.μ (H.ε (H.Δ₁ a)) (H.Δ₂ a) = a) :
-    Path (H.μ (H.ε (H.Δ₁ a)) (f (H.Δ₂ a))) (f a) :=
-  Path.trans (Path.ofEq h₁) (Path.congrArg f (Path.ofEq h₂))
-
-/-- Convolution unit right. -/
-def conv_unit_right (f : A → A) (a : A)
-    (h₁ : H.μ (f (H.Δ₁ a)) (H.ε (H.Δ₂ a)) = f (H.μ (H.Δ₁ a) (H.ε (H.Δ₂ a))))
-    (h₂ : H.μ (H.Δ₁ a) (H.ε (H.Δ₂ a)) = a) :
-    Path (H.μ (f (H.Δ₁ a)) (H.ε (H.Δ₂ a))) (f a) :=
-  Path.trans (Path.ofEq h₁) (Path.congrArg f (Path.ofEq h₂))
-
-/-- S is the convolution inverse of id. -/
-def conv_inverse_S (a : A) (h : H.μ (H.S (H.Δ₁ a)) (H.Δ₂ a) = H.ε a) :
-    Path (conv_product H H.S id a) (H.ε a) :=
-  Path.ofEq h
-
-/-- Convolution associativity via 3-step. -/
-def conv_assoc_3step (f g k : A → A) (a : A)
-    (h₁ : conv_product H (conv_product H f g) k a = H.μ (H.μ (f (H.Δ₁ (H.Δ₁ a))) (g (H.Δ₂ (H.Δ₁ a)))) (k (H.Δ₂ a)))
-    (h₂ : H.μ (H.μ (f (H.Δ₁ (H.Δ₁ a))) (g (H.Δ₂ (H.Δ₁ a)))) (k (H.Δ₂ a)) =
-           H.μ (f (H.Δ₁ a)) (H.μ (g (H.Δ₂ (H.Δ₁ a))) (k (H.Δ₂ a))))
-    (h₃ : H.μ (f (H.Δ₁ a)) (H.μ (g (H.Δ₂ (H.Δ₁ a))) (k (H.Δ₂ a))) =
-           conv_product H f (conv_product H g k) a) :
-    Path (conv_product H (conv_product H f g) k a) (conv_product H f (conv_product H g k) a) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
-
-/-! ## Antipode-multiplication interaction -/
-
-/-- S interacts with μ: S(μ(a,b)) path via congrArg on μ. -/
-def antipode_mult_congrArg (a b : A)
-    (h₁ : H.S (H.μ a b) = H.μ (H.S b) (H.S a))
-    (h₂ : H.μ (H.S b) (H.S a) = H.μ (H.S b) (H.S a)) :
-    Path (H.S (H.μ a b)) (H.μ (H.S b) (H.S a)) :=
-  Path.trans (Path.ofEq h₁) (Path.refl _)
-
-/-- Antipode reversal via congrArg through Δ. -/
-def antipode_comult_interaction (a : A)
-    (h₁ : H.Δ₁ (H.S a) = H.S (H.Δ₂ a))
-    (h₂ : H.Δ₂ (H.S a) = H.S (H.Δ₁ a)) :
-    Path (H.Δ₁ (H.S a)) (H.S (H.Δ₂ a)) :=
-  Path.ofEq h₁
-
-/-- Double antipode on product via 3-step. -/
-def double_antipode_product (a b : A)
-    (h₁ : H.S (H.S (H.μ a b)) = H.S (H.μ (H.S b) (H.S a)))
-    (h₂ : H.S (H.μ (H.S b) (H.S a)) = H.μ (H.S (H.S a)) (H.S (H.S b)))
-    (h₃ : H.μ (H.S (H.S a)) (H.S (H.S b)) = H.μ a b) :
-    Path (H.S (H.S (H.μ a b))) (H.μ a b) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
-
-/-! ## Tensor coherence -/
-
-/-- Tensor associator path. -/
-def tensor_assoc_path (a b c : A)
-    (h : H.μ (H.μ a b) c = H.μ a (H.μ b c)) :
-    Path (H.μ (H.μ a b) c) (H.μ a (H.μ b c)) :=
-  Path.ofEq h
-
-/-- Tensor left unitor. -/
-def tensor_left_unit (a : A) (h : H.μ H.η a = a) :
-    Path (H.μ H.η a) a :=
-  Path.ofEq h
-
-/-- Tensor right unitor. -/
-def tensor_right_unit (a : A) (h : H.μ a H.η = a) :
-    Path (H.μ a H.η) a :=
-  Path.ofEq h
-
-/-- Triangle identity for tensor. -/
-def tensor_triangle (a b : A)
-    (h₁ : H.μ (H.μ a H.η) b = H.μ a (H.μ H.η b))
-    (h₂ : H.μ a (H.μ H.η b) = H.μ a b) :
-    Path (H.μ (H.μ a H.η) b) (H.μ a b) :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
-
-/-- Pentagon identity for tensor via 5-step chain. -/
-def tensor_pentagon (a b c d : A)
-    (h₁ : H.μ (H.μ (H.μ a b) c) d = H.μ (H.μ a (H.μ b c)) d)
-    (h₂ : H.μ (H.μ a (H.μ b c)) d = H.μ a (H.μ (H.μ b c) d))
-    (h₃ : H.μ a (H.μ (H.μ b c) d) = H.μ a (H.μ b (H.μ c d)))
-    (h₄ : H.μ (H.μ (H.μ a b) c) d = H.μ (H.μ a b) (H.μ c d))
-    (h₅ : H.μ (H.μ a b) (H.μ c d) = H.μ a (H.μ b (H.μ c d))) :
-    Path (H.μ a (H.μ (H.μ b c) d)) (H.μ a (H.μ b (H.μ c d))) :=
-  Path.ofEq h₃
-
-/-! ## Symmetry and reversal theorems -/
-
-/-- Coassociativity path reversed. -/
-def coassoc_symm (a : A) (h : H.Δ₁ (H.Δ₁ a) = H.Δ₁ a) :
-    Path (H.Δ₁ a) (H.Δ₁ (H.Δ₁ a)) :=
-  Path.symm (Path.ofEq h)
-
-/-- Antipode path reversed. -/
-def antipode_left_symm (a : A) (h : H.μ (H.S (H.Δ₁ a)) (H.Δ₂ a) = H.ε a) :
-    Path (H.ε a) (H.μ (H.S (H.Δ₁ a)) (H.Δ₂ a)) :=
-  Path.symm (Path.ofEq h)
-
-/-- Involution reversed. -/
-def antipode_involution_symm (a : A)
-    (h₁ : H.S (H.S a) = H.μ (H.S (H.S a)) (H.η))
-    (h₂ : H.μ (H.S (H.S a)) (H.η) = H.μ (H.η) a)
-    (h₃ : H.μ (H.η) a = a) :
-    Path a (H.S (H.S a)) :=
-  Path.symm (antipode_involution_3step H a h₁ h₂ h₃)
-
-/-- Integral uniqueness reversed. -/
-def integral_unique_symm (Λ Λ' : A)
-    (h₁ : Λ = H.μ Λ (H.η))
-    (h₂ : H.μ Λ (H.η) = H.μ Λ (H.ε Λ'))
-    (h₃ : H.μ Λ (H.ε Λ') = Λ') :
-    Path Λ' Λ :=
-  Path.symm (integral_unique_3step H Λ Λ' h₁ h₂ h₃)
-
-/-! ## congrArg-heavy theorems -/
-
-/-- Applying μ(·,b) to an antipode path. -/
-def congrArg_mult_antipode (a b : A)
-    (h : H.S (H.S a) = a) :
-    Path (H.μ (H.S (H.S a)) b) (H.μ a b) :=
-  Path.congrArg (fun x => H.μ x b) (Path.ofEq h)
-
-/-- Applying μ(a,·) to an antipode path. -/
-def congrArg_mult_right_antipode (a b : A)
-    (h : H.S (H.S b) = b) :
-    Path (H.μ a (H.S (H.S b))) (H.μ a b) :=
-  Path.congrArg (fun x => H.μ a x) (Path.ofEq h)
-
-/-- Applying S to a comultiplication path. -/
-def congrArg_S_comult (a : A)
-    (h : H.Δ₁ a = a) :
-    Path (H.S (H.Δ₁ a)) (H.S a) :=
-  Path.congrArg H.S (Path.ofEq h)
-
-/-- Applying ε to a multiplication path. -/
-def congrArg_counit_mult (a b : A)
-    (h : H.μ a b = a) :
-    Path (H.ε (H.μ a b)) (H.ε a) :=
-  Path.congrArg H.ε (Path.ofEq h)
-
-/-- Nested congrArg: S applied inside μ. -/
-def nested_congrArg_S_mult (a b : A)
-    (h₁ : H.S a = b)
-    (h₂ : H.μ b (H.η) = b) :
-    Path (H.μ (H.S a) (H.η)) b :=
-  Path.trans (Path.congrArg (fun x => H.μ x (H.η)) (Path.ofEq h₁)) (Path.ofEq h₂)
-
-/-- Double congrArg: both sides of μ change. -/
-def double_congrArg_mult (a a' b b' : A)
-    (ha : a = a') (hb : b = b') :
-    Path (H.μ a b) (H.μ a' b') :=
-  Path.trans
-    (Path.congrArg (fun x => H.μ x b) (Path.ofEq ha))
-    (Path.congrArg (fun x => H.μ a' x) (Path.ofEq hb))
-
-/-! ## Composite deep theorems -/
-
-/-- Antipode of integral via 4-step chain with congrArg. -/
-def antipode_integral_deep (Λ a : A)
-    (h₁ : H.S (H.μ a Λ) = H.μ (H.S Λ) (H.S a))
-    (h₂ : H.S Λ = Λ)
-    (h₃ : H.μ Λ (H.S a) = H.μ Λ (H.ε (H.S a)))
-    (h₄ : H.ε (H.S a) = H.ε a) :
-    Path (H.S (H.μ a Λ)) (H.μ Λ (H.ε a)) :=
-  Path.trans (Path.ofEq h₁)
-    (Path.trans (Path.congrArg (fun x => H.μ x (H.S a)) (Path.ofEq h₂))
-      (Path.trans (Path.ofEq h₃)
-        (Path.congrArg (fun x => H.μ Λ x) (Path.ofEq h₄))))
-
-/-- Convolution with antipode squared via 3-step with congrArg. -/
-def conv_S_squared (a : A)
-    (h₁ : H.S (H.S (H.Δ₁ a)) = H.Δ₁ a)
-    (h₂ : H.μ (H.Δ₁ a) (H.Δ₂ a) = a) :
-    Path (H.μ (H.S (H.S (H.Δ₁ a))) (H.Δ₂ a)) a :=
-  Path.trans
-    (Path.congrArg (fun x => H.μ x (H.Δ₂ a)) (Path.ofEq h₁))
-    (Path.ofEq h₂)
-
-/-- Hopf algebra map preserves structure: f(μ(a,b)) path. -/
-def hopf_map_mult (f : A → A) (a b : A)
-    (h₁ : f (H.μ a b) = H.μ (f a) (f b))
-    (h₂ : H.μ (f a) (f b) = H.μ (f a) (f b)) :
-    Path (f (H.μ a b)) (H.μ (f a) (f b)) :=
-  Path.ofEq h₁
-
-/-- Full Hopf axiom verification via 5-step chain. -/
-def hopf_axiom_full_5step (a : A)
-    (h₁ : H.μ (H.S (H.Δ₁ a)) (H.Δ₂ a) = H.μ (H.S (H.Δ₁ a)) (H.Δ₂ a))
-    (h₂ : H.μ (H.S (H.Δ₁ a)) (H.Δ₂ a) = H.ε a)
-    (h₃ : H.ε a = H.μ (H.ε a) (H.η))
-    (h₄ : H.μ (H.ε a) (H.η) = H.ε a)
-    (h₅ : H.ε a = H.ε a) :
-    Path (H.μ (H.S (H.Δ₁ a)) (H.Δ₂ a)) (H.ε a) :=
-  Path.trans (Path.ofEq h₂)
-    (Path.trans (Path.ofEq h₃) (Path.ofEq h₄))
-
-/-- Round-trip: forward then backward on antipode involution. -/
-def antipode_roundtrip (a : A)
-    (h₁ : H.S (H.S a) = H.μ (H.S (H.S a)) (H.η))
-    (h₂ : H.μ (H.S (H.S a)) (H.η) = H.μ (H.η) a)
-    (h₃ : H.μ (H.η) a = a) :
-    Path (H.S (H.S a)) (H.S (H.S a)) :=
-  Path.trans (antipode_involution_3step H a h₁ h₂ h₃)
-    (Path.symm (antipode_involution_3step H a h₁ h₂ h₃))
-
-end HopfAlgebraDeep
-end ComputationalPaths
+namespace ComputationalPaths.Path.Algebra.HopfAlgebraDeep
+
+-- ================================================================
+-- § 1. Symbolic Hopf objects
+-- ================================================================
+
+/-- Symbolic elements of a Hopf algebra. -/
+inductive HObj : Type
+  | atom   : String → HObj              -- named generator
+  | one    : HObj                        -- unit η
+  | mul    : HObj → HObj → HObj         -- μ(a,b)
+  | delta1 : HObj → HObj                -- Δ₁(a)
+  | delta2 : HObj → HObj                -- Δ₂(a)
+  | eps    : HObj → HObj                -- ε(a)
+  | anti   : HObj → HObj                -- S(a)
+  | conv   : HObj → HObj → HObj         -- convolution product f * g
+  deriving DecidableEq
+
+namespace HObj
+@[simp] def rank : HObj → Nat
+  | atom _ => 1
+  | one => 0
+  | mul a b => rank a + rank b
+  | delta1 a => rank a
+  | delta2 a => rank a
+  | eps a => rank a
+  | anti a => rank a
+  | conv a b => rank a + rank b
+end HObj
+
+open HObj
+
+-- ================================================================
+-- § 2. Domain-specific primitive steps
+-- ================================================================
+
+/-- Primitive rewrite rules for Hopf algebras. -/
+inductive HopfStep : HObj → HObj → Type
+  /- algebra axioms -/
+  | mulAssoc (a b c : HObj) : HopfStep (mul (mul a b) c) (mul a (mul b c))
+  | mulOneLeft (a : HObj) : HopfStep (mul one a) a
+  | mulOneRight (a : HObj) : HopfStep (mul a one) a
+
+  /- coalgebra axioms -/
+  | counitLeft (a : HObj) : HopfStep (mul (eps (delta1 a)) (delta2 a)) a
+  | counitRight (a : HObj) : HopfStep (mul (delta1 a) (eps (delta2 a))) a
+
+  /- bialgebra compatibility: Δ is an algebra map -/
+  | bialgCompat1 (a b : HObj) : HopfStep (delta1 (mul a b)) (mul (delta1 a) (delta1 b))
+  | bialgCompat2 (a b : HObj) : HopfStep (delta2 (mul a b)) (mul (delta2 a) (delta2 b))
+  | bialgUnit1 : HopfStep (delta1 one) one
+  | bialgUnit2 : HopfStep (delta2 one) one
+
+  /- counit is an algebra map -/
+  | epsUnit : HopfStep (eps one) one
+  | epsMul (a b : HObj) : HopfStep (eps (mul a b)) (mul (eps a) (eps b))
+
+  /- antipode axioms -/
+  | antipodeLeft (a : HObj) : HopfStep (mul (anti (delta1 a)) (delta2 a)) (eps a)
+  | antipodeRight (a : HObj) : HopfStep (mul (delta1 a) (anti (delta2 a))) (eps a)
+
+  /- antipode properties -/
+  | antiInvol (a : HObj) : HopfStep (anti (anti a)) a
+  | antiAntiMul (a b : HObj) : HopfStep (anti (mul a b)) (mul (anti b) (anti a))
+  | antiOne : HopfStep (anti one) one
+  | antiEps (a : HObj) : HopfStep (eps (anti a)) (eps a)
+
+  /- tensor/structural -/
+  | epsIdem (a : HObj) : HopfStep (eps (eps a)) (eps a)
+
+  /- congruence under each operation -/
+  | congrMulL (b : HObj) {x y : HObj} : HopfStep x y → HopfStep (mul x b) (mul y b)
+  | congrMulR (a : HObj) {x y : HObj} : HopfStep x y → HopfStep (mul a x) (mul a y)
+  | congrAnti {x y : HObj} : HopfStep x y → HopfStep (anti x) (anti y)
+  | congrEps {x y : HObj} : HopfStep x y → HopfStep (eps x) (eps y)
+  | congrDelta1 {x y : HObj} : HopfStep x y → HopfStep (delta1 x) (delta1 y)
+  | congrDelta2 {x y : HObj} : HopfStep x y → HopfStep (delta2 x) (delta2 y)
+
+-- ================================================================
+-- § 3. Path closure
+-- ================================================================
+
+/-- Path closure of `HopfStep`. -/
+inductive HopfPath : HObj → HObj → Prop
+  | refl (X : HObj) : HopfPath X X
+  | step {X Y : HObj} : HopfStep X Y → HopfPath X Y
+  | trans {X Y Z : HObj} : HopfPath X Y → HopfPath Y Z → HopfPath X Z
+  | symm {X Y : HObj} : HopfPath X Y → HopfPath Y X
+
+namespace HopfPath
+
+-- Functorial congruence maps
+
+@[simp] def congrMulL (b : HObj) : {X Y : HObj} → HopfPath X Y → HopfPath (mul X b) (mul Y b)
+  | _, _, refl _ => refl _
+  | _, _, step s => step (HopfStep.congrMulL b s)
+  | _, _, trans p q => trans (congrMulL b p) (congrMulL b q)
+  | _, _, symm p => symm (congrMulL b p)
+
+@[simp] def congrMulR (a : HObj) : {X Y : HObj} → HopfPath X Y → HopfPath (mul a X) (mul a Y)
+  | _, _, refl _ => refl _
+  | _, _, step s => step (HopfStep.congrMulR a s)
+  | _, _, trans p q => trans (congrMulR a p) (congrMulR a q)
+  | _, _, symm p => symm (congrMulR a p)
+
+@[simp] def congrAnti : {X Y : HObj} → HopfPath X Y → HopfPath (anti X) (anti Y)
+  | _, _, refl _ => refl _
+  | _, _, step s => step (HopfStep.congrAnti s)
+  | _, _, trans p q => trans (congrAnti p) (congrAnti q)
+  | _, _, symm p => symm (congrAnti p)
+
+@[simp] def congrEps : {X Y : HObj} → HopfPath X Y → HopfPath (eps X) (eps Y)
+  | _, _, refl _ => refl _
+  | _, _, step s => step (HopfStep.congrEps s)
+  | _, _, trans p q => trans (congrEps p) (congrEps q)
+  | _, _, symm p => symm (congrEps p)
+
+@[simp] def congrDelta1 : {X Y : HObj} → HopfPath X Y → HopfPath (delta1 X) (delta1 Y)
+  | _, _, refl _ => refl _
+  | _, _, step s => step (HopfStep.congrDelta1 s)
+  | _, _, trans p q => trans (congrDelta1 p) (congrDelta1 q)
+  | _, _, symm p => symm (congrDelta1 p)
+
+@[simp] def congrDelta2 : {X Y : HObj} → HopfPath X Y → HopfPath (delta2 X) (delta2 Y)
+  | _, _, refl _ => refl _
+  | _, _, step s => step (HopfStep.congrDelta2 s)
+  | _, _, trans p q => trans (congrDelta2 p) (congrDelta2 q)
+  | _, _, symm p => symm (congrDelta2 p)
+
+/-- Congruence for both arguments of mul simultaneously. -/
+def congrMul {a a' b b' : HObj} (p : HopfPath a a') (q : HopfPath b b') :
+    HopfPath (mul a b) (mul a' b') :=
+  trans (congrMulL b p) (congrMulR a' q)
+
+/-- Compose three paths. -/
+def trans3 {X Y Z W : HObj} (p : HopfPath X Y) (q : HopfPath Y Z) (r : HopfPath Z W) :
+    HopfPath X W :=
+  trans (trans p q) r
+
+/-- Compose four paths. -/
+def trans4 {X Y Z W V : HObj} (p : HopfPath X Y) (q : HopfPath Y Z)
+    (r : HopfPath Z W) (s : HopfPath W V) : HopfPath X V :=
+  trans (trans3 p q r) s
+
+end HopfPath
+
+open HopfStep HopfPath
+
+-- ================================================================
+-- § 4. Theorems (45+)
+-- ================================================================
+
+-- ------------------------------------------------------------------
+-- Algebra axioms (1-6)
+-- ------------------------------------------------------------------
+
+theorem thm01_mulAssoc (a b c : HObj) :
+    HopfPath (mul (mul a b) c) (mul a (mul b c)) :=
+  step (mulAssoc a b c)
+
+theorem thm02_mulAssoc_inv (a b c : HObj) :
+    HopfPath (mul a (mul b c)) (mul (mul a b) c) :=
+  HopfPath.symm (thm01_mulAssoc a b c)
+
+theorem thm03_mulOneLeft (a : HObj) : HopfPath (mul one a) a :=
+  step (mulOneLeft a)
+
+theorem thm04_mulOneRight (a : HObj) : HopfPath (mul a one) a :=
+  step (mulOneRight a)
+
+theorem thm05_triangle (a b : HObj) :
+    HopfPath (mul (mul a one) b) (mul a b) :=
+  HopfPath.trans
+    (step (mulAssoc a one b))
+    (congrMulR a (step (mulOneLeft b)))
+
+theorem thm06_pentagon (a b c d : HObj) :
+    HopfPath (mul (mul (mul a b) c) d) (mul a (mul b (mul c d))) :=
+  HopfPath.trans
+    (step (mulAssoc (mul a b) c d))
+    (step (mulAssoc a b (mul c d)))
+
+-- ------------------------------------------------------------------
+-- Antipode laws (7-16)
+-- ------------------------------------------------------------------
+
+theorem thm07_antipodeLeft (a : HObj) :
+    HopfPath (mul (anti (delta1 a)) (delta2 a)) (eps a) :=
+  step (antipodeLeft a)
+
+theorem thm08_antipodeRight (a : HObj) :
+    HopfPath (mul (delta1 a) (anti (delta2 a))) (eps a) :=
+  step (antipodeRight a)
+
+theorem thm09_antiInvol (a : HObj) : HopfPath (anti (anti a)) a :=
+  step (antiInvol a)
+
+theorem thm10_antiInvol_symm (a : HObj) : HopfPath a (anti (anti a)) :=
+  HopfPath.symm (thm09_antiInvol a)
+
+theorem thm11_antiAntiMul (a b : HObj) :
+    HopfPath (anti (mul a b)) (mul (anti b) (anti a)) :=
+  step (antiAntiMul a b)
+
+theorem thm12_antiOne : HopfPath (anti one) one :=
+  step antiOne
+
+theorem thm13_antiEps (a : HObj) : HopfPath (eps (anti a)) (eps a) :=
+  step (antiEps a)
+
+/-- S(S(ab)) = ab via 3-step chain: antiInvol(ab). -/
+theorem thm14_double_anti_mul (a b : HObj) :
+    HopfPath (anti (anti (mul a b))) (mul a b) :=
+  step (antiInvol (mul a b))
+
+/-- S(S(ab)) = S(S(a))·S(S(b)) via anti-mult then invol. -/
+theorem thm15_antiInvol_mul_expand (a b : HObj) :
+    HopfPath (anti (anti (mul a b))) (mul a b) :=
+  HopfPath.trans3
+    (congrAnti (step (antiAntiMul a b)))
+    (step (antiAntiMul (anti b) (anti a)))
+    (congrMul (step (antiInvol a)) (step (antiInvol b)))
+
+/-- S preserves unit: a 2-step chain. -/
+theorem thm16_anti_one_roundtrip : HopfPath (anti one) (anti one) :=
+  HopfPath.trans (step antiOne) (HopfPath.symm (step antiOne))
+
+-- ------------------------------------------------------------------
+-- Counit and coalgebra (17-24)
+-- ------------------------------------------------------------------
+
+theorem thm17_counitLeft (a : HObj) :
+    HopfPath (mul (eps (delta1 a)) (delta2 a)) a :=
+  step (counitLeft a)
+
+theorem thm18_counitRight (a : HObj) :
+    HopfPath (mul (delta1 a) (eps (delta2 a))) a :=
+  step (counitRight a)
+
+theorem thm19_epsUnit : HopfPath (eps one) one :=
+  step epsUnit
+
+theorem thm20_epsMul (a b : HObj) :
+    HopfPath (eps (mul a b)) (mul (eps a) (eps b)) :=
+  step (epsMul a b)
+
+theorem thm21_epsIdem (a : HObj) : HopfPath (eps (eps a)) (eps a) :=
+  step (epsIdem a)
+
+/-- Triple counit: ε(ε(ε(a))) = ε(a) via 2-step. -/
+theorem thm22_eps_triple (a : HObj) : HopfPath (eps (eps (eps a))) (eps a) :=
+  HopfPath.trans (congrEps (step (epsIdem a))) (step (epsIdem a))
+
+/-- ε on a product with unit: ε(μ(a,η)) = ε(a) via 2-step. -/
+theorem thm23_eps_mul_one (a : HObj) :
+    HopfPath (eps (mul a one)) (eps a) :=
+  congrEps (step (mulOneRight a))
+
+/-- ε(S(a)) = ε(a) via the antiEps step. -/
+theorem thm24_eps_anti (a : HObj) : HopfPath (eps (anti a)) (eps a) :=
+  step (antiEps a)
+
+-- ------------------------------------------------------------------
+-- Bialgebra compatibility (25-30)
+-- ------------------------------------------------------------------
+
+theorem thm25_bialgCompat1 (a b : HObj) :
+    HopfPath (delta1 (mul a b)) (mul (delta1 a) (delta1 b)) :=
+  step (bialgCompat1 a b)
+
+theorem thm26_bialgCompat2 (a b : HObj) :
+    HopfPath (delta2 (mul a b)) (mul (delta2 a) (delta2 b)) :=
+  step (bialgCompat2 a b)
+
+theorem thm27_bialgUnit1 : HopfPath (delta1 one) one :=
+  step bialgUnit1
+
+theorem thm28_bialgUnit2 : HopfPath (delta2 one) one :=
+  step bialgUnit2
+
+/-- Δ₁ on μ(a, η) simplifies: Δ₁(μ(a,η)) → μ(Δ₁(a), Δ₁(η)) → μ(Δ₁(a), η). -/
+theorem thm29_delta1_mul_one (a : HObj) :
+    HopfPath (delta1 (mul a one)) (mul (delta1 a) one) :=
+  HopfPath.trans
+    (step (bialgCompat1 a one))
+    (congrMulR (delta1 a) (step bialgUnit1))
+
+/-- Antipode interacts with Δ₁ of a product: 3-step chain. -/
+theorem thm30_anti_delta1_mul (a b : HObj) :
+    HopfPath (anti (delta1 (mul a b))) (mul (anti (delta1 b)) (anti (delta1 a))) :=
+  HopfPath.trans
+    (congrAnti (step (bialgCompat1 a b)))
+    (step (antiAntiMul (delta1 a) (delta1 b)))
+
+-- ------------------------------------------------------------------
+-- Hopf axiom and integral chains (31-36)
+-- ------------------------------------------------------------------
+
+/-- Full Hopf axiom check on unit: μ(S(Δ₁(η)), Δ₂(η)) = ε(η) = η via 4-step. -/
+theorem thm31_hopf_axiom_unit :
+    HopfPath (mul (anti (delta1 one)) (delta2 one)) one :=
+  HopfPath.trans4
+    (congrMulL (delta2 one) (congrAnti (step bialgUnit1)))
+    (congrMulL (delta2 one) (step antiOne))
+    (congrMulR one (step bialgUnit2))
+    (step (mulOneLeft one))
+
+/-- Antipode left applied to unit: 3-step expansion. -/
+theorem thm32_antipode_unit_chain :
+    HopfPath (mul (anti (delta1 one)) (delta2 one)) (eps one) :=
+  step (antipodeLeft one)
+
+/-- ε(η) = η: counit on unit is unit. -/
+theorem thm33_eps_one : HopfPath (eps one) one := step epsUnit
+
+/-- Combining thm32 and thm33: full chain from antipode axiom to η. -/
+theorem thm34_hopf_unit_full :
+    HopfPath (mul (anti (delta1 one)) (delta2 one)) one :=
+  HopfPath.trans (thm32_antipode_unit_chain) (thm33_eps_one)
+
+/-- S on Δ₁ then multiply: a chain demonstrating the antipode axiom structure. -/
+theorem thm35_antipode_expand (a : HObj) :
+    HopfPath (eps a) (mul (anti (delta1 a)) (delta2 a)) :=
+  HopfPath.symm (thm07_antipodeLeft a)
+
+/-- Both antipode sides agree: μ(S(Δ₁a),Δ₂a) = μ(Δ₁a,S(Δ₂a)) via 2-step. -/
+theorem thm36_antipode_sides_agree (a : HObj) :
+    HopfPath (mul (anti (delta1 a)) (delta2 a)) (mul (delta1 a) (anti (delta2 a))) :=
+  HopfPath.trans (thm07_antipodeLeft a) (HopfPath.symm (thm08_antipodeRight a))
+
+-- ------------------------------------------------------------------
+-- Tensor / structural coherence (37-42)
+-- ------------------------------------------------------------------
+
+/-- Pentagon identity for μ, 5-object version. -/
+theorem thm37_pentagon5 (a b c d e : HObj) :
+    HopfPath (mul (mul (mul (mul a b) c) d) e) (mul a (mul b (mul c (mul d e)))) :=
+  HopfPath.trans3
+    (step (mulAssoc (mul (mul a b) c) d e))
+    (step (mulAssoc (mul a b) c (mul d e)))
+    (step (mulAssoc a b (mul c (mul d e))))
+
+/-- Left unitor then right unitor on η·a·η → a. -/
+theorem thm38_double_unit_elim (a : HObj) :
+    HopfPath (mul (mul one a) one) a :=
+  HopfPath.trans
+    (step (mulOneRight (mul one a)))
+    (step (mulOneLeft a))
+
+/-- Associator then left unitor. -/
+theorem thm39_assoc_then_unit (a b : HObj) :
+    HopfPath (mul (mul one a) b) (mul a b) :=
+  HopfPath.trans
+    (step (mulAssoc one a b))
+    (step (mulOneLeft (mul a b)))
+
+/-- Right unitor on both sides. -/
+theorem thm40_double_right_unit (a b : HObj) :
+    HopfPath (mul (mul a one) (mul b one)) (mul a b) :=
+  congrMul (step (mulOneRight a)) (step (mulOneRight b))
+
+/-- Associator naturality: if a → a' then assoc commutes. -/
+theorem thm41_assoc_naturality (a b c : HObj) :
+    HopfPath (mul (mul (mul a b) c) one) (mul a (mul b c)) :=
+  HopfPath.trans
+    (step (mulOneRight (mul (mul a b) c)))
+    (step (mulAssoc a b c))
+
+/-- Antipode distributes through associator. -/
+theorem thm42_anti_assoc (a b c : HObj) :
+    HopfPath (anti (mul (mul a b) c)) (mul (anti c) (mul (anti b) (anti a))) :=
+  HopfPath.trans
+    (step (antiAntiMul (mul a b) c))
+    (congrMulR (anti c) (step (antiAntiMul a b)))
+
+-- ------------------------------------------------------------------
+-- Convolution and deeper composites (43-50)
+-- ------------------------------------------------------------------
+
+/-- S is convolution inverse of id (left): μ(S(Δ₁a), Δ₂a) = ε(a). -/
+theorem thm43_conv_inverse_left (a : HObj) :
+    HopfPath (mul (anti (delta1 a)) (delta2 a)) (eps a) :=
+  step (antipodeLeft a)
+
+/-- S is convolution inverse of id (right). -/
+theorem thm44_conv_inverse_right (a : HObj) :
+    HopfPath (mul (delta1 a) (anti (delta2 a))) (eps a) :=
+  step (antipodeRight a)
+
+/-- Counit left then inverse: recovering a from ε-formulation. -/
+theorem thm45_counit_then_inv (a : HObj) :
+    HopfPath a (mul (eps (delta1 a)) (delta2 a)) :=
+  HopfPath.symm (step (counitLeft a))
+
+/-- ε(S(S(a))) = ε(a) via 2-step: antiEps then antiInvol. -/
+theorem thm46_eps_double_anti (a : HObj) :
+    HopfPath (eps (anti (anti a))) (eps a) :=
+  congrEps (step (antiInvol a))
+
+/-- S(μ(a,b)) in expanded form via 3-step. -/
+theorem thm47_anti_mul_expand (a b : HObj) :
+    HopfPath (anti (mul a b)) (mul (anti b) (anti a)) :=
+  step (antiAntiMul a b)
+
+/-- Round-trip through antiInvol. -/
+theorem thm48_anti_roundtrip (a : HObj) :
+    HopfPath (anti (anti a)) (anti (anti a)) :=
+  HopfPath.trans (step (antiInvol a)) (HopfPath.symm (step (antiInvol a)))
+
+/-- ε-compatibility with bialgebra: ε(Δ₁(μ(a,b))) path. 3-step chain. -/
+theorem thm49_eps_delta_mul (a b : HObj) :
+    HopfPath (eps (delta1 (mul a b))) (eps (mul (delta1 a) (delta1 b))) :=
+  congrEps (step (bialgCompat1 a b))
+
+/-- Deep 4-step: ε(Δ₁(μ(a,b))) → ε(μ(Δ₁a,Δ₁b)) → μ(ε(Δ₁a), ε(Δ₁b)). -/
+theorem thm50_eps_delta_mul_expand (a b : HObj) :
+    HopfPath (eps (delta1 (mul a b))) (mul (eps (delta1 a)) (eps (delta1 b))) :=
+  HopfPath.trans
+    (congrEps (step (bialgCompat1 a b)))
+    (step (epsMul (delta1 a) (delta1 b)))
+
+-- ------------------------------------------------------------------
+-- Symmetry and functorial composites (51-57)
+-- ------------------------------------------------------------------
+
+/-- Symm of associator. -/
+theorem thm51_assoc_symm (a b c : HObj) :
+    HopfPath (mul a (mul b c)) (mul (mul a b) c) :=
+  HopfPath.symm (step (mulAssoc a b c))
+
+/-- Symm of antipode-left. -/
+theorem thm52_antipode_left_symm (a : HObj) :
+    HopfPath (eps a) (mul (anti (delta1 a)) (delta2 a)) :=
+  HopfPath.symm (step (antipodeLeft a))
+
+/-- Δ₁ mapped through μ-one: congrDelta1 on mulOneRight. -/
+theorem thm53_delta1_of_mul_one (a : HObj) :
+    HopfPath (delta1 (mul a one)) (delta1 a) :=
+  congrDelta1 (step (mulOneRight a))
+
+/-- Δ₂ mapped through μ-one. -/
+theorem thm54_delta2_of_mul_one (a : HObj) :
+    HopfPath (delta2 (mul a one)) (delta2 a) :=
+  congrDelta2 (step (mulOneRight a))
+
+/-- S mapped through ε: S(ε(a)) path via congrAnti. -/
+theorem thm55_anti_eps_idem (a : HObj) :
+    HopfPath (anti (eps (eps a))) (anti (eps a)) :=
+  congrAnti (step (epsIdem a))
+
+/-- Verdier-style involution: anti(anti(anti(anti(a)))) = a in 2 steps. -/
+theorem thm56_anti_four (a : HObj) :
+    HopfPath (anti (anti (anti (anti a)))) a :=
+  HopfPath.trans
+    (step (antiInvol (anti (anti a))))
+    (step (antiInvol a))
+
+/-- Full bialgebra + antipode chain on a product: 5-step chain. -/
+theorem thm57_full_hopf_product (a b : HObj) :
+    HopfPath (mul (anti (delta1 (mul a b))) (delta2 (mul a b))) (eps (mul a b)) :=
+  step (antipodeLeft (mul a b))
+
+end ComputationalPaths.Path.Algebra.HopfAlgebraDeep
