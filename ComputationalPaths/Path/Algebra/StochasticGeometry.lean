@@ -1,4 +1,4 @@
-/-!
+/- 
 # Stochastic Geometry via Computational Paths
 
 This module provides a computational-path scaffold for random simplicial

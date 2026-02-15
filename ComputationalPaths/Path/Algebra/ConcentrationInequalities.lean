@@ -1,4 +1,4 @@
-/-!
+/- 
 # Concentration Inequalities via Computational Paths
 
 This module provides a computational-path scaffold for Hoeffding, McDiarmid,

@@ -1,4 +1,4 @@
-/-!
+/- 
 # Markov Chain Mixing via Computational Paths
 
 This module provides a computational-path scaffold for Markov chains, mixing

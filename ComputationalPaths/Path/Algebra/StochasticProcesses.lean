@@ -1,4 +1,4 @@
-/-!
+/- 
 # Stochastic Processes via Computational Paths
 
 This module provides a computational-path scaffold for martingales, Brownian
