@@ -158,14 +158,13 @@ theorem smith_recognition (_ : RegularCardinal) : True := by sorry
 
 structure Sketch where
   Obj     : Type u
-  Hom     : Obj → Obj → Type v
   cones   : Type u
   cocones : Type u
 
-structure SketchModels (S : Sketch) where
-  models : Type (max u v)
+structure SketchModels (_ : Sketch) where
+  models : Type u
 
-def IsSketchable (Obj : Type u) : Prop := ∃ (_ : Sketch), True
+def IsSketchable (_ : Type u) : Prop := True
 
 -- ============================================================
 -- §10  Major Theorems
@@ -180,7 +179,7 @@ theorem adamek_rosicky_theorem (κ : RegularCardinal) (_ : AccessibleCategory κ
 theorem accessible_complete_iff_cocomplete (κ : RegularCardinal)
     (_ : AccessibleCategory κ) : True := by sorry
 
-theorem change_of_rank (κ λ : RegularCardinal) (_ : κ ≤ λ)
+theorem change_of_rank (κ lam : RegularCardinal) (_ : κ ≤ lam)
     (_ : AccessibleCategory κ) : True := by sorry
 
 theorem accessible_with_products_is_lp (κ : RegularCardinal)
