@@ -24,7 +24,7 @@ universe u
 
 /-! ## Model Space -/
 
-/-- A model space (abstract local model for charts). -/
+/-- A model space. -/
 structure ModelSpace where
   carrier : Type u
   origin : carrier
@@ -36,25 +36,14 @@ structure Manifold where
   model : ModelSpace
   basePoint : carrier
 
-/-! ## Charts (total, for simplicity) -/
+/-! ## Charts -/
 
-/-- A chart: a pair of inverse maps between manifold and model. -/
+/-- A chart: a pair of inverse maps (global for simplicity). -/
 structure Chart (M : Manifold) where
   toModel : M.carrier → M.model.carrier
   fromModel : M.model.carrier → M.carrier
   left_inv : ∀ x, Path (fromModel (toModel x)) x
   right_inv : ∀ y, Path (toModel (fromModel y)) y
-
-/-- Identity chart. -/
-def idChart (M : Manifold) (h : Path M.carrier M.model.carrier := Path.refl _)
-    : Chart M := by
-  cases h
-  exact {
-    toModel := fun x => x
-    fromModel := fun y => y
-    left_inv := fun _ => Path.refl _
-    right_inv := fun _ => Path.refl _
-  }
 
 /-- The transition map between two charts. -/
 def transitionMap {M : Manifold} (φ ψ : Chart M) : M.model.carrier → M.model.carrier :=
@@ -64,69 +53,75 @@ def transitionMap {M : Manifold} (φ ψ : Chart M) : M.model.carrier → M.model
 def transitionMapInv {M : Manifold} (φ ψ : Chart M) : M.model.carrier → M.model.carrier :=
   transitionMap ψ φ
 
+/-- transitionMapInv is definitionally transitionMap with swapped args. -/
+theorem transitionMapInv_eq {M : Manifold} (φ ψ : Chart M) :
+    transitionMapInv φ ψ = transitionMap ψ φ := rfl
+
 /-- Transition map is left-invertible. -/
 def transition_left_inv {M : Manifold} (φ ψ : Chart M) (y : M.model.carrier) :
     Path (transitionMapInv φ ψ (transitionMap φ ψ y)) y := by
-  simp [transitionMap, transitionMapInv]
+  unfold transitionMap transitionMapInv
   exact Path.trans (Path.congrArg φ.toModel (ψ.left_inv (φ.fromModel y))) (φ.right_inv y)
 
 /-- Transition map is right-invertible. -/
 def transition_right_inv {M : Manifold} (φ ψ : Chart M) (y : M.model.carrier) :
     Path (transitionMap φ ψ (transitionMapInv φ ψ y)) y := by
-  simp [transitionMap, transitionMapInv]
+  unfold transitionMap transitionMapInv
   exact Path.trans (Path.congrArg ψ.toModel (φ.left_inv (ψ.fromModel y))) (ψ.right_inv y)
 
-/-- Transition from a chart to itself is the identity. -/
+/-- Transition from chart to itself is identity. -/
 def transition_self {M : Manifold} (φ : Chart M) (y : M.model.carrier) :
-    Path (transitionMap φ φ y) y :=
-  Path.trans (Path.congrArg φ.toModel (φ.left_inv (φ.fromModel y))) (φ.right_inv y) |>.symm |>.symm
-
-/-- Actually: transition_self more directly. -/
-def transition_self' {M : Manifold} (φ : Chart M) (y : M.model.carrier) :
     Path (transitionMap φ φ y) y := by
-  simp [transitionMap]
-  exact Path.trans (Path.congrArg φ.toModel (φ.left_inv (φ.fromModel y))) (φ.right_inv y)
+  unfold transitionMap
+  exact φ.right_inv y
 
-/-- Composition of transition maps. -/
-theorem transition_comp {M : Manifold} (φ ψ χ : Chart M) (y : M.model.carrier) :
-    transitionMap ψ χ (transitionMap φ ψ y) =
-      χ.toModel (φ.fromModel y) := by
-  simp [transitionMap]
-  exact congrArg χ.toModel (ψ.left_inv (φ.fromModel y)).proof
-
-/-- Path version of transition composition. -/
+/-- Composition of transition maps (path version). -/
 def transition_comp_path {M : Manifold} (φ ψ χ : Chart M) (y : M.model.carrier) :
     Path (transitionMap ψ χ (transitionMap φ ψ y))
          (transitionMap φ χ y) := by
-  simp [transitionMap]
+  unfold transitionMap
   exact Path.congrArg χ.toModel (ψ.left_inv (φ.fromModel y))
+
+/-- Chart from-to-from is from. -/
+def chart_from_to_from {M : Manifold} (φ : Chart M) (y : M.model.carrier) :
+    Path (φ.fromModel (φ.toModel (φ.fromModel y))) (φ.fromModel y) :=
+  φ.left_inv (φ.fromModel y)
+
+/-- Chart to-from-to is to. -/
+def chart_to_from_to {M : Manifold} (φ : Chart M) (x : M.carrier) :
+    Path (φ.toModel (φ.fromModel (φ.toModel x))) (φ.toModel x) :=
+  Path.congrArg φ.toModel (φ.left_inv x)
 
 /-! ## Atlas -/
 
-/-- An atlas: a list of charts. -/
+/-- An atlas: a nonempty list of charts. -/
 structure Atlas (M : Manifold) where
   charts : List (Chart M)
-  nonempty : charts ≠ []
+  nonempty : 0 < charts.length
 
-/-- Number of charts in an atlas. -/
+/-- Number of charts. -/
 def Atlas.size {M : Manifold} (A : Atlas M) : Nat := A.charts.length
 
-/-- An atlas with at least one chart has positive size. -/
-theorem Atlas.size_pos {M : Manifold} (A : Atlas M) : 0 < A.size := by
-  simp [Atlas.size]
-  exact List.length_pos.mpr A.nonempty
+/-- Atlas size is positive. -/
+theorem Atlas.size_pos {M : Manifold} (A : Atlas M) : 0 < A.size :=
+  A.nonempty
+
+/-- Path: atlas size is positive. -/
+def Atlas.size_pos_path {M : Manifold} (A : Atlas M) :
+    Path (0 < A.size) True :=
+  Path.ofEq (propext ⟨fun _ => trivial, fun _ => A.nonempty⟩)
 
 /-! ## Tangent Bundle -/
 
-/-- A tangent vector: a point plus a model-space vector. -/
+/-- A tangent vector: point plus model-space vector. -/
 structure TangentVec (M : Manifold) where
   point : M.carrier
   vec : M.model.carrier
 
-/-- The tangent bundle projection. -/
+/-- Tangent bundle projection. -/
 def tangentProj {M : Manifold} (v : TangentVec M) : M.carrier := v.point
 
-/-- Zero tangent vector at a point. -/
+/-- Zero tangent vector. -/
 def zeroTangentVec (M : Manifold) (p : M.carrier) : TangentVec M where
   point := p
   vec := M.model.origin
@@ -139,102 +134,80 @@ theorem tangentProj_zero (M : Manifold) (p : M.carrier) :
 def tangentProj_zero_path (M : Manifold) (p : M.carrier) :
     Path (tangentProj (zeroTangentVec M p)) p := Path.refl _
 
-/-! ## Chart-induced tangent map -/
+/-! ## Chart-induced Tangent Map -/
 
-/-- A chart induces a map on tangent vectors. -/
-def chartTangent {M : Manifold} (φ : Chart M) (v : TangentVec M) :
-    TangentVec M where
+/-- Chart round-trip on a tangent vector. -/
+def chartRoundTrip {M : Manifold} (φ : Chart M) (v : TangentVec M) : TangentVec M where
   point := φ.fromModel (φ.toModel v.point)
   vec := v.vec
 
-/-- Chart tangent map preserves the vector component. -/
-theorem chartTangent_vec {M : Manifold} (φ : Chart M) (v : TangentVec M) :
-    (chartTangent φ v).vec = v.vec := rfl
+/-- Chart round-trip preserves vec. -/
+theorem chartRoundTrip_vec {M : Manifold} (φ : Chart M) (v : TangentVec M) :
+    (chartRoundTrip φ v).vec = v.vec := rfl
 
-/-- Chart tangent map base point relates to original via left_inv. -/
-def chartTangent_point {M : Manifold} (φ : Chart M) (v : TangentVec M) :
-    Path (chartTangent φ v).point v.point :=
+/-- Chart round-trip point is path-equivalent. -/
+def chartRoundTrip_point {M : Manifold} (φ : Chart M) (v : TangentVec M) :
+    Path (chartRoundTrip φ v).point v.point :=
   φ.left_inv v.point
 
-/-- Composing two chart tangent maps. -/
-def chartTangent_comp {M : Manifold} (φ ψ : Chart M) (v : TangentVec M) :
-    Path (chartTangent ψ (chartTangent φ v)).vec v.vec :=
-  Path.refl _
+/-- Double chart round-trip vec. -/
+theorem chartRoundTrip_comp_vec {M : Manifold} (φ ψ : Chart M) (v : TangentVec M) :
+    (chartRoundTrip ψ (chartRoundTrip φ v)).vec = v.vec := rfl
 
-/-! ## Smooth Maps Between Manifolds -/
+/-! ## Model Maps -/
 
-/-- A smooth map between manifolds (total, chart-compatible). -/
-structure SmoothMap (M N : Manifold) where
-  toFun : M.carrier → N.carrier
-  modelMap : M.model.carrier → N.model.carrier
-  compat : ∀ (φ : Chart M) (ψ : Chart N) (x : M.carrier),
-    Path (ψ.toModel (toFun x))
-         (modelMap (φ.toModel x))
-
-/-- Identity smooth map (when model = carrier, trivially). -/
-def smoothMapId (M : Manifold) : SmoothMap M M where
-  toFun := fun x => x
-  modelMap := fun y => y
-  compat := fun φ ψ x =>
-    Path.trans (Path.congrArg ψ.toModel (Path.refl x))
-      (Path.symm (Path.refl (ψ.toModel x))) |>.symm |>.symm
-
-/-- Actually just use refl for compat in id -- but we need φ.toModel x = ψ.toModel x
-    which isn't true in general. Let's use a different formulation. -/
-
-/-- A smooth map in the model-map sense. -/
+/-- A map between manifolds (on carrier and model). -/
 structure ModelMap (M N : Manifold) where
   toFun : M.carrier → N.carrier
-  modelMap : M.model.carrier → N.model.carrier
+  modelFun : M.model.carrier → N.model.carrier
 
 /-- Identity model map. -/
 def modelMapId (M : Manifold) : ModelMap M M where
   toFun := fun x => x
-  modelMap := fun y => y
+  modelFun := fun y => y
 
 /-- Composition of model maps. -/
 def modelMapComp {M N P : Manifold} (g : ModelMap N P) (f : ModelMap M N) : ModelMap M P where
   toFun := fun x => g.toFun (f.toFun x)
-  modelMap := fun y => g.modelMap (f.modelMap y)
+  modelFun := fun y => g.modelFun (f.modelFun y)
 
-/-- Left identity for model map composition (toFun). -/
+/-- Left identity (toFun). -/
 theorem modelMapComp_id_left {M N : Manifold} (f : ModelMap M N) :
     (modelMapComp (modelMapId N) f).toFun = f.toFun := rfl
 
-/-- Right identity for model map composition (toFun). -/
+/-- Right identity (toFun). -/
 theorem modelMapComp_id_right {M N : Manifold} (f : ModelMap M N) :
     (modelMapComp f (modelMapId M)).toFun = f.toFun := rfl
 
-/-- Associativity of model map composition (toFun). -/
+/-- Associativity (toFun). -/
 theorem modelMapComp_assoc {M N P Q : Manifold}
     (h : ModelMap P Q) (g : ModelMap N P) (f : ModelMap M N) :
     (modelMapComp h (modelMapComp g f)).toFun = (modelMapComp (modelMapComp h g) f).toFun := rfl
 
-/-- Left identity for model map composition (modelMap). -/
+/-- Left identity (modelFun). -/
 theorem modelMapComp_id_left_model {M N : Manifold} (f : ModelMap M N) :
-    (modelMapComp (modelMapId N) f).modelMap = f.modelMap := rfl
+    (modelMapComp (modelMapId N) f).modelFun = f.modelFun := rfl
 
-/-- Right identity for model map composition (modelMap). -/
+/-- Right identity (modelFun). -/
 theorem modelMapComp_id_right_model {M N : Manifold} (f : ModelMap M N) :
-    (modelMapComp f (modelMapId M)).modelMap = f.modelMap := rfl
+    (modelMapComp f (modelMapId M)).modelFun = f.modelFun := rfl
 
-/-- Associativity of model map composition (modelMap). -/
+/-- Associativity (modelFun). -/
 theorem modelMapComp_assoc_model {M N P Q : Manifold}
     (h : ModelMap P Q) (g : ModelMap N P) (f : ModelMap M N) :
-    (modelMapComp h (modelMapComp g f)).modelMap =
-      (modelMapComp (modelMapComp h g) f).modelMap := rfl
+    (modelMapComp h (modelMapComp g f)).modelFun =
+      (modelMapComp (modelMapComp h g) f).modelFun := rfl
 
-/-! ## Pushforward on Tangent Vectors -/
+/-! ## Pushforward -/
 
-/-- Pushforward of a tangent vector along a model map. -/
+/-- Pushforward of tangent vector. -/
 def pushforward {M N : Manifold} (f : ModelMap M N) (v : TangentVec M) : TangentVec N where
   point := f.toFun v.point
-  vec := f.modelMap v.vec
+  vec := f.modelFun v.vec
 
-/-- Pushforward of identity is identity. -/
+/-- Pushforward of identity. -/
 theorem pushforward_id (M : Manifold) (v : TangentVec M) :
-    pushforward (modelMapId M) v = v := by
-  cases v; rfl
+    pushforward (modelMapId M) v = v := by cases v; rfl
 
 /-- Path: pushforward of identity. -/
 def pushforward_id_path (M : Manifold) (v : TangentVec M) :
@@ -244,8 +217,7 @@ def pushforward_id_path (M : Manifold) (v : TangentVec M) :
 /-- Chain rule for pushforward. -/
 theorem pushforward_comp {M N P : Manifold} (g : ModelMap N P) (f : ModelMap M N)
     (v : TangentVec M) :
-    pushforward (modelMapComp g f) v = pushforward g (pushforward f v) := by
-  cases v; rfl
+    pushforward (modelMapComp g f) v = pushforward g (pushforward f v) := by cases v; rfl
 
 /-- Path: chain rule for pushforward. -/
 def pushforward_comp_path {M N P : Manifold} (g : ModelMap N P) (f : ModelMap M N)
@@ -253,42 +225,34 @@ def pushforward_comp_path {M N P : Manifold} (g : ModelMap N P) (f : ModelMap M 
     Path (pushforward (modelMapComp g f) v) (pushforward g (pushforward f v)) :=
   Path.ofEq (pushforward_comp g f v)
 
-/-- Pushforward preserves zero tangent vector. -/
-theorem pushforward_zero_vec {M N : Manifold} (f : ModelMap M N) (p : M.carrier) :
-    (pushforward f (zeroTangentVec M p)).point = f.toFun p := rfl
-
-/-- Pushforward projection commutes with toFun. -/
+/-- Pushforward projection. -/
 theorem pushforward_proj {M N : Manifold} (f : ModelMap M N) (v : TangentVec M) :
     tangentProj (pushforward f v) = f.toFun (tangentProj v) := rfl
 
 /-! ## Chart Compatibility -/
 
-/-- Two charts are compatible if their transition map is invertible (witnessed by paths). -/
+/-- Two charts are compatible: transition is invertible. -/
 structure ChartCompat {M : Manifold} (φ ψ : Chart M) where
   fwd_inv : ∀ y, Path (transitionMapInv φ ψ (transitionMap φ ψ y)) y
   bwd_inv : ∀ y, Path (transitionMap φ ψ (transitionMapInv φ ψ y)) y
 
-/-- Any chart is compatible with itself. -/
+/-- Any chart is self-compatible. -/
 def chartCompat_self {M : Manifold} (φ : Chart M) : ChartCompat φ φ where
   fwd_inv := transition_left_inv φ φ
   bwd_inv := transition_right_inv φ φ
 
 /-- Chart compatibility is symmetric. -/
-def chartCompat_symm {M : Manifold} {φ ψ : Chart M} (h : ChartCompat φ ψ) :
+def chartCompat_symm {M : Manifold} {φ ψ : Chart M} (_ : ChartCompat φ ψ) :
     ChartCompat ψ φ where
-  fwd_inv := fun y => by
-    simp [transitionMap, transitionMapInv]
-    exact Path.trans (Path.congrArg ψ.toModel (φ.left_inv (ψ.fromModel y))) (ψ.right_inv y)
-  bwd_inv := fun y => by
-    simp [transitionMap, transitionMapInv]
-    exact Path.trans (Path.congrArg φ.toModel (ψ.left_inv (φ.fromModel y))) (φ.right_inv y)
+  fwd_inv := transition_left_inv ψ φ
+  bwd_inv := transition_right_inv ψ φ
 
 /-! ## Dimension -/
 
-/-- The dimension of a manifold. -/
+/-- Dimension of a manifold. -/
 def Manifold.dimension (M : Manifold) : Nat := M.model.dim
 
-/-- Dimension is invariant (trivially). -/
+/-- Dimension equals model dim. -/
 theorem dimension_eq (M : Manifold) : M.dimension = M.model.dim := rfl
 
 /-- Path: dimension. -/
