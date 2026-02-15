@@ -482,3 +482,8 @@ import ComputationalPaths.Path.Algebra.LatticeBasedCrypto
 import ComputationalPaths.Path.Algebra.DerivedAlgebraicGeometryFoundations
 import ComputationalPaths.Path.Algebra.HigherTopos
 import ComputationalPaths.Path.Algebra.CategorifiedAlgebra
+import ComputationalPaths.Path.Algebra.SieveMethodsPaths
+import ComputationalPaths.Path.Algebra.DiophantineGeometry
+import ComputationalPaths.Path.Algebra.AutomorphicL
+import ComputationalPaths.Path.Algebra.ModularCurves
+import ComputationalPaths.Path.Algebra.BerkovichSpaces
