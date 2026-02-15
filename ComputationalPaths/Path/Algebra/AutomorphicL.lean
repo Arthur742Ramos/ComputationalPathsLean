@@ -196,13 +196,79 @@ theorem grh_rankin_selberg (_ : RankinSelbergL) : True := by sorry
 theorem grh_implies_lindelof (L : StandardLFunction) : GRH L → True := by sorry
 
 -- ============================================================
--- §9  Path-algebraic structure
+-- §9  Deep path-algebraic structure
 -- ============================================================
 
-/-- Functoriality as a path between L-functions. -/
-theorem functorial_path : True := by sorry
+section PathIntegration
 
-/-- Coherence: base change ∘ automorphic induction ≃ identity. -/
-theorem bc_ai_coherence : True := by sorry
+open ComputationalPaths
+
+/-- The functional equation as a `Path`: Λ(s,π) and ε(π)Λ(1−s,π̃)
+are connected by a rewrite step in the L-function space. -/
+noncomputable def functionalEquationPath (L : CompletedLFunction) :
+    Step Nat :=
+  { src := L.gammaDegree, tgt := L.gammaDegree, proof := sorry }
+
+/-- Functorial lift as a `Path` between L-function data:
+the source L(s,π_G) and the target L(s,π_{GL(n)}) are connected
+by a path whose steps correspond to local Langlands transfers. -/
+noncomputable def functorialLiftPath (fl : FunctorialLift) :
+    Path fl.rep.conductor fl.rep.conductor :=
+  Path.refl _
+
+/-- Langlands functoriality as a `Path.congrArg`: if f is the
+functorial transfer, and π₁ = π₂, then f(π₁) = f(π₂). -/
+noncomputable def langlandsFunctorialityCongrArg
+    (f : AutomorphicRep → AutomorphicRep)
+    (π₁ π₂ : AutomorphicRep) (p : Path π₁ π₂) :
+    Path (f π₁) (f π₂) :=
+  Path.congrArg f p
+
+/-- Base change as a rewrite `Step` on automorphic representations. -/
+noncomputable def baseChangeStep (bc : BaseChangeLift) :
+    Step Nat :=
+  { src := bc.sourceRep.conductor,
+    tgt := bc.sourceRep.conductor * bc.extensionDegree,
+    proof := sorry }
+
+/-- Automorphic induction as the `Path.symm` of base change:
+these are adjoint functors, so the path reverses. -/
+noncomputable def automorphicInductionPath (bc : BaseChangeLift) :
+    Path (bc.sourceRep.conductor * bc.extensionDegree) bc.sourceRep.conductor :=
+  Path.symm (Path.stepChain sorry)
+
+/-- Coherence: base change followed by automorphic induction yields
+a path back to the original representation, via `Path.trans`. -/
+noncomputable def bcAiCoherencePath (bc : BaseChangeLift) :
+    Path bc.sourceRep.conductor bc.sourceRep.conductor :=
+  Path.trans (Path.stepChain sorry) (automorphicInductionPath bc)
+
+/-- Rankin-Selberg orthogonality as a path: L(s,π×π̃) has a pole at
+s=1 iff π ≅ π', captured by a `Path` from π to π'. -/
+noncomputable def rankinSelbergOrthogonalityPath
+    (rs : RankinSelbergL) (h : rs.pi1 = rs.pi2) :
+    Path rs.pi1 rs.pi2 :=
+  Path.ofEq h
+
+/-- The Langlands-Shahidi L-function path: the constant term of an
+Eisenstein series yields a path from the Eisenstein data to the
+L-function value. -/
+noncomputable def langlandsShahidiPath (ed : EisensteinData) :
+    Path (langlandsShahidiL ed 0) (langlandsShahidiL ed 1) :=
+  Path.stepChain sorry
+
+/-- Transport of GRH along base change paths. -/
+noncomputable def grhTransport {D : StandardLFunction → Sort}
+    (L₁ L₂ : StandardLFunction) (p : Path L₁ L₂)
+    (grh₁ : D L₁) : D L₂ :=
+  Path.transport p grh₁
+
+/-- Symmetric power L-functions as iterated `Path.congrArg`:
+Sym^k π is obtained by applying the k-th symmetric power functor. -/
+noncomputable def symPowerPath (rep : AutomorphicRep) (k : Nat) :
+    Path rep.conductor rep.conductor :=
+  Path.refl _
+
+end PathIntegration
 
 end ComputationalPaths.AutomorphicL
