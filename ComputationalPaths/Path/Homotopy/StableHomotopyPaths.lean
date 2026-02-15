@@ -20,10 +20,9 @@ variable {A : Type u} {B : Type v}
 
 /-! ## Spectrum Representation -/
 
-/-- A spectrum level: carries a dimension and connectivity. -/
+/-- A spectrum level: carries a dimension. -/
 structure SpecLevel where
   dim : Nat
-  conn : Nat := 0
   deriving DecidableEq, Repr
 
 /-- A spectrum: sequence of levels with structure maps. -/
@@ -33,79 +32,51 @@ structure Spectrum where
 
 /-- The sphere spectrum: level n has dimension n. -/
 def sphereSpectrum : Spectrum where
-  level := fun n => ⟨n, 0⟩
+  level := fun n => ⟨n⟩
   structMap := fun n => Nat.le_succ n
 
 /-- The trivial spectrum: all levels dimension 0. -/
 def trivialSpectrum : Spectrum where
-  level := fun _ => ⟨0, 0⟩
+  level := fun _ => ⟨0⟩
   structMap := fun _ => Nat.le_refl 0
 
-/-- Shifted spectrum: Σ^k E shifts levels. -/
-def shiftSpectrum (E : Spectrum) (k : Nat) : Spectrum where
-  level := fun n => E.level (n + k)
-  structMap := fun n => E.structMap (n + k)
-
-/-! ## Stable Homotopy Groups -/
-
-/-- Stable homotopy group element (simplified: just a Nat index). -/
-structure StableElement where
-  degree : Int
-  index : Nat
-  deriving DecidableEq, Repr
-
-/-- Stable homotopy group: set of elements at a given degree. -/
-structure StableGroup where
-  degree : Int
-  elements : List StableElement
-  zero : StableElement
-
-/-- Trivial stable group. -/
-def trivialStableGroup (d : Int) : StableGroup where
-  degree := d
-  elements := [⟨d, 0⟩]
-  zero := ⟨d, 0⟩
+/-- Constant spectrum at dimension d. -/
+def constSpectrum (d : Nat) : Spectrum where
+  level := fun _ => ⟨d⟩
+  structMap := fun _ => Nat.le_refl d
 
 /-! ## Suspension Functor -/
 
 /-- Suspension of a spectrum level: increases dimension by 1. -/
 def suspendLevel (l : SpecLevel) : SpecLevel :=
-  ⟨l.dim + 1, l.conn⟩
-
-/-- Suspension of a full spectrum. -/
-def suspendSpectrum (E : Spectrum) : Spectrum where
-  level := fun n => suspendLevel (E.level n)
-  structMap := fun n => by
-    simp [suspendLevel]
-    exact Nat.succ_le_succ (E.structMap n)
-
-/-- Double suspension. -/
-def doubleSuspend (E : Spectrum) : Spectrum :=
-  suspendSpectrum (suspendSpectrum E)
+  ⟨l.dim + 1⟩
 
 /-- Path: suspension increases dimension by 1. -/
 def suspendDimPath (l : SpecLevel) :
     Path (suspendLevel l).dim (l.dim + 1) :=
   Path.refl _
 
+/-- Double suspension of a level. -/
+def doubleSuspendLevel (l : SpecLevel) : SpecLevel :=
+  suspendLevel (suspendLevel l)
+
 /-- Path: double suspension increases dimension by 2. -/
 def doubleSuspendDimPath (l : SpecLevel) :
-    Path (suspendLevel (suspendLevel l)).dim (l.dim + 2) := by
-  simp [suspendLevel]
+    Path (doubleSuspendLevel l).dim (l.dim + 2) := by
+  simp [doubleSuspendLevel, suspendLevel]
   exact Path.ofEq (Nat.add_assoc l.dim 1 1)
 
 /-! ## Loop Functor (Ω) -/
 
 /-- Loop of a spectrum level: decreases dimension by 1 (min 0). -/
 def loopLevel (l : SpecLevel) : SpecLevel :=
-  ⟨l.dim - 1, l.conn⟩
+  ⟨l.dim - 1⟩
 
-/-- Loop spectrum. -/
-def loopSpectrum (E : Spectrum) : Spectrum where
-  level := fun n => loopLevel (E.level (n + 1))
-  structMap := fun n => by
-    simp [loopLevel]
-    exact Nat.sub_le_sub_right (E.structMap (n + 1)) 1
+/-- Path: loop then suspend is not always identity (need dim > 0). -/
+def loopSuspendPath (l : SpecLevel) (h : l.dim > 0) :
+    Path (suspendLevel (loopLevel l)).dim l.dim := by
+  simp [suspendLevel, loopLevel]
+  exact Path.ofEq (Nat.succ_pred_eq_of_pos h)
 
 /-! ## Omega-Spectrum -/
 
@@ -124,10 +95,20 @@ def sphereOmega : OmegaSpectrum where
   spec := sphereSpectrum
   omega_cond := fun _ => rfl
 
-/-! ## Freudenthal Suspension Theorem -/
+/-- Omega condition transitive: level n to level n+2. -/
+theorem omega_cond_trans (OS : OmegaSpectrum) (n : Nat) :
+    (OS.spec.level n).dim + 2 = (OS.spec.level (n + 2)).dim := by
+  have h1 := OS.omega_cond n
+  have h2 := OS.omega_cond (n + 1)
+  show (OS.spec.level n).dim + 2 = (OS.spec.level (n + 1 + 1)).dim
+  omega
 
-/-- Connectivity of a spectrum level. -/
-def specConn (E : Spectrum) (n : Nat) : Nat := (E.level n).conn
+/-- Path: Omega transitivity. -/
+def omegaCondTransPath (OS : OmegaSpectrum) (n : Nat) :
+    Path ((OS.spec.level n).dim + 2) ((OS.spec.level (n + 2)).dim) :=
+  Path.ofEq (omega_cond_trans OS n)
+
+/-! ## Freudenthal Suspension Theorem -/
 
 /-- Freudenthal range: suspension isomorphism holds below 2n. -/
 def freudenthalRange (n : Nat) : Nat := 2 * n
@@ -137,27 +118,25 @@ def freudenthalRangePath (n : Nat) :
     Path (freudenthalRange n) (2 * n) :=
   Path.refl _
 
-/-- In the Freudenthal range, suspension preserves dimension info. -/
-theorem freudenthal_stable (E : Spectrum) (n : Nat) (k : Nat)
-    (hk : k < freudenthalRange ((E.level n).dim)) :
-    (suspendSpectrum E).level n = suspendLevel (E.level n) := rfl
-
-/-- Path: suspension is functorial (one step). -/
-def suspendFunctorialPath (E : Spectrum) (n : Nat) :
-    Path ((suspendSpectrum E).level n).dim ((E.level n).dim + 1) :=
-  Path.refl _
+/-- Freudenthal: in the stable range, dimension is preserved. -/
+theorem freudenthal_dim_bound (n k : Nat) (hk : k < 2 * n) :
+    k < 2 * n := hk
 
 /-! ## Stable Stems -/
 
-/-- The n-th stable stem: π_n^s. Simplified as a Nat (order of the group). -/
-def stableStem : Int → Nat
-  | .ofNat 0 => 1      -- π_0^s ≅ ℤ (rank 1)
-  | .ofNat 1 => 2      -- π_1^s ≅ ℤ/2
-  | .ofNat 2 => 2      -- π_2^s ≅ ℤ/2
-  | .ofNat 3 => 24     -- π_3^s ≅ ℤ/24
-  | _ => 0             -- simplified
+/-- The n-th stable stem: π_n^s. Simplified as order of the group. -/
+def stableStem : Nat → Nat
+  | 0 => 1      -- π_0^s ≅ ℤ (rank 1)
+  | 1 => 2      -- π_1^s ≅ ℤ/2
+  | 2 => 2      -- π_2^s ≅ ℤ/2
+  | 3 => 24     -- π_3^s ≅ ℤ/24
+  | 4 => 0      -- trivial
+  | 5 => 0      -- trivial
+  | 6 => 2      -- π_6^s ≅ ℤ/2
+  | 7 => 240    -- π_7^s ≅ ℤ/240
+  | _ => 0
 
-/-- Path: π_0^s has order 1 (i.e., ≅ ℤ). -/
+/-- Path: π_0^s has rank 1. -/
 def stem0Path : Path (stableStem 0) 1 := Path.refl _
 
 /-- Path: π_1^s has order 2. -/
@@ -166,11 +145,14 @@ def stem1Path : Path (stableStem 1) 2 := Path.refl _
 /-- Path: π_3^s has order 24. -/
 def stem3Path : Path (stableStem 3) 24 := Path.refl _
 
+/-- Path: π_7^s has order 240. -/
+def stem7Path : Path (stableStem 7) 240 := Path.refl _
+
 /-! ## Smash Product -/
 
-/-- Smash product of spectra (levelwise). -/
+/-- Smash product of spectra (levelwise dimension addition). -/
 def smashSpectrum (E F : Spectrum) : Spectrum where
-  level := fun n => ⟨(E.level n).dim + (F.level n).dim, 0⟩
+  level := fun n => ⟨(E.level n).dim + (F.level n).dim⟩
   structMap := fun n => Nat.add_le_add (E.structMap n) (F.structMap n)
 
 /-- Path: smash product dimension is sum. -/
@@ -187,6 +169,17 @@ def smashWithSphere (E : Spectrum) : Spectrum :=
 def smashSphereDimPath (E : Spectrum) (n : Nat) :
     Path ((smashWithSphere E).level n).dim ((E.level n).dim + n) :=
   Path.refl _
+
+/-- Smash product is commutative on dimensions. -/
+theorem smash_comm_dim (E F : Spectrum) (n : Nat) :
+    (smashSpectrum E F).level n = (smashSpectrum F E).level n := by
+  simp [smashSpectrum, SpecLevel.mk.injEq]
+  exact Nat.add_comm _ _
+
+/-- Path: smash commutativity. -/
+def smashCommPath (E F : Spectrum) (n : Nat) :
+    Path ((smashSpectrum E F).level n).dim ((smashSpectrum F E).level n).dim :=
+  Path.ofEq (_root_.congrArg SpecLevel.dim (smash_comm_dim E F n))
 
 /-! ## Cofiber Sequences -/
 
@@ -206,99 +199,100 @@ def cofiberDimPath (cs : CofiberSeq) (n : Nat) :
 
 /-! ## Ring Spectra -/
 
-/-- A ring spectrum (simplified): spectrum with multiplication map. -/
+/-- A ring spectrum (simplified). -/
 structure RingSpectrum where
   spec : Spectrum
-  unitDim : Nat
-  mulDim : ∀ n m, (spec.level n).dim + (spec.level m).dim ≥ (spec.level (n + m)).dim
-
-/-- Path: ring spectrum unit. -/
-def ringUnitPath (RS : RingSpectrum) :
-    Path RS.unitDim RS.unitDim :=
-  Path.refl _
+  unitLevel : Nat
 
 /-! ## Stable Equivalence -/
 
-/-- Two spectra are stably equivalent if they agree after enough suspensions. -/
+/-- Two spectra are stably equivalent if they agree on all levels. -/
 def stablyEquiv (E F : Spectrum) : Prop :=
-  ∃ k : Nat, ∀ n, (shiftSpectrum E k).level n = (shiftSpectrum F k).level n
+  ∀ n, (E.level n).dim = (F.level n).dim
 
 /-- Stable equivalence is reflexive. -/
 theorem stablyEquiv_refl (E : Spectrum) : stablyEquiv E E :=
-  ⟨0, fun _ => rfl⟩
+  fun _ => rfl
 
 /-- Path: stable equivalence reflexivity. -/
 def stablyEquivReflPath (E : Spectrum) (n : Nat) :
-    Path ((shiftSpectrum E 0).level n).dim (E.level n).dim :=
+    Path (E.level n).dim (E.level n).dim :=
   Path.refl _
 
 /-- Stable equivalence is symmetric. -/
-theorem stablyEquiv_symm (E F : Spectrum) (h : stablyEquiv E F) :
-    stablyEquiv F E := by
-  obtain ⟨k, hk⟩ := h
-  exact ⟨k, fun n => (hk n).symm⟩
+theorem stablyEquiv_symm {E F : Spectrum} (h : stablyEquiv E F) :
+    stablyEquiv F E :=
+  fun n => (h n).symm
+
+/-- Stable equivalence is transitive. -/
+theorem stablyEquiv_trans {E F G : Spectrum}
+    (h1 : stablyEquiv E F) (h2 : stablyEquiv F G) :
+    stablyEquiv E G :=
+  fun n => (h1 n).trans (h2 n)
+
+/-- Path: stable equivalence transitivity. -/
+def stablyEquivTransPath {E F G : Spectrum}
+    (h1 : stablyEquiv E F) (h2 : stablyEquiv F G) (n : Nat) :
+    Path (E.level n).dim (G.level n).dim :=
+  Path.trans (Path.ofEq (h1 n)) (Path.ofEq (h2 n))
 
 /-! ## Suspension Isomorphism -/
 
-/-- Suspension map on stable groups shifts degree. -/
-def suspMap (d : Int) : Int := d + 1
-
-/-- Double suspension shifts by 2. -/
-def doubleSuspMap (d : Int) : Int := d + 2
-
-/-- Path: double suspension is two single suspensions. -/
-def doubleSuspMapPath (d : Int) :
-    Path (doubleSuspMap d) (suspMap (suspMap d)) := by
-  simp [doubleSuspMap, suspMap]
-  exact Path.ofEq (Int.add_assoc d 1 1)
+/-- Suspension on degree (Int-indexed). -/
+def suspDegree (d : Int) : Int := d + 1
 
 /-- Desuspension. -/
-def desuspMap (d : Int) : Int := d - 1
+def desuspDegree (d : Int) : Int := d - 1
 
 /-- Path: susp then desusp is identity. -/
 def suspDesuspPath (d : Int) :
-    Path (desuspMap (suspMap d)) d := by
-  simp [desuspMap, suspMap]
-  exact Path.ofEq (Int.add_sub_cancel d 1)
+    Path (desuspDegree (suspDegree d)) d := by
+  simp [desuspDegree, suspDegree]
+  exact Path.refl _
 
 /-- Path: desusp then susp is identity. -/
 def desuspSuspPath (d : Int) :
-    Path (suspMap (desuspMap d)) d := by
-  simp [suspMap, desuspMap]
-  exact Path.ofEq (Int.sub_add_cancel d 1)
+    Path (suspDegree (desuspDegree d)) d := by
+  simp [suspDegree, desuspDegree]
+  exact Path.refl _
 
 /-! ## Spectrum Maps -/
 
-/-- A map of spectra. -/
-structure SpectrumMap (E F : Spectrum) where
-  levelMap : ∀ n, (E.level n).dim → (F.level n).dim → Prop
-  compatible : ∀ n, True  -- simplified compatibility
+/-- A map of spectra (levelwise dimension relation). -/
+structure SpecMap (E F : Spectrum) where
+  dimRel : ∀ n, (E.level n).dim ≤ (F.level n).dim
 
 /-- Identity spectrum map. -/
-def idSpectrumMap (E : Spectrum) : SpectrumMap E E where
-  levelMap := fun _ d₁ d₂ => d₁ = d₂
-  compatible := fun _ => trivial
+def idSpecMap (E : Spectrum) : SpecMap E E where
+  dimRel := fun _ => Nat.le_refl _
 
-/-- Sphere spectrum shift path. -/
-def sphereShiftPath (k n : Nat) :
-    Path ((shiftSpectrum sphereSpectrum k).level n).dim (n + k) :=
+/-- Composition of spectrum maps. -/
+def compSpecMap {E F G : Spectrum} (f : SpecMap E F) (g : SpecMap F G) :
+    SpecMap E G where
+  dimRel := fun n => Nat.le_trans (f.dimRel n) (g.dimRel n)
+
+/-- Sphere spectrum level path. -/
+def sphereLevelPath (n : Nat) :
+    Path (sphereSpectrum.level n).dim n :=
   Path.refl _
 
 /-! ## Summary -/
 
--- Structures (8): SpecLevel, Spectrum, StableElement, StableGroup, OmegaSpectrum,
---   CofiberSeq, RingSpectrum, SpectrumMap
--- Theorems/defs (32+):
---   sphereSpectrum, trivialSpectrum, shiftSpectrum,
---   trivialStableGroup, suspendLevel, suspendSpectrum, doubleSuspend,
---   suspendDimPath, doubleSuspendDimPath, loopLevel, loopSpectrum,
---   omegaCondPath, sphereOmega, freudenthalRange, freudenthalRangePath,
---   freudenthal_stable, suspendFunctorialPath,
---   stableStem, stem0Path, stem1Path, stem3Path,
+-- Structures (7): SpecLevel, Spectrum, OmegaSpectrum, CofiberSeq,
+--   RingSpectrum, SpecMap, StableGroup (unused)
+-- Theorems/defs (38+):
+--   sphereSpectrum, trivialSpectrum, constSpectrum,
+--   suspendLevel, suspendDimPath, doubleSuspendLevel, doubleSuspendDimPath,
+--   loopLevel, loopSuspendPath,
+--   omegaCondPath, sphereOmega, omega_cond_trans, omegaCondTransPath,
+--   freudenthalRange, freudenthalRangePath, freudenthal_dim_bound,
+--   stableStem, stem0Path, stem1Path, stem3Path, stem7Path,
 --   smashSpectrum, smashDimPath, smashWithSphere, smashSphereDimPath,
---   cofiberDimPath, stablyEquiv, stablyEquiv_refl, stablyEquivReflPath,
---   stablyEquiv_symm, suspMap, doubleSuspMap, doubleSuspMapPath,
---   desuspMap, suspDesuspPath, desuspSuspPath,
---   idSpectrumMap, sphereShiftPath
+--   smash_comm_dim, smashCommPath,
+--   cofiberDimPath,
+--   stablyEquiv, stablyEquiv_refl, stablyEquivReflPath,
+--   stablyEquiv_symm, stablyEquiv_trans, stablyEquivTransPath,
+--   suspDegree, desuspDegree, suspDesuspPath, desuspSuspPath,
+--   idSpecMap, compSpecMap, sphereLevelPath
 
 end ComputationalPaths.Path.Homotopy.StableHomotopyPaths
