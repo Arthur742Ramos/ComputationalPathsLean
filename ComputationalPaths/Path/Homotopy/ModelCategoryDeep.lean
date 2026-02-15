@@ -230,16 +230,10 @@ def LHtpy.lrefl {X Y : Type u} (f : Arrow X Y) : LHtpy f f where
 
 -- Theorem 14: symmetry of left homotopy
 def LHtpy.lsymm {X Y : Type u} {f g : Arrow X Y}
-    (h : LHtpy f g) : LHtpy g f where
-  cyl := { obj   := h.cyl.obj
-            inc0  := h.cyl.inc1
-            inc1  := h.cyl.inc0
-            proj  := h.cyl.proj
-            proj0 := h.cyl.proj1
-            proj1 := h.cyl.proj0 }
-  hom  := h.hom
-  hom0 := h.hom1
-  hom1 := h.hom0
+    (h : LHtpy f g) : LHtpy g f :=
+  let cyl' : Cyl X := ⟨h.cyl.obj, h.cyl.inc1, h.cyl.inc0, h.cyl.proj,
+                        h.cyl.proj1, h.cyl.proj0⟩
+  ⟨cyl', h.hom, h.hom1, h.hom0⟩
 
 -- Theorem 15: WE ⟹ left homotopy (section side)
 def LHtpy.ofWE_sect {X Y : Type u} (f : Arrow X Y) (w : WE f) :
@@ -293,16 +287,10 @@ def RHtpy.rrefl {X Y : Type u} (f : Arrow X Y) : RHtpy f f where
 
 -- Theorem 19: symmetry of right homotopy
 def RHtpy.rsymm {X Y : Type u} {f g : Arrow X Y}
-    (h : RHtpy f g) : RHtpy g f where
-  po := { obj  := h.po.obj
-           diag := h.po.diag
-           ev0  := h.po.ev1
-           ev1  := h.po.ev0
-           ev0d := h.po.ev1d
-           ev1d := h.po.ev0d }
-  hom  := h.hom
-  hom0 := h.hom1
-  hom1 := h.hom0
+    (h : RHtpy f g) : RHtpy g f :=
+  let po' : PObj Y := ⟨h.po.obj, h.po.diag, h.po.ev1, h.po.ev0,
+                        h.po.ev1d, h.po.ev0d⟩
+  ⟨po', h.hom, h.hom1, h.hom0⟩
 
 -- ════════════════════════════════════════════════════════════════
 -- §8  Quillen adjunction and Ken Brown
@@ -368,9 +356,9 @@ theorem idWE_sect (X : Type u) (x : X) :
 theorem idWE_retr (X : Type u) (x : X) :
     (WE.idWE X).retr x = Path.refl x := rfl
 
--- Theorem 26
+-- Theorem 26: double symmetry recovers original arrow
 theorem symmWE_invol {X Y : Type u} {f : Arrow X Y} (w : WE f) :
-    (WE.symmWE (WE.symmWE w)).inv = f := rfl
+    (WE.symmWE (WE.symmWE w)).inv = w.inv := rfl
 
 -- Theorem 27: double symmetry on sect
 theorem symmWE_sect_invol {X Y : Type u} {f : Arrow X Y} (w : WE f) (y : Y) :
@@ -479,7 +467,7 @@ theorem HFib.transport_trans {X Y : Type u} {f : Arrow X Y}
     {y1 y2 y3 : Y} (fib : HFib f y1) (p : Path y1 y2) (q : Path y2 y3) :
     HFib.transport_path (HFib.transport_path fib p) q =
     HFib.transport_path fib (Path.trans p q) := by
-  simp [HFib.transport_path, Path.trans_assoc]
+  simp [HFib.transport_path]
 
 -- ════════════════════════════════════════════════════════════════
 -- §14  Whitehead / homotopy equivalence
@@ -502,7 +490,7 @@ def HEquiv.ofId (X : Type u) : HEquiv (Arrow.idArr X) :=
 
 -- Theorem 44: inverse homotopy equivalence
 def HEquiv.hinv {X Y : Type u} {f : Arrow X Y}
-    (he : HEquiv f) : HEquiv he.hInv where
+    (he : HEquiv f) : @HEquiv Y X he.hInv where
   hInv := f
   lh   := he.rh
   rh   := he.lh
@@ -595,7 +583,7 @@ theorem Arrow.comp_idArr_right {X Y : Type u} (f : Arrow X Y) (x : X) :
 -- ════════════════════════════════════════════════════════════════
 
 -- Theorem 58: WE fibre is contractible (all fibres path-connected to canonical)
-theorem HFib.we_fibre_connected {X Y : Type u} {f : Arrow X Y}
+def HFib.we_fibre_connected {X Y : Type u} {f : Arrow X Y}
     (w : WE f) (y : Y) (fib : HFib f y) :
     Path fib.pt (w.inv.fn y) :=
   Path.trans
@@ -603,7 +591,7 @@ theorem HFib.we_fibre_connected {X Y : Type u} {f : Arrow X Y}
     (Path.congrArg w.inv.fn fib.path)
 
 -- Theorem 59: fibre of idArr is singleton up to path
-theorem HFib.idFib_connected {Y : Type u} (y : Y) (fib : HFib (Arrow.idArr Y) y) :
+def HFib.idFib_connected {Y : Type u} (y : Y) (fib : HFib (Arrow.idArr Y) y) :
     Path fib.pt y := fib.path
 
 -- Theorem 60: fibre preserves symm
@@ -630,7 +618,7 @@ theorem LDerived.Q_is_WE {C D : Type u} {F : Arrow C D} (ld : LDerived F) :
 
 -- Theorem 64: comparison of derived functors
 def LDerived.compare {C D : Type u} {F : Arrow C D}
-    (ld1 ld2 : LDerived F) (c : C) :
+    (ld1 _ld2 : LDerived F) (c : C) :
     Path (ld1.LF.fn c) (F.fn (ld1.Q.fn c)) :=
   ld1.comp c
 
@@ -639,19 +627,19 @@ def LDerived.compare {C D : Type u} {F : Arrow C D}
 -- ════════════════════════════════════════════════════════════════
 
 -- Theorem 65: adjunction unit-counit triangle (left)
-theorem Adj.triangle_left {C D : Type u} {F : Arrow C D} {G : Arrow D C}
+def Adj.triangle_left {C D : Type u} {F : Arrow C D} {G : Arrow D C}
     (adj : Adj F G) (c : C) :
     Path (F.fn c) (F.fn (G.fn (F.fn c))) :=
   Path.congrArg F.fn (adj.unit c)
 
 -- Theorem 66: adjunction unit-counit triangle (right)
-theorem Adj.triangle_right {C D : Type u} {F : Arrow C D} {G : Arrow D C}
+def Adj.triangle_right {C D : Type u} {F : Arrow C D} {G : Arrow D C}
     (adj : Adj F G) (d : D) :
     Path (G.fn (F.fn (G.fn d))) (G.fn d) :=
   Path.congrArg G.fn (adj.counit d)
 
 -- Theorem 67: composition of adjunction with unit gives counit path
-theorem Adj.unit_counit {C D : Type u} {F : Arrow C D} {G : Arrow D C}
+def Adj.unit_counit {C D : Type u} {F : Arrow C D} {G : Arrow D C}
     (adj : Adj F G) (d : D) :
     Path (F.fn (G.fn d)) d :=
   adj.counit d
@@ -752,12 +740,12 @@ structure MapPathSpace {X Y : Type u} (f : Arrow X Y) (y : Y) where
   path : Path (f.fn pt) y
 
 -- Theorem 79: mapping path space is the same as HFib
-theorem MapPathSpace_eq_HFib {X Y : Type u} {f : Arrow X Y} {y : Y}
+def MapPathSpace_eq_HFib {X Y : Type u} {f : Arrow X Y} {y : Y}
     (m : MapPathSpace f y) : HFib f y :=
   { pt := m.pt, path := m.path }
 
 -- Theorem 80: HFib → MapPathSpace
-theorem HFib_eq_MapPathSpace {X Y : Type u} {f : Arrow X Y} {y : Y}
+def HFib_eq_MapPathSpace {X Y : Type u} {f : Arrow X Y} {y : Y}
     (h : HFib f y) : MapPathSpace f y :=
   { pt := h.pt, path := h.path }
 
@@ -767,7 +755,7 @@ def MapPathSpace.proj {X Y : Type u} {f : Arrow X Y} {y : Y}
   f.fn m.pt
 
 -- Theorem 82: projection agrees
-theorem MapPathSpace.proj_eq {X Y : Type u} {f : Arrow X Y} {y : Y}
+def MapPathSpace.proj_eq {X Y : Type u} {f : Arrow X Y} {y : Y}
     (m : MapPathSpace f y) : Path (MapPathSpace.proj m) y :=
   m.path
 
