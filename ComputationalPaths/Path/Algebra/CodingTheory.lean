@@ -7,11 +7,11 @@ namespace CodingTheory
 
 /-! ## Basic code families -/
 
-def Alphabet : Type := Nat
+abbrev Alphabet : Type := Nat
 
-def Word : Type := List Alphabet
+abbrev Word : Type := List Alphabet
 
-def Code : Type := List Word
+abbrev Code : Type := List Word
 
 def codeLength (C : Code) : Nat :=
   match C with
@@ -146,7 +146,7 @@ theorem listDecodeRadius_bound (n d : Nat) :
     listDecodeRadius n d ≤ n + d := by
   sorry
 
-theorem codeLength_path (C : Code) :
+def codeLength_path (C : Code) :
     Path (codeLength C) (codeLength C) := by
   sorry
 

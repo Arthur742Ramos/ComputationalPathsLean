@@ -7,15 +7,15 @@ namespace ComputationalAlgGeo
 
 /-! ## Algebraic-geometry computation data -/
 
-def Monomial : Type := List Nat
+abbrev Monomial : Type := List Nat
 
-def Coeff : Type := Int
+abbrev Coeff : Type := Int
 
-def Polynomial : Type := List (Coeff × Monomial)
+abbrev Polynomial : Type := List (Coeff × Monomial)
 
-def Ideal : Type := List Polynomial
+abbrev Ideal : Type := List Polynomial
 
-def GroebnerBasis : Type := List Polynomial
+abbrev GroebnerBasis : Type := List Polynomial
 
 def eliminationOrder (_k : Nat) : Monomial → Monomial → Bool :=
   fun _ _ => true
@@ -148,7 +148,7 @@ theorem idealMembership_of_mem (I : Ideal) (f : Polynomial) :
     f ∈ I → idealMembershipTest I f = true := by
   sorry
 
-theorem krullDimension_path (I : Ideal) :
+def krullDimension_path (I : Ideal) :
     Path (krullDimensionEstimate I) (krullDimensionEstimate I) := by
   sorry
 

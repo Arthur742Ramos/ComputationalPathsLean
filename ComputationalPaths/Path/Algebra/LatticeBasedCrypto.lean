@@ -7,9 +7,9 @@ namespace LatticeBasedCrypto
 
 /-! ## Lattice problem instances -/
 
-def LatticeVector : Type := List Int
+abbrev LatticeVector : Type := List Int
 
-def LatticeBasis : Type := List LatticeVector
+abbrev LatticeBasis : Type := List LatticeVector
 
 def latticeDimension (B : LatticeBasis) : Nat :=
   match B with
@@ -28,9 +28,9 @@ def lllReduceStep (B : LatticeBasis) : LatticeBasis :=
 def lllReduce (B : LatticeBasis) (_iters : Nat) : LatticeBasis :=
   lllReduceStep B
 
-def svpInstance : Type := LatticeBasis × Nat
+abbrev svpInstance : Type := LatticeBasis × Nat
 
-def cvpInstance : Type := LatticeBasis × LatticeVector
+abbrev cvpInstance : Type := LatticeBasis × LatticeVector
 
 def shortestVectorCandidate (B : LatticeBasis) : LatticeVector :=
   B.getD 0 []
@@ -40,7 +40,7 @@ def closestVectorCandidate (_B : LatticeBasis) (target : LatticeVector) : Lattic
 
 /-! ## Cryptographic constructions -/
 
-def ntruPublicKey : Type := LatticeBasis × LatticeVector
+abbrev ntruPublicKey : Type := LatticeBasis × LatticeVector
 
 def ntruEncrypt (pk : ntruPublicKey) (msg : LatticeVector) : LatticeVector :=
   msg ++ pk.2
@@ -48,17 +48,17 @@ def ntruEncrypt (pk : ntruPublicKey) (msg : LatticeVector) : LatticeVector :=
 def ntruDecrypt (sk : LatticeBasis) (cipher : LatticeVector) : LatticeVector :=
   cipher.take (latticeDimension sk)
 
-def lweSample : Type := LatticeVector × Int
+abbrev lweSample : Type := LatticeVector × Int
 
 def lweEncrypt (A : LatticeBasis) (msg : Int) : lweSample :=
   (shortestVectorCandidate A, msg)
 
-def ringLweSample : Type := List Int × Int
+abbrev ringLweSample : Type := List Int × Int
 
 def ringLweEncrypt (a : List Int) (msg : Int) : ringLweSample :=
   (a, msg)
 
-def fheCiphertext : Type := List Int
+abbrev fheCiphertext : Type := List Int
 
 def fheAdd (c₁ c₂ : fheCiphertext) : fheCiphertext :=
   c₁ ++ c₂
@@ -127,7 +127,7 @@ theorem latticeSignature_length (B : LatticeBasis) (msg : List Int) :
     (latticeSignature B msg).length = msg.length := by
   sorry
 
-theorem latticeDimension_path (B : LatticeBasis) :
+def latticeDimension_path (B : LatticeBasis) :
     Path (latticeDimension B) (latticeDimension B) := by
   sorry
 

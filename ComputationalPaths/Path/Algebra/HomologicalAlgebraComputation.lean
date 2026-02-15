@@ -7,15 +7,15 @@ namespace HomologicalAlgebraComputation
 
 /-! ## Core computational objects -/
 
-def Monomial : Type := List Nat
+abbrev Monomial : Type := List Nat
 
-def ModuleCoeff : Type := Int
+abbrev ModuleCoeff : Type := Int
 
-def ModuleTerm : Type := ModuleCoeff × Monomial
+abbrev ModuleTerm : Type := ModuleCoeff × Monomial
 
-def ModulePolynomial : Type := List ModuleTerm
+abbrev ModulePolynomial : Type := List ModuleTerm
 
-def ModuleVector : Type := List ModulePolynomial
+abbrev ModuleVector : Type := List ModulePolynomial
 
 /-! ## Groebner and syzygy computations -/
 
@@ -139,7 +139,7 @@ theorem bettiTable_nonnegative (R : ResolutionObject) (i j : Nat) :
   sorry
 
 theorem hilbertFunction_monotone (basis : ModuleVector) :
-    Monotone (hilbertFunction basis) := by
+    ∀ {m n : Nat}, m ≤ n → hilbertFunction basis m ≤ hilbertFunction basis n := by
   sorry
 
 theorem regularity_le_basis_size (basis : ModuleVector) :
