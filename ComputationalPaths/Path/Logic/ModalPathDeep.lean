@@ -1,480 +1,516 @@
-/-
-# Modal Logic via Computational Paths (Deep)
-
-Kripke frames where accessibility is modeled by computational paths between
-worlds.  Modal operators □ and ◇ are defined via path quantification.
-K, T, S4, S5, B axiom schemes arise from path properties (reflexivity,
-transitivity, symmetry).  Bisimulation, frame correspondence, temporal
-operators (Until, Since), and graded modalities are developed through
-multi-step path reasoning.
--/
-
-import ComputationalPaths.Path.Basic.Core
+-- ModalPathDeep.lean: Modal logic via computational paths
+-- Kripke frames, □/◇, K/T/S4/S5 axiom schemes, bisimulation,
+-- temporal operators, dynamic logic
+import ComputationalPaths.Path.Core
 
 namespace ComputationalPaths
-namespace Path
-namespace ModalPathDeep
 
-set_option linter.unusedVariables false
-set_option linter.unusedSimpArgs false
+universe u
 
-open ComputationalPaths.Path
+-- ============================================================
+-- SECTION 1: Kripke Frames via Paths
+-- ============================================================
 
-universe u v
-
-/-! ## Kripke Frames as Path Structures -/
-
-/-- A proposition label. -/
-structure PropVar where
-  idx : Nat
-
-/-- A world in a Kripke frame. -/
+/-- A world in a Kripke frame -/
 structure World where
   id : Nat
-  val : PropVar → Bool
+deriving DecidableEq, Repr
 
-/-- Accessibility between worlds witnessed by a computational path on ids. -/
-structure Access (w v : World) where
-  idPath : Path w.id v.id
-  label  : String := ""
+/-- Step in accessibility relation between worlds -/
+inductive AccStep : World → World → Type where
+  | access : (w v : World) → AccStep w v
+  | refl : (w : World) → AccStep w w
+  | symm : {w v : World} → AccStep w v → AccStep v w
+  | trans : {w v u : World} → AccStep w v → AccStep v u → AccStep w u
 
-/-- Self-access from Path.refl. -/
-def Access.selfAccess (w : World) : Access w w :=
-  { idPath := Path.refl w.id }
+/-- Path of accessibility steps -/
+inductive AccPath : World → World → Type where
+  | nil : (w : World) → AccPath w w
+  | cons : {w v u : World} → AccStep w v → AccPath v u → AccPath w u
 
-/-- Compose two accessibility witnesses via Path.trans. -/
-def Access.compose {w v u : World} (a1 : Access w v) (a2 : Access v u) : Access w u :=
-  { idPath := Path.trans a1.idPath a2.idPath }
+/-- Concatenation of accessibility paths -/
+def AccPath.append : {w v u : World} → AccPath w v → AccPath v u → AccPath w u
+  | _, _, _, AccPath.nil _, q => q
+  | _, _, _, AccPath.cons s p, q => AccPath.cons s (AccPath.append p q)
 
-/-- Reverse an accessibility witness via Path.symm. -/
-def Access.reverse {w v : World} (a : Access w v) : Access v w :=
-  { idPath := Path.symm a.idPath }
+/-- Reverse an accessibility path -/
+def AccPath.reverse : {w v : World} → AccPath w v → AccPath v w
+  | _, _, AccPath.nil w => AccPath.nil w
+  | _, _, AccPath.cons s p => AccPath.append (AccPath.reverse p) (AccPath.cons (AccStep.symm s) (AccPath.nil _))
 
-/-! ## Modal Operators -/
+/-- CongrArg for accessibility paths under a world mapping -/
+def AccStep.mapWorld (f : World → World)
+    (lift : {w v : World} → AccStep w v → AccStep (f w) (f v))
+    {w v : World} (s : AccStep w v) : AccStep (f w) (f v) :=
+  lift s
 
-/-- A Kripke frame: accessibility relation on worlds. -/
-structure KFrame where
-  acc : World → World → Prop
+-- ============================================================
+-- SECTION 2: Modal Propositions via Path Quantification
+-- ============================================================
 
-/-- □ φ at w: for every accessible v, φ holds at v. -/
-def boxSat (F : KFrame) (φ : World → Prop) (w : World) : Prop :=
-  ∀ v : World, F.acc w v → φ v
+/-- A modal proposition assigns truth values at worlds -/
+def ModalProp := World → Prop
 
-/-- ◇ φ at w: there exists accessible v where φ holds. -/
-def diaSat (F : KFrame) (φ : World → Prop) (w : World) : Prop :=
-  ∃ v : World, F.acc w v ∧ φ v
+/-- Box: necessarily true = true at all accessible worlds -/
+def boxProp (R : World → World → Prop) (φ : ModalProp) : ModalProp :=
+  fun w => ∀ v, R w v → φ v
 
-/-! ## Axiom K and Distribution -/
+/-- Diamond: possibly true = true at some accessible world -/
+def diamondProp (R : World → World → Prop) (φ : ModalProp) : ModalProp :=
+  fun w => ∃ v, R w v ∧ φ v
 
-/-- 1. Axiom K: □(φ→ψ) → □φ → □ψ. -/
-theorem axiomK (F : KFrame) (φ ψ : World → Prop) (w : World)
-    (hImp : boxSat F (fun v => φ v → ψ v) w)
-    (hPhi : boxSat F φ w) :
-    boxSat F ψ w := by
-  intro v hAcc
-  have step1 : φ v → ψ v := hImp v hAcc
-  have step2 : φ v := hPhi v hAcc
-  exact step1 step2
+/-- Path-based box: true at all path-reachable worlds -/
+def pathBox (φ : ModalProp) : ModalProp :=
+  fun w => ∀ v, Nonempty (AccPath w v) → φ v
 
-/-- 2. Necessitation: if φ everywhere, □φ holds. -/
-theorem necessitation (F : KFrame) (φ : World → Prop) (w : World)
-    (hAll : ∀ v, φ v) :
-    boxSat F φ w :=
-  fun v _ => hAll v
+/-- Path-based diamond: true at some path-reachable world -/
+def pathDiamond (φ : ModalProp) : ModalProp :=
+  fun w => ∃ v, Nonempty (AccPath w v) ∧ φ v
 
-/-- 3. □ over conjunction. -/
-theorem boxConj (F : KFrame) (φ ψ : World → Prop) (w : World)
-    (hPhi : boxSat F φ w) (hPsi : boxSat F ψ w) :
-    boxSat F (fun v => φ v ∧ ψ v) w :=
-  fun v hAcc => ⟨hPhi v hAcc, hPsi v hAcc⟩
+-- ============================================================
+-- SECTION 3: Frame Properties as Path Properties
+-- ============================================================
 
-/-- 4. □(φ∧ψ) → □φ. -/
-theorem boxConjLeft (F : KFrame) (φ ψ : World → Prop) (w : World)
-    (h : boxSat F (fun v => φ v ∧ ψ v) w) :
-    boxSat F φ w :=
-  fun v hAcc => (h v hAcc).1
+/-- Reflexive frame: every world accesses itself -/
+def FrameReflexive (R : World → World → Prop) : Prop :=
+  ∀ w, R w w
 
-/-- 5. □(φ∧ψ) → □ψ. -/
-theorem boxConjRight (F : KFrame) (φ ψ : World → Prop) (w : World)
-    (h : boxSat F (fun v => φ v ∧ ψ v) w) :
-    boxSat F ψ w :=
-  fun v hAcc => (h v hAcc).2
+/-- Transitive frame -/
+def FrameTransitive (R : World → World → Prop) : Prop :=
+  ∀ w v u, R w v → R v u → R w u
 
-/-! ## Axiom T: Reflexivity ↔ □φ → φ -/
+/-- Symmetric frame -/
+def FrameSymmetric (R : World → World → Prop) : Prop :=
+  ∀ w v, R w v → R v w
 
-/-- 6. Axiom T forward: reflexive ⊢ □φ → φ. -/
-theorem axiomT_forward (F : KFrame) (hRefl : ∀ w, F.acc w w)
-    (φ : World → Prop) (w : World) (hBox : boxSat F φ w) : φ w :=
-  hBox w (hRefl w)
+/-- Euclidean frame -/
+def FrameEuclidean (R : World → World → Prop) : Prop :=
+  ∀ w v u, R w v → R w u → R v u
 
-/-- 7. Axiom T converse: if □φ→φ for all φ, frame is reflexive. -/
-theorem axiomT_converse (F : KFrame)
-    (hT : ∀ (φ : World → Prop) (w : World), boxSat F φ w → φ w) :
-    ∀ w, F.acc w w :=
-  fun w => hT (F.acc w) w (fun v hAcc => hAcc)
+/-- Serial frame -/
+def FrameSerial (R : World → World → Prop) : Prop :=
+  ∀ w, ∃ v, R w v
 
-/-! ## Axiom 4: Transitivity ↔ □φ → □□φ -/
+-- ============================================================
+-- SECTION 4: Axiom Scheme Proofs
+-- ============================================================
 
-/-- 8. Axiom 4 forward: transitive ⊢ □φ → □□φ. -/
-theorem axiom4_forward (F : KFrame) (hTrans : ∀ w v u, F.acc w v → F.acc v u → F.acc w u)
-    (φ : World → Prop) (w : World) (hBox : boxSat F φ w) :
-    boxSat F (boxSat F φ) w := by
-  intro v hWV u hVU
-  exact hBox u (hTrans w v u hWV hVU)
+/-- K axiom: □(φ → ψ) → □φ → □ψ -/
+theorem axiom_K (R : World → World → Prop) (φ ψ : ModalProp) (w : World)
+    (h1 : boxProp R (fun v => φ v → ψ v) w) (h2 : boxProp R φ w)
+    : boxProp R ψ w :=
+  fun v hR => h1 v hR (h2 v hR)
 
-/-- 9. □φ → □□φ implies transitivity at any specific triple (given box hyps).
-    Multi-step: apply axiom 4 to the specific formula F.acc · u. -/
-theorem axiom4_specific (F : KFrame) (hTrans : ∀ w v u, F.acc w v → F.acc v u → F.acc w u)
-    (φ : World → Prop) (w v u : World)
-    (hWV : F.acc w v) (hVU : F.acc v u) (hBox : boxSat F φ w) : φ u :=
-  hBox u (hTrans w v u hWV hVU)
-
-/-! ## Axiom B: Symmetry ↔ φ → □◇φ -/
-
-/-- 10. Axiom B forward: symmetric ⊢ φ → □◇φ. -/
-theorem axiomB_forward (F : KFrame) (hSymm : ∀ w v, F.acc w v → F.acc v w)
-    (φ : World → Prop) (w : World) (hPhi : φ w) :
-    boxSat F (diaSat F φ) w := by
-  intro v hAcc
-  exact ⟨w, hSymm w v hAcc, hPhi⟩
-
-/-- 11. Axiom B converse: if φ→□◇φ for all φ, frame is symmetric. -/
-theorem axiomB_converse (F : KFrame)
-    (hB : ∀ (φ : World → Prop) (w : World), φ w → boxSat F (diaSat F φ) w)
-    (w v : World) (hAcc : F.acc w v) :
-    F.acc v w := by
-  have h := hB (fun x => x = w) w rfl v hAcc
-  obtain ⟨u, hVU, hEq⟩ := h
-  subst hEq
-  exact hVU
-
-/-! ## S4 = T + 4 -/
-
-/-- 12. S4-T with extra transitivity hyp for context. -/
-theorem s4_T (F : KFrame) (hRefl : ∀ w, F.acc w w)
-    (_hTrans : ∀ w v u, F.acc w v → F.acc v u → F.acc w u)
-    (φ : World → Prop) (w : World) (hBox : boxSat F φ w) : φ w :=
-  hBox w (hRefl w)
-
-/-- 13. S4: □φ → □□φ (4 part). -/
-theorem s4_4 (F : KFrame) (hTrans : ∀ w v u, F.acc w v → F.acc v u → F.acc w u)
-    (φ : World → Prop) (w : World) (hBox : boxSat F φ w) :
-    boxSat F (boxSat F φ) w := by
-  intro v hWV u hVU
-  exact hBox u (hTrans w v u hWV hVU)
-
-/-- 14. S4: □φ → □□□φ by iterating. -/
-theorem s4_iterated_box (F : KFrame)
-    (hRefl : ∀ w, F.acc w w)
-    (hTrans : ∀ w v u, F.acc w v → F.acc v u → F.acc w u)
-    (φ : World → Prop) (w : World) (hBox : boxSat F φ w) :
-    boxSat F (boxSat F (boxSat F φ)) w := by
-  intro v1 h1 v2 h2 v3 h3
-  have h12 := hTrans v1 v2 v3 h2 h3
-  have hw3 := hTrans w v1 v3 h1 h12
-  exact hBox v3 hw3
-
-/-! ## S5 = T + 4 + B -/
-
-/-- 15. S5: □φ → φ. -/
-theorem s5_T (F : KFrame) (hRefl : ∀ w, F.acc w w)
-    (φ : World → Prop) (w : World) (hBox : boxSat F φ w) : φ w :=
-  hBox w (hRefl w)
-
-/-- 16. S5: φ → □◇φ. -/
-theorem s5_B (F : KFrame) (hSymm : ∀ w v, F.acc w v → F.acc v w)
-    (φ : World → Prop) (w : World) (hPhi : φ w) :
-    boxSat F (diaSat F φ) w := by
-  intro v hAcc
-  exact ⟨w, hSymm w v hAcc, hPhi⟩
-
-/-- 17. S5: ◇φ → □◇φ (diamond propagates through equivalence class). -/
-theorem s5_dia_to_box_dia (F : KFrame)
-    (hSymm : ∀ w v, F.acc w v → F.acc v w)
-    (hTrans : ∀ w v u, F.acc w v → F.acc v u → F.acc w u)
-    (φ : World → Prop) (w : World) (hDia : diaSat F φ w) :
-    boxSat F (diaSat F φ) w := by
-  obtain ⟨u, hWU, hPhi_u⟩ := hDia
-  intro v hWV
-  have hVW := hSymm w v hWV
-  have hVU := hTrans v w u hVW hWU
-  exact ⟨u, hVU, hPhi_u⟩
-
-/-- 18. S5: □◇φ → ◇φ (by reflexivity). -/
-theorem s5_box_dia_to_dia (F : KFrame) (hRefl : ∀ w, F.acc w w)
-    (φ : World → Prop) (w : World)
-    (h : boxSat F (diaSat F φ) w) : diaSat F φ w :=
+/-- T axiom: □φ → φ (requires reflexivity) -/
+theorem axiom_T (R : World → World → Prop) (hRefl : FrameReflexive R)
+    (φ : ModalProp) (w : World) (h : boxProp R φ w) : φ w :=
   h w (hRefl w)
 
-/-- 19. S5: □φ → ◇φ. -/
-theorem s5_box_to_dia (F : KFrame) (hRefl : ∀ w, F.acc w w)
-    (φ : World → Prop) (w : World) (hBox : boxSat F φ w) :
-    diaSat F φ w :=
-  ⟨w, hRefl w, hBox w (hRefl w)⟩
+/-- 4 axiom: □φ → □□φ (requires transitivity) -/
+theorem axiom_4 (R : World → World → Prop) (hTrans : FrameTransitive R)
+    (φ : ModalProp) (w : World) (h : boxProp R φ w) : boxProp R (boxProp R φ) w :=
+  fun v hWV u hVU => h u (hTrans w v u hWV hVU)
 
-/-- 20. S5: ◇□φ → □φ (key S5 reduction). -/
-theorem s5_dia_box_to_box (F : KFrame)
-    (hSymm : ∀ w v, F.acc w v → F.acc v w)
-    (hTrans : ∀ w v u, F.acc w v → F.acc v u → F.acc w u)
-    (φ : World → Prop) (w : World)
-    (h : diaSat F (boxSat F φ) w) :
-    boxSat F φ w := by
-  obtain ⟨u, hWU, hBox_u⟩ := h
-  intro v hWV
-  have hUV := hTrans u w v (hSymm w u hWU) hWV
-  exact hBox_u v hUV
+/-- B axiom: φ → □◇φ (requires symmetry) -/
+theorem axiom_B (R : World → World → Prop) (hSym : FrameSymmetric R)
+    (φ : ModalProp) (w : World) (h : φ w) : boxProp R (diamondProp R φ) w :=
+  fun v hWV => ⟨w, hSym w v hWV, h⟩
 
-/-- 21. S5: ◇□φ → □◇φ (combining 20 + 17). -/
-theorem s5_dia_box_to_box_dia (F : KFrame)
-    (hRefl : ∀ w, F.acc w w)
-    (hSymm : ∀ w v, F.acc w v → F.acc v w)
-    (hTrans : ∀ w v u, F.acc w v → F.acc v u → F.acc w u)
-    (φ : World → Prop) (w : World)
-    (h : diaSat F (boxSat F φ) w) :
-    boxSat F (diaSat F φ) w := by
-  have hBox := s5_dia_box_to_box F hSymm hTrans φ w h
-  intro v hAcc
-  exact ⟨v, hRefl v, hBox v hAcc⟩
+/-- 5 axiom: ◇φ → □◇φ (requires Euclidean) -/
+theorem axiom_5 (R : World → World → Prop) (hEuc : FrameEuclidean R)
+    (φ : ModalProp) (w : World) (h : diamondProp R φ w) : boxProp R (diamondProp R φ) w :=
+  fun v hWV => match h with
+  | ⟨u, hWU, hφU⟩ => ⟨u, hEuc w v u hWV hWU, hφU⟩
 
-/-! ## Bisimulation via Path Correspondence -/
+/-- Dual: □φ ↔ ¬◇¬φ -/
+theorem box_diamond_dual (R : World → World → Prop) (φ : ModalProp) (w : World)
+    : boxProp R φ w ↔ ¬ diamondProp R (fun v => ¬ φ v) w :=
+  ⟨fun hBox ⟨v, hR, hNeg⟩ => hNeg (hBox v hR),
+   fun hNDia v hR => Classical.byContradiction fun hc => hNDia ⟨v, hR, hc⟩⟩
 
-/-- A bisimulation between two frames. -/
-structure Bisimulation (F₁ F₂ : KFrame) where
+/-- D axiom: □φ → ◇φ (requires seriality) -/
+theorem axiom_D (R : World → World → Prop) (hSer : FrameSerial R)
+    (φ : ModalProp) (w : World) (h : boxProp R φ w) : diamondProp R φ w :=
+  match hSer w with
+  | ⟨v, hR⟩ => ⟨v, hR, h v hR⟩
+
+-- ============================================================
+-- SECTION 5: S5 = Reflexive + Symmetric + Transitive (Equivalence)
+-- ============================================================
+
+/-- Symmetric + transitive implies Euclidean -/
+theorem sym_trans_euclidean (R : World → World → Prop)
+    (hSym : FrameSymmetric R) (hTrans : FrameTransitive R)
+    : FrameEuclidean R :=
+  fun w v u hWV hWU => hTrans v w u (hSym w v hWV) hWU
+
+/-- In S5, □φ → □□φ -/
+theorem S5_box_idempotent (R : World → World → Prop)
+    (_hRefl : FrameReflexive R) (_hSym : FrameSymmetric R) (hTrans : FrameTransitive R)
+    (φ : ModalProp) (w : World) (h : boxProp R φ w) : boxProp R (boxProp R φ) w :=
+  axiom_4 R hTrans φ w h
+
+/-- In S5, ◇φ → □◇φ -/
+theorem S5_diamond_box (R : World → World → Prop)
+    (_hRefl : FrameReflexive R) (hSym : FrameSymmetric R) (hTrans : FrameTransitive R)
+    (φ : ModalProp) (w : World) (h : diamondProp R φ w) : boxProp R (diamondProp R φ) w :=
+  axiom_5 R (sym_trans_euclidean R hSym hTrans) φ w h
+
+/-- In S5, ◇□φ → □φ -/
+theorem S5_diamond_box_collapse (R : World → World → Prop)
+    (_hRefl : FrameReflexive R) (hSym : FrameSymmetric R) (hTrans : FrameTransitive R)
+    (φ : ModalProp) (w : World) (h : diamondProp R (boxProp R φ) w) : boxProp R φ w :=
+  fun v hWV => match h with
+  | ⟨u, hWU, hBoxU⟩ => hBoxU v (hTrans u w v (hSym w u hWU) hWV)
+
+/-- In S5, ◇□φ → φ -/
+theorem S5_diamond_box_to_val (R : World → World → Prop)
+    (hRefl : FrameReflexive R) (hSym : FrameSymmetric R) (hTrans : FrameTransitive R)
+    (φ : ModalProp) (w : World) (h : diamondProp R (boxProp R φ) w) : φ w :=
+  axiom_T R hRefl φ w (S5_diamond_box_collapse R hRefl hSym hTrans φ w h)
+
+-- ============================================================
+-- SECTION 6: Path-based Modal Logic Theorems
+-- ============================================================
+
+/-- pathBox distributes over conjunction -/
+theorem pathBox_and (φ ψ : ModalProp) (w : World)
+    (h1 : pathBox φ w) (h2 : pathBox ψ w)
+    : pathBox (fun v => φ v ∧ ψ v) w :=
+  fun v p => ⟨h1 v p, h2 v p⟩
+
+/-- pathBox is monotone -/
+theorem pathBox_mono (φ ψ : ModalProp) (w : World)
+    (hImp : ∀ v, φ v → ψ v) (h : pathBox φ w) : pathBox ψ w :=
+  fun v p => hImp v (h v p)
+
+/-- pathDiamond is monotone -/
+theorem pathDiamond_mono (φ ψ : ModalProp) (w : World)
+    (hImp : ∀ v, φ v → ψ v) (h : pathDiamond φ w) : pathDiamond ψ w :=
+  match h with
+  | ⟨v, p, hφ⟩ => ⟨v, p, hImp v hφ⟩
+
+/-- pathBox implies value at self (via nil path) -/
+theorem pathBox_refl (φ : ModalProp) (w : World) (h : pathBox φ w) : φ w :=
+  h w ⟨AccPath.nil w⟩
+
+/-- pathBox transitive: if pathBox (pathBox φ) w then pathBox φ w -/
+theorem pathBox_trans (φ : ModalProp) (w : World)
+    (h : pathBox (pathBox φ) w) : pathBox φ w :=
+  fun v p => h v p v ⟨AccPath.nil v⟩
+
+/-- pathDiamond from self -/
+theorem pathDiamond_self (φ : ModalProp) (w : World)
+    (h : φ w) : pathDiamond φ w :=
+  ⟨w, ⟨AccPath.nil w⟩, h⟩
+
+-- ============================================================
+-- SECTION 7: Bisimulation via Path Correspondence
+-- ============================================================
+
+/-- A bisimulation relation between two Kripke frames -/
+structure Bisimulation (R₁ R₂ : World → World → Prop) where
   rel : World → World → Prop
-  atomPres : ∀ w₁ w₂, rel w₁ w₂ → w₁.val = w₂.val
-  forth : ∀ w₁ w₂ v₁, rel w₁ w₂ → F₁.acc w₁ v₁ →
-    ∃ v₂, F₂.acc w₂ v₂ ∧ rel v₁ v₂
-  back : ∀ w₁ w₂ v₂, rel w₁ w₂ → F₂.acc w₂ v₂ →
-    ∃ v₁, F₁.acc w₁ v₁ ∧ rel v₁ v₂
+  forth : ∀ w₁ w₂, rel w₁ w₂ → ∀ v₁, R₁ w₁ v₁ → ∃ v₂, R₂ w₂ v₂ ∧ rel v₁ v₂
+  back : ∀ w₁ w₂, rel w₁ w₂ → ∀ v₂, R₂ w₂ v₂ → ∃ v₁, R₁ w₁ v₁ ∧ rel v₁ v₂
 
-/-- 22. Bisimulation preserves □ satisfaction. -/
-theorem bisim_preserves_box (F₁ F₂ : KFrame) (B : Bisimulation F₁ F₂)
-    (φ : World → Prop) (hInv : ∀ w₁ w₂, B.rel w₁ w₂ → (φ w₁ ↔ φ w₂))
-    (w₁ w₂ : World) (hRel : B.rel w₁ w₂) (hBox : boxSat F₁ φ w₁) :
-    boxSat F₂ φ w₂ := by
-  intro v₂ hAcc₂
-  obtain ⟨v₁, hAcc₁, hRel_v⟩ := B.back w₁ w₂ v₂ hRel hAcc₂
-  exact (hInv v₁ v₂ hRel_v).mp (hBox v₁ hAcc₁)
+/-- Bisimulation preserves box (forth direction) -/
+theorem bisim_preserves_box (R₁ R₂ : World → World → Prop)
+    (B : Bisimulation R₁ R₂) (φ₁ φ₂ : ModalProp)
+    (hAtom : ∀ w₁ w₂, B.rel w₁ w₂ → (φ₁ w₁ ↔ φ₂ w₂))
+    (w₁ w₂ : World) (hRel : B.rel w₁ w₂)
+    (h : boxProp R₁ φ₁ w₁) : boxProp R₂ φ₂ w₂ :=
+  fun v₂ hR₂ =>
+    match B.back w₁ w₂ hRel v₂ hR₂ with
+    | ⟨v₁, hR₁, hRelV⟩ => (hAtom v₁ v₂ hRelV).mp (h v₁ hR₁)
 
-/-- 23. Bisimulation preserves ◇ satisfaction. -/
-theorem bisim_preserves_dia (F₁ F₂ : KFrame) (B : Bisimulation F₁ F₂)
-    (φ : World → Prop) (hInv : ∀ w₁ w₂, B.rel w₁ w₂ → (φ w₁ ↔ φ w₂))
-    (w₁ w₂ : World) (hRel : B.rel w₁ w₂) (hDia : diaSat F₁ φ w₁) :
-    diaSat F₂ φ w₂ := by
-  obtain ⟨v₁, hAcc₁, hPhi₁⟩ := hDia
-  obtain ⟨v₂, hAcc₂, hRel_v⟩ := B.forth w₁ w₂ v₁ hRel hAcc₁
-  exact ⟨v₂, hAcc₂, (hInv v₁ v₂ hRel_v).mp hPhi₁⟩
+/-- Bisimulation preserves diamond -/
+theorem bisim_preserves_diamond (R₁ R₂ : World → World → Prop)
+    (B : Bisimulation R₁ R₂) (φ₁ φ₂ : ModalProp)
+    (hAtom : ∀ w₁ w₂, B.rel w₁ w₂ → (φ₁ w₁ ↔ φ₂ w₂))
+    (w₁ w₂ : World) (hRel : B.rel w₁ w₂)
+    (h : diamondProp R₁ φ₁ w₁) : diamondProp R₂ φ₂ w₂ :=
+  match h with
+  | ⟨v₁, hR₁, hφ₁⟩ =>
+    match B.forth w₁ w₂ hRel v₁ hR₁ with
+    | ⟨v₂, hR₂, hRelV⟩ => ⟨v₂, hR₂, (hAtom v₁ v₂ hRelV).mp hφ₁⟩
 
-/-- 24. Identity bisimulation. -/
-def bisimId (F : KFrame) : Bisimulation F F where
-  rel w₁ w₂ := w₁ = w₂
-  atomPres _ _ h := _root_.congrArg World.val h
-  forth w₁ w₂ v₁ hEq hAcc := by subst hEq; exact ⟨v₁, hAcc, rfl⟩
-  back  w₁ w₂ v₂ hEq hAcc := by subst hEq; exact ⟨v₂, hAcc, rfl⟩
+-- ============================================================
+-- SECTION 8: Frame Correspondence Results
+-- ============================================================
 
-/-- 25. Bisimulation composition. -/
-def bisimCompose (F₁ F₂ F₃ : KFrame)
-    (B₁ : Bisimulation F₁ F₂) (B₂ : Bisimulation F₂ F₃) :
-    Bisimulation F₁ F₃ where
-  rel w₁ w₃ := ∃ w₂, B₁.rel w₁ w₂ ∧ B₂.rel w₂ w₃
-  atomPres w₁ w₃ := by
-    intro ⟨w₂, hR₁, hR₂⟩
-    exact (B₁.atomPres w₁ w₂ hR₁).trans (B₂.atomPres w₂ w₃ hR₂)
-  forth w₁ w₃ v₁ := by
-    intro ⟨w₂, hR₁, hR₂⟩ hAcc₁
-    obtain ⟨v₂, hAcc₂, hR₁_v⟩ := B₁.forth w₁ w₂ v₁ hR₁ hAcc₁
-    obtain ⟨v₃, hAcc₃, hR₂_v⟩ := B₂.forth w₂ w₃ v₂ hR₂ hAcc₂
-    exact ⟨v₃, hAcc₃, v₂, hR₁_v, hR₂_v⟩
-  back w₁ w₃ v₃ := by
-    intro ⟨w₂, hR₁, hR₂⟩ hAcc₃
-    obtain ⟨v₂, hAcc₂, hR₂_v⟩ := B₂.back w₂ w₃ v₃ hR₂ hAcc₃
-    obtain ⟨v₁, hAcc₁, hR₁_v⟩ := B₁.back w₁ w₂ v₂ hR₁ hAcc₂
-    exact ⟨v₁, hAcc₁, v₂, hR₁_v, hR₂_v⟩
+/-- Reflexive frames validate T -/
+theorem refl_validates_T (R : World → World → Prop) (hRefl : FrameReflexive R)
+    : ∀ φ : ModalProp, ∀ w, boxProp R φ w → φ w :=
+  fun φ w h => h w (hRefl w)
 
-/-! ## Temporal Operators via Path Sequences -/
+/-- Transitive frames validate 4 -/
+theorem trans_validates_4 (R : World → World → Prop) (hTrans : FrameTransitive R)
+    : ∀ φ : ModalProp, ∀ w, boxProp R φ w → boxProp R (boxProp R φ) w :=
+  fun _φ w h v hWV u hVU => h u (hTrans w v u hWV hVU)
 
-/-- A finite accessibility chain. -/
-structure AccChain (F : KFrame) where
-  worlds : List World
-  linked : ∀ i : Fin (worlds.length - 1),
-    F.acc (worlds.get ⟨i.val, by omega⟩) (worlds.get ⟨i.val + 1, by omega⟩)
+/-- Symmetric frames validate B -/
+theorem sym_validates_B (R : World → World → Prop) (hSym : FrameSymmetric R)
+    : ∀ φ : ModalProp, ∀ w, φ w → boxProp R (diamondProp R φ) w :=
+  fun _φ w h v hWV => ⟨w, hSym w v hWV, h⟩
 
-/-- φ Until ψ along a chain. -/
-def untilChain (F : KFrame) (φ ψ : World → Prop) (ch : AccChain F) : Prop :=
-  ∃ k : Fin ch.worlds.length,
-    ψ (ch.worlds.get k) ∧
-    ∀ j : Fin ch.worlds.length, j.val < k.val → φ (ch.worlds.get j)
+-- ============================================================
+-- SECTION 9: Temporal Operators via Paths
+-- ============================================================
 
-/-- φ Since ψ along a chain. -/
-def sinceChain (F : KFrame) (φ ψ : World → Prop) (ch : AccChain F) : Prop :=
-  ∃ k : Fin ch.worlds.length,
-    ψ (ch.worlds.get k) ∧
-    ∀ j : Fin ch.worlds.length, k.val < j.val → φ (ch.worlds.get j)
+/-- Until: φ holds until ψ along some path -/
+inductive Until (R : World → World → Prop) (φ ψ : ModalProp) : World → Prop where
+  | here : ∀ w, ψ w → Until R φ ψ w
+  | step : ∀ w v, φ w → R w v → Until R φ ψ v → Until R φ ψ w
 
-/-- 26. Until implies ψ eventually. -/
-theorem until_eventually (F : KFrame) (φ ψ : World → Prop) (ch : AccChain F)
-    (hUntil : untilChain F φ ψ ch) :
-    ∃ k : Fin ch.worlds.length, ψ (ch.worlds.get k) := by
-  obtain ⟨k, hPsi, _⟩ := hUntil
-  exact ⟨k, hPsi⟩
+/-- Since: φ held since ψ (backward temporal) -/
+inductive Since (R : World → World → Prop) (φ ψ : ModalProp) : World → Prop where
+  | here : ∀ w, ψ w → Since R φ ψ w
+  | step : ∀ w v, φ w → R v w → Since R φ ψ v → Since R φ ψ w
 
-/-- 27. Since implies ψ was true. -/
-theorem since_sometime (F : KFrame) (φ ψ : World → Prop) (ch : AccChain F)
-    (hSince : sinceChain F φ ψ ch) :
-    ∃ k : Fin ch.worlds.length, ψ (ch.worlds.get k) := by
-  obtain ⟨k, hPsi, _⟩ := hSince
-  exact ⟨k, hPsi⟩
+/-- Eventually = True Until ψ -/
+def Eventually (R : World → World → Prop) (ψ : ModalProp) : World → Prop :=
+  Until R (fun _ => True) ψ
 
-/-- 28. Until implies φ at position 0 (when ψ not at 0). -/
-theorem until_phi_at_zero (F : KFrame) (φ ψ : World → Prop) (ch : AccChain F)
-    (hUntil : untilChain F φ ψ ch)
-    (hLen : 0 < ch.worlds.length)
-    (hNonZero : ∀ k : Fin ch.worlds.length, ψ (ch.worlds.get k) → 0 < k.val) :
-    φ (ch.worlds.get ⟨0, hLen⟩) := by
-  obtain ⟨k, hPsi, hBefore⟩ := hUntil
-  exact hBefore ⟨0, hLen⟩ (hNonZero k hPsi)
+/-- Always = ¬Eventually ¬φ -/
+def Always (R : World → World → Prop) (φ : ModalProp) : World → Prop :=
+  fun w => ¬ Eventually R (fun v => ¬ φ v) w
 
-/-! ## Access Path Algebra -/
+/-- Until is monotone in the goal -/
+theorem until_mono_right (R : World → World → Prop) (φ ψ₁ ψ₂ : ModalProp)
+    (hImp : ∀ v, ψ₁ v → ψ₂ v) (w : World) (h : Until R φ ψ₁ w) : Until R φ ψ₂ w := by
+  induction h with
+  | here w hw => exact Until.here w (hImp w hw)
+  | step w v hw hR _ ih => exact Until.step w v hw hR ih
 
-/-- 29. Self-access compose: result is trans of two refls. -/
-theorem selfAccess_compose_self (w : World) :
-    (Access.compose (Access.selfAccess w) (Access.selfAccess w)).idPath =
-    Path.trans (Path.refl w.id) (Path.refl w.id) := rfl
+/-- Until: if ψ already holds, Until φ ψ holds -/
+theorem until_of_goal (R : World → World → Prop) (φ ψ : ModalProp) (w : World)
+    (h : ψ w) : Until R φ ψ w :=
+  Until.here w h
 
-/-- 30. Compose is associative. -/
-theorem access_compose_assoc {w v u t : World}
-    (a1 : Access w v) (a2 : Access v u) (a3 : Access u t) :
-    (Access.compose (Access.compose a1 a2) a3).idPath =
-    Path.trans (Path.trans a1.idPath a2.idPath) a3.idPath := rfl
+/-- Eventually is weaker than Until -/
+theorem eventually_of_until (R : World → World → Prop) (φ ψ : ModalProp) (w : World)
+    (h : Until R φ ψ w) : Eventually R ψ w := by
+  induction h with
+  | here w hw => exact Until.here w hw
+  | step w v _ hR _ ih => exact Until.step w v trivial hR ih
 
-/-- 31. Reassociated composition agrees at toEq. -/
-theorem access_compose_assoc_eq {w v u t : World}
-    (a1 : Access w v) (a2 : Access v u) (a3 : Access u t) :
-    (Access.compose (Access.compose a1 a2) a3).idPath.toEq =
-    (Access.compose a1 (Access.compose a2 a3)).idPath.toEq := by
-  simp [Access.compose]
+/-- Until preserves through transitivity step -/
+theorem until_step_trans (R : World → World → Prop) (φ ψ : ModalProp) (w v u : World)
+    (hw : φ w) (hR1 : R w v) (hv : φ v) (hR2 : R v u) (hu : Until R φ ψ u)
+    : Until R φ ψ w :=
+  Until.step w v hw hR1 (Until.step v u hv hR2 hu)
 
-/-- 32. Reverse of selfAccess is selfAccess at toEq. -/
-theorem reverse_selfAccess (w : World) :
-    (Access.reverse (Access.selfAccess w)).idPath.toEq =
-    (Access.selfAccess w).idPath.toEq := by
-  simp [Access.reverse, Access.selfAccess]
+/-- Since is monotone in the goal -/
+theorem since_mono_right (R : World → World → Prop) (φ ψ₁ ψ₂ : ModalProp)
+    (hImp : ∀ v, ψ₁ v → ψ₂ v) (w : World) (h : Since R φ ψ₁ w) : Since R φ ψ₂ w := by
+  induction h with
+  | here w hw => exact Since.here w (hImp w hw)
+  | step w v hw hR _ ih => exact Since.step w v hw hR ih
 
-/-- 33. Compose then reverse = symm(trans). -/
-theorem compose_reverse {w v u : World}
-    (a1 : Access w v) (a2 : Access v u) :
-    (Access.reverse (Access.compose a1 a2)).idPath =
-    Path.symm (Path.trans a1.idPath a2.idPath) := rfl
+-- ============================================================
+-- SECTION 10: Dynamic Logic via Paths
+-- ============================================================
 
-/-- 34. Double reverse restores path at toEq. -/
-theorem reverse_reverse_eq {w v : World} (a : Access w v) :
-    (Access.reverse (Access.reverse a)).idPath.toEq = a.idPath.toEq := by
-  simp [Access.reverse]
+/-- A program is a relation between worlds -/
+def Program := World → World → Prop
 
-/-- 35. Compose with reverse gives refl at toEq (right). -/
-theorem compose_reverse_self {w v : World} (a : Access w v) :
-    (Access.compose a (Access.reverse a)).idPath.toEq = (Path.refl w.id).toEq := by
-  simp [Access.compose, Access.reverse]
+/-- Sequential composition -/
+def Program.seq (α β : Program) : Program :=
+  fun w u => ∃ v, α w v ∧ β v u
 
-/-- 36. Reverse compose with original gives refl at toEq (left). -/
-theorem reverse_compose_self {w v : World} (a : Access w v) :
-    (Access.compose (Access.reverse a) a).idPath.toEq = (Path.refl v.id).toEq := by
-  simp [Access.compose, Access.reverse]
+/-- Choice -/
+def Program.choice (α β : Program) : Program :=
+  fun w v => α w v ∨ β w v
 
-/-! ## Monotonicity and Structural Properties -/
+/-- Iteration (reflexive-transitive closure) -/
+inductive Program.star (α : Program) : Program where
+  | refl : ∀ w, Program.star α w w
+  | step : ∀ w v u, α w v → Program.star α v u → Program.star α w u
 
-/-- 37. □ is monotone. -/
-theorem box_monotone (F : KFrame) (φ ψ : World → Prop)
-    (hImp : ∀ w, φ w → ψ w) (w : World) (hBox : boxSat F φ w) :
-    boxSat F ψ w :=
-  fun v hAcc => hImp v (hBox v hAcc)
+/-- Test program -/
+def Program.test (φ : ModalProp) : Program :=
+  fun w v => w = v ∧ φ w
 
-/-- 38. ◇ is monotone. -/
-theorem dia_monotone (F : KFrame) (φ ψ : World → Prop)
-    (hImp : ∀ w, φ w → ψ w) (w : World) (hDia : diaSat F φ w) :
-    diaSat F ψ w := by
-  obtain ⟨v, hAcc, hPhi⟩ := hDia
-  exact ⟨v, hAcc, hImp v hPhi⟩
+/-- Dynamic box: [α]φ -/
+def dynBox (α : Program) (φ : ModalProp) : ModalProp :=
+  fun w => ∀ v, α w v → φ v
 
-/-- 39. ◇(φ ∨ ψ) → ◇φ ∨ ◇ψ. -/
-theorem dia_or (F : KFrame) (φ ψ : World → Prop) (w : World)
-    (h : diaSat F (fun v => φ v ∨ ψ v) w) :
-    diaSat F φ w ∨ diaSat F ψ w := by
-  obtain ⟨v, hAcc, hOr⟩ := h
-  exact hOr.elim (fun hp => Or.inl ⟨v, hAcc, hp⟩) (fun hq => Or.inr ⟨v, hAcc, hq⟩)
+/-- Dynamic diamond: ⟨α⟩φ -/
+def dynDiamond (α : Program) (φ : ModalProp) : ModalProp :=
+  fun w => ∃ v, α w v ∧ φ v
 
-/-- 40. ◇φ ∨ ◇ψ → ◇(φ ∨ ψ). -/
-theorem or_dia (F : KFrame) (φ ψ : World → Prop) (w : World)
-    (h : diaSat F φ w ∨ diaSat F ψ w) :
-    diaSat F (fun v => φ v ∨ ψ v) w := by
-  rcases h with ⟨v, hAcc, hp⟩ | ⟨v, hAcc, hq⟩
-  · exact ⟨v, hAcc, Or.inl hp⟩
-  · exact ⟨v, hAcc, Or.inr hq⟩
+/-- [α;β]φ ↔ [α][β]φ -/
+theorem dynBox_seq (α β : Program) (φ : ModalProp) (w : World)
+    : dynBox (α.seq β) φ w ↔ dynBox α (dynBox β φ) w :=
+  ⟨fun h v hαv u hβu => h u ⟨v, hαv, hβu⟩,
+   fun h u ⟨v, hαv, hβu⟩ => h v hαv u hβu⟩
 
-/-- 41. □⊤ is always true. -/
-theorem box_top (F : KFrame) (w : World) :
-    boxSat F (fun _ => True) w :=
-  fun _ _ => trivial
+/-- [α∪β]φ ↔ [α]φ ∧ [β]φ -/
+theorem dynBox_choice (α β : Program) (φ : ModalProp) (w : World)
+    : dynBox (α.choice β) φ w ↔ dynBox α φ w ∧ dynBox β φ w :=
+  ⟨fun h => ⟨fun v hα => h v (Or.inl hα), fun v hβ => h v (Or.inr hβ)⟩,
+   fun ⟨hα, hβ⟩ v hOr => hOr.elim (fun h => hα v h) (fun h => hβ v h)⟩
 
-/-- 42. ◇⊥ is always false. -/
-theorem dia_bot_false (F : KFrame) (w : World) :
-    ¬ diaSat F (fun _ => False) w :=
-  fun ⟨_, _, hF⟩ => hF
+/-- [φ?]ψ ↔ φ → ψ (at same world) -/
+theorem dynBox_test (φ ψ : ModalProp) (w : World)
+    : dynBox (Program.test φ) ψ w ↔ (φ w → ψ w) :=
+  ⟨fun h hφ => h w ⟨rfl, hφ⟩,
+   fun h v ⟨hEq, hφ⟩ => hEq ▸ h hφ⟩
 
-/-! ## Graded Modalities -/
+/-- ⟨α;β⟩φ ↔ ⟨α⟩⟨β⟩φ -/
+theorem dynDiamond_seq (α β : Program) (φ : ModalProp) (w : World)
+    : dynDiamond (α.seq β) φ w ↔ dynDiamond α (dynDiamond β φ) w :=
+  ⟨fun ⟨u, ⟨v, hαv, hβu⟩, hφ⟩ => ⟨v, hαv, u, hβu, hφ⟩,
+   fun ⟨v, hαv, u, hβu, hφ⟩ => ⟨u, ⟨v, hαv, hβu⟩, hφ⟩⟩
 
-/-- n-fold box. -/
-def boxN (F : KFrame) : Nat → (World → Prop) → (World → Prop)
-  | 0, φ => φ
-  | n + 1, φ => boxSat F (boxN F n φ)
+/-- [α*]φ → φ (star includes refl) -/
+theorem dynBox_star_refl (α : Program) (φ : ModalProp) (w : World)
+    (h : dynBox (Program.star α) φ w) : φ w :=
+  h w (Program.star.refl w)
 
-/-- 43. □⁰ = identity. -/
-theorem boxN_zero (F : KFrame) (φ : World → Prop) (w : World) :
-    boxN F 0 φ w = φ w := rfl
+/-- [α*]φ → [α][α*]φ -/
+theorem dynBox_star_step (α : Program) (φ : ModalProp) (w : World)
+    (h : dynBox (Program.star α) φ w)
+    : dynBox α (dynBox (Program.star α) φ) w :=
+  fun v hαv u hStar => h u (Program.star.step w v u hαv hStar)
 
-/-- 44. □¹ = □. -/
-theorem boxN_one (F : KFrame) (φ : World → Prop) (w : World) :
-    boxN F 1 φ w = boxSat F φ w := rfl
+/-- ⟨φ?⟩ψ ↔ φ ∧ ψ (at same world) -/
+theorem dynDiamond_test (φ ψ : ModalProp) (w : World)
+    : dynDiamond (Program.test φ) ψ w ↔ (φ w ∧ ψ w) :=
+  ⟨fun ⟨v, ⟨hEq, hφ⟩, hψ⟩ => ⟨hEq ▸ hφ, hEq ▸ hψ⟩,
+   fun ⟨hφ, hψ⟩ => ⟨w, ⟨rfl, hφ⟩, hψ⟩⟩
 
-/-- 45. In S4, □² → □. -/
-theorem s4_boxN_reduce (F : KFrame) (hRefl : ∀ w, F.acc w w)
-    (φ : World → Prop) (w : World) (h : boxN F 2 φ w) :
-    boxN F 1 φ w :=
-  fun v hAcc => h v hAcc v (hRefl v)
+/-- ⟨α∪β⟩φ ↔ ⟨α⟩φ ∨ ⟨β⟩φ -/
+theorem dynDiamond_choice (α β : Program) (φ : ModalProp) (w : World)
+    : dynDiamond (α.choice β) φ w ↔ dynDiamond α φ w ∨ dynDiamond β φ w :=
+  ⟨fun ⟨v, hOr, hφ⟩ => hOr.elim (fun h => Or.inl ⟨v, h, hφ⟩) (fun h => Or.inr ⟨v, h, hφ⟩),
+   fun h => h.elim (fun ⟨v, hα, hφ⟩ => ⟨v, Or.inl hα, hφ⟩) (fun ⟨v, hβ, hφ⟩ => ⟨v, Or.inr hβ, hφ⟩)⟩
 
-/-- 46. In S4, □ⁿ⁺¹ → □ for all n. -/
-theorem s4_boxN_collapse (F : KFrame) (hRefl : ∀ w, F.acc w w)
-    (φ : World → Prop) (w : World) (n : Nat) (h : boxN F (n + 1) φ w) :
-    boxSat F φ w := by
-  induction n with
-  | zero => exact h
-  | succ n ih =>
-    exact ih (fun v hAcc => h v hAcc v (hRefl v))
+-- ============================================================
+-- SECTION 11: Multi-modal Logic (Indexed Modalities)
+-- ============================================================
 
-/-! ## Duality -/
+/-- Multi-agent box -/
+def multiBox (R : Nat → World → World → Prop) (i : Nat) (φ : ModalProp) : ModalProp :=
+  fun w => ∀ v, R i w v → φ v
 
-/-- 47. □φ → ¬◇¬φ. -/
-theorem box_to_not_dia_neg (F : KFrame) (φ : World → Prop) (w : World)
-    (hBox : boxSat F φ w) : ¬ diaSat F (fun v => ¬ φ v) w :=
-  fun ⟨v, hAcc, hNeg⟩ => hNeg (hBox v hAcc)
+/-- Common knowledge: everyone knows, everyone knows everyone knows, etc. -/
+inductive CommonReach (R : Nat → World → World → Prop) (agents : List Nat) : World → World → Prop where
+  | refl : ∀ w, CommonReach R agents w w
+  | step : ∀ w v u i, i ∈ agents → R i w v → CommonReach R agents v u → CommonReach R agents w u
 
-/-- 48. ◇φ → ¬□¬φ. -/
-theorem dia_to_not_box_neg (F : KFrame) (φ : World → Prop) (w : World)
-    (hDia : diaSat F φ w) : ¬ boxSat F (fun v => ¬ φ v) w :=
-  fun hBox => let ⟨v, hAcc, hPhi⟩ := hDia; hBox v hAcc hPhi
+def CommonReach.trans' {R : Nat → World → World → Prop} {agents : List Nat}
+    {w v u : World} (h1 : CommonReach R agents w v) (h2 : CommonReach R agents v u) : CommonReach R agents w u := by
+  induction h1 with
+  | refl => exact h2
+  | step w' m _ i hi hR _ ih => exact CommonReach.step w' m u i hi hR (ih h2)
 
-/-! ## Transport of Modal Truth Along Paths -/
+def commonBox (R : Nat → World → World → Prop) (agents : List Nat) (φ : ModalProp) : ModalProp :=
+  fun w => ∀ v, CommonReach R agents w v → φ v
 
-/-- 49. CongrArg on box: path in formula space lifts to path in box space. -/
-theorem congrArg_box (F : KFrame) (φ : World → Prop) (w : World) :
-    Path.congrArg (fun f => boxSat F f w) (Path.refl φ) =
-    Path.refl (boxSat F φ w) := by simp
+/-- Common knowledge implies individual knowledge -/
+theorem common_implies_individual (R : Nat → World → World → Prop) (agents : List Nat)
+    (i : Nat) (hi : i ∈ agents) (φ : ModalProp) (w : World)
+    (h : commonBox R agents φ w) : multiBox R i φ w :=
+  fun v hR => h v (CommonReach.step w v v i hi hR (CommonReach.refl v))
 
-/-- 50. Transport refl on box is identity. -/
-theorem transport_box_refl (F : KFrame) (φ : World → Prop) (w : World)
-    (h : boxSat F φ w) :
-    Path.transport (D := fun w => boxSat F φ w) (Path.refl w) h = h := by simp
+/-- Common knowledge is self-referential -/
+theorem common_box_idempotent (R : Nat → World → World → Prop) (agents : List Nat)
+    (φ : ModalProp) (w : World)
+    (h : commonBox R agents φ w) : commonBox R agents (commonBox R agents φ) w :=
+  fun v hReach u hReach2 => h u (CommonReach.trans' hReach hReach2)
 
-end ModalPathDeep
-end Path
+-- ============================================================
+-- SECTION 12: Filtration and Finite Model Property
+-- ============================================================
+
+/-- Equivalence class of worlds under a set of formulas -/
+def worldEquiv (props : List ModalProp) (w v : World) : Prop :=
+  ∀ φ, φ ∈ props → (φ w ↔ φ v)
+
+/-- worldEquiv is reflexive -/
+theorem worldEquiv_refl (props : List ModalProp) (w : World)
+    : worldEquiv props w w :=
+  fun _ _ => Iff.rfl
+
+/-- worldEquiv is symmetric -/
+theorem worldEquiv_symm (props : List ModalProp) (w v : World)
+    (h : worldEquiv props w v) : worldEquiv props v w :=
+  fun φ hφ => (h φ hφ).symm
+
+/-- worldEquiv is transitive -/
+theorem worldEquiv_trans (props : List ModalProp) (w v u : World)
+    (h1 : worldEquiv props w v) (h2 : worldEquiv props v u)
+    : worldEquiv props w u :=
+  fun φ hφ => (h1 φ hφ).trans (h2 φ hφ)
+
+-- ============================================================
+-- SECTION 13: Additional Frame Properties and Theorems
+-- ============================================================
+
+/-- Euclidean + reflexive implies symmetric -/
+theorem euc_refl_sym (R : World → World → Prop)
+    (hEuc : FrameEuclidean R) (hRefl : FrameReflexive R)
+    : FrameSymmetric R :=
+  fun w v hWV => hEuc w v w hWV (hRefl w)
+
+/-- Symmetric + Euclidean implies transitive -/
+theorem sym_euc_trans (R : World → World → Prop)
+    (hSym : FrameSymmetric R) (hEuc : FrameEuclidean R)
+    : FrameTransitive R :=
+  fun w v u hWV hVU => hEuc v w u (hSym w v hWV) hVU
+
+/-- Box-diamond interaction -/
+theorem box_implies_not_diamond_neg (R : World → World → Prop) (φ : ModalProp) (w : World)
+    (h : boxProp R φ w) : ¬ diamondProp R (fun v => ¬ φ v) w :=
+  fun ⟨v, hR, hNeg⟩ => hNeg (h v hR)
+
+/-- Diamond implies not box neg -/
+theorem diamond_implies_not_box_neg (R : World → World → Prop) (φ : ModalProp) (w : World)
+    (h : diamondProp R φ w) : ¬ boxProp R (fun v => ¬ φ v) w :=
+  fun hBox => match h with
+  | ⟨v, hR, hφ⟩ => hBox v hR hφ
+
+/-- Necessitation: if φ is universally true, □φ holds -/
+theorem necessitation (R : World → World → Prop) (φ : ModalProp)
+    (h : ∀ w, φ w) (w : World) : boxProp R φ w :=
+  fun v _ => h v
+
+/-- K + necessitation: modus ponens under box -/
+theorem box_modus_ponens (R : World → World → Prop) (φ ψ : ModalProp) (w : World)
+    (hImp : boxProp R (fun v => φ v → ψ v) w) (hPrem : boxProp R φ w)
+    : boxProp R ψ w :=
+  axiom_K R φ ψ w hImp hPrem
+
+/-- Box distributes over conjunction -/
+theorem box_and (R : World → World → Prop) (φ ψ : ModalProp) (w : World)
+    (h1 : boxProp R φ w) (h2 : boxProp R ψ w)
+    : boxProp R (fun v => φ v ∧ ψ v) w :=
+  fun v hR => ⟨h1 v hR, h2 v hR⟩
+
+/-- Diamond distributes over disjunction (forward) -/
+theorem diamond_or (R : World → World → Prop) (φ ψ : ModalProp) (w : World)
+    (h : diamondProp R (fun v => φ v ∨ ψ v) w)
+    : diamondProp R φ w ∨ diamondProp R ψ w :=
+  match h with
+  | ⟨v, hR, Or.inl hφ⟩ => Or.inl ⟨v, hR, hφ⟩
+  | ⟨v, hR, Or.inr hψ⟩ => Or.inr ⟨v, hR, hψ⟩
+
+/-- Reflexive + Euclidean = S5 (equivalence) -/
+theorem refl_euc_is_equivalence (R : World → World → Prop)
+    (hRefl : FrameReflexive R) (hEuc : FrameEuclidean R)
+    : FrameReflexive R ∧ FrameSymmetric R ∧ FrameTransitive R :=
+  ⟨hRefl, euc_refl_sym R hEuc hRefl, sym_euc_trans R (euc_refl_sym R hEuc hRefl) hEuc⟩
+
+/-- Star is transitive -/
+theorem star_trans (α : Program) (w v u : World)
+    (h1 : Program.star α w v) (h2 : Program.star α v u)
+    : Program.star α w u := by
+  induction h1 with
+  | refl => exact h2
+  | step _ m _ hα _ ih => exact Program.star.step _ m u hα (ih h2)
+
+-- Total: 42 theorems/lemmas
+
 end ComputationalPaths
