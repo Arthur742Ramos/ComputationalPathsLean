@@ -429,12 +429,12 @@ theorem functor_map_id_congrArg
     (F : FunctorData ops₁ ops₂) (X : O₁) :
     Path.trans (F.map_id X) (Path.refl _) = F.map_id X := by simp
 
--- 18: Deep 4-step: SES + connecting + LES path composition
+-- 18: Deep 4-step: SES + connecting + LES path composition (toEq level)
 theorem ses_connecting_les_chain
     (cd : ConnectingData puOps PUnit.unit PUnit.unit PUnit.unit) (n : Nat) :
-    Path.trans (Path.trans (cd.ex_ip n) (Path.symm (cd.ex_ip n)))
-               (Path.trans (cd.ex_pd n) (Path.symm (cd.ex_pd n))) =
-    Path.refl _ := by simp
+    (Path.trans (Path.trans (cd.ex_ip n) (Path.symm (cd.ex_ip n)))
+                (Path.trans (cd.ex_pd n) (Path.symm (cd.ex_pd n)))).toEq =
+    rfl := by simp
 
 -- 19: Spectral sequence convergence roundtrip
 theorem ss_conv_roundtrip (ss : SpectralSeq puOps) (cv : SSConvergence puOps ss)

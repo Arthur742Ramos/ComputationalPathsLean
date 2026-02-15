@@ -392,7 +392,8 @@ def leftHomRel {A B : Type u} (cyl : CylinderObj A) : HomRel A B where
   isTrans _ _ _ := by
     intro ⟨h1⟩ ⟨h2⟩
     -- Transitivity requires gluing cylinders; we witness existence
-    exact ⟨{
+    constructor
+    exact {
       cyl := cyl
       hom := ⟨fun c => h2.hom.fn (h2.cyl.inl.fn (cyl.proj.fn c))⟩
       onInl := fun a => by
@@ -403,7 +404,7 @@ def leftHomRel {A B : Type u} (cyl : CylinderObj A) : HomRel A B where
         exact Path.trans
           (Path.congrArg (fun x => h2.hom.fn (h2.cyl.inl.fn x)) (cyl.projInr a))
           (h2.onInl a)
-    }⟩
+    }
 
 /-- Localized morphism type for the homotopy category. -/
 structure LocMor (A B : Type u) where
