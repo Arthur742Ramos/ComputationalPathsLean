@@ -232,6 +232,76 @@ def cup_one_right_path (n : Nat) (x : R.carrier n) :
       (_root_.cast (_root_.congrArg R.carrier (Nat.add_zero n).symm) x) :=
   Path.stepChain (R.cup_one_right n x)
 
+/-! ## Additional theorem stubs -/
+
+theorem cupProduct_cup_eq (p q : Nat) (x : R.carrier p) (y : R.carrier q) :
+    R.cupProduct.cup p q x y = R.cup p q x y := by
+  sorry
+
+theorem cupProduct_cup_zero_left_eq (p q : Nat) (y : R.carrier q) :
+    R.cupProduct.cup p q (R.zero p) y = R.zero (p + q) := by
+  sorry
+
+theorem cupProduct_cup_zero_right_eq (p q : Nat) (x : R.carrier p) :
+    R.cupProduct.cup p q x (R.zero q) = R.zero (p + q) := by
+  sorry
+
+theorem cupProduct_cup_add_left_eq (p q : Nat) (x x' : R.carrier p) (y : R.carrier q) :
+    R.cupProduct.cup p q (R.add p x x') y =
+      R.add (p + q) (R.cupProduct.cup p q x y) (R.cupProduct.cup p q x' y) := by
+  sorry
+
+theorem cupProduct_cup_add_right_eq (p q : Nat) (x : R.carrier p) (y y' : R.carrier q) :
+    R.cupProduct.cup p q x (R.add q y y') =
+      R.add (p + q) (R.cupProduct.cup p q x y) (R.cupProduct.cup p q x y') := by
+  sorry
+
+theorem cupProduct_cup_assoc_eq
+    (p q r : Nat) (x : R.carrier p) (y : R.carrier q) (z : R.carrier r) :
+    R.cupProduct.cup (p + q) r (R.cupProduct.cup p q x y) z =
+      _root_.cast (_root_.congrArg R.carrier (Nat.add_assoc p q r).symm)
+        (R.cupProduct.cup p (q + r) x (R.cupProduct.cup q r y z)) := by
+  sorry
+
+theorem cupProduct_cup_comm_eq (p q : Nat) (x : R.carrier p) (y : R.carrier q) :
+    R.cupProduct.cup p q x y =
+      _root_.cast (_root_.congrArg R.carrier (Nat.add_comm q p))
+        (R.cupProduct.cup q p y x) := by
+  sorry
+
+theorem cup_assoc_path_def
+    (p q r : Nat) (x : R.carrier p) (y : R.carrier q) (z : R.carrier r) :
+    R.cup_assoc_path p q r x y z = Path.stepChain (R.cup_assoc p q r x y z) := by
+  sorry
+
+theorem cup_comm_path_def (p q : Nat) (x : R.carrier p) (y : R.carrier q) :
+    R.cup_comm_path p q x y = Path.stepChain (R.cup_comm p q x y) := by
+  sorry
+
+theorem cup_add_left_path_def (p q : Nat) (x x' : R.carrier p) (y : R.carrier q) :
+    R.cup_add_left_path p q x x' y = Path.stepChain (R.cup_add_left p q x x' y) := by
+  sorry
+
+theorem cup_add_right_path_def (p q : Nat) (x : R.carrier p) (y y' : R.carrier q) :
+    R.cup_add_right_path p q x y y' = Path.stepChain (R.cup_add_right p q x y y') := by
+  sorry
+
+theorem cup_zero_left_path_def (p q : Nat) (y : R.carrier q) :
+    R.cup_zero_left_path p q y = Path.stepChain (R.cup_zero_left p q y) := by
+  sorry
+
+theorem cup_zero_right_path_def (p q : Nat) (x : R.carrier p) :
+    R.cup_zero_right_path p q x = Path.stepChain (R.cup_zero_right p q x) := by
+  sorry
+
+theorem cup_one_left_path_def (n : Nat) (x : R.carrier n) :
+    R.cup_one_left_path n x = Path.stepChain (R.cup_one_left n x) := by
+  sorry
+
+theorem cup_one_right_path_def (n : Nat) (x : R.carrier n) :
+    R.cup_one_right_path n x = Path.stepChain (R.cup_one_right n x) := by
+  sorry
+
 end CohomologyRing
 
 /-! ## Examples -/

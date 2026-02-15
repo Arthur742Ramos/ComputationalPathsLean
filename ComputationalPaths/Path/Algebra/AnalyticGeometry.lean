@@ -345,6 +345,74 @@ def tilt_frobenius_compat (R : PerfectoidRingData.{u})
     Path (R.frobenius (T.proj (n + 1) x)) (T.proj n x) :=
   T.compat n x
 
+/-! ## Additional Theorem Stubs -/
+
+theorem nonArch_val_mul_comm (K : NonArchValuation.{u}) (x y : K.carrier) :
+    K.val (K.mul x y) = K.val (K.mul y x) := by
+  sorry
+
+theorem nonArch_val_mul_assoc (K : NonArchValuation.{u}) (x y z : K.carrier) :
+    K.val (K.mul (K.mul x y) z) = K.val (K.mul x (K.mul y z)) := by
+  sorry
+
+theorem nonArch_val_add_comm_bound (K : NonArchValuation.{u}) (x y : K.carrier) :
+    K.val (K.add x y) ≤ max (K.val y) (K.val x) := by
+  sorry
+
+theorem affinoid_scalarMap_additive (K : NonArchValuation.{u})
+    (A : AffinoidAlgebraData K) (x y : K.carrier) :
+    Nonempty (Path (A.scalarMap (K.add x y)) (A.add (A.scalarMap x) (A.scalarMap y))) := by
+  sorry
+
+theorem affinoid_complete_path_functorial (K : NonArchValuation.{u})
+    (A : AffinoidAlgebraData K) (seq : Nat → A.carrier)
+    (h : ∀ n, A.gaussNorm (seq n) ≤ n) :
+    Nonempty (Path (A.add (A.complete seq h) A.zero) (A.complete seq h)) := by
+  sorry
+
+theorem rigid_pointspace_eval_constant (K : NonArchValuation.{u})
+    (p : (RigidAnalyticData.pointSpace K).points) :
+    (RigidAnalyticData.pointSpace K).evalAt p = PUnit.unit := by
+  sorry
+
+theorem berkovich_seminorm_mul_comm (K : NonArchValuation.{u})
+    (B : BerkovichData K) (p : B.points) (x y : B.algebra.carrier) :
+    B.seminorm p (B.algebra.mul x y) = B.seminorm p (B.algebra.mul y x) := by
+  sorry
+
+theorem adic_restriction_id (K : NonArchValuation.{u}) (X : AdicSpaceData K)
+    (U : X.points → Prop) (hU : X.isRational U) (s : X.sections U hU) :
+    X.sheaf_restrict U hU U hU (fun _ h => h) s = s := by
+  sorry
+
+theorem perfectoid_frob_path_naturality (R : PerfectoidRingData.{u}) (x : R.carrier) :
+    Nonempty (Path (R.frobenius (R.add x R.zero)) (R.frobenius x)) := by
+  sorry
+
+theorem tilting_involutive_def (K : NonArchValuation.{u})
+    (X : PerfectoidData K) (tilt : TiltData X.ring)
+    (equiv : TiltingEquiv K X tilt) (p : X.points) :
+    tilting_involutive K X tilt equiv p = equiv.forward_backward p := by
+  sorry
+
+theorem berkovich_extends_base_def (K : NonArchValuation.{u})
+    (B : BerkovichData K) (p : B.points) (k : K.carrier) :
+    berkovich_extends_base K B p k = B.extends_K p k := by
+  sorry
+
+theorem tilt_frobenius_compat_def (R : PerfectoidRingData.{u})
+    (T : TiltData R) (n : Nat) (x : T.carrier) :
+    tilt_frobenius_compat R T n x = T.compat n x := by
+  sorry
+
+theorem analytic_anchor_refl {A : Type u} (a : A) :
+    analyticAnchor a = Path.refl a := by
+  sorry
+
+theorem analyticStep_sound_rweq {A : Type u} {a b : A} {p q : Path a b}
+    (h : AnalyticStep p q) : RwEq p q := by
+  sorry
+
 end AnalyticGeometry
 end Algebra
 end Path
