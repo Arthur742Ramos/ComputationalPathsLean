@@ -114,32 +114,39 @@
 \contentsline {section}{\numberline {11.4}Decidability and the Path Tactic}{57}{section.11.4}%
 \contentsline {subsection}{\numberline {11.4.1}The \texttt {path\_simp} Tactic}{57}{subsection.11.4.1}%
 \contentsline {section}{\numberline {11.5}Connection to HoTT Identity Types}{57}{section.11.5}%
-\contentsline {section}{\numberline {11.6}Module Organization and Dependency Structure}{58}{section.11.6}%
-\contentsline {chapter}{\numberline {12}Conclusion and Future Directions}{60}{chapter.12}%
-\contentsline {section}{\numberline {12.1}Summary of Contributions}{60}{section.12.1}%
-\contentsline {paragraph}{A complete algebraic framework (Part~I).}{60}{section*.27}%
-\contentsline {paragraph}{A confluent, terminating rewrite system.}{60}{section*.28}%
-\contentsline {paragraph}{Weak $\omega $-groupoid structure.}{60}{section*.29}%
-\contentsline {paragraph}{Comprehensive homotopy theory (Part~II).}{60}{section*.30}%
-\contentsline {paragraph}{Metatheory and automation (Part~III).}{61}{section*.31}%
-\contentsline {section}{\numberline {12.2}The Formalization}{61}{section.12.2}%
-\contentsline {paragraph}{Design decisions.}{61}{section*.32}%
-\contentsline {paragraph}{Proof automation.}{61}{section*.33}%
-\contentsline {paragraph}{Module structure.}{62}{section*.34}%
-\contentsline {section}{\numberline {12.3}Future Directions}{62}{section.12.3}%
-\contentsline {paragraph}{Cubical computational paths.}{62}{section*.35}%
-\contentsline {paragraph}{Machine-checked higher-categorical coherence.}{62}{section*.36}%
-\contentsline {paragraph}{Computational content extraction.}{62}{section*.37}%
-\contentsline {paragraph}{Applications to automated reasoning.}{62}{section*.38}%
-\contentsline {paragraph}{Connections to higher-dimensional rewriting.}{63}{section*.39}%
-\contentsline {paragraph}{Synthetic homotopy theory.}{63}{section*.40}%
-\contentsline {paragraph}{Scaling the formalization.}{63}{section*.41}%
-\contentsline {chapter}{\numberline {A}Complete List of Rewrite Rules}{64}{appendix.A}%
-\contentsline {paragraph}{Map decomposition.}{64}{section*.44}%
-\contentsline {paragraph}{Product rules.}{65}{section*.45}%
-\contentsline {paragraph}{Sigma type rules.}{65}{section*.46}%
-\contentsline {paragraph}{Sum type rules.}{65}{section*.47}%
-\contentsline {paragraph}{Function type rules.}{65}{section*.48}%
-\contentsline {paragraph}{Dependent application.}{65}{section*.49}%
-\contentsline {chapter}{\numberline {B}Index of Definitions and Theorems}{70}{appendix.B}%
-\contentsline {chapter}{\numberline {C}Dependency Graph}{82}{appendix.C}%
+\contentsline {section}{\numberline {11.6}The J-Eliminator Derived from Contractibility}{58}{section.11.6}%
+\contentsline {subsection}{\numberline {11.6.1}Based Path Space Contractibility}{59}{subsection.11.6.1}%
+\contentsline {subsection}{\numberline {11.6.2}Derivation of J}{59}{subsection.11.6.2}%
+\contentsline {subsection}{\numberline {11.6.3}Operations Derived from J}{59}{subsection.11.6.3}%
+\contentsline {subsection}{\numberline {11.6.4}Uniqueness and Equivalences}{60}{subsection.11.6.4}%
+\contentsline {subsection}{\numberline {11.6.5}Non-UIP, Failure of K, and Two-Level Structure}{60}{subsection.11.6.5}%
+\contentsline {subsection}{\numberline {11.6.6}Path-Level J and Transport Coherence}{61}{subsection.11.6.6}%
+\contentsline {section}{\numberline {11.7}Module Organization and Dependency Structure}{61}{section.11.7}%
+\contentsline {chapter}{\numberline {12}Conclusion and Future Directions}{63}{chapter.12}%
+\contentsline {section}{\numberline {12.1}Summary of Contributions}{63}{section.12.1}%
+\contentsline {paragraph}{A complete algebraic framework (Part~I).}{63}{section*.27}%
+\contentsline {paragraph}{A confluent, terminating rewrite system.}{63}{section*.28}%
+\contentsline {paragraph}{Weak $\omega $-groupoid structure.}{63}{section*.29}%
+\contentsline {paragraph}{Comprehensive homotopy theory (Part~II).}{63}{section*.30}%
+\contentsline {paragraph}{Metatheory and automation (Part~III).}{64}{section*.31}%
+\contentsline {section}{\numberline {12.2}The Formalization}{64}{section.12.2}%
+\contentsline {paragraph}{Design decisions.}{64}{section*.32}%
+\contentsline {paragraph}{Proof automation.}{64}{section*.33}%
+\contentsline {paragraph}{Module structure.}{65}{section*.34}%
+\contentsline {section}{\numberline {12.3}Future Directions}{65}{section.12.3}%
+\contentsline {paragraph}{Cubical computational paths.}{65}{section*.35}%
+\contentsline {paragraph}{Machine-checked higher-categorical coherence.}{65}{section*.36}%
+\contentsline {paragraph}{Computational content extraction.}{65}{section*.37}%
+\contentsline {paragraph}{Applications to automated reasoning.}{65}{section*.38}%
+\contentsline {paragraph}{Connections to higher-dimensional rewriting.}{66}{section*.39}%
+\contentsline {paragraph}{Synthetic homotopy theory.}{66}{section*.40}%
+\contentsline {paragraph}{Scaling the formalization.}{66}{section*.41}%
+\contentsline {chapter}{\numberline {A}Complete List of Rewrite Rules}{67}{appendix.A}%
+\contentsline {paragraph}{Map decomposition.}{67}{section*.44}%
+\contentsline {paragraph}{Product rules.}{68}{section*.45}%
+\contentsline {paragraph}{Sigma type rules.}{68}{section*.46}%
+\contentsline {paragraph}{Sum type rules.}{68}{section*.47}%
+\contentsline {paragraph}{Function type rules.}{68}{section*.48}%
+\contentsline {paragraph}{Dependent application.}{68}{section*.49}%
+\contentsline {chapter}{\numberline {B}Index of Definitions and Theorems}{73}{appendix.B}%
+\contentsline {chapter}{\numberline {C}Dependency Graph}{85}{appendix.C}%
