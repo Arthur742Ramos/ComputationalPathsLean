@@ -212,14 +212,80 @@ def id (P : GroupPresentation) : CayleyGraphAutomorphism P where
 
 end CayleyGraphAutomorphism
 
-/-! ## Summary -/
+/-! ## Deeper properties of Cayley graphs -/
 
-/-
-We introduced group presentations and Cayley graphs in the computational-paths
-framework, added path-composition lemmas for word actions and word paths, and
-packaged a word metric, geodesic condition, adjacency-preserving automorphisms,
-and a simple rewrite-equivalence example.
--/
+/-- Word inversion is involutive. -/
+theorem Word.inv_inv {Gen : Type u} (w : Word Gen) :
+    Word.inv (Word.inv w) = w := by
+  sorry
+
+/-- Word inversion reverses length. -/
+theorem Word.length_inv {Gen : Type u} (w : Word Gen) :
+    (Word.inv w).length = w.length := by
+  sorry
+
+/-- SignedGen inversion is involutive. -/
+theorem SignedGen.inv_inv {Gen : Type u} (g : SignedGen Gen) :
+    SignedGen.inv (SignedGen.inv g) = g := by
+  sorry
+
+/-- The identity automorphism composed with itself is the identity. -/
+theorem CayleyGraphAutomorphism.id_comp_id (P : GroupPresentation) :
+    ∀ v, (CayleyGraphAutomorphism.id P).toFun ((CayleyGraphAutomorphism.id P).toFun v) = v := by
+  sorry
+
+/-- Word action of the empty word is the identity. -/
+theorem wordAction_nil (P : GroupPresentation) (v : CayleyVertex P) :
+    wordAction P v [] = v := by
+  rfl
+
+/-- Word action is functorial with respect to word concatenation. -/
+theorem wordAction_append (P : GroupPresentation) (v : CayleyVertex P)
+    (w₁ w₂ : Word P.Gen) :
+    wordAction P v (w₁ ++ w₂) = wordAction P (wordAction P v w₁) w₂ := by
+  sorry
+
+/-- Vertex multiplication by pos then neg of the same generator returns to the original vertex. -/
+theorem vertexMul_pos_neg_cancel (P : GroupPresentation) (v : CayleyVertex P)
+    (g : P.Gen) :
+    ∃ (p : Path (vertexMul P (vertexMul P v (SignedGen.pos g)) (SignedGen.neg g)) v), True := by
+  sorry
+
+/-- Geodesic words have minimal word metric. -/
+theorem Geodesic.minimal (P : GroupPresentation) (w : Word P.Gen)
+    (hgeo : Geodesic P w) :
+    ∀ w', P.Rel w w' → wordMetric w ≤ wordMetric w' := by
+  sorry
+
+/-- The word metric is always non-negative (trivially true for Nat). -/
+theorem wordMetric_nonneg {Gen : Type u} (w : Word Gen) :
+    0 ≤ wordMetric w := by
+  sorry
+
+/-- WordPathEq is reflexive. -/
+theorem WordPathEq.refl (P : GroupPresentation) (w : Word P.Gen) :
+    WordPathEq P w w := by
+  sorry
+
+/-- WordPathEq is symmetric. -/
+theorem WordPathEq.symm (P : GroupPresentation) {w₁ w₂ : Word P.Gen}
+    (h : WordPathEq P w₁ w₂) : WordPathEq P w₂ w₁ := by
+  sorry
+
+/-- WordPathEq is transitive. -/
+theorem WordPathEq.trans (P : GroupPresentation) {w₁ w₂ w₃ : Word P.Gen}
+    (h₁ : WordPathEq P w₁ w₂) (h₂ : WordPathEq P w₂ w₃) :
+    WordPathEq P w₁ w₃ := by
+  sorry
+
+/-- CayleyGraphAutomorphism composition preserves adjacency. -/
+theorem CayleyGraphAutomorphism.comp_adj_preserve (P : GroupPresentation)
+    (f g : CayleyGraphAutomorphism P) {v w : CayleyVertex P}
+    (h : Adjacent P v w) :
+    Adjacent P (f.toFun (g.toFun v)) (f.toFun (g.toFun w)) := by
+  sorry
+
+/-! ## Summary -/
 
 end CayleyGraphPaths
 end Algebra

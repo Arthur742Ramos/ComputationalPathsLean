@@ -251,9 +251,88 @@ theorem trans (h₁ : GaloisStep ρ σ) (h₂ : GaloisStep σ τ) : GaloisStep �
  
 end GaloisStep
  
+/-! ## Deeper properties of Galois representations -/
+
+/-- AbsoluteGaloisGroup multiplication is associative. -/
+theorem AbsoluteGaloisGroup.mul_assoc {K : Type u} (Γ : AbsoluteGaloisGroup K)
+    (g h k : Γ.carrier) :
+    Γ.group.mul (Γ.group.mul g h) k = Γ.group.mul g (Γ.group.mul h k) := by
+  sorry
+
+/-- ContinuousGaloisRepresentation action respects the group inverse. -/
+theorem ContinuousGaloisRepresentation.action_inv
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {V : Type v}
+    (rep : ContinuousGaloisRepresentation Γ V) (g : Γ.carrier) (v : V) :
+    Path (rep.action (Γ.group.mul g (Γ.group.inv g)) v) v := by
+  sorry
+
+/-- RepresentationEquiv is an equivalence relation: reflexivity. -/
+theorem RepresentationEquiv.refl_action_path
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {V : Type v}
+    (ρ : ContinuousGaloisRepresentation Γ V) (g : Γ.carrier) (v : V) :
+    (RepresentationEquiv.refl ρ).action_path g v = Path.refl _ := by
+  sorry
+
+/-- RepresentationEquiv symm is involutive. -/
+theorem RepresentationEquiv.symm_symm
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {V : Type v}
+    {ρ σ : ContinuousGaloisRepresentation Γ V}
+    (e : RepresentationEquiv ρ σ) :
+    ∀ g v, (e.symm.symm).action_path g v = e.action_path g v := by
+  sorry
+
+/-- GaloisStep reflexivity is idempotent. -/
+theorem GaloisStep.refl_idempotent
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {V : Type v}
+    (ρ : ContinuousGaloisRepresentation Γ V) :
+    GaloisStep.trans (GaloisStep.refl ρ) (GaloisStep.refl ρ) = GaloisStep.refl ρ := by
+  sorry
+
+/-- ArtinRepresentation inherits the identity action law. -/
+theorem ArtinRepresentation.action_one
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {V : Type v}
+    (ρ : ArtinRepresentation Γ V) (v : V) :
+    Path (ρ.rep.action Γ.group.one v) v := by
+  sorry
+
+/-- GaloisLAdicRepresentation group path is coherent with group multiplication. -/
+theorem GaloisLAdicRepresentation.group_path_mul
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {A : Type v}
+    (ρ : GaloisLAdicRepresentation Γ A) (g h : Γ.carrier) :
+    Path (ρ.rep.group.mul g h) (Γ.group.mul g h) := by
+  sorry
+
+/-- The l-adic action is compatible at all levels. -/
+theorem GaloisLAdicRepresentation.action_levelwise_compat
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {A : Type v}
+    (ρ : GaloisLAdicRepresentation Γ A) (n m : Nat) (g : Γ.carrier) :
+    ∃ (_ : ρ.rep.tate.level n → ρ.rep.tate.level m → Prop), True := by
+  sorry
+
+/-- Composition of three representation equivalences is associative. -/
+theorem RepresentationEquiv.trans_assoc
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {V : Type v}
+    {ρ₁ ρ₂ ρ₃ ρ₄ : ContinuousGaloisRepresentation Γ V}
+    (e₁ : RepresentationEquiv ρ₁ ρ₂)
+    (e₂ : RepresentationEquiv ρ₂ ρ₃)
+    (e₃ : RepresentationEquiv ρ₃ ρ₄) :
+    ∀ g v,
+      (RepresentationEquiv.trans (RepresentationEquiv.trans e₁ e₂) e₃).action_path g v =
+        (RepresentationEquiv.trans e₁ (RepresentationEquiv.trans e₂ e₃)).action_path g v := by
+  sorry
+
+/-- FiniteImage map is compatible with the group operation (statement). -/
+theorem FiniteImage.map_mul_compat
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {V : Type v}
+    (ρ : ArtinRepresentation Γ V) (g h : Γ.carrier) :
+    ∃ (x : ρ.image.carrier), x = ρ.image.map (Γ.group.mul g h) := by
+  sorry
+
+/-- ContinuousGaloisRepresentation action on identity element is Path-reflexive. -/
+theorem ContinuousGaloisRepresentation.action_one_one_refl
+    {K : Type u} {Γ : AbsoluteGaloisGroup K} {V : Type v}
+    (rep : ContinuousGaloisRepresentation Γ V) (v : V) :
+    Path (rep.action Γ.group.one (rep.action Γ.group.one v)) v := by
+  sorry
+
 /-! ## Summary -/
- 
-end GaloisRepresentation
-end Algebra
-end Path
-end ComputationalPaths

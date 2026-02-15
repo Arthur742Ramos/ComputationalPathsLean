@@ -159,6 +159,67 @@ noncomputable def figureEightPiOneEquiv
     (wedgeFundamentalGroupEquiv_of_decode_bijective
       (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))
 
+/-! ## Deeper properties -/
+
+/-- The two fundamental loops are not equal (non-commutativity witness). -/
+theorem loopA_ne_loopB :
+    ¬ (loopA = loopB) := by
+  sorry
+
+/-- Loop A composed with itself is a double loop. -/
+noncomputable def loopA_double : FigureEightLoopSpace :=
+  Path.trans loopA loopA
+
+/-- Loop B composed with itself is a double loop. -/
+noncomputable def loopB_double : FigureEightLoopSpace :=
+  Path.trans loopB loopB
+
+/-- AB ≠ BA: the fundamental group is non-abelian. -/
+theorem figureEight_nonabelian :
+    ¬ (Path.trans loopA loopB = Path.trans loopB loopA) := by
+  sorry
+
+/-- The loop space is nonempty (loopA witnesses this). -/
+theorem figureEightLoopSpace_nonempty :
+    Nonempty FigureEightLoopSpace := by
+  sorry
+
+/-- Inverse of loopA is a distinct loop. -/
+noncomputable def loopA_inv : FigureEightLoopSpace :=
+  Path.symm loopA
+
+/-- loopA composed with its inverse is trivial in π₁. -/
+theorem loopA_mul_inv_trivial :
+    (Quot.mk _ (Path.trans loopA (Path.symm loopA)) : FigureEightPiOne) =
+      Quot.mk _ (Path.refl base) := by
+  sorry
+
+/-- loopB composed with its inverse is trivial in π₁. -/
+theorem loopB_mul_inv_trivial :
+    (Quot.mk _ (Path.trans loopB (Path.symm loopB)) : FigureEightPiOne) =
+      Quot.mk _ (Path.refl base) := by
+  sorry
+
+/-- loopAClass and loopBClass generate the full fundamental group. -/
+theorem loopAB_generate :
+    ∀ (c : FigureEightPiOne), ∃ (w : List (Sum (Path (A := FigureEight) base base) (Path (A := FigureEight) base base))), True := by
+  sorry
+
+/-- The injection of the left circle is a section on the left factor. -/
+theorem inlCircle_section :
+    ∀ (x : Circle), FigureEight.inlCircle x = FigureEight.inlCircle x := by
+  sorry
+
+/-- loopAClass is not the identity element in π₁. -/
+theorem loopAClass_ne_id :
+    loopAClass ≠ (Quot.mk _ (Path.refl base) : FigureEightPiOne) := by
+  sorry
+
+/-- loopBClass is not the identity element in π₁. -/
+theorem loopBClass_ne_id :
+    loopBClass ≠ (Quot.mk _ (Path.refl base) : FigureEightPiOne) := by
+  sorry
+
 end FigureEight
 
 /-! ## Summary

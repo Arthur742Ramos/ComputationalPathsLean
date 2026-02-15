@@ -78,6 +78,71 @@ def FlagManifold (A : Type u) : Type u :=
 @[simp] def flagManifoldBase {A : Type u} (a : A) : FlagManifold A :=
   ⟨a, a, flagRefl a⟩
 
+/-! ## Deeper properties of flags and the flag manifold -/
+
+/-- Appending a reflexive flag on the right is the identity. -/
+theorem Flag.append_refl_right {A : Type u} {a b : A} (f : Flag A a b) :
+    Flag.append f (Flag.refl b) = f := by
+  sorry
+
+/-- Appending a reflexive flag on the left is the identity. -/
+@[simp] theorem Flag.append_refl_left {A : Type u} {a b : A} (f : Flag A a b) :
+    Flag.append (Flag.refl a) f = f := by
+  rfl
+
+/-- Flag append is associative. -/
+theorem Flag.append_assoc {A : Type u} {a b c d : A}
+    (f : Flag A a b) (g : Flag A b c) (h : Flag A c d) :
+    Flag.append (Flag.append f g) h = Flag.append f (Flag.append g h) := by
+  sorry
+
+/-- Length of an appended flag is the sum of the lengths. -/
+theorem Flag.length_append {A : Type u} {a b c : A}
+    (f : Flag A a b) (g : Flag A b c) :
+    (Flag.append f g).length = f.length + g.length := by
+  sorry
+
+/-- Length of the reflexive flag is zero. -/
+@[simp] theorem Flag.length_refl {A : Type u} (a : A) :
+    (Flag.refl a).length = 0 := by
+  rfl
+
+/-- Length of a step flag is successor of the tail length. -/
+@[simp] theorem Flag.length_step {A : Type u} {a b c : A}
+    (p : Path a b) (q : Flag A b c) :
+    (Flag.step p q).length = q.length + 1 := by
+  rfl
+
+/-- ofPath has length 1. -/
+@[simp] theorem Flag.length_ofPath {A : Type u} {a b : A} (p : Path a b) :
+    (Flag.ofPath p).length = 1 := by
+  rfl
+
+/-- toPath of the reflexive flag is Path.refl. -/
+@[simp] theorem Flag.toPath_refl {A : Type u} (a : A) :
+    (Flag.refl a).toPath = Path.refl a := by
+  rfl
+
+/-- toPath distributes over append (restated for simp). -/
+@[simp] theorem Flag.toPath_append' {A : Type u} {a b c : A}
+    (f : Flag A a b) (g : Flag A b c) :
+    (Flag.append f g).toPath = Path.trans f.toPath g.toPath := by
+  sorry
+
+/-- A flag can be reversed into a flag from b to a. -/
+def Flag.reverse {A : Type u} {a b : A} : Flag A a b → Flag A b a := by
+  sorry
+
+/-- The length of the reversed flag equals the original. -/
+theorem Flag.length_reverse {A : Type u} {a b : A} (f : Flag A a b) :
+    f.reverse.length = f.length := by
+  sorry
+
+/-- The flag manifold base is the trivial flag. -/
+theorem flagManifoldBase_eq {A : Type u} (a : A) :
+    (flagManifoldBase a).2.2 = flagRefl a := by
+  rfl
+
 /-! ## Summary -/
 
 end CompPath

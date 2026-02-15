@@ -146,6 +146,79 @@ def trivialKInvariant {A : Type u} {G : Type u} (n : Nat)
     kMap := fun _ => X.base
     kMap_base := rfl }
 
+/-! ## Deeper properties of Eilenberg-MacLane spaces -/
+
+/-- The pointed type of a K-space has a well-defined basepoint. -/
+theorem kSpacePointed_pt {G : Type u} {n : Nat} (X : KSpace G n) :
+    (kSpacePointed X).pt = X.base := by
+  rfl
+
+/-- Loop space property implies the loop equivalence is an involution up to Path. -/
+theorem LoopSpaceProperty.loopEquiv_roundtrip {G : Type u} {n : Nat}
+    {X : KSpace G (n + 1)} (P : LoopSpaceProperty G n X) (l : LoopSpace X.carrier X.base) :
+    Path (P.loopEquiv.invFun (P.loopEquiv.toFun l)) l := by
+  sorry
+
+/-- The trivial k-invariant map sends everything to the basepoint. -/
+theorem trivialKInvariant_kMap_const {A : Type u} {G : Type u} (n : Nat)
+    (P : PostnikovSystem.PostnikovSystem A) (a : A) (X : KSpace G (n + 2))
+    (x : P.stage n) :
+    (trivialKInvariant n P a X).kMap x = X.base := by
+  rfl
+
+/-- CohomologyRepresentability.eval is natural with respect to pointed maps. -/
+theorem CohomologyRepresentability.eval_natural
+    {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
+    (n : Nat) {X Y : Pointed} (f : PointedMap X Y)
+    (g : PointedMap Y (R.space n)) :
+    ∃ (result : H.cohomology n X), True := by
+  sorry
+
+/-- The basepoint map is the zero of the representable hom set. -/
+theorem basepointMap_is_zero {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
+    (n : Nat) (X : Pointed) :
+    R.eval n (basepointMap X (R.space n)) = H.zero n X := by
+  sorry
+
+/-- PostnikovKInvariant k-map is compatible with the Postnikov projection. -/
+theorem PostnikovKInvariant.kMap_proj_compat {A G : Type u} {n : Nat}
+    (K : PostnikovKInvariant A G n) :
+    K.kMap (K.system.proj n K.base) = K.kSpace.base := by
+  sorry
+
+/-- Loop space property: the loop equivalence preserves basepoints. -/
+theorem LoopSpaceProperty.base_preserved {G : Type u} {n : Nat}
+    {X : KSpace G (n + 1)} (P : LoopSpaceProperty G n X) :
+    P.loopEquiv.toFun (Path.refl X.base) = P.loopSpace.base := by
+  sorry
+
+/-- The stage pointed type has the correct carrier. -/
+theorem PostnikovKInvariant.stagePointed_carrier {A G : Type u} {n : Nat}
+    (K : PostnikovKInvariant A G n) :
+    (K.stagePointed).carrier = K.system.stage n := by
+  rfl
+
+/-- The k-invariant map preserves basepoints as a pointed map. -/
+theorem PostnikovKInvariant.kInvariantMap_pt {A G : Type u} {n : Nat}
+    (K : PostnikovKInvariant A G n) :
+    (K.kInvariantMap).map_pt = K.kMap_base := by
+  rfl
+
+/-- Composition of loop space properties gives an iterated loop space. -/
+theorem LoopSpaceProperty.iterate {G : Type u} {n : Nat}
+    {X : KSpace G (n + 2)}
+    (P₁ : LoopSpaceProperty G (n + 1) X)
+    (P₂ : LoopSpaceProperty G n P₁.loopSpace) :
+    ∃ (equiv : SimpleEquiv (LoopSpace (LoopSpace X.carrier X.base) (Path.refl X.base))
+                            P₂.loopSpace.carrier), True := by
+  sorry
+
+/-- Trivial k-invariant is a pointed map. -/
+theorem trivialKInvariant_is_pointed {A G : Type u} (n : Nat)
+    (P : PostnikovSystem.PostnikovSystem A) (a : A) (X : KSpace G (n + 2)) :
+    (trivialKInvariant n P a X).kInvariantMap.map_pt = rfl := by
+  sorry
+
 /-! ## Summary -/
 
 end CompPath

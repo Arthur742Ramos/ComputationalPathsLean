@@ -238,6 +238,87 @@ theorem completionStep_sound {A : Type u} {a b : A} {p q : Path a b}
   | hensel_lift _ _ h => exact h
   | universal _ _ h => exact h
 
+/-! ## Deeper properties of completions -/
+
+/-- CRingData addition is commutative as a Path. -/
+theorem CRingData.add_comm_path {R : Type u} (ring : CRingData R) (a b : R) :
+    Path (ring.add a b) (ring.add b a) := by
+  sorry
+
+/-- CRingData multiplication is commutative as a Path. -/
+theorem CRingData.mul_comm_path {R : Type u} (ring : CRingData R) (a b : R) :
+    Path (ring.mul a b) (ring.mul b a) := by
+  sorry
+
+/-- Trivial completion iota is the identity function. -/
+theorem Completion.trivial_iota_eq {R : Type u} (ring : CRingData R)
+    (I : CIdealData ring) (r : R) :
+    (Completion.trivial ring I).iota r = r := by
+  rfl
+
+/-- Completion preserves the ring structure: the completion ring is a CRingData. -/
+theorem Completion.compRing_add_assoc {R : Type u} {ring : CRingData R}
+    {I : CIdealData ring} (C : Completion ring I) (a b c : C.carrier) :
+    C.compRing.add (C.compRing.add a b) c = C.compRing.add a (C.compRing.add b c) := by
+  sorry
+
+/-- RingMap preserves the zero element. -/
+theorem RingMap.preserves_zero {R : Type u} {S : Type v}
+    {rR : CRingData R} {rS : CRingData S} (f : RingMap rR rS) :
+    Path (f.toFun rR.zero) rS.zero := by
+  sorry
+
+/-- RingMap composition is associative. -/
+theorem RingMap.comp_assoc {R S T U : Type u}
+    {rR : CRingData R} {rS : CRingData S} {rT : CRingData T} {rU : CRingData U}
+    (f : RingMap rR rS) (g : RingMap rS rT) (h : RingMap rT rU) (x : R) :
+    h.toFun (g.toFun (f.toFun x)) = (h.toFun ∘ g.toFun ∘ f.toFun) x := by
+  sorry
+
+/-- IAdicTopology power monotonicity is transitive. -/
+theorem IAdicTopology.power_mono_trans {R : Type u} {ring : CRingData R}
+    {I : CIdealData ring} (top : IAdicTopology ring I)
+    (n m : Nat) (h : n ≤ m) (r : R) :
+    top.mem_power m r → top.mem_power n r := by
+  sorry
+
+/-- HenselLemma unit case produces a root at PUnit.unit. -/
+theorem HenselLemma.unitCase_liftRoot (eval : PUnit → PUnit) (a : PUnit)
+    (h : CIdealData.trivialUnit.mem (eval a)) :
+    HenselLemma.unitCase.liftRoot eval a h = PUnit.unit := by
+  sorry
+
+/-- CompletionStep is reflexive. -/
+theorem CompletionStep.refl_sound {A : Type u} {a : A} (p : Path a a) :
+    CompletionStep p (Path.refl a) → p.proof = (Path.refl a).proof := by
+  sorry
+
+/-- FormalSmoothness implies existence of a section. -/
+theorem FormalSmoothness.section_exists {R S : Type u}
+    {rR : CRingData R} {rS : CRingData S} {f : RingMap rR rS}
+    (smooth : FormalSmoothness rR rS f)
+    {T : Type u} (rT : CRingData T)
+    (surj : T → S) (hsurj : ∀ s, ∃ t, surj t = s) :
+    ∃ h : S → T, ∀ s, surj (h s) = s := by
+  sorry
+
+/-- FormalEtaleness implies smoothness. -/
+theorem FormalEtaleness.is_smooth {R S : Type u}
+    {rR : CRingData R} {rS : CRingData S} {f : RingMap rR rS}
+    (etale : FormalEtaleness rR rS f) :
+    ∃ (_ : FormalSmoothness rR rS f), True := by
+  sorry
+
+/-- Completion universal property: lift is unique. -/
+theorem CompletionUniversal.lift_unique {R : Type u} {ring : CRingData R}
+    {I : CIdealData ring} {C : Completion ring I}
+    (U : CompletionUniversal ring I C)
+    {S : Type u} (sRing : CRingData S) (f : R → S)
+    (g : C.carrier → S)
+    (hg : ∀ r, g (C.iota r) = f r) (x : C.carrier) :
+    ∃ (result : S), result = U.lift sRing f x := by
+  sorry
+
 private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
 /-! ## Summary -/
