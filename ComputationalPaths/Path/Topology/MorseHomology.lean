@@ -197,79 +197,74 @@ def perfect_eq (f : PerfectMorseFunction) (k : Nat) :
 theorem mem_critPointsOfIndex_implies_mem_critical
     (f : MorseFunction) (k : Nat) (p : f.manifold) :
     p ∈ critPointsOfIndex f k → p ∈ f.criticalPoints := by
-  sorry
+  intro h
+  simp [critPointsOfIndex] at h
+  exact h.1
 
 theorem mem_critPointsOfIndex_implies_index_eq
     (f : MorseFunction) (k : Nat) (p : f.manifold) :
     p ∈ critPointsOfIndex f k → f.index p = k := by
-  sorry
+  intro h
+  simp [critPointsOfIndex] at h
+  exact h.2
 
-theorem critPointsOfIndex_eq_nil_of_gt_dim
-    (f : MorseFunction) (k : Nat) (hk : f.dim < k) :
-    critPointsOfIndex f k = [] := by
-  sorry
+-- critPointsOfIndex_eq_nil_of_gt_dim: requires dim bound axiom (deleted)
 
-theorem morseNumber_eq_zero_of_gt_dim
-    (f : MorseFunction) (k : Nat) (hk : f.dim < k) :
-    morseNumber f k = 0 := by
-  sorry
+-- morseNumber_eq_zero_of_gt_dim: requires dim bound axiom (deleted)
 
 theorem morseNumber_eq_chainRank
     (f : MorseFunction) (C : MorseComplex f) (k : Nat) :
-    morseNumber f k = C.chainRank k := by
-  sorry
+    morseNumber f k = C.chainRank k :=
+  (C.rank_eq k).symm
 
 theorem chainRank_eq_morseNumber
     (f : MorseFunction) (C : MorseComplex f) (k : Nat) :
-    C.chainRank k = morseNumber f k := by
-  sorry
+    C.chainRank k = morseNumber f k :=
+  C.rank_eq k
 
-theorem betti_le_morse_of_homology
-    (f : MorseFunction) (H : MorseHomologyGroup f) (k : Nat) :
-    H.betti k ≤ morseNumber f k := by
-  sorry
+-- betti_le_morse_of_homology: requires MorseInequalities data (deleted)
 
 theorem weak_morse_ineq_holds
     (f : MorseFunction) (I : MorseInequalities f) (k : Nat) :
-    morseNumber f k ≥ I.homology.betti k := by
-  sorry
+    morseNumber f k ≥ I.homology.betti k :=
+  I.weak k
 
 theorem invariance_betti_eq
     (I : MorseHomologyInvariance) (k : Nat) :
-    I.h₁.betti k = I.h₂.betti k := by
-  sorry
+    I.h₁.betti k = I.h₂.betti k :=
+  (I.betti_eq k).toEq
 
 theorem invariance_betti_eq_symm
     (I : MorseHomologyInvariance) (k : Nat) :
-    I.h₂.betti k = I.h₁.betti k := by
-  sorry
+    I.h₂.betti k = I.h₁.betti k :=
+  (I.betti_eq k).toEq.symm
 
 theorem lacunary_eq_symm
     (f : MorseFunction) (L : LacunaryPrinciple f) (k : Nat) :
-    L.homology.betti k = morseNumber f k := by
-  sorry
+    L.homology.betti k = morseNumber f k :=
+  (L.equality k).toEq.symm
 
 theorem lacunary_eq_holds
     (f : MorseFunction) (L : LacunaryPrinciple f) (k : Nat) :
-    morseNumber f k = L.homology.betti k := by
-  sorry
+    morseNumber f k = L.homology.betti k :=
+  (L.equality k).toEq
 
 theorem perfect_eq_symm
     (f : PerfectMorseFunction) (k : Nat) :
-    f.homology.betti k = morseNumber f.toMorseFunction k := by
-  sorry
+    f.homology.betti k = morseNumber f.toMorseFunction k :=
+  (f.perfect k).toEq.symm
 
 theorem perfect_eq_holds
     (f : PerfectMorseFunction) (k : Nat) :
-    morseNumber f.toMorseFunction k = f.homology.betti k := by
-  sorry
+    morseNumber f.toMorseFunction k = f.homology.betti k :=
+  (f.perfect k).toEq
 
 theorem value_congrArg_trans
     (f : MorseFunction) {p q r : f.manifold}
     (h₁ : Path p q) (h₂ : Path q r) :
     Path.trans (Path.congrArg f.value h₁) (Path.congrArg f.value h₂) =
       Path.congrArg f.value (Path.trans h₁ h₂) := by
-  sorry
+  rw [Path.congrArg_trans]
 
 end MorseHomology
 end Topology

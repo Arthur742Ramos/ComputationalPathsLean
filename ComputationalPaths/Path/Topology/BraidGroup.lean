@@ -64,44 +64,43 @@ def braid_rel_path {n : Nat} (B : ArtinBraidGroup n) (i j : Fin (n - 1))
 
 /-- Unfolding of generator notation. -/
 theorem sigma_apply {n : Nat} (B : ArtinBraidGroup n) (i : Fin (n - 1)) :
-    sigma B i = B.data.gen i := by
-  sorry
+    sigma B i = B.data.gen i := rfl
 
 /-- Far commutativity written in terms of `sigma`. -/
 theorem far_comm_path_sigma {n : Nat} (B : ArtinBraidGroup n)
     (i j : Fin (n - 1))
     (h : i.val + 2 ≤ j.val ∨ j.val + 2 ≤ i.val) :
     Nonempty (Path (B.data.mul (sigma B i) (sigma B j))
-      (B.data.mul (sigma B j) (sigma B i))) := by
-  sorry
+      (B.data.mul (sigma B j) (sigma B i))) :=
+  ⟨far_comm_path B i j h⟩
 
 /-- Braid relation written in terms of `sigma`. -/
 theorem braid_rel_path_sigma {n : Nat} (B : ArtinBraidGroup n)
     (i j : Fin (n - 1)) (h : j.val = i.val + 1) :
     Nonempty (Path (B.data.mul (B.data.mul (sigma B i) (sigma B j)) (sigma B i))
-      (B.data.mul (B.data.mul (sigma B j) (sigma B i)) (sigma B j))) := by
-  sorry
+      (B.data.mul (B.data.mul (sigma B j) (sigma B i)) (sigma B j))) :=
+  ⟨braid_rel_path B i j h⟩
 
 /-- Path-typed associativity for braid multiplication. -/
 theorem braid_mul_assoc_path {n : Nat} (B : ArtinBraidGroup n)
     (x y z : B.data.Braid) :
-    Nonempty (Path (B.data.mul (B.data.mul x y) z) (B.data.mul x (B.data.mul y z))) := by
-  sorry
+    Nonempty (Path (B.data.mul (B.data.mul x y) z) (B.data.mul x (B.data.mul y z))) :=
+  ⟨Path.stepChain (B.data.mul_assoc x y z)⟩
 
 /-- Path-typed left identity for braid multiplication. -/
 theorem braid_mul_left_id_path {n : Nat} (B : ArtinBraidGroup n) (x : B.data.Braid) :
-    Nonempty (Path (B.data.mul B.data.e x) x) := by
-  sorry
+    Nonempty (Path (B.data.mul B.data.e x) x) :=
+  ⟨Path.stepChain (B.data.e_mul x)⟩
 
 /-- Path-typed left inverse law for braids. -/
 theorem braid_inv_left_path {n : Nat} (B : ArtinBraidGroup n) (x : B.data.Braid) :
-    Nonempty (Path (B.data.mul (B.data.inv x) x) B.data.e) := by
-  sorry
+    Nonempty (Path (B.data.mul (B.data.inv x) x) B.data.e) :=
+  ⟨Path.stepChain (B.data.inv_mul x)⟩
 
 /-- Path-typed right inverse law for braids. -/
 theorem braid_inv_right_path {n : Nat} (B : ArtinBraidGroup n) (x : B.data.Braid) :
-    Nonempty (Path (B.data.mul x (B.data.inv x)) B.data.e) := by
-  sorry
+    Nonempty (Path (B.data.mul x (B.data.inv x)) B.data.e) :=
+  ⟨Path.stepChain (B.data.mul_inv x)⟩
 
 /-! ## Braid Group Representations -/
 
@@ -130,27 +129,30 @@ def map_mul_path {n : Nat} {B : ArtinBraidGroup n}
 theorem map_mul_sigma {n : Nat} {B : ArtinBraidGroup n}
     (R : BraidRepresentation n B) (i j : Fin (n - 1)) :
     R.toFun (B.data.mul (sigma B i) (sigma B j)) =
-      R.targetGroup.mul (R.toFun (sigma B i)) (R.toFun (sigma B j)) := by
-  sorry
+      R.targetGroup.mul (R.toFun (sigma B i)) (R.toFun (sigma B j)) :=
+  R.map_mul (sigma B i) (sigma B j)
 
 /-- Path witness for identity preservation. -/
 theorem map_one_path {n : Nat} {B : ArtinBraidGroup n}
     (R : BraidRepresentation n B) :
-    Nonempty (Path (R.toFun B.data.e) R.targetGroup.one) := by
-  sorry
+    Nonempty (Path (R.toFun B.data.e) R.targetGroup.one) :=
+  ⟨Path.stepChain R.map_one⟩
 
 /-- Path witness for inverse preservation. -/
 theorem map_inv_path {n : Nat} {B : ArtinBraidGroup n}
     (R : BraidRepresentation n B) (x : B.data.Braid) :
-    Nonempty (Path (R.toFun (B.data.inv x)) (R.targetGroup.inv (R.toFun x))) := by
-  sorry
+    Nonempty (Path (R.toFun (B.data.inv x)) (R.targetGroup.inv (R.toFun x))) :=
+  ⟨Path.stepChain (R.map_inv x)⟩
 
 /-- Path-typed functoriality for triple braid products. -/
 theorem map_mul_three_path {n : Nat} {B : ArtinBraidGroup n}
     (R : BraidRepresentation n B) (x y z : B.data.Braid) :
     Nonempty (Path (R.toFun (B.data.mul (B.data.mul x y) z))
       (R.targetGroup.mul (R.toFun x) (R.targetGroup.mul (R.toFun y) (R.toFun z)))) := by
-  sorry
+  have h1 := R.map_mul (B.data.mul x y) z
+  have h2 := R.map_mul x y
+  have h4 := R.targetGroup.mul_assoc (R.toFun x) (R.toFun y) (R.toFun z)
+  exact ⟨Path.stepChain (by rw [h1, h2, h4])⟩
 
 /-! ## Burau and Lawrence-Krammer Representations -/
 
@@ -179,14 +181,14 @@ structure LawrenceKrammerRepresentation (n : Nat) (B : ArtinBraidGroup n) where
 /-- Burau representation preserves the braid identity. -/
 theorem burau_map_one {n : Nat} {B : ArtinBraidGroup n}
     (ρ : BurauRepresentation n B) :
-    ρ.rep.toFun B.data.e = ρ.rep.targetGroup.one := by
-  sorry
+    ρ.rep.toFun B.data.e = ρ.rep.targetGroup.one :=
+  ρ.rep.map_one
 
 /-- Lawrence-Krammer representation preserves braid inverses. -/
 theorem lawrenceKrammer_map_inv {n : Nat} {B : ArtinBraidGroup n}
     (ρ : LawrenceKrammerRepresentation n B) (x : B.data.Braid) :
-    ρ.rep.toFun (B.data.inv x) = ρ.rep.targetGroup.inv (ρ.rep.toFun x) := by
-  sorry
+    ρ.rep.toFun (B.data.inv x) = ρ.rep.targetGroup.inv (ρ.rep.toFun x) :=
+  ρ.rep.map_inv x
 
 /-! ## Braid Closure and Knot Theory -/
 
@@ -230,14 +232,12 @@ structure MarkovTheorem (n : Nat) (B : ArtinBraidGroup n) where
 
 /-- Alexander witness contains a well-defined closure. -/
 theorem alexander_closure_well_defined (A : AlexanderTheorem) :
-    A.closure.closure_well_defined = True.intro := by
-  sorry
+    A.closure.closure_well_defined = True.intro := rfl
 
 /-- Markov theorem relation specializes to any pair of braids. -/
 theorem markov_move_equiv_true {n : Nat} {B : ArtinBraidGroup n}
     (M : MarkovTheorem n B) (b1 b2 : B.data.Braid) :
-    M.moveEquiv b1 b2 = True.intro := by
-  sorry
+    M.moveEquiv b1 b2 = True.intro := rfl
 
 end BraidGroup
 end Topology

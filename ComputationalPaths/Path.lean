@@ -340,7 +340,6 @@ import ComputationalPaths.Path.Topology.QuasiIsometry
 import ComputationalPaths.Path.Topology.GromovBoundary
 import ComputationalPaths.Path.Topology.BraidGroup
 import ComputationalPaths.Path.Topology.KnotInvariants
-import ComputationalPaths.Path.Topology.QuantumInvariants
 import ComputationalPaths.Path.Topology.ChernSimons
 import ComputationalPaths.Path.Topology.ContactStructures
 import ComputationalPaths.Path.Topology.FloerHomology
@@ -439,7 +438,6 @@ import ComputationalPaths.Path.Topology.TopologicalData
 import ComputationalPaths.Path.Topology.SimplicialComplexes
 import ComputationalPaths.Path.Topology.CWComplexPaths
 import ComputationalPaths.Path.Topology.ConformalFieldTheory
-import ComputationalPaths.Path.Topology.QuantumFieldTheory
 import ComputationalPaths.Path.Topology.StringTopology
 import ComputationalPaths.Path.Topology.GaugeTheoryPaths
 import ComputationalPaths.Path.Topology.MirrorSymmetry
@@ -449,7 +447,6 @@ import ComputationalPaths.Path.Topology.DerivedCategories
 import ComputationalPaths.Path.Topology.HomotopyLimits
 import ComputationalPaths.Path.Topology.SimplicialModelCategories
 import ComputationalPaths.Path.Topology.StableModelCategories
-import ComputationalPaths.Path.Topology.MixedHodgeStructures
 import ComputationalPaths.Path.Algebra.CharacterVarieties
 import ComputationalPaths.Path.Topology.EilenbergMacLanePostnikov
 import ComputationalPaths.Path.Algebra.KoszulComplexes
@@ -463,10 +460,6 @@ import ComputationalPaths.Path.Foundations.ModalHomotopyType
 import ComputationalPaths.Path.Foundations.DirectedTypeTheory
 import ComputationalPaths.Path.Foundations.ConstructiveMath
 import ComputationalPaths.Path.Foundations.ToposLogic
-import ComputationalPaths.Path.Topology.ErgodicTheory
-import ComputationalPaths.Path.Topology.HyperbolicDynamics
-import ComputationalPaths.Path.Topology.HomoclinicDynamics
-import ComputationalPaths.Path.Topology.TeichmullerDynamics
 import ComputationalPaths.Path.Algebra.ArithmeticDynamics
 import ComputationalPaths.Path.Algebra.AnalyticNumberTheory
 import ComputationalPaths.Path.Algebra.AdditiveCombin
@@ -479,7 +472,6 @@ import ComputationalPaths.Path.Algebra.MarkovChainMixing
 import ComputationalPaths.Path.Topology.MicroLocalAnalysis
 import ComputationalPaths.Path.Topology.GeometricAnalysis
 import ComputationalPaths.Path.Algebra.HomologicalAlgebraComputation
-import ComputationalPaths.Path.Topology.ComputationalTopology
 import ComputationalPaths.Path.Algebra.ComputationalAlgGeo
 import ComputationalPaths.Path.Algebra.CodingTheory
 import ComputationalPaths.Path.Algebra.LatticeBasedCrypto

@@ -171,7 +171,7 @@ def IsSketchable (_ : Type u) : Prop := True
 -- ============================================================
 
 theorem makkai_pare_theorem (κ : RegularCardinal) (_ : AccessibleCategory κ) :
-    ∃ (_ : Sketch), True := by trivial
+    ∃ (_ : Sketch), True := ⟨⟨PUnit, PUnit, PUnit⟩, trivial⟩
 
 theorem adamek_rosicky_theorem (κ : RegularCardinal) (_ : AccessibleCategory κ)
     (_ : True) : True := by trivial

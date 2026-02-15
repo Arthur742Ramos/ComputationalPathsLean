@@ -148,77 +148,77 @@ structure JSheaf (T : ElementaryTopos) (J : LawvereTierneyTopology T) where
 
 theorem category_assoc_path (C : Category) {A B C' D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B C') (h : C.Hom C' D) :
-    Nonempty (Path (C.comp (C.comp f g) h) (C.comp f (C.comp g h))) := by
-  sorry
+    Nonempty (Path (C.comp (C.comp f g) h) (C.comp f (C.comp g h))) :=
+  ⟨C.assoc f g h⟩
 
 theorem category_id_left_path (C : Category) {A B : C.Obj} (f : C.Hom A B) :
-    Nonempty (Path (C.comp (C.id A) f) f) := by
-  sorry
+    Nonempty (Path (C.comp (C.id A) f) f) :=
+  ⟨C.id_left f⟩
 
 theorem category_id_right_path (C : Category) {A B : C.Obj} (f : C.Hom A B) :
-    Nonempty (Path (C.comp f (C.id B)) f) := by
-  sorry
+    Nonempty (Path (C.comp f (C.id B)) f) :=
+  ⟨C.id_right f⟩
 
 theorem binary_product_fst_lift_path (C : Category) {A B : C.Obj}
     (P : BinaryProduct C A B) {X : C.Obj}
     (f : C.Hom X A) (g : C.Hom X B) :
-    Nonempty (Path (C.comp (P.lift f g) P.fst) f) := by
-  sorry
+    Nonempty (Path (C.comp (P.lift f g) P.fst) f) :=
+  ⟨P.fst_lift f g⟩
 
 theorem binary_product_snd_lift_path (C : Category) {A B : C.Obj}
     (P : BinaryProduct C A B) {X : C.Obj}
     (f : C.Hom X A) (g : C.Hom X B) :
-    Nonempty (Path (C.comp (P.lift f g) P.snd) g) := by
-  sorry
+    Nonempty (Path (C.comp (P.lift f g) P.snd) g) :=
+  ⟨P.snd_lift f g⟩
 
 theorem pullback_square_comm_path (C : Category) {A B C' : C.Obj}
     {f : C.Hom A C'} {g : C.Hom B C'}
     (P : PullbackSquare C f g) :
-    Nonempty (Path (C.comp P.fst f) (C.comp P.snd g)) := by
-  sorry
+    Nonempty (Path (C.comp P.fst f) (C.comp P.snd g)) :=
+  ⟨P.comm⟩
 
 theorem pullback_functor_map_id_path (C : Category)
     (F : PullbackFunctor C) (A : C.Obj) :
-    Nonempty (Path (F.onHom (C.id A)) (C.id (F.onObj A))) := by
-  sorry
+    Nonempty (Path (F.onHom (C.id A)) (C.id (F.onObj A))) :=
+  ⟨F.map_id A⟩
 
 theorem pullback_functor_map_comp_path (C : Category)
     (F : PullbackFunctor C) {A B D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) :
-    Nonempty (Path (F.onHom (C.comp f g)) (C.comp (F.onHom f) (F.onHom g))) := by
-  sorry
+    Nonempty (Path (F.onHom (C.comp f g)) (C.comp (F.onHom f) (F.onHom g))) :=
+  ⟨F.map_comp f g⟩
 
 theorem functor_map_id_path {C D : Category}
     (F : Functor C D) (A : C.Obj) :
-    Nonempty (Path (F.onHom (C.id A)) (D.id (F.onObj A))) := by
-  sorry
+    Nonempty (Path (F.onHom (C.id A)) (D.id (F.onObj A))) :=
+  ⟨F.map_id A⟩
 
 theorem functor_map_comp_path {C D : Category}
     (F : Functor C D) {A B C' : C.Obj}
     (f : C.Hom A B) (g : C.Hom B C') :
-    Nonempty (Path (F.onHom (C.comp f g)) (D.comp (F.onHom f) (F.onHom g))) := by
-  sorry
+    Nonempty (Path (F.onHom (C.comp f g)) (D.comp (F.onHom f) (F.onHom g))) :=
+  ⟨F.map_comp f g⟩
 
 theorem internal_logic_interpret_true_path {T : ElementaryTopos}
     (L : InternalLogic T) :
-    Nonempty (Path (L.interpret True) L.truth) := by
-  sorry
+    Nonempty (Path (L.interpret True) L.truth) :=
+  ⟨L.interpret_true⟩
 
 theorem internal_logic_interpret_false_path {T : ElementaryTopos}
     (L : InternalLogic T) :
-    Nonempty (Path (L.interpret False) L.falsity) := by
-  sorry
+    Nonempty (Path (L.interpret False) L.falsity) :=
+  ⟨L.interpret_false⟩
 
 theorem lawvere_tierney_truth_path {T : ElementaryTopos}
     (J : LawvereTierneyTopology T) :
     Nonempty (Path (T.cat.comp T.subobjectClassifier.truth J.j)
-      T.subobjectClassifier.truth) := by
-  sorry
+      T.subobjectClassifier.truth) :=
+  ⟨J.j_truth⟩
 
 theorem lawvere_tierney_idempotent_path {T : ElementaryTopos}
     (J : LawvereTierneyTopology T) :
-    Nonempty (Path (T.cat.comp J.j J.j) J.j) := by
-  sorry
+    Nonempty (Path (T.cat.comp J.j J.j) J.j) :=
+  ⟨J.j_idem⟩
 
 end ToposTheory
 end Topology

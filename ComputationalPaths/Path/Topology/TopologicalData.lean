@@ -265,36 +265,28 @@ def mapper_node_count (m : MapperGraph) :
 /-! ## Additional Theorem Stubs -/
 
 theorem mapper_node_count_consistency_theorem
-    (m : MapperGraph) : True := by
-  sorry
+    (m : MapperGraph) : True := trivial
 
 theorem mapper_functoriality_refinement_theorem
-    (M : MapperFunctoriality) : True := by
-  sorry
+    (M : MapperFunctoriality) : True := trivial
 
 theorem reeb_interleaving_symmetry_theorem
-    (R : ReebInterleavingDist) : True := by
-  sorry
+    (R : ReebInterleavingDist) : True := trivial
 
 theorem merge_tree_root_fixed_theorem
-    (t : MergeTree) : True := by
-  sorry
+    (t : MergeTree) : True := trivial
 
 theorem merge_tree_distance_nonnegative_theorem
-    (D : MergeTreeDist) : True := by
-  sorry
+    (D : MergeTreeDist) : True := trivial
 
 theorem landscape_order_monotone_theorem
-    (L : PersistenceLandscape) : True := by
-  sorry
+    (L : PersistenceLandscape) : True := trivial
 
 theorem wasserstein_triangle_theorem
-    (p : Nat) (W : WassersteinTriangle p) : True := by
-  sorry
+    (p : Nat) (W : WassersteinTriangle p) : True := trivial
 
 theorem tda_step_validity_theorem
-    (s : TDAStep) : True := by
-  sorry
+    (s : TDAStep) : True := trivial
 
 end TopologicalData
 end Topology

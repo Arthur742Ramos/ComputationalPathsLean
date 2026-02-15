@@ -292,36 +292,28 @@ structure RiemannRoch where
 /-! ## Additional Theorem Stubs -/
 
 theorem fredholm_index_formula_theorem (D : EllipticOperator)
-    (I : FredholmIndex D) : True := by
-  sorry
+    (I : FredholmIndex D) : True := trivial
 
 theorem dirac_index_ahat_theorem (D : DiracOperator)
-    (I : DiracIndex D) : True := by
-  sorry
+    (I : DiracIndex D) : True := trivial
 
 theorem atiyah_singer_index_theorem_statement (D : EllipticOperator)
-    (A : AtiyahSingerTheorem D) : True := by
-  sorry
+    (A : AtiyahSingerTheorem D) : True := trivial
 
 theorem heat_kernel_supertrace_invariance_theorem (D : EllipticOperator)
-    (H : HeatKernelData D) : True := by
-  sorry
+    (H : HeatKernelData D) : True := trivial
 
 theorem heat_kernel_index_agrees_fredholm_theorem (D : EllipticOperator)
-    (H : HeatKernelIndex D) : True := by
-  sorry
+    (H : HeatKernelIndex D) : True := trivial
 
 theorem aps_boundary_correction_theorem (D boundary : EllipticOperator)
-    (A : APSTheorem D boundary) : True := by
-  sorry
+    (A : APSTheorem D boundary) : True := trivial
 
 theorem families_index_specialization_theorem (F : EllipticFamily)
-    (T : FamiliesIndexTheorem F) : True := by
-  sorry
+    (T : FamiliesIndexTheorem F) : True := trivial
 
 theorem analytic_topological_index_agreement_theorem (M : Type u)
-    (K : CotangentKTheory M) (T : TopologicalIndexMap M K) : True := by
-  sorry
+    (K : CotangentKTheory M) (T : TopologicalIndexMap M K) : True := trivial
 
 end IndexTheoryPaths
 end Topology

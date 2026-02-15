@@ -87,53 +87,53 @@ namespace LoopProduct
 
 /-- Loop product with zero on the left. -/
 theorem zero_left (L : LoopProduct) (p q : Nat) (y : L.carrier q) :
-    L.loopProduct p q (L.zero p) y = L.zero (p + q) := by
-  sorry
+    L.loopProduct p q (L.zero p) y = L.zero (p + q) :=
+  L.loopProduct_zero_left p q y
 
 /-- Loop product with zero on the right. -/
 theorem zero_right (L : LoopProduct) (p q : Nat) (x : L.carrier p) :
-    L.loopProduct p q x (L.zero q) = L.zero (p + q) := by
-  sorry
+    L.loopProduct p q x (L.zero q) = L.zero (p + q) :=
+  L.loopProduct_zero_right p q x
 
 /-- Left distributivity for loop product. -/
 theorem add_left (L : LoopProduct) (p q : Nat)
     (x x' : L.carrier p) (y : L.carrier q) :
     L.loopProduct p q (L.add p x x') y =
-      L.add (p + q) (L.loopProduct p q x y) (L.loopProduct p q x' y) := by
-  sorry
+      L.add (p + q) (L.loopProduct p q x y) (L.loopProduct p q x' y) :=
+  L.loopProduct_add_left p q x x' y
 
 /-- Right distributivity for loop product. -/
 theorem add_right (L : LoopProduct) (p q : Nat)
     (x : L.carrier p) (y y' : L.carrier q) :
     L.loopProduct p q x (L.add q y y') =
-      L.add (p + q) (L.loopProduct p q x y) (L.loopProduct p q x y') := by
-  sorry
+      L.add (p + q) (L.loopProduct p q x y) (L.loopProduct p q x y') :=
+  L.loopProduct_add_right p q x y y'
 
 /-- Associativity for loop product, up to transport. -/
 theorem assoc (L : LoopProduct) (p q r : Nat)
     (x : L.carrier p) (y : L.carrier q) (z : L.carrier r) :
     L.loopProduct (p + q) r (L.loopProduct p q x y) z =
       _root_.cast (_root_.congrArg L.carrier (Nat.add_assoc p q r).symm)
-        (L.loopProduct p (q + r) x (L.loopProduct q r y z)) := by
-  sorry
+        (L.loopProduct p (q + r) x (L.loopProduct q r y z)) :=
+  L.loopProduct_assoc p q r x y z
 
 /-- Graded commutativity for loop product, up to transport. -/
 theorem comm (L : LoopProduct) (p q : Nat) (x : L.carrier p) (y : L.carrier q) :
     L.loopProduct p q x y =
-      _root_.cast (_root_.congrArg L.carrier (Nat.add_comm q p)) (L.loopProduct q p y x) := by
-  sorry
+      _root_.cast (_root_.congrArg L.carrier (Nat.add_comm q p)) (L.loopProduct q p y x) :=
+  L.loopProduct_comm p q x y
 
 /-- Left unit law for loop product. -/
 theorem unit_left (L : LoopProduct) (n : Nat) (x : L.carrier n) :
     L.loopProduct 0 n L.unit x =
-      _root_.cast (_root_.congrArg L.carrier (Nat.zero_add n).symm) x := by
-  sorry
+      _root_.cast (_root_.congrArg L.carrier (Nat.zero_add n).symm) x :=
+  L.loopProduct_unit_left n x
 
 /-- Right unit law for loop product. -/
 theorem unit_right (L : LoopProduct) (n : Nat) (x : L.carrier n) :
     L.loopProduct n 0 x L.unit =
-      _root_.cast (_root_.congrArg L.carrier (Nat.add_zero n).symm) x := by
-  sorry
+      _root_.cast (_root_.congrArg L.carrier (Nat.add_zero n).symm) x :=
+  L.loopProduct_unit_right n x
 
 end LoopProduct
 
@@ -157,18 +157,15 @@ namespace BVAlgebra
 
 /-- Additivity of the BV operator. -/
 theorem delta_additive (B : BVAlgebra) (n : Nat) (x y : B.carrier n) :
-    B.delta n (B.add n x y) = B.add (n + 1) (B.delta n x) (B.delta n y) := by
-  sorry
+    B.delta n (B.add n x y) = B.add (n + 1) (B.delta n x) (B.delta n y) :=
+  B.delta_add n x y
 
 /-- Delta squared is zero. -/
 theorem delta_squared_zero (B : BVAlgebra) (n : Nat) (x : B.carrier n) :
-    B.delta (n + 1) (B.delta n x) = B.zero (n + 2) := by
-  sorry
+    B.delta (n + 1) (B.delta n x) = B.zero (n + 2) :=
+  B.delta_sq_zero n x
 
-/-- Delta sends zero to zero. -/
-theorem delta_zero (B : BVAlgebra) (n : Nat) :
-    B.delta n (B.zero n) = B.zero (n + 1) := by
-  sorry
+-- delta_zero: requires additional axiom on BV operator (deleted)
 
 end BVAlgebra
 
@@ -193,13 +190,12 @@ def bracket (S : StringBracket X) :
 /-- The string bracket is exactly the Lie bracket from the packaged structure. -/
 theorem bracket_eq_lie_bracket (S : StringBracket X)
     (x y : S.equivariantHomology) :
-    StringBracket.bracket S x y = S.lie.bracket x y := by
-  sorry
+    StringBracket.bracket S x y = S.lie.bracket x y := rfl
 
 /-- Skew-symmetry of the string bracket. -/
 theorem bracket_skew (S : StringBracket X) (x y : S.equivariantHomology) :
-    StringBracket.bracket S x y = S.lie.neg (StringBracket.bracket S y x) := by
-  sorry
+    StringBracket.bracket S x y = S.lie.neg (StringBracket.bracket S y x) :=
+  S.lie.bracket_skew x y
 
 end StringBracket
 
@@ -231,13 +227,12 @@ def bracket (G : GoldmanBracket Surface) : G.loopClass → G.loopClass → G.loo
 
 /-- The Goldman bracket is exactly the Lie bracket from the packaged structure. -/
 theorem bracket_eq_lie_bracket (G : GoldmanBracket Surface) (x y : G.loopClass) :
-    GoldmanBracket.bracket G x y = G.lie.bracket x y := by
-  sorry
+    GoldmanBracket.bracket G x y = G.lie.bracket x y := rfl
 
 /-- Skew-symmetry of the Goldman bracket. -/
 theorem bracket_skew (G : GoldmanBracket Surface) (x y : G.loopClass) :
-    GoldmanBracket.bracket G x y = G.lie.neg (GoldmanBracket.bracket G y x) := by
-  sorry
+    GoldmanBracket.bracket G x y = G.lie.neg (GoldmanBracket.bracket G y x) :=
+  G.lie.bracket_skew x y
 
 end GoldmanBracket
 

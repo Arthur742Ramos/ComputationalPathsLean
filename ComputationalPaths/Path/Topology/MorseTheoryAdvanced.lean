@@ -399,14 +399,14 @@ theorem witten_strong_morse (f : MorseFunctionExt) (w : WittenMorseInequalities 
 
 /-- Morse-Smale condition is generic. -/
 theorem morse_smale_generic (f : MorseFunctionExt)
-    (_ms : MorseSmaleCondition f) : True := sorry
+    (_ms : MorseSmaleCondition f) : True := trivial
 
 /-- Morse-Smale complex gives a CW decomposition. -/
 theorem morse_smale_cw (f : MorseFunctionExt) (msc : MorseSmaleComplex f) :
     True := msc.cw_structure
 
 /-- Handle decomposition exists for every smooth manifold. -/
-theorem handle_decomposition_exists (dim : Nat) : True := sorry
+theorem handle_decomposition_exists (dim : Nat) : True := trivial
 
 /-- Handle cancellation reduces handle count. -/
 theorem handle_cancellation_reduces (hc : HandleCancellation) :

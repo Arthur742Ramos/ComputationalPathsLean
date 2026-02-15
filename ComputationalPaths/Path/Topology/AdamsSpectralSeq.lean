@@ -260,33 +260,25 @@ def diff_preserves_zero (r : Nat) (P : SSPage.{u} r)
 
 /-! ## Additional Theorem Stubs -/
 
-theorem ssPage_diff_zero_theorem (r : Nat) (P : SSPage r) {s t : Nat} : True := by
-  sorry
+theorem ssPage_diff_zero_theorem (r : Nat) (P : SSPage r) {s t : Nat} : True := trivial
 
 theorem diffSquaredZero_witness (r : Nat) (D : DiffSquaredZero r)
-    {s t : Nat} (x : D.groups.group s (t + r + r)) : True := by
-  sorry
+    {s t : Nat} (x : D.groups.group s (t + r + r)) : True := trivial
 
 theorem adamsStep_interprets_path {E : BiGraded} {s t : Nat}
-    {a b : E.group s t} (st : AdamsStep a b) : True := by
-  sorry
+    {a b : E.group s t} (st : AdamsStep a b) : True := trivial
 
-theorem canonicalWitness_diff_zero_theorem (r : Nat) (P : SSPage r) {s t : Nat} : True := by
-  sorry
+theorem canonicalWitness_diff_zero_theorem (r : Nat) (P : SSPage r) {s t : Nat} : True := trivial
 
-theorem diffPreservesZero_theorem (r : Nat) (P : SSPage r) {s t : Nat} : True := by
-  sorry
+theorem diffPreservesZero_theorem (r : Nat) (P : SSPage r) {s t : Nat} : True := trivial
 
-theorem strongConvergence_isStrong_true (S : StrongConvergence) : True := by
-  sorry
+theorem strongConvergence_isStrong_true (S : StrongConvergence) : True := trivial
 
 theorem adamsNovikov_d_squared_theorem (A : AdamsNovikov)
-    {s t : Nat} (x : A.e2Page.group s (t + 2 + 2)) : True := by
-  sorry
+    {s t : Nat} (x : A.e2Page.group s (t + 2 + 2)) : True := trivial
 
 theorem bigraded_add_comm_theorem (E : BiGraded) {s t : Nat}
-    (x y : E.group s t) : True := by
-  sorry
+    (x y : E.group s t) : True := trivial
 
 
 end AdamsSpectralSeq
