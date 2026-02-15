@@ -479,3 +479,6 @@ import ComputationalPaths.Path.Topology.ComputationalTopology
 import ComputationalPaths.Path.Algebra.ComputationalAlgGeo
 import ComputationalPaths.Path.Algebra.CodingTheory
 import ComputationalPaths.Path.Algebra.LatticeBasedCrypto
+import ComputationalPaths.Path.Algebra.DerivedAlgebraicGeometryFoundations
+import ComputationalPaths.Path.Algebra.HigherTopos
+import ComputationalPaths.Path.Algebra.CategorifiedAlgebra

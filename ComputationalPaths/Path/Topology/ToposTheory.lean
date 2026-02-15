@@ -144,6 +144,82 @@ structure JSheaf (T : ElementaryTopos) (J : LawvereTierneyTopology T) where
   obj : T.cat.Obj
   sheaf_condition : True
 
+/-! ## Basic Theorems -/
+
+theorem category_assoc_path (C : Category) {A B C' D : C.Obj}
+    (f : C.Hom A B) (g : C.Hom B C') (h : C.Hom C' D) :
+    Nonempty (Path (C.comp (C.comp f g) h) (C.comp f (C.comp g h))) := by
+  sorry
+
+theorem category_id_left_path (C : Category) {A B : C.Obj} (f : C.Hom A B) :
+    Nonempty (Path (C.comp (C.id A) f) f) := by
+  sorry
+
+theorem category_id_right_path (C : Category) {A B : C.Obj} (f : C.Hom A B) :
+    Nonempty (Path (C.comp f (C.id B)) f) := by
+  sorry
+
+theorem binary_product_fst_lift_path (C : Category) {A B : C.Obj}
+    (P : BinaryProduct C A B) {X : C.Obj}
+    (f : C.Hom X A) (g : C.Hom X B) :
+    Nonempty (Path (C.comp (P.lift f g) P.fst) f) := by
+  sorry
+
+theorem binary_product_snd_lift_path (C : Category) {A B : C.Obj}
+    (P : BinaryProduct C A B) {X : C.Obj}
+    (f : C.Hom X A) (g : C.Hom X B) :
+    Nonempty (Path (C.comp (P.lift f g) P.snd) g) := by
+  sorry
+
+theorem pullback_square_comm_path (C : Category) {A B C' : C.Obj}
+    {f : C.Hom A C'} {g : C.Hom B C'}
+    (P : PullbackSquare C f g) :
+    Nonempty (Path (C.comp P.fst f) (C.comp P.snd g)) := by
+  sorry
+
+theorem pullback_functor_map_id_path (C : Category)
+    (F : PullbackFunctor C) (A : C.Obj) :
+    Nonempty (Path (F.onHom (C.id A)) (C.id (F.onObj A))) := by
+  sorry
+
+theorem pullback_functor_map_comp_path (C : Category)
+    (F : PullbackFunctor C) {A B D : C.Obj}
+    (f : C.Hom A B) (g : C.Hom B D) :
+    Nonempty (Path (F.onHom (C.comp f g)) (C.comp (F.onHom f) (F.onHom g))) := by
+  sorry
+
+theorem functor_map_id_path {C D : Category}
+    (F : Functor C D) (A : C.Obj) :
+    Nonempty (Path (F.onHom (C.id A)) (D.id (F.onObj A))) := by
+  sorry
+
+theorem functor_map_comp_path {C D : Category}
+    (F : Functor C D) {A B C' : C.Obj}
+    (f : C.Hom A B) (g : C.Hom B C') :
+    Nonempty (Path (F.onHom (C.comp f g)) (D.comp (F.onHom f) (F.onHom g))) := by
+  sorry
+
+theorem internal_logic_interpret_true_path {T : ElementaryTopos}
+    (L : InternalLogic T) :
+    Nonempty (Path (L.interpret True) L.truth) := by
+  sorry
+
+theorem internal_logic_interpret_false_path {T : ElementaryTopos}
+    (L : InternalLogic T) :
+    Nonempty (Path (L.interpret False) L.falsity) := by
+  sorry
+
+theorem lawvere_tierney_truth_path {T : ElementaryTopos}
+    (J : LawvereTierneyTopology T) :
+    Nonempty (Path (T.cat.comp T.subobjectClassifier.truth J.j)
+      T.subobjectClassifier.truth) := by
+  sorry
+
+theorem lawvere_tierney_idempotent_path {T : ElementaryTopos}
+    (J : LawvereTierneyTopology T) :
+    Nonempty (Path (T.cat.comp J.j J.j) J.j) := by
+  sorry
+
 end ToposTheory
 end Topology
 end Path

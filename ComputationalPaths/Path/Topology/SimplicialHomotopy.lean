@@ -391,6 +391,85 @@ structure DoldKanCorrespondence where
   /-- Γ ∘ N ≅ id (abstract). -/
   gn_iso : True
 
+/-! ## Basic Theorems -/
+
+theorem simplex_id_map_path (a : SimplexCat) (i : Fin (a.n + 1)) :
+    Nonempty (Path ((SimplexMorphism.id a).map i) i) := by
+  sorry
+
+theorem simplex_comp_map_path {a b c : SimplexCat}
+    (g : SimplexMorphism b c) (f : SimplexMorphism a b) (i : Fin (a.n + 1)) :
+    Nonempty (Path ((SimplexMorphism.comp g f).map i) (g.map (f.map i))) := by
+  sorry
+
+theorem simplex_comp_id_left_map {a b : SimplexCat}
+    (f : SimplexMorphism a b) (i : Fin (a.n + 1)) :
+    (SimplexMorphism.comp (SimplexMorphism.id b) f).map i = f.map i := by
+  sorry
+
+theorem simplex_comp_id_right_map {a b : SimplexCat}
+    (f : SimplexMorphism a b) (i : Fin (a.n + 1)) :
+    (SimplexMorphism.comp f (SimplexMorphism.id a)).map i = f.map i := by
+  sorry
+
+theorem kan_horn_filler_exists (X : KanComplex.{u}) (n : Nat)
+    (k : Fin (n + 2)) (hn : n ≥ 1)
+    (hornData : (i : Fin (n + 2)) → i ≠ k → X.obj n) :
+    ∃ (filler : X.obj (n + 1)),
+      ∀ (i : Fin (n + 2)) (hi : i ≠ k),
+        X.face n i filler = hornData i hi := by
+  sorry
+
+theorem minimal_kan_faces_ext (X : MinimalKanComplex.{u}) (n : Nat)
+    (x y : X.obj (n + 1))
+    (hfaces : ∀ (i : Fin (n + 2)), X.face n i x = X.face n i y) :
+    x = y := by
+  sorry
+
+theorem small_category_assoc (C : SmallCategory.{u}) {a b c d : C.obj}
+    (f : C.hom c d) (g : C.hom b c) (h : C.hom a b) :
+    C.comp f (C.comp g h) = C.comp (C.comp f g) h := by
+  sorry
+
+theorem small_category_id_left (C : SmallCategory.{u}) {a b : C.obj}
+    (f : C.hom a b) :
+    C.comp (C.id b) f = f := by
+  sorry
+
+theorem small_category_id_right (C : SmallCategory.{u}) {a b : C.obj}
+    (f : C.hom a b) :
+    C.comp f (C.id a) = f := by
+  sorry
+
+theorem simplicial_homotopy_boundary0_eq {X Y : SimplicialSet.{u}}
+    (H : SimplicialHomotopy X Y) (n : Nat) (x : X.obj n) :
+    Y.face n ⟨0, by omega⟩ (H.homotopyData n x) = H.source n x := by
+  sorry
+
+theorem simplicial_homotopy_boundary1_eq {X Y : SimplicialSet.{u}}
+    (H : SimplicialHomotopy X Y) (n : Nat) (x : X.obj n) :
+    Y.face n ⟨1, by omega⟩ (H.homotopyData n x) = H.target n x := by
+  sorry
+
+theorem simplicial_homotopy_group_add_assoc {X : KanComplex.{u}} {n : Nat}
+    (G : SimplicialHomotopyGroup X n) (x y z : G.carrier) :
+    G.add (G.add x y) z = G.add x (G.add y z) := by
+  sorry
+
+theorem simplicial_homotopy_group_abelian_comm {X : KanComplex.{u}} {n : Nat}
+    (G : SimplicialHomotopyGroupAbelian X n) (x y : G.carrier) :
+    G.add x y = G.add y x := by
+  sorry
+
+theorem simplicial_abelian_face_add (A : SimplicialAbelianGroup.{u})
+    (n : Nat) (i : Fin (n + 2)) (x y : A.obj (n + 1)) :
+    A.face n i (A.add (n + 1) x y) = A.add n (A.face n i x) (A.face n i y) := by
+  sorry
+
+theorem quillen_equivalence_unit_counit (Q : QuillenEquivalence.{u}) :
+    (Q.unit_weq = True.intro) ∧ (Q.counit_weq = True.intro) := by
+  sorry
+
 end SimplicialHomotopy
 end Topology
 end Path

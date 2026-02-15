@@ -460,6 +460,74 @@ def peiffer_kernel_act_trivial (M : CrossedModule) (K : CrossedModule.KernelModu
     (Path.symm (Path.stepChain (_root_.congrArg (fun g => M.act g h) (K.in_kernel k).proof)))
     (M.peiffer (K.incl k) h)
 
+/-! ## Additional Structural Theorem Stubs -/
+
+theorem strict2group_vcomp_left_id_src (G : Strict2Group) (f : G.mor) :
+    G.src (G.vcomp (G.idMor (G.src f)) f) = G.src f := by
+  sorry
+
+theorem strict2group_vcomp_right_id_tgt (G : Strict2Group) (f : G.mor) :
+    G.tgt (G.vcomp f (G.idMor (G.tgt f))) = G.tgt f := by
+  sorry
+
+theorem strict2group_obj_assoc_four (G : Strict2Group) (a b c d : G.obj) :
+    G.objMul (G.objMul (G.objMul a b) c) d =
+      G.objMul a (G.objMul b (G.objMul c d)) := by
+  sorry
+
+theorem strict2group_obj_inv_mul_cancel (G : Strict2Group) (g h : G.obj) :
+    G.objMul (G.objMul (G.objInv g) g) h =
+      G.objMul G.objOne h := by
+  sorry
+
+theorem crossedModule_boundary_mul_three (M : CrossedModule) (h₁ h₂ h₃ : M.H) :
+    M.boundary (M.mulH (M.mulH h₁ h₂) h₃) =
+      M.mulG (M.mulG (M.boundary h₁) (M.boundary h₂)) (M.boundary h₃) := by
+  sorry
+
+theorem crossedModule_act_mulH_naturality (M : CrossedModule) (g : M.G) (h₁ h₂ : M.H) :
+    M.act g (M.mulH h₁ h₂) =
+      M.mulH (M.act g h₁) (M.act g h₂) := by
+  sorry
+
+theorem crossedModule_equivariance_one (M : CrossedModule) (h : M.H) :
+    M.boundary (M.act M.oneG h) =
+      M.mulG (M.mulG M.oneG (M.boundary h)) (M.invG M.oneG) := by
+  sorry
+
+theorem diffCrossedModule_dt_dact_naturality (D : DiffCrossedModule) (X : D.gAlg) (Y : D.hAlg) :
+    D.dt (D.dact X Y) = D.bracketG X (D.dt Y) := by
+  sorry
+
+theorem connection2_fake_flat_rewrite (M : DiffCrossedModule) (C : Connection2 M) (x : C.base) :
+    C.curvFA x = M.dt (C.connB x) := by
+  sorry
+
+theorem principal2bundle_diag_transition_left (P : Principal2Bundle) (i j : P.base) :
+    P.struc.objMul (P.transition i i) (P.transition i j) =
+      P.struc.objMul P.struc.objOne (P.transition i j) := by
+  sorry
+
+theorem higherTransport_transport1_const_natural (P : Principal2Bundle)
+    (T : HigherTransport P) (x : P.base) :
+    T.transport1 ⟨x, x⟩ = P.struc.objOne := by
+  sorry
+
+theorem higherTransport_transport2_boundary_naturality (P : Principal2Bundle)
+    (T : HigherTransport P) (σ : BaseSurface P.base) :
+    P.struc.objMul (T.transport1 σ.srcPath) P.struc.objOne =
+      P.struc.objMul (P.struc.src (T.transport2 σ)) P.struc.objOne := by
+  sorry
+
+theorem strict2GroupHom_comp_assoc_pres_objOne
+    {G₁ G₂ G₃ G₄ : Strict2Group}
+    (F : Strict2GroupHom G₁ G₂)
+    (K : Strict2GroupHom G₂ G₃)
+    (L : Strict2GroupHom G₃ G₄) :
+    (((F.comp K).comp L).pres_objOne.proof =
+      (F.comp (K.comp L)).pres_objOne.proof) := by
+  sorry
+
 end HigherGaugeTheory
 end Topology
 end Path
