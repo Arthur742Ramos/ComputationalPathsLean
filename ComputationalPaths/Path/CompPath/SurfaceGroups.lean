@@ -193,63 +193,64 @@ namespace CompPath
 
 theorem surfaceGroups_boundary_orientable (genus boundary : Nat) :
     SurfaceClass.boundary (SurfaceClass.orientable genus boundary) = boundary := by
-  sorry
+  rfl
 
 theorem surfaceGroups_boundary_nonorientable (crosscaps boundary : Nat) :
     SurfaceClass.boundary (SurfaceClass.nonorientable crosscaps boundary) = boundary := by
-  sorry
+  rfl
 
 theorem surfaceGroups_isOrientable_orientable (genus boundary : Nat) :
     SurfaceClass.isOrientable (SurfaceClass.orientable genus boundary) = true := by
-  sorry
+  rfl
 
 theorem surfaceGroups_isOrientable_nonorientable (crosscaps boundary : Nat) :
     SurfaceClass.isOrientable (SurfaceClass.nonorientable crosscaps boundary) = false := by
-  sorry
+  rfl
 
 theorem surfaceGroups_mappingClassComp_id_left (S : SurfaceData) (f : MappingClass S) :
     mappingClassComp (mappingClassId S) f = f := by
-  sorry
+  simp [mappingClassComp, mappingClassId, SimpleEquiv.refl_comp]
 
 theorem surfaceGroups_mappingClassComp_id_right (S : SurfaceData) (f : MappingClass S) :
     mappingClassComp f (mappingClassId S) = f := by
-  sorry
+  simp [mappingClassComp, mappingClassId, SimpleEquiv.comp_refl]
 
 theorem surfaceGroups_mappingClassInv_involutive (S : SurfaceData) (f : MappingClass S) :
     mappingClassInv (mappingClassInv f) = f := by
-  sorry
+  simp [mappingClassInv, SimpleEquiv.symm_symm]
 
 theorem surfaceGroups_dehnTwistPow_zero (S : SurfaceData) (D : DehnTwistData S)
     (c : SurfaceCurve S) :
     dehnTwistPow S D c 0 = mappingClassId S := by
-  sorry
+  simp [dehnTwistPow, Algebra.StrictGroup.zpow]
 
 theorem surfaceGroups_eulerChar_sphere :
     surfaceEulerChar (SurfaceClass.orientable 0 0) = 2 := by
-  sorry
+  rfl
 
 theorem surfaceGroups_eulerChar_torus :
     surfaceEulerChar (SurfaceClass.orientable 1 0) = 0 := by
-  sorry
+  rfl
 
 theorem surfaceGroups_eulerChar_genus_g (g : Nat) :
     surfaceEulerChar (SurfaceClass.orientable g 0) = 2 - 2 * Int.ofNat g := by
-  sorry
+  simp [surfaceEulerChar]
 
 theorem surfaceGroups_mappingClassComp_assoc (S : SurfaceData) (f g h : MappingClass S) :
     mappingClassComp (mappingClassComp f g) h =
     mappingClassComp f (mappingClassComp g h) := by
-  sorry
+  simp [mappingClassComp, SimpleEquiv.comp_assoc]
 
 theorem surfaceGroups_mappingClassInv_left (S : SurfaceData) (f : MappingClass S) :
     mappingClassComp (mappingClassInv f) f = mappingClassId S := by
-  sorry
+  simp [mappingClassComp, mappingClassInv, mappingClassId, SimpleEquiv.symm_comp]
 
 theorem surfaceGroups_dehnTwistPow_succ (S : SurfaceData) (D : DehnTwistData S)
     (c : SurfaceCurve S) (n : Nat) :
     dehnTwistPow S D c (n + 1) =
     mappingClassComp (dehnTwistPow S D c n) (dehnTwistPow S D c 1) := by
-  sorry
+  simp [dehnTwistPow, Algebra.StrictGroup.zpow, mappingClassComp]
+  rfl
 
 end CompPath
 end Path

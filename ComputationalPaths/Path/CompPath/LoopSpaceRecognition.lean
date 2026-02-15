@@ -84,72 +84,72 @@ def recognizeLoopSpaceOfSimpleEquiv {L : Type u} {A : Type u} (a : A)
 
 theorem pathSimpleEquivRefl_toFun_apply (α : Type u) (x : α) :
     (pathSimpleEquivRefl α).toFun x = x := by
-  sorry
+  rfl
 
 theorem pathSimpleEquivRefl_invFun_apply (α : Type u) (x : α) :
     (pathSimpleEquivRefl α).invFun x = x := by
-  sorry
+  rfl
 
 theorem pathSimpleEquivRefl_left_inv_apply (α : Type u) (x : α) :
     (pathSimpleEquivRefl α).left_inv x = Path.refl x := by
-  sorry
+  rfl
 
 theorem pathSimpleEquivRefl_right_inv_apply (α : Type u) (x : α) :
     (pathSimpleEquivRefl α).right_inv x = Path.refl x := by
-  sorry
+  rfl
 
 theorem simpleEquivToPathSimpleEquiv_toFun_apply {α : Type u} {β : Type v}
     (e : SimpleEquiv α β) (x : α) :
     (simpleEquivToPathSimpleEquiv e).toFun x = e.toFun x := by
-  sorry
+  rfl
 
 theorem simpleEquivToPathSimpleEquiv_invFun_apply {α : Type u} {β : Type v}
     (e : SimpleEquiv α β) (y : β) :
     (simpleEquivToPathSimpleEquiv e).invFun y = e.invFun y := by
-  sorry
+  rfl
 
 theorem simpleEquivToPathSimpleEquiv_left_inv_toEq {α : Type u} {β : Type v}
     (e : SimpleEquiv α β) (x : α) :
     Path.toEq ((simpleEquivToPathSimpleEquiv e).left_inv x) = e.left_inv x := by
-  sorry
+  rfl
 
 theorem simpleEquivToPathSimpleEquiv_right_inv_toEq {α : Type u} {β : Type v}
     (e : SimpleEquiv α β) (y : β) :
     Path.toEq ((simpleEquivToPathSimpleEquiv e).right_inv y) = e.right_inv y := by
-  sorry
+  rfl
 
 theorem recognizeLoopSpace_space (A : Type u) (a : A) :
     (recognizeLoopSpace A a).space = A := by
-  sorry
+  rfl
 
 theorem recognizeLoopSpace_base (A : Type u) (a : A) :
     (recognizeLoopSpace A a).base = a := by
-  sorry
+  rfl
 
 theorem recognizeLoopSpace_equiv_toFun_apply (A : Type u) (a : A)
     (p : LoopSpace A a) :
     (recognizeLoopSpace A a).equiv.toFun p = p := by
-  sorry
+  rfl
 
 theorem recognizeLoopSpace_equiv_invFun_apply (A : Type u) (a : A)
     (p : LoopSpace A a) :
     (recognizeLoopSpace A a).equiv.invFun p = p := by
-  sorry
+  rfl
 
 theorem recognizeLoopSpaceOfSimpleEquiv_space {L : Type u} {A : Type u} (a : A)
     (e : SimpleEquiv L (LoopSpace A a)) :
     (recognizeLoopSpaceOfSimpleEquiv a e).space = A := by
-  sorry
+  rfl
 
 theorem recognizeLoopSpaceOfSimpleEquiv_base {L : Type u} {A : Type u} (a : A)
     (e : SimpleEquiv L (LoopSpace A a)) :
     (recognizeLoopSpaceOfSimpleEquiv a e).base = a := by
-  sorry
+  rfl
 
 theorem recognizeLoopSpaceOfSimpleEquiv_left_inv_toEq {L : Type u} {A : Type u}
     (a : A) (e : SimpleEquiv L (LoopSpace A a)) (x : L) :
     Path.toEq ((recognizeLoopSpaceOfSimpleEquiv a e).equiv.left_inv x) = e.left_inv x := by
-  sorry
+  rfl
 
 /-! ## Summary -/
 
