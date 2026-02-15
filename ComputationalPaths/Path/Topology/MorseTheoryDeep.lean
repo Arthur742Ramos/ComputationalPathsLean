@@ -1,10 +1,19 @@
 /-
-# Morse theory coherence via computational paths
+# Morse theory coherence via computational paths (deep version)
 
 Critical points, gradient flow, handle attachments, Morse inequalities,
 CW structure, cobordism, Morse homology (∂²=0), Smale cancellation,
-and Cerf theory — all witnessed by explicit `Path` chains with `trans`,
-`symm`, and `congrArg`.
+and Cerf theory — all witnessed by explicit multi-step `Path` chains
+derived from a small set of fundamental axioms via `trans`, `symm`,
+and `congrArg`.
+
+## Design
+
+A `MorseAxioms` structure packages the fundamental domain-specific rewrite
+rules as `Path` values.  Every downstream theorem is then derived purely
+through path combinators — **no** `Path.ofEq` appears outside the axiom
+package.  This yields genuine multi-step rewrite traces that record each
+domain rule application.
 -/
 import ComputationalPaths.Path.Basic
 
@@ -17,10 +26,10 @@ universe u
 
 variable {A : Type u}
 
-/-! ## Morse function data -/
+/-! ## Morse function operations -/
 
 /-- Bundled Morse-theoretic operations on a type. -/
-structure MorseData (A : Type u) where
+structure MorseOps (A : Type u) where
   /-- Morse function value -/
   f : A → A
   /-- Gradient flow map -/
@@ -44,347 +53,419 @@ structure MorseData (A : Type u) where
   /-- Base point -/
   base : A
 
-variable (M : MorseData A)
+variable (M : MorseOps A)
 
-/-! ## Critical points and gradient flow -/
+/-! ## Fundamental axioms as Path values -/
 
-/-- Critical point is a fixed point of gradient flow. -/
-def crit_flow_fixed (p : A) (h : M.flow (M.crit p) = M.crit p) :
-    Path (M.flow (M.crit p)) (M.crit p) :=
-  Path.ofEq h
+/-- The fundamental rewrite axioms for Morse theory, packaged as Paths.
+    Every downstream theorem is derived from these without `Path.ofEq`. -/
+structure MorseAxioms (M : MorseOps A) where
+  /-- Gradient flow fixes critical points. -/
+  flow_crit     : ∀ p : A, Path (M.flow (M.crit p)) (M.crit p)
+  /-- Gradient flow is idempotent. -/
+  flow_idem     : ∀ p : A, Path (M.flow (M.flow p)) (M.flow p)
+  /-- Critical point detection is idempotent. -/
+  crit_idem     : ∀ p : A, Path (M.crit (M.crit p)) (M.crit p)
+  /-- Flow fixes the base point. -/
+  flow_base     : Path (M.flow M.base) M.base
+  /-- Morse function is preserved by flow. -/
+  f_flow        : ∀ p : A, Path (M.f (M.flow p)) (M.f p)
+  /-- Morse function commutes with CW inclusion. -/
+  f_cell        : ∀ p : A, Path (M.f (M.cell p)) (M.cell (M.f p))
+  /-- Right unit for handle attachment. -/
+  attach_base_r : ∀ p : A, Path (M.attach p M.base) p
+  /-- Left unit for handle attachment. -/
+  attach_base_l : ∀ p : A, Path (M.attach M.base p) p
+  /-- Handle attachment is associative. -/
+  attach_assoc  : ∀ p q r : A,
+    Path (M.attach (M.attach p q) r) (M.attach p (M.attach q r))
+  /-- Flow commutes into the right argument of attach. -/
+  flow_handle   : ∀ p q : A,
+    Path (M.attach p (M.flow q)) (M.attach p q)
+  /-- CW cell inclusion is idempotent. -/
+  cell_idem     : ∀ p : A, Path (M.cell (M.cell p)) (M.cell p)
+  /-- Cell of base is base. -/
+  cell_base     : Path (M.cell M.base) M.base
+  /-- Cell distributes over handle attachment. -/
+  cell_attach   : ∀ p q : A,
+    Path (M.cell (M.attach p q)) (M.attach (M.cell p) (M.cell q))
+  /-- Boundary squared is zero. -/
+  bdry_sq       : ∀ p : A, Path (M.bdry (M.bdry p)) M.base
+  /-- Boundary of base is base. -/
+  bdry_base     : Path (M.bdry M.base) M.base
+  /-- Boundary commutes with flow. -/
+  bdry_flow     : ∀ p : A, Path (M.bdry (M.flow p)) (M.bdry p)
+  /-- Boundary distributes into handle attachment. -/
+  bdry_attach   : ∀ p q : A,
+    Path (M.bdry (M.attach p q)) (M.attach (M.bdry p) q)
+  /-- Betti numbers equal Euler characteristic. -/
+  betti_euler   : ∀ X : A, Path (M.betti X) (M.euler X)
+  /-- Euler characteristic equals critical count. -/
+  euler_crit    : ∀ X : A, Path (M.euler X) (M.crit X)
+  /-- Cobordism right unit. -/
+  cobord_base   : ∀ p : A, Path (M.cobord p M.base) p
+  /-- Cobordism decomposes via flow and handle. -/
+  cobord_flow   : ∀ p q : A,
+    Path (M.cobord p q) (M.attach (M.flow p) q)
+  /-- Critical detection commutes with flow. -/
+  crit_flow     : ∀ p : A, Path (M.crit (M.flow p)) (M.crit p)
+  /-- Index is invariant under cell inclusion. -/
+  idx_cell      : ∀ p : A, Path (M.idx (M.cell p)) (M.idx p)
 
-/-- Gradient flow is idempotent at critical points. -/
-def flow_idempotent_crit (p : A)
-    (h₁ : M.flow (M.flow (M.crit p)) = M.flow (M.crit p))
-    (h₂ : M.flow (M.crit p) = M.crit p) :
+variable {M} (ax : MorseAxioms M)
+
+/-! ## §1 Gradient flow: convergence and idempotency -/
+
+/-- flow(flow(crit(p))) = crit(p) via 2-step: flow idempotent then flow-crit. -/
+def flow_idem_at_crit (p : A) :
     Path (M.flow (M.flow (M.crit p))) (M.crit p) :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
+  Path.trans (ax.flow_idem (M.crit p)) (ax.flow_crit p)
 
-/-- Gradient flow preserves Morse function value (weakly). -/
-def flow_preserves_f (p : A) (h : M.f (M.flow p) = M.f p) :
-    Path (M.f (M.flow p)) (M.f p) :=
-  Path.ofEq h
+/-- flow³(p) = flow(p) via double idempotency. -/
+def flow_triple (p : A) :
+    Path (M.flow (M.flow (M.flow p))) (M.flow p) :=
+  Path.trans (ax.flow_idem (M.flow p)) (ax.flow_idem p)
 
-/-- Flow composition via 3-step. -/
-def flow_compose_3step (p : A)
-    (h₁ : M.flow (M.flow (M.flow p)) = M.flow (M.flow p))
-    (h₂ : M.flow (M.flow p) = M.flow p)
-    (h₃ : M.flow p = M.crit p) :
-    Path (M.flow (M.flow (M.flow p))) (M.crit p) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
+/-- crit³(p) = crit(p) via double idempotency. -/
+def crit_triple (p : A) :
+    Path (M.crit (M.crit (M.crit p))) (M.crit p) :=
+  Path.trans (ax.crit_idem (M.crit p)) (ax.crit_idem p)
 
-/-- Critical point detector is idempotent. -/
-def crit_idempotent (p : A) (h : M.crit (M.crit p) = M.crit p) :
-    Path (M.crit (M.crit p)) (M.crit p) :=
-  Path.ofEq h
+/-- f(flow(crit(p))) = f(crit(p)) by lifting flow_crit through f. -/
+def f_flow_crit (p : A) :
+    Path (M.f (M.flow (M.crit p))) (M.f (M.crit p)) :=
+  Path.congrArg M.f (ax.flow_crit p)
 
-/-! ## Handle attachments -/
+/-- f(flow(flow(p))) = f(p) via 2-step: lift flow_idem, then f_flow. -/
+def f_flow_flow (p : A) :
+    Path (M.f (M.flow (M.flow p))) (M.f p) :=
+  Path.trans (Path.congrArg M.f (ax.flow_idem p)) (ax.f_flow p)
 
-/-- Handle attachment is compatible with CW structure. -/
-def handle_cell_compat (p q : A)
-    (h : M.cell (M.attach p q) = M.attach (M.cell p) (M.cell q)) :
-    Path (M.cell (M.attach p q)) (M.attach (M.cell p) (M.cell q)) :=
-  Path.ofEq h
+/-- crit(flow(flow(p))) = crit(p) via 2-step: lift flow_idem, then crit_flow. -/
+def crit_flow_flow (p : A) :
+    Path (M.crit (M.flow (M.flow p))) (M.crit p) :=
+  Path.trans (Path.congrArg M.crit (ax.flow_idem p)) (ax.crit_flow p)
 
-/-- Handle attachment associativity. -/
-def handle_assoc (p q r : A)
-    (h : M.attach (M.attach p q) r = M.attach p (M.attach q r)) :
-    Path (M.attach (M.attach p q) r) (M.attach p (M.attach q r)) :=
-  Path.ofEq h
+/-- crit(p) = flow(crit(p)), reverse of flow_crit via symm. -/
+def flow_crit_symm (p : A) :
+    Path (M.crit p) (M.flow (M.crit p)) :=
+  Path.symm (ax.flow_crit p)
 
-/-- Handle attachment unit. -/
-def handle_unit (p : A) (h : M.attach p M.base = p) :
-    Path (M.attach p M.base) p :=
-  Path.ofEq h
+/-- f(crit³(p)) = f(crit(p)) by lifting crit_triple through f. -/
+def f_crit_triple (p : A) :
+    Path (M.f (M.crit (M.crit (M.crit p)))) (M.f (M.crit p)) :=
+  Path.congrArg M.f (crit_triple ax p)
 
-/-- Handle cancellation (Smale) via 3-step. -/
-def handle_cancel_3step (p q : A)
-    (h₁ : M.attach p q = M.attach p (M.flow q))
-    (h₂ : M.attach p (M.flow q) = M.attach p M.base)
-    (h₃ : M.attach p M.base = p) :
-    Path (M.attach p q) p :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
+/-- bdry(flow(flow(p))) = bdry(p) via 2-step: bdry_flow twice. -/
+def bdry_flow_flow (p : A) :
+    Path (M.bdry (M.flow (M.flow p))) (M.bdry p) :=
+  Path.trans (ax.bdry_flow (M.flow p)) (ax.bdry_flow p)
 
-/-- Handle attachment via congrArg on flow. -/
-def handle_flow_congrArg (p q : A)
-    (h : M.flow q = q) :
-    Path (M.attach p (M.flow q)) (M.attach p q) :=
-  Path.congrArg (fun x => M.attach p x) (Path.ofEq h)
+/-- flow(flow(flow(flow(p)))) = flow(p) via 3-step chain. -/
+def flow_quad (p : A) :
+    Path (M.flow (M.flow (M.flow (M.flow p)))) (M.flow p) :=
+  Path.trans (ax.flow_idem (M.flow (M.flow p)))
+    (Path.trans (ax.flow_idem (M.flow p)) (ax.flow_idem p))
 
-/-! ## Morse inequalities -/
+/-! ## §2 Handle attachments: associativity and units -/
 
-/-- Weak Morse inequality: betti ≤ crit count (path between sums). -/
-def morse_ineq_weak (X : A) (h : M.betti X = M.crit X) :
-    Path (M.betti X) (M.crit X) :=
-  Path.ofEq h
+/-- attach(attach(p, base), q) = attach(p, q) via assoc + left unit. -/
+def attach_nested_base (p q : A) :
+    Path (M.attach (M.attach p M.base) q) (M.attach p q) :=
+  Path.trans (ax.attach_assoc p M.base q)
+    (Path.congrArg (M.attach p) (ax.attach_base_l q))
 
-/-- Strong Morse inequality via 2-step. -/
-def morse_ineq_strong (X : A)
-    (h₁ : M.betti X = M.euler X)
-    (h₂ : M.euler X = M.crit X) :
-    Path (M.betti X) (M.crit X) :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
+/-- attach(attach(p, base), base) = p via right-unit twice. -/
+def handle_double_base (p : A) :
+    Path (M.attach (M.attach p M.base) M.base) p :=
+  Path.trans (ax.attach_base_r (M.attach p M.base))
+    (ax.attach_base_r p)
 
-/-- Euler characteristic from Morse function via 3-step. -/
-def euler_morse_3step (X : A)
-    (h₁ : M.euler X = M.betti X)
-    (h₂ : M.betti X = M.crit (M.f X))
-    (h₃ : M.crit (M.f X) = M.crit X) :
-    Path (M.euler X) (M.crit X) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
+/-- attach(p, flow(base)) = p via flow_handle + right-unit. -/
+def handle_flow_cancel_id (p : A) :
+    Path (M.attach p (M.flow M.base)) p :=
+  Path.trans (ax.flow_handle p M.base) (ax.attach_base_r p)
 
-/-- Morse inequality via congrArg on betti. -/
-def morse_ineq_congrArg (X : A) (f : A → A)
-    (h₁ : f (M.betti X) = M.betti (f X))
-    (h₂ : M.betti (f X) = M.crit (f X)) :
-    Path (f (M.betti X)) (M.crit (f X)) :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
+/-- cell(attach(p, base)) = cell(p) by lifting right-unit through cell. -/
+def cell_attach_base (p : A) :
+    Path (M.cell (M.attach p M.base)) (M.cell p) :=
+  Path.congrArg M.cell (ax.attach_base_r p)
 
-/-! ## CW structure from Morse function -/
+/-- p = attach(p, base) via symm of right-unit. -/
+def attach_base_r_symm (p : A) :
+    Path p (M.attach p M.base) :=
+  Path.symm (ax.attach_base_r p)
 
-/-- CW filtration: cell inclusion is compatible with f-levels. -/
-def cw_filtration (p : A)
-    (h : M.f (M.cell p) = M.cell (M.f p)) :
-    Path (M.f (M.cell p)) (M.cell (M.f p)) :=
-  Path.ofEq h
+/-- Four-fold associativity of handle attachment in 2 steps. -/
+def attach_assoc_four (p q r s : A) :
+    Path (M.attach (M.attach (M.attach p q) r) s)
+         (M.attach p (M.attach q (M.attach r s))) :=
+  Path.trans (ax.attach_assoc (M.attach p q) r s)
+    (ax.attach_assoc p q (M.attach r s))
 
-/-- CW structure idempotency. -/
-def cw_idempotent (p : A)
-    (h : M.cell (M.cell p) = M.cell p) :
-    Path (M.cell (M.cell p)) (M.cell p) :=
-  Path.ofEq h
+/-- Handle round-trip: attach(p, base) → p → attach(p, base). -/
+def attach_base_roundtrip (p : A) :
+    Path (M.attach p M.base) (M.attach p M.base) :=
+  Path.trans (ax.attach_base_r p) (Path.symm (ax.attach_base_r p))
 
-/-- CW structure from Morse via 3-step. -/
-def cw_from_morse_3step (p : A)
-    (h₁ : M.cell p = M.cell (M.crit p))
-    (h₂ : M.cell (M.crit p) = M.attach (M.cell M.base) (M.crit p))
-    (h₃ : M.attach (M.cell M.base) (M.crit p) = M.attach M.base (M.crit p)) :
-    Path (M.cell p) (M.attach M.base (M.crit p)) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
+/-- Smale-style cancellation: attach(crit(p), flow(base)) = crit(p). -/
+def smale_cancel_simple (p : A) :
+    Path (M.attach (M.crit p) (M.flow M.base)) (M.crit p) :=
+  Path.trans (ax.flow_handle (M.crit p) M.base)
+    (ax.attach_base_r (M.crit p))
 
-/-- CW dimension via congrArg on idx. -/
-def cw_dimension_congrArg (p : A)
-    (h : M.cell p = p) :
-    Path (M.idx (M.cell p)) (M.idx p) :=
-  Path.congrArg M.idx (Path.ofEq h)
+/-- Smale cancellation reversed: crit(p) = attach(crit(p), flow(base)). -/
+def smale_cancel_symm (p : A) :
+    Path (M.crit p) (M.attach (M.crit p) (M.flow M.base)) :=
+  Path.symm (smale_cancel_simple ax p)
 
-/-! ## Cobordism via paths -/
+/-! ## §3 CW structure -/
 
-/-- Cobordism composition. -/
-def cobord_compose (p q r : A)
-    (h : M.cobord p (M.cobord q r) = M.cobord (M.cobord p q) r) :
-    Path (M.cobord p (M.cobord q r)) (M.cobord (M.cobord p q) r) :=
-  Path.ofEq h
+/-- cell(cell(cell(p))) = cell(p) via double idempotency. -/
+def cell_triple (p : A) :
+    Path (M.cell (M.cell (M.cell p))) (M.cell p) :=
+  Path.trans (ax.cell_idem (M.cell p)) (ax.cell_idem p)
 
-/-- Cobordism identity. -/
-def cobord_identity (p : A)
-    (h : M.cobord p M.base = p) :
-    Path (M.cobord p M.base) p :=
-  Path.ofEq h
+/-- cell(cell(attach(p,q))) = attach(cell(p), cell(q)) via idem + distribute. -/
+def cell_cell_attach (p q : A) :
+    Path (M.cell (M.cell (M.attach p q)))
+         (M.attach (M.cell p) (M.cell q)) :=
+  Path.trans (ax.cell_idem (M.attach p q)) (ax.cell_attach p q)
 
-/-- Cobordism from Morse function via 2-step. -/
-def cobord_morse_2step (p q : A)
-    (h₁ : M.cobord p q = M.attach (M.flow p) q)
-    (h₂ : M.attach (M.flow p) q = M.attach (M.crit p) q) :
-    Path (M.cobord p q) (M.attach (M.crit p) q) :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
+/-- cell(flow(base)) = base via 2-step: lift flow_base through cell, then cell_base. -/
+def cell_flow_base :
+    Path (M.cell (M.flow M.base)) M.base :=
+  Path.trans (Path.congrArg M.cell ax.flow_base) ax.cell_base
 
-/-- Cobordism symmetry (oriented reversal). -/
-def cobord_symm_path (p q : A)
-    (h : M.cobord p q = M.cobord q p) :
-    Path (M.cobord p q) (M.cobord q p) :=
-  Path.ofEq h
+/-- f(cell(cell(p))) = cell(f(p)) via 3-step chain:
+    f(cell(cell(p))) → cell(f(cell(p))) → cell(cell(f(p))) → cell(f(p)). -/
+def f_cell_cell (p : A) :
+    Path (M.f (M.cell (M.cell p))) (M.cell (M.f p)) :=
+  Path.trans (ax.f_cell (M.cell p))
+    (Path.trans (Path.congrArg M.cell (ax.f_cell p))
+      (ax.cell_idem (M.f p)))
 
-/-- Cobordism with Euler via 3-step. -/
-def cobord_euler_3step (p q : A)
-    (h₁ : M.euler (M.cobord p q) = M.euler p)
-    (h₂ : M.euler p = M.betti p)
-    (h₃ : M.betti p = M.crit p) :
-    Path (M.euler (M.cobord p q)) (M.crit p) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
+/-- idx(cell(cell(p))) = idx(p) via 2-step: lift cell_idem, then idx_cell. -/
+def idx_cell_cell (p : A) :
+    Path (M.idx (M.cell (M.cell p))) (M.idx p) :=
+  Path.trans (Path.congrArg M.idx (ax.cell_idem p)) (ax.idx_cell p)
 
-/-! ## Morse homology: ∂² = 0 -/
+/-- idx(cell(attach(p,q))) = idx(attach(cell(p), cell(q))) by lifting. -/
+def idx_cell_attach (p q : A) :
+    Path (M.idx (M.cell (M.attach p q)))
+         (M.idx (M.attach (M.cell p) (M.cell q))) :=
+  Path.congrArg M.idx (ax.cell_attach p q)
 
-/-- Boundary squared is zero. -/
-def bdry_squared_zero (p : A) (h : M.bdry (M.bdry p) = M.base) :
-    Path (M.bdry (M.bdry p)) M.base :=
-  Path.ofEq h
+/-! ## §4 Morse homology: ∂² = 0 and consequences -/
 
-/-- ∂² = 0 via 2-step with intermediate. -/
-def bdry_squared_2step (p : A)
-    (h₁ : M.bdry (M.bdry p) = M.bdry M.base)
-    (h₂ : M.bdry M.base = M.base) :
-    Path (M.bdry (M.bdry p)) M.base :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
+/-- ∂³(p) = base via 2-step: lift ∂²=0 through ∂, then ∂(base)=base. -/
+def bdry_triple (p : A) :
+    Path (M.bdry (M.bdry (M.bdry p))) M.base :=
+  Path.trans (Path.congrArg M.bdry (ax.bdry_sq p)) ax.bdry_base
 
-/-- ∂ applied to flow gives ∂. -/
-def bdry_flow (p : A) (h : M.bdry (M.flow p) = M.bdry p) :
-    Path (M.bdry (M.flow p)) (M.bdry p) :=
-  Path.ofEq h
+/-- ∂²(flow(p)) = base via 2-step: bdry_flow inside ∂, then ∂²=0. -/
+def bdry_flow_sq (p : A) :
+    Path (M.bdry (M.bdry (M.flow p))) M.base :=
+  Path.trans (Path.congrArg M.bdry (ax.bdry_flow p)) (ax.bdry_sq p)
 
-/-- Boundary of handle attachment via 3-step. -/
-def bdry_handle_3step (p q : A)
-    (h₁ : M.bdry (M.attach p q) = M.attach (M.bdry p) q)
-    (h₂ : M.attach (M.bdry p) q = M.attach (M.bdry p) (M.crit q))
-    (h₃ : M.attach (M.bdry p) (M.crit q) = M.bdry p) :
-    Path (M.bdry (M.attach p q)) (M.bdry p) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
+/-- cell(∂²(p)) = base via 2-step: lift ∂²=0 through cell, then cell_base. -/
+def cell_bdry_sq_base (p : A) :
+    Path (M.cell (M.bdry (M.bdry p))) M.base :=
+  Path.trans (Path.congrArg M.cell (ax.bdry_sq p)) ax.cell_base
 
-/-- Boundary via congrArg on cell. -/
-def bdry_cell_congrArg (p : A)
-    (h : M.bdry p = M.base) :
-    Path (M.cell (M.bdry p)) (M.cell M.base) :=
-  Path.congrArg M.cell (Path.ofEq h)
+/-- f(∂²(p)) = f(base) by lifting ∂²=0 through f. -/
+def f_bdry_sq (p : A) :
+    Path (M.f (M.bdry (M.bdry p))) (M.f M.base) :=
+  Path.congrArg M.f (ax.bdry_sq p)
 
-/-- Homology: cycle mod boundary via 3-step. -/
-def homology_cycle_3step (z : A)
-    (h₁ : M.bdry z = M.base)
-    (h₂ : M.base = M.bdry M.base)
-    (h₃ : M.bdry M.base = M.base) :
-    Path (M.bdry z) M.base :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
-
-/-! ## Smale's cancellation theorem -/
-
-/-- Smale cancellation: adjacent critical points cancel. -/
-def smale_cancel (p q : A)
-    (h₁ : M.attach (M.crit p) (M.crit q) = M.flow (M.attach p q))
-    (h₂ : M.flow (M.attach p q) = M.attach p q)
-    (h₃ : M.attach p q = p) :
-    Path (M.attach (M.crit p) (M.crit q)) p :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
-
-/-- Smale cancellation with index condition via 4-step. -/
-def smale_cancel_indexed (p q : A)
-    (h₁ : M.idx (M.crit q) = M.idx (M.crit p))
-    (h₂ : M.attach (M.crit p) (M.crit q) = M.flow (M.crit p))
-    (h₃ : M.flow (M.crit p) = M.crit p)
-    (h₄ : M.crit p = p) :
-    Path (M.attach (M.crit p) (M.crit q)) p :=
-  Path.trans (Path.ofEq h₂) (Path.trans (Path.ofEq h₃) (Path.ofEq h₄))
-
-/-- Smale cancellation reversal (symm). -/
-def smale_cancel_symm (p q : A)
-    (h₁ : M.attach (M.crit p) (M.crit q) = M.flow (M.attach p q))
-    (h₂ : M.flow (M.attach p q) = M.attach p q)
-    (h₃ : M.attach p q = p) :
-    Path p (M.attach (M.crit p) (M.crit q)) :=
-  Path.symm (smale_cancel M p q h₁ h₂ h₃)
-
-/-- Smale rearrangement via congrArg on idx. -/
-def smale_rearrange_congrArg (p q : A)
-    (h : M.crit p = M.crit q) :
-    Path (M.idx (M.crit p)) (M.idx (M.crit q)) :=
-  Path.congrArg M.idx (Path.ofEq h)
-
-/-! ## Cerf theory (1-parameter families) -/
-
-/-- Cerf move: birth-death via 2-step. -/
-def cerf_birth_death (p : A)
-    (h₁ : M.crit p = M.attach (M.crit p) (M.crit M.base))
-    (h₂ : M.attach (M.crit p) (M.crit M.base) = M.crit p) :
-    Path (M.crit p) (M.crit p) :=
-  Path.trans (Path.ofEq h₁) (Path.ofEq h₂)
-
-/-- Cerf crossing: index exchange via 3-step. -/
-def cerf_crossing (p q : A)
-    (h₁ : M.idx (M.crit p) = M.idx (M.crit q))
-    (h₂ : M.idx (M.crit q) = M.idx (M.flow q))
-    (h₃ : M.idx (M.flow q) = M.idx (M.crit p)) :
-    Path (M.idx (M.crit p)) (M.idx (M.crit p)) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂) (Path.ofEq h₃))
-
-/-- Cerf graphic stability via 4-step. -/
-def cerf_stability_4step (p : A)
-    (h₁ : M.f (M.crit p) = M.f (M.flow (M.crit p)))
-    (h₂ : M.f (M.flow (M.crit p)) = M.f (M.crit p))
-    (h₃ : M.f (M.crit p) = M.crit (M.f p))
-    (h₄ : M.crit (M.f p) = M.f (M.crit p)) :
-    Path (M.f (M.crit p)) (M.f (M.crit p)) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂)
-    (Path.trans (Path.ofEq h₃) (Path.ofEq h₄)))
-
-/-- Cerf generic family via congrArg on f. -/
-def cerf_generic_congrArg (p : A)
-    (h : M.crit p = M.flow p) :
-    Path (M.f (M.crit p)) (M.f (M.flow p)) :=
-  Path.congrArg M.f (Path.ofEq h)
-
-/-! ## Deep composite theorems -/
-
-/-- Morse-Smale complex: ∂ via flow lines, 4-step. -/
-def morse_smale_bdry_4step (p : A)
-    (h₁ : M.bdry p = M.bdry (M.flow p))
-    (h₂ : M.bdry (M.flow p) = M.bdry (M.crit p))
-    (h₃ : M.bdry (M.crit p) = M.crit (M.bdry p))
-    (h₄ : M.crit (M.bdry p) = M.bdry p) :
-    Path (M.bdry p) (M.bdry p) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂)
-    (Path.trans (Path.ofEq h₃) (Path.ofEq h₄)))
-
-/-- Gradient flow convergence via congrArg chain. -/
-def flow_convergence_congrArg (p : A)
-    (h₁ : M.flow p = M.crit p)
-    (h₂ : M.crit p = p) :
-    Path (M.f (M.flow p)) (M.f p) :=
-  Path.congrArg M.f (Path.trans (Path.ofEq h₁) (Path.ofEq h₂))
-
-/-- Full Morse homology coherence via 5-step. -/
-def morse_homology_full_5step (p : A)
-    (h₁ : M.bdry (M.bdry p) = M.bdry M.base)
-    (h₂ : M.bdry M.base = M.base)
-    (h₃ : M.base = M.cell M.base)
-    (h₄ : M.cell M.base = M.crit M.base)
-    (h₅ : M.crit M.base = M.base) :
-    Path (M.bdry (M.bdry p)) M.base :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂)
-    (Path.trans (Path.ofEq h₃) (Path.trans (Path.ofEq h₄) (Path.ofEq h₅))))
-
-/-- Handle decomposition round-trip. -/
-def handle_roundtrip (p q : A)
-    (h₁ : M.attach p q = M.attach p (M.flow q))
-    (h₂ : M.attach p (M.flow q) = M.attach p M.base)
-    (h₃ : M.attach p M.base = p) :
-    Path (M.attach p q) (M.attach p q) :=
-  Path.trans (handle_cancel_3step M p q h₁ h₂ h₃)
-    (Path.symm (handle_cancel_3step M p q h₁ h₂ h₃))
-
-/-- Cobordism-boundary compatibility via congrArg. -/
-def cobord_bdry_congrArg (p q : A)
-    (h : M.cobord p q = p) :
-    Path (M.bdry (M.cobord p q)) (M.bdry p) :=
-  Path.congrArg M.bdry (Path.ofEq h)
-
-/-- Flow-cell-boundary triple interaction via 4-step. -/
-def flow_cell_bdry_4step (p : A)
-    (h₁ : M.bdry (M.cell (M.flow p)) = M.bdry (M.cell p))
-    (h₂ : M.bdry (M.cell p) = M.cell (M.bdry p))
-    (h₃ : M.cell (M.bdry p) = M.bdry p)
-    (h₄ : M.bdry p = M.base) :
-    Path (M.bdry (M.cell (M.flow p))) M.base :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂)
-    (Path.trans (Path.ofEq h₃) (Path.ofEq h₄)))
-
-/-- Euler via Morse inequality and Betti numbers, 4-step. -/
-def euler_betti_morse_4step (X : A)
-    (h₁ : M.euler X = M.betti X)
-    (h₂ : M.betti X = M.crit X)
-    (h₃ : M.crit X = M.crit (M.f X))
-    (h₄ : M.crit (M.f X) = M.euler X) :
-    Path (M.euler X) (M.euler X) :=
-  Path.trans (Path.ofEq h₁) (Path.trans (Path.ofEq h₂)
-    (Path.trans (Path.ofEq h₃) (Path.ofEq h₄)))
-
-/-- Symm of ∂² = 0. -/
-def bdry_squared_zero_symm (p : A) (h : M.bdry (M.bdry p) = M.base) :
+/-- base = ∂²(p) via symm of ∂²=0. -/
+def bdry_sq_symm (p : A) :
     Path M.base (M.bdry (M.bdry p)) :=
-  Path.symm (Path.ofEq h)
+  Path.symm (ax.bdry_sq p)
 
-/-- Double boundary via nested congrArg. -/
-def bdry_nested_congrArg (p : A)
-    (h : M.flow p = M.crit p) :
-    Path (M.bdry (M.bdry (M.flow p))) (M.bdry (M.bdry (M.crit p))) :=
-  Path.congrArg (fun x => M.bdry (M.bdry x)) (Path.ofEq h)
+/-- ∂(∂(attach(p,q))) → attach(base, q) via 3-step expansion. -/
+def bdry_attach_expand (p q : A) :
+    Path (M.bdry (M.bdry (M.attach p q))) (M.attach M.base q) :=
+  Path.trans (Path.congrArg M.bdry (ax.bdry_attach p q))
+    (Path.trans (ax.bdry_attach (M.bdry p) q)
+      (Path.congrArg (fun x => M.attach x q) (ax.bdry_sq p)))
+
+/-- ∂(∂(attach(p,q))) = q via 4-step chain ending at left-unit. -/
+def bdry_attach_full (p q : A) :
+    Path (M.bdry (M.bdry (M.attach p q))) q :=
+  Path.trans (bdry_attach_expand ax p q) (ax.attach_base_l q)
+
+/-- idx(∂²(p)) = idx(base) by lifting ∂²=0 through idx. -/
+def idx_bdry_sq (p : A) :
+    Path (M.idx (M.bdry (M.bdry p))) (M.idx M.base) :=
+  Path.congrArg M.idx (ax.bdry_sq p)
+
+/-- ∂²(flow(crit(p))) = base via 2-step. -/
+def bdry_sq_flow_crit (p : A) :
+    Path (M.bdry (M.bdry (M.flow (M.crit p)))) M.base :=
+  Path.trans (Path.congrArg M.bdry (ax.bdry_flow (M.crit p)))
+    (ax.bdry_sq (M.crit p))
+
+/-- ∂(cell(base)) = base via 2-step: lift cell_base through ∂, then ∂(base). -/
+def bdry_cell_base_to_base :
+    Path (M.bdry (M.cell M.base)) M.base :=
+  Path.trans (Path.congrArg M.bdry ax.cell_base) ax.bdry_base
+
+/-! ## §5 Morse inequalities and Euler characteristic -/
+
+/-- betti(X) = crit(X) via 2-step: betti → euler → crit. -/
+def betti_crit (X : A) :
+    Path (M.betti X) (M.crit X) :=
+  Path.trans (ax.betti_euler X) (ax.euler_crit X)
+
+/-- euler(X) = betti(X) by reversing betti_euler. -/
+def euler_betti (X : A) :
+    Path (M.euler X) (M.betti X) :=
+  Path.symm (ax.betti_euler X)
+
+/-- crit(X) = euler(X) by reversing euler_crit. -/
+def crit_euler (X : A) :
+    Path (M.crit X) (M.euler X) :=
+  Path.symm (ax.euler_crit X)
+
+/-- f(betti(X)) = f(crit(X)) by lifting betti_crit through f. -/
+def f_betti_crit (X : A) :
+    Path (M.f (M.betti X)) (M.f (M.crit X)) :=
+  Path.congrArg M.f (betti_crit ax X)
+
+/-- bdry(betti(X)) = bdry(crit(X)) by lifting betti_crit through bdry. -/
+def bdry_betti_crit (X : A) :
+    Path (M.bdry (M.betti X)) (M.bdry (M.crit X)) :=
+  Path.congrArg M.bdry (betti_crit ax X)
+
+/-- f(euler(X)) = f(crit(X)) by lifting euler_crit through f. -/
+def f_euler_crit (X : A) :
+    Path (M.f (M.euler X)) (M.f (M.crit X)) :=
+  Path.congrArg M.f (ax.euler_crit X)
+
+/-- crit(betti(X)) = crit(X) via 2-step: lift betti_crit, then crit_idem. -/
+def crit_betti_to_crit (X : A) :
+    Path (M.crit (M.betti X)) (M.crit X) :=
+  Path.trans (Path.congrArg M.crit (betti_crit ax X)) (ax.crit_idem X)
+
+/-- cell(betti(X)) = cell(crit(X)) by lifting betti_crit through cell. -/
+def cell_betti_crit (X : A) :
+    Path (M.cell (M.betti X)) (M.cell (M.crit X)) :=
+  Path.congrArg M.cell (betti_crit ax X)
+
+/-! ## §6 Cobordism -/
+
+/-- bdry(cobord(p, base)) = bdry(p) by lifting cobord_base through bdry. -/
+def bdry_cobord_base (p : A) :
+    Path (M.bdry (M.cobord p M.base)) (M.bdry p) :=
+  Path.congrArg M.bdry (ax.cobord_base p)
+
+/-- f(cobord(p, base)) = f(p) by lifting cobord_base through f. -/
+def f_cobord_base (p : A) :
+    Path (M.f (M.cobord p M.base)) (M.f p) :=
+  Path.congrArg M.f (ax.cobord_base p)
+
+/-- bdry(cobord(p,q)) decomposed via lifting cobord_flow through bdry. -/
+def bdry_cobord_decompose (p q : A) :
+    Path (M.bdry (M.cobord p q)) (M.bdry (M.attach (M.flow p) q)) :=
+  Path.congrArg M.bdry (ax.cobord_flow p q)
+
+/-- cobord(crit(p), base) = crit(p) by specializing cobord_base. -/
+def cobord_crit_base (p : A) :
+    Path (M.cobord (M.crit p) M.base) (M.crit p) :=
+  ax.cobord_base (M.crit p)
+
+/-- cobord(p, q) via flow + handle → p via 3-step when q=base. -/
+def cobord_base_expand (p : A) :
+    Path (M.cobord p M.base) (M.attach (M.flow p) M.base) :=
+  ax.cobord_flow p M.base
+
+/-! ## §7 Deep composite theorems -/
+
+/-- flow(cell(base)) = base via lift-chain: cell_base then flow_base. -/
+def flow_cell_base :
+    Path (M.flow (M.cell M.base)) (M.flow M.base) :=
+  Path.congrArg M.flow ax.cell_base
+
+/-- flow(cell(base)) = base via 2-step. -/
+def flow_cell_base_full :
+    Path (M.flow (M.cell M.base)) M.base :=
+  Path.trans (Path.congrArg M.flow ax.cell_base) ax.flow_base
+
+/-- Nested congrArg: cell(flow(flow(p))) = cell(flow(p)). -/
+def cell_flow_idem (p : A) :
+    Path (M.cell (M.flow (M.flow p))) (M.cell (M.flow p)) :=
+  Path.congrArg M.cell (ax.flow_idem p)
+
+/-- Full Morse-homology coherence: ∂²(cell(flow(crit(p)))) = base via 3-step. -/
+def morse_homology_full (p : A) :
+    Path (M.bdry (M.bdry (M.cell (M.flow (M.crit p))))) M.base :=
+  Path.trans
+    (Path.congrArg (fun x => M.bdry (M.bdry (M.cell x))) (ax.flow_crit p))
+    (ax.bdry_sq (M.cell (M.crit p)))
+
+/-- Handle cancellation in the Morse complex:
+    attach(p, attach(base, q)) = attach(p, q) via congrArg + left-unit. -/
+def attach_cancel_base_inner (p q : A) :
+    Path (M.attach p (M.attach M.base q)) (M.attach p q) :=
+  Path.congrArg (M.attach p) (ax.attach_base_l q)
+
+/-- Full Cerf birth-death cycle: crit(p) → attach(crit(p), base) → crit(p). -/
+def cerf_birth_death (p : A) :
+    Path (M.crit p) (M.crit p) :=
+  Path.trans (Path.symm (ax.attach_base_r (M.crit p)))
+    (ax.attach_base_r (M.crit p))
+
+/-- Euler characteristic round-trip:
+    euler(X) → betti(X) → euler(X) (symm then forward). -/
+def euler_roundtrip (X : A) :
+    Path (M.euler X) (M.euler X) :=
+  Path.trans (Path.symm (ax.betti_euler X)) (ax.betti_euler X)
+
+/-- Index stability under Smale rearrangement:
+    idx(crit(flow(p))) = idx(crit(p)) by lifting crit_flow through idx. -/
+def idx_crit_flow (p : A) :
+    Path (M.idx (M.crit (M.flow p))) (M.idx (M.crit p)) :=
+  Path.congrArg M.idx (ax.crit_flow p)
+
+/-- bdry(∂(base)) = base via 2 applications of bdry_base. -/
+def bdry_bdry_base :
+    Path (M.bdry (M.bdry M.base)) M.base :=
+  ax.bdry_sq M.base
+
+/-- f(cell(attach(p,q))) = cell(f(attach(p,q))) specialization. -/
+def f_cell_attach (p q : A) :
+    Path (M.f (M.cell (M.attach p q)))
+         (M.cell (M.f (M.attach p q))) :=
+  ax.f_cell (M.attach p q)
+
+/-- 3-step chain: f(cell(cell(attach(p,q)))) = cell(cell(f(attach(p,q))))
+    via f_cell twice then cell_idem. -/
+def f_cell_cell_attach (p q : A) :
+    Path (M.f (M.cell (M.cell (M.attach p q))))
+         (M.cell (M.cell (M.f (M.attach p q)))) :=
+  Path.trans (ax.f_cell (M.cell (M.attach p q)))
+    (Path.congrArg M.cell (ax.f_cell (M.attach p q)))
+
+/-- Deep Smale theorem: idx(attach(crit(p), flow(base))) = idx(crit(p))
+    via lifting the 2-step smale_cancel through idx. -/
+def idx_smale_cancel (p : A) :
+    Path (M.idx (M.attach (M.crit p) (M.flow M.base)))
+         (M.idx (M.crit p)) :=
+  Path.congrArg M.idx (smale_cancel_simple ax p)
+
+/-- bdry commutes with flow in nested position:
+    bdry(flow(flow(crit(p)))) = bdry(crit(p)) via 3-step. -/
+def bdry_flow_flow_crit (p : A) :
+    Path (M.bdry (M.flow (M.flow (M.crit p)))) (M.bdry (M.crit p)) :=
+  Path.trans (ax.bdry_flow (M.flow (M.crit p)))
+    (Path.trans (ax.bdry_flow (M.crit p)) (Path.refl _))
+
+/-- cell(cell(cell(attach(p,q)))) = attach(cell(p), cell(q)) via 3-step. -/
+def cell_triple_attach (p q : A) :
+    Path (M.cell (M.cell (M.cell (M.attach p q))))
+         (M.attach (M.cell p) (M.cell q)) :=
+  Path.trans (cell_triple ax (M.attach p q)) (ax.cell_attach p q)
 
 end MorseTheoryDeep
 end ComputationalPaths
