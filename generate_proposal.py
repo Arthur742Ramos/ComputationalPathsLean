@@ -193,6 +193,12 @@ def add_ch1_expansion(doc: Document) -> None:
         These coherence considerations can be phrased categorically: proofs/terms form a category; equality witnesses suggest a groupoid enrichment; and the rules of the calculus supply the generators and relations of this enriched structure. They can also be phrased homotopically: terms are points, reductions are paths, and confluence diagrams are homotopies.
 
         The book’s contribution is to treat this structure systematically and with proofs. Rather than assuming “paths in a space” or postulating identity-type rules, we begin with the proof-theoretically motivated rewrite system implicit in Curry–Howard/LND and show that it generates, by iteration, precisely the kind of weak ω-groupoid structure expected from the homotopy hypothesis.
+
+        A further dimension of the Curry–Howard story is the tension between extensionality and intensionality. In an extensional theory, two terms are equal if they behave the same in all contexts (Leibniz equality). In an intensional theory, equality is a judgement that requires evidence. The computational-paths programme provides a bridge: it offers an intensional theory (where equality witnesses are recorded) that possesses enough algebraic structure to recover extensionality-like principles as derived operations.
+
+        For instance, function extensionality (funext)—the principle that if f and g agree on all inputs, they are equal—is a notorious difficulty in intensional Martin-Löf type theory. In the computational-paths setting, funext is related to the way η-expansion interacts with the rewrite system. By treating η-conversions as explicit rewrites, one obtains a path from f to λx. f x, and therefore a route to compare f and g via their values. The book develops this carefully, showing that many “axiomatic” features of modern type theory are actually consequences of the underlying rewrite algebra.
+
+        Finally, we note that the Curry–Howard interpretation of propositional logic is only the first step. The dictionary extends to first-order and higher-order logic, and to dependent types. While the present book focuses on the propositional core (to keep the higher-categorical construction manageable), the methodology is general. The passage from proof-terms to paths and from rewrites to higher cells is a universal feature of any system with a terminating and confluent reduction relation.
         """
     )
 
@@ -462,6 +468,12 @@ def add_ch1_expansion(doc: Document) -> None:
         In classical algebraic topology, one often computes π₁ by choosing a set of generators and relations (for example via van Kampen) and then analysing the resulting group presentation. Here the analogy is close: the rewrite system supplies generators (primitive rewrites) and relations (coherence rewrites), and the resulting path groupoid can be studied as a presented algebraic object. The later chapters exploit this to compute fundamental groups of standard spaces presented combinatorially.
 
         Thus normalisation is not only a semantic doctrine. It is the mechanism that turns rewriting into a source of computable homotopical invariants.
+
+        One might ask: why should we care about the *path* taken by a normalisation procedure? If the result is unique (confluence), isn't the history irrelevant? The answer lies in the interaction between computation and structure. In a complex formal system, we rarely compute in a vacuum. We compute inside contexts, under binders, and across dependent types. In these situations, the “stability” of normalisation under substitution—the fact that t[x:=u] normalises to the same thing regardless of whether you substitute before or after reducing—is not a triviality. It is a coherence property.
+
+        By recording normalisation paths as computational paths, we make this stability part of the theory. The coherence of substitution becomes a 2-dimensional property: a square relating two different paths. When we prove that these squares can be filled, we are proving that our computational semantics is “geometrically sound.”
+
+        This leads to a new way of thinking about proof-theoretic semantics. Instead of asking “what is the meaning of this proof?”, we ask “what is the homotopy type of the space of meanings?”. For the systems studied in this book, that homotopy type is the ω-groupoid of computational paths. This shift from points (normal forms) to paths and higher cells (normalisation sequences) is exactly the shift from 0-dimensional to higher-dimensional semantics.
         """
     )
 
@@ -527,6 +539,12 @@ def add_ch1_expansion(doc: Document) -> None:
         The book’s Appendix D lists the full rule set and provides a road map for readers who want to see how the critical pairs arise. This is particularly valuable for referees: it makes the proof-theoretic machinery transparent and checkable, and it demonstrates that the higher coherence claims are grounded in a concrete, finite rewriting object.
 
         In addition, the rewrite presentation provides a practical benefit for readers who wish to experiment. Because normal forms are unique, one can perform explicit calculations in the path algebra by reduction. This is analogous to reducing a word in a presented group to a normal form (when a confluent rewriting system is available), and it makes the later topological computations feel concrete rather than abstract.
+
+        The expansion to 77 rules also allows for the explicit treatment of “transport” and “naturality.” In any system with dependent types (or simply with terms that depend on other terms), one needs to be able to move an identification across a function or a constructor. If p : a = b, then for any f, one needs f(a) = f(b). This is the congruence (ap/congrArg) principle. But one also needs to know that this action is well-behaved: that ap_f(p · q) is the same as ap_f(p) · ap_f(q).
+
+        In a purely axiomatic setting, these are axioms of a functor. In the computational-paths setting, these are *rewrite rules*. We include specific rules that “push” the ap constructor through the transitivity (trans) constructor, effectively linearizing the path. This linearization is what allows for a terminating and confluent system: it reduces the nested complexity of path expressions to a canonical, “flattened” normal form.
+
+        Finally, we highlight the role of “whiskering.” Whiskering is the horizontal composition of a path with a 2-cell (a rewrite derivation). For the path groupoid to be a 2-category (or higher), whiskering must satisfy specific laws—the interchange laws. By including rules that govern how rewrites interact with path concatenation, we ensure that the interchange laws are satisfied by the rewrite system. This is the technical bridge that allows us to move from 1-dimensional groupoids to higher categories.
         """
     )
 
