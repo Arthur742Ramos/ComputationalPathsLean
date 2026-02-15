@@ -257,14 +257,14 @@ private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 theorem trivial_add_comm {X : SpaceData.{u}}
     (U : X.Point → Prop) (hU : X.isOpen U)
     (s t : (PresheafData.trivial X).section_ U hU) :
-    Path ((PresheafData.trivial X).add U hU s t)
-      ((PresheafData.trivial X).add U hU t s) := by
+    (PresheafData.trivial X).add U hU s t =
+      (PresheafData.trivial X).add U hU t s := by
   sorry
 
 theorem trivial_restrict_id {X : SpaceData.{u}}
     {U : X.Point → Prop} (hU : X.isOpen U)
     (s : (PresheafData.trivial X).section_ U hU) :
-    Path ((PresheafData.trivial X).restrict hU hU (fun _ hp => hp) s) s := by
+    (PresheafData.trivial X).restrict hU hU (fun _ hp => hp) s = s := by
   sorry
 
 theorem zeroSheaf_rank {X : SpaceData.{u}} :
@@ -278,60 +278,60 @@ theorem structureSheaf_rank {X : SpaceData.{u}} :
 theorem zeroMap_on_any_section {X : SpaceData.{u}}
     (F G : CoherentSheaf X)
     (U : X.Point → Prop) (hU : X.isOpen U) (s : F.section_ U hU) :
-    Path ((SheafMorphism.zeroMap F G).onSections U hU s) (G.zero U hU) := by
+    (SheafMorphism.zeroMap F G).onSections U hU s = G.zero U hU := by
   sorry
 
 theorem zeroMap_restrict_natural {X : SpaceData.{u}}
     (F G : CoherentSheaf X)
     {U V : X.Point → Prop} (hU : X.isOpen U) (hV : X.isOpen V)
     (hUV : ∀ p, V p → U p) (s : F.section_ U hU) :
-    Path (G.restrict hU hV hUV ((SheafMorphism.zeroMap F G).onSections U hU s))
-      ((SheafMorphism.zeroMap F G).onSections V hV (F.restrict hU hV hUV s)) := by
+    G.restrict hU hV hUV ((SheafMorphism.zeroMap F G).onSections U hU s) =
+      (SheafMorphism.zeroMap F G).onSections V hV (F.restrict hU hV hUV s) := by
   sorry
 
 theorem sheafExact_zero_input {X : SpaceData.{u}}
     {F G H : CoherentSheaf X} (seq : SheafExactSeq F G H)
     (U : X.Point → Prop) (hU : X.isOpen U) :
-    Path (seq.g.onSections U hU (seq.f.onSections U hU (F.zero U hU))) (H.zero U hU) := by
+    seq.g.onSections U hU (seq.f.onSections U hU (F.zero U hU)) = H.zero U hU := by
   sorry
 
 theorem cohomology_zero_left_path {X : SpaceData.{u}}
     {F : CoherentSheaf X} (H : SheafCohomology F)
     (n : Nat) (x : H.carrier n) :
-    Path (H.add n (H.zero n) x) x := by
+    H.add n (H.zero n) x = x := by
   sorry
 
 theorem serre_nondegenerate_implies_zero {X : SpaceData.{u}}
     {F : CoherentSheaf X} (S : SerreDuality F)
     (i : Nat) (hi : i ≤ S.dim) (x : S.HF.carrier i)
     (hpair : ∀ y, S.pair i hi x y = PUnit.unit) :
-    Path x (S.HF.zero i) := by
+    x = S.HF.zero i := by
   sorry
 
 theorem riemannRoch_formula_path {X : SpaceData.{u}}
     {F : CoherentSheaf X} (rr : RiemannRochData F) :
-    Path rr.euler.chi (rr.degree + 1 - rr.genus) := by
+    rr.euler.chi = rr.degree + 1 - rr.genus := by
   sorry
 
 theorem hilbert_leading_data_fixed {X : SpaceData.{u}}
     {F : CoherentSheaf X} (hp : HilbertPolynomial F) :
-    Path (hilbert_leading_data hp) (Path.refl (hp.eval 0)) := by
+    hilbert_leading_data hp = Path.refl (hp.eval 0) := by
   sorry
 
 theorem pathAnchor_left_identity {A : Type u} {a : A} (p : Path a a) :
-    Path (Path.trans (pathAnchor a) p) p := by
+    (Path.trans (pathAnchor a) p).proof = p.proof := by
   sorry
 
 theorem pathAnchor_right_identity {A : Type u} {a : A} (p : Path a a) :
-    Path (Path.trans p (pathAnchor a)) p := by
+    (Path.trans p (pathAnchor a)).proof = p.proof := by
   sorry
 
 theorem pathAnchor_assoc {A : Type u} {a : A} (p q r : Path a a) :
-    Path (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) := by
+    (Path.trans (Path.trans p q) r).proof = (Path.trans p (Path.trans q r)).proof := by
   sorry
 
 theorem pathAnchor_symm {A : Type u} (a : A) :
-    Path (Path.symm (pathAnchor a)) (pathAnchor a) := by
+    (Path.symm (pathAnchor a)).proof = (pathAnchor a).proof := by
   sorry
 
 /-! ## Summary -/

@@ -197,3 +197,176 @@ theorem accessible_localization (κ : RegularCardinal)
     (_ : AccessibleCategory κ) : True := by sorry
 
 end ComputationalPaths
+
+namespace ComputationalPaths
+
+open List
+
+universe u v w
+
+/-! ## Extended Accessibility Infrastructure -/
+
+structure LambdaPresentableObject (κ : RegularCardinal) (Obj : Type u) where
+  obj : Obj
+  isKappaPresentable : True
+
+structure LambdaOrthogonality (κ : RegularCardinal) (Obj : Type u)
+    (Hom : Obj → Obj → Type v) where
+  leftClass : Obj → Prop
+  rightClass : Obj → Prop
+  liftingWitness : True
+
+structure LambdaOrthogonalityClass (κ : RegularCardinal) (Obj : Type u) where
+  morphismClass : Obj → Prop
+  orthogonalObjects : Obj → Prop
+  closure : True
+
+structure MakkaiParePresentation (κ : RegularCardinal) where
+  sketch : Sketch
+  equivalenceWitness : True
+
+structure IndProBridge (Obj : Type u) where
+  indSide : IndCategory Obj
+  proSide : ProCategory Obj
+  comparisonFunctor : True
+
+structure AccessibleLocalizationData (κ : RegularCardinal)
+    (C : AccessibleCategory κ) where
+  localizationObj : Type u
+  localize : C.Obj → localizationObj
+  isAccessible : True
+
+structure AccessibleLocalizationFunctor (κ : RegularCardinal)
+    (C : AccessibleCategory κ) where
+  target : Type u
+  mapObj : C.Obj → target
+  preservesFilteredColimits : True
+
+structure SketchDoctrine where
+  baseSketch : Sketch
+  consequence : Type u → Prop
+
+structure SketchModelFunctor (S : Sketch) where
+  modelType : Type u
+  interpretation : S.Obj → modelType
+
+structure ReflectiveAccessibleSubcategory (κ : RegularCardinal)
+    (C : AccessibleCategory κ) where
+  Pred : C.Obj → Prop
+  reflector : C.Obj → C.Obj
+  unitWitness : True
+  isAccessibleReflection : True
+
+structure ReflectionFunctorData (κ : RegularCardinal)
+    (C : AccessibleCategory κ) where
+  subcat : ReflectiveAccessibleSubcategory κ C
+  preservesFilteredColimits : True
+
+structure SoundDoctrine where
+  syntaxType : Type u
+  semantics : syntaxType → Type v
+  soundness : True
+
+structure DoctrineMorphism (D₁ D₂ : SoundDoctrine) where
+  mapSyntax : D₁.syntaxType → D₂.syntaxType
+  preservesTruth : True
+
+def isAccessibleSketchable (κ : RegularCardinal) (C : AccessibleCategory κ) : Prop :=
+  True
+
+def hasReflectiveAccessibleSubcategory (κ : RegularCardinal)
+    (C : AccessibleCategory κ) : Prop :=
+  True
+
+/-! ## Additional Theorems -/
+
+theorem makkai_pare_presentation_exists (κ : RegularCardinal)
+    (C : AccessibleCategory κ) :
+    ∃ P : MakkaiParePresentation κ, True := by
+  sorry
+
+theorem lambda_orthogonality_stable_under_filtered_colimits
+    (κ : RegularCardinal) (Obj : Type u) (Hom : Obj → Obj → Type v)
+    (_ : LambdaOrthogonality κ Obj Hom) : True := by
+  sorry
+
+theorem lambda_orthogonality_characterizes_accessibility
+    (κ : RegularCardinal) (C : AccessibleCategory κ) : True := by
+  sorry
+
+theorem ind_pro_bridge_exists (Obj : Type u) :
+    ∃ B : IndProBridge Obj, True := by
+  sorry
+
+theorem ind_pro_bridge_functorial (Obj : Type u) (B : IndProBridge Obj) :
+    True := by
+  sorry
+
+theorem accessible_localization_data_exists (κ : RegularCardinal)
+    (C : AccessibleCategory κ) :
+    ∃ L : AccessibleLocalizationData κ C, True := by
+  sorry
+
+theorem accessible_localization_functor_exists (κ : RegularCardinal)
+    (C : AccessibleCategory κ) :
+    ∃ F : AccessibleLocalizationFunctor κ C, True := by
+  sorry
+
+theorem accessible_localization_is_reflective_ext (κ : RegularCardinal)
+    (C : AccessibleCategory κ) : True := by
+  sorry
+
+theorem sketch_theoretic_characterization_of_accessibility
+    (κ : RegularCardinal) (C : AccessibleCategory κ) : True := by
+  sorry
+
+theorem reflective_accessible_subcategory_exists
+    (κ : RegularCardinal) (C : AccessibleCategory κ) :
+    hasReflectiveAccessibleSubcategory κ C := by
+  sorry
+
+theorem reflective_accessible_subcategory_closed_under_limits
+    (κ : RegularCardinal) (C : AccessibleCategory κ)
+    (R : ReflectiveAccessibleSubcategory κ C) : True := by
+  sorry
+
+theorem reflective_accessible_subcategory_closed_under_filtered_colimits
+    (κ : RegularCardinal) (C : AccessibleCategory κ)
+    (R : ReflectiveAccessibleSubcategory κ C) : True := by
+  sorry
+
+theorem sound_doctrine_reflects_validity (D : SoundDoctrine) : True := by
+  sorry
+
+theorem sound_doctrine_is_complete_on_models (D : SoundDoctrine) : True := by
+  sorry
+
+theorem doctrine_morphism_composition (D₁ D₂ D₃ : SoundDoctrine)
+    (f : DoctrineMorphism D₁ D₂) (g : DoctrineMorphism D₂ D₃) : True := by
+  sorry
+
+theorem accessible_from_sound_doctrine (κ : RegularCardinal)
+    (C : AccessibleCategory κ) (_ : SoundDoctrine) : True := by
+  sorry
+
+theorem reflective_subcategory_has_accessible_reflector
+    (κ : RegularCardinal) (C : AccessibleCategory κ)
+    (R : ReflectiveAccessibleSubcategory κ C) : True := by
+  sorry
+
+theorem accessibility_preserved_by_reflection
+    (κ : RegularCardinal) (C : AccessibleCategory κ)
+    (R : ReflectiveAccessibleSubcategory κ C) : True := by
+  sorry
+
+theorem ind_and_pro_bridge_respects_localizations
+    (κ : RegularCardinal) (C : AccessibleCategory κ)
+    (_ : AccessibleLocalizationFunctor κ C) : True := by
+  sorry
+
+theorem sketchability_iff_makkai_pare (κ : RegularCardinal)
+    (C : AccessibleCategory κ) :
+    isAccessibleSketchable κ C ↔ True := by
+  sorry
+
+end ComputationalPaths

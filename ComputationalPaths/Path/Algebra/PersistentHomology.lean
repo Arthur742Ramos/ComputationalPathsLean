@@ -48,6 +48,24 @@ structure Poset (I : Type u) where
   /-- Antisymmetry. -/
   antisymm : forall {i j}, le i j -> le j i -> i = j
 
+namespace Poset
+
+variable {I : Type u} (P : Poset I)
+
+/-- Reflexivity of the order relation. -/
+theorem le_refl (i : I) : P.le i i := by
+  sorry
+
+/-- Transitivity of the order relation. -/
+theorem le_trans {i j k : I} (hij : P.le i j) (hjk : P.le j k) : P.le i k := by
+  sorry
+
+/-- Antisymmetry of the order relation. -/
+theorem le_antisymm {i j : I} (hij : P.le i j) (hji : P.le j i) : i = j := by
+  sorry
+
+end Poset
+
 /-- The category associated to a poset. -/
 def posetCategory {I : Type u} (P : Poset I) : Category where
   Obj := I
@@ -70,6 +88,15 @@ def posetCategory {I : Type u} (P : Poset I) : Category where
 def Subsimplex {V : Type v} (tau sigma : List V) : Prop :=
   forall v, List.Mem v tau -> List.Mem v sigma
 
+/-- Every simplex is a subsimplex of itself. -/
+theorem subsimplex_refl {V : Type v} (sigma : List V) : Subsimplex sigma sigma := by
+  sorry
+
+/-- Subsimplex relation is transitive. -/
+theorem subsimplex_trans {V : Type v} {rho tau sigma : List V}
+    (h₁ : Subsimplex rho tau) (h₂ : Subsimplex tau sigma) : Subsimplex rho sigma := by
+  sorry
+
 /-- A simplicial complex as a downward-closed family of simplices. -/
 structure SimplicialComplex (V : Type v) where
   /-- The simplices of the complex. -/
@@ -88,6 +115,23 @@ structure FilteredComplex (I : Type u) (V : Type v) where
   monotone :
     forall {i j} (h : index.le i j) {sigma},
       (complex i).simplices sigma -> (complex j).simplices sigma
+
+namespace FilteredComplex
+
+variable {I : Type u} {V : Type v} (F : FilteredComplex I V)
+
+/-- Monotonicity at a fixed index. -/
+theorem monotone_id {i : I} {sigma : List V}
+    (hs : (F.complex i).simplices sigma) : (F.complex i).simplices sigma := by
+  sorry
+
+/-- Monotonicity along a composable pair of index inequalities. -/
+theorem monotone_trans {i j k : I} (hij : F.index.le i j) (hjk : F.index.le j k)
+    {sigma : List V} (hs : (F.complex i).simplices sigma) :
+    (F.complex k).simplices sigma := by
+  sorry
+
+end FilteredComplex
 
 /-! ## Vect category and linear maps -/
 
@@ -128,6 +172,22 @@ def vectComp {K : Type u} {U V W : VectObj K}
             rw [f.map_smul]
         _ = W.vs.smul a (g.toFun (f.toFun v)) := by
             rw [g.map_smul] }
+
+/-- Composition of linear maps is associative. -/
+theorem vectComp_assoc {K : Type u} {U V W X : VectObj K}
+    (f : VectHom U V) (g : VectHom V W) (h : VectHom W X) :
+    vectComp (vectComp f g) h = vectComp f (vectComp g h) := by
+  sorry
+
+/-- Identity is a left unit for linear-map composition. -/
+theorem vectComp_id_left {K : Type u} {U V : VectObj K} (f : VectHom U V) :
+    vectComp (vectId U) f = f := by
+  sorry
+
+/-- Identity is a right unit for linear-map composition. -/
+theorem vectComp_id_right {K : Type u} {U V : VectObj K} (f : VectHom U V) :
+    vectComp f (vectId V) = f := by
+  sorry
 
 /-- Extensionality for linear maps. -/
 theorem linearMap_ext {K V W : Type u} {vs : VectorSpace K V} {ws : VectorSpace K W}
@@ -188,6 +248,22 @@ def PersistenceModule.map {I : Type u} {K : Type v}
     VectHom (M.obj i) (M.obj j) :=
   M.functor.mapHom h
 
+namespace PersistenceModule
+
+variable {I : Type u} {K : Type v} (M : PersistenceModule I K)
+
+/-- The structure map at a reflexive relation is the identity map. -/
+theorem map_id (i : I) :
+    M.map (M.index.refl i) = vectId (M.obj i) := by
+  sorry
+
+/-- Structure maps are compatible with transitivity in the index poset. -/
+theorem map_trans {i j k : I} (hij : M.index.le i j) (hjk : M.index.le j k) :
+    M.map (M.index.trans hij hjk) = vectComp (M.map hij) (M.map hjk) := by
+  sorry
+
+end PersistenceModule
+
 /-! ## Interval modules and structure theorem data -/
 
 /-- An interval [b,d) in a poset, recorded by its endpoints. -/
@@ -198,6 +274,11 @@ structure Interval {I : Type u} (P : Poset I) where
   death : I
   /-- Birth precedes death. -/
   birth_le_death : P.le birth death
+
+/-- Intervals satisfy their endpoint order condition. -/
+theorem birth_le_death_of_interval {I : Type u} {P : Poset I}
+    (J : Interval P) : P.le J.birth J.death := by
+  sorry
 
 /-- Birth-death pairs are the same data as intervals. -/
 abbrev BirthDeathPair {I : Type u} (P : Poset I) : Type u :=
@@ -232,6 +313,16 @@ structure PersistenceDiagram {I : Type u} (P : Poset I) where
 def diagramOf {I : Type u} {K : Type v}
     (D : IntervalDecomposition I K) : PersistenceDiagram D.module.index :=
   { pairs := D.intervals, finite := trivial }
+
+/-- Diagram extraction preserves the list of intervals as pairs. -/
+theorem diagramOf_pairs {I : Type u} {K : Type v} (D : IntervalDecomposition I K) :
+    (diagramOf D).pairs = D.intervals := by
+  sorry
+
+/-- The extracted persistence diagram is finite. -/
+theorem diagramOf_finite {I : Type u} {K : Type v} (D : IntervalDecomposition I K) :
+    (diagramOf D).finite = trivial := by
+  sorry
 
 /-! ## Persistent homology -/
 

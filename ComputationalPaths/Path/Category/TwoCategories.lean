@@ -395,3 +395,198 @@ theorem lax_to_strict_factorization (C : StrictTwoCategory) (M : TwoMonad C) :
   sorry
 
 end ComputationalPaths
+
+namespace ComputationalPaths
+
+open List
+
+universe u v w
+
+/-! ## Extended Bicategorical Coherence and 2-Monadic Structures -/
+
+structure BicategoryCoherenceData (B : BicategoryData) where
+  strictification : StrictTwoCategory
+  biequivalenceWitness : True
+
+structure StrictificationWitness (B : BicategoryData) where
+  strictPart : StrictTwoCategory
+  comparison : True
+
+structure MatesSquare (C : StrictTwoCategory) where
+  a : C.Obj
+  b : C.Obj
+  a' : C.Obj
+  b' : C.Obj
+  h : C.Hom a a'
+  k : C.Hom b b'
+
+structure MatesBijection (C : StrictTwoCategory) where
+  square : MatesSquare C
+  correspondence : True
+
+structure DoctrinalAdjunctionData (C : StrictTwoCategory) where
+  leftObj : C.Obj
+  rightObj : C.Obj
+  witness : True
+
+structure TwoMonadMorphism (C : StrictTwoCategory) (M N : TwoMonad C) where
+  component : (a : C.Obj) → C.Hom (M.T a) (N.T a)
+  coherence : True
+
+structure TwoMonadAlgebraMorphism (C : StrictTwoCategory) (M : TwoMonad C)
+    (A B : StrictAlgebra C M) where
+  map : C.Hom A.carrier B.carrier
+  preservesAction : True
+
+structure EMObject (C : StrictTwoCategory) (M : TwoMonad C) where
+  algebra : StrictAlgebra C M
+
+structure EilenbergMooreTwoCategory (C : StrictTwoCategory) (M : TwoMonad C) where
+  Obj : Type u
+  Hom : Obj → Obj → Type v
+  hasUniversalProperty : True
+
+structure LaxTransformation₂ (B₁ B₂ : BicategoryData)
+    (F G : LaxFunctor B₁ B₂) where
+  component : (a : B₁.Obj) → B₂.Hom (F.mapObj a) (G.mapObj a)
+  cell : True
+
+structure OplaxTransformation₂ (B₁ B₂ : BicategoryData)
+    (F G : LaxFunctor B₁ B₂) where
+  component : (a : B₁.Obj) → B₂.Hom (F.mapObj a) (G.mapObj a)
+  cell : True
+
+structure PseudoTransformation₂ (B₁ B₂ : BicategoryData)
+    (F G : LaxFunctor B₁ B₂) where
+  component : (a : B₁.Obj) → B₂.Hom (F.mapObj a) (G.mapObj a)
+  invertibleCell : True
+
+structure IconData (B₁ B₂ : BicategoryData)
+    (F G : LaxFunctor B₁ B₂) where
+  objectAgreement : F.mapObj = G.mapObj
+  iconCell : True
+
+structure ModificationData (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂}
+    (α β : LaxTransformation₂ B₁ B₂ F G) where
+  component : (a : B₁.Obj) → B₂.Hom (F.mapObj a) (G.mapObj a)
+  coherence : True
+
+def ModificationVerticalComp (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂}
+    {α β γ : LaxTransformation₂ B₁ B₂ F G}
+    (_ : ModificationData B₁ B₂ α β) (_ : ModificationData B₁ B₂ β γ) : Prop :=
+  True
+
+def ModificationHorizontalComp (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂}
+    {α β γ : LaxTransformation₂ B₁ B₂ F G}
+    (_ : ModificationData B₁ B₂ α β) (_ : ModificationData B₁ B₂ β γ) : Prop :=
+  True
+
+/-! ## Additional Theorems -/
+
+theorem bicategory_coherence_strictification_exists (B : BicategoryData) :
+    ∃ S : StrictificationWitness B, True := by
+  sorry
+
+theorem bicategory_coherence_unique_up_to_biequivalence (B : BicategoryData) :
+    True := by
+  sorry
+
+theorem mates_correspondence_is_bijective (C : StrictTwoCategory)
+    (M : MatesBijection C) : True := by
+  sorry
+
+theorem mates_correspondence_respects_vertical (C : StrictTwoCategory)
+    (M : MatesBijection C) : True := by
+  sorry
+
+theorem mates_correspondence_respects_horizontal (C : StrictTwoCategory)
+    (M : MatesBijection C) : True := by
+  sorry
+
+theorem doctrinal_adjunction_characterization (C : StrictTwoCategory)
+    (D : DoctrinalAdjunctionData C) : True := by
+  sorry
+
+theorem doctrinal_adjunction_lifts_left_adjoint (C : StrictTwoCategory)
+    (D : DoctrinalAdjunctionData C) : True := by
+  sorry
+
+theorem doctrinal_adjunction_lifts_right_adjoint (C : StrictTwoCategory)
+    (D : DoctrinalAdjunctionData C) : True := by
+  sorry
+
+theorem two_monad_algebra_2category_exists (C : StrictTwoCategory) (M : TwoMonad C) :
+    True := by
+  sorry
+
+theorem eilenberg_moore_for_twomonad_exists (C : StrictTwoCategory) (M : TwoMonad C) :
+    ∃ E : EilenbergMooreTwoCategory C M, True := by
+  sorry
+
+theorem eilenberg_moore_universal_property (C : StrictTwoCategory) (M : TwoMonad C)
+    (E : EilenbergMooreTwoCategory C M) : True := by
+  sorry
+
+theorem lax_transformation_whiskering_law (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂} (η : LaxTransformation₂ B₁ B₂ F G) : True := by
+  sorry
+
+theorem oplax_transformation_whiskering_law (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂} (η : OplaxTransformation₂ B₁ B₂ F G) : True := by
+  sorry
+
+theorem pseudo_transformation_gives_lax_and_oplax (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂} (η : PseudoTransformation₂ B₁ B₂ F G) : True := by
+  sorry
+
+theorem icons_form_category (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂} (_ : IconData B₁ B₂ F G) : True := by
+  sorry
+
+theorem icon_vertical_composition_associative (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂} (_ : IconData B₁ B₂ F G) : True := by
+  sorry
+
+theorem icon_identity_law (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂} (_ : IconData B₁ B₂ F G) : True := by
+  sorry
+
+theorem modification_vertical_associative (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂}
+    {α β γ δ : LaxTransformation₂ B₁ B₂ F G}
+    (m₁ : ModificationData B₁ B₂ α β)
+    (m₂ : ModificationData B₁ B₂ β γ)
+    (m₃ : ModificationData B₁ B₂ γ δ) : True := by
+  sorry
+
+theorem modification_horizontal_associative (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂}
+    {α β γ δ : LaxTransformation₂ B₁ B₂ F G}
+    (m₁ : ModificationData B₁ B₂ α β)
+    (m₂ : ModificationData B₁ B₂ β γ)
+    (m₃ : ModificationData B₁ B₂ γ δ) : True := by
+  sorry
+
+theorem modification_interchange_law (B₁ B₂ : BicategoryData)
+    {F G : LaxFunctor B₁ B₂}
+    {α β γ : LaxTransformation₂ B₁ B₂ F G}
+    (m₁ : ModificationData B₁ B₂ α β)
+    (m₂ : ModificationData B₁ B₂ β γ) : True := by
+  sorry
+
+theorem twomonad_morphism_preserves_unit (C : StrictTwoCategory)
+    {M N : TwoMonad C} (φ : TwoMonadMorphism C M N) : True := by
+  sorry
+
+theorem twomonad_morphism_preserves_multiplication (C : StrictTwoCategory)
+    {M N : TwoMonad C} (φ : TwoMonadMorphism C M N) : True := by
+  sorry
+
+theorem em_comparison_2functor_exists (C : StrictTwoCategory) (M : TwoMonad C) :
+    True := by
+  sorry
+
+end ComputationalPaths

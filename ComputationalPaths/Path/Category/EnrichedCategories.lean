@@ -328,8 +328,8 @@ universe u v
 /-! ## Weighted Limits and Colimits -/
 
 structure WeightedDiagram (C : VCategory) where
-  shape : Type u
-  weight : shape → Type v
+  shape : Type
+  weight : shape → Type
   diagramObj : shape → C.Obj
 
 structure WeightedCone (C : VCategory) (D : WeightedDiagram C) where
@@ -358,7 +358,7 @@ def HasWeightedColimits (C : VCategory) : Prop :=
 
 structure EnrichedYonedaIso (C : VCategory) where
   obj : C.Obj
-  presheaf : C.Obj → Type u
+  presheaf : C.Obj → Type
   witness : True
 
 structure EnrichedAdjunction (C D : VCategory) where
@@ -373,7 +373,7 @@ structure EnrichedAdjunctionMate (C D : VCategory) (A : EnrichedAdjunction C D) 
 /-! ## Change of Base, Tensors, Cotensors -/
 
 structure MonoidalBase where
-  Carrier : Type u
+  Carrier : Type
   tensor : Carrier → Carrier → Carrier
   unit : Carrier
 

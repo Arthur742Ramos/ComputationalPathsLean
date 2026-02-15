@@ -67,6 +67,83 @@ def intToFreeGroupOne_freeGroupOneToInt_path (x : BouquetFreeGroup 1) :
   simp [freeGroupOneToInt]
   exact (bouquetWord_one_equiv_single w).symm
 
+theorem freeGroup_rank_formula_one_path_eq (k : Nat) :
+    freeGroup_rank_formula_one_path k = freeGroup_rank_formula_one k := by
+  sorry
+
+theorem freeGroup_rank_formula_one_path_toEq (k : Nat) :
+    (freeGroup_rank_formula_one_path k).toEq = (freeGroup_rank_formula_one k).toEq := by
+  sorry
+
+theorem intToFreeGroupOne_eq_genPow_path_eq (k : Int) :
+    intToFreeGroupOne_eq_genPow_path k = intToFreeGroupOne_eq_genPow k := by
+  sorry
+
+theorem intToFreeGroupOne_eq_genPow_path_toEq (k : Int) :
+    (intToFreeGroupOne_eq_genPow_path k).toEq = (intToFreeGroupOne_eq_genPow k).toEq := by
+  sorry
+
+theorem freeGroupOneToInt_mul_path_toEq (x y : BouquetFreeGroup 1) :
+    (freeGroupOneToInt_mul_path x y).toEq = freeGroupOneToInt_mul x y := by
+  sorry
+
+theorem freeGroupOneToInt_pow_path_toEq (x : BouquetFreeGroup 1) (k : Nat) :
+    (freeGroupOneToInt_pow_path x k).toEq = freeGroupOneToInt_pow x k := by
+  sorry
+
+theorem freeGroupOneToInt_intToFreeGroupOne_path_toEq (k : Int) :
+    (freeGroupOneToInt_intToFreeGroupOne_path k).toEq = freeGroupOneToInt_intToFreeGroupOne k := by
+  sorry
+
+theorem intToFreeGroupOne_freeGroupOneToInt_path_refl_right (x : BouquetFreeGroup 1) :
+    Path.trans (intToFreeGroupOne_freeGroupOneToInt_path x) (Path.refl x) =
+      intToFreeGroupOne_freeGroupOneToInt_path x := by
+  sorry
+
+theorem freeGroupOneToInt_intToFreeGroupOne_path_refl_right (k : Int) :
+    Path.trans (freeGroupOneToInt_intToFreeGroupOne_path k) (Path.refl k) =
+      freeGroupOneToInt_intToFreeGroupOne_path k := by
+  sorry
+
+theorem freeGroupOneToInt_intToFreeGroupOne_symm_trans (k : Int) :
+    Path.trans (Path.symm (freeGroupOneToInt_intToFreeGroupOne_path k))
+      (freeGroupOneToInt_intToFreeGroupOne_path k) =
+      Path.refl k := by
+  sorry
+
+theorem intToFreeGroupOne_freeGroupOneToInt_symm_trans (x : BouquetFreeGroup 1) :
+    Path.trans (Path.symm (intToFreeGroupOne_freeGroupOneToInt_path x))
+      (intToFreeGroupOne_freeGroupOneToInt_path x) =
+      Path.refl x := by
+  sorry
+
+theorem freeGroupOneToInt_mul_path_functorial_id (x y : BouquetFreeGroup 1) :
+    Path.congrArg (fun z : Int => z) (freeGroupOneToInt_mul_path x y) =
+      freeGroupOneToInt_mul_path x y := by
+  sorry
+
+theorem freeGroupOneToInt_mul_path_naturality (x y : BouquetFreeGroup 1) :
+    Path.congrArg (fun z : Int => z)
+      (Path.trans (freeGroupOneToInt_mul_path x y)
+        (Path.refl (freeGroupOneToInt x + freeGroupOneToInt y))) =
+      Path.trans
+        (Path.congrArg (fun z : Int => z) (freeGroupOneToInt_mul_path x y))
+        (Path.congrArg (fun z : Int => z)
+          (Path.refl (freeGroupOneToInt x + freeGroupOneToInt y))) := by
+  sorry
+
+theorem freeGroupOneToInt_mul_path_assoc_refl (x y : BouquetFreeGroup 1) :
+    Path.trans
+      (Path.trans (freeGroupOneToInt_mul_path x y)
+        (Path.refl (freeGroupOneToInt x + freeGroupOneToInt y)))
+      (Path.refl (freeGroupOneToInt x + freeGroupOneToInt y)) =
+      Path.trans
+        (freeGroupOneToInt_mul_path x y)
+        (Path.trans
+          (Path.refl (freeGroupOneToInt x + freeGroupOneToInt y))
+          (Path.refl (freeGroupOneToInt x + freeGroupOneToInt y))) := by
+  sorry
+
 end
 
 /-! ## Summary -/

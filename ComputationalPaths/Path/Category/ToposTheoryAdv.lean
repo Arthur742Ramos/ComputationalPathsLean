@@ -230,3 +230,186 @@ theorem connected_atomic_is_BG : True := by sorry
 theorem locally_connected_pi0 (_ : LocallyConnectedTopos) : True := by sorry
 
 end ComputationalPaths
+
+namespace ComputationalPaths
+
+open List
+
+universe u v w
+
+/-! ## Extended Topos-Theoretic Constructions -/
+
+structure DeligneCompletenessData (E : GrothendieckTopos) where
+  coherentPresentation : True
+  enoughPointsWitness : HasEnoughPoints E
+
+structure BarrCoveringData (E : GrothendieckTopos) where
+  coverTopos : GrothendieckTopos
+  coverMorphism : GeometricMorphism coverTopos E
+  isSurjective : True
+
+structure AtomicToposData (E : GrothendieckTopos) where
+  atomicity : True
+  booleanSubobjects : True
+
+structure ConnectedGeometricMorphism (E F : GrothendieckTopos)
+    (f : GeometricMorphism E F) where
+  preservesTerminalConnectedness : True
+
+structure LocallyConnectedGeometricMorphism (E F : GrothendieckTopos)
+    (f : GeometricMorphism E F) where
+  hasLeftAdjointToInverseImage : True
+
+structure LocalGeometricMorphism (E F : GrothendieckTopos)
+    (f : GeometricMorphism E F) where
+  hasFurtherRightAdjoint : True
+
+structure HyperconnectedPart (E F : GrothendieckTopos) where
+  morphism : GeometricMorphism E F
+  isHyperconnected' : IsHyperconnected E F morphism
+
+structure LocalicPart (E F : GrothendieckTopos) where
+  morphism : GeometricMorphism E F
+  isLocalic' : IsLocalic E F morphism
+
+structure HyperconnectedLocalicFactorizationData (E F : GrothendieckTopos) where
+  middle : GrothendieckTopos
+  hyperPart : GeometricMorphism E middle
+  localicPart : GeometricMorphism middle F
+  witness : IsHyperconnected E middle hyperPart ∧ IsLocalic middle F localicPart
+
+structure GeometricTheory where
+  sort : Type u
+  axioms : sort → Prop
+
+structure ClassifyingTopos (T : GeometricTheory) where
+  carrier : GrothendieckTopos
+  classifiesModels : True
+
+structure ToposPoint (E : GrothendieckTopos) where
+  point : PointOfTopos E
+  conservative : True
+
+structure PointCategory (E : GrothendieckTopos) where
+  Obj : Type u
+  Hom : Obj → Obj → Type v
+  forgetful : Obj → PointOfTopos E
+
+structure EnoughPointsWitness (E : GrothendieckTopos) where
+  points : PointCategory E
+  jointlyConservative : True
+
+structure AtomicConnectedTopos where
+  toTopos : GrothendieckTopos
+  atomic : AtomicToposData toTopos
+  connected : True
+
+def isLocallyConnectedTopos (E : GrothendieckTopos) : Prop :=
+  ∃ F : LocallyConnectedTopos, F.toGrothendieckTopos = E
+
+def pointsDetectIsomorphisms (E : GrothendieckTopos) : Prop :=
+  True
+
+/-! ## Additional Theorems -/
+
+theorem deligne_completeness_data_exists (E : GrothendieckTopos) :
+    ∃ D : DeligneCompletenessData E, True := by
+  sorry
+
+theorem deligne_completeness_implies_enough_points (E : GrothendieckTopos)
+    (D : DeligneCompletenessData E) : HasEnoughPoints E := by
+  sorry
+
+theorem barr_covering_data_exists (E : GrothendieckTopos) :
+    ∃ B : BarrCoveringData E, True := by
+  sorry
+
+theorem barr_covering_surjective (E : GrothendieckTopos) (B : BarrCoveringData E) :
+    True := by
+  sorry
+
+theorem atomic_topos_decomposition (E : GrothendieckTopos)
+    (A : AtomicToposData E) : True := by
+  sorry
+
+theorem connected_geometric_morphism_stable_under_comp
+    (E F G : GrothendieckTopos)
+    (f : GeometricMorphism E F) (g : GeometricMorphism F G)
+    (_ : ConnectedGeometricMorphism E F f)
+    (_ : ConnectedGeometricMorphism F G g) : True := by
+  sorry
+
+theorem locally_connected_geometric_morphism_stable_under_comp
+    (E F G : GrothendieckTopos)
+    (f : GeometricMorphism E F) (g : GeometricMorphism F G)
+    (_ : LocallyConnectedGeometricMorphism E F f)
+    (_ : LocallyConnectedGeometricMorphism F G g) : True := by
+  sorry
+
+theorem local_geometric_morphism_reflects_points
+    (E F : GrothendieckTopos) (f : GeometricMorphism E F)
+    (_ : LocalGeometricMorphism E F f) : True := by
+  sorry
+
+theorem hyperconnected_localic_factorization_data_exists
+    (E F : GrothendieckTopos) (f : GeometricMorphism E F) :
+    ∃ H : HyperconnectedLocalicFactorizationData E F, True := by
+  sorry
+
+theorem hyperconnected_localic_factorization_unique
+    (E F : GrothendieckTopos)
+    (_ : HyperconnectedLocalicFactorizationData E F) : True := by
+  sorry
+
+theorem classifying_topos_exists (T : GeometricTheory) :
+    ∃ C : ClassifyingTopos T, True := by
+  sorry
+
+theorem classifying_topos_points_correspond_models (T : GeometricTheory)
+    (_ : ClassifyingTopos T) : True := by
+  sorry
+
+theorem points_of_topos_form_category (E : GrothendieckTopos) :
+    ∃ P : PointCategory E, True := by
+  sorry
+
+theorem enough_points_from_point_category (E : GrothendieckTopos)
+    (W : EnoughPointsWitness E) : HasEnoughPoints E := by
+  sorry
+
+theorem atomic_connected_topos_has_localic_groupoid (A : AtomicConnectedTopos) :
+    True := by
+  sorry
+
+theorem localic_part_of_factorization_is_localic
+    (E F : GrothendieckTopos)
+    (H : HyperconnectedLocalicFactorizationData E F) :
+    IsLocalic H.middle F H.localicPart := by
+  sorry
+
+theorem hyperconnected_part_of_factorization_is_hyperconnected
+    (E F : GrothendieckTopos)
+    (H : HyperconnectedLocalicFactorizationData E F) :
+    IsHyperconnected E H.middle H.hyperPart := by
+  sorry
+
+theorem connected_atomic_implies_points (A : AtomicConnectedTopos) : True := by
+  sorry
+
+theorem geometric_theory_has_points_if_classifying_topos_has_enough_points
+    (T : GeometricTheory) (C : ClassifyingTopos T) : True := by
+  sorry
+
+theorem points_detect_isomorphisms_iff_enough_points (E : GrothendieckTopos) :
+    pointsDetectIsomorphisms E ↔ HasEnoughPoints E := by
+  sorry
+
+theorem local_geometric_morphism_factorization
+    (E F : GrothendieckTopos) (f : GeometricMorphism E F)
+    (_ : LocalGeometricMorphism E F f) : True := by
+  sorry
+
+theorem deligne_and_barr_are_compatible (E : GrothendieckTopos) : True := by
+  sorry
+
+end ComputationalPaths

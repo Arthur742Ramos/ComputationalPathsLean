@@ -45,6 +45,25 @@ inductive ZigzagArrow where
   /-- Backward arrow from i+1 to i. -/
   | backward
 
+namespace ZigzagArrow
+
+/-- Every zigzag arrow is either forward or backward. -/
+theorem forward_or_backward (a : ZigzagArrow) :
+    a = ZigzagArrow.forward ∨ a = ZigzagArrow.backward := by
+  sorry
+
+/-- A non-forward zigzag arrow must be backward. -/
+theorem not_forward_iff_backward (a : ZigzagArrow) :
+    a ≠ ZigzagArrow.forward ↔ a = ZigzagArrow.backward := by
+  sorry
+
+/-- A non-backward zigzag arrow must be forward. -/
+theorem not_backward_iff_forward (a : ZigzagArrow) :
+    a ≠ ZigzagArrow.backward ↔ a = ZigzagArrow.forward := by
+  sorry
+
+end ZigzagArrow
+
 /-- A finite zigzag persistence module indexed by natural numbers. -/
 structure ZigzagModule where
   /-- Number of arrows in the zigzag. -/
@@ -84,6 +103,26 @@ theorem contains_start (I : Interval) : contains I I.start :=
 theorem contains_stop (I : Interval) : contains I I.stop :=
   And.intro I.start_le_stop (Nat.le_refl _)
 
+/-- Membership unfolds to endpoint inequalities. -/
+theorem contains_iff (I : Interval) (i : Nat) :
+    contains I i ↔ I.start <= i ∧ i <= I.stop := by
+  sorry
+
+/-- Left endpoint inequality extracted from interval membership. -/
+theorem contains_left (I : Interval) {i : Nat} (h : contains I i) :
+    I.start <= i := by
+  sorry
+
+/-- Right endpoint inequality extracted from interval membership. -/
+theorem contains_right (I : Interval) {i : Nat} (h : contains I i) :
+    i <= I.stop := by
+  sorry
+
+/-- Endpoint inequalities imply interval membership. -/
+theorem contains_of_le_of_le (I : Interval) {i : Nat}
+    (hstart : I.start <= i) (hstop : i <= I.stop) : contains I i := by
+  sorry
+
 end Interval
 
 /-- Interval decomposition data for a zigzag module. -/
@@ -117,6 +156,26 @@ def decomposeEquiv (i : Nat) :
     SimpleEquiv (Z.obj i) (D.supportedFiber i) :=
   D.decompose i
 
+/-- Support witnesses imply the left interval inequality. -/
+theorem supports_within_left {j : D.intervals} {i : Nat} (h : D.supports j i) :
+    (D.interval j).start <= i := by
+  sorry
+
+/-- Support witnesses imply the right interval inequality. -/
+theorem supports_within_right {j : D.intervals} {i : Nat} (h : D.supports j i) :
+    i <= (D.interval j).stop := by
+  sorry
+
+/-- The decomposition equivalence is left-invertible on objects. -/
+theorem decomposeEquiv_left_inv (i : Nat) (x : Z.obj i) :
+    (D.decomposeEquiv i).invFun ((D.decomposeEquiv i).toFun x) = x := by
+  sorry
+
+/-- The decomposition equivalence is right-invertible on supported fibers. -/
+theorem decomposeEquiv_right_inv (i : Nat) (x : D.supportedFiber i) :
+    (D.decomposeEquiv i).toFun ((D.decomposeEquiv i).invFun x) = x := by
+  sorry
+
 end IntervalDecomposition
 
 /-! ## Diamond principle -/
@@ -134,6 +193,17 @@ structure DiamondDiagram (A B C D : Type u) where
   /-- Commutativity of the diamond. -/
   commutes : forall a : A, downLeft (left a) = downRight (right a)
 
+namespace DiamondDiagram
+
+variable {A B C D : Type u} (diagram : DiamondDiagram A B C D)
+
+/-- The commutativity field evaluated at a point. -/
+theorem commutes_apply (a : A) :
+    diagram.downLeft (diagram.left a) = diagram.downRight (diagram.right a) := by
+  sorry
+
+end DiamondDiagram
+
 /-- Fiber of a map at a point. -/
 def Fiber {A B : Type u} (f : A -> B) (b : B) : Type u :=
   { a : A // f a = b }
@@ -143,6 +213,18 @@ structure DiamondPrinciple {A B C D : Type u} (diagram : DiamondDiagram A B C D)
   /-- Equivalence between fibers of the two legs over any d. -/
   fiberEquiv :
     forall d : D, SimpleEquiv (Fiber diagram.downLeft d) (Fiber diagram.downRight d)
+
+namespace DiamondPrinciple
+
+variable {A B C D : Type u} {diagram : DiamondDiagram A B C D}
+variable (P : DiamondPrinciple diagram)
+
+/-- Fiber equivalences in a diamond principle satisfy left-inverse law. -/
+theorem fiberEquiv_left_inv (d : D) (x : Fiber diagram.downLeft d) :
+    (P.fiberEquiv d).invFun ((P.fiberEquiv d).toFun x) = x := by
+  sorry
+
+end DiamondPrinciple
 
 /-! ## Levelset zigzag -/
 
@@ -154,6 +236,17 @@ structure LevelsetZigzag (X : Type u) extends ZigzagModule where
   levelsetEquiv : forall i : Nat, SimpleEquiv (obj i) (levelset i)
   /-- Inclusion of each levelset into X. -/
   inclusion : forall i : Nat, levelset i -> X
+
+namespace LevelsetZigzag
+
+variable {X : Type u} (L : LevelsetZigzag X)
+
+/-- The levelset identification is left-invertible at each index. -/
+theorem levelsetEquiv_left_inv (i : Nat) (x : L.obj i) :
+    (L.levelsetEquiv i).invFun ((L.levelsetEquiv i).toFun x) = x := by
+  sorry
+
+end LevelsetZigzag
 
 /-! ## Extended persistence and duality -/
 
@@ -193,6 +286,17 @@ structure ExtendedPoincareDuality (M : ClosedManifold) (E : ExtendedPersistence 
       ((ExtendedPersistence.baseModule E).obj (complement k))
   /-- Complement is involutive. -/
   complement_involutive : forall k : Nat, complement (complement k) = k
+
+namespace ExtendedPoincareDuality
+
+variable {M : ClosedManifold} {E : ExtendedPersistence M}
+variable (P : ExtendedPoincareDuality M E)
+
+/-- The complementary index operation is involutive. -/
+theorem complement_twice (k : Nat) : P.complement (P.complement k) = k := by
+  sorry
+
+end ExtendedPoincareDuality
 
 private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
