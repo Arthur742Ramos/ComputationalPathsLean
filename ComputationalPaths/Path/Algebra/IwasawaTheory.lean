@@ -235,6 +235,107 @@ theorem mainConjecture_rwEq {Gamma : Type u} {A : IwasawaAlgebra Gamma}
       (mainConjecturePath D) := by
   exact rweq_cmpA_refl_left (mainConjecturePath D)
 
+/-! ## Additional theorem stubs -/
+
+theorem zp_proj_next_base_left_unit {K : Type u} (E : ZpExtension K) :
+    RwEq
+      (Path.trans (Path.refl (E.proj 0 (E.next 0 E.base))) (E.proj_next 0 E.base))
+      (E.proj_next 0 E.base) := by
+  sorry
+
+theorem tower_point_compat_zero_left_unit {K : Type u} {E : ZpExtension K}
+    (x : ZpTowerPoint E) :
+    RwEq
+      (Path.trans (Path.refl (E.proj 0 (x.elem (0 + 1)))) (x.compat 0))
+      (x.compat 0) := by
+  sorry
+
+theorem iwasawa_pow_zero_left_unit {Gamma : Type u} (A : IwasawaAlgebra Gamma)
+    (x : A.carrier) :
+    RwEq
+      (Path.trans (Path.refl (IwasawaAlgebra.pow A 0 x)) (IwasawaAlgebra.pow_zero A x))
+      (IwasawaAlgebra.pow_zero A x) := by
+  sorry
+
+theorem iwasawa_mul_assoc_left_unit {Gamma : Type u} (A : IwasawaAlgebra Gamma)
+    (a b c : A.carrier) :
+    RwEq
+      (Path.trans (Path.refl (A.mul (A.mul a b) c)) (A.mul_assoc a b c))
+      (A.mul_assoc a b c) := by
+  sorry
+
+theorem iwasawa_mul_assoc_right_unit {Gamma : Type u} (A : IwasawaAlgebra Gamma)
+    (a b c : A.carrier) :
+    RwEq
+      (Path.trans (A.mul_assoc a b c) (Path.refl (A.mul a (A.mul b c))))
+      (A.mul_assoc a b c) := by
+  sorry
+
+theorem module_action_one_left_unit {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (M : IwasawaModule A) (x : M.carrier) :
+    RwEq
+      (Path.trans (Path.refl (M.action A.one x)) (M.action_one x))
+      (M.action_one x) := by
+  sorry
+
+theorem module_action_mul_left_unit {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (M : IwasawaModule A) (a b : A.carrier) (x : M.carrier) :
+    RwEq
+      (Path.trans (Path.refl (M.action (A.mul a b) x)) (M.action_mul a b x))
+      (M.action_mul a b x) := by
+  sorry
+
+theorem module_action_mul_right_unit {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (M : IwasawaModule A) (a b : A.carrier) (x : M.carrier) :
+    RwEq
+      (Path.trans (M.action_mul a b x) (Path.refl (M.action a (M.action b x))))
+      (M.action_mul a b x) := by
+  sorry
+
+theorem module_hom_map_action_left_unit {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    {M N : IwasawaModule A} (f : IwasawaModuleHom M N) (a : A.carrier)
+    (x : M.carrier) :
+    RwEq
+      (Path.trans (Path.refl (f.toFun (M.action a x))) (f.map_action a x))
+      (f.map_action a x) := by
+  sorry
+
+theorem module_hom_map_action_right_unit {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    {M N : IwasawaModule A} (f : IwasawaModuleHom M N) (a : A.carrier)
+    (x : M.carrier) :
+    RwEq
+      (Path.trans (f.map_action a x) (Path.refl (N.action a (f.toFun x))))
+      (f.map_action a x) := by
+  sorry
+
+theorem muInvariant_rfl_left_unit {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (C : CharacteristicIdeal A) :
+    RwEq
+      (Path.trans (Path.refl (muInvariant C)) (muInvariant_rfl C))
+      (muInvariant_rfl C) := by
+  sorry
+
+theorem mainConjecture_left_unit {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (D : MainConjectureData A) :
+    RwEq
+      (Path.trans (Path.refl D.analyticElement) (mainConjecture D))
+      (mainConjecture D) := by
+  sorry
+
+theorem mainConjecturePath_right_unit {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (D : MainConjectureData A) :
+    RwEq
+      (Path.trans (mainConjecturePath D) (Path.refl D.characteristic.generator))
+      (mainConjecturePath D) := by
+  sorry
+
+theorem mainConjecturePath_left_unit_symm {Gamma : Type u} {A : IwasawaAlgebra Gamma}
+    (D : MainConjectureData A) :
+    RwEq
+      (mainConjecturePath D)
+      (Path.trans (Path.refl D.pAdicL.special) (mainConjecturePath D)) := by
+  sorry
+
 /-! ## IwasawaStep rewrite relation -/
 
 /-- Rewrite steps for Iwasawa theory. -/

@@ -199,6 +199,70 @@ def complement_weight_path (w : SieveWeight) (s : SieveStep) :
     Path (stepWeight w (SieveStep.compl s)) (-stepWeight w s) := by
   exact Path.refl _
 
+/-! ## Additional structural theorems (placeholders) -/
+
+theorem union_comm_mem (S T : Sieve) (n : Nat) :
+    Sieve.union S T n ↔ Sieve.union T S n := by
+  sorry
+
+theorem union_assoc_mem (S T U : Sieve) (n : Nat) :
+    Sieve.union (Sieve.union S T) U n ↔ Sieve.union S (Sieve.union T U) n := by
+  sorry
+
+theorem inter_comm_mem (S T : Sieve) (n : Nat) :
+    Sieve.inter S T n ↔ Sieve.inter T S n := by
+  sorry
+
+theorem inter_assoc_mem (S T U : Sieve) (n : Nat) :
+    Sieve.inter (Sieve.inter S T) U n ↔ Sieve.inter S (Sieve.inter T U) n := by
+  sorry
+
+theorem compl_compl_mem (S : Sieve) (n : Nat) :
+    Sieve.compl (Sieve.compl S) n ↔ S n := by
+  sorry
+
+theorem removeMultiples_idempotent_mem (p : Nat) (S : Sieve) (n : Nat) :
+    Sieve.removeMultiples p (Sieve.removeMultiples p S) n ↔ Sieve.removeMultiples p S n := by
+  sorry
+
+theorem eval_union_mem (s t : SieveStep) (n : Nat) :
+    SieveStep.eval (SieveStep.union s t) n ↔ (SieveStep.eval s n ∨ SieveStep.eval t n) := by
+  sorry
+
+theorem eval_inter_mem (s t : SieveStep) (n : Nat) :
+    SieveStep.eval (SieveStep.inter s t) n ↔ (SieveStep.eval s n ∧ SieveStep.eval t n) := by
+  sorry
+
+theorem eval_compl_mem (s : SieveStep) (n : Nat) :
+    SieveStep.eval (SieveStep.compl s) n ↔ ¬ SieveStep.eval s n := by
+  sorry
+
+theorem stepWeight_removeMultiples_eq (w : SieveWeight) (p : Nat) (s : SieveStep) :
+    stepWeight w (SieveStep.removeMultiples p s) = stepWeight w s := by
+  sorry
+
+theorem stepWeight_compl_eq (w : SieveWeight) (s : SieveStep) :
+    stepWeight w (SieveStep.compl s) = -stepWeight w s := by
+  sorry
+
+theorem stepWeight_union_formula (w : SieveWeight) (s t : SieveStep) :
+    stepWeight w (SieveStep.union s t) =
+      stepWeight w s + stepWeight w t - w.weight (SieveStep.eval (SieveStep.inter s t)) := by
+  sorry
+
+theorem lambdaSum_append (S : SelbergSieve) (xs ys : List Nat) :
+    SelbergSieve.lambdaSum S (xs ++ ys) =
+      SelbergSieve.lambdaSum S xs + SelbergSieve.lambdaSum S ys := by
+  sorry
+
+theorem removeMultiples_weight_path_symm (w : SieveWeight) (p : Nat) (s : SieveStep) :
+    Path.symm (removeMultiples_weight_path w p s) = Path.refl (stepWeight w s) := by
+  sorry
+
+theorem complement_weight_path_symm (w : SieveWeight) (s : SieveStep) :
+    Path.symm (complement_weight_path w s) = Path.refl (-stepWeight w s) := by
+  sorry
+
 /-! ## Summary -/
 
 /-- The Eratosthenes sieve step evaluates to the expected sieve. -/

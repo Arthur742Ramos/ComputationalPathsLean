@@ -71,6 +71,63 @@ def triangleIdentity (f : Hom a b) (g : Hom b c) :
     ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g) :=
   Bicategory.triangleIdentity f g
 
+theorem hom_eq_path (x y : A) : Hom x y = Path x y := by
+  sorry
+
+theorem twoCell_eq_derivation2 {x y : A} (f g : Hom x y) :
+    TwoCell f g = Derivation₂ f g := by
+  sorry
+
+theorem threeCell_eq_derivation3 {x y : A} {f g : Hom x y} (α β : TwoCell f g) :
+    ThreeCell α β = Derivation₃ α β := by
+  sorry
+
+theorem id₂_eq_refl (f : Hom a b) : id₂ f = Derivation₂.refl f := by
+  sorry
+
+theorem vcomp_eq_derivation {f g h : Hom a b} (α : TwoCell f g) (β : TwoCell g h) :
+    vcomp α β = Derivation₂.vcomp α β := by
+  sorry
+
+theorem whiskerLeft_eq_omega (f : Hom a b) {g h : Hom b c} (α : TwoCell g h) :
+    whiskerLeft f α = OmegaGroupoid.whiskerLeft f α := by
+  sorry
+
+theorem whiskerRight_eq_omega {f g : Hom a b} (α : TwoCell f g) (h : Hom b c) :
+    whiskerRight α h = OmegaGroupoid.whiskerRight α h := by
+  sorry
+
+theorem hcomp_eq_omega {f f' : Hom a b} {g g' : Hom b c}
+    (α : TwoCell f f') (β : TwoCell g g') :
+    hcomp α β = OmegaGroupoid.hcomp α β := by
+  sorry
+
+theorem interchangeIdentity_eq_godement {f f' : Hom a b} {g g' : Hom b c}
+    (α : TwoCell f f') (β : TwoCell g g') :
+    interchangeIdentity α β = godementInterchange α β := by
+  sorry
+
+theorem pentagonIdentity_eq_bicategory (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
+    pentagonIdentity f g h k = Bicategory.pentagonIdentity f g h k := by
+  sorry
+
+theorem triangleIdentity_eq_bicategory (f : Hom a b) (g : Hom b c) :
+    triangleIdentity f g = Bicategory.triangleIdentity f g := by
+  sorry
+
+theorem vcomp_id₂_left_explicit {f g : Hom a b} (α : TwoCell f g) :
+    vcomp (id₂ f) α = Derivation₂.vcomp (Derivation₂.refl f) α := by
+  sorry
+
+theorem vcomp_id₂_right_explicit {f g : Hom a b} (α : TwoCell f g) :
+    vcomp α (id₂ g) = Derivation₂.vcomp α (Derivation₂.refl g) := by
+  sorry
+
+theorem hcomp_id₂_components (f : Hom a b) (g : Hom b c) :
+    hcomp (id₂ f) (id₂ g) =
+      OmegaGroupoid.hcomp (Derivation₂.refl f) (Derivation₂.refl g) := by
+  sorry
+
 end TwoCategory
 end HigherCategory
 end ComputationalPaths
