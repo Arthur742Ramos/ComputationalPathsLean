@@ -423,3 +423,7 @@ import ComputationalPaths.Path.Algebra.LatticePaths
 import ComputationalPaths.Path.Algebra.OrderedRewriting
 import ComputationalPaths.Path.Algebra.GaloisPaths
 import ComputationalPaths.Path.Algebra.BooleanAlgebraPaths
+import ComputationalPaths.Path.Topology.MetricPaths
+import ComputationalPaths.Path.Topology.GeodeticPaths
+import ComputationalPaths.Path.Topology.UniformPaths
+import ComputationalPaths.Path.Topology.CompactPaths
