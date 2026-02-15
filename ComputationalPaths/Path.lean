@@ -465,3 +465,8 @@ import ComputationalPaths.Path.Algebra.AdditiveCombin
 import ComputationalPaths.Path.Algebra.AlgebraicCombinatorics
 import ComputationalPaths.Path.Topology.MicroLocalAnalysis
 import ComputationalPaths.Path.Topology.GeometricAnalysis
+import ComputationalPaths.Path.Algebra.HomologicalAlgebraComputation
+import ComputationalPaths.Path.Topology.ComputationalTopology
+import ComputationalPaths.Path.Algebra.ComputationalAlgGeo
+import ComputationalPaths.Path.Algebra.CodingTheory
+import ComputationalPaths.Path.Algebra.LatticeBasedCrypto
