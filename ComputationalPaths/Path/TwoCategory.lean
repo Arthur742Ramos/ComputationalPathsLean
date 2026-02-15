@@ -183,34 +183,34 @@ theorem trianglePath_eq_triangle_path (C : TwoCategory (Obj := Obj))
 theorem vcomp_assoc_apply (C : TwoCategory (Obj := Obj))
     {a b : Obj} {f g h i : C.Hom a b}
     (η : C.TwoCell f g) (θ : C.TwoCell g h) (ι : C.TwoCell h i) :
-    C.vcomp (C.vcomp η θ) ι = C.vcomp η (C.vcomp θ ι) := by
-  rfl
+    C.vcomp (C.vcomp η θ) ι = C.vcomp η (C.vcomp θ ι) :=
+  C.vcomp_assoc η θ ι
 
 /-- Left identity for vertical composition in any `TwoCategory`. -/
 theorem vcomp_left_id_apply (C : TwoCategory (Obj := Obj))
     {a b : Obj} {f g : C.Hom a b} (η : C.TwoCell f g) :
-    C.vcomp (C.id₂ f) η = η := by
-  rfl
+    C.vcomp (C.id₂ f) η = η :=
+  C.vcomp_left_id η
 
 /-- Right identity for vertical composition in any `TwoCategory`. -/
 theorem vcomp_right_id_apply (C : TwoCategory (Obj := Obj))
     {a b : Obj} {f g : C.Hom a b} (η : C.TwoCell f g) :
-    C.vcomp η (C.id₂ g) = η := by
-  rfl
+    C.vcomp η (C.id₂ g) = η :=
+  C.vcomp_right_id η
 
 /-- Horizontal-right unit compatibility in any `TwoCategory`. -/
 theorem hcomp_id_left_apply (C : TwoCategory (Obj := Obj))
     {a b c : Obj} {f g : C.Hom a b} {h : C.Hom b c}
     (η : C.TwoCell f g) :
-    C.hcomp η (C.id₂ h) = C.whiskerRight h η := by
-  rfl
+    C.hcomp η (C.id₂ h) = C.whiskerRight h η :=
+  C.hcomp_id_left η
 
 /-- Horizontal-left unit compatibility in any `TwoCategory`. -/
 theorem hcomp_id_right_apply (C : TwoCategory (Obj := Obj))
     {a b c : Obj} {f : C.Hom a b} {g h : C.Hom b c}
     (η : C.TwoCell g h) :
-    C.hcomp (C.id₂ f) η = C.whiskerLeft f η := by
-  rfl
+    C.hcomp (C.id₂ f) η = C.whiskerLeft f η :=
+  C.hcomp_id_right η
 
 /-- Interchange law between horizontal and vertical composition. -/
 theorem interchange_apply (C : TwoCategory (Obj := Obj))
@@ -218,8 +218,8 @@ theorem interchange_apply (C : TwoCategory (Obj := Obj))
     (η₁ : C.TwoCell f₀ f₁) (η₂ : C.TwoCell f₁ f₂)
     (θ₁ : C.TwoCell g₀ g₁) (θ₂ : C.TwoCell g₁ g₂) :
     C.vcomp (C.hcomp η₁ θ₁) (C.hcomp η₂ θ₂) =
-      C.hcomp (C.vcomp η₁ η₂) (C.vcomp θ₁ θ₂) := by
-  rfl
+      C.hcomp (C.vcomp η₁ η₂) (C.vcomp θ₁ θ₂) :=
+  C.interchange η₁ η₂ θ₁ θ₂
 
 end TwoCategory
 

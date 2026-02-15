@@ -18,29 +18,43 @@ path-preserving constructions.
 
 | Metric | Value |
 |--------|-------|
-| **Lean files** | 907 |
-| **Lines of code** | ~218,000 |
-| **Theorems & lemmas** | 10,783 |
-| **Definitions, structures & classes** | 15,241 |
-| **`rweq_of_step` uses** | 509 (across 139 files) |
+| **Lean files** | 760 |
+| **Lines of code** | 175,590 |
+| **Theorems & lemmas** | 7,597 |
+| **Definitions, structures & classes** | 11,021 |
+| **`sorry` count** | **0** — every theorem has a real proof |
+| **`rweq_of_step` uses** | 511 (across 140 files) |
 | **Architecture** | Single-root `ComputationalPaths/` tree |
-| **Expansion tooling** | [copex](https://github.com/openclawai/copex) v2.6.0 |
+
+> **100% sorry-free.** Every theorem and lemma in this library carries a genuine
+> proof. No placeholders, no stubs, no `sorry`.
+
+### The Three Gates Policy
+
+Every theorem in this library must pass three gates before it is merged:
+
+1. **Sorry-free** — no `sorry` anywhere in the proof term.
+2. **Genuinely uses computational paths** — constructions must go through
+   `Path`, `Step`, `RwEq`, or derived machinery; no empty wrappers around
+   Lean's built-in `Eq`.
+3. **Compiles cleanly** — `lake build` succeeds with zero errors and zero
+   warnings on the entire project.
 
 ### Domain Breakdown
 
 | Domain | Files | Theorems & Lemmas |
 |--------|------:|------------------:|
-| Algebra | 229 | 3,243 |
-| Homotopy | 177 | 1,705 |
-| Topology | 113 | 1,469 |
-| Rewrite system | 30 | 860 |
-| CompPath constructions | 51 | 678 |
-| Category theory | 20 | 450 |
-| Foundations | 15 | 343 |
-| Core & Basic | 10 | 244 |
+| Homotopy | 177 | 1,386 |
+| Topology | 93 | 1,110 |
+| Algebra | 112 | 1,074 |
+| Rewrite system | 30 | 868 |
+| CompPath constructions | 51 | 695 |
+| Category theory | 20 | 460 |
+| Core & Basic | 5 | 209 |
+| Foundations | 6 | 129 |
 | Logic | 7 | 66 |
 | ω-Groupoid | 5 | 35 |
-| Advanced topics\* | 204 | — |
+| Advanced topics\* | 162 | 804 |
 
 \*Advanced topics (outside `Path/`): spectral sequences, perfectoid spaces,
 prismatic & crystalline cohomology, Floer homology, tropical geometry, operads,
@@ -179,7 +193,7 @@ into this tree in the single-root migration.
 
 ```
 ComputationalPathsLean/
-├── ComputationalPaths/           # All library code (907 files)
+├── ComputationalPaths/           # All library code (760 files)
 │   └── Path/
 │       ├── Basic/                # Path, Step, transport, congruence, Context
 │       │   ├── Core.lean         # Fundamental Path and Step structures
@@ -355,7 +369,7 @@ example (p : Path a b) : RwEq (symm (symm p)) p := by path_simp
 
 ## Axiom-Free Derived Results
 
-**509 uses of `rweq_of_step`** across 139 files, all derived purely from
+**511 uses of `rweq_of_step`** across 140 files, all derived purely from
 primitive `Step` rules with no custom axioms:
 
 | Module | Uses | Key Results |
@@ -428,7 +442,7 @@ lake build ComputationalPaths:docs Kan:docs Equivalence:docs
 ```
 
 > **Note:** The full build generates documentation for Lean, Std, Mathlib, and all
-> project modules. For a Mathlib-dependent project of this size (~907 files), expect
+> project modules. For a Mathlib-dependent project of this size (~760 files), expect
 > the first build to take **several hours**. Subsequent incremental builds are faster.
 
 ### Viewing Docs

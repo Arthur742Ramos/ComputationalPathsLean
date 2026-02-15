@@ -168,13 +168,13 @@ theorem act_trans_assoc (M : LeftModule A) {a b c : A} (p : Path a b) (q : Path 
 theorem act_trans_refl_left (M : LeftModule A) {a b : A} (p : Path a b)
     (x : M.carrier a) :
     Nonempty (Path (M.act (Path.trans (Path.refl a) p) x) (M.act p x)) :=
-  ⟨Path.stepChain (congrArg (fun q => M.act q x) (Path.trans_refl_left p))⟩
+  ⟨Path.stepChain (_root_.congrArg (fun q => M.act q x) (Path.trans_refl_left p))⟩
 
 /-- Composing a path with reflexivity on the right does not change the action. -/
 theorem act_trans_refl_right (M : LeftModule A) {a b : A} (p : Path a b)
     (x : M.carrier a) :
     Nonempty (Path (M.act (Path.trans p (Path.refl b)) x) (M.act p x)) :=
-  ⟨Path.stepChain (congrArg (fun q => M.act q x) (Path.trans_refl_right p))⟩
+  ⟨Path.stepChain (_root_.congrArg (fun q => M.act q x) (Path.trans_refl_right p))⟩
 
 end LeftModule
 
@@ -322,13 +322,13 @@ theorem act_trans_assoc (M : RightModule A) {a b c : A} (p : Path a b) (q : Path
 theorem act_trans_refl_left (M : RightModule A) {a b : A} (p : Path a b)
     (x : M.carrier b) :
     Nonempty (Path (M.act (Path.trans (Path.refl a) p) x) (M.act p x)) :=
-  ⟨Path.stepChain (congrArg (fun q => M.act q x) (Path.trans_refl_left p))⟩
+  ⟨Path.stepChain (_root_.congrArg (fun q => M.act q x) (Path.trans_refl_left p))⟩
 
 /-- Composing a path with reflexivity on the right does not change the action. -/
 theorem act_trans_refl_right (M : RightModule A) {a b : A} (p : Path a b)
     (x : M.carrier b) :
     Nonempty (Path (M.act (Path.trans p (Path.refl b)) x) (M.act p x)) :=
-  ⟨Path.stepChain (congrArg (fun q => M.act q x) (Path.trans_refl_right p))⟩
+  ⟨Path.stepChain (_root_.congrArg (fun q => M.act q x) (Path.trans_refl_right p))⟩
 
 end RightModule
 

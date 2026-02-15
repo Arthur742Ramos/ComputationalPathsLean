@@ -63,8 +63,8 @@ def LieGroup.adjoint (G : LieGroup) : G.carrier → G.lieAlgebra → G.lieAlgebr
 /-- Lie bracket on the Lie algebra. -/
 structure LieBracket (G : LieGroup) where
   bracket        : G.lieAlgebra → G.lieAlgebra → G.lieAlgebra
-  antisymmetry   : ∀ x y, bracket x y = bracket x y  -- placeholder
-  jacobi         : ∀ x y z, True                      -- placeholder
+  antisymmetry   : ∀ (x y : G.lieAlgebra), bracket x y = bracket x y  -- placeholder
+  jacobi         : ∀ (x y z : G.lieAlgebra), True                      -- placeholder
 
 /-- The Killing form ⟨−,−⟩ on g. -/
 structure KillingForm (G : LieGroup) where
@@ -238,7 +238,7 @@ structure BPSTInstanton (G : LieGroup) where
 structure MultiInstanton (G : LieGroup) where
   bundle    : PrincipalBundle G
   charge    : Nat
-  centres   : List (PrincipalBundle G).base  -- abstract
+  centres   : List bundle.base  -- abstract
   instanton : Instanton G bundle
 
 /-- Every instanton satisfies the Yang-Mills equation. -/

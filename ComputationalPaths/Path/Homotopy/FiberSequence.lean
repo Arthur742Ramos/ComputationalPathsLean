@@ -82,7 +82,7 @@ theorem incl_exact_route_two_cell {F E B : Type u}
     using incl_assoc_two_cell (seq := seq) (p := p) (q := q) (r := r)
 
 /-- Connecting map exactness route as a computational path witness. -/
-def connecting_exact_route_path {B : Type u} {P : B → Type u}
+noncomputable def connecting_exact_route_path {B : Type u} {P : B → Type u}
     (b : B) (x₀ : P b) (l₁ l₂ : LoopSpace B b) :
     Path
       (Fibration.connectingMap₁ b x₀ (Path.trans l₁ l₂))

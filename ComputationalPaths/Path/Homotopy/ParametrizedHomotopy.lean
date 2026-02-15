@@ -259,21 +259,26 @@ structure FiberwiseEuler (B : Type u) (V : VectorBundle B) where
 /-- ExMap composition preserves fiberwise homotopy on the left. -/
 theorem ExMap.comp_homotopy_left {B : Type u} {E₁ E₂ E₃ : ExSpace B}
     {f g : ExMap E₁ E₂} (H : FiberwiseHomotopy f g) (h : ExMap E₂ E₃) :
-    ∃ (_ : FiberwiseHomotopy (ExMap.comp h f) (ExMap.comp h g)), True := by
-  trivial
+    ∃ (_ : FiberwiseHomotopy (ExMap.comp h f) (ExMap.comp h g)), True :=
+  ⟨{ homotopy := h.toFun ∘ H.homotopy
+     at_zero := fun x => by simp [ExMap.comp, Function.comp, H.at_zero]
+     fiberwise := fun x => by simp [ExMap.comp, Function.comp]; rw [h.proj_comm, H.fiberwise] },
+   trivial⟩
 
 /-- The trivial ex-space is an initial object in the ex-space category. -/
 theorem trivialExSpace_initial {B : Type u} (E : ExSpace B) :
-    ∃ (f : ExMap (trivialExSpace B) E), True := by
-  trivial
+    ∃ (f : ExMap (trivialExSpace B) E), True :=
+  ⟨{ toFun := E.section_
+     proj_comm := fun x => by simp [trivialExSpace]; exact E.section_proj x
+     section_comm := fun _ => rfl }, trivial⟩
 
 
 /-- Parametrized spectrum structure maps compose correctly. -/
 theorem ParametrizedSpectrum.structureMap_comp {B : Type u}
     (S : ParametrizedSpectrum B) (n : Nat) :
     ∃ (f : ExMap (S.level n) (S.level (n + 2))),
-      True := by
-  trivial
+      True :=
+  ⟨ExMap.comp (S.structureMap (n + 1)) (S.structureMap n), trivial⟩
 
 
 

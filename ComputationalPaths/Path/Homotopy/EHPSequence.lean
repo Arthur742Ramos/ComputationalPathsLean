@@ -159,8 +159,8 @@ theorem h_detects_hopf_invariant_one (data : HopfFibrationData)
 
 
 theorem ehpStableRange_iff_true (n k : Nat) :
-    ehpStableRange n k ↔ True := by
-  trivial
+    ehpStableRange n k ↔ True :=
+  Iff.intro (fun _ => trivial) (fun _ => ⟨rfl, rfl⟩)
 
 
 /-! ## Summary -/

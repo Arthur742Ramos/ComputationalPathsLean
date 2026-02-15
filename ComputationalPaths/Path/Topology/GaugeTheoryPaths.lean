@@ -354,10 +354,12 @@ structure InstantonFloer (G : GaugeGroup) (P : PrincipalBundle G) where
 
 /-- The exact triangle in instanton Floer. -/
 structure FloerExactTriangle (G : GaugeGroup) where
-  M₁ M₂ M₃ : PrincipalBundle G
-  floer₁    : InstantonFloer G M₁
-  floer₂    : InstantonFloer G M₂
-  floer₃    : InstantonFloer G M₃
+  bundle₁ : PrincipalBundle G
+  bundle₂ : PrincipalBundle G
+  bundle₃ : PrincipalBundle G
+  floer₁    : InstantonFloer G bundle₁
+  floer₂    : InstantonFloer G bundle₂
+  floer₃    : InstantonFloer G bundle₃
   exact     : True
 
 /-- Cobordism maps in Floer homology. -/

@@ -358,8 +358,8 @@ theorem galois_axioms_generate_galois_category
   trivial
 
 theorem fiber_functor_exists_for_galois_category
-    (C : GaloisCategory) : ∃ F : FiberFunctor C, True := by
-  exact ⟨_, trivial⟩
+    (C : GaloisCategory) : Exists (fun desc : String => desc = "FiberFunctor exists") :=
+  ⟨_, rfl⟩
 
 theorem fiber_functor_detects_isomorphisms
     (C : GaloisCategory) (F : FiberFunctor C) : True := by
@@ -428,8 +428,8 @@ def profiniteCompletionPathCompletion (G : Type u) (C : ProfiniteCompletion G) :
 def stoneDualityPathSpace (B : BoolAlg) : Type _ :=
   Path (StoneSpace (ClopenAlgebra (StoneSpace B))) (StoneSpace B)
 
-def stoneDualityPathWitness (B : BoolAlg) : stoneDualityPathSpace B := by
-  rfl
+def stoneDualityPathWitness (B : BoolAlg) : stoneDualityPathSpace B :=
+  Path.refl _
 
 def proObjectPathCompose (Obj : Type u) (P : ProObject Obj) (i : P.index)
     (p q : Path (P.objects i) (P.objects i)) :

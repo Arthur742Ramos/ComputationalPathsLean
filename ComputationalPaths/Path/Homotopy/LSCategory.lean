@@ -119,10 +119,15 @@ def cat (X : Type u) (data : LSCategoryData X) : Nat :=
 
 /-! ## Cup-length lower bound -/
 
+/-- Placeholder for a cohomology ring type. -/
+structure CohomologyRingData where
+  /-- The underlying type. -/
+  carrier : Type u
+
 /-- Cohomology data attached to a space. -/
 structure CohomologyOn (X : Type u) where
   /-- The associated cohomology ring. -/
-  ring : Algebra.CohomologyRing
+  ring : CohomologyRingData
 
 /-- Cup-length (placeholder value). -/
 def cupLength {X : Type u} (_H : CohomologyOn X) : Nat :=

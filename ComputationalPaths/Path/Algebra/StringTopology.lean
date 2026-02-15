@@ -41,6 +41,15 @@ abbrev LM (X : Type u) : Type u :=
 
 /-! ## Graded homology and loop product -/
 
+/-- Graded abelian group data for (co)homology. -/
+structure CohomologyGroups where
+  /-- The graded components. -/
+  carrier : Nat → Type u
+  /-- Zero element in each degree. -/
+  zero : (n : Nat) → carrier n
+  /-- Addition in each degree. -/
+  add : (n : Nat) → carrier n → carrier n → carrier n
+
 /-- Graded homology groups, reusing the cohomology-group interface. -/
 abbrev HomologyGroups := CohomologyGroups
 

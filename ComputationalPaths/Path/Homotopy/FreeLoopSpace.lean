@@ -122,7 +122,7 @@ theorem freeLoopBase_section {X : Type u} (x : X) :
 /-- The fiber sequence is functorial. -/
 theorem freeLoopFiberSeq_functorial {X Y : Type u} (f : X → Y) (x₀ : X) :
     ∃ (_map : FreeLoopSpace X → FreeLoopSpace Y), True := by
-  trivial
+  exact ⟨fun ⟨x, l⟩ => ⟨f x, Path.congrArg f l⟩, trivial⟩
 
 
 

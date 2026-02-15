@@ -95,6 +95,16 @@ def universalBundle (G : Type u) (S : StrictGroup G) : UniversalBundle G S :=
 
 /-! ## Group cohomology -/
 
+/-- Cohomology groups associated to a classifying space. -/
+structure CohomologyGroups where
+  /-- The graded groups as a function from degree to a type. -/
+  groups : Nat → Type u
+
+/-- A cohomology ring attached to a space. -/
+structure CohomologyRing where
+  /-- The underlying type. -/
+  carrier : Type u
+
 /-- Group cohomology groups associated to `BG`. -/
 structure GroupCohomology (G : Type u) (S : StrictGroup G)
     extends CohomologyGroups

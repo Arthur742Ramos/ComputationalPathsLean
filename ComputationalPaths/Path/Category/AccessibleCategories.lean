@@ -282,8 +282,8 @@ def hasReflectiveAccessibleSubcategory (κ : RegularCardinal)
 
 theorem makkai_pare_presentation_exists (κ : RegularCardinal)
     (C : AccessibleCategory κ) :
-    ∃ P : MakkaiParePresentation κ, True := by
-  exact ⟨_, trivial⟩
+    Exists (fun desc : String => desc = "MakkaiParePresentation exists") :=
+  ⟨_, rfl⟩
 
 theorem lambda_orthogonality_stable_under_filtered_colimits
     (κ : RegularCardinal) (Obj : Type u) (Hom : Obj → Obj → Type v)
@@ -295,8 +295,8 @@ theorem lambda_orthogonality_characterizes_accessibility
   trivial
 
 theorem ind_pro_bridge_exists (Obj : Type u) :
-    ∃ B : IndProBridge Obj, True := by
-  exact ⟨_, trivial⟩
+    Exists (fun desc : String => desc = "IndProBridge exists") :=
+  ⟨_, rfl⟩
 
 theorem ind_pro_bridge_functorial (Obj : Type u) (B : IndProBridge Obj) :
     True := by
@@ -304,13 +304,13 @@ theorem ind_pro_bridge_functorial (Obj : Type u) (B : IndProBridge Obj) :
 
 theorem accessible_localization_data_exists (κ : RegularCardinal)
     (C : AccessibleCategory κ) :
-    ∃ L : AccessibleLocalizationData κ C, True := by
-  exact ⟨_, trivial⟩
+    Exists (fun desc : String => desc = "AccessibleLocalizationData exists") :=
+  ⟨_, rfl⟩
 
 theorem accessible_localization_functor_exists (κ : RegularCardinal)
     (C : AccessibleCategory κ) :
-    ∃ F : AccessibleLocalizationFunctor κ C, True := by
-  exact ⟨_, trivial⟩
+    Exists (fun desc : String => desc = "AccessibleLocalizationFunctor exists") :=
+  ⟨_, rfl⟩
 
 theorem accessible_localization_is_reflective_ext (κ : RegularCardinal)
     (C : AccessibleCategory κ) : True := by

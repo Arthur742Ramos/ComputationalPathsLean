@@ -48,7 +48,7 @@ universe u
 
 /-- Trivial cohomology data on a space. -/
 def trivialCohomologyOn (X : Type u) : CohomologyOn X where
-  ring := Algebra.CohomologyRing.trivial
+  ring := { carrier := PUnit }
 
 /-! ## Input data from fibrations -/
 
