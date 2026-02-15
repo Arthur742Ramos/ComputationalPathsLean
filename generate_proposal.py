@@ -258,6 +258,26 @@ def add_ch1_expansion(doc: Document) -> None:
         It is this balance that makes the proposal relevant to mathematicians outside logic. The point is not to advocate a new proof formalism; it is to extract an algebraic object (a groupoid and higher groupoid) from a familiar proof-theoretic setting and to study it with the tools of algebra and topology.
 
         In particular, LND supplies a disciplined mechanism for “keeping track of the reason”. Once that bookkeeping is regarded as an algebraic structure, one can compare it with the fundamental groupoid of a space, compute loop groups, and apply familiar topological arguments (such as Eckmann–Hilton) in a syntactic setting.
+
+        From the standpoint of exposition, Chapter 2 of the book will present the LND calculus in a self-contained manner: the term language for each connective, the typing rules, and the associated computational conversions (β and η families). Particular emphasis is placed on the role of discharge/abstraction, because it is there that the proof-theoretic structure controls substitution and therefore controls the stability properties required for the later path algebra.
+
+        For example, implication introduction corresponds to taking a derivation of B from an additional assumption A and turning it into a derivation of A → B; on labels, this is λ-abstraction. Equality reasons must respect this operation: if two labels are equal under a reason s, then their abstractions are equal under a transported reason. Similar remarks apply to pairing and projections, injections and case analysis, and quantifier rules.
+
+        LND also provides a natural setting for discussing the “geography” of equality: which equalities are definitional (computational), which are propositional (logical), and which are meta-level equivalences between derivations. The reason-indexed equality judgement can be read as a bridge between these notions: it carries computational content but is expressed as a judgement whose proof-theoretic behaviour can be studied.
+
+        This bridge is particularly important for mathematicians who come to the subject from topology or algebra rather than from type theory. For such readers, LND is not primarily a foundational system; it is a presentation that makes a rewriting algebra visible. Once visible, that algebra can be analysed with familiar tools: presentations by generators and relations, quotient constructions, and the extraction of invariants.
+
+        It is also worth stressing what LND *does not* require. One does not need to adopt a particular foundational stance on the identity type or on univalence in order to work in LND. The system can be presented in a classical metatheory and treated as a combinatorial object: a typed term system together with a labelled equality judgement.
+
+        This makes LND especially suitable for a “Cambridge Tracts” style audience. A reader may accept the term calculus and rewrite rules as definitions, just as one accepts a presentation of a group or a monoidal category by generators and relations, and then proceed to study the resulting algebra.
+
+        Finally, LND clarifies the role of *context* (Γ). In proof theory, context controls assumptions and discharge. In rewriting, context controls where reductions may be performed (closure under contexts). In higher algebra, context corresponds to functoriality: operations must respect composition. LND is the point at which these three notions align. This alignment is one of the reasons the computational-path groupoid and higher groupoid constructions are not artificial: they are the natural algebraic completion of the stability requirements already implicit in labelled deduction.
+
+        Concretely, “closure under contexts” is the statement that if a rewrite step transforms a into b, then placing that step inside any surrounding term context yields a rewrite step of the larger term. In categorical language, this is the statement that term constructors act functorially. In proof-theoretic language, this is the stability of proof transformations under substitution and under the formation of compound deductions.
+
+        Once one records reasons explicitly, this stability becomes an algebraic structure: one must define how a reason is mapped by each constructor and prove that the mapping respects composition and inversion. These are precisely the functoriality laws that later show up as congruence rules in the path rewrite system.
+
+        In this way, LND provides more than motivation: it provides the blueprint for the rule families that must exist in any coherent computational-path calculus. The “extra” rules beyond the base βη-equality rules are not arbitrary additions; they are forced by the requirement that equality reasons behave well under the operations that create and manipulate proofs.
         """
     )
 
@@ -331,6 +351,70 @@ def add_ch1_expansion(doc: Document) -> None:
         (2) Explicit coherence. Rather than postulating associators, unitors, and interchangers as axioms, the book constructs them as explicit derivations arising from the rewrite system. This makes the resulting higher groupoid “computationally explicit” in a rewriting-theoretic sense.
 
         The conclusion of this section is therefore a methodological one: by moving from equality-as-proposition to equality-with-reason, and by allowing rewriting at the level of reasons, one automatically obtains the algebraic infrastructure required for higher groupoids.
+
+        It is worth emphasizing that the move is not merely terminological. It changes what it means to prove an equality statement. Under a reason-indexed equality judgement, proving a = b requires producing not only the endpoint identification but also the *route* by which the identification is achieved.
+
+        Consider a simple rewriting situation familiar from λ-calculus. Let t be a term with two redexes, one nested in the other, or one in each component of a pair. One may reduce the left redex first, then the right; or the right first, then the left. Confluence guarantees that the two strategies eventually meet, but the *diagram* witnessing their meeting is a 2-dimensional piece of data. In rewriting-theoretic terms it is a join of a peak; in homotopical terms it is a homotopy between two paths.
+
+        In the computational-path setting, this diagram becomes a 2-cell between two 1-cells (two reasons). The 2-cell can itself be rewritten or composed with other 2-cells (vertical composition corresponds to concatenating derivations; horizontal composition corresponds to whiskering). At this point the first genuinely higher-categorical structure appears: an interchange law relating vertical and horizontal composition.
+
+        The book makes this precise by defining, for each pair of terms (a,b), a type/object of computational paths Path(a,b), and then defining a relation RwEq on paths generated by the rewrite rules on path expressions. A “derivation” between paths p and q is precisely a witness that p and q are related by RwEq; such derivations become the 2-cells of the theory.
+
+        The reader should notice two important design principles.
+
+        (A) Separating generators from relations. The path constructors (refl, symm, trans, congruence) generate a free syntax of paths. The rewrite rules then impose relations that express coherence. This is analogous to presenting a group by generators and relations: without a presentation one cannot compute.
+
+        (B) Orienting relations as reductions. Rather than merely stating equations, we orient them into a rewrite system and prove it terminating and confluent. This produces canonical normal forms and, therefore, a decision procedure for equivalence of path expressions.
+
+        The choice to orient coherence equations is mathematically consequential. It ensures that computations in the path algebra are tractable and that the resulting quotient structure is well-defined. It also aligns the development with the standard rewriting literature (critical pairs, completion, normalization theorems).
+
+        We also stress that the groupoid structure is not assumed. It is derived. For example, the groupoid law (p · q) · r = p · (q · r) is proved by exhibiting a rewrite derivation from trans(trans(p,q),r) to trans(p,trans(q,r)). Similarly, the unit and inverse laws are proved by reducing trans(refl,p) and trans(p,refl) to p, and trans(symm(p),p) to refl, using the rewrite rules.
+
+        Once these derivations are explicit, they can be reused as higher coherence data. The associator is not just a proposition that associativity holds; it is a concrete 2-cell. The same holds for unitors and inverse laws. In later chapters, these become the building blocks of the ω-groupoid structure.
+
+        Finally, we note how this framework relates to the standard identity-type story. In intensional type theory, one postulates a type Id_A(a,b) of equalities and derives a groupoid structure on it. Here, we start with a syntactic equality witness (a rewrite reason) arising from proof normalisation and define the corresponding Path(a,b). The higher structure then emerges by iterating rewriting. Thus computational paths provide an *algebraic* route to the same kind of higher groupoid phenomena, with explicit normalisation and confluence theorems grounding the construction.
+
+        A worked schematic example may help. Suppose we have a product type A × B with projections π₁, π₂ and pairing ⟨_,_⟩. The β-rules state π₁⟨x,y⟩ → x and π₂⟨x,y⟩ → y. Now fix terms u : A and v : B and consider the term π₁⟨u,v⟩. There are at least two “ways” in which this term is equal to u.
+
+        • One may reduce directly by the β-rule for π₁, producing u.
+
+        • One may first η-expand ⟨u,v⟩ in a context (depending on the chosen η-principles), then perform β-reductions, then simplify.
+
+        Both routes establish definitional equality, but they yield distinct equality reasons. If one retains reasons as objects, these routes become distinct paths. The rewrite system on reasons then provides a way to relate these paths: a derivation that transforms one reason expression into another is a 2-cell.
+
+        In more complex examples, such as nested pairs or iterated applications, the space of reasons can be large. Confluence guarantees that different reduction strategies lead to a common result, but confluence itself is witnessed by a family of 2-cells (one for each critical pair). The computational-paths programme treats these 2-cells as mathematical objects that can be composed, compared, and transported.
+
+        This viewpoint clarifies the role of “equations between equations”. In ordinary mathematics one writes an equation and then, if necessary, shows that it is compatible with operations (e.g. addition, multiplication, substitution). In the present setting, one must also show that *reasons* are compatible with operations. If p : a = b is a path and f is a function symbol/constructor, then there is an induced path ap_f(p) : f(a) = f(b). The equations ap_f(p · q) = ap_f(p) · ap_f(q) and ap_f(p^{-1}) = (ap_f(p))^{-1} are not tautologies at the syntactic level; they are coherence statements witnessed by rewrites.
+
+        Such coherences are precisely what is required to interpret Path as the hom-set of a groupoid (and Derivation₂ as the hom-set of a 2-groupoid-like structure). When these coherences are made explicit, familiar topological arguments become available. For example, one can define a loop space Ω(A,a) as the set of paths a → a modulo the chosen equivalence, and one can define a second loop space Ω²(A,a) as 2-cells from refl to refl. The Eckmann–Hilton argument then becomes an argument about interchange and units in this 2-dimensional algebra.
+
+        Another important point is that this framework is compatible with standard algebraic-topological intuition. A fundamental groupoid is built from paths modulo homotopy; here, one builds an analogous structure from rewrite traces modulo rewrite equivalence. The “homotopies” are derivations between traces. The distinction between strict and weak laws corresponds to the distinction between definitional equality (syntactic equality) and equality witnessed by a higher cell (rewrite derivation).
+
+        In summary, the reason-indexed equality judgement does two things simultaneously: it refines equality to a proof-relevant object, and it provides the raw material from which higher coherence is obtained by rewriting. The rest of the book develops the necessary rewrite-theoretic metatheory and packages the resulting tower into a weak ω-groupoid with applications in algebraic topology.
+
+        Two forward pointers connect this section to the rest of the proposal.
+
+        First: the derived J-eliminator. A standard way to obtain path induction in homotopy type theory is to prove that the based path space at a point a is contractible: the type Σ(y : A), Path(a,y) has a canonical center (a, refl) and every other element is connected to it. In the computational-path framework, one can mimic this argument at the Path-level. The “contractibility proof” is itself built from explicit path constructions and rewrite derivations, and from it one extracts a J-like eliminator as a theorem. The significance is conceptual: path induction is not postulated, but derived from the algebra of rewriting.
+
+        Second: the low-dimensional/nontrivial vs high-dimensional/contractible pattern. The computational-path ω-groupoid is not intended to be “wild” in all dimensions. Instead, the theory is engineered so that higher coherence (from dimension 3 upward) becomes contractible in the appropriate sense, while dimension 2 retains enough structure to encode nontrivial π₁ information. This is what allows classical topological invariants to appear while keeping the higher coherence manageable.
+
+        These points are important for positioning. They show that computational paths are not a mere repackaging of identity types. They are a rewriting-driven construction that yields, with explicit normalisation and confluence theorems, the same kind of higher groupoid structures that homotopy theorists expect, together with a clear explanation of where nontrivial invariants live.
+
+        As a further guide for the reader, one may keep the following “dimension table” in mind.
+
+        • Dimension 0: terms/proof labels (objects).
+
+        • Dimension 1: computational paths (rewrite traces) between terms.
+
+        • Dimension 2: derivations witnessing rewrite equivalence between paths (confluence/critical-pair data; whiskering and interchange).
+
+        • Dimension ≥3: coherences between derivations; these become contractible in the weak ω-groupoid sense.
+
+        This table explains both why the theory is homotopical and why it remains computable. The nontrivial structure is concentrated where topologists expect it (π₁ and related low-dimensional invariants), while higher coherence is tamed by contractibility.
+
+        From the standpoint of a Cambridge Tracts-style exposition, this allows the book to present explicit low-dimensional calculations (circle, torus, Klein bottle, projective plane, bouquets) while keeping the higher-dimensional categorical overhead under control. The reader sees the algebraic topology emerge from rewriting, rather than being asked to accept an abstract ∞-categorical framework at the outset.
+
+        The chapters that follow therefore proceed in the natural mathematical order: define the path expressions and rewrite system; prove termination/confluence; derive groupoid laws; define 2-cells and prove interchange; assemble the ω-groupoid theorem; and then apply the resulting machinery to classical computations.
         """
     )
 
@@ -360,6 +444,24 @@ def add_ch1_expansion(doc: Document) -> None:
         Philosophically, this can be read as an intensional refinement of proof-theoretic semantics: meaning is not only the normal form but also the structured space of reasons by which normalisation proceeds.
 
         Mathematically, the consequences are concrete. Termination and confluence yield unique normal forms for path expressions, giving a decision procedure for path equality. Coherence derivations become explicit 2- and 3-cells, and later chapters show how these cells assemble into weak ω-groupoids.
+
+        From the rewriting standpoint, the key lesson is that confluence proofs are themselves structured. To prove confluence one often proves local confluence (joinability of critical pairs) and combines it with termination via Newman's lemma. Each joinability proof is a square of reductions; in a higher-dimensional rewriting language, these squares are generating 2-cells of a polygraph. The collection of these squares, together with their higher relations, presents a homotopy type.
+
+        In the computational-path system, this rewriting geometry is not imported from topology; it is produced internally by the algebra of equality reasons. The coherence data required to form groupoids and higher groupoids is therefore not an extra layer. It is already present in the confluence structure of the rewrite system.
+
+        This perspective explains why the book repeatedly returns to termination/confluence results. They are not mere technicalities. They are what allow us to treat path expressions as a computational algebra with canonical representatives, and they are what produce explicit higher cells that can be composed and compared.
+
+        In brief: normalisation provides the semantics; rewriting provides the combinatorics; confluence provides the 2-dimensional geometry; and the iterative closure of these constructions provides the higher-dimensional algebra.
+
+        The reader may interpret this as a concrete instance of a general principle in higher algebra: whenever one has a presentation of a structure by generators and relations, one should expect coherence questions about the relations. In rewriting language, these coherence questions appear as overlaps of rewrite rules and the requirement that overlaps be joinable. In homotopy language, they appear as higher cells filling boundaries.
+
+        In a terminating, confluent system, the “space of reductions” between two objects has a particularly tractable shape: every reduction path can be compared to the unique normal-form reduction, and critical pairs generate the essential 2-dimensional data. This is one reason convergent rewriting systems are so well suited to homotopical extraction.
+
+        For computational paths, this tractability is essential. It allows us to define a quotient of paths by rewrite equivalence that is mathematically honest (well-defined) and computationally usable (decidable equality via normal forms). It also allows us to *name* the coherence witnesses that later serve as associators, unitors, and interchangers.
+
+        In classical algebraic topology, one often computes π₁ by choosing a set of generators and relations (for example via van Kampen) and then analysing the resulting group presentation. Here the analogy is close: the rewrite system supplies generators (primitive rewrites) and relations (coherence rewrites), and the resulting path groupoid can be studied as a presented algebraic object. The later chapters exploit this to compute fundamental groups of standard spaces presented combinatorially.
+
+        Thus normalisation is not only a semantic doctrine. It is the mechanism that turns rewriting into a source of computable homotopical invariants.
         """
     )
 
@@ -399,6 +501,32 @@ def add_ch1_expansion(doc: Document) -> None:
         Crucially, the rewrite theory is calibrated so that it does not collapse all paths. It collapses only the “structural bureaucracy” (parenthesisation and immediate cancellations) required to make composition associative and unital up to the chosen equivalence. It leaves intact the possibility of distinct normal forms that represent genuinely different rewrite traces. This is why nontrivial fundamental groups can arise.
 
         In later chapters, this rewrite system is the engine that produces higher structure. The associator, unitors, inverse laws, and interchange properties are not postulated: they are witnessed by explicit rewrite derivations, constructed from the rules of the system.
+
+        From an expository standpoint, the book organises the 77 rules by “type”:
+
+        • Structural/groupoid rules (refl/trans/symm interaction; associativity normalisation; cancellation laws).
+
+        • Functoriality rules (how congruence respects composition and inversion).
+
+        • Congruence/naturality rules (how equalities behave under term constructors and contexts).
+
+        • Transport-style rules (stability of path operations under substitution and dependent-like contexts).
+
+        This classification is important for readers: it makes clear which rules correspond to familiar algebraic laws and which are completion/coherence rules required to maintain confluence.
+
+        The larger rewrite system is also what permits a clean separation of concerns in the later chapters. Chapter 4 presents the rules and the induced equivalence relation. Chapter 5 proves the meta-theorems (termination and confluence). Only then do we pass to structural theorems: the groupoid theorem (Chapter 6) and the higher-cell tower (Chapters 7–9).
+
+        In particular, confluence is not assumed when we build higher structure; it is proved once, and then reused. This is precisely the kind of metatheory expected in a pure mathematics monograph: one proves that the defining equations of a structure yield a consistent, well-behaved quotient, and then one studies the quotient.
+
+        It is also important that the rewrite rules are oriented with a specific normal-form discipline in mind. For example, associativity of composition may be oriented so that compositions are always right-associated, turning any composite trans(trans(p,q),r) into trans(p,trans(q,r)). Unit laws may be oriented to erase explicit refl constructors where they are redundant, and inverse laws may be oriented to cancel immediate symm–trans patterns. These choices do not change the mathematical content (the induced equivalence relation is the same), but they make termination proofs and normal-form computations feasible.
+
+        The move from a smaller rule set (e.g. one designed only to capture βη-equality of proof terms) to the larger rule set required for computational paths is therefore analogous to passing from a presentation of a monoid to a presentation of a groupoid with an explicit functorial action. One must add not only the inverse laws but also the coherence laws ensuring that inverses and congruence behave well with respect to composition.
+
+        In rewriting terms, each new constructor on paths introduces new critical overlaps, and confluence forces corresponding joining reductions. The completed system is thus best viewed as the minimal coherent closure of the original equality-reason calculus under the operations we wish to perform on paths.
+
+        The book’s Appendix D lists the full rule set and provides a road map for readers who want to see how the critical pairs arise. This is particularly valuable for referees: it makes the proof-theoretic machinery transparent and checkable, and it demonstrates that the higher coherence claims are grounded in a concrete, finite rewriting object.
+
+        In addition, the rewrite presentation provides a practical benefit for readers who wish to experiment. Because normal forms are unique, one can perform explicit calculations in the path algebra by reduction. This is analogous to reducing a word in a presented group to a normal form (when a confluent rewriting system is available), and it makes the later topological computations feel concrete rather than abstract.
         """
     )
 
@@ -436,6 +564,22 @@ def add_ch1_expansion(doc: Document) -> None:
         • It makes the coherence data explicit and computable: associators, unitors, and interchangers appear as rewrite derivations, not as abstract existential statements.
 
         • It provides a clear conceptual account of how structures akin to identity-type ω-groupoids can arise from proof theory without adopting the identity type rules as axioms.
+
+        One may also view the two-level architecture as a response to a common referee question: “Where, exactly, is the homotopy theory?” The answer is that the homotopy theory is extracted from Path-level data (rewrite traces) and its higher rewrite structure, while the surrounding exposition uses Eq-level equality in the ordinary sense. This ensures that the book can be read as mainstream mathematics, with no foundational commitments beyond those required to talk about rewriting systems and quotients.
+
+        The architecture also cleanly separates two kinds of statements.
+
+        • Statements about computation: e.g. that a given rewrite system is terminating and confluent, that normal forms exist and are unique, or that a particular path expression reduces to another.
+
+        • Statements about resulting algebraic objects: e.g. that the quotient of paths forms a groupoid, that 2-cells compose and satisfy interchange, or that a based path space is contractible (leading to a derived J-eliminator).
+
+        This separation is important for the book’s positioning relative to HoTT. In HoTT, the identity type is primitive and its eliminator is axiomatic; higher groupoid structure is then derived. Here, the primitive data is a proof-theoretic rewrite system; confluence and normalisation are proved; and the higher groupoid structure is derived from the rewrite theory.
+
+        Finally, the Path vs Eq distinction clarifies how to interpret “failure of UIP” in this setting. The book does not claim that equality in mathematics is ambiguous or that proof-irrelevance is wrong. It claims that there is a mathematically meaningful refinement of equality—equality with reason—that is naturally present in proof theory and rewriting, and that this refinement has genuinely nontrivial homotopical content.
+
+        For the intended audience of mathematicians (algebraists, topologists, type theorists, proof theorists), this provides a familiar pattern: introduce a refinement that carries structure (Path), study its quotient and coherence (RwEq and higher derivations), and recover classical invariants (fundamental groupoids, loop groups) as derived constructions.
+
+        The proposal is therefore intentionally conservative about foundations and ambitious about structure: conservative in that it keeps ordinary equality as the ambient meta-level notion, and ambitious in that it extracts a rich higher-dimensional algebra from explicitly recorded rewrite data. This combination is what makes the project suitable as a research monograph aimed at a broad mathematical audience.
         """
     )
 
