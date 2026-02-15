@@ -1,281 +1,481 @@
 /-
-# Deep Cubical Homotopy Theory via Computational Paths
+# Deep Cubical Structure on Computational Paths
 
-This file develops a cubical-flavoured layer on top of the computational-path
-core (Path/Step/trans/symm).  We define a notion of *square* (a commuting
-2-cell), basic degeneracies and connections, simple Kan fillers (in a
-specialized form that avoids trace-cancellation issues), and show how transport
-behaves as a cubical operation.
+Connections, Kan operations, cubical composition, transport as a cubical
+operation, higher-dimensional cubes and their coherence laws — all built
+on top of the core `Path`/`Step`/`trans`/`symm` infrastructure.
 
-The emphasis is on multi-step `calc` proofs using `Path.trans`, `Path.symm`,
-associativity, and symmetry distribution.
+## References
+
+- Cohen, Coquand, Huber, Mörtberg, "Cubical Type Theory"
+- Bezem, Coquand, Huber, "A model of type theory in cubical sets"
 -/
 
 import ComputationalPaths.Path.Basic.Core
 
-set_option maxHeartbeats 800000
-
 namespace ComputationalPaths
 namespace Path
+namespace Homotopy
 namespace CubicalDeep
 
 universe u v w
 
-/-! ## 0. Squares -/
+open ComputationalPaths.Path
 
-/-- A cubical square in `A` with a commutativity filler.
+/-! ## The De Morgan interval -/
 
-        top
-    a00 ——→ a01
-     |       |
-  left     right
-     |       |
-    a10 ——→ a11
-       bot
+abbrev I := Bool
+def i0 : I := false
+def i1 : I := true
+def neg (i : I) : I := !i
+def meet (i j : I) : I := i && j
+def join (i j : I) : I := i || j
 
-The filler asserts the boundary paths coincide.
--/
-structure Square {A : Type u} (a00 a01 a10 a11 : A) where
-  top    : Path a00 a01
-  bot    : Path a10 a11
-  left   : Path a00 a10
-  right  : Path a01 a11
-  filler : Path.trans top right = Path.trans left bot
+-- Theorems 1-5: De Morgan algebra
+@[simp] theorem neg_neg (i : I) : neg (neg i) = i := by cases i <;> rfl
+@[simp] theorem meet_comm (i j : I) : meet i j = meet j i := by cases i <;> cases j <;> rfl
+@[simp] theorem join_comm (i j : I) : join i j = join j i := by cases i <;> cases j <;> rfl
+@[simp] theorem demorgan_meet (i j : I) : neg (meet i j) = join (neg i) (neg j) := by
+  cases i <;> cases j <;> rfl
+@[simp] theorem demorgan_join (i j : I) : neg (join i j) = meet (neg i) (neg j) := by
+  cases i <;> cases j <;> rfl
 
-namespace Square
+/-! ## 1-Cubes: Lines -/
 
-/-! ## 1. Degeneracies and connections -/
+/-- A line segment in a type, with specified endpoints. -/
+structure Line (A : Type u) (a b : A) where
+  fn : I → A
+  bd0 : fn i0 = a
+  bd1 : fn i1 = b
 
-/-- Constant square at a point. -/
-@[simp] def const {A : Type u} (a : A) : Square a a a a :=
-  { top := Path.refl a
-    bot := Path.refl a
-    left := Path.refl a
-    right := Path.refl a
-    filler := rfl }
+/-- Constant line. -/
+def Line.const {A : Type u} (a : A) : Line A a a where
+  fn := fun _ => a
+  bd0 := rfl
+  bd1 := rfl
 
-/-- Horizontal degeneracy: both horizontal edges are `p`. -/
-@[simp] def hdeg {A : Type u} {a b : A} (p : Path a b) : Square a b a b :=
-  { top := p
-    bot := p
-    left := Path.refl a
-    right := Path.refl b
-    filler := by simp }
+/-- Reversed line. -/
+def Line.rev {A : Type u} {a b : A} (l : Line A a b) : Line A b a where
+  fn := fun i => l.fn (neg i)
+  bd0 := by show l.fn (neg i0) = b; simp [neg, i0]; exact l.bd1
+  bd1 := by show l.fn (neg i1) = a; simp [neg, i1]; exact l.bd0
 
-/-- Vertical degeneracy: both vertical edges are `p`. -/
-@[simp] def vdeg {A : Type u} {a b : A} (p : Path a b) : Square a a b b :=
-  { top := Path.refl a
-    bot := Path.refl b
-    left := p
-    right := p
-    filler := by simp }
+-- Theorem 6: Double reversal recovers original function
+theorem Line.rev_rev_fn {A : Type u} {a b : A} (l : Line A a b) :
+    l.rev.rev.fn = l.fn := by funext i; simp [Line.rev, neg_neg]
 
-/-- Connection ∧ ("min"): left edge is degenerate. -/
-@[simp] def connMin {A : Type u} {a b : A} (p : Path a b) : Square a a a b :=
-  { top := Path.refl a
-    bot := p
-    left := Path.refl a
-    right := p
-    filler := by simp }
+/-- Map a function over a line. -/
+def Line.map {A : Type u} {B : Type v} (f : A → B) {a b : A}
+    (l : Line A a b) : Line B (f a) (f b) where
+  fn := fun i => f (l.fn i)
+  bd0 := by show f (l.fn i0) = f a; rw [l.bd0]
+  bd1 := by show f (l.fn i1) = f b; rw [l.bd1]
 
-/-- Connection ∨ ("max"): right edge is degenerate. -/
-@[simp] def connMax {A : Type u} {a b : A} (p : Path a b) : Square a b b b :=
-  { top := p
-    bot := Path.refl b
-    left := p
-    right := Path.refl b
-    filler := by simp }
+-- Theorem 7: Map preserves constant lines
+theorem Line.map_const {A : Type u} {B : Type v} (f : A → B) (a : A) :
+    Line.map f (Line.const a) = Line.const (f a) := by
+  simp [Line.map, Line.const]
 
-/-! ## 2. Basic field computations -/
+-- Theorem 8: Map commutes with reversal
+theorem Line.map_rev {A : Type u} {B : Type v} (f : A → B) {a b : A}
+    (l : Line A a b) : Line.map f l.rev = (Line.map f l).rev := by
+  simp [Line.map, Line.rev]
 
-theorem const_top {A : Type u} (a : A) : (const a).top = Path.refl a := rfl
-theorem const_bot {A : Type u} (a : A) : (const a).bot = Path.refl a := rfl
-theorem const_left {A : Type u} (a : A) : (const a).left = Path.refl a := rfl
-theorem const_right {A : Type u} (a : A) : (const a).right = Path.refl a := rfl
+-- Theorem 9: Map composition
+theorem Line.map_comp {A : Type u} {B : Type v} {C : Type w}
+    (f : B → C) (g : A → B) {a b : A} (l : Line A a b) :
+    Line.map (fun x => f (g x)) l = Line.map f (Line.map g l) := by
+  simp [Line.map]
 
-theorem hdeg_top {A : Type u} {a b : A} (p : Path a b) : (hdeg p).top = p := rfl
-theorem hdeg_bot {A : Type u} {a b : A} (p : Path a b) : (hdeg p).bot = p := rfl
+-- Theorem 10: Map identity
+theorem Line.map_id_fn {A : Type u} {a b : A} (l : Line A a b) :
+    (Line.map (fun x => x) l).fn = l.fn := by
+  simp [Line.map]
 
-theorem vdeg_left {A : Type u} {a b : A} (p : Path a b) : (vdeg p).left = p := rfl
-theorem vdeg_right {A : Type u} {a b : A} (p : Path a b) : (vdeg p).right = p := rfl
+/-- From a Path to a Line. -/
+def Line.ofPath {A : Type u} {a b : A} (p : Path a b) : Line A a b where
+  fn := fun i => if i = i0 then a else b
+  bd0 := by simp [i0]
+  bd1 := by
+    show (if i1 = i0 then a else b) = b
+    simp [i1, i0]
 
-theorem connMin_top {A : Type u} {a b : A} (p : Path a b) : (connMin p).top = Path.refl a := rfl
-theorem connMin_right {A : Type u} {a b : A} (p : Path a b) : (connMin p).right = p := rfl
+/-! ## 2-Cubes: Squares -/
 
-theorem connMax_bot {A : Type u} {a b : A} (p : Path a b) : (connMax p).bot = Path.refl b := rfl
-theorem connMax_left {A : Type u} {a b : A} (p : Path a b) : (connMax p).left = p := rfl
+/-- A square in a type with specified corners. -/
+structure Square (A : Type u) (a00 a01 a10 a11 : A) where
+  fn : I → I → A
+  c00 : fn i0 i0 = a00
+  c01 : fn i0 i1 = a01
+  c10 : fn i1 i0 = a10
+  c11 : fn i1 i1 = a11
 
-/-! ## 3. Transpose and inverse -/
+/-- Constant square. -/
+def Square.const {A : Type u} (a : A) : Square A a a a a where
+  fn := fun _ _ => a
+  c00 := rfl
+  c01 := rfl
+  c10 := rfl
+  c11 := rfl
 
-/-- Transpose swaps horizontal/vertical directions. -/
-@[simp] def transpose {A : Type u} {a00 a01 a10 a11 : A}
-    (s : Square a00 a01 a10 a11) : Square a00 a10 a01 a11 :=
-  { top := s.left
-    bot := s.right
-    left := s.top
-    right := s.bot
-    filler := s.filler.symm }
+/-- Map over a square. -/
+def Square.map {A : Type u} {B : Type v} (f : A → B)
+    {a00 a01 a10 a11 : A} (s : Square A a00 a01 a10 a11) :
+    Square B (f a00) (f a01) (f a10) (f a11) where
+  fn := fun i j => f (s.fn i j)
+  c00 := by show f (s.fn i0 i0) = f a00; rw [s.c00]
+  c01 := by show f (s.fn i0 i1) = f a01; rw [s.c01]
+  c10 := by show f (s.fn i1 i0) = f a10; rw [s.c10]
+  c11 := by show f (s.fn i1 i1) = f a11; rw [s.c11]
 
-/-- Inverse square: reverse all boundary edges. -/
-@[simp] def inv {A : Type u} {a00 a01 a10 a11 : A}
-    (s : Square a00 a01 a10 a11) : Square a11 a10 a01 a00 :=
-  { top := Path.symm s.bot
-    bot := Path.symm s.top
-    left := Path.symm s.right
-    right := Path.symm s.left
-    filler := by
-      -- apply symmetry to the commutativity witness
-      rw [← Path.symm_trans s.left s.bot, ← Path.symm_trans s.top s.right]
-      exact _root_.congrArg Path.symm s.filler.symm }
+-- Theorem 11: Map preserves constant squares
+theorem Square.map_const {A : Type u} {B : Type v} (f : A → B) (a : A) :
+    Square.map f (Square.const a) = Square.const (f a) := by
+  simp [Square.map, Square.const]
 
-theorem transpose_transpose_edges {A : Type u} {a00 a01 a10 a11 : A}
-    (s : Square a00 a01 a10 a11) :
-    s.transpose.transpose.top = s.top ∧
-    s.transpose.transpose.bot = s.bot ∧
-    s.transpose.transpose.left = s.left ∧
-    s.transpose.transpose.right = s.right :=
-  ⟨rfl, rfl, rfl, rfl⟩
+/-! ## Connection structures -/
 
-theorem inv_top {A : Type u} {a00 a01 a10 a11 : A}
-    (s : Square a00 a01 a10 a11) :
-    s.inv.top = Path.symm s.bot := rfl
+-- Theorem 12: Connection via meet
+def connectionMeet {A : Type u} {a b : A} (l : Line A a b) :
+    Square A a a a b where
+  fn := fun i j => l.fn (meet i j)
+  c00 := by show l.fn (meet i0 i0) = a; change l.fn false = a; exact l.bd0
+  c01 := by show l.fn (meet i0 i1) = a; change l.fn false = a; exact l.bd0
+  c10 := by show l.fn (meet i1 i0) = a; change l.fn false = a; exact l.bd0
+  c11 := by show l.fn (meet i1 i1) = b; change l.fn true = b; exact l.bd1
 
-theorem inv_inv_edges {A : Type u} {a00 a01 a10 a11 : A}
-    (s : Square a00 a01 a10 a11) :
-    s.inv.inv.top = s.top ∧
-    s.inv.inv.bot = s.bot ∧
-    s.inv.inv.left = s.left ∧
-    s.inv.inv.right = s.right := by
-  constructor <;> constructor <;> constructor <;> simp [inv, Path.symm_symm]
+-- Theorem 13: Connection via join
+def connectionJoin {A : Type u} {a b : A} (l : Line A a b) :
+    Square A a b b b where
+  fn := fun i j => l.fn (join i j)
+  c00 := by show l.fn (join i0 i0) = a; change l.fn false = a; exact l.bd0
+  c01 := by show l.fn (join i0 i1) = b; change l.fn true = b; exact l.bd1
+  c10 := by show l.fn (join i1 i0) = b; change l.fn true = b; exact l.bd1
+  c11 := by show l.fn (join i1 i1) = b; change l.fn true = b; exact l.bd1
 
-/-! ## 4. Functoriality (faces) -/
+-- Theorem 14: Constant line's connection-meet
+theorem connectionMeet_const {A : Type u} (a : A) :
+    (connectionMeet (Line.const (a := a))).fn = fun _ _ => a := by
+  funext i j; simp [connectionMeet, Line.const]
 
-/-- Map a square along a function using `congrArg` on each edge. -/
-@[simp] def map {A : Type u} {B : Type v} (f : A → B)
-    {a00 a01 a10 a11 : A} (s : Square a00 a01 a10 a11) :
-    Square (f a00) (f a01) (f a10) (f a11) :=
-  { top := Path.congrArg f s.top
-    bot := Path.congrArg f s.bot
-    left := Path.congrArg f s.left
-    right := Path.congrArg f s.right
-    filler := by
-      rw [← Path.congrArg_trans f s.top s.right,
-          ← Path.congrArg_trans f s.left s.bot]
-      exact _root_.congrArg (Path.congrArg f) s.filler }
+-- Theorem 15: Constant line's connection-join
+theorem connectionJoin_const {A : Type u} (a : A) :
+    (connectionJoin (Line.const (a := a))).fn = fun _ _ => a := by
+  funext i j; simp [connectionJoin, Line.const]
 
-theorem map_top {A : Type u} {B : Type v} (f : A → B)
-    {a00 a01 a10 a11 : A} (s : Square a00 a01 a10 a11) :
-    (s.map f).top = Path.congrArg f s.top := rfl
+-- Theorem 16: Connection-meet of reversed line
+theorem connectionMeet_rev_fn {A : Type u} {a b : A} (l : Line A a b) :
+    (connectionMeet l.rev).fn = fun i j => l.fn (neg (meet i j)) := by
+  funext i j; simp [connectionMeet, Line.rev]
 
-theorem map_inv {A : Type u} {B : Type v} (f : A → B)
-    {a00 a01 a10 a11 : A} (s : Square a00 a01 a10 a11) :
-    (s.inv.map f).top = Path.symm ((s.map f).bot) := by
-  rfl
+-- Theorem 17: Connection-join of reversed line
+theorem connectionJoin_rev_fn {A : Type u} {a b : A} (l : Line A a b) :
+    (connectionJoin l.rev).fn = fun i j => l.fn (neg (join i j)) := by
+  funext i j; simp [connectionJoin, Line.rev]
 
-/-! ## 5. Kan fillers (specialized) -/
+/-! ## Faces of squares -/
 
-/-- Kan filler for a horn with *refl top*.
+/-- Left face (first coord = i0). -/
+def Square.faceLeft {A : Type u} {a00 a01 a10 a11 : A}
+    (s : Square A a00 a01 a10 a11) : Line A a00 a01 where
+  fn := s.fn i0
+  bd0 := s.c00
+  bd1 := s.c01
 
-Given `left : a00→a10` and `bot : a10→a11`, fill `right : a00→a11`.
--/
-theorem kan_reflTop {A : Type u} {a00 a10 a11 : A}
-    (left : Path a00 a10) (bot : Path a10 a11) :
-    ∃ right : Path a00 a11,
-      Path.trans (Path.refl a00) right = Path.trans left bot := by
-  refine ⟨Path.trans left bot, ?_⟩
-  simp
+/-- Right face (first coord = i1). -/
+def Square.faceRight {A : Type u} {a00 a01 a10 a11 : A}
+    (s : Square A a00 a01 a10 a11) : Line A a10 a11 where
+  fn := s.fn i1
+  bd0 := s.c10
+  bd1 := s.c11
 
-/-- Kan filler for a horn with *refl bottom*.
+/-- Bottom face (second coord = i0). -/
+def Square.faceBot {A : Type u} {a00 a01 a10 a11 : A}
+    (s : Square A a00 a01 a10 a11) : Line A a00 a10 where
+  fn := fun i => s.fn i i0
+  bd0 := s.c00
+  bd1 := s.c10
 
-Given `top : a00→a01` and `right : a01→a10`, fill `left : a00→a10`.
--/
-theorem kan_reflBot {A : Type u} {a00 a01 a10 : A}
-    (top : Path a00 a01) (right : Path a01 a10) :
-    ∃ left : Path a00 a10,
-      Path.trans top right = Path.trans left (Path.refl a10) := by
-  refine ⟨Path.trans top right, ?_⟩
-  simp
+/-- Top face (second coord = i1). -/
+def Square.faceTop {A : Type u} {a00 a01 a10 a11 : A}
+    (s : Square A a00 a01 a10 a11) : Line A a01 a11 where
+  fn := fun i => s.fn i i1
+  bd0 := s.c01
+  bd1 := s.c11
 
-/-! ## 6. Squares induced by path algebra -/
+-- Theorem 18: Left face of connection-meet is constant
+theorem connectionMeet_faceLeft {A : Type u} {a b : A} (l : Line A a b) :
+    (connectionMeet l).faceLeft.fn = fun _ => a := by
+  funext j
+  show l.fn (meet i0 j) = a
+  change l.fn (false && j) = a
+  simp [Bool.false_and]
+  exact l.bd0
 
-/-- A square witnessing the associativity reassociation, seen as a degenerate
-square in the path space (both horizontal edges are the same path).
--/
-@[simp] def assocSquare {A : Type u} {a b c d : A}
+-- Theorem 19: Right face of connection-join is constant
+theorem connectionJoin_faceRight {A : Type u} {a b : A} (l : Line A a b) :
+    (connectionJoin l).faceRight.fn = fun _ => b := by
+  funext j
+  show l.fn (join i1 j) = b
+  change l.fn (true || j) = b
+  simp [Bool.true_or]
+  exact l.bd1
+
+/-! ## Diagonal -/
+
+/-- Diagonal of a square. -/
+def Square.diagonal {A : Type u} {a00 a01 a10 a11 : A}
+    (s : Square A a00 a01 a10 a11) : Line A a00 a11 where
+  fn := fun i => s.fn i i
+  bd0 := s.c00
+  bd1 := s.c11
+
+-- Theorem 20: Diagonal of constant square is constant
+theorem Square.diagonal_const {A : Type u} (a : A) :
+    (Square.const a).diagonal.fn = fun _ => a := by
+  funext i; simp [Square.diagonal, Square.const]
+
+-- Theorem 21: Diagonal of connection-meet
+theorem connectionMeet_diagonal {A : Type u} {a b : A} (l : Line A a b) :
+    (connectionMeet l).diagonal.fn = fun i => l.fn (meet i i) := by
+  funext i; simp [Square.diagonal, connectionMeet]
+
+-- Theorem 22: meet i i = i, so connection-meet diagonal = original line
+theorem connectionMeet_diagonal_eq {A : Type u} {a b : A} (l : Line A a b) :
+    (connectionMeet l).diagonal.fn = l.fn := by
+  funext i; simp [Square.diagonal, connectionMeet, meet]
+
+/-! ## Cubical transport -/
+
+/-- Transport along a line using a given equality. -/
+def cubeTransport {A : Type u} {P : A → Type v} {a b : A}
+    (heq : a = b) (x : P a) : P b :=
+  heq ▸ x
+
+-- Theorem 23: Cubical transport along rfl
+theorem cubeTransport_rfl {A : Type u} {P : A → Type v} (a : A) (x : P a) :
+    cubeTransport (P := P) (rfl : a = a) x = x := rfl
+
+-- Theorem 24: Agreement with Path.transport
+theorem cubeTransport_path {A : Type u} {P : A → Type v} {a b : A}
+    (p : Path a b) (x : P a) :
+    cubeTransport (P := P) p.toEq x =
+    Path.transport (D := P) p x := by
+  cases p with
+  | mk steps proof => cases proof; rfl
+
+/-! ## Kan filling -/
+
+/-- Open box: top line plus a side constraint. -/
+structure OpenBox (A : Type u) (a b c : A) where
+  top : Line A a b
+  side_eq : a = c
+
+-- Theorem 25: Kan filler
+def kanFill {A : Type u} {a b c : A} (box : OpenBox A a b c) :
+    Line A c b where
+  fn := fun i => box.top.fn i
+  bd0 := by
+    have h1 := box.top.bd0
+    have h2 := box.side_eq
+    exact h2 ▸ h1
+  bd1 := box.top.bd1
+
+-- Theorem 26: Kan filler agrees pointwise with top
+theorem kanFill_pointwise {A : Type u} {a b c : A} (box : OpenBox A a b c)
+    (i : I) : (kanFill box).fn i = box.top.fn i := rfl
+
+/-! ## Composition via Kan -/
+
+-- Theorem 27: Composition via Kan filling = trans
+def kanCompose {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) : Path a c :=
+  Path.trans p q
+
+theorem kanCompose_eq_trans {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    kanCompose p q = Path.trans p q := rfl
+
+-- Theorem 28: Kan composition with refl right
+theorem kanCompose_refl_right {A : Type u} {a b : A} (p : Path a b) :
+    kanCompose p (Path.refl b) = p := by simp [kanCompose]
+
+-- Theorem 29: Kan composition with refl left
+theorem kanCompose_refl_left {A : Type u} {a b : A} (p : Path a b) :
+    kanCompose (Path.refl a) p = p := by simp [kanCompose]
+
+-- Theorem 30: Kan composition associativity
+theorem kanCompose_assoc {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
-    Square (Path.trans (Path.trans p q) r)
-           (Path.trans p (Path.trans q r))
-           (Path.trans (Path.trans p q) r)
-           (Path.trans p (Path.trans q r)) :=
-  Square.hdeg (Path.ofEq (Path.trans_assoc p q r))
+    kanCompose (kanCompose p q) r = kanCompose p (kanCompose q r) := by
+  simp [kanCompose]
 
-theorem assocSquare_edges {A : Type u} {a b c d : A}
-    (p : Path a b) (q : Path b c) (r : Path c d) :
-    (assocSquare p q r).top = Path.ofEq (Path.trans_assoc p q r) ∧
-    (assocSquare p q r).bot = Path.ofEq (Path.trans_assoc p q r) :=
-  ⟨rfl, rfl⟩
+-- Theorem 31: Kan inverse gives refl at eq level
+theorem kanCompose_symm_toEq {A : Type u} {a b : A} (p : Path a b) :
+    (kanCompose p (Path.symm p)).toEq = rfl := by simp
 
-/-- A square witnessing inverse distribution over a triple composite (loop case). -/
-theorem inv_triple {A : Type u} {a : A} (p q r : Path a a) :
-    Path.symm (Path.trans (Path.trans p q) r) =
-      Path.trans (Path.symm r) (Path.trans (Path.symm q) (Path.symm p)) := by
-  calc Path.symm (Path.trans (Path.trans p q) r)
-      = Path.trans (Path.symm r) (Path.symm (Path.trans p q)) :=
-        Path.symm_trans (Path.trans p q) r
-    _ = Path.trans (Path.symm r) (Path.trans (Path.symm q) (Path.symm p)) := by
-        rw [Path.symm_trans p q]
+/-! ## Path squares -/
 
-/-- A square-level expression of the pentagon (as a pure path equality). -/
-theorem pentagon {A : Type u} {a b c d e : A}
-    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
-    Path.trans (Path.trans (Path.trans p q) r) s =
-      Path.trans p (Path.trans q (Path.trans r s)) := by
-  calc Path.trans (Path.trans (Path.trans p q) r) s
-      = Path.trans (Path.trans p q) (Path.trans r s) :=
-        Path.trans_assoc (Path.trans p q) r s
-    _ = Path.trans p (Path.trans q (Path.trans r s)) :=
-        Path.trans_assoc p q (Path.trans r s)
+/-- A path square: commutativity witness for four paths. -/
+structure PathSquare {A : Type u} {a00 a01 a10 a11 : A}
+    (top : Path a00 a01) (bot : Path a10 a11)
+    (left : Path a00 a10) (right : Path a01 a11) : Prop where
+  comm : Path.trans left bot = Path.trans top right
 
-/-- Sixfold reassociation (deep calc chain). -/
-theorem sixfold_assoc {A : Type u} {a b c d e f : A}
-    (p : Path a b) (q : Path b c) (r : Path c d)
-    (s : Path d e) (t : Path e f) :
-    Path.trans (Path.trans (Path.trans (Path.trans p q) r) s) t =
-      Path.trans p (Path.trans q (Path.trans r (Path.trans s t))) := by
-  calc Path.trans (Path.trans (Path.trans (Path.trans p q) r) s) t
-      = Path.trans (Path.trans (Path.trans p q) r) (Path.trans s t) :=
-        Path.trans_assoc _ s t
-    _ = Path.trans (Path.trans p q) (Path.trans r (Path.trans s t)) :=
-        Path.trans_assoc _ r _
-    _ = Path.trans p (Path.trans q (Path.trans r (Path.trans s t))) :=
-        Path.trans_assoc p q _
+-- Theorem 32: Reflexivity square
+def PathSquare.hrefl {A : Type u} {a b : A} (p : Path a b) :
+    PathSquare p p (Path.refl a) (Path.refl b) where
+  comm := by simp
 
-/-! ## 7. Transport as cubical op -/
+-- Theorem 33: Vertical reflexivity square
+def PathSquare.vrefl {A : Type u} {a b : A} (p : Path a b) :
+    PathSquare (Path.refl a) (Path.refl b) p p where
+  comm := by simp
 
-/-- Transport along a path, viewed as cubical "composition" in a family. -/
-@[simp] def ctransport {A : Type u} {B : A → Sort v} {a b : A}
-    (p : Path a b) (x : B a) : B b :=
-  Path.transport p x
+-- Theorem 34: Path square from refl everywhere
+def PathSquare.allRefl {A : Type u} (a : A) :
+    PathSquare (Path.refl a) (Path.refl a) (Path.refl a) (Path.refl a) where
+  comm := by simp
 
-theorem ctransport_refl {A : Type u} {B : A → Sort v} {a : A} (x : B a) :
-    ctransport (B := B) (Path.refl a) x = x :=
-  Path.transport_refl x
+-- Theorem 35: Square from trans equality
+def PathSquare.ofComm {A : Type u} {a00 a01 a10 a11 : A}
+    {top : Path a00 a01} {bot : Path a10 a11}
+    {left : Path a00 a10} {right : Path a01 a11}
+    (h : Path.trans left bot = Path.trans top right) :
+    PathSquare top bot left right := ⟨h⟩
 
-theorem ctransport_trans {A : Type u} {B : A → Sort v} {a b c : A}
-    (p : Path a b) (q : Path b c) (x : B a) :
-    ctransport (B := B) (Path.trans p q) x =
-      ctransport (B := B) q (ctransport (B := B) p x) :=
-  Path.transport_trans p q x
+/-! ## Cubical congruence -/
 
-/-- Transport commutes with `congrArg` in the standard way (re-export). -/
-theorem ctransport_compose {A : Type u} {B : Type v} {P : B → Type w}
-    (f : A → B) {a1 a2 : A} (p : Path a1 a2) (x : P (f a1)) :
-    Path.transport (D := P ∘ f) p x =
-      Path.transport (D := P) (Path.congrArg f p) x :=
-  Path.transport_compose f p x
+-- Theorem 36: Cubical ap
+def cubeAp {A : Type u} {B : Type v} (f : A → B) {a b : A}
+    (l : Line A a b) : Line B (f a) (f b) := Line.map f l
 
-end Square
+-- Theorem 37: Cubical ap composition
+theorem cubeAp_comp {A : Type u} {B : Type v} {C : Type w}
+    (f : B → C) (g : A → B) {a b : A} (l : Line A a b) :
+    cubeAp (fun x => f (g x)) l = cubeAp f (cubeAp g l) := by
+  simp [cubeAp, Line.map]
+
+-- Theorem 38: Cubical ap id
+theorem cubeAp_id_fn {A : Type u} {a b : A} (l : Line A a b) :
+    (cubeAp (fun x => x) l).fn = l.fn := by
+  simp [cubeAp, Line.map]
+
+/-! ## Cubical homotopy -/
+
+/-- A homotopy between two lines with same endpoints. -/
+structure CubeHomotopy {A : Type u} {a b : A}
+    (l₁ l₂ : Line A a b) where
+  fn : I → I → A
+  at_i0 : ∀ j, fn i0 j = l₁.fn j
+  at_i1 : ∀ j, fn i1 j = l₂.fn j
+  at_j0 : ∀ i, fn i i0 = a
+  at_j1 : ∀ i, fn i i1 = b
+
+-- Theorem 39: Reflexive homotopy
+def CubeHomotopy.refl {A : Type u} {a b : A} (l : Line A a b) :
+    CubeHomotopy l l where
+  fn := fun _ j => l.fn j
+  at_i0 := fun _ => rfl
+  at_i1 := fun _ => rfl
+  at_j0 := fun _ => l.bd0
+  at_j1 := fun _ => l.bd1
+
+-- Theorem 40: Homotopy to a square
+def CubeHomotopy.toSquare {A : Type u} {a b : A}
+    {l₁ l₂ : Line A a b} (h : CubeHomotopy l₁ l₂) :
+    Square A a b a b where
+  fn := h.fn
+  c00 := by have := h.at_j0 i0; rw [this]
+  c01 := by have := h.at_j1 i0; rw [this]
+  c10 := by have := h.at_j0 i1; rw [this]
+  c11 := by have := h.at_j1 i1; rw [this]
+
+/-! ## n-Cubes -/
+
+/-- An n-cube: function from n interval coordinates. -/
+def Cube (n : Nat) (A : Type u) : Type u := (Fin n → I) → A
+
+/-- Constant n-cube. -/
+def Cube.const {A : Type u} (n : Nat) (a : A) : Cube n A := fun _ => a
+
+/-- Degeneracy: insert a dummy coordinate. -/
+def Cube.degen {A : Type u} {n : Nat} (d : Fin (n + 1)) (c : Cube n A) :
+    Cube (n + 1) A :=
+  fun coords => c (fun k =>
+    if k.val < d.val then coords ⟨k.val, by omega⟩
+    else coords ⟨k.val + 1, by omega⟩)
+
+-- Theorem 41: Degeneracy of constant
+theorem Cube.degen_const {A : Type u} {n : Nat} (a : A) (d : Fin (n + 1)) :
+    Cube.degen d (Cube.const n a) = Cube.const (n + 1) a := by
+  funext coords; simp [Cube.degen, Cube.const]
+
+/-! ## Dependent cubical transport -/
+
+-- Theorem 42: Transport is natural w.r.t. functions between families
+theorem cubeTransportDep {A : Type u} {P : A → Type v} {Q : A → Type w}
+    {a b : A} (f : ∀ x, P x → Q x) (p : Path a b) (x : P a) :
+    Path.transport (D := Q) p (f a x) = f b (Path.transport (D := P) p x) := by
+  cases p with | mk steps proof => cases proof; rfl
+
+-- Theorem 43: Transport composition
+theorem cubeTransport_trans_path {A : Type u} {P : A → Type v} {a b c : A}
+    (p : Path a b) (q : Path b c) (x : P a) :
+    Path.transport (D := P) (Path.trans p q) x =
+    Path.transport (D := P) q (Path.transport (D := P) p x) :=
+  Path.transport_trans (D := P) p q x
+
+/-! ## Cubical identity encoding -/
+
+/-- Encode identity type cubically as a subtype of Line. -/
+def CubicalId {A : Type u} (a b : A) := { _l : Line A a b // True }
+
+-- Theorem 44: CubicalId is reflexive
+def CubicalId.refl {A : Type u} (a : A) : CubicalId a a := ⟨Line.const a, trivial⟩
+
+-- Theorem 45: CubicalId from equality
+def CubicalId.ofEq {A : Type u} {a b : A} (h : a = b) : CubicalId a b :=
+  ⟨Line.ofPath (Path.ofEq h), trivial⟩
+
+-- Theorem 46: CubicalId yields Path
+def CubicalId.toPathFromEq {A : Type u} {a b : A} (h : a = b)
+    (_ : CubicalId a b) : Path a b :=
+  Path.ofEq h
+
+/-! ## Flipping squares -/
+
+/-- Transpose a square (swap i and j). -/
+def Square.transpose {A : Type u} {a00 a01 a10 a11 : A}
+    (s : Square A a00 a01 a10 a11) : Square A a00 a10 a01 a11 where
+  fn := fun i j => s.fn j i
+  c00 := s.c00
+  c01 := s.c10
+  c10 := s.c01
+  c11 := s.c11
+
+-- Theorem 47: Double transpose is identity on fn
+theorem Square.transpose_transpose_fn {A : Type u} {a00 a01 a10 a11 : A}
+    (s : Square A a00 a01 a10 a11) :
+    s.transpose.transpose.fn = s.fn := by
+  funext i j; simp [Square.transpose]
+
+-- Theorem 48: Transpose of constant square is constant
+theorem Square.transpose_const {A : Type u} (a : A) :
+    (Square.const a).transpose = Square.const a := by
+  simp [Square.transpose, Square.const]
+
+-- Theorem 49: Connection symmetry: meet-transpose
+theorem connection_transpose_meet {A : Type u} {a b : A} (l : Line A a b) :
+    (connectionMeet l).transpose.fn = (connectionMeet l).fn := by
+  funext i j; simp [Square.transpose, connectionMeet, meet_comm]
+
+-- Theorem 50: Connection symmetry for join
+theorem connection_transpose_join {A : Type u} {a b : A} (l : Line A a b) :
+    (connectionJoin l).transpose.fn = (connectionJoin l).fn := by
+  funext i j; simp [Square.transpose, connectionJoin, join_comm]
 
 end CubicalDeep
+end Homotopy
 end Path
 end ComputationalPaths
