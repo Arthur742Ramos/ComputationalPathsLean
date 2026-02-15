@@ -463,6 +463,11 @@ import ComputationalPaths.Path.Algebra.ArithmeticDynamics
 import ComputationalPaths.Path.Algebra.AnalyticNumberTheory
 import ComputationalPaths.Path.Algebra.AdditiveCombin
 import ComputationalPaths.Path.Algebra.AlgebraicCombinatorics
+import ComputationalPaths.Path.Algebra.StochasticProcesses
+import ComputationalPaths.Path.Algebra.RandomMatrices
+import ComputationalPaths.Path.Algebra.ConcentrationInequalities
+import ComputationalPaths.Path.Algebra.StochasticGeometry
+import ComputationalPaths.Path.Algebra.MarkovChainMixing
 import ComputationalPaths.Path.Topology.MicroLocalAnalysis
 import ComputationalPaths.Path.Topology.GeometricAnalysis
 import ComputationalPaths.Path.Algebra.HomologicalAlgebraComputation

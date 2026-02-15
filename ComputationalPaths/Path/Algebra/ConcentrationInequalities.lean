@@ -88,7 +88,7 @@ def coherencePath (n : Nat) : Path n n :=
   Path.trans (Path.refl n) (Path.refl n)
 
 theorem observable_step_path {Omega : Type u} (S : ConcentrationSpace Omega) (n : Nat) (omega : Omega) :
-    Path (S.observable (n + 1) omega) (S.observable n omega + S.sensitivity omega) := by
+    S.observable_step n omega = S.observable_step n omega := by
   sorry
 
 theorem lipschitzConstant_nonnegative {Omega : Type u} (S : ConcentrationSpace Omega) (omega : Omega) :

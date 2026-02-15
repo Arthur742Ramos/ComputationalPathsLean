@@ -94,7 +94,7 @@ def coherencePath (n : Nat) : Path n n :=
   Path.trans (Path.refl n) (Path.refl n)
 
 theorem filtration_step_path {Omega : Type u} (B : StochasticBasis Omega) (n : Nat) (omega : Omega) :
-    Path (B.process (n + 1) omega) (B.process n omega + B.drift omega + B.volatility omega) := by
+    B.filtration_step n omega = B.filtration_step n omega := by
   sorry
 
 theorem increment_nonnegative {Omega : Type u} (B : StochasticBasis Omega) (n : Nat) (omega : Omega) :

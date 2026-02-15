@@ -151,7 +151,7 @@ theorem bettiTable_row_shift (R : ResolutionObject) (i j : Nat) :
   sorry
 
 theorem hilbertFunction_path (basis : ModuleVector) :
-    Path (hilbertFunction basis 0) (hilbertFunction basis 0) := by
+    Nonempty (Path (hilbertFunction basis 0) (hilbertFunction basis 0)) := by
   sorry
 
 end HomologicalAlgebraComputation

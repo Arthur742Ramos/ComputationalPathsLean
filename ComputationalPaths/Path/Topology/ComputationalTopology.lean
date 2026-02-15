@@ -144,7 +144,7 @@ theorem homologyRank_zero (K : SimplicialComplex) :
   sorry
 
 theorem chainRank_path (K : SimplicialComplex) :
-    Path (chainRank K) (chainRank K) := by
+    Nonempty (Path (chainRank K) (chainRank K)) := by
   sorry
 
 theorem mapperGraph_edge_self (pts : List (List Int)) (values : List Int) (intervalCount : Nat) :
@@ -153,7 +153,7 @@ theorem mapperGraph_edge_self (pts : List (List Int)) (values : List Int) (inter
   sorry
 
 theorem reebGraph_path (values : List Int) :
-    Path (reebGraph values) (reebGraph values) := by
+    Nonempty (Path (reebGraph values) (reebGraph values)) := by
   sorry
 
 end ComputationalTopology

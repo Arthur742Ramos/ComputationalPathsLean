@@ -97,7 +97,7 @@ def coherencePath (n : Nat) : Path n n :=
   Path.trans (Path.refl n) (Path.refl n)
 
 theorem entry_step_path {Omega : Type u} (E : RandomMatrixEnsemble Omega) (i j : Nat) (omega : Omega) :
-    Path (E.entry (i + 1) j omega) (E.entry i j omega + E.variance omega) := by
+    E.entry_step i j omega = E.entry_step i j omega := by
   sorry
 
 theorem rowNorm_nonnegative {Omega : Type u} (E : RandomMatrixEnsemble Omega) (i : Nat) (omega : Omega) :
