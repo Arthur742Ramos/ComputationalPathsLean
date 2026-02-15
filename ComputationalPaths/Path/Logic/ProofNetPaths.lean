@@ -75,7 +75,7 @@ theorem MFormula.size_neg {n : Nat} (A : MFormula n) : A.neg.size = A.size := by
 
 /-- Theorem 3: Formula size is always positive. -/
 theorem MFormula.size_pos {n : Nat} (A : MFormula n) : 0 < A.size := by
-  cases A <;> simp [MFormula.size] <;> omega
+  cases A <;> simp [MFormula.size]
 
 /-! ## Proof Net Links -/
 
@@ -172,7 +172,7 @@ def SequentProof.size {n : Nat} : SequentProof n → Nat
 
 /-- Theorem 8: Proof size is positive. -/
 theorem SequentProof.size_pos {n : Nat} (p : SequentProof n) : 0 < p.size := by
-  cases p <;> simp [SequentProof.size] <;> omega
+  cases p <;> simp [SequentProof.size]
 
 /-- Number of cuts in a proof. -/
 def SequentProof.numCuts {n : Nat} : SequentProof n → Nat
@@ -346,7 +346,7 @@ theorem CutReduction.depth_unitCut {n : Nat} :
 /-- Theorem 30: tensorParCut depth is positive. -/
 theorem CutReduction.depth_tensorParCut_pos {n : Nat} (A B : MFormula n) :
     0 < (CutReduction.tensorParCut A B).depth := by
-  simp [CutReduction.depth]
+  simp only [CutReduction.depth]
   have := MFormula.size_pos A
   omega
 
