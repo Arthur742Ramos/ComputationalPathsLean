@@ -353,6 +353,6 @@ theorem ideal_path_symm_symm {a b : PIdeal}
     induction steps with
     | nil => simp
     | cons s tl ih =>
-      simp [List.map_cons, Step.symm_symm, ih]
+      simp [List.map_cons, ih]
 
 end ComputationalPaths.Path.Algebra.CommAlgDeep
