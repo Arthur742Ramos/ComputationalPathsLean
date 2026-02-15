@@ -10,6 +10,10 @@ import ComputationalPaths.Path.Basic.Context
 import ComputationalPaths.Path.Basic.Congruence
 import ComputationalPaths.Path.Basic.Globular
 import ComputationalPaths.Path.Basic.UIP
+import ComputationalPaths.Path.Basic.PathAlgebra
+import ComputationalPaths.Path.Basic.PathInduction
+import ComputationalPaths.Path.Basic.HigherPaths
+import ComputationalPaths.Path.Basic.PathEquivalence
 
 namespace ComputationalPaths
 namespace Path
