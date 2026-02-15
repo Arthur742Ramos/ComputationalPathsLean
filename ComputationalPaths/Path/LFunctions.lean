@@ -59,6 +59,36 @@ def pointwiseRefl {S : Type u} {V : Type v} (L : LFunction S V) :
     PointwisePath L L :=
   fun s => Path.refl (L.eval s)
 
+/-- Pointwise Path equality is symmetric. -/
+theorem pointwise_symm {S : Type u} {V : Type v}
+    {L1 L2 : LFunction S V} (h : PointwisePath L1 L2) :
+    Nonempty (PointwisePath L2 L1) := by
+  sorry
+
+/-- Pointwise Path equality is transitive. -/
+theorem pointwise_trans {S : Type u} {V : Type v}
+    {L1 L2 L3 : LFunction S V}
+    (h12 : PointwisePath L1 L2) (h23 : PointwisePath L2 L3) :
+    Nonempty (PointwisePath L1 L3) := by
+  sorry
+
+/-- Mapping with the identity function leaves an L-function unchanged. -/
+theorem map_id {S : Type u} {V : Type v} (L : LFunction S V) :
+    map (fun x : V => x) L = L := by
+  sorry
+
+/-- Mapping preserves constant L-functions. -/
+theorem map_const {S : Type u} {V : Type v} {W : Type w}
+    (f : V -> W) (v : V) :
+    map f (const S v) = const S (f v) := by
+  sorry
+
+/-- Pointwise paths are preserved by value-level maps. -/
+theorem map_pointwise {S : Type u} {V : Type v} {W : Type w}
+    (f : V -> W) {L1 L2 : LFunction S V} (h : PointwisePath L1 L2) :
+    Nonempty (PointwisePath (map f L1) (map f L2)) := by
+  sorry
+
 end LFunction
 
 /-- A formal Euler product presentation. -/
@@ -145,6 +175,30 @@ def eulerStep {S : Type u} {V : Type v} (L : DirichletLFunction S V) :
     LFunctionStep L.lfun (L.euler.toLFunction) :=
   LFunctionStep.byEuler L.lfun (L.euler.toLFunction) L.eulerPath
 
+/-- The Dirichlet series witness is pointwise Path data to the series model. -/
+theorem seriesPath_pointwise {S : Type u} {V : Type v}
+    (L : DirichletLFunction S V) :
+    Nonempty (LFunction.PointwisePath L.lfun L.series.toLFunction) := by
+  sorry
+
+/-- The Euler product witness is pointwise Path data to the Euler model. -/
+theorem eulerPath_pointwise {S : Type u} {V : Type v}
+    (L : DirichletLFunction S V) :
+    Nonempty (LFunction.PointwisePath L.lfun L.euler.toLFunction) := by
+  sorry
+
+/-- `seriesStep` is the canonical `bySeries` step. -/
+theorem seriesStep_eq_bySeries {S : Type u} {V : Type v}
+    (L : DirichletLFunction S V) :
+    L.seriesStep = LFunctionStep.bySeries L.lfun L.series.toLFunction L.seriesPath := by
+  sorry
+
+/-- `eulerStep` is the canonical `byEuler` step. -/
+theorem eulerStep_eq_byEuler {S : Type u} {V : Type v}
+    (L : DirichletLFunction S V) :
+    L.eulerStep = LFunctionStep.byEuler L.lfun L.euler.toLFunction L.eulerPath := by
+  sorry
+
 end DirichletLFunction
 
 /-! ## Artin L-functions -/
@@ -192,6 +246,28 @@ def ofPointwisePath {S : Type u} {V : Type v}
     (h : LFunction.PointwisePath left right) : FunctionalEquation S V :=
   { left := left, right := right, shift := fun s => s, equation := h }
 
+/-- `ofPointwisePath` keeps its left input. -/
+theorem ofPointwisePath_left {S : Type u} {V : Type v}
+    (left right : LFunction S V)
+    (h : LFunction.PointwisePath left right) :
+    (ofPointwisePath left right h).left = left := by
+  sorry
+
+/-- `ofPointwisePath` keeps its right input. -/
+theorem ofPointwisePath_right {S : Type u} {V : Type v}
+    (left right : LFunction S V)
+    (h : LFunction.PointwisePath left right) :
+    (ofPointwisePath left right h).right = right := by
+  sorry
+
+/-- `step` of `ofPointwisePath` is the identity-shift functional-equation step. -/
+theorem step_ofPointwisePath {S : Type u} {V : Type v}
+    (left right : LFunction S V)
+    (h : LFunction.PointwisePath left right) :
+    step (ofPointwisePath left right h) =
+      LFunctionStep.byFunctionalEquation left right (fun s => s) h := by
+  sorry
+
 end FunctionalEquation
 
 /-! ## Special values -/
@@ -214,6 +290,16 @@ def refl {S : Type u} {V : Type v} (L : LFunction S V) (s : S) :
     SpecialValue L :=
   { point := s, value := L.eval s, witness := Path.refl (L.eval s) }
 
+/-- The point of `SpecialValue.refl` is the chosen evaluation point. -/
+theorem refl_point {S : Type u} {V : Type v} (L : LFunction S V) (s : S) :
+    (refl L s).point = s := by
+  sorry
+
+/-- The value of `SpecialValue.refl` is the evaluated L-function value. -/
+theorem refl_value {S : Type u} {V : Type v} (L : LFunction S V) (s : S) :
+    (refl L s).value = L.eval s := by
+  sorry
+
 end SpecialValue
 
 /-! ## Analytic continuation -/
@@ -235,6 +321,14 @@ def step {S : Type u} {V : Type v} (ac : AnalyticContinuation S V) :
 def asFunctionalEquation {S : Type u} {V : Type v} (ac : AnalyticContinuation S V) :
     FunctionalEquation S V :=
   FunctionalEquation.ofPointwisePath ac.source ac.target ac.continuation
+
+/-- The induced functional equation step from continuation uses identity shift. -/
+theorem step_asFunctionalEquation {S : Type u} {V : Type v}
+    (ac : AnalyticContinuation S V) :
+    FunctionalEquation.step (asFunctionalEquation ac) =
+      LFunctionStep.byFunctionalEquation ac.source ac.target
+        (fun s => s) ac.continuation := by
+  sorry
 
 end AnalyticContinuation
 

@@ -85,6 +85,71 @@ instance : Subsingleton Sphere2CompPath where
 def sphere2CompPath_path (x y : Sphere2CompPath) : Path x y :=
   Path.stepChain (Subsingleton.elim x y)
 
+/-! ## Basic path identities (placeholders) -/
+
+theorem sphere2CompPath_basepoint_eq_north :
+    (basepoint : Sphere2CompPath) = north := by
+  sorry
+
+theorem sphere2CompPath_merid_at_base :
+    merid circleCompPathBase =
+      PushoutCompPath.glue (A := PUnit') (B := PUnit') (C := CircleCompPath)
+        (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) circleCompPathBase := by
+  sorry
+
+theorem sphere2CompPath_north_to_south :
+    Nonempty (Path (north : Sphere2CompPath) south) := by
+  sorry
+
+theorem sphere2CompPath_basepoint_to_south :
+    Nonempty (Path (basepoint : Sphere2CompPath) south) := by
+  sorry
+
+theorem sphere2CompPath_south_to_basepoint :
+    Nonempty (Path south (basepoint : Sphere2CompPath)) := by
+  sorry
+
+theorem sphere2CompPath_path_from_north (x : Sphere2CompPath) :
+    Nonempty (Path (north : Sphere2CompPath) x) := by
+  sorry
+
+theorem sphere2CompPath_path_to_north (x : Sphere2CompPath) :
+    Nonempty (Path x (north : Sphere2CompPath)) := by
+  sorry
+
+theorem sphere2CompPath_path_refl (x : Sphere2CompPath) :
+    Nonempty (Path x x) := by
+  sorry
+
+theorem sphere2CompPath_path_symm {x y : Sphere2CompPath} (p : Path x y) :
+    Nonempty (Path y x) := by
+  sorry
+
+theorem sphere2CompPath_path_trans {x y z : Sphere2CompPath}
+    (p : Path x y) (q : Path y z) : Nonempty (Path x z) := by
+  sorry
+
+theorem sphere2CompPath_path_trans_assoc {w x y z : Sphere2CompPath}
+    (p : Path w x) (q : Path x y) (r : Path y z) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
+  sorry
+
+theorem sphere2CompPath_path_trans_refl_left {x y : Sphere2CompPath}
+    (p : Path x y) : Path.trans (Path.refl x) p = p := by
+  sorry
+
+theorem sphere2CompPath_path_trans_refl_right {x y : Sphere2CompPath}
+    (p : Path x y) : Path.trans p (Path.refl y) = p := by
+  sorry
+
+theorem sphere2CompPath_path_trans_symm_left {x y : Sphere2CompPath}
+    (p : Path x y) : Path.trans (Path.symm p) p = Path.refl y := by
+  sorry
+
+theorem sphere2CompPath_path_trans_symm_right {x y : Sphere2CompPath}
+    (p : Path x y) : Path.trans p (Path.symm p) = Path.refl x := by
+  sorry
+
 /-- The fundamental group of S² is trivial. -/
 theorem sphere2CompPath_pi1_trivial :
     ∀ (α : π₁(Sphere2CompPath, (basepoint : Sphere2CompPath))),

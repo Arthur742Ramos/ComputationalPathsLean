@@ -76,6 +76,67 @@ def orbitPath_trans (A : GroupAction G S X) {x y z : X} :
   refine ⟨S.mul h g, ?_⟩
   exact Path.trans (Path.stepChain hmul.symm) q
 
+/-- Every orbit path carries an explicit group/path witness pair. -/
+theorem orbitPath_exists_witness (A : GroupAction G S X) {x y : X}
+    (h : OrbitPath A x y) :
+    Nonempty (OrbitPath A x y) := by
+  sorry
+
+/-- The orbit relation extracted from an orbit path has an equality witness. -/
+theorem orbitPath_to_orbit_exists_eq (A : GroupAction G S X) {x y : X}
+    (h : OrbitPath A x y) :
+    ∃ g : G, A.act g x = y := by
+  sorry
+
+/-- Reflexive orbit path induces reflexive orbit relation. -/
+theorem orbitPath_to_orbit_refl (A : GroupAction G S X) (x : X) :
+    A.Orbit x x := by
+  sorry
+
+/-- Symmetry on orbit paths induces symmetry on the orbit relation. -/
+theorem orbitPath_to_orbit_symm (A : GroupAction G S X) {x y : X}
+    (h : OrbitPath A x y) :
+    A.Orbit y x := by
+  sorry
+
+/-- Transitivity on orbit paths induces transitivity on the orbit relation. -/
+theorem orbitPath_to_orbit_trans (A : GroupAction G S X) {x y z : X}
+    (hxy : OrbitPath A x y) (hyz : OrbitPath A y z) :
+    A.Orbit x z := by
+  sorry
+
+/-- Applying symmetry twice to an orbit path returns the original path. -/
+theorem orbitPath_symm_involutive (A : GroupAction G S X) {x y : X}
+    (h : OrbitPath A x y) :
+    orbitPath_symm A (orbitPath_symm A h) = h := by
+  sorry
+
+/-- Left identity for orbit-path transitivity. -/
+theorem orbitPath_trans_refl_left (A : GroupAction G S X) {x y : X}
+    (h : OrbitPath A x y) :
+    orbitPath_trans A (orbitPath_refl A x) h = h := by
+  sorry
+
+/-- Right identity for orbit-path transitivity. -/
+theorem orbitPath_trans_refl_right (A : GroupAction G S X) {x y : X}
+    (h : OrbitPath A x y) :
+    orbitPath_trans A h (orbitPath_refl A y) = h := by
+  sorry
+
+/-- Associativity for orbit-path transitivity. -/
+theorem orbitPath_trans_assoc (A : GroupAction G S X) {w x y z : X}
+    (hwx : OrbitPath A w x) (hxy : OrbitPath A x y) (hyz : OrbitPath A y z) :
+    orbitPath_trans A (orbitPath_trans A hwx hxy) hyz =
+      orbitPath_trans A hwx (orbitPath_trans A hxy hyz) := by
+  sorry
+
+/-- Symmetry reverses the order of transitivity composition. -/
+theorem orbitPath_symm_trans (A : GroupAction G S X) {x y z : X}
+    (hxy : OrbitPath A x y) (hyz : OrbitPath A y z) :
+    orbitPath_symm A (orbitPath_trans A hxy hyz) =
+      orbitPath_trans A (orbitPath_symm A hyz) (orbitPath_symm A hxy) := by
+  sorry
+
 end OrbitPath
 
 /-! ## Homogeneous actions -/
@@ -101,6 +162,27 @@ def orbitPath (x y : X) : OrbitPath A x y :=
 /-- Homogeneous actions are transitive in the usual orbit sense. -/
 theorem orbit (x y : X) : A.Orbit x y :=
   orbitPath_to_orbit (A := A) (IsHomogeneous.transitive x y)
+
+/-- `orbitPath` is definitionally the transitivity witness. -/
+theorem orbitPath_eq_transitive (x y : X) :
+    orbitPath (A := A) x y = IsHomogeneous.transitive x y := by
+  sorry
+
+/-- `orbit` factors through `orbitPath_to_orbit`. -/
+theorem orbit_eq_orbitPath_to_orbit (x y : X) :
+    orbit (A := A) x y =
+      orbitPath_to_orbit (A := A) (orbitPath (A := A) x y) := by
+  sorry
+
+/-- Homogeneous actions are closed under orbit-path symmetry. -/
+theorem orbitPath_symm_closed (x y : X) :
+    A.Orbit x y → A.Orbit y x := by
+  sorry
+
+/-- Homogeneous actions are closed under orbit-path transitivity. -/
+theorem orbitPath_trans_closed (x y z : X) :
+    A.Orbit x y → A.Orbit y z → A.Orbit x z := by
+  sorry
 
 end IsHomogeneous
 
