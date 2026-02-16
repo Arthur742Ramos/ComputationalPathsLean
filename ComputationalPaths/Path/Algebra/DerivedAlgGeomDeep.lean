@@ -410,7 +410,7 @@ theorem cotangent_symm_symm {A B A' B' : SCR.{u}}
     (f : CotangentMor L1 L2) (n : Nat) (x : L1.module (n + 1)) :
     Path.symm (Path.symm (Path.mk [] (f.chain_compat n x)))
     = Path.mk [] (f.chain_compat n x) := by
-  simp [Path.symm, Path.mk, Step.symm]
+  simp [Path.symm]
 
 -- 35. Triple chain composition
 def triple_chain_comp {A1 B1 A2 B2 A3 B3 A4 B4 : SCR.{u}}

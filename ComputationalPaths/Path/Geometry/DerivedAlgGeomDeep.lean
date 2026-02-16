@@ -315,11 +315,11 @@ def hom_distrib (k : Nat) (a b c : DExpr) :
     (.trans ((hom_add_path k b c).congr_mul_right (.hom k a))
             (.step (.distrib (.hom k a) (.hom k b) (.hom k c))))
 
--- 34. Morphism preserves negation chain
+-- 34. Morphism preserves neg-cancel: hom k (a + (-a)) ~~> 0
 def hom_neg_chain (k : Nat) (a : DExpr) :
     DPath (.hom k (.add a (.neg a))) (.zero 0) :=
-  .trans (.step (.hom_add k a (.neg a)))
-         (.trans (.refl _) (.refl _))
+  .trans (.congr_hom k (.step (.add_neg a)))
+         (.step (.hom_zero k 0))
 
 /-! ## 11. Postnikov / Truncation -/
 
@@ -331,7 +331,7 @@ structure PostnikovData (n : Nat) where
 -- 35. Adjacent Postnikov levels
 def postnikov_coarsen (P : PostnikovData n) :
     PostnikovData (n + 1) where
-  truncate k hk a b := P.truncate k (Nat.lt_of_succ_le hk) a b
+  truncate k hk a b := P.truncate k (by omega) a b
 
 /-! ## 12. Path Algebra -/
 
@@ -417,10 +417,15 @@ def face_zero (n i k : Nat) :
 def hom_comp_add (j k : Nat) (a b : DExpr) :
     DPath (.hom j (.hom k (.add a b)))
           (.add (.hom (j + k) a) (.hom (j + k) b)) :=
-  .trans (.congr_hom j (.step (.hom_add k a b)))
-    (.trans (.step (.hom_add j (.hom k a) (.hom k b)))
-      (.trans ((.step (.hom_comp j k a)).congr_add_left (.hom j (.hom k b)))
-              ((.step (.hom_comp j k b)).congr_add_right (.hom (j + k) a))))
+  let p1 : DPath (.hom j (.hom k (.add a b))) (.hom j (.add (.hom k a) (.hom k b))) :=
+    .congr_hom j (.step (.hom_add k a b))
+  let p2 : DPath (.hom j (.add (.hom k a) (.hom k b))) (.add (.hom j (.hom k a)) (.hom j (.hom k b))) :=
+    .step (.hom_add j (.hom k a) (.hom k b))
+  let p3 : DPath (.add (.hom j (.hom k a)) (.hom j (.hom k b))) (.add (.hom (j + k) a) (.hom j (.hom k b))) :=
+    DPath.congr_add_left (.step (.hom_comp j k a)) (.hom j (.hom k b))
+  let p4 : DPath (.add (.hom (j + k) a) (.hom j (.hom k b))) (.add (.hom (j + k) a) (.hom (j + k) b)) :=
+    DPath.congr_add_right (.hom (j + k) a) (.step (.hom_comp j k b))
+  .trans p1 (.trans p2 (.trans p3 p4))
 
 -- 48. d² on hom
 def diff_sq_hom (k : Nat) (a : DExpr) :

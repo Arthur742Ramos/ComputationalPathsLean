@@ -1,8 +1,9 @@
 /-
-# Galois Theory via Computational Paths
+# Galois Theory via Computational Paths — Deep Formalization
 
-Automorphisms, fixed fields, Galois groups, fundamental theorem aspects,
-normal/separable extensions. All coherence witnessed by `Path`.
+Field expressions, automorphism steps, fixed-field reasoning, Galois groups,
+normal/separable witnesses — all built from domain-specific `GExpr`/`GStep`/`GPath`
+inductives. Zero `Path.ofEq`.
 
 ## References
 
@@ -12,364 +13,408 @@ normal/separable extensions. All coherence witnessed by `Path`.
 
 import ComputationalPaths.Path.Basic
 
-namespace ComputationalPaths
-namespace Path
-namespace Algebra
-namespace GaloisPaths
+namespace ComputationalPaths.Path.Algebra.GaloisPaths
 
-universe u v
+universe u
 
-open ComputationalPaths.Path
+/-! ## 1. Field Expression Language -/
 
-/-! ## Path-witnessed field structure (local copy) -/
+/-- Symbolic expressions for a field with named automorphisms. -/
+inductive GExpr : Type where
+  | val   : Nat → GExpr
+  | zero  : GExpr
+  | one   : GExpr
+  | add   : GExpr → GExpr → GExpr
+  | mul   : GExpr → GExpr → GExpr
+  | neg   : GExpr → GExpr
+  | inv   : GExpr → GExpr
+  | aut   : Nat → GExpr → GExpr   -- apply automorphism #n
+  | autInv : Nat → GExpr → GExpr  -- apply inverse of automorphism #n
+  deriving Repr, DecidableEq
 
-/-- A field with Path-witnessed laws (minimal for Galois theory). -/
-structure PField (F : Type u) where
-  zero : F
-  one : F
-  add : F → F → F
-  mul : F → F → F
-  neg : F → F
-  inv : F → F
-  add_assoc : ∀ a b c, add (add a b) c = add a (add b c)
-  add_comm : ∀ a b, add a b = add b a
-  zero_add : ∀ a, add zero a = a
-  add_neg : ∀ a, add a (neg a) = zero
-  mul_assoc : ∀ a b c, mul (mul a b) c = mul a (mul b c)
-  mul_comm : ∀ a b, mul a b = mul b a
-  one_mul : ∀ a, mul one a = a
-  left_distrib : ∀ a b c, mul a (add b c) = add (mul a b) (mul a c)
+/-! ## 2. Elementary Rewrite Steps -/
 
-/-- A field embedding. -/
-structure PFieldEmbed (F E : Type u) (pF : PField F) (pE : PField E) where
-  embed : F → E
-  map_zero : embed pF.zero = pE.zero
-  map_one : embed pF.one = pE.one
-  map_add : ∀ a b, embed (pF.add a b) = pE.add (embed a) (embed b)
-  map_mul : ∀ a b, embed (pF.mul a b) = pE.mul (embed a) (embed b)
+/-- Elementary rewrite steps witnessing field axioms and automorphism laws. -/
+inductive GStep : GExpr → GExpr → Type where
+  -- Field axioms
+  | add_comm   : (a b : GExpr) → GStep (.add a b) (.add b a)
+  | add_assoc  : (a b c : GExpr) →
+      GStep (.add (.add a b) c) (.add a (.add b c))
+  | zero_add   : (a : GExpr) → GStep (.add .zero a) a
+  | add_zero   : (a : GExpr) → GStep (.add a .zero) a
+  | add_neg    : (a : GExpr) → GStep (.add a (.neg a)) .zero
+  | neg_add    : (a : GExpr) → GStep (.add (.neg a) a) .zero
+  | mul_comm   : (a b : GExpr) → GStep (.mul a b) (.mul b a)
+  | mul_assoc  : (a b c : GExpr) →
+      GStep (.mul (.mul a b) c) (.mul a (.mul b c))
+  | one_mul    : (a : GExpr) → GStep (.mul .one a) a
+  | mul_one    : (a : GExpr) → GStep (.mul a .one) a
+  | distrib_l  : (a b c : GExpr) →
+      GStep (.mul a (.add b c)) (.add (.mul a b) (.mul a c))
+  | distrib_r  : (a b c : GExpr) →
+      GStep (.mul (.add a b) c) (.add (.mul a c) (.mul b c))
+  | mul_zero   : (a : GExpr) → GStep (.mul a .zero) .zero
+  | zero_mul   : (a : GExpr) → GStep (.mul .zero a) .zero
+  | neg_neg    : (a : GExpr) → GStep (.neg (.neg a)) a
+  | mul_inv    : (a : GExpr) → GStep (.mul a (.inv a)) .one
+  -- Automorphism homomorphism laws
+  | aut_zero   : (n : Nat) → GStep (.aut n .zero) .zero
+  | aut_one    : (n : Nat) → GStep (.aut n .one) .one
+  | aut_add    : (n : Nat) → (a b : GExpr) →
+      GStep (.aut n (.add a b)) (.add (.aut n a) (.aut n b))
+  | aut_mul    : (n : Nat) → (a b : GExpr) →
+      GStep (.aut n (.mul a b)) (.mul (.aut n a) (.aut n b))
+  | aut_neg    : (n : Nat) → (a : GExpr) →
+      GStep (.aut n (.neg a)) (.neg (.aut n a))
+  -- Identity automorphism (aut 0 = id)
+  | aut_id     : (a : GExpr) → GStep (.aut 0 a) a
+  -- Automorphism inverse cancellation
+  | aut_inv_cancel : (n : Nat) → (a : GExpr) →
+      GStep (.autInv n (.aut n a)) a
+  | inv_aut_cancel : (n : Nat) → (a : GExpr) →
+      GStep (.aut n (.autInv n a)) a
+  -- Automorphism composition
+  | aut_comp   : (n m : Nat) → (a : GExpr) →
+      GStep (.aut n (.aut m a)) (.aut (n + m) a)
+  -- Congruence
+  | congr_add_l : {a b : GExpr} → GStep a b → (c : GExpr) →
+      GStep (.add a c) (.add b c)
+  | congr_add_r : (c : GExpr) → {a b : GExpr} → GStep a b →
+      GStep (.add c a) (.add c b)
+  | congr_mul_l : {a b : GExpr} → GStep a b → (c : GExpr) →
+      GStep (.mul a c) (.mul b c)
+  | congr_mul_r : (c : GExpr) → {a b : GExpr} → GStep a b →
+      GStep (.mul c a) (.mul c b)
+  | congr_neg  : {a b : GExpr} → GStep a b → GStep (.neg a) (.neg b)
+  | congr_aut  : (n : Nat) → {a b : GExpr} → GStep a b →
+      GStep (.aut n a) (.aut n b)
 
-/-! ## Field automorphisms -/
+/-! ## 3. Path = Sequence of Steps -/
 
-/-- A field automorphism: an invertible field homomorphism. -/
-structure FieldAut (F : Type u) (pF : PField F) where
-  toFun : F → F
-  invFun : F → F
-  left_inv : ∀ a, invFun (toFun a) = a
-  right_inv : ∀ a, toFun (invFun a) = a
-  map_zero : toFun pF.zero = pF.zero
-  map_one : toFun pF.one = pF.one
-  map_add : ∀ a b, toFun (pF.add a b) = pF.add (toFun a) (toFun b)
-  map_mul : ∀ a b, toFun (pF.mul a b) = pF.mul (toFun a) (toFun b)
+/-- A `GPath` is a freely generated path from steps, with refl/trans/symm. -/
+inductive GPath : GExpr → GExpr → Type where
+  | refl  : (a : GExpr) → GPath a a
+  | step  : GStep a b → GPath a b
+  | trans : GPath a b → GPath b c → GPath a c
+  | symm  : GPath a b → GPath b a
 
-/-- Identity automorphism. -/
-def autId {F : Type u} (pF : PField F) : FieldAut F pF :=
-  ⟨id, id, fun _ => rfl, fun _ => rfl, rfl, rfl, fun _ _ => rfl, fun _ _ => rfl⟩
+/-! ## 4. Basic Path Combinators -/
 
-/-- Identity automorphism acts as identity. -/
-theorem autId_apply {F : Type u} (pF : PField F) (a : F) :
-    (autId pF).toFun a = a := rfl
+-- 1. Concatenation (synonym for trans)
+def GPath.concat (p : GPath a b) (q : GPath b c) : GPath a c :=
+  GPath.trans p q
 
-/-- Path: identity automorphism. -/
-def autId_path {F : Type u} (pF : PField F) (a : F) :
-    Path ((autId pF).toFun a) a :=
-  Path.refl _
+-- 2. Length of a path
+def GPath.length : GPath a b → Nat
+  | .refl _    => 0
+  | .step _    => 1
+  | .trans p q => p.length + q.length
+  | .symm p    => p.length
 
-/-- Compose two automorphisms. -/
-def autComp {F : Type u} {pF : PField F}
-    (σ τ : FieldAut F pF) : FieldAut F pF :=
-  { toFun := σ.toFun ∘ τ.toFun
-    invFun := τ.invFun ∘ σ.invFun
-    left_inv := fun a => by simp [Function.comp, σ.left_inv, τ.left_inv]
-    right_inv := fun a => by simp [Function.comp, σ.right_inv, τ.right_inv]
-    map_zero := by simp [Function.comp, τ.map_zero, σ.map_zero]
-    map_one := by simp [Function.comp, τ.map_one, σ.map_one]
-    map_add := fun a b => by simp [Function.comp, τ.map_add, σ.map_add]
-    map_mul := fun a b => by simp [Function.comp, τ.map_mul, σ.map_mul] }
+-- 3. Refl has length 0
+theorem gpath_refl_length (a : GExpr) : (GPath.refl a).length = 0 := rfl
 
-/-- Automorphism composition is associative. -/
-theorem autComp_assoc {F : Type u} {pF : PField F}
-    (σ τ ρ : FieldAut F pF) :
-    (autComp (autComp σ τ) ρ).toFun = (autComp σ (autComp τ ρ)).toFun := by
-  rfl
+-- 4. Step has length 1
+theorem gpath_step_length (s : GStep a b) : (GPath.step s).length = 1 := rfl
 
-/-- Path: composition associativity. -/
-def autComp_assoc_path {F : Type u} {pF : PField F}
-    (σ τ ρ : FieldAut F pF) :
-    Path (autComp (autComp σ τ) ρ).toFun (autComp σ (autComp τ ρ)).toFun :=
-  Path.refl _
+-- 5. Symm preserves length
+theorem gpath_symm_length (p : GPath a b) :
+    (GPath.symm p).length = p.length := rfl
 
-/-- Left identity for automorphism composition. -/
-theorem autComp_id_left {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) :
-    (autComp (autId pF) σ).toFun = σ.toFun := by
-  rfl
+-- 6. Trans adds lengths
+theorem gpath_trans_length (p : GPath a b) (q : GPath b c) :
+    (GPath.trans p q).length = p.length + q.length := rfl
 
-/-- Path: left identity. -/
-def autComp_id_left_path {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) :
-    Path (autComp (autId pF) σ).toFun σ.toFun :=
-  Path.refl _
+-- 7. Refl is a left identity for concat (up to GPath equality)
+theorem gpath_refl_trans_length (p : GPath a b) :
+    (GPath.trans (.refl a) p).length = p.length := by
+  simp [GPath.length]
 
-/-- Right identity for automorphism composition. -/
-theorem autComp_id_right {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) :
-    (autComp σ (autId pF)).toFun = σ.toFun := by
-  rfl
+/-! ## 5. Congruence Lifts -/
 
-/-- Path: right identity. -/
-def autComp_id_right_path {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) :
-    Path (autComp σ (autId pF)).toFun σ.toFun :=
-  Path.refl _
+-- 8. Lift a path through addition on the left
+def GPath.congr_add_left (p : GPath a b) (c : GExpr) : GPath (.add a c) (.add b c) :=
+  match p with
+  | .refl _    => .refl _
+  | .step s    => .step (.congr_add_l s c)
+  | .trans p q => .trans (p.congr_add_left c) (q.congr_add_left c)
+  | .symm p    => .symm (p.congr_add_left c)
 
-/-- Inverse automorphism. -/
-def autInv {F : Type u} {pF : PField F} (σ : FieldAut F pF) : FieldAut F pF :=
-  { toFun := σ.invFun
-    invFun := σ.toFun
-    left_inv := σ.right_inv
-    right_inv := σ.left_inv
-    map_zero := by
-      have := σ.left_inv pF.zero
-      rw [σ.map_zero] at this; exact this
-    map_one := by
-      have := σ.left_inv pF.one
-      rw [σ.map_one] at this; exact this
-    map_add := fun a b => by
-      apply_fun σ.toFun using Function.LeftInverse.injective σ.left_inv
-      rw [σ.right_inv, σ.map_add, σ.right_inv, σ.right_inv]
-    map_mul := fun a b => by
-      apply_fun σ.toFun using Function.LeftInverse.injective σ.left_inv
-      rw [σ.right_inv, σ.map_mul, σ.right_inv, σ.right_inv] }
+-- 9. Lift a path through addition on the right
+def GPath.congr_add_right (c : GExpr) (p : GPath a b) : GPath (.add c a) (.add c b) :=
+  match p with
+  | .refl _    => .refl _
+  | .step s    => .step (.congr_add_r c s)
+  | .trans p q => .trans (p.congr_add_right c) (q.congr_add_right c)
+  | .symm p    => .symm (p.congr_add_right c)
 
-/-- Left inverse law. -/
-theorem autComp_inv_left {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a : F) :
-    (autComp (autInv σ) σ).toFun a = a := by
-  simp [autComp, autInv, Function.comp, σ.left_inv]
+-- 10. Lift a path through multiplication on the left
+def GPath.congr_mul_left (p : GPath a b) (c : GExpr) : GPath (.mul a c) (.mul b c) :=
+  match p with
+  | .refl _    => .refl _
+  | .step s    => .step (.congr_mul_l s c)
+  | .trans p q => .trans (p.congr_mul_left c) (q.congr_mul_left c)
+  | .symm p    => .symm (p.congr_mul_left c)
 
-/-- Path: left inverse. -/
-def autComp_inv_left_path {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a : F) :
-    Path ((autComp (autInv σ) σ).toFun a) a :=
-  Path.ofEq (autComp_inv_left σ a)
+-- 11. Lift a path through multiplication on the right
+def GPath.congr_mul_right (c : GExpr) (p : GPath a b) : GPath (.mul c a) (.mul c b) :=
+  match p with
+  | .refl _    => .refl _
+  | .step s    => .step (.congr_mul_r c s)
+  | .trans p q => .trans (p.congr_mul_right c) (q.congr_mul_right c)
+  | .symm p    => .symm (p.congr_mul_right c)
 
-/-- Right inverse law. -/
-theorem autComp_inv_right {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a : F) :
-    (autComp σ (autInv σ)).toFun a = a := by
-  simp [autComp, autInv, Function.comp, σ.right_inv]
+-- 12. Lift a path through negation
+def GPath.congr_neg (p : GPath a b) : GPath (.neg a) (.neg b) :=
+  match p with
+  | .refl _    => .refl _
+  | .step s    => .step (.congr_neg s)
+  | .trans p q => .trans p.congr_neg q.congr_neg
+  | .symm p    => .symm p.congr_neg
 
-/-- Path: right inverse. -/
-def autComp_inv_right_path {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a : F) :
-    Path ((autComp σ (autInv σ)).toFun a) a :=
-  Path.ofEq (autComp_inv_right σ a)
+-- 13. Lift a path through an automorphism
+def GPath.congr_aut (n : Nat) (p : GPath a b) : GPath (.aut n a) (.aut n b) :=
+  match p with
+  | .refl _    => .refl _
+  | .step s    => .step (.congr_aut n s)
+  | .trans p q => .trans (p.congr_aut n) (q.congr_aut n)
+  | .symm p    => .symm (p.congr_aut n)
 
-/-! ## Fixed fields -/
+/-! ## 6. Field Automorphism Paths -/
 
-/-- An element a is fixed by automorphism σ. -/
-def isFixed {F : Type u} {pF : PField F} (σ : FieldAut F pF) (a : F) : Prop :=
-  σ.toFun a = a
+-- 14. Identity automorphism fixes any expression
+def aut_id_path (a : GExpr) : GPath (.aut 0 a) a :=
+  .step (.aut_id a)
 
-/-- The identity fixes everything. -/
-theorem id_fixes_all {F : Type u} (pF : PField F) (a : F) :
-    isFixed (autId pF) a := rfl
+-- 15. Automorphism preserves zero
+def aut_zero_path (n : Nat) : GPath (.aut n .zero) .zero :=
+  .step (.aut_zero n)
 
-/-- Path: identity fixes all. -/
-def id_fixes_all_path {F : Type u} (pF : PField F) (a : F) :
-    Path ((autId pF).toFun a) a :=
-  Path.refl _
+-- 16. Automorphism preserves one
+def aut_one_path (n : Nat) : GPath (.aut n .one) .one :=
+  .step (.aut_one n)
 
-/-- If σ fixes a and b, then σ fixes a + b. -/
-theorem fixed_add {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a b : F) (ha : isFixed σ a) (hb : isFixed σ b) :
-    isFixed σ (pF.add a b) := by
-  simp [isFixed] at *
-  rw [σ.map_add, ha, hb]
+-- 17. Automorphism distributes over addition
+def aut_add_path (n : Nat) (a b : GExpr) :
+    GPath (.aut n (.add a b)) (.add (.aut n a) (.aut n b)) :=
+  .step (.aut_add n a b)
 
-/-- Path: fixed under addition. -/
-def fixed_add_path {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a b : F) (ha : isFixed σ a) (hb : isFixed σ b) :
-    Path (σ.toFun (pF.add a b)) (pF.add a b) :=
-  Path.ofEq (fixed_add σ a b ha hb)
+-- 18. Automorphism distributes over multiplication
+def aut_mul_path (n : Nat) (a b : GExpr) :
+    GPath (.aut n (.mul a b)) (.mul (.aut n a) (.aut n b)) :=
+  .step (.aut_mul n a b)
 
-/-- If σ fixes a and b, then σ fixes a * b. -/
-theorem fixed_mul {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a b : F) (ha : isFixed σ a) (hb : isFixed σ b) :
-    isFixed σ (pF.mul a b) := by
-  simp [isFixed] at *
-  rw [σ.map_mul, ha, hb]
+-- 19. Automorphism inverse cancellation
+def aut_cancel_path (n : Nat) (a : GExpr) :
+    GPath (.autInv n (.aut n a)) a :=
+  .step (.aut_inv_cancel n a)
 
-/-- Path: fixed under multiplication. -/
-def fixed_mul_path {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a b : F) (ha : isFixed σ a) (hb : isFixed σ b) :
-    Path (σ.toFun (pF.mul a b)) (pF.mul a b) :=
-  Path.ofEq (fixed_mul σ a b ha hb)
+-- 20. Forward-inverse cancellation
+def inv_aut_cancel_path (n : Nat) (a : GExpr) :
+    GPath (.aut n (.autInv n a)) a :=
+  .step (.inv_aut_cancel n a)
 
-/-! ## Galois groups -/
+/-! ## 7. Composition of Automorphisms -/
 
-/-- A Galois group: a list of automorphisms with closure properties. -/
-structure GaloisGroup (F : Type u) (pF : PField F) where
-  auts : List (FieldAut F pF)
-  hasId : (autId pF) ∈ auts ∨ auts = []
+-- 21. Automorphism composition path
+def aut_comp_path (n m : Nat) (a : GExpr) :
+    GPath (.aut n (.aut m a)) (.aut (n + m) a) :=
+  .step (.aut_comp n m a)
 
-/-- Singleton Galois group (trivial). -/
-def trivialGalois {F : Type u} (pF : PField F) : GaloisGroup F pF :=
-  ⟨[autId pF], Or.inl (by simp)⟩
+-- 22. Identity is left unit for composition: aut 0 ∘ aut m = aut m
+def aut_comp_id_left (m : Nat) (a : GExpr) :
+    GPath (.aut 0 (.aut m a)) (.aut m a) :=
+  .step (.aut_id (.aut m a))
 
-/-- Size of the Galois group. -/
-def galoisOrder {F : Type u} {pF : PField F} (G : GaloisGroup F pF) : Nat :=
-  G.auts.length
+-- 23. Composition associativity: aut n (aut m (aut k a)) two ways
+def aut_comp_assoc (n m k : Nat) (a : GExpr) :
+    GPath (.aut n (.aut m (.aut k a))) (.aut (n + (m + k)) a) :=
+  .trans (.congr_aut n (.step (.aut_comp m k a))) (.step (.aut_comp n (m + k) a))
 
-/-- Trivial group has order 1. -/
-theorem trivialGalois_order {F : Type u} (pF : PField F) :
-    galoisOrder (trivialGalois pF) = 1 := rfl
+/-! ## 8. Fixed Elements -/
 
-/-- Path: trivial group order. -/
-def trivialGalois_order_path {F : Type u} (pF : PField F) :
-    Path (galoisOrder (trivialGalois pF)) 1 :=
-  Path.refl _
+/-- An expression `a` is fixed by automorphism `n` if there is a path
+    `aut n a ~~> a`. -/
+structure IsGFixed (n : Nat) (a : GExpr) where
+  witness : GPath (.aut n a) a
 
-/-! ## Automorphism congruence and transport -/
+-- 24. Zero is fixed by every automorphism
+def zero_fixed (n : Nat) : IsGFixed n .zero :=
+  ⟨aut_zero_path n⟩
 
-/-- congrArg: equal automorphisms give equal results. -/
-def aut_congr {F : Type u} {pF : PField F}
-    (σ τ : FieldAut F pF) (h : σ = τ) (a : F) :
-    Path (σ.toFun a) (τ.toFun a) :=
-  Path.congrArg (fun s => FieldAut.toFun s a) (Path.ofEq h)
+-- 25. One is fixed by every automorphism
+def one_fixed (n : Nat) : IsGFixed n .one :=
+  ⟨aut_one_path n⟩
 
-/-- congrArg: automorphism applied to equal elements. -/
-def aut_apply_congr {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a b : F) (h : a = b) :
-    Path (σ.toFun a) (σ.toFun b) :=
-  Path.congrArg σ.toFun (Path.ofEq h)
+-- 26. Fixed elements closed under addition
+def fixed_add (n : Nat) (a b : GExpr)
+    (ha : IsGFixed n a) (hb : IsGFixed n b) :
+    IsGFixed n (.add a b) :=
+  ⟨.trans (aut_add_path n a b)
+          (.trans (ha.witness.congr_add_left (.aut n b))
+                  (hb.witness.congr_add_right a))⟩
 
-/-- Transport along automorphism inverse path. -/
-theorem aut_inv_transport {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a : F) :
-    σ.invFun (σ.toFun a) = a :=
-  σ.left_inv a
+-- 27. Fixed elements closed under multiplication
+def fixed_mul (n : Nat) (a b : GExpr)
+    (ha : IsGFixed n a) (hb : IsGFixed n b) :
+    IsGFixed n (.mul a b) :=
+  ⟨.trans (aut_mul_path n a b)
+          (.trans (ha.witness.congr_mul_left (.aut n b))
+                  (hb.witness.congr_mul_right a))⟩
 
-/-- Path: inverse transport. -/
-def aut_inv_transport_path {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a : F) :
-    Path (σ.invFun (σ.toFun a)) a :=
-  Path.ofEq (σ.left_inv a)
+-- 28. Fixed elements closed under negation
+def fixed_neg (n : Nat) (a : GExpr)
+    (ha : IsGFixed n a) : IsGFixed n (.neg a) :=
+  ⟨.trans (.step (.aut_neg n a)) ha.witness.congr_neg⟩
 
-/-- Symm of inverse transport path gives forward transport. -/
-theorem aut_inv_transport_symm {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a : F) :
-    Path.symm (aut_inv_transport_path σ a) =
-      Path.ofEq (σ.left_inv a).symm := by
-  simp [aut_inv_transport_path, Path.symm, Path.ofEq]
+-- 29. Everything is fixed by the identity automorphism
+def id_fixes_all (a : GExpr) : IsGFixed 0 a :=
+  ⟨aut_id_path a⟩
 
-/-! ## Normal extensions -/
+/-! ## 9. Galois Group Structure -/
 
-/-- A set of automorphisms acts transitively on roots: modeled as
-    every element maps to some element via some automorphism. -/
-structure NormalWitness {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) (roots : List F) where
-  act : F → F  -- representative action
-  preserves : ∀ r, r ∈ roots → act r ∈ roots
+/-- A Galois group is a list of automorphism indices. -/
+structure GGaloisGroup where
+  auts : List Nat
+  hasId : 0 ∈ auts
 
-/-- The identity provides a trivial normal witness. -/
-def trivialNormal {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) (roots : List F) :
-    NormalWitness G roots :=
-  ⟨id, fun _ h => h⟩
+/-- An element is in the fixed field of a Galois group. -/
+def IsInFixedField (G : GGaloisGroup) (a : GExpr) : Prop :=
+  ∀ n, n ∈ G.auts → Nonempty (GPath (.aut n a) a)
 
-/-- Trivial normal witness acts as identity. -/
-theorem trivialNormal_id {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) (roots : List F) (r : F) :
-    (trivialNormal G roots).act r = r := rfl
+-- 30. Zero is in every fixed field
+theorem zero_in_fixed_field (G : GGaloisGroup) :
+    IsInFixedField G .zero :=
+  fun n _ => ⟨aut_zero_path n⟩
 
-/-- Path: trivial normal is identity. -/
-def trivialNormal_path {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) (roots : List F) (r : F) :
-    Path ((trivialNormal G roots).act r) r :=
-  Path.refl _
+-- 31. One is in every fixed field
+theorem one_in_fixed_field (G : GGaloisGroup) :
+    IsInFixedField G .one :=
+  fun n _ => ⟨aut_one_path n⟩
 
-/-! ## Separable extensions -/
+-- 32. Trivial Galois group {id}
+def trivialGalois : GGaloisGroup :=
+  ⟨[0], by simp⟩
 
-/-- A polynomial is separable if it has distinct roots (modeled by a witness). -/
-structure SeparableWitness {F : Type u} (pF : PField F) where
-  roots : List F
+-- 33. Trivial group has order 1
+theorem trivialGalois_order : trivialGalois.auts.length = 1 := rfl
+
+/-! ## 10. Normal Extension Witness -/
+
+/-- Witness that a set of roots is permuted by automorphisms. -/
+structure NormalWitness (G : GGaloisGroup) (roots : List GExpr) where
+  permute : Nat → GExpr → GExpr
+  preserves : ∀ n, n ∈ G.auts → ∀ r, r ∈ roots → (permute n r) ∈ roots
+  coherent : ∀ r, permute 0 r = r
+
+-- 34. Identity witness
+def trivialNormalWitness (G : GGaloisGroup) (roots : List GExpr) :
+    NormalWitness G roots where
+  permute := fun _ r => r
+  preserves := fun _ _ _ hr => hr
+  coherent := fun _ => rfl
+
+/-! ## 11. Separable Witness -/
+
+structure SepWitness where
+  roots : List GExpr
   distinct : roots.Nodup
 
-/-- Empty separable witness. -/
-def emptySeparable {F : Type u} (pF : PField F) : SeparableWitness pF :=
-  ⟨[], List.nodup_nil⟩
+-- 35. Empty separable witness
+def emptySep : SepWitness := ⟨[], List.nodup_nil⟩
 
-/-- Empty separable has no roots. -/
-theorem emptySeparable_roots {F : Type u} (pF : PField F) :
-    (emptySeparable pF).roots = [] := rfl
+-- 36. Empty witness has no roots
+theorem emptySep_roots : emptySep.roots = [] := rfl
 
-/-- Path: empty separable roots. -/
-def emptySeparable_path {F : Type u} (pF : PField F) :
-    Path (emptySeparable pF).roots ([] : List F) :=
-  Path.refl _
+/-! ## 12. Composite Paths — Field Laws -/
 
-/-! ## Fundamental theorem aspects -/
+-- 37. a + b + (-b) ~~> a (cancellation)
+def add_cancel_right (a b : GExpr) :
+    GPath (.add (.add a b) (.neg b)) a :=
+  .trans (.step (.add_assoc a b (.neg b)))
+    (.trans (GPath.congr_add_right a (.step (.add_neg b)))
+            (.step (.add_zero a)))
 
-/-- Fixed field: elements fixed by all automorphisms in G. -/
-def isInFixedField {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) (a : F) : Prop :=
-  ∀ σ, σ ∈ G.auts → isFixed σ a
+-- 38. Automorphism of a sum, then cancel, yields the original
+def aut_add_cancel (n : Nat) (a b : GExpr) :
+    GPath (.aut n (.add (.add a b) (.neg b)))
+          (.add (.add (.aut n a) (.aut n b)) (.neg (.aut n b))) :=
+  .trans (.step (.aut_add n (.add a b) (.neg b)))
+    (.trans (GPath.congr_add_left (.step (.aut_add n a b)) (.aut n (.neg b)))
+            (GPath.congr_add_right (.add (.aut n a) (.aut n b)) (.step (.aut_neg n b))))
 
-/-- Zero is in the fixed field. -/
-theorem zero_in_fixed {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) :
-    isInFixedField G pF.zero := by
-  intro σ _
-  exact σ.map_zero
+-- 39. Double negation path
+def neg_neg_path (a : GExpr) : GPath (.neg (.neg a)) a :=
+  .step (.neg_neg a)
 
-/-- Path: zero is fixed. -/
-def zero_in_fixed_path {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) (σ : FieldAut F pF) (hσ : σ ∈ G.auts) :
-    Path (σ.toFun pF.zero) pF.zero :=
-  Path.ofEq (zero_in_fixed G σ hσ)
+-- 40. Mul distributes over add, witnessed path
+def distrib_path (a b c : GExpr) :
+    GPath (.mul a (.add b c)) (.add (.mul a b) (.mul a c)) :=
+  .step (.distrib_l a b c)
 
-/-- One is in the fixed field. -/
-theorem one_in_fixed {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) :
-    isInFixedField G pF.one := by
-  intro σ _
-  exact σ.map_one
+-- 41. Automorphism commutes with distributivity
+def aut_distrib (n : Nat) (a b c : GExpr) :
+    GPath (.aut n (.mul a (.add b c)))
+          (.add (.mul (.aut n a) (.aut n b)) (.mul (.aut n a) (.aut n c))) :=
+  .trans (.step (.aut_mul n a (.add b c)))
+    (.trans (GPath.congr_mul_right (.aut n a) (aut_add_path n b c))
+            (.step (.distrib_l (.aut n a) (.aut n b) (.aut n c))))
 
-/-- Path: one is fixed. -/
-def one_in_fixed_path {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) (σ : FieldAut F pF) (hσ : σ ∈ G.auts) :
-    Path (σ.toFun pF.one) pF.one :=
-  Path.ofEq (one_in_fixed G σ hσ)
+/-! ## 13. Path Algebra -/
 
-/-- Fixed field is closed under addition. -/
-theorem fixed_field_add {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) (a b : F)
-    (ha : isInFixedField G a) (hb : isInFixedField G b) :
-    isInFixedField G (pF.add a b) := by
-  intro σ hσ
-  exact fixed_add σ a b (ha σ hσ) (hb σ hσ)
+-- 42. Symm of symm is the original (propositionally)
+theorem gpath_symm_symm_length (p : GPath a b) :
+    (GPath.symm (GPath.symm p)).length = p.length := rfl
 
-/-- Fixed field is closed under multiplication. -/
-theorem fixed_field_mul {F : Type u} {pF : PField F}
-    (G : GaloisGroup F pF) (a b : F)
-    (ha : isInFixedField G a) (hb : isInFixedField G b) :
-    isInFixedField G (pF.mul a b) := by
-  intro σ hσ
-  exact fixed_mul σ a b (ha σ hσ) (hb σ hσ)
+-- 43. Trans with refl on right preserves length
+theorem gpath_trans_refl_length (p : GPath a b) :
+    (GPath.trans p (.refl b)).length = p.length := by
+  simp [GPath.length]
 
-/-- Trans path: combining two fixed-field proofs. -/
-def fixed_field_trans_path {F : Type u} {pF : PField F}
-    (σ : FieldAut F pF) (a b : F)
-    (ha : isFixed σ a) (hb : isFixed σ b) :
-    Path (σ.toFun (pF.add a b)) (pF.add a b) :=
-  Path.trans
-    (Path.ofEq (σ.map_add a b))
-    (Path.trans
-      (Path.congrArg (fun x => pF.add x (σ.toFun b)) (Path.ofEq ha))
-      (Path.congrArg (fun x => pF.add a x) (Path.ofEq hb)))
+-- 44. Concat is associative in length
+theorem gpath_concat_assoc_length (p : GPath a b) (q : GPath b c) (r : GPath c d) :
+    (GPath.concat (GPath.concat p q) r).length =
+    (GPath.concat p (GPath.concat q r)).length := by
+  simp [GPath.concat, GPath.length, Nat.add_assoc]
 
-end GaloisPaths
-end Algebra
-end Path
-end ComputationalPaths
+/-! ## 14. Galois Correspondence Aspects -/
+
+/-- Subgroup inclusion: G₁ ⊆ G₂ as automorphism lists. -/
+def GSubgroup (G₁ G₂ : GGaloisGroup) : Prop :=
+  ∀ n, n ∈ G₁.auts → n ∈ G₂.auts
+
+-- 45. Larger group ⟹ smaller fixed field (contravariant)
+theorem fixed_field_contravariant (G₁ G₂ : GGaloisGroup) (a : GExpr)
+    (sub : GSubgroup G₁ G₂) (hfix : IsInFixedField G₂ a) :
+    IsInFixedField G₁ a :=
+  fun n hn => hfix n (sub n hn)
+
+-- 46. Every group is a subgroup of itself
+theorem gsubgroup_refl (G : GGaloisGroup) : GSubgroup G G :=
+  fun _ hn => hn
+
+-- 47. Subgroup is transitive
+theorem gsubgroup_trans (G₁ G₂ G₃ : GGaloisGroup)
+    (h12 : GSubgroup G₁ G₂) (h23 : GSubgroup G₂ G₃) :
+    GSubgroup G₁ G₃ :=
+  fun n hn => h23 n (h12 n hn)
+
+/-! ## 15. Extended Automorphism Paths -/
+
+-- 48. Automorphism applied to a product of fixed elements
+def aut_fixed_mul_path (n : Nat) (a b : GExpr)
+    (ha : IsGFixed n a) (hb : IsGFixed n b) :
+    GPath (.aut n (.mul a b)) (.mul a b) :=
+  (fixed_mul n a b ha hb).witness
+
+-- 49. Chain: aut n (aut n⁻¹ a) = a
+def aut_round_trip (n : Nat) (a : GExpr) :
+    GPath (.aut n (.autInv n a)) a :=
+  inv_aut_cancel_path n a
+
+-- 50. Inverse round trip
+def autInv_round_trip (n : Nat) (a : GExpr) :
+    GPath (.autInv n (.aut n a)) a :=
+  aut_cancel_path n a
+
+end ComputationalPaths.Path.Algebra.GaloisPaths

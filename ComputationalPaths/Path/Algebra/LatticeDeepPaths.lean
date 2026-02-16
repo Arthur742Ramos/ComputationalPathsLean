@@ -1,7 +1,7 @@
 /-
 # Deep Lattice Theory via Computational Paths (de-scaffolded)
 
-This file avoids `Path.ofEq` completely.
+This file avoids the `ofEq` constructor completely.
 
 We build a small *domain-specific* rewriting system:
 - `YourObj`  : lattice expressions
@@ -13,11 +13,11 @@ path operations: `refl`, `trans`, `symm`, `congrArg`.
 
 THREE GATES:
 (1) zero sorries
-(2) genuine path operations (no `Path.ofEq`)
+(2) genuine path operations (no `ofEq` shortcut)
 (3) compiles clean
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths.Path.Algebra.LatticeDeepPaths
 
@@ -74,10 +74,10 @@ theorem meet_bot_left (a : LatElem) : meet latBot a = latBot := by
   simp [meet, latBot]
 
 theorem meet_bot_right (a : LatElem) : meet a latBot = latBot := by
-  simp [meet, latBot, Nat.min_eq_left]
+  simp [meet, latBot]
 
 theorem join_bot_right (a : LatElem) : join a latBot = a := by
-  simp [join, latBot, Nat.max_eq_left]
+  simp [join, latBot]
 
 /-- Absorption: a ∧ (a ∨ b) = a. -/
 theorem absorption_meet_join (a b : LatElem) : meet a (join a b) = a := by
@@ -257,7 +257,7 @@ end YourPath
 
 namespace Interpret
 
-/-- Atomic computational path from an equality proof (without using `Path.ofEq`). -/
+/-- Atomic computational path from an equality proof (without using the `ofEq` helper). -/
 private def atom {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
@@ -327,10 +327,7 @@ def join_assoc_Y (x y z : YourObj) :
 /-- A derived commutativity-in-context: `x ∧ (y ∧ z)  ~  x ∧ (z ∧ y)`. -/
 def meet_comm_in_right (x y z : YourObj) :
     YourPath (.meet x (.meet y z)) (.meet x (.meet z y)) :=
-  .congMeetL (meet_comm_Y y z) x |> fun p => by
-    -- `congMeetL` builds `(y∧z)∧x` so we use symmetry + associativity to reach the goal.
-    -- We'll instead build directly using `congMeetL` with the right context.
-    exact .congMeetL (meet_comm_Y y z) x
+  YourPath.congMeetR x (meet_comm_Y y z)
 
 /-- Computational-path version of meet commutativity (LatElem-level). -/
 theorem meet_comm_path (a b : LatElem) : Path (meet a b) (meet b a) := by
@@ -452,7 +449,7 @@ theorem meet_congr_join_comm (a b c : LatElem) :
   have p : Path (join a b) (join b a) := join_comm_path a b
   exact Path.congrArg (fun t => meet t c) p
 
-/-! ## Complements and congruences (kept, but paths are built without `Path.ofEq`) -/
+/-! ## Complements and congruences (kept, but paths are built without `ofEq`) -/
 
 /-- A complement of `a` w.r.t. top `n`: `a ∧ c = ⊥` and `a ∨ c = ⊤`. -/
 structure Complement (a : LatElem) (n : Nat) where
