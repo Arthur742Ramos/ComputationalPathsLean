@@ -76,16 +76,13 @@ theorem weight_pos (w₀ : Nat) (hw : 0 < w₀) (t : Term) : 0 < t.weight w₀ :
 def substVar (n : Nat) (s : Term) : Term → Term
   | .var m => if m = n then s else .var m
   | .const c => .const c
-  | .app f a => .app (f.substVar n s) (a.substVar n s)
-  termination_by t => t.size
+  | .app f a => .app (substVar n s f) (substVar n s a)
 
 theorem substVar_const (n : Nat) (s : Term) (c : Nat) :
-    (.const c : Term).substVar n s = .const c := by
-  unfold substVar; rfl
+    substVar n s (.const c) = .const c := rfl
 
 theorem substVar_app (n : Nat) (s f a : Term) :
-    (Term.app f a).substVar n s = Term.app (f.substVar n s) (a.substVar n s) := by
-  unfold substVar; rfl
+    substVar n s (Term.app f a) = Term.app (substVar n s f) (substVar n s a) := rfl
 
 /-- A substitution is a function from variable indices to terms. -/
 abbrev Subst := Nat → Term
@@ -1012,11 +1009,11 @@ theorem subst_distributes_app (σ : Term.Subst) (f a : Term) :
 /-! ### 70. substVar agrees with applySubst for single variable -/
 
 theorem substVar_as_applySubst (n : Nat) (s t : Term) :
-    t.substVar n s = t.applySubst (fun m => if m = n then s else Term.var m) := by
+    Term.substVar n s t = t.applySubst (fun m => if m = n then s else Term.var m) := by
   induction t with
-  | var m => unfold Term.substVar; simp [Term.applySubst]
-  | const c => unfold Term.substVar; simp
-  | app f a ihf iha => unfold Term.substVar; simp [ihf, iha]
+  | var m => rfl
+  | const c => rfl
+  | app f a ihf iha => simp [Term.substVar, Term.applySubst, ihf, iha]
 
 /-! ### 71. Size of substituted const is unchanged -/
 
