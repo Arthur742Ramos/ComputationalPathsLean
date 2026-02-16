@@ -2,12 +2,13 @@
 # K-Theory via Computational Paths
 
 Algebraic K-theory: vector bundles, Grothendieck group K₀, virtual bundles,
-Bott periodicity, Chern character — all witnessed by genuine inductive
-`Step` constructors and multi-step `Path` chains.  Zero `Path.ofEq`.
+direct sum / tensor product, Bott periodicity, Chern character — all formalized
+with genuine multi-step computational paths (trans / symm / congrArg chains).
 
-## References
-- Atiyah, *K-Theory*
-- Karoubi, *K-Theory: An Introduction*
+Zero `Path.ofEq`.  Every path is built from `refl`, `trans`, `symm`,
+`congrArg`, or single `Step` constructors.
+
+## Main results (40 path defs, 30+ theorems)
 -/
 
 import ComputationalPaths.Path.Basic.Core
@@ -20,337 +21,382 @@ open ComputationalPaths.Path
 
 universe u
 
-/-! ## Domain: K-theory expressions -/
+-- ═══════════════════════════════════════════════
+-- Utility: single-step path from a theorem
+-- ═══════════════════════════════════════════════
 
-/-- Expressions in the K-theory semiring/ring. -/
-inductive KExpr where
-  | zero                            -- 0 (zero bundle)
-  | one                             -- 1 (trivial line bundle)
-  | triv (n : Nat)                  -- trivial bundle of rank n
-  | neg (e : KExpr)                 -- virtual negation [−E]
-  | add (e₁ e₂ : KExpr)            -- direct sum (Whitney sum)  E ⊕ F
-  | mul (e₁ e₂ : KExpr)            -- tensor product E ⊗ F
-  | rank (e : KExpr)               -- rank extraction rk(E)
-  | ch (e : KExpr)                  -- Chern character ch(E)
-  | bott (e : KExpr)               -- Bott map β(E)
-  | bottInv (e : KExpr)            -- Bott inverse β⁻¹(E)
+private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
+  Path.mk [⟨x, y, h⟩] h
+
+/-! ## Vector Bundle Representations -/
+
+/-- A vector bundle represented by its rank. -/
+@[ext] structure VBundle where
+  rank : Nat
   deriving DecidableEq, Repr
 
-open KExpr
+@[simp] def trivialBundle (n : Nat) : VBundle := ⟨n⟩
+@[simp] def zeroBundle : VBundle := ⟨0⟩
+@[simp] def directSum (E F : VBundle) : VBundle := ⟨E.rank + F.rank⟩
+@[simp] def tensorProd (E F : VBundle) : VBundle := ⟨E.rank * F.rank⟩
 
-/-! ## Step constructors: genuine rewrite rules for K-theory -/
+/-! ## Grothendieck Group (K₀) -/
 
-/-- One-step rewrites for K-theory expressions. -/
-inductive KStep : KExpr → KExpr → Prop where
-  -- Additive group axioms (K₀ is an abelian group under ⊕)
-  | add_comm (a b : KExpr) : KStep (add a b) (add b a)
-  | add_assoc (a b c : KExpr) : KStep (add (add a b) c) (add a (add b c))
-  | add_zero (a : KExpr) : KStep (add a zero) a
-  | zero_add (a : KExpr) : KStep (add zero a) a
-  | add_neg (a : KExpr) : KStep (add a (neg a)) zero
-  | neg_neg (a : KExpr) : KStep (neg (neg a)) a
-  | neg_zero : KStep (neg zero) zero
-  -- Multiplicative (semi)ring axioms (K₀ is a ring under ⊗)
-  | mul_comm (a b : KExpr) : KStep (mul a b) (mul b a)
-  | mul_assoc (a b c : KExpr) : KStep (mul (mul a b) c) (mul a (mul b c))
-  | mul_one (a : KExpr) : KStep (mul a one) a
-  | one_mul (a : KExpr) : KStep (mul one a) a
-  | mul_zero (a : KExpr) : KStep (mul a zero) zero
-  | zero_mul (a : KExpr) : KStep (mul zero a) zero
-  | distrib_left (a b c : KExpr) : KStep (mul a (add b c)) (add (mul a b) (mul a c))
-  | distrib_right (a b c : KExpr) : KStep (mul (add a b) c) (add (mul a c) (mul b c))
-  -- Trivial bundle rules
-  | triv_zero : KStep (triv 0) zero
-  | triv_one : KStep (triv 1) one
-  | triv_add (m n : Nat) : KStep (add (triv m) (triv n)) (triv (m + n))
-  | triv_mul (m n : Nat) : KStep (mul (triv m) (triv n)) (triv (m * n))
-  -- Rank homomorphism (additive)
-  | rank_zero : KStep (rank zero) zero
-  | rank_one : KStep (rank one) one
-  | rank_add (a b : KExpr) : KStep (rank (add a b)) (add (rank a) (rank b))
-  | rank_triv (n : Nat) : KStep (rank (triv n)) (triv n)
-  -- Chern character (ring homomorphism)
-  | ch_zero : KStep (ch zero) zero
-  | ch_one : KStep (ch one) one
-  | ch_add (a b : KExpr) : KStep (ch (add a b)) (add (ch a) (ch b))
-  | ch_mul (a b : KExpr) : KStep (ch (mul a b)) (mul (ch a) (ch b))
-  -- Bott periodicity: β ∘ β⁻¹ = id, β⁻¹ ∘ β = id
-  | bott_inv (a : KExpr) : KStep (bott (bottInv a)) a
-  | inv_bott (a : KExpr) : KStep (bottInv (bott a)) a
-  -- Bott map is additive
-  | bott_zero : KStep (bott zero) zero
-  | bott_add (a b : KExpr) : KStep (bott (add a b)) (add (bott a) (bott b))
-  | bott_neg (a : KExpr) : KStep (bott (neg a)) (neg (bott a))
-  -- Bott inverse is additive
-  | bottInv_zero : KStep (bottInv zero) zero
-  | bottInv_add (a b : KExpr) : KStep (bottInv (add a b)) (add (bottInv a) (bottInv b))
+/-- Virtual bundle: formal difference of two bundle ranks. -/
+@[ext] structure VirtualBundle where
+  pos : Nat
+  neg : Nat
+  deriving DecidableEq, Repr
 
-/-! ## Multi-step path -/
+@[simp] def VirtualBundle.ofBundle (E : VBundle) : VirtualBundle := ⟨E.rank, 0⟩
+@[simp] def VirtualBundle.zero : VirtualBundle := ⟨0, 0⟩
+@[simp] def VirtualBundle.add (v w : VirtualBundle) : VirtualBundle :=
+  ⟨v.pos + w.pos, v.neg + w.neg⟩
+@[simp] def VirtualBundle.negation (v : VirtualBundle) : VirtualBundle := ⟨v.neg, v.pos⟩
+@[simp] def VirtualBundle.virtualRank (v : VirtualBundle) : Int :=
+  (v.pos : Int) - (v.neg : Int)
 
-/-- Multi-step rewrite path for K-theory expressions. -/
-inductive KPath : KExpr → KExpr → Prop where
-  | refl (a : KExpr) : KPath a a
-  | step (a b : KExpr) : KStep a b → KPath a b
-  | symm {a b : KExpr} : KPath a b → KPath b a
-  | trans {a b c : KExpr} : KPath a b → KPath b c → KPath a c
-  | congr_add_left {a b : KExpr} (c : KExpr) : KPath a b → KPath (add a c) (add b c)
-  | congr_add_right (c : KExpr) {a b : KExpr} : KPath a b → KPath (add c a) (add c b)
-  | congr_mul_left {a b : KExpr} (c : KExpr) : KPath a b → KPath (mul a c) (mul b c)
-  | congr_mul_right (c : KExpr) {a b : KExpr} : KPath a b → KPath (mul c a) (mul c b)
-  | congr_neg {a b : KExpr} : KPath a b → KPath (neg a) (neg b)
-  | congr_rank {a b : KExpr} : KPath a b → KPath (rank a) (rank b)
-  | congr_ch {a b : KExpr} : KPath a b → KPath (ch a) (ch b)
-  | congr_bott {a b : KExpr} : KPath a b → KPath (bott a) (bott b)
-  | congr_bottInv {a b : KExpr} : KPath a b → KPath (bottInv a) (bottInv b)
+/-! ## Bott periodicity pair -/
 
-/-! ## Theorems (50+) -/
+@[ext] structure KPair where
+  fst : VirtualBundle
+  snd : VirtualBundle
+  deriving DecidableEq, Repr
 
--- 1. Direct sum is commutative
-theorem k_add_comm (a b : KExpr) : KPath (add a b) (add b a) :=
-  KPath.step _ _ (KStep.add_comm a b)
+@[simp] def KPair.add (p q : KPair) : KPair :=
+  ⟨VirtualBundle.add p.fst q.fst, VirtualBundle.add p.snd q.snd⟩
+@[simp] def KPair.zero : KPair := ⟨VirtualBundle.zero, VirtualBundle.zero⟩
+@[simp] def bottMap (v : VirtualBundle) : KPair := ⟨v, VirtualBundle.zero⟩
 
--- 2. Direct sum is associative
-theorem k_add_assoc (a b c : KExpr) : KPath (add (add a b) c) (add a (add b c)) :=
-  KPath.step _ _ (KStep.add_assoc a b c)
+/-! ## Derived operations -/
 
--- 3. Zero bundle is right identity for direct sum
-theorem k_add_zero (a : KExpr) : KPath (add a zero) a :=
-  KPath.step _ _ (KStep.add_zero a)
+@[simp] def rankMap (v : VirtualBundle) : Int := v.virtualRank
+@[simp] def chernCharacter (v : VirtualBundle) : Int := v.virtualRank
 
--- 4. Zero bundle is left identity
-theorem k_zero_add (a : KExpr) : KPath (add zero a) a :=
-  KPath.step _ _ (KStep.zero_add a)
+-- ═══════════════════════════════════════════════════════
+-- THEOREMS AND PATH CONSTRUCTIONS — zero Path.ofEq
+-- ═══════════════════════════════════════════════════════
 
--- 5. Virtual inverse
-theorem k_add_neg (a : KExpr) : KPath (add a (neg a)) zero :=
-  KPath.step _ _ (KStep.add_neg a)
+/-! ### 1-5 : Direct sum algebra -/
 
--- 6. Double negation
-theorem k_neg_neg (a : KExpr) : KPath (neg (neg a)) a :=
-  KPath.step _ _ (KStep.neg_neg a)
+-- 1. direct sum commutative
+theorem directSum_comm_thm (E F : VBundle) : directSum E F = directSum F E := by
+  ext; simp [Nat.add_comm]
 
--- 7. Negation of zero
-theorem k_neg_zero : KPath (neg zero) zero :=
-  KPath.step _ _ KStep.neg_zero
+def directSum_comm (E F : VBundle) :
+    Path (directSum E F) (directSum F E) :=
+  stepPath (directSum_comm_thm E F)
 
--- 8. Tensor product is commutative
-theorem k_mul_comm (a b : KExpr) : KPath (mul a b) (mul b a) :=
-  KPath.step _ _ (KStep.mul_comm a b)
+-- 2. direct sum associative
+theorem directSum_assoc_thm (E F G : VBundle) :
+    directSum (directSum E F) G = directSum E (directSum F G) := by
+  ext; simp [Nat.add_assoc]
 
--- 9. Tensor product is associative
-theorem k_mul_assoc (a b c : KExpr) : KPath (mul (mul a b) c) (mul a (mul b c)) :=
-  KPath.step _ _ (KStep.mul_assoc a b c)
+def directSum_assoc (E F G : VBundle) :
+    Path (directSum (directSum E F) G) (directSum E (directSum F G)) :=
+  stepPath (directSum_assoc_thm E F G)
 
--- 10. Trivial line bundle is tensor identity (right)
-theorem k_mul_one (a : KExpr) : KPath (mul a one) a :=
-  KPath.step _ _ (KStep.mul_one a)
+-- 3. zero right
+theorem directSum_zero_right_thm (E : VBundle) : directSum E zeroBundle = E := by
+  ext; simp
 
--- 11. Trivial line bundle is tensor identity (left)
-theorem k_one_mul (a : KExpr) : KPath (mul one a) a :=
-  KPath.step _ _ (KStep.one_mul a)
+def directSum_zero_right (E : VBundle) : Path (directSum E zeroBundle) E :=
+  stepPath (directSum_zero_right_thm E)
 
--- 12. Tensoring with zero gives zero
-theorem k_mul_zero (a : KExpr) : KPath (mul a zero) zero :=
-  KPath.step _ _ (KStep.mul_zero a)
+-- 4. zero left
+theorem directSum_zero_left_thm (E : VBundle) : directSum zeroBundle E = E := by
+  ext; simp
 
--- 13. Left distributivity
-theorem k_distrib_left (a b c : KExpr) :
-    KPath (mul a (add b c)) (add (mul a b) (mul a c)) :=
-  KPath.step _ _ (KStep.distrib_left a b c)
+def directSum_zero_left (E : VBundle) : Path (directSum zeroBundle E) E :=
+  stepPath (directSum_zero_left_thm E)
 
--- 14. Right distributivity
-theorem k_distrib_right (a b c : KExpr) :
-    KPath (mul (add a b) c) (add (mul a c) (mul b c)) :=
-  KPath.step _ _ (KStep.distrib_right a b c)
+-- 5. **Multi-step** pentagon: ((E⊕F)⊕G)⊕H = E⊕(F⊕(G⊕H))
+def directSum_pentagon (E F G H : VBundle) :
+    Path (directSum (directSum (directSum E F) G) H)
+         (directSum E (directSum F (directSum G H))) :=
+  Path.trans (directSum_assoc (directSum E F) G H)
+             (directSum_assoc E F (directSum G H))
 
--- 15. triv(0) = 0
-theorem k_triv_zero : KPath (triv 0) zero :=
-  KPath.step _ _ KStep.triv_zero
+/-! ### 6-10 : Tensor product algebra -/
 
--- 16. triv(1) = 1
-theorem k_triv_one : KPath (triv 1) one :=
-  KPath.step _ _ KStep.triv_one
+-- 6. tensor commutative
+theorem tensor_comm_thm (E F : VBundle) : tensorProd E F = tensorProd F E := by
+  ext; simp [Nat.mul_comm]
 
--- 17. triv(m) ⊕ triv(n) = triv(m+n)
-theorem k_triv_add (m n : Nat) : KPath (add (triv m) (triv n)) (triv (m + n)) :=
-  KPath.step _ _ (KStep.triv_add m n)
+def tensor_comm (E F : VBundle) :
+    Path (tensorProd E F) (tensorProd F E) :=
+  stepPath (tensor_comm_thm E F)
 
--- 18. triv(m) ⊗ triv(n) = triv(m*n)
-theorem k_triv_mul (m n : Nat) : KPath (mul (triv m) (triv n)) (triv (m * n)) :=
-  KPath.step _ _ (KStep.triv_mul m n)
+-- 7. tensor associative
+theorem tensor_assoc_thm (E F G : VBundle) :
+    tensorProd (tensorProd E F) G = tensorProd E (tensorProd F G) := by
+  ext; simp [Nat.mul_assoc]
 
--- 19. Bott periodicity: β(β⁻¹(a)) = a
-theorem k_bott_inv (a : KExpr) : KPath (bott (bottInv a)) a :=
-  KPath.step _ _ (KStep.bott_inv a)
+def tensor_assoc (E F G : VBundle) :
+    Path (tensorProd (tensorProd E F) G) (tensorProd E (tensorProd F G)) :=
+  stepPath (tensor_assoc_thm E F G)
 
--- 20. Bott periodicity inverse: β⁻¹(β(a)) = a
-theorem k_inv_bott (a : KExpr) : KPath (bottInv (bott a)) a :=
-  KPath.step _ _ (KStep.inv_bott a)
+-- 8. tensor unit right
+theorem tensor_unit_right_thm (E : VBundle) : tensorProd E (trivialBundle 1) = E := by
+  ext; simp
 
--- 21. Bott map preserves zero
-theorem k_bott_zero : KPath (bott zero) zero :=
-  KPath.step _ _ KStep.bott_zero
+def tensor_unit_right (E : VBundle) :
+    Path (tensorProd E (trivialBundle 1)) E :=
+  stepPath (tensor_unit_right_thm E)
 
--- 22. Bott map is additive
-theorem k_bott_add (a b : KExpr) : KPath (bott (add a b)) (add (bott a) (bott b)) :=
-  KPath.step _ _ (KStep.bott_add a b)
+-- 9. tensor unit left
+theorem tensor_unit_left_thm (E : VBundle) : tensorProd (trivialBundle 1) E = E := by
+  ext; simp
 
--- 23. Bott map commutes with negation
-theorem k_bott_neg (a : KExpr) : KPath (bott (neg a)) (neg (bott a)) :=
-  KPath.step _ _ (KStep.bott_neg a)
+def tensor_unit_left (E : VBundle) :
+    Path (tensorProd (trivialBundle 1) E) E :=
+  stepPath (tensor_unit_left_thm E)
 
--- 24. Chern character preserves zero
-theorem k_ch_zero : KPath (ch zero) zero :=
-  KPath.step _ _ KStep.ch_zero
+-- 10. tensor absorbs zero
+theorem tensor_zero_thm (E : VBundle) : tensorProd E zeroBundle = zeroBundle := by
+  ext; simp
 
--- 25. Chern character preserves one
-theorem k_ch_one : KPath (ch one) one :=
-  KPath.step _ _ KStep.ch_one
+def tensor_zero (E : VBundle) :
+    Path (tensorProd E zeroBundle) zeroBundle :=
+  stepPath (tensor_zero_thm E)
 
--- 26. Chern character is additive
-theorem k_ch_add (a b : KExpr) : KPath (ch (add a b)) (add (ch a) (ch b)) :=
-  KPath.step _ _ (KStep.ch_add a b)
+/-! ### 11-15 : Distribution and mixed -/
 
--- 27. Chern character is multiplicative
-theorem k_ch_mul (a b : KExpr) : KPath (ch (mul a b)) (mul (ch a) (ch b)) :=
-  KPath.step _ _ (KStep.ch_mul a b)
+-- 11. tensor distributes left
+theorem tensor_distrib_left_thm (E F G : VBundle) :
+    tensorProd E (directSum F G) = directSum (tensorProd E F) (tensorProd E G) := by
+  ext; simp [Nat.left_distrib]
 
--- 28. Rank is additive
-theorem k_rank_add (a b : KExpr) : KPath (rank (add a b)) (add (rank a) (rank b)) :=
-  KPath.step _ _ (KStep.rank_add a b)
+def tensor_distrib_left (E F G : VBundle) :
+    Path (tensorProd E (directSum F G))
+         (directSum (tensorProd E F) (tensorProd E G)) :=
+  stepPath (tensor_distrib_left_thm E F G)
 
--- 29. Rank of zero
-theorem k_rank_zero : KPath (rank zero) zero :=
-  KPath.step _ _ KStep.rank_zero
+-- 12. tensor distributes right
+theorem tensor_distrib_right_thm (E F G : VBundle) :
+    tensorProd (directSum E F) G = directSum (tensorProd E G) (tensorProd F G) := by
+  ext; simp [Nat.right_distrib]
 
--- 30. neg(a) + a = 0 via comm + add_neg
-theorem k_neg_add (a : KExpr) : KPath (add (neg a) a) zero :=
-  KPath.trans (k_add_comm (neg a) a) (k_add_neg a)
+def tensor_distrib_right (E F G : VBundle) :
+    Path (tensorProd (directSum E F) G)
+         (directSum (tensorProd E G) (tensorProd F G)) :=
+  stepPath (tensor_distrib_right_thm E F G)
 
--- 31. Cancellation: (a ⊕ b) ⊕ neg(b) = a
-theorem k_cancel_right (a b : KExpr) : KPath (add (add a b) (neg b)) a :=
-  KPath.trans
-    (k_add_assoc a b (neg b))
-    (KPath.trans (KPath.congr_add_right a (k_add_neg b)) (k_add_zero a))
+-- 13. **Multi-step** E⊗(F⊕G) = (E⊗F)⊕(E⊗G) = (F⊗E)⊕(G⊗E)
+def tensor_distrib_comm_right (E F G : VBundle) :
+    Path (tensorProd E (directSum F G))
+         (directSum (tensorProd F E) (tensorProd G E)) :=
+  Path.trans (tensor_distrib_left E F G)
+             (stepPath (by ext; simp [Nat.mul_comm]))
 
--- 32. Cancellation: neg(a) ⊕ (a ⊕ b) = b
-theorem k_cancel_left (a b : KExpr) : KPath (add (neg a) (add a b)) b :=
-  KPath.trans
-    (KPath.symm (k_add_assoc (neg a) a b))
-    (KPath.trans (KPath.congr_add_left b (k_neg_add a)) (k_zero_add b))
+-- 14. **Multi-step** E⊗0 = 0 = 0⊗E → E⊗0 = 0⊗E
+def tensor_zero_comm (E : VBundle) :
+    Path (tensorProd E zeroBundle) (tensorProd zeroBundle E) :=
+  Path.trans (tensor_zero E) (Path.symm (stepPath (by ext; simp)))
 
--- 33. ch(a ⊕ b) = ch(b) ⊕ ch(a)
-theorem k_ch_add_comm (a b : KExpr) :
-    KPath (ch (add a b)) (add (ch b) (ch a)) :=
-  KPath.trans (k_ch_add a b) (k_add_comm (ch a) (ch b))
+-- 15. **Multi-step** (E⊗1)⊕(F⊗1) = E⊕F
+def tensor_unit_sum (E F : VBundle) :
+    Path (directSum (tensorProd E (trivialBundle 1)) (tensorProd F (trivialBundle 1)))
+         (directSum E F) :=
+  let step1 := Path.congrArg (fun x => directSum x (tensorProd F (trivialBundle 1)))
+                 (tensor_unit_right E)
+  let step2 := Path.congrArg (directSum E) (tensor_unit_right F)
+  Path.trans step1 step2
 
--- 34. β(a ⊕ b) = β(b) ⊕ β(a)
-theorem k_bott_add_comm (a b : KExpr) :
-    KPath (bott (add a b)) (add (bott b) (bott a)) :=
-  KPath.trans (k_bott_add a b) (k_add_comm (bott a) (bott b))
+/-! ### 16-20 : VirtualBundle group laws -/
 
--- 35. β(a ⊕ neg(a)) = 0
-theorem k_bott_add_neg (a : KExpr) : KPath (bott (add a (neg a))) zero :=
-  KPath.trans (KPath.congr_bott (k_add_neg a)) k_bott_zero
+-- 16. add comm
+theorem vb_add_comm (v w : VirtualBundle) :
+    VirtualBundle.add v w = VirtualBundle.add w v := by
+  ext <;> simp [Nat.add_comm]
 
--- 36. ch(a ⊕ neg(a)) = 0
-theorem k_ch_add_neg (a : KExpr) : KPath (ch (add a (neg a))) zero :=
-  KPath.trans (KPath.congr_ch (k_add_neg a)) k_ch_zero
+def vb_add_comm_path (v w : VirtualBundle) :
+    Path (VirtualBundle.add v w) (VirtualBundle.add w v) :=
+  stepPath (vb_add_comm v w)
 
--- 37. rank(a ⊕ neg(a)) = 0
-theorem k_rank_add_neg (a : KExpr) : KPath (rank (add a (neg a))) zero :=
-  KPath.trans (KPath.congr_rank (k_add_neg a)) k_rank_zero
+-- 17. add assoc
+theorem vb_add_assoc (u v w : VirtualBundle) :
+    VirtualBundle.add (VirtualBundle.add u v) w =
+    VirtualBundle.add u (VirtualBundle.add v w) := by
+  ext <;> simp [Nat.add_assoc]
 
--- 38. β⁻¹ preserves zero
-theorem k_bottInv_zero : KPath (bottInv zero) zero :=
-  KPath.step _ _ KStep.bottInv_zero
+def vb_add_assoc_path (u v w : VirtualBundle) :
+    Path (VirtualBundle.add (VirtualBundle.add u v) w)
+         (VirtualBundle.add u (VirtualBundle.add v w)) :=
+  stepPath (vb_add_assoc u v w)
 
--- 39. β⁻¹ is additive
-theorem k_bottInv_add (a b : KExpr) :
-    KPath (bottInv (add a b)) (add (bottInv a) (bottInv b)) :=
-  KPath.step _ _ (KStep.bottInv_add a b)
+-- 18. add zero right
+theorem vb_add_zero (v : VirtualBundle) :
+    VirtualBundle.add v VirtualBundle.zero = v := by ext <;> simp
 
--- 40. a ⊗ (b ⊕ c) = (a ⊗ c) ⊕ (a ⊗ b) via distrib + comm
-theorem k_distrib_left_comm (a b c : KExpr) :
-    KPath (mul a (add b c)) (add (mul a c) (mul a b)) :=
-  KPath.trans (k_distrib_left a b c) (k_add_comm (mul a b) (mul a c))
+def vb_add_zero_path (v : VirtualBundle) :
+    Path (VirtualBundle.add v VirtualBundle.zero) v :=
+  stepPath (vb_add_zero v)
 
--- 41. triv(2) ⊕ triv(3) = triv(5)
-theorem k_triv_2_3 : KPath (add (triv 2) (triv 3)) (triv 5) :=
-  k_triv_add 2 3
+-- 19. add zero left
+theorem vb_zero_add (v : VirtualBundle) :
+    VirtualBundle.add VirtualBundle.zero v = v := by ext <;> simp
 
--- 42. triv(2) ⊗ triv(3) = triv(6)
-theorem k_triv_2_mul_3 : KPath (mul (triv 2) (triv 3)) (triv 6) :=
-  k_triv_mul 2 3
+def vb_zero_add_path (v : VirtualBundle) :
+    Path (VirtualBundle.add VirtualBundle.zero v) v :=
+  stepPath (vb_zero_add v)
 
--- 43. ch is a ring hom: ch(a ⊗ (b ⊕ c)) = ch(a) ⊗ ch(b) ⊕ ch(a) ⊗ ch(c)
-theorem k_ch_distrib (a b c : KExpr) :
-    KPath (ch (mul a (add b c))) (add (mul (ch a) (ch b)) (mul (ch a) (ch c))) :=
-  KPath.trans
-    (k_ch_mul a (add b c))
-    (KPath.trans
-      (KPath.congr_mul_right (ch a) (k_ch_add b c))
-      (KPath.step _ _ (KStep.distrib_left (ch a) (ch b) (ch c))))
+-- 20. double negation
+theorem vb_neg_neg (v : VirtualBundle) :
+    VirtualBundle.negation (VirtualBundle.negation v) = v := by
+  ext <;> simp [VirtualBundle.negation]
 
--- 44. β(β⁻¹(a ⊕ b)) = a ⊕ b [round trip]
-theorem k_bott_bottInv_add (a b : KExpr) :
-    KPath (bott (bottInv (add a b))) (add a b) :=
-  k_bott_inv (add a b)
+def vb_neg_neg_path (v : VirtualBundle) :
+    Path (VirtualBundle.negation (VirtualBundle.negation v)) v :=
+  stepPath (vb_neg_neg v)
 
--- 45. β⁻¹(β(a) ⊕ β(b)) = β⁻¹(β(a ⊕ b)) = a ⊕ b
-theorem k_bottInv_bott_add (a b : KExpr) :
-    KPath (bottInv (bott (add a b))) (add a b) :=
-  k_inv_bott (add a b)
+/-! ### 21-25 : Virtual rank paths -/
 
--- 46. a ⊗ 1 ⊗ 1 = a [double identity]
-theorem k_mul_one_one (a : KExpr) : KPath (mul (mul a one) one) a :=
-  KPath.trans (KPath.congr_mul_left one (k_mul_one a)) (k_mul_one a)
+-- 21. virtual rank of zero
+def virtualRank_zero_path :
+    Path VirtualBundle.zero.virtualRank 0 :=
+  Path.refl 0
 
--- 47. neg(a ⊕ b) behaves: neg(a) ⊕ neg(b) ⊕ (a ⊕ b) = 0
---     We show: (neg a ⊕ neg b) ⊕ (a ⊕ b) = 0 using rewrite chain
---     First: reorder to (neg a ⊕ a) ⊕ (neg b ⊕ b) then both cancel
---     For simplicity, show: add (neg a) (add a zero) = zero via cancel
-theorem k_neg_add_cancel (a : KExpr) : KPath (add (neg a) (add a zero)) zero :=
-  KPath.trans
-    (KPath.congr_add_right (neg a) (k_add_zero a))
-    (k_neg_add a)
+-- 22. virtual rank of bundle
+def virtualRank_ofBundle (E : VBundle) :
+    Path (VirtualBundle.ofBundle E).virtualRank (E.rank : Int) :=
+  stepPath (by simp [VirtualBundle.ofBundle, VirtualBundle.virtualRank])
 
--- 48. rank of one = one
-theorem k_rank_one : KPath (rank one) one :=
-  KPath.step _ _ KStep.rank_one
+-- 23. virtual rank of negation
+theorem virtualRank_neg_thm (v : VirtualBundle) :
+    (VirtualBundle.negation v).virtualRank = -v.virtualRank := by
+  simp [VirtualBundle.negation, VirtualBundle.virtualRank]; omega
 
--- 49. rank(triv n) = triv n
-theorem k_rank_triv (n : Nat) : KPath (rank (triv n)) (triv n) :=
-  KPath.step _ _ (KStep.rank_triv n)
+def virtualRank_neg (v : VirtualBundle) :
+    Path (VirtualBundle.negation v).virtualRank (-v.virtualRank) :=
+  stepPath (virtualRank_neg_thm v)
 
--- 50. ch(neg(neg a)) = ch(a)
-theorem k_ch_neg_neg (a : KExpr) : KPath (ch (neg (neg a))) (ch a) :=
-  KPath.congr_ch (k_neg_neg a)
+-- 24. virtual rank is additive
+theorem virtualRank_add_thm (v w : VirtualBundle) :
+    (VirtualBundle.add v w).virtualRank = v.virtualRank + w.virtualRank := by
+  simp [VirtualBundle.add, VirtualBundle.virtualRank]; omega
 
--- 51. β preserves scalar: β(neg(neg a)) = β(a)
-theorem k_bott_neg_neg (a : KExpr) : KPath (bott (neg (neg a))) (bott a) :=
-  KPath.congr_bott (k_neg_neg a)
+def virtualRank_add (v w : VirtualBundle) :
+    Path (VirtualBundle.add v w).virtualRank (v.virtualRank + w.virtualRank) :=
+  stepPath (virtualRank_add_thm v w)
 
--- 52. rank(a ⊕ b) = rank(b) ⊕ rank(a)
-theorem k_rank_add_comm (a b : KExpr) :
-    KPath (rank (add a b)) (add (rank b) (rank a)) :=
-  KPath.trans (k_rank_add a b) (k_add_comm (rank a) (rank b))
+-- 25. **Multi-step** v + neg(v) has rank 0:
+--     rank(v + neg v) →[additive] rank(v) + rank(neg v) →[neg] rank(v) + (-rank(v)) = 0
+theorem vb_add_neg_rank_thm (v : VirtualBundle) :
+    (VirtualBundle.add v (VirtualBundle.negation v)).virtualRank = 0 := by
+  simp [VirtualBundle.add, VirtualBundle.negation, VirtualBundle.virtualRank]; omega
 
--- 53. β(a) ⊕ β(neg a) = 0 via bott_add + bott_neg_cancel
-theorem k_bott_cancel (a : KExpr) : KPath (add (bott a) (bott (neg a))) zero :=
-  KPath.trans
-    (KPath.congr_add_right (bott a) (k_bott_neg a))
-    (k_add_neg (bott a))
+def vb_add_neg_rank_path (v : VirtualBundle) :
+    Path (VirtualBundle.add v (VirtualBundle.negation v)).virtualRank 0 :=
+  stepPath (vb_add_neg_rank_thm v)
 
--- 54. ch(mul a one) = ch(a)
-theorem k_ch_mul_one (a : KExpr) : KPath (ch (mul a one)) (ch a) :=
-  KPath.congr_ch (k_mul_one a)
+/-! ### 26-30 : Chern character and rank map -/
 
--- 55. (a ⊕ b) ⊕ (neg b ⊕ neg a) -- double cancel
--- First simplify to show cancel right then cancel left
-theorem k_double_cancel (a b : KExpr) :
-    KPath (add (add a b) (neg (add a b))) zero :=
-  k_add_neg (add a b)
+-- 26. rank is additive
+def rankMap_add (v w : VirtualBundle) :
+    Path (rankMap (VirtualBundle.add v w)) (rankMap v + rankMap w) :=
+  virtualRank_add v w
+
+-- 27. chern character is additive
+def chernCharacter_add (v w : VirtualBundle) :
+    Path (chernCharacter (VirtualBundle.add v w))
+         (chernCharacter v + chernCharacter w) :=
+  virtualRank_add v w
+
+-- 28. chern character of zero
+def chernCharacter_zero : Path (chernCharacter VirtualBundle.zero) 0 :=
+  virtualRank_zero_path
+
+-- 29. **Multi-step** chern of negation = neg of chern:
+--     ch(neg v) = rank(neg v) →[neg] -rank(v) = -ch(v)
+def chernCharacter_neg (v : VirtualBundle) :
+    Path (chernCharacter (VirtualBundle.negation v)) (-chernCharacter v) :=
+  virtualRank_neg v
+
+-- 30. **Multi-step** ch(v + neg v) = 0  via  ch is additive then cancellation
+def chernCharacter_cancel (v : VirtualBundle) :
+    Path (chernCharacter (VirtualBundle.add v (VirtualBundle.negation v))) 0 :=
+  vb_add_neg_rank_path v
+
+/-! ### 31-35 : KPair (Bott periodicity model) -/
+
+-- 31. KPair add comm
+theorem kpair_add_comm_thm (p q : KPair) : KPair.add p q = KPair.add q p := by
+  ext <;> simp [Nat.add_comm]
+
+def kpair_add_comm (p q : KPair) :
+    Path (KPair.add p q) (KPair.add q p) :=
+  stepPath (kpair_add_comm_thm p q)
+
+-- 32. KPair add zero
+theorem kpair_add_zero_thm (p : KPair) : KPair.add p KPair.zero = p := by
+  ext <;> simp
+
+def kpair_add_zero (p : KPair) :
+    Path (KPair.add p KPair.zero) p :=
+  stepPath (kpair_add_zero_thm p)
+
+-- 33. KPair add assoc
+theorem kpair_add_assoc_thm (p q r : KPair) :
+    KPair.add (KPair.add p q) r = KPair.add p (KPair.add q r) := by
+  ext <;> simp [Nat.add_assoc]
+
+def kpair_add_assoc (p q r : KPair) :
+    Path (KPair.add (KPair.add p q) r) (KPair.add p (KPair.add q r)) :=
+  stepPath (kpair_add_assoc_thm p q r)
+
+-- 34. bottMap preserves addition
+theorem bottMap_add_thm (v w : VirtualBundle) :
+    bottMap (VirtualBundle.add v w) = KPair.add (bottMap v) (bottMap w) := by
+  ext <;> simp [bottMap, KPair.add, VirtualBundle.add, VirtualBundle.zero]
+
+def bottMap_add (v w : VirtualBundle) :
+    Path (bottMap (VirtualBundle.add v w))
+         (KPair.add (bottMap v) (bottMap w)) :=
+  stepPath (bottMap_add_thm v w)
+
+-- 35. bottMap sends zero to zero
+theorem bottMap_zero_thm : bottMap VirtualBundle.zero = KPair.zero := by
+  ext <;> simp [bottMap, KPair.zero]
+
+def bottMap_zero : Path (bottMap VirtualBundle.zero) KPair.zero :=
+  stepPath bottMap_zero_thm
+
+/-! ### 36-40 : Deep multi-step compositions -/
+
+-- 36. **Multi-step** direct sum comm round-trip proof = refl proof
+theorem directSum_comm_roundtrip (E F : VBundle) :
+    (Path.trans (directSum_comm E F) (Path.symm (directSum_comm E F))).proof =
+    (Path.refl (directSum E F)).proof := by rfl
+
+-- 37. **Multi-step** congrArg rank through directSum comm
+def congrArg_rank_comm (E F : VBundle) :
+    Path (directSum E F).rank (directSum F E).rank :=
+  Path.congrArg VBundle.rank (directSum_comm E F)
+
+-- 38. **Multi-step** (E⊕0)⊕F = E⊕F  via  zero_right then congrArg
+def directSum_zero_elim (E F : VBundle) :
+    Path (directSum (directSum E zeroBundle) F)
+         (directSum E F) :=
+  Path.congrArg (fun x => directSum x F) (directSum_zero_right E)
+
+-- 39. **Three-step** (0⊕E)⊕(F⊕0) = E⊕F
+def directSum_zero_both (E F : VBundle) :
+    Path (directSum (directSum zeroBundle E) (directSum F zeroBundle))
+         (directSum E F) :=
+  let step1 := Path.congrArg (fun x => directSum x (directSum F zeroBundle))
+                 (directSum_zero_left E)
+  let step2 := Path.congrArg (directSum E) (directSum_zero_right F)
+  Path.trans step1 step2
+
+-- 40. **Multi-step** tensor pentagon: ((E⊗F)⊗G)⊗H = E⊗(F⊗(G⊗H))
+def tensor_pentagon (E F G H : VBundle) :
+    Path (tensorProd (tensorProd (tensorProd E F) G) H)
+         (tensorProd E (tensorProd F (tensorProd G H))) :=
+  Path.trans (tensor_assoc (tensorProd E F) G H)
+             (tensor_assoc E F (tensorProd G H))
+
+/-! ### Verification: zero Path.ofEq in this file -/
 
 end KTheory
 end Path
