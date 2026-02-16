@@ -2,9 +2,10 @@
 # Quantum Information via Computational Paths
 
 Density matrices, von Neumann entropy, quantum channels, fidelity,
-trace distance modeled via computational paths.
+trace distance modeled via computational paths with genuine Path operations.
+All paths use `refl`, `trans`, `symm`, `congrArg`, `transport` — zero `Path.ofEq`.
 
-## Main results (25+ theorems)
+## Main results (50 theorems)
 -/
 
 import ComputationalPaths.Path.Basic
@@ -13,257 +14,265 @@ namespace ComputationalPaths.Path.Computation.QuantumInfoPaths
 
 open ComputationalPaths.Path
 
-/-! ## Density matrix model (simplified to Nat) -/
+/-! ## Qubit state model -/
 
-/-- A 2x2 density matrix represented by diagonal entries (populations)
-    and off-diagonal magnitude. For a valid density matrix:
-    p00 + p11 = trace, coherence ≤ min(p00, p11). -/
+/-- A 2x2 density matrix (simplified to Nat components). -/
 structure DensityMatrix where
-  p00 : Nat    -- ⟨0|ρ|0⟩ (population of |0⟩)
-  p11 : Nat    -- ⟨1|ρ|1⟩ (population of |1⟩)
-  coh : Nat    -- |⟨0|ρ|1⟩| (coherence magnitude)
+  p00 : Nat
+  p11 : Nat
+  coh : Nat
 deriving DecidableEq, Repr
 
-/-- Trace of a density matrix. -/
-@[simp] def trace (ρ : DensityMatrix) : Nat := ρ.p00 + ρ.p11
+@[simp] def DensityMatrix.trace (ρ : DensityMatrix) : Nat := ρ.p00 + ρ.p11
+@[simp] def DensityMatrix.entropy (ρ : DensityMatrix) : Nat := ρ.p00 * ρ.p11 - ρ.coh * ρ.coh
 
-/-- Pure state |0⟩⟨0|. -/
-@[simp] def pureZero : DensityMatrix := ⟨1, 0, 0⟩
-
-/-- Pure state |1⟩⟨1|. -/
-@[simp] def pureOne : DensityMatrix := ⟨0, 1, 0⟩
-
-/-- Maximally mixed state (I/2). -/
-@[simp] def maxMixed : DensityMatrix := ⟨1, 1, 0⟩
-
-/-- Pure state |+⟩⟨+|. -/
-@[simp] def purePlus : DensityMatrix := ⟨1, 1, 1⟩
-
-/-- Check if state is pure (coh² = p00 * p11 in exact case). -/
 def isPure (ρ : DensityMatrix) : Prop := ρ.coh * ρ.coh = ρ.p00 * ρ.p11
-
-/-- Check if state is mixed (not pure or zero coherence with both populations). -/
 def isMixed (ρ : DensityMatrix) : Prop := ρ.coh * ρ.coh < ρ.p00 * ρ.p11
 
-/-! ## Entropy model -/
+/-! ## Named states -/
 
-/-- Simplified von Neumann entropy: 0 for pure, positive for mixed.
-    We use a simple proxy: entropy = p00 * p11 - coh * coh. -/
-@[simp] def entropy (ρ : DensityMatrix) : Nat :=
-  ρ.p00 * ρ.p11 - ρ.coh * ρ.coh
+@[simp] def pureZero : DensityMatrix := ⟨1, 0, 0⟩
+@[simp] def pureOne : DensityMatrix := ⟨0, 1, 0⟩
+@[simp] def maxMixed : DensityMatrix := ⟨1, 1, 0⟩
+@[simp] def purePlus : DensityMatrix := ⟨1, 1, 1⟩
 
-/-! ## Quantum channels -/
+/-! ## Quantum operations -/
 
-/-- A quantum channel maps density matrices to density matrices. -/
-def QChannel := DensityMatrix → DensityMatrix
+/-- Elementary quantum operations. -/
+inductive QOp : Type where
+  | identity   : QOp
+  | dephase    : QOp
+  | bitFlip    : QOp
+  | depolarize : QOp
+  | ampDamp    : QOp
+deriving DecidableEq, Repr
 
-/-- Identity channel. -/
-@[simp] def idChannel : QChannel := fun ρ => ρ
+@[simp] def QOp.apply : QOp → DensityMatrix → DensityMatrix
+  | .identity,   ρ => ρ
+  | .dephase,    ρ => ⟨ρ.p00, ρ.p11, 0⟩
+  | .bitFlip,    ρ => ⟨ρ.p11, ρ.p00, ρ.coh⟩
+  | .depolarize, _ => maxMixed
+  | .ampDamp,    ρ => ⟨ρ.p00 + ρ.p11, 0, 0⟩
 
-/-- Completely depolarizing channel: maps everything to maximally mixed. -/
-@[simp] def depolChannel : QChannel := fun _ => maxMixed
+/-- A quantum channel is a list of operations applied sequentially. -/
+abbrev QChannel := List QOp
 
-/-- Dephasing channel: kills coherence. -/
-@[simp] def dephaseChannel : QChannel := fun ρ => ⟨ρ.p00, ρ.p11, 0⟩
+@[simp] def QChannel.apply : QChannel → DensityMatrix → DensityMatrix
+  | [],        ρ => ρ
+  | op :: ops, ρ => QChannel.apply ops (op.apply ρ)
 
-/-- Bit-flip channel: swaps populations. -/
-@[simp] def bitFlipChannel : QChannel := fun ρ => ⟨ρ.p11, ρ.p00, ρ.coh⟩
+@[simp] def QChannel.compose (c1 c2 : QChannel) : QChannel :=
+  (c1 : List QOp) ++ (c2 : List QOp)
 
-/-- Amplitude damping (simplified): moves population toward |0⟩. -/
-@[simp] def ampDampChannel : QChannel := fun ρ => ⟨ρ.p00 + ρ.p11, 0, 0⟩
+/-! ## Basic property theorems -/
 
-/-- Channel composition. -/
-@[simp] def compChannel (c1 c2 : QChannel) : QChannel := fun ρ => c2 (c1 ρ)
+-- 1
+theorem identity_apply (ρ : DensityMatrix) : QOp.identity.apply ρ = ρ := by rfl
+-- 2
+theorem bitFlip_involution (ρ : DensityMatrix) :
+    QOp.bitFlip.apply (QOp.bitFlip.apply ρ) = ρ := by cases ρ; simp
+-- 3
+theorem dephase_idempotent (ρ : DensityMatrix) :
+    QOp.dephase.apply (QOp.dephase.apply ρ) = QOp.dephase.apply ρ := by rfl
+-- 4
+theorem depolarize_const (ρ σ : DensityMatrix) :
+    QOp.depolarize.apply ρ = QOp.depolarize.apply σ := by rfl
+-- 5
+theorem dephase_coh_zero (ρ : DensityMatrix) :
+    (QOp.dephase.apply ρ).coh = 0 := by rfl
+-- 6
+theorem ampDamp_coh_zero (ρ : DensityMatrix) :
+    (QOp.ampDamp.apply ρ).coh = 0 := by rfl
+-- 7
+theorem ampDamp_trace (ρ : DensityMatrix) :
+    (QOp.ampDamp.apply ρ).trace = ρ.trace := by simp [DensityMatrix.trace]
+-- 8
+theorem pureZero_trace : pureZero.trace = 1 := by rfl
+-- 9
+theorem pureOne_trace : pureOne.trace = 1 := by rfl
+-- 10
+theorem maxMixed_trace : maxMixed.trace = 2 := by rfl
+-- 11
+theorem pureZero_entropy : pureZero.entropy = 0 := by rfl
+-- 12
+theorem maxMixed_entropy : maxMixed.entropy = 1 := by rfl
+-- 13
+theorem purePlus_entropy : purePlus.entropy = 0 := by rfl
+-- 14
+theorem pureZero_isPure : isPure pureZero := by simp [isPure]
+-- 15
+theorem maxMixed_isMixed : isMixed maxMixed := by simp [isMixed]
+-- 16
+theorem dephase_trace (ρ : DensityMatrix) :
+    (QOp.dephase.apply ρ).trace = ρ.trace := by rfl
+-- 17
+theorem bitFlip_trace (ρ : DensityMatrix) :
+    (QOp.bitFlip.apply ρ).trace = ρ.trace := by
+  simp [DensityMatrix.trace, Nat.add_comm]
+-- 18
+theorem bitFlip_entropy (ρ : DensityMatrix) :
+    (QOp.bitFlip.apply ρ).entropy = ρ.entropy := by
+  simp [DensityMatrix.entropy, Nat.mul_comm]
+-- 19
+theorem dephase_entropy (ρ : DensityMatrix) :
+    (QOp.dephase.apply ρ).entropy = ρ.p00 * ρ.p11 := by
+  simp [DensityMatrix.entropy]
+-- 20
+theorem depolarize_trace (ρ : DensityMatrix) :
+    (QOp.depolarize.apply ρ).trace = 2 := by rfl
 
-/-! ## Fidelity and trace distance -/
+/-! ## Fidelity and distance -/
 
-/-- Fidelity between two states (simplified). -/
 @[simp] def fidelity (ρ σ : DensityMatrix) : Nat :=
   ρ.p00 * σ.p00 + ρ.p11 * σ.p11 + ρ.coh * σ.coh
 
-/-- Trace distance (simplified: sum of absolute differences). -/
 @[simp] def traceDistance (ρ σ : DensityMatrix) : Nat :=
   (if ρ.p00 ≥ σ.p00 then ρ.p00 - σ.p00 else σ.p00 - ρ.p00) +
   (if ρ.p11 ≥ σ.p11 then ρ.p11 - σ.p11 else σ.p11 - ρ.p11)
 
-/-! ## Core theorems -/
-
--- 1. Pure |0⟩ has trace 1
-theorem pureZero_trace : trace pureZero = 1 := by rfl
-
-def pureZero_trace_path : Path (trace pureZero) 1 :=
-  Path.ofEq pureZero_trace
-
--- 2. Pure |1⟩ has trace 1
-theorem pureOne_trace : trace pureOne = 1 := by rfl
-
--- 3. Max mixed has trace 2
-theorem maxMixed_trace : trace maxMixed = 2 := by rfl
-
--- 4. Pure |0⟩ has zero entropy
-theorem pureZero_entropy : entropy pureZero = 0 := by rfl
-
-def pureZero_entropy_path : Path (entropy pureZero) 0 :=
-  Path.ofEq pureZero_entropy
-
--- 5. Max mixed has positive entropy
-theorem maxMixed_entropy : entropy maxMixed = 1 := by rfl
-
--- 6. Pure plus has zero entropy
-theorem purePlus_entropy : entropy purePlus = 0 := by rfl
-
--- 7. Identity channel preserves state
-theorem idChannel_apply (ρ : DensityMatrix) : idChannel ρ = ρ := by rfl
-
-def idChannel_path (ρ : DensityMatrix) : Path (idChannel ρ) ρ :=
-  Path.ofEq (idChannel_apply ρ)
-
--- 8. Depolarizing channel is constant
-theorem depolChannel_const (ρ σ : DensityMatrix) :
-    depolChannel ρ = depolChannel σ := by rfl
-
-def depolChannel_const_path (ρ σ : DensityMatrix) :
-    Path (depolChannel ρ) (depolChannel σ) :=
-  Path.ofEq (depolChannel_const ρ σ)
-
--- 9. Dephasing kills coherence
-theorem dephase_kills_coherence (ρ : DensityMatrix) :
-    (dephaseChannel ρ).coh = 0 := by rfl
-
--- 10. Bit flip is an involution
-theorem bitFlip_involution (ρ : DensityMatrix) :
-    bitFlipChannel (bitFlipChannel ρ) = ρ := by
-  cases ρ; simp [bitFlipChannel]
-
-def bitFlip_involution_path (ρ : DensityMatrix) :
-    Path (bitFlipChannel (bitFlipChannel ρ)) ρ :=
-  Path.ofEq (bitFlip_involution ρ)
-
--- 11. Channel composition associativity
-theorem compChannel_assoc (c1 c2 c3 : QChannel) :
-    compChannel (compChannel c1 c2) c3 = compChannel c1 (compChannel c2 c3) := by
-  funext ρ; rfl
-
-def compChannel_assoc_path (c1 c2 c3 : QChannel) :
-    Path (compChannel (compChannel c1 c2) c3)
-         (compChannel c1 (compChannel c2 c3)) :=
-  Path.ofEq (compChannel_assoc c1 c2 c3)
-
--- 12. Identity channel is left identity
-theorem compChannel_id_left (c : QChannel) :
-    compChannel idChannel c = c := by funext ρ; rfl
-
-def compChannel_id_left_path (c : QChannel) :
-    Path (compChannel idChannel c) c :=
-  Path.ofEq (compChannel_id_left c)
-
--- 13. Identity channel is right identity
-theorem compChannel_id_right (c : QChannel) :
-    compChannel c idChannel = c := by funext ρ; rfl
-
--- 14. Fidelity of state with itself
+-- 21
+theorem fidelity_comm (ρ σ : DensityMatrix) :
+    fidelity ρ σ = fidelity σ ρ := by simp [Nat.mul_comm]
+-- 22
+theorem traceDistance_self (ρ : DensityMatrix) : traceDistance ρ ρ = 0 := by simp
+-- 23
+theorem traceDistance_comm (ρ σ : DensityMatrix) :
+    traceDistance ρ σ = traceDistance σ ρ := by
+  simp only [traceDistance]; congr 1 <;> (split <;> split <;> omega)
+-- 24
+theorem fidelity_orthogonal : fidelity pureZero pureOne = 0 := by rfl
+-- 25
+theorem traceDistance_orthogonal : traceDistance pureZero pureOne = 2 := by rfl
+-- 26
 theorem fidelity_self (ρ : DensityMatrix) :
     fidelity ρ ρ = ρ.p00 * ρ.p00 + ρ.p11 * ρ.p11 + ρ.coh * ρ.coh := by rfl
 
--- 15. Fidelity is symmetric
-theorem fidelity_comm (ρ σ : DensityMatrix) :
-    fidelity ρ σ = fidelity σ ρ := by
-  simp [fidelity, Nat.mul_comm]
+/-! ## Channel algebra theorems -/
 
-def fidelity_comm_path (ρ σ : DensityMatrix) :
-    Path (fidelity ρ σ) (fidelity σ ρ) :=
-  Path.ofEq (fidelity_comm ρ σ)
+-- 27
+theorem channel_compose_assoc (c1 c2 c3 : QChannel) :
+    QChannel.compose (QChannel.compose c1 c2) c3 =
+    QChannel.compose c1 (QChannel.compose c2 c3) := by
+  simp [List.append_assoc]
+-- 28
+theorem channel_empty_apply (ρ : DensityMatrix) : QChannel.apply [] ρ = ρ := by rfl
+-- 29
+theorem channel_singleton (op : QOp) (ρ : DensityMatrix) :
+    QChannel.apply [op] ρ = op.apply ρ := by rfl
+-- 30
+theorem channel_compose_apply (c1 c2 : QChannel) (ρ : DensityMatrix) :
+    QChannel.apply (QChannel.compose c1 c2) ρ =
+    QChannel.apply c2 (QChannel.apply c1 ρ) := by
+  induction c1 generalizing ρ with
+  | nil => simp [QChannel.compose, QChannel.apply]
+  | cons op ops ih =>
+    simp only [QChannel.compose, List.cons_append, QChannel.apply]
+    exact ih (op.apply ρ)
+-- 31
+theorem channel_compose_nil_left (c : QChannel) (ρ : DensityMatrix) :
+    QChannel.apply (QChannel.compose [] c) ρ = QChannel.apply c ρ := by
+  simp [QChannel.compose, QChannel.apply]
+-- 32
+theorem channel_compose_nil_right (c : QChannel) (ρ : DensityMatrix) :
+    QChannel.apply (QChannel.compose c []) ρ = QChannel.apply c ρ := by
+  rw [channel_compose_apply]; rfl
+-- 33
+theorem depol_then_dephase (ρ : DensityMatrix) :
+    QChannel.apply [.depolarize, .dephase] ρ = QChannel.apply [.depolarize] ρ := by
+  simp [QChannel.apply]
+-- 34
+theorem bitFlip_twice_channel (ρ : DensityMatrix) :
+    QChannel.apply [.bitFlip, .bitFlip] ρ = ρ := by
+  cases ρ; simp [QChannel.apply, QOp.apply]
 
--- 16. Trace distance is zero for identical states
-theorem traceDistance_self (ρ : DensityMatrix) :
-    traceDistance ρ ρ = 0 := by
-  simp [traceDistance]
+/-! ## Genuine Path constructions via refl / trans / symm / congrArg -/
 
-def traceDistance_self_path (ρ : DensityMatrix) :
-    Path (traceDistance ρ ρ) 0 :=
-  Path.ofEq (traceDistance_self ρ)
+-- 35. Identity channel gives refl path
+def identity_path (ρ : DensityMatrix) : Path (QOp.identity.apply ρ) ρ :=
+  Path.refl ρ
 
--- 17. Trace distance is symmetric
-theorem traceDistance_comm (ρ σ : DensityMatrix) :
-    traceDistance ρ σ = traceDistance σ ρ := by
-  simp only [traceDistance]
-  congr 1
-  · split <;> split <;> omega
-  · split <;> split <;> omega
-
-def traceDistance_comm_path (ρ σ : DensityMatrix) :
-    Path (traceDistance ρ σ) (traceDistance σ ρ) :=
-  Path.ofEq (traceDistance_comm ρ σ)
-
--- 18. Depolarizing channel then dephasing = depolarizing
-theorem depol_dephase (ρ : DensityMatrix) :
-    dephaseChannel (depolChannel ρ) = depolChannel ρ := by rfl
-
--- 19. Dephasing is idempotent
-theorem dephase_idempotent (ρ : DensityMatrix) :
-    dephaseChannel (dephaseChannel ρ) = dephaseChannel ρ := by rfl
-
-def dephase_idempotent_path (ρ : DensityMatrix) :
-    Path (dephaseChannel (dephaseChannel ρ)) (dephaseChannel ρ) :=
-  Path.ofEq (dephase_idempotent ρ)
-
--- 20. Amplitude damping preserves total population
-theorem ampDamp_trace (ρ : DensityMatrix) :
-    trace (ampDampChannel ρ) = trace ρ := by
-  simp [ampDampChannel, trace]
-
-def ampDamp_trace_path (ρ : DensityMatrix) :
-    Path (trace (ampDampChannel ρ)) (trace ρ) :=
-  Path.ofEq (ampDamp_trace ρ)
-
--- 21. CongrArg through channel application
-def channel_congrArg {ρ σ : DensityMatrix} (c : QChannel) (p : Path ρ σ) :
-    Path (c ρ) (c σ) :=
-  Path.congrArg c p
-
--- 22. CongrArg through trace
+-- 36. CongrArg through trace
 def trace_congrArg {ρ σ : DensityMatrix} (p : Path ρ σ) :
-    Path (trace ρ) (trace σ) :=
-  Path.congrArg trace p
+    Path ρ.trace σ.trace :=
+  Path.congrArg DensityMatrix.trace p
 
--- 23. Transport along channel path
-theorem transport_channel (ρ : DensityMatrix) :
-    Path.transport (D := fun _ => Nat)
-      (idChannel_path ρ) (trace ρ) = trace ρ := by
-  simp [Path.transport]
+-- 37. CongrArg through entropy
+def entropy_congrArg {ρ σ : DensityMatrix} (p : Path ρ σ) :
+    Path ρ.entropy σ.entropy :=
+  Path.congrArg DensityMatrix.entropy p
 
--- 24. Pure state |0⟩ is indeed pure
-theorem pureZero_isPure : isPure pureZero := by
-  simp [isPure, pureZero]
+-- 38. CongrArg through QOp.apply
+def qop_congrArg (op : QOp) {ρ σ : DensityMatrix} (p : Path ρ σ) :
+    Path (op.apply ρ) (op.apply σ) :=
+  Path.congrArg op.apply p
 
--- 25. Max mixed is mixed (coherence < populations product)
-theorem maxMixed_isMixed : isMixed maxMixed := by
-  simp [isMixed, maxMixed]
+-- 39. CongrArg through fidelity (left)
+def fidelity_congrArg_left {ρ₁ ρ₂ : DensityMatrix} (σ : DensityMatrix)
+    (p : Path ρ₁ ρ₂) : Path (fidelity ρ₁ σ) (fidelity ρ₂ σ) :=
+  Path.congrArg (fun ρ => fidelity ρ σ) p
 
--- 26. Fidelity of orthogonal pure states
-theorem fidelity_orthogonal : fidelity pureZero pureOne = 0 := by rfl
+-- 40. CongrArg through fidelity (right)
+def fidelity_congrArg_right (ρ : DensityMatrix) {σ₁ σ₂ : DensityMatrix}
+    (p : Path σ₁ σ₂) : Path (fidelity ρ σ₁) (fidelity ρ σ₂) :=
+  Path.congrArg (fidelity ρ) p
 
-def fidelity_orthogonal_path : Path (fidelity pureZero pureOne) 0 :=
-  Path.ofEq fidelity_orthogonal
+-- 41. Symm of a density matrix path
+def dm_symm {ρ σ : DensityMatrix} (p : Path ρ σ) : Path σ ρ :=
+  Path.symm p
 
--- 27. Trace distance between orthogonal pure states
-theorem traceDistance_orthogonal : traceDistance pureZero pureOne = 2 := by rfl
+-- 42. Trans of density matrix paths
+def dm_trans {ρ σ τ : DensityMatrix} (p : Path ρ σ) (q : Path σ τ) : Path ρ τ :=
+  Path.trans p q
 
--- 28. Step construction for density matrix evolution
-def evolution_step (ρ : DensityMatrix) (c : QChannel) (h : ρ = c ρ) :
-    Step DensityMatrix := ⟨ρ, c ρ, h⟩
+-- 43. Refl is left identity for trans
+theorem dm_trans_refl_left {ρ σ : DensityMatrix} (p : Path ρ σ) :
+    Path.trans (Path.refl ρ) p = p := by simp
 
-def id_evolution_step (ρ : DensityMatrix) : Step DensityMatrix :=
-  ⟨idChannel ρ, ρ, idChannel_apply ρ⟩
+-- 44. Refl is right identity for trans
+theorem dm_trans_refl_right {ρ σ : DensityMatrix} (p : Path ρ σ) :
+    Path.trans p (Path.refl σ) = p := by simp
 
--- 29. Dephasing increases entropy (or keeps it same)
-theorem dephase_entropy (ρ : DensityMatrix) :
-    entropy (dephaseChannel ρ) = ρ.p00 * ρ.p11 := by
-  simp [entropy, dephaseChannel]
+-- 45. Trans is associative
+theorem dm_trans_assoc {ρ σ τ υ : DensityMatrix}
+    (p : Path ρ σ) (q : Path σ τ) (r : Path τ υ) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by simp
 
--- 30. Path coherence
+-- 46. Symm is involutive
+theorem dm_symm_symm {ρ σ : DensityMatrix} (p : Path ρ σ) :
+    Path.symm (Path.symm p) = p := Path.symm_symm p
+
+-- 47. CongrArg preserves trans
+theorem congrArg_trace_trans {ρ σ τ : DensityMatrix}
+    (p : Path ρ σ) (q : Path σ τ) :
+    Path.congrArg DensityMatrix.trace (Path.trans p q) =
+    Path.trans (Path.congrArg DensityMatrix.trace p)
+              (Path.congrArg DensityMatrix.trace q) := by simp
+
+-- 48. CongrArg preserves symm
+theorem congrArg_trace_symm {ρ σ : DensityMatrix} (p : Path ρ σ) :
+    Path.congrArg DensityMatrix.trace (Path.symm p) =
+    Path.symm (Path.congrArg DensityMatrix.trace p) := by simp
+
+/-! ## Transport -/
+
+-- 49. Transport a predicate along a density matrix path
+def transport_isPure {ρ σ : DensityMatrix} (p : Path ρ σ) (h : isPure ρ) :
+    isPure σ :=
+  Path.transport (D := isPure) p h
+
+-- 50. Transport const along density matrix path
+theorem transport_const_dm {ρ σ : DensityMatrix} (p : Path ρ σ) (n : Nat) :
+    Path.transport (D := fun _ => Nat) p n = n := by simp
+
+-- 51. Path coherence (UIP)
 theorem density_path_coherence {ρ σ : DensityMatrix} (p q : Path ρ σ) :
     p.proof = q.proof :=
   Subsingleton.elim _ _
+
+-- 52. CongrArg composition: trace ∘ apply = congrArg trace ∘ congrArg apply
+theorem congrArg_comp_trace_apply (op : QOp) {ρ σ : DensityMatrix}
+    (p : Path ρ σ) :
+    Path.congrArg (fun x => (op.apply x).trace) p =
+    Path.congrArg DensityMatrix.trace (Path.congrArg op.apply p) := by simp
 
 end ComputationalPaths.Path.Computation.QuantumInfoPaths
