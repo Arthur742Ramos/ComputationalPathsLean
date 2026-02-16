@@ -265,7 +265,7 @@ def teleport_id_path (q : QState) :
 -- 26. Double X correction cancels
 theorem teleport_double_X (q : QState) :
     teleport_correct ⟨1, by omega⟩ (teleport_correct ⟨1, by omega⟩ q) = q := by
-  simp [teleport_correct]; cases q; simp
+  simp [teleport_correct, pauliX]
 
 def teleport_double_X_path (q : QState) :
     Path (teleport_correct ⟨1, by omega⟩ (teleport_correct ⟨1, by omega⟩ q)) q :=

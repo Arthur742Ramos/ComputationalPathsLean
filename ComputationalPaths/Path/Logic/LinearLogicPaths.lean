@@ -15,7 +15,7 @@ into multi-step paths via `Path.trans`/`Path.symm`/`Path.congrArg`.
 - Troelstra, "Lectures on Linear Logic"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths
 namespace Path
@@ -78,7 +78,7 @@ theorem LProp.neg_neg {n : Nat} (A : LProp n) : A.neg.neg = A := by
 /-! ## Domain-specific rewrite steps for linear negation -/
 
 /-- Rewrite steps capturing De Morgan dualities and involutivity of negation. -/
-inductive LNegStep (n : Nat) : LProp n → LProp n → Prop where
+inductive LNegStep (n : Nat) : LProp n → LProp n → Type where
   | neg_neg (A : LProp n) : LNegStep n A.neg.neg A
   | tensor_demorgan (A B : LProp n) :
       LNegStep n (LProp.neg (LProp.tensor A B)) (LProp.par A.neg B.neg)
@@ -99,17 +99,17 @@ inductive LNegStep (n : Nat) : LProp n → LProp n → Prop where
 
 /-- Convert a negation rewrite step to a Path. -/
 def LNegStep.toPath : LNegStep n a b → Path a b
-  | .neg_neg A          => Path.mk [⟨_, _, LProp.neg_neg A⟩] (LProp.neg_neg A)
-  | .tensor_demorgan A B => Path.mk [⟨_, _, rfl⟩] rfl
-  | .par_demorgan A B    => Path.mk [⟨_, _, rfl⟩] rfl
-  | .with_demorgan A B   => Path.mk [⟨_, _, rfl⟩] rfl
-  | .plus_demorgan A B   => Path.mk [⟨_, _, rfl⟩] rfl
-  | .one_bot             => Path.mk [⟨_, _, rfl⟩] rfl
-  | .bot_one             => Path.mk [⟨_, _, rfl⟩] rfl
-  | .top_zero            => Path.mk [⟨_, _, rfl⟩] rfl
-  | .zero_top            => Path.mk [⟨_, _, rfl⟩] rfl
-  | .ofCourse_neg A      => Path.mk [⟨_, _, rfl⟩] rfl
-  | .whyNot_neg A        => Path.mk [⟨_, _, rfl⟩] rfl
+  | .neg_neg A          => Path.mk [Step.mk _ _ (LProp.neg_neg A)] (LProp.neg_neg A)
+  | .tensor_demorgan _ _ => Path.refl _
+  | .par_demorgan _ _    => Path.refl _
+  | .with_demorgan _ _   => Path.refl _
+  | .plus_demorgan _ _   => Path.refl _
+  | .one_bot             => Path.refl _
+  | .bot_one             => Path.refl _
+  | .top_zero            => Path.refl _
+  | .zero_top            => Path.refl _
+  | .ofCourse_neg _      => Path.refl _
+  | .whyNot_neg _        => Path.refl _
 
 /-! ## Negation paths -/
 
@@ -243,7 +243,7 @@ structure PhaseSpace where
   mul_e : ∀ a, mul a e = a
 
 /-- Rewrite steps for phase space monoid. -/
-inductive PhaseStep (P : PhaseSpace.{u}) : P.carrier → P.carrier → Prop where
+inductive PhaseStep (P : PhaseSpace.{u}) : P.carrier → P.carrier → Type u where
   | comm (a b : P.carrier) : PhaseStep P (P.mul a b) (P.mul b a)
   | assoc (a b c : P.carrier) :
       PhaseStep P (P.mul (P.mul a b) c) (P.mul a (P.mul b c))
@@ -251,11 +251,14 @@ inductive PhaseStep (P : PhaseSpace.{u}) : P.carrier → P.carrier → Prop wher
   | unit_left (a : P.carrier) : PhaseStep P (P.mul P.e a) a
 
 def PhaseStep.toPath : PhaseStep P a b → Path a b
-  | .comm a b       => Path.mk [⟨_, _, P.mul_comm a b⟩] (P.mul_comm a b)
-  | .assoc a b c    => Path.mk [⟨_, _, P.mul_assoc a b c⟩] (P.mul_assoc a b c)
-  | .unit_right a   => Path.mk [⟨_, _, P.mul_e a⟩] (P.mul_e a)
-  | .unit_left a    => Path.mk [⟨_, _, by rw [P.mul_comm]; exact P.mul_e a⟩]
-      (by rw [P.mul_comm]; exact P.mul_e a)
+  | .comm a b       => Path.mk [Step.mk _ _ (P.mul_comm a b)] (P.mul_comm a b)
+  | .assoc a b c    => Path.mk [Step.mk _ _ (P.mul_assoc a b c)] (P.mul_assoc a b c)
+  | .unit_right a   => Path.mk [Step.mk _ _ (P.mul_e a)] (P.mul_e a)
+  | .unit_left a    =>
+      have h : P.mul P.e a = a := by
+        have := P.mul_comm P.e a
+        rw [this]; exact P.mul_e a
+      Path.mk [Step.mk _ _ h] h
 
 -- 23. Phase space commutativity path
 def phaseCommPath (P : PhaseSpace.{u}) (a b : P.carrier) :
@@ -287,8 +290,7 @@ def phaseTripleAssoc (P : PhaseSpace.{u}) (a b c d : P.carrier) :
     Path (P.mul (P.mul (P.mul a b) c) d) (P.mul a (P.mul b (P.mul c d))) :=
   Path.trans
     (phaseAssocPath P (P.mul a b) c d)
-    (Path.congrArg (fun x => P.mul x (P.mul c d)) (phaseAssocPath P a b (P.mul c d)).proof ▸
-      phaseAssocPath P a b (P.mul c d))
+    (phaseAssocPath P a b (P.mul c d))
 
 /-- Orthogonal of a set in a phase space. -/
 def PhaseSpace.orth (P : PhaseSpace) (S : P.carrier → Prop) : P.carrier → Prop :=
