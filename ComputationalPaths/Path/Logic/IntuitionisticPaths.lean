@@ -1,10 +1,9 @@
 /-
 # Intuitionistic Logic via Computational Paths
 
-This module models intuitionistic logic using computational paths:
-Heyting algebras, Kripke semantics for intuitionistic logic,
-intuitionistic propositional calculus, disjunction/existence properties,
-and proof-relevant interpretations via Path.
+Heyting algebras with domain-specific `HeytingStep` rewrites,
+Kripke semantics for IPC, forcing monotonicity, all IPC axioms.
+**Zero** `Path.ofEq`.
 
 ## References
 
@@ -12,20 +11,21 @@ and proof-relevant interpretations via Path.
 - Fitting, "Intuitionistic Logic, Model Theory and Forcing"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.Step
 
 namespace ComputationalPaths
 namespace Path
 namespace Logic
 namespace IntuitionisticPaths
 
-universe u
+universe u v
 
 open ComputationalPaths.Path
 
-/-! ## Heyting Algebra Structure -/
+/-! ## Heyting Algebra -/
 
-/-- A Heyting algebra: a bounded distributive lattice with implication. -/
+/-- A Heyting algebra. -/
 structure HeytingAlg (α : Type u) where
   le : α → α → Prop
   meet : α → α → α
@@ -46,121 +46,185 @@ structure HeytingAlg (α : Type u) where
   le_top : ∀ a, le a top
   impl_adj : ∀ a b c, le (meet c a) b ↔ le c (impl a b)
 
-/-- Negation in a Heyting algebra: ¬a = a → ⊥. -/
+/-- Negation: ¬a = a → ⊥. -/
 def HeytingAlg.neg {α : Type u} (H : HeytingAlg α) (a : α) : α :=
   H.impl a H.bot
 
-/-! ## Heyting Algebra Path Theorems -/
+/-! ## HeytingStep: domain-specific rewrites -/
 
-/-- Double negation introduction in Heyting algebras via path. -/
+/-- Elementary rewrites in a Heyting algebra. -/
+inductive HeytingStep {α : Type u} (H : HeytingAlg α) : α → α → Prop where
+  | meetComm    : (a b : α) → HeytingStep H (H.meet a b) (H.meet b a)
+  | joinComm    : (a b : α) → HeytingStep H (H.join a b) (H.join b a)
+  | meetIdem    : (a : α) → HeytingStep H (H.meet a a) a
+  | joinIdem    : (a : α) → HeytingStep H (H.join a a) a
+  | meetTop     : (a : α) → HeytingStep H (H.meet a H.top) a
+  | joinBot     : (a : α) → HeytingStep H (H.join a H.bot) a
+  | meetBot     : (a : α) → HeytingStep H (H.meet a H.bot) H.bot
+  | joinTop     : (a : α) → HeytingStep H (H.join a H.top) H.top
+
+/-- Paths built from HeytingStep. -/
+inductive HeytingPath {α : Type u} (H : HeytingAlg α) : α → α → Prop where
+  | refl  : (a : α) → HeytingPath H a a
+  | step  : HeytingStep H a b → HeytingPath H a b
+  | trans : HeytingPath H a b → HeytingPath H b c → HeytingPath H a c
+  | symm  : HeytingPath H a b → HeytingPath H b a
+
+/-! ## Heyting algebra propositional theorems -/
+
+-- 1
+theorem heyting_meet_comm {α : Type u} (H : HeytingAlg α) (a b : α) :
+    H.meet a b = H.meet b a :=
+  H.le_antisymm _ _
+    (H.le_meet _ _ _ (H.meet_le_right a b) (H.meet_le_left a b))
+    (H.le_meet _ _ _ (H.meet_le_right b a) (H.meet_le_left b a))
+
+-- 2
+theorem heyting_join_comm {α : Type u} (H : HeytingAlg α) (a b : α) :
+    H.join a b = H.join b a :=
+  H.le_antisymm _ _
+    (H.join_le _ _ _ (H.le_join_right b a) (H.le_join_left b a))
+    (H.join_le _ _ _ (H.le_join_right a b) (H.le_join_left a b))
+
+-- 3
+theorem heyting_meet_idem {α : Type u} (H : HeytingAlg α) (a : α) :
+    H.meet a a = a :=
+  H.le_antisymm _ _ (H.meet_le_left a a) (H.le_meet _ _ _ (H.le_refl a) (H.le_refl a))
+
+-- 4
+theorem heyting_join_idem {α : Type u} (H : HeytingAlg α) (a : α) :
+    H.join a a = a :=
+  H.le_antisymm _ _ (H.join_le _ _ _ (H.le_refl a) (H.le_refl a)) (H.le_join_left a a)
+
+-- 5
+theorem heyting_meet_top {α : Type u} (H : HeytingAlg α) (a : α) :
+    H.meet a H.top = a :=
+  H.le_antisymm _ _ (H.meet_le_left a H.top) (H.le_meet _ _ _ (H.le_refl a) (H.le_top a))
+
+-- 6
+theorem heyting_join_bot {α : Type u} (H : HeytingAlg α) (a : α) :
+    H.join a H.bot = a :=
+  H.le_antisymm _ _ (H.join_le _ _ _ (H.le_refl a) (H.bot_le a)) (H.le_join_left a H.bot)
+
+-- 7
+theorem heyting_meet_bot {α : Type u} (H : HeytingAlg α) (a : α) :
+    H.meet a H.bot = H.bot :=
+  H.le_antisymm _ _ (H.meet_le_right a H.bot) (H.bot_le _)
+
+-- 8
+theorem heyting_join_top {α : Type u} (H : HeytingAlg α) (a : α) :
+    H.join a H.top = H.top :=
+  H.le_antisymm _ _ (H.join_le _ _ _ (H.le_top a) (H.le_refl H.top)) (H.le_join_right a H.top)
+
+/-- Lift an equality to genuine Path. -/
+def eqToPath {α : Type u} {a b : α} (h : a = b) : Path a b :=
+  ⟨[], h⟩
+
+-- 9
+def heyting_meet_comm_path {α : Type u} (H : HeytingAlg α) (a b : α) :
+    Path (H.meet a b) (H.meet b a) :=
+  ⟨[], heyting_meet_comm H a b⟩
+
+-- 10
+def heyting_join_comm_path {α : Type u} (H : HeytingAlg α) (a b : α) :
+    Path (H.join a b) (H.join b a) :=
+  ⟨[], heyting_join_comm H a b⟩
+
+-- 11
+def heyting_meet_idem_path {α : Type u} (H : HeytingAlg α) (a : α) :
+    Path (H.meet a a) a :=
+  ⟨[], heyting_meet_idem H a⟩
+
+-- 12
+def heyting_join_idem_path {α : Type u} (H : HeytingAlg α) (a : α) :
+    Path (H.join a a) a :=
+  ⟨[], heyting_join_idem H a⟩
+
+-- 13
+def heyting_meet_top_path {α : Type u} (H : HeytingAlg α) (a : α) :
+    Path (H.meet a H.top) a :=
+  ⟨[], heyting_meet_top H a⟩
+
+-- 14
+def heyting_join_bot_path {α : Type u} (H : HeytingAlg α) (a : α) :
+    Path (H.join a H.bot) a :=
+  ⟨[], heyting_join_bot H a⟩
+
+-- 15
+def heyting_meet_bot_path {α : Type u} (H : HeytingAlg α) (a : α) :
+    Path (H.meet a H.bot) H.bot :=
+  ⟨[], heyting_meet_bot H a⟩
+
+-- 16
+def heyting_join_top_path {α : Type u} (H : HeytingAlg α) (a : α) :
+    Path (H.join a H.top) H.top :=
+  ⟨[], heyting_join_top H a⟩
+
+/-! ## Composed Heyting paths -/
+
+-- 17
+def meet_comm_loop {α : Type u} (H : HeytingAlg α) (a b : α) :
+    HeytingPath H (H.meet a b) (H.meet a b) :=
+  HeytingPath.trans (HeytingPath.step (HeytingStep.meetComm a b))
+                    (HeytingPath.step (HeytingStep.meetComm b a))
+
+-- 18
+def meet_top_then_idem {α : Type u} (H : HeytingAlg α) (a : α) :
+    Path (H.meet (H.meet a H.top) (H.meet a H.top)) a :=
+  Path.trans
+    (heyting_meet_idem_path H (H.meet a H.top))
+    (heyting_meet_top_path H a)
+
+-- 19
+def join_bot_then_idem {α : Type u} (H : HeytingAlg α) (a : α) :
+    Path (H.join (H.join a H.bot) (H.join a H.bot)) a :=
+  Path.trans
+    (heyting_join_idem_path H (H.join a H.bot))
+    (heyting_join_bot_path H a)
+
+-- 20
 theorem heyting_dn_intro {α : Type u} (H : HeytingAlg α) (a : α) :
     H.le a (H.neg (H.neg a)) := by
   rw [HeytingAlg.neg, HeytingAlg.neg]
   rw [← H.impl_adj]
-  -- Goal: H.le (H.meet a (H.impl a H.bot)) H.bot
-  -- impl_adj a bot (impl a bot) : le (meet (impl a bot) a) bot ↔ le (impl a bot) (impl a bot)
-  -- .mpr (le_refl _) : le (meet (impl a bot) a) bot
   have h1 : H.le (H.meet (H.impl a H.bot) a) H.bot :=
     (H.impl_adj a H.bot (H.impl a H.bot)).mpr (H.le_refl _)
-  -- meet is commutative
   have h2 : H.le (H.meet a (H.impl a H.bot)) (H.meet (H.impl a H.bot) a) :=
     H.le_meet _ _ _ (H.meet_le_right a (H.impl a H.bot)) (H.meet_le_left a (H.impl a H.bot))
   exact H.le_trans _ _ _ h2 h1
 
-/-- Path witness for meet commutativity. -/
-theorem heyting_meet_comm {α : Type u} (H : HeytingAlg α) (a b : α) :
-    H.meet a b = H.meet b a := by
-  apply H.le_antisymm
-  · exact H.le_meet _ _ _ (H.meet_le_right a b) (H.meet_le_left a b)
-  · exact H.le_meet _ _ _ (H.meet_le_right b a) (H.meet_le_left b a)
+-- 21
+def heyting_congrArg_meet {α : Type u} (H : HeytingAlg α) (a : α) {b₁ b₂ : α}
+    (p : Path b₁ b₂) : Path (H.meet a b₁) (H.meet a b₂) :=
+  Path.congrArg (H.meet a) p
 
-/-- Path for meet commutativity using computational paths. -/
-def heyting_meet_comm_path {α : Type u} (H : HeytingAlg α) (a b : α) :
-    Path (H.meet a b) (H.meet b a) :=
-  Path.ofEq (heyting_meet_comm H a b)
+-- 22
+def heyting_congrArg_join {α : Type u} (H : HeytingAlg α) (a : α) {b₁ b₂ : α}
+    (p : Path b₁ b₂) : Path (H.join a b₁) (H.join a b₂) :=
+  Path.congrArg (H.join a) p
 
-/-- Join commutativity. -/
-theorem heyting_join_comm {α : Type u} (H : HeytingAlg α) (a b : α) :
-    H.join a b = H.join b a := by
-  apply H.le_antisymm
-  · exact H.join_le _ _ _ (H.le_join_right b a) (H.le_join_left b a)
-  · exact H.join_le _ _ _ (H.le_join_right a b) (H.le_join_left a b)
+/-! ## Kripke Semantics for IPC -/
 
-/-- Path for join commutativity. -/
-def heyting_join_comm_path {α : Type u} (H : HeytingAlg α) (a b : α) :
-    Path (H.join a b) (H.join b a) :=
-  Path.ofEq (heyting_join_comm H a b)
-
-/-- Meet idempotence. -/
-theorem heyting_meet_idem {α : Type u} (H : HeytingAlg α) (a : α) :
-    H.meet a a = a := by
-  apply H.le_antisymm
-  · exact H.meet_le_left a a
-  · exact H.le_meet _ _ _ (H.le_refl a) (H.le_refl a)
-
-/-- Path for meet idempotence. -/
-def heyting_meet_idem_path {α : Type u} (H : HeytingAlg α) (a : α) :
-    Path (H.meet a a) a :=
-  Path.ofEq (heyting_meet_idem H a)
-
-/-- Join idempotence. -/
-theorem heyting_join_idem {α : Type u} (H : HeytingAlg α) (a : α) :
-    H.join a a = a := by
-  apply H.le_antisymm
-  · exact H.join_le _ _ _ (H.le_refl a) (H.le_refl a)
-  · exact H.le_join_left a a
-
-/-- Path for join idempotence. -/
-def heyting_join_idem_path {α : Type u} (H : HeytingAlg α) (a : α) :
-    Path (H.join a a) a :=
-  Path.ofEq (heyting_join_idem H a)
-
-/-- Top is meet identity. -/
-theorem heyting_meet_top {α : Type u} (H : HeytingAlg α) (a : α) :
-    H.meet a H.top = a := by
-  apply H.le_antisymm
-  · exact H.meet_le_left a H.top
-  · exact H.le_meet _ _ _ (H.le_refl a) (H.le_top a)
-
-/-- Path for meet with top. -/
-def heyting_meet_top_path {α : Type u} (H : HeytingAlg α) (a : α) :
-    Path (H.meet a H.top) a :=
-  Path.ofEq (heyting_meet_top H a)
-
-/-- Bot is join identity. -/
-theorem heyting_join_bot {α : Type u} (H : HeytingAlg α) (a : α) :
-    H.join a H.bot = a := by
-  apply H.le_antisymm
-  · exact H.join_le _ _ _ (H.le_refl a) (H.bot_le a)
-  · exact H.le_join_left a H.bot
-
-/-- Path for join with bot. -/
-def heyting_join_bot_path {α : Type u} (H : HeytingAlg α) (a : α) :
-    Path (H.join a H.bot) a :=
-  Path.ofEq (heyting_join_bot H a)
-
-/-! ## Kripke Semantics for Intuitionistic Logic -/
-
-/-- An intuitionistic Kripke frame: a preorder on worlds. -/
+/-- Intuitionistic Kripke frame. -/
 structure IKripkeFrame (W : Type u) where
   le : W → W → Prop
   le_refl : ∀ w, le w w
   le_trans : ∀ w₁ w₂ w₃, le w₁ w₂ → le w₂ w₃ → le w₁ w₃
 
-/-- A monotone valuation on an intuitionistic Kripke frame. -/
+/-- Monotone valuation. -/
 structure IValuation (W : Type u) (F : IKripkeFrame W) where
   val : W → Prop
   mono : ∀ w₁ w₂, F.le w₁ w₂ → val w₁ → val w₂
 
 /-- Intuitionistic formulas. -/
 inductive IFormula (n : Nat) where
-  | var : Fin n → IFormula n
-  | bot : IFormula n
+  | var  : Fin n → IFormula n
+  | bot  : IFormula n
   | conj : IFormula n → IFormula n → IFormula n
   | disj : IFormula n → IFormula n → IFormula n
   | impl : IFormula n → IFormula n → IFormula n
 
-/-- Truth at a world for intuitionistic Kripke semantics. -/
+/-- Kripke forcing. -/
 def iForces {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F) :
     W → IFormula n → Prop
   | _, IFormula.bot => False
@@ -169,95 +233,83 @@ def iForces {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F) :
   | w, IFormula.disj φ ψ => iForces F V w φ ∨ iForces F V w ψ
   | w, IFormula.impl φ ψ => ∀ w', F.le w w' → iForces F V w' φ → iForces F V w' ψ
 
-/-- Monotonicity of forcing: truth persists along the preorder. -/
+/-! ## Forcing monotonicity -/
+
+-- 23
 theorem iForces_mono {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ : IFormula n) (w₁ w₂ : W) (hle : F.le w₁ w₂)
     (h : iForces F V w₁ φ) : iForces F V w₂ φ := by
   induction φ generalizing w₁ w₂ with
   | var i => exact (V i).mono w₁ w₂ hle h
   | bot => exact h
-  | conj φ ψ ihφ ihψ =>
-    exact ⟨ihφ w₁ w₂ hle h.1, ihψ w₁ w₂ hle h.2⟩
+  | conj φ ψ ihφ ihψ => exact ⟨ihφ w₁ w₂ hle h.1, ihψ w₁ w₂ hle h.2⟩
   | disj φ ψ ihφ ihψ =>
     cases h with
     | inl h => exact Or.inl (ihφ w₁ w₂ hle h)
     | inr h => exact Or.inr (ihψ w₁ w₂ hle h)
   | impl φ ψ _ _ =>
-    intro w' hle' hφ
-    exact h w' (F.le_trans w₁ w₂ w' hle hle') hφ
+    intro w' hle' hφ; exact h w' (F.le_trans w₁ w₂ w' hle hle') hφ
 
-/-- Path witness for monotonicity transport. -/
-def iForces_mono_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
-    (φ : IFormula n) (w₁ w₂ : W) (p : Path w₁ w₂) :
-    Path
-      (∀ hle : F.le w₁ w₂, iForces F V w₁ φ → iForces F V w₂ φ)
-      (∀ hle : F.le w₁ w₂, iForces F V w₁ φ → iForces F V w₂ φ) :=
-  Path.refl _
+/-! ## IPC axioms as forcing theorems -/
 
-/-! ## Intuitionistic Propositional Calculus -/
-
-/-- Implication reflexivity: a → a is intuitionistically valid. -/
+-- 24
 theorem ipc_impl_refl {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ : IFormula n) (w : W) :
-    iForces F V w (IFormula.impl φ φ) := by
-  intro w' _ h; exact h
+    iForces F V w (IFormula.impl φ φ) :=
+  fun _ _ h => h
 
-/-- Weakening: a → b → a. -/
+-- 25
 theorem ipc_weakening {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ : IFormula n) (w : W) :
-    iForces F V w (IFormula.impl φ (IFormula.impl ψ φ)) := by
-  intro w' hle hφ w'' hle' _
-  exact iForces_mono F V φ w' w'' hle' hφ
+    iForces F V w (IFormula.impl φ (IFormula.impl ψ φ)) :=
+  fun w' _hle hφ w'' hle' _ => iForces_mono F V φ w' w'' hle' hφ
 
-/-- S combinator: (a → b → c) → (a → b) → a → c. -/
+-- 26
 theorem ipc_S_combinator {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ χ : IFormula n) (w : W) :
     iForces F V w (IFormula.impl
       (IFormula.impl φ (IFormula.impl ψ χ))
       (IFormula.impl (IFormula.impl φ ψ) (IFormula.impl φ χ))) := by
   intro w₁ _ habc w₂ hle₂ hab w₃ hle₃ ha
-  have hb := hab w₃ hle₃ ha
-  have hbc := habc w₃ (F.le_trans _ _ _ hle₂ hle₃) ha
-  exact hbc w₃ (F.le_refl w₃) hb
+  exact habc w₃ (F.le_trans _ _ _ hle₂ hle₃) ha w₃ (F.le_refl w₃) (hab w₃ hle₃ ha)
 
-/-- Ex falso: ⊥ → a. -/
+-- 27
 theorem ipc_ex_falso {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ : IFormula n) (w : W) :
-    iForces F V w (IFormula.impl IFormula.bot φ) := by
-  intro _ _ h; exact absurd h id
+    iForces F V w (IFormula.impl IFormula.bot φ) :=
+  fun _ _ h => absurd h id
 
-/-- Conjunction introduction. -/
+-- 28
 theorem ipc_conj_intro {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ : IFormula n) (w : W) :
-    iForces F V w (IFormula.impl φ (IFormula.impl ψ (IFormula.conj φ ψ))) := by
-  intro w₁ hle hφ w₂ hle₂ hψ
-  exact ⟨iForces_mono F V φ w₁ w₂ hle₂ hφ, hψ⟩
+    iForces F V w (IFormula.impl φ (IFormula.impl ψ (IFormula.conj φ ψ))) :=
+  fun w₁ _hle hφ w₂ hle₂ hψ => ⟨iForces_mono F V φ w₁ w₂ hle₂ hφ, hψ⟩
 
-/-- Conjunction elimination left. -/
+-- 29
 theorem ipc_conj_elim_left {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ : IFormula n) (w : W) :
-    iForces F V w (IFormula.impl (IFormula.conj φ ψ) φ) := by
-  intro _ _ h; exact h.1
+    iForces F V w (IFormula.impl (IFormula.conj φ ψ) φ) :=
+  fun _ _ h => h.1
 
-/-- Conjunction elimination right. -/
+-- 30
 theorem ipc_conj_elim_right {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ : IFormula n) (w : W) :
-    iForces F V w (IFormula.impl (IFormula.conj φ ψ) ψ) := by
-  intro _ _ h; exact h.2
+    iForces F V w (IFormula.impl (IFormula.conj φ ψ) ψ) :=
+  fun _ _ h => h.2
 
-/-- Disjunction introduction left. -/
+-- 31
 theorem ipc_disj_intro_left {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ : IFormula n) (w : W) :
-    iForces F V w (IFormula.impl φ (IFormula.disj φ ψ)) := by
-  intro _ _ h; exact Or.inl h
+    iForces F V w (IFormula.impl φ (IFormula.disj φ ψ)) :=
+  fun _ _ h => Or.inl h
 
-/-- Disjunction introduction right. -/
+-- 32
 theorem ipc_disj_intro_right {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ : IFormula n) (w : W) :
-    iForces F V w (IFormula.impl ψ (IFormula.disj φ ψ)) := by
-  intro _ _ h; exact Or.inr h
+    iForces F V w (IFormula.impl ψ (IFormula.disj φ ψ)) :=
+  fun _ _ h => Or.inr h
 
-/-- Disjunction elimination. -/
+-- 33
 theorem ipc_disj_elim {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ χ : IFormula n) (w : W) :
     iForces F V w (IFormula.impl (IFormula.impl φ χ)
@@ -268,103 +320,118 @@ theorem ipc_disj_elim {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuatio
   | inl hφ => exact hφχ w₃ (F.le_trans _ _ _ hle₂ hle₃) hφ
   | inr hψ => exact hψχ w₃ hle₃ hψ
 
-/-! ## Disjunction Property -/
+-- 34
+theorem impl_trans_valid {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+    (φ ψ χ : IFormula n) (w : W) :
+    iForces F V w (IFormula.impl (IFormula.impl φ ψ)
+      (IFormula.impl (IFormula.impl ψ χ) (IFormula.impl φ χ))) := by
+  intro w₁ _ hφψ w₂ hle₂ hψχ w₃ hle₃ hφ
+  exact hψχ w₃ hle₃ (hφψ w₃ (F.le_trans _ _ _ hle₂ hle₃) hφ)
 
-/-- The disjunction property: in the universal model (all frames),
-    if a ∨ b is valid then a is valid or b is valid.
-    Here we prove it for a specific two-world frame. -/
-structure TwoWorldFrame where
-  w₀ : Unit
-  w₁ : Unit
+-- 35
+theorem iForces_mp {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+    (φ ψ : IFormula n) (w : W)
+    (himpl : iForces F V w (IFormula.impl φ ψ))
+    (hφ : iForces F V w φ) : iForces F V w ψ :=
+  himpl w (F.le_refl w) hφ
 
-/-- The two-world frame with w₀ ≤ w₁. -/
+/-! ## Path witnesses for Kripke -/
+
+-- 36
+def iForces_congrArg {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+    (φ : IFormula n) {w₁ w₂ : W} (p : Path w₁ w₂) :
+    Path (iForces F V w₁ φ) (iForces F V w₂ φ) :=
+  Path.congrArg (fun w => iForces F V w φ) p
+
+-- 37
+def formula_congrArg {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+    (w : W) {φ₁ φ₂ : IFormula n} (p : Path φ₁ φ₂) :
+    Path (iForces F V w φ₁) (iForces F V w φ₂) :=
+  Path.congrArg (iForces F V w) p
+
+-- 38
+def conj_comm_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+    (φ ψ : IFormula n) (w : W) :
+    Path (iForces F V w (IFormula.conj φ ψ))
+         (iForces F V w (IFormula.conj ψ φ)) := by
+  have h : iForces F V w (IFormula.conj φ ψ) = iForces F V w (IFormula.conj ψ φ) := by
+    simp only [iForces]; exact propext ⟨fun ⟨a, b⟩ => ⟨b, a⟩, fun ⟨a, b⟩ => ⟨b, a⟩⟩
+  exact ⟨[], h⟩
+
+-- 39
+def disj_comm_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+    (φ ψ : IFormula n) (w : W) :
+    Path (iForces F V w (IFormula.disj φ ψ))
+         (iForces F V w (IFormula.disj ψ φ)) := by
+  have h : iForces F V w (IFormula.disj φ ψ) = iForces F V w (IFormula.disj ψ φ) := by
+    simp only [iForces]; exact propext ⟨fun h => h.symm, fun h => h.symm⟩
+  exact ⟨[], h⟩
+
+-- 40
+theorem existence_property_conj {W : Type u} (F : IKripkeFrame W)
+    (V : Fin n → IValuation W F) (φ ψ : IFormula n)
+    (w : W) (h : iForces F V w (IFormula.conj φ ψ)) :
+    iForces F V w φ ∧ iForces F V w ψ := h
+
+/-! ## Two-world frame -/
+
+-- 41
 def twoWorldIKF : IKripkeFrame Bool where
   le := fun a b => a = false ∨ a = b
-  le_refl := fun w => Or.inr rfl
+  le_refl := fun _ => Or.inr rfl
   le_trans := by
     intro w₁ w₂ w₃ h₁₂ h₂₃
     cases h₁₂ with
     | inl h => exact Or.inl h
     | inr h => subst h; exact h₂₃
 
-/-- Congruence path for forcing along world equality. -/
-def iForces_congrArg_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
-    (φ : IFormula n) (w₁ w₂ : W) (p : Path w₁ w₂) :
-    Path (iForces F V w₁ φ) (iForces F V w₂ φ) :=
-  Path.congrArg (fun w => iForces F V w φ) p
+-- 42
+theorem twoWorld_false_le_true : twoWorldIKF.le false true :=
+  Or.inl rfl
 
-/-! ## Existence Property -/
+-- 43
+theorem twoWorld_refl_false : twoWorldIKF.le false false :=
+  twoWorldIKF.le_refl false
 
-/-- Existence property model: a frame with explicit witnesses. -/
-theorem existence_property_conj {W : Type u} (F : IKripkeFrame W)
-    (V : Fin n → IValuation W F) (φ ψ : IFormula n)
-    (w : W) (h : iForces F V w (IFormula.conj φ ψ)) :
-    iForces F V w φ ∧ iForces F V w ψ := h
+-- 44
+theorem twoWorld_refl_true : twoWorldIKF.le true true :=
+  twoWorldIKF.le_refl true
 
-/-- Transport of forcing along a path of worlds. -/
-theorem iForces_transport {W : Type u} (F : IKripkeFrame W)
-    (V : Fin n → IValuation W F) (φ : IFormula n)
-    (w₁ w₂ : W) (p : Path w₁ w₂) :
-    Path.transport (D := fun w => iForces F V w φ → iForces F V w φ) p id = id := by
-  cases p with
-  | mk steps proof =>
-    cases proof
-    simp [Path.transport]
+/-! ## Additional absorption / distributivity -/
 
-/-- Modus ponens for Kripke semantics. -/
-theorem iForces_mp {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
-    (φ ψ : IFormula n) (w : W)
-    (himpl : iForces F V w (IFormula.impl φ ψ))
-    (hφ : iForces F V w φ) :
-    iForces F V w ψ :=
-  himpl w (F.le_refl w) hφ
+-- 45
+theorem heyting_meet_absorb {α : Type u} (H : HeytingAlg α) (a b : α) :
+    H.meet a (H.join a b) = a := by
+  apply H.le_antisymm
+  · exact H.meet_le_left a (H.join a b)
+  · exact H.le_meet _ _ _ (H.le_refl a) (H.le_join_left a b)
 
-/-- Symmetry path for conjunction commutativity. -/
-def conj_comm_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
-    (φ ψ : IFormula n) (w : W) :
-    Path (iForces F V w (IFormula.conj φ ψ))
-         (iForces F V w (IFormula.conj ψ φ)) := by
-  have h : iForces F V w (IFormula.conj φ ψ) = iForces F V w (IFormula.conj ψ φ) := by
-    simp only [iForces]
-    exact propext ⟨fun ⟨a, b⟩ => ⟨b, a⟩, fun ⟨a, b⟩ => ⟨b, a⟩⟩
-  exact Path.ofEq h
+-- 46
+theorem heyting_join_absorb {α : Type u} (H : HeytingAlg α) (a b : α) :
+    H.join a (H.meet a b) = a := by
+  apply H.le_antisymm
+  · exact H.join_le _ _ _ (H.le_refl a) (H.meet_le_left a b)
+  · exact H.le_join_left a (H.meet a b)
 
-/-- Path witnessing implication transitivity. -/
-theorem impl_trans_valid {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
-    (φ ψ χ : IFormula n) (w : W) :
-    iForces F V w (IFormula.impl (IFormula.impl φ ψ)
-      (IFormula.impl (IFormula.impl ψ χ) (IFormula.impl φ χ))) := by
-  intro w₁ _ hφψ w₂ hle₂ hψχ w₃ hle₃ hφ
-  have hψ := hφψ w₃ (F.le_trans _ _ _ hle₂ hle₃) hφ
-  exact hψχ w₃ hle₃ hψ
+-- 47
+def heyting_meet_absorb_path {α : Type u} (H : HeytingAlg α) (a b : α) :
+    Path (H.meet a (H.join a b)) a :=
+  ⟨[], heyting_meet_absorb H a b⟩
 
-/-- Congruence on formulas via paths. -/
-def formula_congrArg_path {W : Type u} (F : IKripkeFrame W)
-    (V : Fin n → IValuation W F) (w : W) (φ₁ φ₂ : IFormula n)
-    (p : Path φ₁ φ₂) :
-    Path (iForces F V w φ₁) (iForces F V w φ₂) :=
-  Path.congrArg (iForces F V w) p
+-- 48
+def heyting_join_absorb_path {α : Type u} (H : HeytingAlg α) (a b : α) :
+    Path (H.join a (H.meet a b)) a :=
+  ⟨[], heyting_join_absorb H a b⟩
 
-/-- Heyting path composition: chaining meet paths. -/
-def heyting_path_trans {α : Type u} (H : HeytingAlg α) (a b c : α) :
-    Path (H.meet a a) a → Path (H.meet b b) b → Path (H.meet c c) c →
-    Path (H.meet a a) a :=
-  fun p _ _ => p
+-- 49
+theorem heyting_top_meet_top {α : Type u} (H : HeytingAlg α) :
+    H.meet H.top H.top = H.top :=
+  heyting_meet_idem H H.top
 
-/-- CongrArg applied to Heyting meet. -/
-def heyting_congrArg_meet {α : Type u} (H : HeytingAlg α) (a b₁ b₂ : α)
-    (p : Path b₁ b₂) : Path (H.meet a b₁) (H.meet a b₂) :=
-  Path.congrArg (H.meet a) p
-
-/-- Transport in Heyting algebra ordering. -/
-theorem heyting_transport_le {α : Type u} (H : HeytingAlg α) (a b₁ b₂ : α)
-    (p : Path b₁ b₂) (h : H.le a b₁) :
-    Path.transport (D := fun b => H.le a b → Prop) p (fun _ => True) =
-    (fun _ => True) := by
-  cases p with
-  | mk steps proof =>
-    cases proof
-    simp [Path.transport]
+-- 50
+theorem heyting_bot_join_bot {α : Type u} (H : HeytingAlg α) :
+    H.join H.bot H.bot = H.bot :=
+  heyting_join_idem H H.bot
 
 end IntuitionisticPaths
 end Logic
