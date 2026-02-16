@@ -201,11 +201,11 @@ def add_zero_path (e : IntExpr) : IntPath (IntExpr.add e IntExpr.zero) e :=
 
 -- 10
 theorem zero_add_eval (e : IntExpr) :
-    eval_eq (zero_add_path e) = by simp := by simp [zero_add_path]
+    eval_eq (zero_add_path e) = by simp := by simp
 
 -- 11
 theorem add_zero_eval (e : IntExpr) :
-    eval_eq (add_zero_path e) = by simp := by simp [add_zero_path]
+    eval_eq (add_zero_path e) = by simp := by simp
 
 /-! ## 3. Additive Inverse Paths -/
 
@@ -224,7 +224,7 @@ def neg_neg_path (e : IntExpr) : IntPath (IntExpr.neg (IntExpr.neg e)) e :=
 -- 15
 theorem neg_neg_eval (e : IntExpr) :
     (eval_eq (neg_neg_path e)) = Int.neg_neg (e.eval) := by
-  simp [neg_neg_path]
+  simp
 
 /-! ## 4. Commutativity and Associativity -/
 
@@ -376,17 +376,17 @@ theorem length_trans {a b c : IntExpr} (p : IntPath a b) (q : IntPath b c) :
 -- 45: add_comm is self-inverse on eval
 theorem add_comm_roundtrip (e₁ e₂ : IntExpr) :
     eval_eq (trans (add_comm_path e₁ e₂) (add_comm_path e₂ e₁)) = rfl := by
-  simp [add_comm_path]
+  simp
 
 -- 46: mul_comm is self-inverse on eval
 theorem mul_comm_roundtrip (e₁ e₂ : IntExpr) :
     eval_eq (trans (mul_comm_path e₁ e₂) (mul_comm_path e₂ e₁)) = rfl := by
-  simp [mul_comm_path]
+  simp
 
 -- 47: symm of add_comm path reverses direction
 theorem add_comm_symm_eval (e₁ e₂ : IntExpr) :
     eval_eq (symm (add_comm_path e₁ e₂)) = eval_eq (add_comm_path e₂ e₁) := by
-  simp [add_comm_path, IntStep.eval_eq, Int.add_comm]
+  simp [Int.add_comm]
 
 /-! ## 12. toPath Coherence -/
 
@@ -421,10 +421,10 @@ def comm_3_5 : IntPath (IntExpr.add (IntExpr.lit 3) (IntExpr.lit 5))
   step (IntStep.add_comm (IntExpr.lit 3) (IntExpr.lit 5))
 
 -- 55
-theorem zero_add_42_eval : eval_eq zero_add_42 = rfl := by simp [zero_add_42]
+theorem zero_add_42_eval : eval_eq zero_add_42 = rfl := by simp
 
 -- 56
-theorem mul_one_42_eval : eval_eq mul_one_42 = rfl := by simp [mul_one_42]
+theorem mul_one_42_eval : eval_eq mul_one_42 = rfl := by simp
 
 end IntPath
 
