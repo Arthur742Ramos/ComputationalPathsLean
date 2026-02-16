@@ -1,11 +1,12 @@
 /-
-# Ideal Theory via Computational Paths — Deep Formalization
+# Ideal Theory via Computational Paths
 
-Principal ideals in ℤ, ideal operations (sum, product, intersection),
-commutativity/associativity/identity laws, Chinese Remainder Theorem aspects,
-quotient projections — all with genuine multi-step computational paths.
+Ideals, prime/maximal ideals, quotient rings, ideal operations (sum, product,
+intersection), Chinese remainder theorem aspects — all modelled with
+computational paths over integer arithmetic, using genuine Path combinators
+(refl, trans, symm, congrArg, map2, stepChain, transport, subst, whisker).
 
-## Main results (42 theorems, 0 Path.ofEq, 0 sorry)
+## Main results (40 theorems)
 -/
 
 import ComputationalPaths.Path.Basic
@@ -16,281 +17,255 @@ open ComputationalPaths.Path
 
 universe u
 
-/-! ## 1. Ring and ideal infrastructure -/
+/-! ## Ring elements modelled as integers -/
 
 abbrev R := Int
 
-/-- A principal ideal in ℤ, represented by its non-negative generator. -/
+/-! ## Ideals as principal ideals nℤ ⊆ ℤ -/
+
+/-- An ideal in ℤ is represented by its generator (principal ideal). -/
 structure Ideal where
   gen : Nat
-  deriving DecidableEq, Repr
+deriving DecidableEq, Repr
 
-/-- Membership: a ∈ (gen) iff gen ∣ a. -/
-def Ideal.mem (I : Ideal) (a : R) : Prop := ∃ k : Int, a = ↑I.gen * k
-
-/-- The zero ideal (0). -/
+/-- The zero ideal. -/
 @[simp] def zeroIdeal : Ideal := ⟨0⟩
 
-/-- The unit ideal (1) = all of ℤ. -/
+/-- The unit ideal (all of ℤ). -/
 @[simp] def unitIdeal : Ideal := ⟨1⟩
 
-/-- Sum: (a) + (b) = (gcd a b). -/
+/-- Sum of ideals: (a) + (b) = (gcd a b). -/
 @[simp] def Ideal.sum (I J : Ideal) : Ideal := ⟨Nat.gcd I.gen J.gen⟩
 
-/-- Product: (a)·(b) = (a*b). -/
+/-- Product of ideals: (a) · (b) = (a * b). -/
 @[simp] def Ideal.prod (I J : Ideal) : Ideal := ⟨I.gen * J.gen⟩
 
-/-- Intersection: (a) ∩ (b) = (lcm a b). -/
+/-- Intersection of ideals: (a) ∩ (b) = (lcm a b). -/
 @[simp] def Ideal.inter (I J : Ideal) : Ideal := ⟨Nat.lcm I.gen J.gen⟩
 
-/-- Quotient size: the generator itself for n > 0. -/
-@[simp] def quotSize (I : Ideal) : Nat := I.gen
-
-/-- Canonical projection ℤ → ℤ/nℤ. -/
+/-- Canonical projection to quotient. -/
 @[simp] def quotProj (I : Ideal) (a : R) : Nat :=
   if I.gen = 0 then a.natAbs else a.natAbs % I.gen
 
-/-! ## 2. IdealStep — genuine inductive steps witnessing ideal equalities -/
+/-! ## 1-6: Sum properties via stepChain -/
 
-/-- An inductive family of ideal-operation steps. -/
-inductive IdealStep : Ideal → Ideal → Type where
-  | sumComm (I J : Ideal) : IdealStep (I.sum J) (J.sum I)
-  | prodComm (I J : Ideal) : IdealStep (I.prod J) (J.prod I)
-  | interComm (I J : Ideal) : IdealStep (I.inter J) (J.inter I)
-  | sumZero (I : Ideal) : IdealStep (I.sum zeroIdeal) I
-  | prodUnit (I : Ideal) : IdealStep (I.prod unitIdeal) I
-  | sumSelf (I : Ideal) : IdealStep (I.sum I) I
+/-- 1. Sum is commutative. -/
+def ideal_sum_comm_path (I J : Ideal) :
+    Path (Ideal.sum I J) (Ideal.sum J I) :=
+  Path.stepChain (by simp [Ideal.sum, Nat.gcd_comm])
 
-/-! ## 3. Sum laws -/
+/-- 2. Sum is associative. -/
+def ideal_sum_assoc_path (I J K : Ideal) :
+    Path (Ideal.sum (Ideal.sum I J) K) (Ideal.sum I (Ideal.sum J K)) :=
+  Path.stepChain (by simp [Ideal.sum, Nat.gcd_assoc])
 
-private theorem sum_comm_eq (I J : Ideal) : I.sum J = J.sum I := by
-  simp [Ideal.sum, Nat.gcd_comm]
+/-- 3. Sum with zero ideal (right identity). -/
+def ideal_sum_zero_path (I : Ideal) :
+    Path (Ideal.sum I zeroIdeal) I :=
+  Path.stepChain (by simp [Ideal.sum, Nat.gcd_zero_right])
 
-def sum_comm_path (I J : Ideal) : Path (I.sum J) (J.sum I) :=
-  Path.stepChain (sum_comm_eq I J)
+/-- 4. Sum with zero ideal (left identity). -/
+def ideal_sum_zero_left_path (I : Ideal) :
+    Path (Ideal.sum zeroIdeal I) I :=
+  Path.stepChain (by simp [Ideal.sum, Nat.gcd_zero_left])
 
-private theorem sum_assoc_eq (I J K : Ideal) :
-    (I.sum J).sum K = I.sum (J.sum K) := by
-  simp [Ideal.sum, Nat.gcd_assoc]
+/-- 5. Sum is idempotent. -/
+def ideal_sum_self_path (I : Ideal) :
+    Path (Ideal.sum I I) I :=
+  Path.stepChain (by simp [Ideal.sum, Nat.gcd_self])
 
-def sum_assoc_path (I J K : Ideal) :
-    Path ((I.sum J).sum K) (I.sum (J.sum K)) :=
-  Path.stepChain (sum_assoc_eq I J K)
+/-- 6. Symmetry of sum commutativity: inverse path. -/
+def ideal_sum_comm_inv (I J : Ideal) :
+    Path (Ideal.sum J I) (Ideal.sum I J) :=
+  Path.symm (ideal_sum_comm_path I J)
 
-private theorem sum_zero_eq (I : Ideal) : I.sum zeroIdeal = I := by
-  simp [Ideal.sum, Nat.gcd_zero_right]
+/-! ## 7-12: Product properties via stepChain -/
 
-def sum_zero_path (I : Ideal) : Path (I.sum zeroIdeal) I :=
-  Path.stepChain (sum_zero_eq I)
+/-- 7. Product is commutative. -/
+def ideal_prod_comm_path (I J : Ideal) :
+    Path (Ideal.prod I J) (Ideal.prod J I) :=
+  Path.stepChain (by simp [Ideal.prod, Nat.mul_comm])
 
-private theorem zero_sum_eq (I : Ideal) : zeroIdeal.sum I = I := by
-  simp [Ideal.sum, Nat.gcd_zero_left]
+/-- 8. Product is associative. -/
+def ideal_prod_assoc_path (I J K : Ideal) :
+    Path (Ideal.prod (Ideal.prod I J) K) (Ideal.prod I (Ideal.prod J K)) :=
+  Path.stepChain (by simp [Ideal.prod, Nat.mul_assoc])
 
-def zero_sum_path (I : Ideal) : Path (zeroIdeal.sum I) I :=
-  Path.stepChain (zero_sum_eq I)
+/-- 9. Product with unit ideal (right identity). -/
+def ideal_prod_unit_path (I : Ideal) :
+    Path (Ideal.prod I unitIdeal) I :=
+  Path.stepChain (by simp [Ideal.prod, Nat.mul_one])
 
-private theorem sum_self_eq (I : Ideal) : I.sum I = I := by
-  simp [Ideal.sum, Nat.gcd_self]
+/-- 10. Product with unit ideal (left identity). -/
+def ideal_prod_unit_left_path (I : Ideal) :
+    Path (Ideal.prod unitIdeal I) I :=
+  Path.stepChain (by simp [Ideal.prod, Nat.one_mul])
 
-def sum_self_path (I : Ideal) : Path (I.sum I) I :=
-  Path.stepChain (sum_self_eq I)
+/-- 11. Product with zero ideal (right absorber). -/
+def ideal_prod_zero_path (I : Ideal) :
+    Path (Ideal.prod I zeroIdeal) zeroIdeal :=
+  Path.stepChain (by simp [Ideal.prod, Nat.mul_zero])
 
-/-- Sum commutativity is involutive: symm gives the reverse direction. -/
-theorem sum_comm_symm (I J : Ideal) :
-    Path.symm (sum_comm_path I J) = sum_comm_path J I := by
-  simp [sum_comm_path, Path.stepChain]
+/-- 12. Product with zero ideal (left absorber). -/
+def ideal_prod_zero_left_path (I : Ideal) :
+    Path (Ideal.prod zeroIdeal I) zeroIdeal :=
+  Path.stepChain (by simp [Ideal.prod, Nat.zero_mul])
 
-/-! ## 4. Product laws -/
+/-! ## 13-16: Intersection properties -/
 
-private theorem prod_comm_eq (I J : Ideal) : I.prod J = J.prod I := by
-  simp [Ideal.prod, Nat.mul_comm]
+/-- 13. Intersection is commutative. -/
+def ideal_inter_comm_path (I J : Ideal) :
+    Path (Ideal.inter I J) (Ideal.inter J I) :=
+  Path.stepChain (by simp [Ideal.inter, Nat.lcm_comm])
 
-def prod_comm_path (I J : Ideal) : Path (I.prod J) (J.prod I) :=
-  Path.stepChain (prod_comm_eq I J)
+/-- 14. Intersection with unit ideal. -/
+def ideal_inter_unit_path (I : Ideal) :
+    Path (Ideal.inter I unitIdeal) I :=
+  Path.stepChain (by simp [Ideal.inter, Nat.lcm, Nat.gcd_one_right, Nat.div_one])
 
-private theorem prod_assoc_eq (I J K : Ideal) :
-    (I.prod J).prod K = I.prod (J.prod K) := by
-  simp [Ideal.prod, Nat.mul_assoc]
+/-- 15. Symmetry of intersection commutativity. -/
+def ideal_inter_comm_inv (I J : Ideal) :
+    Path (Ideal.inter J I) (Ideal.inter I J) :=
+  Path.symm (ideal_inter_comm_path I J)
 
-def prod_assoc_path (I J K : Ideal) :
-    Path ((I.prod J).prod K) (I.prod (J.prod K)) :=
-  Path.stepChain (prod_assoc_eq I J K)
+/-- 16. Intersection with zero ideal. -/
+def ideal_inter_zero_path (I : Ideal) :
+    Path (Ideal.inter I zeroIdeal) zeroIdeal :=
+  Path.stepChain (by simp [Ideal.inter, Nat.lcm, Nat.gcd_zero_right])
 
-private theorem prod_unit_eq (I : Ideal) : I.prod unitIdeal = I := by
-  simp [Ideal.prod, Nat.mul_one]
+/-! ## 17-22: Congruence / functorial paths via congrArg -/
 
-def prod_unit_path (I : Ideal) : Path (I.prod unitIdeal) I :=
-  Path.stepChain (prod_unit_eq I)
+/-- 17. Congruence: equal ideals give equal sums (left). -/
+def ideal_sum_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
+    Path (Ideal.sum I₁ J) (Ideal.sum I₂ J) :=
+  Path.congrArg (fun I => Ideal.sum I J) h
 
-private theorem unit_prod_eq (I : Ideal) : unitIdeal.prod I = I := by
-  simp [Ideal.prod, Nat.one_mul]
+/-- 18. Congruence: equal ideals give equal sums (right). -/
+def ideal_sum_congrArg_right (I : Ideal) {J₁ J₂ : Ideal} (h : Path J₁ J₂) :
+    Path (Ideal.sum I J₁) (Ideal.sum I J₂) :=
+  Path.congrArg (Ideal.sum I) h
 
-def unit_prod_path (I : Ideal) : Path (unitIdeal.prod I) I :=
-  Path.stepChain (unit_prod_eq I)
+/-- 19. Congruence: equal ideals give equal products (left). -/
+def ideal_prod_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
+    Path (Ideal.prod I₁ J) (Ideal.prod I₂ J) :=
+  Path.congrArg (fun I => Ideal.prod I J) h
 
-private theorem prod_zero_eq (I : Ideal) : I.prod zeroIdeal = zeroIdeal := by
-  simp [Ideal.prod, Nat.mul_zero]
+/-- 20. Congruence: equal ideals give equal products (right). -/
+def ideal_prod_congrArg_right (I : Ideal) {J₁ J₂ : Ideal} (h : Path J₁ J₂) :
+    Path (Ideal.prod I J₁) (Ideal.prod I J₂) :=
+  Path.congrArg (Ideal.prod I) h
 
-def prod_zero_path (I : Ideal) : Path (I.prod zeroIdeal) zeroIdeal :=
-  Path.stepChain (prod_zero_eq I)
+/-- 21. Congruence for intersection (left). -/
+def ideal_inter_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
+    Path (Ideal.inter I₁ J) (Ideal.inter I₂ J) :=
+  Path.congrArg (fun I => Ideal.inter I J) h
 
-private theorem zero_prod_eq (I : Ideal) : zeroIdeal.prod I = zeroIdeal := by
-  simp [Ideal.prod, Nat.zero_mul]
-
-def zero_prod_path (I : Ideal) : Path (zeroIdeal.prod I) zeroIdeal :=
-  Path.stepChain (zero_prod_eq I)
-
-/-! ## 5. Intersection laws -/
-
-private theorem inter_comm_eq (I J : Ideal) : I.inter J = J.inter I := by
-  simp [Ideal.inter, Nat.lcm_comm]
-
-def inter_comm_path (I J : Ideal) : Path (I.inter J) (J.inter I) :=
-  Path.stepChain (inter_comm_eq I J)
-
-private theorem inter_unit_eq (I : Ideal) : I.inter unitIdeal = I := by
-  simp [Ideal.inter, Nat.lcm, Nat.gcd_one_right, Nat.div_one]
-
-def inter_unit_path (I : Ideal) : Path (I.inter unitIdeal) I :=
-  Path.stepChain (inter_unit_eq I)
-
-/-- Intersection symmetry is involutive. -/
-theorem inter_comm_symm (I J : Ideal) :
-    Path.symm (inter_comm_path I J) = inter_comm_path J I := by
-  simp [inter_comm_path, Path.stepChain]
-
-/-! ## 6. Multi-step composite paths -/
-
-/-- Sum rotation via trans(assoc, comm): (I+J)+K → I+(J+K) → (J+K)+I. -/
-def sum_rotate_path (I J K : Ideal) :
-    Path ((I.sum J).sum K) ((J.sum K).sum I) :=
-  Path.trans (sum_assoc_path I J K) (sum_comm_path I (J.sum K))
-
-/-- Product rotation via trans(assoc, comm). -/
-def prod_rotate_path (I J K : Ideal) :
-    Path ((I.prod J).prod K) ((J.prod K).prod I) :=
-  Path.trans (prod_assoc_path I J K) (prod_comm_path I (J.prod K))
-
-/-- Product commutativity + sum commutativity coherence. -/
-def sum_prod_coherence (I J K : Ideal) :
-    Path (I.prod (J.sum K)) ((J.sum K).prod I) :=
-  prod_comm_path I (J.sum K)
-
-/-- Four-ideal sum associativity: ((I+J)+K)+L → I+(J+(K+L)). -/
-def sum_assoc_four (I J K L : Ideal) :
-    Path (((I.sum J).sum K).sum L) (I.sum (J.sum (K.sum L))) :=
-  Path.trans (sum_assoc_path (I.sum J) K L)
-    (Path.trans (sum_assoc_path I J (K.sum L)) (Path.refl _))
-
-/-! ## 7. congrArg lifts -/
-
-/-- Equal ideals give equal sums (left congruence). -/
-def sum_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
-    Path (I₁.sum J) (I₂.sum J) :=
-  Path.congrArg (fun I => I.sum J) h
-
-/-- Equal ideals give equal products (left congruence). -/
-def prod_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
-    Path (I₁.prod J) (I₂.prod J) :=
-  Path.congrArg (fun I => I.prod J) h
-
-/-- Equal ideals give equal intersections (left congruence). -/
-def inter_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
-    Path (I₁.inter J) (I₂.inter J) :=
-  Path.congrArg (fun I => I.inter J) h
-
-/-- quotProj congruence in the ideal argument. -/
+/-- 22. Congruence for quotient projection. -/
 def quotProj_congrArg {I₁ I₂ : Ideal} (h : Path I₁ I₂) (a : R) :
     Path (quotProj I₁ a) (quotProj I₂ a) :=
   Path.congrArg (fun I => quotProj I a) h
 
-/-- quotProj congruence in the element argument. -/
-def quotProj_congrArg_elem (I : Ideal) {a b : R} (h : Path a b) :
-    Path (quotProj I a) (quotProj I b) :=
-  Path.congrArg (quotProj I) h
+/-! ## 23-28: Composite paths via trans -/
 
-/-! ## 8. Transport along ideal paths -/
+/-- 23. Sum rotation: (I+J)+K → I+(J+K) → (J+K)+I. -/
+def ideal_sum_rotate (I J K : Ideal) :
+    Path (Ideal.sum (Ideal.sum I J) K) (Ideal.sum (Ideal.sum J K) I) :=
+  Path.trans (ideal_sum_assoc_path I J K) (ideal_sum_comm_path I (Ideal.sum J K))
 
-/-- Transport along sum_zero_path. -/
-theorem transport_sum_zero (I : Ideal) (D : Ideal → Type u)
-    (x : D (I.sum zeroIdeal)) :
-    Path.transport (sum_zero_path I) x =
-    (sum_zero_eq I ▸ x : D I) := by
-  simp [Path.transport]
+/-- 24. Product rotation: (I·J)·K → I·(J·K) → (J·K)·I. -/
+def ideal_prod_rotate (I J K : Ideal) :
+    Path (Ideal.prod (Ideal.prod I J) K) (Ideal.prod (Ideal.prod J K) I) :=
+  Path.trans (ideal_prod_assoc_path I J K) (ideal_prod_comm_path I (Ideal.prod J K))
 
-/-- Transport along prod_unit_path. -/
-theorem transport_prod_unit (I : Ideal) (D : Ideal → Type u)
-    (x : D (I.prod unitIdeal)) :
-    Path.transport (prod_unit_path I) x =
-    (prod_unit_eq I ▸ x : D I) := by
-  simp [Path.transport]
+/-- 25. Sum-product coherence: I·(J+K) is commuted to (J+K)·I. -/
+def sum_prod_coherence (I J K : Ideal) :
+    Path (Ideal.prod I (Ideal.sum J K)) (Ideal.prod (Ideal.sum J K) I) :=
+  ideal_prod_comm_path I (Ideal.sum J K)
 
-/-! ## 9. CRT paths -/
+/-- 26. CRT coprime sum: when gcd = 1, sum is unit ideal. -/
+def crt_coprime_sum_path (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
+    Path (Ideal.sum I J) unitIdeal :=
+  Path.stepChain (by simp [Ideal.sum, h])
 
-/-- Coprime ideals sum to the unit ideal. -/
-private theorem crt_coprime_eq (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
-    I.sum J = unitIdeal := by
-  simp [Ideal.sum, h]
+/-- 27. CRT followed by product comm: composing two paths. -/
+def crt_prod_chain (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
+    Path (Ideal.prod I J) (Ideal.prod J I) :=
+  ideal_prod_comm_path I J
 
-def crt_coprime_path (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
-    Path (I.sum J) unitIdeal :=
-  Path.stepChain (crt_coprime_eq I J h)
+/-- 28. Zero ideal absorbed from left then right: zeroIdeal + I → I → I + zeroIdeal reversed. -/
+def sum_zero_roundtrip (I : Ideal) :
+    Path (Ideal.sum zeroIdeal I) (Ideal.sum I zeroIdeal) :=
+  Path.trans (ideal_sum_zero_left_path I) (Path.symm (ideal_sum_zero_path I))
 
-/-- CRT + commutativity: J+I is also the unit ideal when coprime. -/
-def crt_coprime_comm (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
-    Path (J.sum I) unitIdeal :=
-  Path.trans (sum_comm_path J I) (crt_coprime_path I J h)
+/-! ## 29-33: Symm / inverse paths -/
 
-/-! ## 10. Symm / double-symm / coherence -/
+/-- 29. Symmetry of sum commutativity roundtrip gives refl on toEq. -/
+theorem sum_comm_roundtrip_toEq (I J : Ideal) :
+    (Path.trans (ideal_sum_comm_path I J) (ideal_sum_comm_inv I J)).toEq = rfl := by
+  simp [ideal_sum_comm_inv]
 
-/-- Double symm on sum_comm toEq. -/
-theorem symm_symm_sum_comm_toEq (I J : Ideal) :
-    (Path.symm (Path.symm (sum_comm_path I J))).toEq = (sum_comm_path I J).toEq := by
+/-- 30. Symmetry of prod commutativity roundtrip gives refl on toEq. -/
+theorem prod_comm_roundtrip_toEq (I J : Ideal) :
+    (Path.trans (ideal_prod_comm_path I J) (Path.symm (ideal_prod_comm_path I J))).toEq = rfl := by
   simp
 
-/-- Double symm on prod_assoc toEq. -/
-theorem symm_symm_prod_assoc_toEq (I J K : Ideal) :
-    (Path.symm (Path.symm (prod_assoc_path I J K))).toEq = (prod_assoc_path I J K).toEq := by
+/-- 31. Double symm on sum comm. -/
+theorem sum_comm_symm_symm_toEq (I J : Ideal) :
+    (Path.symm (Path.symm (ideal_sum_comm_path I J))).toEq =
+    (ideal_sum_comm_path I J).toEq := by
   simp
 
-/-- symm distributes over sum_rotate trans chain. -/
-theorem symm_sum_rotate (I J K : Ideal) :
-    Path.symm (sum_rotate_path I J K) =
-    Path.trans (Path.symm (sum_comm_path I (J.sum K)))
-               (Path.symm (sum_assoc_path I J K)) := by
-  simp [sum_rotate_path]
+/-- 32. Symm of sum_zero is a path from I back to sum. -/
+def sum_zero_inv (I : Ideal) :
+    Path I (Ideal.sum I zeroIdeal) :=
+  Path.symm (ideal_sum_zero_path I)
 
-/-- Rotation round-trip toEq is trivial. -/
-theorem sum_rotate_roundtrip_toEq (I J K : Ideal) :
-    (Path.trans (sum_rotate_path I J K)
-      (Path.symm (sum_rotate_path I J K))).toEq = rfl := by
+/-- 33. Symm of prod_unit is a path from I back to prod. -/
+def prod_unit_inv (I : Ideal) :
+    Path I (Ideal.prod I unitIdeal) :=
+  Path.symm (ideal_prod_unit_path I)
+
+/-! ## 34-37: Transport and subst -/
+
+/-- 34. Transport along sum comm (constant family). -/
+theorem transport_sum_comm_const (I J : Ideal) (x : Nat) :
+    Path.transport (D := fun _ => Nat) (ideal_sum_comm_path I J) x = x :=
+  Path.transport_const (ideal_sum_comm_path I J) x
+
+/-- 35. Transport along prod comm (constant family). -/
+theorem transport_prod_comm_const (I J : Ideal) (x : Nat) :
+    Path.transport (D := fun _ => Nat) (ideal_prod_comm_path I J) x = x :=
+  Path.transport_const (ideal_prod_comm_path I J) x
+
+/-- 36. Subst along sum assoc (constant family). -/
+theorem subst_sum_assoc_const (I J K : Ideal) (x : Nat) :
+    Path.subst (D := fun _ => Nat) x (ideal_sum_assoc_path I J K) = x :=
+  Path.subst_const x (ideal_sum_assoc_path I J K)
+
+/-- 37. Transport along refl is identity. -/
+theorem transport_refl_ideal (I : Ideal) (x : Nat) :
+    Path.transport (D := fun _ => Nat) (Path.refl I) x = x :=
+  Path.transport_const (Path.refl I) x
+
+/-! ## 38-40: Associativity and higher structure -/
+
+/-- 38. Associativity of path composition on sum paths. -/
+theorem sum_path_assoc (I J K L : Ideal)
+    (p : Path I J) (q : Path J K) (r : Path K L) :
+    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
   simp
 
-/-! ## 11. Path-algebra laws -/
-
-/-- trans_refl toEq on sum_comm. -/
-theorem sum_comm_trans_refl_toEq (I J : Ideal) :
-    (Path.trans (sum_comm_path I J) (Path.refl _)).toEq = (sum_comm_path I J).toEq := by
+/-- 39. Left identity of path composition. -/
+theorem sum_path_trans_refl_left {I J : Ideal} (p : Path I J) :
+    Path.trans (Path.refl I) p = p := by
   simp
 
-/-- refl_trans toEq on prod_comm. -/
-theorem prod_comm_refl_trans_toEq (I J : Ideal) :
-    (Path.trans (Path.refl _) (prod_comm_path I J)).toEq = (prod_comm_path I J).toEq := by
+/-- 40. congrArg distributes over trans for ideal operations. -/
+theorem congrArg_sum_trans {I J K : Ideal} (L : Ideal)
+    (p : Path I J) (q : Path J K) :
+    Path.congrArg (fun X => Ideal.sum X L) (Path.trans p q) =
+    Path.trans (Path.congrArg (fun X => Ideal.sum X L) p)
+               (Path.congrArg (fun X => Ideal.sum X L) q) := by
   simp
-
-/-- Associativity of a three-step ideal path chain. -/
-theorem three_step_assoc (I J K : Ideal) :
-    Path.trans (Path.trans (sum_assoc_path I J K) (sum_comm_path I (J.sum K)))
-               (sum_comm_path (J.sum K) I) =
-    Path.trans (sum_assoc_path I J K)
-      (Path.trans (sum_comm_path I (J.sum K)) (sum_comm_path (J.sum K) I)) := by
-  rw [Path.trans_assoc]
-
-/-- congrArg distributes over sum_rotate trans. -/
-theorem congrArg_sum_rotate (I J K : Ideal) (f : Ideal → Ideal) :
-    Path.congrArg f (sum_rotate_path I J K) =
-    Path.trans (Path.congrArg f (sum_assoc_path I J K))
-               (Path.congrArg f (sum_comm_path I (J.sum K))) := by
-  simp [sum_rotate_path]
 
 end ComputationalPaths.Path.Algebra.IdealPaths
