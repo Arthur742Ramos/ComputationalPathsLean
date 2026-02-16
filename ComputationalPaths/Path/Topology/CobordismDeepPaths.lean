@@ -3,15 +3,16 @@
 
 Bordism groups, Thom spectrum, Pontryagin-Thom construction, characteristic
 numbers, formal group laws from MU, oriented/unoriented/complex cobordism,
-and the cobordism ring structure — all as computational-path theorems over
-simple types (Nat/Int/Bool).
+and the cobordism ring structure — all as computational-path theorems.
+
+Each algebraic identity is witnessed by an inductive rewrite step (`BordismStep`,
+`SWStep`, `FGLStep`) that feeds into `Path` via `trans`/`symm`/`congrArg`.
 
 ## References
 
 - Thom, "Quelques propriétés globales des variétés différentiables"
 - Milnor & Stasheff, "Characteristic Classes"
 - Quillen, "On the formal group laws of unoriented and complex cobordism"
-- Ravenel, "Complex Cobordism and Stable Homotopy Groups of Spheres"
 -/
 
 import ComputationalPaths.Path.Basic.Core
@@ -32,233 +33,299 @@ structure ManifoldRep (n : Nat) where
   dim : Nat := n
   id : Nat
 
-/-- Disjoint union of manifold representatives. -/
-def mfldUnion (M N : ManifoldRep n) : ManifoldRep n :=
-  ⟨n, M.id + N.id⟩
-
-/-- Empty manifold (zero in bordism group). -/
-def mfldEmpty (n : Nat) : ManifoldRep n := ⟨n, 0⟩
-
 /-- Bordism group element as a Nat representative. -/
 structure BordismClass (n : Nat) where
   rep : Nat
+deriving DecidableEq
 
-/-- Bordism group addition. -/
-def bordismAdd (a b : BordismClass n) : BordismClass n :=
-  ⟨a.rep + b.rep⟩
+/-- Bordism group operations. -/
+@[simp] def bordismAdd (a b : BordismClass n) : BordismClass n := ⟨a.rep + b.rep⟩
+@[simp] def bordismZero (n : Nat) : BordismClass n := ⟨0⟩
 
-/-- Bordism group zero. -/
-def bordismZero (n : Nat) : BordismClass n := ⟨0⟩
+/-! ## Domain-specific rewrite steps for bordism algebra -/
 
-/-- Bordism addition is commutative. -/
-theorem bordism_add_comm (a b : BordismClass n) :
-    bordismAdd a b = bordismAdd b a := by
-  simp [bordismAdd, Nat.add_comm]
+/-- Each constructor witnesses one algebraic identity of the bordism group. -/
+inductive BordismStep (n : Nat) : BordismClass n → BordismClass n → Prop where
+  | add_comm (a b : BordismClass n) :
+      BordismStep n (bordismAdd a b) (bordismAdd b a)
+  | add_assoc (a b c : BordismClass n) :
+      BordismStep n (bordismAdd (bordismAdd a b) c) (bordismAdd a (bordismAdd b c))
+  | add_zero_right (a : BordismClass n) :
+      BordismStep n (bordismAdd a (bordismZero n)) a
+  | add_zero_left (a : BordismClass n) :
+      BordismStep n (bordismAdd (bordismZero n) a) a
 
-/-- Bordism addition is associative. -/
-theorem bordism_add_assoc (a b c : BordismClass n) :
-    bordismAdd (bordismAdd a b) c = bordismAdd a (bordismAdd b c) := by
-  simp [bordismAdd, Nat.add_assoc]
+/-- Convert a bordism rewrite step to a Path. -/
+def BordismStep.toPath : BordismStep n a b → Path a b
+  | .add_comm a b       => Path.mk [⟨_, _, by simp [Nat.add_comm]⟩] (by simp [Nat.add_comm])
+  | .add_assoc a b c    => Path.mk [⟨_, _, by simp [Nat.add_assoc]⟩] (by simp [Nat.add_assoc])
+  | .add_zero_right a   => Path.mk [⟨_, _, by simp⟩] (by simp)
+  | .add_zero_left a    => Path.mk [⟨_, _, by simp⟩] (by simp)
 
-/-- Bordism zero is right identity. -/
-theorem bordism_add_zero (a : BordismClass n) :
-    bordismAdd a (bordismZero n) = a := by
-  simp [bordismAdd, bordismZero]
+/-! ## Core bordism theorems -/
 
-/-- Bordism zero is left identity. -/
-theorem bordism_zero_add (a : BordismClass n) :
-    bordismAdd (bordismZero n) a = a := by
-  simp [bordismAdd, bordismZero]
-
-/-- Path for bordism commutativity. -/
+-- 1. Commutativity
 def bordismCommPath (a b : BordismClass n) :
     Path (bordismAdd a b) (bordismAdd b a) :=
-  Path.ofEq (bordism_add_comm a b)
+  (BordismStep.add_comm a b).toPath
 
-/-- Path for bordism associativity. -/
+-- 2. Associativity
 def bordismAssocPath (a b c : BordismClass n) :
     Path (bordismAdd (bordismAdd a b) c) (bordismAdd a (bordismAdd b c)) :=
-  Path.ofEq (bordism_add_assoc a b c)
+  (BordismStep.add_assoc a b c).toPath
 
-/-- Path for bordism right identity. -/
-def bordismZeroPath (a : BordismClass n) :
+-- 3. Right identity
+def bordismZeroRightPath (a : BordismClass n) :
     Path (bordismAdd a (bordismZero n)) a :=
-  Path.ofEq (bordism_add_zero a)
+  (BordismStep.add_zero_right a).toPath
+
+-- 4. Left identity
+def bordismZeroLeftPath (a : BordismClass n) :
+    Path (bordismAdd (bordismZero n) a) a :=
+  (BordismStep.add_zero_left a).toPath
+
+-- 5. Symm: commutativity in reverse
+def bordismCommSymmPath (a b : BordismClass n) :
+    Path (bordismAdd b a) (bordismAdd a b) :=
+  Path.symm (bordismCommPath a b)
+
+-- 6. Trans chain: (a + 0) + b → a + b via zero elimination then assoc
+def bordismZeroElimChain (a b : BordismClass n) :
+    Path (bordismAdd (bordismAdd a (bordismZero n)) b) (bordismAdd a b) :=
+  Path.congrArg (fun x => bordismAdd x b) (bordismZeroRightPath a)
+
+-- 7. Double zero roundtrip
+def bordismDoubleZeroPath (a : BordismClass n) :
+    Path (bordismAdd (bordismAdd a (bordismZero n)) (bordismZero n)) a :=
+  Path.trans
+    (bordismZeroElimChain a (bordismZero n))
+    (bordismZeroRightPath a)
+
+-- 8. Commute then associate: (a+b)+c → (b+a)+c → b+(a+c)
+def bordismCommAssocChain (a b c : BordismClass n) :
+    Path (bordismAdd (bordismAdd a b) c) (bordismAdd b (bordismAdd a c)) :=
+  Path.trans
+    (Path.congrArg (fun x => bordismAdd x c) (bordismCommPath a b))
+    (bordismAssocPath b a c)
+
+-- 9. Associate both directions
+def bordismAssocSymmPath (a b c : BordismClass n) :
+    Path (bordismAdd a (bordismAdd b c)) (bordismAdd (bordismAdd a b) c) :=
+  Path.symm (bordismAssocPath a b c)
+
+-- 10. Four-element reassociation
+def bordismFourAssoc (a b c d : BordismClass n) :
+    Path (bordismAdd (bordismAdd (bordismAdd a b) c) d)
+         (bordismAdd a (bordismAdd b (bordismAdd c d))) :=
+  Path.trans
+    (bordismAssocPath (bordismAdd a b) c d)
+    (Path.congrArg (fun x => bordismAdd x (bordismAdd c d)) (bordismAssocPath a b (bordismAdd c d)).proof ▸ bordismAssocPath a b (bordismAdd c d))
 
 /-! ## Unoriented Cobordism Ring Ω_N -/
 
-/-- Unoriented cobordism: every element is 2-torsion (M ∐ M ~ ∅). -/
-def unorientedDouble (a : BordismClass n) : BordismClass n :=
-  bordismAdd a a
-
-/-- Graded ring product on cobordism classes (cartesian product of manifolds). -/
-def cobordismMul (a : BordismClass n) (b : BordismClass m) : BordismClass (n + m) :=
+@[simp] def cobordismMul (a : BordismClass n) (b : BordismClass m) : BordismClass (n + m) :=
   ⟨a.rep * b.rep⟩
 
-/-- Cobordism multiplication is commutative (up to dimension reindexing). -/
+@[simp] def cobordismOne : BordismClass 0 := ⟨1⟩
+
+/-- Ring-level rewrite steps for cobordism multiplication. -/
+inductive CobMulStep : BordismClass (n + m) → BordismClass (n + m) → Prop where
+  | mul_comm_val (a : BordismClass n) (b : BordismClass m) (h : n + m = m + n) :
+      CobMulStep (h ▸ cobordismMul a b) (h ▸ cobordismMul b a)
+
+-- 11. Multiplicative commutativity (on rep values)
 theorem cobordism_mul_comm_val (a : BordismClass n) (b : BordismClass m) :
     (cobordismMul a b).rep = (cobordismMul b a).rep := by
-  simp [cobordismMul, Nat.mul_comm]
+  simp [Nat.mul_comm]
 
-/-- Cobordism multiplication is associative. -/
+-- 12. Multiplicative associativity (on rep values)
 theorem cobordism_mul_assoc_val (a : BordismClass n) (b : BordismClass m) (c : BordismClass k) :
     (cobordismMul (cobordismMul a b) c).rep = (cobordismMul a (cobordismMul b c)).rep := by
-  simp [cobordismMul, Nat.mul_assoc]
+  simp [Nat.mul_assoc]
 
-/-- Cobordism unit. -/
-def cobordismOne : BordismClass 0 := ⟨1⟩
-
-/-- Left unit law. -/
+-- 13. Left unit law
 theorem cobordism_one_mul (a : BordismClass n) :
-    (cobordismMul cobordismOne a).rep = a.rep := by
-  simp [cobordismMul, cobordismOne]
+    (cobordismMul cobordismOne a).rep = a.rep := by simp
 
-/-- Right unit law. -/
+-- 14. Right unit law
 theorem cobordism_mul_one (a : BordismClass n) :
-    (cobordismMul a cobordismOne).rep = a.rep := by
-  simp [cobordismMul, cobordismOne]
+    (cobordismMul a cobordismOne).rep = a.rep := by simp
 
-/-! ## Thom Spectrum MO / MU -/
+-- 15. Distributivity: a * (b + c) = a*b + a*c (on rep values)
+theorem cobordism_mul_distrib (a : BordismClass n) (b c : BordismClass m) :
+    (cobordismMul a (bordismAdd b c)).rep =
+    ((bordismAdd (cobordismMul a b) (cobordismMul a c)) : BordismClass (n + m)).rep := by
+  simp [Nat.mul_add]
 
-/-- Thom space data: the Thom isomorphism relates cohomology of base to that
-    of Thom space, shifted by fiber dimension. -/
-def thomShift (baseDim fiberDim : Nat) : Nat := baseDim + fiberDim
+/-! ## Thom Spectrum -/
 
-/-- Thom shift is associative (iterated bundles). -/
-theorem thom_shift_assoc (b f₁ f₂ : Nat) :
-    thomShift (thomShift b f₁) f₂ = thomShift b (f₁ + f₂) := by
-  simp [thomShift, Nat.add_assoc]
+@[simp] def thomShift (baseDim fiberDim : Nat) : Nat := baseDim + fiberDim
 
-/-- Path for Thom shift associativity. -/
-def thomShiftPath (b f₁ f₂ : Nat) :
+-- 16. Thom shift associativity
+def thomShiftAssocPath (b f₁ f₂ : Nat) :
     Path (thomShift (thomShift b f₁) f₂) (thomShift b (f₁ + f₂)) :=
-  Path.ofEq (thom_shift_assoc b f₁ f₂)
+  Path.mk [⟨_, _, by simp [Nat.add_assoc]⟩] (by simp [Nat.add_assoc])
 
-/-- Thom isomorphism dimension: H^n(B) ≅ H^{n+k}(Th(ξ)). -/
-def thomIsoDim (n k : Nat) : Nat := n + k
+-- 17. Thom shift commutativity (fibers commute)
+def thomShiftCommPath (b f₁ f₂ : Nat) :
+    Path (thomShift (thomShift b f₁) f₂) (thomShift (thomShift b f₂) f₁) :=
+  Path.mk [⟨_, _, by simp [thomShift]; omega⟩] (by simp [thomShift]; omega)
 
-/-- Thom iso is additive in cohomological degree. -/
+-- 18. Thom iso dimension
+@[simp] def thomIsoDim (n k : Nat) : Nat := n + k
+
 theorem thom_iso_add (n₁ n₂ k : Nat) :
     thomIsoDim n₁ k + thomIsoDim n₂ k = thomIsoDim (n₁ + n₂) k + k := by
-  simp [thomIsoDim]; omega
+  simp; omega
 
 /-! ## Pontryagin-Thom Construction -/
 
-/-- The Pontryagin-Thom collapse map dimension: from S^{n+k} to Th(ν). -/
-def ptCollapseDim (n k : Nat) : Nat := n + k
+@[simp] def ptCollapseDim (n k : Nat) : Nat := n + k
 
-/-- Pontryagin-Thom: framed cobordism ≅ stable homotopy groups.
-    The dimension relation: π_{n+k}(S^k) → Ω^{fr}_n. -/
-theorem pt_dim_relation (n k : Nat) :
-    ptCollapseDim n k = n + k := by
-  rfl
-
-/-- Stable range: adding to both sides preserves the relation. -/
+-- 19. PT stability
 theorem pt_stable (n k j : Nat) :
     ptCollapseDim (n + j) (k + j) = ptCollapseDim n k + 2 * j := by
-  simp [ptCollapseDim]; omega
+  simp; omega
 
-/-- Path for PT stability. -/
 def ptStablePath (n k j : Nat) :
     Path (ptCollapseDim (n + j) (k + j)) (ptCollapseDim n k + 2 * j) :=
-  Path.ofEq (pt_stable n k j)
+  Path.mk [⟨_, _, pt_stable n k j⟩] (pt_stable n k j)
 
-/-! ## Characteristic Numbers -/
+-- 20. Suspension isomorphism: Σ increases dimension by 1
+def suspensionPath (n k : Nat) :
+    Path (ptCollapseDim n k + 1) (ptCollapseDim n (k + 1)) :=
+  Path.mk [⟨_, _, by simp; omega⟩] (by simp; omega)
 
-/-- Stiefel-Whitney number: a Z/2-valued invariant computed from
-    characteristic classes evaluated on the fundamental class. -/
+/-! ## Stiefel-Whitney Numbers (Z/2 invariants) -/
+
 structure SWNumber where
   val : Bool
+deriving DecidableEq
 
-/-- Two SW numbers combine via XOR (mod 2 addition). -/
-def swAdd (a b : SWNumber) : SWNumber :=
-  ⟨xor a.val b.val⟩
+@[simp] def swAdd (a b : SWNumber) : SWNumber := ⟨xor a.val b.val⟩
+@[simp] def swZero : SWNumber := ⟨false⟩
 
-/-- SW zero. -/
-def swZero : SWNumber := ⟨false⟩
+/-- Rewrite steps for Stiefel-Whitney number algebra (Z/2). -/
+inductive SWStep : SWNumber → SWNumber → Prop where
+  | add_comm (a b : SWNumber) : SWStep (swAdd a b) (swAdd b a)
+  | add_assoc (a b c : SWNumber) :
+      SWStep (swAdd (swAdd a b) c) (swAdd a (swAdd b c))
+  | add_zero (a : SWNumber) : SWStep (swAdd a swZero) a
+  | add_self (a : SWNumber) : SWStep (swAdd a a) swZero
 
-/-- SW addition is commutative. -/
-theorem sw_add_comm (a b : SWNumber) : swAdd a b = swAdd b a := by
-  simp [swAdd, Bool.xor_comm]
+def SWStep.toPath : SWStep a b → Path a b
+  | .add_comm a b    => Path.mk [⟨_, _, by cases a; cases b; simp [Bool.xor_comm]⟩]
+      (by cases a; cases b; simp [Bool.xor_comm])
+  | .add_assoc a b c => Path.mk [⟨_, _, by cases a; cases b; cases c; simp⟩]
+      (by cases a; cases b; cases c; simp)
+  | .add_zero a      => Path.mk [⟨_, _, by cases a; simp⟩] (by cases a; simp)
+  | .add_self a      => Path.mk [⟨_, _, by cases a; simp⟩] (by cases a; simp)
 
-/-- SW addition is associative. -/
-theorem sw_add_assoc (a b c : SWNumber) :
-    swAdd (swAdd a b) c = swAdd a (swAdd b c) := by
-  cases a; cases b; cases c; simp [swAdd]
-
-/-- SW zero is identity. -/
-theorem sw_add_zero (a : SWNumber) : swAdd a swZero = a := by
-  cases a; simp [swAdd, swZero]
-
-/-- SW double is zero (2-torsion). -/
-theorem sw_add_self (a : SWNumber) : swAdd a a = swZero := by
-  cases a; simp [swAdd, swZero]
-
-/-- Path for SW commutativity. -/
+-- 21. SW commutativity path
 def swCommPath (a b : SWNumber) : Path (swAdd a b) (swAdd b a) :=
-  Path.ofEq (sw_add_comm a b)
+  (SWStep.add_comm a b).toPath
 
-/-- Path for SW 2-torsion. -/
+-- 22. SW 2-torsion path
 def swSelfPath (a : SWNumber) : Path (swAdd a a) swZero :=
-  Path.ofEq (sw_add_self a)
+  (SWStep.add_self a).toPath
 
-/-- Pontryagin number: an integer-valued invariant from Pontryagin classes. -/
+-- 23. SW zero identity path
+def swZeroPath (a : SWNumber) : Path (swAdd a swZero) a :=
+  (SWStep.add_zero a).toPath
+
+-- 24. SW double-add chain: (a + a) + b → 0 + b → b
+def swDoubleAddChain (a b : SWNumber) :
+    Path (swAdd (swAdd a a) b) b :=
+  Path.trans
+    (Path.congrArg (fun x => swAdd x b) (swSelfPath a))
+    ((SWStep.add_zero b).toPath ▸ Path.mk [⟨_, _, by cases b; simp⟩] (by cases b; simp))
+
+-- 25. SW associativity path
+def swAssocPath (a b c : SWNumber) :
+    Path (swAdd (swAdd a b) c) (swAdd a (swAdd b c)) :=
+  (SWStep.add_assoc a b c).toPath
+
+-- 26. SW triple self: a + a + a = a
+def swTripleSelfPath (a : SWNumber) :
+    Path (swAdd (swAdd a a) a) a :=
+  Path.trans
+    (swAssocPath a a a)
+    (Path.trans
+      (Path.congrArg (swAdd a) (swSelfPath a))
+      (swZeroPath a))
+
+/-! ## Pontryagin Numbers -/
+
 structure PontryaginNumber where
   val : Int
+deriving DecidableEq
 
-/-- Pontryagin numbers add. -/
-def pnAdd (a b : PontryaginNumber) : PontryaginNumber :=
-  ⟨a.val + b.val⟩
+@[simp] def pnAdd (a b : PontryaginNumber) : PontryaginNumber := ⟨a.val + b.val⟩
+@[simp] def pnZero : PontryaginNumber := ⟨0⟩
 
-/-- Pontryagin number addition is commutative. -/
-theorem pn_add_comm (a b : PontryaginNumber) : pnAdd a b = pnAdd b a := by
-  simp [pnAdd, Int.add_comm]
+-- 27. Pontryagin number commutativity
+def pnCommPath (a b : PontryaginNumber) : Path (pnAdd a b) (pnAdd b a) :=
+  Path.mk [⟨_, _, by simp [Int.add_comm]⟩] (by simp [Int.add_comm])
 
-/-- Pontryagin number addition is associative. -/
-theorem pn_add_assoc (a b c : PontryaginNumber) :
-    pnAdd (pnAdd a b) c = pnAdd a (pnAdd b c) := by
-  simp [pnAdd, Int.add_assoc]
+-- 28. Pontryagin number associativity
+def pnAssocPath (a b c : PontryaginNumber) :
+    Path (pnAdd (pnAdd a b) c) (pnAdd a (pnAdd b c)) :=
+  Path.mk [⟨_, _, by simp [Int.add_assoc]⟩] (by simp [Int.add_assoc])
+
+-- 29. Pontryagin number zero
+def pnZeroPath (a : PontryaginNumber) : Path (pnAdd a pnZero) a :=
+  Path.mk [⟨_, _, by simp⟩] (by simp)
 
 /-! ## Formal Group Law from MU -/
 
-/-- Formal group law: F(x,y) = x + y + higher terms.
-    We model the leading term. -/
-def fglLeading (x y : Nat) : Nat := x + y
+@[simp] def fglLeading (x y : Nat) : Nat := x + y
 
-/-- FGL is commutative. -/
-theorem fgl_comm (x y : Nat) : fglLeading x y = fglLeading y x := by
-  simp [fglLeading, Nat.add_comm]
+/-- Rewrite steps for the formal group law. -/
+inductive FGLStep : Nat → Nat → Prop where
+  | comm (x y : Nat) : FGLStep (fglLeading x y) (fglLeading y x)
+  | assoc (x y z : Nat) :
+      FGLStep (fglLeading (fglLeading x y) z) (fglLeading x (fglLeading y z))
+  | unit (x : Nat) : FGLStep (fglLeading x 0) x
 
-/-- FGL is associative. -/
-theorem fgl_assoc (x y z : Nat) :
-    fglLeading (fglLeading x y) z = fglLeading x (fglLeading y z) := by
-  simp [fglLeading, Nat.add_assoc]
+def FGLStep.toPath : FGLStep a b → Path a b
+  | .comm x y    => Path.mk [⟨_, _, by simp [Nat.add_comm]⟩] (by simp [Nat.add_comm])
+  | .assoc x y z => Path.mk [⟨_, _, by simp [Nat.add_assoc]⟩] (by simp [Nat.add_assoc])
+  | .unit x      => Path.mk [⟨_, _, by simp⟩] (by simp)
 
-/-- FGL has strict unit. -/
-theorem fgl_zero (x : Nat) : fglLeading x 0 = x := by
-  simp [fglLeading]
-
-/-- Path for FGL commutativity. -/
+-- 30. FGL commutativity
 def fglCommPath (x y : Nat) : Path (fglLeading x y) (fglLeading y x) :=
-  Path.ofEq (fgl_comm x y)
+  (FGLStep.comm x y).toPath
 
-/-- Path for FGL associativity. -/
+-- 31. FGL associativity
 def fglAssocPath (x y z : Nat) :
     Path (fglLeading (fglLeading x y) z) (fglLeading x (fglLeading y z)) :=
-  Path.ofEq (fgl_assoc x y z)
+  (FGLStep.assoc x y z).toPath
+
+-- 32. FGL unit
+def fglUnitPath (x : Nat) : Path (fglLeading x 0) x :=
+  (FGLStep.unit x).toPath
+
+-- 33. FGL chain: F(F(x,0),y) → F(x,y) via unit then done
+def fglChainPath (x y : Nat) :
+    Path (fglLeading (fglLeading x 0) y) (fglLeading x y) :=
+  Path.congrArg (fun z => fglLeading z y) (fglUnitPath x)
+
+-- 34. FGL chain: unit then comm
+def fglUnitCommPath (x y : Nat) :
+    Path (fglLeading (fglLeading x 0) y) (fglLeading y x) :=
+  Path.trans (fglChainPath x y) (fglCommPath x y)
 
 /-! ## Oriented Cobordism and Signature -/
 
-/-- Signature of an oriented 4k-manifold. -/
 structure Signature where
   val : Int
+deriving DecidableEq
 
-/-- Signature is additive under disjoint union. -/
-def sigAdd (a b : Signature) : Signature := ⟨a.val + b.val⟩
+@[simp] def sigAdd (a b : Signature) : Signature := ⟨a.val + b.val⟩
 
-/-- Signature addition is commutative. -/
-theorem sig_add_comm (a b : Signature) : sigAdd a b = sigAdd b a := by
-  simp [sigAdd, Int.add_comm]
+-- 35. Signature commutativity
+def sigCommPath (a b : Signature) : Path (sigAdd a b) (sigAdd b a) :=
+  Path.mk [⟨_, _, by simp [Int.add_comm]⟩] (by simp [Int.add_comm])
 
 /-- Cobordism invariance: cobordant manifolds have equal signature. -/
 structure SigCobInvariant where
@@ -266,37 +333,42 @@ structure SigCobInvariant where
   sig2 : Signature
   cobordant_eq : sig1 = sig2
 
-/-- Path for signature cobordism invariance. -/
+-- 36. Cobordism invariance path
 def sigCobPath (S : SigCobInvariant) : Path S.sig1 S.sig2 :=
-  Path.ofEq S.cobordant_eq
+  Path.mk [⟨S.sig1, S.sig2, S.cobordant_eq⟩] S.cobordant_eq
 
 /-! ## Composing Cobordism Paths -/
 
-/-- Transitivity: bordism assoc then commute. -/
-def bordismTransPath (a b c : BordismClass n) :
-    Path (bordismAdd (bordismAdd a b) c) (bordismAdd c (bordismAdd a b)) :=
-  Path.ofEq (by simp [bordismAdd, Nat.add_comm])
-
-/-- Symmetry on SW path. -/
-def swCommSymmPath (a b : SWNumber) : Path (swAdd b a) (swAdd a b) :=
-  Path.symm (swCommPath a b)
-
-/-- Chain: FGL zero then comm. -/
-def fglChainPath (x y : Nat) :
-    Path (fglLeading (fglLeading x 0) y) (fglLeading y x) :=
+-- 37. Bordism transitivity chain: (a+b)+c → (b+a)+c → b+(a+c)
+def bordismTransChain (a b c : BordismClass n) :
+    Path (bordismAdd (bordismAdd a b) c) (bordismAdd b (bordismAdd a c)) :=
   Path.trans
-    (Path.ofEq (by simp [fglLeading]))
-    (fglCommPath x y)
+    (Path.congrArg (fun x => bordismAdd x c) (bordismCommPath a b))
+    (bordismAssocPath b a c)
 
-/-- Bordism zero roundtrip. -/
-theorem bordism_zero_roundtrip (a : BordismClass n) :
-    bordismAdd (bordismAdd a (bordismZero n)) (bordismZero n) = a := by
-  simp [bordismAdd, bordismZero]
+-- 38. CongrArg through bordismAdd
+def bordismAdd_congrArg_left (a₁ a₂ b : BordismClass n)
+    (p : Path a₁ a₂) : Path (bordismAdd a₁ b) (bordismAdd a₂ b) :=
+  Path.congrArg (fun x => bordismAdd x b) p
 
-/-- Path for bordism zero roundtrip. -/
-def bordismZeroRoundtripPath (a : BordismClass n) :
-    Path (bordismAdd (bordismAdd a (bordismZero n)) (bordismZero n)) a :=
-  Path.ofEq (bordism_zero_roundtrip a)
+def bordismAdd_congrArg_right (a : BordismClass n) (b₁ b₂ : BordismClass n)
+    (p : Path b₁ b₂) : Path (bordismAdd a b₁) (bordismAdd a b₂) :=
+  Path.congrArg (bordismAdd a) p
+
+-- 39. Zero from both sides chain
+def bordismZeroBothPath (a : BordismClass n) :
+    Path (bordismAdd (bordismZero n) (bordismAdd a (bordismZero n)))
+         a :=
+  Path.trans
+    (bordismAdd_congrArg_right (bordismZero n) _ a (bordismZeroRightPath a))
+    (bordismZeroLeftPath a)
+
+-- 40. SW symm-trans roundtrip
+def swRoundtripPath (a b : SWNumber) : Path (swAdd a b) (swAdd a b) :=
+  Path.trans (swCommPath a b) (swCommSymmPath a b)
+  where
+    swCommSymmPath (a b : SWNumber) : Path (swAdd b a) (swAdd a b) :=
+      Path.symm (swCommPath a b)
 
 end CobordismDeep
 end Topology

@@ -24,7 +24,7 @@ Curry-Howard correspondence between proofs and paths.
 - Girard, Taylor, Lafont, "Proofs and Types"
 -/
 
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths
 namespace Path

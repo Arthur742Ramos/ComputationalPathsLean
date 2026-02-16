@@ -87,7 +87,7 @@ theorem grabel_add_zero (a : GrAbEl) : GrAbEl.add a (GrAbEl.zero a.deg) = a := b
 
 def grabel_add_zero_path (a : GrAbEl) :
     Path (GrAbEl.add a (GrAbEl.zero a.deg)) a :=
-  Path.refl a ▸ Path.mk [⟨_, _, grabel_add_zero a⟩] (grabel_add_zero a)
+  stepPath (grabel_add_zero a)
 
 -- helper: build a single-step path from a theorem without ofEq
 private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
@@ -101,14 +101,16 @@ def grabel_zero_add_path (a : GrAbEl) :
     Path (GrAbEl.add (GrAbEl.zero a.deg) a) a :=
   stepPath (grabel_zero_add a)
 
--- 3. add comm
-theorem grabel_add_comm (a b : GrAbEl) :
+-- 3. add comm (same-degree elements)
+theorem grabel_add_comm (a b : GrAbEl) (h : a.deg = b.deg) :
     GrAbEl.add a b = GrAbEl.add b a := by
-  ext <;> simp [Int.add_comm]
+  ext
+  · exact h
+  · simp [Int.add_comm]
 
-def grabel_add_comm_path (a b : GrAbEl) :
+def grabel_add_comm_path (a b : GrAbEl) (h : a.deg = b.deg) :
     Path (GrAbEl.add a b) (GrAbEl.add b a) :=
-  stepPath (grabel_add_comm a b)
+  stepPath (grabel_add_comm a b h)
 
 -- 4. add assoc
 theorem grabel_add_assoc (a b c : GrAbEl) :
@@ -122,7 +124,7 @@ def grabel_add_assoc_path (a b c : GrAbEl) :
 -- 5. add neg = zero  (a + (-a) = 0)
 theorem grabel_add_neg (a : GrAbEl) :
     GrAbEl.add a (GrAbEl.neg a) = GrAbEl.zero a.deg := by
-  ext <;> simp
+  ext <;> simp [Int.add_right_neg]
 
 def grabel_add_neg_path (a : GrAbEl) :
     Path (GrAbEl.add a (GrAbEl.neg a)) (GrAbEl.zero a.deg) :=

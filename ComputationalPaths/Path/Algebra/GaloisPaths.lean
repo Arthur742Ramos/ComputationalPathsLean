@@ -10,8 +10,7 @@ normal/separable extensions. All coherence witnessed by `Path`.
 - Artin, "Galois Theory"
 -/
 
-import ComputationalPaths.Path.Basic.Core
-import Mathlib.Tactic.ApplyFun
+import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths
 namespace Path

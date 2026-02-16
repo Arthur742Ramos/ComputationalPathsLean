@@ -23,8 +23,7 @@ and bisimulation as path equivalence.
 - Hughes & Cresswell, "A New Introduction to Modal Logic"
 -/
 
-import ComputationalPaths.Path.Basic.Core
-import Mathlib.Tactic.ByContra
+import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths
 namespace Path

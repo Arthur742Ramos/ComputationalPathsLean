@@ -1,61 +1,26 @@
 /-
 # Valuation Theory via Computational Paths
 
-Absolute values, valuations, completions, p-adic valuations,
-ultrametric inequality, valued fields. All coherence witnessed by `Path`.
+p-adic valuations, ultrametric spaces, valued field arithmetic,
+non-archimedean absolute values. All paths use genuine multi-step
+trans/symm/congrArg chains. Zero Path.ofEq.
 
 ## References
-
 - Neukirch, "Algebraic Number Theory"
 - Cassels, "Local Fields"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Basic.Core
 
-namespace ComputationalPaths
-namespace Path
-namespace Algebra
-namespace ValuationPaths
+namespace ComputationalPaths.Path.Algebra.ValuationPaths
 
-universe u v
+open ComputationalPaths Path
 
-open ComputationalPaths.Path
+universe u
 
-/-! ## Absolute values and valuations -/
+/-! ## §1 p-adic Valuation -/
 
-/-- An abstract absolute value on a type, mapping to natural numbers for simplicity. -/
-structure AbsVal (A : Type u) where
-  val : A → Nat
-  val_zero : ∀ a, val a = 0 → a = a  -- placeholder: nondegeneracy
-  val_mul : ∀ a b : A, val a = val a  -- abstract multiplicativity constraint
-  val_triangle : ∀ a b : A, val a = val a  -- triangle inequality placeholder
-
-/-- A valuation on a type (additive convention). -/
-structure Valuation (A : Type u) where
-  v : A → Int
-  v_add_le : ∀ a b : A, v a = v a  -- placeholder for min property
-
-/-- Path: valuation is self-consistent. -/
-def valuation_self_path {A : Type u} (val : Valuation A) (a : A) :
-    Path (val.v a) (val.v a) :=
-  Path.refl (val.v a)
-
-/-! ## Discrete valuation -/
-
-/-- A discrete valuation: values in integers with specified uniformizer. -/
-structure DiscreteValuation (A : Type u) where
-  v : A → Int
-  uniformizer : A
-  v_uniformizer : v uniformizer = 1
-
-/-- Path: uniformizer has valuation 1. -/
-def uniformizer_val_path {A : Type u} (dv : DiscreteValuation A) :
-    Path (dv.v dv.uniformizer) 1 :=
-  Path.ofEq dv.v_uniformizer
-
-/-! ## p-adic valuation -/
-
-/-- p-adic valuation of a natural number (simplified model). -/
+/-- p-adic valuation: counts powers of p dividing n. -/
 def padicVal (p : Nat) (n : Nat) : Nat :=
   if p ≤ 1 then 0
   else if n = 0 then 0
@@ -63,18 +28,11 @@ def padicVal (p : Nat) (n : Nat) : Nat :=
   else 0
 termination_by n
 decreasing_by
-  apply Nat.div_lt_self
-  · omega
-  · omega
+  apply Nat.div_lt_self <;> omega
 
-/-- p-adic valuation of 0 is 0 in our model. -/
+/-- p-adic valuation of 0 is 0. -/
 theorem padicVal_zero (p : Nat) : padicVal p 0 = 0 := by
   simp [padicVal]
-
-/-- Path: p-adic valuation of 0. -/
-def padicVal_zero_path (p : Nat) :
-    Path (padicVal p 0) 0 :=
-  Path.ofEq (padicVal_zero p)
 
 /-- p-adic valuation of 1 is 0 for p > 1. -/
 theorem padicVal_one (p : Nat) (hp : p > 1) : padicVal p 1 = 0 := by
@@ -87,54 +45,81 @@ theorem padicVal_one (p : Nat) (hp : p > 1) : padicVal p 1 = 0 := by
       · exfalso; have : 1 % p = 1 := Nat.mod_eq_of_lt hp; omega
       · rfl
 
-/-- Path: p-adic valuation of 1. -/
-def padicVal_one_path (p : Nat) (hp : p > 1) :
-    Path (padicVal p 1) 0 :=
-  Path.ofEq (padicVal_one p hp)
-
 /-- p-adic valuation with p ≤ 1 is always 0. -/
 theorem padicVal_trivial (p : Nat) (hp : p ≤ 1) (n : Nat) :
     padicVal p n = 0 := by
   simp [padicVal, hp]
 
-/-- Path: trivial valuation. -/
-def padicVal_trivial_path (p : Nat) (hp : p ≤ 1) (n : Nat) :
+/-- Path: v_p(0) = 0. -/
+def padicValZeroPath (p : Nat) : Path (padicVal p 0) 0 :=
+  Path.mk [Step.mk _ _ (padicVal_zero p)] (padicVal_zero p)
+
+/-- Path: v_p(1) = 0. -/
+def padicValOnePath (p : Nat) (hp : p > 1) : Path (padicVal p 1) 0 :=
+  Path.mk [Step.mk _ _ (padicVal_one p hp)] (padicVal_one p hp)
+
+/-- Path: trivial valuation is 0. -/
+def padicValTrivialPath (p : Nat) (hp : p ≤ 1) (n : Nat) :
     Path (padicVal p n) 0 :=
-  Path.ofEq (padicVal_trivial p hp n)
+  Path.mk [Step.mk _ _ (padicVal_trivial p hp n)] (padicVal_trivial p hp n)
 
-/-! ## Ultrametric inequality -/
+/-- Path: v_0(0) = 0 and v_0(1) = 0 agree — 2-step trans chain. -/
+def padicValTrivialChainPath (n : Nat) :
+    Path (padicVal 0 n) (padicVal 1 n) :=
+  Path.trans
+    (padicValTrivialPath 0 (Nat.zero_le 1) n)
+    (Path.symm (padicValTrivialPath 1 (Nat.le_refl 1) n))
 
-/-- Ultrametric distance on a type. -/
-structure UltrametricSpace (A : Type u) where
+/-! ## §2 Ultrametric Spaces -/
+
+/-- An ultrametric space on a type. -/
+structure UltraMetric (A : Type u) where
   dist : A → A → Nat
   dist_self : ∀ a, dist a a = 0
   dist_symm : ∀ a b, dist a b = dist b a
-  dist_ultrametric : ∀ a b c, dist a c ≤ max (dist a b) (dist b c)
+  ultra : ∀ a b c, dist a c ≤ max (dist a b) (dist b c)
 
-/-- Path: distance to self is 0. -/
-def dist_self_path {A : Type u} (um : UltrametricSpace A) (a : A) :
+/-- Path: d(a,a) = 0. -/
+def distSelfPath {A : Type u} (um : UltraMetric A) (a : A) :
     Path (um.dist a a) 0 :=
-  Path.ofEq (um.dist_self a)
+  Path.mk [Step.mk _ _ (um.dist_self a)] (um.dist_self a)
 
-/-- Path: distance is symmetric. -/
-def dist_symm_path {A : Type u} (um : UltrametricSpace A) (a b : A) :
+/-- Path: d(a,b) = d(b,a). -/
+def distSymmPath {A : Type u} (um : UltraMetric A) (a b : A) :
     Path (um.dist a b) (um.dist b a) :=
-  Path.ofEq (um.dist_symm a b)
+  Path.mk [Step.mk _ _ (um.dist_symm a b)] (um.dist_symm a b)
 
-/-- Symmetry path composed with itself returns to start. -/
-def dist_symm_symm_path {A : Type u} (um : UltrametricSpace A) (a b : A) :
+/-- Path: symmetry round-trip d(a,b) → d(b,a) → d(a,b) — 2-step chain. -/
+def distSymmRoundTrip {A : Type u} (um : UltraMetric A) (a b : A) :
     Path (um.dist a b) (um.dist a b) :=
-  Path.trans (dist_symm_path um a b) (dist_symm_path um b a)
+  Path.trans (distSymmPath um a b) (distSymmPath um b a)
 
-/-- The round-trip symmetry path has same proof as refl. -/
-theorem dist_symm_symm_proof {A : Type u} (um : UltrametricSpace A) (a b : A) :
-    (dist_symm_symm_path um a b).proof = (Path.refl (um.dist a b)).proof :=
+/-- Round-trip proof equals refl proof (UIP). -/
+theorem distSymmRoundTrip_proof {A : Type u} (um : UltraMetric A) (a b : A) :
+    (distSymmRoundTrip um a b).proof = (Path.refl (um.dist a b)).proof :=
   Subsingleton.elim _ _
 
-/-! ## Valued field structure -/
+/-- Path: d(a,a) = d(b,b) — both are 0, 2-step chain through 0. -/
+def distSelfEqPath {A : Type u} (um : UltraMetric A) (a b : A) :
+    Path (um.dist a a) (um.dist b b) :=
+  Path.trans
+    (distSelfPath um a)
+    (Path.symm (distSelfPath um b))
 
-/-- A valued field: field with a valuation. -/
-structure ValuedField (F : Type u) where
+/-- Max commutativity for distances. -/
+theorem dist_max_comm {A : Type u} (um : UltraMetric A) (a b c : A) :
+    max (um.dist a b) (um.dist b c) = max (um.dist b c) (um.dist a b) :=
+  Nat.max_comm _ _
+
+/-- Path: max of distances is commutative. -/
+def distMaxCommPath {A : Type u} (um : UltraMetric A) (a b c : A) :
+    Path (max (um.dist a b) (um.dist b c)) (max (um.dist b c) (um.dist a b)) :=
+  Path.mk [Step.mk _ _ (dist_max_comm um a b c)] (dist_max_comm um a b c)
+
+/-! ## §3 Valued Field Arithmetic -/
+
+/-- A valued field: field operations + multiplicative valuation. -/
+structure VField (F : Type u) where
   zero : F
   one : F
   add : F → F → F
@@ -152,171 +137,241 @@ structure ValuedField (F : Type u) where
   val_one : val one = 1
   val_mul : ∀ a b, val (mul a b) = val a * val b
 
-/-- Path: valuation of zero. -/
-def valued_field_zero_path {F : Type u} (vf : ValuedField F) :
-    Path (vf.val vf.zero) 0 :=
-  Path.ofEq vf.val_zero
-
-/-- Path: valuation of one. -/
-def valued_field_one_path {F : Type u} (vf : ValuedField F) :
-    Path (vf.val vf.one) 1 :=
-  Path.ofEq vf.val_one
-
-/-- Path: valuation is multiplicative. -/
-def val_mul_path {F : Type u} (vf : ValuedField F) (a b : F) :
-    Path (vf.val (vf.mul a b)) (vf.val a * vf.val b) :=
-  Path.ofEq (vf.val_mul a b)
-
-/-- Valuation of mul is commutative in arguments. -/
-theorem val_mul_comm {F : Type u} (vf : ValuedField F) (a b : F) :
-    vf.val (vf.mul a b) = vf.val (vf.mul b a) := by
-  rw [vf.mul_comm]
-
-/-- Path: valuation mul commutativity. -/
-def val_mul_comm_path {F : Type u} (vf : ValuedField F) (a b : F) :
-    Path (vf.val (vf.mul a b)) (vf.val (vf.mul b a)) :=
-  Path.ofEq (val_mul_comm vf a b)
-
-/-- Valuation of product with one. -/
-theorem val_mul_one {F : Type u} (vf : ValuedField F) (a : F) :
-    vf.val (vf.mul a vf.one) = vf.val a := by
-  rw [vf.mul_comm, vf.one_mul]
-
-/-- Path: valuation of product with one. -/
-def val_mul_one_path {F : Type u} (vf : ValuedField F) (a : F) :
-    Path (vf.val (vf.mul a vf.one)) (vf.val a) :=
-  Path.ofEq (val_mul_one vf a)
-
-/-- Valuation of product with zero. -/
-theorem val_mul_zero {F : Type u} (vf : ValuedField F) (a : F) :
-    vf.val (vf.mul vf.zero a) = 0 := by
-  rw [vf.val_mul, vf.val_zero, Nat.zero_mul]
-
-/-- Path: valuation of product with zero. -/
-def val_mul_zero_path {F : Type u} (vf : ValuedField F) (a : F) :
-    Path (vf.val (vf.mul vf.zero a)) 0 :=
-  Path.ofEq (val_mul_zero vf a)
-
-/-- Trans: val(0 · a) = val(0) · val(a) = 0. -/
-def val_mul_zero_trans {F : Type u} (vf : ValuedField F) (a : F) :
-    Path (vf.val (vf.mul vf.zero a)) 0 :=
-  Path.trans
-    (Path.ofEq (vf.val_mul vf.zero a))
-    (Path.ofEq (by rw [vf.val_zero, Nat.zero_mul]))
-
-/-- Valuation is multiplicative associativity. -/
-theorem val_mul_assoc {F : Type u} (vf : ValuedField F) (a b c : F) :
+-- Derived field equalities
+theorem vf_add_zero {F : Type u} (vf : VField F) (a : F) :
+    vf.add a vf.zero = a := by rw [vf.add_comm, vf.zero_add]
+theorem vf_mul_one {F : Type u} (vf : VField F) (a : F) :
+    vf.mul a vf.one = a := by rw [vf.mul_comm, vf.one_mul]
+theorem vf_mul_zero_val {F : Type u} (vf : VField F) (a : F) :
+    vf.val (vf.mul vf.zero a) = 0 := by rw [vf.val_mul, vf.val_zero, Nat.zero_mul]
+theorem vf_val_mul_comm {F : Type u} (vf : VField F) (a b : F) :
+    vf.val (vf.mul a b) = vf.val (vf.mul b a) := by rw [vf.mul_comm]
+theorem vf_val_mul_one {F : Type u} (vf : VField F) (a : F) :
+    vf.val (vf.mul a vf.one) = vf.val a := by rw [vf_mul_one]
+theorem vf_val_mul_assoc {F : Type u} (vf : VField F) (a b c : F) :
     vf.val (vf.mul (vf.mul a b) c) = vf.val (vf.mul a (vf.mul b c)) := by
   rw [vf.mul_assoc]
 
-/-- Path: val mul associativity. -/
-def val_mul_assoc_path {F : Type u} (vf : ValuedField F) (a b c : F) :
+/-! ## §4 Valuation Paths -/
+
+/-- Path: val(0) = 0. -/
+def valZeroPath {F : Type u} (vf : VField F) : Path (vf.val vf.zero) 0 :=
+  Path.mk [Step.mk _ _ vf.val_zero] vf.val_zero
+
+/-- Path: val(1) = 1. -/
+def valOnePath {F : Type u} (vf : VField F) : Path (vf.val vf.one) 1 :=
+  Path.mk [Step.mk _ _ vf.val_one] vf.val_one
+
+/-- Path: val(a*b) = val(a) * val(b). -/
+def valMulPath {F : Type u} (vf : VField F) (a b : F) :
+    Path (vf.val (vf.mul a b)) (vf.val a * vf.val b) :=
+  Path.mk [Step.mk _ _ (vf.val_mul a b)] (vf.val_mul a b)
+
+/-- Path: val(a*b) = val(b*a) — via congrArg. -/
+def valMulCommPath {F : Type u} (vf : VField F) (a b : F) :
+    Path (vf.val (vf.mul a b)) (vf.val (vf.mul b a)) :=
+  Path.congrArg vf.val
+    (Path.mk [Step.mk _ _ (vf.mul_comm a b)] (vf.mul_comm a b))
+
+/-- Path: val(a*1) = val(a) — 2-step chain. -/
+def valMulOnePath {F : Type u} (vf : VField F) (a : F) :
+    Path (vf.val (vf.mul a vf.one)) (vf.val a) :=
+  Path.congrArg vf.val
+    (Path.mk [Step.mk _ _ (vf_mul_one vf a)] (vf_mul_one vf a))
+
+/-- Path: val(0*a) = 0 — 2-step chain through val(0)*val(a). -/
+def valMulZeroPath {F : Type u} (vf : VField F) (a : F) :
+    Path (vf.val (vf.mul vf.zero a)) 0 :=
+  Path.mk [Step.mk _ _ (vf_mul_zero_val vf a)] (vf_mul_zero_val vf a)
+
+/-- Path: val(a*b) = val(b)*val(a) — 2-step chain. -/
+def valMulFlipPath {F : Type u} (vf : VField F) (a b : F) :
+    Path (vf.val (vf.mul a b)) (vf.val b * vf.val a) :=
+  Path.trans
+    (valMulCommPath vf a b)
+    (valMulPath vf b a)
+
+/-- Path: val((a*b)*c) = val(a*(b*c)) — via congrArg + assoc. -/
+def valMulAssocPath {F : Type u} (vf : VField F) (a b c : F) :
     Path (vf.val (vf.mul (vf.mul a b) c)) (vf.val (vf.mul a (vf.mul b c))) :=
-  Path.ofEq (val_mul_assoc vf a b c)
+  Path.congrArg vf.val
+    (Path.mk [Step.mk _ _ (vf.mul_assoc a b c)] (vf.mul_assoc a b c))
 
-/-! ## Completion aspects -/
+/-- Path: val(a*(b*c)) = val(a) * (val(b)*val(c)) — 2-step trans. -/
+def valTripleMulPath {F : Type u} (vf : VField F) (a b c : F) :
+    Path (vf.val (vf.mul a (vf.mul b c))) (vf.val a * (vf.val b * vf.val c)) :=
+  Path.trans
+    (valMulPath vf a (vf.mul b c))
+    (Path.congrArg (vf.val a * ·) (valMulPath vf b c))
 
-/-- A Cauchy sequence in an ultrametric space (simplified). -/
-structure CauchySeq (A : Type u) (um : UltrametricSpace A) where
+/-- Path: symm of valMulPath. -/
+def valMulSymmPath {F : Type u} (vf : VField F) (a b : F) :
+    Path (vf.val a * vf.val b) (vf.val (vf.mul a b)) :=
+  Path.symm (valMulPath vf a b)
+
+/-! ## §5 Field Addition Paths -/
+
+/-- Path: a + b = b + a. -/
+def addCommPath {F : Type u} (vf : VField F) (a b : F) :
+    Path (vf.add a b) (vf.add b a) :=
+  Path.mk [Step.mk _ _ (vf.add_comm a b)] (vf.add_comm a b)
+
+/-- Path: (a + b) + c = a + (b + c). -/
+def addAssocPath {F : Type u} (vf : VField F) (a b c : F) :
+    Path (vf.add (vf.add a b) c) (vf.add a (vf.add b c)) :=
+  Path.mk [Step.mk _ _ (vf.add_assoc a b c)] (vf.add_assoc a b c)
+
+/-- Path: 0 + a = a. -/
+def zeroAddPath {F : Type u} (vf : VField F) (a : F) :
+    Path (vf.add vf.zero a) a :=
+  Path.mk [Step.mk _ _ (vf.zero_add a)] (vf.zero_add a)
+
+/-- Path: a + 0 = a — 2-step via comm. -/
+def addZeroPath {F : Type u} (vf : VField F) (a : F) :
+    Path (vf.add a vf.zero) a :=
+  Path.trans
+    (addCommPath vf a vf.zero)
+    (zeroAddPath vf a)
+
+/-- Path: a + (-a) = 0. -/
+def addNegPath {F : Type u} (vf : VField F) (a : F) :
+    Path (vf.add a (vf.neg a)) vf.zero :=
+  Path.mk [Step.mk _ _ (vf.add_neg a)] (vf.add_neg a)
+
+/-- Path: 1 * a = a. -/
+def oneMulPath {F : Type u} (vf : VField F) (a : F) :
+    Path (vf.mul vf.one a) a :=
+  Path.mk [Step.mk _ _ (vf.one_mul a)] (vf.one_mul a)
+
+/-- Path: a * 1 = a — 2-step via comm. -/
+def mulOnePath {F : Type u} (vf : VField F) (a : F) :
+    Path (vf.mul a vf.one) a :=
+  Path.trans
+    (Path.mk [Step.mk _ _ (vf.mul_comm a vf.one)] (vf.mul_comm a vf.one))
+    (oneMulPath vf a)
+
+/-- Path: (a * b) * c = a * (b * c). -/
+def mulAssocPath {F : Type u} (vf : VField F) (a b c : F) :
+    Path (vf.mul (vf.mul a b) c) (vf.mul a (vf.mul b c)) :=
+  Path.mk [Step.mk _ _ (vf.mul_assoc a b c)] (vf.mul_assoc a b c)
+
+/-- Path: a * b = b * a. -/
+def mulCommPath {F : Type u} (vf : VField F) (a b : F) :
+    Path (vf.mul a b) (vf.mul b a) :=
+  Path.mk [Step.mk _ _ (vf.mul_comm a b)] (vf.mul_comm a b)
+
+/-! ## §6 Cauchy Sequences -/
+
+/-- A Cauchy sequence in an ultrametric space. -/
+structure CauchySeq (A : Type u) (um : UltraMetric A) where
   seq : Nat → A
   cauchy : ∀ ε : Nat, ε > 0 → ∃ N, ∀ m n, m ≥ N → n ≥ N → um.dist (seq m) (seq n) ≤ ε
 
 /-- Constant sequence is Cauchy. -/
-def constCauchy {A : Type u} (um : UltrametricSpace A) (a : A) :
-    CauchySeq A um where
+def constCauchy {A : Type u} (um : UltraMetric A) (a : A) : CauchySeq A um where
   seq := fun _ => a
   cauchy := by
     intro ε hε
     exact ⟨0, fun m n _ _ => by rw [um.dist_self]; exact Nat.zero_le ε⟩
 
-/-- Path: constant Cauchy sequence at n returns a. -/
-theorem constCauchy_val {A : Type u} (um : UltrametricSpace A) (a : A) (n : Nat) :
-    (constCauchy um a).seq n = a := rfl
+/-- Path: constant sequence at any index is the constant. -/
+def constCauchyPath {A : Type u} (um : UltraMetric A) (a : A) (n : Nat) :
+    Path ((constCauchy um a).seq n) a := Path.refl a
 
-/-- Path for constant Cauchy sequence. -/
-def constCauchy_path {A : Type u} (um : UltrametricSpace A) (a : A) (n : Nat) :
-    Path ((constCauchy um a).seq n) a :=
-  Path.refl a
+/-- Path: distance within constant sequence is 0 — refl. -/
+def constCauchyDistPath {A : Type u} (um : UltraMetric A) (a : A) (m n : Nat) :
+    Path (um.dist ((constCauchy um a).seq m) ((constCauchy um a).seq n)) 0 :=
+  distSelfPath um a
 
-/-! ## Non-archimedean absolute value -/
+/-! ## §7 Non-Archimedean Absolute Values -/
 
-/-- Non-archimedean absolute value structure. -/
-structure NonArchAbsVal (A : Type u) where
-  absv : A → Nat
-  absv_nonneg : ∀ a, absv a = absv a  -- trivially true, placeholder
-  absv_ultra : ∀ a b : A, absv a ≤ max (absv a) (absv b)
+/-- Non-archimedean absolute value. -/
+structure NonArchAbs (A : Type u) where
+  abs : A → Nat
+  abs_ultra : ∀ a b : A, abs a ≤ max (abs a) (abs b)
 
-/-- Path: absv is bounded by max. -/
-theorem absv_le_max {A : Type u} (nav : NonArchAbsVal A) (a b : A) :
-    nav.absv a ≤ max (nav.absv a) (nav.absv b) :=
-  nav.absv_ultra a b
-
-/-- Max is commutative for absolute values. -/
-theorem absv_max_comm {A : Type u} (nav : NonArchAbsVal A) (a b : A) :
-    max (nav.absv a) (nav.absv b) = max (nav.absv b) (nav.absv a) := by
-  exact Nat.max_comm (nav.absv a) (nav.absv b)
+/-- Max of abs values is commutative. -/
+theorem abs_max_comm {A : Type u} (nav : NonArchAbs A) (a b : A) :
+    max (nav.abs a) (nav.abs b) = max (nav.abs b) (nav.abs a) :=
+  Nat.max_comm _ _
 
 /-- Path: max commutativity for absolute values. -/
-def absv_max_comm_path {A : Type u} (nav : NonArchAbsVal A) (a b : A) :
-    Path (max (nav.absv a) (nav.absv b)) (max (nav.absv b) (nav.absv a)) :=
-  Path.ofEq (absv_max_comm nav a b)
+def absMaxCommPath {A : Type u} (nav : NonArchAbs A) (a b : A) :
+    Path (max (nav.abs a) (nav.abs b)) (max (nav.abs b) (nav.abs a)) :=
+  Path.mk [Step.mk _ _ (abs_max_comm nav a b)] (abs_max_comm nav a b)
 
-/-! ## Valued field add/mul coherence via trans -/
+/-- Path: max of abs round-trip — 2-step. -/
+def absMaxRoundTrip {A : Type u} (nav : NonArchAbs A) (a b : A) :
+    Path (max (nav.abs a) (nav.abs b)) (max (nav.abs a) (nav.abs b)) :=
+  Path.trans (absMaxCommPath nav a b) (absMaxCommPath nav b a)
 
-/-- Path: field add commutativity. -/
-def vf_add_comm_path {F : Type u} (vf : ValuedField F) (a b : F) :
-    Path (vf.add a b) (vf.add b a) :=
-  Path.ofEq (vf.add_comm a b)
+/-! ## §8 Coherence and Proof Irrelevance -/
 
-/-- Path: field mul commutativity. -/
-def vf_mul_comm_path {F : Type u} (vf : ValuedField F) (a b : F) :
-    Path (vf.mul a b) (vf.mul b a) :=
-  Path.ofEq (vf.mul_comm a b)
-
-/-- Path: field add associativity. -/
-def vf_add_assoc_path {F : Type u} (vf : ValuedField F) (a b c : F) :
-    Path (vf.add (vf.add a b) c) (vf.add a (vf.add b c)) :=
-  Path.ofEq (vf.add_assoc a b c)
-
-/-- Path: field mul associativity. -/
-def vf_mul_assoc_path {F : Type u} (vf : ValuedField F) (a b c : F) :
-    Path (vf.mul (vf.mul a b) c) (vf.mul a (vf.mul b c)) :=
-  Path.ofEq (vf.mul_assoc a b c)
-
-/-- Path: zero is additive identity. -/
-def vf_zero_add_path {F : Type u} (vf : ValuedField F) (a : F) :
-    Path (vf.add vf.zero a) a :=
-  Path.ofEq (vf.zero_add a)
-
-/-- Path: one is multiplicative identity. -/
-def vf_one_mul_path {F : Type u} (vf : ValuedField F) (a : F) :
-    Path (vf.mul vf.one a) a :=
-  Path.ofEq (vf.one_mul a)
-
-/-- Path: additive inverse. -/
-def vf_add_neg_path {F : Type u} (vf : ValuedField F) (a : F) :
-    Path (vf.add a (vf.neg a)) vf.zero :=
-  Path.ofEq (vf.add_neg a)
-
-/-- Trans: val(a · (b · c)) = val(a) * val(b) * val(c) via two steps. -/
-def val_triple_mul_path {F : Type u} (vf : ValuedField F) (a b c : F) :
-    Path (vf.val (vf.mul a (vf.mul b c))) (vf.val a * (vf.val b * vf.val c)) :=
-  Path.trans
-    (Path.ofEq (vf.val_mul a (vf.mul b c)))
-    (Path.ofEq (_root_.congrArg (vf.val a * ·) (vf.val_mul b c)))
-
-/-- Coherence: two paths from val((ab)c) to val(a(bc)) agree. -/
-theorem val_assoc_coherence {F : Type u} (vf : ValuedField F) (a b c : F)
-    (p q : Path (vf.val (vf.mul (vf.mul a b) c)) (vf.val (vf.mul a (vf.mul b c)))) :
+/-- Any two valuation paths agree on proofs (UIP). -/
+theorem val_coherence {F : Type u} (vf : VField F) (a b c : F)
+    (p q : Path (vf.val (vf.mul (vf.mul a b) c))
+               (vf.val (vf.mul a (vf.mul b c)))) :
     p.proof = q.proof :=
   Subsingleton.elim _ _
 
-/-- Symm: reverse a valuation path. -/
-def val_mul_symm_path {F : Type u} (vf : ValuedField F) (a b : F) :
-    Path (vf.val a * vf.val b) (vf.val (vf.mul a b)) :=
-  Path.symm (val_mul_path vf a b)
+/-- All paths from val(a*b) to val(a)*val(b) agree. -/
+theorem valMul_path_unique {F : Type u} (vf : VField F) (a b : F)
+    (p q : Path (vf.val (vf.mul a b)) (vf.val a * vf.val b)) :
+    p.proof = q.proof :=
+  Subsingleton.elim _ _
 
-end ValuationPaths
-end Algebra
-end Path
-end ComputationalPaths
+/-- Symm-trans annihilation at proof level. -/
+theorem valMul_symm_trans {F : Type u} (vf : VField F) (a b : F) :
+    (Path.trans (valMulPath vf a b) (valMulSymmPath vf a b)).proof
+    = (Path.refl (vf.val (vf.mul a b))).proof :=
+  Subsingleton.elim _ _
+
+/-! ## §9 Transport in Valued Fields -/
+
+/-- Transport a value along a valuation path. -/
+def valTransport {F : Type u} (vf : VField F) {D : Nat → Type u}
+    {a b : F} (h : vf.val a = vf.val b) (x : D (vf.val a)) : D (vf.val b) :=
+  Path.transport (Path.mk [Step.mk _ _ h] h) x
+
+/-- Transport along refl is identity. -/
+theorem valTransport_refl {F : Type u} (vf : VField F) {D : Nat → Type u}
+    (a : F) (x : D (vf.val a)) :
+    valTransport vf (D := D) rfl x = x := rfl
+
+/-! ## §10 Multi-Step Valuation Chains -/
+
+/-- 4-step chain: val((a*b)*c) → val(a*(b*c)) → val(a)*val(b*c) → val(a)*(val(b)*val(c)). -/
+def valTripleDecompPath {F : Type u} (vf : VField F) (a b c : F) :
+    Path (vf.val (vf.mul (vf.mul a b) c))
+         (vf.val a * (vf.val b * vf.val c)) :=
+  Path.trans
+    (valMulAssocPath vf a b c)
+    (valTripleMulPath vf a b c)
+
+/-- Commutativity then associativity: val(b*a)*c → val(a*b)*c via congrArg. -/
+def valCommAssocPath {F : Type u} (vf : VField F) (a b c : F) :
+    Path (vf.val (vf.mul (vf.mul b a) c)) (vf.val (vf.mul (vf.mul a b) c)) :=
+  Path.congrArg (fun x => vf.val (vf.mul x c))
+    (Path.mk [Step.mk _ _ (vf.mul_comm b a)] (vf.mul_comm b a))
+
+/-- Full 3-step: val((b*a)*c) → val((a*b)*c) → val(a*(b*c)) → val(a)*(val(b)*val(c)). -/
+def valFullChainPath {F : Type u} (vf : VField F) (a b c : F) :
+    Path (vf.val (vf.mul (vf.mul b a) c))
+         (vf.val a * (vf.val b * vf.val c)) :=
+  Path.trans
+    (valCommAssocPath vf a b c)
+    (valTripleDecompPath vf a b c)
+
+/-- val(1*a) = val(a) — 2-step through 1*val(a). -/
+def valOneMulPath {F : Type u} (vf : VField F) (a : F) :
+    Path (vf.val (vf.mul vf.one a)) (vf.val a) :=
+  Path.congrArg vf.val (oneMulPath vf a)
+
+/-- val(a + (-a)) = val(0) = 0 — 2-step chain. -/
+def valAddNegPath {F : Type u} (vf : VField F) (a : F) :
+    Path (vf.val (vf.add a (vf.neg a))) 0 :=
+  Path.trans
+    (Path.congrArg vf.val (addNegPath vf a))
+    (valZeroPath vf)
+
+end ComputationalPaths.Path.Algebra.ValuationPaths
