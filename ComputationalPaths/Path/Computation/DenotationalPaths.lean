@@ -44,7 +44,6 @@ inductive Stmt where
 /-- An environment maps variables to values. -/
 structure Env where
   lookup : Nat → Nat
-  deriving Repr, BEq
 
 /-- Update an environment at a given variable. -/
 def Env.update (env : Env) (x : Nat) (v : Nat) : Env :=
@@ -64,22 +63,22 @@ theorem env_update_other (env : Env) (x y : Nat) (v : Nat) (h : y != x) :
 /-- 3. Double update at same variable: last wins. -/
 theorem env_update_shadow (env : Env) (x : Nat) (v1 v2 : Nat) :
     (env.update x v1).update x v2 = env.update x v2 := by
-  simp [Env.update]
-  ext y
-  simp
-  split <;> rfl
+  show Env.mk _ = Env.mk _
+  congr 1; funext y; simp [Env.update]; split <;> rfl
 
 /-- 4. Updates at different variables commute. -/
 theorem env_update_comm (env : Env) (x y : Nat) (vx vy : Nat) (hne : x ≠ y) :
     (env.update x vx).update y vy = (env.update y vy).update x vx := by
-  simp [Env.update]
-  ext z
-  simp
-  by_cases hzx : z == x <;> by_cases hzy : z == y <;> simp_all
-  · exfalso; apply hne
-    have := BEq.eq_of_beq hzx
-    have := BEq.eq_of_beq hzy
-    omega
+  show Env.mk _ = Env.mk _
+  congr 1; funext z; simp [Env.update]
+  split
+  · split
+    · next h1 h2 =>
+        have := BEq.eq_of_beq h1
+        have := BEq.eq_of_beq h2
+        omega
+    · rfl
+  · rfl
 
 /-! ## Meaning Functions -/
 
@@ -304,12 +303,12 @@ def stmtEquivPath {s1 s2 : Stmt} (h : StmtEquiv s1 s2) (env : Env) :
 /-- 44. Semantic equivalence of subexpressions lifts to add-left. -/
 theorem semEquiv_add_left {e1 e2 : Expr} (h : SemEquiv e1 e2) (e3 : Expr) :
     SemEquiv (Expr.add e1 e3) (Expr.add e2 e3) :=
-  fun env => by simp [evalExpr]; exact congrArg (· + evalExpr env e3) (h env)
+  fun env => by simp [evalExpr]; rw [h env]
 
 /-- 45. Semantic equivalence of subexpressions lifts to add-right. -/
 theorem semEquiv_add_right {e1 e2 : Expr} (h : SemEquiv e1 e2) (e3 : Expr) :
     SemEquiv (Expr.add e3 e1) (Expr.add e3 e2) :=
-  fun env => by simp [evalExpr]; exact congrArg (evalExpr env e3 + ·) (h env)
+  fun env => by simp [evalExpr]; rw [h env]
 
 end DenotationalPaths
 end Computation
