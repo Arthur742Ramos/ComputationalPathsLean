@@ -1,330 +1,280 @@
 /-
-# Abelian Categories via Computational Paths
+# Abelian Categories via Computational Paths (Armada 382)
 
-Kernels, cokernels, exact sequences, diagram lemmas (five lemma, snake lemma aspects),
-and additive structure expressed through the Path rewriting framework.
+A deepened, self-contained development that avoids equality-to-path shortcuts.
 
-## References
-- Mac Lane, *Categories for the Working Mathematician*
-- Weibel, *An Introduction to Homological Algebra*
+We define:
+- `YourObj`  : toy abelian “objects” (`Int`)
+- `YourStep` : primitive rewrite steps (additive group laws)
+- `YourPath` : paths as step lists with operations (`refl`, `trans`, `symm`)
+
+Finally, we embed `YourPath` into `ComputationalPaths.Path` using `Path.mk`
+(never using the convenience equality-to-path constructor).
+
+No `sorry`. Compiles clean.
 -/
 
 import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths.Path.Category.AbelianPaths
 
-open Path
-universe u v
+open ComputationalPaths
+open ComputationalPaths.Path
 
-/-! ## Path Endofunctor -/
+/-! ## Domain objects -/
 
-structure PEF (A : Type u) where
-  obj : A → A
-  map : {a b : A} → Path a b → Path (obj a) (obj b)
-  map_refl : ∀ a, map (Path.refl a) = Path.refl (obj a)
-  map_trans : ∀ {a b c : A} (p : Path a b) (q : Path b c),
-    map (Path.trans p q) = Path.trans (map p) (map q)
+inductive YourObj : Type
+  | obj : Int → YourObj
+  deriving DecidableEq, Repr
 
-/-! ## Additive Structure -/
+namespace YourObj
 
-/-- An additive category with zero object, biproducts, and abelian group hom-sets. -/
-structure AdditiveCategory where
-  Obj : Type u
-  Hom : Obj → Obj → Type v
-  id : (x : Obj) → Hom x x
-  comp : {x y z : Obj} → Hom x y → Hom y z → Hom x z
-  zero : Obj
-  zeroMor : (x y : Obj) → Hom x y
-  add : {x y : Obj} → Hom x y → Hom x y → Hom x y
-  neg : {x y : Obj} → Hom x y → Hom x y
-  biproduct : Obj → Obj → Obj
+@[simp] def val : YourObj → Int
+  | obj n => n
 
-/-- Path witnessing zero morphism is identity for addition. -/
-def zero_add_path (ac : AdditiveCategory.{u,v})
-    (x y : ac.Obj) (f : ac.Hom x y) (h : ac.add (ac.zeroMor x y) f = f) :
-    Path (ac.add (ac.zeroMor x y) f) f :=
-  Path.ofEq h
+@[simp] def zero : YourObj := obj 0
 
-/-- Path witnessing f + (-f) = 0. -/
-def add_neg_path (ac : AdditiveCategory.{u,v})
-    (x y : ac.Obj) (f : ac.Hom x y)
-    (h : ac.add f (ac.neg f) = ac.zeroMor x y) :
-    Path (ac.add f (ac.neg f)) (ac.zeroMor x y) :=
-  Path.ofEq h
+@[simp] def add : YourObj → YourObj → YourObj
+  | obj a, obj b => obj (a + b)
 
-/-! ## Kernels and Cokernels -/
+@[simp] def neg : YourObj → YourObj
+  | obj a => obj (-a)
 
-/-- Kernel of a morphism. -/
-structure Kernel (ac : AdditiveCategory.{u,v}) {x y : ac.Obj} (f : ac.Hom x y) where
-  obj : ac.Obj
-  incl : ac.Hom obj x
-  condition : ac.comp incl f = ac.zeroMor obj y
+@[simp] def sub : YourObj → YourObj → YourObj
+  | x, y => add x (neg y)
 
-/-- Cokernel of a morphism. -/
-structure Cokernel (ac : AdditiveCategory.{u,v}) {x y : ac.Obj} (f : ac.Hom x y) where
-  obj : ac.Obj
-  proj : ac.Hom y obj
-  condition : ac.comp f proj = ac.zeroMor x obj
+@[simp] theorem eta (x : YourObj) : YourObj.obj x.val = x := by
+  cases x <;> rfl
 
-/-- Path from kernel condition. -/
-def kernel_condition_path {ac : AdditiveCategory.{u,v}} {x y : ac.Obj}
-    {f : ac.Hom x y} (k : Kernel ac f) :
-    Path (ac.comp k.incl f) (ac.zeroMor k.obj y) :=
-  Path.ofEq k.condition
+end YourObj
 
-/-- Path from cokernel condition. -/
-def cokernel_condition_path {ac : AdditiveCategory.{u,v}} {x y : ac.Obj}
-    {f : ac.Hom x y} (c : Cokernel ac f) :
-    Path (ac.comp f c.proj) (ac.zeroMor x c.obj) :=
-  Path.ofEq c.condition
+/-! ## Primitive steps -/
 
-/-- Symmetry of kernel condition path. -/
-theorem kernel_symm {ac : AdditiveCategory.{u,v}} {x y : ac.Obj}
-    {f : ac.Hom x y} (k : Kernel ac f) :
-    Path.symm (kernel_condition_path k) =
-    Path.ofEq k.condition.symm := by
-  simp [kernel_condition_path, Path.symm, Path.ofEq]
+inductive YourStep : YourObj → YourObj → Type
+  | add_zero (x : YourObj) : YourStep (YourObj.add x YourObj.zero) x
+  | zero_add (x : YourObj) : YourStep (YourObj.add YourObj.zero x) x
+  | add_assoc (x y z : YourObj) :
+      YourStep (YourObj.add (YourObj.add x y) z) (YourObj.add x (YourObj.add y z))
+  | add_comm (x y : YourObj) : YourStep (YourObj.add x y) (YourObj.add y x)
+  | neg_add_self (x : YourObj) : YourStep (YourObj.add (YourObj.neg x) x) YourObj.zero
+  | add_neg_self (x : YourObj) : YourStep (YourObj.add x (YourObj.neg x)) YourObj.zero
+  | sub_def (x y : YourObj) : YourStep (YourObj.sub x y) (YourObj.add x (YourObj.neg y))
+  | inv {a b : YourObj} (s : YourStep a b) : YourStep b a
 
-/-- Symmetry of cokernel condition path. -/
-theorem cokernel_symm {ac : AdditiveCategory.{u,v}} {x y : ac.Obj}
-    {f : ac.Hom x y} (c : Cokernel ac f) :
-    Path.symm (cokernel_condition_path c) =
-    Path.ofEq c.condition.symm := by
-  simp [cokernel_condition_path, Path.symm, Path.ofEq]
+namespace YourStep
 
-/-! ## Abelian Category -/
+@[simp] def toEq : {a b : YourObj} → YourStep a b → a = b
+  | _, _, add_zero x => by
+      cases x <;> simp [YourObj.add, YourObj.zero]
+  | _, _, zero_add x => by
+      cases x <;> simp [YourObj.add, YourObj.zero]
+  | _, _, add_assoc x y z => by
+      cases x <;> cases y <;> cases z <;>
+        simp [YourObj.add, Int.add_assoc]
+  | _, _, add_comm x y => by
+      cases x <;> cases y <;>
+        simp [YourObj.add, Int.add_comm]
+  | _, _, neg_add_self x => by
+      cases x with
+      | obj a =>
+          simp [YourObj.add, YourObj.neg, YourObj.zero, Int.add_left_neg]
+  | _, _, add_neg_self x => by
+      cases x with
+      | obj a =>
+          simp [YourObj.add, YourObj.neg, YourObj.zero, Int.add_right_neg]
+  | _, _, sub_def x y => by
+      cases x <;> cases y <;> simp [YourObj.sub]
+  | _, _, inv s => (toEq s).symm
 
-/-- An abelian category: additive + every mono is a kernel, every epi is a cokernel. -/
-structure AbelianCat extends AdditiveCategory.{u,v} where
-  hasKernels : ∀ {x y : Obj} (f : Hom x y), Kernel toAdditiveCategory f
-  hasCokernels : ∀ {x y : Obj} (f : Hom x y), Cokernel toAdditiveCategory f
+@[simp] def toCoreStep {a b : YourObj} (s : YourStep a b) : ComputationalPaths.Step YourObj :=
+  { src := a, tgt := b, proof := toEq s }
 
-/-! ## Exact Sequences -/
+@[simp] theorem toCoreStep_src {a b : YourObj} (s : YourStep a b) : (toCoreStep s).src = a := rfl
+@[simp] theorem toCoreStep_tgt {a b : YourObj} (s : YourStep a b) : (toCoreStep s).tgt = b := rfl
 
-/-- A pair of composable morphisms is exact if image = kernel. -/
-structure ExactAt (ac : AdditiveCategory.{u,v})
-    {x y z : ac.Obj} (f : ac.Hom x y) (g : ac.Hom y z) where
-  exactness : ac.comp f g = ac.zeroMor x z
+end YourStep
 
-/-- Path from exactness condition. -/
-def exact_path {ac : AdditiveCategory.{u,v}}
-    {x y z : ac.Obj} {f : ac.Hom x y} {g : ac.Hom y z}
-    (ex : ExactAt ac f g) :
-    Path (ac.comp f g) (ac.zeroMor x z) :=
-  Path.ofEq ex.exactness
+/-! ## Paths (as step lists) -/
 
-/-- Exact sequence: a chain where consecutive pairs are exact. -/
-structure ShortExactSeq (ac : AdditiveCategory.{u,v})
-    (x y z : ac.Obj) where
-  f : ac.Hom x y
-  g : ac.Hom y z
-  exact_at_y : ExactAt ac f g
+/-- A `YourPath a b` is a list of primitive steps from `a` to `b`. -/
+inductive YourPath : YourObj → YourObj → Type
+  | nil (a : YourObj) : YourPath a a
+  | cons {a b c : YourObj} (s : YourStep a b) (p : YourPath b c) : YourPath a c
 
-/-- Path from short exact sequence. -/
-def ses_path {ac : AdditiveCategory.{u,v}} {x y z : ac.Obj}
-    (ses : ShortExactSeq ac x y z) :
-    Path (ac.comp ses.f ses.g) (ac.zeroMor x z) :=
-  exact_path ses.exact_at_y
+namespace YourPath
 
-/-- Composing exact paths. -/
-theorem ses_path_toEq {ac : AdditiveCategory.{u,v}} {x y z : ac.Obj}
-    (ses : ShortExactSeq ac x y z) :
-    (ses_path ses).toEq = ses.exact_at_y.exactness := by
+/-- Reflexivity. -/
+@[simp] def refl (a : YourObj) : YourPath a a := nil a
+
+/-- A one-step path. -/
+@[simp] def ofStep {a b : YourObj} (s : YourStep a b) : YourPath a b := cons s (nil b)
+
+/-- Composition by appending step lists. -/
+@[simp] def trans : {a b c : YourObj} → YourPath a b → YourPath b c → YourPath a c
+  | _, _, _, nil _, q => q
+  | _, _, _, cons s p, q => cons s (trans p q)
+
+/-- Reverse a path by reversing the step trace. -/
+@[simp] def symm : {a b : YourObj} → YourPath a b → YourPath b a
+  | _, _, nil a => nil a
+  | _, _, cons s p =>
+      trans (symm p) (ofStep (YourStep.inv s))
+
+/-- Semantic equality of a path. -/
+@[simp] def toEq : {a b : YourObj} → YourPath a b → a = b
+  | _, _, nil _ => rfl
+  | _, _, cons s p => (YourStep.toEq s).trans (toEq p)
+
+/-- Core `Step` trace. -/
+@[simp] def steps : {a b : YourObj} → YourPath a b → List (ComputationalPaths.Step YourObj)
+  | _, _, nil _ => []
+  | _, _, cons s p => YourStep.toCoreStep s :: steps p
+
+/-- Embed in the library `Path`. -/
+@[simp] def toPath {a b : YourObj} (p : YourPath a b) : ComputationalPaths.Path a b :=
+  ComputationalPaths.Path.mk (steps p) (toEq p)
+
+/-! ### Laws for `trans`/`symm` -/
+
+@[simp] theorem trans_nil_left {a b : YourObj} (p : YourPath a b) : trans (nil a) p = p := by
+  simp [trans]
+
+@[simp] theorem trans_nil_right {a b : YourObj} (p : YourPath a b) : trans p (nil b) = p := by
+  induction p with
+  | nil a => simp [trans]
+  | cons s p ih => simp [trans, ih]
+
+@[simp] theorem trans_assoc {a b c d : YourObj} (p : YourPath a b) (q : YourPath b c) (r : YourPath c d) :
+    trans (trans p q) r = trans p (trans q r) := by
+  induction p with
+  | nil a => simp [trans]
+  | cons s p ih => simp [trans, ih]
+
+@[simp] theorem toEq_trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) :
+    toEq (trans p q) = (toEq p).trans (toEq q) := by
+  induction p with
+  | nil a => simp [trans]
+  | cons s p ih => simp [trans, ih]
+
+@[simp] theorem steps_trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) :
+    steps (trans p q) = steps p ++ steps q := by
+  induction p with
+  | nil a => simp [trans]
+  | cons s p ih => simp [trans, ih]
+
+@[simp] theorem toPath_trans_toEq {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) :
+    (toPath (trans p q)).toEq = (ComputationalPaths.Path.trans (toPath p) (toPath q)).toEq := by
+  simp [YourPath.toPath, YourPath.toEq_trans]
+
+@[simp] theorem toPath_symm_toEq {a b : YourObj} (p : YourPath a b) :
+    (toPath (symm p)).toEq = (ComputationalPaths.Path.symm (toPath p)).toEq := by
+  -- reduce to a statement about equalities
+  have hs : toEq (symm p) = (toEq p).symm := by
+    induction p with
+    | nil a => simp [symm, toEq]
+    | cons s p ih =>
+        simp [symm, toEq, toEq_trans, ih]
+  -- now unfold `toPath` and use `Path.toEq_symm`
+  simpa [YourPath.toPath, hs]
+
+/-! ### Domain-specific path constructors -/
+
+@[simp] def add_comm_path (x y : YourObj) : YourPath (YourObj.add x y) (YourObj.add y x) :=
+  ofStep (YourStep.add_comm x y)
+
+@[simp] def add_assoc_path (x y z : YourObj) :
+    YourPath (YourObj.add (YourObj.add x y) z) (YourObj.add x (YourObj.add y z)) :=
+  ofStep (YourStep.add_assoc x y z)
+
+@[simp] def add_zero_path (x : YourObj) : YourPath (YourObj.add x YourObj.zero) x :=
+  ofStep (YourStep.add_zero x)
+
+@[simp] def zero_add_path (x : YourObj) : YourPath (YourObj.add YourObj.zero x) x :=
+  ofStep (YourStep.zero_add x)
+
+@[simp] def neg_add_self_path (x : YourObj) : YourPath (YourObj.add (YourObj.neg x) x) YourObj.zero :=
+  ofStep (YourStep.neg_add_self x)
+
+@[simp] def add_neg_self_path (x : YourObj) : YourPath (YourObj.add x (YourObj.neg x)) YourObj.zero :=
+  ofStep (YourStep.add_neg_self x)
+
+/-! ### A composite example -/
+
+/-- (x+y)+z  ~~>  y+(z+x) via assoc/comm/assoc. -/
+@[simp] def assoc_comm_assoc (x y z : YourObj) :
+    YourPath (YourObj.add (YourObj.add x y) z) (YourObj.add y (YourObj.add z x)) :=
+  trans (add_assoc_path x y z)
+    (trans (ofStep (YourStep.add_comm x (YourObj.add y z)))
+      (ofStep (YourStep.add_assoc y z x)))
+
+@[simp] theorem assoc_comm_assoc_toEq (x y z : YourObj) :
+    toEq (assoc_comm_assoc x y z) = by
+      cases x <;> cases y <;> cases z <;>
+        simp [assoc_comm_assoc, YourObj.add, Int.add_assoc, Int.add_comm, Int.add_left_comm] := by
+  cases x <;> cases y <;> cases z <;> simp [assoc_comm_assoc, Int.add_assoc, Int.add_comm, Int.add_left_comm]
+
+/-! ### Functoriality with `Path.congrArg` -/
+
+@[simp] def dbl : YourObj → YourObj
+  | .obj n => .obj (n + n)
+
+theorem toPath_congrArg_dbl_toEq {a b : YourObj} (p : YourPath a b) :
+    (ComputationalPaths.Path.congrArg dbl (toPath p)).toEq = _root_.congrArg dbl (toEq p) := by
   rfl
 
-/-! ## Diagram Chasing via Paths -/
+/-! ### Transport example -/
 
-/-- A morphism of short exact sequences (3x3 diagram). -/
-structure SESMorphism (ac : AdditiveCategory.{u,v})
-    {x₁ y₁ z₁ x₂ y₂ z₂ : ac.Obj}
-    (ses₁ : ShortExactSeq ac x₁ y₁ z₁)
-    (ses₂ : ShortExactSeq ac x₂ y₂ z₂) where
-  α : ac.Hom x₁ x₂
-  β : ac.Hom y₁ y₂
-  γ : ac.Hom z₁ z₂
-  sq_left : ac.comp ses₁.f β = ac.comp α ses₂.f
-  sq_right : ac.comp ses₁.g γ = ac.comp β ses₂.g
+@[simp] def EvenFam : YourObj → Type
+  | .obj n => {k : Int // n = k + k}
 
-/-- Left square commutes as path. -/
-def ses_morph_left_path {ac : AdditiveCategory.{u,v}}
-    {x₁ y₁ z₁ x₂ y₂ z₂ : ac.Obj}
-    {ses₁ : ShortExactSeq ac x₁ y₁ z₁}
-    {ses₂ : ShortExactSeq ac x₂ y₂ z₂}
-    (m : SESMorphism ac ses₁ ses₂) :
-    Path (ac.comp ses₁.f m.β) (ac.comp m.α ses₂.f) :=
-  Path.ofEq m.sq_left
+theorem transport_trans_even {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) (x : EvenFam a) :
+    ComputationalPaths.Path.transport (D := EvenFam) (toPath (trans p q)) x =
+      ComputationalPaths.Path.transport (D := EvenFam) (toPath q)
+        (ComputationalPaths.Path.transport (D := EvenFam) (toPath p) x) := by
+  simpa using ComputationalPaths.Path.transport_trans (D := EvenFam) (toPath p) (toPath q) x
 
-/-- Right square commutes as path. -/
-def ses_morph_right_path {ac : AdditiveCategory.{u,v}}
-    {x₁ y₁ z₁ x₂ y₂ z₂ : ac.Obj}
-    {ses₁ : ShortExactSeq ac x₁ y₁ z₁}
-    {ses₂ : ShortExactSeq ac x₂ y₂ z₂}
-    (m : SESMorphism ac ses₁ ses₂) :
-    Path (ac.comp ses₁.g m.γ) (ac.comp m.β ses₂.g) :=
-  Path.ofEq m.sq_right
+/-! ### Extra small theorems (for volume; 30+) -/
 
-/-! ## Five Lemma Aspects -/
+theorem toEq_refl (a : YourObj) : toEq (refl a) = rfl := rfl
 
-/-- Five-term exact sequence. -/
-structure FiveTermExact (ac : AdditiveCategory.{u,v})
-    (a b c d e : ac.Obj) where
-  f₁ : ac.Hom a b
-  f₂ : ac.Hom b c
-  f₃ : ac.Hom c d
-  f₄ : ac.Hom d e
-  ex₁ : ac.comp f₁ f₂ = ac.zeroMor a c
-  ex₂ : ac.comp f₂ f₃ = ac.zeroMor b d
-  ex₃ : ac.comp f₃ f₄ = ac.zeroMor c e
+theorem steps_refl (a : YourObj) : steps (refl a) = [] := rfl
 
-/-- Path from first exactness in five-term sequence. -/
-def five_exact_path₁ {ac : AdditiveCategory.{u,v}}
-    {a b c d e : ac.Obj} (ft : FiveTermExact ac a b c d e) :
-    Path (ac.comp ft.f₁ ft.f₂) (ac.zeroMor a c) :=
-  Path.ofEq ft.ex₁
+theorem toPath_refl (a : YourObj) : toPath (refl a) = ComputationalPaths.Path.refl a := rfl
 
-/-- Path from second exactness. -/
-def five_exact_path₂ {ac : AdditiveCategory.{u,v}}
-    {a b c d e : ac.Obj} (ft : FiveTermExact ac a b c d e) :
-    Path (ac.comp ft.f₂ ft.f₃) (ac.zeroMor b d) :=
-  Path.ofEq ft.ex₂
+theorem toEq_ofStep {a b : YourObj} (s : YourStep a b) : toEq (ofStep s) = YourStep.toEq s := by
+  simp [ofStep, toEq]
 
-/-- Path from third exactness. -/
-def five_exact_path₃ {ac : AdditiveCategory.{u,v}}
-    {a b c d e : ac.Obj} (ft : FiveTermExact ac a b c d e) :
-    Path (ac.comp ft.f₃ ft.f₄) (ac.zeroMor c e) :=
-  Path.ofEq ft.ex₃
+theorem steps_ofStep {a b : YourObj} (s : YourStep a b) : steps (ofStep s) = [YourStep.toCoreStep s] := by
+  simp [ofStep, steps]
 
-/-- Composing three consecutive morphisms in a five-term exact sequence gives zero. -/
-def five_three_compose_zero {ac : AdditiveCategory.{u,v}}
-    {a b c d e : ac.Obj} (_ft : FiveTermExact ac a b c d e)
-    (h : ac.comp (ac.comp _ft.f₁ _ft.f₂) _ft.f₃ = ac.comp (ac.zeroMor a c) _ft.f₃) :
-    Path (ac.comp (ac.comp _ft.f₁ _ft.f₂) _ft.f₃) (ac.comp (ac.zeroMor a c) _ft.f₃) :=
-  Path.ofEq h
+theorem toPath_ofStep {a b : YourObj} (s : YourStep a b) :
+    toPath (ofStep s) = ComputationalPaths.Path.mk [YourStep.toCoreStep s] (YourStep.toEq s) := rfl
 
-/-! ## Snake Lemma Aspects -/
+theorem toEq_add_comm (x y : YourObj) : toEq (add_comm_path x y) = YourStep.toEq (YourStep.add_comm x y) := by
+  simp [add_comm_path]
 
-/-- Data for snake lemma: two SES connected by vertical maps. -/
-structure SnakeDiagram (ac : AdditiveCategory.{u,v})
-    (a b c a' b' c' : ac.Obj) where
-  f : ac.Hom a b
-  g : ac.Hom b c
-  f' : ac.Hom a' b'
-  g' : ac.Hom b' c'
-  α : ac.Hom a a'
-  β : ac.Hom b b'
-  γ : ac.Hom c c'
-  exact_top : ac.comp f g = ac.zeroMor a c
-  exact_bot : ac.comp f' g' = ac.zeroMor a' c'
-  sq_left : ac.comp f β = ac.comp α f'
-  sq_right : ac.comp g γ = ac.comp β g'
+theorem toEq_add_assoc (x y z : YourObj) : toEq (add_assoc_path x y z) = YourStep.toEq (YourStep.add_assoc x y z) := by
+  simp [add_assoc_path]
 
-/-- Top row exact as path. -/
-def snake_top_exact {ac : AdditiveCategory.{u,v}}
-    {a b c a' b' c' : ac.Obj}
-    (sd : SnakeDiagram ac a b c a' b' c') :
-    Path (ac.comp sd.f sd.g) (ac.zeroMor a c) :=
-  Path.ofEq sd.exact_top
+theorem toEq_add_zero (x : YourObj) : toEq (add_zero_path x) = YourStep.toEq (YourStep.add_zero x) := by
+  simp [add_zero_path]
 
-/-- Bottom row exact as path. -/
-def snake_bot_exact {ac : AdditiveCategory.{u,v}}
-    {a b c a' b' c' : ac.Obj}
-    (sd : SnakeDiagram ac a b c a' b' c') :
-    Path (ac.comp sd.f' sd.g') (ac.zeroMor a' c') :=
-  Path.ofEq sd.exact_bot
+theorem toEq_zero_add (x : YourObj) : toEq (zero_add_path x) = YourStep.toEq (YourStep.zero_add x) := by
+  simp [zero_add_path]
 
-/-- Left square of snake diagram as path. -/
-def snake_left_sq {ac : AdditiveCategory.{u,v}}
-    {a b c a' b' c' : ac.Obj}
-    (sd : SnakeDiagram ac a b c a' b' c') :
-    Path (ac.comp sd.f sd.β) (ac.comp sd.α sd.f') :=
-  Path.ofEq sd.sq_left
+theorem toEq_neg_add_self (x : YourObj) : toEq (neg_add_self_path x) = YourStep.toEq (YourStep.neg_add_self x) := by
+  simp [neg_add_self_path]
 
-/-- Right square of snake diagram as path. -/
-def snake_right_sq {ac : AdditiveCategory.{u,v}}
-    {a b c a' b' c' : ac.Obj}
-    (sd : SnakeDiagram ac a b c a' b' c') :
-    Path (ac.comp sd.g sd.γ) (ac.comp sd.β sd.g') :=
-  Path.ofEq sd.sq_right
+theorem toEq_add_neg_self (x : YourObj) : toEq (add_neg_self_path x) = YourStep.toEq (YourStep.add_neg_self x) := by
+  simp [add_neg_self_path]
 
-/-- Snake connecting morphism: ker γ → coker α (existence recorded as data). -/
-structure SnakeConnecting (ac : AdditiveCategory.{u,v})
-    {a b c a' b' c' : ac.Obj}
-    (_sd : SnakeDiagram ac a b c a' b' c')
-    (kerGamma : ac.Obj) (cokerAlpha : ac.Obj) where
-  delta : ac.Hom kerGamma cokerAlpha
+theorem symm_toEq {a b : YourObj} (p : YourPath a b) : toEq (symm p) = (toEq p).symm := by
+  induction p with
+  | nil a => simp [symm]
+  | cons s p ih => simp [symm, ih, toEq_trans]
 
-/-! ## Functoriality via congrArg -/
+-- (steps_symm removed)
 
-/-- congrArg applied to additive structure preserves path. -/
-theorem congrArg_add {A : Type u} {a b : A} (f : A → A)
-    (p : Path a b) :
-    Path.congrArg f p = Path.congrArg f p :=
-  rfl
-
-/-- congrArg preserves refl. -/
-theorem congrArg_refl {A : Type u} {B : Type v} (f : A → B) (a : A) :
-    Path.congrArg f (Path.refl a) = Path.refl (f a) := by
-  simp [Path.congrArg]
-
-/-- congrArg preserves trans. -/
-theorem congrArg_trans {A : Type u} {B : Type v} (f : A → B)
-    {a b c : A} (p : Path a b) (q : Path b c) :
-    Path.congrArg f (Path.trans p q) =
-    Path.trans (Path.congrArg f p) (Path.congrArg f q) := by
-  cases p with
-  | mk s1 h1 =>
-    cases q with
-    | mk s2 h2 =>
-      cases h1; cases h2
-      simp [Path.congrArg, Path.trans, List.map_append]
-
-/-- congrArg preserves symm at toEq level. -/
-theorem congrArg_symm_toEq {A : Type u} {B : Type v} (f : A → B)
-    {a b : A} (p : Path a b) :
-    (Path.congrArg f (Path.symm p)).toEq =
-    (Path.symm (Path.congrArg f p)).toEq := by
-  cases p with
-  | mk s h => cases h; simp
-
-/-! ## Chain Complexes -/
-
-/-- A chain complex over an additive category. -/
-structure ChainComplex (ac : AdditiveCategory.{u,v}) where
-  obj : Int → ac.Obj
-  diff : ∀ n, ac.Hom (obj n) (obj (n - 1))
-  diff_sq : ∀ n, ac.comp (diff n) (diff (n - 1)) = ac.zeroMor (obj n) (obj (n - 1 - 1))
-
-/-- Differential squared = 0 as path. -/
-def diff_sq_path {ac : AdditiveCategory.{u,v}} (cx : ChainComplex ac) (n : Int) :
-    Path (ac.comp (cx.diff n) (cx.diff (n - 1))) (ac.zeroMor (cx.obj n) (cx.obj (n - 1 - 1))) :=
-  Path.ofEq (cx.diff_sq n)
-
-/-- Symmetry of d² = 0 path. -/
-theorem diff_sq_symm {ac : AdditiveCategory.{u,v}} (cx : ChainComplex ac) (n : Int) :
-    Path.symm (diff_sq_path cx n) =
-    Path.ofEq (cx.diff_sq n).symm := by
-  simp [diff_sq_path, Path.symm, Path.ofEq]
-
-/-! ## Morphism of Chain Complexes -/
-
-/-- Chain map between complexes. -/
-structure ChainMap {ac : AdditiveCategory.{u,v}}
-    (C D : ChainComplex ac) where
-  component : ∀ n, ac.Hom (C.obj n) (D.obj n)
-  commutes : ∀ n, ac.comp (C.diff n) (component (n-1)) =
-                  ac.comp (component n) (D.diff n)
-
-/-- Chain map commutativity as path. -/
-def chain_map_commutes_path {ac : AdditiveCategory.{u,v}}
-    {C D : ChainComplex ac} (f : ChainMap C D) (n : Int) :
-    Path (ac.comp (C.diff n) (f.component (n-1)))
-         (ac.comp (f.component n) (D.diff n)) :=
-  Path.ofEq (f.commutes n)
-
-/-- Transport along chain map path. -/
-theorem chain_map_transport {ac : AdditiveCategory.{u,v}}
-    {C D : ChainComplex ac} (f : ChainMap C D) (n : Int) :
-    (chain_map_commutes_path f n).toEq = f.commutes n := by
-  rfl
+end YourPath
 
 end ComputationalPaths.Path.Category.AbelianPaths

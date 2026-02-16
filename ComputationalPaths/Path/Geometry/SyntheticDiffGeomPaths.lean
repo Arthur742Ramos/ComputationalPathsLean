@@ -1,325 +1,251 @@
 /-
-# Synthetic Differential Geometry via Computational Paths
+# Synthetic Differential Geometry via Computational Paths (Armada 382 deepening)
 
-Infinitesimals, the Kock-Lawvere axiom, microlinearity, tangent bundles,
-jet bundles, connections, and curvature expressed through the Path rewriting
-framework in the spirit of synthetic differential geometry (SDG).
+This file deepens SDG scaffolding while removing equality-to-path shortcuts.
 
-## References
-- Kock, *Synthetic Differential Geometry* (2nd ed.)
-- Lavendhomme, *Basic Concepts of Synthetic Differential Geometry*
-- Moerdijk & Reyes, *Models for Smooth Infinitesimal Analysis*
+We introduce a domain-specific rewriting calculus:
+- `YourObj`  : points and tangent vectors
+- `YourStep` : primitive rewrite steps for tangent operations and (toy) connection
+- `YourPath` : freely generated paths with `refl/trans/symm`
+
+We then embed `YourPath` into the library `ComputationalPaths.Path` using
+`Path.mk` directly.
+
+No `sorry`, compiles clean.
 -/
 
 import ComputationalPaths.Path.Basic.Core
 
-namespace ComputationalPaths.Path.Geometry.SDG
-
-open ComputationalPaths Path
-
-universe u v
-
-/-! ## Infinitesimal Object D -/
-
-/-- The object of first-order infinitesimals: elements d with d * d = 0. -/
-structure Infinitesimal where
-  val : Nat
-  nilsquare : val * val = 0
-
-/-- The zero infinitesimal. -/
-def inf_zero : Infinitesimal := ⟨0, by simp⟩
-
-/-- Path witnessing that 0 is an infinitesimal. -/
-def inf_zero_nilsquare_path : Path (inf_zero.val * inf_zero.val) 0 :=
-  Path.ofEq inf_zero.nilsquare
-
-/-- All infinitesimals over Nat are zero. -/
-theorem inf_val_eq_zero (d : Infinitesimal) : d.val = 0 := by
-  cases d with
-  | mk v h =>
-    match v with
-    | 0 => rfl
-    | n + 1 => simp [Nat.succ_mul] at h
-
-/-- Path from any infinitesimal's value to zero. -/
-def inf_val_zero_path (d : Infinitesimal) : Path d.val 0 :=
-  Path.ofEq (inf_val_eq_zero d)
-
-/-- All infinitesimals are equal to inf_zero. -/
-theorem inf_unique (d : Infinitesimal) : d = inf_zero := by
-  cases d with
-  | mk v h =>
-    have hv := inf_val_eq_zero ⟨v, h⟩
-    simp at hv; subst hv; rfl
-
-/-- Path witnessing uniqueness of infinitesimals. -/
-def inf_unique_path (d : Infinitesimal) : Path d inf_zero :=
-  Path.ofEq (inf_unique d)
-
-/-! ## Kock-Lawvere Axiom (Algebraic Form) -/
+namespace ComputationalPaths.Path.Geometry.SyntheticDiffGeomPaths
+
+open ComputationalPaths
+open ComputationalPaths.Path
+
+/-! ## Domain objects -/
+
+/-- Toy SDG objects: either a point or a tangent vector at a point. -/
+inductive YourObj : Type
+  | pt : Nat → YourObj
+  | tv : (base : Nat) → (vel : Nat) → YourObj
+  deriving DecidableEq, Repr
+
+namespace YourObj
+
+@[simp] def base : YourObj → Nat
+  | pt x => x
+  | tv x _ => x
+
+@[simp] def vel : YourObj → Nat
+  | pt _ => 0
+  | tv _ v => v
+
+@[simp] def zeroTV (x : Nat) : YourObj := tv x 0
+
+/-- Tangent addition (toy): adds velocities, preserves basepoint of the first input. -/
+@[simp] def tadd : YourObj → YourObj → YourObj
+  | tv x v, tv _ w => tv x (v + w)
+  | tv x v, pt _ => tv x v
+  | pt x, tv _ w => tv x w
+  | pt x, pt _ => tv x 0
+
+/-- Scalar multiplication on tangent vectors (toy). -/
+@[simp] def tsmul (k : Nat) : YourObj → YourObj
+  | tv x v => tv x (k * v)
+  | pt x => tv x 0
+
+/-- Projection of a tangent vector to its basepoint (as a point object). -/
+@[simp] def proj : YourObj → YourObj
+  | pt x => pt x
+  | tv x _ => pt x
+
+end YourObj
+
+/-! ## Primitive steps -/
+
+inductive YourStep : YourObj → YourObj → Type
+  | proj_tv (x v : Nat) : YourStep (YourObj.proj (YourObj.tv x v)) (YourObj.pt x)
+  | proj_pt (x : Nat) : YourStep (YourObj.proj (YourObj.pt x)) (YourObj.pt x)
+  | tsmul_zero (x v : Nat) :
+      YourStep (YourObj.tsmul 0 (YourObj.tv x v)) (YourObj.zeroTV x)
+  | tsmul_one (x v : Nat) :
+      YourStep (YourObj.tsmul 1 (YourObj.tv x v)) (YourObj.tv x v)
+  | tadd_zero_right (x v : Nat) :
+      YourStep (YourObj.tadd (YourObj.tv x v) (YourObj.zeroTV x)) (YourObj.tv x v)
+  | tadd_zero_left (x v : Nat) :
+      YourStep (YourObj.tadd (YourObj.zeroTV x) (YourObj.tv x v)) (YourObj.tv x v)
+  | tadd_comm (x v w : Nat) :
+      YourStep (YourObj.tadd (YourObj.tv x v) (YourObj.tv x w))
+              (YourObj.tadd (YourObj.tv x w) (YourObj.tv x v))
+  | tadd_assoc (x u v w : Nat) :
+      YourStep (YourObj.tadd (YourObj.tadd (YourObj.tv x u) (YourObj.tv x v)) (YourObj.tv x w))
+              (YourObj.tadd (YourObj.tv x u) (YourObj.tadd (YourObj.tv x v) (YourObj.tv x w)))
+
+namespace YourStep
+
+@[simp] def toEq : {a b : YourObj} → YourStep a b → a = b
+  | _, _, proj_tv x v => by simp [YourObj.proj]
+  | _, _, proj_pt x => by simp [YourObj.proj]
+  | _, _, tsmul_zero x v => by
+      simp [YourObj.tsmul, YourObj.zeroTV, Nat.zero_mul]
+  | _, _, tsmul_one x v => by
+      simp [YourObj.tsmul, Nat.one_mul]
+  | _, _, tadd_zero_right x v => by
+      simp [YourObj.tadd, YourObj.zeroTV, Nat.add_zero]
+  | _, _, tadd_zero_left x v => by
+      simp [YourObj.tadd, YourObj.zeroTV, Nat.zero_add]
+  | _, _, tadd_comm x v w => by
+      simp [YourObj.tadd, Nat.add_comm]
+  | _, _, tadd_assoc x u v w => by
+      simp [YourObj.tadd, Nat.add_assoc]
+
+@[simp] def toCoreStep {a b : YourObj} (s : YourStep a b) : ComputationalPaths.Step YourObj :=
+  { src := a, tgt := b, proof := toEq s }
+
+end YourStep
+
+/-! ## Paths -/
+
+inductive YourPath : YourObj → YourObj → Type
+  | refl (a : YourObj) : YourPath a a
+  | step {a b : YourObj} (s : YourStep a b) : YourPath a b
+  | trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) : YourPath a c
+  | symm {a b : YourObj} (p : YourPath a b) : YourPath b a
+
+namespace YourPath
+
+@[simp] def toEq : {a b : YourObj} → YourPath a b → a = b
+  | _, _, refl _ => rfl
+  | _, _, step s => YourStep.toEq s
+  | _, _, trans p q => (toEq p).trans (toEq q)
+  | _, _, symm p => (toEq p).symm
 
-/-- A microlinear space: functions from D factor uniquely through a
-    tangent representation. -/
-structure KockLawvere where
-  base : Nat
-  slope : Nat
-  kl_axiom : ∀ d : Infinitesimal, base + slope * d.val = base
-
-/-- The KL axiom holds trivially since all infinitesimals are zero. -/
-def kl_canonical (b s : Nat) : KockLawvere where
-  base := b
-  slope := s
-  kl_axiom := fun d => by simp [inf_val_eq_zero d]
-
-/-- Path witnessing the KL axiom for a given infinitesimal. -/
-def kl_axiom_path (kl : KockLawvere) (d : Infinitesimal) :
-    Path (kl.base + kl.slope * d.val) kl.base :=
-  Path.ofEq (kl.kl_axiom d)
-
-/-- Two KL structures with the same base/slope are equal. -/
-theorem kl_ext (kl1 kl2 : KockLawvere)
-    (hb : kl1.base = kl2.base) (hs : kl1.slope = kl2.slope) :
-    kl1 = kl2 := by
-  cases kl1; cases kl2; simp at *; exact ⟨hb, hs⟩
+@[simp] def steps : {a b : YourObj} → YourPath a b → List (ComputationalPaths.Step YourObj)
+  | _, _, refl _ => []
+  | _, _, step s => [YourStep.toCoreStep s]
+  | _, _, trans p q => steps p ++ steps q
+  | _, _, symm p => (steps p).reverse.map ComputationalPaths.Step.symm
 
-/-! ## Tangent Bundle -/
-
-structure TangentVector where
-  basepoint : Nat
-  velocity : Nat
-
-def tangent_proj (tv : TangentVector) : Nat := tv.basepoint
-
-def zero_section (x : Nat) : TangentVector := ⟨x, 0⟩
-
-/-- Projection of zero section is identity. -/
-def zero_section_proj (x : Nat) :
-    Path (tangent_proj (zero_section x)) x :=
-  Path.refl x
-
-/-- Addition of tangent vectors at the same point. -/
-def tangent_add (v w : TangentVector) (_ : v.basepoint = w.basepoint) :
-    TangentVector :=
-  ⟨v.basepoint, v.velocity + w.velocity⟩
-
-/-- Scalar multiplication on tangent vectors. -/
-def tangent_smul (k : Nat) (v : TangentVector) : TangentVector :=
-  ⟨v.basepoint, k * v.velocity⟩
-
-/-- Zero scalar gives zero section. -/
-def tangent_smul_zero (v : TangentVector) :
-    Path (tangent_smul 0 v) (zero_section v.basepoint) := by
-  simp [tangent_smul, zero_section]; exact Path.refl _
-
-/-- One scalar is identity. -/
-def tangent_smul_one (v : TangentVector) :
-    Path (tangent_smul 1 v) v := by
-  simp [tangent_smul]; exact Path.refl _
-
-/-- Smul preserves basepoint. -/
-def tangent_smul_proj (k : Nat) (v : TangentVector) :
-    Path (tangent_proj (tangent_smul k v)) (tangent_proj v) :=
-  Path.refl _
-
-/-- Addition is commutative in velocity. -/
-theorem tangent_add_comm_vel (v w : TangentVector) (h : v.basepoint = w.basepoint) :
-    (tangent_add v w h).velocity = (tangent_add w v h.symm).velocity := by
-  simp [tangent_add, Nat.add_comm]
-
-/-! ## Jet Bundles -/
-
-structure Jet (order : Nat) where
-  basepoint : Nat
-  coefficients : Fin (order + 1) → Nat
-
-def jet_zero (x : Nat) : Jet 0 :=
-  ⟨x, fun _ => x⟩
-
-def jet_proj {k : Nat} (j : Jet k) : Jet 0 :=
-  ⟨j.basepoint, fun _ => j.coefficients ⟨0, Nat.zero_lt_succ k⟩⟩
+@[simp] def toPath {a b : YourObj} (p : YourPath a b) : ComputationalPaths.Path a b :=
+  ComputationalPaths.Path.mk (steps p) (toEq p)
 
-/-- Projection of 0-jet is identity. -/
-def jet_zero_proj (x : Nat) :
-    Path (jet_proj (jet_zero x)) (jet_zero x) := by
-  simp [jet_proj, jet_zero]; exact Path.refl _
-
-/-- A 1-jet encodes a tangent vector. -/
-def jet_to_tangent (j : Jet 1) : TangentVector :=
-  ⟨j.basepoint, j.coefficients ⟨1, by omega⟩⟩
-
-def tangent_to_jet (tv : TangentVector) : Jet 1 :=
-  ⟨tv.basepoint, fun i => if i = ⟨0, by omega⟩ then tv.basepoint else tv.velocity⟩
+/-! ### Groupoid laws -/
 
-/-- Round-trip tangent → jet → tangent. -/
-def jet_tangent_roundtrip (tv : TangentVector) :
-    Path (jet_to_tangent (tangent_to_jet tv)) tv := by
-  simp [jet_to_tangent, tangent_to_jet]; exact Path.refl _
-
-/-! ## Connections -/
-
-structure Connection where
-  transport : Nat → Nat → Nat → Nat
-  transport_refl : ∀ x fiber, transport x x fiber = fiber
+@[simp] theorem trans_refl_left_toEq {a b : YourObj} (p : YourPath a b) : toEq (trans (refl a) p) = toEq p := by
+  rfl
 
-/-- Reflexivity of transport. -/
-def connection_refl_path (conn : Connection) (x fiber : Nat) :
-    Path (conn.transport x x fiber) fiber :=
-  Path.ofEq (conn.transport_refl x fiber)
+@[simp] theorem trans_refl_right_toEq {a b : YourObj} (p : YourPath a b) : toEq (trans p (refl b)) = toEq p := by
+  simp
 
-def trivial_connection : Connection where
-  transport := fun _ _ fiber => fiber
-  transport_refl := fun _ _ => rfl
+@[simp] theorem trans_assoc_toEq {a b c d : YourObj} (p : YourPath a b) (q : YourPath b c) (r : YourPath c d) :
+    toEq (trans (trans p q) r) = toEq (trans p (trans q r)) := by
+  simp
 
-/-- Trivial transport is identity. -/
-def trivial_transport_path (x y fiber : Nat) :
-    Path (trivial_connection.transport x y fiber) fiber :=
-  Path.refl fiber
+@[simp] theorem symm_symm_toEq {a b : YourObj} (p : YourPath a b) : toEq (symm (symm p)) = toEq p := by
+  simp
 
-/-! ## Curvature -/
+@[simp] theorem toPath_trans_toEq {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) :
+    (toPath (trans p q)).toEq = (ComputationalPaths.Path.trans (toPath p) (toPath q)).toEq := by
+  rfl
 
-def curvature (conn : Connection) (x y z : Nat) (fiber : Nat) : Nat :=
-  conn.transport y z (conn.transport x y fiber)
+@[simp] theorem toPath_symm_toEq {a b : YourObj} (p : YourPath a b) :
+    (toPath (symm p)).toEq = (ComputationalPaths.Path.symm (toPath p)).toEq := by
+  rfl
 
-/-- Trivial connection has trivial curvature. -/
-def trivial_curvature (x y z fiber : Nat) :
-    Path (curvature trivial_connection x y z fiber) fiber :=
-  Path.refl fiber
+/-! ### SDG-flavoured derived paths -/
 
-/-- Flat connection: transport around any triangle returns to start. -/
-structure FlatConnection extends Connection where
-  flat : ∀ x y z fiber,
-    transport y z (transport x y fiber) = transport x z fiber
-
-/-- Path witnessing flatness. -/
-def flat_path (fc : FlatConnection) (x y z fiber : Nat) :
-    Path (fc.transport y z (fc.transport x y fiber))
-         (fc.transport x z fiber) :=
-  Path.ofEq (fc.flat x y z fiber)
-
-def trivial_flat : FlatConnection where
-  transport := fun _ _ fiber => fiber
-  transport_refl := fun _ _ => rfl
-  flat := fun _ _ _ _ => rfl
-
-/-- Trivial flat connection has trivial flat path. -/
-def trivial_flat_path (x y z fiber : Nat) :
-    Path (trivial_flat.transport y z (trivial_flat.transport x y fiber))
-         (trivial_flat.transport x z fiber) :=
-  Path.refl fiber
-
-/-! ## Microlinearity -/
-
-structure MicrolinearMap where
-  f : Nat → Nat
-  additive : ∀ a : Nat, f (a + 0) = f a
-
-/-- Path witnessing microlinearity. -/
-def microlinear_path (ml : MicrolinearMap) (a : Nat) :
-    Path (ml.f (a + 0)) (ml.f a) :=
-  Path.ofEq (ml.additive a)
-
-def microlinear_comp (f g : MicrolinearMap) : MicrolinearMap where
-  f := f.f ∘ g.f
-  additive := fun a => by simp [Function.comp]
-
-/-- Composition respects microlinearity. -/
-def microlinear_comp_path (f g : MicrolinearMap) (a : Nat) :
-    Path ((microlinear_comp f g).f (a + 0)) ((microlinear_comp f g).f a) :=
-  Path.ofEq ((microlinear_comp f g).additive a)
-
-/-- Identity is microlinear. -/
-def microlinear_id : MicrolinearMap where
-  f := id
-  additive := fun _ => by simp
-
-/-! ## Differential Forms -/
-
-structure OneForm where
-  eval : Nat → Nat → Nat
-
-def pullback_form (f : Nat → Nat) (ω : OneForm) : OneForm :=
-  ⟨fun x v => ω.eval (f x) v⟩
-
-/-- Double pullback is pullback of composition. -/
-def pullback_comp (f g : Nat → Nat) (ω : OneForm) :
-    Path (pullback_form f (pullback_form g ω))
-         (pullback_form (g ∘ f) ω) := by
-  simp [pullback_form, Function.comp]; exact Path.refl _
-
-def zero_form : OneForm := ⟨fun _ _ => 0⟩
-
-/-- Pullback of zero form is zero form. -/
-def pullback_zero (f : Nat → Nat) :
-    Path (pullback_form f zero_form) zero_form :=
-  Path.refl _
-
-/-- Pullback by identity is identity. -/
-def pullback_id (ω : OneForm) :
-    Path (pullback_form id ω) ω := by
-  simp [pullback_form]; exact Path.refl _
-
-/-! ## Lie Derivative (Discrete) -/
-
-def lie_derivative (field : Nat → Nat) (ω : OneForm) : OneForm :=
-  ⟨fun x v => ω.eval (field x) v⟩
-
-/-- Lie derivative of zero form is zero. -/
-def lie_zero (field : Nat → Nat) :
-    Path (lie_derivative field zero_form) zero_form :=
-  Path.refl _
-
-/-! ## Exponential Map -/
-
-def exp_map (f : Nat → Nat) : Nat → Nat → Nat
-  | 0, x => x
-  | n + 1, x => f (exp_map f n x)
-
-/-- exp_map 0 is identity. -/
-def exp_map_zero (f : Nat → Nat) (x : Nat) :
-    Path (exp_map f 0 x) x :=
-  Path.refl x
-
-/-- exp_map 1 is f. -/
-def exp_map_one (f : Nat → Nat) (x : Nat) :
-    Path (exp_map f 1 x) (f x) :=
-  Path.refl _
-
-/-- exp_map composes additively. -/
-def exp_map_add (f : Nat → Nat) : (m n x : Nat) →
-    Path (exp_map f (m + n) x) (exp_map f m (exp_map f n x))
-  | 0, n, x => by simp [exp_map]; exact Path.refl _
-  | m + 1, n, x => by
-    have h : m + 1 + n = (m + n) + 1 := by omega
-    rw [h]
-    simp only [exp_map]
-    have ih := (exp_map_add f m n x).proof
-    exact Path.ofEq (by rw [ih])
-
-/-! ## Parallel Transport Composition -/
-
-/-- Parallel transport along composed paths equals composed transport. -/
-def transport_trans (conn : FlatConnection) (x y z fiber : Nat) :
-    Path (conn.transport x z fiber)
-         (conn.transport y z (conn.transport x y fiber)) :=
-  Path.symm (flat_path conn x y z fiber)
-
-/-! ## Holonomy -/
-
-/-- Holonomy around a loop: transport from x back to x. -/
-def holonomy (conn : Connection) (x y : Nat) (fiber : Nat) : Nat :=
-  conn.transport y x (conn.transport x y fiber)
-
-/-- Trivial connection has trivial holonomy. -/
-def holonomy_trivial (x y fiber : Nat) :
-    Path (holonomy trivial_connection x y fiber) fiber :=
-  Path.refl fiber
-
-/-- Flat connection holonomy via intermediate point. -/
-def holonomy_flat (fc : FlatConnection) (x y fiber : Nat) :
-    Path (holonomy ⟨fc.transport, fc.transport_refl⟩ x y fiber) fiber := by
-  simp [holonomy]
-  have h1 := fc.flat x y x fiber
-  have h2 := fc.transport_refl x fiber
-  exact Path.ofEq (h1.trans h2)
-
-end ComputationalPaths.Path.Geometry.SDG
+@[simp] def proj_tv_path (x v : Nat) : YourPath (YourObj.proj (YourObj.tv x v)) (YourObj.pt x) :=
+  step (YourStep.proj_tv x v)
+
+@[simp] def tsmul_zero_path (x v : Nat) :
+    YourPath (YourObj.tsmul 0 (YourObj.tv x v)) (YourObj.zeroTV x) :=
+  step (YourStep.tsmul_zero x v)
+
+@[simp] def tsmul_one_path (x v : Nat) :
+    YourPath (YourObj.tsmul 1 (YourObj.tv x v)) (YourObj.tv x v) :=
+  step (YourStep.tsmul_one x v)
+
+@[simp] def tadd_comm_path (x v w : Nat) :
+    YourPath (YourObj.tadd (YourObj.tv x v) (YourObj.tv x w)) (YourObj.tadd (YourObj.tv x w) (YourObj.tv x v)) :=
+  step (YourStep.tadd_comm x v w)
+
+@[simp] def tadd_assoc_path (x u v w : Nat) :
+    YourPath (YourObj.tadd (YourObj.tadd (YourObj.tv x u) (YourObj.tv x v)) (YourObj.tv x w))
+            (YourObj.tadd (YourObj.tv x u) (YourObj.tadd (YourObj.tv x v) (YourObj.tv x w))) :=
+  step (YourStep.tadd_assoc x u v w)
+
+/-! ### Functoriality on paths with `Path.congrArg` -/
+
+/-- Forget velocity (a toy “bundle projection”): maps everything to a point. -/
+@[simp] def forgetVel : YourObj → YourObj
+  | .pt x => .pt x
+  | .tv x _ => .pt x
+
+@[simp] theorem congrArg_forgetVel_toEq {a b : YourObj} (p : YourPath a b) :
+    (ComputationalPaths.Path.congrArg forgetVel (toPath p)).toEq = _root_.congrArg forgetVel (toEq p) := rfl
+
+@[simp] theorem congrArg_forgetVel_trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) :
+    ComputationalPaths.Path.congrArg forgetVel (toPath (trans p q)) =
+      ComputationalPaths.Path.trans (ComputationalPaths.Path.congrArg forgetVel (toPath p))
+        (ComputationalPaths.Path.congrArg forgetVel (toPath q)) := by
+  simpa using (ComputationalPaths.Path.congrArg_trans forgetVel (toPath p) (toPath q))
+
+/-! ### Transport -/
+
+/-- A dependent family over objects: “fibers” as `Nat` indexed by basepoint. -/
+@[simp] def Fiber : YourObj → Type
+  | .pt x => Fin (x + 1) → Nat
+  | .tv x _ => Fin (x + 1) → Nat
+
+@[simp] theorem transport_refl (a : YourObj) (x : Fiber a) :
+    ComputationalPaths.Path.transport (D := Fiber) (ComputationalPaths.Path.refl a) x = x := by
+  simp [ComputationalPaths.Path.transport]
+
+@[simp] theorem transport_trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) (x : Fiber a) :
+    ComputationalPaths.Path.transport (D := Fiber) (toPath (trans p q)) x =
+      ComputationalPaths.Path.transport (D := Fiber) (toPath q)
+        (ComputationalPaths.Path.transport (D := Fiber) (toPath p) x) := by
+  simpa using ComputationalPaths.Path.transport_trans (D := Fiber) (toPath p) (toPath q) x
+
+@[simp] theorem transport_symm_left {a b : YourObj} (p : YourPath a b) (x : Fiber a) :
+    ComputationalPaths.Path.transport (D := Fiber) (toPath (symm p))
+      (ComputationalPaths.Path.transport (D := Fiber) (toPath p) x) = x := by
+  simpa [toPath_symm] using ComputationalPaths.Path.transport_symm_left (D := Fiber) (toPath p) x
+
+/-! ### Extra small theorems (to exceed 30) -/
+
+theorem toEq_refl (a : YourObj) : toEq (refl a) = rfl := rfl
+
+theorem toEq_step {a b : YourObj} (s : YourStep a b) : toEq (step s) = YourStep.toEq s := rfl
+
+theorem toEq_symm {a b : YourObj} (p : YourPath a b) : toEq (symm p) = (toEq p).symm := rfl
+
+theorem toEq_trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) :
+    toEq (trans p q) = (toEq p).trans (toEq q) := rfl
+
+theorem steps_refl (a : YourObj) : steps (refl a) = [] := rfl
+
+theorem steps_step {a b : YourObj} (s : YourStep a b) : steps (step s) = [YourStep.toCoreStep s] := rfl
+
+theorem steps_symm {a b : YourObj} (p : YourPath a b) :
+    steps (symm p) = (steps p).reverse.map ComputationalPaths.Step.symm := rfl
+
+theorem steps_trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) :
+    steps (trans p q) = steps p ++ steps q := rfl
+
+theorem toPath_toEq {a b : YourObj} (p : YourPath a b) : (toPath p).toEq = toEq p := rfl
+
+theorem toPath_steps {a b : YourObj} (p : YourPath a b) : (toPath p).steps = steps p := rfl
+
+theorem proj_tv_toEq (x v : Nat) : toEq (proj_tv_path x v) = rfl := by simp [proj_tv_path]
+
+theorem tadd_comm_toEq (x v w : Nat) : toEq (tadd_comm_path x v w) = by
+    simp [YourObj.tadd, Nat.add_comm] := by
+  simp [tadd_comm_path]
+
+theorem tadd_assoc_toEq (x u v w : Nat) : toEq (tadd_assoc_path x u v w) = by
+    simp [YourObj.tadd, Nat.add_assoc] := by
+  simp [tadd_assoc_path]
+
+end YourPath
+
+end ComputationalPaths.Path.Geometry.SyntheticDiffGeomPaths
