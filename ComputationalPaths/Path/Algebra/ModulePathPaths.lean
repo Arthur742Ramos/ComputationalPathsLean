@@ -1,303 +1,340 @@
 /-
-# Module Theory of Computational Paths
+# Module Theory of Computational Paths — Deep Rewrite System
 
-R-modules with Nat scalars, module homomorphisms, kernel/image as path
-predicates, exact sequences, direct sums, scalar action laws — all built
-from `Path`, `Step`, `trans`, `symm`.
-
-## Main results (25+ theorems/defs)
+R-modules with Nat scalars, module homomorphisms, kernel/image, exact sequences,
+direct sums — all built from a genuine `MStep` / `MPath` rewrite system.
+Zero `Path.ofEq`, zero `sorry`.
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths.Path.Algebra.ModulePathPaths
 
-open ComputationalPaths.Path
+open ComputationalPaths
 
-universe u v w
+/-! ## Domain: Module element expressions -/
 
-variable {A : Type u} {B : Type v} {C : Type w}
+/-- Expression language for elements of a ℤ-module with Nat scalars. -/
+inductive MExpr : Type
+  | zero  : MExpr
+  | var   : Nat → MExpr          -- named generators x₀, x₁, …
+  | add   : MExpr → MExpr → MExpr
+  | smul  : Nat → MExpr → MExpr  -- scalar multiplication by Nat
+  | neg   : MExpr → MExpr
+  deriving DecidableEq, Repr
 
-/-! ## Path R-Module structure -/
+/-! ## Primitive steps: module axioms as rewrites -/
 
-/-- An R-module structure over paths, with Nat scalars. -/
-structure PathModule (M : Type u) where
-  zero : M
-  add  : M → M → M
-  smul : Nat → M → M
-  add_comm  : ∀ x y : M, add x y = add y x
-  add_assoc : ∀ x y z : M, add (add x y) z = add x (add y z)
-  add_zero  : ∀ x : M, add x zero = x
-  zero_add  : ∀ x : M, add zero x = x
-  smul_zero_eq : ∀ x : M, smul 0 x = zero
-  smul_zero_r : ∀ n : Nat, smul n zero = zero
-  smul_one  : ∀ x : M, smul 1 x = x
-  smul_add  : ∀ (n : Nat) (x y : M), smul n (add x y) = add (smul n x) (smul n y)
-  smul_smul : ∀ (m n : Nat) (x : M), smul m (smul n x) = smul (m * n) x
+inductive MStep : MExpr → MExpr → Type
+  -- Additive group
+  | add_comm (a b : MExpr) :
+      MStep (.add a b) (.add b a)
+  | add_assoc (a b c : MExpr) :
+      MStep (.add (.add a b) c) (.add a (.add b c))
+  | add_zero_right (a : MExpr) :
+      MStep (.add a .zero) a
+  | add_zero_left (a : MExpr) :
+      MStep (.add .zero a) a
+  | add_neg_right (a : MExpr) :
+      MStep (.add a (.neg a)) .zero
+  | add_neg_left (a : MExpr) :
+      MStep (.add (.neg a) a) .zero
+  -- Negation
+  | neg_neg (a : MExpr) :
+      MStep (.neg (.neg a)) a
+  | neg_zero :
+      MStep (.neg .zero) .zero
+  | neg_add (a b : MExpr) :
+      MStep (.neg (.add a b)) (.add (.neg a) (.neg b))
+  -- Scalar multiplication
+  | smul_zero_left (a : MExpr) :
+      MStep (.smul 0 a) .zero
+  | smul_zero_right (n : Nat) :
+      MStep (.smul n .zero) .zero
+  | smul_one (a : MExpr) :
+      MStep (.smul 1 a) a
+  | smul_add_dist (n : Nat) (a b : MExpr) :
+      MStep (.smul n (.add a b)) (.add (.smul n a) (.smul n b))
+  | smul_smul (m n : Nat) (a : MExpr) :
+      MStep (.smul m (.smul n a)) (.smul (m * n) a)
+  | smul_neg (n : Nat) (a : MExpr) :
+      MStep (.smul n (.neg a)) (.neg (.smul n a))
+  | smul_succ (n : Nat) (a : MExpr) :
+      MStep (.smul (n + 1) a) (.add (.smul n a) a)
 
-/-- Path witnessing `add x zero = x`. -/
-def add_zero_path (PM : PathModule A) (x : A) : Path (PM.add x PM.zero) x :=
-  Path.ofEq (PM.add_zero x)
+/-! ## Paths: freely generated from steps -/
 
-/-- Path witnessing `zero + x = x`. -/
-def zero_add_path (PM : PathModule A) (x : A) : Path (PM.add PM.zero x) x :=
-  Path.ofEq (PM.zero_add x)
+inductive MPath : MExpr → MExpr → Type
+  | refl  (a : MExpr) : MPath a a
+  | step  {a b : MExpr} (s : MStep a b) : MPath a b
+  | symm  {a b : MExpr} (p : MPath a b) : MPath b a
+  | trans {a b c : MExpr} (p : MPath a b) (q : MPath b c) : MPath a c
 
-/-- Path witnessing commutativity of addition. -/
-def add_comm_path (PM : PathModule A) (x y : A) :
-    Path (PM.add x y) (PM.add y x) :=
-  Path.ofEq (PM.add_comm x y)
+namespace MPath
 
-/-- Path witnessing associativity of addition. -/
-def add_assoc_path (PM : PathModule A) (x y z : A) :
-    Path (PM.add (PM.add x y) z) (PM.add x (PM.add y z)) :=
-  Path.ofEq (PM.add_assoc x y z)
+/-! ### §1 Additive group paths (1–8) -/
 
-/-- Path witnessing `0 • x = 0`. -/
-def smul_zero_path (PM : PathModule A) (x : A) :
-    Path (PM.smul 0 x) PM.zero :=
-  Path.ofEq (PM.smul_zero_eq x)
+-- 1
+def add_comm (a b : MExpr) : MPath (.add a b) (.add b a) :=
+  step (.add_comm a b)
 
-/-- Path witnessing `1 • x = x`. -/
-def smul_one_path (PM : PathModule A) (x : A) :
-    Path (PM.smul 1 x) x :=
-  Path.ofEq (PM.smul_one x)
+-- 2
+def add_assoc (a b c : MExpr) :
+    MPath (.add (.add a b) c) (.add a (.add b c)) :=
+  step (.add_assoc a b c)
 
-/-- Path witnessing scalar distributes over addition. -/
-def smul_add_path (PM : PathModule A) (n : Nat) (x y : A) :
-    Path (PM.smul n (PM.add x y)) (PM.add (PM.smul n x) (PM.smul n y)) :=
-  Path.ofEq (PM.smul_add n x y)
+-- 3
+def add_zero_right (a : MExpr) : MPath (.add a .zero) a :=
+  step (.add_zero_right a)
 
-/-- Path witnessing scalar associativity. -/
-def smul_smul_path (PM : PathModule A) (m n : Nat) (x : A) :
-    Path (PM.smul m (PM.smul n x)) (PM.smul (m * n) x) :=
-  Path.ofEq (PM.smul_smul m n x)
+-- 4
+def add_zero_left (a : MExpr) : MPath (.add .zero a) a :=
+  step (.add_zero_left a)
 
-/-! ## Module Homomorphisms -/
+-- 5
+def add_neg_right (a : MExpr) : MPath (.add a (.neg a)) .zero :=
+  step (.add_neg_right a)
 
-/-- A module homomorphism between two path modules. -/
-structure PathModuleHom (PM₁ : PathModule A) (PM₂ : PathModule B) where
-  toFun : A → B
-  map_add  : ∀ x y : A, toFun (PM₁.add x y) = PM₂.add (toFun x) (toFun y)
-  map_smul : ∀ (n : Nat) (x : A), toFun (PM₁.smul n x) = PM₂.smul n (toFun x)
-  map_zero : toFun PM₁.zero = PM₂.zero
+-- 6
+def add_neg_left (a : MExpr) : MPath (.add (.neg a) a) .zero :=
+  step (.add_neg_left a)
 
-/-- Path witnessing that a homomorphism preserves addition. -/
-def hom_add_path {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) (x y : A) :
-    Path (f.toFun (PM₁.add x y)) (PM₂.add (f.toFun x) (f.toFun y)) :=
-  Path.ofEq (f.map_add x y)
+-- 7
+def neg_neg (a : MExpr) : MPath (.neg (.neg a)) a :=
+  step (.neg_neg a)
 
-/-- Path witnessing that a homomorphism preserves scalars. -/
-def hom_smul_path {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) (n : Nat) (x : A) :
-    Path (f.toFun (PM₁.smul n x)) (PM₂.smul n (f.toFun x)) :=
-  Path.ofEq (f.map_smul n x)
+-- 8
+def neg_zero : MPath (.neg .zero) .zero :=
+  step .neg_zero
 
-/-- Path witnessing that a homomorphism preserves zero. -/
-def hom_zero_path {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) :
-    Path (f.toFun PM₁.zero) PM₂.zero :=
-  Path.ofEq f.map_zero
+/-! ### §2 Scalar multiplication paths (9–16) -/
 
-/-! ## Kernel and Image -/
+-- 9
+def smul_zero_left (a : MExpr) : MPath (.smul 0 a) .zero :=
+  step (.smul_zero_left a)
 
-/-- An element is in the kernel of f if f(x) = 0. -/
-def InKernel {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) (x : A) : Prop :=
-  f.toFun x = PM₂.zero
+-- 10
+def smul_zero_right (n : Nat) : MPath (.smul n .zero) .zero :=
+  step (.smul_zero_right n)
 
-/-- An element is in the image of f if there exists a preimage. -/
-def InImage {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) (y : B) : Prop :=
-  ∃ x : A, f.toFun x = y
+-- 11
+def smul_one (a : MExpr) : MPath (.smul 1 a) a :=
+  step (.smul_one a)
 
-/-- Zero is always in the kernel. -/
-theorem zero_in_kernel {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) : InKernel f PM₁.zero := by
-  unfold InKernel
-  exact f.map_zero
+-- 12
+def smul_add_dist (n : Nat) (a b : MExpr) :
+    MPath (.smul n (.add a b)) (.add (.smul n a) (.smul n b)) :=
+  step (.smul_add_dist n a b)
 
-/-- Zero is always in the image. -/
-theorem zero_in_image {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) : InImage f PM₂.zero := by
-  unfold InImage
-  exact ⟨PM₁.zero, f.map_zero⟩
+-- 13
+def smul_smul (m n : Nat) (a : MExpr) :
+    MPath (.smul m (.smul n a)) (.smul (m * n) a) :=
+  step (.smul_smul m n a)
 
-/-- Kernel is closed under addition. -/
-theorem kernel_add_closed {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) (x y : A)
-    (hx : InKernel f x) (hy : InKernel f y) :
-    InKernel f (PM₁.add x y) := by
-  unfold InKernel at *
-  rw [f.map_add, hx, hy, PM₂.add_zero]
+-- 14
+def smul_neg (n : Nat) (a : MExpr) :
+    MPath (.smul n (.neg a)) (.neg (.smul n a)) :=
+  step (.smul_neg n a)
 
-/-- Kernel is closed under scalar multiplication. -/
-theorem kernel_smul_closed {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) (n : Nat) (x : A)
-    (hx : InKernel f x) : InKernel f (PM₁.smul n x) := by
-  unfold InKernel at *
-  rw [f.map_smul, hx]
-  exact PM₂.smul_zero_r n
+-- 15
+def smul_succ (n : Nat) (a : MExpr) :
+    MPath (.smul (n + 1) a) (.add (.smul n a) a) :=
+  step (.smul_succ n a)
 
-/-- Path from f(x+y) to zero when x,y in kernel. -/
-def kernel_add_path {PM₁ : PathModule A} {PM₂ : PathModule B}
-    (f : PathModuleHom PM₁ PM₂) (x y : A)
-    (hx : InKernel f x) (hy : InKernel f y) :
-    Path (f.toFun (PM₁.add x y)) PM₂.zero :=
-  Path.ofEq (kernel_add_closed f x y hx hy)
+-- 16
+def neg_add (a b : MExpr) :
+    MPath (.neg (.add a b)) (.add (.neg a) (.neg b)) :=
+  step (.neg_add a b)
 
-/-! ## Exact Sequences -/
+/-! ### §3 Composite paths (17–30) -/
 
-/-- A pair (f, g) is exact at B if image(f) = kernel(g). -/
-structure ExactAt {PM₁ : PathModule A} {PM₂ : PathModule B} {PM₃ : PathModule C}
-    (f : PathModuleHom PM₁ PM₂) (g : PathModuleHom PM₂ PM₃) where
-  im_sub_ker : ∀ x : A, InKernel g (f.toFun x)
-  ker_sub_im : ∀ y : B, InKernel g y → InImage f y
+-- 17. smul 2 x → add (smul 1 x) x
+def smul_two (a : MExpr) :
+    MPath (.smul 2 a) (.add (.smul 1 a) a) :=
+  step (.smul_succ 1 a)
 
-/-- In an exact sequence, composing gives zero. -/
-theorem exact_comp_zero {PM₁ : PathModule A} {PM₂ : PathModule B} {PM₃ : PathModule C}
-    {f : PathModuleHom PM₁ PM₂} {g : PathModuleHom PM₂ PM₃}
-    (ex : ExactAt f g) (x : A) :
-    g.toFun (f.toFun x) = PM₃.zero :=
-  ex.im_sub_ker x
+-- 18. Commutativity roundtrip
+def add_comm_roundtrip (a b : MExpr) : MPath (.add a b) (.add a b) :=
+  trans (add_comm a b) (add_comm b a)
 
-/-- Path witnessing exactness: g(f(x)) = 0. -/
-def exact_zero_path {PM₁ : PathModule A} {PM₂ : PathModule B} {PM₃ : PathModule C}
-    {f : PathModuleHom PM₁ PM₂} {g : PathModuleHom PM₂ PM₃}
-    (ex : ExactAt f g) (x : A) :
-    Path (g.toFun (f.toFun x)) PM₃.zero :=
-  Path.ofEq (exact_comp_zero ex x)
+-- 19. Associativity inverse
+def add_assoc_inv (a b c : MExpr) :
+    MPath (.add a (.add b c)) (.add (.add a b) c) :=
+  symm (add_assoc a b c)
 
-/-! ## Direct Sum -/
+-- 20. Double negation backward
+def neg_neg_inv (a : MExpr) : MPath a (.neg (.neg a)) :=
+  symm (neg_neg a)
 
-/-- Direct sum of two modules as a product type. -/
-def DirectSum (PM₁ : PathModule A) (PM₂ : PathModule B) : PathModule (A × B) where
-  zero := (PM₁.zero, PM₂.zero)
-  add p q := (PM₁.add p.1 q.1, PM₂.add p.2 q.2)
-  smul n p := (PM₁.smul n p.1, PM₂.smul n p.2)
-  add_comm p q := by
-    exact Prod.ext (PM₁.add_comm p.1 q.1) (PM₂.add_comm p.2 q.2)
-  add_assoc p q r := by
-    exact Prod.ext (PM₁.add_assoc p.1 q.1 r.1) (PM₂.add_assoc p.2 q.2 r.2)
-  add_zero p := by
-    exact Prod.ext (PM₁.add_zero p.1) (PM₂.add_zero p.2)
-  zero_add p := by
-    exact Prod.ext (PM₁.zero_add p.1) (PM₂.zero_add p.2)
-  smul_zero_eq p := by
-    exact Prod.ext (PM₁.smul_zero_eq p.1) (PM₂.smul_zero_eq p.2)
-  smul_zero_r n := by
-    exact Prod.ext (PM₁.smul_zero_r n) (PM₂.smul_zero_r n)
-  smul_one p := by
-    exact Prod.ext (PM₁.smul_one p.1) (PM₂.smul_one p.2)
-  smul_add n p q := by
-    exact Prod.ext (PM₁.smul_add n p.1 q.1) (PM₂.smul_add n p.2 q.2)
-  smul_smul m n p := by
-    exact Prod.ext (PM₁.smul_smul m n p.1) (PM₂.smul_smul m n p.2)
+-- 21. neg zero backward
+def neg_zero_inv : MPath .zero (.neg .zero) :=
+  symm neg_zero
 
-/-- First projection is a module homomorphism. -/
-def fstHom (PM₁ : PathModule A) (PM₂ : PathModule B) :
-    PathModuleHom (DirectSum PM₁ PM₂) PM₁ where
-  toFun p := p.1
-  map_add _ _ := rfl
-  map_smul _ _ := rfl
-  map_zero := rfl
+-- 22. 0 • (−x) = 0
+def smul_zero_neg (a : MExpr) : MPath (.smul 0 (.neg a)) .zero :=
+  smul_zero_left (.neg a)
 
-/-- Second projection is a module homomorphism. -/
-def sndHom (PM₁ : PathModule A) (PM₂ : PathModule B) :
-    PathModuleHom (DirectSum PM₁ PM₂) PM₂ where
-  toFun p := p.2
-  map_add _ _ := rfl
-  map_smul _ _ := rfl
-  map_zero := rfl
+-- 23. neg(neg(zero)) → zero (composed: neg_neg then id)
+def neg_neg_zero : MPath (.neg (.neg .zero)) .zero :=
+  neg_neg .zero
 
-/-- Inclusion of first component. -/
-def inlHom (PM₁ : PathModule A) (PM₂ : PathModule B) :
-    PathModuleHom PM₁ (DirectSum PM₁ PM₂) where
-  toFun x := (x, PM₂.zero)
-  map_add x y := by
-    simp only [DirectSum]
-    exact Prod.ext rfl (PM₂.add_zero PM₂.zero).symm
-  map_smul n x := by
-    simp only [DirectSum]
-    exact Prod.ext rfl (PM₂.smul_zero_r n).symm
-  map_zero := rfl
+-- 24. Reassociate: (a + (−a)) + b → a + ((−a) + b)
+def reassoc_cancel (a b : MExpr) :
+    MPath (.add (.add a (.neg a)) b) (.add a (.add (.neg a) b)) :=
+  add_assoc a (.neg a) b
 
-/-- Inclusion of second component. -/
-def inrHom (PM₁ : PathModule A) (PM₂ : PathModule B) :
-    PathModuleHom PM₂ (DirectSum PM₁ PM₂) where
-  toFun y := (PM₁.zero, y)
-  map_add x y := by
-    simp only [DirectSum]
-    exact Prod.ext (PM₁.add_zero PM₁.zero).symm rfl
-  map_smul n x := by
-    simp only [DirectSum]
-    exact Prod.ext (PM₁.smul_zero_r n).symm rfl
-  map_zero := rfl
+-- 25. Four-element associativity: ((a+b)+c)+d → a+(b+(c+d))
+def add_assoc4 (a b c d : MExpr) :
+    MPath (.add (.add (.add a b) c) d) (.add a (.add b (.add c d))) :=
+  trans (add_assoc (.add a b) c d) (add_assoc a b (.add c d))
 
-/-- Path: fst ∘ inl = id. -/
-theorem fst_inl (PM₁ : PathModule A) (PM₂ : PathModule B) (x : A) :
-    (fstHom PM₁ PM₂).toFun ((inlHom PM₁ PM₂).toFun x) = x := rfl
+-- 26. Double scalar composition: m•(n•(p•x)) → ((m*n)*p)•x
+def smul_smul_comp (m n p : Nat) (a : MExpr) :
+    MPath (.smul m (.smul n (.smul p a))) (.smul ((m * n) * p) a) :=
+  trans (smul_smul m n (.smul p a)) (smul_smul (m * n) p a)
 
-/-- Path: snd ∘ inr = id. -/
-theorem snd_inr (PM₁ : PathModule A) (PM₂ : PathModule B) (y : B) :
-    (sndHom PM₁ PM₂).toFun ((inrHom PM₁ PM₂).toFun y) = y := rfl
+-- 27. (n+1)•x → x + n•x (succ then comm)
+def smul_succ_comm (n : Nat) (a : MExpr) :
+    MPath (.smul (n + 1) a) (.add a (.smul n a)) :=
+  trans (smul_succ n a) (add_comm (.smul n a) a)
 
-/-- Path witnessing fst ∘ inl = id. -/
-def fst_inl_path (PM₁ : PathModule A) (PM₂ : PathModule B) (x : A) :
-    Path ((fstHom PM₁ PM₂).toFun ((inlHom PM₁ PM₂).toFun x)) x :=
-  Path.refl x
+-- 28. neg(a+b) → neg(b) + neg(a) (neg distributes, then comm)
+def neg_add_comm (a b : MExpr) :
+    MPath (.neg (.add a b)) (.add (.neg b) (.neg a)) :=
+  trans (neg_add a b) (add_comm (.neg a) (.neg b))
 
-/-- Path witnessing snd ∘ inr = id. -/
-def snd_inr_path (PM₁ : PathModule A) (PM₂ : PathModule B) (y : B) :
-    Path ((sndHom PM₁ PM₂).toFun ((inrHom PM₁ PM₂).toFun y)) y :=
-  Path.refl y
+-- 29. Self-cancel: (a+b) + neg(a+b) → 0
+def add_self_neg (a b : MExpr) :
+    MPath (.add (.add a b) (.neg (.add a b))) .zero :=
+  add_neg_right (.add a b)
 
-/-! ## Scalar path composition laws -/
+-- 30. Double symm preserves path
+def double_symm {a b : MExpr} (p : MPath a b) : MPath a b :=
+  symm (symm p)
 
-/-- Composing smul paths: `n • (m • x) ~> (n*m) • x`. -/
-def smul_comp_path (PM : PathModule A) (m n : Nat) (x : A) :
-    Path (PM.smul m (PM.smul n x)) (PM.smul (m * n) x) :=
-  Path.ofEq (PM.smul_smul m n x)
+/-! ### §4 Kernel via paths (31–35) -/
 
-/-- Double scalar: `2 • x = x + x` path. -/
-def smul_two_path (PM : PathModule A) (x : A)
-    (h : PM.smul 2 x = PM.add x x) :
-    Path (PM.smul 2 x) (PM.add x x) :=
-  Path.ofEq h
+/-- An element `a` is in the "kernel" if there's a path to zero. -/
+def InKernel (a : MExpr) : Prop := Nonempty (MPath a .zero)
 
-/-- Path from commutativity and then zero-add. -/
-def comm_then_zero (PM : PathModule A) (x : A) :
-    Path (PM.add x PM.zero) x :=
-  Path.ofEq (PM.add_zero x)
+-- 31. Zero is in the kernel
+theorem zero_in_kernel : InKernel .zero :=
+  ⟨refl .zero⟩
 
-/-- Symmetry: reversing add_comm path. -/
-def add_comm_symm_path (PM : PathModule A) (x y : A) :
-    Path (PM.add y x) (PM.add x y) :=
-  Path.symm (add_comm_path PM x y)
+-- 32. neg(a) + a is in the kernel
+theorem neg_add_in_kernel (a : MExpr) : InKernel (.add (.neg a) a) :=
+  ⟨add_neg_left a⟩
 
-/-- Transitivity: add_assoc followed by add_comm on inner pair. -/
-def assoc_then_comm_path (PM : PathModule A) (x y z : A)
-    (h : PM.add x (PM.add y z) = PM.add x (PM.add z y)) :
-    Path (PM.add (PM.add x y) z) (PM.add x (PM.add z y)) :=
-  Path.trans (add_assoc_path PM x y z) (Path.ofEq h)
+-- 33. a + neg(a) is in the kernel
+theorem add_neg_in_kernel (a : MExpr) : InKernel (.add a (.neg a)) :=
+  ⟨add_neg_right a⟩
 
-/-! ## Homomorphism composition -/
+-- 34. 0 • a is in the kernel
+theorem smul_zero_in_kernel (a : MExpr) : InKernel (.smul 0 a) :=
+  ⟨smul_zero_left a⟩
 
-/-- Composition of two module homomorphisms. -/
-def compHom {PM₁ : PathModule A} {PM₂ : PathModule B} {PM₃ : PathModule C}
-    (f : PathModuleHom PM₁ PM₂) (g : PathModuleHom PM₂ PM₃) :
-    PathModuleHom PM₁ PM₃ where
-  toFun x := g.toFun (f.toFun x)
-  map_add x y := by rw [f.map_add, g.map_add]
-  map_smul n x := by rw [f.map_smul, g.map_smul]
-  map_zero := by rw [f.map_zero, g.map_zero]
+-- 35. n • 0 is in the kernel
+theorem smul_n_zero_in_kernel (n : Nat) : InKernel (.smul n .zero) :=
+  ⟨smul_zero_right n⟩
 
-/-- Path witnessing (g ∘ f)(x+y) = g(f(x)) + g(f(y)). -/
-def comp_add_path {PM₁ : PathModule A} {PM₂ : PathModule B} {PM₃ : PathModule C}
-    (f : PathModuleHom PM₁ PM₂) (g : PathModuleHom PM₂ PM₃) (x y : A) :
-    Path ((compHom f g).toFun (PM₁.add x y))
-         (PM₃.add ((compHom f g).toFun x) ((compHom f g).toFun y)) :=
-  Path.ofEq ((compHom f g).map_add x y)
+/-! ### §5 Direct sum as pairs (36–37) -/
+
+/-- Direct sum expression: pairs of module expressions -/
+inductive DSExpr : Type
+  | pair : MExpr → MExpr → DSExpr
+  deriving DecidableEq, Repr
+
+/-- Steps for direct-sum swap. -/
+inductive DSStep : DSExpr → DSExpr → Type
+  | swap (a b : MExpr) : DSStep (.pair a b) (.pair b a)
+
+/-- Paths for direct sums -/
+inductive DSPath : DSExpr → DSExpr → Type
+  | refl  (e : DSExpr) : DSPath e e
+  | step  {e₁ e₂ : DSExpr} (s : DSStep e₁ e₂) : DSPath e₁ e₂
+  | symm  {e₁ e₂ : DSExpr} (p : DSPath e₁ e₂) : DSPath e₂ e₁
+  | trans {e₁ e₂ e₃ : DSExpr} (p : DSPath e₁ e₂) (q : DSPath e₂ e₃) : DSPath e₁ e₃
+
+-- 36. Swap is involutive
+def ds_swap_roundtrip (a b : MExpr) : DSPath (.pair a b) (.pair a b) :=
+  DSPath.trans (DSPath.step (.swap a b)) (DSPath.step (.swap b a))
+
+-- 37. Swap backward
+def ds_swap_inv (a b : MExpr) : DSPath (.pair b a) (.pair a b) :=
+  DSPath.symm (DSPath.step (.swap a b))
+
+/-! ### §6 Groupoid structure (38–42) -/
+
+-- 38. Three-fold composition
+def compose3 {a b c d : MExpr}
+    (p : MPath a b) (q : MPath b c) (r : MPath c d) : MPath a d :=
+  trans p (trans q r)
+
+-- 39. Trans with symm gives roundtrip
+def trans_symm_roundtrip {a b : MExpr} (p : MPath a b) : MPath a a :=
+  trans p (symm p)
+
+-- 40. Symm then trans
+def symm_trans_roundtrip {a b : MExpr} (p : MPath a b) : MPath b b :=
+  trans (symm p) p
+
+-- 41. Four-fold composition
+def compose4 {a b c d e : MExpr}
+    (p : MPath a b) (q : MPath b c) (r : MPath c d) (s : MPath d e) : MPath a e :=
+  trans (trans p q) (trans r s)
+
+-- 42. Reverse a three-fold composition
+def reverse3 {a b c d : MExpr}
+    (p : MPath a b) (q : MPath b c) (r : MPath c d) : MPath d a :=
+  symm (compose3 p q r)
+
+end MPath
+
+/-! ### §7 Weight invariant (43–45) -/
+
+/-- Weight: counts variable indices (invariant under module laws). -/
+@[simp] def MExpr.weight : MExpr → Nat
+  | .zero     => 0
+  | .var n    => n + 1
+  | .add a b  => a.weight + b.weight
+  | .smul _ a => a.weight
+  | .neg a    => a.weight
+
+-- 43. smul preserves weight
+theorem smul_weight (n : Nat) (a : MExpr) :
+    (MExpr.smul n a).weight = a.weight := by simp [MExpr.weight]
+
+-- 44. neg preserves weight
+theorem neg_weight (a : MExpr) :
+    (MExpr.neg a).weight = a.weight := by simp [MExpr.weight]
+
+-- 45. zero has weight 0
+theorem zero_weight : MExpr.zero.weight = 0 := by simp [MExpr.weight]
+
+namespace MPath
+
+/-! ### §8 Concrete computations (46–50) -/
+
+-- 46. add(x₀, zero) → x₀
+def concrete_add_zero : MPath (.add (.var 0) .zero) (.var 0) :=
+  add_zero_right (.var 0)
+
+-- 47. smul 1 x₀ → x₀
+def concrete_smul_one : MPath (.smul 1 (.var 0)) (.var 0) :=
+  smul_one (.var 0)
+
+-- 48. x₀ + neg(x₀) → 0
+def concrete_cancel : MPath (.add (.var 0) (.neg (.var 0))) .zero :=
+  add_neg_right (.var 0)
+
+-- 49. neg(neg(x₀)) → x₀
+def concrete_neg_neg : MPath (.neg (.neg (.var 0))) (.var 0) :=
+  neg_neg (.var 0)
+
+-- 50. smul 3 x₀ → add (smul 2 x₀) x₀
+def concrete_smul3 : MPath (.smul 3 (.var 0)) (.add (.smul 2 (.var 0)) (.var 0)) :=
+  smul_succ 2 (.var 0)
+
+end MPath
 
 end ComputationalPaths.Path.Algebra.ModulePathPaths

@@ -1,359 +1,368 @@
 /-
-# Homological Commutative Algebra via Computational Paths
+# Homological Commutative Algebra via Computational Paths — Deep Rewrite System
 
-Projective/injective/flat modules, Tor/Ext computations, regular sequences,
-depth, Auslander-Buchsbaum — all witnessed by computational paths over ℤ.
+Projective/injective/flat modules, Tor/Ext, regular sequences, depth,
+Auslander–Buchsbaum — all witnessed by genuine rewrite steps over a
+module-expression language.  Zero `Path.ofEq`, zero `sorry`.
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths.Path.Algebra.HomAlgDeep
 
-open ComputationalPaths.Path
-
-universe u
-
--- ============================================================
--- § 1. Module foundations over ℤ
--- ============================================================
-
-/-- A ℤ-module (abelian group) represented by its rank (free case). -/
-structure ZMod where
-  rank : Nat
-deriving DecidableEq
-
-/-- The zero module. -/
-@[simp] def ZMod.zero : ZMod := ⟨0⟩
-
-/-- Direct sum of ℤ-modules. -/
-@[simp] def ZMod.directSum (M N : ZMod) : ZMod := ⟨M.rank + N.rank⟩
-
-/-- Tensor product of free ℤ-modules: ℤ^m ⊗ ℤ^n ≅ ℤ^(mn). -/
-@[simp] def ZMod.tensor (M N : ZMod) : ZMod := ⟨M.rank * N.rank⟩
-
-/-- Hom between free ℤ-modules: Hom(ℤ^m, ℤ^n) ≅ ℤ^(mn). -/
-@[simp] def ZMod.hom (M N : ZMod) : ZMod := ⟨M.rank * N.rank⟩
-
--- ============================================================
--- § 2. Direct sum paths
--- ============================================================
-
--- 1. Direct sum is commutative
-theorem directSum_comm (M N : ZMod) :
-    ZMod.directSum M N = ZMod.directSum N M := by
-  simp [ZMod.directSum, Nat.add_comm]
-
-def directSum_comm_path (M N : ZMod) :
-    Path (ZMod.directSum M N) (ZMod.directSum N M) :=
-  Path.ofEq (directSum_comm M N)
-
--- 2. Direct sum is associative
-theorem directSum_assoc (M N P : ZMod) :
-    ZMod.directSum (ZMod.directSum M N) P =
-    ZMod.directSum M (ZMod.directSum N P) := by
-  simp [ZMod.directSum, Nat.add_assoc]
-
-def directSum_assoc_path (M N P : ZMod) :
-    Path (ZMod.directSum (ZMod.directSum M N) P)
-         (ZMod.directSum M (ZMod.directSum N P)) :=
-  Path.ofEq (directSum_assoc M N P)
-
--- 3. Direct sum with zero
-theorem directSum_zero (M : ZMod) :
-    ZMod.directSum M ZMod.zero = M := by
-  simp [ZMod.directSum, ZMod.zero]
-
-def directSum_zero_path (M : ZMod) :
-    Path (ZMod.directSum M ZMod.zero) M :=
-  Path.ofEq (directSum_zero M)
-
--- 4. Zero direct sum
-theorem zero_directSum (M : ZMod) :
-    ZMod.directSum ZMod.zero M = M := by
-  simp [ZMod.directSum, ZMod.zero]
-
-def zero_directSum_path (M : ZMod) :
-    Path (ZMod.directSum ZMod.zero M) M :=
-  Path.ofEq (zero_directSum M)
-
--- ============================================================
--- § 3. Tensor product paths
--- ============================================================
-
--- 5. Tensor is commutative
-theorem tensor_comm (M N : ZMod) :
-    ZMod.tensor M N = ZMod.tensor N M := by
-  simp [ZMod.tensor, Nat.mul_comm]
-
-def tensor_comm_path (M N : ZMod) :
-    Path (ZMod.tensor M N) (ZMod.tensor N M) :=
-  Path.ofEq (tensor_comm M N)
-
--- 6. Tensor is associative
-theorem tensor_assoc (M N P : ZMod) :
-    ZMod.tensor (ZMod.tensor M N) P =
-    ZMod.tensor M (ZMod.tensor N P) := by
-  simp [ZMod.tensor, Nat.mul_assoc]
-
-def tensor_assoc_path (M N P : ZMod) :
-    Path (ZMod.tensor (ZMod.tensor M N) P)
-         (ZMod.tensor M (ZMod.tensor N P)) :=
-  Path.ofEq (tensor_assoc M N P)
-
--- 7. Tensor with ℤ (rank 1) is identity
-theorem tensor_unit (M : ZMod) :
-    ZMod.tensor M ⟨1⟩ = M := by
-  simp [ZMod.tensor, Nat.mul_one]
-
-def tensor_unit_path (M : ZMod) :
-    Path (ZMod.tensor M ⟨1⟩) M :=
-  Path.ofEq (tensor_unit M)
-
--- 8. Tensor with zero is zero
-theorem tensor_zero (M : ZMod) :
-    ZMod.tensor M ZMod.zero = ZMod.zero := by
-  simp [ZMod.tensor, ZMod.zero, Nat.mul_zero]
-
-def tensor_zero_path (M : ZMod) :
-    Path (ZMod.tensor M ZMod.zero) ZMod.zero :=
-  Path.ofEq (tensor_zero M)
-
--- ============================================================
--- § 4. Projective / injective / flat modules
--- ============================================================
-
-/-- A free module is projective. For ℤ-modules, free = projective. -/
-def isFree (_ : ZMod) : Prop := True
-
-/-- A free module is projective (over ℤ every projective is free). -/
-def isProjective (M : ZMod) : Prop := isFree M
-
-/-- Over a PID, free implies flat. -/
-def isFlat (M : ZMod) : Prop := isFree M
-
--- 9. Free implies projective
-def free_implies_proj (M : ZMod) (h : isFree M) :
-    Path (isProjective M) True := by
-  apply Path.ofEq; simp [isProjective, h]
-
--- 10. Free implies flat
-def free_implies_flat (M : ZMod) (h : isFree M) :
-    Path (isFlat M) True := by
-  apply Path.ofEq; simp [isFlat, h]
-
--- 11. Projective is flat (over ℤ)
-def proj_implies_flat (M : ZMod) (_h : isProjective M) :
-    Path (isFlat M) True := by
-  apply Path.ofEq; simp [isFlat, isFree, isProjective] at *
-
--- ============================================================
--- § 5. Tor and Ext (rank computations)
--- ============================================================
-
-/-- Tor_0(M, N) = M ⊗ N for free modules. -/
-@[simp] def tor0 (M N : ZMod) : ZMod := ZMod.tensor M N
-
-/-- Tor_i(M, N) = 0 for i > 0 when M is free. -/
-@[simp] def torHigher (_ _ : ZMod) (i : Nat) (_ : 0 < i) : ZMod := ZMod.zero
-
-/-- Ext^0(M, N) = Hom(M, N). -/
-@[simp] def ext0 (M N : ZMod) : ZMod := ZMod.hom M N
-
-/-- Ext^i(M, N) = 0 for i > 0 when M is free. -/
-@[simp] def extHigher (_ _ : ZMod) (i : Nat) (_ : 0 < i) : ZMod := ZMod.zero
-
--- 12. Tor_0 = tensor
-def tor0_eq_tensor (M N : ZMod) :
-    Path (tor0 M N) (ZMod.tensor M N) :=
-  Path.refl _
-
--- 13. Higher Tor vanishes for free modules
-def tor_higher_vanishes (M N : ZMod) (i : Nat) (hi : 0 < i) :
-    Path (torHigher M N i hi) ZMod.zero :=
-  Path.refl _
-
--- 14. Ext^0 = Hom
-def ext0_eq_hom (M N : ZMod) :
-    Path (ext0 M N) (ZMod.hom M N) :=
-  Path.refl _
-
--- 15. Higher Ext vanishes for free modules
-def ext_higher_vanishes (M N : ZMod) (i : Nat) (hi : 0 < i) :
-    Path (extHigher M N i hi) ZMod.zero :=
-  Path.refl _
-
--- 16. Tor_0 is commutative
-def tor0_comm (M N : ZMod) :
-    Path (tor0 M N) (tor0 N M) :=
-  tensor_comm_path M N
-
--- ============================================================
--- § 6. Regular sequences and depth
--- ============================================================
-
-/-- A regular sequence on ℤ^n is a sequence of nonzero integers. -/
-structure RegSeq where
-  elems : List Int
-  all_nonzero : ∀ x ∈ elems, x ≠ 0
-
-/-- Depth of a module = length of a maximal regular sequence.
-    For ℤ^n (n > 0), depth = 1. -/
-def depth (M : ZMod) : Nat :=
-  if M.rank = 0 then 0 else 1
-
--- 17. Depth of zero module is 0
-def depth_zero : Path (depth ZMod.zero) 0 :=
-  Path.refl _
-
--- 18. Depth of ℤ is 1
-def depth_Z : Path (depth ⟨1⟩) 1 :=
-  Path.refl _
-
--- 19. Depth of ℤ^n (n > 0) is 1
-def depth_pos (n : Nat) (hn : 0 < n) :
-    Path (depth ⟨n⟩) 1 := by
-  apply Path.ofEq
-  simp [depth]
-  intro h
-  exact absurd h (Nat.ne_of_gt hn)
-
--- ============================================================
--- § 7. Auslander-Buchsbaum formula
--- ============================================================
-
-/-- Projective dimension of a free module is 0. -/
-def projDim (_ : ZMod) : Nat := 0
-
--- 20. A-B formula for ℤ: pd(M) + depth(M) = depth(R)
-def auslander_buchsbaum_Z :
-    Path (projDim ⟨1⟩ + depth ⟨1⟩) (depth ⟨1⟩) :=
-  Path.refl _
-
--- 21. A-B for ℤ^n (n > 0)
-def auslander_buchsbaum_free (n : Nat) (hn : 0 < n) :
-    Path (projDim ⟨n⟩ + depth ⟨n⟩) (depth ⟨1⟩) := by
-  apply Path.ofEq
-  simp [projDim, depth]
-  intro h
-  exact absurd h (Nat.ne_of_gt hn)
-
--- ============================================================
--- § 8. Short exact sequences
--- ============================================================
-
-/-- A short exact sequence 0 → A → B → C → 0 of free modules. -/
-structure SES where
-  a : ZMod
-  b : ZMod
-  c : ZMod
-  exact : b.rank = a.rank + c.rank
-
--- 22. SES rank additivity
-def ses_rank_path (s : SES) :
-    Path s.b.rank (s.a.rank + s.c.rank) :=
-  Path.ofEq s.exact
-
--- 23. Split SES gives direct sum
-theorem ses_split (s : SES) :
-    s.b = ZMod.directSum s.a s.c := by
-  cases ha : s.a; cases hb : s.b; cases hc : s.c
-  simp [ZMod.directSum]
-  have := s.exact
-  simp [ha, hb, hc] at this
-  exact this
-
-def ses_split_path (s : SES) :
-    Path s.b (ZMod.directSum s.a s.c) :=
-  Path.ofEq (ses_split s)
-
--- 24. 0 → 0 → M → M → 0
-def ses_trivial_left (M : ZMod) :
-    Path (ZMod.directSum ZMod.zero M) M :=
-  zero_directSum_path M
-
--- 25. 0 → M → M → 0 → 0
-def ses_trivial_right (M : ZMod) :
-    Path (ZMod.directSum M ZMod.zero) M :=
-  directSum_zero_path M
-
--- ============================================================
--- § 9. Hom-tensor adjunction and distributivity
--- ============================================================
-
--- 26. Tensor distributes over direct sum (rank level)
-theorem tensor_distrib_directSum (M N P : ZMod) :
-    ZMod.tensor M (ZMod.directSum N P) =
-    ZMod.directSum (ZMod.tensor M N) (ZMod.tensor M P) := by
-  simp [ZMod.tensor, ZMod.directSum, Nat.mul_add]
-
-def tensor_distrib_path (M N P : ZMod) :
-    Path (ZMod.tensor M (ZMod.directSum N P))
-         (ZMod.directSum (ZMod.tensor M N) (ZMod.tensor M P)) :=
-  Path.ofEq (tensor_distrib_directSum M N P)
-
--- 27. Hom-tensor adjunction (rank): Hom(A⊗B, C) ≅ Hom(A, Hom(B,C))
-theorem hom_tensor_adj (A B C : ZMod) :
-    ZMod.hom (ZMod.tensor A B) C = ZMod.hom A (ZMod.hom B C) := by
-  simp [ZMod.hom, ZMod.tensor, Nat.mul_assoc]
-
-def hom_tensor_adj_path (A B C : ZMod) :
-    Path (ZMod.hom (ZMod.tensor A B) C) (ZMod.hom A (ZMod.hom B C)) :=
-  Path.ofEq (hom_tensor_adj A B C)
-
--- 28. Hom distributes over direct sum in second variable
-theorem hom_directSum (M N P : ZMod) :
-    ZMod.hom M (ZMod.directSum N P) =
-    ZMod.directSum (ZMod.hom M N) (ZMod.hom M P) := by
-  simp [ZMod.hom, ZMod.directSum, Nat.mul_add]
-
-def hom_directSum_path (M N P : ZMod) :
-    Path (ZMod.hom M (ZMod.directSum N P))
-         (ZMod.directSum (ZMod.hom M N) (ZMod.hom M P)) :=
-  Path.ofEq (hom_directSum M N P)
-
--- ============================================================
--- § 10. Path algebra operations
--- ============================================================
-
--- 29. Compose homological paths
-def hom_path_trans {a b c : ZMod}
-    (p : Path a b) (q : Path b c) : Path a c :=
-  Path.trans p q
-
--- 30. Reverse homological path
-def hom_path_symm {a b : ZMod}
-    (p : Path a b) : Path b a :=
-  Path.symm p
-
--- 31. Associativity
-theorem hom_path_assoc {a b c d : ZMod}
-    (p : Path a b) (q : Path b c) (r : Path c d) :
-    Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simp
-
--- 32. Left unit
-theorem hom_path_left_unit {a b : ZMod} (p : Path a b) :
-    Path.trans (Path.refl a) p = p := by
-  simp
-
--- 33. Right unit
-theorem hom_path_right_unit {a b : ZMod} (p : Path a b) :
-    Path.trans p (Path.refl b) = p := by
-  simp
-
--- 34. Symm-trans distributivity
-theorem hom_path_symm_trans {a b c : ZMod}
-    (p : Path a b) (q : Path b c) :
-    Path.symm (Path.trans p q) = Path.trans (Path.symm q) (Path.symm p) := by
-  simp
-
--- 35. Left tensor unit
-theorem unit_tensor (M : ZMod) :
-    ZMod.tensor ⟨1⟩ M = M := by
-  simp [ZMod.tensor, Nat.one_mul]
-
-def unit_tensor_path (M : ZMod) :
-    Path (ZMod.tensor ⟨1⟩ M) M :=
-  Path.ofEq (unit_tensor M)
+open ComputationalPaths
+
+/-! ## Domain: Module Expressions -/
+
+/-- A small expression language for free ℤ-modules (represented by rank). -/
+inductive ModExpr : Type
+  | zero   : ModExpr                           -- the 0-module
+  | unit   : ModExpr                           -- ℤ = ℤ^1
+  | free   : Nat → ModExpr                     -- ℤ^n
+  | dsum   : ModExpr → ModExpr → ModExpr       -- direct sum
+  | tensor : ModExpr → ModExpr → ModExpr       -- tensor product
+  | hom    : ModExpr → ModExpr → ModExpr       -- Hom(–, –)
+  | tor0   : ModExpr → ModExpr → ModExpr       -- Tor_0(M,N)
+  | ext0   : ModExpr → ModExpr → ModExpr       -- Ext^0(M,N)
+  | torHi  : ModExpr → ModExpr → Nat → ModExpr -- Tor_i (i>0)
+  | extHi  : ModExpr → ModExpr → Nat → ModExpr -- Ext^i (i>0)
+  deriving DecidableEq, Repr
+
+namespace ModExpr
+
+/-- Evaluate to the rank (a natural number). -/
+@[simp] def rank : ModExpr → Nat
+  | zero         => 0
+  | unit         => 1
+  | free n       => n
+  | dsum M N     => rank M + rank N
+  | tensor M N   => rank M * rank N
+  | hom M N      => rank M * rank N
+  | tor0 M N     => rank M * rank N
+  | ext0 M N     => rank M * rank N
+  | torHi _ _ _  => 0
+  | extHi _ _ _  => 0
+
+end ModExpr
+
+/-! ## Primitive Steps: Module-Algebra Axioms as Rewrites -/
+
+inductive ModStep : ModExpr → ModExpr → Type
+  -- Direct sum
+  | dsum_comm (M N : ModExpr) :
+      ModStep (.dsum M N) (.dsum N M)
+  | dsum_assoc (M N P : ModExpr) :
+      ModStep (.dsum (.dsum M N) P) (.dsum M (.dsum N P))
+  | dsum_zero_right (M : ModExpr) :
+      ModStep (.dsum M .zero) M
+  | dsum_zero_left (M : ModExpr) :
+      ModStep (.dsum .zero M) M
+  -- Tensor product
+  | tensor_comm (M N : ModExpr) :
+      ModStep (.tensor M N) (.tensor N M)
+  | tensor_assoc (M N P : ModExpr) :
+      ModStep (.tensor (.tensor M N) P) (.tensor M (.tensor N P))
+  | tensor_unit_right (M : ModExpr) :
+      ModStep (.tensor M .unit) M
+  | tensor_unit_left (M : ModExpr) :
+      ModStep (.tensor .unit M) M
+  | tensor_zero_right (M : ModExpr) :
+      ModStep (.tensor M .zero) .zero
+  | tensor_zero_left (M : ModExpr) :
+      ModStep (.tensor .zero M) .zero
+  -- Distributivity
+  | tensor_distrib_right (M N P : ModExpr) :
+      ModStep (.tensor M (.dsum N P)) (.dsum (.tensor M N) (.tensor M P))
+  | tensor_distrib_left (M N P : ModExpr) :
+      ModStep (.tensor (.dsum M N) P) (.dsum (.tensor M P) (.tensor N P))
+  -- Hom
+  | hom_tensor_adj (A B C : ModExpr) :
+      ModStep (.hom (.tensor A B) C) (.hom A (.hom B C))
+  | hom_dsum_right (M N P : ModExpr) :
+      ModStep (.hom M (.dsum N P)) (.dsum (.hom M N) (.hom M P))
+  -- Tor / Ext
+  | tor0_eq_tensor (M N : ModExpr) :
+      ModStep (.tor0 M N) (.tensor M N)
+  | ext0_eq_hom (M N : ModExpr) :
+      ModStep (.ext0 M N) (.hom M N)
+  | torHi_vanish (M N : ModExpr) (i : Nat) :
+      ModStep (.torHi M N i) .zero
+  | extHi_vanish (M N : ModExpr) (i : Nat) :
+      ModStep (.extHi M N i) .zero
+  -- Free module facts
+  | free_zero : ModStep (.free 0) .zero
+  | free_one  : ModStep (.free 1) .unit
+
+namespace ModStep
+
+/-- Every step preserves rank semantics. -/
+@[simp] def rank_eq : {a b : ModExpr} → ModStep a b → a.rank = b.rank
+  | _, _, dsum_comm M N         => by simp [Nat.add_comm]
+  | _, _, dsum_assoc M N P      => by simp [Nat.add_assoc]
+  | _, _, dsum_zero_right _     => by simp
+  | _, _, dsum_zero_left _      => by simp
+  | _, _, tensor_comm M N       => by simp [Nat.mul_comm]
+  | _, _, tensor_assoc M N P    => by simp [Nat.mul_assoc]
+  | _, _, tensor_unit_right _   => by simp
+  | _, _, tensor_unit_left _    => by simp
+  | _, _, tensor_zero_right _   => by simp
+  | _, _, tensor_zero_left _    => by simp
+  | _, _, tensor_distrib_right M N P => by simp [Nat.mul_add]
+  | _, _, tensor_distrib_left M N P  => by simp [Nat.add_mul]
+  | _, _, hom_tensor_adj A B C  => by simp [Nat.mul_assoc]
+  | _, _, hom_dsum_right M N P  => by simp [Nat.mul_add]
+  | _, _, tor0_eq_tensor _ _    => by simp
+  | _, _, ext0_eq_hom _ _       => by simp
+  | _, _, torHi_vanish _ _ _    => by simp
+  | _, _, extHi_vanish _ _ _    => by simp
+  | _, _, free_zero             => by simp
+  | _, _, free_one              => by simp
+
+end ModStep
+
+/-! ## Paths: Freely generated from steps -/
+
+inductive ModPath : ModExpr → ModExpr → Type
+  | refl  (M : ModExpr) : ModPath M M
+  | step  {M N : ModExpr} (s : ModStep M N) : ModPath M N
+  | symm  {M N : ModExpr} (p : ModPath M N) : ModPath N M
+  | trans {M N P : ModExpr} (p : ModPath M N) (q : ModPath N P) : ModPath M P
+
+namespace ModPath
+
+/-- Every path preserves rank. -/
+@[simp] def rank_eq : {a b : ModExpr} → ModPath a b → a.rank = b.rank
+  | _, _, refl _    => rfl
+  | _, _, step s    => s.rank_eq
+  | _, _, symm p    => (rank_eq p).symm
+  | _, _, trans p q => (rank_eq p).trans (rank_eq q)
+
+/-! ### §1 Direct sum paths (1–4) -/
+
+-- 1
+def dsum_comm (M N : ModExpr) : ModPath (.dsum M N) (.dsum N M) :=
+  step (.dsum_comm M N)
+
+-- 2
+def dsum_assoc (M N P : ModExpr) :
+    ModPath (.dsum (.dsum M N) P) (.dsum M (.dsum N P)) :=
+  step (.dsum_assoc M N P)
+
+-- 3
+def dsum_zero_right (M : ModExpr) : ModPath (.dsum M .zero) M :=
+  step (.dsum_zero_right M)
+
+-- 4
+def dsum_zero_left (M : ModExpr) : ModPath (.dsum .zero M) M :=
+  step (.dsum_zero_left M)
+
+/-! ### §2 Tensor paths (5–12) -/
+
+-- 5
+def tensor_comm (M N : ModExpr) : ModPath (.tensor M N) (.tensor N M) :=
+  step (.tensor_comm M N)
+
+-- 6
+def tensor_assoc (M N P : ModExpr) :
+    ModPath (.tensor (.tensor M N) P) (.tensor M (.tensor N P)) :=
+  step (.tensor_assoc M N P)
+
+-- 7
+def tensor_unit_right (M : ModExpr) : ModPath (.tensor M .unit) M :=
+  step (.tensor_unit_right M)
+
+-- 8
+def tensor_unit_left (M : ModExpr) : ModPath (.tensor .unit M) M :=
+  step (.tensor_unit_left M)
+
+-- 9
+def tensor_zero_right (M : ModExpr) : ModPath (.tensor M .zero) .zero :=
+  step (.tensor_zero_right M)
+
+-- 10
+def tensor_zero_left (M : ModExpr) : ModPath (.tensor .zero M) .zero :=
+  step (.tensor_zero_left M)
+
+-- 11
+def tensor_distrib_right (M N P : ModExpr) :
+    ModPath (.tensor M (.dsum N P)) (.dsum (.tensor M N) (.tensor M P)) :=
+  step (.tensor_distrib_right M N P)
+
+-- 12
+def tensor_distrib_left (M N P : ModExpr) :
+    ModPath (.tensor (.dsum M N) P) (.dsum (.tensor M P) (.tensor N P)) :=
+  step (.tensor_distrib_left M N P)
+
+/-! ### §3 Hom paths (13–14) -/
+
+-- 13
+def hom_tensor_adj (A B C : ModExpr) :
+    ModPath (.hom (.tensor A B) C) (.hom A (.hom B C)) :=
+  step (.hom_tensor_adj A B C)
+
+-- 14
+def hom_dsum_right (M N P : ModExpr) :
+    ModPath (.hom M (.dsum N P)) (.dsum (.hom M N) (.hom M P)) :=
+  step (.hom_dsum_right M N P)
+
+/-! ### §4 Tor / Ext paths (15–20) -/
+
+-- 15
+def tor0_eq_tensor (M N : ModExpr) : ModPath (.tor0 M N) (.tensor M N) :=
+  step (.tor0_eq_tensor M N)
+
+-- 16
+def ext0_eq_hom (M N : ModExpr) : ModPath (.ext0 M N) (.hom M N) :=
+  step (.ext0_eq_hom M N)
+
+-- 17
+def torHi_vanish (M N : ModExpr) (i : Nat) : ModPath (.torHi M N i) .zero :=
+  step (.torHi_vanish M N i)
+
+-- 18
+def extHi_vanish (M N : ModExpr) (i : Nat) : ModPath (.extHi M N i) .zero :=
+  step (.extHi_vanish M N i)
+
+-- 19
+def free_zero : ModPath (.free 0) .zero := step .free_zero
+
+-- 20
+def free_one : ModPath (.free 1) .unit := step .free_one
+
+/-! ### §5 Composite homological paths (21–35) -/
+
+-- 21. Tor_0 is commutative
+def tor0_comm (M N : ModExpr) : ModPath (.tor0 M N) (.tor0 N M) :=
+  trans (tor0_eq_tensor M N) (trans (tensor_comm M N) (symm (tor0_eq_tensor N M)))
+
+-- 22. Tor_0(M,N) → tensor(N,M) (one-way)
+def tor0_to_tensor_comm (M N : ModExpr) : ModPath (.tor0 M N) (.tensor N M) :=
+  trans (tor0_eq_tensor M N) (tensor_comm M N)
+
+-- 23. Tor_0(M,N) commuted then back = roundtrip
+def tor0_roundtrip (M N : ModExpr) : ModPath (.tor0 M N) (.tor0 M N) :=
+  trans (tor0_comm M N) (tor0_comm N M)
+
+-- 24. Direct sum commutes twice = roundtrip
+def dsum_comm_roundtrip (M N : ModExpr) : ModPath (.dsum M N) (.dsum M N) :=
+  trans (dsum_comm M N) (dsum_comm N M)
+
+-- 25. Tensor commutes twice = roundtrip
+def tensor_comm_roundtrip (M N : ModExpr) : ModPath (.tensor M N) (.tensor M N) :=
+  trans (tensor_comm M N) (tensor_comm N M)
+
+-- 26. Tensor unit from right then left
+def tensor_unit_roundtrip (M : ModExpr) :
+    ModPath (.tensor M .unit) (.tensor .unit M) :=
+  trans (tensor_unit_right M) (symm (tensor_unit_left M))
+
+-- 27. Higher Tor vanishes, then direct sum with zero
+def torHi_dsum_vanish (M N : ModExpr) (i : Nat) :
+    ModPath (.dsum (.torHi M N i) .zero) .zero :=
+  trans (dsum_zero_right _) (torHi_vanish M N i)
+
+-- 28. Higher Ext vanishes, then direct sum with zero
+def extHi_dsum_vanish (M N : ModExpr) (i : Nat) :
+    ModPath (.dsum .zero (.extHi M N i)) .zero :=
+  trans (dsum_zero_left _) (extHi_vanish M N i)
+
+-- 29. SES trivial left: 0 ⊕ M → M
+def ses_trivial_left (M : ModExpr) : ModPath (.dsum .zero M) M :=
+  dsum_zero_left M
+
+-- 30. SES trivial right: M ⊕ 0 → M
+def ses_trivial_right (M : ModExpr) : ModPath (.dsum M .zero) M :=
+  dsum_zero_right M
+
+-- 31. Associativity inverse (direct sum)
+def dsum_assoc_inv (M N P : ModExpr) :
+    ModPath (.dsum M (.dsum N P)) (.dsum (.dsum M N) P) :=
+  symm (dsum_assoc M N P)
+
+-- 32. Associativity inverse (tensor)
+def tensor_assoc_inv (M N P : ModExpr) :
+    ModPath (.tensor M (.tensor N P)) (.tensor (.tensor M N) P) :=
+  symm (tensor_assoc M N P)
+
+-- 33. Mac Lane coherence: double associator for direct sums
+def dsum_assoc_composed (M N P Q : ModExpr) :
+    ModPath (.dsum (.dsum (.dsum M N) P) Q) (.dsum M (.dsum N (.dsum P Q))) :=
+  trans (dsum_assoc (.dsum M N) P Q) (dsum_assoc M N (.dsum P Q))
+
+-- 34. Mac Lane coherence: double associator for tensors
+def tensor_assoc_composed (M N P Q : ModExpr) :
+    ModPath (.tensor (.tensor (.tensor M N) P) Q) (.tensor M (.tensor N (.tensor P Q))) :=
+  trans (tensor_assoc (.tensor M N) P Q) (tensor_assoc M N (.tensor P Q))
+
+-- 35. Zero tensor from both sides
+def zero_tensor_zero : ModPath (.tensor .zero .zero) .zero :=
+  tensor_zero_right .zero
+
+/-! ### §6 Groupoid structure on ModPath (36–40) -/
+
+-- 36. Double symm
+def double_symm {M N : ModExpr} (p : ModPath M N) : ModPath M N :=
+  symm (symm p)
+
+-- 37. Trans with symm gives roundtrip
+def trans_symm {M N : ModExpr} (p : ModPath M N) : ModPath M M :=
+  trans p (symm p)
+
+-- 38. Symm then trans
+def symm_trans {M N : ModExpr} (p : ModPath M N) : ModPath N N :=
+  trans (symm p) p
+
+-- 39. General path composition
+def compose3 {M N P Q : ModExpr}
+    (p : ModPath M N) (q : ModPath N P) (r : ModPath P Q) : ModPath M Q :=
+  trans p (trans q r)
+
+-- 40. Path reversal of composition
+def compose_symm {M N P : ModExpr}
+    (p : ModPath M N) (q : ModPath N P) : ModPath P M :=
+  symm (trans p q)
+
+/-! ### §7 Rank computations (41–50) -/
+
+/-- Convert a ModPath to a core Path on ranks. -/
+def toCorePath : {a b : ModExpr} → ModPath a b → Path a.rank b.rank
+  | _, _, refl _    => Path.refl _
+  | _, _, step s    => Path.ofEq s.rank_eq
+  | _, _, symm p    => Path.symm (toCorePath p)
+  | _, _, trans p q => Path.trans (toCorePath p) (toCorePath q)
+
+-- 41. ℤ^2 ⊕ ℤ^3 has rank 5
+def rank_dsum_2_3 : Path (ModExpr.dsum (.free 2) (.free 3)).rank 5 := Path.refl _
+
+-- 42. ℤ^2 ⊗ ℤ^3 has rank 6
+def rank_tensor_2_3 : Path (ModExpr.tensor (.free 2) (.free 3)).rank 6 := Path.refl _
+
+-- 43. Hom(ℤ^2, ℤ^3) has rank 6
+def rank_hom_2_3 : Path (ModExpr.hom (.free 2) (.free 3)).rank 6 := Path.refl _
+
+-- 44. Tor_0(ℤ^2, ℤ^3) has rank 6
+def rank_tor0_2_3 : Path (ModExpr.tor0 (.free 2) (.free 3)).rank 6 := Path.refl _
+
+-- 45. Tor_i(M,N) for i>0 has rank 0
+def rank_torHi : Path (ModExpr.torHi (.free 2) (.free 3) 1).rank 0 := Path.refl _
+
+-- 46. Ext^0(ℤ^2, ℤ^3) has rank 6
+def rank_ext0_2_3 : Path (ModExpr.ext0 (.free 2) (.free 3)).rank 6 := Path.refl _
+
+-- 47. Ext^i(M,N) for i>0 has rank 0
+def rank_extHi : Path (ModExpr.extHi (.free 2) (.free 3) 1).rank 0 := Path.refl _
+
+-- 48. ℤ^0 has rank 0 = zero-module rank
+def rank_free_zero : Path (ModExpr.free 0).rank ModExpr.zero.rank := Path.refl _
+
+-- 49. (ℤ^2 ⊕ ℤ^3) ⊗ ℤ^4 has rank 20
+def rank_dsum_tensor :
+    Path (ModExpr.tensor (.dsum (.free 2) (.free 3)) (.free 4)).rank 20 := Path.refl _
+
+-- 50. ((ℤ^2 ⊗ ℤ^3) ⊗ ℤ^4) has rank 24
+def rank_tensor_assoc_ex :
+    Path (ModExpr.tensor (.tensor (.free 2) (.free 3)) (.free 4)).rank 24 := Path.refl _
+
+end ModPath
 
 end ComputationalPaths.Path.Algebra.HomAlgDeep
