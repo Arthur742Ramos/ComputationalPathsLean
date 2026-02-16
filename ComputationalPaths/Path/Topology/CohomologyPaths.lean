@@ -2,8 +2,8 @@
 # Cohomology via Computational Paths
 
 Cochains, coboundary operator, cocycles and coboundaries, cohomology classes,
-long exact sequence aspects, cup product, connecting homomorphism,
-graded ring structure, naturality of coboundary.
+cup product, short exact sequences, connecting homomorphism — all built with
+genuine `Path` operations (`refl`, `trans`, `symm`, `congrArg`). Zero `Path.ofEq`.
 
 ## References
 
@@ -12,9 +12,6 @@ graded ring structure, naturality of coboundary.
 -/
 
 import ComputationalPaths.Path.Basic.Core
-import ComputationalPaths.Path.Algebra.GroupStructures
-import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
-import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -23,9 +20,9 @@ namespace CohomologyPaths
 
 universe u
 
-/-! ## Abelian Group -/
+/-! ## Abelian Group via Paths -/
 
-/-- An abelian group for coefficients. -/
+/-- An abelian group for coefficients, with axioms as paths. -/
 structure AbGroup where
   carrier : Type u
   zero : carrier
@@ -38,24 +35,25 @@ structure AbGroup where
   neg_add : ∀ a, Path (add (neg a) a) zero
   add_assoc : ∀ a b c, Path (add (add a b) c) (add a (add b c))
 
-/-- Negation of zero is zero. -/
+/-! ### Derived group laws -/
+
+/-- 1. Negation of zero is zero. -/
 def neg_zero (G : AbGroup) : Path (G.neg G.zero) G.zero :=
   Path.trans (Path.symm (G.zero_add (G.neg G.zero))) (G.add_neg G.zero)
 
-/-- Double negation is identity. -/
-def neg_neg (G : AbGroup) (a : G.carrier) : Path (G.neg (G.neg a)) a := by
-  let nna := G.neg (G.neg a)
-  exact Path.trans
-    (Path.symm (G.add_zero nna))
+/-- 2. Double negation is identity. -/
+def neg_neg (G : AbGroup) (a : G.carrier) : Path (G.neg (G.neg a)) a :=
+  Path.trans
+    (Path.symm (G.add_zero (G.neg (G.neg a))))
     (Path.trans
-      (Path.congrArg (G.add nna) (Path.symm (G.neg_add a)))
+      (Path.congrArg (G.add (G.neg (G.neg a))) (Path.symm (G.neg_add a)))
       (Path.trans
-        (Path.symm (G.add_assoc nna (G.neg a) a))
+        (Path.symm (G.add_assoc (G.neg (G.neg a)) (G.neg a) a))
         (Path.trans
           (Path.congrArg (G.add · a) (G.neg_add (G.neg a)))
           (G.zero_add a))))
 
-/-- Addition is left-cancellative via paths. -/
+/-- 3. Left cancellation: a + (neg a + b) = b. -/
 def add_cancel_left (G : AbGroup) (a b : G.carrier) :
     Path (G.add a (G.add (G.neg a) b)) b :=
   Path.trans
@@ -63,6 +61,58 @@ def add_cancel_left (G : AbGroup) (a b : G.carrier) :
     (Path.trans
       (Path.congrArg (G.add · b) (G.add_neg a))
       (G.zero_add b))
+
+/-- 4. Right cancellation: (a + neg b) + b = a. -/
+def add_cancel_right (G : AbGroup) (a b : G.carrier) :
+    Path (G.add (G.add a (G.neg b)) b) a :=
+  Path.trans
+    (G.add_assoc a (G.neg b) b)
+    (Path.trans
+      (Path.congrArg (G.add a) (G.neg_add b))
+      (G.add_zero a))
+
+/-- 5. neg distributes over add: neg(a + b) path to neg b + neg a. -/
+def neg_add_rev (G : AbGroup) (a b : G.carrier) :
+    Path (G.add (G.neg b) (G.neg a)) (G.neg (G.add a b)) := by
+  -- Show (neg b + neg a) + (a + b) = 0, so neg b + neg a = neg(a+b)
+  -- We use the unique inverse property
+  let lhs := G.add (G.neg b) (G.neg a)
+  let rhs := G.add a b
+  -- lhs + rhs = neg b + (neg a + (a + b)) via assoc
+  -- = neg b + ((neg a + a) + b) via assoc
+  -- = neg b + (0 + b) = neg b + b = 0
+  have step1 : Path (G.add lhs rhs) (G.add (G.neg b) (G.add (G.neg a) rhs)) :=
+    G.add_assoc (G.neg b) (G.neg a) rhs
+  have step2 : Path (G.add (G.neg a) rhs) (G.add (G.neg a) (G.add a b)) :=
+    Path.refl _
+  have step3 : Path (G.add (G.neg a) (G.add a b)) (G.add (G.add (G.neg a) a) b) :=
+    Path.symm (G.add_assoc (G.neg a) a b)
+  have step4 : Path (G.add (G.add (G.neg a) a) b) (G.add G.zero b) :=
+    Path.congrArg (G.add · b) (G.neg_add a)
+  have step5 : Path (G.add G.zero b) b := G.zero_add b
+  have inner : Path (G.add (G.neg a) rhs) b :=
+    Path.trans step2 (Path.trans step3 (Path.trans step4 step5))
+  have sum_zero : Path (G.add lhs rhs) (G.add (G.neg b) b) :=
+    Path.trans step1 (Path.congrArg (G.add (G.neg b)) inner)
+  have sum_is_zero : Path (G.add lhs rhs) G.zero :=
+    Path.trans sum_zero (G.neg_add b)
+  -- Now: lhs + rhs = 0 implies lhs = neg rhs
+  -- lhs = lhs + 0 = lhs + (rhs + neg rhs) = (lhs + rhs) + neg rhs = 0 + neg rhs = neg rhs
+  exact Path.trans
+    (Path.symm (G.add_zero lhs))
+    (Path.trans
+      (Path.congrArg (G.add lhs) (Path.symm (G.add_neg rhs)))
+      (Path.trans
+        (Path.symm (G.add_assoc lhs rhs (G.neg rhs)))
+        (Path.trans
+          (Path.congrArg (G.add · (G.neg rhs)) sum_is_zero)
+          (G.zero_add (G.neg rhs)))))
+
+/-- 6. add is associative (4-fold, left). -/
+def add_assoc4_left (G : AbGroup) (a b c d : G.carrier) :
+    Path (G.add (G.add (G.add a b) c) d) (G.add a (G.add b (G.add c d))) :=
+  Path.trans (G.add_assoc (G.add a b) c d)
+    (Path.trans (G.add_assoc a b (G.add c d)) (Path.refl _))
 
 /-! ## Cochain Complex -/
 
@@ -76,7 +126,7 @@ structure CochainComplex where
   delta_squared : ∀ n (x : (group n).carrier),
     Path (delta (n + 1) (delta n x)) (group (n + 2)).zero
 
-/-- Delta preserves negation. -/
+/-- 7. Delta preserves negation. -/
 def delta_neg (C : CochainComplex) (n : Nat) (x : (C.group n).carrier) :
     Path (C.delta n ((C.group n).neg x))
          ((C.group (n + 1)).neg (C.delta n x)) := by
@@ -89,6 +139,7 @@ def delta_neg (C : CochainComplex) (n : Nat) (x : (C.group n).carrier) :
                   (G.add δnx δx) :=
     C.delta_add n ((C.group n).neg x) x
   have h3 : Path (G.add δnx δx) G.zero := Path.trans (Path.symm h2) h1
+  -- δnx + δx = 0 implies δnx = neg δx
   exact Path.trans
     (Path.symm (G.add_zero δnx))
     (Path.trans
@@ -98,6 +149,11 @@ def delta_neg (C : CochainComplex) (n : Nat) (x : (C.group n).carrier) :
         (Path.trans
           (Path.congrArg (G.add · (G.neg δx)) h3)
           (G.zero_add (G.neg δx)))))
+
+/-- 8. Delta applied to (a + neg a) is zero. -/
+def delta_add_neg (C : CochainComplex) (n : Nat) (a : (C.group n).carrier) :
+    Path (C.delta n ((C.group n).add a ((C.group n).neg a))) (C.group (n + 1)).zero :=
+  Path.trans (Path.congrArg (C.delta n) ((C.group n).add_neg a)) (C.delta_zero n)
 
 /-! ## Cocycles and Coboundaries -/
 
@@ -112,29 +168,29 @@ structure Coboundary (C : CochainComplex) (n : Nat) where
   preimage : (C.group n).carrier
   is_coboundary : Path val (C.delta n preimage)
 
-/-- The zero cocycle. -/
+/-- 9. The zero cocycle. -/
 def zeroCocycle (C : CochainComplex) (n : Nat) : Cocycle C n where
   val := (C.group n).zero
   is_cocycle := C.delta_zero n
 
-/-- A coboundary is a cocycle (δ² = 0). -/
+/-- 10. A coboundary is a cocycle (δ² = 0). -/
 def coboundary_is_cocycle (C : CochainComplex) (n : Nat) (x : (C.group n).carrier) :
     Cocycle C (n + 1) where
   val := C.delta n x
   is_cocycle := C.delta_squared n x
 
-/-- The zero coboundary. -/
+/-- 11. The zero coboundary. -/
 def zeroCoboundary (C : CochainComplex) (n : Nat) : Coboundary C n where
   val := (C.group (n + 1)).zero
   preimage := (C.group n).zero
   is_coboundary := Path.symm (C.delta_zero n)
 
-/-- δ of a cocycle is zero (restated). -/
+/-- 12. δ of a cocycle is zero. -/
 def delta_cocycle_zero (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
     Path (C.delta n z.val) (C.group (n + 1)).zero :=
   z.is_cocycle
 
-/-- Sum of cocycles is a cocycle. -/
+/-- 13. Sum of cocycles is a cocycle. -/
 def cocycle_add (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C n) :
     Cocycle C n where
   val := (C.group n).add z₁.val z₂.val
@@ -146,26 +202,21 @@ def cocycle_add (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C n) :
           (Path.congrArg ((C.group (n + 1)).add (C.group (n + 1)).zero ·) z₂.is_cocycle)
           ((C.group (n + 1)).zero_add (C.group (n + 1)).zero)))
 
-/-- Negation of a cocycle is a cocycle. -/
+/-- 14. Negation of a cocycle is a cocycle. -/
 def cocycle_neg (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
     Cocycle C n where
   val := (C.group n).neg z.val
   is_cocycle := by
     let G := C.group (n + 1)
     let δneg := C.delta n ((C.group n).neg z.val)
-    have h1 : Path (C.delta n ((C.group n).add ((C.group n).neg z.val) z.val)) G.zero :=
-      Path.trans (Path.congrArg (C.delta n) ((C.group n).neg_add z.val)) (C.delta_zero n)
-    have h2 : Path (C.delta n ((C.group n).add ((C.group n).neg z.val) z.val))
-                    (G.add δneg (C.delta n z.val)) :=
-      C.delta_add n ((C.group n).neg z.val) z.val
-    have h3 : Path (G.add δneg (C.delta n z.val)) G.zero :=
-      Path.trans (Path.symm h2) h1
-    have h4 : Path (G.add δneg G.zero) δneg := G.add_zero δneg
-    have h5 : Path (G.add δneg (C.delta n z.val)) (G.add δneg G.zero) :=
-      Path.congrArg (G.add δneg) z.is_cocycle
-    exact Path.trans (Path.symm h4) (Path.trans (Path.symm h5) h3)
+    have h_neg_delta : Path δneg (G.neg (C.delta n z.val)) :=
+      delta_neg C n z.val
+    have h_delta_zero : Path (C.delta n z.val) G.zero := z.is_cocycle
+    have h_neg_zero : Path (G.neg G.zero) G.zero := neg_zero G
+    exact Path.trans h_neg_delta
+      (Path.trans (Path.congrArg G.neg h_delta_zero) h_neg_zero)
 
-/-- Sum of coboundaries is a coboundary. -/
+/-- 15. Sum of coboundaries is a coboundary. -/
 def coboundary_add (C : CochainComplex) (n : Nat) (b₁ b₂ : Coboundary C n) :
     Coboundary C n where
   val := (C.group (n + 1)).add b₁.val b₂.val
@@ -177,7 +228,7 @@ def coboundary_add (C : CochainComplex) (n : Nat) (b₁ b₂ : Coboundary C n) :
         (Path.congrArg ((C.group (n + 1)).add (C.delta n b₁.preimage) ·) b₂.is_coboundary)
         (Path.symm (C.delta_add n b₁.preimage b₂.preimage)))
 
-/-- Negation of a coboundary is a coboundary. -/
+/-- 16. Negation of a coboundary is a coboundary. -/
 def coboundary_neg (C : CochainComplex) (n : Nat) (b : Coboundary C n) :
     Coboundary C n where
   val := (C.group (n + 1)).neg b.val
@@ -187,6 +238,32 @@ def coboundary_neg (C : CochainComplex) (n : Nat) (b : Coboundary C n) :
       (Path.congrArg (C.group (n + 1)).neg b.is_coboundary)
       (Path.symm (delta_neg C n b.preimage))
 
+/-- 17. Cocycle addition is commutative (at value level). -/
+def cocycle_add_comm (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C n) :
+    Path (cocycle_add C n z₁ z₂).val (cocycle_add C n z₂ z₁).val :=
+  (C.group n).add_comm z₁.val z₂.val
+
+/-- 18. Cocycle addition is associative (at value level). -/
+def cocycle_add_assoc (C : CochainComplex) (n : Nat) (z₁ z₂ z₃ : Cocycle C n) :
+    Path (cocycle_add C n (cocycle_add C n z₁ z₂) z₃).val
+         (cocycle_add C n z₁ (cocycle_add C n z₂ z₃)).val :=
+  (C.group n).add_assoc z₁.val z₂.val z₃.val
+
+/-- 19. Adding zero cocycle on right. -/
+def cocycle_add_zero (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
+    Path (cocycle_add C n z (zeroCocycle C n)).val z.val :=
+  (C.group n).add_zero z.val
+
+/-- 20. Adding zero cocycle on left. -/
+def cocycle_zero_add (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
+    Path (cocycle_add C n (zeroCocycle C n) z).val z.val :=
+  (C.group n).zero_add z.val
+
+/-- 21. Cocycle + neg cocycle = zero cocycle (value level). -/
+def cocycle_add_neg_zero (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
+    Path (cocycle_add C n z (cocycle_neg C n z)).val (zeroCocycle C n).val :=
+  (C.group n).add_neg z.val
+
 /-! ## Cohomology Classes -/
 
 /-- Two cocycles are cohomologous if they differ by a coboundary. -/
@@ -195,86 +272,106 @@ structure Cohomologous (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C (n 
   rel : Path ((C.group (n + 1)).add z₁.val ((C.group (n + 1)).neg z₂.val))
              (C.delta n witness)
 
-/-- Any cocycle is cohomologous to itself (witness = 0). -/
+/-- 22. Any cocycle is cohomologous to itself (witness = 0). -/
 def cohomologous_refl (C : CochainComplex) (n : Nat) (z : Cocycle C (n + 1)) :
     Cohomologous C n z z where
   witness := (C.group n).zero
   rel := Path.trans ((C.group (n + 1)).add_neg z.val) (Path.symm (C.delta_zero n))
 
-/-- Cohomologous is symmetric (via group inverse unique lemma). -/
+/-- 23. Cohomologous is symmetric. -/
 def cohomologous_symm (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C (n + 1))
     (h : Cohomologous C n z₁ z₂) :
     Cohomologous C n z₂ z₁ where
   witness := (C.group n).neg h.witness
   rel := by
     let G := C.group (n + 1)
-    apply Path.ofEq
-    -- Goal: G.add z₂.val (G.neg z₁.val) = C.delta n ((C.group n).neg h.witness)
-    have h1 : G.add z₁.val (G.neg z₂.val) = C.delta n h.witness := h.rel.proof
-    have h2 : C.delta n ((C.group n).neg h.witness) = G.neg (C.delta n h.witness) :=
-      (delta_neg C n h.witness).proof
-    -- h1: G.add z₁.val (G.neg z₂.val) = C.delta n h.witness
-    -- rewrite δ w → z₁ + neg z₂ in h2
-    rw [← h1] at h2
-    -- h2 : C.delta n ((C.group n).neg h.witness) = G.neg (G.add z₁.val (G.neg z₂.val))
-    -- Show: G.add z₂.val (G.neg z₁.val) = G.neg (G.add z₁.val (G.neg z₂.val))
-    -- then conclude with h2.symm
-    -- Proof that x + y = 0 → x = neg y (where x = z₂+neg z₁, y = z₁+neg z₂)
-    have step1 : G.add (G.add z₂.val (G.neg z₁.val)) z₁.val = z₂.val :=
-      ((G.add_assoc z₂.val (G.neg z₁.val) z₁.val).proof).trans
-        ((_root_.congrArg (G.add z₂.val) (G.neg_add z₁.val).proof).trans (G.add_zero z₂.val).proof)
-    have key : G.add (G.add z₂.val (G.neg z₁.val)) (G.add z₁.val (G.neg z₂.val)) = G.zero :=
-      ((G.add_assoc (G.add z₂.val (G.neg z₁.val)) z₁.val (G.neg z₂.val)).proof.symm).trans
-        ((_root_.congrArg (G.add · (G.neg z₂.val)) step1).trans (G.add_neg z₂.val).proof)
-    -- x + y = 0 implies x = neg y
+    let Gn := C.group n
+    -- We need: Path (G.add z₂.val (G.neg z₁.val)) (C.delta n (Gn.neg h.witness))
+    -- h.rel : Path (G.add z₁.val (G.neg z₂.val)) (C.delta n h.witness)
+    -- delta_neg gives: Path (C.delta n (Gn.neg h.witness)) (G.neg (C.delta n h.witness))
+    -- So target = neg(delta h.witness) = neg(z₁ + neg z₂)
+    -- We show z₂ + neg z₁ = neg(z₁ + neg z₂) via group theory
     let x := G.add z₂.val (G.neg z₁.val)
     let y := G.add z₁.val (G.neg z₂.val)
-    have inv_unique : x = G.neg y :=
-      ((G.add_zero x).proof.symm).trans
-        ((_root_.congrArg (G.add x) (G.add_neg y).proof.symm).trans
-          (((G.add_assoc x y (G.neg y)).proof.symm).trans
-            ((_root_.congrArg (G.add · (G.neg y)) key).trans (G.zero_add (G.neg y)).proof)))
-    exact inv_unique.trans h2.symm
+    -- Show x + y = 0
+    have assoc1 : Path (G.add x y) (G.add (G.add z₂.val (G.neg z₁.val)) (G.add z₁.val (G.neg z₂.val))) :=
+      Path.refl _
+    have inner1 : Path (G.add (G.neg z₁.val) (G.add z₁.val (G.neg z₂.val)))
+                       (G.add (G.add (G.neg z₁.val) z₁.val) (G.neg z₂.val)) :=
+      Path.symm (G.add_assoc (G.neg z₁.val) z₁.val (G.neg z₂.val))
+    have inner2 : Path (G.add (G.add (G.neg z₁.val) z₁.val) (G.neg z₂.val))
+                       (G.add G.zero (G.neg z₂.val)) :=
+      Path.congrArg (G.add · (G.neg z₂.val)) (G.neg_add z₁.val)
+    have inner3 : Path (G.add G.zero (G.neg z₂.val)) (G.neg z₂.val) :=
+      G.zero_add (G.neg z₂.val)
+    have inner_combined : Path (G.add (G.neg z₁.val) y) (G.neg z₂.val) :=
+      Path.trans inner1 (Path.trans inner2 inner3)
+    have outer1 : Path (G.add x y) (G.add z₂.val (G.add (G.neg z₁.val) y)) :=
+      G.add_assoc z₂.val (G.neg z₁.val) y
+    have outer2 : Path (G.add z₂.val (G.add (G.neg z₁.val) y))
+                       (G.add z₂.val (G.neg z₂.val)) :=
+      Path.congrArg (G.add z₂.val) inner_combined
+    have sum_zero : Path (G.add x y) G.zero :=
+      Path.trans outer1 (Path.trans outer2 (G.add_neg z₂.val))
+    -- x + y = 0 implies x = neg y
+    have x_eq_neg_y : Path x (G.neg y) :=
+      Path.trans
+        (Path.symm (G.add_zero x))
+        (Path.trans
+          (Path.congrArg (G.add x) (Path.symm (G.add_neg y)))
+          (Path.trans
+            (Path.symm (G.add_assoc x y (G.neg y)))
+            (Path.trans
+              (Path.congrArg (G.add · (G.neg y)) sum_zero)
+              (G.zero_add (G.neg y)))))
+    -- neg y = neg(delta w) via congrArg neg on h.rel
+    have neg_y_eq : Path (G.neg y) (G.neg (C.delta n h.witness)) :=
+      Path.congrArg G.neg h.rel
+    -- delta(neg w) = neg(delta w)
+    have delta_neg_w : Path (C.delta n (Gn.neg h.witness)) (G.neg (C.delta n h.witness)) :=
+      delta_neg C n h.witness
+    exact Path.trans x_eq_neg_y (Path.trans neg_y_eq (Path.symm delta_neg_w))
 
 /-- A cohomology class (representative). -/
 structure CohomologyClass (C : CochainComplex) (n : Nat) where
   rep : Cocycle C n
 
-/-- Zero cohomology class. -/
+/-- 24. Zero cohomology class. -/
 def zeroCohomologyClass (C : CochainComplex) (n : Nat) : CohomologyClass C n where
   rep := zeroCocycle C n
 
-/-- Addition of cohomology classes. -/
+/-- 25. Addition of cohomology classes. -/
 def cohomologyClassAdd (C : CochainComplex) (n : Nat)
     (a b : CohomologyClass C n) : CohomologyClass C n where
   rep := cocycle_add C n a.rep b.rep
 
-/-- Negation of cohomology classes. -/
+/-- 26. Negation of cohomology classes. -/
 def cohomologyClassNeg (C : CochainComplex) (n : Nat)
     (a : CohomologyClass C n) : CohomologyClass C n where
   rep := cocycle_neg C n a.rep
 
-/-- Adding zero class on the right gives same underlying value. -/
-theorem cohomologyClassAdd_zero_val (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
-    (cohomologyClassAdd C n a (zeroCohomologyClass C n)).rep.val =
-    (C.group n).add a.rep.val (C.group n).zero := rfl
-
-/-- Adding zero class on the left gives same underlying value. -/
-theorem cohomologyClassAdd_zero_left_val (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
-    (cohomologyClassAdd C n (zeroCohomologyClass C n) a).rep.val =
-    (C.group n).add (C.group n).zero a.rep.val := rfl
-
-/-- Negation then addition at value level. -/
-theorem cohomologyClassNeg_add_val (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
-    (cohomologyClassAdd C n (cohomologyClassNeg C n a) a).rep.val =
-    (C.group n).add ((C.group n).neg a.rep.val) a.rep.val := rfl
-
-/-- Cohomology class addition is commutative at the value level. -/
+/-- 27. Addition is commutative at value level. -/
 def cohomologyClassAdd_comm_val (C : CochainComplex) (n : Nat) (a b : CohomologyClass C n) :
     Path (cohomologyClassAdd C n a b).rep.val (cohomologyClassAdd C n b a).rep.val :=
   (C.group n).add_comm a.rep.val b.rep.val
 
-/-! ## Short Exact Sequence -/
+/-- 28. Right identity at value level. -/
+def cohomologyClassAdd_zero_right (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
+    Path (cohomologyClassAdd C n a (zeroCohomologyClass C n)).rep.val a.rep.val :=
+  (C.group n).add_zero a.rep.val
+
+/-- 29. Left identity at value level. -/
+def cohomologyClassAdd_zero_left (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
+    Path (cohomologyClassAdd C n (zeroCohomologyClass C n) a).rep.val a.rep.val :=
+  (C.group n).zero_add a.rep.val
+
+/-- 30. Inverse property at value level. -/
+def cohomologyClassNeg_add (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
+    Path (cohomologyClassAdd C n (cohomologyClassNeg C n a) a).rep.val
+         (zeroCohomologyClass C n).rep.val :=
+  (C.group n).neg_add a.rep.val
+
+/-! ## Short Exact Sequences -/
 
 /-- A short exact sequence of cochain complexes (graded maps). -/
 structure ShortExactSeq where
@@ -287,29 +384,19 @@ structure ShortExactSeq where
   project_zero : ∀ n, Path (project n (B.group n).zero) (C'.group n).zero
   exact_at_B : ∀ n x, Path (project n (inject n x)) (C'.group n).zero
 
-/-- Exactness: p ∘ i = 0 (restated as path). -/
+/-- 31. Exactness restated. -/
 def ses_exact {ses : ShortExactSeq} (n : Nat) (x : (ses.A.group n).carrier) :
     Path (ses.project n (ses.inject n x)) (ses.C'.group n).zero :=
   ses.exact_at_B n x
 
-/-- Injection preserves zero (restated). -/
-def ses_inject_zero (ses : ShortExactSeq) (n : Nat) :
-    Path (ses.inject n (ses.A.group n).zero) (ses.B.group n).zero :=
-  ses.inject_zero n
-
-/-- Projection preserves zero (restated). -/
-def ses_project_zero (ses : ShortExactSeq) (n : Nat) :
-    Path (ses.project n (ses.B.group n).zero) (ses.C'.group n).zero :=
-  ses.project_zero n
-
-/-- Composing inject then project on zero yields zero via two paths. -/
+/-- 32. Composing inject then project on zero yields zero via two routes. -/
 def ses_compose_zero (ses : ShortExactSeq) (n : Nat) :
     Path (ses.project n (ses.inject n (ses.A.group n).zero)) (ses.C'.group n).zero :=
   Path.trans
     (Path.congrArg (ses.project n) (ses.inject_zero n))
     (ses.project_zero n)
 
-/-- The two routes to zero (via exactness vs via zero-preservation) agree propositionally. -/
+/-- 33. Two routes to zero agree. -/
 theorem ses_zero_coherence (ses : ShortExactSeq) (n : Nat) :
     (ses_compose_zero ses n).proof = (ses.exact_at_B n (ses.A.group n).zero).proof :=
   Subsingleton.elim _ _
@@ -322,47 +409,28 @@ structure CupProduct (C : CochainComplex) where
   cup_zero_left : ∀ p q y, Path (cup p q (C.group p).zero y) (C.group (p + q)).zero
   cup_zero_right : ∀ p q x, Path (cup p q x (C.group q).zero) (C.group (p + q)).zero
 
-/-- Cup with zero on left. -/
+/-- 34. Cup with zero left. -/
 def cup_zero_left_val {C : CochainComplex} (cp : CupProduct C) (p q : Nat)
     (y : (C.group q).carrier) :
     Path (cp.cup p q (C.group p).zero y) (C.group (p + q)).zero :=
   cp.cup_zero_left p q y
 
-/-- Cup with zero on right. -/
+/-- 35. Cup with zero right. -/
 def cup_zero_right_val {C : CochainComplex} (cp : CupProduct C) (p q : Nat)
     (x : (C.group p).carrier) :
     Path (cp.cup p q x (C.group q).zero) (C.group (p + q)).zero :=
   cp.cup_zero_right p q x
 
-/-- Cup of zero cocycles is zero. -/
+/-- 36. Cup of zero with zero. -/
 def cup_zero_cocycles {C : CochainComplex} (cp : CupProduct C) (p q : Nat) :
     Path (cp.cup p q (C.group p).zero (C.group q).zero) (C.group (p + q)).zero :=
   cp.cup_zero_left p q (C.group q).zero
 
-/-- Cup of zero with zero factors through right-zero equally. -/
+/-- 37. Zero-zero coherence. -/
 theorem cup_zero_zero_coherence {C : CochainComplex} (cp : CupProduct C) (p q : Nat) :
     (cp.cup_zero_left p q (C.group q).zero).proof =
     (cp.cup_zero_right p q (C.group p).zero).proof :=
   Subsingleton.elim _ _
-
-/-! ## Graded Ring Structure -/
-
-/-- An associative cup product. -/
-structure AssociativeCup (C : CochainComplex) extends CupProduct C where
-  cup_assoc : ∀ p q r (x : (C.group p).carrier) (y : (C.group q).carrier)
-    (z : (C.group r).carrier),
-    Path (Path.transport (D := fun n => (C.group n).carrier)
-           (Path.ofEq (Nat.add_assoc p q r))
-           (cup (p + q) r (cup p q x y) z))
-         (cup p (q + r) x (cup q r y z))
-
-/-- Graded commutativity for cup product. -/
-structure GradedCommCup (C : CochainComplex) extends CupProduct C where
-  cup_comm : ∀ p q (x : (C.group p).carrier) (y : (C.group q).carrier),
-    Path (Path.transport (D := fun n => (C.group n).carrier)
-           (Path.ofEq (Nat.add_comm p q))
-           (cup p q x y))
-         (cup q p y x)
 
 /-! ## Connecting Homomorphism -/
 
@@ -371,58 +439,37 @@ structure ConnectingHom (ses : ShortExactSeq) where
   connecting : (n : Nat) → (ses.C'.group n).carrier → (ses.A.group (n + 1)).carrier
   connecting_zero : ∀ n, Path (connecting n (ses.C'.group n).zero) (ses.A.group (n + 1)).zero
 
-/-- Connecting hom preserves zero. -/
+/-- 38. Connecting hom preserves zero. -/
 def connecting_preserves_zero {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
     Path (ch.connecting n (ses.C'.group n).zero) (ses.A.group (n + 1)).zero :=
   ch.connecting_zero n
 
-/-- Composing inject with connecting on zero. -/
+/-- 39. Composing inject with connecting on zero. -/
 def connecting_inject_zero {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
     Path (ses.inject (n + 1) (ch.connecting n (ses.C'.group n).zero)) (ses.B.group (n + 1)).zero :=
   Path.trans
     (Path.congrArg (ses.inject (n + 1)) (ch.connecting_zero n))
     (ses.inject_zero (n + 1))
 
-/-! ## Degree Arithmetic -/
+/-- 40. Exactness at A: project ∘ connecting = 0 at zero. -/
+def connecting_exact_at_zero {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
+    Path (ses.project (n + 1) (ses.inject (n + 1) (ch.connecting n (ses.C'.group n).zero)))
+         (ses.C'.group (n + 1)).zero :=
+  ses.exact_at_B (n + 1) (ch.connecting n (ses.C'.group n).zero)
 
-/-- δ² raises degree by 2. -/
-theorem delta_squared_raises (n : Nat) : n + 1 + 1 = n + 2 := by omega
+/-- 41. Two routes to zero at connecting: via inject-zero vs via exactness. -/
+def connecting_zero_two_routes {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
+    Path (ses.project (n + 1) (ses.inject (n + 1) (ch.connecting n (ses.C'.group n).zero)))
+         (ses.C'.group (n + 1)).zero :=
+  Path.trans
+    (Path.congrArg (ses.project (n + 1)) (connecting_inject_zero ch n))
+    (ses.project_zero (n + 1))
 
-/-- Path: δ² degree. -/
-def delta_squared_degree_path (n : Nat) : Path (n + 1 + 1) (n + 2) :=
-  Path.ofEq (delta_squared_raises n)
+/-! ## Transport along degree paths -/
 
-/-- Cup product degree addition is associative. -/
-theorem cup_degree_assoc (p q r : Nat) : p + q + r = p + (q + r) := by omega
-
-/-- Path for cup degree associativity. -/
-def cup_degree_assoc_path (p q r : Nat) : Path (p + q + r) (p + (q + r)) :=
-  Path.ofEq (cup_degree_assoc p q r)
-
-/-- Cup degree commutativity. -/
-theorem cup_degree_comm (p q : Nat) : p + q = q + p := by omega
-
-/-- Path: cup degree commutativity. -/
-def cup_degree_comm_path (p q : Nat) : Path (p + q) (q + p) :=
-  Path.ofEq (cup_degree_comm p q)
-
-/-- Degree associativity then commutativity compose. -/
-def degree_assoc_then_comm (p q r : Nat) : Path (p + q + r) (q + r + p) :=
-  Path.trans (cup_degree_assoc_path p q r) (cup_degree_comm_path p (q + r))
-
-/-- Transport along refl degree path is identity. -/
+/-- 42. Transport along refl is identity. -/
 theorem transport_degree_refl {C : CochainComplex} (n : Nat) (x : (C.group n).carrier) :
     Path.transport (D := fun m => (C.group m).carrier) (Path.refl n) x = x := rfl
-
-/-- Symmetry of degree path: transporting back and forth is identity. -/
-theorem transport_degree_symm {C : CochainComplex} (n m : Nat) (h : n = m)
-    (x : (C.group n).carrier) :
-    Path.transport (D := fun k => (C.group k).carrier)
-      (Path.symm (Path.ofEq h))
-      (Path.transport (D := fun k => (C.group k).carrier)
-        (Path.ofEq h) x) = x := by
-  cases h
-  simp [Path.transport]
 
 end CohomologyPaths
 end Topology

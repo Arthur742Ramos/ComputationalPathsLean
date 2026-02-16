@@ -205,17 +205,29 @@ inductive MatStep : MatObj n m → MatObj n m → Type
 namespace MatStep
 
 /-- Correctness of steps. -/
-theorem eval_eq {A B : MatObj n m} (s : MatStep A B) : MatObj.eval A = MatObj.eval B := by
-  cases s <;> simp [MatObj.eval, matAdd_comm, matAdd_assoc, matAdd_zero_right, matAdd_zero_left, matAdd_neg_right, matNeg_neg, matScale_one, matScale_zero, matScale_add, matScale_neg, eval_eq]
+theorem eval_eq : {A B : MatObj n m} → (s : MatStep A B) → MatObj.eval A = MatObj.eval B
+  | _, _, addComm A B => matAdd_comm (MatObj.eval A) (MatObj.eval B)
+  | _, _, addAssoc A B C => matAdd_assoc (MatObj.eval A) (MatObj.eval B) (MatObj.eval C)
+  | _, _, addZeroR A => matAdd_zero_right (MatObj.eval A)
+  | _, _, addZeroL A => matAdd_zero_left (MatObj.eval A)
+  | _, _, addNegR A => matAdd_neg_right (MatObj.eval A)
+  | _, _, negNeg A => matNeg_neg (MatObj.eval A)
+  | _, _, scaleOne A => matScale_one (MatObj.eval A)
+  | _, _, scaleZero A => matScale_zero (MatObj.eval A)
+  | _, _, scaleAdd c A B => matScale_add c (MatObj.eval A) (MatObj.eval B)
+  | _, _, scaleNeg c A => matScale_neg c (MatObj.eval A)
+  | _, _, addCongL s C => _root_.congrArg (matAdd · (MatObj.eval C)) (eval_eq s)
+  | _, _, addCongR C s => _root_.congrArg (matAdd (MatObj.eval C) ·) (eval_eq s)
+  | _, _, negCong s => _root_.congrArg matNeg (eval_eq s)
+  | _, _, scaleCong c s => _root_.congrArg (matScale c) (eval_eq s)
 
 /-- Interpret a step as a `Path`. -/
-def toPath {A B : MatObj n m} (s : MatStep A B) : Path (MatObj.eval A) (MatObj.eval B) :=
-  match s with
-  | addCongL s C => Path.congrArg (fun X => matAdd X (MatObj.eval C)) (toPath s)
-  | addCongR C s => Path.congrArg (fun X => matAdd (MatObj.eval C) X) (toPath s)
-  | negCong s => Path.congrArg matNeg (toPath s)
-  | scaleCong c s => Path.congrArg (matScale c) (toPath s)
-  | _ => Path.mk [Step.mk _ _ (eval_eq s)] (eval_eq s)
+def toPath : {A B : MatObj n m} → (s : MatStep A B) → Path (MatObj.eval A) (MatObj.eval B)
+  | _, _, addCongL s C => Path.congrArg (fun X => matAdd X (MatObj.eval C)) (toPath s)
+  | _, _, addCongR C s => Path.congrArg (fun X => matAdd (MatObj.eval C) X) (toPath s)
+  | _, _, negCong s => Path.congrArg matNeg (toPath s)
+  | _, _, scaleCong c s => Path.congrArg (matScale c) (toPath s)
+  | _, _, s => Path.mk [Step.mk _ _ (eval_eq s)] (eval_eq s)
 
 end MatStep
 
@@ -305,11 +317,40 @@ theorem congrArg_matAdd_comm_toEq (f : Mat n m → Nat) (A B : Mat n m) :
 
 theorem transport_matAdd_comm (P : Mat n m → Prop) (A B : Mat n m) (h : P (matAdd A B)) :
     Path.transport (matAdd_comm_path A B) h =
-      (matAdd_comm A B ▸ h) := by
-  simp [Path.transport, matAdd_comm_path]
+      (matAdd_comm A B ▸ h) := rfl
 
 theorem matAdd_assoc_step_count (A B C : Mat n m) :
     (matAdd_assoc_path A B C).steps.length = 1 := rfl
+
+theorem matAdd_zero_right_path_toEq (A : Mat n m) :
+    (matAdd_zero_right_path A).toEq = matAdd_zero_right A := rfl
+
+theorem matAdd_zero_left_path_toEq (A : Mat n m) :
+    (matAdd_zero_left_path A).toEq = matAdd_zero_left A := rfl
+
+theorem matAdd_neg_path_toEq (A : Mat n m) :
+    (matAdd_neg_path A).toEq = matAdd_neg_right A := rfl
+
+theorem matScale_one_path_toEq (A : Mat n m) :
+    (matScale_one_path A).toEq = matScale_one A := rfl
+
+theorem matScale_zero_path_toEq (A : Mat n m) :
+    (matScale_zero_path A).toEq = matScale_zero A := rfl
+
+theorem matScale_add_path_toEq (c : Int) (A B : Mat n m) :
+    (matScale_add_path c A B).toEq = matScale_add c A B := rfl
+
+theorem matTrans_trans_path_toEq (A : Mat n m) :
+    (matTrans_trans_path A).toEq = matTrans_trans A := rfl
+
+theorem matTrans_add_path_toEq (A B : Mat n m) :
+    (matTrans_add_path A B).toEq = matTrans_add A B := rfl
+
+theorem matNeg_neg_path_toEq (A : Mat n m) :
+    (matNeg_neg_path A).toEq = matNeg_neg A := rfl
+
+theorem idMat_trans_path_toEq (n : Nat) :
+    (idMat_trans_path n).toEq = idMat_trans n := rfl
 
 end PathAlgebra
 

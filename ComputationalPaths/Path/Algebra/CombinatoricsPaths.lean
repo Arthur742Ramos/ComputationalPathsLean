@@ -122,37 +122,35 @@ inductive CombStep : CombObj → CombObj → Type
 namespace CombStep
 
 /-- A single combinatorial step preserves evaluation. -/
-theorem eval_eq {a b : CombObj} (s : CombStep a b) : (CombObj.eval a = CombObj.eval b) :=
-  match s with
-  | factZero => rfl
-  | factSucc _ => rfl
-  | chooseZero n => by cases n <;> rfl
-  | chooseZeroSucc _ => rfl
-  | pascal _ _ => rfl
-  | permZero n => by cases n <;> rfl
-  | permZeroSucc _ => rfl
-  | permSucc _ _ => rfl
-  | addNat _ _ => rfl
-  | mulNat _ _ => rfl
-  | addZeroR _ => Nat.add_zero _
-  | addZeroL _ => Nat.zero_add _
-  | mulOneR _ => Nat.mul_one _
-  | mulOneL _ => Nat.one_mul _
-  | mulZeroR _ => Nat.mul_zero _
-  | mulZeroL _ => Nat.zero_mul _
-  | addCongL s _ => congrArg (· + _) (eval_eq s)
-  | addCongR _ s => congrArg (_ + ·) (eval_eq s)
-  | mulCongL s _ => congrArg (· * _) (eval_eq s)
-  | mulCongR _ s => congrArg (_ * ·) (eval_eq s)
+theorem eval_eq : {a b : CombObj} → (s : CombStep a b) → (CombObj.eval a = CombObj.eval b)
+  | _, _, factZero => rfl
+  | _, _, factSucc _ => rfl
+  | _, _, chooseZero n => by cases n <;> rfl
+  | _, _, chooseZeroSucc _ => rfl
+  | _, _, pascal _ _ => rfl
+  | _, _, permZero n => by cases n <;> rfl
+  | _, _, permZeroSucc _ => rfl
+  | _, _, permSucc _ _ => rfl
+  | _, _, addNat _ _ => rfl
+  | _, _, mulNat _ _ => rfl
+  | _, _, addZeroR _ => Nat.add_zero _
+  | _, _, addZeroL _ => Nat.zero_add _
+  | _, _, mulOneR _ => Nat.mul_one _
+  | _, _, mulOneL _ => Nat.one_mul _
+  | _, _, mulZeroR _ => Nat.mul_zero _
+  | _, _, mulZeroL _ => Nat.zero_mul _
+  | _, _, addCongL s _ => _root_.congrArg (· + _) (eval_eq s)
+  | _, _, addCongR _ s => _root_.congrArg (_ + ·) (eval_eq s)
+  | _, _, mulCongL s _ => _root_.congrArg (· * _) (eval_eq s)
+  | _, _, mulCongR _ s => _root_.congrArg (_ * ·) (eval_eq s)
 
 /-- Interpret a step as a `Path` on the semantic `Nat` values. -/
-def toPath {a b : CombObj} (s : CombStep a b) : Path (CombObj.eval a) (CombObj.eval b) :=
-  match s with
-  | addCongL s c => Path.congrArg (fun x => x + CombObj.eval c) (toPath s)
-  | addCongR c s => Path.congrArg (fun x => CombObj.eval c + x) (toPath s)
-  | mulCongL s c => Path.congrArg (fun x => x * CombObj.eval c) (toPath s)
-  | mulCongR c s => Path.congrArg (fun x => CombObj.eval c * x) (toPath s)
-  | _ => Path.mk [Step.mk _ _ (eval_eq s)] (eval_eq s)
+def toPath : {a b : CombObj} → (s : CombStep a b) → Path (CombObj.eval a) (CombObj.eval b)
+  | _, _, addCongL s c => Path.congrArg (fun x => x + CombObj.eval c) (toPath s)
+  | _, _, addCongR c s => Path.congrArg (fun x => CombObj.eval c + x) (toPath s)
+  | _, _, mulCongL s c => Path.congrArg (fun x => x * CombObj.eval c) (toPath s)
+  | _, _, mulCongR c s => Path.congrArg (fun x => CombObj.eval c * x) (toPath s)
+  | _, _, s => Path.mk [Step.mk _ _ (eval_eq s)] (eval_eq s)
 
 @[simp] theorem toPath_toEq {a b : CombObj} (s : CombStep a b) : (toPath s).toEq = eval_eq s := by
   cases s <;> rfl
@@ -217,10 +215,10 @@ def fact_two_path : Path (fact 2) 2 :=
 /-- Factorial is always positive. -/
 theorem fact_pos (n : Nat) : 0 < fact n := by
   induction n with
-  | zero => simp [fact]
+  | zero => unfold fact; decide
   | succ n ih =>
+      unfold fact
       have hn : 0 < n + 1 := Nat.succ_pos _
-      simp [fact]
       exact Nat.mul_pos hn ih
 
 /-- `choose n 0 = 1` as a path. -/
@@ -293,7 +291,7 @@ theorem fact_congrArg_mul_toEq (n : Nat) (f : Nat → Nat) :
 theorem transport_along_pascal (n k : Nat) (D : Nat → Type u)
     (x : D (choose (n + 1) (k + 1))) :
     Path.transport (pascal_path n k) x = x := by
-  simp [Path.transport, pascal_path]
+  simp [Path.transport]
 
 /-- Symmetry of the Pascal path. -/
 theorem symm_pascal_toEq (n k : Nat) :

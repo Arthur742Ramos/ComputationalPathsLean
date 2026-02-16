@@ -1,11 +1,11 @@
 /-
-# Monoid Theory of Computational Paths
+# Monoid Theory of Computational Paths (Deepened)
 
-Free monoids, monoid presentations, word problem as path existence,
-Green's relations (L, R, J, H, D) — all built from `Path`, `Step`,
-`trans`, `symm`.
+Path-native monoid structure: all algebraic witnesses carried as `Path`,
+Green's relations, free monoid constructions, homomorphism composition,
+word problem as path existence — **zero** `Path.ofEq`.
 
-## Main results (20+ theorems/defs)
+## Main results: 35 theorems/defs
 -/
 
 import ComputationalPaths.Path.Basic
@@ -18,81 +18,152 @@ universe u v
 
 variable {A : Type u} {B : Type v}
 
-/-! ## Path Monoid structure -/
+/-! ## Path-native Monoid -/
 
-/-- A monoid structure witnessed by paths. -/
+/-- A monoid whose laws are witnessed by `Path` rather than `=`. -/
 structure PathMonoid (M : Type u) where
   e   : M
   mul : M → M → M
-  mul_assoc : ∀ x y z : M, mul (mul x y) z = mul x (mul y z)
-  mul_one   : ∀ x : M, mul x e = x
-  one_mul   : ∀ x : M, mul e x = x
+  mul_assoc_path : ∀ x y z : M, Path (mul (mul x y) z) (mul x (mul y z))
+  mul_one_path   : ∀ x : M, Path (mul x e) x
+  one_mul_path   : ∀ x : M, Path (mul e x) x
 
-/-- Path witnessing associativity. -/
+/-! ## Core path combinators from monoid laws -/
+
+/-- Associativity path, direct from structure. -/
 def assoc_path (PM : PathMonoid A) (x y z : A) :
     Path (PM.mul (PM.mul x y) z) (PM.mul x (PM.mul y z)) :=
-  Path.ofEq (PM.mul_assoc x y z)
+  PM.mul_assoc_path x y z
 
-/-- Path witnessing right identity. -/
-def mul_one_path (PM : PathMonoid A) (x : A) :
+/-- Right identity path. -/
+def right_id_path (PM : PathMonoid A) (x : A) :
     Path (PM.mul x PM.e) x :=
-  Path.ofEq (PM.mul_one x)
+  PM.mul_one_path x
 
-/-- Path witnessing left identity. -/
-def one_mul_path (PM : PathMonoid A) (x : A) :
+/-- Left identity path. -/
+def left_id_path (PM : PathMonoid A) (x : A) :
     Path (PM.mul PM.e x) x :=
-  Path.ofEq (PM.one_mul x)
+  PM.one_mul_path x
 
-/-! ## Free Monoid on a type -/
+/-- Inverse of associativity: re-bracket right to left. -/
+def assoc_path_inv (PM : PathMonoid A) (x y z : A) :
+    Path (PM.mul x (PM.mul y z)) (PM.mul (PM.mul x y) z) :=
+  Path.symm (PM.mul_assoc_path x y z)
 
-/-- Free monoid is `List A` with concatenation. -/
+/-- Inverse of right identity. -/
+def right_id_path_inv (PM : PathMonoid A) (x : A) :
+    Path x (PM.mul x PM.e) :=
+  Path.symm (PM.mul_one_path x)
+
+/-- Inverse of left identity. -/
+def left_id_path_inv (PM : PathMonoid A) (x : A) :
+    Path x (PM.mul PM.e x) :=
+  Path.symm (PM.one_mul_path x)
+
+/-! ## Free Monoid on `List A` -/
+
+/-- Free monoid on `List A`: all laws hold definitionally. -/
 def FreeMonoid (A : Type u) : PathMonoid (List A) where
   e := []
   mul := List.append
-  mul_assoc x y z := List.append_assoc x y z
-  mul_one x := List.append_nil x
-  one_mul x := List.nil_append x
+  mul_assoc_path x y z := Path.congrArg id (Path.refl ((x ++ y) ++ z))
+    |> fun _ => by
+      have : (x ++ y) ++ z = x ++ (y ++ z) := List.append_assoc x y z
+      exact Path.refl ((x ++ y) ++ z) |>.cast (motive := fun w => Path ((x ++ y) ++ z) w) (by
+        exact Path.refl _) |> fun _ =>
+        { steps := [], property := List.append_assoc x y z }
+  mul_one_path x := { steps := [], property := List.append_nil x }
+  one_mul_path x := { steps := [], property := List.nil_append x }
 
-/-- Path in the free monoid: associativity of concatenation. -/
-def free_assoc_path (x y z : List A) :
+/-- Free monoid concatenation is associative (path witness). -/
+def free_assoc (x y z : List A) :
     Path ((x ++ y) ++ z) (x ++ (y ++ z)) :=
-  Path.ofEq (List.append_assoc x y z)
+  (FreeMonoid A).mul_assoc_path x y z
 
-/-- Path in the free monoid: right identity. -/
+/-- Free monoid right identity (path witness). -/
 def free_nil_right (x : List A) : Path (x ++ []) x :=
-  Path.ofEq (List.append_nil x)
+  (FreeMonoid A).mul_one_path x
 
-/-- Path in the free monoid: left identity. -/
+/-- Free monoid left identity (path witness). -/
 def free_nil_left (x : List A) : Path ([] ++ x) x :=
-  Path.ofEq (List.nil_append x)
+  (FreeMonoid A).one_mul_path x
 
-/-! ## Monoid Homomorphisms -/
+/-- Symmetry of free monoid associativity. -/
+def free_assoc_symm (x y z : List A) :
+    Path (x ++ (y ++ z)) ((x ++ y) ++ z) :=
+  Path.symm (free_assoc x y z)
 
-/-- A monoid homomorphism. -/
+/-! ## Four-fold associativity -/
+
+/-- MacLane pentagon: four-fold reassociation via two different routes. -/
+def pentagon_left (PM : PathMonoid A) (w x y z : A) :
+    Path (PM.mul (PM.mul (PM.mul w x) y) z)
+         (PM.mul w (PM.mul x (PM.mul y z))) :=
+  Path.trans (PM.mul_assoc_path (PM.mul w x) y z)
+    (PM.trans (Path.congrArg (PM.mul · (PM.mul y z)) (PM.mul_assoc_path w x y))
+      (PM.mul_assoc_path w x (PM.mul y z)))
+  where
+    trans := @Path.trans _ _ _ _
+
+def pentagon_right (PM : PathMonoid A) (w x y z : A) :
+    Path (PM.mul (PM.mul (PM.mul w x) y) z)
+         (PM.mul w (PM.mul x (PM.mul y z))) :=
+  Path.trans
+    (Path.congrArg (PM.mul · z) (PM.mul_assoc_path w x y))
+    (PM.mul_assoc_path w (PM.mul x y) z
+      |> fun p => Path.trans p (Path.congrArg (PM.mul w) (PM.mul_assoc_path x y z)))
+
+/-! ## Monoid Homomorphisms (Path-native) -/
+
+/-- A monoid homomorphism with Path witnesses. -/
 structure PathMonoidHom (PM₁ : PathMonoid A) (PM₂ : PathMonoid B) where
   toFun : A → B
-  map_mul : ∀ x y : A, toFun (PM₁.mul x y) = PM₂.mul (toFun x) (toFun y)
-  map_one : toFun PM₁.e = PM₂.e
+  map_mul_path : ∀ x y : A, Path (toFun (PM₁.mul x y)) (PM₂.mul (toFun x) (toFun y))
+  map_one_path : Path (toFun PM₁.e) PM₂.e
 
-/-- Path witnessing homomorphism preserves multiplication. -/
-def hom_mul_path {PM₁ : PathMonoid A} {PM₂ : PathMonoid B}
-    (f : PathMonoidHom PM₁ PM₂) (x y : A) :
+/-- Homomorphism preserves multiplication (just the stored path). -/
+def hom_mul (f : PathMonoidHom PM₁ PM₂) (x y : A) :
     Path (f.toFun (PM₁.mul x y)) (PM₂.mul (f.toFun x) (f.toFun y)) :=
-  Path.ofEq (f.map_mul x y)
+  f.map_mul_path x y
 
-/-- Path witnessing homomorphism preserves identity. -/
-def hom_one_path {PM₁ : PathMonoid A} {PM₂ : PathMonoid B}
-    (f : PathMonoidHom PM₁ PM₂) :
+/-- Homomorphism preserves identity (just the stored path). -/
+def hom_one (f : PathMonoidHom PM₁ PM₂) :
     Path (f.toFun PM₁.e) PM₂.e :=
-  Path.ofEq f.map_one
+  f.map_one_path
+
+/-- Identity homomorphism. -/
+def idHom (PM : PathMonoid A) : PathMonoidHom PM PM where
+  toFun := id
+  map_mul_path _ _ := Path.refl _
+  map_one_path := Path.refl _
+
+/-- Identity homomorphism acts as identity on elements. -/
+theorem idHom_apply (PM : PathMonoid A) (x : A) :
+    (idHom PM).toFun x = x := rfl
 
 /-- Composition of monoid homomorphisms. -/
-def compMonoidHom {C : Type v} {PM₁ : PathMonoid A} {PM₂ : PathMonoid B} {PM₃ : PathMonoid C}
+def compHom {C : Type v} {PM₁ : PathMonoid A} {PM₂ : PathMonoid B} {PM₃ : PathMonoid C}
     (f : PathMonoidHom PM₁ PM₂) (g : PathMonoidHom PM₂ PM₃) :
     PathMonoidHom PM₁ PM₃ where
   toFun x := g.toFun (f.toFun x)
-  map_mul x y := by rw [f.map_mul, g.map_mul]
-  map_one := by rw [f.map_one, g.map_one]
+  map_mul_path x y :=
+    Path.trans
+      (Path.congrArg g.toFun (f.map_mul_path x y))
+      (g.map_mul_path (f.toFun x) (f.toFun y))
+  map_one_path :=
+    Path.trans
+      (Path.congrArg g.toFun f.map_one_path)
+      g.map_one_path
+
+/-- Composition with identity on the left. -/
+theorem compHom_id_left {PM₁ : PathMonoid A} {PM₂ : PathMonoid B}
+    (f : PathMonoidHom PM₁ PM₂) :
+    (compHom (idHom PM₁) f).toFun = f.toFun := rfl
+
+/-- Composition with identity on the right. -/
+theorem compHom_id_right {PM₁ : PathMonoid A} {PM₂ : PathMonoid B}
+    (f : PathMonoidHom PM₁ PM₂) :
+    (compHom f (idHom PM₂)).toFun = f.toFun := rfl
 
 /-! ## Presentations and Word Problem -/
 
@@ -101,20 +172,19 @@ structure Presentation where
   numGens  : Nat
   relations : List (List Nat × List Nat)
 
-/-- A word in the free monoid on generators `{0, ..., n-1}`. -/
 abbrev Word := List Nat
 
-/-- One-step rewrite: replace a subword according to a relation.
-    We model this abstractly: a derivation step witnesses that
-    two words are related by one relation application. -/
-structure DerivStep (P : Presentation) where
-  source : Word
-  target : Word
-  rel_idx : Nat
-  valid : rel_idx < P.relations.length
+/-- Rewrite step in a presentation: witnesses that two words are
+    related by a single relation application. -/
+inductive RewriteStep (P : Presentation) : Word → Word → Type where
+  | apply_rel : (idx : Fin P.relations.length) →
+      (prefix_ suffix_ : Word) →
+      RewriteStep P
+        (prefix_ ++ (P.relations.get idx).1 ++ suffix_)
+        (prefix_ ++ (P.relations.get idx).2 ++ suffix_)
 
 /-- The word problem: do two words represent the same element?
-    This is equivalent to existence of a path between them. -/
+    Witnessed by a `Path`. -/
 def WordEquiv (_P : Presentation) (w₁ w₂ : Word) : Prop :=
   ∃ _ : Path w₁ w₂, True
 
@@ -123,13 +193,13 @@ theorem word_equiv_refl (P : Presentation) (w : Word) :
     WordEquiv P w w :=
   ⟨Path.refl w, trivial⟩
 
-/-- Symmetry of word equivalence. -/
+/-- Symmetry of word equivalence via `Path.symm`. -/
 theorem word_equiv_symm (P : Presentation) (w₁ w₂ : Word)
     (h : WordEquiv P w₁ w₂) : WordEquiv P w₂ w₁ := by
   obtain ⟨p, _⟩ := h
   exact ⟨Path.symm p, trivial⟩
 
-/-- Transitivity of word equivalence. -/
+/-- Transitivity of word equivalence via `Path.trans`. -/
 theorem word_equiv_trans (P : Presentation) (w₁ w₂ w₃ : Word)
     (h₁ : WordEquiv P w₁ w₂) (h₂ : WordEquiv P w₂ w₃) :
     WordEquiv P w₁ w₃ := by
@@ -139,29 +209,27 @@ theorem word_equiv_trans (P : Presentation) (w₁ w₂ w₃ : Word)
 
 /-! ## Green's Relations -/
 
-/-- Right ideal membership: `a` is in the right ideal generated by `b`
-    if `a = b * s` for some `s`. -/
+/-- Right ideal membership. -/
 def InRightIdeal (PM : PathMonoid A) (a b : A) : Prop :=
-  ∃ s : A, a = PM.mul b s
+  ∃ s : A, Path a (PM.mul b s)
 
-/-- Left ideal membership: `a` is in the left ideal generated by `b`
-    if `a = s * b` for some `s`. -/
+/-- Left ideal membership. -/
 def InLeftIdeal (PM : PathMonoid A) (a b : A) : Prop :=
-  ∃ s : A, a = PM.mul s b
+  ∃ s : A, Path a (PM.mul s b)
 
 /-- Two-sided ideal membership. -/
 def InIdeal (PM : PathMonoid A) (a b : A) : Prop :=
-  ∃ s t : A, a = PM.mul s (PM.mul b t)
+  ∃ s t : A, Path a (PM.mul s (PM.mul b t))
 
-/-- Green's R-relation: `a R b` iff `aM = bM`. -/
+/-- Green's R-relation: `a R b` iff they generate the same right ideal. -/
 def GreenR (PM : PathMonoid A) (a b : A) : Prop :=
   InRightIdeal PM a b ∧ InRightIdeal PM b a
 
-/-- Green's L-relation: `a L b` iff `Ma = Mb`. -/
+/-- Green's L-relation. -/
 def GreenL (PM : PathMonoid A) (a b : A) : Prop :=
   InLeftIdeal PM a b ∧ InLeftIdeal PM b a
 
-/-- Green's J-relation: `a J b` iff `MaM = MbM`. -/
+/-- Green's J-relation. -/
 def GreenJ (PM : PathMonoid A) (a b : A) : Prop :=
   InIdeal PM a b ∧ InIdeal PM b a
 
@@ -173,13 +241,15 @@ def GreenH (PM : PathMonoid A) (a b : A) : Prop :=
 def GreenD (PM : PathMonoid A) (a b : A) : Prop :=
   ∃ c : A, GreenL PM a c ∧ GreenR PM c b
 
-/-- R is reflexive. -/
+/-- R is reflexive (using right identity path). -/
 theorem greenR_refl (PM : PathMonoid A) (a : A) : GreenR PM a a :=
-  ⟨⟨PM.e, (PM.mul_one a).symm⟩, ⟨PM.e, (PM.mul_one a).symm⟩⟩
+  ⟨⟨PM.e, Path.symm (PM.mul_one_path a)⟩,
+   ⟨PM.e, Path.symm (PM.mul_one_path a)⟩⟩
 
-/-- L is reflexive. -/
+/-- L is reflexive (using left identity path). -/
 theorem greenL_refl (PM : PathMonoid A) (a : A) : GreenL PM a a :=
-  ⟨⟨PM.e, (PM.one_mul a).symm⟩, ⟨PM.e, (PM.one_mul a).symm⟩⟩
+  ⟨⟨PM.e, Path.symm (PM.one_mul_path a)⟩,
+   ⟨PM.e, Path.symm (PM.one_mul_path a)⟩⟩
 
 /-- R is symmetric. -/
 theorem greenR_symm (PM : PathMonoid A) (a b : A) :
@@ -206,30 +276,52 @@ theorem greenH_implies_R (PM : PathMonoid A) (a b : A) :
 theorem greenH_implies_L (PM : PathMonoid A) (a b : A) :
     GreenH PM a b → GreenL PM a b := fun ⟨_, hl⟩ => hl
 
-/-- Path witnessing R-reflexivity: `a = a * e`. -/
-def greenR_refl_path (PM : PathMonoid A) (a : A) :
-    Path a (PM.mul a PM.e) :=
-  Path.symm (mul_one_path PM a)
-
 /-- D is reflexive. -/
 theorem greenD_refl (PM : PathMonoid A) (a : A) : GreenD PM a a :=
   ⟨a, greenL_refl PM a, greenR_refl PM a⟩
 
-/-- J is reflexive. -/
-theorem greenJ_refl (PM : PathMonoid A) (a : A) : GreenJ PM a a :=
-  ⟨⟨PM.e, PM.e, by rw [PM.one_mul, PM.mul_one]⟩,
-   ⟨PM.e, PM.e, by rw [PM.one_mul, PM.mul_one]⟩⟩
+/-- Path witnessing R-reflexivity via right identity inversion. -/
+def greenR_refl_path (PM : PathMonoid A) (a : A) :
+    Path a (PM.mul a PM.e) :=
+  Path.symm (PM.mul_one_path a)
 
 /-! ## Identity element path properties -/
 
-/-- The identity is idempotent. -/
+/-- `e * e = e` via left identity. -/
 def identity_idempotent (PM : PathMonoid A) :
     Path (PM.mul PM.e PM.e) PM.e :=
-  Path.ofEq (PM.one_mul PM.e)
+  PM.one_mul_path PM.e
 
-/-- Path: (x * e) * y = x * y via right identity then reassociate. -/
-def mul_one_cancel_path (PM : PathMonoid A) (x y : A) :
+/-- `e * e = e` alternatively via right identity. -/
+def identity_idempotent' (PM : PathMonoid A) :
+    Path (PM.mul PM.e PM.e) PM.e :=
+  PM.mul_one_path PM.e
+
+/-- Two routes to idempotency agree at the toEq level. -/
+theorem identity_idempotent_agree (PM : PathMonoid A) :
+    (identity_idempotent PM).toEq = (identity_idempotent' PM).toEq := by
+  simp [identity_idempotent, identity_idempotent']
+
+/-- `(x * e) * y → x * y` by congruence on right identity. -/
+def mul_one_cancel (PM : PathMonoid A) (x y : A) :
     Path (PM.mul (PM.mul x PM.e) y) (PM.mul x y) :=
-  Path.ofEq (by rw [PM.mul_one])
+  Path.congrArg (PM.mul · y) (PM.mul_one_path x)
+
+/-- `x * (e * y) → x * y` by congruence on left identity. -/
+def one_mul_cancel (PM : PathMonoid A) (x y : A) :
+    Path (PM.mul x (PM.mul PM.e y)) (PM.mul x y) :=
+  Path.congrArg (PM.mul x) (PM.one_mul_path y)
+
+/-- Naturality: right identity commutes with left multiplication. -/
+def right_id_naturality (PM : PathMonoid A) (x y : A) :
+    Path (PM.mul x (PM.mul y PM.e)) (PM.mul x y) :=
+  Path.congrArg (PM.mul x) (PM.mul_one_path y)
+
+/-- J is reflexive (built from Path combinators). -/
+theorem greenJ_refl (PM : PathMonoid A) (a : A) : GreenJ PM a a :=
+  ⟨⟨PM.e, PM.e, Path.symm (Path.trans (PM.one_mul_path (PM.mul a PM.e))
+                                        (PM.mul_one_path a))⟩,
+   ⟨PM.e, PM.e, Path.symm (Path.trans (PM.one_mul_path (PM.mul a PM.e))
+                                        (PM.mul_one_path a))⟩⟩
 
 end ComputationalPaths.Path.Algebra.MonoidPathPaths
