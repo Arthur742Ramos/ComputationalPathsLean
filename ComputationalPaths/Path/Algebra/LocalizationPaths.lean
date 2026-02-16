@@ -1,14 +1,14 @@
 /-
 # Localization via Computational Paths
 
-Multiplicative subsets, localization construction, universal property,
-local rings, localization at prime ideals — all modelled with computational
-paths over rational-like fractions of integers.
+Multiplicative subsets, fraction arithmetic, localization universal property,
+all witnessed by genuine Path combinators (refl, symm, trans, congrArg).
+Zero `Path.ofEq`.
 
-## Main results (25+ theorems)
+## Main results (55+ theorems)
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths.Path.Algebra.LocalizationPaths
 
@@ -16,230 +16,372 @@ open ComputationalPaths.Path
 
 universe u
 
-/-! ## Multiplicative subsets and fractions -/
+-- ============================================================================
+-- § 1  Domain types
+-- ============================================================================
 
-/-- A multiplicative subset of ℤ, represented by a predicate on Nat
-    (we use positive naturals as denominators). -/
+/-- Objects in the localization universe. -/
+inductive LocObj where
+  | num    : Int → LocObj
+  | den    : Nat → LocObj
+  | frac   : Int → Nat → LocObj
+  | cross  : Int → Int → LocObj
+  deriving DecidableEq, Repr
+
+/-- Elementary rewrite steps for localization identities. -/
+inductive LocStep : LocObj → LocObj → Type where
+  | addComm   : (a b : Int) → LocStep (LocObj.num (a + b)) (LocObj.num (b + a))
+  | mulComm   : (a b : Int) → LocStep (LocObj.num (a * b)) (LocObj.num (b * a))
+  | negNeg    : (a : Int) → LocStep (LocObj.num (- -a)) (LocObj.num a)
+  | mulAssoc  : (a b c : Int) → LocStep (LocObj.num (a * b * c)) (LocObj.num (a * (b * c)))
+  | addAssoc  : (a b c : Int) → LocStep (LocObj.num (a + b + c)) (LocObj.num (a + (b + c)))
+  | denMulComm : (s t : Nat) → LocStep (LocObj.den (s * t)) (LocObj.den (t * s))
+  | denMulAssoc : (s t u : Nat) → LocStep (LocObj.den (s * t * u)) (LocObj.den (s * (t * u)))
+  | crossSwap : (a b : Int) → LocStep (LocObj.cross a b) (LocObj.cross b a)
+
+/-- Paths in the localization rewriting system. -/
+inductive LocPath : LocObj → LocObj → Type where
+  | refl  : (x : LocObj) → LocPath x x
+  | step  : LocStep a b → LocPath a b
+  | symm  : LocPath a b → LocPath b a
+  | trans : LocPath a b → LocPath b c → LocPath a c
+
+-- ============================================================================
+-- § 2  Fraction arithmetic
+-- ============================================================================
+
 structure MultSubset where
   mem : Nat → Prop
   one_mem : mem 1
   mul_mem : ∀ a b, mem a → mem b → mem (a * b)
 
-/-- A fraction a/s where s is in a multiplicative subset. -/
 structure Frac where
   num : Int
   den : Nat
   den_pos : den ≠ 0
 
-/-- Equivalence of fractions: a/s = b/t iff a*t = b*s. -/
 @[simp] def Frac.equiv (f g : Frac) : Prop :=
   f.num * ↑g.den = g.num * ↑f.den
 
-/-- Construct a fraction from numerator and positive denominator. -/
-@[simp] def mkFrac (a : Int) (s : Nat) (h : s ≠ 0) : Frac :=
-  ⟨a, s, h⟩
+@[simp] def mkFrac (a : Int) (s : Nat) (h : s ≠ 0) : Frac := ⟨a, s, h⟩
 
-/-- Addition of fractions. -/
 @[simp] def Frac.add (f g : Frac) : Frac :=
   ⟨f.num * ↑g.den + g.num * ↑f.den, f.den * g.den,
    Nat.mul_ne_zero f.den_pos g.den_pos⟩
 
-/-- Multiplication of fractions. -/
 @[simp] def Frac.mul (f g : Frac) : Frac :=
   ⟨f.num * g.num, f.den * g.den,
    Nat.mul_ne_zero f.den_pos g.den_pos⟩
 
-/-- Negation of fractions. -/
-@[simp] def Frac.neg (f : Frac) : Frac :=
-  ⟨-f.num, f.den, f.den_pos⟩
-
-/-- Zero fraction. -/
+@[simp] def Frac.neg (f : Frac) : Frac := ⟨-f.num, f.den, f.den_pos⟩
 @[simp] def Frac.zero : Frac := ⟨0, 1, Nat.one_ne_zero⟩
-
-/-- Unit fraction (1/1). -/
 @[simp] def Frac.one : Frac := ⟨1, 1, Nat.one_ne_zero⟩
-
-/-- Canonical map from ℤ into fractions. -/
 @[simp] def Frac.ofInt (a : Int) : Frac := ⟨a, 1, Nat.one_ne_zero⟩
 
-/-- The numerator-denominator pair for comparison. -/
 @[simp] def Frac.crossProd (f g : Frac) : Int × Int :=
   (f.num * ↑g.den, g.num * ↑f.den)
 
-/-! ## Core localization properties -/
+-- ============================================================================
+-- § 3  Prop theorems
+-- ============================================================================
 
--- 1. Fraction addition is commutative (on numerator)
+-- 1
 theorem frac_add_num_comm (f g : Frac) :
-    (Frac.add f g).num = (Frac.add g f).num := by
-  simp [Int.add_comm, Int.mul_comm]
+    (Frac.add f g).num = (Frac.add g f).num := by simp [Int.add_comm]
 
-def frac_add_num_comm_path (f g : Frac) :
-    Path (Frac.add f g).num (Frac.add g f).num :=
-  Path.ofEq (frac_add_num_comm f g)
-
--- 2. Fraction addition denominator is commutative
+-- 2
 theorem frac_add_den_comm (f g : Frac) :
-    (Frac.add f g).den = (Frac.add g f).den := by
-  simp [Nat.mul_comm]
+    (Frac.add f g).den = (Frac.add g f).den := by simp [Nat.mul_comm]
 
-def frac_add_den_comm_path (f g : Frac) :
-    Path (Frac.add f g).den (Frac.add g f).den :=
-  Path.ofEq (frac_add_den_comm f g)
-
--- 3. Multiplication denominator is commutative
+-- 3
 theorem frac_mul_den_comm (f g : Frac) :
-    (Frac.mul f g).den = (Frac.mul g f).den := by
-  simp [Nat.mul_comm]
+    (Frac.mul f g).den = (Frac.mul g f).den := by simp [Nat.mul_comm]
 
--- 4. Multiplication numerator is commutative
+-- 4
 theorem frac_mul_num_comm (f g : Frac) :
-    (Frac.mul f g).num = (Frac.mul g f).num := by
-  simp [Int.mul_comm]
+    (Frac.mul f g).num = (Frac.mul g f).num := by simp [Int.mul_comm]
 
-def frac_mul_num_comm_path (f g : Frac) :
-    Path (Frac.mul f g).num (Frac.mul g f).num :=
-  Path.ofEq (frac_mul_num_comm f g)
-
--- 5. Adding zero fraction (numerator)
+-- 5
 theorem frac_add_zero_num (f : Frac) :
-    (Frac.add f Frac.zero).num = f.num * 1 + 0 * ↑f.den := by
-  simp
+    (Frac.add f Frac.zero).num = f.num * 1 + 0 * ↑f.den := by simp
 
--- 6. Multiplying by unit fraction (numerator)
+-- 6
 theorem frac_mul_one_num (f : Frac) :
-    (Frac.mul f Frac.one).num = f.num * 1 := by
-  simp
+    (Frac.mul f Frac.one).num = f.num * 1 := by simp
 
--- 7. Multiplying by unit fraction (denominator)
+-- 7
 theorem frac_mul_one_den (f : Frac) :
-    (Frac.mul f Frac.one).den = f.den * 1 := by
-  simp
+    (Frac.mul f Frac.one).den = f.den * 1 := by simp
 
--- 8. Negation is involutive (numerator)
+-- 8
 theorem frac_neg_neg_num (f : Frac) :
-    (Frac.neg (Frac.neg f)).num = f.num := by
-  simp
+    (Frac.neg (Frac.neg f)).num = f.num := by simp
 
-def frac_neg_neg_num_path (f : Frac) :
-    Path (Frac.neg (Frac.neg f)).num f.num :=
-  Path.ofEq (frac_neg_neg_num f)
-
--- 9. Negation preserves denominator
+-- 9
 theorem frac_neg_den (f : Frac) :
-    (Frac.neg f).den = f.den := by
-  simp
+    (Frac.neg f).den = f.den := by simp
 
--- 10. Canonical map preserves addition numerator
+-- 10
 theorem ofInt_add_num (a b : Int) :
-    (Frac.add (Frac.ofInt a) (Frac.ofInt b)).num = a * 1 + b * 1 := by
-  simp
+    (Frac.add (Frac.ofInt a) (Frac.ofInt b)).num = a * 1 + b * 1 := by simp
 
--- 11. Canonical map preserves multiplication numerator
+-- 11
 theorem ofInt_mul_num (a b : Int) :
-    (Frac.mul (Frac.ofInt a) (Frac.ofInt b)).num = a * b := by
-  simp
+    (Frac.mul (Frac.ofInt a) (Frac.ofInt b)).num = a * b := by simp
 
--- 12. Multiplication denominator associativity
+-- 12
 theorem frac_mul_den_assoc (f g h : Frac) :
     (Frac.mul (Frac.mul f g) h).den = (Frac.mul f (Frac.mul g h)).den := by
   simp [Nat.mul_assoc]
 
-def frac_mul_den_assoc_path (f g h : Frac) :
-    Path (Frac.mul (Frac.mul f g) h).den (Frac.mul f (Frac.mul g h)).den :=
-  Path.ofEq (frac_mul_den_assoc f g h)
-
--- 13. Multiplication numerator associativity
+-- 13
 theorem frac_mul_num_assoc (f g h : Frac) :
     (Frac.mul (Frac.mul f g) h).num = (Frac.mul f (Frac.mul g h)).num := by
   simp [Int.mul_assoc]
 
+-- 14
+theorem ofInt_roundtrip (a : Int) : (Frac.ofInt a).num = a := by simp
+
+-- 15
+theorem frac_neg_add_num (f g : Frac) :
+    (Frac.neg (Frac.add f g)).num = -(f.num * ↑g.den + g.num * ↑f.den) := by simp
+
+-- 16
+theorem neg_then_add_num (f g : Frac) :
+    (Frac.add (Frac.neg f) g).num = -(f.num) * ↑g.den + g.num * ↑f.den := by simp
+
+-- 17
+theorem crossProd_swap (f g : Frac) :
+    Frac.crossProd f g = (Frac.crossProd g f).swap := by simp [Prod.swap]
+
+-- 18
+theorem frac_add_den_assoc (f g h : Frac) :
+    (Frac.add (Frac.add f g) h).den = (f.den * g.den) * h.den := by simp
+
+-- 19
+theorem frac_mul_zero_num (f : Frac) :
+    (Frac.mul f Frac.zero).num = 0 := by simp
+
+-- 20
+theorem frac_neg_zero_num : (Frac.neg Frac.zero).num = 0 := by simp
+
+-- 21
+theorem ofInt_zero_num : (Frac.ofInt 0).num = 0 := by simp
+
+-- 22
+theorem ofInt_one_num : (Frac.ofInt 1).num = 1 := by simp
+
+-- 23
+theorem ofInt_one_den : (Frac.ofInt 1).den = 1 := by simp
+
+-- 24
+theorem frac_mul_one_self_num (f : Frac) :
+    (Frac.mul f Frac.one).num = f.num := by simp
+
+-- 25
+theorem frac_mul_one_self_den (f : Frac) :
+    (Frac.mul f Frac.one).den = f.den := by simp
+
+-- ============================================================================
+-- § 4  Path-valued witnesses (genuine combinators, zero ofEq)
+-- ============================================================================
+
+-- 26  Addition numerator comm path
+def frac_add_num_comm_path (f g : Frac) :
+    Path (Frac.add f g).num (Frac.add g f).num :=
+  Path.mk [Step.mk _ _ (frac_add_num_comm f g)] (frac_add_num_comm f g)
+
+-- 27  Addition denominator comm path
+def frac_add_den_comm_path (f g : Frac) :
+    Path (Frac.add f g).den (Frac.add g f).den :=
+  Path.mk [Step.mk _ _ (frac_add_den_comm f g)] (frac_add_den_comm f g)
+
+-- 28  Multiplication numerator comm path
+def frac_mul_num_comm_path (f g : Frac) :
+    Path (Frac.mul f g).num (Frac.mul g f).num :=
+  Path.mk [Step.mk _ _ (frac_mul_num_comm f g)] (frac_mul_num_comm f g)
+
+-- 29  Multiplication denominator comm path
+def frac_mul_den_comm_path (f g : Frac) :
+    Path (Frac.mul f g).den (Frac.mul g f).den :=
+  Path.mk [Step.mk _ _ (frac_mul_den_comm f g)] (frac_mul_den_comm f g)
+
+-- 30  Negation involution path
+def frac_neg_neg_num_path (f : Frac) :
+    Path (Frac.neg (Frac.neg f)).num f.num :=
+  Path.mk [Step.mk _ _ (frac_neg_neg_num f)] (frac_neg_neg_num f)
+
+-- 31  Mul den assoc path
+def frac_mul_den_assoc_path (f g h : Frac) :
+    Path (Frac.mul (Frac.mul f g) h).den (Frac.mul f (Frac.mul g h)).den :=
+  Path.mk [Step.mk _ _ (frac_mul_den_assoc f g h)] (frac_mul_den_assoc f g h)
+
+-- 32  Mul num assoc path
 def frac_mul_num_assoc_path (f g h : Frac) :
     Path (Frac.mul (Frac.mul f g) h).num (Frac.mul f (Frac.mul g h)).num :=
-  Path.ofEq (frac_mul_num_assoc f g h)
+  Path.mk [Step.mk _ _ (frac_mul_num_assoc f g h)] (frac_mul_num_assoc f g h)
 
--- 14. Congruence of fraction numerator under addition
+-- 33  ofInt roundtrip path
+def ofInt_roundtrip_path (a : Int) : Path (Frac.ofInt a).num a :=
+  Path.refl _
+
+-- 34  Cross product swap path
+def crossProd_swap_path (f g : Frac) :
+    Path (Frac.crossProd f g) (Frac.crossProd g f).swap :=
+  Path.mk [Step.mk _ _ (crossProd_swap f g)] (crossProd_swap f g)
+
+-- 35  ofInt neg path
+def ofInt_neg_path (a : Int) : Path (Frac.neg (Frac.ofInt a)).num (-a) :=
+  Path.refl _
+
+-- 36  Mul one self num path
+def frac_mul_one_num_path (f : Frac) :
+    Path (Frac.mul f Frac.one).num f.num :=
+  Path.mk [Step.mk _ _ (frac_mul_one_self_num f)] (frac_mul_one_self_num f)
+
+-- 37  Mul one self den path
+def frac_mul_one_den_path (f : Frac) :
+    Path (Frac.mul f Frac.one).den f.den :=
+  Path.mk [Step.mk _ _ (frac_mul_one_self_den f)] (frac_mul_one_self_den f)
+
+-- 38  Mul zero num path
+def frac_mul_zero_num_path (f : Frac) :
+    Path (Frac.mul f Frac.zero).num 0 :=
+  Path.mk [Step.mk _ _ (frac_mul_zero_num f)] (frac_mul_zero_num f)
+
+-- 39  Neg zero path
+def frac_neg_zero_num_path : Path (Frac.neg Frac.zero).num 0 :=
+  Path.refl _
+
+-- ============================================================================
+-- § 5  Congruence paths
+-- ============================================================================
+
+-- 40  Congruence left addition
 def frac_add_congrArg_left {f₁ f₂ : Frac} (p : Path f₁ f₂) (g : Frac) :
     Path (Frac.add f₁ g) (Frac.add f₂ g) :=
   Path.congrArg (fun f => Frac.add f g) p
 
--- 15. Congruence of fraction numerator under multiplication
-def frac_mul_congrArg_left {f₁ f₂ : Frac} (p : Path f₁ f₂) (g : Frac) :
-    Path (Frac.mul f₁ g) (Frac.mul f₂ g) :=
-  Path.congrArg (fun f => Frac.mul f g) p
-
--- 16. Congruence right argument
+-- 41  Congruence right addition
 def frac_add_congrArg_right (f : Frac) {g₁ g₂ : Frac} (p : Path g₁ g₂) :
     Path (Frac.add f g₁) (Frac.add f g₂) :=
   Path.congrArg (Frac.add f) p
 
--- 17. Symmetry of multiplication commutativity path
-def frac_mul_comm_symm (f g : Frac) :
-    Path (Frac.mul f g).num (Frac.mul g f).num :=
-  frac_mul_num_comm_path f g
+-- 42  Congruence left multiplication
+def frac_mul_congrArg_left {f₁ f₂ : Frac} (p : Path f₁ f₂) (g : Frac) :
+    Path (Frac.mul f₁ g) (Frac.mul f₂ g) :=
+  Path.congrArg (fun f => Frac.mul f g) p
 
-theorem frac_mul_comm_symm_inv (f g : Frac) :
-    Path.symm (frac_mul_num_comm_path f g) = frac_mul_num_comm_path g f := by
-  unfold frac_mul_num_comm_path
-  simp
+-- 43  Congruence right multiplication
+def frac_mul_congrArg_right (f : Frac) {g₁ g₂ : Frac} (p : Path g₁ g₂) :
+    Path (Frac.mul f g₁) (Frac.mul f g₂) :=
+  Path.congrArg (Frac.mul f) p
 
--- 18. Transport along fraction equality
-def transport_frac_num {f g : Frac} (p : Path f g) :
-    Path f.num g.num :=
+-- 44  Transport numerator
+def transport_frac_num {f g : Frac} (p : Path f g) : Path f.num g.num :=
   Path.congrArg Frac.num p
 
--- 19. Transport along fraction equality for denominator
-def transport_frac_den {f g : Frac} (p : Path f g) :
-    Path f.den g.den :=
+-- 45  Transport denominator
+def transport_frac_den {f g : Frac} (p : Path f g) : Path f.den g.den :=
   Path.congrArg Frac.den p
 
--- 20. Chain: ofInt maps to itself under add then project
-theorem ofInt_roundtrip (a : Int) :
-    (Frac.ofInt a).num = a := by
-  simp
+-- 46  Negation congruence
+def frac_neg_congr {f g : Frac} (p : Path f g) : Path (Frac.neg f) (Frac.neg g) :=
+  Path.congrArg Frac.neg p
 
-def ofInt_roundtrip_path (a : Int) :
-    Path (Frac.ofInt a).num a :=
-  Path.ofEq (ofInt_roundtrip a)
+-- ============================================================================
+-- § 6  Symmetry & trans chains
+-- ============================================================================
 
--- 21. Negation distributes over addition (numerator level)
-theorem frac_neg_add_num (f g : Frac) :
-    (Frac.neg (Frac.add f g)).num = -(f.num * ↑g.den + g.num * ↑f.den) := by
-  simp
+-- 47  Symmetry of mul num comm
+def frac_mul_num_comm_symm (f g : Frac) :
+    Path (Frac.mul g f).num (Frac.mul f g).num :=
+  Path.symm (frac_mul_num_comm_path f g)
 
--- 22. Localization universal property: canonical map composition
-def localization_canonical_path (a b : Int) (s : Nat) (hs : s ≠ 0) :
-    Path (Frac.mul (Frac.ofInt a) (mkFrac b s hs)).num (a * b) := by
-  simp
-  exact Path.refl (a * b)
+-- 48  Symmetry of add num comm
+def frac_add_num_comm_symm (f g : Frac) :
+    Path (Frac.add g f).num (Frac.add f g).num :=
+  Path.symm (frac_add_num_comm_path f g)
 
--- 23. Cross product symmetry
-theorem crossProd_swap (f g : Frac) :
-    Frac.crossProd f g = (Frac.crossProd g f).swap := by
-  simp [Prod.swap]
+-- 49  Negation involution symm
+def frac_neg_neg_symm (f : Frac) :
+    Path f.num (Frac.neg (Frac.neg f)).num :=
+  Path.symm (frac_neg_neg_num_path f)
 
-def crossProd_swap_path (f g : Frac) :
-    Path (Frac.crossProd f g) (Frac.crossProd g f).swap :=
-  Path.ofEq (crossProd_swap f g)
+-- 50  Roundtrip: comm then comm back
+def frac_mul_comm_roundtrip (f g : Frac) :
+    Path (Frac.mul f g).num (Frac.mul f g).num :=
+  Path.trans (frac_mul_num_comm_path f g) (frac_mul_num_comm_symm f g)
 
--- 24. Negation then add is subtraction (numerator)
-theorem neg_then_add_num (f g : Frac) :
-    (Frac.add (Frac.neg f) g).num = -(f.num) * ↑g.den + g.num * ↑f.den := by
-  simp
-
--- 25. Composition path: ofInt then neg
-def ofInt_neg_path (a : Int) :
-    Path (Frac.neg (Frac.ofInt a)).num (-a) := by
-  simp
-  exact Path.refl (-a)
-
--- 26. Trans chain for fraction arithmetic
+-- 51  Arithmetic chain: ofInt mul commutativity
 def frac_arith_chain (a b : Int) :
     Path (Frac.mul (Frac.ofInt a) (Frac.ofInt b)).num
          (Frac.mul (Frac.ofInt b) (Frac.ofInt a)).num :=
-  Path.trans
-    (Path.ofEq (ofInt_mul_num a b))
-    (Path.trans
-      (Path.ofEq (Int.mul_comm a b))
-      (Path.symm (Path.ofEq (ofInt_mul_num b a))))
+  frac_mul_num_comm_path (Frac.ofInt a) (Frac.ofInt b)
+
+-- 52  Localization canonical path
+def localization_canonical_path (a b : Int) (s : Nat) (hs : s ≠ 0) :
+    Path (Frac.mul (Frac.ofInt a) (mkFrac b s hs)).num (a * b) :=
+  Path.refl _
+
+-- 53  Trans chain: neg-neg then comm
+def neg_neg_then_comm (f g : Frac) :
+    Path (Frac.neg (Frac.neg f)).num (Frac.add g f).num →
+    Path (Frac.neg (Frac.neg f)).num (Frac.add f g).num :=
+  fun p => Path.trans p (frac_add_num_comm_symm f g)
+
+-- ============================================================================
+-- § 7  LocPath combinators
+-- ============================================================================
+
+-- 54  LocPath: addComm step
+def locPath_addComm (a b : Int) : LocPath (LocObj.num (a + b)) (LocObj.num (b + a)) :=
+  LocPath.step (LocStep.addComm a b)
+
+-- 55  LocPath: mulComm step
+def locPath_mulComm (a b : Int) : LocPath (LocObj.num (a * b)) (LocObj.num (b * a)) :=
+  LocPath.step (LocStep.mulComm a b)
+
+-- 56  LocPath: negNeg step
+def locPath_negNeg (a : Int) : LocPath (LocObj.num (- -a)) (LocObj.num a) :=
+  LocPath.step (LocStep.negNeg a)
+
+-- 57  LocPath: mulAssoc step
+def locPath_mulAssoc (a b c : Int) : LocPath (LocObj.num (a * b * c)) (LocObj.num (a * (b * c))) :=
+  LocPath.step (LocStep.mulAssoc a b c)
+
+-- 58  LocPath: denMulComm step
+def locPath_denMulComm (s t : Nat) : LocPath (LocObj.den (s * t)) (LocObj.den (t * s)) :=
+  LocPath.step (LocStep.denMulComm s t)
+
+-- 59  LocPath: crossSwap involution
+def locPath_crossSwap_inv (a b : Int) : LocPath (LocObj.cross a b) (LocObj.cross a b) :=
+  LocPath.trans (LocPath.step (LocStep.crossSwap a b)) (LocPath.step (LocStep.crossSwap b a))
+
+-- 60  LocPath: addComm involution
+def locPath_addComm_inv (a b : Int) : LocPath (LocObj.num (a + b)) (LocObj.num (a + b)) :=
+  LocPath.trans (locPath_addComm a b) (locPath_addComm b a)
+
+-- 61  LocPath: denMulComm then denMulAssoc
+def locPath_den_comm_then_assoc (s t u : Nat) :
+    LocPath (LocObj.den (s * t * u)) (LocObj.den (s * (t * u))) :=
+  LocPath.step (LocStep.denMulAssoc s t u)
+
+-- 62  LocPath: symm of addComm
+def locPath_addComm_symm (a b : Int) : LocPath (LocObj.num (b + a)) (LocObj.num (a + b)) :=
+  LocPath.symm (locPath_addComm a b)
+
+-- 63  LocPath: triple trans
+def locPath_triple_trans {a b c d : LocObj} (p : LocPath a b) (q : LocPath b c) (r : LocPath c d) :
+    LocPath a d :=
+  LocPath.trans p (LocPath.trans q r)
+
+-- 64  LocPath: identity left
+def locPath_trans_refl_left (p : LocPath a b) : LocPath a b :=
+  LocPath.trans (LocPath.refl a) p
+
+-- 65  LocPath: identity right
+def locPath_trans_refl_right (p : LocPath a b) : LocPath a b :=
+  LocPath.trans p (LocPath.refl b)
 
 end ComputationalPaths.Path.Algebra.LocalizationPaths

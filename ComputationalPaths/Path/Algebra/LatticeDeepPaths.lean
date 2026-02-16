@@ -18,6 +18,7 @@ THREE GATES:
 -/
 
 import ComputationalPaths.Path.Basic
+import Mathlib.Order.MinMax
 
 namespace ComputationalPaths.Path.Algebra.LatticeDeepPaths
 
@@ -79,31 +80,25 @@ theorem meet_bot_right (a : LatElem) : meet a latBot = latBot := by
 theorem join_bot_right (a : LatElem) : join a latBot = a := by
   simp [join, latBot]
 
-/-- Absorption: a ∧ (a ∨ b) = a. -/
+/-- Absorption: `a ∧ (a ∨ b) = a`. -/
 theorem absorption_meet_join (a b : LatElem) : meet a (join a b) = a := by
   cases a with
   | mk av =>
     cases b with
     | mk bv =>
-      simp [meet, join, Nat.min_def, Nat.max_def]
-      by_cases h : av ≤ bv
-      · simp [h]
-      · have : bv ≤ av := Nat.le_of_not_ge h
-        simp [h, this]
+      -- `min av (max av bv) = av` since `av ≤ max av bv`.
+      simp [meet, join, Nat.min_eq_left, le_max_left]
 
-/-- Absorption: a ∨ (a ∧ b) = a. -/
+/-- Absorption: `a ∨ (a ∧ b) = a`. -/
 theorem absorption_join_meet (a b : LatElem) : join a (meet a b) = a := by
   cases a with
   | mk av =>
     cases b with
     | mk bv =>
-      simp [join, meet, Nat.min_def, Nat.max_def]
-      by_cases h : av ≤ bv
-      · simp [h]
-      · have : bv ≤ av := Nat.le_of_not_ge h
-        simp [h, this]
+      -- `max av (min av bv) = av` since `min av bv ≤ av`.
+      simp [join, meet, max_eq_left, min_le_left]
 
-/-- Distributive law: a ∧ (b ∨ c) = (a ∧ b) ∨ (a ∧ c). -/
+/-- Distributive law: `a ∧ (b ∨ c) = (a ∧ b) ∨ (a ∧ c)`. -/
 theorem distributive_meet_join (a b c : LatElem) :
     meet a (join b c) = join (meet a b) (meet a c) := by
   cases a with
@@ -112,29 +107,10 @@ theorem distributive_meet_join (a b c : LatElem) :
     | mk bv =>
       cases c with
       | mk cv =>
-        -- case split on comparisons; `simp` on `min_def`/`max_def` finishes.
-        simp [meet, join, Nat.min_def, Nat.max_def]
-        by_cases hb : bv ≤ cv
-        · simp [hb]
-          by_cases ha₁ : av ≤ bv
-          · simp [ha₁]
-          · have hb' : bv ≤ av := Nat.le_of_not_ge ha₁
-            by_cases ha₂ : av ≤ cv
-            · simp [ha₂, hb', hb]
-            · have hc' : cv ≤ av := Nat.le_of_not_ge ha₂
-              simp [ha₁, ha₂, hb', hc', hb]
-        · have hc : cv ≤ bv := Nat.le_of_not_ge hb
-          simp [hb, hc]
-          by_cases ha₁ : av ≤ cv
-          · simp [ha₁]
-            by_cases ha₂ : av ≤ bv
-            · simp [ha₂, hb]
-            · have hb' : bv ≤ av := Nat.le_of_not_ge ha₂
-              simp [ha₂, hb', hb, hc]
-          · have ha₁' : cv ≤ av := Nat.le_of_not_ge ha₁
-            simp [ha₁, ha₁', hb, hc]
+        -- `min a (max b c) = max (min a b) (min a c)`
+        simp [meet, join, min_max_distrib_left]
 
-/-- Dual distributive: a ∨ (b ∧ c) = (a ∨ b) ∧ (a ∨ c). -/
+/-- Dual distributive: `a ∨ (b ∧ c) = (a ∨ b) ∧ (a ∨ c)`. -/
 theorem distributive_join_meet (a b c : LatElem) :
     join a (meet b c) = meet (join a b) (join a c) := by
   cases a with
@@ -143,26 +119,8 @@ theorem distributive_join_meet (a b c : LatElem) :
     | mk bv =>
       cases c with
       | mk cv =>
-        simp [join, meet, Nat.min_def, Nat.max_def]
-        by_cases hb : bv ≤ cv
-        · simp [hb]
-          by_cases ha₁ : av ≤ bv
-          · simp [ha₁]
-          · have hb' : bv ≤ av := Nat.le_of_not_ge ha₁
-            by_cases ha₂ : av ≤ cv
-            · simp [ha₂, hb', hb]
-            · have hc' : cv ≤ av := Nat.le_of_not_ge ha₂
-              simp [ha₁, ha₂, hb', hc', hb]
-        · have hc : cv ≤ bv := Nat.le_of_not_ge hb
-          simp [hb, hc]
-          by_cases ha₁ : av ≤ cv
-          · simp [ha₁]
-            by_cases ha₂ : av ≤ bv
-            · simp [ha₂, hb]
-            · have hb' : bv ≤ av := Nat.le_of_not_ge ha₂
-              simp [ha₂, hb', hb, hc]
-          · have ha₁' : cv ≤ av := Nat.le_of_not_ge ha₁
-            simp [ha₁, ha₁', hb, hc]
+        -- `max a (min b c) = min (max a b) (max a c)`
+        simp [join, meet, max_min_distrib_left]
 
 /-- Modular law: if a ≤ c then a ∨ (b ∧ c) = (a ∨ b) ∧ c. -/
 theorem modular_law (a b c : LatElem) (h : a.val ≤ c.val) :
@@ -173,9 +131,11 @@ theorem modular_law (a b c : LatElem) (h : a.val ≤ c.val) :
     | mk bv =>
       cases c with
       | mk cv =>
-        simp [join, meet] at h ⊢
-        -- `omega` is available through `ComputationalPaths` imports.
-        omega
+        -- from distributivity: `max av (min bv cv) = min (max av bv) (max av cv)`
+        -- and since `av ≤ cv`, we have `max av cv = cv`.
+        have hmax : max av cv = cv := max_eq_right h
+        -- reduce to `Nat` equation
+        simp [join, meet, max_min_distrib_left, hmax]
 
 /-! ## A small rewriting language: `YourObj` / `YourStep` / `YourPath` -/
 
@@ -194,20 +154,23 @@ namespace YourObj
 /-- Evaluate a lattice expression into the concrete carrier. -/
 def eval : YourObj → LatElem
   | atom a => a
-  | meet x y => meet (eval x) (eval y)
-  | join x y => join (eval x) (eval y)
+  | .meet x y => _root_.ComputationalPaths.Path.Algebra.LatticeDeepPaths.meet (eval x) (eval y)
+  | .join x y => _root_.ComputationalPaths.Path.Algebra.LatticeDeepPaths.join (eval x) (eval y)
   | bot => latBot
   | top n => latTop n
 
 @[simp] theorem eval_atom (a : LatElem) : eval (atom a) = a := rfl
-@[simp] theorem eval_meet (x y : YourObj) : eval (meet x y) = meet (eval x) (eval y) := rfl
-@[simp] theorem eval_join (x y : YourObj) : eval (join x y) = join (eval x) (eval y) := rfl
+@[simp] theorem eval_meet (x y : YourObj) :
+    eval (.meet x y) = _root_.ComputationalPaths.Path.Algebra.LatticeDeepPaths.meet (eval x) (eval y) := rfl
+@[simp] theorem eval_join (x y : YourObj) :
+    eval (.join x y) = _root_.ComputationalPaths.Path.Algebra.LatticeDeepPaths.join (eval x) (eval y) := rfl
 @[simp] theorem eval_bot : eval bot = latBot := rfl
 @[simp] theorem eval_top (n : Nat) : eval (top n) = latTop n := rfl
 
 end YourObj
 
-open YourObj
+-- (do not `open YourObj`: it would shadow the lattice operations `meet`/`join`)
+open YourObj (eval)
 
 /-- Primitive rewrite rules (the meaningful *single steps*). -/
 inductive YourStep : YourObj → YourObj → Type
@@ -262,28 +225,26 @@ private def atom {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 /-- Interpret a single primitive rewrite step as a computational path. -/
-private theorem step_sound : ∀ {x y : YourObj}, YourStep x y →
-    Path (eval x) (eval y)
-  | _, _, YourStep.meet_comm x y => atom (by simpa [YourObj.eval] using meet_comm (eval x) (eval y))
-  | _, _, YourStep.join_comm x y => atom (by simpa [YourObj.eval] using join_comm (eval x) (eval y))
-  | _, _, YourStep.meet_assoc x y z => atom (by simpa [YourObj.eval] using meet_assoc (eval x) (eval y) (eval z))
-  | _, _, YourStep.join_assoc x y z => atom (by simpa [YourObj.eval] using join_assoc (eval x) (eval y) (eval z))
-  | _, _, YourStep.meet_idem x => atom (by simpa [YourObj.eval] using meet_idem (eval x))
-  | _, _, YourStep.join_idem x => atom (by simpa [YourObj.eval] using join_idem (eval x))
-  | _, _, YourStep.absorption_meet_join x y =>
-      atom (by simpa [YourObj.eval] using absorption_meet_join (eval x) (eval y))
-  | _, _, YourStep.absorption_join_meet x y =>
-      atom (by simpa [YourObj.eval] using absorption_join_meet (eval x) (eval y))
-  | _, _, YourStep.distributive_meet_join x y z =>
-      atom (by simpa [YourObj.eval] using distributive_meet_join (eval x) (eval y) (eval z))
-  | _, _, YourStep.distributive_join_meet x y z =>
-      atom (by simpa [YourObj.eval] using distributive_join_meet (eval x) (eval y) (eval z))
-  | _, _, YourStep.join_bot x => atom (by simpa [YourObj.eval] using join_bot (eval x))
-  | _, _, YourStep.join_bot_right x => atom (by simpa [YourObj.eval] using join_bot_right (eval x))
-  | _, _, YourStep.meet_bot_left x => atom (by simpa [YourObj.eval] using meet_bot_left (eval x))
-  | _, _, YourStep.meet_bot_right x => atom (by simpa [YourObj.eval] using meet_bot_right (eval x))
-  | _, _, YourStep.modular x y z h =>
-      atom (by simpa [YourObj.eval] using modular_law (eval x) (eval y) (eval z) h)
+private def step_sound {x y : YourObj} (s : YourStep x y) :
+    Path (eval x) (eval y) :=
+  match s with
+  | YourStep.meet_comm x y => atom (by simpa using meet_comm (eval x) (eval y))
+  | YourStep.join_comm x y => atom (by simpa using join_comm (eval x) (eval y))
+  | YourStep.meet_assoc x y z => atom (by simpa using meet_assoc (eval x) (eval y) (eval z))
+  | YourStep.join_assoc x y z => atom (by simpa using join_assoc (eval x) (eval y) (eval z))
+  | YourStep.meet_idem x => atom (by simpa using meet_idem (eval x))
+  | YourStep.join_idem x => atom (by simpa using join_idem (eval x))
+  | YourStep.absorption_meet_join x y => atom (by simpa using absorption_meet_join (eval x) (eval y))
+  | YourStep.absorption_join_meet x y => atom (by simpa using absorption_join_meet (eval x) (eval y))
+  | YourStep.distributive_meet_join x y z =>
+      atom (by simpa using distributive_meet_join (eval x) (eval y) (eval z))
+  | YourStep.distributive_join_meet x y z =>
+      atom (by simpa using distributive_join_meet (eval x) (eval y) (eval z))
+  | YourStep.join_bot x => atom (by simpa using join_bot (eval x))
+  | YourStep.join_bot_right x => atom (by simpa using join_bot_right (eval x))
+  | YourStep.meet_bot_left x => atom (by simpa using meet_bot_left (eval x))
+  | YourStep.meet_bot_right x => atom (by simpa using meet_bot_right (eval x))
+  | YourStep.modular x y z h => atom (by simpa using modular_law (eval x) (eval y) (eval z) h)
 
 /-- Interpret a generated `YourPath` as a computational `Path`. -/
 def toPath : ∀ {x y : YourObj}, YourPath x y → Path (eval x) (eval y)
@@ -291,14 +252,14 @@ def toPath : ∀ {x y : YourObj}, YourPath x y → Path (eval x) (eval y)
   | _, _, @YourPath.step _ _ s => step_sound s
   | _, _, @YourPath.symm _ _ p => Path.symm (toPath p)
   | _, _, @YourPath.trans _ _ _ p q => Path.trans (toPath p) (toPath q)
-  | _, _, @YourPath.congMeetL _ _ p z =>
-      Path.congrArg (fun t => meet t (eval z)) (toPath p)
-  | _, _, @YourPath.congMeetR z _ _ p =>
-      Path.congrArg (fun t => meet (eval z) t) (toPath p)
-  | _, _, @YourPath.congJoinL _ _ p z =>
-      Path.congrArg (fun t => join t (eval z)) (toPath p)
-  | _, _, @YourPath.congJoinR z _ _ p =>
-      Path.congrArg (fun t => join (eval z) t) (toPath p)
+  | _, _, @YourPath.congMeetL _ _ p z => by
+      simpa using Path.congrArg (fun t => meet t (eval z)) (toPath p)
+  | _, _, @YourPath.congMeetR z _ _ p => by
+      simpa using Path.congrArg (fun t => meet (eval z) t) (toPath p)
+  | _, _, @YourPath.congJoinL _ _ p z => by
+      simpa using Path.congrArg (fun t => join t (eval z)) (toPath p)
+  | _, _, @YourPath.congJoinR z _ _ p => by
+      simpa using Path.congrArg (fun t => join (eval z) t) (toPath p)
 
 end Interpret
 
@@ -330,77 +291,77 @@ def meet_comm_in_right (x y z : YourObj) :
   YourPath.congMeetR x (meet_comm_Y y z)
 
 /-- Computational-path version of meet commutativity (LatElem-level). -/
-theorem meet_comm_path (a b : LatElem) : Path (meet a b) (meet b a) := by
+def meet_comm_path (a b : LatElem) : Path (meet a b) (meet b a) := by
   simpa [YourObj.eval] using (toPath (meet_comm_Y (.atom a) (.atom b)))
 
 /-- Computational-path version of join commutativity (LatElem-level). -/
-theorem join_comm_path (a b : LatElem) : Path (join a b) (join b a) := by
+def join_comm_path (a b : LatElem) : Path (join a b) (join b a) := by
   simpa [YourObj.eval] using (toPath (join_comm_Y (.atom a) (.atom b)))
 
 /-- Computational-path version of meet associativity. -/
-theorem meet_assoc_path (a b c : LatElem) :
+def meet_assoc_path (a b c : LatElem) :
     Path (meet (meet a b) c) (meet a (meet b c)) := by
   simpa [YourObj.eval] using (toPath (meet_assoc_Y (.atom a) (.atom b) (.atom c)))
 
 /-- Computational-path version of join associativity. -/
-theorem join_assoc_path (a b c : LatElem) :
+def join_assoc_path (a b c : LatElem) :
     Path (join (join a b) c) (join a (join b c)) := by
   simpa [YourObj.eval] using (toPath (join_assoc_Y (.atom a) (.atom b) (.atom c)))
 
 /-- Idempotence of meet as a computational path. -/
-theorem meet_idem_path (a : LatElem) : Path (meet a a) a := by
+def meet_idem_path (a : LatElem) : Path (meet a a) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.meet_idem (.atom a))))
 
 /-- Idempotence of join as a computational path. -/
-theorem join_idem_path (a : LatElem) : Path (join a a) a := by
+def join_idem_path (a : LatElem) : Path (join a a) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.join_idem (.atom a))))
 
 /-- Absorption `a ∧ (a ∨ b) ~ a` as a computational path. -/
-theorem absorption_meet_join_path (a b : LatElem) :
+def absorption_meet_join_path (a b : LatElem) :
     Path (meet a (join a b)) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.absorption_meet_join (.atom a) (.atom b))))
 
 /-- Absorption `a ∨ (a ∧ b) ~ a` as a computational path. -/
-theorem absorption_join_meet_path (a b : LatElem) :
+def absorption_join_meet_path (a b : LatElem) :
     Path (join a (meet a b)) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.absorption_join_meet (.atom a) (.atom b))))
 
 /-- Distributivity as a computational path. -/
-theorem distributive_meet_join_path (a b c : LatElem) :
+def distributive_meet_join_path (a b c : LatElem) :
     Path (meet a (join b c)) (join (meet a b) (meet a c)) := by
   simpa [YourObj.eval] using
     (toPath (YourPath.step (YourStep.distributive_meet_join (.atom a) (.atom b) (.atom c))))
 
 /-- Dual distributivity as a computational path. -/
-theorem distributive_join_meet_path (a b c : LatElem) :
+def distributive_join_meet_path (a b c : LatElem) :
     Path (join a (meet b c)) (meet (join a b) (join a c)) := by
   simpa [YourObj.eval] using
     (toPath (YourPath.step (YourStep.distributive_join_meet (.atom a) (.atom b) (.atom c))))
 
 /-- Modular law as a computational path. -/
-theorem modular_law_path (a b c : LatElem) (h : a.val ≤ c.val) :
+def modular_law_path (a b c : LatElem) (h : a.val ≤ c.val) :
     Path (join a (meet b c)) (meet (join a b) c) := by
   simpa [YourObj.eval] using
     (toPath (YourPath.step (YourStep.modular (.atom a) (.atom b) (.atom c) h)))
 
 /-- Join with bottom (left) as a computational path. -/
-theorem join_bot_path (a : LatElem) : Path (join latBot a) a := by
+def join_bot_path (a : LatElem) : Path (join latBot a) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.join_bot (.atom a))))
 
 /-- Join with bottom (right) as a computational path. -/
-theorem join_bot_right_path (a : LatElem) : Path (join a latBot) a := by
+def join_bot_right_path (a : LatElem) : Path (join a latBot) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.join_bot_right (.atom a))))
 
 /-- Meet with bottom (left) as a computational path. -/
-theorem meet_bot_left_path (a : LatElem) : Path (meet latBot a) latBot := by
+def meet_bot_left_path (a : LatElem) : Path (meet latBot a) latBot := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.meet_bot_left (.atom a))))
 
 /-- Meet with bottom (right) as a computational path. -/
-theorem meet_bot_right_path (a : LatElem) : Path (meet a latBot) latBot := by
+def meet_bot_right_path (a : LatElem) : Path (meet a latBot) latBot := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.meet_bot_right (.atom a))))
 
 /-- Example of *genuine* composition: reassociate and commute inside a 3-fold meet. -/
-theorem meet_reassoc_comm_path (a b c : LatElem) :
+def meet_reassoc_comm_path (a b c : LatElem) :
     Path (meet (meet a b) c) (meet (meet a c) b) := by
   -- build in `YourPath` using assoc + congruence + comm, then interpret.
   let x : YourObj := .atom a
@@ -408,43 +369,43 @@ theorem meet_reassoc_comm_path (a b c : LatElem) :
   let z : YourObj := .atom c
   have p1 : YourPath (.meet (.meet x y) z) (.meet x (.meet y z)) := meet_assoc_Y x y z
   have p2 : YourPath (.meet x (.meet y z)) (.meet x (.meet z y)) :=
-      .congMeetL (meet_comm_Y y z) x
+      YourPath.congMeetR x (meet_comm_Y y z)
   have p3 : YourPath (.meet x (.meet z y)) (.meet (.meet x z) y) :=
       .symm (meet_assoc_Y x z y)
   simpa [YourObj.eval] using toPath (.trans p1 (.trans p2 p3))
 
 /-- Dual example: reassociate and commute inside a 3-fold join. -/
-theorem join_reassoc_comm_path (a b c : LatElem) :
+def join_reassoc_comm_path (a b c : LatElem) :
     Path (join (join a b) c) (join (join a c) b) := by
   let x : YourObj := .atom a
   let y : YourObj := .atom b
   let z : YourObj := .atom c
   have p1 : YourPath (.join (.join x y) z) (.join x (.join y z)) := join_assoc_Y x y z
   have p2 : YourPath (.join x (.join y z)) (.join x (.join z y)) :=
-      .congJoinL (join_comm_Y y z) x
+      YourPath.congJoinR x (join_comm_Y y z)
   have p3 : YourPath (.join x (.join z y)) (.join (.join x z) y) :=
       .symm (join_assoc_Y x z y)
   simpa [YourObj.eval] using toPath (.trans p1 (.trans p2 p3))
 
 /-- Absorption + symmetry yields: `a = a ∧ (a ∨ b)` as a path. -/
-theorem absorption_meet_join_symm_path (a b : LatElem) :
+def absorption_meet_join_symm_path (a b : LatElem) :
     Path a (meet a (join a b)) := by
   exact Path.symm (absorption_meet_join_path a b)
 
 /-- Absorption + symmetry yields: `a = a ∨ (a ∧ b)` as a path. -/
-theorem absorption_join_meet_symm_path (a b : LatElem) :
+def absorption_join_meet_symm_path (a b : LatElem) :
     Path a (join a (meet a b)) := by
   exact Path.symm (absorption_join_meet_path a b)
 
 /-- A small congruence example: map a commutativity path through `join`. -/
-theorem join_congr_meet_comm (a b c : LatElem) :
+def join_congr_meet_comm (a b c : LatElem) :
     Path (join (meet a b) c) (join (meet b a) c) := by
   -- interpret congruence on the *left* argument of `join`.
   have p : Path (meet a b) (meet b a) := meet_comm_path a b
   exact Path.congrArg (fun t => join t c) p
 
 /-- Another congruence example: map commutativity through `meet`. -/
-theorem meet_congr_join_comm (a b c : LatElem) :
+def meet_congr_join_comm (a b c : LatElem) :
     Path (meet (join a b) c) (meet (join b a) c) := by
   have p : Path (join a b) (join b a) := join_comm_path a b
   exact Path.congrArg (fun t => meet t c) p
