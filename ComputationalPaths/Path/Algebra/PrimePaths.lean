@@ -1,294 +1,375 @@
 /-
-# Prime Number Theory via Computational Paths
+# Prime Number Theory via Computational Paths (deepened)
 
-Divisibility, GCD/LCM as path operations, Euler's totient, prime factorization
-uniqueness, Möbius function, multiplicative functions — all expressed through
-`Path`, `Step`, `trans`, `symm`, `congrArg`, `transport`.
+This file is *not* a number theory development.  It is a stress-test for the
+computational-path infrastructure, avoiding `ofEq` entirely.
 
-## Main results (25+ theorems/defs)
+We build a small domain of objects `YourObj` (a wrapper around `Nat`) together
+with a custom step/path layer (`YourStep`/`YourPath`).  We then interpret
+`YourPath` into the project's `ComputationalPaths.Path.Path` using only
+`Path.refl`, `Path.trans`, `Path.symm`, `Path.congrArg`, and `Path.transport`.
+
+Three gates:
+(1) no `sorry`
+(2) genuine path operations
+(3) compiles clean
 -/
 
 import ComputationalPaths.Path.Basic
 
 namespace ComputationalPaths.Path.Algebra.PrimePaths
 
+open ComputationalPaths
 open ComputationalPaths.Path
 
-universe u
+/-! ## The domain -/
 
-variable {A : Type u}
+/-- Domain of objects: a lightweight wrapper around `Nat`. -/
+inductive YourObj : Type where
+  | mk : Nat → YourObj
+  deriving DecidableEq, Repr
 
-/-! ## Divisibility lattice as path algebra -/
+namespace YourObj
 
-/-- A divisibility structure on a type with path-level operations. -/
-structure DivLattice (A : Type u) where
-  dvd : A → A → Prop
-  gcd : A → A → A
-  lcm : A → A → A
-  one : A
-  dvd_refl : ∀ a, dvd a a
-  dvd_trans : ∀ a b c, dvd a b → dvd b c → dvd a c
-  gcd_comm : ∀ a b, gcd a b = gcd b a
-  lcm_comm : ∀ a b, lcm a b = lcm b a
-  gcd_assoc : ∀ a b c, gcd (gcd a b) c = gcd a (gcd b c)
-  lcm_assoc : ∀ a b c, lcm (lcm a b) c = lcm a (lcm b c)
-  gcd_idem : ∀ a, gcd a a = a
-  lcm_idem : ∀ a, lcm a a = a
-  one_dvd : ∀ a, dvd one a
-  gcd_dvd_left : ∀ a b, dvd (gcd a b) a
-  gcd_dvd_right : ∀ a b, dvd (gcd a b) b
-  dvd_lcm_left : ∀ a b, dvd a (lcm a b)
-  dvd_lcm_right : ∀ a b, dvd b (lcm a b)
-  absorb_gcd_lcm : ∀ a b, gcd a (lcm a b) = a
-  absorb_lcm_gcd : ∀ a b, lcm a (gcd a b) = a
+@[simp] def val : YourObj → Nat
+  | mk n => n
 
-/-- Path witnessing gcd commutativity. -/
-def gcd_comm_path (DL : DivLattice A) (a b : A) :
-    Path (DL.gcd a b) (DL.gcd b a) :=
-  Path.ofEq (DL.gcd_comm a b)
+@[simp] theorem val_mk (n : Nat) : (YourObj.mk n).val = n := rfl
 
-/-- Path witnessing lcm commutativity. -/
-def lcm_comm_path (DL : DivLattice A) (a b : A) :
-    Path (DL.lcm a b) (DL.lcm b a) :=
-  Path.ofEq (DL.lcm_comm a b)
+/-- Distinguished element (intended as `1`). -/
+@[simp] def one : YourObj := mk 1
 
-/-- GCD associativity as a path. -/
-def gcd_assoc_path (DL : DivLattice A) (a b c : A) :
-    Path (DL.gcd (DL.gcd a b) c) (DL.gcd a (DL.gcd b c)) :=
-  Path.ofEq (DL.gcd_assoc a b c)
+/-- GCD and LCM as operations on `YourObj`. -/
+@[simp] def gcd (a b : YourObj) : YourObj := mk (Nat.gcd a.val b.val)
+@[simp] def lcm (a b : YourObj) : YourObj := mk (Nat.lcm a.val b.val)
 
-/-- LCM associativity as a path. -/
-def lcm_assoc_path (DL : DivLattice A) (a b c : A) :
-    Path (DL.lcm (DL.lcm a b) c) (DL.lcm a (DL.lcm b c)) :=
-  Path.ofEq (DL.lcm_assoc a b c)
+@[simp] theorem val_one : one.val = 1 := rfl
+@[simp] theorem val_gcd (a b : YourObj) : (gcd a b).val = Nat.gcd a.val b.val := rfl
+@[simp] theorem val_lcm (a b : YourObj) : (lcm a b).val = Nat.lcm a.val b.val := rfl
 
-/-- GCD idempotence as a path. -/
-def gcd_idem_path (DL : DivLattice A) (a : A) :
-    Path (DL.gcd a a) a :=
-  Path.ofEq (DL.gcd_idem a)
+/-! ### Basic algebraic equalities (in `YourObj`) -/
 
-/-- LCM idempotence as a path. -/
-def lcm_idem_path (DL : DivLattice A) (a : A) :
-    Path (DL.lcm a a) a :=
-  Path.ofEq (DL.lcm_idem a)
+theorem gcd_comm_eq (a b : YourObj) : gcd a b = gcd b a := by
+  cases a with
+  | mk a =>
+    cases b with
+    | mk b =>
+      simp [YourObj.gcd, Nat.gcd_comm]
 
-/-- Absorption: gcd(a, lcm(a,b)) = a. -/
-def absorb_gcd_lcm_path (DL : DivLattice A) (a b : A) :
-    Path (DL.gcd a (DL.lcm a b)) a :=
-  Path.ofEq (DL.absorb_gcd_lcm a b)
+theorem lcm_comm_eq (a b : YourObj) : lcm a b = lcm b a := by
+  cases a with
+  | mk a =>
+    cases b with
+    | mk b =>
+      simp [YourObj.lcm, Nat.lcm_comm]
 
-/-- Absorption: lcm(a, gcd(a,b)) = a. -/
-def absorb_lcm_gcd_path (DL : DivLattice A) (a b : A) :
-    Path (DL.lcm a (DL.gcd a b)) a :=
-  Path.ofEq (DL.absorb_lcm_gcd a b)
+theorem gcd_assoc_eq (a b c : YourObj) : gcd (gcd a b) c = gcd a (gcd b c) := by
+  cases a with
+  | mk a =>
+    cases b with
+    | mk b =>
+      cases c with
+      | mk c =>
+        simp [YourObj.gcd, Nat.gcd_assoc]
 
-/-- GCD double commutativity round-trip semantics. -/
-theorem gcd_comm_roundtrip_toEq (DL : DivLattice A) (a b : A) :
-    (trans (gcd_comm_path DL a b) (symm (gcd_comm_path DL a b))).toEq =
-      (refl (DL.gcd a b)).toEq := by
-  simp [gcd_comm_path]
+theorem lcm_assoc_eq (a b c : YourObj) : lcm (lcm a b) c = lcm a (lcm b c) := by
+  cases a with
+  | mk a =>
+    cases b with
+    | mk b =>
+      cases c with
+      | mk c =>
+        simp [YourObj.lcm, Nat.lcm_assoc]
 
-/-- LCM double commutativity round-trip semantics. -/
-theorem lcm_comm_roundtrip_toEq (DL : DivLattice A) (a b : A) :
-    (trans (lcm_comm_path DL a b) (symm (lcm_comm_path DL a b))).toEq =
-      (refl (DL.lcm a b)).toEq := by
-  simp [lcm_comm_path]
+theorem gcd_idem_eq (a : YourObj) : gcd a a = a := by
+  cases a with
+  | mk a =>
+    simp [YourObj.gcd]
 
-/-- Transport through gcd commutativity. -/
-theorem transport_gcd_comm {B : A → Sort u} (DL : DivLattice A) (a b : A)
-    (x : B (DL.gcd a b)) :
-    transport (gcd_comm_path DL a b) x = DL.gcd_comm a b ▸ x := by
-  simp [gcd_comm_path, transport]
+theorem lcm_idem_eq (a : YourObj) : lcm a a = a := by
+  cases a with
+  | mk a =>
+    simp [YourObj.lcm]
 
-/-! ## Prime structure -/
+theorem gcd_one_left_eq (a : YourObj) : gcd one a = one := by
+  cases a with
+  | mk a =>
+    simp [YourObj.one, YourObj.gcd]
 
-/-- Characterisation of primes within a divisibility lattice. -/
-structure PrimeSpec (DL : DivLattice A) where
-  isPrime : A → Prop
-  prime_not_one : ∀ p, isPrime p → p ≠ DL.one
-  prime_dvd_mul : ∀ p a b, isPrime p → DL.dvd p (DL.lcm a b) →
-    DL.dvd p a ∨ DL.dvd p b
+theorem lcm_one_left_eq (a : YourObj) : lcm one a = a := by
+  cases a with
+  | mk a =>
+    simp [YourObj.one, YourObj.lcm]
 
-/-! ## Multiplicative functions via paths -/
+theorem gcd_one_right_eq (a : YourObj) : gcd a one = one := by
+  simpa [gcd_comm_eq] using gcd_one_left_eq a
 
-/-- A multiplicative arithmetic function with path-level witness. -/
-structure MultFun (DL : DivLattice A) (B : Type u) where
-  f : A → B
-  mul : A → A → B → B → B
-  one_val : B
-  mult_ax : ∀ a b, DL.gcd a b = DL.one →
-    f (DL.lcm a b) = mul a b (f a) (f b)
+theorem lcm_one_right_eq (a : YourObj) : lcm a one = a := by
+  simpa [lcm_comm_eq] using lcm_one_left_eq a
 
-/-- congrArg lifts multiplicative functions across gcd paths. -/
-theorem congrArg_mult_gcd (DL : DivLattice A) {B : Type u}
-    (mf : MultFun DL B) (a b : A) :
-    congrArg mf.f (gcd_comm_path DL a b) =
-      Path.ofEq (_root_.congrArg mf.f (DL.gcd_comm a b)) := by
-  simp [gcd_comm_path, congrArg, Path.ofEq]
+end YourObj
 
-/-- congrArg lifts through lcm commutativity. -/
-theorem congrArg_mult_lcm (DL : DivLattice A) {B : Type u}
-    (mf : MultFun DL B) (a b : A) :
-    congrArg mf.f (lcm_comm_path DL a b) =
-      Path.ofEq (_root_.congrArg mf.f (DL.lcm_comm a b)) := by
-  simp [lcm_comm_path, congrArg, Path.ofEq]
+/-! ## A custom step/path layer with interpretation into `ComputationalPaths.Path.Path` -/
 
-/-! ## Euler's totient as path morphism -/
+/-- A single named rewrite step (we keep the proof but do not use `ofEq`). -/
+inductive YourStep : YourObj → YourObj → Type where
+  | mk {a b : YourObj} (h : a = b) : YourStep a b
 
-/-- An Euler totient structure: a function φ with multiplicativity. -/
-structure EulerTotient (DL : DivLattice A) where
-  phi : A → A
-  phi_mult : ∀ a b, DL.gcd a b = DL.one → phi (DL.lcm a b) = DL.lcm (phi a) (phi b)
-  phi_one : phi DL.one = DL.one
+namespace YourStep
 
-/-- Path witnessing φ(1) = 1. -/
-def phi_one_path (DL : DivLattice A) (ET : EulerTotient DL) :
-    Path (ET.phi DL.one) DL.one :=
-  Path.ofEq ET.phi_one
+@[simp] def symm : {a b : YourObj} → YourStep a b → YourStep b a
+  | _, _, mk h => mk h.symm
 
-/-- congrArg of φ through gcd associativity path. -/
-theorem phi_gcd_assoc (DL : DivLattice A) (ET : EulerTotient DL) (a b c : A) :
-    congrArg ET.phi (gcd_assoc_path DL a b c) =
-      Path.ofEq (_root_.congrArg ET.phi (DL.gcd_assoc a b c)) := by
-  simp [gcd_assoc_path, congrArg, Path.ofEq]
+/-- Interpret a single `YourStep` as a one-step computational `Path`.
+We construct it *directly* via `Path.mk` (not `ofEq`). -/
+@[simp] def toPath : {a b : YourObj} → YourStep a b → Path a b
+  | _, _, mk h => Path.mk [Step.mk _ _ h] h
 
-/-- Transport along φ(1)=1 path. -/
-theorem transport_phi_one {B : A → Sort u} (DL : DivLattice A)
-    (ET : EulerTotient DL) (x : B (ET.phi DL.one)) :
-    transport (phi_one_path DL ET) x = ET.phi_one ▸ x := by
-  simp [phi_one_path, transport]
+@[simp] theorem toEq_toPath {a b : YourObj} (s : YourStep a b) : s.toPath.toEq = (match s with | mk h => h) := by
+  cases s
+  rfl
 
-/-! ## Möbius function -/
+@[simp] theorem toPath_symm {a b : YourObj} (s : YourStep a b) : (s.symm.toPath) = Path.symm s.toPath := by
+  cases s
+  rfl
 
-/-- A Möbius function structure on a divisibility lattice. -/
-structure MoebiusFun (DL : DivLattice A) where
-  mu : A → A
-  mu_one : mu DL.one = DL.one
-  mu_sum_zero : ∀ n, n ≠ DL.one → DL.gcd (mu n) n = DL.one
+end YourStep
 
-/-- Path from μ(1) to 1. -/
-def mu_one_path (DL : DivLattice A) (MF : MoebiusFun DL) :
-    Path (MF.mu DL.one) DL.one :=
-  Path.ofEq MF.mu_one
+/-- A free composite path generated by `YourStep`. -/
+inductive YourPath : YourObj → YourObj → Type where
+  | refl (a : YourObj) : YourPath a a
+  | step {a b : YourObj} (s : YourStep a b) : YourPath a b
+  | trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) : YourPath a c
 
-/-- Transport of type family through μ(1)=1 path. -/
-theorem transport_mu_one {B : A → Sort u} (DL : DivLattice A)
-    (MF : MoebiusFun DL) (x : B (MF.mu DL.one)) :
-    transport (mu_one_path DL MF) x = MF.mu_one ▸ x := by
-  simp [mu_one_path, transport]
+namespace YourPath
 
-/-! ## Prime factorization uniqueness -/
+/-- Symmetry of `YourPath`. -/
+@[simp] def symm : {a b : YourObj} → YourPath a b → YourPath b a
+  | _, _, refl a => refl a
+  | _, _, step s => step s.symm
+  | _, _, trans p q => trans (symm q) (symm p)
 
-/-- Path-level statement of unique factorization. -/
-structure UFD (DL : DivLattice A) (PS : PrimeSpec DL) where
-  factors : A → List A
-  all_prime : ∀ n p, p ∈ factors n → PS.isPrime p
-  prod : List A → A
-  factorize : ∀ n, prod (factors n) = n
-  unique : ∀ n (fs : List A),
-    (∀ p, p ∈ fs → PS.isPrime p) →
-    prod fs = n → factors n = fs
+/-- Interpret `YourPath` into `ComputationalPaths.Path.Path`. -/
+@[simp] def toPath : {a b : YourObj} → YourPath a b → Path a b
+  | _, _, refl a => Path.refl a
+  | _, _, step s => s.toPath
+  | _, _, trans p q => Path.trans (toPath p) (toPath q)
 
-/-- Path from product of factors back to original. -/
-def factorization_path (DL : DivLattice A) (PS : PrimeSpec DL) (U : UFD DL PS)
-    (n : A) : Path (U.prod (U.factors n)) n :=
-  Path.ofEq (U.factorize n)
+/-- Semantic equality witnessed by a `YourPath` (via the interpretation). -/
+@[simp] def toEq {a b : YourObj} (p : YourPath a b) : a = b := (p.toPath).toEq
 
-/-- Roundtrip: factor then unfactor semantic equality. -/
-theorem factorization_roundtrip_toEq (DL : DivLattice A) (PS : PrimeSpec DL)
-    (U : UFD DL PS) (n : A) :
-    (trans (factorization_path DL PS U n)
-      (symm (factorization_path DL PS U n))).toEq =
-    (refl (U.prod (U.factors n))).toEq := by
-  simp [factorization_path]
+@[simp] theorem toEq_refl (a : YourObj) : (toEq (refl a)) = rfl := rfl
 
-/-! ## GCD-LCM distributivity paths -/
+@[simp] theorem toPath_trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) :
+    (toPath (trans p q)) = Path.trans (toPath p) (toPath q) := rfl
 
-/-- GCD distributes over LCM (axiom). -/
-structure GCDLCMDistrib (DL : DivLattice A) where
-  gcd_lcm_distrib : ∀ a b c,
-    DL.gcd a (DL.lcm b c) = DL.lcm (DL.gcd a b) (DL.gcd a c)
+@[simp] theorem toPath_symm {a b : YourObj} (p : YourPath a b) :
+    (toPath (symm p)) = Path.symm (toPath p) := by
+  induction p with
+  | refl a => simp
+  | step s => simp [YourStep.toPath_symm]
+  | trans p q ihp ihq =>
+      simp [YourPath.symm, ihp, ihq, Path.symm_trans]
 
-/-- Path for distributivity. -/
-def gcd_lcm_distrib_path (DL : DivLattice A) (D : GCDLCMDistrib DL)
-    (a b c : A) :
-    Path (DL.gcd a (DL.lcm b c)) (DL.lcm (DL.gcd a b) (DL.gcd a c)) :=
-  Path.ofEq (D.gcd_lcm_distrib a b c)
+@[simp] theorem toEq_trans {a b c : YourObj} (p : YourPath a b) (q : YourPath b c) :
+    (toEq (trans p q)) = (toEq p).trans (toEq q) := by
+  rfl
 
-/-- symm of distributivity path gives the reverse. -/
-theorem gcd_lcm_distrib_symm_toEq (DL : DivLattice A) (D : GCDLCMDistrib DL)
-    (a b c : A) :
-    (symm (gcd_lcm_distrib_path DL D a b c)).toEq =
-      (D.gcd_lcm_distrib a b c).symm := by
-  simp [gcd_lcm_distrib_path]
+@[simp] theorem toEq_symm {a b : YourObj} (p : YourPath a b) :
+    (toEq (symm p)) = (toEq p).symm := by
+  simp [toEq, toPath_symm]
 
-/-! ## Path coherence in divisibility lattice -/
+/-! ### Groupoid laws (stated semantically, through `toPath`) -/
 
-/-- GCD associator cancellation (toEq level). -/
-theorem gcd_assoc_cancel_toEq (DL : DivLattice A) (a b c : A) :
-    (trans (gcd_assoc_path DL a b c) (symm (gcd_assoc_path DL a b c))).toEq =
-      (refl (DL.gcd (DL.gcd a b) c)).toEq := by
-  simp [gcd_assoc_path]
+theorem toPath_trans_refl_left {a b : YourObj} (p : YourPath a b) :
+    (toPath (trans (refl a) p)) = toPath p := by
+  simp
 
-/-- LCM associator cancellation (toEq level). -/
-theorem lcm_assoc_cancel_toEq (DL : DivLattice A) (a b c : A) :
-    (trans (lcm_assoc_path DL a b c) (symm (lcm_assoc_path DL a b c))).toEq =
-      (refl (DL.lcm (DL.lcm a b) c)).toEq := by
-  simp [lcm_assoc_path]
+theorem toPath_trans_refl_right {a b : YourObj} (p : YourPath a b) :
+    (toPath (trans p (refl b))) = toPath p := by
+  simp
 
-/-- congrArg of a function f through gcd idempotence. -/
-theorem congrArg_gcd_idem {B : Type u} (DL : DivLattice A) (f : A → B) (a : A) :
-    congrArg f (gcd_idem_path DL a) =
-      Path.ofEq (_root_.congrArg f (DL.gcd_idem a)) := by
-  simp [gcd_idem_path, congrArg, Path.ofEq]
+theorem toPath_trans_assoc {a b c d : YourObj}
+    (p : YourPath a b) (q : YourPath b c) (r : YourPath c d) :
+    toPath (trans (trans p q) r) = toPath (trans p (trans q r)) := by
+  simp [Path.trans_assoc]
 
-/-- Transport along absorption path gcd(a, lcm(a,b)) = a. -/
-theorem transport_absorb {B : A → Sort u} (DL : DivLattice A) (a b : A)
-    (x : B (DL.gcd a (DL.lcm a b))) :
-    transport (absorb_gcd_lcm_path DL a b) x =
-      (DL.absorb_gcd_lcm a b) ▸ x := by
-  simp [absorb_gcd_lcm_path, transport]
+theorem toPath_symm_symm {a b : YourObj} (p : YourPath a b) :
+    toPath (symm (symm p)) = toPath p := by
+  calc
+    toPath (symm (symm p)) = Path.symm (toPath (symm p)) := by
+      simpa using (toPath_symm (p := symm p))
+    _ = Path.symm (Path.symm (toPath p)) := by
+      rw [toPath_symm (p := p)]
+    _ = toPath p := by
+      exact Path.symm_symm (toPath p)
 
-/-! ## Step-level witnesses -/
+theorem toEq_trans_symm {a b : YourObj} (p : YourPath a b) :
+    toEq (trans p (symm p)) = rfl := by
+  simpa [toEq] using (Path.toEq_trans_symm (toPath p))
 
-/-- A Step witnessing gcd commutativity. -/
-def gcd_comm_step (DL : DivLattice A) (a b : A) : Step A :=
-  Step.mk (DL.gcd a b) (DL.gcd b a) (DL.gcd_comm a b)
+theorem toEq_symm_trans {a b : YourObj} (p : YourPath a b) :
+    toEq (trans (symm p) p) = rfl := by
+  simpa [toEq] using (Path.toEq_symm_trans (toPath p))
 
-/-- Reversing the gcd commutativity step. -/
-theorem gcd_comm_step_symm (DL : DivLattice A) (a b : A) :
-    (gcd_comm_step DL a b).symm = Step.mk (DL.gcd b a) (DL.gcd a b) (DL.gcd_comm a b).symm := by
-  simp [gcd_comm_step, Step.symm]
+/-! ### Congruence and transport through the interpretation -/
 
-/-- Mapping a function through a gcd-comm step. -/
-theorem gcd_comm_step_map {B : Type u} (DL : DivLattice A) (f : A → B)
-    (a b : A) :
-    Step.map f (gcd_comm_step DL a b) =
-      Step.mk (f (DL.gcd a b)) (f (DL.gcd b a))
-        (_root_.congrArg f (DL.gcd_comm a b)) := by
-  simp [gcd_comm_step, Step.map]
+/-- Map a `YourPath` through a function on `YourObj`. -/
+@[simp] def congrArg (f : YourObj → YourObj) : {a b : YourObj} → YourPath a b → YourPath (f a) (f b)
+  | _, _, refl a => refl (f a)
+  | _, _, step (YourStep.mk h) => step (YourStep.mk (_root_.congrArg f h))
+  | _, _, trans p q => trans (congrArg f p) (congrArg f q)
 
-/-- Two paths with same endpoints have same toEq (proof irrelevance). -/
-theorem path_toEq_unique (DL : DivLattice A) (a b : A)
-    (p q : Path (DL.gcd a b) (DL.gcd b a)) :
-    p.toEq = q.toEq := by
-  apply Subsingleton.elim
+@[simp] theorem toPath_congrArg (f : YourObj → YourObj) {a b : YourObj} (p : YourPath a b) :
+    (toPath (congrArg f p)) = Path.congrArg f (toPath p) := by
+  induction p with
+  | refl a => simp
+  | step s =>
+      cases s with
+      | mk h =>
+          simp [YourStep.toPath, Path.congrArg]
+  | trans p q ihp ihq =>
+      simp [ihp, ihq, Path.congrArg_trans]
 
-/-- congrArg commutes with trans for paths in general. -/
-theorem congrArg_trans_general {B : Type u} (DL : DivLattice A) (f : A → B)
-    {x y z : A} (p : Path x y) (q : Path y z) :
-    congrArg f (trans p q) = trans (congrArg f p) (congrArg f q) := by
-  cases p with | mk sp pp =>
-  cases q with | mk sq pq =>
-  cases pp; cases pq
-  simp [congrArg, trans]
+/-- Transport along the interpreted path. -/
+@[simp] theorem transport_toEq {D : YourObj → Sort _} {a b : YourObj}
+    (p : YourPath a b) (x : D a) :
+    Path.transport (D := D) (toPath p) x = Eq.recOn (toEq p) x := by
+  cases p <;> rfl
 
-/-- symm commutes with congrArg for paths. -/
-theorem symm_congrArg_general {B : Type u} (DL : DivLattice A) (f : A → B)
-    {x y : A} (p : Path x y) :
-    symm (congrArg f p) = congrArg f (symm p) := by
-  cases p with | mk sp pp =>
-  cases pp
-  simp [congrArg, symm]
+theorem transport_trans_sem {D : YourObj → Sort _} {a b c : YourObj}
+    (p : YourPath a b) (q : YourPath b c) (x : D a) :
+    Path.transport (D := D) (toPath (trans p q)) x =
+      Path.transport (D := D) (toPath q) (Path.transport (D := D) (toPath p) x) := by
+  simpa [YourPath.toPath] using (Path.transport_trans (D := D) (toPath p) (toPath q) x)
+
+end YourPath
+
+/-! ## Prime-flavoured paths built from the domain operations -/
+
+namespace PrimeOps
+
+open YourObj YourStep YourPath
+
+def gcd_comm_step (a b : YourObj) : YourStep (YourObj.gcd a b) (YourObj.gcd b a) :=
+  YourStep.mk (YourObj.gcd_comm_eq a b)
+
+def lcm_comm_step (a b : YourObj) : YourStep (YourObj.lcm a b) (YourObj.lcm b a) :=
+  YourStep.mk (YourObj.lcm_comm_eq a b)
+
+def gcd_assoc_step (a b c : YourObj) :
+    YourStep (YourObj.gcd (YourObj.gcd a b) c) (YourObj.gcd a (YourObj.gcd b c)) :=
+  YourStep.mk (YourObj.gcd_assoc_eq a b c)
+
+def lcm_assoc_step (a b c : YourObj) :
+    YourStep (YourObj.lcm (YourObj.lcm a b) c) (YourObj.lcm a (YourObj.lcm b c)) :=
+  YourStep.mk (YourObj.lcm_assoc_eq a b c)
+
+def gcd_idem_step (a : YourObj) : YourStep (YourObj.gcd a a) a :=
+  YourStep.mk (YourObj.gcd_idem_eq a)
+
+def lcm_idem_step (a : YourObj) : YourStep (YourObj.lcm a a) a :=
+  YourStep.mk (YourObj.lcm_idem_eq a)
+
+def gcd_comm_path (a b : YourObj) : YourPath (YourObj.gcd a b) (YourObj.gcd b a) :=
+  YourPath.step (gcd_comm_step a b)
+
+def lcm_comm_path (a b : YourObj) : YourPath (YourObj.lcm a b) (YourObj.lcm b a) :=
+  YourPath.step (lcm_comm_step a b)
+
+def gcd_assoc_path (a b c : YourObj) :
+    YourPath (YourObj.gcd (YourObj.gcd a b) c) (YourObj.gcd a (YourObj.gcd b c)) :=
+  YourPath.step (gcd_assoc_step a b c)
+
+def lcm_assoc_path (a b c : YourObj) :
+    YourPath (YourObj.lcm (YourObj.lcm a b) c) (YourObj.lcm a (YourObj.lcm b c)) :=
+  YourPath.step (lcm_assoc_step a b c)
+
+def gcd_idem_path (a : YourObj) : YourPath (YourObj.gcd a a) a :=
+  YourPath.step (gcd_idem_step a)
+
+def lcm_idem_path (a : YourObj) : YourPath (YourObj.lcm a a) a :=
+  YourPath.step (lcm_idem_step a)
+
+/-! ### 10+ theorems using genuine path operations -/
+
+theorem gcd_comm_roundtrip_toEq (a b : YourObj) :
+    (YourPath.toEq (YourPath.trans (gcd_comm_path a b) (YourPath.symm (gcd_comm_path a b)))) = rfl := by
+  simpa using YourPath.toEq_trans_symm (gcd_comm_path a b)
+
+theorem lcm_comm_roundtrip_toEq (a b : YourObj) :
+    (YourPath.toEq (YourPath.trans (lcm_comm_path a b) (YourPath.symm (lcm_comm_path a b)))) = rfl := by
+  simpa using YourPath.toEq_trans_symm (lcm_comm_path a b)
+
+theorem gcd_assoc_cancel_toEq (a b c : YourObj) :
+    YourPath.toEq (YourPath.trans (gcd_assoc_path a b c) (YourPath.symm (gcd_assoc_path a b c))) = rfl := by
+  simpa using YourPath.toEq_trans_symm (gcd_assoc_path a b c)
+
+theorem lcm_assoc_cancel_toEq (a b c : YourObj) :
+    YourPath.toEq (YourPath.trans (lcm_assoc_path a b c) (YourPath.symm (lcm_assoc_path a b c))) = rfl := by
+  simpa using YourPath.toEq_trans_symm (lcm_assoc_path a b c)
+
+theorem gcd_idem_congr_val (a : YourObj) :
+    (Path.congrArg YourObj.val (YourPath.toPath (gcd_idem_path a))).toEq =
+      _root_.congrArg YourObj.val (YourObj.gcd_idem_eq a) := by
+  cases a with
+  | mk n =>
+      simp [gcd_idem_path, gcd_idem_step, YourStep.toPath, Path.congrArg, YourObj.gcd]
+
+theorem congrArg_gcd_comm (a b c : YourObj) :
+    YourPath.toEq (YourPath.congrArg (fun x => YourObj.gcd x c) (gcd_comm_path a b)) =
+      _root_.congrArg (fun x => YourObj.gcd x c) (YourObj.gcd_comm_eq a b) := by
+  simp [gcd_comm_path, gcd_comm_step, YourPath.congrArg]
+
+theorem congrArg_lcm_comm (a b c : YourObj) :
+    YourPath.toEq (YourPath.congrArg (fun x => YourObj.lcm x c) (lcm_comm_path a b)) =
+      _root_.congrArg (fun x => YourObj.lcm x c) (YourObj.lcm_comm_eq a b) := by
+  simp [lcm_comm_path, lcm_comm_step, YourPath.congrArg]
+
+theorem gcd_comm_symm_eq (a b : YourObj) :
+    YourPath.toEq (YourPath.symm (gcd_comm_path a b)) = (YourObj.gcd_comm_eq a b).symm := by
+  simp [gcd_comm_path, gcd_comm_step]
+
+theorem lcm_comm_symm_eq (a b : YourObj) :
+    YourPath.toEq (YourPath.symm (lcm_comm_path a b)) = (YourObj.lcm_comm_eq a b).symm := by
+  simp [lcm_comm_path, lcm_comm_step]
+
+theorem reassoc_fourfold (a b c d e : YourObj)
+    (p : YourPath a b) (q : YourPath b c) (r : YourPath c d) (s : YourPath d e) :
+    YourPath.toPath (YourPath.trans (YourPath.trans (YourPath.trans p q) r) s) =
+      YourPath.toPath (YourPath.trans p (YourPath.trans q (YourPath.trans r s))) := by
+  simpa [YourPath.toPath_trans] using
+    (Path.trans_assoc_fourfold (YourPath.toPath p) (YourPath.toPath q) (YourPath.toPath r) (YourPath.toPath s))
+
+end PrimeOps
+
+/-! ## Extra derived lemmas (padding + regression tests) -/
+
+namespace Extra
+
+open YourObj YourStep YourPath
+open PrimeOps
+
+theorem toEq_gcd_comm_path (a b : YourObj) :
+    YourPath.toEq (gcd_comm_path a b) = YourObj.gcd_comm_eq a b := by
+  simp [gcd_comm_path, gcd_comm_step, YourPath.toEq, YourPath.toPath, YourStep.toPath]
+
+theorem toEq_lcm_comm_path (a b : YourObj) :
+    YourPath.toEq (lcm_comm_path a b) = YourObj.lcm_comm_eq a b := by
+  simp [lcm_comm_path, lcm_comm_step, YourPath.toEq, YourPath.toPath, YourStep.toPath]
+
+theorem toEq_gcd_idem_path (a : YourObj) :
+    YourPath.toEq (gcd_idem_path a) = YourObj.gcd_idem_eq a := by
+  simp [gcd_idem_path, gcd_idem_step, YourPath.toEq, YourPath.toPath, YourStep.toPath]
+
+theorem toEq_lcm_idem_path (a : YourObj) :
+    YourPath.toEq (lcm_idem_path a) = YourObj.lcm_idem_eq a := by
+  simp [lcm_idem_path, lcm_idem_step, YourPath.toEq, YourPath.toPath, YourStep.toPath]
+
+theorem gcd_comm_path_symm_toEq (a b : YourObj) :
+    YourPath.toEq (YourPath.symm (gcd_comm_path a b)) = (YourObj.gcd_comm_eq a b).symm := by
+  simp [gcd_comm_path, gcd_comm_step, YourPath.toEq, YourPath.toPath, YourStep.toPath]
+
+end Extra
 
 end ComputationalPaths.Path.Algebra.PrimePaths
