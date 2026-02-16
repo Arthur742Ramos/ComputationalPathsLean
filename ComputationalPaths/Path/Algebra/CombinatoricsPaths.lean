@@ -84,7 +84,7 @@ def eval : CombObj → Nat
 @[simp] theorem eval_choose (n k : Nat) : eval (.choose n k) = CombinatoricsPaths.choose n k := rfl
 @[simp] theorem eval_perm (n k : Nat) : eval (.perm n k) = CombinatoricsPaths.perm n k := rfl
 @[simp] theorem eval_catalan (n : Nat) : eval (.catalan n) = CombinatoricsPaths.catalan n := rfl
-@[simp] theorem eval_triangle (n : Nat) : eval (.triangle n) = triangleNumber n := rfl
+@[simp] theorem eval_triangle (n : Nat) : eval (.triangle n) = CombinatoricsPaths.triangleNumber n := rfl
 @[simp] theorem eval_add (a b : CombObj) : eval (.add a b) = eval a + eval b := rfl
 @[simp] theorem eval_mul (a b : CombObj) : eval (.mul a b) = eval a * eval b := rfl
 
@@ -122,82 +122,40 @@ inductive CombStep : CombObj → CombObj → Type
 namespace CombStep
 
 /-- A single combinatorial step preserves evaluation. -/
-theorem eval_eq {a b : CombObj} : CombStep a b → (CombObj.eval a = CombObj.eval b)
-  | factZero => by simp [CombObj.eval, fact]
-  | factSucc n => by simp [CombObj.eval, fact]
-  | chooseZero n => by cases n <;> simp [CombObj.eval, choose]
-  | chooseZeroSucc k => by simp [CombObj.eval, choose]
-  | pascal n k => by simp [CombObj.eval, choose]
-  | permZero n => by cases n <;> simp [CombObj.eval, perm]
-  | permZeroSucc k => by simp [CombObj.eval, perm]
-  | permSucc n k => by simp [CombObj.eval, perm]
-  | addNat a b => by simp [CombObj.eval]
-  | mulNat a b => by simp [CombObj.eval]
-  | addZeroR a => by simp [CombObj.eval]
-  | addZeroL a => by simp [CombObj.eval]
-  | mulOneR a => by simp [CombObj.eval]
-  | mulOneL a => by simp [CombObj.eval]
-  | mulZeroR a => by simp [CombObj.eval]
-  | mulZeroL a => by simp [CombObj.eval]
-  | addCongL s c => by
-      simp [CombObj.eval, eval_eq s]
-  | addCongR c s => by
-      simp [CombObj.eval, eval_eq s]
-  | mulCongL s c => by
-      simp [CombObj.eval, eval_eq s]
-  | mulCongR c s => by
-      simp [CombObj.eval, eval_eq s]
+theorem eval_eq {a b : CombObj} (s : CombStep a b) : (CombObj.eval a = CombObj.eval b) :=
+  match s with
+  | factZero => rfl
+  | factSucc _ => rfl
+  | chooseZero n => by cases n <;> rfl
+  | chooseZeroSucc _ => rfl
+  | pascal _ _ => rfl
+  | permZero n => by cases n <;> rfl
+  | permZeroSucc _ => rfl
+  | permSucc _ _ => rfl
+  | addNat _ _ => rfl
+  | mulNat _ _ => rfl
+  | addZeroR _ => Nat.add_zero _
+  | addZeroL _ => Nat.zero_add _
+  | mulOneR _ => Nat.mul_one _
+  | mulOneL _ => Nat.one_mul _
+  | mulZeroR _ => Nat.mul_zero _
+  | mulZeroL _ => Nat.zero_mul _
+  | addCongL s _ => congrArg (· + _) (eval_eq s)
+  | addCongR _ s => congrArg (_ + ·) (eval_eq s)
+  | mulCongL s _ => congrArg (· * _) (eval_eq s)
+  | mulCongR _ s => congrArg (_ * ·) (eval_eq s)
 
-/-- Interpret a step as a `Path` on the semantic `Nat` values.
+/-- Interpret a step as a `Path` on the semantic `Nat` values. -/
+def toPath {a b : CombObj} (s : CombStep a b) : Path (CombObj.eval a) (CombObj.eval b) :=
+  match s with
+  | addCongL s c => Path.congrArg (fun x => x + CombObj.eval c) (toPath s)
+  | addCongR c s => Path.congrArg (fun x => CombObj.eval c + x) (toPath s)
+  | mulCongL s c => Path.congrArg (fun x => x * CombObj.eval c) (toPath s)
+  | mulCongR c s => Path.congrArg (fun x => CombObj.eval c * x) (toPath s)
+  | _ => Path.mk [Step.mk _ _ (eval_eq s)] (eval_eq s)
 
-This uses an explicit single rewrite `Step` (no `Path.ofEq`).
-For congruence steps we use `Path.congrArg` applied to the recursively
-interpreted sub-step, exhibiting genuine path operations.
--/
-def toPath {a b : CombObj} : CombStep a b → Path (CombObj.eval a) (CombObj.eval b)
-  | factZero =>
-      Path.mk [Step.mk _ _ (eval_eq (a := .fact 0) (b := .nat 1) CombStep.factZero)]
-        (eval_eq CombStep.factZero)
-  | factSucc n =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.factSucc n))] (eval_eq (CombStep.factSucc n))
-  | chooseZero n =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.chooseZero n))] (eval_eq (CombStep.chooseZero n))
-  | chooseZeroSucc k =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.chooseZeroSucc k))] (eval_eq (CombStep.chooseZeroSucc k))
-  | pascal n k =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.pascal n k))] (eval_eq (CombStep.pascal n k))
-  | permZero n =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.permZero n))] (eval_eq (CombStep.permZero n))
-  | permZeroSucc k =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.permZeroSucc k))] (eval_eq (CombStep.permZeroSucc k))
-  | permSucc n k =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.permSucc n k))] (eval_eq (CombStep.permSucc n k))
-  | addNat a b =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.addNat a b))] (eval_eq (CombStep.addNat a b))
-  | mulNat a b =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.mulNat a b))] (eval_eq (CombStep.mulNat a b))
-  | addZeroR a =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.addZeroR a))] (eval_eq (CombStep.addZeroR a))
-  | addZeroL a =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.addZeroL a))] (eval_eq (CombStep.addZeroL a))
-  | mulOneR a =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.mulOneR a))] (eval_eq (CombStep.mulOneR a))
-  | mulOneL a =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.mulOneL a))] (eval_eq (CombStep.mulOneL a))
-  | mulZeroR a =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.mulZeroR a))] (eval_eq (CombStep.mulZeroR a))
-  | mulZeroL a =>
-      Path.mk [Step.mk _ _ (eval_eq (CombStep.mulZeroL a))] (eval_eq (CombStep.mulZeroL a))
-  | addCongL s c =>
-      Path.congrArg (fun x => x + CombObj.eval c) (toPath s)
-  | addCongR c s =>
-      Path.congrArg (fun x => CombObj.eval c + x) (toPath s)
-  | mulCongL s c =>
-      Path.congrArg (fun x => x * CombObj.eval c) (toPath s)
-  | mulCongR c s =>
-      Path.congrArg (fun x => CombObj.eval c * x) (toPath s)
-
-@[simp] theorem toPath_toEq {a b : CombObj} (s : CombStep a b) : (toPath s).toEq = eval_eq s := rfl
+@[simp] theorem toPath_toEq {a b : CombObj} (s : CombStep a b) : (toPath s).toEq = eval_eq s := by
+  cases s <;> rfl
 
 end CombStep
 
@@ -212,7 +170,7 @@ namespace CombPath
 
 /-- Interpret a generated combinatorial path as a semantic `Path` on `Nat`. -/
 def toPath {a b : CombObj} : CombPath a b → Path (CombObj.eval a) (CombObj.eval b)
-  | refl a => Path.refl _
+  | refl _ => Path.refl _
   | step s => CombStep.toPath s
   | trans p q => Path.trans (toPath p) (toPath q)
   | symm p => Path.symm (toPath p)
@@ -237,112 +195,77 @@ end CombPath
 /-! ## Exported paths (Nat-level) built from the domain language -/
 
 /-- `fact 0 = 1` as a path. -/
-def fact_zero_path : Path (fact 0) 1 := by
-  simpa [CombObj.eval] using (CombStep.toPath (a := .fact 0) (b := .nat 1) CombStep.factZero)
+def fact_zero_path : Path (fact 0) 1 :=
+  CombStep.toPath CombStep.factZero
 
 /-- `fact (n+1) = (n+1) * fact n` as a path. -/
-def fact_succ_path (n : Nat) : Path (fact (n + 1)) ((n + 1) * fact n) := by
-  simpa [CombObj.eval] using
-    (CombStep.toPath (a := .fact (n + 1))
-      (b := .mul (.nat (n + 1)) (.fact n)) (CombStep.factSucc n))
+def fact_succ_path (n : Nat) : Path (fact (n + 1)) ((n + 1) * fact n) :=
+  CombStep.toPath (CombStep.factSucc n)
 
 /-- A concrete computation path: `fact 1 = 1`. -/
-def fact_one_path : Path (fact 1) 1 := by
-  -- fact 1  ~~> 1 * fact 0 ~~> 1 * 1 ~~> 1
+def fact_one_path : Path (fact 1) 1 :=
   let p : CombPath (.fact 1) (.nat 1) :=
-    CombPath.trans
-      (CombPath.step (CombStep.factSucc 0))
-      (CombPath.trans
-        (CombPath.step (CombStep.mulCongR (.nat 1) CombStep.factZero))
-        (CombPath.trans
-          (CombPath.step (CombStep.mulNat 1 1))
-          (CombPath.refl (.nat 1))))
-  simpa [CombObj.eval, fact] using (CombPath.toPath p)
+    .trans (.step (.factSucc 0))
+      (.trans (.step (.mulCongR (.nat 1) .factZero))
+        (.step (.mulNat 1 1)))
+  CombPath.toPath p
 
-/-- A concrete computation path: `fact 2 = 2`.
-
-We keep the trace explicit (one `Step`) and avoid `Path.ofEq`.
--/
+/-- A concrete computation path: `fact 2 = 2`. -/
 def fact_two_path : Path (fact 2) 2 :=
-  Path.mk [Step.mk (fact 2) 2 (by decide)] (by decide)
+  Path.mk [Step.mk (fact 2) 2 rfl] rfl
 
 /-- Factorial is always positive. -/
 theorem fact_pos (n : Nat) : 0 < fact n := by
   induction n with
   | zero => simp [fact]
   | succ n ih =>
-      -- (n+1) * fact n is positive
       have hn : 0 < n + 1 := Nat.succ_pos _
-      simpa [fact] using Nat.mul_pos hn ih
+      simp [fact]
+      exact Nat.mul_pos hn ih
 
 /-- `choose n 0 = 1` as a path. -/
-def choose_zero_path (n : Nat) : Path (choose n 0) 1 := by
-  simpa [CombObj.eval] using
-    (CombStep.toPath (a := .choose n 0) (b := .nat 1) (CombStep.chooseZero n))
+def choose_zero_path (n : Nat) : Path (choose n 0) 1 :=
+  CombStep.toPath (CombStep.chooseZero n)
 
 /-- `choose 0 (k+1) = 0` as a path. -/
-def choose_zero_succ_path (k : Nat) : Path (choose 0 (k + 1)) 0 := by
-  simpa [CombObj.eval] using
-    (CombStep.toPath (a := .choose 0 (k + 1)) (b := .nat 0) (CombStep.chooseZeroSucc k))
+def choose_zero_succ_path (k : Nat) : Path (choose 0 (k + 1)) 0 :=
+  CombStep.toPath (CombStep.chooseZeroSucc k)
 
 /-- Pascal's identity as a path. -/
 def pascal_path (n k : Nat) :
-    Path (choose (n + 1) (k + 1)) (choose n k + choose n (k + 1)) := by
-  simpa [CombObj.eval] using
-    (CombStep.toPath (a := .choose (n + 1) (k + 1))
-      (b := .add (.choose n k) (.choose n (k + 1))) (CombStep.pascal n k))
-
-/-- `choose 1 1 = 1` (concrete diagonal case). -/
-theorem choose_one_one : choose 1 1 = 1 := by
-  simp [choose]
-
-/-- `choose 2 2 = 1` (concrete diagonal case). -/
-theorem choose_two_two : choose 2 2 = 1 := by
-  simp [choose]
-
-/-- `choose 3 3 = 1` (concrete diagonal case). -/
-theorem choose_three_three : choose 3 3 = 1 := by
-  simp [choose]
-
-/-- `choose 3 1 = 3`. -/
-theorem choose_three_one : choose 3 1 = 3 := by
-  simp [choose]
+    Path (choose (n + 1) (k + 1)) (choose n k + choose n (k + 1)) :=
+  CombStep.toPath (CombStep.pascal n k)
 
 /-- `choose n 1 = n` for all `n`. -/
 theorem choose_one_eq (n : Nat) : choose n 1 = n := by
   induction n with
-  | zero => simp [choose]
+  | zero => rfl
   | succ n ih =>
-      -- choose (n+1) 1 = choose n 0 + choose n 1 = 1 + n = n+1
-      simp [choose, ih, Nat.add_comm, Nat.add_left_comm, Nat.add_assoc]
+      simp [choose, ih, Nat.add_comm]
 
 /-- `choose n 1 = n` as a path. -/
 def choose_one_path (n : Nat) : Path (choose n 1) n :=
   Path.mk [Step.mk _ _ (choose_one_eq n)] (choose_one_eq n)
 
 /-- `perm n 0 = 1` as a path. -/
-def perm_zero_path (n : Nat) : Path (perm n 0) 1 := by
-  simpa [CombObj.eval] using
-    (CombStep.toPath (a := .perm n 0) (b := .nat 1) (CombStep.permZero n))
+def perm_zero_path (n : Nat) : Path (perm n 0) 1 :=
+  CombStep.toPath (CombStep.permZero n)
 
 /-- `perm 0 (k+1) = 0` as a path. -/
-def perm_zero_succ_path (k : Nat) : Path (perm 0 (k + 1)) 0 := by
-  simpa [CombObj.eval] using
-    (CombStep.toPath (a := .perm 0 (k + 1)) (b := .nat 0) (CombStep.permZeroSucc k))
+def perm_zero_succ_path (k : Nat) : Path (perm 0 (k + 1)) 0 :=
+  CombStep.toPath (CombStep.permZeroSucc k)
 
 /-- Falling factorial step as a path. -/
 def perm_succ_path (n k : Nat) :
-    Path (perm (n + 1) (k + 1)) ((n + 1) * perm n k) := by
-  simpa [CombObj.eval] using
-    (CombStep.toPath (a := .perm (n + 1) (k + 1))
-      (b := .mul (.nat (n + 1)) (.perm n k)) (CombStep.permSucc n k))
+    Path (perm (n + 1) (k + 1)) ((n + 1) * perm n k) :=
+  CombStep.toPath (CombStep.permSucc n k)
 
 /-- `perm n n = fact n`. -/
 theorem perm_eq_fact : (n : Nat) → perm n n = fact n
   | 0 => rfl
   | n + 1 => by simp [perm, fact, perm_eq_fact n]
 
-/-- `perm n n = fact n` as a path (single explicit step, no `Path.ofEq`). -/
+/-- `perm n n = fact n` as a path. -/
 def perm_eq_fact_path (n : Nat) : Path (perm n n) (fact n) :=
   Path.mk [Step.mk _ _ (perm_eq_fact n)] (perm_eq_fact n)
 
@@ -354,31 +277,29 @@ def triangle_zero_path : Path (triangleNumber 0) 0 := Path.refl 0
 
 /-- `triangleNumber 1 = 1` as a path. -/
 def triangle_one_path : Path (triangleNumber 1) 1 :=
-  Path.mk [Step.mk (triangleNumber 1) 1 (by decide)] (by decide)
+  Path.mk [Step.mk (triangleNumber 1) 1 rfl] rfl
 
 /-- `triangleNumber 3 = 6` as a path. -/
 def triangle_three_path : Path (triangleNumber 3) 6 :=
-  Path.mk [Step.mk (triangleNumber 3) 6 (by decide)] (by decide)
+  Path.mk [Step.mk (triangleNumber 3) 6 rfl] rfl
 
-/-! ## Path-algebra theorems (genuine operations) -/
+/-! ## Path-algebra theorems -/
 
-/-- `congrArg` on the factorial successor path has the expected underlying equality. -/
+/-- `congrArg` on the factorial successor path. -/
 theorem fact_congrArg_mul_toEq (n : Nat) (f : Nat → Nat) :
-    (Path.congrArg f (fact_succ_path n)).toEq = _root_.congrArg f (fact_succ_path n).toEq := by
-  rfl
+    (Path.congrArg f (fact_succ_path n)).toEq = _root_.congrArg f (fact_succ_path n).toEq := rfl
 
-/-- Transport of a dependent value along the Pascal path is definitional. -/
+/-- Transport of a dependent value along the Pascal path. -/
 theorem transport_along_pascal (n k : Nat) (D : Nat → Type u)
     (x : D (choose (n + 1) (k + 1))) :
     Path.transport (pascal_path n k) x = x := by
   simp [Path.transport, pascal_path]
 
-/-- Symmetry of the Pascal path (a one-step trace) yields the expected toEq. -/
+/-- Symmetry of the Pascal path. -/
 theorem symm_pascal_toEq (n k : Nat) :
-    (Path.symm (pascal_path n k)).toEq = (pascal_path n k).toEq.symm := by
-  rfl
+    (Path.symm (pascal_path n k)).toEq = (pascal_path n k).toEq.symm := rfl
 
-/-- Round-trip of a concrete path yields reflexivity at equality level. -/
+/-- Round-trip of a concrete path. -/
 theorem fact_one_roundtrip :
     (Path.trans fact_one_path (Path.symm fact_one_path)).toEq = rfl := by
   simp
@@ -386,24 +307,24 @@ theorem fact_one_roundtrip :
 /-- Underlying equality of `perm_eq_fact_path`. -/
 theorem perm_fact_toEq (n : Nat) : (perm_eq_fact_path n).toEq = perm_eq_fact n := rfl
 
-/-- Composing a path with `refl` on the right is unchanged. -/
+/-- Composing a path with `refl` on the right. -/
 theorem trans_refl_right_fact_one :
-    Path.trans fact_one_path (Path.refl 1) = fact_one_path := by
-  simpa using (Path.trans_refl_right fact_one_path)
+    Path.trans fact_one_path (Path.refl 1) = fact_one_path :=
+  Path.trans_refl_right _
 
-/-- Composing a path with `refl` on the left is unchanged. -/
+/-- Composing a path with `refl` on the left. -/
 theorem trans_refl_left_fact_one :
-    Path.trans (Path.refl (fact 1)) fact_one_path = fact_one_path := by
-  simpa using (Path.trans_refl_left fact_one_path)
+    Path.trans (Path.refl (fact 1)) fact_one_path = fact_one_path :=
+  Path.trans_refl_left _
 
-/-- Symmetry twice is the identity (example specialization). -/
-theorem symm_symm_fact_one : Path.symm (Path.symm fact_one_path) = fact_one_path := by
-  simpa using (Path.symm_symm fact_one_path)
+/-- Symmetry twice is the identity. -/
+theorem symm_symm_fact_one : Path.symm (Path.symm fact_one_path) = fact_one_path :=
+  Path.symm_symm _
 
-/-- Associativity of trans (example specialization). -/
+/-- Associativity of trans. -/
 theorem trans_assoc_fact_one (p q : Path 1 1) :
     Path.trans (Path.trans fact_one_path p) q =
-      Path.trans fact_one_path (Path.trans p q) := by
-  simpa using (Path.trans_assoc fact_one_path p q)
+      Path.trans fact_one_path (Path.trans p q) :=
+  Path.trans_assoc _ _ _
 
 end ComputationalPaths.Path.Algebra.CombinatoricsPaths

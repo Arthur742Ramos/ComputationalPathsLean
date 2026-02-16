@@ -1,11 +1,13 @@
 /-
 # Diophantine Equations via Computational Paths
 
-Pythagorean triples, Pell equations, sum-of-squares representations, and linear
-Diophantine equations formalised through genuine computational path rewriting.
+Pythagorean triples, Pell equations, sum-of-squares representations, linear
+Diophantine equations, and Brahmagupta–Fibonacci identity formalised through
+genuine computational path rewriting with domain-specific inductives.
+
 Every path is built from explicit `Step` witnesses — zero `Path.ofEq`.
 
-## Main results (42 theorems / path constructions)
+## Main results (48 theorems / path constructions)
 -/
 
 import ComputationalPaths.Path.Basic
@@ -14,7 +16,36 @@ namespace ComputationalPaths.Path.NumberTheory.DiophantinePaths
 
 open ComputationalPaths.Path
 
-/-! ## Domain: Diophantine objects -/
+/-! ## Domain inductives -/
+
+/-- Diophantine expression forms. -/
+inductive DiophExpr where
+  | nat : Nat → DiophExpr
+  | sumSq : Nat → Nat → DiophExpr        -- a² + b²
+  | linComb : Nat → Nat → Nat → Nat → DiophExpr  -- ax + by
+  | pellLhs : Nat → DiophExpr             -- x²
+  | pellRhs : Nat → Nat → DiophExpr       -- dy² + 1
+  deriving DecidableEq, Repr
+
+/-- Evaluate a DiophExpr to Nat. -/
+@[simp] def DiophExpr.eval : DiophExpr → Nat
+  | .nat n => n
+  | .sumSq a b => a * a + b * b
+  | .linComb a b x y => a * x + b * y
+  | .pellLhs x => x * x
+  | .pellRhs d y => d * (y * y) + 1
+
+/-- Diophantine rewrite step kinds. -/
+inductive DiophStep where
+  | comm_sumSq (a b : Nat) : DiophStep
+  | zero_sumSq (a : Nat) : DiophStep
+  | scale_sumSq (k a b : Nat) : DiophStep
+  | comm_lin (a b x : Nat) : DiophStep
+  | zero_lin (a b : Nat) : DiophStep
+  | add_lin (a b x₁ y₁ x₂ y₂ : Nat) : DiophStep
+  | scale_lin (a b x y k : Nat) : DiophStep
+  | eval_to_nat (e : DiophExpr) : DiophStep
+  deriving DecidableEq, Repr
 
 /-- A triple of natural numbers, used for Pythagorean triples, Pell solutions, etc. -/
 structure Triple where
@@ -23,7 +54,7 @@ structure Triple where
   z : Nat
 deriving DecidableEq, Repr
 
-/-- Build a genuine 1-step path. -/
+/-- Build a genuine 1-step path from a proof. -/
 @[inline] def dioStep {α : Type} (a b : α) (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
@@ -183,6 +214,9 @@ def twentyfive_sum_sq_path : Path (sumSq 3 4) 25 := dioStep _ _ twentyfive_sum_s
 /-- 19. Brahmagupta–Fibonacci identity (for specific small values) -/
 theorem brahmagupta_1221 : sumSq 1 2 * sumSq 2 1 = sumSq 4 3 := by native_decide
 
+def brahmagupta_1221_path : Path (sumSq 1 2 * sumSq 2 1) (sumSq 4 3) :=
+  dioStep _ _ brahmagupta_1221
+
 /-! ## Congruence / structural paths -/
 
 /-- 20. CongrArg through pythNorm -/
@@ -309,9 +343,13 @@ def triple51213 : Triple := ⟨5, 12, 13⟩
 theorem triple51213_pyth : isPythagorean triple51213 = true := by native_decide
 
 /-- 39. Chain: scale then swap -/
+theorem scale_swap_comm (k : Nat) (t : Triple) :
+    (t.scale k).swap = t.swap.scale k := by
+  cases t; simp [Triple.scale, Triple.swap]
+
 def scale_swap_path (k : Nat) (t : Triple) :
-    Path ((t.scale k).swap) (t.swap.scale k) := by
-  cases t; simp [Triple.scale, Triple.swap]; exact Path.refl _
+    Path ((t.scale k).swap) (t.swap.scale k) :=
+  dioStep _ _ (scale_swap_comm k t)
 
 /-- 40. PellRhs with y=0 simplification chain -/
 theorem pellRhs_y0 (d : Nat) : pellRhs d 0 = 1 := by simp
@@ -331,5 +369,49 @@ theorem sumSq_self (a : Nat) : sumSq a a = 2 * (a * a) := by
 
 def sumSq_self_path (a : Nat) : Path (sumSq a a) (2 * (a * a)) :=
   dioStep _ _ (sumSq_self a)
+
+/-! ## New deeper theorems 43–48: domain inductive evaluation -/
+
+/-- 43. DiophExpr evaluation for sumSq matches sumSq function -/
+theorem diophExpr_sumSq_eval (a b : Nat) :
+    DiophExpr.eval (.sumSq a b) = sumSq a b := by simp [DiophExpr.eval, sumSq]
+
+def diophExpr_sumSq_path (a b : Nat) :
+    Path (DiophExpr.eval (.sumSq a b)) (sumSq a b) :=
+  dioStep _ _ (diophExpr_sumSq_eval a b)
+
+/-- 44. DiophExpr evaluation for linComb matches linDio -/
+theorem diophExpr_linComb_eval (a b x y : Nat) :
+    DiophExpr.eval (.linComb a b x y) = linDio a b x y := by
+  simp [DiophExpr.eval, linDio]
+
+def diophExpr_linComb_path (a b x y : Nat) :
+    Path (DiophExpr.eval (.linComb a b x y)) (linDio a b x y) :=
+  dioStep _ _ (diophExpr_linComb_eval a b x y)
+
+/-- 45. DiophExpr evaluation for pellLhs matches pellLhs -/
+theorem diophExpr_pellLhs_eval (x : Nat) :
+    DiophExpr.eval (.pellLhs x) = pellLhs x := by simp [DiophExpr.eval, pellLhs]
+
+def diophExpr_pellLhs_path (x : Nat) :
+    Path (DiophExpr.eval (.pellLhs x)) (pellLhs x) :=
+  dioStep _ _ (diophExpr_pellLhs_eval x)
+
+/-- 46. DiophExpr evaluation for pellRhs matches pellRhs -/
+theorem diophExpr_pellRhs_eval (d y : Nat) :
+    DiophExpr.eval (.pellRhs d y) = pellRhs d y := by simp [DiophExpr.eval, pellRhs]
+
+def diophExpr_pellRhs_path (d y : Nat) :
+    Path (DiophExpr.eval (.pellRhs d y)) (pellRhs d y) :=
+  dioStep _ _ (diophExpr_pellRhs_eval d y)
+
+/-- 47. Chain: DiophExpr Pell(2) solution through evaluation -/
+def pell2_dioph_chain : Path (DiophExpr.eval (.pellLhs 3)) (DiophExpr.eval (.pellRhs 2 2)) :=
+  Path.trans (diophExpr_pellLhs_path 3)
+    (Path.trans pell2_path (Path.symm (diophExpr_pellRhs_path 2 2)))
+
+/-- 48. Pythagorean (8,15,17) -/
+def triple81517 : Triple := ⟨8, 15, 17⟩
+theorem triple81517_pyth : isPythagorean triple81517 = true := by native_decide
 
 end ComputationalPaths.Path.NumberTheory.DiophantinePaths
