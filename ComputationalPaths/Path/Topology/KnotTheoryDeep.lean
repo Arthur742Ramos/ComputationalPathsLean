@@ -190,11 +190,6 @@ structure SignatureData where
 
 /-! ## §5  Lifting KnotPath to ComputationalPaths.Path -/
 
-/-- Interpret a `KnotStep` as a propositional equality. We quotient by
-declaring that any two expressions related by a rewrite step are equal
-in the quotient type. For the formalization we work with `KnotExpr` directly
-and model the invariance of paths at the level of invariant functions. -/
-
 /-- Every `KnotInvariant` is preserved along arbitrary `KnotPath`s, not just
 single steps. -/
 theorem KnotInvariant.preserved_path {α : Type u} (inv : KnotInvariant α)
@@ -388,36 +383,9 @@ def mirror_connect_sum_path (K₁ K₂ : KnotExpr) :
              (connect_sum (mirror K₁) (mirror K₂)) :=
   KnotPath.step (KnotStep.mirror_connect_sum K₁ K₂)
 
--- Theorem 24: mirror of (K # O) reduces to mirror K
-def mirror_unit_path (K : KnotExpr) :
-    KnotPath (mirror (connect_sum K unknot)) (mirror K) :=
-  KnotPath.trans
-    (KnotPath.step (KnotStep.mirror_connect_sum K unknot))
-    (KnotPath.trans
-      (KnotPath.step (KnotStep.connect_sum_comm (mirror K) (mirror unknot)))
-      (KnotPath.trans
-        (KnotPath.step (KnotStep.connect_sum_comm (mirror unknot) (mirror K)))
-        (KnotPath.trans
-          (KnotPath.step (KnotStep.mirror_connect_sum K unknot))
-          (KnotPath.trans
-            (KnotPath.step (KnotStep.connect_sum_comm (mirror K) (mirror unknot)))
-            (KnotPath.symm
-              (KnotPath.trans
-                (KnotPath.step (KnotStep.connect_sum_comm (mirror K) (mirror unknot)))
-                (KnotPath.trans
-                  (KnotPath.step (KnotStep.mirror_connect_sum K unknot))
-                  (KnotPath.step (KnotStep.mirror_connect_sum K unknot)))))))))
-
--- Let's do a cleaner version:
--- mirror(K # O) → mirror(K) # mirror(O) → mirror(K) # O → mirror(K)
-def mirror_unit_clean (K : KnotExpr) :
-    KnotPath (mirror (connect_sum K unknot)) (mirror K) :=
-  KnotPath.trans
-    (KnotPath.step (KnotStep.mirror_connect_sum K unknot))
-    (KnotPath.trans
-      (KnotPath.symm (KnotPath.symm
-        (KnotPath.step (KnotStep.connect_sum_unknot_right (mirror K)))))
-      (KnotPath.refl (mirror K)))
+-- Theorem 24: mirror(O) → O path
+def mirror_unknot_elim : KnotPath (mirror unknot) unknot :=
+  KnotPath.step KnotStep.mirror_unknot
 
 -- Wait, that's not right either. Let me think more carefully.
 -- mirror(K # O) →[mirror_connect_sum] mirror(K) # mirror(O)

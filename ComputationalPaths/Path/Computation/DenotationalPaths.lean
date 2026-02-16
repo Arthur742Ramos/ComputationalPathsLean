@@ -70,15 +70,8 @@ theorem env_update_shadow (env : Env) (x : Nat) (v1 v2 : Nat) :
 theorem env_update_comm (env : Env) (x y : Nat) (vx vy : Nat) (hne : x ≠ y) :
     (env.update x vx).update y vy = (env.update y vy).update x vx := by
   show Env.mk _ = Env.mk _
-  congr 1; funext z; simp [Env.update]
-  split
-  · split
-    · next h1 h2 =>
-        have := BEq.eq_of_beq h1
-        have := BEq.eq_of_beq h2
-        omega
-    · rfl
-  · rfl
+  congr 1; funext z; simp only [Env.update]
+  split <;> split <;> simp_all <;> omega
 
 /-! ## Meaning Functions -/
 
