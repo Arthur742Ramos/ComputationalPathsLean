@@ -81,7 +81,7 @@ theorem derivedstep_rweq {A : Type u} {a b : A} {p q : Path a b}
 /-! ## Chain complex data -/
 
 /-- A chain complex in a pre-additive category. -/
-structure ChainComplex (C : PreAdditiveCategory.{u}) where
+structure ChainComplex (C : PreAdditiveCategory) where
   /-- Object at each degree. -/
   obj : Int → C.Obj
   /-- Differential d_n : C_n → C_{n-1}. -/
@@ -90,7 +90,7 @@ structure ChainComplex (C : PreAdditiveCategory.{u}) where
   diff_sq : ∀ n : Int, C.comp (diff n) (diff (n - 1)) = C.zero (obj n) (obj (n - 1 - 1))
 
 /-- A chain map between chain complexes. -/
-structure ChainMap {C : PreAdditiveCategory.{u}}
+structure ChainMap {C : PreAdditiveCategory}
     (X Y : ChainComplex C) where
   /-- Component maps. -/
   component : ∀ n : Int, C.Hom (X.obj n) (Y.obj n)
@@ -100,13 +100,13 @@ structure ChainMap {C : PreAdditiveCategory.{u}}
     C.comp (component n) (Y.diff n)
 
 /-- Identity chain map. -/
-def ChainMap.id {C : PreAdditiveCategory.{u}} (X : ChainComplex C) :
+def ChainMap.id {C : PreAdditiveCategory} (X : ChainComplex C) :
     ChainMap X X where
   component := fun n => C.id (X.obj n)
   comm := fun n => by rw [C.comp_id, C.id_comp]
 
 /-- Composition of chain maps. -/
-def ChainMap.comp {C : PreAdditiveCategory.{u}}
+def ChainMap.comp {C : PreAdditiveCategory}
     {X Y Z : ChainComplex C}
     (f : ChainMap X Y) (g : ChainMap Y Z) : ChainMap X Z where
   component := fun n => C.comp (f.component n) (g.component n)
@@ -129,7 +129,7 @@ def ChainMap.comp {C : PreAdditiveCategory.{u}}
 /-! ## Quasi-isomorphisms -/
 
 /-- Data for quasi-isomorphism detection. -/
-structure QuasiIsoData {C : PreAdditiveCategory.{u}}
+structure QuasiIsoData {C : PreAdditiveCategory}
     (X Y : ChainComplex C) (f : ChainMap X Y) where
   /-- Predicate that f induces isomorphisms on all homology groups. -/
   isQuasiIso : Prop
@@ -137,7 +137,7 @@ structure QuasiIsoData {C : PreAdditiveCategory.{u}}
   id_is_qi : Path f f → isQuasiIso
 
 /-- Trivial quasi-isomorphism data for the identity. -/
-def trivialQI {C : PreAdditiveCategory.{u}} (X : ChainComplex C) :
+def trivialQI {C : PreAdditiveCategory} (X : ChainComplex C) :
     QuasiIsoData X X (ChainMap.id X) where
   isQuasiIso := True
   id_is_qi := fun _ => trivial
@@ -178,7 +178,7 @@ def trivialLocalization (A : Type u) : LocalizationData A where
 /-! ## Derived category data -/
 
 /-- A derived category structure with Path-valued coherences. -/
-structure DerivedCatData (C : PreAdditiveCategory.{u}) where
+structure DerivedCatData (C : PreAdditiveCategory) where
   /-- Shift functor. -/
   shift : ShiftFunctor C
   /-- Class of distinguished triangles. -/
@@ -201,8 +201,8 @@ structure DerivedCatData (C : PreAdditiveCategory.{u}) where
     Path (shift.shiftHom T.f) (shift.shiftHom T.f)
 
 /-- Build a derived category data from a triangulated category. -/
-def DerivedCatData.ofTriangulated {C : PreAdditiveCategory.{u}}
-    (TC : TriangulatedCategory.{u})
+def DerivedCatData.ofTriangulated {C : PreAdditiveCategory}
+    (TC : TriangulatedCategory)
     (hC : TC.cat = C) : DerivedCatData C where
   shift := hC ▸ TC.shift
   distinguished := fun _ => True
@@ -215,7 +215,7 @@ def DerivedCatData.ofTriangulated {C : PreAdditiveCategory.{u}}
 
 /-- A left derived functor with Path witnesses. -/
 structure LeftDerivedFunctor
-    (C D : PreAdditiveCategory.{u})
+    (C D : PreAdditiveCategory)
     (DC : DerivedCatData C)
     (DD : DerivedCatData D) where
   /-- Object map. -/
@@ -233,7 +233,7 @@ structure LeftDerivedFunctor
 
 /-- A right derived functor with Path witnesses. -/
 structure RightDerivedFunctor
-    (C D : PreAdditiveCategory.{u})
+    (C D : PreAdditiveCategory)
     (DC : DerivedCatData C)
     (DD : DerivedCatData D) where
   /-- Object map. -/
@@ -247,7 +247,7 @@ structure RightDerivedFunctor
     Path (mapHom (C.comp f g)) (D.comp (mapHom f) (mapHom g))
 
 /-- Identity left derived functor. -/
-def LeftDerivedFunctor.id (C : PreAdditiveCategory.{u})
+def LeftDerivedFunctor.id (C : PreAdditiveCategory)
     (DC : DerivedCatData C) : LeftDerivedFunctor C C DC DC where
   obj := fun X => X
   mapHom := fun {_ _} f => f
@@ -256,7 +256,7 @@ def LeftDerivedFunctor.id (C : PreAdditiveCategory.{u})
   shift_comm := fun _X => Path.refl _
 
 /-- Identity right derived functor. -/
-def RightDerivedFunctor.id (C : PreAdditiveCategory.{u})
+def RightDerivedFunctor.id (C : PreAdditiveCategory)
     (DC : DerivedCatData C) : RightDerivedFunctor C C DC DC where
   obj := fun X => X
   mapHom := fun {_ _} f => f
@@ -267,7 +267,7 @@ def RightDerivedFunctor.id (C : PreAdditiveCategory.{u})
 
 /-- A natural transformation between left derived functors. -/
 structure DerivedNatTrans
-    {C D : PreAdditiveCategory.{u}}
+    {C D : PreAdditiveCategory}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     (F G : LeftDerivedFunctor C D DC DD) where
   /-- Component at each object. -/
@@ -279,7 +279,7 @@ structure DerivedNatTrans
 
 /-- Identity natural transformation. -/
 def DerivedNatTrans.id
-    {C D : PreAdditiveCategory.{u}}
+    {C D : PreAdditiveCategory}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     (F : LeftDerivedFunctor C D DC DD) :
     DerivedNatTrans F F where
@@ -288,7 +288,7 @@ def DerivedNatTrans.id
 
 /-- Composition of natural transformations. -/
 def DerivedNatTrans.comp
-    {C D : PreAdditiveCategory.{u}}
+    {C D : PreAdditiveCategory}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     {F G H : LeftDerivedFunctor C D DC DD}
     (α : DerivedNatTrans F G) (β : DerivedNatTrans G H) :
@@ -316,7 +316,7 @@ def DerivedNatTrans.comp
 /-! ## t-Structures -/
 
 /-- A t-structure on a derived category with Path coherences. -/
-structure TStructureData (C : PreAdditiveCategory.{u})
+structure TStructureData (C : PreAdditiveCategory)
     (DC : DerivedCatData C) where
   /-- Objects in the non-negative part D^≥0. -/
   geZero : C.Obj → Prop
@@ -336,13 +336,13 @@ structure TStructureData (C : PreAdditiveCategory.{u})
     ∃ Y : C.Obj, leZero Y ∧ ∃ _f : C.Hom Y X, True
 
 /-- The heart of a t-structure. -/
-def TStructureData.heart {C : PreAdditiveCategory.{u}}
+def TStructureData.heart {C : PreAdditiveCategory}
     {DC : DerivedCatData C} (T : TStructureData C DC) :
     C.Obj → Prop :=
   fun X => T.geZero X ∧ T.leZero X
 
 /-- Objects in the heart are in both D^≥0 and D^≤0. -/
-theorem heart_in_both {C : PreAdditiveCategory.{u}}
+theorem heart_in_both {C : PreAdditiveCategory}
     {DC : DerivedCatData C} (T : TStructureData C DC) (X : C.Obj) :
     T.heart X → T.geZero X ∧ T.leZero X :=
   id
@@ -350,7 +350,7 @@ theorem heart_in_both {C : PreAdditiveCategory.{u}}
 /-! ## Coherence theorems -/
 
 /-- Chain map composition is associative via Path. -/
-def chainMap_comp_assoc {C : PreAdditiveCategory.{u}}
+def chainMap_comp_assoc {C : PreAdditiveCategory}
     {W X Y Z : ChainComplex C}
     (f : ChainMap W X) (g : ChainMap X Y) (h : ChainMap Y Z) :
     ∀ n : Int,
@@ -361,7 +361,7 @@ def chainMap_comp_assoc {C : PreAdditiveCategory.{u}}
   exact Path.stepChain (C.assoc _ _ _)
 
 /-- Identity chain map is a left identity. -/
-def chainMap_id_comp {C : PreAdditiveCategory.{u}}
+def chainMap_id_comp {C : PreAdditiveCategory}
     {X Y : ChainComplex C} (f : ChainMap X Y) :
     ∀ n : Int,
       Path (ChainMap.comp (ChainMap.id X) f |>.component n)
@@ -371,7 +371,7 @@ def chainMap_id_comp {C : PreAdditiveCategory.{u}}
   exact Path.stepChain (C.id_comp _)
 
 /-- Identity chain map is a right identity. -/
-def chainMap_comp_id {C : PreAdditiveCategory.{u}}
+def chainMap_comp_id {C : PreAdditiveCategory}
     {X Y : ChainComplex C} (f : ChainMap X Y) :
     ∀ n : Int,
       Path (ChainMap.comp f (ChainMap.id Y) |>.component n)
@@ -382,7 +382,7 @@ def chainMap_comp_id {C : PreAdditiveCategory.{u}}
 
 /-- Derived natural transformation composition is associative. -/
 def derivedNatTrans_assoc
-    {C D : PreAdditiveCategory.{u}}
+    {C D : PreAdditiveCategory}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     {F G H K : LeftDerivedFunctor C D DC DD}
     (α : DerivedNatTrans F G) (β : DerivedNatTrans G H)
@@ -403,7 +403,7 @@ theorem derivedstep_multi_sound {A : Type u} {a b : A}
 
 /-- Derived functor identity composition via RwEq. -/
 theorem derived_id_comp_rweq
-    {C D : PreAdditiveCategory.{u}}
+    {C D : PreAdditiveCategory}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     (F : LeftDerivedFunctor C D DC DD) (X : C.Obj) :
     RwEq (Path.trans (F.map_id X) (Path.refl (D.id (F.obj X))))

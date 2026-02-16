@@ -103,8 +103,7 @@ theorem box_diamond_dual {W : Type u} (F : KripkeFrame W) (φ : Valuation W)
   · intro hbox ⟨w', hacc, hneg⟩
     exact hneg (hbox w' hacc)
   · intro hndiam w' hacc
-    by_contra h
-    exact hndiam ⟨w', hacc, h⟩
+    exact Classical.byContradiction fun h => hndiam ⟨w', hacc, h⟩
 
 /-- Diamond-box duality: ◇φ ↔ ¬□¬φ. -/
 theorem diamond_box_dual {W : Type u} (F : KripkeFrame W) (φ : Valuation W)
@@ -114,10 +113,8 @@ theorem diamond_box_dual {W : Type u} (F : KripkeFrame W) (φ : Valuation W)
   · intro ⟨w', hacc, hphi⟩ hbox
     exact hbox w' hacc hphi
   · intro hnbox
-    by_contra hndiam
-    apply hnbox
-    intro w' hacc hphi
-    exact hndiam ⟨w', hacc, hphi⟩
+    exact Classical.byContradiction fun hndiam =>
+      hnbox fun w' hacc hphi => hndiam ⟨w', hacc, hphi⟩
 
 /-! ## Frame Conditions as Path Properties -/
 

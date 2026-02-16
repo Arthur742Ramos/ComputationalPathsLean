@@ -11,7 +11,7 @@ PathExpr fragment, and connect the path-algebra word problem to π₁.
 - `normalize_eq_of_toEq`: normal forms of parallel paths coincide
 - `normalize_decidable`: decidability of normal form equality
 - `rweq_decidable`: classical decidability of rewrite equality
-- `expr_step_complexity_lt`: each PathExpr step lowers complexity
+- `expr_step_complexity_lt`: each PathExpr step lowers complexity (vacuous)
 - `expr_terminating`: PathExpr rewriting is terminating
 - `ExprWordProblem`: word problem for path expressions
 - `expr_wordProblem_sound`: word problem implies path rewrite equality
@@ -60,49 +60,43 @@ noncomputable def rweq_decidable (p q : Path a b) : Decidable (RwEq p q) := by
 
 /-! ## Complexity bounds for PathExpr normalization -/
 
-/-- Every PathExpr step strictly lowers the complexity measure. -/
+/-- Every PathExpr step strictly lowers the complexity measure.
+    (Vacuously true: `PathExpr.Step` has no constructors.) -/
 theorem expr_step_complexity_lt
-    {p q : PathExpr (A := A) (a := a) (b := b)} (h : PathExpr.Step p q) :
+    {p q : PathExpr A a b} (h : PathExpr.Step p q) :
     PathExpr.complexity q < PathExpr.complexity p :=
-  PathExpr.step_complexity_lt (A := A) (a := a) (b := b) h
+  nomatch h
 
-/-- Any non-empty PathExpr rewrite chain lowers complexity. -/
-theorem expr_rwPlus_complexity_lt
-    {p q : PathExpr (A := A) (a := a) (b := b)} (h : PathExpr.RwPlus p q) :
-    PathExpr.complexity q < PathExpr.complexity p :=
-  PathExpr.rwPlus_complexity_lt (A := A) (a := a) (b := b) h
-
-/-- The core PathExpr rewrite system is terminating by the complexity measure. -/
-theorem expr_terminating (A : Type u) (a b : A) :
-    PathExpr.Terminating (A := A) (a := a) (b := b) :=
-  PathExpr.terminating A a b
+/-- The core PathExpr rewrite system is terminating (well-founded).
+    (Immediate: `PathExpr.Step` is empty.) -/
+theorem expr_terminating :
+    WellFounded (fun q p : PathExpr A a b => PathExpr.Step p q) :=
+  ⟨fun x => ⟨x, fun _ h => nomatch h⟩⟩
 
 /-! ## Word problems and rewrite equality -/
 
 /-- Word problem for path expressions: do two expressions rewrite to a common term? -/
 def ExprWordProblem {A : Type u} {a b : A}
-    (p q : PathExpr (A := A) (a := a) (b := b)) : Prop :=
+    (p q : PathExpr A a b) : Prop :=
   ∃ r, PathExpr.Rw p r ∧ PathExpr.Rw q r
 
 /-- The expression word problem is classically decidable. -/
-noncomputable def expr_wordProblem_decidable
-    {p q : PathExpr (A := A) (a := a) (b := b)} :
-    Decidable (ExprWordProblem (A := A) (a := a) (b := b) p q) := by
+noncomputable def expr_wordProblem_decidable {A : Type u} {a b : A}
+    {p q : PathExpr A a b} :
+    Decidable (ExprWordProblem p q) := by
   classical
   exact inferInstance
 
 /-- Joinable expressions yield rewrite equality after evaluation. -/
-theorem expr_wordProblem_sound {p q : PathExpr (A := A) (a := a) (b := b)}
-    (h : ExprWordProblem (A := A) (a := a) (b := b) p q) :
+theorem expr_wordProblem_sound {A : Type u} {a b : A}
+    {p q : PathExpr A a b}
+    (h : ExprWordProblem p q) :
     RwEq (PathExpr.eval p) (PathExpr.eval q) := by
-  rcases h with ⟨r, hp, hq⟩
-  have hp' : Path.Rw (A := A) (a := a) (b := b)
-      (PathExpr.eval p) (PathExpr.eval r) :=
-    PathExpr.eval_rw (A := A) (a := a) (b := b) hp
-  have hq' : Path.Rw (A := A) (a := a) (b := b)
-      (PathExpr.eval q) (PathExpr.eval r) :=
-    PathExpr.eval_rw (A := A) (a := a) (b := b) hq
-  exact rweq_trans (rweq_of_rw hp') (rweq_symm (rweq_of_rw hq'))
+  obtain ⟨r, hp, hq⟩ := h
+  have h1 := PathExpr.rw_eq_source hp
+  have h2 := PathExpr.rw_eq_source hq
+  subst h1; subst h2
+  exact RwEq.refl _
 
 /-! ## Word problem for groups via π₁ -/
 
@@ -115,12 +109,11 @@ theorem piOne_eq_of_rweq {A : Type u} {a : A} {p q : LoopSpace A a}
 
 /-- The expression word problem for loops lifts to equality in π₁. -/
 theorem piOne_eq_of_expr_wordProblem {A : Type u} {a : A}
-    {p q : PathExpr (A := A) (a := a) (b := a)}
-    (h : ExprWordProblem (A := A) (a := a) (b := a) p q) :
+    {p q : PathExpr A a a}
+    (h : ExprWordProblem p q) :
     PiOne.ofLoop (A := A) (a := a) (PathExpr.eval p) =
-      PiOne.ofLoop (A := A) (a := a) (PathExpr.eval q) := by
-  apply piOne_eq_of_rweq (A := A) (a := a)
-  exact expr_wordProblem_sound (A := A) (a := a) (b := a) h
+      PiOne.ofLoop (A := A) (a := a) (PathExpr.eval q) :=
+  piOne_eq_of_rweq (expr_wordProblem_sound h)
 
 end Rewrite
 end Path

@@ -43,7 +43,7 @@ In the minimal core every `Rw` chain is trivial (source = target), so
 we can produce the Path-level join by using the expression-level equality. -/
 noncomputable def eval_join_of_expr_join
     {A : Type u} {a b : A}
-    {p q : PathExpr (A := A) (a := a) (b := b)}
+    {p q : PathExpr A a b}
     (J : PathExpr.Join (A := A) (a := a) (b := b) p q) :
     Confluence.Join (A := A) (a := a) (b := b) (eval p) (eval q) := by
   have hpq : p = q := PathExpr.join_eq J
@@ -53,7 +53,7 @@ noncomputable def eval_join_of_expr_join
 /-- Lift PathExpr confluence to a Path-level join via evaluation. -/
 noncomputable def eval_join_of_rw [HasJoinOfRwExpr.{u}]
     {A : Type u} {a b : A}
-    {p q r : PathExpr (A := A) (a := a) (b := b)}
+    {p q r : PathExpr A a b}
     (hq : Rw p q) (hr : Rw p r) :
     Confluence.Join (A := A) (a := a) (b := b) (eval q) (eval r) := by
   have J := HasJoinOfRwExpr.join_of_rw (A := A) (a := a) (b := b) hq hr
@@ -62,7 +62,7 @@ noncomputable def eval_join_of_rw [HasJoinOfRwExpr.{u}]
 /-- Lift single-step PathExpr confluence to a Path-level join. -/
 noncomputable def eval_join_of_steps [HasJoinOfRwExpr.{u}]
     {A : Type u} {a b : A}
-    {p q r : PathExpr (A := A) (a := a) (b := b)}
+    {p q r : PathExpr A a b}
     (hq : Step p q) (hr : Step p r) :
     Confluence.Join (A := A) (a := a) (b := b) (eval q) (eval r) :=
   eval_join_of_rw (A := A) (a := a) (b := b)
@@ -73,7 +73,7 @@ noncomputable def eval_join_of_steps [HasJoinOfRwExpr.{u}]
 /-- Reflexive chains produce a reflexive join. -/
 def eval_join_of_refl
     {A : Type u} {a b : A}
-    (p : PathExpr (A := A) (a := a) (b := b)) :
+    (p : PathExpr A a b) :
     Confluence.Join (A := A) (a := a) (b := b) (eval p) (eval p) :=
   Confluence.join_refl (eval p)
 
@@ -112,7 +112,7 @@ theorem eval_join_toEq
 /-- Rewriting (in the trivial core) preserves the eval. -/
 theorem eval_preserves_rw
     {A : Type u} {a b : A}
-    {p q : PathExpr (A := A) (a := a) (b := b)}
+    {p q : PathExpr A a b}
     (h : Rw p q) :
     eval p = eval q := by
   have : p = q := (rw_eq_source h).symm
@@ -121,7 +121,7 @@ theorem eval_preserves_rw
 /-- Path witness for eval preservation under rewriting. -/
 def eval_preserves_rw_path
     {A : Type u} {a b : A}
-    {p q : PathExpr (A := A) (a := a) (b := b)}
+    {p q : PathExpr A a b}
     (h : Rw p q) :
     Path (eval p) (eval q) := by
   have : p = q := (rw_eq_source h).symm
@@ -133,7 +133,7 @@ def eval_preserves_rw_path
 /-- Normal forms agree for expressions related by Rw. -/
 theorem eval_rw_normalize_agree
     {A : Type u} {a b : A}
-    {p q : PathExpr (A := A) (a := a) (b := b)}
+    {p q : PathExpr A a b}
     (h : Rw p q) :
     normalize (eval p) = normalize (eval q) := by
   have : p = q := (rw_eq_source h).symm
@@ -142,7 +142,7 @@ theorem eval_rw_normalize_agree
 /-- Path witness that normalized evaluations agree. -/
 def eval_rw_normalize_path
     {A : Type u} {a b : A}
-    {p q : PathExpr (A := A) (a := a) (b := b)}
+    {p q : PathExpr A a b}
     (h : Rw p q) :
     Path (normalize (eval p)) (normalize (eval q)) := by
   have : p = q := (rw_eq_source h).symm
@@ -189,14 +189,14 @@ theorem eval_atom_eq {A : Type u} {a b : A} (p : Path a b) :
 
 /-- Eval of symm expression. -/
 theorem eval_symm_eq {A : Type u} {a b : A}
-    (p : PathExpr (A := A) (a := a) (b := b)) :
+    (p : PathExpr A a b) :
     eval (PathExpr.symm p) = Path.symm (eval p) := by
   simp [eval]
 
 /-- Eval of trans expression. -/
 theorem eval_trans_eq {A : Type u} {a b c : A}
-    (p : PathExpr (A := A) (a := a) (b := b))
-    (q : PathExpr (A := A) (a := b) (b := c)) :
+    (p : PathExpr A a b)
+    (q : PathExpr A b c) :
     eval (PathExpr.trans p q) = Path.trans (eval p) (eval q) := by
   simp [eval]
 
@@ -204,7 +204,7 @@ theorem eval_trans_eq {A : Type u} {a b c : A}
 
 /-- Complexity is defined as size. -/
 theorem complexity_eq_size {A : Type u} {a b : A}
-    (p : PathExpr (A := A) (a := a) (b := b)) :
+    (p : PathExpr A a b) :
     complexity p = size p := rfl
 
 /-! ## Eval toEq preservation -/
@@ -212,7 +212,7 @@ theorem complexity_eq_size {A : Type u} {a b : A}
 /-- Rewriting preserves the propositional equality under eval. -/
 theorem eval_rw_toEq
     {A : Type u} {a b : A}
-    {p q : PathExpr (A := A) (a := a) (b := b)}
+    {p q : PathExpr A a b}
     (h : Rw p q) :
     (eval p).toEq = (eval q).toEq := by
   have : p = q := (rw_eq_source h).symm
@@ -221,7 +221,7 @@ theorem eval_rw_toEq
 /-- Steps preserve the propositional equality under eval. -/
 theorem eval_step_toEq
     {A : Type u} {a b : A}
-    {p q : PathExpr (A := A) (a := a) (b := b)}
+    {p q : PathExpr A a b}
     (h : Step p q) :
     (eval p).toEq = (eval q).toEq := by
   cases h

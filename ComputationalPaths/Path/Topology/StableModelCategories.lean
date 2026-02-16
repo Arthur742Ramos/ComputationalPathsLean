@@ -84,7 +84,7 @@ theorem stablemcstep_rweq {A : Type u} {a b : A} {p q : Path a b}
 /-! ## Shift functor with Path witnesses -/
 
 /-- Shift functor with Path-valued functoriality witnesses. -/
-structure StableShiftData (C : PreAdditiveCategory.{u}) where
+structure StableShiftData (C : PreAdditiveCategory) where
   /-- Underlying shift functor. -/
   shift : ShiftFunctor C
   /-- Path witness for shift preserving identity. -/
@@ -104,7 +104,7 @@ structure StableShiftData (C : PreAdditiveCategory.{u}) where
     Path (unshift (shift.shiftObj X)) X
 
 /-- Build a StableShiftData from a ShiftFunctor and chosen inverse witnesses. -/
-def StableShiftData.ofShift (C : PreAdditiveCategory.{u})
+def StableShiftData.ofShift (C : PreAdditiveCategory)
     (T : ShiftFunctor C)
     (unshift : C.Obj → C.Obj)
     (shift_unshift : ∀ X : C.Obj, Path (T.shiftObj (unshift X)) X)
@@ -120,7 +120,7 @@ def StableShiftData.ofShift (C : PreAdditiveCategory.{u})
 /-! ## Exact triangles with Path witnesses -/
 
 /-- An exact triangle X → Y → Z → Σ(X) with Path witnesses. -/
-structure ExactTriangleData (C : PreAdditiveCategory.{u})
+structure ExactTriangleData (C : PreAdditiveCategory)
     (S : StableShiftData C) where
   /-- The underlying triangle. -/
   triangle : Triangle C S.shift
@@ -139,7 +139,7 @@ structure ExactTriangleData (C : PreAdditiveCategory.{u})
 
 /-- Build an exact triangle from a triangle where all composites are zero. -/
 def ExactTriangleData.ofZeroComposites
-    {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
+    {C : PreAdditiveCategory} {S : StableShiftData C}
     (T : Triangle C S.shift)
     (hgf : C.comp T.f T.g = C.zero T.X T.Z)
     (hhg : C.comp T.g T.h = C.zero T.Y (S.shift.shiftObj T.X)) :
@@ -153,7 +153,7 @@ def ExactTriangleData.ofZeroComposites
 /-! ## Rotation of exact triangles -/
 
 /-- Rotate a triangle: X → Y → Z → ΣX becomes Y → Z → ΣX → ΣY. -/
-def rotateTriangle {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
+def rotateTriangle {C : PreAdditiveCategory} {S : StableShiftData C}
     (T : Triangle C S.shift) : Triangle C S.shift where
   X := T.Y
   Y := T.Z
@@ -164,7 +164,7 @@ def rotateTriangle {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
 
 /-- Rotation data: records the rotated triangle and its exactness witnesses
     without requiring full neg-composition axioms beyond PreAdditiveCategory. -/
-structure RotationData {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
+structure RotationData {C : PreAdditiveCategory} {S : StableShiftData C}
     (E : ExactTriangleData C S) where
   /-- Path witness: the rotated triangle's first map is g. -/
   rot_f : Path (rotateTriangle E.triangle).f E.triangle.g
@@ -175,7 +175,7 @@ structure RotationData {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
     C.zero (rotateTriangle E.triangle).X (rotateTriangle E.triangle).Z
 
 /-- Trivial rotation data. -/
-def trivialRotation {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
+def trivialRotation {C : PreAdditiveCategory} {S : StableShiftData C}
     (E : ExactTriangleData C S)
     (hcomp : C.comp E.triangle.g E.triangle.h =
       C.zero E.triangle.Y (S.shift.shiftObj E.triangle.X)) :
@@ -188,7 +188,7 @@ def trivialRotation {C : PreAdditiveCategory.{u}} {S : StableShiftData C}
 
 /-- Octahedral axiom data: given exact triangles on f, g, and g∘f,
     there exist connecting maps forming a fourth exact triangle. -/
-structure OctahedralData {C : PreAdditiveCategory.{u}}
+structure OctahedralData {C : PreAdditiveCategory}
     {S : StableShiftData C} where
   /-- First morphism. -/
   f_tri : ExactTriangleData C S
@@ -208,7 +208,7 @@ structure OctahedralData {C : PreAdditiveCategory.{u}}
     (C.comp u_map v_map)
 
 /-- Trivial octahedral data (all identities). -/
-def trivialOctahedral {C : PreAdditiveCategory.{u}}
+def trivialOctahedral {C : PreAdditiveCategory}
     {S : StableShiftData C}
     (E : ExactTriangleData C S) : OctahedralData (S := S) where
   f_tri := E
@@ -224,7 +224,7 @@ def trivialOctahedral {C : PreAdditiveCategory.{u}}
 
 /-- A stable model category: a model category with a compatible shift
     functor where the homotopy category is triangulated. -/
-structure StableModelCatData (C : PreAdditiveCategory.{u})
+structure StableModelCatData (C : PreAdditiveCategory)
     extends ModelCategory C.Obj where
   /-- The shift data. -/
   shiftData : StableShiftData C
@@ -244,7 +244,7 @@ structure StableModelCatData (C : PreAdditiveCategory.{u})
 /-- Data witnessing that the homotopy category of a stable model category
     is triangulated. -/
 structure TriangulatedFromStable
-    (C : PreAdditiveCategory.{u})
+    (C : PreAdditiveCategory)
     (SM : StableModelCatData C) where
   /-- Distinguished triangles in the homotopy category. -/
   distinguished : Triangle C SM.shiftData.shift → Prop
@@ -264,7 +264,7 @@ structure TriangulatedFromStable
 
 /-- Build triangulated structure from a stable model category. -/
 def triangulatedFromStable
-    (C : PreAdditiveCategory.{u})
+    (C : PreAdditiveCategory)
     (SM : StableModelCatData C) : TriangulatedFromStable C SM where
   distinguished := fun _ => True
   exact_is_dist := fun _ => trivial
@@ -276,7 +276,7 @@ def triangulatedFromStable
 
 /-- A stable equivalence between stable model categories. -/
 structure StableEquivData
-    (C D : PreAdditiveCategory.{u})
+    (C D : PreAdditiveCategory)
     (SM : StableModelCatData C)
     (SN : StableModelCatData D) where
   /-- Object map. -/
@@ -300,7 +300,7 @@ structure StableEquivData
 
 /-- Identity stable equivalence. -/
 def stableEquivId
-    (C : PreAdditiveCategory.{u})
+    (C : PreAdditiveCategory)
     (SM : StableModelCatData C) : StableEquivData C C SM SM where
   obj := id
   mapHom := id
@@ -312,32 +312,32 @@ def stableEquivId
 /-! ## Coherence theorems -/
 
 /-- Shift of identity via Path and RwEq. -/
-theorem shift_id_rweq {C : PreAdditiveCategory.{u}}
+theorem shift_id_rweq {C : PreAdditiveCategory}
     (S : StableShiftData C) (X : C.Obj) :
     RwEq (S.shift_id_path X) (S.shift_id_path X) :=
   RwEq.refl _
 
 /-- Shift composition compatibility via RwEq. -/
-theorem shift_comp_rweq {C : PreAdditiveCategory.{u}}
+theorem shift_comp_rweq {C : PreAdditiveCategory}
     (S : StableShiftData C) {X Y Z : C.Obj}
     (f : C.Hom X Y) (g : C.Hom Y Z) :
     RwEq (S.shift_comp_path f g) (S.shift_comp_path f g) :=
   RwEq.refl _
 
 /-- Exact triangle g∘f = 0 via Path. -/
-theorem exact_gf_zero {C : PreAdditiveCategory.{u}}
+theorem exact_gf_zero {C : PreAdditiveCategory}
     {S : StableShiftData C} (E : ExactTriangleData C S) :
     E.gf_zero_path.toEq = E.exact_at_Y :=
   rfl
 
 /-- Exact triangle h∘g = 0 via Path. -/
-theorem exact_hg_zero {C : PreAdditiveCategory.{u}}
+theorem exact_hg_zero {C : PreAdditiveCategory}
     {S : StableShiftData C} (E : ExactTriangleData C S) :
     E.hg_zero_path.toEq = E.exact_at_Z :=
   rfl
 
 /-- Shift-unshift is identity via Path. -/
-theorem shift_unshift_id {C : PreAdditiveCategory.{u}}
+theorem shift_unshift_id {C : PreAdditiveCategory}
     (S : StableShiftData C) (X : C.Obj) :
     (S.shift_unshift X).toEq = (S.shift_unshift X).toEq :=
   rfl
@@ -351,21 +351,21 @@ theorem stablemcstep_multi_sound {A : Type u} {a b : A}
 
 /-- Triangle morphism id is reflexive via Path. -/
 theorem triangle_morph_id_path
-    {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
+    {C : PreAdditiveCategory} {T : ShiftFunctor C}
     (Tr : Triangle C T) :
     (TriangleMorphism.id Tr).comm_f.symm.symm =
       (TriangleMorphism.id Tr).comm_f := by
   rfl
 
 /-- Rotation first map is Path-reflexive. -/
-theorem rotate_f_eq {C : PreAdditiveCategory.{u}}
+theorem rotate_f_eq {C : PreAdditiveCategory}
     {S : StableShiftData C} (E : ExactTriangleData C S) :
     (rotateTriangle E.triangle).f = E.triangle.g :=
   rfl
 
 /-- Stable equivalence preserves identity morphisms. -/
 theorem stable_equiv_preserves_id
-    {C D : PreAdditiveCategory.{u}}
+    {C D : PreAdditiveCategory}
     {SM : StableModelCatData C} {SN : StableModelCatData D}
     (F : StableEquivData C D SM SN) (X : C.Obj) :
     RwEq (F.map_id X) (F.map_id X) :=
@@ -373,7 +373,7 @@ theorem stable_equiv_preserves_id
 
 /-- Stable equivalence composition is sound via Path. -/
 theorem stable_equiv_comp_sound
-    {C D : PreAdditiveCategory.{u}}
+    {C D : PreAdditiveCategory}
     {SM : StableModelCatData C} {SN : StableModelCatData D}
     (F : StableEquivData C D SM SN)
     {X Y Z : C.Obj} (f : C.Hom X Y) (g : C.Hom Y Z) :

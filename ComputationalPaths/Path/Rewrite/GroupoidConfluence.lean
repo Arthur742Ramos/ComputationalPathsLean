@@ -818,7 +818,7 @@ and abstract levels. -/
     Atoms are mapped to `Expr.atom 0` (sufficient for the groupoid fragment
     where atom identity doesn't matter for the algebraic structure). -/
 def eraseTypes {A : Type _} {a b : A} :
-    Rewrite.PathExpr (A := A) (a := a) (b := b) → Expr
+    Rewrite.PathExpr A a b → Expr
   | .atom _ => .atom 0
   | .refl _ => .refl
   | .symm e => .symm (eraseTypes e)

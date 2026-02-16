@@ -51,7 +51,7 @@ inductive StableStep : {A : Type u} → {a b : A} → Path a b → Path a b → 
 /-! ## Suspension with Path witnesses -/
 
 /-- A suspension functor with Path-valued naturality. -/
-structure StableSuspension (C : PreAdditiveCategory.{u}) where
+structure StableSuspension (C : PreAdditiveCategory) where
   /-- The underlying shift functor. -/
   shift : ShiftFunctor C
   /-- Path witness for shift of identity. -/
@@ -63,7 +63,7 @@ structure StableSuspension (C : PreAdditiveCategory.{u}) where
          (C.comp (shift.shiftHom f) (shift.shiftHom g))
 
 /-- Build a StableSuspension from a ShiftFunctor. -/
-def StableSuspension.ofShift (C : PreAdditiveCategory.{u})
+def StableSuspension.ofShift (C : PreAdditiveCategory)
     (T : ShiftFunctor C) : StableSuspension C where
   shift := T
   shift_id_path := fun X => Path.stepChain (T.shift_id X)
@@ -72,7 +72,7 @@ def StableSuspension.ofShift (C : PreAdditiveCategory.{u})
 /-! ## Desuspension -/
 
 /-- Desuspension data: a right adjoint to suspension. -/
-structure Desuspension (C : PreAdditiveCategory.{u}) (S : StableSuspension C) where
+structure Desuspension (C : PreAdditiveCategory) (S : StableSuspension C) where
   /-- Desuspension on objects. -/
   desuspObj : C.Obj → C.Obj
   /-- Desuspension on morphisms. -/
@@ -86,7 +86,7 @@ structure Desuspension (C : PreAdditiveCategory.{u}) (S : StableSuspension C) wh
 /-! ## Exact triangles with Path witnesses -/
 
 /-- An exact triangle with Path witnesses for the compositions. -/
-structure ExactTrianglePath (C : PreAdditiveCategory.{u})
+structure ExactTrianglePath (C : PreAdditiveCategory)
     (T : ShiftFunctor C) where
   /-- The underlying triangle. -/
   tri : Triangle C T
@@ -96,7 +96,7 @@ structure ExactTrianglePath (C : PreAdditiveCategory.{u})
   hg_zero_path : Path (C.comp tri.g tri.h) (C.zero tri.Y (T.shiftObj tri.X))
 
 /-- Build an ExactTrianglePath from an ExactTriangle. -/
-def ExactTrianglePath.ofExact {C : PreAdditiveCategory.{u}}
+def ExactTrianglePath.ofExact {C : PreAdditiveCategory}
     {T : ShiftFunctor C} (Tr : Triangle C T)
     (ex : ExactTriangle Tr) : ExactTrianglePath C T where
   tri := Tr
@@ -106,7 +106,7 @@ def ExactTrianglePath.ofExact {C : PreAdditiveCategory.{u}}
 /-! ## Octahedral axiom as Path -/
 
 /-- The octahedral axiom with Path-valued witnesses. -/
-structure OctahedralPath (TC : TriangulatedCategory.{u}) where
+structure OctahedralPath (TC : TriangulatedCategory) where
   /-- For composable morphisms, the octahedral diagram commutes. -/
   octahedral :
     ∀ {X Y Z : TC.cat.Obj}
@@ -119,7 +119,7 @@ structure OctahedralPath (TC : TriangulatedCategory.{u}) where
       TC.distinguished Tgf ∧ Tgf.X = X ∧ Tgf.Y = Z
 
 /-- The trivial octahedral axiom (using tr2_complete). -/
-def trivialOctahedral (TC : TriangulatedCategory.{u}) :
+def trivialOctahedral (TC : TriangulatedCategory) :
     OctahedralPath TC where
   octahedral := fun f g _Tf _ _hX _hY _Tg _ _ _ =>
     let ⟨Z', g', h', dist⟩ := TC.tr2_complete (TC.cat.comp f g)
@@ -128,7 +128,7 @@ def trivialOctahedral (TC : TriangulatedCategory.{u}) :
 /-! ## Verdier quotient data -/
 
 /-- A thick subcategory: closed under shifts and direct summands. -/
-structure ThickSubcategory (TC : TriangulatedCategory.{u}) where
+structure ThickSubcategory (TC : TriangulatedCategory) where
   /-- Membership predicate on objects. -/
   mem : TC.cat.Obj → Prop
   /-- Closed under shift. -/
@@ -137,7 +137,7 @@ structure ThickSubcategory (TC : TriangulatedCategory.{u}) where
   zero_mem : ∀ (Z : ZeroObject TC.cat), mem Z.zero
 
 /-- Verdier quotient construction data. -/
-structure VerdierData (TC : TriangulatedCategory.{u}) where
+structure VerdierData (TC : TriangulatedCategory) where
   /-- The thick subcategory to quotient by. -/
   sub : ThickSubcategory TC
   /-- The quotient category objects. -/
@@ -150,7 +150,7 @@ structure VerdierData (TC : TriangulatedCategory.{u}) where
 /-- A localization sequence: a fiber sequence of triangulated categories. -/
 structure LocalizationSequence where
   /-- The ambient triangulated category. -/
-  ambient : TriangulatedCategory.{u}
+  ambient : TriangulatedCategory
   /-- The subcategory. -/
   sub : ThickSubcategory ambient
   /-- The Verdier quotient. -/

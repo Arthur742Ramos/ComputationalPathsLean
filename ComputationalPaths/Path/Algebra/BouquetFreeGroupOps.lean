@@ -56,9 +56,10 @@ variable {n : Nat}
 @[simp] theorem length_wordConcat (w₁ w₂ : BouquetWord n) :
     (wordConcat w₁ w₂).length = w₁.length + w₂.length := by
   induction w₁ with
-  | nil => simp [wordConcat, length]
+  | nil => exact (Nat.zero_add _).symm
   | cons l rest ih =>
-      simp [wordConcat, length, ih, Nat.add_assoc]
+      show 1 + (wordConcat rest w₂).length = 1 + rest.length + w₂.length
+      rw [ih, Nat.add_assoc]
 
 /-- Length of an inverse word equals the length of the word. -/
 @[simp] theorem length_inverse (w : BouquetWord n) :
@@ -66,12 +67,10 @@ variable {n : Nat}
   induction w with
   | nil => rfl
   | cons l rest ih =>
-    calc
-      (inverse (BouquetWord.cons l rest)).length
-          = (inverse rest).length + 1 := by
-              simp [inverse, length, length_wordConcat, Nat.add_comm]
-      _ = rest.length + 1 := by simp [ih]
-      _ = (BouquetWord.cons l rest).length := by simp [length, Nat.add_comm]
+    show (wordConcat (inverse rest) _).length = 1 + rest.length
+    rw [length_wordConcat, ih]
+    show rest.length + (1 + 0) = 1 + rest.length
+    omega
 
 /-- Inverse of the empty word. -/
 @[simp] theorem inverse_nil : inverse (n := n) .nil = .nil := rfl
