@@ -38,8 +38,8 @@ def confluence_eval
     {p q r : PathExpr A a b}
     (hq : PathExpr.Rw p q) (hr : PathExpr.Rw p r) :
     Confluence.Join (A := A) (a := a) (b := b) (PathExpr.eval q) (PathExpr.eval r) := by
-  have hpq : p = q := (PathExpr.rw_eq_source hq).symm
-  have hpr : p = r := (PathExpr.rw_eq_source hr).symm
+  have hpq : p = q := PathExpr.rw_eq_source hq
+  have hpr : p = r := PathExpr.rw_eq_source hr
   have hqr : q = r := hpq.symm.trans hpr
   cases hqr
   exact Confluence.join_refl (PathExpr.eval q)
@@ -79,7 +79,7 @@ theorem eval_rw_preserves_toEq
     {p q : PathExpr A a b}
     (h : PathExpr.Rw p q) :
     (PathExpr.eval p).toEq = (PathExpr.eval q).toEq := by
-  have : p = q := (PathExpr.rw_eq_source h).symm
+  have : p = q := PathExpr.rw_eq_source h
   rw [this]
 
 /-- Path witness that eval is invariant under rewriting. -/
@@ -88,7 +88,7 @@ def eval_rw_path_witness
     {p q : PathExpr A a b}
     (h : PathExpr.Rw p q) :
     Path (PathExpr.eval p) (PathExpr.eval q) := by
-  have : p = q := (PathExpr.rw_eq_source h).symm
+  have : p = q := PathExpr.rw_eq_source h
   cases this
   exact Path.refl (PathExpr.eval p)
 
@@ -100,9 +100,9 @@ theorem eval_deterministic
     {p q r : PathExpr A a b}
     (hq : PathExpr.Rw p q) (hr : PathExpr.Rw p r) :
     PathExpr.eval q = PathExpr.eval r := by
-  have hq' : q = p := PathExpr.rw_eq_source hq
-  have hr' : r = p := PathExpr.rw_eq_source hr
-  rw [hq', hr']
+  have hq' : p = q := PathExpr.rw_eq_source hq
+  have hr' : p = r := PathExpr.rw_eq_source hr
+  rw [← hq', ← hr']
 
 /-- Path witness for determinism. -/
 def eval_deterministic_path
@@ -138,7 +138,7 @@ theorem eval_symm_rw
     {p q : PathExpr A a b}
     (h : PathExpr.Rw p q) :
     Path.symm (PathExpr.eval p) = Path.symm (PathExpr.eval q) := by
-  have : p = q := (PathExpr.rw_eq_source h).symm
+  have : p = q := PathExpr.rw_eq_source h
   rw [this]
 
 /-- Path witness for symm of rewritten expression. -/
@@ -147,7 +147,7 @@ def eval_symm_rw_path
     {p q : PathExpr A a b}
     (h : PathExpr.Rw p q) :
     Path (Path.symm (PathExpr.eval p)) (Path.symm (PathExpr.eval q)) := by
-  have : p = q := (PathExpr.rw_eq_source h).symm
+  have : p = q := PathExpr.rw_eq_source h
   cases this
   exact Path.refl (Path.symm (PathExpr.eval p))
 
@@ -155,29 +155,29 @@ def eval_symm_rw_path
 theorem eval_trans_rw_left
     {A : Type u} {a b c : A}
     {p q : PathExpr A a b}
-    (r : PathExpr (A := A) (a := b) (b := c))
+    (r : PathExpr A b c)
     (h : PathExpr.Rw p q) :
     Path.trans (PathExpr.eval p) (PathExpr.eval r) =
       Path.trans (PathExpr.eval q) (PathExpr.eval r) := by
-  have : p = q := (PathExpr.rw_eq_source h).symm
+  have : p = q := PathExpr.rw_eq_source h
   rw [this]
 
 /-- Rewriting on the right component of a trans preserves eval. -/
 theorem eval_trans_rw_right
     {A : Type u} {a b c : A}
     (p : PathExpr A a b)
-    {q r : PathExpr (A := A) (a := b) (b := c)}
+    {q r : PathExpr A b c}
     (h : PathExpr.Rw q r) :
     Path.trans (PathExpr.eval p) (PathExpr.eval q) =
       Path.trans (PathExpr.eval p) (PathExpr.eval r) := by
-  have : q = r := (PathExpr.rw_eq_source h).symm
+  have : q = r := PathExpr.rw_eq_source h
   rw [this]
 
 /-- Path witness for left rewriting in trans. -/
 def eval_trans_rw_left_path
     {A : Type u} {a b c : A}
     {p q : PathExpr A a b}
-    (r : PathExpr (A := A) (a := b) (b := c))
+    (r : PathExpr A b c)
     (h : PathExpr.Rw p q) :
     Path (Path.trans (PathExpr.eval p) (PathExpr.eval r))
          (Path.trans (PathExpr.eval q) (PathExpr.eval r)) :=
@@ -187,7 +187,7 @@ def eval_trans_rw_left_path
 def eval_trans_rw_right_path
     {A : Type u} {a b c : A}
     (p : PathExpr A a b)
-    {q r : PathExpr (A := A) (a := b) (b := c)}
+    {q r : PathExpr A b c}
     (h : PathExpr.Rw q r) :
     Path (Path.trans (PathExpr.eval p) (PathExpr.eval q))
          (Path.trans (PathExpr.eval p) (PathExpr.eval r)) :=
@@ -201,7 +201,7 @@ theorem eval_rw_normalize_eq
     {p q : PathExpr A a b}
     (h : PathExpr.Rw p q) :
     normalize (PathExpr.eval p) = normalize (PathExpr.eval q) := by
-  have : p = q := (PathExpr.rw_eq_source h).symm
+  have : p = q := PathExpr.rw_eq_source h
   rw [this]
 
 /-- Path witness for normal form agreement. -/
@@ -210,7 +210,7 @@ def eval_rw_normalize_path
     {p q : PathExpr A a b}
     (h : PathExpr.Rw p q) :
     Path (normalize (PathExpr.eval p)) (normalize (PathExpr.eval q)) := by
-  have : p = q := (PathExpr.rw_eq_source h).symm
+  have : p = q := PathExpr.rw_eq_source h
   cases this
   exact Path.refl _
 

@@ -204,7 +204,7 @@ theorem church_rosser_steps
 theorem rw_target_eq_source {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : Rw p q) : p = q :=
-  (rw_eq_source h).symm
+  rw_eq_source h
 
 /-- Confluence implies unique normal forms: if two expressions are both
     in normal form (i.e., no further steps apply) and are joinable, they

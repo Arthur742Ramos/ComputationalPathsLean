@@ -25,6 +25,8 @@ properties, and interactions with the `normalize` function.
 import ComputationalPaths.Path.Rewrite.PathExpr
 import ComputationalPaths.Path.Rewrite.ExprConfluence
 import ComputationalPaths.Path.Rewrite.Confluence
+import ComputationalPaths.Path.Rewrite.Normalization
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -115,7 +117,7 @@ theorem eval_preserves_rw
     {p q : PathExpr A a b}
     (h : Rw p q) :
     eval p = eval q := by
-  have : p = q := (rw_eq_source h).symm
+  have : p = q := rw_eq_source h
   rw [this]
 
 /-- Path witness for eval preservation under rewriting. -/
@@ -124,7 +126,7 @@ def eval_preserves_rw_path
     {p q : PathExpr A a b}
     (h : Rw p q) :
     Path (eval p) (eval q) := by
-  have : p = q := (rw_eq_source h).symm
+  have : p = q := rw_eq_source h
   cases this
   exact Path.refl (eval p)
 
@@ -135,8 +137,8 @@ theorem eval_rw_normalize_agree
     {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : Rw p q) :
-    normalize (eval p) = normalize (eval q) := by
-  have : p = q := (rw_eq_source h).symm
+    ComputationalPaths.Path.normalize (eval p) = ComputationalPaths.Path.normalize (eval q) := by
+  have : p = q := rw_eq_source h
   rw [this]
 
 /-- Path witness that normalized evaluations agree. -/
@@ -144,8 +146,8 @@ def eval_rw_normalize_path
     {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : Rw p q) :
-    Path (normalize (eval p)) (normalize (eval q)) := by
-  have : p = q := (rw_eq_source h).symm
+    Path (ComputationalPaths.Path.normalize (eval p)) (ComputationalPaths.Path.normalize (eval q)) := by
+  have : p = q := rw_eq_source h
   cases this
   exact Path.refl _
 
@@ -154,7 +156,7 @@ theorem eval_join_normalize_agree
     {A : Type u} {a b : A}
     {p q : Path a b}
     (J : Confluence.Join (A := A) (a := a) (b := b) p q) :
-    normalize p = normalize q :=
+    ComputationalPaths.Path.normalize p = ComputationalPaths.Path.normalize q :=
   normalize_of_rweq J.rweq
 
 /-- Path witness for normal form agreement. -/
@@ -162,7 +164,7 @@ def eval_join_normalize_path
     {A : Type u} {a b : A}
     {p q : Path a b}
     (J : Confluence.Join (A := A) (a := a) (b := b) p q) :
-    Path (normalize p) (normalize q) :=
+    Path (ComputationalPaths.Path.normalize p) (ComputationalPaths.Path.normalize q) :=
   Path.stepChain (eval_join_normalize_agree J)
 
 /-! ## Quotient compatibility -/
@@ -215,7 +217,7 @@ theorem eval_rw_toEq
     {p q : PathExpr A a b}
     (h : Rw p q) :
     (eval p).toEq = (eval q).toEq := by
-  have : p = q := (rw_eq_source h).symm
+  have : p = q := rw_eq_source h
   rw [this]
 
 /-- Steps preserve the propositional equality under eval. -/
