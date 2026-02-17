@@ -5,7 +5,7 @@ Arithmetic expressions as an inductive type, single-step rewrites as an
 inductive relation, multi-step paths as a free groupoid, and 35+
 theorems witnessing that every rewrite step and path preserves evaluation.
 
-Zero `Path.ofEq`. Zero `sorry`. Genuine domain inductives throughout.
+Constructive path witnesses and rewrite-inductive proofs throughout.
 -/
 
 import ComputationalPaths.Path.Basic
@@ -344,7 +344,7 @@ theorem comm_assoc_coherence (a b _c : AExpr) :
     let p2 := add_swap a b
     p1.eval_eq = p2.eval_eq :=
   by
-    simp [trans_eval, add_comm_involutive_eval]
+    simp
 
 /-! ## Triangle Coherence -/
 
