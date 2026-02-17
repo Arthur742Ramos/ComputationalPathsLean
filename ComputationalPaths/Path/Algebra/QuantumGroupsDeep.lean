@@ -175,38 +175,38 @@ theorem thm12_mkPath_irrel {A : Type u} {a b : A}
 
 /-! ## Hopf algebra coherence wrappers -/
 
-theorem thm13_hopf_mul_refl {A : Type u} (H : HopfOps A) (a b : A) :
+def thm13_hopf_mul_refl {A : Type u} (H : HopfOps A) (a b : A) :
     Path (H.mul a b) (H.mul a b) :=
   Path.refl (H.mul a b)
 
-theorem thm14_hopf_unit_refl {A : Type u} (H : HopfOps A) :
+def thm14_hopf_unit_refl {A : Type u} (H : HopfOps A) :
     Path H.one H.one :=
   mkReflPath H.one
 
-theorem thm15_hopf_comul1_refl {A : Type u} (H : HopfOps A) (a : A) :
+def thm15_hopf_comul1_refl {A : Type u} (H : HopfOps A) (a : A) :
     Path (H.comul1 a) (H.comul1 a) :=
   Path.refl (H.comul1 a)
 
-theorem thm16_hopf_comul2_refl {A : Type u} (H : HopfOps A) (a : A) :
+def thm16_hopf_comul2_refl {A : Type u} (H : HopfOps A) (a : A) :
     Path (H.comul2 a) (H.comul2 a) :=
   Path.refl (H.comul2 a)
 
-theorem thm17_hopf_antipode_congr {A : Type u} (H : HopfOps A)
+def thm17_hopf_antipode_congr {A : Type u} (H : HopfOps A)
     {a b : A} (p : Path a b) :
     Path (H.antipode a) (H.antipode b) :=
   Path.congrArg H.antipode p
 
-theorem thm18_hopf_counit_congr {A : Type u} (H : HopfOps A)
+def thm18_hopf_counit_congr {A : Type u} (H : HopfOps A)
     {a b : A} (p : Path a b) :
     Path (H.counit a) (H.counit b) :=
   Path.congrArg H.counit p
 
-theorem thm19_hopf_mul_congr_left {A : Type u} (H : HopfOps A)
+def thm19_hopf_mul_congr_left {A : Type u} (H : HopfOps A)
     (a : A) {b c : A} (p : Path b c) :
     Path (H.mul a b) (H.mul a c) :=
   Path.congrArg (fun x => H.mul a x) p
 
-theorem thm20_hopf_mul_congr_right {A : Type u} (H : HopfOps A)
+def thm20_hopf_mul_congr_right {A : Type u} (H : HopfOps A)
     (a : A) {b c : A} (p : Path b c) :
     Path (H.mul b a) (H.mul c a) :=
   Path.congrArg (fun x => H.mul x a) p
@@ -223,11 +223,11 @@ theorem thm22_hopf_symm_trans {A : Type u} {a b c : A}
 
 /-! ## `Uq(g)` path calculations -/
 
-theorem thm23_uq_gen_refl (g : QGen) :
+def thm23_uq_gen_refl (g : QGen) :
     Path (UqExpr.gen g) (UqExpr.gen g) :=
   mkReflPath (UqExpr.gen g)
 
-theorem thm24_uq_kAction_congr {a b : UqExpr}
+def thm24_uq_kAction_congr {a b : UqExpr}
     (p : Path a b) :
     Path (kAction a) (kAction b) :=
   Path.congrArg kAction p
@@ -244,17 +244,17 @@ theorem thm26_uq_kAction_symm {a b : UqExpr}
       Path.symm (Path.congrArg kAction p) := by
   simpa using Path.congrArg_symm kAction p
 
-theorem thm27_uq_tensor_congr_left (x : UqExpr) {a b : UqExpr}
+def thm27_uq_tensor_congr_left (x : UqExpr) {a b : UqExpr}
     (p : Path a b) :
     Path (UqExpr.tensor x a) (UqExpr.tensor x b) :=
   Path.congrArg (fun t => UqExpr.tensor x t) p
 
-theorem thm28_uq_comm_chain {a b : UqExpr}
+def thm28_uq_comm_chain {a b : UqExpr}
     (p : Path a b) :
     Path a a :=
   Path.trans p (Path.symm p)
 
-theorem thm29_uq_comm_chain_symm {a b : UqExpr}
+def thm29_uq_comm_chain_symm {a b : UqExpr}
     (p : Path a b) :
     Path b b :=
   Path.trans (Path.symm p) p
@@ -276,20 +276,20 @@ theorem thm32_uq_trans_refl_right {a b : UqExpr}
 
 /-! ## R-matrices and Yang-Baxter equation interface -/
 
-theorem thm33_yb_left_refl (r : RMatExpr) :
+def thm33_yb_left_refl (r : RMatExpr) :
     Path (ybLeft r) (ybLeft r) :=
   Path.refl (ybLeft r)
 
-theorem thm34_yb_right_refl (r : RMatExpr) :
+def thm34_yb_right_refl (r : RMatExpr) :
     Path (ybRight r) (ybRight r) :=
   Path.refl (ybRight r)
 
-theorem thm35_yb_bridge_symm {r1 r2 : RMatExpr}
+def thm35_yb_bridge_symm {r1 r2 : RMatExpr}
     (p : Path (ybLeft r1) (ybRight r2)) :
     Path (ybRight r2) (ybLeft r1) :=
   Path.symm p
 
-theorem thm36_yb_bridge_trans {r1 r2 r3 : RMatExpr}
+def thm36_yb_bridge_trans {r1 r2 r3 : RMatExpr}
     (p : Path (ybLeft r1) (ybRight r2))
     (q : Path (ybRight r2) (ybLeft r3)) :
     Path (ybLeft r1) (ybLeft r3) :=
@@ -302,7 +302,7 @@ theorem thm37_yb_bridge_assoc {r1 r2 r3 r4 : RMatExpr}
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
   simpa using Path.trans_assoc p q r
 
-theorem thm38_rInverse_congr {r s : RMatExpr}
+def thm38_rInverse_congr {r s : RMatExpr}
     (p : Path r s) :
     Path (RMatExpr.inverse r) (RMatExpr.inverse s) :=
   Path.congrArg RMatExpr.inverse p
@@ -332,16 +332,16 @@ theorem thm42_yb_toEq_bridge {r1 r2 : RMatExpr}
 
 /-! ## Quantum double and ribbon category coherence -/
 
-theorem thm43_qdouble_refl (d : QuantumDouble) :
+def thm43_qdouble_refl (d : QuantumDouble) :
     Path d d :=
   Path.refl d
 
-theorem thm44_qdouble_swap_congr {d1 d2 : QuantumDouble}
+def thm44_qdouble_swap_congr {d1 d2 : QuantumDouble}
     (p : Path d1 d2) :
     Path (qDoubleSwap d1) (qDoubleSwap d2) :=
   Path.congrArg qDoubleSwap p
 
-theorem thm45_qdouble_swap_symm {d1 d2 : QuantumDouble}
+def thm45_qdouble_swap_symm {d1 d2 : QuantumDouble}
     (p : Path d1 d2) :
     Path (qDoubleSwap d2) (qDoubleSwap d1) :=
   Path.symm (Path.congrArg qDoubleSwap p)
@@ -352,16 +352,16 @@ theorem thm46_qdouble_swap_roundtrip {d1 d2 : QuantumDouble}
       Path.congrArg qDoubleSwap p := by
   simpa using Path.symm_symm (Path.congrArg qDoubleSwap p)
 
-theorem thm47_ribbon_obj_refl (n : Nat) :
+def thm47_ribbon_obj_refl (n : Nat) :
     Path (RibbonExpr.obj n) (RibbonExpr.obj n) :=
   mkReflPath (RibbonExpr.obj n)
 
-theorem thm48_ribbon_tensor_congr_left (x : RibbonExpr)
+def thm48_ribbon_tensor_congr_left (x : RibbonExpr)
     {a b : RibbonExpr} (p : Path a b) :
     Path (RibbonExpr.tensor x a) (RibbonExpr.tensor x b) :=
   Path.congrArg (fun t => RibbonExpr.tensor x t) p
 
-theorem thm49_ribbon_tensor_congr_right (x : RibbonExpr)
+def thm49_ribbon_tensor_congr_right (x : RibbonExpr)
     {a b : RibbonExpr} (p : Path a b) :
     Path (RibbonExpr.tensor a x) (RibbonExpr.tensor b x) :=
   Path.congrArg (fun t => RibbonExpr.tensor t x) p
@@ -374,17 +374,17 @@ theorem thm50_ribbon_tensor_congr_trans (x : RibbonExpr)
         (Path.congrArg (fun t => RibbonExpr.tensor x t) q) := by
   simpa using Path.congrArg_trans (fun t => RibbonExpr.tensor x t) p q
 
-theorem thm51_ribbon_braiding_congr_left (x : RibbonExpr)
+def thm51_ribbon_braiding_congr_left (x : RibbonExpr)
     {a b : RibbonExpr} (p : Path a b) :
     Path (RibbonExpr.braiding x a) (RibbonExpr.braiding x b) :=
   Path.congrArg (fun t => RibbonExpr.braiding x t) p
 
-theorem thm52_ribbon_braiding_congr_right (x : RibbonExpr)
+def thm52_ribbon_braiding_congr_right (x : RibbonExpr)
     {a b : RibbonExpr} (p : Path a b) :
     Path (RibbonExpr.braiding a x) (RibbonExpr.braiding b x) :=
   Path.congrArg (fun t => RibbonExpr.braiding t x) p
 
-theorem thm53_ribbon_twist_congr {a b : RibbonExpr}
+def thm53_ribbon_twist_congr {a b : RibbonExpr}
     (p : Path a b) :
     Path (RibbonExpr.twist a) (RibbonExpr.twist b) :=
   Path.congrArg RibbonExpr.twist p
@@ -397,20 +397,20 @@ theorem thm54_ribbon_dual_symm_symm {a b : RibbonExpr}
 
 /-! ## Drinfeld center and Kazhdan-Lusztig wrappers -/
 
-theorem thm55_center_carrier_refl (c : CenterObj) :
+def thm55_center_carrier_refl (c : CenterObj) :
     Path c.carrier c.carrier :=
   Path.refl c.carrier
 
-theorem thm56_center_half_refl (c : CenterObj) :
+def thm56_center_half_refl (c : CenterObj) :
     Path c.halfBraiding c.halfBraiding :=
   Path.refl c.halfBraiding
 
-theorem thm57_center_congr_carrier {c1 c2 : CenterObj}
+def thm57_center_congr_carrier {c1 c2 : CenterObj}
     (p : Path c1 c2) :
     Path c1.carrier c2.carrier :=
   Path.congrArg CenterObj.carrier p
 
-theorem thm58_center_congr_half {c1 c2 : CenterObj}
+def thm58_center_congr_half {c1 c2 : CenterObj}
     (p : Path c1 c2) :
     Path c1.halfBraiding c2.halfBraiding :=
   Path.congrArg CenterObj.halfBraiding p
@@ -420,11 +420,11 @@ theorem thm59_center_trans_assoc {c1 c2 c3 c4 : CenterObj}
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
   simpa using Path.trans_assoc p q r
 
-theorem thm60_kl_bar_refl (k : KLExpr) :
+def thm60_kl_bar_refl (k : KLExpr) :
     Path (KLExpr.bar k) (KLExpr.bar k) :=
   Path.refl (KLExpr.bar k)
 
-theorem thm61_kl_bar_congr {a b : KLExpr}
+def thm61_kl_bar_congr {a b : KLExpr}
     (p : Path a b) :
     Path (KLExpr.bar a) (KLExpr.bar b) :=
   Path.congrArg KLExpr.bar p
@@ -443,26 +443,26 @@ theorem thm63_kl_bar_congr_trans {a b c : KLExpr}
 
 /-! ## Crystal and canonical bases -/
 
-theorem thm64_crystal_highest_refl (n : Nat) :
+def thm64_crystal_highest_refl (n : Nat) :
     Path (CrystalExpr.highest n) (CrystalExpr.highest n) :=
   Path.refl (CrystalExpr.highest n)
 
-theorem thm65_crystal_raise_congr (i : Nat) {a b : CrystalExpr}
+def thm65_crystal_raise_congr (i : Nat) {a b : CrystalExpr}
     (p : Path a b) :
     Path (CrystalExpr.raise i a) (CrystalExpr.raise i b) :=
   Path.congrArg (CrystalExpr.raise i) p
 
-theorem thm66_crystal_lower_congr (i : Nat) {a b : CrystalExpr}
+def thm66_crystal_lower_congr (i : Nat) {a b : CrystalExpr}
     (p : Path a b) :
     Path (CrystalExpr.lower i a) (CrystalExpr.lower i b) :=
   Path.congrArg (CrystalExpr.lower i) p
 
-theorem thm67_crystal_tensor_congr_left (x : CrystalExpr)
+def thm67_crystal_tensor_congr_left (x : CrystalExpr)
     {a b : CrystalExpr} (p : Path a b) :
     Path (CrystalExpr.tensor x a) (CrystalExpr.tensor x b) :=
   Path.congrArg (fun t => CrystalExpr.tensor x t) p
 
-theorem thm68_crystal_tensor_congr_right (x : CrystalExpr)
+def thm68_crystal_tensor_congr_right (x : CrystalExpr)
     {a b : CrystalExpr} (p : Path a b) :
     Path (CrystalExpr.tensor a x) (CrystalExpr.tensor b x) :=
   Path.congrArg (fun t => CrystalExpr.tensor t x) p
@@ -475,26 +475,26 @@ theorem thm69_crystal_tensor_congr_trans (x : CrystalExpr)
         (Path.congrArg (fun t => CrystalExpr.tensor x t) q) := by
   simpa using Path.congrArg_trans (fun t => CrystalExpr.tensor x t) p q
 
-theorem thm70_canonical_basis_refl (n : Nat) :
+def thm70_canonical_basis_refl (n : Nat) :
     Path (CanonicalExpr.basis n) (CanonicalExpr.basis n) :=
   mkReflPath (CanonicalExpr.basis n)
 
-theorem thm71_canonical_bar_congr {a b : CanonicalExpr}
+def thm71_canonical_bar_congr {a b : CanonicalExpr}
     (p : Path a b) :
     Path (CanonicalExpr.bar a) (CanonicalExpr.bar b) :=
   Path.congrArg CanonicalExpr.bar p
 
-theorem thm72_canonical_dual_congr {a b : CanonicalExpr}
+def thm72_canonical_dual_congr {a b : CanonicalExpr}
     (p : Path a b) :
     Path (CanonicalExpr.dual a) (CanonicalExpr.dual b) :=
   Path.congrArg CanonicalExpr.dual p
 
-theorem thm73_canonical_prod_congr_left (x : CanonicalExpr)
+def thm73_canonical_prod_congr_left (x : CanonicalExpr)
     {a b : CanonicalExpr} (p : Path a b) :
     Path (CanonicalExpr.prod x a) (CanonicalExpr.prod x b) :=
   Path.congrArg (fun t => CanonicalExpr.prod x t) p
 
-theorem thm74_canonical_prod_congr_right (x : CanonicalExpr)
+def thm74_canonical_prod_congr_right (x : CanonicalExpr)
     {a b : CanonicalExpr} (p : Path a b) :
     Path (CanonicalExpr.prod a x) (CanonicalExpr.prod b x) :=
   Path.congrArg (fun t => CanonicalExpr.prod t x) p
@@ -538,5 +538,60 @@ theorem thm81_canonical_toEq_roundtrip {a b : CanonicalExpr}
     (p : Path a b) :
     Path.toEq (Path.trans p (Path.symm p)) = rfl := by
   simpa using Path.toEq_trans_symm p
+
+theorem thm82_hopf_mul_refl_toEq {A : Type u} (H : HopfOps A) (a b : A) :
+    Path.toEq (thm13_hopf_mul_refl H a b) = rfl := rfl
+
+theorem thm83_hopf_unit_refl_toEq {A : Type u} (H : HopfOps A) :
+    Path.toEq (thm14_hopf_unit_refl H) = rfl := rfl
+
+theorem thm84_uq_gen_refl_toEq (g : QGen) :
+    Path.toEq (thm23_uq_gen_refl g) = rfl := rfl
+
+theorem thm85_yb_left_refl_toEq (r : RMatExpr) :
+    Path.toEq (thm33_yb_left_refl r) = rfl := rfl
+
+theorem thm86_qdouble_refl_toEq (d : QuantumDouble) :
+    Path.toEq (thm43_qdouble_refl d) = rfl := rfl
+
+theorem thm87_ribbon_obj_refl_toEq (n : Nat) :
+    Path.toEq (thm47_ribbon_obj_refl n) = rfl := rfl
+
+theorem thm88_center_carrier_refl_toEq (c : CenterObj) :
+    Path.toEq (thm55_center_carrier_refl c) = rfl := rfl
+
+theorem thm89_kl_bar_refl_toEq (k : KLExpr) :
+    Path.toEq (thm60_kl_bar_refl k) = rfl := rfl
+
+theorem thm90_crystal_highest_refl_toEq (n : Nat) :
+    Path.toEq (thm64_crystal_highest_refl n) = rfl := rfl
+
+theorem thm91_canonical_basis_refl_toEq (n : Nat) :
+    Path.toEq (thm70_canonical_basis_refl n) = rfl := rfl
+
+theorem thm92_hopf_antipode_congr_toEq {A : Type u} (H : HopfOps A)
+    {a b : A} (p : Path a b) :
+    Path.toEq (thm17_hopf_antipode_congr H p) =
+      _root_.congrArg H.antipode (Path.toEq p) := rfl
+
+theorem thm93_uq_kAction_congr_toEq {a b : UqExpr}
+    (p : Path a b) :
+    Path.toEq (thm24_uq_kAction_congr p) =
+      _root_.congrArg kAction (Path.toEq p) := rfl
+
+theorem thm94_rInverse_congr_toEq {r s : RMatExpr}
+    (p : Path r s) :
+    Path.toEq (thm38_rInverse_congr p) =
+      _root_.congrArg RMatExpr.inverse (Path.toEq p) := rfl
+
+theorem thm95_canonical_bar_congr_toEq {a b : CanonicalExpr}
+    (p : Path a b) :
+    Path.toEq (thm71_canonical_bar_congr p) =
+      _root_.congrArg CanonicalExpr.bar (Path.toEq p) := rfl
+
+theorem thm96_crystal_raise_congr_toEq (i : Nat) {a b : CrystalExpr}
+    (p : Path a b) :
+    Path.toEq (thm65_crystal_raise_congr i p) =
+      _root_.congrArg (CrystalExpr.raise i) (Path.toEq p) := rfl
 
 end ComputationalPaths.Path.Algebra.QuantumGroupsDeep
