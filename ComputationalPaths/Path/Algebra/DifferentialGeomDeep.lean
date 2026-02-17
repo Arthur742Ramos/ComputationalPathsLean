@@ -107,7 +107,7 @@ def transitionMap {M : Type u} {R : Type v}
 def transition_self {M : Type u} {R : Type v}
     (c : ChartData M R) (r : R) :
     Path (transitionMap c c r) r :=
-  Path.trans (Path.congrArg c.toCoord (c.roundtrip (c.fromCoord r)))
+  Path.trans (congrArg c.toCoord (c.roundtrip (c.fromCoord r)))
              (c.coordRoundtrip r)
 
 /-- Def 2: Chart double roundtrip. -/
