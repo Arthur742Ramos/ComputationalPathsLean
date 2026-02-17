@@ -435,6 +435,10 @@ theorem PadicStep.deterministic {s t₁ t₂ : PadicState}
 /-- Modular equivalence. -/
 def ModEq (m a b : Nat) : Prop := a % m = b % m
 
+instance modEqDecidable (m a b : Nat) : Decidable (ModEq m a b) := by
+  unfold ModEq
+  infer_instance
+
 /-- Theorem 46: ModEq is reflexive. -/
 theorem modEq_refl (m a : Nat) : ModEq m a a := rfl
 
@@ -520,7 +524,7 @@ def full_distribute_path (a b c : NVal) :
 
 /-- A number is prime if it's ≥ 2 and has no divisors other than 1 and itself. -/
 def isPrime (n : Nat) : Bool :=
-  n ≥ 2 && ((List.range n).filter (fun d => d ≥ 2 && n % d == 0)).length == 0
+  decide (n ≥ 2) && ((List.range n).filter (fun d => decide (d ≥ 2) && n % d == 0)).length == 0
 
 /-- Theorem 61: 2 is prime. -/
 theorem two_prime : isPrime 2 = true := by native_decide
