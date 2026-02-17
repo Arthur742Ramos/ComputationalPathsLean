@@ -534,4 +534,44 @@ theorem five_prime : isPrime 5 = true := by native_decide
 /-- Theorem 64: 7 is prime. -/
 theorem seven_prime : isPrime 7 = true := by native_decide
 
+/-! ## §19 Additional multi-step computational paths -/
+
+/-- Theorem 65: Reassociate-swap-reassociate on addition. -/
+def add_reassoc_swap_path (a b c : NVal) :
+    Path (nadd (nadd a b) c) (nadd (nadd a c) b) :=
+  Path.trans
+    (stepPath (NTStep.add_assoc a b c))
+    (Path.trans
+      (Path.congrArg (nadd a) (stepPath (NTStep.add_comm b c)))
+      (Path.symm (stepPath (NTStep.add_assoc a c b))))
+
+/-- Theorem 66: Reassociate-swap-reassociate on multiplication. -/
+def mul_reassoc_swap_path (a b c : NVal) :
+    Path (nmul (nmul a b) c) (nmul (nmul a c) b) :=
+  Path.trans
+    (stepPath (NTStep.mul_assoc a b c))
+    (Path.trans
+      (Path.congrArg (nmul a) (stepPath (NTStep.mul_comm b c)))
+      (Path.symm (stepPath (NTStep.mul_assoc a c b))))
+
+/-- Theorem 67: Distribution + local commutativity in both summands. -/
+def dist_double_comm_path (a b c : NVal) :
+    Path (nmul a (nadd b c)) (nadd (nmul b a) (nmul c a)) :=
+  Path.trans
+    (dist_path a b c)
+    (Path.trans
+      (Path.congrArg (fun x => nadd x (nmul a c)) (mul_comm_path a b))
+      (Path.congrArg (nadd (nmul b a)) (mul_comm_path a c)))
+
+/-- Theorem 68: Multiply by one roundtrip. -/
+def mul_one_roundtrip_path (a : NVal) : Path a a :=
+  Path.trans (Path.symm (mul_one_path a)) (mul_one_path a)
+
+/-- Theorem 69: Add zero roundtrip nested under multiplication. -/
+def mul_add_zero_roundtrip_path (a b : NVal) :
+    Path (nmul a b) (nmul a b) :=
+  Path.trans
+    (Path.congrArg (nmul a) (add_zero_symm_path b))
+    (Path.congrArg (nmul a) (add_zero_path b))
+
 end ComputationalPaths.Path.Algebra.NumberTheoryDeep
