@@ -44,7 +44,7 @@ universe u v w
 -- ============================================================================
 
 /-- Rewrite steps for differential geometry. -/
-inductive DiffGeoStep : ℕ → ℕ → Prop where
+inductive DiffGeoStep : ℕ → ℕ → Type where
   | chart_transition (a : ℕ) : DiffGeoStep a a
   | parallel_transport (a b : ℕ) (h : a = b) : DiffGeoStep a b
   | covariant_deriv (a : ℕ) : DiffGeoStep a a
