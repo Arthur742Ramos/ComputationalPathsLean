@@ -14,7 +14,6 @@ in covering spaces, phrased in the computational paths framework.
 - HoTT Book, Chapter 8.4
 -/
 
-import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
 
 namespace ComputationalPaths

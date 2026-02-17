@@ -26,7 +26,6 @@ making them "fibrations" in the type-theoretic sense.
 -/
 
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
-import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 
 namespace ComputationalPaths

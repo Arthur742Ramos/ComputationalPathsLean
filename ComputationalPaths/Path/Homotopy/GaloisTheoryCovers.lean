@@ -21,7 +21,6 @@ actions, and the deck-transformation viewpoint on Galois groups.
 - HoTT Book, Chapter 8
 -/
 
-import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.GroupoidCovering
 import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid

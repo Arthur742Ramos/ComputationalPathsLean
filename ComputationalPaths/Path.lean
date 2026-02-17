@@ -100,7 +100,6 @@ import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Homotopy.AcyclicModels
 import ComputationalPaths.Path.Homotopy.PathHomology
 import ComputationalPaths.Path.Homotopy.MapperAlgorithm
-import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
 import ComputationalPaths.Path.Homotopy.GroupoidCovering
@@ -217,7 +216,6 @@ import ComputationalPaths.Path.CompPath.MilnorFibration
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.InfinityGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
-import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
@@ -373,7 +371,6 @@ import ComputationalPaths.Path.Algebra.CoxeterGroups
 import ComputationalPaths.Path.Algebra.CombHopfAlgebras
 import ComputationalPaths.Path.Algebra.EtaleCohomology
 import ComputationalPaths.Path.Algebra.ArithmeticPaths
-import ComputationalPaths.Path.Algebra.IntegerPaths
 import ComputationalPaths.Path.Algebra.PolynomialPaths
 import ComputationalPaths.Path.Algebra.MatrixPaths
 import ComputationalPaths.Path.Topology.ChromaticHomotopy
@@ -435,7 +432,6 @@ import ComputationalPaths.Path.Topology.MetricPaths
 import ComputationalPaths.Path.Topology.GeodeticPaths
 import ComputationalPaths.Path.Topology.UniformPaths
 import ComputationalPaths.Path.Topology.CompactPaths
-import ComputationalPaths.Path.Homotopy.SimplicialPaths
 import ComputationalPaths.Path.Homotopy.CubicalPaths
 import ComputationalPaths.Path.Homotopy.ChainComplexPaths
 import ComputationalPaths.Path.Homotopy.CWComplexPaths
@@ -443,7 +439,6 @@ import ComputationalPaths.Path.Category.OperadPaths
 import ComputationalPaths.Path.Category.MultiCategoryPaths
 import ComputationalPaths.Path.Category.DoubleCategoryPaths
 import ComputationalPaths.Path.Category.HigherCategoryPaths
-import ComputationalPaths.Path.TypeTheory.WTypePaths
 import ComputationalPaths.Path.TypeTheory.InductiveTypePaths
 import ComputationalPaths.Path.TypeTheory.IdentityTypePaths
 import ComputationalPaths.Path.TypeTheory.UnivalencePaths
@@ -455,6 +450,5 @@ import ComputationalPaths.Path.HoTT.UnivalenceDeep
 import ComputationalPaths.Path.Rewriting.HigherRewritingDeep
 import ComputationalPaths.Path.Rewriting.KnuthBendixDeep
 import ComputationalPaths.Path.Rewriting.CoherenceDeep
-import ComputationalPaths.Path.Rewriting.StringRewritingDeep
 import ComputationalPaths.Path.Homotopy.CubicalDeep
 import ComputationalPaths.Path.Algebra.CompletionDeep
