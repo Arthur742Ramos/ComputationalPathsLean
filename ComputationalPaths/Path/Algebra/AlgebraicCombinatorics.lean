@@ -194,11 +194,13 @@ theorem schurExpansionTerm_zero (P : Partition) :
 
 def rs_shape_path (R : RobinsonSchenstedPair) :
     Path (rsShapeAgreement R) (rsShapeAgreement R) :=
-  Path.refl _
+  Path.trans
+    (Path.congrArg (fun n => n) (Path.refl (rsShapeAgreement R)))
+    (Path.symm (Path.congrArg (fun n => n) (Path.refl (rsShapeAgreement R))))
 
 def rs_shape_path_trans (R : RobinsonSchenstedPair) :
     Path (rsShapeAgreement R) (rsShapeAgreement R) :=
-  Path.trans (Path.refl _) (Path.refl _)
+  Path.trans (rs_shape_path R) (Path.symm (rs_shape_path R))
 
 end AlgebraicCombinatorics
 end Algebra
