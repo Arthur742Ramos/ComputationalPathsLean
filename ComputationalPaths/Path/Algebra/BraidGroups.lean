@@ -212,7 +212,7 @@ def jones_unknot_path {n : Nat} {B : BraidGroupAlg n} (J : JonesData n B) :
 /-! ## Rewrite Steps -/
 
 /-- Rewrite steps for braid group reasoning. -/
-inductive BraidStep : {A : Type u} → A → A → Type u
+inductive BraidStep : {A : Type u} → A → A → Type (u + 2)
   | far_comm {n : Nat} {B : BraidGroupAlg n} {i j : Fin (n - 1)}
       (h : i.val + 2 ≤ j.val ∨ j.val + 2 ≤ i.val) :
       BraidStep (B.mul (B.sigma i) (B.sigma j))

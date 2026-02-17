@@ -224,6 +224,36 @@ variable {n : Nat}
       | _ w₂ =>
           simp [BouquetFreeGroup.mul, BouquetFreeGroup.inv, BouquetWord.inverse_wordConcat]
 
+/-- Path-level associativity witness with explicit path combinators. -/
+theorem mul_assoc_path (x y z : BouquetFreeGroup n) :
+    Path (BouquetFreeGroup.mul (BouquetFreeGroup.mul x y) z)
+      (BouquetFreeGroup.mul x (BouquetFreeGroup.mul y z)) := by
+  let hAssoc :
+      Path (BouquetFreeGroup.mul (BouquetFreeGroup.mul x y) z)
+        (BouquetFreeGroup.mul x (BouquetFreeGroup.mul y z)) :=
+    Path.mk [] (mul_assoc (x := x) (y := y) (z := z))
+  exact
+    Path.trans
+      (Path.trans
+        (Path.symm (Path.refl (BouquetFreeGroup.mul (BouquetFreeGroup.mul x y) z)))
+        (Path.congrArg (fun t => t) hAssoc))
+      (Path.refl (BouquetFreeGroup.mul x (BouquetFreeGroup.mul y z)))
+
+/-- Path-level inversion law with explicit path composition. -/
+theorem inv_mul_path (x y : BouquetFreeGroup n) :
+    Path (BouquetFreeGroup.inv (BouquetFreeGroup.mul x y))
+      (BouquetFreeGroup.mul (BouquetFreeGroup.inv y) (BouquetFreeGroup.inv x)) := by
+  let hInv :
+      Path (BouquetFreeGroup.inv (BouquetFreeGroup.mul x y))
+        (BouquetFreeGroup.mul (BouquetFreeGroup.inv y) (BouquetFreeGroup.inv x)) :=
+    Path.mk [] (inv_mul (x := x) (y := y))
+  exact
+    Path.trans
+      (Path.symm (Path.refl (BouquetFreeGroup.inv (BouquetFreeGroup.mul x y))))
+      (Path.trans
+        (Path.congrArg (fun t => t) hInv)
+        (Path.refl (BouquetFreeGroup.mul (BouquetFreeGroup.inv y) (BouquetFreeGroup.inv x))))
+
 /-- Strict monoid structure on `BouquetFreeGroup`. -/
 @[simp] noncomputable def strictMonoid (n : Nat) : StrictMonoid (BouquetFreeGroup n) where
   mul := BouquetFreeGroup.mul

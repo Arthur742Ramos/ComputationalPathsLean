@@ -147,6 +147,12 @@ def block_char_trans {O : CategoryOData.{u}} {cc : CentralCharacter O}
     Path (cc.charOf (B.toObj M)) (cc.charOf (B.toObj N)) :=
   Path.trans (B.has_char M) (Path.symm (B.has_char N))
 
+/-- Path.congrArg on block character transitions. -/
+def block_char_trans_congr {O : CategoryOData.{u}} {cc : CentralCharacter O}
+    (B : Block O cc) (M N : B.obj) (f : cc.CChar → cc.CChar) :
+    Path (f (cc.charOf (B.toObj M))) (f (cc.charOf (B.toObj N))) :=
+  Path.congrArg f (block_char_trans B M N)
+
 /-- Path.trans for associativity of block composition. -/
 def block_triple_compose {O : CategoryOData.{u}} {cc : CentralCharacter O}
     (B : Block O cc) (L M N : B.obj) :

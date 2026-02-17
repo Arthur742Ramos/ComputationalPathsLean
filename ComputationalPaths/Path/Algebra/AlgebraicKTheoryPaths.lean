@@ -146,13 +146,13 @@ structure BassFundamental (R : Type u) where
   splitting : (i : Nat) → ∀ x : kR i, Path (retract i (inclusion i x)) x
 
 /-- Congruence of the Bass splitting path under inclusion. -/
-theorem bass_splitting_congr {R : Type u} (B : BassFundamental R)
+def bass_splitting_congr {R : Type u} (B : BassFundamental R)
     (i : Nat) (x : B.kR i) :
     Path (B.inclusion i (B.retract i (B.inclusion i x))) (B.inclusion i x) :=
   Path.congrArg (B.inclusion i) (B.splitting i x)
 
 /-- Two-step loop from the Bass splitting witness. -/
-theorem bass_splitting_loop {R : Type u} (B : BassFundamental R)
+def bass_splitting_loop {R : Type u} (B : BassFundamental R)
     (i : Nat) (x : B.kR i) :
     Path (B.inclusion i x) (B.inclusion i x) :=
   Path.trans (Path.symm (bass_splitting_congr B i x)) (bass_splitting_congr B i x)

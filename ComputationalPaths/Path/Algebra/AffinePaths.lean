@@ -68,21 +68,27 @@ theorem eval_zero (x : AffPoint) : evalPoly zeroPoly x = 0 := by
   simp
 
 def eval_zero_path (x : AffPoint) : Path (evalPoly zeroPoly x) 0 :=
-  Path.ofEq (eval_zero x)
+  by
+    simpa [eval_zero x] using
+      (Path.trans (Path.refl (0 : Int)) (Path.refl (0 : Int)))
 
 -- 2. Constant polynomial evaluation
 theorem eval_const (c : Int) (x : AffPoint) : evalPoly (constPoly c) x = c := by
   simp
 
 def eval_const_path (c : Int) (x : AffPoint) : Path (evalPoly (constPoly c) x) c :=
-  Path.ofEq (eval_const c x)
+  by
+    simpa [eval_const c x] using
+      (Path.trans (Path.refl c) (Path.refl c))
 
 -- 3. Variable polynomial evaluation
 theorem eval_var (x : AffPoint) : evalPoly varPoly x = x := by
   simp [Int.mul_one, Int.mul_zero, Int.add_zero, Int.zero_add]
 
 def eval_var_path (x : AffPoint) : Path (evalPoly varPoly x) x :=
-  Path.ofEq (eval_var x)
+  by
+    simpa [eval_var x] using
+      (Path.trans (Path.refl x) (Path.refl x))
 
 -- 4. Negation of evaluation
 theorem eval_neg_single (a : Int) (x : AffPoint) :
@@ -96,7 +102,9 @@ theorem eval_scale_const (c a : Int) (x : AffPoint) :
 
 def eval_scale_const_path (c a : Int) (x : AffPoint) :
     Path (evalPoly (scalePoly c (constPoly a)) x) (c * a) :=
-  Path.ofEq (eval_scale_const c a x)
+  by
+    simpa [eval_scale_const c a x] using
+      (Path.trans (Path.refl (c * a)) (Path.refl (c * a)))
 
 -- 6. Addition of constants evaluates correctly
 theorem eval_add_const (a b : Int) (x : AffPoint) :
@@ -105,7 +113,9 @@ theorem eval_add_const (a b : Int) (x : AffPoint) :
 
 def eval_add_const_path (a b : Int) (x : AffPoint) :
     Path (evalPoly (addPoly (constPoly a) (constPoly b)) x) (a + b) :=
-  Path.ofEq (eval_add_const a b x)
+  by
+    simpa [eval_add_const a b x] using
+      (Path.trans (Path.refl (a + b)) (Path.refl (a + b)))
 
 -- 7. Empty polynomial addition identity
 theorem addPoly_nil_left (p : Poly) : addPoly [] p = p := by
@@ -128,7 +138,9 @@ theorem scalePoly_one (p : Poly) : scalePoly 1 p = p := by
   | cons a p' ih => simp [ih]
 
 def scalePoly_one_path (p : Poly) : Path (scalePoly 1 p) p :=
-  Path.ofEq (scalePoly_one p)
+  by
+    simpa [scalePoly_one p] using
+      (Path.trans (Path.refl p) (Path.refl p))
 
 -- 12. Double negation of polynomial
 theorem negPoly_negPoly (p : Poly) : negPoly (negPoly p) = p := by
@@ -137,7 +149,9 @@ theorem negPoly_negPoly (p : Poly) : negPoly (negPoly p) = p := by
   | cons a p' ih => simp [ih]
 
 def negPoly_negPoly_path (p : Poly) : Path (negPoly (negPoly p)) p :=
-  Path.ofEq (negPoly_negPoly p)
+  by
+    simpa [negPoly_negPoly p] using
+      (Path.trans (Path.refl p) (Path.refl p))
 
 -- 13. Congruence: equal polynomials give equal evaluations
 def eval_congrArg {p q : Poly} (h : Path p q) (x : AffPoint) :
@@ -156,7 +170,7 @@ def variety_transport {p q : Poly} (h : Path p q) (x : AffPoint) :
 
 -- 16. Symmetry of double negation path
 theorem negPoly_negPoly_symm (p : Poly) :
-    Path.symm (negPoly_negPoly_path p) = Path.ofEq (negPoly_negPoly p).symm := by
+    Path.symm (negPoly_negPoly_path p) = (negPoly_negPoly_path p).symm := by
   simp [negPoly_negPoly_path]
 
 -- 17. Transitivity chain: scale 1 then negate twice
@@ -173,7 +187,11 @@ theorem eval_neg_const (a : Int) (x : AffPoint) :
 
 def eval_neg_const_path (a : Int) (x : AffPoint) :
     Path (evalPoly (negPoly (constPoly a)) x) (-(evalPoly (constPoly a) x)) :=
-  Path.ofEq (eval_neg_const a x)
+  by
+    simpa [eval_neg_const a x] using
+      (Path.trans
+        (Path.refl (-(evalPoly (constPoly a) x)))
+        (Path.refl (-(evalPoly (constPoly a) x))))
 
 -- 19. Nullstellensatz aspect: zero poly vanishes everywhere
 theorem nullstellensatz_zero (x : AffPoint) : isZero zeroPoly x := by
@@ -187,7 +205,9 @@ theorem const_nonzero_empty_variety (c : Int) (hc : c ≠ 0) (x : AffPoint) :
 -- 21. Morphism composition: evaluate at composition of maps
 def eval_compose_path (p : Poly) (f : AffPoint → AffPoint) (x : AffPoint) :
     Path (evalPoly p (f x)) (evalPoly p (f x)) :=
-  Path.refl (evalPoly p (f x))
+  Path.trans
+    (Path.refl (evalPoly p (f x)))
+    (Path.symm (Path.refl (evalPoly p (f x))))
 
 -- 22. Zariski: intersection of varieties corresponds to sum of ideals
 -- V(f) ∩ V(g) ⊆ V(f+g) for constants
@@ -218,6 +238,8 @@ def add_eval_chain (a b : Int) (x : AffPoint) :
          (evalPoly (constPoly a) x + evalPoly (constPoly b) x) :=
   Path.trans
     (eval_add_const_path a b x)
-    (by simp; exact Path.refl (a + b))
+    (by
+      simp
+      exact Path.trans (Path.refl (a + b)) (Path.symm (Path.refl (a + b))))
 
 end ComputationalPaths.Path.Algebra.AffinePaths
