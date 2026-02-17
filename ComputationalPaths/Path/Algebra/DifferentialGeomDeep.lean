@@ -383,6 +383,7 @@ def flat_parallel_single {M : Type u} {R : Type v}
     Path (parallelTransport flatConnection p [d] v) v.components := by
   unfold parallelTransport flatConnection
   simp [List.foldl]
+  exact Path.refl _
 
 /-- Def 25: Flat parallel transport along two steps. -/
 def flat_parallel_two {M : Type u} {R : Type v}
@@ -390,6 +391,7 @@ def flat_parallel_two {M : Type u} {R : Type v}
     Path (parallelTransport flatConnection p [d₁, d₂] v) v.components := by
   unfold parallelTransport flatConnection
   simp [List.foldl]
+  exact Path.refl _
 
 /-- Def 26: Flat parallel transport along any list. -/
 def flat_parallel_any {M : Type u} {R : Type v}
@@ -397,9 +399,9 @@ def flat_parallel_any {M : Type u} {R : Type v}
     Path (parallelTransport flatConnection p dirs v) v.components := by
   unfold parallelTransport flatConnection
   induction dirs with
-  | nil => simp [List.foldl]
+  | nil => simp [List.foldl]; exact Path.refl _
   | cons d ds ih =>
-    simp [List.foldl] at ih ⊢
+    simp only [List.foldl] at ih ⊢
     exact ih
 
 -- ============================================================================
