@@ -44,16 +44,16 @@ universe u v w
 -- ============================================================================
 
 /-- Rewrite steps for differential geometry. -/
-inductive DiffGeoStep (R : Type u) : R → R → Prop where
-  | chart_transition (a : R) : DiffGeoStep a a
-  | parallel_transport (a b : R) (h : a = b) : DiffGeoStep a b
-  | covariant_deriv (a : R) : DiffGeoStep a a
-  | curvature_identity (a b : R) (h : a = b) : DiffGeoStep a b
-  | geodesic_eq (a : R) : DiffGeoStep a a
+inductive DiffGeoStep : ℕ → ℕ → Prop where
+  | chart_transition (a : ℕ) : DiffGeoStep a a
+  | parallel_transport (a b : ℕ) (h : a = b) : DiffGeoStep a b
+  | covariant_deriv (a : ℕ) : DiffGeoStep a a
+  | curvature_identity (a b : ℕ) (h : a = b) : DiffGeoStep a b
+  | geodesic_eq (a : ℕ) : DiffGeoStep a a
 
 /-- Every DiffGeoStep yields a Path. -/
-def DiffGeoStep.toPath {R : Type u} {a b : R}
-    (s : DiffGeoStep R a b) : Path a b :=
+def DiffGeoStep.toPath {a b : ℕ}
+    (s : DiffGeoStep a b) : Path a b :=
   match s with
   | .chart_transition _ => Path.refl _
   | .parallel_transport _ _ h => Path.stepChain h
@@ -107,8 +107,7 @@ def transitionMap {M : Type u} {R : Type v}
 def transition_self {M : Type u} {R : Type v}
     (c : ChartData M R) (r : R) :
     Path (transitionMap c c r) r :=
-  Path.trans (congrArg c.toCoord (c.roundtrip (c.fromCoord r)))
-             (c.coordRoundtrip r)
+  c.coordRoundtrip r
 
 /-- Def 2: Chart double roundtrip. -/
 def chart_double_roundtrip {M : Type u} {R : Type v}

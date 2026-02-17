@@ -140,7 +140,7 @@ structure OrlikSolomon (A : Arrangement.{u}) where
   /-- Boundary map ∂. -/
   boundary : ∀ {p}, grade p → grade (p - 1)
   /-- ∂² = 0 (Path). -/
-  boundary_sq : ∀ {p} (x : grade p) (z : grade (p - 1 - 1)),
+  boundary_sq : ∀ {p} (_x : grade p) (z : grade (p - 1 - 1)),
     Path z z
   /-- Rank of grade p = |μ| sum over codim-p flats (Path). -/
   rank_formula : ∀ (p : Nat), Path p p
@@ -182,7 +182,7 @@ structure FreeArrangement (A : Arrangement.{u}) where
   /-- Exponents of the arrangement. -/
   exponents : List Nat
   /-- Sum of exponents = |𝒜| (Path). -/
-  exp_sum : ∀ (n : Nat),
+  exp_sum : ∀ (_n : Nat),
     Path (exponents.length) (exponents.length)
   /-- Factorization of χ: χ(t) = Π (t - e_i) (Path). -/
   chi_factors : Path A.dim A.dim

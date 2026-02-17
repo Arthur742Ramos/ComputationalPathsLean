@@ -193,7 +193,7 @@ structure LazardRing where
   /-- The universal FGL over L. -/
   universalFGL : FormalGroupLaw carrier ring
   /-- Universality: for any FGL over R, there exists a unique ring map L → R. -/
-  classify : ∀ (R : Type u) (Ri : CommRing R) (F : FormalGroupLaw R Ri),
+  classify : ∀ (R : Type u) (Ri : CommRing R) (_F : FormalGroupLaw R Ri),
     carrier → R
 
 /-- Path witnessing that the Lazard ring classifies the additive FGL via
