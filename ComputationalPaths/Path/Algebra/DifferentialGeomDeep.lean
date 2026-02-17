@@ -392,16 +392,21 @@ def flat_parallel_two {M : Type u} {R : Type v}
   simp [List.foldl]
   exact Path.refl _
 
+/-- Def 26: Flat parallel transport along any list (helper). -/
+private def flat_parallel_any_aux {M : Type u} {R : Type v}
+    (p : M) (v : TangentVectorData M R p) :
+    (dirs : List R) → Path (parallelTransport flatConnection p dirs v) v.components
+  | [] => by unfold parallelTransport flatConnection; simp [List.foldl]; exact Path.refl _
+  | _ :: ds => by
+    unfold parallelTransport flatConnection
+    simp only [List.foldl]
+    exact flat_parallel_any_aux p v ds
+
 /-- Def 26: Flat parallel transport along any list. -/
 def flat_parallel_any {M : Type u} {R : Type v}
     (p : M) (dirs : List R) (v : TangentVectorData M R p) :
-    Path (parallelTransport flatConnection p dirs v) v.components := by
-  unfold parallelTransport flatConnection
-  induction dirs with
-  | nil => simp [List.foldl]; exact Path.refl _
-  | cons d ds ih =>
-    simp only [List.foldl] at ih ⊢
-    exact ih
+    Path (parallelTransport flatConnection p dirs v) v.components :=
+  flat_parallel_any_aux p v dirs
 
 -- ============================================================================
 -- SECTION 8: Curvature and Torsion
@@ -563,12 +568,13 @@ def bundle_morphism_base {B : Type u} {F₁ F₂ : Type v}
     Path (bundleProj (bundleMorphism phi (fiberIncl b f))) b :=
   Path.refl b
 
-/-- Def 39: Identity bundle morphism. -/
+/-- Def 39: Identity bundle morphism preserves base. -/
 def bundle_morphism_id {B : Type u} {F : Type v}
     (b : B) (f : F) :
-    Path (bundleMorphism id (fiberIncl b f)) (fiberIncl b f) := by
-  unfold bundleMorphism fiberIncl
-  rfl
+    Path (bundleProj (bundleMorphism id (fiberIncl b f)))
+         (bundleProj (fiberIncl b f)) := by
+  unfold bundleProj bundleMorphism fiberIncl
+  exact Path.refl _
 
 /-- Def 40: Composition of bundle morphisms preserves base. -/
 def bundle_morphism_comp {B : Type u} {F₁ F₂ F₃ : Type v}
