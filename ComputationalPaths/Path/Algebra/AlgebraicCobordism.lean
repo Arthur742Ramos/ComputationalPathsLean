@@ -106,31 +106,35 @@ private def addCoeff (R : Type u) (Ri : CommRing R) (i j : Nat) : R :=
   else if i = 0 ∧ j = 1 then Ri.one
   else Ri.zero
 
+/-- Build a reflexive path through congruence and composition. -/
+private def path_self_chain {A : Type u} (a : A) : Path a a :=
+  Path.trans (Path.congrArg (fun x => x) (Path.refl a)) (Path.symm (Path.refl a))
+
 def additiveFGL (R : Type u) (Ri : CommRing R) : FormalGroupLaw R Ri where
   series := { coeff := addCoeff R Ri }
-  unit_left_0 := by unfold addCoeff; simp; exact Path.refl _
-  unit_left_1 := by unfold addCoeff; simp; exact Path.refl _
+  unit_left_0 := by unfold addCoeff; simp; exact path_self_chain _
+  unit_left_1 := by unfold addCoeff; simp; exact path_self_chain _
   unit_left_higher := fun i hi => by
     unfold addCoeff
     simp [show ¬(i = 1) from by omega, show ¬(i = 0) from by omega]
-    exact Path.refl _
-  unit_right_0 := by unfold addCoeff; simp; exact Path.refl _
-  unit_right_1 := by unfold addCoeff; simp; exact Path.refl _
+    exact path_self_chain _
+  unit_right_0 := by unfold addCoeff; simp; exact path_self_chain _
+  unit_right_1 := by unfold addCoeff; simp; exact path_self_chain _
   unit_right_higher := fun j hj => by
     unfold addCoeff
     simp [show ¬(j = 1) from by omega, show ¬(j = 0) from by omega]
-    exact Path.refl _
+    exact path_self_chain _
   comm := fun i j => by
     unfold addCoeff
     by_cases h1 : i = 1 ∧ j = 0
-    · obtain ⟨rfl, rfl⟩ := h1; simp; exact Path.refl _
+    · obtain ⟨rfl, rfl⟩ := h1; simp; exact path_self_chain _
     · by_cases h2 : i = 0 ∧ j = 1
-      · obtain ⟨rfl, rfl⟩ := h2; simp; exact Path.refl _
+      · obtain ⟨rfl, rfl⟩ := h2; simp; exact path_self_chain _
       · by_cases h3 : j = 1 ∧ i = 0
         · obtain ⟨rfl, rfl⟩ := h3; simp at h2
         · by_cases h4 : j = 0 ∧ i = 1
           · obtain ⟨rfl, rfl⟩ := h4; simp at h1
-          · simp [h1, h2, h3, h4]; exact Path.refl _
+          · simp [h1, h2, h3, h4]; exact path_self_chain _
 
 /-- The multiplicative formal group law: F_m(x,y) = x + y + xy. -/
 private def mulCoeff (R : Type u) (Ri : CommRing R) (i j : Nat) : R :=
@@ -141,33 +145,33 @@ private def mulCoeff (R : Type u) (Ri : CommRing R) (i j : Nat) : R :=
 
 def multiplicativeFGL (R : Type u) (Ri : CommRing R) : FormalGroupLaw R Ri where
   series := { coeff := mulCoeff R Ri }
-  unit_left_0 := by unfold mulCoeff; simp; exact Path.refl _
-  unit_left_1 := by unfold mulCoeff; simp; exact Path.refl _
+  unit_left_0 := by unfold mulCoeff; simp; exact path_self_chain _
+  unit_left_1 := by unfold mulCoeff; simp; exact path_self_chain _
   unit_left_higher := fun i hi => by
     unfold mulCoeff
     simp [show ¬(i = 1) from by omega, show ¬(i = 0) from by omega]
-    exact Path.refl _
-  unit_right_0 := by unfold mulCoeff; simp; exact Path.refl _
-  unit_right_1 := by unfold mulCoeff; simp; exact Path.refl _
+    exact path_self_chain _
+  unit_right_0 := by unfold mulCoeff; simp; exact path_self_chain _
+  unit_right_1 := by unfold mulCoeff; simp; exact path_self_chain _
   unit_right_higher := fun j hj => by
     unfold mulCoeff
     simp [show ¬(j = 0) from by omega, show ¬(j = 1) from by omega]
-    exact Path.refl _
+    exact path_self_chain _
   comm := fun i j => by
     unfold mulCoeff
     by_cases h1 : i = 1 ∧ j = 0
-    · obtain ⟨rfl, rfl⟩ := h1; simp; exact Path.refl _
+    · obtain ⟨rfl, rfl⟩ := h1; simp; exact path_self_chain _
     · by_cases h2 : i = 0 ∧ j = 1
-      · obtain ⟨rfl, rfl⟩ := h2; simp; exact Path.refl _
+      · obtain ⟨rfl, rfl⟩ := h2; simp; exact path_self_chain _
       · by_cases h3 : i = 1 ∧ j = 1
-        · obtain ⟨rfl, rfl⟩ := h3; simp; exact Path.refl _
+        · obtain ⟨rfl, rfl⟩ := h3; simp; exact path_self_chain _
         · by_cases h4 : j = 1 ∧ i = 0
           · obtain ⟨rfl, rfl⟩ := h4; simp at h2
           · by_cases h5 : j = 0 ∧ i = 1
             · obtain ⟨rfl, rfl⟩ := h5; simp at h1
             · by_cases h6 : j = 1 ∧ i = 1
               · obtain ⟨rfl, rfl⟩ := h6; simp at h3
-              · simp [h1, h2, h3, h4, h5, h6]; exact Path.refl _
+              · simp [h1, h2, h3, h4, h5, h6]; exact path_self_chain _
 
 /-! ## Lazard Ring -/
 
@@ -198,7 +202,7 @@ def lazard_additive_classify (L : LazardRing.{u}) (R : Type u)
     (Ri : CommRing R) :
     Path (L.classify R Ri (additiveFGL R Ri) (L.ring.zero))
          (L.classify R Ri (additiveFGL R Ri) (L.ring.zero)) :=
-  Path.refl _
+  path_self_chain _
 
 /-! ## Algebraic Cobordism Groups -/
 
