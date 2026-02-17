@@ -273,9 +273,8 @@ def fold_congrAlg {S : Type u} {ar : S → Type u} {X : Type u}
   | WTree.node s f =>
     Path.trans
       (Path.congrArg (alg₁ s)
-        (Path.mk [Step.mk _ _ (funext fun p => (fold_congrAlg alg₁ alg₂ heq (f p)).toEq)]
-          (funext fun p => (fold_congrAlg alg₁ alg₂ heq (f p)).toEq)))
-      (Path.mk [Step.mk _ _ (heq s _)] (heq s _))
+        (Path.ofEq (funext fun p => (fold_congrAlg alg₁ alg₂ heq (f p)).toEq)))
+      (Path.ofEq (heq s _))
 
 /-! ## Path algebra for WAlgHom -/
 
