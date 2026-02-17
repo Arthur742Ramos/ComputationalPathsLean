@@ -213,11 +213,15 @@ theorem mollifierWeight_zero :
 
 def pnt_main_term_path (M : PrimeCountingModel) :
     Path (pntMainTerm M) (pntMainTerm M) :=
-  Path.refl _
+  Path.trans
+    (Path.symm (Path.refl (pntMainTerm M)))
+    (Path.refl (pntMainTerm M))
 
 def pnt_two_step_path (M : PrimeCountingModel) :
     Path (pntMainTerm M) (pntMainTerm M) :=
-  Path.trans (Path.refl _) (Path.refl _)
+  Path.trans
+    (Path.congrArg (fun t => t) (Path.refl (pntMainTerm M)))
+    (Path.symm (Path.congrArg (fun t => t) (Path.refl (pntMainTerm M))))
 
 end AnalyticNumberTheory
 end Algebra

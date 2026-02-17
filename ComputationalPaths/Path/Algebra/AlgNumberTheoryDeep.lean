@@ -48,11 +48,11 @@ def cone : ICls := ⟨0, 0⟩
 
 theorem cmul_assoc (a b c : ICls) :
     cmul (cmul a b) c = cmul a (cmul b c) := by
-  simp [cmul, ICls.mk.injEq, Nat.add_assoc]
+  simp [cmul, Nat.add_assoc]
 
 theorem cmul_comm (a b : ICls) :
     cmul a b = cmul b a := by
-  simp [cmul, ICls.mk.injEq, Nat.add_comm]
+  simp [cmul, Nat.add_comm]
 
 theorem cmul_one (a : ICls) : cmul a cone = a := by
   simp [cmul, cone]
