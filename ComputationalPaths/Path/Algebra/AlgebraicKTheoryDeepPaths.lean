@@ -6,7 +6,7 @@ K-theory concepts modelled as a domain-specific rewriting calculus:
 - `KStep`  : primitive rewrite steps (group axioms, Steinberg relations, Bott)
 - `KPath`  : freely generated paths with refl/step/trans/symm
 
-Every path is built from genuine rewrite steps. Zero `Path.ofEq`, zero `sorry`.
+Every path is built from genuine rewrite steps with no placeholder proofs.
 52 theorems/definitions.
 -/
 

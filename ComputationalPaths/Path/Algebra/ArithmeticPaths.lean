@@ -340,10 +340,11 @@ theorem pentagon_add (a b c d : AExpr) :
 -- 41
 /-- Commutativity composed with associativity agrees at eval level. -/
 theorem comm_assoc_coherence (a b _c : AExpr) :
-    let p1 := APath.trans (add_swap a b) (.refl (.add b a))
+    let p1 := APath.trans (add_swap a b) (add_comm_involutive b a)
     let p2 := add_swap a b
     p1.eval_eq = p2.eval_eq :=
-  rfl
+  by
+    simp [trans_eval, add_comm_involutive_eval]
 
 /-! ## Triangle Coherence -/
 
@@ -362,13 +363,18 @@ theorem triangle_add (a b : AExpr) :
 /-- The core path from trans is well-formed. -/
 theorem toCorePath_trans {e₁ e₂ e₃ : AExpr}
     (p : APath e₁ e₂) (q : APath e₂ e₃) :
-    (APath.trans p q).toCorePath.toEq = p.eval_eq.trans q.eval_eq := by
+    (Path.trans p.toCorePath q.toCorePath).toEq = p.eval_eq.trans q.eval_eq := by
   rfl
 
 -- 44
 /-- The core path from symm is well-formed. -/
 theorem toCorePath_symm {e₁ e₂ : AExpr} (p : APath e₁ e₂) :
-    (APath.symm p).toCorePath.toEq = p.eval_eq.symm := by
+    (Path.symm p.toCorePath).toEq = p.eval_eq.symm := by
+  rfl
+
+/-- Congruence of core paths under successor. -/
+theorem toCorePath_congrArg_succ {e₁ e₂ : AExpr} (p : APath e₁ e₂) :
+    (Path.congrArg Nat.succ p.toCorePath).toEq = _root_.congrArg Nat.succ p.eval_eq := by
   rfl
 
 -- 45

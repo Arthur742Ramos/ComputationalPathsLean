@@ -60,9 +60,15 @@ def trivial (X : PointedSet.{u}) : BarComplex.{u} where
   d := fun _ => zeroHom X X
   d_comp_zero := by
     intro n
-    apply Path.stepChain
-    apply PointedHom.ext
-    rfl
+    let z : PointedHom X X := zeroHom X X
+    have hz : Path z z := Path.symm (Path.stepChain rfl)
+    have hcomp : Path (PointedHom.comp z z) (PointedHom.comp z z) :=
+      Path.congrArg (fun f => PointedHom.comp f z) hz
+    have hzero : Path (PointedHom.comp z z) z := by
+      apply Path.stepChain
+      apply PointedHom.ext
+      rfl
+    simpa [z] using Path.trans hcomp hzero
 
 end BarComplex
 
@@ -74,13 +80,29 @@ def trivial (X : PointedSet.{u}) : BarResolution X where
   d := fun _ => zeroHom X X
   d_comp_zero := by
     intro n
-    apply Path.stepChain
-    apply PointedHom.ext
-    rfl
+    let z : PointedHom X X := zeroHom X X
+    have hz : Path z z := Path.symm (Path.stepChain rfl)
+    have hcomp : Path (PointedHom.comp z z) (PointedHom.comp z z) :=
+      Path.congrArg (fun f => PointedHom.comp f z) hz
+    have hzero : Path (PointedHom.comp z z) z := by
+      apply Path.stepChain
+      apply PointedHom.ext
+      rfl
+    simpa [z] using Path.trans hcomp hzero
   augmentation := PointedHom.id X
   augmentation_zero := by
-    apply Path.stepChain
-    simpa using (PointedHom.id_comp (zeroHom X X))
+    have hid : Path (PointedHom.id X) (PointedHom.id X) :=
+      Path.symm (Path.stepChain rfl)
+    have hcomp :
+        Path (PointedHom.comp (PointedHom.id X) (zeroHom X X))
+          (PointedHom.comp (PointedHom.id X) (zeroHom X X)) :=
+      Path.congrArg (fun f => PointedHom.comp f (zeroHom X X)) hid
+    have hzero :
+        Path (PointedHom.comp (PointedHom.id X) (zeroHom X X))
+          (zeroHom X X) := by
+      apply Path.stepChain
+      simpa using (PointedHom.id_comp (zeroHom X X))
+    exact Path.trans hcomp hzero
 
 end BarResolution
 
