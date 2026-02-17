@@ -225,7 +225,7 @@ variable {n : Nat}
           simp [BouquetFreeGroup.mul, BouquetFreeGroup.inv, BouquetWord.inverse_wordConcat]
 
 /-- Path-level associativity witness with explicit path combinators. -/
-def mul_assoc_path (x y z : BouquetFreeGroup n) :
+noncomputable def mul_assoc_path (x y z : BouquetFreeGroup n) :
     Path (BouquetFreeGroup.mul (BouquetFreeGroup.mul x y) z)
       (BouquetFreeGroup.mul x (BouquetFreeGroup.mul y z)) := by
   let hAssoc :
@@ -240,7 +240,7 @@ def mul_assoc_path (x y z : BouquetFreeGroup n) :
       (Path.refl (BouquetFreeGroup.mul x (BouquetFreeGroup.mul y z)))
 
 /-- Path-level inversion law with explicit path composition. -/
-def inv_mul_path (x y : BouquetFreeGroup n) :
+noncomputable def inv_mul_path (x y : BouquetFreeGroup n) :
     Path (BouquetFreeGroup.inv (BouquetFreeGroup.mul x y))
       (BouquetFreeGroup.mul (BouquetFreeGroup.inv y) (BouquetFreeGroup.inv x)) := by
   let hInv :
