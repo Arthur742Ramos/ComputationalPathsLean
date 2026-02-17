@@ -100,6 +100,7 @@ import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Homotopy.AcyclicModels
 import ComputationalPaths.Path.Homotopy.PathHomology
 import ComputationalPaths.Path.Homotopy.MapperAlgorithm
+import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.CoveringPathLifting
 import ComputationalPaths.Path.Homotopy.GroupoidCovering
@@ -216,6 +217,7 @@ import ComputationalPaths.Path.CompPath.MilnorFibration
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.InfinityGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
+import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps

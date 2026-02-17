@@ -20,6 +20,7 @@ equivalent, and the action on loops recovers the usual pi_1 action on fibers.
 
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.CoveringFibrationAlgebra
+import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.CoveringSpaceLifting
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 import ComputationalPaths.Path.Homotopy.GrothendieckConstruction

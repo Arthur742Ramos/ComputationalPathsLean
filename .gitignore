@@ -45,3 +45,6 @@ Scripts/CheckCylinder.lean
 arxiv_svk/
 arXiv-*.tar
 *.pdf
+.claude/
+.claude/
+.git.old/

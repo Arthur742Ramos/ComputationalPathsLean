@@ -19,6 +19,7 @@ identities with the connecting map from fibration theory.
 - Brown, "Topology and Groupoids"
 -/
 
+import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.FundamentalGroup

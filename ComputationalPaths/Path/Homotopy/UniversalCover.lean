@@ -21,6 +21,7 @@ and connect the deck transformation group to π₁.
 - Brown, "Topology and Groupoids"
 -/
 
+import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.FundamentalGroupoid
 
 namespace ComputationalPaths

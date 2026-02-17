@@ -15,6 +15,7 @@ paths and the uniqueness of lifted endpoints.
 - HoTT Book, Chapter 8.4
 -/
 
+import ComputationalPaths.Path.Homotopy.CoveringSpace
 
 namespace ComputationalPaths
 namespace Path

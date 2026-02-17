@@ -23,6 +23,7 @@ surfaces.
 - Goldman, "Invariant functions on Lie groups and Hamiltonian flows of surface group representations"
 -/
 
+import ComputationalPaths.Path.Algebra.LieAlgebraCohomology
 import ComputationalPaths.Path.Homotopy.FreeLoopSpace
 
 namespace ComputationalPaths

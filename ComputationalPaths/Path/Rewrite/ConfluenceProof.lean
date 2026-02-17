@@ -70,6 +70,7 @@ purely algebraic theorem about the groupoid TRS.
 import ComputationalPaths.Path.Rewrite.Confluence
 import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
 import ComputationalPaths.Path.Rewrite.GroupoidTRS
+import ComputationalPaths.Path.Rewrite.GroupoidConfluence
 import ComputationalPaths.Path.Rewrite.TerminationBridge
 
 namespace ComputationalPaths
