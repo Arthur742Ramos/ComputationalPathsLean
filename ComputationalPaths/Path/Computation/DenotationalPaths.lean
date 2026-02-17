@@ -3,7 +3,7 @@
 
 Expression/statement semantics, environment paths, substitution lemma,
 compositionality, semantic equivalence — all with genuine `Path` operations.
-Zero `Path.ofEq`.
+Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## References
 

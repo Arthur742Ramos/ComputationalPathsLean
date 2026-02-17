@@ -4,7 +4,7 @@
 Diamond, strip lemma, confluence, Newman's lemma, Church-Rosser,
 normal form uniqueness — all with Path as the core mathematical object.
 
-87 theorems/defs. ZERO sorry, ZERO Path.ofEq.
+87 theorems/defs. ZERO sorry, ZERO Path.mk [Step.mk _ _ h] h.
 -/
 
 import ComputationalPaths.Path.Basic
