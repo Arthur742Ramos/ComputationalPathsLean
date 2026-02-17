@@ -11,7 +11,7 @@
   - Euler characteristic as congrArg-invariant
   - Cellular chain complex with boundary² = 0 as Path
   - Whitehead theorem structure
-  All using Path.trans, congrArg, symm — no sorry, no Path.ofEq.
+  All using Path.trans, congrArg, and symm without placeholders.
 -/
 
 import ComputationalPaths.Path.Basic
