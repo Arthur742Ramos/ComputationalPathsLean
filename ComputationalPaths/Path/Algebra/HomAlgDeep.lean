@@ -363,6 +363,43 @@ def rank_dsum_tensor :
 def rank_tensor_assoc_ex :
     Path (ModExpr.tensor (.tensor (.free 2) (.free 3)) (.free 4)).rank 24 := Path.refl _
 
+-- 51. Tor_0 and tensor ranks coincide via trans/symm
+def rank_tor0_tensor_link :
+    Path (ModExpr.tor0 (.free 2) (.free 3)).rank
+         (ModExpr.tensor (.free 2) (.free 3)).rank :=
+  Path.trans rank_tor0_2_3 (Path.symm rank_tensor_2_3)
+
+-- 52. Ext^0 and Hom ranks coincide via trans/symm
+def rank_ext0_hom_link :
+    Path (ModExpr.ext0 (.free 2) (.free 3)).rank
+         (ModExpr.hom (.free 2) (.free 3)).rank :=
+  Path.trans rank_ext0_2_3 (Path.symm rank_hom_2_3)
+
+-- 53. Higher Tor and higher Ext both vanish in rank
+def rank_tor_ext_vanish_link :
+    Path (ModExpr.torHi (.free 2) (.free 3) 1).rank
+         (ModExpr.extHi (.free 2) (.free 3) 1).rank :=
+  Path.trans rank_torHi (Path.symm rank_extHi)
+
+-- 54. Congruence under (+ 0), then simplify
+def rank_dsum_tensor_plus_zero :
+    Path ((ModExpr.tensor (.dsum (.free 2) (.free 3)) (.free 4)).rank + 0) 20 :=
+  Path.trans
+    (Path.congrArg (fun n => n + 0) rank_dsum_tensor)
+    (Path.mk [Step.mk _ _ (Nat.add_zero 20)] (Nat.add_zero 20))
+
+-- 55. Congruence under (* 1), then simplify
+def rank_tensor_assoc_mul_one :
+    Path ((ModExpr.tensor (.tensor (.free 2) (.free 3)) (.free 4)).rank * 1) 24 :=
+  Path.trans
+    (Path.congrArg (fun n => n * 1) rank_tensor_assoc_ex)
+    (Path.mk [Step.mk _ _ (Nat.mul_one 24)] (Nat.mul_one 24))
+
+-- 56. Free-zero rank roundtrip
+def rank_free_zero_roundtrip :
+    Path (ModExpr.free 0).rank (ModExpr.free 0).rank :=
+  Path.trans rank_free_zero (Path.symm rank_free_zero)
+
 end ModPath
 
 end ComputationalPaths.Path.Algebra.HomAlgDeep

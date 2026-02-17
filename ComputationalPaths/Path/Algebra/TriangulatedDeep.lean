@@ -291,6 +291,35 @@ def octahedral_Tg_tgt (d : OctahedralData ops S) :
     Path d.T_g.Y d.Z :=
   d.T_g_tgt
 
+/-! ## 30: Multi-step path chains -/
+
+def shift_unshift_roundtrip_inv (X : Obj) :
+    Path X (S.unshift (S.shift X)) :=
+  Path.symm (shift_unshift_roundtrip (ops := ops) (S := S) X)
+
+def shift_unshift_loop (X : Obj) :
+    Path (S.unshift (S.shift X)) (S.unshift (S.shift X)) :=
+  Path.trans (shift_unshift_roundtrip (ops := ops) (S := S) X)
+    (shift_unshift_roundtrip_inv (ops := ops) (S := S) X)
+
+def shift_after_unshift_shift (X : Obj) :
+    Path (S.shift (S.unshift (S.shift X))) (S.shift X) :=
+  Path.congrArg S.shift (shift_unshift_roundtrip (ops := ops) (S := S) X)
+
+def unshift_after_shift_unshift (X : Obj) :
+    Path (S.unshift (S.shift (S.unshift X))) (S.unshift X) :=
+  Path.congrArg S.unshift (unshift_shift_roundtrip (ops := ops) (S := S) X)
+
+def rotate_middle_to_twice_source (T : Triangle ops S) :
+    Path (rotate_triangle ops S T).Y (rotate_twice ops S T).X :=
+  Path.trans (rotate_middle (ops := ops) (S := S) T)
+    (Path.symm (rotate_twice_X (ops := ops) (S := S) T))
+
+def octahedral_source_bridge (d : OctahedralData ops S) :
+    Path d.T_f.X d.T_fg.X :=
+  Path.trans (octahedral_Tf_src (ops := ops) (S := S) d)
+    (Path.symm (octahedral_Tfg_src (ops := ops) (S := S) d))
+
 end TriangulatedDeep
 end Algebra
 end Path

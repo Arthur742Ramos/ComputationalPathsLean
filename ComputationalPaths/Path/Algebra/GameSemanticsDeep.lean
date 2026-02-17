@@ -601,4 +601,35 @@ def complexity_lam_congrArg (t1 t2 : TermRepr) (h : t1 = t2) :
   Path.congrArg (fun t => (TermRepr.lam t).complexity)
     (Path.mk [Step.mk _ _ h] h)
 
+/-! ## 27. Additional multi-step coherence chains -/
+
+def semSize_left_id_collapse (n : Nat) (s : MorphRepr) :
+    Path (semSize (.comp (.ident n) s)) (semSize s) :=
+  Path.trans (semSize_comp_id_left n s)
+    (Path.mk [Step.mk _ _ (Nat.zero_add (semSize s))] (Nat.zero_add (semSize s)))
+
+def tensor_assoc_then_inner_comm (a b c : Nat) :
+    Path (tensorSize (tensorSize a b) c) (tensorSize a (tensorSize c b)) :=
+  Path.trans (tensor_size_assoc a b c)
+    (Path.congrArg (fun n => tensorSize a n) (tensor_size_comm b c))
+
+def tensor_assoc_outer_swap (a b c : Nat) :
+    Path (tensorSize (tensorSize a b) c) (tensorSize (tensorSize c b) a) :=
+  Path.trans (assoc_then_comm a b c)
+    (Path.congrArg (fun n => tensorSize n a) (tensor_size_comm b c))
+
+def tensor_comm_roundtrip_chain (a b : Nat) :
+    Path (tensorSize a b) (tensorSize a b) :=
+  Path.trans (tensor_size_comm a b) (Path.symm (tensor_size_comm a b))
+
+def weight_left_id_roundtrip (n : Nat) (f : MorphRepr) :
+    Path (MorphRepr.comp (.ident n) f).weight (MorphRepr.comp (.ident n) f).weight :=
+  Path.trans (comp_ident_left_weight n f) (Path.symm (comp_ident_left_weight n f))
+
+def arrow_gameSize_comm_chain (a b : TyCode) :
+    Path (TyCode.arrow a b).gameSize (TyCode.arrow b a).gameSize :=
+  Path.trans (arrow_gameSize a b)
+    (Path.trans (tensor_size_comm a.gameSize b.gameSize)
+      (Path.symm (arrow_gameSize b a)))
+
 end GameSemanticsDeep
