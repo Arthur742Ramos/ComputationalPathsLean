@@ -223,7 +223,7 @@ def InvLimitElem.pathFromComponents (S : ProjSystem)
     (x y : InvLimitElem S)
     (h : ∀ n, x.components n = y.components n) :
     Path x y :=
-  Path.ofEq (InvLimitElem.ext S x y h)
+  Path.mk [Step.mk _ _ (InvLimitElem.ext S x y h)] (InvLimitElem.ext S x y h)
 
 -- Theorem 19: Projection preserves paths (at eq level)
 theorem projection_preserves_path_eq (S : ProjSystem) (n : Nat)

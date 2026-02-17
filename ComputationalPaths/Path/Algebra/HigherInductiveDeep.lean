@@ -8,7 +8,7 @@
   demonstrating recursion/induction principles and the encode-decode method.
 
   All path algebra uses genuine Path.trans, Path.symm, Path.congrArg —
-  no sorry, no Path.ofEq.
+  no sorry, no Path.mk.
 -/
 
 import ComputationalPaths.Path.Basic

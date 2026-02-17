@@ -3,7 +3,7 @@
 
 p-adic valuations, ultrametric spaces, valued field arithmetic,
 non-archimedean absolute values. All paths use genuine multi-step
-trans/symm/congrArg chains. Zero Path.ofEq.
+trans/symm/congrArg chains. Zero Path.mk [Step.mk _ _ h] h.
 
 ## References
 - Neukirch, "Algebraic Number Theory"

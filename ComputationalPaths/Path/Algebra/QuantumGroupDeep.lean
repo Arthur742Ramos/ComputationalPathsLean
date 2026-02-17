@@ -16,7 +16,7 @@
   - Ribbon category structure
 
   All proofs use Path.trans for composition, Path.symm for duality,
-  Path.congrArg for functoriality — no sorry, no Path.ofEq.
+  Path.congrArg for functoriality — no sorry, no Path.mk.
 -/
 
 import ComputationalPaths.Path.Basic

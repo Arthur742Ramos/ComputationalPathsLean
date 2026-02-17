@@ -3,7 +3,7 @@
 
 Code words, Hamming weight, parity checks, XOR algebra, linear codes,
 syndrome decoding, code composition. All paths via `refl`, `trans`, `symm`,
-`congrArg`, `transport` — zero `Path.ofEq`.
+`congrArg`, `transport` — zero `Path.mk [Step.mk _ _ h] h`.
 
 ## Main results (40+ theorems)
 -/

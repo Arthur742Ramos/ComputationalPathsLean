@@ -5,7 +5,7 @@ Tropical semiring (min-plus), tropical polynomials, tropical curves,
 valuations, Newton polygons — all modelled with genuine computational paths
 over Nat using `stepChain`, `trans`, `symm`, `congrArg`, `transport`.
 
-## Main results (35+ theorems/defs, zero Path.ofEq)
+## Main results (35+ theorems/defs, zero Path.mk)
 -/
 
 import ComputationalPaths.Path.Basic

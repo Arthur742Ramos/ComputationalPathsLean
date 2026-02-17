@@ -80,7 +80,7 @@ theorem SKK_reduces (x : CL) :
 /-- SKK two-step as a path. -/
 def SKK_path (x : CL) :
     Path (reduceN 2 (((CL.S ⬝ CL.K) ⬝ CL.K) ⬝ x)) x :=
-  Path.ofEq (SKK_reduces x)
+  Path.mk [Step.mk _ _ (SKK_reduces x)] (SKK_reduces x)
 
 /-! ## Church booleans -/
 

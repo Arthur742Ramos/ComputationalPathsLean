@@ -3,7 +3,7 @@
 
 Presheaves, sheaf condition, stalks, sheafification, cohomology —
 all modelled with computational paths.  Every path is constructed from
-`refl`, `trans`, `symm`, `congrArg` — zero `Path.ofEq`, zero `sorry`.
+`refl`, `trans`, `symm`, `congrArg` — zero `Path.mk [Step.mk _ _ h] h`, zero `sorry`.
 
 ## Main results (35 theorems/defs)
 -/

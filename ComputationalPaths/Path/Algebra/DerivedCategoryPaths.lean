@@ -3,7 +3,7 @@
 
 Chain complexes, chain maps, chain homotopies, mapping cones, shifts,
 and triangulated category axioms — all modelled with genuine domain
-inductives, rewrite steps, and multi-step paths. Zero `Path.ofEq`.
+inductives, rewrite steps, and multi-step paths. Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## Main results (35+ theorems)
 -/

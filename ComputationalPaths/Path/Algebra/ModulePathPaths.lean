@@ -3,7 +3,7 @@
 
 R-modules with Nat scalars, module homomorphisms, kernel/image, exact sequences,
 direct sums — all built from a genuine `MStep` / `MPath` rewrite system.
-Zero `Path.ofEq`, zero `sorry`.
+Zero `Path.mk [Step.mk _ _ _] _`, zero `sorry`.
 -/
 
 import ComputationalPaths.Path.Basic.Core

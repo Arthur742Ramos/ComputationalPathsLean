@@ -271,7 +271,8 @@ theorem dec_rws_equiv_trans {A : Type u} [DecidableEq A] (R : DecRWS A)
 
 /-! ## Connection to Computational Paths -/
 
-def eqToPath {A : Type u} {a b : A} (h : a = b) : Path a b := Path.ofEq h
+def eqToPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
+  Path.mk [Step.mk _ _ h] h
 
 /-- All proofs of `a = b` are equal (proof irrelevance). -/
 theorem path_toEq_irrel {A : Type u} {a b : A} (p q : Path a b) :

@@ -2,7 +2,7 @@
 # Deep Homological Algebra III (audit fix: genuine domain-specific paths)
 
 The previous version of this file had "fake depth": almost every statement was
-proved by `Path.ofEq` over definitional equalities.
+proved by `Path.mk [Step.mk _ _ _] _` over definitional equalities.
 
 Here we instead introduce *domain-specific* generators `HomStep` and build
 `HomPath` as their path closure, with explicit multi-step witnesses built using

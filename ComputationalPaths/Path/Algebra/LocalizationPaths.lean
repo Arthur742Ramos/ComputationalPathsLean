@@ -3,7 +3,7 @@
 
 Multiplicative subsets, fraction arithmetic, localization universal property,
 all witnessed by genuine Path combinators (refl, symm, trans, congrArg).
-Zero `Path.ofEq`.
+Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## Main results (55+ theorems)
 -/

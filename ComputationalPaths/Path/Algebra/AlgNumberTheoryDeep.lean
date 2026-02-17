@@ -4,7 +4,7 @@
 Dedekind domains, ideal class groups, ramification theory,
 Frobenius elements, decomposition/inertia groups — all coherence
 witnessed by domain-specific step types and genuine Path operations
-(refl, trans, symm, congrArg, transport). Zero Path.ofEq, zero sorry.
+(refl, trans, symm, congrArg, transport). Zero Path.mk [Step.mk _ _ _] _, zero sorry.
 
 ## References
 - Neukirch, *Algebraic Number Theory*

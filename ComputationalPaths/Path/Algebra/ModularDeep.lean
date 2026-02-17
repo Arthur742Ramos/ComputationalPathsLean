@@ -4,7 +4,7 @@
 Ring expressions with genuine rewrite steps for commutativity,
 distributivity, exponentiation, CRT, Fermat/Euler, ideals.
 
-Zero `Path.ofEq` — every path built from `step`, `trans`, `symm`, `congrAdd/Mul`.
+Zero `Path.mk` — every path built from `step`, `trans`, `symm`, `congrAdd/Mul`.
 -/
 
 import ComputationalPaths.Path.Basic

@@ -4,7 +4,7 @@
 Free ℤ-module algebra (direct sum, tensor, Hom, Ext, Tor) modelled as
 a domain-specific rewriting system with genuine multi-step Path operations.
 
-Zero `Path.ofEq` — every path built from `step`, `trans`, `symm`, `congrDS/Ten`.
+Zero `Path.mk [Step.mk _ _ h] h` — every path built from `step`, `trans`, `symm`, `congrDS/Ten`.
 -/
 
 import ComputationalPaths.Path.Basic

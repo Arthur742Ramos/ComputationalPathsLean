@@ -284,7 +284,7 @@ structure BifurcationData where
 /-- Composing two bifurcation transitions. -/
 def bifurcationCascade (d1 : BifurcationData) (d2 : BifurcationData)
     (h : d1.postVal = d2.preVal) : Path d1.preVal d2.postVal :=
-  Path.trans d1.bifurcPath (Path.trans (Path.ofEq h) d2.bifurcPath)
+  Path.trans d1.bifurcPath (Path.trans (Path.mk [Step.mk _ _ h] h) d2.bifurcPath)
 
 /-- Bifurcation symm_symm. -/
 theorem bifurcation_rweq_symm_symm (d : BifurcationData) :

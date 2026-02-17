@@ -4,7 +4,7 @@
   Monads, Algebras and Beck's Monadicity via Computational Paths
 
   All coherence laws witnessed by Path.trans / Path.symm / Path.congrArg.
-  65 theorems, zero sorry, zero Path.ofEq.
+  65 theorems, zero sorry, zero Path.mk [Step.mk _ _ h] h.
 -/
 
 import ComputationalPaths.Path.Basic

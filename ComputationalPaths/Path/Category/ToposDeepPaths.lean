@@ -3,7 +3,7 @@
 
 Heyting algebra of truth values, subobject classifier, geometric morphisms,
 sheafification, and Lawvere-Tierney topologies — all with genuine multi-step
-Path chains using trans/symm/congrArg. Zero Path.ofEq.
+Path chains using trans/symm/congrArg. Zero Path.mk.
 
 ## References
 - Johnstone, *Sketches of an Elephant*

@@ -4,7 +4,7 @@
 Profinite sets, condensed sets (as presheaves on a small category of
 profinite-like objects), solidification, and the condensed tensor product —
 all modelled with genuine domain inductives, rewrite steps, and multi-step
-paths. Zero `Path.ofEq`. Zero `sorry`.
+paths. Zero `Path.mk [Step.mk _ _ _] _`. Zero `sorry`.
 
 ## References
 - Clausen–Scholze, "Condensed Mathematics"

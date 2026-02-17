@@ -3,7 +3,7 @@
 
 Eigenvalues, eigenvectors, spectral decomposition, and resolvent concepts
 modeled through genuine computational-paths operations: `stepChain`, `trans`,
-`symm`, `congrArg`, `transport`. Zero `Path.ofEq`.
+`symm`, `congrArg`, `transport`. Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## Main results (35+ theorems/defs)
 -/

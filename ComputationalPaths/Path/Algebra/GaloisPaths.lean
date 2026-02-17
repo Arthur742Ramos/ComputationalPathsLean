@@ -3,7 +3,7 @@
 
 Field expressions, automorphism steps, fixed-field reasoning, Galois groups,
 normal/separable witnesses — all built from domain-specific `GExpr`/`GStep`/`GPath`
-inductives. Zero `Path.ofEq`.
+inductives. Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## References
 

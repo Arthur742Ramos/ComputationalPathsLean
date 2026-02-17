@@ -3,7 +3,7 @@
 
 Path-native monoid structure: all algebraic witnesses carried as `Path`,
 Green's relations, free monoid constructions, homomorphism composition,
-word problem as path existence — **zero** `Path.ofEq`.
+word problem as path existence — **zero** `Path.mk [Step.mk _ _ h] h`.
 
 ## Main results: 35 theorems/defs
 -/

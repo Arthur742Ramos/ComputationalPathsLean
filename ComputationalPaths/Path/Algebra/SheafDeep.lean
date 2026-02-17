@@ -331,7 +331,7 @@ theorem transport_sections
     {X : Type u} {τ : Topology X}
     (F : Presheaf (X := X) τ)
     {U V : τ.Open} (h : U = V) (s : F.sections U) :
-    Path.transport (D := F.sections) (Path.ofEq h) s = h ▸ s := by
+    Path.transport (D := F.sections) (Path.mk [Step.mk _ _ h] h) s = h ▸ s := by
   cases h; rfl
 
 -- 22: kernel presheaf inclusion gives zero

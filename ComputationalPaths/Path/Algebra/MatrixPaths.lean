@@ -1,7 +1,7 @@
 /-
 # Matrix Algebra via Computational Paths (deepened)
 
-This file eliminates `Path.ofEq` scaffolding.  We provide a small
+This file eliminates `Path.mk [Step.mk _ _ h] h` scaffolding.  We provide a small
 matrix-expression language:
 
 * `MatObj`  — expressions for matrices (addition/negation/scaling)

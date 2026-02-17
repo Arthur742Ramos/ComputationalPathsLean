@@ -341,7 +341,7 @@ theorem beta_star_lam_congr {t t' : LTerm} (h : BetaStar t t') :
 /-! ## Connection to computational Path -/
 
 /-- Lambda term equality lifted to computational path. -/
-def termPath {t s : LTerm} (h : t = s) : Path t s := Path.ofEq h
+def termPath {t s : LTerm} (h : t = s) : Path t s := Path.mk [Step.mk _ _ h] h
 
 /-- Composition of term paths. -/
 theorem termPath_toEq_trans {t s u : LTerm} (h1 : t = s) (h2 : s = u) :

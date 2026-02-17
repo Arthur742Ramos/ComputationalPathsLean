@@ -3,7 +3,7 @@
 
 Frame lattice operations (meet/join on Nat via min/max), nucleus operators,
 open/closed sublocales, frame homomorphisms, locale maps, and absorption laws.
-All paths use genuine multi-step trans/symm/congrArg chains. Zero Path.ofEq.
+All paths use genuine multi-step trans/symm/congrArg chains. Zero Path.mk [Step.mk _ _ h] h.
 
 ## References
 * Johnstone, *Stone Spaces* (1982)

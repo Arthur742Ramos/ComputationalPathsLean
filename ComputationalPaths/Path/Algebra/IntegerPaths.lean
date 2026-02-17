@@ -6,7 +6,7 @@ Integer ring axioms modelled as a domain-specific rewriting calculus:
 - `IntStep`  : primitive rewrite steps (ring axioms)
 - `IntPath`  : freely generated paths with refl/step/trans/symm
 
-Every path is built from genuine rewrite steps. Zero `Path.ofEq`, zero `sorry`.
+Every path is built from genuine rewrite steps. Zero `Path.mk [Step.mk _ _ _] _`, zero `sorry`.
 -/
 
 import ComputationalPaths.Path.Basic.Core

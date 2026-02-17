@@ -270,7 +270,7 @@ theorem derived_cross_module_dependencies_nonempty
     (E : GeneralizedHomologyTheory.{u, v})
     {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
     Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) :=
-  ⟨Path.ofEq (E.map_comp g f n)⟩
+  ⟨Path.mk [Step.mk _ _ (E.map_comp g f n)] (E.map_comp g f n)⟩
 
 /-! ## Summary
 

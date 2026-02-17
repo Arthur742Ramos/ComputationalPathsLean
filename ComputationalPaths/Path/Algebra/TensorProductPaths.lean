@@ -4,7 +4,7 @@
 Bilinear maps, universal property of tensor products, tensor of path maps,
 commutativity/associativity of tensor, functoriality of tensor.
 
-All paths built from genuine TenStep inductive — zero Path.ofEq.
+All paths built from genuine TenStep inductive — zero Path.mk.
 
 ## Main results (45 theorems)
 -/

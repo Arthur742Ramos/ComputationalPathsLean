@@ -4,7 +4,7 @@
 Source and target languages, compilation functions, semantic preservation,
 optimization passes, correctness composition — all correctness witnesses
 built from `Path.refl`, `Path.trans`, `Path.symm`, `Path.congrArg`,
-`Path.transport`. **Zero** `Path.ofEq`.
+`Path.transport`. **Zero** `Path.mk [Step.mk _ _ h] h`.
 
 ## References
 

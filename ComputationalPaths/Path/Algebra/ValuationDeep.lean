@@ -3,7 +3,7 @@
 
 Discrete valuations, completions, Henselian rings, ramification —
 all witnessed by genuine inductive `Step` constructors and multi-step
-`Path` chains.  Zero `Path.ofEq` remaining.
+`Path` chains.  Zero `Path.mk` remaining.
 
 ## References
 - Serre, *Local Fields*

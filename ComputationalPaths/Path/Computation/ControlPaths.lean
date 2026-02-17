@@ -63,7 +63,7 @@ structure ReachabilityWitness (S : Type u) where
 /-- Reachability is transitive via path composition. -/
 def reachTransitive {S : Type u} (r1 : ReachabilityWitness S) (r2 : ReachabilityWitness S)
     (h : r1.to_ = r2.from_) : Path r1.from_ r2.to_ :=
-  Path.trans r1.reachPath (Path.trans (Path.ofEq h) r2.reachPath)
+  Path.trans r1.reachPath (Path.trans (Path.mk [Step.mk _ _ h] h) r2.reachPath)
 
 /-- RwEq: reachability path trans refl. -/
 theorem reach_rweq_trans_refl {S : Type u} (r : ReachabilityWitness S) :

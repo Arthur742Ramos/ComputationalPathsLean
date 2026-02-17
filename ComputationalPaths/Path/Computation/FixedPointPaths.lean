@@ -176,7 +176,7 @@ theorem param_iterate_succ {P A : Type u} (f : ParamMonotone P A)
 def param_change_path {P A : Type u} (f : ParamMonotone P A)
     {p1 p2 : P} (hp : p1 = p2) (n : Nat) (x : A) :
     Path (f.iterate p1 n x) (f.iterate p2 n x) :=
-  Path.ofEq (by subst hp; rfl)
+  Path.mk [Step.mk _ _ (by subst hp; rfl)] (by subst hp; rfl)
 
 /-! ## Bekic's Lemma Aspects -/
 

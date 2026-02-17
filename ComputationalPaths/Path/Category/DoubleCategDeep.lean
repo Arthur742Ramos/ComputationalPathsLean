@@ -724,7 +724,7 @@ def vfunctor_comp_right_unit_obj (D E : DblCat) (F : VFunctor D E) (a : D.Obj) :
 --   Path.refl, Path.trans, Path.symm, Path.congrArg
 --   trans_assoc, trans_refl_left, trans_refl_right,
 --   symm_trans, symm_symm, congrArg_trans, congrArg_symm
--- Zero sorry, Zero Path.ofEq
+-- Zero sorry, Zero Path.mk
 
 end DoubleCategDeep
 

@@ -4,7 +4,7 @@
 Principal ideals, localization, Nakayama, dimension theory — all modelled
 over ℤ as principal ideal domain using domain-specific step inductives,
 with `IdealPath`/`ModPath` propositional closures and genuine multi-step
-path reasoning (trans/symm/congrArg). Zero `Path.ofEq`.
+path reasoning (trans/symm/congrArg). Zero `Path.mk [Step.mk _ _ h] h`.
 -/
 
 import ComputationalPaths.Path.Basic

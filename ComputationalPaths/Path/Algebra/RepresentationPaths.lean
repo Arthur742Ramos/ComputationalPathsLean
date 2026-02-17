@@ -5,7 +5,7 @@ Group representations, Schur's lemma aspects, character theory,
 irreducibility, direct sums, tensor products of representations.
 All coherence witnessed by domain-specific step inductives and
 multi-step `Path.trans`/`Path.symm`/`Path.congrArg` chains.
-Zero `Path.ofEq`.
+Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## References
 - Serre, "Linear Representations of Finite Groups"

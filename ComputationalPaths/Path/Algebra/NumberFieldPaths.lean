@@ -4,7 +4,7 @@
 Number fields, rings of integers, norms, traces, discriminants, ideal factorization
 — all encoded through genuine `Path` ops: `stepChain`, `trans`, `symm`, `congrArg`, `transport`.
 
-## Main results (35+ theorems/defs, zero Path.ofEq)
+## Main results (35+ theorems/defs, zero Path.mk [Step.mk _ _ h] h)
 -/
 
 import ComputationalPaths.Path.Basic

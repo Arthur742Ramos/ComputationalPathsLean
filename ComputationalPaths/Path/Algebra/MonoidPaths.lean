@@ -4,7 +4,7 @@
 Free monoid expressions with an inductive rewrite system: each step constructor
 captures a genuine monoid rewrite rule (associativity, left/right identity,
 congruence). Paths are chains of steps. 35+ theorems with multi-step
-trans/symm chains, zero `Path.ofEq`.
+trans/symm chains, zero `Path.mk [Step.mk _ _ h] h`.
 
 ## Domain-specific types
 - `MTerm α`  — free monoid expression AST
