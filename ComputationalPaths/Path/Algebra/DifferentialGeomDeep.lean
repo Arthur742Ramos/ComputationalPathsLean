@@ -43,23 +43,12 @@ universe u v w
 -- Domain-specific rewrite steps
 -- ============================================================================
 
-/-- Rewrite steps for differential geometry. -/
-inductive DiffGeoStep : ℕ → ℕ → Type where
-  | chart_transition (a : ℕ) : DiffGeoStep a a
-  | parallel_transport (a b : ℕ) (h : a = b) : DiffGeoStep a b
-  | covariant_deriv (a : ℕ) : DiffGeoStep a a
-  | curvature_identity (a b : ℕ) (h : a = b) : DiffGeoStep a b
-  | geodesic_eq (a : ℕ) : DiffGeoStep a a
-
-/-- Every DiffGeoStep yields a Path. -/
-def DiffGeoStep.toPath {a b : ℕ}
-    (s : DiffGeoStep a b) : Path a b :=
-  match s with
-  | .chart_transition _ => Path.refl _
-  | .parallel_transport _ _ h => Path.stepChain h
-  | .covariant_deriv _ => Path.refl _
-  | .curvature_identity _ _ h => Path.stepChain h
-  | .geodesic_eq _ => Path.refl _
+/-- Rewrite steps for differential geometry, modeled as Path witnesses. -/
+def diffGeoChartStep (a : ℕ) : Path a a := Path.refl a
+def diffGeoTransportStep (a b : ℕ) (h : a = b) : Path a b := Path.stepChain h
+def diffGeoCovariantStep (a : ℕ) : Path a a := Path.refl a
+def diffGeoCurvatureStep (a b : ℕ) (h : a = b) : Path a b := Path.stepChain h
+def diffGeoGeodesicStep (a : ℕ) : Path a a := Path.refl a
 
 -- ============================================================================
 -- SECTION 1: Path-witnessed algebraic structures for geometry
