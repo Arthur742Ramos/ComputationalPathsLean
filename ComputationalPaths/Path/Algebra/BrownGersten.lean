@@ -16,14 +16,12 @@ spectral sequence interfaces and adds edge compatibility data.
 - Weibel, "An Introduction to Homological Algebra"
 -/
 
-import ComputationalPaths.Path.Algebra.SpectralSequenceAlgebra
+import ComputationalPaths.Path.Algebra.SpectralSequenceConvergence
 
 namespace ComputationalPaths
 namespace Path
 namespace Algebra
 namespace BrownGersten
-
-open SpectralSequenceAlgebra
 
 universe u
 
@@ -31,29 +29,33 @@ universe u
 
 /-- A Brown-Gersten spectral sequence with Path-valued edge compatibility. -/
 structure BrownGerstenSpectralSequence where
-  /-- Underlying algebraic spectral sequence. -/
-  seq : SpectralSequence
-  /-- Target bigraded abelian group (abutment). -/
-  target : BigradedAbelianGroup
+  /-- Underlying pages of the spectral sequence. -/
+  seq : (r : Nat) → SpectralPage r
+  /-- Comparison maps between successive pages. -/
+  next : ∀ r p q, (seq r).term p q → (seq (r + 1)).term p q
+  /-- Target bigraded type family (abutment). -/
+  target : Nat → Nat → Type u
   /-- Edge maps from each page to the abutment. -/
-  edge : ∀ r : Nat, BigradedHom (seq.page r).groups target
-  /-- Edge maps are compatible with the comparison maps between pages. -/
+  edge : ∀ r p q, (seq r).term p q → target p q
+  /-- Edge maps are compatible with the comparison maps. -/
   edge_natural :
-    ∀ r p q (x : (seq.page r).groups.carrier p q),
-      Path ((edge (r + 1)).map p q ((seq.next r).map p q x))
-        ((edge r).map p q x)
+    ∀ r p q (x : (seq r).term p q),
+      Path (edge (r + 1) p q (next r p q x))
+        (edge r p q x)
 
 namespace BrownGerstenSpectralSequence
 
 /-- The trivial Brown-Gersten spectral sequence. -/
 def trivial : BrownGerstenSpectralSequence where
-  seq := trivialSpectralSequence
-  target := trivialBigradedAbelianGroup
-  edge := fun r => BigradedHom.id (trivialPage r).groups
+  seq := trivialSpectralPage
+  next := fun _ _ _ _ => PUnit.unit
+  target := fun _ _ => PUnit
+  edge := fun _ _ _ _ => PUnit.unit
   edge_natural := by
     intro _ _ _ x
-    let idPath : Path x x := Path.congrArg (fun y => y) (Path.refl x)
-    exact Path.trans (Path.symm idPath) idPath
+    let edgePath : Path PUnit.unit PUnit.unit :=
+      Path.congrArg (fun _ : PUnit => PUnit.unit) (Path.refl x)
+    exact Path.trans (Path.symm edgePath) edgePath
 
 end BrownGerstenSpectralSequence
 

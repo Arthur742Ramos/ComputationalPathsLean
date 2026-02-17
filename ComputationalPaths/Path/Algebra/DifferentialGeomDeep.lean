@@ -571,12 +571,12 @@ def bundle_morphism_id {B : Type u} {F : Type v}
   unfold bundleMorphism fiberIncl
   rfl
 
-/-- Def 40: Composition of bundle morphisms. -/
+/-- Def 40: Composition of bundle morphisms preserves base. -/
 def bundle_morphism_comp {B : Type u} {F₁ F₂ F₃ : Type v}
-    (phi : F₁ → F₂) (psi : F₂ → F₃) (p : TrivialBundleData B F₁) :
-    Path (bundleProj (bundleMorphism psi (bundleMorphism phi p)))
-         (bundleProj (bundleMorphism (psi ∘ phi) p)) := by
-  unfold bundleProj bundleMorphism
+    (phi : F₁ → F₂) (psi : F₂ → F₃) (b : B) (f : F₁) :
+    Path (bundleProj (bundleMorphism psi (bundleMorphism phi (fiberIncl b f))))
+         (bundleProj (bundleMorphism (psi ∘ phi) (fiberIncl b f))) := by
+  unfold bundleProj bundleMorphism fiberIncl
   exact Path.refl _
 
 -- ============================================================================
