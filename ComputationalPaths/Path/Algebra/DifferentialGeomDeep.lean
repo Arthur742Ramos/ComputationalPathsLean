@@ -566,10 +566,10 @@ def bundle_morphism_base {B : Type u} {F₁ F₂ : Type v}
 
 /-- Def 39: Identity bundle morphism. -/
 def bundle_morphism_id {B : Type u} {F : Type v}
-    (p : TrivialBundleData B F) :
-    Path (bundleMorphism id p) p := by
-  unfold bundleMorphism
-  simp
+    (b : B) (f : F) :
+    Path (bundleMorphism id (fiberIncl b f)) (fiberIncl b f) := by
+  unfold bundleMorphism fiberIncl
+  rfl
 
 /-- Def 40: Composition of bundle morphisms. -/
 def bundle_morphism_comp {B : Type u} {F₁ F₂ F₃ : Type v}
