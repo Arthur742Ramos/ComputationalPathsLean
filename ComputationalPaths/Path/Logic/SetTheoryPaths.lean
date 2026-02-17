@@ -54,7 +54,7 @@ def succOrd : SetState → SetState := fun n => n + 1/-! ## Extensionality: path
 /-- Extensionality as path: if two states encode the same set, there's a path. -/
 def extensionality_path (s₁ s₂ : SetState) (h : s₁ = s₂) :
     SetPath s₁ s₂ :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Extensionality is symmetric. -/
 def extensionality_symm (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :

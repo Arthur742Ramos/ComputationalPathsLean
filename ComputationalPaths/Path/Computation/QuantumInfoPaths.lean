@@ -3,7 +3,7 @@
 
 Density matrices, von Neumann entropy, quantum channels, fidelity,
 trace distance modeled via computational paths with genuine Path operations.
-All paths use `refl`, `trans`, `symm`, `congrArg`, `transport` — zero `Path.ofEq`.
+All paths use `refl`, `trans`, `symm`, `congrArg`, `transport` — zero `Path.mk [Step.mk _ _ h] h`.
 
 ## Main results (50 theorems)
 -/

@@ -4,7 +4,7 @@
   unification for first-order terms, factoring, paramodulation, completeness
   structure, strategy, proof terms as Path witnesses, Robinson's resolution theorem.
 
-  60 theorems/defs. ZERO sorry, ZERO Path.ofEq.
+  60 theorems/defs. ZERO sorry, ZERO Path.mk [Step.mk _ _ h] h.
 -/
 import ComputationalPaths.Path.Basic
 

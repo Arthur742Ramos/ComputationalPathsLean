@@ -143,7 +143,7 @@ def treeRewriteRoot {Sigma : Type u} (rule : TreeRewriteRule Sigma)
 /-- Path witness for tree rewriting. -/
 def treeRewritePath {Sigma : Type u} (rule : TreeRewriteRule Sigma)
     (h : rule.lhs = rule.rhs) : Path rule.lhs rule.rhs :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Reflexive tree rewrite. -/
 def treeRewriteRefl {Sigma : Type u} (t : RTree Sigma) :

@@ -31,7 +31,7 @@ variable {X : Type u} {Y : Type v}
 
 /-- Attachment path from a boundary point to the interior. -/
 def attach (c : Cell X) (b : X) (hb : b ∈ c.boundary) : Path b c.interior :=
-  Path.ofEq (c.bdry_eq b hb)
+  Path.mk [Step.mk _ _ (c.bdry_eq b hb)] (c.bdry_eq b hb)
 
 /-- The attachment proof component. -/
 theorem attach_proof (c : Cell X) (b : X) (hb : b ∈ c.boundary) :

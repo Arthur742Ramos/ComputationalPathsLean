@@ -402,7 +402,7 @@ theorem dd_classification_surjective_path
     (C : GerbeClassification) (c : C.cohom.classRep) :
     ∃ G : BundleGerbe, Nonempty (Path (C.classify G) c) := by
   rcases C.surjective c with ⟨G, hGc⟩
-  exact ⟨G, ⟨Path.ofEq hGc⟩⟩
+  exact ⟨G, ⟨Path.mk [Step.mk _ _ hGc] hGc⟩⟩
 
 /-- Reflexive path-level form of DD classification. -/
 theorem dd_classification_refl

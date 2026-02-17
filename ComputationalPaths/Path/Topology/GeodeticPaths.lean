@@ -7,7 +7,7 @@ CAT(0)-like non-positive curvature properties, and comparison triangles.
 
 ## Design
 
-All `Path.ofEq` wrappers have been replaced with either:
+All `Path.mk [Step.mk _ _ h] h` wrappers have been replaced with either:
 - `Path.stepChain` for leaf-level facts (domain axioms)
 - Multi-step `trans`/`symm`/`congrArg` chains for derived theorems
 

@@ -4,7 +4,7 @@
 Equivalences as invertible paths, ua-like principles, transport along
 equivalences, equivalence composition, half-adjoint equivalences —
 all witnesses built from `Path.refl`, `Path.trans`, `Path.symm`,
-`Path.congrArg`, `Path.transport`. **Zero** `Path.ofEq`.
+`Path.congrArg`, `Path.transport`. **Zero** `Path.mk [Step.mk _ _ h] h`.
 
 ## References
 

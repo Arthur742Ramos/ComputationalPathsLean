@@ -5,7 +5,7 @@ Pythagorean triples, Pell equations, sum-of-squares representations, linear
 Diophantine equations, and Brahmagupta–Fibonacci identity formalised through
 genuine computational path rewriting with domain-specific inductives.
 
-Every path is built from explicit `Step` witnesses — zero `Path.ofEq`.
+Every path is built from explicit `Step` witnesses — zero `Path.mk [Step.mk _ _ h] h`.
 
 ## Main results (48 theorems / path constructions)
 -/

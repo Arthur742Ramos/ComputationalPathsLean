@@ -527,7 +527,7 @@ theorem whiskerRight_symm {a : A} (r : Loop A a)
 /-! ## 46. Step-level witness -/
 
 theorem loop_step_witness {a : A} (h : a = a) :
-    Path.ofEq h = Path.mk [Step.mk a a h] h := rfl
+    Path.mk [Step.mk _ _ h] h = Path.mk [Step.mk a a h] h := rfl
 
 end LoopSpaceDeep
 end Path

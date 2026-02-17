@@ -4,7 +4,7 @@
 Transport, dependent paths, ap/apd, fiber transport, naturality,
 NatTrans — all via the concrete Path type.
 
-90+ theorems/defs. ZERO sorry, ZERO Path.ofEq.
+90+ theorems/defs. ZERO sorry, ZERO Path.mk [Step.mk _ _ h] h.
 -/
 
 import ComputationalPaths.Path.Basic

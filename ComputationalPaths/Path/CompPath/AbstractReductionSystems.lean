@@ -315,7 +315,7 @@ def Commute (s1 s2 : A → A → Prop) :=
 /-! ## Connection to computational Path -/
 
 /-- Lift an equality to a single-step computational path. -/
-def toPath {a b : A} (h : a = b) : Path a b := Path.ofEq h
+def toPath {a b : A} (h : a = b) : Path a b := Path.mk [Step.mk _ _ h] h
 
 /-- The underlying equality of composed paths is the composition of equalities. -/
 theorem toPath_toEq_trans {a b c : A} (h1 : a = b) (h2 : b = c) :
@@ -328,7 +328,7 @@ theorem toPath_toEq_symm {a b : A} (h : a = b) :
   subst h; rfl
 
 /-- Reflexive path from `rfl`. -/
-theorem toPath_refl (a : A) : toPath (rfl : a = a) = Path.ofEq rfl := rfl
+theorem toPath_refl (a : A) : toPath (rfl : a = a) = Path.mk [Step.mk _ _ rfl] rfl := rfl
 
 /-- Transport along a toPath is the same as Eq-substitution. -/
 theorem transport_via_path {a b : A} {D : A → Type u} (h : a = b) (x : D a) :

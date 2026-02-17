@@ -5,7 +5,7 @@ Thue systems: string rewriting where paths of rewrites ARE the mathematics.
 Word equivalence = existence of a path. Confluence = diamond on paths.
 Church-Rosser = every zigzag path can be straightened.
 
-90+ theorems/defs. ZERO sorry, ZERO Path.ofEq.
+90+ theorems/defs. ZERO sorry, ZERO Path.mk [Step.mk _ _ h] h.
 -/
 
 import ComputationalPaths.Path.Basic

@@ -107,7 +107,7 @@ theorem filter_rweq_inv_left (d : FilterData) :
 /-- Cascading two filters in series. -/
 def filterCascade (d1 d2 : FilterData)
     (h : d1.outputSample = d2.inputSample) : Path d1.inputSample d2.outputSample :=
-  Path.trans d1.filterPath (Path.trans (Path.ofEq h) d2.filterPath)
+  Path.trans d1.filterPath (Path.trans (Path.mk [Step.mk _ _ h] h) d2.filterPath)
 
 /-! ## Frequency Domain -/
 

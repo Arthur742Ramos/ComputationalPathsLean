@@ -3,7 +3,7 @@
 
 Domain-specific field expression language with rewrite-rule constructors,
 propositional path closure, and 55 theorems built from genuine multi-step
-`trans`/`symm` chains.  Zero `Path.ofEq` in the rewrite system.
+`trans`/`symm` chains.  Zero `Path.mk [Step.mk _ _ h] h` in the rewrite system.
 
 ## Architecture
 
@@ -589,7 +589,7 @@ theorem path_sound {F V : Type u} (fi : FieldInterp F V)
 def lift_to_path {F V : Type u} (fi : FieldInterp F V)
     {a b : FieldExpr V} (p : FieldPath V a b) :
     Path (evalInterp fi a) (evalInterp fi b) :=
-  Path.ofEq (path_sound fi p)
+  Path.mk [Step.mk _ _ (path_sound fi p)] (path_sound fi p)
 
 /-- Theorem 54: Soundness of add_sub_cancel in any interpretation. -/
 theorem add_sub_cancel_sound {F V : Type u} (fi : FieldInterp F V)

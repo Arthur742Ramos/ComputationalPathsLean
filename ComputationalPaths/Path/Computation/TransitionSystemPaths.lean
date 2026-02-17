@@ -169,12 +169,12 @@ def trace_nil_left {L : Type u} (t : List L) :
 /-- 14. Trace concatenation path: empty right. -/
 def trace_nil_right {L : Type u} (t : List L) :
     Path (t ++ ([] : List L)) t :=
-  Path.ofEq (List.append_nil t)
+  Path.mk [Step.mk _ _ (List.append_nil t)] (List.append_nil t)
 
 /-- 15. Trace associativity. -/
 def trace_assoc {L : Type u} (t₁ t₂ t₃ : List L) :
     Path (t₁ ++ t₂ ++ t₃) (t₁ ++ (t₂ ++ t₃)) :=
-  Path.ofEq (List.append_assoc t₁ t₂ t₃)
+  Path.mk [Step.mk _ _ (List.append_assoc t₁ t₂ t₃)] (List.append_assoc t₁ t₂ t₃)
 
 /-- 16. Trace congruence on left. -/
 def trace_congr_left {L : Type u} {t₁ t₁' : List L}
@@ -250,7 +250,7 @@ theorem pairPath_transport {S₁ S₂ : Type u} (D : LTSPair S₁ S₂ → Type 
 theorem pairPath_congrArg {S₁ S₂ : Type u}
     {a₁ a₂ : S₁} {b₁ b₂ : S₂}
     (ha : a₁ = a₂) (hb : b₁ = b₂) :
-    (pairPath (Path.ofEq ha) (Path.ofEq hb)).toEq =
+    (pairPath (Path.mk [Step.mk _ _ ha] ha) (Path.mk [Step.mk _ _ hb] hb)).toEq =
       (show LTSPair.mk a₁ b₁ = LTSPair.mk a₂ b₂ from by rw [ha, hb]) := by
   cases ha; cases hb; rfl
 

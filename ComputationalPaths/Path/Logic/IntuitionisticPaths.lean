@@ -3,7 +3,7 @@
 
 Heyting algebras with domain-specific `HeytingStep` rewrites,
 Kripke semantics for IPC, forcing monotonicity, all IPC axioms.
-**Zero** `Path.ofEq`.
+**Zero** `Path.mk [Step.mk _ _ h] h`.
 
 ## References
 

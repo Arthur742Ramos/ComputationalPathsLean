@@ -3,7 +3,7 @@
 
 Cochains, coboundary operator, cocycles and coboundaries, cohomology classes,
 cup product, short exact sequences, connecting homomorphism — all built with
-genuine `Path` operations (`refl`, `trans`, `symm`, `congrArg`). Zero `Path.ofEq`.
+genuine `Path` operations (`refl`, `trans`, `symm`, `congrArg`). Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## References
 

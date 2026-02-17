@@ -106,7 +106,7 @@ theorem constSSet_kan_subsingleton (A : Type u) [Nonempty A] [Subsingleton A] :
     simplex := a
     matches_faces := fun i hi => by
       simp [constSSet]
-      exact Path.ofEq (Subsingleton.elim _ _)
+      exact Path.mk [Step.mk _ _ (Subsingleton.elim _ _)] (Subsingleton.elim _ _)
   }⟩
 
 /-! ## Simplicial maps -/

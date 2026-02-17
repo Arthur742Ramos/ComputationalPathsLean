@@ -2,7 +2,7 @@
 # Arithmetic Geometry via Domain-Specific Computational Paths (audit fix)
 
 The previous scaffolding defined an "elliptic curve group law" as componentwise
-addition on coordinates and then proved everything by `Path.ofEq` + `simp`.
+addition on coordinates and then proved everything by `Path.mk [Step.mk _ _ h] h` + `simp`.
 
 This file replaces that with a *domain-specific* rewrite system:
 - `ArithStep` encodes arithmetic-geometry moves (EC group axioms, isogenies,

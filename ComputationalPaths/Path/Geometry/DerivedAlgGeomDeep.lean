@@ -3,7 +3,7 @@
 
 Simplicial commutative rings, cotangent complexes, deformation theory,
 Postnikov towers — formalized with domain-specific `DExpr`/`DStep`/`DPath`
-inductives. Zero `Path.ofEq`.
+inductives. Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## References
 

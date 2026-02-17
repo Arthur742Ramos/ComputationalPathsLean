@@ -73,7 +73,9 @@ def gray_interchange_path_from_interchange (G : GrayCategory (Obj := Obj))
     CellPath
       (G.vcomp (G.hcomp η₁ θ₁) (G.hcomp η₂ θ₂))
       (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂)) :=
-  CellPath.ofEq (G.interchange η₁ η₂ θ₁ θ₂)
+  Path.mk
+    [Step.mk _ _ (_root_.congrArg PLift.up (G.interchange η₁ η₂ θ₁ θ₂))]
+    (_root_.congrArg PLift.up (G.interchange η₁ η₂ θ₁ θ₂))
 
 /-- Interchange with identity 2-cells collapses to the original tensor. -/
 theorem gray_interchange_unit (G : GrayCategory (Obj := Obj))
@@ -151,7 +153,12 @@ theorem gray_tensor_product_associative_nonempty (G : GrayCategory (Obj := Obj))
       (G.vcomp (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂)) (G.hcomp η₃ θ₃))
       (G.hcomp (G.vcomp η₁ (G.vcomp η₂ η₃))
         (G.vcomp θ₁ (G.vcomp θ₂ θ₃)))) :=
-  ⟨CellPath.ofEq (gray_tensor_product_associative (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃)⟩
+  ⟨Path.mk
+    [Step.mk _ _
+      (_root_.congrArg PLift.up
+        (gray_tensor_product_associative (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃))]
+    (_root_.congrArg PLift.up
+      (gray_tensor_product_associative (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃))⟩
 
 /-- Gray tensor (horizontal composition) is functorial: interchange swaps
 the direction of the 3-cell. -/
@@ -363,12 +370,20 @@ def pathGrayCategory (A : Type u) : GrayCategory (Obj := A) where
   interchange_path := by
     intro a b c f₀ f₁ f₂ g₀ g₁ g₂ η₁ η₂ θ₁ θ₂
     exact
-      CellPath.ofEq
-        ((pathTwoCategory A).interchange
-          (a := a) (b := b) (c := c)
-          (f₀ := f₀) (f₁ := f₁) (f₂ := f₂)
-          (g₀ := g₀) (g₁ := g₁) (g₂ := g₂)
-          (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂))
+      Path.mk
+        [Step.mk _ _
+          (_root_.congrArg PLift.up
+            ((pathTwoCategory A).interchange
+              (a := a) (b := b) (c := c)
+              (f₀ := f₀) (f₁ := f₁) (f₂ := f₂)
+              (g₀ := g₀) (g₁ := g₁) (g₂ := g₂)
+              (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)))]
+        (_root_.congrArg PLift.up
+          ((pathTwoCategory A).interchange
+            (a := a) (b := b) (c := c)
+            (f₀ := f₀) (f₁ := f₁) (f₂ := f₂)
+            (g₀ := g₀) (g₁ := g₁) (g₂ := g₂)
+            (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)))
 
 /-- For `pathGrayCategory`, the stored interchange 3-cell recovers interchange by extraction. -/
 theorem pathGrayCategory_interchange_from_path (A : Type u)
@@ -408,7 +423,10 @@ def pathGrayCategory_tensor_assoc_path (A : Type u)
       ((pathGrayCategory A).vcomp
         ((pathGrayCategory A).assoc f₀ g₀ h₀)
         ((pathGrayCategory A).hcomp η ((pathGrayCategory A).hcomp θ ι))) :=
-  CellPath.ofEq (pathGrayCategory_tensor_assoc (A := A) η θ ι)
+  Path.mk
+    [Step.mk _ _
+      (_root_.congrArg PLift.up (pathGrayCategory_tensor_assoc (A := A) η θ ι))]
+    (_root_.congrArg PLift.up (pathGrayCategory_tensor_assoc (A := A) η θ ι))
 
 /-- Forgetting 3-cell data recovers the path 2-category. -/
 @[simp] theorem pathGrayCategory_to_twoCategory (A : Type u) :

@@ -92,7 +92,7 @@ theorem one_isStabilizer {PG : PathGroup G} (A : PathAction PG X) (x : X) :
 /-- Stabilizer element gives a path from act(g,x) to x. -/
 def stabilizerPathOf {PG : PathGroup G} (A : PathAction PG X)
     (x : X) (g : G) (h : IsStabilizer A x g) : Path (A.act g x) x :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Stabilizer of identity gives the reflexive path (at proof level). -/
 theorem stabilizerPath_one_toEq {PG : PathGroup G} (A : PathAction PG X) (x : X) :

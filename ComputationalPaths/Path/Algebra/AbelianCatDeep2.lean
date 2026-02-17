@@ -139,14 +139,14 @@ def epi_from_short_exact {A B C : Obj} {f : Hom A B} {g : Hom B C}
 def diagram_chase_left {A B C : Obj} (f₁ f₂ : Hom A B) (g : Hom B C)
     (h : Path f₁ f₂) :
     Path (ops.comp f₁ g) (ops.comp f₂ g) :=
-  Path.ofEq (by rw [h.proof])
+  Path.mk [Step.mk _ _ (by rw [h.proof])] (by rw [h.proof])
 
 /-! ## 11: Diagram chase – congruence right -/
 
 def diagram_chase_right {A B C : Obj} (f : Hom A B) (g₁ g₂ : Hom B C)
     (h : Path g₁ g₂) :
     Path (ops.comp f g₁) (ops.comp f g₂) :=
-  Path.ofEq (by rw [h.proof])
+  Path.mk [Step.mk _ _ (by rw [h.proof])] (by rw [h.proof])
 
 /-! ## Snake lemma data -/
 

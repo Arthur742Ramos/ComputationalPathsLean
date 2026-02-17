@@ -1,7 +1,7 @@
 /-
 # Combinatorics via Computational Paths (deepened)
 
-This module removes `Path.ofEq` scaffolding and replaces it with a small
+This module removes `Path.mk [Step.mk _ _ h] h` scaffolding and replaces it with a small
 combinatorics-specific rewriting language:
 
 * `CombObj`  — combinatorial expressions
@@ -10,7 +10,7 @@ combinatorics-specific rewriting language:
 
 All exported `Path` witnesses are produced using genuine `Path` operations
 (`refl`, `trans`, `symm`, `congrArg`) and explicit single-step traces
-(`Path.mk` + `Step.mk`), never `Path.ofEq`.
+(`Path.mk` + `Step.mk`), never `Path.mk [Step.mk _ _ h] h`.
 -/
 
 import ComputationalPaths.Path.Basic

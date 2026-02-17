@@ -7,7 +7,7 @@ multi-step `Path` chains.
 
 ## Design
 
-Instead of wrapping `simp` / `rfl` results with `Path.ofEq`, we define
+Instead of wrapping `simp` / `rfl` results with `Path.mk [Step.mk _ _ h] h`, we define
 concrete algebraic operations (barcode concat, filtration maps, etc.)
 and derive every `Path` theorem from `trans`, `symm`, `congrArg` chains
 over those definitions.  The result is a real path-rewriting trace for

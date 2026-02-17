@@ -1,7 +1,7 @@
 /-
 # Galois Groupoid via Computational Paths (deepened)
 
-This module removes `Path.ofEq` scaffolding.  We keep the lightweight field
+This module removes `Path.mk [Step.mk _ _ h] h` scaffolding.  We keep the lightweight field
 and automorphism infrastructure, and introduce a small domain-specific
 rewriting layer:
 
@@ -11,7 +11,7 @@ rewriting layer:
 
 All `Path` witnesses are built using `Path.refl`, `Path.trans`, `Path.symm`,
 `Path.congrArg`, and explicit one-step traces (`Path.mk` + `Step.mk`).
-No `Path.ofEq` appears in this file.
+No `Path.mk [Step.mk _ _ h] h` appears in this file.
 -/
 
 import ComputationalPaths.Path.Basic.Core

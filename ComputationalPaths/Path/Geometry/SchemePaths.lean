@@ -4,7 +4,7 @@
 Affine scheme structure: rings, ideals, spec topology, localization,
 sheaf conditions, and morphisms modeled via genuine rewrite steps.
 
-All paths built from SchemeStep/RStep inductives — zero Path.ofEq.
+All paths built from SchemeStep/RStep inductives — zero Path.mk [Step.mk _ _ h] h.
 
 ## Main results (45 theorems)
 -/

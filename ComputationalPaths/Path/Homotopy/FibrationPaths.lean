@@ -101,7 +101,7 @@ theorem fiberSeq_incl_proj {B E F : Type v} (fs : FiberSeq B E F) (x : F) :
 /-- Path from proj ∘ incl to the basepoint. -/
 def fiberSeq_proj_incl_path {B E F : Type v} (fs : FiberSeq B E F) (x : F) :
     Path (fs.proj (fs.incl x)) fs.basepoint :=
-  Path.ofEq (fs.fiberOver x)
+  Path.mk [Step.mk _ _ (fs.fiberOver x)] (fs.fiberOver x)
 
 /-! ## Homotopy lifting property -/
 

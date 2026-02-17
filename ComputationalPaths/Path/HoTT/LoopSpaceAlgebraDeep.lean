@@ -19,7 +19,7 @@ Main results:
 - Normalization of loop expressions to canonical form
 - 50+ theorems with multi-step trans/symm/congrArg chains
 
-ZERO `sorry`, ZERO `Path.ofEq`.
+ZERO `sorry`, ZERO `Path.mk [Step.mk _ _ h] h`.
 -/
 
 import ComputationalPaths.Path.Basic

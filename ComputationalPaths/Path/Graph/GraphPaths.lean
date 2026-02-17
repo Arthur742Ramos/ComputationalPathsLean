@@ -76,7 +76,7 @@ def vertexStep {V : Type u} {a b : V} (h : a = b) : Step V :=
 
 /-- Build a computational Path from a vertex equality. -/
 def vertexPath {V : Type u} {a b : V} (h : a = b) : Path a b :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Path from vertex to itself via reflexivity. -/
 def vertexRefl {V : Type u} (v : V) : Path v v :=

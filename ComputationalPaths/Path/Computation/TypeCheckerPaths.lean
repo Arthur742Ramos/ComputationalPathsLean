@@ -2,7 +2,7 @@
 # Type Checking via Computational Paths
 
 Typing contexts, type judgments, type inference, subject reduction,
-progress, type soundness, all via computational paths. Zero `Path.ofEq`.
+progress, type soundness, all via computational paths. Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## Main results (40+ theorems)
 -/

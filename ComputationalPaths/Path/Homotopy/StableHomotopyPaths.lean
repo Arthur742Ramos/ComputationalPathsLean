@@ -3,7 +3,7 @@
 
 Spectra, suspension, loop functors, Omega-spectra, stable stems, smash product,
 cofiber sequences, spectrum maps, stable equivalence — all with genuine `Path`
-operations (`refl`, `trans`, `symm`, `congrArg`). Zero `Path.ofEq`.
+operations (`refl`, `trans`, `symm`, `congrArg`). Zero `Path.mk [Step.mk _ _ h] h`.
 
 ## Main results: 45+ theorems/defs
 -/
