@@ -1,4 +1,4 @@
-/-!
+/-
 # Forcing and Set Theory via Computational Paths (Deep Structure)
 
 Large structural development for forcing-inspired set theory using computational
@@ -48,7 +48,7 @@ def atomicPath (h : a = b) : Path a b :=
 @[simp] theorem atomicPath_symm_symm (h : a = b) :
     Path.symm (Path.symm (atomicPath (a := a) (b := b) h)) =
       atomicPath (a := a) (b := b) h := by
-  simpa using congrArg Path.symm (atomicPath_symm (a := a) (b := b) h)
+  simpa using Path.symm_symm (atomicPath (a := a) (b := b) h)
 
 theorem trans_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
@@ -70,12 +70,12 @@ theorem symm_symm (p : Path a b) :
     Path.symm (Path.symm p) = p := by
   simpa using Path.symm_symm p
 
-theorem congrArg_trans (f : A → Type v) (p : Path a b) (q : Path b c) :
+theorem congrArg_trans {B : Type v} (f : A → B) (p : Path a b) (q : Path b c) :
     Path.congrArg f (Path.trans p q) =
       Path.trans (Path.congrArg f p) (Path.congrArg f q) := by
   simpa using Path.congrArg_trans f p q
 
-theorem congrArg_symm (f : A → Type v) (p : Path a b) :
+theorem congrArg_symm {B : Type v} (f : A → B) (p : Path a b) :
     Path.congrArg f (Path.symm p) =
       Path.symm (Path.congrArg f p) := by
   simpa using Path.congrArg_symm f p
@@ -101,7 +101,7 @@ theorem congrArg_symm (f : A → Type v) (p : Path a b) :
 
 @[simp] theorem atomicPath_congr_toEq (f : A → A) (h : a = b) :
     Path.toEq (Path.congrArg f (atomicPath (a := a) (b := b) h)) =
-      congrArg f h := rfl
+      _root_.congrArg f h := rfl
 
 end PathAPI
 
@@ -157,8 +157,7 @@ def conditionPath {Cond : Type u} {p q : Cond} (h : p = q) :
       _root_.congrArg ForcingCondition.mk h := rfl
 
 @[simp] theorem conditionPath_refl {Cond : Type u} (p : Cond) :
-    conditionPath (p := p) (q := p) rfl = Path.refl (ForcingCondition.mk p) := by
-  rfl
+    Path.toEq (conditionPath (p := p) (q := p) rfl) = rfl := rfl
 
 @[simp] theorem conditionPath_symm {Cond : Type u} {p q : Cond} (h : p = q) :
     Path.symm (conditionPath (p := p) (q := q) h) =
@@ -506,8 +505,7 @@ def evalPath {Obj : Type u} (M : BooleanValuedModel Obj) {x y : Obj}
 
 @[simp] theorem evalPath_refl {Obj : Type u}
     (M : BooleanValuedModel Obj) (x : Obj) :
-    evalPath M (Path.refl x) = Path.refl (M.eval x) := by
-  simp [evalPath]
+    evalPath M (Path.refl x) = Path.refl (M.eval x) := rfl
 
 @[simp] theorem evalPath_trans {Obj : Type u}
     (M : BooleanValuedModel Obj) {x y z : Obj}
@@ -525,7 +523,7 @@ def evalPath {Obj : Type u} (M : BooleanValuedModel Obj) {x y : Obj}
 @[simp] theorem evalPath_toEq {Obj : Type u}
     (M : BooleanValuedModel Obj) {x y : Obj}
     (p : Path x y) :
-    Path.toEq (evalPath M p) = congrArg M.eval (Path.toEq p) := rfl
+    Path.toEq (evalPath M p) = _root_.congrArg M.eval (Path.toEq p) := rfl
 
 /-! ## Consistency and independence packaging -/
 
@@ -681,12 +679,12 @@ theorem independenceResult_path_symm (R : IndependenceResult)
 theorem independenceResult_path_trans_unit (R : IndependenceResult)
     (p : Path R R) :
     Path.trans p (Path.refl R) = p := by
-  simpa using Path.trans_refl_right p
+  exact Path.trans_refl_right p
 
 theorem independenceResult_path_trans_unit_left (R : IndependenceResult)
     (p : Path R R) :
     Path.trans (Path.refl R) p = p := by
-  simpa using Path.trans_refl_left p
+  exact Path.trans_refl_left p
 
 theorem independenceResult_congr_sym (R S : IndependenceResult)
     (p : Path R S) :
