@@ -118,7 +118,7 @@ def density_counit_path {A : Sort u} (nerve real : A → A) (a : A) :
   .cons (.density_counit nerve real a) (.nil _)
 
 -- 9. Density theorem: nerve is fully faithful encoding
-def density_nerve_ff {A : Sort u} (nerve real : A → A) (a b : A)
+def density_nerve_ff {A : Sort u} (nerve _real : A → A) (a b : A)
     (p : CatDeep3Path a b) : CatDeep3Path (nerve a) (nerve b) :=
   CatDeep3Path.congrArg nerve p
 
@@ -167,12 +167,12 @@ def monad_unit_left_path {A : Sort u} (μ η : A → A) (a : A) :
   .cons (.monad_unit_left μ η a) (.nil _)
 
 -- 18. Barr-Beck: monad algebra ↔ descent data chain
-def barr_beck_chain {A : Sort u} (μ η T : A → A) (a : A) :
+def barr_beck_chain {A : Sort u} (_μ η _T : A → A) (a : A) :
     CatDeep3Path a (η a) :=
   .cons (.monad_unit η a) (.nil _)
 
 -- 19. Barr-Beck monadicity: full round trip T²a → μa → μa
-def barr_beck_monadicity {A : Sort u} (μ η T : A → A) (a : A) :
+def barr_beck_monadicity {A : Sort u} (μ _η T : A → A) (a : A) :
     CatDeep3Path (T (T a)) (μ a) :=
   CatDeep3Path.trans
     (monad_mult_path μ T a)
@@ -233,7 +233,7 @@ def street_em_path {A : Sort u} (em : A → A) (a : A) :
   .cons (.street_em em a) (.nil _)
 
 -- 30. Street's formal theory: EM object + monad
-def street_em_monad_chain {A : Sort u} (em η μ T : A → A) (a : A) :
+def street_em_monad_chain {A : Sort u} (em _η μ T : A → A) (a : A) :
     CatDeep3Path (T (T a)) (em (μ a)) :=
   CatDeep3Path.trans
     (monad_mult_path μ T a)
@@ -247,7 +247,7 @@ def street_formal_adj {A : Sort u} (em η : A → A) (a : A) :
     (.cons (.street_em em (η a)) (.nil _))
 
 -- 32. Grand monadicity chain: T²a → em(coeq(μ a))
-def grand_monadicity_chain {A : Sort u} (η μ T coeq em : A → A) (a : A) :
+def grand_monadicity_chain {A : Sort u} (_η μ T coeq em : A → A) (a : A) :
     CatDeep3Path (T (T a)) (em (coeq (μ a))) :=
   CatDeep3Path.trans
     (.cons (.monad_mult μ T a) (.nil _))
@@ -299,7 +299,7 @@ def monad_algebra_path {A : Sort u} (T alg : A → A) (a b : A)
   CatDeep3Path.congrArg alg (CatDeep3Path.congrArg T p)
 
 -- 40. Complete Barr-Beck: algebra ↔ coequalizer ↔ EM
-def complete_barr_beck {A : Sort u} (μ η T coeq em : A → A) (a : A) :
+def complete_barr_beck {A : Sort u} (μ _η T coeq em : A → A) (a : A) :
     CatDeep3Path (T (T a)) (em (coeq (μ a))) :=
   CatDeep3Path.trans
     (monad_mult_path μ T a)

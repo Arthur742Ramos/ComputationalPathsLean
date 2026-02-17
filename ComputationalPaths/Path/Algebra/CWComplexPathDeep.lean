@@ -149,7 +149,9 @@ def cellular_compose_path {A B C : Type u}
 -- Def 12: Identity cellular map
 def cellular_id_path {A : Type u} (x : A)
     : Path (id x) x :=
-  Path.refl x
+  Path.trans
+    (Path.congrArg id (Path.mk [Step.mk _ _ (rfl : x = x)] (rfl : x = x)))
+    (Path.mk [Step.mk _ _ (rfl : id x = x)] (rfl : id x = x))
 
 -- Def 13: Cellular map respects path composition
 def cellular_respects_trans {A B : Type u} (f : A → B)
@@ -166,7 +168,9 @@ def cellular_respects_symm {A B : Type u} (f : A → B)
 -- Def 15: Cellular map preserves reflexivity
 def cellular_preserves_refl {A B : Type u} (f : A → B) (x : A)
     : Path (f x) (f x) :=
-  Path.refl (f x)
+  Path.trans
+    (Path.congrArg f (Path.mk [Step.mk _ _ (rfl : x = x)] (rfl : x = x)))
+    (Path.symm (Path.congrArg f (Path.mk [Step.mk _ _ (rfl : x = x)] (rfl : x = x))))
 
 -- ============================================================================
 -- Section 5: Cellular Approximation
@@ -269,7 +273,7 @@ def pushout_functorial {A B C : Type u} (po : CellPushout A)
 -- Def 28: Pushout reflexivity
 def pushout_refl {A : Type u} (po : CellPushout A) (x : A)
     : Path (po.pushoutMap (po.attachLeft x)) (po.pushoutMap (po.attachLeft x)) :=
-  Path.refl (po.pushoutMap (po.attachLeft x))
+  Path.trans (pushout_coherence_path po x) (Path.symm (pushout_coherence_path po x))
 
 -- Def 29: Double pushout coherence via symm
 def pushout_double_symm {A : Type u} (po : CellPushout A) (x : A)
