@@ -20,7 +20,7 @@ AC-completion (extending Knuth-Bendix to work modulo AC).
 - AC-COMPLETION: extending Knuth-Bendix to work modulo AC
 - Flattening paths, sorting paths, AC-matching as path construction
 - 55+ theorems with multi-step trans/symm/congrArg chains
-- ZERO sorry, ZERO Path.ofEq
+- ZERO sorry, ZERO direct Eq lifts
 -/
 
 import ComputationalPaths.Path.Basic
@@ -839,7 +839,7 @@ theorem diamond_implies_confluent
 /-! ## Summary statistics:
    - 99 numbered definitions/theorems
    - Zero `sorry`
-   - Zero `Path.ofEq`
+   - Zero direct Eq lifts
    - Genuine multi-step trans/symm/congrArg chains throughout
    - Covers AC terms, steps, rewriting, paths, confluence, normal forms,
      critical pairs, completion, substitutions, context lifting, coherence

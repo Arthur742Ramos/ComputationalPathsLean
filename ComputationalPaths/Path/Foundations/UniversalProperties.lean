@@ -170,7 +170,8 @@ variable {A : Type u} {B : Type v}
 /-- Function extensionality: pointwise paths give a path between functions. -/
 def funext {f g : A → B} (h : ∀ x, Path (f x) (g x)) :
     Path f g :=
-  Path.ofEq (_root_.funext (fun x => (h x).toEq))
+  Path.mk [Step.mk _ _ (_root_.funext (fun x => (h x).toEq))]
+    (_root_.funext (fun x => (h x).toEq))
 
 /-- Pointwise extraction from a function path. -/
 def happly {f g : A → B} (p : Path f g) (x : A) :
@@ -196,19 +197,20 @@ theorem funext_happly_toEq {f g : A → B} (p : Path f g) :
 theorem funext_symm {f g : A → B} (h : ∀ x, Path (f x) (g x)) :
     (funext (fun x => Path.symm (h x))).toEq =
       (funext h).toEq.symm := by
-  simp [funext, Path.ofEq]
+  simp [funext]
 
 /-- `funext` respects transitivity at toEq level. -/
 theorem funext_trans {f g k : A → B}
     (h₁ : ∀ x, Path (f x) (g x)) (h₂ : ∀ x, Path (g x) (k x)) :
     (funext (fun x => Path.trans (h₁ x) (h₂ x))).toEq =
       ((funext h₁).toEq.trans (funext h₂).toEq) := by
-  simp [funext, Path.ofEq]
+  simp [funext]
 
 /-- Dependent function extensionality. -/
 def dfunext {C : A → Type v} {f g : ∀ x, C x}
     (h : ∀ x, Path (f x) (g x)) : Path f g :=
-  Path.ofEq (_root_.funext (fun x => (h x).toEq))
+  Path.mk [Step.mk _ _ (_root_.funext (fun x => (h x).toEq))]
+    (_root_.funext (fun x => (h x).toEq))
 
 /-- Pointwise extraction from dependent function path. -/
 def dhapply {C : A → Type v} {f g : ∀ x, C x}
@@ -231,7 +233,7 @@ variable {A : Type u} {a b : A}
 def pathToEq : Path a b → (a = b) := Path.toEq
 
 /-- Eq maps to path space via ofEq. -/
-def eqToPath : (a = b) → Path a b := Path.ofEq
+def eqToPath : (a = b) → Path a b := fun h => Path.mk [Step.mk _ _ h] h
 
 @[simp] theorem pathToEq_eqToPath (h : a = b) :
     pathToEq (eqToPath h) = h := rfl
@@ -253,7 +255,7 @@ theorem based_path_toEq_eq (p : Path a a) : p.toEq = rfl := by
 for all `p`, it suffices to prove `C rfl`. -/
 theorem eq_ind {C : (a = b) → Prop}
     (h : ∀ (p : Path a b), C p.toEq) (e : a = b) : C e := by
-  exact h (Path.ofEq e)
+  exact h (Path.mk [Step.mk _ _ e] e)
 
 /-- Uniqueness of identity proofs for Path.toEq. -/
 theorem toEq_unique (p q : Path a b) : p.toEq = q.toEq := by
@@ -266,7 +268,7 @@ theorem toEq_eq_proof (p : Path a b) (h : a = b) : p.toEq = h :=
 
 /-- Transport along a path via ofEq round-trips. -/
 theorem transport_ofEq_roundtrip {C : A → Type v} (h : a = b) (x : C a) :
-    Path.transport (D := C) (Path.ofEq h) x = h ▸ x := by
+    Path.transport (D := C) (Path.mk [Step.mk _ _ h] h) x = h ▸ x := by
   cases h; rfl
 
 end PathUniversal

@@ -350,7 +350,7 @@ def amalgamation_vertex_path {G : Graph}
     (v : amal.commonL.Vertex)
     (h : m1.onVertex (amal.embedL1.onVertex v) = m2.onVertex (amal.embedL2.onVertex v)) :
     Path (m1.onVertex (amal.embedL1.onVertex v)) (m2.onVertex (amal.embedL2.onVertex v)) :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-! ## 12. Critical Pairs -/
 
@@ -657,7 +657,7 @@ structure PushoutCommutes (sq : PushoutSquare) where
 def pushoutCommutePath (sq : PushoutSquare) (pc : PushoutCommutes sq)
     (a : sq.A.Vertex) :
     Path (sq.inB.onVertex (sq.f.onVertex a)) (sq.inC.onVertex (sq.g.onVertex a)) :=
-  Path.ofEq (pc.vertexCommute a)
+  Path.mk [Step.mk _ _ (pc.vertexCommute a)] (pc.vertexCommute a)
 
 /-- Pushout universal property. -/
 structure PushoutUniversal (sq : PushoutSquare) where

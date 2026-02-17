@@ -181,15 +181,15 @@ def punitVerdier : VerdierQuotientData PUnit punitHom punitShift where
 
 theorem shiftData_unshift_shift_path {Obj : Type u} (S : ShiftData Obj) (X : Obj) :
     Nonempty (Path (S.unshift (S.shift X)) X) :=
-  ⟨Path.ofEq (S.unshift_shift X)⟩
+  ⟨Path.mk [Step.mk _ _ (S.unshift_shift X)] (S.unshift_shift X)⟩
 
 theorem shiftData_shift_unshift_path {Obj : Type u} (S : ShiftData Obj) (X : Obj) :
     Nonempty (Path (S.shift (S.unshift X)) X) :=
-  ⟨Path.ofEq (S.shift_unshift X)⟩
+  ⟨Path.mk [Step.mk _ _ (S.shift_unshift X)] (S.shift_unshift X)⟩
 
 theorem shiftData_unshift_shift_symm {Obj : Type u} (S : ShiftData Obj) (X : Obj) :
     Nonempty (Path X (S.unshift (S.shift X))) :=
-  ⟨Path.symm (Path.ofEq (S.unshift_shift X))⟩
+  ⟨Path.symm (Path.mk [Step.mk _ _ (S.unshift_shift X)] (S.unshift_shift X))⟩
 
 theorem triangleData_X_refl {Obj : Type u} {Hom : Obj → Obj → Type v}
     {S : ShiftData Obj} (T : TriangleData Obj Hom S) :
@@ -209,12 +209,12 @@ theorem triangleData_Z_refl {Obj : Type u} {Hom : Obj → Obj → Type v}
 theorem octahedral_overlap_symm {Obj : Type u} {Hom : Obj → Obj → Type v}
     {S : ShiftData Obj} (O : OctahedralData Obj Hom S) :
     Nonempty (Path O.tri1.Z O.tri3.X) :=
-  ⟨Path.ofEq O.overlap⟩
+  ⟨Path.mk [Step.mk _ _ O.overlap] O.overlap⟩
 
 theorem verdier_shift_compat_path {Obj : Type u} {Hom : Obj → Obj → Type v}
     {S : ShiftData Obj} (V : VerdierQuotientData Obj Hom S) (X : Obj) :
     Nonempty (Path (V.Qshift.shift (V.onObj X)) (V.onObj (S.shift X))) :=
-  ⟨Path.ofEq (V.shift_compat X)⟩
+  ⟨Path.mk [Step.mk _ _ (V.shift_compat X)] (V.shift_compat X)⟩
 
 theorem triangulated_localization_functoriality
     {C : Type u} (L : LeftExactLocalization C)
@@ -227,7 +227,7 @@ theorem triangulated_homology_functoriality
     (E : GeneralizedHomologyTheory.{u, w})
     {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
     Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) :=
-  ⟨Path.ofEq (E.map_comp g f n)⟩
+  ⟨Path.mk [Step.mk _ _ (E.map_comp g f n)] (E.map_comp g f n)⟩
 
 theorem triangulated_cross_dependencies_left
     {C : Type u} (L : LeftExactLocalization C)
@@ -244,7 +244,7 @@ theorem triangulated_cross_dependencies_right
     (E : GeneralizedHomologyTheory.{u, w})
     {X Y Z : PtdType.{u}} (g : PtdMap Y Z) (f : PtdMap X Y) (n : Nat) :
     Nonempty (Path (E.map (PtdMap.comp g f) n) ((E.map g n) ∘ (E.map f n))) :=
-  ⟨Path.ofEq (E.map_comp g f n)⟩
+  ⟨Path.mk [Step.mk _ _ (E.map_comp g f n)] (E.map_comp g f n)⟩
 
 theorem punit_loop_trans_assoc (p q r : Path PUnit.unit PUnit.unit) :
     RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=

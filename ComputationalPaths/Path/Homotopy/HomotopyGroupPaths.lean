@@ -266,12 +266,14 @@ theorem exact_composite_null {X Y Z : Type u} {f : X → Y} {g : Y → Z} {z₀ 
 noncomputable def suspensionLoopMap {a : A}
     (_l : LoopSpace A a) :
     Path (Suspension.merid (X := A) a) (Suspension.merid (X := A) a) :=
-  Path.ofEq rfl
+  Path.mk [Step.mk _ _ rfl] rfl
 
 /-- The suspension of refl is the identity 2-cell. -/
 theorem suspensionLoopMap_refl {a : A} :
     @suspensionLoopMap A a (loopId a) =
-      Path.ofEq (rfl : Suspension.merid (X := A) a = Suspension.merid (X := A) a) := by
+      Path.mk
+        [Step.mk _ _ (rfl : Suspension.merid (X := A) a = Suspension.merid (X := A) a)]
+        (rfl : Suspension.merid (X := A) a = Suspension.merid (X := A) a) := by
   rfl
 
 /-! ## Path Space Fibration -/

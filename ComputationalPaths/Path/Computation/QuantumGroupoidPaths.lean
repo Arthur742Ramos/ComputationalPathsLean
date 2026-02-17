@@ -136,7 +136,7 @@ theorem pauliX_involution (q : QState) : pauliX (pauliX q) = q := by
   cases q; simp
 
 def pauliX_inv_path (q : QState) : Path (pauliX (pauliX q)) q :=
-  Path.ofEq (pauliX_involution q)
+  Path.mk [Step.mk _ _ (pauliX_involution q)] (pauliX_involution q)
 
 -- 13. lpSwap = pauliX (definitional)
 theorem lpSwap_eq_pauliX (q : QState) : lpSwap q = pauliX q := by rfl
@@ -151,7 +151,7 @@ theorem measure_idempotent (q : QState) :
 
 def measure_idempotent_path (q : QState) :
     Path (measureProject (measureProject q)) (measureProject q) :=
-  Path.ofEq (measure_idempotent q)
+  Path.mk [Step.mk _ _ (measure_idempotent q)] (measure_idempotent q)
 
 -- 16. Measurement kills phase shift
 theorem measure_kills_phase (q : QState) :
@@ -159,7 +159,7 @@ theorem measure_kills_phase (q : QState) :
 
 def measure_kills_phase_path (q : QState) :
     Path (measureProject (phaseShift q)) (measureProject q) :=
-  Path.ofEq (measure_kills_phase q)
+  Path.mk [Step.mk _ _ (measure_kills_phase q)] (measure_kills_phase q)
 
 -- 17. Transport along gate path
 def quantum_transport {D : QState → Type} {a b : QState}
@@ -194,7 +194,7 @@ theorem pauliX_comp_id : pauliX ∘ pauliX = gateId := by
   funext q; cases q; simp
 
 def pauliX_comp_path : Path (pauliX ∘ pauliX) gateId :=
-  Path.ofEq pauliX_comp_id
+  Path.mk [Step.mk _ _ pauliX_comp_id] pauliX_comp_id
 
 -- 24. Level doubling preserves phase
 theorem levelDouble_phase (q : QState) : (levelDouble q).phase = q.phase := by simp

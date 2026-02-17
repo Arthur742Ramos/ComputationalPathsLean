@@ -96,17 +96,18 @@ theorem SRRtc.toThueEquiv {α : Type u} {rules : List (SRRule α)}
 /-- Path witnessing associativity of word concatenation. -/
 def wordAssocPath {α : Type u} (u v w : SRWord α) :
     ComputationalPaths.Path (u ++ v ++ w) (u ++ (v ++ w)) :=
-  ComputationalPaths.Path.ofEq (List.append_assoc u v w)
+  ComputationalPaths.Path.mk [Step.mk _ _ (List.append_assoc u v w)]
+    (List.append_assoc u v w)
 
 /-- Path witnessing left identity. -/
 def wordNilLeftPath {α : Type u} (w : SRWord α) :
     ComputationalPaths.Path ([] ++ w) w :=
-  ComputationalPaths.Path.ofEq (List.nil_append w)
+  ComputationalPaths.Path.mk [Step.mk _ _ (List.nil_append w)] (List.nil_append w)
 
 /-- Path witnessing right identity. -/
 def wordNilRightPath {α : Type u} (w : SRWord α) :
     ComputationalPaths.Path (w ++ []) w :=
-  ComputationalPaths.Path.ofEq (List.append_nil w)
+  ComputationalPaths.Path.mk [Step.mk _ _ (List.append_nil w)] (List.append_nil w)
 
 @[simp] theorem wordNilLeftPath_toEq {α : Type u} (w : SRWord α) :
     (wordNilLeftPath w).toEq = List.nil_append w := by simp

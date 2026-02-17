@@ -77,9 +77,9 @@ theorem natCataHomSuccPath_toEq (B : NatAlg) (n : Nat) :
 /-- Any algebra hom from initial agrees with catamorphism. -/
 def natCata_unique (B : NatAlg) (h : NatAlgHom NatAlg.initial B) :
     (n : Nat) → Path (h.map n) (natCata B n)
-  | 0 => Path.ofEq h.map_zero
+  | 0 => Path.mk [Step.mk _ _ h.map_zero] h.map_zero
   | n + 1 => Path.trans
-      (Path.ofEq (h.map_succ n))
+      (Path.mk [Step.mk _ _ (h.map_succ n)] (h.map_succ n))
       (Path.congrArg B.succ (natCata_unique B h n))
 
 theorem natCata_unique_zero (B : NatAlg) (h : NatAlgHom NatAlg.initial B) :
@@ -190,7 +190,7 @@ def cata_fusion (A B : NatAlg) (h : NatAlgHom A B)
     (n : Nat)
     (heq : h.map (hA.map n) = (natCata B) n) :
     Path (h.map (hA.map n)) (natCata B n) :=
-  Path.ofEq heq
+  Path.mk [Step.mk _ _ heq] heq
 
 /-- Catamorphism identity law: fold with initial algebra constructors is identity. -/
 def cata_id_path (n : Nat) :

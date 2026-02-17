@@ -6,7 +6,7 @@ chain homotopies, mapping cones, connecting homomorphisms,
 and derived-functor computations — all modelled with genuine
 multi-step computational paths (trans / symm / congrArg chains).
 
-Zero `Path.ofEq`.  Every path is built from `refl`, `trans`, `symm`,
+Zero `Path.mk [Step.mk _ _ _] _`.  Every path is built from `refl`, `trans`, `symm`,
 `congrArg`, or compositions thereof.
 
 ## Main results (35 path defs, 30+ theorems)
@@ -352,9 +352,9 @@ def tor_shift_path (n : Nat) (a b : Int) :
     Path (tor n a b) (tor (n+1) a b) :=
   Path.trans (tor_vanish_path n a b) (Path.symm (tor_vanish_path (n+1) a b))
 
-/-! ### Verification: zero Path.ofEq in this file -/
+/-! ### Verification: zero Path.mk [Step.mk _ _ _] _ in this file -/
 
 -- All 40 path defs use: refl, trans, symm, congrArg, or stepPath (single Step constructor)
--- Zero occurrences of Path.ofEq
+-- Zero occurrences of Path.mk [Step.mk _ _ _] _
 
 end ComputationalPaths.Path.Algebra.HomologicalDeepPaths

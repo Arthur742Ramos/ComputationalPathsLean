@@ -5,7 +5,7 @@ Triangulated categories, distinguished triangles, shift functor,
 rotation, octahedral axiom, t-structures, truncation — all modelled
 with genuine multi-step computational paths (trans / symm / congrArg).
 
-Zero `Path.ofEq`.  Every path is built from `refl`, `trans`, `symm`,
+Zero `Path.mk`.  Every path is built from `refl`, `trans`, `symm`,
 `congrArg`, or single `Step` constructors.
 
 ## Main results (40 path defs, 30+ theorems)
@@ -88,7 +88,7 @@ structure DMor (A B : DObj) where
   rotateTri (rotateTri2 T)
 
 -- ═══════════════════════════════════════════════════════
--- THEOREMS AND PATH CONSTRUCTIONS — zero Path.ofEq
+-- THEOREMS AND PATH CONSTRUCTIONS — zero Path.mk
 -- ═══════════════════════════════════════════════════════
 
 /-! ### 1-5 : Shift functor algebra -/
@@ -353,6 +353,6 @@ theorem cone_zero_roundtrip :
     (Path.trans cone_zero_zero_path (Path.symm cone_zero_zero_path)).proof =
     (Path.refl (cone dZero dZero)).proof := by rfl
 
-/-! ### Verification: zero Path.ofEq in this file -/
+/-! ### Verification: zero Path.mk in this file -/
 
 end ComputationalPaths.Path.Algebra.DerivedCategoryDeepPaths

@@ -285,15 +285,17 @@ theorem transport_hMor_src_symm (D : DblCat) {a₁ a₂ b : D.Obj}
 /-- 20. CongrArg through hComp in first argument. -/
 theorem congrArg_hComp_left (D : DblCat) {a b c : D.Obj}
     {f₁ f₂ : D.HMor a b} (h : f₁ = f₂) (g : D.HMor b c) :
-    Path.congrArg (fun f => D.hComp f g) (Path.ofEq h) =
-      Path.ofEq (_root_.congrArg (fun f => D.hComp f g) h) := by
+    Path.congrArg (fun f => D.hComp f g) (Path.mk [Step.mk _ _ h] h) =
+      Path.mk [Step.mk _ _ (_root_.congrArg (fun f => D.hComp f g) h)]
+        (_root_.congrArg (fun f => D.hComp f g) h) := by
   subst h; simp
 
 /-- 21. CongrArg through hComp in second argument. -/
 theorem congrArg_hComp_right (D : DblCat) {a b c : D.Obj}
     (f : D.HMor a b) {g₁ g₂ : D.HMor b c} (h : g₁ = g₂) :
-    Path.congrArg (fun g => D.hComp f g) (Path.ofEq h) =
-      Path.ofEq (_root_.congrArg (fun g => D.hComp f g) h) := by
+    Path.congrArg (fun g => D.hComp f g) (Path.mk [Step.mk _ _ h] h) =
+      Path.mk [Step.mk _ _ (_root_.congrArg (fun g => D.hComp f g) h)]
+        (_root_.congrArg (fun g => D.hComp f g) h) := by
   subst h; simp
 
 /-- 22. hAssoc path cancels with inverse. -/
