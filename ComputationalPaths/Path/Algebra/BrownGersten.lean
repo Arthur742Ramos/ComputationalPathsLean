@@ -52,7 +52,8 @@ def trivial : BrownGerstenSpectralSequence where
   edge := fun r => BigradedHom.id (trivialPage r).groups
   edge_natural := by
     intro _ _ _ x
-    exact Path.refl x
+    let idPath : Path x x := Path.congrArg (fun y => y) (Path.refl x)
+    exact Path.trans (Path.symm idPath) idPath
 
 end BrownGerstenSpectralSequence
 

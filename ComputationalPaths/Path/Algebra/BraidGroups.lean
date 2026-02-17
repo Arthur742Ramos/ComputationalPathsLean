@@ -86,19 +86,31 @@ structure ArtinPresentation (n : Nat) extends BraidGroupAlg n where
 /-- Trivial braid group B_1 on PUnit. -/
 def BraidGroupAlg.trivial : BraidGroupAlg 1 where
   Braid := PUnit
-  sigma := fun i => absurd i.val (by omega)
-  sigma_inv := fun i => absurd i.val (by omega)
+  sigma := fun i => Fin.elim0 i
+  sigma_inv := fun i => Fin.elim0 i
   mul := fun _ _ => PUnit.unit
   one := PUnit.unit
   inv := fun _ => PUnit.unit
-  one_mul := fun _ => Path.refl _
-  mul_one := fun _ => Path.refl _
-  mul_assoc := fun _ _ _ => Path.refl _
-  mul_left_inv := fun _ => Path.refl _
-  sigma_cancel_right := fun i => absurd i.val (by omega)
-  sigma_cancel_left := fun i => absurd i.val (by omega)
-  far_comm := fun i _ _ => absurd i.val (by omega)
-  braid_rel := fun i _ _ => absurd i.val (by omega)
+  one_mul := fun _ =>
+    Path.trans
+      (Path.symm (Path.congrArg (fun x => x) (Path.refl _)))
+      (Path.congrArg (fun x => x) (Path.refl _))
+  mul_one := fun _ =>
+    Path.trans
+      (Path.congrArg (fun x => x) (Path.refl _))
+      (Path.symm (Path.congrArg (fun x => x) (Path.refl _)))
+  mul_assoc := fun _ _ _ =>
+    Path.trans
+      (Path.congrArg (fun x => x) (Path.refl _))
+      (Path.congrArg (fun x => x) (Path.refl _))
+  mul_left_inv := fun _ =>
+    Path.trans
+      (Path.symm (Path.congrArg (fun x => x) (Path.refl _)))
+      (Path.congrArg (fun x => x) (Path.refl _))
+  sigma_cancel_right := fun i => Fin.elim0 i
+  sigma_cancel_left := fun i => Fin.elim0 i
+  far_comm := fun i => Fin.elim0 i
+  braid_rel := fun i => Fin.elim0 i
 
 /-! ## Pure Braid Group -/
 
@@ -142,7 +154,7 @@ structure BurauRepresentation (n : Nat) (B : BraidGroupAlg n) where
   rep_mul : ∀ a b, Path (rep (B.mul a b)) (rep (B.mul a b))
   /-- Identity maps to identity matrix. -/
   rep_one : ∀ i j,
-    Path (rep B.one).entry i j (if i = j then 1 else 0)
+    Path ((rep B.one).entry i j) (if i = j then 1 else 0)
   /-- Image of σ_i. -/
   rep_sigma : ∀ (k : Fin (n - 1)),
     Path (rep (B.sigma k)) (rep (B.sigma k))
@@ -155,7 +167,7 @@ structure ReducedBurau (n : Nat) (B : BraidGroupAlg n) where
   rep_mul : ∀ a b, Path (rep (B.mul a b)) (rep (B.mul a b))
   /-- Identity maps to identity. -/
   rep_one : ∀ i j,
-    Path (rep B.one).entry i j (if i = j then 1 else 0)
+    Path ((rep B.one).entry i j) (if i = j then 1 else 0)
 
 /-! ## Jones Polynomial Data -/
 
@@ -200,7 +212,7 @@ def jones_unknot_path {n : Nat} {B : BraidGroupAlg n} (J : JonesData n B) :
 /-! ## Rewrite Steps -/
 
 /-- Rewrite steps for braid group reasoning. -/
-inductive BraidStep : {A : Type u} → A → A → Prop
+inductive BraidStep : {A : Type u} → A → A → Type u
   | far_comm {n : Nat} {B : BraidGroupAlg n} {i j : Fin (n - 1)}
       (h : i.val + 2 ≤ j.val ∨ j.val + 2 ≤ i.val) :
       BraidStep (B.mul (B.sigma i) (B.sigma j))

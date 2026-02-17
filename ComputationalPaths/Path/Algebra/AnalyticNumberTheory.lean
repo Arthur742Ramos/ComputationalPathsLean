@@ -186,17 +186,17 @@ theorem zeroFreeStrip_self (Z : ZeroFreeRegion) :
 theorem siegelWalfiszBound_nonneg (S : SiegelWalfiszDatum) :
     0 ≤ siegelWalfiszBound S := by
   unfold siegelWalfiszBound
-  exact Int.ofNat_nonneg _
+  exact Int.natCast_nonneg _
 
 theorem bombieriVinogradovLevel_nonneg (B : BombieriVinogradovDatum) :
     0 ≤ bombieriVinogradovLevel B := by
   unfold bombieriVinogradovLevel
-  exact Int.ofNat_nonneg _
+  exact Int.natCast_nonneg _
 
 theorem largeSieveBound_nonneg (L : LargeSieveDatum) :
     0 ≤ largeSieveBound L := by
   unfold largeSieveBound
-  exact Int.ofNat_nonneg _
+  exact Int.natCast_nonneg _
 
 theorem chebyshevPsi_zero :
     chebyshevPsi 0 = 0 := rfl
