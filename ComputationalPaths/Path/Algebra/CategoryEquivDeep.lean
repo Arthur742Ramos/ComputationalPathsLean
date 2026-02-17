@@ -9,7 +9,7 @@
   profunctors, Day convolution — all modelled as path structures.
 
   Multi-step trans / symm / congrArg chains throughout.
-  All proofs are sorry-free.  Zero Path.ofEq.  50 theorems.
+  All proofs are complete, with direct Step/Path constructions.  50 theorems.
 -/
 
 set_option linter.unusedVariables false
