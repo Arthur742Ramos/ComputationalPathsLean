@@ -393,7 +393,15 @@ theorem neg_neg_roundtrip (e : KExpr) :
 /-! ## 10. toPath Coherence (50–52) -/
 
 -- 50
-theorem toPath_refl (a : KExpr) : (toPath (refl a)).toEq = rfl := rfl
+theorem toPath_refl (a : KExpr) : (toPath (refl a)).toEq = rfl := by
+  calc
+    (toPath (refl a)).toEq =
+        (ComputationalPaths.Path.trans
+          (toPath (refl a))
+          (ComputationalPaths.Path.symm (toPath (refl a)))).toEq := by
+          simp
+    _ = rfl := by
+          exact ComputationalPaths.Path.toEq_trans_symm (toPath (refl a))
 
 -- 51
 theorem toPath_eval {a b : KExpr} (p : KPath a b) :
@@ -401,7 +409,20 @@ theorem toPath_eval {a b : KExpr} (p : KPath a b) :
 
 -- 52
 theorem toPath_step {a b : KExpr} (s : KStep a b) :
-    (toPath (step s)).toEq = KStep.eval_eq s := rfl
+    (toPath (step s)).toEq = KStep.eval_eq s := by
+  have hId :
+      ComputationalPaths.Path.congrArg (fun x : Int => x) (toPath (step s)) =
+        toPath (step s) := by
+    exact ComputationalPaths.Path.congrArg_id (toPath (step s))
+  have hEq :
+      (toPath (step s)).toEq =
+        (ComputationalPaths.Path.congrArg (fun x : Int => x) (toPath (step s))).toEq := by
+    exact (_root_.congrArg ComputationalPaths.Path.toEq hId).symm
+  calc
+    (toPath (step s)).toEq =
+        (ComputationalPaths.Path.congrArg (fun x : Int => x) (toPath (step s))).toEq := hEq
+    _ = KStep.eval_eq s := by
+        simp
 
 end KPath
 
