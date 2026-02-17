@@ -236,7 +236,8 @@ def groth_pair_neg (a b : KExpr) :
 def groth_neg_then_add (a b : KExpr) :
     KPath (KExpr.add (KExpr.pair a b) (KExpr.pair b a))
           (KExpr.add (KExpr.pair a b) (KExpr.pair b a)) :=
-  refl _
+  trans (step (KStep.add_comm (KExpr.pair a b) (KExpr.pair b a)))
+        (symm (step (KStep.add_comm (KExpr.pair a b) (KExpr.pair b a))))
 
 /-! ## 4. K₁ Determinant Paths (19–22) -/
 

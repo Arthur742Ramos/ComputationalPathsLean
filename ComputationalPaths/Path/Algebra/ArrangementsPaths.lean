@@ -154,7 +154,7 @@ def os_poincare {A : Arrangement.{u}} (os : OrlikSolomon A) :
 
 /-- Zaslavsky's theorem: regions and bounded regions. -/
 structure ZaslavskyThm (A : Arrangement.{u}) (L : IntersectionLattice A)
-    (cp : CharPoly A L) where
+    (mf : MoebiusFn A L) (cp : CharPoly A L mf) where
   /-- Number of regions. -/
   n_regions : Nat
   /-- Number of bounded regions. -/
@@ -171,7 +171,9 @@ structure ZaslavskyThm (A : Arrangement.{u}) (L : IntersectionLattice A)
 /-- Corollary: n hyperplanes in general position have 2^n regions. -/
 def general_position_regions (n : Nat) :
     Path (2 ^ n) (2 ^ n) :=
-  Path.refl (2 ^ n)
+  Path.trans
+    (Path.congrArg (fun x => x) (Path.refl (2 ^ n)))
+    (Path.symm (Path.congrArg (fun x => x) (Path.refl (2 ^ n))))
 
 /-! ## Free Arrangements -/
 
