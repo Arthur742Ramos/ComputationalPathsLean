@@ -213,17 +213,17 @@ def jones_unknot_path {n : Nat} {B : BraidGroupAlg n} (J : JonesData n B) :
 
 /-- Rewrite steps for braid group reasoning. -/
 inductive BraidStep : {A : Type u} → A → A → Type (u + 2)
-  | far_comm {n : Nat} {B : BraidGroupAlg n} {i j : Fin (n - 1)}
+  | far_comm {n : Nat} {B : BraidGroupAlg.{u} n} {i j : Fin (n - 1)}
       (h : i.val + 2 ≤ j.val ∨ j.val + 2 ≤ i.val) :
       BraidStep (B.mul (B.sigma i) (B.sigma j))
                 (B.mul (B.sigma j) (B.sigma i))
-  | braid_rel {n : Nat} {B : BraidGroupAlg n} {i j : Fin (n - 1)}
+  | braid_rel {n : Nat} {B : BraidGroupAlg.{u} n} {i j : Fin (n - 1)}
       (h : j.val = i.val + 1) :
       BraidStep (B.mul (B.sigma i) (B.mul (B.sigma j) (B.sigma i)))
                 (B.mul (B.sigma j) (B.mul (B.sigma i) (B.sigma j)))
-  | sigma_cancel {n : Nat} {B : BraidGroupAlg n} {i : Fin (n - 1)} :
+  | sigma_cancel {n : Nat} {B : BraidGroupAlg.{u} n} {i : Fin (n - 1)} :
       BraidStep (B.mul (B.sigma i) (B.sigma_inv i)) B.one
-  | markov {n : Nat} {B : BraidGroupAlg n} {cl : BraidClosure n B} {a b : B.Braid} :
+  | markov {n : Nat} {B : BraidGroupAlg.{u} n} {cl : BraidClosure.{u} n B} {a b : B.Braid} :
       BraidStep (cl.close (B.mul (B.mul a b) (B.inv a))) (cl.close b)
 
 /-- BraidStep implies Path. -/
