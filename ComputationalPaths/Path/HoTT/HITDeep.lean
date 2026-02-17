@@ -35,7 +35,7 @@ theorem Interval.seg_eq : Interval.zero = Interval.one :=
   Quot.sound IntervalRel.seg
 
 def Interval.segPath : Path Interval.zero Interval.one :=
-  Path.ofEq Interval.seg_eq
+  Path.mk [Step.mk _ _ Interval.seg_eq] Interval.seg_eq
 
 /-- Interval elimination. -/
 def Interval.lift {D : Type v} (d₀ d₁ : D) (h : d₀ = d₁) : Interval → D :=
@@ -54,7 +54,7 @@ theorem interval_seg_steps_length :
 /-- 3. Double reversal of interval segment recovers the original proof. -/
 theorem interval_seg_symm_symm :
     Path.symm (Path.symm Interval.segPath) = Interval.segPath := by
-  simp [Interval.segPath, Path.symm, Path.ofEq]
+  simp [Interval.segPath, Path.symm]
 
 /-! ## Deep circle properties -/
 
@@ -155,7 +155,7 @@ def HITQuot.cls {A : Type u} {R : A → A → Prop} (a : A) : HITQuot R := Quot.
 
 def HITQuot.clsPath {A : Type u} {R : A → A → Prop} {a b : A} (r : R a b) :
     Path (HITQuot.cls a : HITQuot R) (HITQuot.cls b) :=
-  Path.ofEq (Quot.sound r)
+  Path.mk [Step.mk _ _ (Quot.sound r)] (Quot.sound r)
 
 /-- 20. Quotient class path composed with inverse is trivial. -/
 theorem hitquot_cls_cancel {A : Type u} {R : A → A → Prop} {a b : A} (r : R a b) :
@@ -191,7 +191,7 @@ def PropTrunc.mk {A : Type u} (a : A) : PropTrunc A := Quot.mk _ a
 /-- The truncation path: all elements are identified. -/
 def PropTrunc.truncPath {A : Type u} (a b : A) :
     Path (PropTrunc.mk a : PropTrunc A) (PropTrunc.mk b) :=
-  Path.ofEq (Quot.sound (TruncRel.trunc a b))
+  Path.mk [Step.mk _ _ (Quot.sound (TruncRel.trunc a b))] (Quot.sound (TruncRel.trunc a b))
 
 /-- 23. Propositional truncation is a proposition: any two paths have same toEq. -/
 theorem proptrunc_isProp {A : Type u} (x y : PropTrunc A) :
@@ -270,7 +270,7 @@ theorem interval_congrArg {D : Type v} (f : Interval → D) :
 /-- 33. Wedge glue path symm-symm roundtrip. -/
 theorem wedge_glue_symm_symm {A B : Type u} {a₀ : A} {b₀ : B} :
     Path.symm (Path.symm (@Wedge.gluePath A B a₀ b₀)) = @Wedge.gluePath A B a₀ b₀ := by
-  simp [Wedge.gluePath, Path.symm, Path.ofEq]
+  simp [Wedge.gluePath, Path.symm]
 
 /-- 34. Coequalizer paths have one step each. -/
 theorem coeq_path_one_step {X Y : Type u} {f g : X → Y} (x : X) :
@@ -280,7 +280,7 @@ theorem coeq_path_one_step {X Y : Type u} {f g : X → Y} (x : X) :
 /-- 35. Steps length of suspension loop. -/
 theorem susp_loop_steps_length {A : Type u} (a₁ a₂ : A) :
     (Susp.loop a₁ a₂).steps.length = 2 := by
-  simp [Susp.loop, Susp.merid, Pushout.gluePath, Path.trans, Path.symm, Path.ofEq]
+  simp [Susp.loop, Susp.merid, Pushout.gluePath, Path.trans, Path.symm]
 
 end HITDeep
 end HoTT

@@ -28,7 +28,7 @@ structure Fiber (f : A → B) (b : B) where
 
 /-- Construct a fiber from a point and an equality. -/
 def Fiber.ofEq (f : A → B) {a : A} {b : B} (h : f a = b) : Fiber f b :=
-  ⟨a, Path.ofEq h⟩
+  ⟨a, Path.mk [Step.mk _ _ h] h⟩
 
 /-- The canonical fiber element at `f a`. -/
 def Fiber.canonical (f : A → B) (a : A) : Fiber f (f a) :=
@@ -104,17 +104,16 @@ def biInvToQInv {f : A → B} (e : BiInv f) : QInv f where
   retr := fun b =>
     -- Use: g(f(h(b))) = h(b) from sect, f(h(b)) = b from retr
     -- So f(g(b)) = b follows from: f(g(b)) = f(g(f(h(b)))) = f(h(b)) = b
-    Path.ofEq (by
-      have hsect := fun x => (e.left.sect x).proof
-      have hretr := fun x => (e.right.retr x).proof
-      -- g(f(x)) = x and f(h(x)) = x
-      -- f(g(b)) = f(g(f(h(b)))) [by congrArg f (congrArg g (hretr b))⁻¹]
-      --         = f(h(b))        [by congrArg f (hsect (h(b)))]
-      --         = b              [by hretr b]
+    (by
+      have h :
+          f (e.left.linv b) = b := by
+            have hsect := fun x => (e.left.sect x).proof
+            have hretr := fun x => (e.right.retr x).proof
       calc f (e.left.linv b)
           = f (e.left.linv (f (e.right.rinv b))) := by rw [hretr b]
         _ = f (e.right.rinv b) := by rw [hsect]
-        _ = b := hretr b)
+        _ = b := hretr b
+      exact Path.mk [Step.mk _ _ h] h)
 
 /-! ## Half-adjoint equivalences -/
 
@@ -216,8 +215,10 @@ def transportEquiv {D : A → Type v} {a b : A} (p : Path a b) :
   toFun := Path.transport p
   isEquiv :=
     { inv := Path.transport (Path.symm p)
-      sect := fun x => Path.ofEq (Path.transport_symm_left p x)
-      retr := fun y => Path.ofEq (Path.transport_symm_right p y) }
+      sect := fun x =>
+        Path.mk [Step.mk _ _ (Path.transport_symm_left p x)] (Path.transport_symm_left p x)
+      retr := fun y =>
+        Path.mk [Step.mk _ _ (Path.transport_symm_right p y)] (Path.transport_symm_right p y) }
 
 /-- Forward map of transportEquiv is transport. -/
 theorem transportEquiv_toFun {D : A → Type v} {a b : A}

@@ -106,20 +106,23 @@ def Distribution.smulDist (T : TestFunctionSpace) (n : Int) (d : Distribution T)
   eval := fun f => n * d.eval f
   eval_zero :=
     let h := d.eval_zero
-    Path.ofEq (by rw [h.proof]; simp)
+    Path.mk [Step.mk _ _ (by rw [h.proof]; simp)]
+      (by rw [h.proof]; simp)
   linear_add := fun f g => Path.refl _
 
 /-- 11. Zero scalar gives zero distribution -/
 def smul_zero_dist (T : TestFunctionSpace) (d : Distribution T)
     (f : T.carrier) :
     Path ((Distribution.smulDist T 0 d).eval f) 0 :=
-  Path.ofEq (by simp [Distribution.smulDist])
+  Path.mk [Step.mk _ _ (by simp [Distribution.smulDist])]
+    (by simp [Distribution.smulDist])
 
 /-- 12. One scalar gives same distribution -/
 def smul_one_dist (T : TestFunctionSpace) (d : Distribution T)
     (f : T.carrier) :
     Path ((Distribution.smulDist T 1 d).eval f) (d.eval f) :=
-  Path.ofEq (by simp [Distribution.smulDist])
+  Path.mk [Step.mk _ _ (by simp [Distribution.smulDist])]
+    (by simp [Distribution.smulDist])
 
 /-! ## Distributional Derivative -/
 
@@ -136,13 +139,15 @@ def dist_deriv (T : TestFunctionSpace) (d : Distribution T) (D : DerivativeOp T)
     show Path (-(d.eval (D.deriv T.zero))) 0
     have h1 := D.deriv_zero.proof
     have h2 := d.eval_zero.proof
-    exact Path.ofEq (by rw [h1]; rw [h2]; rfl)
+    exact Path.mk [Step.mk _ _ (by rw [h1]; rw [h2]; rfl)]
+      (by rw [h1]; rw [h2]; rfl)
   linear_add := fun f g => Path.refl _
 
 /-- 13. Distributional derivative of zero distribution -/
 def dist_deriv_zero_dist (T : TestFunctionSpace) (D : DerivativeOp T) (f : T.carrier) :
     Path ((dist_deriv T (Distribution.zeroDist T) D).eval f) 0 :=
-  Path.ofEq (by simp [dist_deriv, Distribution.zeroDist])
+  Path.mk [Step.mk _ _ (by simp [dist_deriv, Distribution.zeroDist])]
+    (by simp [dist_deriv, Distribution.zeroDist])
 
 /-- 14. Derivative operator at zero -/
 def deriv_at_zero (T : TestFunctionSpace) (D : DerivativeOp T) :

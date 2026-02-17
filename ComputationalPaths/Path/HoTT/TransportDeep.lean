@@ -365,12 +365,14 @@ def transport_path_cong {D : A → Type v} {a b : A}
 /-- Transport along ofEq h, then along symm (ofEq h), is identity. -/
 theorem transport_ofEq_symm_cancel {D : A → Type v} {a b : A}
     (h : a = b) (x : D a) :
-    Path.transport (D := D) (Path.symm (Path.ofEq h))
-      (Path.transport (D := D) (Path.ofEq h) x) = x := by
-  calc Path.transport (D := D) (Path.symm (Path.ofEq h))
-        (Path.transport (D := D) (Path.ofEq h) x)
-      = Path.transport (D := D) (Path.trans (Path.ofEq h) (Path.symm (Path.ofEq h))) x :=
-          (Path.transport_trans (Path.ofEq h) (Path.symm (Path.ofEq h)) x).symm
+    Path.transport (D := D) (Path.symm (Path.mk [Step.mk _ _ h] h))
+      (Path.transport (D := D) (Path.mk [Step.mk _ _ h] h) x) = x := by
+  calc Path.transport (D := D) (Path.symm (Path.mk [Step.mk _ _ h] h))
+        (Path.transport (D := D) (Path.mk [Step.mk _ _ h] h) x)
+      = Path.transport (D := D)
+          (Path.trans (Path.mk [Step.mk _ _ h] h) (Path.symm (Path.mk [Step.mk _ _ h] h))) x :=
+          (Path.transport_trans (Path.mk [Step.mk _ _ h] h)
+            (Path.symm (Path.mk [Step.mk _ _ h] h)) x).symm
     _ = x := by cases h; rfl
 
 /-! ## 29. cast_eq_transport -/

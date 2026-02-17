@@ -272,8 +272,9 @@ theorem transport_hom_symm (M : MultiCat) {inputs : List M.Obj}
 /-- 20. CongrArg on comp₁ in the second argument. -/
 theorem congrArg_comp₁_right (M : MultiCat) {a b c : M.Obj}
     (f : M.Hom [a] b) {g₁ g₂ : M.Hom [b] c} (h : g₁ = g₂) :
-    Path.congrArg (fun g => M.comp₁ f g) (Path.ofEq h) =
-      Path.ofEq (_root_.congrArg (fun g => M.comp₁ f g) h) := by
+    Path.congrArg (fun g => M.comp₁ f g) (Path.mk [Step.mk _ _ h] h) =
+      Path.mk [Step.mk _ _ (_root_.congrArg (fun g => M.comp₁ f g) h)]
+        (_root_.congrArg (fun g => M.comp₁ f g) h) := by
   subst h; simp
 
 /-- 21. Associativity path cancels with inverse. -/
@@ -286,8 +287,9 @@ theorem assoc₁_path_cancel (M : MultiCat) {a b c d : M.Obj}
 /-- 22. CongrArg comp₁ on a path. -/
 theorem congrArg_comp₁_left (M : MultiCat) {a b c : M.Obj}
     {f₁ f₂ : M.Hom [a] b} (h : f₁ = f₂) (g : M.Hom [b] c) :
-    Path.congrArg (fun f => M.comp₁ f g) (Path.ofEq h) =
-      Path.ofEq (_root_.congrArg (fun f => M.comp₁ f g) h) := by
+    Path.congrArg (fun f => M.comp₁ f g) (Path.mk [Step.mk _ _ h] h) =
+      Path.mk [Step.mk _ _ (_root_.congrArg (fun f => M.comp₁ f g) h)]
+        (_root_.congrArg (fun f => M.comp₁ f g) h) := by
   subst h; simp
 
 end ComputationalPaths.Path.Category.MultiCategoryPaths

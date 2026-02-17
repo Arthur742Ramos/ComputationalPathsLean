@@ -153,7 +153,7 @@ def encode {A : Type u} [DecidableEq A] {a b : A}
 
 /-- 19. Decode: from code to path. -/
 def decode {A : Type u} [DecidableEq A] {a b : A}
-    (c : Code a b) : Path a b := Path.ofEq c
+    (c : Code a b) : Path a b := Path.mk [Step.mk _ _ c] c
 
 /-- 20. Encode-decode roundtrip. -/
 theorem encode_decode_roundtrip {A : Type u} [DecidableEq A] {a b : A}
@@ -161,7 +161,7 @@ theorem encode_decode_roundtrip {A : Type u} [DecidableEq A] {a b : A}
 
 /-- 21. Decode-encode gives ofEq of the proof. -/
 theorem decode_encode {A : Type u} [DecidableEq A] {a b : A}
-    (p : Path a b) : decode (encode p) = Path.ofEq p.proof := rfl
+    (p : Path a b) : decode (encode p) = Path.mk [Step.mk _ _ p.proof] p.proof := rfl
 
 /-- 22. Encode at refl gives rfl. -/
 theorem encode_refl {A : Type u} [DecidableEq A] (a : A) :
@@ -172,7 +172,8 @@ theorem encode_refl {A : Type u} [DecidableEq A] (a : A) :
 /-- 23. Function extensionality: pointwise paths give a path between functions. -/
 def funext_path {A : Type u} {B : A → Type v} {f g : (a : A) → B a}
     (h : ∀ a, Path (f a) (g a)) : Path f g :=
-  Path.ofEq (funext (fun a => (h a).proof))
+  Path.mk [Step.mk _ _ (funext (fun a => (h a).proof))]
+    (funext (fun a => (h a).proof))
 
 /-- 24. Happly: a path between functions gives pointwise paths. -/
 def happly {A : Type u} {B : A → Type v} {f g : (a : A) → B a}
@@ -229,8 +230,10 @@ def invQInv {A B : Type u} {f : A → B} (ef : QInv f) : QInv ef.inv where
 def transportQInv {A : Type u} {D : A → Type u} {a b : A}
     (p : Path a b) : QInv (transport (D := D) p) where
   inv := transport (D := D) (symm p)
-  rightInv := fun y => Path.ofEq (transport_symm_right p y)
-  leftInv := fun x => Path.ofEq (transport_symm_left p x)
+  rightInv := fun y => Path.mk [Step.mk _ _ (transport_symm_right p y)]
+    (transport_symm_right p y)
+  leftInv := fun x => Path.mk [Step.mk _ _ (transport_symm_left p x)]
+    (transport_symm_left p x)
 
 /-! ## Path algebra deep chains -/
 

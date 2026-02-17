@@ -137,7 +137,7 @@ theorem truncate_zero (d : Deformation A) :
 
 def truncate_zero_path (d : Deformation A) :
     Path (d.truncate 0) (trivialDef d.base) :=
-  Path.ofEq (truncate_zero d)
+  Path.mk [Step.mk _ _ (truncate_zero d)] (truncate_zero d)
 
 -- 12. Truncation is idempotent (truncating again at same level)
 theorem truncate_idempotent (d : Deformation A) (n : Nat) :
@@ -146,7 +146,7 @@ theorem truncate_idempotent (d : Deformation A) (n : Nat) :
 
 def truncate_idem_path (d : Deformation A) (n : Nat) :
     Path ((d.truncate n).truncate n) (d.truncate n) :=
-  Path.ofEq (truncate_idempotent d n)
+  Path.mk [Step.mk _ _ (truncate_idempotent d n)] (truncate_idempotent d n)
 
 -- 13. Truncation at high order preserves deformation
 theorem truncate_high (d : Deformation A) (n : Nat) (h : d.corrections.length ≤ n) :
@@ -199,7 +199,7 @@ theorem truncate_compose (d : Deformation A) (m n : Nat) :
 
 def truncate_compose_path (d : Deformation A) (m n : Nat) :
     Path ((d.truncate n).truncate m) (d.truncate (min m n)) :=
-  Path.ofEq (truncate_compose d m n)
+  Path.mk [Step.mk _ _ (truncate_compose d m n)] (truncate_compose d m n)
 
 -- 23. Trivial deformation is fixed by truncation
 theorem trivial_truncate (a : A) (n : Nat) :
@@ -208,7 +208,7 @@ theorem trivial_truncate (a : A) (n : Nat) :
 
 def trivial_truncate_path (a : A) (n : Nat) :
     Path ((trivialDef a).truncate n) (trivialDef a) :=
-  Path.ofEq (trivial_truncate a n)
+  Path.mk [Step.mk _ _ (trivial_truncate a n)] (trivial_truncate a n)
 
 -- 24. Gauge equivalence is symmetric (by symm)
 theorem gauge_symmetric {d₁ d₂ : Deformation A}
@@ -223,6 +223,7 @@ theorem firstOrder_truncate_base (a c₁ c₂ : A) :
 
 def firstOrder_truncate_path (a c₁ c₂ : A) :
     Path ((firstOrderDef a c₁).truncate 0) ((firstOrderDef a c₂).truncate 0) :=
-  Path.ofEq (firstOrder_truncate_base a c₁ c₂)
+  Path.mk [Step.mk _ _ (firstOrder_truncate_base a c₁ c₂)]
+    (firstOrder_truncate_base a c₁ c₂)
 
 end ComputationalPaths.Path.Algebra.DeformationPaths

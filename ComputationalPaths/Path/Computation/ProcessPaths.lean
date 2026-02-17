@@ -117,12 +117,12 @@ def trace_nil_left {L : Type u} (t : List (Act L)) :
 /-- 10. Empty trace is right identity for append. -/
 def trace_nil_right {L : Type u} (t : List (Act L)) :
     Path (t ++ []) t := by
-  exact Path.ofEq (List.append_nil t)
+  exact Path.mk [Step.mk _ _ (List.append_nil t)] (List.append_nil t)
 
 /-- 11. Trace concatenation is associative. -/
 def trace_assoc {L : Type u} (t₁ t₂ t₃ : List (Act L)) :
     Path (t₁ ++ t₂ ++ t₃) (t₁ ++ (t₂ ++ t₃)) :=
-  Path.ofEq (List.append_assoc t₁ t₂ t₃)
+  Path.mk [Step.mk _ _ (List.append_assoc t₁ t₂ t₃)] (List.append_assoc t₁ t₂ t₃)
 
 /-! ## Bisimulation via Paths -/
 
@@ -184,14 +184,14 @@ def relabelTrace {L : Type u} (f : L → L) (t : List (Act L)) : List (Act L) :=
 def relabel_length {L : Type u} (f : L → L) (t : List (Act L)) :
     Path (relabelTrace f t).length t.length := by
   unfold relabelTrace
-  exact Path.ofEq (List.length_map _)
+  exact Path.mk [Step.mk _ _ (List.length_map _)] (List.length_map _)
 
 /-- 18. Relabeling distributes over concatenation. -/
 def relabel_concat {L : Type u} (f : L → L) (t₁ t₂ : List (Act L)) :
     Path (relabelTrace f (t₁ ++ t₂))
          (relabelTrace f t₁ ++ relabelTrace f t₂) := by
   unfold relabelTrace
-  exact Path.ofEq (by simp [List.map_append])
+  exact Path.mk [Step.mk _ _ (by simp [List.map_append])] (by simp [List.map_append])
 
 /-- 19. Relabeling empty trace gives empty. -/
 def relabel_nil {L : Type u} (f : L → L) :

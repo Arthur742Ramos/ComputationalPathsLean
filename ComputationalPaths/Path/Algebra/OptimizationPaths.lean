@@ -37,7 +37,7 @@ structure FeasibleSol (P : OptProblem A) where
 def objectivePath (P : OptProblem A) (s₁ s₂ : FeasibleSol P)
     (h : P.objective s₁.point = P.objective s₂.point) :
     Path (P.objective s₁.point) (P.objective s₂.point) :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Objective path steps are a singleton -/
 theorem objectivePath_steps (P : OptProblem A) (s₁ s₂ : FeasibleSol P)
@@ -92,7 +92,7 @@ structure DescentIter (A : Type u) where
 
 /-- Path witnessing the fixed point -/
 def fixedPath (D : DescentIter A) : Path (D.step D.fixedPt) D.fixedPt :=
-  Path.ofEq D.isFixed
+  Path.mk [Step.mk _ _ D.isFixed] D.isFixed
 
 /-- The n-fold iteration of the step map -/
 def iterStep (D : DescentIter A) : Nat → A → A
@@ -117,13 +117,13 @@ theorem iterStep_fixedPt (D : DescentIter A) (n : Nat) :
 /-- Path from iterated fixed point to fixed point -/
 def iterFixedPath (D : DescentIter A) (n : Nat) :
     Path (iterStep D n D.fixedPt) D.fixedPt :=
-  Path.ofEq (iterStep_fixedPt D n)
+  Path.mk [Step.mk _ _ (iterStep_fixedPt D n)] (iterStep_fixedPt D n)
 
 /-- CongrArg applied to fixed path -/
 theorem congrArg_fixedPath (D : DescentIter A) (f : A → B) :
     Path.congrArg f (fixedPath D) =
-    Path.ofEq (_root_.congrArg f D.isFixed) := by
-  simp [fixedPath, Path.congrArg, Path.ofEq, Step.map]
+    Path.mk [Step.mk _ _ (_root_.congrArg f D.isFixed)] (_root_.congrArg f D.isFixed) := by
+  simp [fixedPath, Path.congrArg, Step.map]
 
 /-- Transport along iterated fixed path at 0 is identity -/
 theorem transport_iterFixed_zero {P : A → Type v} (D : DescentIter A)
@@ -199,7 +199,7 @@ theorem kkt_congrArg_reverse (K : KKTCondition A) (f : A → B) (a : A) :
 def paretoObjectivePath (f : A → A)
     (a b : A) (h : f a = f b) :
     Path (f a) (f b) :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Symmetry of Pareto paths -/
 theorem pareto_symm (f : A → A)
@@ -219,8 +219,8 @@ theorem pareto_steps (f : A → A)
 theorem pareto_congrArg (f : A → A) (g : A → B)
     (a b : A) (h : f a = f b) :
     Path.congrArg g (paretoObjectivePath f a b h) =
-    Path.ofEq (_root_.congrArg g h) := by
-  simp [paretoObjectivePath, Path.congrArg, Path.ofEq, Step.map]
+    Path.mk [Step.mk _ _ (_root_.congrArg g h)] (_root_.congrArg g h) := by
+  simp [paretoObjectivePath, Path.congrArg, Step.map]
 
 /-- Transport along Pareto path -/
 theorem pareto_transport {P : A → Type v} (f : A → A)

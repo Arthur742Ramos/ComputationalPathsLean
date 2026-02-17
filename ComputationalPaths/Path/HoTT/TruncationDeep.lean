@@ -86,8 +86,8 @@ theorem isProp_triple_assoc (h : IsProp A) (a b c d : A) :
 
 /-- 11. In a set, the proof of any ofEq path equals the proof of any other. -/
 theorem isSet_ofEq_proofs (h : IsSet A) {a b : A} (p q : a = b) :
-    (Path.ofEq p).toEq = (Path.ofEq q).toEq :=
-  h.proofEq (Path.ofEq p) (Path.ofEq q)
+    (Path.mk [Step.mk _ _ p] p).toEq = (Path.mk [Step.mk _ _ q] q).toEq :=
+  h.proofEq (Path.mk [Step.mk _ _ p] p) (Path.mk [Step.mk _ _ q] q)
 
 /-- 12. In a set, any two paths between the same endpoints have equal proof. -/
 theorem isSet_paths_agree (h : IsSet A) {a b : A} (p q : Path a b) :
@@ -197,7 +197,8 @@ def PTrunc (A : Type u) : Type u := Quot (PTruncRel A)
 def PTrunc.mk (a : A) : PTrunc A := Quot.mk _ a
 
 def PTrunc.path (a b : A) : Path (PTrunc.mk a : PTrunc A) (PTrunc.mk b) :=
-  Path.ofEq (Quot.sound (PTruncRel.identify a b))
+  Path.mk [Step.mk _ _ (Quot.sound (PTruncRel.identify a b))]
+    (Quot.sound (PTruncRel.identify a b))
 
 /-- 28. PTrunc is a proposition: any two equalities agree. -/
 theorem ptrunc_isProp (x y : PTrunc A) : ∀ (p q : x = y), p = q :=
@@ -236,7 +237,8 @@ def STrunc (A : Type u) : Type u := Quot (STruncRel A)
 def STrunc.mk (a : A) : STrunc A := Quot.mk _ a
 
 def STrunc.path (a b : A) : Path (STrunc.mk a : STrunc A) (STrunc.mk b) :=
-  Path.ofEq (Quot.sound (STruncRel.identify a b))
+  Path.mk [Step.mk _ _ (Quot.sound (STruncRel.identify a b))]
+    (Quot.sound (STruncRel.identify a b))
 
 /-- 32. Set truncation is a set (all proofs of equality agree). -/
 theorem strunc_isSet : ∀ (x y : STrunc A) (p q : x = y), p = q :=

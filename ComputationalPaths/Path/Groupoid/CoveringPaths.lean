@@ -47,7 +47,7 @@ theorem proj_liftEndpoint (C : CoveringProj E A) {a b : A} (e : E)
 def liftEndpointReflPath (C : CoveringProj E A) {a : A} (e : E)
     (he : C.proj e = a) :
     Path (liftEndpoint C e he (Path.refl a)) e :=
-  Path.ofEq (liftEndpoint_refl C e he)
+  Path.mk [Step.mk _ _ (liftEndpoint_refl C e he)] (liftEndpoint_refl C e he)
 
 /-! ## Deck transformations -/
 
@@ -150,7 +150,7 @@ theorem deck_proj_eq {C : CoveringProj E A}
 def deck_proj_path {C : CoveringProj E A}
     (σ : DeckTransformation C) (e : E) :
     Path (C.proj (σ.toFun e)) (C.proj e) :=
-  Path.ofEq (σ.proj_comm e)
+  Path.mk [Step.mk _ _ (σ.proj_comm e)] (σ.proj_comm e)
 
 /-! ## Monodromy -/
 
@@ -189,7 +189,7 @@ theorem monodromyFiber_refl (C : CoveringProj E A) {a : A}
 def trivialCovering (A : Type u) (F : Type v) : CoveringProj (A × F) A where
   proj := Prod.fst
   lift := fun ⟨a₀, f⟩ ha p =>
-    ⟨(Path.transport (D := fun _ => A) (Path.ofEq ha |>.trans p) a₀ : A), f⟩
+    ⟨(Path.transport (D := fun _ => A) ((Path.mk [Step.mk _ _ ha] ha) |>.trans p) a₀ : A), f⟩
   lift_proj := fun ⟨_, _⟩ ha p => by
     cases ha; cases p with | mk s h => cases h; simp [Path.transport]
   lift_refl := fun ⟨_, _⟩ ha => by cases ha; simp [Path.transport]
@@ -233,15 +233,17 @@ theorem DeckTransformation.comp_id_right {C : CoveringProj E A}
 theorem projPath_section (C : CoveringProj E A) (f : A → E)
     (hf : ∀ a, C.proj (f a) = a) {a b : A} (p : Path a b) :
     (projPath C (Path.congrArg f p)).toEq =
-      (Path.ofEq (hf a) |>.trans (Path.trans p (Path.ofEq (hf b).symm))).toEq := by
+      ((Path.mk [Step.mk _ _ (hf a)] (hf a))
+        |>.trans (Path.trans p (Path.mk [Step.mk _ _ (hf b).symm] (hf b).symm))).toEq := by
   cases p with | mk s h => cases h; simp
 
 /-- Deck transformations commute with projection paths (at toEq level). -/
 theorem deck_projPath_toEq {C : CoveringProj E A}
     (σ : DeckTransformation C) {e₁ e₂ : E} (p : Path e₁ e₂) :
     (projPath C (σ.mapPath p)).toEq =
-      ((Path.ofEq (σ.proj_comm e₁)).trans
-        (Path.trans (projPath C p) (Path.ofEq (σ.proj_comm e₂).symm))).toEq := by
+      ((Path.mk [Step.mk _ _ (σ.proj_comm e₁)] (σ.proj_comm e₁)).trans
+        (Path.trans (projPath C p)
+          (Path.mk [Step.mk _ _ (σ.proj_comm e₂).symm] (σ.proj_comm e₂).symm))).toEq := by
   cases p with | mk s h => cases h; simp
 
 end CoveringPaths

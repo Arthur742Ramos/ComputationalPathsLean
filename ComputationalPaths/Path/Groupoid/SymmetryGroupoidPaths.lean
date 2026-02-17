@@ -131,14 +131,14 @@ theorem swap_involution (s : State) : swapSym (swapSym s) = s := by
   cases s; simp
 
 def swap_inv_path (s : State) : Path (swapSym (swapSym s)) s :=
-  Path.ofEq (swap_involution s)
+  Path.mk [Step.mk _ _ (swap_involution s)] (swap_involution s)
 
 -- 8. Double swap is identity
 theorem doubleSwap_is_id (s : State) : doubleSwap s = s := by
   cases s; simp
 
 def doubleSwap_path (s : State) : Path (doubleSwap s) s :=
-  Path.ofEq (doubleSwap_is_id s)
+  Path.mk [Step.mk _ _ (doubleSwap_is_id s)] (doubleSwap_is_id s)
 
 -- 9. Projection is idempotent
 theorem projectCharge_idem (s : State) :
@@ -146,7 +146,7 @@ theorem projectCharge_idem (s : State) :
 
 def projectCharge_idem_path (s : State) :
     Path (projectCharge (projectCharge s)) (projectCharge s) :=
-  Path.ofEq (projectCharge_idem s)
+  Path.mk [Step.mk _ _ (projectCharge_idem s)] (projectCharge_idem s)
 
 -- 10. Projection kills charge shift
 theorem project_kills_shift (s : State) :
@@ -154,7 +154,7 @@ theorem project_kills_shift (s : State) :
 
 def project_kills_shift_path (s : State) :
     Path (projectCharge (shiftCharge s)) (projectCharge s) :=
-  Path.ofEq (project_kills_shift s)
+  Path.mk [Step.mk _ _ (project_kills_shift s)] (project_kills_shift s)
 
 -- 11. Total charge is conserved under swap
 theorem totalCharge_swap_conserved (s : State) :
@@ -163,7 +163,7 @@ theorem totalCharge_swap_conserved (s : State) :
 
 def totalCharge_swap_path (s : State) :
     Path (totalCharge (swapSym s)) (totalCharge s) :=
-  Path.ofEq (totalCharge_swap_conserved s)
+  Path.mk [Step.mk _ _ (totalCharge_swap_conserved s)] (totalCharge_swap_conserved s)
 
 -- 12. Noether-type: symmetry path gives conservation path via congrArg
 def noether_correspondence (obs : Observable) {a b : State}

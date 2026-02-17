@@ -47,7 +47,7 @@ def trivialSolution (C : CSP A) (a : A) (h : C.domain a) :
 def solutionPath (C : CSP A) (s₁ s₂ : CSPSolution C)
     (h : s₁.point = s₂.point) :
     Path s₁.point s₂.point :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Solution path steps -/
 theorem solutionPath_steps (C : CSP A) (s₁ s₂ : CSPSolution C)
@@ -81,14 +81,14 @@ structure FixedWitness (C : CSP A) (AC : ArcConsistent C) where
 def fixedWitnessPath (C : CSP A) (AC : ArcConsistent C)
     (FW : FixedWitness C AC) :
     Path (AC.witness FW.fixedPt) FW.fixedPt :=
-  Path.ofEq FW.isFixed
+  Path.mk [Step.mk _ _ FW.isFixed] FW.isFixed
 
 /-- CongrArg applied to fixed witness path -/
 theorem congrArg_fixedWitness (C : CSP A) (AC : ArcConsistent C)
     (FW : FixedWitness C AC) (f : A → B) :
     congrArg f (fixedWitnessPath C AC FW) =
-    Path.ofEq (_root_.congrArg f FW.isFixed) := by
-  simp [fixedWitnessPath, congrArg, Path.ofEq, Step.map]
+    Path.mk [Step.mk _ _ (_root_.congrArg f FW.isFixed)] (_root_.congrArg f FW.isFixed) := by
+  simp [fixedWitnessPath, congrArg, Step.map]
 
 /-! ## Constraint propagation as path reduction -/
 
@@ -122,7 +122,7 @@ structure SearchNode (A : Type u) where
 /-- Path from a search node's value to one of its choices -/
 def choicePath (n : SearchNode A) (c : A) (h : c = n.value) :
     Path c n.value :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Backtracking: reverting a choice via symm -/
 def backtrack (n : SearchNode A) (c : A) (h : c = n.value) :
@@ -175,8 +175,8 @@ theorem transport_domain (C : CSP A) {a b : A} (p : Path a b)
 theorem congrArg_solution (C : CSP A) (f : A → B)
     (s₁ s₂ : CSPSolution C) (h : s₁.point = s₂.point) :
     congrArg f (solutionPath C s₁ s₂ h) =
-    Path.ofEq (_root_.congrArg f h) := by
-  simp [solutionPath, congrArg, Path.ofEq, Step.map]
+    Path.mk [Step.mk _ _ (_root_.congrArg f h)] (_root_.congrArg f h) := by
+  simp [solutionPath, congrArg, Step.map]
 
 /-- Transport along solution path and back is identity -/
 theorem solution_transport_roundtrip {P : A → Type v}

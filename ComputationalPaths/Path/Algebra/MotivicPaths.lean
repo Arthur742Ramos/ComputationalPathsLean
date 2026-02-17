@@ -75,7 +75,7 @@ theorem add_zero_components (c : AlgCycle) :
 /-- Adding zero gives same components (path). -/
 def add_zero_path (c : AlgCycle) :
     Path (c.add (AlgCycle.zero c.codim)).components (c.components ++ []) :=
-  Path.ofEq (add_zero_components c)
+  Path.mk [Step.mk _ _ (add_zero_components c)] (add_zero_components c)
 
 -- ============================================================================
 -- Section 2: Chow Groups
@@ -122,7 +122,7 @@ theorem classical_degree (p rank : Nat) :
 /-- Product codim comm path. -/
 def chow_product_codim_comm_path (c₁ c₂ : ChowData) :
     Path (c₁.product c₂).codim (c₂.product c₁).codim :=
-  Path.ofEq (chow_product_codim_comm c₁ c₂)
+  Path.mk [Step.mk _ _ (chow_product_codim_comm c₁ c₂)] (chow_product_codim_comm c₁ c₂)
 
 -- ============================================================================
 -- Section 3: Cycle Class Maps
@@ -143,7 +143,7 @@ theorem cycle_class_degree (ccm : CycleClassMap) :
 /-- Cycle class degree path. -/
 def cycle_class_degree_path (ccm : CycleClassMap) :
     Path ccm.target_degree (2 * ccm.source_codim) :=
-  Path.ofEq ccm.degree_formula
+  Path.mk [Step.mk _ _ ccm.degree_formula] ccm.degree_formula
 
 /-- Compatibility: cycle class of codim 0 maps to H^0. -/
 theorem cycle_class_codim_zero (ccm : CycleClassMap) (h : ccm.source_codim = 0) :
@@ -192,7 +192,7 @@ theorem tate_twist_twist (mw : MotivicWeight) :
 /-- Double twist path. -/
 def double_twist_weight_path (mw : MotivicWeight) :
     Path mw.doubleTwist.weight (mw.weight + 4) :=
-  Path.ofEq (double_twist_weight mw)
+  Path.mk [Step.mk _ _ (double_twist_weight mw)] (double_twist_weight mw)
 
 -- ============================================================================
 -- Section 5: Motivic Spectral Sequence
@@ -248,7 +248,7 @@ theorem bloch_kato_iso (bk : BlochKatoData) :
 /-- Bloch-Kato path. -/
 def bloch_kato_path (bk : BlochKatoData) :
     Path bk.milnorK_rank bk.galoisH_rank :=
-  Path.ofEq bk.iso
+  Path.mk [Step.mk _ _ bk.iso] bk.iso
 
 /-- Bloch-Kato symmetric path. -/
 def bloch_kato_symm_path (bk : BlochKatoData) :
@@ -309,7 +309,7 @@ theorem tensor_dimension (m₁ m₂ : VoevodskyMotive) :
 /-- Direct sum dimension path. -/
 def directSum_dim_comm_path (m₁ m₂ : VoevodskyMotive) :
     Path (m₁.directSum m₂).dimension (m₂.directSum m₁).dimension :=
-  Path.ofEq (directSum_dim_comm m₁ m₂)
+  Path.mk [Step.mk _ _ (directSum_dim_comm m₁ m₂)] (directSum_dim_comm m₁ m₂)
 
 /-- Tensor weight commutativity. -/
 theorem tensor_weight_comm (m₁ m₂ : VoevodskyMotive) :
@@ -319,7 +319,7 @@ theorem tensor_weight_comm (m₁ m₂ : VoevodskyMotive) :
 /-- Tensor weight comm path. -/
 def tensor_weight_comm_path (m₁ m₂ : VoevodskyMotive) :
     Path (m₁.tensor m₂).weight (m₂.tensor m₁).weight :=
-  Path.ofEq (tensor_weight_comm m₁ m₂)
+  Path.mk [Step.mk _ _ (tensor_weight_comm m₁ m₂)] (tensor_weight_comm m₁ m₂)
 
 end MotivicPaths
 end Algebra

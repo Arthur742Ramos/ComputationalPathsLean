@@ -146,7 +146,8 @@ theorem fracEquiv_refl {R : Type u} {ring : SpecRing R} {S : MultSet ring}
 def fracEquivReflPath {R : Type u} {ring : SpecRing R} {S : MultSet ring}
     (x : LocalizationData ring S) :
     Path (fracEquiv x x) True :=
-  Path.ofEq (propext ⟨fun _ => trivial, fun _ => fracEquiv_refl x⟩)
+  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => fracEquiv_refl x⟩)]
+    (propext ⟨fun _ => trivial, fun _ => fracEquiv_refl x⟩)
 
 /-! ## Localization at a prime -/
 
@@ -334,24 +335,24 @@ def specHomComp {R S T : Type u}
     show Path (ψ.toFun (φ.toFun rR.zero)) rT.zero
     have h1 := φ.map_zero.proof
     have h2 := ψ.map_zero.proof
-    exact Path.ofEq (by rw [h1, h2])
+    exact Path.mk [Step.mk _ _ (by rw [h1, h2])] (by rw [h1, h2])
   map_one := by
     show Path (ψ.toFun (φ.toFun rR.one)) rT.one
     have h1 := φ.map_one.proof
     have h2 := ψ.map_one.proof
-    exact Path.ofEq (by rw [h1, h2])
+    exact Path.mk [Step.mk _ _ (by rw [h1, h2])] (by rw [h1, h2])
   map_add := fun a b => by
     show Path (ψ.toFun (φ.toFun (rR.add a b)))
               (rT.add (ψ.toFun (φ.toFun a)) (ψ.toFun (φ.toFun b)))
     have h1 := (φ.map_add a b).proof
     have h2 := (ψ.map_add (φ.toFun a) (φ.toFun b)).proof
-    exact Path.ofEq (by rw [h1, h2])
+    exact Path.mk [Step.mk _ _ (by rw [h1, h2])] (by rw [h1, h2])
   map_mul := fun a b => by
     show Path (ψ.toFun (φ.toFun (rR.mul a b)))
               (rT.mul (ψ.toFun (φ.toFun a)) (ψ.toFun (φ.toFun b)))
     have h1 := (φ.map_mul a b).proof
     have h2 := (ψ.map_mul (φ.toFun a) (φ.toFun b)).proof
-    exact Path.ofEq (by rw [h1, h2])
+    exact Path.mk [Step.mk _ _ (by rw [h1, h2])] (by rw [h1, h2])
 
 -- 26
 theorem specMap_comp_mem {R S T : Type u}

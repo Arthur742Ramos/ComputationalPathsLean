@@ -45,7 +45,7 @@ theorem dj1_constant_false (v : Bool) :
 
 def dj1_constant_path (v : Bool) :
     Path (deutschJozsa1 (constOracle 1 v)) false :=
-  Path.ofEq (dj1_constant_false v)
+  Path.mk [Step.mk _ _ (dj1_constant_false v)] (dj1_constant_false v)
 
 /-! ## Grover search -/
 
@@ -102,7 +102,8 @@ theorem constOracle_isConstant (n : Nat) (v : Bool) :
 
 def constOracle_path (n : Nat) (v : Bool) (x y : Fin n → Bool) :
     Path (constOracle n v x) (constOracle n v y) :=
-  Path.ofEq (constOracle_isConstant n v x y)
+  Path.mk [Step.mk _ _ (constOracle_isConstant n v x y)]
+    (constOracle_isConstant n v x y)
 
 -- 2. DJ on constant oracle gives false
 theorem dj_constant (v : Bool) : deutschJozsa1 (constOracle 1 v) = false := by
@@ -122,7 +123,7 @@ theorem grover_found_monotone (gs : GroverState) (s : Bool) :
 
 def grover_found_path (gs : GroverState) (s : Bool) (h : gs.found = true) :
     Path (groverStep gs s).found true :=
-  Path.ofEq (grover_found_monotone gs s h)
+  Path.mk [Step.mk _ _ (grover_found_monotone gs s h)] (grover_found_monotone gs s h)
 
 -- 6. Grover with success finds
 theorem grover_success (gs : GroverState) :
@@ -134,7 +135,7 @@ theorem qft_iqft (n : Nat) (k : Fin (2^n)) :
 
 def qft_iqft_path (n : Nat) (k : Fin (2^n)) :
     Path (iqftPerm n (qftPerm n k)) k :=
-  Path.ofEq (qft_iqft n k)
+  Path.mk [Step.mk _ _ (qft_iqft n k)] (qft_iqft n k)
 
 -- 8. QFT∘IQFT = id
 theorem qft_iqft_comp (n : Nat) :
@@ -142,7 +143,7 @@ theorem qft_iqft_comp (n : Nat) :
 
 def qft_iqft_comp_path (n : Nat) :
     Path (iqftPerm n ∘ qftPerm n) id :=
-  Path.ofEq (qft_iqft_comp n)
+  Path.mk [Step.mk _ _ (qft_iqft_comp n)] (qft_iqft_comp n)
 
 -- 9. CongrArg through DJ
 def dj_congrArg {f g : Oracle 1} (p : Path f g) :
@@ -171,7 +172,8 @@ theorem groverNSteps_iter : (n : Nat) → (successes : Fin n → Bool) →
 
 def groverNSteps_path (n : Nat) (successes : Fin n → Bool) :
     Path (groverNSteps n successes).iteration n :=
-  Path.ofEq (groverNSteps_iter n successes)
+  Path.mk [Step.mk _ _ (groverNSteps_iter n successes)]
+    (groverNSteps_iter n successes)
 
 -- 13. If any success in Grover, final state is found
 theorem groverNSteps_any_success : (n : Nat) → (successes : Fin n → Bool) →
@@ -208,12 +210,12 @@ theorem dj_constant_both :
 
 def dj_constant_both_path :
     Path (deutschJozsa1 (constOracle 1 true)) (deutschJozsa1 (constOracle 1 false)) :=
-  Path.ofEq dj_constant_both
+  Path.mk [Step.mk _ _ dj_constant_both] dj_constant_both
 
 -- 18. Path from DJ result to false for constant oracle
 def dj_to_false_path (v : Bool) :
     Path (deutschJozsa1 (constOracle 1 v)) false :=
-  Path.ofEq (dj_constant v)
+  Path.mk [Step.mk _ _ (dj_constant v)] (dj_constant v)
 
 -- 19. Step construction for DJ
 def dj_step (v : Bool) : Step Bool :=
@@ -234,7 +236,8 @@ theorem qalg_path_coherence {a b : Bool} (p q : Path a b) :
 
 -- 23. Symm of QFT path
 theorem qft_path_symm (n : Nat) (k : Fin (2^n)) :
-    Path.symm (qft_iqft_path n k) = Path.ofEq (qft_iqft n k).symm := rfl
+    Path.symm (qft_iqft_path n k) =
+      Path.mk [Step.mk _ _ (qft_iqft n k).symm] (qft_iqft n k).symm := rfl
 
 -- 24. Phase estimate zero
 theorem phase_zero_num : phaseZero.numerator = 0 := rfl

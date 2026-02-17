@@ -145,7 +145,8 @@ def SeqColimit.descMor {D : SeqDiag.{u}} (C : Cocone D) :
 -- 16: Path in the colimit from the identification
 def SeqColimit.ιPath (D : SeqDiag.{u}) (n : Nat) (x : D.obj n) :
     Path (SeqColimit.ι D n x) (SeqColimit.ι D (n + 1) (D.map n x)) :=
-  Path.ofEq (SeqColimit.ι_comm D n x)
+  Path.mk [Step.mk _ _ (SeqColimit.ι_comm D n x)]
+    (SeqColimit.ι_comm D n x)
 
 -- 17: composing two identification paths (deep — uses trans and ι_comm)
 theorem SeqColimit.ιPath_trans (D : SeqDiag.{u}) (n : Nat) (x : D.obj n) :
@@ -199,7 +200,7 @@ theorem milnor_kernel_is_holim (D : SeqDiag.{u}) (s : ∀ n, D.obj n) :
 -- 25: milnor diff as a path
 def milnorPath (D : SeqDiag.{u}) (h : HoLim D) (n : Nat) :
     Path (D.map n (h.point n)) (h.point (n + 1)) :=
-  Path.ofEq (h.compat n)
+  Path.mk [Step.mk _ _ (h.compat n)] (h.compat n)
 
 -- 26: milnor paths compose via trans (deep — chain of paths)
 theorem milnorPath_trans_proof (D : SeqDiag.{u}) (h : HoLim D) (n : Nat) :
@@ -283,7 +284,7 @@ theorem HoPullback.diagonal_π₁ (a : A) :
 
 -- 40: pullback over refl path has canonical injection
 def HoPullback.ofEq {f : A → C} {g : B → C} (a : A) (b : B) (h : f a = g b) :
-    HoPullback f g := ⟨a, b, Path.ofEq h⟩
+    HoPullback f g := ⟨a, b, Path.mk [Step.mk _ _ h] h⟩
 
 /-! ## §10 Natural transformations between diagrams -/
 
@@ -358,7 +359,7 @@ theorem FibTower.section_retract (T : FibTower.{u}) (n : Nat) (x : T.obj n) :
 -- 52: section gives a path (deep — uses Step/Path)
 def FibTower.sectionPath (T : FibTower.{u}) (n : Nat) (x : T.obj n) :
     Path (T.section_ n (T.map n x)) x :=
-  Path.ofEq (T.section_inv n x)
+  Path.mk [Step.mk _ _ (T.section_inv n x)] (T.section_inv n x)
 
 -- 53: HoLim retract at each level
 theorem FibTower.hoLim_section_compat (T : FibTower.{u})

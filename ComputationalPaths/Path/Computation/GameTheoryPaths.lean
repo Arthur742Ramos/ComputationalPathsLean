@@ -56,13 +56,13 @@ theorem payoff2_eq_of_profile_eq {S1 S2 : Type u} (g : Game S1 S2)
 def payoff1_path {S1 S2 : Type u} (g : Game S1 S2)
     {p q : Profile S1 S2} (h : p = q) :
     Path (payoff1_at g p) (payoff1_at g q) :=
-  Path.congrArg (payoff1_at g) (Path.ofEq h)
+  Path.congrArg (payoff1_at g) (Path.mk [Step.mk _ _ h] h)
 
 /-- Path between profiles induces path between payoffs (player 2). -/
 def payoff2_path {S1 S2 : Type u} (g : Game S1 S2)
     {p q : Profile S1 S2} (h : p = q) :
     Path (payoff2_at g p) (payoff2_at g q) :=
-  Path.congrArg (payoff2_at g) (Path.ofEq h)
+  Path.congrArg (payoff2_at g) (Path.mk [Step.mk _ _ h] h)
 
 /-! ## Zero-Sum Games -/
 
@@ -79,7 +79,7 @@ theorem zerosum_neg {S1 S2 : Type u} (g : ZeroSumGame S1 S2)
 /-- Path witnessing zero-sum negation. -/
 def zerosum_neg_path {S1 S2 : Type u} (g : ZeroSumGame S1 S2)
     (s1 : S1) (s2 : S2) : Path (g.payoff2 s1 s2) (-g.payoff1 s1 s2) :=
-  Path.ofEq (zerosum_neg g s1 s2)
+  Path.mk [Step.mk _ _ (zerosum_neg g s1 s2)] (zerosum_neg g s1 s2)
 
 /-- Zero-sum property is preserved under profile equality. -/
 theorem zerosum_profile_eq {S1 S2 : Type u} (g : ZeroSumGame S1 S2)
@@ -125,7 +125,7 @@ theorem nash_eq_of_profile_eq {S1 S2 : Type u} (g : Game S1 S2)
 def nash_transport {S1 S2 : Type u} (g : Game S1 S2)
     {p q : Profile S1 S2} (h : p = q) :
     IsNashEquilibrium g p → IsNashEquilibrium g q :=
-  Path.transport (D := fun pr => IsNashEquilibrium g pr) (Path.ofEq h)
+  Path.transport (D := fun pr => IsNashEquilibrium g pr) (Path.mk [Step.mk _ _ h] h)
 
 /-- Path between Nash equilibrium proofs (proof irrelevance). -/
 theorem nash_proof_irrel {S1 S2 : Type u} (g : Game S1 S2)
@@ -230,13 +230,13 @@ theorem morph_id_profile {S1 S2 : Type u} (g : Game S1 S2)
 /-- Path between games induced by equality. -/
 def gamePath {S1 S2 : Type u} {g1 g2 : Game S1 S2} (h : g1 = g2) :
     Path g1 g2 :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Transport of profiles along game path. -/
 def profileTransport {S1 S2 : Type u}
     {p1 p2 : Profile S1 S2} (h : p1 = p2)
     (P : Profile S1 S2 → Type v) (x : P p1) : P p2 :=
-  Path.transport (Path.ofEq h) x
+  Path.transport (Path.mk [Step.mk _ _ h] h) x
 
 /-- Profile transport along refl is identity. -/
 theorem profile_transport_refl {S1 S2 : Type u}
@@ -274,7 +274,7 @@ theorem pureToMixed_eq {S : Type u} {s1 s2 : S} :
 /-- Path from pure strategy equality. -/
 def pureStrategyPath {S : Type u} {s1 s2 : S} (h : s1 = s2) :
     Path (pureToMixed s1) (pureToMixed s2) :=
-  Path.congrArg pureToMixed (Path.ofEq h)
+  Path.congrArg pureToMixed (Path.mk [Step.mk _ _ h] h)
 
 /-! ## Utility and CongrArg -/
 
@@ -290,7 +290,7 @@ theorem utility_congrArg {S1 S2 : Type u}
 def utility_path {S1 S2 : Type u}
     (u : Utility S1 S2) {s1 s1' : S1} (h : s1 = s1') (s2 : S2) :
     Path (u s1 s2) (u s1' s2) :=
-  Path.ofEq (utility_congrArg u h s2)
+  Path.mk [Step.mk _ _ (utility_congrArg u h s2)] (utility_congrArg u h s2)
 
 /-- Utility path composition: underlying proofs agree. -/
 theorem utility_path_trans_proof {S1 S2 : Type u}
@@ -309,7 +309,7 @@ def IsSymmetric {S : Type u} (g : Game S S) : Prop :=
 def symmetric_payoff_path {S : Type u} (g : Game S S)
     (hsym : IsSymmetric g) (s1 s2 : S) :
     Path (g.payoff1 s1 s2) (g.payoff2 s2 s1) :=
-  Path.ofEq (hsym s1 s2)
+  Path.mk [Step.mk _ _ (hsym s1 s2)] (hsym s1 s2)
 
 /-- Symmetric game: Nash at (s1,s2) implies best response symmetry. -/
 theorem symmetric_nash_br {S : Type u} (g : Game S S)

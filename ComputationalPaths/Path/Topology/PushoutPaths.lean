@@ -64,7 +64,7 @@ theorem glue_eq (c : C) : inl (f c) = @inr C A B f g (g c) :=
 
 /-- The gluing path from `inl (f c)` to `inr (g c)`. -/
 def gluePath (c : C) : Path (@inl C A B f g (f c)) (inr (g c)) :=
-  Path.ofEq (glue_eq c)
+  Path.mk [Step.mk _ _ (glue_eq c)] (glue_eq c)
 
 /-- Reverse gluing path. -/
 def gluePathRev (c : C) : Path (@inr C A B f g (g c)) (inl (f c)) :=
@@ -111,7 +111,7 @@ theorem Cocone.desc_inr (cc : Cocone f g D) (b : B) :
 /-- The cocone commutation as a computational path. -/
 def Cocone.commutePath (cc : Cocone f g D) (c : C) :
     Path (cc.left (f c)) (cc.right (g c)) :=
-  Path.ofEq (cc.commute c)
+  Path.mk [Step.mk _ _ (cc.commute c)] (cc.commute c)
 
 /-- Uniqueness of the cocone map. -/
 theorem Cocone.desc_unique (cc : Cocone f g D)
@@ -179,11 +179,11 @@ For general pushouts this requires further assumptions; here we prove the
 raw-level statement. -/
 theorem inl_eq_inl_of_eq {a₁ a₂ : A} (h : @inl C A B f g a₁ = inl a₂) :
     ∃ (p : Path (@inl C A B f g a₁) (inl a₂)), p.proof = h :=
-  ⟨Path.ofEq h, rfl⟩
+  ⟨Path.mk [Step.mk _ _ h] h, rfl⟩
 
 theorem inr_eq_inr_of_eq {b₁ b₂ : B} (h : @inr C A B f g b₁ = inr b₂) :
     ∃ (p : Path (@inr C A B f g b₁) (inr b₂)), p.proof = h :=
-  ⟨Path.ofEq h, rfl⟩
+  ⟨Path.mk [Step.mk _ _ h] h, rfl⟩
 
 /-! ## Transport across the glue -/
 
@@ -215,13 +215,14 @@ theorem path_inl_inr_iff (a : A) (b : B) :
     Nonempty (Path (@inl C A B f g a) (inr b)) ↔ (inl a : Pushout f g) = inr b := by
   constructor
   · intro ⟨p⟩; exact p.proof
-  · intro h; exact ⟨Path.ofEq h⟩
+  · intro h; exact ⟨Path.mk [Step.mk _ _ h] h⟩
 
 /-- Two glue paths compose to give a path between inl-points
 when they share a common right endpoint. -/
 def glueCompose (c₁ c₂ : C) (h : @inr C A B f g (g c₁) = inr (g c₂)) :
     Path (@inl C A B f g (f c₁)) (inl (f c₂)) :=
-  Path.trans (gluePath c₁) (Path.trans (Path.ofEq h) (gluePathRev c₂))
+  Path.trans (gluePath c₁)
+    (Path.trans (Path.mk [Step.mk _ _ h] h) (gluePathRev c₂))
 
 /-- The composed glue path's proof is irrelevant. -/
 theorem glueCompose_proof_irrel (c₁ c₂ : C)

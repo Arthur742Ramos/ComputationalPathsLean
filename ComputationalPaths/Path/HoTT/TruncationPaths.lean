@@ -167,13 +167,16 @@ def prod_isContr (hA : IsContr A) (hB : IsContr B) :
     IsContr (A × B) where
   center := (hA.center, hB.center)
   contr := fun (a, b) =>
-    Path.ofEq (by rw [(hA.contr a).proof, (hB.contr b).proof])
+    Path.mk [Step.mk _ _ (by rw [(hA.contr a).proof, (hB.contr b).proof])]
+      (by rw [(hA.contr a).proof, (hB.contr b).proof])
 
 /-- Product of propositions is a proposition. -/
 def prod_isProp (hA : IsProp A) (hB : IsProp B) :
     IsProp (A × B) where
   allPaths := fun (a₁, b₁) (a₂, b₂) =>
-    Path.ofEq (by rw [(hA.allPaths a₁ a₂).proof, (hB.allPaths b₁ b₂).proof])
+    Path.mk [Step.mk _ _
+      (by rw [(hA.allPaths a₁ a₂).proof, (hB.allPaths b₁ b₂).proof])]
+      (by rw [(hA.allPaths a₁ a₂).proof, (hB.allPaths b₁ b₂).proof])
 
 /-- Product of sets is a set. -/
 def prod_isSet : IsSet (A × B) where
@@ -182,7 +185,8 @@ def prod_isSet : IsSet (A × B) where
 /-- Function type into a proposition is a proposition. -/
 def fun_isProp (hB : IsProp B) : IsProp (A → B) where
   allPaths := fun f g =>
-    Path.ofEq (funext fun a => (hB.allPaths (f a) (g a)).proof)
+    Path.mk [Step.mk _ _ (funext fun a => (hB.allPaths (f a) (g a)).proof)]
+      (funext fun a => (hB.allPaths (f a) (g a)).proof)
 
 /-- Function type into a set is a set. -/
 def fun_isSet : IsSet (A → B) where
@@ -192,24 +196,35 @@ def fun_isSet : IsSet (A → B) where
 def transport_isContr {D : A → Type v} {a b : A}
     (p : Path a b) (h : IsContr (D a)) : IsContr (D b) where
   center := Path.transport p h.center
-  contr := fun x => Path.ofEq (by
-    cases p with | mk s pf => cases pf; exact (h.contr x).proof)
+  contr := fun x =>
+    Path.mk [Step.mk _ _ (by
+      cases p with | mk s pf => cases pf; exact (h.contr x).proof)]
+      (by
+        cases p with | mk s pf => cases pf; exact (h.contr x).proof)
 
 /-- Transport preserves propositions. -/
 def transport_isProp {D : A → Type v} {a b : A}
     (p : Path a b) (h : IsProp (D a)) : IsProp (D b) where
-  allPaths := fun x y => Path.ofEq (by
-    cases p with | mk s pf => cases pf; exact (h.allPaths x y).proof)
+  allPaths := fun x y =>
+    Path.mk [Step.mk _ _ (by
+      cases p with | mk s pf => cases pf; exact (h.allPaths x y).proof)]
+      (by
+        cases p with | mk s pf => cases pf; exact (h.allPaths x y).proof)
 
 /-- Sigma type over a contractible base is contractible. -/
 def sigma_isContr {B : A → Type v}
     (hA : IsContr A) (hB : IsContr (B hA.center)) :
     IsContr ((a : A) × B a) where
   center := ⟨hA.center, hB.center⟩
-  contr := fun ⟨a, b⟩ => Path.ofEq (by
-    have ha := (hA.contr a).proof
-    cases ha
-    exact _root_.congrArg (Sigma.mk hA.center) (hB.contr b).proof)
+  contr := fun ⟨a, b⟩ =>
+    Path.mk [Step.mk _ _ (by
+      have ha := (hA.contr a).proof
+      cases ha
+      exact _root_.congrArg (Sigma.mk hA.center) (hB.contr b).proof)]
+      (by
+        have ha := (hA.contr a).proof
+        cases ha
+        exact _root_.congrArg (Sigma.mk hA.center) (hB.contr b).proof)
 
 /-- Connected type induces (-1)-truncation. -/
 theorem connected_path_trunc (h : IsConnected A) :

@@ -112,7 +112,7 @@ def singleError (n : Nat) (pos : Fin n) (e : ErrorType) : ErrorChannel n :=
 theorem noError_identity (q : QBit) : applyError ErrorType.none q = q := by rfl
 
 def noError_path (q : QBit) : Path (applyError ErrorType.none q) q :=
-  Path.ofEq (noError_identity q)
+  Path.mk [Step.mk _ _ (noError_identity q)] (noError_identity q)
 
 -- 2. Bit flip is an involution
 theorem bitFlip_involution (q : QBit) :
@@ -121,7 +121,7 @@ theorem bitFlip_involution (q : QBit) :
 
 def bitFlip_involution_path (q : QBit) :
     Path (applyError ErrorType.bitFlip (applyError ErrorType.bitFlip q)) q :=
-  Path.ofEq (bitFlip_involution q)
+  Path.mk [Step.mk _ _ (bitFlip_involution q)] (bitFlip_involution q)
 
 -- 3. Correction undoes error (bit flip case)
 theorem correction_undoes_bitFlip (q : QBit) :
@@ -130,7 +130,7 @@ theorem correction_undoes_bitFlip (q : QBit) :
 
 def correction_path (q : QBit) :
     Path (applyCorrection ErrorType.bitFlip (applyError ErrorType.bitFlip q)) q :=
-  Path.ofEq (correction_undoes_bitFlip q)
+  Path.mk [Step.mk _ _ (correction_undoes_bitFlip q)] (correction_undoes_bitFlip q)
 
 -- 4. No-error correction is identity
 theorem noError_correction (q : QBit) :
@@ -141,7 +141,7 @@ theorem encode_decode (q : QBit) : decode3 (encode3 q) = q := by
   simp [encode3, decode3]
 
 def encode_decode_path (q : QBit) : Path (decode3 (encode3 q)) q :=
-  Path.ofEq (encode_decode q)
+  Path.mk [Step.mk _ _ (encode_decode q)] (encode_decode q)
 
 -- 6. Single bit-flip error on position 0 is correctable
 theorem correct_single_flip_0 (q : QBit) :
@@ -161,17 +161,17 @@ theorem correct_single_flip_2 (q : QBit) :
 -- 9. Path: error correction roundtrip for position 0
 def error_correct_roundtrip_0 (q : QBit) :
     Path (decode3 (flipAt ⟨0, by omega⟩ (encode3 q))) q :=
-  Path.ofEq (correct_single_flip_0 q)
+  Path.mk [Step.mk _ _ (correct_single_flip_0 q)] (correct_single_flip_0 q)
 
 -- 9b. Path: error correction roundtrip for position 1
 def error_correct_roundtrip_1 (q : QBit) :
     Path (decode3 (flipAt ⟨1, by omega⟩ (encode3 q))) q :=
-  Path.ofEq (correct_single_flip_1 q)
+  Path.mk [Step.mk _ _ (correct_single_flip_1 q)] (correct_single_flip_1 q)
 
 -- 9c. Path: error correction roundtrip for position 2
 def error_correct_roundtrip_2 (q : QBit) :
     Path (decode3 (flipAt ⟨2, by omega⟩ (encode3 q))) q :=
-  Path.ofEq (correct_single_flip_2 q)
+  Path.mk [Step.mk _ _ (correct_single_flip_2 q)] (correct_single_flip_2 q)
 
 -- 10. No-error channel is identity
 theorem noError_channel_id {n : Nat} (r : RegN n) :
@@ -180,7 +180,7 @@ theorem noError_channel_id {n : Nat} (r : RegN n) :
 
 def noError_channel_path {n : Nat} (r : RegN n) :
     Path (applyChannel (noError n) r) r :=
-  Path.ofEq (noError_channel_id r)
+  Path.mk [Step.mk _ _ (noError_channel_id r)] (noError_channel_id r)
 
 -- 11. CongrArg through error application
 def error_congrArg {q1 q2 : QBit} (e : ErrorType) (p : Path q1 q2) :
@@ -238,7 +238,8 @@ def error_correct_compose (q : QBit) :
 -- 19. Symm of error path
 theorem error_path_symm (q : QBit) :
     Path.symm (bitFlip_involution_path q) =
-    Path.ofEq (bitFlip_involution q).symm := by rfl
+    Path.mk [Step.mk _ _ (bitFlip_involution q).symm] (bitFlip_involution q).symm := by
+  rfl
 
 /-- Error weight for 3-qubit channel. -/
 def errorWeight3 (ch : ErrorChannel 3) : Nat :=

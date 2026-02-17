@@ -55,7 +55,8 @@ def fiberTransport_trans (fib : Fibration.{u}) {b₁ b₂ b₃ : fib.B}
     Path (fiberTransport fib (Path.trans p q) f)
          (fiberTransport fib q (fiberTransport fib p f)) := by
   unfold fiberTransport
-  exact Path.ofEq (Path.transport_trans (D := fun _ => fib.F) p q f)
+  exact Path.mk [Step.mk _ _ (Path.transport_trans (D := fun _ => fib.F) p q f)]
+    (Path.transport_trans (D := fun _ => fib.F) p q f)
 
 /-! ## 3: Fiber transport over symm left -/
 
@@ -63,7 +64,8 @@ def fiberTransport_symm_left (fib : Fibration.{u}) {b₁ b₂ : fib.B}
     (p : Path b₁ b₂) (f : fib.F) :
     Path (fiberTransport fib (Path.symm p) (fiberTransport fib p f)) f := by
   unfold fiberTransport
-  exact Path.ofEq (Path.transport_symm_left (D := fun _ => fib.F) p f)
+  exact Path.mk [Step.mk _ _ (Path.transport_symm_left (D := fun _ => fib.F) p f)]
+    (Path.transport_symm_left (D := fun _ => fib.F) p f)
 
 /-! ## 4: Fiber transport over symm right -/
 
@@ -71,7 +73,8 @@ def fiberTransport_symm_right (fib : Fibration.{u}) {b₁ b₂ : fib.B}
     (p : Path b₁ b₂) (g : fib.F) :
     Path (fiberTransport fib p (fiberTransport fib (Path.symm p) g)) g := by
   unfold fiberTransport
-  exact Path.ofEq (Path.transport_symm_right (D := fun _ => fib.F) p g)
+  exact Path.mk [Step.mk _ _ (Path.transport_symm_right (D := fun _ => fib.F) p g)]
+    (Path.transport_symm_right (D := fun _ => fib.F) p g)
 
 /-! ## Path lifting structure -/
 
@@ -210,8 +213,11 @@ def pullback_transport_trans (fib : Fibration.{u}) (A : Type u)
              Path.trans (Path.congrArg pb.pullMap p) (Path.congrArg pb.pullMap q) :=
     Path.congrArg_trans pb.pullMap p q
   rw [h1]
-  exact Path.ofEq (Path.transport_trans (D := fun _ => fib.F)
-    (Path.congrArg pb.pullMap p) (Path.congrArg pb.pullMap q) f)
+  exact Path.mk
+    [Step.mk _ _ (Path.transport_trans (D := fun _ => fib.F)
+      (Path.congrArg pb.pullMap p) (Path.congrArg pb.pullMap q) f)]
+    (Path.transport_trans (D := fun _ => fib.F)
+      (Path.congrArg pb.pullMap p) (Path.congrArg pb.pullMap q) f)
 
 /-! ## Fiber sequences -/
 

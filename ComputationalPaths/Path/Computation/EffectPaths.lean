@@ -143,20 +143,20 @@ theorem Handler.compose_assoc_ret {α β γ δ : Type}
 
 /-- Path witnessing an effect transformation. -/
 def effectPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Theorem 14: Effect path at refl is ofEq rfl. -/
 theorem effectPath_rfl {A : Type u} {a : A} :
-    effectPath (rfl : a = a) = Path.ofEq rfl := rfl
+    effectPath (rfl : a = a) = Path.mk [Step.mk _ _ rfl] rfl := rfl
 
 /-- Path for handler application on values. -/
 def handlerPath (h : Handler Nat Nat) (a b : Nat) (heq : h.handlePure a = b) :
     Path (h.handlePure a) b :=
-  Path.ofEq heq
+  Path.mk [Step.mk _ _ heq] heq
 
 /-- Theorem 15: Handler path at identity. -/
 theorem handlerPath_id (a : Nat) :
-    handlerPath (Handler.id Nat) a a rfl = Path.ofEq rfl := rfl
+    handlerPath (Handler.id Nat) a a rfl = Path.mk [Step.mk _ _ rfl] rfl := rfl
 
 /-! ## Effect State Transformer -/
 

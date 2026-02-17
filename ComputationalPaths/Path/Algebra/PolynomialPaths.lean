@@ -54,7 +54,7 @@ theorem polyAdd_nil_right (p : Poly) : polyAdd p [] = p := by
   cases p <;> rfl
 
 def polyAdd_zero_right_path (p : Poly) : Path (polyAdd p zeroPoly) p :=
-  Path.ofEq (polyAdd_nil_right p)
+  Path.mk [Step.mk _ _ (polyAdd_nil_right p)] (polyAdd_nil_right p)
 
 /-! ## Commutativity via well-founded recursion -/
 
@@ -67,7 +67,7 @@ theorem polyAdd_comm (p q : Poly) : polyAdd p q = polyAdd q p := by
     | cons b bs => simp [polyAdd, Int.add_comm a b, ih bs]
 
 def polyAdd_comm_path (p q : Poly) : Path (polyAdd p q) (polyAdd q p) :=
-  Path.ofEq (polyAdd_comm p q)
+  Path.mk [Step.mk _ _ (polyAdd_comm p q)] (polyAdd_comm p q)
 
 /-! ## Associativity -/
 
@@ -85,7 +85,7 @@ theorem polyAdd_assoc (p q r : Poly) :
 
 def polyAdd_assoc_path (p q r : Poly) :
     Path (polyAdd (polyAdd p q) r) (polyAdd p (polyAdd q r)) :=
-  Path.ofEq (polyAdd_assoc p q r)
+  Path.mk [Step.mk _ _ (polyAdd_assoc p q r)] (polyAdd_assoc p q r)
 
 /-! ## Negation -/
 
@@ -95,7 +95,7 @@ theorem polyNeg_neg (p : Poly) : polyNeg (polyNeg p) = p := by
   | cons a as ih => simp [polyNeg, Int.neg_neg, ih]
 
 def polyNeg_neg_path (p : Poly) : Path (polyNeg (polyNeg p)) p :=
-  Path.ofEq (polyNeg_neg p)
+  Path.mk [Step.mk _ _ (polyNeg_neg p)] (polyNeg_neg p)
 
 /-! ## Scalar multiplication -/
 
@@ -105,7 +105,7 @@ theorem polyScale_one (p : Poly) : polyScale 1 p = p := by
   | cons a as ih => simp [polyScale, ih]
 
 def polyScale_one_path (p : Poly) : Path (polyScale 1 p) p :=
-  Path.ofEq (polyScale_one p)
+  Path.mk [Step.mk _ _ (polyScale_one p)] (polyScale_one p)
 
 theorem polyScale_zero (p : Poly) : polyScale 0 p = List.replicate p.length 0 := by
   induction p with
@@ -117,13 +117,13 @@ theorem polyScale_zero (p : Poly) : polyScale 0 p = List.replicate p.length 0 :=
 theorem polyEval_nil (x : Int) : polyEval [] x = 0 := rfl
 
 def polyEval_zero_path (x : Int) : Path (polyEval zeroPoly x) 0 :=
-  Path.ofEq (polyEval_nil x)
+  Path.mk [Step.mk _ _ (polyEval_nil x)] (polyEval_nil x)
 
 theorem polyEval_const (c x : Int) : polyEval [c] x = c := by
   simp [polyEval, List.foldr]
 
 def polyEval_const_path (c x : Int) : Path (polyEval (constPoly c) x) c :=
-  Path.ofEq (polyEval_const c x)
+  Path.mk [Step.mk _ _ (polyEval_const c x)] (polyEval_const c x)
 
 theorem polyEval_cons (a : Int) (as : Poly) (x : Int) :
     polyEval (a :: as) x = a + polyEval as x * x := by
@@ -134,12 +134,12 @@ theorem polyEval_cons (a : Int) (as : Poly) (x : Int) :
 theorem polyDeg_nil : polyDeg zeroPoly = 0 := rfl
 
 def polyDeg_zero_path : Path (polyDeg zeroPoly) 0 :=
-  Path.ofEq polyDeg_nil
+  Path.mk [Step.mk _ _ polyDeg_nil] polyDeg_nil
 
 theorem polyDeg_const (c : Int) : polyDeg (constPoly c) = 1 := rfl
 
 def polyDeg_const_path (c : Int) : Path (polyDeg (constPoly c)) 1 :=
-  Path.ofEq (polyDeg_const c)
+  Path.mk [Step.mk _ _ (polyDeg_const c)] (polyDeg_const c)
 
 theorem polyDeg_cons (a : Int) (as : Poly) :
     polyDeg (a :: as) = polyDeg as + 1 := by

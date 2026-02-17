@@ -57,7 +57,7 @@ theorem wtreeDoubleRefl_toEq {S : Type u} {ar : S → Type u} (w : WTree S ar) :
 def nodeCongrChildren {S : Type u} {ar : S → Type u} (s : S)
     {f g : ar s → WTree S ar} (h : f = g) :
     Path (WTree.node s f) (WTree.node s g) :=
-  Path.congrArg (WTree.node s) (Path.ofEq h)
+  Path.congrArg (WTree.node s) (Path.mk [Step.mk _ _ h] h)
 
 theorem nodeCongrChildren_refl {S : Type u} {ar : S → Type u} (s : S)
     (f : ar s → WTree S ar) :
@@ -129,7 +129,8 @@ def compHomPath {S : Type u} {ar : S → Type u} {A B C : WAlgebra S ar}
     (s : S) (k : ar s → A.Carrier) :
     Path ((WAlgHom.comp g f).map (A.op s k))
          (C.op s (fun p => (WAlgHom.comp g f).map (k p))) :=
-  Path.ofEq ((WAlgHom.comp g f).commutes s k)
+  Path.mk [Step.mk _ _ ((WAlgHom.comp g f).commutes s k)]
+    ((WAlgHom.comp g f).commutes s k)
 
 /-! ## Dependent eliminator -/
 
@@ -230,8 +231,10 @@ def fold_unique {S : Type u} {ar : S → Type u} {X : Type u}
     (hcomm : ∀ s f, h (WTree.node s f) = alg s (fun p => h (f p))) :
     (w : WTree S ar) → Path (h w) (WTree.fold alg w)
   | WTree.node s f =>
-    Path.trans (Path.ofEq (hcomm s f))
-      (Path.congrArg (alg s) (Path.ofEq (funext fun p => (fold_unique alg h hcomm (f p)).toEq)))
+    Path.trans (Path.mk [Step.mk _ _ (hcomm s f)] (hcomm s f))
+      (Path.congrArg (alg s)
+        (Path.mk [Step.mk _ _ (funext fun p => (fold_unique alg h hcomm (f p)).toEq)]
+          (funext fun p => (fold_unique alg h hcomm (f p)).toEq)))
 
 /-- Initiality: fold from two identical algebras gives the same result. -/
 def fold_initiality {S : Type u} {ar : S → Type u} {X : Type u}
@@ -269,8 +272,10 @@ def fold_congrAlg {S : Type u} {ar : S → Type u} {X : Type u}
     (w : WTree S ar) → Path (WTree.fold alg₁ w) (WTree.fold alg₂ w)
   | WTree.node s f =>
     Path.trans
-      (Path.congrArg (alg₁ s) (Path.ofEq (funext fun p => (fold_congrAlg alg₁ alg₂ heq (f p)).toEq)))
-      (Path.ofEq (heq s _))
+      (Path.congrArg (alg₁ s)
+        (Path.mk [Step.mk _ _ (funext fun p => (fold_congrAlg alg₁ alg₂ heq (f p)).toEq)]
+          (funext fun p => (fold_congrAlg alg₁ alg₂ heq (f p)).toEq)))
+      (Path.mk [Step.mk _ _ (heq s _)] (heq s _))
 
 /-! ## Path algebra for WAlgHom -/
 

@@ -33,7 +33,7 @@ def bot : CPOElem := ⟨0⟩
 
 /-- Approximation path: a ⊑ b witnessed by a path from a to b. -/
 def approxPath (a b : CPOElem) (h : a = b) : Path a b :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Every element is above bottom (when they coincide at bot). -/
 theorem bot_least : bot = (⟨0⟩ : CPOElem) := rfl
@@ -133,8 +133,8 @@ def fixedPointLoop {f : CPOElem → CPOElem} {x : CPOElem}
 /-- If f x = x propositionally, we get a fixed point. -/
 def fixedPointOfEq (f : CPOElem → CPOElem) (x : CPOElem)
     (h : f x = x) : FixedPoint f x where
-  forward := Path.ofEq h
-  backward := Path.symm (Path.ofEq h)
+  forward := Path.mk [Step.mk _ _ h] h
+  backward := Path.symm (Path.mk [Step.mk _ _ h] h)
 
 /-- Fixed point from equality has forward-backward = refl proof. -/
 theorem fixedPointOfEq_loop (f : CPOElem → CPOElem) (x : CPOElem)
@@ -224,12 +224,12 @@ inductive Lifted (α : Type u) where
 /-- Path from bottom to any lifted element. -/
 def liftedBot {α : Type u} [DecidableEq α] (x : Lifted α) (h : Lifted.bottom = x) :
     Path (Lifted.bottom : Lifted α) x :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Flat domain: paths between equal lifted elements. -/
 def flat_domain_paths {α : Type u} [DecidableEq α] (a b : α) (h : a = b) :
     Path (Lifted.up a) (Lifted.up b) :=
-  Path.ofEq (h ▸ rfl)
+  Path.mk [Step.mk _ _ (h ▸ rfl)] (h ▸ rfl)
 
 /-- Flat domain identity path proof is rfl. -/
 theorem flat_domain_refl_proof {α : Type u} [DecidableEq α] (a : α) :
@@ -249,7 +249,8 @@ def deflation_fixedPoint (f : CPOElem → CPOElem) (d : Deflation f) (x : CPOEle
 
 /-- Deflation composed with itself yields path to same target. -/
 theorem deflation_double_below_proof (f : CPOElem → CPOElem) (d : Deflation f) (x : CPOElem) :
-    (d.below (f x)).proof.symm = (Path.ofEq (d.idempotent x).symm).proof := by
+    (d.below (f x)).proof.symm =
+      (Path.mk [Step.mk _ _ (d.idempotent x).symm] (d.idempotent x).symm).proof := by
   simp
 
 end ComputationalPaths.Path.Computation.DomainTheoryPaths

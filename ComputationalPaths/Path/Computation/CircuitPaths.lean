@@ -125,7 +125,7 @@ theorem circComp_id_left {n m : Nat} (f : Circuit n m) :
 
 def circComp_id_left_path {n m : Nat} (f : Circuit n m) :
     Path (circComp (circId n) f) f :=
-  Path.ofEq (circComp_id_left f)
+  Path.mk [Step.mk _ _ (circComp_id_left f)] (circComp_id_left f)
 
 -- 3. Right identity for composition
 theorem circComp_id_right {n m : Nat} (f : Circuit n m) :
@@ -134,7 +134,7 @@ theorem circComp_id_right {n m : Nat} (f : Circuit n m) :
 
 def circComp_id_right_path {n m : Nat} (f : Circuit n m) :
     Path (circComp f (circId m)) f :=
-  Path.ofEq (circComp_id_right f)
+  Path.mk [Step.mk _ _ (circComp_id_right f)] (circComp_id_right f)
 
 -- 4. Composition associativity
 theorem circComp_assoc {a b c d : Nat}
@@ -145,7 +145,7 @@ theorem circComp_assoc {a b c d : Nat}
 def circComp_assoc_path {a b c d : Nat}
     (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) :
     Path (circComp (circComp f g) h) (circComp f (circComp g h)) :=
-  Path.ofEq (circComp_assoc f g h)
+  Path.mk [Step.mk _ _ (circComp_assoc f g h)] (circComp_assoc f g h)
 
 -- 5. NOT is an involution
 theorem circNot_involution (n : Nat) :
@@ -154,7 +154,7 @@ theorem circNot_involution (n : Nat) :
 
 def circNot_involution_path (n : Nat) :
     Path (circComp (circNot n) (circNot n)) (circId n) :=
-  Path.ofEq (circNot_involution n)
+  Path.mk [Step.mk _ _ (circNot_involution n)] (circNot_involution n)
 
 -- 6. Roundtrip path from NOT involution
 def circNot_roundtrip (n : Nat) : Path (circId n) (circId n) :=
@@ -206,7 +206,7 @@ theorem circEquiv_to_eq {n m : Nat} {f g : Circuit n m}
 
 def circEquiv_path {n m : Nat} {f g : Circuit n m}
     (h : CircEquiv f g) : Path f g :=
-  Path.ofEq (circEquiv_to_eq h)
+  Path.mk [Step.mk _ _ (circEquiv_to_eq h)] (circEquiv_to_eq h)
 
 -- 15. Composition preserves equivalence (left)
 theorem circComp_equiv_left {a b c : Nat}
@@ -348,6 +348,6 @@ theorem circuit_congrArg_comp {n m k : Nat}
 -- 40. NOT composed with identity path
 def not_id_path (n : Nat) :
     Path (circComp (circNot n) (circId n)) (circNot n) :=
-  Path.ofEq (circComp_id_right (circNot n))
+  Path.mk [Step.mk _ _ (circComp_id_right (circNot n))] (circComp_id_right (circNot n))
 
 end ComputationalPaths.Path.Computation.CircuitPaths

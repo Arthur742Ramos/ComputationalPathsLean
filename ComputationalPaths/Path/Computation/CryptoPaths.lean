@@ -31,7 +31,7 @@ structure HashFn (M D : Type u) where
 /-- Two hash functions are path-equal iff they agree pointwise. -/
 def hashPath {M D : Type u} (h1 h2 : HashFn M D) (heq : h1 = h2) :
     Path h1 h2 :=
-  Path.ofEq heq
+  Path.mk [Step.mk _ _ heq] heq
 
 /-- Composing hash functions. -/
 def hashCompose {M D E : Type u} (h1 : HashFn M D) (h2 : HashFn D E) :
@@ -144,7 +144,7 @@ structure SymEncCorrect {P C K : Type u} (s : SymEncScheme P C K) where
 def encDecPath {P C K : Type u} (s : SymEncScheme P C K)
     (h : SymEncCorrect s) (k : K) (m : P) :
     Path (s.decrypt k (s.encrypt k m)) m :=
-  Path.ofEq (h.correct k m)
+  Path.mk [Step.mk _ _ (h.correct k m)] (h.correct k m)
 
 /-- Double encryption and double decryption cancel. -/
 theorem double_enc_dec {P C K : Type u} (s : SymEncScheme P C K)
@@ -193,7 +193,7 @@ structure SigCorrect {M S VK SK : Type u} (ss : SigScheme M S VK SK) where
 def sigCorrectPath {M S VK SK : Type u} (ss : SigScheme M S VK SK)
     (h : SigCorrect ss) (sk : SK) (m : M) :
     Path (ss.verify (h.keypair sk) m (ss.sign sk m)) true :=
-  Path.ofEq (h.correct sk m)
+  Path.mk [Step.mk _ _ (h.correct sk m)] (h.correct sk m)
 
 /-- Signing the same message twice yields the same signature. -/
 theorem sign_deterministic {M S VK SK : Type u}
@@ -221,7 +221,7 @@ structure MACCorrect {M T K : Type u} (mac : MACScheme M T K) where
 def macCorrectPath {M T K : Type u} (mac : MACScheme M T K)
     (h : MACCorrect mac) (k : K) (m : M) :
     Path (mac.verify k m (mac.tag k m)) true :=
-  Path.ofEq (h.correct k m)
+  Path.mk [Step.mk _ _ (h.correct k m)] (h.correct k m)
 
 /-! ## Key derivation and path transport -/
 
@@ -302,15 +302,16 @@ theorem merkle_root_congr {D : Type u} (t1 t2 : MerkleTree D) (h : t1 = t2) :
 /-- Path for root congruence. -/
 def merkle_root_congr_path {D : Type u} (t1 t2 : MerkleTree D) (h : t1 = t2) :
     Path (merkleRoot t1) (merkleRoot t2) :=
-  Path.congrArg merkleRoot (Path.ofEq h)
+  Path.congrArg merkleRoot (Path.mk [Step.mk _ _ h] h)
 
 /-! ## Path symmetry as cryptographic duality -/
 
 /-- Encryption path and decryption path are symmetric. -/
 theorem enc_dec_symm {P C K : Type u} (s : SymEncScheme P C K)
     (h : SymEncCorrect s) (k : K) (m : P) :
-    Path.symm (encDecPath s h k m) = Path.ofEq (h.correct k m).symm := by
-  simp [encDecPath, Path.symm, Path.ofEq]
+    Path.symm (encDecPath s h k m) =
+      Path.mk [Step.mk _ _ (h.correct k m).symm] (h.correct k m).symm := by
+  simp [encDecPath, Path.symm]
 
 /-- Trans of enc-dec path and its symm gives refl proof. -/
 theorem enc_dec_trans_symm {P C K : Type u} (s : SymEncScheme P C K)
