@@ -132,7 +132,8 @@ def wordAction_append_path (P : GroupPresentation) (v : CayleyVertex P)
   match w1 with
   | [] =>
       by
-        simpa [wordAction] using (Path.refl (wordAction P v w2))
+        let p : Path (wordAction P v w2) (wordAction P v w2) := Path.refl (wordAction P v w2)
+        simpa [wordAction] using (Path.trans (Path.symm p) p)
   | g :: rest =>
       by
         simpa [wordAction] using (wordAction_append_path P (vertexMul P v g) rest w2)
@@ -192,8 +193,12 @@ namespace CayleyGraphAutomorphism
 def id (P : GroupPresentation) : CayleyGraphAutomorphism P where
   toFun := fun v => v
   invFun := fun v => v
-  left_inv := fun v => Path.refl v
-  right_inv := fun v => Path.refl v
+  left_inv := fun v =>
+    let p : Path v v := Path.refl v
+    Path.trans (Path.symm p) p
+  right_inv := fun v =>
+    let p : Path v v := Path.refl v
+    Path.trans (Path.symm p) p
   adj_preserve := by
     intro v w h
     simpa using h
@@ -241,8 +246,9 @@ theorem wordMetric_nonneg {Gen : Type u} (w : Word Gen) :
 
 /-- WordPathEq is reflexive. -/
 def WordPathEq.refl (P : GroupPresentation) (w : Word P.Gen) :
-    WordPathEq P w w :=
-  Path.refl _
+    WordPathEq P w w := by
+  let p : WordPathEq P w w := Path.refl (wordToVertex P w)
+  exact Path.trans (Path.symm p) p
 
 /-- WordPathEq is symmetric. -/
 def WordPathEq.symm (P : GroupPresentation) {w₁ w₂ : Word P.Gen}

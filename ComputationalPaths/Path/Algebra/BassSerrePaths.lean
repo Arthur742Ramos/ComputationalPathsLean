@@ -194,6 +194,16 @@ def bsEdgeIdentLoop {G : BSGraph.{u}} (H : BSGraphOfGroups G)
   Path.trans (bsEdgeIdentPath H e h pre suf)
     (Path.symm (bsEdgeIdentPath H e h pre suf))
 
+/-- Edge identifications are preserved by the `Option.some` constructor. -/
+def bsEdgeIdentPathSome {G : BSGraph.{u}} (H : BSGraphOfGroups G)
+    (e : G.Edge) (h : H.edgeGroup e) (pre suf : BSWord G H.vertexGroup) :
+    Path
+      (Option.some
+        (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.src e) (H.srcInclusion e h)] ++ suf)))
+      (Option.some
+        (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.tgt e) (H.tgtInclusion e h)] ++ suf))) :=
+  Path.congrArg (fun x => Option.some x) (bsEdgeIdentPath H e h pre suf)
+
 /-- A fundamental domain for a tree action. -/
 structure BSFundamentalDomain {G : Type u} {S : StrictGroup G} {T : BSTree}
     (_A : BSTreeAction G S T) where
