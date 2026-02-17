@@ -13,8 +13,8 @@ irrelevance of `RwEq`, but the typed framework remains useful for future work.
 
 ## Key Definitions
 
-- `TStar r a b`: Type-valued reflexive-transitive closure
-- `TJoinable r a b`: Type-valued joinability with explicit witnesses
+- `TStar r p q`: Type-valued reflexive-transitive closure
+- `TJoinable r p q`: Type-valued joinability with explicit witnesses
 - `TDiamond r`: Type-valued diamond property with 3-cells
 - `TConfluent r`: Type-valued confluence with 3-cells
 
@@ -34,7 +34,7 @@ namespace Path
 namespace OmegaGroupoid
 namespace TypedRewriting
 
-universe u
+universe u v
 
 variable {A : Type u}
 
@@ -45,80 +45,37 @@ of the derivation as Type-valued data.
 -/
 
 /-- Type-valued reflexive-transitive closure.
-    This is isomorphic to `Derivation₂` but defined inductively
-    to match the Metatheory structure for easier lifting. -/
-inductive TStar {a b : A} (r : ∀ {p q : Path a b}, Prop) :
-    Path a b → Path a b → Type u where
+    The relation `r` maps pairs of paths to `Type v` so that witnesses are
+    computationally relevant. -/
+inductive TStar {a b : A} (r : Path a b → Path a b → Type v) :
+    Path a b → Path a b → Type (max u v) where
   | refl (p : Path a b) : TStar r p p
-  | tail {p q s : Path a b} : TStar r p q → r (p := q) (q := s) → TStar r p s
+  | tail {p q s : Path a b} : TStar r p q → r q s → TStar r p s
 
 namespace TStar
 
 /-- Single step implies multi-step -/
-def single {a b : A} {r : ∀ {p q : Path a b}, Prop}
-    {p q : Path a b} (h : r (p := p) (q := q)) : TStar r p q :=
+def single {a b : A} {r : Path a b → Path a b → Type v}
+    {p q : Path a b} (h : r p q) : TStar r p q :=
   TStar.tail (TStar.refl p) h
 
 /-- Multi-step is transitive -/
-def trans {a b : A} {r : ∀ {p q : Path a b}, Prop}
-    {p q s : Path a b} (h1 : TStar r p q) (h2 : TStar r q s) : TStar r p s := by
-  induction h2 with
-  | refl => exact h1
-  | tail _ hstep ih => exact TStar.tail ih hstep
+noncomputable def trans {a b : A} {r : Path a b → Path a b → Type v}
+    {p q s : Path a b} (h1 : TStar r p q) (h2 : TStar r q s) : TStar r p s :=
+  match h2 with
+  | .refl _ => h1
+  | .tail h2' hstep => .tail (trans h1 h2') hstep
 
 /-- Prepend a single step -/
-def head {a b : A} {r : ∀ {p q : Path a b}, Prop}
-    {p q s : Path a b} (hpq : r (p := p) (q := q)) (hqs : TStar r q s) : TStar r p s :=
+noncomputable def head {a b : A} {r : Path a b → Path a b → Type v}
+    {p q s : Path a b} (hpq : r p q) (hqs : TStar r q s) : TStar r p s :=
   trans (single hpq) hqs
 
-/-! ### Bridge to `Derivation₂` -/
-
-/-- Convert a `TStar Step` derivation into a `Derivation₂`. -/
-def toDerivation₂ {a b : A} {p q : Path a b}
-    (h : TStar (r := Step) p q) : Derivation₂ p q := by
-  induction h with
-  | refl p => exact .refl p
-  | tail hstar hstep ih =>
-    exact .vcomp ih (.step hstep)
-
 /-- Length of a TStar derivation -/
-def length {a b : A} {r : ∀ {p q : Path a b}, Prop}
+def length {a b : A} {r : Path a b → Path a b → Type v}
     {p q : Path a b} : TStar r p q → Nat
   | .refl _ => 0
   | .tail h _ => h.length + 1
-
-/-- Decompose a `TStar` derivation into its first step (if any) together with
-the remaining derivation.
-
-`uncons h` is `none` exactly when `h` is reflexive. When it is `some`, it returns
-the first one-step reduction `p ⟶ q₁` and the remaining tail `q₁ ⟶* q`. -/
-def uncons {a b : A} {r : forall {p q : Path a b}, Prop}
-    {p q : Path a b} (h : TStar r p q) :
-    Option (Sigma fun q1 : Path a b =>
-      r (p := p) (q := q1) × TStar r q1 q) := by
-  induction h with
-  | refl =>
-      exact none
-  | tail hstar hstep ih =>
-      cases ih with
-      | none =>
-          exact some ⟨_, hstep, .refl _⟩
-      | some data =>
-          rcases data with ⟨q1, hpq1, hq1q⟩
-          exact some ⟨q1, hpq1, .tail hq1q hstep⟩
-
-/-- `uncons` always succeeds on a non-empty derivation. -/
-theorem uncons_tail_some {a b : A} {r : forall {p q : Path a b}, Prop}
-    {p q s : Path a b} (hstar : TStar r p q) (hstep : r (p := q) (q := s)) :
-    ∃ data, uncons (r := r) (.tail hstar hstep) = some data := by
-  cases hu : uncons (r := r) hstar with
-  | none =>
-      refine ⟨⟨_, hstep, .refl _⟩, ?_⟩
-      simp [uncons, hu]
-  | some data =>
-      rcases data with ⟨q1, hpq1, hq1q⟩
-      refine ⟨⟨q1, hpq1, .tail hq1q hstep⟩, ?_⟩
-      simp [uncons, hu]
 
 end TStar
 
@@ -129,8 +86,8 @@ We preserve the witnesses (the common path and the derivations to it).
 -/
 
 /-- Type-valued joinability: paths can reach a common target. -/
-structure TJoinable {a b : A} (r : ∀ {p q : Path a b}, Prop)
-    (p q : Path a b) : Type u where
+structure TJoinable {a b : A} (r : Path a b → Path a b → Type v)
+    (p q : Path a b) : Type (max u v) where
   /-- The common path both can reach -/
   common : Path a b
   /-- Derivation from p to common -/
@@ -141,17 +98,17 @@ structure TJoinable {a b : A} (r : ∀ {p q : Path a b}, Prop)
 namespace TJoinable
 
 /-- Joinability is reflexive -/
-def refl {a b : A} {r : ∀ {p q : Path a b}, Prop} (p : Path a b) :
+def refl {a b : A} {r : Path a b → Path a b → Type v} (p : Path a b) :
     TJoinable r p p :=
   ⟨p, .refl p, .refl p⟩
 
 /-- Joinability is symmetric -/
-def symm {a b : A} {r : ∀ {p q : Path a b}, Prop}
+def symm {a b : A} {r : Path a b → Path a b → Type v}
     {p q : Path a b} (j : TJoinable r p q) : TJoinable r q p :=
   ⟨j.common, j.right, j.left⟩
 
 /-- From a TStar derivation, paths are joinable -/
-def of_star {a b : A} {r : ∀ {p q : Path a b}, Prop}
+def of_star {a b : A} {r : Path a b → Path a b → Type v}
     {p q : Path a b} (h : TStar r p q) : TJoinable r p q :=
   ⟨q, h, .refl q⟩
 
@@ -166,22 +123,20 @@ For 3-cells, we additionally require the two closing paths to be 3-equivalent.
 /-- Diamond property with 3-cell witness.
     When two single steps diverge, they can close to a common point,
     and the two derivations are 3-equivalent. -/
-structure TDiamond {a b : A} (r : ∀ {p q : Path a b}, Prop) : Type (u + 1) where
+structure TDiamond {a b : A} (r : Path a b → Path a b → Type v) :
+    Type (max (u + 1) v) where
   /-- Embed an `r`-witness as a `Step` so we can form 2-cells (`Derivation₂`)
   and state 3-cell coherences. -/
-  step_of : ∀ {p q : Path a b}, r (p := p) (q := q) → Step p q
-  /-- Given two steps from the same source... -/
+  step_of : ∀ {p q : Path a b}, r p q → Step p q
+  /-- Given two steps from the same source, there exists a common target
+      with closing steps. -/
   close : ∀ {p q₁ q₂ : Path a b},
-    r (p := p) (q := q₁) → r (p := p) (q := q₂) →
-    /-- ...there exists a common target with closing steps... -/
-    Σ (s : Path a b),
-      (r (p := q₁) (q := s)) ×
-      (r (p := q₂) (q := s))
-  /-- ...and the 3-cell witnessing the diamond commutes -/
+    r p q₁ → r p q₂ →
+    Σ (s : Path a b), (r q₁ s) × (r q₂ s)
+  /-- The 3-cell witnessing the diamond commutes -/
   coherence : ∀ {p q₁ q₂ : Path a b}
-    (h₁ : r (p := p) (q := q₁)) (h₂ : r (p := p) (q := q₂)),
-    let ⟨s, h₃, h₄⟩ := close h₁ h₂
-    -- The two derivations p → q₁ → s and p → q₂ → s are 3-equivalent
+    (h₁ : r p q₁) (h₂ : r p q₂),
+    let ⟨_, h₃, h₄⟩ := close h₁ h₂
     Derivation₃
       (.vcomp (.step (step_of h₁)) (.step (step_of h₃)))
       (.vcomp (.step (step_of h₂)) (.step (step_of h₄)))
@@ -192,10 +147,11 @@ Local confluence allows multi-step closing of single-step divergences.
 -/
 
 /-- Type-valued local confluence with 3-cells. -/
-structure TLocalConfluent {a b : A} (r : ∀ {p q : Path a b}, Prop) : Type (u + 1) where
+structure TLocalConfluent {a b : A} (r : Path a b → Path a b → Type v) :
+    Type (max (u + 1) v) where
   /-- Single-step divergences can be closed with multi-step -/
   close : ∀ {p q₁ q₂ : Path a b},
-    r (p := p) (q := q₁) → r (p := p) (q := q₂) →
+    r p q₁ → r p q₂ →
     TJoinable r q₁ q₂
 
 /-! ## Type-Valued Confluence
@@ -204,7 +160,8 @@ Full confluence: multi-step divergences can be closed.
 -/
 
 /-- Type-valued confluence with joining witnesses. -/
-structure TConfluent {a b : A} (r : ∀ {p q : Path a b}, Prop) : Type (u + 1) where
+structure TConfluent {a b : A} (r : Path a b → Path a b → Type v) :
+    Type (max (u + 1) v) where
   /-- Multi-step divergences can be closed -/
   close : ∀ {p q₁ q₂ : Path a b},
     TStar r p q₁ → TStar r p q₂ →
@@ -216,10 +173,11 @@ Semi-confluence is intermediate between local and full confluence.
 -/
 
 /-- Type-valued semi-confluence. -/
-structure TSemiConfluent {a b : A} (r : ∀ {p q : Path a b}, Prop) : Type (u + 1) where
+structure TSemiConfluent {a b : A} (r : Path a b → Path a b → Type v) :
+    Type (max (u + 1) v) where
   /-- Single step vs multi-step can be closed -/
   close : ∀ {p q₁ q₂ : Path a b},
-    r (p := p) (q := q₁) → TStar r p q₂ →
+    r p q₁ → TStar r p q₂ →
     TJoinable r q₁ q₂
 
 /-! ## Key Lemmas
@@ -229,27 +187,30 @@ These mirror the Metatheory library but preserve Type structure.
 
 section KeyLemmas
 
-variable {a b : A} {r : ∀ {p q : Path a b}, Prop}
+variable {a b : A} {r : Path a b → Path a b → Type v}
 
 /-- Diamond implies local confluence -/
 def localConfluent_of_diamond (hd : TDiamond (a := a) (b := b) r) :
     TLocalConfluent r where
-  close := fun {_ q₁ q₂} h₁ h₂ =>
+  close := fun h₁ h₂ =>
     let ⟨s, h₃, h₄⟩ := hd.close h₁ h₂
     ⟨s, .single h₃, .single h₄⟩
 
 /-- Semi-confluence implies local confluence -/
-def localConfluent_of_semiConfluent (hsc : TSemiConfluent (a := a) (b := b) r) :
+noncomputable def localConfluent_of_semiConfluent
+    (hsc : TSemiConfluent (a := a) (b := b) r) :
     TLocalConfluent r where
   close := fun h₁ h₂ => hsc.close h₁ (.single h₂)
 
 /-- Confluence implies semi-confluence -/
-def semiConfluent_of_confluent (hc : TConfluent (a := a) (b := b) r) :
+noncomputable def semiConfluent_of_confluent
+    (hc : TConfluent (a := a) (b := b) r) :
     TSemiConfluent r where
   close := fun h₁ h₂ => hc.close (.single h₁) h₂
 
 /-- Confluence implies local confluence -/
-def localConfluent_of_confluent (hc : TConfluent (a := a) (b := b) r) :
+noncomputable def localConfluent_of_confluent
+    (hc : TConfluent (a := a) (b := b) r) :
     TLocalConfluent r :=
   localConfluent_of_semiConfluent (semiConfluent_of_confluent hc)
 
@@ -263,42 +224,34 @@ Given diamond, a single step can be pushed through a multi-step.
 
 section StripLemma
 
-variable {a b : A} {r : ∀ {p q : Path a b}, Prop}
+variable {a b : A} {r : Path a b → Path a b → Type v}
 
-/-- Strip lemma helper: push a step through a multi-step, get multi-step + single step. -/
-def strip_single (hd : TDiamond (a := a) (b := b) r)
+/-- Strip lemma helper: push a step through a multi-step,
+    yielding multi-step + single step. -/
+noncomputable def strip_single (hd : TDiamond (a := a) (b := b) r)
     {p q₁ q₂ : Path a b}
-    (h₁ : r (p := p) (q := q₁))
+    (h₁ : r p q₁)
     (h₂ : TStar r p q₂) :
-    Σ (s : Path a b), TStar r q₁ s × r (p := q₂) (q := s) := by
-  induction h₂ generalizing q₁ with
-  | refl =>
-    -- q₂ = p, so r p q₁ gives us r q₂ q₁
-    exact ⟨q₁, .refl q₁, h₁⟩
-  | tail hstar hstep ih =>
-    -- hstar : TStar r p q₂', hstep : r q₂' q₂
-    -- ih : ∀ q₁, r p q₁ → Σ s, TStar r q₁ s × r q₂' s
-    obtain ⟨s', hs', hq₂'s'⟩ := ih h₁
-    -- Apply diamond to hq₂'s' : r q₂' s' and hstep : r q₂' q₂
-    obtain ⟨s, hs's, hq₂s⟩ := hd.close hq₂'s' hstep
-    exact ⟨s, TStar.tail hs' hs's, hq₂s⟩
+    Σ (s : Path a b), TStar r q₁ s × r q₂ s :=
+  match h₂ with
+  | .refl _ => ⟨q₁, .refl q₁, h₁⟩
+  | .tail hstar hstep =>
+    let ⟨_, hs', hq₂'s'⟩ := strip_single hd h₁ hstar
+    let ⟨s, hs's, hq₂s⟩ := hd.close hq₂'s' hstep
+    ⟨s, TStar.tail hs' hs's, hq₂s⟩
 
 /-- Full strip lemma: push a step through a multi-step, get two multi-steps. -/
-def strip (hd : TDiamond (a := a) (b := b) r)
+noncomputable def strip (hd : TDiamond (a := a) (b := b) r)
     {p q₁ q₂ : Path a b}
-    (h₁ : r (p := p) (q := q₁))
+    (h₁ : r p q₁)
     (h₂ : TStar r p q₂) :
-    Σ (s : Path a b), TStar r q₁ s × TStar r q₂ s := by
-  induction h₂ generalizing q₁ with
-  | refl =>
-    -- q₂ = p
-    exact ⟨q₁, .refl q₁, .single h₁⟩
-  | tail hstar hstep ih =>
-    -- hstar : TStar r p q₂', hstep : r q₂' q₂
-    obtain ⟨s', hs', hq₂'s'⟩ := ih h₁
-    -- Push hstep through hq₂'s' using strip_single
-    obtain ⟨s, hq₂s, hs's⟩ := strip_single hd hstep hq₂'s'
-    exact ⟨s, TStar.tail hs' hs's, hq₂s⟩
+    Σ (s : Path a b), TStar r q₁ s × TStar r q₂ s :=
+  match h₂ with
+  | .refl _ => ⟨q₁, .refl q₁, .single h₁⟩
+  | .tail hstar hstep =>
+    let ⟨_, hs', hq₂'s'⟩ := strip hd h₁ hstar
+    let ⟨s, hq₂s, hs's⟩ := strip_single hd hstep hq₂'s'
+    ⟨s, TStar.tail hs' hs's, hq₂s⟩
 
 end StripLemma
 
@@ -309,32 +262,38 @@ The main theorem: diamond property implies confluence.
 
 section DiamondConfluence
 
-variable {a b : A} {r : ∀ {p q : Path a b}, Prop}
+variable {a b : A} {r : Path a b → Path a b → Type v}
 
 /-- Diamond implies semi-confluence -/
-def semiConfluent_of_diamond (hd : TDiamond (a := a) (b := b) r) :
+noncomputable def semiConfluent_of_diamond
+    (hd : TDiamond (a := a) (b := b) r) :
     TSemiConfluent r where
   close := fun h₁ h₂ =>
     let ⟨s, hs₁, hs₂⟩ := strip hd h₁ h₂
     ⟨s, hs₁, hs₂⟩
 
-/-- Semi-confluence implies confluence (key lemma!) -/
-def confluent_of_semiConfluent (hsc : TSemiConfluent (a := a) (b := b) r) :
+/-- Semi-confluence implies confluence (key lemma!)
+
+    We proceed by structural induction on the first multi-step derivation. -/
+noncomputable def confluent_of_semiConfluent
+    (hsc : TSemiConfluent (a := a) (b := b) r) :
     TConfluent r where
-  close := fun {p q₁ q₂} h₁ h₂ => by
-    -- Induction on h₁
-    induction h₁ generalizing q₂ with
-    | refl => exact TJoinable.of_star h₂
-    | tail hstar hstep ih =>
-      -- hstar : TStar r p q₁', hstep : r q₁' q₁
-      -- ih : TStar r p q₂ → TJoinable r q₁' q₂
-      obtain ⟨s, hs₁', hs₂⟩ := ih h₂
-      -- By semi-confluence on hstep and hs₁'
-      obtain ⟨t, hs₁t, hst⟩ := hsc.close hstep hs₁'
-      exact ⟨t, hs₁t, TStar.trans hs₂ hst⟩
+  close := fun {_ _ _} h₁ h₂ => auxClose hsc h₁ h₂
+where
+  /-- Auxiliary: structural induction on first derivation. -/
+  auxClose (hsc : TSemiConfluent (a := a) (b := b) r)
+      {p q₁ q₂ : Path a b}
+      (h₁ : TStar r p q₁) (h₂ : TStar r p q₂) : TJoinable r q₁ q₂ :=
+    match h₁ with
+    | .refl _ => TJoinable.of_star h₂
+    | .tail hstar hstep =>
+      let ⟨_mid, hq₂mid, hmidmid⟩ := auxClose hsc hstar h₂
+      let ⟨t, hq₁t, hmidt⟩ := hsc.close hstep hq₂mid
+      ⟨t, hq₁t, TStar.trans hmidmid hmidt⟩
 
 /-- Diamond implies confluence -/
-def confluent_of_diamond (hd : TDiamond (a := a) (b := b) r) :
+noncomputable def confluent_of_diamond
+    (hd : TDiamond (a := a) (b := b) r) :
     TConfluent r :=
   confluent_of_semiConfluent (semiConfluent_of_diamond hd)
 
@@ -347,122 +306,157 @@ Newman's lemma: termination + local confluence → confluence.
 
 section Newman
 
-variable {a b : A} {r : ∀ {p q : Path a b}, Prop}
+variable {a b : A} {r : Path a b → Path a b → Type v}
 
 /-- Type-valued transitive closure (one or more steps). -/
-inductive TPlus {a b : A} (r : ∀ {p q : Path a b}, Prop) :
-    Path a b → Path a b → Type u where
-  | single {p q : Path a b} : r (p := p) (q := q) → TPlus r p q
-  | tail {p q s : Path a b} : TPlus r p q → r (p := q) (q := s) → TPlus r p s
+inductive TPlus {a b : A} (r : Path a b → Path a b → Type v) :
+    Path a b → Path a b → Type (max u v) where
+  | single {p q : Path a b} : r p q → TPlus r p q
+  | tail {p q s : Path a b} : TPlus r p q → r q s → TPlus r p s
 
 /-- TPlus implies TStar -/
-def TStar.of_plus {a b : A} {r : ∀ {p q : Path a b}, Prop}
-    {p q : Path a b} : TPlus r p q → TStar r p q
+noncomputable def TStar.of_plus {a b : A} {r : Path a b → Path a b → Type v}
+    {p q : Path a b} (h : TPlus r p q) : TStar r p q :=
+  match h with
   | .single h => .single h
-  | .tail h hstep => .tail (TStar.of_plus h) hstep
+  | .tail h' hstep => .tail (TStar.of_plus h') hstep
 
-/-- Termination: the relation is well-founded on the reverse of TPlus. -/
-def Terminating {a b : A} (r : ∀ {p q : Path a b}, Prop) : Prop :=
-  WellFounded (fun p q => TPlus r q p)
+/-- Extend a TPlus by a TStar tail -/
+noncomputable def TPlus.trans_star {a b : A} {r : Path a b → Path a b → Type v}
+    {p q s : Path a b} (hpq : TPlus r p q) (hqs : TStar r q s) : TPlus r p s :=
+  match hqs with
+  | .refl _ => hpq
+  | .tail hqs' hstep => .tail (hpq.trans_star hqs') hstep
+
+/-- Termination: the relation is well-founded on the reverse of TPlus.
+    We state this propositionally since `WellFounded` lives in `Prop`. -/
+def Terminating {a b : A} (r : Path a b → Path a b → Type v) : Prop :=
+  WellFounded (fun (p q : Path a b) => Nonempty (TPlus r q p))
+
+/-- Head-based multi-step: built by prepending steps at the front.
+    This makes first-step decomposition trivial, which is needed for Newman's lemma. -/
+inductive TStarH {a b : A} (r : Path a b → Path a b → Type v) :
+    Path a b → Path a b → Type (max u v) where
+  | refl (p : Path a b) : TStarH r p p
+  | head {p q s : Path a b} : r p q → TStarH r q s → TStarH r p s
+
+/-- Convert tail-based TStar to head-based TStarH -/
+noncomputable def TStar.toH {a b : A} {r : Path a b → Path a b → Type v}
+    {p q : Path a b} (h : TStar r p q) : TStarH r p q :=
+  match h with
+  | .refl _ => .refl _
+  | .tail hstar hstep => appendH (toH hstar) hstep
+where
+  appendH {p q s : Path a b} (h : TStarH r p q) (hs : r q s) : TStarH r p s :=
+    match h with
+    | .refl _ => .head hs (.refl _)
+    | .head hr rest => .head hr (appendH rest hs)
+
+/-- Convert head-based TStarH to tail-based TStar -/
+noncomputable def TStarH.toT {a b : A} {r : Path a b → Path a b → Type v}
+    {p q : Path a b} (h : TStarH r p q) : TStar r p q :=
+  match h with
+  | .refl _ => .refl _
+  | .head hr rest => TStar.head hr rest.toT
 
 /-- Newman's Lemma (Type-Valued): Termination + Local Confluence → Confluence
 
-    The proof follows the standard structure but preserves Type-valued witnesses.
-    We use well-founded induction on the termination order. -/
-def newman (hterm : Terminating (a := a) (b := b) r)
+    The proof uses well-founded induction on the termination order and
+    head-based multi-step decomposition. -/
+noncomputable def newman
+    (hterm : Terminating (a := a) (b := b) r)
     (hlc : TLocalConfluent (a := a) (b := b) r) :
     TConfluent r where
-  close := fun {p q₁ q₂} h₁ h₂ => by
-    -- Well-founded induction on p
-    induction p using hterm.induction generalizing q₁ q₂ with
-    | h p ih =>
-      -- Case split on h₁
-      cases h₁ with
-      | refl => exact TJoinable.of_star h₂
-      | tail h₁' hstep₁ =>
-        -- h₁' : TStar r p p', hstep₁ : r p' q₁
-        -- Case split on h₂
-        cases h₂ with
-        | refl =>
-          exact TJoinable.symm (TJoinable.of_star (.tail h₁' hstep₁))
-        | tail h₂' hstep₂ =>
-          -- h₂' : TStar r p p'', hstep₂ : r p'' q₂
-          -- Get p' from h₁'
-          -- Reconstruct the full derivations and split off their *first* steps.
-          -- (Our `TStar` is defined by appending steps, so we use `TStar.uncons`.)
-          let h1full : TStar r p q₁ := .tail h₁' hstep₁
-          let h2full : TStar r p q₂ := .tail h₂' hstep₂
+  close := fun {p _ _} h₁ h₂ =>
+    newmanAux hterm hlc p h₁.toH h₂.toH
+where
+  /-- The core of Newman's lemma, using head-based derivations for
+      clean first-step decomposition. -/
+  newmanAux (hterm : Terminating (a := a) (b := b) r)
+      (hlc : TLocalConfluent (a := a) (b := b) r)
+      (p : Path a b) {q₁ q₂ : Path a b}
+      (h₁ : TStarH r p q₁) (h₂ : TStarH r p q₂) : TJoinable r q₁ q₂ :=
+    hterm.fix (C := fun p => ∀ {q₁ q₂ : Path a b},
+      TStarH r p q₁ → TStarH r p q₂ → TJoinable r q₁ q₂)
+      (fun p ih {q₁ q₂} h₁ h₂ =>
+        match h₁, h₂ with
+        | .refl _, h₂ => TJoinable.of_star h₂.toT
+        | h₁, .refl _ => TJoinable.symm (TJoinable.of_star h₁.toT)
+        | .head hstep₁ rest₁, .head hstep₂ rest₂ =>
+          -- hstep₁ : r p a₁, rest₁ : TStarH r a₁ q₁
+          -- hstep₂ : r p a₂, rest₂ : TStarH r a₂ q₂
+          -- By local confluence: a₁ and a₂ can be joined
+          let ⟨c, ha₁c, ha₂c⟩ := hlc.close hstep₁ hstep₂
+          -- IH at a₁ (p →₁ a₁, so a₁ is strictly smaller):
+          -- join rest₁ (a₁ →* q₁) with ha₁c (a₁ →* c)
+          let j₁ := ih _ ⟨.single hstep₁⟩ rest₁ ha₁c.toH
+          -- j₁ : TJoinable r q₁ j₁.common with q₁ →* j₁.common and c →* j₁.common
 
-          -- Helper: extend a `TPlus` derivation by a `TStar` tail.
-          have transPlusStar :
-              ∀ {x y z : Path a b}, TPlus r x y → TStar r y z → TPlus r x z := by
-            intro x y z hxy hyz
-            induction hyz generalizing x with
-            | refl =>
-                exact hxy
-            | tail hstar hstep ih =>
-                exact TPlus.tail (ih hxy) hstep
+          -- IH at a₂ (p →₁ a₂, so a₂ is strictly smaller):
+          -- join rest₂ (a₂ →* q₂) with ha₂c (a₂ →* c)
+          let j₂ := ih _ ⟨.single hstep₂⟩ rest₂ ha₂c.toH
+          -- j₂ : TJoinable r q₂ j₂.common with q₂ →* j₂.common and c →* j₂.common
 
-          -- Extract the head step p ⟶ p₁ and the remainder p₁ ⟶* q₁ (and likewise for q₂).
-          rcases TStar.uncons_tail_some (r := r) h₁' hstep₁ with ⟨data1, _h1u⟩
-          rcases data1 with ⟨p₁, hp₁, h₁rest⟩
-          rcases TStar.uncons_tail_some (r := r) h₂' hstep₂ with ⟨data2, _h2u⟩
-          rcases data2 with ⟨p₂, hp₂, h₂rest⟩
+          -- Now join j₁.common and j₂.common through c.
+          -- c →* j₁.common and c →* j₂.common
+          -- IH at c (p →₁ a₁ →* c, so c is strictly smaller...
+          -- we need p →⁺ c, which is (.single hstep₁).trans_star ha₁c)
+          let p_plus_c : TPlus r p c := TPlus.trans_star (.single hstep₁) ha₁c
+          let jc := ih _ ⟨p_plus_c⟩ j₁.right.toH j₂.right.toH
+          -- jc : TJoinable r j₁.common j₂.common
 
-          -- Local confluence closes the one-step divergence.
-          obtain ⟨s, hp₁s, hp₂s⟩ := hlc.close (p := p) (q1 := p₁) (q2 := p₂) hp₁ hp₂
-
-          -- Apply IH at `p₁` and `p₂` to join the endpoints with `s`.
-          have jq₁s : TJoinable r q₁ s :=
-            ih p₁ (.single hp₁) h₁rest hp₁s
-          have jq₂s : TJoinable r q₂ s :=
-            ih p₂ (.single hp₂) h₂rest hp₂s
-
-          -- `s` is reachable from `p` by at least one step, so IH applies at `s`.
-          have p_to_s : TPlus r p s :=
-            transPlusStar (.single hp₁) hp₁s
-
-          -- Use IH at `s` to join the two common points coming from `q₁` and `q₂`.
-          have jCommon : TJoinable r jq₁s.common jq₂s.common :=
-            ih s p_to_s jq₁s.right jq₂s.right
-
-          -- Assemble the final joinability witness for `q₁` and `q₂`.
-          refine ⟨jCommon.common, ?_, ?_⟩
-          · exact TStar.trans jq₁s.left jCommon.left
-          · exact TStar.trans jq₂s.left jCommon.right
+          -- Assemble: q₁ →* j₁.common →* jc.common and q₂ →* j₂.common →* jc.common
+          ⟨jc.common,
+           TStar.trans j₁.left jc.left,
+           TStar.trans j₂.left jc.right⟩)
+      p h₁ h₂
 
 end Newman
 
-/-! ## Typed Instances for `Step` -/
+/-! ## Typed Instances for `Step`
+
+We lift `Step : Path a b → Path a b → Prop` into the Type-valued framework
+via `PLift`. -/
 
 section StepInstances
 
 open Path Rewrite
 
-variable {a b : A}
+/-- Lift the Prop-valued `Step` relation into `Type` via `PLift`.
+    Note: `Step` lives at `Type 0` (Prop), so `StepT` lives at `Type 0`.
+    We fix the universe to 0 for this section. -/
+abbrev StepT {A : Type} {a b : A} (p q : Path a b) : Type := PLift (Step p q)
 
-lemma TStar.of_rw {p q : Path a b} : Rw p q → TStar (r := Step) p q
-  | .refl _ => .refl _
-  | .tail h step => .tail (TStar.of_rw h) step
+variable {A₀ : Type} {a₀ b₀ : A₀}
+
+private noncomputable def TStar.of_rw_prop {p q : Path a₀ b₀} (h : Rw p q) :
+    Nonempty (TStar StepT p q) := by
+  induction h with
+  | refl => exact ⟨.refl _⟩
+  | tail _ step ih => exact ih.elim fun d => ⟨.tail d ⟨step⟩⟩
+
+noncomputable def TStar.of_rw {p q : Path a₀ b₀} (h : Rw p q) :
+    TStar StepT p q :=
+  Classical.choice (TStar.of_rw_prop h)
 
 /-- `Step` is type-level locally confluent using the Prop-level proof. -/
 noncomputable def localConfluent_step
-    [Rewrite.ConfluenceConstructive.HasLocalConfluenceProp.{u}] :
-    TLocalConfluent (a := a) (b := b) (r := Step) where
-  close := fun {p q₁ q₂} h₁ h₂ => by
-    classical
+    [Rewrite.ConfluenceConstructive.HasLocalConfluenceProp.{0}] :
+    TLocalConfluent (a := a₀) (b := b₀) StepT where
+  close := fun {_p _q₁ _q₂} h₁ h₂ =>
     have hjoin :=
       (ConfluenceConstructive.local_confluence_prop
-        (A := A) (a := a) (b := b) h₁ h₂)
-    rcases hjoin with ⟨s, hq₁s, hq₂s⟩
-    exact ⟨s, TStar.of_rw hq₁s, TStar.of_rw hq₂s⟩
+        (A := A₀) (a := a₀) (b := b₀) h₁.down h₂.down)
+    Classical.choice (hjoin.elim fun s hs =>
+      hs.elim fun hq₁s hq₂s =>
+        ⟨⟨s, TStar.of_rw hq₁s, TStar.of_rw hq₂s⟩⟩)
 
 /-- `Step` is type-level confluent, using termination + local confluence. -/
 noncomputable def confluent_step
-    [Rewrite.ConfluenceConstructive.HasLocalConfluenceProp.{u}]
-    (hterm : Terminating (a := a) (b := b) (r := Step)) :
-    TConfluent (a := a) (b := b) (r := Step) :=
-  newman (a := a) (b := b) (r := Step) hterm (localConfluent_step (a := a) (b := b))
+    [Rewrite.ConfluenceConstructive.HasLocalConfluenceProp.{0}]
+    (hterm : Terminating (a := a₀) (b := b₀) StepT) :
+    TConfluent (a := a₀) (b := b₀) StepT :=
+  newman hterm (localConfluent_step (a₀ := a₀) (b₀ := b₀))
 
 end StepInstances
 
