@@ -95,7 +95,7 @@ theorem pass_responds_none {M : Type u} (A : Arena M) (p : Play M A) :
 /-- Path between strategies: they agree on all plays. -/
 def strategyPath {M : Type u} {A : Arena M}
     (s1 s2 : Strategy M A) (h : s1 = s2) : Path s1 s2 :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Strategy equality implies response equality. -/
 theorem strategy_eq_respond {M : Type u} {A : Arena M}
@@ -234,13 +234,13 @@ theorem morph_empty_play {M1 M2 : Type u} {A1 : Arena M1} {A2 : Arena M2}
 /-- Path between plays induced by a path between arenas. -/
 def playPath {M : Type u} {A : Arena M}
     {p1 p2 : Play M A} (h : p1 = p2) : Path p1 p2 :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Transport of play properties along paths. -/
 def playTransport {M : Type u} {A : Arena M}
     {P : Play M A → Type v} {p1 p2 : Play M A}
     (h : p1 = p2) (x : P p1) : P p2 :=
-  Path.transport (Path.ofEq h) x
+  Path.transport (Path.mk [Step.mk _ _ h] h) x
 
 /-- Transport along reflexive play path is identity. -/
 theorem play_transport_refl {M : Type u} {A : Arena M}

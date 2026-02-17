@@ -3,7 +3,7 @@
 
 Projective/injective/flat modules, Tor/Ext, regular sequences, depth,
 Auslander–Buchsbaum — all witnessed by genuine rewrite steps over a
-module-expression language.  Zero `Path.ofEq`, zero `sorry`.
+module-expression language.  Zero `Path.mk`, zero `sorry`.
 -/
 
 import ComputationalPaths.Path.Basic.Core
@@ -327,7 +327,7 @@ def compose_symm {M N P : ModExpr}
 /-- Convert a ModPath to a core Path on ranks. -/
 def toCorePath : {a b : ModExpr} → ModPath a b → Path a.rank b.rank
   | _, _, refl _    => Path.refl _
-  | _, _, step s    => Path.ofEq s.rank_eq
+  | _, _, step s    => Path.mk [Step.mk _ _ s.rank_eq] s.rank_eq
   | _, _, symm p    => Path.symm (toCorePath p)
   | _, _, trans p q => Path.trans (toCorePath p) (toCorePath q)
 

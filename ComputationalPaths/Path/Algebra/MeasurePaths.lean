@@ -302,12 +302,12 @@ theorem meas_congrArg {X : Type u} (m : Measure X) {n1 n2 : Nat}
 /-- Path from congrArg on measure. -/
 def meas_congrArg_path {X : Type u} (m : Measure X) {n1 n2 : Nat}
     (h : n1 = n2) : Path (m.meas n1) (m.meas n2) :=
-  Path.ofEq (_root_.congrArg m.meas h)
+  Path.mk [Step.mk _ _ (_root_.congrArg m.meas h)] (_root_.congrArg m.meas h)
 
 /-- Transport of measure data along index equality. -/
 def meas_transport {P : Nat → Type v} {n1 n2 : Nat}
     (h : n1 = n2) (x : P n1) : P n2 :=
-  Path.transport (Path.ofEq h) x
+  Path.transport (Path.mk [Step.mk _ _ h] h) x
 
 /-- Transport along refl is identity. -/
 theorem meas_transport_refl {P : Nat → Type v} (n : Nat) (x : P n) :

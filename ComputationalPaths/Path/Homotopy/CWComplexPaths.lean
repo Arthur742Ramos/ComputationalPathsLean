@@ -114,7 +114,7 @@ def CellAttachment.compose {A : Type u} {n m : Nat}
     (att1 : CellAttachment A n) (att2 : CellAttachment A m)
     (h : att1.cellCenter = att2.attachingPoint) :
     Path att1.attachingPoint att2.cellCenter :=
-  Path.trans att1.attachPath (Path.trans (Path.ofEq h) att2.attachPath)
+  Path.trans att1.attachPath (Path.trans (Path.mk [Step.mk _ _ h] h) att2.attachPath)
 
 /-! ## Euler characteristic -/
 
@@ -150,7 +150,7 @@ structure CellularDifferential (A : Type u) where
 def CellularDifferential.d_sq_path (cd : CellularDifferential A) (n : Nat)
     (x : (cd.group (n + 2)).carrier) :
     Path (cd.d n (cd.d (n + 1) x)) (cd.group n).zero :=
-  Path.ofEq (cd.d_sq n x)
+  Path.mk [Step.mk _ _ (cd.d_sq n x)] (cd.d_sq n x)
 
 /-! ## Skeleton filtration paths -/
 

@@ -155,7 +155,7 @@ theorem differential_id (M : SmoothSpace) (v : TangentVector M) :
 /-- Path: differential of identity. -/
 def differential_id_path (M : SmoothSpace) (v : TangentVector M) :
     Path (differential (smoothId M) v) v :=
-  Path.ofEq (differential_id M v)
+  Path.mk [Step.mk _ _ (differential_id M v)] (differential_id M v)
 
 /-- Chain rule: d(g ∘ f) = dg ∘ df. -/
 theorem chain_rule {M : SmoothSpace} (g f : SmoothEndo M) (v : TangentVector M) :
@@ -165,7 +165,7 @@ theorem chain_rule {M : SmoothSpace} (g f : SmoothEndo M) (v : TangentVector M) 
 /-- Path: chain rule. -/
 def chain_rule_path {M : SmoothSpace} (g f : SmoothEndo M) (v : TangentVector M) :
     Path (differential (smoothComp g f) v) (differential g (differential f v)) :=
-  Path.ofEq (chain_rule g f v)
+  Path.mk [Step.mk _ _ (chain_rule g f v)] (chain_rule g f v)
 
 /-- Triple chain rule. -/
 theorem chain_rule_triple {M : SmoothSpace} (h g f : SmoothEndo M) (v : TangentVector M) :
@@ -319,7 +319,7 @@ theorem exteriorD_squared_degree (M : SmoothSpace) (ω : GradedForm M) :
 /-- Path: d² degree. -/
 def exteriorD_squared_path (M : SmoothSpace) (ω : GradedForm M) :
     Path (exteriorD M (exteriorD M ω)).degree (ω.degree + 2) :=
-  Path.ofEq (exteriorD_squared_degree M ω)
+  Path.mk [Step.mk _ _ (exteriorD_squared_degree M ω)] (exteriorD_squared_degree M ω)
 
 /-- Zero graded form. -/
 def zeroGradedForm (M : SmoothSpace) (p : Nat) : GradedForm M where

@@ -1,10 +1,10 @@
 /-
 # Riemannian Geometry via Domain-Specific Computational Paths
 
-Replaces the prior scaffolding (41 `Path.ofEq` wrappers) with a genuine
+Replaces the prior scaffolding (41 `Path.mk [Step.mk _ _ h] h` wrappers) with a genuine
 domain-specific rewrite system.
 
-Zero `sorry`. Zero `Path.ofEq`. All reasoning is multi-step chains.
+Zero `sorry`. Zero `Path.mk [Step.mk _ _ h] h`. All reasoning is multi-step chains.
 -/
 
 import ComputationalPaths.Path.Basic

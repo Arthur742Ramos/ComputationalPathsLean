@@ -253,7 +253,7 @@ def truncation_idempotent_path (T : GiraudAxioms) (n : Int)
     (τ : TruncationModality T n) (k : Nat) (x : T.cat.sset.obj k) :
     Path ((InftyFunctor.comp τ.truncFunctor τ.truncFunctor).map.map k x)
          (τ.truncFunctor.map.map k x) :=
-  Path.ofEq (τ.idempotent k x)
+  Path.mk [Step.mk _ _ (τ.idempotent k x)] (τ.idempotent k x)
 
 /-! ## Slice ∞-Topos -/
 
@@ -316,7 +316,7 @@ def geometric_morphism_path (S T : GiraudAxioms)
     (f : GeometricMorphism S T) (k : Nat) (x : T.cat.sset.obj k) :
     Path (f.directStar.map.map k (f.inverseStar.map.map k x))
          (f.directStar.map.map k (f.inverseStar.map.map k x)) :=
-  Path.ofEq (f.adjunction k x)
+  Path.mk [Step.mk _ _ (f.adjunction k x)] (f.adjunction k x)
 
 /-- Composition of geometric morphisms. -/
 def GeometricMorphism.comp {R S T : GiraudAxioms}

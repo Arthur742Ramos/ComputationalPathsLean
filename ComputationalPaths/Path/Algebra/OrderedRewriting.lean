@@ -38,7 +38,7 @@ def monoStep (_M : MonotoneRw A) {a b : A} (h : a = b) : Step A :=
 
 /-- A single monotone step composes to a `Path`. -/
 def monoStepPath (_M : MonotoneRw A) {a b : A} (h : a = b) : Path a b :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Two monotone paths compose: step-lists concatenate. -/
 theorem mono_trans_steps (_M : MonotoneRw A) {a b c : A}
@@ -153,7 +153,7 @@ theorem rpo_sub_chain (R : RPO A) {a b c : A}
 /-- RPO witness as a `Path` from `cmp a b` to `.lt`. -/
 def rpoWitness (R : RPO A) {a b : A} (h : R.isSub a b) :
     Path (R.cmp a b) .lt :=
-  Path.ofEq (R.sub_lt a b h)
+  Path.mk [Step.mk _ _ (R.sub_lt a b h)] (R.sub_lt a b h)
 
 /-! ## KBO -/
 
@@ -171,7 +171,7 @@ theorem kbo_wt_lt (K : KBO A) {a b : A} (h : K.weight a < K.weight b) :
 /-- KBO weight-decrease witness as a `Path`. -/
 def kboWtPath (K : KBO A) {a b : A} (h : K.weight a < K.weight b) :
     Path (K.cmp a b) .lt :=
-  Path.ofEq (K.wt_lt a b h)
+  Path.mk [Step.mk _ _ (K.wt_lt a b h)] (K.wt_lt a b h)
 
 /-! ## Ordered completion -/
 

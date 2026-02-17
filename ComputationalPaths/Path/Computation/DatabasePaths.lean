@@ -5,7 +5,7 @@ Relations, selection, projection, join, union — modelled through
 an inductive `DbStep` rewrite system.  Every path-valued def uses
 genuine `Path` operations (`Path.refl`, `Path.trans`, `Path.symm`,
 `Path.congrArg`, or the `⟨[], proof⟩` empty-step constructor).
-**Zero** `Path.ofEq`.
+**Zero** `Path.mk`.
 
 ## References
 
@@ -189,7 +189,7 @@ theorem union_card_assoc {T : Type u} (r1 r2 r3 : Relation T) :
     (union (union r1 r2) r3).card = r1.card + r2.card + r3.card := by
   simp [union, Relation.card, List.length_append]; omega
 
-/-! ## Path witnesses — zero Path.ofEq -/
+/-! ## Path witnesses — zero Path.mk -/
 
 -- 24
 def selection_true_path {T : Type u} (r : Relation T) :

@@ -5,7 +5,7 @@ Algebraic K-theory: vector bundles, Grothendieck group K₀, virtual bundles,
 direct sum / tensor product, Bott periodicity, Chern character — all formalized
 with genuine multi-step computational paths (trans / symm / congrArg chains).
 
-Zero `Path.ofEq`.  Every path is built from `refl`, `trans`, `symm`,
+Zero `Path.mk`.  Every path is built from `refl`, `trans`, `symm`,
 `congrArg`, or single `Step` constructors.
 
 ## Main results (40 path defs, 30+ theorems)
@@ -74,7 +74,7 @@ private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
 @[simp] def chernCharacter (v : VirtualBundle) : Int := v.virtualRank
 
 -- ═══════════════════════════════════════════════════════
--- THEOREMS AND PATH CONSTRUCTIONS — zero Path.ofEq
+-- THEOREMS AND PATH CONSTRUCTIONS — zero Path.mk
 -- ═══════════════════════════════════════════════════════
 
 /-! ### 1-5 : Direct sum algebra -/
@@ -396,7 +396,7 @@ def tensor_pentagon (E F G H : VBundle) :
   Path.trans (tensor_assoc (tensorProd E F) G H)
              (tensor_assoc E F (tensorProd G H))
 
-/-! ### Verification: zero Path.ofEq in this file -/
+/-! ### Verification: zero Path.mk in this file -/
 
 end KTheory
 end Path

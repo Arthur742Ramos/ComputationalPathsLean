@@ -118,11 +118,11 @@ structure CorrectNet (n : Nat) extends ProofStructure n where
 
 /-- Path witnessing correctness: from any formula to any other. -/
 def correctnessPath {A : Type u} (a b : A) (h : a = b) : Path a b :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Theorem 5: Correctness path is reflexive at identity. -/
 theorem correctnessPath_refl {A : Type u} (a : A) :
-    correctnessPath a a rfl = Path.ofEq rfl := by
+    correctnessPath a a rfl = Path.mk [Step.mk _ _ rfl] rfl := by
   rfl
 
 /-! ## Cut Elimination as Path Reduction -/
@@ -141,7 +141,7 @@ def CutReduction.depth {n : Nat} : CutReduction n → Nat
 
 /-- Path witnessing cut reduction: before ↝ after. -/
 def cutReductionPath (before after : Nat) (h : before = after) : Path before after :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Theorem 6: Cut reduction path composes via trans. -/
 theorem cutReductionPath_trans (a b c : Nat) (h1 : a = b) (h2 : b = c) :

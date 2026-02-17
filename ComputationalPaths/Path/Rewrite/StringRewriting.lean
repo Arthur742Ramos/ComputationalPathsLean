@@ -110,17 +110,20 @@ theorem word_append_nil {α : Type u} (w : Word α) :
 /-- Path witnessing associativity of word concatenation. -/
 def wordAssocPath {α : Type u} (u v w : Word α) :
     ComputationalPaths.Path (u ++ v ++ w) (u ++ (v ++ w)) :=
-  ComputationalPaths.Path.ofEq (word_append_assoc u v w)
+  ComputationalPaths.Path.mk [Step.mk _ _ (word_append_assoc u v w)]
+    (word_append_assoc u v w)
 
 /-- Path witnessing left identity of word concatenation. -/
 def wordNilLeftPath {α : Type u} (w : Word α) :
     ComputationalPaths.Path ([] ++ w) w :=
-  ComputationalPaths.Path.ofEq (word_nil_append w)
+  ComputationalPaths.Path.mk [Step.mk _ _ (word_nil_append w)]
+    (word_nil_append w)
 
 /-- Path witnessing right identity of word concatenation. -/
 def wordNilRightPath {α : Type u} (w : Word α) :
     ComputationalPaths.Path (w ++ []) w :=
-  ComputationalPaths.Path.ofEq (word_append_nil w)
+  ComputationalPaths.Path.mk [Step.mk _ _ (word_append_nil w)]
+    (word_append_nil w)
 
 /-- Monoid left-unit path toEq is correct. -/
 theorem wordNilLeftPath_toEq {α : Type u} (w : Word α) :

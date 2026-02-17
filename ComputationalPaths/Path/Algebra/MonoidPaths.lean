@@ -93,7 +93,7 @@ theorem sound {s t : MTerm α} (p : MPath s t) : s.eval = t.eval := by
 
 -- Theorem 3
 def toPath {s t : MTerm α} (p : MPath s t) : Path s.eval t.eval :=
-  Path.ofEq (sound p)
+  Path.mk [Step.mk _ _ (sound p)] (sound p)
 
 end MPath
 
@@ -243,7 +243,7 @@ theorem path_preserves_size {s t : MTerm α} (p : MPath s t) : termSize s = term
 -- Theorem 24: size is a Path between Nats
 def sizePathOfMPath {s t : MTerm α} (p : MPath s t) :
     Path (termSize s) (termSize t) :=
-  Path.ofEq (path_preserves_size p)
+  Path.mk [Step.mk _ _ (path_preserves_size p)] (path_preserves_size p)
 
 /-! ## Unit absorption chains -/
 

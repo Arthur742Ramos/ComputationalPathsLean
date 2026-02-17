@@ -267,14 +267,14 @@ theorem substPathMap_id_toEq {s t : TRSTerm}
 /-- Path witnessing identity substitution is a no-op. -/
 def idSubstPath (t : TRSTerm) :
     ComputationalPaths.Path (applySubst TRSSubst.id t) t :=
-  ComputationalPaths.Path.ofEq (applySubst_id t)
+  ComputationalPaths.Path.mk [Step.mk _ _ (applySubst_id t)] (applySubst_id t)
 
 /-- Path witnessing substitution composition. -/
 def compSubstPath (σ τ : TRSSubst) (t : TRSTerm) :
     ComputationalPaths.Path
       (applySubst (TRSSubst.comp σ τ) t)
       (applySubst σ (applySubst τ t)) :=
-  ComputationalPaths.Path.ofEq (applySubst_comp σ τ t)
+  ComputationalPaths.Path.mk [Step.mk _ _ (applySubst_comp σ τ t)] (applySubst_comp σ τ t)
 
 /-- Symmetry of idSubstPath. -/
 def idSubstPathSymm (t : TRSTerm) :
@@ -350,7 +350,7 @@ theorem applySubst_ground (σ : TRSSubst) (t : TRSTerm) (hg : t.isGround = true)
 
 def groundInvariantPath (σ : TRSSubst) (t : TRSTerm) (hg : t.isGround = true) :
     ComputationalPaths.Path (applySubst σ t) t :=
-  ComputationalPaths.Path.ofEq (applySubst_ground σ t hg)
+  ComputationalPaths.Path.mk [Step.mk _ _ (applySubst_ground σ t hg)] (applySubst_ground σ t hg)
 
 /-! ## Empty TRS Properties -/
 

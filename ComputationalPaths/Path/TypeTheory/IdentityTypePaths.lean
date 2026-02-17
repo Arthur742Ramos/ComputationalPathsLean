@@ -155,7 +155,7 @@ theorem sumInrPath_symm {A : Type u} {B : Type v} {b₁ b₂ : B}
 /-- Pointwise path between functions gives a path between functions. -/
 def funextPath {A : Type u} {B : Type v} {f g : A → B}
     (h : ∀ x, Path (f x) (g x)) : Path f g :=
-  Path.ofEq (funext fun x => (h x).toEq)
+  Path.mk [Step.mk _ _ (funext fun x => (h x).toEq)] (funext fun x => (h x).toEq)
 
 theorem funextPath_toEq {A : Type u} {B : Type v} {f g : A → B}
     (h : ∀ x, Path (f x) (g x)) :
@@ -201,7 +201,7 @@ theorem path_toEq_unique {A : Type u} {a b : A} (p q : Path a b) :
 
 /-- Decidable equality gives a canonical path. -/
 def decEqPath {A : Type u} [DecidableEq A] (a b : A) (h : a = b) : Path a b :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 theorem decEqPath_toEq {A : Type u} [DecidableEq A] (a b : A) (h : a = b) :
     (decEqPath a b h).toEq = h := rfl
@@ -244,7 +244,7 @@ theorem singleton_contractible {A : Type u} (a b : A) (p : a = b) :
 /-- Path version of singleton contractibility. -/
 def singletonContractPath {A : Type u} (a b : A) (p : a = b) :
     Path (⟨a, PLift.up rfl⟩ : Σ x, PLift (a = x)) ⟨b, PLift.up p⟩ :=
-  Path.ofEq (singleton_contractible a b p)
+  Path.mk [Step.mk _ _ (singleton_contractible a b p)] (singleton_contractible a b p)
 
 theorem singletonContractPath_refl {A : Type u} (a : A) :
     (singletonContractPath a a rfl).toEq = rfl := rfl

@@ -191,7 +191,7 @@ structure ChainCpx where
 /-- Path witnessing d²=0 as a computational path. -/
 def dsq_path (cc : ChainCpx.{u}) (n : Int) (x : cc.graded.obj n) :
     Path (cc.diff.d (n - 1) (cc.diff.d n x)) (cc.basepoint (n - 1 - 1)) :=
-  Path.ofEq (cc.d_sq n x)
+  Path.mk [Step.mk _ _ (cc.d_sq n x)] (cc.d_sq n x)
 
 /-! ## Chain homotopy -/
 
@@ -232,7 +232,7 @@ theorem ShortExact.gf_zero (ses : ShortExact.{u}) (a : ses.A.carrier) :
 /-- Path witnessing g ∘ f = 0. -/
 def ShortExact.gf_zero_path (ses : ShortExact.{u}) (a : ses.A.carrier) :
     Path (ses.g.toFun (ses.f.toFun a)) ses.C.zero :=
-  Path.ofEq (ses.gf_zero a)
+  Path.mk [Step.mk _ _ (ses.gf_zero a)] (ses.gf_zero a)
 
 /-! ## Mayer-Vietoris data -/
 
@@ -252,7 +252,7 @@ structure MayerVietorisData where
 /-- Commutativity as a path. -/
 def MayerVietorisData.comm_path (mv : MayerVietorisData.{u}) (x : mv.AB.carrier) :
     Path (mv.jA.toFun (mv.iA.toFun x)) (mv.jB.toFun (mv.iB.toFun x)) :=
-  Path.ofEq (mv.comm x)
+  Path.mk [Step.mk _ _ (mv.comm x)] (mv.comm x)
 
 /-- The connecting map data type. -/
 structure ConnectingMap (mv : MayerVietorisData.{u}) where

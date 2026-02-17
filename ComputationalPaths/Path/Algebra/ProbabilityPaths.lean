@@ -85,12 +85,12 @@ theorem prob_congrArg {Ω : Type u} (m : MeasurePath Ω) {e1 e2 : Event Ω}
 /-- Path from congrArg on probability. -/
 def prob_congrArg_path {Ω : Type u} (m : MeasurePath Ω) {e1 e2 : Event Ω}
     (h : e1 = e2) : Path (m.prob e1) (m.prob e2) :=
-  Path.ofEq (_root_.congrArg m.prob h)
+  Path.mk [Step.mk _ _ (_root_.congrArg m.prob h)] (_root_.congrArg m.prob h)
 
 /-- Transport of probability data along event equality. -/
 def prob_transport {Ω : Type u} {P : Event Ω → Type v}
     {e1 e2 : Event Ω} (h : e1 = e2) (x : P e1) : P e2 :=
-  Path.transport (Path.ofEq h) x
+  Path.transport (Path.mk [Step.mk _ _ h] h) x
 
 /-- Transport along refl is identity. -/
 theorem prob_transport_refl {Ω : Type u} {P : Event Ω → Type v}
@@ -406,7 +406,7 @@ def trivialIndepData : IndepData Unit where
   probB := 1
   probAB := 1
   product := 1
-  prodPath := Path.ofEq (by norm_num)
+  prodPath := Path.mk [Step.mk _ _ (by norm_num)] (by norm_num)
   indepPath := Path.refl 1
 
 /-- Trivial expectation data. -/

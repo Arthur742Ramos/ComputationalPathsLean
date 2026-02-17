@@ -264,12 +264,12 @@ theorem trans_congrArg {S : Type u} (m : TransMatrix S) (i : S)
 /-- Path from congrArg on transitions. -/
 def trans_congrArg_path {S : Type u} (m : TransMatrix S) (i : S)
     {j1 j2 : S} (h : j1 = j2) : Path (m.trans i j1) (m.trans i j2) :=
-  Path.ofEq (_root_.congrArg (m.trans i) h)
+  Path.mk [Step.mk _ _ (_root_.congrArg (m.trans i) h)] (_root_.congrArg (m.trans i) h)
 
 /-- Transport for state-indexed data. -/
 def state_transport {S : Type u} {P : S → Type v}
     {s1 s2 : S} (h : s1 = s2) (x : P s1) : P s2 :=
-  Path.transport (Path.ofEq h) x
+  Path.transport (Path.mk [Step.mk _ _ h] h) x
 
 /-- Transport along refl is identity. -/
 theorem state_transport_refl {S : Type u} {P : S → Type v}

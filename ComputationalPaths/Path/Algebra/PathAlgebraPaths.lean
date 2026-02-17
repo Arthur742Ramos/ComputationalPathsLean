@@ -3,7 +3,7 @@
 
 Formal linear combinations of paths in a quiver, with multiplication by
 concatenation. Every algebraic identity is witnessed by genuine computational
-paths built from domain-specific rewrite steps — zero `Path.ofEq`.
+paths built from domain-specific rewrite steps — zero `Path.mk`.
 
 ## Main results (42 theorems / path constructions)
 -/
@@ -57,7 +57,7 @@ deriving DecidableEq, Repr
 /-! ## Domain-specific rewrite steps
 
 Each step encodes a named algebraic law as a single rewrite.  Paths are
-assembled from these steps, never from the generic `Path.ofEq`. -/
+assembled from these steps, never from the generic `Path.mk`. -/
 
 /-- Build a genuine 1-step path from an equality between PAElems. -/
 @[inline] def paStep {s t : Vertex} (a b : PAElem s t) (h : a = b) : Path a b :=

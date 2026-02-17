@@ -109,7 +109,8 @@ theorem Atlas.size_pos {M : Manifold} (A : Atlas M) : 0 < A.size :=
 /-- Path: atlas size is positive. -/
 def Atlas.size_pos_path {M : Manifold} (A : Atlas M) :
     Path (0 < A.size) True :=
-  Path.ofEq (propext ⟨fun _ => trivial, fun _ => A.nonempty⟩)
+  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => A.nonempty⟩)]
+    (propext ⟨fun _ => trivial, fun _ => A.nonempty⟩)
 
 /-! ## Tangent Bundle -/
 
@@ -212,7 +213,7 @@ theorem pushforward_id (M : Manifold) (v : TangentVec M) :
 /-- Path: pushforward of identity. -/
 def pushforward_id_path (M : Manifold) (v : TangentVec M) :
     Path (pushforward (modelMapId M) v) v :=
-  Path.ofEq (pushforward_id M v)
+  Path.mk [Step.mk _ _ (pushforward_id M v)] (pushforward_id M v)
 
 /-- Chain rule for pushforward. -/
 theorem pushforward_comp {M N P : Manifold} (g : ModelMap N P) (f : ModelMap M N)
@@ -223,7 +224,7 @@ theorem pushforward_comp {M N P : Manifold} (g : ModelMap N P) (f : ModelMap M N
 def pushforward_comp_path {M N P : Manifold} (g : ModelMap N P) (f : ModelMap M N)
     (v : TangentVec M) :
     Path (pushforward (modelMapComp g f) v) (pushforward g (pushforward f v)) :=
-  Path.ofEq (pushforward_comp g f v)
+  Path.mk [Step.mk _ _ (pushforward_comp g f v)] (pushforward_comp g f v)
 
 /-- Pushforward projection. -/
 theorem pushforward_proj {M N : Manifold} (f : ModelMap M N) (v : TangentVec M) :

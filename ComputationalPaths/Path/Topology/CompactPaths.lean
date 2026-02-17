@@ -174,12 +174,12 @@ theorem empty_compact_rewriting {A : Type u} [Inhabited A] :
 
 /-- Path from a rewrite step. -/
 def rewrite_step_path {A : Type u} {a b : A} (h : a = b) : Path a b :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Composing rewrite step paths. -/
 def rewrite_chain_path {A : Type u} {a b c : A} (h1 : a = b) (h2 : b = c) :
     Path a c :=
-  Path.trans (Path.ofEq h1) (Path.ofEq h2)
+  Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.mk [Step.mk _ _ h2] h2)
 
 /-! ## Path Trees and König's Lemma -/
 
@@ -216,7 +216,7 @@ structure KoenigPath {A : Type u} (t : PathTree A) where
 /-- Path from König sequence start to root. -/
 def koenig_start_path {A : Type u} {t : PathTree A} (k : KoenigPath t) :
     Path (k.path_seq 0) t.root :=
-  Path.ofEq k.starts
+  Path.mk [Step.mk _ _ k.starts] k.starts
 
 /-- Each König step gives a path. -/
 def koenig_step_path {A : Type u} {t : PathTree A} (k : KoenigPath t) (n : Nat) :

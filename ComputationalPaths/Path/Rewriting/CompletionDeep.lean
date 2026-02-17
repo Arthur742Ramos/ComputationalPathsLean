@@ -17,7 +17,7 @@ critical pairs (forks in the path space) and orienting them as new rules.
 - Path algebra: composition, reversal, concatenation at overlaps
 - 50+ theorems, all using genuine Path operations
 
-ZERO `Path.ofEq`, ZERO `sorry`.
+ZERO `Path.mk [Step.mk _ _ h] h`, ZERO `sorry`.
 -/
 
 import ComputationalPaths.Path.Basic
@@ -1211,7 +1211,7 @@ Theorems numbered 1-96 above. Key categories:
 - Normalization: 92-96
 
 ALL proofs use genuine Path.trans, Path.symm, Path.congrArg, Path.transport.
-ZERO `Path.ofEq`. ZERO `sorry`.
+ZERO `Path.mk [Step.mk _ _ h] h`. ZERO `sorry`.
 -/
 
 end ComputationalPaths.Path.Rewriting.CompletionDeep

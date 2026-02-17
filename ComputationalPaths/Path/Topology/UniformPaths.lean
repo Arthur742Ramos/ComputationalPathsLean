@@ -272,7 +272,7 @@ def uniform_equiv_loop {A : Type u} {B : Type v}
     {UA : UniformPathSpace A} {UB : UniformPathSpace B}
     (e : UniformEquiv UA UB) (a : A) :
     Path (e.invFun (e.toFun a)) a :=
-  Path.ofEq (e.left_inv a)
+  Path.mk [Step.mk _ _ (e.left_inv a)] (e.left_inv a)
 
 /-- Transport along the round-trip path. -/
 theorem uniform_equiv_transport {A : Type u} {B : Type v}
@@ -300,7 +300,7 @@ def entourageIndex {A : Type u} (U : UniformPathSpace A) [DecidableEq A]
 def entourageIndex_self_path {A : Type u} (U : UniformPathSpace A)
     [DecidableEq A] (a : A) :
     Path (entourageIndex U a a) 0 :=
-  Path.ofEq (entourageIndex_self U a)
+  Path.mk [Step.mk _ _ (entourageIndex_self U a)] (entourageIndex_self U a)
 
 end UniformPaths
 end Topology

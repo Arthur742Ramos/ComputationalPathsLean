@@ -54,7 +54,7 @@ theorem Pushout.glue {A B C : Type u} {s : Span A B C} (c : C) :
 /-- The glue identification as a computational path. -/
 def Pushout.gluePath {A B C : Type u} {s : Span A B C} (c : C) :
     Path (@Pushout.inl A B C s (s.left c)) (@Pushout.inr A B C s (s.right c)) :=
-  Path.ofEq (Pushout.glue c)
+  Path.mk [Step.mk _ _ (Pushout.glue c)] (Pushout.glue c)
 
 /-- Elimination from the pushout into a type family (non-dependent). -/
 def Pushout.lift {A B C : Type u} {s : Span A B C} {D : Type v}
@@ -98,7 +98,7 @@ theorem Coequalizer.coeq {X Y : Type u} {f g : X → Y} (x : X) :
 /-- The coequalizer identification as a computational path. -/
 def Coequalizer.coeqPath {X Y : Type u} {f g : X → Y} (x : X) :
     Path (@Coequalizer.inc X Y f g (f x)) (@Coequalizer.inc X Y f g (g x)) :=
-  Path.ofEq (Coequalizer.coeq x)
+  Path.mk [Step.mk _ _ (Coequalizer.coeq x)] (Coequalizer.coeq x)
 
 /-- Elimination from the coequalizer. -/
 def Coequalizer.lift {X Y : Type u} {f g : X → Y} {D : Type v}
@@ -192,7 +192,7 @@ theorem Wedge.glue {A B : Type u} {a₀ : A} {b₀ : B} :
 /-- The wedge identification as a computational path. -/
 def Wedge.gluePath {A B : Type u} {a₀ : A} {b₀ : B} :
     Path (@Wedge.inl A B a₀ b₀ a₀) (@Wedge.inr A B a₀ b₀ b₀) :=
-  Path.ofEq Wedge.glue
+  Path.mk [Step.mk _ _ Wedge.glue] Wedge.glue
 
 /-! ## Pushout properties via Path -/
 

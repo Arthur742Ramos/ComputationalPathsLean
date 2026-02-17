@@ -4,7 +4,7 @@
 Distance modelled via an inductive `MetricStep` rewrite system on a
 Nat-valued distance function.  Triangle inequality, Cauchy sequences,
 completeness, Lipschitz / contraction / isometry — all path-native.
-**Zero** `Path.ofEq`.
+**Zero** `Path.mk [Step.mk _ _ _] _`.
 
 ## References
 
@@ -79,7 +79,7 @@ theorem dist_eq_zero_self {A : Type u} (M : PathMetric A) (a : A) :
 theorem dist_symm_symm {A : Type u} (M : PathMetric A) (a b : A) :
     M.dist a b = M.dist a b := rfl
 
-/-! ## Path witnesses — zero Path.ofEq -/
+/-! ## Path witnesses — zero Path.mk [Step.mk _ _ _] _ -/
 
 -- 8
 def dist_self_path {A : Type u} (M : PathMetric A) (a : A) :

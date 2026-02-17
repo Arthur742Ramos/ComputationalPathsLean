@@ -74,7 +74,7 @@ theorem north_eq_south (a : A) : @north A = @south A :=
 
 /-- Full meridian path from north to south through `a`. -/
 def fullMeridian (a : A) : Path (@north A) (@south A) :=
-  Path.ofEq (north_eq_south a)
+  Path.mk [Step.mk _ _ (north_eq_south a)] (north_eq_south a)
 
 /-- Reverse meridian path. -/
 def fullMeridianRev (a : A) : Path (@south A) (@north A) :=
@@ -167,7 +167,8 @@ theorem eq_north (x : Susp A) [Nonempty A] : x = north := by
 
 /-- The suspension of a nonempty type is path-connected. -/
 def pathConnectedPath [Nonempty A] (x y : Susp A) : Path x y :=
-  Path.ofEq ((eq_north x).trans (eq_north y).symm)
+  Path.mk [Step.mk _ _ ((eq_north x).trans (eq_north y).symm)]
+    ((eq_north x).trans (eq_north y).symm)
 
 /-! ## Transport across suspension -/
 

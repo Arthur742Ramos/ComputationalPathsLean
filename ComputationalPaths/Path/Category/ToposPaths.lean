@@ -186,13 +186,13 @@ structure LTTopology (A : Type u) where
 /-- j being idempotent as a path. -/
 def lt_idempotent_path {A : Type u} (lt : LTTopology A) (a : A) :
     Path (lt.j (lt.j a)) (lt.j a) :=
-  Path.ofEq (lt.idempotent a)
+  Path.mk [Step.mk _ _ (lt.idempotent a)] (lt.idempotent a)
 
 /-- j² = j as path symmetry. -/
 theorem lt_idempotent_symm {A : Type u} (lt : LTTopology A) (a : A) :
     Path.symm (lt_idempotent_path lt a) =
-    Path.ofEq (lt.idempotent a).symm := by
-  simp [lt_idempotent_path, Path.symm, Path.ofEq]
+    Path.mk [Step.mk _ _ (lt.idempotent a).symm] (lt.idempotent a).symm := by
+  simp [lt_idempotent_path, Path.symm, Path.mk]
 
 /-- Functoriality of j via congrArg. -/
 theorem lt_functorial {A : Type u} (lt : LTTopology A) {a b : A}

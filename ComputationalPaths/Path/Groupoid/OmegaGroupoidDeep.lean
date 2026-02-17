@@ -200,17 +200,17 @@ theorem vcomp2_middle_four {a b : A} {p q r s t : Path a b}
 def assoc_cell {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Cell2 (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
-  Path.ofEq (Path.trans_assoc p q r)
+  Path.mk [Step.mk _ _ (Path.trans_assoc p q r)] (Path.trans_assoc p q r)
 
 /-- 26. Left unitor 2-cell. -/
 def lunitor {a b : A} (p : Path a b) :
     Cell2 (Path.trans (Path.refl a) p) p :=
-  Path.ofEq (Path.trans_refl_left p)
+  Path.mk [Step.mk _ _ (Path.trans_refl_left p)] (Path.trans_refl_left p)
 
 /-- 27. Right unitor 2-cell. -/
 def runitor {a b : A} (p : Path a b) :
     Cell2 (Path.trans p (Path.refl b)) p :=
-  Path.ofEq (Path.trans_refl_right p)
+  Path.mk [Step.mk _ _ (Path.trans_refl_right p)] (Path.trans_refl_right p)
 
 /-- 28. Pentagon coherence: both paths around the pentagon agree (proof-irrelevance). -/
 theorem pentagon_coherence {a b c d e : A}

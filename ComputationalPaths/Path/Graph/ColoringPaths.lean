@@ -62,7 +62,7 @@ theorem colorClass_independent {V : Type u} {C : Type v} [DecidableEq C]
 /-- Path witness: recoloring preserves structure. -/
 theorem recolor_path {V : Type u} {C : Type v} {G : SimpleGraph V}
     {c1 c2 : C} (h : c1 = c2) (col : Coloring G C) (v : V) :
-    Path.transport (D := fun _ => C) (Path.ofEq h) (col.color v) = col.color v := by
+    Path.transport (D := fun _ => C) (Path.mk [Step.mk _ _ h] h) (col.color v) = col.color v := by
   cases h; rfl
 
 /-- Single color witness is trivially satisfied. -/
@@ -130,7 +130,7 @@ def coloring_path_of_eq {V : Type u} {C : Type v}
     {G : SimpleGraph V} (c1 c2 : Coloring G C)
     (h : c1.color = c2.color) :
     Path c1.color c2.color :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- congrArg on coloring function. -/
 def congrArg_color {V : Type u} {C : Type v}

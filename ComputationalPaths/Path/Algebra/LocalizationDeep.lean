@@ -35,7 +35,7 @@ def Arrow.id (a : A) : Arrow A :=
 def Arrow.comp {A : Type u} (f : Arrow A) (g : Arrow A)
     (h : f.tgt = g.src) : Arrow A :=
   Arrow.mk f.src g.tgt
-    (Path.trans f.mor (Path.trans (Path.ofEq h) g.mor))
+    (Path.trans f.mor (Path.trans (Path.mk [Step.mk _ _ h] h) g.mor))
 
 -- 3. Inverse arrow
 def Arrow.inv {A : Type u} (f : Arrow A) : Arrow A :=
@@ -163,7 +163,7 @@ structure Saturated (A : Type u) (S : InvSet A) : Prop where
   contains_id : ∀ a : A, S.contains (Arrow.mk a a (Path.refl a))
   closed_comp : ∀ (f g : Arrow A), S.contains f → S.contains g →
     (h : f.tgt = g.src) → S.contains (Arrow.mk f.src g.tgt
-      (Path.trans f.mor (Path.trans (Path.ofEq h) g.mor)))
+      (Path.trans f.mor (Path.trans (Path.mk [Step.mk _ _ h] h) g.mor)))
   contains_inv : ∀ (f : Arrow A), S.contains f →
     S.contains (Arrow.mk f.tgt f.src (Path.symm f.mor))
 

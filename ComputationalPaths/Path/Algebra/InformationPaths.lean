@@ -51,7 +51,7 @@ theorem entropyEquiv_trans {d1 d2 d3 : EntropyData}
 /-- Path from entropy equivalence. -/
 def entropyEquiv_path {d1 d2 : EntropyData}
     (h : entropyEquiv d1 d2) : Path d1.entropyVal d2.entropyVal :=
-  Path.ofEq h
+  Path.mk [Step.mk _ _ h] h
 
 /-- Normalization path trans refl. -/
 theorem entropy_norm_trans_refl (d : EntropyData) :
@@ -275,12 +275,13 @@ theorem dist_congrArg {d1 d2 : List Nat}
 /-- Path from congrArg on distributions. -/
 def dist_congrArg_path {d1 d2 : List Nat}
     (h : d1 = d2) : Path (d1.foldl (· + ·) 0) (d2.foldl (· + ·) 0) :=
-  Path.ofEq (_root_.congrArg (fun l => l.foldl (· + ·) 0) h)
+  Path.mk [Step.mk _ _ (_root_.congrArg (fun l => l.foldl (· + ·) 0) h)]
+    (_root_.congrArg (fun l => l.foldl (· + ·) 0) h)
 
 /-- Transport for entropy-indexed data. -/
 def entropy_transport {P : Nat → Type v} {n1 n2 : Nat}
     (h : n1 = n2) (x : P n1) : P n2 :=
-  Path.transport (Path.ofEq h) x
+  Path.transport (Path.mk [Step.mk _ _ h] h) x
 
 /-- Transport along refl is identity. -/
 theorem entropy_transport_refl {P : Nat → Type v} (n : Nat) (x : P n) :

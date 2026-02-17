@@ -4,7 +4,7 @@
 Vector space axioms expressed through an inductive rewrite system: each step
 constructor captures a genuine vector-space rewrite rule (vadd commutativity,
 associativity, zero identity, scalar distribution, etc.). Paths are chains
-of steps. 38+ theorems with multi-step trans/symm chains, zero `Path.ofEq`.
+of steps. 38+ theorems with multi-step trans/symm chains, zero `Path.mk [Step.mk _ _ _] _`.
 
 ## Domain-specific types
 - `VExpr n`  — vector expression AST over `Fin n → Int`
@@ -136,7 +136,7 @@ theorem sound {e₁ e₂ : VExpr n} (p : VPath' e₁ e₂) : e₁.eval = e₂.ev
 
 -- Theorem 3: lift to computational Path
 def toPath {e₁ e₂ : VExpr n} (p : VPath' e₁ e₂) : Path e₁.eval e₂.eval :=
-  Path.ofEq (sound p)
+  Path.mk [Step.mk _ _ (sound p)] (sound p)
 
 end VPath'
 

@@ -193,13 +193,15 @@ theorem monad_trans_assoc
 def whisker_bind_left (m : PMon α) (f f' : α → PMon β)
     (h : f = f') :
     Path (pbind m f) (pbind m f') :=
-  Path.ofEq (_root_.congrArg (fun g => pbind m g) h)
+  Path.mk [Step.mk _ _ (_root_.congrArg (fun g => pbind m g) h)]
+    (_root_.congrArg (fun g => pbind m g) h)
 
 /-- 25. Whiskering: right-whisker by changing the monad value. -/
 def whisker_bind_right (m m' : PMon α) (f : α → PMon β)
     (h : m = m') :
     Path (pbind m f) (pbind m' f) :=
-  Path.ofEq (_root_.congrArg (fun x => pbind x f) h)
+  Path.mk [Step.mk _ _ (_root_.congrArg (fun x => pbind x f) h)]
+    (_root_.congrArg (fun x => pbind x f) h)
 
 /-- 26. Double whiskering combines into a single path via trans. -/
 def double_whisker (m m' : PMon α) (f f' : α → PMon β)

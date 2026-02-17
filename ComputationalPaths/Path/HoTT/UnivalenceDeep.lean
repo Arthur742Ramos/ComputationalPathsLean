@@ -86,7 +86,13 @@ def biInvToQInv {f : A → B} (e : BiInv f) : QInv f where
   inv := e.left.linv
   sect := e.left.sect
   retr := fun b =>
-    Path.ofEq (by
+    Path.mk [Step.mk _ _ (by
+      have hsect := fun x => (e.left.sect x).proof
+      have hretr := fun x => (e.right.retr x).proof
+      calc f (e.left.linv b)
+          = f (e.left.linv (f (e.right.rinv b))) := by rw [hretr b]
+        _ = f (e.right.rinv b) := by rw [hsect]
+        _ = b := hretr b)] (by
       have hsect := fun x => (e.left.sect x).proof
       have hretr := fun x => (e.right.retr x).proof
       calc f (e.left.linv b)
@@ -99,8 +105,10 @@ def transportEquiv' {D : A → Type v} {a b : A} (p : Path a b) :
   toFun := Path.transport p
   isEquiv :=
     { inv := Path.transport (Path.symm p)
-      sect := fun x => Path.ofEq (Path.transport_symm_left p x)
-      retr := fun y => Path.ofEq (Path.transport_symm_right p y) }
+      sect := fun x => Path.mk [Step.mk _ _ (Path.transport_symm_left p x)]
+        (Path.transport_symm_left p x)
+      retr := fun y => Path.mk [Step.mk _ _ (Path.transport_symm_right p y)]
+        (Path.transport_symm_right p y) }
 
 /-! ## Univalence axiom (postulated) -/
 

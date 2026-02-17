@@ -1,7 +1,7 @@
 /-
 # C*-Algebra Properties via Domain-Specific Computational Paths
 
-Replaces the prior scaffolding (37 `Path.ofEq` wrappers) with a genuine
+Replaces the prior scaffolding (37 `Path.mk [Step.mk _ _ _] _` wrappers) with a genuine
 domain-specific rewrite system:
 
 - `CStarObj` models symbolic C*-algebraic expressions (products, involutions,
@@ -11,7 +11,7 @@ domain-specific rewrite system:
   algebra axioms, GNS inner product, Gelfand–Naimark, spectral radius).
 - `CStarPath` is the propositional closure.
 
-Zero `sorry`. Zero `Path.ofEq`. All reasoning is multi-step chains.
+Zero `sorry`. Zero `Path.mk [Step.mk _ _ _] _`. All reasoning is multi-step chains.
 -/
 
 import ComputationalPaths.Path.Basic
