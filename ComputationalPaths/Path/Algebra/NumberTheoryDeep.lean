@@ -4,7 +4,7 @@
 Divisibility as rewriting, GCD computation as paths (Euclidean algorithm steps),
 Bezout's identity, fundamental theorem of arithmetic (unique factorization sketch),
 Chinese remainder theorem, quadratic reciprocity sketch, p-adic valuation paths.
-40+ theorems, all sorry-free. No Path.ofEq — multi-step trans/symm/congrArg chains.
+40+ theorems, fully proved, with multi-step trans/symm/congrArg chains.
 
 ## References
 - Hardy & Wright, *An Introduction to the Theory of Numbers*
@@ -113,7 +113,7 @@ theorem divides_zero (a : NVal) : Divides a nzero :=
 theorem divides_trans {a b c : NVal} (h1 : Divides a b) (h2 : Divides b c) : Divides a c := by
   obtain ⟨k1, hk1⟩ := h1
   obtain ⟨k2, hk2⟩ := h2
-  exact ⟨k1 * k2, by omega⟩
+  exact ⟨k1 * k2, by rw [hk2, hk1, Nat.mul_assoc]⟩
 
 /-- Theorem 5: If a | b and a | c then a | (b + c). -/
 theorem divides_add {a b c : NVal} (h1 : Divides a b) (h2 : Divides a c) :
@@ -126,7 +126,7 @@ theorem divides_add {a b c : NVal} (h1 : Divides a b) (h2 : Divides a c) :
 theorem divides_mul_right {a b c : NVal} (h : Divides a b) :
     Divides a (nmul b c) := by
   obtain ⟨k, hk⟩ := h
-  exact ⟨k * c.val, by simp [nmul]; subst hk; ring⟩
+  exact ⟨k * c.val, by simp [nmul]; rw [hk, Nat.mul_assoc]⟩
 
 /-! ## §6 Divisibility rewrite step type and paths -/
 
@@ -520,7 +520,7 @@ def full_distribute_path (a b c : NVal) :
 
 /-- A number is prime if it's ≥ 2 and has no divisors other than 1 and itself. -/
 def isPrime (n : Nat) : Bool :=
-  n ≥ 2 && (List.range n).filter (fun d => d ≥ 2 && n % d == 0) |>.length == 0
+  n ≥ 2 && ((List.range n).filter (fun d => d ≥ 2 && n % d == 0)).length == 0
 
 /-- Theorem 61: 2 is prime. -/
 theorem two_prime : isPrime 2 = true := by native_decide
