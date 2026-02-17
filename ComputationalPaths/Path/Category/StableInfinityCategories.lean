@@ -173,7 +173,7 @@ def IsStable (C : StableInfinityCategory.{u,v})
   IsSemistable C σ φ x ∧ True -- no proper subobjects condition
 
 /-- The space of stability conditions Stab(C). -/
-def StabSpace (C : StableInfinityCategory.{u,v}) : Type :=
+def StabSpace (C : StableInfinityCategory.{u,v}) :=
   StabilityCondition C
 
 /-- The phase of a semistable object. -/
@@ -186,6 +186,7 @@ def phase (C : StableInfinityCategory.{u,v})
 /-- The homotopy category of a stable ∞-category is triangulated. -/
 theorem homotopy_category_triangulated (C : StableInfinityCategory.{u,v}) :
     ∀ (T : ExactTriangle C), IsDistinguished C T → True := by
+  intro _ _
   trivial
 
 /-- Rotation of exact triangles preserves exactness. -/
@@ -202,14 +203,25 @@ theorem loop_suspension_inverse (C : StableInfinityCategory.{u,v}) (X : C.Obj) :
 /-- The heart of a t-structure is an abelian category. -/
 theorem heart_is_abelian (C : StableInfinityCategory.{u,v}) (t : TStructure C) :
     ∀ (x y : C.Obj), heart C t x → heart C t y → True := by
-  intro; trivial
+  intro _ _ _ _
+  trivial
 
 /-- The truncation triangle: τ≤n X → X → τ≥(n+1) X → Σ τ≤n X is exact. -/
 theorem truncation_triangle_exact (C : StableInfinityCategory.{u,v})
     (t : TStructure C) (n : Int) (x : C.Obj) :
     ∃ (T : ExactTriangle C), T.X = truncBelow C t n x := by
-  exact ⟨⟨truncBelow C t n x, x, truncAbove C t (n+1) x, C.comp (C.id _) (C.id _),
-         C.comp (C.id _) (C.id _), C.comp (C.id _) (C.id _)⟩, rfl⟩
+  let X₀ := truncBelow C t n x
+  let Y₀ := x
+  let Z₀ := truncAbove C t (n + 1) x
+  refine ⟨{
+    X := X₀
+    Y := Y₀
+    Z := Z₀
+    f := C.comp (C.toZero X₀) (C.fromZero Y₀)
+    g := C.comp (C.toZero Y₀) (C.fromZero Z₀)
+    h := C.comp (C.toZero Z₀) (C.fromZero (suspension C.toPointedInfinityCategory X₀))
+  }, ?_⟩
+  rfl
 
 /-- Bounded t-structure implies convergent spectral sequence. -/
 theorem bounded_spectral_sequence (C : StableInfinityCategory.{u,v})
@@ -234,7 +246,8 @@ theorem verdier_universal_property (C : StableInfinityCategory.{u,v})
     (N : ThickSubcategory C) :
     ∀ (D : StableInfinityCategory.{u,v}) (F : C.Obj → D.Obj),
       (∀ x, N.mem x → F x = D.zero) → True := by
-  intro; trivial
+  intro _ _ _
+  trivial
 
 /-- The kernel-quotient exact sequence: N → C → C/N. -/
 theorem localization_sequence (C : StableInfinityCategory.{u,v})
@@ -251,7 +264,7 @@ theorem stab_space_manifold (C : StableInfinityCategory.{u,v}) :
 theorem harder_narasimhan_existence (C : StableInfinityCategory.{u,v})
     (σ : StabilityCondition C) (x : C.Obj) :
     ∃ (n : Nat) (phases : Fin n → Float), True := by
-  exact ⟨_, trivial⟩
+  exact ⟨1, (fun _ => 0.0), trivial⟩
 
 /-- The HN filtration is functorial. -/
 theorem hn_filtration_functorial (C : StableInfinityCategory.{u,v})
@@ -263,7 +276,7 @@ theorem hn_filtration_functorial (C : StableInfinityCategory.{u,v})
 theorem stable_iff_simple (C : StableInfinityCategory.{u,v})
     (σ : StabilityCondition C) (φ : Float) (x : C.Obj) :
     IsStable C σ φ x ↔ (IsSemistable C σ φ x ∧ True) := by
-  exact ⟨fun _ => trivial, fun _ => trivial⟩
+  rfl
 
 /-- Wall-crossing: stability conditions in adjacent chambers give equivalent categories. -/
 theorem wall_crossing (C : StableInfinityCategory.{u,v})
@@ -275,7 +288,14 @@ theorem wall_crossing (C : StableInfinityCategory.{u,v})
 theorem octahedral_axiom (C : StableInfinityCategory.{u,v})
     (X Y Z : C.Obj) (f : C.Hom X Y) (g : C.Hom Y Z) :
     ∃ (T : ExactTriangle C), True := by
-  exact ⟨_, trivial⟩
+  exact ⟨{
+    X := X
+    Y := Y
+    Z := Z
+    f := f
+    g := g
+    h := C.comp (C.toZero Z) (C.fromZero X)
+  }, trivial⟩
 
 /-- Exact functors preserve exact triangles. -/
 theorem exact_functor_preserves_triangles
@@ -291,7 +311,8 @@ theorem t_structure_determined_by_heart
     (t₁ t₂ : TStructure C) :
     IsNonDegenerate C t₁ → IsNonDegenerate C t₂ →
     (∀ x, heart C t₁ x ↔ heart C t₂ x) → True := by
-  exact ⟨fun _ => trivial, fun _ => trivial⟩
+  intro _ _ _
+  trivial
 
 /-- Phase function is continuous on semistable objects. -/
 theorem phase_continuous (C : StableInfinityCategory.{u,v})
@@ -303,6 +324,6 @@ theorem phase_continuous (C : StableInfinityCategory.{u,v})
 theorem shift_action_on_stab (C : StableInfinityCategory.{u,v})
     (σ : StabilityCondition C) :
     ∃ (σ' : StabilityCondition C), True := by
-  exact ⟨_, trivial⟩
+  exact ⟨σ, trivial⟩
 
 end ComputationalPaths.Path.Category.StableInfinityCategories
