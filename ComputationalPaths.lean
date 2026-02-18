@@ -52,11 +52,8 @@ import ComputationalPaths.OperadicAlgebra.EnOperads
 import ComputationalPaths.OperadicAlgebra.KoszulDuality
 import ComputationalPaths.Path.Logic.DependentTypeDeep
 import ComputationalPaths.Path.Logic.LinearLogicDeep
-import ComputationalPaths.Path.ModelCategoryPaths
-import ComputationalPaths.Path.HigherCategoryPaths
 import ComputationalPaths.Path.OperadPaths
 import ComputationalPaths.Path.DerivedCategoryPaths
-import ComputationalPaths.Path.QuantumGroupPaths
 import ComputationalPaths.Path.AlgebraicTopologyPaths
 import ComputationalPaths.Path.MotivicHomotopyPaths
 import ComputationalPaths.Path.HigherToposPaths
