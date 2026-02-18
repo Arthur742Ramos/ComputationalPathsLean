@@ -223,7 +223,7 @@ noncomputable def base : (n : Nat) → TorusN n
 /-- **TorusN 0 theorem**: Parallel paths in TorusN 0 (a point) are RwEq.
 T⁰ = PUnit', which is a set. -/
 theorem torusN_zero_pathEq {a b : TorusN.{u} 0} (p q : Path.{u} a b) : RwEq.{u} p q :=
-  (isHSet_of_subsingleton (A := TorusN.{u} 0)) p q
+  (isHSet_of_subsingleton (A := TorusN.{u} 0)).rweq p q
 
 /-- T⁰ is a point, with trivial π₁. -/
 theorem torusN_zero_trivial (α : π₁(TorusN.{u} 0, TorusN.base.{u} 0)) :

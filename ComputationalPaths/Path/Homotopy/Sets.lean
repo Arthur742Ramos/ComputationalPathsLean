@@ -27,8 +27,8 @@ variable {A : Type u}
 
 /-- A type is a homotopy set (h-set) if any two parallel paths are RwEq.
     This is the computational paths analog of "0-truncated" types in HoTT. -/
-def IsHSet (A : Type u) : Prop :=
-  ∀ {a b : A} (p q : Path a b), RwEq p q
+class IsHSet (A : Type u) : Prop where
+  rweq : ∀ {a b : A} (p q : Path a b), RwEq p q
 
 /-- A type satisfies Axiom K if every loop is RwEq to refl.
     This is the computational paths analog of the "K axiom" in type theory. -/
@@ -121,13 +121,14 @@ theorem inverse_unique {a b : A} (p : Path a b) (q : Path b a)
     Proof: Any loop `p : a → a` is parallel to `refl a`, so by `IsHSet`, `p ≈ refl`. -/
 theorem isHSet_implies_axiomK (h : IsHSet A) : AxiomK A := by
   intro a p
-  exact h p (Path.refl a)
+  exact IsHSet.rweq (A := A) p (Path.refl a)
 
 /-- If A satisfies Axiom K, then A is a set.
 
     Proof: Given paths `p, q : a → b`, form `trans p (symm q) : a → a`.
     By Axiom K, this is RwEq to refl. Then derive `p ≈ q` via path algebra. -/
 theorem axiomK_implies_isHSet (h : AxiomK A) : IsHSet A := by
+  refine ⟨?rweq⟩
   intro a b p q
   -- Form the loop trans p (symm q) : a → a
   have loop_refl : RwEq (Path.trans p (Path.symm q)) (Path.refl a) := h a _

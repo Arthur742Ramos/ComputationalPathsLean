@@ -208,6 +208,132 @@ theorem abelianization_is_abelian {G : Type u} (mul : G → G → G) (inv : G �
   unfold abelianization_mk
   exact Quotient.sound (AbelianizationRel.comm a b)
 
+/-- A raw commutativity predicate for a binary operation. -/
+def IsAbelian {G : Type u} (mul : G → G → G) : Prop :=
+  ∀ a b, mul a b = mul b a
+
+/-- Raw group-like laws for a binary operation with inverse and unit. -/
+def IsGroupLike {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) : Prop :=
+  (∀ x y z, mul (mul x y) z = mul x (mul y z)) ∧
+  (∀ x, mul e x = x) ∧
+  (∀ x, mul x e = x) ∧
+  (∀ x, mul (inv x) x = e) ∧
+  (∀ x, mul x (inv x) = e)
+
+/-- Raw hom-like predicate for maps respecting mul, inv, and e. -/
+def IsMulHom {G H : Type u} (mulG : G → G → G) (invG : G → G) (eG : G)
+    (mulH : H → H → H) (invH : H → H) (eH : H) (f : G → H) : Prop :=
+  (∀ x y, f (mulG x y) = mulH (f x) (f y)) ∧
+  (∀ x, f (invG x) = invH (f x)) ∧
+  f eG = eH
+
+/-- The induced multiplication on the abelianization is commutative. -/
+theorem abelianization_mul_comm {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) :
+    IsAbelian (abelianization_mul mul inv e) := by
+  intro x y
+  refine Quotient.inductionOn x ?_
+  intro a
+  refine Quotient.inductionOn y ?_
+  intro b
+  exact abelianization_is_abelian (mul := mul) (inv := inv) (e := e) a b
+
+/-- Any hom-like map into a commutative target respects AbelianizationRel. -/
+theorem abelianizationRel_respects {G H : Type u}
+    (mulG : G → G → G) (invG : G → G) (eG : G)
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : G → H) (hgroup : IsGroupLike mulH invH eH) (hcomm : IsAbelian mulH)
+    (hhom : IsMulHom mulG invG eG mulH invH eH f) :
+    ∀ {x y}, AbelianizationRel G mulG invG eG x y → f x = f y := by
+  rcases hgroup with ⟨hassoc, hidl, hidr, hinvl, hinvr⟩
+  rcases hhom with ⟨hmul, hinv, hid⟩
+  intro x y h
+  induction h with
+  | refl x => rfl
+  | symm _ ih => exact ih.symm
+  | trans _ _ ih1 ih2 => exact ih1.trans ih2
+  | comm a b =>
+      calc
+        f (mulG a b) = mulH (f a) (f b) := hmul a b
+        _ = mulH (f b) (f a) := hcomm _ _
+        _ = f (mulG b a) := (hmul b a).symm
+  | congr_left z _ ih =>
+      simp [hmul, ih]
+  | congr_right z _ ih =>
+      simp [hmul, ih]
+  | assoc x y z =>
+      calc
+        f (mulG (mulG x y) z) = mulH (f (mulG x y)) (f z) := hmul _ _
+        _ = mulH (mulH (f x) (f y)) (f z) := by rw [hmul x y]
+        _ = mulH (f x) (mulH (f y) (f z)) := hassoc _ _ _
+        _ = mulH (f x) (f (mulG y z)) := by rw [hmul y z]
+        _ = f (mulG x (mulG y z)) := (hmul x (mulG y z)).symm
+  | id_left x =>
+      calc
+        f (mulG eG x) = mulH (f eG) (f x) := hmul _ _
+        _ = mulH eH (f x) := by rw [hid]
+        _ = f x := hidl _
+  | id_right x =>
+      calc
+        f (mulG x eG) = mulH (f x) (f eG) := hmul _ _
+        _ = mulH (f x) eH := by rw [hid]
+        _ = f x := hidr _
+  | inv_left x =>
+      calc
+        f (mulG (invG x) x) = mulH (f (invG x)) (f x) := hmul _ _
+        _ = mulH (invH (f x)) (f x) := by rw [hinv x]
+        _ = eH := hinvl _
+        _ = f eG := by rw [hid]
+  | inv_right x =>
+      calc
+        f (mulG x (invG x)) = mulH (f x) (f (invG x)) := hmul _ _
+        _ = mulH (f x) (invH (f x)) := by rw [hinv x]
+        _ = eH := hinvr _
+        _ = f eG := by rw [hid]
+
+/-- Descend a map that respects AbelianizationRel to the quotient. -/
+def abelianization_desc {G H : Type u}
+    (mulG : G → G → G) (invG : G → G) (eG : G)
+    (f : G → H) (hrel : ∀ {x y}, AbelianizationRel G mulG invG eG x y → f x = f y) :
+    Abelianization G mulG invG eG → H :=
+  Quotient.lift f (fun _ _ h => hrel h)
+
+theorem abelianization_desc_comp {G H : Type u}
+    (mulG : G → G → G) (invG : G → G) (eG : G)
+    (f : G → H) (hrel : ∀ {x y}, AbelianizationRel G mulG invG eG x y → f x = f y)
+    (x : G) :
+    abelianization_desc mulG invG eG f hrel (abelianization_mk mulG invG eG x) = f x := rfl
+
+theorem abelianization_desc_unique {G H : Type u}
+    (mulG : G → G → G) (invG : G → G) (eG : G)
+    (f : G → H) (hrel : ∀ {x y}, AbelianizationRel G mulG invG eG x y → f x = f y)
+    (g : Abelianization G mulG invG eG → H)
+    (hg : ∀ x, g (abelianization_mk mulG invG eG x) = f x) :
+    g = abelianization_desc mulG invG eG f hrel := by
+  funext q
+  refine Quotient.inductionOn q (fun x => ?_)
+  simpa [abelianization_desc] using (hg x)
+
+/-- Universal factor map for hom-like maps into abelian targets. -/
+def abelianization_desc_of_hom {G H : Type u}
+    (mulG : G → G → G) (invG : G → G) (eG : G)
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : G → H) (hgroup : IsGroupLike mulH invH eH) (hcomm : IsAbelian mulH)
+    (hhom : IsMulHom mulG invG eG mulH invH eH f) :
+    Abelianization G mulG invG eG → H :=
+  abelianization_desc mulG invG eG f
+    (abelianizationRel_respects mulG invG eG mulH invH eH f hgroup hcomm hhom)
+
+theorem abelianization_desc_of_hom_unique {G H : Type u}
+    (mulG : G → G → G) (invG : G → G) (eG : G)
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : G → H) (hgroup : IsGroupLike mulH invH eH) (hcomm : IsAbelian mulH)
+    (hhom : IsMulHom mulG invG eG mulH invH eH f)
+    (g : Abelianization G mulG invG eG → H)
+    (hg : ∀ x, g (abelianization_mk mulG invG eG x) = f x) :
+    g = abelianization_desc_of_hom mulG invG eG mulH invH eH f hgroup hcomm hhom := by
+  refine abelianization_desc_unique mulG invG eG f
+    (abelianizationRel_respects mulG invG eG mulH invH eH f hgroup hcomm hhom) g hg
+
 /-! ## First Homology Group
 
 H₁(X) is defined as the abelianization of π₁(X).
@@ -332,6 +458,36 @@ theorem figureEight_H1_equiv_int_prod :
 /-- H₁(S¹ ∨ S¹) represented as ℤ × ℤ. -/
 abbrev FigureEightH1 : Type := Int × Int
 
+/-- Addition on `FigureEightH1`. -/
+def figureEightMul : FigureEightH1 → FigureEightH1 → FigureEightH1
+  | (x₁, y₁), (x₂, y₂) => (x₁ + x₂, y₁ + y₂)
+
+/-- Inversion on `FigureEightH1`. -/
+def figureEightInv : FigureEightH1 → FigureEightH1
+  | (x, y) => (-x, -y)
+
+/-- Identity on `FigureEightH1`. -/
+def figureEightOne : FigureEightH1 := (0, 0)
+
+/-- `FigureEightH1` is group-like under componentwise addition. -/
+theorem figureEight_group_like : IsGroupLike figureEightMul figureEightInv figureEightOne := by
+  refine ⟨?assoc, ?idl, ?idr, ?invl, ?invr⟩
+  · intro x y z
+    cases x <;> cases y <;> cases z <;> simp [figureEightMul, Int.add_assoc]
+  · intro x
+    cases x <;> simp [figureEightMul, figureEightOne]
+  · intro x
+    cases x <;> simp [figureEightMul, figureEightOne]
+  · intro x
+    cases x <;> simp [figureEightMul, figureEightInv, figureEightOne, Int.add_left_neg]
+  · intro x
+    cases x <;> simp [figureEightMul, figureEightInv, figureEightOne, Int.add_right_neg]
+
+/-- `FigureEightH1` is abelian under componentwise addition. -/
+theorem figureEight_comm : IsAbelian figureEightMul := by
+  intro x y
+  cases x <;> cases y <;> simp [figureEightMul, Int.add_comm]
+
 /-- The abelianization map for the figure-eight: FreeProductWord Int Int → ℤ × ℤ.
 
 In the abelianization:
@@ -391,6 +547,74 @@ theorem figureEight_abelianization_concat_snd (w₁ w₂ : CompPath.FreeProductW
     simp only [figureEight_abelianization_map, CompPath.FreeProductWord.concat]
     omega
 
+/-- The abelianization map respects concatenation. -/
+theorem figureEight_abelianization_concat (w₁ w₂ : FreeProductWord Int Int) :
+    figureEight_abelianization_map (w₁.concat w₂) =
+    figureEightMul (figureEight_abelianization_map w₁) (figureEight_abelianization_map w₂) := by
+  apply Prod.ext <;> simp [figureEightMul, figureEight_abelianization_concat_fst,
+    figureEight_abelianization_concat_snd]
+
+/-- The abelianization map on a left singleton. -/
+theorem figureEight_abelianization_singleLeft (x : Int) :
+    figureEight_abelianization_map (FreeProductWord.singleLeft x) = (x, 0) := by
+  simp [figureEight_abelianization_map, FreeProductWord.singleLeft]
+
+/-- The abelianization map on a right singleton. -/
+theorem figureEight_abelianization_singleRight (y : Int) :
+    figureEight_abelianization_map (FreeProductWord.singleRight y) = (0, y) := by
+  simp [figureEight_abelianization_map, FreeProductWord.singleRight]
+
+/-- The abelianization map respects inversion. -/
+theorem figureEight_abelianization_inverse (w : FreeProductWord Int Int) :
+    figureEight_abelianization_map (FreeProductWord.inverse w) =
+    figureEightInv (figureEight_abelianization_map w) := by
+  induction w with
+  | nil =>
+      rfl
+  | consLeft x rest ih =>
+      cases h : figureEight_abelianization_map rest with
+      | mk m n =>
+        have ih' : figureEight_abelianization_map (FreeProductWord.inverse rest) = (-m, -n) := by
+          simpa [figureEightInv, h] using ih
+        apply Prod.ext <;> simp [FreeProductWord.inverse, figureEight_abelianization_concat, ih',
+          figureEight_abelianization_singleLeft, figureEightMul, figureEightInv,
+          figureEight_abelianization_map, h, Int.neg_add]
+  | consRight y rest ih =>
+      cases h : figureEight_abelianization_map rest with
+      | mk m n =>
+        have ih' : figureEight_abelianization_map (FreeProductWord.inverse rest) = (-m, -n) := by
+          simpa [figureEightInv, h] using ih
+        apply Prod.ext <;> simp [FreeProductWord.inverse, figureEight_abelianization_concat, ih',
+          figureEight_abelianization_singleRight, figureEightMul, figureEightInv,
+          figureEight_abelianization_map, h, Int.neg_add]
+
+/-- The figure-eight abelianization map is hom-like. -/
+theorem figureEight_abelianization_hom :
+    IsMulHom FreeProductWord.concat FreeProductWord.inverse FreeProductWord.nil
+      figureEightMul figureEightInv figureEightOne figureEight_abelianization_map := by
+  refine ⟨?mul, ?inv, ?one⟩
+  · intro x y
+    exact figureEight_abelianization_concat x y
+  · intro x
+    exact figureEight_abelianization_inverse x
+  · rfl
+
+/-- The abelianization map factors through the abelianization quotient. -/
+noncomputable def figureEight_abelianization_desc :
+    Abelianization (FreeProductWord Int Int) FreeProductWord.concat
+      FreeProductWord.inverse FreeProductWord.nil → FigureEightH1 :=
+  abelianization_desc_of_hom
+    FreeProductWord.concat FreeProductWord.inverse FreeProductWord.nil
+    figureEightMul figureEightInv figureEightOne
+    figureEight_abelianization_map
+    figureEight_group_like figureEight_comm figureEight_abelianization_hom
+
+theorem figureEight_abelianization_desc_comp (w : FreeProductWord Int Int) :
+    figureEight_abelianization_desc (abelianization_mk
+      FreeProductWord.concat FreeProductWord.inverse FreeProductWord.nil w) =
+    figureEight_abelianization_map w := by
+  rfl
+
 /-- **Theorem**: (G * H)^ab ≃ G^ab × H^ab
 
 The abelianization of a free product is the direct product of abelianizations.
@@ -431,6 +655,40 @@ theorem hurewiczMap_kernel (A : Type u) (a : A) (α : π₁(A, a)) :
     exact Quotient.exact h
   · intro h
     exact Quotient.sound h
+
+/-! ## Universal Property of H₁ -/
+
+noncomputable def hurewicz_desc {A : Type u} {a : A} {H : Type u}
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : π₁(A, a) → H) (hgroup : IsGroupLike mulH invH eH) (hcomm : IsAbelian mulH)
+    (hhom : IsMulHom LoopQuot.comp LoopQuot.inv LoopQuot.id mulH invH eH f) :
+    H1 A a → H :=
+  abelianization_desc_of_hom LoopQuot.comp LoopQuot.inv LoopQuot.id
+    mulH invH eH f hgroup hcomm hhom
+
+theorem hurewicz_desc_comp {A : Type u} {a : A} {H : Type u}
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : π₁(A, a) → H) (hgroup : IsGroupLike mulH invH eH) (hcomm : IsAbelian mulH)
+    (hhom : IsMulHom LoopQuot.comp LoopQuot.inv LoopQuot.id mulH invH eH f)
+    (α : π₁(A, a)) :
+    hurewicz_desc (A := A) (a := a) mulH invH eH f hgroup hcomm hhom (hurewiczMap A a α) =
+      f α := by
+  rfl
+
+theorem hurewicz_universal {A : Type u} {a : A} {H : Type u}
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : π₁(A, a) → H) (hgroup : IsGroupLike mulH invH eH) (hcomm : IsAbelian mulH)
+    (hhom : IsMulHom LoopQuot.comp LoopQuot.inv LoopQuot.id mulH invH eH f) :
+    ∃ g : H1 A a → H,
+      (∀ α, g (hurewiczMap A a α) = f α) ∧
+      ∀ g', (∀ α, g' (hurewiczMap A a α) = f α) → g' = g := by
+  refine ⟨hurewicz_desc (A := A) (a := a) mulH invH eH f hgroup hcomm hhom, ?_⟩
+  constructor
+  · intro α
+    exact hurewicz_desc_comp (A := A) (a := a) mulH invH eH f hgroup hcomm hhom α
+  · intro g hg
+    exact abelianization_desc_of_hom_unique LoopQuot.comp LoopQuot.inv LoopQuot.id
+      mulH invH eH f hgroup hcomm hhom g hg
 
 /-! ## Higher Hurewicz Theorem
 

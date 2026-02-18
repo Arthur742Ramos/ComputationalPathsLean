@@ -1206,6 +1206,113 @@ def freeGroup_ab_equiv (n : Nat) : PathSimpleEquiv (FreeGroupAb n) (IntPow n) wh
   left_inv := freeGroup_ab_right_inv_path
   right_inv := freeGroup_ab_left_inv_path
 
+/-! ## Universal Property of FreeGroupAb
+
+We express the universal property using the explicit equivalence with ℤⁿ.
+-/
+
+/-- Inversion on `FreeGroupAb`, defined via the ℤⁿ equivalence. -/
+noncomputable def FreeGroupAb.inv {n : Nat} (x : FreeGroupAb n) : FreeGroupAb n :=
+  intPowToFreeGroupAb (IntPow.negation (freeGroupAbToIntPow x))
+
+@[simp] theorem freeGroupAbToIntPow_inv {n : Nat} (x : FreeGroupAb n) :
+    freeGroupAbToIntPow (FreeGroupAb.inv x) = IntPow.negation (freeGroupAbToIntPow x) := by
+  simp [FreeGroupAb.inv, freeGroup_ab_left_inv]
+
+@[simp] theorem freeGroupAbToIntPow_one {n : Nat} :
+    freeGroupAbToIntPow (FreeGroupAb.one (n := n)) = IntPow.zero := by
+  rfl
+
+theorem freeGroupAbToIntPow_mul {n : Nat} (x y : FreeGroupAb n) :
+    freeGroupAbToIntPow (FreeGroupAb.mul x y) =
+    IntPow.add (freeGroupAbToIntPow x) (freeGroupAbToIntPow y) := by
+  induction x using Quot.ind with
+  | _ a =>
+    induction y using Quot.ind with
+    | _ b =>
+      change freeGroupToIntPow (BouquetFreeGroup.mul a b) =
+        IntPow.add (freeGroupToIntPow a) (freeGroupToIntPow b)
+      exact freeGroupToIntPow_respects_mul a b
+
+/-- IntPow is detected on generators in FreeGroupAb. -/
+theorem freeGroupAbToIntPow_genWordAb {n : Nat} (i : Fin n) (k : Int) :
+    freeGroupAbToIntPow (genWordAb i k) = fun j => if i = j then k else 0 := by
+  change wordToIntPow (singleGenWord i k) = _
+  simpa using wordToIntPow_singleGenWord i k
+
+/-- Descend a hom-like map out of ℤⁿ to `FreeGroupAb`. -/
+def freeGroupAb_desc {n : Nat} {H : Type}
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : IntPow n → H)
+    (_hhom : IsMulHom (G := IntPow n) (H := H)
+      (IntPow.add (n := n)) (IntPow.negation (n := n)) (IntPow.zero (n := n))
+      mulH invH eH f) :
+    FreeGroupAb n → H :=
+  fun x => f (freeGroupAbToIntPow x)
+
+theorem freeGroupAb_desc_comp {n : Nat} {H : Type}
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : IntPow n → H)
+    (hhom : IsMulHom (G := IntPow n) (H := H)
+      (IntPow.add (n := n)) (IntPow.negation (n := n)) (IntPow.zero (n := n))
+      mulH invH eH f)
+    (v : IntPow n) :
+    freeGroupAb_desc mulH invH eH f hhom (intPowToFreeGroupAb v) = f v := by
+  simp [freeGroupAb_desc, freeGroup_ab_left_inv]
+
+theorem freeGroupAb_desc_genWordAb {n : Nat} {H : Type}
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : IntPow n → H)
+    (hhom : IsMulHom (G := IntPow n) (H := H)
+      (IntPow.add (n := n)) (IntPow.negation (n := n)) (IntPow.zero (n := n))
+      mulH invH eH f)
+    (i : Fin n) (k : Int) :
+    freeGroupAb_desc mulH invH eH f hhom (genWordAb i k) =
+      f (fun j => if i = j then k else 0) := by
+  simp [freeGroupAb_desc, freeGroupAbToIntPow_genWordAb]
+
+theorem freeGroupAb_desc_hom {n : Nat} {H : Type}
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : IntPow n → H)
+    (hhom : IsMulHom (G := IntPow n) (H := H)
+      (IntPow.add (n := n)) (IntPow.negation (n := n)) (IntPow.zero (n := n))
+      mulH invH eH f) :
+    IsMulHom FreeGroupAb.mul FreeGroupAb.inv (FreeGroupAb.one (n := n)) mulH invH eH
+      (freeGroupAb_desc mulH invH eH f hhom) := by
+  rcases hhom with ⟨hmul, hinv, hone⟩
+  refine ⟨?mul, ?inv, ?one⟩
+  · intro x y
+    simp [freeGroupAb_desc, freeGroupAbToIntPow_mul, hmul]
+  · intro x
+    simp [freeGroupAb_desc, freeGroupAbToIntPow_inv, hinv]
+  · simp [freeGroupAb_desc, freeGroupAbToIntPow_one, hone]
+
+theorem freeGroupAb_universal {n : Nat} {H : Type}
+    (mulH : H → H → H) (invH : H → H) (eH : H)
+    (f : IntPow n → H)
+    (hhom : IsMulHom (G := IntPow n) (H := H)
+      (IntPow.add (n := n)) (IntPow.negation (n := n)) (IntPow.zero (n := n))
+      mulH invH eH f) :
+    ∃ g : FreeGroupAb n → H,
+      (∀ v, g (intPowToFreeGroupAb v) = f v) ∧
+      IsMulHom FreeGroupAb.mul FreeGroupAb.inv (FreeGroupAb.one (n := n)) mulH invH eH g ∧
+      ∀ g',
+        (∀ v, g' (intPowToFreeGroupAb v) = f v) →
+        IsMulHom FreeGroupAb.mul FreeGroupAb.inv (FreeGroupAb.one (n := n)) mulH invH eH g' →
+        g' = g := by
+  refine ⟨freeGroupAb_desc mulH invH eH f hhom, ?_⟩
+  refine ⟨?comp, ?hom, ?uniq⟩
+  · intro v
+    exact freeGroupAb_desc_comp (n := n) mulH invH eH f hhom v
+  · exact freeGroupAb_desc_hom (n := n) mulH invH eH f hhom
+  · intro g' hcomp _hhom
+    funext x
+    calc
+      g' x = g' (intPowToFreeGroupAb (freeGroupAbToIntPow x)) := by
+        simpa using _root_.congrArg g' (freeGroup_ab_right_inv (n := n) x).symm
+      _ = f (freeGroupAbToIntPow x) := hcomp _
+      _ = freeGroupAb_desc mulH invH eH f hhom x := rfl
+
 /-! ## (G * H)^ab ≃ G^ab × H^ab
 
 The abelianization of a free product is the direct product of abelianizations.
