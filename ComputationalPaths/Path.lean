@@ -454,3 +454,5 @@ import ComputationalPaths.Path.Rewriting.KnuthBendixDeep
 import ComputationalPaths.Path.Rewriting.CoherenceDeep
 import ComputationalPaths.Path.Homotopy.CubicalDeep
 import ComputationalPaths.Path.Algebra.CompletionDeep
+import ComputationalPaths.Path.StableHomotopyPaths
+import ComputationalPaths.Path.ToposPaths
