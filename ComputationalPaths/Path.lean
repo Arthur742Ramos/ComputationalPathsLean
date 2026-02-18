@@ -253,6 +253,7 @@ import ComputationalPaths.Path.Homotopy.PoincareDuality
 import ComputationalPaths.Path.Homotopy.MorseTheory
 import ComputationalPaths.Path.Homotopy.LocalizationHomotopy
 import ComputationalPaths.Path.Homotopy.MotivicHomotopy
+import ComputationalPaths.Path.MotivicHomotopyPathsDeep
 import ComputationalPaths.Path.Homotopy.TransferMap
 import ComputationalPaths.Path.Homotopy.LoopSpaceRecognition
 import ComputationalPaths.Path.Homotopy.InfiniteLoopSpace
