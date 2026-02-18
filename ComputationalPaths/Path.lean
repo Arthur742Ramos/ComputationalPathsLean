@@ -456,3 +456,5 @@ import ComputationalPaths.Path.Homotopy.CubicalDeep
 import ComputationalPaths.Path.Algebra.CompletionDeep
 import ComputationalPaths.Path.StableHomotopyPaths
 import ComputationalPaths.Path.ToposPaths
+import ComputationalPaths.Path.CobordismPaths
+import ComputationalPaths.Path.KTheoryPaths
