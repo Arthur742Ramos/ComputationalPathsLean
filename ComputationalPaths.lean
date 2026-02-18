@@ -5,6 +5,8 @@ import ComputationalPaths.Path
 import ComputationalPaths.SieveTheory
 import ComputationalPaths.Simplicial.PathCoherence
 import ComputationalPaths.Motivic.PathInfrastructure
+import ComputationalPaths.Motivic.MotivicHomotopyPaths
+import ComputationalPaths.Motivic.MotivicCohomologyOps
 import ComputationalPaths.MotivicCohomology.PathInfrastructure
 import ComputationalPaths.Chromatic.PathInfrastructure
 import ComputationalPaths.Topos.PathCoherence
