@@ -57,3 +57,4 @@ import ComputationalPaths.Path.DerivedCategoryPaths
 import ComputationalPaths.Path.QuantumGroupPaths
 import ComputationalPaths.Path.AlgebraicTopologyPaths
 import ComputationalPaths.Path.MotivicHomotopyPaths
+import ComputationalPaths.Path.HigherToposPaths
