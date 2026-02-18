@@ -67,3 +67,5 @@ import ComputationalPaths.CategoricalLogic.CategoricalLogicPaths
 import ComputationalPaths.AlgebraicGeometry.PathInfrastructure
 import ComputationalPaths.Homological.PathInfrastructure
 import ComputationalPaths.Homological.DeepPaths
+import ComputationalPaths.CoveringSpace.PathInfrastructure
+import ComputationalPaths.KnotInvariant.PathInfrastructure
