@@ -68,3 +68,5 @@ import ComputationalPaths.SpectralSequence.PathInfrastructure
 import ComputationalPaths.CategoricalLogic.PathInfrastructure
 import ComputationalPaths.CategoricalLogic.CategoricalLogicPaths
 import ComputationalPaths.AlgebraicGeometry.PathInfrastructure
+import ComputationalPaths.Homological.PathInfrastructure
+import ComputationalPaths.Homological.DeepPaths
