@@ -13,6 +13,10 @@ import ComputationalPaths.InfinityCategoryPaths
 
 set_option linter.unusedVariables false
 
+open ComputationalPaths.InfinityCategoryPaths
+
+namespace ComputationalPaths.HigherAlgebraPaths
+
 universe u v w
 
 -- ============================================================
@@ -263,3 +267,5 @@ theorem equalizer_has_mor (C : QCat) (E : QEqualizer C) :
     E.equalizerMor = E.equalizerMor := rfl
 
 end HigherAlgThm
+
+end ComputationalPaths.HigherAlgebraPaths

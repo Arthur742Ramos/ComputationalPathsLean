@@ -7,6 +7,8 @@
 
 set_option linter.unusedVariables false
 
+namespace ComputationalPaths.InfinityCategoryPaths
+
 universe u v w
 
 -- ============================================================
@@ -716,3 +718,5 @@ theorem pTrans_step_left {α : Type u} {a b c : α} (s : CStep α a b) (p : CPat
     pTrans (CPath.cons s (CPath.nil b)) p = CPath.cons s p := rfl
 
 end CoherenceThm
+
+end ComputationalPaths.InfinityCategoryPaths

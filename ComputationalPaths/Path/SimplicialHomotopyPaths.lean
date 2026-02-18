@@ -192,7 +192,7 @@ structure HornFill (S : SimpSet) (n : Nat) (k : Fin (n + 2))
     Path (S.face n i filler) (h.faces i hi)
 
 /-- Kan complex: every horn has a filler via paths. -/
-structure KanComplex (S : SimpSet) where
+structure KanComplexPath (S : SimpSet) where
   fill : ∀ (n : Nat) (k : Fin (n + 2)) (h : HornDatum S n k),
     HornFill S n k h
 
@@ -206,11 +206,11 @@ structure QuasiCategory (S : SimpSet) where
     ∀ (h : HornDatum S n k), HornFill S n k h
 
 /-- Theorem 11: Every Kan complex is a quasi-category. -/
-def kanIsQuasiCat {S : SimpSet} (kan : KanComplex S) : QuasiCategory S where
+def kanIsQuasiCat {S : SimpSet} (kan : KanComplexPath S) : QuasiCategory S where
   fill := fun n k _ h => kan.fill n k h
 
 /-- Minimal Kan: fillers are unique when missing face agrees. -/
-structure MinimalKan (S : SimpSet) extends KanComplex S where
+structure MinimalKan (S : SimpSet) extends KanComplexPath S where
   unique : ∀ (n : Nat) (k : Fin (n + 2)) (h : HornDatum S n k)
     (f1 f2 : HornFill S n k h),
     S.face n k f1.filler = S.face n k f2.filler →
