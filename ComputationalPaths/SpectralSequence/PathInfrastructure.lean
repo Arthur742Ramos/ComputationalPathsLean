@@ -8,3 +8,5 @@ import ComputationalPaths.SpectralSequence.Convergence
 import ComputationalPaths.SpectralSequence.AdamsSequence
 import ComputationalPaths.SpectralSequence.LeraySerreSequence
 import ComputationalPaths.SpectralSequence.AtiyahHirzebruchSequence
+import ComputationalPaths.SpectralSequence.ExactCouplePaths
+import ComputationalPaths.SpectralSequence.MultiplicativeStructurePaths
