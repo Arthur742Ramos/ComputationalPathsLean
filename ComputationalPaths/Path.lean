@@ -458,3 +458,5 @@ import ComputationalPaths.Path.StableHomotopyPaths
 import ComputationalPaths.Path.ToposPaths
 import ComputationalPaths.Path.CobordismPaths
 import ComputationalPaths.Path.KTheoryPaths
+import ComputationalPaths.Path.HomologicalAlgebraPaths
+import ComputationalPaths.Path.SheafPaths
