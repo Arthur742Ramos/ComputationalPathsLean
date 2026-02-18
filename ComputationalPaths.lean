@@ -50,3 +50,5 @@ import ComputationalPaths.OperadicAlgebra.EnOperads
 import ComputationalPaths.OperadicAlgebra.KoszulDuality
 import ComputationalPaths.Path.Logic.DependentTypeDeep
 import ComputationalPaths.Path.Logic.LinearLogicDeep
+import ComputationalPaths.Path.ModelCategoryPaths
+import ComputationalPaths.Path.HigherCategoryPaths
