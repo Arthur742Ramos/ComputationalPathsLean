@@ -65,3 +65,5 @@ import ComputationalPaths.Path.EnrichedCategoryPaths
 import ComputationalPaths.InfinityCategoryPaths
 import ComputationalPaths.HigherAlgebraPaths
 import ComputationalPaths.SpectralSequence.PathInfrastructure
+import ComputationalPaths.CategoricalLogic.PathInfrastructure
+import ComputationalPaths.CategoricalLogic.CategoricalLogicPaths
