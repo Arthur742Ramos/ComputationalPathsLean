@@ -69,3 +69,5 @@ import ComputationalPaths.Homological.PathInfrastructure
 import ComputationalPaths.Homological.DeepPaths
 import ComputationalPaths.CoveringSpace.PathInfrastructure
 import ComputationalPaths.KnotInvariant.PathInfrastructure
+import ComputationalPaths.LieAlgebra.PathInfrastructure
+import ComputationalPaths.SheafCohomology.PathInfrastructure
