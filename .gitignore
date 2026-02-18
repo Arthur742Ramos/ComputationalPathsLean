@@ -49,3 +49,18 @@ arXiv-*.tar
 .claude/
 .git.old/
 CLAUDE.md
+
+# Local-only files
+.DS_Store
+*.docx
+*.pdf
+paper/
+docs/
+docbuild/
+Scripts/
+.codex/
+.copex/
+.opencode/
+*.patch
+opencode.json
+primer.eval.json
