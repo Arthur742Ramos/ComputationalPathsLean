@@ -2200,6 +2200,7 @@ Use `HasPushoutSVKEncodeDecodeFull` instead, which quotients by
 
 See `PushoutSVKInstances.hasPushoutSVKEncodeDecode_impossible_PUnit` for the
 formal impossibility proof. -/
+-- DEPRECATED: Provably unsatisfiable — nil vs consLeft(0,nil) obstruction.
 class HasPushoutSVKEncodeDecode (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeQuot A B C f g c₀] : Prop where
   encode_decode :
@@ -2963,6 +2964,7 @@ Use `HasPushoutSVKDecodeFullAmalgBijective` instead, which quotients by
 
 See `PushoutSVKInstances.hasPushoutSVKDecodeAmalgBijective_impossible_PUnit`
 for the formal impossibility proof. -/
+-- DEPRECATED: Provably unsatisfiable — AmalgEquiv preserves word length.
 class HasPushoutSVKDecodeAmalgBijective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
     [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀] : Prop where
@@ -3520,6 +3522,7 @@ Use `HasPushoutSVKEncodeDecodeFull` (or `HasWedgeSVKEncodeDataFull` from
 See `WedgeSVKCircleInstances.not_hasWedgeSVKEncodeDecode_Circle` and
 `PushoutSVKInstances.hasWedgeSVKEncodeData_impossible_PUnit` for the
 formal impossibility proofs. -/
+-- DEPRECATED: Provably unsatisfiable — nil vs consLeft(0,nil) obstruction.
 class HasWedgeSVKEncodeDecode (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
     [HasWedgeSVKEncodeQuot A B a₀ b₀] : Prop where
   encode_decode :
@@ -3529,6 +3532,7 @@ class HasWedgeSVKEncodeDecode (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
             (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit w) = w
 
 /-- Full encode/decode data for wedge sums (both round-trip laws). -/
+-- DEPRECATED: Contains impossible field (encode_decode); see HasWedgeSVKEncodeDecode.
 class HasWedgeSVKEncodeData (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) : Type u extends
     HasWedgeSVKEncodeQuot A B a₀ b₀ where
   /-- `decode ∘ encode = id` on loop representatives (hence on π₁). -/
