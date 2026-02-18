@@ -54,3 +54,4 @@ import ComputationalPaths.Path.ModelCategoryPaths
 import ComputationalPaths.Path.HigherCategoryPaths
 import ComputationalPaths.Path.OperadPaths
 import ComputationalPaths.Path.DerivedCategoryPaths
+import ComputationalPaths.Path.QuantumGroupPaths
