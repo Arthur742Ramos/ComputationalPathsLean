@@ -64,3 +64,4 @@ Scripts/
 *.patch
 opencode.json
 primer.eval.json
+.copex-worktree-*
