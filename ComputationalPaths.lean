@@ -71,6 +71,7 @@ import ComputationalPaths.CoveringSpace.PathInfrastructure
 import ComputationalPaths.KnotInvariant.PathInfrastructure
 import ComputationalPaths.LieAlgebra.PathInfrastructure
 import ComputationalPaths.SheafCohomology.PathInfrastructure
+import ComputationalPaths.TwoCategoryInstances
 import ComputationalPaths.Adjunction.PathInfrastructure
 import ComputationalPaths.DAG.CotangentComplexPaths
 import ComputationalPaths.DAG.DerivedStacksPaths

@@ -1,194 +1,161 @@
-# Axiom minimization status
+# ComputationalPaths — Axiom & Typeclass Inventory
 
-This project distinguishes:
+> Auto-generated 2026-02-18.  Covers every `axiom` declaration in the
+> project source tree and every typeclass whose instantiation status is
+> tracked.
 
-- **Kernel axioms**: Lean `axiom` declarations that extend the trusted base.
-- **Assumptions**: explicit hypotheses (usually typeclasses), ranging from `Prop`-valued markers
-  (e.g. `HasUnivalence`) to `Type`-valued data interfaces (e.g. `HasCircleLoopDecode`). These
-  do *not* extend the kernel, but must be discharged by providing an instance/proof.
+---
 
-The goal is to keep the **kernel axiom set** as small as possible, and make any additional assumptions **local and explicit** in signatures.
+## §1  Lean `axiom` declarations (30 total)
 
-## How to measure
+### 1.1  HoTT axioms — Higher Inductive Type constructors (9)
 
-From the repository root:
+| # | File | Name | Purpose |
+|---|------|------|---------|
+| 1 | `Path/Algebra/HigherInductiveDeep.lean:31` | `S1.loop` | The non-trivial loop on the circle `S¹` |
+| 2 | `Path/Algebra/HigherInductiveDeep.lean:106` | `Interval.seg` | Path from `Interval.zero` to `Interval.one` |
+| 3 | `Path/Algebra/HigherInductiveDeep.lean:160` | `Susp.merid` | Meridian path in the suspension `Susp A` |
+| 4 | `Path/Algebra/HigherInductiveDeep.lean:262` | `QType.glue` | Gluing path for quotient types `A/R` |
+| 5 | `Path/Algebra/HigherInductiveDeep.lean:312` | `Pushout.glue` | Gluing path in pushouts `A ⊔_C B` |
+| 6 | `Path/Algebra/HigherInductiveDeep.lean:369` | `Coeq.glue` | Gluing path in coequalizers |
+| 7 | `Path/Algebra/HigherInductiveDeep.lean:413` | `Torus.loopA` | First generator loop on the torus |
+| 8 | `Path/Algebra/HigherInductiveDeep.lean:414` | `Torus.loopB` | Second generator loop on the torus |
+| 9 | `Path/Algebra/HigherInductiveDeep.lean:417` | `Torus.surface` | 2-cell filling `loopA·loopB = loopB·loopA` |
 
-- Global kernel axiom inventory (for `import ComputationalPaths`):
-  - `.\lake.cmd env lean Scripts\AxiomInventory.lean`
-- Kernel axiom dependencies for a specific declaration:
-  - `.\lake.cmd env lean Scripts\AxiomDependencies.lean`
-  - Edit `Scripts/AxiomDependencies.lean` to change the queried declaration.
-- Prop-valued typeclass assumptions required by a specific declaration:
-  - `.\lake.cmd env lean Scripts\AssumptionDependencies.lean`
-  - Edit `Scripts/AssumptionDependencies.lean` to change the queried declaration.
-- Quick multi-theorem survey (handy while refactoring):
-  - `.\lake.cmd env lean Scripts\AssumptionSurvey.lean`
+### 1.2  HoTT axioms — Univalence (8)
 
-## Consistency note: `HasUnivalence`
+| # | File | Name | Purpose |
+|---|------|------|---------|
+| 10 | `Path/HoTT/UnivalenceDeep.lean:115` | `ua` | Univalence: equivalence → path of types (`Equiv' A B → Path A B`) |
+| 11 | `Path/HoTT/UnivalenceDeep.lean:116` | `ua_transport` | Transport along `ua e` computes as `e.toFun` |
+| 12 | `Path/HoTT/UnivalenceDeep.lean:118` | `ua_refl'` | `ua (Equiv'.refl A) = Path.refl A` |
+| 13 | `Path/HoTT/UnivalencePaths.lean:352` | `ua'` | Univalence (alternate equiv `≃ₚ` variant) |
+| 14 | `Path/HoTT/UnivalencePaths.lean:354` | `ua'_transport` | Transport computation for `ua'` |
+| 15 | `Path/HoTT/UnivalencePaths.lean:359` | `ua'_idEquiv` | `ua' idEquiv = refl` |
+| 16 | `Path/HoTT/UnivalencePaths.lean:364` | `ua'_comp` | `ua'` respects composition of equivalences |
+| 17 | `Path/HoTT/UnivalencePaths.lean:393` | `ua'_symm_transport` | Inverse transport along `ua'` |
 
-In standard Lean, `Eq` lives in `Prop`, hence is **proof-irrelevant**. This has an important
-consequence for any “univalence via `Eq` + `transport`” interface:
+### 1.3  HoTT axioms — Univalence (function form) (1)
 
-- For any type `A`, the equality `A = A` is definitionally reflexive.
-- Therefore `transport` along any proof of `A = A` must be the identity function.
-- So an axiom stating that transport along `ua (e : A ≃ A)` computes to `e.toFun` forces
-  *every* autoequivalence to be judgmentally the identity.
+| # | File | Name | Purpose |
+|---|------|------|---------|
+| 18 | `Path/Homotopy/UnivalenceApplications.lean:42` | `univalence` | `IsEquiv (@idtoeqv A B)` — univalence as equivalence-of-maps |
 
-This collapses nontrivial equivalences (e.g. boolean negation), and yields a contradiction.
+### 1.4  Truncation axioms (9)
 
-The script `Scripts/UnivalenceInconsistency.lean` proves `False` from `[HasUnivalence]` using
-`Bool` as a tiny witness:
+| # | File | Name | Purpose |
+|---|------|------|---------|
+| 19 | `Path/Homotopy/HigherInductiveTypes.lean:73` | `Trunc` (propositional) | Propositional truncation type former |
+| 20 | `Path/Homotopy/HigherInductiveTypes.lean:76` | `Trunc.mk` (propositional) | Constructor for propositional truncation |
+| 21 | `Path/Homotopy/HigherInductiveTypes.lean:79` | `Trunc.isProp` | All elements of `Trunc A` are equal |
+| 22 | `Path/Homotopy/HigherInductiveTypes.lean:82` | `Trunc.rec` | Eliminator for propositional truncation |
+| 23 | `Path/Homotopy/TruncationTheory.lean:58` | `Trunc` (n-truncation) | n-truncation type former `Trunc n A` |
+| 24 | `Path/Homotopy/TruncationTheory.lean:61` | `Trunc.mk` (n-truncation) | Constructor for n-truncation |
+| 25 | `Path/Homotopy/TruncationTheory.lean:64` | `Trunc.isOfHLevel` | `Trunc n A` has h-level `n` |
+| 26 | `Path/Homotopy/TruncationTheory.lean:68` | `Trunc.elim` | Eliminator for n-truncation (non-dependent) |
+| 27 | `Path/Homotopy/TruncationTheory.lean:72` | `Trunc.ind` | Dependent eliminator for n-truncation |
 
-- `.\lake.cmd env lean Scripts\UnivalenceInconsistency.lean`
+### 1.5  SKI combinator equations (3)
 
-As a result, `HasUnivalence` is currently best understood as a **meta-level marker** for
-HoTT-style developments, not something that can be instantiated inside Lean’s standard logic.
+| # | File | Name | Purpose |
+|---|------|------|---------|
+| 28 | `Path/Rewriting/CombinatorReductionDeep.lean:71` | `I_ax` | `I x = x` |
+| 29 | `Path/Rewriting/CombinatorReductionDeep.lean:72` | `K_ax` | `K x y = x` |
+| 30 | `Path/Rewriting/CombinatorReductionDeep.lean:73` | `S_ax` | `S x y z = (x z)(y z)` |
 
-## Current kernel axioms (global)
+---
 
-`Scripts/AxiomInventory.lean` currently reports **7** kernel axioms when importing `ComputationalPaths` (the Circle constructors and eliminators).
+## §2  Instantiated typeclasses (proved) ✅
 
-### HIT interfaces (7 axioms)
+These classes have concrete, `sorry`-free instances.
 
-Kernel axioms are restricted to HIT-style interfaces that are not constructible in standard Lean 4:
+| Class | Instance | File | Technique |
+|-------|----------|------|-----------|
+| `HasTerminationProp` | `instHasTerminationProp` | `Path/Rewrite/ConfluenceProof.lean:570` | Polynomial weight function on `Expr` |
+| `HasConfluencePropExpr` | `instHasConfluencePropExpr` | `Path/Rewrite/ConfluenceProof.lean:619` | Free group interpretation (`toRW`) of groupoid TRS |
+| `HasCirclePiOneEncode` | `instHasCirclePiOneEncode` | `Path/CompPath/CircleStep.lean:35` | Winding number (`windingNumber`) |
+| `HasTorusPiOneEncode` | `instHasTorusPiOneEncode_ofCircle` | `Path/CompPath/TorusStep.lean:90` | Delegates to circle via projection |
+| `HasGlueNaturalLoopRwEq` | `instHasGlueNaturalLoopRwEq_Wedge` | `Path/CompPath/PushoutCompPath.lean:345` | Wedge specialisation (`C = PUnit'`) |
+| `HasWedgeProvenanceEncode` | `instHasWedgeProvenanceEncode_FigureEight` | `Path/CompPath/FigureEight.lean:124` | Provenance tagging for figure-eight |
+| `HasDifferentialSquaredZero` | `(trivialPage r)` | `Path/Homotopy/AdamsSpectralSequence.lean:185` | Trivial spectral sequence page |
+| **`HasVcompAssoc`** | `instHasVcompAssoc_EqTwoCat` | `TwoCategoryInstances.lean` | **NEW** — `PLift Eq` 2-cells; proof irrelevance |
+| **`HasHcompFunctorial`** | `instHasHcompFunctorial_EqTwoCat` | `TwoCategoryInstances.lean` | **NEW** — `PLift Eq` 2-cells; proof irrelevance |
+| **`HasInterchange`** | `instHasInterchange_EqTwoCat` | `TwoCategoryInstances.lean` | **NEW** — `PLift Eq` 2-cells; proof irrelevance |
 
-- `Circle` (constructors + recursor/β rules)
+---
 
-Torus is now a *constructed* type (Circle × Circle) and contributes no kernel axioms. The Möbius band module was removed as legacy placeholder code.
+## §3  Impossible typeclasses ⛔ (formally proved unsatisfiable)
 
-### Quarantined assumptions (typeclasses)
-These assumptions remain explicit in signatures; there are no opt-in kernel-axiom wrapper files anymore.
+These classes have **formal impossibility proofs** showing no instance can
+exist.  They are retained for documentation but marked `-- DEPRECATED`.
 
-| Assumption | Scope | Justification |
-|-----------|-------|---------------|
-| `HasLocalConfluenceProp` | `Rewrite/ConfluenceConstructive.lean` | Critical pair analysis |
-| `HasTerminationProp` | `Rewrite/ConfluenceProof.lean` | Newman's lemma |
+| Class | Obstruction | Proof location |
+|-------|-------------|----------------|
+| `HasWedgeSVKEncodeDecode` | `nil` and `consLeft 0 nil` both decode to the identity loop but are structurally distinct words; no `encodeQuot` can round-trip both. | `WedgeSVKCircleInstances.not_hasWedgeSVKEncodeDecode_Circle` |
+| `HasWedgeSVKEncodeData` | Contains `encode_decode` field from `HasWedgeSVKEncodeDecode` ⇒ inherits its impossibility. | `PushoutSVKInstances.hasWedgeSVKEncodeData_impossible_PUnit` |
+| `HasPushoutSVKEncodeDecode` | `AmalgEquiv` preserves word length while `pushoutDecode` maps words of different lengths to the same π₁ element. | `PushoutSVKInstances.hasPushoutSVKEncodeDecode_impossible_PUnit` |
+| `HasPushoutSVKDecodeAmalgBijective` | Same word-length obstruction as `HasPushoutSVKEncodeDecode`. | `PushoutSVKInstances.hasPushoutSVKDecodeAmalgBijective_impossible_PUnit` |
 
-> **Note:** We keep `HasLocalConfluenceProp` and `HasTerminationProp` as explicit assumptions because the full critical-pair and termination proofs for the complete rewrite system involve a prohibitively large case analysis. These remain non-kernel, local obligations rather than global axioms.
-### Non-kernel typeclass assumptions
+**Replacement**: Use `HasPushoutSVKEncodeDecodeFull` / `HasWedgeSVKEncodeDataFull`
+which quotient by `FullAmalgEquiv` (amalgamation + free group reduction).
 
-Rewrite-system confluence is packaged as **non-kernel** typeclass assumptions
-(see `ComputationalPaths/Path/Rewrite/Confluence.lean` and `ComputationalPaths/Path/Rewrite/ConfluenceProof.lean`).
+---
 
-No univalence or pushout computation/naturality principles remain as kernel axioms.
+## §4  Fundamentally blocked at Path level ⛔
 
-## Circle fundamental group (π₁(S¹) ≃ ℤ)
+These classes are **not** impossible in general — they hold for the `Expr`
+representation — but cannot be instantiated when 2-cells are `Path` values
+(which carry distinct step lists for the same propositional equality).
 
-Kernel axioms *used by* `ComputationalPaths.Path.circlePiOneEquivInt`:
+| Class | Why blocked | Working alternative |
+|-------|------------|---------------------|
+| `HasJoinOfRw` | Two `Path`s with `p.proof = q.proof` but different `.steps` lists are not `Rw`-joinable without a step-erasure rule. | `GroupoidConfluence.confluence` on `Expr` |
+| `HasLocalConfluenceProp` | Same step-list obstruction. | `HasConfluencePropExpr` |
+| `HasConfluenceProp` | Same step-list obstruction. | `HasConfluencePropExpr` |
 
-- `Circle`, `circleBase`, `circleLoop`
+---
 
-This is reported by `Scripts/AxiomDependencies.lean`.
+## §5  Open problems — SVK encode direction 🔴
 
-Non-kernel assumptions required by the circle encode/decode development:
+These classes are **not known to be impossible** but remain uninstantiated.
+They require constructing the universal cover of the relevant space, which
+is a significant open formalisation problem.
 
-- `ComputationalPaths.Path.HasCircleLoopDecode`
-  - Circle-specific loop classification hypothesis (encode/decode “decode∘encode” direction).
-  - Defined in `ComputationalPaths/Path/HIT/Circle.lean`.
-  - Speaks about *raw* loops (`Path circleBase circleBase`) and provides a normal form
-    `loop^n` up to `RwEq`.
-  - This interface is now *derivable* from the quotient-level interface
-    `HasCirclePiOneEncode` via `hasCircleLoopDecodeOfPiOneEncode` in
-    `ComputationalPaths/Path/HIT/CircleStep.lean`.
+| Class | What's needed |
+|-------|---------------|
+| `HasWedgeSVKEncodeQuot` | Universal cover of `Wedge A B` ⇒ `encodeQuot` function |
+| `HasWedgeSVKDecodeEncode` | `decode ∘ encode = id` on loop representatives |
+| `HasWedgeSVKDecodeBijective` | Bijectivity of `wedgeDecodeAmalg` |
+| `HasPushoutSVKEncodeQuot` | Universal cover of `Pushout A B C f g` ⇒ `encodeQuot` function |
+| `HasPushoutSVKDecodeEncode` | `decode ∘ encode = id` for general pushouts |
+| `HasPushoutSVKEncodeDecodeFull` | `encode ∘ decode = id` modulo `FullAmalgEquiv` |
+| `HasPushoutSVKDecodeFullAmalgBijective` | Bijectivity of `pushoutDecodeFullAmalg` |
 
-- `ComputationalPaths.Path.HasCirclePiOneEncode`
-  - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
-    an `encode : π₁(S¹) → ℤ` with `encode (circleDecode z) = z` and
-    `circleDecode (encode x) = x`.
-  - Defined in `ComputationalPaths/Path/HIT/CircleStep.lean`.
-  - Every `[HasCircleLoopDecode]` provides an instance, and conversely
-    `HasCirclePiOneEncode` can be turned back into `HasCircleLoopDecode` when a
-    raw-loop statement is required.
-  - Downstream developments
-    (e.g. legacy `Pi2Sphere.lean`,
-    `ComputationalPaths/Path/Homotopy/LieGroups.lean`) now depend only on this weaker
-    hypothesis.
+All seven require the **encode-decode method** via covering spaces, which
+demands constructing a type family over the HIT whose total space is
+contractible.  This is feasible in principle (Favonia–Shulman, Brunerie)
+but has not been carried out in this codebase.
 
-### Local assumption instance
+---
 
-If you want to use the circle π₁ result without threading a typeclass hypothesis
-through your signatures, provide a local instance of `HasCirclePiOneEncode` (or
-keep it scoped inside a helper module). The core library no longer ships a
-kernel-axiom wrapper.
-## Torus fundamental group (π₁(T²) ≃ ℤ × ℤ)
+## §6  Structural 2-category classes
 
-Kernel axioms *used by* `ComputationalPaths.Path.torusPiOneEquivIntProd`:
+| Class | Status | Notes |
+|-------|--------|-------|
+| `HasDifferentialSquaredZero` | ✅ for trivial page; 🔴 for non-trivial | Trivial instance at `AdamsSpectralSequence.lean:185`. Non-trivial requires computing `d ∘ d` on actual spectral sequence pages. |
+| `HasVcompAssoc` | ✅ | Instantiated on `EqTwoCat` (see §2). |
+| `HasHcompFunctorial` | ✅ | Instantiated on `EqTwoCat` (see §2). |
+| `HasInterchange` | ✅ | Instantiated on `EqTwoCat` (see §2). |
 
-- `Circle`, `circleBase`, `circleLoop`
+---
 
-Non-kernel assumptions required by the torus encode/decode development:
+## Summary
 
-- `ComputationalPaths.Path.HasTorusPiOneEncode`
-  - Weaker, discharge-friendly interface living purely at the `π₁` (quotient) level:
-    an `encode : π₁(T²) → ℤ × ℤ` with `encode (torusDecode z) = z` and
-    `torusDecode (encode x) = x`.
-  - Defined in `ComputationalPaths/Path/HIT/TorusStep.lean`.
-  - Since `Torus` is defined as `Circle × Circle`, `TorusStep.lean` provides an instance
-    `[HasCirclePiOneEncode] → HasTorusPiOneEncode` using the product fundamental
-    group theorem.
-  - Downstream developments can therefore depend only on the circle π₁ hypothesis.
-
-### Local assumption instance
-
-If you want to use the torus π₁ result without threading a typeclass hypothesis
-through your signatures, provide a local instance of `HasTorusPiOneEncode` (or
-keep it scoped inside a helper module). The core library no longer ships a
-kernel-axiom wrapper.
-
-## Lens space (π₁(L(p,1)) ≃ ℤ/pℤ)
-The lens space module was removed as legacy placeholder code. Any future
-formalization should reintroduce the equivalence without new axioms.
-## Pushout / SVK
-
-The pushout is implemented as a quotient, but some HIT-style β/naturality laws are not definitional.
-These are now **non-kernel assumptions**:
-
-- `Pushout.HasGlueNaturalRwEq` (full glue naturality, up to `RwEq`)
-- `Pushout.HasGlueNaturalLoopRwEq` (loop-only glue naturality at a chosen basepoint)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeQuot` (SVK encode map)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeEncode` (SVK law: `decode ∘ encode = id`)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeDecode` (SVK law: `encode ∘ decode ~ id` up to `AmalgEquiv`)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeDecodeFull` (SVK law: `encode ∘ decode ~ id` up to `FullAmalgEquiv`)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeAmalgBijective` (SVK: Prop-level `pushoutDecodeAmalg` bijective)
-- `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKDecodeFullAmalgBijective` (SVK: Prop-level `pushoutDecodeFullAmalg` bijective)
-
-They are defined in `ComputationalPaths/Path/HIT/Pushout.lean` and
-`ComputationalPaths/Path/HIT/PushoutPaths.lean`.
-
-Notes:
-
-- The SVK decoding proof only needs the **loop-only** naturality hypothesis
-  `Pushout.HasGlueNaturalLoopRwEq c₀`, and this is derived automatically in common cases
-  (e.g. `Subsingleton C`, `IsHSet C`, or when both legs satisfy Axiom K / `IsHSet`
-  such as `Subsingleton A` and `Subsingleton B`).
-- `seifertVanKampenEquiv` depends on the split SVK assumptions above; the legacy bundled
-  class `ComputationalPaths.Path.HIT.PushoutPaths.HasPushoutSVKEncodeData` remains as a convenience wrapper.
-- `seifertVanKampenFullEquiv` is the corresponding equivalence with the *full* target
-  `FullAmalgamatedFreeProduct` (amalgamation + free reduction). It depends on
-  `HasPushoutSVKEncodeDecodeFull`, which is weaker than `HasPushoutSVKEncodeDecode`
-  (and is derived automatically when `HasPushoutSVKEncodeDecode` is available).
-- If you want to avoid assuming an explicit `encode` map, use the Prop-only wrapper
-  `seifertVanKampenEquiv_of_decodeAmalg_bijective`, which depends only on
-  `HasPushoutSVKDecodeAmalgBijective` (and builds `encode` by classical choice).
-- The analogous wrapper for the full target is
-  `seifertVanKampenFullEquiv_of_decodeFullAmalg_bijective`, which depends only on
-  `HasPushoutSVKDecodeFullAmalgBijective`.
-- If you need the legacy word-level `encode` data, it can be reconstructed noncomputably from
-  `HasPushoutSVKDecodeAmalgBijective` via
-  `hasPushoutSVKEncodeData_of_decodeAmalg_bijective` (in `PushoutPaths.lean`).
-- The wedge case `π₁(A ∨ B) ≃ π₁(A) * π₁(B)` is available in two layers:
-  - Explicit (non-kernel) encode/decode assumptions:
-    `WedgeSVKInstances.HasWedgeSVKEncodeQuot`, `WedgeSVKInstances.HasWedgeSVKDecodeEncode`,
-    and `WedgeSVKInstances.HasWedgeSVKEncodeDecode` (bundled as `WedgeSVKInstances.HasWedgeSVKEncodeData`).
-  - Prop-level interface `HasWedgeSVKDecodeBijective`, plus the choice-based equivalence
-    `wedgeFundamentalGroupEquiv_of_decode_bijective` (no wrapper class).
-  Provide local instances of the Prop-level interface where needed; the old
-  kernel-axiom wrapper file has been removed.
-
-
-
-
-
-
-
-
+| Category | Count |
+|----------|-------|
+| `axiom` declarations | **30** |
+| Instantiated typeclasses ✅ | **10** |
+| Impossible typeclasses ⛔ | **4** |
+| Blocked at Path level ⛔ | **3** |
+| Open problems 🔴 | **7** |
+| Structural (mixed) | **1** (`HasDifferentialSquaredZero`) |
