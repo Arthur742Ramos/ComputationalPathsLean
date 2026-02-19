@@ -97,6 +97,4 @@ import ComputationalPaths.Stable.PathInfrastructure
 import ComputationalPaths.Synthetic.HomotopyPaths
 import ComputationalPaths.TropicalGeometry.BergmanFan
 import ComputationalPaths.TropicalGeometry.Matroids
-import ComputationalPaths.TropicalGeometry.TropicalPolynomials
 import ComputationalPaths.TropicalGeometry.TropicalSemiring
-import ComputationalPaths.TropicalGeometry.ValuatedMatroids
