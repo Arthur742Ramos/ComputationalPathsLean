@@ -167,16 +167,15 @@ def prod_isContr (hA : IsContr A) (hB : IsContr B) :
     IsContr (A × B) where
   center := (hA.center, hB.center)
   contr := fun (a, b) =>
-    Path.mk [Step.mk _ _ (by rw [(hA.contr a).proof, (hB.contr b).proof])]
-      (by rw [(hA.contr a).proof, (hB.contr b).proof])
+    Path.trans (congrArg (Prod.mk · hB.center) (hA.contr a))
+              (congrArg (Prod.mk a ·) (hB.contr b))
 
 /-- Product of propositions is a proposition. -/
 def prod_isProp (hA : IsProp A) (hB : IsProp B) :
     IsProp (A × B) where
   allPaths := fun (a₁, b₁) (a₂, b₂) =>
-    Path.mk [Step.mk _ _
-      (by rw [(hA.allPaths a₁ a₂).proof, (hB.allPaths b₁ b₂).proof])]
-      (by rw [(hA.allPaths a₁ a₂).proof, (hB.allPaths b₁ b₂).proof])
+    Path.trans (congrArg (Prod.mk · b₁) (hA.allPaths a₁ a₂))
+              (congrArg (Prod.mk a₂ ·) (hB.allPaths b₁ b₂))
 
 /-- Product of sets is a set. -/
 def prod_isSet : IsSet (A × B) where
@@ -196,35 +195,28 @@ def fun_isSet : IsSet (A → B) where
 def transport_isContr {D : A → Type v} {a b : A}
     (p : Path a b) (h : IsContr (D a)) : IsContr (D b) where
   center := Path.transport p h.center
-  contr := fun x =>
-    Path.mk [Step.mk _ _ (by
-      cases p with | mk s pf => cases pf; exact (h.contr x).proof)]
-      (by
-        cases p with | mk s pf => cases pf; exact (h.contr x).proof)
+  contr := fun x => by
+    have hp := p.proof
+    subst hp
+    exact h.contr x
 
 /-- Transport preserves propositions. -/
 def transport_isProp {D : A → Type v} {a b : A}
     (p : Path a b) (h : IsProp (D a)) : IsProp (D b) where
-  allPaths := fun x y =>
-    Path.mk [Step.mk _ _ (by
-      cases p with | mk s pf => cases pf; exact (h.allPaths x y).proof)]
-      (by
-        cases p with | mk s pf => cases pf; exact (h.allPaths x y).proof)
+  allPaths := fun x y => by
+    have hp := p.proof
+    subst hp
+    exact h.allPaths x y
 
 /-- Sigma type over a contractible base is contractible. -/
 def sigma_isContr {B : A → Type v}
     (hA : IsContr A) (hB : IsContr (B hA.center)) :
     IsContr ((a : A) × B a) where
   center := ⟨hA.center, hB.center⟩
-  contr := fun ⟨a, b⟩ =>
-    Path.mk [Step.mk _ _ (by
-      have ha := (hA.contr a).proof
-      cases ha
-      exact _root_.congrArg (Sigma.mk hA.center) (hB.contr b).proof)]
-      (by
-        have ha := (hA.contr a).proof
-        cases ha
-        exact _root_.congrArg (Sigma.mk hA.center) (hB.contr b).proof)
+  contr := fun ⟨a, b⟩ => by
+    have ha := (hA.contr a).proof
+    subst ha
+    exact congrArg (Sigma.mk hA.center ·) (hB.contr b)
 
 /-- Connected type induces (-1)-truncation. -/
 theorem connected_path_trunc (h : IsConnected A) :

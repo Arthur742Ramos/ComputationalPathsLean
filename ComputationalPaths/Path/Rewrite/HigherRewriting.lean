@@ -85,13 +85,13 @@ end TwoPolygraph
 structure ThreePolygraph extends TwoPolygraph where
   /-- The generating 3-cells between parallel 2-cells. -/
   ThreeCell :
-    {a b : Obj} {p q : OneCell a b} →
+    (a b : Obj) → (p q : OneCell a b) →
       TwoCell p q → TwoCell p q → Prop
 
 /-- A 3-polygraph is coherent if every pair of parallel 2-cells is connected. -/
 def Coherent (P : ThreePolygraph) : Prop :=
   ∀ {a b} {p q : P.OneCell a b} (α β : P.TwoCell p q),
-    P.ThreeCell α β
+    P.ThreeCell a b p q α β
 
 /-- A coherent presentation packages a 3-polygraph with its coherence proof. -/
 structure CoherentPresentation where
@@ -107,7 +107,7 @@ def homotopicalCompletion (P : TwoPolygraph) : ThreePolygraph :=
   { Obj := P.Obj
     OneCell := P.OneCell
     TwoCell := P.TwoCell
-    ThreeCell := fun {a b} {p q : P.OneCell a b} (α β : P.TwoCell p q) => α = β }
+    ThreeCell := fun a b (p q : P.OneCell a b) (α β : P.TwoCell p q) => α = β }
 
 /-- The homotopical completion is coherent by proof irrelevance. -/
 theorem homotopicalCompletion_coherent (P : TwoPolygraph) :

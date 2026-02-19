@@ -108,7 +108,7 @@ namespace IsSet
 def punitSet : IsSet CompPath.PUnit' where
   pathEq := by
     intro a b p q
-    exact isHSet_of_subsingleton (A := CompPath.PUnit') p q
+    exact (isHSet_of_subsingleton CompPath.PUnit').rweq p q
 
 end IsSet
 

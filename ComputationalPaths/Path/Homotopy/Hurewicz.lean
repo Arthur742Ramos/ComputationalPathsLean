@@ -488,7 +488,7 @@ theorem figureEight_comm : IsAbelian figureEightMul := by
   intro x y
   cases x <;> cases y <;> simp [figureEightMul, Int.add_comm]
 
-/-- The abelianization map for the figure-eight: FreeProductWord Int Int → ℤ × ℤ.
+/-- The abelianization map for the figure-eight: CompPath.FreeProductWord Int Int → ℤ × ℤ.
 
 In the abelianization:
 - a · b = b · a (by commutativity)
@@ -548,7 +548,7 @@ theorem figureEight_abelianization_concat_snd (w₁ w₂ : CompPath.FreeProductW
     omega
 
 /-- The abelianization map respects concatenation. -/
-theorem figureEight_abelianization_concat (w₁ w₂ : FreeProductWord Int Int) :
+theorem figureEight_abelianization_concat (w₁ w₂ : CompPath.FreeProductWord Int Int) :
     figureEight_abelianization_map (w₁.concat w₂) =
     figureEightMul (figureEight_abelianization_map w₁) (figureEight_abelianization_map w₂) := by
   apply Prod.ext <;> simp [figureEightMul, figureEight_abelianization_concat_fst,
@@ -556,17 +556,17 @@ theorem figureEight_abelianization_concat (w₁ w₂ : FreeProductWord Int Int) 
 
 /-- The abelianization map on a left singleton. -/
 theorem figureEight_abelianization_singleLeft (x : Int) :
-    figureEight_abelianization_map (FreeProductWord.singleLeft x) = (x, 0) := by
-  simp [figureEight_abelianization_map, FreeProductWord.singleLeft]
+    figureEight_abelianization_map (CompPath.FreeProductWord.singleLeft x) = (x, 0) := by
+  simp [figureEight_abelianization_map, CompPath.FreeProductWord.singleLeft]
 
 /-- The abelianization map on a right singleton. -/
 theorem figureEight_abelianization_singleRight (y : Int) :
-    figureEight_abelianization_map (FreeProductWord.singleRight y) = (0, y) := by
-  simp [figureEight_abelianization_map, FreeProductWord.singleRight]
+    figureEight_abelianization_map (CompPath.FreeProductWord.singleRight y) = (0, y) := by
+  simp [figureEight_abelianization_map, CompPath.FreeProductWord.singleRight]
 
 /-- The abelianization map respects inversion. -/
-theorem figureEight_abelianization_inverse (w : FreeProductWord Int Int) :
-    figureEight_abelianization_map (FreeProductWord.inverse w) =
+theorem figureEight_abelianization_inverse (w : CompPath.FreeProductWord Int Int) :
+    figureEight_abelianization_map (CompPath.FreeProductWord.inverse w) =
     figureEightInv (figureEight_abelianization_map w) := by
   induction w with
   | nil =>
@@ -574,23 +574,23 @@ theorem figureEight_abelianization_inverse (w : FreeProductWord Int Int) :
   | consLeft x rest ih =>
       cases h : figureEight_abelianization_map rest with
       | mk m n =>
-        have ih' : figureEight_abelianization_map (FreeProductWord.inverse rest) = (-m, -n) := by
+        have ih' : figureEight_abelianization_map (CompPath.FreeProductWord.inverse rest) = (-m, -n) := by
           simpa [figureEightInv, h] using ih
-        apply Prod.ext <;> simp [FreeProductWord.inverse, figureEight_abelianization_concat, ih',
+        apply Prod.ext <;> simp [CompPath.FreeProductWord.inverse, figureEight_abelianization_concat, ih',
           figureEight_abelianization_singleLeft, figureEightMul, figureEightInv,
           figureEight_abelianization_map, h, Int.neg_add]
   | consRight y rest ih =>
       cases h : figureEight_abelianization_map rest with
       | mk m n =>
-        have ih' : figureEight_abelianization_map (FreeProductWord.inverse rest) = (-m, -n) := by
+        have ih' : figureEight_abelianization_map (CompPath.FreeProductWord.inverse rest) = (-m, -n) := by
           simpa [figureEightInv, h] using ih
-        apply Prod.ext <;> simp [FreeProductWord.inverse, figureEight_abelianization_concat, ih',
+        apply Prod.ext <;> simp [CompPath.FreeProductWord.inverse, figureEight_abelianization_concat, ih',
           figureEight_abelianization_singleRight, figureEightMul, figureEightInv,
           figureEight_abelianization_map, h, Int.neg_add]
 
 /-- The figure-eight abelianization map is hom-like. -/
 theorem figureEight_abelianization_hom :
-    IsMulHom FreeProductWord.concat FreeProductWord.inverse FreeProductWord.nil
+    IsMulHom CompPath.FreeProductWord.concat CompPath.FreeProductWord.inverse CompPath.FreeProductWord.nil
       figureEightMul figureEightInv figureEightOne figureEight_abelianization_map := by
   refine ⟨?mul, ?inv, ?one⟩
   · intro x y
@@ -601,17 +601,17 @@ theorem figureEight_abelianization_hom :
 
 /-- The abelianization map factors through the abelianization quotient. -/
 noncomputable def figureEight_abelianization_desc :
-    Abelianization (FreeProductWord Int Int) FreeProductWord.concat
-      FreeProductWord.inverse FreeProductWord.nil → FigureEightH1 :=
+    Abelianization (CompPath.FreeProductWord Int Int) CompPath.FreeProductWord.concat
+      CompPath.FreeProductWord.inverse CompPath.FreeProductWord.nil → FigureEightH1 :=
   abelianization_desc_of_hom
-    FreeProductWord.concat FreeProductWord.inverse FreeProductWord.nil
+    CompPath.FreeProductWord.concat CompPath.FreeProductWord.inverse CompPath.FreeProductWord.nil
     figureEightMul figureEightInv figureEightOne
     figureEight_abelianization_map
     figureEight_group_like figureEight_comm figureEight_abelianization_hom
 
-theorem figureEight_abelianization_desc_comp (w : FreeProductWord Int Int) :
+theorem figureEight_abelianization_desc_comp (w : CompPath.FreeProductWord Int Int) :
     figureEight_abelianization_desc (abelianization_mk
-      FreeProductWord.concat FreeProductWord.inverse FreeProductWord.nil w) =
+      CompPath.FreeProductWord.concat CompPath.FreeProductWord.inverse CompPath.FreeProductWord.nil w) =
     figureEight_abelianization_map w := by
   rfl
 
