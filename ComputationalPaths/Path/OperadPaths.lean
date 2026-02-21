@@ -14,6 +14,8 @@ namespace ComputationalPaths
 namespace Path
 namespace Operad
 
+noncomputable section
+
 open Path
 
 universe u v w
@@ -45,7 +47,7 @@ def OperadStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .symm_trans p q => Path.Step.symm_trans_congr p q
 
 /-- Lift an operad step to rewrite equivalence. -/
-theorem rweq_of_operad_step {A : Type u} {a b : A}
+def rweq_of_operad_step {A : Type u} {a b : A}
     {p q : Path a b} (s : OperadStep p q) : RwEq p q :=
   rweq_of_step (OperadStep.toStep s)
 
@@ -73,21 +75,21 @@ namespace OperadData
 variable {A : Type u} (O : OperadData A)
 
 /-- Left unit law holds up to rewrite equivalence via trans with refl. -/
-@[simp] theorem left_unit_rweq (x : A) :
+def left_unit_rweq (x : A) :
     RwEq
       (Path.trans (O.leftUnitPath x) (Path.refl x))
       (O.leftUnitPath x) :=
   rweq_of_operad_step (OperadStep.right_unit (O.leftUnitPath x))
 
 /-- Right unit law holds up to rewrite equivalence via trans with refl. -/
-@[simp] theorem right_unit_rweq (x : A) :
+def right_unit_rweq (x : A) :
     RwEq
       (Path.trans (O.rightUnitPath x) (Path.refl x))
       (O.rightUnitPath x) :=
   rweq_of_operad_step (OperadStep.right_unit (O.rightUnitPath x))
 
 /-- Associativity law holds up to rewrite equivalence. -/
-@[simp] theorem assoc_rweq (x y z : A) :
+def assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (O.assocPath x y z) (Path.refl (O.compose x (O.compose y z))))
       (O.assocPath x y z) :=
@@ -99,7 +101,7 @@ def unitAssocRoundTrip (x : A) :
   Path.trans (O.leftUnitPath x) (Path.symm (O.leftUnitPath x))
 
 /-- Round-trip composes to refl up to RwEq. -/
-@[simp] theorem unitAssocRoundTrip_rweq (x : A) :
+def unitAssocRoundTrip_rweq (x : A) :
     RwEq (O.unitAssocRoundTrip x) (Path.refl (O.compose O.ident x)) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (O.leftUnitPath x))
 
@@ -111,13 +113,13 @@ def rebracket (x y z : A) : Path (O.compose3 x y z) (O.compose x (O.compose y z)
   O.assocPath x y z
 
 /-- Mac Lane coherence for the assoc paths: any two rebracketings agree. -/
-theorem rebracket_coherence (x y z : A)
+def rebracket_coherence (x y z : A)
     (h₁ h₂ : Path (O.compose3 x y z) (O.compose x (O.compose y z))) :
     h₁.toEq = h₂.toEq := by
   apply subsingleton_eq_by_cases
 
 /-- Transport the compose operation along a path. -/
-theorem compose_transport {x₁ x₂ : A} (p : Path x₁ x₂) (y : A) :
+def compose_transport {x₁ x₂ : A} (p : Path x₁ x₂) (y : A) :
     Path.transport (D := fun _ => A) p (O.compose x₁ y) = O.compose x₁ y := by
   simp [Path.transport_const]
 
@@ -139,14 +141,14 @@ namespace SymmetricOperadData
 variable {A : Type u} (S : SymmetricOperadData A)
 
 /-- Swap involution holds up to RwEq (via trans with refl). -/
-@[simp] theorem swap_inv_rweq (x : A) :
+def swap_inv_rweq (x : A) :
     RwEq
       (Path.trans (S.swapInvPath x) (Path.refl x))
       (S.swapInvPath x) :=
   rweq_of_operad_step (OperadStep.right_unit (S.swapInvPath x))
 
 /-- Swap-compose coherence holds up to RwEq. -/
-@[simp] theorem swap_compose_rweq (x y : A) :
+def swap_compose_rweq (x y : A) :
     RwEq
       (Path.trans (S.swapComposePath x y) (Path.refl (S.swap (S.compose x y))))
       (S.swapComposePath x y) :=
@@ -158,12 +160,12 @@ def doubleSwapRoundTrip (x : A) :
   Path.trans (S.swapInvPath x) (Path.symm (S.swapInvPath x))
 
 /-- Double swap round-trip is identity up to RwEq. -/
-@[simp] theorem doubleSwapRoundTrip_rweq (x : A) :
+def doubleSwapRoundTrip_rweq (x : A) :
     RwEq (S.doubleSwapRoundTrip x) (Path.refl (S.swap (S.swap x))) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (S.swapInvPath x))
 
 /-- Naturality of swap with left unit: two paths between the same endpoints agree. -/
-theorem swap_leftUnit_naturality (x : A)
+def swap_leftUnit_naturality (x : A)
     (p q : Path (S.swap (S.compose S.ident x)) (S.swap x)) :
     p.toEq = q.toEq := by
   apply subsingleton_eq_by_cases
@@ -194,19 +196,19 @@ def unitRoundTrip (b : B) :
   Path.trans (alg.unitPath b) (Path.symm (alg.unitPath b))
 
 /-- Unit round-trip is identity up to RwEq. -/
-@[simp] theorem unitRoundTrip_rweq (b : B) :
+def unitRoundTrip_rweq (b : B) :
     RwEq (alg.unitRoundTrip b) (Path.refl (alg.act O.ident b)) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (alg.unitPath b))
 
 /-- Composition coherence: two ways of acting agree up to RwEq. -/
-@[simp] theorem compose_coherence_rweq (x y : A) (b : B) :
+def compose_coherence_rweq (x y : A) (b : B) :
     RwEq
       (Path.trans (alg.composePath x y b) (Path.refl (alg.act x (alg.act y b))))
       (alg.composePath x y b) :=
   rweq_of_operad_step (OperadStep.right_unit (alg.composePath x y b))
 
 /-- Transport algebra element along a path in B. -/
-theorem act_transport_const (x : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
+def act_transport_const (x : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
     Path.transport (D := fun _ => B) p (alg.act x b₁) = alg.act x b₁ := by
   simp [Path.transport_const]
 
@@ -218,7 +220,7 @@ def iteratedActAssoc (x y z : A) (b : B) :
     (alg.composePath x y (alg.act z b))
 
 /-- Iterated action associativity followed by refl simplifies. -/
-@[simp] theorem iteratedActAssoc_rweq (x y z : A) (b : B) :
+def iteratedActAssoc_rweq (x y z : A) (b : B) :
     RwEq
       (Path.trans (alg.iteratedActAssoc x y z b) (Path.refl _))
       (alg.iteratedActAssoc x y z b) :=
@@ -264,11 +266,11 @@ def id (O : OperadData A) : OperadMorphism O O where
   composePath _ _ := Path.refl _
 
 /-- Left unit for composition of morphisms. -/
-theorem comp_id_left (f : OperadMorphism O₁ O₂) :
+def comp_id_left (f : OperadMorphism O₁ O₂) :
     (comp (id O₁) f).mapOp = f.mapOp := rfl
 
 /-- Ident preservation of composition followed by refl simplifies. -/
-@[simp] theorem comp_ident_rweq (f : OperadMorphism O₁ O₂) (g : OperadMorphism O₂ O₃) :
+def comp_ident_rweq (f : OperadMorphism O₁ O₂) (g : OperadMorphism O₂ O₃) :
     RwEq
       (Path.trans (comp f g).identPath (Path.refl _))
       (comp f g).identPath :=
@@ -310,14 +312,14 @@ def toOperadData : OperadData G where
   assocPath := F.freeAssocPath
 
 /-- Free assoc: left-nested trans-with-refl simplifies. -/
-@[simp] theorem free_assoc_rweq (x y z : G) :
+def free_assoc_rweq (x y z : G) :
     RwEq
       (Path.trans (F.freeAssocPath x y z) (Path.refl _))
       (F.freeAssocPath x y z) :=
   rweq_of_operad_step (OperadStep.right_unit (F.freeAssocPath x y z))
 
 /-- Universal property: congrArg on free paths preserves toEq. -/
-theorem universal_property_toEq
+def universal_property_toEq
     (f : G → G) :
     ∀ x : G, (Path.congrArg f (F.freeLeftUnitPath x)).toEq =
       (Path.congrArg f (F.freeLeftUnitPath x)).toEq := by
@@ -349,14 +351,14 @@ namespace LittleCubesData
 variable {A : Type u} (L : LittleCubesData A)
 
 /-- Cube unit coherence up to RwEq. -/
-@[simp] theorem cube_unit_rweq (x : A) :
+def cube_unit_rweq (x : A) :
     RwEq
       (Path.trans (L.cubeUnitPath x) (Path.refl x))
       (L.cubeUnitPath x) :=
   rweq_of_operad_step (OperadStep.right_unit (L.cubeUnitPath x))
 
 /-- Cube associativity coherence up to RwEq. -/
-@[simp] theorem cube_assoc_rweq (x y z : A) :
+def cube_assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (L.cubeAssocPath x y z) (Path.refl _))
       (L.cubeAssocPath x y z) :=
@@ -368,13 +370,13 @@ def swapRoundTrip (x y : A) :
   Path.trans (L.cubeSwapPath x y) (L.cubeSwapPath y x)
 
 /-- Swap involution: two swaps are identity up to toEq. -/
-theorem swap_involution_toEq (x y : A) :
+def swap_involution_toEq (x y : A) :
     (L.swapRoundTrip x y).toEq =
     (Path.refl (L.composeCube x y)).toEq := by
   apply subsingleton_eq_by_cases
 
 /-- Cube swap-assoc coherence: two different path constructions agree (toEq). -/
-theorem swap_assoc_coherence (x y z : A)
+def swap_assoc_coherence (x y z : A)
     (p q : Path (L.composeCube (L.composeCube x y) z) (L.composeCube x (L.composeCube z y))) :
     p.toEq = q.toEq := by
   apply subsingleton_eq_by_cases
@@ -410,21 +412,21 @@ namespace AInfinityData
 variable {A : Type u} (AI : AInfinityData A)
 
 /-- Assoc path followed by refl simplifies. -/
-@[simp] theorem assoc_rweq (x y z : A) :
+def assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (AI.assocPath x y z) (Path.refl _))
       (AI.assocPath x y z) :=
   rweq_of_operad_step (OperadStep.right_unit (AI.assocPath x y z))
 
 /-- Pentagon coherence followed by refl simplifies. -/
-@[simp] theorem pentagon_rweq (x y z w : A) :
+def pentagon_rweq (x y z w : A) :
     RwEq
       (Path.trans (AI.pentagonPath x y z w) (Path.refl _))
       (AI.pentagonPath x y z w) :=
   rweq_of_operad_step (OperadStep.right_unit (AI.pentagonPath x y z w))
 
 /-- The two standard paths from ((xy)z)w to x(y(zw)) agree at toEq level. -/
-theorem pentagon_coherence_toEq (x y z w : A) :
+def pentagon_coherence_toEq (x y z w : A) :
     (Path.trans (AI.assocPath (AI.mul x y) z w)
                 (AI.assocPath x y (AI.mul z w))).toEq =
     (Path.trans (Path.congrArg (fun a => AI.mul a w) (AI.assocPath x y z))
@@ -437,12 +439,12 @@ def assocInvRoundTrip (x y z : A) :
     Path (AI.mul (AI.mul x y) z) (AI.mul (AI.mul x y) z) :=
   Path.trans (AI.assocPath x y z) (Path.symm (AI.assocPath x y z))
 
-@[simp] theorem assocInvRoundTrip_rweq (x y z : A) :
+def assocInvRoundTrip_rweq (x y z : A) :
     RwEq (AI.assocInvRoundTrip x y z) (Path.refl _) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (AI.assocPath x y z))
 
 /-- CongrArg of mul on assocPath. -/
-theorem mul_congrArg_assoc (x y z w : A) :
+def mul_congrArg_assoc (x y z w : A) :
     Path.congrArg (AI.mul x) (AI.assocPath y z w) =
     Path.congrArg (AI.mul x) (AI.assocPath y z w) := rfl
 
@@ -463,7 +465,7 @@ namespace EInfinityData
 variable {A : Type u} (EI : EInfinityData A)
 
 /-- Comm path followed by refl simplifies. -/
-@[simp] theorem comm_rweq (x y : A) :
+def comm_rweq (x y : A) :
     RwEq
       (Path.trans (EI.commPath x y) (Path.refl _))
       (EI.commPath x y) :=
@@ -475,12 +477,12 @@ def commRoundTrip (x y : A) :
   Path.trans (EI.commPath x y) (EI.commPath y x)
 
 /-- Comm round-trip and refl agree at toEq level. -/
-theorem commRoundTrip_toEq (x y : A) :
+def commRoundTrip_toEq (x y : A) :
     (EI.commRoundTrip x y).toEq = (Path.refl (EI.mul x y)).toEq := by
   apply subsingleton_eq_by_cases
 
 /-- Hexagon identity: two paths from mul(mul x y)z to mul y(mul x z) agree (toEq). -/
-theorem hexagon_toEq (x y z : A) :
+def hexagon_toEq (x y z : A) :
     let p1 := Path.congrArg (fun a => EI.mul a z) (EI.commPath x y)
     let p2 := EI.toAInfinityData.assocPath y x z
     let route1 := Path.trans p1 p2
@@ -489,7 +491,7 @@ theorem hexagon_toEq (x y z : A) :
   rfl
 
 /-- Symmetry of commPath. -/
-theorem comm_symm_toEq (x y : A) :
+def comm_symm_toEq (x y : A) :
     (Path.symm (EI.commPath x y)).toEq = (EI.commPath y x).toEq := by
   apply subsingleton_eq_by_cases
 
@@ -520,14 +522,14 @@ variable {alg : AlgebraData A C O₁}
 variable (K : OperadicKanExtData O₁ O₂ f alg)
 
 /-- Extension unit followed by refl. -/
-@[simp] theorem ext_unit_rweq (c : C) :
+def ext_unit_rweq (c : C) :
     RwEq
       (Path.trans (K.extUnitPath c) (Path.refl _))
       (K.extUnitPath c) :=
   rweq_of_operad_step (OperadStep.right_unit (K.extUnitPath c))
 
 /-- Extension coherence composed with unit. -/
-theorem ext_cohere_unit_toEq (c : C) :
+def ext_cohere_unit_toEq (c : C) :
     (Path.trans (K.extCoherePath O₁.ident c) (alg.unitPath c)).toEq =
     (K.extUnitPath c).toEq := by
   apply subsingleton_eq_by_cases
@@ -538,7 +540,7 @@ def extRoundTrip (x : A) (c : C) :
   Path.trans (K.extCoherePath x c) (Path.symm (K.extCoherePath x c))
 
 /-- Extension round-trip is refl up to RwEq. -/
-@[simp] theorem extRoundTrip_rweq (x : A) (c : C) :
+def extRoundTrip_rweq (x : A) (c : C) :
     RwEq (K.extRoundTrip x c) (Path.refl _) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (K.extCoherePath x c))
 
@@ -559,14 +561,14 @@ def pathPermuteReverse {A : Type u} {a b c : A}
   Path.symm (pathPermute p q)
 
 /-- Path permute reverse unfolds correctly. -/
-@[simp] theorem pathPermuteReverse_eq {A : Type u} {a b c : A}
+def pathPermuteReverse_eq {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     pathPermuteReverse p q = Path.trans (Path.symm q) (Path.symm p) := by
   unfold pathPermuteReverse pathPermute
   simp
 
 /-- Double reversal of path permutation is identity. -/
-@[simp] theorem pathPermute_double_reverse_toEq {A : Type u} {a b c : A}
+def pathPermute_double_reverse_toEq {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     (Path.trans (pathPermute p q) (pathPermuteReverse p q)).toEq =
     (Path.refl a).toEq := by
@@ -574,7 +576,7 @@ def pathPermuteReverse {A : Type u} {a b c : A}
   simp
 
 /-- Associativity of path permutation. -/
-@[simp] theorem pathPermute_assoc {A : Type u} {a b c d : A}
+def pathPermute_assoc {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     pathPermute (pathPermute p q) r = pathPermute p (pathPermute q r) := by
   unfold pathPermute
@@ -603,14 +605,14 @@ namespace ColoredOperadData
 variable {Color : Type u} {A : Type v} (CO : ColoredOperadData Color A)
 
 /-- Colored unit up to RwEq. -/
-@[simp] theorem color_unit_rweq (c : Color) (x : A) :
+def color_unit_rweq (c : Color) (x : A) :
     RwEq
       (Path.trans (CO.colorUnitPath c x) (Path.refl x))
       (CO.colorUnitPath c x) :=
   rweq_of_operad_step (OperadStep.right_unit (CO.colorUnitPath c x))
 
 /-- Colored associativity up to RwEq. -/
-@[simp] theorem color_assoc_rweq (x y z : A) :
+def color_assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (CO.colorAssocPath x y z) (Path.refl _))
       (CO.colorAssocPath x y z) :=
@@ -626,6 +628,8 @@ def atColor (c : Color) : OperadData A where
   assocPath := CO.colorAssocPath
 
 end ColoredOperadData
+
+end
 
 end Operad
 end Path
