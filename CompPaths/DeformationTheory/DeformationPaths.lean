@@ -70,7 +70,7 @@ end PathDeformation
 /-- Infinitesimal deformation: one rewrite step viewed as tangent data. -/
 structure InfinitesimalDeformation {A : Type u} {a b : A} (p : Path a b) where
   next : Path a b
-  tangent : Path.Step p next
+  tangent : Step p next
 
 namespace InfinitesimalDeformation
 
@@ -94,7 +94,7 @@ inductive StepSequence {A : Type u} {a b : A} :
     Path a b → Path a b → Type u where
   | nil (p : Path a b) : StepSequence p p
   | cons {p q r : Path a b} :
-      Path.Step p q → StepSequence q r → StepSequence p r
+      Step p q → StepSequence q r → StepSequence p r
 
 namespace StepSequence
 
@@ -129,12 +129,8 @@ structure MaurerCartanEquation {A : Type u} {a b : A} (p : Path a b) where
 namespace MaurerCartanEquation
 
 noncomputable def consistency {A : Type u} {a b : A} {p : Path a b}
-    (mc : MaurerCartanEquation p) : RwEq p mc.terminal := by
-  induction mc.steps with
-  | nil p =>
-      exact rweq_refl p
-  | cons hs tail ih =>
-      exact rweq_trans (rweq_of_step hs) ih
+    (mc : MaurerCartanEquation p) : RwEq p mc.terminal :=
+  StepSequence.toRwEq mc.steps
 
 noncomputable def toDeformation {A : Type u} {a b : A} {p : Path a b}
     (mc : MaurerCartanEquation p) : PathDeformation p :=
@@ -147,8 +143,8 @@ structure CriticalPairAt {A : Type u} {a b : A} (p : Path a b) where
   caseTag : CriticalPairCase
   left : Path a b
   right : Path a b
-  leftStep : Path.Step p left
-  rightStep : Path.Step p right
+  leftStep : Step p left
+  rightStep : Step p right
 
 namespace CriticalPairAt
 
@@ -175,10 +171,10 @@ noncomputable def PathDeformation.extend_of_joinable
     {A : Type u} {a b : A} {p₀ : Path a b}
     (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal)
     (h : D.ExtendableAlong cp) :
-    Σ r : Path a b, PathDeformation p₀ := by
-  rcases h with ⟨r, hLeft, _⟩
-  refine ⟨r, D.extend ?_⟩
-  exact rweq_trans (cp.left_rweq) hLeft
+    Σ r : Path a b, PathDeformation p₀ :=
+  ⟨Classical.choice (let ⟨r, _, _⟩ := h; ⟨r⟩),
+   D.extend (rweq_trans cp.left_rweq
+     (Classical.choice (let ⟨_, hLeft, _⟩ := h; ⟨hLeft⟩)))⟩
 
 /-- Obstruction: a non-joinable critical pair blocks extension. -/
 structure ExtensionObstruction {A : Type u} {a b : A} {p₀ : Path a b}

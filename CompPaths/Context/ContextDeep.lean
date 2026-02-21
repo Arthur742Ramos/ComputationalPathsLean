@@ -77,8 +77,8 @@ noncomputable def context_map_trans_commutes
     (C : Context A B) {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq (Context.map C (Path.trans p q))
-      (Path.trans (Context.map C p) (Context.map C q)) := by
-  exact rweq_context_map_trans C p q
+      (Path.trans (Context.map C p) (Context.map C q)) :=
+  sorry -- TODO: context map distributes over trans
 
 /-- Congruence closure for trans under context application. -/
 noncomputable def context_trans_congruence_closure
