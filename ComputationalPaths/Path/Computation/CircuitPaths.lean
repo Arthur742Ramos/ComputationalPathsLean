@@ -299,12 +299,12 @@ def three_circuit_path {a b c d : Nat}
 -- 31. Any two proofs of circuit equality agree
 theorem circuit_proof_unique {n m : Nat} {f g : Circuit n m}
     (h₁ h₂ : f = g) : h₁ = h₂ :=
-  Subsingleton.elim _ _
+  rfl
 
 -- 32. Coherence: two paths between same circuits agree in proof
 theorem circuit_path_coherence {n m : Nat} {f g : Circuit n m}
     (p q : Path f g) : p.proof = q.proof :=
-  Subsingleton.elim _ _
+  rfl
 
 -- 33. Four-circuit associativity coherence
 theorem four_circuit_coherence {a b c d e : Nat}

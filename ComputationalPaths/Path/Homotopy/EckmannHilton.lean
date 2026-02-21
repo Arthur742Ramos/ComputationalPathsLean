@@ -362,7 +362,7 @@ def hcomp_comm (α β : OmegaTwo A a) :
 theorem eckmann_hilton_rweq (α β : OmegaTwo A a) :
     Derivation₂.toRwEq (OmegaTwo.vcomp α β) =
     Derivation₂.toRwEq (OmegaTwo.vcomp β α) :=
-  Subsingleton.elim _ _
+  rfl
 
 end EckmannHiltonProof
 

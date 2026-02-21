@@ -77,11 +77,11 @@ theorem path_eq_of_steps_eq {a b : A} (p q : Path a b)
 /-- All self-path proofs are rfl. -/
 theorem self_path_proof_rfl {a : A} (p : Path a a) :
     p.proof = rfl :=
-  Subsingleton.elim _ _
+  rfl
 
 /-- UIP for propositional equality. -/
 theorem proof_uip {a b : A} (h₁ h₂ : a = b) : h₁ = h₂ :=
-  Subsingleton.elim _ _
+  rfl
 
 /-- Proof irrelevance for Path proofs. -/
 theorem path_proof_irrel {a b : A} (p : Path a b) :
@@ -228,7 +228,7 @@ theorem pathOver_symm {B : A → Type v} {a b : A}
 theorem pathOver_subsingleton {B : A → Type v} {a b : A}
     (p : Path a b) (u : B a) (v : B b)
     (h₁ h₂ : PathOver p u v) : h₁ = h₂ :=
-  Subsingleton.elim h₁ h₂
+  rfl
 
 /-- PathOver from transport. -/
 theorem pathOver_of_transport {B : A → Type v} {a b : A}

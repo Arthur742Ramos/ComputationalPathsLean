@@ -115,7 +115,7 @@ theorem interchange_law
         (whiskerLeft (A := A) (a := a) (b := b) (c := c) f' theta) =
       comp (whiskerLeft (A := A) (a := a) (b := b) (c := c) f theta)
         (whiskerRight (A := A) (a := a) (b := b) (c := c) g' eta) := by
-  apply Subsingleton.elim
+  rfl
 
 end WhiskerOperations
 end Path

@@ -413,7 +413,7 @@ variable (L : SheafLongExactData F G H)
 
 theorem three_step_coherence (n : Nat) (s : A) :
     (Path.trans (L.exactGPath n s) (Path.symm (L.exactGPath n s))).toEq = rfl := by
-  apply Subsingleton.elim
+  rfl
 
 theorem exactG_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (L.exactGPath n s) b = b := by
@@ -480,7 +480,7 @@ variable (Fl : FlasqueData F)
 
 theorem flasque_acyclic (V : O) (s : A) :
     (Path.trans (Fl.extendPath V s) (Path.symm (Fl.extendPath V s))).toEq = rfl := by
-  apply Subsingleton.elim
+  rfl
 
 theorem extend_transport_const {B : Type w} (V : O) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (Fl.extendPath V s) b = b := by

@@ -399,7 +399,7 @@ def ses_compose_zero (ses : ShortExactSeq) (n : Nat) :
 /-- 33. Two routes to zero agree. -/
 theorem ses_zero_coherence (ses : ShortExactSeq) (n : Nat) :
     (ses_compose_zero ses n).proof = (ses.exact_at_B n (ses.A.group n).zero).proof :=
-  Subsingleton.elim _ _
+  rfl
 
 /-! ## Cup Product -/
 
@@ -430,7 +430,7 @@ def cup_zero_cocycles {C : CochainComplex} (cp : CupProduct C) (p q : Nat) :
 theorem cup_zero_zero_coherence {C : CochainComplex} (cp : CupProduct C) (p q : Nat) :
     (cp.cup_zero_left p q (C.group q).zero).proof =
     (cp.cup_zero_right p q (C.group p).zero).proof :=
-  Subsingleton.elim _ _
+  rfl
 
 /-! ## Connecting Homomorphism -/
 

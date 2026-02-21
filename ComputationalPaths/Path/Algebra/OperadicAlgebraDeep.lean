@@ -497,17 +497,17 @@ def EInfinityOperad.trivial : EInfinityOperad where
 
 theorem eInfinity_contractible_refl (E : EInfinityOperad) {n : Nat} (x : E.Op n) :
     E.contractible x x = rfl := by
-  apply Subsingleton.elim
+  rfl
 
 theorem eInfinity_contractible_symm (E : EInfinityOperad) {n : Nat}
     (x y : E.Op n) :
     (E.contractible x y).symm = E.contractible y x := by
-  apply Subsingleton.elim
+  rfl
 
 theorem eInfinity_contractible_trans (E : EInfinityOperad) {n : Nat}
     (x y z : E.Op n) :
     Eq.trans (E.contractible x y) (E.contractible y z) = E.contractible x z := by
-  apply Subsingleton.elim
+  rfl
 
 theorem eInfinity_contractible_path_eq_stepChain (E : EInfinityOperad) {n : Nat}
     (x y : E.Op n) :

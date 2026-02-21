@@ -230,19 +230,19 @@ def pathEnrichedCategory (A : Type u) : GroupoidEnrichedCategory (Obj := A) :=
 @[simp] theorem pathEnrichedCategory_assoc {A : Type u} {a b c d : A}
     (p : EnrichedHom A a b) (q : EnrichedHom A b c) (r : EnrichedHom A c d) :
     (pathEnrichedCategory A).assoc p q r = enriched_assoc p q r := by
-  apply Subsingleton.elim
+  rfl
 
 /-- The left unitor agrees with `enriched_left_unit` (proof-irrelevant). -/
 @[simp] theorem pathEnrichedCategory_leftUnitor {A : Type u} {a b : A}
     (p : EnrichedHom A a b) :
     (pathEnrichedCategory A).leftUnitor p = enriched_left_unit p := by
-  apply Subsingleton.elim
+  rfl
 
 /-- The right unitor agrees with `enriched_right_unit` (proof-irrelevant). -/
 @[simp] theorem pathEnrichedCategory_rightUnitor {A : Type u} {a b : A}
     (p : EnrichedHom A a b) :
     (pathEnrichedCategory A).rightUnitor p = enriched_right_unit p := by
-  apply Subsingleton.elim
+  rfl
 
 /-! ## Summary -/
 

@@ -79,7 +79,7 @@ theorem gluePath_proof_irrel
     {x y : Pushout f g}
     (p q : Path x y) :
     p.proof = q.proof :=
-  Subsingleton.elim _ _
+  rfl
 
 /-! ## Universal property -/
 
@@ -233,7 +233,7 @@ theorem glueCompose_proof_irrel (c₁ c₂ : C)
 /-- Any loop in the pushout has proof-irrelevant underlying equality. -/
 theorem pushout_loop_trivial {x : Pushout f g} (p q : Path x x) :
     p.proof = q.proof :=
-  Subsingleton.elim _ _
+  rfl
 
 end Pushout
 

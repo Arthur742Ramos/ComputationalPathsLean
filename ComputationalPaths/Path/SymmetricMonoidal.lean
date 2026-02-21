@@ -69,7 +69,7 @@ theorem braiding_natural {p p' : Path a b} {q q' : Path b c}
         (braiding_path (p := p') (q := q')) =
       rweq_trans (braiding_path (p := p) (q := q))
         (rweq_trans_congr (rweq_symm_congr β) (rweq_symm_congr α)) := by
-  apply Subsingleton.elim
+  rfl
 
 /-! ## Symmetric Monoidal Structure -/
 

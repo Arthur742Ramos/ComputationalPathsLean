@@ -274,7 +274,7 @@ theorem reduction_transport {A : Type u} (R : PathReduction A)
     {a b : A} (p : Path a b) (D : A → Type v) (x : D a) :
     Path.transport (R.reduce p) x = Path.transport p x := by
   have h : (R.reduce p).proof = p.proof := by
-    apply Subsingleton.elim
+    rfl
   simp [Path.transport, h]
 
 end CompactPaths

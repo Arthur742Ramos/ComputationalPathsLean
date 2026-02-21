@@ -652,7 +652,7 @@ theorem fiber_connected_loop {E B : Type} {f : E → B} {b : B}
     (fib₁ fib₂ : Fiber f b) (p : Path fib₁.point fib₂.point) :
     (trans fib₁.over (symm fib₂.over)).toEq =
     (fiber_connected fib₁ fib₂ p).toEq :=
-  Subsingleton.elim _ _
+  rfl
 
 /-- 77. Fiber of projection from triple is a pair. -/
 def triple_fiber (a b : Nat) :
@@ -669,13 +669,13 @@ theorem fiber_transport_functorial (F : Fibration) {b₁ b₂ b₃ : F.base}
 /-- 79. Bundle map id is identity on fibers. -/
 theorem bundle_map_id_fiber (F : Fibration) (b : F.base) (fib : Fiber F.proj b) :
     (bundle_map_fiber F F (BundleMap.id F) b fib).toEq = fib.over.toEq :=
-  Subsingleton.elim _ _
+  rfl
 
 /-- 80. Any two paths in a fiber over the same base point agree (proof-level). -/
 theorem fiber_path_unique {E B : Type} {f : E → B} {b : B}
     (fib : Fiber f b) (p q : Path (f fib.point) b) :
     p.toEq = q.toEq :=
-  Subsingleton.elim _ _
+  rfl
 
 end FibrationDeep
 

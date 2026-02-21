@@ -110,12 +110,12 @@ theorem southLoop_toEq (a b : A) :
 /-- All loops at north are proof-irrelevant. -/
 theorem loop_north_eq (p q : Path (@north A) (@north A)) :
     p.proof = q.proof :=
-  Subsingleton.elim _ _
+  rfl
 
 /-- All loops at south are proof-irrelevant. -/
 theorem loop_south_eq (p q : Path (@south A) (@south A)) :
     p.proof = q.proof :=
-  Subsingleton.elim _ _
+  rfl
 
 /-! ## Suspension functoriality -/
 

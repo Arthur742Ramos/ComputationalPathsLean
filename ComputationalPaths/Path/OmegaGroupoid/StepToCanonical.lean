@@ -78,7 +78,7 @@ variable {a b : A} {p q : Path a b}
 /-- All derivations between the same paths have equal toRwEq (proof irrelevance). -/
 theorem derivations_toRwEq_eq (d₁ d₂ : Derivation₂ p q) :
     d₁.toRwEq = d₂.toRwEq :=
-  Subsingleton.elim d₁.toRwEq d₂.toRwEq
+  rfl
 
 end SemanticArgument
 
