@@ -18,20 +18,20 @@ namespace ObstructionClass
 
 variable {A : Type u} {x : A}
 
-@[simp] theorem vanishing_rweq (ob : ObstructionClass A x) :
+noncomputable def vanishing_rweq (ob : ObstructionClass A x) :
     RwEq (Path.trans ob.primary ob.correction) ob.correction :=
   ob.vanishing
 
 /-- Trivial obstruction class with reflexive primary component. -/
-def trivial (p : Path x x) : ObstructionClass A x where
+noncomputable def trivial (p : Path x x) : ObstructionClass A x where
   primary := Path.refl x
   correction := p
   vanishing := rweq_cmpA_refl_left p
 
-@[simp] theorem trivial_primary (p : Path x x) :
+noncomputable def trivial_primary (p : Path x x) :
     (trivial (A := A) (x := x) p).primary = Path.refl x := rfl
 
-@[simp] theorem trivial_correction (p : Path x x) :
+noncomputable def trivial_correction (p : Path x x) :
     (trivial (A := A) (x := x) p).correction = p := rfl
 
 end ObstructionClass
@@ -44,25 +44,25 @@ namespace KodairaSpencerMap
 
 variable {A : Type u} {B : Type u} (κ : KodairaSpencerMap A B)
 
-def mapPath {x y : A} (p : Path x y) :
+noncomputable def mapPath {x y : A} (p : Path x y) :
     Path (κ.toFun x) (κ.toFun y) :=
   Path.congrArg κ.toFun p
 
-@[simp] theorem mapPath_refl (x : A) :
+noncomputable def mapPath_refl (x : A) :
     RwEq (κ.mapPath (Path.refl x)) (Path.refl (κ.toFun x)) := by
   simpa [mapPath] using rweq_congrArg_refl (f := κ.toFun) x
 
-@[simp] theorem mapPath_trans {x y z : A}
+noncomputable def mapPath_trans {x y z : A}
     (p : Path x y) (q : Path y z) :
     RwEq (κ.mapPath (Path.trans p q))
       (Path.trans (κ.mapPath p) (κ.mapPath q)) := by
   simpa [mapPath] using rweq_congrArg_trans (f := κ.toFun) (p := p) (q := q)
 
-@[simp] theorem mapPath_rweq {x y : A} {p q : Path x y}
+noncomputable def mapPath_rweq {x y : A} {p q : Path x y}
     (h : RwEq p q) : RwEq (κ.mapPath p) (κ.mapPath q) := by
   simpa [mapPath] using rweq_congrArg_of_rweq (f := κ.toFun) h
 
-def mapObstruction {x : A} (ob : ObstructionClass A x) :
+noncomputable def mapObstruction {x : A} (ob : ObstructionClass A x) :
     ObstructionClass B (κ.toFun x) where
   primary := κ.mapPath ob.primary
   correction := κ.mapPath ob.correction
@@ -77,7 +77,7 @@ def mapObstruction {x : A} (ob : ObstructionClass A x) :
       κ.mapPath_rweq ob.vanishing
     exact rweq_trans (rweq_symm h₁) h₂
 
-@[simp] theorem mapObstruction_vanishing {x : A} (ob : ObstructionClass A x) :
+noncomputable def mapObstruction_vanishing {x : A} (ob : ObstructionClass A x) :
     RwEq
       (Path.trans (κ.mapObstruction ob).primary (κ.mapObstruction ob).correction)
       (κ.mapObstruction ob).correction :=
@@ -86,20 +86,20 @@ def mapObstruction {x : A} (ob : ObstructionClass A x) :
 end KodairaSpencerMap
 
 /-- Smoothness criterion at `x`: vanishing primary classes have lifts. -/
-def SmoothAt (A : Type u) (x : A) : Prop :=
+noncomputable def SmoothAt (A : Type u) (x : A) : Prop :=
   ∀ ob : ObstructionClass A x, RwEq ob.primary (Path.refl x) →
-    ∃ lift : Path x x, RwEq (Path.trans ob.primary lift) lift
+    ∃ lift : Path x x, RwEqProp (Path.trans ob.primary lift) lift
 
 theorem smoothness_from_primary_vanishing
     {A : Type u} {x : A} (ob : ObstructionClass A x)
     (h : RwEq ob.primary (Path.refl x)) :
-    ∃ lift : Path x x, RwEq (Path.trans ob.primary lift) lift := by
+    ∃ lift : Path x x, RwEqProp (Path.trans ob.primary lift) lift := by
   refine ⟨ob.correction, ?_⟩
-  exact rweq_trans
+  exact rweqProp_of_rweq (rweq_trans
     (rweq_trans_congr_left ob.correction h)
-    (rweq_cmpA_refl_left ob.correction)
+    (rweq_cmpA_refl_left ob.correction))
 
-theorem smooth_at_of_vanishing_primary {A : Type u} {x : A} :
+noncomputable def smooth_at_of_vanishing_primary {A : Type u} {x : A} :
     SmoothAt A x := by
   intro ob h
   exact smoothness_from_primary_vanishing ob h
@@ -107,12 +107,12 @@ theorem smooth_at_of_vanishing_primary {A : Type u} {x : A} :
 theorem smoothness_for_trivial_obstruction
     {A : Type u} {x : A} (p : Path x x) :
     ∃ lift : Path x x,
-      RwEq
+      RwEqProp
         (Path.trans (ObstructionClass.trivial (A := A) (x := x) p).primary lift)
         lift := by
   refine ⟨p, ?_⟩
-  simpa using
-    (ObstructionClass.trivial (A := A) (x := x) p).vanishing
+  exact rweqProp_of_rweq (by simpa using
+    (ObstructionClass.trivial (A := A) (x := x) p).vanishing)
 
 end DeformationTheory
 end CompPaths

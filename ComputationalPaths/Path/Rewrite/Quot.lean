@@ -21,15 +21,31 @@ universe u v w
 section Setoid
 
 /-- Rewrite equality induces a setoid on computational paths. -/
+abbrev rwEqRel (A : Type u) (a b : A) : Path a b → Path a b → Prop :=
+  RwEqProp
+
+instance {A : Type u} {a b : A} {p q : Path a b} :
+    Coe (RwEq p q) (rwEqRel A a b p q) where
+  coe h := rweqProp_of_rweq h
+
+noncomputable instance {A : Type u} {a b : A} {p q : Path a b} :
+    Coe (rwEqRel A a b p q) (RwEq p q) where
+  coe h := rweq_of_rweqProp h
+
+/-- Rewrite equality induces a setoid on computational paths. -/
 def rwEqSetoid (A : Type u) (a b : A) : Setoid (Path a b) where
-  r := RwEq
+  r := rwEqRel A a b
   iseqv :=
-    { refl := fun p => rweq_refl (p := p)
-      symm := fun {_ _} h => rweq_symm h
-      trans := fun {_ _ _} h₁ h₂ => rweq_trans h₁ h₂ }
+    { refl := fun p => rweqProp_of_rweq (rweq_refl (p := p))
+      symm := fun {_ _} h =>
+        match h with
+        | ⟨h'⟩ => rweqProp_of_rweq (rweq_symm h')
+      trans := fun {_ _ _} h₁ h₂ =>
+        match h₁, h₂ with
+        | ⟨h₁'⟩, ⟨h₂'⟩ => rweqProp_of_rweq (rweq_trans h₁' h₂') }
 
 @[simp] theorem rwEqSetoid_r {A : Type u} {a b : A} :
-    (rwEqSetoid A a b).r = RwEq :=
+    (rwEqSetoid A a b).r = rwEqRel A a b :=
   rfl
 
 instance pathRwEqSetoid (A : Type u) (a b : A) :
@@ -38,7 +54,7 @@ instance pathRwEqSetoid (A : Type u) (a b : A) :
 
 /-- Paths modulo rewrite equality, mirroring the paper's notion of canonical proofs. -/
 abbrev PathRwQuot (A : Type u) (a b : A) :=
-  Quot (rwEqSetoid A a b).r
+  Quot (rwEqRel A a b)
 
 end Setoid
 
@@ -58,7 +74,7 @@ def symm {a b : A} :
   Quot.liftOn x (fun p => Quot.mk _ (Path.symm p))
     (by
       intro p q h
-      exact Quot.sound (rweq_symm_congr h))
+      exact Quot.sound (rweqProp_of_rweq (rweq_symm_congr (rweq_of_rweqProp h))))
 
 /-- Composition descends to the quotient. -/
 def trans {a b c : A} :
@@ -69,12 +85,12 @@ def trans {a b c : A} :
         (by
           intro q₁ q₂ hq
           exact Quot.sound
-            (rweq_trans_congr_right p hq)))
+            (rweqProp_of_rweq (rweq_trans_congr_right p (rweq_of_rweqProp hq)))))
       (by
         intro p₁ p₂ hp
         refine Quot.inductionOn y (fun q =>
           Quot.sound
-            (rweq_trans_congr_left q hp)))
+            (rweqProp_of_rweq (rweq_trans_congr_left q (rweq_of_rweqProp hp)))))
 
 /-- Coerce a propositional equality to the path quotient. -/
 @[simp] def ofEq {a b : A} (h : a = b) : PathRwQuot A a b :=
@@ -85,7 +101,7 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
   Quot.lift (fun p : Path a b => p.toEq)
     (by
       intro p q h
-      exact rweq_toEq h)
+      exact rweq_toEq (rweq_of_rweqProp h))
 
 @[simp] theorem toEq_mk {a b : A} (p : Path a b) :
     toEq (A := A) (Quot.mk _ p) = p.toEq := rfl
@@ -119,35 +135,35 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
     (x : PathRwQuot A a b) :
     symm (A := A) (symm x) = x := by
   refine Quot.inductionOn x (fun p => by
-    apply Quot.sound
+    apply (fun h => Quot.sound (rweqProp_of_rweq h))
     exact rweq_of_step (Step.symm_symm (A := A) p))
 
 @[simp] theorem trans_refl_left {a b : A}
     (x : PathRwQuot A a b) :
     trans (A := A) (refl a) x = x := by
   refine Quot.inductionOn x (fun p => by
-    apply Quot.sound
+    apply (fun h => Quot.sound (rweqProp_of_rweq h))
     exact rweq_of_step (Step.trans_refl_left (A := A) p))
 
 @[simp] theorem trans_refl_right {a b : A}
     (x : PathRwQuot A a b) :
     trans (A := A) x (refl b) = x := by
   refine Quot.inductionOn x (fun p => by
-    apply Quot.sound
+    apply (fun h => Quot.sound (rweqProp_of_rweq h))
     exact rweq_of_step (Step.trans_refl_right (A := A) p))
 
 @[simp] theorem trans_symm {a b : A}
     (x : PathRwQuot A a b) :
     trans (A := A) x (symm x) = refl a := by
   refine Quot.inductionOn x (fun p => by
-    apply Quot.sound
+    apply (fun h => Quot.sound (rweqProp_of_rweq h))
     exact rweq_of_step (Step.trans_symm (A := A) p))
 
 @[simp] theorem symm_trans {a b : A}
     (x : PathRwQuot A a b) :
     trans (A := A) (symm x) x = refl b := by
   refine Quot.inductionOn x (fun p => by
-    apply Quot.sound
+    apply (fun h => Quot.sound (rweqProp_of_rweq h))
     exact rweq_of_step (Step.symm_trans (A := A) p))
 
 @[simp] theorem trans_assoc {a b c d : A}
@@ -159,7 +175,7 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
   refine Quot.inductionOn x (fun p =>
     Quot.inductionOn y (fun q =>
       Quot.inductionOn z (fun r => by
-        apply Quot.sound
+        apply (fun h => Quot.sound (rweqProp_of_rweq h))
         exact rweq_of_step
           (Step.trans_assoc (A := A) (p := p) (q := q) (r := r)))))
 
@@ -253,7 +269,7 @@ def congrArg (A : Type u) (B : Type u) (f : A → B) {a a' : A}
     (x : PathRwQuot A a a') : PathRwQuot B (f a) (f a') :=
   Quot.lift
     (fun p => Quot.mk _ (Path.congrArg f p))
-    (fun _ _ h => Quot.sound (rweq_congrArg_of_rweq f h))
+    (fun _ _ h => Quot.sound (rweqProp_of_rweq (rweq_congrArg_of_rweq f (rweq_of_rweqProp h))))
     x
 
 @[simp] theorem congrArg_mk (A : Type u) (B : Type u) (f : A → B) {a a' : A}
@@ -274,7 +290,7 @@ def congrArg (A : Type u) (B : Type u) (f : A → B) {a a' : A}
     | _ q =>
       change Quot.mk _ (Path.congrArg f (Path.trans p q)) =
         Quot.mk _ (Path.trans (Path.congrArg f p) (Path.congrArg f q))
-      apply Quot.sound
+      apply (fun h => Quot.sound (rweqProp_of_rweq h))
       exact rweq_of_eq (Path.congrArg_trans f p q)
 
 @[simp] theorem congrArg_symm (A : Type u) (B : Type u) (f : A → B) {a b : A}
@@ -284,7 +300,7 @@ def congrArg (A : Type u) (B : Type u) (f : A → B) {a a' : A}
   | _ p =>
     change Quot.mk _ (Path.congrArg f (Path.symm p)) =
       Quot.mk _ (Path.symm (Path.congrArg f p))
-    apply Quot.sound
+    apply (fun h => Quot.sound (rweqProp_of_rweq h))
     exact rweq_of_eq (Path.congrArg_symm f p)
 
 /-- Identity function preserves paths. -/
@@ -293,7 +309,7 @@ def congrArg (A : Type u) (B : Type u) (f : A → B) {a a' : A}
   induction x using Quot.ind with
   | _ p =>
     change Quot.mk _ (Path.congrArg id p) = Quot.mk _ p
-    apply Quot.sound
+    apply (fun h => Quot.sound (rweqProp_of_rweq h))
     exact rweq_of_eq (Path.congrArg_id p)
 
 /-- Composition of functions composes on paths. -/
@@ -304,7 +320,7 @@ def congrArg (A : Type u) (B : Type u) (f : A → B) {a a' : A}
   | _ p =>
     change Quot.mk _ (Path.congrArg g (Path.congrArg f p)) =
       Quot.mk _ (Path.congrArg (g ∘ f) p)
-    apply Quot.sound
+    apply (fun h => Quot.sound (rweqProp_of_rweq h))
     exact rweq_symm (rweq_of_eq (Path.congrArg_comp g f p))
 
 end PathRwQuot
@@ -318,7 +334,7 @@ namespace PathRwQuot
           (Path.congrArg Sum.inl p)) :
         PathRwQuot A (f a1) (f a2)) =
       Quot.mk _ (Path.congrArg f p) := by
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_sum_rec_inl_beta (α := α) (β := β) (A := A)
     (f := f) (g := g) (p := p)
 
@@ -329,7 +345,7 @@ namespace PathRwQuot
           (Path.congrArg Sum.inr p)) :
         PathRwQuot A (g b1) (g b2)) =
       Quot.mk _ (Path.congrArg g p) := by
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_sum_rec_inr_beta (α := α) (β := β) (A := A)
     (f := f) (g := g) (p := p)
 
@@ -339,7 +355,7 @@ namespace PathRwQuot
     (Quot.mk _ (Path.prodMk (Path.fst p) (Path.snd p)) :
         PathRwQuot (Prod α β) (a₁, b₁) (a₂, b₂))
       = Quot.mk _ p := by
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_prod_eta (α := α) (β := β) (p := p)
 
 @[simp] theorem fst_prodMk {α β : Type u}
@@ -348,7 +364,7 @@ namespace PathRwQuot
     (Quot.mk _ (Path.fst (Path.prodMk p q)) :
         PathRwQuot α a₁ a₂) =
       Quot.mk _ p := by
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_fst_prodMk (α := α) (β := β) (p := p) (q := q)
 
 @[simp] theorem snd_prodMk {α β : Type u}
@@ -357,7 +373,7 @@ namespace PathRwQuot
     (Quot.mk _ (Path.snd (Path.prodMk p q)) :
         PathRwQuot β b₁ b₂) =
       Quot.mk _ q := by
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_snd_prodMk (α := α) (β := β) (p := p) (q := q)
 
 @[simp] theorem congrArg_prod_map {α β α' β' : Type u}
@@ -367,7 +383,7 @@ namespace PathRwQuot
     (Quot.mk _ (Path.congrArg (fun x : α × β => (g x.1, h x.2)) (Path.prodMk p q)) :
         PathRwQuot (α' × β') (g a₁, h b₁) (g a₂, h b₂)) =
       Quot.mk _ (Path.prodMk (Path.congrArg g p) (Path.congrArg h q)) := by
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_congrArg_prod_map (α := α) (β := β) (α' := α') (β' := β') (g := g) (h := h) (p := p) (q := q)
 
 @[simp] theorem sigma_eta {A : Type u} {B : A → Type u}
@@ -376,7 +392,7 @@ namespace PathRwQuot
     (Quot.mk _ (Path.sigmaMk (Path.sigmaFst p) (Path.sigmaSnd p)) :
         PathRwQuot (Sigma B) ⟨a1, b1⟩ ⟨a2, b2⟩) =
       Quot.mk _ p := by
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_sigma_eta (A := A) (B := B) (p := p)
 
 @[simp] theorem sigma_refl_ofEq {A : Type u} {B : A → Type u}
@@ -386,7 +402,7 @@ namespace PathRwQuot
           (Path.stepChain (A := B a) (a := b) (b := b) rfl)) :
         PathRwQuot (Sigma B) (Sigma.mk a b) (Sigma.mk a b)) =
       PathRwQuot.refl (A := Sigma B) (Sigma.mk a b) := by
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact
     rweq_sigmaMk_refl (A := A) (B := B) (a := a) (b := b)
 
@@ -394,7 +410,7 @@ namespace PathRwQuot
     {f g : α → β} (p : Path f g) :
     (Quot.mk _ (Path.lamCongr (fun x => Path.app p x)) :
         PathRwQuot (α → β) f g) = Quot.mk _ p := by
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_fun_eta (α := α) (β := β) (p := p)
 
 end PathRwQuot
@@ -412,7 +428,8 @@ variable (C : Context A B)
     (by
       intro p q h
       exact Quot.sound
-        (rweq_context_map_of_rweq (A := A) (B := B) (Ctx := C) h))
+        (rweqProp_of_rweq
+          (rweq_context_map_of_rweq (A := A) (B := B) (Ctx := C) (rweq_of_rweqProp h))))
 
 variable {C}
 
@@ -435,7 +452,7 @@ variable {C}
   change
     Quot.mk _ (Context.map (A := A) (B := B) C (Path.refl a)) =
       Quot.mk _ (Path.refl (C.fill a))
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact
     (rweq_of_eq
       (Context.map_refl (A := A) (B := B) (C := C) (a := a)))
@@ -448,7 +465,7 @@ variable {C}
   refine Quot.inductionOn x (fun p => ?_)
   change Quot.mk _ (Context.map (A := A) (B := B) C (Path.symm p)) =
     Quot.mk _ (Path.symm (Context.map (A := A) (B := B) C p))
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact
     (rweq_of_eq
       (Context.map_symm (A := A) (B := B) (C := C) (p := p)))
@@ -467,7 +484,7 @@ variable {C}
         (Path.stepChain (A := B)
           (a := C.fill a) (b := C.fill b)
           (_root_.congrArg C.fill h))
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact
     (rweq_of_eq
       (Context.map_ofEq (A := A) (B := B) (C := C) (h := h)))
@@ -485,7 +502,7 @@ variable {C}
       (Path.trans
         (Context.map (A := A) (B := B) C p)
         (Context.map (A := A) (B := B) C q))
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact
     (rweq_of_eq
       (Context.map_trans (A := A) (B := B) (C := C) (p := p) (q := q)))
@@ -524,7 +541,7 @@ variable {C}
   change
     Quot.mk _ (DepContext.map (A := A) (B := B) C (Path.refl a)) =
       Quot.mk _ (Path.refl (C.fill a))
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact
     (rweq_of_eq
       (DepContext.map_refl (A := A) (B := B) (C := C) (a := a)))
@@ -549,9 +566,9 @@ variable (K : BiContext A B C)
     (by
       intro p q h
       exact Quot.sound
-        (rweq_biContext_mapLeft_of_rweq
+        (rweqProp_of_rweq (rweq_biContext_mapLeft_of_rweq
           (A := A) (B := B) (C := C) (K := K) (b := b)
-          (p := p) (q := q) h))
+          (p := p) (q := q) (rweq_of_rweqProp h))))
 
 /-- Lift substitution along the right hole of a binary context to the quotient level. -/
 @[simp] def mapRightQuot {b₁ b₂ : B} (a : A) :
@@ -564,9 +581,9 @@ variable (K : BiContext A B C)
     (by
       intro p q h
       exact Quot.sound
-        (rweq_biContext_mapRight_of_rweq
+        (rweqProp_of_rweq (rweq_biContext_mapRight_of_rweq
           (A := A) (B := B) (C := C) (K := K) (a := a)
-          (p := p) (q := q) h))
+          (p := p) (q := q) (rweq_of_rweqProp h))))
 
 /-- Simultaneously substitute along both holes of a binary context in the quotient. -/
 @[simp] def map2Quot {a₁ a₂ : A} {b₁ b₂ : B}
@@ -612,7 +629,7 @@ variable {K}
       PathRwQuot.refl (A := C) (K.fill a b) := by
   change Quot.mk _
       (BiContext.mapLeft (A := A) (B := B) (C := C) K (Path.refl a) b) = _
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   have hmap :
       BiContext.mapLeft (A := A) (B := B) (C := C) K (Path.refl a) b =
         Path.refl (K.fill a b) := by
@@ -625,7 +642,7 @@ variable {K}
       PathRwQuot.refl (A := C) (K.fill a b) := by
   change Quot.mk _
       (BiContext.mapRight (A := A) (B := B) (C := C) K a (Path.refl b)) = _
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   have hmap :
       BiContext.mapRight (A := A) (B := B) (C := C) K a (Path.refl b) =
         Path.refl (K.fill a b) := by
@@ -641,7 +658,7 @@ variable {K}
   refine Quot.inductionOn x (fun p => ?_)
   change Quot.mk _ (BiContext.mapLeft (A := A) (B := B) (C := C) K (Path.symm p) b) =
     Quot.mk _ (Path.symm (BiContext.mapLeft (A := A) (B := B) (C := C) K p b))
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact
     (rweq_of_eq
       (BiContext.mapLeft_symm (A := A) (B := B) (C := C) (K := K)
@@ -656,7 +673,7 @@ variable {K}
   refine Quot.inductionOn x (fun p => ?_)
   change Quot.mk _ (BiContext.mapRight (A := A) (B := B) (C := C) K a (Path.symm p)) =
     Quot.mk _ (Path.symm (BiContext.mapRight (A := A) (B := B) (C := C) K a p))
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact
     (rweq_of_eq
       (BiContext.mapRight_symm (A := A) (B := B) (C := C) (K := K)
@@ -671,7 +688,7 @@ variable {K}
   change Quot.mk _
       (BiContext.mapLeft (A := A) (B := B) (C := C) K
         (Path.stepChain (A := A) (a := a₁) (b := a₂) h) b) = _
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_of_eq
     (by
       simpa [BiContext.mapLeft, BiContext.fixRight]
@@ -689,7 +706,7 @@ variable {K}
   change Quot.mk _
       (BiContext.mapRight (A := A) (B := B) (C := C) K a
         (Path.stepChain (A := B) (a := b₁) (b := b₂) h)) = _
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_of_eq
     (by
       simpa [BiContext.mapRight, BiContext.fixLeft]
@@ -707,7 +724,7 @@ variable {K}
         (mapLeftQuot (A := A) (B := B) (C := C) (K := K) b y) := by
   refine Quot.inductionOn x (fun p =>
     Quot.inductionOn y (fun q => ?_))
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_of_eq
     (BiContext.mapLeft_trans (A := A) (B := B) (C := C) (K := K)
       (p := p) (q := q) (b := b))
@@ -721,7 +738,7 @@ variable {K}
         (mapRightQuot (A := A) (B := B) (C := C) (K := K) a y) := by
   refine Quot.inductionOn x (fun p =>
     Quot.inductionOn y (fun q => ?_))
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   exact rweq_of_eq
     (BiContext.mapRight_trans (A := A) (B := B) (C := C) (K := K)
       (a := a) (p := p) (q := q))
@@ -801,7 +818,7 @@ variable (K : DepBiContext A B C)
         (PathRwQuot.normalPath (A := A) (x := x))
         (PathRwQuot.normalPath (A := B) (x := y))).toEq := rfl
 
-@[simp] theorem map2_rweq_left
+noncomputable def map2_rweq_left
     {a₁ a₂ : A} {b₁ b₂ : B}
     {p q : Path a₁ a₂} (r : Path b₁ b₂) (h : RwEq p q) :
     RwEq (DepBiContext.map2 (A := A) (B := B) (C := C) K p r)
@@ -815,7 +832,7 @@ variable (K : DepBiContext A B C)
   | symm _ ih => exact RwEq.symm ih
   | trans _ _ ih₁ ih₂ => exact RwEq.trans ih₁ ih₂
 
-@[simp] theorem map2_rweq_right
+noncomputable def map2_rweq_right
     {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) {q r : Path b₁ b₂} (h : RwEq q r) :
     RwEq (DepBiContext.map2 (A := A) (B := B) (C := C) K p q)
@@ -835,7 +852,7 @@ variable (K : DepBiContext A B C)
       PathRwQuot.refl (A := C a b) (K.fill a b) := by
   change Quot.mk _
       (DepBiContext.mapLeft (A := A) (B := B) (C := C) K (Path.refl a) b) = _
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   have hmap :
       DepBiContext.mapLeft (A := A) (B := B) (C := C) K (Path.refl a) b =
         Path.refl (K.fill a b) := by
@@ -854,7 +871,7 @@ variable (K : DepBiContext A B C)
       PathRwQuot.refl (A := C a b) (K.fill a b) := by
   change Quot.mk _
       (DepBiContext.mapRight (A := A) (B := B) (C := C) K a (Path.refl b)) = _
-  apply Quot.sound
+  apply (fun h => Quot.sound (rweqProp_of_rweq h))
   have hmap :
       DepBiContext.mapRight (A := A) (B := B) (C := C) K a (Path.refl b) =
         Path.refl (K.fill a b) := by

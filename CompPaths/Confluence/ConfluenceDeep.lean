@@ -18,24 +18,24 @@ namespace RTC
 
 variable {α : Type u} {R : α → α → Prop}
 
-theorem single {a b : α} (h : R a b) : RTC R a b :=
+noncomputable def single {a b : α} (h : R a b) : RTC R a b :=
   RTC.step h (RTC.refl b)
 
-theorem trans {a b c : α} (h₁ : RTC R a b) (h₂ : RTC R b c) : RTC R a c := by
+noncomputable def trans {a b c : α} (h₁ : RTC R a b) (h₂ : RTC R b c) : RTC R a c := by
   induction h₁ with
   | refl _ =>
       exact h₂
   | step hab hbc ih =>
       exact RTC.step hab (ih h₂)
 
-theorem snoc {a b c : α} (h₁ : RTC R a b) (h₂ : R b c) : RTC R a c := by
+noncomputable def snoc {a b c : α} (h₁ : RTC R a b) (h₂ : R b c) : RTC R a c := by
   induction h₁ with
   | refl _ =>
       exact RTC.step h₂ (RTC.refl c)
   | step hab hbc ih =>
       exact RTC.step hab (ih h₂)
 
-theorem cases_head {a b : α} (h : RTC R a b) :
+noncomputable def cases_head {a b : α} (h : RTC R a b) :
     a = b ∨ ∃ c, R a c ∧ RTC R c b := by
   cases h with
   | refl _ =>
@@ -56,7 +56,7 @@ def Confluent {α : Type u} (R : α → α → Prop) : Prop :=
 def Diamond {α : Type u} (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
 
-theorem newman_lemma {α : Type u} {R : α → α → Prop}
+noncomputable def newman_lemma {α : Type u} {R : α → α → Prop}
     (wf : WellFounded (fun y x => R x y))
     (hLocal : LocallyConfluent R) :
     Confluent R := by
@@ -73,7 +73,7 @@ theorem newman_lemma {α : Type u} {R : α → α → Prop}
           obtain ⟨d₂, hcd₂, hd₁d₂⟩ := ih a₂ ha₂ c d₁ h₂c (RTC.trans h₂d₀ hd₀d₁)
           exact ⟨d₂, RTC.trans hbd₁ hd₁d₂, hcd₂⟩
 
-theorem diamond_lemma_terminating {α : Type u} {R : α → α → Prop}
+noncomputable def diamond_lemma_terminating {α : Type u} {R : α → α → Prop}
     (wf : WellFounded (fun y x => R x y))
     (hDiamond : Diamond R) :
     Confluent R := by
@@ -91,7 +91,7 @@ variable {A : Type u} {a b : A}
 
 abbrev StepRel : Path a b → Path a b → Prop := fun p q => Step p q
 
-theorem rtc_of_rw {p q : Path a b} (h : Rw p q) :
+noncomputable def rtc_of_rw {p q : Path a b} (h : Rw p q) :
     RTC (StepRel (A := A) (a := a) (b := b)) p q := by
   induction h with
   | refl =>
@@ -99,7 +99,7 @@ theorem rtc_of_rw {p q : Path a b} (h : Rw p q) :
   | tail h₁ h₂ ih =>
       exact RTC.snoc ih h₂
 
-theorem rw_of_rtc {p q : Path a b}
+noncomputable def rw_of_rtc {p q : Path a b}
     (h : RTC (StepRel (A := A) (a := a) (b := b)) p q) :
     Rw p q := by
   induction h with
@@ -194,7 +194,7 @@ def CoreCriticalPair.Joinable : CoreCriticalPair (A := A) → Prop
       Step.Joinable (Path.trans (Path.symm r) (Path.symm (Path.trans p q)))
         (Path.symm (Path.trans p (Path.trans q r)))
 
-theorem critical_pair_resolves :
+noncomputable def critical_pair_resolves :
     ∀ cp : CoreCriticalPair (A := A), CoreCriticalPair.Joinable cp := by
   intro cp
   cases cp with

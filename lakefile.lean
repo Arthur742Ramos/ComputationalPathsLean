@@ -14,8 +14,6 @@ lean_lib ComputationalPaths where
 lean_lib CompPaths where
   roots := #[`CompPaths,
     `CompPaths.Confluence.ConfluenceDeep,
-    `CompPaths.Confluence.WordProblem,
-    `CompPaths.Rewriting.KnuthBendix,
     `CompPaths.Coherence.AssociativityCoherence,
     `CompPaths.Coherence.UnitCoherence,
     `CompPaths.Coherence.InverseCoherence,
@@ -24,7 +22,6 @@ lean_lib CompPaths where
     `CompPaths.DeformationTheory.ObstructionPaths,
     `CompPaths.OmegaGroupoid.WeakGroupoidPaths,
     `CompPaths.OmegaGroupoid.CoherencePaths,
-    `CompPaths.OmegaGroupoid.HigherCellPaths,
     `CompPaths.Examples.FundamentalGroupCircle,
     `CompPaths.Examples.FundamentalGroupTorus]
 

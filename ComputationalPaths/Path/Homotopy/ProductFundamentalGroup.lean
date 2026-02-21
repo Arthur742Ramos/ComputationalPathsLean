@@ -59,10 +59,10 @@ theorem Path.prod_fst_snd {a a' : A} {b b' : B}
   simp
 
 /-- Round-trip at the `RwEq` level: recombining projections yields the original path. -/
-theorem Path.prod_fst_snd_rweq {a a' : A} {b b' : B}
+noncomputable def Path.prod_fst_snd_rweq {a a' : A} {b b' : B}
     (p : Path (a, b) (a', b')) :
-    RwEq (Path.prod (Path.fst p) (Path.snd p)) p := by
-  simpa [Path.prod] using (rweq_prod_eta (α := A) (β := B) (p := p))
+    RwEq (Path.prod (Path.fst p) (Path.snd p)) p :=
+  by simpa [Path.prod] using (rweq_prod_eta (α := A) (β := B) (p := p))
 
 end ProductPaths
 
@@ -84,18 +84,18 @@ noncomputable def prodDecodePath :
   fun ⟨p, q⟩ => Path.prod p q
 
 /-- `prodDecodePath` respects `RwEq` componentwise. -/
-theorem prodDecodePath_respects_rweq {p₁ p₂ : Path a a} {q₁ q₂ : Path b b}
+noncomputable def prodDecodePath_respects_rweq {p₁ p₂ : Path a a} {q₁ q₂ : Path b b}
     (hp : RwEq p₁ p₂) (hq : RwEq q₁ q₂) :
     RwEq (prodDecodePath a b (p₁, q₁)) (prodDecodePath a b (p₂, q₂)) := by
   simpa [prodDecodePath, Path.prod] using
     (rweq_map2_of_rweq (f := Prod.mk) (hp := hp) (hq := hq))
 
 /-- Projections preserve `RwEq` on product paths. -/
-theorem prodEncode_respects_rweq {p q : Path (a, b) (a, b)} (h : RwEq p q) :
-    RwEq (Path.fst p) (Path.fst q) ∧ RwEq (Path.snd p) (Path.snd q) := by
-  constructor
-  · simpa [Path.fst] using (rweq_congrArg_of_rweq (A := A × B) (f := Prod.fst) h)
-  · simpa [Path.snd] using (rweq_congrArg_of_rweq (A := A × B) (f := Prod.snd) h)
+noncomputable def prodEncode_respects_rweq {p q : Path (a, b) (a, b)} (h : RwEq p q) :
+    RwEq (Path.fst p) (Path.fst q) × RwEq (Path.snd p) (Path.snd q) := by
+  exact
+    ( by simpa [Path.fst] using (rweq_congrArg_of_rweq (A := A × B) (f := Prod.fst) h),
+      by simpa [Path.snd] using (rweq_congrArg_of_rweq (A := A × B) (f := Prod.snd) h) )
 
 /-! ### Quotient-Level Maps -/
 
@@ -104,9 +104,9 @@ noncomputable def prodPiOneEncode :
     π₁(A × B, (a, b)) → π₁(A, a) × π₁(B, b) :=
   Quot.lift
     (fun p => (Quot.mk _ (Path.fst p), Quot.mk _ (Path.snd p)))
-    (fun _ _ h =>
-      let ⟨hfst, hsnd⟩ := prodEncode_respects_rweq (A := A) (B := B) a b h
-      Prod.ext (Quot.sound hfst) (Quot.sound hsnd))
+    (fun _ _ h => by
+      have ⟨hfst, hsnd⟩ := prodEncode_respects_rweq (A := A) (B := B) a b (rweq_of_rweqProp h)
+      exact Prod.ext (Quot.sound (rweqProp_of_rweq hfst)) (Quot.sound (rweqProp_of_rweq hsnd)))
 
 /-- Decode at the quotient level: π₁(A) × π₁(B) → π₁(A × B). -/
 noncomputable def prodPiOneDecode :
@@ -115,12 +115,12 @@ noncomputable def prodPiOneDecode :
     Quot.lift (fun p =>
       Quot.lift (fun q => Quot.mk _ (Path.prod p q))
         (fun q₁ q₂ hq =>
-          Quot.sound (prodDecodePath_respects_rweq (A := A) (B := B) a b (hp := RwEq.refl p) hq))
+          Quot.sound (rweqProp_of_rweq (prodDecodePath_respects_rweq (A := A) (B := B) a b (hp := RwEq.refl p) (hq := rweq_of_rweqProp hq))))
         β)
       (fun p₁ p₂ hp => by
         induction β using Quot.ind with
         | _ q =>
-            exact Quot.sound (prodDecodePath_respects_rweq (A := A) (B := B) a b (hp := hp) (hq := RwEq.refl q)))
+            exact Quot.sound (rweqProp_of_rweq (prodDecodePath_respects_rweq (A := A) (B := B) a b (hp := rweq_of_rweqProp hp) (hq := RwEq.refl q))))
       α
 
 /-! ### Round-Trips -/
@@ -136,9 +136,11 @@ theorem prodPiOne_encode_decode (x : π₁(A, a) × π₁(B, b)) :
       simp only [prodPiOneDecode, prodPiOneEncode]
       refine Prod.ext ?_ ?_
       · apply Quot.sound
-        simpa [Path.prod] using (rweq_fst_prodMk (α := A) (β := B) (p := p) (q := q))
+        exact rweqProp_of_rweq
+          (by simpa [Path.prod] using (rweq_fst_prodMk (α := A) (β := B) (p := p) (q := q)))
       · apply Quot.sound
-        simpa [Path.prod] using (rweq_snd_prodMk (α := A) (β := B) (p := p) (q := q))
+        exact rweqProp_of_rweq
+          (by simpa [Path.prod] using (rweq_snd_prodMk (α := A) (β := B) (p := p) (q := q)))
 
 /-- Round-trip: decode ∘ encode = id. -/
 theorem prodPiOne_decode_encode (γ : π₁(A × B, (a, b))) :
@@ -146,7 +148,7 @@ theorem prodPiOne_decode_encode (γ : π₁(A × B, (a, b))) :
   induction γ using Quot.ind with
   | _ p =>
     simp only [prodPiOneEncode, prodPiOneDecode]
-    exact Quot.sound (Path.prod_fst_snd_rweq (A := A) (B := B) (p := p))
+    exact Quot.sound (rweqProp_of_rweq (Path.prod_fst_snd_rweq (A := A) (B := B) (p := p)))
 
 /-! ## Main Theorem -/
 

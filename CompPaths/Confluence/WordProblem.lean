@@ -27,7 +27,7 @@ def inv : Letter → Letter
   | .pos n => .neg n
   | .neg n => .pos n
 
-@[simp] theorem inv_inv (g : Letter) : inv (inv g) = g := by
+noncomputable def inv_inv (g : Letter) : inv (inv g) = g := by
   cases g <;> rfl
 
 end Letter
@@ -43,7 +43,7 @@ def push (g : Letter) : List Letter → List Letter
   | [] => [g]
   | h :: t => if Letter.inv g = h then t else g :: h :: t
 
-theorem push_length_le (g : Letter) (w : List Letter) :
+noncomputable def push_length_le (g : Letter) (w : List Letter) :
     (push g w).length ≤ w.length + 1 := by
   cases w with
   | nil =>
@@ -53,7 +53,7 @@ theorem push_length_le (g : Letter) (w : List Letter) :
       · simp [push, hc]; omega
       · simp [push, hc]
 
-theorem push_preserves_normal (g : Letter) :
+noncomputable def push_preserves_normal (g : Letter) :
     ∀ {w : List Letter}, Normal w → Normal (push g w)
   | [], _ => by
       simp [push, Normal]
@@ -74,13 +74,13 @@ def reduceWord : List Letter → List Letter
   | [] => []
   | g :: w => push g (reduceWord w)
 
-theorem reduceWord_normal : ∀ w : List Letter, Normal (reduceWord w)
+noncomputable def reduceWord_normal : ∀ w : List Letter, Normal (reduceWord w)
   | [] => by
       simp [reduceWord, Normal]
   | g :: w => by
       exact push_preserves_normal g (reduceWord_normal w)
 
-theorem reduceWord_length_le : ∀ w : List Letter, (reduceWord w).length ≤ w.length
+noncomputable def reduceWord_length_le : ∀ w : List Letter, (reduceWord w).length ≤ w.length
   | [] => by
       simp [reduceWord]
   | g :: w => by
@@ -93,7 +93,7 @@ theorem reduceWord_length_le : ∀ w : List Letter, (reduceWord w).length ≤ w.
         _ = (g :: w).length := by
               simp
 
-theorem reduceWord_measure_drop (g : Letter) (w : List Letter) :
+noncomputable def reduceWord_measure_drop (g : Letter) (w : List Letter) :
     (reduceWord w).length < (g :: w).length := by
   exact Nat.lt_succ_of_le (reduceWord_length_le w)
 
@@ -128,7 +128,7 @@ def normalizeWith : ReductionStrategy → Expr → List Letter
 def normalForm (p : Expr) : List Letter :=
   normalizeWith .outermost p
 
-theorem normalizeInnermost_normal (p : Expr) : Normal (normalizeInnermost p) := by
+noncomputable def normalizeInnermost_normal (p : Expr) : Normal (normalizeInnermost p) := by
   induction p with
   | atom n =>
       simp [normalizeInnermost, Normal]
@@ -141,10 +141,10 @@ theorem normalizeInnermost_normal (p : Expr) : Normal (normalizeInnermost p) := 
       simpa [normalizeInnermost] using
         (reduceWord_normal (normalizeInnermost p ++ normalizeInnermost q))
 
-theorem normalizeOutermost_normal (p : Expr) : Normal (normalizeOutermost p) := by
+noncomputable def normalizeOutermost_normal (p : Expr) : Normal (normalizeOutermost p) := by
   simpa [normalizeOutermost] using reduceWord_normal (rawWord p)
 
-theorem normalizeWith_normal (s : ReductionStrategy) (p : Expr) :
+noncomputable def normalizeWith_normal (s : ReductionStrategy) (p : Expr) :
     Normal (normalizeWith s p) := by
   cases s with
   | innermost => simpa [normalizeWith] using normalizeInnermost_normal p
@@ -161,7 +161,7 @@ instance groupoidRwEq_decidable (p q : Expr) : Decidable (GroupoidRwEq p q) := b
 def decideGroupoidRwEq (p q : Expr) : Bool :=
   decide (GroupoidRwEq p q)
 
-theorem decideGroupoidRwEq_spec (p q : Expr) :
+noncomputable def decideGroupoidRwEq_spec (p q : Expr) :
     decideGroupoidRwEq p q = true ↔ GroupoidRwEq p q := by
   simp [decideGroupoidRwEq]
 
@@ -172,23 +172,23 @@ def exprComplexity : Expr → Nat
   | .symm p => exprComplexity p + 1
   | .trans p q => exprComplexity p + exprComplexity q + 1
 
-theorem exprComplexity_symm_lt (p : Expr) :
+noncomputable def exprComplexity_symm_lt (p : Expr) :
     exprComplexity p < exprComplexity (.symm p) := by
   simp [exprComplexity]
 
-theorem exprComplexity_trans_left_lt (p q : Expr) :
+noncomputable def exprComplexity_trans_left_lt (p q : Expr) :
     exprComplexity p < exprComplexity (.trans p q) := by
   simp [exprComplexity]; omega
 
-theorem exprComplexity_trans_right_lt (p q : Expr) :
+noncomputable def exprComplexity_trans_right_lt (p q : Expr) :
     exprComplexity q < exprComplexity (.trans p q) := by
   simp [exprComplexity]; omega
 
-theorem normalization_word_wf :
+noncomputable def normalization_word_wf :
     WellFounded (fun w₁ w₂ : List Letter => w₁.length < w₂.length) :=
   InvImage.wf List.length Nat.lt_wfRel.wf
 
-theorem normalization_expr_wf :
+noncomputable def normalization_expr_wf :
     WellFounded (fun p q : Expr => exprComplexity p < exprComplexity q) :=
   InvImage.wf exprComplexity Nat.lt_wfRel.wf
 

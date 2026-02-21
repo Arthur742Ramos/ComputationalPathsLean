@@ -19,20 +19,20 @@ namespace FormalDeformation
 variable {A : Type u}
 
 /-- The first-order step induced by a deformation witness. -/
-def infinitesimalStep (D : FormalDeformation A) (a : A) : Step A :=
+noncomputable def infinitesimalStep (D : FormalDeformation A) (a : A) : Step A :=
   Step.mk (D.base a) (D.deform a) (D.witness a).proof
 
-@[simp] theorem infinitesimalStep_src (D : FormalDeformation A) (a : A) :
+noncomputable def infinitesimalStep_src (D : FormalDeformation A) (a : A) :
     (D.infinitesimalStep a).src = D.base a := rfl
 
-@[simp] theorem infinitesimalStep_tgt (D : FormalDeformation A) (a : A) :
+noncomputable def infinitesimalStep_tgt (D : FormalDeformation A) (a : A) :
     (D.infinitesimalStep a).tgt = D.deform a := rfl
 
-def pushForward (D : FormalDeformation A) {a b : A} (p : Path a b) :
+noncomputable def pushForward (D : FormalDeformation A) {a b : A} (p : Path a b) :
     Path (D.base a) (D.deform b) :=
   trans (D.witness a) (congrArg D.deform p)
 
-def pullForward (D : FormalDeformation A) {a b : A} (p : Path a b) :
+noncomputable def pullForward (D : FormalDeformation A) {a b : A} (p : Path a b) :
     Path (D.base a) (D.deform b) :=
   trans (congrArg D.base p) (D.witness b)
 
@@ -49,7 +49,7 @@ namespace MaurerCartanPath
 
 variable {A : Type u}
 
-def trivial (a : A) : MaurerCartanPath a where
+noncomputable def trivial (a : A) : MaurerCartanPath a where
   omega := Path.refl a
   dOmega := Path.refl a
   bracket := Path.refl a
@@ -73,14 +73,14 @@ structure DeformationFunctor (A : Type u) (B : Type v) where
 
 namespace DeformationFunctor
 
-def id (A : Type u) : DeformationFunctor A A where
+noncomputable def id (A : Type u) : DeformationFunctor A A where
   obj := fun a => a
   mapPath := fun p => p
   map_rweq := fun h => h
   map_trans := fun _ _ => rweq_refl _
   map_symm := fun _ => rweq_refl _
 
-def comp {A : Type u} {B : Type v} {C : Type w}
+noncomputable def comp {A : Type u} {B : Type v} {C : Type w}
     (F : DeformationFunctor A B) (G : DeformationFunctor B C) :
     DeformationFunctor A C where
   obj := fun a => G.obj (F.obj a)
@@ -95,7 +95,7 @@ def comp {A : Type u} {B : Type v} {C : Type w}
       (G.map_rweq (F.map_symm p))
       (G.map_symm (F.mapPath p))
 
-def mapMaurerCartan {A : Type u} {B : Type v}
+noncomputable def mapMaurerCartan {A : Type u} {B : Type v}
     (F : DeformationFunctor A B) {a : A} (mc : MaurerCartanPath a) :
     MaurerCartanPath (F.obj a) where
   omega := F.mapPath mc.omega

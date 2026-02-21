@@ -4,7 +4,7 @@ namespace CompPaths.OmegaGroupoid
 
 universe u
 
-theorem pentagon_identity {A : Type u} {a b c d e : A}
+noncomputable def pentagon_identity {A : Type u} {a b c d e : A}
     (p : ComputationalPaths.Path a b) (q : ComputationalPaths.Path b c)
     (r : ComputationalPaths.Path c d) (s : ComputationalPaths.Path d e) :
     Eq.trans
@@ -19,7 +19,7 @@ theorem pentagon_identity {A : Type u} {a b c d e : A}
             (ComputationalPaths.Path.trans_assoc q r s))) := by
   simpa using ComputationalPaths.Path.trans_assoc_pentagon (p := p) (q := q) (r := r) (s := s)
 
-theorem triangle_identity {A : Type u} {a b c : A}
+noncomputable def triangle_identity {A : Type u} {a b c : A}
     (p : ComputationalPaths.Path a b) (q : ComputationalPaths.Path b c) :
     Eq.trans
       (ComputationalPaths.Path.trans_assoc p (ComputationalPaths.Path.refl b) q)
@@ -29,7 +29,7 @@ theorem triangle_identity {A : Type u} {a b c : A}
         (ComputationalPaths.Path.trans_refl_right p) := by
   apply Subsingleton.elim
 
-theorem mac_lane_coherence_paths {A : Type u} {a b c d e : A}
+noncomputable def mac_lane_coherence_paths {A : Type u} {a b c d e : A}
     (p : ComputationalPaths.Path a b) (q : ComputationalPaths.Path b c)
     (r : ComputationalPaths.Path c d) (s : ComputationalPaths.Path d e)
     (h₁ h₂ :
@@ -40,7 +40,7 @@ theorem mac_lane_coherence_paths {A : Type u} {a b c d e : A}
     h₁ = h₂ := by
   exact ComputationalPaths.Path.mac_lane_coherence p q r s h₁ h₂
 
-theorem eckmann_hilton_two_cells {A : Type u} {a b : A}
+noncomputable def eckmann_hilton_two_cells {A : Type u} {a b : A}
     {p : ComputationalPaths.Path a b} (α β : p = p) :
     Eq.trans α β = Eq.trans β α := by
   exact ComputationalPaths.Path.eckmann_hilton_two_paths α β

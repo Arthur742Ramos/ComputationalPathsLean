@@ -56,50 +56,50 @@ variable {A : Type u} {a : A}
 /-! ## RwEq examples -/
 
 /-- Two loop witnesses at the base point are RwEq-equivalent. -/
-theorem inv_comp_rweq (p : LoopSpace A a) :
-    RwEq (Path.trans (Path.symm p) p) (Path.refl a) := by
-  exact rweq_of_step (Step.symm_trans (A := A) (p := p))
+noncomputable def inv_comp_rweq (p : LoopSpace A a) :
+    RwEq (Path.trans (Path.symm p) p) (Path.refl a) :=
+  rweq_of_step (Step.symm_trans (A := A) (p := p))
 
 /-- Right cancellation for loops. -/
-theorem comp_inv_rweq (p : LoopSpace A a) :
-    RwEq (Path.trans p (Path.symm p)) (Path.refl a) := by
-  exact rweq_of_step (Step.trans_symm (A := A) (p := p))
+noncomputable def comp_inv_rweq (p : LoopSpace A a) :
+    RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
+  rweq_of_step (Step.trans_symm (A := A) (p := p))
 
 /-- Loop cancellation: `p ⬝ p⁻¹ ≈ refl` via a single `Step.trans_symm`.
 This is the canonical Step-level witness for right inverse cancellation. -/
-theorem loop_cancel (p : LoopSpace A a) :
+noncomputable def loop_cancel (p : LoopSpace A a) :
     RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
   rweq_of_step (Step.trans_symm (A := A) (p := p))
 
 /-- Loop cancellation (left variant): `p⁻¹ ⬝ p ≈ refl` via `Step.symm_trans`. -/
-theorem loop_cancel_left (p : LoopSpace A a) :
+noncomputable def loop_cancel_left (p : LoopSpace A a) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl a) :=
   rweq_of_step (Step.symm_trans (A := A) (p := p))
 
 /-- Double inverse cancellation: `(p⁻¹)⁻¹ ≈ p` via `Step.symm_symm`. -/
-theorem loop_inv_inv (p : LoopSpace A a) :
+noncomputable def loop_inv_inv (p : LoopSpace A a) :
     RwEq (Path.symm (Path.symm p)) p :=
   rweq_of_step (Step.symm_symm (A := A) (p := p))
 
 /-- Right unit: `p ⬝ refl ≈ p` via `Step.trans_refl_right`. -/
-theorem loop_trans_refl (p : LoopSpace A a) :
+noncomputable def loop_trans_refl (p : LoopSpace A a) :
     RwEq (Path.trans p (Path.refl a)) p :=
   rweq_of_step (Step.trans_refl_right (A := A) (p := p))
 
 /-- Left unit: `refl ⬝ p ≈ p` via `Step.trans_refl_left`. -/
-theorem loop_refl_trans (p : LoopSpace A a) :
+noncomputable def loop_refl_trans (p : LoopSpace A a) :
     RwEq (Path.trans (Path.refl a) p) p :=
   rweq_of_step (Step.trans_refl_left (A := A) (p := p))
 
 /-- Associativity of loop composition up to RwEq. -/
-theorem comp_assoc_rweq (p q r : LoopSpace A a) :
-    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) := by
-  exact rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r))
+noncomputable def comp_assoc_rweq (p q r : LoopSpace A a) :
+    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
+  rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r))
 
 /-- Inverse involution for loops up to RwEq. -/
-theorem inv_inv_rweq (p : LoopSpace A a) :
-    RwEq (Path.symm (Path.symm p)) p := by
-  exact rweq_of_step (Step.symm_symm (A := A) (p := p))
+noncomputable def inv_inv_rweq (p : LoopSpace A a) :
+    RwEq (Path.symm (Path.symm p)) p :=
+  rweq_of_step (Step.symm_symm (A := A) (p := p))
 
 end LoopSpace
 
