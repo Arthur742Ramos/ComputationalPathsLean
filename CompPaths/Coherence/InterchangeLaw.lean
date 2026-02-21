@@ -30,7 +30,7 @@ noncomputable def interchange
     (β₁ : TwoCell q₁ q₂) (β₂ : TwoCell q₂ q₃) :
     hcomp (vcomp α₁ α₂) (vcomp β₁ β₂) =
       vcomp (hcomp α₁ β₁) (hcomp α₂ β₂) := by
-  apply Subsingleton.elim
+  rfl  -- TwoCell = RwEqProp = Nonempty (RwEq ..) is Prop; definitional proof irrelevance
 
 section EckmannHilton
 
@@ -50,7 +50,7 @@ noncomputable def vertical (α β : LoopTwoCell a) : LoopTwoCell a :=
 
 noncomputable def eckmann_hilton_via_interchange (α β : LoopTwoCell a) :
     vertical α β = vertical β α :=
-  Subsingleton.elim _ _
+  rfl  -- LoopTwoCell = TwoCell(refl,refl) = Prop; proof irrelevance
 
 end EckmannHilton
 

@@ -27,7 +27,7 @@ noncomputable def triangle_identity {A : Type u} {a b c : A}
         (ComputationalPaths.Path.trans_refl_left q)) =
       _root_.congrArg (fun t => ComputationalPaths.Path.trans t q)
         (ComputationalPaths.Path.trans_refl_right p) := by
-  apply Subsingleton.elim
+  rfl  -- both sides are proofs of the same Eq proposition; definitional proof irrelevance
 
 noncomputable def mac_lane_coherence_paths {A : Type u} {a b c d e : A}
     (p : ComputationalPaths.Path a b) (q : ComputationalPaths.Path b c)
