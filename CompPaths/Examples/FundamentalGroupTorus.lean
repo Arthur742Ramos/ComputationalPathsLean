@@ -42,19 +42,19 @@ noncomputable def torusLoopToPair : torusLoopSpace → TorusPathPair :=
   fun p => (Path.fst p, Path.snd p)
 
 /-- First projection β-rule: `fst(prodMk(p, q)) ≈ p` via `Step.prod_fst_beta`. -/
-theorem torusPairToLoop_fst (p q : Path (A := Circle) circleBase circleBase) :
+noncomputable def torusPairToLoop_fst (p q : Path (A := Circle) circleBase circleBase) :
     RwEq (Path.fst (torusPairToLoop (p, q))) p := by
   simpa [torusPairToLoop] using
     (rweq_fst_prodMk (α := Circle) (β := Circle) (p := p) (q := q))
 
 /-- Second projection β-rule: `snd(prodMk(p, q)) ≈ q` via `Step.prod_snd_beta`. -/
-theorem torusPairToLoop_snd (p q : Path (A := Circle) circleBase circleBase) :
+noncomputable def torusPairToLoop_snd (p q : Path (A := Circle) circleBase circleBase) :
     RwEq (Path.snd (torusPairToLoop (p, q))) q := by
   simpa [torusPairToLoop] using
     (rweq_snd_prodMk (α := Circle) (β := Circle) (p := p) (q := q))
 
 /-- Product η-rule: `prodMk(fst(p), snd(p)) ≈ p` via `Step.prod_eta`. -/
-theorem torusLoop_pair_eta (p : torusLoopSpace) :
+noncomputable def torusLoop_pair_eta (p : torusLoopSpace) :
     RwEq (torusPairToLoop (torusLoopToPair p)) p := by
   simpa [torusPairToLoop, torusLoopToPair] using
     (rweq_prod_eta (α := Circle) (β := Circle) (p := p))
@@ -354,7 +354,7 @@ then `p₁ ≈ p₂` and `q₁ ≈ q₂` separately.
 
 Proof: apply `fst`/`snd` projections (via `Step.prod_fst_beta`/`Step.prod_snd_beta`)
 to extract each component from the RwEq witness. -/
-theorem torusPathPair_independence
+noncomputable def torusPathPair_independence
     {p₁ p₂ q₁ q₂ : Path (A := Circle) circleBase circleBase}
     (h : RwEq (Path.prodMk p₁ q₁) (Path.prodMk p₂ q₂)) :
     RwEq p₁ p₂ × RwEq q₁ q₂ := by
@@ -382,10 +382,9 @@ theorem torusPathPair_independence
 
 /-- If the two torus generators were identified, both circle axes would collapse.
 This is proved entirely at the path level using `torusPathPair_independence`. -/
-theorem torusGenerator_independence_path
+noncomputable def torusGenerator_independence_path
     (h : RwEq torusLoop1 torusLoop2) :
-    RwEq circleLoop (Path.refl circleBase) ∧
-    RwEq (Path.refl circleBase) circleLoop := by
+    RwEq circleLoop (Path.refl circleBase) × RwEq (Path.refl circleBase) circleLoop := by
   simpa [torusLoop1, torusLoop2] using
     (torusPathPair_independence
       (p₁ := circleLoop) (q₁ := Path.refl circleBase)

@@ -25,6 +25,7 @@ lean_lib CompPaths where
     `CompPaths.DeformationTheory.ObstructionPaths,
     `CompPaths.Transport.PathOverPath,
     `CompPaths.Transport.TransportDeep,
+    `CompPaths.TypeFormers.UniversalProperties,
     `CompPaths.OmegaGroupoid.WeakGroupoidPaths,
     `CompPaths.OmegaGroupoid.CoherencePaths,
     `CompPaths.OmegaGroupoid.TwoCategoryStructure,
