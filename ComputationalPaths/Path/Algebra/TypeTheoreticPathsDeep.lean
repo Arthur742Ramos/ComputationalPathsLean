@@ -280,25 +280,25 @@ def vcomp {A : Type u} {a b : A} {p q r : Path a b}
 theorem eckmann_hilton {A : Type u} {a : A}
     (α β : TwoPath (Path.refl a) (Path.refl a)) :
     vcomp α β = vcomp β α := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-- Vertical composition is associative. -/
 theorem vcomp_assoc {A : Type u} {a b : A} {p q r s : Path a b}
     (α : TwoPath p q) (β : TwoPath q r) (γ : TwoPath r s) :
     vcomp (vcomp α β) γ = vcomp α (vcomp β γ) := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-- Vertical composition with refl (left). -/
 theorem vcomp_refl_left {A : Type u} {a b : A} {p q : Path a b}
     (α : TwoPath p q) :
     vcomp (Eq.refl p) α = α := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-- Vertical composition with refl (right). -/
 theorem vcomp_refl_right {A : Type u} {a b : A} {p q : Path a b}
     (α : TwoPath p q) :
     vcomp α (Eq.refl q) = α := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-- Concrete Eckmann–Hilton on Bool loops. -/
 theorem eckmann_hilton_bool
@@ -350,7 +350,7 @@ theorem transport_path_proof {A : Type u} {a b c : A}
     (p : Path a b) (q : Path a c) :
     (Path.transport (D := fun x => Path x c) p q).proof =
     (Path.trans (Path.symm p) q).proof := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-! ## Section 9 — Singleton contractibility -/
 
@@ -442,7 +442,7 @@ theorem assoc_proof {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     (Path.trans (Path.trans p q) r).proof =
     (Path.trans p (Path.trans q r)).proof := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-! ## Section 14 — Naturality of ap -/
 
@@ -554,12 +554,12 @@ theorem reassoc_agree {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Path.trans_assoc_fourfold p q r s =
     Path.trans_assoc_fourfold_alt p q r s := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-- All 2-paths between paths are equal (UIP consequence). -/
 theorem two_path_unique {A : Type u} {a b : A} {p q : Path a b}
     (α β : p = q) : α = β :=
-  Subsingleton.elim α β
+  subsingleton_eq_by_cases α β
 
 /-! ## Section 20 — Whiskering operations -/
 

@@ -140,7 +140,7 @@ def Square.hcomp {A : Type u} {a b c : A}
     {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (s₁ : Square p₁ p₂) (s₂ : Square q₁ q₂) :
     Square (Path.trans p₁ q₁) (Path.trans p₂ q₂) :=
-  ⟨by apply Subsingleton.elim⟩
+  ⟨by apply subsingleton_eq_by_cases⟩
 
 /-- Inverse square. -/
 def Square.inv {A : Type u} {a b : A} {p q : Path a b}
@@ -189,7 +189,7 @@ theorem square_vcomp_inv_right {A : Type u} {a b : A} {p q : Path a b}
 def kanFill {A : Type u} {a b c : A}
     (top : Path a b) (left : Path a c) (right : Path b c) :
     Square (Path.trans top right) left :=
-  ⟨by apply Subsingleton.elim⟩
+  ⟨by apply subsingleton_eq_by_cases⟩
 
 /-- Kan filling is unique. -/
 theorem kanFill_unique {A : Type u} {a b c : A}
@@ -227,12 +227,12 @@ theorem kanFill_unique_nat
 /-- Connection ∧: square from trans p refl to p. -/
 def connection_and {A : Type u} {a b : A}
     (p : Path a b) : Square (Path.trans p (Path.refl b)) p :=
-  ⟨by apply Subsingleton.elim⟩
+  ⟨by apply subsingleton_eq_by_cases⟩
 
 /-- Connection ∨: square from trans refl p to p. -/
 def connection_or {A : Type u} {a b : A}
     (p : Path a b) : Square (Path.trans (Path.refl a) p) p :=
-  ⟨by apply Subsingleton.elim⟩
+  ⟨by apply subsingleton_eq_by_cases⟩
 
 /-- Connection ∧ cancel. -/
 theorem connection_and_cancel {A : Type u} {a b : A} (p : Path a b) :
@@ -316,7 +316,7 @@ theorem congrArg_line_symm {A B : Type u} (f : A → B) {a b : A}
 def congrArg_square {A B : Type u} (f : A → B) {a b : A} {p q : Path a b}
     (s : Square p q) :
     Square (Path.congrArg f p) (Path.congrArg f q) :=
-  ⟨by apply Subsingleton.elim⟩
+  ⟨by apply subsingleton_eq_by_cases⟩
 
 /-- congrArg_square preserves refl. -/
 theorem congrArg_square_refl {A B : Type u} (f : A → B) {a b : A}
@@ -424,14 +424,14 @@ def comp4R {A : Type u} {a b c d e : A}
 theorem comp4_proof_eq {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     (comp4L p q r s).proof = (comp4R p q r s).proof := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-- Pentagon coherence: the two reassociation routes agree. -/
 theorem pentagon_coherence {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Path.trans_assoc_fourfold p q r s =
     Path.trans_assoc_fourfold_alt p q r s := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-- Pentagon coherence for Bool. -/
 theorem pentagon_bool :
@@ -439,7 +439,7 @@ theorem pentagon_bool :
       (Path.refl true) (Path.refl true) (Path.refl true) (Path.refl true) =
     Path.trans_assoc_fourfold_alt
       (Path.refl true) (Path.refl true) (Path.refl true) (Path.refl true) := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-- Pentagon coherence for Nat. -/
 theorem pentagon_nat :
@@ -447,7 +447,7 @@ theorem pentagon_nat :
       (Path.refl (0 : Nat)) (Path.refl 0) (Path.refl 0) (Path.refl 0) =
     Path.trans_assoc_fourfold_alt
       (Path.refl (0 : Nat)) (Path.refl 0) (Path.refl 0) (Path.refl 0) := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-! ## Section 12 — Higher cubes -/
 
@@ -455,7 +455,7 @@ theorem pentagon_nat :
 def assocSquare {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Square (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
-  ⟨by apply Subsingleton.elim⟩
+  ⟨by apply subsingleton_eq_by_cases⟩
 
 /-- The associator square composed with its inverse is refl. -/
 theorem assocSquare_cancel {A : Type u} {a b c d : A}
@@ -516,7 +516,7 @@ theorem prodPath_symm_proof {A B : Type u} {a₁ a₂ : A} {b₁ b₂ : B}
     (pa : Path a₁ a₂) (pb : Path b₁ b₂) :
     (Path.symm (prodPath pa pb)).proof =
     (prodPath (Path.symm pa) (Path.symm pb)).proof := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-! ## Section 15 — Interchange law for squares -/
 
@@ -663,7 +663,7 @@ theorem path_eq_of_steps_eq {A : Type u} {a b : A}
 /-- Two paths with same proof have same proof (trivial but useful). -/
 theorem path_proof_irrel {A : Type u} {a b : A}
     (p q : Path a b) : p.proof = q.proof := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 end CubicalMethodsDeep
 end Algebra

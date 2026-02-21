@@ -395,7 +395,7 @@ theorem cp_join_roundtrip {a b c : A}
     (reduce₁ : Path a b) (reduce₂ : Path a c) :
     (Path.trans reduce₁ (criticalPairJoin reduce₁ reduce₂)).toEq =
     reduce₂.toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ### 16. Symmetric join -/
 
@@ -426,7 +426,7 @@ theorem joinable_diamond_closes {a b c d : A}
     (reduce₁ : Path a b) (reduce₂ : Path a c)
     (join₁ : Path b d) (join₂ : Path c d) :
     (Path.trans reduce₁ join₁).toEq = (Path.trans reduce₂ join₂).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ### 19. Transport along critical pair join -/
 
@@ -549,7 +549,7 @@ theorem double_transport_roundtrip {D : A → Sort u} {a b : A}
 theorem convergent_transport {D : A → Sort u} {a b : A}
     (p q : Path a b) (x : D a) :
     Path.transport (D := D) p x = Path.transport (D := D) q x := by
-  exact Path.transport_of_toEq_eq (D := D) (Subsingleton.elim p.toEq q.toEq) x
+  exact Path.transport_of_toEq_eq (D := D) (subsingleton_eq_by_cases p.toEq q.toEq) x
 
 /-! ### 29. Middle-four interchange -/
 
@@ -733,14 +733,14 @@ structure LocallyConfluent (forks : List (A × A × A)) where
     the equational theory is unchanged. -/
 theorem cp_lemma_equational_theory {a b : A}
     (p q : Path a b) : p.toEq = q.toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ### 44. All paths between same endpoints have equal transport -/
 
 theorem cp_lemma_transport {D : A → Sort u} {a b : A}
     (p q : Path a b) (x : D a) :
     Path.transport (D := D) p x = Path.transport (D := D) q x :=
-  Path.transport_of_toEq_eq (D := D) (Subsingleton.elim _ _) x
+  Path.transport_of_toEq_eq (D := D) (subsingleton_eq_by_cases _ _) x
 
 /-! ### 45. Confluence witness: composing two join paths -/
 
@@ -763,7 +763,7 @@ theorem completion_correct_eq {a b c : A}
 theorem completion_correct_toEq {a b c : A}
     (p₁ : Path a b) (p₂ : Path a c) (join : Path b c) :
     (Path.trans p₁ join).toEq = p₂.toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ### 48. Completion chain: sequential completion steps compose -/
 
@@ -1067,7 +1067,7 @@ variable {A : Type u}
 theorem add_derivable_rule {a b : A}
     (existing : Path a b) (new : Path a b) :
     existing.toEq = new.toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ### 80. Oriented critical pair produces compatible equational theory -/
 
@@ -1092,7 +1092,7 @@ theorem completion_step_transport {D : A → Sort u}
 theorem completed_same_theory {a b : A}
     (before : Path a b) (after : Path a b) :
     before.toEq = after.toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ### 83. Multiple completion steps compose coherently -/
 
@@ -1179,7 +1179,7 @@ theorem two_normalizations_agree {D : A → Sort u} {a nf₁ nf₂ : A}
       = Path.transport (D := D) (Path.trans p₁ join) x :=
           (Path.transport_trans (D := D) p₁ join x).symm
     _ = Path.transport (D := D) p₂ x :=
-          Path.transport_of_toEq_eq (D := D) (Subsingleton.elim _ _) x
+          Path.transport_of_toEq_eq (D := D) (subsingleton_eq_by_cases _ _) x
 
 /-! ### 95. Normalization is idempotent (path version) -/
 

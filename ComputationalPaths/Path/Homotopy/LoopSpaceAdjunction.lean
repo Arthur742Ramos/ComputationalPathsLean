@@ -125,7 +125,7 @@ theorem pointedMap_subsingleton_of_subsingleton {X Y : Pointed}
   apply PointedMap.ext
   apply funext
   intro x
-  have hx : x = X.pt := Subsingleton.elim _ _
+  have hx : x = X.pt := subsingleton_eq_by_cases _ _
   calc
     f.toFun x = f.toFun X.pt := by simp [hx]
     _ = Y.pt := f.map_pt
@@ -143,7 +143,7 @@ instance instSubsingleton_pointedMap_omegaEq (X Y : Pointed) :
   apply PointedMap.ext
   apply funext
   intro x
-  exact Subsingleton.elim _ _
+  exact subsingleton_eq_by_cases _ _
  
 /-! ## Functorial maps -/
  
@@ -167,7 +167,7 @@ def omegaEqMap {X Y : Pointed} (f : PointedMap X Y) :
       have h := _root_.congrArg f.toFun (LiftEq.toEq p)
       exact Eq.trans (Eq.trans (Eq.symm f.map_pt) h) f.map_pt)
   map_pt := by
-    apply Subsingleton.elim
+    apply subsingleton_eq_by_cases
  
 /-- Functor structure on pointed types. -/
 structure PointedFunctor where
@@ -187,10 +187,10 @@ noncomputable def sigmaFunctor : PointedFunctor where
   map := fun {X Y} f => sigmaMap f
   map_id := by
     intro X
-    apply Subsingleton.elim
+    apply subsingleton_eq_by_cases
   map_comp := by
     intro X Y Z g f
-    apply Subsingleton.elim
+    apply subsingleton_eq_by_cases
  
 /-- OmegaEq as a pointed functor. -/
 def omegaEqFunctor : PointedFunctor where
@@ -198,10 +198,10 @@ def omegaEqFunctor : PointedFunctor where
   map := fun {X Y} f => omegaEqMap f
   map_id := by
     intro X
-    apply Subsingleton.elim
+    apply subsingleton_eq_by_cases
   map_comp := by
     intro X Y Z g f
-    apply Subsingleton.elim
+    apply subsingleton_eq_by_cases
  
 instance instSubsingleton_pointedMap_omegaEq_sigma (X Y : Pointed) :
     Subsingleton (PointedMap X (omegaEqFunctor.obj (sigmaFunctor.obj Y))) := by
@@ -228,7 +228,7 @@ def suspToLoopEq {X Y : Pointed} (f : PointedMap (sigmaPointed X) Y) :
   toFun := fun x =>
     LiftEq.mk (suspToLoopPath f x).toEq
   map_pt := by
-    apply Subsingleton.elim
+    apply subsingleton_eq_by_cases
  
 /-- Loop-to-suspension map (propositional loops). -/
 def loopEqToSusp {X Y : Pointed} (g : PointedMap X (omegaEqPointed Y)) :
@@ -259,10 +259,10 @@ def suspLoopAdjunction (X Y : Pointed) :
   invFun := loopEqToSusp
   left_inv := by
     intro f
-    apply Subsingleton.elim
+    apply subsingleton_eq_by_cases
   right_inv := by
     intro g
-    apply Subsingleton.elim
+    apply subsingleton_eq_by_cases
  
 /-- Unit of the suspension-loop adjunction. -/
 def unit (X : Pointed) :
@@ -289,7 +289,7 @@ noncomputable def unit_naturality {X Y : Pointed} (f : PointedMap X Y) :
     ((unit Y).comp f).toFun x
   simp only [omegaEqFunctor, sigmaFunctor, unit, suspLoopAdjunction, suspToLoopEq,
     omegaEqMap, sigmaMap, omegaEqPointed, PointedMap.comp, PointedMap.id]
-  apply @Subsingleton.elim _ (instSubsingleton_loopSpaceEq _)
+  apply @subsingleton_eq_by_cases _ (instSubsingleton_loopSpaceEq _)
 
 /-- Naturality of the counit. -/
 noncomputable def counit_naturality {X Y : Pointed} (f : PointedMap X Y) :
@@ -299,7 +299,7 @@ noncomputable def counit_naturality {X Y : Pointed} (f : PointedMap X Y) :
   apply funext
   intro x
   have hx : x = (sigmaPointed (omegaEqPointed X)).pt :=
-    Subsingleton.elim _ _
+    subsingleton_eq_by_cases _ _
   have h_left : (PointedMap.comp f (counit X)).toFun x = Y.pt := by
     have h_base := (PointedMap.comp f (counit X)).map_pt
     simpa [hx] using h_base
@@ -397,13 +397,13 @@ theorem adjunction_counit_square {X Y : Pointed}
 theorem triangle_sigma (X : Pointed) :
     PointedMap.comp (counit (sigmaPointed X)) (sigmaFunctor.map (unit X)) =
       PointedMap.id (sigmaPointed X) := by
-  apply @Subsingleton.elim _ (instSubsingleton_pointedMap_sigma _ _)
+  apply @subsingleton_eq_by_cases _ (instSubsingleton_pointedMap_sigma _ _)
 
 /-- The triangle identity: `Ω(ε_Y) ∘ η_{ΩY} = id_{ΩY}`. -/
 theorem triangle_omega (Y : Pointed) :
     PointedMap.comp (omegaEqFunctor.map (counit Y)) (unit (omegaEqPointed Y)) =
       PointedMap.id (omegaEqPointed Y) := by
-  apply @Subsingleton.elim _ (instSubsingleton_pointedMap_omegaEq _ _)
+  apply @subsingleton_eq_by_cases _ (instSubsingleton_pointedMap_omegaEq _ _)
 
 /-- `Path.trans` naturality: whiskering the unit on both sides yields
 the same naturality square. -/

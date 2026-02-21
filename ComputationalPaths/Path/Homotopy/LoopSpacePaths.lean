@@ -98,39 +98,39 @@ def twoLoop_inv {a : A} {p q : Omega A a} (α : TwoLoop p q) : TwoLoop q p :=
 /-- All 2-loops between the same endpoints are equal (proof irrelevance). -/
 theorem twoLoop_subsingleton {a : A} {p q : Omega A a} (α β : TwoLoop p q) :
     α = β :=
-  Subsingleton.elim α β
+  subsingleton_eq_by_cases α β
 
 /-- 2-loop composition is commutative (Eckmann-Hilton). -/
 theorem twoLoop_eckmann_hilton {a : A} {p : Omega A a}
     (α β : TwoLoop p p) :
     twoLoop_comp α β = twoLoop_comp β α :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-- 2-loop left identity. -/
 theorem twoLoop_comp_refl_left {a : A} {p q : Omega A a} (α : TwoLoop p q) :
     twoLoop_comp (twoLoop_refl p) α = α :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-- 2-loop right identity. -/
 theorem twoLoop_comp_refl_right {a : A} {p q : Omega A a} (α : TwoLoop p q) :
     twoLoop_comp α (twoLoop_refl q) = α :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-- 2-loop left inverse. -/
 theorem twoLoop_inv_comp {a : A} {p q : Omega A a} (α : TwoLoop p q) :
     twoLoop_comp (twoLoop_inv α) α = twoLoop_refl q :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-- 2-loop right inverse. -/
 theorem twoLoop_comp_inv {a : A} {p q : Omega A a} (α : TwoLoop p q) :
     twoLoop_comp α (twoLoop_inv α) = twoLoop_refl p :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-- 2-loop associativity. -/
 theorem twoLoop_comp_assoc {a : A} {p q r s : Omega A a}
     (α : TwoLoop p q) (β : TwoLoop q r) (γ : TwoLoop r s) :
     twoLoop_comp (twoLoop_comp α β) γ = twoLoop_comp α (twoLoop_comp β γ) :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## Loop space functoriality -/
 

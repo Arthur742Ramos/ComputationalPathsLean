@@ -79,7 +79,7 @@ def isProp_inhabited_isContr (h : IsProp A) (a : A) : IsContr A where
 /-- All paths in a proposition have the same toEq (proof irrelevance). -/
 theorem isProp_paths_toEq {a b : A} (p q : Path a b) :
     p.toEq = q.toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## Sets -/
 
@@ -90,23 +90,23 @@ structure IsSet (A : Type u) where
 
 /-- A proposition is a set. -/
 def isProp_isSet : IsSet A where
-  proofEq := fun _ _ => Subsingleton.elim _ _
+  proofEq := fun _ _ => subsingleton_eq_by_cases _ _
 
 /-- Nat is a set. -/
 def natIsSet : IsSet Nat where
-  proofEq := fun _ _ => Subsingleton.elim _ _
+  proofEq := fun _ _ => subsingleton_eq_by_cases _ _
 
 /-- Bool is a set. -/
 def boolIsSet : IsSet Bool where
-  proofEq := fun _ _ => Subsingleton.elim _ _
+  proofEq := fun _ _ => subsingleton_eq_by_cases _ _
 
 /-- Unit is a set. -/
 def unitIsSet : IsSet Unit where
-  proofEq := fun _ _ => Subsingleton.elim _ _
+  proofEq := fun _ _ => subsingleton_eq_by_cases _ _
 
 /-- Empty is a set. -/
 def emptyIsSet : IsSet Empty where
-  proofEq := fun _ _ => Subsingleton.elim _ _
+  proofEq := fun _ _ => subsingleton_eq_by_cases _ _
 
 /-! ## n-types -/
 
@@ -179,7 +179,7 @@ def prod_isProp (hA : IsProp A) (hB : IsProp B) :
 
 /-- Product of sets is a set. -/
 def prod_isSet : IsSet (A × B) where
-  proofEq := fun _ _ => Subsingleton.elim _ _
+  proofEq := fun _ _ => subsingleton_eq_by_cases _ _
 
 /-- Function type into a proposition is a proposition. -/
 def fun_isProp (hB : IsProp B) : IsProp (A → B) where
@@ -189,7 +189,7 @@ def fun_isProp (hB : IsProp B) : IsProp (A → B) where
 
 /-- Function type into a set is a set. -/
 def fun_isSet : IsSet (A → B) where
-  proofEq := fun _ _ => Subsingleton.elim _ _
+  proofEq := fun _ _ => subsingleton_eq_by_cases _ _
 
 /-- Transport preserves contractibility. -/
 def transport_isContr {D : A → Type v} {a b : A}
@@ -227,12 +227,12 @@ theorem connected_path_trunc (h : IsConnected A) :
 /-- All proofs of a = b are equal (UIP). -/
 theorem proof_uip_path {a b : A} (p q : a = b) :
     p = q :=
-  Subsingleton.elim p q
+  subsingleton_eq_by_cases p q
 
 /-- The toEq of a connecting path in a contractible type. -/
 theorem isContr_connect_proof (h : IsContr A) (a b : A) :
     (isContr_connect h a b).proof = ((h.contr a).proof.symm.trans (h.contr b).proof) := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 end Truncation
 end HoTT

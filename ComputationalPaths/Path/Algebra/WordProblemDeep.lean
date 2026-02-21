@@ -188,7 +188,7 @@ theorem freeMonoid_assoc4_coherence (a b c d : FreeMonoid α) :
     (freeMonoid_assoc4_path a b c d).toEq =
     (Path.trans (freeMonoid_assoc_path (FreeMonoid.mul a b) c d)
                 (freeMonoid_assoc_path a b (FreeMonoid.mul c d))).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 -- Theorem 23: trans of assoc path and its inverse
 theorem freeMonoid_assoc_roundtrip (a b c : FreeMonoid α) :
@@ -395,14 +395,14 @@ theorem concatCongrPath_refl_right {w₁ w₁' w₂ : Word α}
     (p : Path w₁ w₁') :
     (concatCongrPath p (Path.refl w₂)).toEq =
     (Path.congrArg (fun x => Word.concat x w₂) p).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 -- Theorem 42: concat congr with refl on left
 theorem concatCongrPath_refl_left {w₁ w₂ w₂' : Word α}
     (p : Path w₂ w₂') :
     (concatCongrPath (Path.refl w₁) p).toEq =
     (Path.congrArg (Word.concat w₁) p).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 -- Theorem 43: multi-step path composition: pentagon
 def freeMonoid_pentagon_path (a b c d : FreeMonoid α) :
@@ -416,7 +416,7 @@ def freeMonoid_pentagon_path (a b c d : FreeMonoid α) :
 theorem freeMonoid_pentagon_coherence₂ (a b c d : FreeMonoid α) :
     (freeMonoid_pentagon_path a b c d).toEq =
     (freeMonoid_assoc4_path a b c d).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 -- Theorem 45: trans of assoc path and its inverse
 theorem freeMonoid_assoc_roundtrip₂ (a b c : FreeMonoid α) :
@@ -659,7 +659,7 @@ structure CongruenceClass (T : Type u) where
 -- Theorem 74: the representative is path-reachable from itself
 theorem congruenceClass_rep_refl {T : Type u} (cls : CongruenceClass T)
     (h : cls.rep ∈ cls.members) : (cls.paths cls.rep h).toEq = rfl :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 -- Theorem 75: transitivity within a congruence class
 def congruenceClass_trans {T : Type u} (cls : CongruenceClass T)
@@ -671,7 +671,7 @@ def congruenceClass_trans {T : Type u} (cls : CongruenceClass T)
 theorem congruenceClass_trans_toEq_irrel {T : Type u} (cls : CongruenceClass T)
     {m₁ m₂ : T} (h₁ h₁' : m₁ ∈ cls.members) (h₂ h₂' : m₂ ∈ cls.members) :
     (congruenceClass_trans cls h₁ h₂).toEq = (congruenceClass_trans cls h₁' h₂').toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## Complete system -/
 
@@ -705,25 +705,25 @@ def completeSystem_nf_path {T : Type u} (cs : CompleteSystem T)
 -- Theorem 79
 theorem path_coherence {T : Type u} {a b : T}
     (p q : Path a b) : p.toEq = q.toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 -- Theorem 80
 theorem path_trans_coherence {T : Type u} {a b c : T}
     (p₁ p₂ : Path a b) (q₁ q₂ : Path b c) :
     (Path.trans p₁ q₁).toEq = (Path.trans p₂ q₂).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 -- Theorem 81
 theorem path_symm_coherence {T : Type u} {a b : T}
     (p q : Path a b) :
     (Path.symm p).toEq = (Path.symm q).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 -- Theorem 82: congrArg coherence
 theorem path_congrArg_coherence {T S : Type u} {a b : T}
     (f : T → S) (p q : Path a b) :
     (Path.congrArg f p).toEq = (Path.congrArg f q).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## Path algebra on word operations -/
 
@@ -846,13 +846,13 @@ def congrArg₂Path {T₁ T₂ S : Type u} {a₁ b₁ : T₁} {a₂ b₂ : T₂}
 theorem congrArg₂Path_refl_left {T₁ T₂ S : Type u} {a : T₁} {a₂ b₂ : T₂}
     (f : T₁ → T₂ → S) (p : Path a₂ b₂) :
     (congrArg₂Path f (Path.refl a) p).toEq = (Path.congrArg (f a) p).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 -- Theorem 101: congrArg₂ with refl on second argument
 theorem congrArg₂Path_refl_right {T₁ T₂ S : Type u} {a₁ b₁ : T₁} {a : T₂}
     (f : T₁ → T₂ → S) (p : Path a₁ b₁) :
     (congrArg₂Path f p (Path.refl a)).toEq = (Path.congrArg (fun x => f x a) p).toEq :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## Rewriting equivalence classes -/
 

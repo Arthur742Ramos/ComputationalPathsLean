@@ -173,7 +173,7 @@ def writheInv : KnotInvariant Int where
 theorem invariant_path_coherence {R : Type v} (inv : KnotInvariant R)
     {d₁ d₂ : KnotDiagram} (p q : Path d₁ d₂) :
     inv.preserved p = inv.preserved q :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-- Composing paths preserves invariant values transitively. -/
 theorem invariant_trans {R : Type v} (inv : KnotInvariant R)
@@ -327,7 +327,7 @@ def MoveSequence.reverse {d₁ d₂ : KnotDiagram}
 theorem moveSequence_invariant_eq {R : Type v} (inv : KnotInvariant R)
     {d₁ d₂ : KnotDiagram} (s₁ s₂ : MoveSequence d₁ d₂) :
     inv.preserved s₁.path = inv.preserved s₂.path :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## §11 Path algebra of knot equivalence -/
 
@@ -717,7 +717,7 @@ def writhe_crossingNumber_pair : KnotInvariant (Int × Nat) :=
 theorem pair_invariant_coherence {d₁ d₂ : KnotDiagram} (p q : Path d₁ d₂) :
     writhe_crossingNumber_pair.preserved p =
     writhe_crossingNumber_pair.preserved q :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## §26 Move complexity -/
 
@@ -759,7 +759,7 @@ theorem invariant_naturality {R S : Type v}
     (f : R → S) (inv : KnotInvariant R) {d₁ d₂ : KnotDiagram}
     (p : Path d₁ d₂) :
     (inv.map f).preserved p = _root_.congrArg f (inv.preserved p) :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## §30 Totality theorems -/
 
@@ -767,7 +767,7 @@ theorem invariant_naturality {R S : Type v}
 theorem invariant_self_loop {R : Type v} (inv : KnotInvariant R)
     (d : KnotDiagram) (p : Path d d) :
     inv.preserved p = rfl := by
-  apply Subsingleton.elim
+  apply subsingleton_eq_by_cases
 
 /-- A self-loop writhe path is reflexive at the propositional level. -/
 theorem writhe_self_loop (d : KnotDiagram) (p : Path d d) :
@@ -823,7 +823,7 @@ def tripleInvariant : KnotInvariant (Int × Nat × List CrossingSign) where
 theorem tripleInvariant_coherence {d₁ d₂ : KnotDiagram}
     (p q : Path d₁ d₂) :
     tripleInvariant.preserved p = tripleInvariant.preserved q :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## §34 Whisker operations on knot paths -/
 
@@ -929,7 +929,7 @@ theorem invariant_map_coherence {R S : Type v}
     (f : R → S) (inv : KnotInvariant R)
     {d₁ d₂ : KnotDiagram} (p q : Path d₁ d₂) :
     (inv.map f).preserved p = (inv.map f).preserved q :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-- Mapping identity is identity. -/
 theorem invariant_map_id {R : Type v} (inv : KnotInvariant R) :
@@ -1038,7 +1038,7 @@ theorem r1_inverse_loop (m : ReidemeisterMove) :
 /-- Self-inverse property of self-loops. -/
 theorem self_loop_toEq (d : KnotDiagram) (p : Path d d) :
     p.toEq = rfl :=
-  Subsingleton.elim _ _
+  subsingleton_eq_by_cases _ _
 
 /-! ## §49 Diagram category -/
 
@@ -1069,7 +1069,7 @@ def mkInvariantFamily {I R : Type v} (f : I → KnotDiagram → R)
     (h : ∀ i {d₁ d₂ : KnotDiagram}, Path d₁ d₂ → f i d₁ = f i d₂) :
     InvariantFamily I R where
   inv := fun i => ⟨f i, h i⟩
-  coherent := by intros; apply Subsingleton.elim
+  coherent := by intros; apply subsingleton_eq_by_cases
 
 /-! ## §51 Combined path operations -/
 
@@ -1119,7 +1119,7 @@ theorem diagramIso_implies_equiv {d₁ d₂ : KnotDiagram}
 /-- All 2-paths between knot paths are equal (UIP). -/
 theorem knot_path_uip {d₁ d₂ : KnotDiagram}
     (p q : Path d₁ d₂) (α β : p = q) : α = β :=
-  Subsingleton.elim α β
+  subsingleton_eq_by_cases α β
 
 /-- The groupoid of knot diagrams satisfies all coherence conditions. -/
 theorem knot_groupoid_coherence {d₁ d₂ d₃ : KnotDiagram}
