@@ -36,7 +36,9 @@ lean_lib CompPaths where
     `CompPaths.Rewriting.CriticalPairs,
     `CompPaths.Rewriting.TerminationProofs,
     `CompPaths.CoveringSpace.CoveringDeep,
-    `CompPaths.CoveringSpace.PathLifting]
+    `CompPaths.CoveringSpace.PathLifting,
+    `CompPaths.Algebra.FreeGroupoid,
+    `CompPaths.Algebra.Presentation]
 
 @[default_target]
 lean_exe computational_paths where

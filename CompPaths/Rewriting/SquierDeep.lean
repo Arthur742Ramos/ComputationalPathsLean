@@ -98,8 +98,8 @@ def homotopyBasisUpperBound : Nat := allCriticalPairs.length * overlapPositionBo
 
 theorem homotopyBasis_finite_bound :
     homotopyBasis.length ≤ allCriticalPairs.length * overlapPositionBound := by
-  have hnum : (33 : Nat) ≤ 66 := by decide
-  simpa [homotopyBasis, overlapPositionBound, allCriticalPairs_count] using hnum
+  rw [homotopyBasis, allCriticalPairs_count]
+  decide
 
 theorem homotopyBasis_bound_formula :
     homotopyBasisUpperBound = allCriticalPairs.length * overlapPositionBound := rfl
