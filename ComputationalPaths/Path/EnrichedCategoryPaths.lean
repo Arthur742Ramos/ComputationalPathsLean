@@ -37,6 +37,8 @@ open Path
 
 universe u v w
 
+noncomputable section
+
 /-! ## Domain-specific rewrite steps -/
 
 /-- Domain-specific rewrite steps for enriched category coherence. -/
@@ -69,7 +71,7 @@ def EnrichedStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .symm_distrib p q => Path.Step.symm_trans_congr p q
 
 /-- Lift an enriched step to rewrite equivalence. -/
-theorem rweq_of_enriched_step {A : Type u} {a b : A}
+def rweq_of_enriched_step {A : Type u} {a b : A}
     {p q : Path a b} (s : EnrichedStep p q) : RwEq p q :=
   rweq_of_step (EnrichedStep.toStep s)
 
@@ -88,49 +90,49 @@ namespace MonoidalBase
 variable {V : Type u} (M : MonoidalBase V)
 
 -- Theorem 1: Left unitor followed by refl
-@[simp] theorem leftUnitor_trans_refl (x : V) :
+@[simp] def leftUnitor_trans_refl (x : V) :
     RwEq
       (Path.trans (M.leftUnitorPath x) (Path.refl x))
       (M.leftUnitorPath x) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (M.leftUnitorPath x))
 
 -- Theorem 2: Right unitor followed by refl
-@[simp] theorem rightUnitor_trans_refl (x : V) :
+@[simp] def rightUnitor_trans_refl (x : V) :
     RwEq
       (Path.trans (M.rightUnitorPath x) (Path.refl x))
       (M.rightUnitorPath x) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (M.rightUnitorPath x))
 
 -- Theorem 3: Associator followed by refl
-@[simp] theorem assoc_trans_refl (x y z : V) :
+@[simp] def assoc_trans_refl (x y z : V) :
     RwEq
       (Path.trans (M.assocPath x y z) (Path.refl _))
       (M.assocPath x y z) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (M.assocPath x y z))
 
 -- Theorem 4: Associator symm cancel
-@[simp] theorem assoc_symm_cancel (x y z : V) :
+@[simp] def assoc_symm_cancel (x y z : V) :
     RwEq
       (Path.trans (M.assocPath x y z) (Path.symm (M.assocPath x y z)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (M.assocPath x y z))
 
 -- Theorem 5: Left unitor inverse cancels
-@[simp] theorem leftUnitor_symm_cancel (x : V) :
+@[simp] def leftUnitor_symm_cancel (x : V) :
     RwEq
       (Path.trans (M.leftUnitorPath x) (Path.symm (M.leftUnitorPath x)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (M.leftUnitorPath x))
 
 -- Theorem 6: Right unitor inverse cancels
-@[simp] theorem rightUnitor_symm_cancel (x : V) :
+@[simp] def rightUnitor_symm_cancel (x : V) :
     RwEq
       (Path.trans (M.rightUnitorPath x) (Path.symm (M.rightUnitorPath x)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (M.rightUnitorPath x))
 
 -- Theorem 7: Symm distributes over assocPath trans
-theorem assoc_symm_distrib (x y z : V) :
+def assoc_symm_distrib (x y z : V) :
     RwEq
       (Path.symm (Path.trans (M.assocPath x y z) (Path.symm (M.assocPath x y z))))
       (Path.trans (Path.symm (Path.symm (M.assocPath x y z)))
@@ -139,7 +141,7 @@ theorem assoc_symm_distrib (x y z : V) :
     (EnrichedStep.symm_distrib (M.assocPath x y z) (Path.symm (M.assocPath x y z)))
 
 -- Theorem 8: Transport along left unitor is constant
-theorem transport_leftUnitor_const (x : V) :
+def transport_leftUnitor_const (x : V) :
     Path.transport (D := fun _ => V) (M.leftUnitorPath x) (M.tensor M.unit x)
       = M.tensor M.unit x := by
   simp [Path.transport_const]
@@ -170,40 +172,40 @@ namespace VEnrichedCat
 variable {V : Type u} {M : MonoidalBase V} (C : VEnrichedCat V M)
 
 -- Theorem 9: Left unit followed by refl
-@[simp] theorem leftUnit_trans_refl (a b : C.Obj) :
+@[simp] def leftUnit_trans_refl (a b : C.Obj) :
     RwEq
       (Path.trans (C.leftUnitPath a b) (Path.refl _))
       (C.leftUnitPath a b) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (C.leftUnitPath a b))
 
 -- Theorem 10: Right unit followed by refl
-@[simp] theorem rightUnit_trans_refl (a b : C.Obj) :
+@[simp] def rightUnit_trans_refl (a b : C.Obj) :
     RwEq
       (Path.trans (C.rightUnitPath a b) (Path.refl _))
       (C.rightUnitPath a b) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (C.rightUnitPath a b))
 
 -- Theorem 11: Assoc inverse cancel
-@[simp] theorem assoc_inverse_cancel (a b c d : C.Obj) :
+@[simp] def assoc_inverse_cancel (a b c d : C.Obj) :
     RwEq
       (Path.trans (C.assocPath a b c d) (Path.symm (C.assocPath a b c d)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (C.assocPath a b c d))
 
 -- Theorem 12: Left unit inverse cancel
-@[simp] theorem leftUnit_inverse_cancel (a b : C.Obj) :
+@[simp] def leftUnit_inverse_cancel (a b : C.Obj) :
     RwEq
       (Path.trans (C.leftUnitPath a b) (Path.symm (C.leftUnitPath a b)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (C.leftUnitPath a b))
 
 -- Theorem 13: Transport of id along idPath is constant
-theorem transport_id_const (a : C.Obj) :
+def transport_id_const (a : C.Obj) :
     Path.transport (D := fun _ => V) (C.idPath a) M.unit = M.unit := by
   simp [Path.transport_const]
 
 -- Theorem 14: Symm distributes over comp+leftUnit trans
-theorem comp_leftUnit_symm_distrib (a b c : C.Obj) :
+def comp_leftUnit_symm_distrib (a b c : C.Obj) :
     RwEq
       (Path.symm (Path.trans (C.compPath a b c) (Path.symm (C.compPath a b c))))
       (Path.trans (Path.symm (Path.symm (C.compPath a b c)))
@@ -234,28 +236,28 @@ variable {C D : VEnrichedCat V M}
 variable (F : EnrichedFunctor C D)
 
 -- Theorem 15: homAction followed by refl
-@[simp] theorem homAction_trans_refl (a b : C.Obj) :
+@[simp] def homAction_trans_refl (a b : C.Obj) :
     RwEq
       (Path.trans (F.homActionPath a b) (Path.refl _))
       (F.homActionPath a b) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (F.homActionPath a b))
 
 -- Theorem 16: idPres inverse cancel
-@[simp] theorem idPres_inverse_cancel (a : C.Obj) :
+@[simp] def idPres_inverse_cancel (a : C.Obj) :
     RwEq
       (Path.trans (F.idPresPath a) (Path.symm (F.idPresPath a)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (F.idPresPath a))
 
 -- Theorem 17: homAction symm cancel left
-@[simp] theorem homAction_symm_cancel_left (a b : C.Obj) :
+@[simp] def homAction_symm_cancel_left (a b : C.Obj) :
     RwEq
       (Path.trans (Path.symm (F.homActionPath a b)) (F.homActionPath a b))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel_left (F.homActionPath a b))
 
 -- Theorem 18: Transport along idPres is constant
-theorem transport_along_idPres (a : C.Obj) :
+def transport_along_idPres (a : C.Obj) :
     Path.transport (D := fun _ => V) (F.idPresPath a) (C.idMorph a)
       = C.idMorph a := by
   simp [Path.transport_const]
@@ -282,7 +284,7 @@ def EnrichedFunctor.comp {V : Type u} {M : MonoidalBase V}
       (G.idPresPath (F.objMap a))
 
 -- Theorem 19: Composed functor homAction is trans of components
-theorem EnrichedFunctor.comp_homActionPath {V : Type u} {M : MonoidalBase V}
+def EnrichedFunctor.comp_homActionPath {V : Type u} {M : MonoidalBase V}
     {C D E : VEnrichedCat V M}
     (F : EnrichedFunctor C D) (G : EnrichedFunctor D E)
     (a b : C.Obj) :
@@ -292,7 +294,7 @@ theorem EnrichedFunctor.comp_homActionPath {V : Type u} {M : MonoidalBase V}
   rfl
 
 -- Theorem 20: Composed functor idPres is trans of components
-theorem EnrichedFunctor.comp_idPresPath {V : Type u} {M : MonoidalBase V}
+def EnrichedFunctor.comp_idPresPath {V : Type u} {M : MonoidalBase V}
     {C D E : VEnrichedCat V M}
     (F : EnrichedFunctor C D) (G : EnrichedFunctor D E)
     (a : C.Obj) :
@@ -320,28 +322,28 @@ variable {C D : VEnrichedCat V M}
 variable {F G : EnrichedFunctor C D}
 
 -- Theorem 21: Naturality path followed by refl
-@[simp] theorem naturality_trans_refl (α : EnrichedNatTrans F G) (a b : C.Obj) :
+@[simp] def naturality_trans_refl (α : EnrichedNatTrans F G) (a b : C.Obj) :
     RwEq
       (Path.trans (α.naturalityPath a b) (Path.refl _))
       (α.naturalityPath a b) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (α.naturalityPath a b))
 
 -- Theorem 22: Component path inverse cancels
-@[simp] theorem component_inverse_cancel (α : EnrichedNatTrans F G) (a : C.Obj) :
+@[simp] def component_inverse_cancel (α : EnrichedNatTrans F G) (a : C.Obj) :
     RwEq
       (Path.trans (α.componentPath a) (Path.symm (α.componentPath a)))
       (Path.refl M.unit) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (α.componentPath a))
 
 -- Theorem 23: Naturality path inverse cancels
-@[simp] theorem naturality_inverse_cancel (α : EnrichedNatTrans F G) (a b : C.Obj) :
+@[simp] def naturality_inverse_cancel (α : EnrichedNatTrans F G) (a b : C.Obj) :
     RwEq
       (Path.trans (α.naturalityPath a b) (Path.symm (α.naturalityPath a b)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (α.naturalityPath a b))
 
 -- Theorem 24: Symm distributes over naturality path pair
-theorem naturality_symm_distrib (α : EnrichedNatTrans F G) (a b : C.Obj) :
+def naturality_symm_distrib (α : EnrichedNatTrans F G) (a b : C.Obj) :
     RwEq
       (Path.symm (Path.trans (α.componentPath a) (Path.symm (α.componentPath a))))
       (Path.trans (Path.symm (Path.symm (α.componentPath a)))
@@ -378,35 +380,35 @@ variable {F : EnrichedFunctor C D} {G : EnrichedFunctor D C}
 variable (adj : EnrichedAdjunction F G)
 
 -- Theorem 25: Triangle1 followed by refl
-@[simp] theorem triangle1_trans_refl (a : C.Obj) :
+@[simp] def triangle1_trans_refl (a : C.Obj) :
     RwEq
       (Path.trans (adj.trianglePath1 a) (Path.refl _))
       (adj.trianglePath1 a) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (adj.trianglePath1 a))
 
 -- Theorem 26: Triangle2 followed by refl
-@[simp] theorem triangle2_trans_refl (b : D.Obj) :
+@[simp] def triangle2_trans_refl (b : D.Obj) :
     RwEq
       (Path.trans (adj.trianglePath2 b) (Path.refl _))
       (adj.trianglePath2 b) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (adj.trianglePath2 b))
 
 -- Theorem 27: Unit path inverse cancellation
-@[simp] theorem unit_inverse_cancel (a : C.Obj) :
+@[simp] def unit_inverse_cancel (a : C.Obj) :
     RwEq
       (Path.trans (adj.unitPath a) (Path.symm (adj.unitPath a)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (adj.unitPath a))
 
 -- Theorem 28: Counit path inverse cancellation
-@[simp] theorem counit_inverse_cancel (b : D.Obj) :
+@[simp] def counit_inverse_cancel (b : D.Obj) :
     RwEq
       (Path.trans (adj.counitPath b) (Path.symm (adj.counitPath b)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (adj.counitPath b))
 
 -- Theorem 29: Symm distributes over unit path pair
-theorem unit_symm_distrib (a : C.Obj) :
+def unit_symm_distrib (a : C.Obj) :
     RwEq
       (Path.symm (Path.trans (adj.unitPath a) (Path.symm (adj.unitPath a))))
       (Path.trans (Path.symm (Path.symm (adj.unitPath a)))
@@ -415,7 +417,7 @@ theorem unit_symm_distrib (a : C.Obj) :
     (EnrichedStep.symm_distrib (adj.unitPath a) (Path.symm (adj.unitPath a)))
 
 -- Theorem 30: Transport along unit is constant
-theorem transport_unit_const (a : C.Obj) :
+def transport_unit_const (a : C.Obj) :
     Path.transport (D := fun _ => V) (adj.unitPath a) (C.idMorph a)
       = C.idMorph a := by
   simp [Path.transport_const]
@@ -439,21 +441,21 @@ variable {V : Type u} {M : MonoidalBase V}
 variable (D : DayConvolution M)
 
 -- Theorem 31: Coend path followed by refl
-@[simp] theorem coend_trans_refl (x y z : V) :
+@[simp] def coend_trans_refl (x y z : V) :
     RwEq
       (Path.trans (D.coendPath x y z) (Path.refl _))
       (D.coendPath x y z) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (D.coendPath x y z))
 
 -- Theorem 32: Coend path inverse cancellation
-@[simp] theorem coend_inverse_cancel (x y z : V) :
+@[simp] def coend_inverse_cancel (x y z : V) :
     RwEq
       (Path.trans (D.coendPath x y z) (Path.symm (D.coendPath x y z)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (D.coendPath x y z))
 
 -- Theorem 33: Symm distributes over coend path pair
-theorem coend_symm_distrib (x y z : V) :
+def coend_symm_distrib (x y z : V) :
     RwEq
       (Path.symm (Path.trans (D.coendPath x y z) (Path.symm (D.coendPath x y z))))
       (Path.trans (Path.symm (Path.symm (D.coendPath x y z)))
@@ -480,41 +482,41 @@ variable {C : VEnrichedCat V M}
 variable (Y : EnrichedYoneda C)
 
 -- Theorem 34: Repr path followed by refl
-@[simp] theorem repr_trans_refl (a b : C.Obj) :
+@[simp] def repr_trans_refl (a b : C.Obj) :
     RwEq
       (Path.trans (Y.reprPath a b) (Path.refl _))
       (Y.reprPath a b) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (Y.reprPath a b))
 
 -- Theorem 35: Repr path inverse cancel
-@[simp] theorem repr_inverse_cancel (a b : C.Obj) :
+@[simp] def repr_inverse_cancel (a b : C.Obj) :
     RwEq
       (Path.trans (Y.reprPath a b) (Path.symm (Y.reprPath a b)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (Y.reprPath a b))
 
 -- Theorem 36: Yoneda path followed by refl
-@[simp] theorem yoneda_trans_refl (a b c : C.Obj) :
+@[simp] def yoneda_trans_refl (a b c : C.Obj) :
     RwEq
       (Path.trans (Y.yonedaPath a b c) (Path.refl _))
       (Y.yonedaPath a b c) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (Y.yonedaPath a b c))
 
 -- Theorem 37: Yoneda path inverse cancel
-@[simp] theorem yoneda_inverse_cancel (a b c : C.Obj) :
+@[simp] def yoneda_inverse_cancel (a b c : C.Obj) :
     RwEq
       (Path.trans (Y.yonedaPath a b c) (Path.symm (Y.yonedaPath a b c)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (Y.yonedaPath a b c))
 
 -- Theorem 38: Transport along repr is constant
-theorem transport_repr_const (a b : C.Obj) :
+def transport_repr_const (a b : C.Obj) :
     Path.transport (D := fun _ => V) (Y.reprPath a b) (Y.repr a b)
       = Y.repr a b := by
   simp [Path.transport_const]
 
 -- Theorem 39: Repr path symm distributes
-theorem repr_symm_distrib (a b : C.Obj) :
+def repr_symm_distrib (a b : C.Obj) :
     RwEq
       (Path.symm (Path.trans (Y.reprPath a b) (Path.symm (Y.reprPath a b))))
       (Path.trans (Path.symm (Path.symm (Y.reprPath a b)))
@@ -544,48 +546,48 @@ variable {C : VEnrichedCat V M}
 variable (W : WeightedLimit C)
 
 -- Theorem 40: Cone path followed by refl
-@[simp] theorem cone_trans_refl (a : C.Obj) :
+@[simp] def cone_trans_refl (a : C.Obj) :
     RwEq
       (Path.trans (W.conePath a) (Path.refl _))
       (W.conePath a) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (W.conePath a))
 
 -- Theorem 41: Cone path inverse cancel
-@[simp] theorem cone_inverse_cancel (a : C.Obj) :
+@[simp] def cone_inverse_cancel (a : C.Obj) :
     RwEq
       (Path.trans (W.conePath a) (Path.symm (W.conePath a)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (W.conePath a))
 
 -- Theorem 42: Universal path followed by refl
-@[simp] theorem universal_trans_refl (x : V) (a : C.Obj) :
+@[simp] def universal_trans_refl (x : V) (a : C.Obj) :
     RwEq
       (Path.trans (W.universalPath x a) (Path.refl _))
       (W.universalPath x a) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (W.universalPath x a))
 
 -- Theorem 43: Universal path inverse cancel
-@[simp] theorem universal_inverse_cancel (x : V) (a : C.Obj) :
+@[simp] def universal_inverse_cancel (x : V) (a : C.Obj) :
     RwEq
       (Path.trans (W.universalPath x a) (Path.symm (W.universalPath x a)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (W.universalPath x a))
 
 -- Theorem 44: Cone path symm cancel left
-@[simp] theorem cone_symm_cancel_left (a : C.Obj) :
+@[simp] def cone_symm_cancel_left (a : C.Obj) :
     RwEq
       (Path.trans (Path.symm (W.conePath a)) (W.conePath a))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel_left (W.conePath a))
 
 -- Theorem 45: Transport along cone is constant
-theorem transport_cone_const (a : C.Obj) :
+def transport_cone_const (a : C.Obj) :
     Path.transport (D := fun _ => V) (W.conePath a) W.limitObj
       = W.limitObj := by
   simp [Path.transport_const]
 
 -- Theorem 46: Cone symm distributes
-theorem cone_symm_distrib (a : C.Obj) :
+def cone_symm_distrib (a : C.Obj) :
     RwEq
       (Path.symm (Path.trans (W.conePath a) (Path.symm (W.conePath a))))
       (Path.trans (Path.symm (Path.symm (W.conePath a)))
@@ -615,28 +617,28 @@ variable {C : VEnrichedCat V M}
 variable (E : EnrichedEnd C)
 
 -- Theorem 47: Proj path followed by refl
-@[simp] theorem proj_trans_refl (a : C.Obj) :
+@[simp] def proj_trans_refl (a : C.Obj) :
     RwEq
       (Path.trans (E.projPath a) (Path.refl _))
       (E.projPath a) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (E.projPath a))
 
 -- Theorem 48: Wedge path inverse cancel
-@[simp] theorem wedge_inverse_cancel (a b : C.Obj) :
+@[simp] def wedge_inverse_cancel (a b : C.Obj) :
     RwEq
       (Path.trans (E.wedgePath a b) (Path.symm (E.wedgePath a b)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (E.wedgePath a b))
 
 -- Theorem 49: Proj path symm cancel left
-@[simp] theorem proj_symm_cancel_left (a : C.Obj) :
+@[simp] def proj_symm_cancel_left (a : C.Obj) :
     RwEq
       (Path.trans (Path.symm (E.projPath a)) (E.projPath a))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel_left (E.projPath a))
 
 -- Theorem 50: Proj symm distributes
-theorem proj_symm_distrib (a : C.Obj) :
+def proj_symm_distrib (a : C.Obj) :
     RwEq
       (Path.symm (Path.trans (E.projPath a) (Path.symm (E.projPath a))))
       (Path.trans (Path.symm (Path.symm (E.projPath a)))
@@ -665,27 +667,27 @@ variable {C : VEnrichedCat V M}
 variable (T : EnrichedMonad C)
 
 -- Theorem 51: Monad unit path followed by refl
-@[simp] theorem monad_unit_trans_refl (a : C.Obj) :
+@[simp] def monad_unit_trans_refl (a : C.Obj) :
     RwEq
       (Path.trans (T.unitPath a) (Path.refl _))
       (T.unitPath a) :=
   rweq_of_enriched_step (EnrichedStep.right_unit (T.unitPath a))
 
 -- Theorem 52: Monad mult path inverse cancel
-@[simp] theorem monad_mult_inverse_cancel (a : C.Obj) :
+@[simp] def monad_mult_inverse_cancel (a : C.Obj) :
     RwEq
       (Path.trans (T.multPath a) (Path.symm (T.multPath a)))
       (Path.refl _) :=
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (T.multPath a))
 
 -- Theorem 53: Transport along monad unit is constant
-theorem transport_monad_unit_const (a : C.Obj) :
+def transport_monad_unit_const (a : C.Obj) :
     Path.transport (D := fun _ => V) (T.unitPath a) (C.idMorph a)
       = C.idMorph a := by
   simp [Path.transport_const]
 
 -- Theorem 54: Monad unit symm distributes
-theorem monad_unit_symm_distrib (a : C.Obj) :
+def monad_unit_symm_distrib (a : C.Obj) :
     RwEq
       (Path.symm (Path.trans (T.unitPath a) (Path.symm (T.unitPath a))))
       (Path.trans (Path.symm (Path.symm (T.unitPath a)))
@@ -694,7 +696,7 @@ theorem monad_unit_symm_distrib (a : C.Obj) :
     (EnrichedStep.symm_distrib (T.unitPath a) (Path.symm (T.unitPath a)))
 
 -- Theorem 55: Monad mult symm cancel left
-@[simp] theorem monad_mult_symm_cancel_left (a : C.Obj) :
+@[simp] def monad_mult_symm_cancel_left (a : C.Obj) :
     RwEq
       (Path.trans (Path.symm (T.multPath a)) (T.multPath a))
       (Path.refl _) :=
@@ -702,6 +704,7 @@ theorem monad_unit_symm_distrib (a : C.Obj) :
 
 end EnrichedMonad
 
+end
 end EnrichedCategory
 end Path
 end ComputationalPaths
