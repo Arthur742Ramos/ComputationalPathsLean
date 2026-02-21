@@ -1,3 +1,8 @@
+import CompPaths.Core
+import CompPaths.Algebra.HomologicalAlgebra
+import ComputationalPaths.Path.CompPath.CircleStep
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
+
 /-!
 # Mayer-Vietoris for computational paths
 
@@ -9,11 +14,6 @@ This file adds a computational-path Mayer-Vietoris segment:
 * exactness witnesses expressed with `Step` and `RwEq`;
 * a circle application interface (`S¹` covered by two arcs).
 -/
-
-import CompPaths.Core
-import CompPaths.Algebra.HomologicalAlgebra
-import ComputationalPaths.Path.CompPath.CircleStep
-import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 namespace CompPaths.Algebra
 
@@ -107,7 +107,7 @@ def mergeLoops (M : CoverData)
   Path.trans (Path.congrArg M.iU p) (M.loopFromV q)
 
 /-- `loopFromV` is compatible with `RwEq` witnesses. -/
-theorem loopFromV_respects {M : CoverData} {q q' : Path M.baseV M.baseV}
+def loopFromV_respects {M : CoverData} {q q' : Path M.baseV M.baseV}
     (h : RwEq q q') :
     RwEq (M.loopFromV q) (M.loopFromV q') := by
   have hmap : RwEq (Path.congrArg M.iV q) (Path.congrArg M.iV q') :=
@@ -120,7 +120,7 @@ theorem loopFromV_respects {M : CoverData} {q q' : Path M.baseV M.baseV}
   exact rweq_trans_congr_right M.glue hinter
 
 /-- `mergeLoops` is compatible with `RwEq` in both arguments. -/
-theorem mergeLoops_respects {M : CoverData}
+def mergeLoops_respects {M : CoverData}
     {p p' : Path M.baseU M.baseU} {q q' : Path M.baseV M.baseV}
     (hp : RwEq p p') (hq : RwEq q q') :
     RwEq (M.mergeLoops p q) (M.mergeLoops p' q') := by
@@ -223,7 +223,7 @@ theorem exact_at_pair (M : CoverData) (W : MayerVietorisWitness M)
     jMap M (iMap M z) = zeroH1 M := by
   refine Quot.inductionOn z ?_
   intro p
-  change Quot.mk _ (M.mergeLoops (Path.congrArg M.iUVU p) (Path.congrArg M.iUVV p)) =
+  show Quot.mk _ (M.mergeLoops (Path.congrArg M.iUVU p) (Path.congrArg M.iUVV p)) =
     Quot.mk _ (Path.refl M.baseA)
   exact Quot.sound ⟨RwEq.step (W.overlapBoundaryStep p)⟩
 
@@ -231,11 +231,12 @@ theorem exact_at_pair (M : CoverData) (W : MayerVietorisWitness M)
 theorem exact_at_h1_forward (M : CoverData) (W : MayerVietorisWitness M)
     (x : H1Sum M) :
     delta M W.decompose (jMap M x) = zeroH0 M := by
-  refine Quot.inductionOn x.1 ?_
+  obtain ⟨x₁, x₂⟩ := x
+  refine Quot.inductionOn x₁ ?_
   intro p
-  refine Quot.inductionOn x.2 ?_
+  refine Quot.inductionOn x₂ ?_
   intro q
-  change Quot.mk _ ((W.decompose (M.mergeLoops p q)).overlapPoint) = Quot.mk _ M.baseUV
+  show Quot.mk _ ((W.decompose (M.mergeLoops p q)).overlapPoint) = Quot.mk _ M.baseUV
   exact Quot.sound ⟨(W.decompose (M.mergeLoops p q)).overlapToBase⟩
 
 /-- Surjectivity of `j` from decomposition witnesses (`Step`/`RwEq`). -/
@@ -246,7 +247,7 @@ theorem jMap_surjective (M : CoverData) (W : MayerVietorisWitness M) :
   intro p
   let d := W.decompose p
   refine ⟨(Quot.mk _ d.uLoop, Quot.mk _ d.vLoop), ?_⟩
-  change Quot.mk _ (M.mergeLoops d.uLoop d.vLoop) = Quot.mk _ p
+  show Quot.mk _ (M.mergeLoops d.uLoop d.vLoop) = Quot.mk _ p
   exact Quot.sound ⟨rweq_symm d.rweqWitness⟩
 
 /-- Exactness at `H₁(A)` (backward): kernel of `δ` lies in `im(j)`. -/
@@ -262,14 +263,7 @@ theorem mayerVietoris_long_exact_rwEq (M : CoverData) (W : MayerVietorisWitness 
     (∀ x : H1Sum M, delta M W.decompose (jMap M x) = zeroH0 M) ∧
     (∀ α : H1 M.A M.baseA,
       delta M W.decompose α = zeroH0 M → ∃ x : H1Sum M, jMap M x = α) := by
-  constructor
-  · intro z
-    exact exact_at_pair M W z
-  constructor
-  · intro x
-    exact exact_at_h1_forward M W x
-  · intro α hδ
-    exact exact_at_h1_backward M W α hδ
+  exact ⟨exact_at_pair M W, exact_at_h1_forward M W, exact_at_h1_backward M W⟩
 
 /-! ## Circle application: two-arc Mayer-Vietoris interface -/
 
@@ -298,13 +292,20 @@ def CircleArcCover.toCoverData (C : CircleArcCover) : CoverData where
   baseUV := C.baseUV
   glue := C.glue
 
-/-- `H₁(S¹) ≃ ℤ`, exposed through the Mayer-Vietoris two-arc interface. -/
+/-- `H₁(S¹) ≅ ℤ` via Mayer-Vietoris: the two-arc cover reduces
+    H₁ to winding numbers by the long exact sequence + contractibility of arcs.
+
+    The bridge `pi1ToCirclePiOne` converts the path-based `π₁(S¹)` quotient
+    into the computational circle's winding-number quotient `circlePiOne`,
+    completing the chain `H₁ ≃ π₁ ≃ circlePiOne ≃ ℤ`. -/
 noncomputable def circleH1EquivInt_viaMayerVietoris
     (C : CircleArcCover)
-    (W : MayerVietorisWitness C.toCoverData) :
+    (W : MayerVietorisWitness C.toCoverData)
+    (pi1Bridge : SimpleEquiv (π₁(Circle, circleBase)) circlePiOne) :
     SimpleEquiv (H1 Circle circleBase) Int := by
-  let _ := mayerVietoris_long_exact_rwEq C.toCoverData W
-  exact SimpleEquiv.comp (h1EquivPi1 Circle circleBase) circlePiOneEquivInt
+  let _les := mayerVietoris_long_exact_rwEq C.toCoverData W
+  exact SimpleEquiv.comp (h1EquivPi1 Circle circleBase)
+    (SimpleEquiv.comp pi1Bridge CompPath.circlePiOneEquivInt)
 
 end
 

@@ -100,22 +100,48 @@ def h1Mul {A : Type u} {a : A} :
 def h1One {A : Type u} (a : A) : H₁ A a :=
   Quotient.mk (abelSetoid A a) (Path.refl a)
 
+/-- AbelRel is congruent under Path.symm. -/
+theorem abelRel_symm_congr {A : Type u} {a : A}
+    {p q : Loop A a} (h : AbelRel p q) :
+    AbelRel (Path.symm p) (Path.symm q) := by
+  induction h with
+  | rweq hrw =>
+      exact AbelRel.rweq (by rcases hrw with ⟨hrw⟩; exact ⟨rweq_symm_congr hrw⟩)
+  | comm p' q' =>
+      -- Goal: AbelRel (symm (trans p' q')) (symm (trans q' p'))
+      -- Chain: symm(p'·q') ~step q'⁻¹·p'⁻¹ ~comm p'⁻¹·q'⁻¹ ~step symm(q'·p')
+      exact AbelRel.trans
+        (AbelRel.rweq ⟨rweq_of_step (Step.symm_trans_congr p' q')⟩)
+        (AbelRel.trans
+          (AbelRel.comm (Path.symm q') (Path.symm p'))
+          (AbelRel.rweq ⟨rweq_symm (rweq_of_step (Step.symm_trans_congr q' p'))⟩))
+  | congr_left r' _hpq ih =>
+      -- Goal: AbelRel (symm (trans r' p)) (symm (trans r' q))
+      -- Chain: symm(r'·p) ~step p⁻¹·r'⁻¹ ~congr q⁻¹·r'⁻¹ ~step symm(r'·q)
+      exact AbelRel.trans
+        (AbelRel.rweq ⟨rweq_of_step (Step.symm_trans_congr r' _)⟩)
+        (AbelRel.trans
+          (AbelRel.congr_right (Path.symm r') ih)
+          (AbelRel.rweq ⟨rweq_symm (rweq_of_step (Step.symm_trans_congr r' _))⟩))
+  | congr_right r' _hpq ih =>
+      -- Goal: AbelRel (symm (trans p r')) (symm (trans q r'))
+      -- Chain: symm(p·r') ~step r'⁻¹·p⁻¹ ~congr r'⁻¹·q⁻¹ ~step symm(q·r')
+      exact AbelRel.trans
+        (AbelRel.rweq ⟨rweq_of_step (Step.symm_trans_congr _ r')⟩)
+        (AbelRel.trans
+          (AbelRel.congr_left (Path.symm r') ih)
+          (AbelRel.rweq ⟨rweq_symm (rweq_of_step (Step.symm_trans_congr _ r'))⟩))
+  | symm _ ih => exact AbelRel.symm ih
+  | trans _ _ ih1 ih2 => exact AbelRel.trans ih1 ih2
+
 /-- Inverse in H₁, descending Path.symm. -/
 def h1Inv {A : Type u} {a : A} :
     H₁ A a → H₁ A a :=
   Quotient.lift
     (fun p => Quotient.mk (abelSetoid A a) (Path.symm p))
     (by
-      intro p q (h : AbelRel p q)
-      apply Quotient.sound
-      -- We prove: AbelRel (symm p) (symm q) from AbelRel p q
-      -- Instead of inducting on h (which isn't always possible on Setoid),
-      -- we use the fact that the relation includes symmetry via rweq
-      -- For the general case, we lift through π₁ which has inv_congr
-      -- All paths from a to a have the same toEq (proof irrelevance),
-      -- so symm p and symm q have the same underlying proof.
-      -- Since all such paths are related by RwEq (via toEq), we get AbelRel.
-      exact AbelRel.rweq ⟨rweq_of_toEq rfl⟩)
+      intro p q h
+      exact Quotient.sound (abelRel_symm_congr h))
 
 /-- `h(p · q) = h(p) · h(q)`. -/
 theorem hurewiczMap_mul {A : Type u} {a : A}
