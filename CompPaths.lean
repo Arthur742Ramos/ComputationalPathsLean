@@ -28,3 +28,4 @@ import CompPaths.Algebra.HomologicalAlgebra
 import CompPaths.HIT.SuspensionDeep
 import CompPaths.Category.EnrichedCategory
 import CompPaths.Algebra.OperadStructure
+import CompPaths.Algebra.PathAlgebra
