@@ -1,5 +1,8 @@
 import CompPaths.Core
+import CompPaths.Coherence.AssociativityCoherence
 import CompPaths.Coherence.UnitCoherence
+import CompPaths.Coherence.InverseCoherence
+import CompPaths.Coherence.InterchangeLaw
 import CompPaths.DeformationTheory.ObstructionPaths
 import CompPaths.OmegaGroupoid.WeakGroupoidPaths
 import CompPaths.OmegaGroupoid.CoherencePaths

@@ -12,7 +12,14 @@ lean_lib ComputationalPaths where
 
 @[default_target]
 lean_lib CompPaths where
-  roots := #[`CompPaths, `CompPaths.OmegaGroupoid.WeakGroupoidPaths, `CompPaths.OmegaGroupoid.CoherencePaths, `CompPaths.OmegaGroupoid.HigherCellPaths]
+  roots := #[`CompPaths,
+    `CompPaths.Coherence.AssociativityCoherence,
+    `CompPaths.Coherence.UnitCoherence,
+    `CompPaths.Coherence.InverseCoherence,
+    `CompPaths.Coherence.InterchangeLaw,
+    `CompPaths.OmegaGroupoid.WeakGroupoidPaths,
+    `CompPaths.OmegaGroupoid.CoherencePaths,
+    `CompPaths.OmegaGroupoid.HigherCellPaths]
 
 @[default_target]
 lean_exe computational_paths where
