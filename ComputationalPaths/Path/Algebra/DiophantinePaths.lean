@@ -282,6 +282,6 @@ theorem pyth_step_map {B : Type u} (R : DRing A) (T : PythTriple R) (f : A → B
 /-- Two diophantine paths agree semantically. -/
 theorem dioph_coherence {x y : A} (p q : Path x y) :
     p.toEq = q.toEq :=
-  Subsingleton.elim p.toEq q.toEq
+  rfl p.toEq q.toEq
 
 end ComputationalPaths.Path.Algebra.DiophantinePaths

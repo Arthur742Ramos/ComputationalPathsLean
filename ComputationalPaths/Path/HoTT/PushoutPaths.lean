@@ -234,7 +234,7 @@ theorem pushout_naturality {A B C : Type u} {s : Span A B C} {D : Type v}
     (hglue : ∀ c, fA (s.left c) = fB (s.right c))
     (c : C) :
     _root_.congrArg (Pushout.lift fA fB hglue) (Pushout.glue c) = hglue c := by
-  apply Subsingleton.elim
+  rfl
 
 /-- The coequalizer path composed with its inverse is trivial (toEq). -/
 theorem coeqPath_trans_symm_toEq {X Y : Type u} {f g : X → Y} (x : X) :

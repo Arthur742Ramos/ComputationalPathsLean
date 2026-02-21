@@ -170,7 +170,7 @@ instance cofiberIdSubsingleton : Subsingleton (CofiberId A) where
 
 /-- Path connecting any two points of Cf(id). -/
 def cofiberId_path (x y : CofiberId A) : Path x y :=
-  Path.stepChain (Subsingleton.elim x y)
+  Path.stepChain (rfl x y)
 
 /-! ## Cofiber of a constant map -/
 

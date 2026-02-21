@@ -299,7 +299,7 @@ theorem transport_const_cw {n : Nat} {w1 w2 : CodeWord n}
 
 -- 43. Path coherence (UIP)
 theorem cw_path_coherence {n : Nat} {w1 w2 : CodeWord n} (p q : Path w1 w2) :
-    p.proof = q.proof := Subsingleton.elim _ _
+    p.proof = q.proof := rfl
 
 -- 44. CongrArg composition
 theorem congrArg_comp_encode_parity {n k : Nat} (c : LinearCode n k)

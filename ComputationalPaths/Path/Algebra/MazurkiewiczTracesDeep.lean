@@ -243,7 +243,7 @@ theorem traceMulFour_eq (a b c d : TraceWord Sym) :
 
 theorem traceMulFourPath_toEq (a b c d : TraceWord Sym) :
     (traceMulFourPath a b c d).toEq = traceMulFour_eq a b c d := by
-  apply Subsingleton.elim
+  rfl
 
 end TraceMonoid
 

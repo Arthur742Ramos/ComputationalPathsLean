@@ -131,7 +131,7 @@ def nash_transport {S1 S2 : Type u} (g : Game S1 S2)
 theorem nash_proof_irrel {S1 S2 : Type u} (g : Game S1 S2)
     (p : Profile S1 S2) (h1 h2 : IsNashEquilibrium g p) :
     h1 = h2 := by
-  exact Subsingleton.elim h1 h2
+  exact rfl h1 h2
 
 /-! ## Dominant Strategies -/
 

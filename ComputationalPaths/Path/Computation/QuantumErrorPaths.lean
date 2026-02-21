@@ -280,6 +280,6 @@ def error_correction_step (q : QBit) : Step QBit :=
 theorem correction_path_coherence (q : QBit) (p1 p2 :
     Path (applyCorrection ErrorType.bitFlip (applyError ErrorType.bitFlip q)) q) :
     p1.proof = p2.proof :=
-  Subsingleton.elim _ _
+  rfl
 
 end ComputationalPaths.Path.Computation.QuantumErrorPaths

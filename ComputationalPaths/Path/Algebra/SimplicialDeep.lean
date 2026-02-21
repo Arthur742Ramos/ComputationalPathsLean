@@ -616,7 +616,7 @@ theorem nerve_pentagon_coherence {Ob : Type u} (C : SmallCatData Ob)
     (p1 p2 : C.comp (C.comp (C.comp f g) h) k =
              C.comp f (C.comp g (C.comp h k))) :
     p1 = p2 := by
-  apply Subsingleton.elim
+  rfl
 
 /-- Theorem 32: Left and right unit compose to give associator path. -/
 def nerve_triangle_path {Ob : Type u} (C : SmallCatData Ob)

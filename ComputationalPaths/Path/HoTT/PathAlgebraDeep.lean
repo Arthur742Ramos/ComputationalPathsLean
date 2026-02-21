@@ -317,7 +317,7 @@ theorem pentagon_coherence {a b c d e : A}
       (Eq.trans
         (Path.trans_assoc p (Path.trans q r) s)
         (_root_.congrArg (fun t => Path.trans p t) (Path.trans_assoc q r s))) :=
-  Subsingleton.elim _ _
+  rfl
 
 /-! ## 21. Transport along congrArg path -/
 

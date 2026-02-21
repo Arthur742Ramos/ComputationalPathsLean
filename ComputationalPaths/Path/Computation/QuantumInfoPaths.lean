@@ -267,7 +267,7 @@ theorem transport_const_dm {ρ σ : DensityMatrix} (p : Path ρ σ) (n : Nat) :
 -- 51. Path coherence (UIP)
 theorem density_path_coherence {ρ σ : DensityMatrix} (p q : Path ρ σ) :
     p.proof = q.proof :=
-  Subsingleton.elim _ _
+  rfl
 
 -- 52. CongrArg composition: trace ∘ apply = congrArg trace ∘ congrArg apply
 theorem congrArg_comp_trace_apply (op : QOp) {ρ σ : DensityMatrix}

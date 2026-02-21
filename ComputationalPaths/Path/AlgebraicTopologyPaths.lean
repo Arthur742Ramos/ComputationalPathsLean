@@ -427,7 +427,7 @@ theorem FiberSeq.connecting_symm_proof {F E B : Type u}
     (fs : FiberSeq F E B) {b₁ b₂ : B}
     (p : Path b₁ b₂) (e : E) (he : Path (fs.proj e) b₁) :
     (fs.connecting (Path.symm p) e (fs.connecting p e he)).proof = he.proof :=
-  Subsingleton.elim _ _
+  rfl
 
 /-- Projection of fiber elements: congrArg through proj ∘ incl. -/
 theorem FiberSeq.proj_incl_eq {F E B : Type u}

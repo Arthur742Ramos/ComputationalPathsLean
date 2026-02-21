@@ -407,7 +407,7 @@ theorem pathGrayCategory_tensor_assoc (A : Type u)
     (pathGrayCategory A).vcomp
       ((pathGrayCategory A).assoc f₀ g₀ h₀)
       ((pathGrayCategory A).hcomp η ((pathGrayCategory A).hcomp θ ι)) := by
-  apply Subsingleton.elim
+  rfl
 
 /-- The path Gray-category tensor associativity equality can be lifted to a 3-cell witness. -/
 def pathGrayCategory_tensor_assoc_path (A : Type u)
