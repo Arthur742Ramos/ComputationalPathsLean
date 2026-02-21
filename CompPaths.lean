@@ -1,2 +1,6 @@
 import CompPaths.Core
 import CompPaths.Coherence.UnitCoherence
+import CompPaths.DeformationTheory.ObstructionPaths
+import CompPaths.OmegaGroupoid.WeakGroupoidPaths
+import CompPaths.OmegaGroupoid.CoherencePaths
+import CompPaths.OmegaGroupoid.HigherCellPaths
