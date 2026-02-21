@@ -1,5 +1,6 @@
 import CompPaths.Core
 import CompPaths.Comparison.HoTTComparison
+import CompPaths.Comparison.UnivalenceAnalog
 import CompPaths.Context.CongruenceClosure
 -- import CompPaths.Rewriting.KnuthBendix  -- TODO: fix GTRS.Expr dependency
 import CompPaths.Confluence.ConfluenceDeep
