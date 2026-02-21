@@ -28,12 +28,12 @@ variable {A : Type u}
 /-- A type is a homotopy set (h-set) if any two parallel paths are RwEq.
     This is the computational paths analog of "0-truncated" types in HoTT. -/
 class IsHSet (A : Type u) : Prop where
-  rweq : ∀ {a b : A} (p q : Path a b), RwEq p q
+  rweq : ∀ {a b : A} (p q : Path a b), RwEqProp p q
 
 /-- A type satisfies Axiom K if every loop is RwEq to refl.
     This is the computational paths analog of the "K axiom" in type theory. -/
 def AxiomK (A : Type u) : Prop :=
-  ∀ (a : A) (p : Path a a), RwEq p (Path.refl a)
+  ∀ (a : A) (p : Path a a), RwEqProp p (Path.refl a)
 
 /-- Subsingleton types satisfy Axiom K: any loop rewrites to reflexivity.
 
@@ -42,6 +42,7 @@ step in a loop can be replaced by the unique reflexive step at the basepoint,
 and `Path.stepChain rfl` rewrites to `Path.refl` (see `Homotopy/Reflexivity.lean`). -/
 theorem axiomK_of_subsingleton (A : Type u) [Subsingleton A] : AxiomK A := by
   intro a p
+  refine ⟨?_⟩
   have step_eq_refl (s : ComputationalPaths.Step A) :
       s = ComputationalPaths.Step.mk a a (rfl : a = a) := by
     cases s with
@@ -86,11 +87,11 @@ theorem axiomK_of_subsingleton (A : Type u) [Subsingleton A] : AxiomK A := by
 
 /-- Lemma 5.12: Every path has an inverse that composes to refl on both sides.
     In our formalization, the inverse is `Path.symm`. -/
-theorem inverse_left {a b : A} (p : Path a b) :
+noncomputable def inverse_left {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl b) :=
   rweq_of_step (Step.symm_trans p)
 
-theorem inverse_right {a b : A} (p : Path a b) :
+noncomputable def inverse_right {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
   rweq_of_step (Step.trans_symm p)
 
@@ -99,7 +100,7 @@ theorem inverse_right {a b : A} (p : Path a b) :
 
     This formalizes the uniqueness part of Lemma 5.12:
     "Furthermore, t⁻¹ is unique up to propositional identity" -/
-theorem inverse_unique {a b : A} (p : Path a b) (q : Path b a)
+noncomputable def inverse_unique {a b : A} (p : Path a b) (q : Path b a)
     (hpq : RwEq (Path.trans p q) (Path.refl a)) :
     RwEq q (Path.symm p) := by
   -- q ≈ trans refl q ≈ trans (trans (symm p) p) q
@@ -130,8 +131,10 @@ theorem isHSet_implies_axiomK (h : IsHSet A) : AxiomK A := by
 theorem axiomK_implies_isHSet (h : AxiomK A) : IsHSet A := by
   refine ⟨?rweq⟩
   intro a b p q
+  refine ⟨?_⟩
   -- Form the loop trans p (symm q) : a → a
-  have loop_refl : RwEq (Path.trans p (Path.symm q)) (Path.refl a) := h a _
+  have loop_refl : RwEq (Path.trans p (Path.symm q)) (Path.refl a) :=
+    rweq_of_rweqProp (h a _)
   -- We need to show p ≈ q
   -- p ≈ trans p refl ≈ trans p (trans (symm q) q)
   --   ≈ trans (trans p (symm q)) q ≈ trans refl q ≈ q

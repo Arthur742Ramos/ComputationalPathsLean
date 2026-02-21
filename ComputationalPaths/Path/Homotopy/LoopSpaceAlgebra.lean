@@ -36,26 +36,26 @@ abbrev Omega (A : Type u) (a : A) : Type u :=
 
 /-! ## Group Laws Up to RwEq -/
 
-@[simp] theorem id_comp_rweq (p : Omega A a) :
+@[simp] noncomputable def id_comp_rweq (p : Omega A a) :
     RwEq (LoopSpace.comp (LoopSpace.id (A := A) (a := a)) p) p := by
   simp [LoopSpace.id, LoopSpace.comp]
 
-@[simp] theorem comp_id_rweq (p : Omega A a) :
+@[simp] noncomputable def comp_id_rweq (p : Omega A a) :
     RwEq (LoopSpace.comp p (LoopSpace.id (A := A) (a := a))) p := by
   simp [LoopSpace.id, LoopSpace.comp]
 
-@[simp] theorem comp_assoc_rweq (p q r : Omega A a) :
+@[simp] noncomputable def comp_assoc_rweq (p q r : Omega A a) :
     RwEq (LoopSpace.comp (LoopSpace.comp p q) r)
       (LoopSpace.comp p (LoopSpace.comp q r)) := by
   simp [LoopSpace.comp]
 
-@[simp] theorem inv_comp_rweq (p : Omega A a) :
+@[simp] noncomputable def inv_comp_rweq (p : Omega A a) :
     RwEq (LoopSpace.comp (LoopSpace.inv p) p)
       (LoopSpace.id (A := A) (a := a)) := by
   simpa [LoopSpace.inv, LoopSpace.comp, LoopSpace.id] using
     (rweq_cmpA_inv_left (p := p))
 
-@[simp] theorem comp_inv_rweq (p : Omega A a) :
+@[simp] noncomputable def comp_inv_rweq (p : Omega A a) :
     RwEq (LoopSpace.comp p (LoopSpace.inv p))
       (LoopSpace.id (A := A) (a := a)) := by
   simpa [LoopSpace.inv, LoopSpace.comp, LoopSpace.id] using
@@ -63,22 +63,22 @@ abbrev Omega (A : Type u) (a : A) : Type u :=
 
 /-! ## Compatibility with RwEq -/
 
-theorem comp_congr_left {p p' q : Omega A a} (h : RwEq p p') :
+noncomputable def comp_congr_left {p p' q : Omega A a} (h : RwEq p p') :
     RwEq (LoopSpace.comp p q) (LoopSpace.comp p' q) := by
   simpa [LoopSpace.comp] using
     (rweq_trans_congr_left q h)
 
-theorem comp_congr_right {p q q' : Omega A a} (h : RwEq q q') :
+noncomputable def comp_congr_right {p q q' : Omega A a} (h : RwEq q q') :
     RwEq (LoopSpace.comp p q) (LoopSpace.comp p q') := by
   simpa [LoopSpace.comp] using
     (rweq_trans_congr_right p h)
 
-theorem comp_congr {p p' q q' : Omega A a} (hp : RwEq p p') (hq : RwEq q q') :
+noncomputable def comp_congr {p p' q q' : Omega A a} (hp : RwEq p p') (hq : RwEq q q') :
     RwEq (LoopSpace.comp p q) (LoopSpace.comp p' q') := by
   simpa [LoopSpace.comp] using
     (rweq_trans_congr hp hq)
 
-theorem inv_congr {p q : Omega A a} (h : RwEq p q) :
+noncomputable def inv_congr {p q : Omega A a} (h : RwEq p q) :
     RwEq (LoopSpace.inv p) (LoopSpace.inv q) := by
   simpa [LoopSpace.inv] using
     (rweq_symm_congr h)

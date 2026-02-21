@@ -85,32 +85,32 @@ theorem rw_trans_refl_right_outer (p : Path a b) (q : Path b c) :
 /-! ## Congruence-step interactions -/
 
 /-- Applying `congrArg f` to `refl a` is rewrite-equal to `refl (f a)`. -/
-theorem rweq_congrArg_refl_eq {B : Type u} (f : A → B) (a : A) :
+noncomputable def rweq_congrArg_refl_eq {B : Type u} (f : A → B) (a : A) :
     RwEq (Path.congrArg f (Path.refl a)) (Path.refl (f a)) := by
   simp
 
 /-- `congrArg f (symm p)` is rewrite-equal to `symm (congrArg f p)`. -/
-theorem rweq_congrArg_symm_eq {B : Type u} (f : A → B) (p : Path a b) :
+noncomputable def rweq_congrArg_symm_eq {B : Type u} (f : A → B) (p : Path a b) :
     RwEq (Path.congrArg f (Path.symm p))
          (Path.symm (Path.congrArg f p)) := by
   simp
 
 /-- `congrArg f (trans p q)` is rewrite-equal to
     `trans (congrArg f p) (congrArg f q)`. -/
-theorem rweq_congrArg_trans_eq {B : Type u} (f : A → B)
+noncomputable def rweq_congrArg_trans_eq {B : Type u} (f : A → B)
     (p : Path a b) (q : Path b c) :
     RwEq (Path.congrArg f (Path.trans p q))
          (Path.trans (Path.congrArg f p) (Path.congrArg f q)) := by
   simp
 
 /-- `congrArg id p` is rewrite-equal to `p`. -/
-theorem rweq_congrArg_id_eq (p : Path a b) :
+noncomputable def rweq_congrArg_id_eq (p : Path a b) :
     RwEq (Path.congrArg (fun x : A => x) p) p := by
   simp
 
 /-- Composition of congruences: `congrArg (g ∘ f) p` equals
     `congrArg g (congrArg f p)`. -/
-theorem rweq_congrArg_comp_eq {B C : Type u}
+noncomputable def rweq_congrArg_comp_eq {B C : Type u}
     (f : A → B) (g : B → C)
     (p : Path a b) :
     RwEq (Path.congrArg (fun x => g (f x)) p)
@@ -154,7 +154,7 @@ theorem rw_symm_symm_trans (p : Path a b) (q : Path b c) :
 
 /-- The Mac Lane pentagon: the two ways to reassociate `((p ∘ q) ∘ r) ∘ s`
     into `p ∘ (q ∘ (r ∘ s))` yield the same result (up to `RwEq`). -/
-theorem rweq_pentagon (p : Path a b) (q : Path b c) (r : Path c d)
+noncomputable def rweq_pentagon (p : Path a b) (q : Path b c) (r : Path c d)
     {e : A} (s : Path d e) :
     RwEq
       (Path.trans (Path.trans (Path.trans p q) r) s)
@@ -169,9 +169,9 @@ theorem rw_symm_refl (a : A) :
   rw_of_step (Step.symm_refl a)
 
 /-- `ofEq h` for any `h : a = a` rewrites to `ofEq rfl`. -/
-theorem rweq_ofEq_rfl_eq_refl (h : a = a) :
+noncomputable def rweq_ofEq_rfl_eq_refl (h : a = a) :
     RwEq (Path.stepChain h) (Path.stepChain rfl) := by
-  have : h = rfl := rfl
+  have : h = rfl := proof_irrel _ _
   subst this
   exact RwEq.refl _
 
@@ -193,7 +193,7 @@ theorem rw_congrArg_of_rw {B : Type u} (f : A → B) {p q : Path a b}
   | tail _ step ih => exact Rw.tail ih (step_congrArg_of_step f step)
 
 /-- If `RwEq p q` then `RwEq (congrArg f p) (congrArg f q)`. -/
-theorem rweq_congrArg_of_rweq' {B : Type u} (f : A → B) {p q : Path a b}
+noncomputable def rweq_congrArg_of_rweq' {B : Type u} (f : A → B) {p q : Path a b}
     (h : RwEq p q) :
     RwEq (Path.congrArg f p) (Path.congrArg f q) :=
   rweq_congrArg_of_rweq f h

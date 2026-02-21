@@ -207,27 +207,27 @@ structure CauchyPropertyWitness (x : ConstructiveReal) where
 
 /-! ## RwEq Coherences -/
 
-theorem add_comm_symm_rweq (x y : ConstructiveReal) :
+noncomputable def add_comm_symm_rweq (x y : ConstructiveReal) :
     RwEq (Path.symm (Path.symm (add_comm_path x y)))
          (add_comm_path x y) :=
   RwEq.step (Step.symm_symm _)
 
-theorem add_comm_trans_refl_rweq (x y : ConstructiveReal) :
+noncomputable def add_comm_trans_refl_rweq (x y : ConstructiveReal) :
     RwEq (Path.trans (add_comm_path x y) (Path.refl _))
          (add_comm_path x y) :=
   RwEq.step (Step.trans_refl_right _)
 
-theorem add_comm_refl_trans_rweq (x y : ConstructiveReal) :
+noncomputable def add_comm_refl_trans_rweq (x y : ConstructiveReal) :
     RwEq (Path.trans (Path.refl _) (add_comm_path x y))
          (add_comm_path x y) :=
   RwEq.step (Step.trans_refl_left _)
 
-theorem equiv_rfl_rweq (x : ConstructiveReal) :
+noncomputable def equiv_rfl_rweq (x : ConstructiveReal) :
     RwEq (Path.refl (True : Prop))
          ((CREquiv.rfl_equiv x).equiv_witness 0 0 (Nat.le_refl _)) :=
   RwEq.refl _
 
-theorem equiv_symm_trans_rweq {x y : ConstructiveReal}
+noncomputable def equiv_symm_trans_rweq {x y : ConstructiveReal}
     (e : CREquiv x y) (k n : Nat) (hn : n ≥ e.equiv_modulus k) :
     RwEq (Path.trans (Path.symm (e.equiv_witness k n hn)) (e.equiv_witness k n hn))
          (Path.refl True) :=

@@ -211,8 +211,8 @@ end PushoutPath
 /-- Two expressions are equivalent if their interpreted paths are rewrite-equal. -/
 def exprRel {x y : PushoutCompPath A B C f g}
     (p q : PushoutCompPathExpr A B C f g x y) : Prop :=
-  RwEq (exprToPath (A := A) (B := B) (C := C) (f := f) (g := g) p)
-       (exprToPath (A := A) (B := B) (C := C) (f := f) (g := g) q)
+  RwEqProp (exprToPath (A := A) (B := B) (C := C) (f := f) (g := g) p)
+    (exprToPath (A := A) (B := B) (C := C) (f := f) (g := g) q)
 
 @[simp] theorem exprRel_refl {x y : PushoutCompPath A B C f g}
     (p : PushoutCompPathExpr A B C f g x y) : exprRel (A := A) (B := B) (C := C) (f := f) (g := g) p p :=
@@ -312,8 +312,8 @@ variable (c₀ : C)
     It is needed for the Seifert-Van Kampen theorem proof. -/
 class HasGlueNaturalLoopRwEq : Prop where
    eq : ∀ (c : C) (p : Path c₀ c),
-      RwEq (trans (symm (inlPath (congrArg f p))) (trans (glue c₀) (inrPath (congrArg g p))))
-           (glue c)
+      RwEqProp (trans (symm (inlPath (congrArg f p))) (trans (glue c₀) (inrPath (congrArg g p))))
+        (glue c)
 
 end Pushout
 

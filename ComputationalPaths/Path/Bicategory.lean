@@ -48,7 +48,7 @@ end CellPath
 `A_{2rw}(a,b)` in the computational-path literature. -/
 abbrev TwoCell {A : Type u} {a b : A}
     (p q : Path a b) : Prop :=
-  RwEq (A := A) (a := a) (b := b) p q
+  RwEqProp (A := A) (a := a) (b := b) p q
 
 namespace TwoCell
 

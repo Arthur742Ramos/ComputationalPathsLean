@@ -94,7 +94,7 @@ variable {i : Instantiation}
   rw_of_step i.step
 
 /-- Promote the instantiation to the symmetric closure. -/
-@[simp] def toRwEq : RwEq (A := _) i.p i.q :=
+@[simp] noncomputable def toRwEq : RwEq (A := _) i.p i.q :=
   rweq_of_step i.step
 
 /-! ### Soundness/completeness package for instantiated LNDEQ rules -/
@@ -115,7 +115,7 @@ variable {i : Instantiation}
     Rw (A := _) i.p i.q :=
   i.toRw
 
-@[simp] theorem complete_to_rweq (i : Instantiation) :
+@[simp] noncomputable def complete_to_rweq (i : Instantiation) :
     RwEq (A := _) i.p i.q :=
   i.toRwEq
 
@@ -135,9 +135,9 @@ variable {i : Instantiation}
     i.p.toEq = i.q.toEq ∧ Rw (A := _) i.p i.q :=
   ⟨i.rw_sound, i.toRw⟩
 
-@[simp] theorem sound_complete_rweq_bundle (i : Instantiation) :
-    i.p.toEq = i.q.toEq ∧ RwEq (A := _) i.p i.q :=
-  ⟨i.rweq_sound, i.toRwEq⟩
+@[simp] noncomputable def sound_complete_rweq_bundle (i : Instantiation) :
+    i.p.toEq = i.q.toEq × RwEq (A := _) i.p i.q :=
+  (i.rweq_sound, i.toRwEq)
 
 @[simp] theorem normalize_idem_source (i : Instantiation) :
     normalize (normalize i.p) = normalize i.p :=
@@ -175,9 +175,9 @@ variable {i : Instantiation}
     Rw (A := _) i.p i.q ∧ i.p.toEq = i.q.toEq :=
   ⟨i.toRw, i.rw_sound⟩
 
-@[simp] theorem complete_sound_rweq_pair (i : Instantiation) :
-    RwEq (A := _) i.p i.q ∧ i.p.toEq = i.q.toEq :=
-  ⟨i.toRwEq, i.rweq_sound⟩
+@[simp] noncomputable def complete_sound_rweq_pair (i : Instantiation) :
+    RwEq (A := _) i.p i.q × i.p.toEq = i.q.toEq :=
+  (i.toRwEq, i.rweq_sound)
 
 @[simp] theorem termination_bundle (i : Instantiation) :
     IsNormal (normalize i.p) ∧ IsNormal (normalize i.q) ∧ normalize i.p = normalize i.q :=
@@ -647,7 +647,7 @@ end Builder
 
 /-! ## Local peak closure lemmas (bridge to confluence proofs) -/
 
-@[simp] theorem peak_rweq_of_steps {A : Type u} {a b : A}
+@[simp] noncomputable def peak_rweq_of_steps {A : Type u} {a b : A}
     {p q r : Path a b}
     (hq : Step (A := A) p q) (hr : Step (A := A) p r) :
     RwEq (A := A) q r :=
@@ -674,7 +674,7 @@ end Builder
   refine ⟨normalize_isNormal q, ?_⟩
   simpa [hnorm] using (normalize_isNormal q)
 
-@[simp] theorem critical_pair_tt_rrr_via_peak {A : Type u} {a b c : A}
+@[simp] noncomputable def critical_pair_tt_rrr_via_peak {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
@@ -684,7 +684,7 @@ end Builder
       (r := Path.refl c)).step)
     (hr := (Builder.instRrr (A := A) (p := Path.trans p q)).step)
 
-@[simp] theorem critical_pair_tt_lrr_via_peak {A : Type u} {a b c : A}
+@[simp] noncomputable def critical_pair_tt_lrr_via_peak {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
@@ -694,7 +694,7 @@ end Builder
       (q := q) (r := r)).step)
     (hr := (Builder.instLrr (A := A) (p := Path.trans q r)).step)
 
-@[simp] theorem critical_pair_tt_rrr_rweq {A : Type u} {a b c : A}
+@[simp] noncomputable def critical_pair_tt_rrr_rweq {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
@@ -703,7 +703,7 @@ end Builder
   exact rweq_of_step
     (Step.trans_congr_right (p := p) (Step.trans_refl_right (p := q)))
 
-@[simp] theorem critical_pair_tt_lrr_rweq {A : Type u} {a b c : A}
+@[simp] noncomputable def critical_pair_tt_lrr_rweq {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
@@ -795,7 +795,7 @@ theorem critical_pair_tt_lrr_join_toEq {A : Type u} {a b c : A}
 /-- Soundness/completeness/termination package for the `tt/rrr` overlap. -/
 theorem critical_pair_tt_rrr_sound_complete_termination {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
-    RwEq
+    RwEqProp
       (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
       (Builder.instRrr (A := A) (p := Path.trans p q)).q ∧
       (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q.toEq =
@@ -813,7 +813,7 @@ theorem critical_pair_tt_rrr_sound_complete_termination {A : Type u} {a b c : A}
 /-- Soundness/completeness/termination package for the `tt/lrr` overlap. -/
 theorem critical_pair_tt_lrr_sound_complete_termination {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
-    RwEq
+    RwEqProp
       (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
       (Builder.instLrr (A := A) (p := Path.trans q r)).q ∧
       (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q.toEq =
@@ -859,7 +859,7 @@ theorem confluence_bridge_tt_lrr_join_exists {A : Type u} {a b c : A}
 /-! ## Soundness/completeness/termination refinements for confluence bridges -/
 
 /-- Completeness extraction from the `tt/rrr` join witness. -/
-theorem critical_pair_tt_rrr_join_rweq {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_rrr_join_rweq {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
@@ -868,7 +868,7 @@ theorem critical_pair_tt_rrr_join_rweq {A : Type u} {a b c : A}
   exact rweq_trans (rweq_of_rw hs₁) (rweq_symm (rweq_of_rw hs₂))
 
 /-- Completeness extraction from the `tt/lrr` join witness. -/
-theorem critical_pair_tt_lrr_join_rweq {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_lrr_join_rweq {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
@@ -911,10 +911,10 @@ theorem critical_pair_tt_lrr_join_termination {A : Type u} {a b c : A}
   exact ⟨s, hs₁, hs₂, normalize_isNormal s⟩
 
 /-- Direct bridge package in the shape consumed by the main confluence development (`tt/rrr`). -/
-theorem confluence_bridge_tt_rrr_sound_complete {A : Type u} {a b c : A}
+noncomputable def confluence_bridge_tt_rrr_sound_complete {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
-    (∃ s, Rw (Path.trans p (Path.trans q (Path.refl c))) s ∧ Rw (Path.trans p q) s) ∧
-    RwEq (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q) ∧
+    (∃ s, Rw (Path.trans p (Path.trans q (Path.refl c))) s ∧ Rw (Path.trans p q) s) ×
+    RwEq (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q) ×
     (Path.trans p (Path.trans q (Path.refl c))).toEq = (Path.trans p q).toEq := by
   refine ⟨confluence_bridge_tt_rrr_join_exists (A := A) (p := p) (q := q), ?_, ?_⟩
   · simpa [Builder.instTt, Builder.instRrr] using
@@ -922,10 +922,10 @@ theorem confluence_bridge_tt_rrr_sound_complete {A : Type u} {a b c : A}
   · exact confluence_bridge_tt_rrr_toEq (A := A) (p := p) (q := q)
 
 /-- Direct bridge package in the shape consumed by the main confluence development (`tt/lrr`). -/
-theorem confluence_bridge_tt_lrr_sound_complete {A : Type u} {a b c : A}
+noncomputable def confluence_bridge_tt_lrr_sound_complete {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
-    (∃ s, Rw (Path.trans (Path.refl a) (Path.trans q r)) s ∧ Rw (Path.trans q r) s) ∧
-    RwEq (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r) ∧
+    (∃ s, Rw (Path.trans (Path.refl a) (Path.trans q r)) s ∧ Rw (Path.trans q r) s) ×
+    RwEq (Path.trans (Path.refl a) (Path.trans q r)) (Path.trans q r) ×
     (Path.trans (Path.refl a) (Path.trans q r)).toEq = (Path.trans q r).toEq := by
   refine ⟨confluence_bridge_tt_lrr_join_exists (A := A) (q := q) (r := r), ?_, ?_⟩
   · simpa [Builder.instTt, Builder.instLrr] using
