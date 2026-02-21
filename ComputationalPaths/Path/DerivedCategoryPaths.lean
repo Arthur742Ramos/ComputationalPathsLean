@@ -190,7 +190,7 @@ def invForwardRoundTrip_rweq (x : A) :
 theorem qi_coherence_toEq (x : A) :
     (Path.congrArg Q.mapDeg (Q.invForwardPath x)).toEq =
     (Q.forwardInvPath (Q.mapDeg x)).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end QuasiIsoData
 
@@ -299,7 +299,7 @@ theorem localized_forward_inv_toEq (x y : A) :
     (Path.trans (D.forwardPath x y) (D.localizedInverse x y)).toEq =
     (D.backwardPath x y).toEq := by
   unfold localizedInverse
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end DerivedLocData
 
@@ -329,18 +329,18 @@ variable {A : Type u} (T : DistTriangleData A)
 /-- Shift preserves identity (toEq). -/
 @[simp] theorem shift_refl_toEq (x : A) :
     (T.shiftPath (Path.refl x)).toEq = (Path.refl (T.shift x)).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Shift preserves composition (toEq). -/
 @[simp] theorem shift_trans_toEq {x y z : A} (p : Path x y) (q : Path y z) :
     (T.shiftPath (Path.trans p q)).toEq =
     (Path.trans (T.shiftPath p) (T.shiftPath q)).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Shift preserves symmetry (toEq). -/
 @[simp] theorem shift_symm_toEq {x y : A} (p : Path x y) :
     (T.shiftPath (Path.symm p)).toEq = (Path.symm (T.shiftPath p)).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Rotation path followed by refl simplifies. -/
 def rotation_rweq (x y : A) :
@@ -440,7 +440,7 @@ def torBalancedRoundTrip (n : Nat) (x y : A) :
 /-- Tor balanced round-trip agrees with refl (toEq). -/
 theorem torBalancedRoundTrip_toEq (n : Nat) (x y : A) :
     (T.torBalancedRoundTrip n x y).toEq = (Path.refl _).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Tor balanced path is self-inverse up to RwEq. -/
 def tor_balanced_inv_rweq (n : Nat) (x y : A) :
@@ -597,7 +597,7 @@ variable {A : Type u} (L : LeftDerivedData A)
 /-- Functor preserves symmetry (toEq). -/
 @[simp] theorem func_symm_toEq {x y : A} (p : Path x y) :
     (L.funcPath (Path.symm p)).toEq = (Path.symm (L.funcPath p)).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Resolution round-trip. -/
 def resolutionRoundTrip (x : A) :

@@ -86,10 +86,10 @@ def FunctorOn.toFunctor {A B : Type u} {f : A -> B}
       cases h_map
       have h_id : @map_idF = @map_idG := by
         funext a
-        apply subsingleton_eq_by_cases
+        apply proof_irrel
       have h_comp : @map_compF = @map_compG := by
         funext a b c p q
-        apply subsingleton_eq_by_cases
+        apply proof_irrel
       cases h_id
       cases h_comp
       rfl

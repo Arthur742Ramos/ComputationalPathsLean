@@ -277,7 +277,7 @@ theorem whiskerRight_vcomp (L : C → A)
 theorem inverse_naturality_proof (α : PathNatTrans F G) {a b : A} (p : Path a b) :
     (Path.trans (Path.congrArg G p) (Path.symm (α.component b))).proof =
     (Path.trans (Path.symm (α.component a)) (Path.congrArg F p)).proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- The inverse components satisfy the cancellation law. -/
 theorem inverse_cancel_toEq (α : PathNatTrans F G) (a : A) :
@@ -310,7 +310,7 @@ theorem interchange_toEq {J K L : B → C}
     (γ : PathNatTrans J K) (δ : PathNatTrans K L) (a : A) :
     ((hcomp (vcomp α β) (vcomp γ δ)).component a).toEq =
       ((vcomp (hcomp α γ) (hcomp β δ)).component a).toEq :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 end PathNatTrans
 

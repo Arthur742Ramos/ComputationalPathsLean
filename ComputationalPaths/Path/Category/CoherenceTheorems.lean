@@ -8,7 +8,7 @@ propositional equality (`proof : a = b`) plus a rewrite trace (`steps`);
 since `Eq` in Lean is proof-irrelevant (UIP), all parallel 2-paths
 (equalities between paths with the same endpoints) are equal.
 Coherence therefore reduces to showing that every pair of reassociation
-proofs coincides — which is exactly `subsingleton_eq_by_cases` on `Eq`.
+proofs coincides — which is exactly `proof_irrel` on `Eq`.
 
 ## Key Results
 
@@ -96,7 +96,7 @@ variable {a b c d : A}
 /-- Core confluence lemma: any two paths with the same endpoints have
     equal underlying proofs. This is UIP for `Path`. -/
 theorem path_confluence (p q : Path a b) : p.proof = q.proof :=
-  subsingleton_eq_by_cases p.proof q.proof
+  proof_irrel p.proof q.proof
 
 /-- Two paths with the same step traces are definitionally equal. -/
 theorem path_ext (p q : Path a b) (hs : p.steps = q.steps) : p = q := by
@@ -106,7 +106,7 @@ theorem path_ext (p q : Path a b) (hs : p.steps = q.steps) : p = q := by
     This is the coherence principle: the "space of coherence witnesses" is
     contractible. -/
 theorem coherence_2paths (p q : Path a b) (h₁ h₂ : p = q) : h₁ = h₂ :=
-  subsingleton_eq_by_cases h₁ h₂
+  proof_irrel h₁ h₂
 
 /-- Pentagon coherence: all reassociations of four paths agree.
     The pentagon identity as a joinable critical pair: both routes through
@@ -115,13 +115,13 @@ theorem pentagon_coherence {e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e)
     (h₁ h₂ : trans (trans (trans p q) r) s = trans p (trans q (trans r s))) :
     h₁ = h₂ :=
-  subsingleton_eq_by_cases h₁ h₂
+  proof_irrel h₁ h₂
 
 /-- The two standard routes through the pentagon yield the same proof. -/
 theorem pentagon_routes_agree {e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     trans_assoc_fourfold p q r s = trans_assoc_fourfold_alt p q r s :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Triangle identity: the two ways of eliminating a unit (refl) agree. -/
 theorem triangle_identity (p : Path a b) (q : Path b c) :
@@ -141,7 +141,7 @@ theorem triangle_right (p : Path a b) :
 /-- Triangle coherence: any two proofs of unit elimination agree. -/
 theorem triangle_coherence (p : Path a b)
     (h₁ h₂ : trans p (refl b) = p) : h₁ = h₂ :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 -- ============================================================
 -- §3  All Parallel Paths in Free Monoidal Category Are Equal
@@ -150,7 +150,7 @@ theorem triangle_coherence (p : Path a b)
 /-- Fundamental coherence: any two paths with the same source and target
     have equal underlying proofs. -/
 theorem parallel_paths_proof_eq (p q : Path a b) : p.proof = q.proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Mac Lane coherence (general form): any two reassociations with
     identical endpoints have equal proofs. -/
@@ -158,13 +158,13 @@ theorem mac_lane_coherence_general
     (p q : Path a b)
     (h₁ : p.proof = q.proof) (h₂ : p.proof = q.proof) :
     h₁ = h₂ :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Every monoidal diagram commutes: any two paths with the same
     endpoints are equal in their proof component. -/
 theorem coherence_all_diagrams_commute
     (p q : Path a b) : p.toEq = q.toEq :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Coherence at the level of transport: any two paths transport
     identically. -/
@@ -191,7 +191,7 @@ theorem fivefold_coherence {e f : A}
     (h₁ h₂ : trans (trans (trans (trans p q) r) s) t =
               trans p (trans q (trans r (trans s t)))) :
     h₁ = h₂ :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Six-fold coherence: all bracketings of six paths agree. -/
 theorem sixfold_coherence {e f g : A}
@@ -200,7 +200,7 @@ theorem sixfold_coherence {e f g : A}
     (h₁ h₂ : trans (trans (trans (trans (trans p q) r) s) t) u =
               trans p (trans q (trans r (trans s (trans t u))))) :
     h₁ = h₂ :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 -- ============================================================
 -- §5  Unit Coherence
@@ -309,7 +309,7 @@ theorem whisker_interchange {p p' : Path a b} {q q' : Path b c}
 /-- Transport coherence: any two transport proofs from the same path agree. -/
 theorem transport_coherence {D : A → Sort v} (p : Path a b) (x : D a)
     (h₁ h₂ : transport p x = transport p x) : h₁ = h₂ :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Transport along two equal paths gives the same result. -/
 theorem transport_path_eq {D : A → Sort v} (p q : Path a b) (x : D a) :

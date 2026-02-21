@@ -264,7 +264,7 @@ theorem toEq_unique (p q : Path a b) : p.toEq = q.toEq := by
 
 /-- The semantic content (toEq) of any path equals any Eq proof. -/
 theorem toEq_eq_proof (p : Path a b) (h : a = b) : p.toEq = h :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Transport along a path via ofEq round-trips. -/
 theorem transport_ofEq_roundtrip {C : A → Type v} (h : a = b) (x : C a) :

@@ -263,7 +263,7 @@ def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ 
     the induced `RwEq` witnesses of the endpoints. -/
 def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q} (_ : Derivation₃ d₁ d₂) :
     d₁.toRwEq = d₂.toRwEq :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Left whiskering for 3-cells: c · _ applied to both sides -/
 def whiskerLeft₃ {a b : A} {p q r : Path a b} (c : Derivation₂ r p)
@@ -301,7 +301,7 @@ variable {a b : A}
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell. -/
 def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .step (.rweq_eq (subsingleton_eq_by_cases d₁.toRwEq d₂.toRwEq))
+  .step (.rweq_eq (proof_irrel d₁.toRwEq d₂.toRwEq))
 
 /-- **Loop contraction**: Any loop derivation `d : Derivation₂ p p` contracts to `refl p`.
 
@@ -419,14 +419,14 @@ def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (_ : Derivation₄ m₁ m₂) :
     Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
       Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂ :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 end Derivation₄
 
 /-- Contractibility at Level 4: any two parallel 3-cells are connected by a 4-cell. -/
 def contractibility₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m₁ m₂ : Derivation₃ d₁ d₂) : Derivation₄ m₁ m₂ :=
-  .step (.rweq_eq (subsingleton_eq_by_cases
+  .step (.rweq_eq (proof_irrel
     (Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁)
     (Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂)))
 
@@ -537,7 +537,7 @@ end DerivationHigh
 def contractibilityHigh {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (n : Nat)
     (c₁ c₂ : Derivation₄ m₁ m₂) : DerivationHigh n c₁ c₂ :=
-  .step (.rweq_eq (subsingleton_eq_by_cases
+  .step (.rweq_eq (proof_irrel
     (Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₁)
     (Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₂)))
 
@@ -708,13 +708,13 @@ def trunc₄ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
 theorem trunc₃_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m₁ m₂ : Derivation₃ d₁ d₂) :
     trunc₃ m₁ = trunc₃ m₂ :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 theorem trunc₄_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂}
     (c₁ c₂ : Derivation₄ m₁ m₂) :
     trunc₄ c₁ = trunc₄ c₂ :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 theorem truncation_preserves_pentagon
     (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
@@ -964,12 +964,12 @@ theorem exchange_law_symm_contractible_to_canonical {f f' : Path a b} {g g' : Pa
 theorem trunc₃_inv_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m : Derivation₃ d₁ d₂) :
     trunc₃ (Derivation₃.inv m) = trunc₃ m :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 theorem trunc₄_inv_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (c : Derivation₄ m₁ m₂) :
     trunc₄ (Derivation₄.inv c) = trunc₄ c :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 theorem trunc₃_vcomp_to_contractible {p q : Path a b}
     {d₁ d₂ d₃ : Derivation₂ p q}

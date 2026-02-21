@@ -36,13 +36,13 @@ variable {a b c d : A}
 def whiskerLeft_id' (f : Path a b) (g : Path b c) :
     TwoCell.whiskerLeft f (TwoCell.id (A := A) g) =
       TwoCell.id (Path.trans f g) := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Right whiskering preserves identity 2-cells. -/
 def whiskerRight_id' (f : Path a b) (g : Path b c) :
     TwoCell.whiskerRight g (TwoCell.id (A := A) f) =
       TwoCell.id (Path.trans f g) := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Left whiskering distributes over vertical composition. -/
 def whiskerLeft_comp' {f : Path a b} {g h i : Path b c}
@@ -51,7 +51,7 @@ def whiskerLeft_comp' {f : Path a b} {g h i : Path b c}
     TwoCell.whiskerLeft f (TwoCell.comp η θ) =
       TwoCell.comp (TwoCell.whiskerLeft f η)
         (TwoCell.whiskerLeft f θ) := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Right whiskering distributes over vertical composition. -/
 def whiskerRight_comp' {f g h : Path a b} {k : Path b c}
@@ -60,7 +60,7 @@ def whiskerRight_comp' {f g h : Path a b} {k : Path b c}
     TwoCell.whiskerRight k (TwoCell.comp η θ) =
       TwoCell.comp (TwoCell.whiskerRight k η)
         (TwoCell.whiskerRight k θ) := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-! ## Horizontal Composition Laws -/
 
@@ -69,14 +69,14 @@ def hcomp_id_left' {f g : Path a b} {h : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g) :
     TwoCell.hcomp η (TwoCell.id h) =
       TwoCell.whiskerRight h η := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Horizontal composition with identity 2-cells on the right. -/
 def hcomp_id_right' {f : Path a b} {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
     TwoCell.hcomp (TwoCell.id f) η =
       TwoCell.whiskerLeft f η := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Interchange with identities collapses to whiskering. -/
 def interchange_id_left' {f g : Path a b} {h k : Path b c}
@@ -85,7 +85,7 @@ def interchange_id_left' {f g : Path a b} {h k : Path b c}
     TwoCell.comp (TwoCell.hcomp η θ)
       (TwoCell.id (Path.trans g k)) =
         TwoCell.hcomp η θ := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Interchange with identities collapses to whiskering (right). -/
 def interchange_id_right' {f g : Path a b} {h k : Path b c}
@@ -94,7 +94,7 @@ def interchange_id_right' {f g : Path a b} {h k : Path b c}
     TwoCell.comp (TwoCell.id (Path.trans f h))
       (TwoCell.hcomp η θ) =
         TwoCell.hcomp η θ := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-! ## Additional Derived Identities -/
 

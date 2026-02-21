@@ -174,7 +174,7 @@ def noether_correspondence (obs : Observable) {a b : State}
 theorem conservation_trivial (obs : Observable) {a b : State}
     (sym : Symmetry a b) (h : isConserved obs sym) :
     (noether_correspondence obs sym).toEq = h := by
-  exact subsingleton_eq_by_cases _ _
+  exact proof_irrel _ _
 
 -- 14. Symmetry breaking: obstruction IS failure of path to exist
 -- We can't construct Path (projectCharge vacuum) excitedB because they differ

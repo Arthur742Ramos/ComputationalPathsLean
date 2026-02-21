@@ -116,7 +116,7 @@ def rebracket (x y z : A) : Path (O.compose3 x y z) (O.compose x (O.compose y z)
 def rebracket_coherence (x y z : A)
     (h₁ h₂ : Path (O.compose3 x y z) (O.compose x (O.compose y z))) :
     h₁.toEq = h₂.toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Transport the compose operation along a path. -/
 def compose_transport {x₁ x₂ : A} (p : Path x₁ x₂) (y : A) :
@@ -168,7 +168,7 @@ def doubleSwapRoundTrip_rweq (x : A) :
 def swap_leftUnit_naturality (x : A)
     (p q : Path (S.swap (S.compose S.ident x)) (S.swap x)) :
     p.toEq = q.toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end SymmetricOperadData
 
@@ -373,13 +373,13 @@ def swapRoundTrip (x y : A) :
 def swap_involution_toEq (x y : A) :
     (L.swapRoundTrip x y).toEq =
     (Path.refl (L.composeCube x y)).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Cube swap-assoc coherence: two different path constructions agree (toEq). -/
 def swap_assoc_coherence (x y z : A)
     (p q : Path (L.composeCube (L.composeCube x y) z) (L.composeCube x (L.composeCube z y))) :
     p.toEq = q.toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Little cubes form an operad. -/
 def toOperadData : OperadData A where
@@ -432,7 +432,7 @@ def pentagon_coherence_toEq (x y z w : A) :
     (Path.trans (Path.congrArg (fun a => AI.mul a w) (AI.assocPath x y z))
                 (Path.trans (AI.assocPath x (AI.mul y z) w)
                             (Path.congrArg (AI.mul x) (AI.assocPath y z w)))).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- A-infinity assoc is self-inverse round-trip up to RwEq. -/
 def assocInvRoundTrip (x y z : A) :
@@ -479,7 +479,7 @@ def commRoundTrip (x y : A) :
 /-- Comm round-trip and refl agree at toEq level. -/
 def commRoundTrip_toEq (x y : A) :
     (EI.commRoundTrip x y).toEq = (Path.refl (EI.mul x y)).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Hexagon identity: two paths from mul(mul x y)z to mul y(mul x z) agree (toEq). -/
 def hexagon_toEq (x y z : A) :
@@ -493,7 +493,7 @@ def hexagon_toEq (x y z : A) :
 /-- Symmetry of commPath. -/
 def comm_symm_toEq (x y : A) :
     (Path.symm (EI.commPath x y)).toEq = (EI.commPath y x).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end EInfinityData
 
@@ -532,7 +532,7 @@ def ext_unit_rweq (c : C) :
 def ext_cohere_unit_toEq (c : C) :
     (Path.trans (K.extCoherePath O₁.ident c) (alg.unitPath c)).toEq =
     (K.extUnitPath c).toEq := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-- Extension round-trip: extend then undo. -/
 def extRoundTrip (x : A) (c : C) :

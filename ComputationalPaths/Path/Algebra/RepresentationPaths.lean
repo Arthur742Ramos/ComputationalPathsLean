@@ -539,7 +539,7 @@ theorem rho_eg_coherence {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V)
     (p q : Path (rep.rho (pg.mul pg.e g) v) (rep.rho g v)) :
     p.proof = q.proof := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 -- 48. rho_e comp path: rho(e)(rho(g)(v)) → rho(g)(v)
 def rho_e_comp_path {G : Type u} {V : Type v} {pg : PathGroup G}

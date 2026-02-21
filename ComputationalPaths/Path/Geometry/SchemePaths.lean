@@ -350,7 +350,7 @@ def mul_assoc_symm_path (a b c : R) :
 
 -- 45. Coherence: two ring equality proofs agree
 theorem ring_proof_coherence {a b : R} (h₁ h₂ : a = b) : h₁ = h₂ :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 -- 46. Ideal containment: zero ⊆ unit
 theorem zero_sub_unit (a : R) (_h : zeroIdeal.mem a) : unitIdeal.mem a :=

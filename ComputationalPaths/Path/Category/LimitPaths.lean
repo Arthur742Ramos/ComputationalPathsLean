@@ -71,7 +71,7 @@ theorem pair_unique_toEq {a b prod : A} (P : PathProduct a b prod)
     {x : A} (f : Path x a) (g : Path x b) (h : Path x prod)
     (hf : (Path.trans h P.fst).toEq = f.toEq)
     (hg : (Path.trans h P.snd).toEq = g.toEq) :
-    h.toEq = (P.pair x f g).toEq := subsingleton_eq_by_cases _ _
+    h.toEq = (P.pair x f g).toEq := proof_irrel _ _
 
 /-- Product of an object with itself has a diagonal. -/
 def diagonal {a prod : A} (P : PathProduct a a prod) : Path a prod :=
@@ -94,7 +94,7 @@ def swap {a b prod prod' : A}
 theorem swap_swap_toEq {a b prod prod' : A}
     (P : PathProduct a b prod) (Q : PathProduct b a prod') :
     (Path.trans (swap P Q) (swap Q P)).toEq = rfl :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 end PathProduct
 
@@ -114,7 +114,7 @@ variable {A : Type u}
 theorem factor_unique_toEq {f g : A → A} {a eq_obj : A}
     (E : PathEqualizer f g a eq_obj) {x : A} (h : Path x a)
     (hc : f x = g x) (k : Path x eq_obj) (hk : (Path.trans k E.incl).toEq = h.toEq) :
-    k.toEq = (E.factor x h hc).toEq := subsingleton_eq_by_cases _ _
+    k.toEq = (E.factor x h hc).toEq := proof_irrel _ _
 
 end PathEqualizer
 
@@ -139,7 +139,7 @@ theorem pbPair_unique_toEq {f : A → A} {g : A → A} {a b pb : A}
     (ha : Path x a) (hb : Path x b) (hc : f x = g x)
     (k : Path x pb) (kf : (Path.trans k P.pbFst).toEq = ha.toEq)
     (kg : (Path.trans k P.pbSnd).toEq = hb.toEq) :
-    k.toEq = (P.pbPair x ha hb hc).toEq := subsingleton_eq_by_cases _ _
+    k.toEq = (P.pbPair x ha hb hc).toEq := proof_irrel _ _
 
 end PathPullback
 
@@ -173,7 +173,7 @@ theorem copair_unique_toEq {a b coprod : A} (C : PathCoproduct a b coprod)
     {x : A} (f : Path a x) (g : Path b x) (h : Path coprod x)
     (hf : (Path.trans C.inl h).toEq = f.toEq)
     (hg : (Path.trans C.inr h).toEq = g.toEq) :
-    h.toEq = (C.copair x f g).toEq := subsingleton_eq_by_cases _ _
+    h.toEq = (C.copair x f g).toEq := proof_irrel _ _
 
 /-- Codiagonal (fold map). -/
 def codiagonal {a coprod : A} (C : PathCoproduct a a coprod) : Path coprod a :=
@@ -196,7 +196,7 @@ def swap {a b coprod coprod' : A}
 theorem swap_swap_toEq {a b coprod coprod' : A}
     (C : PathCoproduct a b coprod) (D : PathCoproduct b a coprod') :
     (Path.trans (swap C D) (swap D C)).toEq = rfl :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 end PathCoproduct
 
@@ -215,7 +215,7 @@ variable {A : Type u}
 theorem cofactor_unique_toEq {f g : A → A} {a coeq : A}
     (E : PathCoequalizer f g a coeq) {x : A} (h : Path a x) (hc : f a = g a)
     (k : Path coeq x) (hk : (Path.trans E.proj k).toEq = h.toEq) :
-    k.toEq = (E.cofactor x h hc).toEq := subsingleton_eq_by_cases _ _
+    k.toEq = (E.cofactor x h hc).toEq := proof_irrel _ _
 
 end PathCoequalizer
 
@@ -239,7 +239,7 @@ theorem poCopair_unique_toEq {f g : A → A} {a b po : A}
     (ha : Path a x) (hb : Path b x) (hc : f a = g a)
     (k : Path po x) (kf : (Path.trans P.poInl k).toEq = ha.toEq)
     (kg : (Path.trans P.poInr k).toEq = hb.toEq) :
-    k.toEq = (P.poCopair x ha hb hc).toEq := subsingleton_eq_by_cases _ _
+    k.toEq = (P.poCopair x ha hb hc).toEq := proof_irrel _ _
 
 end PathPushout
 
@@ -289,8 +289,8 @@ def productToCoproduct {A : Type u} {a b prod : A} (P : PathProduct a b prod) :
   inr := Path.symm P.snd
   copair x f g := Path.trans (Path.symm (P.pair x (Path.symm f) (Path.symm g)))
     (Path.refl x)
-  copair_inl_toEq _ _ _ := subsingleton_eq_by_cases _ _
-  copair_inr_toEq _ _ _ := subsingleton_eq_by_cases _ _
+  copair_inl_toEq _ _ _ := proof_irrel _ _
+  copair_inr_toEq _ _ _ := proof_irrel _ _
 
 theorem productToCoproduct_inl_toEq {A : Type u} {a b prod : A} (P : PathProduct a b prod) :
     (productToCoproduct P).inl.toEq = P.fst.toEq.symm := rfl
@@ -315,7 +315,7 @@ def coneMorphComp {A : Type u} {D : LimPEF A} {c c' c'' : A}
     (f : PathConeMorphism K K') (g : PathConeMorphism K' K'') :
     PathConeMorphism K K'' where
   morph := Path.trans f.morph g.morph
-  compat_toEq a := subsingleton_eq_by_cases _ _
+  compat_toEq a := proof_irrel _ _
 
 theorem coneMorphComp_morph {A : Type u} {D : LimPEF A} {c c' c'' : A}
     {K : PathCone D c} {K' : PathCone D c'} {K'' : PathCone D c''}
@@ -328,7 +328,7 @@ def coconeMorphComp {A : Type u} {D : LimPEF A} {c c' c'' : A}
     (f : PathCoconeMorphism K K') (g : PathCoconeMorphism K' K'') :
     PathCoconeMorphism K K'' where
   morph := Path.trans f.morph g.morph
-  compat_toEq a := subsingleton_eq_by_cases _ _
+  compat_toEq a := proof_irrel _ _
 
 theorem coconeMorphComp_morph {A : Type u} {D : LimPEF A} {c c' c'' : A}
     {K : PathCocone D c} {K' : PathCocone D c'} {K'' : PathCocone D c''}

@@ -512,7 +512,7 @@ theorem d_sq_proof_irrel {Obj : Type u} {Hom : Obj → Obj → Type v}
     {ops : CatOps Obj Hom}
     (C : ChainCx ops) (n : Nat)
     (h₁ h₂ : C.d_sq n = C.d_sq n) :
-    h₁ = h₂ := by apply subsingleton_eq_by_cases
+    h₁ = h₂ := by apply proof_irrel
 
 -- 28: Ext LES existence
 theorem ext_les_exists :

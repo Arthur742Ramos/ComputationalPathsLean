@@ -273,7 +273,7 @@ theorem FreePath.lift_unique {V : Type u} {G : Graph.{u, v} V} {B : Type w}
     matches the congruence of the original toEq. -/
 theorem map_toEq' (F : PathFunctor A B) {a b : A} (p : Path a b) :
     (F.mapPath p).toEq = _root_.congrArg F.obj p.toEq :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Path functors preserve double symmetry. -/
 theorem map_symm_symm' (F : PathFunctor A B) {a b : A} (p : Path a b) :

@@ -246,7 +246,7 @@ def snake_coherence (a : A)
     (Path.trans
       (S.snake_exactness_path a kerP)
       (Path.symm (S.snake_exactness_path a kerP))).toEq = rfl := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end SnakeData
 
@@ -274,7 +274,7 @@ variable (F : FiveLemmaData A₁ A₂ A₃ A₄ A₅ B₁ B₂ B₃ B₄ B₅
 /-- Five lemma coherence: the square paths compose trivially. -/
 def five_lemma_coherence (a : A₃) :
     (Path.trans (F.sqR a) (Path.symm (F.sqR a))).toEq = rfl := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end FiveLemmaData
 
@@ -309,7 +309,7 @@ def connect_transport_const {D : Type v} (n : Int) (c : C) (d : D) :
 
 def connect_periodicity (n : Int) (c : C) :
     (Path.trans (L.connectPath n c) (Path.symm (L.connectPath n c))).toEq = rfl := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end LongExactData
 
@@ -458,7 +458,7 @@ variable (T : TorData GA GB)
 
 def tor_coherence (n : Nat) (b : B) :
     (Path.trans (T.ddTensorZeroPath n b) (Path.symm (T.ddTensorZeroPath n b))).toEq = rfl := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end TorData
 
@@ -498,7 +498,7 @@ def directSumDd_transport_const {D : Type v} (n : Nat) (a : A) (c : C) (d : D) :
 def horseshoe_coherence (n : Nat) (a : A) (c : C) :
     (Path.trans (H.directSumDdPath n a c)
       (Path.symm (H.directSumDdPath n a c))).toEq = rfl := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end HorseshoeData
 
@@ -662,7 +662,7 @@ variable (E : ExtLongExactData GA GM)
 def ext_three_step_coherence (n : Nat) (m : M) :
     (Path.trans (E.exactBPath n m)
       (Path.symm (E.exactBPath n m))).toEq = rfl := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 def exactB_transport_const {D : Type v} (n : Nat) (m : M) (d : D) :
     Path.transport (D := fun _ => D) (E.exactBPath n m) d = d := by
@@ -697,7 +697,7 @@ def forwardBackwardRoundTrip (n : Nat) (a : A) :
 def shift_coherence (n : Nat) (a : A) :
     (Path.trans (D.forwardPath n a)
       (Path.symm (D.forwardPath n a))).toEq = rfl := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end DimensionShiftData
 
@@ -797,7 +797,7 @@ variable {A : Type u} (C : AbelianCategoryData A)
 
 def kernel_cokernel_coherence (f : A → A) (x : A) :
     (Path.trans (C.kernelPath f x) (Path.symm (C.kernelPath f x))).toEq = rfl := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 end AbelianCategoryData
 

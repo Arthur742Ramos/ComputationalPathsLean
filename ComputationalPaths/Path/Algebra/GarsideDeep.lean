@@ -822,7 +822,7 @@ theorem eckmann_hilton_braid {w : BraidWord}
     (α : BraidElem.equivPath h₁ = BraidElem.equivPath h₁)
     (β : BraidElem.equivPath h₂ = BraidElem.equivPath h₂) :
     Eq.trans α β = Eq.trans β α := by
-  apply subsingleton_eq_by_cases
+  apply proof_irrel
 
 /-! ## Normalization step kinds -/
 

@@ -112,7 +112,7 @@ theorem extend_congrArg {B : Type u} (f : A → B) {a b c : A}
 /-- Symmetry interacts correctly with extend (proof level). -/
 theorem extend_symm_proof {a b : A} (p : Path a b) :
     (extend p (Path.symm p)).proof = (pure a).proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Extend preserves the proof component. -/
 theorem extend_proof {a b c : A} (p : Path a b) (q : Path b c) :
@@ -170,22 +170,22 @@ theorem comp_inv_toEq (f : KleisliArrow A a b) :
 /-- Inverse is involutive on the proof level. -/
 theorem inv_inv_proof (f : KleisliArrow A a b) :
     (inv (inv f)).arrow.proof = f.arrow.proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Inverse distributes over composition on the proof level. -/
 theorem inv_comp_proof (f : KleisliArrow A a b) (g : KleisliArrow A b c) :
     (inv (comp f g)).arrow.proof = (comp (inv g) (inv f)).arrow.proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- The Kleisli category has all morphisms invertible (groupoid). -/
 theorem kleisli_groupoid (f : KleisliArrow A a b) :
     (comp (inv f) f).arrow.proof = (KleisliArrow.id b).arrow.proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Kleisli arrows with the same proof are proof-equal. -/
 theorem arrow_proof_eq (f g : KleisliArrow A a b) :
     f.arrow.proof = g.arrow.proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 end KleisliArrow
 
@@ -319,7 +319,7 @@ def constAlg (D : Type v) : TransportAlgebra A (fun _ => D) where
 /-- All paths with the same endpoints have the same proof. -/
 theorem path_proof_unique {a b : A} (p q : Path a b) :
     p.proof = q.proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- The monad multiplication (join): flatten nested paths. -/
 theorem monad_join {a b c : A} (p : Path a b) (q : Path b c) :
@@ -328,12 +328,12 @@ theorem monad_join {a b c : A} (p : Path a b) (q : Path b c) :
 /-- The monad is well-defined: extend respects proof equality. -/
 theorem extend_proof_eq {a b c : A} (p₁ p₂ : Path a b) (q₁ q₂ : Path b c) :
     (extend p₁ q₁).proof = (extend p₂ q₂).proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Pure is a two-sided identity at the proof level. -/
 theorem pure_neutral_proof {a b : A} (p : Path a b) :
     (extend (pure a) p).proof = p.proof :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 end PathMonad
 

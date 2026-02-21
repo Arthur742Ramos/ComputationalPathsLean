@@ -238,13 +238,13 @@ theorem whisker_naturality {a : A} {p p' : Loop A a} {q q' : Loop A a}
 /-! ## 15. Eckmann-Hilton: 2-loops commute -/
 
 theorem eckmann_hilton {a : A} {p : Loop A a} (α β : p = p) :
-    Eq.trans α β = Eq.trans β α := subsingleton_eq_by_cases _ _
+    Eq.trans α β = Eq.trans β α := proof_irrel _ _
 
 /-! ## 16. Interchange law for 2-loops -/
 
 theorem interchange_2loops {a : A} {p : Loop A a} (α β γ δ : p = p) :
     Eq.trans (Eq.trans α β) (Eq.trans γ δ) =
-    Eq.trans (Eq.trans α γ) (Eq.trans β δ) := subsingleton_eq_by_cases _ _
+    Eq.trans (Eq.trans α γ) (Eq.trans β δ) := proof_irrel _ _
 
 /-! ## 17. Pentagon coherence -/
 
@@ -255,14 +255,14 @@ theorem loop_pentagon {a : A} (p q r s : Loop A a) :
       (_root_.congrArg (fun t => Path.trans t s) (Path.trans_assoc p q r))
       (Eq.trans (Path.trans_assoc p (Path.trans q r) s)
                 (_root_.congrArg (Path.trans p) (Path.trans_assoc q r s))) :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-! ## 18. Mac Lane coherence -/
 
 theorem mac_lane_six {a : A} (p q r s t u : Loop A a)
     (h₁ h₂ : Path.trans (Path.trans (Path.trans (Path.trans (Path.trans p q) r) s) t) u =
               Path.trans p (Path.trans q (Path.trans r (Path.trans s (Path.trans t u))))) :
-    h₁ = h₂ := subsingleton_eq_by_cases _ _
+    h₁ = h₂ := proof_irrel _ _
 
 /-! ## 19. loopPow one -/
 
@@ -369,23 +369,23 @@ def hcomp2 {a : A} {α β γ : Loop A a} (h₁ : α = β) (h₂ : β = γ) : α 
 theorem hcomp2_assoc {a : A} {α β γ δ : Loop A a}
     (h₁ : α = β) (h₂ : β = γ) (h₃ : γ = δ) :
     hcomp2 (hcomp2 h₁ h₂) h₃ = hcomp2 h₁ (hcomp2 h₂ h₃) :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 theorem hcomp2_inv_left {a : A} {α β : Loop A a} (h : α = β) :
-    hcomp2 (Eq.symm h) h = rfl := subsingleton_eq_by_cases _ _
+    hcomp2 (Eq.symm h) h = rfl := proof_irrel _ _
 
 theorem hcomp2_inv_right {a : A} {α β : Loop A a} (h : α = β) :
-    hcomp2 h (Eq.symm h) = rfl := subsingleton_eq_by_cases _ _
+    hcomp2 h (Eq.symm h) = rfl := proof_irrel _ _
 
 /-! ## 32. Eckmann-Hilton via interchange at Ω² -/
 
 theorem eckmann_hilton_interchange {a : A} {p : Loop A a} (α β : p = p) :
-    hcomp2 α β = hcomp2 β α := subsingleton_eq_by_cases _ _
+    hcomp2 α β = hcomp2 β α := proof_irrel _ _
 
 /-! ## 33. Delooping: conjugation is identity on Ω² -/
 
 theorem deloop_conjugation {a : A} {p : Loop A a} (α β : p = p) :
-    hcomp2 (hcomp2 β α) (Eq.symm β) = α := subsingleton_eq_by_cases _ _
+    hcomp2 (hcomp2 β α) (Eq.symm β) = α := proof_irrel _ _
 
 /-! ## 34. Commutator path -/
 

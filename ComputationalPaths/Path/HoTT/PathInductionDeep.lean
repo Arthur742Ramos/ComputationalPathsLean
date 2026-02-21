@@ -343,7 +343,7 @@ theorem transport_double_congrArg {B C : Type u} {D : C → Sort v}
 /-- A type with decidable equality has proof-irrelevant paths. -/
 theorem path_proof_decidable [DecidableEq A] {a b : A}
     (p q : Path a b) : p.proof = q.proof :=
-  subsingleton_eq_by_cases p.proof q.proof
+  proof_irrel p.proof q.proof
 
 /-! ## 26. symm interaction with transport -/
 

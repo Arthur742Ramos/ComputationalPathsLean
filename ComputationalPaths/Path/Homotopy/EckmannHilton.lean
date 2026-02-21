@@ -88,7 +88,7 @@ def hcompRw' {p p' : Path a b} {q q' : Path b c}
 theorem hcompRw_eq_hcompRw' {p p' : Path a b} {q q' : Path b c}
     (α : RwEq p p') (β : RwEq q q') :
     hcompRw α β = hcompRw' α β :=
-  subsingleton_eq_by_cases _ _
+  proof_irrel _ _
 
 /-- Horizontal composition with `RwEq.refl` on the right is right whiskering. -/
 theorem hcompRw_refl_right {p p' : Path a b} (α : RwEq p p') (q : Path b c) :
