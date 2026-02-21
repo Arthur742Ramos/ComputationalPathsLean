@@ -127,6 +127,7 @@ theorem hcomp_eq_vcomp_on_refl
     hcomp α β = vcomp α β := by
   -- hcomp α β = congrArg₂ trans α β, which on refl loops simplifies
   -- Both live in `refl a = refl a`, which is a subsingleton
+  -- Structural: this is equality between proofs in `Prop`.
   exact Subsingleton.elim _ _
 
 /-- Eckmann–Hilton: 2-path loops on `refl` commute under vertical composition. -/
@@ -139,11 +140,13 @@ theorem eckmann_hilton
   -- and we can use the interchange law.
   -- Actually, `Eq` at any type is a subsingleton in Lean 4's Prop.
   -- No: `refl a = refl a` is `Prop`, so it IS a subsingleton.
+  -- Structural: this compares proofs in `Prop`.
   exact Subsingleton.elim _ _
 
 /-- Alternative statement using `Eq.trans` directly. -/
 theorem eckmann_hilton' (α β : @refl A a = @refl A a) :
     α.trans β = β.trans α :=
+  -- Structural: direct Eq-proof commutativity in `Prop`.
   Subsingleton.elim _ _
 
 /-! ## 2-groupoid structure -/
@@ -178,17 +181,42 @@ theorem hcomp_right_refl_eq {p₁ p₂ : Path a b}
 /-- Any two 2-paths between the same pair of paths are equal. -/
 theorem path2_eq {p q : Path a b}
     (α β : Path2 p q) : α = β :=
+  -- Structural: `Path2 p q` is itself `Prop`.
   Subsingleton.elim α β
 
 /-- The space of 2-paths is a set. -/
 theorem path2_is_set {p q : Path a b} :
     ∀ (α β : Path2 p q), α = β :=
+  -- Structural: proof irrelevance for `Eq`.
   fun α β => Subsingleton.elim α β
 
 /-- All 3-paths (equalities between 2-paths) are equal. -/
 theorem path3_trivial {p q : Path a b}
     {α β : Path2 p q} (u v : α = β) : u = v :=
+  -- Structural: all 3-paths are proof-equal in `Prop`.
   Subsingleton.elim u v
+
+/-- Step-trace companion: a 2-path identifies the underlying step traces. -/
+theorem path2_steps_eq {p q : Path a b} (α : Path2 p q) :
+    p.steps = q.steps := by
+  cases α
+  rfl
+
+/-- Step-trace companion: vertical composition preserves endpoint traces. -/
+theorem vcomp_steps_eq {p q r : Path a b}
+    (α : Path2 p q) (β : Path2 q r) :
+    p.steps = r.steps := by
+  cases α
+  cases β
+  rfl
+
+/-- Step-trace companion: horizontal composition preserves concatenated traces. -/
+theorem hcomp_steps_eq {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+    (α : Path2 p₁ p₂) (β : Path2 q₁ q₂) :
+    (trans p₁ q₁).steps = (trans p₂ q₂).steps := by
+  cases α
+  cases β
+  rfl
 
 /-! ## Naturality of whiskering -/
 

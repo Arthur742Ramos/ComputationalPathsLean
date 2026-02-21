@@ -214,6 +214,7 @@ theorem trans_assoc_pentagon {e : A}
         (Eq.trans
           (trans_assoc p (trans q r) s)
           (_root_.congrArg (fun t => trans p t) (trans_assoc q r s))) := by
+  -- Structural: this is equality between proofs in `Prop` (Eq proof irrelevance).
   apply Subsingleton.elim
 
 /-- Mac Lane coherence: any two reassociations with identical endpoints agree. -/
@@ -222,6 +223,7 @@ theorem mac_lane_coherence {e : A}
     (h₁ h₂ :
       trans (trans (trans p q) r) s = trans p (trans q (trans r s))) :
     h₁ = h₂ := by
+  -- Structural: this compares proofs of the same proposition.
   apply Subsingleton.elim
 
 /-- Specialization of Mac Lane coherence to the two standard fourfold routes. -/
@@ -229,7 +231,30 @@ theorem mac_lane_coherence_fourfold {e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Eq.trans (trans_assoc (trans p q) r s) (trans_assoc p q (trans r s)) =
       trans_assoc_fourfold_alt p q r s := by
+  -- Structural: both sides are proofs in `Prop`.
   apply Subsingleton.elim
+
+/-- Step-trace companion to fourfold coherence: both reassociation routes yield
+the same rewrite trace. -/
+theorem mac_lane_coherence_fourfold_steps {e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    (trans (trans (trans p q) r) s).steps =
+      (trans p (trans q (trans r s))).steps := by
+  simp [trans, List.append_assoc]
+
+/-- Step-trace companion: reversing and symmetrizing a trace twice is identity. -/
+theorem trace_symm_involutive (steps : List (Step A)) :
+    (steps.reverse.map Step.symm).reverse.map Step.symm = steps := by
+  have hmap : List.map (Step.symm ∘ Step.symm) steps = steps := by
+    induction steps with
+    | nil => simp
+    | cons s tail ih =>
+        simp [Function.comp, ih]
+  calc
+    (steps.reverse.map Step.symm).reverse.map Step.symm
+        = List.map (Step.symm ∘ Step.symm) steps := by
+            simp [List.map_map]
+    _ = steps := hmap
 
 /-- Left whiskering of a 2-path by postcomposition. -/
 @[simp] def whiskerLeft {p p' : Path a b} (h : p = p') (q : Path b c) :
@@ -289,13 +314,21 @@ theorem two_path_interchange {p : Path a b}
     (α β γ δ : p = p) :
     Eq.trans (Eq.trans α β) (Eq.trans γ δ) =
       Eq.trans (Eq.trans α γ) (Eq.trans β δ) := by
+  -- Structural: 2-path loops are proofs in `Prop`.
   apply Subsingleton.elim
 
 /-- Eckmann–Hilton commutativity for 2-path loops. -/
 theorem eckmann_hilton_two_paths {p : Path a b}
     (α β : p = p) :
     Eq.trans α β = Eq.trans β α := by
+  -- Structural: equality between equality-proofs in `Prop`.
   apply Subsingleton.elim
+
+/-- Step-trace companion to 2-path loop laws: inversion reverses composite
+traces in the expected order. -/
+theorem symm_trans_steps_concat (p : Path a b) (q : Path b c) :
+    (symm (trans p q)).steps = (symm q).steps ++ (symm p).steps := by
+  simp [trans, symm, List.reverse_append, List.map_append]
 
 @[simp] theorem symm_refl (a : A) : symm (refl a) = refl a := by
   simp [symm, refl]

@@ -110,6 +110,7 @@ theorem pathRec_unique_refl {B : Sort v}
 have the same `proof` field. -/
 theorem eta_proof (p : Path a a) :
     p.proof = (refl a).proof :=
+  -- Structural: equality of Eq-proofs in `Prop`.
   Subsingleton.elim _ _
 
 /-- Two functions that agree on all `refl` paths agree on all `refl`-proof paths. -/
@@ -154,6 +155,7 @@ theorem transport_symm_cancel' {D : A → Sort v}
 for the proof of `p`, it holds for `p`. -/
 theorem proof_based_ind (p : Path a b) {P : (a = b) → Prop}
     (h : P p.proof) (q : Path a b) : P q.proof := by
+  -- Structural: `p.proof` and `q.proof` are proposition proofs.
   have : p.proof = q.proof := Subsingleton.elim _ _
   rwa [← this]
 
@@ -161,12 +163,25 @@ theorem proof_based_ind (p : Path a b) {P : (a = b) → Prop}
 determined (proof irrelevance). -/
 theorem proof_unique (p : Path a b) (h : a = b) :
     p.proof = h :=
+  -- Structural: proof irrelevance for `Eq`.
   Subsingleton.elim _ _
 
 /-- The proof field of any self-loop is `rfl`. -/
 theorem self_path_proof (p : Path a a) :
     p.proof = rfl :=
+  -- Structural: proof irrelevance for reflexive equalities.
   Subsingleton.elim _ _
+
+/-- Step-trace companion: path composition is explicitly associative on traces. -/
+theorem trans_trace_assoc_companion {d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    (trans (trans p q) r).steps = p.steps ++ q.steps ++ r.steps := by
+  simp [trans, List.append_assoc]
+
+/-- Step-trace companion: double symmetry preserves the original trace. -/
+theorem symm_symm_trace_companion (p : Path a b) :
+    (symm (symm p)).steps = p.steps := by
+  simpa using _root_.congrArg Path.steps (symm_symm p)
 
 /-! ## Dependent elimination -/
 
