@@ -451,9 +451,6 @@ import ComputationalPaths.Path.TypeTheory.IdentityTypeDeep
 import ComputationalPaths.Path.HoTT.PathAlgebraDeep
 import ComputationalPaths.Path.HoTT.TransportDeep
 import ComputationalPaths.Path.HoTT.UnivalenceDeep
-import ComputationalPaths.Path.Rewriting.HigherRewritingDeep
-import ComputationalPaths.Path.Rewriting.KnuthBendixDeep
-import ComputationalPaths.Path.Rewriting.CoherenceDeep
 import ComputationalPaths.Path.Homotopy.CubicalDeep
 import ComputationalPaths.Path.Algebra.CompletionDeep
 import ComputationalPaths.Path.StableHomotopyPaths

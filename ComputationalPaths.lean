@@ -74,7 +74,3 @@ import ComputationalPaths.SheafCohomology.PathInfrastructure
 import ComputationalPaths.TwoCategoryInstances
 import ComputationalPaths.DeformationTheory.DeformationPaths
 import ComputationalPaths.DeformationTheory.ObstructionPaths
-import ComputationalPaths.Coherence.AssociativityCoherence
-import ComputationalPaths.Coherence.UnitCoherence
-import ComputationalPaths.Coherence.InverseCoherence
-import ComputationalPaths.Coherence.InterchangeLaw

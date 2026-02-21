@@ -175,4 +175,72 @@ theorem mac_lane_coherence
 
 end MacLane
 
+/-! ## Derived coherence wrappers -/
+
+section DerivedCoherence
+
+variable {A : Type u}
+
+theorem pentagon_routes_agree
+    {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    rweq_toEq (pentagon_left_route p q r s) =
+      rweq_toEq (pentagon_right_route p q r s) :=
+  pentagon_coherence p q r s
+
+theorem triangle_routes_agree
+    {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    rweq_toEq (triangle_left_route p q) =
+      rweq_toEq (triangle_right_route p q) :=
+  triangle_coherence p q
+
+theorem eckmann_hilton_interchange_eq
+    {a : A}
+    (α β : TwoCell (A := A) a) :
+    rweq_toEq (vertical_comp α β) =
+      rweq_toEq (horizontal_comp α β) := by
+  exact congrArg rweq_toEq (eckmann_hilton_interchange α β)
+
+theorem two_cell_ext_refl
+    {a : A}
+    (α : TwoCell (A := A) a) :
+    rweq_toEq α = rweq_toEq α := rfl
+
+theorem whisker_left_refl
+    {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq (Path.trans (Path.refl a) (Path.trans p q))
+      (Path.trans p q) :=
+  RwEq.step (Step.trans_refl_left (Path.trans p q))
+
+theorem whisker_right_refl
+    {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq (Path.trans (Path.trans p q) (Path.refl c))
+      (Path.trans p q) :=
+  RwEq.step (Step.trans_refl_right (Path.trans p q))
+
+theorem coherence_refl
+    {a b : A}
+    (p : Path a b) :
+    RwEq p p :=
+  RwEq.refl p
+
+theorem coherence_symm
+    {a b : A}
+    {p q : Path a b}
+    (h : RwEq p q) :
+    RwEq q p :=
+  RwEq.symm h
+
+theorem coherence_trans
+    {a b : A}
+    {p q r : Path a b}
+    (h₁ : RwEq p q) (h₂ : RwEq q r) :
+    RwEq p r :=
+  RwEq.trans h₁ h₂
+
+end DerivedCoherence
+
 end CompPaths.Coherence
