@@ -1,114 +1,224 @@
 import CompPaths.Core
+import CompPaths.Rewriting.CriticalPairs
 
 namespace CompPaths
 namespace DeformationTheory
 
 open ComputationalPaths
 open ComputationalPaths.Path
+open CompPaths.Rewriting
 
-universe u v w
+universe u
 
-/-- Formal deformations modeled by path witnesses between undeformed and deformed points. -/
-structure FormalDeformation (A : Type u) where
-  base : A → A
-  deform : A → A
-  witness : ∀ a, Path (base a) (deform a)
+/-!
+# Deformations as computational-path rewrite chains
 
-namespace FormalDeformation
+A deformation of a path is encoded as a finite sequence of intermediate paths
+whose consecutive entries are linked by `RwEq`.
+-/
 
-variable {A : Type u}
+/-- A finite family `p₀, p₁, ..., pₙ` with `RwEq pᵢ pᵢ₊₁` witnesses. -/
+inductive RwEqSequence {A : Type u} {a b : A} :
+    Path a b → Path a b → Type u where
+  | nil (p : Path a b) : RwEqSequence p p
+  | cons {p q r : Path a b} :
+      RwEq p q → RwEqSequence q r → RwEqSequence p r
 
-/-- The first-order step induced by a deformation witness. -/
-noncomputable def infinitesimalStep (D : FormalDeformation A) (a : A) : Step A :=
-  Step.mk (D.base a) (D.deform a) (D.witness a).proof
+namespace RwEqSequence
 
-noncomputable def infinitesimalStep_src (D : FormalDeformation A) (a : A) :
-    (D.infinitesimalStep a).src = D.base a := rfl
+noncomputable def compose {A : Type u} {a b : A} {p q : Path a b}
+    (σ : RwEqSequence p q) : RwEq p q := by
+  induction σ with
+  | nil p =>
+      exact rweq_refl p
+  | cons h tail ih =>
+      exact rweq_trans h ih
 
-noncomputable def infinitesimalStep_tgt (D : FormalDeformation A) (a : A) :
-    (D.infinitesimalStep a).tgt = D.deform a := rfl
+noncomputable def append {A : Type u} {a b : A}
+    {p q r : Path a b} (σ : RwEqSequence p q) (h : RwEq q r) :
+    RwEqSequence p r :=
+  match σ with
+  | .nil _ => .cons h (.nil r)
+  | .cons h₁ tail => .cons h₁ (append tail h)
 
-noncomputable def pushForward (D : FormalDeformation A) {a b : A} (p : Path a b) :
-    Path (D.base a) (D.deform b) :=
-  trans (D.witness a) (congrArg D.deform p)
+end RwEqSequence
 
-noncomputable def pullForward (D : FormalDeformation A) {a b : A} (p : Path a b) :
-    Path (D.base a) (D.deform b) :=
-  trans (congrArg D.base p) (D.witness b)
+/-- A deformation starting at `p₀` and ending at `terminal`. -/
+structure PathDeformation {A : Type u} {a b : A} (p₀ : Path a b) where
+  terminal : Path a b
+  sequence : RwEqSequence p₀ terminal
 
-end FormalDeformation
+namespace PathDeformation
 
-/-- Maurer-Cartan data encoded by computational paths at a basepoint. -/
-structure MaurerCartanPath {A : Type u} (a : A) where
-  omega : Path a a
-  dOmega : Path a a
-  bracket : Path a a
-  equation : RwEq (trans dOmega bracket) (symm omega)
+noncomputable def consistency {A : Type u} {a b : A} {p₀ : Path a b}
+    (D : PathDeformation p₀) : RwEq p₀ D.terminal :=
+  RwEqSequence.compose D.sequence
 
-namespace MaurerCartanPath
+noncomputable def extend {A : Type u} {a b : A} {p₀ : Path a b}
+    (D : PathDeformation p₀) {q : Path a b} (h : RwEq D.terminal q) :
+    PathDeformation p₀ where
+  terminal := q
+  sequence := RwEqSequence.append D.sequence h
 
-variable {A : Type u}
+noncomputable def refl {A : Type u} {a b : A} (p₀ : Path a b) :
+    PathDeformation p₀ where
+  terminal := p₀
+  sequence := .nil p₀
 
-noncomputable def trivial (a : A) : MaurerCartanPath a where
-  omega := Path.refl a
-  dOmega := Path.refl a
-  bracket := Path.refl a
-  equation := by
-    simpa using (rweq_cmpA_refl_left (Path.refl a))
+end PathDeformation
 
-end MaurerCartanPath
+/-- Infinitesimal deformation: one rewrite step viewed as tangent data. -/
+structure InfinitesimalDeformation {A : Type u} {a b : A} (p : Path a b) where
+  next : Path a b
+  tangent : Path.Step p next
 
-/-- Deformation functors preserve paths, rewrite equivalence, and groupoid structure. -/
-structure DeformationFunctor (A : Type u) (B : Type v) where
-  obj : A → B
-  mapPath : {a b : A} → Path a b → Path (obj a) (obj b)
-  map_rweq :
-      ∀ {a b : A} {p q : Path a b}, RwEq p q → RwEq (mapPath p) (mapPath q)
-  map_trans :
-      ∀ {a b c : A} (p : Path a b) (q : Path b c),
-        RwEq (mapPath (trans p q)) (trans (mapPath p) (mapPath q))
-  map_symm :
-      ∀ {a b : A} (p : Path a b),
-        RwEq (mapPath (symm p)) (symm (mapPath p))
+namespace InfinitesimalDeformation
 
-namespace DeformationFunctor
+noncomputable def tangent_rweq {A : Type u} {a b : A} {p : Path a b}
+    (δ : InfinitesimalDeformation p) : RwEq p δ.next :=
+  rweq_of_step δ.tangent
 
-noncomputable def id (A : Type u) : DeformationFunctor A A where
-  obj := fun a => a
-  mapPath := fun p => p
-  map_rweq := fun h => h
-  map_trans := fun _ _ => rweq_refl _
-  map_symm := fun _ => rweq_refl _
+noncomputable def toSequence {A : Type u} {a b : A} {p : Path a b}
+    (δ : InfinitesimalDeformation p) : RwEqSequence p δ.next :=
+  .cons (δ.tangent_rweq) (.nil δ.next)
 
-noncomputable def comp {A : Type u} {B : Type v} {C : Type w}
-    (F : DeformationFunctor A B) (G : DeformationFunctor B C) :
-    DeformationFunctor A C where
-  obj := fun a => G.obj (F.obj a)
-  mapPath := fun p => G.mapPath (F.mapPath p)
-  map_rweq := fun h => G.map_rweq (F.map_rweq h)
-  map_trans := fun p q =>
-    rweq_trans
-      (G.map_rweq (F.map_trans p q))
-      (G.map_trans (F.mapPath p) (F.mapPath q))
-  map_symm := fun p =>
-    rweq_trans
-      (G.map_rweq (F.map_symm p))
-      (G.map_symm (F.mapPath p))
+noncomputable def toDeformation {A : Type u} {a b : A} {p : Path a b}
+    (δ : InfinitesimalDeformation p) : PathDeformation p where
+  terminal := δ.next
+  sequence := δ.toSequence
 
-noncomputable def mapMaurerCartan {A : Type u} {B : Type v}
-    (F : DeformationFunctor A B) {a : A} (mc : MaurerCartanPath a) :
-    MaurerCartanPath (F.obj a) where
-  omega := F.mapPath mc.omega
-  dOmega := F.mapPath mc.dOmega
-  bracket := F.mapPath mc.bracket
-  equation := by
-    exact rweq_trans
-      (rweq_symm (F.map_trans mc.dOmega mc.bracket))
-      (rweq_trans
-        (F.map_rweq mc.equation)
-        (F.map_symm mc.omega))
+end InfinitesimalDeformation
 
-end DeformationFunctor
+/-- A sequence of primitive `Step`s along a deformation trajectory. -/
+inductive StepSequence {A : Type u} {a b : A} :
+    Path a b → Path a b → Type u where
+  | nil (p : Path a b) : StepSequence p p
+  | cons {p q r : Path a b} :
+      Path.Step p q → StepSequence q r → StepSequence p r
+
+namespace StepSequence
+
+noncomputable def toRwEq {A : Type u} {a b : A} {p q : Path a b}
+    (σ : StepSequence p q) : RwEq p q := by
+  induction σ with
+  | nil p =>
+      exact rweq_refl p
+  | cons hs tail ih =>
+      exact rweq_trans (rweq_of_step hs) ih
+
+noncomputable def toRwEqSequence {A : Type u} {a b : A} {p q : Path a b}
+    (σ : StepSequence p q) : RwEqSequence p q := by
+  induction σ with
+  | nil p =>
+      exact .nil p
+  | cons hs tail ih =>
+      exact .cons (rweq_of_step hs) ih
+
+noncomputable def toDeformation {A : Type u} {a b : A} {p q : Path a b}
+    (σ : StepSequence p q) : PathDeformation p where
+  terminal := q
+  sequence := σ.toRwEqSequence
+
+end StepSequence
+
+/-- Maurer-Cartan consistency: composed infinitesimal steps yield one `RwEq` chain. -/
+structure MaurerCartanEquation {A : Type u} {a b : A} (p : Path a b) where
+  terminal : Path a b
+  steps : StepSequence p terminal
+
+namespace MaurerCartanEquation
+
+noncomputable def consistency {A : Type u} {a b : A} {p : Path a b}
+    (mc : MaurerCartanEquation p) : RwEq p mc.terminal := by
+  induction mc.steps with
+  | nil p =>
+      exact rweq_refl p
+  | cons hs tail ih =>
+      exact rweq_trans (rweq_of_step hs) ih
+
+noncomputable def toDeformation {A : Type u} {a b : A} {p : Path a b}
+    (mc : MaurerCartanEquation p) : PathDeformation p :=
+  StepSequence.toDeformation mc.steps
+
+end MaurerCartanEquation
+
+/-- A critical-pair branch at the tip of a partial deformation. -/
+structure CriticalPairAt {A : Type u} {a b : A} (p : Path a b) where
+  caseTag : CriticalPairCase
+  left : Path a b
+  right : Path a b
+  leftStep : Path.Step p left
+  rightStep : Path.Step p right
+
+namespace CriticalPairAt
+
+def Joinable {A : Type u} {a b : A} {p : Path a b}
+    (cp : CriticalPairAt p) : Prop :=
+  ∃ r : Path a b, RwEq cp.left r ∧ RwEq cp.right r
+
+noncomputable def left_rweq {A : Type u} {a b : A} {p : Path a b}
+    (cp : CriticalPairAt p) : RwEq p cp.left :=
+  rweq_of_step cp.leftStep
+
+noncomputable def right_rweq {A : Type u} {a b : A} {p : Path a b}
+    (cp : CriticalPairAt p) : RwEq p cp.right :=
+  rweq_of_step cp.rightStep
+
+end CriticalPairAt
+
+def PathDeformation.ExtendableAlong
+    {A : Type u} {a b : A} {p₀ : Path a b}
+    (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal) : Prop :=
+  cp.Joinable
+
+noncomputable def PathDeformation.extend_of_joinable
+    {A : Type u} {a b : A} {p₀ : Path a b}
+    (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal)
+    (h : D.ExtendableAlong cp) :
+    Σ r : Path a b, PathDeformation p₀ := by
+  rcases h with ⟨r, hLeft, _⟩
+  refine ⟨r, D.extend ?_⟩
+  exact rweq_trans (cp.left_rweq) hLeft
+
+/-- Obstruction: a non-joinable critical pair blocks extension. -/
+structure ExtensionObstruction {A : Type u} {a b : A} {p₀ : Path a b}
+    (D : PathDeformation p₀) where
+  critical : CriticalPairAt D.terminal
+  nonjoinable : ¬ D.ExtendableAlong critical
+
+namespace ExtensionObstruction
+
+theorem blocks_extension
+    {A : Type u} {a b : A} {p₀ : Path a b}
+    {D : PathDeformation p₀} (obs : ExtensionObstruction D) :
+    ¬ D.ExtendableAlong obs.critical :=
+  obs.nonjoinable
+
+end ExtensionObstruction
+
+/-- Gauge equivalence between deformations via a higher `RwEq` witness. -/
+structure GaugeEquivalence {A : Type u} {a b : A} {p₀ : Path a b}
+    (D₁ D₂ : PathDeformation p₀) where
+  higher : RwEq D₁.terminal D₂.terminal
+
+namespace GaugeEquivalence
+
+noncomputable def refl {A : Type u} {a b : A} {p₀ : Path a b}
+    (D : PathDeformation p₀) : GaugeEquivalence D D where
+  higher := rweq_refl D.terminal
+
+noncomputable def symm {A : Type u} {a b : A} {p₀ : Path a b}
+    {D₁ D₂ : PathDeformation p₀} (g : GaugeEquivalence D₁ D₂) :
+    GaugeEquivalence D₂ D₁ where
+  higher := rweq_symm g.higher
+
+noncomputable def trans {A : Type u} {a b : A} {p₀ : Path a b}
+    {D₁ D₂ D₃ : PathDeformation p₀}
+    (g₁ : GaugeEquivalence D₁ D₂) (g₂ : GaugeEquivalence D₂ D₃) :
+    GaugeEquivalence D₁ D₃ where
+  higher := rweq_trans g₁.higher g₂.higher
+
+end GaugeEquivalence
 
 end DeformationTheory
 end CompPaths

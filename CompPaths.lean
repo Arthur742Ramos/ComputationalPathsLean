@@ -12,14 +12,14 @@ import CompPaths.DeformationTheory.DeformationPaths
 import CompPaths.DeformationTheory.ObstructionPaths
 import CompPaths.Transport.PathOverPath
 import CompPaths.Transport.TransportDeep
--- import CompPaths.Confluence.WordProblem  -- TODO: fix after RwEq Type migration
+import CompPaths.TypeFormers.UniversalProperties
 import CompPaths.OmegaGroupoid.WeakGroupoidPaths
 import CompPaths.OmegaGroupoid.CoherencePaths
 import CompPaths.OmegaGroupoid.TwoCategoryStructure
 import CompPaths.OmegaGroupoid.GroupoidProofs
--- import CompPaths.OmegaGroupoid.HigherCellPaths  -- TODO: depends on broken OmegaGroupoid module
-import CompPaths.Examples.FundamentalGroupCircle
 import CompPaths.Examples.FundamentalGroupTorus
 import CompPaths.Homotopy.VanKampen
 import CompPaths.Homotopy.VanKampenApplications
 import CompPaths.Algebra.HomologicalAlgebra
+import CompPaths.HIT.SuspensionDeep
+import CompPaths.Category.EnrichedCategory

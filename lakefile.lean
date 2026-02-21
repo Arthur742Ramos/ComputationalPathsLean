@@ -14,6 +14,7 @@ lean_lib ComputationalPaths where
 lean_lib CompPaths where
   roots := #[`CompPaths,
     `CompPaths.Comparison.HoTTComparison,
+    `CompPaths.Category.EnrichedCategory,
     `CompPaths.Context.CongruenceClosure,
     `CompPaths.Confluence.ConfluenceDeep,
     `CompPaths.Coherence.AssociativityCoherence,
@@ -40,8 +41,10 @@ lean_lib CompPaths where
     `CompPaths.CoveringSpace.CoveringDeep,
     `CompPaths.CoveringSpace.PathLifting,
     `CompPaths.Algebra.FreeGroupoid,
+    `CompPaths.Algebra.PathAlgebra,
     `CompPaths.Algebra.Presentation,
-    `CompPaths.Algebra.HomologicalAlgebra]
+    `CompPaths.Algebra.HomologicalAlgebra,
+    `CompPaths.Category.EnrichedCategory]
 
 @[default_target]
 lean_exe computational_paths where
