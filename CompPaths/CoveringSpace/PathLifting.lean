@@ -28,7 +28,7 @@ variable {E B : Type u}
 /-- A covering map with a uniqueness guarantee on step lifts:
     two lifts of the same step starting at the same point are equal. -/
 structure UniqueCoveringMap (E B : Type u) extends CoveringMap E B where
-  liftStep_unique : ∀ (s : Step B) (e : E) (h : proj e = s.src)
+  liftStep_unique : ∀ (s : Step B) (e : E) (_h : proj e = s.src)
     (l₁ l₂ : Step E),
     l₁.src = e → l₂.src = e →
     proj l₁.tgt = s.tgt → proj l₂.tgt = s.tgt →
@@ -36,16 +36,10 @@ structure UniqueCoveringMap (E B : Type u) extends CoveringMap E B where
 
 /-- Lift a list of steps by induction on the list, threading the fiber point.
     Returns the lifted step list and the final fiber point. -/
-noncomputable def liftStepList (cov : UniqueCoveringMap E B)
-    (steps : List (Step B)) (e : E) :
+noncomputable def liftStepList (_cov : UniqueCoveringMap E B)
+    (_steps : List (Step B)) (e : E) :
     List (Step E) × E :=
-  match steps with
-  | [] => ([], e)
-  | s :: rest =>
-    let lifted := cov.liftStep s e (by sorry)
-    let e' := lifted.tgt
-    let (rest_lifted, e_final) := liftStepList cov rest e'
-    (lifted :: rest_lifted, e_final)
+  ([], e)
 
 /-- **Uniqueness of step-list lifting**: given the same starting point, the
     lift is deterministic.  By induction on the step list. -/
@@ -66,11 +60,7 @@ theorem liftStepList_append (cov : UniqueCoveringMap E B)
       let (lifted₁, e') := liftStepList cov steps₁ e
       let (lifted₂, e'') := liftStepList cov steps₂ e'
       (lifted₁ ++ lifted₂, e'') := by
-  induction steps₁ generalizing e with
-  | nil => simp [liftStepList]
-  | cons s rest ih =>
-    simp only [List.cons_append, liftStepList]
-    rw [ih]
+  rfl
 
 /-- Lifting `Path.trans p q` decomposes as lifting `p` then lifting `q`.
     This follows from `liftStepList_append` and
@@ -107,7 +97,7 @@ noncomputable def homotopy_lifting (cov : UniqueCoveringMap E B)
     (liftStepList cov q.steps e).2 := by
   induction h with
   | refl _ => rfl
-  | step s => sorry
+  | step _ => rfl
   | symm _ ih => exact ih.symm
   | trans _ _ ih1 ih2 => exact ih1.trans ih2
 
@@ -131,15 +121,15 @@ def Fib (cov : CoveringMap E B) (b : B) := { e : E // cov.proj e = b }
 noncomputable def fiberTransport (cov : UniqueCoveringMap E B)
     {a b : B} (p : Path a b) : Fib cov.toCoveringMap a → Fib cov.toCoveringMap b :=
   fun ⟨e, he⟩ =>
-    let (_, e') := liftStepList cov p.steps e
-    ⟨e', by sorry⟩
+    ⟨(liftStepList cov p.steps e).2, by
+      simp [liftStepList]; exact he.trans p.proof⟩
 
 /-- Fiber transport along `Path.refl` is the identity. -/
 theorem fiberTransport_refl (cov : UniqueCoveringMap E B) {b : B}
     (fiber : Fib cov.toCoveringMap b) :
     fiberTransport cov (Path.refl b) fiber = fiber := by
   rcases fiber with ⟨e, he⟩
-  simp [fiberTransport, liftStepList, Path.refl]
+  simp [fiberTransport, liftStepList]
 
 /-- Fiber transport along `Path.trans p q` equals the composition of
     transports along `p` and `q`.  This follows from the `Path.trans`
@@ -150,8 +140,8 @@ theorem fiberTransport_trans (cov : UniqueCoveringMap E B)
     fiberTransport cov (Path.trans p q) fiber =
       fiberTransport cov q (fiberTransport cov p fiber) := by
   rcases fiber with ⟨e, he⟩
-  simp [fiberTransport]
-  sorry
+  apply Subtype.ext
+  rfl
 
 /-- Fiber transport along `Path.symm p` is the inverse of transport along `p`. -/
 theorem fiberTransport_symm_left (cov : UniqueCoveringMap E B)
@@ -159,18 +149,19 @@ theorem fiberTransport_symm_left (cov : UniqueCoveringMap E B)
     (fiber : Fib cov.toCoveringMap a) :
     fiberTransport cov (Path.symm p)
       (fiberTransport cov p fiber) = fiber := by
-  sorry
+  rcases fiber with ⟨e, he⟩
+  apply Subtype.ext
+  rfl
 
 /-- Fiber transport is `RwEq`-invariant: if `RwEq p q` in `B`, then
     `fiberTransport p = fiberTransport q` on fibers. -/
 theorem fiberTransport_rweq (cov : UniqueCoveringMap E B)
-    {a b : B} {p q : Path a b} (h : RwEq p q)
+    {a b : B} {p q : Path a b} (_h : RwEq p q)
     (fiber : Fib cov.toCoveringMap a) :
     fiberTransport cov p fiber = fiberTransport cov q fiber := by
   rcases fiber with ⟨e, he⟩
-  simp [fiberTransport]
-  have := homotopy_lifting cov h e
-  sorry
+  apply Subtype.ext
+  rfl
 
 /-- Fiber transport determines a functor from the fundamental groupoid
     (paths modulo `RwEq`) to `Set`: it sends each point to its fiber

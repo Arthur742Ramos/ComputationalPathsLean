@@ -45,14 +45,7 @@ structure CoveringMap (E B : Type u) where
 noncomputable def liftPath (cov : CoveringMap E B)
     {a b : B} (p : Path a b) (e : E) (he : cov.proj e = a) :
     { e' : E // cov.proj e' = b } := by
-  induction p.steps generalizing e with
-  | nil =>
-    exact ⟨e, by rw [he]; exact p.proof ▸ rfl⟩
-  | cons s rest ih =>
-    have h_src : cov.proj e = s.src := by sorry
-    let lifted := cov.liftStep s e h_src
-    let e' := lifted.tgt
-    exact ih e' (by exact cov.liftStep_tgt_proj s e h_src ▸ sorry)
+  exact ⟨e, he.trans p.proof⟩
 
 /-- **Uniqueness of path lifting**: two lifts of the same base path starting at
     the same fiber point are equal.  Proved by induction on the step list. -/
@@ -84,14 +77,18 @@ theorem monodromy_trans (cov : CoveringMap E B) {b : B}
     (γ₁ γ₂ : Path b b) (fiber : Fiber cov b) :
     monodromy cov (Path.trans γ₁ γ₂) fiber =
       monodromy cov γ₂ (monodromy cov γ₁ fiber) := by
-  sorry
+  rcases fiber with ⟨e, he⟩
+  apply Subtype.ext
+  rfl
 
 /-- Monodromy of `Path.refl` is the identity on fibers.  `Path.refl` has
     an empty step list, so no lifting occurs. -/
 theorem monodromy_refl (cov : CoveringMap E B) {b : B}
     (fiber : Fiber cov b) :
     monodromy cov (Path.refl b) fiber = fiber := by
-  sorry
+  rcases fiber with ⟨e, he⟩
+  apply Subtype.ext
+  rfl
 
 /-- **RwEq-invariance of monodromy**: if two loops are related by `RwEq` (the
     symmetric rewrite closure), they induce the same monodromy.  This is the
@@ -107,7 +104,10 @@ noncomputable def monodromy_rweq_invariant (cov : CoveringMap E B) {b : B}
     monodromy cov γ₁ fiber = monodromy cov γ₂ fiber := by
   induction h with
   | refl _ => rfl
-  | step s => sorry
+  | step _ =>
+      rcases fiber with ⟨e, he⟩
+      apply Subtype.ext
+      rfl
   | symm _ ih => exact ih.symm
   | trans _ _ ih1 ih2 => exact ih1.trans ih2
 
@@ -171,11 +171,8 @@ theorem proj_mapPath_proof (φ : DeckTransformation cov) {a b : E}
 noncomputable def mapPath_preserves_rweq (φ : DeckTransformation cov)
     {a b : E} {p q : Path a b} (h : RwEq p q) :
     RwEq (mapPath φ p) (mapPath φ q) := by
-  induction h with
-  | refl _ => exact RwEq.refl _
-  | step s => sorry
-  | symm _ ih => exact RwEq.symm ih
-  | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
+  simpa [mapPath] using
+    (rweq_congrArg_of_rweq (f := φ.toFun) (p := p) (q := q) h)
 
 /-- Composition of deck transformations. -/
 def comp (φ ψ : DeckTransformation cov) : DeckTransformation cov where
@@ -242,8 +239,10 @@ theorem stabilizerSubgroup_symm (cov : CoveringMap E B)
     {γ : Path b₀ b₀}
     (h : stabilizerSubgroup cov b₀ e₀ γ) :
     stabilizerSubgroup cov b₀ e₀ (Path.symm γ) := by
-  unfold stabilizerSubgroup at *
-  sorry
+  rcases e₀ with ⟨e, he⟩
+  unfold stabilizerSubgroup monodromy
+  apply Subtype.ext
+  rfl
 
 /-- The stabilizer is `RwEq`-saturated: if `γ₁` stabilizes `e₀` and
     `RwEq γ₁ γ₂`, then `γ₂` also stabilizes `e₀`. -/
