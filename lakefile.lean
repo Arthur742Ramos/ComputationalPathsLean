@@ -17,6 +17,8 @@ lean_lib CompPaths where
     `CompPaths.Coherence.UnitCoherence,
     `CompPaths.Coherence.InverseCoherence,
     `CompPaths.Coherence.InterchangeLaw,
+    `CompPaths.DeformationTheory.DeformationPaths,
+    `CompPaths.DeformationTheory.ObstructionPaths,
     `CompPaths.OmegaGroupoid.WeakGroupoidPaths,
     `CompPaths.OmegaGroupoid.CoherencePaths,
     `CompPaths.OmegaGroupoid.HigherCellPaths]

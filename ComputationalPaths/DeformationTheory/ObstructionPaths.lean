@@ -181,16 +181,14 @@ variable {A : Type u} {B : Type v} (K : KodairaSpencerMap A B)
 
 /-- The KS map respects path composition via `congrArg`. -/
 theorem ksPathTrans {x y z : A} (p : Path x y) (q : Path y z) :
-    K.ksPath (Path.trans p q) =
-      Path.trans (K.ksPath p) (K.ksPath q) := by
-  simp [Path.congrArg_trans]
-  rfl
+    Path.congrArg K.ks (Path.trans p q) =
+      Path.trans (Path.congrArg K.ks p) (Path.congrArg K.ks q) := by
+  simpa using Path.congrArg_trans (f := K.ks) (p := p) (q := q)
 
 /-- The KS map respects path symmetry. -/
 theorem ksPathSymm {x y : A} (p : Path x y) :
-    K.ksPath (Path.symm p) = Path.symm (K.ksPath p) := by
-  simp [Path.congrArg_symm]
-  rfl
+    Path.congrArg K.ks (Path.symm p) = Path.symm (Path.congrArg K.ks p) := by
+  simpa using Path.congrArg_symm (f := K.ks) (p := p)
 
 end KodairaSpencerMap
 
@@ -324,15 +322,14 @@ def tangentUnobstructed (t : B) : T.obs.Unobstructed (T.ks.ks t) where
 def ksImageSmooth : ∀ t : B, T.obs.Unobstructed (T.ks.ks t) :=
   T.tangentUnobstructed
 
-/-- The exactness witness composes with the KS zero path to give
-a closed loop in the obstruction space. -/
+/-- The exactness witness composes with the inverse mapped KS zero path. -/
 @[simp] theorem exactKsZeroLoop :
     RwEq
       (Path.trans
-        (T.obs.obsMapPath T.ks.ksZero)
+        (Path.symm (T.obs.obsMapPath T.ks.ksZero))
         (T.exact T.ks.tangentZero))
       (Path.trans
-        (T.obs.obsMapPath T.ks.ksZero)
+        (Path.symm (T.obs.obsMapPath T.ks.ksZero))
         (T.exact T.ks.tangentZero)) :=
   RwEq.refl _
 

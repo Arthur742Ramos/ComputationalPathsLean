@@ -206,21 +206,24 @@ def symm (g : GaugeEquivalenceData D mc₁ mc₂) :
   action := Path.symm g.action
   coherence := Path.symm g.coherence
   equationCompat :=
-    RwEq.trans
-      (RwEq.step (Path.Step.symm_trans_congr g.coherence mc₂.equation))
-      (RwEq.trans
-        (RwEq.symm (RwEq.step (Path.Step.trans_assoc
-          (Path.symm mc₂.equation) (Path.symm g.coherence) (Path.trans g.coherence mc₂.equation))))
-        (RwEq.trans
-          (rweq_cmpA_refl_left
-            (Path.trans (Path.symm g.coherence) (Path.trans g.coherence mc₂.equation)))
-          (RwEq.trans
-            (RwEq.symm (RwEq.step (Path.Step.trans_assoc
-              (Path.symm g.coherence) g.coherence mc₂.equation)))
-            (RwEq.trans
-              (rweq_cmpA_refl_left
-                (Path.trans (Path.symm g.coherence) (Path.trans g.coherence mc₂.equation)))
-              g.equationCompat))))
+    by
+      have h₁ :
+          RwEq (Path.trans (Path.symm g.coherence) mc₁.equation)
+            (Path.trans (Path.symm g.coherence) (Path.trans g.coherence mc₂.equation)) :=
+        rweq_trans_congr_right (Path.symm g.coherence) (rweq_symm g.equationCompat)
+      have h₂ :
+          RwEq
+            (Path.trans (Path.symm g.coherence) (Path.trans g.coherence mc₂.equation))
+            (Path.trans (Path.trans (Path.symm g.coherence) g.coherence) mc₂.equation) :=
+        rweq_symm (rweq_tt (Path.symm g.coherence) g.coherence mc₂.equation)
+      have h₃ :
+          RwEq
+            (Path.trans (Path.trans (Path.symm g.coherence) g.coherence) mc₂.equation)
+            (Path.trans (Path.refl (formalCurvature D mc₂.element)) mc₂.equation) :=
+        rweq_trans_congr_left mc₂.equation (rweq_cmpA_inv_left g.coherence)
+      exact rweq_trans h₁
+        (rweq_trans h₂
+          (rweq_trans h₃ (rweq_cmpA_refl_left mc₂.equation)))
 
 end GaugeEquivalenceData
 
