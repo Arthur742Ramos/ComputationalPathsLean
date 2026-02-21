@@ -8,6 +8,7 @@ import CompPaths.Coherence.UnitCoherence
 import CompPaths.Coherence.InverseCoherence
 import CompPaths.Coherence.InterchangeLaw
 import CompPaths.Context.ContextDeep
+import CompPaths.CwF.CwFDeep
 import CompPaths.DeformationTheory.DeformationPaths
 import CompPaths.DeformationTheory.ObstructionPaths
 import CompPaths.Transport.PathOverPath
@@ -17,6 +18,7 @@ import CompPaths.OmegaGroupoid.WeakGroupoidPaths
 import CompPaths.OmegaGroupoid.CoherencePaths
 import CompPaths.OmegaGroupoid.TwoCategoryStructure
 import CompPaths.OmegaGroupoid.GroupoidProofs
+import CompPaths.OmegaGroupoid.TruncationProof
 import CompPaths.Examples.FundamentalGroupTorus
 import CompPaths.Homotopy.VanKampen
 import CompPaths.Homotopy.VanKampenApplications
