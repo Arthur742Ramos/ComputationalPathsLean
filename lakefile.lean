@@ -38,6 +38,7 @@ lean_lib CompPaths where
     `CompPaths.Homotopy.VanKampenApplications,
     `CompPaths.Homotopy.ModelStructure,
     `CompPaths.Homotopy.FibrationSequence,
+    `CompPaths.Homotopy.HITDeep,
     `CompPaths.Homotopy.WhiteheadTheorem,
     `CompPaths.HIT.SuspensionDeep,
     `CompPaths.Rewriting.KnuthBendix,
@@ -49,6 +50,7 @@ lean_lib CompPaths where
     `CompPaths.Algebra.PathAlgebra,
     `CompPaths.Algebra.Presentation,
     `CompPaths.Algebra.HomologicalAlgebra,
+    `CompPaths.Algebra.MayerVietoris,
     `CompPaths.Algebra.SpectralSequence,
     `CompPaths.Algebra.OperadStructure]
 

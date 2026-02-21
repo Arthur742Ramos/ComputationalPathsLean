@@ -46,7 +46,7 @@ These two paths represent the same identity operation:
 We can relate them via the primitive rewrite rule `Step.transport_refl_beta`,
 instantiated with a constant family. This avoids the unsound global
 canonicalization rule (`Step.canon`). -/
-theorem rweq_ofEq_rfl_refl {A : Type u} (a : A) :
+noncomputable def rweq_ofEq_rfl_refl {A : Type u} (a : A) :
     RwEq (Path.stepChain (rfl : a = a)) (Path.refl a) := by
   -- `transport (refl ⋆) a = a` is definitional for the constant family `fun _ => A`.
   simpa using
@@ -77,7 +77,7 @@ example {A B : Type u} (f : A → B) :
 /-! ## RwEq example -/
 
 /-- Double symmetry gives a second path witness that is RwEq to the original. -/
-theorem rweq_symm_symm {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def rweq_symm_symm {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.symm (Path.symm p)) p := by
   exact rweq_ss (p := p)
 
