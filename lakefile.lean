@@ -32,6 +32,7 @@ lean_lib CompPaths where
     `CompPaths.Examples.FundamentalGroupTorus,
     `CompPaths.Homotopy.VanKampen,
     `CompPaths.Homotopy.VanKampenApplications,
+    `CompPaths.HIT.SuspensionDeep,
     `CompPaths.Rewriting.KnuthBendix,
     `CompPaths.Rewriting.CriticalPairs,
     `CompPaths.Rewriting.TerminationProofs,
