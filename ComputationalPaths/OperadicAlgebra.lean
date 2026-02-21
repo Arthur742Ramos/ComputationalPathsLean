@@ -1,0 +1,7 @@
+/- Root module for ComputationalPaths.OperadicAlgebra -/
+
+import ComputationalPaths.OperadicAlgebra.AlgebrasOverOperadsPaths
+import ComputationalPaths.OperadicAlgebra.EnOperads
+import ComputationalPaths.OperadicAlgebra.KoszulDuality
+import ComputationalPaths.OperadicAlgebra.KoszulDualityPaths
+import ComputationalPaths.OperadicAlgebra.PathInfrastructure

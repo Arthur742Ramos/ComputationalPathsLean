@@ -1,2 +1,3 @@
 -- Root module for perfectoid path infrastructure.
-import ComputationalPaths.Perfectoid.PathInfrastructure
+import ComputationalPaths.Perfectoid.AlmostMathematicsPaths
+import ComputationalPaths.Perfectoid.TiltingEquivalences

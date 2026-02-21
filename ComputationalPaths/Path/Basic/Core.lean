@@ -89,7 +89,7 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
 /-- Explicit subsingleton equality via constructor matching on the instance. -/
 theorem subsingleton_eq_by_cases {α : Sort u} [h : Subsingleton α] (x y : α) : x = y := by
   cases h with
-  | mk hxy =>
+  | intro hxy =>
       exact hxy x y
 
 

@@ -1,7 +1,7 @@
 -- ModalPathDeep.lean: Modal logic via computational paths
 -- Kripke frames, □/◇, K/T/S4/S5 axiom schemes, bisimulation,
 -- temporal operators, dynamic logic
-import ComputationalPaths.Path.Core
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths
 

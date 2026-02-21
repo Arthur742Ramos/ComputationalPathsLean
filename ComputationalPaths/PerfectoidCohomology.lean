@@ -1,3 +1,5 @@
 /- Root import for perfectoid cohomology path infrastructure modules. -/
 
 import ComputationalPaths.PerfectoidCohomology.PathInfrastructure
+import ComputationalPaths.PerfectoidCohomology.AlmostVanishingPaths
+import ComputationalPaths.PerfectoidCohomology.TiltingEquivalencePaths

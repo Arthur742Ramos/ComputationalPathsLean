@@ -1,3 +1,4 @@
 /- Root import for topological field theory path modules. -/
 
-import ComputationalPaths.TFT.PathInfrastructure
+import ComputationalPaths.TFT.CobordismFunctorPaths
+import ComputationalPaths.TFT.StateSumPaths

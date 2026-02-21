@@ -1,2 +1,3 @@
 -- Root module for tropical path infrastructure.
-import ComputationalPaths.Tropical.PathInfrastructure
+import ComputationalPaths.Tropical.TropicalCurvesPaths
+import ComputationalPaths.Tropical.ValuationPaths

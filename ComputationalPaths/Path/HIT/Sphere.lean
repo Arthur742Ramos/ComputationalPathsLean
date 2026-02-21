@@ -32,8 +32,8 @@ free product collapses to the trivial group regardless of what π₁(C) is.
 -/
 
 import ComputationalPaths.Path.HIT.Pushout
-import ComputationalPaths.Path.HIT.PushoutPaths
-import ComputationalPaths.Path.HIT.Circle
+-- import ComputationalPaths.Path.HIT.PushoutPaths  -- does not exist
+-- import ComputationalPaths.Path.HIT.Circle  -- does not exist
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Sets

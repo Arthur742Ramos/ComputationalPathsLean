@@ -1,7 +1,7 @@
 -- GaloisDeep2.lean: Galois theory via computational paths
 -- Field extensions, Galois groups, fixed field correspondence,
 -- normal/separable extensions, fundamental theorem, cyclotomic, solvable groups
-import ComputationalPaths.Path.Core
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths
 

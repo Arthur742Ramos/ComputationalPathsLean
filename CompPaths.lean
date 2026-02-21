@@ -1,4 +1,3 @@
-import CompPaths.Core
 import CompPaths.Comparison.HoTTComparison
 import CompPaths.Comparison.UnivalenceAnalog
 import CompPaths.Context.CongruenceClosure
@@ -34,3 +33,21 @@ import CompPaths.HIT.SuspensionDeep
 import CompPaths.Category.EnrichedCategory
 import CompPaths.Algebra.OperadStructure
 import CompPaths.Algebra.PathAlgebra
+
+-- Auto-wired subdirectory root modules
+import CompPaths.Algebra
+import CompPaths.Category
+import CompPaths.Coherence
+import CompPaths.Comparison
+import CompPaths.Confluence
+import CompPaths.Context
+import CompPaths.CoveringSpace
+import CompPaths.CwF
+import CompPaths.DeformationTheory
+import CompPaths.Examples
+import CompPaths.HIT
+import CompPaths.Homotopy
+import CompPaths.OmegaGroupoid
+import CompPaths.Rewriting
+import CompPaths.Transport
+import CompPaths.TypeFormers

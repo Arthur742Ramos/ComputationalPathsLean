@@ -1,4 +1,4 @@
-import ComputationalPaths.Path.Core
+import ComputationalPaths.Path.Basic.Core
 
 namespace ComputationalPaths
 
