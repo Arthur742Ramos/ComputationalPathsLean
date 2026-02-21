@@ -26,6 +26,8 @@ open Path
 
 universe u v w
 
+noncomputable section
+
 /-! ## Domain-specific rewrite steps -/
 
 inductive SheafStep {A : Type u} :
@@ -53,7 +55,7 @@ def SheafStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .assoc p q r => Path.Step.trans_assoc p q r
   | .symm_distrib p q => Path.Step.symm_trans_congr p q
 
-theorem rweq_of_sheaf_step {A : Type u} {a b : A}
+def rweq_of_sheaf_step {A : Type u} {a b : A}
     {p q : Path a b} (s : SheafStep p q) : RwEq p q :=
   rweq_of_step (SheafStep.toStep s)
 
@@ -72,33 +74,33 @@ namespace PresheafData
 variable {O : Type u} {A : Type v}
 variable (F : PresheafData O A)
 
-@[simp] theorem restrictId_rweq (U : O) (s : A) :
+@[simp] def restrictId_rweq (U : O) (s : A) :
     RwEq (Path.trans (F.restrictIdPath U s) (Path.refl _)) (F.restrictIdPath U s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (F.restrictIdPath U s))
 
-@[simp] theorem restrictComp_rweq (U V W : O) (s : A) :
+@[simp] def restrictComp_rweq (U V W : O) (s : A) :
     RwEq
       (Path.trans (F.restrictCompPath U V W s) (Path.refl _))
       (F.restrictCompPath U V W s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (F.restrictCompPath U V W s))
 
-@[simp] theorem restrictId_cancel_rweq (U : O) (s : A) :
+@[simp] def restrictId_cancel_rweq (U : O) (s : A) :
     RwEq
       (Path.trans (F.restrictIdPath U s) (Path.symm (F.restrictIdPath U s)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (F.restrictIdPath U s))
 
-@[simp] theorem restrictComp_cancel_rweq (U V W : O) (s : A) :
+@[simp] def restrictComp_cancel_rweq (U V W : O) (s : A) :
     RwEq
       (Path.trans (F.restrictCompPath U V W s) (Path.symm (F.restrictCompPath U V W s)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (F.restrictCompPath U V W s))
 
-theorem restrictId_transport_const {B : Type w} (U : O) (s : A) (b : B) :
+def restrictId_transport_const {B : Type w} (U : O) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (F.restrictIdPath U s) b = b := by
   simp [Path.transport_const]
 
-theorem restrictComp_transport_const {B : Type w} (U V W : O) (s : A) (b : B) :
+def restrictComp_transport_const {B : Type w} (U V W : O) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (F.restrictCompPath U V W s) b = b := by
   simp [Path.transport_const]
 
@@ -118,19 +120,19 @@ variable {O : Type u} {A B : Type v}
 variable {F : PresheafData O A} {G : PresheafData O B}
 variable (η : PresheafMorphData F G)
 
-@[simp] theorem naturality_rweq (U V : O) (s : A) :
+@[simp] def naturality_rweq (U V : O) (s : A) :
     RwEq
       (Path.trans (η.naturalityPath U V s) (Path.refl _))
       (η.naturalityPath U V s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (η.naturalityPath U V s))
 
-@[simp] theorem naturality_cancel_rweq (U V : O) (s : A) :
+@[simp] def naturality_cancel_rweq (U V : O) (s : A) :
     RwEq
       (Path.trans (η.naturalityPath U V s) (Path.symm (η.naturalityPath U V s)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (η.naturalityPath U V s))
 
-theorem naturality_transport_const {C : Type w} (U V : O) (s : A) (c : C) :
+def naturality_transport_const {C : Type w} (U V : O) (s : A) (c : C) :
     Path.transport (D := fun _ => C) (η.naturalityPath U V s) c = c := by
   simp [Path.transport_const]
 
@@ -153,26 +155,26 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (S : SheafCondData F)
 
-@[simp] theorem locality_rweq (cover : List O) (s t : A)
+@[simp] def locality_rweq (cover : List O) (s t : A)
     (agreeOn : ∀ U : O, Path (F.restrict S.whole U s) (F.restrict S.whole U t)) :
     RwEq
       (Path.trans (S.localityPath cover s t agreeOn) (Path.refl _))
       (S.localityPath cover s t agreeOn) :=
   rweq_of_sheaf_step (SheafStep.right_unit (S.localityPath cover s t agreeOn))
 
-@[simp] theorem gluing_rweq (cover : List O) (ls : O → A) (U : O) :
+@[simp] def gluing_rweq (cover : List O) (ls : O → A) (U : O) :
     RwEq
       (Path.trans (S.gluingPath cover ls U) (Path.refl _))
       (S.gluingPath cover ls U) :=
   rweq_of_sheaf_step (SheafStep.right_unit (S.gluingPath cover ls U))
 
-@[simp] theorem gluing_cancel_rweq (cover : List O) (ls : O → A) (U : O) :
+@[simp] def gluing_cancel_rweq (cover : List O) (ls : O → A) (U : O) :
     RwEq
       (Path.trans (S.gluingPath cover ls U) (Path.symm (S.gluingPath cover ls U)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (S.gluingPath cover ls U))
 
-theorem gluing_transport_const {B : Type w} (cover : List O) (ls : O → A) (U : O) (b : B) :
+def gluing_transport_const {B : Type w} (cover : List O) (ls : O → A) (U : O) (b : B) :
     Path.transport (D := fun _ => B) (S.gluingPath cover ls U) b = b := by
   simp [Path.transport_const]
 
@@ -197,15 +199,15 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (s : StalkData F)
 
-@[simp] theorem germ_rweq :
+@[simp] def germ_rweq :
     RwEq (Path.trans s.germPath (Path.refl _)) s.germPath :=
   rweq_of_sheaf_step (SheafStep.right_unit s.germPath)
 
-@[simp] theorem germ_cancel_rweq :
+@[simp] def germ_cancel_rweq :
     RwEq (Path.trans s.germPath (Path.symm s.germPath)) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel s.germPath)
 
-theorem germ_transport_const {B : Type w} (b : B) :
+def germ_transport_const {B : Type w} (b : B) :
     Path.transport (D := fun _ => B) s.germPath b = b := by
   simp [Path.transport_const]
 
@@ -226,15 +228,15 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (Sh : SheafificationData F)
 
-@[simp] theorem unit_rweq (U V : O) (s : A) :
+@[simp] def unit_rweq (U V : O) (s : A) :
     RwEq (Path.trans (Sh.unitPath U V s) (Path.refl _)) (Sh.unitPath U V s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (Sh.unitPath U V s))
 
-@[simp] theorem unit_cancel_rweq (U V : O) (s : A) :
+@[simp] def unit_cancel_rweq (U V : O) (s : A) :
     RwEq (Path.trans (Sh.unitPath U V s) (Path.symm (Sh.unitPath U V s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (Sh.unitPath U V s))
 
-theorem unit_transport_const {B : Type w} (U V : O) (s : A) (b : B) :
+def unit_transport_const {B : Type w} (U V : O) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (Sh.unitPath U V s) b = b := by
   simp [Path.transport_const]
 
@@ -255,23 +257,23 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (H : SheafCohomologyData F)
 
-@[simp] theorem dd_rweq (n : Nat) (s : A) :
+@[simp] def dd_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (H.ddPath n s) (Path.refl _)) (H.ddPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (H.ddPath n s))
 
-@[simp] theorem dd_cancel_rweq (n : Nat) (s : A) :
+@[simp] def dd_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (H.ddPath n s) (Path.symm (H.ddPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (H.ddPath n s))
 
-@[simp] theorem augment_rweq :
+@[simp] def augment_rweq :
     RwEq (Path.trans H.augmentPath (Path.refl _)) H.augmentPath :=
   rweq_of_sheaf_step (SheafStep.right_unit H.augmentPath)
 
-theorem dd_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+def dd_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (H.ddPath n s) b = b := by
   simp [Path.transport_const]
 
-theorem augment_transport_const {B : Type w} (b : B) :
+def augment_transport_const {B : Type w} (b : B) :
     Path.transport (D := fun _ => B) H.augmentPath b = b := by
   simp [Path.transport_const]
 
@@ -294,31 +296,31 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (C : CechCohomologyData F)
 
-@[simp] theorem ddCech_rweq (n : Nat) (s : A) :
+@[simp] def ddCech_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (C.ddCechPath n s) (Path.refl _)) (C.ddCechPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (C.ddCechPath n s))
 
-@[simp] theorem ddCech_cancel_rweq (n : Nat) (s : A) :
+@[simp] def ddCech_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (C.ddCechPath n s) (Path.symm (C.ddCechPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (C.ddCechPath n s))
 
-@[simp] theorem comparisonComm_rweq (n : Nat) (s : A) :
+@[simp] def comparisonComm_rweq (n : Nat) (s : A) :
     RwEq
       (Path.trans (C.comparisonCommPath n s) (Path.refl _))
       (C.comparisonCommPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (C.comparisonCommPath n s))
 
-@[simp] theorem comparisonComm_cancel_rweq (n : Nat) (s : A) :
+@[simp] def comparisonComm_cancel_rweq (n : Nat) (s : A) :
     RwEq
       (Path.trans (C.comparisonCommPath n s) (Path.symm (C.comparisonCommPath n s)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (C.comparisonCommPath n s))
 
-theorem ddCech_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+def ddCech_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (C.ddCechPath n s) b = b := by
   simp [Path.transport_const]
 
-theorem comparisonComm_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+def comparisonComm_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (C.comparisonCommPath n s) b = b := by
   simp [Path.transport_const]
 
@@ -343,27 +345,27 @@ variable {O : Type u} {A : Type v}
 variable {F G H : PresheafData O A}
 variable (E : SheafExactSeqData F G H)
 
-@[simp] theorem exact_rweq (s : A) :
+@[simp] def exact_rweq (s : A) :
     RwEq (Path.trans (E.exactPath s) (Path.refl _)) (E.exactPath s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (E.exactPath s))
 
-@[simp] theorem exact_cancel_rweq (s : A) :
+@[simp] def exact_cancel_rweq (s : A) :
     RwEq (Path.trans (E.exactPath s) (Path.symm (E.exactPath s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (E.exactPath s))
 
-@[simp] theorem incRestrict_cancel_rweq (U V : O) (s : A) :
+@[simp] def incRestrict_cancel_rweq (U V : O) (s : A) :
     RwEq
       (Path.trans (E.incRestrictPath U V s) (Path.symm (E.incRestrictPath U V s)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (E.incRestrictPath U V s))
 
-@[simp] theorem projRestrict_cancel_rweq (U V : O) (s : A) :
+@[simp] def projRestrict_cancel_rweq (U V : O) (s : A) :
     RwEq
       (Path.trans (E.projRestrictPath U V s) (Path.symm (E.projRestrictPath U V s)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (E.projRestrictPath U V s))
 
-theorem exact_transport_const {B : Type w} (s : A) (b : B) :
+def exact_transport_const {B : Type w} (s : A) (b : B) :
     Path.transport (D := fun _ => B) (E.exactPath s) b = b := by
   simp [Path.transport_const]
 
@@ -387,35 +389,35 @@ variable {O : Type u} {A : Type v}
 variable {F G H : PresheafData O A}
 variable (L : SheafLongExactData F G H)
 
-@[simp] theorem exactG_rweq (n : Nat) (s : A) :
+@[simp] def exactG_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactGPath n s) (Path.refl _)) (L.exactGPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (L.exactGPath n s))
 
-@[simp] theorem exactH_rweq (n : Nat) (s : A) :
+@[simp] def exactH_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactHPath n s) (Path.refl _)) (L.exactHPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (L.exactHPath n s))
 
-@[simp] theorem exactF_rweq (n : Nat) (s : A) :
+@[simp] def exactF_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactFPath n s) (Path.refl _)) (L.exactFPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (L.exactFPath n s))
 
-@[simp] theorem exactG_cancel_rweq (n : Nat) (s : A) :
+@[simp] def exactG_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactGPath n s) (Path.symm (L.exactGPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (L.exactGPath n s))
 
-@[simp] theorem exactH_cancel_rweq (n : Nat) (s : A) :
+@[simp] def exactH_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactHPath n s) (Path.symm (L.exactHPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (L.exactHPath n s))
 
-@[simp] theorem exactF_cancel_rweq (n : Nat) (s : A) :
+@[simp] def exactF_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactFPath n s) (Path.symm (L.exactFPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (L.exactFPath n s))
 
-theorem three_step_coherence (n : Nat) (s : A) :
+def three_step_coherence (n : Nat) (s : A) :
     (Path.trans (L.exactGPath n s) (Path.symm (L.exactGPath n s))).toEq = rfl := by
   apply subsingleton_eq_by_cases
 
-theorem exactG_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+def exactG_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (L.exactGPath n s) b = b := by
   simp [Path.transport_const]
 
@@ -438,20 +440,20 @@ variable {O₁ O₂ : Type u} {A : Type v}
 variable {F : PresheafData O₁ A}
 variable (D : DirectImageData F (O₂ := O₂))
 
-@[simp] theorem directRestrictId_rweq (U : O₂) (s : A) :
+@[simp] def directRestrictId_rweq (U : O₂) (s : A) :
     RwEq
       (Path.trans (D.directRestrictIdPath U s) (Path.refl _))
       (D.directRestrictIdPath U s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (D.directRestrictIdPath U s))
 
-@[simp] theorem directRestrictComp_cancel_rweq (U V W : O₂) (s : A) :
+@[simp] def directRestrictComp_cancel_rweq (U V W : O₂) (s : A) :
     RwEq
       (Path.trans (D.directRestrictCompPath U V W s)
                   (Path.symm (D.directRestrictCompPath U V W s)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (D.directRestrictCompPath U V W s))
 
-theorem directRestrictId_transport_const {B : Type w} (U : O₂) (s : A) (b : B) :
+def directRestrictId_transport_const {B : Type w} (U : O₂) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (D.directRestrictIdPath U s) b = b := by
   simp [Path.transport_const]
 
@@ -470,19 +472,19 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (Fl : FlasqueData F)
 
-@[simp] theorem extend_rweq (V : O) (s : A) :
+@[simp] def extend_rweq (V : O) (s : A) :
     RwEq (Path.trans (Fl.extendPath V s) (Path.refl _)) (Fl.extendPath V s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (Fl.extendPath V s))
 
-@[simp] theorem extend_cancel_rweq (V : O) (s : A) :
+@[simp] def extend_cancel_rweq (V : O) (s : A) :
     RwEq (Path.trans (Fl.extendPath V s) (Path.symm (Fl.extendPath V s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (Fl.extendPath V s))
 
-theorem flasque_acyclic (V : O) (s : A) :
+def flasque_acyclic (V : O) (s : A) :
     (Path.trans (Fl.extendPath V s) (Path.symm (Fl.extendPath V s))).toEq = rfl := by
   apply subsingleton_eq_by_cases
 
-theorem extend_transport_const {B : Type w} (V : O) (s : A) (b : B) :
+def extend_transport_const {B : Type w} (V : O) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (Fl.extendPath V s) b = b := by
   simp [Path.transport_const]
 
@@ -503,19 +505,19 @@ namespace RingedSpaceData
 variable {O : Type u} {A : Type v}
 variable (R : RingedSpaceData O A)
 
-@[simp] theorem mulAssoc_rweq (x y z : A) :
+@[simp] def mulAssoc_rweq (x y z : A) :
     RwEq (Path.trans (R.mulAssocPath x y z) (Path.refl _)) (R.mulAssocPath x y z) :=
   rweq_of_sheaf_step (SheafStep.right_unit (R.mulAssocPath x y z))
 
-@[simp] theorem mulOne_cancel_rweq (x : A) :
+@[simp] def mulOne_cancel_rweq (x : A) :
     RwEq (Path.trans (R.mulOnePath x) (Path.symm (R.mulOnePath x))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (R.mulOnePath x))
 
-@[simp] theorem oneMul_cancel_rweq (x : A) :
+@[simp] def oneMul_cancel_rweq (x : A) :
     RwEq (Path.trans (R.oneMulPath x) (Path.symm (R.oneMulPath x))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (R.oneMulPath x))
 
-theorem mulAssoc_transport_const {B : Type w} (x y z : A) (b : B) :
+def mulAssoc_transport_const {B : Type w} (x y z : A) (b : B) :
     Path.transport (D := fun _ => B) (R.mulAssocPath x y z) b = b := by
   simp [Path.transport_const]
 
@@ -538,31 +540,31 @@ variable {O : Type u} {A : Type v}
 variable {R : RingedSpaceData O A}
 variable (M : SheafModuleData R)
 
-@[simp] theorem actionAssoc_rweq (r s m : A) :
+@[simp] def actionAssoc_rweq (r s m : A) :
     RwEq
       (Path.trans (M.actionAssocPath r s m) (Path.refl _))
       (M.actionAssocPath r s m) :=
   rweq_of_sheaf_step (SheafStep.right_unit (M.actionAssocPath r s m))
 
-@[simp] theorem actionOne_rweq (m : A) :
+@[simp] def actionOne_rweq (m : A) :
     RwEq
       (Path.trans (M.actionOnePath m) (Path.refl _))
       (M.actionOnePath m) :=
   rweq_of_sheaf_step (SheafStep.right_unit (M.actionOnePath m))
 
-@[simp] theorem actionAssoc_cancel_rweq (r s m : A) :
+@[simp] def actionAssoc_cancel_rweq (r s m : A) :
     RwEq
       (Path.trans (M.actionAssocPath r s m) (Path.symm (M.actionAssocPath r s m)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (M.actionAssocPath r s m))
 
-@[simp] theorem actionOne_cancel_rweq (m : A) :
+@[simp] def actionOne_cancel_rweq (m : A) :
     RwEq
       (Path.trans (M.actionOnePath m) (Path.symm (M.actionOnePath m)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (M.actionOnePath m))
 
-theorem actionAssoc_transport_const {B : Type w} (r s m : A) (b : B) :
+def actionAssoc_transport_const {B : Type w} (r s m : A) (b : B) :
     Path.transport (D := fun _ => B) (M.actionAssocPath r s m) b = b := by
   simp [Path.transport_const]
 
@@ -583,20 +585,21 @@ variable {O : Type u} {A : Type v}
 variable {F G : PresheafData O A}
 variable (E : SheafExtData F G)
 
-@[simp] theorem dd_rweq (n : Nat) (s : A) :
+@[simp] def dd_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (E.ddPath n s) (Path.refl _)) (E.ddPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (E.ddPath n s))
 
-@[simp] theorem dd_cancel_rweq (n : Nat) (s : A) :
+@[simp] def dd_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (E.ddPath n s) (Path.symm (E.ddPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (E.ddPath n s))
 
-theorem dd_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+def dd_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (E.ddPath n s) b = b := by
   simp [Path.transport_const]
 
 end SheafExtData
 
+end
 end SheafTheory
 end Path
 end ComputationalPaths
