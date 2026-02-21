@@ -15,6 +15,8 @@ namespace ComputationalPaths
 namespace Path
 namespace DerivedCategory
 
+noncomputable section
+
 open Path
 
 universe u v w
@@ -49,7 +51,7 @@ def DerivedStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .symm_distrib p q => Path.Step.symm_trans_congr p q
 
 /-- Lift a derived step to rewrite equivalence. -/
-theorem rweq_of_derived_step {A : Type u} {a b : A}
+def rweq_of_derived_step {A : Type u} {a b : A}
     {p q : Path a b} (s : DerivedStep p q) : RwEq p q :=
   rweq_of_step (DerivedStep.toStep s)
 
@@ -73,7 +75,7 @@ namespace ChainComplexData
 variable {A : Type u} (C : ChainComplexData A)
 
 /-- d∘d = 0 followed by refl simplifies. -/
-@[simp] theorem dd_zero_rweq (n : Int) (x : A) :
+def dd_zero_rweq (n : Int) (x : A) :
     RwEq
       (Path.trans (C.ddZeroPath n x) (Path.refl x))
       (C.ddZeroPath n x) :=
@@ -85,12 +87,12 @@ def ddRoundTrip (n : Int) (x : A) :
   Path.trans (C.ddZeroPath n x) (Path.symm (C.ddZeroPath n x))
 
 /-- dd round-trip is identity up to RwEq. -/
-@[simp] theorem ddRoundTrip_rweq (n : Int) (x : A) :
+def ddRoundTrip_rweq (n : Int) (x : A) :
     RwEq (C.ddRoundTrip n x) (Path.refl _) :=
   rweq_of_derived_step (DerivedStep.inverse_cancel (C.ddZeroPath n x))
 
 /-- Differential identity path followed by refl. -/
-@[simp] theorem diff_ident_rweq (n : Int) :
+def diff_ident_rweq (n : Int) :
     RwEq
       (Path.trans (C.diffIdentPath n) (Path.refl _))
       (C.diffIdentPath n) :=
@@ -133,7 +135,7 @@ def id (C : ChainComplexData A) : ChainMapData A C C where
   commPath _ _ := Path.refl _
 
 /-- Commutativity path followed by refl simplifies. -/
-@[simp] theorem comm_rweq (f : ChainMapData A C₁ C₂) (n : Int) (x : A) :
+def comm_rweq (f : ChainMapData A C₁ C₂) (n : Int) (x : A) :
     RwEq
       (Path.trans (f.commPath n x) (Path.refl _))
       (f.commPath n x) :=
@@ -173,12 +175,12 @@ def forwardInvRoundTrip (x : A) :
   Path.trans (Q.forwardInvPath x) (Path.symm (Q.forwardInvPath x))
 
 /-- Forward-inverse round-trip is refl. -/
-@[simp] theorem forwardInvRoundTrip_rweq (x : A) :
+def forwardInvRoundTrip_rweq (x : A) :
     RwEq (Q.forwardInvRoundTrip x) (Path.refl _) :=
   rweq_of_derived_step (DerivedStep.inverse_cancel (Q.forwardInvPath x))
 
 /-- Inverse-forward round-trip is refl. -/
-@[simp] theorem invForwardRoundTrip_rweq (x : A) :
+def invForwardRoundTrip_rweq (x : A) :
     RwEq
       (Path.trans (Q.invForwardPath x) (Path.symm (Q.invForwardPath x)))
       (Path.refl _) :=
@@ -211,7 +213,7 @@ variable {f g : ChainMapData A C₁ C₂}
 variable (H : ChainHomotopyData A C₁ C₂ f g)
 
 /-- Homotopy path followed by refl simplifies. -/
-@[simp] theorem homotopy_rweq (n : Int) (x : A) :
+def homotopy_rweq (n : Int) (x : A) :
     RwEq
       (Path.trans (H.homotopyPath n x) (Path.refl _))
       (H.homotopyPath n x) :=
@@ -227,7 +229,7 @@ def inverse : ChainHomotopyData A C₁ C₂ g f where
     H.inverse.homotopyPath n x = Path.symm (H.homotopyPath n x) := rfl
 
 /-- Homotopy composed with its inverse is refl up to RwEq. -/
-@[simp] theorem homotopy_inv_rweq (n : Int) (x : A) :
+def homotopy_inv_rweq (n : Int) (x : A) :
     RwEq
       (Path.trans (H.homotopyPath n x) (H.inverse.homotopyPath n x))
       (Path.refl _) :=
@@ -264,14 +266,14 @@ variable {A : Type u} {C : ChainComplexData A}
 variable (D : DerivedLocData A C)
 
 /-- Derived assoc up to RwEq. -/
-@[simp] theorem derived_assoc_rweq (x y z : A) :
+def derived_assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (D.derivedAssocPath x y z) (Path.refl _))
       (D.derivedAssocPath x y z) :=
   rweq_of_derived_step (DerivedStep.right_unit (D.derivedAssocPath x y z))
 
 /-- Derived left unit up to RwEq. -/
-@[simp] theorem derived_left_unit_rweq (x : A) :
+def derived_left_unit_rweq (x : A) :
     RwEq
       (Path.trans (D.derivedLeftUnitPath x) (Path.refl x))
       (D.derivedLeftUnitPath x) :=
@@ -283,7 +285,7 @@ def spanRoundTrip (x y : A) :
   Path.trans (D.forwardPath x y) (Path.symm (D.forwardPath x y))
 
 /-- Span round-trip is refl up to RwEq. -/
-@[simp] theorem spanRoundTrip_rweq (x y : A) :
+def spanRoundTrip_rweq (x y : A) :
     RwEq (D.spanRoundTrip x y) (Path.refl _) :=
   rweq_of_derived_step (DerivedStep.inverse_cancel (D.forwardPath x y))
 
@@ -310,9 +312,9 @@ structure DistTriangleData (A : Type u) where
   /-- Shift preserves paths. -/
   shiftPath : ∀ {x y : A}, Path x y → Path (shift x) (shift y)
   /-- Triangle: three vertices and three edges. -/
-  edge₁ : A → A → Path A A  -- X → Y
-  edge₂ : A → A → A         -- Y → Z (cone)
-  edge₃ : A → A → A         -- Z → shift X (connecting)
+  edge₁ : ∀ x y : A, Path x y  -- X → Y
+  edge₂ : ∀ y z : A, Path y z  -- Y → Z (cone)
+  edge₃ : ∀ z x : A, Path z (shift x)  -- Z → shift X (connecting)
   /-- Rotation path: rotating a distinguished triangle yields another. -/
   rotationPath : ∀ x y : A,
     Path (edge₂ x y) (edge₂ x y)
@@ -341,14 +343,14 @@ variable {A : Type u} (T : DistTriangleData A)
   apply subsingleton_eq_by_cases
 
 /-- Rotation path followed by refl simplifies. -/
-@[simp] theorem rotation_rweq (x y : A) :
+def rotation_rweq (x y : A) :
     RwEq
       (Path.trans (T.rotationPath x y) (Path.refl _))
       (T.rotationPath x y) :=
   rweq_of_derived_step (DerivedStep.right_unit (T.rotationPath x y))
 
 /-- Octahedral path followed by refl. -/
-@[simp] theorem octahedral_rweq (x y z : A) :
+def octahedral_rweq (x y z : A) :
     RwEq
       (Path.trans (T.octahedralPath x y z) (Path.refl _))
       (T.octahedralPath x y z) :=
@@ -379,14 +381,14 @@ namespace ExtData
 variable {A : Type u} (E : ExtData A)
 
 /-- Connecting map followed by refl. -/
-@[simp] theorem connecting_rweq (n : Nat) (x y z : A) :
+def connecting_rweq (n : Nat) (x y z : A) :
     RwEq
       (Path.trans (E.connectingPath n x y z) (Path.refl _))
       (E.connectingPath n x y z) :=
   rweq_of_derived_step (DerivedStep.right_unit (E.connectingPath n x y z))
 
 /-- Yoneda associativity followed by refl. -/
-@[simp] theorem yoneda_assoc_rweq (n m k : Nat) (x y z w : A) :
+def yoneda_assoc_rweq (n m k : Nat) (x y z w : A) :
     RwEq
       (Path.trans (E.yonedaAssocPath n m k x y z w) (Path.refl _))
       (E.yonedaAssocPath n m k x y z w) :=
@@ -398,7 +400,7 @@ def connectingRoundTrip (n : Nat) (x y z : A) :
   Path.trans (E.connectingPath n x y z) (Path.symm (E.connectingPath n x y z))
 
 /-- Connecting round-trip is refl up to RwEq. -/
-@[simp] theorem connectingRoundTrip_rweq (n : Nat) (x y z : A) :
+def connectingRoundTrip_rweq (n : Nat) (x y z : A) :
     RwEq (E.connectingRoundTrip n x y z) (Path.refl _) :=
   rweq_of_derived_step (DerivedStep.inverse_cancel (E.connectingPath n x y z))
 
@@ -424,7 +426,7 @@ namespace TorData
 variable {A : Type u} (T : TorData A)
 
 /-- Tor connecting followed by refl. -/
-@[simp] theorem tor_connecting_rweq (n : Nat) (x y z : A) :
+def tor_connecting_rweq (n : Nat) (x y z : A) :
     RwEq
       (Path.trans (T.torConnectingPath n x y z) (Path.refl _))
       (T.torConnectingPath n x y z) :=
@@ -441,7 +443,7 @@ theorem torBalancedRoundTrip_toEq (n : Nat) (x y : A) :
   apply subsingleton_eq_by_cases
 
 /-- Tor balanced path is self-inverse up to RwEq. -/
-@[simp] theorem tor_balanced_inv_rweq (n : Nat) (x y : A) :
+def tor_balanced_inv_rweq (n : Nat) (x y : A) :
     RwEq
       (Path.trans (T.torBalancedPath n x y) (Path.symm (T.torBalancedPath n x y)))
       (Path.refl _) :=
@@ -472,28 +474,28 @@ namespace SpectralSeqData
 variable {A : Type u} (S : SpectralSeqData A)
 
 /-- d_r ∘ d_r = 0 up to RwEq. -/
-@[simp] theorem drdr_zero_rweq (r : Nat) (p q : Int) (x : A) :
+def drdr_zero_rweq (r : Nat) (p q : Int) (x : A) :
     RwEq
       (Path.trans (S.drdrZeroPath r p q x) (Path.refl _))
       (S.drdrZeroPath r p q x) :=
   rweq_of_derived_step (DerivedStep.right_unit (S.drdrZeroPath r p q x))
 
 /-- d_r ∘ d_r round-trip is refl. -/
-@[simp] theorem drdr_roundtrip_rweq (r : Nat) (p q : Int) (x : A) :
+def drdr_roundtrip_rweq (r : Nat) (p q : Int) (x : A) :
     RwEq
       (Path.trans (S.drdrZeroPath r p q x) (Path.symm (S.drdrZeroPath r p q x)))
       (Path.refl _) :=
   rweq_of_derived_step (DerivedStep.inverse_cancel (S.drdrZeroPath r p q x))
 
 /-- Page transition followed by refl. -/
-@[simp] theorem page_trans_rweq (r : Nat) (p q : Int) :
+def page_trans_rweq (r : Nat) (p q : Int) :
     RwEq
       (Path.trans (S.pageTransPath r p q) (Path.refl _))
       (S.pageTransPath r p q) :=
   rweq_of_derived_step (DerivedStep.right_unit (S.pageTransPath r p q))
 
 /-- Convergence path followed by refl. -/
-@[simp] theorem convergence_rweq (p q : Int) :
+def convergence_rweq (p q : Int) :
     RwEq
       (Path.trans (S.convergencePath p q) (Path.refl _))
       (S.convergencePath p q) :=
@@ -536,14 +538,14 @@ def fullTrianglePath (x y z : A) : Path x (E.shift x) :=
   Path.trans (E.edgeComposite x y z) (E.edge₃ z x)
 
 /-- Full triangle path: trans with refl simplifies. -/
-@[simp] theorem fullTriangle_rweq (x y z : A) :
+def fullTriangle_rweq (x y z : A) :
     RwEq
       (Path.trans (E.fullTrianglePath x y z) (Path.refl _))
       (E.fullTrianglePath x y z) :=
   rweq_of_derived_step (DerivedStep.right_unit (E.fullTrianglePath x y z))
 
 /-- Rotation path followed by refl. -/
-@[simp] theorem rotation_rweq (x y z : A) :
+def rotation_rweq (x y z : A) :
     RwEq
       (Path.trans (E.rotationPath x y z) (Path.refl _))
       (E.rotationPath x y z) :=
@@ -603,12 +605,12 @@ def resolutionRoundTrip (x : A) :
   Path.trans (L.resolutionPath x) (Path.symm (L.resolutionPath x))
 
 /-- Resolution round-trip is refl up to RwEq. -/
-@[simp] theorem resolutionRoundTrip_rweq (x : A) :
+def resolutionRoundTrip_rweq (x : A) :
     RwEq (L.resolutionRoundTrip x) (Path.refl _) :=
   rweq_of_derived_step (DerivedStep.inverse_cancel (L.resolutionPath x))
 
 /-- Derived 0 coherence followed by refl. -/
-@[simp] theorem derived0_rweq (x : A) :
+def derived0_rweq (x : A) :
     RwEq
       (Path.trans (L.derived0Path x) (Path.refl _))
       (L.derived0Path x) :=
@@ -619,7 +621,7 @@ def derivedResolution (x : A) : Path (L.funcObj (L.resolution x)) (L.funcObj x) 
   L.funcPath (L.resolutionPath x)
 
 /-- Derived resolution followed by refl simplifies. -/
-@[simp] theorem derivedResolution_rweq (x : A) :
+def derivedResolution_rweq (x : A) :
     RwEq
       (Path.trans (L.derivedResolution x) (Path.refl _))
       (L.derivedResolution x) :=
@@ -650,14 +652,14 @@ namespace FilteredComplexData
 variable {A : Type u} (F : FilteredComplexData A)
 
 /-- Inclusion followed by refl. -/
-@[simp] theorem incl_rweq (n p : Int) :
+def incl_rweq (n p : Int) :
     RwEq
       (Path.trans (F.inclPath n p) (Path.refl _))
       (F.inclPath n p) :=
   rweq_of_derived_step (DerivedStep.right_unit (F.inclPath n p))
 
 /-- Graded path followed by refl. -/
-@[simp] theorem graded_rweq (p q : Int) :
+def graded_rweq (p q : Int) :
     RwEq
       (Path.trans (F.gradedPath p q) (Path.refl _))
       (F.gradedPath p q) :=
@@ -668,7 +670,7 @@ def doubleInclusion (n p : Int) : Path (F.filt n p) (F.filt n (p + 1 + 1)) :=
   Path.trans (F.inclPath n p) (F.inclPath n (p + 1))
 
 /-- Double inclusion trans with refl simplifies. -/
-@[simp] theorem doubleInclusion_rweq (n p : Int) :
+def doubleInclusion_rweq (n p : Int) :
     RwEq
       (Path.trans (F.doubleInclusion n p) (Path.refl _))
       (F.doubleInclusion n p) :=
@@ -704,14 +706,14 @@ variable {A : Type u} {C₁ C₂ : ChainComplexData A}
 variable (M : MappingConeData A C₁ C₂)
 
 /-- Cone d∘d = 0 up to RwEq. -/
-@[simp] theorem cone_dd_rweq (n : Int) (x : A) :
+def cone_dd_rweq (n : Int) (x : A) :
     RwEq
       (Path.trans (M.coneDDPath n x) (Path.refl _))
       (M.coneDDPath n x) :=
   rweq_of_derived_step (DerivedStep.right_unit (M.coneDDPath n x))
 
 /-- Cone d∘d round-trip. -/
-@[simp] theorem cone_dd_roundtrip_rweq (n : Int) (x : A) :
+def cone_dd_roundtrip_rweq (n : Int) (x : A) :
     RwEq
       (Path.trans (M.coneDDPath n x) (Path.symm (M.coneDDPath n x)))
       (Path.refl _) :=
@@ -722,13 +724,15 @@ def inclProjComposite (n : Int) : Path (C₂.obj n) (C₁.obj (n - 1)) :=
   Path.trans (M.inclC₂Path n) (M.projPath n)
 
 /-- Inclusion-projection composite followed by refl. -/
-@[simp] theorem inclProj_rweq (n : Int) :
+def inclProj_rweq (n : Int) :
     RwEq
       (Path.trans (M.inclProjComposite n) (Path.refl _))
       (M.inclProjComposite n) :=
   rweq_of_derived_step (DerivedStep.right_unit (M.inclProjComposite n))
 
 end MappingConeData
+
+end
 
 end DerivedCategory
 end Path
