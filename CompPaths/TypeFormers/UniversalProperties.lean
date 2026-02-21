@@ -28,21 +28,21 @@ variable {x y : X}
     (Step.prod_snd_beta (A := B) (B := A)
       (p := Path.congrArg f p) (q := Path.congrArg g p))
 
-@[simp] def fstPairRwEq (f : X → A) (g : X → B) (p : Path x y) :
+@[simp] noncomputable def fstPairRwEq (f : X → A) (g : X → B) (p : Path x y) :
     RwEq (Path.fst (pairPath f g p)) (Path.congrArg f p) :=
   rweq_of_step (fstPairStep f g p)
 
-@[simp] def sndPairRwEq (f : X → A) (g : X → B) (p : Path x y) :
+@[simp] noncomputable def sndPairRwEq (f : X → A) (g : X → B) (p : Path x y) :
     RwEq (Path.snd (pairPath f g p)) (Path.congrArg g p) :=
   rweq_of_step (sndPairStep f g p)
 
-theorem prod_factor_through_pairing
+noncomputable def prod_factor_through_pairing
     {a₁ a₂ : A} {b₁ b₂ : B}
     (r : Path (a₁, b₁) (a₂, b₂)) :
     RwEq r (Path.prodMk (Path.fst r) (Path.snd r)) :=
   rweq_symm (rweq_prod_eta r)
 
-theorem prod_pairing_unique
+noncomputable def prod_pairing_unique
     {a₁ a₂ : A} {b₁ b₂ : B}
     {r : Path (a₁, b₁) (a₂, b₂)}
     {p : Path a₁ a₂} {q : Path b₁ b₂}
@@ -72,7 +72,10 @@ variable {a₁ a₂ : A} {b₁ b₂ : B}
   Path.inrCongr p
 
 @[simp] def copair (f : A → C) (g : B → C) : Sum A B → C :=
-  Sum.rec f g
+  fun s =>
+    match s with
+    | Sum.inl a => f a
+    | Sum.inr b => g b
 
 @[simp] def caseInlStep (f : A → C) (g : B → C) (p : Path a₁ a₂) :
     Step (Path.congrArg (copair f g) (inlPath p)) (Path.congrArg f p) := by
@@ -86,11 +89,11 @@ variable {a₁ a₂ : A} {b₁ b₂ : B}
     (Step.sum_rec_inr_beta (A := C) (α := A) (β := B)
       (f := f) (g := g) (p := p))
 
-@[simp] def caseInlRwEq (f : A → C) (g : B → C) (p : Path a₁ a₂) :
+@[simp] noncomputable def caseInlRwEq (f : A → C) (g : B → C) (p : Path a₁ a₂) :
     RwEq (Path.congrArg (copair f g) (inlPath p)) (Path.congrArg f p) :=
   rweq_of_step (caseInlStep f g p)
 
-@[simp] def caseInrRwEq (f : A → C) (g : B → C) (p : Path b₁ b₂) :
+@[simp] noncomputable def caseInrRwEq (f : A → C) (g : B → C) (p : Path b₁ b₂) :
     RwEq (Path.congrArg (copair f g) (inrPath p)) (Path.congrArg g p) :=
   rweq_of_step (caseInrStep f g p)
 
@@ -104,7 +107,7 @@ noncomputable def copairFactorPath
     | Sum.inl a => hl a
     | Sum.inr b => hr b)
 
-theorem copairFactor_unique
+noncomputable def copairFactor_unique
     {h : Sum A B → C} {f : A → C} {g : B → C}
     (hl : ∀ a : A, Path (h (Sum.inl a)) (f a))
     (hr : ∀ b : B, Path (h (Sum.inr b)) (g b))
@@ -143,12 +146,12 @@ variable {f g : A → B}
     Step (Path.lamCongr (fun x => Path.app p x)) p :=
   Step.fun_eta p
 
-@[simp] def lamAppRwEq
+@[simp] noncomputable def lamAppRwEq
     (p : ∀ x : A, Path (f x) (g x)) (a : A) :
     RwEq (Path.app (Path.lamCongr p) a) (p a) :=
   rweq_of_step (lamAppStep p a)
 
-@[simp] def lamEtaRwEq (p : Path f g) :
+@[simp] noncomputable def lamEtaRwEq (p : Path f g) :
     RwEq (Path.lamCongr (fun x => Path.app p x)) p :=
   rweq_of_step (lamEtaStep p)
 
@@ -156,7 +159,7 @@ variable {f g : A → B}
 
 @[simp] def uncurryFn (k : A → B → C) : A × B → C := fun ab => k ab.1 ab.2
 
-theorem curryAdjunctionRwEq
+noncomputable def curryAdjunctionRwEq
     {h₁ h₂ : A × B → C}
     (p : Path h₁ h₂) :
     RwEq
@@ -173,7 +176,7 @@ theorem curryAdjunctionRwEq
     exact rweq_fun_eta (Path.app (Path.congrArg curryFn p) a)
   exact rweq_trans hinner (rweq_fun_eta (Path.congrArg curryFn p))
 
-theorem uncurryAdjunctionRwEq
+noncomputable def uncurryAdjunctionRwEq
     {k₁ k₂ : A → B → C}
     (p : Path k₁ k₂) :
     RwEq
