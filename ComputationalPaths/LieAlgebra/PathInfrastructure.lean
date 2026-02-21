@@ -21,6 +21,8 @@ open Path
 
 universe u v w
 
+noncomputable section
+
 /-! ## Lie Algebra Rewrite Steps -/
 
 inductive LieStep {A : Type u} :
@@ -45,7 +47,7 @@ def LieStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .inverse_cancel_left p => Step.symm_trans p
   | .assoc p q r => Step.trans_assoc p q r
 
-def rweq_of_lie_step {A : Type u} {a b : A}
+noncomputable def rweq_of_lie_step {A : Type u} {a b : A}
     {p q : Path a b} (s : LieStep p q) : RwEq p q :=
   rweq_of_step (LieStep.toStep s)
 
@@ -106,31 +108,31 @@ def jacobi_identity (x y z : A) :
   L.jacobiPath x y z
 
 /-- Theorem 6: right unit for bracket composition path. -/
-theorem bracket_right_unit_rweq (x y : A) :
+def bracket_right_unit_rweq (x y : A) :
     RwEq (Path.trans (L.antisymPath x y) (Path.refl _))
          (L.antisymPath x y) :=
   rweq_of_lie_step (LieStep.right_unit _)
 
 /-- Theorem 7: left unit for bracket composition path. -/
-theorem bracket_left_unit_rweq (x y : A) :
+def bracket_left_unit_rweq (x y : A) :
     RwEq (Path.trans (Path.refl _) (L.antisymPath x y))
          (L.antisymPath x y) :=
   rweq_of_lie_step (LieStep.left_unit _)
 
 /-- Theorem 8: inverse cancel for antisymmetry path. -/
-theorem antisym_cancel_rweq (x y : A) :
+def antisym_cancel_rweq (x y : A) :
     RwEq (Path.trans (L.antisymPath x y) (Path.symm (L.antisymPath x y)))
          (Path.refl _) :=
   rweq_of_lie_step (LieStep.inverse_cancel _)
 
 /-- Theorem 9: Jacobi left unit. -/
-theorem jacobi_left_unit_rweq (x y z : A) :
+def jacobi_left_unit_rweq (x y z : A) :
     RwEq (Path.trans (Path.refl _) (L.jacobiPath x y z))
          (L.jacobiPath x y z) :=
   rweq_of_lie_step (LieStep.left_unit _)
 
 /-- Theorem 10: Jacobi right unit. -/
-theorem jacobi_right_unit_rweq (x y z : A) :
+def jacobi_right_unit_rweq (x y z : A) :
     RwEq (Path.trans (L.jacobiPath x y z) (Path.refl _))
          (L.jacobiPath x y z) :=
   rweq_of_lie_step (LieStep.right_unit _)
@@ -159,19 +161,19 @@ def ad_jacobi (x y z : A) :
   L.jacobiPath x y z
 
 /-- Theorem 15: ad zero right unit. -/
-theorem ad_zero_right_unit (y : A) :
+def ad_zero_right_unit (y : A) :
     RwEq (Path.trans (L.ad_zero y) (Path.refl _))
          (L.ad_zero y) :=
   rweq_of_lie_step (LieStep.right_unit _)
 
 /-- Theorem 16: ad zero left unit. -/
-theorem ad_zero_left_unit (y : A) :
+def ad_zero_left_unit (y : A) :
     RwEq (Path.trans (Path.refl _) (L.ad_zero y))
          (L.ad_zero y) :=
   rweq_of_lie_step (LieStep.left_unit _)
 
 /-- Theorem 17: ad inverse cancel. -/
-theorem ad_inverse_cancel (y : A) :
+def ad_inverse_cancel (y : A) :
     RwEq (Path.trans (L.ad_zero y) (Path.symm (L.ad_zero y)))
          (Path.refl _) :=
   rweq_of_lie_step (LieStep.inverse_cancel _)
@@ -224,13 +226,13 @@ def kill_zero_right (x : A) : Path (K.kill x L.zero) L.zero :=
   K.killZeroRight x
 
 /-- Theorem 25: Killing symmetry right unit. -/
-theorem kill_symm_right_unit (x y : A) :
+def kill_symm_right_unit (x y : A) :
     RwEq (Path.trans (K.killSymm x y) (Path.refl _))
          (K.killSymm x y) :=
   rweq_of_lie_step (LieStep.right_unit _)
 
 /-- Theorem 26: Killing symmetry inverse cancel. -/
-theorem kill_symm_inverse_cancel (x y : A) :
+def kill_symm_inverse_cancel (x y : A) :
     RwEq (Path.trans (K.killSymm x y) (Path.symm (K.killSymm x y)))
          (Path.refl _) :=
   rweq_of_lie_step (LieStep.inverse_cancel _)
@@ -314,19 +316,19 @@ def derived_zero_id (x : A) : Path (S.derived 0 x) x :=
   S.derivedZero x
 
 /-- Theorem 37: derived zero right unit. -/
-theorem derived_zero_right_unit (x : A) :
+def derived_zero_right_unit (x : A) :
     RwEq (Path.trans (S.derivedZero x) (Path.refl _))
          (S.derivedZero x) :=
   rweq_of_lie_step (LieStep.right_unit _)
 
 /-- Theorem 38: derived zero inverse cancel. -/
-theorem derived_zero_inverse_cancel (x : A) :
+def derived_zero_inverse_cancel (x : A) :
     RwEq (Path.trans (S.derivedZero x) (Path.symm (S.derivedZero x)))
          (Path.refl _) :=
   rweq_of_lie_step (LieStep.inverse_cancel _)
 
 /-- Theorem 39: derived zero left unit. -/
-theorem derived_zero_left_unit (x : A) :
+def derived_zero_left_unit (x : A) :
     RwEq (Path.trans (Path.refl _) (S.derivedZero x))
          (S.derivedZero x) :=
   rweq_of_lie_step (LieStep.left_unit _)
@@ -367,19 +369,19 @@ def reflect_zero : Path (R.reflect L.zero) L.zero :=
   R.reflectZero
 
 /-- Theorem 44: reflection involution right unit. -/
-theorem reflect_invol_right_unit (x : A) :
+def reflect_invol_right_unit (x : A) :
     RwEq (Path.trans (R.reflectPath x) (Path.refl _))
          (R.reflectPath x) :=
   rweq_of_lie_step (LieStep.right_unit _)
 
 /-- Theorem 45: reflection involution left unit. -/
-theorem reflect_invol_left_unit (x : A) :
+def reflect_invol_left_unit (x : A) :
     RwEq (Path.trans (Path.refl _) (R.reflectPath x))
          (R.reflectPath x) :=
   rweq_of_lie_step (LieStep.left_unit _)
 
 /-- Theorem 46: reflection involution inverse cancel. -/
-theorem reflect_invol_inverse_cancel (x : A) :
+def reflect_invol_inverse_cancel (x : A) :
     RwEq (Path.trans (R.reflectPath x) (Path.symm (R.reflectPath x)))
          (Path.refl _) :=
   rweq_of_lie_step (LieStep.inverse_cancel _)
@@ -414,7 +416,7 @@ def reflect_zero_roundtrip :
     R.reflectZero
 
 /-- Theorem 52: weight zero right unit. -/
-theorem weight_zero_right_unit :
+def weight_zero_right_unit :
     RwEq (Path.trans R.weightZero (Path.refl _))
          R.weightZero :=
   rweq_of_lie_step (LieStep.right_unit _)
@@ -458,19 +460,19 @@ def uea_embed_bracket (x y : A) :
   U.embedBracket x y
 
 /-- Theorem 57: UEA assoc right unit coherence. -/
-theorem uea_assoc_right_unit (x y z : A) :
+def uea_assoc_right_unit (x y z : A) :
     RwEq (Path.trans (U.mulAssoc x y z) (Path.refl _))
          (U.mulAssoc x y z) :=
   rweq_of_lie_step (LieStep.right_unit _)
 
 /-- Theorem 58: UEA assoc left unit coherence. -/
-theorem uea_assoc_left_unit (x y z : A) :
+def uea_assoc_left_unit (x y z : A) :
     RwEq (Path.trans (Path.refl _) (U.mulAssoc x y z))
          (U.mulAssoc x y z) :=
   rweq_of_lie_step (LieStep.left_unit _)
 
 /-- Theorem 59: UEA assoc inverse cancel. -/
-theorem uea_assoc_inverse_cancel (x y z : A) :
+def uea_assoc_inverse_cancel (x y z : A) :
     RwEq (Path.trans (U.mulAssoc x y z) (Path.symm (U.mulAssoc x y z)))
          (Path.refl _) :=
   rweq_of_lie_step (LieStep.inverse_cancel _)
@@ -535,13 +537,13 @@ def weight_decomp_zero (h : A) (hh : C.isCartan h) :
   C.weightDecompZero h hh
 
 /-- Theorem 68: Cartan comm right unit. -/
-theorem cartan_comm_right_unit (x y : A) (hx : C.isCartan x) (hy : C.isCartan y) :
+def cartan_comm_right_unit (x y : A) (hx : C.isCartan x) (hy : C.isCartan y) :
     RwEq (Path.trans (C.cartanComm x y hx hy) (Path.refl _))
          (C.cartanComm x y hx hy) :=
   rweq_of_lie_step (LieStep.right_unit _)
 
 /-- Theorem 69: Cartan comm inverse cancel. -/
-theorem cartan_comm_inverse_cancel (x y : A) (hx : C.isCartan x) (hy : C.isCartan y) :
+def cartan_comm_inverse_cancel (x y : A) (hx : C.isCartan x) (hy : C.isCartan y) :
     RwEq (Path.trans (C.cartanComm x y hx hy) (Path.symm (C.cartanComm x y hx hy)))
          (Path.refl _) :=
   rweq_of_lie_step (LieStep.inverse_cancel _)
@@ -562,19 +564,19 @@ def weight_decomp_congr_both {h₁ h₂ x₁ x₂ : A} (p : Path h₁ h₂) (q :
   Path.trans (Path.congrArg (fun t => C.weightDecomp t x₁) p) (Path.congrArg (C.weightDecomp h₂) q)
 
 /-- Theorem 73: Cartan comm left unit. -/
-theorem cartan_comm_left_unit (x y : A) (hx : C.isCartan x) (hy : C.isCartan y) :
+def cartan_comm_left_unit (x y : A) (hx : C.isCartan x) (hy : C.isCartan y) :
     RwEq (Path.trans (Path.refl _) (C.cartanComm x y hx hy))
          (C.cartanComm x y hx hy) :=
   rweq_of_lie_step (LieStep.left_unit _)
 
 /-- Theorem 74: weight decomp zero right unit. -/
-theorem weight_decomp_zero_right_unit (h : A) (hh : C.isCartan h) :
+def weight_decomp_zero_right_unit (h : A) (hh : C.isCartan h) :
     RwEq (Path.trans (C.weightDecompZero h hh) (Path.refl _))
          (C.weightDecompZero h hh) :=
   rweq_of_lie_step (LieStep.right_unit _)
 
 /-- Theorem 75: weight decomp zero inverse cancel. -/
-theorem weight_decomp_zero_inverse_cancel (h : A) (hh : C.isCartan h) :
+def weight_decomp_zero_inverse_cancel (h : A) (hh : C.isCartan h) :
     RwEq (Path.trans (C.weightDecompZero h hh) (Path.symm (C.weightDecompZero h hh)))
          (Path.refl _) :=
   rweq_of_lie_step (LieStep.inverse_cancel _)
@@ -618,18 +620,20 @@ def hom_congr {x₁ x₂ : A} (p : Path x₁ x₂) :
   Path.congrArg φ.hom p
 
 /-- Theorem 79: hom bracket right unit. -/
-theorem hom_bracket_right_unit (x y : A) :
+def hom_bracket_right_unit (x y : A) :
     RwEq (Path.trans (φ.homBracket x y) (Path.refl _))
          (φ.homBracket x y) :=
   rweq_of_lie_step (LieStep.right_unit _)
 
 /-- Theorem 80: hom zero inverse cancel. -/
-theorem hom_zero_inverse_cancel :
+def hom_zero_inverse_cancel :
     RwEq (Path.trans φ.homZero (Path.symm φ.homZero))
          (Path.refl _) :=
   rweq_of_lie_step (LieStep.inverse_cancel _)
 
 end LieHomData
+
+end
 
 end LieAlgebra
 end Path
