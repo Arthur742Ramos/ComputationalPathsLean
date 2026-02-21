@@ -43,7 +43,8 @@ lean_lib CompPaths where
     `CompPaths.Algebra.FreeGroupoid,
     `CompPaths.Algebra.PathAlgebra,
     `CompPaths.Algebra.Presentation,
-    `CompPaths.Algebra.HomologicalAlgebra]
+    `CompPaths.Algebra.HomologicalAlgebra,
+    `CompPaths.Algebra.SpectralSequence]
 
 @[default_target]
 lean_exe computational_paths where
