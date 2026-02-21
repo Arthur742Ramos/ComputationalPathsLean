@@ -113,6 +113,14 @@ theorem compMap_preserves_vcomp_toEq
       rweq_toEq (RwEq.trans (compMap (A := A) α₁ β₁) (compMap (A := A) α₂ β₂)) := by
   rfl
 
+theorem compMap_steps_agrees
+    {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (sp : Step p p') (sq : Step q q') :
+    rweq_toEq (compMap (A := A) (RwEq.step sp) (RwEq.step sq)) =
+      rweq_toEq (compMap_steps (A := A) sp sq) := by
+  rfl
+
 end CompositionFunctor
 
 section EnrichedYoneda
@@ -172,6 +180,18 @@ noncomputable def enrichedYoneda_right {a x : A}
     RwEq ((yonedaToNat (A := A) (yonedaFromNat (A := A) η)).app g) (η.app g) :=
   enrichedYoneda_right_inv (A := A) η g
 
+/-- Enriched Yoneda equivalence packaged as the two `RwEq` roundtrip witnesses. -/
+noncomputable def enriched_yoneda
+    {a x : A} :
+    (∀ p : Path a x, RwEq (yonedaFromNat (A := A) (yonedaToNat (A := A) p)) p) ×
+    (∀ η : EnrichedNat (A := A) a x, ∀ (y : A) (g : Path x y),
+      RwEq ((yonedaToNat (A := A) (yonedaFromNat (A := A) η)).app g) (η.app g)) := by
+  refine ⟨?_, ?_⟩
+  · intro p
+    exact enrichedYoneda_left (A := A) p
+  · intro η y g
+    exact enrichedYoneda_right (A := A) η (y := y) g
+
 end EnrichedYoneda
 
 section LocallyGroupoidal
@@ -183,6 +203,18 @@ variable {A : Type u}
     {a b : A} {p q : Path a b} (α : RwEq p q) : RwEq q p :=
   (pathHomGroupoid (A := A) a b).inv₂ α
 
+theorem twoCellInverse_left_toEq
+    {a b : A} {p q : Path a b} (α : RwEq p q) :
+    rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂ α (twoCellInverse (A := A) α)) =
+      rweq_toEq ((pathHomGroupoid (A := A) a b).id₂ p) := by
+  apply Subsingleton.elim
+
+theorem twoCellInverse_right_toEq
+    {a b : A} {p q : Path a b} (α : RwEq p q) :
+    rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂ (twoCellInverse (A := A) α) α) =
+      rweq_toEq ((pathHomGroupoid (A := A) a b).id₂ q) := by
+  apply Subsingleton.elim
+
 /-- Local groupoidality: each 2-cell admits a two-sided inverse (at `toEq` level). -/
 theorem locally_groupoidal
     {a b : A} {p q : Path a b} (α : RwEq p q) :
@@ -192,8 +224,8 @@ theorem locally_groupoidal
       rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂ β α) =
         rweq_toEq ((pathHomGroupoid (A := A) a b).id₂ q) := by
   refine ⟨twoCellInverse (A := A) α, ?_, ?_⟩
-  · apply Subsingleton.elim
-  · apply Subsingleton.elim
+  · exact twoCellInverse_left_toEq (A := A) α
+  · exact twoCellInverse_right_toEq (A := A) α
 
 end LocallyGroupoidal
 
