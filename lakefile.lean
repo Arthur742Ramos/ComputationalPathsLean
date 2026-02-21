@@ -39,7 +39,8 @@ lean_lib CompPaths where
     `CompPaths.CoveringSpace.CoveringDeep,
     `CompPaths.CoveringSpace.PathLifting,
     `CompPaths.Algebra.FreeGroupoid,
-    `CompPaths.Algebra.Presentation]
+    `CompPaths.Algebra.Presentation,
+    `CompPaths.Algebra.HomologicalAlgebra]
 
 @[default_target]
 lean_exe computational_paths where
