@@ -461,6 +461,14 @@ def toRW : Expr → List Gen
   | .symm e => rwInv (toRW e)
   | .trans e₁ e₂ => rwAppend (toRW e₁) (toRW e₂)
 
+/-- Equality on expressions is decidable (inherited from `GroupoidTRS.Expr`). -/
+def expr_eq_decidable (e₁ e₂ : Expr) : Decidable (e₁ = e₂) :=
+  inferInstance
+
+/-- Equality of interpreted free-group words is decidable. -/
+def toRW_eq_decidable (e₁ e₂ : Expr) : Decidable (toRW e₁ = toRW e₂) :=
+  inferInstance
+
 theorem toRW_reduced : ∀ (e : Expr), Reduced (toRW e)
   | .atom _ => trivial
   | .refl => trivial
@@ -523,6 +531,53 @@ def rwToExpr : List Gen → Expr
 
 /-- The canonical form. -/
 def canon (e : Expr) : Expr := rwToExpr (toRW e)
+
+@[simp] theorem toRW_gen_toExpr (g : Gen) : toRW g.toExpr = [g] := by
+  cases g <;> rfl
+
+theorem toRW_rwToExpr_of_reduced :
+    ∀ {w : List Gen}, Reduced w → toRW (rwToExpr w) = w := by
+  intro w hw
+  induction w with
+  | nil =>
+      rfl
+  | cons g rest ih =>
+      cases rest with
+      | nil =>
+          simp [rwToExpr, toRW_gen_toExpr]
+      | cons h rest' =>
+          have htail : Reduced (h :: rest') := hw.2
+          have hne : g.inv ≠ h := hw.1
+          calc
+            toRW (rwToExpr (g :: h :: rest')) =
+                rwAppend (toRW g.toExpr) (toRW (rwToExpr (h :: rest'))) := by
+                  simp [rwToExpr, toRW]
+            _ = rwAppend [g] (h :: rest') := by
+                  simp [toRW_gen_toExpr, ih htail]
+            _ = prepend g (h :: rest') := by
+                  simp [rwAppend]
+            _ = g :: h :: rest' := prepend_no_cancel g h rest' hne
+
+theorem canon_idempotent (e : Expr) : canon (canon e) = canon e := by
+  unfold canon
+  rw [toRW_rwToExpr_of_reduced (w := toRW e) (toRW_reduced e)]
+
+theorem rwToExpr_injective_of_reduced {w₁ w₂ : List Gen}
+    (h₁ : Reduced w₁) (h₂ : Reduced w₂)
+    (h : rwToExpr w₁ = rwToExpr w₂) : w₁ = w₂ := by
+  have hToRW : toRW (rwToExpr w₁) = toRW (rwToExpr w₂) := by
+    simp [h]
+  rw [toRW_rwToExpr_of_reduced (w := w₁) h₁,
+    toRW_rwToExpr_of_reduced (w := w₂) h₂] at hToRW
+  exact hToRW
+
+theorem rwToExpr_eq_iff_of_reduced {w₁ w₂ : List Gen}
+    (h₁ : Reduced w₁) (h₂ : Reduced w₂) :
+    rwToExpr w₁ = rwToExpr w₂ ↔ w₁ = w₂ := by
+  constructor
+  · exact rwToExpr_injective_of_reduced h₁ h₂
+  · intro hEq
+    simp [hEq]
 
 /-- Cancel g with g.inv at the head. -/
 theorem reach_cancel (g : Gen) (rest : List Gen) (_hr : Reduced rest) :
