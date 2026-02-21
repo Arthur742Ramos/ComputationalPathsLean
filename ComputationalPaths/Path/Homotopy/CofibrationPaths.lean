@@ -205,7 +205,7 @@ def mkCofibrationData (f : A → B) : CofibrationData A B where
   map := f
 
 /-- The cofiber glue proof is equal to itself (UIP on proofs). -/
-theorem cofiberGlue_proof_irrel (f : A → B) (a : A) :
+theorem cofiberGlue_Subsingleton.elim (f : A → B) (a : A) :
     (cofiberGlue f a).proof = (cofiberGlue f a).proof := by
   rfl
 

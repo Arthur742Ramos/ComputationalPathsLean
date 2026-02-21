@@ -508,11 +508,11 @@ theorem connecting_full_les_chain
   simp
 
 -- 27: Deep: any two d² proofs at the same degree agree (proof irrelevance)
-theorem d_sq_proof_irrel {Obj : Type u} {Hom : Obj → Obj → Type v}
+theorem d_sq_Subsingleton.elim {Obj : Type u} {Hom : Obj → Obj → Type v}
     {ops : CatOps Obj Hom}
     (C : ChainCx ops) (n : Nat)
     (h₁ h₂ : C.d_sq n = C.d_sq n) :
-    h₁ = h₂ := by apply proof_irrel
+    h₁ = h₂ := by apply Subsingleton.elim
 
 -- 28: Ext LES existence
 theorem ext_les_exists :

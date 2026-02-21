@@ -131,7 +131,7 @@ def qinvToHAE {f : A → B} (e : QInv f) : IsHAE f where
   inv := e.inv
   sect := e.sect
   retr := e.retr
-  coh := fun _ => proof_irrel _ _
+  coh := fun _ => Subsingleton.elim _ _
 
 /-- A half-adjoint equivalence yields a quasi-inverse. -/
 def haeToQInv {f : A → B} (e : IsHAE f) : QInv f where

@@ -266,7 +266,7 @@ theorem normalForm_symm_path (nf : Path.NormalForm A a b) :
 /-- All NormalForms between the same endpoints are equal (subsingleton). -/
 theorem normalForm_eq (nf₁ nf₂ : Path.NormalForm A a b) :
     nf₁ = nf₂ :=
-  proof_irrel nf₁ nf₂
+  Subsingleton.elim nf₁ nf₂
 
 /-- Build a NormalForm from a propositional equality. -/
 def normalForm_ofEq (h : a = b) : Path.NormalForm A a b :=

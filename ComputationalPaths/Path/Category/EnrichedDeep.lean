@@ -244,7 +244,7 @@ theorem pentagon_route2 {a b c d e : A}
 theorem pentagon_routes_agree {a b c d e : A}
     (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
     pentagon_route1 f g h k = pentagon_route2 f g h k := by
-  apply proof_irrel
+  apply Subsingleton.elim
 
 /-! ## Triangle coherence for the enriched unit -/
 
@@ -270,7 +270,7 @@ theorem triangle_routes_agree {a b c : A}
     (f : Hom a b) (g : Hom b c) :
     triangle_coherence f g =
     Eq.trans (homComp_assoc f (homId b) g) (triangle_right f g) := by
-  apply proof_irrel
+  apply Subsingleton.elim
 
 /-! ## Enriched transport structure -/
 

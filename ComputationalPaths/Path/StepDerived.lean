@@ -171,7 +171,7 @@ theorem rw_symm_refl (a : A) :
 /-- `ofEq h` for any `h : a = a` rewrites to `ofEq rfl`. -/
 noncomputable def rweq_ofEq_rfl_eq_refl (h : a = a) :
     RwEq (Path.stepChain h) (Path.stepChain rfl) := by
-  have : h = rfl := proof_irrel _ _
+  have : h = rfl := Subsingleton.elim _ _
   subst this
   exact RwEq.refl _
 

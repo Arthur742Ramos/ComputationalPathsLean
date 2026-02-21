@@ -128,10 +128,10 @@ def nash_transport {S1 S2 : Type u} (g : Game S1 S2)
   Path.transport (D := fun pr => IsNashEquilibrium g pr) (Path.mk [Step.mk _ _ h] h)
 
 /-- Path between Nash equilibrium proofs (proof irrelevance). -/
-theorem nash_proof_irrel {S1 S2 : Type u} (g : Game S1 S2)
+theorem nash_Subsingleton.elim {S1 S2 : Type u} (g : Game S1 S2)
     (p : Profile S1 S2) (h1 h2 : IsNashEquilibrium g p) :
     h1 = h2 := by
-  exact proof_irrel h1 h2
+  exact Subsingleton.elim h1 h2
 
 /-! ## Dominant Strategies -/
 

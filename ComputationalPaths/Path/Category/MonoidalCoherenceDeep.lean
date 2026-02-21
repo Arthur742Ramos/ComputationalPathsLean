@@ -288,12 +288,12 @@ theorem MonPath.semEq {α : Type u} {e₁ e₂ : MonExpr α}
     propositional equality on evaluations. -/
 theorem coherence_semantic {α : Type u} {e₁ e₂ : MonExpr α}
     (p q : MonPath α e₁ e₂) : p.eval_preserved = q.eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- **Mac Lane Coherence (atoms).** -/
 theorem coherence_atoms {α : Type u} {e₁ e₂ : MonExpr α}
     (p q : MonPath α e₁ e₂) : p.atoms_preserved = q.atoms_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- **Mac Lane Coherence (normal form).** Any path witnesses same normal form. -/
 theorem coherence_normal_form {α : Type u} {e₁ e₂ : MonExpr α}
@@ -303,7 +303,7 @@ theorem coherence_normal_form {α : Type u} {e₁ e₂ : MonExpr α}
 /-- **Mac Lane Coherence (master).** All structural diagrams commute. -/
 theorem maclane_coherence {α : Type u} {e₁ e₂ : MonExpr α}
     (p q : MonPath α e₁ e₂) : p.eval_preserved = q.eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## Pentagon Identity -/
 
@@ -339,13 +339,13 @@ def pentagonPath2 :
 theorem pentagon_commutes :
     (pentagonPath1 a b c d).eval_preserved =
     (pentagonPath2 a b c d).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Pentagon: normal form coherence. -/
 theorem pentagon_normal_form :
     coherence_normal_form (pentagonPath1 a b c d) =
     coherence_normal_form (pentagonPath2 a b c d) :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end Pentagon
 
@@ -375,12 +375,12 @@ def trianglePath2 :
 theorem triangle_commutes :
     (trianglePath1 a b).eval_preserved =
     (trianglePath2 a b).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 theorem triangle_normal_form :
     coherence_normal_form (trianglePath1 a b) =
     coherence_normal_form (trianglePath2 a b) :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end Triangle
 
@@ -406,7 +406,7 @@ def doubleAssocBwd (a b c d : MonExpr α) :
 theorem doubleAssoc_roundtrip (a b c d : MonExpr α) :
     (MonPath.trans (doubleAssocFwd a b c d) (doubleAssocBwd a b c d)).eval_preserved =
     (MonPath.refl _).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Unit absorption left: `I⊗(I⊗a)` → `a`. -/
 def unitAbsorbLeft (a : MonExpr α) :
@@ -421,7 +421,7 @@ def unitAbsorbLeft' (a : MonExpr α) :
 
 theorem unitAbsorb_coherent (a : MonExpr α) :
     (unitAbsorbLeft a).eval_preserved = (unitAbsorbLeft' a).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Unit absorption right: `(a⊗I)⊗I` → `a`. -/
 def unitAbsorbRight (a : MonExpr α) :
@@ -454,7 +454,7 @@ def assoc5' (a b c d e : MonExpr α) :
 
 theorem assoc5_coherent (a b c d e : MonExpr α) :
     (assoc5 a b c d e).eval_preserved = (assoc5' a b c d e).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end StructuralPaths
 
@@ -644,7 +644,7 @@ variable {α : Type u}
 theorem unitor_coherence_unit :
     (MonPath.leftUnit (α := α) MonExpr.unit).eval_preserved =
     (MonPath.rightUnit (α := α) MonExpr.unit).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Associator-unitor interaction: two routes from `(a⊗I)⊗I` to `a`. -/
 def assocUnitorPath (a : MonExpr α) :
@@ -666,7 +666,7 @@ def assocUnitorPath' (a : MonExpr α) :
 theorem assocUnitor_coherent (a : MonExpr α) :
     (assocUnitorPath a).eval_preserved =
     (assocUnitorPath' a).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Three paths for `I⊗(a⊗I)` → `a`. -/
 def unitSandwich1 (a : MonExpr α) :
@@ -689,61 +689,61 @@ def unitSandwich3 (a : MonExpr α) :
 
 theorem unitSandwich_coherent12 (a : MonExpr α) :
     (unitSandwich1 a).eval_preserved = (unitSandwich2 a).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 theorem unitSandwich_coherent13 (a : MonExpr α) :
     (unitSandwich1 a).eval_preserved = (unitSandwich3 a).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 theorem unitSandwich_coherent23 (a : MonExpr α) :
     (unitSandwich2 a).eval_preserved = (unitSandwich3 a).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Symmetry coherence. -/
 theorem symm_coherent {e₁ e₂ : MonExpr α}
     (p q : MonPath α e₁ e₂) :
     (MonPath.symm p).eval_preserved = (MonPath.symm q).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Trans-symm cancellation. -/
 theorem trans_symm_coherent {e₁ e₂ : MonExpr α}
     (p : MonPath α e₁ e₂) :
     (MonPath.trans p (MonPath.symm p)).eval_preserved =
     (MonPath.refl e₁).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Symm-trans cancellation. -/
 theorem symm_trans_coherent {e₁ e₂ : MonExpr α}
     (p : MonPath α e₁ e₂) :
     (MonPath.trans (MonPath.symm p) p).eval_preserved =
     (MonPath.refl e₂).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Any path loop gives the trivial equality. -/
 theorem loop_trivial {e : MonExpr α} (p : MonPath α e e) :
     p.eval_preserved = Eq.refl (e.eval) :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Whiskering on the left. -/
 theorem whisker_left_coherent {b b' : MonExpr α} (a : MonExpr α)
     (p q : MonPath α b b') :
     (MonPath.congRight a p).eval_preserved =
     (MonPath.congRight a q).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Whiskering on the right. -/
 theorem whisker_right_coherent {a a' : MonExpr α} (b : MonExpr α)
     (p q : MonPath α a a') :
     (MonPath.congLeft b p).eval_preserved =
     (MonPath.congLeft b q).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Bifunctoriality of tensor. -/
 theorem bifunctor_coherent {a a' b b' : MonExpr α}
     (p : MonPath α a a') (q : MonPath α b b') :
     (MonPath.congBoth p q).eval_preserved =
     (MonPath.trans (MonPath.congRight a q) (MonPath.congLeft b' p)).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Naturality of the associator. -/
 theorem assoc_naturality {a a' b b' c c' : MonExpr α}
@@ -754,7 +754,7 @@ theorem assoc_naturality {a a' b b' c c' : MonExpr α}
     (MonPath.trans
       (MonPath.assocBwd a b c)
       (MonPath.congBoth p (MonPath.congBoth q r))).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Naturality of left unitor. -/
 theorem left_unitor_naturality {a a' : MonExpr α}
@@ -763,7 +763,7 @@ theorem left_unitor_naturality {a a' : MonExpr α}
       (MonPath.congBoth (MonPath.refl MonExpr.unit) p)
       (MonPath.leftUnit a')).eval_preserved =
     (MonPath.trans (MonPath.leftUnit a) p).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Naturality of right unitor. -/
 theorem right_unitor_naturality {a a' : MonExpr α}
@@ -772,7 +772,7 @@ theorem right_unitor_naturality {a a' : MonExpr α}
       (MonPath.congBoth p (MonPath.refl MonExpr.unit))
       (MonPath.rightUnit a')).eval_preserved =
     (MonPath.trans (MonPath.rightUnit a) p).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Discrete on normal forms: paths preserve normal form. -/
 theorem discrete_on_normal_forms {e₁ e₂ : MonExpr α}
@@ -804,7 +804,7 @@ theorem interchange {a₁ a₂ a₃ b₁ b₂ b₃ : MonExpr α}
     (p₂ : MonPath α b₁ b₂) (q₂ : MonPath α b₂ b₃) :
     (hcomp (vcomp p₁ q₁) (vcomp p₂ q₂)).eval_preserved =
     (vcomp (hcomp p₁ p₂) (hcomp q₁ q₂)).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 theorem hcomp_unit_left {b b' : MonExpr α}
     (q : MonPath α b b') :
@@ -812,7 +812,7 @@ theorem hcomp_unit_left {b b' : MonExpr α}
     (MonPath.trans
       (MonPath.leftUnit b)
       (MonPath.trans q (MonPath.leftUnitInv b'))).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 theorem hcomp_unit_right {a a' : MonExpr α}
     (p : MonPath α a a') :
@@ -820,7 +820,7 @@ theorem hcomp_unit_right {a a' : MonExpr α}
     (MonPath.trans
       (MonPath.rightUnit a)
       (MonPath.trans p (MonPath.rightUnitInv a'))).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end PathAlgebra
 
@@ -886,17 +886,17 @@ variable {α : Type u}
 theorem unit_endomorphism_coherent
     (p q : MonPath α MonExpr.unit MonExpr.unit) :
     p.eval_preserved = q.eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 theorem unit_terminal (e : MonExpr α)
     (p q : MonPath α e MonExpr.unit) :
     p.eval_preserved = q.eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 theorem unit_initial (e : MonExpr α)
     (p q : MonPath α MonExpr.unit e) :
     p.eval_preserved = q.eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end EckmannHilton
 
@@ -958,12 +958,12 @@ theorem stasheff4_pentagon (a b c d : MonExpr α) :
     (MonPath.trans (stasheff4_e12 a b c d)
       (MonPath.trans (stasheff4_e23 a b c d) (stasheff4_e34 a b c d))).eval_preserved =
     (MonPath.trans (stasheff4_e15 a b c d) (stasheff4_e54 a b c d)).eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 theorem stasheff4_all_paths_coherent (a b c d : MonExpr α)
     (p q : MonPath α (stasheff4_1 a b c d) (stasheff4_4 a b c d)) :
     p.eval_preserved = q.eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end Associahedron
 
@@ -1049,7 +1049,7 @@ def ex_path' : MonPath Nat ex_left ex_right :=
       (MonPath.assocBwd (MonExpr.atom 1) (MonExpr.atom 2) (MonExpr.atom 3)))
 
 theorem ex_coherent : ex_path.eval_preserved = ex_path'.eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 def ex4_left : NExpr :=
   MonExpr.tensor
@@ -1077,7 +1077,7 @@ def ex4_path2 : MonPath Nat ex4_left ex4_right :=
       (MonPath.congRight (MonExpr.atom 1) (MonPath.assocBwd (MonExpr.atom 2) (MonExpr.atom 3) (MonExpr.atom 4))))
 
 theorem ex4_coherent : ex4_path1.eval_preserved = ex4_path2.eval_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end Examples
 

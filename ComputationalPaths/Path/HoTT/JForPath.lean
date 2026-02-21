@@ -198,12 +198,12 @@ theorem level_01_proof_relevant (a : A) :
   ⟨witness_refl a, witness_step a, non_uip_witness a⟩
 
 /-- Level 1→2: Eq on Path is proof-irrelevant. -/
-theorem level_12_proof_irrelevant {a b : A} (p q : Path a b)
-    (h₁ h₂ : p = q) : h₁ = h₂ := proof_irrel h₁ h₂
+theorem level_12_Subsingleton.elimevant {a b : A} (p q : Path a b)
+    (h₁ h₂ : p = q) : h₁ = h₂ := Subsingleton.elim h₁ h₂
 
 /-- All proof fields are equal. -/
 theorem proof_field_irrelevant {a b : A} (p q : Path a b) :
-    p.proof = q.proof := proof_irrel _ _
+    p.proof = q.proof := Subsingleton.elim _ _
 
 /-- Two-level coherence: transport depends only on proof, not steps. -/
 theorem two_level_coherence {B : A → Sort v} {a b : A}
@@ -213,12 +213,12 @@ theorem two_level_coherence {B : A → Sort v} {a b : A}
 
 /-- Semantic projection is well-defined. -/
 theorem semantic_projection_wd {a b : A} (p q : Path a b) :
-    p.toEq = q.toEq := proof_irrel _ _
+    p.toEq = q.toEq := Subsingleton.elim _ _
 
 /-- Path refines Eq: same proof, possibly different steps. -/
 theorem path_refines_eq {a b : A} (p q : Path a b) :
     p.proof = q.proof ∧ (p.steps ≠ q.steps → p ≠ q) :=
-  ⟨proof_irrel _ _, fun hne heq => hne (_root_.congrArg Path.steps heq)⟩
+  ⟨Subsingleton.elim _ _, fun hne heq => hne (_root_.congrArg Path.steps heq)⟩
 
 /-! ========================================================================
     § 7. HoTT OPERATIONS ARE PATH OPERATIONS
@@ -371,19 +371,19 @@ theorem yet_paths_differ (a : A) :
     ======================================================================== -/
 
 theorem J_left_unit {a b : A} (p : Path a b) :
-    (trans (refl a) p).proof = p.proof := proof_irrel _ _
+    (trans (refl a) p).proof = p.proof := Subsingleton.elim _ _
 
 theorem J_right_unit {a b : A} (p : Path a b) :
-    (trans p (refl b)).proof = p.proof := proof_irrel _ _
+    (trans p (refl b)).proof = p.proof := Subsingleton.elim _ _
 
 theorem J_assoc {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
-    (trans (trans p q) r).proof = (trans p (trans q r)).proof := proof_irrel _ _
+    (trans (trans p q) r).proof = (trans p (trans q r)).proof := Subsingleton.elim _ _
 
 theorem J_left_inv {a b : A} (p : Path a b) :
-    (trans (symm p) p).proof = (refl b).proof := proof_irrel _ _
+    (trans (symm p) p).proof = (refl b).proof := Subsingleton.elim _ _
 
 theorem J_right_inv {a b : A} (p : Path a b) :
-    (trans p (symm p)).proof = (refl a).proof := proof_irrel _ _
+    (trans p (symm p)).proof = (refl a).proof := Subsingleton.elim _ _
 
 /-! ========================================================================
     § 14. TRANSPORT IS PATH-INDEPENDENT
@@ -406,7 +406,7 @@ def path_encode {a y : A} (p : Path a y) : PathCode a y := p.proof
 def path_decode {a y : A} (c : PathCode a y) : Path a y := ofEq c
 
 theorem path_encode_decode {a y : A} (c : PathCode a y) :
-    path_encode (path_decode c) = c := proof_irrel _ _
+    path_encode (path_decode c) = c := Subsingleton.elim _ _
 
 theorem path_decode_encode {a y : A} (p : Path a y) :
     path_decode (path_encode p) = ofEq p.proof := rfl
@@ -527,7 +527,7 @@ theorem transport_triangle' {B : A → Sort v} {a b : A}
 
 /-- K works for Lean's Eq (because Eq is proof-irrelevant). -/
 def K_for_Eq (a : A) (C : a = a → Prop) (c : C rfl) (h : a = a) : C h := by
-  have : h = rfl := proof_irrel h rfl; rw [this]; exact c
+  have : h = rfl := Subsingleton.elim h rfl; rw [this]; exact c
 
 /-- K works at Eq level but NOT at Path level. -/
 theorem K_two_level_summary (a : A) :
@@ -553,7 +553,7 @@ theorem path_strictly_refines_eq (a : A) :
 theorem proof_factoring_motive {a b : A}
     (M : a = b → Sort v) (p q : Path a b) :
     M p.proof = M q.proof := by
-  have : p.proof = q.proof := proof_irrel _ _; rw [this]
+  have : p.proof = q.proof := Subsingleton.elim _ _; rw [this]
 
 /-! ========================================================================
     § 24. PAULIN-MOHRING J
@@ -597,7 +597,7 @@ theorem fundamental_consistency (a : A) :
 /-- congrArg at proof level: always equal. -/
 theorem congrArg_proof_level {B : Type v} (f : A → B) {a b : A}
     (p q : Path a b) : (congrArg f p).proof = (congrArg f q).proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- congrArg at step level: preserves distinctions. -/
 theorem congrArg_step_level {B : Type v} (f : A → B) {a : A} :

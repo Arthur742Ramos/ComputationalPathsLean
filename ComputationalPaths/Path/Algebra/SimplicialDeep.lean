@@ -278,7 +278,7 @@ theorem kanFiller_face_path_via_horn {A : Nat → Type u} {S : SimplicialData A}
     (kf1 kf2 : KanFiller S n k horn) (i : Nat) (h : i ≠ k) :
     Path.toEq (kanFiller_face_path kf1 kf2 i h) =
     (kf1.face_match i h).trans (kf2.face_match i h).symm := by
-  apply proof_irrel
+  apply Subsingleton.elim
 
 /-! ## Section 8: Chain Complex for Dold-Kan -/
 

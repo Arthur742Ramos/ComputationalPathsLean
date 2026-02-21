@@ -53,7 +53,7 @@ variable {A B C : Type u}
       subst h_app
       have h_nat : @natη = @natθ := by
         funext a b p
-        apply proof_irrel
+        apply Subsingleton.elim
       cases h_nat
       rfl
 

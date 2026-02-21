@@ -86,12 +86,6 @@ variable {A : Type u} {B : Type v} {C : Type w}
 variable {a b c d : A}
 variable {a1 a2 a3 : A} {b1 b2 b3 : B}
 
-/-- Explicit subsingleton equality via constructor matching on the instance. -/
-theorem proof_irrel {α : Sort u} [h : Subsingleton α] (x y : α) : x = y := by
-  cases h with
-  | intro hxy =>
-      exact hxy x y
-
 
 /-- Helper showing that mapping the identity over step lists is a no-op. -/
 @[simp] theorem steps_map_id (steps : List (Step A)) :

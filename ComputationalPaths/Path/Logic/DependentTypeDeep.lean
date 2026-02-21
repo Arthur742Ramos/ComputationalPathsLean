@@ -299,7 +299,7 @@ def PathOver.trans' {A : Type u} {B : A → Type v} {a₁ a₂ a₃ : A}
 theorem elim_prop_irrel {A : Type u} (P : A → Prop)
     (h₁ h₂ : (a : A) → P a) (a : A) :
     h₁ a = h₂ a :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## Type Formers as Paths -/
 

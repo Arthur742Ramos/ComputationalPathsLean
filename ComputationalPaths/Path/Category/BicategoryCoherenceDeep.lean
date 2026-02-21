@@ -399,7 +399,7 @@ coherence theorem: all diagrams of canonical 2-cells commute. -/
 theorem coherence_semantic {γ : Type u} {e₁ e₂ : Cell2Expr γ}
     (p q : Cell2Path γ e₁ e₂) :
     p.atomCount_preserved = q.atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- **Coherence (normal form).** Any path witnesses equal atom counts. -/
 theorem coherence_normal_form {γ : Type u} {e₁ e₂ : Cell2Expr γ}
@@ -410,7 +410,7 @@ theorem coherence_normal_form {γ : Type u} {e₁ e₂ : Cell2Expr γ}
 theorem bicategory_coherence {γ : Type u} {e₁ e₂ : Cell2Expr γ}
     (p q : Cell2Path γ e₁ e₂) :
     p.atomCount_preserved = q.atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## Interchange Law -/
 
@@ -436,7 +436,7 @@ def interchange_roundtrip (f g h k : Cell2Expr γ) :
 
 theorem interchange_roundtrip_semantic (f g h k : Cell2Expr γ) :
     (interchange_roundtrip f g h k).atomCount_preserved =
-    (Cell2Path.refl _).atomCount_preserved := proof_irrel _ _
+    (Cell2Path.refl _).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Middle-four interchange: apply interchange in a larger context. -/
 def middle_four_interchange (f g h k p q : Cell2Expr γ) :
@@ -468,7 +468,7 @@ theorem double_interchange_semantic (f g h k p q r s : Cell2Expr γ) :
     (Cell2Path.congVertBoth
       (Cell2Path.interchangeFwd f g h k)
       (Cell2Path.interchangeFwd p q r s)).atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end Interchange
 
@@ -559,7 +559,7 @@ def eckmann_hilton_double_comm (f g : Cell2Expr γ) :
 
 theorem eckmann_hilton_double_semantic (f g : Cell2Expr γ) :
     (eckmann_hilton_double_comm f g).atomCount_preserved =
-    (Cell2Path.refl _).atomCount_preserved := proof_irrel _ _
+    (Cell2Path.refl _).atomCount_preserved := Subsingleton.elim _ _
 
 end EckmannHilton
 
@@ -585,13 +585,13 @@ theorem whiskerLeft_count (g : Cell2Expr γ) {f f' : Cell2Expr γ}
     (p : Cell2Path γ f f') :
     (whiskerLeft g p).atomCount_preserved =
     _root_.congrArg (g.atomCount + ·) p.atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 theorem whiskerRight_count {f f' : Cell2Expr γ} (p : Cell2Path γ f f')
     (g : Cell2Expr γ) :
     (whiskerRight p g).atomCount_preserved =
     _root_.congrArg (· + g.atomCount) p.atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Double whiskering: whisker on both sides. -/
 def whiskerBoth (g : Cell2Expr γ) {f f' : Cell2Expr γ}
@@ -630,7 +630,7 @@ theorem whiskerLeft_vert_eq (g : Cell2Expr γ) {f₁ f₂ f₃ : Cell2Expr γ}
     (p : Cell2Path γ f₁ f₂) (q : Cell2Path γ f₂ f₃) :
     (whiskerLeft_vert g p q).atomCount_preserved =
     (Cell2Path.trans (whiskerLeft g p) (whiskerLeft g q)).atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end Whiskering
 
@@ -664,7 +664,7 @@ def vertPentagon2 (f g h k : Cell2Expr γ) :
 /-- **Vertical pentagon identity**: the two routes commute. -/
 theorem vert_pentagon_commutes (f g h k : Cell2Expr γ) :
     (vertPentagon1 f g h k).atomCount_preserved =
-    (vertPentagon2 f g h k).atomCount_preserved := proof_irrel _ _
+    (vertPentagon2 f g h k).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Horizontal pentagon path 1. -/
 def horizPentagon1 (f g h k : Cell2Expr γ) :
@@ -689,7 +689,7 @@ def horizPentagon2 (f g h k : Cell2Expr γ) :
 /-- **Horizontal pentagon identity**. -/
 theorem horiz_pentagon_commutes (f g h k : Cell2Expr γ) :
     (horizPentagon1 f g h k).atomCount_preserved =
-    (horizPentagon2 f g h k).atomCount_preserved := proof_irrel _ _
+    (horizPentagon2 f g h k).atomCount_preserved := Subsingleton.elim _ _
 
 end Pentagon
 
@@ -717,7 +717,7 @@ def vertTriangle2 (f g : Cell2Expr γ) :
 /-- **Vertical triangle identity**: the two routes commute. -/
 theorem vert_triangle_commutes (f g : Cell2Expr γ) :
     (vertTriangle1 f g).atomCount_preserved =
-    (vertTriangle2 f g).atomCount_preserved := proof_irrel _ _
+    (vertTriangle2 f g).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Horizontal triangle path 1. -/
 def horizTriangle1 (f g : Cell2Expr γ) :
@@ -738,7 +738,7 @@ def horizTriangle2 (f g : Cell2Expr γ) :
 /-- **Horizontal triangle identity**. -/
 theorem horiz_triangle_commutes (f g : Cell2Expr γ) :
     (horizTriangle1 f g).atomCount_preserved =
-    (horizTriangle2 f g).atomCount_preserved := proof_irrel _ _
+    (horizTriangle2 f g).atomCount_preserved := Subsingleton.elim _ _
 
 end Triangle
 
@@ -763,7 +763,7 @@ def unitAbsorbLeft2 (f : Cell2Expr γ) :
 
 theorem unit_absorb_coherent (f : Cell2Expr γ) :
     (unitAbsorbLeft1 f).atomCount_preserved =
-    (unitAbsorbLeft2 f).atomCount_preserved := proof_irrel _ _
+    (unitAbsorbLeft2 f).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Double right-unit absorption. -/
 def unitAbsorbRight (f : Cell2Expr γ) :
@@ -787,7 +787,7 @@ def unitMixed' (f : Cell2Expr γ) :
 
 theorem unit_mixed_coherent (f : Cell2Expr γ) :
     (unitMixed f).atomCount_preserved =
-    (unitMixed' f).atomCount_preserved := proof_irrel _ _
+    (unitMixed' f).atomCount_preserved := Subsingleton.elim _ _
 
 end UnitCoherence
 
@@ -831,7 +831,7 @@ def vertAssoc5' (a b c d e : Cell2Expr γ) :
 
 theorem vert_assoc5_coherent (a b c d e : Cell2Expr γ) :
     (vertAssoc5 a b c d e).atomCount_preserved =
-    (vertAssoc5' a b c d e).atomCount_preserved := proof_irrel _ _
+    (vertAssoc5' a b c d e).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Associator roundtrip is semantically trivial. -/
 def assoc_roundtrip (f g h : Cell2Expr γ) :
@@ -844,7 +844,7 @@ def assoc_roundtrip (f g h : Cell2Expr γ) :
 
 theorem assoc_roundtrip_semantic (f g h : Cell2Expr γ) :
     (assoc_roundtrip f g h).atomCount_preserved =
-    (Cell2Path.refl _).atomCount_preserved := proof_irrel _ _
+    (Cell2Path.refl _).atomCount_preserved := Subsingleton.elim _ _
 
 end AssocCoherence
 
@@ -879,7 +879,7 @@ def refl (n : NatTrans2 γ) : Modification γ := ⟨n, n, rfl, rfl⟩
 theorem modification_coherence (m : Modification γ) :
     m.nt1.path.atomCount_preserved =
     (m.source_eq ▸ m.target_eq ▸ m.nt2.path.atomCount_preserved) :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end Modification
 
@@ -943,7 +943,7 @@ theorem interchange_units_coherent (f g : Cell2Expr γ) :
     (interchange_left_units_simplified f g).atomCount_preserved =
     (Cell2Path.congHorizBoth
       (Cell2Path.vertLeftUnit f)
-      (Cell2Path.vertLeftUnit g)).atomCount_preserved := proof_irrel _ _
+      (Cell2Path.vertLeftUnit g)).atomCount_preserved := Subsingleton.elim _ _
 
 end InterchangeUnits
 
@@ -985,7 +985,7 @@ equal atom-count proofs. -/
 theorem pasting_coherence {f g h k : Cell2Expr γ}
     (top top' : Cell2Path γ f g) (bot bot' : Cell2Path γ h k) :
     (pastingSquare top bot).atomCount_preserved =
-    (pastingSquare top' bot').atomCount_preserved := proof_irrel _ _
+    (pastingSquare top' bot').atomCount_preserved := Subsingleton.elim _ _
 
 end Pasting
 
@@ -1012,14 +1012,14 @@ def left_unit_naturality {f f' : Cell2Expr γ} (p : Cell2Path γ f f') :
 theorem left_unit_nat_coherent {f f' : Cell2Expr γ} (p : Cell2Path γ f f') :
     (Cell2Path.trans (Cell2Path.vertLeftUnit f) p).atomCount_preserved =
     (Cell2Path.trans (left_unit_naturality p)
-      (Cell2Path.vertLeftUnit f')).atomCount_preserved := proof_irrel _ _
+      (Cell2Path.vertLeftUnit f')).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Right-unitor naturality square commutes. -/
 theorem right_unit_nat_coherent {f f' : Cell2Expr γ} (p : Cell2Path γ f f') :
     (Cell2Path.trans (Cell2Path.vertRightUnit f) p).atomCount_preserved =
     (Cell2Path.trans
       (Cell2Path.congVertLeft Cell2Expr.id2 p)
-      (Cell2Path.vertRightUnit f')).atomCount_preserved := proof_irrel _ _
+      (Cell2Path.vertRightUnit f')).atomCount_preserved := Subsingleton.elim _ _
 
 end NaturalitySquares
 
@@ -1045,7 +1045,7 @@ theorem mixed_coherence_1 (f g h k l m : Cell2Expr γ) :
     (interchange_after_assoc f g h k l m).atomCount_preserved =
     (Cell2Path.congHorizBoth
       (Cell2Path.vertAssocFwd f g h)
-      (Cell2Path.vertAssocFwd k l m)).atomCount_preserved := proof_irrel _ _
+      (Cell2Path.vertAssocFwd k l m)).atomCount_preserved := Subsingleton.elim _ _
 
 end MixedCoherence
 
@@ -1065,7 +1065,7 @@ def strictify_assoc (f g h : Cell2Expr γ) :
 
 theorem strictify_assoc_identity (f g h : Cell2Expr γ) :
     (strictify_assoc f g h).atomCount_preserved =
-    (Cell2Path.refl _).atomCount_preserved := proof_irrel _ _
+    (Cell2Path.refl _).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Left-unit roundtrip. -/
 def strictify_left_unit (f : Cell2Expr γ) :
@@ -1078,7 +1078,7 @@ def strictify_left_unit (f : Cell2Expr γ) :
 
 theorem strictify_left_unit_identity (f : Cell2Expr γ) :
     (strictify_left_unit f).atomCount_preserved =
-    (Cell2Path.refl _).atomCount_preserved := proof_irrel _ _
+    (Cell2Path.refl _).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Right-unit roundtrip. -/
 def strictify_right_unit (f : Cell2Expr γ) :
@@ -1091,7 +1091,7 @@ def strictify_right_unit (f : Cell2Expr γ) :
 
 theorem strictify_right_unit_identity (f : Cell2Expr γ) :
     (strictify_right_unit f).atomCount_preserved =
-    (Cell2Path.refl _).atomCount_preserved := proof_irrel _ _
+    (Cell2Path.refl _).atomCount_preserved := Subsingleton.elim _ _
 
 end Strictification
 
@@ -1103,26 +1103,26 @@ variable {γ : Type u}
 /-- Two atom-count proofs between the same expressions always agree. -/
 theorem three_cell_coherence {e₁ e₂ : Cell2Expr γ}
     (hp hq : e₁.atomCount = e₂.atomCount) : hp = hq :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Parallel transport: any three 3-cell paths pairwise agree. -/
 theorem parallel_transport_3cell {e₁ e₂ : Cell2Expr γ}
     (p q r : Cell2Path γ e₁ e₂) :
     p.atomCount_preserved = q.atomCount_preserved ∧
     q.atomCount_preserved = r.atomCount_preserved :=
-  ⟨proof_irrel _ _, proof_irrel _ _⟩
+  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _⟩
 
 /-- Whisker-interchange at 3-cell level. -/
 theorem whisker_interchange_3cell {f₁ f₂ g₁ g₂ : Cell2Expr γ}
     (p p' : Cell2Path γ f₁ f₂) (q q' : Cell2Path γ g₁ g₂) :
     (Cell2Path.congVertBoth p q).atomCount_preserved =
-    (Cell2Path.congVertBoth p' q').atomCount_preserved := proof_irrel _ _
+    (Cell2Path.congVertBoth p' q').atomCount_preserved := Subsingleton.elim _ _
 
 /-- Eckmann–Hilton at 3-cell level: loop composition is commutative. -/
 theorem eckmann_hilton_3cell {e : Cell2Expr γ}
     (p q : Cell2Path γ e e) :
     (Cell2Path.trans p q).atomCount_preserved =
-    (Cell2Path.trans q p).atomCount_preserved := proof_irrel _ _
+    (Cell2Path.trans q p).atomCount_preserved := Subsingleton.elim _ _
 
 end HigherCoherence
 
@@ -1143,7 +1143,7 @@ theorem assoc_functorial {f f' g g' h h' : Cell2Expr γ}
       (Cell2Path.vertAssocFwd f g h)
       (Cell2Path.congVertBoth
         (Cell2Path.congVertBoth pf pg) ph)).atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Interchange is natural. -/
 theorem interchange_functorial {f f' g g' h h' k k' : Cell2Expr γ}
@@ -1159,7 +1159,7 @@ theorem interchange_functorial {f f' g g' h h' k k' : Cell2Expr γ}
       (Cell2Path.congVertBoth
         (Cell2Path.congHorizBoth pf ph)
         (Cell2Path.congHorizBoth pg pk))).atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Left unitor is natural. -/
 theorem left_unitor_functorial {f f' : Cell2Expr γ}
@@ -1168,7 +1168,7 @@ theorem left_unitor_functorial {f f' : Cell2Expr γ}
       (Cell2Path.congVertRight Cell2Expr.id2 p)
       (Cell2Path.vertLeftUnit f')).atomCount_preserved =
     (Cell2Path.trans (Cell2Path.vertLeftUnit f) p).atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Right unitor is natural. -/
 theorem right_unitor_functorial {f f' : Cell2Expr γ}
@@ -1177,7 +1177,7 @@ theorem right_unitor_functorial {f f' : Cell2Expr γ}
       (Cell2Path.congVertLeft Cell2Expr.id2 p)
       (Cell2Path.vertRightUnit f')).atomCount_preserved =
     (Cell2Path.trans (Cell2Path.vertRightUnit f) p).atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 end Functoriality
 
@@ -1212,12 +1212,12 @@ def vert_unit_horiz (f g : Cell2Expr γ) :
 /-- H-V interaction coherence: both routes to `f*g` give same atom-count. -/
 theorem hv_interaction_coherent (f g : Cell2Expr γ) :
     (horiz_unit_vert f g).atomCount_preserved =
-    (horiz_unit_vert f g).atomCount_preserved := proof_irrel _ _
+    (horiz_unit_vert f g).atomCount_preserved := Subsingleton.elim _ _
 
 /-- H-V interaction: vertical-unit route preserves atom count. -/
 theorem vert_unit_horiz_semantic (f g : Cell2Expr γ) :
     (vert_unit_horiz f g).atomCount_preserved =
-    (vert_unit_horiz f g).atomCount_preserved := proof_irrel _ _
+    (vert_unit_horiz f g).atomCount_preserved := Subsingleton.elim _ _
 
 /-- The two sources have the same atom count. -/
 theorem hv_sources_agree (f g : Cell2Expr γ) :
@@ -1259,18 +1259,18 @@ agree on atom-count preservation. -/
 theorem universal_coherence {e₁ e₂ : Cell2Expr γ}
     (p q : Cell2Path γ e₁ e₂) :
     p.atomCount_preserved = q.atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Every endopath is coherent with refl. -/
 theorem endo_coherence {e : Cell2Expr γ} (p : Cell2Path γ e e) :
     p.atomCount_preserved = (Cell2Path.refl e).atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Symmetry involution coherence. -/
 theorem symm_involution_coherence {e₁ e₂ : Cell2Expr γ}
     (p : Cell2Path γ e₁ e₂) :
     (Cell2Path.symm (Cell2Path.symm p)).atomCount_preserved =
-    p.atomCount_preserved := proof_irrel _ _
+    p.atomCount_preserved := Subsingleton.elim _ _
 
 /-- Trans-assoc coherence. -/
 theorem trans_assoc_coherence {e₁ e₂ e₃ e₄ : Cell2Expr γ}
@@ -1278,31 +1278,31 @@ theorem trans_assoc_coherence {e₁ e₂ e₃ e₄ : Cell2Expr γ}
     (r : Cell2Path γ e₃ e₄) :
     (Cell2Path.trans (Cell2Path.trans p q) r).atomCount_preserved =
     (Cell2Path.trans p (Cell2Path.trans q r)).atomCount_preserved :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- Left-unit coherence for trans. -/
 theorem trans_left_unit_coherence {e₁ e₂ : Cell2Expr γ}
     (p : Cell2Path γ e₁ e₂) :
     (Cell2Path.trans (Cell2Path.refl e₁) p).atomCount_preserved =
-    p.atomCount_preserved := proof_irrel _ _
+    p.atomCount_preserved := Subsingleton.elim _ _
 
 /-- Right-unit coherence for trans. -/
 theorem trans_right_unit_coherence {e₁ e₂ : Cell2Expr γ}
     (p : Cell2Path γ e₁ e₂) :
     (Cell2Path.trans p (Cell2Path.refl e₂)).atomCount_preserved =
-    p.atomCount_preserved := proof_irrel _ _
+    p.atomCount_preserved := Subsingleton.elim _ _
 
 /-- Left-inverse coherence. -/
 theorem left_inverse_coherence {e₁ e₂ : Cell2Expr γ}
     (p : Cell2Path γ e₁ e₂) :
     (Cell2Path.trans (Cell2Path.symm p) p).atomCount_preserved =
-    (Cell2Path.refl e₂).atomCount_preserved := proof_irrel _ _
+    (Cell2Path.refl e₂).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Right-inverse coherence. -/
 theorem right_inverse_coherence {e₁ e₂ : Cell2Expr γ}
     (p : Cell2Path γ e₁ e₂) :
     (Cell2Path.trans p (Cell2Path.symm p)).atomCount_preserved =
-    (Cell2Path.refl e₁).atomCount_preserved := proof_irrel _ _
+    (Cell2Path.refl e₁).atomCount_preserved := Subsingleton.elim _ _
 
 end Summary
 

@@ -80,7 +80,7 @@ structure Simplex {A : Type u} (C : Cover A) where
           cases h_indices
           cases h_point
           have hw : witness = witness' := by
-            apply proof_irrel
+            apply Subsingleton.elim
           cases hw
           rfl
 

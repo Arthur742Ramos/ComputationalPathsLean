@@ -117,7 +117,7 @@ theorem transport_path_eq {p q : Path a b} (h : p = q) (x : D a) :
   rw [h]
 
 /-- Transport along two paths with same proof agrees. -/
-theorem transport_proof_irrel (p q : Path a b) (x : D a) :
+theorem transport_Subsingleton.elim (p q : Path a b) (x : D a) :
     transport (D := D) p x = transport (D := D) q x := by
   cases p with | mk sp hp => cases q with | mk sq hq =>
     cases hp; cases hq; rfl

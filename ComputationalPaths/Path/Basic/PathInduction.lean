@@ -225,7 +225,7 @@ theorem based_contr_proof (a : A) (bp : Σ b, Path a b) :
   exact p.proof.symm
 
 /-- Transport is independent of the path: only the proof field matters. -/
-theorem transport_proof_irrel {D : A → Sort v}
+theorem transport_Subsingleton.elim {D : A → Sort v}
     (p q : Path a b) (x : D a) :
     transport p x = transport q x := by
   cases p with
@@ -235,10 +235,10 @@ theorem transport_proof_irrel {D : A → Sort v}
           cases proof1; cases proof2; rfl
 
 /-- `depElim` is independent of the specific path chosen. -/
-theorem depElim_proof_irrel {D : A → Sort v}
+theorem depElim_Subsingleton.elim {D : A → Sort v}
     (p q : Path a b) (x : D a) :
     depElim p x = depElim q x :=
-  transport_proof_irrel p q x
+  transport_Subsingleton.elim p q x
 
 /-- Path induction on the equality: any proposition about `a = b` that holds
 for `rfl` holds for all equalities. -/

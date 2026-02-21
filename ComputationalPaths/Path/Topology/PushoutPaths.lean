@@ -75,11 +75,11 @@ theorem gluePath_toEq (c : C) :
     (gluePath (f := f) (g := g) c).toEq = glue_eq c := rfl
 
 /-- Any two paths with the same endpoints in the pushout have the same proof (UIP). -/
-theorem gluePath_proof_irrel
+theorem gluePath_Subsingleton.elim
     {x y : Pushout f g}
     (p q : Path x y) :
     p.proof = q.proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## Universal property -/
 
@@ -131,7 +131,7 @@ theorem Cocone.desc_gluePath (cc : Cocone f g D) (c : C) :
     Path.congrArg cc.desc (gluePath c) =
       Path.mk ((gluePath c).steps.map (Step.map cc.desc))
               (_root_.congrArg cc.desc (gluePath c).proof) :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## Pushout functoriality -/
 
@@ -225,7 +225,7 @@ def glueCompose (c₁ c₂ : C) (h : @inr C A B f g (g c₁) = inr (g c₂)) :
     (Path.trans (Path.mk [Step.mk _ _ h] h) (gluePathRev c₂))
 
 /-- The composed glue path's proof is irrelevant. -/
-theorem glueCompose_proof_irrel (c₁ c₂ : C)
+theorem glueCompose_Subsingleton.elim (c₁ c₂ : C)
     (h : @inr C A B f g (g c₁) = inr (g c₂)) :
     (glueCompose c₁ c₂ h).proof = (glueCompose c₁ c₂ h).proof :=
   rfl

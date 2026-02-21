@@ -390,7 +390,7 @@ theorem Join.symm_symm {A : Type u} {a b : A}
 theorem Join.refl_quot {A : Type u} {a b : A}
     (p : Path a b) :
     (join_refl p).quot_eq = rfl := by
-  exact proof_irrel _ _
+  exact Subsingleton.elim _ _
 
 /-- Join is transitive: if p joins q and q joins r, then p joins r. -/
 theorem Join.trans_join {A : Type u} {a b : A}
@@ -414,7 +414,7 @@ theorem join_refl_meet {A : Type u} {a b : A}
 theorem Join.symm_rweq {A : Type u} {a b : A}
     {p q : Path a b} (J : Join (A := A) (a := a) (b := b) p q) :
     J.symm.rweq = rweq_symm J.rweq := by
-  exact proof_irrel _ _
+  exact Subsingleton.elim _ _
 
 /-- Join quot_eq is transitive via Eq.trans. -/
 theorem Join.quot_eq_trans {A : Type u} {a b : A}

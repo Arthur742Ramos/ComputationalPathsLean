@@ -232,7 +232,7 @@ def dj_trans_path :
 -- 22. Path coherence for quantum algorithms
 theorem qalg_path_coherence {a b : Bool} (p q : Path a b) :
     p.proof = q.proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 -- 23. Symm of QFT path
 theorem qft_path_symm (n : Nat) (k : Fin (2^n)) :

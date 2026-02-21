@@ -105,7 +105,7 @@ theorem bps_fst_eq {a : A} (bp : BasedPathSpace a) : bp.1 = a :=
   bp.2.proof.symm
 
 /-- The proof fields of all based paths agree (proof irrelevance). -/
-theorem bps_proof_irrel {a : A} (bp : BasedPathSpace a) :
+theorem bps_Subsingleton.elim {a : A} (bp : BasedPathSpace a) :
     bp.2.proof = bp.2.proof := rfl
 
 /-! ## 10–11. Singleton contractibility (Eq level) -/
@@ -343,7 +343,7 @@ theorem transport_double_congrArg {B C : Type u} {D : C → Sort v}
 /-- A type with decidable equality has proof-irrelevant paths. -/
 theorem path_proof_decidable [DecidableEq A] {a b : A}
     (p q : Path a b) : p.proof = q.proof :=
-  proof_irrel p.proof q.proof
+  Subsingleton.elim p.proof q.proof
 
 /-! ## 26. symm interaction with transport -/
 

@@ -63,7 +63,7 @@ namespace PathNatTrans
       subst h_app
       have h_nat : @natη = @natθ := by
         funext a b p x
-        apply proof_irrel
+        apply Subsingleton.elim
       cases h_nat
       rfl
 

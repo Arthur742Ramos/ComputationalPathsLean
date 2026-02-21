@@ -378,7 +378,7 @@ theorem MVBoundaryElem.connecting_refl_left {X A B C : Type u}
     let bd : MVBoundaryElem mv x :=
       ⟨preA, preB, ⟨[Step.mk (mv.inclAX preA) x hA], hA⟩, pathFromB⟩
     bd.connectingPath.toEq = (Path.trans ⟨[Step.mk (mv.inclAX preA) x hA], hA⟩ (Path.symm pathFromB)).toEq := by
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-- The MV square on paths: applying congrArg inclAX to a path in C, then
     conjugating with the square paths, yields congrArg inclBX. -/

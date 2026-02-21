@@ -153,14 +153,14 @@ theorem isContr_path_steps (h : IsContr A) (a b : A) :
 
 theorem isContr_path_unique (h : IsContr A) (a b : A) (p : Path a b) :
     p.proof = (isContr_path h a b).proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## 17. Triple point connection chain -/
 
 theorem isContr_triple_chain_proof (h : IsContr A) (a b c : A) :
     (Path.trans (isContr_path h a b) (isContr_path h b c)).proof =
       (isContr_path h a c).proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## 18. Triple chain steps concatenation -/
 
@@ -199,13 +199,13 @@ def isContr_isProp (h : IsContr A) : IsProp A where
 theorem isProp_path_chain (h : IsProp A) (a b c : A) :
     (Path.trans (h.propPath a b) (h.propPath b c)).proof =
       (h.propPath a c).proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## 24. Proposition: symm of propPath agrees with reverse -/
 
 theorem isProp_path_symm (h : IsProp A) (a b : A) :
     (Path.symm (h.propPath a b)).proof = (h.propPath b a).proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## 25. Propositions: trans then symm cancels at proof level -/
 
@@ -222,7 +222,7 @@ structure IsSet' (A : Type u) where
 /-! ## 26. Propositions are sets -/
 
 def isProp_isSet (h : IsProp A) : IsSet' A where
-  setPath := fun _ _ => proof_irrel _ _
+  setPath := fun _ _ => Subsingleton.elim _ _
 
 /-! ## 27. Unit is a set -/
 
@@ -292,7 +292,7 @@ theorem homotopy_naturality {f g : A → B} (h : Homotopy' f g)
     {a₁ a₂ : A} (p : Path a₁ a₂) :
     (Path.trans (Path.congrArg f p) (h a₂)).proof =
       (Path.trans (h a₁) (Path.congrArg g p)).proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## 36. Homotopy symm-then-trans cancels -/
 
@@ -322,7 +322,7 @@ theorem funextPath_steps {f g : (a : A) → B} (h : ∀ a, f a = g a) :
 
 theorem funextPath_symm {f g : (a : A) → B} (h : ∀ a, f a = g a) :
     (Path.symm (funextPath h)).proof = (funextPath (fun a => (h a).symm)).proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## 41. Funext path trans proof agrees -/
 
@@ -330,7 +330,7 @@ theorem funextPath_trans {f g k : (a : A) → B}
     (h₁ : ∀ a, f a = g a) (h₂ : ∀ a, g a = k a) :
     (Path.trans (funextPath h₁) (funextPath h₂)).proof =
       (funextPath (fun a => (h₁ a).trans (h₂ a))).proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ## 42. Funext path trans has two steps -/
 

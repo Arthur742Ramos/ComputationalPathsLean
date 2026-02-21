@@ -68,7 +68,7 @@ theorem indep_symm_twice (h : A.indep a b) : A.indep a b :=
   A.indep_symm (A.indep_symm h)
 
 theorem pairWord_length (x y : Sym) : (pairWord x y).length = 2 :=
-  apply proof_irrel
+  apply Subsingleton.elim
 
 theorem swapTwicePair_eq_pairWord (x y : Sym) : swapTwicePair x y = pairWord x y :=
   rfl

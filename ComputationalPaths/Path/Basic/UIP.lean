@@ -88,7 +88,7 @@ same endpoints always have the same `toEq`. -/
 
 /-- Proof irrelevance: `ofEq` always produces the same path regardless
 of which equality proof is supplied. -/
-@[simp] theorem ofEq_proof_irrelevance {A : Type u} {a b : A}
+@[simp] theorem ofEq_Subsingleton.elimevance {A : Type u} {a b : A}
     (h₁ h₂ : a = b) : Path.stepChain h₁ = Path.stepChain h₂ := by
   cases h₁
   cases h₂

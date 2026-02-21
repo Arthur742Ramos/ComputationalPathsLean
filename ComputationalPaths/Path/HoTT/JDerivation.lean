@@ -237,7 +237,7 @@ def J_PM_from_J {b : A} (C : (a : A) → a = b → Sort v)
   have h_symm : b = a := h.symm
   have result := J (fun y (k : b = y) => C y k.symm) (by simp; exact c) h_symm
   -- result : C a h_symm.symm, and h_symm.symm = h
-  have heq : h_symm.symm = h := proof_irrel _ _
+  have heq : h_symm.symm = h := Subsingleton.elim _ _
   rw [heq] at result
   exact result
 
@@ -408,7 +408,7 @@ theorem contr_to_center (a : A) (bp : BasedPathSpace a) :
 /-- In a contractible type, the path from any element to center is unique. -/
 theorem contr_path_unique (a : A) (bp : BasedPathSpace a)
     (h₁ h₂ : bp = center a) : h₁ = h₂ :=
-  proof_irrel h₁ h₂
+  Subsingleton.elim h₁ h₂
 
 /-- The loop space of the center is trivial. -/
 theorem contr_center_loop (a : A) :
@@ -416,9 +416,9 @@ theorem contr_center_loop (a : A) :
 
 /-- Contractibility of BasedPathSpace implies proof irrelevance for Eq. -/
 theorem contr_implies_eq_irrel {a b : A} (h₁ h₂ : a = b) : h₁ = h₂ :=
-  proof_irrel h₁ h₂
+  Subsingleton.elim h₁ h₂
 
-/-- Alternative proof of contractibility via proof_irrel. -/
+/-- Alternative proof of contractibility via Subsingleton.elim. -/
 theorem contraction_via_subsingleton (a : A) (bp : BasedPathSpace a) :
     bp = center a := by
   obtain ⟨y, ⟨h⟩⟩ := bp
@@ -453,9 +453,9 @@ theorem basedP_toEq_contr (a : A) (bp : BasedPathSpaceP a) :
 
 /-- Two Path-based-path-space elements with the same endpoint have
 equal proof fields. -/
-theorem basedP_proof_irrel {a : A} (bp₁ bp₂ : BasedPathSpaceP a)
+theorem basedP_Subsingleton.elim {a : A} (bp₁ bp₂ : BasedPathSpaceP a)
     (h : bp₁.1 = bp₂.1) : bp₁.2.proof = h ▸ bp₂.2.proof :=
-  proof_irrel _ _
+  Subsingleton.elim _ _
 
 /-! ========================================================================
     § 15. J FOR SIGMA TYPES (PAIR INDUCTION)
@@ -653,12 +653,12 @@ theorem sigma_eta {B : A → Type v} (p : Sigma B) :
 
 /-- Using J we can prove that `Eq` is proof-irrelevant: any two proofs
 of `a = b` are equal. This is a consequence of contractibility. -/
-theorem eq_proof_irrel {a b : A} (h₁ h₂ : a = b) : h₁ = h₂ :=
-  proof_irrel h₁ h₂
+theorem eq_Subsingleton.elim {a b : A} (h₁ h₂ : a = b) : h₁ = h₂ :=
+  Subsingleton.elim h₁ h₂
 
 /-- K axiom derived from J + UIP: any proof of `a = a` is `rfl`. -/
 theorem K_axiom {a : A} (h : a = a) : h = rfl :=
-  proof_irrel h rfl
+  Subsingleton.elim h rfl
 
 /-- Using K and J, Streicher's axiom K is derivable. -/
 def streicher_K {a : A} (C : a = a → Sort v)
