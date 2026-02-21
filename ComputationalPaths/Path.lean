@@ -23,6 +23,7 @@ import ComputationalPaths.Path.Rewrite.NormalizationDerived
 import ComputationalPaths.Path.Rewrite.PathNormalizationDecision
 import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
 import ComputationalPaths.Path.Rewrite.PathTactic
+import ComputationalPaths.Path.Polygraph.RwEqDerivation
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.LocalizationCategory
 import ComputationalPaths.Path.ModelCategory
