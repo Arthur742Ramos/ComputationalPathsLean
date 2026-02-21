@@ -207,13 +207,43 @@ theorem twoCellInverse_left_toEq
     {a b : A} {p q : Path a b} (α : RwEq p q) :
     rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂ α (twoCellInverse (A := A) α)) =
       rweq_toEq ((pathHomGroupoid (A := A) a b).id₂ p) := by
-  apply Subsingleton.elim
+  change
+    rweq_toEq (RwEq.trans α (RwEq.symm α)) =
+      rweq_toEq (RwEq.refl p)
+  induction α with
+  | refl _ =>
+      rfl
+  | step s =>
+      cases step_toEq s
+      rfl
+  | symm h ih =>
+      cases e : rweq_toEq h
+      rfl
+  | trans h₁ h₂ ih₁ ih₂ =>
+      cases e₁ : rweq_toEq h₁
+      cases e₂ : rweq_toEq h₂
+      rfl
 
 theorem twoCellInverse_right_toEq
     {a b : A} {p q : Path a b} (α : RwEq p q) :
     rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂ (twoCellInverse (A := A) α) α) =
       rweq_toEq ((pathHomGroupoid (A := A) a b).id₂ q) := by
-  apply Subsingleton.elim
+  change
+    rweq_toEq (RwEq.trans (RwEq.symm α) α) =
+      rweq_toEq (RwEq.refl q)
+  induction α with
+  | refl _ =>
+      rfl
+  | step s =>
+      cases step_toEq s
+      rfl
+  | symm h ih =>
+      cases e : rweq_toEq h
+      rfl
+  | trans h₁ h₂ ih₁ ih₂ =>
+      cases e₁ : rweq_toEq h₁
+      cases e₂ : rweq_toEq h₂
+      rfl
 
 /-- Local groupoidality: each 2-cell admits a two-sided inverse (at `toEq` level). -/
 theorem locally_groupoidal
