@@ -16,6 +16,8 @@ namespace ComputationalPaths
 namespace Path
 namespace Homological
 
+noncomputable section
+
 open Path
 
 universe u v w
@@ -47,7 +49,7 @@ def HomStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .assoc p q r => Path.Step.trans_assoc p q r
   | .symm_distrib p q => Path.Step.symm_trans_congr p q
 
-theorem rweq_of_hom_step {A : Type u} {a b : A}
+def rweq_of_hom_step {A : Type u} {a b : A}
     {p q : Path a b} (s : HomStep p q) : RwEq p q :=
   rweq_of_step (HomStep.toStep s)
 
@@ -57,31 +59,31 @@ section CoreLemmas
 
 variable {A : Type u} {a b c : A}
 
-theorem hom_right_unit (p : Path a b) :
+def hom_right_unit (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p :=
   rweq_of_hom_step (HomStep.right_unit p)
 
-theorem hom_left_unit (p : Path a b) :
+def hom_left_unit (p : Path a b) :
     RwEq (Path.trans (Path.refl a) p) p :=
   rweq_of_hom_step (HomStep.left_unit p)
 
-theorem hom_inverse_cancel (p : Path a b) :
+def hom_inverse_cancel (p : Path a b) :
     RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
   rweq_of_hom_step (HomStep.inverse_cancel p)
 
-theorem hom_inverse_cancel_left (p : Path a b) :
+def hom_inverse_cancel_left (p : Path a b) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl b) :=
   rweq_of_hom_step (HomStep.inverse_cancel_left p)
 
-theorem hom_assoc (p : Path a b) (q : Path b c) {d : A} (r : Path c d) :
+def hom_assoc (p : Path a b) (q : Path b c) {d : A} (r : Path c d) :
     RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   rweq_of_hom_step (HomStep.assoc p q r)
 
-theorem hom_symm_distrib (p : Path a b) (q : Path b c) :
+def hom_symm_distrib (p : Path a b) (q : Path b c) :
     RwEq (Path.symm (Path.trans p q)) (Path.trans (Path.symm q) (Path.symm p)) :=
   rweq_of_hom_step (HomStep.symm_distrib p q)
 
-theorem hom_symm_symm (p : Path a b) :
+def hom_symm_symm (p : Path a b) :
     Path.symm (Path.symm p) = p := by
   cases p with
   | mk steps proof => cases proof; simp [Path.symm, List.map_map, Function.comp]
@@ -89,7 +91,7 @@ theorem hom_symm_symm (p : Path a b) :
                       | nil => rfl
                       | cons s t ih => simp [List.map, Step.symm_symm, ih]
 
-theorem hom_congrArg_trans {B : Type u} (f : A → B)
+def hom_congrArg_trans {B : Type u} (f : A → B)
     (p : Path a b) (q : Path b c) :
     Path.congrArg f (Path.trans p q) =
     Path.trans (Path.congrArg f p) (Path.congrArg f q) := by
@@ -97,14 +99,14 @@ theorem hom_congrArg_trans {B : Type u} (f : A → B)
   | mk sp pp => cases q with
     | mk sq pq => cases pp; cases pq; simp [Path.congrArg, Path.trans, List.map_append]
 
-theorem hom_congrArg_symm {B : Type u} (f : A → B) (p : Path a b) :
+def hom_congrArg_symm {B : Type u} (f : A → B) (p : Path a b) :
     Path.congrArg f (Path.symm p) =
     Path.symm (Path.congrArg f p) := by
   cases p with
   | mk steps proof =>
     cases proof; simp [Path.congrArg, Path.symm, List.map_reverse, List.map_map]
 
-theorem hom_congrArg_refl {B : Type u} (f : A → B) :
+def hom_congrArg_refl {B : Type u} (f : A → B) :
     Path.congrArg f (Path.refl a) = Path.refl (f a) := by
   simp [Path.congrArg, Path.refl]
 
@@ -140,15 +142,15 @@ def negAdd (x : A) : Path (R.add (R.neg x) x) R.zero :=
 def negZero (hNegZero : Path (R.neg R.zero) R.zero) :
     Path (R.neg R.zero) R.zero := hNegZero
 
-theorem addAssoc_rweq (x y z : A) :
+def addAssoc_rweq (x y z : A) :
     RwEq (Path.trans (R.addAssoc x y z) (Path.refl _)) (R.addAssoc x y z) :=
   hom_right_unit _
 
-theorem addZero_rweq (x : A) :
+def addZero_rweq (x : A) :
     RwEq (Path.trans (R.addZero x) (Path.refl _)) (R.addZero x) :=
   hom_right_unit _
 
-theorem addNeg_roundtrip (x : A) :
+def addNeg_roundtrip (x : A) :
     RwEq (Path.trans (R.addNeg x) (Path.symm (R.addNeg x))) (Path.refl _) :=
   hom_inverse_cancel _
 
@@ -177,7 +179,7 @@ def shift (k : Nat) : ChainComplexData A where
     rw [h]
     exact C.ddZero (n + k) x
 
-theorem ddZero_rweq (n : Nat) (x : A) :
+def ddZero_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (C.ddZero n x) (Path.refl _)) (C.ddZero n x) :=
   hom_right_unit _
 
@@ -226,7 +228,7 @@ def compAssocPath (φ : ChainMapData A C D) (ψ : ChainMapData A D E)
     Path ((comp (comp φ ψ) χ).f n x) ((comp φ (comp ψ χ)).f n x) :=
   Path.refl _
 
-theorem naturality_rweq (φ : ChainMapData A C D) (n : Nat) (x : A) :
+def naturality_rweq (φ : ChainMapData A C D) (n : Nat) (x : A) :
     RwEq (Path.trans (φ.naturality n x) (Path.refl _)) (φ.naturality n x) :=
   hom_right_unit _
 
@@ -261,7 +263,7 @@ def exactRoundtrip (x : A) :
     Path (S.f (S.exactConv (S.f x) (S.exact x)).1) (S.f x) :=
   (S.exactConv (S.f x) (S.exact x)).2
 
-theorem exact_rweq (x : A) :
+def exact_rweq (x : A) :
     RwEq (Path.trans (S.exact x) (Path.refl _)) (S.exact x) :=
   hom_right_unit _
 
@@ -305,11 +307,11 @@ def snakeWellDef (x : A) (hx : Path (S.γ x) S.botSES.zero)
     Path (S.botSES.g (S.β l1)) (S.botSES.g (S.β l2)) :=
   Path.trans (S.snakeConnect x hx l1 h1) (Path.symm (S.snakeConnect x hx l2 h2))
 
-theorem outerRect_rweq (x : A) :
+def outerRect_rweq (x : A) :
     RwEq (Path.trans (S.outerRect x) (Path.refl _)) (S.outerRect x) :=
   hom_right_unit _
 
-theorem snake_roundtrip (x : A) (hx : Path (S.γ x) S.botSES.zero)
+def snake_roundtrip (x : A) (hx : Path (S.γ x) S.botSES.zero)
     (lift : A) (hlift : Path (S.topSES.g lift) x) :
     RwEq
       (Path.trans (S.snakeConnect x hx lift hlift)
@@ -354,11 +356,11 @@ def outerRectZeroBot (x : A) :
 def fiveInject (x : A) (hx : Path (F.v2 x) F.zero) :
     Path (F.v2 x) F.zero := hx
 
-theorem outerRect_rweq (x : A) :
+def outerRect_rweq (x : A) :
     RwEq (Path.trans (F.outerRect x) (Path.refl _)) (F.outerRect x) :=
   hom_right_unit _
 
-theorem five_coherence (x : A) :
+def five_coherence (x : A) :
     RwEq
       (Path.trans (F.outerRectZeroTop x) (Path.refl _))
       (F.outerRectZeroTop x) :=
@@ -384,7 +386,7 @@ def augmentedDdZero (x : A) : Path (P.augment (P.chain.diff 1 x)) P.target :=
 def uniquePath (Q : ProjResData A) (h : Path P.target Q.target) :
     Path P.target Q.target := h
 
-theorem augDZero_rweq (x : A) :
+def augDZero_rweq (x : A) :
     RwEq (Path.trans (P.augDZero x) (Path.refl _)) (P.augDZero x) :=
   hom_right_unit _
 
@@ -409,7 +411,7 @@ variable {A : Type u} (E : ExtFunctorData A)
 
 def extZero : Path (E.ext 0) E.src := E.ext0
 
-theorem ext0_rweq :
+def ext0_rweq :
     RwEq (Path.trans E.ext0 (Path.refl _)) E.ext0 :=
   hom_right_unit _
 
@@ -426,7 +428,7 @@ variable {A : Type u} (T : TorFunctorData A)
 
 def torZero : Path (T.tor 0) T.src := T.tor0
 
-theorem tor0_rweq :
+def tor0_rweq :
     RwEq (Path.trans T.tor0 (Path.refl _)) T.tor0 :=
   hom_right_unit _
 
@@ -462,15 +464,15 @@ def fullCycle (n : Nat) (x : A) :
     (Path (L.fStar n (L.delta (n + 1) x)) L.zero) :=
   ⟨L.gfZero n x, L.deltaGZero n x, L.fDeltaZero n x⟩
 
-theorem les_gf_rweq (n : Nat) (x : A) :
+def les_gf_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (L.exactAtB n x) (Path.refl _)) (L.exactAtB n x) :=
   hom_right_unit _
 
-theorem les_delta_rweq (n : Nat) (x : A) :
+def les_delta_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (L.exactAtC n x) (Path.refl _)) (L.exactAtC n x) :=
   hom_right_unit _
 
-theorem les_assoc (n : Nat) (x : A) (p q : Path L.zero L.zero) :
+def les_assoc (n : Nat) (x : A) (p q : Path L.zero L.zero) :
     RwEq
       (Path.trans (Path.trans (L.exactAtB n x) p) q)
       (Path.trans (L.exactAtB n x) (Path.trans p q)) :=
@@ -496,7 +498,7 @@ def horseshoeDdZero (n : Nat) (x : A) :
     Path (H.resBDiff n (H.resBDiff (n + 1) x)) x :=
   H.resBDdZero n x
 
-theorem horseshoe_rweq (n : Nat) (x : A) :
+def horseshoe_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (H.resBDdZero n x) (Path.refl _)) (H.resBDdZero n x) :=
   hom_right_unit _
 
@@ -519,7 +521,7 @@ def regularAcyclic (isReg : ∀ (n : Nat) (x : A), Path (K.diff n x) x)
     (n : Nat) (x : A) : Path (K.diff n (K.diff (n + 1) x)) x :=
   K.ddZero n x
 
-theorem koszul_rweq (n : Nat) (x : A) :
+def koszul_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (K.ddZero n x) (Path.refl _)) (K.ddZero n x) :=
   hom_right_unit _
 
@@ -545,11 +547,11 @@ def dhSquaredZero (p q : Nat) (x : A) : Path (D.dh p q (D.dh (p + 1) q x)) x :=
 def dvSquaredZero (p q : Nat) (x : A) : Path (D.dv p q (D.dv p (q + 1) x)) x :=
   D.dvdvZero p q x
 
-theorem dh_rweq (p q : Nat) (x : A) :
+def dh_rweq (p q : Nat) (x : A) :
     RwEq (Path.trans (D.dhdhZero p q x) (Path.refl _)) (D.dhdhZero p q x) :=
   hom_right_unit _
 
-theorem dv_rweq (p q : Nat) (x : A) :
+def dv_rweq (p q : Nat) (x : A) :
     RwEq (Path.trans (D.dvdvZero p q x) (Path.refl _)) (D.dvdvZero p q x) :=
   hom_right_unit _
 
@@ -573,7 +575,7 @@ def toChainComplex : ChainComplexData A where
   diff := T.diff
   ddZero := T.ddZero
 
-theorem total_rweq (n : Nat) (x : A) :
+def total_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (T.ddZero n x) (Path.refl _)) (T.ddZero n x) :=
   hom_right_unit _
 
@@ -600,7 +602,7 @@ def pageStabilize (r p q : Nat)
     Path (SS.page (r + 1) p q) (SS.page r p q) :=
   hr (r + 1) (Nat.le_succ r)
 
-theorem page_rweq (r p q : Nat) (x : A) :
+def page_rweq (r p q : Nat) (x : A) :
     RwEq (Path.trans (SS.ddZero r p q x) (Path.refl _)) (SS.ddZero r p q x) :=
   hom_right_unit _
 
@@ -627,7 +629,7 @@ def toChainComplex : ChainComplexData A where
   diff := M.coneDiff
   ddZero := M.coneDdZero
 
-theorem cone_rweq (n : Nat) (x : A) :
+def cone_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (M.coneDdZero n x) (Path.refl _)) (M.coneDdZero n x) :=
   hom_right_unit _
 
@@ -655,7 +657,7 @@ def functorialPath (D : HomologyObjData A) (f : ChainMapData A H.chain D.chain)
     Path (D.cycles n (f.f n (H.cycles n x))) (D.cycles n (f.f n (H.cycles n x))) :=
   Path.refl _
 
-theorem bdy_rweq (n : Nat) (x : A) :
+def bdy_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (H.bdyIsCycle n x) (Path.refl _)) (H.bdyIsCycle n x) :=
   hom_right_unit _
 
@@ -682,23 +684,23 @@ def rotate : ExactTriData A where
 
 def rotate2 : ExactTriData A := T.rotate.rotate
 
-theorem rotate3_f : T.rotate2.rotate.f = T.f := rfl
-theorem rotate3_g : T.rotate2.rotate.g = T.g := rfl
-theorem rotate3_h : T.rotate2.rotate.h = T.h := rfl
-theorem rotate3_zero : T.rotate2.rotate.zero = T.zero := rfl
+def rotate3_f : T.rotate2.rotate.f = T.f := rfl
+def rotate3_g : T.rotate2.rotate.g = T.g := rfl
+def rotate3_h : T.rotate2.rotate.h = T.h := rfl
+def rotate3_zero : T.rotate2.rotate.zero = T.zero := rfl
 
 def rotateGfZero (a : A) : Path (T.rotate.g (T.rotate.f a)) T.rotate.zero :=
   T.rotate.gfZero a
 
-theorem gfZero_rweq (a : A) :
+def gfZero_rweq (a : A) :
     RwEq (Path.trans (T.gfZero a) (Path.refl _)) (T.gfZero a) :=
   hom_right_unit _
 
-theorem hgZero_rweq (a : A) :
+def hgZero_rweq (a : A) :
     RwEq (Path.trans (T.hgZero a) (Path.refl _)) (T.hgZero a) :=
   hom_right_unit _
 
-theorem fhZero_rweq (a : A) :
+def fhZero_rweq (a : A) :
     RwEq (Path.trans (T.fhZero a) (Path.refl _)) (T.fhZero a) :=
   hom_right_unit _
 
@@ -718,11 +720,11 @@ variable {A : Type u} (B : BalancingTor A)
 def balanced (n : Nat) : Path (B.torL n) (B.torR n) := B.balance n
 def balancedSymm (n : Nat) : Path (B.torR n) (B.torL n) := Path.symm (B.balance n)
 
-theorem balance_roundtrip (n : Nat) :
+def balance_roundtrip (n : Nat) :
     RwEq (Path.trans (B.balance n) (Path.symm (B.balance n))) (Path.refl _) :=
   hom_inverse_cancel _
 
-theorem balance_roundtrip_left (n : Nat) :
+def balance_roundtrip_left (n : Nat) :
     RwEq (Path.trans (Path.symm (B.balance n)) (B.balance n)) (Path.refl _) :=
   hom_inverse_cancel_left _
 
@@ -758,11 +760,11 @@ def pentagon (n : Nat) (w x y z : A) :
   have h2 := Y.baerAssoc n w x (Y.baerSum n y z)
   exact Path.trans h1 h2
 
-theorem assoc_rweq (n : Nat) (x y z : A) :
+def assoc_rweq (n : Nat) (x y z : A) :
     RwEq (Path.trans (Y.baerAssoc n x y z) (Path.refl _)) (Y.baerAssoc n x y z) :=
   hom_right_unit _
 
-theorem comm_rweq (n : Nat) (x y : A) :
+def comm_rweq (n : Nat) (x y : A) :
     RwEq (Path.trans (Y.baerComm n x y) (Path.refl _)) (Y.baerComm n x y) :=
   hom_right_unit _
 
@@ -784,7 +786,7 @@ variable {A : Type u} (U : UCTSplit A)
 def uctSplit (n : Nat) : Path (U.cohomology n) (U.add (U.homPart n) (U.extPart n)) :=
   U.split n
 
-theorem uct_rweq (n : Nat) :
+def uct_rweq (n : Nat) :
     RwEq (Path.trans (U.split n) (Path.refl _)) (U.split n) :=
   hom_right_unit _
 
@@ -811,7 +813,7 @@ def torFreeSplit (n : Nat) (torZero : Path (K.torTerm n) (K.tensorSum n)) :
     Path (K.tensorHom n) (K.add (K.tensorSum n) (K.tensorSum n)) :=
   Path.trans (K.split n) (Path.congrArg (K.add (K.tensorSum n)) torZero)
 
-theorem kunneth_rweq (n : Nat) :
+def kunneth_rweq (n : Nat) :
     RwEq (Path.trans (K.split n) (Path.refl _)) (K.split n) :=
   hom_right_unit _
 
@@ -830,11 +832,11 @@ variable {A : Type u} (D : DimShift A)
 
 def dimShift (n : Nat) : Path (D.ext (n + 1)) (D.extShifted n) := D.shift n
 
-theorem shift_rweq (n : Nat) :
+def shift_rweq (n : Nat) :
     RwEq (Path.trans (D.shift n) (Path.refl _)) (D.shift n) :=
   hom_right_unit _
 
-theorem shift_roundtrip (n : Nat) :
+def shift_roundtrip (n : Nat) :
     RwEq (Path.trans (D.shift n) (Path.symm (D.shift n))) (Path.refl _) :=
   hom_inverse_cancel _
 
@@ -857,7 +859,7 @@ def ssDdZero (r p q : Nat) (x : A) :
     Path (G.ssData.pageDiff r p q (G.ssData.pageDiff r (p + r) (q + 1) x)) x :=
   G.ssData.ddZero r p q x
 
-theorem e2_rweq (p q : Nat) :
+def e2_rweq (p q : Nat) :
     RwEq (Path.trans (G.e2Id p q) (Path.refl _)) (G.e2Id p q) :=
   hom_right_unit _
 
@@ -876,11 +878,11 @@ variable {A : Type u} (C : ComparisonThm A)
 
 def comparison : Path C.res1.target C.res2.target := C.agree
 
-theorem comparison_rweq :
+def comparison_rweq :
     RwEq (Path.trans C.agree (Path.refl _)) C.agree :=
   hom_right_unit _
 
-theorem comparison_roundtrip :
+def comparison_roundtrip :
     RwEq (Path.trans C.agree (Path.symm C.agree)) (Path.refl _) :=
   hom_inverse_cancel _
 
@@ -900,7 +902,7 @@ variable {A : Type u} (D : DerivedLoc A)
 def locQuasiIso (x : A) : Path (D.localize (D.qiso x)) (D.localize x) :=
   D.locQiso x
 
-theorem loc_rweq (x : A) :
+def loc_rweq (x : A) :
     RwEq (Path.trans (D.locQiso x) (Path.refl _)) (D.locQiso x) :=
   hom_right_unit _
 
@@ -926,7 +928,7 @@ def toChainComplex : ChainComplexData A where
   diff := M.cylDiff
   ddZero := M.cylDdZero
 
-theorem cyl_rweq (n : Nat) (x : A) :
+def cyl_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (M.cylDdZero n x) (Path.refl _)) (M.cylDdZero n x) :=
   hom_right_unit _
 
@@ -945,7 +947,7 @@ variable {A : Type u} (L : LeftDerived A)
 
 def leftDerivedZero (x : A) : Path (L.derived 0 x) (L.func x) := L.d0 x
 
-theorem ld0_rweq (x : A) :
+def ld0_rweq (x : A) :
     RwEq (Path.trans (L.d0 x) (Path.refl _)) (L.d0 x) :=
   hom_right_unit _
 
@@ -962,11 +964,13 @@ variable {A : Type u} (R : RightDerived A)
 
 def rightDerivedZero (x : A) : Path (R.derived 0 x) (R.func x) := R.d0 x
 
-theorem rd0_rweq (x : A) :
+def rd0_rweq (x : A) :
     RwEq (Path.trans (R.d0 x) (Path.refl _)) (R.d0 x) :=
   hom_right_unit _
 
 end RightDerived
+
+end
 
 end Homological
 end Path
