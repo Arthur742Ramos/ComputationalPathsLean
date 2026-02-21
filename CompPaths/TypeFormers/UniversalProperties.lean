@@ -1,4 +1,5 @@
 import CompPaths.Core
+import CompPaths.TypeFormers.BetaEtaDeep
 
 namespace CompPaths.TypeFormers
 
@@ -71,11 +72,7 @@ variable {a₁ a₂ : A} {b₁ b₂ : B}
     Path (Sum.inr b₁ : Sum A B) (Sum.inr b₂) :=
   Path.inrCongr p
 
-@[simp] def copair (f : A → C) (g : B → C) : Sum A B → C :=
-  fun s =>
-    match s with
-    | Sum.inl a => f a
-    | Sum.inr b => g b
+-- copair is imported from BetaEtaDeep
 
 @[simp] def caseInlStep (f : A → C) (g : B → C) (p : Path a₁ a₂) :
     Step (Path.congrArg (copair f g) (inlPath p)) (Path.congrArg f p) := by

@@ -1,3 +1,9 @@
+import CompPaths.Core
+import ComputationalPaths.Path.Homotopy.SeifertVanKampen
+import ComputationalPaths.Path.CompPath.FigureEightStep
+import ComputationalPaths.Path.CompPath.KleinBottleStep
+import ComputationalPaths.Path.CompPath.ProjectivePlaneStep
+
 /-!
 # Van Kampen applications in computational paths
 
@@ -8,12 +14,6 @@ path decompositions and `RwEq` identifications:
 2. `π₁(Klein bottle)` via the relator decomposition `a b a⁻¹ b`.
 3. `π₁(RP²)` via the order-two decomposition of the generator.
 -/
-
-import CompPaths.Core
-import ComputationalPaths.Path.Homotopy.SeifertVanKampen
-import ComputationalPaths.Path.CompPath.FigureEightStep
-import ComputationalPaths.Path.CompPath.KleinBottleStep
-import ComputationalPaths.Path.CompPath.ProjectivePlaneStep
 
 namespace CompPaths
 namespace Homotopy

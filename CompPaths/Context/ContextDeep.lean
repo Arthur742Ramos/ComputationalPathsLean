@@ -78,13 +78,7 @@ noncomputable def context_map_trans_commutes
     (p : Path a b) (q : Path b c) :
     RwEq (Context.map C (Path.trans p q))
       (Path.trans (Context.map C p) (Context.map C q)) := by
-  cases p with
-  | mk steps₁ proof₁ =>
-      cases q with
-      | mk steps₂ proof₂ =>
-          cases proof₁
-          cases proof₂
-          exact RwEq.refl _
+  exact rweq_context_map_trans C p q
 
 /-- Congruence closure for trans under context application. -/
 noncomputable def context_trans_congruence_closure
