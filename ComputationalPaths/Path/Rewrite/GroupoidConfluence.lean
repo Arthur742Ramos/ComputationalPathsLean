@@ -47,6 +47,7 @@ locally confluent (see `NewmanLemma.lean` for the critical pair witness).
 import ComputationalPaths.Path.Rewrite.GroupoidTRS
 import ComputationalPaths.Path.Rewrite.NewmanLemma
 import ComputationalPaths.Path.Rewrite.PathExpr
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 namespace ComputationalPaths.Path.Rewrite.GroupoidConfluence
 
@@ -818,6 +819,106 @@ theorem toRW_characterizes_joinability (e₁ e₂ : Expr) :
   · exact church_rosser e₁ e₂
   · rintro ⟨d, h₁, h₂⟩
     rw [toRW_invariant_rtc h₁, toRW_invariant_rtc h₂]
+
+/-! ## Expr-Level Rewrite Equivalence (`ExprRwEq`) -/
+
+/-- Symmetric reflexive-transitive closure of `CStep` on `Expr`. -/
+inductive ExprRwEq : Expr → Expr → Prop where
+  | refl (e : Expr) : ExprRwEq e e
+  | step {e₁ e₂ : Expr} : CStep e₁ e₂ → ExprRwEq e₁ e₂
+  | symm {e₁ e₂ : Expr} : ExprRwEq e₁ e₂ → ExprRwEq e₂ e₁
+  | trans {e₁ e₂ e₃ : Expr} : ExprRwEq e₁ e₂ → ExprRwEq e₂ e₃ → ExprRwEq e₁ e₃
+
+theorem toRW_eq_of_exprRwEq {e₁ e₂ : Expr} (h : ExprRwEq e₁ e₂) :
+    toRW e₁ = toRW e₂ := by
+  induction h with
+  | refl _ => rfl
+  | step hstep => exact toRW_invariant hstep
+  | symm _ ih => exact ih.symm
+  | trans _ _ ih₁ ih₂ => exact ih₁.trans ih₂
+
+theorem exprRwEq_of_crtc {e₁ e₂ : Expr} (h : CRTC e₁ e₂) :
+    ExprRwEq e₁ e₂ := by
+  induction h with
+  | refl => exact ExprRwEq.refl _
+  | head s _ ih => exact ExprRwEq.trans (ExprRwEq.step s) ih
+
+theorem toRW_eq_iff_exprRwEq (e₁ e₂ : Expr) :
+    toRW e₁ = toRW e₂ ↔ ExprRwEq e₁ e₂ := by
+  constructor
+  · intro h
+    rcases (toRW_characterizes_joinability e₁ e₂).1 h with ⟨d, h₁, h₂⟩
+    exact ExprRwEq.trans (exprRwEq_of_crtc h₁) (ExprRwEq.symm (exprRwEq_of_crtc h₂))
+  · intro h
+    exact toRW_eq_of_exprRwEq h
+
+theorem canon_eq_iff_toRW_eq (e₁ e₂ : Expr) :
+    canon e₁ = canon e₂ ↔ toRW e₁ = toRW e₂ := by
+  constructor
+  · intro h
+    have hTo : toRW (canon e₁) = toRW (canon e₂) := by
+      simp [h]
+    simpa [canon, toRW_rwToExpr_of_reduced (w := toRW e₁) (toRW_reduced e₁),
+      toRW_rwToExpr_of_reduced (w := toRW e₂) (toRW_reduced e₂)] using hTo
+  · intro h
+    unfold canon
+    simp [h]
+
+theorem exprRwEq_iff_canon_eq (e₁ e₂ : Expr) :
+    ExprRwEq e₁ e₂ ↔ canon e₁ = canon e₂ := by
+  constructor
+  · intro h
+    exact (canon_eq_iff_toRW_eq e₁ e₂).2 (toRW_eq_of_exprRwEq h)
+  · intro h
+    exact (toRW_eq_iff_exprRwEq e₁ e₂).1 ((canon_eq_iff_toRW_eq e₁ e₂).1 h)
+
+instance exprRwEqDecidable (e₁ e₂ : Expr) : Decidable (ExprRwEq e₁ e₂) := by
+  refine
+    match (inferInstance : Decidable (canon e₁ = canon e₂)) with
+    | isTrue h => isTrue ((exprRwEq_iff_canon_eq e₁ e₂).2 h)
+    | isFalse h => isFalse (fun hEq => h ((exprRwEq_iff_canon_eq e₁ e₂).1 hEq))
+
+/-- Quotient of expressions by `ExprRwEq`. -/
+abbrev ExprRwQuot := Quot ExprRwEq
+
+/-- Reduced free-group words. -/
+abbrev ReducedWord := {w : List Gen // Reduced w}
+
+def exprRwQuotToReduced : ExprRwQuot → ReducedWord :=
+  Quot.lift
+    (fun e => ⟨toRW e, toRW_reduced e⟩)
+    (fun _ _ h => Subtype.ext (toRW_eq_of_exprRwEq h))
+
+def reducedToExprRwQuot : ReducedWord → ExprRwQuot :=
+  fun w => Quot.mk _ (rwToExpr w.1)
+
+@[simp] theorem exprRwQuotToReduced_mk (e : Expr) :
+    exprRwQuotToReduced (Quot.mk _ e) = ⟨toRW e, toRW_reduced e⟩ := rfl
+
+@[simp] theorem exprRwQuotToReduced_reducedToExprRwQuot (w : ReducedWord) :
+    exprRwQuotToReduced (reducedToExprRwQuot w) = w := by
+  rcases w with ⟨w, hw⟩
+  apply Subtype.ext
+  simp [reducedToExprRwQuot, exprRwQuotToReduced, toRW_rwToExpr_of_reduced, hw]
+
+@[simp] theorem reducedToExprRwQuot_exprRwQuotToReduced (q : ExprRwQuot) :
+    reducedToExprRwQuot (exprRwQuotToReduced q) = q := by
+  refine Quot.inductionOn q ?_
+  intro e
+  change Quot.mk _ (rwToExpr (toRW e)) = Quot.mk _ e
+  exact Quot.sound (ExprRwEq.symm (exprRwEq_of_crtc (reach_canon e)))
+
+/-- `Expr/ExprRwEq` is isomorphic to reduced free-group words. -/
+def exprRwQuotEquivReducedWord : SimpleEquiv ExprRwQuot ReducedWord where
+  toFun := exprRwQuotToReduced
+  invFun := reducedToExprRwQuot
+  left_inv := reducedToExprRwQuot_exprRwQuotToReduced
+  right_inv := exprRwQuotToReduced_reducedToExprRwQuot
+
+theorem separation_of_toRW_ne {e₁ e₂ : Expr} (h : toRW e₁ ≠ toRW e₂) :
+    ¬ ExprRwEq e₁ e₂ := by
+  intro hEq
+  exact h (toRW_eq_of_exprRwEq hEq)
 
 /-! ## Diamond Property and Confluence -/
 
