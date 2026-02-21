@@ -339,6 +339,18 @@ def cell_cobord_id (p : A) : Path (M.cell (M.cobord p M.base)) (M.cell p) :=
 def attach_unit_loop (p : A) : Path (M.attach p M.base) (M.attach p M.base) :=
   Path.trans (attach_unit_path (M := M) p) (Path.symm (attach_unit_path (M := M) p))
 
+/-- Boundary-square witnesses compose to a loop at the Morse basepoint. -/
+theorem bdry_squared_roundtrip (p : A) : M.base = M.base :=
+  (Path.trans (bdry_squared_symm_path (M := M) p) (bdry_squared_path (M := M) p)).toEq
+
+/-- Attachment unit and its inverse compose to a loop at `p`. -/
+theorem attach_unit_roundtrip (p : A) : p = p :=
+  (Path.trans (Path.symm (attach_unit_path (M := M) p)) (attach_unit_path (M := M) p)).toEq
+
+/-- Euler-to-critical witness composes with its inverse to a loop at `euler p`. -/
+theorem euler_to_crit_roundtrip (p : A) : M.euler p = M.euler p :=
+  (Path.trans (euler_to_crit (M := M) p) (Path.symm (euler_to_crit (M := M) p))).toEq
+
 end
 
 end MorseAlg

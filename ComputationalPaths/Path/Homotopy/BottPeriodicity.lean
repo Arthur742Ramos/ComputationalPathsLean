@@ -239,12 +239,26 @@ end CannibalisticClass
 
 namespace PointedEquiv
 
+/-- Converting to a pointed map keeps the recorded basepoint equality. -/
+theorem toPointedMap_map_pt {X Y : Pointed} (e : PointedEquiv X Y) :
+    (toPointedMap e).map_pt = e.map_pt.toEq :=
+  rfl
+
+/-- The identity pointed equivalence induces the identity function. -/
+theorem refl_toPointedMap_toFun (X : Pointed) :
+    (toPointedMap (refl X)).toFun = id :=
+  rfl
 
 
 
 end PointedEquiv
 
 namespace BottPeriodicityData
+
+/-- The Bott map preserves basepoints by construction. -/
+theorem bottMap_map_pt {BU : Pointed} (B : BottPeriodicityData BU) :
+    (B.bottMap).map_pt = B.bott_equiv.map_pt.toEq :=
+  rfl
 
 
 
@@ -268,6 +282,16 @@ namespace ClutchingConstruction
 end ClutchingConstruction
 
 namespace AdamsOperation
+
+/-- The trivial Adams operation acts as identity at every index. -/
+theorem trivial_psi_eval {M : Type u} (S : StrictMonoid M) (k : Nat) (x : KTheory.K0 S) :
+    (AdamsOperation.trivial S).psi k x = x :=
+  rfl
+
+/-- The `psi^1` path of the trivial Adams operation is reflexive. -/
+theorem trivial_psi_one_path {M : Type u} (S : StrictMonoid M) (x : KTheory.K0 S) :
+    AdamsOperation.psi_one_path (AdamsOperation.trivial S) x = Path.stepChain rfl :=
+  rfl
 
 
 

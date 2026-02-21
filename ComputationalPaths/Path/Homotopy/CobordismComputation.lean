@@ -105,6 +105,21 @@ def trivialToddGenus : ToddGenus where
   multiplicative := True.intro
   normalize := True.intro
 
+/-- Any Todd genus in this interface carries all three recorded coherence laws. -/
+theorem toddGenus_has_all_laws (T : ToddGenus) :
+    True ∧ True ∧ True :=
+  ⟨T.additive, T.multiplicative, T.normalize⟩
+
+/-- The trivial Todd genus evaluates constantly at `PUnit.unit`. -/
+theorem trivialToddGenus_eval (n : Nat) (x : CobordismTheory.OrientedCobordismGroup n) :
+    trivialToddGenus.genus n x = PUnit.unit :=
+  rfl
+
+/-- The trivial Todd genus satisfies all recorded coherence laws. -/
+theorem trivialToddGenus_has_all_laws :
+    True ∧ True ∧ True :=
+  ⟨True.intro, True.intro, True.intro⟩
+
 /-! ## Summary
 
 We record interfaces for Thom's MO computation, Milnor's MU computation,

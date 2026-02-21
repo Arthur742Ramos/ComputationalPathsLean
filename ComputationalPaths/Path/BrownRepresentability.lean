@@ -124,6 +124,28 @@ def brown_representability {A : Type u} {F : PathContraFunctor A}
 
 /-! ## Basic properties and coherence lemmas -/
 
+/-- Pointwise left inverse property of `wedge_equiv`. -/
+theorem wedge_equiv_inv_toFun {A : Type u} {F : PathContraFunctor A}
+    (W : WedgeAxiom A F) (MV : MayerVietorisAxiom A F W) (b : A) (x : F.obj b) :
+    (wedge_equiv (W := W) (MV := MV) b).invFun ((wedge_equiv (W := W) (MV := MV) b).toFun x) = x :=
+  (wedge_equiv (W := W) (MV := MV) b).left_inv x
+
+/-- Pointwise right inverse property of `wedge_equiv`. -/
+theorem wedge_equiv_toFun_inv {A : Type u} {F : PathContraFunctor A}
+    (W : WedgeAxiom A F) (MV : MayerVietorisAxiom A F W)
+    (b : A) (p : FundamentalGroupoid.Hom A b W.obj) :
+    (wedge_equiv (W := W) (MV := MV) b).toFun ((wedge_equiv (W := W) (MV := MV) b).invFun p) = p :=
+  (wedge_equiv (W := W) (MV := MV) b).right_inv p
+
+/-- Naturality recovered from `brown_representability`. -/
+theorem brown_representability_naturality {A : Type u} {F : PathContraFunctor A}
+    (W : WedgeAxiom A F) (MV : MayerVietorisAxiom A F W)
+    {b c : A} (p : FundamentalGroupoid.Hom A b c) (x : F.obj c) :
+    ((brown_representability (W := W) (MV := MV)).equiv b).toFun (F.map p x) =
+      FundamentalGroupoid.comp' A p
+        (((brown_representability (W := W) (MV := MV)).equiv c).toFun x) :=
+  (brown_representability (W := W) (MV := MV)).naturality p x
+
 
 
 

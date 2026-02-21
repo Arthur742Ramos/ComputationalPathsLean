@@ -34,6 +34,29 @@ def EqTwoCat : StrictTwoCategory.{u+1, u, 0} where
   leftId₁ := fun _ => rfl
   rightId₁ := fun _ => rfl
 
+/-- Left unit for vertical composition in `EqTwoCat`, computed directly. -/
+theorem eqTwoCat_vcomp_id_left {A B : Type u} {f g : A → B}
+    (α : PLift (f = g)) :
+    EqTwoCat.vcomp (EqTwoCat.id₂ f) α = α := by
+  cases α
+  rfl
+
+/-- Right unit for vertical composition in `EqTwoCat`, computed directly. -/
+theorem eqTwoCat_vcomp_id_right {A B : Type u} {f g : A → B}
+    (α : PLift (f = g)) :
+    EqTwoCat.vcomp α (EqTwoCat.id₂ g) = α := by
+  cases α
+  rfl
+
+/-- Associativity of vertical composition follows by direct path computation. -/
+theorem eqTwoCat_vcomp_assoc_explicit {A B : Type u} {f g h i : A → B}
+    (α : PLift (f = g)) (β : PLift (g = h)) (γ : PLift (h = i)) :
+    EqTwoCat.vcomp (EqTwoCat.vcomp α β) γ = EqTwoCat.vcomp α (EqTwoCat.vcomp β γ) := by
+  cases α
+  cases β
+  cases γ
+  rfl
+
 -- Any two elements of `PLift (f = g)` are equal.
 private theorem plift_eq_subsingleton {α : Prop} (a b : PLift α) : a = b := by
   cases a; cases b; congr

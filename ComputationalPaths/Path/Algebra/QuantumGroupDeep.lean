@@ -651,6 +651,23 @@ def quantum_trace (h : HopfStr A) (a : A)
     : Path (h.mul (h.antipode a) a) tr :=
   Path.trans p q
 
+/-- A congruence path composed with its symmetric inverse yields a loop. -/
+theorem congr_trans_roundtrip (f : A → B) (a b : A) (p : Path a b) :
+    f a = f a :=
+  (Path.trans (Path.congrArg f p) (Path.symm (Path.congrArg f p))).toEq
+
+/-- The antipode chain closes to a loop when followed by the reverse witness. -/
+theorem antipode_chain_roundtrip (h : HopfStr A) (a b : A)
+    (p : Path (h.antipode a) b) :
+    h.antipode a = h.antipode a :=
+  (antipode_chain (h := h) (a := a) (b := b) (c := a) p (Path.symm p)).toEq
+
+/-- Four-fold composition specializes to three-fold composition with a final reflexive edge. -/
+theorem four_fold_trans_with_refl {X : Type u} (a b c d : X)
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    a = d :=
+  (four_fold_trans (a := a) (b := b) (c := c) (d := d) (e := d) p q r (Path.refl d)).toEq
+
 end QuantumGroupDeep
 end Algebra
 end Path

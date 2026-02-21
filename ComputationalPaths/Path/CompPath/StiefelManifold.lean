@@ -95,6 +95,23 @@ abbrev StiefelManifold (n k : Nat) : Type u := StiefelManifoldCompPath n k
 @[simp] abbrev stiefelManifoldBasepoint (n k : Nat) : StiefelManifold n k :=
   stiefelManifoldBase n k
 
+/-- Decode at `0` is the reflexivity loop. -/
+theorem stiefelManifoldDecodePath_zero (n k : Nat) :
+    stiefelManifoldDecodePath n k 0 = Path.refl (stiefelManifoldBase n k) :=
+  rfl
+
+/-- Decode at `m+1` is one loop followed by decode at `m`. -/
+theorem stiefelManifoldDecodePath_succ (n k m : Nat) :
+    stiefelManifoldDecodePath n k (Nat.succ m) =
+      Path.trans (stiefelManifoldLoop n k) (stiefelManifoldDecodePath n k m) :=
+  rfl
+
+/-- Every point of the model is equal to the chosen basepoint. -/
+theorem stiefelManifold_point_eq_base (n k : Nat) (x : StiefelManifoldCompPath n k) :
+    x = stiefelManifoldBase n k := by
+  cases x
+  rfl
+
 /-! ## Summary -/
 
 end CompPath

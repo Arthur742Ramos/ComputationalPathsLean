@@ -94,6 +94,24 @@ axiom Trunc.rec {A : Type u} {B : Type v} (hB : ∀ x y : B, x = y)
 
 /-! ## Theorems -/
 
+/-- Recursion out of truncation is independent of the input witness. -/
+theorem trunc_rec_independent_input {A : Type u} {B : Type v}
+    (hB : ∀ x y : B, x = y) (f : A → B) (x y : Trunc A) :
+    Trunc.rec hB f x = Trunc.rec hB f y :=
+  hB _ _
+
+/-- Recursion out of truncation is independent of the chosen map into a proposition. -/
+theorem trunc_rec_independent_map {A : Type u} {B : Type v}
+    (hB : ∀ x y : B, x = y) (f g : A → B) (x : Trunc A) :
+    Trunc.rec hB f x = Trunc.rec hB g x :=
+  hB _ _
+
+/-- Constant recursion into a proposition returns the constant value. -/
+theorem trunc_rec_const {A : Type u} {B : Type v}
+    (hB : ∀ x y : B, x = y) (b : B) (x : Trunc A) :
+    Trunc.rec hB (fun _ => b) x = b :=
+  hB _ _
+
 
 
 

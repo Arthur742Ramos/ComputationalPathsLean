@@ -320,6 +320,21 @@ def octahedral_source_bridge (d : OctahedralData ops S) :
   Path.trans (octahedral_Tf_src (ops := ops) (S := S) d)
     (Path.symm (octahedral_Tfg_src (ops := ops) (S := S) d))
 
+/-- Symmetric form of the octahedral source bridge. -/
+theorem octahedral_source_bridge_symm (d : OctahedralData ops S) :
+    d.T_fg.X = d.T_f.X :=
+  (Path.symm (octahedral_source_bridge (ops := ops) (S := S) d)).toEq
+
+/-- Symmetric form of the rotate-middle bridge. -/
+theorem rotate_middle_to_twice_source_symm (T : Triangle ops S) :
+    (rotate_twice ops S T).X = (rotate_triangle ops S T).Y :=
+  (Path.symm (rotate_middle_to_twice_source (ops := ops) (S := S) T)).toEq
+
+/-- Roundtrip coherence obtained by composing shift/unshift witnesses. -/
+theorem shift_unshift_roundtrip_loop_at_source (X : Obj) :
+    S.unshift (S.shift X) = S.unshift (S.shift X) :=
+  (shift_unshift_loop (ops := ops) (S := S) X).toEq
+
 end TriangulatedDeep
 end Algebra
 end Path

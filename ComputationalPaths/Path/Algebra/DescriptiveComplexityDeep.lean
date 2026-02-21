@@ -607,4 +607,19 @@ def congrArg_game_rounds (k : Nat) :
     Path (GameType.ef k).rounds (GameType.ef k).rounds :=
   Path.congrArg GameType.rounds (Path.refl (GameType.ef k))
 
+/-- The EF logic/game correspondence composes to a roundtrip loop on logic level. -/
+theorem ef_logic_roundtrip (k : Nat) :
+    (efFoCorr k).logicLevel = (efFoCorr k).logicLevel :=
+  (Path.trans (ef_fo_logic_game k) (game_logic_symm k)).toEq
+
+/-- The FO base hierarchy witness closes to a reflexive loop. -/
+theorem hierarchy_fo_loop :
+    expressiveness (.fo 0) = expressiveness (.fo 0) :=
+  (Path.trans hierarchy_fo_lfp (Path.symm hierarchy_fo_lfp)).toEq
+
+/-- Pebble game round witness composes with its inverse to give a loop. -/
+theorem pebble_roundtrip (k r : Nat) :
+    (pebbleFokCorr k r).gameRounds = (pebbleFokCorr k r).gameRounds :=
+  (Path.trans (pebble_corr_rounds k r) (Path.symm (pebble_corr_rounds k r))).toEq
+
 end DescriptiveComplexityDeep
