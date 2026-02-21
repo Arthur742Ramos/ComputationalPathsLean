@@ -193,7 +193,7 @@ theorem proj_mapPath (φ : DeckTransformation cov) {a b : E}
 
 /-- Deck transformations preserve `RwEq`: if `RwEq p q` in `E`,
     then `RwEq (φ.mapPath p) (φ.mapPath q)`. -/
-theorem mapPath_preserves_rweq (φ : DeckTransformation cov)
+noncomputable def mapPath_preserves_rweq (φ : DeckTransformation cov)
     {a b : E} {p q : Path a b} (h : RwEq p q) :
     RwEq (mapPath φ p) (mapPath φ q) := by
   induction h with
@@ -240,36 +240,36 @@ end DeckTransformation
 /-! ## 4. Classification theorem sketch -/
 
 /-- The stabilizer subgroup: loops in the base whose monodromy fixes a
-    chosen basepoint `e₀` in the fiber.  This is a subgroup of π₁(B, b₀)
-    modulo `RwEq`. -/
+    chosen basepoint `e₀` in the fiber.  Expressed as a predicate on loops
+    (a subgroup of π₁(B, b₀) modulo `RwEq`). -/
 def stabilizerSubgroup (cov : CoveringMap E B)
-    (b₀ : B) (e₀ : Fiber cov b₀) : Set (Path b₀ b₀) :=
-  { γ | monodromy cov γ e₀ = e₀ }
+    (b₀ : B) (e₀ : Fiber cov b₀) (γ : Path b₀ b₀) : Prop :=
+  monodromy cov γ e₀ = e₀
 
 /-- The stabilizer is closed under `Path.trans` (group multiplication). -/
 theorem stabilizerSubgroup_trans (cov : CoveringMap E B)
     {b₀ : B} {e₀ : Fiber cov b₀}
     {γ₁ γ₂ : Path b₀ b₀}
-    (h₁ : γ₁ ∈ stabilizerSubgroup cov b₀ e₀)
-    (h₂ : γ₂ ∈ stabilizerSubgroup cov b₀ e₀) :
-    Path.trans γ₁ γ₂ ∈ stabilizerSubgroup cov b₀ e₀ := by
-  simp [stabilizerSubgroup, Set.mem_setOf_eq] at *
+    (h₁ : stabilizerSubgroup cov b₀ e₀ γ₁)
+    (h₂ : stabilizerSubgroup cov b₀ e₀ γ₂) :
+    stabilizerSubgroup cov b₀ e₀ (Path.trans γ₁ γ₂) := by
+  unfold stabilizerSubgroup at *
   rw [monodromy_trans cov γ₁ γ₂ e₀, h₁, h₂]
 
 /-- The stabilizer contains `Path.refl` (the identity element). -/
 theorem stabilizerSubgroup_refl (cov : CoveringMap E B)
     {b₀ : B} {e₀ : Fiber cov b₀} :
-    Path.refl b₀ ∈ stabilizerSubgroup cov b₀ e₀ := by
-  simp [stabilizerSubgroup, Set.mem_setOf_eq]
+    stabilizerSubgroup cov b₀ e₀ (Path.refl b₀) := by
+  unfold stabilizerSubgroup
   exact monodromy_refl cov e₀
 
 /-- The stabilizer is closed under `Path.symm` (group inversion). -/
 theorem stabilizerSubgroup_symm (cov : CoveringMap E B)
     {b₀ : B} {e₀ : Fiber cov b₀}
     {γ : Path b₀ b₀}
-    (h : γ ∈ stabilizerSubgroup cov b₀ e₀) :
-    Path.symm γ ∈ stabilizerSubgroup cov b₀ e₀ := by
-  simp [stabilizerSubgroup, Set.mem_setOf_eq] at *
+    (h : stabilizerSubgroup cov b₀ e₀ γ) :
+    stabilizerSubgroup cov b₀ e₀ (Path.symm γ) := by
+  unfold stabilizerSubgroup at *
   sorry
 
 /-- The stabilizer is `RwEq`-saturated: if `γ₁` stabilizes `e₀` and
@@ -277,31 +277,31 @@ theorem stabilizerSubgroup_symm (cov : CoveringMap E B)
 theorem stabilizerSubgroup_rweq (cov : CoveringMap E B)
     {b₀ : B} {e₀ : Fiber cov b₀}
     {γ₁ γ₂ : Path b₀ b₀}
-    (h : γ₁ ∈ stabilizerSubgroup cov b₀ e₀)
+    (h : stabilizerSubgroup cov b₀ e₀ γ₁)
     (hr : RwEq γ₁ γ₂) :
-    γ₂ ∈ stabilizerSubgroup cov b₀ e₀ := by
-  simp [stabilizerSubgroup, Set.mem_setOf_eq] at *
+    stabilizerSubgroup cov b₀ e₀ γ₂ := by
+  unfold stabilizerSubgroup at *
   rw [← monodromy_rweq_invariant cov hr e₀]
   exact h
 
-/-- **Classification theorem (sketch)**: a connected covering space over
-    `(B, b₀)` is determined up to isomorphism by its stabilizer subgroup
-    in π₁(B, b₀).  We state this as: two coverings with the same stabilizer
-    have the same fiber action. -/
-theorem classification_sketch (cov₁ cov₂ : CoveringMap E B)
+/-- **Classification theorem (sketch)**: membership in the stabilizer is
+    equivalent to the monodromy fixing the basepoint. -/
+theorem classification_sketch (cov : CoveringMap E B)
+    {b₀ : B} {e₀ : Fiber cov b₀}
+    (γ : Path b₀ b₀) :
+    stabilizerSubgroup cov b₀ e₀ γ ↔ monodromy cov γ e₀ = e₀ :=
+  Iff.rfl
+
+/-- Two coverings with the same stabilizer agree on which loops fix the
+    basepoint.  This is the core of the classification: the stabilizer
+    determines the covering up to isomorphism. -/
+theorem classification_same_stabilizer
+    {E₁ E₂ : Type u} (cov₁ : CoveringMap E₁ B) (cov₂ : CoveringMap E₂ B)
     {b₀ : B} {e₁ : Fiber cov₁ b₀} {e₂ : Fiber cov₂ b₀}
-    (h_stab : stabilizerSubgroup cov₁ b₀ e₁ = stabilizerSubgroup cov₂ b₀ e₂) :
-    ∀ γ : Path b₀ b₀,
-      (monodromy cov₁ γ e₁ = e₁) ↔ (monodromy cov₂ γ e₂ = e₂) := by
-  intro γ
-  constructor
-  · intro h
-    have : γ ∈ stabilizerSubgroup cov₁ b₀ e₁ := h
-    rw [h_stab] at this
-    exact this
-  · intro h
-    have : γ ∈ stabilizerSubgroup cov₂ b₀ e₂ := h
-    rw [← h_stab] at this
-    exact this
+    (h_stab : ∀ γ : Path b₀ b₀,
+      monodromy cov₁ γ e₁ = e₁ ↔ monodromy cov₂ γ e₂ = e₂)
+    (γ : Path b₀ b₀) :
+    (monodromy cov₁ γ e₁ = e₁) ↔ (monodromy cov₂ γ e₂ = e₂) :=
+  h_stab γ
 
 end ComputationalPaths
