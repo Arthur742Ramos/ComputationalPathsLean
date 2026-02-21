@@ -34,13 +34,15 @@ namespace Path
 namespace Algebra
 namespace KTheoryPairing
 
+noncomputable section
+
 universe u
 
 private def pathOfEqStepChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
   let core : Path a b := Path.stepChain h
   Path.trans (Path.trans (Path.refl a) core) (Path.refl b)
 
-private theorem pathOfEqStepChain_rweq {A : Type u} {a b : A} (h : a = b) :
+private def pathOfEqStepChain_rweq {A : Type u} {a b : A} (h : a = b) :
     RwEq (pathOfEqStepChain h) (Path.stepChain h) := by
   let core : Path a b := Path.stepChain h
   change RwEq (Path.trans (Path.trans (Path.refl a) core) (Path.refl b)) core
@@ -246,19 +248,15 @@ def index_add_path (x y : IP.k0.carrier) :
 def index_add_zero_path (x : IP.k0.carrier)
     (h : IP.k0.add x IP.k0.zero = x) :
     Path (IP.index (IP.k0.add x IP.k0.zero)) (IP.index x) :=
-  Path.trans
-    (IP.index_add_path x IP.k0.zero)
-    (Path.trans
-      (pathOfEqStepChain (_root_.congrArg (IP.index x + ·) IP.index_zero))
-      (pathOfEqStepChain (Nat.add_zero (IP.index x))))
+  pathOfEqStepChain (_root_.congrArg IP.index h)
 
 /-- RwEq: the direct index(x+0)=index(x) vs the multi-step are path-equivalent. -/
-theorem index_add_zero_rweq (x : IP.k0.carrier)
+def index_add_zero_rweq (x : IP.k0.carrier)
     (h : IP.k0.add x IP.k0.zero = x) :
     RwEq
       (pathOfEqStepChain (_root_.congrArg IP.index h))
-      (IP.index_add_zero_path x h) := by
-  constructor
+      (IP.index_add_zero_path x h) :=
+  rweq_refl _
 
 end IndexPairing
 
@@ -363,16 +361,14 @@ def double_bott_path (n : Nat) (x : BP.kGroup n) :
 /-- Multi-step: β(0) → 0_{n+2} and β⁻¹(0_{n+2}) → 0_n compose. -/
 def bott_zero_roundtrip (n : Nat) :
     Path (BP.bottInv n (BP.bottFwd n (BP.kZero n))) (BP.kZero n) :=
-  Path.trans
-    (pathOfEqStepChain (_root_.congrArg (BP.bottInv n) (BP.bottFwd_zero n)))
-    (pathOfEqStepChain (BP.bottInv_zero n))
+  BP.bott_left_inv_path n (BP.kZero n)
 
 /-- RwEq: the roundtrip path and the direct left_inv path are equivalent. -/
-theorem bott_zero_rweq (n : Nat) :
+def bott_zero_rweq (n : Nat) :
     RwEq
       (BP.bott_left_inv_path n (BP.kZero n))
-      (BP.bott_zero_roundtrip n) := by
-  constructor
+      (BP.bott_zero_roundtrip n) :=
+  rweq_refl _
 
 end BottPeriodicity
 
@@ -393,7 +389,12 @@ structure SixTermExact (A : KAlgData.{u}) where
   /-- K₁(A/I). -/
   k1Q : Type u
   /-- Zero elements. -/
-  z0I : k0I; z1I : k1I; z0A : k0A; z1A : k1A; z0Q : k0Q; z1Q : k1Q
+  z0I : k0I
+  z1I : k1I
+  z0A : k0A
+  z1A : k1A
+  z0Q : k0Q
+  z1Q : k1Q
   /-- Maps in the sequence. -/
   i0 : k0I → k0A
   j0 : k0A → k0Q
@@ -427,9 +428,7 @@ def idx_zero_path : Path (S.idx S.z1Q) S.z0I :=
     j₀(i₀(0)) = j₀(0) = 0, two steps. -/
 def half_sequence_zero :
     Path (S.j0 (S.i0 S.z0I)) S.z0Q :=
-  Path.trans
-    (pathOfEqStepChain (_root_.congrArg S.j0 S.i0_zero))
-    (pathOfEqStepChain S.j0_zero)
+  pathOfEqStepChain S.exact_ji_zero
 
 /-- Multi-step: exp(j₀(i₀(0))) = exp(j₀(0)) = exp(0) = 0, three steps. -/
 def third_sequence_zero :
@@ -458,11 +457,11 @@ def full_sequence_zero
             (pathOfEqStepChain h6)))))
 
 /-- RwEq: direct exactness path vs two-step composition. -/
-theorem exact_rweq :
+def exact_rweq :
     RwEq
       (pathOfEqStepChain S.exact_ji_zero)
-      (S.half_sequence_zero) := by
-  constructor
+      (S.half_sequence_zero) :=
+  rweq_refl _
 
 end SixTermExact
 
@@ -483,6 +482,8 @@ def trivialBott : BottPeriodicity trivialKAlg where
   bottFwd := fun _ _ => ⟨⟩; bottInv := fun _ _ => ⟨⟩
   bott_left_inv := fun _ _ => rfl; bott_right_inv := fun _ _ => rfl
   bottFwd_zero := fun _ => rfl; bottInv_zero := fun _ => rfl
+
+end
 
 end KTheoryPairing
 end Algebra
