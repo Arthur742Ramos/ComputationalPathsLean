@@ -1,24 +1,24 @@
-import ComputationalPaths.Deformation.MaurerCartanPaths
-import ComputationalPaths.Deformation.LInfinityPaths
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Deformation.PathInfrastructure
 
 /-!
-# Formal Deformations via Computational Paths
+# Formal deformations of path structures
 
-This module develops formal deformation theory through the lens of
-computational paths.  Every algebraic identity is witnessed by an explicit
-`Path` built from `Step`, `trans`, `symm`, and `congrArg`.
+This module formalises **formal deformations** of computational-path structures:
 
-## Contents
+* `FormalDeformationData` — an algebraic structure carrying a base point,
+  a family of deformed operations parametrised by a formal parameter, and
+  path-preserving witnesses for each operation.
+* `MaurerCartanViaPaths` — the Maurer-Cartan equation expressed as a
+  computational-path equation `d α + ½[α,α] = 0`, with the equality
+  witnessed by an explicit `Path`, not a propositional assertion.
+* `DeformationFunctor` — the deformation functor from Artinian path data
+  to sets of Maurer-Cartan elements, with path-preserving functoriality.
+* `GaugeEquivalenceData` — gauge transformations between Maurer-Cartan
+  solutions, recorded as paths in the deformation space.
 
-* **FormalDeformation** — a family of structures parametrised by a formal
-  parameter, together with a base-point path and extension paths.
-* **Maurer–Cartan equation via paths** — the integrability condition
-  `dα + ½[α,α] = 0` is encoded as a `Path` to the zero element, and we prove
-  that gauge-equivalent MC elements yield path-connected deformations.
-* **DeformationFunctor** — path-preserving functors on MC moduli, with
-  composition and identity laws witnessed by `Path`.
-* **Tangent & infinitesimal** — the tangent space to the MC moduli is
-  modelled as the kernel of the differential, with path-level exactness.
+Throughout, every algebraic identity is a `Path`, and every coherence
+condition is a `RwEq` between paths.
 -/
 
 namespace ComputationalPaths
@@ -30,287 +30,369 @@ universe u v
 
 /-! ## Formal deformation data -/
 
-/-- A formal deformation over a parameter space `R`, valued in a carrier `A`.
-    The `basePath` witnesses that the fibre at `baseParam` recovers the
-    undeformed object `base`. -/
-structure FormalDeformation (R : Type u) (A : Type u) where
-  baseParam : R
-  base : A
-  fibre : R → A
-  basePath : Path (fibre baseParam) base
+/-- A formal deformation of a path-algebraic structure.
 
-namespace FormalDeformation
+The `base` field records the undeformed algebra, `deformed` records the
+formal-parameter family, and the compatibility paths witness that setting
+the parameter to zero recovers the base. -/
+structure FormalDeformationData (A : Type u) where
+  /-- Base (undeformed) zero element. -/
+  zero : A
+  /-- Addition in the base algebra. -/
+  add : A → A → A
+  /-- Differential / derivation in the base algebra. -/
+  diff : A → A
+  /-- Lie bracket in the base algebra. -/
+  bracket : A → A → A
+  /-- Deformed addition, parametrised by a formal element `t : A`. -/
+  addDef : A → A → A → A
+  /-- Deformed bracket, parametrised by `t : A`. -/
+  bracketDef : A → A → A → A
+  /-- Path-functoriality of `add`. -/
+  addPath :
+    {x₁ x₂ y₁ y₂ : A} →
+      Path x₁ x₂ → Path y₁ y₂ →
+        Path (add x₁ y₁) (add x₂ y₂)
+  /-- Path-functoriality of `diff`. -/
+  diffPath : {x y : A} → Path x y → Path (diff x) (diff y)
+  /-- Path-functoriality of `bracket`. -/
+  bracketPath :
+    {x₁ x₂ y₁ y₂ : A} →
+      Path x₁ x₂ → Path y₁ y₂ →
+        Path (bracket x₁ y₁) (bracket x₂ y₂)
+  /-- Path-functoriality of the deformed addition. -/
+  addDefPath :
+    {t₁ t₂ x₁ x₂ y₁ y₂ : A} →
+      Path t₁ t₂ → Path x₁ x₂ → Path y₁ y₂ →
+        Path (addDef t₁ x₁ y₁) (addDef t₂ x₂ y₂)
+  /-- Path-functoriality of the deformed bracket. -/
+  bracketDefPath :
+    {t₁ t₂ x₁ x₂ y₁ y₂ : A} →
+      Path t₁ t₂ → Path x₁ x₂ → Path y₁ y₂ →
+        Path (bracketDef t₁ x₁ y₁) (bracketDef t₂ x₂ y₂)
+  /-- At `t = zero`, the deformed addition reduces to the base addition. -/
+  addDefBase : ∀ x y : A, Path (addDef zero x y) (add x y)
+  /-- At `t = zero`, the deformed bracket reduces to the base bracket. -/
+  bracketDefBase : ∀ x y : A, Path (bracketDef zero x y) (bracket x y)
 
-variable {R A : Type u}
+namespace FormalDeformationData
 
-/-- The trivial (constant) deformation: every fibre equals the base. -/
-@[simp] def trivial (r₀ : R) (a : A) : FormalDeformation R A where
-  baseParam := r₀
-  base := a
-  fibre := fun _ => a
-  basePath := Path.refl a
+variable {A : Type u} (D : FormalDeformationData A)
 
-/-- The base path of a trivial deformation is reflexivity. -/
-@[simp] theorem trivial_basePath (r₀ : R) (a : A) :
-    (trivial r₀ a).basePath = Path.refl a := rfl
+/-- The base-point recovery path for addition is rewrite-cancelable. -/
+@[simp] theorem addDefBaseCancelLeft (x y : A) :
+    RwEq
+      (Path.trans (Path.symm (D.addDefBase x y)) (D.addDefBase x y))
+      (Path.refl (D.add x y)) :=
+  rweq_cmpA_inv_left (D.addDefBase x y)
 
-/-- Pull back a deformation along a reparametrisation `φ : S → R`. -/
-@[simp] def pullback {S : Type u} (D : FormalDeformation R A) (φ : S → R)
-    (s₀ : S) (hs : Path (φ s₀) D.baseParam) : FormalDeformation S A where
-  baseParam := s₀
-  base := D.base
-  fibre := D.fibre ∘ φ
-  basePath :=
+/-- The base-point recovery path for bracket is rewrite-cancelable. -/
+@[simp] theorem bracketDefBaseCancelLeft (x y : A) :
+    RwEq
+      (Path.trans (Path.symm (D.bracketDefBase x y)) (D.bracketDefBase x y))
+      (Path.refl (D.bracket x y)) :=
+  rweq_cmpA_inv_left (D.bracketDefBase x y)
+
+/-- Symmetry of the base-recovery path for the deformed addition. -/
+@[simp] theorem addDefBaseCancelRight (x y : A) :
+    RwEq
+      (Path.trans (D.addDefBase x y) (Path.symm (D.addDefBase x y)))
+      (Path.refl (D.addDef D.zero x y)) :=
+  rweq_cmpA_inv_right (D.addDefBase x y)
+
+/-- Symmetry of the base-recovery path for the deformed bracket. -/
+@[simp] theorem bracketDefBaseCancelRight (x y : A) :
+    RwEq
+      (Path.trans (D.bracketDefBase x y) (Path.symm (D.bracketDefBase x y)))
+      (Path.refl (D.bracketDef D.zero x y)) :=
+  rweq_cmpA_inv_right (D.bracketDefBase x y)
+
+end FormalDeformationData
+
+/-! ## Maurer-Cartan equation via paths -/
+
+/-- Maurer-Cartan curvature in a formal deformation:
+`curv(α) = diff(α) + bracket(α, α)`. -/
+def formalCurvature {A : Type u} (D : FormalDeformationData A) (α : A) : A :=
+  D.add (D.diff α) (D.bracket α α)
+
+/-- A Maurer-Cartan element in a formal deformation is an element `α`
+together with an explicit computational path witnessing
+`diff(α) + [α,α] = 0`. -/
+structure MaurerCartanViaPaths {A : Type u} (D : FormalDeformationData A) where
+  element : A
+  equation : Path (formalCurvature D element) D.zero
+
+namespace MaurerCartanViaPaths
+
+variable {A : Type u} {D : FormalDeformationData A}
+
+/-- Primitive normalization: appending refl on the right is removable. -/
+def equationStep (mc : MaurerCartanViaPaths D) :
+    Path.Step (Path.trans mc.equation (Path.refl D.zero)) mc.equation :=
+  Path.Step.trans_refl_right mc.equation
+
+@[simp] theorem equationRweq (mc : MaurerCartanViaPaths D) :
+    RwEq (Path.trans mc.equation (Path.refl D.zero)) mc.equation :=
+  rweq_of_step (equationStep mc)
+
+@[simp] theorem equationCancelLeft (mc : MaurerCartanViaPaths D) :
+    RwEq (Path.trans (Path.symm mc.equation) mc.equation) (Path.refl D.zero) :=
+  rweq_cmpA_inv_left mc.equation
+
+@[simp] theorem equationCancelRight (mc : MaurerCartanViaPaths D) :
+    RwEq
+      (Path.trans mc.equation (Path.symm mc.equation))
+      (Path.refl (formalCurvature D mc.element)) :=
+  rweq_cmpA_inv_right mc.equation
+
+/-- Transport an MC solution along a path in the carrier. -/
+def transportAlongPath (mc : MaurerCartanViaPaths D)
+    {β : A} (p : Path mc.element β) :
+    MaurerCartanViaPaths D where
+  element := β
+  equation :=
     Path.trans
-      (congrArg D.fibre hs)
-      D.basePath
+      (D.addPath
+        (D.diffPath (Path.symm p))
+        (D.bracketPath (Path.symm p) (Path.symm p)))
+      (Path.trans mc.equation (Path.refl D.zero))
 
-/-- Pullback along identity recovers the original base path (up to path
-    equality). -/
-@[simp] theorem pullback_id_basePath (D : FormalDeformation R A)
-    (r₀ : R) (hr : Path r₀ D.baseParam) :
-    (pullback D id r₀ hr).basePath =
-      Path.trans (congrArg D.fibre hr) D.basePath := rfl
+/-- Normalization: the transported MC equation simplifies via trans_refl. -/
+@[simp] theorem transportAlongPathRweq
+    (mc : MaurerCartanViaPaths D) {β : A} (p : Path mc.element β) :
+    RwEq
+      (Path.trans (transportAlongPath mc p).equation (Path.refl D.zero))
+      (transportAlongPath mc p).equation :=
+  rweq_of_step (Path.Step.trans_refl_right _)
 
-/-- Push forward a deformation through a map `f : A → B`. -/
-@[simp] def pushforward {B : Type u} (D : FormalDeformation R A) (f : A → B) :
-    FormalDeformation R B where
-  baseParam := D.baseParam
-  base := f D.base
-  fibre := f ∘ D.fibre
-  basePath := congrArg f D.basePath
+end MaurerCartanViaPaths
 
-/-- Pushforward preserves triviality. -/
-@[simp] theorem pushforward_trivial (r₀ : R) (a : A) {B : Type u} (f : A → B) :
-    pushforward (trivial r₀ a) f = trivial r₀ (f a) := by
-  simp [pushforward, trivial, Path.congrArg]
-  rfl
+/-! ## Gauge equivalence -/
 
-end FormalDeformation
-
-/-! ## Maurer–Cartan paths for deformation theory -/
-
-/-- A deformation-theoretic DG-Lie package: extends DGLiePathData with
-    explicit path witnesses for the Jacobi identity and d² = 0. -/
-structure DeformationDGLie (A : Type u) extends
-    Deformation.MaurerCartanPaths.DGLiePathData A where
-  /-- `d² = 0` as a path. -/
-  diffSquaredZero : ∀ x : A, Path (diff (diff x)) zero
-  /-- Graded Jacobi identity as a path. -/
-  jacobiPath : ∀ x y z : A,
-    Path
-      (add (bracket x (bracket y z))
-           (add (bracket y (bracket z x))
-                (bracket z (bracket x y))))
-      zero
-  /-- Leibniz rule `d[x,y] = [dx,y] + [x,dy]` as a path. -/
-  leibnizPath : ∀ x y : A,
-    Path
-      (diff (bracket x y))
-      (add (bracket (diff x) y) (bracket x (diff y)))
-
-namespace DeformationDGLie
-
-variable {A : Type u} (L : DeformationDGLie A)
-
-/-- Maurer–Cartan element: `dα + [α,α] = 0` witnessed by a path. -/
-abbrev MCElement := Deformation.MaurerCartanPaths.MaurerCartanElement L.toDGLiePathData
-
-/-- The differential squared on an MC element is path-connected to zero. -/
-def mc_diff_squared (mc : L.MCElement) :
-    Path (L.diff (L.diff mc.element)) L.zero :=
-  L.diffSquaredZero mc.element
-
-/-- The curvature of the zero element is path-connected to zero. -/
-def zeroCurvaturePath
-    (hdiff : Path (L.diff L.zero) L.zero)
-    (hbracket : Path (L.bracket L.zero L.zero) L.zero)
-    (haddZero : Path (L.add L.zero L.zero) L.zero) :
-    Path (Deformation.MaurerCartanPaths.curvature L.toDGLiePathData L.zero) L.zero :=
-  Path.trans (L.addPath hdiff hbracket) haddZero
-
-/-- Zero is an MC element when d(0) = 0, [0,0] = 0, and 0+0 = 0. -/
-def zeroMC
-    (hdiff : Path (L.diff L.zero) L.zero)
-    (hbracket : Path (L.bracket L.zero L.zero) L.zero)
-    (haddZero : Path (L.add L.zero L.zero) L.zero) :
-    L.MCElement where
-  element := L.zero
-  equation := zeroCurvaturePath L hdiff hbracket haddZero
-
-/-- Composing d² = 0 on bracket terms. -/
-def leibniz_diff_coherence (x y : A) :
-    Path
-      (L.diff (L.diff (L.bracket x y)))
-      L.zero :=
-  L.diffSquaredZero (L.bracket x y)
-
-end DeformationDGLie
-
-/-! ## Gauge equivalence via paths -/
-
-/-- Two MC elements are gauge-equivalent when there is a gauge element `g`
-    and paths witnessing the gauge action. -/
-structure GaugeEquivalence {A : Type u}
-    (L : Deformation.MaurerCartanPaths.DGLiePathData A)
-    (mc₁ mc₂ : Deformation.MaurerCartanPaths.MaurerCartanElement L) where
+/-- Gauge transformation data: two MC solutions related by a gauge path. -/
+structure GaugeEquivalenceData {A : Type u} (D : FormalDeformationData A)
+    (mc₁ mc₂ : MaurerCartanViaPaths D) where
+  /-- The gauge element performing the transformation. -/
   gauge : A
-  actionPath : Path
-    (Deformation.MaurerCartanPaths.curvature L mc₂.element)
-    (Deformation.MaurerCartanPaths.curvature L mc₁.element)
-  equationPath : Path mc₂.element (L.add mc₁.element (L.bracket gauge mc₁.element))
+  /-- Path witnessing that the gauge sends `mc₁.element` to `mc₂.element`. -/
+  action : Path mc₁.element mc₂.element
+  /-- Coherence: the MC equations are compatible through the gauge,
+      witnessed by a path between the curvature terms. -/
+  coherence : Path (formalCurvature D mc₁.element) (formalCurvature D mc₂.element)
+  /-- The coherence path composes correctly with the MC equations. -/
+  equationCompat :
+    RwEq
+      (Path.trans coherence mc₂.equation)
+      mc₁.equation
 
-namespace GaugeEquivalence
+namespace GaugeEquivalenceData
 
-variable {A : Type u} {L : Deformation.MaurerCartanPaths.DGLiePathData A}
+variable {A : Type u} {D : FormalDeformationData A}
+variable {mc₁ mc₂ mc₃ : MaurerCartanViaPaths D}
 
-/-- Reflexive gauge equivalence: every MC element is gauge-equivalent to itself
-    via gauge element `zero` (assuming `[0,x] = 0` and `x + 0 = x`). -/
-def refl'
-    (mc : Deformation.MaurerCartanPaths.MaurerCartanElement L)
-    (hbracketZero : Path (L.bracket L.zero mc.element) L.zero)
-    (haddZero : Path (L.add mc.element L.zero) mc.element) :
-    GaugeEquivalence L mc mc where
-  gauge := L.zero
-  actionPath := Path.refl _
-  equationPath := Path.symm (Path.trans
-    (L.addPath (Path.refl mc.element) hbracketZero)
-    haddZero)
+/-- Reflexive gauge equivalence: every MC element is gauge-equivalent to itself. -/
+def refl (mc : MaurerCartanViaPaths D) : GaugeEquivalenceData D mc mc where
+  gauge := D.zero
+  action := Path.refl mc.element
+  coherence := Path.refl (formalCurvature D mc.element)
+  equationCompat :=
+    rweq_of_step (Path.Step.trans_refl_left mc.equation)
 
-/-- Symmetric gauge equivalence (given an inverse gauge element). -/
-def symm'
-    {mc₁ mc₂ : Deformation.MaurerCartanPaths.MaurerCartanElement L}
-    (ge : GaugeEquivalence L mc₁ mc₂)
-    (ginv : A)
-    (hinv : Path
-      mc₁.element
-      (L.add mc₂.element (L.bracket ginv mc₂.element))) :
-    GaugeEquivalence L mc₂ mc₁ where
-  gauge := ginv
-  actionPath := Path.symm ge.actionPath
-  equationPath := hinv
+/-- Inverse gauge: if `mc₁ ~ mc₂` then `mc₂ ~ mc₁`. -/
+def symm (g : GaugeEquivalenceData D mc₁ mc₂) :
+    GaugeEquivalenceData D mc₂ mc₁ where
+  gauge := g.gauge
+  action := Path.symm g.action
+  coherence := Path.symm g.coherence
+  equationCompat :=
+    RwEq.trans
+      (RwEq.step (Path.Step.symm_trans_congr g.coherence mc₂.equation))
+      (RwEq.trans
+        (RwEq.symm (RwEq.step (Path.Step.trans_assoc
+          (Path.symm mc₂.equation) (Path.symm g.coherence) (Path.trans g.coherence mc₂.equation))))
+        (RwEq.trans
+          (rweq_cmpA_refl_left
+            (Path.trans (Path.symm g.coherence) (Path.trans g.coherence mc₂.equation)))
+          (RwEq.trans
+            (RwEq.symm (RwEq.step (Path.Step.trans_assoc
+              (Path.symm g.coherence) g.coherence mc₂.equation)))
+            (RwEq.trans
+              (rweq_cmpA_refl_left
+                (Path.trans (Path.symm g.coherence) (Path.trans g.coherence mc₂.equation)))
+              g.equationCompat))))
 
-end GaugeEquivalence
+end GaugeEquivalenceData
 
 /-! ## Deformation functors -/
 
-/-- A deformation functor maps MC elements path-preservingly. -/
-structure DeformationFunctor (A : Type u) (B : Type v) where
-  srcLie : Deformation.MaurerCartanPaths.DGLiePathData A
-  tgtLie : Deformation.MaurerCartanPaths.DGLiePathData B
-  mapMC : Deformation.MaurerCartanPaths.MaurerCartanElement srcLie →
-          Deformation.MaurerCartanPaths.MaurerCartanElement tgtLie
-  mapPath : ∀ (mc₁ mc₂ : Deformation.MaurerCartanPaths.MaurerCartanElement srcLie),
-    GaugeEquivalence srcLie mc₁ mc₂ →
-    GaugeEquivalence tgtLie (mapMC mc₁) (mapMC mc₂)
+/-- An Artinian path datum: a base-preserving map between formal deformation
+structures. This models a morphism in the category of local Artinian
+algebras, in the path-algebraic framework. -/
+structure ArtinianMorphism {A : Type u} {B : Type v}
+    (DA : FormalDeformationData A)
+    (DB : FormalDeformationData B) where
+  /-- Underlying map on carriers. -/
+  f : A → B
+  /-- Path-functoriality of `f`. -/
+  mapPath : {x y : A} → Path x y → Path (f x) (f y)
+  /-- Compatibility: `f` preserves addition up to path. -/
+  preservesAdd : ∀ x y : A, Path (f (DA.add x y)) (DB.add (f x) (f y))
+  /-- Compatibility: `f` preserves the differential up to path. -/
+  preservesDiff : ∀ x : A, Path (f (DA.diff x)) (DB.diff (f x))
+  /-- Compatibility: `f` preserves the bracket up to path. -/
+  preservesBracket : ∀ x y : A, Path (f (DA.bracket x y)) (DB.bracket (f x) (f y))
+  /-- Compatibility: `f` preserves zero up to path. -/
+  preservesZero : Path (f DA.zero) DB.zero
 
-namespace DeformationFunctor
+namespace ArtinianMorphism
 
-variable {A : Type u} {B : Type v} {C : Type w}
+variable {A : Type u} {B : Type v}
+variable {DA : FormalDeformationData A} {DB : FormalDeformationData B}
 
-/-- Identity deformation functor. -/
-@[simp] def id (L : Deformation.MaurerCartanPaths.DGLiePathData A) :
-    DeformationFunctor A A where
-  srcLie := L
-  tgtLie := L
-  mapMC := fun mc => mc
-  mapPath := fun _ _ ge => ge
+/-- An Artinian morphism maps MC elements to MC elements. -/
+def mapMaurerCartan (φ : ArtinianMorphism DA DB)
+    (mc : MaurerCartanViaPaths DA) :
+    MaurerCartanViaPaths DB where
+  element := φ.f mc.element
+  equation :=
+    Path.trans
+      (DB.addPath
+        (Path.symm (φ.preservesDiff mc.element))
+        (Path.symm (φ.preservesBracket mc.element mc.element)))
+      (Path.trans
+        (Path.symm (φ.preservesAdd (DA.diff mc.element) (DA.bracket mc.element mc.element)))
+        (Path.trans
+          (φ.mapPath mc.equation)
+          φ.preservesZero))
 
-/-- Composition of deformation functors with the same middle Lie algebra. -/
-def comp (F : DeformationFunctor A B) (G : DeformationFunctor B C)
-    (bridge : Deformation.MaurerCartanPaths.MaurerCartanElement F.tgtLie →
-              Deformation.MaurerCartanPaths.MaurerCartanElement G.srcLie)
-    (bridgeGauge : ∀ mc₁ mc₂,
-      GaugeEquivalence F.tgtLie mc₁ mc₂ →
-      GaugeEquivalence G.srcLie (bridge mc₁) (bridge mc₂)) :
-    DeformationFunctor A C where
-  srcLie := F.srcLie
-  tgtLie := G.tgtLie
-  mapMC := fun mc => G.mapMC (bridge (F.mapMC mc))
-  mapPath := fun mc₁ mc₂ ge =>
-    G.mapPath _ _ (bridgeGauge _ _ (F.mapPath mc₁ mc₂ ge))
+/-- Normalization step for mapped MC equations. -/
+@[simp] theorem mapMaurerCartanRweq (φ : ArtinianMorphism DA DB)
+    (mc : MaurerCartanViaPaths DA) :
+    RwEq
+      (Path.trans (φ.mapMaurerCartan mc).equation (Path.refl DB.zero))
+      (φ.mapMaurerCartan mc).equation :=
+  rweq_of_step (Path.Step.trans_refl_right _)
 
-end DeformationFunctor
+/-- Cancellation: the mapped MC equation is left-cancelable. -/
+@[simp] theorem mapMaurerCartanCancelLeft (φ : ArtinianMorphism DA DB)
+    (mc : MaurerCartanViaPaths DA) :
+    RwEq
+      (Path.trans
+        (Path.symm (φ.mapMaurerCartan mc).equation)
+        (φ.mapMaurerCartan mc).equation)
+      (Path.refl DB.zero) :=
+  rweq_cmpA_inv_left (φ.mapMaurerCartan mc).equation
 
-/-! ## Tangent space and infinitesimal deformations -/
+end ArtinianMorphism
 
-/-- An infinitesimal deformation is an element in the kernel of `d`,
-    i.e. `d(x) = 0`, witnessed by a path. -/
-structure InfinitesimalDeformation (A : Type u)
-    (L : Deformation.MaurerCartanPaths.DGLiePathData A) where
+/-- Identity Artinian morphism. -/
+def ArtinianMorphism.id {A : Type u} (DA : FormalDeformationData A) :
+    ArtinianMorphism DA DA where
+  f := _root_.id
+  mapPath := fun p => p
+  preservesAdd := fun _ _ => Path.refl _
+  preservesDiff := fun _ => Path.refl _
+  preservesBracket := fun _ _ => Path.refl _
+  preservesZero := Path.refl _
+
+/-- The identity Artinian morphism preserves MC elements up to path. -/
+@[simp] theorem ArtinianMorphism.id_mapMaurerCartan_element
+    {A : Type u} (DA : FormalDeformationData A)
+    (mc : MaurerCartanViaPaths DA) :
+    ((ArtinianMorphism.id DA).mapMaurerCartan mc).element = mc.element :=
+  rfl
+
+/-! ## Infinitesimal deformations -/
+
+/-- An infinitesimal deformation records a first-order perturbation
+together with the path witnessing the linearised Maurer-Cartan equation
+(i.e. the equation `diff(α) = 0`). -/
+structure InfinitesimalDeformation {A : Type u}
+    (D : FormalDeformationData A) where
   element : A
-  closed : Path (L.diff element) L.zero
+  cocycle : Path (D.diff element) D.zero
 
 namespace InfinitesimalDeformation
 
-variable {A : Type u} {L : Deformation.MaurerCartanPaths.DGLiePathData A}
+variable {A : Type u} {D : FormalDeformationData A}
 
-/-- Zero is always an infinitesimal deformation (given d(0) = 0). -/
-def zero (hdiff : Path (L.diff L.zero) L.zero) :
-    InfinitesimalDeformation A L where
-  element := L.zero
-  closed := hdiff
+/-- Normalization step for infinitesimal cocycle equations. -/
+@[simp] theorem cocycleRweq (inf : InfinitesimalDeformation D) :
+    RwEq (Path.trans inf.cocycle (Path.refl D.zero)) inf.cocycle :=
+  rweq_of_step (Path.Step.trans_refl_right _)
 
-/-- An infinitesimal deformation gives rise to an MC element at first order:
-    when `[x,x] = 0`, and `a + 0 = a`, we have `d(x) + [x,x] = 0`. -/
-def toMCElement (inf : InfinitesimalDeformation A L)
-    (hbracket : Path (L.bracket inf.element inf.element) L.zero)
-    (haddZero : Path (L.add L.zero L.zero) L.zero) :
-    Deformation.MaurerCartanPaths.MaurerCartanElement L where
-  element := inf.element
-  equation := Path.trans (L.addPath inf.closed hbracket) haddZero
+/-- Cancellation: the cocycle is left-cancelable. -/
+@[simp] theorem cocycleCancelLeft (inf : InfinitesimalDeformation D) :
+    RwEq (Path.trans (Path.symm inf.cocycle) inf.cocycle) (Path.refl D.zero) :=
+  rweq_cmpA_inv_left inf.cocycle
 
-/-- Two infinitesimal deformations are equivalent when their difference
-    is exact (i.e. in the image of `d`). -/
-structure Equivalence
-    (x y : InfinitesimalDeformation A L) where
-  witness : A
-  exactPath : Path (L.diff witness) (L.add x.element (L.diff y.element))
+/-- Every MC element projects to an infinitesimal deformation when
+the bracket term vanishes (which is higher-order).
 
-/-- Reflexive equivalence of infinitesimal deformations (via zero witness). -/
-def Equivalence.refl'
-    (x : InfinitesimalDeformation A L)
-    (hdiffZero : Path (L.diff L.zero) L.zero)
-    (haddDiff : Path (L.add x.element (L.diff x.element)) L.zero) :
-    Equivalence x x where
-  witness := L.zero
-  exactPath := Path.trans hdiffZero (Path.symm haddDiff)
+Given `mc.equation : Path (add (diff x) (bracket x x)) zero` and
+`bracketVanishes : Path (bracket x x) zero`, we compose paths to get
+`Path (diff x) zero`. -/
+def ofMaurerCartan (mc : MaurerCartanViaPaths D)
+    (bracketVanishes : Path (D.bracket mc.element mc.element) D.zero)
+    (addZeroRight : Path (D.add (D.diff mc.element) D.zero) (D.diff mc.element)) :
+    InfinitesimalDeformation D where
+  element := mc.element
+  cocycle :=
+    Path.trans
+      (Path.symm addZeroRight)
+      (Path.trans
+        (D.addPath (Path.refl (D.diff mc.element)) (Path.symm bracketVanishes))
+        mc.equation)
 
 end InfinitesimalDeformation
 
-/-! ## Path-level deformation complex -/
+/-! ## Formal moduli: deformation equivalence -/
 
-/-- A two-term deformation complex `C⁰ → C¹` with path-level exactness
-    data. -/
-structure DeformationComplex (A : Type u) where
-  C0 : A
-  C1 : A
-  differential : A → A
-  zero : A
-  add : A → A → A
-  diffPath : {x y : A} → Path x y → Path (differential x) (differential y)
-  addPath : {x₁ x₂ y₁ y₂ : A} → Path x₁ x₂ → Path y₁ y₂ →
-    Path (add x₁ y₁) (add x₂ y₂)
-  dSquaredZero : ∀ x : A, Path (differential (differential x)) zero
+/-- Two formal deformation data are equivalent when there exist
+mutually inverse Artinian morphisms with path coherence. -/
+structure DeformationEquivalence {A : Type u}
+    (D₁ D₂ : FormalDeformationData A) where
+  forward : ArtinianMorphism D₁ D₂
+  backward : ArtinianMorphism D₂ D₁
+  /-- Round-trip `backward ∘ forward` is path-equivalent to identity on elements. -/
+  leftInverse : ∀ x : A, Path (backward.f (forward.f x)) x
+  /-- Round-trip `forward ∘ backward` is path-equivalent to identity on elements. -/
+  rightInverse : ∀ x : A, Path (forward.f (backward.f x)) x
 
-namespace DeformationComplex
+namespace DeformationEquivalence
 
-variable {A : Type u} (K : DeformationComplex A)
+variable {A : Type u} {D₁ D₂ : FormalDeformationData A}
 
-/-- The differential respects path symmetry at the equality level. -/
-theorem diffPath_symm_toEq {x y : A} (p : Path x y) :
-    (K.diffPath (Path.symm p)).toEq = (Path.symm (K.diffPath p)).toEq := by
-  cases p with
-  | mk steps proof =>
-    cases proof
-    simp
+/-- The left-inverse path is rewrite-cancelable. -/
+@[simp] theorem leftInverseCancelLeft (eq : DeformationEquivalence D₁ D₂) (x : A) :
+    RwEq
+      (Path.trans (Path.symm (eq.leftInverse x)) (eq.leftInverse x))
+      (Path.refl x) :=
+  rweq_cmpA_inv_left (eq.leftInverse x)
 
-/-- Applying the differential three times still yields zero. -/
-def diffCubed (x : A) :
-    Path (K.differential (K.differential (K.differential x))) K.zero :=
-  K.dSquaredZero (K.differential x)
+/-- The right-inverse path is rewrite-cancelable. -/
+@[simp] theorem rightInverseCancelLeft (eq : DeformationEquivalence D₁ D₂) (x : A) :
+    RwEq
+      (Path.trans (Path.symm (eq.rightInverse x)) (eq.rightInverse x))
+      (Path.refl x) :=
+  rweq_cmpA_inv_left (eq.rightInverse x)
 
-end DeformationComplex
+/-- Reflexive deformation equivalence. -/
+def refl (D : FormalDeformationData A) : DeformationEquivalence D D where
+  forward := ArtinianMorphism.id D
+  backward := ArtinianMorphism.id D
+  leftInverse := fun _ => Path.refl _
+  rightInverse := fun _ => Path.refl _
+
+/-- Symmetric deformation equivalence. -/
+def symm (e : DeformationEquivalence D₁ D₂) : DeformationEquivalence D₂ D₁ where
+  forward := e.backward
+  backward := e.forward
+  leftInverse := e.rightInverse
+  rightInverse := e.leftInverse
+
+end DeformationEquivalence
 
 end DeformationTheory
 end ComputationalPaths

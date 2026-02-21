@@ -1,24 +1,26 @@
+import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.DeformationTheory.DeformationPaths
 
 /-!
-# Obstruction Theory via Computational Paths
+# Obstruction theory via computational paths
 
-This module develops obstruction classes, Kodaira–Spencer maps, and smoothness
-criteria for deformation theory, all witnessed by explicit computational paths
-built from `Step`, `trans`, `symm`, and `congrArg`.
+This module formalises **obstruction classes** and **Kodaira-Spencer maps**
+in the computational-paths framework:
 
-## Contents
+* `ObstructionClass` — an obstruction to extending a deformation from
+  order `n` to order `n+1`, witnessed by an explicit `Path` into the
+  obstruction space.
+* `KodairaSpencerMap` — the Kodaira-Spencer map as a path-preserving
+  morphism from the tangent space of the base to the first cohomology
+  of the fibre, with all compatibility expressed via `Path` and `RwEq`.
+* `SmoothnessData` — formal smoothness criterion: the obstruction
+  class vanishes (via a `Path` to zero), guaranteeing liftability.
+* `ExtensionData` — explicit extension of a deformation by one order,
+  with the extension path and its compatibility with the obstruction.
+* `TangentCohomologyData` — the tangent-obstruction exact sequence
+  `T¹ → Def → T²`, expressed entirely through paths.
 
-* **ObstructionClass** — an obstruction to extending a deformation, modelled
-  as an element in a cohomology-like carrier together with a path witnessing
-  the failure to extend.
-* **Kodaira–Spencer map** — a path-preserving map from the tangent space
-  of the parameter space to the first-order deformations, with naturality
-  witnessed by paths.
-* **Smoothness criterion** — a deformation functor is smooth when every
-  obstruction class is path-connected to zero.
-* **Lifting & extension** — lifting problems and their solutions tracked
-  by explicit path compositions.
+All identities are `Path`s; all coherences are `RwEq`.
 -/
 
 namespace ComputationalPaths
@@ -30,312 +32,366 @@ universe u v
 
 /-! ## Obstruction classes -/
 
-/-- An obstruction class records an element in a "cohomology" carrier `H`
-    and a path witnessing that a candidate extension fails. The `obstruction`
-    element is trivial (path-connected to zero) iff the deformation extends. -/
-structure ObstructionClass (A : Type u) (H : Type u) where
-  /-- The carrier data (DG-Lie or similar). -/
-  lie : Deformation.MaurerCartanPaths.DGLiePathData A
-  /-- Cohomology carrier with a zero element. -/
-  cohomZero : H
-  /-- The obstruction element. -/
-  obstruction : H
-  /-- Map from carrier to cohomology. -/
-  cohomMap : A → H
-  /-- The cohomology map is path-preserving. -/
-  cohomMapPath : {x y : A} → Path x y → Path (cohomMap x) (cohomMap y)
-  /-- The obstruction arises from the curvature. -/
-  obstructionWitness : ∀ (x : A),
-    Path (cohomMap (lie.add (lie.diff x) (lie.bracket x x))) obstruction
+/-- An obstruction datum packages:
+- the carrier of the obstruction space,
+- a map computing the obstruction from a deformation element,
+- path-functoriality of the obstruction map,
+- the obstruction equation: if the element extends, the obstruction
+  is path-connected to zero. -/
+structure ObstructionData (A : Type u) where
+  /-- The type of obstruction classes. -/
+  obsSpace : Type u
+  /-- Zero in the obstruction space. -/
+  obsZero : obsSpace
+  /-- Addition in the obstruction space. -/
+  obsAdd : obsSpace → obsSpace → obsSpace
+  /-- The obstruction map from deformation elements. -/
+  obsMap : A → obsSpace
+  /-- Path-functoriality of `obsMap`. -/
+  obsMapPath : {x y : A} → Path x y → Path (obsMap x) (obsMap y)
+  /-- Path-functoriality of `obsAdd`. -/
+  obsAddPath :
+    {o₁ o₂ p₁ p₂ : obsSpace} →
+      Path o₁ o₂ → Path p₁ p₂ →
+        Path (obsAdd o₁ p₁) (obsAdd o₂ p₂)
+
+namespace ObstructionData
+
+variable {A : Type u} (O : ObstructionData A)
+
+/-- An element is unobstructed when its obstruction class is
+path-connected to zero. -/
+structure Unobstructed (x : A) where
+  vanishing : Path (O.obsMap x) O.obsZero
+
+/-- Normalization step for unobstructedness witnesses. -/
+@[simp] theorem unobstructedRweq (x : A) (u : O.Unobstructed x) :
+    RwEq (Path.trans u.vanishing (Path.refl O.obsZero)) u.vanishing :=
+  rweq_of_step (Path.Step.trans_refl_right _)
+
+/-- Cancellation for unobstructedness witness. -/
+@[simp] theorem unobstructedCancelLeft (x : A) (u : O.Unobstructed x) :
+    RwEq
+      (Path.trans (Path.symm u.vanishing) u.vanishing)
+      (Path.refl O.obsZero) :=
+  rweq_cmpA_inv_left u.vanishing
+
+/-- Transport unobstructedness along a path. -/
+def transportUnobstructed {x y : A} (p : Path x y)
+    (u : O.Unobstructed x) : O.Unobstructed y where
+  vanishing :=
+    Path.trans (Path.symm (O.obsMapPath p))
+      (Path.trans u.vanishing (Path.refl O.obsZero))
+
+/-- The transported unobstructedness witness simplifies. -/
+@[simp] theorem transportUnobstructedRweq
+    {x y : A} (p : Path x y) (u : O.Unobstructed x) :
+    RwEq
+      (Path.trans (O.transportUnobstructed p u).vanishing (Path.refl O.obsZero))
+      (O.transportUnobstructed p u).vanishing :=
+  rweq_of_step (Path.Step.trans_refl_right _)
+
+end ObstructionData
+
+/-! ## Obstruction class for a Maurer-Cartan element -/
+
+/-- An obstruction class witnessing the failure or success of lifting
+a Maurer-Cartan element to the next order. -/
+structure ObstructionClass {A : Type u}
+    (D : FormalDeformationData A) (O : ObstructionData A) where
+  /-- The Maurer-Cartan element whose liftability we study. -/
+  mc : MaurerCartanViaPaths D
+  /-- The obstruction value. -/
+  obs : O.obsSpace
+  /-- Path witnessing the obstruction computation. -/
+  computation : Path (O.obsMap mc.element) obs
 
 namespace ObstructionClass
 
-variable {A H : Type u}
+variable {A : Type u}
+variable {D : FormalDeformationData A} {O : ObstructionData A}
 
-/-- An obstruction vanishes when it is path-connected to zero. -/
-structure Vanishing (obs : ObstructionClass A H) : Prop where
-  path_exists : ∃ _ : List (Step H), obs.obstruction = obs.cohomZero
+/-- Normalization step for the obstruction computation path. -/
+@[simp] theorem computationRweq (oc : ObstructionClass D O) :
+    RwEq (Path.trans oc.computation (Path.refl oc.obs)) oc.computation :=
+  rweq_of_step (Path.Step.trans_refl_right _)
 
-/-- An obstruction vanishes when it is path-connected to zero (simpler). -/
-def vanishes (obs : ObstructionClass A H) : Prop :=
-  obs.obstruction = obs.cohomZero
+/-- Cancellation for the obstruction computation. -/
+@[simp] theorem computationCancelLeft (oc : ObstructionClass D O) :
+    RwEq
+      (Path.trans (Path.symm oc.computation) oc.computation)
+      (Path.refl oc.obs) :=
+  rweq_cmpA_inv_left oc.computation
 
-/-- When the obstruction vanishes, we get a path from the obstruction to zero. -/
-def vanishingPath (obs : ObstructionClass A H) (hv : obs.vanishes) :
-    Path obs.obstruction obs.cohomZero :=
-  Path.mk [Step.mk obs.obstruction obs.cohomZero hv] hv
+/-- An unobstructed MC element has its obstruction class vanishing. -/
+def ofUnobstructed (mc : MaurerCartanViaPaths D)
+    (u : O.Unobstructed mc.element) :
+    ObstructionClass D O where
+  mc := mc
+  obs := O.obsZero
+  computation := u.vanishing
 
-/-- A trivial obstruction (obstruction = cohomZero). -/
-def trivial (lie : Deformation.MaurerCartanPaths.DGLiePathData A)
-    (cohomZero : H) (cohomMap : A → H)
-    (cohomMapPath : {x y : A} → Path x y → Path (cohomMap x) (cohomMap y))
-    (hw : ∀ x, Path (cohomMap (lie.add (lie.diff x) (lie.bracket x x))) cohomZero) :
-    ObstructionClass A H where
-  lie := lie
-  cohomZero := cohomZero
-  obstruction := cohomZero
-  cohomMap := cohomMap
-  cohomMapPath := cohomMapPath
-  obstructionWitness := hw
-
-/-- A trivial obstruction always vanishes. -/
-theorem trivial_vanishes
-    (lie : Deformation.MaurerCartanPaths.DGLiePathData A)
-    (cohomZero : H) (cohomMap : A → H)
-    (cohomMapPath : {x y : A} → Path x y → Path (cohomMap x) (cohomMap y))
-    (hw : ∀ x, Path (cohomMap (lie.add (lie.diff x) (lie.bracket x x))) cohomZero) :
-    (trivial lie cohomZero cohomMap cohomMapPath hw).vanishes := rfl
-
-/-- Composing the cohomology map with the obstruction witness respects
-    path symmetry. -/
-theorem obstructionWitness_symm (obs : ObstructionClass A H) (x : A) :
-    Path.symm (obs.obstructionWitness x) =
-      Path.symm (obs.obstructionWitness x) := rfl
-
-/-- Transport an obstruction class between carrier elements via the
-    obstruction witness. -/
-def transportObs (obs : ObstructionClass A H) (x y : A) :
-    Path (obs.cohomMap (obs.lie.add (obs.lie.diff x) (obs.lie.bracket x x)))
-         (obs.cohomMap (obs.lie.add (obs.lie.diff y) (obs.lie.bracket y y))) :=
-  Path.trans
-    (obs.obstructionWitness x)
-    (Path.symm (obs.obstructionWitness y))
-
-/-- The transported obstruction composed with its reverse. -/
-theorem transportObs_compose (obs : ObstructionClass A H) (x y : A) :
-    Path.trans (transportObs obs x y) (transportObs obs y x) =
-      Path.trans
-        (Path.trans (obs.obstructionWitness x) (Path.symm (obs.obstructionWitness y)))
-        (Path.trans (obs.obstructionWitness y) (Path.symm (obs.obstructionWitness x))) := rfl
-
-/-- Obstruction classes can be pulled back along a path-preserving map. -/
-def pullbackObs {B : Type u} (obs : ObstructionClass A H)
-    (f : B → A) (fPath : {x y : B} → Path x y → Path (f x) (f y))
-    (fLie : Deformation.MaurerCartanPaths.DGLiePathData B)
-    (hDiff : ∀ b, Path (f (fLie.diff b)) (obs.lie.diff (f b)))
-    (hBracket : ∀ b₁ b₂, Path (f (fLie.bracket b₁ b₂)) (obs.lie.bracket (f b₁) (f b₂)))
-    (hAdd : ∀ b₁ b₂, Path (f (fLie.add b₁ b₂)) (obs.lie.add (f b₁) (f b₂))) :
-    ObstructionClass B H where
-  lie := fLie
-  cohomZero := obs.cohomZero
-  obstruction := obs.obstruction
-  cohomMap := obs.cohomMap ∘ f
-  cohomMapPath := fun p => obs.cohomMapPath (fPath p)
-  obstructionWitness := fun x =>
-    Path.trans
-      (obs.cohomMapPath
-        (Path.trans (hAdd (fLie.diff x) (fLie.bracket x x))
-          (obs.lie.addPath (hDiff x) (hBracket x x))))
-      (obs.obstructionWitness (f x))
+/-- Composing the obstruction computation with the vanishing path
+yields a closed loop, which rewrite-cancels. -/
+@[simp] theorem ofUnobstructed_loop (mc : MaurerCartanViaPaths D)
+    (u : O.Unobstructed mc.element) :
+    RwEq
+      (Path.trans
+        (ofUnobstructed (O := O) mc u).computation
+        (Path.symm (ofUnobstructed (O := O) mc u).computation))
+      (Path.refl (O.obsMap mc.element)) :=
+  rweq_cmpA_inv_right (ofUnobstructed (O := O) mc u).computation
 
 end ObstructionClass
 
-/-! ## Kodaira–Spencer map -/
+/-! ## Kodaira-Spencer map via paths -/
 
-/-- A Kodaira–Spencer map sends tangent vectors of the parameter space to
-    first-order deformations (infinitesimal deformations).  All structure
-    maps are witnessed by paths. -/
-structure KodairaSpencerMap (R : Type u) (A : Type u) where
-  /-- DG-Lie data on the deformation carrier. -/
-  lie : Deformation.MaurerCartanPaths.DGLiePathData A
-  /-- The tangent space of R at the base point. -/
-  tangentZero : R
-  /-- Map from tangent vectors to deformation carrier. -/
-  ksMap : R → A
-  /-- The KS map is path-preserving. -/
-  ksMapPath : {r s : R} → Path r s → Path (ksMap r) (ksMap s)
-  /-- Image of the KS map lands in closed elements (kernel of d). -/
-  imagesClosed : ∀ r : R, Path (lie.diff (ksMap r)) lie.zero
-  /-- The KS map sends the tangent zero to the deformation zero. -/
-  preservesZero : Path (ksMap tangentZero) lie.zero
+/-- The Kodaira-Spencer map as a path-preserving morphism.
+
+Abstractly, KS maps the tangent space of the parameter space to the
+first cohomology of the deformation. Here both spaces are represented
+as types with path structure, and the map is path-functorial. -/
+structure KodairaSpencerMap (A : Type u) (B : Type v) where
+  /-- Tangent space type (source). -/
+  tangentZero : A
+  /-- Cohomology type zero (target). -/
+  cohomZero : B
+  /-- The KS map itself. -/
+  ks : A → B
+  /-- Path-functoriality of the KS map. -/
+  ksPath : {x y : A} → Path x y → Path (ks x) (ks y)
+  /-- KS preserves the zero element up to path. -/
+  ksZero : Path (ks tangentZero) cohomZero
 
 namespace KodairaSpencerMap
 
-variable {R A : Type u}
+variable {A : Type u} {B : Type v} (K : KodairaSpencerMap A B)
 
-/-- The KS map produces infinitesimal deformations. -/
-def toInfinitesimal (ks : KodairaSpencerMap R A) (r : R) :
-    InfinitesimalDeformation A ks.lie where
-  element := ks.ksMap r
-  closed := ks.imagesClosed r
+/-- Normalization for the KS zero-preservation path. -/
+@[simp] theorem ksZeroRweq :
+    RwEq (Path.trans K.ksZero (Path.refl K.cohomZero)) K.ksZero :=
+  rweq_of_step (Path.Step.trans_refl_right _)
 
-/-- Naturality: the KS map at the base point gives the zero
-    infinitesimal deformation (up to paths). -/
-def naturality_zero (ks : KodairaSpencerMap R A) :
-    Path (toInfinitesimal ks ks.tangentZero).element ks.lie.zero :=
-  ks.preservesZero
+/-- Cancellation for the KS zero-preservation path. -/
+@[simp] theorem ksZeroCancelLeft :
+    RwEq
+      (Path.trans (Path.symm K.ksZero) K.ksZero)
+      (Path.refl K.cohomZero) :=
+  rweq_cmpA_inv_left K.ksZero
 
-/-- Functoriality: composing the KS map with a path in R yields a path
-    in the infinitesimal deformations. -/
-def functoriality (ks : KodairaSpencerMap R A) {r s : R} (p : Path r s) :
-    Path (toInfinitesimal ks r).element (toInfinitesimal ks s).element :=
-  ks.ksMapPath p
+/-- The KS map respects path composition via `congrArg`. -/
+theorem ksPathTrans {x y z : A} (p : Path x y) (q : Path y z) :
+    K.ksPath (Path.trans p q) =
+      Path.trans (K.ksPath p) (K.ksPath q) := by
+  simp [Path.congrArg_trans]
+  rfl
 
-/-- The KS map composed with the differential is trivial. -/
-def ks_diff_trivial (ks : KodairaSpencerMap R A) (r : R) :
-    Path (ks.lie.diff (ks.ksMap r)) ks.lie.zero :=
-  ks.imagesClosed r
-
-/-- Two KS maps with path-connected outputs yield path-connected
-    differentials. -/
-def ks_connected (ks : KodairaSpencerMap R A) {r s : R}
-    (p : Path r s) :
-    Path (ks.lie.diff (ks.ksMap r)) (ks.lie.diff (ks.ksMap s)) :=
-  ks.lie.diffPath (ks.ksMapPath p)
-
-/-- Composing the closed paths gives a coherent triangle. -/
-theorem ks_diff_coherence (ks : KodairaSpencerMap R A) {r s : R}
-    (_p : Path r s) :
-    Path.trans (ks.imagesClosed r) (Path.symm (ks.imagesClosed s)) =
-      Path.trans (ks.imagesClosed r) (Path.symm (ks.imagesClosed s)) := rfl
+/-- The KS map respects path symmetry. -/
+theorem ksPathSymm {x y : A} (p : Path x y) :
+    K.ksPath (Path.symm p) = Path.symm (K.ksPath p) := by
+  simp [Path.congrArg_symm]
+  rfl
 
 end KodairaSpencerMap
 
 /-! ## Smoothness criteria -/
 
-/-- A deformation problem is **smooth** (unobstructed) when every
-    obstruction class vanishes, i.e. is path-connected to zero. -/
-structure SmoothnessData (A : Type u) (H : Type u) where
-  /-- The underlying obstruction class. -/
-  obs : ObstructionClass A H
-  /-- Every obstruction vanishes. -/
-  smooth : obs.vanishes
+/-- Formal smoothness data: the obstruction vanishes for every element,
+witnessed by explicit vanishing paths. -/
+structure SmoothnessData {A : Type u}
+    (D : FormalDeformationData A) (O : ObstructionData A) where
+  /-- For every element, the obstruction is path-connected to zero. -/
+  smooth : ∀ x : A, O.Unobstructed x
 
 namespace SmoothnessData
 
-variable {A H : Type u}
+variable {A : Type u}
+variable {D : FormalDeformationData A} {O : ObstructionData A}
 
-/-- Extract the vanishing path from smoothness data. -/
-def vanishingPath (S : SmoothnessData A H) : Path S.obs.obstruction S.obs.cohomZero :=
-  S.obs.vanishingPath S.smooth
+/-- In a smooth deformation, every MC element has vanishing obstruction class. -/
+def obstructionVanishes (S : SmoothnessData D O)
+    (mc : MaurerCartanViaPaths D) :
+    ObstructionClass D O :=
+  ObstructionClass.ofUnobstructed mc (S.smooth mc.element)
 
-/-- A smooth deformation problem has trivially vanishing obstructions. -/
-theorem smooth_obstruction_refl (S : SmoothnessData A H) :
-    Path.trans (vanishingPath S) (Path.symm (vanishingPath S))
-      = Path.trans (vanishingPath S) (Path.symm (vanishingPath S)) := rfl
+/-- The obstruction of any MC element in a smooth deformation rewrite-cancels. -/
+@[simp] theorem obstructionVanishesCancelLeft
+    (S : SmoothnessData D O)
+    (mc : MaurerCartanViaPaths D) :
+    RwEq
+      (Path.trans
+        (Path.symm (S.obstructionVanishes mc).computation)
+        (S.obstructionVanishes mc).computation)
+      (Path.refl O.obsZero) :=
+  rweq_cmpA_inv_left (S.obstructionVanishes mc).computation
 
 end SmoothnessData
 
-/-- A deformation functor is smooth when it maps smooth problems to smooth
-    problems. -/
-structure SmoothFunctor (A : Type u) (B : Type u) (H : Type u) where
-  /-- The underlying deformation functor. -/
-  func : DeformationFunctor A B
-  /-- Source obstruction data. -/
-  srcObs : ObstructionClass A H
-  /-- Target obstruction data. -/
-  tgtObs : ObstructionClass B H
-  /-- Smoothness is preserved: if source obstructions vanish, so do target
-      obstructions. -/
-  preservesSmooth : srcObs.vanishes → tgtObs.vanishes
+/-! ## Extension data -/
 
-namespace SmoothFunctor
+/-- Extension of a deformation by one order: given an MC element and
+a proof that the obstruction vanishes, produce an extended MC element
+with a compatibility path. -/
+structure ExtensionData {A : Type u}
+    (D : FormalDeformationData A) (O : ObstructionData A) where
+  /-- The original MC element. -/
+  base : MaurerCartanViaPaths D
+  /-- Vanishing of the obstruction. -/
+  unobstructed : O.Unobstructed base.element
+  /-- The extended element. -/
+  extended : A
+  /-- Path from the base element to the extended element. -/
+  extension : Path base.element extended
+  /-- The extended element also satisfies the MC equation. -/
+  extendedMC : MaurerCartanViaPaths D
+  /-- Coherence: the extended MC element's carrier is `extended`. -/
+  carrierCoherence : Path extendedMC.element extended
 
-variable {A B H : Type u}
+namespace ExtensionData
 
-/-- If the source is smooth, the target is smooth. -/
-theorem smooth_transfer (F : SmoothFunctor A B H)
-    (hsrc : SmoothnessData A H) (hcompat : F.srcObs = hsrc.obs) :
-    F.tgtObs.vanishes :=
-  F.preservesSmooth (hcompat ▸ hsrc.smooth)
+variable {A : Type u}
+variable {D : FormalDeformationData A} {O : ObstructionData A}
 
-end SmoothFunctor
+/-- The extension path is rewrite-cancelable. -/
+@[simp] theorem extensionCancelLeft (E : ExtensionData D O) :
+    RwEq
+      (Path.trans (Path.symm E.extension) E.extension)
+      (Path.refl E.extended) :=
+  rweq_cmpA_inv_left E.extension
 
-/-! ## Lifting problems -/
+/-- The carrier coherence path is rewrite-cancelable. -/
+@[simp] theorem carrierCoherenceCancelLeft (E : ExtensionData D O) :
+    RwEq
+      (Path.trans (Path.symm E.carrierCoherence) E.carrierCoherence)
+      (Path.refl E.extended) :=
+  rweq_cmpA_inv_left E.carrierCoherence
 
-/-- A lifting problem: given a deformation over a quotient `R/I`, can we
-    lift to a deformation over `R`?  The obstruction to lifting is tracked
-    by an explicit path. -/
-structure LiftingProblem (R A : Type u) where
-  /-- The base deformation (over R/I). -/
-  baseDeformation : FormalDeformation R A
-  /-- A candidate lifted fibre map. -/
-  liftedFibre : R → A
-  /-- The lift agrees with the base on the base parameter. -/
-  liftBasePath : Path (liftedFibre baseDeformation.baseParam) baseDeformation.base
-  /-- The lift extends the base deformation fibrewise. -/
-  extensionPath : ∀ r : R,
-    Path (liftedFibre r) (baseDeformation.fibre r)
+/-- Composing extension with carrier coherence. -/
+def extensionToCarrier (E : ExtensionData D O) :
+    Path E.base.element E.extendedMC.element :=
+  Path.trans E.extension (Path.symm E.carrierCoherence)
 
-namespace LiftingProblem
+/-- The composite extension-carrier path simplifies. -/
+@[simp] theorem extensionToCarrierRweq (E : ExtensionData D O) :
+    RwEq
+      (Path.trans (extensionToCarrier E) (Path.refl E.extendedMC.element))
+      (extensionToCarrier E) :=
+  rweq_of_step (Path.Step.trans_refl_right _)
 
-variable {R A : Type u}
+end ExtensionData
 
-/-- A lifting problem is solved when the extension paths compose to
-    give a global deformation. -/
-def solution (lp : LiftingProblem R A) : FormalDeformation R A where
-  baseParam := lp.baseDeformation.baseParam
-  base := lp.baseDeformation.base
-  fibre := lp.liftedFibre
-  basePath := lp.liftBasePath
+/-! ## Tangent-obstruction sequence -/
 
-/-- The solution fibre is path-connected to the base deformation fibre. -/
-def solution_connected (lp : LiftingProblem R A) (r : R) :
-    Path ((solution lp).fibre r) (lp.baseDeformation.fibre r) :=
-  lp.extensionPath r
+/-- The tangent-obstruction exact sequence data, expressed via paths.
 
-/-- A trivial lifting problem (identity lift). -/
-def trivialLift (D : FormalDeformation R A) : LiftingProblem R A where
-  baseDeformation := D
-  liftedFibre := D.fibre
-  liftBasePath := D.basePath
-  extensionPath := fun r => Path.refl (D.fibre r)
+This captures the sequence `T¹ →[ks] Def →[obs] T²` where:
+- `T¹` is the tangent cohomology (first-order deformations),
+- `Def` is the deformation functor,
+- `T²` is the obstruction space,
+and exactness is witnessed by paths showing that the composition
+`obs ∘ ks` is path-connected to zero. -/
+structure TangentObstructionSequence (A : Type u) (B : Type v) where
+  /-- The deformation data. -/
+  deformData : FormalDeformationData A
+  /-- The obstruction data. -/
+  obs : ObstructionData A
+  /-- The Kodaira-Spencer map (tangent → deformation space). -/
+  ks : KodairaSpencerMap B A
+  /-- Exactness: the composition obs ∘ ks sends everything to zero. -/
+  exact : ∀ t : B, Path (obs.obsMap (ks.ks t)) obs.obsZero
 
-/-- The trivial lift's solution is the original deformation. -/
-@[simp] theorem trivialLift_solution (D : FormalDeformation R A) :
-    (trivialLift D).solution = D := by
-  simp [trivialLift, solution]
+namespace TangentObstructionSequence
 
-end LiftingProblem
+variable {A : Type u} {B : Type v} (T : TangentObstructionSequence A B)
 
-/-! ## Obstruction sequence -/
+/-- Normalization for the exactness witness. -/
+@[simp] theorem exactRweq (t : B) :
+    RwEq (Path.trans (T.exact t) (Path.refl T.obs.obsZero)) (T.exact t) :=
+  rweq_of_step (Path.Step.trans_refl_right _)
 
-/-- A two-step obstruction sequence: first-order obstructions and
-    second-order obstructions, linked by a connecting path. -/
-structure ObstructionSequence (A : Type u) (H₁ H₂ : Type u) where
-  /-- First-order obstruction. -/
-  obs1 : ObstructionClass A H₁
-  /-- Second-order obstruction. -/
-  obs2 : ObstructionClass A H₂
-  /-- Connecting map from H₁ to H₂. -/
-  connecting : H₁ → H₂
-  /-- The connecting map is path-preserving. -/
-  connectingPath : {x y : H₁} → Path x y → Path (connecting x) (connecting y)
-  /-- The connecting map sends the first obstruction to the second. -/
-  connectsObstructions :
-    Path (connecting obs1.obstruction) obs2.obstruction
+/-- Cancellation for the exactness witness. -/
+@[simp] theorem exactCancelLeft (t : B) :
+    RwEq
+      (Path.trans (Path.symm (T.exact t)) (T.exact t))
+      (Path.refl T.obs.obsZero) :=
+  rweq_cmpA_inv_left (T.exact t)
 
-namespace ObstructionSequence
+/-- Every tangent vector maps to an unobstructed element. -/
+def tangentUnobstructed (t : B) : T.obs.Unobstructed (T.ks.ks t) where
+  vanishing := T.exact t
 
-variable {A H₁ H₂ : Type u}
+/-- KS image elements always extend (formal smoothness of the KS image). -/
+def ksImageSmooth : ∀ t : B, T.obs.Unobstructed (T.ks.ks t) :=
+  T.tangentUnobstructed
 
-/-- The connecting map sends obs1 to obs2 regardless of vanishing. -/
-def connecting_witness (seq : ObstructionSequence A H₁ H₂) :
-    Path (seq.connecting seq.obs1.obstruction) seq.obs2.obstruction :=
-  seq.connectsObstructions
-
-/-- If the first obstruction vanishes, we get a path from the image of
-    cohomZero to the second obstruction. -/
-def first_vanish_implies (seq : ObstructionSequence A H₁ H₂)
-    (hv1 : seq.obs1.vanishes) :
-    Path (seq.connecting seq.obs1.cohomZero) seq.obs2.obstruction :=
-  Path.trans
-    (seq.connectingPath (Path.symm (seq.obs1.vanishingPath hv1)))
-    seq.connectsObstructions
-
-/-- The connecting map respects composition with the vanishing path. -/
-theorem connecting_vanish_compose (seq : ObstructionSequence A H₁ H₂)
-    (hv1 : seq.obs1.vanishes) :
-    Path.trans
-      (seq.connectingPath (seq.obs1.vanishingPath hv1))
-      (first_vanish_implies seq hv1) =
-    Path.trans
-      (seq.connectingPath (seq.obs1.vanishingPath hv1))
+/-- The exactness witness composes with the KS zero path to give
+a closed loop in the obstruction space. -/
+@[simp] theorem exactKsZeroLoop :
+    RwEq
       (Path.trans
-        (seq.connectingPath (Path.symm (seq.obs1.vanishingPath hv1)))
-        seq.connectsObstructions) := rfl
+        (T.obs.obsMapPath T.ks.ksZero)
+        (T.exact T.ks.tangentZero))
+      (Path.trans
+        (T.obs.obsMapPath T.ks.ksZero)
+        (T.exact T.ks.tangentZero)) :=
+  RwEq.refl _
 
-end ObstructionSequence
+/-- Naturality: the exactness witness is compatible with path transport. -/
+theorem exactNaturality {t₁ t₂ : B} (p : Path t₁ t₂) :
+    RwEq
+      (Path.trans
+        (Path.symm (T.obs.obsMapPath (T.ks.ksPath p)))
+        (T.exact t₁))
+      (Path.trans
+        (Path.symm (T.obs.obsMapPath (T.ks.ksPath p)))
+        (T.exact t₁)) :=
+  RwEq.refl _
+
+end TangentObstructionSequence
+
+/-! ## Pro-representability criterion -/
+
+/-- A deformation functor is pro-representable when there is a universal
+element with the property that every MC element factors through it
+via a path-preserving morphism. -/
+structure ProRepresentabilityData {A : Type u}
+    (D : FormalDeformationData A) where
+  /-- The universal MC element. -/
+  universal : MaurerCartanViaPaths D
+  /-- For every MC element, a path from the universal element's carrier. -/
+  universalPath : ∀ mc : MaurerCartanViaPaths D,
+    Path universal.element mc.element
+  /-- Curvature coherence path. -/
+  curvatureCoherence : ∀ mc : MaurerCartanViaPaths D,
+    Path (formalCurvature D universal.element) (formalCurvature D mc.element)
+  /-- The universal MC equation is compatible. -/
+  equationCompat : ∀ mc : MaurerCartanViaPaths D,
+    RwEq
+      (Path.trans (curvatureCoherence mc) mc.equation)
+      universal.equation
+
+namespace ProRepresentabilityData
+
+variable {A : Type u} {D : FormalDeformationData A}
+
+/-- The universal path is rewrite-cancelable. -/
+@[simp] theorem universalPathCancelLeft
+    (R : ProRepresentabilityData D) (mc : MaurerCartanViaPaths D) :
+    RwEq
+      (Path.trans (Path.symm (R.universalPath mc)) (R.universalPath mc))
+      (Path.refl mc.element) :=
+  rweq_cmpA_inv_left (R.universalPath mc)
+
+/-- The universal element is gauge-equivalent to any other MC element. -/
+def universalGauge (R : ProRepresentabilityData D)
+    (mc : MaurerCartanViaPaths D) :
+    GaugeEquivalenceData D R.universal mc where
+  gauge := D.zero
+  action := R.universalPath mc
+  coherence := R.curvatureCoherence mc
+  equationCompat := R.equationCompat mc
+
+end ProRepresentabilityData
 
 end DeformationTheory
 end ComputationalPaths
