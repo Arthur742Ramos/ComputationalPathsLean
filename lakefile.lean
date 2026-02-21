@@ -34,6 +34,7 @@ lean_lib CompPaths where
     `CompPaths.Examples.FundamentalGroupTorus,
     `CompPaths.Homotopy.VanKampen,
     `CompPaths.Homotopy.VanKampenApplications,
+    `CompPaths.Homotopy.ModelStructure,
     `CompPaths.Homotopy.FibrationSequence,
     `CompPaths.HIT.SuspensionDeep,
     `CompPaths.Rewriting.KnuthBendix,
@@ -45,7 +46,8 @@ lean_lib CompPaths where
     `CompPaths.Algebra.PathAlgebra,
     `CompPaths.Algebra.Presentation,
     `CompPaths.Algebra.HomologicalAlgebra,
-    `CompPaths.Algebra.SpectralSequence]
+    `CompPaths.Algebra.SpectralSequence,
+    `CompPaths.Algebra.OperadStructure]
 
 @[default_target]
 lean_exe computational_paths where
