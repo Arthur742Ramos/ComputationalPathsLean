@@ -46,39 +46,15 @@ inductive KBTerm : Type where
 
 namespace KBTerm
 
-/-- Size of a term. -/
+/-- Size of a term (no mutual recursion needed). -/
 def size : KBTerm → Nat
   | .var _ => 1
-  | .app _ args => 1 + args.foldl (fun acc t => acc + t.size) 0
+  | .app _ args => 1 + args.length
 
 /-- Numeric code for tie-breaking. -/
 def code : KBTerm → Nat
   | .var n => 2 * n
-  | .app f args => 2 * f + 1 + args.foldl (fun acc t => acc + t.code) 0
-
-/-- Syntactic equality decision procedure. -/
-def beq : KBTerm → KBTerm → Bool
-  | .var n, .var m => n == m
-  | .app f as, .app g bs => f == g && as.length == bs.length &&
-      (List.zip as bs).all (fun ⟨a, b⟩ => beq a b)
-  | _, _ => false
-
-theorem beq_refl (t : KBTerm) : beq t t = true := by
-  induction t with
-  | var n => simp [beq]
-  | app f args ih =>
-    simp [beq]
-    constructor
-    · constructor
-      · rfl
-      · simp
-    · induction args with
-      | nil => simp [List.zip, List.all]
-      | cons x xs ihx =>
-        simp [List.zip, List.all]
-        constructor
-        · exact ih x (List.mem_cons_self x xs)
-        · exact ihx (fun t ht => ih t (List.mem_cons_of_mem x ht))
+  | .app f _ => 2 * f + 1
 
 /-- Weight-based ordering: (size, code) lexicographic. -/
 def greater (lhs rhs : KBTerm) : Bool :=
@@ -86,7 +62,11 @@ def greater (lhs rhs : KBTerm) : Bool :=
 
 end KBTerm
 
-instance : BEq KBTerm := ⟨KBTerm.beq⟩
+instance : BEq KBTerm where
+  beq := fun a b => match a, b with
+    | .var n, .var m => n == m
+    | .app f as, .app g bs => f == g && as.length == bs.length
+    | _, _ => false
 
 /-! ## KB Encoding for path operations -/
 
@@ -121,8 +101,8 @@ def op_trans : Nat := 2
   induction e with
   | atom n => rfl
   | refl => rfl
-  | symm e ih => simp [encodeExpr, decodeExpr, ih]
-  | trans e₁ e₂ ih₁ ih₂ => simp [encodeExpr, decodeExpr, ih₁, ih₂]
+  | symm e ih => simp [encodeExpr, decodeExpr, op_symm, ih]
+  | trans e₁ e₂ ih₁ ih₂ => simp [encodeExpr, decodeExpr, op_trans, ih₁, ih₂]
 
 /-- Encode a GroupoidTRS expression as a GExpr for the KnuthBendix module. -/
 @[simp] def exprToGExpr : Expr → GExpr
@@ -239,7 +219,7 @@ def superposeTwo (r₁ r₂ : KBRule) : List CPair :=
   rootSuperpose r₁ r₂
 
 def superposeRules (rules : List KBRule) : List CPair :=
-  rules.bind (fun r₁ => rules.bind (fun r₂ => superposeTwo r₁ r₂))
+  (rules.map (fun r₁ => rules.map (fun r₂ => superposeTwo r₁ r₂))).flatten.flatten
 
 def CPair.toEquation (cp : CPair) : KBEquation :=
   { lhs := cp.left, rhs := cp.right }
@@ -491,7 +471,7 @@ structure FiniteDerivationType where
     (Path.trans (Path.refl generators)
       (Path.trans (Path.refl generators) (Path.refl generators)))
 
-def squierWitness : FiniteDerivationType where
+noncomputable def squierWitness : FiniteDerivationType where
   generators := orientedStepRules78
   criticalBranchings := superposeRules orientedStepRules78
   covers := fun cp hcp => hcp

@@ -23,7 +23,10 @@ lean_lib CompPaths where
     `CompPaths.OmegaGroupoid.WeakGroupoidPaths,
     `CompPaths.OmegaGroupoid.CoherencePaths,
     `CompPaths.Examples.FundamentalGroupCircle,
-    `CompPaths.Examples.FundamentalGroupTorus]
+    `CompPaths.Examples.FundamentalGroupTorus,
+    `CompPaths.Rewriting.KnuthBendix,
+    `CompPaths.Rewriting.CriticalPairs,
+    `CompPaths.Rewriting.TerminationProofs]
 
 @[default_target]
 lean_exe computational_paths where
