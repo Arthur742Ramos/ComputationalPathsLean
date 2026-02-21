@@ -24,6 +24,7 @@ import CompPaths.Homotopy.VanKampen
 import CompPaths.Homotopy.VanKampenApplications
 import CompPaths.Homotopy.ModelStructure
 import CompPaths.Homotopy.FibrationSequence
+import CompPaths.Homotopy.WhiteheadTheorem
 import CompPaths.Algebra.HomologicalAlgebra
 import CompPaths.HIT.SuspensionDeep
 import CompPaths.Category.EnrichedCategory

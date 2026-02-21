@@ -38,6 +38,7 @@ lean_lib CompPaths where
     `CompPaths.Homotopy.VanKampenApplications,
     `CompPaths.Homotopy.ModelStructure,
     `CompPaths.Homotopy.FibrationSequence,
+    `CompPaths.Homotopy.WhiteheadTheorem,
     `CompPaths.HIT.SuspensionDeep,
     `CompPaths.Rewriting.KnuthBendix,
     `CompPaths.Rewriting.CriticalPairs,
