@@ -21,6 +21,7 @@ lean_lib CompPaths where
     `CompPaths.Coherence.UnitCoherence,
     `CompPaths.Coherence.InverseCoherence,
     `CompPaths.Coherence.InterchangeLaw,
+    `CompPaths.Coherence.CoherenceDeep,
     `CompPaths.Context.ContextDeep,
     `CompPaths.CwF.CwFDeep,
     `CompPaths.DeformationTheory.DeformationPaths,
