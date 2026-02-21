@@ -72,3 +72,5 @@ import ComputationalPaths.KnotInvariant.PathInfrastructure
 import ComputationalPaths.LieAlgebra.PathInfrastructure
 import ComputationalPaths.SheafCohomology.PathInfrastructure
 import ComputationalPaths.TwoCategoryInstances
+import ComputationalPaths.DeformationTheory.DeformationPaths
+import ComputationalPaths.DeformationTheory.ObstructionPaths
