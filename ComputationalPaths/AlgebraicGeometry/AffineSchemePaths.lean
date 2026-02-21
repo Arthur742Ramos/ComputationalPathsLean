@@ -19,6 +19,8 @@ open Path
 
 universe u
 
+noncomputable section
+
 /-! ## Section 1: Commutative ring path data -/
 
 /-- Commutative ring operations with path-level algebraic identities. -/
@@ -41,63 +43,63 @@ namespace CRingPathData
 
 variable {R : Type u} (CR : CRingPathData R)
 
-@[simp] theorem addAssoc_rweq (x y z : R) :
+@[simp] def addAssoc_rweq (x y z : R) :
     RwEq
       (Path.trans (CR.addAssocPath x y z)
         (Path.refl (CR.add x (CR.add y z))))
       (CR.addAssocPath x y z) :=
   rweq_of_step (Path.Step.trans_refl_right (CR.addAssocPath x y z))
 
-@[simp] theorem addComm_rweq (x y : R) :
+@[simp] def addComm_rweq (x y : R) :
     RwEq
       (Path.trans (CR.addCommPath x y) (Path.refl (CR.add y x)))
       (CR.addCommPath x y) :=
   rweq_of_step (Path.Step.trans_refl_right (CR.addCommPath x y))
 
-@[simp] theorem addZero_rweq (x : R) :
+@[simp] def addZero_rweq (x : R) :
     RwEq
       (Path.trans (Path.refl (CR.add x CR.zero)) (CR.addZeroPath x))
       (CR.addZeroPath x) :=
   rweq_of_step (Path.Step.trans_refl_left (CR.addZeroPath x))
 
-@[simp] theorem addNeg_rweq (x : R) :
+@[simp] def addNeg_rweq (x : R) :
     RwEq
       (Path.trans (CR.addNegPath x) (Path.refl CR.zero))
       (CR.addNegPath x) :=
   rweq_of_step (Path.Step.trans_refl_right (CR.addNegPath x))
 
-@[simp] theorem mulAssoc_rweq (x y z : R) :
+@[simp] def mulAssoc_rweq (x y z : R) :
     RwEq
       (Path.trans (CR.mulAssocPath x y z)
         (Path.refl (CR.mul x (CR.mul y z))))
       (CR.mulAssocPath x y z) :=
   rweq_of_step (Path.Step.trans_refl_right (CR.mulAssocPath x y z))
 
-@[simp] theorem mulComm_rweq (x y : R) :
+@[simp] def mulComm_rweq (x y : R) :
     RwEq
       (Path.trans (CR.mulCommPath x y) (Path.refl (CR.mul y x)))
       (CR.mulCommPath x y) :=
   rweq_of_step (Path.Step.trans_refl_right (CR.mulCommPath x y))
 
-@[simp] theorem mulOne_rweq (x : R) :
+@[simp] def mulOne_rweq (x : R) :
     RwEq
       (Path.trans (CR.mulOnePath x) (Path.refl x))
       (CR.mulOnePath x) :=
   rweq_of_step (Path.Step.trans_refl_right (CR.mulOnePath x))
 
-@[simp] theorem distrib_rweq (x y z : R) :
+@[simp] def distrib_rweq (x y z : R) :
     RwEq
       (Path.trans (Path.refl (CR.mul x (CR.add y z))) (CR.distribPath x y z))
       (CR.distribPath x y z) :=
   rweq_of_step (Path.Step.trans_refl_left (CR.distribPath x y z))
 
-@[simp] theorem mulComm_cancel_rweq (x y : R) :
+@[simp] def mulComm_cancel_rweq (x y : R) :
     RwEq
       (Path.trans (Path.symm (CR.mulCommPath x y)) (CR.mulCommPath x y))
       (Path.refl (CR.mul y x)) :=
   rweq_cmpA_inv_left (CR.mulCommPath x y)
 
-@[simp] theorem addComm_cancel_rweq (x y : R) :
+@[simp] def addComm_cancel_rweq (x y : R) :
     RwEq
       (Path.trans (Path.symm (CR.addCommPath x y)) (CR.addCommPath x y))
       (Path.refl (CR.add y x)) :=
@@ -126,32 +128,32 @@ namespace SpecPathData
 
 variable {R Point : Type u} (S : SpecPathData R Point)
 
-@[simp] theorem complement_rweq (f : R) (p : Point) :
+@[simp] def complement_rweq (f : R) (p : Point) :
     RwEq
       (Path.trans (S.complementPath f p) (Path.refl (S.basicOpen f p)))
       (S.complementPath f p) :=
   rweq_of_step (Path.Step.trans_refl_right (S.complementPath f p))
 
-@[simp] theorem basicOpenMul_rweq (f g : R) (p : Point) :
+@[simp] def basicOpenMul_rweq (f g : R) (p : Point) :
     RwEq
       (Path.trans (S.basicOpenMulPath f g p)
         (Path.refl (And (S.basicOpen f p) (S.basicOpen g p))))
       (S.basicOpenMulPath f g p) :=
   rweq_of_step (Path.Step.trans_refl_right (S.basicOpenMulPath f g p))
 
-@[simp] theorem basicOpenOne_rweq (p : Point) :
+@[simp] def basicOpenOne_rweq (p : Point) :
     RwEq
       (Path.trans (S.basicOpenOnePath p) (Path.refl True))
       (S.basicOpenOnePath p) :=
   rweq_of_step (Path.Step.trans_refl_right (S.basicOpenOnePath p))
 
-@[simp] theorem vanishingZero_rweq (p : Point) :
+@[simp] def vanishingZero_rweq (p : Point) :
     RwEq
       (Path.trans (Path.refl (S.vanishing S.ring.zero p)) (S.vanishingZeroPath p))
       (S.vanishingZeroPath p) :=
   rweq_of_step (Path.Step.trans_refl_left (S.vanishingZeroPath p))
 
-@[simp] theorem basicOpenMul_cancel_rweq (f g : R) (p : Point) :
+@[simp] def basicOpenMul_cancel_rweq (f g : R) (p : Point) :
     RwEq
       (Path.trans (Path.symm (S.basicOpenMulPath f g p)) (S.basicOpenMulPath f g p))
       (Path.refl (And (S.basicOpen f p) (S.basicOpen g p))) :=
@@ -179,27 +181,27 @@ namespace SpecFunctorPathData
 variable {R S Point₁ Point₂ : Type u}
          (F : SpecFunctorPathData R S Point₁ Point₂)
 
-@[simp] theorem pullbackVanish_rweq (f : R) (q : Point₂) :
+@[simp] def pullbackVanish_rweq (f : R) (q : Point₂) :
     RwEq
       (Path.trans (F.pullbackVanishPath f q)
         (Path.refl (F.specS.vanishing (F.ringHom f) q)))
       (F.pullbackVanishPath f q) :=
   rweq_of_step (Path.Step.trans_refl_right (F.pullbackVanishPath f q))
 
-@[simp] theorem pullbackOpen_rweq (f : R) (q : Point₂) :
+@[simp] def pullbackOpen_rweq (f : R) (q : Point₂) :
     RwEq
       (Path.trans (F.pullbackOpenPath f q)
         (Path.refl (F.specS.basicOpen (F.ringHom f) q)))
       (F.pullbackOpenPath f q) :=
   rweq_of_step (Path.Step.trans_refl_right (F.pullbackOpenPath f q))
 
-@[simp] theorem functorId_rweq (q : Point₂) :
+@[simp] def functorId_rweq (q : Point₂) :
     RwEq
       (Path.trans (F.functorIdPath q) (Path.refl (F.pullback q)))
       (F.functorIdPath q) :=
   rweq_of_step (Path.Step.trans_refl_right (F.functorIdPath q))
 
-@[simp] theorem pullbackVanish_cancel_rweq (f : R) (q : Point₂) :
+@[simp] def pullbackVanish_cancel_rweq (f : R) (q : Point₂) :
     RwEq
       (Path.trans (Path.symm (F.pullbackVanishPath f q)) (F.pullbackVanishPath f q))
       (Path.refl (F.specS.vanishing (F.ringHom f) q)) :=
@@ -231,45 +233,45 @@ namespace StructureSheafPathData
 
 variable {R Section : Type u} (Sh : StructureSheafPathData R Section)
 
-@[simp] theorem sheafLocality_rweq (f g : R) (s : Section) :
+@[simp] def sheafLocality_rweq (f g : R) (s : Section) :
     RwEq
       (Path.trans (Sh.sheafLocalityPath f g s) (Path.refl s))
       (Sh.sheafLocalityPath f g s) :=
   rweq_of_step (Path.Step.trans_refl_right (Sh.sheafLocalityPath f g s))
 
-@[simp] theorem sheafGluing_rweq (f : R) (s : Section) :
+@[simp] def sheafGluing_rweq (f : R) (s : Section) :
     RwEq
       (Path.trans (Path.refl (Sh.restrict f f s)) (Sh.sheafGluingPath f s))
       (Sh.sheafGluingPath f s) :=
   rweq_of_step (Path.Step.trans_refl_left (Sh.sheafGluingPath f s))
 
-@[simp] theorem sectionMul_rweq (f g : R) :
+@[simp] def sectionMul_rweq (f g : R) :
     RwEq
       (Path.trans (Sh.sectionMulPath f g)
         (Path.refl (Sh.restrict f g (Sh.sectionOnOpen (Sh.ring.mul f g)))))
       (Sh.sectionMulPath f g) :=
   rweq_of_step (Path.Step.trans_refl_right (Sh.sectionMulPath f g))
 
-@[simp] theorem localizeId_rweq (f : R) :
+@[simp] def localizeId_rweq (f : R) :
     RwEq
       (Path.trans (Sh.localizeIdPath f) (Path.refl (Sh.sectionOnOpen Sh.ring.one)))
       (Sh.localizeIdPath f) :=
   rweq_of_step (Path.Step.trans_refl_right (Sh.localizeIdPath f))
 
-@[simp] theorem restrictAssoc_rweq (f g h : R) (s : Section) :
+@[simp] def restrictAssoc_rweq (f g h : R) (s : Section) :
     RwEq
       (Path.trans (Sh.restrictAssocPath f g h s)
         (Path.refl (Sh.restrict f h s)))
       (Sh.restrictAssocPath f g h s) :=
   rweq_of_step (Path.Step.trans_refl_right (Sh.restrictAssocPath f g h s))
 
-@[simp] theorem sheafLocality_cancel_rweq (f g : R) (s : Section) :
+@[simp] def sheafLocality_cancel_rweq (f g : R) (s : Section) :
     RwEq
       (Path.trans (Path.symm (Sh.sheafLocalityPath f g s)) (Sh.sheafLocalityPath f g s))
       (Path.refl s) :=
   rweq_cmpA_inv_left (Sh.sheafLocalityPath f g s)
 
-@[simp] theorem restrictAssoc_cancel_rweq (f g h : R) (s : Section) :
+@[simp] def restrictAssoc_cancel_rweq (f g h : R) (s : Section) :
     RwEq
       (Path.trans (Path.symm (Sh.restrictAssocPath f g h s))
         (Sh.restrictAssocPath f g h s))
@@ -294,13 +296,13 @@ namespace SchemeMorphismPathData
 
 variable {X Y Ox Oy : Type u} (M : SchemeMorphismPathData X Y Ox Oy)
 
-@[simp] theorem identity_rweq (s : Oy) :
+@[simp] def identity_rweq (s : Oy) :
     RwEq
       (Path.trans (M.identityPath s) (Path.refl (M.sheafMap s)))
       (M.identityPath s) :=
   rweq_of_step (Path.Step.trans_refl_right (M.identityPath s))
 
-@[simp] theorem identity_cancel_rweq (s : Oy) :
+@[simp] def identity_cancel_rweq (s : Oy) :
     RwEq
       (Path.trans (Path.symm (M.identityPath s)) (M.identityPath s))
       (Path.refl (M.sheafMap s)) :=
@@ -326,14 +328,14 @@ namespace SchemeMorphismCompPathData
 variable {X Y Z Ox Oy Oz : Type u}
          (C : SchemeMorphismCompPathData X Y Z Ox Oy Oz)
 
-@[simp] theorem compSheafMap_rweq (s : Oz) :
+@[simp] def compSheafMap_rweq (s : Oz) :
     RwEq
       (Path.trans (Path.refl (C.morphXY.sheafMap (C.morphYZ.sheafMap s)))
         (C.compSheafMapPath s))
       (C.compSheafMapPath s) :=
   rweq_of_step (Path.Step.trans_refl_left (C.compSheafMapPath s))
 
-@[simp] theorem compAssoc_rweq (s : Oz) :
+@[simp] def compAssoc_rweq (s : Oz) :
     RwEq
       (Path.trans (C.compAssocPath s)
         (Path.refl (C.morphXY.sheafMap (C.morphYZ.sheafMap s))))
@@ -361,20 +363,20 @@ namespace FiberProductPathData
 
 variable {X Y S FP : Type u} (FB : FiberProductPathData X Y S FP)
 
-@[simp] theorem fiberSquare_rweq (p : FP) :
+@[simp] def fiberSquare_rweq (p : FP) :
     RwEq
       (Path.trans (FB.fiberSquarePath p)
         (Path.refl (FB.baseY (FB.projY p))))
       (FB.fiberSquarePath p) :=
   rweq_of_step (Path.Step.trans_refl_right (FB.fiberSquarePath p))
 
-@[simp] theorem fiberSquare_cancel_rweq (p : FP) :
+@[simp] def fiberSquare_cancel_rweq (p : FP) :
     RwEq
       (Path.trans (Path.symm (FB.fiberSquarePath p)) (FB.fiberSquarePath p))
       (Path.refl (FB.baseY (FB.projY p))) :=
   rweq_cmpA_inv_left (FB.fiberSquarePath p)
 
-@[simp] theorem symmetryPath_rweq (p : FP) :
+@[simp] def symmetryPath_rweq (p : FP) :
     RwEq
       (Path.trans (FB.symmetryPath p) (Path.refl (FB.projX p)))
       (FB.symmetryPath p) :=
@@ -400,20 +402,20 @@ namespace SeparatedMorphismPathData
 
 variable {X S : Type u} (Sep : SeparatedMorphismPathData X S)
 
-@[simp] theorem diagClosed_rweq (x y : X) :
+@[simp] def diagClosed_rweq (x y : X) :
     RwEq
       (Path.trans (Sep.diagClosedPath x y)
         (Path.refl (Sep.morphism x = Sep.morphism y → x = y)))
       (Sep.diagClosedPath x y) :=
   rweq_of_step (Path.Step.trans_refl_right (Sep.diagClosedPath x y))
 
-@[simp] theorem separatedSquare_rweq (x : X) :
+@[simp] def separatedSquare_rweq (x : X) :
     RwEq
       (Path.trans (Sep.separatedSquarePath x) (Path.refl True))
       (Sep.separatedSquarePath x) :=
   rweq_of_step (Path.Step.trans_refl_right (Sep.separatedSquarePath x))
 
-@[simp] theorem diagClosed_cancel_rweq (x y : X) :
+@[simp] def diagClosed_cancel_rweq (x y : X) :
     RwEq
       (Path.trans (Path.symm (Sep.diagClosedPath x y)) (Sep.diagClosedPath x y))
       (Path.refl (Sep.morphism x = Sep.morphism y → x = y)) :=
@@ -435,13 +437,13 @@ namespace ProperMorphismPathData
 
 variable {X S : Type u} (P : ProperMorphismPathData X S)
 
-@[simp] theorem finiteType_rweq :
+@[simp] def finiteType_rweq :
     RwEq
       (Path.trans (P.finiteTypePath) (Path.refl P.finiteTypeProp))
       P.finiteTypePath :=
   rweq_of_step (Path.Step.trans_refl_right P.finiteTypePath)
 
-@[simp] theorem univClosed_rweq :
+@[simp] def univClosed_rweq :
     RwEq
       (Path.trans P.univClosedPath (Path.refl P.univClosedProp))
       P.univClosedPath :=
@@ -469,46 +471,46 @@ namespace LocalizationPathData
 
 variable {R Loc : Type u} (L : LocalizationPathData R Loc)
 
-@[simp] theorem locMapAdd_rweq (x y : R) :
+@[simp] def locMapAdd_rweq (x y : R) :
     RwEq
       (Path.trans (L.locMapAddPath x y)
         (Path.refl (L.locRing.add (L.locMap x) (L.locMap y))))
       (L.locMapAddPath x y) :=
   rweq_of_step (Path.Step.trans_refl_right (L.locMapAddPath x y))
 
-@[simp] theorem locMapMul_rweq (x y : R) :
+@[simp] def locMapMul_rweq (x y : R) :
     RwEq
       (Path.trans (L.locMapMulPath x y)
         (Path.refl (L.locRing.mul (L.locMap x) (L.locMap y))))
       (L.locMapMulPath x y) :=
   rweq_of_step (Path.Step.trans_refl_right (L.locMapMulPath x y))
 
-@[simp] theorem locMapOne_rweq :
+@[simp] def locMapOne_rweq :
     RwEq
       (Path.trans L.locMapOnePath (Path.refl L.locRing.one))
       L.locMapOnePath :=
   rweq_of_step (Path.Step.trans_refl_right L.locMapOnePath)
 
-@[simp] theorem locMapZero_rweq :
+@[simp] def locMapZero_rweq :
     RwEq
       (Path.trans L.locMapZeroPath (Path.refl L.locRing.zero))
       L.locMapZeroPath :=
   rweq_of_step (Path.Step.trans_refl_right L.locMapZeroPath)
 
-@[simp] theorem locInvert_rweq (s : R) :
+@[simp] def locInvert_rweq (s : R) :
     RwEq
       (Path.trans (L.locInvertPath s)
         (Path.refl (L.locMap (L.ring.mul s s))))
       (L.locInvertPath s) :=
   rweq_of_step (Path.Step.trans_refl_right (L.locInvertPath s))
 
-@[simp] theorem locMapAdd_cancel_rweq (x y : R) :
+@[simp] def locMapAdd_cancel_rweq (x y : R) :
     RwEq
       (Path.trans (Path.symm (L.locMapAddPath x y)) (L.locMapAddPath x y))
       (Path.refl (L.locRing.add (L.locMap x) (L.locMap y))) :=
   rweq_cmpA_inv_left (L.locMapAddPath x y)
 
-@[simp] theorem locMapMul_cancel_rweq (x y : R) :
+@[simp] def locMapMul_cancel_rweq (x y : R) :
     RwEq
       (Path.trans (Path.symm (L.locMapMulPath x y)) (L.locMapMulPath x y))
       (Path.refl (L.locRing.mul (L.locMap x) (L.locMap y))) :=
@@ -533,21 +535,21 @@ namespace AffineSchemePathData
 
 variable {R Point Section : Type u} (A : AffineSchemePathData R Point Section)
 
-@[simp] theorem globalSections_rweq (r : R) :
+@[simp] def globalSections_rweq (r : R) :
     RwEq
       (Path.trans (A.globalSectionsPath r)
         (Path.refl (A.sheaf.sectionOnOpen r)))
       (A.globalSectionsPath r) :=
   rweq_of_step (Path.Step.trans_refl_right (A.globalSectionsPath r))
 
-@[simp] theorem gammaSpecAdj_rweq (r : R) :
+@[simp] def gammaSpecAdj_rweq (r : R) :
     RwEq
       (Path.trans (A.gammaSpecAdjPath r)
         (Path.refl (A.sheaf.sectionOnOpen r)))
       (A.gammaSpecAdjPath r) :=
   rweq_of_step (Path.Step.trans_refl_right (A.gammaSpecAdjPath r))
 
-@[simp] theorem affineCover_rweq (f : R) (p : Point) :
+@[simp] def affineCover_rweq (f : R) (p : Point) :
     RwEq
       (Path.trans (A.affineCoverPath f p)
         (Path.refl (A.spec.basicOpen f p)))
@@ -585,5 +587,6 @@ def trivialSpecPathData : SpecPathData PUnit PUnit where
   basicOpenOnePath := fun _ => Path.refl True
   vanishingZeroPath := fun _ => Path.refl True
 
+end
 end AlgebraicGeometry
 end ComputationalPaths
