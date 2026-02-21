@@ -223,7 +223,7 @@ private def axiomK_subsingleton {A : Type u} [Subsingleton A] (a : A)
     intro s
     cases s with | mk src tgt prf =>
       subst prf        -- structural: use the Step's own equality proof to unify src=tgt
-      have h1 : src = a := inst.allEq src a  -- field accessor, not Subsingleton.elim
+      have h1 : src = a := Subsingleton.allEq src a
       subst h1; rfl
   cases p with
   | mk steps proof =>
