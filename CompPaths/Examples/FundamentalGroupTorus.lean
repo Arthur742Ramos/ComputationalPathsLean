@@ -1,33 +1,16 @@
 /-
-# π₁(T²) ≅ ℤ × ℤ as a Group Isomorphism — Eckmann-Hilton
+# Fundamental group of the torus via explicit computational paths
 
-This module deepens the existing torus computation from `Torus.lean` and
-`TorusStep.lean` by:
+This file keeps the torus argument entirely at the path level:
 
-1. Promoting the `SimpleEquiv` to a group isomorphism (encode preserves mul).
-2. Proving the Eckmann-Hilton argument: loop composition commutes on the torus
-   at the π₁ level, using the product structure.
-3. Showing the torus fundamental group is the free abelian group on two generators.
-4. Connecting everything back through the existing circle proof.
-
-Builds on: `CircleCompPath`, `Torus`, `TorusStep`, `FundamentalGroupCircle`.
-
-NO sorry/admit/Path.ofEq. Multi-step proofs with genuine induction.
-
-## References
-
-- HoTT Book, §2.1 (Eckmann-Hilton), §6.6 (torus)
-- Hatcher, *Algebraic Topology*, §1.2
+1. `T² = S¹ × S¹` is handled by explicit path pairs (`Path.prodMk`, `Path.fst`, `Path.snd`).
+2. Eckmann-Hilton interchange is witnessed directly by `Step.map2_subst`.
+3. The commutator `[a,b] = 1` is reduced by an explicit `Step` chain.
+4. Generator independence is expressed as componentwise independence of path pairs.
 -/
 
 import CompPaths.Core
-import CompPaths.Examples.FundamentalGroupCircle
 import ComputationalPaths.Path.CompPath.Torus
-import ComputationalPaths.Path.CompPath.TorusStep
-import ComputationalPaths.Path.CompPath.CircleCompPath
-import ComputationalPaths.Path.CompPath.WindingNumberProperties
-import ComputationalPaths.Path.Homotopy.FundamentalGroup
-import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 set_option maxHeartbeats 2000000
 
@@ -35,259 +18,233 @@ namespace ComputationalPaths
 namespace Path
 namespace CompPath
 
-open SimpleEquiv
+/-! ## Torus paths as explicit pairs -/
 
-universe u
+abbrev TorusPathPair : Type :=
+  Path (A := Circle) circleBase circleBase × Path (A := Circle) circleBase circleBase
 
-/-! ## Multiplication on torusPiOne -/
+noncomputable def torusPairToLoop : TorusPathPair → torusLoopSpace
+  | (p, q) => Path.prodMk p q
 
-/-- Component-wise multiplication on `torusPiOne = circlePiOne × circlePiOne`. -/
-noncomputable def torusPiOneMul (x y : torusPiOne) : torusPiOne :=
-  (circlePiOneMul x.1 y.1, circlePiOneMul x.2 y.2)
+noncomputable def torusLoopToPair : torusLoopSpace → TorusPathPair :=
+  fun p => (Path.fst p, Path.snd p)
 
-/-- Identity element of the torus fundamental group. -/
-noncomputable def torusPiOneOne : torusPiOne :=
-  (circlePiOneOne, circlePiOneOne)
+theorem torusPairToLoop_fst (p q : Path (A := Circle) circleBase circleBase) :
+    RwEq (Path.fst (torusPairToLoop (p, q))) p := by
+  simpa [torusPairToLoop] using
+    (rweq_fst_prodMk (α := Circle) (β := Circle) (p := p) (q := q))
 
-/-- Inversion on the torus fundamental group. -/
-noncomputable def torusPiOneInv (x : torusPiOne) : torusPiOne :=
-  (circlePiOneInv x.1, circlePiOneInv x.2)
+theorem torusPairToLoop_snd (p q : Path (A := Circle) circleBase circleBase) :
+    RwEq (Path.snd (torusPairToLoop (p, q))) q := by
+  simpa [torusPairToLoop] using
+    (rweq_snd_prodMk (α := Circle) (β := Circle) (p := p) (q := q))
 
-/-! ## Torus group axioms -/
+theorem torusLoop_pair_eta (p : torusLoopSpace) :
+    RwEq (torusPairToLoop (torusLoopToPair p)) p := by
+  simpa [torusPairToLoop, torusLoopToPair] using
+    (rweq_prod_eta (α := Circle) (β := Circle) (p := p))
 
-/-- Associativity of torus multiplication. -/
-theorem torusPiOneMul_assoc (x y z : torusPiOne) :
-    torusPiOneMul (torusPiOneMul x y) z =
-    torusPiOneMul x (torusPiOneMul y z) := by
-  simp only [torusPiOneMul]
-  exact Prod.ext (circlePiOneMul_assoc x.1 y.1 z.1) (circlePiOneMul_assoc x.2 y.2 z.2)
+/-! ## Eckmann-Hilton interchange from `Step` constructors -/
 
-/-- Left identity for torus multiplication. -/
-theorem torusPiOneMul_one_left (x : torusPiOne) :
-    torusPiOneMul torusPiOneOne x = x := by
-  simp only [torusPiOneMul, torusPiOneOne]
-  exact Prod.ext (circlePiOneMul_one_left x.1) (circlePiOneMul_one_left x.2)
+noncomputable def horizontalAxis (p : Path (A := Circle) circleBase circleBase) :
+    torusLoopSpace :=
+  Path.mapLeft (A := Circle) (B := Circle) (C := Torus) Prod.mk p circleBase
 
-/-- Right identity for torus multiplication. -/
-theorem torusPiOneMul_one_right (x : torusPiOne) :
-    torusPiOneMul x torusPiOneOne = x := by
-  simp only [torusPiOneMul, torusPiOneOne]
-  exact Prod.ext (circlePiOneMul_one_right x.1) (circlePiOneMul_one_right x.2)
+noncomputable def verticalAxis (q : Path (A := Circle) circleBase circleBase) :
+    torusLoopSpace :=
+  Path.mapRight (A := Circle) (B := Circle) (C := Torus) Prod.mk circleBase q
 
-/-- Left inverse for torus multiplication. -/
-theorem torusPiOneMul_inv_left (x : torusPiOne) :
-    torusPiOneMul (torusPiOneInv x) x = torusPiOneOne := by
-  simp only [torusPiOneMul, torusPiOneInv, torusPiOneOne]
-  exact Prod.ext (circlePiOneMul_inv_left x.1) (circlePiOneMul_inv_left x.2)
+noncomputable def horizontalThenVertical
+    (p q : Path (A := Circle) circleBase circleBase) : torusLoopSpace :=
+  Path.trans (horizontalAxis p) (verticalAxis q)
 
-/-- Right inverse for torus multiplication. -/
-theorem torusPiOneMul_inv_right (x : torusPiOne) :
-    torusPiOneMul x (torusPiOneInv x) = torusPiOneOne := by
-  simp only [torusPiOneMul, torusPiOneInv, torusPiOneOne]
-  exact Prod.ext (circlePiOneMul_inv_right x.1) (circlePiOneMul_inv_right x.2)
+noncomputable def verticalThenHorizontal
+    (p q : Path (A := Circle) circleBase circleBase) : torusLoopSpace :=
+  Path.trans (verticalAxis q) (horizontalAxis p)
 
-/-! ## Winding pair is a group homomorphism -/
+/-- Explicit interchange step:
+`horizontalThenVertical p q` rewrites to `verticalThenHorizontal p q`
+by the primitive constructor `Step.map2_subst`. -/
+noncomputable def torusInterchangeStep
+    (p q : Path (A := Circle) circleBase circleBase) :
+    Step (horizontalThenVertical p q) (verticalThenHorizontal p q) := by
+  change
+    Step
+      (Path.map2 (A := Circle) (B := Circle) (C := Torus) Prod.mk p q)
+      (Path.trans
+        (Path.mapRight (A := Circle) (B := Circle) (C := Torus) Prod.mk circleBase q)
+        (Path.mapLeft (A := Circle) (B := Circle) (C := Torus) Prod.mk p circleBase))
+  exact
+    Step.map2_subst
+      (A := Torus) (A₁ := Circle) (B := Circle) (f := Prod.mk) (p := p) (q := q)
 
-/-- Encode on the torus: component-wise winding numbers. -/
-noncomputable def torusWindingPair (x : torusPiOne) : Int × Int :=
-  (windingNumber x.1, windingNumber x.2)
+noncomputable def torusInterchangeRwEq
+    (p q : Path (A := Circle) circleBase circleBase) :
+    RwEq (horizontalThenVertical p q) (verticalThenHorizontal p q) :=
+  rweq_of_step (torusInterchangeStep p q)
 
-/-- The winding pair preserves multiplication. -/
-theorem torusWindingPair_mul (x y : torusPiOne) :
-    torusWindingPair (torusPiOneMul x y) =
-    ((torusWindingPair x).1 + (torusWindingPair y).1,
-     (torusWindingPair x).2 + (torusWindingPair y).2) := by
-  simp only [torusWindingPair, torusPiOneMul]
-  exact Prod.ext (windingNumber_mul x.1 y.1) (windingNumber_mul x.2 y.2)
+noncomputable def torusLoop1_to_horizontalAxis :
+    RwEq torusLoop1 (horizontalAxis circleLoop) := by
+  unfold torusLoop1 horizontalAxis Path.prodMk Path.map2
+  simpa using
+    (rweq_cmpA_refl_right
+      (Path.mapLeft (A := Circle) (B := Circle) (C := Torus) Prod.mk circleLoop circleBase))
 
-/-- The winding pair sends the identity to (0, 0). -/
-theorem torusWindingPair_one :
-    torusWindingPair torusPiOneOne = ((0 : Int), (0 : Int)) := by
-  simp only [torusWindingPair, torusPiOneOne]
-  exact Prod.ext (windingNumber_one.{0}) (windingNumber_one.{0})
+noncomputable def torusLoop2_to_verticalAxis :
+    RwEq torusLoop2 (verticalAxis circleLoop) := by
+  unfold torusLoop2 verticalAxis Path.prodMk Path.map2
+  simpa using
+    (rweq_cmpA_refl_left
+      (Path.mapRight (A := Circle) (B := Circle) (C := Torus) Prod.mk circleBase circleLoop))
 
-/-- The winding pair respects inversion. -/
-theorem torusWindingPair_inv (x : torusPiOne) :
-    torusWindingPair (torusPiOneInv x) =
-    (-(torusWindingPair x).1, -(torusWindingPair x).2) := by
-  simp only [torusWindingPair, torusPiOneInv]
-  exact Prod.ext (windingNumber_inv x.1) (windingNumber_inv x.2)
+/-- The generator loops commute by the interchange witness chain. -/
+noncomputable def torusGeneratorsCommuteRwEq :
+    RwEq (Path.trans torusLoop1 torusLoop2) (Path.trans torusLoop2 torusLoop1) := by
+  have h_left :
+      RwEq (Path.trans torusLoop1 torusLoop2)
+        (Path.trans (horizontalAxis circleLoop) (verticalAxis circleLoop)) :=
+    rweq_trans_congr torusLoop1_to_horizontalAxis torusLoop2_to_verticalAxis
+  have h_mid :
+      RwEq (Path.trans (horizontalAxis circleLoop) (verticalAxis circleLoop))
+        (Path.trans (verticalAxis circleLoop) (horizontalAxis circleLoop)) :=
+    torusInterchangeRwEq circleLoop circleLoop
+  have h_right :
+      RwEq (Path.trans (verticalAxis circleLoop) (horizontalAxis circleLoop))
+        (Path.trans torusLoop2 torusLoop1) :=
+    rweq_trans_congr (rweq_symm torusLoop2_to_verticalAxis) (rweq_symm torusLoop1_to_horizontalAxis)
+  exact rweq_trans h_left (rweq_trans h_mid h_right)
 
-/-! ## Torus decode is a group homomorphism -/
+/-! ## Commutator cancellation via explicit `Step` chains -/
 
-/-- Decoding addition component-wise. -/
-theorem torusDecode_add (m n : Int × Int) :
-    torusPiOneMul (torusDecode m) (torusDecode n) =
-    torusDecode (m.1 + n.1, m.2 + n.2) := by
-  simp only [torusPiOneMul, torusDecode]
-  exact Prod.ext (circleDecode_add m.1 n.1) (circleDecode_add m.2 n.2)
+noncomputable def torusCommutatorExplicit : torusLoopSpace :=
+  Path.trans
+    (Path.trans (Path.trans torusLoop1 torusLoop2) (Path.symm torusLoop1))
+    (Path.symm torusLoop2)
 
-/-- Decoding (0,0) gives the identity. -/
-theorem torusDecode_zero :
-    torusDecode (0, 0) = torusPiOneOne := by
-  simp only [torusDecode, torusPiOneOne]
-  exact Prod.ext circleDecode_zero_eq_one circleDecode_zero_eq_one
+private noncomputable def commutatorReflRightRw {A : Type} {a : A}
+    (p : LoopSpace A a) :
+    Rw
+      (Path.trans (Path.trans (Path.trans p (Path.refl a)) (Path.symm p))
+        (Path.symm (Path.refl a)))
+      (Path.refl a) := by
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_right
+      (Path.trans (Path.trans p (Path.refl a)) (Path.symm p))
+      (Step.symm_refl a))
+  apply rw_trans
+  · exact rw_of_step (Step.trans_refl_right _)
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_left (Path.symm p) (Step.trans_refl_right p))
+  exact rw_of_step (Step.trans_symm p)
 
-/-! ## Injectivity of the winding pair -/
+private noncomputable def commutatorReflLeftRw {A : Type} {a : A}
+    (p : LoopSpace A a) :
+    Rw
+      (Path.trans (Path.trans (Path.trans (Path.refl a) p) (Path.symm (Path.refl a)))
+        (Path.symm p))
+      (Path.refl a) := by
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_left (Path.symm p)
+      (Step.trans_congr_right (Path.trans (Path.refl a) p) (Step.symm_refl a)))
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_left (Path.symm p)
+      (Step.trans_refl_right (Path.trans (Path.refl a) p)))
+  apply rw_trans
+  · exact rw_of_step (Step.trans_congr_left (Path.symm p)
+      (Step.trans_refl_left p))
+  exact rw_of_step (Step.trans_symm p)
 
-/-- The winding pair is injective on torusPiOne. -/
-theorem torusWindingPair_injective {x y : torusPiOne}
-    (h : torusWindingPair x = torusWindingPair y) : x = y := by
-  have h1 : windingNumber x.1 = windingNumber y.1 :=
-    _root_.congrArg Prod.fst h
-  have h2 : windingNumber x.2 = windingNumber y.2 :=
-    _root_.congrArg Prod.snd h
-  exact Prod.ext (winding_number_injective h1) (winding_number_injective h2)
+private noncomputable def commutatorReflRightRwEq {A : Type} {a : A}
+    (p : LoopSpace A a) :
+    RwEq
+      (Path.trans (Path.trans (Path.trans p (Path.refl a)) (Path.symm p))
+        (Path.symm (Path.refl a)))
+      (Path.refl a) :=
+  rweq_of_rw (commutatorReflRightRw p)
 
-/-- The winding pair is surjective on torusPiOne. -/
-theorem torusWindingPair_surjective (z : Int × Int) :
-    ∃ x : torusPiOne, torusWindingPair x = z := by
-  refine ⟨torusDecode z, ?_⟩
-  simp only [torusWindingPair, torusDecode, windingNumber]
-  simp only [circlePiOneEncode_circleDecode]
+private noncomputable def commutatorReflLeftRwEq {A : Type} {a : A}
+    (p : LoopSpace A a) :
+    RwEq
+      (Path.trans (Path.trans (Path.trans (Path.refl a) p) (Path.symm (Path.refl a)))
+        (Path.symm p))
+      (Path.refl a) :=
+  rweq_of_rw (commutatorReflLeftRw p)
 
-/-! ## Group isomorphism π₁(T²) ≅ ℤ × ℤ -/
+noncomputable def torusCommutator_fst_refl :
+    RwEq (Path.fst torusCommutatorExplicit) (Path.refl circleBase) := by
+  unfold torusCommutatorExplicit
+  simp only [Path.fst, congrArg_trans, congrArg_symm]
+  apply rweq_trans
+  · apply rweq_trans_congr
+    · apply rweq_trans_congr
+      · apply rweq_trans_congr
+        · exact rweq_fst_prodMk circleLoop (Path.refl circleBase)
+        · exact rweq_fst_prodMk (Path.refl circleBase) circleLoop
+      · exact rweq_symm_congr (rweq_fst_prodMk circleLoop (Path.refl circleBase))
+    · exact rweq_symm_congr (rweq_fst_prodMk (Path.refl circleBase) circleLoop)
+  · exact commutatorReflRightRwEq circleLoop
 
-/-- The equivalence between torusPiOne and ℤ × ℤ. -/
-noncomputable def torusPiOneEquivIntProdDirect :
-    SimpleEquiv torusPiOne (Int × Int) where
-  toFun := torusWindingPair
-  invFun := torusDecode
-  left_inv := by
-    intro x
-    apply torusWindingPair_injective
-    simp only [torusWindingPair, torusDecode, windingNumber]
-    simp only [circlePiOneEncode_circleDecode]
-  right_inv := by
-    intro z
-    simp only [torusWindingPair, torusDecode, windingNumber]
-    simp only [circlePiOneEncode_circleDecode]
+noncomputable def torusCommutator_snd_refl :
+    RwEq (Path.snd torusCommutatorExplicit) (Path.refl circleBase) := by
+  unfold torusCommutatorExplicit
+  simp only [Path.snd, congrArg_trans, congrArg_symm]
+  apply rweq_trans
+  · apply rweq_trans_congr
+    · apply rweq_trans_congr
+      · apply rweq_trans_congr
+        · exact rweq_snd_prodMk circleLoop (Path.refl circleBase)
+        · exact rweq_snd_prodMk (Path.refl circleBase) circleLoop
+      · exact rweq_symm_congr (rweq_snd_prodMk circleLoop (Path.refl circleBase))
+    · exact rweq_symm_congr (rweq_snd_prodMk (Path.refl circleBase) circleLoop)
+  · exact commutatorReflLeftRwEq circleLoop
 
-/-- π₁(T²) is group-isomorphic to (ℤ × ℤ, +, (0,0)). -/
-noncomputable def torusPiOneGroupIsoIntProd :
-    @GroupIso torusPiOne (Int × Int) torusPiOneMul torusPiOneOne
-      (fun a b => (a.1 + b.1, a.2 + b.2)) ((0 : Int), (0 : Int)) where
-  equiv := torusPiOneEquivIntProdDirect
-  map_mul := by
-    intro x y
-    simp only [torusPiOneEquivIntProdDirect, torusWindingPair, torusPiOneMul]
-    exact Prod.ext (windingNumber_mul x.1 y.1) (windingNumber_mul x.2 y.2)
-  map_one := torusWindingPair_one
+/-- Explicit commutator reduction `[a,b] = 1` at the torus path level. -/
+noncomputable def torusCommutator_trivial_path :
+    RwEq torusCommutatorExplicit (Path.refl torusBase) := by
+  have h_eta :
+      RwEq torusCommutatorExplicit
+        (Path.prodMk (Path.fst torusCommutatorExplicit) (Path.snd torusCommutatorExplicit)) :=
+    rweq_symm (rweq_prod_eta torusCommutatorExplicit)
+  have h_prod :
+      RwEq (Path.prodMk (Path.fst torusCommutatorExplicit) (Path.snd torusCommutatorExplicit))
+        (Path.prodMk (Path.refl circleBase) (Path.refl circleBase)) :=
+    rweq_map2_of_rweq (f := Prod.mk) torusCommutator_fst_refl torusCommutator_snd_refl
+  have h_refl :
+      Path.prodMk (Path.refl circleBase) (Path.refl circleBase) = Path.refl torusBase :=
+    Path.prodMk_refl_refl circleBase circleBase
+  exact rweq_trans h_eta (rweq_trans h_prod (rweq_of_eq h_refl))
 
-/-! ## Eckmann-Hilton: commutativity of π₁(T²)
+/-! ## Generator independence at the path level -/
 
-The Eckmann-Hilton argument shows that when a type has two unital binary
-operations that satisfy an interchange law, both operations coincide and
-are commutative.
-
-For the torus T² = S¹ × S¹, this reduces to showing that loop composition
-commutes. We prove this using the product structure: in each S¹ factor,
-π₁ is ℤ which is commutative. -/
-
-/-- The Eckmann-Hilton result for the torus: π₁(T²) is abelian. -/
-theorem torusPiOne_comm (x y : torusPiOne) :
-    torusPiOneMul x y = torusPiOneMul y x := by
-  simp only [torusPiOneMul]
-  exact Prod.ext (circlePiOne_comm x.1 y.1) (circlePiOne_comm x.2 y.2)
-
-/-- The torus fundamental group is abelian: the commutator is trivial.
-This is a multi-step proof using associativity, commutativity, and inverses. -/
-theorem torusPiOne_commutator_trivial (x y : torusPiOne) :
-    torusPiOneMul
-      (torusPiOneMul (torusPiOneMul x y) (torusPiOneInv x))
-      (torusPiOneInv y) = torusPiOneOne := by
-  -- Step 1: use commutativity to swap x y → y x
-  have h_comm : torusPiOneMul x y = torusPiOneMul y x := torusPiOne_comm x y
-  -- Step 2: reassociate (y * x) * x⁻¹ → y * (x * x⁻¹)
-  have h_assoc : torusPiOneMul (torusPiOneMul (torusPiOneMul y x) (torusPiOneInv x)) (torusPiOneInv y) =
-    torusPiOneMul (torusPiOneMul y (torusPiOneMul x (torusPiOneInv x))) (torusPiOneInv y) := by
-    rw [torusPiOneMul_assoc y x (torusPiOneInv x)]
-  -- Step 3: cancel x * x⁻¹ → id
-  have h_cancel : torusPiOneMul x (torusPiOneInv x) = torusPiOneOne := torusPiOneMul_inv_right x
-  -- Step 4: y * id → y
-  have h_unit : torusPiOneMul y torusPiOneOne = y := torusPiOneMul_one_right y
-  -- Step 5: y * y⁻¹ → id
-  have h_cancel2 : torusPiOneMul y (torusPiOneInv y) = torusPiOneOne := torusPiOneMul_inv_right y
-  -- Combine
-  calc torusPiOneMul (torusPiOneMul (torusPiOneMul x y) (torusPiOneInv x)) (torusPiOneInv y)
-      = torusPiOneMul (torusPiOneMul (torusPiOneMul y x) (torusPiOneInv x)) (torusPiOneInv y) := by
-          rw [h_comm]
-    _ = torusPiOneMul (torusPiOneMul y (torusPiOneMul x (torusPiOneInv x))) (torusPiOneInv y) := by
-          rw [torusPiOneMul_assoc y x (torusPiOneInv x)]
-    _ = torusPiOneMul (torusPiOneMul y torusPiOneOne) (torusPiOneInv y) := by
-          rw [h_cancel]
-    _ = torusPiOneMul y (torusPiOneInv y) := by
-          rw [h_unit]
-    _ = torusPiOneOne := h_cancel2
-
-/-! ## Free abelian group on two generators -/
-
-/-- The two generators of π₁(T²). -/
-noncomputable def torusGen1 : torusPiOne := torusDecode (1, 0)
-noncomputable def torusGen2 : torusPiOne := torusDecode (0, 1)
-
-/-- Every element of π₁(T²) is determined by a pair of integers (its winding pair). -/
-theorem torusPiOne_classification (x : torusPiOne) :
-    x = torusDecode (windingNumber x.1, windingNumber x.2) := by
-  apply torusWindingPair_injective
-  simp only [torusWindingPair, torusDecode, windingNumber]
-  simp only [circlePiOneEncode_circleDecode]
-
-/-- The two generators commute. -/
-theorem torusGen_comm :
-    torusPiOneMul torusGen1 torusGen2 = torusPiOneMul torusGen2 torusGen1 :=
-  torusPiOne_comm torusGen1 torusGen2
-
-/-- The generators are independent: their winding pairs are the standard basis. -/
-theorem torusGen1_winding : torusWindingPair torusGen1 = (1, 0) := by
-  simp only [torusGen1, torusWindingPair, torusDecode, windingNumber]
-  simp only [circlePiOneEncode_circleDecode]
-
-theorem torusGen2_winding : torusWindingPair torusGen2 = (0, 1) := by
-  simp only [torusGen2, torusWindingPair, torusDecode, windingNumber]
-  simp only [circlePiOneEncode_circleDecode]
-
-/-- The generators are non-trivial. -/
-theorem torusGen1_ne_one : torusGen1 ≠ torusPiOneOne := by
-  intro h
-  have h1 := _root_.congrArg torusWindingPair h
-  rw [torusGen1_winding, torusWindingPair_one] at h1
-  exact absurd (_root_.congrArg Prod.fst h1) (by decide)
-
-theorem torusGen2_ne_one : torusGen2 ≠ torusPiOneOne := by
-  intro h
-  have h1 := _root_.congrArg torusWindingPair h
-  rw [torusGen2_winding, torusWindingPair_one] at h1
-  exact absurd (_root_.congrArg Prod.snd h1) (by decide)
-
-/-- The generators are distinct. -/
-theorem torusGen1_ne_gen2 : torusGen1 ≠ torusGen2 := by
-  intro h
-  have h1 := _root_.congrArg torusWindingPair h
-  rw [torusGen1_winding, torusGen2_winding] at h1
-  exact absurd (_root_.congrArg Prod.fst h1) (by decide)
-
-/-! ## Winding pair decides the word problem -/
-
-/-- The winding pair is a complete invariant: two elements of π₁(T²) are
-equal if and only if they have the same winding pair. -/
-theorem torusPiOne_eq_iff_windingPair_eq (x y : torusPiOne) :
-    x = y ↔ torusWindingPair x = torusWindingPair y := by
+theorem torusPathPair_independence
+    {p₁ p₂ q₁ q₂ : Path (A := Circle) circleBase circleBase}
+    (h : RwEq (Path.prodMk p₁ q₁) (Path.prodMk p₂ q₂)) :
+    RwEq p₁ p₂ × RwEq q₁ q₂ := by
+  have hfst :
+      RwEq (Path.fst (Path.prodMk p₁ q₁)) (Path.fst (Path.prodMk p₂ q₂)) := by
+    simpa [Path.fst] using
+      (rweq_congrArg_of_rweq (A := Torus) (f := Prod.fst) h)
+  have hsnd :
+      RwEq (Path.snd (Path.prodMk p₁ q₁)) (Path.snd (Path.prodMk p₂ q₂)) := by
+    simpa [Path.snd] using
+      (rweq_congrArg_of_rweq (A := Torus) (f := Prod.snd) h)
   constructor
-  · intro h; rw [h]
-  · exact torusWindingPair_injective
+  · exact
+      rweq_trans (rweq_symm (rweq_fst_prodMk p₁ q₁))
+        (rweq_trans hfst (rweq_fst_prodMk p₂ q₂))
+  · exact
+      rweq_trans (rweq_symm (rweq_snd_prodMk p₁ q₁))
+        (rweq_trans hsnd (rweq_snd_prodMk p₂ q₂))
 
-/-! ## Summary
-
-We have shown:
-1. `torusPiOneGroupIsoIntProd` — π₁(T²) ≅ ℤ × ℤ as groups
-2. `torusPiOne_comm` — Eckmann-Hilton: π₁(T²) is abelian
-3. `torusPiOne_commutator_trivial` — commutator subgroup is trivial
-4. `torusGen1`, `torusGen2` — explicit generators
-5. `torusPiOne_classification` — every element is uniquely (m,n)-loops
-6. `torusPiOne_eq_iff_windingPair_eq` — winding pair decides the word problem
-7. Full group axioms verified: associativity, identity, inverses
--/
+/-- If the two torus generators were identified, both circle axes would collapse. -/
+theorem torusGenerator_independence_path
+    (h : RwEq torusLoop1 torusLoop2) :
+    RwEq circleLoop (Path.refl circleBase) ∧
+    RwEq (Path.refl circleBase) circleLoop := by
+  simpa [torusLoop1, torusLoop2] using
+    (torusPathPair_independence
+      (p₁ := circleLoop) (q₁ := Path.refl circleBase)
+      (p₂ := Path.refl circleBase) (q₂ := circleLoop) h)
 
 end CompPath
 end Path

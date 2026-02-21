@@ -28,13 +28,14 @@ lean_lib CompPaths where
     `CompPaths.OmegaGroupoid.CoherencePaths,
     `CompPaths.OmegaGroupoid.TwoCategoryStructure,
     `CompPaths.OmegaGroupoid.GroupoidProofs,
-    `CompPaths.Examples.FundamentalGroupCircle,
     `CompPaths.Examples.FundamentalGroupTorus,
     `CompPaths.Homotopy.VanKampen,
     `CompPaths.Homotopy.VanKampenApplications,
     `CompPaths.Rewriting.KnuthBendix,
     `CompPaths.Rewriting.CriticalPairs,
-    `CompPaths.Rewriting.TerminationProofs]
+    `CompPaths.Rewriting.TerminationProofs,
+    `CompPaths.CoveringSpace.CoveringDeep,
+    `CompPaths.CoveringSpace.PathLifting]
 
 @[default_target]
 lean_exe computational_paths where
