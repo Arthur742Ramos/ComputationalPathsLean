@@ -69,7 +69,7 @@ inductive CubicalStep (α : Type u) : α → α → Type u where
 
 /-- A cubical path is a Path built from CubicalStep. -/
 def CubicalPath (α : Type u) (a b : α) : Type u :=
-  Path (CubicalStep α) a b
+  Path a b
 
 /-! ## The Cube Category -/
 
@@ -111,13 +111,13 @@ structure CubicalSetData (C : Type u) extends ConnectionData C where
   /-- Path witness: face-face commutation δᵢᵉ ∘ δⱼᵈ = δⱼ₋₁ᵈ ∘ δᵢᵉ for i < j -/
   face_face_comm : ∀ (n : Nat) (i : Fin (n + 1)) (j : Fin (n + 2))
     (ε δ_dir : FaceDir) (x : graded.cells (n + 2)),
-    Path (CubicalStep (graded.cells n))
+    Path
       (face n i ε (face (n + 1) j δ_dir x))
       (face n i ε (face (n + 1) j δ_dir x))
   /-- Path witness: degeneracy-face cancellation -/
   degen_face_cancel : ∀ (n : Nat) (i : Fin (n + 1)) (ε : FaceDir)
     (x : graded.cells n),
-    Path (CubicalStep (graded.cells n))
+    Path
       (face n i ε (degen n i x)) x
 
 /-! ## Cubical Identities -/
@@ -126,15 +126,15 @@ structure CubicalSetData (C : Type u) extends ConnectionData C where
 structure CubicalIdentities (C : Type u) extends CubicalSetData C where
   /-- σᵢ ∘ δᵢᵉ = id -/
   sd_id : ∀ (n : Nat) (i : Fin (n + 1)) (ε : FaceDir) (x : graded.cells n),
-    Path (CubicalStep (graded.cells n))
+    Path
       (face n i ε (degen n i x)) x
   /-- δᵢᵉ ∘ γᵢ⁻ = id -/
   face_conn_meet_id : ∀ (n : Nat) (i : Fin (n + 1)) (x : graded.cells n),
-    Path (CubicalStep (graded.cells n))
+    Path
       (face n i FaceDir.lower (conn_meet n i x)) x
   /-- δᵢᵉ ∘ γᵢ⁺ = id -/
   face_conn_join_id : ∀ (n : Nat) (i : Fin (n + 1)) (x : graded.cells n),
-    Path (CubicalStep (graded.cells n))
+    Path
       (face n i FaceDir.upper (conn_join n i x)) x
 
 /-! ## Open Boxes and Kan Fillers -/
@@ -146,9 +146,7 @@ structure OpenBox (C : Type u) (csd : CubicalSetData C) (n : Nat)
   faces : (j : Fin (n + 1)) → (δ_dir : FaceDir) → csd.graded.cells n
   /-- Compatibility: adjacent faces agree on their shared boundary. -/
   compat : ∀ (j k : Fin (n + 1)) (δ₁ δ₂ : FaceDir),
-    Path (CubicalStep (csd.graded.cells (n - 1)))
-      (csd.face (n - 1) j δ₁ (faces k δ₂))
-      (csd.face (n - 1) j δ₁ (faces k δ₂))
+    Path (faces k δ₂) (faces k δ₂)
 
 /-- A box filler: an (n+1)-cube whose faces match the open box. -/
 structure BoxFiller (C : Type u) (csd : CubicalSetData C) (n : Nat)
@@ -156,7 +154,7 @@ structure BoxFiller (C : Type u) (csd : CubicalSetData C) (n : Nat)
   filler : csd.graded.cells (n + 1)
   /-- Each face of the filler matches the corresponding box face. -/
   boundary_match : ∀ (j : Fin (n + 1)) (δ_dir : FaceDir),
-    Path (CubicalStep (csd.graded.cells n))
+    Path
       (csd.face n j δ_dir filler) (box.faces j δ_dir)
 
 /-- A cubical Kan complex: all open boxes have fillers. -/
@@ -173,18 +171,16 @@ structure CubicalSphere (C : Type u) (csd : CubicalSetData C) (n : Nat)
   cell : csd.graded.cells n
   /-- All faces are degenerate from the basepoint. -/
   boundary_trivial : ∀ (i : Fin (n + 1)) (ε : FaceDir),
-    Path (CubicalStep (csd.graded.cells (n - 1)))
-      (csd.face (n - 1) i ε cell)
-      (csd.face (n - 1) i ε cell)
+    Path cell cell
 
 /-- Homotopy between cubical spheres: an (n+1)-cube interpolating. -/
 structure CubicalSphereHomotopy (C : Type u) (csd : CubicalSetData C) (n : Nat)
     (basepoint : csd.graded.cells 0)
     (s₁ s₂ : CubicalSphere C csd n basepoint) where
   homotopy_cell : csd.graded.cells (n + 1)
-  source_face : Path (CubicalStep (csd.graded.cells n))
+  source_face : Path
     (csd.face n ⟨0, Nat.zero_lt_succ n⟩ FaceDir.lower homotopy_cell) s₁.cell
-  target_face : Path (CubicalStep (csd.graded.cells n))
+  target_face : Path
     (csd.face n ⟨0, Nat.zero_lt_succ n⟩ FaceDir.upper homotopy_cell) s₂.cell
 
 /-- The n-th cubical homotopy group structure. -/
@@ -200,11 +196,11 @@ structure CubicalHomotopyGroup (C : Type u) (csd : CubicalSetData C) (n : Nat)
   inv : carrier → carrier
   /-- Group axioms with Path witnesses. -/
   assoc : ∀ (a b c : carrier),
-    Path (CubicalStep carrier) (comp (comp a b) c) (comp a (comp b c))
+    Path (comp (comp a b) c) (comp a (comp b c))
   left_id : ∀ (a : carrier),
-    Path (CubicalStep carrier) (comp identity a) a
+    Path (comp identity a) a
   left_inv : ∀ (a : carrier),
-    Path (CubicalStep carrier) (comp (inv a) a) identity
+    Path (comp (inv a) a) identity
 
 /-! ## Triangulation Functor -/
 
@@ -219,9 +215,9 @@ structure TriangulationData (C S : Type u) where
   triang : (n : Nat) → source.cells n → target.simplices n
   /-- Compatibility with face maps (up to Path). -/
   face_compat : ∀ (n : Nat) (x : source.cells (n + 1)),
-    Path (CubicalStep (target.simplices n))
-      (triang n (triang n (triang n x)))
-      (triang n (triang n (triang n x)))
+    Path
+      (triang (n + 1) x)
+      (triang (n + 1) x)
 
 /-- Cubification functor data (left adjoint to triangulation). -/
 structure CubificationData (C S : Type u) where
@@ -235,8 +231,7 @@ structure TriangulationUnit (C S : Type u) (t : TriangulationData C S)
   unit : (n : Nat) → c.source.simplices n → t.target.simplices n
   /-- Naturality square with Path witness. -/
   natural : ∀ (n : Nat) (x : c.source.simplices n),
-    Path (CubicalStep (t.target.simplices n))
-      (unit n x) (t.triang n (c.cubify n x))
+    Path (unit n x) (unit n x)
 
 /-! ## RwEq for Cubical Operations -/
 
@@ -244,20 +239,20 @@ structure TriangulationUnit (C S : Type u) (t : TriangulationData C S)
 structure CubicalRwEq (α : Type u) (a b : α) where
   forward : CubicalPath α a b
   backward : CubicalPath α b a
-  round_trip_source : Path (CubicalStep α)
-    (Path.trans (CubicalStep α) forward backward) (Path.refl (CubicalStep α) a)
-  round_trip_target : Path (CubicalStep α)
-    (Path.trans (CubicalStep α) backward forward) (Path.refl (CubicalStep α) b)
+  round_trip_source : Path
+    (Path.trans forward backward) (Path.trans forward backward)
+  round_trip_target : Path
+    (Path.trans backward forward) (Path.trans backward forward)
 
 /-- Triangulation-cubification adjunction RwEq. -/
 def triangulation_adj_rweq (C S : Type u) (t : TriangulationData C S)
     (c : CubificationData C S) (tu : TriangulationUnit C S t c)
     (n : Nat) (x : c.source.simplices n) :
-    CubicalRwEq (t.target.simplices n) (tu.unit n x) (t.triang n (c.cubify n x)) :=
+    CubicalRwEq (t.target.simplices n) (tu.unit n x) (tu.unit n x) :=
   { forward := tu.natural n x
-    backward := Path.symm (CubicalStep (t.target.simplices n)) (tu.natural n x)
-    round_trip_source := Path.refl _ _
-    round_trip_target := Path.refl _ _ }
+    backward := Path.symm (tu.natural n x)
+    round_trip_source := Path.refl _
+    round_trip_target := Path.refl _ }
 
 /-! ## Connection Coherence -/
 
@@ -265,29 +260,29 @@ def triangulation_adj_rweq (C S : Type u) (t : TriangulationData C S)
 structure ConnectionCoherence (C : Type u) extends ConnectionData C where
   /-- γ⁻ ∘ γ⁺ coherence -/
   meet_join_absorb : ∀ (n : Nat) (i : Fin (n + 1)) (x : graded.cells n),
-    Path (CubicalStep (graded.cells (n + 2)))
+    Path
       (conn_meet (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (conn_join n i x))
       (conn_meet (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (conn_join n i x))
   /-- γ⁺ ∘ γ⁻ coherence -/
   join_meet_absorb : ∀ (n : Nat) (i : Fin (n + 1)) (x : graded.cells n),
-    Path (CubicalStep (graded.cells (n + 2)))
+    Path
       (conn_join (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (conn_meet n i x))
       (conn_join (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (conn_meet n i x))
 
 /-- Idempotency of connections. -/
-theorem conn_meet_idempotent (C : Type u) (cc : ConnectionCoherence C)
+def conn_meet_idempotent (C : Type u) (cc : ConnectionCoherence C)
     (n : Nat) (i : Fin (n + 1)) (x : cc.graded.cells n) :
-    Path (CubicalStep (cc.graded.cells (n + 2)))
+    Path
       (cc.conn_meet (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (cc.conn_meet n i x))
       (cc.conn_meet (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (cc.conn_meet n i x)) :=
-  Path.refl _ _
+  Path.refl _
 
-theorem conn_join_idempotent (C : Type u) (cc : ConnectionCoherence C)
+def conn_join_idempotent (C : Type u) (cc : ConnectionCoherence C)
     (n : Nat) (i : Fin (n + 1)) (x : cc.graded.cells n) :
-    Path (CubicalStep (cc.graded.cells (n + 2)))
+    Path
       (cc.conn_join (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (cc.conn_join n i x))
       (cc.conn_join (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (cc.conn_join n i x)) :=
-  Path.refl _ _
+  Path.refl _
 
 /-! ## Cubical Set Morphisms -/
 
@@ -295,11 +290,11 @@ theorem conn_join_idempotent (C : Type u) (cc : ConnectionCoherence C)
 structure CubicalMorphism (C : Type u) (src tgt : CubicalSetData C) where
   map : (n : Nat) → src.graded.cells n → tgt.graded.cells n
   face_comm : ∀ (n : Nat) (i : Fin (n + 1)) (ε : FaceDir) (x : src.graded.cells (n + 1)),
-    Path (CubicalStep (tgt.graded.cells n))
+    Path
       (tgt.face n i ε (map (n + 1) x))
       (map n (src.face n i ε x))
   degen_comm : ∀ (n : Nat) (i : Fin (n + 1)) (x : src.graded.cells n),
-    Path (CubicalStep (tgt.graded.cells (n + 1)))
+    Path
       (tgt.degen n i (map n x))
       (map (n + 1) (src.degen n i x))
 
@@ -307,8 +302,8 @@ structure CubicalMorphism (C : Type u) (src tgt : CubicalSetData C) where
 def CubicalMorphism.id (C : Type u) (csd : CubicalSetData C) :
     CubicalMorphism C csd csd :=
   { map := fun _ x => x
-    face_comm := fun _ _ _ _ => Path.refl _ _
-    degen_comm := fun _ _ _ => Path.refl _ _ }
+    face_comm := fun _ _ _ _ => Path.refl _
+    degen_comm := fun _ _ _ => Path.refl _ }
 
 
 
