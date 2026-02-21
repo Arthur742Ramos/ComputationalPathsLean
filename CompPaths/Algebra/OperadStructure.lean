@@ -45,7 +45,7 @@ noncomputable def pathOperad (A : Type u) (a : A) : PathOperad A a where
 /-! ## (2) Operad Axioms via Explicit RwEq Witnesses -/
 
 /-- Associativity of γ via `Step.trans_assoc`. -/
-noncomputable theorem gamma_assoc {A : Type u} {a : A}
+noncomputable def gamma_assoc {A : Type u} {a : A}
     (p q r : Loop' A a) :
     RwEq
       ((pathOperad A a).gamma ((pathOperad A a).gamma p q) r)
@@ -53,19 +53,19 @@ noncomputable theorem gamma_assoc {A : Type u} {a : A}
   rweq_of_step (Step.trans_assoc p q r)
 
 /-- Left unitality via `Step.trans_refl_left`. -/
-noncomputable theorem gamma_unit_left {A : Type u} {a : A}
+noncomputable def gamma_unit_left {A : Type u} {a : A}
     (p : Loop' A a) :
     RwEq ((pathOperad A a).gamma (pathOperad A a).identity p) p :=
   rweq_of_step (Step.trans_refl_left p)
 
 /-- Right unitality via `Step.trans_refl_right`. -/
-noncomputable theorem gamma_unit_right {A : Type u} {a : A}
+noncomputable def gamma_unit_right {A : Type u} {a : A}
     (p : Loop' A a) :
     RwEq ((pathOperad A a).gamma p (pathOperad A a).identity) p :=
   rweq_of_step (Step.trans_refl_right p)
 
-/-- N-ary associativity: composing `[p, q, r]` equals `γ(p, γ(q, r))`. -/
-noncomputable theorem gammaN_assoc_three {A : Type u} {a : A}
+/-- N-ary associativity: composing `[p, q, r]` equals `γ(p, γ(q, γ(r, refl)))`. -/
+noncomputable def gammaN_assoc_three {A : Type u} {a : A}
     (p q r : Loop' A a) :
     RwEq (gammaN [p, q, r])
          (Path.trans p (Path.trans q (Path.trans r (Path.refl a)))) :=
@@ -73,7 +73,7 @@ noncomputable theorem gammaN_assoc_three {A : Type u} {a : A}
 
 /-- N-ary unitality: composing the singleton `[p]` yields `γ(p, refl)`,
     which is RwEq to `p`. -/
-noncomputable theorem gammaN_singleton {A : Type u} {a : A}
+noncomputable def gammaN_singleton {A : Type u} {a : A}
     (p : Loop' A a) :
     RwEq (gammaN [p]) p :=
   rweq_of_step (Step.trans_refl_right p)
@@ -119,14 +119,17 @@ structure PathGroupoidAction (A : Type u) (a : A) (X : Type v) where
   act_identity := grp.action_identity
   act_gamma := grp.action_comp
 
-/-- The two notions are equivalent. -/
-noncomputable def operadAlgebraEquivGroupoid
-    {A : Type u} {a : A} {X : Type v} :
-    PathOperadAlgebra A a X ≃ PathGroupoidAction A a X where
-  toFun := PathOperadAlgebra.toGroupoid
-  invFun := PathGroupoidAction.toAlgebra
-  left_inv := by intro alg; cases alg; rfl
-  right_inv := by intro grp; cases grp; rfl
+/-- Round-trip from algebra to groupoid and back is the identity. -/
+theorem operadAlgebra_roundtrip_left {A : Type u} {a : A} {X : Type v}
+    (alg : PathOperadAlgebra A a X) :
+    (PathOperadAlgebra.toGroupoid alg).toAlgebra = alg := by
+  cases alg; rfl
+
+/-- Round-trip from groupoid to algebra and back is the identity. -/
+theorem operadAlgebra_roundtrip_right {A : Type u} {a : A} {X : Type v}
+    (grp : PathGroupoidAction A a X) :
+    (PathGroupoidAction.toAlgebra grp).toGroupoid = grp := by
+  cases grp; rfl
 
 /-- The action of `symm p` inverts the action of `p` (left). -/
 theorem PathOperadAlgebra.inverse_left {A : Type u} {a : A} {X : Type v}
@@ -149,11 +152,11 @@ theorem PathOperadAlgebra.inverse_right {A : Type u} {a : A} {X : Type v}
 /-- A 2-derivation between paths is an RwEq witness. -/
 abbrev Deriv2 {A : Type u} {a b : A} (p q : Path a b) : Type u := RwEq p q
 
-/-- A 3-derivation witnesses equality of two 2-derivations (at the
-    truncated/quotient level, any two RwEq witnesses are identified). -/
+/-- A 3-derivation witnesses that two 2-derivations are connected.
+    At the truncated/quotient level, any two RwEq witnesses are identified
+    by confluence of the rewriting system. -/
 structure Deriv3 {A : Type u} {a b : A} {p q : Path a b}
-    (d₁ d₂ : Deriv2 p q) : Type u where
-  /-- Evidence that the two derivations yield the same quotient element. -/
+    (_ : Deriv2 p q) (_ : Deriv2 p q) : Type u where
   mk ::
 
 /-- The path operad is an A∞ operad: all operad axioms hold up to
@@ -168,8 +171,7 @@ structure AInfinityPathOperad (A : Type u) (a : A) where
   /-- Right unit witnessed by Step.trans_refl_right. -/
   unit_right₂ : ∀ p : Loop' A a, RwEq (Path.trans p (Path.refl a)) p
   /-- Higher coherences are contractible: any two derivations
-      between the same pair of paths are connected. This is the
-      A∞ condition coming from confluence of the rewriting system. -/
+      between the same pair of paths are connected. -/
   higher_contractible :
     ∀ {p q : Loop' A a} (d₁ d₂ : Deriv2 p q), Nonempty (Deriv3 d₁ d₂)
 
@@ -200,15 +202,13 @@ noncomputable def verticalWhisker {A : Type u} {a : A}
   Path.mapRight (f := @Prod.mk A A) a q
 
 /-- The E₂ interchange step: `map2 Prod.mk p q` reduces to
-    `trans (mapRight Prod.mk a q) (mapLeft Prod.mk p a)` via Step.map2_subst,
-    exhibiting the swap of horizontal and vertical composition order.
+    `trans (mapRight Prod.mk a q) (mapLeft Prod.mk p a)` via Step.map2_subst.
 
-    `map2 f p q = trans (mapLeft f p b₁) (mapRight f a₂ q)`
-    by definition, and `map2_subst` rewrites it to
-    `trans (mapRight f a₁ q) (mapLeft f p b₂)`.
+    By definition `map2 f p q = trans (mapLeft f p b₁) (mapRight f a₂ q)`,
+    and `map2_subst` rewrites it to `trans (mapRight f a₁ q) (mapLeft f p b₂)`.
 
-    For loops (`a₁ = a₂ = a`, `b₁ = b₂ = a`), this yields the
-    Eckmann-Hilton interchange. -/
+    For loops at `a`, this is `trans (horizontalWhisker p) (verticalWhisker q)`
+    stepping to `trans (verticalWhisker q) (horizontalWhisker p)`. -/
 noncomputable def e2InterchangeStep {A : Type u} {a : A}
     (p q : Loop' A a) :
     Step
@@ -216,8 +216,7 @@ noncomputable def e2InterchangeStep {A : Type u} {a : A}
       (Path.trans (verticalWhisker q) (horizontalWhisker p)) :=
   Step.map2_subst (f := @Prod.mk A A) p q
 
-/-- The interchange law as an RwEq: horizontal-then-vertical equals
-    vertical-then-horizontal (up to RwEq). -/
+/-- The interchange law as an RwEq. -/
 noncomputable def e2InterchangeRwEq {A : Type u} {a : A}
     (p q : Loop' A a) :
     RwEq
@@ -225,24 +224,18 @@ noncomputable def e2InterchangeRwEq {A : Type u} {a : A}
       (Path.trans (verticalWhisker q) (horizontalWhisker p)) :=
   rweq_of_step (e2InterchangeStep p q)
 
-/-- Eckmann-Hilton: composing loops via `map2` (horizontal ∘ vertical) is
-    RwEq to composing them in the reverse order (vertical ∘ horizontal).
+/-- Eckmann-Hilton: the two composition orders on product loops are RwEq.
 
-    Since `map2 f p q = trans (mapLeft f p b) (mapRight f a₂ q)` by definition,
-    and `map2_subst` rewrites this to `trans (mapRight f a₁ q) (mapLeft f p b₂)`,
-    for loops (where `a₁ = a₂ = a`, `b = a`) this gives us:
-
-    `trans (horizontalWhisker p) (verticalWhisker q)` RwEq
-    `trans (verticalWhisker q) (horizontalWhisker p)` -/
-noncomputable theorem eckmannHilton {A : Type u} {a : A}
+    `map2 Prod.mk p q = trans (mapLeft Prod.mk p a) (mapRight Prod.mk a q)`
+      = `trans (horizontalWhisker p) (verticalWhisker q)` (definitionally).
+    `Step.map2_subst` then gives a step to
+    `trans (mapRight Prod.mk a q) (mapLeft Prod.mk p a)`
+      = `trans (verticalWhisker q) (horizontalWhisker p)`. -/
+noncomputable def eckmannHilton {A : Type u} {a : A}
     (p q : Loop' A a) :
     RwEq
       (Path.trans (horizontalWhisker p) (verticalWhisker q))
       (Path.trans (verticalWhisker q) (horizontalWhisker p)) :=
-  -- map2 Prod.mk p q = trans (mapLeft Prod.mk p a) (mapRight Prod.mk a q)
-  --                   = trans (horizontalWhisker p) (verticalWhisker q)  by definition
-  -- Step.map2_subst gives us a step to trans (mapRight Prod.mk a q) (mapLeft Prod.mk p a)
-  --                   = trans (verticalWhisker q) (horizontalWhisker p)
   rweq_of_step (Step.map2_subst (f := @Prod.mk A A) p q)
 
 end CompPaths.Algebra
