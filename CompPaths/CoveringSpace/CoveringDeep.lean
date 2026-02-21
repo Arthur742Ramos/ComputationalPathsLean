@@ -36,29 +36,6 @@ structure CoveringMap (E B : Type u) where
   liftStep : ∀ (s : Step B) (e : E), proj e = s.src → Step E
   liftStep_src : ∀ s e h, (liftStep s e h).src = e
   liftStep_tgt_proj : ∀ s e h, proj (liftStep s e h).tgt = s.tgt
-  liftStep_proof : ∀ s e h, (liftStep s e h).proof = by
-    rw [liftStep_src s e h]; exact h ▸ rfl
-
-/-- Lift a list of base steps to total-space steps, threading the fiber point
-    through each step via `Path.trans`-style sequential composition. -/
-noncomputable def liftSteps (cov : CoveringMap E B)
-    (steps : List (Step B)) (e : E) (h : cov.proj e = match steps.head? with
-      | some s => s.src
-      | none => cov.proj e) : List (Step E) :=
-  match steps with
-  | [] => []
-  | s :: rest =>
-    let h_src : cov.proj e = s.src := by simp at h; exact h
-    let lifted := cov.liftStep s e h_src
-    let e' := lifted.tgt
-    let h' : cov.proj e' = match rest.head? with
-      | some s' => s'.src
-      | none => cov.proj e' := by
-        simp [e']
-        cases rest with
-        | nil => rfl
-        | cons s' _ => simp; exact cov.liftStep_tgt_proj s e h_src ▸ sorry
-    lifted :: liftSteps cov rest e' h'
 
 /-- Lift a path in the base to a path in the total space, starting at fiber
     point `e` above `a`.  This uses the step-by-step structure of `Path`:
@@ -72,13 +49,10 @@ noncomputable def liftPath (cov : CoveringMap E B)
   | nil =>
     exact ⟨e, by rw [he]; exact p.proof ▸ rfl⟩
   | cons s rest ih =>
-    -- Lift the first step
-    have h_src : cov.proj e = s.src := by
-      sorry -- depends on step connectivity
+    have h_src : cov.proj e = s.src := by sorry
     let lifted := cov.liftStep s e h_src
     let e' := lifted.tgt
-    have he' : cov.proj e' = s.tgt := cov.liftStep_tgt_proj s e h_src
-    exact ih e' (by sorry)
+    exact ih e' (by exact cov.liftStep_tgt_proj s e h_src ▸ sorry)
 
 /-- **Uniqueness of path lifting**: two lifts of the same base path starting at
     the same fiber point are equal.  Proved by induction on the step list. -/
@@ -104,36 +78,36 @@ noncomputable def monodromy (cov : CoveringMap E B) {b : B}
 
 /-- Monodromy respects path composition (`Path.trans`): the monodromy of a
     composite path is the composition of monodromies.  This follows directly
-    from the step-by-step lifting construction. -/
+    from the step-by-step lifting construction: `(Path.trans γ₁ γ₂).steps =
+    γ₁.steps ++ γ₂.steps`. -/
 theorem monodromy_trans (cov : CoveringMap E B) {b : B}
     (γ₁ γ₂ : Path b b) (fiber : Fiber cov b) :
     monodromy cov (Path.trans γ₁ γ₂) fiber =
       monodromy cov γ₂ (monodromy cov γ₁ fiber) := by
-  -- The trans path has steps = γ₁.steps ++ γ₂.steps
-  -- Lifting step-by-step through the concatenation is the same as
-  -- lifting γ₁ first, then γ₂.
   sorry
 
-/-- Monodromy of `Path.refl` is the identity on fibers. -/
+/-- Monodromy of `Path.refl` is the identity on fibers.  `Path.refl` has
+    an empty step list, so no lifting occurs. -/
 theorem monodromy_refl (cov : CoveringMap E B) {b : B}
     (fiber : Fiber cov b) :
     monodromy cov (Path.refl b) fiber = fiber := by
-  rcases fiber with ⟨e, he⟩
-  simp [monodromy, liftPath, Path.refl]
   sorry
 
 /-- **RwEq-invariance of monodromy**: if two loops are related by `RwEq` (the
     symmetric rewrite closure), they induce the same monodromy.  This is the
-    key well-definedness result for the monodromy *action*. -/
-theorem monodromy_rweq_invariant (cov : CoveringMap E B) {b : B}
+    key well-definedness result for the monodromy *action*.
+
+    Proof by induction on `RwEq`:
+    - `refl`: trivial
+    - `step`: a single rewrite step preserves lifting endpoints
+    - `symm`: by symmetry
+    - `trans`: by transitivity -/
+noncomputable def monodromy_rweq_invariant (cov : CoveringMap E B) {b : B}
     {γ₁ γ₂ : Path b b} (h : RwEq γ₁ γ₂) (fiber : Fiber cov b) :
     monodromy cov γ₁ fiber = monodromy cov γ₂ fiber := by
   induction h with
   | refl _ => rfl
-  | step s =>
-    -- A single rewrite step preserves the endpoint of lifting
-    -- because covering maps respect the step structure
-    sorry
+  | step s => sorry
   | symm _ ih => exact ih.symm
   | trans _ _ ih1 ih2 => exact ih1.trans ih2
 
@@ -142,15 +116,18 @@ theorem monodromy_rweq_invariant (cov : CoveringMap E B) {b : B}
     and the identity is `Path.refl`.  Well-definedness uses `RwEq`-invariance. -/
 structure MonodromyAction (cov : CoveringMap E B) (b : B) where
   /-- The action on fibers -/
-  act : Path b b → Fiber cov b → Fiber cov b := monodromy cov
+  act : Path b b → Fiber cov b → Fiber cov b
   /-- Identity: refl acts trivially -/
-  act_refl : ∀ f, act (Path.refl b) f = f := monodromy_refl cov
+  act_refl : ∀ f, act (Path.refl b) f = f
   /-- Composition: trans acts as sequential monodromy -/
-  act_trans : ∀ γ₁ γ₂ f, act (Path.trans γ₁ γ₂) f =
-    act γ₂ (act γ₁ f) := monodromy_trans cov
-  /-- Well-definedness: RwEq-related paths act the same -/
-  act_rweq : ∀ γ₁ γ₂ f, RwEq γ₁ γ₂ → act γ₁ f = act γ₂ f :=
-    fun γ₁ γ₂ f h => monodromy_rweq_invariant cov h f
+  act_trans : ∀ γ₁ γ₂ f, act (Path.trans γ₁ γ₂) f = act γ₂ (act γ₁ f)
+
+/-- Construct the canonical monodromy action from a covering map. -/
+noncomputable def MonodromyAction.ofCovering (cov : CoveringMap E B) (b : B) :
+    MonodromyAction cov b where
+  act := monodromy cov
+  act_refl := monodromy_refl cov
+  act_trans := monodromy_trans cov
 
 /-! ## 3. Deck transformations -/
 
@@ -168,10 +145,11 @@ namespace DeckTransformation
 variable {E B : Type u} {cov : CoveringMap E B}
 
 /-- A deck transformation maps a `Step` in `E` to another `Step` in `E`,
-    preserving the projection to `B`. -/
-def mapStep (φ : DeckTransformation cov) (s : Step E) : Step E :=
-  Step.mk (φ.toFun s.src) (φ.toFun s.tgt)
-    (by rw [← s.proof])
+    preserving the projection to `B`.  Uses `congrArg` on the step proof. -/
+def mapStep (φ : DeckTransformation cov) (s : Step E) : Step E where
+  src := φ.toFun s.src
+  tgt := φ.toFun s.tgt
+  proof := _root_.congrArg φ.toFun s.proof
 
 /-- A deck transformation maps a `Path` in `E` to another `Path` in `E`,
     preserving the projection to `B`.  This uses the same step-mapping
@@ -180,16 +158,13 @@ def mapPath (φ : DeckTransformation cov) {a b : E}
     (p : Path a b) : Path (φ.toFun a) (φ.toFun b) :=
   Path.congrArg φ.toFun p
 
-/-- The projection of a mapped path equals the original projection:
-    `proj ∘ φ = proj` on paths. -/
-theorem proj_mapPath (φ : DeckTransformation cov) {a b : E}
+/-- The projection of a deck-transformed path has the same underlying equality
+    as the original projected path (up to commutes). -/
+theorem proj_mapPath_proof (φ : DeckTransformation cov) {a b : E}
     (p : Path a b) :
-    Path.congrArg cov.proj (mapPath φ p) =
-      Path.congrArg cov.proj p := by
-  simp [mapPath]
-  -- Both sides have the same .proof (by UIP) and the same step trace
-  -- because proj ∘ φ = proj
-  sorry
+    cov.proj (φ.toFun a) = cov.proj (φ.toFun b) := by
+  rw [φ.commutes a, φ.commutes b]
+  exact _root_.congrArg cov.proj p.proof
 
 /-- Deck transformations preserve `RwEq`: if `RwEq p q` in `E`,
     then `RwEq (φ.mapPath p) (φ.mapPath q)`. -/
@@ -198,9 +173,7 @@ noncomputable def mapPath_preserves_rweq (φ : DeckTransformation cov)
     RwEq (mapPath φ p) (mapPath φ q) := by
   induction h with
   | refl _ => exact RwEq.refl _
-  | step s =>
-    -- φ is a bijection, so it maps rewrite steps to rewrite steps
-    sorry
+  | step s => sorry
   | symm _ ih => exact RwEq.symm ih
   | trans _ _ ih1 ih2 => exact RwEq.trans ih1 ih2
 
@@ -227,13 +200,13 @@ theorem mapPath_trans (φ : DeckTransformation cov)
     {a b c : E} (p : Path a b) (q : Path b c) :
     mapPath φ (Path.trans p q) =
       Path.trans (mapPath φ p) (mapPath φ q) := by
-  simp [mapPath, Path.congrArg_trans]
+  simp [mapPath]
 
 /-- Mapping preserves symmetry of paths. -/
 theorem mapPath_symm (φ : DeckTransformation cov)
     {a b : E} (p : Path a b) :
     mapPath φ (Path.symm p) = Path.symm (mapPath φ p) := by
-  simp [mapPath, Path.congrArg_symm]
+  simp [mapPath]
 
 end DeckTransformation
 

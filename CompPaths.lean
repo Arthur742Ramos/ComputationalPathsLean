@@ -21,3 +21,5 @@ import CompPaths.Examples.FundamentalGroupCircle
 import CompPaths.Examples.FundamentalGroupTorus
 import CompPaths.Homotopy.VanKampen
 import CompPaths.Homotopy.VanKampenApplications
+import CompPaths.Algebra.Presentation
+import CompPaths.Rewriting.SquierDeep
