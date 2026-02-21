@@ -67,44 +67,44 @@ namespace CyclicHomologyPathData
 
 variable {C : Nat → Type u} (H : CyclicHomologyPathData C)
 
-@[simp] theorem bSqZero_rweq (n : Nat) (x : C (n + 2)) :
+noncomputable def bSqZero_rweq (n : Nat) (x : C (n + 2)) :
     RwEq
       (Path.trans (H.bSqZeroPath n x) (Path.refl (H.zero n)))
       (H.bSqZeroPath n x) :=
   rweq_of_step (H.bSqZeroStep n x)
 
-@[simp] theorem BSqZero_rweq (n : Nat) (x : C n) :
+noncomputable def BSqZero_rweq (n : Nat) (x : C n) :
     RwEq
       (Path.trans (H.BSqZeroPath n x) (Path.refl (H.zero (n + 2))))
       (H.BSqZeroPath n x) :=
   rweq_of_step (H.BSqZeroStep n x)
 
-@[simp] theorem IZero_rweq (n : Nat) :
+noncomputable def IZero_rweq (n : Nat) :
     RwEq
       (Path.trans (H.IZeroPath n) (Path.refl (H.zero n)))
       (H.IZeroPath n) :=
   rweq_of_step (H.IZeroStep n)
 
-@[simp] theorem SZero_rweq (n : Nat) :
+noncomputable def SZero_rweq (n : Nat) :
     RwEq
       (Path.trans (H.SZeroPath n) (Path.refl (H.zero n)))
       (H.SZeroPath n) :=
   rweq_of_step (H.SZeroStep n)
 
-@[simp] theorem BZero_rweq (n : Nat) :
+noncomputable def BZero_rweq (n : Nat) :
     RwEq
       (Path.trans (H.BZeroPath n) (Path.refl (H.zero (n + 1))))
       (H.BZeroPath n) :=
   rweq_of_step (H.BZeroStep n)
 
-@[simp] theorem SBI_rweq (n : Nat) :
+noncomputable def SBI_rweq (n : Nat) :
     RwEq
       (Path.trans (H.SBIPath n) (Path.refl (H.zero (n + 1))))
       (H.SBIPath n) :=
   rweq_of_step (H.SBIStep n)
 
 /-- Two-step normalization for the SBI witness with duplicated unit tails. -/
-theorem SBI_two_refl_rweq (n : Nat) :
+noncomputable def SBI_two_refl_rweq (n : Nat) :
     RwEq
       (Path.trans
         (Path.trans (H.SBIPath n) (Path.refl (H.zero (n + 1))))
@@ -129,7 +129,7 @@ def SBI_roundtrip (n : Nat) :
       (H.S (n + 1) (H.I (n + 3) (H.B (n + 2) (H.zero (n + 2))))) :=
   Path.trans (H.SBIPath n) (Path.symm (H.SBIPath n))
 
-@[simp] theorem SBI_roundtrip_rweq (n : Nat) :
+noncomputable def SBI_roundtrip_rweq (n : Nat) :
     RwEq
       (H.SBI_roundtrip n)
       (Path.refl (H.S (n + 1) (H.I (n + 3) (H.B (n + 2) (H.zero (n + 2)))))) :=
@@ -160,7 +160,7 @@ def identityCyclicHomologyPathData
   SBIStep := fun _ => Path.Step.trans_refl_right (Path.refl default)
 
 /-- In the identity model, the SBI roundtrip reduces to reflexivity. -/
-theorem identity_SBI_roundtrip_rweq
+noncomputable def identity_SBI_roundtrip_rweq
     (C : Nat → Type u) [∀ n, Inhabited (C n)] (n : Nat) :
     RwEq
       (Path.trans (Path.refl (default : C (n + 1)))

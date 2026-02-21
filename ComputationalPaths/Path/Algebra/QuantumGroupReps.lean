@@ -290,12 +290,12 @@ theorem quantumRepStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Examples -/
 
 /-- RwEq: K inverse paths are stable. -/
-theorem rwEq_K_inv (U : QUEAlgebra.{u}) (i : U.rank) :
+noncomputable def rwEq_K_inv (U : QUEAlgebra.{u}) (i : U.rank) :
     RwEq (U.K_inv_right i) (U.K_inv_right i) :=
   RwEq.refl _
 
 /-- RwEq: R-matrix left inverse is stable. -/
-theorem rwEq_rmat_inv {U : QUEAlgebra.{u}} {ρ : QRep U}
+noncomputable def rwEq_rmat_inv {U : QUEAlgebra.{u}} {ρ : QRep U}
     (rm : RMatrixAction U ρ) (x : ρ.V × ρ.V) :
     RwEq (rm.left_inv x) (rm.left_inv x) :=
   RwEq.refl _
@@ -308,7 +308,7 @@ theorem symm_symm_yb {U : QUEAlgebra.{u}} {ρ : QRep U} {rm : RMatrixAction U ρ
   simp
 
 /-- RwEq: canonical basis bar involution. -/
-theorem rwEq_bar_invol {U : QUEAlgebra.{u}} (cb : CanonicalBasis U) (a : U.A) :
+noncomputable def rwEq_bar_invol {U : QUEAlgebra.{u}} (cb : CanonicalBasis U) (a : U.A) :
     RwEq (cb.bar_invol a) (cb.bar_invol a) :=
   RwEq.refl _
 

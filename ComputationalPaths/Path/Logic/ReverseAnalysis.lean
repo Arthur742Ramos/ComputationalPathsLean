@@ -163,7 +163,7 @@ def conservation_compose (c₁ c₂ : ConservationResult)
   conservation := Path.trans c₁.conservation c₂.conservation
 
 /-- RwEq: conservation composition. -/
-theorem conservation_compose_rweq (c₁ c₂ : ConservationResult)
+noncomputable def conservation_compose_rweq (c₁ c₂ : ConservationResult)
     (h : c₁.weaker = c₂.stronger) :
     RwEq (conservation_compose c₁ c₂ h).conservation
          (Path.trans c₁.conservation c₂.conservation) :=
@@ -259,7 +259,7 @@ def conservation_chain : Path (True : Prop) True :=
     wkl_pi11_conservation.conservation
 
 /-- RwEq: conservation chain. -/
-theorem conservation_chain_rweq :
+noncomputable def conservation_chain_rweq :
     RwEq conservation_chain (Path.refl True) := by
   simp [conservation_chain, wkl_pi02_conservation, wkl_pi11_conservation]
 
@@ -283,22 +283,22 @@ def hierarchy_linear (H : BigFiveHierarchy) :
 /-! ## RwEq Coherences -/
 
 /-- RwEq: symm(symm(conservation)) simplifies. -/
-theorem conservation_symm_rweq :
+noncomputable def conservation_symm_rweq :
     RwEq (Path.symm (Path.symm conservation_chain)) conservation_chain :=
   RwEq.step (Step.symm_symm _)
 
 /-- RwEq: trans(conservation, refl) simplifies. -/
-theorem conservation_trans_refl_rweq :
+noncomputable def conservation_trans_refl_rweq :
     RwEq (Path.trans conservation_chain (Path.refl _)) conservation_chain :=
   RwEq.step (Step.trans_refl_right _)
 
 /-- RwEq: trans(refl, conservation) simplifies. -/
-theorem conservation_refl_trans_rweq :
+noncomputable def conservation_refl_trans_rweq :
     RwEq (Path.trans (Path.refl _) conservation_chain) conservation_chain :=
   RwEq.step (Step.trans_refl_left _)
 
 /-- RwEq: equiv_via_system is self-consistent. -/
-theorem equiv_rweq (e₁ e₂ : ReverseEquivalence)
+noncomputable def equiv_rweq (e₁ e₂ : ReverseEquivalence)
     (h : e₁.axiom_system = e₂.axiom_system) :
     RwEq (equiv_via_system e₁ e₂ h) (equiv_via_system e₁ e₂ h) :=
   RwEq.refl _

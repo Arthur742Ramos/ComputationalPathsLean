@@ -74,23 +74,23 @@ namespace PresheafData
 variable {O : Type u} {A : Type v}
 variable (F : PresheafData O A)
 
-@[simp] def restrictId_rweq (U : O) (s : A) :
+noncomputable def restrictId_rweq (U : O) (s : A) :
     RwEq (Path.trans (F.restrictIdPath U s) (Path.refl _)) (F.restrictIdPath U s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (F.restrictIdPath U s))
 
-@[simp] def restrictComp_rweq (U V W : O) (s : A) :
+noncomputable def restrictComp_rweq (U V W : O) (s : A) :
     RwEq
       (Path.trans (F.restrictCompPath U V W s) (Path.refl _))
       (F.restrictCompPath U V W s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (F.restrictCompPath U V W s))
 
-@[simp] def restrictId_cancel_rweq (U : O) (s : A) :
+noncomputable def restrictId_cancel_rweq (U : O) (s : A) :
     RwEq
       (Path.trans (F.restrictIdPath U s) (Path.symm (F.restrictIdPath U s)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (F.restrictIdPath U s))
 
-@[simp] def restrictComp_cancel_rweq (U V W : O) (s : A) :
+noncomputable def restrictComp_cancel_rweq (U V W : O) (s : A) :
     RwEq
       (Path.trans (F.restrictCompPath U V W s) (Path.symm (F.restrictCompPath U V W s)))
       (Path.refl _) :=
@@ -120,13 +120,13 @@ variable {O : Type u} {A B : Type v}
 variable {F : PresheafData O A} {G : PresheafData O B}
 variable (η : PresheafMorphData F G)
 
-@[simp] def naturality_rweq (U V : O) (s : A) :
+noncomputable def naturality_rweq (U V : O) (s : A) :
     RwEq
       (Path.trans (η.naturalityPath U V s) (Path.refl _))
       (η.naturalityPath U V s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (η.naturalityPath U V s))
 
-@[simp] def naturality_cancel_rweq (U V : O) (s : A) :
+noncomputable def naturality_cancel_rweq (U V : O) (s : A) :
     RwEq
       (Path.trans (η.naturalityPath U V s) (Path.symm (η.naturalityPath U V s)))
       (Path.refl _) :=
@@ -155,20 +155,20 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (S : SheafCondData F)
 
-@[simp] def locality_rweq (cover : List O) (s t : A)
+noncomputable def locality_rweq (cover : List O) (s t : A)
     (agreeOn : ∀ U : O, Path (F.restrict S.whole U s) (F.restrict S.whole U t)) :
     RwEq
       (Path.trans (S.localityPath cover s t agreeOn) (Path.refl _))
       (S.localityPath cover s t agreeOn) :=
   rweq_of_sheaf_step (SheafStep.right_unit (S.localityPath cover s t agreeOn))
 
-@[simp] def gluing_rweq (cover : List O) (ls : O → A) (U : O) :
+noncomputable def gluing_rweq (cover : List O) (ls : O → A) (U : O) :
     RwEq
       (Path.trans (S.gluingPath cover ls U) (Path.refl _))
       (S.gluingPath cover ls U) :=
   rweq_of_sheaf_step (SheafStep.right_unit (S.gluingPath cover ls U))
 
-@[simp] def gluing_cancel_rweq (cover : List O) (ls : O → A) (U : O) :
+noncomputable def gluing_cancel_rweq (cover : List O) (ls : O → A) (U : O) :
     RwEq
       (Path.trans (S.gluingPath cover ls U) (Path.symm (S.gluingPath cover ls U)))
       (Path.refl _) :=
@@ -199,11 +199,11 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (s : StalkData F)
 
-@[simp] def germ_rweq :
+noncomputable def germ_rweq :
     RwEq (Path.trans s.germPath (Path.refl _)) s.germPath :=
   rweq_of_sheaf_step (SheafStep.right_unit s.germPath)
 
-@[simp] def germ_cancel_rweq :
+noncomputable def germ_cancel_rweq :
     RwEq (Path.trans s.germPath (Path.symm s.germPath)) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel s.germPath)
 
@@ -228,11 +228,11 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (Sh : SheafificationData F)
 
-@[simp] def unit_rweq (U V : O) (s : A) :
+noncomputable def unit_rweq (U V : O) (s : A) :
     RwEq (Path.trans (Sh.unitPath U V s) (Path.refl _)) (Sh.unitPath U V s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (Sh.unitPath U V s))
 
-@[simp] def unit_cancel_rweq (U V : O) (s : A) :
+noncomputable def unit_cancel_rweq (U V : O) (s : A) :
     RwEq (Path.trans (Sh.unitPath U V s) (Path.symm (Sh.unitPath U V s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (Sh.unitPath U V s))
 
@@ -257,15 +257,15 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (H : SheafCohomologyData F)
 
-@[simp] def dd_rweq (n : Nat) (s : A) :
+noncomputable def dd_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (H.ddPath n s) (Path.refl _)) (H.ddPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (H.ddPath n s))
 
-@[simp] def dd_cancel_rweq (n : Nat) (s : A) :
+noncomputable def dd_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (H.ddPath n s) (Path.symm (H.ddPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (H.ddPath n s))
 
-@[simp] def augment_rweq :
+noncomputable def augment_rweq :
     RwEq (Path.trans H.augmentPath (Path.refl _)) H.augmentPath :=
   rweq_of_sheaf_step (SheafStep.right_unit H.augmentPath)
 
@@ -296,21 +296,21 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (C : CechCohomologyData F)
 
-@[simp] def ddCech_rweq (n : Nat) (s : A) :
+noncomputable def ddCech_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (C.ddCechPath n s) (Path.refl _)) (C.ddCechPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (C.ddCechPath n s))
 
-@[simp] def ddCech_cancel_rweq (n : Nat) (s : A) :
+noncomputable def ddCech_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (C.ddCechPath n s) (Path.symm (C.ddCechPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (C.ddCechPath n s))
 
-@[simp] def comparisonComm_rweq (n : Nat) (s : A) :
+noncomputable def comparisonComm_rweq (n : Nat) (s : A) :
     RwEq
       (Path.trans (C.comparisonCommPath n s) (Path.refl _))
       (C.comparisonCommPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (C.comparisonCommPath n s))
 
-@[simp] def comparisonComm_cancel_rweq (n : Nat) (s : A) :
+noncomputable def comparisonComm_cancel_rweq (n : Nat) (s : A) :
     RwEq
       (Path.trans (C.comparisonCommPath n s) (Path.symm (C.comparisonCommPath n s)))
       (Path.refl _) :=
@@ -345,21 +345,21 @@ variable {O : Type u} {A : Type v}
 variable {F G H : PresheafData O A}
 variable (E : SheafExactSeqData F G H)
 
-@[simp] def exact_rweq (s : A) :
+noncomputable def exact_rweq (s : A) :
     RwEq (Path.trans (E.exactPath s) (Path.refl _)) (E.exactPath s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (E.exactPath s))
 
-@[simp] def exact_cancel_rweq (s : A) :
+noncomputable def exact_cancel_rweq (s : A) :
     RwEq (Path.trans (E.exactPath s) (Path.symm (E.exactPath s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (E.exactPath s))
 
-@[simp] def incRestrict_cancel_rweq (U V : O) (s : A) :
+noncomputable def incRestrict_cancel_rweq (U V : O) (s : A) :
     RwEq
       (Path.trans (E.incRestrictPath U V s) (Path.symm (E.incRestrictPath U V s)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (E.incRestrictPath U V s))
 
-@[simp] def projRestrict_cancel_rweq (U V : O) (s : A) :
+noncomputable def projRestrict_cancel_rweq (U V : O) (s : A) :
     RwEq
       (Path.trans (E.projRestrictPath U V s) (Path.symm (E.projRestrictPath U V s)))
       (Path.refl _) :=
@@ -389,27 +389,27 @@ variable {O : Type u} {A : Type v}
 variable {F G H : PresheafData O A}
 variable (L : SheafLongExactData F G H)
 
-@[simp] def exactG_rweq (n : Nat) (s : A) :
+noncomputable def exactG_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactGPath n s) (Path.refl _)) (L.exactGPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (L.exactGPath n s))
 
-@[simp] def exactH_rweq (n : Nat) (s : A) :
+noncomputable def exactH_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactHPath n s) (Path.refl _)) (L.exactHPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (L.exactHPath n s))
 
-@[simp] def exactF_rweq (n : Nat) (s : A) :
+noncomputable def exactF_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactFPath n s) (Path.refl _)) (L.exactFPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (L.exactFPath n s))
 
-@[simp] def exactG_cancel_rweq (n : Nat) (s : A) :
+noncomputable def exactG_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactGPath n s) (Path.symm (L.exactGPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (L.exactGPath n s))
 
-@[simp] def exactH_cancel_rweq (n : Nat) (s : A) :
+noncomputable def exactH_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactHPath n s) (Path.symm (L.exactHPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (L.exactHPath n s))
 
-@[simp] def exactF_cancel_rweq (n : Nat) (s : A) :
+noncomputable def exactF_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactFPath n s) (Path.symm (L.exactFPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (L.exactFPath n s))
 
@@ -440,13 +440,13 @@ variable {O₁ O₂ : Type u} {A : Type v}
 variable {F : PresheafData O₁ A}
 variable (D : DirectImageData F (O₂ := O₂))
 
-@[simp] def directRestrictId_rweq (U : O₂) (s : A) :
+noncomputable def directRestrictId_rweq (U : O₂) (s : A) :
     RwEq
       (Path.trans (D.directRestrictIdPath U s) (Path.refl _))
       (D.directRestrictIdPath U s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (D.directRestrictIdPath U s))
 
-@[simp] def directRestrictComp_cancel_rweq (U V W : O₂) (s : A) :
+noncomputable def directRestrictComp_cancel_rweq (U V W : O₂) (s : A) :
     RwEq
       (Path.trans (D.directRestrictCompPath U V W s)
                   (Path.symm (D.directRestrictCompPath U V W s)))
@@ -472,11 +472,11 @@ variable {O : Type u} {A : Type v}
 variable {F : PresheafData O A}
 variable (Fl : FlasqueData F)
 
-@[simp] def extend_rweq (V : O) (s : A) :
+noncomputable def extend_rweq (V : O) (s : A) :
     RwEq (Path.trans (Fl.extendPath V s) (Path.refl _)) (Fl.extendPath V s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (Fl.extendPath V s))
 
-@[simp] def extend_cancel_rweq (V : O) (s : A) :
+noncomputable def extend_cancel_rweq (V : O) (s : A) :
     RwEq (Path.trans (Fl.extendPath V s) (Path.symm (Fl.extendPath V s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (Fl.extendPath V s))
 
@@ -505,15 +505,15 @@ namespace RingedSpaceData
 variable {O : Type u} {A : Type v}
 variable (R : RingedSpaceData O A)
 
-@[simp] def mulAssoc_rweq (x y z : A) :
+noncomputable def mulAssoc_rweq (x y z : A) :
     RwEq (Path.trans (R.mulAssocPath x y z) (Path.refl _)) (R.mulAssocPath x y z) :=
   rweq_of_sheaf_step (SheafStep.right_unit (R.mulAssocPath x y z))
 
-@[simp] def mulOne_cancel_rweq (x : A) :
+noncomputable def mulOne_cancel_rweq (x : A) :
     RwEq (Path.trans (R.mulOnePath x) (Path.symm (R.mulOnePath x))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (R.mulOnePath x))
 
-@[simp] def oneMul_cancel_rweq (x : A) :
+noncomputable def oneMul_cancel_rweq (x : A) :
     RwEq (Path.trans (R.oneMulPath x) (Path.symm (R.oneMulPath x))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (R.oneMulPath x))
 
@@ -540,25 +540,25 @@ variable {O : Type u} {A : Type v}
 variable {R : RingedSpaceData O A}
 variable (M : SheafModuleData R)
 
-@[simp] def actionAssoc_rweq (r s m : A) :
+noncomputable def actionAssoc_rweq (r s m : A) :
     RwEq
       (Path.trans (M.actionAssocPath r s m) (Path.refl _))
       (M.actionAssocPath r s m) :=
   rweq_of_sheaf_step (SheafStep.right_unit (M.actionAssocPath r s m))
 
-@[simp] def actionOne_rweq (m : A) :
+noncomputable def actionOne_rweq (m : A) :
     RwEq
       (Path.trans (M.actionOnePath m) (Path.refl _))
       (M.actionOnePath m) :=
   rweq_of_sheaf_step (SheafStep.right_unit (M.actionOnePath m))
 
-@[simp] def actionAssoc_cancel_rweq (r s m : A) :
+noncomputable def actionAssoc_cancel_rweq (r s m : A) :
     RwEq
       (Path.trans (M.actionAssocPath r s m) (Path.symm (M.actionAssocPath r s m)))
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (M.actionAssocPath r s m))
 
-@[simp] def actionOne_cancel_rweq (m : A) :
+noncomputable def actionOne_cancel_rweq (m : A) :
     RwEq
       (Path.trans (M.actionOnePath m) (Path.symm (M.actionOnePath m)))
       (Path.refl _) :=
@@ -585,11 +585,11 @@ variable {O : Type u} {A : Type v}
 variable {F G : PresheafData O A}
 variable (E : SheafExtData F G)
 
-@[simp] def dd_rweq (n : Nat) (s : A) :
+noncomputable def dd_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (E.ddPath n s) (Path.refl _)) (E.ddPath n s) :=
   rweq_of_sheaf_step (SheafStep.right_unit (E.ddPath n s))
 
-@[simp] def dd_cancel_rweq (n : Nat) (s : A) :
+noncomputable def dd_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (E.ddPath n s) (Path.symm (E.ddPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (E.ddPath n s))
 

@@ -210,14 +210,14 @@ def disjoint_commutativity_symm_path {surf : SurfaceData.{u}}
   Path.symm R.comm_path
 
 /-- Disjoint Dehn twist commutativity is reflexive under rewrite equivalence. -/
-theorem disjoint_commutativity_self_rweq {surf : SurfaceData.{u}}
+noncomputable def disjoint_commutativity_self_rweq {surf : SurfaceData.{u}}
     (R : DisjointCommutativity surf) :
     let p := R.comm_path
     RwEq p p :=
   RwEq.refl _
 
 /-- Symmetric disjoint commutativity path is reflexive under rewrite equivalence. -/
-theorem disjoint_commutativity_symm_self_rweq {surf : SurfaceData.{u}}
+noncomputable def disjoint_commutativity_symm_self_rweq {surf : SurfaceData.{u}}
     (R : DisjointCommutativity surf) :
     let p := Path.symm R.comm_path
     RwEq p p :=
@@ -235,14 +235,14 @@ def braid_relation_symm_path {surf : SurfaceData.{u}}
   Path.symm R.braid_path
 
 /-- The braid relation is reflexive under rewrite equivalence. -/
-theorem braid_relation_self_rweq {surf : SurfaceData.{u}}
+noncomputable def braid_relation_self_rweq {surf : SurfaceData.{u}}
     (R : BraidRelation surf) :
     let p := R.braid_path
     RwEq p p :=
   RwEq.refl _
 
 /-- Symmetric braid relation is reflexive under rewrite equivalence. -/
-theorem braid_relation_symm_self_rweq {surf : SurfaceData.{u}}
+noncomputable def braid_relation_symm_self_rweq {surf : SurfaceData.{u}}
     (R : BraidRelation surf) :
     let p := Path.symm R.braid_path
     RwEq p p :=
@@ -260,14 +260,14 @@ def lantern_relation_symm_path {surf : SurfaceData.{u}}
   Path.symm L.lantern_path
 
 /-- Lantern relation is reflexive under rewrite equivalence. -/
-theorem lantern_relation_self_rweq {surf : SurfaceData.{u}}
+noncomputable def lantern_relation_self_rweq {surf : SurfaceData.{u}}
     (L : LanternRelation surf) :
     let p := L.lantern_path
     RwEq p p :=
   RwEq.refl _
 
 /-- Symmetric lantern relation is reflexive under rewrite equivalence. -/
-theorem lantern_relation_symm_self_rweq {surf : SurfaceData.{u}}
+noncomputable def lantern_relation_symm_self_rweq {surf : SurfaceData.{u}}
     (L : LanternRelation surf) :
     let p := Path.symm L.lantern_path
     RwEq p p :=
@@ -280,7 +280,7 @@ def dehn_twist_relation_chain {surf : SurfaceData.{u}}
   Path.trans D.comm_path B.braid_path
 
 /-- Composite Dehn twist relation path is reflexive under rewrite equivalence. -/
-theorem dehn_twist_relation_chain_self_rweq {surf : SurfaceData.{u}}
+noncomputable def dehn_twist_relation_chain_self_rweq {surf : SurfaceData.{u}}
     (D : DisjointCommutativity surf) (B : BraidRelation surf) :
     let p := Path.trans D.comm_path B.braid_path
     RwEq p p :=
@@ -304,7 +304,7 @@ theorem mapping_class_group_presentation {surf : SurfaceData.{u}}
   exact P.dehn_lickorish.generates
 
 /-- Every listed presentation relation is reflexive under rewrite equivalence. -/
-theorem presentation_relations_are_rweq {surf : SurfaceData.{u}}
+noncomputable def presentation_relations_are_rweq {surf : SurfaceData.{u}}
     (P : MCGPresentation surf) :
     (∀ R, R ∈ P.disjoint_relations → RwEq R.comm_path R.comm_path) ∧
       (∀ R, R ∈ P.braid_relations → RwEq R.braid_path R.braid_path) ∧

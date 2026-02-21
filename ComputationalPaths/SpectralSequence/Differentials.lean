@@ -46,19 +46,19 @@ namespace Differentials
 
 variable {E : Pages.{u}} (D : Differentials E)
 
-@[simp] theorem d_squared_rweq (r p q : Nat) :
+noncomputable def d_squared_rweq (r p q : Nat) :
     RwEq
       (Path.trans (D.dSquaredPath r p q) (Path.refl (E.base p q)))
       (D.dSquaredPath r p q) :=
   rweq_of_step (D.dSquaredStep r p q)
 
-@[simp] theorem d_squared_cancel_rweq (r p q : Nat) :
+noncomputable def d_squared_cancel_rweq (r p q : Nat) :
     RwEq
       (Path.trans (Path.symm (D.dSquaredPath r p q)) (D.dSquaredPath r p q))
       (Path.refl (E.base p q)) :=
   rweq_cmpA_inv_left (D.dSquaredPath r p q)
 
-@[simp] theorem commute_rweq (r p q : Nat) :
+noncomputable def commute_rweq (r p q : Nat) :
     RwEq
       (Path.trans
         (Path.refl (E.shift r p q (D.d r p q (E.base p q))))
@@ -66,7 +66,7 @@ variable {E : Pages.{u}} (D : Differentials E)
       (D.commutePath r p q) :=
   rweq_of_step (D.commuteStep r p q)
 
-@[simp] theorem commute_cancel_rweq (r p q : Nat) :
+noncomputable def commute_cancel_rweq (r p q : Nat) :
     RwEq
       (Path.trans (Path.symm (D.commutePath r p q)) (D.commutePath r p q))
       (Path.refl (D.d (r + 1) p q (E.shift r p q (E.base p q)))) :=
@@ -77,7 +77,7 @@ def boundaryLoop (r p q : Nat) :
     Path (D.d r p q (D.d r p q (E.base p q))) (D.d r p q (D.d r p q (E.base p q))) :=
   Path.trans (D.dSquaredPath r p q) (Path.symm (D.dSquaredPath r p q))
 
-@[simp] theorem boundaryLoop_contracts (r p q : Nat) :
+noncomputable def boundaryLoop_contracts (r p q : Nat) :
     RwEq (D.boundaryLoop r p q)
       (Path.refl (D.d r p q (D.d r p q (E.base p q)))) := by
   unfold boundaryLoop
@@ -90,7 +90,7 @@ def stabilizedBoundary (r p q : Nat) :
       (E.shift r p q (E.base p q)) :=
   Path.congrArg (E.shift r p q) (D.dSquaredPath r p q)
 
-@[simp] theorem stabilizedBoundary_contracts (r p q : Nat) :
+noncomputable def stabilizedBoundary_contracts (r p q : Nat) :
     RwEq
       (Path.trans (D.stabilizedBoundary r p q) (Path.symm (D.stabilizedBoundary r p q)))
       (Path.refl (E.shift r p q (D.d r p q (D.d r p q (E.base p q))))) :=

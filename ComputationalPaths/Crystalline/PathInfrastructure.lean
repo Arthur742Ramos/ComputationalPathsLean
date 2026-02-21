@@ -29,7 +29,7 @@ namespace CrystallinePathInfrastructure
 variable {Ring : Type u} {X : Type v}
 variable (I : CrystallinePathInfrastructure Ring X)
 
-@[simp] theorem unitComparison_rweq (x : X) :
+noncomputable def unitComparison_rweq (x : X) :
     RwEq
       (Path.trans (I.comparison.comparisonPath 0 x)
         (Path.refl (I.comparison.deRhamWittClass 0 x)))

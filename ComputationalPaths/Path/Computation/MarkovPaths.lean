@@ -90,35 +90,35 @@ theorem ck_assoc {S : Type u} (d : ChapmanKolmogorov S)
   simp
 
 /-- RwEq: CK path trans refl. -/
-theorem ck_rweq_trans_refl {S : Type u} (d : ChapmanKolmogorov S) :
+noncomputable def ck_rweq_trans_refl {S : Type u} (d : ChapmanKolmogorov S) :
     RwEq
       (Path.trans d.ckPath (Path.refl d.sumOverK))
       d.ckPath :=
   rweq_of_step (Step.trans_refl_right d.ckPath)
 
 /-- RwEq: CK path refl trans. -/
-theorem ck_rweq_refl_trans {S : Type u} (d : ChapmanKolmogorov S) :
+noncomputable def ck_rweq_refl_trans {S : Type u} (d : ChapmanKolmogorov S) :
     RwEq
       (Path.trans (Path.refl d.probNM) d.ckPath)
       d.ckPath :=
   rweq_of_step (Step.trans_refl_left d.ckPath)
 
 /-- RwEq: CK path inv cancel right. -/
-theorem ck_rweq_inv_right {S : Type u} (d : ChapmanKolmogorov S) :
+noncomputable def ck_rweq_inv_right {S : Type u} (d : ChapmanKolmogorov S) :
     RwEq
       (Path.trans d.ckPath (Path.symm d.ckPath))
       (Path.refl d.probNM) :=
   rweq_cmpA_inv_right d.ckPath
 
 /-- RwEq: CK path inv cancel left. -/
-theorem ck_rweq_inv_left {S : Type u} (d : ChapmanKolmogorov S) :
+noncomputable def ck_rweq_inv_left {S : Type u} (d : ChapmanKolmogorov S) :
     RwEq
       (Path.trans (Path.symm d.ckPath) d.ckPath)
       (Path.refl d.sumOverK) :=
   rweq_cmpA_inv_left d.ckPath
 
 /-- RwEq: CK path symm_symm. -/
-theorem ck_rweq_symm_symm {S : Type u} (d : ChapmanKolmogorov S) :
+noncomputable def ck_rweq_symm_symm {S : Type u} (d : ChapmanKolmogorov S) :
     RwEq
       (Path.symm (Path.symm d.ckPath))
       d.ckPath :=
@@ -141,21 +141,21 @@ theorem stationary_trans_refl {S : Type u} (d : StationaryData S) :
   simp
 
 /-- RwEq: stationary path trans refl. -/
-theorem stationary_rweq_trans_refl {S : Type u} (d : StationaryData S) :
+noncomputable def stationary_rweq_trans_refl {S : Type u} (d : StationaryData S) :
     RwEq
       (Path.trans d.stationaryPath (Path.refl d.piVal))
       d.stationaryPath :=
   rweq_of_step (Step.trans_refl_right d.stationaryPath)
 
 /-- RwEq: stationary inv cancel right. -/
-theorem stationary_rweq_inv_right {S : Type u} (d : StationaryData S) :
+noncomputable def stationary_rweq_inv_right {S : Type u} (d : StationaryData S) :
     RwEq
       (Path.trans d.stationaryPath (Path.symm d.stationaryPath))
       (Path.refl d.piTimesP) :=
   rweq_cmpA_inv_right d.stationaryPath
 
 /-- RwEq: stationary symm_symm. -/
-theorem stationary_rweq_symm_symm {S : Type u} (d : StationaryData S) :
+noncomputable def stationary_rweq_symm_symm {S : Type u} (d : StationaryData S) :
     RwEq
       (Path.symm (Path.symm d.stationaryPath))
       d.stationaryPath :=
@@ -176,14 +176,14 @@ theorem absorb_trans_refl {S : Type u} (d : AbsorbingData S) :
   simp
 
 /-- RwEq: absorbing inv cancel. -/
-theorem absorb_rweq_inv_right {S : Type u} (d : AbsorbingData S) :
+noncomputable def absorb_rweq_inv_right {S : Type u} (d : AbsorbingData S) :
     RwEq
       (Path.trans d.absorbPath (Path.symm d.absorbPath))
       (Path.refl d.selfWeight) :=
   rweq_cmpA_inv_right d.absorbPath
 
 /-- RwEq: absorbing trans refl. -/
-theorem absorb_rweq_trans_refl {S : Type u} (d : AbsorbingData S) :
+noncomputable def absorb_rweq_trans_refl {S : Type u} (d : AbsorbingData S) :
     RwEq
       (Path.trans d.absorbPath (Path.refl d.totalWeight))
       d.absorbPath :=
@@ -210,21 +210,21 @@ def balance_reverse {S : Type u} (d : DetailedBalance S) :
   Path.symm d.balancePath
 
 /-- RwEq: balance inv cancel right. -/
-theorem balance_rweq_inv_right {S : Type u} (d : DetailedBalance S) :
+noncomputable def balance_rweq_inv_right {S : Type u} (d : DetailedBalance S) :
     RwEq
       (Path.trans d.balancePath (Path.symm d.balancePath))
       (Path.refl d.piI_Pij) :=
   rweq_cmpA_inv_right d.balancePath
 
 /-- RwEq: balance inv cancel left. -/
-theorem balance_rweq_inv_left {S : Type u} (d : DetailedBalance S) :
+noncomputable def balance_rweq_inv_left {S : Type u} (d : DetailedBalance S) :
     RwEq
       (Path.trans (Path.symm d.balancePath) d.balancePath)
       (Path.refl d.piJ_Pji) :=
   rweq_cmpA_inv_left d.balancePath
 
 /-- RwEq: balance symm_symm. -/
-theorem balance_rweq_symm_symm {S : Type u} (d : DetailedBalance S) :
+noncomputable def balance_rweq_symm_symm {S : Type u} (d : DetailedBalance S) :
     RwEq
       (Path.symm (Path.symm d.balancePath))
       d.balancePath :=
@@ -241,14 +241,14 @@ structure ErgodicData (S : Type u) where
   convergePath : Path probN piJ
 
 /-- RwEq: ergodic convergence trans refl. -/
-theorem ergodic_rweq_trans_refl {S : Type u} (d : ErgodicData S) :
+noncomputable def ergodic_rweq_trans_refl {S : Type u} (d : ErgodicData S) :
     RwEq
       (Path.trans d.convergePath (Path.refl d.piJ))
       d.convergePath :=
   rweq_of_step (Step.trans_refl_right d.convergePath)
 
 /-- RwEq: ergodic inv cancel. -/
-theorem ergodic_rweq_inv_right {S : Type u} (d : ErgodicData S) :
+noncomputable def ergodic_rweq_inv_right {S : Type u} (d : ErgodicData S) :
     RwEq
       (Path.trans d.convergePath (Path.symm d.convergePath))
       (Path.refl d.probN) :=

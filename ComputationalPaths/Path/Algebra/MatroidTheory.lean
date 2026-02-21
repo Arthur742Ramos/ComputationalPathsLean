@@ -435,11 +435,11 @@ theorem tropicalBridgeDimension_eq_rank (n r : Nat) (tls : TropicalLinearSpace n
 theorem matroidFullRank_refl' (n : Nat) (M : RankMatroid n) :
     matroidFullRank n M = matroidFullRank n M := rfl
 
-theorem dualRankEmpty_rweq (n : Nat) (M : RankMatroid n) (D : MatroidDual n M) :
+noncomputable def dualRankEmpty_rweq (n : Nat) (M : RankMatroid n) (D : MatroidDual n M) :
     RwEq D.dual_rank_empty D.dual_rank_empty :=
   RwEq.refl _
 
-theorem intersectionMinmax_rweq (n : Nat) (mi : MatroidIntersection n) :
+noncomputable def intersectionMinmax_rweq (n : Nat) (mi : MatroidIntersection n) :
     RwEq mi.minmax_path mi.minmax_path :=
   RwEq.refl _
 

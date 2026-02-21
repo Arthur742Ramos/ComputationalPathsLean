@@ -46,7 +46,7 @@ inductive MaurerCartanStep : {A : Type u} → {a b : A} → Path a b → Path a 
       MaurerCartanStep (Path.trans p (Path.refl b)) p
 
 /-- Maurer-Cartan rewrite steps induce rewrite equivalence. -/
-theorem MaurerCartanStep.to_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def MaurerCartanStep.to_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : MaurerCartanStep p q) : RwEq p q := by
   cases h
   exact rweq_of_step (Path.Step.trans_refl_right _)
@@ -60,15 +60,15 @@ def equationStep (mc : MaurerCartanElement L) :
     Path.Step (Path.trans mc.equation (Path.refl L.zero)) mc.equation :=
   Path.Step.trans_refl_right mc.equation
 
-@[simp] theorem equationRweq (mc : MaurerCartanElement L) :
+noncomputable def equationRweq (mc : MaurerCartanElement L) :
     RwEq (Path.trans mc.equation (Path.refl L.zero)) mc.equation :=
   rweq_of_step (equationStep mc)
 
-@[simp] theorem equationCancelLeft (mc : MaurerCartanElement L) :
+noncomputable def equationCancelLeft (mc : MaurerCartanElement L) :
     RwEq (Path.trans (Path.symm mc.equation) mc.equation) (Path.refl L.zero) :=
   rweq_cmpA_inv_left mc.equation
 
-@[simp] theorem equationCancelRight (mc : MaurerCartanElement L) :
+noncomputable def equationCancelRight (mc : MaurerCartanElement L) :
     RwEq
       (Path.trans mc.equation (Path.symm mc.equation))
       (Path.refl (curvature L mc.element)) :=
@@ -90,7 +90,7 @@ def transportStep {β : A} (mc : MaurerCartanElement L) (p : Path mc.element β)
       (transport mc p).equation :=
   Path.Step.trans_refl_right (transport mc p).equation
 
-@[simp] theorem transportRweq {β : A} (mc : MaurerCartanElement L) (p : Path mc.element β) :
+noncomputable def transportRweq {β : A} (mc : MaurerCartanElement L) (p : Path mc.element β) :
     RwEq
       (Path.trans (transport mc p).equation (Path.refl L.zero))
       (transport mc p).equation :=
@@ -114,7 +114,7 @@ def onMaurerCartan (G : GaugeAction L) (mc : MaurerCartanElement L) :
   element := G.act mc.element
   equation := Path.trans (G.preserveCurvature mc.element) mc.equation
 
-@[simp] theorem onMaurerCartanRweq (G : GaugeAction L) (mc : MaurerCartanElement L) :
+noncomputable def onMaurerCartanRweq (G : GaugeAction L) (mc : MaurerCartanElement L) :
     RwEq
       (Path.trans (onMaurerCartan G mc).equation (Path.refl L.zero))
       (onMaurerCartan G mc).equation :=

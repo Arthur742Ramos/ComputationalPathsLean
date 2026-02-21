@@ -354,7 +354,7 @@ theorem mwStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Constructions -/
 
 /-- RwEq: Steinberg relation coherence. -/
-theorem rwEq_steinberg (k : Type u) (F : MWField k) (n : Int)
+noncomputable def rwEq_steinberg (k : Type u) (F : MWField k) (n : Int)
     (K : KMWGroup k F n) (u : k) :
     RwEq (K.steinberg u) (K.steinberg u) :=
   RwEq.refl _
@@ -377,7 +377,7 @@ def steinberg_via_neg (k : Type u) (F : MWField k) (n : Int)
     (K.neg_diag u)
 
 /-- RwEq for the composite path. -/
-theorem rwEq_steinberg_neg (k : Type u) (F : MWField k) (n : Int)
+noncomputable def rwEq_steinberg_neg (k : Type u) (F : MWField k) (n : Int)
     (K : KMWGroup k F n) (u : k)
     (h : F.oneMinus u = F.negUnit u) :
     RwEq (steinberg_via_neg k F n K u h) (steinberg_via_neg k F n K u h) :=

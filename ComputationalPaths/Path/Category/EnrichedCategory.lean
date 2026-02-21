@@ -73,7 +73,7 @@ abbrev EnrichedHom (A : Type u) (a b : A) : Type u :=
   Step.symm_trans_congr p q
 
 /-- Symmetry of enriched composition, lifted to rewrite equivalence. -/
-@[simp] theorem enrichedComp_symm {A : Type u} {a b c : A}
+noncomputable def enrichedComp_symm {A : Type u} {a b c : A}
     (p : EnrichedHom A a b) (q : EnrichedHom A b c) :
     RwEq (Path.symm (enrichedComp p q))
       (enrichedComp (Path.symm q) (Path.symm p)) :=
@@ -92,13 +92,13 @@ abbrev EnrichedHom (A : Type u) (a b : A) : Type u :=
   Step.trans_symm p
 
 /-- Left inverse coherence for enriched composition via rewrite equivalence. -/
-@[simp] theorem enrichedComp_inv_left {A : Type u} {a b : A}
+noncomputable def enrichedComp_inv_left {A : Type u} {a b : A}
     (p : EnrichedHom A a b) :
     RwEq (enrichedComp (Path.symm p) p) (enrichedId b) :=
   rweq_of_step (enrichedComp_inv_left_step p)
 
 /-- Right inverse coherence for enriched composition via rewrite equivalence. -/
-@[simp] theorem enrichedComp_inv_right {A : Type u} {a b : A}
+noncomputable def enrichedComp_inv_right {A : Type u} {a b : A}
     (p : EnrichedHom A a b) :
     RwEq (enrichedComp p (Path.symm p)) (enrichedId a) :=
   rweq_of_step (enrichedComp_inv_right_step p)
@@ -118,7 +118,7 @@ abbrev EnrichedHom (A : Type u) (a b : A) : Type u :=
   Step.trans_congr_right p h
 
 /-- Two primitive hom-object steps induce a rewrite-equivalent composite. -/
-@[simp] theorem enrichedComp_respects_steps {A : Type u} {a b c : A}
+noncomputable def enrichedComp_respects_steps {A : Type u} {a b c : A}
     {p p' : EnrichedHom A a b} {q q' : EnrichedHom A b c}
     (hp : Step p p') (hq : Step q q') :
     RwEq (enrichedComp p q) (enrichedComp p' q') := by
@@ -136,7 +136,7 @@ abbrev EnrichedHom (A : Type u) (a b : A) : Type u :=
   Step.trans_assoc p q r
 
 /-- Associativity coherence for enriched composition. -/
-@[simp] theorem enriched_assoc {A : Type u} {a b c d : A}
+noncomputable def enriched_assoc {A : Type u} {a b c d : A}
     (p : EnrichedHom A a b) (q : EnrichedHom A b c) (r : EnrichedHom A c d) :
     RwEq (enrichedComp (enrichedComp p q) r)
       (enrichedComp p (enrichedComp q r)) :=
@@ -149,7 +149,7 @@ abbrev EnrichedHom (A : Type u) (a b : A) : Type u :=
   Step.trans_refl_left p
 
 /-- Left unit coherence for enriched composition. -/
-@[simp] theorem enriched_left_unit {A : Type u} {a b : A}
+noncomputable def enriched_left_unit {A : Type u} {a b : A}
     (p : EnrichedHom A a b) :
     RwEq (enrichedComp (enrichedId a) p) p :=
   rweq_of_step (enriched_left_unit_step p)
@@ -161,27 +161,27 @@ abbrev EnrichedHom (A : Type u) (a b : A) : Type u :=
   Step.trans_refl_right p
 
 /-- Right unit coherence for enriched composition. -/
-@[simp] theorem enriched_right_unit {A : Type u} {a b : A}
+noncomputable def enriched_right_unit {A : Type u} {a b : A}
     (p : EnrichedHom A a b) :
     RwEq (enrichedComp p (enrichedId b)) p :=
   rweq_of_step (enriched_right_unit_step p)
 
 /-- Enriched composition is congruent in the left hom-object argument. -/
-@[simp] theorem enrichedComp_respects_left {A : Type u} {a b c : A}
+noncomputable def enrichedComp_respects_left {A : Type u} {a b c : A}
     {p p' : EnrichedHom A a b} (q : EnrichedHom A b c)
     (h : RwEq p p') :
     RwEq (enrichedComp p q) (enrichedComp p' q) :=
   rweq_trans_congr_left q h
 
 /-- Enriched composition is congruent in the right hom-object argument. -/
-@[simp] theorem enrichedComp_respects_right {A : Type u} {a b c : A}
+noncomputable def enrichedComp_respects_right {A : Type u} {a b c : A}
     (p : EnrichedHom A a b) {q q' : EnrichedHom A b c}
     (h : RwEq q q') :
     RwEq (enrichedComp p q) (enrichedComp p q') :=
   rweq_trans_congr_right p h
 
 /-- Enriched composition respects rewrite equivalence in both arguments. -/
-@[simp] theorem enrichedComp_respects {A : Type u} {a b c : A}
+noncomputable def enrichedComp_respects {A : Type u} {a b c : A}
     {p p' : EnrichedHom A a b} {q q' : EnrichedHom A b c}
     (hp : RwEq p p') (hq : RwEq q q') :
     RwEq (enrichedComp p q) (enrichedComp p' q') :=

@@ -39,14 +39,14 @@ def twoStepPath (m₁ m₂ : MMPPaths.Move) :
   C.data.twoStepCanonicalPath m₁ m₂ C.startModel
 
 /-- Primitive right-unit normalization for two-step MMP construction paths. -/
-@[simp] theorem twoStepPathNormalize (m₁ m₂ : MMPPaths.Move) :
+noncomputable def twoStepPathNormalize (m₁ m₂ : MMPPaths.Move) :
     RwEq
       (Path.trans (C.twoStepPath m₁ m₂) (Path.refl (C.data.birational.canonical C.startModel)))
       (C.twoStepPath m₁ m₂) :=
   C.data.twoStepNormalize m₁ m₂ C.startModel
 
 /-- Left inverse cancellation for one-step MMP construction paths. -/
-@[simp] theorem firstStepCancelLeft (m : MMPPaths.Move) :
+noncomputable def firstStepCancelLeft (m : MMPPaths.Move) :
     RwEq
       (Path.trans (Path.symm (C.firstStepPath m)) (C.firstStepPath m))
       (Path.refl (C.data.birational.canonical C.startModel)) :=

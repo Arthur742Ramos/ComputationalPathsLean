@@ -248,12 +248,12 @@ theorem posetStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Instances -/
 
 /-- RwEq: Möbius diagonal path is stable. -/
-theorem rwEq_mu_diag (P : PathPoset) (mf : MobiusFunction P) (x : P.P) :
+noncomputable def rwEq_mu_diag (P : PathPoset) (mf : MobiusFunction P) (x : P.P) :
     RwEq (mf.mu_diag x) (mf.mu_diag x) :=
   RwEq.refl _
 
 /-- RwEq: poset reflexivity is stable. -/
-theorem rwEq_le_refl (P : PathPoset) (x : P.P) :
+noncomputable def rwEq_le_refl (P : PathPoset) (x : P.P) :
     RwEq (P.le_refl x) (P.le_refl x) :=
   RwEq.refl _
 
@@ -264,7 +264,7 @@ theorem symm_symm_poset (P : PathPoset) (x : P.P) :
   simp
 
 /-- RwEq: CM purity paths are stable. -/
-theorem rwEq_cm_pure (P : PathPoset) (cm : CohenMacaulayPoset P)
+noncomputable def rwEq_cm_pure (P : PathPoset) (cm : CohenMacaulayPoset P)
     (c₁ c₂ : MaximalChain P) :
     RwEq (cm.pure c₁ c₂) (cm.pure c₁ c₂) :=
   RwEq.refl _
@@ -344,11 +344,11 @@ theorem quillenFiberWitness_refl (P : PathPoset) (oc : OrderComplex P) :
 theorem orderComplexConnectivity_refl (P : PathPoset) (oc : OrderComplex P) :
     orderComplexConnectivity P oc = orderComplexConnectivity P oc := rfl
 
-theorem el_shellable_cm_rweq (P : PathPoset) (el : ELLabeling P) (oc : OrderComplex P) :
+noncomputable def el_shellable_cm_rweq (P : PathPoset) (el : ELLabeling P) (oc : OrderComplex P) :
     RwEq (el_implies_shellable el oc) (el_implies_shellable el oc) :=
   RwEq.refl _
 
-theorem mobius_diag_rweq_extra (P : PathPoset) (mf : MobiusFunction P) (x : P.P) :
+noncomputable def mobius_diag_rweq_extra (P : PathPoset) (mf : MobiusFunction P) (x : P.P) :
     RwEq (mf.mu_diag x) (mf.mu_diag x) :=
   RwEq.refl _
 

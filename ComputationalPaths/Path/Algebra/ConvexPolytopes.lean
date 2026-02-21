@@ -219,13 +219,13 @@ theorem polytopeStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Examples -/
 
 /-- RwEq: Euler formula is stable. -/
-theorem rwEq_euler {P : ConvexPolytope.{u}} {fv : FVector P}
+noncomputable def rwEq_euler {P : ConvexPolytope.{u}} {fv : FVector P}
     (ef : EulerFormula P fv) :
     RwEq ef.euler ef.euler :=
   RwEq.refl _
 
 /-- RwEq: h-vector nonnegativity is stable. -/
-theorem rwEq_hv_nonneg {P : ConvexPolytope.{u}} (hv : HVector P)
+noncomputable def rwEq_hv_nonneg {P : ConvexPolytope.{u}} (hv : HVector P)
     (i : Fin (P.dim + 1)) :
     RwEq (hv.nonneg i) (hv.nonneg i) :=
   RwEq.refl _

@@ -64,7 +64,7 @@ theorem simpmcstep_toEq {A : Type u} {a b : A} {p q : Path a b}
   | enrichment_assoc p q r => simp
   | tensor_unit p => simp
 
-theorem simpmcstep_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def simpmcstep_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : SimpMCStep p q) : RwEq p q := by
   cases h with
   | map_id => exact RwEq.refl _
@@ -300,7 +300,7 @@ structure FramingData (A : Type u) (M : SimpModelCatData A) where
 /-! ## Coherence theorems -/
 
 /-- Mapping space composition is associative via Path. -/
-theorem mapping_comp_assoc {A : Type u}
+noncomputable def mapping_comp_assoc {A : Type u}
     (M : SimpMappingSpace A) {a b c d : A}
     (f : (M.mapSpace a b).simplices 0)
     (g : (M.mapSpace b c).simplices 0)
@@ -316,7 +316,7 @@ theorem mapping_id_left_rweq {A : Type u}
   rfl
 
 /-- Multi-step SimpMCStep composition is sound. -/
-theorem simpmcstep_multi_sound {A : Type u} {a b : A}
+noncomputable def simpmcstep_multi_sound {A : Type u} {a b : A}
     {p q r : Path a b}
     (h1 : SimpMCStep p q) (h2 : SimpMCStep q r) :
     RwEq p r :=
@@ -339,7 +339,7 @@ theorem simp_quillen_triangle_right {A : Type u} {B : Type v}
   simp
 
 /-- Cosimplicial framing identity via RwEq. -/
-theorem cosimp_framing_id {A : Type u} {M : SimpModelCatData A}
+noncomputable def cosimp_framing_id {A : Type u} {M : SimpModelCatData A}
     (CF : CosimplicialFraming A M) (X : A) {n : Nat}
     (j : Fin (n + 1)) :
     RwEq (Path.trans (CF.codegen X j) (CF.coface X (Fin.castSucc j)))
@@ -347,7 +347,7 @@ theorem cosimp_framing_id {A : Type u} {M : SimpModelCatData A}
   exact rweq_of_eq (CF.coface_codegen X j).toEq
 
 /-- Simplicial framing identity via RwEq. -/
-theorem simp_framing_id {A : Type u} {M : SimpModelCatData A}
+noncomputable def simp_framing_id {A : Type u} {M : SimpModelCatData A}
     (SF : SimplicialFraming A M) (X : A) {n : Nat}
     (j : Fin (n + 1)) :
     RwEq (Path.trans (SF.degen X j) (SF.face X (Fin.castSucc j)))

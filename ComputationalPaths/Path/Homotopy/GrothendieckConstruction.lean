@@ -151,7 +151,7 @@ def functorFibrationEquiv (A : Type u) :
 /-! ## RwEq interchange for fiber transport -/
 
 /-- Transport along RwEq-equivalent paths yields equal results. -/
-theorem transportFiber_rweq {A : Type u} (P : FibrationFamily A)
+noncomputable def transportFiber_rweq {A : Type u} (P : FibrationFamily A)
     {a b : A} {p q : Path a b} (h : RwEq p q) (x : P a) :
     transportFiber P p x = transportFiber P q x := by
   unfold transportFiber
@@ -181,7 +181,7 @@ projecting a transported element yields the transport of the projection. -/
 
 /-- RwEq interchange for fiber transport: composing transports along two
 paths that are both RwEq-equivalent yields equal results. -/
-theorem transportFiber_rweq_trans {A : Type u} (P : FibrationFamily A)
+noncomputable def transportFiber_rweq_trans {A : Type u} (P : FibrationFamily A)
     {a b c : A} {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (hp : RwEq p₁ p₂) (hq : RwEq q₁ q₂) (x : P a) :
     transportFiber P (Path.trans p₁ q₁) x =

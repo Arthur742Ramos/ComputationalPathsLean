@@ -39,12 +39,12 @@ universe u
 /-! ## Basic Loop Cancellation -/
 
 /-- Cancellation: l · l⁻¹ ≈ refl -/
-@[simp] theorem loop_cancel_right {A : Type u} {a : A} (l : Path a a) :
+noncomputable def loop_cancel_right {A : Type u} {a : A} (l : Path a a) :
     RwEq (Path.trans l (Path.symm l)) (Path.refl a) := by
   path_simp
 
 /-- Cancellation: l⁻¹ · l ≈ refl -/
-@[simp] theorem loop_cancel_left {A : Type u} {a : A} (l : Path a a) :
+noncomputable def loop_cancel_left {A : Type u} {a : A} (l : Path a a) :
     RwEq (Path.trans (Path.symm l) l) (Path.refl a) := by
   path_simp
 
@@ -63,7 +63,7 @@ universe u
     loopIter l (Nat.succ n) = Path.trans (loopIter l n) l := rfl
 
 /-- Alternative characterization: loopIter l (n+1) = l · loopIter l n -/
-theorem loopIter_succ' {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+noncomputable def loopIter_succ' {A : Type u} {a : A} (l : Path a a) (n : Nat) :
     RwEq (loopIter l (n + 1)) (Path.trans l (loopIter l n)) := by
   induction n with
   | zero => exact RwEq.refl _
@@ -79,7 +79,7 @@ theorem loopIter_succ' {A : Type u} {a : A} (l : Path a a) (n : Nat) :
 
 /-- Addition law: loopIter l m · loopIter l n ≈ loopIter l (m+n) · l
     This represents l^{m+1} · l^{n+1} = l^{m+n+2} -/
-theorem loopIter_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
+noncomputable def loopIter_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
     RwEq (Path.trans (loopIter l m) (loopIter l n))
          (Path.trans (loopIter l (m + n)) l) := by
   induction n with
@@ -92,7 +92,7 @@ theorem loopIter_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
     exact rweq_trans_congr_left l ih
 
 /-- Corollary: loopIter l m · loopIter l n ≈ loopIter l (m+n+1) when we want l^{m+n+2} -/
-theorem loopIter_add' {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
+noncomputable def loopIter_add' {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
     RwEq (Path.trans (loopIter l m) (loopIter l n))
          (loopIter l (m + n + 1)) := by
   exact loopIter_add l m n
@@ -101,7 +101,7 @@ theorem loopIter_add' {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
 
 /-- Helper: l · (l^{-1})^{n+2} ≈ (l^{-1})^{n+1}
     One cancellation on the left of inverse iterations. -/
-theorem loopIter_symm_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+noncomputable def loopIter_symm_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
     RwEq (Path.trans l (loopIter (Path.symm l) (n + 1)))
          (loopIter (Path.symm l) n) := by
   induction n with
@@ -122,7 +122,7 @@ theorem loopIter_symm_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
 
 /-- Symmetric helper: (l)^{n+2} · l^{-1} ≈ l^{n+1}
     One cancellation on the right. -/
-theorem loopIter_cancel_r {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+noncomputable def loopIter_cancel_r {A : Type u} {a : A} (l : Path a a) (n : Nat) :
     RwEq (Path.trans (loopIter l (n + 1)) (Path.symm l))
          (loopIter l n) := by
   -- loopIter l (n+1) = trans (loopIter l n) l
@@ -136,7 +136,7 @@ theorem loopIter_cancel_r {A : Type u} {a : A} (l : Path a a) (n : Nat) :
 
 /-- Helper: l^{-1} · l^{n+2} ≈ l^{n+1}
     One cancellation on the left. -/
-theorem loopIter_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+noncomputable def loopIter_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
     RwEq (Path.trans (Path.symm l) (loopIter l (n + 1)))
          (loopIter l n) := by
   -- Use loopIter_succ' to get: loopIter l (n+1) ≈ trans l (loopIter l n)
@@ -149,7 +149,7 @@ theorem loopIter_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat) :
   path_simp  -- refl · X ≈ X
 
 /-- Equal powers cancel: l^{m+1} · (l^{-1})^{m+1} ≈ refl -/
-theorem loopIter_cancel_eq' {A : Type u} {a : A} (l : Path a a) (m : Nat) :
+noncomputable def loopIter_cancel_eq' {A : Type u} {a : A} (l : Path a a) (m : Nat) :
     RwEq (Path.trans (loopIter l m) (loopIter (Path.symm l) m)) (Path.refl a) := by
   induction m with
   | zero => exact loop_cancel_right l
@@ -165,7 +165,7 @@ theorem loopIter_cancel_eq' {A : Type u} {a : A} (l : Path a a) (m : Nat) :
 
 /-- Cancellation when m > n: l^{m+1} · (l^{-1})^{n+1} ≈ l^{m-n}
     More precisely: loopIter l m · loopIter (symm l) n ≈ loopIter l (m - n - 1) -/
-theorem loopIter_cancel_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m > n) :
+noncomputable def loopIter_cancel_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m > n) :
     RwEq (Path.trans (loopIter l m) (loopIter (Path.symm l) n))
          (loopIter l (m - n - 1)) := by
   induction n generalizing m with
@@ -191,7 +191,7 @@ theorem loopIter_cancel_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : 
 
 /-- Cancellation when m < n: l^{m+1} · (l^{-1})^{n+1} ≈ (l^{-1})^{n-m}
     More precisely: loopIter l m · loopIter (symm l) n ≈ loopIter (symm l) (n - m - 1) -/
-theorem loopIter_cancel_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m < n) :
+noncomputable def loopIter_cancel_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m < n) :
     RwEq (Path.trans (loopIter l m) (loopIter (Path.symm l) n))
          (loopIter (Path.symm l) (n - m - 1)) := by
   induction m generalizing n with
@@ -224,7 +224,7 @@ theorem loopIter_cancel_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : 
 
 /-- The symm-symm identity lifts to iterations:
     loopIter l k ≈ loopIter (symm (symm l)) k -/
-theorem loopIter_symm_symm {A : Type u} {a : A} (l : Path a a) (k : Nat) :
+noncomputable def loopIter_symm_symm {A : Type u} {a : A} (l : Path a a) (k : Nat) :
     RwEq (loopIter l k) (loopIter (Path.symm (Path.symm l)) k) := by
   induction k with
   | zero => exact rweq_symm (rweq_ss l)

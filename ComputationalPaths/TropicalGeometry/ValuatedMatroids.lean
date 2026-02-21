@@ -137,7 +137,7 @@ theorem ValuatedMatroid.valuation_path
   ComputationalPaths.Path.refl _
 
 /-- A two-step reflexive composition on valuations is `RwEq`-equivalent to reflexivity. -/
-theorem ValuatedMatroid.valuation_rweq
+noncomputable def ValuatedMatroid.valuation_rweq
     {ι : Type u} [DecidableEq ι] {r : ℕ}
     (M : ValuatedMatroid ι r) :
     ComputationalPaths.Path.RwEq

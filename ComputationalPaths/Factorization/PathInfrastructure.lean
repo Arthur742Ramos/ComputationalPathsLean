@@ -39,11 +39,11 @@ variable {a b : A} {f : Path a b}
 def composite (F : FactorizationWitness A L R f) : Path a b :=
   Path.trans F.left F.right
 
-@[simp] theorem right_unit_rweq (F : FactorizationWitness A L R f) :
+noncomputable def right_unit_rweq (F : FactorizationWitness A L R f) :
     RwEq (Path.trans F.composite (Path.refl b)) F.composite :=
   rweq_of_step F.rightUnitStep
 
-@[simp] theorem left_unit_rweq (F : FactorizationWitness A L R f) :
+noncomputable def left_unit_rweq (F : FactorizationWitness A L R f) :
     RwEq (Path.trans (Path.refl a) F.composite) F.composite :=
   rweq_of_step F.leftUnitStep
 
@@ -78,11 +78,11 @@ theorem factor_left_unit_step {a b : A} (f : Path a b) :
     Path.Step (Path.trans (Path.refl a) (W.factorComposite f)) (W.factorComposite f) :=
   (W.factor f).leftUnitStep
 
-@[simp] theorem factor_right_unit_rweq {a b : A} (f : Path a b) :
+noncomputable def factor_right_unit_rweq {a b : A} (f : Path a b) :
     RwEq (Path.trans (W.factorComposite f) (Path.refl b)) (W.factorComposite f) :=
   rweq_of_step (W.factor_right_unit_step f)
 
-@[simp] theorem factor_left_unit_rweq {a b : A} (f : Path a b) :
+noncomputable def factor_left_unit_rweq {a b : A} (f : Path a b) :
     RwEq (Path.trans (Path.refl a) (W.factorComposite f)) (W.factorComposite f) :=
   rweq_of_step (W.factor_left_unit_step f)
 
@@ -135,13 +135,13 @@ namespace ModelStructurePaths
 
 variable {A : Type u} (M : ModelStructurePaths A)
 
-@[simp] theorem cof_factor_rweq {a b : A} (f : Path a b) :
+noncomputable def cof_factor_rweq {a b : A} (f : Path a b) :
     RwEq
       (Path.trans (M.cofTrivFib.factorComposite f) (Path.refl b))
       (M.cofTrivFib.factorComposite f) :=
   rweq_of_step (M.cof_factor_step f)
 
-@[simp] theorem fib_factor_rweq {a b : A} (f : Path a b) :
+noncomputable def fib_factor_rweq {a b : A} (f : Path a b) :
     RwEq
       (Path.trans (Path.refl a) (M.trivCofFib.factorComposite f))
       (M.trivCofFib.factorComposite f) :=

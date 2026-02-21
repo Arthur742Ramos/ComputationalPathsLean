@@ -61,7 +61,7 @@ def comp_step {X Y Z : Obj} (p : Path X Y) (q : Path Y Z) :
       (T.comp2Cell p q) :=
   Path.Step.trans_refl_left (T.comp2Cell p q)
 
-@[simp] theorem comp_rweq {X Y Z : Obj} (p : Path X Y) (q : Path Y Z) :
+noncomputable def comp_rweq {X Y Z : Obj} (p : Path X Y) (q : Path Y Z) :
     RwEq
       (Path.trans
         (Path.refl (Path.trans (T.actMor p) (T.actMor q)))
@@ -78,7 +78,7 @@ def whisker_step {X Y : Obj} (p : Path X Y) :
       (T.whisker2Cell p) :=
   Path.Step.trans_refl_right (T.whisker2Cell p)
 
-@[simp] theorem whisker_rweq {X Y : Obj} (p : Path X Y) :
+noncomputable def whisker_rweq {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans
         (T.whisker2Cell p)
@@ -95,7 +95,7 @@ def mate_step {X Y : Obj} (p : Path X Y) :
       (T.mate2Cell p) :=
   Path.Step.trans_refl_right (T.mate2Cell p)
 
-@[simp] theorem mate_rweq {X Y : Obj} (p : Path X Y) :
+noncomputable def mate_rweq {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans
         (T.mate2Cell p)
@@ -109,7 +109,7 @@ def doubleMatePath {X Y : Obj} (p : Path X Y) :
       (T.actMor p) :=
   Path.stepChain (Path.symm_symm (T.actMor p))
 
-@[simp] theorem doubleMate_cancel_rweq {X Y : Obj} (p : Path X Y) :
+noncomputable def doubleMate_cancel_rweq {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans
         (Path.symm (T.doubleMatePath p))
@@ -151,7 +151,7 @@ def crossingAction_step (X Y : Obj) :
       (B.crossingActionPath X Y) :=
   Path.Step.trans_refl_right (B.crossingActionPath X Y)
 
-@[simp] theorem crossingAction_rweq (X Y : Obj) :
+noncomputable def crossingAction_rweq (X Y : Obj) :
     RwEq
       (Path.trans
         (B.crossingActionPath X Y)
@@ -159,13 +159,13 @@ def crossingAction_step (X Y : Obj) :
       (B.crossingActionPath X Y) :=
   rweq_of_step (B.crossingAction_step X Y)
 
-@[simp] theorem eAction_cancel_rweq (X : Obj) :
+noncomputable def eAction_cancel_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.symm (B.eActionPath X)) (B.eActionPath X))
       (Path.refl (Q.e1 (T.actObj X))) :=
   rweq_cmpA_inv_left (B.eActionPath X)
 
-@[simp] theorem fAction_cancel_rweq (X : Obj) :
+noncomputable def fAction_cancel_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.symm (B.fActionPath X)) (B.fActionPath X))
       (Path.refl (Q.f1 (T.actObj X))) :=

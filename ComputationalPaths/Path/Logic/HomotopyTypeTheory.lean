@@ -244,20 +244,20 @@ structure EncodeDecode {A : Type u} (a₀ : A) (P : A → Type u) where
 /-! ## RwEq Coherence Theorems -/
 
 /-- Equivalence identity law: composing with idEquiv gives same equiv. -/
-@[simp] theorem pathEquiv_id_compose_rweq {A B : Type u}
+noncomputable def pathEquiv_id_compose_rweq {A B : Type u}
     (e : PathEquiv A B) (b : B) :
     RwEq ((PathEquiv.compose (PathEquiv.idEquiv A) e).right_inv b)
          ((PathEquiv.compose (PathEquiv.idEquiv A) e).right_inv b) :=
   RwEq.refl _
 
 /-- Equivalence symmetry coherence. -/
-@[simp] theorem pathEquiv_inv_right_rweq {A B : Type u}
+noncomputable def pathEquiv_inv_right_rweq {A B : Type u}
     (e : PathEquiv A B) (a : A) :
     RwEq (e.inv.right_inv a) (e.left_inv a) :=
   RwEq.refl _
 
 /-- Transport along refl is identity (RwEq version). -/
-@[simp] theorem transport_refl_rweq {A : Type u} {B : A → Type u}
+noncomputable def transport_refl_rweq {A : Type u} {B : A → Type u}
     {a : A} (x : B a) :
     RwEq (Path.refl (Path.transport (Path.refl a) x))
          (Path.refl x) :=
@@ -271,7 +271,7 @@ theorem ntype_path_space {A : Type u} {n : Nat}
   | succ_type hn => exact hn a b
 
 /-- Encode-decode round trip coherence via RwEq. -/
-theorem encode_decode_rweq {A : Type u} {a₀ : A} {P : A → Type u}
+noncomputable def encode_decode_rweq {A : Type u} {a₀ : A} {P : A → Type u}
     (ed : EncodeDecode a₀ P) {a : A} (p : Path a₀ a) :
     RwEq (ed.decode_encode p) (ed.decode_encode p) :=
   RwEq.refl _

@@ -40,7 +40,7 @@ def skew_step (i j : ι) :
       (S.skewPath i j) :=
   Path.Step.trans_refl_right (S.skewPath i j)
 
-@[simp] theorem skew_rweq (i j : ι) :
+noncomputable def skew_rweq (i j : ι) :
     RwEq
       (Path.trans (S.skewPath i j) (Path.refl (-(S.exchangeMatrix j i))))
       (S.skewPath i j) :=
@@ -75,7 +75,7 @@ def exchange_step :
       (M.exchangePath) :=
   Path.Step.trans_refl_right (M.exchangePath)
 
-@[simp] theorem exchange_rweq :
+noncomputable def exchange_rweq :
     RwEq
       (Path.trans (M.exchangePath) (Path.refl (M.add M.posMonomial M.negMonomial)))
       (M.exchangePath) :=
@@ -90,7 +90,7 @@ def mutation_involutive_step :
       (M.mutationInvolutivePath) :=
   Path.Step.trans_refl_left (M.mutationInvolutivePath)
 
-@[simp] theorem mutation_involutive_rweq :
+noncomputable def mutation_involutive_rweq :
     RwEq
       (Path.trans
         (Path.refl (M.mutateAt M.direction (M.mutateAt M.direction (S.vars M.direction))))
@@ -98,7 +98,7 @@ def mutation_involutive_step :
       (M.mutationInvolutivePath) :=
   rweq_of_step (M.mutation_involutive_step)
 
-@[simp] theorem exchange_cancel_rweq :
+noncomputable def exchange_cancel_rweq :
     RwEq
       (Path.trans (Path.symm (M.exchangePath)) (M.exchangePath))
       (Path.refl (M.add M.posMonomial M.negMonomial)) :=

@@ -1523,7 +1523,7 @@ noncomputable def wedgeDecode :
         (wedgeDecode rest)
 
 /-- Decode respects word concatenation. -/
-theorem wedgeDecode_concat (w₁ w₂ : WedgeLoopCode a₀ b₀) :
+noncomputable def wedgeDecode_concat (w₁ w₂ : WedgeLoopCode a₀ b₀) :
     RwEq (wedgeDecode a₀ b₀ (FreeProductWord.concat w₁ w₂))
          (Path.trans (wedgeDecode a₀ b₀ w₁) (wedgeDecode a₀ b₀ w₂)) := by
   induction w₁ with
@@ -2239,7 +2239,7 @@ noncomputable def pushoutEncodeAxiom (A : Type u) (B : Type u) (C : Type u)
   fun p => pushoutEncodeQuotAxiom A B C f g c₀ (Quot.mk _ p)
 
 /-- Encode respects RwEq. -/
-theorem pushoutEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (C : Type u)
+noncomputable def pushoutEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeQuot A B C f g c₀]
     {p q : LoopSpace (Pushout A B C f g) (Pushout.inl (f c₀))}
     (h : RwEq p q) :
@@ -3658,7 +3658,7 @@ noncomputable def wedgeEncodeAxiom (A : Type u) (B : Type u) (a₀ : A) (b₀ : 
     WedgeSVKInstances.wedgeEncodeQuotPrim (A := A) (B := B) a₀ b₀ (Quot.mk _ p)
 
 /-- Encode respects RwEq (as it factors through π₁). -/
-theorem wedgeEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
+noncomputable def wedgeEncodeAxiom_respects_rweq (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
     [WedgeSVKInstances.HasWedgeSVKEncodeData A B a₀ b₀]
     {p q : LoopSpace (Wedge A B a₀ b₀) Wedge.basepoint}
     (h : RwEq p q) :

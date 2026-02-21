@@ -48,7 +48,7 @@ structure Zigzag (adj : AdjunctionData C D F G) : Prop where
   right : ∀ y : D, RwEq (adj.rightTriangle y) (Path.refl (G y))
 
 /-- Left zigzag by explicit rewriting and inverse cancellation. -/
-theorem left_zigzag_of_inverse
+noncomputable def left_zigzag_of_inverse
     (adj : AdjunctionData C D F G)
     (hε : LeftCounitInverse adj) :
     ∀ x : C, RwEq (adj.leftTriangle x) (Path.refl (F x)) := by
@@ -66,7 +66,7 @@ theorem left_zigzag_of_inverse
   exact rweq_trans hrewrite (rweq_cmpA_inv_right (Path.congrArg F (adj.unit x)))
 
 /-- Right zigzag by explicit rewriting and inverse cancellation. -/
-theorem right_zigzag_of_inverse
+noncomputable def right_zigzag_of_inverse
     (adj : AdjunctionData C D F G)
     (hη : RightUnitInverse adj) :
     ∀ y : D, RwEq (adj.rightTriangle y) (Path.refl (G y)) := by

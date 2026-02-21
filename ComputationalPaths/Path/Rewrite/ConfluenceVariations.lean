@@ -382,45 +382,45 @@ variable {A : Type u} {a b : A}
 open Confluence
 
 /-- Equal paths are RwEq-equivalent. -/
-theorem rweq_of_eq {p q : Path a b} (h : p = q) : RwEq p q := by subst h; exact RwEq.refl p
+noncomputable def rweq_of_eq {p q : Path a b} (h : p = q) : RwEq p q := by subst h; exact RwEq.refl p
 
 /-- Path rewriting preserves toEq. -/
 theorem rw_preserves_toEq {p q : Path a b} (h : Rw p q) : p.toEq = q.toEq :=
   rw_toEq h
 
 /-- RwEq is transitive (re-export). -/
-theorem rweq_trans' {p q r : Path a b} (h₁ : RwEq p q) (h₂ : RwEq q r) : RwEq p r :=
+noncomputable def rweq_trans' {p q r : Path a b} (h₁ : RwEq p q) (h₂ : RwEq q r) : RwEq p r :=
   rweq_trans h₁ h₂
 
 /-- RwEq is symmetric (re-export). -/
-theorem rweq_symm' {p q : Path a b} (h : RwEq p q) : RwEq q p :=
+noncomputable def rweq_symm' {p q : Path a b} (h : RwEq p q) : RwEq q p :=
   rweq_symm h
 
 /-- Rw implies RwEq. -/
-theorem rweq_of_rw' {p q : Path a b} (h : Rw p q) : RwEq p q :=
+noncomputable def rweq_of_rw' {p q : Path a b} (h : Rw p q) : RwEq p q :=
   rweq_of_rw h
 
 /-- Single step implies RwEq. -/
-theorem rweq_of_step' {p q : Path a b} (h : Step (A := A) p q) : RwEq p q :=
+noncomputable def rweq_of_step' {p q : Path a b} (h : Step (A := A) p q) : RwEq p q :=
   rweq_of_rw (Rw.tail (Rw.refl p) h)
 
 /-- RwEq on paths is "confluent": any two RwEq-equivalent paths can be joined
 (since RwEq is already an equivalence relation). -/
-theorem rweq_confluent_eq {p q r : Path a b}
+noncomputable def rweq_confluent_eq {p q r : Path a b}
     (hpq : RwEq p q) (hpr : RwEq p r) : RwEq q r :=
   rweq_trans (rweq_symm hpq) hpr
 
 /-- Two single-step reductions from the same source are RwEq-joinable. -/
-theorem step_peak_rweq {p q r : Path a b}
+noncomputable def step_peak_rweq {p q r : Path a b}
     (hpq : Step (A := A) p q) (hpr : Step (A := A) p r) : RwEq q r :=
   rweq_trans (rweq_symm (rweq_of_step' hpq)) (rweq_of_step' hpr)
 
 /-- Multi-step reductions preserve RwEq class. -/
-theorem rw_preserves_rweq_class {p q : Path a b} (h : Rw p q) : RwEq p q :=
+noncomputable def rw_preserves_rweq_class {p q : Path a b} (h : Rw p q) : RwEq p q :=
   rweq_of_rw h
 
 /-- RwEq-equivalent paths have equal toEq. -/
-theorem rweq_toEq {p q : Path a b} (h : RwEq p q) : p.toEq = q.toEq := by
+noncomputable def rweq_toEq {p q : Path a b} (h : RwEq p q) : p.toEq = q.toEq := by
   induction h with
   | refl => rfl
   | step s => exact step_toEq s

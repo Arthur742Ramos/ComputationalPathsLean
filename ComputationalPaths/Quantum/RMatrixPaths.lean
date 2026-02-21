@@ -58,7 +58,7 @@ def mapPath_step {x y : A × A} (p : Path x y) :
       (R.mapPath p) :=
   Path.Step.trans_refl_right (R.mapPath p)
 
-@[simp] theorem mapPath_rweq {x y : A × A} (p : Path x y) :
+noncomputable def mapPath_rweq {x y : A × A} (p : Path x y) :
     RwEq
       (Path.trans (R.mapPath p) (Path.refl (R.braid y)))
       (R.mapPath p) :=
@@ -71,7 +71,7 @@ def leftInv_step (x : A × A) :
       (R.leftInvPath x) :=
   Path.Step.trans_refl_right (R.leftInvPath x)
 
-@[simp] theorem leftInv_rweq (x : A × A) :
+noncomputable def leftInv_rweq (x : A × A) :
     RwEq
       (Path.trans (R.leftInvPath x) (Path.refl x))
       (R.leftInvPath x) :=
@@ -84,19 +84,19 @@ def rightInv_step (x : A × A) :
       (R.rightInvPath x) :=
   Path.Step.trans_refl_right (R.rightInvPath x)
 
-@[simp] theorem rightInv_rweq (x : A × A) :
+noncomputable def rightInv_rweq (x : A × A) :
     RwEq
       (Path.trans (R.rightInvPath x) (Path.refl x))
       (R.rightInvPath x) :=
   rweq_of_step (R.rightInv_step x)
 
-@[simp] theorem leftInv_cancel_rweq (x : A × A) :
+noncomputable def leftInv_cancel_rweq (x : A × A) :
     RwEq
       (Path.trans (Path.symm (R.leftInvPath x)) (R.leftInvPath x))
       (Path.refl x) :=
   rweq_cmpA_inv_left (R.leftInvPath x)
 
-@[simp] theorem rightInv_cancel_rweq (x : A × A) :
+noncomputable def rightInv_cancel_rweq (x : A × A) :
     RwEq
       (Path.trans (Path.symm (R.rightInvPath x)) (R.rightInvPath x))
       (Path.refl x) :=
@@ -111,7 +111,7 @@ def yangBaxter_step (x : A × A × A) :
       (R.yangBaxterPath x) :=
   Path.Step.trans_refl_right (R.yangBaxterPath x)
 
-@[simp] theorem yangBaxter_rweq (x : A × A × A) :
+noncomputable def yangBaxter_rweq (x : A × A × A) :
     RwEq
       (Path.trans
         (R.yangBaxterPath x)

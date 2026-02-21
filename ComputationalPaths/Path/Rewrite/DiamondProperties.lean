@@ -396,7 +396,7 @@ noncomputable def join_of_pathJoinable {p q : Path a b}
   h.choose_spec.elim (fun hps hqs => ⟨h.choose, hps, hqs⟩)
 
 /-- `RwEq` implies joinability (given the Join → RwEq direction from Confluence). -/
-theorem pathJoinable_of_rweq_join {p q : Path a b}
+noncomputable def pathJoinable_of_rweq_join {p q : Path a b}
     (j : Confluence.Join p q) : RwEq p q :=
   j.rweq
 

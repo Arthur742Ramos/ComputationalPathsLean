@@ -94,7 +94,7 @@ def mono_color_unique {k : Nat} (c : Coloring Nat k)
   Path.trans (Path.symm h₁) h₂
 
 /-- RwEq: symm_symm on coloring. -/
-theorem mono_symm_rweq {k : Nat} (c : Coloring Nat k)
+noncomputable def mono_symm_rweq {k : Nat} (c : Coloring Nat k)
     (S : InfiniteSubset) (col : Fin k)
     (h : Path (c.color (S.enum 0) (S.enum 1)) col) :
     RwEq (Path.symm (Path.symm h)) h :=
@@ -177,7 +177,7 @@ structure RamseyMultiplicity where
 
 /-! ## RwEq Coherences -/
 
-theorem restrict_rweq {X : Type u} {k : Nat}
+noncomputable def restrict_rweq {X : Type u} {k : Nat}
     {c : Coloring X k} {S : X → Prop} {col : Fin k}
     (m : Monochromatic c S col) (T : X → Prop) (hTS : ∀ x, T x → S x)
     (x y : X) (hx : T x) (hy : T y) (hne : x ≠ y) :
@@ -185,23 +185,23 @@ theorem restrict_rweq {X : Type u} {k : Nat}
          (m.mono_witness x y (hTS x hx) (hTS y hy) hne) :=
   RwEq.refl _
 
-theorem coloring_trans_refl_rweq {k : Nat} (c : Coloring Nat k)
+noncomputable def coloring_trans_refl_rweq {k : Nat} (c : Coloring Nat k)
     (S : InfiniteSubset) (col : Fin k)
     (h : Path (c.color (S.enum 0) (S.enum 1)) col) :
     RwEq (Path.trans (Path.refl _) h) h :=
   RwEq.step (Step.trans_refl_left _)
 
-theorem coloring_refl_trans_rweq {k : Nat} (c : Coloring Nat k)
+noncomputable def coloring_refl_trans_rweq {k : Nat} (c : Coloring Nat k)
     (S : InfiniteSubset) (col : Fin k)
     (h : Path (c.color (S.enum 0) (S.enum 1)) col) :
     RwEq (Path.trans h (Path.refl _)) h :=
   RwEq.step (Step.trans_refl_right _)
 
-theorem wqo_path_rweq {X : Type u} (W : WellQuasiOrder X) (f : Nat → X) :
+noncomputable def wqo_path_rweq {X : Type u} (W : WellQuasiOrder X) (f : Nat → X) :
     RwEq (wqo_path W f) (wqo_path W f) :=
   RwEq.refl _
 
-theorem kruskal_rweq {L : Type u} (K : KruskalData L)
+noncomputable def kruskal_rweq {L : Type u} (K : KruskalData L)
     (f : Nat → FiniteTree L) :
     RwEq (kruskal_path K f) (kruskal_path K f) :=
   RwEq.refl _

@@ -59,21 +59,21 @@ theorem entropy_norm_trans_refl (d : EntropyData) :
   simp
 
 /-- RwEq: entropy norm trans refl. -/
-theorem entropy_rweq_trans_refl (d : EntropyData) :
+noncomputable def entropy_rweq_trans_refl (d : EntropyData) :
     RwEq
       (Path.trans d.normPath (Path.refl d.totalWeight))
       d.normPath :=
   rweq_of_step (Step.trans_refl_right d.normPath)
 
 /-- RwEq: entropy norm inv cancel right. -/
-theorem entropy_rweq_inv_right (d : EntropyData) :
+noncomputable def entropy_rweq_inv_right (d : EntropyData) :
     RwEq
       (Path.trans d.normPath (Path.symm d.normPath))
       (Path.refl (d.distribution.foldl (· + ·) 0)) :=
   rweq_cmpA_inv_right d.normPath
 
 /-- RwEq: entropy norm symm_symm. -/
-theorem entropy_rweq_symm_symm (d : EntropyData) :
+noncomputable def entropy_rweq_symm_symm (d : EntropyData) :
     RwEq
       (Path.symm (Path.symm d.normPath))
       d.normPath :=
@@ -96,21 +96,21 @@ theorem chain_trans_refl (d : JointEntropyData) :
   simp
 
 /-- RwEq: chain rule trans refl. -/
-theorem chain_rweq_trans_refl (d : JointEntropyData) :
+noncomputable def chain_rweq_trans_refl (d : JointEntropyData) :
     RwEq
       (Path.trans d.chainPath (Path.refl (d.marginalX + d.condEntropy)))
       d.chainPath :=
   rweq_of_step (Step.trans_refl_right d.chainPath)
 
 /-- RwEq: chain rule inv cancel. -/
-theorem chain_rweq_inv_right (d : JointEntropyData) :
+noncomputable def chain_rweq_inv_right (d : JointEntropyData) :
     RwEq
       (Path.trans d.chainPath (Path.symm d.chainPath))
       (Path.refl d.jointEntropy) :=
   rweq_cmpA_inv_right d.chainPath
 
 /-- RwEq: chain rule refl trans. -/
-theorem chain_rweq_refl_trans (d : JointEntropyData) :
+noncomputable def chain_rweq_refl_trans (d : JointEntropyData) :
     RwEq
       (Path.trans (Path.refl d.jointEntropy) d.chainPath)
       d.chainPath :=
@@ -145,21 +145,21 @@ theorem mi_symm_trans (d : MutualInfoData) :
   simp [mi_composed_path]
 
 /-- RwEq: MI path trans refl. -/
-theorem mi_rweq_trans_refl (d : MutualInfoData) :
+noncomputable def mi_rweq_trans_refl (d : MutualInfoData) :
     RwEq
       (Path.trans d.miPath (Path.refl d.sumEntropies))
       d.miPath :=
   rweq_of_step (Step.trans_refl_right d.miPath)
 
 /-- RwEq: MI path inv cancel. -/
-theorem mi_rweq_inv_right (d : MutualInfoData) :
+noncomputable def mi_rweq_inv_right (d : MutualInfoData) :
     RwEq
       (Path.trans d.miPath (Path.symm d.miPath))
       (Path.refl (d.mutualInfo + d.jointEntropy)) :=
   rweq_cmpA_inv_right d.miPath
 
 /-- RwEq: MI symm_symm. -/
-theorem mi_rweq_symm_symm (d : MutualInfoData) :
+noncomputable def mi_rweq_symm_symm (d : MutualInfoData) :
     RwEq
       (Path.symm (Path.symm d.miPath))
       d.miPath :=
@@ -181,28 +181,28 @@ theorem kl_trans_refl (d : KLDivData) :
   simp
 
 /-- RwEq: KL divergence trans refl. -/
-theorem kl_rweq_trans_refl (d : KLDivData) :
+noncomputable def kl_rweq_trans_refl (d : KLDivData) :
     RwEq
       (Path.trans d.klPath (Path.refl (d.crossEntropy + d.entropyP)))
       d.klPath :=
   rweq_of_step (Step.trans_refl_right d.klPath)
 
 /-- RwEq: KL divergence inv cancel. -/
-theorem kl_rweq_inv_right (d : KLDivData) :
+noncomputable def kl_rweq_inv_right (d : KLDivData) :
     RwEq
       (Path.trans d.klPath (Path.symm d.klPath))
       (Path.refl d.klVal) :=
   rweq_cmpA_inv_right d.klPath
 
 /-- RwEq: KL divergence inv cancel left. -/
-theorem kl_rweq_inv_left (d : KLDivData) :
+noncomputable def kl_rweq_inv_left (d : KLDivData) :
     RwEq
       (Path.trans (Path.symm d.klPath) d.klPath)
       (Path.refl (d.crossEntropy + d.entropyP)) :=
   rweq_cmpA_inv_left d.klPath
 
 /-- RwEq: KL symm_symm. -/
-theorem kl_rweq_symm_symm (d : KLDivData) :
+noncomputable def kl_rweq_symm_symm (d : KLDivData) :
     RwEq
       (Path.symm (Path.symm d.klPath))
       d.klPath :=
@@ -223,14 +223,14 @@ theorem dp_trans_refl (d : DataProcessingData) :
   simp
 
 /-- RwEq: data processing trans refl. -/
-theorem dp_rweq_trans_refl (d : DataProcessingData) :
+noncomputable def dp_rweq_trans_refl (d : DataProcessingData) :
     RwEq
       (Path.trans d.dpPath (Path.refl d.miXY))
       d.dpPath :=
   rweq_of_step (Step.trans_refl_right d.dpPath)
 
 /-- RwEq: data processing inv cancel. -/
-theorem dp_rweq_inv_right (d : DataProcessingData) :
+noncomputable def dp_rweq_inv_right (d : DataProcessingData) :
     RwEq
       (Path.trans d.dpPath (Path.symm d.dpPath))
       (Path.refl (d.miXZ + d.gap)) :=
@@ -252,14 +252,14 @@ theorem coding_trans_refl (d : SourceCodingData) :
   simp
 
 /-- RwEq: source coding trans refl. -/
-theorem coding_rweq_trans_refl (d : SourceCodingData) :
+noncomputable def coding_rweq_trans_refl (d : SourceCodingData) :
     RwEq
       (Path.trans d.codingPath (Path.refl (d.entropy + d.slack)))
       d.codingPath :=
   rweq_of_step (Step.trans_refl_right d.codingPath)
 
 /-- RwEq: source coding inv cancel. -/
-theorem coding_rweq_inv_right (d : SourceCodingData) :
+noncomputable def coding_rweq_inv_right (d : SourceCodingData) :
     RwEq
       (Path.trans d.codingPath (Path.symm d.codingPath))
       (Path.refl d.rate) :=

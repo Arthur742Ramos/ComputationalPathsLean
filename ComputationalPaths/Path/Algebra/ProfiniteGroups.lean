@@ -267,17 +267,17 @@ def profiniteStep_to_path {A : Type u} {a b : A} (h : ProfiniteStep a b) :
 /-! ## RwEq Instances -/
 
 /-- RwEq: projection compatibility is stable. -/
-theorem rwEq_proj_compat (G : ProfiniteGroup) (n : Nat) (x : G.limit) :
+noncomputable def rwEq_proj_compat (G : ProfiniteGroup) (n : Nat) (x : G.limit) :
     RwEq (G.proj_compat n x) (G.proj_compat n x) :=
   RwEq.refl _
 
 /-- RwEq: transition one is stable. -/
-theorem rwEq_transition_one (S : InverseSystem) (n : Nat) :
+noncomputable def rwEq_transition_one (S : InverseSystem) (n : Nat) :
     RwEq (S.transition_one n) (S.transition_one n) :=
   RwEq.refl _
 
 /-- RwEq: limit identity is stable. -/
-theorem rwEq_lim_one_mul (G : ProfiniteGroup) (x : G.limit) :
+noncomputable def rwEq_lim_one_mul (G : ProfiniteGroup) (x : G.limit) :
     RwEq (G.lim_one_mul x) (G.lim_one_mul x) :=
   RwEq.refl _
 

@@ -44,7 +44,7 @@ namespace PerfectoidCohomologyPathInfrastructure
 variable {R : Type u} {H : Int → Type v} {Htilt : Int → Type w}
 variable (I : PerfectoidCohomologyPathInfrastructure R H Htilt)
 
-@[simp] theorem vanishingTransport_rweq
+noncomputable def vanishingTransport_rweq
     (n : Int) (ε : R) (x : H n) (hε : I.almost.ideal ε) :
     RwEq
       (Path.trans
@@ -53,7 +53,7 @@ variable (I : PerfectoidCohomologyPathInfrastructure R H Htilt)
       (I.vanishingTransportPath n ε x hε) :=
   rweq_of_step (I.vanishingTransportStep n ε x hε)
 
-@[simp] theorem mapDifferential_rweq (n : Int) (x : H n) :
+noncomputable def mapDifferential_rweq (n : Int) (x : H n) :
     RwEq
       (Path.trans
         (I.tilting.mapDifferentialPath n x)
@@ -61,7 +61,7 @@ variable (I : PerfectoidCohomologyPathInfrastructure R H Htilt)
       (I.tilting.mapDifferentialPath n x) :=
   TiltingEquivalencePathData.mapDifferential_rweq (T := I.tilting) n x
 
-@[simp] theorem vanishingTransport_cancel_right_rweq
+noncomputable def vanishingTransport_cancel_right_rweq
     (n : Int) (ε : R) (x : H n) (hε : I.almost.ideal ε) :
     RwEq
       (Path.trans

@@ -275,13 +275,13 @@ def centralExtStep_to_path {A : Type u} {a b : A} (h : CentralExtStep a b) :
 /-! ## RwEq Instances -/
 
 /-- RwEq: centrality path is stable. -/
-theorem rwEq_central {A E G : Type u} (ext : CentralExtension A E G)
+noncomputable def rwEq_central {A E G : Type u} (ext : CentralExtension A E G)
     (a : A) (x : E) :
     RwEq (ext.central a x) (ext.central a x) :=
   RwEq.refl _
 
 /-- RwEq: exactness path is stable. -/
-theorem rwEq_exact {A E G : Type u} (ext : CentralExtension A E G) (a : A) :
+noncomputable def rwEq_exact {A E G : Type u} (ext : CentralExtension A E G) (a : A) :
     RwEq (ext.exact_at_E a) (ext.exact_at_E a) :=
   RwEq.refl _
 

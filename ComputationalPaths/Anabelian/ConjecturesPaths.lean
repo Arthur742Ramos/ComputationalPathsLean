@@ -46,25 +46,25 @@ namespace AnabelianConjecturePaths
 
 variable {Obj : Type u} (A : AnabelianConjecturePaths Obj)
 
-@[simp] theorem sectionConjecture_rweq (X : Obj) :
+noncomputable def sectionConjecture_rweq (X : Obj) :
     RwEq
       (Path.trans (A.sectionConjecturePath X) (Path.refl X))
       (A.sectionConjecturePath X) :=
   rweq_of_step (A.sectionConjectureStep X)
 
-@[simp] theorem homConjecture_rweq (X : Obj) :
+noncomputable def homConjecture_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.refl (A.etalePi1 (A.sectionLift X))) (A.homConjecturePath X))
       (A.homConjecturePath X) :=
   rweq_of_step (A.homConjectureStep X)
 
-@[simp] theorem sectionConjecture_cancel_rweq (X : Obj) :
+noncomputable def sectionConjecture_cancel_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.symm (A.sectionConjecturePath X)) (A.sectionConjecturePath X))
       (Path.refl X) :=
   rweq_cmpA_inv_left (A.sectionConjecturePath X)
 
-@[simp] theorem homConjecture_cancel_rweq (X : Obj) :
+noncomputable def homConjecture_cancel_rweq (X : Obj) :
     RwEq
       (Path.trans (A.homConjecturePath X) (Path.symm (A.homConjecturePath X)))
       (Path.refl (A.etalePi1 (A.sectionLift X))) :=

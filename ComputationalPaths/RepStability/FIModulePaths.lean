@@ -71,7 +71,7 @@ def comp_assoc_path {n m k l : Nat}
     Path (comp (comp f g) h) (comp f (comp g h)) :=
   Path.stepChain (comp_assoc f g h)
 
-@[simp] theorem comp_assoc_path_rweq {n m k l : Nat}
+noncomputable def comp_assoc_path_rweq {n m k l : Nat}
     (f : FIHom n m) (g : FIHom m k) (h : FIHom k l) :
     RwEq
       (Path.trans (comp_assoc_path f g h) (Path.refl (comp f (comp g h))))
@@ -113,7 +113,7 @@ def actionId_step (n : Nat) (x : Carrier) :
       (F.actionIdPath n x) :=
   Path.Step.trans_refl_right (F.actionIdPath n x)
 
-@[simp] theorem actionId_rweq (n : Nat) (x : Carrier) :
+noncomputable def actionId_rweq (n : Nat) (x : Carrier) :
     RwEq
       (Path.trans (F.actionIdPath n x) (Path.refl x))
       (F.actionIdPath n x) :=
@@ -126,7 +126,7 @@ def stabilizationNaturality_step {n m : Nat} (f : FIHom n m) (x : Carrier) :
       (F.stabilizationNaturalityPath f x) :=
   Path.Step.trans_refl_left (F.stabilizationNaturalityPath f x)
 
-@[simp] theorem stabilizationNaturality_rweq {n m : Nat} (f : FIHom n m) (x : Carrier) :
+noncomputable def stabilizationNaturality_rweq {n m : Nat} (f : FIHom n m) (x : Carrier) :
     RwEq
       (Path.trans (Path.refl (F.stabilize m (F.action f x))) (F.stabilizationNaturalityPath f x))
       (F.stabilizationNaturalityPath f x) :=
@@ -141,7 +141,7 @@ def eventualStability_step (n : Nat) (hn : F.stableRange ≤ n) (x : Carrier) :
       (F.eventualStabilityPath n hn x) :=
   Path.Step.trans_refl_right (F.eventualStabilityPath n hn x)
 
-@[simp] theorem eventualStability_rweq (n : Nat) (hn : F.stableRange ≤ n) (x : Carrier) :
+noncomputable def eventualStability_rweq (n : Nat) (hn : F.stableRange ≤ n) (x : Carrier) :
     RwEq
       (Path.trans
         (F.eventualStabilityPath n hn x)
@@ -157,7 +157,7 @@ def eventualStability_twoStepPath (n : Nat) (hn : F.stableRange ≤ n) (x : Carr
     (F.eventualStabilityPath (n + 1)
       (Nat.le_trans hn (Nat.le_succ n)) x)
 
-@[simp] theorem eventualStability_twoStep_rweq (n : Nat)
+noncomputable def eventualStability_twoStep_rweq (n : Nat)
     (hn : F.stableRange ≤ n) (x : Carrier) :
     RwEq
       (Path.trans
@@ -166,7 +166,7 @@ def eventualStability_twoStepPath (n : Nat) (hn : F.stableRange ≤ n) (x : Carr
       (F.eventualStability_twoStepPath n hn x) :=
   rweq_cmpA_refl_right (F.eventualStability_twoStepPath n hn x)
 
-@[simp] theorem eventualStability_twoStep_cancel_rweq (n : Nat)
+noncomputable def eventualStability_twoStep_cancel_rweq (n : Nat)
     (hn : F.stableRange ≤ n) (x : Carrier) :
     RwEq
       (Path.trans
@@ -183,7 +183,7 @@ def stabilizationIdBridgePath (n : Nat) (x : Carrier) :
     (Path.congrArg (F.stabilize n) (F.actionIdPath n x))
     (Path.symm (F.actionIdPath n (F.stabilize n x)))
 
-@[simp] theorem stabilizationIdBridge_cancel_rweq (n : Nat) (x : Carrier) :
+noncomputable def stabilizationIdBridge_cancel_rweq (n : Nat) (x : Carrier) :
     RwEq
       (Path.trans
         (Path.symm (F.stabilizationIdBridgePath n x))
@@ -191,7 +191,7 @@ def stabilizationIdBridgePath (n : Nat) (x : Carrier) :
       (Path.refl (F.action (FIHom.id n) (F.stabilize n x))) :=
   rweq_cmpA_inv_left (F.stabilizationIdBridgePath n x)
 
-@[simp] theorem actionComposite_cancel_rweq {n m k : Nat}
+noncomputable def actionComposite_cancel_rweq {n m k : Nat}
     (f : FIHom n m) (g : FIHom m k) (x : Carrier) :
     RwEq
       (Path.trans (Path.symm (F.actionCompPath f g x)) (F.actionCompPath f g x))

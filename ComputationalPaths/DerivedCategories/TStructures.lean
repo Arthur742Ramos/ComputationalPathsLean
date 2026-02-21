@@ -50,26 +50,26 @@ def TStructureStep.toStep {Obj : Type u} {a b : Obj} {p q : Path a b}
   | .trunc_assoc p q r => Path.Step.trans_assoc p q r
 
 /-- Lift a t-structure step to rewrite equivalence. -/
-theorem rweq_of_tstructure_step {Obj : Type u} {a b : Obj}
+noncomputable def rweq_of_tstructure_step {Obj : Type u} {a b : Obj}
     {p q : Path a b} (s : TStructureStep p q) : RwEq p q :=
   rweq_of_step (TStructureStep.toStep s)
 
-@[simp] theorem tstructure_left_unit_rweq {Obj : Type u} {a b : Obj}
+noncomputable def tstructure_left_unit_rweq {Obj : Type u} {a b : Obj}
     (p : Path a b) :
     RwEq (Path.trans (Path.refl a) p) p :=
   rweq_of_tstructure_step (TStructureStep.trunc_ge_left_unit p)
 
-@[simp] theorem tstructure_right_unit_rweq {Obj : Type u} {a b : Obj}
+noncomputable def tstructure_right_unit_rweq {Obj : Type u} {a b : Obj}
     (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p :=
   rweq_of_tstructure_step (TStructureStep.trunc_ge_right_unit p)
 
-@[simp] theorem tstructure_adjunction_right_rweq {Obj : Type u} {a b : Obj}
+noncomputable def tstructure_adjunction_right_rweq {Obj : Type u} {a b : Obj}
     (p : Path a b) :
     RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
   rweq_of_tstructure_step (TStructureStep.trunc_adjunction_cancel_right p)
 
-@[simp] theorem tstructure_assoc_rweq {Obj : Type u} {a b c d : Obj}
+noncomputable def tstructure_assoc_rweq {Obj : Type u} {a b c d : Obj}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   rweq_of_tstructure_step (TStructureStep.trunc_assoc p q r)
@@ -143,43 +143,43 @@ def shifted_trunc_ge_step (X : Obj) :
       (T.shiftPath (S.truncGEUnit X)) :=
   T.shift_step (S.truncGEUnit X)
 
-@[simp] theorem trunc_ge_rweq (X : Obj) :
+noncomputable def trunc_ge_rweq (X : Obj) :
     RwEq
       (Path.trans (S.truncGEUnit X) (Path.refl (S.truncGE X)))
       (S.truncGEUnit X) :=
   rweq_of_step (S.trunc_ge_step X)
 
-@[simp] theorem trunc_ge_left_rweq (X : Obj) :
+noncomputable def trunc_ge_left_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.refl X) (S.truncGEUnit X))
       (S.truncGEUnit X) :=
   tstructure_left_unit_rweq (S.truncGEUnit X)
 
-@[simp] theorem trunc_le_rweq (X : Obj) :
+noncomputable def trunc_le_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.refl (S.truncLE X)) (S.truncLECounit X))
       (S.truncLECounit X) :=
   rweq_of_step (S.trunc_le_step X)
 
-@[simp] theorem trunc_le_right_rweq (X : Obj) :
+noncomputable def trunc_le_right_rweq (X : Obj) :
     RwEq
       (Path.trans (S.truncLECounit X) (Path.refl X))
       (S.truncLECounit X) :=
   tstructure_right_unit_rweq (S.truncLECounit X)
 
-@[simp] theorem trunc_adjunction_rweq (X : Obj) :
+noncomputable def trunc_adjunction_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.symm (S.truncGEUnit X)) (S.truncGEUnit X))
       (Path.refl (S.truncGE X)) :=
   rweq_of_step (S.adjunction_step X)
 
-@[simp] theorem trunc_adjunction_right_rweq (X : Obj) :
+noncomputable def trunc_adjunction_right_rweq (X : Obj) :
     RwEq
       (Path.trans (S.truncGEUnit X) (Path.symm (S.truncGEUnit X)))
       (Path.refl X) :=
   tstructure_adjunction_right_rweq (S.truncGEUnit X)
 
-@[simp] theorem shifted_trunc_ge_rweq (X : Obj) :
+noncomputable def shifted_trunc_ge_rweq (X : Obj) :
     RwEq
       (Path.trans
         (T.shiftPath (S.truncGEUnit X))
@@ -188,7 +188,7 @@ def shifted_trunc_ge_step (X : Obj) :
   rweq_of_step (S.shifted_trunc_ge_step X)
 
 /-- Coherence: double right-unit whiskering of `truncGEUnit` contracts via Step witnesses. -/
-theorem trunc_ge_unit_assoc_rweq (X : Obj) :
+noncomputable def trunc_ge_unit_assoc_rweq (X : Obj) :
     RwEq
       (Path.trans
         (Path.trans (S.truncGEUnit X) (Path.refl (S.truncGE X)))
@@ -220,7 +220,7 @@ theorem trunc_ge_unit_assoc_rweq (X : Obj) :
   exact rweq_trans h₁ (rweq_trans h₂ h₃)
 
 /-- Coherence: truncation adjunction cancellation survives right-unit whiskering. -/
-theorem trunc_adjunction_unit_assoc_rweq (X : Obj) :
+noncomputable def trunc_adjunction_unit_assoc_rweq (X : Obj) :
     RwEq
       (Path.trans
         (Path.trans (Path.symm (S.truncGEUnit X)) (S.truncGEUnit X))

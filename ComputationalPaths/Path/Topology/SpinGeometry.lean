@@ -313,26 +313,26 @@ structure SpinCStructure (M : RiemannianManifold.{u}) where
 /-! ## RwEq Coherence -/
 
 /-- Rewrite-equivalence: Spin group identity. -/
-theorem spin_one_mul_rweq {n : Nat} (spin : SpinGroup.{u} n) (g : spin.carrier) :
+noncomputable def spin_one_mul_rweq {n : Nat} (spin : SpinGroup.{u} n) (g : spin.carrier) :
     RwEq (Path.trans (spin.one_mul g) (Path.refl g))
          (spin.one_mul g) := by
   exact rweq_cmpA_refl_right (p := spin.one_mul g)
 
 /-- Rewrite-equivalence: Clifford algebra identity. -/
-theorem clifford_one_mul_rweq {V S : Type u} {q : QuadraticForm V S}
+noncomputable def clifford_one_mul_rweq {V S : Type u} {q : QuadraticForm V S}
     (cl : CliffordAlgebra V S q) (a : cl.carrier) :
     RwEq (Path.trans (cl.one_mul a) (Path.refl a))
          (cl.one_mul a) := by
   exact rweq_cmpA_refl_right (p := cl.one_mul a)
 
 /-- Rewrite-equivalence: metric symmetry. -/
-theorem metric_symm_rweq (M : RiemannianManifold.{u}) (v w : M.tangent) :
+noncomputable def metric_symm_rweq (M : RiemannianManifold.{u}) (v w : M.tangent) :
     RwEq (Path.trans (M.metric_symm v w) (Path.refl _))
          (M.metric_symm v w) := by
   exact rweq_cmpA_refl_right (p := M.metric_symm v w)
 
 /-- Rewrite-equivalence: spinor representation identity. -/
-theorem spinorRep_one_rweq {n : Nat} {spin : SpinGroup.{u} n}
+noncomputable def spinorRep_one_rweq {n : Nat} {spin : SpinGroup.{u} n}
     (sr : SpinorRep n spin) (s : sr.spinorSpace) :
     RwEq (Path.trans (sr.rep_one s) (Path.refl s))
          (sr.rep_one s) := by

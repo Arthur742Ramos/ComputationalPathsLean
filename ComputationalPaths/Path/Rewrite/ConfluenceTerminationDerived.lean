@@ -59,7 +59,7 @@ variable {A : Type u} {a b : A}
     right := rw_trans h j.right }
 
 /-- Convert a join into a rewrite equivalence. -/
-@[simp] theorem join_to_rweq {p q : Path a b} (j : Join (A := A) (a := a) (b := b) p q) :
+noncomputable def join_to_rweq {p q : Path a b} (j : Join (A := A) (a := a) (b := b) p q) :
     RwEq (A := A) (a := a) (b := b) p q :=
   j.rweq
 
@@ -85,7 +85,7 @@ def join_congr_right_rw {p q q' : Path a b}
 /-! ## Normal Forms -/
 
 /-- Normal forms are unique up to `RwEq`. -/
-@[simp] theorem normal_unique_of_rweq {p q : Path a b}
+noncomputable def normal_unique_of_rweq {p q : Path a b}
     (h : RwEq (A := A) (a := a) (b := b) p q) :
     normalize (A := A) (a := a) (b := b) p =
       normalize (A := A) (a := a) (b := b) q :=

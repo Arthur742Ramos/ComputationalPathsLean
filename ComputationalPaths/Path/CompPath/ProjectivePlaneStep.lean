@@ -135,7 +135,7 @@ theorem rp2Norm2 :
   · exact Step.trans_refl_right _
 
 /-- Two normalizations agree via RwEq. -/
-theorem rp2Normalization_rweq :
+noncomputable def rp2Normalization_rweq :
     RwEq (Path.trans (Path.trans (Path.refl rp2Base) rp2Loop) (Path.refl rp2Base))
          rp2Loop :=
   rweq_of_rw rp2Norm1
@@ -168,7 +168,7 @@ theorem rp2Assoc :
   rw_of_step (Step.trans_assoc rp2Loop rp2Loop rp2Loop)
 
 /-- Associativity as RwEq. -/
-theorem rp2Assoc_rweq :
+noncomputable def rp2Assoc_rweq :
     RwEq (Path.trans (Path.trans rp2Loop rp2Loop) rp2Loop)
          (Path.trans rp2Loop (Path.trans rp2Loop rp2Loop)) :=
   rweq_of_rw rp2Assoc

@@ -57,36 +57,36 @@ namespace SpectralTriplePathData
 
 variable {H A : Type u} (S : SpectralTriplePathData H A)
 
-@[simp] theorem reprOne_rweq (v : H) :
+noncomputable def reprOne_rweq (v : H) :
     RwEq (Path.trans (S.reprOnePath v) (Path.refl v)) (S.reprOnePath v) :=
   rweq_of_step (S.reprOneStep v)
 
-@[simp] theorem commutatorZero_rweq (a : A) :
+noncomputable def commutatorZero_rweq (a : A) :
     RwEq
       (Path.trans (S.commutatorZeroPath a) (Path.refl S.zeroVec))
       (S.commutatorZeroPath a) :=
   rweq_of_step (S.commutatorZeroStep a)
 
-@[simp] theorem gradingSquare_rweq (v : H) :
+noncomputable def gradingSquare_rweq (v : H) :
     RwEq
       (Path.trans (S.gradingSquarePath v) (Path.refl v))
       (S.gradingSquarePath v) :=
   rweq_of_step (S.gradingSquareStep v)
 
-@[simp] theorem chargeConjSquare_rweq (v : H) :
+noncomputable def chargeConjSquare_rweq (v : H) :
     RwEq
       (Path.trans (S.chargeConjSquarePath v) (Path.refl v))
       (S.chargeConjSquarePath v) :=
   rweq_of_step (S.chargeConjSquareStep v)
 
-@[simp] theorem reality_rweq (v : H) :
+noncomputable def reality_rweq (v : H) :
     RwEq
       (Path.trans (S.realityPath v) (Path.refl (S.grading (S.chargeConj v))))
       (S.realityPath v) :=
   rweq_of_step (S.realityStep v)
 
 /-- Two-step normalization for `gradingSquarePath` with duplicated unit tails. -/
-theorem gradingSquare_two_refl_rweq (v : H) :
+noncomputable def gradingSquare_two_refl_rweq (v : H) :
     RwEq
       (Path.trans
         (Path.trans (S.gradingSquarePath v) (Path.refl v))
@@ -109,7 +109,7 @@ def reality_roundtrip (v : H) :
     Path (S.chargeConj (S.grading v)) (S.chargeConj (S.grading v)) :=
   Path.trans (S.realityPath v) (Path.symm (S.realityPath v))
 
-@[simp] theorem reality_roundtrip_rweq (v : H) :
+noncomputable def reality_roundtrip_rweq (v : H) :
     RwEq (S.reality_roundtrip v) (Path.refl (S.chargeConj (S.grading v))) :=
   rweq_cmpA_inv_right (S.realityPath v)
 
@@ -137,7 +137,7 @@ def identitySpectralTriplePathData (H A : Type u) [Inhabited H] [Inhabited A] :
   realityStep := fun v => Path.Step.trans_refl_right (Path.refl v)
 
 /-- In the identity model, reality roundtrip normalizes to reflexivity. -/
-theorem identity_reality_roundtrip_rweq
+noncomputable def identity_reality_roundtrip_rweq
     (H A : Type u) [Inhabited H] [Inhabited A] (v : H) :
     RwEq
       (Path.trans (Path.refl v) (Path.symm (Path.refl v)))

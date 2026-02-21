@@ -216,7 +216,7 @@ theorem petriStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Instances -/
 
 /-- RwEq: reachable refl is stable. -/
-theorem rwEq_reach_refl {P T : Type u} (N : PetriNet P T) (m : Marking P) :
+noncomputable def rwEq_reach_refl {P T : Type u} (N : PetriNet P T) (m : Marking P) :
     RwEq (Path.refl (reachable N m m)) (Path.refl (reachable N m m)) :=
   RwEq.refl _
 
@@ -226,7 +226,7 @@ theorem symm_symm_petri {P : Type u} (m : Marking P) :
     Path.toEq (Path.refl m) := by simp
 
 /-- RwEq for covering reflexivity. -/
-theorem rwEq_covers {P : Type u} (m : Marking P) :
+noncomputable def rwEq_covers {P : Type u} (m : Marking P) :
     RwEq (Path.refl (covers m m)) (Path.refl (covers m m)) :=
   RwEq.refl _
 

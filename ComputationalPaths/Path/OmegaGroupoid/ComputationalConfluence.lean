@@ -74,7 +74,7 @@ def refl_derivation₂ (p : Path a b) : Derivation₂ p p :=
     (Derivation₂.vcomp d₁ d₂).depth = d₁.depth + d₂.depth + 1 := rfl
 
 /-- Any derivation from p to itself has the same toRwEq. -/
-theorem derivation₂_self_toRwEq (p : Path a b)
+noncomputable def derivation₂_self_toRwEq (p : Path a b)
     (d : Derivation₂ p p) : d.toRwEq = RwEq.refl p := by
   -- RwEq is proof-irrelevant (lives in Prop)
   rfl

@@ -35,7 +35,7 @@ def BreuilKisinStep.toStep {M : Type v} {x y : M} {p q : Path x y}
   | .frobenius_cancel p => Path.Step.trans_symm p
 
 /-- Lift a Breuil-Kisin step to rewrite equivalence. -/
-theorem rweq_of_breuil_kisin_step {M : Type v} {x y : M}
+noncomputable def rweq_of_breuil_kisin_step {M : Type v} {x y : M}
     {p q : Path x y} (s : BreuilKisinStep p q) : RwEq p q :=
   rweq_of_step (BreuilKisinStep.toStep s)
 
@@ -76,20 +76,20 @@ namespace BreuilKisinModulePathData
 variable {A : Type u} {M : Type v} {P : PrismPathData A}
 variable (B : BreuilKisinModulePathData A M P)
 
-@[simp] theorem linearity_rweq (a : A) (m : M) :
+noncomputable def linearity_rweq (a : A) (m : M) :
     RwEq
       (Path.trans (B.linearityPath a m)
         (Path.refl (B.scalar (P.frobenius a) (B.phiModule m))))
       (B.linearityPath a m) :=
   rweq_of_breuil_kisin_step (B.linearityStep a m)
 
-@[simp] theorem twist_rweq (m : M) :
+noncomputable def twist_rweq (m : M) :
     RwEq
       (Path.trans (Path.refl (B.twist (B.phiModule m))) (B.twistPath m))
       (B.twistPath m) :=
   rweq_of_breuil_kisin_step (B.twistStep m)
 
-@[simp] theorem generator_action_rweq (m : M) :
+noncomputable def generator_action_rweq (m : M) :
     RwEq
       (Path.trans (B.generatorActionPath m) (Path.refl (B.twist m)))
       (B.generatorActionPath m) :=
@@ -121,7 +121,7 @@ def twistRoundTrip (m : M) :
     Path (B.twist (B.phiModule m)) (B.twist (B.phiModule m)) :=
   Path.trans (B.twistPath m) (Path.symm (B.twistPath m))
 
-@[simp] theorem twist_roundtrip_rweq (m : M) :
+noncomputable def twist_roundtrip_rweq (m : M) :
     RwEq (B.twistRoundTrip m) (Path.refl (B.twist (B.phiModule m))) :=
   rweq_of_breuil_kisin_step (BreuilKisinStep.frobenius_cancel (B.twistPath m))
 

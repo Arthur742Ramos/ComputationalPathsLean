@@ -53,7 +53,7 @@ def pullbackAssoc_step (U V W : Obj) :
       (S.pullbackAssocPath U V W) :=
   Path.Step.trans_refl_right (S.pullbackAssocPath U V W)
 
-@[simp] theorem pullbackAssoc_rweq (U V W : Obj) :
+noncomputable def pullbackAssoc_rweq (U V W : Obj) :
     RwEq
       (Path.trans (S.pullbackAssocPath U V W)
         (Path.refl (S.pullbackObj U (S.pullbackObj V W))))
@@ -67,7 +67,7 @@ def coverCompose_step (f g : Cover) :
       (S.coverComposePath f g) :=
   Path.Step.trans_refl_left (S.coverComposePath f g)
 
-@[simp] theorem coverCompose_rweq (f g : Cover) :
+noncomputable def coverCompose_rweq (f g : Cover) :
     RwEq
       (Path.trans (Path.refl (S.source (S.composeCover f g))) (S.coverComposePath f g))
       (S.coverComposePath f g) :=
@@ -81,14 +81,14 @@ def restrictionMap_step {U V : Obj} (p : Path U V) :
       (S.restrictionMap p) :=
   Path.Step.trans_refl_right (S.restrictionMap p)
 
-@[simp] theorem restrictionMap_rweq {U V : Obj} (p : Path U V) :
+noncomputable def restrictionMap_rweq {U V : Obj} (p : Path U V) :
     RwEq
       (Path.trans (S.restrictionMap p)
         (Path.refl (S.pullbackObj V S.baseObj)))
       (S.restrictionMap p) :=
   rweq_of_step (S.restrictionMap_step p)
 
-@[simp] theorem restriction_cancel_rweq (U : Obj) :
+noncomputable def restriction_cancel_rweq (U : Obj) :
     RwEq
       (Path.trans (Path.symm (S.restrictionPath U)) (S.restrictionPath U))
       (Path.refl U) :=

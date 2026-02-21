@@ -53,13 +53,13 @@ namespace QuotientStackPathData
 
 variable {Obj : Type u} {Group : Type v} (Q : QuotientStackPathData Obj Group)
 
-@[simp] theorem action_descent_rweq (g : Group) (x : Obj) :
+noncomputable def action_descent_rweq (g : Group) (x : Obj) :
     RwEq
       (Path.trans (Q.actionDescentPath g x) (Path.refl (Q.quotientMap x)))
       (Q.actionDescentPath g x) :=
   rweq_of_step (Q.actionDescentStep g x)
 
-@[simp] theorem semistable_transport_rweq (g : Group) (x : Obj) :
+noncomputable def semistable_transport_rweq (g : Group) (x : Obj) :
     RwEq
       (Path.trans
         (Path.refl (Q.semistable (Q.action g x)))
@@ -67,7 +67,7 @@ variable {Obj : Type u} {Group : Type v} (Q : QuotientStackPathData Obj Group)
       (Q.semistableTransportPath g x) :=
   rweq_of_step (Q.semistableTransportStep g x)
 
-@[simp] theorem atlas_rweq (x : Obj) :
+noncomputable def atlas_rweq (x : Obj) :
     RwEq
       (Path.trans (Q.atlasPath x) (Path.refl (Q.quotientMap x)))
       (Q.atlasPath x) :=
@@ -78,19 +78,19 @@ def actionDescentTwoStepPath (g h : Group) (x : Obj) :
     Path (Q.quotientMap (Q.action g (Q.action h x))) (Q.quotientMap x) :=
   Path.trans (Q.actionDescentPath g (Q.action h x)) (Q.actionDescentPath h x)
 
-@[simp] theorem action_descent_two_step_rweq (g h : Group) (x : Obj) :
+noncomputable def action_descent_two_step_rweq (g h : Group) (x : Obj) :
     RwEq
       (Path.trans (Q.actionDescentTwoStepPath g h x) (Path.refl (Q.quotientMap x)))
       (Q.actionDescentTwoStepPath g h x) :=
   rweq_cmpA_refl_right (Q.actionDescentTwoStepPath g h x)
 
-@[simp] theorem action_descent_cancel_rweq (g : Group) (x : Obj) :
+noncomputable def action_descent_cancel_rweq (g : Group) (x : Obj) :
     RwEq
       (Path.trans (Path.symm (Q.actionDescentPath g x)) (Q.actionDescentPath g x))
       (Path.refl (Q.quotientMap x)) :=
   rweq_cmpA_inv_left (Q.actionDescentPath g x)
 
-@[simp] theorem semistable_transport_cancel_rweq (g : Group) (x : Obj) :
+noncomputable def semistable_transport_cancel_rweq (g : Group) (x : Obj) :
     RwEq
       (Path.trans
         (Q.semistableTransportPath g x)

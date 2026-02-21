@@ -30,22 +30,22 @@ structure AdjunctionWitness {Obj : Type u} (F : SixFunctorData Obj) where
   counit : (x : Obj) → Path x (F.exceptionalPushforward (F.exceptionalPullback x))
 
 /-- Left triangle witness as a rewrite step. -/
-theorem triangle_left {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def triangle_left {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.refl a) p) p :=
   rweq_of_step (Step.trans_refl_left p)
 
 /-- Right triangle witness as a rewrite step. -/
-theorem triangle_right {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def triangle_right {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p :=
   rweq_of_step (Step.trans_refl_right p)
 
 /-- Unit-counit cancellation in six-functor adjunctions. -/
-theorem unit_counit_cancel {A : Type u} {a b : A} (η : Path a b) :
+noncomputable def unit_counit_cancel {A : Type u} {a b : A} (η : Path a b) :
     RwEq (Path.trans η (Path.symm η)) (Path.refl a) :=
   rweq_of_step (Step.trans_symm η)
 
 /-- Whiskered cancellation for projection-formula style composites. -/
-theorem projection_formula_normalize {A : Type u} {a b c : A}
+noncomputable def projection_formula_normalize {A : Type u} {a b c : A}
     (η : Path a b) (k : Path a c) :
     RwEq (Path.trans (Path.trans η (Path.symm η)) k) k := by
   exact rweq_trans

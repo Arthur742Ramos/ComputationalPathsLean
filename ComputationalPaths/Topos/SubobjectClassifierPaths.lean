@@ -56,7 +56,7 @@ abbrev classifyingPath {A B : C.Obj} (m : C.Hom A B) :
   sc.classify_comm m
 
 /-- Left-unit insertion on a classifying path is rewrite-equivalent. -/
-theorem classifyingPath_unit_left {A B : C.Obj} (m : C.Hom A B) :
+noncomputable def classifyingPath_unit_left {A B : C.Obj} (m : C.Hom A B) :
     RwEq
       (Path.trans
         (Path.refl (C.comp m (sc.classify m)))
@@ -65,7 +65,7 @@ theorem classifyingPath_unit_left {A B : C.Obj} (m : C.Hom A B) :
   rweq_cmpA_refl_left (sc.classifyingPath m)
 
 /-- Right-unit insertion on a classifying path is rewrite-equivalent. -/
-theorem classifyingPath_unit_right {A B : C.Obj} (m : C.Hom A B) :
+noncomputable def classifyingPath_unit_right {A B : C.Obj} (m : C.Hom A B) :
     RwEq
       (Path.trans
         (sc.classifyingPath m)
@@ -74,14 +74,14 @@ theorem classifyingPath_unit_right {A B : C.Obj} (m : C.Hom A B) :
   rweq_cmpA_refl_right (sc.classifyingPath m)
 
 /-- A classifying path composed with its inverse contracts to reflexivity. -/
-theorem classifyingPath_cancel {A B : C.Obj} (m : C.Hom A B) :
+noncomputable def classifyingPath_cancel {A B : C.Obj} (m : C.Hom A B) :
     RwEq
       (Path.trans (sc.classifyingPath m) (Path.symm (sc.classifyingPath m)))
       (Path.refl (C.comp m (sc.classify m))) :=
   rweq_cmpA_inv_right (sc.classifyingPath m)
 
 /-- Uniqueness of classifying maps is itself coherent under inverse cancellation. -/
-theorem classify_uniqueness_coherent {A B : C.Obj}
+noncomputable def classify_uniqueness_coherent {A B : C.Obj}
     (m : C.Hom A B) (χ : C.Hom B sc.Omega)
     (hχ : Path (C.comp m χ) (C.comp (T.toOne A) sc.truth)) :
     RwEq

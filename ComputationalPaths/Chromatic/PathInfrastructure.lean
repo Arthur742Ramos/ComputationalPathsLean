@@ -43,14 +43,14 @@ namespace ChromaticFiltrationPaths
 
 variable {X : Type u} (F : ChromaticFiltrationPaths X)
 
-@[simp] theorem twoStep_rweq (n : Nat) (x : F.stage (n + 2)) :
+noncomputable def twoStep_rweq (n : Nat) (x : F.stage (n + 2)) :
     RwEq
       (Path.trans (F.twoStepPath n x)
         (Path.refl (F.transition n (F.transition (n + 1) x))))
       (F.twoStepPath n x) :=
   rweq_of_step (F.twoStepStep n x)
 
-@[simp] theorem twoStep_cancel_rweq (n : Nat) (x : F.stage (n + 2)) :
+noncomputable def twoStep_cancel_rweq (n : Nat) (x : F.stage (n + 2)) :
     RwEq
       (Path.trans (Path.symm (F.twoStepPath n x)) (F.twoStepPath n x))
       (Path.refl (F.transition n (F.transition (n + 1) x))) :=
@@ -86,19 +86,19 @@ namespace MoravaKPathData
 
 variable (K : MoravaKPathData)
 
-@[simp] theorem periodicity_rweq :
+noncomputable def periodicity_rweq :
     RwEq
       (Path.trans K.periodicityPath (Path.refl (K.mul K.vnInv K.vn)))
       K.periodicityPath :=
   rweq_of_step K.periodicityStep
 
-@[simp] theorem periodicity_cancel_left_rweq :
+noncomputable def periodicity_cancel_left_rweq :
     RwEq
       (Path.trans (Path.symm K.periodicityPath) K.periodicityPath)
       (Path.refl (K.mul K.vnInv K.vn)) :=
   rweq_cmpA_inv_left K.periodicityPath
 
-@[simp] theorem periodicity_cancel_right_rweq :
+noncomputable def periodicity_cancel_right_rweq :
     RwEq
       (Path.trans K.periodicityPath (Path.symm K.periodicityPath))
       (Path.refl (K.mul K.vn K.vnInv)) :=

@@ -47,19 +47,19 @@ namespace DifferentialPaths
 
 variable {E : SpectralPagePaths.{u}} (D : DifferentialPaths E)
 
-@[simp] theorem d_squared_rweq (r p q : Nat) :
+noncomputable def d_squared_rweq (r p q : Nat) :
     RwEq
       (Path.trans (D.dSquaredZeroPath r p q) (Path.refl (E.base p q)))
       (D.dSquaredZeroPath r p q) :=
   rweq_of_step (D.dSquaredZeroStep r p q)
 
-@[simp] theorem d_squared_cancel_rweq (r p q : Nat) :
+noncomputable def d_squared_cancel_rweq (r p q : Nat) :
     RwEq
       (Path.trans (Path.symm (D.dSquaredZeroPath r p q)) (D.dSquaredZeroPath r p q))
       (Path.refl (E.base p q)) :=
   rweq_cmpA_inv_left (D.dSquaredZeroPath r p q)
 
-@[simp] theorem commute_rweq (r p q : Nat) :
+noncomputable def commute_rweq (r p q : Nat) :
     RwEq
       (Path.trans
         (Path.refl (E.next r p q (D.d r p q (E.base p q))))
@@ -67,7 +67,7 @@ variable {E : SpectralPagePaths.{u}} (D : DifferentialPaths E)
       (D.commutePath r p q) :=
   rweq_of_step (D.commuteStep r p q)
 
-@[simp] theorem commute_cancel_rweq (r p q : Nat) :
+noncomputable def commute_cancel_rweq (r p q : Nat) :
     RwEq
       (Path.trans (Path.symm (D.commutePath r p q)) (D.commutePath r p q))
       (Path.refl (D.d (r + 1) p q (E.next r p q (E.base p q)))) :=
@@ -78,7 +78,7 @@ def boundaryLoop (r p q : Nat) :
     Path (D.d r p q (D.d r p q (E.base p q))) (D.d r p q (D.d r p q (E.base p q))) :=
   Path.trans (D.dSquaredZeroPath r p q) (Path.symm (D.dSquaredZeroPath r p q))
 
-@[simp] theorem boundaryLoop_contracts (r p q : Nat) :
+noncomputable def boundaryLoop_contracts (r p q : Nat) :
     RwEq (D.boundaryLoop r p q)
       (Path.refl (D.d r p q (D.d r p q (E.base p q)))) := by
   unfold boundaryLoop

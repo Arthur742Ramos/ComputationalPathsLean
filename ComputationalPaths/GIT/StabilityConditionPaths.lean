@@ -62,13 +62,13 @@ namespace StabilityConditionPathData
 
 variable {Obj : Type u} (S : StabilityConditionPathData Obj)
 
-@[simp] theorem phase_shift_rweq (E : Obj) (n : Int) :
+noncomputable def phase_shift_rweq (E : Obj) (n : Int) :
     RwEq
       (Path.trans (S.phaseShiftPath E n) (Path.refl (S.phase E)))
       (S.phaseShiftPath E n) :=
   rweq_of_step (S.phaseShiftStep E n)
 
-@[simp] theorem semistable_shift_rweq (E : Obj) (n : Int) :
+noncomputable def semistable_shift_rweq (E : Obj) (n : Int) :
     RwEq
       (Path.trans
         (Path.refl (S.semistable (S.shift E n)))
@@ -76,13 +76,13 @@ variable {Obj : Type u} (S : StabilityConditionPathData Obj)
       (S.semistableShiftPath E n) :=
   rweq_of_step (S.semistableShiftStep E n)
 
-@[simp] theorem charge_shift_zero_rweq (E : Obj) :
+noncomputable def charge_shift_zero_rweq (E : Obj) :
     RwEq
       (Path.trans (S.chargeShiftZeroPath E) (Path.refl (S.centralCharge E)))
       (S.chargeShiftZeroPath E) :=
   rweq_of_step (S.chargeShiftZeroStep E)
 
-@[simp] theorem roundtrip_rweq (E : Obj) :
+noncomputable def roundtrip_rweq (E : Obj) :
     RwEq
       (Path.trans (S.roundtripPath E) (Path.refl E))
       (S.roundtripPath E) :=
@@ -93,13 +93,13 @@ def phaseRoundtripPath (E : Obj) (n : Int) :
     Path (S.phase (S.shift E n)) (S.phase (S.shift E n)) :=
   Path.trans (S.phaseShiftPath E n) (Path.symm (S.phaseShiftPath E n))
 
-@[simp] theorem phase_roundtrip_rweq (E : Obj) (n : Int) :
+noncomputable def phase_roundtrip_rweq (E : Obj) (n : Int) :
     RwEq
       (S.phaseRoundtripPath E n)
       (Path.refl (S.phase (S.shift E n))) :=
   rweq_cmpA_inv_right (S.phaseShiftPath E n)
 
-@[simp] theorem roundtrip_cancel_rweq (E : Obj) :
+noncomputable def roundtrip_cancel_rweq (E : Obj) :
     RwEq
       (Path.trans (Path.symm (S.roundtripPath E)) (S.roundtripPath E))
       (Path.refl E) :=

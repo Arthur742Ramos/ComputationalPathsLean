@@ -109,7 +109,7 @@ inductive DerivedStep : {A : Type u} → {a b : A} → Path a b → Path a b →
       DerivedStep (Path.refl a) (Path.refl a)
 
 /-- DerivedStep generates an RwEq. -/
-theorem derivedStep_to_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def derivedStep_to_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : DerivedStep p q) : RwEq p q := by
   cases h <;> exact RwEq.refl _
 
@@ -287,7 +287,7 @@ structure DerivedTensorAssoc (R : SimplicialRing.{u})
   assoc_inv_right : ∀ (y : T₂.ModT), Path (assocFwd (assocBwd y)) y
 
 /-- Associativity round-trip gives RwEq-level coherence. -/
-theorem tensor_assoc_coherence (R : SimplicialRing.{u})
+noncomputable def tensor_assoc_coherence (R : SimplicialRing.{u})
     (T₁ T₂ : DerivedTensor R) (A : DerivedTensorAssoc R T₁ T₂)
     (x : T₁.ModT) :
     RwEq (A.assoc_inv_left x) (A.assoc_inv_left x) := by
@@ -380,7 +380,7 @@ def pi0_functorial (R S : SimplicialRing.{u})
 /-! ## Multi-step RwEq Construction -/
 
 /-- Multi-step derived rewrite: tensor associativity coherence. -/
-theorem derived_tensor_multi_step
+noncomputable def derived_tensor_multi_step
     {A : Type u} (a : A) :
     RwEq (Path.trans (Path.refl a) (Path.trans (Path.refl a) (Path.refl a)))
          (Path.refl a) := by
@@ -389,13 +389,13 @@ theorem derived_tensor_multi_step
   exact RwEq.trans (RwEq.refl _) step1
 
 /-- Derived scheme identity compositions simplify via RwEq. -/
-theorem derived_scheme_identity_simp
+noncomputable def derived_scheme_identity_simp
     {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.refl a) p) p := by
   constructor
 
 /-- Symmetry involution for derived paths. -/
-theorem derived_symm_involution
+noncomputable def derived_symm_involution
     {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.symm (Path.symm p)) p :=
   rweq_ss p

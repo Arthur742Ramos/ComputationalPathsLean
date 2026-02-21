@@ -240,13 +240,13 @@ theorem repStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Examples -/
 
 /-- RwEq: equivariance paths compose reflexively. -/
-theorem rwEq_equivariance {G V W : Type u} {ρ : GroupRep G V} {σ : GroupRep G W}
+noncomputable def rwEq_equivariance {G V W : Type u} {ρ : GroupRep G V} {σ : GroupRep G W}
     (f : RepMorphism ρ σ) (g : G) (v : V) :
     RwEq (f.equivariant g v) (f.equivariant g v) :=
   RwEq.refl _
 
 /-- RwEq: inner product symmetry is its own symmetric. -/
-theorem rwEq_inner_symm {G : Type u} (w : OrthogonalityWitness G) :
+noncomputable def rwEq_inner_symm {G : Type u} (w : OrthogonalityWitness G) :
     RwEq (w.ip.symmetric w.χ₁ w.χ₂)
          (w.ip.symmetric w.χ₁ w.χ₂) :=
   RwEq.refl _
@@ -259,7 +259,7 @@ theorem symm_symm_equivariant {G V W : Type u} {ρ : GroupRep G V} {σ : GroupRe
   simp
 
 /-- RwEq: orthogonality and its commuted form are RwEq-related via trans. -/
-theorem rwEq_ortho_comm {G : Type u} (w : OrthogonalityWitness G) :
+noncomputable def rwEq_ortho_comm {G : Type u} (w : OrthogonalityWitness G) :
     RwEq (inner_product_comm_ortho w) (inner_product_comm_ortho w) :=
   RwEq.refl _
 

@@ -94,7 +94,7 @@ variable {i : Instantiation}
   rw_of_step i.step
 
 /-- Promote the instantiation to the symmetric closure. -/
-@[simp] noncomputable def toRwEq : RwEq (A := _) i.p i.q :=
+noncomputable def toRwEq : RwEq (A := _) i.p i.q :=
   rweq_of_step i.step
 
 /-! ### Soundness/completeness package for instantiated LNDEQ rules -/
@@ -115,7 +115,7 @@ variable {i : Instantiation}
     Rw (A := _) i.p i.q :=
   i.toRw
 
-@[simp] noncomputable def complete_to_rweq (i : Instantiation) :
+noncomputable def complete_to_rweq (i : Instantiation) :
     RwEq (A := _) i.p i.q :=
   i.toRwEq
 
@@ -135,7 +135,7 @@ variable {i : Instantiation}
     i.p.toEq = i.q.toEq ∧ Rw (A := _) i.p i.q :=
   ⟨i.rw_sound, i.toRw⟩
 
-@[simp] noncomputable def sound_complete_rweq_bundle (i : Instantiation) :
+noncomputable def sound_complete_rweq_bundle (i : Instantiation) :
     PProd (i.p.toEq = i.q.toEq) (RwEq (A := _) i.p i.q) :=
   ⟨i.rweq_sound, i.toRwEq⟩
 
@@ -175,7 +175,7 @@ variable {i : Instantiation}
     Rw (A := _) i.p i.q ∧ i.p.toEq = i.q.toEq :=
   ⟨i.toRw, i.rw_sound⟩
 
-@[simp] noncomputable def complete_sound_rweq_pair (i : Instantiation) :
+noncomputable def complete_sound_rweq_pair (i : Instantiation) :
     PProd (RwEq (A := _) i.p i.q) (i.p.toEq = i.q.toEq) :=
   ⟨i.toRwEq, i.rweq_sound⟩
 
@@ -674,7 +674,7 @@ end Builder
   refine ⟨normalize_isNormal q, ?_⟩
   simpa [hnorm] using (normalize_isNormal q)
 
-@[simp] noncomputable def critical_pair_tt_rrr_via_peak {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_rrr_via_peak {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
@@ -684,7 +684,7 @@ end Builder
       (r := Path.refl c)).step)
     (hr := (Builder.instRrr (A := A) (p := Path.trans p q)).step)
 
-@[simp] noncomputable def critical_pair_tt_lrr_via_peak {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_lrr_via_peak {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
@@ -694,7 +694,7 @@ end Builder
       (q := q) (r := r)).step)
     (hr := (Builder.instLrr (A := A) (p := Path.trans q r)).step)
 
-@[simp] noncomputable def critical_pair_tt_rrr_rweq {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_rrr_rweq {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
@@ -703,7 +703,7 @@ end Builder
   exact rweq_of_step
     (Step.trans_congr_right (p := p) (Step.trans_refl_right (p := q)))
 
-@[simp] noncomputable def critical_pair_tt_lrr_rweq {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_lrr_rweq {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
     RwEq
       (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q

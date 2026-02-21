@@ -49,7 +49,7 @@ theorem pentagon_right_steps (p : Path a b) (q : Path b c)
   · exact Step.trans_congr_right p (Step.trans_assoc q r s)
 
 /-- Pentagon coherence as a genuine rewrite-equivalence witness. -/
-theorem pentagon_identity (p : Path a b) (q : Path b c)
+noncomputable def pentagon_identity (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) :
     RwEq (tensorPath (tensorPath (tensorPath p q) r) s)
          (tensorPath p (tensorPath q (tensorPath r s))) :=
@@ -70,13 +70,13 @@ theorem triangle_right_unitor_whisker (p : Path a b) (q : Path b c) :
   rw_of_step (Step.trans_congr_left q (Step.trans_refl_right p))
 
 /-- Triangle coherence as a rewrite-equivalence witness. -/
-theorem triangle_identity (p : Path a b) (q : Path b c) :
+noncomputable def triangle_identity (p : Path a b) (q : Path b c) :
     RwEq (tensorPath (tensorPath p (unitPath b)) q)
          (tensorPath p q) :=
   rweq_of_rw (triangle_assoc_left_unitor p q)
 
 /-- Associator and unitor interact coherently in the triangle identity. -/
-theorem associator_unitor_interact (p : Path a b) (q : Path b c) :
+noncomputable def associator_unitor_interact (p : Path a b) (q : Path b c) :
     RwEq (tensorPath (tensorPath p (unitPath b)) q)
          (tensorPath p q) :=
   triangle_identity p q

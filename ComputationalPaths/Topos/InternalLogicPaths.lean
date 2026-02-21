@@ -71,24 +71,24 @@ theorem eval_and (L : InternalLogic sc) (φ ψ : Formula C T sc) :
     L.eval (Formula.and φ ψ) = L.andOp (L.eval φ) (L.eval ψ) := rfl
 
 /-- Left-unit insertion on conjunction coherence normalizes by rewrite. -/
-theorem and_unit_left_rw (L : InternalLogic sc) (p : TruthValue sc) :
+noncomputable def and_unit_left_rw (L : InternalLogic sc) (p : TruthValue sc) :
     RwEq (Path.trans (L.and_unit_left p) (Path.refl p)) (L.and_unit_left p) :=
   rweq_cmpA_refl_right (L.and_unit_left p)
 
 /-- Commutativity coherence for conjunction is invertible up to rewrite. -/
-theorem and_comm_cancel (L : InternalLogic sc) (p q : TruthValue sc) :
+noncomputable def and_comm_cancel (L : InternalLogic sc) (p q : TruthValue sc) :
     RwEq
       (Path.trans (L.and_comm p q) (Path.symm (L.and_comm p q)))
       (Path.refl (L.andOp p q)) :=
   rweq_cmpA_inv_right (L.and_comm p q)
 
 /-- The chosen top element coherently identifies with classifier truth. -/
-theorem top_is_truth_unit_left_rw (L : InternalLogic sc) :
+noncomputable def top_is_truth_unit_left_rw (L : InternalLogic sc) :
     RwEq (Path.trans (Path.refl L.top) L.top_is_truth) L.top_is_truth :=
   rweq_cmpA_refl_left L.top_is_truth
 
 /-- The top/truth coherence path contracts with its inverse. -/
-theorem top_is_truth_cancel (L : InternalLogic sc) :
+noncomputable def top_is_truth_cancel (L : InternalLogic sc) :
     RwEq (Path.trans L.top_is_truth (Path.symm L.top_is_truth)) (Path.refl L.top) :=
   rweq_cmpA_inv_right L.top_is_truth
 

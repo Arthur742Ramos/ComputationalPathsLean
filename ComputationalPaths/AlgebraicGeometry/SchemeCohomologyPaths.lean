@@ -45,58 +45,58 @@ namespace CoherentSheafPathData
 
 variable {Mod Section : Type u} (F : CoherentSheafPathData Mod Section)
 
-@[simp] def addAssoc_rweq (m₁ m₂ m₃ : Mod) :
+noncomputable def addAssoc_rweq (m₁ m₂ m₃ : Mod) :
     RwEq
       (Path.trans (F.addAssocPath m₁ m₂ m₃)
         (Path.refl (F.add m₁ (F.add m₂ m₃))))
       (F.addAssocPath m₁ m₂ m₃) :=
   rweq_of_step (Path.Step.trans_refl_right (F.addAssocPath m₁ m₂ m₃))
 
-@[simp] def addComm_rweq (m₁ m₂ : Mod) :
+noncomputable def addComm_rweq (m₁ m₂ : Mod) :
     RwEq
       (Path.trans (F.addCommPath m₁ m₂) (Path.refl (F.add m₂ m₁)))
       (F.addCommPath m₁ m₂) :=
   rweq_of_step (Path.Step.trans_refl_right (F.addCommPath m₁ m₂))
 
-@[simp] def addZero_rweq (m : Mod) :
+noncomputable def addZero_rweq (m : Mod) :
     RwEq
       (Path.trans (F.addZeroPath m) (Path.refl m))
       (F.addZeroPath m) :=
   rweq_of_step (Path.Step.trans_refl_right (F.addZeroPath m))
 
-@[simp] def scalarDistrib_rweq (s : Section) (m₁ m₂ : Mod) :
+noncomputable def scalarDistrib_rweq (s : Section) (m₁ m₂ : Mod) :
     RwEq
       (Path.trans (F.scalarDistribPath s m₁ m₂)
         (Path.refl (F.add (F.scalarMul s m₁) (F.scalarMul s m₂))))
       (F.scalarDistribPath s m₁ m₂) :=
   rweq_of_step (Path.Step.trans_refl_right (F.scalarDistribPath s m₁ m₂))
 
-@[simp] def restrictCompat_rweq (f : Section) (m : Mod) :
+noncomputable def restrictCompat_rweq (f : Section) (m : Mod) :
     RwEq
       (Path.trans (F.restrictCompatPath f m)
         (Path.refl (F.restrict f m)))
       (F.restrictCompatPath f m) :=
   rweq_of_step (Path.Step.trans_refl_right (F.restrictCompatPath f m))
 
-@[simp] def finiteGen_rweq :
+noncomputable def finiteGen_rweq :
     RwEq
       (Path.trans F.finiteGenPath (Path.refl F.finiteGenProp))
       F.finiteGenPath :=
   rweq_of_step (Path.Step.trans_refl_right F.finiteGenPath)
 
-@[simp] def addComm_cancel_rweq (m₁ m₂ : Mod) :
+noncomputable def addComm_cancel_rweq (m₁ m₂ : Mod) :
     RwEq
       (Path.trans (Path.symm (F.addCommPath m₁ m₂)) (F.addCommPath m₁ m₂))
       (Path.refl (F.add m₂ m₁)) :=
   rweq_cmpA_inv_left (F.addCommPath m₁ m₂)
 
-@[simp] def addZero_cancel_rweq (m : Mod) :
+noncomputable def addZero_cancel_rweq (m : Mod) :
     RwEq
       (Path.trans (Path.symm (F.addZeroPath m)) (F.addZeroPath m))
       (Path.refl m) :=
   rweq_cmpA_inv_left (F.addZeroPath m)
 
-@[simp] def restrictCompat_cancel_rweq (f : Section) (m : Mod) :
+noncomputable def restrictCompat_cancel_rweq (f : Section) (m : Mod) :
     RwEq
       (Path.trans (Path.symm (F.restrictCompatPath f m))
         (F.restrictCompatPath f m))
@@ -125,33 +125,33 @@ namespace SheafMorphismPathData
 variable {Mod₁ Mod₂ Section : Type u}
          (φ : SheafMorphismPathData Mod₁ Mod₂ Section)
 
-@[simp] def mapAdd_rweq (m₁ m₂ : Mod₁) :
+noncomputable def mapAdd_rweq (m₁ m₂ : Mod₁) :
     RwEq
       (Path.trans (φ.mapAddPath m₁ m₂)
         (Path.refl (φ.target.add (φ.mapMod m₁) (φ.mapMod m₂))))
       (φ.mapAddPath m₁ m₂) :=
   rweq_of_step (Path.Step.trans_refl_right (φ.mapAddPath m₁ m₂))
 
-@[simp] def mapZero_rweq :
+noncomputable def mapZero_rweq :
     RwEq
       (Path.trans φ.mapZeroPath (Path.refl φ.target.zero))
       φ.mapZeroPath :=
   rweq_of_step (Path.Step.trans_refl_right φ.mapZeroPath)
 
-@[simp] def mapScalar_rweq (s : Section) (m : Mod₁) :
+noncomputable def mapScalar_rweq (s : Section) (m : Mod₁) :
     RwEq
       (Path.trans (φ.mapScalarPath s m)
         (Path.refl (φ.target.scalarMul s (φ.mapMod m))))
       (φ.mapScalarPath s m) :=
   rweq_of_step (Path.Step.trans_refl_right (φ.mapScalarPath s m))
 
-@[simp] def mapAdd_cancel_rweq (m₁ m₂ : Mod₁) :
+noncomputable def mapAdd_cancel_rweq (m₁ m₂ : Mod₁) :
     RwEq
       (Path.trans (Path.symm (φ.mapAddPath m₁ m₂)) (φ.mapAddPath m₁ m₂))
       (Path.refl (φ.target.add (φ.mapMod m₁) (φ.mapMod m₂))) :=
   rweq_cmpA_inv_left (φ.mapAddPath m₁ m₂)
 
-@[simp] def mapScalar_cancel_rweq (s : Section) (m : Mod₁) :
+noncomputable def mapScalar_cancel_rweq (s : Section) (m : Mod₁) :
     RwEq
       (Path.trans (Path.symm (φ.mapScalarPath s m)) (φ.mapScalarPath s m))
       (Path.refl (φ.target.scalarMul s (φ.mapMod m))) :=
@@ -185,47 +185,47 @@ namespace CechCohomologyPathData
 variable {Cochain Cocycle Coboundary Cohom : Type u}
          (CC : CechCohomologyPathData Cochain Cocycle Coboundary Cohom)
 
-@[simp] def coboundarySquare_rweq (c : Cochain) :
+noncomputable def coboundarySquare_rweq (c : Cochain) :
     RwEq
       (Path.trans (CC.coboundarySquarePath c) (Path.refl CC.zero))
       (CC.coboundarySquarePath c) :=
   rweq_of_step (Path.Step.trans_refl_right (CC.coboundarySquarePath c))
 
-@[simp] def cocycleCond_rweq (z : Cocycle) :
+noncomputable def cocycleCond_rweq (z : Cocycle) :
     RwEq
       (Path.trans (CC.cocycleCondPath z) (Path.refl CC.zero))
       (CC.cocycleCondPath z) :=
   rweq_of_step (Path.Step.trans_refl_right (CC.cocycleCondPath z))
 
-@[simp] def coboundaryExact_rweq (c : Cochain) :
+noncomputable def coboundaryExact_rweq (c : Cochain) :
     RwEq
       (Path.trans (CC.coboundaryExactPath c)
         (Path.refl (CC.coboundaryMap c)))
       (CC.coboundaryExactPath c) :=
   rweq_of_step (Path.Step.trans_refl_right (CC.coboundaryExactPath c))
 
-@[simp] def addCochain_rweq (c₁ c₂ : Cochain) :
+noncomputable def addCochain_rweq (c₁ c₂ : Cochain) :
     RwEq
       (Path.trans (CC.addCochainPath c₁ c₂)
         (Path.refl (CC.add (CC.coboundaryMap c₁) (CC.coboundaryMap c₂))))
       (CC.addCochainPath c₁ c₂) :=
   rweq_of_step (Path.Step.trans_refl_right (CC.addCochainPath c₁ c₂))
 
-@[simp] def refinement_rweq (z : Cocycle) :
+noncomputable def refinement_rweq (z : Cocycle) :
     RwEq
       (Path.trans (CC.refinementPath z)
         (Path.refl (CC.quotientMap z)))
       (CC.refinementPath z) :=
   rweq_of_step (Path.Step.trans_refl_right (CC.refinementPath z))
 
-@[simp] def coboundarySquare_cancel_rweq (c : Cochain) :
+noncomputable def coboundarySquare_cancel_rweq (c : Cochain) :
     RwEq
       (Path.trans (Path.symm (CC.coboundarySquarePath c))
         (CC.coboundarySquarePath c))
       (Path.refl CC.zero) :=
   rweq_cmpA_inv_left (CC.coboundarySquarePath c)
 
-@[simp] def cocycleCond_cancel_rweq (z : Cocycle) :
+noncomputable def cocycleCond_cancel_rweq (z : Cocycle) :
     RwEq
       (Path.trans (Path.symm (CC.cocycleCondPath z))
         (CC.cocycleCondPath z))
@@ -254,28 +254,28 @@ namespace LongExactSeqPathData
 
 variable {H0 H1 H2 : Type u} (LES : LongExactSeqPathData H0 H1 H2)
 
-@[simp] def exactAt1_rweq (h : H0) :
+noncomputable def exactAt1_rweq (h : H0) :
     RwEq
       (Path.trans (LES.exactAt1Path h)
         (Path.refl (LES.mapH12 (LES.mapH01 h))))
       (LES.exactAt1Path h) :=
   rweq_of_step (Path.Step.trans_refl_right (LES.exactAt1Path h))
 
-@[simp] def exactAt2_rweq (h : H1) :
+noncomputable def exactAt2_rweq (h : H1) :
     RwEq
       (Path.trans (LES.exactAt2Path h)
         (Path.refl (LES.connectingMap (LES.mapH12 h))))
       (LES.exactAt2Path h) :=
   rweq_of_step (Path.Step.trans_refl_right (LES.exactAt2Path h))
 
-@[simp] def exactAt0_rweq (h : H2) :
+noncomputable def exactAt0_rweq (h : H2) :
     RwEq
       (Path.trans (LES.exactAt0Path h)
         (Path.refl (LES.mapH01 (LES.connectingMap h))))
       (LES.exactAt0Path h) :=
   rweq_of_step (Path.Step.trans_refl_right (LES.exactAt0Path h))
 
-@[simp] def connectingNat_rweq (h : H2) :
+noncomputable def connectingNat_rweq (h : H2) :
     RwEq
       (Path.trans (LES.connectingNatPath h)
         (Path.refl (LES.connectingMap h)))
@@ -306,42 +306,42 @@ namespace SerreDualityPathData
 variable {Hi Hni Dual Pairing : Type u}
          (SD : SerreDualityPathData Hi Hni Dual Pairing)
 
-@[simp] def pairingComm_rweq (h : Hi) (g : Hni) :
+noncomputable def pairingComm_rweq (h : Hi) (g : Hni) :
     RwEq
       (Path.trans (SD.pairingCommPath h g)
         (Path.refl (SD.pairingMap h g)))
       (SD.pairingCommPath h g) :=
   rweq_of_step (Path.Step.trans_refl_right (SD.pairingCommPath h g))
 
-@[simp] def dualCompat_rweq (h : Hi) (g : Hni) :
+noncomputable def dualCompat_rweq (h : Hi) (g : Hni) :
     RwEq
       (Path.trans (SD.dualCompatPath h g)
         (Path.refl (SD.dualPairMap (SD.dualSheafMap h) g)))
       (SD.dualCompatPath h g) :=
   rweq_of_step (Path.Step.trans_refl_right (SD.dualCompatPath h g))
 
-@[simp] def traceIdempotent_rweq (p : Pairing) :
+noncomputable def traceIdempotent_rweq (p : Pairing) :
     RwEq
       (Path.trans (SD.traceIdempotentPath p)
         (Path.refl (SD.traceMap p)))
       (SD.traceIdempotentPath p) :=
   rweq_of_step (Path.Step.trans_refl_right (SD.traceIdempotentPath p))
 
-@[simp] def serrePerfect_rweq (h : Hi) :
+noncomputable def serrePerfect_rweq (h : Hi) :
     RwEq
       (Path.trans (SD.serrePerfectPath h)
         (Path.refl (SD.dualSheafMap h)))
       (SD.serrePerfectPath h) :=
   rweq_of_step (Path.Step.trans_refl_right (SD.serrePerfectPath h))
 
-@[simp] def dualCompat_cancel_rweq (h : Hi) (g : Hni) :
+noncomputable def dualCompat_cancel_rweq (h : Hi) (g : Hni) :
     RwEq
       (Path.trans (Path.symm (SD.dualCompatPath h g))
         (SD.dualCompatPath h g))
       (Path.refl (SD.dualPairMap (SD.dualSheafMap h) g)) :=
   rweq_cmpA_inv_left (SD.dualCompatPath h g)
 
-@[simp] def traceIdempotent_cancel_rweq (p : Pairing) :
+noncomputable def traceIdempotent_cancel_rweq (p : Pairing) :
     RwEq
       (Path.trans (Path.symm (SD.traceIdempotentPath p))
         (SD.traceIdempotentPath p))
@@ -372,28 +372,28 @@ namespace EulerCharPathData
 
 variable {Dim : Type u} (EC : EulerCharPathData Dim)
 
-@[simp] def eulerChar_rweq :
+noncomputable def eulerChar_rweq :
     RwEq
       (Path.trans EC.eulerCharPath
         (Path.refl (EC.add EC.h0 (EC.add (EC.neg EC.h1) EC.h2))))
       EC.eulerCharPath :=
   rweq_of_step (Path.Step.trans_refl_right EC.eulerCharPath)
 
-@[simp] def additivity_rweq (d₁ d₂ : Dim) :
+noncomputable def additivity_rweq (d₁ d₂ : Dim) :
     RwEq
       (Path.trans (EC.additivityPath d₁ d₂)
         (Path.refl (EC.add d₂ d₁)))
       (EC.additivityPath d₁ d₂) :=
   rweq_of_step (Path.Step.trans_refl_right (EC.additivityPath d₁ d₂))
 
-@[simp] def shortExactEuler_rweq (a b : Dim) :
+noncomputable def shortExactEuler_rweq (a b : Dim) :
     RwEq
       (Path.trans (EC.shortExactEulerPath a b)
         (Path.refl (EC.add a (EC.neg b))))
       (EC.shortExactEulerPath a b) :=
   rweq_of_step (Path.Step.trans_refl_right (EC.shortExactEulerPath a b))
 
-@[simp] def additivity_cancel_rweq (d₁ d₂ : Dim) :
+noncomputable def additivity_cancel_rweq (d₁ d₂ : Dim) :
     RwEq
       (Path.trans (Path.symm (EC.additivityPath d₁ d₂))
         (EC.additivityPath d₁ d₂))
@@ -425,7 +425,7 @@ namespace RiemannRochPathData
 
 variable {Dim : Type u} (RR : RiemannRochPathData Dim)
 
-@[simp] def rrFormula_rweq :
+noncomputable def rrFormula_rweq :
     RwEq
       (Path.trans RR.rrFormulaPath
         (Path.refl (RR.euler.add RR.degree
@@ -433,41 +433,41 @@ variable {Dim : Type u} (RR : RiemannRochPathData Dim)
       RR.rrFormulaPath :=
   rweq_of_step (Path.Step.trans_refl_right RR.rrFormulaPath)
 
-@[simp] def twist_rweq (d : Dim) :
+noncomputable def twist_rweq (d : Dim) :
     RwEq
       (Path.trans (RR.twistPath d)
         (Path.refl (RR.euler.add d RR.degree)))
       (RR.twistPath d) :=
   rweq_of_step (Path.Step.trans_refl_right (RR.twistPath d))
 
-@[simp] def tensorRR_rweq (d₁ d₂ : Dim) :
+noncomputable def tensorRR_rweq (d₁ d₂ : Dim) :
     RwEq
       (Path.trans (RR.tensorRRPath d₁ d₂)
         (Path.refl (RR.euler.add d₁ d₂)))
       (RR.tensorRRPath d₁ d₂) :=
   rweq_of_step (Path.Step.trans_refl_right (RR.tensorRRPath d₁ d₂))
 
-@[simp] def dualRR_rweq :
+noncomputable def dualRR_rweq :
     RwEq
       (Path.trans RR.dualRRPath (Path.refl (RR.euler.neg RR.degree)))
       RR.dualRRPath :=
   rweq_of_step (Path.Step.trans_refl_right RR.dualRRPath)
 
-@[simp] def grothendieckRR_rweq (d : Dim) :
+noncomputable def grothendieckRR_rweq (d : Dim) :
     RwEq
       (Path.trans (RR.grothendieckRRPath d)
         (Path.refl (RR.euler.add d RR.degree)))
       (RR.grothendieckRRPath d) :=
   rweq_of_step (Path.Step.trans_refl_right (RR.grothendieckRRPath d))
 
-@[simp] def rrFormula_cancel_rweq :
+noncomputable def rrFormula_cancel_rweq :
     RwEq
       (Path.trans (Path.symm RR.rrFormulaPath) RR.rrFormulaPath)
       (Path.refl (RR.euler.add RR.degree
         (RR.euler.add RR.rank (RR.euler.neg RR.genus)))) :=
   rweq_cmpA_inv_left RR.rrFormulaPath
 
-@[simp] def twist_cancel_rweq (d : Dim) :
+noncomputable def twist_cancel_rweq (d : Dim) :
     RwEq
       (Path.trans (Path.symm (RR.twistPath d)) (RR.twistPath d))
       (Path.refl (RR.euler.add d RR.degree)) :=
@@ -501,51 +501,51 @@ namespace DivisorClassPathData
 
 variable {Div : Type u} (DC : DivisorClassPathData Div)
 
-@[simp] def linEquiv_rweq (d₁ d₂ : Div) :
+noncomputable def linEquiv_rweq (d₁ d₂ : Div) :
     RwEq
       (Path.trans (DC.linEquivPath d₁ d₂)
         (Path.refl (DC.add d₁ (DC.neg d₂))))
       (DC.linEquivPath d₁ d₂) :=
   rweq_of_step (Path.Step.trans_refl_right (DC.linEquivPath d₁ d₂))
 
-@[simp] def divAddAssoc_rweq (d₁ d₂ d₃ : Div) :
+noncomputable def divAddAssoc_rweq (d₁ d₂ d₃ : Div) :
     RwEq
       (Path.trans (DC.addAssocPath d₁ d₂ d₃)
         (Path.refl (DC.add d₁ (DC.add d₂ d₃))))
       (DC.addAssocPath d₁ d₂ d₃) :=
   rweq_of_step (Path.Step.trans_refl_right (DC.addAssocPath d₁ d₂ d₃))
 
-@[simp] def divAddComm_rweq (d₁ d₂ : Div) :
+noncomputable def divAddComm_rweq (d₁ d₂ : Div) :
     RwEq
       (Path.trans (DC.addCommPath d₁ d₂) (Path.refl (DC.add d₂ d₁)))
       (DC.addCommPath d₁ d₂) :=
   rweq_of_step (Path.Step.trans_refl_right (DC.addCommPath d₁ d₂))
 
-@[simp] def divAddZero_rweq (d : Div) :
+noncomputable def divAddZero_rweq (d : Div) :
     RwEq
       (Path.trans (DC.addZeroPath d) (Path.refl d))
       (DC.addZeroPath d) :=
   rweq_of_step (Path.Step.trans_refl_right (DC.addZeroPath d))
 
-@[simp] def divAddNeg_rweq (d : Div) :
+noncomputable def divAddNeg_rweq (d : Div) :
     RwEq
       (Path.trans (DC.addNegPath d) (Path.refl DC.zero))
       (DC.addNegPath d) :=
   rweq_of_step (Path.Step.trans_refl_right (DC.addNegPath d))
 
-@[simp] def principalDivisor_rweq (d : Div) :
+noncomputable def principalDivisor_rweq (d : Div) :
     RwEq
       (Path.trans (DC.principalDivisorPath d) (Path.refl d))
       (DC.principalDivisorPath d) :=
   rweq_of_step (Path.Step.trans_refl_right (DC.principalDivisorPath d))
 
-@[simp] def divAddNeg_cancel_rweq (d : Div) :
+noncomputable def divAddNeg_cancel_rweq (d : Div) :
     RwEq
       (Path.trans (Path.symm (DC.addNegPath d)) (DC.addNegPath d))
       (Path.refl DC.zero) :=
   rweq_cmpA_inv_left (DC.addNegPath d)
 
-@[simp] def divAddComm_cancel_rweq (d₁ d₂ : Div) :
+noncomputable def divAddComm_cancel_rweq (d₁ d₂ : Div) :
     RwEq
       (Path.trans (Path.symm (DC.addCommPath d₁ d₂)) (DC.addCommPath d₁ d₂))
       (Path.refl (DC.add d₂ d₁)) :=
@@ -578,52 +578,52 @@ namespace GrothendieckGroupPathData
 
 variable {K : Type u} (GG : GrothendieckGroupPathData K)
 
-@[simp] def k0AddAssoc_rweq (a b c : K) :
+noncomputable def k0AddAssoc_rweq (a b c : K) :
     RwEq
       (Path.trans (GG.addAssocPath a b c)
         (Path.refl (GG.add a (GG.add b c))))
       (GG.addAssocPath a b c) :=
   rweq_of_step (Path.Step.trans_refl_right (GG.addAssocPath a b c))
 
-@[simp] def k0AddComm_rweq (a b : K) :
+noncomputable def k0AddComm_rweq (a b : K) :
     RwEq
       (Path.trans (GG.addCommPath a b) (Path.refl (GG.add b a)))
       (GG.addCommPath a b) :=
   rweq_of_step (Path.Step.trans_refl_right (GG.addCommPath a b))
 
-@[simp] def k0AddZero_rweq (a : K) :
+noncomputable def k0AddZero_rweq (a : K) :
     RwEq
       (Path.trans (GG.addZeroPath a) (Path.refl a))
       (GG.addZeroPath a) :=
   rweq_of_step (Path.Step.trans_refl_right (GG.addZeroPath a))
 
-@[simp] def k0AddNeg_rweq (a : K) :
+noncomputable def k0AddNeg_rweq (a : K) :
     RwEq
       (Path.trans (GG.addNegPath a) (Path.refl GG.zero))
       (GG.addNegPath a) :=
   rweq_of_step (Path.Step.trans_refl_right (GG.addNegPath a))
 
-@[simp] def shortExactRel_rweq (a b c : K) :
+noncomputable def shortExactRel_rweq (a b c : K) :
     RwEq
       (Path.trans (GG.shortExactRelPath a b c)
         (Path.refl (GG.classOf b)))
       (GG.shortExactRelPath a b c) :=
   rweq_of_step (Path.Step.trans_refl_right (GG.shortExactRelPath a b c))
 
-@[simp] def tensorProduct_rweq (a b : K) :
+noncomputable def tensorProduct_rweq (a b : K) :
     RwEq
       (Path.trans (GG.tensorProductPath a b)
         (Path.refl (GG.add (GG.classOf a) (GG.classOf b))))
       (GG.tensorProductPath a b) :=
   rweq_of_step (Path.Step.trans_refl_right (GG.tensorProductPath a b))
 
-@[simp] def k0AddNeg_cancel_rweq (a : K) :
+noncomputable def k0AddNeg_cancel_rweq (a : K) :
     RwEq
       (Path.trans (Path.symm (GG.addNegPath a)) (GG.addNegPath a))
       (Path.refl GG.zero) :=
   rweq_cmpA_inv_left (GG.addNegPath a)
 
-@[simp] def shortExactRel_cancel_rweq (a b c : K) :
+noncomputable def shortExactRel_cancel_rweq (a b c : K) :
     RwEq
       (Path.trans (Path.symm (GG.shortExactRelPath a b c))
         (GG.shortExactRelPath a b c))

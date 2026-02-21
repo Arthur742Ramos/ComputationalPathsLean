@@ -50,7 +50,7 @@ def eventualTerm (p q : Nat) : C.limit p q :=
 def shiftedTerm (r p q : Nat) : C.limit p q :=
   C.embed p q (E.shift r p q (E.base p q))
 
-@[simp] theorem stabilize_rweq (r p q : Nat) :
+noncomputable def stabilize_rweq (r p q : Nat) :
     RwEq
       (Path.trans (C.stabilizePath r p q) (Path.refl (C.eventualTerm p q)))
       (C.stabilizePath r p q) :=
@@ -61,7 +61,7 @@ def stabilizationLoop (r p q : Nat) :
     Path (C.shiftedTerm r p q) (C.shiftedTerm r p q) :=
   Path.trans (C.stabilizePath r p q) (Path.symm (C.stabilizePath r p q))
 
-@[simp] theorem stabilizationLoop_contracts (r p q : Nat) :
+noncomputable def stabilizationLoop_contracts (r p q : Nat) :
     RwEq (C.stabilizationLoop r p q) (Path.refl (C.shiftedTerm r p q)) := by
   unfold stabilizationLoop
   exact rweq_cmpA_inv_right (C.stabilizePath r p q)
@@ -80,7 +80,7 @@ def convergedBoundary (r p q : Nat) :
       (C.eventualTerm p q) :=
   Path.trans (C.boundaryShiftToLimit r p q) (C.stabilizePath r p q)
 
-@[simp] theorem convergedBoundary_normalizes (r p q : Nat) :
+noncomputable def convergedBoundary_normalizes (r p q : Nat) :
     RwEq
       (Path.trans (C.convergedBoundary r p q) (Path.refl (C.eventualTerm p q)))
       (C.convergedBoundary r p q) :=

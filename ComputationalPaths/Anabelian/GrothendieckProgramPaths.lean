@@ -48,31 +48,31 @@ namespace GrothendieckProgramPaths
 
 variable {Obj : Type u} (G : GrothendieckProgramPaths Obj)
 
-@[simp] theorem reconstruction_rweq (X : Obj) :
+noncomputable def reconstruction_rweq (X : Obj) :
     RwEq
       (Path.trans (G.reconstructionPath X) (Path.refl X))
       (G.reconstructionPath X) :=
   rweq_of_step (G.reconstructionStep X)
 
-@[simp] theorem functoriality_rweq (X : Obj) :
+noncomputable def functoriality_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.refl (G.conjectures.etalePi1 (G.reconstruction X))) (G.functorialityPath X))
       (G.functorialityPath X) :=
   rweq_of_step (G.functorialityStep X)
 
-@[simp] theorem reconstruction_cancel_rweq (X : Obj) :
+noncomputable def reconstruction_cancel_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.symm (G.reconstructionPath X)) (G.reconstructionPath X))
       (Path.refl X) :=
   rweq_cmpA_inv_left (G.reconstructionPath X)
 
-@[simp] theorem functoriality_cancel_rweq (X : Obj) :
+noncomputable def functoriality_cancel_rweq (X : Obj) :
     RwEq
       (Path.trans (G.functorialityPath X) (Path.symm (G.functorialityPath X)))
       (Path.refl (G.conjectures.etalePi1 (G.reconstruction X))) :=
   rweq_cmpA_inv_right (G.functorialityPath X)
 
-@[simp] theorem sectionConjecture_in_program_rweq (X : Obj) :
+noncomputable def sectionConjecture_in_program_rweq (X : Obj) :
     RwEq
       (Path.trans (G.conjectures.sectionConjecturePath X) (Path.refl X))
       (G.conjectures.sectionConjecturePath X) :=

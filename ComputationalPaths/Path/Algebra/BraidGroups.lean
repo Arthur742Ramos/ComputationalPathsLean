@@ -238,19 +238,19 @@ def braidStep_to_path {A : Type u} {a b : A} (h : BraidStep a b) :
 /-! ## RwEq Instances -/
 
 /-- RwEq: far commutativity is stable. -/
-theorem rwEq_far_comm {n : Nat} (B : BraidGroupAlg n) (i j : Fin (n - 1))
+noncomputable def rwEq_far_comm {n : Nat} (B : BraidGroupAlg n) (i j : Fin (n - 1))
     (h : i.val + 2 ≤ j.val ∨ j.val + 2 ≤ i.val) :
     RwEq (B.far_comm i j h) (B.far_comm i j h) :=
   RwEq.refl _
 
 /-- RwEq: braid relation is stable. -/
-theorem rwEq_braid_rel {n : Nat} (B : BraidGroupAlg n) (i j : Fin (n - 1))
+noncomputable def rwEq_braid_rel {n : Nat} (B : BraidGroupAlg n) (i j : Fin (n - 1))
     (h : j.val = i.val + 1) :
     RwEq (B.braid_rel i j h) (B.braid_rel i j h) :=
   RwEq.refl _
 
 /-- RwEq: sigma cancellation is stable. -/
-theorem rwEq_sigma_cancel {n : Nat} (B : BraidGroupAlg n) (i : Fin (n - 1)) :
+noncomputable def rwEq_sigma_cancel {n : Nat} (B : BraidGroupAlg n) (i : Fin (n - 1)) :
     RwEq (B.sigma_cancel_right i) (B.sigma_cancel_right i) :=
   RwEq.refl _
 
@@ -261,7 +261,7 @@ theorem symm_symm_braid {n : Nat} (B : BraidGroupAlg n) (i : Fin (n - 1)) :
   simp
 
 /-- RwEq: Jones unknot is stable. -/
-theorem rwEq_jones_unknot {n : Nat} {B : BraidGroupAlg n} (J : JonesData n B) :
+noncomputable def rwEq_jones_unknot {n : Nat} {B : BraidGroupAlg n} (J : JonesData n B) :
     RwEq J.jones_unknot J.jones_unknot :=
   RwEq.refl _
 

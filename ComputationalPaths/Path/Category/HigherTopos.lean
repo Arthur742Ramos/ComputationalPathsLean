@@ -207,20 +207,20 @@ structure BaseChangeAdjunction (C : Type u) (f : C → C)
 /-! ## RwEq coherence theorems -/
 
 /-- Descent transition along refl is coherent under RwEq. -/
-@[simp] theorem descent_refl_rweq {Idx : Type u} {F : Idx → Type u}
+noncomputable def descent_refl_rweq {Idx : Type u} {F : Idx → Type u}
     (D : DescentDatum Idx F) (i : Idx) (x : F i) :
     RwEq (D.trans_refl i x) (D.trans_refl i x) :=
   RwEq.refl _
 
 /-- Pullback preserves reflexivity under RwEq. -/
-@[simp] theorem pullback_refl_rweq {C : Type u} {f : C → C}
+noncomputable def pullback_refl_rweq {C : Type u} {f : C → C}
     (bc : BaseChangeFunctor C f) (a : C) :
     RwEq (bc.pullback_path (Path.refl a))
          (bc.pullback_path (Path.refl a)) :=
   RwEq.refl _
 
 /-- Pullback functoriality is coherent: composing pullback with trans. -/
-@[simp] theorem pullback_trans_rweq {C : Type u} {f : C → C}
+noncomputable def pullback_trans_rweq {C : Type u} {f : C → C}
     (bc : BaseChangeFunctor C f) {a b c : C}
     (p : Path a b) (q : Path b c) :
     RwEq (bc.pullback_path (Path.trans p q))
@@ -229,21 +229,21 @@ structure BaseChangeAdjunction (C : Type u) (f : C → C)
 
 /-- Descent cocycle coherence: the two ways to decompose a triple
     composition yield RwEq-equal paths. -/
-theorem topos_descent_coherence {Idx : Type u} {F : Idx → Type u}
+noncomputable def topos_descent_coherence {Idx : Type u} {F : Idx → Type u}
     (D : DescentDatum Idx F) {i j k : Idx}
     (p : Path i j) (q : Path j k) (x : F i) :
     RwEq (D.cocycle p q x) (D.cocycle p q x) :=
   RwEq.refl _
 
 /-- Connected map section is coherent. -/
-@[simp] theorem connected_map_section_rweq {A B : Type u}
+noncomputable def connected_map_section_rweq {A B : Type u}
     {f : A → B} {n : TruncLevel}
     (cm : ConnectedMap f n) (b : B) :
     RwEq (cm.section_prop b) (cm.section_prop b) :=
   RwEq.refl _
 
 /-- Base change unit-counit triangle identity. -/
-theorem base_change_triangle {C : Type u} {f : C → C}
+noncomputable def base_change_triangle {C : Type u} {f : C → C}
     (adj : BaseChangeAdjunction C f) (a : C) :
     RwEq (Path.trans (adj.adjUnit a)
            (Path.congrArg adj.depProd

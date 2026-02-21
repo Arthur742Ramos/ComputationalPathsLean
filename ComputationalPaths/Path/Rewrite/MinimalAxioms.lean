@@ -81,7 +81,7 @@ private theorem step5_ss : RwEq (Path.symm (Path.symm p)) p :=
   rweq_ss p
 
 /-- Main theorem: trans_refl_right is derivable from trans_refl_left + symmetry rules -/
-theorem derive_trans_refl_right : RwEq (Path.trans p (Path.refl b)) p := by
+noncomputable def derive_trans_refl_right : RwEq (Path.trans p (Path.refl b)) p := by
   apply rweq_trans (step1_ss p)
   apply rweq_trans (step2_symm_trans p)
   apply rweq_trans (step3_sr p)
@@ -137,7 +137,7 @@ This requires symm_symm, which we should check is independently derivable.
     σ(p) · p ≈ σ(p) · σ(σ(p))    (substitute p with σ(σ(p)))
              ≈ ρ                  (trans_symm on σ(p))
 -/
-theorem derive_symm_trans : RwEq (Path.trans (Path.symm p) p) (Path.refl b) := by
+noncomputable def derive_symm_trans : RwEq (Path.trans (Path.symm p) p) (Path.refl b) := by
   -- Substitute p with σ(σ(p)) using symm_symm
   apply rweq_trans
   · exact rweq_trans_congr_right (Path.symm p) (rweq_symm (rweq_ss p))
@@ -188,7 +188,7 @@ symm_trans, we need symm_symm to derive it, creating a circularity!
 The resolution: We need EITHER symm_symm OR one of the inverse laws
 as primitive. We cannot eliminate both.
 -/
-theorem derive_symm_symm_from_both_inverses : RwEq (Path.symm (Path.symm p)) p := by
+noncomputable def derive_symm_symm_from_both_inverses : RwEq (Path.symm (Path.symm p)) p := by
   -- Right unit: σ(σ(p)) ≈ σ(σ(p)) · ρ
   apply rweq_trans
   · exact rweq_symm (rweq_cmpA_refl_right (Path.symm (Path.symm p)))
@@ -264,12 +264,12 @@ structure MinimalGroupoidAxioms (A : Type u) where
   symm_symm : ∀ {a b : A} (p : Path a b), RwEq (Path.symm (Path.symm p)) p
 
 /-- Derive trans_refl_right from the minimal set. -/
-theorem deriveTransReflRight (M : MinimalGroupoidAxioms A) {a b : A} (p : Path a b) :
+noncomputable def deriveTransReflRight (M : MinimalGroupoidAxioms A) {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p :=
   derive_trans_refl_right p
 
 /-- Derive symm_trans from the minimal set. -/
-theorem deriveSymmTrans (M : MinimalGroupoidAxioms A) {a b : A} (p : Path a b) :
+noncomputable def deriveSymmTrans (M : MinimalGroupoidAxioms A) {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl b) :=
   derive_symm_trans p
 

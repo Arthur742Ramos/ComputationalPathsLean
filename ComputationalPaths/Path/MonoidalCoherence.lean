@@ -43,17 +43,17 @@ variable {a b c d e f' : A}
   Path.refl a
 
 /-- Associator for the path tensor. -/
-theorem tensor_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
+noncomputable def tensor_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (tensorPath (tensorPath p q) r) (tensorPath p (tensorPath q r)) :=
   rweq_of_step (Step.trans_assoc p q r)
 
 /-- Left unitor for the path tensor. -/
-theorem tensor_left_unitor (p : Path a b) :
+noncomputable def tensor_left_unitor (p : Path a b) :
     RwEq (tensorPath (unitPath a) p) p :=
   rweq_of_step (Step.trans_refl_left p)
 
 /-- Right unitor for the path tensor. -/
-theorem tensor_right_unitor (p : Path a b) :
+noncomputable def tensor_right_unitor (p : Path a b) :
     RwEq (tensorPath p (unitPath b)) p :=
   rweq_of_step (Step.trans_refl_right p)
 
@@ -103,20 +103,20 @@ def pathMonoidal (A : Type u) : MonoidalPathAlgebra A where
 /-! ## Mac Lane Coherence -/
 
 /-- Pentagon coherence for the path tensor. -/
-theorem mac_lane_pentagon (p : Path a b) (q : Path b c)
+noncomputable def mac_lane_pentagon (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) :
     RwEq (tensorPath (tensorPath (tensorPath p q) r) s)
          (tensorPath p (tensorPath q (tensorPath r s))) :=
   CoherenceDerived.rweq_pentagon_full p q r s
 
 /-- Triangle coherence for the path tensor. -/
-theorem mac_lane_triangle (p : Path a b) (q : Path b c) :
+noncomputable def mac_lane_triangle (p : Path a b) (q : Path b c) :
     RwEq (tensorPath (tensorPath p (unitPath b)) q)
          (tensorPath p q) :=
   PathAlgebraIdentities.rweq_triangle_identity p q
 
 /-- Mac Lane coherence: fivefold reassociation is canonical. -/
-theorem mac_lane_coherence (p : Path a b) (q : Path b c)
+noncomputable def mac_lane_coherence (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) (t : Path e f') :
     RwEq (tensorPath (tensorPath (tensorPath p q) r) (tensorPath s t))
          (tensorPath p (tensorPath q (tensorPath r (tensorPath s t)))) :=
@@ -125,19 +125,19 @@ theorem mac_lane_coherence (p : Path a b) (q : Path b c)
 /-! ## Unit Coherence -/
 
 /-- Left unit coherence for a two-step tensor. -/
-theorem unit_left_coherence (p : Path a b) (q : Path b c) :
+noncomputable def unit_left_coherence (p : Path a b) (q : Path b c) :
     RwEq (tensorPath (tensorPath (unitPath a) p) q)
          (tensorPath p q) :=
   CoherenceDerived.rweq_left_unit_coherence p q
 
 /-- Right unit coherence for a two-step tensor. -/
-theorem unit_right_coherence (p : Path a b) (q : Path b c) :
+noncomputable def unit_right_coherence (p : Path a b) (q : Path b c) :
     RwEq (tensorPath (tensorPath p (unitPath b)) q)
          (tensorPath p q) :=
   CoherenceDerived.rweq_right_unit_coherence p q
 
 /-- Inner unit coherence: p tensor (unit tensor q) reduces to p tensor q. -/
-theorem unit_inner_coherence (p : Path a b) (q : Path b c) :
+noncomputable def unit_inner_coherence (p : Path a b) (q : Path b c) :
     RwEq (tensorPath p (tensorPath (unitPath b) q))
          (tensorPath p q) :=
   CoherenceDerived.rweq_inner_unit_coherence p q
@@ -145,7 +145,7 @@ theorem unit_inner_coherence (p : Path a b) (q : Path b c) :
 /-! ## Braiding and Symmetry -/
 
 /-- Braiding for the path tensor via inversion. -/
-theorem tensor_braiding (p : Path a b) (q : Path b c) :
+noncomputable def tensor_braiding (p : Path a b) (q : Path b c) :
     RwEq (symm (tensorPath p q))
          (tensorPath (symm q) (symm p)) :=
   by
@@ -155,7 +155,7 @@ theorem tensor_braiding (p : Path a b) (q : Path b c) :
     exact rweq_symm_trans_congr (p := p) (q := q)
 
 /-- The braiding is symmetric: reversing twice returns the original tensor. -/
-theorem tensor_braiding_symm (p : Path a b) (q : Path b c) :
+noncomputable def tensor_braiding_symm (p : Path a b) (q : Path b c) :
     RwEq (symm (tensorPath (symm q) (symm p)))
          (tensorPath p q) := by
   have h1 :
@@ -175,7 +175,7 @@ theorem tensor_braiding_symm (p : Path a b) (q : Path b c) :
   exact RwEq.trans h1 h2
 
 /-- Hexagon coherence for the inversion braiding. -/
-theorem tensor_hexagon_braiding (p : Path a b) (q : Path b c) (r : Path c d) :
+noncomputable def tensor_hexagon_braiding (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (symm (tensorPath (tensorPath p q) r))
          (tensorPath (symm r) (tensorPath (symm q) (symm p))) := by
   change

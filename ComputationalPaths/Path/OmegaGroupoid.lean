@@ -148,7 +148,7 @@ NOT hold in general - not all parallel paths have derivations between them.
 This is essential for preserving non-trivial fundamental groups. -/
 
 /-- A derivation implies RwEq (but not conversely in general). -/
-theorem derivation₂_to_rweq {p q : Path a b} : Derivation₂ p q → RwEq p q :=
+noncomputable def derivation₂_to_rweq {p q : Path a b} : Derivation₂ p q → RwEq p q :=
   Derivation₂.toRwEq
 
 /-! ## Horizontal Composition (Whiskering) -/
@@ -653,13 +653,13 @@ variable {a b c d e : A}
 
 /-! ### Functoriality of the Cell Tower -/
 
-@[simp] theorem cell_tower_functor_refl (p : Path a b) :
+noncomputable def cell_tower_functor_refl (p : Path a b) :
     Derivation₂.toRwEq (.refl p) = RwEq.refl p := rfl
 
-@[simp] theorem cell_tower_functor_inv {p q : Path a b} (d : Derivation₂ p q) :
+noncomputable def cell_tower_functor_inv {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₂.toRwEq (.inv d) = RwEq.symm (Derivation₂.toRwEq d) := rfl
 
-@[simp] theorem cell_tower_functor_vcomp {p q r : Path a b}
+noncomputable def cell_tower_functor_vcomp {p q r : Path a b}
     (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) :
     Derivation₂.toRwEq (.vcomp d₁ d₂) =
       RwEq.trans (Derivation₂.toRwEq d₁) (Derivation₂.toRwEq d₂) := rfl
@@ -684,7 +684,7 @@ theorem cell_tower_functor_whiskerRight {p q : Path a b}
   | inv α ih => simp
   | vcomp α β ihα ihβ => simp
 
-theorem cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
+noncomputable def cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
     (α : Derivation₂ p p') (β : Derivation₂ q q') :
     Derivation₂.toRwEq (hcomp α β) =
       RwEq.trans
@@ -941,17 +941,17 @@ theorem exchange_law_symm_contractible_to_canonical {f f' : Path a b} {g g' : Pa
 
 /-! ### Cell-Tower Functoriality Deepening -/
 
-@[simp] theorem cell_tower_functor_whiskerLeft_toRwEq_refl
+noncomputable def cell_tower_functor_whiskerLeft_toRwEq_refl
     (f : Path a b) (p : Path b c) :
     Derivation₂.toRwEq (whiskerLeft f (Derivation₂.refl p)) =
       RwEq.refl (Path.trans f p) := rfl
 
-@[simp] theorem cell_tower_functor_whiskerRight_toRwEq_refl
+noncomputable def cell_tower_functor_whiskerRight_toRwEq_refl
     (p : Path a b) (g : Path b c) :
     Derivation₂.toRwEq (whiskerRight (Derivation₂.refl p) g) =
       RwEq.refl (Path.trans p g) := rfl
 
-@[simp] theorem cell_tower_functor_hcomp_toRwEq_via_whiskers
+noncomputable def cell_tower_functor_hcomp_toRwEq_via_whiskers
     {p p' : Path a b} {q q' : Path b c}
     (α : Derivation₂ p p') (β : Derivation₂ q q') :
     Derivation₂.toRwEq (hcomp α β) =

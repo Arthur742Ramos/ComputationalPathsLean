@@ -44,20 +44,20 @@ namespace ValuationPathData
 
 variable {K : Type u} {Γ : Type v} (V : ValuationPathData K Γ)
 
-@[simp] theorem mul_val_rweq (x y : K) :
+noncomputable def mul_val_rweq (x y : K) :
     RwEq
       (Path.trans (V.mulValPath x y)
         (Path.refl (V.tropMul (V.val x) (V.val y))))
       (V.mulValPath x y) :=
   rweq_of_step (V.mulValStep x y)
 
-@[simp] theorem add_val_rweq (x y : K) :
+noncomputable def add_val_rweq (x y : K) :
     RwEq
       (Path.trans (Path.refl (V.val (V.addK x y))) (V.addValPath x y))
       (V.addValPath x y) :=
   rweq_of_step (V.addValStep x y)
 
-@[simp] theorem add_val_cancel_rweq (x y : K) :
+noncomputable def add_val_cancel_rweq (x y : K) :
     RwEq
       (Path.trans (Path.symm (V.addValPath x y)) (V.addValPath x y))
       (Path.refl (V.tropAdd (V.val x) (V.val y))) :=
@@ -86,13 +86,13 @@ variable {C : TropicalCurvePathData Vertex Edge}
 variable {V : ValuationPathData K Γ}
 variable (T : TropicalizationPathData C V)
 
-@[simp] theorem tropical_length_rweq (e : Edge) :
+noncomputable def tropical_length_rweq (e : Edge) :
     RwEq
       (Path.trans (T.tropicalLengthPath e) (Path.refl (T.tropicalLength e)))
       (T.tropicalLengthPath e) :=
   rweq_of_step (T.tropicalLengthStep e)
 
-@[simp] theorem tropical_length_cancel_rweq (e : Edge) :
+noncomputable def tropical_length_cancel_rweq (e : Edge) :
     RwEq
       (Path.trans (Path.symm (T.tropicalLengthPath e)) (T.tropicalLengthPath e))
       (Path.refl (T.tropicalLength e)) :=

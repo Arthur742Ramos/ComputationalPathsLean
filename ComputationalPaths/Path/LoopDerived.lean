@@ -19,19 +19,19 @@ variable {A : Type u} {a : A}
 /-! ## Unit and inverse laws -/
 
 /-- Right unit for loops. -/
-theorem rweq_loop_unit_right (p : LoopSpace A a) :
+noncomputable def rweq_loop_unit_right (p : LoopSpace A a) :
     RwEq (Path.trans p (Path.refl a)) p :=
   rweq_cmpA_refl_right (p := p)
 
 /-- Right inverse for loops. -/
-theorem rweq_loop_inv_right (p : LoopSpace A a) :
+noncomputable def rweq_loop_inv_right (p : LoopSpace A a) :
     RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
   rweq_cmpA_inv_right (p := p)
 
 /-! ## Conjugation -/
 
 /-- Conjugation by the reflexive loop is trivial. -/
-theorem rweq_loop_conj_refl (q : LoopSpace A a) :
+noncomputable def rweq_loop_conj_refl (q : LoopSpace A a) :
     RwEq (Path.trans (Path.trans (Path.refl a) q)
       (Path.symm (Path.refl a))) q := by
   have h1 :
@@ -52,7 +52,7 @@ theorem rweq_loop_conj_refl (q : LoopSpace A a) :
 /-! ## Self commutator -/
 
 /-- The self-commutator of a loop is trivial. -/
-theorem rweq_loop_self_commutator (p : LoopSpace A a) :
+noncomputable def rweq_loop_self_commutator (p : LoopSpace A a) :
     RwEq (Path.trans (Path.trans (Path.trans p p) (Path.symm p)) (Path.symm p))
       (Path.refl a) := by
   have h1 :

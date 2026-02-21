@@ -93,7 +93,7 @@ theorem comp_base_assoc_step (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
       (h.map_base n))
 
 /-- Associativity coherence for basepoint composites as rewrite equivalence. -/
-theorem comp_base_assoc_rweq (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
+noncomputable def comp_base_assoc_rweq (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
     (f : ThomSpectrumMap E F) (n : Nat) :
     RwEq (compBaseLeft h g f n) (compBaseRight h g f n) :=
   rweq_of_step (comp_base_assoc_step h g f n)
@@ -122,13 +122,13 @@ namespace ThomSpectrumEquivalence
 variable {E F : ThomSpectrumMO}
 
 /-- Left inverse cancellation in rewrite-equivalence form. -/
-theorem left_cancel_rweq (e : ThomSpectrumEquivalence E F) (n : Nat) :
+noncomputable def left_cancel_rweq (e : ThomSpectrumEquivalence E F) (n : Nat) :
     RwEq (Path.trans (Path.symm (e.leftBase n)) (e.leftBase n))
       (Path.refl (thomBase E n)) :=
   rweq_of_step (e.left_cancel_step n)
 
 /-- Right inverse cancellation in rewrite-equivalence form. -/
-theorem right_cancel_rweq (e : ThomSpectrumEquivalence E F) (n : Nat) :
+noncomputable def right_cancel_rweq (e : ThomSpectrumEquivalence E F) (n : Nat) :
     RwEq (Path.trans (Path.symm (e.rightBase n)) (e.rightBase n))
       (Path.refl (thomBase F n)) :=
   rweq_of_step (e.right_cancel_step n)

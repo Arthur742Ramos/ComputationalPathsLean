@@ -72,13 +72,13 @@ variable (F : FilteredComplexPaths.{u})
 
 /-! ### Basic RwEq theorems -/
 
-@[simp] theorem dSquared_rweq (n : Nat) :
+noncomputable def dSquared_rweq (n : Nat) :
     RwEq
       (Path.trans (F.dSquaredPath n) (Path.refl (F.chainBase n)))
       (F.dSquaredPath n) :=
   rweq_of_step (F.dSquaredStep n)
 
-@[simp] theorem filtDiff_rweq (s n : Nat) :
+noncomputable def filtDiff_rweq (s n : Nat) :
     RwEq
       (Path.trans (F.filtDiffPath s n)
         (Path.refl (F.filt s n (F.chainDiff n (F.chainBase n)))))
@@ -93,7 +93,7 @@ def dSquaredLoop (n : Nat) :
       (F.chainDiff n (F.chainDiff n (F.chainBase n))) :=
   Path.trans (F.dSquaredPath n) (Path.symm (F.dSquaredPath n))
 
-@[simp] theorem dSquaredLoop_contracts (n : Nat) :
+noncomputable def dSquaredLoop_contracts (n : Nat) :
     RwEq (F.dSquaredLoop n)
       (Path.refl (F.chainDiff n (F.chainDiff n (F.chainBase n)))) := by
   unfold dSquaredLoop
@@ -105,7 +105,7 @@ def filtDiffLoop (s n : Nat) :
       (F.chainDiff n (F.filt s n (F.chainBase n))) :=
   Path.trans (F.filtDiffPath s n) (Path.symm (F.filtDiffPath s n))
 
-@[simp] theorem filtDiffLoop_contracts (s n : Nat) :
+noncomputable def filtDiffLoop_contracts (s n : Nat) :
     RwEq (F.filtDiffLoop s n)
       (Path.refl (F.chainDiff n (F.filt s n (F.chainBase n)))) := by
   unfold filtDiffLoop
@@ -113,13 +113,13 @@ def filtDiffLoop (s n : Nat) :
 
 /-! ### Inverse cancellations -/
 
-@[simp] theorem dSquared_inv_left (n : Nat) :
+noncomputable def dSquared_inv_left (n : Nat) :
     RwEq
       (Path.trans (Path.symm (F.dSquaredPath n)) (F.dSquaredPath n))
       (Path.refl (F.chainBase n)) :=
   rweq_cmpA_inv_left (F.dSquaredPath n)
 
-@[simp] theorem filtDiff_inv_left (s n : Nat) :
+noncomputable def filtDiff_inv_left (s n : Nat) :
     RwEq
       (Path.trans (Path.symm (F.filtDiffPath s n)) (F.filtDiffPath s n))
       (Path.refl (F.filt s n (F.chainDiff n (F.chainBase n)))) :=
@@ -133,14 +133,14 @@ def filtDSquaredPath (s n : Nat) :
       (F.filt s n (F.chainBase n)) :=
   Path.congrArg (F.filt s n) (F.dSquaredPath n)
 
-@[simp] theorem filtDSquared_normalizes (s n : Nat) :
+noncomputable def filtDSquared_normalizes (s n : Nat) :
     RwEq
       (Path.trans (F.filtDSquaredPath s n)
         (Path.refl (F.filt s n (F.chainBase n))))
       (F.filtDSquaredPath s n) :=
   rweq_cmpA_refl_right (F.filtDSquaredPath s n)
 
-@[simp] theorem filtDSquared_loop_contracts (s n : Nat) :
+noncomputable def filtDSquared_loop_contracts (s n : Nat) :
     RwEq
       (Path.trans (F.filtDSquaredPath s n) (Path.symm (F.filtDSquaredPath s n)))
       (Path.refl (F.filt s n (F.chainDiff n (F.chainDiff n (F.chainBase n))))) :=
@@ -166,7 +166,7 @@ def gradedDiffFilteredPath (s n : Nat) :
     Path (F.gradedDiff s n) (F.filt s n (F.chainDiff n (F.chainBase n))) :=
   F.filtDiffPath s n
 
-@[simp] theorem gradedDiffFiltered_normalizes (s n : Nat) :
+noncomputable def gradedDiffFiltered_normalizes (s n : Nat) :
     RwEq
       (Path.trans (F.gradedDiffFilteredPath s n)
         (Path.refl (F.filt s n (F.chainDiff n (F.chainBase n)))))
@@ -180,7 +180,7 @@ def doubleFiltInclusionPath (s n : Nat) :
     Path (F.gradedPiece s n) (F.gradedPiece (s + 2) n) :=
   Path.trans (F.gradedInclusionPath s n) (F.gradedInclusionPath (s + 1) n)
 
-@[simp] theorem doubleFiltInclusion_normalizes (s n : Nat) :
+noncomputable def doubleFiltInclusion_normalizes (s n : Nat) :
     RwEq
       (Path.trans (F.doubleFiltInclusionPath s n)
         (Path.refl (F.gradedPiece (s + 2) n)))
@@ -239,7 +239,7 @@ variable (M : MultiplicativePagePaths.{u})
 
 /-! ### Product RwEq theorems -/
 
-@[simp] theorem prodLeftUnit_rweq (p q : Nat) (x : M.toPages.term p q) :
+noncomputable def prodLeftUnit_rweq (p q : Nat) (x : M.toPages.term p q) :
     RwEq
       (Path.trans (M.prodLeftUnitPath p q x) (Path.refl x))
       (M.prodLeftUnitPath p q x) :=
@@ -251,7 +251,7 @@ def prodLeftUnitLoop (p q : Nat) (x : M.toPages.term p q) :
       (M.prod p q p q (M.toPages.base p q) x) :=
   Path.trans (M.prodLeftUnitPath p q x) (Path.symm (M.prodLeftUnitPath p q x))
 
-@[simp] theorem prodLeftUnitLoop_contracts (p q : Nat) (x : M.toPages.term p q) :
+noncomputable def prodLeftUnitLoop_contracts (p q : Nat) (x : M.toPages.term p q) :
     RwEq (M.prodLeftUnitLoop p q x)
       (Path.refl (M.prod p q p q (M.toPages.base p q) x)) := by
   unfold prodLeftUnitLoop
@@ -264,14 +264,14 @@ def prodRightUnitLoop (p₁ q₁ p₂ q₂ : Nat) :
   Path.trans (M.prodRightUnitPath p₁ q₁ p₂ q₂)
     (Path.symm (M.prodRightUnitPath p₁ q₁ p₂ q₂))
 
-@[simp] theorem prodRightUnitLoop_contracts (p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def prodRightUnitLoop_contracts (p₁ q₁ p₂ q₂ : Nat) :
     RwEq (M.prodRightUnitLoop p₁ q₁ p₂ q₂)
       (Path.refl (M.prod p₁ q₁ p₂ q₂ (M.toPages.base p₁ q₁)
         (M.toPages.base p₂ q₂))) := by
   unfold prodRightUnitLoop
   exact rweq_cmpA_inv_right (M.prodRightUnitPath p₁ q₁ p₂ q₂)
 
-@[simp] theorem prodRightUnit_inv_left (p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def prodRightUnit_inv_left (p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (Path.symm (M.prodRightUnitPath p₁ q₁ p₂ q₂))
         (M.prodRightUnitPath p₁ q₁ p₂ q₂))
@@ -290,7 +290,7 @@ def prodShiftLoop (r p₁ q₁ p₂ q₂ : Nat) :
   Path.trans (M.prodShiftPath r p₁ q₁ p₂ q₂)
     (Path.symm (M.prodShiftPath r p₁ q₁ p₂ q₂))
 
-@[simp] theorem prodShiftLoop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def prodShiftLoop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq (M.prodShiftLoop r p₁ q₁ p₂ q₂)
       (Path.refl (M.toPages.shift r p₁ q₁
         (M.prod p₁ q₁ p₂ q₂ (M.toPages.base p₁ q₁)
@@ -298,7 +298,7 @@ def prodShiftLoop (r p₁ q₁ p₂ q₂ : Nat) :
   unfold prodShiftLoop
   exact rweq_cmpA_inv_right (M.prodShiftPath r p₁ q₁ p₂ q₂)
 
-@[simp] theorem prodShift_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def prodShift_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (M.prodShiftPath r p₁ q₁ p₂ q₂)
         (Path.refl _))
@@ -315,14 +315,14 @@ def shiftProdRightUnitPath (r p₁ q₁ p₂ q₂ : Nat) :
       (M.toPages.shift r p₁ q₁ (M.toPages.base p₁ q₁)) :=
   Path.congrArg (M.toPages.shift r p₁ q₁) (M.prodRightUnitPath p₁ q₁ p₂ q₂)
 
-@[simp] theorem shiftProdRightUnit_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def shiftProdRightUnit_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (M.shiftProdRightUnitPath r p₁ q₁ p₂ q₂)
         (Path.refl _))
       (M.shiftProdRightUnitPath r p₁ q₁ p₂ q₂) :=
   rweq_cmpA_refl_right (M.shiftProdRightUnitPath r p₁ q₁ p₂ q₂)
 
-@[simp] theorem shiftProdRightUnit_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def shiftProdRightUnit_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (M.shiftProdRightUnitPath r p₁ q₁ p₂ q₂)
         (Path.symm (M.shiftProdRightUnitPath r p₁ q₁ p₂ q₂)))
@@ -366,7 +366,7 @@ namespace MultiplicativeDiffPaths
 
 variable {M : MultiplicativePagePaths.{u}} (MD : MultiplicativeDiffPaths M)
 
-@[simp] theorem leibniz_rweq (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def leibniz_rweq (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (MD.leibnizPath r p₁ q₁ p₂ q₂) (Path.refl _))
       (MD.leibnizPath r p₁ q₁ p₂ q₂) :=
@@ -382,12 +382,12 @@ def leibnizLoop (r p₁ q₁ p₂ q₂ : Nat) :
   Path.trans (MD.leibnizPath r p₁ q₁ p₂ q₂)
     (Path.symm (MD.leibnizPath r p₁ q₁ p₂ q₂))
 
-@[simp] theorem leibnizLoop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def leibnizLoop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq (MD.leibnizLoop r p₁ q₁ p₂ q₂) (Path.refl _) := by
   unfold leibnizLoop
   exact rweq_cmpA_inv_right (MD.leibnizPath r p₁ q₁ p₂ q₂)
 
-@[simp] theorem leibniz_inv_left (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def leibniz_inv_left (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (Path.symm (MD.leibnizPath r p₁ q₁ p₂ q₂))
         (MD.leibnizPath r p₁ q₁ p₂ q₂))
@@ -408,14 +408,14 @@ def shiftedLeibnizPath (r p₁ q₁ p₂ q₂ : Nat) :
           (M.toPages.base p₂ q₂))) :=
   Path.congrArg (M.toPages.shift r p₁ q₁) (MD.leibnizPath r p₁ q₁ p₂ q₂)
 
-@[simp] theorem shiftedLeibniz_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def shiftedLeibniz_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (MD.shiftedLeibnizPath r p₁ q₁ p₂ q₂)
         (Path.refl _))
       (MD.shiftedLeibnizPath r p₁ q₁ p₂ q₂) :=
   rweq_cmpA_refl_right (MD.shiftedLeibnizPath r p₁ q₁ p₂ q₂)
 
-@[simp] theorem shiftedLeibniz_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def shiftedLeibniz_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (MD.shiftedLeibnizPath r p₁ q₁ p₂ q₂)
         (Path.symm (MD.shiftedLeibnizPath r p₁ q₁ p₂ q₂)))
@@ -473,42 +473,42 @@ variable {E : Pages.{u}} {D : Differentials E} {C : Convergence E D}
   (H : EdgeHomPaths E D C)
 
 /-- Left edge to spectral base path. -/
-@[simp] theorem leftEdgeBase_normalizes (n : Nat) :
+noncomputable def leftEdgeBase_normalizes (n : Nat) :
     RwEq
       (Path.trans (H.leftEdgeBasePath n) (Path.refl (E.base n 0)))
       (H.leftEdgeBasePath n) :=
   rweq_cmpA_refl_right (H.leftEdgeBasePath n)
 
 /-- Right edge from spectral base path. -/
-@[simp] theorem rightEdgeBase_normalizes (n : Nat) :
+noncomputable def rightEdgeBase_normalizes (n : Nat) :
     RwEq
       (Path.trans (H.rightEdgeBasePath n) (Path.refl (H.targetBase n)))
       (H.rightEdgeBasePath n) :=
   rweq_cmpA_refl_right (H.rightEdgeBasePath n)
 
 /-- Left edge loop contracts. -/
-@[simp] theorem leftEdgeBase_loop_contracts (n : Nat) :
+noncomputable def leftEdgeBase_loop_contracts (n : Nat) :
     RwEq
       (Path.trans (H.leftEdgeBasePath n) (Path.symm (H.leftEdgeBasePath n)))
       (Path.refl (H.leftEdge n (H.sourceBase n))) :=
   rweq_cmpA_inv_right (H.leftEdgeBasePath n)
 
 /-- Right edge loop contracts. -/
-@[simp] theorem rightEdgeBase_loop_contracts (n : Nat) :
+noncomputable def rightEdgeBase_loop_contracts (n : Nat) :
     RwEq
       (Path.trans (H.rightEdgeBasePath n) (Path.symm (H.rightEdgeBasePath n)))
       (Path.refl (H.rightEdge n (E.base 0 n))) :=
   rweq_cmpA_inv_right (H.rightEdgeBasePath n)
 
 /-- Left edge inverse cancellation. -/
-@[simp] theorem leftEdgeBase_inv_left (n : Nat) :
+noncomputable def leftEdgeBase_inv_left (n : Nat) :
     RwEq
       (Path.trans (Path.symm (H.leftEdgeBasePath n)) (H.leftEdgeBasePath n))
       (Path.refl (E.base n 0)) :=
   rweq_cmpA_inv_left (H.leftEdgeBasePath n)
 
 /-- Right edge inverse cancellation. -/
-@[simp] theorem rightEdgeBase_inv_left (n : Nat) :
+noncomputable def rightEdgeBase_inv_left (n : Nat) :
     RwEq
       (Path.trans (Path.symm (H.rightEdgeBasePath n)) (H.rightEdgeBasePath n))
       (Path.refl (H.targetBase n)) :=
@@ -521,13 +521,13 @@ def leftEdgeShiftToBasePath (r n : Nat) :
       (E.base n 0) :=
   Path.trans (H.leftEdgeShiftPath r n) (H.leftEdgeBasePath n)
 
-@[simp] theorem leftEdgeShiftToBase_normalizes (r n : Nat) :
+noncomputable def leftEdgeShiftToBase_normalizes (r n : Nat) :
     RwEq
       (Path.trans (H.leftEdgeShiftToBasePath r n) (Path.refl (E.base n 0)))
       (H.leftEdgeShiftToBasePath r n) :=
   rweq_cmpA_refl_right (H.leftEdgeShiftToBasePath r n)
 
-@[simp] theorem leftEdgeShiftToBase_loop_contracts (r n : Nat) :
+noncomputable def leftEdgeShiftToBase_loop_contracts (r n : Nat) :
     RwEq
       (Path.trans (H.leftEdgeShiftToBasePath r n)
         (Path.symm (H.leftEdgeShiftToBasePath r n)))
@@ -535,13 +535,13 @@ def leftEdgeShiftToBasePath (r n : Nat) :
   rweq_cmpA_inv_right (H.leftEdgeShiftToBasePath r n)
 
 /-- Shifted right edge path. -/
-@[simp] theorem rightEdgeShift_normalizes (r n : Nat) :
+noncomputable def rightEdgeShift_normalizes (r n : Nat) :
     RwEq
       (Path.trans (H.rightEdgeShiftPath r n) (Path.refl (H.targetBase n)))
       (H.rightEdgeShiftPath r n) :=
   rweq_cmpA_refl_right (H.rightEdgeShiftPath r n)
 
-@[simp] theorem rightEdgeShift_loop_contracts (r n : Nat) :
+noncomputable def rightEdgeShift_loop_contracts (r n : Nat) :
     RwEq
       (Path.trans (H.rightEdgeShiftPath r n) (Path.symm (H.rightEdgeShiftPath r n)))
       (Path.refl _) :=
@@ -589,34 +589,34 @@ namespace CrossProductPaths
 
 variable {E : Pages.{u}} (X : CrossProductPaths E)
 
-@[simp] theorem crossBase_normalizes (p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def crossBase_normalizes (p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (X.crossBasePath p₁ q₁ p₂ q₂)
         (Path.refl (E.base p₁ q₁)))
       (X.crossBasePath p₁ q₁ p₂ q₂) :=
   rweq_cmpA_refl_right (X.crossBasePath p₁ q₁ p₂ q₂)
 
-@[simp] theorem crossBase_loop_contracts (p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def crossBase_loop_contracts (p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (X.crossBasePath p₁ q₁ p₂ q₂)
         (Path.symm (X.crossBasePath p₁ q₁ p₂ q₂)))
       (Path.refl _) :=
   rweq_cmpA_inv_right (X.crossBasePath p₁ q₁ p₂ q₂)
 
-@[simp] theorem crossBase_inv_left (p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def crossBase_inv_left (p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (Path.symm (X.crossBasePath p₁ q₁ p₂ q₂))
         (X.crossBasePath p₁ q₁ p₂ q₂))
       (Path.refl _) :=
   rweq_cmpA_inv_left (X.crossBasePath p₁ q₁ p₂ q₂)
 
-@[simp] theorem crossShift_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def crossShift_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (X.crossShiftPath r p₁ q₁ p₂ q₂) (Path.refl _))
       (X.crossShiftPath r p₁ q₁ p₂ q₂) :=
   rweq_cmpA_refl_right (X.crossShiftPath r p₁ q₁ p₂ q₂)
 
-@[simp] theorem crossShift_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def crossShift_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (X.crossShiftPath r p₁ q₁ p₂ q₂)
         (Path.symm (X.crossShiftPath r p₁ q₁ p₂ q₂)))
@@ -631,14 +631,14 @@ def shiftedCrossBasePath (r p₁ q₁ p₂ q₂ : Nat) :
       (E.shift r p₁ q₁ (E.base p₁ q₁)) :=
   Path.congrArg (E.shift r p₁ q₁) (X.crossBasePath p₁ q₁ p₂ q₂)
 
-@[simp] theorem shiftedCrossBase_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def shiftedCrossBase_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (X.shiftedCrossBasePath r p₁ q₁ p₂ q₂)
         (Path.refl _))
       (X.shiftedCrossBasePath r p₁ q₁ p₂ q₂) :=
   rweq_cmpA_refl_right (X.shiftedCrossBasePath r p₁ q₁ p₂ q₂)
 
-@[simp] theorem shiftedCrossBase_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def shiftedCrossBase_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
     RwEq
       (Path.trans (X.shiftedCrossBasePath r p₁ q₁ p₂ q₂)
         (Path.symm (X.shiftedCrossBasePath r p₁ q₁ p₂ q₂)))
@@ -685,13 +685,13 @@ def selfProductPath :
     Path MS.selfProduct MS.baseElement :=
   MS.mulPages.prodRightUnitPath 0 0 0 0
 
-@[simp] theorem selfProduct_normalizes :
+noncomputable def selfProduct_normalizes :
     RwEq
       (Path.trans MS.selfProductPath (Path.refl MS.baseElement))
       MS.selfProductPath :=
   rweq_cmpA_refl_right MS.selfProductPath
 
-@[simp] theorem selfProduct_loop_contracts :
+noncomputable def selfProduct_loop_contracts :
     RwEq
       (Path.trans MS.selfProductPath (Path.symm MS.selfProductPath))
       (Path.refl MS.selfProduct) :=

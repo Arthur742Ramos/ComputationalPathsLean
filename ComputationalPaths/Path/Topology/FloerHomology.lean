@@ -239,7 +239,7 @@ structure PSSIsomorphism (M : FloerData.{u}) where
   pss_path : Path True True
 
 /-- PSS composition is rewrite-equivalent to identity. -/
-theorem pss_comp_rweq_id (M : FloerData.{u}) (P : PSSIsomorphism M) :
+noncomputable def pss_comp_rweq_id (M : FloerData.{u}) (P : PSSIsomorphism M) :
     RwEq (Path.trans (Path.refl True) P.pss_path) P.pss_path := by
   exact rweq_cmpA_refl_left (p := P.pss_path)
 
@@ -342,7 +342,7 @@ structure ContinuationComposition (M : FloerData.{u})
 /-! ## Rewrite Equivalences -/
 
 /-- Floer step composition is associative up to RwEq. -/
-theorem floerStep_comp_assoc {M : FloerData.{u}}
+noncomputable def floerStep_comp_assoc {M : FloerData.{u}}
     {γ₁ γ₂ γ₃ γ₄ : PeriodicOrbit M}
     (s₁ : FloerStep M γ₁ γ₂) (s₂ : FloerStep M γ₂ γ₃)
     (s₃ : FloerStep M γ₃ γ₄) :

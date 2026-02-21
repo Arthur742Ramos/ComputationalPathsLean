@@ -52,7 +52,7 @@ def localize {A : Type u} {a b : A} (p : Path a b) : PathRwQuot A a b :=
   Quot.mk _ p
 
 /-- Localization identifies rewrite-equivalent paths. -/
-theorem localize_respects_rweq {A : Type u} {a b : A}
+noncomputable def localize_respects_rweq {A : Type u} {a b : A}
     {p q : Path a b} (h : RwEq p q) :
     localize (A := A) p = localize (A := A) q :=
   Quot.sound h

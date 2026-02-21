@@ -98,11 +98,11 @@ def normalizeStep {X Y : HeckeObject} (r : SphericalHeckeRewrite X Y) :
     Path.Step (Path.trans r.toPath (Path.refl Y)) r.toPath :=
   Path.Step.trans_refl_right r.toPath
 
-@[simp] theorem normalize_rweq {X Y : HeckeObject} (r : SphericalHeckeRewrite X Y) :
+noncomputable def normalize_rweq {X Y : HeckeObject} (r : SphericalHeckeRewrite X Y) :
     RwEq (Path.trans r.toPath (Path.refl Y)) r.toPath :=
   rweq_of_step (normalizeStep r)
 
-@[simp] theorem cancel_rweq {X Y : HeckeObject} (r : SphericalHeckeRewrite X Y) :
+noncomputable def cancel_rweq {X Y : HeckeObject} (r : SphericalHeckeRewrite X Y) :
     RwEq (Path.trans (Path.symm r.toPath) r.toPath) (Path.refl Y) :=
   rweq_cmpA_inv_left r.toPath
 
@@ -131,7 +131,7 @@ def natSphericalHeckeCategory : SphericalHeckeCategoryPathData where
   rightUnitPath := rightUnitPath
   fusionNormalizePath := fusionNormalizePath
 
-@[simp] theorem fusionNormalize_rweq (X Y : HeckeObject) :
+noncomputable def fusionNormalize_rweq (X Y : HeckeObject) :
     RwEq
       (Path.trans (natSphericalHeckeCategory.fusionNormalizePath X Y) (Path.refl (convolution X Y)))
       (natSphericalHeckeCategory.fusionNormalizePath X Y) :=

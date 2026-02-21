@@ -56,7 +56,7 @@ def differentialSquare_step (x : Gen) :
       (F.differentialSquarePath x) :=
   Path.Step.trans_refl_right (F.differentialSquarePath x)
 
-@[simp] theorem differentialSquare_rweq (x : Gen) :
+noncomputable def differentialSquare_rweq (x : Gen) :
     RwEq
       (Path.trans (F.differentialSquarePath x) (Path.refl F.zero))
       (F.differentialSquarePath x) :=
@@ -69,7 +69,7 @@ def continuationChain_step (x : Gen) :
       (F.continuationChainPath x) :=
   Path.Step.trans_refl_right (F.continuationChainPath x)
 
-@[simp] theorem continuationChain_rweq (x : Gen) :
+noncomputable def continuationChain_rweq (x : Gen) :
     RwEq
       (Path.trans (F.continuationChainPath x) (Path.refl (F.differential (F.continuation x))))
       (F.continuationChainPath x) :=
@@ -82,7 +82,7 @@ def actionFiltration_step (x : Gen) :
       (F.actionFiltrationPath x) :=
   Path.Step.trans_refl_left (F.actionFiltrationPath x)
 
-@[simp] theorem actionFiltration_rweq (x : Gen) :
+noncomputable def actionFiltration_rweq (x : Gen) :
     RwEq
       (Path.trans (Path.refl (F.actionLevel (F.continuation x))) (F.actionFiltrationPath x))
       (F.actionFiltrationPath x) :=
@@ -95,13 +95,13 @@ def continuationOfSquare_step (x : Gen) :
       (F.continuationOfSquarePath x) :=
   Path.Step.trans_refl_right (F.continuationOfSquarePath x)
 
-@[simp] theorem continuationOfSquare_rweq (x : Gen) :
+noncomputable def continuationOfSquare_rweq (x : Gen) :
     RwEq
       (Path.trans (F.continuationOfSquarePath x) (Path.refl (F.continuation F.zero)))
       (F.continuationOfSquarePath x) :=
   rweq_of_step (F.continuationOfSquare_step x)
 
-@[simp] theorem continuationChain_cancel_rweq (x : Gen) :
+noncomputable def continuationChain_cancel_rweq (x : Gen) :
     RwEq
       (Path.trans (Path.symm (F.continuationChainPath x)) (F.continuationChainPath x))
       (Path.refl (F.differential (F.continuation x))) :=

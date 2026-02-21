@@ -47,7 +47,7 @@ inductive LInfinityStep : {A : Type u} → {a b : A} → Path a b → Path a b �
       LInfinityStep (Path.trans p (Path.refl b)) p
 
 /-- L-infinity rewrite steps induce rewrite equivalence. -/
-theorem LInfinityStep.to_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def LInfinityStep.to_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : LInfinityStep p q) : RwEq p q := by
   cases h
   exact rweq_of_step (Path.Step.trans_refl_right _)
@@ -61,15 +61,15 @@ def equationStep (mc : MaurerCartanElement L) :
     Path.Step (Path.trans mc.equation (Path.refl L.zero)) mc.equation :=
   Path.Step.trans_refl_right mc.equation
 
-@[simp] theorem equationRweq (mc : MaurerCartanElement L) :
+noncomputable def equationRweq (mc : MaurerCartanElement L) :
     RwEq (Path.trans mc.equation (Path.refl L.zero)) mc.equation :=
   rweq_of_step (equationStep mc)
 
-@[simp] theorem equationCancelLeft (mc : MaurerCartanElement L) :
+noncomputable def equationCancelLeft (mc : MaurerCartanElement L) :
     RwEq (Path.trans (Path.symm mc.equation) mc.equation) (Path.refl L.zero) :=
   rweq_cmpA_inv_left mc.equation
 
-@[simp] theorem equationCancelRight (mc : MaurerCartanElement L) :
+noncomputable def equationCancelRight (mc : MaurerCartanElement L) :
     RwEq
       (Path.trans mc.equation (Path.symm mc.equation))
       (Path.refl (curvature L mc.element)) :=
@@ -115,7 +115,7 @@ def mapMaurerCartanStep {A : Type u} {B : Type v}
       (mapMaurerCartan φ α).equation :=
   Path.Step.trans_refl_right (mapMaurerCartan φ α).equation
 
-@[simp] theorem mapMaurerCartanRweq {A : Type u} {B : Type v}
+noncomputable def mapMaurerCartanRweq {A : Type u} {B : Type v}
     {L : LInfinityPathData A} {M : LInfinityPathData B}
     (φ : LInfinityMorphismPathData L M)
     (α : MaurerCartanElement L) :
@@ -124,7 +124,7 @@ def mapMaurerCartanStep {A : Type u} {B : Type v}
       (mapMaurerCartan φ α).equation :=
   rweq_of_step (mapMaurerCartanStep φ α)
 
-@[simp] theorem mapMaurerCartanCancelLeft {A : Type u} {B : Type v}
+noncomputable def mapMaurerCartanCancelLeft {A : Type u} {B : Type v}
     {L : LInfinityPathData A} {M : LInfinityPathData B}
     (φ : LInfinityMorphismPathData L M)
     (α : MaurerCartanElement L) :

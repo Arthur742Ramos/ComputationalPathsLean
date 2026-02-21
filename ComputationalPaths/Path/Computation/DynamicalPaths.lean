@@ -70,24 +70,24 @@ theorem fixedPoint_trans_refl {S : Type u} (d : FixedPointData S) :
   simp
 
 /-- RwEq: fixed point trans refl. -/
-theorem fixedPoint_rweq_trans_refl {S : Type u} (d : FixedPointData S) :
+noncomputable def fixedPoint_rweq_trans_refl {S : Type u} (d : FixedPointData S) :
     RwEq (Path.trans d.fixedPath (Path.refl d.point)) d.fixedPath :=
   rweq_of_step (Step.trans_refl_right d.fixedPath)
 
 /-- RwEq: fixed point inv cancel right. -/
-theorem fixedPoint_rweq_inv_right {S : Type u} (d : FixedPointData S) :
+noncomputable def fixedPoint_rweq_inv_right {S : Type u} (d : FixedPointData S) :
     RwEq
       (Path.trans d.fixedPath (Path.symm d.fixedPath))
       (Path.refl d.image) :=
   rweq_cmpA_inv_right d.fixedPath
 
 /-- RwEq: fixed point symm_symm. -/
-theorem fixedPoint_rweq_symm_symm {S : Type u} (d : FixedPointData S) :
+noncomputable def fixedPoint_rweq_symm_symm {S : Type u} (d : FixedPointData S) :
     RwEq (Path.symm (Path.symm d.fixedPath)) d.fixedPath :=
   rweq_of_step (Step.symm_symm d.fixedPath)
 
 /-- RwEq: fixed point inv cancel left. -/
-theorem fixedPoint_rweq_inv_left {S : Type u} (d : FixedPointData S) :
+noncomputable def fixedPoint_rweq_inv_left {S : Type u} (d : FixedPointData S) :
     RwEq
       (Path.trans (Path.symm d.fixedPath) d.fixedPath)
       (Path.refl d.point) :=
@@ -108,19 +108,19 @@ theorem periodic_trans_refl {S : Type u} (d : PeriodicOrbitData S) :
   simp
 
 /-- RwEq: periodic inv cancel right. -/
-theorem periodic_rweq_inv_right {S : Type u} (d : PeriodicOrbitData S) :
+noncomputable def periodic_rweq_inv_right {S : Type u} (d : PeriodicOrbitData S) :
     RwEq
       (Path.trans d.periodicPath (Path.symm d.periodicPath))
       (Path.refl d.iterateImage) :=
   rweq_cmpA_inv_right d.periodicPath
 
 /-- RwEq: periodic symm_symm. -/
-theorem periodic_rweq_symm_symm {S : Type u} (d : PeriodicOrbitData S) :
+noncomputable def periodic_rweq_symm_symm {S : Type u} (d : PeriodicOrbitData S) :
     RwEq (Path.symm (Path.symm d.periodicPath)) d.periodicPath :=
   rweq_of_step (Step.symm_symm d.periodicPath)
 
 /-- RwEq: periodic inv cancel left. -/
-theorem periodic_rweq_inv_left {S : Type u} (d : PeriodicOrbitData S) :
+noncomputable def periodic_rweq_inv_left {S : Type u} (d : PeriodicOrbitData S) :
     RwEq
       (Path.trans (Path.symm d.periodicPath) d.periodicPath)
       (Path.refl d.basePoint) :=
@@ -140,14 +140,14 @@ theorem lyapunov_trans_refl (d : LyapunovData) :
   simp
 
 /-- RwEq: Lyapunov inv cancel right. -/
-theorem lyapunov_rweq_inv_right (d : LyapunovData) :
+noncomputable def lyapunov_rweq_inv_right (d : LyapunovData) :
     RwEq
       (Path.trans d.lyapunovPath (Path.symm d.lyapunovPath))
       (Path.refl d.vAtNext) :=
   rweq_cmpA_inv_right d.lyapunovPath
 
 /-- RwEq: Lyapunov trans refl. -/
-theorem lyapunov_rweq_trans_refl (d : LyapunovData) :
+noncomputable def lyapunov_rweq_trans_refl (d : LyapunovData) :
     RwEq
       (Path.trans d.lyapunovPath (Path.refl d.vAtState))
       d.lyapunovPath :=
@@ -167,14 +167,14 @@ theorem conjugacy_trans_refl {A B : Type u} (d : ConjugacyData A B) :
   simp
 
 /-- RwEq: conjugacy inv cancel right. -/
-theorem conjugacy_rweq_inv_right {A B : Type u} (d : ConjugacyData A B) :
+noncomputable def conjugacy_rweq_inv_right {A B : Type u} (d : ConjugacyData A B) :
     RwEq
       (Path.trans d.conjugacyPath (Path.symm d.conjugacyPath))
       (Path.refl d.hfVal) :=
   rweq_cmpA_inv_right d.conjugacyPath
 
 /-- RwEq: conjugacy symm_symm. -/
-theorem conjugacy_rweq_symm_symm {A B : Type u} (d : ConjugacyData A B) :
+noncomputable def conjugacy_rweq_symm_symm {A B : Type u} (d : ConjugacyData A B) :
     RwEq (Path.symm (Path.symm d.conjugacyPath)) d.conjugacyPath :=
   rweq_of_step (Step.symm_symm d.conjugacyPath)
 
@@ -194,7 +194,7 @@ theorem semiconj_orbit_compose {A B : Type u}
   simp [orbitCompose]
 
 /-- RwEq: semiconjugacy refl trans. -/
-theorem semiconj_rweq_refl_trans {A B : Type u} (d : SemiconjugacyData A B) :
+noncomputable def semiconj_rweq_refl_trans {A B : Type u} (d : SemiconjugacyData A B) :
     RwEq
       (Path.trans (Path.refl d.hfVal) d.semiconjPath)
       d.semiconjPath :=
@@ -214,14 +214,14 @@ theorem attractor_trans_refl {S : Type u} (d : AttractorData S) :
   simp
 
 /-- RwEq: attractor inv cancel right. -/
-theorem attractor_rweq_inv_right {S : Type u} (d : AttractorData S) :
+noncomputable def attractor_rweq_inv_right {S : Type u} (d : AttractorData S) :
     RwEq
       (Path.trans d.convergePath (Path.symm d.convergePath))
       (Path.refl d.orbitVal) :=
   rweq_cmpA_inv_right d.convergePath
 
 /-- RwEq: attractor refl trans. -/
-theorem attractor_rweq_refl_trans {S : Type u} (d : AttractorData S) :
+noncomputable def attractor_rweq_refl_trans {S : Type u} (d : AttractorData S) :
     RwEq
       (Path.trans (Path.refl d.orbitVal) d.convergePath)
       d.convergePath :=
@@ -240,14 +240,14 @@ def repellerReturn {S : Type u} (d : RepellerData S) : Path d.orbitVal d.repelle
   Path.symm d.divergePath
 
 /-- Repeller diverge-return cancels. -/
-theorem repeller_rweq_diverge_return {S : Type u} (d : RepellerData S) :
+noncomputable def repeller_rweq_diverge_return {S : Type u} (d : RepellerData S) :
     RwEq
       (Path.trans d.divergePath (repellerReturn d))
       (Path.refl d.repellerVal) :=
   rweq_cmpA_inv_right d.divergePath
 
 /-- RwEq: repeller symm_symm. -/
-theorem repeller_rweq_symm_symm {S : Type u} (d : RepellerData S) :
+noncomputable def repeller_rweq_symm_symm {S : Type u} (d : RepellerData S) :
     RwEq (Path.symm (Path.symm d.divergePath)) d.divergePath :=
   rweq_of_step (Step.symm_symm d.divergePath)
 
@@ -260,14 +260,14 @@ structure OmegaLimitData (S : Type u) where
   approachPath : Path orbitVal limitVal
 
 /-- Omega-limit approach composed with return gives identity. -/
-theorem omegaLimit_rweq_approach_return {S : Type u} (d : OmegaLimitData S) :
+noncomputable def omegaLimit_rweq_approach_return {S : Type u} (d : OmegaLimitData S) :
     RwEq
       (Path.trans d.approachPath (Path.symm d.approachPath))
       (Path.refl d.orbitVal) :=
   rweq_cmpA_inv_right d.approachPath
 
 /-- RwEq: omega-limit refl trans. -/
-theorem omegaLimit_rweq_refl_trans {S : Type u} (d : OmegaLimitData S) :
+noncomputable def omegaLimit_rweq_refl_trans {S : Type u} (d : OmegaLimitData S) :
     RwEq
       (Path.trans (Path.refl d.orbitVal) d.approachPath)
       d.approachPath :=
@@ -287,7 +287,7 @@ def bifurcationCascade (d1 : BifurcationData) (d2 : BifurcationData)
   Path.trans d1.bifurcPath (Path.trans (Path.mk [Step.mk _ _ h] h) d2.bifurcPath)
 
 /-- Bifurcation symm_symm. -/
-theorem bifurcation_rweq_symm_symm (d : BifurcationData) :
+noncomputable def bifurcation_rweq_symm_symm (d : BifurcationData) :
     RwEq (Path.symm (Path.symm d.bifurcPath)) d.bifurcPath :=
   rweq_of_step (Step.symm_symm d.bifurcPath)
 
@@ -310,7 +310,7 @@ theorem invariant_trans_refl {S : Type u} (d : InvariantSetData S) :
   simp
 
 /-- RwEq: invariant set inv cancel left. -/
-theorem invariant_rweq_inv_left {S : Type u} (d : InvariantSetData S) :
+noncomputable def invariant_rweq_inv_left {S : Type u} (d : InvariantSetData S) :
     RwEq
       (Path.trans (Path.symm d.invariantPath) d.invariantPath)
       (Path.refl d.memberVal) :=
@@ -352,31 +352,31 @@ theorem ergodic_trans_refl (d : ErgodicData) :
   simp
 
 /-- RwEq: ergodic inv cancel. -/
-theorem ergodic_rweq_inv_right (d : ErgodicData) :
+noncomputable def ergodic_rweq_inv_right (d : ErgodicData) :
     RwEq
       (Path.trans d.ergodicPath (Path.symm d.ergodicPath))
       (Path.refl d.timeAvg) :=
   rweq_cmpA_inv_right d.ergodicPath
 
 /-- RwEq: ergodic symm_symm. -/
-theorem ergodic_rweq_symm_symm (d : ErgodicData) :
+noncomputable def ergodic_rweq_symm_symm (d : ErgodicData) :
     RwEq (Path.symm (Path.symm d.ergodicPath)) d.ergodicPath :=
   rweq_of_step (Step.symm_symm d.ergodicPath)
 
 /-! ## Orbit Equivalence -/
 
 /-- Two orbit paths that agree propositionally are RwEq. -/
-theorem orbit_rweq_of_eq {S : Type u} {a b : S}
+noncomputable def orbit_rweq_of_eq {S : Type u} {a b : S}
     (p q : Path a b) (h : p = q) : RwEq p q := by
   subst h; exact rweq_refl p
 
 /-- Orbit symm trans cancel. -/
-theorem orbit_rweq_symm_trans {S : Type u} {a b : S} (p : Path a b) :
+noncomputable def orbit_rweq_symm_trans {S : Type u} {a b : S} (p : Path a b) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl b) :=
   rweq_cmpA_inv_left p
 
 /-- Orbit trans symm cancel. -/
-theorem orbit_rweq_trans_symm {S : Type u} {a b : S} (p : Path a b) :
+noncomputable def orbit_rweq_trans_symm {S : Type u} {a b : S} (p : Path a b) :
     RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
   rweq_cmpA_inv_right p
 
@@ -396,7 +396,7 @@ theorem iteratedOrbit_one {S : Type u} {a : S} (p : Path a a) :
     iteratedOrbit p 1 = Path.trans (Path.refl a) p := rfl
 
 /-- RwEq: iterated orbit 1 simplifies. -/
-theorem iteratedOrbit_one_rweq {S : Type u} {a : S} (p : Path a a) :
+noncomputable def iteratedOrbit_one_rweq {S : Type u} {a : S} (p : Path a a) :
     RwEq (iteratedOrbit p 1) p :=
   rweq_of_step (Step.trans_refl_left p)
 

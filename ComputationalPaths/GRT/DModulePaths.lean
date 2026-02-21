@@ -48,7 +48,7 @@ namespace DModulePathData
 
 variable {Obj : Type u} (D : DModulePathData Obj)
 
-@[simp] theorem riemannHilbert_rweq (M : Obj) :
+noncomputable def riemannHilbert_rweq (M : Obj) :
     RwEq
       (Path.trans (D.riemannHilbertPath M) (Path.refl M))
       (D.riemannHilbertPath M) :=
@@ -60,13 +60,13 @@ variable {Obj : Type u} (D : DModulePathData Obj)
       (D.riemannHilbertPath M) :=
   Path.Step.trans_refl_left (D.riemannHilbertPath M)
 
-@[simp] theorem riemannHilbert_left_unit_rweq (M : Obj) :
+noncomputable def riemannHilbert_left_unit_rweq (M : Obj) :
     RwEq
       (Path.trans (Path.refl (D.solution (D.deRham M))) (D.riemannHilbertPath M))
       (D.riemannHilbertPath M) :=
   rweq_of_step (D.riemannHilbert_left_unit_step M)
 
-@[simp] theorem convolution_assoc_rweq (M N K : Obj) :
+noncomputable def convolution_assoc_rweq (M N K : Obj) :
     RwEq
       (Path.trans
         (D.convolutionAssocPath M N K)
@@ -82,7 +82,7 @@ variable {Obj : Type u} (D : DModulePathData Obj)
       (D.convolutionAssocPath M N K) :=
   Path.Step.trans_refl_left (D.convolutionAssocPath M N K)
 
-@[simp] theorem convolution_assoc_left_unit_rweq (M N K : Obj) :
+noncomputable def convolution_assoc_left_unit_rweq (M N K : Obj) :
     RwEq
       (Path.trans
         (Path.refl (D.tensor (D.tensor M N) K))
@@ -96,7 +96,7 @@ variable {Obj : Type u} (D : DModulePathData Obj)
       (Path.refl (D.solution (D.deRham M))) :=
   Path.Step.trans_symm (D.riemannHilbertPath M)
 
-@[simp] theorem riemannHilbert_cancel_rweq (M : Obj) :
+noncomputable def riemannHilbert_cancel_rweq (M : Obj) :
     RwEq
       (Path.trans (D.riemannHilbertPath M) (Path.symm (D.riemannHilbertPath M)))
       (Path.refl (D.solution (D.deRham M))) :=

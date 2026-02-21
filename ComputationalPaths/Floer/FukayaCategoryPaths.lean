@@ -63,7 +63,7 @@ def assoc_step (f g h : Mor) :
       (F.assocPath f g h) :=
   Path.Step.trans_refl_right (F.assocPath f g h)
 
-@[simp] theorem assoc_rweq (f g h : Mor) :
+noncomputable def assoc_rweq (f g h : Mor) :
     RwEq
       (Path.trans (F.assocPath f g h) (Path.refl (F.mu2 f (F.mu2 g h))))
       (F.assocPath f g h) :=
@@ -76,7 +76,7 @@ def unitLeft_step (f : Mor) :
       (F.unitLeftPath f) :=
   Path.Step.trans_refl_right (F.unitLeftPath f)
 
-@[simp] theorem unitLeft_rweq (f : Mor) :
+noncomputable def unitLeft_rweq (f : Mor) :
     RwEq
       (Path.trans (F.unitLeftPath f) (Path.refl f))
       (F.unitLeftPath f) :=
@@ -89,7 +89,7 @@ def unitRight_step (f : Mor) :
       (F.unitRightPath f) :=
   Path.Step.trans_refl_right (F.unitRightPath f)
 
-@[simp] theorem unitRight_rweq (f : Mor) :
+noncomputable def unitRight_rweq (f : Mor) :
     RwEq
       (Path.trans (F.unitRightPath f) (Path.refl f))
       (F.unitRightPath f) :=
@@ -102,7 +102,7 @@ def differentialSquare_step (f : Mor) :
       (F.differentialSquarePath f) :=
   Path.Step.trans_refl_right (F.differentialSquarePath f)
 
-@[simp] theorem differentialSquare_rweq (f : Mor) :
+noncomputable def differentialSquare_rweq (f : Mor) :
     RwEq
       (Path.trans (F.differentialSquarePath f) (Path.refl F.zeroMor))
       (F.differentialSquarePath f) :=
@@ -115,7 +115,7 @@ def leibniz_step (f g : Mor) :
       (F.leibnizPath f g) :=
   Path.Step.trans_refl_right (F.leibnizPath f g)
 
-@[simp] theorem leibniz_rweq (f g : Mor) :
+noncomputable def leibniz_rweq (f g : Mor) :
     RwEq
       (Path.trans (F.leibnizPath f g) (Path.refl (F.mu2 (F.mu1 f) g)))
       (F.leibnizPath f g) :=
@@ -128,19 +128,19 @@ def leftToRightUnit_step (f : Mor) :
       (F.leftToRightUnitPath f) :=
   Path.Step.trans_refl_right (F.leftToRightUnitPath f)
 
-@[simp] theorem leftToRightUnit_rweq (f : Mor) :
+noncomputable def leftToRightUnit_rweq (f : Mor) :
     RwEq
       (Path.trans (F.leftToRightUnitPath f) (Path.refl (F.mu2 f (F.idMor (F.target f)))))
       (F.leftToRightUnitPath f) :=
   rweq_of_step (F.leftToRightUnit_step f)
 
-@[simp] theorem assoc_cancel_rweq (f g h : Mor) :
+noncomputable def assoc_cancel_rweq (f g h : Mor) :
     RwEq
       (Path.trans (Path.symm (F.assocPath f g h)) (F.assocPath f g h))
       (Path.refl (F.mu2 f (F.mu2 g h))) :=
   rweq_cmpA_inv_left (F.assocPath f g h)
 
-@[simp] theorem leftToRightUnit_cancel_rweq (f : Mor) :
+noncomputable def leftToRightUnit_cancel_rweq (f : Mor) :
     RwEq
       (Path.trans (Path.symm (F.leftToRightUnitPath f)) (F.leftToRightUnitPath f))
       (Path.refl (F.mu2 f (F.idMor (F.target f)))) :=
@@ -179,7 +179,7 @@ def mu1ToDifferential_step (f : Mor) :
       (B.mu1ToDifferentialPath f) :=
   Path.Step.trans_refl_right (B.mu1ToDifferentialPath f)
 
-@[simp] theorem mu1ToDifferential_rweq (f : Mor) :
+noncomputable def mu1ToDifferential_rweq (f : Mor) :
     RwEq
       (Path.trans
         (B.mu1ToDifferentialPath f)
@@ -194,13 +194,13 @@ def idToCycle_step (X : Obj) :
       (B.idToCyclePath X) :=
   Path.Step.trans_refl_right (B.idToCyclePath X)
 
-@[simp] theorem idToCycle_rweq (X : Obj) :
+noncomputable def idToCycle_rweq (X : Obj) :
     RwEq
       (Path.trans (B.idToCyclePath X) (Path.refl H.zero))
       (B.idToCyclePath X) :=
   rweq_of_step (B.idToCycle_step X)
 
-@[simp] theorem idToCycle_cancel_rweq (X : Obj) :
+noncomputable def idToCycle_cancel_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.symm (B.idToCyclePath X)) (B.idToCyclePath X))
       (Path.refl H.zero) :=

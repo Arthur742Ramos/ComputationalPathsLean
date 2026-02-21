@@ -241,7 +241,7 @@ class HasGlueNaturalRwEq : Prop where
               (Path.trans (inrPath (Path.congrArg g p))
                 (Path.symm (glue c₂))))
 
-theorem glue_natural_rweq_axiom [h : HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
+noncomputable def glue_natural_rweq_axiom [h : HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
     {c₁ c₂ : C} (p : Path c₁ c₂) :
     RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
          (Path.trans (glue c₁)
@@ -254,7 +254,7 @@ States that inlPath(f*(p)) is RwEq to glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹.
 
 Since equality proofs are proof-irrelevant, it is enough to show both sides
 have the same underlying propositional equality. -/
-theorem glue_natural_rweq [HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
+noncomputable def glue_natural_rweq [HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
     {c₁ c₂ : C} (p : Path c₁ c₂) :
     RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
          (Path.trans (glue c₁)

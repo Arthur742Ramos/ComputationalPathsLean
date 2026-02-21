@@ -254,7 +254,7 @@ def inertia_compose {C : SmallCat.{u}} {act : GroupAction C}
 /-! ## RwEq Examples -/
 
 /-- RwEq: the identity action path is related to refl under symmetric closure. -/
-theorem rwEq_action_id {C : SmallCat.{u}} (act : GroupAction C) :
+noncomputable def rwEq_action_id {C : SmallCat.{u}} (act : GroupAction C) :
     RwEq (act.act_id) (act.act_id) :=
   RwEq.refl _
 
@@ -264,7 +264,7 @@ theorem symm_symm_stack {A : Type u} {a b : A} (p : Path a b) :
   simp
 
 /-- RwEq: trans with symm is reflexive. -/
-theorem rwEq_trans_symm_stack {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def rwEq_trans_symm_stack {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.symm p)) (Path.trans p (Path.symm p)) :=
   RwEq.refl _
 

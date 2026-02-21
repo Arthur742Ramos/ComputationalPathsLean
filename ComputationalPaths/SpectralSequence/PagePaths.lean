@@ -40,20 +40,20 @@ namespace SpectralPagePaths
 
 variable (E : SpectralPagePaths)
 
-@[simp] theorem twoStep_rweq (r p q : Nat) (x : E.term p q) :
+noncomputable def twoStep_rweq (r p q : Nat) (x : E.term p q) :
     RwEq
       (Path.trans (E.twoStepPath r p q x)
         (Path.refl (E.next r p q (E.next (r + 1) p q x))))
       (E.twoStepPath r p q x) :=
   rweq_of_step (E.twoStepStep r p q x)
 
-@[simp] theorem twoStep_cancel_left_rweq (r p q : Nat) (x : E.term p q) :
+noncomputable def twoStep_cancel_left_rweq (r p q : Nat) (x : E.term p q) :
     RwEq
       (Path.trans (Path.symm (E.twoStepPath r p q x)) (E.twoStepPath r p q x))
       (Path.refl (E.next r p q (E.next (r + 1) p q x))) :=
   rweq_cmpA_inv_left (E.twoStepPath r p q x)
 
-@[simp] theorem twoStep_cancel_right_rweq (r p q : Nat) (x : E.term p q) :
+noncomputable def twoStep_cancel_right_rweq (r p q : Nat) (x : E.term p q) :
     RwEq
       (Path.trans (E.twoStepPath r p q x) (Path.symm (E.twoStepPath r p q x)))
       (Path.refl (E.twoStep r p q x)) :=

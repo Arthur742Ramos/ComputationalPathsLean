@@ -121,7 +121,7 @@ theorem connectingMap_characterization {P : B → Type u} (b : B) (x₀ : P b)
     exact ⟨l, hl⟩
 
 /-- For simply connected base, the connecting map is trivial. -/
-theorem connectingMap_trivial_of_simply_connected {P : B → Type u} (b : B) (x₀ : P b)
+noncomputable def connectingMap_trivial_of_simply_connected {P : B → Type u} (b : B) (x₀ : P b)
     (hsc : ∀ l : LoopSpace B b, RwEq l (Path.refl b)) :
     ∀ l : LoopSpace B b, connectingMap₁ b x₀ l = x₀ := by
   intro l

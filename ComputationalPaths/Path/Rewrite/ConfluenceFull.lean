@@ -68,7 +68,7 @@ theorem rw_sound {p q : Path a b} (h : Rw p q) : p.toEq = q.toEq :=
   rw_toEq h
 
 /-- RwEq is sound. -/
-theorem rweq_sound' {p q : Path a b} (h : RwEq p q) : p.toEq = q.toEq :=
+noncomputable def rweq_sound' {p q : Path a b} (h : RwEq p q) : p.toEq = q.toEq :=
   rweq_toEq h
 
 /-- Soundness implies equal transport. -/
@@ -141,7 +141,7 @@ theorem rw_of_step' {p q : Path a b} (h : Step p q) : Rw p q :=
 /-! ## Coherence: RwEq Paths Share Normal Forms -/
 
 /-- RwEq-related paths have the same normal form. -/
-theorem rweq_normalize_eq {p q : Path a b} (_h : RwEq p q) :
+noncomputable def rweq_normalize_eq {p q : Path a b} (_h : RwEq p q) :
     Path.normalize p = Path.normalize q := by simp
 
 /-- Rw-related paths have the same normal form. -/
@@ -181,7 +181,7 @@ theorem transport_rw_eq {D : A → Sort v} {p q : Path a b}
     cases pr₁; cases pr₂; rfl
 
 /-- Transport along RwEq-related paths gives the same result. -/
-theorem transport_rweq_eq {D : A → Sort v} {p q : Path a b}
+noncomputable def transport_rweq_eq {D : A → Sort v} {p q : Path a b}
     (_h : RwEq p q) (x : D a) :
     Path.transport (D := D) p x = Path.transport (D := D) q x := by
   cases p with | mk s₁ pr₁ => cases q with | mk s₂ pr₂ =>
@@ -195,7 +195,7 @@ theorem subst_rw_eq {D : A → Sort v} {p q : Path a b}
     cases pr₁; cases pr₂; rfl
 
 /-- Substitution along RwEq-related paths. -/
-theorem subst_rweq_eq {D : A → Sort v} {p q : Path a b}
+noncomputable def subst_rweq_eq {D : A → Sort v} {p q : Path a b}
     (_h : RwEq p q) (x : D a) :
     Path.subst (D := D) x p = Path.subst (D := D) x q := by
   cases p with | mk s₁ pr₁ => cases q with | mk s₂ pr₂ =>
@@ -213,7 +213,7 @@ theorem rw_congrArg {B : Type u} (f : A → B) {p q : Path a b}
     exact rw_trans ih (rw_of_step (Step.context_congr ⟨f⟩ hstep))
 
 /-- CongrArg preserves RwEq. -/
-theorem rweq_congrArg {B : Type u} (f : A → B) {p q : Path a b}
+noncomputable def rweq_congrArg {B : Type u} (f : A → B) {p q : Path a b}
     (h : RwEq p q) :
     RwEq (Path.congrArg f p) (Path.congrArg f q) := by
   induction h with
@@ -225,25 +225,25 @@ theorem rweq_congrArg {B : Type u} (f : A → B) {p q : Path a b}
 /-! ## Congruence Closure -/
 
 /-- Symm preserves RwEq. -/
-theorem rweq_symm_congr' {p q : Path a b}
+noncomputable def rweq_symm_congr' {p q : Path a b}
     (h : RwEq p q) :
     RwEq (Path.symm p) (Path.symm q) :=
   rweq_symm_congr h
 
 /-- Trans preserves RwEq in the left argument. -/
-theorem rweq_trans_congr_left' {p₁ p₂ : Path a b} (q : Path b c)
+noncomputable def rweq_trans_congr_left' {p₁ p₂ : Path a b} (q : Path b c)
     (h : RwEq p₁ p₂) :
     RwEq (Path.trans p₁ q) (Path.trans p₂ q) :=
   rweq_trans_congr_left q h
 
 /-- Trans preserves RwEq in the right argument. -/
-theorem rweq_trans_congr_right' (p : Path a b) {q₁ q₂ : Path b c}
+noncomputable def rweq_trans_congr_right' (p : Path a b) {q₁ q₂ : Path b c}
     (h : RwEq q₁ q₂) :
     RwEq (Path.trans p q₁) (Path.trans p q₂) :=
   rweq_trans_congr_right p h
 
 /-- Trans preserves RwEq in both arguments simultaneously. -/
-theorem rweq_trans_congr_both {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+noncomputable def rweq_trans_congr_both {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (hp : RwEq p₁ p₂) (hq : RwEq q₁ q₂) :
     RwEq (Path.trans p₁ q₁) (Path.trans p₂ q₂) :=
   rweq_trans (rweq_trans_congr_left q₁ hp) (rweq_trans_congr_right p₂ hq)

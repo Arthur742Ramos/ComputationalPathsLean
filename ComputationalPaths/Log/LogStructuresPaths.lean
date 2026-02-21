@@ -49,7 +49,7 @@ def chartMul_step (x y : Obj) :
       (L.chartMulPath x y) :=
   Path.Step.trans_refl_right (L.chartMulPath x y)
 
-@[simp] theorem chartMul_rweq (x y : Obj) :
+noncomputable def chartMul_rweq (x y : Obj) :
     RwEq
       (Path.trans (L.chartMulPath x y)
         (Path.refl (L.monoidMul (L.chart x) (L.chart y))))
@@ -63,7 +63,7 @@ def chartUnit_step :
       L.chartUnitPath :=
   Path.Step.trans_refl_right L.chartUnitPath
 
-@[simp] theorem chartUnit_rweq :
+noncomputable def chartUnit_rweq :
     RwEq
       (Path.trans L.chartUnitPath (Path.refl L.unitMonoid))
       L.chartUnitPath :=
@@ -76,13 +76,13 @@ def transportChart_step {x y : Obj} (p : Path x y) :
       (L.transportChart p) :=
   Path.Step.trans_refl_right (L.transportChart p)
 
-@[simp] theorem transportChart_rweq {x y : Obj} (p : Path x y) :
+noncomputable def transportChart_rweq {x y : Obj} (p : Path x y) :
     RwEq
       (Path.trans (L.transportChart p) (Path.refl (L.chart y)))
       (L.transportChart p) :=
   rweq_of_step (L.transportChart_step p)
 
-@[simp] theorem chartUnit_cancel_rweq :
+noncomputable def chartUnit_cancel_rweq :
     RwEq
       (Path.trans (Path.symm L.chartUnitPath) L.chartUnitPath)
       (Path.refl L.unitMonoid) :=

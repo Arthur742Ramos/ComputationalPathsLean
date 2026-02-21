@@ -47,25 +47,25 @@ namespace LocalLanglandsPathData
 
 variable {Rep : Type u} {Param : Type v} (L : LocalLanglandsPathData Rep Param)
 
-@[simp] theorem frobeniusCompat_rweq (ρ : Rep) :
+noncomputable def frobeniusCompat_rweq (ρ : Rep) :
     RwEq
       (Path.trans (L.frobeniusCompatPath ρ) (Path.refl (L.toParameter ρ)))
       (L.frobeniusCompatPath ρ) :=
   rweq_of_step (L.frobeniusCompatStep ρ)
 
-@[simp] theorem inertiaCompat_rweq (ρ : Rep) :
+noncomputable def inertiaCompat_rweq (ρ : Rep) :
     RwEq
       (Path.trans (Path.refl (L.toParameter (L.inertiaRestriction ρ))) (L.inertiaCompatPath ρ))
       (L.inertiaCompatPath ρ) :=
   rweq_of_step (L.inertiaCompatStep ρ)
 
-@[simp] theorem frobeniusCompat_cancel_rweq (ρ : Rep) :
+noncomputable def frobeniusCompat_cancel_rweq (ρ : Rep) :
     RwEq
       (Path.trans (Path.symm (L.frobeniusCompatPath ρ)) (L.frobeniusCompatPath ρ))
       (Path.refl (L.toParameter ρ)) :=
   rweq_cmpA_inv_left (L.frobeniusCompatPath ρ)
 
-@[simp] theorem inertiaCompat_cancel_rweq (ρ : Rep) :
+noncomputable def inertiaCompat_cancel_rweq (ρ : Rep) :
     RwEq
       (Path.trans (L.inertiaCompatPath ρ) (Path.symm (L.inertiaCompatPath ρ)))
       (Path.refl (L.toParameter (L.inertiaRestriction ρ))) :=

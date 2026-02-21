@@ -196,7 +196,7 @@ def trivialSimplicialModel : SimplicialModelStructure.{u} where
 
 /-! ## RwEq lemmas -/
 
-theorem simplicialStep_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def simplicialStep_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : SimplicialStep p q) : RwEq p q := by
   cases h with
   | face_face => exact RwEq.refl _

@@ -60,7 +60,7 @@ def convergenceWitness (r : Nat) :
       (A.convergence.embed 0 0 A.e2Base) :=
   A.convergence.stabilizePath r 0 0
 
-@[simp] theorem filtration_rweq (s r : Nat) :
+noncomputable def filtration_rweq (s r : Nat) :
     RwEq
       (Path.trans
         (Path.refl (A.filtration (s + 1) r A.e2Base))
@@ -73,7 +73,7 @@ def filtrationLoop (s r : Nat) :
     Path (A.filtration (s + 1) r A.e2Base) (A.filtration (s + 1) r A.e2Base) :=
   Path.trans (A.filtrationPath s r) (Path.symm (A.filtrationPath s r))
 
-@[simp] theorem filtrationLoop_contracts (s r : Nat) :
+noncomputable def filtrationLoop_contracts (s r : Nat) :
     RwEq (A.filtrationLoop s r) (Path.refl (A.filtration (s + 1) r A.e2Base)) := by
   unfold filtrationLoop
   exact rweq_cmpA_inv_right (A.filtrationPath s r)
@@ -97,7 +97,7 @@ def shiftedBoundaryInLimit (r : Nat) :
     (fun x => A.convergence.embed 0 0 (A.pages.shift r 0 0 x))
     (A.differentials.dSquaredPath r 0 0)
 
-@[simp] theorem convergenceWitness_rweq (r : Nat) :
+noncomputable def convergenceWitness_rweq (r : Nat) :
     RwEq
       (Path.trans (A.convergenceWitness r) (Path.refl (A.convergence.embed 0 0 A.e2Base)))
       (A.convergenceWitness r) :=

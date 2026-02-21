@@ -68,7 +68,7 @@ theorem derivedstep_toEq {A : Type u} {a b : A} {p q : Path a b}
   | shift_compose => rfl
   | triangle_rotate => rfl
 
-theorem derivedstep_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def derivedstep_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : DerivedStep p q) : RwEq p q := by
   cases h with
   | qi_refl => exact RwEq.refl _
@@ -395,14 +395,14 @@ def derivedNatTrans_assoc
   exact Path.stepChain (D.assoc _ _ _)
 
 /-- Multi-step derivedstep composition is sound. -/
-theorem derivedstep_multi_sound {A : Type u} {a b : A}
+noncomputable def derivedstep_multi_sound {A : Type u} {a b : A}
     {p q r : Path a b}
     (h1 : DerivedStep p q) (h2 : DerivedStep q r) :
     RwEq p r :=
   RwEq.trans (derivedstep_rweq h1) (derivedstep_rweq h2)
 
 /-- Derived functor identity composition via RwEq. -/
-theorem derived_id_comp_rweq
+noncomputable def derived_id_comp_rweq
     {C D : PreAdditiveCategory}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     (F : LeftDerivedFunctor C D DC DD) (X : C.Obj) :

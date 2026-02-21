@@ -49,17 +49,17 @@ theorem opComp_assoc_rw (f : Operation a b) (g : Operation b c) (h : Operation c
   rw_of_step (Step.trans_assoc (A := A) (a := a) (b := b) (c := c) (d := d) f g h)
 
 /-- Left unitality in rewrite-equivalence form. -/
-theorem opComp_id_left (f : Operation a b) :
+noncomputable def opComp_id_left (f : Operation a b) :
     RwEq (opComp (opId a) f) f :=
   rweq_of_rw (opComp_id_left_rw (A := A) (a := a) (b := b) f)
 
 /-- Right unitality in rewrite-equivalence form. -/
-theorem opComp_id_right (f : Operation a b) :
+noncomputable def opComp_id_right (f : Operation a b) :
     RwEq (opComp f (opId b)) f :=
   rweq_of_rw (opComp_id_right_rw (A := A) (a := a) (b := b) f)
 
 /-- Associativity in rewrite-equivalence form. -/
-theorem opComp_assoc (f : Operation a b) (g : Operation b c) (h : Operation c d) :
+noncomputable def opComp_assoc (f : Operation a b) (g : Operation b c) (h : Operation c d) :
     RwEq (opComp (opComp f g) h) (opComp f (opComp g h)) :=
   rweq_of_rw (opComp_assoc_rw (A := A) (a := a) (b := b) (c := c) (d := d) f g h)
 

@@ -318,12 +318,12 @@ theorem automataStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Instances -/
 
 /-- RwEq: DFA empty word path is stable. -/
-theorem rwEq_dfa_empty {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) :
+noncomputable def rwEq_dfa_empty {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) :
     RwEq (dfa_empty_word M q) (dfa_empty_word M q) :=
   RwEq.refl _
 
 /-- RwEq: product construction path is stable. -/
-theorem rwEq_product {Q₁ Q₂ Alpha : Type u}
+noncomputable def rwEq_product {Q₁ Q₂ Alpha : Type u}
     (M₁ : DFAPath Q₁ Alpha) (M₂ : DFAPath Q₂ Alpha) (w : List Alpha) :
     RwEq (product_accepts_iff M₁ M₂ w) (product_accepts_iff M₁ M₂ w) :=
   RwEq.refl _
@@ -334,12 +334,12 @@ theorem symm_symm_dfa {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) :
     Path.toEq (dfa_empty_word M q) := by simp
 
 /-- RwEq for complement extend. -/
-theorem rwEq_complement {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) (w : List Alpha) :
+noncomputable def rwEq_complement {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) (w : List Alpha) :
     RwEq (complement_extend M q w) (complement_extend M q w) :=
   RwEq.refl _
 
 /-- RwEq for union. -/
-theorem rwEq_union {Q₁ Q₂ Alpha : Type u}
+noncomputable def rwEq_union {Q₁ Q₂ Alpha : Type u}
     (M₁ : DFAPath Q₁ Alpha) (M₂ : DFAPath Q₂ Alpha) (q₁ : Q₁) (q₂ : Q₂) (w : List Alpha) :
     RwEq (union_extend_eq_product M₁ M₂ q₁ q₂ w) (union_extend_eq_product M₁ M₂ q₁ q₂ w) :=
   RwEq.refl _

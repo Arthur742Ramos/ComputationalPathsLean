@@ -61,16 +61,16 @@ def HasLift {a b c d : A} (i : Path a b) (p : Path c d) : Type u :=
     RwEq (Path.trans f p) (Path.trans i g) →
     Σ h : Path b c, RwEq (Path.trans i h) f × RwEq (Path.trans h p) g
 
-theorem trans_assoc_rweq {a b c d : A}
+noncomputable def trans_assoc_rweq {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   rweq_tt p q r
 
-theorem trans_right_unit_rweq {a b : A} (p : Path a b) :
+noncomputable def trans_right_unit_rweq {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p :=
   rweq_cmpA_refl_right (p := p)
 
-theorem trans_left_unit_rweq {a b : A} (p : Path a b) :
+noncomputable def trans_left_unit_rweq {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.refl a) p) p :=
   rweq_cmpA_refl_left (p := p)
 

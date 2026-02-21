@@ -41,7 +41,7 @@ namespace CotangentComplexPaths
 
 variable {R : Type u} (L : CotangentComplexPaths R)
 
-@[simp] theorem d_squared_rweq (n : Nat) (x : L.degree (n + 2)) :
+noncomputable def d_squared_rweq (n : Nat) (x : L.degree (n + 2)) :
     RwEq
       (Path.trans
         (L.dSquaredPath n x)
@@ -49,13 +49,13 @@ variable {R : Type u} (L : CotangentComplexPaths R)
       (L.dSquaredPath n x) :=
   rweq_of_step (L.dSquaredStep n x)
 
-@[simp] theorem base_change_rweq (n : Nat) (x : L.degree n) :
+noncomputable def base_change_rweq (n : Nat) (x : L.degree n) :
     RwEq
       (Path.trans (Path.refl (L.baseChange n x)) (L.baseChangePath n x))
       (L.baseChangePath n x) :=
   rweq_of_step (L.baseChangeStep n x)
 
-@[simp] theorem base_change_cancel_rweq (n : Nat) (x : L.degree n) :
+noncomputable def base_change_cancel_rweq (n : Nat) (x : L.degree n) :
     RwEq
       (Path.trans (Path.symm (L.baseChangePath n x)) (L.baseChangePath n x))
       (Path.refl (L.baseChange n x)) :=

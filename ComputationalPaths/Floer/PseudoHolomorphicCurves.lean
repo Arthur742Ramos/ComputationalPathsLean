@@ -76,7 +76,7 @@ def cauchyRiemann_step (x : Gen) :
       (P.cauchyRiemannPath x) :=
   Path.Step.trans_refl_right (P.cauchyRiemannPath x)
 
-@[simp] theorem cauchyRiemann_rweq (x : Gen) :
+noncomputable def cauchyRiemann_rweq (x : Gen) :
     RwEq
       (Path.trans
         (P.cauchyRiemannPath x)
@@ -93,7 +93,7 @@ def asymptoticBoundary_step (x : Gen) :
       (P.asymptoticBoundaryPath x) :=
   Path.Step.trans_refl_right (P.asymptoticBoundaryPath x)
 
-@[simp] theorem asymptoticBoundary_rweq (x : Gen) :
+noncomputable def asymptoticBoundary_rweq (x : Gen) :
     RwEq
       (Path.trans
         (P.asymptoticBoundaryPath x)
@@ -110,7 +110,7 @@ def energyAction_step (x : Gen) :
       (P.energyActionPath x) :=
   Path.Step.trans_refl_left (P.energyActionPath x)
 
-@[simp] theorem energyAction_rweq (x : Gen) :
+noncomputable def energyAction_rweq (x : Gen) :
     RwEq
       (Path.trans
         (Path.refl (P.energy (P.strip x)))
@@ -127,7 +127,7 @@ def compactification_step (x : Gen) :
       (P.compactificationPath x) :=
   Path.Step.trans_refl_right (P.compactificationPath x)
 
-@[simp] theorem compactification_rweq (x : Gen) :
+noncomputable def compactification_rweq (x : Gen) :
     RwEq
       (Path.trans
         (P.compactificationPath x)
@@ -144,7 +144,7 @@ def boundaryAfterCompactification_step (x : Gen) :
       (P.boundaryAfterCompactificationPath x) :=
   Path.Step.trans_refl_right (P.boundaryAfterCompactificationPath x)
 
-@[simp] theorem boundaryAfterCompactification_rweq (x : Gen) :
+noncomputable def boundaryAfterCompactification_rweq (x : Gen) :
     RwEq
       (Path.trans
         (P.boundaryAfterCompactificationPath x)
@@ -152,7 +152,7 @@ def boundaryAfterCompactification_step (x : Gen) :
       (P.boundaryAfterCompactificationPath x) :=
   rweq_of_step (P.boundaryAfterCompactification_step x)
 
-@[simp] theorem asymptoticBoundary_cancel_rweq (x : Gen) :
+noncomputable def asymptoticBoundary_cancel_rweq (x : Gen) :
     RwEq
       (Path.trans (Path.symm (P.asymptoticBoundaryPath x)) (P.asymptoticBoundaryPath x))
       (Path.refl (P.complex.continuation x)) :=

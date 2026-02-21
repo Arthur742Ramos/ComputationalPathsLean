@@ -243,12 +243,12 @@ theorem matroidStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Instances -/
 
 /-- RwEq: exchange property paths are stable. -/
-theorem rwEq_exchange {E : Type u} (M : PathMatroid E) :
+noncomputable def rwEq_exchange {E : Type u} (M : PathMatroid E) :
     RwEq (M.indep_empty) (M.indep_empty) :=
   RwEq.refl _
 
 /-- RwEq: rank submodularity is stable. -/
-theorem rwEq_rank_submod {E : Type u} {M : PathMatroid E}
+noncomputable def rwEq_rank_submod {E : Type u} {M : PathMatroid E}
     (r : MatroidRank E M) :
     RwEq (r.rank_empty) (r.rank_empty) :=
   RwEq.refl _
@@ -260,7 +260,7 @@ theorem symm_symm_matroid {E : Type u} (M : PathMatroid E) :
   simp
 
 /-- RwEq: circuit dep is stable. -/
-theorem rwEq_circuit_dep {E : Type u} {M : PathMatroid E}
+noncomputable def rwEq_circuit_dep {E : Type u} {M : PathMatroid E}
     (mc : MatroidCircuit E M) (C : E → Prop) (hC : mc.isCircuit C) :
     RwEq (mc.circuit_dep C hC) (mc.circuit_dep C hC) :=
   RwEq.refl _

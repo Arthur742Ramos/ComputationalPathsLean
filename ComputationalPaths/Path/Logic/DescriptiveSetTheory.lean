@@ -141,12 +141,12 @@ structure CoanalyticSet (X : Type u) where
     (¬ complement_of.pred x : Prop)
 
 /-- RwEq: analytic witness is self-consistent. -/
-theorem analytic_rweq {X : Type u} (A : AnalyticSet X) (x : X) :
+noncomputable def analytic_rweq {X : Type u} (A : AnalyticSet X) (x : X) :
     RwEq (A.analytic_witness x) (A.analytic_witness x) :=
   RwEq.refl _
 
 /-- RwEq: symm(symm(is_complement)) simplifies. -/
-theorem coanalytic_symm_rweq {X : Type u} (C : CoanalyticSet X) (x : X) :
+noncomputable def coanalytic_symm_rweq {X : Type u} (C : CoanalyticSet X) (x : X) :
     RwEq (Path.symm (Path.symm (C.is_complement x)))
          (C.is_complement x) :=
   RwEq.step (Step.symm_symm _)
@@ -250,7 +250,7 @@ structure PerfectSetProperty (X : Type u) (τ : TopologyData X) where
   hasPerfect : Option (Σ' (embed : (Nat → Bool) → X), ∀ f, S (embed f))
 
 /-- RwEq: perfect set is self-consistent. -/
-theorem perfect_set_rweq {X : Type u} {τ : TopologyData X}
+noncomputable def perfect_set_rweq {X : Type u} {τ : TopologyData X}
     (psp : PerfectSetProperty X τ) :
     RwEq (Path.refl (psp.S : X → Prop)) (Path.refl psp.S) :=
   RwEq.refl _
@@ -287,7 +287,7 @@ def wadge_triple_trans {X : Type u} {τ : TopologyData X}
   WadgeReducible.trans_wadge (WadgeReducible.trans_wadge h₁ h₂) h₃
 
 /-- RwEq: Wadge transitivity is self-consistent. -/
-theorem wadge_trans_rweq {X : Type u} {τ : TopologyData X}
+noncomputable def wadge_trans_rweq {X : Type u} {τ : TopologyData X}
     {A B C : X → Prop}
     (h₁ : WadgeReducible X τ A B) (h₂ : WadgeReducible X τ B C) (x : X) :
     RwEq ((WadgeReducible.trans_wadge h₁ h₂).reduces x)
@@ -295,19 +295,19 @@ theorem wadge_trans_rweq {X : Type u} {τ : TopologyData X}
   RwEq.refl _
 
 /-- RwEq: symm(symm(reduces)) simplifies via Step.symm_symm. -/
-theorem wadge_symm_symm_rweq {X : Type u} {τ : TopologyData X}
+noncomputable def wadge_symm_symm_rweq {X : Type u} {τ : TopologyData X}
     {A B : X → Prop} (h : WadgeReducible X τ A B) (x : X) :
     RwEq (Path.symm (Path.symm (h.reduces x))) (h.reduces x) :=
   RwEq.step (Step.symm_symm _)
 
 /-- RwEq: trans with refl simplifies. -/
-theorem wadge_trans_refl_rweq {X : Type u} {τ : TopologyData X}
+noncomputable def wadge_trans_refl_rweq {X : Type u} {τ : TopologyData X}
     {A B : X → Prop} (h : WadgeReducible X τ A B) (x : X) :
     RwEq (Path.trans (h.reduces x) (Path.refl _)) (h.reduces x) :=
   RwEq.step (Step.trans_refl_right _)
 
 /-- RwEq: refl trans simplifies. -/
-theorem wadge_refl_trans_rweq {X : Type u} {τ : TopologyData X}
+noncomputable def wadge_refl_trans_rweq {X : Type u} {τ : TopologyData X}
     {A B : X → Prop} (h : WadgeReducible X τ A B) (x : X) :
     RwEq (Path.trans (Path.refl _) (h.reduces x)) (h.reduces x) :=
   RwEq.step (Step.trans_refl_left _)

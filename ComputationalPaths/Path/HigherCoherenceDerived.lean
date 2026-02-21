@@ -39,31 +39,31 @@ bracketings of four factors. We prove all edges and faces commute. -/
 
 /-- K₄ edge: α₁₂ — left-biased reassociation of four paths,
     ((p·q)·r)·s → (p·(q·r))·s -/
-theorem k4_edge_alpha12 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def k4_edge_alpha12 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans (trans p q) r) s)
          (trans (trans p (trans q r)) s) :=
   rweq_trans_congr_left s (rweq_of_step (Step.trans_assoc p q r))
 
 /-- K₄ edge: α₂₃ — (p·(q·r))·s → p·((q·r)·s) -/
-theorem k4_edge_alpha23 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def k4_edge_alpha23 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans p (trans q r)) s)
          (trans p (trans (trans q r) s)) :=
   rweq_of_step (Step.trans_assoc p (trans q r) s)
 
 /-- K₄ edge: α_inner — p·((q·r)·s) → p·(q·(r·s)) -/
-theorem k4_edge_alpha_inner (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def k4_edge_alpha_inner (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans p (trans (trans q r) s))
          (trans p (trans q (trans r s))) :=
   rweq_trans_congr_right p (rweq_of_step (Step.trans_assoc q r s))
 
 /-- K₄ edge: β₁ — ((p·q)·r)·s → (p·q)·(r·s) -/
-theorem k4_edge_beta1 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def k4_edge_beta1 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans (trans p q) r) s)
          (trans (trans p q) (trans r s)) :=
   rweq_of_step (Step.trans_assoc (trans p q) r s)
 
 /-- K₄ edge: β₂ — (p·q)·(r·s) → p·(q·(r·s)) -/
-theorem k4_edge_beta2 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def k4_edge_beta2 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans p q) (trans r s))
          (trans p (trans q (trans r s))) :=
   rweq_of_step (Step.trans_assoc p q (trans r s))
@@ -71,7 +71,7 @@ theorem k4_edge_beta2 (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e
 /-- K₄ pentagon: top route = bottom route (both reach p·(q·(r·s))).
     Route 1: α₁₂ → α₂₃ → α_inner
     Route 2: β₁ → β₂ -/
-theorem k4_pentagon_commutes (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def k4_pentagon_commutes (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans (trans p q) r) s)
          (trans p (trans q (trans r s))) := by
   -- Both routes are valid:
@@ -89,14 +89,14 @@ the boundary of K₅ commutes, i.e., any two paths of reassociation
 from one bracketing to another are equal. -/
 
 /-- K₅ route via inner pentagon then outer assoc. -/
-theorem k5_route_A (p : Path a b) (q : Path b c) (r : Path c d)
+noncomputable def k5_route_A (p : Path a b) (q : Path b c) (r : Path c d)
     (s : Path d e) (t : Path e f') :
     RwEq (trans (trans (trans (trans p q) r) s) t)
          (trans p (trans q (trans r (trans s t)))) :=
   rweq_trans_five_assoc p q r s t
 
 /-- K₅ via different intermediate bracketings. -/
-theorem k5_route_B (p : Path a b) (q : Path b c) (r : Path c d)
+noncomputable def k5_route_B (p : Path a b) (q : Path b c) (r : Path c d)
     (s : Path d e) (t : Path e f') :
     RwEq (trans (trans (trans (trans p q) r) s) t)
          (trans p (trans q (trans r (trans s t)))) := by
@@ -270,14 +270,14 @@ theorem hexagon_commutes
 
 /-- Double pentagon: the pentagon for five paths factors through
     the pentagons for four-path subsets. -/
-theorem double_pentagon (p : Path a b) (q : Path b c) (r : Path c d)
+noncomputable def double_pentagon (p : Path a b) (q : Path b c) (r : Path c d)
     (s : Path d e) (t : Path e f') :
     RwEq (trans (trans (trans (trans p q) r) s) t)
          (trans p (trans q (trans r (trans s t)))) :=
   rweq_trans_five_assoc p q r s t
 
 /-- Inverse pentagon: the pentagon for inverse paths. -/
-theorem inverse_pentagon (p : Path a b) (q : Path b c)
+noncomputable def inverse_pentagon (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) :
     RwEq (symm (trans p (trans q (trans r s))))
          (trans (symm s) (trans (symm r) (trans (symm q) (symm p)))) := by
@@ -318,7 +318,7 @@ theorem inverse_pentagon (p : Path a b) (q : Path b c)
   exact RwEq.trans h7 h8
 
 /-- Coherence for conjugation: p · q · p⁻¹ · p · r · p⁻¹ ≈ p · (q · r) · p⁻¹ -/
-theorem conjugation_coherence (p : Path a b) (q r : Path b b) :
+noncomputable def conjugation_coherence (p : Path a b) (q r : Path b b) :
     RwEq (trans (trans (trans (trans (trans p q) (symm p)) p) r) (symm p))
          (trans (trans p (trans q r)) (symm p)) := by
   -- (p·q·p⁻¹·p) → (p·q·(p⁻¹·p)) → (p·q·refl) → p·q

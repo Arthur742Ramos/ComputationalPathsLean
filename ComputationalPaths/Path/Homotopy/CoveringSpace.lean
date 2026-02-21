@@ -234,7 +234,7 @@ theorem monodromy_step_well_defined {P : A → Type u} {a : A}
     loopAction l₁ x = loopAction l₂ x :=
   loopAction_respects_step (P := P) h x
 
-theorem loopAction_respects_rweq {P : A → Type u} {a : A}
+noncomputable def loopAction_respects_rweq {P : A → Type u} {a : A}
     {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) (x : P a) :
     loopAction l₁ x = loopAction l₂ x := by
   induction h with
@@ -248,7 +248,7 @@ theorem loopAction_respects_rweq {P : A → Type u} {a : A}
       exact ih₁.trans ih₂
 
 /-- Monodromy is well-defined on rewrite-equivalent loops. -/
-theorem monodromy_rweq_well_defined {P : A → Type u} {a : A}
+noncomputable def monodromy_rweq_well_defined {P : A → Type u} {a : A}
     {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) (x : P a) :
     loopAction l₁ x = loopAction l₂ x :=
   loopAction_respects_rweq (P := P) h x

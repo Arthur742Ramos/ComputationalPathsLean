@@ -369,7 +369,7 @@ needed to prove decode respects the free group relation.
 /-! ### Helper lemmas for positive iteration -/
 
 /-- iterateLoopPos l (m + n) = trans l^m l^n, proved via associativity. -/
-theorem iterateLoopPos_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
+noncomputable def iterateLoopPos_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
     RwEq (Path.trans (iterateLoopPos l m) (iterateLoopPos l n))
          (iterateLoopPos l (m + n)) := by
   induction m with
@@ -389,7 +389,7 @@ theorem iterateLoopPos_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
 /-! ### Helper lemmas for negative iteration -/
 
 /-- iterateLoopNeg l (m + n) = trans (l⁻¹)^m (l⁻¹)^n. -/
-theorem iterateLoopNeg_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
+noncomputable def iterateLoopNeg_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
     RwEq (Path.trans (iterateLoopNeg l m) (iterateLoopNeg l n))
          (iterateLoopNeg l (m + n)) := by
   induction m with
@@ -404,18 +404,18 @@ theorem iterateLoopNeg_add {A : Type u} {a : A} (l : Path a a) (m n : Nat) :
 /-! ### Cross cancellation lemmas -/
 
 /-- l · l⁻¹ ≈ refl -/
-theorem loop_cancel {A : Type u} {a : A} (l : Path a a) :
+noncomputable def loop_cancel {A : Type u} {a : A} (l : Path a a) :
     RwEq (Path.trans l (Path.symm l)) (Path.refl a) := by
   path_simp
 
 /-- l⁻¹ · l ≈ refl -/
-theorem loop_cancel' {A : Type u} {a : A} (l : Path a a) :
+noncomputable def loop_cancel' {A : Type u} {a : A} (l : Path a a) :
     RwEq (Path.trans (Path.symm l) l) (Path.refl a) := by
   path_simp
 
 /-- l · (l⁻¹)^{n+1} ≈ (l⁻¹)^n
     This is: l · (l⁻¹ · (l⁻¹)^n) ≈ (l · l⁻¹) · (l⁻¹)^n ≈ refl · (l⁻¹)^n ≈ (l⁻¹)^n -/
-theorem iterateLoopNeg_cancel_one {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+noncomputable def iterateLoopNeg_cancel_one {A : Type u} {a : A} (l : Path a a) (n : Nat) :
     RwEq (Path.trans l (iterateLoopNeg l (n + 1)))
          (iterateLoopNeg l n) := by
   -- iterateLoopNeg l (n+1) = trans (symm l) (iterateLoopNeg l n)
@@ -430,7 +430,7 @@ theorem iterateLoopNeg_cancel_one {A : Type u} {a : A} (l : Path a a) (n : Nat) 
 
 /-- (l⁻¹) · l^{n+1} ≈ l^n
     This is: l⁻¹ · (l · l^n) ≈ (l⁻¹ · l) · l^n ≈ refl · l^n ≈ l^n -/
-theorem iterateLoopPos_cancel_one {A : Type u} {a : A} (l : Path a a) (n : Nat) :
+noncomputable def iterateLoopPos_cancel_one {A : Type u} {a : A} (l : Path a a) (n : Nat) :
     RwEq (Path.trans (Path.symm l) (iterateLoopPos l (n + 1)))
          (iterateLoopPos l n) := by
   simp only [iterateLoopPos]
@@ -441,7 +441,7 @@ theorem iterateLoopPos_cancel_one {A : Type u} {a : A} (l : Path a a) (n : Nat) 
 /-- l^{m+1} · l⁻¹ ≈ l^m
     Key insight: l^{m+1} = l · l^m, so l^{m+1} · l⁻¹ = l · (l^m · l⁻¹)
     By induction: l^m · l⁻¹ ≈ l^{m-1}, so l · l^{m-1} = l^m -/
-theorem iterateLoopPos_cancel_right {A : Type u} {a : A} (l : Path a a) (m : Nat) :
+noncomputable def iterateLoopPos_cancel_right {A : Type u} {a : A} (l : Path a a) (m : Nat) :
     RwEq (Path.trans (iterateLoopPos l (m + 1)) (Path.symm l))
          (iterateLoopPos l m) := by
   induction m with
@@ -457,7 +457,7 @@ theorem iterateLoopPos_cancel_right {A : Type u} {a : A} (l : Path a a) (m : Nat
     exact rweq_trans_congr_right l ih
 
 /-- (l⁻¹)^{m+1} · l ≈ (l⁻¹)^m -/
-theorem iterateLoopNeg_cancel_right {A : Type u} {a : A} (l : Path a a) (m : Nat) :
+noncomputable def iterateLoopNeg_cancel_right {A : Type u} {a : A} (l : Path a a) (m : Nat) :
     RwEq (Path.trans (iterateLoopNeg l (m + 1)) l)
          (iterateLoopNeg l m) := by
   induction m with
@@ -480,7 +480,7 @@ theorem iterateLoopNeg_cancel_right {A : Type u} {a : A} (l : Path a a) (m : Nat
     l^{m+1} · (l⁻¹)^{m+1} ≈ l^{m+1} · l⁻¹ · (l⁻¹)^m  [by splitting]
     ≈ l^m · (l⁻¹)^m  [by iterateLoopPos_cancel_right]
     ≈ refl  [by IH] -/
-theorem iterateLoopPos_neg_cancel_eq {A : Type u} {a : A} (l : Path a a) (m : Nat) :
+noncomputable def iterateLoopPos_neg_cancel_eq {A : Type u} {a : A} (l : Path a a) (m : Nat) :
     RwEq (Path.trans (iterateLoopPos l m) (iterateLoopNeg l m)) (Path.refl a) := by
   induction m with
   | zero =>
@@ -498,7 +498,7 @@ theorem iterateLoopPos_neg_cancel_eq {A : Type u} {a : A} (l : Path a a) (m : Na
     exact ih
 
 /-- Positive > Negative: l^m · (l⁻¹)^n ≈ l^{m-n} when m > n -/
-theorem iterateLoopPos_neg_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m > n) :
+noncomputable def iterateLoopPos_neg_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m > n) :
     RwEq (Path.trans (iterateLoopPos l m) (iterateLoopNeg l n))
          (iterateLoopPos l (m - n)) := by
   induction n generalizing m with
@@ -532,7 +532,7 @@ theorem iterateLoopPos_neg_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h
     Case m = 0: refl · (l⁻¹)^{n+1} ≈ (l⁻¹)^{n+1}
     Case m > 0: l^m · l⁻¹ ≈ l^{m-1} [by iterateLoopPos_cancel_right]
                Then l^{m-1} · (l⁻¹)^n by IH -/
-theorem iterateLoopPos_neg_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m < n) :
+noncomputable def iterateLoopPos_neg_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : m < n) :
     RwEq (Path.trans (iterateLoopPos l m) (iterateLoopNeg l n))
          (iterateLoopNeg l (n - m)) := by
   induction n generalizing m with
@@ -564,7 +564,7 @@ theorem iterateLoopPos_neg_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h
     (l⁻¹)^{m+1} · l^{m+1} = (l⁻¹)^{m+1} · l · l^m
     ≈ (l⁻¹)^m · l^m  [by iterateLoopNeg_cancel_right]
     ≈ refl  [by IH] -/
-theorem iterateLoopNeg_pos_cancel_eq {A : Type u} {a : A} (l : Path a a) (m : Nat) :
+noncomputable def iterateLoopNeg_pos_cancel_eq {A : Type u} {a : A} (l : Path a a) (m : Nat) :
     RwEq (Path.trans (iterateLoopNeg l m) (iterateLoopPos l m)) (Path.refl a) := by
   induction m with
   | zero =>
@@ -589,7 +589,7 @@ theorem iterateLoopNeg_pos_cancel_eq {A : Type u} {a : A} (l : Path a a) (m : Na
 
     Case m = 0: (refl · l) · l^{n'} ≈ l · l^{n'} = l^{n'+1}
     Case m > 0: Use iterateLoopNeg_cancel_right on smaller m -/
-theorem iterateLoopNeg_pos_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : n > m) :
+noncomputable def iterateLoopNeg_pos_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : n > m) :
     RwEq (Path.trans (iterateLoopNeg l m) (iterateLoopPos l n))
          (iterateLoopPos l (n - m)) := by
   induction n generalizing m with
@@ -620,7 +620,7 @@ theorem iterateLoopNeg_pos_gt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h
     ≈ l⁻¹ · ((l⁻¹)^{m'} · l^n)  [by tt]
 
     Then by IH (if n < m') or equal case (if n = m') -/
-theorem iterateLoopNeg_pos_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : n < m) :
+noncomputable def iterateLoopNeg_pos_lt {A : Type u} {a : A} (l : Path a a) (m n : Nat) (h : n < m) :
     RwEq (Path.trans (iterateLoopNeg l m) (iterateLoopPos l n))
          (iterateLoopNeg l (m - n)) := by
   induction m generalizing n with
@@ -670,7 +670,7 @@ Proof by cases on signs of m and n:
 - m < 0, n < 0: Use iterateLoopNeg_add
 - m ≥ 0, n < 0: Use iterateLoopPos_neg_gt/lt/cancel_eq based on comparison
 - m < 0, n ≥ 0: Use iterateLoopNeg_pos_gt/lt/cancel_eq based on comparison -/
-theorem iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : Int) :
+noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : Int) :
     RwEq (Path.trans (iterateLoopInt l m) (iterateLoopInt l n))
          (iterateLoopInt l (m + n)) := by
   unfold iterateLoopInt
@@ -788,7 +788,7 @@ theorem iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : Int) :
 /-- Cancellation: l^m · l^{-m} ≈ refl.
 
 This follows from iterateLoopInt_add: l^m · l^{-m} ≈ l^{m + (-m)} = l^0 = refl. -/
-theorem iterateLoopInt_cancel {A : Type u} {a : A} (l : Path a a) (m : Int) :
+noncomputable def iterateLoopInt_cancel {A : Type u} {a : A} (l : Path a a) (m : Int) :
     RwEq (Path.trans (iterateLoopInt l m) (iterateLoopInt l (-m)))
          (Path.refl a) := by
   have h1 := iterateLoopInt_add l m (-m)
@@ -804,7 +804,7 @@ noncomputable def decodeWord {n : Nat} : BouquetWord n → LoopSpaceN n
 
 /-- Decode respects the free group relation.
     The proof uses loop iteration theorems to handle combining and cancellation. -/
-theorem decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
+noncomputable def decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
     (h : BouquetRel n w₁ w₂) :
     RwEq (decodeWord w₁) (decodeWord w₂) := by
   induction h with

@@ -48,7 +48,7 @@ def mapId_step (X : C.Obj) :
       (F.map_id X) :=
   Path.Step.trans_refl_right (F.map_id X)
 
-@[simp] theorem mapId_rweq (X : C.Obj) :
+noncomputable def mapId_rweq (X : C.Obj) :
     RwEq
       (Path.trans (F.map_id X) (Path.refl (D.id (F.objMap X))))
       (F.map_id X) :=
@@ -101,12 +101,12 @@ theorem mapComp_assoc_step {W X Y Z : C.Obj}
       (F.mapCompLast f g h))
 
 /-- Rewrite-equivalence form of functorial coherence associativity. -/
-theorem mapComp_assoc_rweq {W X Y Z : C.Obj}
+noncomputable def mapComp_assoc_rweq {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     RwEq (F.mapCompChainLeft f g h) (F.mapCompChainRight f g h) :=
   rweq_of_step (F.mapComp_assoc_step f g h)
 
-@[simp] theorem mapComp_cancel_rweq {W X Y Z : C.Obj}
+noncomputable def mapComp_cancel_rweq {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     RwEq
       (Path.trans (Path.symm (F.mapCompChainRight f g h)) (F.mapCompChainRight f g h))

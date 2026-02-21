@@ -49,7 +49,7 @@ theorem mapPath_preserves_rw {a b : A} (p : Path a b) :
   rw_of_step (L.mapPath_preserves_step p)
 
 /-- Preservation witness lifted to rewrite equivalence. -/
-theorem mapPath_preserves_rweq {a b : A} (p : Path a b) :
+noncomputable def mapPath_preserves_rweq {a b : A} (p : Path a b) :
     RwEq (L.mapPath p) (Path.congrArg L.obj p) :=
   rweq_of_step (L.mapPath_preserves_step p)
 
@@ -62,7 +62,7 @@ theorem map_reflect_rw {a b : A} (q : Path (L.obj a) (L.obj b)) :
   · exact Path.Step.trans_refl_right q
 
 /-- Reflection witness as rewrite equivalence. -/
-theorem map_reflect_rweq {a b : A} (q : Path (L.obj a) (L.obj b)) :
+noncomputable def map_reflect_rweq {a b : A} (q : Path (L.obj a) (L.obj b)) :
     RwEq (L.mapPath (L.reflectPath q)) q :=
   rweq_of_rw (L.map_reflect_rw q)
 

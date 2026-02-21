@@ -179,7 +179,7 @@ def balancingChain {M : FiniteMatroid E} (W : BergmanWitness M) :
   Path.trans (Path.refl (IsBalanced W.fan)) (Path.refl (IsBalanced W.fan))
 
 /-- The balancing chain is stable under rewrite equivalence. -/
-theorem balancingChain_rwEq {M : FiniteMatroid E} (W : BergmanWitness M) :
+noncomputable def balancingChain_rwEq {M : FiniteMatroid E} (W : BergmanWitness M) :
     Path.RwEq (balancingChain W) (balancingChain W) :=
   Path.RwEq.refl _
 

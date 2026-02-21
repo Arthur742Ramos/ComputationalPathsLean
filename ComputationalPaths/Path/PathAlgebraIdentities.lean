@@ -32,7 +32,7 @@ variable {A : Type u} {a b c d e f' : A}
 /-! ## Mac Lane Coherence Beyond Pentagon -/
 
 /-- Reassociate ((p * q) * r) * (s * t) to p * (q * (r * (s * t))). -/
-theorem rweq_mac_lane_five_split {p : Path a b} {q : Path b c}
+noncomputable def rweq_mac_lane_five_split {p : Path a b} {q : Path b c}
     {r : Path c d} {s : Path d e} {t : Path e f'} :
     RwEq (trans (trans (trans p q) r) (trans s t))
          (trans p (trans q (trans r (trans s t)))) := by
@@ -49,14 +49,14 @@ theorem rweq_mac_lane_five_split {p : Path a b} {q : Path b c}
 /-! ## Triangle Identity -/
 
 /-- Triangle identity: (f * refl) * g reduces to f * g. -/
-theorem rweq_triangle_identity (f : Path a b) (g : Path b c) :
+noncomputable def rweq_triangle_identity (f : Path a b) (g : Path b c) :
     RwEq (trans (trans f (refl b)) g) (trans f g) :=
   CoherenceDerived.rweq_triangle_full f g
 
 /-! ## Hexagon Identity for the Inversion Braiding -/
 
 /-- Hexagon identity for inversion: symm (p * q * r) reduces to symm r * symm q * symm p. -/
-theorem rweq_hexagon_braiding (p : Path a b) (q : Path b c) (r : Path c d) :
+noncomputable def rweq_hexagon_braiding (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (symm (trans (trans p q) r))
          (trans (symm r) (trans (symm q) (symm p))) :=
   CoherenceDerived.rweq_symm_trans_assoc p q r

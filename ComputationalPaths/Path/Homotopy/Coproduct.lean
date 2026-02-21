@@ -77,14 +77,14 @@ def sumDecodeR {b₀ : B} {x : Sum A B} (c : sumCodeR b₀ x) : Path (Sum.inr b�
   | inr b => exact inrCongr c
 
 /-- `sumDecode` preserves `RwEq` (by functoriality of `congrArg`). -/
-theorem sumDecode_respects_rweq (a₀ a : A) {c₁ c₂ : Path a₀ a} (h : RwEq c₁ c₂) :
+noncomputable def sumDecode_respects_rweq (a₀ a : A) {c₁ c₂ : Path a₀ a} (h : RwEq c₁ c₂) :
     RwEq (sumDecode (a₀ := a₀) (x := (Sum.inl a : Sum A B)) c₁)
       (sumDecode (a₀ := a₀) (x := (Sum.inl a : Sum A B)) c₂) := by
   simpa [sumDecode] using
     (rweq_congrArg_of_rweq (A := A) (B := Sum A B) Sum.inl h)
 
 /-- `sumDecodeR` preserves `RwEq` (by functoriality of `congrArg`). -/
-theorem sumDecodeR_respects_rweq (b₀ b : B) {c₁ c₂ : Path b₀ b} (h : RwEq c₁ c₂) :
+noncomputable def sumDecodeR_respects_rweq (b₀ b : B) {c₁ c₂ : Path b₀ b} (h : RwEq c₁ c₂) :
     RwEq (sumDecodeR (b₀ := b₀) (x := (Sum.inr b : Sum A B)) c₁)
       (sumDecodeR (b₀ := b₀) (x := (Sum.inr b : Sum A B)) c₂) := by
   simpa [sumDecodeR] using

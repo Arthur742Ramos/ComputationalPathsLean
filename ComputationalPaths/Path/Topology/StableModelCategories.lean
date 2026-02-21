@@ -71,7 +71,7 @@ theorem stablemcstep_toEq {A : Type u} {a b : A} {p q : Path a b}
   | exact_compose => rfl
   | octahedral => rfl
 
-theorem stablemcstep_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def stablemcstep_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : StableMCStep p q) : RwEq p q := by
   cases h with
   | shift_id => exact RwEq.refl _
@@ -312,13 +312,13 @@ def stableEquivId
 /-! ## Coherence theorems -/
 
 /-- Shift of identity via Path and RwEq. -/
-theorem shift_id_rweq {C : PreAdditiveCategory}
+noncomputable def shift_id_rweq {C : PreAdditiveCategory}
     (S : StableShiftData C) (X : C.Obj) :
     RwEq (S.shift_id_path X) (S.shift_id_path X) :=
   RwEq.refl _
 
 /-- Shift composition compatibility via RwEq. -/
-theorem shift_comp_rweq {C : PreAdditiveCategory}
+noncomputable def shift_comp_rweq {C : PreAdditiveCategory}
     (S : StableShiftData C) {X Y Z : C.Obj}
     (f : C.Hom X Y) (g : C.Hom Y Z) :
     RwEq (S.shift_comp_path f g) (S.shift_comp_path f g) :=
@@ -343,7 +343,7 @@ theorem shift_unshift_id {C : PreAdditiveCategory}
   rfl
 
 /-- Multi-step StableMCStep is sound. -/
-theorem stablemcstep_multi_sound {A : Type u} {a b : A}
+noncomputable def stablemcstep_multi_sound {A : Type u} {a b : A}
     {p q r : Path a b}
     (h1 : StableMCStep p q) (h2 : StableMCStep q r) :
     RwEq p r :=
@@ -364,7 +364,7 @@ theorem rotate_f_eq {C : PreAdditiveCategory}
   rfl
 
 /-- Stable equivalence preserves identity morphisms. -/
-theorem stable_equiv_preserves_id
+noncomputable def stable_equiv_preserves_id
     {C D : PreAdditiveCategory}
     {SM : StableModelCatData C} {SN : StableModelCatData D}
     (F : StableEquivData C D SM SN) (X : C.Obj) :
@@ -372,7 +372,7 @@ theorem stable_equiv_preserves_id
   RwEq.refl _
 
 /-- Stable equivalence composition is sound via Path. -/
-theorem stable_equiv_comp_sound
+noncomputable def stable_equiv_comp_sound
     {C D : PreAdditiveCategory}
     {SM : StableModelCatData C} {SN : StableModelCatData D}
     (F : StableEquivData C D SM SN)

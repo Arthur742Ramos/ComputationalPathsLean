@@ -362,7 +362,7 @@ def circlePointed : Pointed where
     (sigmaPointed circlePointed).pt = CompPath.suspensionCircleBasepoint := rfl
  
 /-- Comparison to computational loops at the basepoint. -/
-theorem omegaEq_base_rweq (Y : Pointed) :
+noncomputable def omegaEq_base_rweq (Y : Pointed) :
     RwEq (loopSpaceEqToPath (liftEqRefl Y.pt)) (Path.refl Y.pt) := by
   simpa using rweq_ofEq_rfl_refl (a := Y.pt)
  

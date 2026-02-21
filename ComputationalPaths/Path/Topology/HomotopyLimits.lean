@@ -64,7 +64,7 @@ theorem holimstep_toEq {A : Type u} {a b : A} {p q : Path a b}
   | pushout_univ => rfl
   | telescope_step => rfl
 
-theorem holimstep_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def holimstep_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : HoLimStep p q) : RwEq p q := by
   cases h with
   | cone_refl => exact RwEq.refl _
@@ -346,7 +346,7 @@ theorem cocone_leg_refl {I : DiagramShape.{u}} {A : Type v}
   simp
 
 /-- HoLimStep multi-step is sound. -/
-theorem holimstep_multi_sound {A : Type u} {a b : A}
+noncomputable def holimstep_multi_sound {A : Type u} {a b : A}
     {p q r : Path a b}
     (h1 : HoLimStep p q) (h2 : HoLimStep q r) :
     RwEq p r :=
@@ -359,7 +359,7 @@ def mayerVietoris_symm {A : Type v}
   Path.symm MV.comm
 
 /-- Telescope compatibility via RwEq. -/
-theorem tel_compat_rweq {A : Type v} (T : TelData A) (n : Nat) :
+noncomputable def tel_compat_rweq {A : Type v} (T : TelData A) (n : Nat) :
     RwEq (Path.trans (T.map n) (T.incl (n + 1))) (T.incl n) := by
   exact rweq_of_eq (T.compat n).toEq
 

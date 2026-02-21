@@ -90,7 +90,7 @@ theorem lensLoopPow_succ (p q n : Nat) :
     lensLoopNPow p q (n + 1) = Path.trans (lensLoopNPow p q n) (lensLoop p q) := by rfl
 
 /-- `loop^1 ≈ loop` via left unit. -/
-theorem lensLoopPow_one_rweq (p q : Nat) :
+noncomputable def lensLoopPow_one_rweq (p q : Nat) :
     RwEq (lensLoopNPow p q 1) (lensLoop p q) :=
   rweq_of_step (Step.trans_refl_left (lensLoop p q))
 
@@ -116,7 +116,7 @@ theorem lensRightUnit (p q n : Nat) :
   rw_of_step (Step.trans_refl_right (lensLoopNPow p q n))
 
 /-- Associativity of loop powers: `(loop^m ⬝ loop^n) ⬝ loop ▷ loop^m ⬝ (loop^n ⬝ loop)`. -/
-theorem lensPowAssoc (p q : Nat) (m : Nat) (n : Nat) :
+noncomputable def lensPowAssoc (p q : Nat) (m : Nat) (n : Nat) :
     RwEq (Path.trans (Path.trans (lensLoopNPow p q m) (lensLoopNPow p q n))
             (lensLoop p q))
          (Path.trans (lensLoopNPow p q m)
@@ -145,7 +145,7 @@ theorem lensNorm2 (p q : Nat) :
   · exact Step.trans_refl_right _
 
 /-- Two normalizations agree via RwEq. -/
-theorem lensNormalization_rweq (p q : Nat) :
+noncomputable def lensNormalization_rweq (p q : Nat) :
     RwEq (Path.trans (Path.trans (Path.refl (lensSpaceBase p q)) (lensLoop p q))
             (Path.refl (lensSpaceBase p q)))
          (lensLoop p q) :=

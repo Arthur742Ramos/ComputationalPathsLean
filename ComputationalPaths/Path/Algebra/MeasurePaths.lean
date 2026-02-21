@@ -118,28 +118,28 @@ theorem additivity_symm_trans (d : AdditivityData) :
   simp [additivity_path]
 
 /-- RwEq: additivity path trans refl. -/
-theorem additivity_rweq_trans_refl (d : AdditivityData) :
+noncomputable def additivity_rweq_trans_refl (d : AdditivityData) :
     RwEq
       (Path.trans d.additivePath (Path.refl d.sumVal))
       d.additivePath :=
   rweq_of_step (Step.trans_refl_right d.additivePath)
 
 /-- RwEq: additivity inv cancel right. -/
-theorem additivity_rweq_inv_right (d : AdditivityData) :
+noncomputable def additivity_rweq_inv_right (d : AdditivityData) :
     RwEq
       (Path.trans d.additivePath (Path.symm d.additivePath))
       (Path.refl d.measUnion) :=
   rweq_cmpA_inv_right d.additivePath
 
 /-- RwEq: additivity inv cancel left. -/
-theorem additivity_rweq_inv_left (d : AdditivityData) :
+noncomputable def additivity_rweq_inv_left (d : AdditivityData) :
     RwEq
       (Path.trans (Path.symm d.additivePath) d.additivePath)
       (Path.refl d.sumVal) :=
   rweq_cmpA_inv_left d.additivePath
 
 /-- RwEq: additivity symm_symm. -/
-theorem additivity_rweq_symm_symm (d : AdditivityData) :
+noncomputable def additivity_rweq_symm_symm (d : AdditivityData) :
     RwEq
       (Path.symm (Path.symm d.additivePath))
       d.additivePath :=
@@ -160,14 +160,14 @@ theorem mono_trans_refl (d : MonoData) :
   simp
 
 /-- RwEq: monotonicity trans refl. -/
-theorem mono_rweq_trans_refl (d : MonoData) :
+noncomputable def mono_rweq_trans_refl (d : MonoData) :
     RwEq
       (Path.trans d.monoPath (Path.refl d.measB))
       d.monoPath :=
   rweq_of_step (Step.trans_refl_right d.monoPath)
 
 /-- RwEq: monotonicity inv cancel. -/
-theorem mono_rweq_inv_right (d : MonoData) :
+noncomputable def mono_rweq_inv_right (d : MonoData) :
     RwEq
       (Path.trans d.monoPath (Path.symm d.monoPath))
       (Path.refl (d.measA + d.diff)) :=
@@ -188,21 +188,21 @@ theorem cont_below_trans_refl (d : ContFromBelow) :
   simp
 
 /-- RwEq: continuity from below inv cancel. -/
-theorem cont_below_rweq_inv_right (d : ContFromBelow) :
+noncomputable def cont_below_rweq_inv_right (d : ContFromBelow) :
     RwEq
       (Path.trans d.limitPath (Path.symm d.limitPath))
       (Path.refl d.unionMeas) :=
   rweq_cmpA_inv_right d.limitPath
 
 /-- RwEq: continuity from below trans refl. -/
-theorem cont_below_rweq_trans_refl (d : ContFromBelow) :
+noncomputable def cont_below_rweq_trans_refl (d : ContFromBelow) :
     RwEq
       (Path.trans d.limitPath (Path.refl d.limitVal))
       d.limitPath :=
   rweq_of_step (Step.trans_refl_right d.limitPath)
 
 /-- RwEq: continuity from below symm_symm. -/
-theorem cont_below_rweq_symm_symm (d : ContFromBelow) :
+noncomputable def cont_below_rweq_symm_symm (d : ContFromBelow) :
     RwEq
       (Path.symm (Path.symm d.limitPath))
       d.limitPath :=
@@ -218,14 +218,14 @@ structure ContFromAbove where
   limitPath : Path interMeas limitVal
 
 /-- RwEq: continuity from above inv cancel. -/
-theorem cont_above_rweq_inv_right (d : ContFromAbove) :
+noncomputable def cont_above_rweq_inv_right (d : ContFromAbove) :
     RwEq
       (Path.trans d.limitPath (Path.symm d.limitPath))
       (Path.refl d.interMeas) :=
   rweq_cmpA_inv_right d.limitPath
 
 /-- RwEq: continuity from above trans refl. -/
-theorem cont_above_rweq_trans_refl (d : ContFromAbove) :
+noncomputable def cont_above_rweq_trans_refl (d : ContFromAbove) :
     RwEq
       (Path.trans d.limitPath (Path.refl d.limitVal))
       d.limitPath :=
@@ -244,14 +244,14 @@ theorem null_trans_refl (d : NullSetData) :
   simp
 
 /-- RwEq: null set inv cancel. -/
-theorem null_rweq_inv_right (d : NullSetData) :
+noncomputable def null_rweq_inv_right (d : NullSetData) :
     RwEq
       (Path.trans d.nullPath (Path.symm d.nullPath))
       (Path.refl d.measVal) :=
   rweq_cmpA_inv_right d.nullPath
 
 /-- RwEq: null set symm_symm. -/
-theorem null_rweq_symm_symm (d : NullSetData) :
+noncomputable def null_rweq_symm_symm (d : NullSetData) :
     RwEq
       (Path.symm (Path.symm d.nullPath))
       d.nullPath :=
@@ -279,14 +279,14 @@ theorem outer_assoc {a b c d : Nat}
   simp
 
 /-- RwEq: outer measure trans refl. -/
-theorem outer_rweq_trans_refl (d : OuterMeasureData) :
+noncomputable def outer_rweq_trans_refl (d : OuterMeasureData) :
     RwEq
       (Path.trans d.subaddPath (Path.refl d.sumVal))
       d.subaddPath :=
   rweq_of_step (Step.trans_refl_right d.subaddPath)
 
 /-- RwEq: outer measure inv cancel. -/
-theorem outer_rweq_inv_right (d : OuterMeasureData) :
+noncomputable def outer_rweq_inv_right (d : OuterMeasureData) :
     RwEq
       (Path.trans d.subaddPath (Path.symm d.subaddPath))
       (Path.refl d.outerVal) :=

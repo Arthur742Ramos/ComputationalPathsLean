@@ -56,7 +56,7 @@ def coveringLoopLifts {P : A → Type u} {a : A}
   loopAction l pc.basepoint = pc.basepoint
 
 /-- coveringLoopLifts respects RwEq of loops. -/
-theorem coveringLoopLifts_respects_rweq {P : A → Type u} {a : A}
+noncomputable def coveringLoopLifts_respects_rweq {P : A → Type u} {a : A}
     (pc : PointedCovering P a)
     {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) :
     coveringLoopLifts pc l₁ ↔ coveringLoopLifts pc l₂ := by

@@ -46,7 +46,7 @@ abbrev homotopyLocalize {A : Type u} {a b : A} (p : Path a b) :
   localize p
 
 /-- Homotopy localization identifies rewrite-equivalent paths. -/
-theorem homotopyLocalize_respects_rweq {A : Type u} {a b : A}
+noncomputable def homotopyLocalize_respects_rweq {A : Type u} {a b : A}
     {p q : Path a b} (h : RwEq p q) :
     homotopyLocalize (A := A) p = homotopyLocalize (A := A) q :=
   localize_respects_rweq (A := A) (a := a) (b := b) (p := p) (q := q) h

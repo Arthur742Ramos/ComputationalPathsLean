@@ -34,7 +34,7 @@ def OperadAlgebraStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .inverse_cancel p => Path.Step.trans_symm p
 
 /-- Lift an operadic-algebra normalization step to rewrite equivalence. -/
-theorem rweq_of_operad_algebra_step {A : Type u} {a b : A}
+noncomputable def rweq_of_operad_algebra_step {A : Type u} {a b : A}
     {p q : Path a b} (s : OperadAlgebraStep p q) : RwEq p q :=
   rweq_of_step (OperadAlgebraStep.toStep s)
 
@@ -68,13 +68,13 @@ variable {O : Path.Algebra.OperadTheory.CleanOperad}
 variable {A : Type v}
 variable (D : AlgebraOverOperadPathData O A)
 
-@[simp] theorem unit_action_rweq (x : A) :
+noncomputable def unit_action_rweq (x : A) :
     RwEq
       (Path.trans (D.unitActionPath x) (Path.refl x))
       (D.unitActionPath x) :=
   rweq_of_operad_algebra_step (D.unitActionStep x)
 
-@[simp] theorem equivariant_rweq
+noncomputable def equivariant_rweq
     {n : Nat} (σ : Path.Algebra.OperadTheory.Perm n) (θ : O.ops n) (xs : Fin n → A) :
     RwEq
       (Path.trans (Path.refl (D.act (O.action σ θ) xs)) (D.equivariantPath σ θ xs))
@@ -87,7 +87,7 @@ def actionRoundTrip
     Path (D.act (O.action σ θ) xs) (D.act (O.action σ θ) xs) :=
   Path.trans (D.equivariantPath σ θ xs) (Path.symm (D.equivariantPath σ θ xs))
 
-@[simp] theorem action_roundtrip_rweq
+noncomputable def action_roundtrip_rweq
     {n : Nat} (σ : Path.Algebra.OperadTheory.Perm n) (θ : O.ops n) (xs : Fin n → A) :
     RwEq (D.actionRoundTrip σ θ xs) (Path.refl (D.act (O.action σ θ) xs)) := by
   unfold actionRoundTrip
@@ -150,7 +150,7 @@ variable {X : AlgebraOverOperadPathData O A}
 variable {Y : AlgebraOverOperadPathData O B}
 variable (f : OperadAlgebraMorphismPathData X Y)
 
-@[simp] theorem map_action_rweq
+noncomputable def map_action_rweq
     {n : Nat} (θ : O.ops n) (xs : Fin n → A) :
     RwEq
       (Path.trans (f.mapActionPath θ xs)

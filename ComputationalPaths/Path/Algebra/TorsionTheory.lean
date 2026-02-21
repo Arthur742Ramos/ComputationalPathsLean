@@ -210,7 +210,7 @@ def trivialCluster (TC : TriangulatedCategory.{u})
 
 /-! ## RwEq lemmas -/
 
-theorem torsionStep_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def torsionStep_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : TorsionStep p q) : RwEq p q := by
   cases h with
   | orth_refl => exact RwEq.refl _

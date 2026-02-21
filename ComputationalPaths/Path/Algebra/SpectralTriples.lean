@@ -341,7 +341,7 @@ def grading_real_interaction (v : F.hilbert.carrier) :
         (pathOfEqStepChain (F.gamma_sq (F.chargeConj v)).symm)))
 
 /-- RwEq witness: the two paths J(γ²v)→v are path-equivalent. -/
-theorem grading_real_rweq (v : F.hilbert.carrier) :
+noncomputable def grading_real_rweq (v : F.hilbert.carrier) :
     RwEq
       (Path.trans (pathOfEqStepChain (_root_.congrArg F.chargeConj (F.gamma_sq v)))
                   (pathOfEqStepChain (F.chargeConj_sq v)))

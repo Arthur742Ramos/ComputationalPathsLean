@@ -152,7 +152,7 @@ def connectivityRouteRight {A : Type u} {a : A} (p q r : Path a a) : Path a a :=
   Path.trans p (Path.trans q r)
 
 /-- Reassociation of connectivity routes is witnessed by rewrite equivalence. -/
-theorem connectivity_route_two_cell {A : Type u} {a : A} (p q r : Path a a) :
+noncomputable def connectivity_route_two_cell {A : Type u} {a : A} (p q r : Path a a) :
     RwEq (connectivityRouteLeft p q r) (connectivityRouteRight p q r) :=
   rweq_tt p q r
 

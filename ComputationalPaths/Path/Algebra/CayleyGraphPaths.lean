@@ -157,7 +157,7 @@ def wordPathEq_trans (P : GroupPresentation) {w1 w2 w3 : Word P.Gen}
 /-! ## Rewrite-equivalence example -/
 
 /-- Two syntactically different word paths are rewrite-equivalent. -/
-theorem wordPath_rweq_refl (P : GroupPresentation) (w : Word P.Gen) :
+noncomputable def wordPath_rweq_refl (P : GroupPresentation) (w : Word P.Gen) :
     RwEq
       (Path.trans (Path.refl (wordToVertex P w)) (Path.refl (wordToVertex P w)))
       (Path.refl (wordToVertex P w)) := by

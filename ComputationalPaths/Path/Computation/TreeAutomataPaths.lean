@@ -256,7 +256,7 @@ theorem treeAutoStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Instances -/
 
 /-- RwEq: tree rewrite refl is stable. -/
-theorem rwEq_tree_refl {Sigma : Type u} (t : RTree Sigma) :
+noncomputable def rwEq_tree_refl {Sigma : Type u} (t : RTree Sigma) :
     RwEq (treeRewriteRefl t) (treeRewriteRefl t) :=
   RwEq.refl _
 
@@ -282,7 +282,7 @@ theorem trans_refl_tree {Sigma : Type u} (t : RTree Sigma) :
     Path.trans (treeRewriteRefl t) (Path.refl t) = treeRewriteRefl t := by simp
 
 /-- RwEq for tree rewrite symmetry. -/
-theorem rwEq_tree_symm {Sigma : Type u} {t₁ t₂ : RTree Sigma}
+noncomputable def rwEq_tree_symm {Sigma : Type u} {t₁ t₂ : RTree Sigma}
     (p : Path t₁ t₂) : RwEq (treeRewriteSymm p) (treeRewriteSymm p) :=
   RwEq.refl _
 

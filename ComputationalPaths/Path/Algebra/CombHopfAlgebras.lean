@@ -297,12 +297,12 @@ theorem hopfStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Instances -/
 
 /-- RwEq: antipode-one path is stable. -/
-theorem rwEq_antipode_one (H : PathHopfAlgebra) :
+noncomputable def rwEq_antipode_one (H : PathHopfAlgebra) :
     RwEq H.antipode_one H.antipode_one :=
   RwEq.refl _
 
 /-- RwEq: dendriform axiom paths are stable. -/
-theorem rwEq_dendri (DA : DendriformAlgebra) (x y z : DA.D) :
+noncomputable def rwEq_dendri (DA : DendriformAlgebra) (x y z : DA.D) :
     RwEq (DA.dendri_1 x y z) (DA.dendri_1 x y z) :=
   RwEq.refl _
 
@@ -313,12 +313,12 @@ theorem symm_symm_hopf (H : PathHopfAlgebra) :
   simp
 
 /-- RwEq: bialgebra associativity is stable. -/
-theorem rwEq_bialg (B : PathBialgebra) (a b c : B.A) :
+noncomputable def rwEq_bialg (B : PathBialgebra) (a b c : B.A) :
     RwEq (B.mul_assoc a b c) (B.mul_assoc a b c) :=
   RwEq.refl _
 
 /-- RwEq: antipode anti-homomorphism is stable. -/
-theorem rwEq_anti_homo (H : PathHopfAlgebra) (a b : H.A) :
+noncomputable def rwEq_anti_homo (H : PathHopfAlgebra) (a b : H.A) :
     RwEq (H.antipode_anti a b) (H.antipode_anti a b) :=
   RwEq.refl _
 

@@ -175,7 +175,7 @@ theorem affineSchubertDegree_refl (n : Nat) (pls : PetersonLamShimozonoData n) :
 theorem quantumSchubertIndex_refl (n : Nat) (c : SchubertClass n) :
     quantumSchubertIndex n c = quantumSchubertIndex n c := rfl
 
-theorem schubertPolynomialSupport_rweq (n : Nat) (d : DoubleSchubertPolynomial n) :
+noncomputable def schubertPolynomialSupport_rweq (n : Nat) (d : DoubleSchubertPolynomial n) :
     RwEq (Path.refl (schubertPolynomialSupport n d))
          (Path.refl (schubertPolynomialSupport n d)) :=
   RwEq.refl _

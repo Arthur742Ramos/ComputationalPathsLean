@@ -49,25 +49,25 @@ namespace MotivicComplexPathData
 
 variable {X : Type u} (C : MotivicComplexPathData X)
 
-@[simp] theorem addZero_rweq (n : Int) (x : C.term n) :
+noncomputable def addZero_rweq (n : Int) (x : C.term n) :
     RwEq
       (Path.trans (C.addZeroPath n x) (Path.refl x))
       (C.addZeroPath n x) :=
   rweq_of_step (C.addZeroStep n x)
 
-@[simp] theorem dSquared_rweq (n : Int) (x : C.term n) :
+noncomputable def dSquared_rweq (n : Int) (x : C.term n) :
     RwEq
       (Path.trans (C.dSquaredPath n x) (Path.refl (C.zero (n + 1 + 1))))
       (C.dSquaredPath n x) :=
   rweq_of_step (C.dSquaredStep n x)
 
-@[simp] theorem dSquared_cancel_left_rweq (n : Int) (x : C.term n) :
+noncomputable def dSquared_cancel_left_rweq (n : Int) (x : C.term n) :
     RwEq
       (Path.trans (Path.symm (C.dSquaredPath n x)) (C.dSquaredPath n x))
       (Path.refl (C.zero (n + 1 + 1))) :=
   rweq_cmpA_inv_left (C.dSquaredPath n x)
 
-@[simp] theorem dSquared_cancel_right_rweq (n : Int) (x : C.term n) :
+noncomputable def dSquared_cancel_right_rweq (n : Int) (x : C.term n) :
     RwEq
       (Path.trans (C.dSquaredPath n x) (Path.symm (C.dSquaredPath n x)))
       (Path.refl (C.differential (n + 1) (C.differential n x))) :=

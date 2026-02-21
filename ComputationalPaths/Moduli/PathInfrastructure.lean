@@ -35,13 +35,13 @@ def canonicalClassCompat :
       (M.virtualClass.classOf M.deformation.specialFiber) :=
   M.virtualClass.mapClass M.deformation.specialize
 
-@[simp] theorem classCompat_cancel_left :
+noncomputable def classCompat_cancel_left :
     RwEq
       (Path.trans (Path.symm M.classCompat) M.classCompat)
       (Path.refl (M.virtualClass.classOf M.deformation.specialFiber)) :=
   rweq_cmpA_inv_left M.classCompat
 
-@[simp] theorem canonicalClassCompat_refl_right :
+noncomputable def canonicalClassCompat_refl_right :
     RwEq
       (Path.trans
         M.canonicalClassCompat
@@ -56,7 +56,7 @@ def classInvariance (n : Nat) :
       (M.virtualClass.classOf M.deformation.specialFiber) :=
   M.virtualClass.deformationInvariantClass M.deformation n
 
-@[simp] theorem classInvariance_cancel_left (n : Nat) :
+noncomputable def classInvariance_cancel_left (n : Nat) :
     RwEq
       (Path.trans (Path.symm (M.classInvariance n)) (M.classInvariance n))
       (Path.refl (M.virtualClass.classOf M.deformation.specialFiber)) :=

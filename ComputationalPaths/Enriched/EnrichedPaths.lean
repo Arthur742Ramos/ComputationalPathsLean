@@ -81,7 +81,7 @@ abbrev EnrichedHomObj (A : Type u) (a b : A) : Type u :=
   Path.Step.trans_congr_right p h
 
 /-- Enriched composition respects simultaneous primitive steps in both arguments. -/
-@[simp] theorem homComp_respects_steps {A : Type u} {a b c : A}
+noncomputable def homComp_respects_steps {A : Type u} {a b c : A}
     {p p' : EnrichedHomObj A a b} {q q' : EnrichedHomObj A b c}
     (hp : Path.Step p p') (hq : Path.Step q q') :
     RwEq (homComp p q) (homComp p' q') := by
@@ -90,14 +90,14 @@ abbrev EnrichedHomObj (A : Type u) (a b : A) : Type u :=
     (rweq_of_step (homComp_respects_step_right (p := p') hq))
 
 /-- Enriched composition respects rewrite equivalence on hom-objects. -/
-@[simp] theorem homComp_respects_rweq {A : Type u} {a b c : A}
+noncomputable def homComp_respects_rweq {A : Type u} {a b c : A}
     {p p' : EnrichedHomObj A a b} {q q' : EnrichedHomObj A b c}
     (hp : RwEq p p') (hq : RwEq q q') :
     RwEq (homComp p q) (homComp p' q') :=
   rweq_trans_congr hp hq
 
 /-- Compatibility with the packaged enriched-category composition. -/
-@[simp] theorem pathEnriched_comp_respects_steps {A : Type u} {a b c : A}
+noncomputable def pathEnriched_comp_respects_steps {A : Type u} {a b c : A}
     {p p' : (pathEnrichedCategory A).Hom a b}
     {q q' : (pathEnrichedCategory A).Hom b c}
     (hp : Path.Step p p') (hq : Path.Step q q') :
@@ -106,7 +106,7 @@ abbrev EnrichedHomObj (A : Type u) (a b : A) : Type u :=
   simpa using homComp_respects_steps (A := A) (hp := hp) (hq := hq)
 
 /-- Compatibility with the packaged enriched-category composition under `RwEq`. -/
-@[simp] theorem pathEnriched_comp_respects_rweq {A : Type u} {a b c : A}
+noncomputable def pathEnriched_comp_respects_rweq {A : Type u} {a b c : A}
     {p p' : (pathEnrichedCategory A).Hom a b}
     {q q' : (pathEnrichedCategory A).Hom b c}
     (hp : RwEq p p') (hq : RwEq q q') :

@@ -43,7 +43,7 @@ def naturalityWitness {a b : A} (p : Path a b) (x : F.obj a) :
     (Path.trans (Path.refl _) (naturalityCore (η := η) p x))
     (Path.refl _)
 
-@[simp] theorem naturalityWitness_rweq_core {a b : A} (p : Path a b) (x : F.obj a) :
+noncomputable def naturalityWitness_rweq_core {a b : A} (p : Path a b) (x : F.obj a) :
     RwEq (naturalityWitness (η := η) p x) (naturalityCore (η := η) p x) := by
   apply rweq_trans
   · exact rweq_of_step

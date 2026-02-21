@@ -139,7 +139,7 @@ theorem kleinNormalize2 :
   · exact Step.trans_refl_right kleinBottleLoopA
 
 /-- Two normalizations agree: they produce the same result via RwEq. -/
-theorem kleinNormalization_rweq :
+noncomputable def kleinNormalization_rweq :
     RwEq (Path.trans (Path.trans (Path.refl kleinBottleBase) kleinBottleLoopA)
             (Path.refl kleinBottleBase))
          kleinBottleLoopA :=
@@ -170,7 +170,7 @@ theorem kleinAssocChain :
       (Step.trans_assoc kleinBottleLoopB (Path.symm kleinBottleLoopA) kleinBottleLoopB)
 
 /-- The associator chain as RwEq. -/
-theorem kleinAssocChain_rweq :
+noncomputable def kleinAssocChain_rweq :
     RwEq (Path.trans (Path.trans (Path.trans kleinBottleLoopA kleinBottleLoopB)
             (Path.symm kleinBottleLoopA)) kleinBottleLoopB)
          (Path.trans kleinBottleLoopA
@@ -190,7 +190,7 @@ theorem kleinRelatorNorm :
   · exact Step.trans_refl_left _
 
 /-- Normalization of the relator word as RwEq. -/
-theorem kleinRelatorNorm_rweq :
+noncomputable def kleinRelatorNorm_rweq :
     RwEq (Path.trans (Path.trans (Path.refl kleinBottleBase) kleinRelatorWord)
             (Path.refl kleinBottleBase))
          kleinRelatorWord :=
@@ -205,7 +205,7 @@ theorem kleinSymmTrans :
   rw_of_step (Step.symm_trans_congr kleinBottleLoopA kleinBottleLoopB)
 
 /-- Symmetry distribution as RwEq. -/
-theorem kleinSymmTrans_rweq :
+noncomputable def kleinSymmTrans_rweq :
     RwEq (Path.symm (Path.trans kleinBottleLoopA kleinBottleLoopB))
          (Path.trans (Path.symm kleinBottleLoopB) (Path.symm kleinBottleLoopA)) :=
   rweq_of_rw kleinSymmTrans

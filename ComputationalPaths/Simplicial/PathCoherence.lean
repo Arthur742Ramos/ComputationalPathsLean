@@ -74,13 +74,13 @@ theorem mapPath_step (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj n}
   simpa [mapPath] using Path.Step.trans_refl_right (Path.congrArg (F.map n) p)
 
 /-- `mapPath` reduction witness lifted to rewrite equivalence. -/
-theorem mapPath_rweq (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj n}
+noncomputable def mapPath_rweq (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj n}
     (p : Path x y) :
     RwEq (F.mapPath p) (Path.congrArg (F.map n) p) :=
   rweq_of_step (F.mapPath_step p)
 
 /-- Path action respects rewrite equivalence. -/
-theorem mapPath_respects_rweq (F : PathPreservingSSetMap S T)
+noncomputable def mapPath_respects_rweq (F : PathPreservingSSetMap S T)
     {n : Nat} {x y : S.obj n} {p q : Path x y} :
     RwEq p q → RwEq (F.mapPath p) (F.mapPath q) := by
   intro h
@@ -153,7 +153,7 @@ theorem mappedFacePath_step (F : PathPreservingSSetMap S T)
   Path.Step.trans_refl_right (F.mappedFacePath kan horn i hi)
 
 /-- Rewrite-equivalence form of `mappedFacePath_step`. -/
-theorem mappedFacePath_rweq (F : PathPreservingSSetMap S T)
+noncomputable def mappedFacePath_rweq (F : PathPreservingSSetMap S T)
     (kan : KanFillerProperty S)
     {n : Nat} {k : Fin (n + 2)} (horn : HornData S n k)
     (i : Fin (n + 2)) (hi : i ≠ k) :

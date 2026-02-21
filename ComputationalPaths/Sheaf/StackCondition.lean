@@ -25,23 +25,23 @@ structure DescentTransition (Idx : Type u) (Fiber : Idx → Type u) where
     Path (transport (Path.trans p q) x) (transport q (transport p x))
 
 /-- Left-unit normalization for stack transport composition. -/
-theorem transport_left_unit {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def transport_left_unit {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.refl a) p) p :=
   rweq_of_step (Step.trans_refl_left p)
 
 /-- Right-unit normalization for stack transport composition. -/
-theorem transport_right_unit {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def transport_right_unit {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p :=
   rweq_of_step (Step.trans_refl_right p)
 
 /-- Associativity witness for triple transport composition. -/
-theorem transport_assoc {A : Type u} {a b c d : A}
+noncomputable def transport_assoc {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   rweq_of_step (Step.trans_assoc p q r)
 
 /-- A two-step rewrite witness replacing direct equality reasoning. -/
-theorem transport_cancel_normalize {A : Type u} {a b c : A}
+noncomputable def transport_cancel_normalize {A : Type u} {a b c : A}
     (p : Path a b) (q : Path a c) :
     RwEq (Path.trans (Path.trans p (Path.symm p)) q) q := by
   exact rweq_trans

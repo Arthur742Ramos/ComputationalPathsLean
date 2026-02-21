@@ -51,7 +51,7 @@ namespace TiltPathData
 variable {R : Type u} {Rflat : Type v}
 variable {rR : PerfectoidMulData R} {rRf : PerfectoidMulData Rflat}
 
-@[simp] theorem sharp_mul_rweq
+noncomputable def sharp_mul_rweq
     (T : TiltPathData R Rflat rR rRf) (a b : Rflat) :
     RwEq
       (Path.trans
@@ -60,12 +60,12 @@ variable {rR : PerfectoidMulData R} {rRf : PerfectoidMulData Rflat}
       (Path.refl (rR.mul (T.sharp a) (T.sharp b))) :=
   rweq_of_step (T.sharp_mul_step a b)
 
-@[simp] theorem to_from_rweq
+noncomputable def to_from_rweq
     (T : TiltPathData R Rflat rR rRf) (x : Rflat) :
     RwEq (Path.trans (T.to_from x) (Path.refl x)) (T.to_from x) :=
   rweq_of_step (T.to_from_step x)
 
-@[simp] theorem from_to_rweq
+noncomputable def from_to_rweq
     (T : TiltPathData R Rflat rR rRf) (x : R) :
     RwEq (Path.trans (T.from_to x) (Path.refl x)) (T.from_to x) :=
   rweq_of_step (T.from_to_step x)
@@ -104,12 +104,12 @@ def charRoundTripInv
     Path T.primeR T.primeR :=
   Path.trans T.primeInvPath T.primePath
 
-@[simp] theorem char_roundtrip_rweq
+noncomputable def char_roundtrip_rweq
     (T : TiltingPathInfrastructure R Rflat rR rRf) :
     RwEq (T.charRoundTrip) (Path.refl T.primeFlat) :=
   rweq_of_step T.prime_roundtrip_step
 
-@[simp] theorem char_roundtrip_inv_rweq
+noncomputable def char_roundtrip_inv_rweq
     (T : TiltingPathInfrastructure R Rflat rR rRf) :
     RwEq (T.charRoundTripInv) (Path.refl T.primeR) :=
   rweq_of_step T.prime_roundtrip_inv_step
@@ -122,7 +122,7 @@ def sharpMulNormalized
       (rR.mul (T.forward.sharp a) (T.forward.sharp a)) :=
   Path.trans (Path.refl _) (Path.refl _)
 
-@[simp] theorem sharp_mul_normalized_rweq
+noncomputable def sharp_mul_normalized_rweq
     (T : TiltingPathInfrastructure R Rflat rR rRf) (a : Rflat) :
     RwEq
       (T.sharpMulNormalized a)

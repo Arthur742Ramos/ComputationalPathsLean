@@ -80,28 +80,28 @@ namespace FormalDeformationData
 variable {A : Type u} (D : FormalDeformationData A)
 
 /-- The base-point recovery path for addition is rewrite-cancelable. -/
-@[simp] theorem addDefBaseCancelLeft (x y : A) :
+noncomputable def addDefBaseCancelLeft (x y : A) :
     RwEq
       (Path.trans (Path.symm (D.addDefBase x y)) (D.addDefBase x y))
       (Path.refl (D.add x y)) :=
   rweq_cmpA_inv_left (D.addDefBase x y)
 
 /-- The base-point recovery path for bracket is rewrite-cancelable. -/
-@[simp] theorem bracketDefBaseCancelLeft (x y : A) :
+noncomputable def bracketDefBaseCancelLeft (x y : A) :
     RwEq
       (Path.trans (Path.symm (D.bracketDefBase x y)) (D.bracketDefBase x y))
       (Path.refl (D.bracket x y)) :=
   rweq_cmpA_inv_left (D.bracketDefBase x y)
 
 /-- Symmetry of the base-recovery path for the deformed addition. -/
-@[simp] theorem addDefBaseCancelRight (x y : A) :
+noncomputable def addDefBaseCancelRight (x y : A) :
     RwEq
       (Path.trans (D.addDefBase x y) (Path.symm (D.addDefBase x y)))
       (Path.refl (D.addDef D.zero x y)) :=
   rweq_cmpA_inv_right (D.addDefBase x y)
 
 /-- Symmetry of the base-recovery path for the deformed bracket. -/
-@[simp] theorem bracketDefBaseCancelRight (x y : A) :
+noncomputable def bracketDefBaseCancelRight (x y : A) :
     RwEq
       (Path.trans (D.bracketDefBase x y) (Path.symm (D.bracketDefBase x y)))
       (Path.refl (D.bracketDef D.zero x y)) :=
@@ -132,15 +132,15 @@ def equationStep (mc : MaurerCartanViaPaths D) :
     Path.Step (Path.trans mc.equation (Path.refl D.zero)) mc.equation :=
   Path.Step.trans_refl_right mc.equation
 
-@[simp] theorem equationRweq (mc : MaurerCartanViaPaths D) :
+noncomputable def equationRweq (mc : MaurerCartanViaPaths D) :
     RwEq (Path.trans mc.equation (Path.refl D.zero)) mc.equation :=
   rweq_of_step (equationStep mc)
 
-@[simp] theorem equationCancelLeft (mc : MaurerCartanViaPaths D) :
+noncomputable def equationCancelLeft (mc : MaurerCartanViaPaths D) :
     RwEq (Path.trans (Path.symm mc.equation) mc.equation) (Path.refl D.zero) :=
   rweq_cmpA_inv_left mc.equation
 
-@[simp] theorem equationCancelRight (mc : MaurerCartanViaPaths D) :
+noncomputable def equationCancelRight (mc : MaurerCartanViaPaths D) :
     RwEq
       (Path.trans mc.equation (Path.symm mc.equation))
       (Path.refl (formalCurvature D mc.element)) :=
@@ -159,7 +159,7 @@ def transportAlongPath (mc : MaurerCartanViaPaths D)
       (Path.trans mc.equation (Path.refl D.zero))
 
 /-- Normalization: the transported MC equation simplifies via trans_refl. -/
-@[simp] theorem transportAlongPathRweq
+noncomputable def transportAlongPathRweq
     (mc : MaurerCartanViaPaths D) {β : A} (p : Path mc.element β) :
     RwEq
       (Path.trans (transportAlongPath mc p).equation (Path.refl D.zero))
@@ -270,7 +270,7 @@ def mapMaurerCartan (φ : ArtinianMorphism DA DB)
           φ.preservesZero))
 
 /-- Normalization step for mapped MC equations. -/
-@[simp] theorem mapMaurerCartanRweq (φ : ArtinianMorphism DA DB)
+noncomputable def mapMaurerCartanRweq (φ : ArtinianMorphism DA DB)
     (mc : MaurerCartanViaPaths DA) :
     RwEq
       (Path.trans (φ.mapMaurerCartan mc).equation (Path.refl DB.zero))
@@ -278,7 +278,7 @@ def mapMaurerCartan (φ : ArtinianMorphism DA DB)
   rweq_of_step (Path.Step.trans_refl_right _)
 
 /-- Cancellation: the mapped MC equation is left-cancelable. -/
-@[simp] theorem mapMaurerCartanCancelLeft (φ : ArtinianMorphism DA DB)
+noncomputable def mapMaurerCartanCancelLeft (φ : ArtinianMorphism DA DB)
     (mc : MaurerCartanViaPaths DA) :
     RwEq
       (Path.trans
@@ -321,12 +321,12 @@ namespace InfinitesimalDeformation
 variable {A : Type u} {D : FormalDeformationData A}
 
 /-- Normalization step for infinitesimal cocycle equations. -/
-@[simp] theorem cocycleRweq (inf : InfinitesimalDeformation D) :
+noncomputable def cocycleRweq (inf : InfinitesimalDeformation D) :
     RwEq (Path.trans inf.cocycle (Path.refl D.zero)) inf.cocycle :=
   rweq_of_step (Path.Step.trans_refl_right _)
 
 /-- Cancellation: the cocycle is left-cancelable. -/
-@[simp] theorem cocycleCancelLeft (inf : InfinitesimalDeformation D) :
+noncomputable def cocycleCancelLeft (inf : InfinitesimalDeformation D) :
     RwEq (Path.trans (Path.symm inf.cocycle) inf.cocycle) (Path.refl D.zero) :=
   rweq_cmpA_inv_left inf.cocycle
 
@@ -368,14 +368,14 @@ namespace DeformationEquivalence
 variable {A : Type u} {D₁ D₂ : FormalDeformationData A}
 
 /-- The left-inverse path is rewrite-cancelable. -/
-@[simp] theorem leftInverseCancelLeft (eq : DeformationEquivalence D₁ D₂) (x : A) :
+noncomputable def leftInverseCancelLeft (eq : DeformationEquivalence D₁ D₂) (x : A) :
     RwEq
       (Path.trans (Path.symm (eq.leftInverse x)) (eq.leftInverse x))
       (Path.refl x) :=
   rweq_cmpA_inv_left (eq.leftInverse x)
 
 /-- The right-inverse path is rewrite-cancelable. -/
-@[simp] theorem rightInverseCancelLeft (eq : DeformationEquivalence D₁ D₂) (x : A) :
+noncomputable def rightInverseCancelLeft (eq : DeformationEquivalence D₁ D₂) (x : A) :
     RwEq
       (Path.trans (Path.symm (eq.rightInverse x)) (eq.rightInverse x))
       (Path.refl x) :=

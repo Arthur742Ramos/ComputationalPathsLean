@@ -255,17 +255,17 @@ structure TopologicalOrder where
 /-! ## RwEq Results -/
 
 /-- TKNN formula composes with refl. -/
-theorem tknn_rweq {BZ : BrillouinZone.{u}} (T : TKNNFormula BZ) :
+noncomputable def tknn_rweq {BZ : BrillouinZone.{u}} (T : TKNNFormula BZ) :
     RwEq (Path.trans (Path.refl _) T.tknn) T.tknn := by
   exact rweq_cmpA_refl_left T.tknn
 
 /-- Bulk-boundary correspondence composes with refl. -/
-theorem bulk_boundary_rweq {BZ : BrillouinZone.{u}} (BB : BulkBoundary BZ) :
+noncomputable def bulk_boundary_rweq {BZ : BrillouinZone.{u}} (BB : BulkBoundary BZ) :
     RwEq (Path.trans (Path.refl _) BB.correspondence) BB.correspondence := by
   exact rweq_cmpA_refl_left BB.correspondence
 
 /-- Z2 bulk-boundary composes with refl. -/
-theorem z2_bulk_boundary_rweq {BZ : BrillouinZone.{u}} (ZBB : Z2BulkBoundary BZ) :
+noncomputable def z2_bulk_boundary_rweq {BZ : BrillouinZone.{u}} (ZBB : Z2BulkBoundary BZ) :
     RwEq (Path.trans (Path.refl _) ZBB.correspondence) ZBB.correspondence := by
   exact rweq_cmpA_refl_left ZBB.correspondence
 

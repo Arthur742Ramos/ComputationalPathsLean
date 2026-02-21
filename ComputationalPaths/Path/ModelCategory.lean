@@ -166,12 +166,12 @@ theorem factorization_triv_cof_fib_rw_from_step {a b : A} (p : Path a b) :
   exact rw_of_step (factorization_triv_cof_fib_step_witness (A := A) p)
 
 /-- Cofibration-trivial-fibration factorization gives an `RwEq` rewrite from its Step witness. -/
-theorem factorization_cof_triv_fib_rweq_from_step {a b : A} (p : Path a b) :
+noncomputable def factorization_cof_triv_fib_rweq_from_step {a b : A} (p : Path a b) :
     RwEq ((pathModelCategory A).comp p (Path.refl b)) p := by
   exact rweq_of_step (factorization_cof_triv_fib_step_witness (A := A) p)
 
 /-- Trivial-cofibration-fibration factorization gives an `RwEq` rewrite from its Step witness. -/
-theorem factorization_triv_cof_fib_rweq_from_step {a b : A} (p : Path a b) :
+noncomputable def factorization_triv_cof_fib_rweq_from_step {a b : A} (p : Path a b) :
     RwEq ((pathModelCategory A).comp (Path.refl a) p) p := by
   exact rweq_of_step (factorization_triv_cof_fib_step_witness (A := A) p)
 

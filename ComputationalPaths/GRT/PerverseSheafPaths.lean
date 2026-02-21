@@ -45,7 +45,7 @@ namespace PerverseSheafPathData
 
 variable {Obj : Type u} (P : PerverseSheafPathData Obj)
 
-@[simp] theorem tExact_rweq (F : Obj) :
+noncomputable def tExact_rweq (F : Obj) :
     RwEq
       (Path.trans (P.tExactPath F) (Path.refl (P.nearbyCycles F)))
       (P.tExactPath F) :=
@@ -57,13 +57,13 @@ variable {Obj : Type u} (P : PerverseSheafPathData Obj)
       (P.tExactPath F) :=
   Path.Step.trans_refl_left (P.tExactPath F)
 
-@[simp] theorem tExact_left_unit_rweq (F : Obj) :
+noncomputable def tExact_left_unit_rweq (F : Obj) :
     RwEq
       (Path.trans (Path.refl (P.shift (P.nearbyCycles F) 0)) (P.tExactPath F))
       (P.tExactPath F) :=
   rweq_of_step (P.tExact_left_unit_step F)
 
-@[simp] theorem gluing_rweq (F : Obj) :
+noncomputable def gluing_rweq (F : Obj) :
     RwEq
       (Path.trans (Path.refl (P.vanishingCycles F)) (P.gluingPath F))
       (P.gluingPath F) :=
@@ -75,7 +75,7 @@ variable {Obj : Type u} (P : PerverseSheafPathData Obj)
       (P.gluingPath F) :=
   Path.Step.trans_refl_right (P.gluingPath F)
 
-@[simp] theorem gluing_right_unit_rweq (F : Obj) :
+noncomputable def gluing_right_unit_rweq (F : Obj) :
     RwEq
       (Path.trans (P.gluingPath F) (Path.refl (P.nearbyCycles F)))
       (P.gluingPath F) :=
@@ -87,7 +87,7 @@ variable {Obj : Type u} (P : PerverseSheafPathData Obj)
       (Path.refl (P.nearbyCycles F)) :=
   Path.Step.symm_trans (P.gluingPath F)
 
-@[simp] theorem gluing_cancel_left_rweq (F : Obj) :
+noncomputable def gluing_cancel_left_rweq (F : Obj) :
     RwEq
       (Path.trans (Path.symm (P.gluingPath F)) (P.gluingPath F))
       (Path.refl (P.nearbyCycles F)) :=
@@ -99,7 +99,7 @@ variable {Obj : Type u} (P : PerverseSheafPathData Obj)
       (Path.refl (P.vanishingCycles F)) :=
   Path.Step.trans_symm (P.gluingPath F)
 
-@[simp] theorem gluing_cancel_right_rweq (F : Obj) :
+noncomputable def gluing_cancel_right_rweq (F : Obj) :
     RwEq
       (Path.trans (P.gluingPath F) (Path.symm (P.gluingPath F)))
       (Path.refl (P.vanishingCycles F)) :=

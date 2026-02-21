@@ -94,7 +94,7 @@ def equivariantPath_of_path {x y : X} (p : Path x y) :
   simp [equivariantPath_of_path]
 
 /-- Equivariant path projection respects rewrite equality. -/
-theorem equivariantPath_respects_rweq {x y : X} {p q : Path x y}
+noncomputable def equivariantPath_respects_rweq {x y : X} {p q : Path x y}
     (h : RwEq p q) :
     RwEq (equivariantPath_of_path (A := A) p)
       (equivariantPath_of_path (A := A) q) := by

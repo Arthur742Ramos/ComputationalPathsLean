@@ -34,7 +34,7 @@ def ScanningStep.toStep {Y : Type v} {a b : Y} {p q : Path a b}
   | .cancel p => Path.Step.symm_trans p
 
 /-- Lift a domain-specific scanning step to rewrite equivalence. -/
-theorem rweq_of_scanning_step {Y : Type v} {a b : Y}
+noncomputable def rweq_of_scanning_step {Y : Type v} {a b : Y}
     {p q : Path a b} (s : ScanningStep p q) : RwEq p q :=
   rweq_of_step (ScanningStep.toStep s)
 
@@ -56,7 +56,7 @@ namespace ScanningMapData
 variable {X : Type u} {Y : Type v}
 variable (S : ScanningMapData X Y)
 
-@[simp] theorem commutation_rweq (x : X) :
+noncomputable def commutation_rweq (x : X) :
     RwEq
       (Path.trans (S.commutationPath x) (Path.refl (S.targetShift (S.scan x))))
       (S.commutationPath x) :=
@@ -69,13 +69,13 @@ def commutation_left_unit_step (x : X) :
       (S.commutationPath x) :=
   ScanningStep.left_unit (S.commutationPath x)
 
-@[simp] theorem commutation_left_unit_rweq (x : X) :
+noncomputable def commutation_left_unit_rweq (x : X) :
     RwEq
       (Path.trans (Path.refl (S.scan (S.sourceStabilize x))) (S.commutationPath x))
       (S.commutationPath x) :=
   rweq_of_scanning_step (S.commutation_left_unit_step x)
 
-@[simp] theorem commutation_cancel_rweq (x : X) :
+noncomputable def commutation_cancel_rweq (x : X) :
     RwEq
       (Path.trans (Path.symm (S.commutationPath x)) (S.commutationPath x))
       (Path.refl (S.targetShift (S.scan x))) :=
@@ -90,7 +90,7 @@ def twoStepScanningPath (x : X) :
     (S.commutationPath (S.sourceStabilize x))
     (Path.congrArg S.targetShift (S.commutationPath x))
 
-@[simp] theorem two_step_rweq (x : X) :
+noncomputable def two_step_rweq (x : X) :
     RwEq
       (Path.trans
         (S.twoStepScanningPath x)

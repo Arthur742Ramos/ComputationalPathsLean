@@ -65,7 +65,7 @@ def crossing_step (X Y : Obj) :
       (Q.crossingPath X Y) :=
   Path.Step.trans_refl_right (Q.crossingPath X Y)
 
-@[simp] theorem crossing_rweq (X Y : Obj) :
+noncomputable def crossing_rweq (X Y : Obj) :
     RwEq
       (Path.trans
         (Q.crossingPath X Y)
@@ -82,7 +82,7 @@ def nilHecke_step (X : Obj) :
       (Q.nilHeckePath X) :=
   Path.Step.trans_refl_left (Q.nilHeckePath X)
 
-@[simp] theorem nilHecke_rweq (X : Obj) :
+noncomputable def nilHecke_rweq (X : Obj) :
     RwEq
       (Path.trans
         (Path.refl (Q.tensor (Q.e1 (Q.e1 X)) (Q.shift X)))
@@ -96,7 +96,7 @@ def unitCounitTrianglePath (X : Obj) :
       (Q.tensor (Q.e1 (Q.f1 X)) (Q.shift X)) :=
   Path.trans (Q.unitPath X) (Q.counitPath X)
 
-@[simp] theorem unitCounitTriangle_rweq (X : Obj) :
+noncomputable def unitCounitTriangle_rweq (X : Obj) :
     RwEq
       (Path.trans
         (Q.unitCounitTrianglePath X)
@@ -104,13 +104,13 @@ def unitCounitTrianglePath (X : Obj) :
       (Q.unitCounitTrianglePath X) :=
   rweq_cmpA_refl_right (Q.unitCounitTrianglePath X)
 
-@[simp] theorem crossing_cancel_left (X Y : Obj) :
+noncomputable def crossing_cancel_left (X Y : Obj) :
     RwEq
       (Path.trans (Path.symm (Q.crossingPath X Y)) (Q.crossingPath X Y))
       (Path.refl (Q.tensor (Q.f1 Y) (Q.e1 X))) :=
   rweq_cmpA_inv_left (Q.crossingPath X Y)
 
-@[simp] theorem crossing_cancel_right (X Y : Obj) :
+noncomputable def crossing_cancel_right (X Y : Obj) :
     RwEq
       (Path.trans (Q.crossingPath X Y) (Path.symm (Q.crossingPath X Y)))
       (Path.refl (Q.tensor (Q.e1 X) (Q.f1 Y))) :=
@@ -125,7 +125,7 @@ def braidHexagon_step (X Y Z : Obj) :
       (Q.braidHexagonPath X Y Z) :=
   Path.Step.trans_refl_right (Q.braidHexagonPath X Y Z)
 
-@[simp] theorem braidHexagon_rweq (X Y Z : Obj) :
+noncomputable def braidHexagon_rweq (X Y Z : Obj) :
     RwEq
       (Path.trans
         (Q.braidHexagonPath X Y Z)
@@ -133,7 +133,7 @@ def braidHexagon_step (X Y Z : Obj) :
       (Q.braidHexagonPath X Y Z) :=
   rweq_of_step (Q.braidHexagon_step X Y Z)
 
-@[simp] theorem unitCounit_cancel_rweq (X : Obj) :
+noncomputable def unitCounit_cancel_rweq (X : Obj) :
     RwEq
       (Path.trans
         (Path.symm (Q.unitCounitTrianglePath X))

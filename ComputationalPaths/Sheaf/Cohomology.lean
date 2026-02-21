@@ -28,19 +28,19 @@ def boundary {A : Type u} {a b : A} (p : Path a b) : Path a a :=
   Path.trans p (Path.symm p)
 
 /-- Boundary contracts to reflexivity by a single rewrite step. -/
-theorem boundary_contracts {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def boundary_contracts {A : Type u} {a b : A} (p : Path a b) :
     RwEq (boundary p) (Path.refl a) :=
   rweq_of_step (Step.trans_symm p)
 
 /-- Unit insertion followed by contraction gives a rewrite-normal form. -/
-theorem boundary_unit_contracts {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def boundary_unit_contracts {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans (boundary p) (Path.refl a)) (Path.refl a) := by
   exact rweq_trans
     (rweq_of_step (Step.trans_refl_right (boundary p)))
     (rweq_of_step (Step.trans_symm p))
 
 /-- Reassociation witness for triple composites in connecting morphisms. -/
-theorem connecting_assoc {A : Type u} {a b c d : A}
+noncomputable def connecting_assoc {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   rweq_of_step (Step.trans_assoc p q r)

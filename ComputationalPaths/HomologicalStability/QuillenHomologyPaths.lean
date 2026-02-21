@@ -37,7 +37,7 @@ def QuillenHomologyStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .cancel p => Path.Step.symm_trans p
 
 /-- Lift a Quillen-homology domain step to rewrite equivalence. -/
-theorem rweq_of_quillen_step {A : Type u} {a b : A}
+noncomputable def rweq_of_quillen_step {A : Type u} {a b : A}
     {p q : Path a b} (s : QuillenHomologyStep p q) : RwEq p q :=
   rweq_of_step (QuillenHomologyStep.toStep s)
 
@@ -61,7 +61,7 @@ namespace QuillenHomologyPathData
 variable {A : Type u}
 variable (Q : QuillenHomologyPathData A)
 
-@[simp] theorem linearization_rweq (x : A) :
+noncomputable def linearization_rweq (x : A) :
     RwEq
       (Path.trans
         (Q.linearizationPath x)
@@ -83,7 +83,7 @@ def stabilization_left_unit_step (x : A) :
       (Q.stabilizationPath x) :=
   QuillenHomologyStep.left_unit (Q.stabilizationPath x)
 
-@[simp] theorem stabilization_left_unit_rweq (x : A) :
+noncomputable def stabilization_left_unit_rweq (x : A) :
     RwEq
       (Path.trans (Path.refl (Q.derive (Q.stabilize x))) (Q.stabilizationPath x))
       (Q.stabilizationPath x) :=
@@ -96,7 +96,7 @@ def linearizationRoundTrip (x : A) :
       (Q.stabilize (Q.indecomposables x)) :=
   Path.trans (Path.symm (Q.linearizationPath x)) (Q.linearizationPath x)
 
-@[simp] theorem linearizationRoundTrip_rweq (x : A) :
+noncomputable def linearizationRoundTrip_rweq (x : A) :
     RwEq
       (Q.linearizationRoundTrip x)
       (Path.refl (Q.stabilize (Q.indecomposables x))) := by
@@ -122,7 +122,7 @@ def scanLinearizationPath (x : X) :
       (B.quillen.stabilize (B.quillen.indecomposables (B.scanning.scan x))) :=
   B.quillen.linearizationPath (B.scanning.scan x)
 
-@[simp] theorem scanLinearization_cancel_rweq (x : X) :
+noncomputable def scanLinearization_cancel_rweq (x : X) :
     RwEq
       (Path.trans (Path.symm (B.scanLinearizationPath x)) (B.scanLinearizationPath x))
       (Path.refl (B.quillen.stabilize (B.quillen.indecomposables (B.scanning.scan x)))) :=
@@ -137,7 +137,7 @@ def stabilizedScanningPath (x : X) :
     (Path.congrArg B.quillen.stabilize (B.scanning.commutationPath x))
     (Path.refl (B.quillen.stabilize (B.scanning.targetShift (B.scanning.scan x))))
 
-@[simp] theorem stabilizedScanning_rweq (x : X) :
+noncomputable def stabilizedScanning_rweq (x : X) :
     RwEq
       (B.stabilizedScanningPath x)
       (Path.congrArg B.quillen.stabilize (B.scanning.commutationPath x)) := by
@@ -145,7 +145,7 @@ def stabilizedScanningPath (x : X) :
   exact rweq_cmpA_refl_right
     (Path.congrArg B.quillen.stabilize (B.scanning.commutationPath x))
 
-@[simp] theorem stabilizedScanning_cancel_rweq (x : X) :
+noncomputable def stabilizedScanning_cancel_rweq (x : X) :
     RwEq
       (Path.trans (Path.symm (B.stabilizedScanningPath x)) (B.stabilizedScanningPath x))
       (Path.refl (B.quillen.stabilize (B.scanning.targetShift (B.scanning.scan x)))) :=

@@ -255,20 +255,20 @@ def mkEnrichedYoneda (C : VCategory) : EnrichedYoneda C where
 /-! ## RwEq Coherence Theorems -/
 
 /-- Enriched composition is associative up to RwEq on path-enriched categories. -/
-@[simp] theorem enriched_assoc_rweq {A : Type u} {a b c d : A}
+noncomputable def enriched_assoc_rweq {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (Path.trans (Path.trans p q) r)
          (Path.trans p (Path.trans q r)) :=
   rweq_tt p q r
 
 /-- Enriched left unit law via RwEq. -/
-@[simp] theorem enriched_left_unit_rweq {A : Type u} {a b : A}
+noncomputable def enriched_left_unit_rweq {A : Type u} {a b : A}
     (p : Path a b) :
     RwEq (Path.trans (Path.refl a) p) p :=
   rweq_cmpA_refl_left p
 
 /-- Enriched right unit law via RwEq. -/
-@[simp] theorem enriched_right_unit_rweq {A : Type u} {a b : A}
+noncomputable def enriched_right_unit_rweq {A : Type u} {a b : A}
     (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p :=
   rweq_cmpA_refl_right p

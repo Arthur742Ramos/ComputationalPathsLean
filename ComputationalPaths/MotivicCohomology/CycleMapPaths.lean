@@ -52,26 +52,26 @@ namespace CycleMapPathData
 variable {X : Type u} {H : Int → Type v}
 variable {C : MotivicComplexPathData X} (M : CycleMapPathData C H)
 
-@[simp] theorem cycleMap_rweq (n : Int) (x : C.term n) :
+noncomputable def cycleMap_rweq (n : Int) (x : C.term n) :
     RwEq
       (Path.trans (M.cycleMapPath n x)
         (Path.refl (M.cohDifferential n (M.cycleClass n x))))
       (M.cycleMapPath n x) :=
   rweq_of_step (M.cycleMapStep n x)
 
-@[simp] theorem zeroMap_rweq (n : Int) :
+noncomputable def zeroMap_rweq (n : Int) :
     RwEq
       (Path.trans (Path.refl (M.cycleClass n (C.zero n))) (M.zeroMapPath n))
       (M.zeroMapPath n) :=
   rweq_of_step (M.zeroMapStep n)
 
-@[simp] theorem cycleMap_cancel_left_rweq (n : Int) (x : C.term n) :
+noncomputable def cycleMap_cancel_left_rweq (n : Int) (x : C.term n) :
     RwEq
       (Path.trans (Path.symm (M.cycleMapPath n x)) (M.cycleMapPath n x))
       (Path.refl (M.cohDifferential n (M.cycleClass n x))) :=
   rweq_cmpA_inv_left (M.cycleMapPath n x)
 
-@[simp] theorem cycleMap_cancel_right_rweq (n : Int) (x : C.term n) :
+noncomputable def cycleMap_cancel_right_rweq (n : Int) (x : C.term n) :
     RwEq
       (Path.trans (M.cycleMapPath n x) (Path.symm (M.cycleMapPath n x)))
       (Path.refl (M.cycleClass (n + 1) (C.differential n x))) :=

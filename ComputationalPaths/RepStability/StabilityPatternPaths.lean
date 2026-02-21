@@ -70,7 +70,7 @@ def centralDetectPath (x : Carrier) :
     (S.detectIdempotentPath (S.shift x))
     (S.centralStabilityPath x)
 
-@[simp] theorem centralDetect_rweq (x : Carrier) :
+noncomputable def centralDetect_rweq (x : Carrier) :
     RwEq
       (Path.trans
         (S.centralDetectPath x)
@@ -78,7 +78,7 @@ def centralDetectPath (x : Carrier) :
       (S.centralDetectPath x) :=
   rweq_cmpA_refl_right (S.centralDetectPath x)
 
-@[simp] theorem centralDetect_cancel_rweq (x : Carrier) :
+noncomputable def centralDetect_cancel_rweq (x : Carrier) :
     RwEq
       (Path.trans (Path.symm (S.centralDetectPath x)) (S.centralDetectPath x))
       (Path.refl (S.shift (S.detectStable x))) :=
@@ -91,7 +91,7 @@ def detectIdempotent_step (x : Carrier) :
       (S.detectIdempotentPath x) :=
   Path.Step.trans_refl_right (S.detectIdempotentPath x)
 
-@[simp] theorem detectIdempotent_rweq (x : Carrier) :
+noncomputable def detectIdempotent_rweq (x : Carrier) :
     RwEq
       (Path.trans (S.detectIdempotentPath x) (Path.refl (S.detectStable x)))
       (S.detectIdempotentPath x) :=
@@ -104,7 +104,7 @@ def periodicity_step (n : Nat) (x : Carrier) :
       (S.periodicityPath n x) :=
   Path.Step.trans_refl_left (S.periodicityPath n x)
 
-@[simp] theorem periodicity_rweq (n : Nat) (x : Carrier) :
+noncomputable def periodicity_rweq (n : Nat) (x : Carrier) :
     RwEq
       (Path.trans (Path.refl (S.stage (n + S.period) x)) (S.periodicityPath n x))
       (S.periodicityPath n x) :=
@@ -115,7 +115,7 @@ def periodicityDoublePath (n : Nat) (x : Carrier) :
     Path (S.stage ((n + S.period) + S.period) x) (S.stage n x) :=
   Path.trans (S.periodicityPath (n + S.period) x) (S.periodicityPath n x)
 
-@[simp] theorem periodicityDouble_rweq (n : Nat) (x : Carrier) :
+noncomputable def periodicityDouble_rweq (n : Nat) (x : Carrier) :
     RwEq
       (Path.trans
         (Path.refl (S.stage ((n + S.period) + S.period) x))
@@ -123,7 +123,7 @@ def periodicityDoublePath (n : Nat) (x : Carrier) :
       (S.periodicityDoublePath n x) :=
   rweq_cmpA_refl_left (S.periodicityDoublePath n x)
 
-@[simp] theorem periodicityDouble_cancel_rweq (n : Nat) (x : Carrier) :
+noncomputable def periodicityDouble_cancel_rweq (n : Nat) (x : Carrier) :
     RwEq
       (Path.trans
         (Path.symm (S.periodicityDoublePath n x))
@@ -131,7 +131,7 @@ def periodicityDoublePath (n : Nat) (x : Carrier) :
       (Path.refl (S.stage n x)) :=
   rweq_cmpA_inv_left (S.periodicityDoublePath n x)
 
-@[simp] theorem periodicity_cancel_rweq (n : Nat) (x : Carrier) :
+noncomputable def periodicity_cancel_rweq (n : Nat) (x : Carrier) :
     RwEq
       (Path.trans (Path.symm (S.periodicityPath n x)) (S.periodicityPath n x))
       (Path.refl (S.stage n x)) :=

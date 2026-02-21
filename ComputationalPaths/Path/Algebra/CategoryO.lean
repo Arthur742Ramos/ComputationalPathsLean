@@ -277,19 +277,19 @@ theorem catOStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Examples -/
 
 /-- RwEq: weight decomposition projection is stable. -/
-theorem rwEq_weight_decomp {O : CategoryOData.{u}} {M : O.cat.Obj}
+noncomputable def rwEq_weight_decomp {O : CategoryOData.{u}} {M : O.cat.Obj}
     (wd : WeightDecomp O M) (wt_ : wd.supportWeights) :
     RwEq (wd.proj_incl wt_) (wd.proj_incl wt_) :=
   RwEq.refl _
 
 /-- RwEq: block character constraint is symmetric under RwEq.symm. -/
-theorem rwEq_block_symm {O : CategoryOData.{u}} {cc : CentralCharacter O}
+noncomputable def rwEq_block_symm {O : CategoryOData.{u}} {cc : CentralCharacter O}
     (B : Block O cc) (M : B.obj) :
     RwEq (B.has_char M) (B.has_char M) :=
   RwEq.refl _
 
 /-- RwEq: KL multiplicity evaluation is reflexive. -/
-theorem rwEq_kl_mult {O : CategoryOData.{u}} (kl : KLData O) (w y : kl.Index) :
+noncomputable def rwEq_kl_mult {O : CategoryOData.{u}} (kl : KLData O) (w y : kl.Index) :
     RwEq (kl.mult_eq_eval w y) (kl.mult_eq_eval w y) :=
   RwEq.refl _
 
@@ -301,7 +301,7 @@ theorem symm_symm_block {O : CategoryOData.{u}} {cc : CentralCharacter O}
   simp
 
 /-- RwEq: abelian category associativity law. -/
-theorem rwEq_assoc {C : AbCat.{u}} {X Y Z W : C.Obj}
+noncomputable def rwEq_assoc {C : AbCat.{u}} {X Y Z W : C.Obj}
     (f : C.Hom X Y) (g : C.Hom Y Z) (h : C.Hom Z W) :
     RwEq (C.assoc f g h) (C.assoc f g h) :=
   RwEq.refl _

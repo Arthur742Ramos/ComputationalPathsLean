@@ -414,7 +414,7 @@ def motivicHopf : MotivicHopfMap.{u} where
 /-! ## RwEq Constructions -/
 
 /-- RwEq: bidegree addition is commutative (multi-step). -/
-theorem rwEq_bidegree_comm (d₁ d₂ : Bidegree) :
+noncomputable def rwEq_bidegree_comm (d₁ d₂ : Bidegree) :
     @RwEq Bidegree (d₁.add d₂) (d₂.add d₁)
       (bidegree_add_comm_path d₁ d₂)
       (bidegree_add_comm_path d₁ d₂) :=
@@ -433,7 +433,7 @@ def double_suspension_path (p q : Int) :
   Path.stepChain (by show Bidegree.mk (p + 2) q = Bidegree.mk (p + 2) (q + 0); congr 1; omega)
 
 /-- RwEq: smash product commutativity for motivic spheres. -/
-theorem rwEq_smash_comm (S₁ S₂ : MotivicSphere.{u}) :
+noncomputable def rwEq_smash_comm (S₁ S₂ : MotivicSphere.{u}) :
     @RwEq Bidegree
       (smashSphere S₁ S₂).degree
       (smashSphere S₂ S₁).degree
@@ -456,7 +456,7 @@ def smash_assoc_coherence (S₁ S₂ S₃ : MotivicSphere.{u}) :
     (Path.stepChain (by simp [smashSphere, Bidegree.add]))
 
 /-- RwEq for smash associativity coherence. -/
-theorem rwEq_smash_assoc (S₁ S₂ S₃ : MotivicSphere.{u}) :
+noncomputable def rwEq_smash_assoc (S₁ S₂ S₃ : MotivicSphere.{u}) :
     RwEq (smash_assoc_coherence S₁ S₂ S₃)
          (smash_assoc_coherence S₁ S₂ S₃) :=
   RwEq.refl _

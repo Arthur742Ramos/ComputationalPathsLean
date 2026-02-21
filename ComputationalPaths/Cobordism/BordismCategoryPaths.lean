@@ -67,26 +67,26 @@ theorem bordism_cancel_step {n : Nat} {X Y : BordismObj n}
   simpa [bordismComp, bordismId] using Path.Step.symm_trans p
 
 /-- Left unit as rewrite equivalence. -/
-theorem bordism_id_left_rweq {n : Nat} {X Y : BordismObj n}
+noncomputable def bordism_id_left_rweq {n : Nat} {X Y : BordismObj n}
     (p : Path X Y) :
     RwEq (bordismComp (bordismId X) p) p :=
   rweq_of_step (bordism_id_left_step (p := p))
 
 /-- Right unit as rewrite equivalence. -/
-theorem bordism_id_right_rweq {n : Nat} {X Y : BordismObj n}
+noncomputable def bordism_id_right_rweq {n : Nat} {X Y : BordismObj n}
     (p : Path X Y) :
     RwEq (bordismComp p (bordismId Y)) p :=
   rweq_of_step (bordism_id_right_step (p := p))
 
 /-- Associativity as rewrite equivalence. -/
-theorem bordism_assoc_rweq {n : Nat}
+noncomputable def bordism_assoc_rweq {n : Nat}
     {W X Y Z : BordismObj n}
     (f : Path W X) (g : Path X Y) (h : Path Y Z) :
     RwEq (bordismComp (bordismComp f g) h) (bordismComp f (bordismComp g h)) :=
   rweq_of_step (bordism_assoc_step f g h)
 
 /-- Inverse cancellation as rewrite equivalence. -/
-theorem bordism_cancel_rweq {n : Nat} {X Y : BordismObj n}
+noncomputable def bordism_cancel_rweq {n : Nat} {X Y : BordismObj n}
     (p : Path X Y) :
     RwEq (bordismComp (Path.symm p) p) (bordismId Y) :=
   rweq_of_step (bordism_cancel_step (p := p))

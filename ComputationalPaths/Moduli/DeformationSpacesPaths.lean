@@ -48,25 +48,25 @@ inductive DeformationSpaceStep : {a b : X} → Path a b → Path a b → Prop
       DeformationSpaceStep (Path.trans (Path.refl a) p) p
 
 /-- Deformation-space primitive steps induce global rewrite equivalences. -/
-theorem DeformationSpaceStep.to_rweq {a b : X} {p q : Path a b}
+noncomputable def DeformationSpaceStep.to_rweq {a b : X} {p q : Path a b}
     (h : DeformationSpaceStep p q) : RwEq p q := by
   cases h
   · exact rweq_of_step (Path.Step.trans_refl_right _)
   · exact rweq_of_step (Path.Step.trans_refl_left _)
 
-@[simp] theorem specializeFrom_refl_right_rweq (n : Nat) :
+noncomputable def specializeFrom_refl_right_rweq (n : Nat) :
     RwEq
       (Path.trans (D.specializeFrom n) (Path.refl D.specialFiber))
       (D.specializeFrom n) :=
   rweq_of_step (Path.Step.trans_refl_right (D.specializeFrom n))
 
-@[simp] theorem specializeFrom_cancel_left (n : Nat) :
+noncomputable def specializeFrom_cancel_left (n : Nat) :
     RwEq
       (Path.trans (Path.symm (D.specializeFrom n)) (D.specializeFrom n))
       (Path.refl D.specialFiber) :=
   rweq_cmpA_inv_left (D.specializeFrom n)
 
-@[simp] theorem specializeLoop_contract (n : Nat) :
+noncomputable def specializeLoop_contract (n : Nat) :
     RwEq (D.specializeLoop n) (Path.refl (D.fiber (n + 1))) :=
   rweq_cmpA_inv_right (D.specializeFrom (n + 1))
 
@@ -81,13 +81,13 @@ namespace Section
 def specializeAtZero (s : D.Section) : Path (s.value 0) D.specialFiber :=
   Path.trans (s.lift 0) D.specialize
 
-@[simp] theorem specializeAtZero_refl_right_rweq (s : D.Section) :
+noncomputable def specializeAtZero_refl_right_rweq (s : D.Section) :
     RwEq
       (Path.trans (specializeAtZero D s) (Path.refl D.specialFiber))
       (specializeAtZero D s) :=
   rweq_of_step (Path.Step.trans_refl_right (specializeAtZero D s))
 
-@[simp] theorem specializeAtZero_cancel_left (s : D.Section) :
+noncomputable def specializeAtZero_cancel_left (s : D.Section) :
     RwEq
       (Path.trans (Path.symm (specializeAtZero D s)) (specializeAtZero D s))
       (Path.refl D.specialFiber) :=

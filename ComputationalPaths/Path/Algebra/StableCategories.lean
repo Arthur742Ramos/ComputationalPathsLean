@@ -190,7 +190,7 @@ def trivialStableInfinity (A : Type u) : StableInfinityData.{u} where
 
 /-! ## RwEq lemmas -/
 
-theorem stableStep_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def stableStep_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : StableStep p q) : RwEq p q := by
   cases h with
   | susp_refl => exact RwEq.refl _

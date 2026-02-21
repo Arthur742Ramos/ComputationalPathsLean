@@ -43,31 +43,31 @@ namespace PerfectoidSpacePathData
 
 variable {X : Type u} {R : Type v} (P : PerfectoidSpacePathData X R)
 
-@[simp] theorem tilt_roundtrip_rweq (x : X) :
+noncomputable def tilt_roundtrip_rweq (x : X) :
     RwEq
       (Path.trans (P.tiltRoundTripPath x) (Path.refl x))
       (P.tiltRoundTripPath x) :=
   rweq_of_step (P.tiltRoundTripStep x)
 
-@[simp] theorem untilt_roundtrip_rweq (x : X) :
+noncomputable def untilt_roundtrip_rweq (x : X) :
     RwEq
       (Path.trans (Path.refl (P.tilt (P.untilt x))) (P.untiltRoundTripPath x))
       (P.untiltRoundTripPath x) :=
   rweq_of_step (P.untiltRoundTripStep x)
 
-@[simp] theorem sharp_compat_rweq (x : X) :
+noncomputable def sharp_compat_rweq (x : X) :
     RwEq
       (Path.trans (P.sharpCompatPath x) (Path.refl (P.sectionVal x)))
       (P.sharpCompatPath x) :=
   rweq_of_step (P.sharpCompatStep x)
 
-@[simp] theorem tilt_cancel_rweq (x : X) :
+noncomputable def tilt_cancel_rweq (x : X) :
     RwEq
       (Path.trans (Path.symm (P.tiltRoundTripPath x)) (P.tiltRoundTripPath x))
       (Path.refl x) :=
   rweq_cmpA_inv_left (P.tiltRoundTripPath x)
 
-@[simp] theorem untilt_cancel_rweq (x : X) :
+noncomputable def untilt_cancel_rweq (x : X) :
     RwEq
       (Path.trans (P.untiltRoundTripPath x) (Path.symm (P.untiltRoundTripPath x)))
       (Path.refl (P.tilt (P.untilt x))) :=

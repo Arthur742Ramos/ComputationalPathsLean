@@ -61,14 +61,14 @@ def twoStepCanonicalPath (m₁ m₂ : Move) (x : X) :
     (M.moveCanonicalPath m₂ x)
 
 /-- Primitive right-unit normalization for two-step MMP canonical paths. -/
-@[simp] theorem twoStepNormalize (m₁ m₂ : Move) (x : X) :
+noncomputable def twoStepNormalize (m₁ m₂ : Move) (x : X) :
     RwEq
       (Path.trans (M.twoStepCanonicalPath m₁ m₂ x) (Path.refl (M.birational.canonical x)))
       (M.twoStepCanonicalPath m₁ m₂ x) :=
   rweq_of_step (Path.Step.trans_refl_right _)
 
 /-- Any elementary MMP move canonical path cancels with its inverse on the left. -/
-@[simp] theorem moveCancelLeft (m : Move) (x : X) :
+noncomputable def moveCancelLeft (m : Move) (x : X) :
     RwEq
       (Path.trans (Path.symm (M.moveCanonicalPath m x)) (M.moveCanonicalPath m x))
       (Path.refl (M.birational.canonical x)) :=
@@ -81,7 +81,7 @@ def flipThenFlopPath (x : X) :
   M.twoStepCanonicalPath Move.flip Move.flop x
 
 /-- Primitive right-unit normalization for `flip` then `flop` paths. -/
-@[simp] theorem flipThenFlopNormalize (x : X) :
+noncomputable def flipThenFlopNormalize (x : X) :
     RwEq
       (Path.trans (M.flipThenFlopPath x) (Path.refl (M.birational.canonical x)))
       (M.flipThenFlopPath x) :=

@@ -267,13 +267,13 @@ def triangle_identity_left {C D : QuasiCategory.{u}}
 /-! ## RwEq Examples -/
 
 /-- RwEq: horn filler Path witnesses are RwEq-related reflexively. -/
-theorem rwEq_filler {X : SSet.{u}} {n : Nat} {k : Fin (n + 2)}
+noncomputable def rwEq_filler {X : SSet.{u}} {n : Nat} {k : Fin (n + 2)}
     {h : Horn X n k} (f : HornFiller X n k h) (i : Fin (n + 2)) (hi : i ≠ k) :
     RwEq (f.face_match i hi) (f.face_match i hi) :=
   RwEq.refl _
 
 /-- RwEq: composition of simplicial maps is associative up to RwEq. -/
-theorem rwEq_sset_map_assoc {X Y Z W : SSet.{u}}
+noncomputable def rwEq_sset_map_assoc {X Y Z W : SSet.{u}}
     (f : SSetMap X Y) (g : SSetMap Y Z) (h : SSetMap Z W) (n : Nat)
     (x : X.simp n) :
     RwEq (Path.refl ((SSetMap.comp (SSetMap.comp f g) h).mapLevel n x))

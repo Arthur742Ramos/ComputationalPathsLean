@@ -47,7 +47,7 @@ theorem normalize_idem' (p : Path a b) :
   normalize_idem p
 
 /-- Normalization preserves rewrite equivalence. -/
-theorem normalize_congr {p q : Path a b} (h : RwEq p q) :
+noncomputable def normalize_congr {p q : Path a b} (h : RwEq p q) :
     normalize (A := A) (a := a) (b := b) p = normalize (A := A) (a := a) (b := b) q :=
   normalize_of_rweq (A := A) (a := a) (b := b) h
 
@@ -156,7 +156,7 @@ theorem normalize_steps_agree (p q : Path a b) :
 /-! ## RwEq and normalization -/
 
 /-- If two paths are RwEq, they have the same normal form. -/
-theorem rweq_implies_normalize_eq {p q : Path a b} (h : RwEq p q) :
+noncomputable def rweq_implies_normalize_eq {p q : Path a b} (h : RwEq p q) :
     normalize p = normalize q :=
   normalize_of_rweq h
 

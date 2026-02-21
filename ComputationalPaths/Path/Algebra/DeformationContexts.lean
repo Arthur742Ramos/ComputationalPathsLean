@@ -102,7 +102,7 @@ inductive DeformationStep : {A : Type u} → {a b : A} → Path a b → Path a b
       DeformationStep (Path.refl a) (Path.refl a)
 
 /-- DeformationStep generates RwEq. -/
-theorem deformationStep_to_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def deformationStep_to_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : DeformationStep p q) : RwEq p q := by
   cases h <;> exact RwEq.refl _
 
@@ -349,7 +349,7 @@ theorem obstruction_functorial
 /-! ## Multi-step RwEq Constructions -/
 
 /-- Multi-step deformation rewrite: small extension composition. -/
-theorem deformation_ext_multi_step
+noncomputable def deformation_ext_multi_step
     {A : Type u} (a : A) :
     RwEq (Path.trans (Path.refl a) (Path.trans (Path.refl a) (Path.refl a)))
          (Path.refl a) := by
@@ -358,23 +358,23 @@ theorem deformation_ext_multi_step
   exact RwEq.trans (RwEq.refl _) step1
 
 /-- DG Lie morphism composition simplifies. -/
-theorem dglie_comp_simp {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def dglie_comp_simp {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.refl a) p) p := by
   constructor
 
 /-- Koszul duality round-trip at the Path level. -/
-theorem koszul_roundtrip_rweq {A : Type u} (a : A) :
+noncomputable def koszul_roundtrip_rweq {A : Type u} (a : A) :
     RwEq (Path.symm (Path.refl a)) (Path.refl a) := by
   constructor
 
 /-- Obstruction vanishing as Path simplification. -/
-theorem obstruction_vanish_rweq
+noncomputable def obstruction_vanish_rweq
     {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.symm (Path.symm p)) p :=
   rweq_ss p
 
 /-- Tangent map preserves identity path. -/
-theorem tangent_id_path {A : Type u} (a : A) :
+noncomputable def tangent_id_path {A : Type u} (a : A) :
     RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) := by
   constructor
 

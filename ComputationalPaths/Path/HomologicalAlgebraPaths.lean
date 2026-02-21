@@ -75,15 +75,15 @@ namespace AbelianData
 
 variable {A : Type u} (G : AbelianData A)
 
-@[simp] def addZero_rweq (x : A) :
+noncomputable def addZero_rweq (x : A) :
     RwEq (Path.trans (G.addZeroPath x) (Path.refl x)) (G.addZeroPath x) :=
   rweq_of_hom_step (HomStep.right_unit (G.addZeroPath x))
 
-@[simp] def addNeg_cancel_rweq (x : A) :
+noncomputable def addNeg_cancel_rweq (x : A) :
     RwEq (Path.trans (G.addNegPath x) (Path.symm (G.addNegPath x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (G.addNegPath x))
 
-@[simp] def addAssoc_rweq (x y z : A) :
+noncomputable def addAssoc_rweq (x y z : A) :
     RwEq (Path.trans (G.addAssocPath x y z) (Path.refl _)) (G.addAssocPath x y z) :=
   rweq_of_hom_step (HomStep.right_unit (G.addAssocPath x y z))
 
@@ -119,7 +119,7 @@ def id' (GA : AbelianData A) : HomData GA GA where
   mapAddPath _ _ := Path.refl _
   mapZeroPath := Path.refl _
 
-@[simp] def mapZero_rweq (f : HomData GA GB) :
+noncomputable def mapZero_rweq (f : HomData GA GB) :
     RwEq (Path.trans f.mapZeroPath (Path.refl _)) f.mapZeroPath :=
   rweq_of_hom_step (HomStep.right_unit f.mapZeroPath)
 
@@ -143,11 +143,11 @@ variable {GA : AbelianData A} {GB : AbelianData B} {GC : AbelianData C}
 variable {f : HomData GA GB} {g : HomData GB GC}
 variable (E : ExactAtData GA GB GC f g)
 
-@[simp] def imgToKer_rweq (a : A) :
+noncomputable def imgToKer_rweq (a : A) :
     RwEq (Path.trans (E.imgToKer a) (Path.refl _)) (E.imgToKer a) :=
   rweq_of_hom_step (HomStep.right_unit (E.imgToKer a))
 
-@[simp] def imgToKer_cancel_rweq (a : A) :
+noncomputable def imgToKer_cancel_rweq (a : A) :
     RwEq (Path.trans (E.imgToKer a) (Path.symm (E.imgToKer a))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (E.imgToKer a))
 
@@ -174,7 +174,7 @@ variable (S : ShortExactData GA GB GC)
 def compositionZeroPath (a : A) : Path (S.proj.map (S.inc.map a)) GC.zero :=
   S.exact.imgToKer a
 
-@[simp] def compositionZero_cancel_rweq (a : A) :
+noncomputable def compositionZero_cancel_rweq (a : A) :
     RwEq
       (Path.trans (S.compositionZeroPath a) (Path.symm (S.compositionZeroPath a)))
       (Path.refl _) :=
@@ -206,11 +206,11 @@ variable {GA : AbelianData A} {GB : AbelianData B} {GC : AbelianData C}
 variable {GA' : AbelianData A'} {GB' : AbelianData B'} {GC' : AbelianData C'}
 variable (S : SnakeData GA GB GC GA' GB' GC')
 
-@[simp] def leftSq_cancel_rweq (a : A) :
+noncomputable def leftSq_cancel_rweq (a : A) :
     RwEq (Path.trans (S.leftSqPath a) (Path.symm (S.leftSqPath a))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (S.leftSqPath a))
 
-@[simp] def rightSq_cancel_rweq (b : B) :
+noncomputable def rightSq_cancel_rweq (b : B) :
     RwEq (Path.trans (S.rightSqPath b) (Path.symm (S.rightSqPath b))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (S.rightSqPath b))
 
@@ -222,7 +222,7 @@ def connectingPath (c : C) (kerP : Path (S.γ.map c) GC'.zero)
     (Path.symm (S.rightSqPath b))
     (Path.trans (Path.congrArg S.γ.map liftP) kerP)
 
-@[simp] def connecting_rweq (c : C) (kerP : Path (S.γ.map c) GC'.zero)
+noncomputable def connecting_rweq (c : C) (kerP : Path (S.γ.map c) GC'.zero)
     (b : B) (liftP : Path (S.g.map b) c) :
     RwEq
       (Path.trans (S.connectingPath c kerP b liftP) (Path.refl _))
@@ -295,11 +295,11 @@ variable {A B C : Type u}
 variable {GA : AbelianData A} {GB : AbelianData B} {GC : AbelianData C}
 variable (L : LongExactData GA GB GC)
 
-@[simp] def connect_rweq (n : Int) (c : C) :
+noncomputable def connect_rweq (n : Int) (c : C) :
     RwEq (Path.trans (L.connectPath n c) (Path.refl _)) (L.connectPath n c) :=
   rweq_of_hom_step (HomStep.right_unit (L.connectPath n c))
 
-@[simp] def connect_cancel_rweq (n : Int) (c : C) :
+noncomputable def connect_cancel_rweq (n : Int) (c : C) :
     RwEq (Path.trans (L.connectPath n c) (Path.symm (L.connectPath n c))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (L.connectPath n c))
 
@@ -328,11 +328,11 @@ variable {A B P : Type u}
 variable {GA : AbelianData A} {GB : AbelianData B} {GP : AbelianData P}
 variable (Proj : ProjectiveData GA GB GP)
 
-@[simp] def liftPath_rweq (p : P) :
+noncomputable def liftPath_rweq (p : P) :
     RwEq (Path.trans (Proj.liftPath p) (Path.refl _)) (Proj.liftPath p) :=
   rweq_of_hom_step (HomStep.right_unit (Proj.liftPath p))
 
-@[simp] def liftPath_cancel_rweq (p : P) :
+noncomputable def liftPath_cancel_rweq (p : P) :
     RwEq (Path.trans (Proj.liftPath p) (Path.symm (Proj.liftPath p))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (Proj.liftPath p))
 
@@ -357,11 +357,11 @@ variable {A B I : Type u}
 variable {GA : AbelianData A} {GB : AbelianData B} {GI : AbelianData I}
 variable (Inj : InjectiveData GA GB GI)
 
-@[simp] def extPath_rweq (a : A) :
+noncomputable def extPath_rweq (a : A) :
     RwEq (Path.trans (Inj.extPath a) (Path.refl _)) (Inj.extPath a) :=
   rweq_of_hom_step (HomStep.right_unit (Inj.extPath a))
 
-@[simp] def extPath_cancel_rweq (a : A) :
+noncomputable def extPath_cancel_rweq (a : A) :
     RwEq (Path.trans (Inj.extPath a) (Path.symm (Inj.extPath a))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (Inj.extPath a))
 
@@ -384,11 +384,11 @@ namespace ProjResolutionData
 variable {A : Type u} {GA : AbelianData A}
 variable (R : ProjResolutionData GA)
 
-@[simp] def ddZero_rweq (n : Nat) (x : A) :
+noncomputable def ddZero_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (R.ddZeroPath n x) (Path.refl _)) (R.ddZeroPath n x) :=
   rweq_of_hom_step (HomStep.right_unit (R.ddZeroPath n x))
 
-@[simp] def ddZero_cancel_rweq (n : Nat) (x : A) :
+noncomputable def ddZero_cancel_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (R.ddZeroPath n x) (Path.symm (R.ddZeroPath n x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (R.ddZeroPath n x))
 
@@ -400,7 +400,7 @@ def ddRoundTrip (n : Nat) (x : A) :
     Path (R.diff n (R.diff (n + 1) x)) (R.diff n (R.diff (n + 1) x)) :=
   Path.trans (R.ddZeroPath n x) (Path.symm (R.ddZeroPath n x))
 
-@[simp] def ddRoundTrip_rweq (n : Nat) (x : A) :
+noncomputable def ddRoundTrip_rweq (n : Nat) (x : A) :
     RwEq (R.ddRoundTrip n x) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (R.ddZeroPath n x))
 
@@ -420,11 +420,11 @@ namespace ExtData
 variable {A B : Type u} {GA : AbelianData A} {GB : AbelianData B}
 variable (E : ExtData GA GB)
 
-@[simp] def ddStar_rweq (n : Nat) (b : B) :
+noncomputable def ddStar_rweq (n : Nat) (b : B) :
     RwEq (Path.trans (E.ddStarZeroPath n b) (Path.refl _)) (E.ddStarZeroPath n b) :=
   rweq_of_hom_step (HomStep.right_unit (E.ddStarZeroPath n b))
 
-@[simp] def ddStar_cancel_rweq (n : Nat) (b : B) :
+noncomputable def ddStar_cancel_rweq (n : Nat) (b : B) :
     RwEq (Path.trans (E.ddStarZeroPath n b) (Path.symm (E.ddStarZeroPath n b))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (E.ddStarZeroPath n b))
 
@@ -448,11 +448,11 @@ namespace TorData
 variable {A B : Type u} {GA : AbelianData A} {GB : AbelianData B}
 variable (T : TorData GA GB)
 
-@[simp] def ddTensor_rweq (n : Nat) (b : B) :
+noncomputable def ddTensor_rweq (n : Nat) (b : B) :
     RwEq (Path.trans (T.ddTensorZeroPath n b) (Path.refl _)) (T.ddTensorZeroPath n b) :=
   rweq_of_hom_step (HomStep.right_unit (T.ddTensorZeroPath n b))
 
-@[simp] def ddTensor_cancel_rweq (n : Nat) (b : B) :
+noncomputable def ddTensor_cancel_rweq (n : Nat) (b : B) :
     RwEq (Path.trans (T.ddTensorZeroPath n b) (Path.symm (T.ddTensorZeroPath n b))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (T.ddTensorZeroPath n b))
 
@@ -479,13 +479,13 @@ variable {A B C : Type u}
 variable {GA : AbelianData A} {GB : AbelianData B} {GC : AbelianData C}
 variable (H : HorseshoeData GA GB GC)
 
-@[simp] def directSumDd_rweq (n : Nat) (a : A) (c : C) :
+noncomputable def directSumDd_rweq (n : Nat) (a : A) (c : C) :
     RwEq
       (Path.trans (H.directSumDdPath n a c) (Path.refl _))
       (H.directSumDdPath n a c) :=
   rweq_of_hom_step (HomStep.right_unit (H.directSumDdPath n a c))
 
-@[simp] def directSumDd_cancel_rweq (n : Nat) (a : A) (c : C) :
+noncomputable def directSumDd_cancel_rweq (n : Nat) (a : A) (c : C) :
     RwEq
       (Path.trans (H.directSumDdPath n a c) (Path.symm (H.directSumDdPath n a c)))
       (Path.refl _) :=
@@ -518,11 +518,11 @@ namespace ResolutionComparisonData
 variable {A : Type u} {GA : AbelianData A}
 variable (R : ResolutionComparisonData GA)
 
-@[simp] def comm_rweq (n : Nat) (x : A) :
+noncomputable def comm_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (R.commPath n x) (Path.refl _)) (R.commPath n x) :=
   rweq_of_hom_step (HomStep.right_unit (R.commPath n x))
 
-@[simp] def roundTrip_cancel_rweq (n : Nat) (x : A) :
+noncomputable def roundTrip_cancel_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (R.roundTripPath n x) (Path.symm (R.roundTripPath n x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (R.roundTripPath n x))
 
@@ -547,11 +547,11 @@ namespace LeftDerivedData
 variable {A B : Type u} {GA : AbelianData A} {GB : AbelianData B}
 variable (L : LeftDerivedData GA GB)
 
-@[simp] def derivedDd_rweq (n : Nat) (b : B) :
+noncomputable def derivedDd_rweq (n : Nat) (b : B) :
     RwEq (Path.trans (L.derivedDdPath n b) (Path.refl _)) (L.derivedDdPath n b) :=
   rweq_of_hom_step (HomStep.right_unit (L.derivedDdPath n b))
 
-@[simp] def derivedDd_cancel_rweq (n : Nat) (b : B) :
+noncomputable def derivedDd_cancel_rweq (n : Nat) (b : B) :
     RwEq (Path.trans (L.derivedDdPath n b) (Path.symm (L.derivedDdPath n b))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (L.derivedDdPath n b))
 
@@ -575,15 +575,15 @@ variable (D : DoubleComplexData A GA)
 
 def totalDiff (n : Int) (x : A) : A := GA.add (D.dH n 0 x) (D.dV n 0 x)
 
-@[simp] def dHdH_rweq (p q : Int) (x : A) :
+noncomputable def dHdH_rweq (p q : Int) (x : A) :
     RwEq (Path.trans (D.dHdHPath p q x) (Path.refl _)) (D.dHdHPath p q x) :=
   rweq_of_hom_step (HomStep.right_unit (D.dHdHPath p q x))
 
-@[simp] def dVdV_rweq (p q : Int) (x : A) :
+noncomputable def dVdV_rweq (p q : Int) (x : A) :
     RwEq (Path.trans (D.dVdVPath p q x) (Path.refl _)) (D.dVdVPath p q x) :=
   rweq_of_hom_step (HomStep.right_unit (D.dVdVPath p q x))
 
-@[simp] def antiComm_rweq (p q : Int) (x : A) :
+noncomputable def antiComm_rweq (p q : Int) (x : A) :
     RwEq (Path.trans (D.antiCommPath p q x) (Path.refl _)) (D.antiCommPath p q x) :=
   rweq_of_hom_step (HomStep.right_unit (D.antiCommPath p q x))
 
@@ -609,11 +609,11 @@ namespace MappingConeData
 variable {A : Type u} {GA : AbelianData A}
 variable (M : MappingConeData GA)
 
-@[simp] def coneDd_rweq (n : Int) (x : A) :
+noncomputable def coneDd_rweq (n : Int) (x : A) :
     RwEq (Path.trans (M.dConeDdPath n x) (Path.refl _)) (M.dConeDdPath n x) :=
   rweq_of_hom_step (HomStep.right_unit (M.dConeDdPath n x))
 
-@[simp] def chainComm_cancel_rweq (n : Int) (x : A) :
+noncomputable def chainComm_cancel_rweq (n : Int) (x : A) :
     RwEq (Path.trans (M.chainCommPath n x) (Path.symm (M.chainCommPath n x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (M.chainCommPath n x))
 
@@ -639,23 +639,23 @@ namespace ExtLongExactData
 variable {A M : Type u} {GA : AbelianData A} {GM : AbelianData M}
 variable (E : ExtLongExactData GA GM)
 
-@[simp] def exactB_rweq (n : Nat) (m : M) :
+noncomputable def exactB_rweq (n : Nat) (m : M) :
     RwEq (Path.trans (E.exactBPath n m) (Path.refl _)) (E.exactBPath n m) :=
   rweq_of_hom_step (HomStep.right_unit (E.exactBPath n m))
 
-@[simp] def exactA_rweq (n : Nat) (m : M) :
+noncomputable def exactA_rweq (n : Nat) (m : M) :
     RwEq (Path.trans (E.exactAPath n m) (Path.refl _)) (E.exactAPath n m) :=
   rweq_of_hom_step (HomStep.right_unit (E.exactAPath n m))
 
-@[simp] def exactC_rweq (n : Nat) (m : M) :
+noncomputable def exactC_rweq (n : Nat) (m : M) :
     RwEq (Path.trans (E.exactCPath n m) (Path.refl _)) (E.exactCPath n m) :=
   rweq_of_hom_step (HomStep.right_unit (E.exactCPath n m))
 
-@[simp] def exactB_cancel_rweq (n : Nat) (m : M) :
+noncomputable def exactB_cancel_rweq (n : Nat) (m : M) :
     RwEq (Path.trans (E.exactBPath n m) (Path.symm (E.exactBPath n m))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (E.exactBPath n m))
 
-@[simp] def exactA_cancel_rweq (n : Nat) (m : M) :
+noncomputable def exactA_cancel_rweq (n : Nat) (m : M) :
     RwEq (Path.trans (E.exactAPath n m) (Path.symm (E.exactAPath n m))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (E.exactAPath n m))
 
@@ -682,11 +682,11 @@ namespace DimensionShiftData
 variable {A : Type u} {GA : AbelianData A}
 variable (D : DimensionShiftData GA)
 
-@[simp] def forward_rweq (n : Nat) (a : A) :
+noncomputable def forward_rweq (n : Nat) (a : A) :
     RwEq (Path.trans (D.forwardPath n a) (Path.refl _)) (D.forwardPath n a) :=
   rweq_of_hom_step (HomStep.right_unit (D.forwardPath n a))
 
-@[simp] def forward_backward_rweq (n : Nat) (a : A) :
+noncomputable def forward_backward_rweq (n : Nat) (a : A) :
     RwEq (Path.trans (D.forwardPath n a) (Path.symm (D.forwardPath n a))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (D.forwardPath n a))
 
@@ -718,11 +718,11 @@ namespace ChainHomotopyData
 variable {A : Type u} {GA : AbelianData A}
 variable (H : ChainHomotopyData GA)
 
-@[simp] def homotopy_rweq (n : Int) (x : A) :
+noncomputable def homotopy_rweq (n : Int) (x : A) :
     RwEq (Path.trans (H.homotopyPath n x) (Path.refl _)) (H.homotopyPath n x) :=
   rweq_of_hom_step (HomStep.right_unit (H.homotopyPath n x))
 
-@[simp] def homotopy_cancel_rweq (n : Int) (x : A) :
+noncomputable def homotopy_cancel_rweq (n : Int) (x : A) :
     RwEq (Path.trans (H.homotopyPath n x) (Path.symm (H.homotopyPath n x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (H.homotopyPath n x))
 
@@ -746,11 +746,11 @@ namespace SpectralSeqData
 variable {A : Type u} {GA : AbelianData A}
 variable (S : SpectralSeqData GA)
 
-@[simp] def ddR_rweq (r : Nat) (p q : Int) (x : A) :
+noncomputable def ddR_rweq (r : Nat) (p q : Int) (x : A) :
     RwEq (Path.trans (S.ddRPath r p q x) (Path.refl _)) (S.ddRPath r p q x) :=
   rweq_of_hom_step (HomStep.right_unit (S.ddRPath r p q x))
 
-@[simp] def ddR_cancel_rweq (r : Nat) (p q : Int) (x : A) :
+noncomputable def ddR_cancel_rweq (r : Nat) (p q : Int) (x : A) :
     RwEq (Path.trans (S.ddRPath r p q x) (Path.symm (S.ddRPath r p q x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (S.ddRPath r p q x))
 
@@ -779,19 +779,19 @@ namespace AbelianCategoryData
 
 variable {A : Type u} (C : AbelianCategoryData A)
 
-@[simp] def kernel_rweq (f : A → A) (x : A) :
+noncomputable def kernel_rweq (f : A → A) (x : A) :
     RwEq (Path.trans (C.kernelPath f x) (Path.refl _)) (C.kernelPath f x) :=
   rweq_of_hom_step (HomStep.right_unit (C.kernelPath f x))
 
-@[simp] def cokernel_rweq (f : A → A) (y : A) :
+noncomputable def cokernel_rweq (f : A → A) (y : A) :
     RwEq (Path.trans (C.cokernelPath f y) (Path.refl _)) (C.cokernelPath f y) :=
   rweq_of_hom_step (HomStep.right_unit (C.cokernelPath f y))
 
-@[simp] def kernel_cancel_rweq (f : A → A) (x : A) :
+noncomputable def kernel_cancel_rweq (f : A → A) (x : A) :
     RwEq (Path.trans (C.kernelPath f x) (Path.symm (C.kernelPath f x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (C.kernelPath f x))
 
-@[simp] def cokernel_cancel_rweq (f : A → A) (y : A) :
+noncomputable def cokernel_cancel_rweq (f : A → A) (y : A) :
     RwEq (Path.trans (C.cokernelPath f y) (Path.symm (C.cokernelPath f y))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (C.cokernelPath f y))
 

@@ -42,19 +42,19 @@ def canonical (A : Type u) : PathCoherentOperad A where
 variable {A : Type u}
 
 /-- Associativity coherence as rewrite equivalence. -/
-theorem assoc {a b c d : A}
+noncomputable def assoc {a b c d : A}
     (f : Path a b) (g : Path b c) (h : Path c d) :
     RwEq ((canonical A).compose ((canonical A).compose f g) h)
       ((canonical A).compose f ((canonical A).compose g h)) :=
   rweq_of_rw ((canonical A).assoc_rw f g h)
 
 /-- Left unitality coherence as rewrite equivalence. -/
-theorem left_unit {a b : A} (f : Path a b) :
+noncomputable def left_unit {a b : A} (f : Path a b) :
     RwEq ((canonical A).compose ((canonical A).unit a) f) f :=
   rweq_of_rw ((canonical A).left_unit_rw f)
 
 /-- Right unitality coherence as rewrite equivalence. -/
-theorem right_unit {a b : A} (f : Path a b) :
+noncomputable def right_unit {a b : A} (f : Path a b) :
     RwEq ((canonical A).compose f ((canonical A).unit b)) f :=
   rweq_of_rw ((canonical A).right_unit_rw f)
 
@@ -81,7 +81,7 @@ theorem pentagon_right_route {a b c d e : A}
   · exact Step.trans_congr_right f (Step.trans_assoc g h k)
 
 /-- Pentagon coherence as a genuine rewrite equivalence witness. -/
-theorem pentagon {a b c d e : A}
+noncomputable def pentagon {a b c d e : A}
     (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
     RwEq ((canonical A).compose ((canonical A).compose ((canonical A).compose f g) h) k)
       ((canonical A).compose f ((canonical A).compose g ((canonical A).compose h k))) :=

@@ -34,7 +34,7 @@ def KoszulStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .inverse_cancel p => Path.Step.trans_symm p
 
 /-- Lift Koszul-domain steps to rewrite equivalence. -/
-theorem rweq_of_koszul_step {A : Type u} {a b : A}
+noncomputable def rweq_of_koszul_step {A : Type u} {a b : A}
     {p q : Path a b} (s : KoszulStep p q) : RwEq p q :=
   rweq_of_step (KoszulStep.toStep s)
 
@@ -64,11 +64,11 @@ namespace BarCobarDualityPathData
 variable {A : Type u} {C : Type v}
 variable (D : BarCobarDualityPathData A C)
 
-@[simp] theorem unit_rweq (a : A) :
+noncomputable def unit_rweq (a : A) :
     RwEq (Path.trans (D.unitPath a) (Path.refl a)) (D.unitPath a) :=
   rweq_of_koszul_step (D.unitStep a)
 
-@[simp] theorem counit_rweq (c : C) :
+noncomputable def counit_rweq (c : C) :
     RwEq
       (Path.trans (Path.refl (D.bar (D.cobar c))) (D.counitPath c))
       (D.counitPath c) :=
@@ -78,7 +78,7 @@ variable (D : BarCobarDualityPathData A C)
 def algebraRoundTrip (a : A) : Path (D.cobar (D.bar a)) (D.cobar (D.bar a)) :=
   Path.trans (D.unitPath a) (Path.symm (D.unitPath a))
 
-@[simp] theorem algebra_roundtrip_rweq (a : A) :
+noncomputable def algebra_roundtrip_rweq (a : A) :
     RwEq (D.algebraRoundTrip a) (Path.refl (D.cobar (D.bar a))) := by
   unfold algebraRoundTrip
   exact rweq_cmpA_inv_right (D.unitPath a)
@@ -120,7 +120,7 @@ namespace KoszulOperadicAlgebraPathData
 variable {O : Path.Algebra.OperadTheory.CleanOperad}
 variable (K : KoszulOperadicAlgebraPathData O)
 
-@[simp] theorem bar_action_rweq
+noncomputable def bar_action_rweq
     {n : Nat} (θ : O.ops n) (xs : Fin n → K.carrier) :
     RwEq
       (Path.trans (K.barActionPath θ xs)

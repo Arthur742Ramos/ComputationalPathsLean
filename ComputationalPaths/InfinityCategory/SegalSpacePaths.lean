@@ -52,14 +52,14 @@ namespace SegalComposition
 
 variable {S : SegalPathSpace.{u}} (C : SegalComposition S)
 
-@[simp] theorem binary_rweq {x y z : S.Obj}
+noncomputable def binary_rweq {x y z : S.Obj}
     (f : S.OneSimplex x y) (g : S.OneSimplex y z) :
     RwEq
       (Path.trans (Path.refl x) (Path.trans (S.toPath f) (S.toPath g)))
       (S.toPath (C.compose f g)) :=
   rweq_of_step (C.binary_step f g)
 
-@[simp] theorem assoc_rweq {w x y z : S.Obj}
+noncomputable def assoc_rweq {w x y z : S.Obj}
     (f : S.OneSimplex w x) (g : S.OneSimplex x y) (h : S.OneSimplex y z) :
     RwEq
       (Path.trans (S.toPath (C.compose f g)) (S.toPath h))
@@ -91,7 +91,7 @@ abbrev compose3 {S : SegalPathSpace.{u}} (C : SegalComposition S)
     Path w z :=
   Path.trans (S.toPath f) (S.toPath (C.compose g h))
 
-@[simp] theorem compose3_assoc_rweq (Obj : Type u)
+noncomputable def compose3_assoc_rweq (Obj : Type u)
     {w x y z : Obj} (f : Path w x) (g : Path x y) (h : Path y z) :
     RwEq
       (Path.trans (Path.trans f g) h)

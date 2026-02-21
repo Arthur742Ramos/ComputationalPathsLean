@@ -61,12 +61,12 @@ def normalizeStep {W : WeightFunctorPathData} {a b : Nat}
     Path.Step (Path.trans r.toPath (Path.refl b)) r.toPath :=
   Path.Step.trans_refl_right r.toPath
 
-@[simp] theorem normalize_rweq {W : WeightFunctorPathData} {a b : Nat}
+noncomputable def normalize_rweq {W : WeightFunctorPathData} {a b : Nat}
     (r : WeightFunctorRewrite W a b) :
     RwEq (Path.trans r.toPath (Path.refl b)) r.toPath :=
   rweq_of_step (normalizeStep r)
 
-@[simp] theorem cancel_rweq {W : WeightFunctorPathData} {a b : Nat}
+noncomputable def cancel_rweq {W : WeightFunctorPathData} {a b : Nat}
     (r : WeightFunctorRewrite W a b) :
     RwEq (Path.trans (Path.symm r.toPath) r.toPath) (Path.refl b) :=
   rweq_cmpA_inv_left r.toPath
@@ -109,13 +109,13 @@ def rightComparison (X Y Z : HeckeObject) :
       (W.weight (convolution X (convolution Y Z))) :=
   Path.trans (leftToRightViaSatake W X Y Z) (Path.symm (tripleTensorRight W X Y Z))
 
-@[simp] theorem tensor_rweq (X Y : HeckeObject) :
+noncomputable def tensor_rweq (X Y : HeckeObject) :
     RwEq
       (Path.trans (W.tensorPath X Y) (Path.refl (W.weight X + W.weight Y)))
       (W.tensorPath X Y) :=
   rweq_cmpA_refl_right (W.tensorPath X Y)
 
-@[simp] theorem rightComparison_assoc_rweq (X Y Z : HeckeObject) :
+noncomputable def rightComparison_assoc_rweq (X Y Z : HeckeObject) :
     RwEq
       (Path.trans
         (Path.trans (tripleTensorLeft W X Y Z) (reassociatePath W X Y Z))
@@ -125,7 +125,7 @@ def rightComparison (X Y Z : HeckeObject) :
         (Path.trans (reassociatePath W X Y Z) (Path.symm (tripleTensorRight W X Y Z)))) :=
   rweq_tt (tripleTensorLeft W X Y Z) (reassociatePath W X Y Z) (Path.symm (tripleTensorRight W X Y Z))
 
-@[simp] theorem rightComparison_cancel_rweq (X Y Z : HeckeObject) :
+noncomputable def rightComparison_cancel_rweq (X Y Z : HeckeObject) :
     RwEq
       (Path.trans (Path.symm (rightComparison W X Y Z)) (rightComparison W X Y Z))
       (Path.refl (W.weight (convolution X (convolution Y Z)))) :=
@@ -154,7 +154,7 @@ def dominantWeightFunctor : WeightFunctorPathData where
     simpa using dominantTensorPath X Y
   unitPath := dominantUnitPath
 
-@[simp] theorem dominant_tensor_rweq (X Y : HeckeObject) :
+noncomputable def dominant_tensor_rweq (X Y : HeckeObject) :
     RwEq
       (Path.trans
         (dominantWeightFunctor.tensorPath X Y)
@@ -169,7 +169,7 @@ def dominantOnFusionNormalizePath (X Y : HeckeObject) :
       (dominantWeightFunctor.weight (convolution X Y)) :=
   Path.congrArg dominantWeightFunctor.weight (fusionNormalizePath X Y)
 
-@[simp] theorem dominantOnFusionNormalize_cancel_rweq (X Y : HeckeObject) :
+noncomputable def dominantOnFusionNormalize_cancel_rweq (X Y : HeckeObject) :
     RwEq
       (Path.trans
         (Path.symm (dominantOnFusionNormalizePath X Y))
@@ -177,7 +177,7 @@ def dominantOnFusionNormalizePath (X Y : HeckeObject) :
       (Path.refl (dominantWeightFunctor.weight (convolution X Y))) :=
   rweq_cmpA_inv_left (dominantOnFusionNormalizePath X Y)
 
-@[simp] theorem dominant_rightComparison_cancel_rweq (X Y Z : HeckeObject) :
+noncomputable def dominant_rightComparison_cancel_rweq (X Y Z : HeckeObject) :
     RwEq
       (Path.trans
         (Path.symm (WeightFunctorPathData.rightComparison dominantWeightFunctor X Y Z))

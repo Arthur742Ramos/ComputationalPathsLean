@@ -39,7 +39,7 @@ inductive VirtualFundamentalClassStep {V : Type v} :
       VirtualFundamentalClassStep (Path.trans (Path.refl a) p) p
 
 /-- Primitive virtual-class steps induce `RwEq`. -/
-theorem VirtualFundamentalClassStep.to_rweq {V : Type v} {a b : V} {p q : Path a b}
+noncomputable def VirtualFundamentalClassStep.to_rweq {V : Type v} {a b : V} {p q : Path a b}
     (h : VirtualFundamentalClassStep p q) : RwEq p q := by
   cases h
   · exact rweq_of_step (Path.Step.trans_refl_right _)
@@ -67,7 +67,7 @@ def deformationInvariantRank
     Path (C.obstructionRank (D.fiber n)) (C.obstructionRank D.specialFiber) :=
   C.mapRank (D.specializeFrom n)
 
-@[simp] theorem deformationInvariantClass_refl_right_rweq
+noncomputable def deformationInvariantClass_refl_right_rweq
     (D : DeformationSpacePathData X) (n : Nat) :
     RwEq
       (Path.trans
@@ -76,7 +76,7 @@ def deformationInvariantRank
       (C.deformationInvariantClass D n) :=
   rweq_of_step (Path.Step.trans_refl_right (C.deformationInvariantClass D n))
 
-@[simp] theorem deformationInvariantClass_cancel_left
+noncomputable def deformationInvariantClass_cancel_left
     (D : DeformationSpacePathData X) (n : Nat) :
     RwEq
       (Path.trans
@@ -85,7 +85,7 @@ def deformationInvariantRank
       (Path.refl (C.classOf D.specialFiber)) :=
   rweq_cmpA_inv_left (C.deformationInvariantClass D n)
 
-@[simp] theorem deformationInvariantDim_refl_right_rweq
+noncomputable def deformationInvariantDim_refl_right_rweq
     (D : DeformationSpacePathData X) (n : Nat) :
     RwEq
       (Path.trans
@@ -94,7 +94,7 @@ def deformationInvariantRank
       (C.deformationInvariantDim D n) :=
   rweq_of_step (Path.Step.trans_refl_right (C.deformationInvariantDim D n))
 
-@[simp] theorem deformationInvariantRank_refl_left_rweq
+noncomputable def deformationInvariantRank_refl_left_rweq
     (D : DeformationSpacePathData X) (n : Nat) :
     RwEq
       (Path.trans

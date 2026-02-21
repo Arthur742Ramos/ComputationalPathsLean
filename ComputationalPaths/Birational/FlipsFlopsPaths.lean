@@ -32,7 +32,7 @@ inductive FlipFlopStep : {X : Type u} → {a b : X} → Path a b → Path a b �
       FlipFlopStep (Path.trans p (Path.refl b)) p
 
 /-- Birational rewrite steps induce rewrite equivalence. -/
-theorem FlipFlopStep.to_rweq {X : Type u} {a b : X} {p q : Path a b}
+noncomputable def FlipFlopStep.to_rweq {X : Type u} {a b : X} {p q : Path a b}
     (h : FlipFlopStep p q) : RwEq p q := by
   cases h
   exact rweq_of_step (Path.Step.trans_refl_right _)
@@ -52,28 +52,28 @@ def flopThenFlipCanonicalPath (x : X) :
   Path.trans (B.flopPath (B.flip x)) (B.flipPath x)
 
 /-- Flip path cancellation on the left by inverse. -/
-@[simp] theorem flipPathCancelLeft (x : X) :
+noncomputable def flipPathCancelLeft (x : X) :
     RwEq
       (Path.trans (Path.symm (B.flipPath x)) (B.flipPath x))
       (Path.refl (B.canonical x)) :=
   rweq_cmpA_inv_left (B.flipPath x)
 
 /-- Flop path cancellation on the left by inverse. -/
-@[simp] theorem flopPathCancelLeft (x : X) :
+noncomputable def flopPathCancelLeft (x : X) :
     RwEq
       (Path.trans (Path.symm (B.flopPath x)) (B.flopPath x))
       (Path.refl (B.canonical x)) :=
   rweq_cmpA_inv_left (B.flopPath x)
 
 /-- Primitive right-unit normalization for `flip ∘ flop` canonical paths. -/
-@[simp] theorem flipThenFlopNormalize (x : X) :
+noncomputable def flipThenFlopNormalize (x : X) :
     RwEq
       (Path.trans (B.flipThenFlopCanonicalPath x) (Path.refl (B.canonical x)))
       (B.flipThenFlopCanonicalPath x) :=
   rweq_of_step (Path.Step.trans_refl_right _)
 
 /-- Primitive right-unit normalization for `flop ∘ flip` canonical paths. -/
-@[simp] theorem flopThenFlipNormalize (x : X) :
+noncomputable def flopThenFlipNormalize (x : X) :
     RwEq
       (Path.trans (B.flopThenFlipCanonicalPath x) (Path.refl (B.canonical x)))
       (B.flopThenFlipCanonicalPath x) :=

@@ -58,24 +58,24 @@ theorem inverse_concat_step {a b c : A}
     Path.Step (inverse (concat p q)) (concat (inverse q) (inverse p)) := by
   simpa [concat, inverse] using (Path.Step.symm_trans_congr p q)
 
-theorem concat_left_unit_rweq {a b : A} (p : Path a b) :
+noncomputable def concat_left_unit_rweq {a b : A} (p : Path a b) :
     RwEq (concat (Path.refl a) p) p :=
   rweq_of_step (concat_left_unit_step p)
 
-theorem concat_right_unit_rweq {a b : A} (p : Path a b) :
+noncomputable def concat_right_unit_rweq {a b : A} (p : Path a b) :
     RwEq (concat p (Path.refl b)) p :=
   rweq_of_step (concat_right_unit_step p)
 
-theorem concat_assoc_rweq {a b c d : A}
+noncomputable def concat_assoc_rweq {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (concat (concat p q) r) (concat p (concat q r)) :=
   rweq_of_step (concat_assoc_step p q r)
 
-theorem concat_inverse_right_rweq {a b : A} (p : Path a b) :
+noncomputable def concat_inverse_right_rweq {a b : A} (p : Path a b) :
     RwEq (concat p (inverse p)) (Path.refl a) :=
   rweq_of_step (concat_inverse_right_step p)
 
-theorem concat_inverse_left_rweq {a b : A} (p : Path a b) :
+noncomputable def concat_inverse_left_rweq {a b : A} (p : Path a b) :
     RwEq (concat (inverse p) p) (Path.refl b) :=
   rweq_of_step (concat_inverse_left_step p)
 
@@ -107,11 +107,11 @@ theorem transport_refl_step {a : A} (u : P a) :
   simpa [transportReflPath] using
     (Path.Step.transport_refl_beta (A := A) (B := P) (a := a) u)
 
-theorem apd_refl_rweq (f : (x : A) → P x) (a : A) :
+noncomputable def apd_refl_rweq (f : (x : A) → P x) (a : A) :
     RwEq (apd (A := A) (P := P) f (Path.refl a)) (Path.refl (f a)) :=
   rweq_of_step (apd_refl_step (A := A) (P := P) f a)
 
-theorem transport_refl_rweq {a : A} (u : P a) :
+noncomputable def transport_refl_rweq {a : A} (u : P a) :
     RwEq (transportReflPath (A := A) (P := P) u) (Path.refl u) :=
   rweq_of_step (transport_refl_step (A := A) (P := P) u)
 
@@ -163,12 +163,12 @@ theorem homotopy_app_step {f g : A → B} (H : Homotopy f g) (x : A) :
       (H x) := by
   simpa [Homotopy] using (Path.Step.fun_app_beta (A := B) (f := f) (g := g) H x)
 
-theorem hTrans_assoc_rweq {f g h k : A → B}
+noncomputable def hTrans_assoc_rweq {f g h k : A → B}
     (H₁ : Homotopy f g) (H₂ : Homotopy g h) (H₃ : Homotopy h k) (x : A) :
     RwEq (hTrans (hTrans H₁ H₂) H₃ x) (hTrans H₁ (hTrans H₂ H₃) x) :=
   rweq_of_step (hTrans_assoc_step H₁ H₂ H₃ x)
 
-theorem homotopy_app_rweq {f g : A → B} (H : Homotopy f g) (x : A) :
+noncomputable def homotopy_app_rweq {f g : A → B} (H : Homotopy f g) (x : A) :
     RwEq
       (Path.congrArg (fun k : A → B => k x)
         (Path.lamCongr (f := f) (g := g) H))

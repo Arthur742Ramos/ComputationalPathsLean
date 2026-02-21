@@ -237,12 +237,12 @@ def clusterStep_to_path {A : Type _} {a b : A} (h : ClusterStep a b) :
 /-! ## RwEq Instances -/
 
 /-- RwEq: exchange relation is stable. -/
-theorem rwEq_exchange {n : Nat} (er : ExchangeRelation n) :
+noncomputable def rwEq_exchange {n : Nat} (er : ExchangeRelation n) :
     RwEq er.exchange er.exchange :=
   RwEq.refl _
 
 /-- RwEq: skew-symmetry is stable. -/
-theorem rwEq_skew_symm {n : Nat} (B : ExchangeMatrix n) (i j : Fin n) :
+noncomputable def rwEq_skew_symm {n : Nat} (B : ExchangeMatrix n) (i j : Fin n) :
     RwEq (B.skew_symm i j) (B.skew_symm i j) :=
   RwEq.refl _
 
@@ -376,7 +376,7 @@ theorem calderoChapotonMap_pos (n : Nat) (cv : ClusterVariable n) :
 theorem calderoChapotonTrace_refl (n : Nat) (cv : ClusterVariable n) :
     calderoChapotonTrace n cv = calderoChapotonTrace n cv := rfl
 
-theorem clusterExchange_rweq {n : Nat} (er : ExchangeRelation n) :
+noncomputable def clusterExchange_rweq {n : Nat} (er : ExchangeRelation n) :
     RwEq er.exchange er.exchange :=
   RwEq.refl _
 

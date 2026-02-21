@@ -23,7 +23,7 @@ inductive WeylStep : {A : Type u} → {a b : A} → Path a b → Path a b → Pr
       WeylStep (Path.trans (Path.refl a) p) p
 
 /-- Weyl rewrite tags induce rewrite equivalence. -/
-theorem WeylStep.to_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def WeylStep.to_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : WeylStep p q) : RwEq p q := by
   cases h with
   | contract_right =>
@@ -76,19 +76,19 @@ namespace WeylGroupPathData
 
 variable {W : Type u} {I : Type v} (Weyl : WeylGroupPathData W I)
 
-@[simp] theorem reflectionAction_rweq (i : I) :
+noncomputable def reflectionAction_rweq (i : I) :
     RwEq
       (Path.trans (Weyl.reflectionActionPath i) (Path.refl i))
       (Weyl.reflectionActionPath i) :=
   rweq_of_step (Weyl.reflectionActionStep i)
 
-@[simp] theorem involutive_rweq (i : I) :
+noncomputable def involutive_rweq (i : I) :
     RwEq
       (Path.trans (Weyl.involutivePath i) (Path.refl Weyl.one))
       (Weyl.involutivePath i) :=
   rweq_of_step (Weyl.involutiveStep i)
 
-@[simp] theorem braid_rweq (i j : I) :
+noncomputable def braid_rweq (i j : I) :
     RwEq
       (Path.trans
         (Path.refl (Weyl.mul (Weyl.mul (Weyl.simpleRef i) (Weyl.simpleRef j)) (Weyl.simpleRef i)))
@@ -96,13 +96,13 @@ variable {W : Type u} {I : Type v} (Weyl : WeylGroupPathData W I)
       (Weyl.braidPath i j) :=
   rweq_of_step (Weyl.braidStep i j)
 
-@[simp] theorem involutive_cancel_rweq (i : I) :
+noncomputable def involutive_cancel_rweq (i : I) :
     RwEq
       (Path.trans (Path.symm (Weyl.involutivePath i)) (Weyl.involutivePath i))
       (Path.refl Weyl.one) :=
   rweq_cmpA_inv_left (Weyl.involutivePath i)
 
-@[simp] theorem braid_cancel_rweq (i j : I) :
+noncomputable def braid_cancel_rweq (i j : I) :
     RwEq
       (Path.trans (Weyl.braidPath i j) (Path.symm (Weyl.braidPath i j)))
       (Path.refl (Weyl.mul (Weyl.mul (Weyl.simpleRef i) (Weyl.simpleRef j)) (Weyl.simpleRef i))) :=

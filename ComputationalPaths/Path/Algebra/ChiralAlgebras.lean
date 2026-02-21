@@ -321,26 +321,26 @@ def curve_genus_path (X : AlgebraicCurve.{u}) :
 /-! ## RwEq Coherence -/
 
 /-- Rewrite-equivalence: D-module identity composition. -/
-theorem dmod_id_comp_rweq {X : AlgebraicCurve.{u}} {M N : DModule X}
+noncomputable def dmod_id_comp_rweq {X : AlgebraicCurve.{u}} {M N : DModule X}
     (f : DModuleHom M N) (S : RanSpace X) (s : M.sections S) :
     RwEq (Path.trans (dmodHom_comp_id_left f S s) (Path.refl _))
          (dmodHom_comp_id_left f S s) := by
   exact rweq_cmpA_refl_right (p := dmodHom_comp_id_left f S s)
 
 /-- Rewrite-equivalence: ran union associativity with refl. -/
-theorem ran_assoc_rweq {X : AlgebraicCurve.{u}} (S T U : RanSpace X) :
+noncomputable def ran_assoc_rweq {X : AlgebraicCurve.{u}} (S T U : RanSpace X) :
     RwEq (Path.trans (ranUnion_assoc S T U) (Path.refl _))
          (ranUnion_assoc S T U) := by
   exact rweq_cmpA_refl_right (p := ranUnion_assoc S T U)
 
 /-- Rewrite-equivalence: vertex vacuum path with refl. -/
-theorem vertex_vacuum_rweq (V : VertexAlgebraData.{u}) (a : V.stateSpace) :
+noncomputable def vertex_vacuum_rweq (V : VertexAlgebraData.{u}) (a : V.stateSpace) :
     RwEq (Path.trans (vertex_vacuum_path V a) (Path.refl a))
          (vertex_vacuum_path V a) := by
   exact rweq_cmpA_refl_right (p := vertex_vacuum_path V a)
 
 /-- Rewrite-equivalence: refl composed with singleton union path. -/
-theorem singleton_union_rweq {X : AlgebraicCurve.{u}} (p q : X.points) :
+noncomputable def singleton_union_rweq {X : AlgebraicCurve.{u}} (p q : X.points) :
     RwEq (Path.trans (Path.refl _) (ranSingleton_union p q))
          (ranSingleton_union p q) := by
   exact rweq_cmpA_refl_left (p := ranSingleton_union p q)

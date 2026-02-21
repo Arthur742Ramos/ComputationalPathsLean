@@ -59,7 +59,7 @@ def differentialDegree_step (x : Gen) :
       (G.differentialDegreePath x) :=
   Path.Step.trans_refl_right (G.differentialDegreePath x)
 
-@[simp] theorem differentialDegree_rweq (x : Gen) :
+noncomputable def differentialDegree_rweq (x : Gen) :
     RwEq
       (Path.trans (G.differentialDegreePath x) (Path.refl (Nat.pred (G.grading x))))
       (G.differentialDegreePath x) :=
@@ -72,7 +72,7 @@ def continuationDegree_step (x : Gen) :
       (G.continuationDegreePath x) :=
   Path.Step.trans_refl_right (G.continuationDegreePath x)
 
-@[simp] theorem continuationDegree_rweq (x : Gen) :
+noncomputable def continuationDegree_rweq (x : Gen) :
     RwEq
       (Path.trans (G.continuationDegreePath x) (Path.refl (G.grading x)))
       (G.continuationDegreePath x) :=
@@ -85,7 +85,7 @@ def shiftDegree_step (x : Gen) :
       (G.shiftDegreePath x) :=
   Path.Step.trans_refl_left (G.shiftDegreePath x)
 
-@[simp] theorem shiftDegree_rweq (x : Gen) :
+noncomputable def shiftDegree_rweq (x : Gen) :
     RwEq
       (Path.trans (Path.refl (G.grading (G.shift x))) (G.shiftDegreePath x))
       (G.shiftDegreePath x) :=
@@ -98,7 +98,7 @@ def shiftCommutes_step (x : Gen) :
       (G.shiftCommutesPath x) :=
   Path.Step.trans_refl_right (G.shiftCommutesPath x)
 
-@[simp] theorem shiftCommutes_rweq (x : Gen) :
+noncomputable def shiftCommutes_rweq (x : Gen) :
     RwEq
       (Path.trans (G.shiftCommutesPath x) (Path.refl (G.complex.differential (G.shift x))))
       (G.shiftCommutesPath x) :=
@@ -111,13 +111,13 @@ def continuationShift_step (x : Gen) :
       (G.continuationShiftPath x) :=
   Path.Step.trans_refl_right (G.continuationShiftPath x)
 
-@[simp] theorem continuationShift_rweq (x : Gen) :
+noncomputable def continuationShift_rweq (x : Gen) :
     RwEq
       (Path.trans (G.continuationShiftPath x) (Path.refl (G.grading (G.complex.continuation x))))
       (G.continuationShiftPath x) :=
   rweq_of_step (G.continuationShift_step x)
 
-@[simp] theorem shiftCommutes_cancel_rweq (x : Gen) :
+noncomputable def shiftCommutes_cancel_rweq (x : Gen) :
     RwEq
       (Path.trans (Path.symm (G.shiftCommutesPath x)) (G.shiftCommutesPath x))
       (Path.refl (G.complex.differential (G.shift x))) :=

@@ -65,12 +65,12 @@ structure Unobstructed (x : A) where
   vanishing : Path (O.obsMap x) O.obsZero
 
 /-- Normalization step for unobstructedness witnesses. -/
-@[simp] theorem unobstructedRweq (x : A) (u : O.Unobstructed x) :
+noncomputable def unobstructedRweq (x : A) (u : O.Unobstructed x) :
     RwEq (Path.trans u.vanishing (Path.refl O.obsZero)) u.vanishing :=
   rweq_of_step (Path.Step.trans_refl_right _)
 
 /-- Cancellation for unobstructedness witness. -/
-@[simp] theorem unobstructedCancelLeft (x : A) (u : O.Unobstructed x) :
+noncomputable def unobstructedCancelLeft (x : A) (u : O.Unobstructed x) :
     RwEq
       (Path.trans (Path.symm u.vanishing) u.vanishing)
       (Path.refl O.obsZero) :=
@@ -84,7 +84,7 @@ def transportUnobstructed {x y : A} (p : Path x y)
       (Path.trans u.vanishing (Path.refl O.obsZero))
 
 /-- The transported unobstructedness witness simplifies. -/
-@[simp] theorem transportUnobstructedRweq
+noncomputable def transportUnobstructedRweq
     {x y : A} (p : Path x y) (u : O.Unobstructed x) :
     RwEq
       (Path.trans (O.transportUnobstructed p u).vanishing (Path.refl O.obsZero))
@@ -112,12 +112,12 @@ variable {A : Type u}
 variable {D : FormalDeformationData A} {O : ObstructionData A}
 
 /-- Normalization step for the obstruction computation path. -/
-@[simp] theorem computationRweq (oc : ObstructionClass D O) :
+noncomputable def computationRweq (oc : ObstructionClass D O) :
     RwEq (Path.trans oc.computation (Path.refl oc.obs)) oc.computation :=
   rweq_of_step (Path.Step.trans_refl_right _)
 
 /-- Cancellation for the obstruction computation. -/
-@[simp] theorem computationCancelLeft (oc : ObstructionClass D O) :
+noncomputable def computationCancelLeft (oc : ObstructionClass D O) :
     RwEq
       (Path.trans (Path.symm oc.computation) oc.computation)
       (Path.refl oc.obs) :=
@@ -133,7 +133,7 @@ def ofUnobstructed (mc : MaurerCartanViaPaths D)
 
 /-- Composing the obstruction computation with the vanishing path
 yields a closed loop, which rewrite-cancels. -/
-@[simp] theorem ofUnobstructed_loop (mc : MaurerCartanViaPaths D)
+noncomputable def ofUnobstructed_loop (mc : MaurerCartanViaPaths D)
     (u : O.Unobstructed mc.element) :
     RwEq
       (Path.trans
@@ -168,12 +168,12 @@ namespace KodairaSpencerMap
 variable {A : Type u} {B : Type v} (K : KodairaSpencerMap A B)
 
 /-- Normalization for the KS zero-preservation path. -/
-@[simp] theorem ksZeroRweq :
+noncomputable def ksZeroRweq :
     RwEq (Path.trans K.ksZero (Path.refl K.cohomZero)) K.ksZero :=
   rweq_of_step (Path.Step.trans_refl_right _)
 
 /-- Cancellation for the KS zero-preservation path. -/
-@[simp] theorem ksZeroCancelLeft :
+noncomputable def ksZeroCancelLeft :
     RwEq
       (Path.trans (Path.symm K.ksZero) K.ksZero)
       (Path.refl K.cohomZero) :=
@@ -213,7 +213,7 @@ def obstructionVanishes (S : SmoothnessData D O)
   ObstructionClass.ofUnobstructed mc (S.smooth mc.element)
 
 /-- The obstruction of any MC element in a smooth deformation rewrite-cancels. -/
-@[simp] theorem obstructionVanishesCancelLeft
+noncomputable def obstructionVanishesCancelLeft
     (S : SmoothnessData D O)
     (mc : MaurerCartanViaPaths D) :
     RwEq
@@ -251,14 +251,14 @@ variable {A : Type u}
 variable {D : FormalDeformationData A} {O : ObstructionData A}
 
 /-- The extension path is rewrite-cancelable. -/
-@[simp] theorem extensionCancelLeft (E : ExtensionData D O) :
+noncomputable def extensionCancelLeft (E : ExtensionData D O) :
     RwEq
       (Path.trans (Path.symm E.extension) E.extension)
       (Path.refl E.extended) :=
   rweq_cmpA_inv_left E.extension
 
 /-- The carrier coherence path is rewrite-cancelable. -/
-@[simp] theorem carrierCoherenceCancelLeft (E : ExtensionData D O) :
+noncomputable def carrierCoherenceCancelLeft (E : ExtensionData D O) :
     RwEq
       (Path.trans (Path.symm E.carrierCoherence) E.carrierCoherence)
       (Path.refl E.extended) :=
@@ -270,7 +270,7 @@ def extensionToCarrier (E : ExtensionData D O) :
   Path.trans E.extension (Path.symm E.carrierCoherence)
 
 /-- The composite extension-carrier path simplifies. -/
-@[simp] theorem extensionToCarrierRweq (E : ExtensionData D O) :
+noncomputable def extensionToCarrierRweq (E : ExtensionData D O) :
     RwEq
       (Path.trans (extensionToCarrier E) (Path.refl E.extendedMC.element))
       (extensionToCarrier E) :=
@@ -303,12 +303,12 @@ namespace TangentObstructionSequence
 variable {A : Type u} {B : Type v} (T : TangentObstructionSequence A B)
 
 /-- Normalization for the exactness witness. -/
-@[simp] theorem exactRweq (t : B) :
+noncomputable def exactRweq (t : B) :
     RwEq (Path.trans (T.exact t) (Path.refl T.obs.obsZero)) (T.exact t) :=
   rweq_of_step (Path.Step.trans_refl_right _)
 
 /-- Cancellation for the exactness witness. -/
-@[simp] theorem exactCancelLeft (t : B) :
+noncomputable def exactCancelLeft (t : B) :
     RwEq
       (Path.trans (Path.symm (T.exact t)) (T.exact t))
       (Path.refl T.obs.obsZero) :=
@@ -323,7 +323,7 @@ def ksImageSmooth : ∀ t : B, T.obs.Unobstructed (T.ks.ks t) :=
   T.tangentUnobstructed
 
 /-- The exactness witness composes with the inverse mapped KS zero path. -/
-@[simp] theorem exactKsZeroLoop :
+noncomputable def exactKsZeroLoop :
     RwEq
       (Path.trans
         (Path.symm (T.obs.obsMapPath T.ks.ksZero))
@@ -334,7 +334,7 @@ def ksImageSmooth : ∀ t : B, T.obs.Unobstructed (T.ks.ks t) :=
   RwEq.refl _
 
 /-- Naturality: the exactness witness is compatible with path transport. -/
-theorem exactNaturality {t₁ t₂ : B} (p : Path t₁ t₂) :
+noncomputable def exactNaturality {t₁ t₂ : B} (p : Path t₁ t₂) :
     RwEq
       (Path.trans
         (Path.symm (T.obs.obsMapPath (T.ks.ksPath p)))
@@ -372,7 +372,7 @@ namespace ProRepresentabilityData
 variable {A : Type u} {D : FormalDeformationData A}
 
 /-- The universal path is rewrite-cancelable. -/
-@[simp] theorem universalPathCancelLeft
+noncomputable def universalPathCancelLeft
     (R : ProRepresentabilityData D) (mc : MaurerCartanViaPaths D) :
     RwEq
       (Path.trans (Path.symm (R.universalPath mc)) (R.universalPath mc))

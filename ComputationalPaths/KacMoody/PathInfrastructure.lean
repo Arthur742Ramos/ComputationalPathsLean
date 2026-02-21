@@ -39,13 +39,13 @@ namespace PathPreservingKacMoodyData
 variable {L : Type u} {W : Type v} {I : Type w}
 variable (K : PathPreservingKacMoodyData L W I)
 
-@[simp] theorem simpleAction_rweq (i : I) :
+noncomputable def simpleAction_rweq (i : I) :
     RwEq
       (Path.trans (K.simpleActionPath i) (Path.refl (K.algebra.coroot i)))
       (K.simpleActionPath i) :=
   rweq_of_step (K.simpleActionStep i)
 
-@[simp] theorem simpleAction_cancel_rweq (i : I) :
+noncomputable def simpleAction_cancel_rweq (i : I) :
     RwEq
       (Path.trans (Path.symm (K.simpleActionPath i)) (K.simpleActionPath i))
       (Path.refl (K.algebra.coroot i)) :=
@@ -68,7 +68,7 @@ def transportedSerreStep (i j : I) :
       (transportedSerrePath K i j) :=
   Path.Step.trans_refl_right (transportedSerrePath K i j)
 
-@[simp] theorem transportedSerre_rweq (i j : I) :
+noncomputable def transportedSerre_rweq (i j : I) :
     RwEq
       (Path.trans
         (transportedSerrePath K i j)
@@ -94,7 +94,7 @@ def reflectionSquareStep (i : I) :
       (reflectionSquarePath K i) :=
   Path.Step.trans_refl_right (reflectionSquarePath K i)
 
-@[simp] theorem reflectionSquare_rweq (i : I) :
+noncomputable def reflectionSquare_rweq (i : I) :
     RwEq
       (Path.trans
         (reflectionSquarePath K i)

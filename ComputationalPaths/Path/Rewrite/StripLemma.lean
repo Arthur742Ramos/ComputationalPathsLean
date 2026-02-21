@@ -219,7 +219,7 @@ theorem join_lift_trans_both {c : A} {p₁ p₂ : Path a b} {q₁ q₂ : Path b 
 /-! ## Normal Form Uniqueness -/
 
 /-- Normal forms are unique up to RwEq. -/
-theorem unique_normal_form_of_rweq
+noncomputable def unique_normal_form_of_rweq
     {p q : Path a b}
     (_h : RwEq p q)
     (hp : IsNormal p) (hq : IsNormal q) :

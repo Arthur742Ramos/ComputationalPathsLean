@@ -319,34 +319,34 @@ def strict_fiber_zero {S : Type u} {A : CommAlgebra S}
 /-! ## RwEq Coherence -/
 
 /-- Rewrite-equivalence: commutative algebra identity with refl. -/
-theorem commAlg_one_mul_rweq {S : Type u} (A : CommAlgebra S) (a : A.carrier) :
+noncomputable def commAlg_one_mul_rweq {S : Type u} (A : CommAlgebra S) (a : A.carrier) :
     RwEq (Path.trans (A.one_mul a) (Path.refl a))
          (A.one_mul a) := by
   exact rweq_cmpA_refl_right (p := A.one_mul a)
 
 /-- Rewrite-equivalence: Moyal associativity with refl. -/
-theorem moyal_assoc_rweq {n : Nat} (mp : MoyalProduct.{u} n)
+noncomputable def moyal_assoc_rweq {n : Nat} (mp : MoyalProduct.{u} n)
     (f g h : mp.funSpace) :
     RwEq (Path.trans (mp.assoc f g h) (Path.refl _))
          (mp.assoc f g h) := by
   exact rweq_cmpA_refl_right (p := mp.assoc f g h)
 
 /-- Rewrite-equivalence: Weyl algebra one_mul with refl. -/
-theorem weyl_one_mul_rweq {n : Nat} (W : WeylAlgebra.{u} n)
+noncomputable def weyl_one_mul_rweq {n : Nat} (W : WeylAlgebra.{u} n)
     (a : W.carrier) :
     RwEq (Path.trans (W.one_mul a) (Path.refl a))
          (W.one_mul a) := by
   exact rweq_cmpA_refl_right (p := W.one_mul a)
 
 /-- Rewrite-equivalence: star product zeroth order with refl. -/
-theorem star_zeroth_rweq {S : Type u} {A : CommAlgebra S}
+noncomputable def star_zeroth_rweq {S : Type u} {A : CommAlgebra S}
     (fd : FormalDeformation S A) (f g : A.carrier) :
     RwEq (Path.trans (fd.zeroth_order f g) (Path.refl _))
          (fd.zeroth_order f g) := by
   exact rweq_cmpA_refl_right (p := fd.zeroth_order f g)
 
 /-- Rewrite-equivalence: commutativity path and associativity. -/
-theorem commAlg_comm_assoc_rweq {S : Type u} (A : CommAlgebra S)
+noncomputable def commAlg_comm_assoc_rweq {S : Type u} (A : CommAlgebra S)
     (a b : A.carrier) :
     RwEq (Path.trans (A.mul_comm a b) (Path.refl _))
          (A.mul_comm a b) := by

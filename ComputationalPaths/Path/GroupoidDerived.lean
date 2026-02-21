@@ -183,7 +183,7 @@ theorem constFunctor_map {a₁ a₂ : A}
 
 /-- In the identity weak groupoid, `comp (inv p) (comp p q)` is rewrite-equal
     to `q` (left cancellation). -/
-theorem identity_cancel_left_rweq {a b c : A}
+noncomputable def identity_cancel_left_rweq {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq (Path.trans (Path.symm p) (Path.trans p q)) q := by
   apply RwEq.trans

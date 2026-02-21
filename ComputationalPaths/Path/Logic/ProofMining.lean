@@ -161,7 +161,7 @@ def ProofTheoreticBound.compose
     connection k n (b₁.valid k n (Nat.le_trans (Nat.le_max_left _ _) hn))
 
 /-- RwEq: bound_path is self-consistent. -/
-theorem bound_rweq (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
+noncomputable def bound_rweq (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
     RwEq (bound_path b k n hn) (bound_path b k n hn) :=
   RwEq.refl _
 
@@ -214,7 +214,7 @@ def HerbrandWitness.combine (h₁ h₂ : HerbrandWitness)
 /-! ## RwEq Coherences -/
 
 /-- RwEq: Dialectica soundness. -/
-theorem dialectica_sound_rweq {A B : DialecticaFormula}
+noncomputable def dialectica_sound_rweq {A B : DialecticaFormula}
     (wA : DialecticaWitness A) (wB : DialecticaWitness B)
     (c : (dialectica_conj A B).challengeType) :
     RwEq ((dialectica_conj_sound A B wA wB).correct c)
@@ -222,24 +222,24 @@ theorem dialectica_sound_rweq {A B : DialecticaFormula}
   RwEq.refl _
 
 /-- RwEq: compose_assoc via Path.refl. -/
-theorem compose_assoc_rweq (f g h : MonotoneFunctional) :
+noncomputable def compose_assoc_rweq (f g h : MonotoneFunctional) :
     RwEq (compose_assoc_path f g h) (Path.refl _) :=
   RwEq.refl _
 
 /-- RwEq: symm(symm(bound_path)). -/
-theorem bound_symm_rweq (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
+noncomputable def bound_symm_rweq (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
     RwEq (Path.symm (Path.symm (bound_path b k n hn)))
          (bound_path b k n hn) :=
   RwEq.step (Step.symm_symm _)
 
 /-- RwEq: trans(bound_path, refl). -/
-theorem bound_trans_refl_rweq (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
+noncomputable def bound_trans_refl_rweq (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
     RwEq (Path.trans (bound_path b k n hn) (Path.refl _))
          (bound_path b k n hn) :=
   RwEq.step (Step.trans_refl_right _)
 
 /-- Multi-step RwEq chain. -/
-theorem multi_step_rweq (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
+noncomputable def multi_step_rweq (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
     RwEq (Path.trans (Path.refl _) (bound_path b k n hn))
          (bound_path b k n hn) :=
   RwEq.step (Step.trans_refl_left _)

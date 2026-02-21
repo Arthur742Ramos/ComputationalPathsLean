@@ -20,7 +20,7 @@ variable {A : Type u} {B : A → Type u}
 /-! ## Sigma eta -/
 
 /-- Sigma eta: rebuilding a sigma path from its projections. -/
-theorem rweq_sigmaMk_sigmaFst_sigmaSnd {x y : Sigma B}
+noncomputable def rweq_sigmaMk_sigmaFst_sigmaSnd {x y : Sigma B}
     (p : Path x y) :
     RwEq (Path.sigmaMk (Path.sigmaFst p) (Path.sigmaSnd p)) p :=
   rweq_sigma_eta (A := A) (B := B) (p := p)
@@ -50,13 +50,13 @@ theorem rweq_sigmaSnd_sigmaMk {a₁ a₂ : A}
 /-! ## Product β-rules -/
 
 /-- First projection β-rule for products: `fst (prodMk p q) ≃ p`. -/
-theorem rweq_fst_prodMk {α β : Type u} {a₁ a₂ : α} {b₁ b₂ : β}
+noncomputable def rweq_fst_prodMk {α β : Type u} {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     RwEq (Path.fst (Path.prodMk p q)) p :=
   rweq_prod_fst_beta p q
 
 /-- Second projection β-rule for products: `snd (prodMk p q) ≃ q`. -/
-theorem rweq_snd_prodMk {α β : Type u} {a₁ a₂ : α} {b₁ b₂ : β}
+noncomputable def rweq_snd_prodMk {α β : Type u} {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     RwEq (Path.snd (Path.prodMk p q)) q :=
   rweq_prod_snd_beta p q
@@ -64,7 +64,7 @@ theorem rweq_snd_prodMk {α β : Type u} {a₁ a₂ : α} {b₁ b₂ : β}
 /-! ## Product eta -/
 
 /-- Product η: rebuilding a product path from its projections. -/
-theorem rweq_prodMk_fst_snd {α β : Type u} {x y : α × β}
+noncomputable def rweq_prodMk_fst_snd {α β : Type u} {x y : α × β}
     (p : Path x y) :
     RwEq (Path.prodMk (Path.fst p) (Path.snd p)) p :=
   rweq_prod_eta p
@@ -266,7 +266,7 @@ example {α β : Type u} {a₁ a₂ : α} {b₁ b₂ : β}
 /-! ## RwEq coherence for products -/
 
 /-- `RwEq` for `prodMk` congruence in the first component. -/
-theorem rweq_prodMk_congr_left {α β : Type u}
+noncomputable def rweq_prodMk_congr_left {α β : Type u}
     {a₁ a₂ : α} {b₁ b₂ : β}
     {p q : Path a₁ a₂} (r : Path b₁ b₂)
     (h : RwEq p q) :
@@ -281,7 +281,7 @@ theorem rweq_prodMk_congr_left {α β : Type u}
   | trans _ _ ih₁ ih₂ => exact RwEq.trans ih₁ ih₂
 
 /-- `RwEq` for `prodMk` congruence in the second component. -/
-theorem rweq_prodMk_congr_right {α β : Type u}
+noncomputable def rweq_prodMk_congr_right {α β : Type u}
     {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path a₁ a₂) {r s : Path b₁ b₂}
     (h : RwEq r s) :

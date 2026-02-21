@@ -41,11 +41,11 @@ namespace LiquidTensorPathData
 
 variable {X : Type u} (L : LiquidTensorPathData X)
 
-@[simp] theorem liquidize_rweq (x : X) :
+noncomputable def liquidize_rweq (x : X) :
     RwEq (Path.trans (L.liquidizePath x) (Path.refl x)) (L.liquidizePath x) :=
   rweq_of_step (L.liquidizeStep x)
 
-@[simp] theorem composite_rweq (x y : X) :
+noncomputable def composite_rweq (x y : X) :
     RwEq
       (Path.trans
         (Path.trans (L.leftPath x y) (L.rightPath x y))
@@ -54,7 +54,7 @@ variable {X : Type u} (L : LiquidTensorPathData X)
   rweq_of_step (L.compositeStep x y)
 
 /-- Normalization of a composite liquid tensor path with two trailing units. -/
-theorem composite_two_refl_rweq (x y : X) :
+noncomputable def composite_two_refl_rweq (x y : X) :
     RwEq
       (Path.trans
         (Path.trans
@@ -74,7 +74,7 @@ theorem composite_two_refl_rweq (x y : X) :
         (rweq_cmpA_refl_left (Path.refl (L.tensor x (L.liquidize y)))))
       (L.composite_rweq x y))
 
-@[simp] theorem composite_cancel_right (x y : X) :
+noncomputable def composite_cancel_right (x y : X) :
     RwEq
       (Path.trans
         (Path.trans (L.leftPath x y) (L.rightPath x y))
@@ -82,7 +82,7 @@ theorem composite_two_refl_rweq (x y : X) :
       (Path.refl (L.tensor (L.liquidize x) y)) :=
   rweq_cmpA_inv_right (Path.trans (L.leftPath x y) (L.rightPath x y))
 
-@[simp] theorem composite_cancel_left (x y : X) :
+noncomputable def composite_cancel_left (x y : X) :
     RwEq
       (Path.trans
         (Path.symm (Path.trans (L.leftPath x y) (L.rightPath x y)))
@@ -106,7 +106,7 @@ def leftProjectionLiquidTensorPathData (X : Type u) : LiquidTensorPathData X whe
 
 /-- In the canonical model, the composite liquid tensor path cancels with its
 inverse by rewrite normalization. -/
-theorem leftProjection_composite_cancel (X : Type u) (x y : X) :
+noncomputable def leftProjection_composite_cancel (X : Type u) (x y : X) :
     RwEq
       (Path.trans
         (Path.trans (Path.refl x) (Path.refl x))

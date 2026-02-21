@@ -48,26 +48,26 @@ namespace GaloisRepresentationPathData
 
 variable {Γ : Type u} {V : Type v} (G : GaloisRepresentationPathData Γ V)
 
-@[simp] theorem compatibility_rweq (p q : Nat) (x : V) :
+noncomputable def compatibility_rweq (p q : Nat) (x : V) :
     RwEq
       (Path.trans (G.compatibilityPath p q x)
         (Path.refl (G.rho (G.frobenius p) (G.rho (G.frobenius q) x))))
       (G.compatibilityPath p q x) :=
   rweq_of_step (G.compatibilityStep p q x)
 
-@[simp] theorem semisimple_rweq (p : Nat) (x : V) :
+noncomputable def semisimple_rweq (p : Nat) (x : V) :
     RwEq
       (Path.trans (Path.refl (G.rho (G.frobenius p) x)) (G.semisimplePath p x))
       (G.semisimplePath p x) :=
   rweq_of_step (G.semisimpleStep p x)
 
-@[simp] theorem semisimple_cancel_left_rweq (p : Nat) (x : V) :
+noncomputable def semisimple_cancel_left_rweq (p : Nat) (x : V) :
     RwEq
       (Path.trans (Path.symm (G.semisimplePath p x)) (G.semisimplePath p x))
       (Path.refl (G.rho (G.frobenius p) x)) :=
   rweq_cmpA_inv_left (G.semisimplePath p x)
 
-@[simp] theorem semisimple_cancel_right_rweq (p : Nat) (x : V) :
+noncomputable def semisimple_cancel_right_rweq (p : Nat) (x : V) :
     RwEq
       (Path.trans (G.semisimplePath p x) (Path.symm (G.semisimplePath p x)))
       (Path.refl (G.rho (G.frobenius p) x)) :=

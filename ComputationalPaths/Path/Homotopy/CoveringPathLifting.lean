@@ -28,7 +28,7 @@ variable {A : Type u}
 /-! ## Transport and RwEq -/
 
 /-- Fiber transport is invariant under rewrite equivalence of base paths. -/
-theorem fiberTransport_respects_rweq {P : A → Type u} {a b : A}
+noncomputable def fiberTransport_respects_rweq {P : A → Type u} {a b : A}
     {p q : Path a b} (h : RwEq p q) (x : P a) :
     fiberTransport (P := P) p x = fiberTransport (P := P) q x := by
   unfold fiberTransport

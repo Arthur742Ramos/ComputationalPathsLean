@@ -45,20 +45,20 @@ namespace AutomorphicFormPathData
 
 variable {A : Type u} (F : AutomorphicFormPathData A)
 
-@[simp] theorem hecke_comm_rweq (m n : Nat) (x : A) :
+noncomputable def hecke_comm_rweq (m n : Nat) (x : A) :
     RwEq
       (Path.trans (F.heckeCommPath m n x)
         (Path.refl (F.heckeOp n (F.heckeOp m x))))
       (F.heckeCommPath m n x) :=
   rweq_of_step (F.heckeCommStep m n x)
 
-@[simp] theorem qexpansion_rweq (n : Nat) :
+noncomputable def qexpansion_rweq (n : Nat) :
     RwEq
       (Path.trans (Path.refl (F.coeff n)) (F.qExpansionPath n))
       (F.qExpansionPath n) :=
   rweq_of_step (F.qExpansionStep n)
 
-@[simp] theorem qexpansion_cancel_rweq (n : Nat) :
+noncomputable def qexpansion_cancel_rweq (n : Nat) :
     RwEq
       (Path.trans (Path.symm (F.qExpansionPath n)) (F.qExpansionPath n))
       (Path.refl (F.coeff n)) :=
@@ -89,13 +89,13 @@ variable {G : GaloisRepresentationPathData Γ V}
 variable {F : AutomorphicFormPathData A}
 variable (L : LanglandsCompatibilityPathData G F)
 
-@[simp] theorem local_global_rweq (n : Nat) :
+noncomputable def local_global_rweq (n : Nat) :
     RwEq
       (Path.trans (L.localGlobalPath n) (Path.refl (F.coeff n)))
       (L.localGlobalPath n) :=
   rweq_of_step (L.localGlobalStep n)
 
-@[simp] theorem local_global_symm_rweq (n : Nat) :
+noncomputable def local_global_symm_rweq (n : Nat) :
     RwEq
       (Path.trans (Path.symm (L.localGlobalPath n)) (L.localGlobalPath n))
       (Path.refl (F.coeff n)) :=

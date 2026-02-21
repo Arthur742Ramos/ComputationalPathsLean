@@ -49,21 +49,21 @@ namespace AlmostVanishingPathData
 variable {R : Type u} {H : Int → Type v}
 variable (A : AlmostVanishingPathData R H)
 
-@[simp] theorem almostVanishing_rweq
+noncomputable def almostVanishing_rweq
     (n : Int) (ε : R) (x : H n) (hε : A.ideal ε) :
     RwEq
       (Path.trans (A.almostVanishingPath n ε x hε) (Path.refl (A.zero (n + 1))))
       (A.almostVanishingPath n ε x hε) :=
   rweq_of_step (A.almostVanishingStep n ε x hε)
 
-@[simp] theorem scalarZero_rweq
+noncomputable def scalarZero_rweq
     (n : Int) (ε : R) (hε : A.ideal ε) :
     RwEq
       (Path.trans (Path.refl (A.scalar ε n (A.zero n))) (A.scalarZeroPath n ε hε))
       (A.scalarZeroPath n ε hε) :=
   rweq_of_step (A.scalarZeroStep n ε hε)
 
-@[simp] theorem almostVanishing_cancel_left_rweq
+noncomputable def almostVanishing_cancel_left_rweq
     (n : Int) (ε : R) (x : H n) (hε : A.ideal ε) :
     RwEq
       (Path.trans

@@ -102,12 +102,12 @@ theorem punit_loop_is_refl (p : PUnitLoopSpace) : p.toEq = Eq.refl PUnit'.unit :
 
 /-- **PUnit' set theorem**: Parallel paths in PUnit' are RwEq.
 PUnit' is a proposition (has at most one element), so it's trivially a set. -/
-theorem punit_pathEq
+noncomputable def punit_pathEq
     {a b : PUnit'.{u}} (p q : Path.{u} a b) : RwEq.{u} p q :=
   (isHSet_of_subsingleton (A := PUnit'.{u})).rweq p q
 
 /-- Any two loops in PUnit' are RwEq. -/
-theorem punit_loops_rweq
+noncomputable def punit_loops_rweq
     (p q : PUnitLoopSpace.{u}) : RwEq.{u} p q :=
   punit_pathEq p q
 
@@ -179,7 +179,7 @@ theorem inrPath_refl_eq_refl {A B C : Type u} {f : C → A} {g : C → B} (b : B
 
 /-- The conjugate of refl by glue is RwEq to refl.
     trans (glue c) (trans refl (symm (glue c))) ≈ refl -/
-theorem glue_conj_refl_rweq {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
+noncomputable def glue_conj_refl_rweq {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
     RwEq (Path.trans (Pushout.glue c)
            (Path.trans (Path.refl _) (Path.symm (Pushout.glue c))))
          (Path.refl (Pushout.inl (f c) : Pushout A B C f g)) := by

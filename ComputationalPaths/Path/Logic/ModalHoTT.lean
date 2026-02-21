@@ -213,39 +213,39 @@ structure RealCohesiveModality extends CohesiveStructure where
 /-! ## RwEq Coherence Theorems -/
 
 /-- Modality unit is coherent: mu(eta(x)) = x. -/
-@[simp] theorem modality_idempotent_rweq {A : Type u}
+noncomputable def modality_idempotent_rweq {A : Type u}
     (M : ModalityFull) (x : M.op A) :
     RwEq (M.mu_eta A x) (M.mu_eta A x) :=
   RwEq.refl _
 
 /-- Lex modality product coherence via RwEq. -/
-@[simp] theorem lex_prod_coherence_rweq {A B : Type u}
+noncomputable def lex_prod_coherence_rweq {A B : Type u}
     (M : LexModality) (x : A × B) :
     RwEq (M.prod_coherent A B x) (M.prod_coherent A B x) :=
   RwEq.refl _
 
 /-- Connected-truncated factorization commutes via RwEq. -/
-@[simp] theorem conn_trunc_comm_rweq {A B : Type u}
+noncomputable def conn_trunc_comm_rweq {A B : Type u}
     {f : A → B} {n : Nat}
     (F : ConnTruncFactorization f n) (a : A) :
     RwEq (F.comm a) (F.comm a) :=
   RwEq.refl _
 
 /-- Shape of discrete is trivial. -/
-theorem shape_discrete_rweq (C : CohesiveStructure) {A : Type u}
+noncomputable def shape_discrete_rweq (C : CohesiveStructure) {A : Type u}
     (x y : C.shape.op (C.flat.op A)) :
     RwEq (C.shape_discrete A x y) (C.shape_discrete A x y) :=
   RwEq.refl _
 
 /-- Flat counit composed with unit yields a path. -/
-theorem flat_counit_unit_rweq {A : Type u}
+noncomputable def flat_counit_unit_rweq {A : Type u}
     (M : FlatModality) (a : A) :
     RwEq (Path.refl (M.counit A (M.eta A a)))
          (Path.refl (M.counit A (M.eta A a))) :=
   RwEq.refl _
 
 /-- Modal type is fixed: composing unit and inverse gives identity. -/
-theorem isModal_fixed_rweq {A : Type u}
+noncomputable def isModal_fixed_rweq {A : Type u}
     (M : ModalityFull) (hA : IsModal M A) :
     ∃ (_f : M.op A → A),
       ∀ a : A, RwEq (Path.refl a) (Path.refl a) := by
@@ -253,13 +253,13 @@ theorem isModal_fixed_rweq {A : Type u}
   exact ⟨_inv, fun _a => RwEq.refl _⟩
 
 /-- Connected type: any two points are connected. -/
-theorem connected_path_rweq {A : Type u} {n : Nat}
+noncomputable def connected_path_rweq {A : Type u} {n : Nat}
     (C : NConnected A n) (a b : A) :
     RwEq (C.connected a b) (C.connected a b) :=
   RwEq.refl _
 
 /-- Factorization composition is coherent with the original map. -/
-theorem factorization_coherence {A B : Type u}
+noncomputable def factorization_coherence {A B : Type u}
     {f : A → B} {n : Nat}
     (F : ConnTruncFactorization f n) (a : A) :
     RwEq (F.comm a) (F.comm a) :=

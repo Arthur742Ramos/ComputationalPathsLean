@@ -284,7 +284,7 @@ section PathStepPairs
 variable {A : Type u} {a b : A}
 
 /-- Two Steps from the same path produce an RwEq peak. -/
-theorem step_pair_rweq {p q r : Path a b}
+noncomputable def step_pair_rweq {p q r : Path a b}
     (hpq : Step (A := A) p q) (hpr : Step (A := A) p r) : RwEq q r :=
   rweq_trans (rweq_symm (rweq_of_rw (Rw.tail (.refl p) hpq)))
              (rweq_of_rw (Rw.tail (.refl p) hpr))
@@ -300,7 +300,7 @@ theorem rw_of_step {p q : Path a b}
   Rw.tail (.refl p) h
 
 /-- RwEq from a Step. -/
-theorem rweq_of_step {p q : Path a b}
+noncomputable def rweq_of_step {p q : Path a b}
     (h : Step (A := A) p q) : RwEq p q :=
   rweq_of_rw (rw_of_step h)
 
@@ -321,7 +321,7 @@ theorem rw_chain_preserves_toEq {p q : Path a b}
   rw_toEq h
 
 /-- RwEq preserves toEq. -/
-theorem rweq_preserves_toEq {p q : Path a b}
+noncomputable def rweq_preserves_toEq {p q : Path a b}
     (h : RwEq p q) : p.toEq = q.toEq := by
   induction h with
   | refl => rfl

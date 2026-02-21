@@ -78,7 +78,7 @@ def unmapPath (E : CategoricalEquivalence C D F G) {x y : C} :
       (Path.trans (Path.congrArg G q) (E.unitIso y).inv)
 
 /-- `unmapPath` is a left inverse to `mapPath` up to rewrite equivalence. -/
-theorem unmap_map_rweq (E : CategoricalEquivalence C D F G) {x y : C}
+noncomputable def unmap_map_rweq (E : CategoricalEquivalence C D F G) {x y : C}
     (p : Path x y) :
     RwEq (unmapPath E (mapPath E p)) p := by
   dsimp [unmapPath, mapPath]
@@ -122,7 +122,7 @@ theorem unmap_map_rweq (E : CategoricalEquivalence C D F G) {x y : C}
       (rweq_cmpA_refl_right p)
 
 /-- `mapPath` is a right inverse to `unmapPath` up to rewrite equivalence. -/
-theorem map_unmap_rweq (E : CategoricalEquivalence C D F G) {x y : C}
+noncomputable def map_unmap_rweq (E : CategoricalEquivalence C D F G) {x y : C}
     (q : Path (F x) (F y)) :
     RwEq (mapPath E (unmapPath E q)) q := by
   dsimp [mapPath, unmapPath]

@@ -76,7 +76,7 @@ def transgression (s r : Nat) :
     Path (L.baseClass (s + 1) r) (L.fiberClass s r) :=
   L.transgressionPath s r
 
-@[simp] theorem transgression_rweq (s r : Nat) :
+noncomputable def transgression_rweq (s r : Nat) :
     RwEq
       (Path.trans (Path.refl (L.baseClass (s + 1) r)) (L.transgression s r))
       (L.transgression s r) :=
@@ -87,7 +87,7 @@ def transgressionLoop (s r : Nat) :
     Path (L.baseClass (s + 1) r) (L.baseClass (s + 1) r) :=
   Path.trans (L.transgression s r) (Path.symm (L.transgression s r))
 
-@[simp] theorem transgressionLoop_contracts (s r : Nat) :
+noncomputable def transgressionLoop_contracts (s r : Nat) :
     RwEq
       (L.transgressionLoop s r)
       (Path.refl (L.baseClass (s + 1) r)) := by
@@ -110,7 +110,7 @@ def transgressionToFiberLimit (s r : Nat) :
       (L.convergence.embed 0 0 (L.fiberClass s r)) :=
   Path.trans (L.shiftedTransgression s r) (L.fiberStabilizePath s r)
 
-@[simp] theorem transgressionToFiberLimit_rweq (s r : Nat) :
+noncomputable def transgressionToFiberLimit_rweq (s r : Nat) :
     RwEq
       (Path.trans
         (L.transgressionToFiberLimit s r)
@@ -148,7 +148,7 @@ def fiberBoundaryToLimit (s r : Nat) :
       (L.convergence.embed 0 0 (L.fiberClass s r)) :=
   Path.trans (L.shiftedFiberBoundaryCompression s r) (L.fiberStabilizePath s r)
 
-@[simp] theorem fiberBoundaryToLimit_rweq (s r : Nat) :
+noncomputable def fiberBoundaryToLimit_rweq (s r : Nat) :
     RwEq
       (Path.trans
         (L.fiberBoundaryToLimit s r)

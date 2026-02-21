@@ -227,13 +227,13 @@ theorem arrangeStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Examples -/
 
 /-- RwEq: Möbius diagonal is stable. -/
-theorem rwEq_moebius_diag {A : Arrangement.{u}} {L : IntersectionLattice A}
+noncomputable def rwEq_moebius_diag {A : Arrangement.{u}} {L : IntersectionLattice A}
     (mf : MoebiusFn A L) (j : L.J) :
     RwEq (mf.mu_diag j) (mf.mu_diag j) :=
   RwEq.refl _
 
 /-- RwEq: meet commutativity is stable. -/
-theorem rwEq_meet_comm {A : Arrangement.{u}} (L : IntersectionLattice A)
+noncomputable def rwEq_meet_comm {A : Arrangement.{u}} (L : IntersectionLattice A)
     (j1 j2 : L.J) :
     RwEq (L.meet_comm j1 j2) (L.meet_comm j1 j2) :=
   RwEq.refl _

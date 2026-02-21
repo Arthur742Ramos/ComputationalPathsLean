@@ -56,26 +56,26 @@ variable {Cycle : Type u} {R : Type v}
 variable {C : ChowRingPathData R}
 variable (D : CycleClassPathData Cycle R C)
 
-@[simp] theorem rational_eq_rweq {z z' : Cycle} (h : D.rationalEq z z') :
+noncomputable def rational_eq_rweq {z z' : Cycle} (h : D.rationalEq z z') :
     RwEq
       (Path.trans (D.rationalEqPath h) (Path.refl (D.cycleClass z')))
       (D.rationalEqPath h) :=
   rweq_of_step (D.rationalEqStep h)
 
-@[simp] theorem add_class_rweq (z w : Cycle) :
+noncomputable def add_class_rweq (z w : Cycle) :
     RwEq
       (Path.trans (Path.refl (D.cycleClass (D.addCycle z w))) (D.addClassPath z w))
       (D.addClassPath z w) :=
   rweq_of_step (D.addClassStep z w)
 
-@[simp] theorem intersection_class_rweq (z w : Cycle) :
+noncomputable def intersection_class_rweq (z w : Cycle) :
     RwEq
       (Path.trans (D.intersectionClassPath z w)
         (Path.refl (C.mul (D.cycleClass z) (D.cycleClass w))))
       (D.intersectionClassPath z w) :=
   rweq_of_step (D.intersectionClassStep z w)
 
-@[simp] theorem intersection_class_cancel_rweq (z w : Cycle) :
+noncomputable def intersection_class_cancel_rweq (z w : Cycle) :
     RwEq
       (Path.trans (Path.symm (D.intersectionClassPath z w)) (D.intersectionClassPath z w))
       (Path.refl (C.mul (D.cycleClass z) (D.cycleClass w))) :=

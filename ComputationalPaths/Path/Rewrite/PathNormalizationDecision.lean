@@ -88,7 +88,7 @@ noncomputable def expr_wordProblem_decidable {A : Type u} {a b : A}
   exact inferInstance
 
 /-- Joinable expressions yield rewrite equality after evaluation. -/
-theorem expr_wordProblem_sound {A : Type u} {a b : A}
+noncomputable def expr_wordProblem_sound {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : ExprWordProblem p q) :
     RwEq (PathExpr.eval p) (PathExpr.eval q) := by
@@ -101,7 +101,7 @@ theorem expr_wordProblem_sound {A : Type u} {a b : A}
 /-! ## Word problem for groups via π₁ -/
 
 /-- Rewrite-equivalent loops represent the same π₁ element. -/
-theorem piOne_eq_of_rweq {A : Type u} {a : A} {p q : LoopSpace A a}
+noncomputable def piOne_eq_of_rweq {A : Type u} {a : A} {p q : LoopSpace A a}
     (h : RwEq p q) :
     PiOne.ofLoop (A := A) (a := a) p =
       PiOne.ofLoop (A := A) (a := a) q := by

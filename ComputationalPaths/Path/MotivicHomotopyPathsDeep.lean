@@ -124,7 +124,7 @@ theorem a1local_retract_inv {X Y : Type u} (e : A1LocalEquiv X Y) (y : Y) :
   Step.trans_symm _
 
 /-- RwEq: left unit for A¹-retract. -/
-theorem a1local_retract_left_unit_rweq {X : Type u} (x : X) :
+noncomputable def a1local_retract_left_unit_rweq {X : Type u} (x : X) :
     RwEq
       (Path.trans (Path.refl x) ((A1LocalEquiv.idEquiv X).retract x))
       ((A1LocalEquiv.idEquiv X).retract x) :=
@@ -246,7 +246,7 @@ theorem slice_descend_one_step {A : Type u} (t : SliceTower A) (n : Nat) :
   Step.trans_refl_right _
 
 /-- RwEq: descending 1 level. -/
-theorem slice_descend_one_rweq {A : Type u} (t : SliceTower A) (n : Nat) :
+noncomputable def slice_descend_one_rweq {A : Type u} (t : SliceTower A) (n : Nat) :
     RwEq (t.descend n 1) (t.conn n) :=
   rweq_of_step (Step.trans_refl_right _)
 
@@ -371,18 +371,18 @@ theorem motivic_right_inv {A : Type u} {a b : A} (p : Path a b) :
   Step.trans_symm _
 
 /-- RwEq: associativity for motivic composition. -/
-theorem motivic_assoc_rweq {A : Type u} {a b c d : A}
+noncomputable def motivic_assoc_rweq {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   rweq_of_step (Step.trans_assoc p q r)
 
 /-- RwEq: left inverse. -/
-theorem motivic_left_inv_rweq {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def motivic_left_inv_rweq {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl b) :=
   rweq_of_step (Step.symm_trans _)
 
 /-- RwEq: right inverse. -/
-theorem motivic_right_inv_rweq {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def motivic_right_inv_rweq {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
   rweq_of_step (Step.trans_symm _)
 

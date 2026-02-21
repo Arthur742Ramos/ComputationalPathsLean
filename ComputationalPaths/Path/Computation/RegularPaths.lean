@@ -288,7 +288,7 @@ theorem regularStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Instances -/
 
 /-- RwEq: epsilon match path is stable. -/
-theorem rwEq_epsilon {Alpha : Type u} :
+noncomputable def rwEq_epsilon {Alpha : Type u} :
     RwEq (Path.refl (regexMatch (Regex.epsilon : Regex Alpha) []))
          (Path.refl (regexMatch (Regex.epsilon : Regex Alpha) [])) :=
   RwEq.refl _

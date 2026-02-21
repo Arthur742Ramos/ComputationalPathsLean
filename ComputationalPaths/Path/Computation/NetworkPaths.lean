@@ -66,19 +66,19 @@ theorem flowConserve_trans_refl (d : FlowConservation) :
   simp
 
 /-- RwEq: flow conservation inv cancel right. -/
-theorem flowConserve_rweq_inv_right (d : FlowConservation) :
+noncomputable def flowConserve_rweq_inv_right (d : FlowConservation) :
     RwEq
       (Path.trans d.conservePath (Path.symm d.conservePath))
       (Path.refl d.flowIn) :=
   rweq_cmpA_inv_right d.conservePath
 
 /-- RwEq: flow conservation symm_symm. -/
-theorem flowConserve_rweq_symm_symm (d : FlowConservation) :
+noncomputable def flowConserve_rweq_symm_symm (d : FlowConservation) :
     RwEq (Path.symm (Path.symm d.conservePath)) d.conservePath :=
   rweq_of_step (Step.symm_symm d.conservePath)
 
 /-- RwEq: flow conservation refl trans. -/
-theorem flowConserve_rweq_refl_trans (d : FlowConservation) :
+noncomputable def flowConserve_rweq_refl_trans (d : FlowConservation) :
     RwEq
       (Path.trans (Path.refl d.flowIn) d.conservePath)
       d.conservePath :=
@@ -98,14 +98,14 @@ theorem routing_trans_refl {N : Type u} (d : RoutingData N) :
   simp
 
 /-- RwEq: routing inv cancel left. -/
-theorem routing_rweq_inv_left {N : Type u} (d : RoutingData N) :
+noncomputable def routing_rweq_inv_left {N : Type u} (d : RoutingData N) :
     RwEq
       (Path.trans (Path.symm d.routePath) d.routePath)
       (Path.refl d.destination) :=
   rweq_cmpA_inv_left d.routePath
 
 /-- RwEq: routing refl trans. -/
-theorem routing_rweq_refl_trans {N : Type u} (d : RoutingData N) :
+noncomputable def routing_rweq_refl_trans {N : Type u} (d : RoutingData N) :
     RwEq
       (Path.trans (Path.refl d.source) d.routePath)
       d.routePath :=
@@ -125,7 +125,7 @@ theorem capacity_trans_refl (d : CapacityData) :
   simp
 
 /-- RwEq: capacity inv cancel right. -/
-theorem capacity_rweq_inv_right (d : CapacityData) :
+noncomputable def capacity_rweq_inv_right (d : CapacityData) :
     RwEq
       (Path.trans d.capacityPath (Path.symm d.capacityPath))
       (Path.refl d.currentFlow) :=
@@ -140,12 +140,12 @@ structure CutData where
   cutPath : Path srcSideFlow tgtSideFlow
 
 /-- Cut-flow duality: cut value relates to flow via path. -/
-theorem cut_rweq_symm_symm (d : CutData) :
+noncomputable def cut_rweq_symm_symm (d : CutData) :
     RwEq (Path.symm (Path.symm d.cutPath)) d.cutPath :=
   rweq_of_step (Step.symm_symm d.cutPath)
 
 /-- RwEq: cut inv cancel left. -/
-theorem cut_rweq_inv_left (d : CutData) :
+noncomputable def cut_rweq_inv_left (d : CutData) :
     RwEq
       (Path.trans (Path.symm d.cutPath) d.cutPath)
       (Path.refl d.tgtSideFlow) :=
@@ -165,14 +165,14 @@ theorem loadBalance_trans_refl {N : Type u} (d : LoadBalanceData N) :
   simp
 
 /-- RwEq: load balance inv cancel right. -/
-theorem loadBalance_rweq_inv_right {N : Type u} (d : LoadBalanceData N) :
+noncomputable def loadBalance_rweq_inv_right {N : Type u} (d : LoadBalanceData N) :
     RwEq
       (Path.trans d.balancePath (Path.symm d.balancePath))
       (Path.refl d.entryPoint) :=
   rweq_cmpA_inv_right d.balancePath
 
 /-- RwEq: load balance refl trans. -/
-theorem loadBalance_rweq_refl_trans {N : Type u} (d : LoadBalanceData N) :
+noncomputable def loadBalance_rweq_refl_trans {N : Type u} (d : LoadBalanceData N) :
     RwEq
       (Path.trans (Path.refl d.entryPoint) d.balancePath)
       d.balancePath :=
@@ -187,14 +187,14 @@ structure CongestionData where
   congestionPath : Path normalFlow congestedFlow
 
 /-- RwEq: congestion trans refl. -/
-theorem congestion_rweq_trans_refl (d : CongestionData) :
+noncomputable def congestion_rweq_trans_refl (d : CongestionData) :
     RwEq
       (Path.trans d.congestionPath (Path.refl d.congestedFlow))
       d.congestionPath :=
   rweq_of_step (Step.trans_refl_right d.congestionPath)
 
 /-- RwEq: congestion symm_symm. -/
-theorem congestion_rweq_symm_symm (d : CongestionData) :
+noncomputable def congestion_rweq_symm_symm (d : CongestionData) :
     RwEq (Path.symm (Path.symm d.congestionPath)) d.congestionPath :=
   rweq_of_step (Step.symm_symm d.congestionPath)
 
@@ -213,14 +213,14 @@ theorem reliability_paths_agree {N : Type u} (d : ReliabilityData N) :
   rfl
 
 /-- RwEq: primary inv cancel right. -/
-theorem reliability_rweq_primary_inv {N : Type u} (d : ReliabilityData N) :
+noncomputable def reliability_rweq_primary_inv {N : Type u} (d : ReliabilityData N) :
     RwEq
       (Path.trans d.primaryPath (Path.symm d.primaryPath))
       (Path.refl d.src) :=
   rweq_cmpA_inv_right d.primaryPath
 
 /-- RwEq: backup inv cancel right. -/
-theorem reliability_rweq_backup_inv {N : Type u} (d : ReliabilityData N) :
+noncomputable def reliability_rweq_backup_inv {N : Type u} (d : ReliabilityData N) :
     RwEq
       (Path.trans d.backupPath (Path.symm d.backupPath))
       (Path.refl d.src) :=
@@ -260,7 +260,7 @@ theorem multiHop_zero {N : Type u} {a : N} (p : Path a a) :
     multiHop p 0 = Path.refl a := rfl
 
 /-- RwEq: multi-hop 1 simplifies. -/
-theorem multiHop_one_rweq {N : Type u} {a : N} (p : Path a a) :
+noncomputable def multiHop_one_rweq {N : Type u} {a : N} (p : Path a a) :
     RwEq (multiHop p 1) p :=
   rweq_of_step (Step.trans_refl_left p)
 

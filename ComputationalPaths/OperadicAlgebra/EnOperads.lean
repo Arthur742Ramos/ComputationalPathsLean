@@ -40,7 +40,7 @@ namespace EnOperadAlgebraPathData
 variable {n : Nat} {A : Type u}
 variable (E : EnOperadAlgebraPathData n A)
 
-@[simp] theorem iterated_unit_rweq (x : A) :
+noncomputable def iterated_unit_rweq (x : A) :
     RwEq
       (Path.trans (E.iteratedUnitPath x) (Path.refl x))
       (E.iteratedUnitPath x) :=
@@ -69,7 +69,7 @@ def actionUnitRoundTrip {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     E.actionUnitRoundTrip c xs =
       Path.trans (E.unitOnAction c xs) (Path.symm (E.unitOnAction c xs)) := rfl
 
-@[simp] theorem action_unit_roundtrip_rweq
+noncomputable def action_unit_roundtrip_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     RwEq
       (E.actionUnitRoundTrip c xs)
@@ -78,7 +78,7 @@ def actionUnitRoundTrip {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
   unfold actionUnitRoundTrip unitOnAction
   exact rweq_cmpA_inv_right (E.base.unitActionPath (E.base.act c xs))
 
-theorem action_unit_roundtrip_left_refl_rweq
+noncomputable def action_unit_roundtrip_left_refl_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     RwEq
       (Path.trans
@@ -88,7 +88,7 @@ theorem action_unit_roundtrip_left_refl_rweq
       (E.actionUnitRoundTrip c xs) :=
   rweq_cmpA_refl_left (p := E.actionUnitRoundTrip c xs)
 
-theorem action_unit_roundtrip_right_refl_rweq
+noncomputable def action_unit_roundtrip_right_refl_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     RwEq
       (Path.trans
@@ -98,7 +98,7 @@ theorem action_unit_roundtrip_right_refl_rweq
       (E.actionUnitRoundTrip c xs) :=
   rweq_cmpA_refl_right (p := E.actionUnitRoundTrip c xs)
 
-theorem unit_on_action_assoc_with_refl
+noncomputable def unit_on_action_assoc_with_refl
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     RwEq
       (Path.trans
@@ -109,7 +109,7 @@ theorem unit_on_action_assoc_with_refl
         (Path.trans (Path.refl (E.base.act c xs)) (Path.symm (E.unitOnAction c xs)))) :=
   rweq_tt (E.unitOnAction c xs) (Path.refl _) (Path.symm (E.unitOnAction c xs))
 
-theorem unit_on_action_inverse_right_rweq
+noncomputable def unit_on_action_inverse_right_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     RwEq
       (Path.trans (E.unitOnAction c xs) (Path.symm (E.unitOnAction c xs)))
@@ -117,14 +117,14 @@ theorem unit_on_action_inverse_right_rweq
         (E.base.act (LittleCubesOperad.identityCube n) (fun _ => E.base.act c xs))) :=
   rweq_cmpA_inv_right (E.unitOnAction c xs)
 
-theorem unit_on_action_inverse_left_rweq
+noncomputable def unit_on_action_inverse_left_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     RwEq
       (Path.trans (Path.symm (E.unitOnAction c xs)) (E.unitOnAction c xs))
       (Path.refl (E.base.act c xs)) :=
   rweq_cmpA_inv_left (E.unitOnAction c xs)
 
-theorem iterated_unit_left_refl_rweq (x : A) :
+noncomputable def iterated_unit_left_refl_rweq (x : A) :
     RwEq
       (Path.trans
         (Path.refl

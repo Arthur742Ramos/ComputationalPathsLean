@@ -153,7 +153,7 @@ noncomputable def connectingMap₁ {P : B → Type u} (b : B) (x₀ : P b) :
   Path.transport loop x₀
 
 /-- The connecting map respects RwEq. -/
-theorem connectingMap₁_respects_rweq {P : B → Type u} (b : B) (x₀ : P b)
+noncomputable def connectingMap₁_respects_rweq {P : B → Type u} (b : B) (x₀ : P b)
     {l₁ l₂ : LoopSpace B b} (h : RwEq l₁ l₂) :
     connectingMap₁ b x₀ l₁ = connectingMap₁ b x₀ l₂ := by
   unfold connectingMap₁
@@ -224,7 +224,7 @@ def inducedLoopMap (f : A → B) (a : A) : LoopSpace A a → LoopSpace B (f a) :
   Path.congrArg f
 
 /-- Induced map respects RwEq (via context map preservation). -/
-theorem inducedLoopMap_respects_rweq (f : A → B) (a : A)
+noncomputable def inducedLoopMap_respects_rweq (f : A → B) (a : A)
     {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) :
     RwEq (inducedLoopMap f a l₁) (inducedLoopMap f a l₂) := by
   unfold inducedLoopMap

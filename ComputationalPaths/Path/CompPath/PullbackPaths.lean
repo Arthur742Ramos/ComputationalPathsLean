@@ -149,7 +149,7 @@ def pathFromData {x y : Pullback A B C f g} :
   | ⟨p, q⟩ => Path.sigmaMk p q
 
 /-- Pullback paths are determined by their components (sigma eta). -/
-theorem path_eta {x y : Pullback A B C f g} (p : Path x y) :
+noncomputable def path_eta {x y : Pullback A B C f g} (p : Path x y) :
     RwEq (pathFromData (A := A) (B := B) (C := C) (f := f) (g := g)
       (pathToData (A := A) (B := B) (C := C) (f := f) (g := g) p)) p :=
   ProductSigmaDerived.rweq_sigmaMk_sigmaFst_sigmaSnd p

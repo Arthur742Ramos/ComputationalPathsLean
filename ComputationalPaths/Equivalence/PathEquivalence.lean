@@ -80,24 +80,24 @@ theorem counit_inv_hom_rw (E : CategoricalEquivalence C D) (y : D) :
   rw_of_step (E.counit_inv_hom_step y)
 
 /-- Unit cancellation promoted from primitive steps to rewrite equivalence. -/
-theorem unit_hom_inv_rweq (E : CategoricalEquivalence C D) (x : C) :
+noncomputable def unit_hom_inv_rweq (E : CategoricalEquivalence C D) (x : C) :
     RwEq (Path.trans (E.unit x) (Path.symm (E.unit x))) (Path.refl x) :=
   rweq_of_step (E.unit_hom_inv_step x)
 
 /-- Unit inverse cancellation promoted from primitive steps to rewrite equivalence. -/
-theorem unit_inv_hom_rweq (E : CategoricalEquivalence C D) (x : C) :
+noncomputable def unit_inv_hom_rweq (E : CategoricalEquivalence C D) (x : C) :
     RwEq (Path.trans (Path.symm (E.unit x)) (E.unit x))
       (Path.refl (E.invFun (E.toFun x))) :=
   rweq_of_step (E.unit_inv_hom_step x)
 
 /-- Counit cancellation promoted from primitive steps to rewrite equivalence. -/
-theorem counit_hom_inv_rweq (E : CategoricalEquivalence C D) (y : D) :
+noncomputable def counit_hom_inv_rweq (E : CategoricalEquivalence C D) (y : D) :
     RwEq (Path.trans (E.counit y) (Path.symm (E.counit y)))
       (Path.refl (E.toFun (E.invFun y))) :=
   rweq_of_step (E.counit_hom_inv_step y)
 
 /-- Counit inverse cancellation promoted from primitive steps to rewrite equivalence. -/
-theorem counit_inv_hom_rweq (E : CategoricalEquivalence C D) (y : D) :
+noncomputable def counit_inv_hom_rweq (E : CategoricalEquivalence C D) (y : D) :
     RwEq (Path.trans (Path.symm (E.counit y)) (E.counit y)) (Path.refl y) :=
   rweq_of_step (E.counit_inv_hom_step y)
 

@@ -108,35 +108,35 @@ theorem norm_path_refl_trans {Ω : Type u} (m : MeasurePath Ω) :
   simp
 
 /-- RwEq: normalization path trans refl step. -/
-theorem norm_rweq_trans_refl {Ω : Type u} (m : MeasurePath Ω) :
+noncomputable def norm_rweq_trans_refl {Ω : Type u} (m : MeasurePath Ω) :
     RwEq
       (Path.trans m.normPath (Path.refl m.totalProb))
       m.normPath :=
   rweq_of_step (Step.trans_refl_right m.normPath)
 
 /-- RwEq: normalization path refl trans step. -/
-theorem norm_rweq_refl_trans {Ω : Type u} (m : MeasurePath Ω) :
+noncomputable def norm_rweq_refl_trans {Ω : Type u} (m : MeasurePath Ω) :
     RwEq
       (Path.trans (Path.refl (m.prob (Event.certain Ω))) m.normPath)
       m.normPath :=
   rweq_of_step (Step.trans_refl_left m.normPath)
 
 /-- RwEq: normalization path inv cancel right. -/
-theorem norm_rweq_inv_right {Ω : Type u} (m : MeasurePath Ω) :
+noncomputable def norm_rweq_inv_right {Ω : Type u} (m : MeasurePath Ω) :
     RwEq
       (Path.trans m.normPath (Path.symm m.normPath))
       (Path.refl (m.prob (Event.certain Ω))) :=
   rweq_cmpA_inv_right m.normPath
 
 /-- RwEq: normalization path inv cancel left. -/
-theorem norm_rweq_inv_left {Ω : Type u} (m : MeasurePath Ω) :
+noncomputable def norm_rweq_inv_left {Ω : Type u} (m : MeasurePath Ω) :
     RwEq
       (Path.trans (Path.symm m.normPath) m.normPath)
       (Path.refl m.totalProb) :=
   rweq_cmpA_inv_left m.normPath
 
 /-- RwEq: symm_symm for normalization path. -/
-theorem norm_rweq_symm_symm {Ω : Type u} (m : MeasurePath Ω) :
+noncomputable def norm_rweq_symm_symm {Ω : Type u} (m : MeasurePath Ω) :
     RwEq
       (Path.symm (Path.symm m.normPath))
       m.normPath :=
@@ -174,42 +174,42 @@ theorem bayes_refl_trans {Ω : Type u} (bd : BayesData Ω) :
   simp
 
 /-- RwEq: pathAB inverse cancel right. -/
-theorem bayes_rweq_inv_right {Ω : Type u} (bd : BayesData Ω) :
+noncomputable def bayes_rweq_inv_right {Ω : Type u} (bd : BayesData Ω) :
     RwEq
       (Path.trans bd.pathAB (Path.symm bd.pathAB))
       (Path.refl bd.condValAB) :=
   rweq_cmpA_inv_right bd.pathAB
 
 /-- RwEq: pathAB inverse cancel left. -/
-theorem bayes_rweq_inv_left {Ω : Type u} (bd : BayesData Ω) :
+noncomputable def bayes_rweq_inv_left {Ω : Type u} (bd : BayesData Ω) :
     RwEq
       (Path.trans (Path.symm bd.pathAB) bd.pathAB)
       (Path.refl bd.probAB) :=
   rweq_cmpA_inv_left bd.pathAB
 
 /-- RwEq: pathAB trans refl. -/
-theorem bayes_rweq_trans_refl {Ω : Type u} (bd : BayesData Ω) :
+noncomputable def bayes_rweq_trans_refl {Ω : Type u} (bd : BayesData Ω) :
     RwEq
       (Path.trans bd.pathAB (Path.refl bd.probAB))
       bd.pathAB :=
   rweq_of_step (Step.trans_refl_right bd.pathAB)
 
 /-- RwEq: pathAB refl trans. -/
-theorem bayes_rweq_refl_trans {Ω : Type u} (bd : BayesData Ω) :
+noncomputable def bayes_rweq_refl_trans {Ω : Type u} (bd : BayesData Ω) :
     RwEq
       (Path.trans (Path.refl bd.condValAB) bd.pathAB)
       bd.pathAB :=
   rweq_of_step (Step.trans_refl_left bd.pathAB)
 
 /-- RwEq: pathAB symm_symm. -/
-theorem bayes_rweq_symm_symm {Ω : Type u} (bd : BayesData Ω) :
+noncomputable def bayes_rweq_symm_symm {Ω : Type u} (bd : BayesData Ω) :
     RwEq
       (Path.symm (Path.symm bd.pathAB))
       bd.pathAB :=
   rweq_of_step (Step.symm_symm bd.pathAB)
 
 /-- RwEq: pathBA inverse cancel right. -/
-theorem bayes_rweq_BA_inv_right {Ω : Type u} (bd : BayesData Ω) :
+noncomputable def bayes_rweq_BA_inv_right {Ω : Type u} (bd : BayesData Ω) :
     RwEq
       (Path.trans bd.pathBA (Path.symm bd.pathBA))
       (Path.refl bd.condValBA) :=
@@ -243,28 +243,28 @@ theorem indep_symm_trans {Ω : Type u} (d : IndepData Ω) :
   simp [indep_factor_path]
 
 /-- RwEq: indepPath inv cancel right. -/
-theorem indep_rweq_inv_right {Ω : Type u} (d : IndepData Ω) :
+noncomputable def indep_rweq_inv_right {Ω : Type u} (d : IndepData Ω) :
     RwEq
       (Path.trans d.indepPath (Path.symm d.indepPath))
       (Path.refl d.probAB) :=
   rweq_cmpA_inv_right d.indepPath
 
 /-- RwEq: indepPath inv cancel left. -/
-theorem indep_rweq_inv_left {Ω : Type u} (d : IndepData Ω) :
+noncomputable def indep_rweq_inv_left {Ω : Type u} (d : IndepData Ω) :
     RwEq
       (Path.trans (Path.symm d.indepPath) d.indepPath)
       (Path.refl d.product) :=
   rweq_cmpA_inv_left d.indepPath
 
 /-- RwEq: indepPath symm_symm. -/
-theorem indep_rweq_symm_symm {Ω : Type u} (d : IndepData Ω) :
+noncomputable def indep_rweq_symm_symm {Ω : Type u} (d : IndepData Ω) :
     RwEq
       (Path.symm (Path.symm d.indepPath))
       d.indepPath :=
   rweq_of_step (Step.symm_symm d.indepPath)
 
 /-- RwEq: prodPath trans refl. -/
-theorem indep_rweq_prod_trans_refl {Ω : Type u} (d : IndepData Ω) :
+noncomputable def indep_rweq_prod_trans_refl {Ω : Type u} (d : IndepData Ω) :
     RwEq
       (Path.trans d.prodPath (Path.refl (d.probA * d.probB)))
       d.prodPath :=
@@ -290,35 +290,35 @@ theorem expect_trans_refl (d : ExpectationData) :
   simp
 
 /-- RwEq: expectation inv cancel right. -/
-theorem expect_rweq_inv_right (d : ExpectationData) :
+noncomputable def expect_rweq_inv_right (d : ExpectationData) :
     RwEq
       (Path.trans d.sumPath (Path.symm d.sumPath))
       (Path.refl d.expectation) :=
   rweq_cmpA_inv_right d.sumPath
 
 /-- RwEq: expectation inv cancel left. -/
-theorem expect_rweq_inv_left (d : ExpectationData) :
+noncomputable def expect_rweq_inv_left (d : ExpectationData) :
     RwEq
       (Path.trans (Path.symm d.sumPath) d.sumPath)
       (Path.refl d.weightedSum) :=
   rweq_cmpA_inv_left d.sumPath
 
 /-- RwEq: expectation trans refl step. -/
-theorem expect_rweq_trans_refl (d : ExpectationData) :
+noncomputable def expect_rweq_trans_refl (d : ExpectationData) :
     RwEq
       (Path.trans d.sumPath (Path.refl d.weightedSum))
       d.sumPath :=
   rweq_of_step (Step.trans_refl_right d.sumPath)
 
 /-- RwEq: linear exp trans refl. -/
-theorem linear_rweq_trans_refl (d : LinearExpData) :
+noncomputable def linear_rweq_trans_refl (d : LinearExpData) :
     RwEq
       (Path.trans d.constExpPath (Path.refl d.constProduct))
       d.constExpPath :=
   rweq_of_step (Step.trans_refl_right d.constExpPath)
 
 /-- RwEq: linear exp symm_symm. -/
-theorem linear_rweq_symm_symm (d : LinearExpData) :
+noncomputable def linear_rweq_symm_symm (d : LinearExpData) :
     RwEq
       (Path.symm (Path.symm d.constExpPath))
       d.constExpPath :=
@@ -339,28 +339,28 @@ theorem total_prob_trans_refl {Ω : Type u} (d : TotalProbData Ω) :
   simp
 
 /-- RwEq: total prob inv cancel right. -/
-theorem total_prob_rweq_inv_right {Ω : Type u} (d : TotalProbData Ω) :
+noncomputable def total_prob_rweq_inv_right {Ω : Type u} (d : TotalProbData Ω) :
     RwEq
       (Path.trans d.totalProbPath (Path.symm d.totalProbPath))
       (Path.refl d.probA) :=
   rweq_cmpA_inv_right d.totalProbPath
 
 /-- RwEq: total prob inv cancel left. -/
-theorem total_prob_rweq_inv_left {Ω : Type u} (d : TotalProbData Ω) :
+noncomputable def total_prob_rweq_inv_left {Ω : Type u} (d : TotalProbData Ω) :
     RwEq
       (Path.trans (Path.symm d.totalProbPath) d.totalProbPath)
       (Path.refl d.weightedSum) :=
   rweq_cmpA_inv_left d.totalProbPath
 
 /-- RwEq: total prob trans refl step. -/
-theorem total_prob_rweq_trans_refl {Ω : Type u} (d : TotalProbData Ω) :
+noncomputable def total_prob_rweq_trans_refl {Ω : Type u} (d : TotalProbData Ω) :
     RwEq
       (Path.trans d.totalProbPath (Path.refl d.weightedSum))
       d.totalProbPath :=
   rweq_of_step (Step.trans_refl_right d.totalProbPath)
 
 /-- RwEq: total prob symm_symm. -/
-theorem total_prob_rweq_symm_symm {Ω : Type u} (d : TotalProbData Ω) :
+noncomputable def total_prob_rweq_symm_symm {Ω : Type u} (d : TotalProbData Ω) :
     RwEq
       (Path.symm (Path.symm d.totalProbPath))
       d.totalProbPath :=

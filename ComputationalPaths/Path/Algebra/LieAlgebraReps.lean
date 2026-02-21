@@ -273,13 +273,13 @@ theorem lieRepStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Examples -/
 
 /-- RwEq: bracket preservation paths are reflexively equivalent. -/
-theorem rwEq_bracket {𝔤 𝔥 : Type u} {L1 : LieAlgebra 𝔤} {L2 : LieAlgebra 𝔥}
+noncomputable def rwEq_bracket {𝔤 𝔥 : Type u} {L1 : LieAlgebra 𝔤} {L2 : LieAlgebra 𝔥}
     (f : LieAlgHom 𝔤 𝔥 L1 L2) (x y : 𝔤) :
     RwEq (f.map_bracket x y) (f.map_bracket x y) :=
   RwEq.refl _
 
 /-- RwEq: reflection involution is stable. -/
-theorem rwEq_reflect_invol {𝔥 : Type u} {rs : RootSystem 𝔥}
+noncomputable def rwEq_reflect_invol {𝔥 : Type u} {rs : RootSystem 𝔥}
     (W : WeylGroup 𝔥 rs) (s : W.SimpleRoot) (wt_ : rs.wl.Weight) :
     RwEq (W.reflect_invol s wt_) (W.reflect_invol s wt_) :=
   RwEq.refl _
@@ -291,7 +291,7 @@ theorem symm_symm_bracket {𝔤 : Type u} (L : LieAlgebra 𝔤) (x y : 𝔤) :
   simp
 
 /-- RwEq.trans composition for weight lattice associativity. -/
-theorem rwEq_weight_assoc {𝔥 : Type u} (wl : WeightLattice 𝔥)
+noncomputable def rwEq_weight_assoc {𝔥 : Type u} (wl : WeightLattice 𝔥)
     (a b c : wl.Weight) :
     RwEq (wl.wadd_assoc a b c) (wl.wadd_assoc a b c) :=
   RwEq.refl _

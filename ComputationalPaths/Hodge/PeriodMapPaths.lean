@@ -35,7 +35,7 @@ def PeriodMapStep.toStep {D : Type u} {a b : D} {p q : Path a b}
   | .monodromy_cancel p => Path.Step.symm_trans p
 
 /-- Lift a period-map step to rewrite equivalence. -/
-theorem rweq_of_period_step {D : Type u} {a b : D}
+noncomputable def rweq_of_period_step {D : Type u} {a b : D}
     {p q : Path a b} (s : PeriodMapStep p q) : RwEq p q :=
   rweq_of_step (PeriodMapStep.toStep s)
 
@@ -85,25 +85,25 @@ namespace PeriodMapPathData
 variable {X : Type u} {H : Type v} {D : Type w}
 variable (P : PeriodMapPathData X H D)
 
-@[simp] theorem variation_transport_rweq {x y : X} (p : Path x y) :
+noncomputable def variation_transport_rweq {x y : X} (p : Path x y) :
     RwEq
       (Path.trans (P.variation.parallelTransport p) (Path.refl (P.variation.fiber y)))
       (P.variation.parallelTransport p) :=
   rweq_of_period_step (P.variation.parallelTransportStep p)
 
-@[simp] theorem horizontality_rweq {x y : X} (p : Path x y) :
+noncomputable def horizontality_rweq {x y : X} (p : Path x y) :
     RwEq
       (Path.trans (P.periodTransport p) (Path.refl (P.periodMap y)))
       (P.periodTransport p) :=
   rweq_of_period_step (P.horizontalityStep p)
 
-@[simp] theorem functorial_rweq {x y : X} (p : Path x y) :
+noncomputable def functorial_rweq {x y : X} (p : Path x y) :
     RwEq
       (Path.trans (Path.refl (P.periodMap x)) (P.periodTransport p))
       (P.periodTransport p) :=
   rweq_of_period_step (P.functorialStep p)
 
-@[simp] theorem local_monodromy_cancel_rweq (x : X) :
+noncomputable def local_monodromy_cancel_rweq (x : X) :
     RwEq
       (Path.trans (Path.symm (P.localMonodromy x)) (P.localMonodromy x))
       (Path.refl (P.periodMap x)) :=
@@ -113,7 +113,7 @@ variable (P : PeriodMapPathData X H D)
 def periodRoundTrip (x : X) : Path (P.periodMap x) (P.periodMap x) :=
   Path.trans (P.localMonodromy x) (Path.symm (P.localMonodromy x))
 
-@[simp] theorem period_roundtrip_rweq (x : X) :
+noncomputable def period_roundtrip_rweq (x : X) :
     RwEq (P.periodRoundTrip x) (Path.refl (P.periodMap x)) :=
   rweq_of_step (Path.Step.trans_symm (P.localMonodromy x))
 

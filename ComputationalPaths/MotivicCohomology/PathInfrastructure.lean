@@ -38,14 +38,14 @@ namespace MotivicCohomologyPathInfrastructure
 variable {X : Type u} {H : Int → Type v}
 variable (I : MotivicCohomologyPathInfrastructure X H)
 
-@[simp] theorem zeroDifferential_rweq (n : Int) :
+noncomputable def zeroDifferential_rweq (n : Int) :
     RwEq
       (Path.trans (I.zeroDifferentialPath n)
         (Path.refl (I.cycleMap.cohDifferential n (I.cycleMap.cohZero n))))
       (I.zeroDifferentialPath n) :=
   rweq_of_step (I.zeroDifferentialStep n)
 
-@[simp] theorem zeroDifferential_cancel_left_rweq (n : Int) :
+noncomputable def zeroDifferential_cancel_left_rweq (n : Int) :
     RwEq
       (Path.trans (Path.symm (I.zeroDifferentialPath n)) (I.zeroDifferentialPath n))
       (Path.refl (I.cycleMap.cohDifferential n (I.cycleMap.cohZero n))) :=

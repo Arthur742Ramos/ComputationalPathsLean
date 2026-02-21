@@ -52,21 +52,21 @@ namespace AlmostPathPreservingMap
 variable {R : Type u} {S : Type v}
 variable {aR : AlmostData R} {aS : AlmostData S}
 
-@[simp] theorem map_zero_rweq
+noncomputable def map_zero_rweq
     (F : AlmostPathPreservingMap R S aR aS) :
     RwEq
       (Path.trans F.map_zero (Path.refl aS.zero))
       F.map_zero :=
   rweq_of_step (Path.Step.trans_refl_right F.map_zero)
 
-@[simp] theorem map_one_rweq
+noncomputable def map_one_rweq
     (F : AlmostPathPreservingMap R S aR aS) :
     RwEq
       (Path.trans F.map_one (Path.refl aS.one))
       F.map_one :=
   rweq_of_step (Path.Step.trans_refl_right F.map_one)
 
-theorem annihilator_rweq
+noncomputable def annihilator_rweq
     (F : AlmostPathPreservingMap R S aR aS)
     (ε x : R) (hε : aR.ideal ε) (hx : aR.almostZero x) :
     RwEq
@@ -103,12 +103,12 @@ def extMulNormalized
       (aS.mul (A.ext.toFun x) (A.ext.toFun y)) :=
   Path.trans (A.ext.map_mul x y) (Path.refl _)
 
-@[simp] theorem ext_mul_normalized_rweq
+noncomputable def ext_mul_normalized_rweq
     (A : AlmostPurityPaths R S aR aS) (x y : R) :
     RwEq (A.extMulNormalized x y) (A.ext.map_mul x y) :=
   rweq_of_step (Path.Step.trans_refl_right (A.ext.map_mul x y))
 
-theorem disc_rweq
+noncomputable def disc_rweq
     (A : AlmostPurityPaths R S aR aS) (ε : R) (hε : aR.ideal ε) :
     RwEq
       (Path.trans

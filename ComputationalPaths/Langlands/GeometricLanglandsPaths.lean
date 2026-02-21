@@ -48,25 +48,25 @@ namespace GeometricLanglandsPathData
 variable {BunObj : Type u} {SpecObj : Type v}
 variable (G : GeometricLanglandsPathData BunObj SpecObj)
 
-@[simp] theorem heckeEigen_rweq (F : BunObj) :
+noncomputable def heckeEigen_rweq (F : BunObj) :
     RwEq
       (Path.trans (G.heckeEigenPath F) (Path.refl (G.heckeModify (G.eigensheaf F))))
       (G.heckeEigenPath F) :=
   rweq_of_step (G.heckeEigenStep F)
 
-@[simp] theorem spectralCompat_rweq (F : BunObj) :
+noncomputable def spectralCompat_rweq (F : BunObj) :
     RwEq
       (Path.trans (Path.refl (G.spectralTransform (G.heckeModify F))) (G.spectralCompatPath F))
       (G.spectralCompatPath F) :=
   rweq_of_step (G.spectralCompatStep F)
 
-@[simp] theorem heckeEigen_cancel_rweq (F : BunObj) :
+noncomputable def heckeEigen_cancel_rweq (F : BunObj) :
     RwEq
       (Path.trans (Path.symm (G.heckeEigenPath F)) (G.heckeEigenPath F))
       (Path.refl (G.heckeModify (G.eigensheaf F))) :=
   rweq_cmpA_inv_left (G.heckeEigenPath F)
 
-@[simp] theorem spectralCompat_cancel_rweq (F : BunObj) :
+noncomputable def spectralCompat_cancel_rweq (F : BunObj) :
     RwEq
       (Path.trans (G.spectralCompatPath F) (Path.symm (G.spectralCompatPath F)))
       (Path.refl (G.spectralTransform (G.heckeModify F))) :=

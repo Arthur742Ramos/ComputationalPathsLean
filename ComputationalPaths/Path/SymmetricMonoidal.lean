@@ -32,25 +32,25 @@ variable {a b c d : A}
 /-! ## Braiding and Hexagon Coherence -/
 
 /-- Braiding for path composition via inversion. -/
-theorem braiding_path (p : Path a b) (q : Path b c) :
+noncomputable def braiding_path (p : Path a b) (q : Path b c) :
     RwEq (symm (tensorPath p q))
          (tensorPath (symm q) (symm p)) :=
   tensor_braiding p q
 
 /-- Symmetry of the braiding: applying it twice returns the original tensor. -/
-theorem braiding_symm (p : Path a b) (q : Path b c) :
+noncomputable def braiding_symm (p : Path a b) (q : Path b c) :
     RwEq (symm (tensorPath (symm q) (symm p)))
          (tensorPath p q) :=
   tensor_braiding_symm p q
 
 /-- Left hexagon coherence for the braiding. -/
-theorem braiding_hexagon_left (p : Path a b) (q : Path b c) (r : Path c d) :
+noncomputable def braiding_hexagon_left (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (symm (tensorPath (tensorPath p q) r))
          (tensorPath (symm r) (tensorPath (symm q) (symm p))) :=
   tensor_hexagon_braiding p q r
 
 /-- Right hexagon coherence for the braiding. -/
-theorem braiding_hexagon_right (p : Path a b) (q : Path b c) (r : Path c d) :
+noncomputable def braiding_hexagon_right (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (symm (tensorPath p (tensorPath q r)))
          (tensorPath (symm r) (tensorPath (symm q) (symm p))) := by
   have h_assoc : RwEq (tensorPath (tensorPath p q) r)
@@ -63,7 +63,7 @@ theorem braiding_hexagon_right (p : Path a b) (q : Path b c) (r : Path c d) :
   exact RwEq.trans h_symm (braiding_hexagon_left p q r)
 
 /-- Naturality of the braiding with respect to rewrite equivalence. -/
-theorem braiding_natural {p p' : Path a b} {q q' : Path b c}
+noncomputable def braiding_natural {p p' : Path a b} {q q' : Path b c}
     (α : RwEq p p') (β : RwEq q q') :
     rweq_trans (rweq_symm_congr (rweq_trans_congr α β))
         (braiding_path (p := p') (q := q')) =

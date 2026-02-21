@@ -42,19 +42,19 @@ namespace PDivisibleGroupPathData
 
 variable {G : Type u} (D : PDivisibleGroupPathData G)
 
-@[simp] theorem divisibility_rweq (n : Nat) (x : G) :
+noncomputable def divisibility_rweq (n : Nat) (x : G) :
     RwEq
       (Path.trans (D.divisibilityPath n x) (Path.refl (D.towerPoint n x)))
       (D.divisibilityPath n x) :=
   rweq_of_step (D.divisibilityStep n x)
 
-@[simp] theorem compatibility_rweq (n : Nat) (x : G) :
+noncomputable def compatibility_rweq (n : Nat) (x : G) :
     RwEq
       (Path.trans (Path.refl (D.towerPoint n (D.pMul x))) (D.compatibilityPath n x))
       (D.compatibilityPath n x) :=
   rweq_of_step (D.compatibilityStep n x)
 
-@[simp] theorem divisibility_cancel_rweq (n : Nat) (x : G) :
+noncomputable def divisibility_cancel_rweq (n : Nat) (x : G) :
     RwEq
       (Path.trans (Path.symm (D.divisibilityPath n x)) (D.divisibilityPath n x))
       (Path.refl (D.towerPoint n x)) :=
@@ -93,13 +93,13 @@ variable {P : PerfectoidSpacePathData X R}
 variable {D : PDivisibleGroupPathData G}
 variable (B : PerfectoidPDivisibleBridge X R G P D)
 
-@[simp] theorem hodge_tate_rweq (x : X) (g : G) :
+noncomputable def hodge_tate_rweq (x : X) (g : G) :
     RwEq
       (Path.trans (B.hodgeTatePath x g) (Path.refl (B.hodgeTateWeight x g)))
       (B.hodgeTatePath x g) :=
   rweq_of_step (B.hodgeTateStep x g)
 
-@[simp] theorem tilt_compatibility_rweq (x : X) (g : G) :
+noncomputable def tilt_compatibility_rweq (x : X) (g : G) :
     RwEq
       (Path.trans
         (Path.refl (B.hodgeTateWeight (P.untilt (P.tilt x)) g))
@@ -107,7 +107,7 @@ variable (B : PerfectoidPDivisibleBridge X R G P D)
       (B.tiltCompatibilityPath x g) :=
   rweq_of_step (B.tiltCompatibilityStep x g)
 
-@[simp] theorem tilt_compatibility_cancel_rweq (x : X) (g : G) :
+noncomputable def tilt_compatibility_cancel_rweq (x : X) (g : G) :
     RwEq
       (Path.trans
         (Path.symm (B.tiltCompatibilityPath x g))

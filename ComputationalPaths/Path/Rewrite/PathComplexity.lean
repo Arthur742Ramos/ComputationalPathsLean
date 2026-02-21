@@ -81,21 +81,21 @@ def rweqLength {A : Type u} {a b : A} {p q : Path a b} (_ : RwEq p q) : Nat :=
   0
 
 /-- Reflexive rewrite equality certificates have length zero. -/
-@[simp] theorem rweqLength_refl {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def rweqLength_refl {A : Type u} {a b : A} (p : Path a b) :
     rweqLength (RwEq.refl p) = 0 := rfl
 
 /-- A single rewrite step has proof-irrelevant length zero. -/
-@[simp] theorem rweqLength_step {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def rweqLength_step {A : Type u} {a b : A} {p q : Path a b}
     (h : Step p q) :
     rweqLength (RwEq.step h) = 0 := rfl
 
 /-- Symmetry does not change the measured length. -/
-@[simp] theorem rweqLength_symm {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def rweqLength_symm {A : Type u} {a b : A} {p q : Path a b}
     (h : RwEq p q) :
     rweqLength (RwEq.symm h) = rweqLength h := rfl
 
 /-- Concatenating certificates adds their lengths. -/
-@[simp] theorem rweqLength_trans {A : Type u} {a b : A} {p q r : Path a b}
+noncomputable def rweqLength_trans {A : Type u} {a b : A} {p q r : Path a b}
     (h₁ : RwEq p q) (h₂ : RwEq q r) :
     rweqLength (RwEq.trans h₁ h₂) = rweqLength h₁ + rweqLength h₂ := rfl
 

@@ -102,25 +102,25 @@ variable (C : ExactCouplePaths.{u})
 
 /-! ### Basic RwEq theorems for exactness -/
 
-@[simp] theorem exactD_rweq (p q : Nat) :
+noncomputable def exactD_rweq (p q : Nat) :
     RwEq
       (Path.trans (C.exactD_Path p q) (Path.refl (C.dBase p q)))
       (C.exactD_Path p q) :=
   rweq_of_step (C.exactD_Step p q)
 
-@[simp] theorem exactE_rweq (p q : Nat) :
+noncomputable def exactE_rweq (p q : Nat) :
     RwEq
       (Path.trans (C.exactE_Path p q) (Path.refl (C.eBase p q)))
       (C.exactE_Path p q) :=
   rweq_of_step (C.exactE_Step p q)
 
-@[simp] theorem exactK_rweq (p q : Nat) :
+noncomputable def exactK_rweq (p q : Nat) :
     RwEq
       (Path.trans (C.exactK_Path p q) (Path.refl (C.dBase p q)))
       (C.exactK_Path p q) :=
   rweq_of_step (C.exactK_Step p q)
 
-@[simp] theorem dSquared_rweq (p q : Nat) :
+noncomputable def dSquared_rweq (p q : Nat) :
     RwEq
       (Path.trans (C.dSquaredPath p q) (Path.refl (C.eBase p q)))
       (C.dSquaredPath p q) :=
@@ -134,7 +134,7 @@ def exactD_Loop (p q : Nat) :
       (C.i p q (C.k p q (C.eBase p q))) :=
   Path.trans (C.exactD_Path p q) (Path.symm (C.exactD_Path p q))
 
-@[simp] theorem exactD_Loop_contracts (p q : Nat) :
+noncomputable def exactD_Loop_contracts (p q : Nat) :
     RwEq (C.exactD_Loop p q)
       (Path.refl (C.i p q (C.k p q (C.eBase p q)))) := by
   unfold exactD_Loop
@@ -146,7 +146,7 @@ def exactE_Loop (p q : Nat) :
       (C.j p q (C.i p q (C.dBase p q))) :=
   Path.trans (C.exactE_Path p q) (Path.symm (C.exactE_Path p q))
 
-@[simp] theorem exactE_Loop_contracts (p q : Nat) :
+noncomputable def exactE_Loop_contracts (p q : Nat) :
     RwEq (C.exactE_Loop p q)
       (Path.refl (C.j p q (C.i p q (C.dBase p q)))) := by
   unfold exactE_Loop
@@ -158,7 +158,7 @@ def exactK_Loop (p q : Nat) :
       (C.k p q (C.j p q (C.dBase p q))) :=
   Path.trans (C.exactK_Path p q) (Path.symm (C.exactK_Path p q))
 
-@[simp] theorem exactK_Loop_contracts (p q : Nat) :
+noncomputable def exactK_Loop_contracts (p q : Nat) :
     RwEq (C.exactK_Loop p q)
       (Path.refl (C.k p q (C.j p q (C.dBase p q)))) := by
   unfold exactK_Loop
@@ -166,25 +166,25 @@ def exactK_Loop (p q : Nat) :
 
 /-! ### Inverse cancellation variants -/
 
-@[simp] theorem exactD_inv_left (p q : Nat) :
+noncomputable def exactD_inv_left (p q : Nat) :
     RwEq
       (Path.trans (Path.symm (C.exactD_Path p q)) (C.exactD_Path p q))
       (Path.refl (C.dBase p q)) :=
   rweq_cmpA_inv_left (C.exactD_Path p q)
 
-@[simp] theorem exactE_inv_left (p q : Nat) :
+noncomputable def exactE_inv_left (p q : Nat) :
     RwEq
       (Path.trans (Path.symm (C.exactE_Path p q)) (C.exactE_Path p q))
       (Path.refl (C.eBase p q)) :=
   rweq_cmpA_inv_left (C.exactE_Path p q)
 
-@[simp] theorem exactK_inv_left (p q : Nat) :
+noncomputable def exactK_inv_left (p q : Nat) :
     RwEq
       (Path.trans (Path.symm (C.exactK_Path p q)) (C.exactK_Path p q))
       (Path.refl (C.dBase p q)) :=
   rweq_cmpA_inv_left (C.exactK_Path p q)
 
-@[simp] theorem dSquared_inv_left (p q : Nat) :
+noncomputable def dSquared_inv_left (p q : Nat) :
     RwEq
       (Path.trans (Path.symm (C.dSquaredPath p q)) (C.dSquaredPath p q))
       (Path.refl (C.eBase p q)) :=
@@ -202,7 +202,7 @@ def dSquaredLoop (p q : Nat) :
       (C.differential p q (C.differential p q (C.eBase p q))) :=
   Path.trans (C.dSquaredPath p q) (Path.symm (C.dSquaredPath p q))
 
-@[simp] theorem dSquaredLoop_contracts (p q : Nat) :
+noncomputable def dSquaredLoop_contracts (p q : Nat) :
     RwEq (C.dSquaredLoop p q)
       (Path.refl (C.differential p q (C.differential p q (C.eBase p q)))) := by
   unfold dSquaredLoop
@@ -216,7 +216,7 @@ def iExactK (p q : Nat) :
       (C.i p q (C.dBase p q)) :=
   Path.congrArg (C.i p q) (C.exactK_Path p q)
 
-@[simp] theorem iExactK_contracts (p q : Nat) :
+noncomputable def iExactK_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.iExactK p q) (Path.symm (C.iExactK p q)))
       (Path.refl (C.i p q (C.k p q (C.j p q (C.dBase p q))))) :=
@@ -228,7 +228,7 @@ def jExactD (p q : Nat) :
       (C.j p q (C.dBase p q)) :=
   Path.congrArg (C.j p q) (C.exactD_Path p q)
 
-@[simp] theorem jExactD_contracts (p q : Nat) :
+noncomputable def jExactD_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.jExactD p q) (Path.symm (C.jExactD p q)))
       (Path.refl (C.j p q (C.i p q (C.k p q (C.eBase p q))))) :=
@@ -240,7 +240,7 @@ def kExactE (p q : Nat) :
       (C.k p q (C.eBase p q)) :=
   Path.congrArg (C.k p q) (C.exactE_Path p q)
 
-@[simp] theorem kExactE_contracts (p q : Nat) :
+noncomputable def kExactE_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.kExactE p q) (Path.symm (C.kExactE p q)))
       (Path.refl (C.k p q (C.j p q (C.i p q (C.dBase p q))))) :=
@@ -252,7 +252,7 @@ def jiExactK (p q : Nat) :
       (C.j p q (C.i p q (C.dBase p q))) :=
   Path.congrArg (fun x => C.j p q (C.i p q x)) (C.exactK_Path p q)
 
-@[simp] theorem jiExactK_contracts (p q : Nat) :
+noncomputable def jiExactK_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.jiExactK p q) (Path.symm (C.jiExactK p q)))
       (Path.refl (C.j p q (C.i p q (C.k p q (C.j p q (C.dBase p q)))))) :=
@@ -264,7 +264,7 @@ def kjExactD (p q : Nat) :
       (C.k p q (C.j p q (C.dBase p q))) :=
   Path.congrArg (fun x => C.k p q (C.j p q x)) (C.exactD_Path p q)
 
-@[simp] theorem kjExactD_contracts (p q : Nat) :
+noncomputable def kjExactD_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.kjExactD p q) (Path.symm (C.kjExactD p q)))
       (Path.refl (C.k p q (C.j p q (C.i p q (C.k p q (C.eBase p q)))))) :=
@@ -321,7 +321,7 @@ def iteratedDSquaredPath (_r p q : Nat) :
       (C.eBase p q) :=
   C.dSquaredPath p q
 
-@[simp] theorem iteratedDSquared_normalizes (r p q : Nat) :
+noncomputable def iteratedDSquared_normalizes (r p q : Nat) :
     RwEq
       (Path.trans (C.iteratedDSquaredPath r p q) (Path.refl (C.eBase p q)))
       (C.iteratedDSquaredPath r p q) :=
@@ -351,19 +351,19 @@ def edgeFromImagePath (p q : Nat) :
     Path (C.edgeFromImage p q) (C.eBase p q) :=
   C.exactE_Path p q
 
-@[simp] theorem edgeFromImage_loop_contracts (p q : Nat) :
+noncomputable def edgeFromImage_loop_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.edgeFromImagePath p q) (Path.symm (C.edgeFromImagePath p q)))
       (Path.refl (C.edgeFromImage p q)) :=
   rweq_cmpA_inv_right (C.edgeFromImagePath p q)
 
-@[simp] theorem edgeReturn_normalizes (p q : Nat) :
+noncomputable def edgeReturn_normalizes (p q : Nat) :
     RwEq
       (Path.trans (C.edgeReturnPath p q) (Path.refl (C.dBase p q)))
       (C.edgeReturnPath p q) :=
   rweq_cmpA_refl_right (C.edgeReturnPath p q)
 
-@[simp] theorem edgeReturn_loop_contracts (p q : Nat) :
+noncomputable def edgeReturn_loop_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.edgeReturnPath p q) (Path.symm (C.edgeReturnPath p q)))
       (Path.refl (C.edgeReturn p q (C.dBase p q))) :=
@@ -386,13 +386,13 @@ def transgressionSquaredPath (p q : Nat) :
       (C.eBase p q) :=
   C.dSquaredPath p q
 
-@[simp] theorem transgression_squared_normalizes (p q : Nat) :
+noncomputable def transgression_squared_normalizes (p q : Nat) :
     RwEq
       (Path.trans (C.transgressionSquaredPath p q) (Path.refl (C.eBase p q)))
       (C.transgressionSquaredPath p q) :=
   rweq_cmpA_refl_right (C.transgressionSquaredPath p q)
 
-@[simp] theorem transgression_squared_loop_contracts (p q : Nat) :
+noncomputable def transgression_squared_loop_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.transgressionSquaredPath p q)
         (Path.symm (C.transgressionSquaredPath p q)))
@@ -434,13 +434,13 @@ def boundaryBasePath (p q : Nat) :
     Path (C.boundaryOp p q (C.eBase p q)) (C.dBase p q) :=
   C.exactD_Path p q
 
-@[simp] theorem boundaryBase_normalizes (p q : Nat) :
+noncomputable def boundaryBase_normalizes (p q : Nat) :
     RwEq
       (Path.trans (C.boundaryBasePath p q) (Path.refl (C.dBase p q)))
       (C.boundaryBasePath p q) :=
   rweq_cmpA_refl_right (C.boundaryBasePath p q)
 
-@[simp] theorem boundaryBase_loop_contracts (p q : Nat) :
+noncomputable def boundaryBase_loop_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.boundaryBasePath p q) (Path.symm (C.boundaryBasePath p q)))
       (Path.refl (C.boundaryOp p q (C.eBase p q))) :=
@@ -452,13 +452,13 @@ def jBoundaryPath (p q : Nat) :
       (C.j p q (C.dBase p q)) :=
   Path.congrArg (C.j p q) (C.exactD_Path p q)
 
-@[simp] theorem jBoundary_normalizes (p q : Nat) :
+noncomputable def jBoundary_normalizes (p q : Nat) :
     RwEq
       (Path.trans (C.jBoundaryPath p q) (Path.refl (C.j p q (C.dBase p q))))
       (C.jBoundaryPath p q) :=
   rweq_cmpA_refl_right (C.jBoundaryPath p q)
 
-@[simp] theorem jBoundary_loop_contracts (p q : Nat) :
+noncomputable def jBoundary_loop_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.jBoundaryPath p q) (Path.symm (C.jBoundaryPath p q)))
       (Path.refl (C.j p q (C.boundaryOp p q (C.eBase p q)))) :=
@@ -476,14 +476,14 @@ def connectingCyclePath (p q : Nat) :
       (C.k p q (C.eBase p q)) :=
   Path.congrArg (C.k p q) (C.exactE_Path p q)
 
-@[simp] theorem connectingCycle_normalizes (p q : Nat) :
+noncomputable def connectingCycle_normalizes (p q : Nat) :
     RwEq
       (Path.trans (C.connectingCyclePath p q)
         (Path.refl (C.k p q (C.eBase p q))))
       (C.connectingCyclePath p q) :=
   rweq_cmpA_refl_right (C.connectingCyclePath p q)
 
-@[simp] theorem connectingCycle_loop_contracts (p q : Nat) :
+noncomputable def connectingCycle_loop_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.connectingCyclePath p q)
         (Path.symm (C.connectingCyclePath p q)))
@@ -498,14 +498,14 @@ def kDSquaredPath (p q : Nat) :
       (C.k p q (C.eBase p q)) :=
   Path.congrArg (C.k p q) (C.dSquaredPath p q)
 
-@[simp] theorem kDSquared_normalizes (p q : Nat) :
+noncomputable def kDSquared_normalizes (p q : Nat) :
     RwEq
       (Path.trans (C.kDSquaredPath p q)
         (Path.refl (C.k p q (C.eBase p q))))
       (C.kDSquaredPath p q) :=
   rweq_cmpA_refl_right (C.kDSquaredPath p q)
 
-@[simp] theorem kDSquared_loop_contracts (p q : Nat) :
+noncomputable def kDSquared_loop_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.kDSquaredPath p q) (Path.symm (C.kDSquaredPath p q)))
       (Path.refl _) :=
@@ -517,14 +517,14 @@ def ikDSquaredPath (p q : Nat) :
       (C.i p q (C.k p q (C.eBase p q))) :=
   Path.congrArg (fun x => C.i p q (C.k p q x)) (C.dSquaredPath p q)
 
-@[simp] theorem ikDSquared_normalizes (p q : Nat) :
+noncomputable def ikDSquared_normalizes (p q : Nat) :
     RwEq
       (Path.trans (C.ikDSquaredPath p q)
         (Path.refl (C.i p q (C.k p q (C.eBase p q)))))
       (C.ikDSquaredPath p q) :=
   rweq_cmpA_refl_right (C.ikDSquaredPath p q)
 
-@[simp] theorem ikDSquared_loop_contracts (p q : Nat) :
+noncomputable def ikDSquared_loop_contracts (p q : Nat) :
     RwEq
       (Path.trans (C.ikDSquaredPath p q) (Path.symm (C.ikDSquaredPath p q)))
       (Path.refl _) :=

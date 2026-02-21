@@ -451,7 +451,7 @@ def factorization_coherence {A : Type u} (F : FunctorialFactorization A)
 
 /-! ## RwEq-based model step lemmas -/
 
-theorem modelStep_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def modelStep_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : ModelStep p q) : RwEq p q := by
   cases h with
   | weq_refl => exact RwEq.refl _

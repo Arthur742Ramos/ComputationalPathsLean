@@ -61,7 +61,7 @@ def differentialSquare_step (x : Gen) :
       (F.differentialSquarePath x) :=
   Path.Step.trans_refl_right (F.differentialSquarePath x)
 
-@[simp] theorem differentialSquare_rweq (x : Gen) :
+noncomputable def differentialSquare_rweq (x : Gen) :
     RwEq
       (Path.trans (F.differentialSquarePath x) (Path.refl F.zero))
       (F.differentialSquarePath x) :=
@@ -74,7 +74,7 @@ def continuationChain_step (x : Gen) :
       (F.continuationChainPath x) :=
   Path.Step.trans_refl_right (F.continuationChainPath x)
 
-@[simp] theorem continuationChain_rweq (x : Gen) :
+noncomputable def continuationChain_rweq (x : Gen) :
     RwEq
       (Path.trans (F.continuationChainPath x) (Path.refl (F.differential (F.continuation x))))
       (F.continuationChainPath x) :=
@@ -87,7 +87,7 @@ def pssChain_step (x : Gen) :
       (F.pssChainPath x) :=
   Path.Step.trans_refl_right (F.pssChainPath x)
 
-@[simp] theorem pssChain_rweq (x : Gen) :
+noncomputable def pssChain_rweq (x : Gen) :
     RwEq
       (Path.trans (F.pssChainPath x) (Path.refl (F.differential (F.pss x))))
       (F.pssChainPath x) :=
@@ -100,7 +100,7 @@ def continuationToPSS_step (x : Gen) :
       (F.continuationToPSSPath x) :=
   Path.Step.trans_refl_right (F.continuationToPSSPath x)
 
-@[simp] theorem continuationToPSS_rweq (x : Gen) :
+noncomputable def continuationToPSS_rweq (x : Gen) :
     RwEq
       (Path.trans (F.continuationToPSSPath x) (Path.refl (F.differential (F.pss x))))
       (F.continuationToPSSPath x) :=
@@ -113,7 +113,7 @@ def continuationPSS_step (x : Gen) :
       (F.continuationPSSPath x) :=
   Path.Step.trans_refl_right (F.continuationPSSPath x)
 
-@[simp] theorem continuationPSS_rweq (x : Gen) :
+noncomputable def continuationPSS_rweq (x : Gen) :
     RwEq
       (Path.trans (F.continuationPSSPath x) (Path.refl (F.pss x)))
       (F.continuationPSSPath x) :=
@@ -126,19 +126,19 @@ def filtration_step (x : Gen) :
       (F.filtrationPath x) :=
   Path.Step.trans_refl_left (F.filtrationPath x)
 
-@[simp] theorem filtration_rweq (x : Gen) :
+noncomputable def filtration_rweq (x : Gen) :
     RwEq
       (Path.trans (Path.refl (F.actionLevel (F.continuation x))) (F.filtrationPath x))
       (F.filtrationPath x) :=
   rweq_of_step (F.filtration_step x)
 
-@[simp] theorem continuationPSS_cancel_rweq (x : Gen) :
+noncomputable def continuationPSS_cancel_rweq (x : Gen) :
     RwEq
       (Path.trans (Path.symm (F.continuationPSSPath x)) (F.continuationPSSPath x))
       (Path.refl (F.pss x)) :=
   rweq_cmpA_inv_left (F.continuationPSSPath x)
 
-@[simp] theorem continuationToPSS_cancel_rweq (x : Gen) :
+noncomputable def continuationToPSS_cancel_rweq (x : Gen) :
     RwEq
       (Path.trans (Path.symm (F.continuationToPSSPath x)) (F.continuationToPSSPath x))
       (Path.refl (F.differential (F.pss x))) :=

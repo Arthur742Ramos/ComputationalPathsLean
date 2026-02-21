@@ -45,7 +45,7 @@ def tensorMap_step {X1 X2 Y1 Y2 : Obj}
       (B.tensorMap p q) :=
   Path.Step.trans_refl_right (B.tensorMap p q)
 
-@[simp] theorem tensorMap_rweq {X1 X2 Y1 Y2 : Obj}
+noncomputable def tensorMap_rweq {X1 X2 Y1 Y2 : Obj}
     (p : Path X1 X2) (q : Path Y1 Y2) :
     RwEq
       (Path.trans (B.tensorMap p q) (Path.refl (B.tensor X2 Y2)))
@@ -62,7 +62,7 @@ def braidNaturality_step {X1 X2 Y1 Y2 : Obj}
       (B.braidNaturality p q) :=
   Path.Step.trans_refl_right (B.braidNaturality p q)
 
-@[simp] theorem braidNaturality_rweq {X1 X2 Y1 Y2 : Obj}
+noncomputable def braidNaturality_rweq {X1 X2 Y1 Y2 : Obj}
     (p : Path X1 X2) (q : Path Y1 Y2) :
     RwEq
       (Path.trans
@@ -71,13 +71,13 @@ def braidNaturality_step {X1 X2 Y1 Y2 : Obj}
       (B.braidNaturality p q) :=
   rweq_of_step (B.braidNaturality_step p q)
 
-@[simp] theorem braid_cancel_left (X Y : Obj) :
+noncomputable def braid_cancel_left (X Y : Obj) :
     RwEq
       (Path.trans (Path.symm (B.braid X Y)) (B.braid X Y))
       (Path.refl (B.tensor Y X)) :=
   rweq_cmpA_inv_left (B.braid X Y)
 
-@[simp] theorem braid_cancel_right (X Y : Obj) :
+noncomputable def braid_cancel_right (X Y : Obj) :
     RwEq
       (Path.trans (B.braid X Y) (Path.symm (B.braid X Y)))
       (Path.refl (B.tensor X Y)) :=
@@ -92,7 +92,7 @@ def hexagon_step (X Y Z : Obj) :
       (B.hexagonPath X Y Z) :=
   Path.Step.trans_refl_right (B.hexagonPath X Y Z)
 
-@[simp] theorem hexagon_rweq (X Y Z : Obj) :
+noncomputable def hexagon_rweq (X Y Z : Obj) :
     RwEq
       (Path.trans
         (B.hexagonPath X Y Z)

@@ -66,14 +66,14 @@ theorem conv_trans_refl (d : ConvolutionData) :
   simp
 
 /-- RwEq: convolution inv cancel right. -/
-theorem conv_rweq_inv_right (d : ConvolutionData) :
+noncomputable def conv_rweq_inv_right (d : ConvolutionData) :
     RwEq
       (Path.trans d.convPath (Path.symm d.convPath))
       (Path.refl d.inputVal) :=
   rweq_cmpA_inv_right d.convPath
 
 /-- RwEq: convolution symm_symm. -/
-theorem conv_rweq_symm_symm (d : ConvolutionData) :
+noncomputable def conv_rweq_symm_symm (d : ConvolutionData) :
     RwEq (Path.symm (Path.symm d.convPath)) d.convPath :=
   rweq_of_step (Step.symm_symm d.convPath)
 
@@ -91,14 +91,14 @@ theorem filter_trans_refl (d : FilterData) :
   simp
 
 /-- RwEq: filter refl trans. -/
-theorem filter_rweq_refl_trans (d : FilterData) :
+noncomputable def filter_rweq_refl_trans (d : FilterData) :
     RwEq
       (Path.trans (Path.refl d.inputSample) d.filterPath)
       d.filterPath :=
   rweq_of_step (Step.trans_refl_left d.filterPath)
 
 /-- RwEq: filter inv cancel left. -/
-theorem filter_rweq_inv_left (d : FilterData) :
+noncomputable def filter_rweq_inv_left (d : FilterData) :
     RwEq
       (Path.trans (Path.symm d.filterPath) d.filterPath)
       (Path.refl d.outputSample) :=
@@ -122,21 +122,21 @@ def inverseTransform (d : FrequencyData) : Path d.freqDomainVal d.timeDomainVal 
   Path.symm d.transformPath
 
 /-- Round-trip transform cancels (forward then inverse). -/
-theorem freq_roundtrip_rweq (d : FrequencyData) :
+noncomputable def freq_roundtrip_rweq (d : FrequencyData) :
     RwEq
       (Path.trans d.transformPath (inverseTransform d))
       (Path.refl d.timeDomainVal) :=
   rweq_cmpA_inv_right d.transformPath
 
 /-- Round-trip inverse then forward cancels. -/
-theorem freq_roundtrip_inv_rweq (d : FrequencyData) :
+noncomputable def freq_roundtrip_inv_rweq (d : FrequencyData) :
     RwEq
       (Path.trans (inverseTransform d) d.transformPath)
       (Path.refl d.freqDomainVal) :=
   rweq_cmpA_inv_left d.transformPath
 
 /-- RwEq: transform symm_symm. -/
-theorem freq_rweq_symm_symm (d : FrequencyData) :
+noncomputable def freq_rweq_symm_symm (d : FrequencyData) :
     RwEq (Path.symm (Path.symm d.transformPath)) d.transformPath :=
   rweq_of_step (Step.symm_symm d.transformPath)
 
@@ -153,7 +153,7 @@ def demodulate (d : ModulationData) : Path d.modulatedVal d.basebandVal :=
   Path.symm d.modPath
 
 /-- Modulate then demodulate cancels. -/
-theorem mod_demod_rweq (d : ModulationData) :
+noncomputable def mod_demod_rweq (d : ModulationData) :
     RwEq
       (Path.trans d.modPath (demodulate d))
       (Path.refl d.basebandVal) :=
@@ -173,14 +173,14 @@ structure SamplingData where
   samplePath : Path continuousVal discreteVal
 
 /-- RwEq: sampling trans refl. -/
-theorem sampling_rweq_trans_refl (d : SamplingData) :
+noncomputable def sampling_rweq_trans_refl (d : SamplingData) :
     RwEq
       (Path.trans d.samplePath (Path.refl d.discreteVal))
       d.samplePath :=
   rweq_of_step (Step.trans_refl_right d.samplePath)
 
 /-- RwEq: sampling inv cancel right. -/
-theorem sampling_rweq_inv_right (d : SamplingData) :
+noncomputable def sampling_rweq_inv_right (d : SamplingData) :
     RwEq
       (Path.trans d.samplePath (Path.symm d.samplePath))
       (Path.refl d.continuousVal) :=
@@ -195,7 +195,7 @@ structure QuantizationData where
   quantPath : Path analogVal quantizedVal
 
 /-- Quantization error path (quantized minus analog). -/
-theorem quant_rweq_symm_symm (d : QuantizationData) :
+noncomputable def quant_rweq_symm_symm (d : QuantizationData) :
     RwEq (Path.symm (Path.symm d.quantPath)) d.quantPath :=
   rweq_of_step (Step.symm_symm d.quantPath)
 
@@ -213,14 +213,14 @@ structure NoiseChannelData where
   noisePath : Path cleanVal noisyVal
 
 /-- RwEq: noise channel inv cancel. -/
-theorem noise_rweq_inv_right (d : NoiseChannelData) :
+noncomputable def noise_rweq_inv_right (d : NoiseChannelData) :
     RwEq
       (Path.trans d.noisePath (Path.symm d.noisePath))
       (Path.refl d.cleanVal) :=
   rweq_cmpA_inv_right d.noisePath
 
 /-- RwEq: noise refl trans. -/
-theorem noise_rweq_refl_trans (d : NoiseChannelData) :
+noncomputable def noise_rweq_refl_trans (d : NoiseChannelData) :
     RwEq
       (Path.trans (Path.refl d.cleanVal) d.noisePath)
       d.noisePath :=
@@ -260,7 +260,7 @@ theorem signalIterate_zero {a : Nat} (p : Path a a) :
     signalIterate p 0 = Path.refl a := rfl
 
 /-- RwEq: signal iterate 1 simplifies. -/
-theorem signalIterate_one_rweq {a : Nat} (p : Path a a) :
+noncomputable def signalIterate_one_rweq {a : Nat} (p : Path a a) :
     RwEq (signalIterate p 1) p :=
   rweq_of_step (Step.trans_refl_left p)
 

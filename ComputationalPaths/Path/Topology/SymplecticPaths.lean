@@ -175,7 +175,7 @@ def hamiltonianIsotopy_compose {M : SymplecticManifold.{u}}
 /-! ## Rewrite-equivalence example -/
 
 /-- Two syntactic symplectic paths are rewrite-equivalent. -/
-theorem symplectoPath_rweq_refl (M : SymplecticManifold.{u})
+noncomputable def symplectoPath_rweq_refl (M : SymplecticManifold.{u})
     (f : Symplectomorphism M M) :
     RwEq (Path.trans (Path.refl f) (Path.refl f)) (Path.refl f) := by
   exact rweq_cmpA_refl_left (p := Path.refl f)

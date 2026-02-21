@@ -509,7 +509,7 @@ theorem coveringLoopLiftsHom_comp {P : A → Type u} {a : A}
             (coveringLoopLifts_trans (pc := pc) (l₁ := p) (l₂ := q) h₁ h₂)
 
 /-- Compatibility with rewrite-equivalent representatives at the loop level. -/
-theorem coveringLoopLiftsHom_of_rweq {P : A → Type u} {a : A}
+noncomputable def coveringLoopLiftsHom_of_rweq {P : A → Type u} {a : A}
     (pc : PointedCovering P a) {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) :
     coveringLoopLiftsHom pc (Quot.mk _ l₁) ↔
       coveringLoopLiftsHom pc (Quot.mk _ l₂) := by

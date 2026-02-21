@@ -52,7 +52,7 @@ namespace ConformalBlockData
 variable {V : VertexAlgebraData.{u}} (B : ConformalBlockData V)
 
 /-- Left-unit insertion on transport reflexivity coherence. -/
-theorem transportReflLeftUnitRwEq (i : Fin B.curve.nPoints) (ψ : B.Block) :
+noncomputable def transportReflLeftUnitRwEq (i : Fin B.curve.nPoints) (ψ : B.Block) :
     RwEq
       (Path.trans
         (Path.refl (B.transport (Path.refl (B.curve.mark i)) ψ))
@@ -61,7 +61,7 @@ theorem transportReflLeftUnitRwEq (i : Fin B.curve.nPoints) (ψ : B.Block) :
   rweq_cmpA_refl_left (B.transport_refl i ψ)
 
 /-- Transport reflexivity path contracts with its inverse. -/
-theorem transportReflCancelRwEq (i : Fin B.curve.nPoints) (ψ : B.Block) :
+noncomputable def transportReflCancelRwEq (i : Fin B.curve.nPoints) (ψ : B.Block) :
     RwEq
       (Path.trans (B.transport_refl i ψ) (Path.symm (B.transport_refl i ψ)))
       (Path.refl (B.transport (Path.refl (B.curve.mark i)) ψ)) :=
@@ -98,7 +98,7 @@ theorem transportCompWithUnitsStep {i j k : Fin B.curve.nPoints}
       (Path.refl (B.transport q (B.transport p ψ))))
 
 /-- Reassociation for the unit-extended transport coherence in `RwEq`. -/
-theorem transportCompWithUnitsRwEq {i j k : Fin B.curve.nPoints}
+noncomputable def transportCompWithUnitsRwEq {i j k : Fin B.curve.nPoints}
     (p : Path (B.curve.mark i) (B.curve.mark j))
     (q : Path (B.curve.mark j) (B.curve.mark k))
     (ψ : B.Block) :
@@ -130,7 +130,7 @@ variable {O : OPEData V} {B : ConformalBlockData V}
 variable (F : ConformalBlockOPECompat O B)
 
 /-- Fused associativity path contracts with its inverse. -/
-theorem fusionAssocCancelRwEq
+noncomputable def fusionAssocCancelRwEq
     (i : Fin B.curve.nPoints) (a b c : V.State) (m n : Int) :
     RwEq
       (Path.trans
@@ -140,7 +140,7 @@ theorem fusionAssocCancelRwEq
   rweq_cmpA_inv_right (F.fusion_assoc i a b c m n)
 
 /-- Right-unit insertion on the vacuum compatibility path normalizes by rewrite. -/
-theorem vacuumInsertRightUnitRwEq (i : Fin B.curve.nPoints) (a : V.State) :
+noncomputable def vacuumInsertRightUnitRwEq (i : Fin B.curve.nPoints) (a : V.State) :
     RwEq
       (Path.trans (F.vacuum_insert i a) (Path.refl (B.insert i a)))
       (F.vacuum_insert i a) :=

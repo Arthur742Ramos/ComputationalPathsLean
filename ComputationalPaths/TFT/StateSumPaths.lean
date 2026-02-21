@@ -42,7 +42,7 @@ def assignId_step (X : C.Obj) :
       (S.assign_id X) :=
   Path.Step.trans_refl_right (S.assign_id X)
 
-@[simp] theorem assignId_rweq (X : C.Obj) :
+noncomputable def assignId_rweq (X : C.Obj) :
     RwEq
       (Path.trans (S.assign_id X) (Path.refl S.zero))
       (S.assign_id X) :=
@@ -103,7 +103,7 @@ theorem gluing_assoc_step {W X Y Z : C.Obj}
       (S.gluingLast f g h))
 
 /-- Rewrite-equivalence form of gluing associativity. -/
-theorem gluing_assoc_rweq {W X Y Z : C.Obj}
+noncomputable def gluing_assoc_rweq {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     RwEq (S.gluingChainLeft f g h) (S.gluingChainRight f g h) :=
   rweq_of_step (S.gluing_assoc_step f g h)
@@ -122,25 +122,25 @@ def addRightUnit_step (a : S.amplitude) :
       (S.add_zero_right a) :=
   Path.Step.trans_refl_right (S.add_zero_right a)
 
-@[simp] theorem addLeftUnit_rweq (a : S.amplitude) :
+noncomputable def addLeftUnit_rweq (a : S.amplitude) :
     RwEq
       (Path.trans (S.add_zero_left a) (Path.refl a))
       (S.add_zero_left a) :=
   rweq_of_step (S.addLeftUnit_step a)
 
-@[simp] theorem addRightUnit_rweq (a : S.amplitude) :
+noncomputable def addRightUnit_rweq (a : S.amplitude) :
     RwEq
       (Path.trans (S.add_zero_right a) (Path.refl a))
       (S.add_zero_right a) :=
   rweq_of_step (S.addRightUnit_step a)
 
-@[simp] theorem addLeftCancel_rweq (a : S.amplitude) :
+noncomputable def addLeftCancel_rweq (a : S.amplitude) :
     RwEq
       (Path.trans (Path.symm (S.add_zero_left a)) (S.add_zero_left a))
       (Path.refl a) :=
   rweq_cmpA_inv_left (S.add_zero_left a)
 
-@[simp] theorem addRightCancel_rweq (a : S.amplitude) :
+noncomputable def addRightCancel_rweq (a : S.amplitude) :
     RwEq
       (Path.trans (S.add_zero_right a) (Path.symm (S.add_zero_right a)))
       (Path.refl (S.add a S.zero)) :=

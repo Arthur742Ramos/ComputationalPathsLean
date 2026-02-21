@@ -54,20 +54,20 @@ def advanceBasePath (r p q : Nat) :
       (E.shift r p q (E.advanceBase (r + 1) p q)) :=
   E.shiftPath r p q (E.base p q)
 
-@[simp] theorem shift_rweq (r p q : Nat) (x : E.term p q) :
+noncomputable def shift_rweq (r p q : Nat) (x : E.term p q) :
     RwEq
       (Path.trans (E.shiftPath r p q x)
         (Path.refl (E.shift r p q (E.shift (r + 1) p q x))))
       (E.shiftPath r p q x) :=
   rweq_of_step (E.shiftStep r p q x)
 
-@[simp] theorem shift_cancel_left_rweq (r p q : Nat) (x : E.term p q) :
+noncomputable def shift_cancel_left_rweq (r p q : Nat) (x : E.term p q) :
     RwEq
       (Path.trans (Path.symm (E.shiftPath r p q x)) (E.shiftPath r p q x))
       (Path.refl (E.shift r p q (E.shift (r + 1) p q x))) :=
   rweq_cmpA_inv_left (E.shiftPath r p q x)
 
-@[simp] theorem shift_cancel_right_rweq (r p q : Nat) (x : E.term p q) :
+noncomputable def shift_cancel_right_rweq (r p q : Nat) (x : E.term p q) :
     RwEq
       (Path.trans (E.shiftPath r p q x) (Path.symm (E.shiftPath r p q x)))
       (Path.refl (E.twoShift r p q x)) :=
@@ -78,7 +78,7 @@ def transitionLoop (r p q : Nat) (x : E.term p q) :
     Path (E.twoShift r p q x) (E.twoShift r p q x) :=
   Path.trans (E.shiftPath r p q x) (Path.symm (E.shiftPath r p q x))
 
-@[simp] theorem transitionLoop_contracts (r p q : Nat) (x : E.term p q) :
+noncomputable def transitionLoop_contracts (r p q : Nat) (x : E.term p q) :
     RwEq (E.transitionLoop r p q x) (Path.refl (E.twoShift r p q x)) := by
   unfold transitionLoop
   exact rweq_cmpA_inv_right (E.shiftPath r p q x)

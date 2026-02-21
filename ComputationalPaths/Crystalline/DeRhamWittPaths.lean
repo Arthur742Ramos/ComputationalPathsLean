@@ -75,32 +75,32 @@ def verschiebungTransport {n : Nat} {x y : W.level n} (p : Path x y) :
     Path (W.verschiebung n x) (W.verschiebung n y) :=
   Path.congrArg (W.verschiebung n) p
 
-@[simp] theorem addZero_rweq (n : Nat) (x : W.level n) :
+noncomputable def addZero_rweq (n : Nat) (x : W.level n) :
     RwEq
       (Path.trans (W.addZeroPath n x) (Path.refl x))
       (W.addZeroPath n x) :=
   rweq_of_step (W.addZeroStep n x)
 
-@[simp] theorem differentialZero_rweq (n : Nat) :
+noncomputable def differentialZero_rweq (n : Nat) :
     RwEq
       (Path.trans (W.differentialZeroPath n) (Path.refl (W.zero n)))
       (W.differentialZeroPath n) :=
   rweq_of_step (W.differentialZeroStep n)
 
-@[simp] theorem frobeniusVerschiebung_rweq (n : Nat) (x : W.level n) :
+noncomputable def frobeniusVerschiebung_rweq (n : Nat) (x : W.level n) :
     RwEq
       (Path.trans (W.frobeniusVerschiebungPath n x) (Path.refl x))
       (W.frobeniusVerschiebungPath n x) :=
   rweq_of_step (W.frobeniusVerschiebungStep n x)
 
-@[simp] theorem frobeniusVerschiebung_cancel_rweq (n : Nat) (x : W.level n) :
+noncomputable def frobeniusVerschiebung_cancel_rweq (n : Nat) (x : W.level n) :
     RwEq
       (Path.trans (Path.symm (W.frobeniusVerschiebungPath n x))
         (W.frobeniusVerschiebungPath n x))
       (Path.refl x) :=
   rweq_cmpA_inv_left (W.frobeniusVerschiebungPath n x)
 
-@[simp] theorem projectionFrobenius_rweq (n : Nat) (x : W.level (n + 1)) :
+noncomputable def projectionFrobenius_rweq (n : Nat) (x : W.level (n + 1)) :
     RwEq
       (Path.trans (W.projectionFrobeniusPath n x) (Path.refl (W.frobenius n x)))
       (W.projectionFrobeniusPath n x) :=
@@ -113,7 +113,7 @@ def frobeniusTransport_step {n : Nat} {x y : W.level (n + 1)} (p : Path x y) :
       (W.frobeniusTransport p) :=
   Path.Step.trans_refl_right (W.frobeniusTransport p)
 
-@[simp] theorem frobeniusTransport_rweq {n : Nat} {x y : W.level (n + 1)}
+noncomputable def frobeniusTransport_rweq {n : Nat} {x y : W.level (n + 1)}
     (p : Path x y) :
     RwEq
       (Path.trans (W.frobeniusTransport p) (Path.refl (W.frobenius n y)))
@@ -127,7 +127,7 @@ def verschiebungTransport_step {n : Nat} {x y : W.level n} (p : Path x y) :
       (W.verschiebungTransport p) :=
   Path.Step.trans_refl_right (W.verschiebungTransport p)
 
-@[simp] theorem verschiebungTransport_rweq {n : Nat} {x y : W.level n}
+noncomputable def verschiebungTransport_rweq {n : Nat} {x y : W.level n}
     (p : Path x y) :
     RwEq
       (Path.trans (W.verschiebungTransport p) (Path.refl (W.verschiebung n y)))

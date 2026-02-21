@@ -85,18 +85,18 @@ def hcompRw' {p p' : Path a b} {q q' : Path b c}
   rweq_trans (whiskerLeftRw p β) (whiskerRightRw α q')
 
 /-- The two horizontal compositions agree (proof irrelevance for Prop). -/
-theorem hcompRw_eq_hcompRw' {p p' : Path a b} {q q' : Path b c}
+noncomputable def hcompRw_eq_hcompRw' {p p' : Path a b} {q q' : Path b c}
     (α : RwEq p p') (β : RwEq q q') :
     hcompRw α β = hcompRw' α β :=
   Subsingleton.elim _ _
 
 /-- Horizontal composition with `RwEq.refl` on the right is right whiskering. -/
-theorem hcompRw_refl_right {p p' : Path a b} (α : RwEq p p') (q : Path b c) :
+noncomputable def hcompRw_refl_right {p p' : Path a b} (α : RwEq p p') (q : Path b c) :
     hcompRw α (RwEq.refl q) = whiskerRightRw α q :=
   rfl
 
 /-- Horizontal composition with `RwEq.refl` on the left is left whiskering. -/
-theorem hcompRw_refl_left (p : Path a b) {q q' : Path b c} (β : RwEq q q') :
+noncomputable def hcompRw_refl_left (p : Path a b) {q q' : Path b c} (β : RwEq q q') :
     hcompRw (RwEq.refl p) β = whiskerLeftRw p β :=
   rfl
 
@@ -122,7 +122,7 @@ variable {a b : A}
          v                                          v
          p              --[α]-->                   q
     ``` -/
-theorem unitLeft_natural {p q : Path a b} (α : RwEq p q) :
+noncomputable def unitLeft_natural {p q : Path a b} (α : RwEq p q) :
     rweq_trans (whiskerLeftRw (Path.refl a) α) (rweq_cmpA_refl_left q) =
     rweq_trans (rweq_cmpA_refl_left p) α :=
   rfl
@@ -136,13 +136,13 @@ theorem unitLeft_natural {p q : Path a b} (α : RwEq p q) :
          v                                           v
          p              --[α]-->                    q
     ``` -/
-theorem unitRight_natural {p q : Path a b} (α : RwEq p q) :
+noncomputable def unitRight_natural {p q : Path a b} (α : RwEq p q) :
     rweq_trans (whiskerRightRw α (Path.refl b)) (rweq_cmpA_refl_right q) =
     rweq_trans (rweq_cmpA_refl_right p) α :=
   rfl
 
 /-- Associativity is natural in all three arguments. -/
-theorem assoc_natural {a b c d : A}
+noncomputable def assoc_natural {a b c d : A}
     {p p' : Path a b} {q q' : Path b c} {r r' : Path c d}
     (α : RwEq p p') (β : RwEq q q') (γ : RwEq r r') :
     rweq_trans (rweq_trans_congr (rweq_trans_congr α β) γ) (rweq_tt p' q' r') =
@@ -150,7 +150,7 @@ theorem assoc_natural {a b c d : A}
   rfl
 
 /-- Symmetry involution is natural. -/
-theorem symm_involution_natural {p q : Path a b} (α : RwEq p q) :
+noncomputable def symm_involution_natural {p q : Path a b} (α : RwEq p q) :
     rweq_trans (rweq_symm_congr (rweq_symm_congr α)) (rweq_ss q) =
     rweq_trans (rweq_ss p) α :=
   rfl
@@ -172,7 +172,7 @@ variable {a b c : A}
 
 /-- Interchange law at the RwEq level:
     `hcomp (α₁ · α₂) (β₁ · β₂) = (hcomp α₁ β₁) · (hcomp α₂ β₂)` -/
-theorem interchangeRw
+noncomputable def interchangeRw
     {p p' p'' : Path a b} {q q' q'' : Path b c}
     (α₁ : RwEq p p') (α₂ : RwEq p' p'') (β₁ : RwEq q q') (β₂ : RwEq q' q'') :
     hcompRw (rweq_trans α₁ α₂) (rweq_trans β₁ β₂) =

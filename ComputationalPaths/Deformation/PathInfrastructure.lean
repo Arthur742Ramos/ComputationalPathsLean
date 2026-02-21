@@ -28,13 +28,13 @@ namespace PathPreservingDeformationData
 
 variable {A : Type u} (D : PathPreservingDeformationData A)
 
-@[simp] theorem differentialCompatCancelLeft (x : A) :
+noncomputable def differentialCompatCancelLeft (x : A) :
     RwEq
       (Path.trans (Path.symm (D.differentialCompat x)) (D.differentialCompat x))
       (Path.refl (D.dg.diff x)) :=
   rweq_cmpA_inv_left (D.differentialCompat x)
 
-@[simp] theorem bracketCompatCancelLeft (x y : A) :
+noncomputable def bracketCompatCancelLeft (x y : A) :
     RwEq
       (Path.trans (Path.symm (D.bracketCompat x y)) (D.bracketCompat x y))
       (Path.refl (D.dg.bracket x y)) :=
@@ -64,7 +64,7 @@ def toLInfinityStep
       (toLInfinityMaurerCartan D mc).equation :=
   Path.Step.trans_refl_right (toLInfinityMaurerCartan D mc).equation
 
-@[simp] theorem toLInfinityRweq
+noncomputable def toLInfinityRweq
     (mc : MaurerCartanPaths.MaurerCartanElement D.dg) :
     RwEq
       (Path.trans (toLInfinityMaurerCartan D mc).equation (Path.refl D.linf.zero))

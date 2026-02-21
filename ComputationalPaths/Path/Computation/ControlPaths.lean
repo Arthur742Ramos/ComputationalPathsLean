@@ -66,21 +66,21 @@ def reachTransitive {S : Type u} (r1 : ReachabilityWitness S) (r2 : Reachability
   Path.trans r1.reachPath (Path.trans (Path.mk [Step.mk _ _ h] h) r2.reachPath)
 
 /-- RwEq: reachability path trans refl. -/
-theorem reach_rweq_trans_refl {S : Type u} (r : ReachabilityWitness S) :
+noncomputable def reach_rweq_trans_refl {S : Type u} (r : ReachabilityWitness S) :
     RwEq
       (Path.trans r.reachPath (Path.refl r.to_))
       r.reachPath :=
   rweq_of_step (Step.trans_refl_right r.reachPath)
 
 /-- RwEq: reachability inv cancel. -/
-theorem reach_rweq_inv_right {S : Type u} (r : ReachabilityWitness S) :
+noncomputable def reach_rweq_inv_right {S : Type u} (r : ReachabilityWitness S) :
     RwEq
       (Path.trans r.reachPath (Path.symm r.reachPath))
       (Path.refl r.from_) :=
   rweq_cmpA_inv_right r.reachPath
 
 /-- RwEq: reachability symm_symm. -/
-theorem reach_rweq_symm_symm {S : Type u} (r : ReachabilityWitness S) :
+noncomputable def reach_rweq_symm_symm {S : Type u} (r : ReachabilityWitness S) :
     RwEq (Path.symm (Path.symm r.reachPath)) r.reachPath :=
   rweq_of_step (Step.symm_symm r.reachPath)
 
@@ -98,14 +98,14 @@ theorem controllability_trans_refl {S : Type u} (d : ControllabilityData S) :
   simp
 
 /-- RwEq: controllability inv cancel left. -/
-theorem controllability_rweq_inv_left {S : Type u} (d : ControllabilityData S) :
+noncomputable def controllability_rweq_inv_left {S : Type u} (d : ControllabilityData S) :
     RwEq
       (Path.trans (Path.symm d.controlSeq) d.controlSeq)
       (Path.refl d.target) :=
   rweq_cmpA_inv_left d.controlSeq
 
 /-- RwEq: controllability refl trans. -/
-theorem controllability_rweq_refl_trans {S : Type u} (d : ControllabilityData S) :
+noncomputable def controllability_rweq_refl_trans {S : Type u} (d : ControllabilityData S) :
     RwEq
       (Path.trans (Path.refl d.origin) d.controlSeq)
       d.controlSeq :=
@@ -122,14 +122,14 @@ structure ObservabilityData (S O : Type u) where
   obsPath : Path output1 output2
 
 /-- RwEq: observability path trans refl. -/
-theorem obs_rweq_trans_refl {S O : Type u} (d : ObservabilityData S O) :
+noncomputable def obs_rweq_trans_refl {S O : Type u} (d : ObservabilityData S O) :
     RwEq
       (Path.trans d.obsPath (Path.refl d.output2))
       d.obsPath :=
   rweq_of_step (Step.trans_refl_right d.obsPath)
 
 /-- RwEq: observability inv cancel. -/
-theorem obs_rweq_inv_right {S O : Type u} (d : ObservabilityData S O) :
+noncomputable def obs_rweq_inv_right {S O : Type u} (d : ObservabilityData S O) :
     RwEq
       (Path.trans d.obsPath (Path.symm d.obsPath))
       (Path.refl d.output1) :=
@@ -153,7 +153,7 @@ theorem feedbackLoop_zero {S : Type u} {a : S} (p : Path a a) :
     feedbackLoop p 0 = Path.refl a := rfl
 
 /-- RwEq: feedback loop 1 simplifies. -/
-theorem feedbackLoop_one_rweq {S : Type u} {a : S} (p : Path a a) :
+noncomputable def feedbackLoop_one_rweq {S : Type u} {a : S} (p : Path a a) :
     RwEq (feedbackLoop p 1) p :=
   rweq_of_step (Step.trans_refl_left p)
 
@@ -163,7 +163,7 @@ theorem feedback_trans_refl {S : Type u} (d : FeedbackData S) :
   simp
 
 /-- RwEq: feedback symm_symm. -/
-theorem feedback_rweq_symm_symm {S : Type u} (d : FeedbackData S) :
+noncomputable def feedback_rweq_symm_symm {S : Type u} (d : FeedbackData S) :
     RwEq (Path.symm (Path.symm d.feedbackPath)) d.feedbackPath :=
   rweq_of_step (Step.symm_symm d.feedbackPath)
 
@@ -176,14 +176,14 @@ structure StateEstimate (S : Type u) where
   estimatePath : Path estimatedState trueState
 
 /-- RwEq: estimate inv cancel right. -/
-theorem estimate_rweq_inv_right {S : Type u} (d : StateEstimate S) :
+noncomputable def estimate_rweq_inv_right {S : Type u} (d : StateEstimate S) :
     RwEq
       (Path.trans d.estimatePath (Path.symm d.estimatePath))
       (Path.refl d.estimatedState) :=
   rweq_cmpA_inv_right d.estimatePath
 
 /-- RwEq: estimate refl trans. -/
-theorem estimate_rweq_refl_trans {S : Type u} (d : StateEstimate S) :
+noncomputable def estimate_rweq_refl_trans {S : Type u} (d : StateEstimate S) :
     RwEq
       (Path.trans (Path.refl d.estimatedState) d.estimatePath)
       d.estimatePath :=
@@ -204,7 +204,7 @@ theorem optimal_trans_refl {S : Type u} (d : OptimalControlData S) :
   simp
 
 /-- RwEq: optimal inv cancel. -/
-theorem optimal_rweq_inv_right {S : Type u} (d : OptimalControlData S) :
+noncomputable def optimal_rweq_inv_right {S : Type u} (d : OptimalControlData S) :
     RwEq
       (Path.trans d.optimalPath (Path.symm d.optimalPath))
       (Path.refl d.initialState) :=
@@ -224,14 +224,14 @@ theorem stabilize_trans_refl {S : Type u} (d : StabilizationData S) :
   simp
 
 /-- RwEq: stabilization refl trans. -/
-theorem stabilize_rweq_refl_trans {S : Type u} (d : StabilizationData S) :
+noncomputable def stabilize_rweq_refl_trans {S : Type u} (d : StabilizationData S) :
     RwEq
       (Path.trans (Path.refl d.currentState) d.stabilizePath)
       d.stabilizePath :=
   rweq_of_step (Step.trans_refl_left d.stabilizePath)
 
 /-- RwEq: stabilization symm_symm. -/
-theorem stabilize_rweq_symm_symm {S : Type u} (d : StabilizationData S) :
+noncomputable def stabilize_rweq_symm_symm {S : Type u} (d : StabilizationData S) :
     RwEq (Path.symm (Path.symm d.stabilizePath)) d.stabilizePath :=
   rweq_of_step (Step.symm_symm d.stabilizePath)
 
@@ -249,7 +249,7 @@ theorem tracking_trans_refl {S : Type u} (d : TrackingData S) :
   simp
 
 /-- RwEq: tracking inv cancel left. -/
-theorem tracking_rweq_inv_left {S : Type u} (d : TrackingData S) :
+noncomputable def tracking_rweq_inv_left {S : Type u} (d : TrackingData S) :
     RwEq
       (Path.trans (Path.symm d.trackPath) d.trackPath)
       (Path.refl d.reference) :=

@@ -124,7 +124,7 @@ theorem fullNorm_rw (p : Path a b) :
   · exact Step.trans_symm p
 
 /-- The full normalization holds as RwEq. -/
-theorem fullNorm_rweq (p : Path a b) :
+noncomputable def fullNorm_rweq (p : Path a b) :
     RwEq (Path.trans (Path.trans (Path.trans (Path.refl a) p) (Path.symm p))
             (Path.refl a))
          (Path.refl a) :=
@@ -161,7 +161,7 @@ theorem triangle_rw (p : Path a b) (q : Path b c) :
   · exact Step.trans_congr_right p (Step.trans_refl_left q)
 
 /-- Triangle identity as RwEq. -/
-theorem triangle_rweq (p : Path a b) (q : Path b c) :
+noncomputable def triangle_rweq (p : Path a b) (q : Path b c) :
     RwEq (Path.trans (Path.trans p (Path.refl b)) q)
          (Path.trans p q) :=
   rweq_of_rw (triangle_rw p q)
@@ -227,7 +227,7 @@ theorem pentagon_right_rw (p : Path a b) (q : Path b c) (r : Path c d) (s : Path
   · exact Step.trans_congr_right p (Step.trans_assoc q r s)
 
 /-- Both paths agree via RwEq: this IS Mac Lane coherence. -/
-theorem pentagon_coherence (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def pentagon_coherence (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans (trans p q) r) s)
          (trans p (trans q (trans r s))) :=
   rweq_of_rw (pentagon_left_rw p q r s)

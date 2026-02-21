@@ -35,23 +35,23 @@ namespace SolidModulePathData
 
 variable {M : Type u} (S : SolidModulePathData M)
 
-@[simp] theorem unit_rweq (x : M) :
+noncomputable def unit_rweq (x : M) :
     RwEq (Path.trans (S.unitPath x) (Path.refl x)) (S.unitPath x) :=
   rweq_of_step (S.unitStep x)
 
-@[simp] theorem idempotent_rweq (x : M) :
+noncomputable def idempotent_rweq (x : M) :
     RwEq
       (Path.trans (S.idempotentPath x) (Path.refl (S.solidify x)))
       (S.idempotentPath x) :=
   rweq_of_step (S.idempotentStep x)
 
-@[simp] theorem unit_cancel_left (x : M) :
+noncomputable def unit_cancel_left (x : M) :
     RwEq
       (Path.trans (Path.symm (S.unitPath x)) (S.unitPath x))
       (Path.refl x) :=
   rweq_cmpA_inv_left (S.unitPath x)
 
-@[simp] theorem unit_cancel_right (x : M) :
+noncomputable def unit_cancel_right (x : M) :
     RwEq
       (Path.trans (S.unitPath x) (Path.symm (S.unitPath x)))
       (Path.refl (S.solidify x)) :=
@@ -59,7 +59,7 @@ variable {M : Type u} (S : SolidModulePathData M)
 
 /-- Two-step normalization for idempotence paths, using associativity and unit
 rewrite rules. -/
-theorem idempotent_two_step_rweq (x : M) :
+noncomputable def idempotent_two_step_rweq (x : M) :
     RwEq
       (Path.trans
         (Path.trans (S.idempotentPath x) (Path.refl (S.solidify x)))
@@ -88,7 +88,7 @@ def identitySolidModulePathData (M : Type u) : SolidModulePathData M where
   idempotentStep := fun x => Path.Step.trans_refl_right (Path.refl x)
 
 /-- The canonical identity solidification satisfies two-step normalization. -/
-theorem identity_idempotent_two_step_rweq (M : Type u) (x : M) :
+noncomputable def identity_idempotent_two_step_rweq (M : Type u) (x : M) :
     RwEq
       (Path.trans (Path.trans (Path.refl x) (Path.refl x)) (Path.refl x))
       (Path.refl x) :=

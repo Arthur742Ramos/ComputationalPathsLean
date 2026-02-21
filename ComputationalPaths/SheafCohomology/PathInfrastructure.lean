@@ -86,19 +86,19 @@ def restrict_zero (x y : A) : Path (F.restrict F.zero y) F.zero :=
   F.restrictZero x y
 
 /-- Theorem 4: restrict id right unit. -/
-theorem restrict_id_right_unit (x : A) :
+noncomputable def restrict_id_right_unit (x : A) :
     RwEq (Path.trans (F.restrictId x) (Path.refl _))
          (F.restrictId x) :=
   rweq_of_sh_step (ShStep.right_unit _)
 
 /-- Theorem 5: restrict id left unit. -/
-theorem restrict_id_left_unit (x : A) :
+noncomputable def restrict_id_left_unit (x : A) :
     RwEq (Path.trans (Path.refl _) (F.restrictId x))
          (F.restrictId x) :=
   rweq_of_sh_step (ShStep.left_unit _)
 
 /-- Theorem 6: restrict id inverse cancel. -/
-theorem restrict_id_inverse_cancel (x : A) :
+noncomputable def restrict_id_inverse_cancel (x : A) :
     RwEq (Path.trans (F.restrictId x) (Path.symm (F.restrictId x)))
          (Path.refl _) :=
   rweq_of_sh_step (ShStep.inverse_cancel _)
@@ -124,13 +124,13 @@ def sections_congr {x₁ x₂ : A} (p : Path x₁ x₂) :
   Path.congrArg F.sections p
 
 /-- Theorem 11: restrict comp right unit. -/
-theorem restrict_comp_right_unit (x y z : A) :
+noncomputable def restrict_comp_right_unit (x y z : A) :
     RwEq (Path.trans (F.restrictComp x y z) (Path.refl _))
          (F.restrictComp x y z) :=
   rweq_of_sh_step (ShStep.right_unit _)
 
 /-- Theorem 12: restrict comp inverse cancel. -/
-theorem restrict_comp_inverse_cancel (x y z : A) :
+noncomputable def restrict_comp_inverse_cancel (x y z : A) :
     RwEq (Path.trans (F.restrictComp x y z) (Path.symm (F.restrictComp x y z)))
          (Path.refl _) :=
   rweq_of_sh_step (ShStep.inverse_cancel _)
@@ -182,19 +182,19 @@ def coboundary_neg (x : A) :
   C.coboundaryNeg x
 
 /-- Theorem 17: coboundary square right unit. -/
-theorem coboundary_sq_right_unit (x : A) :
+noncomputable def coboundary_sq_right_unit (x : A) :
     RwEq (Path.trans (C.coboundarySquare x) (Path.refl _))
          (C.coboundarySquare x) :=
   rweq_of_sh_step (ShStep.right_unit _)
 
 /-- Theorem 18: coboundary square left unit. -/
-theorem coboundary_sq_left_unit (x : A) :
+noncomputable def coboundary_sq_left_unit (x : A) :
     RwEq (Path.trans (Path.refl _) (C.coboundarySquare x))
          (C.coboundarySquare x) :=
   rweq_of_sh_step (ShStep.left_unit _)
 
 /-- Theorem 19: coboundary square inverse cancel. -/
-theorem coboundary_sq_inverse_cancel (x : A) :
+noncomputable def coboundary_sq_inverse_cancel (x : A) :
     RwEq (Path.trans (C.coboundarySquare x) (Path.symm (C.coboundarySquare x)))
          (Path.refl _) :=
   rweq_of_sh_step (ShStep.inverse_cancel _)
@@ -210,7 +210,7 @@ def coboundary_double_congr {x₁ x₂ : A} (p : Path x₁ x₂) :
   Path.congrArg (fun t => C.coboundary (C.coboundary t)) p
 
 /-- Theorem 22: coboundary zero right unit. -/
-theorem coboundary_zero_right_unit :
+noncomputable def coboundary_zero_right_unit :
     RwEq (Path.trans C.coboundaryZero (Path.refl _))
          C.coboundaryZero :=
   rweq_of_sh_step (ShStep.right_unit _)
@@ -223,7 +223,7 @@ def coboundary_triple_zero (x : A) :
     C.coboundaryZero
 
 /-- Theorem 24: coboundary add right unit. -/
-theorem coboundary_add_right_unit (x y : A) :
+noncomputable def coboundary_add_right_unit (x y : A) :
     RwEq (Path.trans (C.coboundaryAdd x y) (Path.refl _))
          (C.coboundaryAdd x y) :=
   rweq_of_sh_step (ShStep.right_unit _)
@@ -284,19 +284,19 @@ def delta_zero : Path (E.delta E.zero) E.zero :=
   E.deltaZero
 
 /-- Theorem 32: gf exact right unit. -/
-theorem gf_exact_right_unit (x : A) :
+noncomputable def gf_exact_right_unit (x : A) :
     RwEq (Path.trans (E.fgExact x) (Path.refl _))
          (E.fgExact x) :=
   rweq_of_sh_step (ShStep.right_unit _)
 
 /-- Theorem 33: gf exact left unit. -/
-theorem gf_exact_left_unit (x : A) :
+noncomputable def gf_exact_left_unit (x : A) :
     RwEq (Path.trans (Path.refl _) (E.fgExact x))
          (E.fgExact x) :=
   rweq_of_sh_step (ShStep.left_unit _)
 
 /-- Theorem 34: gf exact inverse cancel. -/
-theorem gf_exact_inverse_cancel (x : A) :
+noncomputable def gf_exact_inverse_cancel (x : A) :
     RwEq (Path.trans (E.fgExact x) (Path.symm (E.fgExact x)))
          (Path.refl _) :=
   rweq_of_sh_step (ShStep.inverse_cancel _)
@@ -378,19 +378,19 @@ def connect_g_exact (x : A) : Path (D.connect (D.g x)) D.zero :=
   D.connectGExact x
 
 /-- Theorem 46: connect zero right unit. -/
-theorem connect_zero_right_unit :
+noncomputable def connect_zero_right_unit :
     RwEq (Path.trans D.connectZero (Path.refl _))
          D.connectZero :=
   rweq_of_sh_step (ShStep.right_unit _)
 
 /-- Theorem 47: connect zero left unit. -/
-theorem connect_zero_left_unit :
+noncomputable def connect_zero_left_unit :
     RwEq (Path.trans (Path.refl _) D.connectZero)
          D.connectZero :=
   rweq_of_sh_step (ShStep.left_unit _)
 
 /-- Theorem 48: connect zero inverse cancel. -/
-theorem connect_zero_inverse_cancel :
+noncomputable def connect_zero_inverse_cancel :
     RwEq (Path.trans D.connectZero (Path.symm D.connectZero))
          (Path.refl _) :=
   rweq_of_sh_step (ShStep.inverse_cancel _)
@@ -419,13 +419,13 @@ def connect_g_zero_path : Path (D.connect (D.g D.zero)) D.zero :=
   D.connectGExact D.zero
 
 /-- Theorem 54: f connect exact assoc with three paths. -/
-theorem f_connect_assoc (x : A) (p : Path D.zero D.zero) :
+noncomputable def f_connect_assoc (x : A) (p : Path D.zero D.zero) :
     RwEq (Path.trans (Path.trans (D.fConnectExact x) p) (Path.refl _))
          (Path.trans (D.fConnectExact x) p) :=
   rweq_of_sh_step (ShStep.right_unit _)
 
 /-- Theorem 55: connect neg right unit. -/
-theorem connect_neg_right_unit (x : A) :
+noncomputable def connect_neg_right_unit (x : A) :
     RwEq (Path.trans (D.connectNeg x) (Path.refl _))
          (D.connectNeg x) :=
   rweq_of_sh_step (ShStep.right_unit _)
@@ -511,7 +511,7 @@ def ruv_iv_zero : Path (M.rUV (M.iV M.zero)) M.zero :=
   M.mvExact2 M.zero
 
 /-- Theorem 68: mv exact right unit. -/
-theorem mv_exact1_right_unit (x : A) :
+noncomputable def mv_exact1_right_unit (x : A) :
     RwEq (Path.trans (M.mvExact1 x) (Path.refl _))
          (M.mvExact1 x) :=
   rweq_of_sh_step (ShStep.right_unit _)
@@ -573,25 +573,25 @@ def connect_congr (n : Nat) {x₁ x₂ : A} (p : Path x₁ x₂) :
   Path.congrArg (R.connecting n) p
 
 /-- Theorem 75: derF zero right unit. -/
-theorem derF_zero_right_unit (n : Nat) :
+noncomputable def derF_zero_right_unit (n : Nat) :
     RwEq (Path.trans (R.derFZero n) (Path.refl _))
          (R.derFZero n) :=
   rweq_of_sh_step (ShStep.right_unit _)
 
 /-- Theorem 76: derF zero left unit. -/
-theorem derF_zero_left_unit (n : Nat) :
+noncomputable def derF_zero_left_unit (n : Nat) :
     RwEq (Path.trans (Path.refl _) (R.derFZero n))
          (R.derFZero n) :=
   rweq_of_sh_step (ShStep.left_unit _)
 
 /-- Theorem 77: derF zero inverse cancel. -/
-theorem derF_zero_inverse_cancel (n : Nat) :
+noncomputable def derF_zero_inverse_cancel (n : Nat) :
     RwEq (Path.trans (R.derFZero n) (Path.symm (R.derFZero n)))
          (Path.refl _) :=
   rweq_of_sh_step (ShStep.inverse_cancel _)
 
 /-- Theorem 78: connect exact right unit. -/
-theorem connect_exact_right_unit (n : Nat) (x : A) :
+noncomputable def connect_exact_right_unit (n : Nat) (x : A) :
     RwEq (Path.trans (R.connectExact n x) (Path.refl _))
          (R.connectExact n x) :=
   rweq_of_sh_step (ShStep.right_unit _)
@@ -602,7 +602,7 @@ def derF_double_congr (n m : Nat) {x₁ x₂ : A} (p : Path x₁ x₂) :
   Path.congrArg (fun t => R.derF n (R.derF m t)) p
 
 /-- Theorem 80: connect exact inverse cancel. -/
-theorem connect_exact_inverse_cancel (n : Nat) (x : A) :
+noncomputable def connect_exact_inverse_cancel (n : Nat) (x : A) :
     RwEq (Path.trans (R.connectExact n x) (Path.symm (R.connectExact n x)))
          (Path.refl _) :=
   rweq_of_sh_step (ShStep.inverse_cancel _)

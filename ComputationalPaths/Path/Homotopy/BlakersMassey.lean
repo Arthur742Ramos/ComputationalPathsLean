@@ -45,7 +45,7 @@ def canonicalSquare (A B C : Type u) (f : C → A) (g : C → B) :
 /-! ## Glue cancellation -/
 
 /-- Glue followed by its inverse is rewrite-equivalent to the identity path. -/
-theorem glue_cancel_right {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
+noncomputable def glue_cancel_right {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
     RwEq
       (Path.trans
         (CompPath.PushoutCompPath.glue (A := A) (B := B) (C := C) (f := f) (g := g) c)
@@ -57,7 +57,7 @@ theorem glue_cancel_right {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
       (p := CompPath.PushoutCompPath.glue (A := A) (B := B) (C := C) (f := f) (g := g) c))
 
 /-- Inverse glue followed by glue is rewrite-equivalent to the identity path. -/
-theorem glue_cancel_left {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
+noncomputable def glue_cancel_left {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
     RwEq
       (Path.trans
         (CompPath.PushoutCompPath.glueInv (A := A) (B := B) (C := C) (f := f) (g := g) c)

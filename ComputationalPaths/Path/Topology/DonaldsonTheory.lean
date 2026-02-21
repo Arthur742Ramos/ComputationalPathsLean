@@ -319,25 +319,25 @@ def bubbleTreeEnergy (bt : BubbleTree) : Nat :=
 /-! ## RwEq Coherence -/
 
 /-- Rewrite-equivalence for gauge identity path. -/
-theorem gauge_id_rweq {G : LieGroup.{u}} {M : FourManifold.{u}}
+noncomputable def gauge_id_rweq {G : LieGroup.{u}} {M : FourManifold.{u}}
     {P : PrincipalBundle G M} (A : Connection G M P) :
     RwEq (Path.trans (gaugeId_preserves A) (Path.refl A))
          (gaugeId_preserves A) := by
   exact rweq_cmpA_refl_right (p := gaugeId_preserves A)
 
 /-- Rewrite-equivalence: Lie group one_mul with refl. -/
-theorem lieGroup_one_mul_rweq (G : LieGroup.{u}) (g : G.carrier) :
+noncomputable def lieGroup_one_mul_rweq (G : LieGroup.{u}) (g : G.carrier) :
     RwEq (Path.trans (G.one_mul g) (Path.refl g)) (G.one_mul g) := by
   exact rweq_cmpA_refl_right (p := G.one_mul g)
 
 /-- Rewrite-equivalence: Lie group left-inverse with right-inverse path. -/
-theorem lieGroup_inv_rweq (G : LieGroup.{u}) (g : G.carrier) :
+noncomputable def lieGroup_inv_rweq (G : LieGroup.{u}) (g : G.carrier) :
     RwEq (Path.trans (G.inv_mul g) (Path.refl G.one))
          (G.inv_mul g) := by
   exact rweq_cmpA_refl_right (p := G.inv_mul g)
 
 /-- Rewrite-equivalence: b₂ decomposition path with refl. -/
-theorem b2_decomp_rweq (M : FourManifold.{u}) :
+noncomputable def b2_decomp_rweq (M : FourManifold.{u}) :
     RwEq (Path.trans M.b2_decomp (Path.refl _)) M.b2_decomp := by
   exact rweq_cmpA_refl_right (p := M.b2_decomp)
 

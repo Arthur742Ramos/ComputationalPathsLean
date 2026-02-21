@@ -36,26 +36,26 @@ abbrev Omega (A : Type u) (a : A) : Type u :=
 
 /-! ## Group Laws Up to RwEq -/
 
-@[simp] noncomputable def id_comp_rweq (p : Omega A a) :
+noncomputable def id_comp_rweq (p : Omega A a) :
     RwEq (LoopSpace.comp (LoopSpace.id (A := A) (a := a)) p) p := by
   simp [LoopSpace.id, LoopSpace.comp]
 
-@[simp] noncomputable def comp_id_rweq (p : Omega A a) :
+noncomputable def comp_id_rweq (p : Omega A a) :
     RwEq (LoopSpace.comp p (LoopSpace.id (A := A) (a := a))) p := by
   simp [LoopSpace.id, LoopSpace.comp]
 
-@[simp] noncomputable def comp_assoc_rweq (p q r : Omega A a) :
+noncomputable def comp_assoc_rweq (p q r : Omega A a) :
     RwEq (LoopSpace.comp (LoopSpace.comp p q) r)
       (LoopSpace.comp p (LoopSpace.comp q r)) := by
   simp [LoopSpace.comp]
 
-@[simp] noncomputable def inv_comp_rweq (p : Omega A a) :
+noncomputable def inv_comp_rweq (p : Omega A a) :
     RwEq (LoopSpace.comp (LoopSpace.inv p) p)
       (LoopSpace.id (A := A) (a := a)) := by
   simpa [LoopSpace.inv, LoopSpace.comp, LoopSpace.id] using
     (rweq_cmpA_inv_left (p := p))
 
-@[simp] noncomputable def comp_inv_rweq (p : Omega A a) :
+noncomputable def comp_inv_rweq (p : Omega A a) :
     RwEq (LoopSpace.comp p (LoopSpace.inv p))
       (LoopSpace.id (A := A) (a := a)) := by
   simpa [LoopSpace.inv, LoopSpace.comp, LoopSpace.id] using

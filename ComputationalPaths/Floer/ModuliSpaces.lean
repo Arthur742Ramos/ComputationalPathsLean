@@ -85,7 +85,7 @@ def stripBoundary_step (f : Mor) :
       (M.stripBoundaryPath f) :=
   Path.Step.trans_refl_right (M.stripBoundaryPath f)
 
-@[simp] theorem stripBoundary_rweq (f : Mor) :
+noncomputable def stripBoundary_rweq (f : Mor) :
     RwEq
       (Path.trans
         (M.stripBoundaryPath f)
@@ -102,7 +102,7 @@ def stripToBoundary_step (f : Mor) :
       (M.stripToBoundaryPath f) :=
   Path.Step.trans_refl_right (M.stripToBoundaryPath f)
 
-@[simp] theorem stripToBoundary_rweq (f : Mor) :
+noncomputable def stripToBoundary_rweq (f : Mor) :
     RwEq
       (Path.trans
         (M.stripToBoundaryPath f)
@@ -119,7 +119,7 @@ def gluing_step (f g : Mor) :
       (M.gluingPath f g) :=
   Path.Step.trans_refl_right (M.gluingPath f g)
 
-@[simp] theorem gluing_rweq (f g : Mor) :
+noncomputable def gluing_rweq (f g : Mor) :
     RwEq
       (Path.trans
         (M.gluingPath f g)
@@ -134,7 +134,7 @@ def identityDegeneracy_step (X : Obj) :
       (M.identityDegeneracyPath X) :=
   Path.Step.trans_refl_right (M.identityDegeneracyPath X)
 
-@[simp] theorem identityDegeneracy_rweq (X : Obj) :
+noncomputable def identityDegeneracy_rweq (X : Obj) :
     RwEq
       (Path.trans (M.identityDegeneracyPath X) (Path.refl M.graded.complex.zero))
       (M.identityDegeneracyPath X) :=
@@ -149,7 +149,7 @@ def dimensionDrop_step (f : Mor) :
       (M.dimensionDropPath f) :=
   Path.Step.trans_refl_left (M.dimensionDropPath f)
 
-@[simp] theorem dimensionDrop_rweq (f : Mor) :
+noncomputable def dimensionDrop_rweq (f : Mor) :
     RwEq
       (Path.trans
         (Path.refl (M.graded.grading (M.chordOf (M.fukaya.mu1 f))))
@@ -167,7 +167,7 @@ def boundaryAfterGluing_step (f g : Mor) :
       (M.boundaryAfterGluingPath f g) :=
   Path.Step.trans_refl_right (M.boundaryAfterGluingPath f g)
 
-@[simp] theorem boundaryAfterGluing_rweq (f g : Mor) :
+noncomputable def boundaryAfterGluing_rweq (f g : Mor) :
     RwEq
       (Path.trans
         (M.boundaryAfterGluingPath f g)
@@ -176,13 +176,13 @@ def boundaryAfterGluing_step (f g : Mor) :
       (M.boundaryAfterGluingPath f g) :=
   rweq_of_step (M.boundaryAfterGluing_step f g)
 
-@[simp] theorem identityDegeneracy_cancel_rweq (X : Obj) :
+noncomputable def identityDegeneracy_cancel_rweq (X : Obj) :
     RwEq
       (Path.trans (Path.symm (M.identityDegeneracyPath X)) (M.identityDegeneracyPath X))
       (Path.refl M.graded.complex.zero) :=
   rweq_cmpA_inv_left (M.identityDegeneracyPath X)
 
-@[simp] theorem pseudoCurve_cancel_rweq (f : Mor) :
+noncomputable def pseudoCurve_cancel_rweq (f : Mor) :
     RwEq
       (Path.trans (Path.symm (M.pseudoCurvePath f)) (M.pseudoCurvePath f))
       (Path.refl (M.chordOf f)) :=

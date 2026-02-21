@@ -57,31 +57,31 @@ namespace ChowRingPathData
 
 variable {R : Type u} (C : ChowRingPathData R)
 
-@[simp] theorem add_comm_rweq (x y : R) :
+noncomputable def add_comm_rweq (x y : R) :
     RwEq
       (Path.trans (C.addCommPath x y) (Path.refl (C.add y x)))
       (C.addCommPath x y) :=
   rweq_of_step (C.addCommStep x y)
 
-@[simp] theorem mul_assoc_rweq (x y z : R) :
+noncomputable def mul_assoc_rweq (x y z : R) :
     RwEq
       (Path.trans (Path.refl (C.mul (C.mul x y) z)) (C.mulAssocPath x y z))
       (C.mulAssocPath x y z) :=
   rweq_of_step (C.mulAssocStep x y z)
 
-@[simp] theorem grade_add_rweq (x y : R) :
+noncomputable def grade_add_rweq (x y : R) :
     RwEq
       (Path.trans (C.gradeAddPath x y) (Path.refl (C.grade (C.add y x))))
       (C.gradeAddPath x y) :=
   rweq_of_step (C.gradeAddStep x y)
 
-@[simp] theorem intersect_comm_rweq (x y : R) :
+noncomputable def intersect_comm_rweq (x y : R) :
     RwEq
       (Path.trans (Path.refl (C.mul x y)) (C.intersectCommPath x y))
       (C.intersectCommPath x y) :=
   rweq_of_step (C.intersectCommStep x y)
 
-@[simp] theorem intersect_comm_cancel_rweq (x y : R) :
+noncomputable def intersect_comm_cancel_rweq (x y : R) :
     RwEq
       (Path.trans (Path.symm (C.intersectCommPath x y)) (C.intersectCommPath x y))
       (Path.refl (C.mul y x)) :=

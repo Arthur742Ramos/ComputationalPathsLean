@@ -79,7 +79,7 @@ theorem transport_eq_pathJ {a b : A} {D : A → Sort v}
       rfl
 
 /-- Transport is invariant under rewrite equality. -/
-theorem transport_of_rweq {a b : A} {D : A → Sort v}
+noncomputable def transport_of_rweq {a b : A} {D : A → Sort v}
     {p q : Path a b} (h : RwEq p q) (x : D a) :
     transport (D := D) p x = transport (D := D) q x := by
   exact transport_of_toEq_eq (D := D) (p := p) (q := q) (h := rweq_toEq h) x

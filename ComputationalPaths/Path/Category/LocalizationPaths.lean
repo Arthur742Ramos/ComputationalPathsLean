@@ -220,28 +220,28 @@ structure BousfieldLocalization (C : Type u) where
 /-! ## RwEq Coherence Theorems -/
 
 /-- Localization universal property coherence. -/
-@[simp] theorem localization_universal_rweq {C : Type u} {W : MorphismClass C}
+noncomputable def localization_universal_rweq {C : Type u} {W : MorphismClass C}
     (L : LocalizedCategory C W) {a b : C}
     {p q : Path a b} (h : RwEq p q) :
     RwEq (L.localize p) (L.localize q) :=
   L.localize_rweq h
 
 /-- Reflection unit is coherent with fixed. -/
-@[simp] theorem reflection_unit_rweq {C : Type u}
+noncomputable def reflection_unit_rweq {C : Type u}
     (R : ReflectiveSubcategory C) (a : C) (ha : R.isLocal a) :
     RwEq (Path.trans (R.unit a) (R.fixed a ha))
          (Path.refl a) :=
   R.triangle a ha
 
 /-- Bousfield universal property. -/
-@[simp] theorem bousfield_universal_rweq {C : Type u}
+noncomputable def bousfield_universal_rweq {C : Type u}
     (B : BousfieldLocalization C) {a b : C}
     (hb : B.isLocal b) (f : Path a b) :
     RwEq (Path.trans (B.locMap a) (B.universal hb f)) f :=
   B.universal_unique hb f
 
 /-- Localized category: inverting and then composing is identity. -/
-theorem loc_invert_right_rweq {C : Type u} {W : MorphismClass C}
+noncomputable def loc_invert_right_rweq {C : Type u} {W : MorphismClass C}
     (L : LocalizedCategory C W) {a b : C}
     (p : Path a b) (h : W.mem p) :
     RwEq (Path.trans (L.localize p) (L.invert p h))
@@ -249,7 +249,7 @@ theorem loc_invert_right_rweq {C : Type u} {W : MorphismClass C}
   L.right_inv p h
 
 /-- Localized category: composing inverse then morphism is identity. -/
-theorem loc_invert_left_rweq {C : Type u} {W : MorphismClass C}
+noncomputable def loc_invert_left_rweq {C : Type u} {W : MorphismClass C}
     (L : LocalizedCategory C W) {a b : C}
     (p : Path a b) (h : W.mem p) :
     RwEq (Path.trans (L.invert p h) (L.localize p))
@@ -257,7 +257,7 @@ theorem loc_invert_left_rweq {C : Type u} {W : MorphismClass C}
   L.left_inv p h
 
 /-- Left exact localization preserves composition coherence. -/
-@[simp] theorem left_exact_preserves_comp_rweq {C : Type u}
+noncomputable def left_exact_preserves_comp_rweq {C : Type u}
     (L : LeftExactLocalization C) {a b c : C}
     (p : Path a b) (q : Path b c) :
     RwEq (L.preserves_product (Path.trans p q))
@@ -265,7 +265,7 @@ theorem loc_invert_left_rweq {C : Type u} {W : MorphismClass C}
   L.preserves_comp p q
 
 /-- Ore condition square commutes. -/
-theorem ore_commutes_rweq {C : Type u} {W : MorphismClass C}
+noncomputable def ore_commutes_rweq {C : Type u} {W : MorphismClass C}
     (O : OreCondition C W) {a b c : C}
     (w : Path a b) (hw : W.mem w) (f : Path a c) :
     RwEq (Path.trans w (O.completeGen w hw f))

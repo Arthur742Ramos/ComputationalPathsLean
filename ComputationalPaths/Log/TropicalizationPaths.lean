@@ -59,7 +59,7 @@ def tropicalizeMap_step {a b : Monoid} (p : Path a b) :
       (T.tropicalizeMap p) :=
   Path.Step.trans_refl_right (T.tropicalizeMap p)
 
-@[simp] theorem tropicalizeMap_rweq {a b : Monoid} (p : Path a b) :
+noncomputable def tropicalizeMap_rweq {a b : Monoid} (p : Path a b) :
     RwEq
       (Path.trans (T.tropicalizeMap p) (Path.refl (T.tropicalize b)))
       (T.tropicalizeMap p) :=
@@ -73,7 +73,7 @@ def tropicalizeMul_step (x y : Obj) :
       (T.tropicalizeMulPath x y) :=
   Path.Step.trans_refl_right (T.tropicalizeMulPath x y)
 
-@[simp] theorem tropicalizeMul_rweq (x y : Obj) :
+noncomputable def tropicalizeMul_rweq (x y : Obj) :
     RwEq
       (Path.trans (T.tropicalizeMulPath x y)
         (Path.refl (T.tropMul (T.tropicalize (L.chart x)) (T.tropicalize (L.chart y)))))
@@ -88,7 +88,7 @@ def tropicalizeUnit_step :
       T.tropicalizeUnitPath :=
   Path.Step.trans_refl_right T.tropicalizeUnitPath
 
-@[simp] theorem tropicalizeUnit_rweq :
+noncomputable def tropicalizeUnit_rweq :
     RwEq
       (Path.trans T.tropicalizeUnitPath
         (Path.refl (T.tropMul (T.tropicalize L.unitMonoid) (T.tropicalize L.unitMonoid))))
@@ -103,14 +103,14 @@ def tropicalizeChartMul_step (x y : Obj) :
       (T.tropicalizeChartMul x y) :=
   Path.Step.trans_refl_right (T.tropicalizeChartMul x y)
 
-@[simp] theorem tropicalizeChartMul_rweq (x y : Obj) :
+noncomputable def tropicalizeChartMul_rweq (x y : Obj) :
     RwEq
       (Path.trans (T.tropicalizeChartMul x y)
         (Path.refl (T.tropMul (T.tropicalize (L.chart x)) (T.tropicalize (L.chart y)))))
       (T.tropicalizeChartMul x y) :=
   rweq_of_step (T.tropicalizeChartMul_step x y)
 
-@[simp] theorem tropicalizeChartMul_cancel_rweq (x y : Obj) :
+noncomputable def tropicalizeChartMul_cancel_rweq (x y : Obj) :
     RwEq
       (Path.trans (Path.symm (T.tropicalizeChartMul x y)) (T.tropicalizeChartMul x y))
       (Path.refl (T.tropMul (T.tropicalize (L.chart x)) (T.tropicalize (L.chart y)))) :=

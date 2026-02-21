@@ -35,7 +35,7 @@ def PrismStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .nygaard_cancel p => Path.Step.symm_trans p
 
 /-- Lift a prism step to rewrite equivalence. -/
-theorem rweq_of_prism_step {A : Type u} {a b : A}
+noncomputable def rweq_of_prism_step {A : Type u} {a b : A}
     {p q : Path a b} (s : PrismStep p q) : RwEq p q :=
   rweq_of_step (PrismStep.toStep s)
 
@@ -67,25 +67,25 @@ namespace PrismPathData
 
 variable {A : Type u} (P : PrismPathData A)
 
-@[simp] theorem phi_delta_rweq (a : A) :
+noncomputable def phi_delta_rweq (a : A) :
     RwEq
       (Path.trans (P.phiDeltaPath a) (Path.refl (P.delta a)))
       (P.phiDeltaPath a) :=
   rweq_of_prism_step (P.phiDeltaStep a)
 
-@[simp] theorem nygaard_rweq (a : A) :
+noncomputable def nygaard_rweq (a : A) :
     RwEq
       (Path.trans (Path.refl (P.frobenius (P.delta a))) (P.nygaardPath a))
       (P.nygaardPath a) :=
   rweq_of_prism_step (P.nygaardStep a)
 
-@[simp] theorem prism_condition_rweq :
+noncomputable def prism_condition_rweq :
     RwEq
       (Path.trans P.prismConditionPath (Path.refl P.idealGenerator))
       P.prismConditionPath :=
   rweq_of_prism_step P.prismConditionStep
 
-@[simp] theorem prism_condition_cancel_rweq :
+noncomputable def prism_condition_cancel_rweq :
     RwEq
       (Path.trans (Path.symm P.prismConditionPath) P.prismConditionPath)
       (Path.refl P.idealGenerator) :=
@@ -100,7 +100,7 @@ def frobeniusTransport {x y : A} (p : Path x y) :
 def generatorRoundTrip : Path P.idealGenerator P.idealGenerator :=
   Path.trans (Path.symm P.prismConditionPath) P.prismConditionPath
 
-@[simp] theorem generator_roundtrip_rweq :
+noncomputable def generator_roundtrip_rweq :
     RwEq P.generatorRoundTrip (Path.refl P.idealGenerator) :=
   P.prism_condition_cancel_rweq
 

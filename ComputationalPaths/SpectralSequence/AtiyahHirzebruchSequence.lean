@@ -89,7 +89,7 @@ def edge (n r : Nat) :
     Path (A.kClass n r) (A.skeletalClass n r) :=
   A.edgePath n r
 
-@[simp] theorem edge_rweq (n r : Nat) :
+noncomputable def edge_rweq (n r : Nat) :
     RwEq
       (Path.trans (Path.refl (A.kClass n r)) (A.edge n r))
       (A.edge n r) :=
@@ -100,7 +100,7 @@ def chernCharacter (n r : Nat) :
     Path (A.kClass (n + 1) r) (A.skeletalClass n r) :=
   A.chernPath n r
 
-@[simp] theorem chern_rweq (n r : Nat) :
+noncomputable def chern_rweq (n r : Nat) :
     RwEq
       (Path.trans (A.chernCharacter n r) (Path.refl (A.skeletalClass n r)))
       (A.chernCharacter n r) :=
@@ -111,7 +111,7 @@ def edgeLoop (n r : Nat) :
     Path (A.kClass n r) (A.kClass n r) :=
   Path.trans (A.edge n r) (Path.symm (A.edge n r))
 
-@[simp] theorem edgeLoop_contracts (n r : Nat) :
+noncomputable def edgeLoop_contracts (n r : Nat) :
     RwEq (A.edgeLoop n r) (Path.refl (A.kClass n r)) := by
   unfold edgeLoop
   exact rweq_cmpA_inv_right (A.edge n r)
@@ -132,7 +132,7 @@ def edgeToSkeletalLimit (n r : Nat) :
       (A.convergence.embed 0 0 (A.skeletalClass n r)) :=
   Path.trans (A.shiftedEdge n r) (A.skeletalStabilizePath n r)
 
-@[simp] theorem edgeToSkeletalLimit_rweq (n r : Nat) :
+noncomputable def edgeToSkeletalLimit_rweq (n r : Nat) :
     RwEq
       (Path.trans
         (A.edgeToSkeletalLimit n r)
@@ -170,7 +170,7 @@ def kBoundaryToLimit (n r : Nat) :
       (A.convergence.embed 0 0 (A.kClass n r)) :=
   Path.trans (A.shiftedKBoundaryCompression n r) (A.kStabilizePath n r)
 
-@[simp] theorem kBoundaryToLimit_rweq (n r : Nat) :
+noncomputable def kBoundaryToLimit_rweq (n r : Nat) :
     RwEq
       (Path.trans
         (A.kBoundaryToLimit n r)

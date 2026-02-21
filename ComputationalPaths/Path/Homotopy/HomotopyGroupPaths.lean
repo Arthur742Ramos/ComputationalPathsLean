@@ -74,12 +74,12 @@ theorem loopInv_comp {a : A} (l₁ l₂ : LoopSpace A a) :
   simp [loopInv, loopComp]
 
 /-- Right inverse law via RwEq. -/
-theorem loopComp_inv_right_rweq {a : A} (l : LoopSpace A a) :
+noncomputable def loopComp_inv_right_rweq {a : A} (l : LoopSpace A a) :
     RwEq (loopComp l (loopInv l)) (loopId a) :=
   rweq_cmpA_inv_right l
 
 /-- Left inverse law via RwEq. -/
-theorem loopComp_inv_left_rweq {a : A} (l : LoopSpace A a) :
+noncomputable def loopComp_inv_left_rweq {a : A} (l : LoopSpace A a) :
     RwEq (loopComp (loopInv l) l) (loopId a) :=
   rweq_cmpA_inv_left l
 

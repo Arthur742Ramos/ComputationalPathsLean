@@ -127,7 +127,7 @@ def canonical : SpectrumMapPathPreserving f where
   comm_assoc_step := fun n => SpectrumMap.commBase_assoc_step (f := f) n
   structure_cancel_step := fun n => SpectrumMap.structure_cancel_step (F := F) n
 
-@[simp] theorem comm_assoc_rweq (P : SpectrumMapPathPreserving f) (n : Nat) :
+noncomputable def comm_assoc_rweq (P : SpectrumMapPathPreserving f) (n : Nat) :
     RwEq
       (Path.trans
         (Path.trans (f.commBase n) ((F.structureMap n).map_pt))
@@ -137,7 +137,7 @@ def canonical : SpectrumMapPathPreserving f where
         (Path.trans ((F.structureMap n).map_pt) (Path.symm ((F.structureMap n).map_pt)))) :=
   rweq_of_step (P.comm_assoc_step n)
 
-@[simp] theorem structure_cancel_rweq (P : SpectrumMapPathPreserving f) (n : Nat) :
+noncomputable def structure_cancel_rweq (P : SpectrumMapPathPreserving f) (n : Nat) :
     RwEq
       (Path.trans ((F.structureMap n).map_pt) (Path.symm ((F.structureMap n).map_pt)))
       (Path.refl ((F.structureMap n).toFun (sigmaPointed (F.level n)).pt)) :=
@@ -167,11 +167,11 @@ namespace StableEquivalence
 
 variable {E F : Spectrum}
 
-@[simp] theorem left_cancel_rweq (e : StableEquivalence E F) (n : Nat) :
+noncomputable def left_cancel_rweq (e : StableEquivalence E F) (n : Nat) :
     RwEq (Path.trans (Path.symm (e.leftBase n)) (e.leftBase n)) (Path.refl (E.level n).pt) :=
   rweq_of_step (e.left_cancel_step n)
 
-@[simp] theorem right_cancel_rweq (e : StableEquivalence E F) (n : Nat) :
+noncomputable def right_cancel_rweq (e : StableEquivalence E F) (n : Nat) :
     RwEq (Path.trans (Path.symm (e.rightBase n)) (e.rightBase n)) (Path.refl (F.level n).pt) :=
   rweq_of_step (e.right_cancel_step n)
 
@@ -219,7 +219,7 @@ theorem symm_nonempty (e : StableEquivalence E F) :
   ⟨e.symm⟩
 
 /-- Right cancellation form for the left inverse witness. -/
-theorem left_cancel_right_rweq (e : StableEquivalence E F) (n : Nat) :
+noncomputable def left_cancel_right_rweq (e : StableEquivalence E F) (n : Nat) :
     RwEq
       (Path.trans (e.leftBase n) (Path.symm (e.leftBase n)))
       (Path.refl
@@ -228,7 +228,7 @@ theorem left_cancel_right_rweq (e : StableEquivalence E F) (n : Nat) :
   rweq_cmpA_inv_right (e.leftBase n)
 
 /-- Right cancellation form for the right inverse witness. -/
-theorem right_cancel_right_rweq (e : StableEquivalence E F) (n : Nat) :
+noncomputable def right_cancel_right_rweq (e : StableEquivalence E F) (n : Nat) :
     RwEq
       (Path.trans (e.rightBase n) (Path.symm (e.rightBase n)))
       (Path.refl

@@ -67,7 +67,7 @@ theorem mcstep_toEq {A : Type u} {a b : A} {p q : Path a b}
   | two_of_three_left => rfl
   | two_of_three_right => rfl
 
-theorem mcstep_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def mcstep_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : MCStep p q) : RwEq p q := by
   cases h with
   | weq_id => exact RwEq.refl _
@@ -414,7 +414,7 @@ theorem mcstep_preserves_toEq {A : Type u} {a b : A}
   mcstep_toEq h
 
 /-- Multi-step composition for MCStep is sound. -/
-theorem mcstep_multi_sound {A : Type u} {a b : A}
+noncomputable def mcstep_multi_sound {A : Type u} {a b : A}
     {p q r : Path a b}
     (h1 : MCStep p q) (h2 : MCStep q r) :
     RwEq p r :=

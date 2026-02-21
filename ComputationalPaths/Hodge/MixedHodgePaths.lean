@@ -34,7 +34,7 @@ def MixedHodgeStep.toStep {H : Type u} {a b : H} {p q : Path a b}
   | .polarization_cancel p => Path.Step.trans_symm p
 
 /-- Lift a mixed-Hodge step to rewrite equivalence. -/
-theorem rweq_of_mixed_hodge_step {H : Type u} {a b : H}
+noncomputable def rweq_of_mixed_hodge_step {H : Type u} {a b : H}
     {p q : Path a b} (s : MixedHodgeStep p q) : RwEq p q :=
   rweq_of_step (MixedHodgeStep.toStep s)
 
@@ -75,14 +75,14 @@ namespace MixedHodgeFiltrationData
 
 variable {H : Type u} (M : MixedHodgeFiltrationData H)
 
-@[simp] theorem weight_compose_rweq (i j : Int) (x : H) :
+noncomputable def weight_compose_rweq (i j : Int) (x : H) :
     RwEq
       (Path.trans (M.weightComposePath i j x)
         (Path.refl (M.weightFiltration (i + j) x)))
       (M.weightComposePath i j x) :=
   rweq_of_mixed_hodge_step (M.weightComposeStep i j x)
 
-@[simp] theorem hodge_compose_rweq (p q : Nat) (x : H) :
+noncomputable def hodge_compose_rweq (p q : Nat) (x : H) :
     RwEq
       (Path.trans
         (Path.refl (M.hodgeFiltration p (M.hodgeFiltration q x)))
@@ -90,7 +90,7 @@ variable {H : Type u} (M : MixedHodgeFiltrationData H)
       (M.hodgeComposePath p q x) :=
   rweq_of_mixed_hodge_step (M.hodgeComposeStep p q x)
 
-@[simp] theorem graded_weight_rweq (n : Int) (x : H) :
+noncomputable def graded_weight_rweq (n : Int) (x : H) :
     RwEq
       (Path.trans (M.gradedWeightPath n x) (Path.refl (M.gradedPiece n x)))
       (M.gradedWeightPath n x) :=
@@ -103,7 +103,7 @@ def weightRoundTrip (i j : Int) (x : H) :
       (M.weightFiltration i (M.weightFiltration j x)) :=
   Path.trans (M.weightComposePath i j x) (Path.symm (M.weightComposePath i j x))
 
-@[simp] theorem weight_roundtrip_rweq (i j : Int) (x : H) :
+noncomputable def weight_roundtrip_rweq (i j : Int) (x : H) :
     RwEq (M.weightRoundTrip i j x)
       (Path.refl (M.weightFiltration i (M.weightFiltration j x))) := by
   unfold weightRoundTrip

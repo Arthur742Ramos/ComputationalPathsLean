@@ -87,7 +87,7 @@ def monopoleInvolution_step (x : Branch) :
       (C.monopoleInvolutionPath x) :=
   C.monopoleInvolutionStep x
 
-@[simp] theorem monopoleInvolution_rweq (x : Branch) :
+noncomputable def monopoleInvolution_rweq (x : Branch) :
     RwEq
       (Path.trans (C.monopoleInvolutionPath x) (Path.refl x))
       (C.monopoleInvolutionPath x) :=
@@ -100,7 +100,7 @@ def unitLeft_step (x : Branch) :
       (C.unitLeftPath x) :=
   C.unitLeftStep x
 
-@[simp] theorem unitLeft_rweq (x : Branch) :
+noncomputable def unitLeft_rweq (x : Branch) :
     RwEq
       (Path.trans (C.unitLeftPath x) (Path.refl x))
       (C.unitLeftPath x) :=
@@ -113,7 +113,7 @@ def unitRight_step (x : Branch) :
       (C.unitRightPath x) :=
   C.unitRightStep x
 
-@[simp] theorem unitRight_rweq (x : Branch) :
+noncomputable def unitRight_rweq (x : Branch) :
     RwEq
       (Path.trans (C.unitRightPath x) (Path.refl x))
       (C.unitRightPath x) :=
@@ -126,7 +126,7 @@ def wallMonopole_step (x : Branch) :
       (C.wallMonopolePath x) :=
   C.wallMonopoleStep x
 
-@[simp] theorem wallMonopole_rweq (x : Branch) :
+noncomputable def wallMonopole_rweq (x : Branch) :
     RwEq
       (Path.trans (C.wallMonopolePath x) (Path.refl (C.monopole (C.wallCrossing x))))
       (C.wallMonopolePath x) :=
@@ -139,7 +139,7 @@ def monopoleMap_step {a b : Branch} (p : Path a b) :
       (C.monopoleMap p) :=
   C.monopoleMapStep p
 
-@[simp] theorem monopoleMap_rweq {a b : Branch} (p : Path a b) :
+noncomputable def monopoleMap_rweq {a b : Branch} (p : Path a b) :
     RwEq
       (Path.trans (C.monopoleMap p) (Path.refl (C.monopole b)))
       (C.monopoleMap p) :=
@@ -154,7 +154,7 @@ def wallToVacuum_step (x : Branch) :
       (C.wallToVacuumPath x) :=
   Path.Step.trans_refl_right (C.wallToVacuumPath x)
 
-@[simp] theorem wallToVacuum_rweq (x : Branch) :
+noncomputable def wallToVacuum_rweq (x : Branch) :
     RwEq
       (Path.trans
         (C.wallToVacuumPath x)
@@ -162,7 +162,7 @@ def wallToVacuum_step (x : Branch) :
       (C.wallToVacuumPath x) :=
   rweq_of_step (C.wallToVacuum_step x)
 
-@[simp] theorem wallToVacuum_cancel_rweq (x : Branch) :
+noncomputable def wallToVacuum_cancel_rweq (x : Branch) :
     RwEq
       (Path.trans (Path.symm (C.wallToVacuumPath x)) (C.wallToVacuumPath x))
       (Path.refl (C.quantumProduct (C.monopole (C.wallCrossing x)) C.vacuum)) :=
@@ -203,7 +203,7 @@ def mirrorMonopole_step (h : Higgs) :
       (B.mirrorMonopoleComparison h) :=
   Path.Step.trans_refl_right (B.mirrorMonopoleComparison h)
 
-@[simp] theorem mirrorMonopole_rweq (h : Higgs) :
+noncomputable def mirrorMonopole_rweq (h : Higgs) :
     RwEq
       (Path.trans
         (B.mirrorMonopoleComparison h)
@@ -211,7 +211,7 @@ def mirrorMonopole_step (h : Higgs) :
       (B.mirrorMonopoleComparison h) :=
   rweq_of_step (B.mirrorMonopole_step h)
 
-@[simp] theorem mirrorMonopole_cancel_rweq (h : Higgs) :
+noncomputable def mirrorMonopole_cancel_rweq (h : Higgs) :
     RwEq
       (Path.trans (Path.symm (B.mirrorMonopoleComparison h)) (B.mirrorMonopoleComparison h))
       (Path.refl (M.fiShift (M.mirrorToCoulomb h))) :=

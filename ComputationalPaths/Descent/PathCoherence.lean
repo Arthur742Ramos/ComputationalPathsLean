@@ -51,7 +51,7 @@ namespace EffectiveDescentData
 variable {Idx : Type u} {Obj : Type v} (D : EffectiveDescentData Idx Obj)
 
 /-- Left-unit coherence for transition composition. -/
-theorem transition_left_unit {i j : Idx} (p : Path i j) :
+noncomputable def transition_left_unit {i j : Idx} (p : Path i j) :
     RwEq (Path.trans (D.transition (Path.refl i)) (D.transition p))
          (D.transition p) := by
   exact rweq_trans
@@ -59,7 +59,7 @@ theorem transition_left_unit {i j : Idx} (p : Path i j) :
     (rweq_cmpA_refl_left (D.transition p))
 
 /-- Right-unit coherence for transition composition. -/
-theorem transition_right_unit {i j : Idx} (p : Path i j) :
+noncomputable def transition_right_unit {i j : Idx} (p : Path i j) :
     RwEq (Path.trans (D.transition p) (D.transition (Path.refl j)))
          (D.transition p) := by
   exact rweq_trans
@@ -67,7 +67,7 @@ theorem transition_right_unit {i j : Idx} (p : Path i j) :
     (rweq_cmpA_refl_right (D.transition p))
 
 /-- Associativity coherence for transition composition. -/
-theorem transition_assoc {i j k l : Idx}
+noncomputable def transition_assoc {i j k l : Idx}
     (p : Path i j) (q : Path j k) (r : Path k l) :
     RwEq
       (Path.trans (Path.trans (D.transition p) (D.transition q)) (D.transition r))
@@ -105,7 +105,7 @@ def mapEffectiveDescent (F : PathPreservingMap A B)
       (F.map_rweq (D.glue_compat p))
 
 /-- The mapped descent datum still satisfies gluing coherence. -/
-theorem mapEffectiveDescent_glue_compat
+noncomputable def mapEffectiveDescent_glue_compat
     (F : PathPreservingMap A B) (D : EffectiveDescentData Idx A)
     {i j : Idx} (p : Path i j) :
     RwEq
@@ -136,7 +136,7 @@ def mapEffectiveDescent (ff : FaithfullyFlatDescent A B)
   PathPreservingMap.mapEffectiveDescent ff.toPathPreservingMap D
 
 /-- Faithfulness reflects rewrite-equivalent descent transitions. -/
-theorem reflect_transition_rweq (ff : FaithfullyFlatDescent A B)
+noncomputable def reflect_transition_rweq (ff : FaithfullyFlatDescent A B)
     (D : EffectiveDescentData Idx A) {i j : Idx}
     (p q : Path i j) :
     RwEq (ff.mapPath (D.transition p)) (ff.mapPath (D.transition q)) →
@@ -144,7 +144,7 @@ theorem reflect_transition_rweq (ff : FaithfullyFlatDescent A B)
   ff.faithful (D.transition p) (D.transition q)
 
 /-- Section paths contract with their inverses by rewrite normalization. -/
-theorem section_path_cancel (ff : FaithfullyFlatDescent A B) (b : B) :
+noncomputable def section_path_cancel (ff : FaithfullyFlatDescent A B) (b : B) :
     RwEq (Path.trans (ff.section_path b) (Path.symm (ff.section_path b)))
          (Path.refl (ff.toFun (ff.witness b))) :=
   rweq_cmpA_inv_right (ff.section_path b)

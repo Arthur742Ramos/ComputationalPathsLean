@@ -57,7 +57,7 @@ def section_step (b : Base) :
       (S.sectionProjPath b) :=
   Path.Step.trans_refl_right (S.sectionProjPath b)
 
-@[simp] theorem section_rweq (b : Base) :
+noncomputable def section_rweq (b : Base) :
     RwEq
       (Path.trans (S.sectionProjPath b) (Path.refl b))
       (S.sectionProjPath b) :=
@@ -70,7 +70,7 @@ def transport_step (b : Base) :
       (S.transportPath b) :=
   Path.Step.trans_refl_left (S.transportPath b)
 
-@[simp] theorem transport_rweq (b : Base) :
+noncomputable def transport_rweq (b : Base) :
     RwEq
       (Path.trans (Path.refl (S.fiberAt (S.proj (S.sectionMap b)))) (S.transportPath b))
       (S.transportPath b) :=
@@ -83,7 +83,7 @@ def dualInvolution_step (b : Base) :
       (S.dualInvolutionPath b) :=
   Path.Step.trans_refl_right (S.dualInvolutionPath b)
 
-@[simp] theorem dualInvolution_rweq (b : Base) :
+noncomputable def dualInvolution_rweq (b : Base) :
     RwEq
       (Path.trans (S.dualInvolutionPath b) (Path.refl (S.fiberAt b)))
       (S.dualInvolutionPath b) :=
@@ -98,7 +98,7 @@ def monodromyDual_step (b : Base) (x : Fiber) :
       (S.monodromyDualPath b x) :=
   Path.Step.trans_refl_right (S.monodromyDualPath b x)
 
-@[simp] theorem monodromyDual_rweq (b : Base) (x : Fiber) :
+noncomputable def monodromyDual_rweq (b : Base) (x : Fiber) :
     RwEq
       (Path.trans
         (S.monodromyDualPath b x)
@@ -106,13 +106,13 @@ def monodromyDual_step (b : Base) (x : Fiber) :
       (S.monodromyDualPath b x) :=
   rweq_of_step (S.monodromyDual_step b x)
 
-@[simp] theorem dualInvolution_cancel_rweq (b : Base) :
+noncomputable def dualInvolution_cancel_rweq (b : Base) :
     RwEq
       (Path.trans (Path.symm (S.dualInvolutionPath b)) (S.dualInvolutionPath b))
       (Path.refl (S.fiberAt b)) :=
   rweq_cmpA_inv_left (S.dualInvolutionPath b)
 
-@[simp] theorem fiberMirrorComparison_cancel_rweq (b : Base) :
+noncomputable def fiberMirrorComparison_cancel_rweq (b : Base) :
     RwEq
       (Path.trans (Path.symm (S.fiberMirrorComparison b)) (S.fiberMirrorComparison b))
       (Path.refl (S.dualFiber (S.dualFiber (S.fiberAt b)))) :=

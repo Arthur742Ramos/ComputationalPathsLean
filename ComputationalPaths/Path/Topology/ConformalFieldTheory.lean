@@ -235,12 +235,12 @@ structure VerlindeFormula (V : VirasoroAlgebra.{u}) where
 /-! ## RwEq Results -/
 
 /-- CFT vacuum step composes with refl via RwEq. -/
-theorem cft_vacuum_rweq {V : VertexAlgebra.{u}} (a : V.states) :
+noncomputable def cft_vacuum_rweq {V : VertexAlgebra.{u}} (a : V.states) :
     RwEq (Path.trans (Path.refl _) (V.vacuum_axiom a)) (V.vacuum_axiom a) := by
   exact rweq_cmpA_refl_left (V.vacuum_axiom a)
 
 /-- Modular functor identity composes trivially. -/
-theorem modular_functor_id_rweq {G : ModularGroupoid.{u, v}}
+noncomputable def modular_functor_id_rweq {G : ModularGroupoid.{u, v}}
     {F : ModularFunctor G} {X : G.Obj} (v : F.objMap X) :
     RwEq (Path.trans (Path.refl _) (F.map_id X v)) (F.map_id X v) := by
   exact rweq_cmpA_refl_left (F.map_id X v)

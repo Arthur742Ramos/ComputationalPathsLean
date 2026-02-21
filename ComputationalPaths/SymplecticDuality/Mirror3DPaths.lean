@@ -81,7 +81,7 @@ def higgsRoundTrip_step (h : Higgs) :
       (M.higgsRoundTripPath h) :=
   M.higgsRoundTripStep h
 
-@[simp] theorem higgsRoundTrip_rweq (h : Higgs) :
+noncomputable def higgsRoundTrip_rweq (h : Higgs) :
     RwEq
       (Path.trans (M.higgsRoundTripPath h) (Path.refl h))
       (M.higgsRoundTripPath h) :=
@@ -94,7 +94,7 @@ def coulombRoundTrip_step (c : Coulomb) :
       (M.coulombRoundTripPath c) :=
   M.coulombRoundTripStep c
 
-@[simp] theorem coulombRoundTrip_rweq (c : Coulomb) :
+noncomputable def coulombRoundTrip_rweq (c : Coulomb) :
     RwEq
       (Path.trans (M.coulombRoundTripPath c) (Path.refl c))
       (M.coulombRoundTripPath c) :=
@@ -109,7 +109,7 @@ def massFI_step (h : Higgs) :
       (M.massFIPath h) :=
   M.massFIStep h
 
-@[simp] theorem massFI_rweq (h : Higgs) :
+noncomputable def massFI_rweq (h : Higgs) :
     RwEq
       (Path.trans
         (M.massFIPath h)
@@ -124,7 +124,7 @@ def mirrorMap_step {a b : Higgs} (p : Path a b) :
       (M.mirrorMap p) :=
   M.mirrorMapStep p
 
-@[simp] theorem mirrorMap_rweq {a b : Higgs} (p : Path a b) :
+noncomputable def mirrorMap_rweq {a b : Higgs} (p : Path a b) :
     RwEq
       (Path.trans (M.mirrorMap p) (Path.refl (M.mirrorToCoulomb b)))
       (M.mirrorMap p) :=
@@ -140,7 +140,7 @@ def dualizedMass_step (h : Higgs) :
       (M.dualizedMassPath h) :=
   Path.Step.trans_refl_right (M.dualizedMassPath h)
 
-@[simp] theorem dualizedMass_rweq (h : Higgs) :
+noncomputable def dualizedMass_rweq (h : Higgs) :
     RwEq
       (Path.trans
         (M.dualizedMassPath h)
@@ -149,7 +149,7 @@ def dualizedMass_step (h : Higgs) :
       (M.dualizedMassPath h) :=
   rweq_of_step (M.dualizedMass_step h)
 
-@[simp] theorem dualizedMass_cancel_rweq (h : Higgs) :
+noncomputable def dualizedMass_cancel_rweq (h : Higgs) :
     RwEq
       (Path.trans (Path.symm (M.dualizedMassPath h)) (M.dualizedMassPath h))
       (Path.refl

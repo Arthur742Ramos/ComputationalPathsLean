@@ -337,7 +337,7 @@ theorem hermitianStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Constructions -/
 
 /-- RwEq: metabolic forms vanish in GW. -/
-theorem rwEq_metabolic (R : Type u) (Ri : RingWithInvolution R)
+noncomputable def rwEq_metabolic (R : Type u) (Ri : RingWithInvolution R)
     (G : GWGroup R Ri) (M : MetabolicForm R Ri) :
     RwEq (G.metabolic_zero M) (G.metabolic_zero M) :=
   RwEq.refl _
@@ -356,7 +356,7 @@ def double_periodicity_path (R : Type u) (Ri : RingWithInvolution R)
   P.left_inv n x
 
 /-- RwEq for periodicity round-trip. -/
-theorem rwEq_periodicity (R : Type u) (Ri : RingWithInvolution R)
+noncomputable def rwEq_periodicity (R : Type u) (Ri : RingWithInvolution R)
     (P : Periodicity4 R Ri) (n : Int) (x : (P.gw n).carrier) :
     RwEq (P.left_inv n x) (P.left_inv n x) :=
   RwEq.refl _
@@ -377,7 +377,7 @@ def metabolic_sum_zero (R : Type u) (Ri : RingWithInvolution R)
       (G.metabolic_zero M₂))
 
 /-- RwEq for metabolic sum. -/
-theorem rwEq_metabolic_sum (R : Type u) (Ri : RingWithInvolution R)
+noncomputable def rwEq_metabolic_sum (R : Type u) (Ri : RingWithInvolution R)
     (G : GWGroup R Ri) (M₁ M₂ : MetabolicForm R Ri) :
     RwEq (metabolic_sum_zero R Ri G M₁ M₂)
          (metabolic_sum_zero R Ri G M₁ M₂) :=

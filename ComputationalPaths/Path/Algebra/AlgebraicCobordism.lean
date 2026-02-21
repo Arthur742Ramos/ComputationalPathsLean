@@ -409,7 +409,7 @@ def universality_naturality (U : Universality.{u})
   (U.classify A).naturality f n x
 
 /-- RwEq for Conner-Floyd round-trip. -/
-theorem rwEq_conner_floyd (CF : ConnerFloyd.{u})
+noncomputable def rwEq_conner_floyd (CF : ConnerFloyd.{u})
     (X : SmoothVar.{u}) (n : Int) (x : CF.baseChange X n) :
     RwEq (conner_floyd_roundtrip CF X n x) (CF.left_inv X n x) :=
   RwEq.refl _

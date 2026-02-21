@@ -35,11 +35,11 @@ namespace A1PathInfrastructure
 
 variable {X : Type u} {A1 : Type v} (M : A1PathInfrastructure X A1)
 
-@[simp] theorem retract_rweq (x : X) :
+noncomputable def retract_rweq (x : X) :
     RwEq (Path.trans (M.retractPath x) (Path.refl x)) (M.retractPath x) :=
   rweq_of_step (M.retractStep x)
 
-@[simp] theorem section_rweq (p : X × A1) :
+noncomputable def section_rweq (p : X × A1) :
     RwEq (Path.trans (Path.refl (M.sec (M.proj p))) (M.sectionPath p)) (M.sectionPath p) :=
   rweq_of_step (M.sectionStep p)
 
@@ -70,7 +70,7 @@ def idA1PathInfrastructure (X : Type u) :
     (sectionPath := fun _ => Path.refl _)
 
 /-- Canonical retract normalization exposed as rewrite equivalence. -/
-theorem id_retract_rweq (X : Type u) (x : X) :
+noncomputable def id_retract_rweq (X : Type u) (x : X) :
     RwEq
       (Path.trans ((idA1PathInfrastructure X).retractPath x) (Path.refl x))
       ((idA1PathInfrastructure X).retractPath x) :=

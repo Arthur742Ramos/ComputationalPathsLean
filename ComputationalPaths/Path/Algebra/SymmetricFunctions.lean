@@ -297,7 +297,7 @@ def hallLittlewood_to_schur (SR : SymRing) (sf : SchurFunction SR)
   HL.specialize_t_zero lam
 
 /-- Reflexive rewrite-equivalence for Hall-Littlewood pairing witnesses. -/
-theorem rwEq_hall_pairing (SR : SymRing) (sf : SchurFunction SR)
+noncomputable def rwEq_hall_pairing (SR : SymRing) (sf : SchurFunction SR)
     (HL : HallLittlewoodSystem SR sf) (lam mu : Partition) (t : Nat) :
     RwEq (HL.hall_pairing lam mu t) (HL.hall_pairing lam mu t) :=
   RwEq.refl _
@@ -334,7 +334,7 @@ def macdonald_zero_zero_to_schur (SR : SymRing) (sf : SchurFunction SR)
   Path.trans (M.specialize_q_zero lam 0) (HL.specialize_t_zero lam)
 
 /-- Reflexive rewrite-equivalence for Macdonald kernel witnesses. -/
-theorem rwEq_macdonald_kernel (SR : SymRing) (sf : SchurFunction SR)
+noncomputable def rwEq_macdonald_kernel (SR : SymRing) (sf : SchurFunction SR)
     (HL : HallLittlewoodSystem SR sf) (M : MacdonaldSystem SR sf HL)
     (lam mu : Partition) (q t : Nat) :
     RwEq (M.cauchy_kernel lam mu q t) (M.cauchy_kernel lam mu q t) :=
@@ -427,12 +427,12 @@ theorem symFuncStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Instances -/
 
 /-- RwEq: elementary e_0 path is stable. -/
-theorem rwEq_e_zero (SR : SymRing) (ef : ElementarySymFun SR) :
+noncomputable def rwEq_e_zero (SR : SymRing) (ef : ElementarySymFun SR) :
     RwEq ef.e_zero ef.e_zero :=
   RwEq.refl _
 
 /-- RwEq: LR symmetry is stable. -/
-theorem rwEq_lr_symm (SR : SymRing) (sf : SchurFunction SR) (lr : LRRule SR sf)
+noncomputable def rwEq_lr_symm (SR : SymRing) (sf : SchurFunction SR) (lr : LRRule SR sf)
     (lam mu nu : Partition) :
     RwEq (lr.lr_symmetry lam mu nu) (lr.lr_symmetry lam mu nu) :=
   RwEq.refl _
@@ -443,7 +443,7 @@ theorem symm_symm_sym (SR : SymRing) (a b : SR.R) (p : Path a b) :
   simp
 
 /-- RwEq: Cauchy identity is stable. -/
-theorem rwEq_cauchy (SR : SymRing) (hf : HomogeneousSymFun SR) :
+noncomputable def rwEq_cauchy (SR : SymRing) (hf : HomogeneousSymFun SR) :
     RwEq (hf.h_zero) (hf.h_zero) :=
   RwEq.refl _
 

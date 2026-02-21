@@ -247,12 +247,12 @@ theorem coxeterStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Instances -/
 
 /-- RwEq: involution path is stable. -/
-theorem rwEq_involution {M : CoxeterMatrix} (G : CoxeterGroup M) (s : M.S) :
+noncomputable def rwEq_involution {M : CoxeterMatrix} (G : CoxeterGroup M) (s : M.S) :
     RwEq (G.involution s) (G.involution s) :=
   RwEq.refl _
 
 /-- RwEq: length paths are stable. -/
-theorem rwEq_length_one {M : CoxeterMatrix} {G : CoxeterGroup M}
+noncomputable def rwEq_length_one {M : CoxeterMatrix} {G : CoxeterGroup M}
     (l : CoxeterLength M G) :
     RwEq l.length_one l.length_one :=
   RwEq.refl _
@@ -264,13 +264,13 @@ theorem symm_symm_coxeter {M : CoxeterMatrix} (G : CoxeterGroup M) (s : M.S) :
   simp
 
 /-- RwEq: Hecke quadratic relation is stable. -/
-theorem rwEq_hecke_quad {M : CoxeterMatrix} {G : CoxeterGroup M}
+noncomputable def rwEq_hecke_quad {M : CoxeterMatrix} {G : CoxeterGroup M}
     (ha : HeckeAlgebra M G) (s : M.S) :
     RwEq (ha.quadratic s) (ha.quadratic s) :=
   RwEq.refl _
 
 /-- RwEq: Coxeter matrix symmetry is stable. -/
-theorem rwEq_coxeter_symm (M : CoxeterMatrix) (s t : M.S) :
+noncomputable def rwEq_coxeter_symm (M : CoxeterMatrix) (s t : M.S) :
     RwEq (M.symm s t) (M.symm s t) :=
   RwEq.refl _
 

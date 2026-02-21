@@ -41,20 +41,20 @@ namespace TropicalCurvePathData
 
 variable {Vertex Edge : Type u} (C : TropicalCurvePathData Vertex Edge)
 
-@[simp] theorem balancing_rweq (v : Vertex) :
+noncomputable def balancing_rweq (v : Vertex) :
     RwEq
       (Path.trans (C.balancingPath v)
         (Path.refl (C.balancingIndex v + C.balancingIndex v)))
       (C.balancingPath v) :=
   rweq_of_step (C.balancingStep v)
 
-@[simp] theorem cycle_rweq (e : Edge) :
+noncomputable def cycle_rweq (e : Edge) :
     RwEq
       (Path.trans (Path.refl (C.source e)) (C.cyclePath e))
       (C.cyclePath e) :=
   rweq_of_step (C.cycleStep e)
 
-@[simp] theorem cycle_cancel_rweq (e : Edge) :
+noncomputable def cycle_cancel_rweq (e : Edge) :
     RwEq
       (Path.trans (Path.symm (C.cyclePath e)) (C.cyclePath e))
       (Path.refl (C.target e)) :=

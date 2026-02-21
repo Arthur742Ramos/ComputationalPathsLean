@@ -23,7 +23,7 @@ inductive KacMoodyStep : {A : Type u} → {a b : A} → Path a b → Path a b �
       KacMoodyStep (Path.trans (Path.refl a) p) p
 
 /-- Kac-Moody rewrite tags induce rewrite equivalence. -/
-theorem KacMoodyStep.to_rweq {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def KacMoodyStep.to_rweq {A : Type u} {a b : A} {p q : Path a b}
     (h : KacMoodyStep p q) : RwEq p q := by
   cases h with
   | contract_right =>
@@ -75,13 +75,13 @@ namespace KacMoodyAlgebraPathData
 
 variable {L : Type u} {I : Type v} (K : KacMoodyAlgebraPathData L I)
 
-@[simp] theorem simpleReflection_rweq (i : I) :
+noncomputable def simpleReflection_rweq (i : I) :
     RwEq
       (Path.trans (K.simpleReflectionPath i) (Path.refl (K.bracket (K.coroot i) (K.simpleRoot i))))
       (K.simpleReflectionPath i) :=
   rweq_of_step (K.simpleReflectionStep i)
 
-@[simp] theorem serre_rweq (i j : I) :
+noncomputable def serre_rweq (i j : I) :
     RwEq
       (Path.trans
         (Path.refl (K.adPower 2 (K.simpleRoot i) (K.simpleRoot j)))
@@ -89,13 +89,13 @@ variable {L : Type u} {I : Type v} (K : KacMoodyAlgebraPathData L I)
       (K.serrePath i j) :=
   rweq_of_step (K.serreStep i j)
 
-@[simp] theorem simpleReflection_cancel_rweq (i : I) :
+noncomputable def simpleReflection_cancel_rweq (i : I) :
     RwEq
       (Path.trans (Path.symm (K.simpleReflectionPath i)) (K.simpleReflectionPath i))
       (Path.refl (K.bracket (K.coroot i) (K.simpleRoot i))) :=
   rweq_cmpA_inv_left (K.simpleReflectionPath i)
 
-@[simp] theorem serre_cancel_rweq (i j : I) :
+noncomputable def serre_cancel_rweq (i j : I) :
     RwEq
       (Path.trans (K.serrePath i j) (Path.symm (K.serrePath i j)))
       (Path.refl (K.adPower 2 (K.simpleRoot i) (K.simpleRoot j))) :=

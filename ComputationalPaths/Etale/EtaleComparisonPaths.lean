@@ -69,7 +69,7 @@ def comparison_step (n : Nat) (U : Obj) :
       (C.comparisonPath n U) :=
   Path.Step.trans_refl_right (C.comparisonPath n U)
 
-@[simp] theorem comparison_rweq (n : Nat) (U : Obj) :
+noncomputable def comparison_rweq (n : Nat) (U : Obj) :
     RwEq
       (Path.trans (C.comparisonPath n U)
         (Path.refl (C.singularCohomology n U)))
@@ -84,14 +84,14 @@ def comparisonAlong_step {U V : Obj} (p : Path U V) (n : Nat) :
       (C.comparisonAlong p n) :=
   Path.Step.trans_refl_right (C.comparisonAlong p n)
 
-@[simp] theorem comparisonAlong_rweq {U V : Obj} (p : Path U V) (n : Nat) :
+noncomputable def comparisonAlong_rweq {U V : Obj} (p : Path U V) (n : Nat) :
     RwEq
       (Path.trans (C.comparisonAlong p n)
         (Path.refl (C.singularCohomology n V)))
       (C.comparisonAlong p n) :=
   rweq_of_step (C.comparisonAlong_step p n)
 
-@[simp] theorem comparisonAlong_cancel_rweq {U V : Obj} (p : Path U V) (n : Nat) :
+noncomputable def comparisonAlong_cancel_rweq {U V : Obj} (p : Path U V) (n : Nat) :
     RwEq
       (Path.trans (Path.symm (C.comparisonAlong p n)) (C.comparisonAlong p n))
       (Path.refl (C.singularCohomology n V)) :=
@@ -105,7 +105,7 @@ def comparisonNaturality_step {U V : Obj} (p : Path U V) (n : Nat) :
       (C.comparisonNaturalityAlong p n) :=
   Path.Step.trans_refl_right (C.comparisonNaturalityAlong p n)
 
-@[simp] theorem comparisonNaturality_rweq {U V : Obj} (p : Path U V) (n : Nat) :
+noncomputable def comparisonNaturality_rweq {U V : Obj} (p : Path U V) (n : Nat) :
     RwEq
       (Path.trans (C.comparisonNaturalityAlong p n)
         (Path.refl (Path.trans (C.etaleMap p n) (C.comparisonPath n V))))

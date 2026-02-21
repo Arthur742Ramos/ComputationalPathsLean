@@ -38,19 +38,19 @@ namespace DerivedStackPaths
 
 variable {Obj : Type u} (D : DerivedStackPaths Obj)
 
-@[simp] theorem descent_rweq {X Y : Obj} (p : Path X Y) (s : D.prestack Y) :
+noncomputable def descent_rweq {X Y : Obj} (p : Path X Y) (s : D.prestack Y) :
     RwEq
       (Path.trans (D.descentPath p s) (Path.refl (D.pullback p s)))
       (D.descentPath p s) :=
   rweq_of_step (D.descentStep p s)
 
-@[simp] theorem atlas_glue_rweq (X : Obj) (a : D.atlas X) :
+noncomputable def atlas_glue_rweq (X : Obj) (a : D.atlas X) :
     RwEq
       (Path.trans (Path.refl a) (D.atlasGluePath X a))
       (D.atlasGluePath X a) :=
   rweq_of_step (D.atlasGlueStep X a)
 
-@[simp] theorem descent_cancel_rweq {X Y : Obj}
+noncomputable def descent_cancel_rweq {X Y : Obj}
     (p : Path X Y) (s : D.prestack Y) :
     RwEq
       (Path.trans (D.descentPath p s) (Path.symm (D.descentPath p s)))

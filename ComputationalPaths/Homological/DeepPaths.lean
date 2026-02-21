@@ -44,21 +44,21 @@ def double_shift_roundtrip (x : A) :
     (Tr.invShiftPath x)
 
 /-- Shift roundtrip coherence. -/
-theorem shift_roundtrip_rweq (x : A) :
+noncomputable def shift_roundtrip_rweq (x : A) :
     RwEq
       (Path.trans (Tr.shiftInvPath x) (Path.refl _))
       (Tr.shiftInvPath x) :=
   rweq_of_hom_step (HomStep.right_unit _)
 
 /-- Inverse shift roundtrip coherence. -/
-theorem inv_shift_roundtrip_rweq (x : A) :
+noncomputable def inv_shift_roundtrip_rweq (x : A) :
     RwEq
       (Path.trans (Tr.invShiftPath x) (Path.refl _))
       (Tr.invShiftPath x) :=
   rweq_of_hom_step (HomStep.right_unit _)
 
 /-- Shift-unshift cancellation via RwEq. -/
-theorem shift_cancel_rweq (x : A) :
+noncomputable def shift_cancel_rweq (x : A) :
     RwEq
       (Path.trans (Tr.shiftInvPath x) (Path.symm (Tr.shiftInvPath x)))
       (Path.refl _) :=
@@ -133,7 +133,7 @@ def serre_bottom (f g : A) :
   S.serrePath 0 f g
 
 /-- Serre duality coherence. -/
-theorem serre_rweq (i : Nat) (f g : A) :
+noncomputable def serre_rweq (i : Nat) (f g : A) :
     RwEq
       (Path.trans (S.serrePath i f g) (Path.refl _))
       (S.serrePath i f g) :=
@@ -185,7 +185,7 @@ def tilting_inv_roundtrip (x : A) :
   T.equivRoundtrip2 x
 
 /-- Tilting roundtrip coherence. -/
-theorem tilting_roundtrip_rweq (x : A) :
+noncomputable def tilting_roundtrip_rweq (x : A) :
     RwEq
       (Path.trans (T.equivRoundtrip1 x) (Path.refl _))
       (T.equivRoundtrip1 x) :=
@@ -199,7 +199,7 @@ def tilting_double_roundtrip (x : A) :
     (T.equivRoundtrip1 x)
 
 /-- Tilting cancellation via RwEq. -/
-theorem tilting_cancel_rweq (x : A) :
+noncomputable def tilting_cancel_rweq (x : A) :
     RwEq
       (Path.trans (T.equivRoundtrip1 x) (Path.symm (T.equivRoundtrip1 x)))
       (Path.refl _) :=
@@ -244,7 +244,7 @@ def k0_zero (x : A) : Path (K.add x K.zero) x :=
   K.addZeroPath x
 
 /-- K_0 assoc coherence. -/
-theorem k0_assoc_rweq (x y z : A) :
+noncomputable def k0_assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (K.addAssocPath x y z) (Path.refl _))
       (K.addAssocPath x y z) :=
@@ -290,7 +290,7 @@ def cup_comm (p q : Nat) (x y : A) :
   H.cupCommPath p q x y
 
 /-- Cup assoc coherence. -/
-theorem cup_assoc_rweq (p q r : Nat) (x y z : A) :
+noncomputable def cup_assoc_rweq (p q r : Nat) (x y z : A) :
     RwEq
       (Path.trans (H.cupAssocPath p q r x y z) (Path.refl _))
       (H.cupAssocPath p q r x y z) :=
@@ -335,14 +335,14 @@ def derived_tensor_unit_right (n : Nat) (x : A) :
   Path.trans (D.commPath n x D.unitObj) (D.unitPath n x)
 
 /-- Assoc coherence. -/
-theorem derived_tensor_assoc_rweq (n : Nat) (x y z : A) :
+noncomputable def derived_tensor_assoc_rweq (n : Nat) (x y z : A) :
     RwEq
       (Path.trans (D.assocPath n x y z) (Path.refl _))
       (D.assocPath n x y z) :=
   rweq_of_hom_step (HomStep.right_unit _)
 
 /-- Comm + unit composes correctly. -/
-theorem derived_tensor_unit_right_rweq (n : Nat) (x : A) :
+noncomputable def derived_tensor_unit_right_rweq (n : Nat) (x : A) :
     RwEq
       (Path.trans (D.derived_tensor_unit_right n x) (Path.refl _))
       (D.derived_tensor_unit_right n x) :=
@@ -368,7 +368,7 @@ def tensor_hom_adj (n : Nat) (x y z : A) (tensorL : Nat → A → A → A) :
   R.adjPath n x y z tensorL
 
 /-- Adjunction coherence. -/
-theorem adj_rweq (n : Nat) (x y z : A) (tensorL : Nat → A → A → A) :
+noncomputable def adj_rweq (n : Nat) (x y z : A) (tensorL : Nat → A → A → A) :
     RwEq
       (Path.trans (R.adjPath n x y z tensorL) (Path.refl _))
       (R.adjPath n x y z tensorL) :=
@@ -399,14 +399,14 @@ def triple_duality (x : A) :
   Path.congrArg D.dualFunctor (D.involutionPath x)
 
 /-- Duality involution coherence. -/
-theorem duality_rweq (x : A) :
+noncomputable def duality_rweq (x : A) :
     RwEq
       (Path.trans (D.involutionPath x) (Path.refl _))
       (D.involutionPath x) :=
   rweq_of_hom_step (HomStep.right_unit _)
 
 /-- Duality cancellation. -/
-theorem duality_cancel_rweq (x : A) :
+noncomputable def duality_cancel_rweq (x : A) :
     RwEq
       (Path.trans (D.involutionPath x) (Path.symm (D.involutionPath x)))
       (Path.refl _) :=
@@ -432,7 +432,7 @@ def euler_additive (a b c : A) :
   E.eulerSESPath a b c
 
 /-- Euler additivity coherence. -/
-theorem euler_rweq (a b c : A) :
+noncomputable def euler_rweq (a b c : A) :
     RwEq
       (Path.trans (E.eulerSESPath a b c) (Path.refl _))
       (E.eulerSESPath a b c) :=
@@ -468,14 +468,14 @@ def homotopy_id_comp (x : A) : Path (H.comp (H.idMor x) x) x :=
   H.idCompPath x
 
 /-- Associativity coherence. -/
-theorem homotopy_assoc_rweq (x y z : A) :
+noncomputable def homotopy_assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (H.compAssocPath x y z) (Path.refl _))
       (H.compAssocPath x y z) :=
   rweq_of_hom_step (HomStep.right_unit _)
 
 /-- Right id coherence. -/
-theorem homotopy_comp_id_rweq (x : A) :
+noncomputable def homotopy_comp_id_rweq (x : A) :
     RwEq
       (Path.trans (H.compIdPath x) (Path.refl _))
       (H.compIdPath x) :=
@@ -509,7 +509,7 @@ def perverse_tau_idemp (n : Nat) (x : A) :
   P.pTauIdempPath n x
 
 /-- Idempotency coherence. -/
-theorem perverse_idemp_rweq (n : Nat) (x : A) :
+noncomputable def perverse_idemp_rweq (n : Nat) (x : A) :
     RwEq
       (Path.trans (P.pTauIdempPath n x) (Path.refl _))
       (P.pTauIdempPath n x) :=
@@ -554,7 +554,7 @@ def graded_iso (p : Nat) : Path (F.srcFilt.graded p) (F.tgtFilt.graded p) :=
   F.gradedIsoPath p
 
 /-- Graded iso coherence. -/
-theorem graded_iso_rweq (p : Nat) :
+noncomputable def graded_iso_rweq (p : Nat) :
     RwEq
       (Path.trans (F.gradedIsoPath p) (Path.refl _))
       (F.gradedIsoPath p) :=

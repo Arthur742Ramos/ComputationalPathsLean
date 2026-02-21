@@ -75,7 +75,7 @@ def comparison_step (n : Nat) (x : X) :
       (C.comparisonPath n x) :=
   Path.Step.trans_refl_right (C.comparisonPath n x)
 
-@[simp] theorem comparison_rweq (n : Nat) (x : X) :
+noncomputable def comparison_rweq (n : Nat) (x : X) :
     RwEq
       (Path.trans (C.comparisonPath n x) (Path.refl (C.deRhamWittClass n x)))
       (C.comparisonPath n x) :=
@@ -88,13 +88,13 @@ def comparisonAlong_step {x y : X} (p : Path x y) (n : Nat) :
       (C.comparisonAlong p n) :=
   Path.Step.trans_refl_right (C.comparisonAlong p n)
 
-@[simp] theorem comparisonAlong_rweq {x y : X} (p : Path x y) (n : Nat) :
+noncomputable def comparisonAlong_rweq {x y : X} (p : Path x y) (n : Nat) :
     RwEq
       (Path.trans (C.comparisonAlong p n) (Path.refl (C.deRhamWittClass n y)))
       (C.comparisonAlong p n) :=
   rweq_of_step (C.comparisonAlong_step p n)
 
-@[simp] theorem comparisonAlong_cancel_rweq {x y : X} (p : Path x y) (n : Nat) :
+noncomputable def comparisonAlong_cancel_rweq {x y : X} (p : Path x y) (n : Nat) :
     RwEq
       (Path.trans (Path.symm (C.comparisonAlong p n)) (C.comparisonAlong p n))
       (Path.refl (C.deRhamWittClass n y)) :=
@@ -108,7 +108,7 @@ def comparisonNaturality_step {x y : X} (p : Path x y) (n : Nat) :
       (C.comparisonNaturalityAlong p n) :=
   Path.Step.trans_refl_right (C.comparisonNaturalityAlong p n)
 
-@[simp] theorem comparisonNaturality_rweq {x y : X} (p : Path x y) (n : Nat) :
+noncomputable def comparisonNaturality_rweq {x y : X} (p : Path x y) (n : Nat) :
     RwEq
       (Path.trans (C.comparisonNaturalityAlong p n)
         (Path.refl (Path.trans (C.crystallineMap p n) (C.comparisonPath n y))))
@@ -123,7 +123,7 @@ def frobeniusComparison_step (n : Nat) (x : X) :
       (C.frobeniusComparison n x) :=
   Path.Step.trans_refl_right (C.frobeniusComparison n x)
 
-@[simp] theorem frobeniusComparison_rweq (n : Nat) (x : X) :
+noncomputable def frobeniusComparison_rweq (n : Nat) (x : X) :
     RwEq
       (Path.trans (C.frobeniusComparison n x)
         (Path.refl (W.frobenius 0 (C.deRhamWittClass n x))))

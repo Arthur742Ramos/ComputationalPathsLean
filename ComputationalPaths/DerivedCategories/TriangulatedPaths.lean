@@ -49,7 +49,7 @@ def TriangulatedStep.toStep {Obj : Type u} {a b : Obj} {p q : Path a b}
   | .rotation_symm_trans p q => Path.Step.symm_trans_congr p q
 
 /-- Lift a triangulated step to rewrite equivalence. -/
-theorem rweq_of_triangulated_step {Obj : Type u} {a b : Obj}
+noncomputable def rweq_of_triangulated_step {Obj : Type u} {a b : Obj}
     {p q : Path a b} (s : TriangulatedStep p q) : RwEq p q :=
   rweq_of_step (TriangulatedStep.toStep s)
 
@@ -142,46 +142,46 @@ def symm_trans_step (_T : TriangulatedPaths Obj) {X Y Z : Obj}
       (Path.trans (Path.symm q) (Path.symm p)) :=
   TriangulatedStep.toStep (TriangulatedStep.rotation_symm_trans p q)
 
-@[simp] theorem shift_rweq {X Y : Obj} (p : Path X Y) :
+noncomputable def shift_rweq {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans (T.shiftPath p) (Path.refl (T.shiftObj Y)))
       (T.shiftPath p) :=
   rweq_of_step (T.shift_step p)
 
-@[simp] theorem connect_rweq {X Y Z : Obj}
+noncomputable def connect_rweq {X Y Z : Obj}
     (h : T.distinguished X Y Z) (f : Path X Y) (g : Path Y Z) :
     RwEq
       (Path.trans (Path.refl Z) (T.connect h f g))
       (T.connect h f g) :=
   rweq_of_step (T.connect_step h f g)
 
-@[simp] theorem rotation_rweq {X Y Z : Obj}
+noncomputable def rotation_rweq {X Y Z : Obj}
     (h : T.distinguished X Y Z) (f : Path X Y) (g : Path Y Z) :
     RwEq
       (Path.trans (T.rotationPath h f g) (Path.refl (T.shiftObj X)))
       (T.rotationPath h f g) :=
   rweq_of_step (T.rotation_step h f g)
 
-@[simp] theorem cone_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
+noncomputable def cone_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans (Path.symm p) p)
       (Path.refl Y) :=
   rweq_of_step (T.cone_step p)
 
-@[simp] theorem cone_right_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
+noncomputable def cone_right_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans p (Path.symm p))
       (Path.refl X) :=
   rweq_of_step (T.cone_right_step p)
 
-@[simp] theorem assoc_rweq (T : TriangulatedPaths Obj) {W X Y Z : Obj}
+noncomputable def assoc_rweq (T : TriangulatedPaths Obj) {W X Y Z : Obj}
     (p : Path W X) (q : Path X Y) (r : Path Y Z) :
     RwEq
       (Path.trans (Path.trans p q) r)
       (Path.trans p (Path.trans q r)) :=
   rweq_of_step (T.assoc_step p q r)
 
-@[simp] theorem symm_trans_rweq (T : TriangulatedPaths Obj) {X Y Z : Obj}
+noncomputable def symm_trans_rweq (T : TriangulatedPaths Obj) {X Y Z : Obj}
     (p : Path X Y) (q : Path Y Z) :
     RwEq
       (Path.symm (Path.trans p q))
@@ -189,7 +189,7 @@ def symm_trans_step (_T : TriangulatedPaths Obj) {X Y Z : Obj}
   rweq_of_step (T.symm_trans_step p q)
 
 /-- Coherence: connect-unit normalizations are stable under right whiskering by `refl`. -/
-theorem connect_unit_assoc_rweq {X Y Z : Obj}
+noncomputable def connect_unit_assoc_rweq {X Y Z : Obj}
     (h : T.distinguished X Y Z) (f : Path X Y) (g : Path Y Z) :
     RwEq
       (Path.trans
@@ -219,7 +219,7 @@ theorem connect_unit_assoc_rweq {X Y Z : Obj}
   exact rweq_trans h₁ (rweq_trans h₂ h₃)
 
 /-- Coherence: cone cancellation remains stable after appending a right unit. -/
-theorem cone_unit_assoc_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
+noncomputable def cone_unit_assoc_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
     RwEq
       (Path.trans (Path.trans (Path.symm p) p) (Path.refl Y))
       (Path.refl Y) := by

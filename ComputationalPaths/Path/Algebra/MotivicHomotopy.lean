@@ -261,12 +261,12 @@ structure MotivicCupProduct (X : SmoothScheme.{u}) where
 /-! ## RwEq Examples -/
 
 /-- RwEq example: A¹-homotopy reflexivity. -/
-theorem rwEq_a1_refl (X : SmoothScheme.{u}) :
+noncomputable def rwEq_a1_refl (X : SmoothScheme.{u}) :
     @RwEq (SmoothScheme.{u}) X X (Path.refl X) (Path.refl X) :=
   RwEq.refl _
 
 /-- RwEq: Path.trans with Path.symm. -/
-theorem rwEq_motivic_trans_symm {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def rwEq_motivic_trans_symm {A : Type u} {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.symm p)) (Path.trans p (Path.symm p)) :=
   RwEq.refl _
 

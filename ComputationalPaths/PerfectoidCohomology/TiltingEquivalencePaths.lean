@@ -55,15 +55,15 @@ variable {A : AlmostVanishingPathData R H}
 variable {Atilt : AlmostVanishingPathData R Htilt}
 variable (T : TiltingEquivalencePathData A Atilt)
 
-@[simp] theorem toFrom_rweq (n : Int) (x : Htilt n) :
+noncomputable def toFrom_rweq (n : Int) (x : Htilt n) :
     RwEq (Path.trans (T.toFromPath n x) (Path.refl x)) (T.toFromPath n x) :=
   rweq_of_step (T.toFromStep n x)
 
-@[simp] theorem fromTo_rweq (n : Int) (x : H n) :
+noncomputable def fromTo_rweq (n : Int) (x : H n) :
     RwEq (Path.trans (T.fromToPath n x) (Path.refl x)) (T.fromToPath n x) :=
   rweq_of_step (T.fromToStep n x)
 
-@[simp] theorem mapDifferential_rweq (n : Int) (x : H n) :
+noncomputable def mapDifferential_rweq (n : Int) (x : H n) :
     RwEq
       (Path.trans
         (T.mapDifferentialPath n x)
@@ -71,7 +71,7 @@ variable (T : TiltingEquivalencePathData A Atilt)
       (T.mapDifferentialPath n x) :=
   rweq_of_step (T.mapDifferentialStep n x)
 
-@[simp] theorem fromTo_cancel_right_rweq (n : Int) (x : H n) :
+noncomputable def fromTo_cancel_right_rweq (n : Int) (x : H n) :
     RwEq
       (Path.trans (T.fromToPath n x) (Path.symm (T.fromToPath n x)))
       (Path.refl (T.fromTilt n (T.toTilt n x))) :=

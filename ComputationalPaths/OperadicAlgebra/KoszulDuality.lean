@@ -41,7 +41,7 @@ namespace EnKoszulDualityPathData
 variable {n : Nat} {A : Type u} {C : Type v}
 variable (K : EnKoszulDualityPathData n A C)
 
-@[simp] theorem bar_action_rweq
+noncomputable def bar_action_rweq
     {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     RwEq
       (Path.trans (K.barActionPath c xs)
@@ -54,7 +54,7 @@ def dualRoundTrip (x : A) :
     Path (K.duality.cobar (K.duality.bar x)) (K.duality.cobar (K.duality.bar x)) :=
   Path.trans (K.duality.unitPath x) (Path.symm (K.duality.unitPath x))
 
-@[simp] theorem dual_roundtrip_rweq (x : A) :
+noncomputable def dual_roundtrip_rweq (x : A) :
     RwEq (K.dualRoundTrip x) (Path.refl (K.duality.cobar (K.duality.bar x))) := by
   unfold dualRoundTrip
   exact rweq_cmpA_inv_right (K.duality.unitPath x)

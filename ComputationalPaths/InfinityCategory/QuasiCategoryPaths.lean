@@ -36,15 +36,15 @@ namespace QuasiPathComposition
 
 variable {Obj : Type u} (Q : QuasiPathComposition Obj)
 
-@[simp] theorem left_id_rweq {x y : Obj} (p : Path x y) :
+noncomputable def left_id_rweq {x y : Obj} (p : Path x y) :
     RwEq (Q.compose (Path.refl x) p) p :=
   rweq_of_step (Q.left_id_step p)
 
-@[simp] theorem right_id_rweq {x y : Obj} (p : Path x y) :
+noncomputable def right_id_rweq {x y : Obj} (p : Path x y) :
     RwEq (Q.compose p (Path.refl y)) p :=
   rweq_of_step (Q.right_id_step p)
 
-@[simp] theorem assoc_rweq {w x y z : Obj}
+noncomputable def assoc_rweq {w x y z : Obj}
     (p : Path w x) (q : Path x y) (r : Path y z) :
     RwEq (Q.compose (Q.compose p q) r) (Q.compose p (Q.compose q r)) :=
   rweq_of_step (Q.assoc_step p q r)
@@ -67,7 +67,7 @@ abbrev composeObjPaths (C : Homotopy.QuasiCategory)
     {x y z : C.obj} (p : Path x y) (q : Path y z) : Path x z :=
   (onObjects C).compose p q
 
-@[simp] theorem composeObjPaths_assoc (C : Homotopy.QuasiCategory)
+noncomputable def composeObjPaths_assoc (C : Homotopy.QuasiCategory)
     {w x y z : C.obj} (p : Path w x) (q : Path x y) (r : Path y z) :
     RwEq (composeObjPaths C (composeObjPaths C p q) r)
       (composeObjPaths C p (composeObjPaths C q r)) :=

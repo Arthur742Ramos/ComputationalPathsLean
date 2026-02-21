@@ -127,14 +127,14 @@ theorem pentagon_right_path {a b c d e : A}
   · exact Step.trans_congr_right p (Step.trans_assoc q r s)
 
 /-- Pentagon coherence: left and right paths are RwEq-equivalent. -/
-theorem pentagon_coherence {a b c d e : A}
+noncomputable def pentagon_coherence {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans (trans p q) r) s)
          (trans p (trans q (trans r s))) :=
   rweq_of_rw (pentagon_left_path p q r s)
 
 /-- Pentagon coherence via the existing library theorem. -/
-theorem pentagon_coherence' {a b c d e : A}
+noncomputable def pentagon_coherence' {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans (trans p q) r) s)
          (trans p (trans q (trans r s))) :=
@@ -188,14 +188,14 @@ theorem triangle_left {a b c : A}
   rw_of_step (Step.trans_congr_left q (Step.trans_refl_right p))
 
 /-- Triangle coherence: both paths are RwEq-equivalent. -/
-theorem triangle_coherence {a b c : A}
+noncomputable def triangle_coherence {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq (trans (trans p (refl b)) q)
          (trans p q) :=
   rweq_of_rw (triangle_top_right p q)
 
 /-- Triangle coherence via the existing library theorem. -/
-theorem triangle_coherence' {a b c : A}
+noncomputable def triangle_coherence' {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq (trans (trans p (refl b)) q)
          (trans p q) :=
@@ -205,7 +205,7 @@ theorem triangle_coherence' {a b c : A}
 
 /-- Two parallel associator paths agree: both sides of the pentagon
     reach the same normal form `p ⬝ (q ⬝ (r ⬝ s))`. -/
-theorem coherence_parallel_rweq {a b c d e : A}
+noncomputable def coherence_parallel_rweq {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans (trans p q) r) s)
          (trans p (trans q (trans r s))) :=
@@ -213,7 +213,7 @@ theorem coherence_parallel_rweq {a b c d e : A}
 
 /-- Any two ways of fully right-associating a 5-fold composition agree.
     We show `((pq)r)(st) → p(q(r(st)))`. -/
-theorem coherence_5fold {a b c d e f : A}
+noncomputable def coherence_5fold {a b c d e f : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e)
     (t : Path e f) :
     RwEq (trans (trans (trans p q) r) (trans s t))
@@ -228,7 +228,7 @@ an RwEq between two RwEq proofs' representative paths. -/
 
 /-- The two sides of the pentagon identity (left path and right path)
     are equal as 1-cells. This is the content of Mac Lane coherence. -/
-theorem coherence_3cell_pentagon {a b c d e : A}
+noncomputable def coherence_3cell_pentagon {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (trans (trans (trans p q) r) s)
          (trans p (trans q (trans r s))) :=
@@ -237,14 +237,14 @@ theorem coherence_3cell_pentagon {a b c d e : A}
 /-- The triangle and pentagon together determine all coherence:
     any two bracketings of a path composition are RwEq-equivalent.
     This is the computational-paths formulation of Mac Lane's coherence theorem. -/
-theorem macLane_coherence_any_bracketing {a b c d : A}
+noncomputable def macLane_coherence_any_bracketing {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (trans (trans p q) r) (trans p (trans q r)) :=
   rweq_of_step (Step.trans_assoc p q r)
 
 /-- Extended Mac Lane coherence: all bracketings of a 4-fold composition
     are RwEq-equivalent. Shown by reduction to the fully right-associated form. -/
-theorem macLane_coherence_4fold_all {a b c d e : A}
+noncomputable def macLane_coherence_4fold_all {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     -- bracketing 1: ((pq)r)s
     -- bracketing 2: (p(qr))s
