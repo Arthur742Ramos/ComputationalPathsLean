@@ -78,15 +78,17 @@ end ThreeCell
 
 /-- Identity 2-cell on a computational path. -/
 @[simp] def id (p : Path a b) : TwoCell (A := A) (a := a) (b := b) p p :=
-  RwEq.refl _
+  ⟨RwEq.refl _⟩
 
 /-- Vertical composition of 2-cells (categorical composition inside each
 `Hom(a,b)` category). -/
 @[simp] def comp {p q r : Path a b}
     (η : TwoCell (A := A) (a := a) (b := b) p q)
     (θ : TwoCell (A := A) (a := a) (b := b) q r) :
-    TwoCell (A := A) (a := a) (b := b) p r :=
-  RwEq.trans η θ
+    TwoCell (A := A) (a := a) (b := b) p r := by
+  rcases η with ⟨η'⟩
+  rcases θ with ⟨θ'⟩
+  exact ⟨RwEq.trans η' θ'⟩
 
 /-- Vertical composition can be iterated associatively using `RwEq.trans`. -/
 @[simp] theorem vcomp_assoc {p q r s : Path a b}
@@ -94,7 +96,10 @@ end ThreeCell
     (η₂ : TwoCell (A := A) (a := a) (b := b) q r)
     (η₃ : TwoCell (A := A) (a := a) (b := b) r s) :
     TwoCell (A := A) (a := a) (b := b) p s := by
-  exact rweq_trans η₁ (rweq_trans η₂ η₃)
+  rcases η₁ with ⟨η₁'⟩
+  rcases η₂ with ⟨η₂'⟩
+  rcases η₃ with ⟨η₃'⟩
+  exact ⟨rweq_trans η₁' (rweq_trans η₂' η₃')⟩
 
 /-- Vertical composition is associative as an equality of 2-cells. -/
 @[simp] theorem vcomp_assoc_eq {p q r s : Path a b}
@@ -130,7 +135,10 @@ end ThreeCell
     (η₂ : TwoCell (A := A) (a := a) (b := b) q r)
     (η₃ : TwoCell (A := A) (a := a) (b := b) r s) :
     TwoCell (A := A) (a := a) (b := b) p s := by
-  exact rweq_trans (rweq_trans η₁ η₂) η₃
+  rcases η₁ with ⟨η₁'⟩
+  rcases η₂ with ⟨η₂'⟩
+  rcases η₃ with ⟨η₃'⟩
+  exact ⟨rweq_trans (rweq_trans η₁' η₂') η₃'⟩
 
 /-- Step-based vertical functoriality with right-associated composition. -/
 @[simp] theorem vcomp_functorial_step_right {p q r s : Path a b}
@@ -138,7 +146,10 @@ end ThreeCell
     (η₂ : TwoCell (A := A) (a := a) (b := b) q r)
     (η₃ : TwoCell (A := A) (a := a) (b := b) r s) :
     TwoCell (A := A) (a := a) (b := b) p s := by
-  exact rweq_trans η₁ (rweq_trans η₂ η₃)
+  rcases η₁ with ⟨η₁'⟩
+  rcases η₂ with ⟨η₂'⟩
+  rcases η₃ with ⟨η₃'⟩
+  exact ⟨rweq_trans η₁' (rweq_trans η₂' η₃')⟩
 
 /-- Vertical composition is functorial in the first variable. -/
 @[simp] theorem vcomp_functorial_left_eq {p q r : Path a b}
@@ -161,38 +172,44 @@ end ThreeCell
 /-- Left whiskering: precompose a 2-cell with a fixed 1-cell. -/
 @[simp] def whiskerLeft (f : Path a b) {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
-    TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f h) :=
-  rweq_trans_congr_right f η
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f h) := by
+  rcases η with ⟨η'⟩
+  exact ⟨rweq_trans_congr_right f η'⟩
 
 /-- Left whiskering distributes over vertical composition. -/
 @[simp] theorem whiskerLeft_comp (f : Path a b) {g₀ g₁ g₂ : Path b c}
     (η₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
     (η₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f g₀) (Path.trans f g₂) := by
-  exact rweq_trans (rweq_trans_congr_right f η₁) (rweq_trans_congr_right f η₂)
+  rcases η₁ with ⟨η₁'⟩
+  rcases η₂ with ⟨η₂'⟩
+  exact ⟨rweq_trans (rweq_trans_congr_right f η₁') (rweq_trans_congr_right f η₂')⟩
 
 /-- Right whiskering: postcompose a 2-cell with a fixed 1-cell. -/
 @[simp] def whiskerRight {f g : Path a b} (h : Path b c)
     (η : TwoCell (A := A) (a := a) (b := b) f g) :
-    TwoCell (A := A) (a := a) (b := c) (Path.trans f h) (Path.trans g h) :=
-  rweq_trans_congr_left h η
+    TwoCell (A := A) (a := a) (b := c) (Path.trans f h) (Path.trans g h) := by
+  rcases η with ⟨η'⟩
+  exact ⟨rweq_trans_congr_left h η'⟩
 
 /-- Right whiskering distributes over vertical composition. -/
 @[simp] theorem whiskerRight_comp {f₀ f₁ f₂ : Path a b} (h : Path b c)
     (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
     (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f₀ h) (Path.trans f₂ h) := by
-  exact rweq_trans (rweq_trans_congr_left h η₁) (rweq_trans_congr_left h η₂)
+  rcases η₁ with ⟨η₁'⟩
+  rcases η₂ with ⟨η₂'⟩
+  exact ⟨rweq_trans (rweq_trans_congr_left h η₁') (rweq_trans_congr_left h η₂')⟩
 
 /-- Whiskering preserves identity 2-cells on the left. -/
 @[simp] theorem id2_whiskerLeft (f : Path a b) (g : Path b c) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f g) := by
-  exact rweq_trans_congr_right f (RwEq.refl g)
+  exact ⟨rweq_trans_congr_right f (RwEq.refl g)⟩
 
 /-- Whiskering preserves identity 2-cells on the right. -/
 @[simp] theorem id2_whiskerRight (f : Path a b) (g : Path b c) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f g) := by
-  exact rweq_trans_congr_left g (RwEq.refl f)
+  exact ⟨rweq_trans_congr_left g (RwEq.refl f)⟩
 
 /-- Horizontal composition of 2-cells.  This is the operation denoted
 `∘ₕ` (or `circ_h`) in many texts and is defined by first whiskering on the
@@ -215,9 +232,13 @@ composition on both sides. -/
     (θ₁ : TwoCell (A := A) (a := b) (b := c) g₀ g₁)
     (θ₂ : TwoCell (A := A) (a := b) (b := c) g₁ g₂) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f₀ g₀) (Path.trans f₂ g₂) := by
-  apply rweq_trans
-  · exact rweq_trans_congr_left (q := g₀) (rweq_trans η₁ η₂)
-  · exact rweq_trans_congr_right f₂ (rweq_trans θ₁ θ₂)
+  rcases η₁ with ⟨η₁'⟩
+  rcases η₂ with ⟨η₂'⟩
+  rcases θ₁ with ⟨θ₁'⟩
+  rcases θ₂ with ⟨θ₂'⟩
+  exact ⟨rweq_trans
+    (rweq_trans_congr_left (q := g₀) (rweq_trans η₁' η₂'))
+    (rweq_trans_congr_right f₂ (rweq_trans θ₁' θ₂'))⟩
 
 /-- Step-based horizontal functoriality witness. -/
 @[simp] theorem hcomp_functorial_step
@@ -318,8 +339,8 @@ composition on both sides. -/
     TwoCell (A := A) (a := a) (b := d)
       (Path.trans (Path.trans p q) r)
       (Path.trans p (Path.trans q r)) :=
-  rweq_of_step (Step.trans_assoc (A := A)
-    (a := a) (b := b) (c := c) (d := d) p q r)
+  ⟨rweq_of_step (Step.trans_assoc (A := A)
+    (a := a) (b := b) (c := c) (d := d) p q r)⟩
 
 /-- Naturality of the associator under 2-cells in each argument. -/
 @[simp] theorem assoc_naturality
@@ -330,23 +351,27 @@ composition on both sides. -/
     TwoCell (A := A) (a := a) (b := d)
       (Path.trans (Path.trans p q) r)
       (Path.trans p' (Path.trans q' r')) := by
-  apply rweq_trans
-  · exact rweq_trans_congr_left (q := r) (rweq_trans_congr η θ)
-  apply rweq_trans
-  · exact rweq_trans_congr_right (Path.trans p' q') ι
-  · exact assoc (A := A) (a := a) (b := b) (c := c) (d := d) p' q' r'
+  rcases η with ⟨η'⟩
+  rcases θ with ⟨θ'⟩
+  rcases ι with ⟨ι'⟩
+  exact ⟨rweq_trans
+    (rweq_trans_congr_left (q := r) (rweq_trans_congr η' θ'))
+    (rweq_trans
+      (rweq_trans_congr_right (Path.trans p' q') ι')
+      (rweq_of_step (Step.trans_assoc (A := A)
+        (a := a) (b := b) (c := c) (d := d) p' q' r')))⟩
 
 /-- Left unitor 2-cell witnessing `(1 ∘ f) ⇒ f`. -/
 @[simp] def leftUnitor (p : Path a b) :
     TwoCell (A := A) (a := a) (b := b)
       (Path.trans (Path.refl a) p) p :=
-  rweq_of_step (Step.trans_refl_left (A := A) (a := a) (b := b) p)
+  ⟨rweq_of_step (Step.trans_refl_left (A := A) (a := a) (b := b) p)⟩
 
 /-- Right unitor 2-cell witnessing `(f ∘ 1) ⇒ f`. -/
 @[simp] def rightUnitor (p : Path a b) :
     TwoCell (A := A) (a := a) (b := b)
       (Path.trans p (Path.refl b)) p :=
-  rweq_of_step (Step.trans_refl_right (A := A) (a := a) (b := b) p)
+  ⟨rweq_of_step (Step.trans_refl_right (A := A) (a := a) (b := b) p)⟩
 
 /-- Naturality of unitors along a 2-cell. -/
 @[simp] theorem unitor_naturality {p q : Path a b}
@@ -354,11 +379,12 @@ composition on both sides. -/
     TwoCell (A := A) (a := a) (b := b)
       (Path.trans (Path.refl a) p)
       (Path.trans q (Path.refl b)) := by
-  apply rweq_trans
-  · exact rweq_of_step (Step.trans_refl_left (A := A) (a := a) (b := b) p)
-  apply rweq_trans
-  · exact η
-  · exact rweq_symm (rweq_of_step (Step.trans_refl_right (A := A) (a := a) (b := b) q))
+  rcases η with ⟨η'⟩
+  exact ⟨rweq_trans
+    (rweq_of_step (Step.trans_refl_left (A := A) (a := a) (b := b) p))
+    (rweq_trans
+      η'
+      (rweq_symm (rweq_of_step (Step.trans_refl_right (A := A) (a := a) (b := b) q))))⟩
 
 /-- Horizontal composition exchanges with vertical composition (the
 interchange law).  The statement produces the canonical 2-cell that
@@ -419,9 +445,11 @@ then vertically, useful for establishing the interchange equality. -/
     TwoCell (A := A) (a := a) (b := e)
       (Path.trans (Path.trans (Path.trans p q) r) s)
       (Path.trans p (Path.trans q (Path.trans r s))) := by
-  apply rweq_trans (rweq_trans_congr_left (q := s) (rweq_tt p q r))
-  apply rweq_trans (rweq_tt p (Path.trans q r) s)
-  exact rweq_trans_congr_right p (rweq_tt q r s)
+  exact ⟨rweq_trans
+    (rweq_trans_congr_left (q := s) (rweq_tt p q r))
+    (rweq_trans
+      (rweq_tt p (Path.trans q r) s)
+      (rweq_trans_congr_right p (rweq_tt q r s)))⟩
 
 /-- Pentagon coherence: any four composable computational paths associate to
 the same composite up to a rewrite-equality 2-cell. -/
@@ -441,7 +469,7 @@ up to a rewrite-equality 2-cell. -/
     TwoCell (A := A) (a := a) (b := c)
       (Path.trans (Path.trans p (Path.refl b)) q)
       (Path.trans p q) := by
-  exact rweq_trans_congr_left (q := q) (rweq_cmpA_refl_right p)
+  exact ⟨rweq_trans_congr_left (q := q) (rweq_cmpA_refl_right p)⟩
 
 /-- Left route of Mac Lane's pentagon, built by vertical composition of
 associator 2-cells and whiskering. -/
@@ -656,8 +684,9 @@ horizontal composites. -/
 /-- Every 2-cell is invertible (since TwoCell lives in Prop). -/
 @[simp] def inv {p q : Path a b}
     (η : TwoCell (A := A) (a := a) (b := b) p q) :
-    TwoCell (A := A) (a := a) (b := b) q p :=
-  RwEq.symm η
+    TwoCell (A := A) (a := a) (b := b) q p := by
+  rcases η with ⟨η'⟩
+  exact ⟨RwEq.symm η'⟩
 
 /-- Left inverse law for 2-cell inversion. -/
 theorem inv_comp_cancel {p q : Path a b}
@@ -922,9 +951,9 @@ def weakTwoGroupoid (A : Type u) :
   toWeakBicategory := weakBicategory A
   inv₁ := fun {_ _} f => Path.symm f
   leftInv₁ := fun {_ _} f =>
-    rweq_cmpA_inv_left (A := A) (p := f)
+    ⟨rweq_cmpA_inv_left (A := A) (p := f)⟩
   rightInv₁ := fun {_ _} f =>
-    rweq_cmpA_inv_right (A := A) (p := f)
+    ⟨rweq_cmpA_inv_right (A := A) (p := f)⟩
 
 end Path
 end ComputationalPaths
