@@ -117,7 +117,7 @@ theorem section_implies_surjective (F : Fibration) (s : FibSection F) (b : F.bas
 /-- 10. Section gives a right inverse at the proof level. -/
 theorem section_right_inverse (F : Fibration) (s : FibSection F) (b : F.base) :
     (s.is_section b).toEq = (s.is_section b).toEq :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 -- ============================================================
 -- §4  Pullback Fibrations
@@ -194,7 +194,7 @@ def hfib_transport {E B : Type} (f : E → B) {b₁ b₂ : B}
 theorem hfib_transport_refl {E B : Type} (f : E → B) (b : B)
     (x : HomotopyFiber f b) :
     (hfib_transport f (refl b) x).point = x.point :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 -- ============================================================
 -- §6  Composition of Fibrations (Nat-based)
@@ -282,7 +282,7 @@ def trivial_fiber_element (B F : Type) (b : B) (f : F) :
 /-- 29. Any element in trivial fiber has correct projection. -/
 theorem trivial_fiber_proj (B F : Type) (b : B) (f : F) :
     ((trivial_fiber_element B F b f).over).toEq = rfl :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-- 30. Trivial bundle section roundtrip. -/
 theorem trivial_section_roundtrip (B F : Type) (f₀ : F) (b : B) :

@@ -193,7 +193,7 @@ theorem happly_symm {A : Type u} {B : Type v} {f g : A → B}
 /-- Hedberg's lemma aspect: all Eq-proofs for decidable types are equal. -/
 theorem hedberg_eq {A : Type u} [DecidableEq A]
     {a b : A} (p q : a = b) : p = q := by
-  rfl
+  apply subsingleton_eq_by_cases
 
 /-- All paths in any type have equal toEq (by proof irrelevance). -/
 theorem path_toEq_unique {A : Type u} {a b : A} (p q : Path a b) :

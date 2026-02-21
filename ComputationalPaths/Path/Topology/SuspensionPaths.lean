@@ -83,7 +83,7 @@ def fullMeridianRev (a : A) : Path (@south A) (@north A) :=
 /-- The meridian path has the expected proof component. -/
 theorem fullMeridian_proof (a : A) :
     (fullMeridian a).proof = north_eq_south a :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-- Two full meridians are propositionally equal (UIP). -/
 theorem fullMeridian_eq (a b : A) : fullMeridian a = fullMeridian b := by
@@ -110,7 +110,7 @@ theorem southLoop_toEq (a b : A) :
 /-- All loops at north are proof-irrelevant. -/
 theorem loop_north_eq (p q : Path (@north A) (@north A)) :
     p.proof = q.proof :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-- All loops at south are proof-irrelevant. -/
 theorem loop_south_eq (p q : Path (@south A) (@south A)) :

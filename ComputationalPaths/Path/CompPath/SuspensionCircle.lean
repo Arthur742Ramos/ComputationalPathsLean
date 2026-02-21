@@ -90,7 +90,7 @@ instance : Subsingleton SuspensionCircleCompPath where
 
 /-- Any two points of Σ(S¹) are connected by a path. -/
 def suspensionCircle_path (x y : SuspensionCircleCompPath) : Path x y :=
-  Path.stepChain (rfl
+  Path.stepChain (subsingleton_eq_by_cases x y)
 
 /-- The fundamental group of Σ(S¹) is trivial. -/
 theorem suspensionCircleCompPath_pi1_trivial :
@@ -215,7 +215,7 @@ instance : Subsingleton DoubleSuspensionCircle where
 
 /-- Any two points of ΣΣ(S¹) are connected by a path. -/
 def doubleSuspensionCircle_path (x y : DoubleSuspensionCircle) : Path x y :=
-  Path.stepChain (rfl
+  Path.stepChain (subsingleton_eq_by_cases x y)
 
 /-- π₁(ΣΣ(S¹)) is trivial. -/
 theorem doubleSuspensionCircle_pi1_trivial :

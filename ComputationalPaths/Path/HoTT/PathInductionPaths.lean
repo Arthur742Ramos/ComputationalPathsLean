@@ -77,11 +77,11 @@ theorem path_eq_of_steps_eq {a b : A} (p q : Path a b)
 /-- All self-path proofs are rfl. -/
 theorem self_path_proof_rfl {a : A} (p : Path a a) :
     p.proof = rfl :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-- UIP for propositional equality. -/
 theorem proof_uip {a b : A} (h₁ h₂ : a = b) : h₁ = h₂ :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-- Proof irrelevance for Path proofs. -/
 theorem path_proof_irrel {a b : A} (p : Path a b) :
@@ -149,7 +149,7 @@ theorem apd_refl_path {B : A → Type v} (f : (x : A) → B x) (a : A) :
 theorem apd_proof_irrel {B : A → Type v} (f : (x : A) → B x) {a b : A}
     (p : Path a b) :
     (Path.apd (B := B) f p).proof = (Path.apd (B := B) f p).proof :=
-  rfl
+  subsingleton_eq_by_cases h₁ h₂
 
 /-- apd steps are empty for refl. -/
 theorem apd_refl_steps {B : A → Type v} (f : (x : A) → B x) (a : A) :

@@ -134,7 +134,7 @@ theorem pushout_lift_glue_path {A B C : Type u} {s : Span A B C} {D : Type v}
     (hglue : ∀ c, fA (s.left c) = fB (s.right c))
     (c : C) :
     _root_.congrArg (Pushout.lift fA fB hglue) (Pushout.glue c) = hglue c :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-- 18. Pushout map identity: inl ∘ id lands on inl. -/
 theorem pushout_map_id_inl {A B C : Type u} {s : Span A B C} (a : A) :
@@ -196,13 +196,13 @@ def PropTrunc.truncPath {A : Type u} (a b : A) :
 /-- 23. Propositional truncation is a proposition: any two paths have same toEq. -/
 theorem proptrunc_isProp {A : Type u} (x y : PropTrunc A) :
     ∀ (p q : x = y), p = q :=
-  fun p q => rfl
+  fun p q => subsingleton_eq_by_cases p q
 
 /-- 24. The truncation path chain proof: mk a → mk b → mk c. -/
 theorem proptrunc_trans_chain_proof {A : Type u} (a b c : A) :
     (Path.trans (PropTrunc.truncPath a b) (PropTrunc.truncPath b c)).proof =
     (PropTrunc.truncPath a c).proof :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-- PropTrunc elimination into propositions. -/
 def PropTrunc.lift {A : Type u} {B : Type v}

@@ -96,7 +96,7 @@ theorem pentagon_irrelevance (p : Path a b) (q : Path b c) (r : Path c d) (s : P
     (h₁ h₂ : PathTensor (PathTensor (PathTensor p q) r) s =
               PathTensor p (PathTensor q (PathTensor r s))) :
     h₁ = h₂ := by
-  rfl
+  apply subsingleton_eq_by_cases
 
 /-- Pentagon coherence: all reassociations of a fivefold tensor agree. -/
 theorem pentagon_coherence
@@ -227,7 +227,7 @@ theorem mac_lane_coherence_general
     (h₁ h₂ : PathTensor (PathTensor (PathTensor p q) r) s =
               PathTensor p (PathTensor q (PathTensor r s))) :
     h₁ = h₂ := by
-  rfl
+  apply subsingleton_eq_by_cases
 
 /-- All bracketings of a triple tensor are equal. -/
 @[simp] theorem triple_tensor_coherence (p : Path a b) (q : Path b c) (r : Path c d) :

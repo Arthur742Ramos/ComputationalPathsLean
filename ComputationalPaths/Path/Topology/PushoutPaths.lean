@@ -79,7 +79,7 @@ theorem gluePath_proof_irrel
     {x y : Pushout f g}
     (p q : Path x y) :
     p.proof = q.proof :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-! ## Universal property -/
 
@@ -131,7 +131,7 @@ theorem Cocone.desc_gluePath (cc : Cocone f g D) (c : C) :
     Path.congrArg cc.desc (gluePath c) =
       Path.mk ((gluePath c).steps.map (Step.map cc.desc))
               (_root_.congrArg cc.desc (gluePath c).proof) :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-! ## Pushout functoriality -/
 

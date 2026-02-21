@@ -163,7 +163,7 @@ def Circle.loop : Path Circle.base Circle.base :=
 theorem Circle.loop_steps :
     Circle.loop.steps =
       (Susp.merid true).steps ++ (Path.symm (Susp.merid false)).steps := by
-  rfl
+  apply subsingleton_eq_by_cases
 
 /-! ## Wedge sum -/
 

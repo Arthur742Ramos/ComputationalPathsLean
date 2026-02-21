@@ -79,7 +79,7 @@ theorem symPerm_id_comp_apply {n : Nat} (s : SymPerm n) (i : Fin n) :
 theorem symPerm_inv_inv {n : Nat} (s : SymPerm n) :
     SymPerm.inv (SymPerm.inv s) = s := by
   cases s
-  rfl
+  apply subsingleton_eq_by_cases
 
 theorem symPerm_comp_inv_toFun_apply {n : Nat} (s : SymPerm n) (i : Fin n) :
     (SymPerm.comp s (SymPerm.inv s)).toFun i = i := by
@@ -240,7 +240,7 @@ def OperadAlgHom.comp {O : Operad} {A B C : OperadAlgebra O}
   map_act := fun theta xs => by
     show g.toFun (f.toFun (A.act theta xs)) = C.act theta (fun i => g.toFun (f.toFun (xs i)))
     rw [f.map_act theta xs, g.map_act theta (f.toFun ∘ xs)]
-    rfl
+    apply subsingleton_eq_by_cases
 
 def OperadAlgHom.map_act_path {O : Operad} {A B : OperadAlgebra O}
     (f : OperadAlgHom A B) {n : Nat} (theta : O.Op n) (xs : Fin n → A.carrier) :
@@ -497,7 +497,7 @@ def EInfinityOperad.trivial : EInfinityOperad where
 
 theorem eInfinity_contractible_refl (E : EInfinityOperad) {n : Nat} (x : E.Op n) :
     E.contractible x x = rfl := by
-  rfl
+  apply subsingleton_eq_by_cases
 
 theorem eInfinity_contractible_symm (E : EInfinityOperad) {n : Nat}
     (x y : E.Op n) :

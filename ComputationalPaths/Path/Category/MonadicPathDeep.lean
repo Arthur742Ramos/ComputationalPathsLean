@@ -149,14 +149,14 @@ theorem freeAlgebra_struct {A : Type u} (M : PathMonad A) (x : A) :
 theorem algebra_unit_unique {A : Type u} {M : PathMonad A}
     {c : A} {s : Path (M.obj c) c}
     (h1 h2 : Path.trans (M.eta c) s = Path.refl c) : h1 = h2 :=
-  rfl
+  subsingleton_eq_by_cases h1 h2
 
 /-- Theorem 18: Algebra mult law witness is unique -/
 theorem algebra_mult_unique {A : Type u} {M : PathMonad A}
     {c : A} {s : Path (M.obj c) c}
     (h1 h2 : Path.trans (Path.congrArg M.obj s) s =
               Path.trans (M.mu c) s) : h1 = h2 :=
-  rfl
+  subsingleton_eq_by_cases h1 h2
 
 /-! ## Section 4: Algebra Morphisms -/
 

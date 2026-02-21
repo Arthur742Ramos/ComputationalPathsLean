@@ -284,7 +284,7 @@ theorem gray_tensor_naturality' (G : GrayCategory (Obj := Obj))
     {a b c d e : Obj}
     (f : G.Hom a b) (g : G.Hom b c) (h : G.Hom c d) (k : G.Hom d e) :
     gray_to_tricategory_coherence_pentagon G f g h k = G.pentagonPath f g h k := by
-  rfl
+  apply subsingleton_eq_by_cases
 
 /-- Gray triangle data matches the tricategory-facing packaging. -/
 @[simp] theorem gray_to_tricategory_coherence_triangle_eq

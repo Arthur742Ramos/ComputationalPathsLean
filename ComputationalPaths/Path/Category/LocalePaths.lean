@@ -335,17 +335,17 @@ def trivialPointPath (a : Nat) : Path (trivialPoint.isMember a) true := Path.ref
 
 /-- Any two paths between same endpoints agree on proof field. -/
 theorem locale_coherence {a b : Nat} (p q : Path a b) : p.proof = q.proof :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-- Meet-comm round-trip proof = refl proof. -/
 theorem meetComm_roundtrip_proof (a b : Nat) :
     (meetCommRoundTrip a b).proof = (Path.refl (fMeet a b)).proof :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-- Symm of meet-comm has same proof as meet-comm in reverse. -/
 theorem meetComm_symm_proof (a b : Nat) :
     (Path.symm (meetCommPath a b)).proof = (meetCommPath b a).proof :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 /-! ## §10 CongrArg Coherence for Frame Ops -/
 

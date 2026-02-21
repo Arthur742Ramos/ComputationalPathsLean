@@ -59,7 +59,7 @@ def pathJ {a : A}
 
 /-- Any two equality witnesses extracted from paths are equal. -/
 theorem toEq_unique {a b : A} (p q : Path a b) : p.toEq = q.toEq := by
-  rfl
+  apply subsingleton_eq_by_cases
 
 /-- Canonical `ofEq` witnesses coincide for any two paths with the same endpoints. -/
 @[simp] theorem ofEq_toEq_eq {a b : A} (p q : Path a b) :

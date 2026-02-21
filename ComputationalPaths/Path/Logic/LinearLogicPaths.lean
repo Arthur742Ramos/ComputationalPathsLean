@@ -378,7 +378,7 @@ def proof_symm_path {n : Nat} {p₁ p₂ : MLLProof n} (h : Path p₁ p₂) :
 theorem transport_neg_neg {n : Nat} (A : LProp n) :
     Path.transport (D := fun X => LProp.neg X = LProp.neg X)
       (neg_neg_path A) rfl = rfl :=
-  rfl
+  subsingleton_eq_by_cases _ _
 
 -- 38. Composing De Morgan paths: ¬(A ⊗ B) → A⊥ ⅋ B⊥ → ¬¬(A⊥ ⅋ B⊥)
 def demorgan_then_neg {n : Nat} (A B : LProp n) :

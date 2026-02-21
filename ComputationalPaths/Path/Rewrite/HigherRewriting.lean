@@ -113,7 +113,7 @@ def homotopicalCompletion (P : TwoPolygraph) : ThreePolygraph :=
 theorem homotopicalCompletion_coherent (P : TwoPolygraph) :
     Coherent (homotopicalCompletion P) := by
   intro _ _ _ _ α β
-  rfl
+  apply subsingleton_eq_by_cases
 
 /-- The canonical coherent presentation obtained from homotopical completion. -/
 def homotopicalCompletionPresentation (P : TwoPolygraph) : CoherentPresentation :=
