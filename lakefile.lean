@@ -13,7 +13,7 @@ lean_lib ComputationalPaths where
 @[default_target]
 lean_lib CompPaths where
   roots := #[`CompPaths,
-    `CompPaths.Algebra.Presentation,
+    `CompPaths.Comparison.HoTTComparison,
     `CompPaths.Context.CongruenceClosure,
     `CompPaths.Confluence.ConfluenceDeep,
     `CompPaths.Coherence.AssociativityCoherence,
@@ -29,13 +29,11 @@ lean_lib CompPaths where
     `CompPaths.OmegaGroupoid.CoherencePaths,
     `CompPaths.OmegaGroupoid.TwoCategoryStructure,
     `CompPaths.OmegaGroupoid.GroupoidProofs,
-    `CompPaths.Examples.FundamentalGroupCircle,
     `CompPaths.Examples.FundamentalGroupTorus,
     `CompPaths.Homotopy.VanKampen,
     `CompPaths.Homotopy.VanKampenApplications,
     `CompPaths.Rewriting.KnuthBendix,
     `CompPaths.Rewriting.CriticalPairs,
-    `CompPaths.Rewriting.SquierDeep,
     `CompPaths.Rewriting.TerminationProofs,
     `CompPaths.CoveringSpace.CoveringDeep,
     `CompPaths.CoveringSpace.PathLifting]
