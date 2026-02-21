@@ -26,6 +26,7 @@ import CompPaths.Homotopy.ModelStructure
 import CompPaths.Homotopy.FibrationSequence
 import CompPaths.Homotopy.HITDeep
 import CompPaths.Homotopy.WhiteheadTheorem
+import CompPaths.Homotopy.PostnikovTower
 import CompPaths.Algebra.HomologicalAlgebra
 import CompPaths.Algebra.MayerVietoris
 import CompPaths.HIT.SuspensionDeep

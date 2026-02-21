@@ -40,6 +40,7 @@ lean_lib CompPaths where
     `CompPaths.Homotopy.FibrationSequence,
     `CompPaths.Homotopy.HITDeep,
     `CompPaths.Homotopy.WhiteheadTheorem,
+    `CompPaths.Homotopy.PostnikovTower,
     `CompPaths.HIT.SuspensionDeep,
     `CompPaths.Rewriting.KnuthBendix,
     `CompPaths.Rewriting.CriticalPairs,
