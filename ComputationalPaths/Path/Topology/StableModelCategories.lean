@@ -43,7 +43,7 @@ universe u v
 /-! ## Stable model step relation -/
 
 /-- Atomic rewrite steps for stable model category identities. -/
-inductive StableMCStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive StableMCStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | shift_id {A : Type u} (a : A) :
       StableMCStep (Path.refl a) (Path.refl a)
   | shift_comp_cancel {A : Type u} {a b : A} (p : Path a b) :
