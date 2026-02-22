@@ -50,7 +50,7 @@ def latTop (n : Nat) : LatElem := ⟨n⟩
 /-! ## Equality-level lattice laws (used only to justify primitive steps) -/
 
 private theorem latElem_ext {a b : LatElem} (h : a.val = b.val) : a = b := by
-  cases a; cases b; simp at h; exact congrArg _ h
+  cases a; cases b; simp_all
 
 theorem meet_comm (a b : LatElem) : meet a b = meet b a := by
   apply latElem_ext; simp [meet, Nat.min_comm]
