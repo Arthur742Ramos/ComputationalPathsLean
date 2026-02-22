@@ -65,12 +65,12 @@ structure PathRingHom {R : Type u} {S : Type v}
 /-! ## Domain-specific rewrite steps -/
 
 /-- Rewrite steps for diamond theory. -/
-inductive DiamondStep (X : Type u) : X → X → Prop where
-  | proetale_desc (a : X) : DiamondStep a a
-  | v_cover (a : X) : DiamondStep a a
-  | geometric_point (a b : X) (h : a = b) : DiamondStep a b
-  | fiber_product (a : X) : DiamondStep a a
-  | quotient (a b : X) (h : a = b) : DiamondStep a b
+inductive DiamondStep (X : Type u) : X → X → Type (u + 1) where
+  | proetale_desc (a : X) : DiamondStep X a a
+  | v_cover (a : X) : DiamondStep X a a
+  | geometric_point (a b : X) (h : a = b) : DiamondStep X a b
+  | fiber_product (a : X) : DiamondStep X a a
+  | quotient (a b : X) (h : a = b) : DiamondStep X a b
 
 /-- Every DiamondStep yields a Path. -/
 noncomputable def DiamondStep.toPath {X : Type u} {a b : X}

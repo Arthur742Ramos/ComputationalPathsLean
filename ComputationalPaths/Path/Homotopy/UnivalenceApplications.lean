@@ -19,7 +19,7 @@ universe u v w
 /-! ## Equivalences -/
 
 /-- Homotopy between functions. -/
-noncomputable def Homotopy {A : Type u} {B : Type v} (f g : A → B) : Type (max u v) :=
+noncomputable def Homotopy {A : Type u} {B : Type v} (f g : A → B) : Type u :=
   (a : A) → f a = g a
 
 /-- A function is an equivalence (biinvertible map). -/
@@ -37,6 +37,11 @@ infixl:25 " ≃' " => Equiv'
 
 /-! ## Univalence -/
 
+/-- Identity-to-equivalence: given A = B, transport gives A ≃' B. -/
+noncomputable def idtoeqv {A B : Type u} (p : A = B) : Equiv' A B :=
+  ⟨fun a => p ▸ a, ⟨fun b => p ▸ b,
+    fun a => by cases p; rfl,
+    fun b => by cases p; rfl⟩⟩
 
 /-- The univalence axiom: idtoeqv is itself an equivalence. -/
 axiom univalence (A B : Type u) : IsEquiv (@idtoeqv A B)
@@ -50,7 +55,7 @@ noncomputable def transportUniverse {A B : Type u} (p : A = B) : A → B :=
 
 /-- Path-over: a path in a dependent type lying over a base path. -/
 noncomputable def PathOver {A : Type u} (P : A → Type v) {a₁ a₂ : A}
-    (p : a₁ = a₂) (b₁ : P a₁) (b₂ : P a₂) : Type v :=
+    (p : a₁ = a₂) (b₁ : P a₁) (b₂ : P a₂) : Prop :=
   p ▸ b₁ = b₂
 
 /-- Dependent transport. -/

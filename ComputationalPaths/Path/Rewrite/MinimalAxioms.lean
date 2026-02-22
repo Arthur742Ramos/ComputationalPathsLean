@@ -51,18 +51,18 @@ section DeriveRightUnit
 variable {a b : A} (p : Path a b)
 
 /-- Step 1: p · ρ ≈ σ(σ(p · ρ)) by symm_symm -/
-private theorem step1_ss : RwEq (Path.trans p (Path.refl b)) (Path.symm (Path.symm (Path.trans p (Path.refl b)))) :=
+private noncomputable def step1_ss : RwEq (Path.trans p (Path.refl b)) (Path.symm (Path.symm (Path.trans p (Path.refl b)))) :=
   rweq_symm (rweq_ss (Path.trans p (Path.refl b)))
 
 /-- Step 2: σ(σ(p · ρ)) ≈ σ(σ(p) · σ(ρ)) by symm_trans_congr applied inside σ -/
-private theorem step2_symm_trans : RwEq
+private noncomputable def step2_symm_trans : RwEq
     (Path.symm (Path.symm (Path.trans p (Path.refl b))))
     (Path.symm (Path.trans (Path.symm (Path.refl b)) (Path.symm p))) := by
   apply rweq_symm_congr
   path_inv_distr  -- σ(p · q) ≈ σ(q) · σ(p)
 
 /-- Step 3: σ(σ(ρ) · σ(p)) ≈ σ(ρ · σ(p)) by applying symm_refl inside -/
-private theorem step3_sr : RwEq
+private noncomputable def step3_sr : RwEq
     (Path.symm (Path.trans (Path.symm (Path.refl b)) (Path.symm p)))
     (Path.symm (Path.trans (Path.refl b) (Path.symm p))) := by
   apply rweq_symm_congr
@@ -70,14 +70,14 @@ private theorem step3_sr : RwEq
   path_symm_refl  -- σ(ρ) ≈ ρ
 
 /-- Step 4: σ(ρ · σ(p)) ≈ σ(σ(p)) by trans_refl_left -/
-private theorem step4_left_unit : RwEq
+private noncomputable def step4_left_unit : RwEq
     (Path.symm (Path.trans (Path.refl b) (Path.symm p)))
     (Path.symm (Path.symm p)) := by
   apply rweq_symm_congr
   path_simp  -- refl · X ≈ X
 
 /-- Step 5: σ(σ(p)) ≈ p by symm_symm -/
-private theorem step5_ss : RwEq (Path.symm (Path.symm p)) p :=
+private noncomputable def step5_ss : RwEq (Path.symm (Path.symm p)) p :=
   rweq_ss p
 
 /-- Main theorem: trans_refl_right is derivable from trans_refl_left + symmetry rules -/

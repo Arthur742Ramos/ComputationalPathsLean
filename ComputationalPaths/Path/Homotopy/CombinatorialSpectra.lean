@@ -67,7 +67,7 @@ inductive SpectrumStep (α : Type u) : α → α → Type u where
 
 /-- A spectrum path is a Path built from SpectrumStep. -/
 noncomputable def SpectrumPath (α : Type u) (a b : α) : Type u :=
-  Path (SpectrumStep α) a b
+  Path a b
 
 /-! ## Symmetric Sequences -/
 
@@ -77,7 +77,7 @@ structure PermAction (α : Type u) where
   act : carrier → α → α
   /-- Action is a group homomorphism (associativity). -/
   act_assoc : ∀ (g h : carrier) (x : α),
-    Path (SpectrumStep α) (act g (act h x)) (act g (act h x))
+    Path (act g (act h x)) (act g (act h x))
 
 /-- A symmetric sequence: a graded type with symmetric group action. -/
 structure SymmetricSequence (S : Type u) where
@@ -89,8 +89,7 @@ structure SymmetricSequence (S : Type u) where
 structure SymSeqMorphism (S : Type u) (src tgt : SymmetricSequence S) where
   map : (n : Nat) → src.level n → tgt.level n
   equivariant : ∀ (n : Nat) (g : (src.sigma_action n).carrier) (x : src.level n),
-    Path (SpectrumStep (tgt.level n))
-      (map n ((src.sigma_action n).act g x))
+    Path       (map n ((src.sigma_action n).act g x))
       ((tgt.sigma_action n).act g (map n x))
 
 /-! ## Day Convolution -/
@@ -119,7 +118,7 @@ structure DayUnit (S : Type u) where
   unit_point : unit_seq.level 0
   /-- Higher levels are trivial: all elements are equal. -/
   higher_trivial : ∀ (n : Nat) (x y : unit_seq.level n),
-    Path (SpectrumStep (unit_seq.level n)) x y
+    Path x y
 
 /-! ## Level Structure and Structure Maps -/
 
@@ -136,7 +135,7 @@ structure AdjointStructureMap (S : Type u) (ld : LevelData S) where
   adjoint : (n : Nat) → ld.space n → (ld.space (n + 1))
   /-- Coherence: adjoint relates to structure_map via Path. -/
   coherence : ∀ (n : Nat) (x : ld.space n),
-    Path (SpectrumStep (ld.space (n + 1)))
+    Path
       (adjoint n x) (ld.structure_map n x)
 
 /-! ## Ω-Spectra -/
@@ -148,11 +147,10 @@ structure OmegaSpectrumWitness (S : Type u) (ld : LevelData S) where
   retract : (n : Nat) → ld.space (n + 1) → ld.space n
   /-- retract ∘ adjoint ~ id -/
   section_retract : ∀ (n : Nat) (x : ld.space n),
-    Path (SpectrumStep (ld.space n))
-      (retract n (adjoint_data.adjoint n x)) x
+    Path       (retract n (adjoint_data.adjoint n x)) x
   /-- adjoint ∘ retract ~ id -/
   retract_section : ∀ (n : Nat) (y : ld.space (n + 1)),
-    Path (SpectrumStep (ld.space (n + 1)))
+    Path
       (adjoint_data.adjoint n (retract n y)) y
 
 /-- An Ω-spectrum is a level data together with the witness. -/
@@ -171,14 +169,14 @@ structure HomotopyGroupData (S : Type u) (ld : LevelData S) (n : Int) where
   neg : carrier → carrier
   /-- Group axioms with Path witnesses. -/
   add_assoc : ∀ (a b c : carrier),
-    Path (SpectrumStep carrier) (add (add a b) c) (add a (add b c))
+    Path (add (add a b) c) (add a (add b c))
   add_zero : ∀ (a : carrier),
-    Path (SpectrumStep carrier) (add a zero) a
+    Path (add a zero) a
   add_neg : ∀ (a : carrier),
-    Path (SpectrumStep carrier) (add a (neg a)) zero
+    Path (add a (neg a)) zero
   /-- Commutativity for n ≥ 1 (abelian). -/
   add_comm : ∀ (a b : carrier),
-    Path (SpectrumStep carrier) (add a b) (add b a)
+    Path (add a b) (add b a)
 
 /-- Suspension isomorphism on homotopy groups. -/
 structure SuspensionIso (S : Type u) (ld : LevelData S)
@@ -187,9 +185,9 @@ structure SuspensionIso (S : Type u) (ld : LevelData S)
   iso_inv : πn1.carrier → πn.carrier
   /-- Round-trip Path witnesses. -/
   left_inv : ∀ (x : πn.carrier),
-    Path (SpectrumStep πn.carrier) (iso_inv (iso_map x)) x
+    Path (iso_inv (iso_map x)) x
   right_inv : ∀ (y : πn1.carrier),
-    Path (SpectrumStep πn1.carrier) (iso_map (iso_inv y)) y
+    Path (iso_map (iso_inv y)) y
 
 /-! ## Stable Equivalences -/
 
@@ -198,7 +196,7 @@ structure SpectrumMap (S : Type u) (src tgt : LevelData S) where
   level_map : (n : Nat) → src.space n → tgt.space n
   /-- Commutes with structure maps up to Path. -/
   structure_compat : ∀ (n : Nat) (x : src.space n),
-    Path (SpectrumStep (tgt.space (n + 1)))
+    Path
       (tgt.structure_map n (level_map n x))
       (level_map (n + 1) (src.structure_map n x))
 
@@ -207,9 +205,9 @@ structure LevelwiseEquivalence (S : Type u) (src tgt : LevelData S) extends
     SpectrumMap S src tgt where
   level_inv : (n : Nat) → tgt.space n → src.space n
   left_inv : ∀ (n : Nat) (x : src.space n),
-    Path (SpectrumStep (src.space n)) (level_inv n (level_map n x)) x
+    Path (level_inv n (level_map n x)) x
   right_inv : ∀ (n : Nat) (y : tgt.space n),
-    Path (SpectrumStep (tgt.space n)) (level_map n (level_inv n y)) y
+    Path (level_map n (level_inv n y)) y
 
 /-- Stable equivalence: induces isomorphisms on all stable homotopy groups. -/
 structure StableEquivalenceData (S : Type u) (src tgt : LevelData S) extends
@@ -217,7 +215,7 @@ structure StableEquivalenceData (S : Type u) (src tgt : LevelData S) extends
   /-- Path certificate that each π_n^s is isomorphic. -/
   stable_iso : ∀ (n : Int) (πs : HomotopyGroupData S src n)
     (πt : HomotopyGroupData S tgt n),
-    Path (SpectrumStep πt.carrier) πt.zero πt.zero
+    Path πt.zero πt.zero
 
 /-! ## Smash Product -/
 
@@ -239,11 +237,9 @@ structure SmashAssocRwEq (S : Type u) (E F G : LevelData S)
   backward : (n : Nat) → EFG_right.result.space n → EFG_left.result.space n
   /-- Round-trip Path witnesses. -/
   round_left : ∀ (n : Nat) (x : EFG_left.result.space n),
-    Path (SpectrumStep (EFG_left.result.space n))
-      (backward n (forward n x)) x
+    Path       (backward n (forward n x)) x
   round_right : ∀ (n : Nat) (y : EFG_right.result.space n),
-    Path (SpectrumStep (EFG_right.result.space n))
-      (forward n (backward n y)) y
+    Path       (forward n (backward n y)) y
 
 /-- Smash associativity coherence as a concrete theorem. -/
 theorem smash_assoc_coherence (S : Type u)
@@ -256,8 +252,7 @@ theorem smash_assoc_coherence (S : Type u)
       (SmashProductData.mk (LevelData.mk (fun _ => PUnit) (fun _ _ => PUnit.unit) (fun _ => PUnit.unit))
         (fun _ _ _ _ => PUnit.unit)))
     (n : Nat) (x : EFG_left.result.space n) :
-    Path (SpectrumStep (EFG_left.result.space n))
-      (rweq.backward n (rweq.forward n x)) x :=
+    Path       (rweq.backward n (rweq.forward n x)) x :=
   rweq.round_left n x
 
 /-! ## Spectrum Morphism Composition -/
@@ -265,7 +260,7 @@ theorem smash_assoc_coherence (S : Type u)
 /-- Identity spectrum map. -/
 noncomputable def SpectrumMap.id (S : Type u) (ld : LevelData S) : SpectrumMap S ld ld :=
   { level_map := fun _ x => x
-    structure_compat := fun _ _ => Path.refl _ _ }
+    structure_compat := fun _ _ => Path.refl _ }
 
 /-- Composition of spectrum maps. -/
 noncomputable def SpectrumMap.comp (S : Type u) {a b c : LevelData S}
@@ -273,15 +268,15 @@ noncomputable def SpectrumMap.comp (S : Type u) {a b c : LevelData S}
     SpectrumMap S a c :=
   { level_map := fun n x => g.level_map n (f.level_map n x)
     structure_compat := fun n x =>
-      Path.trans (SpectrumStep (c.space (n + 1)))
+      Path.trans
         (g.structure_compat n (f.level_map n x))
-        (Path.refl _ _) }
+        (Path.refl _) }
 
 /-- Ω-spectrum map composition preserves the Ω-property. -/
 theorem omega_spectrum_compose (S : Type u) (E F : OmegaSpectrum S)
     (f : SpectrumMap S E.levels F.levels)
     (n : Nat) (x : E.levels.space n) :
-    Path (SpectrumStep (F.levels.space (n + 1)))
+    Path
       (F.levels.structure_map n (f.level_map n x))
       (f.level_map (n + 1) (E.levels.structure_map n x)) :=
   f.structure_compat n x
@@ -291,11 +286,10 @@ theorem omega_spectrum_compose (S : Type u) (E F : OmegaSpectrum S)
 /-- A levelwise fibration: each level map is a fibration. -/
 structure LevelwiseFibration (S : Type u) (src tgt : LevelData S) extends
     SpectrumMap S src tgt where
+  level_inv_lift : (n : Nat) → tgt.space n → src.space n
   /-- Lifting property at each level, witnessed by Path. -/
   lifting : ∀ (n : Nat) (y : tgt.space n),
-    Path (SpectrumStep (src.space n))
-      (level_inv_lift n y) (level_inv_lift n y)
-  level_inv_lift : (n : Nat) → tgt.space n → src.space n
+    Path (level_inv_lift n y) (level_inv_lift n y)
 
 /-- A stable fibration: fibration in the stable model structure. -/
 structure StableFibration (S : Type u) (src tgt : LevelData S) extends
@@ -303,7 +297,7 @@ structure StableFibration (S : Type u) (src tgt : LevelData S) extends
   /-- Ω-spectrum condition on fibers. -/
   fiber_omega : ∀ (n : Nat) (y : tgt.space n)
     (x : src.space n),
-    Path (SpectrumStep (src.space (n + 1)))
+    Path
       (src.structure_map n x)
       (src.structure_map n x)
 
@@ -311,7 +305,7 @@ structure StableFibration (S : Type u) (src tgt : LevelData S) extends
 theorem stable_equiv_of_omega (S : Type u) (E F : OmegaSpectrum S)
     (f : StableEquivalenceData S E.levels F.levels)
     (n : Nat) (x : E.levels.space n) :
-    Path (SpectrumStep (F.levels.space (n + 1)))
+    Path
       (F.levels.structure_map n (f.level_map n x))
       (f.level_map (n + 1) (E.levels.structure_map n x)) :=
   f.structure_compat n x

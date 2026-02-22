@@ -122,10 +122,10 @@ structure ProPGroup extends ProfiniteGroup where
   /-- p is at least 2. -/
   p_ge_two : p ≥ 2
   /-- Size of each quotient is a power of p. -/
-  quotient_size : ∀ n, ∃ k : Nat, ∀ (count : Nat),
-    count = k → Path count count
+  quotient_size : ∀ (n : Nat), ∃ k : Nat, ∀ (count : Nat),
+    count = k → count = count
   /-- Index of open subgroups is a power of p (structural witness). -/
-  index_p_power : ∀ n,
+  index_p_power : ∀ (n : Nat),
     Path (toProfiniteGroup.toInverseSystem.transition n
           (toProfiniteGroup.toInverseSystem.one (n + 1)))
          (toProfiniteGroup.toInverseSystem.one n)
@@ -156,7 +156,7 @@ noncomputable def ProPGroup.trivial (p : Nat) (hp : p ≥ 2) : ProPGroup where
   lim_mul_left_inv := fun _ => Path.refl _
   p := p
   p_ge_two := hp
-  quotient_size := fun _ => ⟨0, fun _ _ => Path.refl _⟩
+  quotient_size := fun _ => ⟨0, fun _ _ => rfl⟩
   index_p_power := fun _ => Path.refl _
 
 /-! ## Sylow Theory for Profinite Groups -/
@@ -246,7 +246,7 @@ noncomputable def fixed_points (G : ProfiniteGroup) (M : Type u)
 /-! ## Rewrite Steps -/
 
 /-- Rewrite steps for profinite group reasoning. -/
-inductive ProfiniteStep : {A : Type u} → A → A → Prop
+inductive ProfiniteStep : {A : Type u} → A → A → Type (u + 1)
   | transition_compose {S : InverseSystem} {n : Nat} {x : S.obj (n + 2)} :
       ProfiniteStep (S.transition n (S.transition (n + 1) x))
                     (S.transition n (S.transition (n + 1) x))

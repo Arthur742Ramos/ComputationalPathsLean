@@ -17,17 +17,17 @@ open SuspensionLoop
 universe u
 
 /-- A 2-cell between parallel computational paths. -/
-abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Prop := RwEq p q
+abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Type u := RwEq p q
 
 /-- The adjunction basepoint loop contracts to reflexivity through a 2-cell. -/
-theorem adjMap_basepoint_two_cell {X : Type u} (x₀ : X) {Y : Pointed}
+noncomputable def adjMap_basepoint_two_cell {X : Type u} (x₀ : X) {Y : Pointed}
     (f : SuspensionLoop.Suspension X → Y.carrier)
     (hf : f (SuspensionLoop.Suspension.north (X := X)) = Y.pt) :
     TwoCell (adjMap x₀ f hf x₀) (Path.refl Y.pt) :=
   adjMap_basepoint_rweq x₀ f hf
 
 /-- Rebracketing a whiskered meridian cancellation yields a 2-cell in `ΣX`. -/
-theorem meridian_whisker_assoc_two_cell {X : Type u} (x y : X) :
+noncomputable def meridian_whisker_assoc_two_cell {X : Type u} (x y : X) :
     TwoCell
       (Path.trans
         (Path.trans
@@ -45,7 +45,7 @@ theorem meridian_whisker_assoc_two_cell {X : Type u} (x y : X) :
     (SuspensionLoop.Suspension.merid (X := X) y)
 
 /-- The whiskered cancellation route contracts to the direct meridian route. -/
-theorem meridian_whisker_contracts_two_cell {X : Type u} (x y : X) :
+noncomputable def meridian_whisker_contracts_two_cell {X : Type u} (x y : X) :
     TwoCell
       (Path.trans
         (Path.trans
@@ -73,14 +73,14 @@ noncomputable def pushoutLoopDegenerate {X : Type u} (x : X) :
   pushoutLoop x x
 
 /-- Degenerate pushout loop contracts to reflexivity via inverse cancellation. -/
-theorem pushoutLoopDegenerate_two_cell {X : Type u} (x : X) :
+noncomputable def pushoutLoopDegenerate_two_cell {X : Type u} (x : X) :
     TwoCell (pushoutLoopDegenerate (X := X) x)
       (Path.refl (SuspensionLoop.Suspension.north (X := X))) := by
   simpa [pushoutLoopDegenerate, pushoutLoop]
     using (rweq_cmpA_inv_right (SuspensionLoop.Suspension.merid (X := X) x))
 
 /-- Left-whiskered degenerate pushout loop contracts to the target meridian. -/
-theorem pushout_whisker_contracts_two_cell {X : Type u} (x y : X) :
+noncomputable def pushout_whisker_contracts_two_cell {X : Type u} (x y : X) :
     TwoCell
       (Path.trans (pushoutLoopDegenerate (X := X) x)
         (SuspensionLoop.Suspension.merid (X := X) y))
@@ -91,7 +91,7 @@ theorem pushout_whisker_contracts_two_cell {X : Type u} (x y : X) :
     (pushoutLoopDegenerate_two_cell (X := X) x)
 
 /-- Rebracketing of pushout-loop composition is a 2-cell. -/
-theorem pushout_assoc_two_cell {X : Type u} (x y z : X) :
+noncomputable def pushout_assoc_two_cell {X : Type u} (x y z : X) :
     TwoCell
       (Path.trans
         (Path.trans

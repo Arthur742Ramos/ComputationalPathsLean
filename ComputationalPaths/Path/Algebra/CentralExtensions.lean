@@ -162,35 +162,35 @@ noncomputable def SchurMultiplier.trivialUnit (G : Type u) (gd : GroupData G) : 
     mul_left_inv := fun _ => rfl
     mul_comm := fun _ _ => rfl
   }
-  universal := fun _ ext =>
+  universal := fun _ ext' =>
     -- π(1_E) = 1_G because π is a group homomorphism
     -- Proof: 1·1 = 1, so π(1·1) = π(1), but also π(1·1) = π(1)·π(1)
     -- Hence π(1) = π(1)·π(1), and by left-cancel with π(1)⁻¹ we get π(1) = 1
-    let e := ext.extension.one
-    let πe := ext.projection e
-    have h_proj_mul := (ext.proj_mul e e).toEq
-    have h_one_mul := congrArg ext.projection (ext.extension.one_mul e).toEq
+    let e := ext'.extension.one
+    let πe := ext'.projection e
+    have h_proj_mul := (ext'.proj_mul e e).toEq
+    have h_one_mul := congrArg ext'.projection (ext'.extension.one_mul e)
     -- πe = πe * πe
-    have h_idem : πe = ext.quotient_grp.mul πe πe := by
+    have h_idem : πe = ext'.quotient_grp.mul πe πe := by
       rw [← h_one_mul, h_proj_mul]
     -- inv(πe) * πe = 1
-    have h_left_inv := ext.quotient_grp.mul_left_inv πe
+    have h_left_inv := ext'.quotient_grp.mul_left_inv πe
     -- inv(πe) * (πe * πe) = (inv(πe) * πe) * πe = 1 * πe = πe
     -- But also inv(πe) * πe = 1, so from idempotence:
     -- 1 = inv(πe) * πe = inv(πe) * (πe * πe)
     --   = (inv(πe) * πe) * πe = 1 * πe = πe
     Path.stepChain (by
-      have := ext.quotient_grp.mul_left_inv πe
+      have := ext'.quotient_grp.mul_left_inv πe
       -- this : mul (inv πe) πe = one
-      calc πe = ext.quotient_grp.mul ext.quotient_grp.one πe := by
-                rw [ext.quotient_grp.one_mul]
-            _ = ext.quotient_grp.mul (ext.quotient_grp.mul (ext.quotient_grp.inv πe) πe) πe := by
+      calc πe = ext'.quotient_grp.mul ext'.quotient_grp.one πe := by
+                rw [ext'.quotient_grp.one_mul]
+            _ = ext'.quotient_grp.mul (ext'.quotient_grp.mul (ext'.quotient_grp.inv πe) πe) πe := by
                 rw [this]
-            _ = ext.quotient_grp.mul (ext.quotient_grp.inv πe) (ext.quotient_grp.mul πe πe) := by
-                rw [ext.quotient_grp.mul_assoc]
-            _ = ext.quotient_grp.mul (ext.quotient_grp.inv πe) πe := by
+            _ = ext'.quotient_grp.mul (ext'.quotient_grp.inv πe) (ext'.quotient_grp.mul πe πe) := by
+                rw [ext'.quotient_grp.mul_assoc]
+            _ = ext'.quotient_grp.mul (ext'.quotient_grp.inv πe) πe := by
                 rw [← h_idem]
-            _ = ext.quotient_grp.one := this)
+            _ = ext'.quotient_grp.one := this)
 
 /-! ## Universal Central Extension -/
 
@@ -295,9 +295,9 @@ inductive CentralExtStep : {A : Type u} → A → A → Type (u + 1)
 noncomputable def centralExtStep_to_path {A : Type u} {a b : A} (h : CentralExtStep a b) :
     Path a b := by
   cases h with
-  | cocycle_normalize => rename_i G A' gd ad f g; exact f.normalized_left g
-  | central_commute => rename_i A' E G ext aa x; exact ext.central aa x
-  | exact_kernel => rename_i A' E G ext aa; exact ext.exact_at_E aa
+  | @cocycle_normalize _ _ _ _ f g => exact f.normalized_left g
+  | @central_commute _ _ _ ext' aa x => exact ext'.central aa x
+  | @exact_kernel _ _ _ ext' aa => exact ext'.exact_at_E aa
 
 /-! ## RwEq Instances -/
 

@@ -64,7 +64,7 @@ structure PathAlgebra (R : Type u) (rR : PathRing R) (A : Type v) extends PathRi
 /-! ## Domain-specific rewrite steps -/
 
 /-- Rewrite steps for modular form computations. -/
-inductive ModFormAdvStep (R : Type u) : R → R → Prop where
+inductive ModFormAdvStep (R : Type u) : R → R → Type (u + 1) where
   | hecke_mult {ring : PathRing R} (a b : R) :
       ModFormAdvStep (ring.mul a b) (ring.mul a b)
   | atkin_lehner {ring : PathRing R} (a : R) :
@@ -74,12 +74,9 @@ inductive ModFormAdvStep (R : Type u) : R → R → Prop where
 
 /-- Every step yields a Path. -/
 noncomputable def ModFormAdvStep.toPath {R : Type u} {a b : R}
-    (s : ModFormAdvStep R a b) : Path a b :=
-  match s with
-  | .hecke_mult _ _ => Path.refl _
-  | .atkin_lehner _ => Path.refl _
-  | .q_expand _ _ h => Path.stepChain h
-  | .rankin_selberg _ => Path.refl _
+    (s : ModFormAdvStep R a b) : Path a b := by
+  cases s
+  all_goals first | exact Path.refl _ | exact Path.stepChain (by assumption)
 
 /-! ## Modular form basics -/
 

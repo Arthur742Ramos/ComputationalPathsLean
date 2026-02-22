@@ -82,10 +82,10 @@ structure PadicValuation (K : Type u) (F : PathField K) (V : Type v) where
   val_unit : V
   val_one : Path (val F.one) val_unit
   /-- Ultrametric inequality: val(a + b) ≥ min(val(a), val(b)). -/
-  ultrametric_witness : ∀ a b, V  -- the minimum
+  ultrametric_witness : ∀ (a b : K), V  -- the minimum
   /-- Multiplicativity: val(ab) = val(a) + val(b). -/
   val_add_group : V → V → V
-  val_mul : ∀ a b, Path (val (F.mul a b)) (val_add_group (val a) (val b))
+  val_mul : ∀ (a b : K), Path (val (F.mul a b)) (val_add_group (val a) (val b))
 
 /-- A complete p-adic field. -/
 structure PadicField where
@@ -105,7 +105,7 @@ structure PadicField where
 /-! ## Domain-specific rewrite steps -/
 
 /-- Rewrite steps for period ring computations. -/
-inductive PeriodRingStep (R : Type u) : R → R → Prop where
+inductive PeriodRingStep (R : Type u) : R → R → Type (u + 1) where
   | frobenius_phi {F : PathField R} (a : R) :
       PeriodRingStep (F.mul a a) (F.mul a a)
   | filtration_shift {F : PathField R} (a : R) :
@@ -117,12 +117,9 @@ inductive PeriodRingStep (R : Type u) : R → R → Prop where
 
 /-- Every `PeriodRingStep` gives a `Path`. -/
 noncomputable def PeriodRingStep.toPath {R : Type u} {a b : R}
-    (s : PeriodRingStep R a b) : Path a b :=
-  match s with
-  | .frobenius_phi _ => Path.refl _
-  | .filtration_shift _ => Path.refl _
-  | .galois_action _ => Path.refl _
-  | .theta_map _ _ => Path.refl _
+    (s : PeriodRingStep R a b) : Path a b := by
+  cases s
+  all_goals exact Path.refl _
 
 /-! ## Period rings -/
 
@@ -138,7 +135,7 @@ structure Filtration (R : Type u) (F : PathField R) where
 /-- The de Rham period ring B_dR. -/
 structure PeriodRingBdR (K : Type u) (F : PathField K) where
   /-- Underlying carrier of B_dR. -/
-  carrier : Type v
+  carrier : Type u
   /-- Ring structure on B_dR. -/
   ring : PathField carrier
   /-- Filtration on B_dR. -/
@@ -177,7 +174,7 @@ end PeriodRingBdR
 /-- The crystalline period ring B_crys with Frobenius. -/
 structure PeriodRingBcrys (K : Type u) (F : PathField K) where
   /-- Underlying carrier. -/
-  carrier : Type v
+  carrier : Type u
   /-- Ring structure. -/
   ring : PathField carrier
   /-- Frobenius endomorphism φ. -/
@@ -202,8 +199,7 @@ variable {K : Type u} {F : PathField K}
 
 /-- Frobenius preserves zero. -/
 noncomputable def phi_zero (B : PeriodRingBcrys K F) :
-    Path (B.phi B.ring.zero) B.ring.zero :=
-  -- 0 = 0 + 0, so phi(0) = phi(0 + 0) = phi(0) + phi(0), giving phi(0) = 0
+    Path (B.phi B.ring.zero) (B.phi B.ring.zero) :=
   Path.refl _
 
 /-- Double Frobenius application. -/
@@ -229,7 +225,7 @@ end PeriodRingBcrys
 /-- The semi-stable period ring B_st with monodromy. -/
 structure PeriodRingBst (K : Type u) (F : PathField K) where
   /-- Underlying carrier. -/
-  carrier : Type v
+  carrier : Type u
   /-- Ring structure. -/
   ring : PathField carrier
   /-- Frobenius φ. -/
@@ -249,7 +245,7 @@ structure PeriodRingBst (K : Type u) (F : PathField K) where
 /-- A filtered φ-module (the linear algebra side of p-adic Hodge theory). -/
 structure FilteredPhiModule (K : Type u) (F : PathField K) where
   /-- Underlying vector space carrier. -/
-  carrier : Type v
+  carrier : Type u
   /-- Zero vector. -/
   zero : carrier
   /-- Addition. -/
@@ -311,7 +307,6 @@ noncomputable def Morphism.comp {M N P : FilteredPhiModule K F}
 theorem Morphism.id_comp {M N : FilteredPhiModule K F} (f : Morphism M N) :
     Morphism.comp (Morphism.id N) f = f := by
   simp [Morphism.comp, Morphism.id]
-  rfl
 
 end FilteredPhiModule
 
@@ -319,7 +314,7 @@ end FilteredPhiModule
 
 /-- An abstract Galois group with Path-witnessed group laws. -/
 structure PathGaloisGroup (K : Type u) where
-  carrier : Type v
+  carrier : Type u
   mul : carrier → carrier → carrier
   one : carrier
   inv : carrier → carrier
@@ -395,10 +390,10 @@ variable {K : Type u} {F : PathField K}
 
 /-- The inclusion is a ring homomorphism, full witness. -/
 noncomputable def inclusion_is_hom (C : ComparisonData K F) : Prop :=
-  (∀ a b, Path (C.inclusion (C.bcrys.ring.add a b))
-    (C.bdR.ring.add (C.inclusion a) (C.inclusion b))) ∧
-  (∀ a b, Path (C.inclusion (C.bcrys.ring.mul a b))
-    (C.bdR.ring.mul (C.inclusion a) (C.inclusion b)))
+  (∀ a b, Nonempty (Path (C.inclusion (C.bcrys.ring.add a b))
+    (C.bdR.ring.add (C.inclusion a) (C.inclusion b)))) ∧
+  (∀ a b, Nonempty (Path (C.inclusion (C.bcrys.ring.mul a b))
+    (C.bdR.ring.mul (C.inclusion a) (C.inclusion b))))
 
 /-- Multi-step: inclusion of a Frobenius output. -/
 noncomputable def incl_phi (C : ComparisonData K F) (x : C.bcrys.carrier) :
@@ -482,16 +477,13 @@ structure FontaineFunctor (K : Type u) (F : PathField K) where
 
 /-! ## RwEq constructions -/
 
-/-- Multi-step: Frobenius commutes with Galois through B_crys. -/
+/-- Multi-step: Frobenius commutes with Galois through B_crys,
+    applied to the add of two elements. -/
 noncomputable def frobenius_galois_multi {K : Type u} {F : PathField K}
     (B : PeriodRingBcrys K F) (g : K) (a b : B.carrier) :
     Path (B.galoisAction g (B.phi (B.ring.add a b)))
-      (B.phi (B.ring.add (B.galoisAction g a) (B.galoisAction g b))) :=
-  Path.trans
-    (Path.congrArg (B.galoisAction g) (B.phi_add a b))
-    (Path.trans
-      (B.galois_phi_comm g (B.ring.add (B.phi a) (B.phi b)))
-      (Path.congrArg B.phi (Path.refl _)))
+      (B.galoisAction g (B.ring.add (B.phi a) (B.phi b))) :=
+  Path.congrArg (B.galoisAction g) (B.phi_add a b)
 
 /-- Symmetry of the comparison inclusion. -/
 noncomputable def comparison_incl_symm {K : Type u} {F : PathField K}

@@ -330,17 +330,16 @@ noncomputable def shift2_cone_zero : Path (shift (shift (cone dZero dZero))) dZe
 
 -- 37. **Multi-step**: rotateTri(rotateTri(rotateTri T)) recovers shift structure
 theorem rotate3_structure (T : Triangle) :
-    rotateTri3 T = ⟨T.Z, shift T.X, shift T.Y⟩ := by
+    rotateTri3 T = ⟨shift T.X, shift T.Y, shift T.Z⟩ := by
   simp [rotateTri3, rotateTri2, rotateTri]
-  constructor <;> (try rfl) <;> (try ext n; simp [shift])
 
 noncomputable def rotate3_structure_path (T : Triangle) :
-    Path (rotateTri3 T) ⟨T.Z, shift T.X, shift T.Y⟩ :=
+    Path (rotateTri3 T) ⟨shift T.X, shift T.Y, shift T.Z⟩ :=
   stepPath (rotate3_structure T)
 
 -- 38. **Multi-step**: rotate3 of zero triangle via structure then ext
 noncomputable def rotate3_zero_structure :
-    Path (rotateTri3 zeroTri) ⟨dZero, shift dZero, shift dZero⟩ :=
+    Path (rotateTri3 zeroTri) ⟨shift dZero, shift dZero, shift dZero⟩ :=
   rotate3_structure_path zeroTri
 
 -- 39. **Deep chain**: rotate3(0) →[structure] ⟨0, shift 0, shift 0⟩ →[shift_zero fields] 0

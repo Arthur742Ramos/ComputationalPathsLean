@@ -234,14 +234,14 @@ This means: inlPath(f*(p)) ⋅ glue(c₂) = glue(c₁) ⋅ inrPath(g*(p))
 /-- **Glue naturality axiom**: The glue path is natural with respect to paths in C.
 This states that inlPath(f*(p)) ≈ glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹, which captures
 the commutativity of the pushout square at the level of paths. -/
-class HasGlueNaturalRwEq : Prop where
+structure HasGlueNaturalRwEq : Type _ where
   glue_natural_rweq_axiom {c₁ c₂ : C} (p : Path c₁ c₂) :
       RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
            (Path.trans (glue c₁)
               (Path.trans (inrPath (Path.congrArg g p))
                 (Path.symm (glue c₂))))
 
-noncomputable def glue_natural_rweq_axiom [h : HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
+noncomputable def glue_natural_rweq_axiom (h : HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g))
     {c₁ c₂ : C} (p : Path c₁ c₂) :
     RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
          (Path.trans (glue c₁)
@@ -254,19 +254,19 @@ States that inlPath(f*(p)) is RwEq to glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹.
 
 Since equality proofs are proof-irrelevant, it is enough to show both sides
 have the same underlying propositional equality. -/
-noncomputable def glue_natural_rweq [HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)]
+noncomputable def glue_natural_rweq (h_gn : HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g))
     {c₁ c₂ : C} (p : Path c₁ c₂) :
     RwEq (inlPath (Path.congrArg f p) : Path (inl (f c₁)) (inl (f c₂)))
          (Path.trans (glue c₁)
             (Path.trans (inrPath (Path.congrArg g p))
               (Path.symm (glue c₂)))) :=
-  glue_natural_rweq_axiom p
+  h_gn.glue_natural_rweq_axiom p
 
 /-- **Loop-only glue naturality axiom**: The glue path is natural with respect to loops at `c₀`.
 
 This is the only form of glue naturality used by the SVK decoding proof, since
 amalgamation is witnessed by conjugating loops at the chosen basepoint. -/
-class HasGlueNaturalLoopRwEq (c₀ : C) : Prop where
+structure HasGlueNaturalLoopRwEq (c₀ : C) : Type _ where
   glue_natural_loop_rweq_axiom (p : LoopSpace C c₀) :
       RwEq
         (inlPath (Path.congrArg f p) :
@@ -275,15 +275,15 @@ class HasGlueNaturalLoopRwEq (c₀ : C) : Prop where
           (Path.trans (inrPath (Path.congrArg g p))
             (Path.symm (glue c₀))))
 
-noncomputable instance hasGlueNaturalLoopRwEq_of_hasGlueNaturalRwEq (c₀ : C)
-    [HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)] :
+noncomputable def hasGlueNaturalLoopRwEq_of_hasGlueNaturalRwEq (c₀ : C)
+    (h_gn : HasGlueNaturalRwEq (A := A) (B := B) (C := C) (f := f) (g := g)) :
     HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ where
   glue_natural_loop_rweq_axiom p := by
-    simpa using (glue_natural_rweq (A := A) (B := B) (C := C) (f := f) (g := g) (p := p))
+    simpa using (glue_natural_rweq h_gn (p := p))
 
 /-- If `C` satisfies Axiom K (all loops rewrite to refl), then glue naturality for loops
 holds automatically: both sides reduce to the trivial loop at the basepoint. -/
-theorem hasGlueNaturalLoopRwEq_of_axiomK (c₀ : C) (hC : AxiomK C) :
+noncomputable def hasGlueNaturalLoopRwEq_of_axiomK (c₀ : C) (hC : AxiomK C) :
     HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ where
   glue_natural_loop_rweq_axiom p := by
     -- In a type satisfying Axiom K, every loop is rewrite-equal to `refl`.
@@ -359,13 +359,13 @@ theorem hasGlueNaturalLoopRwEq_of_axiomK (c₀ : C) (hC : AxiomK C) :
     exact RwEq.trans hlhs (rweq_symm hrhs)
 
 /-- A convenient specialization: subsingleton gluing types automatically satisfy loop naturality. -/
-noncomputable instance hasGlueNaturalLoopRwEq_of_subsingleton (c₀ : C) [Subsingleton C] :
+noncomputable def hasGlueNaturalLoopRwEq_of_subsingleton (c₀ : C) [Subsingleton C] :
     HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ :=
   hasGlueNaturalLoopRwEq_of_axiomK (A := A) (B := B) (C := C) (f := f) (g := g) c₀
     (hC := axiomK_of_subsingleton (A := C))
 
 /-- H-set gluing types satisfy loop naturality (via Axiom K). -/
-noncomputable instance hasGlueNaturalLoopRwEq_of_isHSet (c₀ : C) [IsHSet C] :
+noncomputable def hasGlueNaturalLoopRwEq_of_isHSet (c₀ : C) [IsHSet C] :
     HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ := by
   have hC : AxiomK C := isHSet_implies_axiomK (A := C) (h := inferInstance)
   exact hasGlueNaturalLoopRwEq_of_axiomK (A := A) (B := B) (C := C) (f := f) (g := g) c₀ hC
@@ -373,7 +373,7 @@ noncomputable instance hasGlueNaturalLoopRwEq_of_isHSet (c₀ : C) [IsHSet C] :
 /-- If both legs `A` and `B` satisfy Axiom K (all loops rewrite to refl), then glue naturality for
 loops holds automatically: both sides of the naturality statement reduce to the trivial loop in
 the pushout. -/
-theorem hasGlueNaturalLoopRwEq_of_axiomK_left_right (c₀ : C) (hA : AxiomK A) (hB : AxiomK B) :
+noncomputable def hasGlueNaturalLoopRwEq_of_axiomK_left_right (c₀ : C) (hA : AxiomK A) (hB : AxiomK B) :
     HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ where
   glue_natural_loop_rweq_axiom p := by
     have hf : RwEq (Path.congrArg f p) (Path.refl (f c₀)) := hA (f c₀) (Path.congrArg f p)
@@ -444,7 +444,7 @@ theorem hasGlueNaturalLoopRwEq_of_axiomK_left_right (c₀ : C) (hA : AxiomK A) (
 
 /-- A convenient specialization: if both legs are subsingletons, loop naturality holds
 without assumptions on the gluing type `C`. -/
-noncomputable instance (priority := 50) hasGlueNaturalLoopRwEq_of_subsingleton_left_right (c₀ : C)
+noncomputable def hasGlueNaturalLoopRwEq_of_subsingleton_left_right (c₀ : C)
     [Subsingleton A] [Subsingleton B] :
     HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ :=
   hasGlueNaturalLoopRwEq_of_axiomK_left_right (A := A) (B := B) (C := C) (f := f) (g := g) c₀
@@ -452,7 +452,7 @@ noncomputable instance (priority := 50) hasGlueNaturalLoopRwEq_of_subsingleton_l
     (hB := axiomK_of_subsingleton (A := B))
 
 /-- If both legs are h-sets, loop naturality follows from Axiom K on each leg. -/
-noncomputable instance (priority := 50) hasGlueNaturalLoopRwEq_of_isHSet_left_right (c₀ : C)
+noncomputable def hasGlueNaturalLoopRwEq_of_isHSet_left_right (c₀ : C)
     [IsHSet A] [IsHSet B] :
     HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀ := by
   have hA : AxiomK A := isHSet_implies_axiomK (A := A) (h := inferInstance)
@@ -467,9 +467,9 @@ noncomputable instance (priority := 50) hasGlueNaturalLoopRwEq_of_isHSet_left_ri
 
 /-- Glue naturality for loops: For a loop p at c₀, inlPath(f*(p)) equals
 glue ⋅ inrPath(g*(p)) ⋅ glue⁻¹ up to RwEq. This is the key fact for SVK. -/
-theorem glue_natural_loop_rweq
+noncomputable def glue_natural_loop_rweq
     (c₀ : C)
-    [h : HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    (h : HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀)
     (p : LoopSpace C c₀) :
     RwEq (inlPath (Path.congrArg f p) : LoopSpace (Pushout A B C f g) (inl (f c₀)))
          (Path.trans (glue c₀)
@@ -652,7 +652,7 @@ namespace Pushout
 variable {A : Type u} {B : Type u} {C : Type u}
 
 /-- Glue naturality holds when both maps are constant. -/
-noncomputable instance hasGlueNaturalRwEq_const (a₀ : A) (b₀ : B) :
+noncomputable def hasGlueNaturalRwEq_const (a₀ : A) (b₀ : B) :
     Pushout.HasGlueNaturalRwEq
       (A := A) (B := B) (C := C)
       (f := fun _ : C => a₀) (g := fun _ : C => b₀) where
@@ -757,7 +757,7 @@ noncomputable instance hasGlueNaturalRwEq_const (a₀ : A) (b₀ : B) :
     exact rweq_trans lhs_eq (rweq_symm rhs_eq)
 
 /-- Glue naturality is automatic when both codomains are `PUnit'`. -/
-noncomputable instance hasGlueNaturalRwEq_punit {C : Type u} (f g : C → PUnit'.{u}) :
+noncomputable def hasGlueNaturalRwEq_punit {C : Type u} (f g : C → PUnit'.{u}) :
     Pushout.HasGlueNaturalRwEq (A := PUnit'.{u}) (B := PUnit'.{u}) (C := C) (f := f) (g := g) := by
   have hf : f = (fun _ : C => PUnit'.unit) := by
     funext c
@@ -769,7 +769,7 @@ noncomputable instance hasGlueNaturalRwEq_punit {C : Type u} (f g : C → PUnit'
     rfl
   cases hf
   cases hg
-  infer_instance
+  exact Pushout.hasGlueNaturalRwEq_const PUnit'.unit PUnit'.unit
 
 end Pushout
 
@@ -790,7 +790,7 @@ Since f = (fun _ => a₀) and g = (fun _ => b₀), for any path p : Path c₁ c�
 - congrArg g p ≈ refl b₀ (by rweq_congrArg_const)
 
 And since c₁ = c₂ = PUnit'.unit (unique element), both sides reduce to refl. -/
-noncomputable instance hasGlueNaturalRwEq :
+noncomputable def hasGlueNaturalRwEq_wedge :
     Pushout.HasGlueNaturalRwEq
       (A := A) (B := B) (C := PUnit')
       (f := fun _ => a₀) (g := fun _ => b₀) where

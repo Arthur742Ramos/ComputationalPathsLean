@@ -61,7 +61,7 @@ def south {A : Type u} : SuspensionData A := ⟨false⟩
 end SuspensionData
 
 /-- Suspension alias. -/
-abbrev Suspension (A : Type u) : Type u := SuspensionData A
+abbrev Suspension (A : Type u) : Type := SuspensionData A
 
 
 

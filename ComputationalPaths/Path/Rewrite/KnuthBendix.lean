@@ -33,7 +33,8 @@ namespace Rewriting
 open ComputationalPaths
 open ComputationalPaths.Path
 open ComputationalPaths.Path.Rewrite.GroupoidTRS (Expr)
-open ComputationalPaths.Path.Rewrite.KnuthBendix (GExpr CStep CRtc BaseStep)
+open ComputationalPaths.Path.Rewrite.GroupoidConfluence (CStep CRTC)
+open ComputationalPaths.Path.Rewrite.CriticalPairs (StepRule allStepRules)
 
 /-! ## Term Syntax -/
 
@@ -103,12 +104,8 @@ noncomputable def op_trans : Nat := 2
   | symm e ih => simp [encodeExpr, decodeExpr, op_symm, ih]
   | trans e₁ e₂ ih₁ ih₂ => simp [encodeExpr, decodeExpr, op_trans, ih₁, ih₂]
 
-/-- Encode a GroupoidTRS expression as a GExpr for the KnuthBendix module. -/
-@[simp] noncomputable def exprToGExpr : Expr → GExpr
-  | .atom n => .atom n
-  | .refl => .refl
-  | .symm e => .sym (exprToGExpr e)
-  | .trans e₁ e₂ => .tr (exprToGExpr e₁) (exprToGExpr e₂)
+/-- Encode a GroupoidTRS expression as an Expr (identity on Expr). -/
+@[simp] noncomputable def exprToExpr (e : Expr) : Expr := e
 
 end KBEncoding
 
@@ -433,30 +430,30 @@ theorem orient_all_78_terminating : WellFounded Step78Rel :=
     (fun h => step78_measure_decrease h)
     (InvImage.wf (fun e => (Expr.weight e, Expr.leftWeight e)) natLex_wf)
 
-/-! ## Bridge to the GExpr/CStep completed system -/
+/-! ## Bridge to the Expr/CStep completed system -/
 
 /-- Each rule shape maps to a concrete CStep reduction chain. -/
-noncomputable def shapeToCRtc (s : RuleShape) :
-    CRtc (KBEncoding.exprToGExpr (shapeExprPair s).1)
-         (KBEncoding.exprToGExpr (shapeExprPair s).2) := by
+noncomputable def shapeToCRTC (s : RuleShape) :
+    CRTC (KBEncoding.exprToExpr (shapeExprPair s).1)
+         (KBEncoding.exprToExpr (shapeExprPair s).2) := by
   cases s with
-  | symmRefl => exact CRtc.single .sym_refl
-  | symmSymm => exact CRtc.single (.sym_sym (.atom 0))
-  | transReflLeft => exact CRtc.single (.tr_refl_left (.atom 0))
-  | transReflRight => exact CRtc.single (.tr_refl_right (.atom 0))
-  | transSymm => exact CRtc.single (.tr_sym (.atom 0))
-  | symmTrans => exact CRtc.single (.sym_tr (.atom 0))
-  | symmTransCongr => exact CRtc.single (.sym_tr_congr (.atom 0) (.atom 1))
-  | transAssoc => exact CRtc.single (.tr_assoc (.atom 0) (.atom 1) (.atom 2))
-  | cancelLeft => exact CRtc.single (.cancel_left (.atom 0) (.atom 1))
-  | cancelRight => exact CRtc.single (.cancel_right (.atom 0) (.atom 1))
-  | identity => exact CRtc.single (.tr_refl_left (.atom 0))
+  | symmRefl => exact CRTC.single .symm_refl
+  | symmSymm => exact CRTC.single (.symm_symm (.atom 0))
+  | transReflLeft => exact CRTC.single (.trans_refl_left (.atom 0))
+  | transReflRight => exact CRTC.single (.trans_refl_right (.atom 0))
+  | transSymm => exact CRTC.single (.trans_symm (.atom 0))
+  | symmTrans => exact CRTC.single (.symm_trans (.atom 0))
+  | symmTransCongr => exact CRTC.single (.symm_trans_congr (.atom 0) (.atom 1))
+  | transAssoc => exact CRTC.single (.trans_assoc (.atom 0) (.atom 1) (.atom 2))
+  | cancelLeft => exact CRTC.single (.trans_cancel_left (.atom 0) (.atom 1))
+  | cancelRight => exact CRTC.single (.trans_cancel_right (.atom 0) (.atom 1))
+  | identity => exact CRTC.single (.trans_refl_left (.atom 0))
 
-theorem stepRuleToCRtc (r : StepRule) :
-    CRtc (KBEncoding.exprToGExpr (stepRuleExprPair r).1)
-         (KBEncoding.exprToGExpr (stepRuleExprPair r).2) := by
+theorem stepRuleToCRTC (r : StepRule) :
+    CRTC (KBEncoding.exprToExpr (stepRuleExprPair r).1)
+         (KBEncoding.exprToExpr (stepRuleExprPair r).2) := by
   simp [stepRuleExprPair]
-  exact shapeToCRtc (stepRuleShape r)
+  exact shapeToCRTC (stepRuleShape r)
 
 /-! ## Squier-style finite derivation type -/
 

@@ -148,17 +148,17 @@ theorem decideNbE_spec (e₁ e₂ : Expr) :
 /-! ## Worked Examples -/
 
 /-- Example: `trans refl (atom 0)` normalizes to `atom 0`. -/
-example : nbe (.trans .refl (.atom 0)) = .atom 0 := by native_decide
+example : nbe (.trans .refl (.atom 0)) = .atom 0 := by decide
 
 /-- Example: `trans (atom 0) (symm (atom 0))` normalizes to `refl`. -/
-example : nbe (.trans (.atom 0) (.symm (.atom 0))) = .refl := by native_decide
+example : nbe (.trans (.atom 0) (.symm (.atom 0))) = .refl := by decide
 
 /-- Example: `symm (symm (atom 1))` normalizes to `atom 1`. -/
-example : nbe (.symm (.symm (.atom 1))) = .atom 1 := by native_decide
+example : nbe (.symm (.symm (.atom 1))) = .atom 1 := by decide
 
 /-- Example: NbE identifies equivalent expressions. -/
 example : nbe (.trans (.trans (.atom 0) (.atom 1)) (.atom 2)) =
-          nbe (.trans (.atom 0) (.trans (.atom 1) (.atom 2))) := by native_decide
+          nbe (.trans (.atom 0) (.trans (.atom 1) (.atom 2))) := by decide
 
 /-! ## NbE and the Coherent Presentation
 
@@ -218,7 +218,7 @@ theorem nbe_trans_compat (e₁ e₂ : Expr) :
   rw [key]
 
 /-- NbE maps `refl` to `refl`. -/
-theorem nbe_refl : nbe .refl = .refl := by native_decide
+theorem nbe_refl : nbe .refl = .refl := by decide
 
 /-- NbE maps atoms to atoms. -/
 theorem nbe_atom (n : Nat) : nbe (.atom n) = .atom n := by

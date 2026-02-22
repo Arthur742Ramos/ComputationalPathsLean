@@ -67,7 +67,7 @@ structure PathRingHom {R : Type u} {S : Type v}
 /-! ## Domain-specific rewrite steps -/
 
 /-- Rewrite steps for prismatic cohomology. -/
-inductive PrismaticStep (R : Type u) : R → R → Prop where
+inductive PrismaticStep (R : Type u) : R → R → Type (u + 1) where
   | delta_map (a : R) : PrismaticStep a a
   | frobenius_lift (a b : R) (h : a = b) : PrismaticStep a b
   | nygaard_filt (a : R) : PrismaticStep a a
@@ -76,13 +76,9 @@ inductive PrismaticStep (R : Type u) : R → R → Prop where
 
 /-- Every PrismaticStep yields a Path. -/
 noncomputable def PrismaticStep.toPath {R : Type u} {a b : R}
-    (s : PrismaticStep R a b) : Path a b :=
-  match s with
-  | .delta_map _ => Path.refl _
-  | .frobenius_lift _ _ h => Path.stepChain h
-  | .nygaard_filt _ => Path.refl _
-  | .comparison _ _ h => Path.stepChain h
-  | .breuil_kisin _ => Path.refl _
+    (s : PrismaticStep R a b) : Path a b := by
+  cases s
+  all_goals first | exact Path.refl _ | exact Path.stepChain (by assumption)
 
 /-! ## δ-Rings -/
 

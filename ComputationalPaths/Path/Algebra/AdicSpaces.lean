@@ -63,7 +63,7 @@ structure PathRingHom {R : Type u} {S : Type v}
 /-! ## Domain-specific rewrite steps -/
 
 /-- Rewrite steps for adic space theory. -/
-inductive AdicStep (R : Type u) : R → R → Prop where
+inductive AdicStep (R : Type u) : R → R → Type (u + 1) where
   | valuation_bound (a : R) : AdicStep R a a
   | rational_loc (a b : R) (h : a = b) : AdicStep R a b
   | completion (a : R) : AdicStep R a a
@@ -73,12 +73,8 @@ inductive AdicStep (R : Type u) : R → R → Prop where
 /-- Every AdicStep yields a Path. -/
 noncomputable def AdicStep.toPath {R : Type u} {a b : R}
     (s : AdicStep R a b) : Path a b := by
-  cases s with
-  | valuation_bound _ => exact Path.refl _
-  | rational_loc _ _ h => exact Path.stepChain h
-  | completion _ => exact Path.refl _
-  | restriction _ _ h => exact Path.stepChain h
-  | topology _ => exact Path.refl _
+  cases s
+  all_goals first | exact Path.refl _ | exact Path.stepChain (by assumption)
 
 /-! ## Huber Rings -/
 

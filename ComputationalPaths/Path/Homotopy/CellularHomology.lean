@@ -150,7 +150,7 @@ noncomputable def eulerChar_point :
     dim 0 with rank 1, dim 1 with rank 0 for a single vertex). -/
 noncomputable def eulerChar_segment :
     Path (eulerChar { dim := 1, rank := fun n => if n = 0 then 2 else if n = 1 then 1 else 0 }) 1 :=
-  Path.stepChain (by native_decide)
+  Path.stepChain (by decide)
 
 /-! ## Chain maps -/
 

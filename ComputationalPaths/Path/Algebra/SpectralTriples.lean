@@ -224,22 +224,17 @@ inductive SpectralStep : {H : HilbertData.{u}} → H.carrier → H.carrier → T
       SpectralStep (D.dirac H.zero) H.zero
   | repr_one (H : HilbertData.{u}) (A : CStarData H) (v : H.carrier) :
       SpectralStep (A.repr A.one v) v
-  | star_invol (H : HilbertData.{u}) (A : CStarData H) (a : A.alg) :
-      @SpectralStep u ⟨A.alg, A.algZero, A.add, fun _ => id, fun _ _ => 0,
-        fun x y => A.add y x, fun x => x, fun _ _ => rfl⟩
-        (A.star (A.star a)) a
 
 /-- Convert a spectral step to a computational path. -/
 noncomputable def spectralStepPath {H : HilbertData.{u}} {x y : H.carrier}
-    (s : @SpectralStep u H x y) : Path x y :=
+    (s : @SpectralStep H x y) : Path x y :=
   match s with
   | SpectralStep.dirac_zero _ D => pathOfEqStepChain D.dirac_zero
   | SpectralStep.repr_one _ A v => pathOfEqStepChain (A.repr_one v)
-  | _ => Path.stepChain rfl
 
 /-- Compose two spectral steps. -/
 noncomputable def spectral_steps_compose {H : HilbertData.{u}} {x y z : H.carrier}
-    (s1 : @SpectralStep u H x y) (s2 : @SpectralStep u H y z) : Path x z :=
+    (s1 : @SpectralStep H x y) (s2 : @SpectralStep H y z) : Path x z :=
   Path.trans (spectralStepPath s1) (spectralStepPath s2)
 
 /-! ## Grading operator -/
@@ -328,35 +323,31 @@ namespace FullSpectralTriple
 
 variable (F : FullSpectralTriple.{u})
 
-/-- Multi-step path: Jγγv → Jv → γγJv, via Jγ² = id then J = γ²J.
-    Uses Path.trans to compose the two rewrite steps. -/
+/-- Multi-step path: Jγγv → Jv → γγJv.
+    Step 1: J(γ(γ(v))) = J(v) via gamma_sq
+    Step 2: J(v) = γ(γ(J(v))) via (gamma_sq (J(v)))⁻¹
+    Step 3: γ(γ(J(v))) = γ(γ(J(v))) (need gamma_chargeConj_comm) -/
 noncomputable def grading_real_interaction (v : F.hilbert.carrier) :
     Path (F.chargeConj (F.gamma (F.gamma v))) (F.gamma (F.gamma (F.chargeConj v))) :=
   Path.trans
     (pathOfEqStepChain (_root_.congrArg F.chargeConj (F.gamma_sq v)))
-    (Path.trans
-      (pathOfEqStepChain (F.chargeConj_sq v).symm)
-      (Path.trans
-        (pathOfEqStepChain (_root_.congrArg (fun w => F.chargeConj (F.chargeConj w)) rfl))
-        (pathOfEqStepChain (F.gamma_sq (F.chargeConj v)).symm)))
+    (pathOfEqStepChain (F.gamma_sq (F.chargeConj v)).symm)
 
 /-- RwEq witness: the two paths J(γ²v)→v are path-equivalent. -/
 noncomputable def grading_real_rweq (v : F.hilbert.carrier) :
     RwEq
       (Path.trans (pathOfEqStepChain (_root_.congrArg F.chargeConj (F.gamma_sq v)))
                   (pathOfEqStepChain (F.chargeConj_sq v)))
-      (pathOfEqStepChain (by rw [F.gamma_sq, F.chargeConj_sq] : F.chargeConj (F.gamma (F.gamma v)) = v)) := by
-  constructor
+      (pathOfEqStepChain (show F.chargeConj (F.gamma (F.gamma v)) = v from by
+        rw [F.gamma_sq v, F.chargeConj_sq v])) := by
+  exact RwEq.refl _
 
 /-- Multi-step: γJJv → γv → JJγv, showing γ commutes past J². -/
 noncomputable def gamma_past_chargeConj_sq (v : F.hilbert.carrier) :
     Path (F.gamma (F.chargeConj (F.chargeConj v))) (F.chargeConj (F.chargeConj (F.gamma v))) :=
   Path.trans
     (pathOfEqStepChain (_root_.congrArg F.gamma (F.chargeConj_sq v)))
-    (Path.trans
-      (pathOfEqStepChain (F.chargeConj_sq (F.gamma v)).symm)
-      (pathOfEqStepChain (_root_.congrArg (fun w => F.chargeConj (F.chargeConj w))
-        (F.gamma_chargeConj_comm v).symm).symm))
+    (pathOfEqStepChain (F.chargeConj_sq (F.gamma v)).symm)
 
 end FullSpectralTriple
 

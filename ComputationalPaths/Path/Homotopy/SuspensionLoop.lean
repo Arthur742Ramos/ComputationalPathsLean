@@ -251,7 +251,7 @@ structure IsPathConnectedPointed (X : Pointed) where
 structure IsSimplyConnected (X : Pointed) extends IsPathConnectedPointed X where
   /-- π₁ is trivial. -/
   pi1_trivial : ∀ l : LoopSpace X.carrier X.pt,
-    Quot.mk rwEqRel l = Quot.mk rwEqRel (Path.refl X.pt)
+    Quot.mk (rwEqRel X.carrier X.pt X.pt) l = Quot.mk (rwEqRel X.carrier X.pt X.pt) (Path.refl X.pt)
 
 /-- The suspension of a non-empty space has path-connected structure.
     For the proof that π₁(ΣX) = 1, see `CompPath/SphereCompPath.lean` which proves this
