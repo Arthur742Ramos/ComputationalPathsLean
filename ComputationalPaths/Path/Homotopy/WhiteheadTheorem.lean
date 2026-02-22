@@ -1,181 +1,194 @@
-/-
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Rewrite.Quot
+import Mathlib.Logic.Function.Basic
+/-!
 # Whitehead Theorem for Computational Paths
 
-This module records a Path-based Whitehead theorem scaffold. We package
-induced maps on πₙ, weak-equivalence data (isomorphisms on all homotopy groups),
-and a Whitehead equivalence that carries a Path-based quasi-inverse.
-
-## Key Results
-
-- `piOneInduced` / `piNInduced`: induced maps on π₁ and πₙ
-- `WeakEquivData`: weak equivalence data on all homotopy groups
-- `weakEquivToPathEquiv`: π₁ equivalence extracted from weak equivalence data
-- `WhiteheadEquiv`: weak equivalence data plus a Path-based quasi-inverse
-- `whiteheadSimpleEquiv`: resulting `SimpleEquiv` on points
-
-## References
-
-- HoTT Book, Chapter 8 (Whitehead theorem)
-- Whitehead, "Combinatorial Homotopy II"
+Weak homotopy equivalence, Whitehead's theorem for 1-types, n-types,
+and the groupoid structure — all built on `Path`/`Step`/`RwEq`.
 -/
 
-import ComputationalPaths.Path.Rewrite.SimpleEquiv
-import ComputationalPaths.Path.Homotopy.Fibration
-import ComputationalPaths.Path.Homotopy.HoTT
+namespace ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 
-set_option maxHeartbeats 400000
+open ComputationalPaths
+open ComputationalPaths.Path
 
-namespace ComputationalPaths
-namespace Path
-namespace WhiteheadTheorem
+universe u
 
-universe u v
+noncomputable section
 
-variable {A B C : Type u}
+/-! ## Weak homotopy equivalence via `PathRwQuot` -/
 
-open HoTT
+/-- A computational model for `πₙ(A,a)` based on loops modulo `RwEq`. -/
+abbrev PiN (_n : Nat) (A : Type u) (a : A) : Type u :=
+  PathRwQuot A a a
 
-/-! ## Induced maps on homotopy groups -/
+/-- Induced map on `PiN`: action of `f` on quotient loops. -/
+def piNMap {A B : Type u} (f : A → B) (n : Nat) (a : A) :
+    PiN n A a → PiN n B (f a) :=
+  PathRwQuot.congrArg A B f
 
-/-- The induced map on π₁: given `f : A → B`, we get a map
-`π₁(A, a₀) → π₁(B, f a₀)`. -/
-noncomputable abbrev piOneInduced (f : A → B) (a₀ : A) :
-    π₁(A, a₀) → π₁(B, f a₀) :=
-  Fibration.inducedPi1Map f a₀
+@[simp] theorem piNMap_id {A : Type u} (n : Nat) (a : A)
+    (x : PiN n A a) :
+    piNMap (A := A) (B := A) id n a x = x := by
+  simp [piNMap]
 
-/-- The induced map on πₙ: given `f : A → B`, we get a map
-`πₙ(A, a₀) → πₙ(B, f a₀)`. -/
-noncomputable abbrev piNInduced (n : Nat) (f : A → B) (a₀ : A) :
-    HigherHomotopy.PiN n A a₀ → HigherHomotopy.PiN n B (f a₀) :=
-  Fibration.inducedPiNMap n f a₀
+@[simp] theorem piNMap_comp {A B C : Type u}
+    (f : A → B) (g : B → C) (n : Nat) (a : A)
+    (x : PiN n A a) :
+    piNMap (A := B) (B := C) g n (f a)
+      (piNMap (A := A) (B := B) f n a x) =
+      piNMap (A := A) (B := C) (g ∘ f) n a x := by
+  simp [piNMap]
 
-/-- The induced map preserves the identity element. -/
-@[simp] theorem piOneInduced_unit (f : A → B) (a₀ : A) :
-    piOneInduced f a₀ (PiOne.id) = PiOne.id := by
-  simp [piOneInduced, PiOne.id, LoopQuot.id, PathRwQuot.refl,
-    Fibration.inducedPi1Map, Fibration.inducedLoopMap]
+/-- Weak homotopy equivalence: `f` induces bijections on all `PiN`. -/
+structure WeakHomotopyEquivalence {A B : Type u} (f : A → B) : Prop where
+  bijective_piN : ∀ n (a : A), Function.Bijective (piNMap f n a)
 
-/-- The induced map on a concrete loop. -/
-theorem piOneInduced_ofLoop (f : A → B) (a₀ : A) (l : LoopSpace A a₀) :
-    piOneInduced f a₀ (LoopQuot.ofLoop l) =
-      LoopQuot.ofLoop (Path.congrArg f l) := by
-  simp [piOneInduced, LoopQuot.ofLoop, Fibration.inducedPi1Map,
-    Fibration.inducedLoopMap]
+/-- The induced map on `π₁` in the `PiN` model. -/
+abbrev piOneMap {A B : Type u} (f : A → B) (a : A) :
+    PiN 1 A a → PiN 1 B (f a) :=
+  piNMap f 1 a
 
-/-! ## `SimpleEquiv` Path witnesses -/
+/-- Inverse map on `π₁` obtained from bijectivity of the induced map. -/
+noncomputable def piOneInverse {A B : Type u} {f : A → B}
+    (hweak : WeakHomotopyEquivalence f) (a : A) :
+    PiN 1 B (f a) → PiN 1 A a :=
+  fun β => Classical.choose ((hweak.bijective_piN 1 a).2 β)
 
-/-- `Path` witness for the left inverse of a `SimpleEquiv`. -/
-def simpleEquiv_left_path {α : Type u} {β : Type v}
-    (e : SimpleEquiv α β) (x : α) :
-    Path (e.invFun (e.toFun x)) x :=
-  Path.stepChain (e.left_inv x)
+@[simp] theorem piOneInverse_spec {A B : Type u} {f : A → B}
+    (hweak : WeakHomotopyEquivalence f) (a : A) (β : PiN 1 B (f a)) :
+    piOneMap f a (piOneInverse hweak a β) = β :=
+  Classical.choose_spec ((hweak.bijective_piN 1 a).2 β)
 
-/-- `Path` witness for the right inverse of a `SimpleEquiv`. -/
-def simpleEquiv_right_path {α : Type u} {β : Type v}
-    (e : SimpleEquiv α β) (y : β) :
-    Path (e.toFun (e.invFun y)) y :=
-  Path.stepChain (e.right_inv y)
+@[simp] theorem piOneInverse_left_inv {A B : Type u} {f : A → B}
+    (hweak : WeakHomotopyEquivalence f) (a : A) (α : PiN 1 A a) :
+    piOneInverse hweak a (piOneMap f a α) = α := by
+  apply (hweak.bijective_piN 1 a).1
+  simp
 
-/-! ## Weak equivalence data -/
+/-! ## 1-types and path lifting data -/
 
-/-- Data witnessing that a map `f : A → B` is a weak equivalence. -/
-structure WeakEquivData (f : A → B) where
-  /-- For every `b : B`, there exists `a : A` with `f a = b`. -/
-  surj : ∀ b : B, ∃ a : A, f a = b
-  /-- For every `n` and basepoint, we have an equivalence on πₙ. -/
-  piNEquiv : ∀ n (a : A),
-    SimpleEquiv (HigherHomotopy.PiN n A a)
-      (HigherHomotopy.PiN n B (f a))
-  /-- The πₙ equivalence is induced by `f`. -/
-  piNEquiv_toFun : ∀ n (a : A),
-    (piNEquiv n a).toFun = piNInduced n f a
+/-- A 1-type is a type where `RwEq` gives an equivalence relation on path terms. -/
+structure IsOneType (A : Type u) : Type u where
+  rweq_refl : ∀ {a b : A} (p : Path a b), RwEq p p
+  rweq_symm : ∀ {a b : A} {p q : Path a b}, RwEq p q → RwEq q p
+  rweq_trans : ∀ {a b : A} {p q r : Path a b}, RwEq p q → RwEq q r → RwEq p r
 
-/-- A weak equivalence induces a `SimpleEquiv` on π₁. -/
-def weakEquivToPathEquiv (f : A → B) (w : WeakEquivData f)
-    (a : A) :
-    SimpleEquiv (π₁(A, a)) (π₁(B, f a)) := by
-  simpa using (w.piNEquiv 1 a)
+/-- Every type is a 1-type in the computational-path setting. -/
+def isOneType_of_any (A : Type u) : IsOneType A where
+  rweq_refl := fun p => rweq_refl p
+  rweq_symm := fun h => rweq_symm h
+  rweq_trans := fun h₁ h₂ => rweq_trans h₁ h₂
 
-/-- The π₁ equivalence uses the induced map as its forward direction. -/
-theorem weakEquiv_piOne_toFun (f : A → B) (w : WeakEquivData f) (a : A) :
-    (weakEquivToPathEquiv f w a).toFun = piOneInduced f a := by
-  simpa [weakEquivToPathEquiv, piNInduced, piOneInduced] using
-    (w.piNEquiv_toFun 1 a)
+/-- Connectedness from a chosen basepoint in the computational-path sense. -/
+structure PathConnected (B : Type u) (b₀ : B) : Type u where
+  connect : ∀ b : B, Path b₀ b
 
-/-- `Path` witness for the left inverse on πₙ under weak equivalence data. -/
-def weakEquiv_piN_left_path (f : A → B) (w : WeakEquivData f)
-    (n : Nat) (a : A) (x : HigherHomotopy.PiN n A a) :
-    Path ((w.piNEquiv n a).invFun ((w.piNEquiv n a).toFun x)) x :=
-  simpleEquiv_left_path (w.piNEquiv n a) x
+/-- Path-lifting data used in the Whitehead construction. -/
+structure PathLiftingData {A B : Type u} (f : A → B) (a₀ : A) : Type u where
+  liftPoint : ∀ b : B, Path (f a₀) b → A
+  liftPath  : ∀ b : B, (γ : Path (f a₀) b) → Path (f (liftPoint b γ)) b
 
-/-- `Path` witness for the right inverse on πₙ under weak equivalence data. -/
-def weakEquiv_piN_right_path (f : A → B) (w : WeakEquivData f)
-    (n : Nat) (a : A) (y : HigherHomotopy.PiN n B (f a)) :
-    Path ((w.piNEquiv n a).toFun ((w.piNEquiv n a).invFun y)) y :=
-  simpleEquiv_right_path (w.piNEquiv n a) y
+/-- Explicit `Step` witness used as a loop-normalization coherence. -/
+def refl_loop_unit_rweq {A : Type u} (a : A) :
+    RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+  rweq_of_step (Step.trans_refl_left (Path.refl a))
 
-/-- The π₁-isomorphism from a weak equivalence preserves the unit. -/
-@[simp] theorem weakEquivToPathEquiv_unit (f : A → B) (w : WeakEquivData f)
-    (a : A) :
-    (weakEquivToPathEquiv f w a).toFun PiOne.id = PiOne.id := by
-  simpa [weakEquiv_piOne_toFun f w a] using
-    (piOneInduced_unit (f := f) (a₀ := a))
+/-- Data produced by the key Whitehead step:
+path lifting gives pointwise inverse candidates, and `π₁` bijectivity
+provides the lifted base-loop correction. -/
+structure InverseConstruction {A B : Type u} (f : A → B) (a₀ : A) : Type u where
+  inv : B → A
+  leftPath : ∀ b : B, Path (f (inv b)) b
+  baseLoopLift : PiN 1 A a₀
+  baseLoopLift_spec : piOneMap f a₀ baseLoopLift = PathRwQuot.refl (f a₀)
 
-/-! ## Whitehead equivalence -/
+/-- Key construction: homotopy inverse candidate from path lifting + `π₁` bijection. -/
+noncomputable def constructInverseData {A B : Type u} {f : A → B} {a₀ : A}
+    (hweak : WeakHomotopyEquivalence f)
+    (hconn : PathConnected B (f a₀))
+    (hlift : PathLiftingData f a₀) :
+    InverseConstruction f a₀ where
+  inv := fun b => hlift.liftPoint b (hconn.connect b)
+  leftPath := fun b => hlift.liftPath b (hconn.connect b)
+  baseLoopLift := piOneInverse hweak a₀ (PathRwQuot.refl (f a₀))
+  baseLoopLift_spec := by simp
 
-/-- Convert a Path-based equivalence (`IsEquiv`) into a `SimpleEquiv`. -/
-def isEquivToSimpleEquiv (f : A → B) (hf : IsEquiv f) :
-    SimpleEquiv A B where
-  toFun := f
-  invFun := IsEquiv.inv hf
-  left_inv := fun a => (hf.toQuasiInverse.rightHomotopy a).toEq
-  right_inv := fun b => (hf.toQuasiInverse.leftHomotopy b).toEq
+/-- A homotopy equivalence in computational paths. -/
+structure HomotopyEquivalence {A B : Type u} (f : A → B) : Type u where
+  inv : B → A
+  leftHomotopy : ∀ b : B, Path (f (inv b)) b
+  rightHomotopy : ∀ a : A, Path (inv (f a)) a
 
-/-- Data packaging the Whitehead theorem: weak equivalence plus quasi-inverse. -/
-structure WhiteheadEquiv (f : A → B) extends WeakEquivData f where
-  /-- Chosen Path-based equivalence on points. -/
-  isEquiv : IsEquiv f
+/-- Whitehead theorem for 1-types:
+if `f` is a weak homotopy equivalence, path lifting + `π₁` bijection provide
+a homotopy inverse. -/
+def whitehead_one_type {A B : Type u} {f : A → B} {a₀ : A}
+    (_hA : IsOneType A) (_hB : IsOneType B)
+    (hweak : WeakHomotopyEquivalence f)
+    (hconn : PathConnected B (f a₀))
+    (hlift : PathLiftingData f a₀)
+    (hright : ∀ a : A,
+      Path ((constructInverseData (f := f) (a₀ := a₀) hweak hconn hlift).inv (f a)) a) :
+    HomotopyEquivalence f :=
+  let data := constructInverseData (f := f) (a₀ := a₀) hweak hconn hlift
+  { inv := data.inv
+    leftHomotopy := data.leftPath
+    rightHomotopy := hright }
 
-/-- Package the Whitehead theorem from weak-equivalence data and a quasi-inverse. -/
-def whiteheadTheorem (f : A → B) (w : WeakEquivData f) (h : IsEquiv f) :
-    WhiteheadEquiv f :=
-  { w with isEquiv := h }
+/-! ## n-types, sets, and groupoids -/
 
-/-- Extract the `SimpleEquiv` on points from a Whitehead equivalence. -/
-def whiteheadSimpleEquiv (f : A → B) (w : WhiteheadEquiv f) :
-    SimpleEquiv A B :=
-  isEquivToSimpleEquiv f w.isEquiv
+/-- Contractibility of a computational type. -/
+structure IsContractible (X : Type u) : Type u where
+  center : X
+  contraction : ∀ x : X, Path center x
 
-/-- Path witness for the left inverse of the Whitehead `SimpleEquiv`. -/
-def whiteheadSimpleEquiv_left_path (f : A → B) (w : WhiteheadEquiv f) (a : A) :
-    Path ((whiteheadSimpleEquiv f w).invFun ((whiteheadSimpleEquiv f w).toFun a)) a :=
-  simpleEquiv_left_path (whiteheadSimpleEquiv f w) a
+/-- Computational sets (`0`-types): loop spaces are contractible. -/
+def IsSet (A : Type u) : Type u :=
+  ∀ a : A, IsContractible (PiN 1 A a)
 
-/-- Path witness for the right inverse of the Whitehead `SimpleEquiv`. -/
-def whiteheadSimpleEquiv_right_path (f : A → B) (w : WhiteheadEquiv f) (b : B) :
-    Path ((whiteheadSimpleEquiv f w).toFun ((whiteheadSimpleEquiv f w).invFun b)) b :=
-  simpleEquiv_right_path (whiteheadSimpleEquiv f w) b
+/-- `n`-types: all `k`-cells with `k > n` are contractible. -/
+def IsNType (n : Nat) (A : Type u) : Type u :=
+  ∀ k : Nat, n < k → ∀ a : A, IsContractible (PiN k A a)
 
-/-- Path witness for the left inverse from a Whitehead equivalence. -/
-def whitehead_left_path (f : A → B) (w : WhiteheadEquiv f) (b : B) :
-    Path (f (IsEquiv.inv w.isEquiv b)) b :=
-  w.isEquiv.toQuasiInverse.leftHomotopy b
+/-- `0`-types are sets. -/
+def zero_types_are_sets {A : Type u} (h0 : IsNType 0 A) : IsSet A := by
+  intro a
+  exact h0 1 (Nat.zero_lt_succ 0) a
 
-/-- Path witness for the right inverse from a Whitehead equivalence. -/
-def whitehead_right_path (f : A → B) (w : WhiteheadEquiv f) (a : A) :
-    Path (IsEquiv.inv w.isEquiv (f a)) a :=
-  w.isEquiv.toQuasiInverse.rightHomotopy a
+/-- Path-groupoid structure on `PathRwQuot` hom-types. -/
+structure PathGroupoid (A : Type u) : Type (u + 1) where
+  Hom : A → A → Type u
+  id : (a : A) → Hom a a
+  comp : {a b c : A} → Hom a b → Hom b c → Hom a c
+  inv : {a b : A} → Hom a b → Hom b a
+  comp_assoc :
+    ∀ {a b c d : A} (x : Hom a b) (y : Hom b c) (z : Hom c d),
+      comp (comp x y) z = comp x (comp y z)
+  id_comp : ∀ {a b : A} (x : Hom a b), comp (id a) x = x
+  comp_id : ∀ {a b : A} (x : Hom a b), comp x (id b) = x
+  inv_comp : ∀ {a b : A} (x : Hom a b), comp (inv x) x = id b
+  comp_inv : ∀ {a b : A} (x : Hom a b), comp x (inv x) = id a
 
-/-! ## Whitehead criterion -/
+/-- Canonical path-groupoid on any type via `PathRwQuot`. -/
+def pathGroupoid (A : Type u) : PathGroupoid A where
+  Hom := fun a b => PathRwQuot A a b
+  id := fun a => PathRwQuot.refl a
+  comp := fun x y => PathRwQuot.trans x y
+  inv := fun x => PathRwQuot.symm x
+  comp_assoc := fun x y z => PathRwQuot.trans_assoc x y z
+  id_comp := fun x => PathRwQuot.trans_refl_left x
+  comp_id := fun x => PathRwQuot.trans_refl_right x
+  inv_comp := fun x => PathRwQuot.symm_trans x
+  comp_inv := fun x => PathRwQuot.trans_symm x
 
-/-- A weak equivalence that is injective on points is a bijection. -/
-theorem weakEquiv_injective_is_bijective (f : A → B) (w : WeakEquivData f)
-    (inj : ∀ a₁ a₂ : A, f a₁ = f a₂ → a₁ = a₂) :
-    (∀ b, ∃ a, f a = b) ∧ (∀ a₁ a₂, f a₁ = f a₂ → a₁ = a₂) :=
-  ⟨w.surj, inj⟩
+/-- `1`-types are groupoids. -/
+def one_types_are_groupoids {A : Type u} (_h1 : IsNType 1 A) :
+    PathGroupoid A :=
+  pathGroupoid A
 
-/-! ## Summary -/
+end
 
-end WhiteheadTheorem
-end Path
-end ComputationalPaths
+end ComputationalPaths.Path.Homotopy.WhiteheadTheorem

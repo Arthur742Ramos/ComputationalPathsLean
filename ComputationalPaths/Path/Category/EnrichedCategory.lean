@@ -1,257 +1,263 @@
-/-
-# Enriched categories of computational paths
-
-This module packages a lightweight enriched category whose hom-objects are
-computational paths.  The `Path` structure carries a rewrite trace (`steps`)
-and a propositional equality witness (`proof`), and we use the rewrite system
-(`RwEq`) to provide associativity and unit coherence.
-
-## Key Results
-
-- `EnrichedHom`: hom-objects as `Path` types
-- `enrichedComp`/`enrichedId`: composition and identities via `trans`/`refl`
-- `enrichedComp_steps`/`enrichedComp_respects`: trace and congruence laws
-- `enriched_assoc`/`enriched_left_unit`/`enriched_right_unit`: RwEq coherence
-- `pathEnrichedCategory`: groupoid-enriched structure from `pathGroupoidEnriched`
-- `enriched_assoc_path`/`enriched_left_unit_path`/`enriched_right_unit_path`
--/
-
-import ComputationalPaths.Path.EnrichedCategory
-import ComputationalPaths.Path.MonoidalCoherence
-
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 namespace ComputationalPaths
-namespace Path
 namespace Category
+
+open ComputationalPaths
+open ComputationalPaths.Path
 
 universe u
 
-/-! ## Enriched hom-objects -/
+section PathGroupoidEnrichment
 
-/-- Enriched hom-objects are computational paths. -/
-abbrev EnrichedHom (A : Type u) (a b : A) : Type u :=
-  Path a b
+variable {A : Type u}
 
-/-- Enriched composition is path concatenation. -/
-@[simp] abbrev enrichedComp {A : Type u} {a b c : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) : EnrichedHom A a c :=
-  Path.trans p q
+/-- `Hom(a,b)` as a groupoid: objects are paths `Path a b`, morphisms are `RwEq`. -/
+structure PathHomGroupoid (a b : A) where
+  id₂ : ∀ p : Path a b, RwEq p p
+  vcomp₂ : ∀ {p q r : Path a b}, RwEq p q → RwEq q r → RwEq p r
+  inv₂ : ∀ {p q : Path a b}, RwEq p q → RwEq q p
 
-/-- Enriched identity is the reflexive path. -/
-@[simp] abbrev enrichedId {A : Type u} (a : A) : EnrichedHom A a a :=
-  Path.refl a
+@[simp] def pathHomGroupoid (a b : A) : PathHomGroupoid (A := A) a b where
+  id₂ := fun p => RwEq.refl p
+  vcomp₂ := fun α β => RwEq.trans α β
+  inv₂ := fun α => RwEq.symm α
 
-/-- The trace stored by an enriched identity is empty. -/
-@[simp] theorem enrichedId_steps {A : Type u} (a : A) :
-    (enrichedId (A := A) a).steps = [] := rfl
+theorem pathHomGroupoid_vcomp_assoc_toEq
+    {a b : A} {p q r s : Path a b}
+    (α : RwEq p q) (β : RwEq q r) (γ : RwEq r s) :
+    rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂
+      ((pathHomGroupoid (A := A) a b).vcomp₂ α β) γ) =
+    rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂
+      α ((pathHomGroupoid (A := A) a b).vcomp₂ β γ)) := by
+  rfl
 
-/-- The proof stored by an enriched identity is reflexivity. -/
-@[simp] theorem enrichedId_proof {A : Type u} (a : A) :
-    (enrichedId (A := A) a).proof = rfl := rfl
+theorem pathHomGroupoid_vcomp_left_id_toEq
+    {a b : A} {p q : Path a b} (α : RwEq p q) :
+    rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂
+      ((pathHomGroupoid (A := A) a b).id₂ p) α) =
+    rweq_toEq α := by
+  rfl
 
-/-- Enriched composition matches the monoidal tensor on paths. -/
-@[simp] theorem enrichedComp_eq_tensor {A : Type u} {a b c : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) :
-    enrichedComp p q = MonoidalCoherence.tensorPath p q := rfl
+theorem pathHomGroupoid_vcomp_right_id_toEq
+    {a b : A} {p q : Path a b} (α : RwEq p q) :
+    rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂
+      α ((pathHomGroupoid (A := A) a b).id₂ q)) =
+    rweq_toEq α := by
+  rfl
 
-/-- Enriched composition concatenates the computational traces. -/
-@[simp] theorem enrichedComp_steps {A : Type u} {a b c : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) :
-    (enrichedComp p q).steps = p.steps ++ q.steps := rfl
+end PathGroupoidEnrichment
 
-/-- Enriched composition composes the underlying equality witnesses. -/
-@[simp] theorem enrichedComp_toEq {A : Type u} {a b c : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) :
-    (enrichedComp p q).toEq = (p.toEq).trans (q.toEq) := rfl
+section CompositionFunctor
 
-/-! ## Primitive computational steps on hom-objects -/
+variable {A : Type u}
 
-/-- Symmetry of enriched composition rewrites by the primitive trans-symm rule. -/
-@[simp] theorem enrichedComp_symm_step {A : Type u} {a b c : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) :
-    Step (Path.symm (enrichedComp p q))
-      (enrichedComp (Path.symm q) (Path.symm p)) :=
-  Step.symm_trans_congr p q
+/-- Composition preserves `RwEq` in the left variable via explicit `Step.trans_congr_left`. -/
+noncomputable def compMapLeft {a b c : A}
+    (r : Path b c) {p p' : Path a b}
+    (α : RwEq p p') :
+    RwEq (Path.trans p r) (Path.trans p' r) := by
+  induction α with
+  | refl p =>
+      exact RwEq.refl (Path.trans p r)
+  | step s =>
+      exact RwEq.step (Step.trans_congr_left r s)
+  | symm _ ih =>
+      exact RwEq.symm ih
+  | trans _ _ ih₁ ih₂ =>
+      exact RwEq.trans ih₁ ih₂
 
-/-- Symmetry of enriched composition, lifted to rewrite equivalence. -/
-noncomputable def enrichedComp_symm {A : Type u} {a b c : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) :
-    RwEq (Path.symm (enrichedComp p q))
-      (enrichedComp (Path.symm q) (Path.symm p)) :=
-  rweq_of_step (enrichedComp_symm_step p q)
+/-- Composition preserves `RwEq` in the right variable via explicit `Step.trans_congr_right`. -/
+noncomputable def compMapRight {a b c : A}
+    (l : Path a b) {q q' : Path b c}
+    (β : RwEq q q') :
+    RwEq (Path.trans l q) (Path.trans l q') := by
+  induction β with
+  | refl q =>
+      exact RwEq.refl (Path.trans l q)
+  | step s =>
+      exact RwEq.step (Step.trans_congr_right l s)
+  | symm _ ih =>
+      exact RwEq.symm ih
+  | trans _ _ ih₁ ih₂ =>
+      exact RwEq.trans ih₁ ih₂
 
-/-- Primitive left inverse step for enriched composition. -/
-@[simp] theorem enrichedComp_inv_left_step {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    Step (enrichedComp (Path.symm p) p) (enrichedId b) :=
-  Step.symm_trans p
+/-- Composition as a groupoid functor on hom-groupoids. -/
+noncomputable def compMap {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (α : RwEq p p') (β : RwEq q q') :
+    RwEq (Path.trans p q) (Path.trans p' q') :=
+  RwEq.trans (compMapLeft (A := A) q α) (compMapRight (A := A) p' β)
 
-/-- Primitive right inverse step for enriched composition. -/
-@[simp] theorem enrichedComp_inv_right_step {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    Step (enrichedComp p (Path.symm p)) (enrichedId a) :=
-  Step.trans_symm p
+/-- Single-step functoriality witness for composition, using explicit `Step` constructors. -/
+noncomputable def compMap_steps {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (sp : Step p p') (sq : Step q q') :
+    RwEq (Path.trans p q) (Path.trans p' q') :=
+  RwEq.trans
+    (RwEq.step (Step.trans_congr_left q sp))
+    (RwEq.step (Step.trans_congr_right p' sq))
 
-/-- Left inverse coherence for enriched composition via rewrite equivalence. -/
-noncomputable def enrichedComp_inv_left {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    RwEq (enrichedComp (Path.symm p) p) (enrichedId b) :=
-  rweq_of_step (enrichedComp_inv_left_step p)
+theorem compMap_preserves_id_toEq
+    {a b c : A} (p : Path a b) (q : Path b c) :
+    rweq_toEq (compMap (A := A) (RwEq.refl p) (RwEq.refl q)) =
+      rweq_toEq (RwEq.refl (Path.trans p q)) := by
+  rfl
 
-/-- Right inverse coherence for enriched composition via rewrite equivalence. -/
-noncomputable def enrichedComp_inv_right {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    RwEq (enrichedComp p (Path.symm p)) (enrichedId a) :=
-  rweq_of_step (enrichedComp_inv_right_step p)
+theorem compMap_preserves_vcomp_toEq
+    {a b c : A}
+    {p₁ p₂ p₃ : Path a b} {q₁ q₂ q₃ : Path b c}
+    (α₁ : RwEq p₁ p₂) (α₂ : RwEq p₂ p₃)
+    (β₁ : RwEq q₁ q₂) (β₂ : RwEq q₂ q₃) :
+    rweq_toEq (compMap (A := A) (RwEq.trans α₁ α₂) (RwEq.trans β₁ β₂)) =
+      rweq_toEq (RwEq.trans (compMap (A := A) α₁ β₁) (compMap (A := A) α₂ β₂)) := by
+  rfl
 
-/-- A primitive step in the left hom-object argument lifts through composition. -/
-@[simp] theorem enrichedComp_respects_step_left {A : Type u} {a b c : A}
-    {p p' : EnrichedHom A a b} (q : EnrichedHom A b c)
-    (h : Step p p') :
-    Step (enrichedComp p q) (enrichedComp p' q) :=
-  Step.trans_congr_left q h
+theorem compMap_steps_agrees
+    {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (sp : Step p p') (sq : Step q q') :
+    rweq_toEq (compMap (A := A) (RwEq.step sp) (RwEq.step sq)) =
+      rweq_toEq (compMap_steps (A := A) sp sq) := by
+  rfl
 
-/-- A primitive step in the right hom-object argument lifts through composition. -/
-@[simp] theorem enrichedComp_respects_step_right {A : Type u} {a b c : A}
-    (p : EnrichedHom A a b) {q q' : EnrichedHom A b c}
-    (h : Step q q') :
-    Step (enrichedComp p q) (enrichedComp p q') :=
-  Step.trans_congr_right p h
+end CompositionFunctor
 
-/-- Two primitive hom-object steps induce a rewrite-equivalent composite. -/
-noncomputable def enrichedComp_respects_steps {A : Type u} {a b c : A}
-    {p p' : EnrichedHom A a b} {q q' : EnrichedHom A b c}
-    (hp : Step p p') (hq : Step q q') :
-    RwEq (enrichedComp p q) (enrichedComp p' q') := by
-  exact rweq_trans
-    (rweq_of_step (enrichedComp_respects_step_left (q := q) hp))
-    (rweq_of_step (enrichedComp_respects_step_right (p := p') hq))
+section EnrichedYoneda
 
-/-! ## RwEq coherence -/
+variable {A : Type u}
 
-/-- Primitive associativity rewrite step for enriched composition. -/
-@[simp] theorem enriched_assoc_step {A : Type u} {a b c d : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) (r : EnrichedHom A c d) :
-    Step (enrichedComp (enrichedComp p q) r)
-      (enrichedComp p (enrichedComp q r)) :=
-  Step.trans_assoc p q r
+/-- Enriched natural families `Hom(x,-) ⟹ Hom(a,-)` in the path-groupoid enrichment. -/
+structure EnrichedNat (a x : A) where
+  app : {y : A} → Path x y → Path a y
+  natural :
+    ∀ {y z : A} (g : Path x y) (f : Path y z),
+      RwEq (app (Path.trans g f)) (Path.trans (app g) f)
+  determined_by_base :
+    ∀ {y : A} (g : Path x y),
+      RwEq (app g) (Path.trans (app (Path.refl x)) g)
 
-/-- Associativity coherence for enriched composition. -/
-noncomputable def enriched_assoc {A : Type u} {a b c d : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) (r : EnrichedHom A c d) :
-    RwEq (enrichedComp (enrichedComp p q) r)
-      (enrichedComp p (enrichedComp q r)) :=
-  rweq_of_step (enriched_assoc_step p q r)
+/-- Yoneda map: a path `p : a ⟶ x` gives precomposition by `p`. -/
+noncomputable def yonedaToNat {a x : A} (p : Path a x) : EnrichedNat (A := A) a x where
+  app := fun {_} g => Path.trans p g
+  natural := by
+    intro y z g f
+    exact RwEq.symm (RwEq.step (Step.trans_assoc p g f))
+  determined_by_base := by
+    intro y g
+    exact RwEq.symm
+      (RwEq.trans
+        (RwEq.step (Step.trans_assoc p (Path.refl x) g))
+        (RwEq.step (Step.trans_congr_right p (Step.trans_refl_left g))))
 
-/-- Primitive left-unit rewrite step for enriched composition. -/
-@[simp] theorem enriched_left_unit_step {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    Step (enrichedComp (enrichedId a) p) p :=
-  Step.trans_refl_left p
+/-- Yoneda evaluation at identity. -/
+@[simp] def yonedaFromNat {a x : A} (η : EnrichedNat (A := A) a x) : Path a x :=
+  η.app (Path.refl x)
 
-/-- Left unit coherence for enriched composition. -/
-noncomputable def enriched_left_unit {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    RwEq (enrichedComp (enrichedId a) p) p :=
-  rweq_of_step (enriched_left_unit_step p)
+/-- Enriched Yoneda left inverse (up to `RwEq`). -/
+noncomputable def enrichedYoneda_left_inv {a x : A} (p : Path a x) :
+    RwEq (yonedaFromNat (A := A) (yonedaToNat (A := A) p)) p := by
+  simpa [yonedaFromNat, yonedaToNat] using
+    (RwEq.step (Step.trans_refl_right p) :
+      RwEq (Path.trans p (Path.refl x)) p)
 
-/-- Primitive right-unit rewrite step for enriched composition. -/
-@[simp] theorem enriched_right_unit_step {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    Step (enrichedComp p (enrichedId b)) p :=
-  Step.trans_refl_right p
+/-- Enriched Yoneda right inverse, pointwise up to `RwEq`. -/
+noncomputable def enrichedYoneda_right_inv
+    {a x : A} (η : EnrichedNat (A := A) a x)
+    {y : A} (g : Path x y) :
+    RwEq ((yonedaToNat (A := A) (yonedaFromNat (A := A) η)).app g) (η.app g) := by
+  change RwEq (Path.trans (η.app (Path.refl x)) g) (η.app g)
+  exact RwEq.symm (η.determined_by_base g)
 
-/-- Right unit coherence for enriched composition. -/
-noncomputable def enriched_right_unit {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    RwEq (enrichedComp p (enrichedId b)) p :=
-  rweq_of_step (enriched_right_unit_step p)
+/-- Enriched Yoneda left inverse: given path `p`, the roundtrip produces `RwEq`. -/
+noncomputable def enrichedYoneda_left {a x : A} (p : Path a x) :
+    RwEq (yonedaFromNat (A := A) (yonedaToNat (A := A) p)) p :=
+  enrichedYoneda_left_inv (A := A) p
 
-/-- Enriched composition is congruent in the left hom-object argument. -/
-noncomputable def enrichedComp_respects_left {A : Type u} {a b c : A}
-    {p p' : EnrichedHom A a b} (q : EnrichedHom A b c)
-    (h : RwEq p p') :
-    RwEq (enrichedComp p q) (enrichedComp p' q) :=
-  rweq_trans_congr_left q h
+/-- Enriched Yoneda right inverse: given `η` and `g`, the roundtrip produces `RwEq`. -/
+noncomputable def enrichedYoneda_right {a x : A}
+    (η : EnrichedNat (A := A) a x) {y : A} (g : Path x y) :
+    RwEq ((yonedaToNat (A := A) (yonedaFromNat (A := A) η)).app g) (η.app g) :=
+  enrichedYoneda_right_inv (A := A) η g
 
-/-- Enriched composition is congruent in the right hom-object argument. -/
-noncomputable def enrichedComp_respects_right {A : Type u} {a b c : A}
-    (p : EnrichedHom A a b) {q q' : EnrichedHom A b c}
-    (h : RwEq q q') :
-    RwEq (enrichedComp p q) (enrichedComp p q') :=
-  rweq_trans_congr_right p h
+/-- Enriched Yoneda equivalence packaged as the two `RwEq` roundtrip witnesses. -/
+noncomputable def enriched_yoneda
+    {a x : A} :
+    (∀ p : Path a x, RwEq (yonedaFromNat (A := A) (yonedaToNat (A := A) p)) p) ×
+    (∀ η : EnrichedNat (A := A) a x, ∀ (y : A) (g : Path x y),
+      RwEq ((yonedaToNat (A := A) (yonedaFromNat (A := A) η)).app g) (η.app g)) := by
+  refine ⟨?_, ?_⟩
+  · intro p
+    exact enrichedYoneda_left (A := A) p
+  · intro η y g
+    exact enrichedYoneda_right (A := A) η (y := y) g
 
-/-- Enriched composition respects rewrite equivalence in both arguments. -/
-noncomputable def enrichedComp_respects {A : Type u} {a b c : A}
-    {p p' : EnrichedHom A a b} {q q' : EnrichedHom A b c}
-    (hp : RwEq p p') (hq : RwEq q q') :
-    RwEq (enrichedComp p q) (enrichedComp p' q') :=
-  rweq_trans_congr hp hq
+end EnrichedYoneda
 
-/-! ## Path-level equalities -/
+section LocallyGroupoidal
 
-/-- Associativity as a path equality. -/
-@[simp] theorem enriched_assoc_path {A : Type u} {a b c d : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) (r : EnrichedHom A c d) :
-    enrichedComp (enrichedComp p q) r = enrichedComp p (enrichedComp q r) :=
-  trans_assoc p q r
+variable {A : Type u}
 
-/-- Left unit as a path equality. -/
-@[simp] theorem enriched_left_unit_path {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    enrichedComp (enrichedId a) p = p :=
-  trans_refl_left p
+/-- Every 2-cell in a hom-groupoid is invertible by symmetry of `RwEq`. -/
+@[simp] noncomputable def twoCellInverse
+    {a b : A} {p q : Path a b} (α : RwEq p q) : RwEq q p :=
+  (pathHomGroupoid (A := A) a b).inv₂ α
 
-/-- Right unit as a path equality. -/
-@[simp] theorem enriched_right_unit_path {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    enrichedComp p (enrichedId b) = p :=
-  trans_refl_right p
+theorem twoCellInverse_left_toEq
+    {a b : A} {p q : Path a b} (α : RwEq p q) :
+    rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂ α (twoCellInverse (A := A) α)) =
+      rweq_toEq ((pathHomGroupoid (A := A) a b).id₂ p) := by
+  change
+    rweq_toEq (RwEq.trans α (RwEq.symm α)) =
+      rweq_toEq (RwEq.refl p)
+  induction α with
+  | refl _ =>
+      rfl
+  | step s =>
+      cases step_toEq s
+      rfl
+  | symm h ih =>
+      cases e : rweq_toEq h
+      rfl
+  | trans h₁ h₂ ih₁ ih₂ =>
+      cases e₁ : rweq_toEq h₁
+      cases e₂ : rweq_toEq h₂
+      rfl
 
-/-! ## Groupoid-enriched structure -/
+theorem twoCellInverse_right_toEq
+    {a b : A} {p q : Path a b} (α : RwEq p q) :
+    rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂ (twoCellInverse (A := A) α) α) =
+      rweq_toEq ((pathHomGroupoid (A := A) a b).id₂ q) := by
+  change
+    rweq_toEq (RwEq.trans (RwEq.symm α) α) =
+      rweq_toEq (RwEq.refl q)
+  induction α with
+  | refl _ =>
+      rfl
+  | step s =>
+      cases step_toEq s
+      rfl
+  | symm h ih =>
+      cases e : rweq_toEq h
+      rfl
+  | trans h₁ h₂ ih₁ ih₂ =>
+      cases e₁ : rweq_toEq h₁
+      cases e₂ : rweq_toEq h₂
+      rfl
 
-/-- The path-enriched category packaged as a groupoid-enriched category. -/
-def pathEnrichedCategory (A : Type u) : GroupoidEnrichedCategory (Obj := A) :=
-  pathGroupoidEnriched A
+/-- Local groupoidality: each 2-cell admits a two-sided inverse (at `toEq` level). -/
+theorem locally_groupoidal
+    {a b : A} {p q : Path a b} (α : RwEq p q) :
+    ∃ β : RwEq q p,
+      rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂ α β) =
+        rweq_toEq ((pathHomGroupoid (A := A) a b).id₂ p) ∧
+      rweq_toEq ((pathHomGroupoid (A := A) a b).vcomp₂ β α) =
+        rweq_toEq ((pathHomGroupoid (A := A) a b).id₂ q) := by
+  refine ⟨twoCellInverse (A := A) α, ?_, ?_⟩
+  · exact twoCellInverse_left_toEq (A := A) α
+  · exact twoCellInverse_right_toEq (A := A) α
 
-/-- Hom-objects in the enriched category are paths. -/
-@[simp] theorem pathEnrichedCategory_hom (A : Type u) (a b : A) :
-    (pathEnrichedCategory A).Hom a b = EnrichedHom A a b := rfl
-
-/-- Composition in the enriched category is path concatenation. -/
-@[simp] theorem pathEnrichedCategory_comp {A : Type u} {a b c : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) :
-    (pathEnrichedCategory A).comp p q = enrichedComp p q := rfl
-
-/-- Identities in the enriched category are reflexive paths. -/
-@[simp] theorem pathEnrichedCategory_id {A : Type u} (a : A) :
-    (pathEnrichedCategory A).id₁ a = enrichedId a := rfl
-
-/-- The associator agrees with `enriched_assoc` (proof-irrelevant). -/
-@[simp] theorem pathEnrichedCategory_assoc {A : Type u} {a b c d : A}
-    (p : EnrichedHom A a b) (q : EnrichedHom A b c) (r : EnrichedHom A c d) :
-    (pathEnrichedCategory A).assoc p q r = enriched_assoc p q r := by
-  apply Subsingleton.elim
-
-/-- The left unitor agrees with `enriched_left_unit` (proof-irrelevant). -/
-@[simp] theorem pathEnrichedCategory_leftUnitor {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    (pathEnrichedCategory A).leftUnitor p = enriched_left_unit p := by
-  apply Subsingleton.elim
-
-/-- The right unitor agrees with `enriched_right_unit` (proof-irrelevant). -/
-@[simp] theorem pathEnrichedCategory_rightUnitor {A : Type u} {a b : A}
-    (p : EnrichedHom A a b) :
-    (pathEnrichedCategory A).rightUnitor p = enriched_right_unit p := by
-  apply Subsingleton.elim
-
-/-! ## Summary -/
-
-/-!
-We defined a path-enriched category whose hom-objects are computational paths,
-with composition and identity given by `Path.trans`/`Path.refl`, and coherence
-provided by `RwEq` lemmas and proof irrelevance.
--/
+end LocallyGroupoidal
 
 end Category
-end Path
 end ComputationalPaths

@@ -1,158 +1,233 @@
 /-
-# Postnikov Towers for Computational Paths
+# Postnikov Tower via Computational Paths
 
-This module formalizes Postnikov towers by truncating the computational-path
-infinity-groupoid tower at each level. The resulting stages retain all cells
-up to level `n` and collapse higher cells to `PUnit`.
+This module develops the Postnikov tower for computational paths:
 
-## Key Results
+1. **n-truncation via quotient** – `τ n A a` identifies loops by `RwEq`-level
+   truncation; at level 0 everything collapses, at level ≥ 1 we quotient by
+   `RwEqProp`.
+2. **Postnikov tower** – a sequence of stages `τ n A a` connected by bonding
+   maps `τ (n+1) A a → τ n A a`.
+3. **τ₁ recovers π₁** – `τ 1 A a ≃ π₁(A,a)` by `SimpleEquiv`, since both
+   are `LoopQuot A a`.
+4. **k-invariants** – `RwEq`-invariant loop data descends to coherent maps on
+   truncation stages.
 
-- `nTruncation` : the `n`-th Postnikov stage (an `n`-groupoid truncation)
-- `postnikovTower` : the full tower of stages
-- `tower_converges` : stages stabilize on any fixed dimension
-- `stage_kills_next` : the next homotopy group is trivial at each stage
-
-## References
-
-- HoTT Book, Chapter 8 (Postnikov towers)
-- Lumsdaine, "Weak omega-categories from intensional type theory"
+All proofs use `Path`/`Step`/`RwEq`. No `sorry`/`admit`.
 -/
 
-import ComputationalPaths.Path.InfinityGroupoid
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.Rewrite.Quot
+import ComputationalPaths.Path.Rewrite.SimpleEquiv
+namespace ComputationalPaths.Path.Homotopy.PostnikovTower
 
-namespace ComputationalPaths
-namespace Path
-namespace PostnikovTower
-
-open InfinityGroupoid
+open ComputationalPaths
+open ComputationalPaths.Path
 
 universe u
 
-/-! ## Postnikov stages and n-truncations -/
+/-! ## Section 1 – n-truncation via quotient -/
 
-/-- The `n`-truncation (Postnikov stage) of the computational-path tower. -/
-def nTruncation (A : Type u) (n : Nat) : NGroupoidTruncation A n :=
-  compPathTruncation A n
+/-- Based loops as computational paths. -/
+abbrev Loop (A : Type u) (a : A) : Type u :=
+  Path a a
 
-/-- The Postnikov tower of computational paths, indexed by truncation level. -/
-def postnikovTower (A : Type u) : (n : Nat) → NGroupoidTruncation A n :=
-  truncationTower A
+/-- Quotient relation for the `n`-truncation of based loops.
+    At level 0 everything is identified; at level ≥ 1 we use `RwEqProp`. -/
+def truncRel (A : Type u) (a : A) : Nat → Loop A a → Loop A a → Prop
+  | 0, _, _ => True
+  | _ + 1, p, q => RwEqProp p q
 
-/-- Cells in stage `n` at dimension `k`. -/
-abbrev stageCells (A : Type u) (n k : Nat) : Type u :=
-  (nTruncation A n).cells k
+/-- `truncRel n` is an equivalence relation for every `n`. -/
+noncomputable def truncSetoid (A : Type u) (a : A) (n : Nat) :
+    Setoid (Loop A a) where
+  r := truncRel A a n
+  iseqv := by
+    constructor
+    · intro p
+      cases n with
+      | zero => trivial
+      | succ n => exact ⟨rweq_refl p⟩
+    · intro p q hpq
+      cases n with
+      | zero => trivial
+      | succ n =>
+        obtain ⟨h⟩ := hpq
+        exact ⟨rweq_symm h⟩
+    · intro p q r hpq hqr
+      cases n with
+      | zero => trivial
+      | succ n =>
+        obtain ⟨h₁⟩ := hpq
+        obtain ⟨h₂⟩ := hqr
+        exact ⟨rweq_trans h₁ h₂⟩
 
-/-! ## Convergence of the tower -/
+/-- `τ n A a` – the `n`-truncation of loops at `a` via quotient. -/
+abbrev τ (n : Nat) (A : Type u) (a : A) : Type u :=
+  Quot (truncSetoid A a n).r
 
-/-- If `k ≤ n`, the `k`-cells in stage `n` agree with the full tower. -/
-def stageCells_eq_of_le {A : Type u} {n k : Nat} (h : k ≤ n) :
-    Path (stageCells A n k) (cellType A k) := by
-  refine Path.stepChain ?_
-  simp [stageCells, nTruncation, compPathTruncation, truncCell, h]
+/-- Class of a loop in the `n`-truncation quotient. -/
+def truncClass (n : Nat) {A : Type u} {a : A} (p : Loop A a) : τ n A a :=
+  Quot.mk _ p
 
-/-- Tower convergence: once `k` is below the stage, all later stages agree on `k`-cells. -/
-def tower_converges {A : Type u} {k n m : Nat} (hkn : k ≤ n) (hnm : n ≤ m) :
-    Path (stageCells A n k) (stageCells A m k) := by
-  have hkm : k ≤ m := Nat.le_trans hkn hnm
-  refine Path.stepChain ?_
-  simp [stageCells, nTruncation, compPathTruncation, truncCell, hkn, hkm]
+/-- At positive levels, `RwEq`-related loops have equal classes. -/
+theorem truncClass_sound {A : Type u} {a : A} {n : Nat} {p q : Loop A a}
+    (h : RwEq p q) :
+    truncClass (n + 1) p = truncClass (n + 1) q :=
+  Quot.sound (⟨h⟩ : RwEqProp p q)
 
-/-! ## Killing homotopy groups -/
+/-- In every positive stage, `p · refl` and `p` define the same class
+    (witnessed by `Step.trans_refl_right`). -/
+theorem truncClass_right_unit {A : Type u} {a : A}
+    (n : Nat) (p : Loop A a) :
+    truncClass (n + 1) (Path.trans p (Path.refl a)) = truncClass (n + 1) p :=
+  truncClass_sound (rweq_of_step (Step.trans_refl_right p))
 
-/-- Cells above the truncation level are collapsed to `PUnit`. -/
-def stageCells_eq_punit_of_lt {A : Type u} {n k : Nat} (h : n < k) :
-    Path (stageCells A n k) PUnit := by
-  have hk : ¬ k ≤ n := Nat.not_le_of_gt h
-  refine Path.stepChain ?_
-  simp [stageCells, nTruncation, compPathTruncation, truncCell, hk]
+/-- Symmetrically, `refl · p = p` in every positive stage. -/
+theorem truncClass_left_unit {A : Type u} {a : A}
+    (n : Nat) (p : Loop A a) :
+    truncClass (n + 1) (Path.trans (Path.refl a) p) = truncClass (n + 1) p :=
+  truncClass_sound (rweq_of_step (Step.trans_refl_left p))
 
-/-- Each stage kills the next homotopy group: `(n+1)`-cells are `PUnit`. -/
-def stage_kills_next {A : Type u} (n : Nat) :
-    Path (stageCells A n (n + 1)) PUnit := by
-  exact stageCells_eq_punit_of_lt (A := A) (n := n) (k := n + 1) (Nat.lt_succ_self n)
+/-! ## Section 2 – Postnikov tower -/
 
-/-! ## Computational-path exactness addenda -/
+/-- Bonding map `τ (n+1) A a → τ n A a` for the Postnikov tower.
+    At every level the canonical quotient map coarsens the relation. -/
+noncomputable def postnikovProjection (A : Type u) (a : A) :
+    (n : Nat) → τ (n + 1) A a → τ n A a
+  | 0 =>
+      Quot.lift (fun p => truncClass 0 p) (by
+        intro _ _ _
+        exact Quot.sound trivial)
+  | n + 1 =>
+      Quot.lift (fun p => truncClass (n + 1) p) (by
+        intro _ _ hpq
+        exact Quot.sound hpq)
 
-/-- Any fixed stage-cell type carries a reflexive computational path. -/
-def stage_refl_path (A : Type u) (n k : Nat) :
-    Path (stageCells A n k) (stageCells A n k) :=
-  Path.refl _
+/-- The Postnikov tower bundled as stages with bonding maps. -/
+structure PostnikovTower (A : Type u) (a : A) where
+  /-- Stage `n` of the tower. -/
+  stage : Nat → Type u
+  /-- Projection from stage `n + 1` to stage `n`. -/
+  proj : (n : Nat) → stage (n + 1) → stage n
 
-/-- Stage comparison to the ambient `k`-cells as a computational path. -/
-def stage_exact_path {A : Type u} {n k : Nat} (h : k ≤ n) :
-    Path (stageCells A n k) (cellType A k) :=
-  stageCells_eq_of_le h
+/-- Canonical Postnikov tower from quotient truncations. -/
+noncomputable def postnikovTower (A : Type u) (a : A) : PostnikovTower A a where
+  stage := fun n => τ n A a
+  proj := postnikovProjection A a
 
-/-- Transition between Postnikov stages on fixed cells, as a computational path. -/
-def stage_transition_path {A : Type u} {k n m : Nat} (hkn : k ≤ n) (hnm : n ≤ m) :
-    Path (stageCells A n k) (stageCells A m k) :=
-  tower_converges hkn hnm
+/-- Projections transport the right-unit rewrite. -/
+theorem projection_right_unit {A : Type u} {a : A}
+    (n : Nat) (p : Loop A a) :
+    postnikovProjection A a (n + 1)
+        (truncClass (n + 2) (Path.trans p (Path.refl a))) =
+      postnikovProjection A a (n + 1)
+        (truncClass (n + 2) p) := by
+  simp only [postnikovProjection]
+  exact truncClass_right_unit (n + 1) p
 
-/-- The next layer is killed at each Postnikov stage, as a computational path. -/
-def next_stage_killed_path {A : Type u} (n : Nat) :
-    Path (stageCells A n (n + 1)) PUnit :=
-  stage_kills_next (A := A) n
+/-! ## Section 3 – τ₁(A) recovers π₁ -/
 
-/-- Each Postnikov stage in the tower has a reflexive computational witness. -/
-def tower_stage_refl_path (A : Type u) (n : Nat) :
-    Path (postnikovTower A n) (postnikovTower A n) :=
-  Path.refl _
+/-- First truncation stage. -/
+abbrev τ₁ (A : Type u) (a : A) : Type u := τ 1 A a
 
-/-- Each truncation stage has a reflexive computational witness. -/
-def truncation_stage_refl_path (A : Type u) (n : Nat) :
-    Path (nTruncation A n) (nTruncation A n) :=
-  Path.refl _
+/-- Map from `τ₁(A,a)` to the fundamental group `π₁(A,a)`.
+    Both are `Quot (RwEqProp · ·)`, so the map lifts the identity on loops. -/
+noncomputable def tau1ToPiOne (A : Type u) (a : A) :
+    τ₁ A a → PiOne A a :=
+  Quot.lift (fun p => (Quot.mk _ p : PiOne A a)) (by
+    intro _ _ hpq
+    exact Quot.sound hpq)
 
-/-! ## Summary
+/-- Map from `π₁(A,a)` to `τ₁(A,a)`. -/
+noncomputable def piOneToTau1 (A : Type u) (a : A) :
+    PiOne A a → τ₁ A a :=
+  Quot.lift (fun p => (Quot.mk _ p : τ₁ A a)) (by
+    intro _ _ hpq
+    exact Quot.sound hpq)
 
-We define Postnikov stages as the canonical `n`-groupoid truncations of the
-computational-path infinity groupoid. The tower converges because each fixed
-dimension stabilizes once the truncation level is high enough, and each stage
-collapses the next layer of cells to `PUnit`, mirroring the classical statement
-that the next homotopy group vanishes.
--/
+/-- Left inverse witness. -/
+theorem tau1_pi1_left_inv {A : Type u} (a : A) (x : τ₁ A a) :
+    piOneToTau1 A a (tau1ToPiOne A a x) = x := by
+  exact Quot.inductionOn x (fun _ => rfl)
 
+/-- Right inverse witness. -/
+theorem tau1_pi1_right_inv {A : Type u} (a : A) (x : PiOne A a) :
+    tau1ToPiOne A a (piOneToTau1 A a x) = x := by
+  exact Quot.inductionOn x (fun _ => rfl)
 
-/-! ## Basic path theorem layer -/
+/-- `τ₁(A,a) ≃ π₁(A,a)` as a `SimpleEquiv`. -/
+noncomputable def tau1RecoversPiOne (A : Type u) (a : A) :
+    SimpleEquiv (τ₁ A a) (PiOne A a) where
+  toFun := tau1ToPiOne A a
+  invFun := piOneToTau1 A a
+  left_inv := fun x => tau1_pi1_left_inv a x
+  right_inv := fun x => tau1_pi1_right_inv a x
 
-theorem path_refl_1 {A : Type _} (a : A) :
-    Path.refl a = Path.refl a := by
-  rfl
+/-- Stage 1 of the canonical Postnikov tower is `π₁`. -/
+noncomputable def postnikovStageOneEquivPiOne (A : Type u) (a : A) :
+    SimpleEquiv ((postnikovTower A a).stage 1) (PiOne A a) :=
+  tau1RecoversPiOne A a
 
-theorem path_refl_2 {A : Type _} (a : A) :
-    Path.trans (Path.refl a) (Path.refl a) =
-      Path.trans (Path.refl a) (Path.refl a) := by
-  rfl
+/-! ## Section 4 – k-invariants -/
 
-theorem path_symm_refl {A : Type _} (a : A) :
-    Path.symm (Path.refl a) = Path.symm (Path.refl a) := by
-  rfl
+/-- Data for a k-invariant: an `RwEq`-invariant function on loops. -/
+structure KInvariantData (A : Type u) (a : A) (n : Nat) where
+  /-- Coefficient type. -/
+  coeff : Type u
+  /-- The raw map on loops. -/
+  onLoop : Loop A a → coeff
+  /-- `onLoop` respects rewrite equality. -/
+  respects_rweq : ∀ {p q : Loop A a}, RwEq p q → onLoop p = onLoop q
 
-theorem path_trans_refl {A : Type _} (a : A) :
-    Path.trans (Path.refl a) (Path.symm (Path.refl a)) =
-      Path.trans (Path.refl a) (Path.symm (Path.refl a)) := by
-  rfl
+/-- A k-invariant on stage `n+1`: a map from the quotient together with
+    right-unit coherence expressed as a `Path`. -/
+structure KInvariant (A : Type u) (a : A) (n : Nat) where
+  /-- Coefficient type. -/
+  coeff : Type u
+  /-- The descended map on the quotient stage. -/
+  classMap : τ (n + 1) A a → coeff
+  /-- Right-unit coherence: `classMap [p · refl] = classMap [p]`. -/
+  rightUnitCompat :
+    ∀ p : Loop A a,
+      Path
+        (classMap (truncClass (n + 1) (Path.trans p (Path.refl a))))
+        (classMap (truncClass (n + 1) p))
 
-theorem path_trans_assoc_shape {A : Type _} (a : A) :
-    Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) =
-      Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) := by
-  rfl
+/-- Any `RwEq`-invariant loop recipe descends to a k-invariant on `τ_{n+1}`. -/
+noncomputable def KInvariantData.toKInvariant {A : Type u} {a : A} {n : Nat}
+    (K : KInvariantData A a n) : KInvariant A a n where
+  coeff := K.coeff
+  classMap := Quot.lift K.onLoop (by
+    intro p q hpq
+    exact K.respects_rweq (Classical.choice hpq))
+  rightUnitCompat := by
+    intro p
+    exact Path.stepChain (K.respects_rweq (rweq_of_step (Step.trans_refl_right p)))
 
-theorem path_symm_trans_shape {A : Type _} (a : A) :
-    Path.symm (Path.trans (Path.refl a) (Path.refl a)) =
-      Path.symm (Path.trans (Path.refl a) (Path.refl a)) := by
-  rfl
+/-- Canonical k-invariant data: the identity quotient map on stage `n+1`. -/
+noncomputable def canonicalKInvariantData (A : Type u) (a : A) (n : Nat) :
+    KInvariantData A a n where
+  coeff := τ (n + 1) A a
+  onLoop := fun p => truncClass (n + 1) p
+  respects_rweq := by
+    intro p q hpq
+    exact Quot.sound (⟨hpq⟩ : RwEqProp p q)
 
-theorem path_trans_symm_shape {A : Type _} (a : A) :
-    Path.trans (Path.symm (Path.refl a)) (Path.refl a) =
-      Path.trans (Path.symm (Path.refl a)) (Path.refl a) := by
-  rfl
+/-- Canonical k-invariant on stage `n+1`. -/
+noncomputable def canonicalKInvariant (A : Type u) (a : A) (n : Nat) :
+    KInvariant A a n :=
+  (canonicalKInvariantData A a n).toKInvariant
 
-theorem path_double_symm_refl {A : Type _} (a : A) :
-    Path.symm (Path.symm (Path.refl a)) =
-      Path.symm (Path.symm (Path.refl a)) := by
-  rfl
+/-- The bonding map itself is a k-invariant (the projection from `n+2` to `n+1`). -/
+noncomputable def bondingKInvariant (A : Type u) (a : A) (n : Nat) :
+    KInvariant A a (n + 1) where
+  coeff := τ (n + 1) A a
+  classMap := postnikovProjection A a (n + 1)
+  rightUnitCompat := by
+    intro p
+    exact Path.stepChain (projection_right_unit (n + 1) p)
 
-end PostnikovTower
-end Path
-end ComputationalPaths
+end ComputationalPaths.Path.Homotopy.PostnikovTower

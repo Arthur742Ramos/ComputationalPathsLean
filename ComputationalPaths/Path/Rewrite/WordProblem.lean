@@ -1,118 +1,241 @@
-/-
-# Word Problem Decidability for the Groupoid Fragment
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+namespace ComputationalPaths.Path.Confluence
 
-The word problem for the groupoid rewriting system on `Expr` is decidable:
-given two expressions `e₁ e₂ : Expr`, we can decide whether they are
-rewrite-equivalent (`ExprRwEq e₁ e₂`).
+open ComputationalPaths
+open ComputationalPaths.Path
 
-## Strategy
+universe u
 
-The groupoid fragment is the free group on atoms. Two expressions are
-equivalent iff their reduced word representations (`toRW`) are equal.
-Since `toRW` is computable and reduced words have `DecidableEq`,
-this gives a decision procedure.
+/-- Groupoid-fragment paths built from generators, identity, inverse, and composition. -/
+inductive Expr : Type
+  | atom : Nat → Expr
+  | refl : Expr
+  | symm : Expr → Expr
+  | trans : Expr → Expr → Expr
+  deriving DecidableEq, Repr
 
-## Main Results
+/-- Signed generators used in normal forms. -/
+inductive Letter : Type
+  | pos : Nat → Letter
+  | neg : Nat → Letter
+  deriving DecidableEq, Repr
 
-1. `decideExprRwEq`: a decision procedure for `ExprRwEq`
-2. `decideExprRwEq_spec`: soundness and completeness  
-3. `exprRwEq_decidable`: `Decidable` instance
-4. `exprRwEq_separation`: distinct normal forms → not equivalent
+namespace Letter
 
-## References
+def inv : Letter → Letter
+  | .pos n => .neg n
+  | .neg n => .pos n
 
-- Magnus, Karrass & Solitar, "Combinatorial Group Theory"
--/
+noncomputable def inv_inv (g : Letter) : inv (inv g) = g := by
+  cases g <;> rfl
 
-import ComputationalPaths.Path.Rewrite.GroupoidConfluence
+end Letter
 
-namespace ComputationalPaths.Path.Rewrite.GroupoidConfluence
+/-- Reduced words: no adjacent inverse pair. -/
+def Normal : List Letter → Prop
+  | [] => True
+  | [_] => True
+  | g :: h :: t => Letter.inv g ≠ h ∧ Normal (h :: t)
 
-open GroupoidTRS
+/-- Prepend one letter, canceling when an inverse pair appears at the boundary. -/
+def push (g : Letter) : List Letter → List Letter
+  | [] => [g]
+  | h :: t => if Letter.inv g = h then t else g :: h :: t
 
-/-! ## The Decision Procedure -/
+noncomputable def push_length_le (g : Letter) (w : List Letter) :
+    (push g w).length ≤ w.length + 1 := by
+  cases w with
+  | nil =>
+      simp [push]
+  | cons h t =>
+      by_cases hc : Letter.inv g = h
+      · simp [push, hc]; omega
+      · simp [push, hc]
 
-/-- Decision procedure for `ExprRwEq`: normalize both to reduced words. -/
-def decideExprRwEq (e₁ e₂ : Expr) : Bool :=
-  toRW e₁ == toRW e₂
+noncomputable def push_preserves_normal (g : Letter) :
+    ∀ {w : List Letter}, Normal w → Normal (push g w)
+  | [], _ => by
+      simp [push, Normal]
+  | [h], _ => by
+      by_cases hc : Letter.inv g = h
+      · simp [push, hc, Normal]
+      · simp [push, hc, Normal]
+  | h :: h₂ :: t, hw => by
+      rcases hw with ⟨hstep, htail⟩
+      by_cases hc : Letter.inv g = h
+      · simpa [push, hc] using htail
+      · have hnormal : Normal (h :: h₂ :: t) := by
+          exact ⟨hstep, htail⟩
+        simpa [push, hc, Normal] using And.intro hc hnormal
 
-/-- The decision procedure is sound and complete. -/
-theorem decideExprRwEq_spec (e₁ e₂ : Expr) :
-    decideExprRwEq e₁ e₂ = true ↔ ExprRwEq e₁ e₂ := by
-  simp only [decideExprRwEq, beq_iff_eq]
-  exact toRW_eq_iff_exprRwEq e₁ e₂
+/-- Innermost normalization on words (right-associated recursive reduction). -/
+def reduceWord : List Letter → List Letter
+  | [] => []
+  | g :: w => push g (reduceWord w)
 
-/-- `ExprRwEq` is decidable. -/
-instance exprRwEq_decidable (e₁ e₂ : Expr) : Decidable (ExprRwEq e₁ e₂) := by
-  rw [← toRW_eq_iff_exprRwEq]
-  exact toRW_eq_decidable e₁ e₂
+noncomputable def reduceWord_normal : ∀ w : List Letter, Normal (reduceWord w)
+  | [] => by
+      simp [reduceWord, Normal]
+  | g :: w => by
+      exact push_preserves_normal g (reduceWord_normal w)
 
-/-! ## Canonical form and uniqueness -/
+noncomputable def reduceWord_length_le : ∀ w : List Letter, (reduceWord w).length ≤ w.length
+  | [] => by
+      simp [reduceWord]
+  | g :: w => by
+      calc
+        (reduceWord (g :: w)).length
+            = (push g (reduceWord w)).length := by
+                simp [reduceWord]
+        _ ≤ (reduceWord w).length + 1 := push_length_le g (reduceWord w)
+        _ ≤ w.length + 1 := Nat.succ_le_succ (reduceWord_length_le w)
+        _ = (g :: w).length := by
+              simp
 
-/-- Two expressions have the same canonical form iff they are `ExprRwEq`. -/
-theorem canon_eq_iff_exprRwEq (e₁ e₂ : Expr) :
-    canon e₁ = canon e₂ ↔ ExprRwEq e₁ e₂ := by
-  rw [← toRW_eq_iff_exprRwEq, ← canon_eq_iff_toRW_eq]
+noncomputable def reduceWord_measure_drop (g : Letter) (w : List Letter) :
+    (reduceWord w).length < (g :: w).length := by
+  exact Nat.lt_succ_of_le (reduceWord_length_le w)
 
-/-- Canonical forms are idempotent. -/
-theorem canon_canon (e : Expr) : canon (canon e) = canon e := by
-  -- canon e = rwToExpr (toRW e)
-  -- canon (canon e) = rwToExpr (toRW (canon e))
-  -- toRW (canon e) = toRW e  (by toRW_invariant_rtc and reach_canon)
-  simp only [canon]
-  congr 1
-  exact (toRW_invariant_rtc (reach_canon e)).symm
+/-- Syntax-level words before cancellation. -/
+def rawWord : Expr → List Letter
+  | .atom n => [.pos n]
+  | .refl => []
+  | .symm p => (rawWord p).reverse.map Letter.inv
+  | .trans p q => rawWord p ++ rawWord q
 
-/-! ## Separation theorem -/
+/-- Innermost strategy: normalize subterms before reducing the parent term. -/
+def normalizeInnermost : Expr → List Letter
+  | .atom n => [.pos n]
+  | .refl => []
+  | .symm p => reduceWord ((normalizeInnermost p).reverse.map Letter.inv)
+  | .trans p q => reduceWord (normalizeInnermost p ++ normalizeInnermost q)
 
-/-- If two expressions have different reduced words, they are NOT equivalent.
-    This is the separation half of the word problem. -/
-theorem exprRwEq_separation (e₁ e₂ : Expr)
-    (h : toRW e₁ ≠ toRW e₂) : ¬ ExprRwEq e₁ e₂ := by
-  intro heq
-  exact h (toRW_eq_of_exprRwEq heq)
+/-- Outermost strategy: flatten first, then normalize once. -/
+def normalizeOutermost (p : Expr) : List Letter :=
+  reduceWord (rawWord p)
 
-/-- Concrete separation example: `atom 0` and `atom 1` are not equivalent. -/
-theorem atom_zero_ne_one : ¬ ExprRwEq (.atom 0) (.atom 1) := by
-  apply exprRwEq_separation
-  simp [toRW]
+inductive ReductionStrategy
+  | innermost
+  | outermost
+  deriving DecidableEq, Repr
 
-/-- Concrete separation: `atom 0` and `refl` are not equivalent. -/
-theorem atom_ne_refl : ¬ ExprRwEq (.atom 0) .refl := by
-  apply exprRwEq_separation
-  simp [toRW]
+def normalizeWith : ReductionStrategy → Expr → List Letter
+  | .innermost => normalizeInnermost
+  | .outermost => normalizeOutermost
 
-/-! ## Additional Word Problem Properties -/
+/-- Canonical normal form used to solve the word problem. -/
+def normalForm (p : Expr) : List Letter :=
+  normalizeWith .outermost p
 
-/-- The word problem respects symmetry (via ExprRwEq). -/
-theorem decideExprRwEq_symm' (e₁ e₂ : Expr)
-    (h : decideExprRwEq e₁ e₂ = true) : decideExprRwEq e₂ e₁ = true := by
-  rw [decideExprRwEq_spec] at h ⊢
-  exact ExprRwEq.symm h
+noncomputable def normalizeInnermost_normal (p : Expr) : Normal (normalizeInnermost p) := by
+  induction p with
+  | atom n =>
+      simp [normalizeInnermost, Normal]
+  | refl =>
+      simp [normalizeInnermost, Normal]
+  | symm p ih =>
+      simpa [normalizeInnermost] using
+        (reduceWord_normal ((normalizeInnermost p).reverse.map Letter.inv))
+  | trans p q ihp ihq =>
+      simpa [normalizeInnermost] using
+        (reduceWord_normal (normalizeInnermost p ++ normalizeInnermost q))
 
-/-- Transitivity: if e₁ ~ e₂ and e₂ ~ e₃, then e₁ ~ e₃. -/
-theorem exprRwEq_trans' {e₁ e₂ e₃ : Expr}
-    (h₁ : ExprRwEq e₁ e₂) (h₂ : ExprRwEq e₂ e₃) :
-    ExprRwEq e₁ e₃ :=
-  ExprRwEq.trans h₁ h₂
+noncomputable def normalizeOutermost_normal (p : Expr) : Normal (normalizeOutermost p) := by
+  simpa [normalizeOutermost] using reduceWord_normal (rawWord p)
 
-/-- `ExprRwEq` is an equivalence relation (packaged as Setoid). -/
-instance exprRwEqSetoid : Setoid Expr where
-  r := ExprRwEq
-  iseqv := ⟨ExprRwEq.refl, fun h => ExprRwEq.symm h, fun h₁ h₂ => ExprRwEq.trans h₁ h₂⟩
+noncomputable def normalizeWith_normal (s : ReductionStrategy) (p : Expr) :
+    Normal (normalizeWith s p) := by
+  cases s with
+  | innermost => simpa [normalizeWith] using normalizeInnermost_normal p
+  | outermost => simpa [normalizeWith] using normalizeOutermost_normal p
 
-/-! ## The Full System: Undecidability Discussion
+/-- Decidable rewrite equality for the groupoid fragment via normal forms. -/
+def GroupoidRwEq (p q : Expr) : Prop :=
+  normalForm p = normalForm q
 
-For the **full** computational paths system including β-reduction,
-η-expansion, and dependent type formers, the word problem is expected
-to be undecidable:
+instance groupoidRwEq_decidable (p q : Expr) : Decidable (GroupoidRwEq p q) := by
+  unfold GroupoidRwEq normalForm normalizeWith normalizeOutermost
+  infer_instance
 
-1. The system can encode System F (polymorphic λ-calculus)
-2. Typechecking in System F is undecidable (Wells, 1999)  
-3. The word problem for βη-equality subsumes typechecking
+def decideGroupoidRwEq (p q : Expr) : Bool :=
+  decide (GroupoidRwEq p q)
 
-**Conjecture**: The word problem for the full LNDEQ system
-extended with dependent types is Σ₁⁰-complete.
--/
+noncomputable def decideGroupoidRwEq_spec (p q : Expr) :
+    decideGroupoidRwEq p q = true ↔ GroupoidRwEq p q := by
+  simp [decideGroupoidRwEq]
 
-end ComputationalPaths.Path.Rewrite.GroupoidConfluence
+/-- Complexity measure used for explicit termination arguments on expressions. -/
+def exprComplexity : Expr → Nat
+  | .atom _ => 1
+  | .refl => 1
+  | .symm p => exprComplexity p + 1
+  | .trans p q => exprComplexity p + exprComplexity q + 1
+
+noncomputable def exprComplexity_symm_lt (p : Expr) :
+    exprComplexity p < exprComplexity (.symm p) := by
+  simp [exprComplexity]
+
+noncomputable def exprComplexity_trans_left_lt (p q : Expr) :
+    exprComplexity p < exprComplexity (.trans p q) := by
+  simp [exprComplexity]; omega
+
+noncomputable def exprComplexity_trans_right_lt (p q : Expr) :
+    exprComplexity q < exprComplexity (.trans p q) := by
+  simp [exprComplexity]; omega
+
+noncomputable def normalization_word_wf :
+    WellFounded (fun w₁ w₂ : List Letter => w₁.length < w₂.length) :=
+  InvImage.wf List.length Nat.lt_wfRel.wf
+
+noncomputable def normalization_expr_wf :
+    WellFounded (fun p q : Expr => exprComplexity p < exprComplexity q) :=
+  InvImage.wf exprComplexity Nat.lt_wfRel.wf
+
+/-- Interpret a reduced-word letter as a loop path. -/
+def letterPath {A : Type u} {a : A} (ρ : Nat → Path a a) : Letter → Path a a
+  | .pos n => ρ n
+  | .neg n => Path.symm (ρ n)
+
+/-- Interpret a word as an iterated composition of loop paths. -/
+def evalWord {A : Type u} {a : A} (ρ : Nat → Path a a) : List Letter → Path a a
+  | [] => Path.refl a
+  | g :: w => Path.trans (letterPath ρ g) (evalWord ρ w)
+
+noncomputable def evalWord_cancel_pos_neg {A : Type u} {a : A}
+    (ρ : Nat → Path a a) (n : Nat) (w : List Letter) :
+    RwEq (evalWord ρ (.pos n :: .neg n :: w)) (evalWord ρ w) := by
+  have hAssoc :
+      RwEq
+        (Path.trans (ρ n) (Path.trans (Path.symm (ρ n)) (evalWord ρ w)))
+        (Path.trans (Path.trans (ρ n) (Path.symm (ρ n))) (evalWord ρ w)) := by
+    exact rweq_symm (rweq_tt (ρ n) (Path.symm (ρ n)) (evalWord ρ w))
+  have hCancel :
+      RwEq
+        (Path.trans (Path.trans (ρ n) (Path.symm (ρ n))) (evalWord ρ w))
+        (Path.trans (Path.refl a) (evalWord ρ w)) :=
+    rweq_trans_congr_left (evalWord ρ w) (rweq_cmpA_inv_right (ρ n))
+  have hUnit :
+      RwEq (Path.trans (Path.refl a) (evalWord ρ w)) (evalWord ρ w) :=
+    rweq_cmpA_refl_left (evalWord ρ w)
+  simpa [evalWord, letterPath] using rweq_trans hAssoc (rweq_trans hCancel hUnit)
+
+noncomputable def evalWord_cancel_neg_pos {A : Type u} {a : A}
+    (ρ : Nat → Path a a) (n : Nat) (w : List Letter) :
+    RwEq (evalWord ρ (.neg n :: .pos n :: w)) (evalWord ρ w) := by
+  have hAssoc :
+      RwEq
+        (Path.trans (Path.symm (ρ n)) (Path.trans (ρ n) (evalWord ρ w)))
+        (Path.trans (Path.trans (Path.symm (ρ n)) (ρ n)) (evalWord ρ w)) := by
+    exact rweq_symm (rweq_tt (Path.symm (ρ n)) (ρ n) (evalWord ρ w))
+  have hCancel :
+      RwEq
+        (Path.trans (Path.trans (Path.symm (ρ n)) (ρ n)) (evalWord ρ w))
+        (Path.trans (Path.refl a) (evalWord ρ w)) :=
+    rweq_trans_congr_left (evalWord ρ w) (rweq_cmpA_inv_left (ρ n))
+  have hUnit :
+      RwEq (Path.trans (Path.refl a) (evalWord ρ w)) (evalWord ρ w) :=
+    rweq_cmpA_refl_left (evalWord ρ w)
+  simpa [evalWord, letterPath] using rweq_trans hAssoc (rweq_trans hCancel hUnit)
+
+end ComputationalPaths.Path.Confluence

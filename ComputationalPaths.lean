@@ -41,7 +41,21 @@ import ComputationalPaths.SheafCohomology.PathInfrastructure
 import ComputationalPaths.TwoCategoryInstances
 import ComputationalPaths.DeformationTheory.DeformationPaths
 import ComputationalPaths.DeformationTheory.ObstructionPaths
-
+import ComputationalPaths.Path.Algebra
+import ComputationalPaths.Path.Category
+import ComputationalPaths.Coherence
+import ComputationalPaths.Comparison
+import ComputationalPaths.Path.Confluence
+import ComputationalPaths.Path.Context
+import ComputationalPaths.Path.CoveringSpace
+import ComputationalPaths.CwF
+import ComputationalPaths.Examples
+import ComputationalPaths.Path.HIT
+import ComputationalPaths.Path.Homotopy
+import ComputationalPaths.Path.OmegaGroupoidCompPaths
+import ComputationalPaths.Path.Rewriting
+import ComputationalPaths.Path.Transport
+import ComputationalPaths.TypeFormers
 -- Auto-wired subdirectory root modules
 import ComputationalPaths.Adjunction
 import ComputationalPaths.AlgebraicGeometry

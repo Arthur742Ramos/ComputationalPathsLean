@@ -1,394 +1,253 @@
+import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
-import ComputationalPaths.DeformationTheory.DeformationPaths
-
-/-!
-# Obstruction theory via computational paths
-
-This module formalises **obstruction classes** and **Kodaira-Spencer maps**
-in the computational-paths framework:
-
-* `ObstructionClass` — an obstruction to extending a deformation from
-  order `n` to order `n+1`, witnessed by an explicit `Path` into the
-  obstruction space.
-* `KodairaSpencerMap` — the Kodaira-Spencer map as a path-preserving
-  morphism from the tangent space of the base to the first cohomology
-  of the fibre, with all compatibility expressed via `Path` and `RwEq`.
-* `SmoothnessData` — formal smoothness criterion: the obstruction
-  class vanishes (via a `Path` to zero), guaranteeing liftability.
-* `ExtensionData` — explicit extension of a deformation by one order,
-  with the extension path and its compatibility with the obstruction.
-* `TangentCohomologyData` — the tangent-obstruction exact sequence
-  `T¹ → Def → T²`, expressed entirely through paths.
-
-All identities are `Path`s; all coherences are `RwEq`.
--/
-
+import ComputationalPaths.Path.Rewrite.CriticalPairs
 namespace ComputationalPaths
 namespace DeformationTheory
 
-open Path
-
-universe u v
-
-/-! ## Obstruction classes -/
-
-/-- An obstruction datum packages:
-- the carrier of the obstruction space,
-- a map computing the obstruction from a deformation element,
-- path-functoriality of the obstruction map,
-- the obstruction equation: if the element extends, the obstruction
-  is path-connected to zero. -/
-structure ObstructionData (A : Type u) where
-  /-- The type of obstruction classes. -/
-  obsSpace : Type u
-  /-- Zero in the obstruction space. -/
-  obsZero : obsSpace
-  /-- Addition in the obstruction space. -/
-  obsAdd : obsSpace → obsSpace → obsSpace
-  /-- The obstruction map from deformation elements. -/
-  obsMap : A → obsSpace
-  /-- Path-functoriality of `obsMap`. -/
-  obsMapPath : {x y : A} → Path x y → Path (obsMap x) (obsMap y)
-  /-- Path-functoriality of `obsAdd`. -/
-  obsAddPath :
-    {o₁ o₂ p₁ p₂ : obsSpace} →
-      Path o₁ o₂ → Path p₁ p₂ →
-        Path (obsAdd o₁ p₁) (obsAdd o₂ p₂)
-
-namespace ObstructionData
-
-variable {A : Type u} (O : ObstructionData A)
-
-/-- An element is unobstructed when its obstruction class is
-path-connected to zero. -/
-structure Unobstructed (x : A) where
-  vanishing : Path (O.obsMap x) O.obsZero
-
-/-- Normalization step for unobstructedness witnesses. -/
-noncomputable def unobstructedRweq (x : A) (u : O.Unobstructed x) :
-    RwEq (Path.trans u.vanishing (Path.refl O.obsZero)) u.vanishing :=
-  rweq_of_step (Path.Step.trans_refl_right _)
-
-/-- Cancellation for unobstructedness witness. -/
-noncomputable def unobstructedCancelLeft (x : A) (u : O.Unobstructed x) :
-    RwEq
-      (Path.trans (Path.symm u.vanishing) u.vanishing)
-      (Path.refl O.obsZero) :=
-  rweq_cmpA_inv_left u.vanishing
-
-/-- Transport unobstructedness along a path. -/
-def transportUnobstructed {x y : A} (p : Path x y)
-    (u : O.Unobstructed x) : O.Unobstructed y where
-  vanishing :=
-    Path.trans (Path.symm (O.obsMapPath p))
-      (Path.trans u.vanishing (Path.refl O.obsZero))
-
-/-- The transported unobstructedness witness simplifies. -/
-noncomputable def transportUnobstructedRweq
-    {x y : A} (p : Path x y) (u : O.Unobstructed x) :
-    RwEq
-      (Path.trans (O.transportUnobstructed p u).vanishing (Path.refl O.obsZero))
-      (O.transportUnobstructed p u).vanishing :=
-  rweq_of_step (Path.Step.trans_refl_right _)
-
-end ObstructionData
-
-/-! ## Obstruction class for a Maurer-Cartan element -/
-
-/-- An obstruction class witnessing the failure or success of lifting
-a Maurer-Cartan element to the next order. -/
-structure ObstructionClass {A : Type u}
-    (D : FormalDeformationData A) (O : ObstructionData A) where
-  /-- The Maurer-Cartan element whose liftability we study. -/
-  mc : MaurerCartanViaPaths D
-  /-- The obstruction value. -/
-  obs : O.obsSpace
-  /-- Path witnessing the obstruction computation. -/
-  computation : Path (O.obsMap mc.element) obs
-
-namespace ObstructionClass
-
-variable {A : Type u}
-variable {D : FormalDeformationData A} {O : ObstructionData A}
-
-/-- Normalization step for the obstruction computation path. -/
-noncomputable def computationRweq (oc : ObstructionClass D O) :
-    RwEq (Path.trans oc.computation (Path.refl oc.obs)) oc.computation :=
-  rweq_of_step (Path.Step.trans_refl_right _)
-
-/-- Cancellation for the obstruction computation. -/
-noncomputable def computationCancelLeft (oc : ObstructionClass D O) :
-    RwEq
-      (Path.trans (Path.symm oc.computation) oc.computation)
-      (Path.refl oc.obs) :=
-  rweq_cmpA_inv_left oc.computation
-
-/-- An unobstructed MC element has its obstruction class vanishing. -/
-def ofUnobstructed (mc : MaurerCartanViaPaths D)
-    (u : O.Unobstructed mc.element) :
-    ObstructionClass D O where
-  mc := mc
-  obs := O.obsZero
-  computation := u.vanishing
-
-/-- Composing the obstruction computation with the vanishing path
-yields a closed loop, which rewrite-cancels. -/
-noncomputable def ofUnobstructed_loop (mc : MaurerCartanViaPaths D)
-    (u : O.Unobstructed mc.element) :
-    RwEq
-      (Path.trans
-        (ofUnobstructed (O := O) mc u).computation
-        (Path.symm (ofUnobstructed (O := O) mc u).computation))
-      (Path.refl (O.obsMap mc.element)) :=
-  rweq_cmpA_inv_right (ofUnobstructed (O := O) mc u).computation
-
-end ObstructionClass
-
-/-! ## Kodaira-Spencer map via paths -/
-
-/-- The Kodaira-Spencer map as a path-preserving morphism.
-
-Abstractly, KS maps the tangent space of the parameter space to the
-first cohomology of the deformation. Here both spaces are represented
-as types with path structure, and the map is path-functorial. -/
-structure KodairaSpencerMap (A : Type u) (B : Type v) where
-  /-- Tangent space type (source). -/
-  tangentZero : A
-  /-- Cohomology type zero (target). -/
-  cohomZero : B
-  /-- The KS map itself. -/
-  ks : A → B
-  /-- Path-functoriality of the KS map. -/
-  ksPath : {x y : A} → Path x y → Path (ks x) (ks y)
-  /-- KS preserves the zero element up to path. -/
-  ksZero : Path (ks tangentZero) cohomZero
-
-namespace KodairaSpencerMap
-
-variable {A : Type u} {B : Type v} (K : KodairaSpencerMap A B)
-
-/-- Normalization for the KS zero-preservation path. -/
-noncomputable def ksZeroRweq :
-    RwEq (Path.trans K.ksZero (Path.refl K.cohomZero)) K.ksZero :=
-  rweq_of_step (Path.Step.trans_refl_right _)
-
-/-- Cancellation for the KS zero-preservation path. -/
-noncomputable def ksZeroCancelLeft :
-    RwEq
-      (Path.trans (Path.symm K.ksZero) K.ksZero)
-      (Path.refl K.cohomZero) :=
-  rweq_cmpA_inv_left K.ksZero
-
-/-- The KS map respects path composition via `congrArg`. -/
-theorem ksPathTrans {x y z : A} (p : Path x y) (q : Path y z) :
-    Path.congrArg K.ks (Path.trans p q) =
-      Path.trans (Path.congrArg K.ks p) (Path.congrArg K.ks q) := by
-  simpa using Path.congrArg_trans (f := K.ks) (p := p) (q := q)
-
-/-- The KS map respects path symmetry. -/
-theorem ksPathSymm {x y : A} (p : Path x y) :
-    Path.congrArg K.ks (Path.symm p) = Path.symm (Path.congrArg K.ks p) := by
-  simpa using Path.congrArg_symm (f := K.ks) (p := p)
-
-end KodairaSpencerMap
-
-/-! ## Smoothness criteria -/
-
-/-- Formal smoothness data: the obstruction vanishes for every element,
-witnessed by explicit vanishing paths. -/
-structure SmoothnessData {A : Type u}
-    (D : FormalDeformationData A) (O : ObstructionData A) where
-  /-- For every element, the obstruction is path-connected to zero. -/
-  smooth : ∀ x : A, O.Unobstructed x
-
-namespace SmoothnessData
-
-variable {A : Type u}
-variable {D : FormalDeformationData A} {O : ObstructionData A}
-
-/-- In a smooth deformation, every MC element has vanishing obstruction class. -/
-def obstructionVanishes (S : SmoothnessData D O)
-    (mc : MaurerCartanViaPaths D) :
-    ObstructionClass D O :=
-  ObstructionClass.ofUnobstructed mc (S.smooth mc.element)
-
-/-- The obstruction of any MC element in a smooth deformation rewrite-cancels. -/
-noncomputable def obstructionVanishesCancelLeft
-    (S : SmoothnessData D O)
-    (mc : MaurerCartanViaPaths D) :
-    RwEq
-      (Path.trans
-        (Path.symm (S.obstructionVanishes mc).computation)
-        (S.obstructionVanishes mc).computation)
-      (Path.refl O.obsZero) :=
-  rweq_cmpA_inv_left (S.obstructionVanishes mc).computation
-
-end SmoothnessData
-
-/-! ## Extension data -/
-
-/-- Extension of a deformation by one order: given an MC element and
-a proof that the obstruction vanishes, produce an extended MC element
-with a compatibility path. -/
-structure ExtensionData {A : Type u}
-    (D : FormalDeformationData A) (O : ObstructionData A) where
-  /-- The original MC element. -/
-  base : MaurerCartanViaPaths D
-  /-- Vanishing of the obstruction. -/
-  unobstructed : O.Unobstructed base.element
-  /-- The extended element. -/
-  extended : A
-  /-- Path from the base element to the extended element. -/
-  extension : Path base.element extended
-  /-- The extended element also satisfies the MC equation. -/
-  extendedMC : MaurerCartanViaPaths D
-  /-- Coherence: the extended MC element's carrier is `extended`. -/
-  carrierCoherence : Path extendedMC.element extended
-
-namespace ExtensionData
-
-variable {A : Type u}
-variable {D : FormalDeformationData A} {O : ObstructionData A}
-
-/-- The extension path is rewrite-cancelable. -/
-noncomputable def extensionCancelLeft (E : ExtensionData D O) :
-    RwEq
-      (Path.trans (Path.symm E.extension) E.extension)
-      (Path.refl E.extended) :=
-  rweq_cmpA_inv_left E.extension
-
-/-- The carrier coherence path is rewrite-cancelable. -/
-noncomputable def carrierCoherenceCancelLeft (E : ExtensionData D O) :
-    RwEq
-      (Path.trans (Path.symm E.carrierCoherence) E.carrierCoherence)
-      (Path.refl E.extended) :=
-  rweq_cmpA_inv_left E.carrierCoherence
-
-/-- Composing extension with carrier coherence. -/
-def extensionToCarrier (E : ExtensionData D O) :
-    Path E.base.element E.extendedMC.element :=
-  Path.trans E.extension (Path.symm E.carrierCoherence)
-
-/-- The composite extension-carrier path simplifies. -/
-noncomputable def extensionToCarrierRweq (E : ExtensionData D O) :
-    RwEq
-      (Path.trans (extensionToCarrier E) (Path.refl E.extendedMC.element))
-      (extensionToCarrier E) :=
-  rweq_of_step (Path.Step.trans_refl_right _)
-
-end ExtensionData
-
-/-! ## Tangent-obstruction sequence -/
-
-/-- The tangent-obstruction exact sequence data, expressed via paths.
-
-This captures the sequence `T¹ →[ks] Def →[obs] T²` where:
-- `T¹` is the tangent cohomology (first-order deformations),
-- `Def` is the deformation functor,
-- `T²` is the obstruction space,
-and exactness is witnessed by paths showing that the composition
-`obs ∘ ks` is path-connected to zero. -/
-structure TangentObstructionSequence (A : Type u) (B : Type v) where
-  /-- The deformation data. -/
-  deformData : FormalDeformationData A
-  /-- The obstruction data. -/
-  obs : ObstructionData A
-  /-- The Kodaira-Spencer map (tangent → deformation space). -/
-  ks : KodairaSpencerMap B A
-  /-- Exactness: the composition obs ∘ ks sends everything to zero. -/
-  exact : ∀ t : B, Path (obs.obsMap (ks.ks t)) obs.obsZero
-
-namespace TangentObstructionSequence
-
-variable {A : Type u} {B : Type v} (T : TangentObstructionSequence A B)
-
-/-- Normalization for the exactness witness. -/
-noncomputable def exactRweq (t : B) :
-    RwEq (Path.trans (T.exact t) (Path.refl T.obs.obsZero)) (T.exact t) :=
-  rweq_of_step (Path.Step.trans_refl_right _)
-
-/-- Cancellation for the exactness witness. -/
-noncomputable def exactCancelLeft (t : B) :
-    RwEq
-      (Path.trans (Path.symm (T.exact t)) (T.exact t))
-      (Path.refl T.obs.obsZero) :=
-  rweq_cmpA_inv_left (T.exact t)
-
-/-- Every tangent vector maps to an unobstructed element. -/
-def tangentUnobstructed (t : B) : T.obs.Unobstructed (T.ks.ks t) where
-  vanishing := T.exact t
-
-/-- KS image elements always extend (formal smoothness of the KS image). -/
-def ksImageSmooth : ∀ t : B, T.obs.Unobstructed (T.ks.ks t) :=
-  T.tangentUnobstructed
-
-/-- The exactness witness composes with the inverse mapped KS zero path. -/
-noncomputable def exactKsZeroLoop :
-    RwEq
-      (Path.trans
-        (Path.symm (T.obs.obsMapPath T.ks.ksZero))
-        (T.exact T.ks.tangentZero))
-      (Path.trans
-        (Path.symm (T.obs.obsMapPath T.ks.ksZero))
-        (T.exact T.ks.tangentZero)) :=
-  RwEq.refl _
-
-/-- Naturality: the exactness witness is compatible with path transport. -/
-noncomputable def exactNaturality {t₁ t₂ : B} (p : Path t₁ t₂) :
-    RwEq
-      (Path.trans
-        (Path.symm (T.obs.obsMapPath (T.ks.ksPath p)))
-        (T.exact t₁))
-      (Path.trans
-        (Path.symm (T.obs.obsMapPath (T.ks.ksPath p)))
-        (T.exact t₁)) :=
-  RwEq.refl _
-
-end TangentObstructionSequence
-
-/-! ## Pro-representability criterion -/
-
-/-- A deformation functor is pro-representable when there is a universal
-element with the property that every MC element factors through it
-via a path-preserving morphism. -/
-structure ProRepresentabilityData {A : Type u}
-    (D : FormalDeformationData A) where
-  /-- The universal MC element. -/
-  universal : MaurerCartanViaPaths D
-  /-- For every MC element, a path from the universal element's carrier. -/
-  universalPath : ∀ mc : MaurerCartanViaPaths D,
-    Path universal.element mc.element
-  /-- Curvature coherence path. -/
-  curvatureCoherence : ∀ mc : MaurerCartanViaPaths D,
-    Path (formalCurvature D universal.element) (formalCurvature D mc.element)
-  /-- The universal MC equation is compatible. -/
-  equationCompat : ∀ mc : MaurerCartanViaPaths D,
-    RwEq
-      (Path.trans (curvatureCoherence mc) mc.equation)
-      universal.equation
-
-namespace ProRepresentabilityData
-
-variable {A : Type u} {D : FormalDeformationData A}
-
-/-- The universal path is rewrite-cancelable. -/
-noncomputable def universalPathCancelLeft
-    (R : ProRepresentabilityData D) (mc : MaurerCartanViaPaths D) :
-    RwEq
-      (Path.trans (Path.symm (R.universalPath mc)) (R.universalPath mc))
-      (Path.refl mc.element) :=
-  rweq_cmpA_inv_left (R.universalPath mc)
-
-/-- The universal element is gauge-equivalent to any other MC element. -/
-def universalGauge (R : ProRepresentabilityData D)
-    (mc : MaurerCartanViaPaths D) :
-    GaugeEquivalenceData D R.universal mc where
-  gauge := D.zero
-  action := R.universalPath mc
-  coherence := R.curvatureCoherence mc
-  equationCompat := R.equationCompat mc
-
-end ProRepresentabilityData
+open ComputationalPaths
+open ComputationalPaths.Path
+open ComputationalPaths.Path.Rewriting
+
+universe u
+
+/-- Partial deformation tower up to level `n` with explicit `RwEq` links. -/
+structure PartialDeformation {A : Type u} {a b : A} (p₀ : Path a b) (n : Nat) where
+  pathAt : Nat → Path a b
+  start : p₀ = pathAt 0
+  adjacent : ∀ t, t < n → RwEq (pathAt t) (pathAt (t + 1))
+
+namespace PartialDeformation
+
+variable {A : Type u} {a b : A} {p₀ : Path a b} {n : Nat}
+
+@[simp] def terminal (D : PartialDeformation p₀ n) : Path a b :=
+  D.pathAt n
+
+noncomputable def prefixRwEq (D : PartialDeformation p₀ n) :
+    ∀ t, t ≤ n → RwEq (D.pathAt 0) (D.pathAt t)
+  | 0, _ => rweq_refl (D.pathAt 0)
+  | Nat.succ t, h =>
+      have ht : t < n := Nat.lt_of_lt_of_le (Nat.lt_succ_self t) h
+      have hprev : RwEq (D.pathAt 0) (D.pathAt t) := prefixRwEq D t (Nat.le_of_lt ht)
+      rweq_trans hprev (D.adjacent t ht)
+
+noncomputable def totalRwEq (D : PartialDeformation p₀ n) :
+    RwEq p₀ D.terminal :=
+  rweq_trans (rweq_of_eq D.start) (D.prefixRwEq n (Nat.le_refl n))
+
+end PartialDeformation
+
+/-- Quotient of paths by rewrite equivalence. -/
+abbrev RwEqClass {A : Type u} {x y : A} : Type u :=
+  Quot (fun p q : Path x y => RwEqProp p q)
+
+noncomputable def rweqClassOf {A : Type u} {x y : A}
+    (p : Path x y) : RwEqClass (A := A) (x := x) (y := y) :=
+  Quot.mk _ p
+
+noncomputable def rweq_symm_congr_from_rweq
+    {A : Type u} {a b : A} {p q : Path a b}
+    (h : RwEq p q) : RwEq (Path.symm p) (Path.symm q) := by
+  induction h with
+  | refl p =>
+      exact rweq_refl (Path.symm p)
+  | step hs =>
+      exact rweq_of_step (ComputationalPaths.Path.Step.symm_congr hs)
+  | symm _ ih =>
+      exact rweq_symm ih
+  | trans _ _ ih₁ ih₂ =>
+      exact rweq_trans ih₁ ih₂
+
+noncomputable def rweq_of_rw
+    {A : Type u} {a b : A} {p q : Path a b}
+    (h : Rw p q) : RwEq p q := by
+  induction h with
+  | refl p =>
+      exact rweq_refl p
+  | tail h step ih =>
+      exact rweq_trans ih (rweq_of_step step)
+
+/-- Obstruction cocycle at level `n`: two competing one-step extensions
+from the terminal path of a partial deformation. -/
+structure ObstructionCocycle
+    {A : Type u} {a b : A} {p₀ : Path a b} {n : Nat}
+    (D : PartialDeformation p₀ n) where
+  caseTag : CriticalPairCase
+  left : Path a b
+  right : Path a b
+  leftStep : ComputationalPaths.Path.Step D.terminal left
+  rightStep : ComputationalPaths.Path.Step D.terminal right
+
+namespace ObstructionCocycle
+
+variable {A : Type u} {a b : A} {p₀ : Path a b} {n : Nat}
+variable {D : PartialDeformation p₀ n}
+
+/-- Primary obstruction loop at the target endpoint. -/
+@[simp] def obstructionLoop (oc : ObstructionCocycle D) : Path b b :=
+  Path.trans (Path.symm oc.left) oc.right
+
+/-- Obstruction cocycle represented as an `RwEq` class. -/
+noncomputable def obstructionClass (oc : ObstructionCocycle D) :
+    RwEqClass (A := A) (x := b) (y := b) :=
+  rweqClassOf oc.obstructionLoop
+
+/-- Joinability phrased at the `RwEq` level. -/
+def Joinable (oc : ObstructionCocycle D) : Prop :=
+  ∃ r : Path a b, RwEq oc.left r ∧ RwEq oc.right r
+
+/-- Joinability in the `Rw` sense, as used in `CriticalPairs.lean`. -/
+def RwJoinable (oc : ObstructionCocycle D) : Prop :=
+  JoinableRw oc.left oc.right
+
+/-- Vanishing of the primary obstruction class. -/
+def Vanishes (oc : ObstructionCocycle D) : Prop :=
+  RwEqProp oc.obstructionLoop (Path.refl b)
+
+/-- Two choices of extension data with `RwEq`-equivalent branches. -/
+structure SameChoice (oc₁ oc₂ : ObstructionCocycle D) where
+  leftEq : RwEq oc₁.left oc₂.left
+  rightEq : RwEq oc₁.right oc₂.right
+
+theorem obstructionLoop_respects_rweq
+    {oc₁ oc₂ : ObstructionCocycle D}
+    (h : SameChoice oc₁ oc₂) :
+    RwEq oc₁.obstructionLoop oc₂.obstructionLoop := by
+  exact rweq_trans_congr
+    (rweq_symm_congr_from_rweq h.leftEq)
+    h.rightEq
+
+/-- Well-definedness: equivalent extension choices define the same obstruction class. -/
+theorem obstructionClass_well_defined
+    {oc₁ oc₂ : ObstructionCocycle D}
+    (h : SameChoice oc₁ oc₂) :
+    oc₁.obstructionClass = oc₂.obstructionClass := by
+  exact Quot.sound (rweqProp_of_rweq (obstructionLoop_respects_rweq h))
+
+theorem joinable_of_rwJoinable
+    (oc : ObstructionCocycle D) (h : oc.RwJoinable) :
+    oc.Joinable := by
+  rcases h with ⟨r, hl, hr⟩
+  exact ⟨r, rweq_of_rw hl, rweq_of_rw hr⟩
+
+theorem vanishes_of_joinable
+    (oc : ObstructionCocycle D) (h : oc.Joinable) :
+    oc.Vanishes := by
+  rcases h with ⟨r, hleft, hright⟩
+  have hright_left : RwEq oc.right oc.left :=
+    rweq_trans hright (rweq_symm hleft)
+  have h₁ :
+      RwEq
+        (Path.trans (Path.symm oc.left) oc.right)
+        (Path.trans (Path.symm oc.left) oc.left) :=
+    rweq_trans_congr_right (Path.symm oc.left) hright_left
+  have h₂ :
+      RwEq (Path.trans (Path.symm oc.left) oc.left) (Path.refl b) :=
+    rweq_cmpA_inv_left oc.left
+  exact rweqProp_of_rweq (rweq_trans h₁ h₂)
+
+theorem joinable_of_vanishes
+    (oc : ObstructionCocycle D) (h : oc.Vanishes) :
+    oc.Joinable := by
+  rcases h with ⟨hloop⟩
+  have hcongr :
+      RwEq
+        (Path.trans oc.left oc.obstructionLoop)
+        (Path.trans oc.left (Path.refl b)) :=
+    rweq_trans_congr_left oc.left hloop
+  have hToLeft :
+      RwEq (Path.trans oc.left oc.obstructionLoop) oc.left :=
+    rweq_trans hcongr (rweq_cmpA_refl_right oc.left)
+  have hToRight :
+      RwEq (Path.trans oc.left oc.obstructionLoop) oc.right := by
+    simpa [obstructionLoop] using
+      (rweq_of_step (ComputationalPaths.Path.Step.trans_cancel_left oc.left oc.right))
+  have hright_left : RwEq oc.right oc.left :=
+    rweq_trans (rweq_symm hToRight) hToLeft
+  exact ⟨oc.left, rweq_refl oc.left, hright_left⟩
+
+/-- Vanishing criterion: the primary obstruction vanishes exactly when the
+critical pair at that level is joinable. -/
+theorem vanishing_iff_joinable (oc : ObstructionCocycle D) :
+    oc.Vanishes ↔ oc.Joinable := by
+  constructor
+  · intro h
+    exact joinable_of_vanishes oc h
+  · intro h
+    exact vanishes_of_joinable oc h
+
+theorem vanishing_of_criticalPairJoinable
+    (oc : ObstructionCocycle D) (h : oc.RwJoinable) :
+    oc.Vanishes :=
+  vanishes_of_joinable oc (joinable_of_rwJoinable oc h)
+
+/-- Secondary (Toda) representative, defined only after primary vanishing. -/
+structure TodaRepresentative (oc : ObstructionCocycle D) where
+  primaryVanishes : oc.Vanishes
+  mediator : Path a b
+  leftJoin : RwEq oc.left mediator
+  rightJoin : RwEq oc.right mediator
+  secondary : Path b b
+
+namespace TodaRepresentative
+
+variable {oc : ObstructionCocycle D}
+
+noncomputable def secondaryClass (τ : TodaRepresentative oc) :
+    RwEqClass (A := A) (x := b) (y := b) :=
+  rweqClassOf τ.secondary
+
+def GaugeEquivalent (τ₁ τ₂ : TodaRepresentative oc) : Prop :=
+  RwEq τ₁.secondary τ₂.secondary
+
+theorem secondaryClass_eq_of_gauge
+    {τ₁ τ₂ : TodaRepresentative oc}
+    (h : GaugeEquivalent τ₁ τ₂) :
+    τ₁.secondaryClass = τ₂.secondaryClass := by
+  exact Quot.sound (rweqProp_of_rweq h)
+
+/-- Toda bracket as a right coset in the space of `RwEq` classes. -/
+def todaCoset (τ : TodaRepresentative oc) :
+    Set (RwEqClass (A := A) (x := b) (y := b)) :=
+  fun cls => ∃ γ : Path b b, cls = rweqClassOf (Path.trans τ.secondary γ)
+
+abbrev TodaBracket (oc : ObstructionCocycle D) :=
+  Set (RwEqClass (A := A) (x := b) (y := b))
+
+noncomputable def todaBracket (τ : TodaRepresentative oc) : TodaBracket oc :=
+  τ.todaCoset
+
+theorem baseClass_mem_todaBracket (τ : TodaRepresentative oc) :
+    τ.secondaryClass ∈ τ.todaBracket := by
+  refine ⟨Path.refl b, ?_⟩
+  exact Quot.sound (rweqProp_of_rweq (rweq_symm (rweq_cmpA_refl_right τ.secondary)))
+
+theorem todaBracket_eq_of_gauge
+    {τ₁ τ₂ : TodaRepresentative oc}
+    (h : GaugeEquivalent τ₁ τ₂) :
+    τ₁.todaBracket = τ₂.todaBracket := by
+  funext cls
+  apply propext
+  constructor
+  · intro hmem
+    rcases hmem with ⟨γ, hγ⟩
+    refine ⟨γ, ?_⟩
+    calc
+      cls = rweqClassOf (Path.trans τ₁.secondary γ) := hγ
+      _ = rweqClassOf (Path.trans τ₂.secondary γ) := by
+        exact Quot.sound (rweqProp_of_rweq (rweq_trans_congr_left γ h))
+  · intro hmem
+    rcases hmem with ⟨γ, hγ⟩
+    refine ⟨γ, ?_⟩
+    calc
+      cls = rweqClassOf (Path.trans τ₂.secondary γ) := hγ
+      _ = rweqClassOf (Path.trans τ₁.secondary γ) := by
+        exact Quot.sound (rweqProp_of_rweq
+          (rweq_trans_congr_left γ (rweq_symm h)))
+
+end TodaRepresentative
+
+end ObstructionCocycle
 
 end DeformationTheory
 end ComputationalPaths
