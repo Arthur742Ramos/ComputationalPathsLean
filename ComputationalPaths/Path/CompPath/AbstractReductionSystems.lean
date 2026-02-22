@@ -328,7 +328,7 @@ theorem toPath_toEq_symm {a b : A} (h : a = b) :
   subst h; rfl
 
 /-- Reflexive path from `rfl`. -/
-theorem toPath_refl (a : A) : toPath (rfl : a = a) = Path.mk [Step.mk _ _ rfl] rfl := rfl
+theorem toPath_refl (a : A) : toPath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl
 
 /-- Transport along a toPath is the same as Eq-substitution. -/
 theorem transport_via_path {a b : A} {D : A → Type u} (h : a = b) (x : D a) :

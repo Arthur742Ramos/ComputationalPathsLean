@@ -108,7 +108,7 @@ namespace IsSet
 def punitSet : IsSet CompPath.PUnit' where
   pathEq := by
     intro a b p q
-    exact (isHSet_of_subsingleton CompPath.PUnit').rweq p q
+    exact rweq_of_rweqProp ((isHSet_of_subsingleton CompPath.PUnit').rweq p q)
 
 end IsSet
 
@@ -160,7 +160,7 @@ theorem set_pi1_trivial (h : IsSet A) (a : A) :
   induction α using Quot.ind with
   | _ p =>
       apply Quot.sound
-      exact h.pathEq p (Path.refl a)
+      exact rweqProp_of_rweq (h.pathEq p (Path.refl a))
 
 /-- π₂(A, a) is always trivial in our framework (by contractibility₃, when assumed). -/
 theorem pi2_trivial (a : A) :

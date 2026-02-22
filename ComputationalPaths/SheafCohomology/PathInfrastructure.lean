@@ -45,7 +45,7 @@ def ShStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .inverse_cancel_left p => Step.symm_trans p
   | .assoc p q r => Step.trans_assoc p q r
 
-def rweq_of_sh_step {A : Type u} {a b : A}
+noncomputable def rweq_of_sh_step {A : Type u} {a b : A}
     {p q : Path a b} (s : ShStep p q) : RwEq p q :=
   rweq_of_step (ShStep.toStep s)
 

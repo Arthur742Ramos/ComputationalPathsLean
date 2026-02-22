@@ -189,9 +189,8 @@ section EliminateRedundantPathLaws
           = p                         (by σσ)
 -/
 noncomputable def derive_trans_refl_right_via_left {a b : A} (p : Path a b) :
-    RwEq (Path.trans p (Path.refl b)) p := by
-  -- Direct proof using existing RwEq lemmas
-  path_simp  -- X · refl ≈ X
+    RwEq (Path.trans p (Path.refl b)) p :=
+  rweq_cmpA_refl_right p
 
 /-- Derive symm_trans from trans_symm + symmetry.
 

@@ -1563,13 +1563,15 @@ noncomputable def piOneMul {X : Type u} {x₀ : X} (α β : π₁(X, x₀)) : π
   Quot.lift
     (fun p =>
       Quot.lift
-        (fun q => Quot.mk RwEq (Path.trans p q))
-        (fun _ _ hq => Quot.sound (rweq_trans_congr_right p hq))
+        (fun q => Quot.mk _ (Path.trans p q))
+        (fun _ _ hq =>
+          Quot.sound (rweqProp_of_rweq (rweq_trans_congr_right p (rweq_of_rweqProp hq))))
         β)
     (fun p p' hp => by
       -- Need to show: lift (trans p _) β = lift (trans p' _) β when p ~_rw p'
       induction β using Quot.ind with
-      | _ q => exact Quot.sound (rweq_trans_congr_left q hp))
+      | _ q =>
+          exact Quot.sound (rweqProp_of_rweq (rweq_trans_congr_left q (rweq_of_rweqProp hp))))
     α
 
 /-- Associativity of piOneMul: (α ⋅ β) ⋅ γ = α ⋅ (β ⋅ γ). -/
@@ -1582,25 +1584,27 @@ theorem piOneMul_assoc {X : Type u} {x₀ : X}
     | _ q =>
       induction γ using Quot.ind with
       | _ r =>
-        show Quot.mk RwEq (Path.trans (Path.trans p q) r) =
-             Quot.mk RwEq (Path.trans p (Path.trans q r))
-        exact Quot.sound (rweq_tt p q r)
+        show Quot.mk (rwEqRel X x₀ x₀) (Path.trans (Path.trans p q) r) =
+             Quot.mk (rwEqRel X x₀ x₀) (Path.trans p (Path.trans q r))
+        exact Quot.sound (rweqProp_of_rweq (rweq_tt p q r))
 
 /-- Right identity for piOneMul: α ⋅ refl = α. -/
 theorem piOneMul_refl_right {X : Type u} {x₀ : X} (α : π₁(X, x₀)) :
     piOneMul α (Quot.mk _ (Path.refl x₀)) = α := by
   induction α using Quot.ind with
   | _ p =>
-    show Quot.mk RwEq (Path.trans p (Path.refl x₀)) = Quot.mk RwEq p
-    exact Quot.sound (rweq_cmpA_refl_right p)
+    show Quot.mk (rwEqRel X x₀ x₀) (Path.trans p (Path.refl x₀)) =
+         Quot.mk (rwEqRel X x₀ x₀) p
+    exact Quot.sound (rweqProp_of_rweq (rweq_cmpA_refl_right p))
 
 /-- Left identity for piOneMul: refl ⋅ α = α. -/
 theorem piOneMul_refl_left {X : Type u} {x₀ : X} (α : π₁(X, x₀)) :
     piOneMul (Quot.mk _ (Path.refl x₀)) α = α := by
   induction α using Quot.ind with
   | _ p =>
-    show Quot.mk RwEq (Path.trans (Path.refl x₀) p) = Quot.mk RwEq p
-    exact Quot.sound (rweq_cmpA_refl_left p)
+    show Quot.mk (rwEqRel X x₀ x₀) (Path.trans (Path.refl x₀) p) =
+         Quot.mk (rwEqRel X x₀ x₀) p
+    exact Quot.sound (rweqProp_of_rweq (rweq_cmpA_refl_left p))
 
 /-- piOneMul at concrete representatives. -/
 theorem piOneMul_mk_mk {X : Type u} {x₀ : X} (p q : LoopSpace X x₀) :
@@ -1634,7 +1638,7 @@ noncomputable def piOneInl :
       -- If p ~_rw q in A, then inlPath p ~_rw inlPath q in Pushout
       apply Quot.sound
       unfold Pushout.inlPath
-      exact rweq_congrArg_of_rweq Pushout.inl hpq)
+      exact rweqProp_of_rweq (rweq_congrArg_of_rweq Pushout.inl (rweq_of_rweqProp hpq)))
 
 /-- The induced map on fundamental groups: π₁(B) → π₁(Pushout). -/
 noncomputable def piOneInr :
@@ -1645,7 +1649,7 @@ noncomputable def piOneInr :
       intro p q hpq
       apply Quot.sound
       unfold Pushout.inrPath
-      exact rweq_congrArg_of_rweq Pushout.inr hpq)
+      exact rweqProp_of_rweq (rweq_congrArg_of_rweq Pushout.inr (rweq_of_rweqProp hpq)))
 
 /-- The induced map from π₁(C): via f. -/
 noncomputable def piOneFmap :
@@ -1655,7 +1659,7 @@ noncomputable def piOneFmap :
     (by
       intro p q hpq
       apply Quot.sound
-      exact rweq_congrArg_of_rweq f hpq)
+      exact rweqProp_of_rweq (rweq_congrArg_of_rweq f (rweq_of_rweqProp hpq)))
 
 /-- The induced map from π₁(C): via g. -/
 noncomputable def piOneGmap :
@@ -1665,7 +1669,7 @@ noncomputable def piOneGmap :
     (by
       intro p q hpq
       apply Quot.sound
-      exact rweq_congrArg_of_rweq g hpq)
+      exact rweqProp_of_rweq (rweq_congrArg_of_rweq g (rweq_of_rweqProp hpq)))
 
 /-! ### Seifert-Van Kampen Theorem
 
@@ -2028,7 +2032,8 @@ noncomputable def pushoutDecode
       let αInPushout : π₁(Pushout A B C f g, Pushout.inl (f c₀)) :=
         Quot.lift
           (fun p => Quot.mk _ (Pushout.inlPath p))
-          (fun _ _ hp => Quot.sound (rweq_congrArg_of_rweq Pushout.inl hp))
+          (fun _ _ hp =>
+            Quot.sound (rweqProp_of_rweq (rweq_congrArg_of_rweq Pushout.inl (rweq_of_rweqProp hp))))
           α
       piOneMul αInPushout (pushoutDecode c₀ rest)
   | .consRight β rest =>
@@ -2040,9 +2045,9 @@ noncomputable def pushoutDecode
               (Pushout.glue c₀)
               (Path.trans (Pushout.inrPath q)
                 (Path.symm (Pushout.glue c₀)))))
-          (fun _ _ hq => Quot.sound (
+          (fun _ _ hq => Quot.sound (rweqProp_of_rweq (
             rweq_trans_congr_right _ (rweq_trans_congr_left _
-              (rweq_congrArg_of_rweq Pushout.inr hq))))
+              (rweq_congrArg_of_rweq Pushout.inr (rweq_of_rweqProp hq))))))
           β
       piOneMul βInPushout (pushoutDecode c₀ rest)
 
@@ -2361,7 +2366,8 @@ noncomputable def pushoutPiOneInl :
     π₁(A, f c₀) → π₁(Pushout A B C f g, Pushout.inl (f c₀)) :=
   Quot.lift
     (fun p => Quot.mk _ (Pushout.inlPath p))
-    (fun _ _ hp => Quot.sound (rweq_congrArg_of_rweq Pushout.inl hp))
+    (fun _ _ hp =>
+      Quot.sound (rweqProp_of_rweq (rweq_congrArg_of_rweq Pushout.inl (rweq_of_rweqProp hp))))
 
 /-- Right injection of π₁(B) into π₁(Pushout), conjugated by `glue` to match basepoint `inl (f c₀)`. -/
 noncomputable def pushoutPiOneInr :
@@ -2371,9 +2377,9 @@ noncomputable def pushoutPiOneInr :
         (Pushout.glue c₀)
         (Path.trans (Pushout.inrPath q)
           (Path.symm (Pushout.glue c₀)))))
-    (fun _ _ hq => Quot.sound (
+    (fun _ _ hq => Quot.sound (rweqProp_of_rweq (
       rweq_trans_congr_right _ (rweq_trans_congr_left _
-        (rweq_congrArg_of_rweq Pushout.inr hq))))
+        (rweq_congrArg_of_rweq Pushout.inr (rweq_of_rweqProp hq))))))
 
 theorem pushoutPiOneInl_mul (α β : π₁(A, f c₀)) :
     pushoutPiOneInl (A := A) (B := B) (C := C) (f := f) (g := g) c₀ (piOneMul α β) =
@@ -3324,20 +3330,21 @@ noncomputable def wedgeFreeProductDecode :
        let αInWedge : π₁(Wedge A B a₀ b₀, Wedge.basepoint) :=
          Quot.lift
           (fun p => Quot.mk _ (Pushout.inlPath p))
-          (fun _ _ hp => Quot.sound (rweq_congrArg_of_rweq Pushout.inl hp))
+          (fun _ _ hp =>
+            Quot.sound (rweqProp_of_rweq (rweq_congrArg_of_rweq Pushout.inl (rweq_of_rweqProp hp))))
           α
        piOneMul αInWedge (wedgeFreeProductDecode rest)
   | .consRight β rest =>
       -- β : π₁(B, b₀), wrap with glue path: glue ⋅ inrPath ⋅ glue⁻¹ ⋅ rest
-       let βInWedge : π₁(Wedge A B a₀ b₀, Wedge.basepoint) :=
-         Quot.lift
-          (fun p => Quot.mk _ (Path.trans
-              (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
-              (Path.trans (Pushout.inrPath p)
-                (Path.symm (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))))))
-          (fun _ _ hp => Quot.sound (
+        let βInWedge : π₁(Wedge A B a₀ b₀, Wedge.basepoint) :=
+          Quot.lift
+           (fun p => Quot.mk _ (Path.trans
+               (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
+               (Path.trans (Pushout.inrPath p)
+                 (Path.symm (Wedge.glue (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))))))
+          (fun _ _ hp => Quot.sound (rweqProp_of_rweq (
             rweq_trans_congr_right _ (rweq_trans_congr_left _
-              (rweq_congrArg_of_rweq Pushout.inr hp))))
+              (rweq_congrArg_of_rweq Pushout.inr (rweq_of_rweqProp hp))))))
            β
        piOneMul βInWedge (wedgeFreeProductDecode rest)
 

@@ -81,7 +81,7 @@ namespace PathPreservingMap
 variable {A : Type u} {B : Type v} {Idx : Type w}
 
 /-- Push effective descent data forward along a path-preserving map. -/
-def mapEffectiveDescent (F : PathPreservingMap A B)
+noncomputable def mapEffectiveDescent (F : PathPreservingMap A B)
     (D : EffectiveDescentData Idx A) :
     EffectiveDescentData Idx B where
   localObj := fun i => F.toFun (D.localObj i)
@@ -130,7 +130,7 @@ namespace FaithfullyFlatDescent
 variable {A : Type u} {B : Type v} {Idx : Type w}
 
 /-- Effective descent data induced by a faithfully flat path-preserving map. -/
-def mapEffectiveDescent (ff : FaithfullyFlatDescent A B)
+noncomputable def mapEffectiveDescent (ff : FaithfullyFlatDescent A B)
     (D : EffectiveDescentData Idx A) :
     EffectiveDescentData Idx B :=
   PathPreservingMap.mapEffectiveDescent ff.toPathPreservingMap D

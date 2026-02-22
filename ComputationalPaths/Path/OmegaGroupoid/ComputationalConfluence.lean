@@ -73,17 +73,15 @@ def refl_derivation₂ (p : Path a b) : Derivation₂ p p :=
     (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) :
     (Derivation₂.vcomp d₁ d₂).depth = d₁.depth + d₂.depth + 1 := rfl
 
-/-- Any derivation from p to itself has the same toRwEq. -/
+/-- Any derivation from p to itself has the same toRwEq (at Prop level). -/
 noncomputable def derivation₂_self_toRwEq (p : Path a b)
-    (d : Derivation₂ p p) : d.toRwEq = RwEq.refl p := by
-  -- RwEq is proof-irrelevant (lives in Prop)
-  rfl
+    (d : Derivation₂ p p) : rweq_toEq d.toRwEq = rweq_toEq (RwEq.refl p) := by
+  exact Subsingleton.elim _ _
 
-/-- Two derivations between the same paths have the same toRwEq. -/
+/-- Two derivations between the same paths have the same toRwEq (at Prop level). -/
 theorem derivation₂_toRwEq_unique {p q : Path a b}
-    (d₁ d₂ : Derivation₂ p q) : d₁.toRwEq = d₂.toRwEq := by
-  -- RwEq is Prop-valued, so proof irrelevance applies
-  rfl
+    (d₁ d₂ : Derivation₂ p q) : rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq := by
+  exact Subsingleton.elim _ _
 
 /-! ## Soundness of the Embedding -/
 

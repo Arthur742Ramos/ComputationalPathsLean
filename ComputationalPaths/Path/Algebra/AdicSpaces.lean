@@ -64,11 +64,11 @@ structure PathRingHom {R : Type u} {S : Type v}
 
 /-- Rewrite steps for adic space theory. -/
 inductive AdicStep (R : Type u) : R → R → Prop where
-  | valuation_bound (a : R) : AdicStep a a
-  | rational_loc (a b : R) (h : a = b) : AdicStep a b
-  | completion (a : R) : AdicStep a a
-  | restriction (a b : R) (h : a = b) : AdicStep a b
-  | topology (a : R) : AdicStep a a
+  | valuation_bound (a : R) : AdicStep R a a
+  | rational_loc (a b : R) (h : a = b) : AdicStep R a b
+  | completion (a : R) : AdicStep R a a
+  | restriction (a b : R) (h : a = b) : AdicStep R a b
+  | topology (a : R) : AdicStep R a a
 
 /-- Every AdicStep yields a Path. -/
 def AdicStep.toPath {R : Type u} {a b : R}

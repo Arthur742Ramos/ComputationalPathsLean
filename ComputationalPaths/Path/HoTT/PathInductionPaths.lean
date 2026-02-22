@@ -149,7 +149,7 @@ theorem apd_refl_path {B : A → Type v} (f : (x : A) → B x) (a : A) :
 theorem apd_Subsingleton.elim {B : A → Type v} (f : (x : A) → B x) {a b : A}
     (p : Path a b) :
     (Path.apd (B := B) f p).proof = (Path.apd (B := B) f p).proof :=
-  Subsingleton.elim h₁ h₂
+  rfl
 
 /-- apd steps are empty for refl. -/
 theorem apd_refl_steps {B : A → Type v} (f : (x : A) → B x) (a : A) :
