@@ -6,3 +6,5 @@ import ComputationalPaths.Path.Category.ClosedPaths
 import ComputationalPaths.Path.Category.MonoidalCoherenceDeep
 import ComputationalPaths.Path.Category.MonoidalPaths
 import ComputationalPaths.Path.Category.TracedPaths
+import ComputationalPaths.Path.Category.GrothendieckToposPaths
+import ComputationalPaths.Path.Category.ClassifyingToposPaths

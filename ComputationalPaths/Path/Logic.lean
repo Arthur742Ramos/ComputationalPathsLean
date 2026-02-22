@@ -7,3 +7,4 @@ import ComputationalPaths.Path.Logic.ProofTheoryPaths
 import ComputationalPaths.Path.Logic.RecursionPaths
 import ComputationalPaths.Path.Logic.SetTheoryPaths
 import ComputationalPaths.Path.Logic.TemporalLogicPaths
+import ComputationalPaths.Path.Logic.InternalToposLogicPaths
