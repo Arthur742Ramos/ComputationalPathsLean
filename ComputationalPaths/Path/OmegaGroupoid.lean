@@ -425,9 +425,7 @@ end Derivation₄
 /-- Contractibility at Level 4: any two parallel 3-cells are connected by a 4-cell. -/
 def contractibility₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m₁ m₂ : Derivation₃ d₁ d₂) : Derivation₄ m₁ m₂ :=
-  .step (.rweq_eq (Subsingleton.elim
-    (Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁)
-    (Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂)))
+  .step .rweq_eq
 
 /-- Loop contraction at level 4: Any loop m : Derivation₃ d d contracts to .refl d. -/
 def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂ p q}
@@ -667,13 +665,25 @@ theorem cell_tower_functor_whiskerLeft (f : Path a b) {p q : Path b c}
     (α : Derivation₂ p q) :
     Derivation₂.toRwEq (whiskerLeft f α) =
       rweq_trans_congr_right f (Derivation₂.toRwEq α) := by
-  exact Subsingleton.elim _ _
+  induction α with
+  | refl _ => rfl
+  | step _ => rfl
+  | inv _ ih =>
+      simpa [whiskerLeft, Derivation₂.toRwEq, rweq_trans_congr_right, ih]
+  | vcomp _ _ ih₁ ih₂ =>
+      simpa [whiskerLeft, Derivation₂.toRwEq, rweq_trans_congr_right, ih₁, ih₂]
 
 theorem cell_tower_functor_whiskerRight {p q : Path a b}
     (α : Derivation₂ p q) (g : Path b c) :
     Derivation₂.toRwEq (whiskerRight α g) =
       rweq_trans_congr_left g (Derivation₂.toRwEq α) := by
-  exact Subsingleton.elim _ _
+  induction α with
+  | refl _ => rfl
+  | step _ => rfl
+  | inv _ ih =>
+      simpa [whiskerRight, Derivation₂.toRwEq, rweq_trans_congr_left, ih]
+  | vcomp _ _ ih₁ ih₂ =>
+      simpa [whiskerRight, Derivation₂.toRwEq, rweq_trans_congr_left, ih₁, ih₂]
 
 noncomputable def cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
     (α : Derivation₂ p p') (β : Derivation₂ q q') :
@@ -681,12 +691,13 @@ noncomputable def cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
       RwEq.trans
         (rweq_trans_congr_left q (Derivation₂.toRwEq α))
         (rweq_trans_congr_right p' (Derivation₂.toRwEq β)) := by
-  exact Subsingleton.elim _ _
+  simp [hcomp, cell_tower_functor_whiskerRight, cell_tower_functor_whiskerLeft,
+    Derivation₂.toRwEq]
 
 /-! ### Truncation Preserves Coherence -/
 
 def trunc₃ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-    (m : Derivation₃ d₁ d₂) : d₁.toRwEq = d₂.toRwEq :=
+    (m : Derivation₃ d₁ d₂) : rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq :=
   Derivation₃.toRwEqEq m
 
 def trunc₄ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
@@ -825,8 +836,8 @@ theorem batanin_contractible_high_loop_constructive {p q : Path a b}
 
 theorem trunc₃_preserves_exchange {f f' : Path a b} {g g' : Path b c}
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
-    Nonempty ((hcomp α β).toRwEq =
-      (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')).toRwEq) := by
+    Nonempty (rweq_toEq (hcomp α β).toRwEq =
+      rweq_toEq (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')).toRwEq) := by
   refine ⟨?_⟩
   exact trunc₃ (Derivation₃.step (MetaStep₃.interchange α β))
 
@@ -954,7 +965,7 @@ noncomputable def cell_tower_functor_hcomp_toRwEq_via_whiskers
 
 theorem trunc₃_inv_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m : Derivation₃ d₁ d₂) :
-    trunc₃ (Derivation₃.inv m) = trunc₃ m :=
+    trunc₃ (Derivation₃.inv m) = (trunc₃ m).symm :=
   Subsingleton.elim _ _
 
 theorem trunc₄_inv_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
