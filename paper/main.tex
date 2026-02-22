@@ -104,14 +104,14 @@ of \emph{uniqueness of identity proofs} (UIP).  From the standpoint of the
 Curry--Howard correspondence, however, every proof of $a =_A b$ is a
 \emph{computation} that transforms $a$ into $b$, and distinct proofs may record
 genuinely different computational histories.  The theory of \emph{computational
-paths}, initiated by de~Queiroz~\cite{deQueiroz1994} in the context of labelled
+paths}, initiated by de~Queiroz~\cite{deQueirozGabbay1994} in the context of labelled
 natural deduction, takes this observation as its starting point: the inhabitants
 of $a =_A b$ are not mere truth values but structured objects---sequences of
 elementary rewrite steps---and the question of when two such sequences should be
 identified is itself a question about \emph{paths between paths}.
 
 This perspective is superficially reminiscent of homotopy type theory
-(HoTT)~\cite{HoTTBook}, where the identity type is endowed with a rich
+(HoTT)~\cite{UFP2013}, where the identity type is endowed with a rich
 higher-dimensional structure.  The resemblance, however, masks a fundamental
 difference of method.  In HoTT, the higher groupoid structure of identity types
 is \emph{axiomatic}: one postulates the univalence axiom and derives its
@@ -125,14 +125,14 @@ system, not axioms imposed upon it.
 \subsection{Historical development}
 
 The roots of the present work lie in de~Queiroz's 1994 proposal for labelled
-deductive systems~\cite{deQueiroz1994}, which assigned explicit labels to proof
+deductive systems~\cite{deQueirozGabbay1994}, which assigned explicit labels to proof
 steps in natural deduction and observed that the normalization of proofs
 corresponds to a rewriting process on these labels.  The key insight was that
 two proofs of the same sequent may reduce to different normal forms, so that the
 labels carry genuine computational content beyond the mere fact of provability.
 
 This idea was developed over the subsequent two decades through a series of
-papers~\cite{deQueiroz2011,RamosQueiroz2016,RamosQueiroz2018} that progressively
+papers~\cite{deQueiroz2011,RQGO2016,RamosEtAl2018} that progressively
 formalized the notion of a \emph{computational path} as a sequence of elementary
 rewriting steps, defined the algebraic operations on paths (composition,
 inversion, identity), and identified the rewrite rules governing these
@@ -141,7 +141,7 @@ comprises a term rewriting system (TRS) on the algebra of paths, with each
 rewrite rule corresponding to an algebraic identity of the groupoid structure.
 
 The present paper reports on a comprehensive formalization of this theory in the
-Lean~4 proof assistant~\cite{Lean4}.  The formalization encompasses approximately
+Lean~4 proof assistant~\cite{Moura2021}.  The formalization encompasses approximately
 1,300 source files, over 46,000 formally verified theorems, and contains no uses
 of \texttt{sorry} or \texttt{admit}---every theorem is fully proved.  The scale
 of the formalization is, to our knowledge, unprecedented for a single
@@ -243,7 +243,7 @@ are methodological:
 
 \item \emph{Constructivity.}  The univalence axiom in HoTT is not
   computationally effective in standard Martin-L\"of type theory (though cubical
-  type theory~\cite{CCHM} provides a computational interpretation).  The
+  type theory~\cite{CCHM2018} provides a computational interpretation).  The
   rewrite rules of computational paths are directly executable: every rule has a
   concrete left-hand side and right-hand side, and the normalization procedure is
   an algorithm.
@@ -269,7 +269,7 @@ rewrite system, the $\mathsf{RwEq}$ relation, and the congruence and
 functoriality properties.  Section~\ref{sec:confluence} establishes the
 confluence of the completed groupoid TRS via a free-group interpretation, and
 discusses the Church--Rosser property and its consequences.
-Sections~\ref{sec:omega}--\ref{sec:applications} (Parts~2 and~3) develop the
+Sections~\ref{sec:omega}--\ref{sec:homotopy} (Parts~2 and~3) develop the
 weak $\omega$-groupoid structure, the homotopy-theoretic applications, and the
 breadth of the formalization across mathematical domains.
 
@@ -577,7 +577,7 @@ operations and that certain critical pairs are closed:
 \end{tabular}
 \end{center}
 
-\begin{remark}[The cancellation rules]\label{rem:cancellation}
+\begin{remark}[The cancellation rules]\label{rem:cancellation}\label{ex:critical-pair}
 Rules 77 and 78 are \emph{completion rules}: they do not follow from the
 basic groupoid axioms (Rules 1--8) as single rewrite steps, though they are
 derivable in the equivalence closure.  Their presence is mandated by confluence:
@@ -1169,7 +1169,7 @@ $r : \Path\;c\;d$, the \emph{associator} is the $\RwEq$ witness
 constructed as
 $\alpha_{p,q,r} \triangleq \RwEq.\mathsf{step}(\Step.\mathsf{trans\_assoc}\;p\;q\;r)$.
 This is a single application of Rule~8 from the step system
-(Table~\ref{tab:step-rules}).
+(\S\ref{ssec:constructors}; see also Appendix~\ref{app:steps}).
 \end{definition}
 
 To state the pentagon, we introduce five edges connecting the five
@@ -1800,7 +1800,7 @@ $\mathsf{PathRwQuot}\;A\;a\;b \triangleq \mathsf{Quot}(\RwEqProp)$,
 where $\RwEqProp\;p\;q \triangleq \mathsf{Nonempty}(\RwEq\;p\;q) : \Prop$.
 Composition $\trs$ and inversion $\sym$ descend to the quotient because
 $\RwEq$ is a congruence for both operations
-(Proposition~\ref{prop:congr}).
+(Proposition~\ref{thm:trans-congr}).
 \end{definition}
 
 \begin{proposition}[Groupoid enrichment]\label{prop:enrichment}
@@ -1831,7 +1831,7 @@ of the next section.
 
 
 % ======================================================================
-\section{The Weak $\omega$-Groupoid Theorem}\label{sec:omega}
+\section{The Weak \texorpdfstring{$\omega$}{ω}-Groupoid Theorem}\label{sec:omega}
 % ======================================================================
 
 \subsection{The cell tower}\label{subsec:cell-tower}
@@ -2194,7 +2194,7 @@ The Batanin--Leinster data for $A$ is assembled as follows.
   \item \textbf{Composition, identity, inverse} at level~1:
     $\trs$, $\refl$, $\sym$, constructed from $\Eq$ operations on
     the underlying equality proofs (Definition~\ref{def:associator}
-    and Theorem~\ref{thm:weak-groupoid-laws}).
+    and Theorem~\ref{thm:def-groupoid}).
   \item \textbf{Coherence witnesses} at level~2
     (the associator, unitors, and inverse witnesses):
     single $\Step$ applications
@@ -2242,20 +2242,20 @@ $\mathsf{PathRwQuot}\;A\;a\;b \triangleq
  \mathsf{Quot}(\RwEqProp)$
 is the 1-truncated hom-space of the $\omega$-groupoid:
 composition, units, and inverses descend to the quotient via
-Proposition~\ref{prop:congr}, yielding a strict groupoid
+Proposition~\ref{thm:trans-congr}, yielding a strict groupoid
 $\Pi_1^{\mathrm{cp}}(A)$.
 \end{theorem}
 
 \begin{proof}
 The $\RwEqProp$ relation is a congruence for $\trs$, $\sym$, and
-$\refl$ by the congruence lemmas of \S\ref{subsec:rweq}.
+$\refl$ by the congruence lemmas of \S\ref{ssec:rweq}.
 The quotient operations are defined by $\mathsf{Quot.lift}$ and
 $\mathsf{Quot.liftOn}_2$; the associativity, unit, and inverse laws
 become strict equalities on the quotient because the $\RwEq$
 witnesses witnessing them are absorbed into the equivalence classes.
 \end{proof}
 
-\begin{remark}[Comparison with HoTT]\label{rem:hott-comparison}
+\begin{remark}[Comparison with HoTT]\label{rem:hott-comparison-omega}
 In HoTT, the $\omega$-groupoid structure on a type $A$ is
 \emph{intrinsic}: the identity type $\mathsf{Id}_A$ already carries
 the path structure, and the $J$-eliminator provides all operations
@@ -2452,7 +2452,7 @@ $\mathsf{decode}(1 + \mathsf{wind}(p')) =
 \trs(\mathsf{loop}, \mathsf{decode}(\mathsf{wind}(p')))$.
 By the inductive hypothesis,
 $\RwEq\;(\mathsf{decode}(\mathsf{wind}(p')))\;p'$,
-and by Proposition~\ref{prop:congr} (bifunctoriality of composition),
+and by Proposition~\ref{thm:trans-congr} (bifunctoriality of composition),
 $\RwEq\;(\trs(\mathsf{loop},
 \mathsf{decode}(\mathsf{wind}(p'))))\;(\trs(\mathsf{loop}, p'))$.
 The result follows since
@@ -2525,7 +2525,7 @@ $\mathsf{decode}(m + n) =_{\RwEq}
 \trs(\mathsf{decode}(m), \mathsf{decode}(n))$.
 \end{proof}
 
-\begin{remark}[Comparison with the HoTT proof]\label{rem:hott-comparison}
+\begin{remark}[Comparison with the HoTT proof]\label{rem:hott-comparison-pi1}
 The standard HoTT proof of $\pi_1(S^1) \cong \mathbb{Z}$
 (as in~\cite{UFP2013}, Chapter~8, or Licata--Shulman) relies on
 the univalence axiom to establish that transport along
@@ -2672,7 +2672,7 @@ $\mathsf{encode} : \Path\;p_0\;x \to \mathsf{code}(x)$
 sends a path $p$ to $\mathsf{transport}\;\mathsf{code}\;p\;\epsilon$,
 where $\epsilon$ is the empty word.
 Well-definedness with respect to $\RwEq$ follows from
-Theorem~\ref{thm:idtoequiv-wd}.
+Theorem~\ref{thm:idtoequiv-wd-full}.
 
 \emph{Step 3: Decoding.}
 The decode map
@@ -3237,7 +3237,7 @@ of the formalization depth across all 1{,}294 source files.
     No \texttt{sorry} or \texttt{admit} is used.
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \caption{Formalization status by component.}
 \label{tab:status-full}
@@ -3283,7 +3283,7 @@ of the formalization depth across all 1{,}294 source files.
 
 \subsection{Quantitative summary}
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \caption{Aggregate formalization statistics (February 2026).}
 \label{tab:aggregate}
@@ -3486,14 +3486,14 @@ The principal contributions are:
   \item A \textbf{Seifert--van Kampen theorem} for pushouts at the
     computational-path level, yielding
     $\pi_1(\mathsf{Pushout}) \simeq \pi_1(A) *_{\pi_1(C)} \pi_1(B)$
-    (\S\ref{sec:svk}).
+    (\S\ref{subsec:svk-full}).
 
   \item \textbf{Partial univalence} for 1-types, with a precise
     characterization of why full univalence fails in the
-    computational-path setting (\S\ref{sec:univalence}).
+    computational-path setting (\S\ref{subsec:partial-ua}).
 
   \item \textbf{Extensions to 72+ mathematical domains}
-    (\S\ref{sec:extensions}), with honest formalization status reporting
+    (\S\ref{sec:higher-cat}), with honest formalization status reporting
     distinguishing $\FF$, $\PS$, and SO levels (\S\ref{sec:status}).
 \end{enumerate}
 
@@ -3538,7 +3538,7 @@ Several directions for future work present themselves, organized by
 increasing ambition.
 
 \paragraph{Full univalence.}
-The partial univalence result (\S\ref{sec:univalence}) applies only
+The partial univalence result (\S\ref{subsec:partial-ua}) applies only
 to 1-types.
 Extending it to higher-truncated types, or finding a suitable
 modification of the univalence principle that holds for computational
@@ -3548,7 +3548,7 @@ constructor that witnesses type equivalences, analogous to the
 \texttt{ua} axiom of HoTT~\cite{Voevodsky2010,UFP2013}.
 
 \paragraph{Synthetic homotopy theory via paths.}
-The HoTT modules (\S\ref{sec:extensions}) include higher inductive
+The HoTT modules (\S\ref{sec:higher-cat}) include higher inductive
 types, Postnikov towers, and loop space constructions at the
 $\PS$ level.
 Deepening these to $\FF$ status would yield a synthetic homotopy theory
@@ -3582,7 +3582,7 @@ required to have inverses.
 
 \paragraph{Machine-verified mathematical physics.}
 The TFT, cobordism, and Floer homology modules
-(\S\ref{sec:extensions}) formalize structures from mathematical
+(\S\ref{sec:higher-cat}) formalize structures from mathematical
 physics at the SO level.
 Deepening these to include verified Atiyah--Segal axioms for
 topological quantum field theories~\cite{Atiyah1988}, path-level
@@ -4079,15 +4079,26 @@ in each module directory (excluding the root import file).
 The \textbf{Status} column indicates the overall formalization tier
 ($\FF$/$\PS$/SO) as defined in \S\ref{sec:status}.
 
-\begin{table}[h!]
-\centering
+{%
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{0.9}
+\begin{longtable}{p{4.2cm}rp{5.2cm}c}
 \caption{Module index: 72 top-level domains, 1{,}294 source files total.}
-\label{tab:module-index}
-\small
-\begin{tabular}{p{4.8cm}rp{5.2cm}c}
+\label{tab:module-index} \\
 \toprule
 \textbf{Module} & \textbf{Files} & \textbf{Key Results} & \textbf{Status} \\
 \midrule
+\endfirsthead
+\toprule
+\textbf{Module} & \textbf{Files} & \textbf{Key Results} & \textbf{Status} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\emph{Continued on next page}} \\
+\endfoot
+\bottomrule
+\endlastfoot
 \multicolumn{4}{l}{\textit{Core Path Infrastructure}} \\
 \midrule
 Path (core framework) & 1{,}026 & Steps, RwEq, confluence, coherence, $\omega$-groupoid & $\FF$ \\
@@ -4201,9 +4212,8 @@ GRT & 2 & Grothendieck--Teichm\"uller & SO \\
 KnotInvariant & 2 & Knot invariants, Jones polynomial & SO \\
 Langlands & 2 & Langlands functoriality & SO \\
 RepStability & 2 & Representation stability & SO \\
-\bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}
+}
 
 \noindent
 The overwhelming majority of source files (1{,}026 out of 1{,}294)
@@ -4277,6 +4287,11 @@ R.~J.~G.~B. de~Queiroz and D.~M. Gabbay.
   interpretation of propositional equality.
 \newblock In P.~Dekker and M.~Stokhof, editors, \emph{Proceedings of the 9th
   Amsterdam Colloquium}, pages 547--565. ILLC, University of Amsterdam, 1994.
+
+\bibitem{deQueiroz2011}
+R.~J.~G.~B. de~Queiroz, A.~G. de~Oliveira, and A.~F. Ramos.
+\newblock Propositional equality, identity types, and computational paths.
+\newblock \emph{South American Journal of Formal Logic}, 1(1):1--51, 2011.
 
 \bibitem{RQGO2016}
 R.~J.~G.~B. de~Queiroz, A.~G. de~Oliveira, and A.~F. Ramos.
