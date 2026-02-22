@@ -39,7 +39,7 @@ universe u v
 /-! ## Simplicial model step relation -/
 
 /-- Atomic rewrite steps for simplicial model category identities. -/
-inductive SimpMCStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive SimpMCStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | map_id {A : Type u} (a : A) :
       SimpMCStep (Path.refl a) (Path.refl a)
   | map_comp_cancel {A : Type u} {a b : A} (p : Path a b) :
