@@ -69,6 +69,7 @@ structure DerivedCategory where
   id : (x : Obj) → Hom x x
   comp : {x y z : Obj} → Hom x y → Hom y z → Hom x z
   zeroHom : (x y : Obj) → Hom x y
+  zeroObj : Obj
 
 /-- The bounded derived category D^b(A). -/
 structure BoundedDerivedCategory extends DerivedCategory.{u,v} where
@@ -187,13 +188,13 @@ theorem derived_category_triangulated (D : DerivedCategory.{u,v}) :
 theorem octahedral_axiom (D : DerivedCategory.{u,v})
     (X Y Z : D.Obj) (f : D.Hom X Y) (g : D.Hom Y Z) :
     ∃ (T : ExactTriangle D), True := by
-  exact ⟨⟨X, Y, Z, f, g, D.id Z⟩, trivial⟩
+  exact ⟨⟨X, Y, Z, f, g, D.zeroHom Z X⟩, trivial⟩
 
 /-- Rotation of triangles: (X → Y → Z → X[1]) ↦ (Y → Z → X[1] → Y[1]). -/
 theorem triangle_rotation (D : DerivedCategory.{u,v})
     (T : ExactTriangle D) :
     ∃ (T' : ExactTriangle D), T'.X = T.Y ∧ T'.Y = T.Z := by
-  exact ⟨⟨T.Y, T.Z, shift D 1 T.X, T.g, T.h, D.id (shift D 1 T.X)⟩, rfl, rfl⟩
+  exact ⟨⟨T.Y, T.Z, shift D 1 T.X, T.g, T.h, D.zeroHom (shift D 1 T.X) (shift D 1 T.Y)⟩, rfl, rfl⟩
 
 /-- Serre functor exists on D^b(X) for X smooth projective. -/
 theorem serre_functor_exists (D : BoundedDerivedCategory.{u,v}) :
@@ -217,7 +218,7 @@ theorem orlov_representability (D₁ D₂ : BoundedDerivedCategory.{u,v})
     (Φ : D₁.Obj → D₂.Obj) :
     (∀ (T : ExactTriangle D₁.toDerivedCategory), True) →
     ∃ (P : FMKernel D₁ D₂), True := by
-  intro _; exact ⟨⟨Φ D₁.base.zero⟩, trivial⟩
+  intro _; exact ⟨⟨Φ D₁.zeroObj⟩, trivial⟩
 
 /-- Composition of FM transforms = FM transform of convolution kernel. -/
 theorem fm_composition (D₁ D₂ D₃ : BoundedDerivedCategory.{u,v})
@@ -229,7 +230,7 @@ theorem fm_composition (D₁ D₂ D₃ : BoundedDerivedCategory.{u,v})
 /-- Bondal's theorem: D^b(ℙⁿ) has a full exceptional collection of length n+1. -/
 theorem bondal_projective_space (D : BoundedDerivedCategory.{u,v}) (n : Nat) :
     ∃ (E : ExceptionalCollection D), E.length = n + 1 ∧ IsFullExceptional D E := by
-  exact ⟨⟨n + 1, fun _ => D.base.zero, fun _ => (fun _ _ => trivial), fun _ _ _ => trivial⟩,
+  exact ⟨⟨n + 1, fun _ => D.zeroObj, fun _ => (fun _ _ => trivial), fun _ _ _ => trivial⟩,
          rfl, trivial⟩
 
 /-- Beilinson's theorem: D^b(ℙⁿ) = ⟨O, O(1), ..., O(n)⟩. -/

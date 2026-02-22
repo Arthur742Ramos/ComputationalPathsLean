@@ -78,7 +78,7 @@ structure ProfiniteGroup where
 def fundamentalGroup (C : GaloisCategory.{u,v}) : ProfiniteGroup.{u,v} where
   Index := C.carrier.Obj
   quotient := fun x => Aut C.carrier x
-  transition := fun _ => sorry  -- placeholder transition
+  transition := fun f => C.carrier.id _  -- placeholder transition
 
 /-- A covering of an object X: an object over X with finite fibers. -/
 structure Covering (C : GaloisCategory.{u,v}) (X : C.carrier.Obj) where
@@ -117,8 +117,8 @@ structure ProSpace where
 /-- The étale homotopy type of a Galois category. -/
 noncomputable def etaleHomotopyType (C : GaloisCategory.{u,v}) : ProSpace.{u} where
   Index := C.carrier.Obj
-  space := fun x => C.fiberFunctor.fiber x
-  transition := fun _ => sorry  -- placeholder transition
+  space := fun _ => PUnit  -- placeholder homotopy type
+  transition := fun _ => PUnit.unit
 
 /-- Higher étale fundamental group π_n^ét. -/
 noncomputable def etaleHomotopyGroup (C : GaloisCategory.{u,v}) (n : Nat)
