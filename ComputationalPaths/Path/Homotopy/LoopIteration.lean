@@ -173,8 +173,7 @@ noncomputable def loopIter_cancel_gt {A : Type u} {a : A} (l : Path a a) (m n : 
     -- m > 0, so m = m' + 1 for some m'
     match m, h with
     | Nat.succ m', _ =>
-      simp only [Nat.succ_sub_one]
-      exact loopIter_cancel_r l m'
+      simpa [Nat.succ_sub_one] using (loopIter_cancel_r l m')
   | succ n ih =>
     -- m > n + 1, so m > n
     have h' : m > n := Nat.lt_of_succ_lt h
@@ -182,9 +181,7 @@ noncomputable def loopIter_cancel_gt {A : Type u} {a : A} (l : Path a a) (m n : 
     apply rweq_trans (rweq_trans_congr_left (Path.symm l) (ih m h'))
     match m - n - 1, Nat.sub_pos_of_lt (by omega : n + 1 < m) with
     | Nat.succ k, _ =>
-      have heq : m - (n + 1) - 1 = k := by omega
-      rw [heq]
-      exact loopIter_cancel_r l k
+      simpa [Nat.succ_sub_one] using (loopIter_cancel_r l k)
 
 /-- Cancellation when m < n: l^{m+1} · (l^{-1})^{n+1} ≈ (l^{-1})^{n-m}
     More precisely: loopIter l m · loopIter (symm l) n ≈ loopIter (symm l) (n - m - 1) -/
@@ -195,8 +192,7 @@ noncomputable def loopIter_cancel_lt {A : Type u} {a : A} (l : Path a a) (m n : 
   | zero =>
     match n, h with
     | Nat.succ n', _ =>
-      simp only [Nat.succ_sub_one]
-      exact loopIter_symm_cancel_l l n'
+      simpa [Nat.succ_sub_one] using (loopIter_symm_cancel_l l n')
   | succ m ih =>
     have h' : m < n := Nat.lt_of_succ_lt h
     match n, h with
