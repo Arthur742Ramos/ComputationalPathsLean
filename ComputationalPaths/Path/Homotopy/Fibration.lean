@@ -235,7 +235,7 @@ noncomputable def inducedPi1Map (f : A → B) (a : A) :
     π₁(A, a) → π₁(B, f a) :=
   Quot.lift
     (fun l => Quot.mk _ (inducedLoopMap f a l))
-    (fun _ _ h => Quot.sound (inducedLoopMap_respects_rweq f a h))
+    (fun _ _ h => Quot.sound (rweqProp_of_rweq (inducedLoopMap_respects_rweq f a h)))
 
 /-- Induced map preserves identity. -/
 theorem inducedPi1Map_id (a : A) :
@@ -344,7 +344,7 @@ noncomputable def longExactSequence {P : B → Type u} (b : B) (x₀ : P b) :
     -- The fiber P b embeds into Total P via x ↦ ⟨b, x⟩
     Quot.lift
       (fun l => Quot.mk _ (Path.congrArg (fun x => (⟨b, x⟩ : Total P)) l))
-      (fun _ _ h => Quot.sound (rweq_context_map_of_rweq ⟨fun x => (⟨b, x⟩ : Total P)⟩ h))
+      (fun _ _ h => Quot.sound (rweqProp_of_rweq (rweq_context_map_of_rweq ⟨fun x => (⟨b, x⟩ : Total P)⟩ h)))
       α
   proj_star := fun β =>
     -- For β : π₁(Total P, ⟨b, x₀⟩), project to a loop in B

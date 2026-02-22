@@ -16,16 +16,16 @@ namespace HomotopyGroup
 universe u
 
 /-- A 2-cell between parallel computational paths. -/
-abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Prop := RwEq p q
+abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Type u := RwEq p q
 
 /-- Associative rerouting of loop composition gives a canonical 2-cell. -/
-theorem loop_assoc_two_cell {A : Type u} {a : A}
+noncomputable def loop_assoc_two_cell {A : Type u} {a : A}
     (p q r : LoopSpace A a) :
     TwoCell (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   LoopSpace.comp_assoc_rweq (A := A) (a := a) p q r
 
 /-- The two standard cancellation routes are connected by a 2-cell. -/
-theorem cancellation_route_two_cell {A : Type u} {a : A}
+noncomputable def cancellation_route_two_cell {A : Type u} {a : A}
     (p : LoopSpace A a) :
     TwoCell
       (Path.trans (Path.trans p (Path.symm p)) p)
@@ -33,7 +33,7 @@ theorem cancellation_route_two_cell {A : Type u} {a : A}
   rweq_tt p (Path.symm p) p
 
 /-- Whiskering cancellation on the right contracts back to `p`. -/
-theorem cancellation_contracts_two_cell {A : Type u} {a : A}
+noncomputable def cancellation_contracts_two_cell {A : Type u} {a : A}
     (p : LoopSpace A a) :
     TwoCell (Path.trans p (Path.trans (Path.symm p) p)) p := by
   refine RwEq.trans ?_ (rweq_cmpA_refl_right p)

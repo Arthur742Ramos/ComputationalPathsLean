@@ -66,7 +66,7 @@ noncomputable def rweq_of_rweqProp {A : Type u} {a b : A}
     {p q : Path a b} (h : RwEqProp p q) : RwEq p q :=
   Classical.choice h
 
-instance {A : Type u} {a b : A} {p q : Path a b} :
+noncomputable instance {A : Type u} {a b : A} {p q : Path a b} :
     Coe (RwEq p q) (RwEqProp p q) where
   coe h := rweqProp_of_rweq h
 

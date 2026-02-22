@@ -24,7 +24,7 @@ section Setoid
 abbrev rwEqRel (A : Type u) (a b : A) : Path a b → Path a b → Prop :=
   RwEqProp
 
-instance {A : Type u} {a b : A} {p q : Path a b} :
+noncomputable instance {A : Type u} {a b : A} {p q : Path a b} :
     Coe (RwEq p q) (rwEqRel A a b p q) where
   coe h := rweqProp_of_rweq h
 
@@ -33,7 +33,7 @@ noncomputable instance {A : Type u} {a b : A} {p q : Path a b} :
   coe h := rweq_of_rweqProp h
 
 /-- Rewrite equality induces a setoid on computational paths. -/
-def rwEqSetoid (A : Type u) (a b : A) : Setoid (Path a b) where
+noncomputable def rwEqSetoid (A : Type u) (a b : A) : Setoid (Path a b) where
   r := rwEqRel A a b
   iseqv :=
     { refl := fun p => rweqProp_of_rweq (rweq_refl (p := p))
@@ -69,7 +69,7 @@ def refl (a : A) : PathRwQuot A a a :=
   Quot.mk _ (Path.refl a)
 
 /-- Symmetry descends to the quotient. -/
-def symm {a b : A} :
+noncomputable def symm {a b : A} :
     PathRwQuot A a b → PathRwQuot A b a := fun x =>
   Quot.liftOn x (fun p => Quot.mk _ (Path.symm p))
     (by
@@ -77,7 +77,7 @@ def symm {a b : A} :
       exact Quot.sound (rweqProp_of_rweq (rweq_symm_congr (rweq_of_rweqProp h))))
 
 /-- Composition descends to the quotient. -/
-def trans {a b c : A} :
+noncomputable def trans {a b c : A} :
     PathRwQuot A a b → PathRwQuot A b c → PathRwQuot A a c :=
   fun x y =>
     Quot.liftOn x (fun p : Path a b =>
@@ -97,7 +97,7 @@ def trans {a b c : A} :
   Quot.mk _ (Path.stepChain h)
 
 /-- Forget the rewrite trace and recover the underlying equality. -/
-def toEq {a b : A} : PathRwQuot A a b → a = b :=
+noncomputable def toEq {a b : A} : PathRwQuot A a b → a = b :=
   Quot.lift (fun p : Path a b => p.toEq)
     (by
       intro p q h
@@ -265,7 +265,7 @@ def toEq {a b : A} : PathRwQuot A a b → a = b :=
 /-! ## Functorial operations (congrArg) -/
 
 /-- Apply a function to a quotient path (functorial action). -/
-def congrArg (A : Type u) (B : Type u) (f : A → B) {a a' : A}
+noncomputable def congrArg (A : Type u) (B : Type u) (f : A → B) {a a' : A}
     (x : PathRwQuot A a a') : PathRwQuot B (f a) (f a') :=
   Quot.lift
     (fun p => Quot.mk _ (Path.congrArg f p))

@@ -63,23 +63,23 @@ section RwEqWhiskering
 variable {a b c : A}
 
 /-- Left whiskering: if `α : p ≈ q` then `f · p ≈ f · q`. -/
-def whiskerLeftRw (f : Path a b) {p q : Path b c} (α : RwEq p q) :
+noncomputable def whiskerLeftRw (f : Path a b) {p q : Path b c} (α : RwEq p q) :
     RwEq (Path.trans f p) (Path.trans f q) :=
   rweq_trans_congr_right f α
 
 /-- Right whiskering: if `α : p ≈ q` then `p · g ≈ q · g`. -/
-def whiskerRightRw {p q : Path a b} (α : RwEq p q) (g : Path b c) :
+noncomputable def whiskerRightRw {p q : Path a b} (α : RwEq p q) (g : Path b c) :
     RwEq (Path.trans p g) (Path.trans q g) :=
   rweq_trans_congr_left g α
 
 /-- Horizontal composition at the RwEq level: right-whisker then left-whisker. -/
-def hcompRw {p p' : Path a b} {q q' : Path b c}
+noncomputable def hcompRw {p p' : Path a b} {q q' : Path b c}
     (α : RwEq p p') (β : RwEq q q') :
     RwEq (Path.trans p q) (Path.trans p' q') :=
   rweq_trans_congr α β
 
 /-- Alternative horizontal composition: left-whisker then right-whisker. -/
-def hcompRw' {p p' : Path a b} {q q' : Path b c}
+noncomputable def hcompRw' {p p' : Path a b} {q q' : Path b c}
     (α : RwEq p p') (β : RwEq q q') :
     RwEq (Path.trans p q) (Path.trans p' q') :=
   rweq_trans (whiskerLeftRw p β) (whiskerRightRw α q')
