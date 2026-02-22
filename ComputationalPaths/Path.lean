@@ -833,6 +833,9 @@ import ComputationalPaths.Path.HoTT.PushoutPaths
 import ComputationalPaths.Path.HoTT.TruncationDeep
 import ComputationalPaths.Path.HoTT.TruncationPaths
 import ComputationalPaths.Path.HoTT.UnivalencePaths
+import ComputationalPaths.Path.HoTT.ModalHoTT
+import ComputationalPaths.Path.HoTT.SyntheticHomotopy
+import ComputationalPaths.Path.HoTT.Descent
 import ComputationalPaths.Path.Homotopy.AdamsSpectralSequence
 import ComputationalPaths.Path.Homotopy.BlakersMassey
 import ComputationalPaths.Path.Homotopy.CellularApproximation
