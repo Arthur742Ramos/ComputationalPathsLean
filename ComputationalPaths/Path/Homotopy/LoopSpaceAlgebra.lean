@@ -37,17 +37,17 @@ abbrev Omega (A : Type u) (a : A) : Type u :=
 /-! ## Group Laws Up to RwEq -/
 
 noncomputable def id_comp_rweq (p : Omega A a) :
-    RwEq (LoopSpace.comp (LoopSpace.id (A := A) (a := a)) p) p := by
-  simp [LoopSpace.id, LoopSpace.comp]
+    RwEq (LoopSpace.comp (LoopSpace.id (A := A) (a := a)) p) p :=
+  rweq_cmpA_refl_left (p := p)
 
 noncomputable def comp_id_rweq (p : Omega A a) :
-    RwEq (LoopSpace.comp p (LoopSpace.id (A := A) (a := a))) p := by
-  simp [LoopSpace.id, LoopSpace.comp]
+    RwEq (LoopSpace.comp p (LoopSpace.id (A := A) (a := a))) p :=
+  rweq_cmpA_refl_right (p := p)
 
 noncomputable def comp_assoc_rweq (p q r : Omega A a) :
     RwEq (LoopSpace.comp (LoopSpace.comp p q) r)
-      (LoopSpace.comp p (LoopSpace.comp q r)) := by
-  simp [LoopSpace.comp]
+      (LoopSpace.comp p (LoopSpace.comp q r)) :=
+  rweq_of_step (Path.Step.trans_assoc p q r)
 
 noncomputable def inv_comp_rweq (p : Omega A a) :
     RwEq (LoopSpace.comp (LoopSpace.inv p) p)
@@ -105,7 +105,7 @@ structure LoopSpaceGroup (A : Type u) (a : A) where
   mul_right_inv : ∀ x, RwEq (mul x (inv x)) one
 
 /-- Canonical loop space group induced by path composition. -/
-def loopSpaceGroup (A : Type u) (a : A) : LoopSpaceGroup A a where
+noncomputable def loopSpaceGroup (A : Type u) (a : A) : LoopSpaceGroup A a where
   mul := LoopSpace.comp
   one := LoopSpace.id
   inv := LoopSpace.inv

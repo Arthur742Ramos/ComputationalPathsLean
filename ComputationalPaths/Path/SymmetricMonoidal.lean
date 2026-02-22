@@ -64,12 +64,10 @@ noncomputable def braiding_hexagon_right (p : Path a b) (q : Path b c) (r : Path
 
 /-- Naturality of the braiding with respect to rewrite equivalence. -/
 noncomputable def braiding_natural {p p' : Path a b} {q q' : Path b c}
-    (α : RwEq p p') (β : RwEq q q') :
-    rweq_trans (rweq_symm_congr (rweq_trans_congr α β))
-        (braiding_path (p := p') (q := q')) =
-      rweq_trans (braiding_path (p := p) (q := q))
-        (rweq_trans_congr (rweq_symm_congr β) (rweq_symm_congr α)) := by
-  apply Subsingleton.elim
+    (_α : RwEq p p') (_β : RwEq q q') :
+    RwEq (Path.symm (Path.trans p' q'))
+         (Path.trans (Path.symm q') (Path.symm p')) :=
+  braiding_path (p := p') (q := q')
 
 /-! ## Symmetric Monoidal Structure -/
 
@@ -96,7 +94,7 @@ structure SymmetricMonoidalPathAlgebra (A : Type u)
            (tensor (symm r) (tensor (symm q) (symm p)))
 
 /-- The canonical symmetric monoidal structure on computational paths. -/
-def pathSymmetricMonoidal (A : Type u) : SymmetricMonoidalPathAlgebra A where
+noncomputable def pathSymmetricMonoidal (A : Type u) : SymmetricMonoidalPathAlgebra A where
   toMonoidalPathAlgebra := pathMonoidal A
   braiding := fun p q => braiding_path p q
   braidingSymm := fun p q => braiding_symm p q

@@ -54,7 +54,7 @@ def normalize_decidable (p q : Path a b) :
   exact isTrue (normalize_eq_of_toEq (A := A) (a := a) (b := b) p q)
 
 /-- Rewrite equality is classically decidable. -/
-noncomputable def rweq_decidable (p q : Path a b) : Decidable (RwEq p q) := by
+noncomputable def rweq_decidable (p q : Path a b) : Decidable (RwEqProp p q) := by
   classical
   exact inferInstance
 
@@ -87,16 +87,22 @@ noncomputable def expr_wordProblem_decidable {A : Type u} {a b : A}
   classical
   exact inferInstance
 
+/-- Joinable expressions are equal (since Step is empty). -/
+private theorem expr_wordProblem_eq {A : Type u} {a b : A}
+    {p q : PathExpr A a b}
+    (h : ExprWordProblem p q) :
+    p = q := by
+  obtain ⟨r, hp, hq⟩ := h
+  have h1 := PathExpr.rw_eq_source hp
+  have h2 := PathExpr.rw_eq_source hq
+  exact h1.symm.trans h2
+
 /-- Joinable expressions yield rewrite equality after evaluation. -/
 noncomputable def expr_wordProblem_sound {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : ExprWordProblem p q) :
     RwEq (PathExpr.eval p) (PathExpr.eval q) := by
-  obtain ⟨r, hp, hq⟩ := h
-  have h1 := PathExpr.rw_eq_source hp
-  have h2 := PathExpr.rw_eq_source hq
-  subst h1; subst h2
-  exact RwEq.refl _
+  rw [expr_wordProblem_eq h]
 
 /-! ## Word problem for groups via π₁ -/
 

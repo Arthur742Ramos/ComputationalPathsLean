@@ -92,7 +92,7 @@ def eval_join_symm
 /-! ## Join implies RwEq -/
 
 /-- Two paths that are joined are RwEq. -/
-def eval_join_rweq
+noncomputable def eval_join_rweq
     {A : Type u} {a b : A}
     {p q : Path a b}
     (J : Confluence.Join (A := A) (a := a) (b := b) p q) :

@@ -104,7 +104,7 @@ noncomputable def normal_unique_of_rweq {p q : Path a b}
     (Quot.mk _ (normalize (A := A) (a := a) (b := b) p) : PathRwQuot A a b) =
       Quot.mk _ (normalize (A := A) (a := a) (b := b) q) := by
   apply Quot.sound
-  exact rweq_of_eq (normal_unique_of_join (A := A) (a := a) (b := b) (p := p) (q := q) j)
+  exact ⟨rweq_of_eq (normal_unique_of_join (A := A) (a := a) (b := b) (p := p) (q := q) j)⟩
 
 /-! ## Confluence with Normal Forms -/
 

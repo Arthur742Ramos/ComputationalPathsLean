@@ -168,14 +168,14 @@ def chrom_steps_compose {T : ChromConv.{u}} {k : Nat}
 /-! ## RwEq Witnesses -/
 
 /-- RwEq: convergence retract followed by its inverse is identity. -/
-def convergence_retract_rweq (C : ChromConv.{u}) (k : Nat)
+noncomputable def convergence_retract_rweq (C : ChromConv.{u}) (k : Nat)
     (x : C.spectrum.level k) :
     RwEq (Path.trans (C.left_inv k x) (Path.symm (C.left_inv k x)))
          (Path.refl (C.fromHolim k (C.toHolim k x))) :=
   rweq_cmpA_inv_right (C.left_inv k x)
 
 /-- RwEq: symmetry of convergence. -/
-def convergence_symm_rweq (C : ChromConv.{u}) (k : Nat)
+noncomputable def convergence_symm_rweq (C : ChromConv.{u}) (k : Nat)
     (x : C.spectrum.level k) :
     RwEq (Path.symm (Path.symm (C.left_inv k x)))
          (C.left_inv k x) :=

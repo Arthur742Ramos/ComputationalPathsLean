@@ -233,9 +233,9 @@ abbrev Path0Cell (A : Type u) : Type u :=
 abbrev Path1Cell {A : Type u} (a b : A) : Type u :=
   Path a b
 
-/-- 2-cells in the path 2-category are rewrite equalities. -/
+/-- 2-cells in the path 2-category are rewrite equalities (propositional). -/
 abbrev Path2Cell {A : Type u} {a b : A} (p q : Path a b) : Prop :=
-  RwEq (A := A) (a := a) (b := b) p q
+  Nonempty (RwEq (A := A) (a := a) (b := b) p q)
 
 /-- The 2-category carried by computational paths. -/
 def pathTwoCategory (A : Type u) : TwoCategory (Obj := A) where

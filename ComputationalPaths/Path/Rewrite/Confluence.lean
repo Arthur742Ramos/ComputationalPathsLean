@@ -32,7 +32,7 @@ noncomputable def Join.rweq {A : Type u} {a b : A}
     RwEq (A := A) (a := a) (b := b) p q :=
   rweq_trans (rweq_of_rw J.left) (rweq_symm (rweq_of_rw J.right))
 
-@[simp] def Join.quot_eq {A : Type u} {a b : A}
+@[simp] noncomputable def Join.quot_eq {A : Type u} {a b : A}
     {p q : Path a b} (J : Join (A := A) (a := a) (b := b) p q) :
     (Quot.mk _ p : PathRwQuot A a b) = Quot.mk _ q :=
   Quot.sound J.rweq

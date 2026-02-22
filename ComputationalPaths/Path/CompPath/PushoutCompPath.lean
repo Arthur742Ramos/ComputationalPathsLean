@@ -216,20 +216,20 @@ def exprRel {x y : PushoutCompPath A B C f g}
 
 @[simp] theorem exprRel_refl {x y : PushoutCompPath A B C f g}
     (p : PushoutCompPathExpr A B C f g x y) : exprRel (A := A) (B := B) (C := C) (f := f) (g := g) p p :=
-  rweq_refl _
+  ⟨rweq_refl _⟩
 
 @[simp] theorem exprRel_symm {x y : PushoutCompPath A B C f g}
     {p q : PushoutCompPathExpr A B C f g x y}
     (h : exprRel (A := A) (B := B) (C := C) (f := f) (g := g) p q) :
     exprRel (A := A) (B := B) (C := C) (f := f) (g := g) q p :=
-  rweq_symm h
+  let ⟨h'⟩ := h; ⟨rweq_symm h'⟩
 
 @[simp] theorem exprRel_trans {x y : PushoutCompPath A B C f g}
     {p q r : PushoutCompPathExpr A B C f g x y}
     (h₁ : exprRel (A := A) (B := B) (C := C) (f := f) (g := g) p q)
     (h₂ : exprRel (A := A) (B := B) (C := C) (f := f) (g := g) q r) :
     exprRel (A := A) (B := B) (C := C) (f := f) (g := g) p r :=
-  rweq_trans h₁ h₂
+  let ⟨h₁'⟩ := h₁; let ⟨h₂'⟩ := h₂; ⟨rweq_trans h₁' h₂'⟩
 
 /-- Setoid on pushout path expressions. -/
 def exprSetoid (x y : PushoutCompPath A B C f g) :
@@ -389,9 +389,8 @@ instance instHasGlueNaturalLoopRwEq_Wedge {A : Type u} {B : Type u} (a₀ : A) (
       apply rweq_trans (rweq_trans_congr_right glue' hinr)
       exact rweq_cmpA_refl_right glue'
     -- Step 2: Transform the full expression
-    apply rweq_trans (rweq_trans_congr_left _ hsymm)
-    apply rweq_trans (rweq_cmpA_refl_left _)
-    exact hmid
+    exact ⟨rweq_trans (rweq_trans_congr_left _ hsymm)
+      (rweq_trans (rweq_cmpA_refl_left _) hmid)⟩
 
 /-! ## Legacy notation -/
 

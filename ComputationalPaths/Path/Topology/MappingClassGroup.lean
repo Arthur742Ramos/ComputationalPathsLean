@@ -306,10 +306,10 @@ theorem mapping_class_group_presentation {surf : SurfaceData.{u}}
 /-- Every listed presentation relation is reflexive under rewrite equivalence. -/
 noncomputable def presentation_relations_are_rweq {surf : SurfaceData.{u}}
     (P : MCGPresentation surf) :
-    (∀ R, R ∈ P.disjoint_relations → RwEq R.comm_path R.comm_path) ×
-      (∀ R, R ∈ P.braid_relations → RwEq R.braid_path R.braid_path) ×
-      (∀ R, R ∈ P.lantern_relations → RwEq R.lantern_path R.lantern_path) :=
-  ⟨fun R _ => RwEq.refl _, fun R _ => RwEq.refl _, fun R _ => RwEq.refl _⟩
+    (∀ R, R ∈ P.disjoint_relations → RwEqProp R.comm_path R.comm_path) ∧
+      (∀ R, R ∈ P.braid_relations → RwEqProp R.braid_path R.braid_path) ∧
+      (∀ R, R ∈ P.lantern_relations → RwEqProp R.lantern_path R.lantern_path) :=
+  ⟨fun R _ => ⟨RwEq.refl _⟩, fun R _ => ⟨RwEq.refl _⟩, fun R _ => ⟨RwEq.refl _⟩⟩
 
 /-! ## Birman Exact Sequence -/
 

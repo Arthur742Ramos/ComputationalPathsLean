@@ -1,8 +1,7 @@
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.CriticalPairs
-namespace ComputationalPaths
-namespace Rewriting
+namespace ComputationalPaths.Path.Rewriting
 
 open ComputationalPaths
 open ComputationalPaths.Path
@@ -23,7 +22,7 @@ This file packages a Squier-style finite-derivation-type witness from:
 
 /-- Basic generating 2-cells: primitive Step reductions and critical-pair fillers. -/
 inductive BasicTwoCell {A : Type u} {a b : A} : Path a b → Path a b → Prop where
-  | step {p q : Path a b} (h : Step p q) : BasicTwoCell p q
+  | step {p q : Path a b} (h : ComputationalPaths.Path.Step p q) : BasicTwoCell p q
   | critical {p q : Path a b} (h : JoinableRw p q) : BasicTwoCell p q
 
 /-- Closure of basic 2-cells by identity, inversion, and composition. -/
@@ -132,5 +131,4 @@ theorem computationalPathMonoid_hasFDT : HasFDT computationalPathMonoid :=
 theorem computationalPathMonoid_typeFP3 : TypeFP3 computationalPathMonoid :=
   fdt_implies_typeFP3 (M := computationalPathMonoid) computationalPathMonoid_hasFDT
 
-end Rewriting
-end ComputationalPaths
+end ComputationalPaths.Path.Rewriting

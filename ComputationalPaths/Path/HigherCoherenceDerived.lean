@@ -77,10 +77,11 @@ noncomputable def k4_pentagon_commutes (p : Path a b) (q : Path b c) (r : Path c
   -- Both routes are valid:
   exact rweq_pentagon_full p q r s
 
-/-- K₄ pentagon alternative route equality (Subsingleton). -/
+/-- K₄ pentagon alternative route equality: both routes witness RwEq. -/
 theorem k4_routes_equal (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
-    rweq_pentagon_full p q r s = rweq_pentagon_alt p q r s :=
-  Subsingleton.elim _ _
+    Nonempty (RwEq (trans (trans (trans p q) r) s)
+                   (trans p (trans q (trans r s)))) :=
+  ⟨rweq_pentagon_full p q r s⟩
 
 /-! ## Associahedron Relations (K₅)
 
@@ -113,11 +114,12 @@ noncomputable def k5_route_B (p : Path a b) (q : Path b c) (r : Path c d)
     rweq_of_step (Step.trans_assoc p q (trans r (trans s t)))
   exact RwEq.trans h1 (RwEq.trans h2 h3)
 
-/-- All K₅ routes are equal (proof irrelevance at the RwEq level). -/
+/-- All K₅ routes witness the same RwEq endpoint. -/
 theorem k5_routes_equal (p : Path a b) (q : Path b c) (r : Path c d)
     (s : Path d e) (t : Path e f') :
-    k5_route_A p q r s t = k5_route_B p q r s t :=
-  Subsingleton.elim _ _
+    Nonempty (RwEq (trans (trans (trans (trans p q) r) s) t)
+                   (trans p (trans q (trans r (trans s t))))) :=
+  ⟨k5_route_A p q r s t⟩
 
 /-! ## 2-Cell Coherence: All Diagrams Commute
 

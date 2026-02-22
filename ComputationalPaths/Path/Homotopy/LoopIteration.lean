@@ -40,13 +40,13 @@ universe u
 
 /-- Cancellation: l · l⁻¹ ≈ refl -/
 noncomputable def loop_cancel_right {A : Type u} {a : A} (l : Path a a) :
-    RwEq (Path.trans l (Path.symm l)) (Path.refl a) := by
-  path_simp
+    RwEq (Path.trans l (Path.symm l)) (Path.refl a) :=
+  rweq_cmpA_inv_right (p := l)
 
 /-- Cancellation: l⁻¹ · l ≈ refl -/
 noncomputable def loop_cancel_left {A : Type u} {a : A} (l : Path a a) :
-    RwEq (Path.trans (Path.symm l) l) (Path.refl a) := by
-  path_simp
+    RwEq (Path.trans (Path.symm l) l) (Path.refl a) :=
+  rweq_cmpA_inv_left (p := l)
 
 /-! ## Natural Number Iteration -/
 
@@ -110,7 +110,7 @@ noncomputable def loopIter_symm_cancel_l {A : Type u} {a : A} (l : Path a a) (n 
     -- ≈ trans (trans l (symm l)) (symm l) ≈ trans refl (symm l) ≈ symm l
     apply rweq_trans (rweq_symm (rweq_tt l (Path.symm l) (Path.symm l)))
     apply rweq_trans (rweq_trans_congr_left (Path.symm l) (loop_cancel_right l))
-    path_simp  -- refl · X ≈ X
+    exact rweq_cmpA_refl_left (p := Path.symm l)
   | succ n ih =>
     -- trans l (loopIter (symm l) (n+2))
     -- = trans l (trans (loopIter (symm l) (n+1)) (symm l))
@@ -132,7 +132,7 @@ noncomputable def loopIter_cancel_r {A : Type u} {a : A} (l : Path a a) (n : Nat
   -- ≈ loopIter l n  [by refl_right]
   apply rweq_trans (rweq_tt (loopIter l n) l (Path.symm l))
   apply rweq_trans (rweq_trans_congr_right (loopIter l n) (loop_cancel_right l))
-  path_simp  -- X · refl ≈ X
+  exact rweq_cmpA_refl_right (p := loopIter l n)
 
 /-- Helper: l^{-1} · l^{n+2} ≈ l^{n+1}
     One cancellation on the left. -/
@@ -146,7 +146,7 @@ noncomputable def loopIter_cancel_l {A : Type u} {a : A} (l : Path a a) (n : Nat
   apply rweq_trans (rweq_symm (rweq_tt (Path.symm l) l (loopIter l n)))
   -- ≈ trans refl (loopIter l n)
   apply rweq_trans (rweq_trans_congr_left (loopIter l n) (loop_cancel_left l))
-  path_simp  -- refl · X ≈ X
+  exact rweq_cmpA_refl_left (p := loopIter l n)
 
 /-- Equal powers cancel: l^{m+1} · (l^{-1})^{m+1} ≈ refl -/
 noncomputable def loopIter_cancel_eq' {A : Type u} {a : A} (l : Path a a) (m : Nat) :
@@ -171,23 +171,20 @@ noncomputable def loopIter_cancel_gt {A : Type u} {a : A} (l : Path a a) (m n : 
   induction n generalizing m with
   | zero =>
     -- m > 0, so m = m' + 1 for some m'
-    have hm : m ≥ 1 := h
-    obtain ⟨m', hm'⟩ : ∃ m', m = m' + 1 := ⟨m - 1, by omega⟩
-    rw [hm']
-    have hsub : m' + 1 - 0 - 1 = m' := by omega
-    rw [hsub]
-    exact loopIter_cancel_r l m'
+    match m, h with
+    | Nat.succ m', _ =>
+      simp only [Nat.succ_sub_one]
+      exact loopIter_cancel_r l m'
   | succ n ih =>
     -- m > n + 1, so m > n
     have h' : m > n := Nat.lt_of_succ_lt h
     apply rweq_trans (rweq_symm (rweq_tt (loopIter l m) (loopIter (Path.symm l) n) (Path.symm l)))
     apply rweq_trans (rweq_trans_congr_left (Path.symm l) (ih m h'))
-    have hk : m - n - 1 ≥ 1 := by omega
-    obtain ⟨k, hk'⟩ : ∃ k, m - n - 1 = k + 1 := ⟨m - n - 2, by omega⟩
-    rw [hk']
-    have heq : m - (n + 1) - 1 = k := by omega
-    rw [heq]
-    exact loopIter_cancel_r l k
+    match m - n - 1, Nat.sub_pos_of_lt (by omega : n + 1 < m) with
+    | Nat.succ k, _ =>
+      have heq : m - (n + 1) - 1 = k := by omega
+      rw [heq]
+      exact loopIter_cancel_r l k
 
 /-- Cancellation when m < n: l^{m+1} · (l^{-1})^{n+1} ≈ (l^{-1})^{n-m}
     More precisely: loopIter l m · loopIter (symm l) n ≈ loopIter (symm l) (n - m - 1) -/
@@ -196,29 +193,20 @@ noncomputable def loopIter_cancel_lt {A : Type u} {a : A} (l : Path a a) (m n : 
          (loopIter (Path.symm l) (n - m - 1)) := by
   induction m generalizing n with
   | zero =>
-    -- n > 0, so n = n' + 1
-    have hn : n ≥ 1 := h
-    obtain ⟨n', hn'⟩ : ∃ n', n = n' + 1 := ⟨n - 1, by omega⟩
-    rw [hn']
-    have hsub : n' + 1 - 0 - 1 = n' := by omega
-    rw [hsub]
-    exact loopIter_symm_cancel_l l n'
+    match n, h with
+    | Nat.succ n', _ =>
+      simp only [Nat.succ_sub_one]
+      exact loopIter_symm_cancel_l l n'
   | succ m ih =>
     have h' : m < n := Nat.lt_of_succ_lt h
-    have hn : n ≥ m + 2 := h
-    obtain ⟨n', hn'⟩ : ∃ n', n = n' + 1 := ⟨n - 1, by omega⟩
-    rw [hn']
-    apply rweq_trans (rweq_tt (loopIter l m) l (loopIter (Path.symm l) (n' + 1)))
-    apply rweq_trans (rweq_trans_congr_right (loopIter l m) (loopIter_symm_cancel_l l n'))
-    have h'' : m ≤ n' := by omega
-    cases Nat.eq_or_lt_of_le h'' with
-    | inl heq =>
-      -- m = n' is impossible since m + 1 < n = n' + 1 means m < n'
-      omega
-    | inr hlt =>
+    match n, h with
+    | Nat.succ n', hn =>
+      apply rweq_trans (rweq_tt (loopIter l m) l (loopIter (Path.symm l) (n' + 1)))
+      apply rweq_trans (rweq_trans_congr_right (loopIter l m) (loopIter_symm_cancel_l l n'))
+      have h'' : m < n' := by omega
       have goal_eq : n' + 1 - (m + 1) - 1 = n' - m - 1 := by omega
       rw [goal_eq]
-      exact ih n' hlt
+      exact ih n' h''
 
 /-! ## Symmetry Iteration -/
 

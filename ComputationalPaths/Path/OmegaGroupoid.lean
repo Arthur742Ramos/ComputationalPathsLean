@@ -213,7 +213,7 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   Since `RwEq p q` is a proposition, any two derivations have equal `toRwEq` proofs.
   This constructor encodes contractibility via proof irrelevance. -/
   | rweq_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      (h : d₁.toRwEq = d₂.toRwEq) : MetaStep₃ d₁ d₂
+      : MetaStep₃ d₁ d₂
   -- Pentagon coherence
   | pentagon {a b c d e : A} (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
       MetaStep₃
@@ -262,8 +262,8 @@ def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ 
 /-- Prop-level projection: any 3-cell yields the same equality proof between
     the induced `RwEq` witnesses of the endpoints. -/
 def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q} (_ : Derivation₃ d₁ d₂) :
-    d₁.toRwEq = d₂.toRwEq :=
-  Subsingleton.elim _ _
+    rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq :=
+  rfl
 
 /-- Left whiskering for 3-cells: c · _ applied to both sides -/
 def whiskerLeft₃ {a b : A} {p q r : Path a b} (c : Derivation₂ r p)
@@ -301,7 +301,7 @@ variable {a b : A}
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell. -/
 def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .step (.rweq_eq (Subsingleton.elim d₁.toRwEq d₂.toRwEq))
+  .step .rweq_eq
 
 /-- **Loop contraction**: Any loop derivation `d : Derivation₂ p p` contracts to `refl p`.
 
@@ -360,8 +360,7 @@ inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivati
   proofs of it, and we can connect them at level 4. -/
   | rweq_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ : Derivation₃ d₁ d₂}
-      (h : Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
-           Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂) :
+      :
       MetaStep₄ m₁ m₂
   -- Whiskering at level 4 (functoriality of vcomp)
   | whisker_left₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
@@ -668,21 +667,13 @@ theorem cell_tower_functor_whiskerLeft (f : Path a b) {p q : Path b c}
     (α : Derivation₂ p q) :
     Derivation₂.toRwEq (whiskerLeft f α) =
       rweq_trans_congr_right f (Derivation₂.toRwEq α) := by
-  induction α with
-  | refl p => simp
-  | step s => simp
-  | inv α ih => simp
-  | vcomp α β ihα ihβ => simp
+  exact Subsingleton.elim _ _
 
 theorem cell_tower_functor_whiskerRight {p q : Path a b}
     (α : Derivation₂ p q) (g : Path b c) :
     Derivation₂.toRwEq (whiskerRight α g) =
       rweq_trans_congr_left g (Derivation₂.toRwEq α) := by
-  induction α with
-  | refl p => simp
-  | step s => simp
-  | inv α ih => simp
-  | vcomp α β ihα ihβ => simp
+  exact Subsingleton.elim _ _
 
 noncomputable def cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
     (α : Derivation₂ p p') (β : Derivation₂ q q') :
@@ -690,7 +681,7 @@ noncomputable def cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
       RwEq.trans
         (rweq_trans_congr_left q (Derivation₂.toRwEq α))
         (rweq_trans_congr_right p' (Derivation₂.toRwEq β)) := by
-  simp
+  exact Subsingleton.elim _ _
 
 /-! ### Truncation Preserves Coherence -/
 

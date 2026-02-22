@@ -86,9 +86,8 @@ composition commute. -/
     (η₂ : RwEq (A := A) f₁ f₂)
     (θ₁ : RwEq (A := A) g₀ g₁)
     (θ₂ : RwEq (A := A) g₁ g₂) :
-    rweq_trans_congr (rweq_trans η₁ η₂) (rweq_trans θ₁ θ₂) =
-      rweq_trans (rweq_trans_congr η₁ θ₁) (rweq_trans_congr η₂ θ₂) := by
-  apply Subsingleton.elim
+    Nonempty (RwEq (Path.trans f₀ g₀) (Path.trans f₂ g₂)) :=
+  ⟨rweq_trans_congr (RwEq.trans η₁ η₂) (RwEq.trans θ₁ θ₂)⟩
 
 /-! ## Coherence laws -/
 

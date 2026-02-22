@@ -28,7 +28,7 @@ noncomputable def rweq_sigmaMk_sigmaFst_sigmaSnd {x y : Sigma B}
 /-! ## Sigma projection β-rules -/
 
 /-- First projection β-rule: `sigmaFst (sigmaMk p q) ≃ ofEq p.toEq`. -/
-theorem rweq_sigmaFst_sigmaMk {a₁ a₂ : A}
+noncomputable def rweq_sigmaFst_sigmaMk {a₁ a₂ : A}
     {b₁ : B a₁} {b₂ : B a₂}
     (p : Path a₁ a₂)
     (q : Path
@@ -38,7 +38,7 @@ theorem rweq_sigmaFst_sigmaMk {a₁ a₂ : A}
   rweq_sigma_fst_beta (A := A) (B := B) (p := p) (q := q)
 
 /-- Second projection β-rule. -/
-theorem rweq_sigmaSnd_sigmaMk {a₁ a₂ : A}
+noncomputable def rweq_sigmaSnd_sigmaMk {a₁ a₂ : A}
     {b₁ : B a₁} {b₂ : B a₂}
     (p : Path a₁ a₂)
     (q : Path

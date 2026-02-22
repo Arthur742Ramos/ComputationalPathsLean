@@ -92,11 +92,11 @@ noncomputable def compMap {a b c : A}
 /-- Single-step functoriality witness for composition, using explicit `Step` constructors. -/
 noncomputable def compMap_steps {a b c : A}
     {p p' : Path a b} {q q' : Path b c}
-    (sp : Step p p') (sq : Step q q') :
+    (sp : ComputationalPaths.Path.Step p p') (sq : ComputationalPaths.Path.Step q q') :
     RwEq (Path.trans p q) (Path.trans p' q') :=
   RwEq.trans
-    (RwEq.step (Step.trans_congr_left q sp))
-    (RwEq.step (Step.trans_congr_right p' sq))
+    (RwEq.step (ComputationalPaths.Path.Step.trans_congr_left q sp))
+    (RwEq.step (ComputationalPaths.Path.Step.trans_congr_right p' sq))
 
 theorem compMap_preserves_id_toEq
     {a b c : A} (p : Path a b) (q : Path b c) :
@@ -116,7 +116,7 @@ theorem compMap_preserves_vcomp_toEq
 theorem compMap_steps_agrees
     {a b c : A}
     {p p' : Path a b} {q q' : Path b c}
-    (sp : Step p p') (sq : Step q q') :
+    (sp : ComputationalPaths.Path.Step p p') (sq : ComputationalPaths.Path.Step q q') :
     rweq_toEq (compMap (A := A) (RwEq.step sp) (RwEq.step sq)) =
       rweq_toEq (compMap_steps (A := A) sp sq) := by
   rfl

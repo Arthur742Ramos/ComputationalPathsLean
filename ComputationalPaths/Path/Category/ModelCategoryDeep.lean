@@ -18,13 +18,13 @@ structure IsIso {a b : A} (p : Path a b) where
 structure IsWeq {a b : A} (p : Path a b) where
   iso : IsIso p
 
-def path_is_weq {a b : A} (p : Path a b) : IsWeq p where
+noncomputable def path_is_weq {a b : A} (p : Path a b) : IsWeq p where
   iso :=
     { inv := Path.symm p
       id_l := rweq_cmpA_inv_right (p := p)
       id_r := rweq_cmpA_inv_left (p := p) }
 
-def weq_comp {a b c : A} {f : Path a b} {g : Path b c}
+noncomputable def weq_comp {a b c : A} {f : Path a b} {g : Path b c}
     (_hf : IsWeq f) (_hg : IsWeq g) : IsWeq (Path.trans f g) :=
   path_is_weq (Path.trans f g)
 

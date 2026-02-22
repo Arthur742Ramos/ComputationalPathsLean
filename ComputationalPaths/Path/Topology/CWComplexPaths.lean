@@ -237,12 +237,12 @@ def cwStep_valid : CWStep → True
 /-! ## RwEq Witnesses -/
 
 /-- Attaching and then collapsing a cell is the identity (RwEq). -/
-def attach_collapse_rweq (n : Nat) :
+noncomputable def attach_collapse_rweq (n : Nat) :
     RwEq (Path.trans (Path.refl n) (Path.refl n)) (Path.refl n) :=
   rweq_cmpA_refl_left (Path.refl n)
 
 /-- CW cell dimension consistency (RwEq). -/
-def cell_dim_rweq (n : Nat) (c : CWCell n) :
+noncomputable def cell_dim_rweq (n : Nat) (c : CWCell n) :
     RwEq (Path.trans c.dim_eq (Path.refl n)) c.dim_eq :=
   rweq_cmpA_refl_right c.dim_eq
 

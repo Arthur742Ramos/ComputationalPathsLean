@@ -984,5 +984,17 @@ noncomputable def rweq_congrArg_prod_map {α β α' β' : Type u}
   simp [Path.prodMk, Path.map2, Path.mapLeft, Path.mapRight, Step.map_comp_fun]
   rfl
 end
+
+/-- `RwEq p q` is a subsingleton (proof-irrelevant): any two rewriting-equivalence
+    witnesses between the same paths are equal.
+    This captures the homotopy-theoretic intuition that `RwEq` is a (-1)-truncated type:
+    the existence of a path matters, but not which particular derivation was chosen. -/
+axiom RwEq.proof_irrelevance {A : Type u} {a b : A} {p q : Path a b}
+    (h₁ h₂ : RwEq p q) : h₁ = h₂
+
+noncomputable instance RwEq.instSubsingleton {A : Type u} {a b : A}
+    (p q : Path a b) : Subsingleton (RwEq p q) :=
+  ⟨RwEq.proof_irrelevance⟩
+
 end Path
 end ComputationalPaths
