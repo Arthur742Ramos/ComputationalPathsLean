@@ -15,6 +15,7 @@ set_option linter.unusedVariables false
 
 namespace ComputationalPaths
 namespace Cluster
+namespace LaurentCategoryPaths
 
 open Path
 
@@ -122,14 +123,20 @@ noncomputable def add_congr_right (a : Val) {b₁ b₂ : Val} (q : Path b₁ b�
     Path (L.add a b₁) (L.add a b₂) :=
   Path.congrArg (L.add a) q
 
+end LaurentData
+
 /-! ### Theorem 16-25: Laurent phenomenon witnesses -/
 
 /-- Laurent phenomenon witness: a cluster variable is a Laurent polynomial. -/
-structure LaurentPhenomenonWitness (clusterVar : Val) where
+structure LaurentPhenomenonWitness {ι : Type u} {Val : Type v}
+    (L : LaurentData ι Val) (clusterVar : Val) where
   laurentExpr : Val
   laurentPath : Path clusterVar laurentExpr
 
-variable {clusterVar : Val} (LP : L.LaurentPhenomenonWitness clusterVar)
+namespace LaurentPhenomenonWitness
+
+variable {ι : Type u} {Val : Type v} {L : LaurentData ι Val}
+variable {clusterVar : Val} (LP : LaurentPhenomenonWitness L clusterVar)
 
 /-- Theorem 16: Laurent expression path. -/
 noncomputable def laurent_expr :
@@ -163,6 +170,12 @@ noncomputable def laurent_left_inv :
          (Path.refl _) :=
   rweq_of_step (Path.Step.symm_trans _)
 
+end LaurentPhenomenonWitness
+
+section LaurentMore
+
+variable {ι : Type u} {Val : Type v} (L : LaurentData ι Val)
+
 /-- Theorem 22: mul_one double symmetry. -/
 noncomputable def mul_one_symm_symm (a : Val) :
     RwEq (Path.symm (Path.symm (L.mulOne a))) (L.mulOne a) :=
@@ -186,7 +199,7 @@ noncomputable def mul_comm_inv_cancel (a b : Val) :
          (Path.refl _) :=
   rweq_of_step (Path.Step.trans_symm _)
 
-end LaurentData
+end LaurentMore
 
 /-! ## Cluster category / quiver representation -/
 
@@ -301,5 +314,6 @@ end QuiverRepData
 
 end
 
+end LaurentCategoryPaths
 end Cluster
 end ComputationalPaths
