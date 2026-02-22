@@ -105,7 +105,7 @@ structure IsSet (A : Type u) where
 namespace IsSet
 
 /-- PUnit' is a set. -/
-def punitSet : IsSet CompPath.PUnit' where
+noncomputable def punitSet : IsSet CompPath.PUnit' where
   pathEq := by
     intro a b p q
     exact rweq_of_rweqProp ((isHSet_of_subsingleton CompPath.PUnit').rweq p q)
