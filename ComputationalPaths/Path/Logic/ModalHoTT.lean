@@ -247,8 +247,8 @@ noncomputable def flat_counit_unit_rweq {A : Type u}
 /-- Modal type is fixed: composing unit and inverse gives identity. -/
 noncomputable def isModal_fixed_rweq {A : Type u}
     (M : ModalityFull) (hA : IsModal M A) :
-    ∃ (_f : M.op A → A),
-      ∀ a : A, RwEq (Path.refl a) (Path.refl a) := by
+    (f : M.op A → A) ×
+      (∀ a : A, RwEq (Path.refl a) (Path.refl a)) := by
   obtain ⟨_inv, _⟩ := hA
   exact ⟨_inv, fun _a => RwEq.refl _⟩
 

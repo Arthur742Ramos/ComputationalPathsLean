@@ -194,7 +194,7 @@ def hfib_transport {E B : Type} (f : E → B) {b₁ b₂ : B}
 theorem hfib_transport_refl {E B : Type} (f : E → B) (b : B)
     (x : HomotopyFiber f b) :
     (hfib_transport f (refl b) x).point = x.point :=
-  Subsingleton.elim _ _
+  rfl
 
 -- ============================================================
 -- §6  Composition of Fibrations (Nat-based)

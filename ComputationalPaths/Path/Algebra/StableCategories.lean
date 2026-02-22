@@ -36,7 +36,7 @@ universe u
 /-! ## Stable step relation -/
 
 /-- Atomic rewrite steps for stable category identities. -/
-inductive StableStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive StableStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | susp_refl {A : Type u} (a : A) :
       StableStep (Path.refl a) (Path.refl a)
   | susp_symm_refl {A : Type u} (a : A) :

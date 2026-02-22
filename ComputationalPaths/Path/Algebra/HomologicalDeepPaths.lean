@@ -82,16 +82,16 @@ structure ChainMap (C D : ChainCpx) where
 /-! ### 1-5 : GrAbEl algebra -/
 
 -- 1. add zero right
+-- helper: build a single-step path from a theorem without ofEq
+private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
+  Path.mk [⟨x, y, h⟩] h
+
 theorem grabel_add_zero (a : GrAbEl) : GrAbEl.add a (GrAbEl.zero a.deg) = a := by
   ext <;> simp
 
 def grabel_add_zero_path (a : GrAbEl) :
     Path (GrAbEl.add a (GrAbEl.zero a.deg)) a :=
   stepPath (grabel_add_zero a)
-
--- helper: build a single-step path from a theorem without ofEq
-private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
-  Path.mk [⟨x, y, h⟩] h
 
 -- 2. add zero left
 theorem grabel_zero_add (a : GrAbEl) : GrAbEl.add (GrAbEl.zero a.deg) a = a := by

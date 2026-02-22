@@ -89,7 +89,7 @@ structure ResidueField (R : ArtinRing.{u}) where
 /-! ## Deformation Step Relation -/
 
 /-- Atomic rewrite steps for deformation identities. -/
-inductive DeformationStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive DeformationStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | ext_refl {A : Type u} (a : A) :
       DeformationStep (Path.refl a) (Path.refl a)
   | small_ext_cancel {A : Type u} (a : A) :

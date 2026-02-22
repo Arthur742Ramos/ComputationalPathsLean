@@ -262,6 +262,7 @@ def conservation_chain : Path (True : Prop) True :=
 noncomputable def conservation_chain_rweq :
     RwEq conservation_chain (Path.refl True) := by
   simp [conservation_chain, wkl_pi02_conservation, wkl_pi11_conservation]
+  exact RwEq.refl _
 
 /-! ## Hierarchy Structure -/
 

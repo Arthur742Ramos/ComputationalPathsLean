@@ -261,7 +261,7 @@ theorem reduction_eq {A : Type u} {a b : A} (R : PathReduction A) (p : Path a b)
 /-- Reduction is idempotent for identity reduction. -/
 theorem id_reduction_idem {A : Type u} {a b : A} (p : Path a b) :
     (idReduction A).reduce ((idReduction A).reduce p) = (idReduction A).reduce p := by
-  apply Subsingleton.elim
+  rfl
 
 /-- CongrArg through reduction. -/
 def reduction_congrArg {A : Type u} {B : Type v} (R : PathReduction A)

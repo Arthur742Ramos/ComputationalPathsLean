@@ -21,6 +21,7 @@ Ramsey theory, partition calculus, trees, and well-quasi-orders.
 -/
 
 import ComputationalPaths.Path.Rewrite.RwEq
+import Mathlib.Data.Fintype.Card
 
 namespace ComputationalPaths
 namespace Path

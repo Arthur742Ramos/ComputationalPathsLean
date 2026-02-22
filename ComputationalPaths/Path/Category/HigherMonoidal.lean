@@ -84,7 +84,7 @@ def quillenPath (C : HigherMonoidalCategory) (a : algebraObject C) : Path a a :=
   Path.refl a
 
 theorem infinityOperadShape_nonempty (n : Nat) : Nat.succ n > 0 := by
-  rfl
+  omega
 
 theorem dayConvolutionTensor_formula (C D : HigherMonoidalCategory)
     (x y : dayConvolutionObj C D) :

@@ -39,7 +39,7 @@ universe u
 /-! ## Torsion step relation -/
 
 /-- Atomic rewrite steps for torsion theory identities. -/
-inductive TorsionStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive TorsionStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | orth_refl {A : Type u} (a : A) :
       TorsionStep (Path.refl a) (Path.refl a)
   | orth_symm_refl {A : Type u} (a : A) :

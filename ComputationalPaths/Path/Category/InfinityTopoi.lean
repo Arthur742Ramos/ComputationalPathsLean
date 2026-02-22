@@ -247,10 +247,11 @@ theorem cohomology_homotopy_invariance (T : InfinityTopos.{u,v})
   intros; rfl
 
 /-- Mayer-Vietoris: for a pushout X = U ∪_W V, there is a long exact sequence. -/
-theorem mayer_vietoris (T : InfinityTopos.{u,v})
-    (U V W X A : T.carrier.Obj) (n : Nat) :
+noncomputable theorem mayer_vietoris (T : InfinityTopos.{u,v})
+    (U V W X A : T.carrier.Obj) (n : Nat)
+    (i : T.carrier.Hom X W) :
     ∃ (connecting : cohomology T W A n → cohomology T X A (n + 1)), True :=
-  ⟨fun _ => T.carrier.id _, trivial⟩
+  ⟨fun h => T.carrier.comp i h, trivial⟩
 
 /-- The object classifier exists in every ∞-topos. -/
 theorem object_classifier_exists (T : InfinityTopos.{u,v}) :

@@ -61,7 +61,7 @@ variable (A : Type u)
 /-- The groupoid-enriched category of computational paths on a type `A`. -/
 def pathGroupoidEnriched (A : Type u) : GroupoidEnrichedCategory (Obj := A) where
   toWeakBicategory := weakBicategory A
-  inv₂ := fun {a b} {f g} η => RwEq.symm η
+  inv₂ := fun {a b} {f g} η => η.map RwEq.symm
   vcomp_assoc := by
     intro a b f g h i η θ ι
     apply Subsingleton.elim

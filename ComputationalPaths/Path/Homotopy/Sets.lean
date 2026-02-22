@@ -60,7 +60,7 @@ theorem axiomK_of_subsingleton (A : Type u) [Subsingleton A] : AxiomK A := by
       induction steps with
       | nil =>
           -- `Path.mk [] rfl` is definitionally `Path.refl a`.
-          simp [Path.refl]
+          exact RwEq.refl _
       | cons s ss ih =>
           have hseg :
               RwEq

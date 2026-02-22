@@ -177,7 +177,7 @@ def suslin_complementarity_path {X : Type u} {τ : TopologyData X}
     have h₁ := (sw.analytic_eq x).proof
     have h₂ := (sw.coanalytic_eq x).proof
     rw [h₁, h₂]
-    simp only [eq_iff_iff, not_not]
+    simp only [eq_iff_iff]
     exact ⟨fun h => fun hns => hns h, fun h => Classical.byContradiction h⟩)
 
 /-! ## Polish Spaces -/

@@ -382,7 +382,7 @@ theorem cobordismStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Constructions -/
 
 /-- RwEq: additive FGL unit axiom (first). -/
-theorem rwEq_additive_unit (R : Type u) (Ri : CommRing R) :
+def rwEq_additive_unit (R : Type u) (Ri : CommRing R) :
     let F := additiveFGL R Ri
     RwEq (F.unit_left_0) (F.unit_right_0) :=
   RwEq.refl _

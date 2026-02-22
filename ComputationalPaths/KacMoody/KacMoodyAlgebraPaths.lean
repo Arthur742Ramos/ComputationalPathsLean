@@ -16,7 +16,7 @@ open Path
 universe u v
 
 /-- Domain-specific rewrite tags for Kac-Moody path normalizations. -/
-inductive KacMoodyStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive KacMoodyStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | contract_right {A : Type u} {a b : A} (p : Path a b) :
       KacMoodyStep (Path.trans p (Path.refl b)) p
   | contract_left {A : Type u} {a b : A} (p : Path a b) :

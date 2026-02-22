@@ -348,7 +348,8 @@ noncomputable def floerStep_comp_assoc {M : FloerData.{u}}
     (s₃ : FloerStep M γ₃ γ₄) :
     RwEq (FloerStep.comp (FloerStep.comp s₁ s₂) s₃).index_eq
          (FloerStep.comp s₁ (FloerStep.comp s₂ s₃)).index_eq := by
-  simp [FloerStep.comp]
+  simp only [FloerStep.comp]
+  exact RwEq.refl _
 
 end FloerHomology
 end Topology

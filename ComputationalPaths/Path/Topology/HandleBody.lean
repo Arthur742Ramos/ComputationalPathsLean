@@ -233,7 +233,7 @@ def cancel_preserves (n : Nat) (c : HandleCancellation.{u} n) :
     Path c.before c.after := c.cancel_path
 
 /-- RwEq witness: cancellation followed by re-introduction gives identity. -/
-def cancel_reintroduce_rweq (n : Nat) (c : HandleCancellation.{u} n) :
+noncomputable def cancel_reintroduce_rweq (n : Nat) (c : HandleCancellation.{u} n) :
     RwEq (Path.trans c.cancel_path (Path.symm c.cancel_path))
       (Path.refl c.before) :=
   rweq_cmpA_inv_right c.cancel_path

@@ -96,7 +96,7 @@ structure SimplicialRing where
 /-! ## Derived Step Relation -/
 
 /-- Atomic rewrite steps for derived algebraic geometry identities. -/
-inductive DerivedStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive DerivedStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | tensor_assoc_refl {A : Type u} (a : A) :
       DerivedStep (Path.refl a) (Path.refl a)
   | tensor_symm_cancel {A : Type u} (a : A) :

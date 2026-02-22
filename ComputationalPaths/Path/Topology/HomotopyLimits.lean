@@ -38,7 +38,7 @@ universe u v
 /-! ## Homotopy limit step relation -/
 
 /-- Atomic rewrite steps for homotopy limit/colimit identities. -/
-inductive HoLimStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive HoLimStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | cone_refl {A : Type u} (a : A) :
       HoLimStep (Path.refl a) (Path.refl a)
   | cone_comp_cancel {A : Type u} {a b : A} (p : Path a b) :

@@ -82,10 +82,10 @@ composition. -/
 composition commute. -/
 @[simp] theorem interchange_rweq
     {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
-    (η₁ : Path2Cell (A := A) f₀ f₁)
-    (η₂ : Path2Cell (A := A) f₁ f₂)
-    (θ₁ : Path2Cell (A := A) g₀ g₁)
-    (θ₂ : Path2Cell (A := A) g₁ g₂) :
+    (η₁ : RwEq (A := A) f₀ f₁)
+    (η₂ : RwEq (A := A) f₁ f₂)
+    (θ₁ : RwEq (A := A) g₀ g₁)
+    (θ₂ : RwEq (A := A) g₁ g₂) :
     rweq_trans_congr (rweq_trans η₁ η₂) (rweq_trans θ₁ θ₂) =
       rweq_trans (rweq_trans_congr η₁ θ₁) (rweq_trans_congr η₂ θ₂) := by
   apply Subsingleton.elim

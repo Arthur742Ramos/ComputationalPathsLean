@@ -41,7 +41,7 @@ universe u v
 /-! ## Derived category step relation -/
 
 /-- Atomic rewrite steps for derived category identities. -/
-inductive DerivedStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive DerivedStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | qi_refl {A : Type u} (a : A) :
       DerivedStep (Path.refl a) (Path.refl a)
   | qi_comp_cancel {A : Type u} {a b : A} (p : Path a b) :

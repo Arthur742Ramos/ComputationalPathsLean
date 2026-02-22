@@ -131,7 +131,7 @@ theorem Cocone.desc_gluePath (cc : Cocone f g D) (c : C) :
     Path.congrArg cc.desc (gluePath c) =
       Path.mk ((gluePath c).steps.map (Step.map cc.desc))
               (_root_.congrArg cc.desc (gluePath c).proof) :=
-  Subsingleton.elim _ _
+  rfl
 
 /-! ## Pushout functoriality -/
 

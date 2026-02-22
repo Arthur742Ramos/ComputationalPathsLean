@@ -27,7 +27,6 @@ import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.CriticalPairs
 import ComputationalPaths.Path.Rewrite.GroupoidTRS
-import ComputationalPaths.Path.Rewrite.KnuthBendix
 namespace ComputationalPaths
 namespace Rewriting
 

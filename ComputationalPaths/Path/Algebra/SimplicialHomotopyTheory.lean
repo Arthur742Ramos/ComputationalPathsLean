@@ -37,7 +37,7 @@ universe u
 /-! ## Simplicial step relation -/
 
 /-- Atomic rewrite steps for simplicial identities. -/
-inductive SimplicialStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive SimplicialStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | face_face {A : Type u} (a : A) :
       SimplicialStep (Path.refl a) (Path.refl a)
   | degen_degen {A : Type u} (a : A) :

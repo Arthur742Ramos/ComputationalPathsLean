@@ -135,7 +135,7 @@ def pathTwoPolygraph (A : Type u) : TwoPolygraph :=
   { Obj := A
     OneCell := fun a b => Path a b
     TwoCell := fun {a b} p q =>
-      RwEq (A := A) (a := a) (b := b) p q }
+      Nonempty (RwEq (A := A) (a := a) (b := b) p q) }
 
 /-- The path 3-polygraph obtained via homotopical completion. -/
 def pathThreePolygraph (A : Type u) : ThreePolygraph :=

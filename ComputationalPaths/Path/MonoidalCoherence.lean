@@ -86,7 +86,7 @@ structure MonoidalPathAlgebra (A : Type u) where
       RwEq (tensor (tensor p (unit)) q) (tensor p q)
 
 /-- The canonical monoidal structure on computational paths. -/
-def pathMonoidal (A : Type u) : MonoidalPathAlgebra A where
+noncomputable def pathMonoidal (A : Type u) : MonoidalPathAlgebra A where
   tensor := fun p q => Path.trans p q
   unit := fun {a} => Path.refl a
   associator := fun p q r =>

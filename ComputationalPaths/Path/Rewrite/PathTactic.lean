@@ -402,7 +402,7 @@ macro "path_eta" : tactic =>
 /-! ## Calc Support for RwEq -/
 
 /-- Enable calc notation for RwEq: `calc p ≈ q := h₁; _ ≈ r := h₂` -/
-instance : Trans (α := Path a b) RwEq RwEq RwEq where
+noncomputable instance : Trans (α := Path a b) RwEq RwEq RwEq where
   trans := rweq_trans
 
 end Tactic

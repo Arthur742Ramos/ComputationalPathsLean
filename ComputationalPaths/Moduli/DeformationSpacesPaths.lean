@@ -41,7 +41,7 @@ def specializeLoop (n : Nat) : Path (D.fiber (n + 1)) (D.fiber (n + 1)) :=
   Path.trans (D.specializeFrom (n + 1)) (Path.symm (D.specializeFrom (n + 1)))
 
 /-- Primitive normalization steps for deformation-space path expressions. -/
-inductive DeformationSpaceStep : {a b : X} → Path a b → Path a b → Prop
+inductive DeformationSpaceStep : {a b : X} → Path a b → Path a b → Type
   | contract_right {a b : X} (p : Path a b) :
       DeformationSpaceStep (Path.trans p (Path.refl b)) p
   | contract_left {a b : X} (p : Path a b) :

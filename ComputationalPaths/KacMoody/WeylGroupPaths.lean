@@ -16,7 +16,7 @@ open Path
 universe u v
 
 /-- Domain-specific rewrite tags for Weyl-group path normalizations. -/
-inductive WeylStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive WeylStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | contract_right {A : Type u} {a b : A} (p : Path a b) :
       WeylStep (Path.trans p (Path.refl b)) p
   | contract_left {A : Type u} {a b : A} (p : Path a b) :

@@ -35,7 +35,7 @@ abbrev pathCategory (A : Type u) : WeakCategory A :=
 
 /-- Weak equivalences in the path category are rewrite equalities. -/
 abbrev pathWeakEquiv {A : Type u} {a b : A} (p q : Path a b) : Prop :=
-  RwEq p q
+  Nonempty (RwEq p q)
 
 /-- The localization of the path category at rewrite equalities. -/
 abbrev pathLocalization (A : Type u) : StrictCategory A :=

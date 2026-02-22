@@ -76,7 +76,7 @@ structure PathOperad (A : Type u) where
       RwEq (comp (comp f g) h) (comp f (comp g h))
 
 /-- Canonical operadic coherence induced by path composition. -/
-def canonicalPathOperad (A : Type u) : PathOperad A where
+noncomputable def canonicalPathOperad (A : Type u) : PathOperad A where
   comp := fun f g => opComp f g
   id := opId
   comp_id_left := by
