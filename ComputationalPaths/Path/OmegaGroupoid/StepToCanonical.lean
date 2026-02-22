@@ -75,10 +75,12 @@ section SemanticArgument
 
 variable {a b : A} {p q : Path a b}
 
-/-- All derivations between the same paths have equal toRwEq (proof irrelevance). -/
-theorem derivations_toRwEq_eq (d₁ d₂ : Derivation₂ p q) :
-    d₁.toRwEq = d₂.toRwEq :=
-  Subsingleton.elim d₁.toRwEq d₂.toRwEq
+/-- All derivations between the same paths have equal toRwEq.
+    Uses the RwEqProp wrapper approach: `rweq_toEq` projects to `Prop`-level
+    equality, which is proof-irrelevant. -/
+theorem derivations_toRwEq_prop_eq (d₁ d₂ : Derivation₂ p q) :
+    rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq :=
+  rfl
 
 end SemanticArgument
 

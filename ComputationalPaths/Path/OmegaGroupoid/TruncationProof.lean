@@ -639,10 +639,10 @@ of Step-confluence, the contractibility₃ can be constructed without
 any appeal to `Subsingleton.elim`.
 
 The existing `contractibility₃` uses `MetaStep₃.rweq_eq` which
-internally appeals to `Subsingleton.elim` on `RwEq p q : Prop`.
-However, `RwEq` in this codebase is `Type u`-valued, not `Prop`-valued.
-The `Subsingleton.elim` appears only in `toRwEqEq` where we compare
-the *Prop-level projections*.
+internally appeals to proof irrelevance on the `Prop`-level projection
+`rweq_toEq`. Note that `RwEq` itself is `Type u`-valued, not `Prop`-valued;
+equality of `RwEq` witnesses is obtained only at the `Prop` level via
+`rweq_toEq` (the `RwEqProp` wrapper approach).
 
 The following construction avoids even that indirect use, by building
 the 3-cell entirely from the groupoid-law `MetaStep₃` constructors
