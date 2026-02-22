@@ -216,7 +216,7 @@ noncomputable def kleinBottlePiOneEquivIntProd :
 
 abbrev KleinBottle : Type u := KleinBottleCompPath.{u}
 
-@[simp] abbrev kleinBottleBasepoint : KleinBottle := kleinBottleBase
+@[simp] noncomputable abbrev kleinBottleBasepoint : KleinBottle := kleinBottleBase
 
 end CompPath
 end Path

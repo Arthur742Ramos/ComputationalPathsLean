@@ -92,7 +92,7 @@ noncomputable def stiefelManifoldPiOneEquivUnit (n k : Nat) :
 abbrev StiefelManifold (n k : Nat) : Type u := StiefelManifoldCompPath n k
 
 /-- Alias for the Stiefel manifold basepoint. -/
-@[simp] abbrev stiefelManifoldBasepoint (n k : Nat) : StiefelManifold n k :=
+@[simp] noncomputable abbrev stiefelManifoldBasepoint (n k : Nat) : StiefelManifold n k :=
   stiefelManifoldBase n k
 
 /-- Decode at `0` is the reflexivity loop. -/

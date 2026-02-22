@@ -20,15 +20,15 @@ section PathOperations
 variable {A : Type u}
 
 /-- HoTT-style path concatenation. -/
-@[simp] abbrev concat {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
+@[simp] noncomputable abbrev concat {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
 /-- HoTT-style inverse of a path. -/
-@[simp] abbrev inverse {a b : A} (p : Path a b) : Path b a :=
+@[simp] noncomputable abbrev inverse {a b : A} (p : Path a b) : Path b a :=
   Path.symm p
 
 /-- HoTT-style action on paths (`ap`). -/
-@[simp] abbrev ap {B : Type v} (f : A → B) {x y : A}
+@[simp] noncomputable abbrev ap {B : Type v} (f : A → B) {x y : A}
     (p : Path x y) : Path (f x) (f y) :=
   Path.congrArg f p
 
@@ -86,7 +86,7 @@ section DependentOperations
 variable {A : Type u} {P : A → Type u}
 
 /-- HoTT-style dependent action on paths (`apd`). -/
-@[simp] abbrev apd (f : (x : A) → P x) {a b : A} (p : Path a b) :
+@[simp] noncomputable abbrev apd (f : (x : A) → P x) {a b : A} (p : Path a b) :
     Path (Path.transport (A := A) (D := P) p (f a)) (f b) :=
   Path.apd (A := A) (B := P) f p
 

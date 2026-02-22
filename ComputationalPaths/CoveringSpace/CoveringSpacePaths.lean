@@ -63,9 +63,9 @@ variable {E B : Type u} (C : CovData E B)
     Path.symm (Path.symm (C.projLiftPath b)) = C.projLiftPath b := Path.symm_symm _
 /-- 10 -/ @[simp] theorem symm_symm_liftProj (e : E) :
     Path.symm (Path.symm (C.liftProjPath e)) = C.liftProjPath e := Path.symm_symm _
-/-- 11 -/ def projOfLiftProjPath (e : E) : Path (C.proj (C.lift (C.proj e))) (C.proj e) :=
+/-- 11 -/ noncomputable def projOfLiftProjPath (e : E) : Path (C.proj (C.lift (C.proj e))) (C.proj e) :=
     Path.congrArg C.proj (C.liftProjPath e)
-/-- 12 -/ def liftOfProjLiftPath (b : B) : Path (C.lift (C.proj (C.lift b))) (C.lift b) :=
+/-- 12 -/ noncomputable def liftOfProjLiftPath (b : B) : Path (C.lift (C.proj (C.lift b))) (C.lift b) :=
     Path.congrArg C.lift (C.projLiftPath b)
 
 -- §3  Deck-transformation coherence (12 theorems)
@@ -86,7 +86,7 @@ variable {E B : Type u} (C : CovData E B)
     Path.trans (Path.refl (C.proj (C.deck e))) (C.deckProjPath e) = C.deckProjPath e := Path.trans_refl_left _
 /-- 20 -/ @[simp] theorem deckProj_symm_toEq (e : E) :
     (Path.trans (C.deckProjPath e) (Path.symm (C.deckProjPath e))).toEq = rfl := Path.toEq_trans_symm (C.deckProjPath e)
-/-- 21 -/ def projDeckDeckPath (e : E) : Path (C.proj (C.deck (C.deck e))) (C.proj e) :=
+/-- 21 -/ noncomputable def projDeckDeckPath (e : E) : Path (C.proj (C.deck (C.deck e))) (C.proj e) :=
     Path.congrArg C.proj (C.deckDeckPath e)
 /-- 22 -/ @[simp] theorem deckLift_trans_refl (b : B) :
     Path.trans (C.deckLiftPath b) (Path.refl (C.lift b)) = C.deckLiftPath b := Path.trans_refl_right _
@@ -97,7 +97,7 @@ variable {E B : Type u} (C : CovData E B)
 
 -- §4  Composite coherence paths (14 theorems)
 
-/-- 25 -/ def projDeckLiftPath (b : B) : Path (C.proj (C.deck (C.lift b))) b :=
+/-- 25 -/ noncomputable def projDeckLiftPath (b : B) : Path (C.proj (C.deck (C.lift b))) b :=
     Path.trans (C.deckProjPath (C.lift b)) (C.projLiftPath b)
 /-- 26 -/ @[simp] theorem projDeckLift_trans_refl (b : B) :
     Path.trans (C.projDeckLiftPath b) (Path.refl b) = C.projDeckLiftPath b := Path.trans_refl_right _
@@ -107,14 +107,14 @@ variable {E B : Type u} (C : CovData E B)
     (Path.trans (C.projDeckLiftPath b) (Path.symm (C.projDeckLiftPath b))).toEq = rfl := Path.toEq_trans_symm (C.projDeckLiftPath b)
 /-- 29 -/ @[simp] theorem symm_symm_projDeckLift (b : B) :
     Path.symm (Path.symm (C.projDeckLiftPath b)) = C.projDeckLiftPath b := Path.symm_symm _
-/-- 30 -/ def liftProjDeckPath (e : E) : Path (C.lift (C.proj (C.deck e))) (C.lift (C.proj e)) :=
+/-- 30 -/ noncomputable def liftProjDeckPath (e : E) : Path (C.lift (C.proj (C.deck e))) (C.lift (C.proj e)) :=
     Path.congrArg C.lift (C.deckProjPath e)
 /-- 31 -/ @[simp] theorem liftProjDeck_trans_refl (e : E) :
     Path.trans (C.liftProjDeckPath e) (Path.refl _) = C.liftProjDeckPath e := Path.trans_refl_right _
 /-- 32 -/ theorem projDeckLift_assoc (b : B) :
     Path.trans (Path.trans (C.deckProjPath (C.lift b)) (C.projLiftPath b)) (Path.refl b) =
     Path.trans (C.deckProjPath (C.lift b)) (Path.trans (C.projLiftPath b) (Path.refl b)) := Path.trans_assoc _ _ _
-/-- 33 -/ def deckLiftProjPath (e : E) : Path (C.deck (C.lift (C.proj e))) (C.deck e) :=
+/-- 33 -/ noncomputable def deckLiftProjPath (e : E) : Path (C.deck (C.lift (C.proj e))) (C.deck e) :=
     Path.congrArg C.deck (C.liftProjPath e)
 /-- 34 -/ @[simp] theorem deckLiftProj_trans_refl (e : E) :
     Path.trans (C.deckLiftProjPath e) (Path.refl _) = C.deckLiftProjPath e := Path.trans_refl_right _
@@ -140,12 +140,12 @@ variable {E B : Type u} (C : CovData E B)
     (Path.trans (Path.symm (C.monodromyPath e)) (C.monodromyPath e)).toEq = rfl := Path.toEq_symm_trans (C.deckDeckPath e)
 /-- 44 -/ @[simp] theorem symm_symm_monodromy (e : E) :
     Path.symm (Path.symm (C.monodromyPath e)) = C.monodromyPath e := Path.symm_symm _
-/-- 45 -/ def projMonodromyPath (e : E) : Path (C.proj (C.deck (C.deck e))) (C.proj e) :=
+/-- 45 -/ noncomputable def projMonodromyPath (e : E) : Path (C.proj (C.deck (C.deck e))) (C.proj e) :=
     Path.congrArg C.proj (C.monodromyPath e)
 /-- 46 -/ @[simp] theorem projMonodromy_eq (e : E) : C.projMonodromyPath e = C.projDeckDeckPath e := rfl
 /-- 47 -/ @[simp] theorem projMonodromy_trans_refl (e : E) :
     Path.trans (C.projMonodromyPath e) (Path.refl _) = C.projMonodromyPath e := Path.trans_refl_right _
-/-- 48 -/ def deckMonodromyPath (e : E) : Path (C.deck (C.deck (C.deck e))) (C.deck e) :=
+/-- 48 -/ noncomputable def deckMonodromyPath (e : E) : Path (C.deck (C.deck (C.deck e))) (C.deck e) :=
     Path.congrArg C.deck (C.monodromyPath e)
 /-- 49 -/ @[simp] theorem deckMonodromy_trans_refl (e : E) :
     Path.trans (C.deckMonodromyPath e) (Path.refl _) = C.deckMonodromyPath e := Path.trans_refl_right _
