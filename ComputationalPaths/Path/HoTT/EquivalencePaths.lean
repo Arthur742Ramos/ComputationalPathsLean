@@ -104,7 +104,19 @@ noncomputable def biInvToQInv {f : A → B} (e : BiInv f) : QInv f where
   retr := fun b => by
     -- Use: g(f(h(b))) = h(b) from sect, f(h(b)) = b from retr
     -- So f(g(b)) = b follows from: f(g(b)) = f(g(f(h(b)))) = f(h(b)) = b
-    sorry
+    let g := e.left.linv
+    let h := e.right.rinv
+    -- g = left inverse, h = right inverse
+    -- f(g(b)) = f(g(f(h(b)))) (by retr: f(h(b)) = b)
+    -- f(g(f(h(b)))) = f(h(b)) (by sect: g(f(h(b))) = h(b))
+    -- f(h(b)) = b (by retr)
+    have step1 : Path (f (g (f (h b)))) (f (h b)) :=
+      congrArg f (e.left.sect (h b))
+    have step2 : Path (f (h b)) b := e.right.retr b
+    -- f(g(b)) = f(g(f(h(b)))) since f(h(b)) = b
+    have step0 : Path (f (g b)) (f (g (f (h b)))) :=
+      congrArg (fun x => f (g x)) (symm (e.right.retr b))
+    exact trans (trans step0 step1) step2
 
 /-! ## Half-adjoint equivalences -/
 

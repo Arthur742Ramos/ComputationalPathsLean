@@ -413,8 +413,8 @@ theorem join_refl_meet {A : Type u} {a b : A}
 /-- Symmetric join induces the symmetric RwEq. -/
 noncomputable def Join.symm_rweq {A : Type u} {a b : A}
     {p q : Path a b} (J : Join (A := A) (a := a) (b := b) p q) :
-    J.symm.rweq = rweq_symm J.rweq := by
-  sorry
+    J.symm.rweq = rweq_symm J.rweq :=
+  ComputationalPaths.Path.rweq_proof_irrel _ _
 
 /-- Join quot_eq is transitive via Eq.trans. -/
 theorem Join.quot_eq_trans {A : Type u} {a b : A}

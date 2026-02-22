@@ -184,14 +184,14 @@ def relabelTrace {L : Type u} (f : L → L) (t : List (Act L)) : List (Act L) :=
 def relabel_length {L : Type u} (f : L → L) (t : List (Act L)) :
     Path (relabelTrace f t).length t.length := by
   unfold relabelTrace
-  sorry
+  exact Path.mk [Step.mk _ _ (List.length_map t (relabelAct f))] (List.length_map t (relabelAct f))
 
 /-- 18. Relabeling distributes over concatenation. -/
 def relabel_concat {L : Type u} (f : L → L) (t₁ t₂ : List (Act L)) :
     Path (relabelTrace f (t₁ ++ t₂))
          (relabelTrace f t₁ ++ relabelTrace f t₂) := by
   unfold relabelTrace
-  sorry
+  exact Path.mk [Step.mk _ _ (List.map_append (relabelAct f) t₁ t₂)] (List.map_append (relabelAct f) t₁ t₂)
 
 /-- 19. Relabeling empty trace gives empty. -/
 def relabel_nil {L : Type u} (f : L → L) :

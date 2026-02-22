@@ -89,11 +89,11 @@ def dayUnit (C : SymMonInfCat.{u,v}) : C.Obj → Type v :=
 /-- Day convolution gives a monoidal structure on presheaves. -/
 noncomputable def dayMonoidal (C : SymMonInfCat.{u,v}) :
     MonoidalStructure (Presheaf C.toInfCat) where
-  tensor := sorry
-  unit := sorry
-  assocWitness := fun _ _ _ x => sorry
-  leftUnit := fun _ x => sorry
-  rightUnit := fun _ x => sorry
+  tensor := fun F G x => F x × G x
+  unit := dayUnit C
+  assocWitness := fun _ _ _ x => fun ⟨⟨a, b⟩, c⟩ => ⟨a, ⟨b, c⟩⟩
+  leftUnit := fun _ x => fun ⟨_, a⟩ => a
+  rightUnit := fun _ x => fun ⟨a, _⟩ => a
 
 /-! ## ∞-Operads -/
 

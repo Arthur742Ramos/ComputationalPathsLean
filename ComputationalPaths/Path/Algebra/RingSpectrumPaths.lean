@@ -331,10 +331,12 @@ def specHomComp {R S T : Type u}
     {rR : SpecRing R} {rS : SpecRing S} {rT : SpecRing T}
     (φ : SpecHom rR rS) (ψ : SpecHom rS rT) : SpecHom rR rT where
   toFun := ψ.toFun ∘ φ.toFun
-  map_zero := sorry
-  map_one := sorry
-  map_add := fun _ _ => sorry
-  map_mul := fun _ _ => sorry
+  map_zero := trans (congrArg ψ.toFun φ.map_zero) ψ.map_zero
+  map_one := trans (congrArg ψ.toFun φ.map_one) ψ.map_one
+  map_add := fun a b => trans (congrArg ψ.toFun (φ.map_add a b))
+    (trans (ψ.map_add (φ.toFun a) (φ.toFun b)) (Path.refl _))
+  map_mul := fun a b => trans (congrArg ψ.toFun (φ.map_mul a b))
+    (trans (ψ.map_mul (φ.toFun a) (φ.toFun b)) (Path.refl _))
 
 -- 26
 theorem specMap_comp_mem {R S T : Type u}

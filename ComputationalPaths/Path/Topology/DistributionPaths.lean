@@ -104,18 +104,22 @@ def dist_eval_zero (T : TestFunctionSpace) (d : Distribution T) :
 noncomputable def Distribution.smulDist (T : TestFunctionSpace) (n : Int) (d : Distribution T) :
     Distribution T where
   eval := fun f => n * d.eval f
-  eval_zero := sorry
+  eval_zero := by
+    show Path (n * d.eval T.zero) 0
+    exact trans (congrArg (n * ·) d.eval_zero) (Path.mk [Step.mk _ _ (Int.mul_zero n)] (Int.mul_zero n))
   linear_add := fun f g => Path.refl _
 
 /-- 11. Zero scalar gives zero distribution -/
 noncomputable def smul_zero_dist (T : TestFunctionSpace) (d : Distribution T)
     (f : T.carrier) :
-    Path ((Distribution.smulDist T 0 d).eval f) 0 := sorry
+    Path ((Distribution.smulDist T 0 d).eval f) 0 :=
+  Path.mk [Step.mk _ _ (Int.zero_mul (d.eval f))] (Int.zero_mul (d.eval f))
 
 /-- 12. One scalar gives same distribution -/
 noncomputable def smul_one_dist (T : TestFunctionSpace) (d : Distribution T)
     (f : T.carrier) :
-    Path ((Distribution.smulDist T 1 d).eval f) (d.eval f) := sorry
+    Path ((Distribution.smulDist T 1 d).eval f) (d.eval f) :=
+  Path.mk [Step.mk _ _ (Int.one_mul (d.eval f))] (Int.one_mul (d.eval f))
 
 /-! ## Distributional Derivative -/
 
@@ -128,12 +132,18 @@ structure DerivativeOp (T : TestFunctionSpace) where
 noncomputable def dist_deriv (T : TestFunctionSpace) (d : Distribution T) (D : DerivativeOp T) :
     Distribution T where
   eval := fun f => -(d.eval (D.deriv f))
-  eval_zero := sorry
+  eval_zero := by
+    show Path (-(d.eval (D.deriv T.zero))) 0
+    exact trans (congrArg (- ·) (trans (congrArg d.eval D.deriv_zero) d.eval_zero))
+               (Path.mk [Step.mk _ _ (Int.neg_zero)] Int.neg_zero)
   linear_add := fun f g => Path.refl _
 
 /-- 13. Distributional derivative of zero distribution -/
 noncomputable def dist_deriv_zero_dist (T : TestFunctionSpace) (D : DerivativeOp T) (f : T.carrier) :
-    Path ((dist_deriv T (Distribution.zeroDist T) D).eval f) 0 := sorry
+    Path ((dist_deriv T (Distribution.zeroDist T) D).eval f) 0 := by
+  show Path (-(Distribution.zeroDist T).eval (D.deriv f)) 0
+  exact trans (congrArg (- ·) (Path.refl _))
+              (Path.mk [Step.mk _ _ (Int.neg_zero)] Int.neg_zero)
 
 /-- 14. Derivative operator at zero -/
 def deriv_at_zero (T : TestFunctionSpace) (D : DerivativeOp T) :

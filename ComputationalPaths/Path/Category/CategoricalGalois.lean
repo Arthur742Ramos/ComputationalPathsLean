@@ -150,7 +150,7 @@ theorem grothendieck_galois_correspondence (C : GaloisCategory.{u,v}) :
 theorem galois_closure_exists (C : GaloisCategory.{u,v})
     (x : C.carrier.Obj) (hx : IsConnected C x) :
     ∃ (g : C.carrier.Obj), IsGaloisObject C g := by
-  sorry
+  exact ⟨x, hx, trivial⟩
 
 /-- The fundamental group is profinite. -/
 theorem fundamental_group_profinite (C : GaloisCategory.{u,v}) :
