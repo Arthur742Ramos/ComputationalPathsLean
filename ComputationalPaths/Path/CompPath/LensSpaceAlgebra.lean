@@ -22,6 +22,8 @@ namespace LensSpaceAlgebra
 
 universe u
 
+noncomputable section
+
 /-! ## Modular arithmetic helpers -/
 
 theorem mod_add_mod (a b p : Nat) : (a % p + b) % p = (a + b) % p := by
@@ -373,6 +375,8 @@ theorem lensSpaceLoopPow_toEq (p q n : Nat) :
 /-- The fundamental loop has trivial toEq (PUnit). -/
 theorem lensSpaceLoop_toEq (p q : Nat) :
     (lensSpaceLoop p q).toEq = rfl := by simp
+
+end
 
 end LensSpaceAlgebra
 end CompPath

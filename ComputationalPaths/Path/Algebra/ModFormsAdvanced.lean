@@ -136,12 +136,12 @@ noncomputable def mapModularForm {R : Type u} {S : Type v}
   constantTerm_eq := Path.congrArg φ.toFun f.constantTerm_eq
 
 /-- Identity law for mapped q-expansions. -/
-theorem mapQExpansion_id {R : Type u} (q : Nat → R) (n : Nat) :
+noncomputable def mapQExpansion_id {R : Type u} (q : Nat → R) (n : Nat) :
     Path (mapQExpansion (QExpansionCoeffMap.id R) q n) (q n) :=
   Path.refl _
 
 /-- Composition law for mapped q-expansions. -/
-theorem mapQExpansion_comp {R : Type u} {S : Type v} {T : Type w}
+noncomputable def mapQExpansion_comp {R : Type u} {S : Type v} {T : Type w}
     (φ : QExpansionCoeffMap R S) (ψ : QExpansionCoeffMap S T)
     (q : Nat → R) (n : Nat) :
     Path (mapQExpansion (QExpansionCoeffMap.comp ψ φ) q n)
@@ -149,7 +149,7 @@ theorem mapQExpansion_comp {R : Type u} {S : Type v} {T : Type w}
   Path.refl _
 
 /-- Functoriality: q-expansion commutes with coefficient maps. -/
-theorem qExpansion_map {R : Type u} {S : Type v}
+noncomputable def qExpansion_map {R : Type u} {S : Type v}
     {ringR : PathRing R} (ringS : PathRing S)
     (φ : QExpansionCoeffMap R S) (f : ModularForm R ringR) (n : Nat) :
     Path (qExpansion (mapModularForm ringS φ f) n)
@@ -157,14 +157,14 @@ theorem qExpansion_map {R : Type u} {S : Type v}
   Path.refl _
 
 /-- Functoriality identity law for q-expansion. -/
-theorem qExpansion_map_id {R : Type u} {ring : PathRing R}
+noncomputable def qExpansion_map_id {R : Type u} {ring : PathRing R}
     (f : ModularForm R ring) (n : Nat) :
     Path (qExpansion (mapModularForm ring (QExpansionCoeffMap.id R) f) n)
       (qExpansion f n) :=
   Path.refl _
 
 /-- Functoriality composition law for q-expansion. -/
-theorem qExpansion_map_comp {R : Type u} {S : Type v} {T : Type w}
+noncomputable def qExpansion_map_comp {R : Type u} {S : Type v} {T : Type w}
     {ringR : PathRing R} (ringS : PathRing S) (ringT : PathRing T)
     (φ : QExpansionCoeffMap R S) (ψ : QExpansionCoeffMap S T)
     (f : ModularForm R ringR) (n : Nat) :
@@ -211,19 +211,19 @@ noncomputable def hecke_comm (H : HeckeAlgebraData R ring) (m n : Nat) :
   H.algStr.mul_comm (H.heckeT m) (H.heckeT n)
 
 /-- Hecke operator commutativity as a theorem-level Path witness. -/
-theorem hecke_commutativity_path (H : HeckeAlgebraData R ring) (m n : Nat) :
+noncomputable def hecke_commutativity_path (H : HeckeAlgebraData R ring) (m n : Nat) :
     Path (H.algStr.mul (H.heckeT m) (H.heckeT n))
       (H.algStr.mul (H.heckeT n) (H.heckeT m)) :=
   hecke_comm H m n
 
 /-- Commutativity round-trip gives a loop path. -/
-theorem hecke_comm_roundtrip (H : HeckeAlgebraData R ring) (m n : Nat) :
+noncomputable def hecke_comm_roundtrip (H : HeckeAlgebraData R ring) (m n : Nat) :
     Path (H.algStr.mul (H.heckeT m) (H.heckeT n))
       (H.algStr.mul (H.heckeT m) (H.heckeT n)) :=
   Path.trans (hecke_comm H m n) (hecke_comm H n m)
 
 /-- Coprime multiplicativity implies Hecke commutativity. -/
-theorem hecke_comm_of_coprime (H : HeckeAlgebraData R ring)
+noncomputable def hecke_comm_of_coprime (H : HeckeAlgebraData R ring)
     (m n : Nat) (hmn : Nat.Coprime m n) :
     Path (H.algStr.mul (H.heckeT m) (H.heckeT n))
       (H.algStr.mul (H.heckeT n) (H.heckeT m)) :=
@@ -233,13 +233,13 @@ theorem hecke_comm_of_coprime (H : HeckeAlgebraData R ring)
       (Path.symm (H.mult_coprime n m hmn.symm)))
 
 /-- Diamond operators commute via commutative multiplication. -/
-theorem diamond_commutativity_path (H : HeckeAlgebraData R ring) (a b : Nat) :
+noncomputable def diamond_commutativity_path (H : HeckeAlgebraData R ring) (a b : Nat) :
     Path (H.algStr.mul (H.diamondOp a) (H.diamondOp b))
       (H.algStr.mul (H.diamondOp b) (H.diamondOp a)) :=
   H.algStr.mul_comm (H.diamondOp a) (H.diamondOp b)
 
 /-- Diamond multiplicativity is compatible with swapping factors. -/
-theorem diamond_swap_of_mult (H : HeckeAlgebraData R ring) (a b : Nat) :
+noncomputable def diamond_swap_of_mult (H : HeckeAlgebraData R ring) (a b : Nat) :
     Path (H.diamondOp (a * b)) (H.diamondOp (b * a)) :=
   Path.trans (Path.symm (H.diamond_mult a b))
     (Path.trans
@@ -274,32 +274,32 @@ noncomputable def coeff_eigenvalue (E : HeckeEigenform R ring) (p : Nat) :
   Path.symm (E.eigen_eq_coeff p)
 
 /-- Expected eigenpath identity: eigenvalue equals coefficient. -/
-theorem eigenvalue_expected (E : HeckeEigenform R ring) (p : Nat) :
+noncomputable def eigenvalue_expected (E : HeckeEigenform R ring) (p : Nat) :
     Path (E.eigenvalue p) (E.form.fourierCoeff p) :=
   eigenvalue_path E p
 
 /-- Eigenvalue-to-coefficient round-trip. -/
-theorem eigenvalue_coeff_roundtrip (E : HeckeEigenform R ring) (p : Nat) :
+noncomputable def eigenvalue_coeff_roundtrip (E : HeckeEigenform R ring) (p : Nat) :
     Path (E.eigenvalue p) (E.eigenvalue p) :=
   Path.trans (E.eigen_eq_coeff p) (Path.symm (E.eigen_eq_coeff p))
 
 /-- Coefficient-to-eigenvalue round-trip. -/
-theorem coeff_eigen_roundtrip (E : HeckeEigenform R ring) (p : Nat) :
+noncomputable def coeff_eigen_roundtrip (E : HeckeEigenform R ring) (p : Nat) :
     Path (E.form.fourierCoeff p) (E.form.fourierCoeff p) :=
   Path.trans (Path.symm (E.eigen_eq_coeff p)) (E.eigen_eq_coeff p)
 
 /-- Normalization transports to the first Hecke eigenvalue. -/
-theorem normalized_eigenvalue_one (E : HeckeEigenform R ring) :
+noncomputable def normalized_eigenvalue_one (E : HeckeEigenform R ring) :
     Path (E.eigenvalue 1) ring.one :=
   Path.trans (E.eigen_eq_coeff 1) E.normalized
 
 /-- Reverse normalized path: one maps to the first eigenvalue. -/
-theorem normalized_one_to_eigenvalue (E : HeckeEigenform R ring) :
+noncomputable def normalized_one_to_eigenvalue (E : HeckeEigenform R ring) :
     Path ring.one (E.eigenvalue 1) :=
   Path.trans (Path.symm E.normalized) (coeff_eigenvalue E 1)
 
 /-- Multiplicative compatibility between eigenvalues and Fourier coefficients. -/
-theorem eigenvalue_mul_to_coeff_mul (E : HeckeEigenform R ring) (p q : Nat) :
+noncomputable def eigenvalue_mul_to_coeff_mul (E : HeckeEigenform R ring) (p q : Nat) :
     Path (ring.mul (E.eigenvalue p) (E.eigenvalue q))
       (ring.mul (E.form.fourierCoeff p) (E.form.fourierCoeff q)) :=
   Path.trans
@@ -307,7 +307,7 @@ theorem eigenvalue_mul_to_coeff_mul (E : HeckeEigenform R ring) (p q : Nat) :
     (Path.congrArg (ring.mul (E.form.fourierCoeff p)) (E.eigen_eq_coeff q))
 
 /-- Eigenvalues commute under multiplication in the coefficient ring. -/
-theorem eigenvalue_mul_comm (E : HeckeEigenform R ring) (p q : Nat) :
+noncomputable def eigenvalue_mul_comm (E : HeckeEigenform R ring) (p q : Nat) :
     Path (ring.mul (E.eigenvalue p) (E.eigenvalue q))
       (ring.mul (E.eigenvalue q) (E.eigenvalue p)) :=
   ring.mul_comm (E.eigenvalue p) (E.eigenvalue q)

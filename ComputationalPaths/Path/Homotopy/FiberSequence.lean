@@ -19,7 +19,7 @@ universe u
 abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Type u := RwEq p q
 
 /-- Projection in a fiber sequence preserves the associator 2-cell on loops. -/
-theorem proj_assoc_two_cell {F E B : Type u}
+noncomputable def proj_assoc_two_cell {F E B : Type u}
     (seq : Fibration.FiberSeq F E B) {e : E}
     (p q r : LoopSpace E e) :
     TwoCell
@@ -29,7 +29,7 @@ theorem proj_assoc_two_cell {F E B : Type u}
   exact rweq_context_map_of_rweq ⟨seq.proj⟩ (rweq_tt p q r)
 
 /-- Fiber inclusion also preserves the same 2-cell route. -/
-theorem incl_assoc_two_cell {F E B : Type u}
+noncomputable def incl_assoc_two_cell {F E B : Type u}
     (seq : Fibration.FiberSeq F E B) {f₀ : F}
     (p q r : LoopSpace F f₀) :
     TwoCell
@@ -59,12 +59,12 @@ noncomputable def exactRouteRight {A : Type u} {a : A} (p q r : LoopSpace A a) :
   Path.trans p (Path.trans q r)
 
 /-- Exactness rerouting is witnessed by the associator 2-cell. -/
-theorem exact_route_two_cell {A : Type u} {a : A} (p q r : LoopSpace A a) :
+noncomputable def exact_route_two_cell {A : Type u} {a : A} (p q r : LoopSpace A a) :
     TwoCell (exactRouteLeft p q r) (exactRouteRight p q r) :=
   rweq_tt p q r
 
 /-- Projection carries exact-route rerouting to exact-route rerouting. -/
-theorem proj_exact_route_two_cell {F E B : Type u}
+noncomputable def proj_exact_route_two_cell {F E B : Type u}
     (seq : Fibration.FiberSeq F E B) {e : E} (p q r : LoopSpace E e) :
     TwoCell
       (Fibration.inducedLoopMap seq.proj e (exactRouteLeft p q r))
@@ -73,7 +73,7 @@ theorem proj_exact_route_two_cell {F E B : Type u}
     using proj_assoc_two_cell (seq := seq) (p := p) (q := q) (r := r)
 
 /-- Inclusion carries exact-route rerouting to exact-route rerouting. -/
-theorem incl_exact_route_two_cell {F E B : Type u}
+noncomputable def incl_exact_route_two_cell {F E B : Type u}
     (seq : Fibration.FiberSeq F E B) {f₀ : F} (p q r : LoopSpace F f₀) :
     TwoCell
       (Fibration.inducedLoopMap (Fibration.FiberSeq.incl seq) f₀ (exactRouteLeft p q r))

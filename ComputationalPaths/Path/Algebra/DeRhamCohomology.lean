@@ -257,17 +257,17 @@ theorem surfaceBetti_b2 (g : Nat) : (surfaceBetti g).betti 2 = 1 := by
   simp [surfaceBetti]
 
 /-- Path coherence for b₀. -/
-def surfaceBetti_b0_path (g : Nat) :
+noncomputable def surfaceBetti_b0_path (g : Nat) :
     Path ((surfaceBetti g).betti 0) 1 :=
   Path.stepChain (surfaceBetti_b0 g)
 
 /-- Path coherence for b₁. -/
-def surfaceBetti_b1_path (g : Nat) :
+noncomputable def surfaceBetti_b1_path (g : Nat) :
     Path ((surfaceBetti g).betti 1) (2 * g) :=
   Path.stepChain (surfaceBetti_b1 g)
 
 /-- Path coherence for b₂. -/
-def surfaceBetti_b2_path (g : Nat) :
+noncomputable def surfaceBetti_b2_path (g : Nat) :
     Path ((surfaceBetti g).betti 2) 1 :=
   Path.stepChain (surfaceBetti_b2 g)
 
@@ -277,7 +277,7 @@ theorem surfaceBetti_vanish (g : Nat) (k : Nat) (hk : k > 2) :
   simp [surfaceBetti, show ¬(k = 0) by omega, show ¬(k = 2) by omega, show ¬(k = 1) by omega]
 
 /-- Path for higher Betti vanishing. -/
-def surfaceBetti_vanish_path (g : Nat) (k : Nat) (hk : k > 2) :
+noncomputable def surfaceBetti_vanish_path (g : Nat) (k : Nat) (hk : k > 2) :
     Path ((surfaceBetti g).betti k) 0 :=
   Path.stepChain (surfaceBetti_vanish g k hk)
 

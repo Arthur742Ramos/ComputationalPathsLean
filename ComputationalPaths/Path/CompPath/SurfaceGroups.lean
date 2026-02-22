@@ -76,7 +76,7 @@ abbrev surfaceGroup (S : SurfaceData) : Type u :=
   π₁(S.carrier, S.basepoint)
 
 /-- Strict group structure on the surface fundamental group. -/
-abbrev surfaceGroupStruct (S : SurfaceData) : LoopGroup S.carrier S.basepoint :=
+noncomputable abbrev surfaceGroupStruct (S : SurfaceData) : LoopGroup S.carrier S.basepoint :=
   PiOneGroup S.carrier S.basepoint
 
 /-- Raw loop space at the surface basepoint. -/

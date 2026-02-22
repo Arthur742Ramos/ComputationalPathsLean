@@ -41,7 +41,7 @@ private noncomputable def pathOfEqStepChain {A : Type u} {a b : A} (h : a = b) :
   let core : Path a b := Path.stepChain h
   Path.trans (Path.trans (Path.refl a) core) (Path.refl b)
 
-private theorem pathOfEqStepChain_rweq {A : Type u} {a b : A} (h : a = b) :
+private noncomputable def pathOfEqStepChain_rweq {A : Type u} {a b : A} (h : a = b) :
     RwEq (pathOfEqStepChain h) (Path.stepChain h) := by
   let core : Path a b := Path.stepChain h
   change RwEq (Path.trans (Path.trans (Path.refl a) core) (Path.refl b)) core

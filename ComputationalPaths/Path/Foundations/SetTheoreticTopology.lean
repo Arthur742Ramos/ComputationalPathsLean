@@ -174,7 +174,7 @@ theorem v_eq_l_implies_gch :
     True := trivial
 
 /-- Every measurable cardinal is inaccessible. -/
-theorem measurable_is_inaccessible (M : MeasurableCardinal) : Inaccessible :=
+noncomputable def measurable_is_inaccessible (M : MeasurableCardinal) : Inaccessible :=
   M.toInaccessible
 
 /-- Woodin cardinals imply Σ²₁ absoluteness. -/

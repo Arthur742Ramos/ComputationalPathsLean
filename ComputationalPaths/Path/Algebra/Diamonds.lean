@@ -443,23 +443,23 @@ theorem vtopology_cover_surj_path {X : Type u}
 
 /-- A v-sheaf on the v-site, with descent along chosen v-covers. -/
 structure VSheafData (X : Type u) (VT : VTopologyData X) where
-  section : X → Type v
-  pullback : (i : VT.CoverIdx) → (x : X) → section x →
-    section (VT.coverMap i (VT.cover_surj i x))
+  sectionFun : X → Type v
+  pullback : (i : VT.CoverIdx) → (x : X) → sectionFun x →
+    sectionFun (VT.coverMap i (VT.cover_surj i x))
   descend : (i : VT.CoverIdx) → (x : X) →
-    section (VT.coverMap i (VT.cover_surj i x)) → section x
-  descent_spec : (i : VT.CoverIdx) → (x : X) → (s : section x) →
+    sectionFun (VT.coverMap i (VT.cover_surj i x)) → sectionFun x
+  descent_spec : (i : VT.CoverIdx) → (x : X) → (s : sectionFun x) →
     Path (descend i x (pullback i x s)) s
 
 theorem vsheaf_satisfies_descent {X : Type u} {VT : VTopologyData X}
     (VS : VSheafData X VT) :
-    ∀ (i : VT.CoverIdx) (x : X) (s : VS.section x),
+    ∀ (i : VT.CoverIdx) (x : X) (s : VS.sectionFun x),
       Nonempty (Path (VS.descend i x (VS.pullback i x s)) s) := by
   intro i x s
   exact ⟨VS.descent_spec i x s⟩
 
 theorem vsheaf_descent_chain {X : Type u} {VT : VTopologyData X}
-    (VS : VSheafData X VT) (i : VT.CoverIdx) (x : X) (s : VS.section x) :
+    (VS : VSheafData X VT) (i : VT.CoverIdx) (x : X) (s : VS.sectionFun x) :
     Nonempty (Path (VS.descend i x (VS.pullback i x s)) s) :=
   ⟨Path.trans (VS.descent_spec i x s) (Path.refl _)⟩
 
