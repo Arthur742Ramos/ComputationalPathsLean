@@ -32,7 +32,7 @@ universe u v w
 
 /-- Squares between computational paths are rewrite equalities. -/
 abbrev PathSquare {A : Type u} {a b : A} (p q : Path a b) : Prop :=
-  RwEq (A := A) (a := a) (b := b) p q
+  TwoCell (A := A) (a := a) (b := b) p q
 
 /-- A double category on computational paths records the interchange law for
 horizontal and vertical composition of squares. -/
