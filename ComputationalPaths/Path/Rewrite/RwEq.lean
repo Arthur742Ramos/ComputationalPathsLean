@@ -58,12 +58,6 @@ inductive RwEq {A : Type u} {a b : A} : Path a b → Path a b → Type u
 abbrev RwEqProp {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   Nonempty (RwEq p q)
 
-/-- All rewrite-equivalences between the same paths are equal (proof irrelevance
-for 2-cells). This is used throughout the omega-groupoid and confluence modules. -/
-    (h₁ h₂ : RwEq p q) : h₁ = h₂
-
-    {p q : Path a b} : Subsingleton (RwEq p q) :=
-
 noncomputable def rweqProp_of_rweq {A : Type u} {a b : A}
     {p q : Path a b} (h : RwEq p q) : RwEqProp p q :=
   ⟨h⟩
