@@ -8,6 +8,16 @@
 \usepackage{booktabs,longtable}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage[nameinlink,noabbrev]{cleveref}
+\usepackage{fancyhdr}
+
+% BSL-style header
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\small\textit{Submitted to the Bulletin of Symbolic Logic}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{13pt}
+\addtolength{\topmargin}{-5pt}
 
 % Theorem environments
 \newtheorem{theorem}{Theorem}[section]
@@ -44,16 +54,12 @@
 \newcommand{\PS}{\textbf{PS}}
 \newcommand{\SO}{\textbf{SO}}
 
-\title{A Calculus of Computational Paths}
-\author{Arthur Freitas Ramos}
-\address{Microsoft}
-\email{arfreita@microsoft.com}
-\author{Ruy J.G.B. de Queiroz}
-\address{Center for Informatics (CIn), Universidade Federal de Pernambuco (UFPE)}
-\email{ruy@cin.ufpe.br}
-\author{Anjolina G. de Oliveira}
-\address{Center for Informatics (CIn), Universidade Federal de Pernambuco (UFPE)}
-\email{ago@cin.ufpe.br}
+\title[A Calculus of Computational Paths]{A Calculus of Computational Paths\\[4pt]
+{\normalsize\textit{Weak $\omega$-Groupoids from Term Rewriting in Lean~4}}}
+
+\keywords{computational paths, weak $\omega$-groupoid, term rewriting, Lean 4, homotopy type theory, proof relevance}
+\subjclass[2020]{03B15, 03B38, 03B70, 18N50, 55Q05, 68V15}
+\date{February 2026}
 
 \begin{document}
 \maketitle
@@ -4446,5 +4452,20 @@ C.~A. Weibel.
 \newblock Cambridge University Press, 1994.
 
 \end{thebibliography}
+
+\bigskip
+\noindent\textsc{Arthur Freitas Ramos}\\
+\textit{Microsoft}\\
+\textit{E-mail}: \texttt{arfreita@microsoft.com}
+
+\medskip
+\noindent\textsc{Ruy J.G.B. de Queiroz}\\
+\textit{Center for Informatics (CIn), Universidade Federal de Pernambuco (UFPE)}\\
+\textit{E-mail}: \texttt{ruy@cin.ufpe.br}
+
+\medskip
+\noindent\textsc{Anjolina G. de Oliveira}\\
+\textit{Center for Informatics (CIn), Universidade Federal de Pernambuco (UFPE)}\\
+\textit{E-mail}: \texttt{ago@cin.ufpe.br}
 
 \end{document}
