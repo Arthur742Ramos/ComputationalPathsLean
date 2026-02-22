@@ -29,7 +29,6 @@ private noncomputable def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y
 /-- Object in a derived category (graded by Nat). -/
 @[ext] structure DObj where
   val : Nat → Int
-  deriving DecidableEq
 
 /-- Morphism in the derived category. -/
 structure DMor (A B : DObj) where
@@ -247,7 +246,7 @@ noncomputable def truncAbove_zero_path (k : Nat) : Path (truncAbove dZero k) dZe
 
 -- 23. tHeart of truncBelow at k ≥ 0
 theorem tHeart_truncBelow (A : DObj) (k : Nat) : tHeart (truncBelow A k) = A.val 0 := by
-  simp [truncBelow, tHeart]; omega
+  simp [truncBelow, tHeart]
 
 noncomputable def tHeart_truncBelow_path (A : DObj) (k : Nat) :
     Path (tHeart (truncBelow A k)) (A.val 0) :=
@@ -256,7 +255,7 @@ noncomputable def tHeart_truncBelow_path (A : DObj) (k : Nat) :
 -- 24. **Multi-step**: tHeart(truncBelow(truncBelow A k₁) k₂) = A.val 0
 noncomputable def tHeart_double_trunc (A : DObj) (k₁ k₂ : Nat) :
     Path (tHeart (truncBelow (truncBelow A k₁) k₂)) (A.val 0) :=
-  stepPath (by simp [truncBelow, tHeart]; omega)
+  stepPath (by simp [truncBelow, tHeart])
 
 -- 25. **Multi-step**: truncBelow 0 k →[zero] 0 →[symm zero] truncAbove 0 k
 noncomputable def trunc_zero_connected (k : Nat) :
@@ -332,7 +331,8 @@ noncomputable def shift2_cone_zero : Path (shift (shift (cone dZero dZero))) dZe
 -- 37. **Multi-step**: rotateTri(rotateTri(rotateTri T)) recovers shift structure
 theorem rotate3_structure (T : Triangle) :
     rotateTri3 T = ⟨T.Z, shift T.X, shift T.Y⟩ := by
-  ext <;> simp [rotateTri3, rotateTri2, rotateTri]
+  simp [rotateTri3, rotateTri2, rotateTri]
+  constructor <;> (try rfl) <;> (try ext n; simp [shift])
 
 noncomputable def rotate3_structure_path (T : Triangle) :
     Path (rotateTri3 T) ⟨T.Z, shift T.X, shift T.Y⟩ :=

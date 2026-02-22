@@ -239,7 +239,7 @@ noncomputable def error_correct_compose (q : QBit) :
 theorem error_path_symm (q : QBit) :
     Path.symm (bitFlip_involution_path q) =
     Path.mk [Step.mk _ _ (bitFlip_involution q).symm] (bitFlip_involution q).symm := by
-  exact Subsingleton.elim _ _
+  rfl
 
 /-- Error weight for 3-qubit channel. -/
 noncomputable def errorWeight3 (ch : ErrorChannel 3) : Nat :=

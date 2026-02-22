@@ -305,8 +305,8 @@ structure DiamondProductData (X : Type u) (Y : Type v) (S : Type w) where
   /-- Fiber condition: proj1 ∘ fst = proj2 ∘ snd. -/
   fiber_eq : ∀ p, Path (proj1 (fst p)) (proj2 (snd p))
   /-- Universal property: pairing. -/
-  pair : (Z : Type u) → (Z → X) → (Z → Y) →
-    (∀ z, Path (proj1 (‹Z → X› z)) (proj2 (‹Z → Y› z))) → Z → ProductType
+  pair : (Z : Type u) → (f : Z → X) → (g : Z → Y) →
+    (∀ z, Path (proj1 (f z)) (proj2 (g z))) → Z → ProductType
   /-- First projection of pairing. -/
   pair_fst : ∀ Z f g h z, Path (fst (pair Z f g h z)) (f z)
   /-- Second projection of pairing. -/

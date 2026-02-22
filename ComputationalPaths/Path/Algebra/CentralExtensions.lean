@@ -169,7 +169,7 @@ noncomputable def SchurMultiplier.trivialUnit (G : Type u) (gd : GroupData G) : 
     let e := ext.extension.one
     let πe := ext.projection e
     have h_proj_mul := (ext.proj_mul e e).toEq
-    have h_one_mul := congr_arg ext.projection (ext.extension.one_mul e)
+    have h_one_mul := congrArg ext.projection (ext.extension.one_mul e).toEq
     -- πe = πe * πe
     have h_idem : πe = ext.quotient_grp.mul πe πe := by
       rw [← h_one_mul, h_proj_mul]
@@ -295,9 +295,9 @@ inductive CentralExtStep : {A : Type u} → A → A → Type (u + 1)
 noncomputable def centralExtStep_to_path {A : Type u} {a b : A} (h : CentralExtStep a b) :
     Path a b := by
   cases h with
-  | cocycle_normalize => rename_i f g; exact f.normalized_left g
-  | central_commute => rename_i ext a x; exact ext.central a x
-  | exact_kernel => rename_i ext a; exact ext.exact_at_E a
+  | cocycle_normalize => rename_i G A' gd ad f g; exact f.normalized_left g
+  | central_commute => rename_i A' E G ext aa x; exact ext.central aa x
+  | exact_kernel => rename_i A' E G ext aa; exact ext.exact_at_E aa
 
 /-! ## RwEq Instances -/
 

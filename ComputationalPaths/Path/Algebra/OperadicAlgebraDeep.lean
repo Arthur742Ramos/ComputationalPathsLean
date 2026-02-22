@@ -240,6 +240,7 @@ noncomputable def OperadAlgHom.comp {O : Operad} {A B C : OperadAlgebra O}
   map_act := fun theta xs => by
     show g.toFun (f.toFun (A.act theta xs)) = C.act theta (fun i => g.toFun (f.toFun (xs i)))
     rw [f.map_act theta xs, g.map_act theta (f.toFun ∘ xs)]
+    rfl
 
 noncomputable def OperadAlgHom.map_act_path {O : Operad} {A B : OperadAlgebra O}
     (f : OperadAlgHom A B) {n : Nat} (theta : O.Op n) (xs : Fin n → A.carrier) :

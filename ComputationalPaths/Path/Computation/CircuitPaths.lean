@@ -116,7 +116,7 @@ noncomputable def parComp {a b c d : Nat} (f : AnnotatedCircuit a b) (g : Annota
 -- 1. Identity circuit is the identity function
 theorem circId_apply (n : Nat) (inp : Fin n → Bool) :
     circId n inp = inp := by
-  Subsingleton.elim _ _
+  rfl
 
 -- 2. Left identity for composition
 theorem circComp_id_left {n m : Nat} (f : Circuit n m) :
@@ -166,7 +166,7 @@ noncomputable def circNot_roundtrip (n : Nat) : Path (circId n) (circId n) :=
 theorem seqComp_depth {a b c : Nat}
     (f : AnnotatedCircuit a b) (g : AnnotatedCircuit b c) :
     (seqComp f g).depth = f.depth + g.depth := by
-  Subsingleton.elim _ _
+  simp [seqComp]
 
 -- 8. Parallel depth is max
 theorem parComp_depth {a b c d : Nat}

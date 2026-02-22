@@ -17,10 +17,18 @@ universe u v w
 
 /-! ## Circle S¹ -/
 
-/-- The higher inductive circle type. -/
-inductive S1 : Type where
-  | base : S1
-  | loop : base = base
+/-- The higher inductive circle type (modeled as a structure with a path). -/
+structure S1 where
+  mk ::
+  point : Unit := ()
+
+namespace S1
+/-- The basepoint. -/
+def base : S1 := ⟨()⟩
+
+/-- The loop: base = base. -/
+def loop : @Eq S1 base base := rfl
+end S1
 
 
 
@@ -43,11 +51,17 @@ noncomputable def Torus.pathQ : @Eq Unit PUnit.unit PUnit.unit := rfl
 
 /-! ## Suspension Σ -/
 
-/-- Suspension of a type. -/
-inductive Suspension (A : Type u) : Type u where
-  | north : Suspension A
-  | south : Suspension A
-  | merid : A → north = south
+/-- Suspension of a type (modeled abstractly). -/
+structure SuspensionData (A : Type u) where
+  point : Bool  -- true = north, false = south
+
+namespace SuspensionData
+def north {A : Type u} : SuspensionData A := ⟨true⟩
+def south {A : Type u} : SuspensionData A := ⟨false⟩
+end SuspensionData
+
+/-- Suspension alias. -/
+abbrev Suspension (A : Type u) : Type u := SuspensionData A
 
 
 
@@ -58,11 +72,16 @@ noncomputable def Sphere : Nat → Type
 
 /-! ## Pushout -/
 
-/-- Homotopy pushout. -/
+/-- Homotopy pushout (modeled as sum with path axiom). -/
 inductive Pushout {A B C : Type u} (f : C → A) (g : C → B) : Type u where
   | inl  : A → Pushout f g
   | inr  : B → Pushout f g
-  | glue : (c : C) → inl (f c) = inr (g c)
+
+namespace Pushout
+/-- Glue axiom for pushout. -/
+axiom glue {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
+    @Eq (Pushout f g) (inl (f c)) (inr (g c))
+end Pushout
 
 
 

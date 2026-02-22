@@ -57,18 +57,18 @@ noncomputable def CohenForcing : ForcingNotion :=
 
 /-- Random forcing (Solovay forcing). -/
 noncomputable def RandomForcing : ForcingNotion :=
-  ⟨ℕ, fun a b => a ≤ b, 0⟩  -- simplified
+  ⟨Nat, fun a b => a ≤ b, 0⟩  -- simplified
 
 /-- Sacks forcing. -/
 noncomputable def SacksForcing : ForcingNotion :=
-  ⟨ℕ, fun a b => a ≤ b, 0⟩
+  ⟨Nat, fun a b => a ≤ b, 0⟩
 
 /-- Iterated forcing (two-step). -/
 structure IteratedForcing (P : ForcingNotion) (Q : ForcingNotion) where
   combined : ForcingNotion
 
 /-- Martin's axiom: MA(κ) for a cardinal κ. -/
-noncomputable def MartinsAxiom (κ : ℕ) : Prop :=
+noncomputable def MartinsAxiom (κ : Nat) : Prop :=
   True  -- for every CCC poset and < κ dense sets, a generic filter exists
 
 /-- Proper forcing. -/
@@ -93,18 +93,18 @@ structure SouslinLine where
 /-- Souslin tree: an ω₁-tree with no uncountable chains or antichains. -/
 structure SouslinTree where
   nodes : Type u
-  level : nodes → ℕ
+  level : nodes → Nat
   lt : nodes → nodes → Prop
 
 /-- Large cardinal: inaccessible cardinal. -/
 structure Inaccessible where
-  κ : ℕ  -- ordinal placeholder
+  κ : Nat  -- ordinal placeholder
   regular : True
   strong_limit : True
 
 /-- Measurable cardinal. -/
 structure MeasurableCardinal extends Inaccessible where
-  ultrafilter : ℕ  -- κ-complete nonprincipal ultrafilter code
+  ultrafilter : Nat  -- κ-complete nonprincipal ultrafilter code
 
 /-- Woodin cardinal. -/
 structure WoodinCardinal extends Inaccessible where
@@ -116,14 +116,14 @@ structure SupercompactCardinal extends MeasurableCardinal where
 
 /-- Inner model: L (Gödel's constructible universe). -/
 structure ConstructibleUniverse where
-  level : ℕ → Type u  -- L_α
+  level : Nat → Type u  -- L_α
 
 /-- Core model K. -/
 structure CoreModel where
-  level : ℕ → Type u
+  level : Nat → Type u
 
 /-- Determinacy for pointclasses. -/
-noncomputable def PointclassDeterminacy (Γ : (ℕ → ℕ) → Prop → Prop) : Prop :=
+noncomputable def PointclassDeterminacy (Γ : (Nat → Nat) → Prop → Prop) : Prop :=
   True  -- all games in Γ are determined
 
 -- ============================================================
@@ -147,7 +147,7 @@ theorem proper_preserves_omega1 (P : ForcingNotion) (h : Proper P) :
     True := trivial
 
 /-- Martin's axiom implies Souslin's hypothesis. -/
-theorem ma_implies_sh (κ : ℕ) (h : MartinsAxiom κ) :
+theorem ma_implies_sh (κ : Nat) (h : MartinsAxiom κ) :
     True := trivial
 
 /-- ◇ implies existence of a Souslin tree. -/

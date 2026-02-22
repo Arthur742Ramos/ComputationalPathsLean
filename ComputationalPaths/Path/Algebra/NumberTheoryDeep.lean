@@ -279,12 +279,12 @@ structure Factorization where
   allGt1  : ∀ p ∈ factors, p ≥ 2
 
 /-- Product of a list of naturals. -/
-noncomputable def listProd : List Nat → Nat
+def listProd : List Nat → Nat
   | [] => 1
   | x :: xs => x * listProd xs
 
 /-- A factorization represents a number. -/
-noncomputable def Factorization.product (f : Factorization) : Nat := listProd f.factors
+def Factorization.product (f : Factorization) : Nat := listProd f.factors
 
 /-- Theorem 27: listProd of empty is 1. -/
 theorem listProd_nil : listProd [] = 1 := rfl
@@ -363,7 +363,7 @@ theorem qr_3_5 : legendreSymbol 3 5 * legendreSymbol 5 3 =
 /-! ## §13 p-adic Valuation -/
 
 /-- p-adic valuation: largest power of p dividing n. -/
-noncomputable def padicVal (p n : Nat) : Nat :=
+def padicVal (p n : Nat) : Nat :=
   if p ≤ 1 ∨ n == 0 then 0
   else
     let rec go (n : Nat) (fuel : Nat) : Nat :=

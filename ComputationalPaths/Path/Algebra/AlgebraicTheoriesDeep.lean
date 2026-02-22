@@ -203,7 +203,9 @@ noncomputable def monoid_to_ring_path : Path AlgTheory theoryOfMonoid theoryOfRi
   Path.trans monoid_to_group_path group_to_ring_path
 
 /-- T14: Monoid to ring path has 4 steps. -/
-theorem monoid_to_ring_length : monoid_to_ring_path.length = 4 := by native_decide
+theorem monoid_to_ring_length : monoid_to_ring_path.length = 4 := by
+  simp [monoid_to_ring_path, monoid_to_group_path, group_to_ring_path,
+        Path.trans_length, Path.length, Path.single, Path.trans]
 
 /-- T15: Commutative monoid as quotient. -/
 noncomputable def comm_monoid_quotient : Path AlgTheory theoryOfMonoid theoryOfComm :=
@@ -463,7 +465,8 @@ noncomputable def monadicity_path : Path MonadicSt (MonadicSt.mk 0 "theory") (Mo
           (Path.single (Step.rule "equiv" (MonadicSt.mk 4 "verified") (MonadicSt.mk 5 "equivalence"))))))
 
 /-- T42: Monadicity path has 5 steps. -/
-theorem monadicity_length : monadicity_path.length = 5 := by native_decide
+theorem monadicity_length : monadicity_path.length = 5 := by
+  simp [monadicity_path, Path.trans_length, Path.length, Path.single, Path.trans]
 
 /-- T43: Beck's monadicity criterion path. -/
 noncomputable def beck_criterion : Path MonadicSt (MonadicSt.mk 0 "functor") (MonadicSt.mk 3 "monadic") :=
@@ -474,7 +477,8 @@ noncomputable def beck_criterion : Path MonadicSt (MonadicSt.mk 0 "functor") (Mo
       (Path.single (Step.rule "beck_conclude" (MonadicSt.mk 2 "reflects") (MonadicSt.mk 3 "monadic"))))
 
 /-- T44: Beck criterion has 3 steps. -/
-theorem beck_length : beck_criterion.length = 3 := by native_decide
+theorem beck_length : beck_criterion.length = 3 := by
+  simp [beck_criterion, Path.trans_length, Path.length, Path.single, Path.trans]
 
 -- ============================================================
 -- §13  Coherence & Presentation (T45–T50)
