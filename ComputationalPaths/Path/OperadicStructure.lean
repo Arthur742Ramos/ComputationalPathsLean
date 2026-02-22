@@ -252,9 +252,9 @@ noncomputable def loop_action_unit_right_via_operad_unit {A : Type u} {a : A}
 noncomputable def path_composition_defines_operad {A : Type u} {a : A} :
     (∀ p q r : LoopSpace A a,
       RwEq (LoopSpace.comp (LoopSpace.comp p q) r)
-        (LoopSpace.comp p (LoopSpace.comp q r))) ∧
+        (LoopSpace.comp p (LoopSpace.comp q r))) ×
     (∀ p : LoopSpace A a,
-      RwEq (LoopSpace.comp (LoopSpace.id (A := A) (a := a)) p) p) ∧
+      RwEq (LoopSpace.comp (LoopSpace.id (A := A) (a := a)) p) p) ×
     (∀ p : LoopSpace A a,
       RwEq (LoopSpace.comp p (LoopSpace.id (A := A) (a := a))) p) := by
   refine ⟨?assoc, ?units⟩
@@ -351,11 +351,7 @@ noncomputable def loop_action_s2_interchange {A : Type u} {a : A}
       (match σ with
        | Symm2.id => AssocOp.act assocTreeBinary (Vec.of2 p q)
        | Symm2.swap => AssocOp.act assocTreeBinary (Vec.of2 q p)) := by
-  cases σ
-  · simpa [Symm2.actVec2, assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split,
-      LoopSpace.comp] using (RwEq.refl (AssocOp.act assocTreeBinary (Vec.of2 p q)))
-  · simpa [Symm2.actVec2, assocTreeBinary, AssocOp.act, AssocTree.eval, Vec.of2, Vec.split,
-      LoopSpace.comp] using (RwEq.refl (AssocOp.act assocTreeBinary (Vec.of2 q p)))
+  cases σ <;> exact rweq_of_eq rfl
 
 /-- Identity permutation leaves binary operad action unchanged. -/
 noncomputable def loop_action_s2_interchange_id {A : Type u} {a : A}
@@ -443,8 +439,9 @@ noncomputable def associahedron_k4 {A : Type u} {a : A}
     (p q r s : LoopSpace A a) :
     RwEq (AssocOp.act assocTreeLeft (Vec.of4 p q r s))
       (AssocOp.act assocTreeRight (Vec.of4 p q r s)) := by
-  simp [assocTreeLeft, assocTreeRight, AssocOp.act, AssocTree.eval, Vec.of4,
-    Vec.split, LoopSpace.comp]
+  simpa [assocTreeLeft, assocTreeRight, AssocOp.act, AssocTree.eval, Vec.of4,
+    Vec.split, LoopSpace.comp] using
+      (RwEq.refl (LoopSpace.comp p (LoopSpace.comp q (LoopSpace.comp r s))))
 
 private def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
