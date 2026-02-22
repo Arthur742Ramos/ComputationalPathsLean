@@ -1,28 +1,38 @@
 % !TEX program = pdflatex
 % Computational Paths as Proof-Relevant Equality
-% Target venue: LICS / POPL / ITP
-\documentclass[acmsmall,screen,review]{acmart}
+% Target venue: Bulletin of Symbolic Logic
+\documentclass[12pt]{amsart}
 
 % ── packages ──────────────────────────────────────────────────────────
 \usepackage{amsmath,amssymb,amsthm}
-\usepackage{mathpartir}
 \usepackage{stmaryrd}
 \usepackage{xcolor}
-\usepackage{listings}
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{tikz-cd}
 \usepackage{enumitem}
 \usepackage{booktabs}
+\usepackage{mathrsfs}
 
 % ── theorem environments ──────────────────────────────────────────────
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
 \newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
 
 % ── macros ────────────────────────────────────────────────────────────
 \newcommand{\Path}{\mathsf{Path}}
 \newcommand{\Step}{\mathsf{Step}}
 \newcommand{\RwEq}{\mathsf{RwEq}}
 \newcommand{\Rw}{\mathsf{Rw}}
+\newcommand{\CStep}{\mathsf{CStep}}
+\newcommand{\CRTC}{\mathsf{CRTC}}
 \newcommand{\Deriv}[1]{\mathsf{Derivation}_{#1}}
 \newcommand{\refl}{\mathsf{refl}}
 \newcommand{\sym}{\mathsf{symm}}
@@ -39,199 +49,227 @@
 \newcommand{\ogrpd}{\omega\text{-}\mathsf{Gpd}}
 \newcommand{\UIP}{\mathsf{UIP}}
 \newcommand{\Eq}{\mathsf{Eq}}
-
-% ── listings ──────────────────────────────────────────────────────────
-\lstset{
-  language=,
-  basicstyle=\ttfamily\small,
-  keywordstyle=\bfseries\color{blue!70!black},
-  commentstyle=\itshape\color{green!50!black},
-  columns=flexible,
-  keepspaces=true,
-  mathescape=true,
-  literate={→}{$\to$}1 {←}{$\leftarrow$}1 {∀}{$\forall$}1 {∃}{$\exists$}1
-           {α}{$\alpha$}1 {β}{$\beta$}1 {γ}{$\gamma$}1 {ω}{$\omega$}1
-           {≃}{$\simeq$}1 {⟨}{$\langle$}1 {⟩}{$\rangle$}1
-}
+\newcommand{\toRW}{\mathsf{toRW}}
+\newcommand{\canon}{\mathsf{canon}}
+\newcommand{\Expr}{\mathsf{Expr}}
+\newcommand{\FF}{\textbf{FF}}
+\newcommand{\PS}{\textbf{PS}}
+\newcommand{\SO}{\textbf{SO}}
 
 % ── metadata ──────────────────────────────────────────────────────────
-\title{Computational Paths as Proof-Relevant Equality:\\
-  A 1{,}294-Module Lean~4 Formalization Spanning\\
-  Confluence, Coherence, and Higher Mathematics}
+\title[Computational Paths as Proof-Relevant Equality]
+  {Computational Paths as Proof-Relevant Equality:\\
+  Confluence, Coherence, and Higher Structure\\
+  in a 1{,}294-Module Lean~4 Formalization}
 
 \author{Arthur Ramos}
-\affiliation{%
-  \institution{Universidade Federal da Para\'iba}
-  \country{Brazil}}
+\address{Departamento de Inform\'atica, Universidade Federal da Para\'iba, Brazil}
 \email{arthur@ci.ufpb.br}
+
+\subjclass[2020]{03B38, 03B70, 18N10, 68V15, 55P99}
+
+\keywords{computational paths, proof relevance, weak $\omega$-groupoids,
+  confluence, coherence, rewriting, Lean~4 formalization}
+
+\date{February 2026}
 
 \begin{document}
 
 \begin{abstract}
-We present the largest known Lean~4 formalization of \emph{computational
-paths}: a proof-relevant framework for propositional equality in which
-different derivations of the same equation carry distinct computational
-content.  The development comprises \textbf{1{,}294 Lean~4 source files}
-containing \textbf{46{,}000+ definitions and theorems} with \textbf{zero
-uses of \texttt{sorry}}.  The framework is organized around three core
-layers: (1)~a \emph{Path/Step} rewrite system whose symmetric--transitive
-closure $\RwEq$ lives in $\Ty\;u$ (not $\Prop$), preserving proof
-relevance; (2)~explicit \emph{coherence} data---pentagon, triangle,
-interchange, and Eckmann--Hilton---established through $\Step$ chains and
-$\RwEq$ witnesses; and (3)~a \emph{weak $\omega$-groupoid} structure in the
-sense of Batanin--Leinster, where contractibility at dimensions $\ge 3$ is
-\emph{derived} from Church--Rosser confluence rather than postulated.
+We present a large-scale Lean~4 formalization of \emph{computational paths}:
+a proof-relevant framework for propositional equality in which different
+derivations of the same equation carry distinct computational content.
+The development comprises 1{,}294 source files containing over 46{,}000
+definitions and theorems with zero uses of \texttt{sorry} or \texttt{admit}.
 
-Beyond the core path algebra, the formalization extends the computational-path
-methodology into over 90 mathematical domains, including: \emph{operads} and
-operadic algebras; \emph{stable homotopy theory} with spectra and chromatic
-filtration; \emph{homotopy type theory} constructions (higher inductive types,
-Postnikov towers, Hurewicz theorem); \emph{derived categories} with
-triangulated structure and spectral sequences; \emph{topos theory} with
-Grothendieck toposes and classifying toposes; \emph{condensed mathematics};
-\emph{perfectoid spaces}; \emph{motivic cohomology}; \emph{infinity
-categories} and simplicial structures; \emph{cobordism theory} and
-topological field theories; \emph{$p$-adic Hodge theory}; and
-\emph{Langlands program} structures.
+The architecture is organized around three layers:
+(1)~a rewrite system of 75 elementary step constructors whose
+symmetric--transitive closure $\RwEq$ is defined in $\Ty\;u$ (not $\Prop$),
+ensuring genuine proof relevance;
+(2)~explicit coherence data---pentagon, triangle, interchange,
+Eckmann--Hilton, Mac~Lane fivefold, and inverse coherences---established
+through $\Step$ chains and $\RwEq$ witnesses that cannot be collapsed by
+proof irrelevance;
+and (3)~a weak $\omega$-groupoid structure in the sense of
+Batanin--Leinster, where contractibility at dimensions $\ge 3$ is
+\emph{derived} from a Church--Rosser confluence theorem proved via
+free-group interpretation and critical pair analysis.
 
-We formalize a Seifert--van Kampen theorem at the path level, a partial
-univalence principle for 1-types, strict 2-category instances with Godement
-interchange, and a comprehensive suite of algebraic topology computations.
-Every result is constructively verified with explicit \texttt{Path}/\texttt{Step}
-witnesses.  We discuss the design trade-offs of working in a proof-irrelevant
-kernel while maintaining proof-relevant rewrite traces, and compare our approach
-with HoTT identity types and Squier's homotopical algebra of rewriting.
+Beyond core path algebra, the formalization extends the computational-path
+methodology into over 70 mathematical domains including operads, stable
+homotopy theory, derived categories, topos theory, descent, and condensed
+mathematics.
+We provide a precise formalization status table distinguishing fully
+formalized results from partially structured and statement-only
+contributions, and address the relationship between anti-involution
+structure on 2-cells, the suspension map, and HoTT descent.
 \end{abstract}
 
-\keywords{computational paths, proof relevance, weak $\omega$-groupoids,
-  confluence, coherence, operads, stable homotopy, derived categories,
-  topos theory, Lean~4 formalization}
-
 \maketitle
+
+\tableofcontents
 
 % ======================================================================
 \section{Introduction}\label{sec:intro}
 % ======================================================================
 
-The identity type of Martin-L\"of type theory has two complementary
-readings.  In the \emph{intensional} reading, typified by Homotopy Type
+The identity type of Martin-L\"of type theory admits two complementary
+readings.
+In the \emph{intensional} reading, typified by Homotopy Type
 Theory (HoTT)~\cite{UFP2013}, the identity type $\mathsf{Id}_A(a,b)$ is
-a rich higher-dimensional structure: its elements are paths, paths between
+a higher-dimensional structure whose elements are paths, paths between
 paths form homotopies, and the resulting tower gives every type the
 structure of a weak $\omega$-groupoid~\cite{Lumsdaine2010,vdBG2011}.
 In the \emph{extensional} reading---and in proof assistants such as
-Lean~4 and Coq whose kernels validate UIP---propositional equalities are
-proof-irrelevant: any two proofs of $a = b$ are themselves equal.
+Lean~4 and Coq whose kernels validate $\UIP$---propositional equalities
+are proof-irrelevant: any two proofs of $a = b$ are themselves equal.
 
 The theory of \emph{computational paths}, introduced by de~Queiroz and
-de~Oliveira~\cite{deQueiroz1994,deQueirozGabbay1994,RQGO2016} and
-developed by Ramos et al.~\cite{RamosQueiroz2022,RamosQueiroz2024},
-pursues a third option.  We work inside a proof-irrelevant kernel
-(Lean~4's $\Eq$), but we \emph{record} the sequence of rewrite steps
-that produces an equality as metadata.  The resulting structure---the
-\emph{rewrite equivalence} $\RwEq$---is valued in $\Ty\;u$ rather than
-$\Prop$, so different derivations are distinguishable even though the
-underlying equalities are not.  This design gives us proof relevance
-\emph{where it matters} (at the level of rewrite traces) while retaining
-full compatibility with the classical metatheory of Lean~4.
+Gabbay~\cite{deQueirozGabbay1994} and developed by de~Queiroz,
+de~Oliveira, and Ramos~\cite{RQGO2016,RamosQueiroz2022,RamosQueiroz2024},
+pursues a third option.
+We work inside a proof-irrelevant kernel (Lean~4's $\Eq$), but
+\emph{record} the sequence of rewrite steps that produces an equality as
+explicit metadata.
+The resulting structure---the \emph{rewrite equivalence}
+$\RwEq$---inhabits $\Ty\;u$ rather than $\Prop$, so different
+derivations are distinguishable even though the underlying equalities
+are not.
 
-\paragraph{Scale and scope.}
-This paper presents the first comprehensive account of what is, to our
-knowledge, the largest single Lean~4 formalization of computational paths
-and their applications to higher mathematics.  The repository contains
-\textbf{1{,}294 Lean~4 source files} organized into \textbf{90+ top-level
-modules}, with a combined total of \textbf{46{,}000+ definitions and
-theorems} and \textbf{zero uses of \texttt{sorry} or \texttt{admit}}.
-The formalization spans topics from foundational rewrite theory through
-algebraic topology, algebraic geometry, and modern categorical
-abstractions, all unified by the computational-path methodology.
+\subsection{The proof-relevance design}\label{subsec:type-valued-rweq}
 
-\paragraph{Contributions.}
-Our main results are:
+This architectural choice merits early emphasis, as it is the linchpin
+of the entire formalization.
+
+In earlier versions of this work, $\RwEq$ was defined in $\Prop$.
+A consequence was that coherence proofs (pentagon, interchange,
+Eckmann--Hilton, etc.) became vacuous: Lean's
+$\mathsf{Subsingleton.elim}$ could identify any two inhabitants of a
+$\Prop$-valued type, trivially discharging any commutativity
+obligation between route witnesses.
+This meant that the sophisticated structure of the coherence
+arguments was invisible to the kernel.
+
+In the present formalization, $\RwEq$ is declared as:
+\[
+  \texttt{inductive RwEq} : \Path\;a\;b \to \Path\;a\;b \to \Ty\;u
+\]
+That is, it is an inductive family valued in $\Ty\;u$, not in $\Prop$.
+As a result:
+\begin{itemize}[nosep]
+  \item $\mathsf{Subsingleton.elim}$ does not apply.
+  \item Two distinct sequences of rewrite steps connecting the same pair
+    of paths yield \emph{distinguishable} $\RwEq$ witnesses.
+  \item Coherence theorems must be proved by constructing explicit
+    $\Step$ chains and composing them via the $\RwEq$ constructors.
+  \item $\UIP$ acts only on Lean's built-in $\Eq$ (which lives in
+    $\Prop$); the $\RwEq$ witnesses are immune.
+\end{itemize}
+
+For interfacing with $\mathsf{Setoid}$ and quotient machinery (which
+require $\Prop$-valued relations), we define the propositional wrapper:
+\[
+  \mathsf{RwEqProp}\;p\;q \;\triangleq\; \mathsf{Nonempty}(\RwEq\;p\;q)
+  \;:\; \Prop.
+\]
+This deliberate two-level design---$\RwEq$ in $\Ty$ for proof-relevant
+reasoning, $\mathsf{RwEqProp}$ in $\Prop$ for quotient
+construction---is the central architectural choice of the formalization.
+
+\subsection{Scale and scope}
+
+This paper presents the first comprehensive account of a Lean~4
+formalization of computational paths and their applications to higher
+mathematics at scale.
+
+\begin{table}[h]
+\centering
+\caption{Formalization statistics (as of February 2026).}
+\label{tab:stats}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Metric} & \textbf{Previous} & \textbf{Current} \\
+\midrule
+Lean 4 source files & 516 & 1{,}294 \\
+Theorems and lemmas & $\sim$1{,}466 & 20{,}488 \\
+Total declarations (incl.\ defs, structures) & --- & 54{,}760 \\
+Top-level modules & $\sim$20 & 72 \\
+Uses of \texttt{sorry}/\texttt{admit} & 0 & 0 \\
+Step constructors (rewrite rules) & 56 & 75 \\
+CStep constructors (completed TRS) & --- & 13 \\
+Critical pair witnesses & 0 & 7+ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Contributions}
 
 \begin{enumerate}[label=(\roman*),nosep]
-\item A \textbf{Path/Step/RwEq framework} (\S\ref{sec:framework}) in
-  which $\RwEq : \Path\;a\;b \to \Path\;a\;b \to \Ty\;u$ is the
-  proof-relevant symmetric--transitive closure of rewrite steps.
+\item A \textbf{Path/Step/RwEq framework} (\S\ref{sec:framework}) with
+  75 elementary rewrite step constructors and a $\Ty$-valued rewrite
+  equivalence, ensuring genuine proof relevance.
 
 \item \textbf{Explicit coherence} (\S\ref{sec:coherence}): pentagon,
-  triangle, interchange, Mac~Lane fivefold coherence, and
-  inverse-cancellation witnesses constructed as $\Step$ chains, together
-  with a proof of the Eckmann--Hilton theorem for 2-path loops.
+  triangle, interchange, Mac~Lane fivefold coherence, inverse and
+  double-inverse coherences, and Eckmann--Hilton commutativity---all
+  constructed as $\Step$ chains that cannot be trivialized by
+  $\mathsf{Subsingleton.elim}$.
 
-\item A \textbf{strict 2-category instance} (\S\ref{sec:twocat}) with
-  Godement horizontal composition, whiskering naturality, and the
-  interchange law.
+\item A \textbf{Church--Rosser confluence theorem}
+  (\S\ref{sec:confluence}) for the completed groupoid TRS, proved
+  via free-group interpretation with explicit critical pair witnesses
+  justifying the completion rules.
 
-\item A \textbf{weak $\omega$-groupoid theorem}
+\item A \textbf{weak $\omega$-groupoid structure}
   (\S\ref{sec:omega}) in the Batanin--Leinster sense, where
   contractibility at dimension $\ge 3$ is \emph{derived} from
-  Church--Rosser confluence of the rewrite system, not axiomatized.
+  Church--Rosser confluence.
 
-\item A \textbf{Seifert--van Kampen theorem} at the computational-path
-  level (\S\ref{sec:svk}).
+\item A \textbf{strict 2-category instance} (\S\ref{sec:twocat}) with
+  Godement interchange and whiskering naturality.
 
-\item A \textbf{partial univalence principle} for 1-types
-  (\S\ref{sec:univalence}).
+\item A \textbf{Seifert--van Kampen theorem} (\S\ref{sec:svk}) at the
+  computational-path level.
 
-\item \textbf{Extensions to 90+ mathematical domains}
-  (\S\ref{sec:extensions}), including operads, stable homotopy theory,
-  HoTT constructions, derived categories, topos theory, condensed
-  mathematics, perfectoid spaces, motivic cohomology, cobordism theory,
-  and more---each formalized with genuine \texttt{Path}/\texttt{Step}
-  witnesses.
+\item A \textbf{partial univalence principle} (\S\ref{sec:univalence})
+  for 1-types.
+
+\item \textbf{Extensions to 70+ mathematical domains}
+  (\S\ref{sec:extensions}), with a formalization status table
+  (\S\ref{sec:status}) distinguishing fully formalized results from
+  partially structured and statement-only contributions.
 \end{enumerate}
 
 \noindent
 The full formalization is available at
 \url{https://github.com/Arthur742Ramos/ComputationalPathsLean}.
 
-\paragraph{Proof relevance vs.\ UIP.}
-A potential concern is whether our use of $\RwEq : \Ty\;u$ is
-undermined by Lean~4's proof irrelevance.  It is not.
-$\mathsf{Subsingleton.elim}$ applies only to inhabitants of
-$\mathsf{Prop}$; since $\RwEq$ is defined as an inductive family in
-$\Ty\;u$, the kernel never identifies distinct $\RwEq$ witnesses.
-UIP acts only on Lean's built-in $\Eq$ (which lives in $\Prop$),
-and we exploit this \emph{deliberately}: coherence proofs at the
-2-path level (equalities between equalities of $\Path$ values) are
-proof-irrelevant because they are propositions, while the $\RwEq$
-witnesses connecting distinct paths are proof-relevant because they
-live in $\Ty$.
-
 % ======================================================================
 \section{The Path/Step/RwEq Framework}\label{sec:framework}
 % ======================================================================
 
-\subsection{Paths and Steps}
+\subsection{Paths and elementary steps}
 
 Let $A : \Ty\;u$.  A \emph{computational path} from $a$ to $b$ in $A$
-is a pair consisting of a propositional equality $a = b$ (living in
-$\Prop$) and a list of elementary rewrite steps (living in $\Ty$):
+consists of a propositional equality $a = b$ (living in $\Prop$) and a
+list of elementary rewrite steps (living in $\Ty$):
 
-\begin{lstlisting}
-structure Path {A : Type u} (a b : A) where
-  steps : List (Step A)
-  proof : a = b
-\end{lstlisting}
-
-\noindent
+\begin{definition}[Computational path]
+A \emph{computational path} is a dependent record:
+\[
+  \Path\;a\;b \;\triangleq\;
+  \big\{\, \mathit{steps} : \mathrm{List}(\Step\;A),\;
+           \mathit{proof} : a =_{\Eq} b \,\big\}.
+\]
 An \emph{elementary step} records a source, target, and justifying
-equality:
+equality: $\Step\;A \triangleq \{s, t : A,\; p : s =_{\Eq} t\}$.
+\end{definition}
 
-\begin{lstlisting}
-structure Step (A : Type u) where
-  src : A
-  tgt : A
-  proof : src = tgt
-\end{lstlisting}
-
-\noindent
 The key design decision is the separation of concerns: the
-\texttt{proof} field provides semantic correctness (sound with respect
-to Lean's kernel), while the \texttt{steps} list is a computational
-trace that carries intensional information about \emph{how} the
-equality was derived.
+$\mathit{proof}$ field provides semantic correctness (soundness with
+respect to Lean's kernel), while the $\mathit{steps}$ list is a
+computational trace carrying intensional information about \emph{how}
+the equality was derived.
 
 \begin{definition}[Path operations]
 The following operations are defined by structural recursion on step
@@ -245,9 +283,9 @@ lists:
 \end{align*}
 \end{definition}
 
-\begin{theorem}[Weak groupoid laws on $\Path$]\label{thm:weak-groupoid-laws}
-The following hold as definitional equalities on step lists (and hence as
-propositional equalities on $\Path$ values):
+\begin{theorem}[Weak groupoid laws on paths]\label{thm:weak-groupoid-laws}
+The following hold as propositional equalities on $\Path$ values,
+reducing to list identities:
 \begin{enumerate}[nosep]
   \item $\trs(\refl(a),\, p) = p$ \quad (left unit)
   \item $\trs(p,\, \refl(b)) = p$ \quad (right unit)
@@ -256,152 +294,256 @@ propositional equalities on $\Path$ values):
 \end{enumerate}
 \end{theorem}
 
-\begin{proof}
-Each reduces to list identities: \texttt{[] ++ xs = xs},
-\texttt{xs ++ [] = xs}, associativity of \texttt{++}, and the
-involution $\Step.\sym \circ \Step.\sym = \mathsf{id}$.
-\end{proof}
+\subsection{The 75 rewrite step constructors}\label{subsec:step-constructors}
 
-\subsection{Rewrite Steps and Rewrite Equivalence}
+The 1-dimensional rewrite system operates on $\Path$ values via the
+$\Step$ inductive type, which has \textbf{75 constructors} organized
+into the following categories:
 
-The 1-dimensional rewrite system operates on $\Path$ values.
-A \emph{rewrite step} $\Step\;p\;q$ (at the level of paths) witnesses
-that $p$ can be rewritten to~$q$ by a single rule application---for
-instance, $\beta$-reduction, $\eta$-expansion, or an associativity
-rewrite.
+\begin{table}[h]
+\centering
+\caption{Classification of the 75 elementary step constructors.}
+\label{tab:step-rules}
+\begin{tabular}{p{5.5cm}cr}
+\toprule
+\textbf{Category} & \textbf{Rules} & \textbf{Count} \\
+\midrule
+Basic path algebra (identity, associativity, inverses,
+contravariance) & 1--8 & 8 \\
+Map/substitution ($\mathsf{map2}$) & 9 & 1 \\
+Product types ($\beta$, $\eta$, projection, congruence) & 10--16 & 7 \\
+Sigma types ($\beta$, $\eta$, projection) & 17--21 & 5 \\
+Sum types (recursor $\beta$) & 22--23 & 2 \\
+Function types ($\beta$, $\eta$, $\lambda$-congruence) & 24--27 & 4 \\
+Dependent application & 28 & 1 \\
+Transport ($\refl$-$\beta$, composition, symmetry,
+$\Sigma$-constructors) & 29--35 & 7 \\
+Context/substitution rules (unary, dependent, binary) & 36--56 & 21 \\
+Mapping congruences ($\mathsf{mapLeft}$, $\mathsf{mapRight}$) & 57--62 & 6 \\
+Congruence closure ($\sym$/$\trs$-congruence) & 63--65 & 3 \\
+Knuth--Bendix completion (cancellation) & 66--67 & 2 \\
+Higher-level derived rules & 68--75 & 8 \\
+\midrule
+\textbf{Total} & & \textbf{75} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\begin{definition}[Rewrite equivalence $\RwEq$]
-The \emph{rewrite equivalence} is the smallest Type-valued relation
+Each constructor of $\Step$ witnesses that one $\Path$ value can be
+rewritten to another by a single rule application.
+Rules~1--8 form the ``core groupoid TRS'' corresponding to the
+LNDEQ system of de~Queiroz, de~Oliveira, and
+Ramos~\cite{RQGO2016}.
+Rules~9--62 extend the system to handle type formers (products,
+sums, functions, dependent types, transport, contexts).
+Rules~63--65 provide congruence closure so that steps can be applied
+under $\sym$ and $\trs$ constructors.
+Rules~66--67 are Knuth--Bendix completion rules that close critical
+pairs (see \S\ref{sec:confluence}).
+
+\subsection{Rewrite equivalence}\label{subsec:rweq}
+
+\begin{definition}[Rewrite equivalence $\RwEq$]\label{def:rweq}
+The \emph{rewrite equivalence} is the smallest $\Ty$-valued relation
 containing elementary steps and closed under reflexivity, symmetry,
 and transitivity:
-\begin{lstlisting}
-inductive RwEq {A : Type u} {a b : A} :
-    Path a b $\to$ Path a b $\to$ Type u
-  | refl (p : Path a b) : RwEq p p
-  | step {p q} : Step p q $\to$ RwEq p q
-  | symm {p q} : RwEq p q $\to$ RwEq q p
-  | trans {p q r} : RwEq p q $\to$ RwEq q r $\to$ RwEq p r
-\end{lstlisting}
+\begin{align*}
+  &\RwEq : \Path\;a\;b \to \Path\;a\;b \to \Ty\;u \\
+  &\quad \RwEq.\refl\;(p) : \RwEq\;p\;p \\
+  &\quad \RwEq.\mathsf{step} : \Step\;p\;q \to \RwEq\;p\;q \\
+  &\quad \RwEq.\sym : \RwEq\;p\;q \to \RwEq\;q\;p \\
+  &\quad \RwEq.\trs : \RwEq\;p\;q \to \RwEq\;q\;r \to \RwEq\;p\;r
+\end{align*}
 \end{definition}
 
-\noindent
-\textbf{Crucially}, $\RwEq$ is an inductive family in $\Ty\;u$, not in
-$\Prop$.  This means that two distinct sequences of rewrite steps
-connecting the same pair of paths yield \emph{distinguishable}
-$\RwEq$ witnesses.  Lean's $\mathsf{Subsingleton.elim}$ cannot
-collapse them, because it applies only to types in $\Prop$.
+\begin{remark}[Why $\Ty\;u$ and not $\Prop$]\label{rem:type-valued}
+As emphasized in \S\ref{subsec:type-valued-rweq}, the $\Ty\;u$ universe
+is essential.
+If $\RwEq$ were declared in $\Prop$, every coherence obligation would
+be trivially dischargeable by $\mathsf{Subsingleton.elim}$, rendering
+the pentagon, interchange, and Eckmann--Hilton proofs vacuous.
+With $\RwEq : \Ty\;u$, each coherence witness must be \emph{constructed}
+as an explicit chain of $\Step$ applications.
+\end{remark}
 
-For interfacing with $\mathsf{Setoid}$ and quotient machinery (which
-require $\Prop$-valued relations), we define the \emph{propositional
-wrapper}:
-\[
-  \mathsf{RwEqProp}\;p\;q \;\triangleq\; \mathsf{Nonempty}(\RwEq\;p\;q)
-  \;:\; \Prop
-\]
-This deliberate two-level design---$\RwEq$ in $\Ty$ for proof-relevant
-reasoning, $\mathsf{RwEqProp}$ in $\Prop$ for quotient
-construction---is the central architectural choice of the formalization.
+\subsection{Congruence and functoriality}
 
-\subsection{Congruence and Functoriality}
-
-$\RwEq$ is a congruence with respect to path operations:
-
-\begin{proposition}[Bifunctoriality of $\trs$]\label{prop:congr}
+\begin{proposition}[Bifunctoriality of composition]\label{prop:congr}
 If $\RwEq\;p\;p'$ and $\RwEq\;q\;q'$, then
 $\RwEq\;(\trs\;p\;q)\;(\trs\;p'\;q')$.
 \end{proposition}
 
-\noindent
-This is established by two lemmas \texttt{rweq\_trans\_congr\_left} and
-\texttt{rweq\_trans\_congr\_right}, combined as
-\texttt{rweq\_trans\_congr}.  The proof proceeds by induction on the
-$\RwEq$ derivation, lifting each $\Step$ through the congruence
-combinators $\Step.\mathsf{trans\_congr\_left}$ and
-$\Step.\mathsf{trans\_congr\_right}$.
+\begin{proof}
+Two lemmas establish congruence in each argument separately:
+$\mathsf{rweq\_trans\_congr\_left}$ lifts a step in the first argument
+using $\Step.\mathsf{trans\_congr\_left}$, and
+$\mathsf{rweq\_trans\_congr\_right}$ lifts a step in the second.
+Their composition gives bifunctoriality.
+\end{proof}
 
-\subsection{Confluence and Church--Rosser}
+% ======================================================================
+\section{Confluence and Church--Rosser}\label{sec:confluence}
+% ======================================================================
 
-The rewrite-engineering layer is formalized in
-\texttt{GroupoidConfluence.lean}, where expressions are interpreted into a
-free-group normal form via \texttt{toRW}.  Two technical ingredients are
-central: (i) \texttt{toRW\_invariant}, showing each rewrite step preserves
-the interpretation, and (ii) \texttt{reach\_canon}, showing every
-expression reaches the canonical normal form \texttt{canon}.  Together they
-yield confluence and Church--Rosser, which are then used in
-\S\ref{sec:omega} to derive high-dimensional contractibility
-(Theorem~\ref{thm:contract}) and in \S\ref{sec:svk} to control loop normal
-forms in pushout decompositions.
+The core groupoid TRS (rules~1--8) is not locally confluent.
+The system requires \emph{completion} to achieve confluence,
+and our formalization makes this explicit through critical pair
+analysis and a free-group interpretation.
 
-\begin{theorem}[Confluence of the completed groupoid TRS]\label{thm:groupoid-confluence}
-Let \texttt{Expr} be the path-expression syntax and \texttt{CRTC} the
-reflexive--transitive closure of completed rewrite steps \texttt{CStep}.  For
-all expressions $a,b,c$:
+\subsection{Critical pairs and completion}\label{subsec:critical-pairs}
+
+The basic 8-rule system has critical pairs between the associativity
+rule and the inverse laws.
+The formalization provides \textbf{7 explicit critical pair witnesses},
+of which the following is representative.
+
+\begin{example}[Critical pair: associativity vs.\ right inverse]
+\label{ex:critical-pair}
+Consider the expression $\trs(\trs(p, q), \sym(\trs(p, q)))$.
+Two rules apply at the root:
+\begin{itemize}[nosep]
+  \item The right inverse rule yields $\refl$.
+  \item Associativity yields $\trs(p, \trs(q, \sym(\trs(p, q))))$.
+\end{itemize}
+The second term normalizes (under contravariance and inverse laws) to
+$\trs(p, \trs(q, \trs(\sym(q), \sym(p))))$, which is irreducible under
+the 8-rule system but not joinable with $\refl$.
+\end{example}
+
+This critical pair is witnessed explicitly by the theorem
+$\mathsf{critical\_pair\_witness}$ in the Newman lemma module.
+To resolve it, the system is \emph{completed} by adding two
+cancellation rules:
+\begin{align}
+  \trs(p, \trs(\sym(p), q)) &\to q
+    \tag{Rule 66: left cancellation} \\
+  \trs(\sym(p), \trs(p, q)) &\to q
+    \tag{Rule 67: right cancellation}
+\end{align}
+These correspond to the free-group identity $x \cdot x^{-1} \cdot y = y$
+applied in non-root position.
+
+\begin{definition}[Completed step relation $\CStep$]
+The completed groupoid TRS has 13 constructors: the 8~base rules,
+the 2~cancellation rules~(66--67), and 3~congruence closure rules
+($\sym$-congruence, left and right $\trs$-congruence).
+\end{definition}
+
+\subsection{Confluence via free-group interpretation}
+
+\begin{theorem}[Confluence of the completed TRS]\label{thm:confluence}
+For all expressions $a, b, c$ in the path syntax:
 \[
-  \mathsf{CRTC}(a,b)\;\wedge\;\mathsf{CRTC}(a,c)
+  \CRTC(a,b)\;\wedge\;\CRTC(a,c)
   \;\Longrightarrow\;
-  \exists d,\;\mathsf{CRTC}(b,d)\;\wedge\;\mathsf{CRTC}(c,d).
+  \exists d,\;\CRTC(b,d)\;\wedge\;\CRTC(c,d),
 \]
-In Lean this is theorem \texttt{confluence} in
-\texttt{Path/Rewrite/GroupoidConfluence.lean}.
+where $\CRTC$ is the reflexive--transitive closure of $\CStep$.
 \end{theorem}
 
-\begin{proof}[Proof idea]
-Interpret every expression $e$ as a reduced word $\mathsf{toRW}(e)$ in the
-free group.  The theorem \texttt{toRW\_invariant} proves each rewrite step
-preserves that interpretation; therefore any two descendants $b,c$ of $a$
-have equal free-group image.  The theorem \texttt{reach\_canon} sends both
-$b$ and $c$ to a common canonical representative
-$\mathsf{canon}(b)=\mathsf{canon}(c)$, yielding the join.
+\begin{proof}
+The proof proceeds by semantic interpretation into the free group on
+atom generators.
+\begin{enumerate}
+  \item \textbf{Interpretation.}
+    A function $\toRW : \Expr \to \mathrm{ReducedWord}$ maps each
+    expression to a reduced word in the free group:
+    atoms map to single generators, $\refl$ maps to the empty word,
+    $\sym$ maps to word inversion, and $\trs$ maps to reduced
+    concatenation.
+
+  \item \textbf{Invariance.}
+    The theorem $\toRW\_\mathsf{invariant}$ establishes that every
+    $\CStep$ rewrite preserves the free-group interpretation:
+    if $\CStep\;e_1\;e_2$, then $\toRW(e_1) = \toRW(e_2)$.
+    This is proved by case analysis on all 13 constructors, each
+    reducing to a free-group identity.
+
+  \item \textbf{Reachability.}
+    The theorem $\mathsf{reach\_canon}$ shows that every expression
+    $e$ reduces (via $\CRTC$) to a canonical form
+    $\mathsf{rwToExpr}(\toRW(e))$ determined by its reduced word.
+
+  \item \textbf{Join.}
+    If $\CRTC(a,b)$ and $\CRTC(a,c)$, then by invariance
+    $\toRW(b) = \toRW(a) = \toRW(c)$, so $b$ and $c$ have the same
+    canonical form.
+    Taking $d = \mathsf{rwToExpr}(\toRW(b))$ and applying
+    $\mathsf{reach\_canon}$ to both $b$ and $c$ yields the join.
+\end{enumerate}
 \end{proof}
 
-\begin{theorem}[Church--Rosser via free-group interpretation]\label{thm:groupoid-church-rosser}
-For expressions $e_1,e_2$, if $\mathsf{toRW}(e_1)=\mathsf{toRW}(e_2)$ then
-there exists $d$ such that
-\[
-  \mathsf{CRTC}(e_1,d)\;\wedge\;\mathsf{CRTC}(e_2,d).
-\]
-Equivalently, semantic equality in the free-group model implies syntactic
-joinability.  In Lean this is theorem \texttt{church\_rosser} in
-\texttt{GroupoidConfluence.lean}.
+\begin{theorem}[Church--Rosser]\label{thm:church-rosser}
+For expressions $e_1, e_2$, if $\toRW(e_1) = \toRW(e_2)$ then there
+exists $d$ such that $\CRTC(e_1, d)$ and $\CRTC(e_2, d)$.
 \end{theorem}
 
-\begin{proof}[Proof idea]
-Both expressions reduce to their canonical form: $e_i \to^\ast
-\mathsf{canon}(e_i)$.  If \texttt{toRW} values agree, the canonical forms
-are definitionally equal by construction of \texttt{canon}.  Taking that
-common normal form as $d$ gives a Church--Rosser witness.  The
-\texttt{church\_rosser\_explicit} variant additionally records reduction
-lengths, used in resource-sensitive normalization arguments.
+\begin{proof}
+Both expressions reduce to their canonical forms via
+$\mathsf{reach\_canon}$.
+If $\toRW$ values agree, the canonical forms are definitionally
+equal by construction, yielding the Church--Rosser witness.
+An explicit variant additionally records reduction step counts for
+resource-sensitive normalization arguments.
 \end{proof}
+
+\begin{remark}[Newman's lemma]
+The formalization also includes an abstract Newman's lemma
+(well-founded termination + local confluence $\Rightarrow$ global
+confluence) and a proof that the 8-rule system \emph{fails}
+local confluence, thereby justifying the completion.
+\end{remark}
+
+\subsection{What is proved vs.\ what is assumed}\label{subsec:confluence-status}
+
+We are explicit about the status of confluence in the full 75-rule
+system.
+
+\begin{itemize}[nosep]
+  \item \textbf{Fully proved}: Confluence and Church--Rosser for the
+    13-constructor $\CStep$ completed groupoid TRS on the path expression
+    syntax $\Expr$ (atoms, $\refl$, $\sym$, $\trs$).
+  \item \textbf{Fully proved}: 7+ critical pair witnesses for the
+    uncompleted 8-rule system, justifying the completion rules.
+  \item \textbf{Assumed via normalization}: For the full 75-rule $\Step$
+    system (which includes product, function, transport, and context
+    rules), confluence is established by reduction to a canonical form
+    via a function that maps every path to its underlying propositional
+    equality.
+    This gives a \emph{semantic} confluence argument (every path has a
+    unique normal form up to propositional equality), but does not
+    provide a syntactic confluence proof for the full system.
+  \item \textbf{Not assumed}: We do not use any axiom, postulate, or
+    \texttt{sorry} for confluence claims.
+\end{itemize}
 
 % ======================================================================
 \section{Coherence}\label{sec:coherence}
 % ======================================================================
 
-The coherence laws of higher category theory---pentagon, triangle,
-interchange---are proved as explicit $\RwEq$ witnesses rather than
-by appeal to proof irrelevance.
+The coherence laws of higher category theory are proved as explicit
+$\RwEq$ witnesses.
+Because $\RwEq : \Ty\;u$, these witnesses carry genuine computational
+content: they record the specific sequence of rewrite steps that
+transforms one route into another.
 
-\subsection{The Associator and the Pentagon}
-
-The associator is implemented by explicit step chains, not by a
-meta-level conversion rule.  Concretely, the route combinators
-\texttt{pentagon\_right\_route} and \texttt{pentagon\_left\_route} in
-\texttt{OmegaGroupoid/GroupoidProofs.lean} witness the two Mac Lane paths.
+\subsection{Pentagon coherence}
 
 \begin{definition}[Associator]
 For composable paths $p, q, r$:
 \[
   \alpha_{p,q,r} : \RwEq\;\big(\trs(\trs(p,q),r)\big)\;\big(\trs(p,\trs(q,r))\big)
 \]
-constructed via the rewrite step \texttt{rweq\_tt} corresponding to
-list associativity.
+constructed via the $\Step$ constructor corresponding to list
+associativity.
 \end{definition}
 
 \begin{theorem}[Pentagon coherence]\label{thm:pentagon}
 For four composable paths $p, q, r, s$, the two canonical routes from
-$((p \cmpA q) \cmpA r) \cmpA s$ to $p \cmpA (q \cmpA (r \cmpA s))$
-yield the same underlying equality:
+$((p \cmpA q) \cmpA r) \cmpA s$ to $p \cmpA (q \cmpA (r \cmpA s))$---namely
+the ``right route'' (associating the outer pair first, then the inner)
+and the ``left route'' (associating the inner pair first)---yield the
+same underlying equality after projection through $\mathsf{rweq\_toEq}$:
 \[
   \mathsf{rweq\_toEq}(\text{left route}) =
   \mathsf{rweq\_toEq}(\text{right route}).
@@ -409,34 +551,30 @@ yield the same underlying equality:
 \end{theorem}
 
 \begin{proof}
-This is theorem \texttt{pentagon\_coherence}.  Both sides are equalities in
-$\Prop$ after applying \texttt{rweq\_toEq}; hence proof irrelevance closes
-the target proposition while preserving distinct intensional witnesses before
-projection.
+The two routes are constructed as explicit $\RwEq$ composites using
+$\Step.\mathsf{trans\_assoc}$ and $\RwEq.\mathsf{trans\_congr}$.
+After applying $\mathsf{rweq\_toEq}$, both sides are equalities in
+$\Prop$; proof irrelevance then identifies them.
+
+The important point is that the two routes are \emph{distinct as
+$\RwEq$ witnesses} (they record different step sequences), but they
+agree on the underlying propositional equality.
+This is exactly the situation described by Mac~Lane's coherence
+theorem: all diagrams of canonical natural transformations commute.
 \end{proof}
 
-\begin{theorem}[Mac Lane coherence (fivefold reassociation)]\label{thm:mac-lane-coherence}
-For composable paths $p,q,r,s,t$, every parenthesization of the fivefold
-composite $p\cmpA q\cmpA r\cmpA s\cmpA t$ is connected to the fully
-right-associated form by a canonical $\RwEq$ witness, and all such routes
-induce the same underlying equality in $\Eq$.
-In Lean this is realized by \texttt{mac\_lane\_coherence} in
-\texttt{MonoidalCoherence.lean}.
+\begin{theorem}[Mac Lane fivefold coherence]\label{thm:mac-lane}
+For composable paths $p, q, r, s, t$, every parenthesization of the
+fivefold composite $p \cmpA q \cmpA r \cmpA s \cmpA t$ is connected
+to the fully right-associated form by a canonical $\RwEq$ witness,
+and all such routes induce the same underlying equality.
 \end{theorem}
 
-\begin{proof}[Proof sketch]
-The explicit witness \texttt{rweq\_mac\_lane\_five\_split} composes
-instances of associativity (\texttt{rweq\_tt}) and congruence
-(\texttt{rweq\_trans\_congr\_left/right}).  Equality of alternate route
-projections follows exactly as in Theorem~\ref{thm:pentagon}.
-\end{proof}
+\subsection{Interchange and Eckmann--Hilton}\label{subsec:interchange}
 
-\subsection{Interchange and Eckmann--Hilton}
-
-Two-cells admit both vertical and horizontal composition.  In the
-computational-path presentation, horizontal composition is implemented via
-whiskering (\texttt{trans\_congr\_left/right}), and the interchange law is a
-compatibility statement between whiskering orders.
+Two-cells admit vertical composition (concatenation of $\RwEq$
+witnesses) and horizontal composition (whiskering via
+$\mathsf{trans\_congr\_left}$ and $\mathsf{trans\_congr\_right}$).
 
 \begin{theorem}[Interchange]\label{thm:interchange}
 For 2-cells $\alpha_1, \alpha_2, \beta_1, \beta_2$:
@@ -446,100 +584,74 @@ For 2-cells $\alpha_1, \alpha_2, \beta_1, \beta_2$:
 \]
 \end{theorem}
 
-\begin{corollary}[Eckmann--Hilton]\label{cor:EH}
-For any element $a : A$, the monoid of 2-cells
-$\mathsf{LoopTwoCell}(a) = \mathsf{TwoCell}(\refl\;a,\,\refl\;a)$
-is commutative:
-\[
-  \alpha \vcomp \beta = \beta \vcomp \alpha.
-\]
-\end{corollary}
-
-\begin{theorem}[Eckmann--Hilton commutativity, formal route statement]\label{thm:eckmann-hilton-commutativity}
-Let $\alpha,\beta : \mathsf{LoopTwoCell}(a)$.  The commutativity equality is
+\begin{theorem}[Eckmann--Hilton commutativity]\label{thm:eckmann-hilton}
+Let $\alpha, \beta : \RwEq\;(\refl\;a)\;(\refl\;a)$ be 2-cell loops.
+The commutativity $\alpha \vcomp \beta = \beta \vcomp \alpha$ is
 obtained by the composite:
 \[
   \alpha \vcomp \beta
-  \xRightarrow[\text{unitors}]{}\;
+  \xrightarrow{\text{unitors}}
   \alpha \hcomp \beta
-  \xRightarrow[\text{interchange}]{}\;
+  \xrightarrow{\text{interchange}}
   \beta \hcomp \alpha
-  \xRightarrow[\text{unitors}]{}\;
+  \xrightarrow{\text{unitors}}
   \beta \vcomp \alpha.
 \]
-In Lean this is instantiated by \texttt{eckmann\_hilton\_two\_cells} in
-\texttt{OmegaGroupoid/CoherencePaths.lean}.
+Each arrow is an explicit $\RwEq$ transformation; no step invokes
+$\mathsf{Subsingleton.elim}$.
 \end{theorem}
 
-\subsection{Unit, Inverse, and Naturality Coherence}
+\begin{remark}[Anti-involution, not symmetric braiding]\label{rem:anti-involution}
+In earlier versions of this work, we incorrectly claimed that path
+composition carries a ``symmetric monoidal'' braiding.
+The correct statement is that the involution $\sym$ on paths induces
+an \emph{anti-involution} on the path monoid:
+$\sym(\trs\;p\;q) = \trs(\sym\;q)(\sym\;p)$.
+This is a contravariance law, not a braiding.
+Eckmann--Hilton commutativity applies only to 2-cell \emph{loops}
+(based at $\refl$), and does not extend to a braiding on
+arbitrary 1-cells.
+The correct categorical structure at the 1-cell level is a
+\emph{groupoid with anti-involution}, not a braided monoidal category.
+\end{remark}
 
-\begin{proposition}[Left unit law]\label{prop:left-unit-law}
-For composable $p : \Path\,a\,b$ and $q : \Path\,b\,c$:
-\[
-  \RwEq\!\big(\trs(\trs(\refl\,a,p),q),\;\trs(p,q)\big).
-\]
-This is \texttt{rweq\_left\_unit\_coherence}.
-\end{proposition}
+\subsection{Triangle, inverse, and naturality coherences}
 
-\begin{proposition}[Right unit law]\label{prop:right-unit-law}
-For composable $p : \Path\,a\,b$ and $q : \Path\,b\,c$:
-\[
-  \RwEq\!\big(\trs(\trs(p,\refl\,b),q),\;\trs(p,q)\big).
-\]
-This is \texttt{rweq\_right\_unit\_coherence}.
-\end{proposition}
-
-\begin{theorem}[Triangle coherence]\label{thm:triangle-coherence-formal}
-For composable $p : \Path\,a\,b$ and $q : \Path\,b\,c$, the two standard
-routes from $(p\cmpA \refl(b))\cmpA q$ to $p\cmpA q$ induce the same
-underlying equality:
-\[
-  \mathsf{rweq\_toEq}(\text{triangle left route}) =
-  \mathsf{rweq\_toEq}(\text{triangle right route}).
-\]
-This is theorem \texttt{triangle\_coherence}.
+\begin{theorem}[Triangle coherence]\label{thm:triangle}
+For composable $p, q$, the two standard routes from
+$(p \cmpA \refl(b)) \cmpA q$ to $p \cmpA q$ induce the same
+underlying equality.
 \end{theorem}
 
 \begin{theorem}[Inverse coherence]\label{thm:inverse-coherence}
-For every $p : \Path\,a\,b$, the two cancellation routes from
-$(p\cmpA p^{-1})\cmpA p$ to $p$ agree after projection:
-\[
-  \mathsf{rweq\_toEq}(\text{assoc-then-cancel}) =
-  \mathsf{rweq\_toEq}(\text{cancel-then-unit}).
-\]
-This is theorem \texttt{inverse\_coherence}.
+For every $p : \Path\;a\;b$, the two cancellation routes from
+$(p \cmpA p^{-1}) \cmpA p$ to $p$ agree after projection.
 \end{theorem}
 
-\begin{theorem}[Double inverse coherence]\label{thm:double-inverse-coherence}
-For every $p : \Path\,a\,b$, two rewrite routes reducing
-$(p^{-1})^{-1}\cmpA p^{-1}$ to a reflexive path induce the same equality.
-This is theorem \texttt{double\_inverse\_coherence}.
+\begin{theorem}[Double inverse coherence]\label{thm:double-inverse}
+For every $p$, two rewrite routes reducing $(p^{-1})^{-1} \cmpA p^{-1}$
+to a reflexive path induce the same equality.
 \end{theorem}
 
-\begin{theorem}[Contravariance coherence]\label{thm:contravariance-coherence}
-For composable $p,q,r$, the two decompositions of
-$(p\cmpA(q\cmpA r))^{-1}$ to $(r^{-1}\cmpA q^{-1})\cmpA p^{-1}$ yield
-equal projected proofs.
-This is theorem \texttt{contravariance\_coherence}.
+\begin{theorem}[Contravariance coherence]\label{thm:contravariance}
+For composable $p, q, r$, the two decompositions of
+$(p \cmpA (q \cmpA r))^{-1}$ to
+$(r^{-1} \cmpA q^{-1}) \cmpA p^{-1}$ yield equal projected proofs.
 \end{theorem}
 
-\begin{proposition}[Naturality of associator]\label{prop:associator-naturality}
-The associator is natural in at least the first and third variables,
-formalized as \texttt{assoc\_natural\_first\_toEq} and
-\texttt{assoc\_natural\_third\_toEq}.
+\begin{proposition}[Naturality of the associator]\label{prop:assoc-nat}
+The associator is natural in the first and third variables.
 \end{proposition}
 
-\begin{proposition}[Naturality of unitors]\label{prop:unitor-naturality}
-Whiskering by identities is coherent with unit cancellation,
-formalized as \texttt{whiskerRight\_refl\_coherence} and
-\texttt{whiskerLeft\_refl\_coherence}.
+\begin{proposition}[Naturality of unitors]\label{prop:unitor-nat}
+Whiskering by identities is coherent with unit cancellation.
 \end{proposition}
 
 % ======================================================================
 \section{Two-Categorical Structure}\label{sec:twocat}
 % ======================================================================
 
-\begin{definition}[Strict 2-category \texttt{EqTwoCat}]
+\begin{definition}[Strict 2-category of types and functions]
 The strict 2-category $\mathcal{C}$ has:
 \begin{itemize}[nosep]
   \item 0-cells: types $A : \Ty\;u$
@@ -547,455 +659,343 @@ The strict 2-category $\mathcal{C}$ has:
   \item 2-cells: $\mathsf{PLift}(f = g) : \Ty\;0$
 \end{itemize}
 with vertical composition given by transitivity, horizontal composition
-(Godement product) by function composition congruence, and the
-interchange law by proof irrelevance of $\mathsf{PLift}$.
+(Godement product) by function composition congruence.
 \end{definition}
 
-\begin{theorem}[Strict 2-category instance]\label{thm:eqtwocat-instance}
-The data \texttt{EqTwoCat} defines an instance of
-\texttt{StrictTwoCategory} satisfying strict associativity/unit laws for
-1-cells together with vertical and horizontal 2-cell compositions.
+\begin{theorem}[Strict 2-category instance]\label{thm:strict-2cat}
+The data above defines a strict 2-category satisfying:
+strict associativity and unit laws for 1-cells,
+vertical and horizontal 2-cell composition,
+and the interchange law.
 \end{theorem}
 
-\begin{theorem}[Godement interchange]\label{thm:godement-interchange}
-The horizontal composition $\hcomp$ satisfies the interchange law
-with vertical composition $\vcomp$:
+\begin{theorem}[Godement interchange]\label{thm:godement}
 \[
   (\alpha_1 \vcomp \alpha_2) \hcomp (\beta_1 \vcomp \beta_2) =
   (\alpha_1 \hcomp \beta_1) \vcomp (\alpha_2 \hcomp \beta_2).
 \]
 \end{theorem}
 
-\begin{proposition}[Whiskering naturality]\label{prop:whisker-nat}
+\begin{proposition}[Whiskering naturality]\label{prop:whisk-nat}
 For 2-paths $h : p = p'$ and $k : q = q'$:
 \[
-  (p \wr k) \cdot (h \wl q') = (h \wl q) \cdot (p' \wr k)
+  (p \wr k) \cdot (h \wl q') = (h \wl q) \cdot (p' \wr k).
 \]
-where $\wl$ and $\wr$ denote left and right whiskering.
 \end{proposition}
 
 % ======================================================================
 \section{The Weak $\omega$-Groupoid Theorem}\label{sec:omega}
 % ======================================================================
 
-The central structural result is that computational paths, together with
-their higher rewrite derivations, form a weak $\omega$-groupoid in the
-sense of Batanin~\cite{Batanin1998} and Leinster~\cite{Leinster2004}.
+\subsection{The cell tower}
 
-\subsection{The Cell Tower}
-
-\begin{definition}[Cell tower]
+\begin{definition}[Cell tower]\label{def:cell-tower}
 \begin{align*}
   \text{Level 0:} &\quad \text{Elements } a : A \\
   \text{Level 1:} &\quad \Path\;a\;b \\
   \text{Level 2:} &\quad \Deriv{2}\;p\;q \;\triangleq\; \RwEq\;p\;q \\
   \text{Level 3:} &\quad \Deriv{3}\;d_1\;d_2
     \quad\text{(meta-steps between derivations)} \\
-  \text{Level 4:} &\quad \Deriv{4}\;m_1\;m_2 \\
-  \text{Level } n \ge 5: &\quad \mathsf{DerivationHigh}\;(n-5)\;c_1\;c_2
+  \text{Level } n \ge 4: &\quad \mathsf{DerivationHigh}\;(n-4)\;c_1\;c_2
 \end{align*}
 \end{definition}
 
-\subsection{Contractibility from Confluence}
+\subsection{Contractibility from confluence}
 
-\begin{theorem}[Contractibility at dimension $\ge 3$]\label{thm:contract}
+\begin{theorem}[Contractibility at dimension $\ge 3$]%
+\label{thm:contract}
 \leavevmode
 \begin{enumerate}[nosep]
-  \item At level~3: for any parallel $d_1, d_2 : \Deriv{2}\;p\;q$,
+  \item At level~3: for any parallel $d_1, d_2 : \RwEq\;p\;q$,
     there exists $m : \Deriv{3}\;d_1\;d_2$.
-  \item At level~4: for any parallel $m_1, m_2 : \Deriv{3}\;d_1\;d_2$,
-    there exists $c : \Deriv{4}\;m_1\;m_2$.
-  \item At level $n \ge 5$: contractibility propagates by construction.
+  \item At level $n \ge 4$: contractibility propagates by construction.
 \end{enumerate}
 \end{theorem}
 
 \begin{proof}
 Level~3 contractibility reduces to showing that any two $\RwEq$
-witnesses between the same pair of paths are connected by a 3-cell.
-By Church--Rosser confluence (Theorem~\ref{thm:groupoid-confluence}),
+witnesses between the same pair of paths can be connected by a 3-cell.
+By Church--Rosser confluence (Theorem~\ref{thm:confluence}),
 any two derivations of the same rewrite equivalence can be joined.
-The \texttt{Join} structure provides the meeting point; combined with
-symmetric closure, this yields the 3-cell.  Level~4 and above follow
-because $\Deriv{3}$ carries propositional payload, making higher cells
-automatically contractible by proof irrelevance.
+The meeting point provided by the $\mathsf{Join}$ structure, combined
+with symmetric closure, yields the 3-cell.
+Level~4 and above follow because $\Deriv{3}$ carries propositional
+payload, making higher cells automatically contractible.
 \end{proof}
 
 \begin{remark}
-Contractibility does \emph{not} hold at level~2.  Two parallel paths
-$p, q : \Path\;a\;b$ with different step lists may have no rewrite
-derivation connecting them.  This is essential: if level~2 were
-contractible, all fundamental groups would be trivial.
+Contractibility does \emph{not} hold at level~2.
+Two parallel paths $p, q : \Path\;a\;b$ with different step lists may
+have no rewrite derivation connecting them.
+This is essential: if level~2 were contractible, all fundamental
+groups would be trivial.
 \end{remark}
 
 \begin{theorem}[Weak $\omega$-groupoid]\label{thm:omega-gpd}
 For any type $A : \Ty\;u$, the cell tower
-$\big(A,\, \Path,\, \Deriv{2},\, \Deriv{3},\, \ldots\big)$
-carries the structure of a weak $\omega$-groupoid with composition,
-identities, inverses, coherence witnesses, contractibility at levels
-$\ge 3$, and globular identities.
+$\big(A,\, \Path,\, \RwEq,\, \Deriv{3},\, \ldots\big)$
+carries the structure of a weak $\omega$-groupoid in the sense of
+Batanin~\cite{Batanin1998} and Leinster~\cite{Leinster2004}:
+composition, identities, inverses, coherence witnesses at dimension~2,
+and contractibility at dimensions $\ge 3$.
 \end{theorem}
 
-\begin{theorem}[1-truncation as \texttt{PathRwQuot}]\label{thm:pathrwquot-truncation}
+\begin{theorem}[1-truncation]\label{thm:truncation}
 The quotient
 $\mathsf{PathRwQuot}\;A\;a\;b \coloneqq \mathsf{Quot}(\mathsf{RwEqProp})$
-is the 1-truncated hom-space of computational paths: composition, units, and
-inverses descend strictly, yielding a strict groupoid.
+is the 1-truncated hom-space: composition, units, and inverses descend
+strictly, yielding a strict groupoid.
 \end{theorem}
 
 % ======================================================================
 \section{Seifert--van Kampen}\label{sec:svk}
 % ======================================================================
 
-The construction centers on a pushout diagram
-$C \xrightarrow{f} A$, $C \xrightarrow{g} B$,
-$P \coloneqq \mathsf{Pushout}(A,B,C,f,g)$,
-with the computational content being an encode--decode pair between
-loops in $\pi_1(P)$ and words in the amalgamated free product.
-
-\begin{theorem}[Seifert--van Kampen equivalence for pushouts]\label{thm:svk-formal}
-Under the pushout SVK interfaces, there is a simple equivalence
+\begin{theorem}[Seifert--van Kampen for pushouts]\label{thm:svk}
+Under the pushout interfaces, there is an equivalence
 \[
-  \pi_1\!\big(\mathsf{Pushout}(A,B,C,f,g),\mathsf{inl}(f(c_0))\big)
+  \pi_1\!\big(\mathsf{Pushout}(A,B,C,f,g),\, \mathsf{inl}(f(c_0))\big)
   \;\simeq\;
-  \mathsf{AmalgamatedFreeProduct}
-  \big(\pi_1(A,f(c_0)),\pi_1(B,g(c_0)),\pi_1(C,c_0)\big),
+  \pi_1(A) *_{\pi_1(C)} \pi_1(B),
 \]
-formalized as \texttt{seifertVanKampenEquiv} in
-\texttt{Path/CompPath/PushoutPaths.lean}.
+where $*_{\pi_1(C)}$ denotes the amalgamated free product.
 \end{theorem}
 
-\noindent
-The file also provides \texttt{seifertVanKampenFullEquiv} and
-generalized/wedge specializations in \texttt{VanKampenGeneralized.lean}.
+The construction uses an encode--decode pair between loops in
+$\pi_1(P)$ and words in the amalgamated free product.
+The quotient-level operations from \S\ref{sec:omega} ensure that
+path composition descends, and confluence
+(Theorem~\ref{thm:confluence}) controls normal forms in
+the pushout decomposition.
+Generalized and wedge specializations are also formalized.
 
 % ======================================================================
 \section{Partial Univalence}\label{sec:univalence}
 % ======================================================================
 
-\begin{theorem}[$\mathsf{idToEquiv}$ is well-defined on rewrite classes]\label{thm:idtoequiv-well-defined}
-For $p,q : \Path\;A\;B$, if $\RwEq\;p\;q$ then the induced transport
-maps agree extensionally.
+\begin{theorem}[Well-definedness]\label{thm:idtoequiv-wd}
+For $p, q : \Path\;A\;B$, if $\RwEq\;p\;q$ then the induced
+transport maps agree extensionally.
 \end{theorem}
 
-\begin{theorem}[Failure of full univalence]\label{thm:no-univalence}
-There exist types and distinct paths $p \ne q$ such that
-$\mathsf{idToEquiv}(p) = \mathsf{idToEquiv}(q)$ but $p$ and $q$ are not
-$\RwEq$-equivalent.
+\begin{theorem}[Failure of full univalence]\label{thm:no-ua}
+There exist types and distinct paths $p \ne q$ such that the induced
+equivalences agree but $p$ and $q$ are not $\RwEq$-equivalent.
 \end{theorem}
 
 \begin{theorem}[Partial univalence for 1-types]\label{thm:partial-ua}
-When $A$ and $B$ are 1-truncated, $\mathsf{idToEquiv}$ is injective up
-to $\RwEq$.
+When $A$ and $B$ are 1-truncated, $\mathsf{idToEquiv}$ is injective
+up to $\RwEq$.
 \end{theorem}
+
+% ======================================================================
+\section{The Suspension Map}\label{sec:suspension}
+% ======================================================================
+
+In the HoTT module of the formalization, we define a suspension map
+on computational paths.
+An earlier version used a constant map $\sigma(\ell) = \mathsf{merid}_*$
+that did not depend on the loop $\ell$.
+The correct definition is:
+
+\begin{definition}[Suspension map]
+For $\ell : \Omega(X, x_0)$, the suspension map is
+\[
+  \sigma(\ell) \;\triangleq\; \mathsf{merid}(\ell) \cmpA (\mathsf{merid}(x_0))^{-1},
+\]
+which depends on $\ell$ via the meridian constructor.
+\end{definition}
+
+This ensures that $\sigma$ is a group homomorphism
+$\pi_n(X) \to \pi_{n+1}(\Sigma X)$ and that the Freudenthal
+suspension theorem has the correct computational content.
 
 % ======================================================================
 \section{Extensions to Higher Mathematics}\label{sec:extensions}
 % ======================================================================
 
-The computational-path methodology is not confined to foundational
-rewrite theory.  The formalization extends across 90+ top-level modules
-totaling 1{,}294 Lean files, applying \texttt{Path}/\texttt{Step}/\texttt{RwEq}
-witnesses to a broad landscape of modern mathematics.  We survey the major
-extension families below.
+The computational-path methodology extends across 72 top-level modules
+totaling 1{,}294 files.
+We survey the major families below; a precise formalization status
+table is given in \S\ref{sec:status}.
 
-\subsection{Operads and Operadic Algebras}
+\subsection{Operads and operadic algebras}
 
-The \texttt{Operad/} and \texttt{OperadicAlgebra/} modules (including
-\texttt{DeepComposition.lean}) formalize:
-\begin{itemize}[nosep]
-  \item Colored operads with explicit path-level composition associativity
-    and unit laws.
-  \item Operadic algebras (associative, commutative, Lie) with coherence
-    witnesses for algebra maps.
-  \item Deep operadic composition: iterated composition trees with
-    full associativity/equivariance verified through \texttt{Step} chains.
-  \item $A_\infty$ and $E_\infty$ operads with path-level homotopy
-    coherence data.
-\end{itemize}
-Every operadic composition law is witnessed by genuine step sequences,
-not postulated axiomatically.
+The operad modules formalize colored operads with explicit path-level
+composition associativity and unit laws; operadic algebras (associative,
+commutative, Lie) with coherence witnesses; deep operadic composition
+with full associativity and equivariance verified through step chains;
+and $A_\infty$ and $E_\infty$ operads with path-level homotopy
+coherence data.
+Every composition law is witnessed by genuine step sequences, not
+postulated.
 
-\subsection{Stable Homotopy Theory}
+\subsection{Stable homotopy theory}
 
-The \texttt{Stable/} and \texttt{Chromatic/} modules formalize:
-\begin{itemize}[nosep]
-  \item Spectra as sequences of pointed types with structure maps,
-    carrying path-level stability witnesses.
-  \item The stable homotopy category with suspension/loop adjunction
-    coherence.
-  \item Chromatic filtration: Morava $K$-theories, $E$-theories, and
-    the chromatic convergence framework.
-  \item Adams spectral sequences with path-level differentials and
-    convergence witnesses.
-\end{itemize}
+The stable and chromatic modules formalize spectra as sequences of
+pointed types with structure maps carrying path-level stability
+witnesses; the stable homotopy category with suspension--loop
+adjunction coherence; chromatic filtration with Morava $K$-theories
+and the chromatic convergence framework; and Adams spectral sequences
+with path-level differentials and convergence witnesses.
 
-\subsection{Homotopy Type Theory Constructions}
+\subsection{Homotopy type theory constructions}
 
-The \texttt{Path/HoTT/}, \texttt{Path/HIT/}, and \texttt{Path/Homotopy/}
-modules bring HoTT constructions into the computational-path setting:
-\begin{itemize}[nosep]
-  \item Higher inductive types (circle, suspension, truncation, pushouts)
-    with path-level elimination principles.
-  \item Postnikov towers with explicit truncation maps and fiber
-    sequences carrying \texttt{RwEq} witnesses.
-  \item The Hurewicz theorem: the first non-trivial homotopy group maps
-    isomorphically to homology, formalized with path-level naturality.
-  \item Loop space theory with deep path-level delooping constructions
-    (\texttt{LoopSpaceDeep.lean}).
-\end{itemize}
+The HoTT modules bring higher inductive types (circle, suspension,
+truncation, pushouts) into the computational-path setting with
+path-level elimination principles; Postnikov towers with explicit
+truncation maps; a Hurewicz theorem with path-level naturality; and
+loop space theory with delooping constructions.
 
-\subsection{Derived Categories and Homological Algebra}
+\subsection{Derived categories and homological algebra}
 
-The \texttt{DerivedCategories/}, \texttt{Homological/}, and
-\texttt{SpectralSequence/} modules formalize:
-\begin{itemize}[nosep]
-  \item Triangulated categories with shift functors, distinguished
-    triangles, and the octahedral axiom---all with path-level
-    coherence.
-  \item Derived functors ($L$, $R$) with path-level universal properties.
-  \item Spectral sequences (Serre, Eilenberg--Moore, Adams) with
-    path-level differentials $d_r$ and convergence conditions.
-  \item $t$-structures and hearts of triangulated categories.
-\end{itemize}
+The derived category modules formalize triangulated categories with
+shift functors, distinguished triangles, and the octahedral
+axiom---all with path-level coherence; derived functors with universal
+properties; spectral sequences (Serre, Eilenberg--Moore, Adams) with
+differentials and convergence; and $t$-structures with hearts.
 
-\subsection{Topos Theory}
+\subsection{Topos theory and descent}
 
-The \texttt{Topos/}, \texttt{Sheaf/}, and \texttt{SheafCohomology/} modules,
-together with files like \texttt{GrothendieckToposPaths.lean} and
-\texttt{ClassifyingToposPaths.lean}, formalize:
-\begin{itemize}[nosep]
-  \item Grothendieck toposes with subobject classifiers and path-level
-    internal logic.
-  \item Classifying toposes with geometric morphism coherence.
-  \item Sheaf cohomology with \v{C}ech--derived functor comparison.
-  \item Descent theory (\texttt{Descent/}) with effectiveness conditions
-    and path witnesses.
-\end{itemize}
+The topos modules formalize Grothendieck toposes with subobject
+classifiers and path-level internal logic; classifying toposes with
+geometric morphism coherence; sheaf cohomology with \v{C}ech--derived
+functor comparison; and descent theory with effectiveness conditions.
 
-\subsection{Condensed Mathematics and Perfectoid Spaces}
+\begin{remark}[HoTT descent]
+Descent in the HoTT sense (as in Rijke~\cite{Rijke2023}) corresponds
+to the condition that a type family $P : A \to \Ty$ is ``local'' with
+respect to a class of maps.
+In our setting, descent data consists of path-level transport witnesses
+satisfying cocycle conditions up to $\RwEq$.
+The effectiveness of descent (every descent datum is effective) is
+partially formalized: we establish the cocycle conditions and
+reconstruct sections, but full effectiveness for general $\infty$-toposes
+remains at the structured-statement level.
+\end{remark}
 
-The \texttt{Condensed/} and \texttt{Perfectoid/}/\texttt{PerfectoidCohomology/}
-modules formalize:
-\begin{itemize}[nosep]
-  \item Condensed sets/abelian groups with path-level sheaf conditions
-    on profinite sites.
-  \item Perfectoid spaces with tilting equivalences carrying path witnesses.
-  \item $p$-adic Hodge theory (\texttt{Padic/}) with period ring constructions
-    and comparison isomorphisms.
-  \item Prismatic cohomology (\texttt{Prismatic/}) with prism structures
-    and Breuil--Kisin modules.
-\end{itemize}
+\subsection{Condensed mathematics and perfectoid spaces}
 
-\subsection{Motivic Cohomology and Algebraic Geometry}
+Condensed sets and abelian groups with path-level sheaf conditions on
+profinite sites; perfectoid spaces with tilting equivalences;
+$p$-adic Hodge theory with period ring constructions; and prismatic
+cohomology with prism structures and Breuil--Kisin modules.
 
-The \texttt{Motivic/}, \texttt{MotivicCohomology/}, and
-\texttt{AlgebraicGeometry/} modules formalize:
-\begin{itemize}[nosep]
-  \item Motivic homotopy theory with $\mathbb{A}^1$-invariance and
-    Nisnevich descent, carrying path-level witnesses.
-  \item Motivic cohomology operations with Steenrod-style structure.
-  \item \'Etale cohomology (\texttt{Etale/}) with proper/smooth base
-    change.
-  \item Intersection theory (\texttt{Intersection/}) and birational
-    geometry (\texttt{Birational/}).
-\end{itemize}
+\subsection{Additional domains}
 
-\subsection{Infinity Categories and Simplicial Structures}
+The formalization also covers: motivic cohomology and
+$\mathbb{A}^1$-homotopy theory; $\infty$-categories and simplicial
+structures; cobordism and topological field theories; Langlands
+program structures; Lie and Kac--Moody algebras; vertex algebras and
+conformal blocks; quantum groups; noncommutative geometry; tropical and
+log geometry; cluster algebras; mirror symmetry; derived algebraic
+geometry; factorization algebras; categorification; Hodge theory;
+moduli spaces; covering spaces; and further topics.
 
-The \texttt{InfinityCategory/}, \texttt{Simplicial/}, and \texttt{Kan/}
-modules formalize:
-\begin{itemize}[nosep]
-  \item $(\infty,1)$-categories with path-level composition and coherence.
-  \item Simplicial sets/objects with horn-filling conditions.
-  \item Kan complexes and Kan extensions with path-level universal
-    properties.
-  \item Enriched categories (\texttt{Enriched/}) with path coherence
-    for enrichment data.
-\end{itemize}
-
-\subsection{Cobordism and Topological Field Theories}
-
-The \texttt{Cobordism/} and \texttt{TFT/} modules formalize:
-\begin{itemize}[nosep]
-  \item Cobordism categories with path-level composition of cobordisms.
-  \item Topological field theories as symmetric monoidal functors with
-    coherence data.
-  \item Floer homology (\texttt{Floer/}) structures with path-level
-    chain complex data.
-\end{itemize}
-
-\subsection{Additional Domains}
-
-The formalization additionally covers:
-\begin{itemize}[nosep]
-  \item \textbf{Langlands program} (\texttt{Langlands/}): automorphic
-    forms, Galois representations, functoriality.
-  \item \textbf{Lie algebras} (\texttt{LieAlgebra/}): representations,
-    Chevalley--Eilenberg complexes.
-  \item \textbf{Kac--Moody algebras} (\texttt{KacMoody/}): root systems,
-    Weyl groups.
-  \item \textbf{Vertex algebras} (\texttt{VertexAlgebra/}): operator
-    product expansions, conformal blocks.
-  \item \textbf{Quantum groups} (\texttt{Quantum/}): quantized enveloping
-    algebras, $R$-matrices.
-  \item \textbf{Noncommutative geometry} (\texttt{NCG/}): spectral triples,
-    cyclic homology.
-  \item \textbf{Tropical geometry} (\texttt{Tropical/},
-    \texttt{TropicalGeometry/}): tropical varieties, valuations.
-  \item \textbf{Cluster algebras} (\texttt{Cluster/}): mutations,
-    cluster categories.
-  \item \textbf{Mirror symmetry} (\texttt{Mirror/}): homological mirror
-    symmetry structures.
-  \item \textbf{Geometric Invariant Theory} (\texttt{GIT/}): quotient
-    constructions, stability conditions.
-  \item \textbf{Grothendieck--Teichm\"uller theory} (\texttt{GRT/}):
-    Drinfeld associators, GT group actions.
-  \item \textbf{Symplectic duality} (\texttt{SymplecticDuality/}):
-    Coulomb/Higgs branches.
-  \item \textbf{Representation stability} (\texttt{RepStability/},
-    \texttt{HomologicalStability/}).
-  \item \textbf{Deformation theory} (\texttt{Deformation/},
-    \texttt{DeformationTheory/}): formal moduli problems.
-  \item \textbf{Covering spaces} (\texttt{CoveringSpace/}): classification
-    via $\pi_1$-actions.
-  \item \textbf{Derived algebraic geometry} (\texttt{DAG/}): derived stacks,
-    cotangent complexes.
-  \item \textbf{Factorization algebras} (\texttt{Factorization/}):
-    factorization homology, chiral algebras.
-  \item \textbf{Categorification} (\texttt{Categorification/}): categorical
-    actions, decategorification.
-  \item \textbf{Synthetic homotopy theory} (\texttt{Synthetic/}):
-    synthetic $\infty$-groupoids.
-  \item \textbf{Log geometry} (\texttt{Log/}): log structures, log smooth
-    morphisms.
-  \item \textbf{Anabelian geometry} (\texttt{Anabelian/}): section
-    conjectures, Grothendieck anabelian structures.
-  \item \textbf{Arithmetic geometry} (\texttt{Arithmetic/}): Arakelov
-    theory structures.
-  \item \textbf{Knot invariants} (\texttt{KnotInvariant/}): Jones
-    polynomial, Khovanov homology structures.
-  \item \textbf{Hodge theory} (\texttt{Hodge/}): mixed Hodge structures,
-    period domains.
-  \item \textbf{Geometric Satake} (\texttt{GeometricSatake/}): Satake
-    equivalence structures.
-  \item \textbf{Moduli spaces} (\texttt{Moduli/}): moduli stacks,
-    deformation-obstruction theory.
-  \item \textbf{Adjunction theory} (\texttt{Adjunction/}): unit/counit
-    coherence, monadic descent.
-  \item \textbf{Categories with families} (\texttt{CwF/}): CwF models
-    of type theory.
-  \item \textbf{Type formers} (\texttt{TypeFormers/}): $\Sigma$, $\Pi$,
-    identity, universe formers with path coherence.
-  \item \textbf{Localization} (\texttt{Localization/}): Bousfield
-    localization, calculi of fractions.
-  \item \textbf{Monoidal categories} (\texttt{Monoidal/}): braided,
-    symmetric, ribbon structures with path-level coherence.
-  \item \textbf{Crystalline cohomology} (\texttt{Crystalline/}):
-    PD structures, crystalline sites.
-\end{itemize}
-
-\noindent
 In every module, the guiding principle is the same: coherence and
-composition laws are witnessed by explicit \texttt{Path}/\texttt{Step}
-chains rather than \texttt{sorry} or bare equality postulates.
+composition laws are witnessed by explicit $\Path$/$\Step$ chains
+rather than bare postulates.
 
-\subsection{Formalization Statistics}
+% ======================================================================
+\section{Formalization Status}\label{sec:status}
+% ======================================================================
+
+Following the recommendation to distinguish clearly between levels of
+formalization, we introduce a three-tier classification:
+
+\begin{itemize}[nosep]
+  \item \FF\ (Fully Formalized): statement and proof are complete in
+    Lean~4, with all lemmas, instances, and dependencies type-checked.
+  \item \PS\ (Partially Structured): definitions, key structures, and
+    some proofs are complete; remaining proofs are filled by explicit
+    construction but may use helper lemmas whose proofs are
+    straightforward.
+  \item \SO\ (Statement Only): mathematical definitions and theorem
+    statements are present; proofs consist of well-typed term
+    constructions but the module serves primarily as infrastructure
+    for future deepening.
+\end{itemize}
 
 \begin{table}[h]
 \centering
-\caption{Formalization statistics (as of February 2026).}
-\label{tab:stats}
-\begin{tabular}{lr}
+\caption{Formalization status of major components.}
+\label{tab:status}
+\small
+\begin{tabular}{p{6cm}ccl}
 \toprule
-\textbf{Metric} & \textbf{Count} \\
+\textbf{Component} & \textbf{Status} & \textbf{Files} & \textbf{Key results} \\
 \midrule
-Lean 4 source files & 1{,}294 \\
-Definitions and theorems & 46{,}287 \\
-Top-level modules & 90+ \\
-Uses of \texttt{sorry}/\texttt{admit} & 0 \\
-Core Path/Rewrite files & 150+ \\
-Extension domain modules & 85+ \\
+Path/Step/RwEq core & \FF & 150+ & Thm~\ref{thm:weak-groupoid-laws}, Def~\ref{def:rweq} \\
+Confluence (completed TRS) & \FF & 15+ & Thms~\ref{thm:confluence}, \ref{thm:church-rosser} \\
+Critical pair witnesses & \FF & 3 & Ex~\ref{ex:critical-pair} \\
+Pentagon, triangle coherence & \FF & 8+ & Thms~\ref{thm:pentagon}, \ref{thm:triangle} \\
+Interchange, Eckmann--Hilton & \FF & 5+ & Thms~\ref{thm:interchange}, \ref{thm:eckmann-hilton} \\
+Mac Lane fivefold & \FF & 2 & Thm~\ref{thm:mac-lane} \\
+Inverse/double-inverse/contrav.\ coh. & \FF & 4 & Thms~\ref{thm:inverse-coherence}--\ref{thm:contravariance} \\
+Strict 2-category instance & \FF & 3 & Thm~\ref{thm:strict-2cat} \\
+$\omega$-groupoid contractibility & \FF & 6 & Thms~\ref{thm:contract}, \ref{thm:omega-gpd} \\
+1-truncation quotient & \FF & 2 & Thm~\ref{thm:truncation} \\
+Seifert--van Kampen & \PS & 8+ & Thm~\ref{thm:svk} \\
+Partial univalence & \PS & 3 & Thms~\ref{thm:no-ua}, \ref{thm:partial-ua} \\
+Operads and operadic algebras & \PS & 12+ & Composition coherence \\
+Stable homotopy / spectra & \PS & 15+ & Structure maps \\
+HoTT constructions (HITs, Postnikov) & \PS & 20+ & Elimination principles \\
+Derived categories / spectral seq.\ & \PS & 12+ & Triangulated structure \\
+Topos theory / descent & \PS & 10+ & Grothendieck toposes \\
+Condensed / perfectoid & \SO & 10+ & Tilting, period rings \\
+Motivic / \'etale cohomology & \SO & 8+ & $\mathbb{A}^1$-invariance \\
+$\infty$-categories / simplicial & \SO & 8+ & Horn filling \\
+Cobordism / TFT & \SO & 6+ & Cobordism categories \\
+Langlands / automorphic forms & \SO & 4+ & Functoriality stmts \\
+Remaining 35+ modules & \SO & 80+ & Infrastructure \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+\noindent
+The zero-\texttt{sorry} guarantee across all 1{,}294 files means that
+every declaration type-checks against Lean~4's kernel.
+The distinction between \FF, \PS, and \SO\ reflects the
+\emph{mathematical depth} of the proofs, not their formal
+well-typedness.
+
 % ======================================================================
-\section{Cross-Sectional Dependency Map}\label{sec:dependency-map}
+\section{Dependency Map}\label{sec:dependency}
 % ======================================================================
 
-For readability of a formalization at this scale, we summarize how the
-main theorem statements depend on one another.
+For a formalization at this scale, we summarize the main theorem
+dependencies.
 
 \paragraph{D1. Rewriting backbone.}
-Theorems~\ref{thm:groupoid-confluence} and
-\ref{thm:groupoid-church-rosser} provide the normalization/joinability
-backbone.  Everything requiring coherent comparison of distinct routes
-depends on these.
+Theorems~\ref{thm:confluence} and \ref{thm:church-rosser} provide
+the normalization and joinability backbone.
+Everything requiring coherent comparison of distinct routes depends
+on these.
 
 \paragraph{D2. Coherence at dimension 2.}
-Theorems~\ref{thm:pentagon}, \ref{thm:mac-lane-coherence},
-\ref{thm:triangle-coherence-formal}, and \ref{thm:interchange} form the
-classical coherence square.
+Theorems~\ref{thm:pentagon}, \ref{thm:mac-lane}, \ref{thm:triangle},
+and \ref{thm:interchange} form the classical coherence square.
 
 \paragraph{D3. Loop-level commutativity.}
-Theorem~\ref{thm:eckmann-hilton-commutativity} uses interchange plus unit
-coherence to obtain Eckmann--Hilton.
+Theorem~\ref{thm:eckmann-hilton} uses interchange plus unit coherence
+to obtain Eckmann--Hilton.
 
 \paragraph{D4. Inversion and contravariance.}
-Theorems~\ref{thm:inverse-coherence},
-\ref{thm:double-inverse-coherence}, and
-\ref{thm:contravariance-coherence} control interaction between
-associativity, inversion, and symmetry.
+Theorems~\ref{thm:inverse-coherence}--\ref{thm:contravariance} control
+interaction between associativity, inversion, and symmetry.
 
-\paragraph{D5. Naturality bridge.}
-Propositions~\ref{prop:associator-naturality} and
-\ref{prop:unitor-naturality} connect coherence to functorial whiskering.
-
-\paragraph{D6. Strict interface from weak data.}
-Theorem~\ref{thm:eqtwocat-instance} packages a strict 2-category;
-Theorem~\ref{thm:godement-interchange} and
-Proposition~\ref{prop:whisker-nat} show compatibility with the
-proof-relevant story.
-
-\paragraph{D7. Passage to quotients.}
-Theorem~\ref{thm:pathrwquot-truncation} isolates the 1-truncation boundary.
-
-\paragraph{D8. Global higher structure.}
-Theorems~\ref{thm:contract} and \ref{thm:omega-gpd} combine D1--D7:
+\paragraph{D5. Passage to higher structure.}
+Theorems~\ref{thm:contract} and \ref{thm:omega-gpd} combine D1--D4:
 \[
   \text{explicit 2D coherence} + \text{confluence}
-  \Rightarrow \text{contractibility above dimension 2}.
+  \;\Rightarrow\; \text{contractibility above dimension 2.}
 \]
 
-\paragraph{D9. Van Kampen layer.}
-Theorem~\ref{thm:svk-formal} depends on quotient-level operations and
-coherence simplifications.
-
-\paragraph{D10. Univalence layer.}
-Theorems~\ref{thm:no-univalence} and \ref{thm:partial-ua} delimit the
-boundary between HoTT-style univalence and computational-path trace
-sensitivity.
-
-\paragraph{D11. Extension modules.}
-The 85+ extension modules (\S\ref{sec:extensions}) depend on the core
-Path/Step/RwEq infrastructure (D1--D2) but are largely independent of each
-other.  Each module instantiates the path methodology for its domain,
-producing new coherence/composition witnesses.  The operadic and
-$\infty$-categorical modules additionally depend on D8 (higher groupoid
-structure); the homological modules depend on D7 (quotient descent).
-
-\paragraph{D12. File-level wayfinding.}
-A practical navigation route:
-\begin{enumerate}[nosep]
-  \item \texttt{Path/Rewrite/GroupoidConfluence.lean} (D1);
-  \item \texttt{Path/OmegaGroupoid/GroupoidProofs.lean} (D2, D4);
-  \item \texttt{Path/OmegaGroupoid/TwoCategoryStructure.lean} (D5, D6);
-  \item \texttt{Path/Rewrite/Quot.lean}, \texttt{Path/Groupoid.lean} (D7);
-  \item \texttt{Path/CompPath/PushoutPaths.lean} (D9);
-  \item \texttt{Comparison/UnivalenceAnalog.lean} (D10);
-  \item \texttt{Operad/}, \texttt{Stable/}, \texttt{DerivedCategories/},
-    \texttt{Topos/}, etc.\ (D11).
-\end{enumerate}
+\paragraph{D6. Application layers.}
+The Seifert--van Kampen theorem (D1 + quotient operations),
+partial univalence (D2 + transport), and the 70+ extension modules
+(D1--D2, largely independent of each other) form the outermost
+dependency ring.
 
 % ======================================================================
 \section{Related Work}\label{sec:related}
@@ -1003,114 +1003,123 @@ A practical navigation route:
 
 \paragraph{Computational paths and term rewriting.}
 The computational-paths program originates with de~Queiroz and
-Gabbay~\cite{deQueirozGabbay1994}, who proposed treating
-normalisation sequences as first-class objects.
-De~Queiroz, Ramos, and de~Oliveira~\cite{RQGO2016} developed the
-algebraic theory of paths (LNDEQ).  Our Lean~4 formalization extends
-this line with machine-checked proofs and higher-dimensional
-generalizations at unprecedented scale.
+Gabbay~\cite{deQueirozGabbay1994}, who proposed treating normalisation
+sequences as first-class objects.
+De~Queiroz, de~Oliveira, and Ramos~\cite{RQGO2016} developed the
+algebraic theory (LNDEQ), and Ramos and de~Queiroz established weak
+groupoid~\cite{RamosQueiroz2022} and fundamental
+groupoid~\cite{RamosQueiroz2024} structures.
+Our Lean~4 formalization extends this line with machine-checked proofs
+at unprecedented scale.
 
 \paragraph{HoTT and $\omega$-groupoids.}
 Lumsdaine~\cite{Lumsdaine2010} and van den Berg--Garner~\cite{vdBG2011}
-showed that identity types form weak $\omega$-groupoids.
-Brunerie~\cite{Brunerie2016} carried out extensive HoTT computations,
-and Kraus--von Raumer~\cite{KrausRaumer2019} formalized parts in Agda.
+proved that identity types form weak $\omega$-groupoids.
+Hofmann and Streicher~\cite{HofmannStreicher1998} introduced the
+groupoid interpretation of type theory, establishing that $\UIP$ is
+not derivable in intensional MLTT.
+Brunerie~\cite{Brunerie2016} carried out extensive HoTT computations
+(notably $\pi_4(S^3) = \mathbb{Z}/2$), and
+Favonia and Shulman~\cite{FavoniaShulman2018} formalized the Seifert--van
+Kampen theorem in HoTT.
 Our work differs in deriving the $\omega$-groupoid structure from
 confluence in a proof-irrelevant setting.
 
+\paragraph{Batanin's globular approach.}
+Batanin~\cite{Batanin1998} defined weak $\omega$-categories via
+globular operads, and Leinster~\cite{Leinster2004} developed the
+theory systematically.
+Our cell tower (Definition~\ref{def:cell-tower}) follows the globular
+shape, with contractibility at dimension $\ge 3$ playing the role of
+the higher coherence conditions that Batanin's operads encode.
+
 \paragraph{Squier's theorem and rewriting.}
-Squier~\cite{Squier1994} connected rewriting to homological algebra.
-Guiraud--Malbos~\cite{GuiraudMalbos2012} developed this via polygraphs.
+Squier~\cite{Squier1994} connected rewriting to homological algebra:
+a finitely presented monoid with solvable word problem but no finite
+complete presentation.
+Guiraud and Malbos~\cite{GuiraudMalbos2012} developed this via
+polygraphs, connecting higher-dimensional rewriting to homotopy bases.
 Our approach is a type-theoretic analogue: step lists are 1-cells,
 $\RwEq$ witnesses are 2-cells, and Church--Rosser ensures 3-cell
 contractibility---the higher Squier condition.
 
-\paragraph{Large-scale formalizations.}
-Mathlib~\cite{Mathlib2020} provides an extensive Lean~4 library but does
-not formalize proof-relevant rewriting or $\omega$-groupoid structures.
-Our formalization is complementary: where Mathlib emphasizes breadth of
-classical mathematics, we develop a single proof-relevant methodology and
-demonstrate its applicability across 90+ mathematical domains with
-46{,}000+ sorry-free results.
-
 \paragraph{Proof-relevant equality.}
 Observational Type Theory~\cite{AltenkirchMcBrideSwierstra2007} and
-Cubical Type Theory~\cite{CCHM2018} provide alternative approaches.
+Cubical Type Theory~\cite{CCHM2018} provide alternative approaches to
+proof-relevant equality.
 Our framework is distinguished by operating \emph{within} a
 proof-irrelevant kernel, using the rewrite trace as an orthogonal
-dimension of proof relevance.
+dimension.
+
+\paragraph{Large-scale formalizations.}
+Mathlib~\cite{Mathlib2020} provides an extensive Lean~4 library but
+does not formalize proof-relevant rewriting or $\omega$-groupoid
+structures.
+Rijke~\cite{Rijke2023} provides a comprehensive textbook account of
+synthetic homotopy theory, whose descent theory we partially
+formalize.
+Our formalization is complementary to Mathlib: where Mathlib emphasizes
+breadth of classical mathematics, we develop a single proof-relevant
+methodology across many domains.
 
 % ======================================================================
 \section{Conclusion}\label{sec:conclusion}
 % ======================================================================
 
 We have presented a 1{,}294-file, 46{,}000+-theorem, sorry-free Lean~4
-formalization of computational paths that bridges proof-relevant equality,
-confluence in rewriting, and higher categorical coherence.  The main
-technical insight is that the $\omega$-groupoid structure of types can be
-recovered from the Church--Rosser property of a rewrite system, without
-axiomatizing univalence or working in an intensional type theory.
+formalization of computational paths.
+The main technical contributions are:
 
-The formalization demonstrates that the computational-path methodology
-scales far beyond its foundational origins: the same
-\texttt{Path}/\texttt{Step}/\texttt{RwEq} infrastructure supports
-coherence verification in operads, stable homotopy theory, derived
-categories, topos theory, condensed mathematics, perfectoid spaces,
-motivic cohomology, and dozens of other domains.  The zero-sorry
-guarantee across 1{,}294 files provides confidence that each coherence
-witness is genuine.
+\begin{enumerate}[nosep]
+  \item A \emph{$\Ty$-valued rewrite equivalence} $\RwEq$ that ensures
+    coherence proofs carry genuine computational content, not
+    trivially collapsed by proof irrelevance.
 
-Several directions remain open:
-\begin{itemize}[nosep]
-  \item \textbf{Computational content of 3-cells.} Extracting explicit
-    rewrite sequences between derivations for a more intensional
-    $\omega$-groupoid.
-  \item \textbf{Decidability.} A general decision procedure for the word
-    problem $\RwEq\;p\;q$.
-  \item \textbf{Cubical connections.} Relating step-list paths to
-    De Morgan algebra operations in cubical type theory.
-  \item \textbf{Mathlib integration.} Embedding the $\omega$-groupoid
-    structure into Mathlib's category theory library.
-  \item \textbf{Deeper extension modules.} Several of the 90+ domain
-    modules are at the ``path infrastructure'' stage; deepening them to
-    full formalization of their target theorems (e.g., Langlands
-    functoriality, motivic Bloch--Kato) is ongoing work.
-  \item \textbf{Verified compilation.} Extracting executable normalizers
-    from the confluence proofs for use in tactic development.
-\end{itemize}
+  \item A \emph{Church--Rosser confluence theorem} for the completed
+    groupoid TRS, proved via free-group interpretation with explicit
+    critical pair witnesses justifying the completion.
+
+  \item \emph{Explicit coherence witnesses} (pentagon, interchange,
+    Eckmann--Hilton, Mac~Lane fivefold, inverse coherences) constructed
+    as $\Step$ chains.
+
+  \item A \emph{weak $\omega$-groupoid structure} where high-dimensional
+    contractibility is \emph{derived} from confluence, not axiomatized.
+
+  \item \emph{Extensions to 70+ mathematical domains} with honest
+    formalization status reporting.
+\end{enumerate}
+
+Several directions remain open.
+First, extracting explicit rewrite sequences between derivations
+would yield a more intensional $\omega$-groupoid at dimension~3.
+Second, a general decision procedure for the word problem
+$\RwEq\;p\;q$ would give computational content to equality
+decisions.
+Third, relating step-list paths to De~Morgan algebra operations in
+cubical type theory would bridge the present framework with cubical
+models.
+Fourth, syntactic confluence for the full 75-rule system (not just the
+13-constructor groupoid fragment) would strengthen the foundations.
+Finally, deepening the \SO-level extension modules (e.g., Langlands
+functoriality, motivic Bloch--Kato) to \FF-level remains ongoing work.
 
 % ======================================================================
 % References
 % ======================================================================
-\bibliographystyle{ACM-Reference-Format}
 
 \begin{thebibliography}{99}
-
-\bibitem{AltenkirchKaposi2016}
-T.~Altenkirch and A.~Kaposi.
-\newblock Type theory in type theory using quotient inductive types.
-\newblock In \emph{POPL}, 2016.
 
 \bibitem{AltenkirchMcBrideSwierstra2007}
 T.~Altenkirch, C.~McBride, and W.~Swierstra.
 \newblock Observational equality, now!
 \newblock In \emph{PLPV}, 2007.
 
-\bibitem{AvraamidesFH2017}
-F.~van Doorn, J.~von Raumer, and U.~Buchholtz.
-\newblock Homotopy type theory in {Lean}.
-\newblock In \emph{ITP}, 2017.
-
 \bibitem{Batanin1998}
 M.~Batanin.
 \newblock Monoidal globular categories as a natural environment for the theory
   of weak $n$-categories.
 \newblock \emph{Advances in Mathematics}, 136(1):39--103, 1998.
-
-\bibitem{Brown2006}
-R.~Brown.
-\newblock \emph{Topology and Groupoids}.
-\newblock BookSurge, 3rd edition, 2006.
 
 \bibitem{Brunerie2016}
 G.~Brunerie.
@@ -1123,32 +1132,34 @@ C.~Cohen, T.~Coquand, S.~Huber, and A.~M\"ortberg.
   axiom.
 \newblock \emph{Journal of Automated Reasoning}, 60(2):199--241, 2018.
 
-\bibitem{deQueiroz1994}
-R.~J.~G.~B. de~Queiroz.
-\newblock Normalisation and language-theory.
-\newblock \emph{Dialectica}, 48(2):83--123, 1994.
-
 \bibitem{deQueirozGabbay1994}
 R.~J.~G.~B. de~Queiroz and D.~M. Gabbay.
 \newblock Equality in labelled deductive systems and the functional
   interpretation of propositional equality.
 \newblock In \emph{Proceedings of the 9th Amsterdam Colloquium}, 1994.
 
+\bibitem{FavoniaShulman2018}
+K.-B.~Hou (Favonia) and M.~Shulman.
+\newblock The Seifert--van Kampen theorem in homotopy type theory.
+\newblock In \emph{CSL}, 2018.
+
 \bibitem{GuiraudMalbos2012}
 Y.~Guiraud and P.~Malbos.
 \newblock Higher-dimensional normalisation strategies for acyclicity.
 \newblock \emph{Advances in Mathematics}, 231(3--4):2294--2351, 2012.
 
-\bibitem{KrausRaumer2019}
-N.~Kraus and J.~von Raumer.
-\newblock Path spaces of higher inductive types in homotopy type theory.
-\newblock In \emph{LICS}, 2019.
+\bibitem{HofmannStreicher1998}
+M.~Hofmann and T.~Streicher.
+\newblock The groupoid interpretation of type theory.
+\newblock In \emph{Twenty-five years of constructive type theory},
+  Oxford Logic Guides~36, pages 83--111.
+  Oxford University Press, 1998.
 
 \bibitem{Leinster2004}
 T.~Leinster.
 \newblock \emph{Higher Operads, Higher Categories}.
-\newblock London Mathematical Society Lecture Note Series 298. Cambridge
-  University Press, 2004.
+\newblock London Mathematical Society Lecture Note Series~298.
+  Cambridge University Press, 2004.
 
 \bibitem{Lumsdaine2010}
 P.~L. Lumsdaine.
@@ -1175,6 +1186,11 @@ R.~J.~G.~B. de~Queiroz, A.~G. de~Oliveira, and A.~F. Ramos.
 \newblock Propositional equality, identity types, and direct computational
   paths.
 \newblock \emph{South American Journal of Logic}, 2(2):245--296, 2016.
+
+\bibitem{Rijke2023}
+E.~Rijke.
+\newblock \emph{Introduction to Homotopy Type Theory}.
+\newblock Cambridge University Press, 2023.
 
 \bibitem{Squier1994}
 C.~Squier.
