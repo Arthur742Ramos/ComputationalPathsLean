@@ -140,9 +140,9 @@ noncomputable def horizontal_comp (α β : TwoCell (A := A) a) :
     (Path.mapLeft (fun x y : Path a a => Path.trans x y) α (Path.refl a))
 
 noncomputable def eckmann_hilton_step (α β : TwoCell (A := A) a) :
-    Step (vertical_comp α β) (horizontal_comp α β) := by
+    Path.Step (vertical_comp α β) (horizontal_comp α β) := by
   change
-    Step
+    Path.Step
       (Path.map2 (A := Path a a) (B := Path a a) (C := Path a a)
         (fun x y : Path a a => Path.trans x y) α β)
       (Path.trans
@@ -191,50 +191,50 @@ theorem pentagon_routes_agree
 theorem triangle_routes_agree
     {a b c : A}
     (p : Path a b) (q : Path b c) :
-    rweq_toEq (triangle_left_route p q) =
-      rweq_toEq (triangle_right_route p q) :=
-  triangle_coherence p q
+    rweq_toEq (triangle_assoc_then_unitor p q) =
+      rweq_toEq (triangle_unitor p q) :=
+  triangle_identity p q
 
-theorem eckmann_hilton_interchange_eq
+noncomputable def eckmann_hilton_interchange_eq
     {a : A}
     (α β : TwoCell (A := A) a) :
-    rweq_toEq (vertical_comp α β) =
-      rweq_toEq (horizontal_comp α β) := by
-  exact congrArg rweq_toEq (eckmann_hilton_interchange α β)
+    (vertical_comp α β).toEq =
+      (horizontal_comp α β).toEq :=
+  rweq_toEq (eckmann_hilton_interchange α β)
 
-theorem two_cell_ext_refl
+noncomputable def two_cell_ext_refl
     {a : A}
     (α : TwoCell (A := A) a) :
-    rweq_toEq α = rweq_toEq α := rfl
+    α.toEq = α.toEq := rfl
 
-theorem whisker_left_refl
+noncomputable def whisker_left_refl
     {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq (Path.trans (Path.refl a) (Path.trans p q))
       (Path.trans p q) :=
   RwEq.step (Step.trans_refl_left (Path.trans p q))
 
-theorem whisker_right_refl
+noncomputable def whisker_right_refl
     {a b c : A}
     (p : Path a b) (q : Path b c) :
     RwEq (Path.trans (Path.trans p q) (Path.refl c))
       (Path.trans p q) :=
   RwEq.step (Step.trans_refl_right (Path.trans p q))
 
-theorem coherence_refl
+noncomputable def coherence_refl
     {a b : A}
     (p : Path a b) :
     RwEq p p :=
   RwEq.refl p
 
-theorem coherence_symm
+noncomputable def coherence_symm
     {a b : A}
     {p q : Path a b}
     (h : RwEq p q) :
     RwEq q p :=
   RwEq.symm h
 
-theorem coherence_trans
+noncomputable def coherence_trans
     {a b : A}
     {p q r : Path a b}
     (h₁ : RwEq p q) (h₂ : RwEq q r) :

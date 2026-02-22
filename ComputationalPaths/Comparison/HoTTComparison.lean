@@ -14,7 +14,7 @@ universe u v
 
 /-! ## (1) HoTT identity type interface (axiomatic style) -/
 
-abbrev HoTTId {A : Type u} (a b : A) : Type u := a = b
+abbrev HoTTId {A : Type u} (a b : A) : Prop := a = b
 
 noncomputable def hottJ {A : Type u} {a : A}
     (C : (b : A) → HoTTId a b → Sort v)
@@ -79,7 +79,7 @@ noncomputable def compPathAssocRwEq {A : Type u} {a b c d : A}
     (p : HoTTId a b) :
     (compPathOfHoTTId p).toEq = p := rfl
 
-noncomputable theorem compPathOfHoTTId_right_unit_rw
+noncomputable def compPathOfHoTTId_right_unit_rw
     {A : Type u} {a b : A} (p : HoTTId a b) :
     RwEq (Path.trans (compPathOfHoTTId p) (Path.refl b))
       (compPathOfHoTTId p) :=
@@ -102,7 +102,7 @@ noncomputable def decidablePathEqViaNormalForms {A : Type u} {a b : A}
   ComputationalPaths.Path.Rewrite.normalize_decidable (A := A) (a := a) (b := b) p q
 
 noncomputable def decidableRwEqViaNormalization {A : Type u} {a b : A}
-    (p q : Path a b) : Decidable (RwEq p q) :=
+    (p q : Path a b) : Decidable (RwEqProp p q) :=
   ComputationalPaths.Path.Rewrite.rweq_decidable (A := A) (a := a) (b := b) p q
 
 noncomputable def rewritingTheoryAssocWitness {A : Type u} {a b c d : A}
@@ -172,7 +172,7 @@ noncomputable def pathRwQuotOneTruncationData {A : Type u} (a b : A) :
     intro p q d₁ d₂
     exact ⟨OmegaGroupoid.contractibility₃ d₁ d₂⟩
 
-theorem pathRwQuot_is_one_truncation {A : Type u} (a b : A) :
+noncomputable def pathRwQuot_is_one_truncation {A : Type u} (a b : A) :
     IsOneTruncation A a b :=
   pathRwQuotOneTruncationData (A := A) a b
 

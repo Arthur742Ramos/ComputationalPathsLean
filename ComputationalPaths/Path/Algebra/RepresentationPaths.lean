@@ -51,7 +51,7 @@ inductive GrpStep {G : Type u} (pg : PathGroup G) : G → G → Type u where
   | invL (a : G) : GrpStep pg (pg.mul (pg.inv a) a) pg.e
 
 /-- Soundness of group steps. -/
-noncomputable def GrpStep.sound {G : Type u} {pg : PathGroup G} : GrpStep pg a b → a = b
+noncomputable def GrpStep.sound {G : Type u} {pg : PathGroup G} {a b : G} : GrpStep pg a b → a = b
   | .assoc a b c => pg.mul_assoc a b c
   | .identL a => pg.e_mul a
   | .identR a => pg.mul_e a
@@ -59,7 +59,7 @@ noncomputable def GrpStep.sound {G : Type u} {pg : PathGroup G} : GrpStep pg a b
   | .invL a => pg.inv_mul a
 
 /-- Convert a group step to a computational path. -/
-noncomputable def GrpStep.toPath {G : Type u} {pg : PathGroup G} (s : GrpStep pg a b) : Path a b :=
+noncomputable def GrpStep.toPath {G : Type u} {pg : PathGroup G} {a b : G} (s : GrpStep pg a b) : Path a b :=
   Path.mk [Step.mk a b s.sound] s.sound
 
 -- ============================================================
@@ -80,13 +80,13 @@ inductive RepStep {G : Type u} {V : Type v} {pg : PathGroup G}
 
 /-- Soundness for representation steps. -/
 noncomputable def RepStep.sound {G : Type u} {V : Type v} {pg : PathGroup G}
-    {rep : Representation G V pg} : RepStep rep a b → a = b
+    {rep : Representation G V pg} {a b : V} : RepStep rep a b → a = b
   | .identAct v => rep.rho_e v
   | .mulAct g h v => rep.rho_mul g h v
 
 /-- Convert a rep step to a path. -/
 noncomputable def RepStep.toPath {G : Type u} {V : Type v} {pg : PathGroup G}
-    {rep : Representation G V pg} (s : RepStep rep a b) : Path a b :=
+    {rep : Representation G V pg} {a b : V} (s : RepStep rep a b) : Path a b :=
   Path.mk [Step.mk a b s.sound] s.sound
 
 -- ============================================================

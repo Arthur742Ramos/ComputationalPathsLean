@@ -68,21 +68,21 @@ noncomputable def immersionId {n : Nat} (M : SmoothManifold n) : Immersion M M :
 
 /-- Regular homotopy between immersions, represented by a computational path. -/
 noncomputable def RegularHomotopy {m n : Nat} {M : SmoothManifold m} {N : SmoothManifold n}
-    (f g : Immersion M N) : Type u :=
+    (f g : Immersion M N) :=
   Path f g
 
 /-- Regular homotopy is reflexive. -/
-theorem regular_homotopy_refl {m n : Nat} {M : SmoothManifold m} {N : SmoothManifold n}
+noncomputable def regular_homotopy_refl {m n : Nat} {M : SmoothManifold m} {N : SmoothManifold n}
     (f : Immersion M N) : RegularHomotopy f f :=
   Path.refl f
 
 /-- Regular homotopy is symmetric. -/
-theorem regular_homotopy_symm {m n : Nat} {M : SmoothManifold m} {N : SmoothManifold n}
+noncomputable def regular_homotopy_symm {m n : Nat} {M : SmoothManifold m} {N : SmoothManifold n}
     {f g : Immersion M N} (h : RegularHomotopy f g) : RegularHomotopy g f :=
   Path.symm h
 
 /-- Regular homotopy is transitive. -/
-theorem regular_homotopy_trans {m n : Nat} {M : SmoothManifold m} {N : SmoothManifold n}
+noncomputable def regular_homotopy_trans {m n : Nat} {M : SmoothManifold m} {N : SmoothManifold n}
     {f g h : Immersion M N} (hfg : RegularHomotopy f g) (hgh : RegularHomotopy g h) :
     RegularHomotopy f h :=
   Path.trans hfg hgh
@@ -93,7 +93,7 @@ noncomputable def RegularHomotopyRel {m n : Nat} {M : SmoothManifold m} {N : Smo
   Nonempty (RegularHomotopy f g)
 
 /-- Regular homotopy classes of immersions. -/
-noncomputable def RegularHomotopyClass {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) : Type u :=
+noncomputable def RegularHomotopyClass {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) :=
   Quot (RegularHomotopyRel (M := M) (N := N))
 
 /-! ## Formal immersions and Smale-Hirsch data -/
@@ -125,7 +125,7 @@ noncomputable def FormalImmersionRel {m n : Nat} {M : SmoothManifold m} {N : Smo
   Nonempty (RegularHomotopy F.immersion G.immersion)
 
 /-- Formal immersion classes up to regular homotopy of the underlying immersion. -/
-noncomputable def FormalImmersionClass {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) : Type u :=
+noncomputable def FormalImmersionClass {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) :=
   Quot (FormalImmersionRel (M := M) (N := N))
 
 /-- Smale-Hirsch data: equivalence between immersions and formal immersions up to
@@ -171,7 +171,7 @@ structure SphereEversion (sphere : Sphere) (ambient : AmbientSpace) where
   eversion : RegularHomotopy start finish
 
 /-- Trivial eversion: any immersion is regularly homotopic to itself. -/
-theorem sphere_eversion_refl (sphere : Sphere) (ambient : AmbientSpace)
+noncomputable def sphere_eversion_refl (sphere : Sphere) (ambient : AmbientSpace)
     (f : Immersion sphere ambient) : SphereEversion sphere ambient :=
   { start := f, finish := f, eversion := regular_homotopy_refl f }
 
@@ -191,18 +191,20 @@ structure ImmersionClassification {m n : Nat} (M : SmoothManifold m) (N : Smooth
 /-- Lift regular homotopy classes to formal immersion classes by adding trivial data. -/
 noncomputable def toFormalClass {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) :
     RegularHomotopyClass M N → FormalImmersionClass M N :=
-  Quot.map FormalImmersion.ofImmersion (by
-    intro f g h
-    rcases h with ⟨hfg⟩
-    exact ⟨hfg⟩)
+  Quot.lift (fun f => Quot.mk _ (FormalImmersion.ofImmersion f)) (by
+    intro f g (h : RegularHomotopyRel f g)
+    apply Quot.sound
+    show FormalImmersionRel _ _
+    exact h)
 
 /-- Forget formal data on classes. -/
 noncomputable def toImmersionClass {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) :
     FormalImmersionClass M N → RegularHomotopyClass M N :=
-  Quot.map FormalImmersion.forget (by
-    intro F G h
-    rcases h with ⟨hFG⟩
-    exact ⟨hFG⟩)
+  Quot.lift (fun F => Quot.mk _ (FormalImmersion.forget F)) (by
+    intro F G (h : FormalImmersionRel F G)
+    apply Quot.sound
+    show RegularHomotopyRel _ _
+    exact h)
 
 /-- Identity immersion classification induced by trivial formal data. -/
 noncomputable def immersionClassificationIdentity {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) :
