@@ -406,8 +406,8 @@ noncomputable def trivialIndepData : IndepData Unit where
   probB := 1
   probAB := 1
   product := 1
-  prodPath := Path.mk [Step.mk _ _ (by norm_num)] (by norm_num)
-  indepPath := Path.refl 1
+  prodPath := Path.refl (1 : Nat)
+  indepPath := Path.refl (1 : Nat)
 
 /-- Trivial expectation data. -/
 noncomputable def trivialExpData : ExpectationData where

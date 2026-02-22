@@ -27,6 +27,7 @@ import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.CriticalPairs
 import ComputationalPaths.Path.Rewrite.GroupoidTRS
+import ComputationalPaths.Path.Rewrite.GroupoidConfluence
 namespace ComputationalPaths
 namespace Rewriting
 
@@ -34,7 +35,7 @@ open ComputationalPaths
 open ComputationalPaths.Path
 open ComputationalPaths.Path.Rewrite.GroupoidTRS (Expr)
 open ComputationalPaths.Path.Rewrite.GroupoidConfluence (CStep CRTC)
-open ComputationalPaths.Path.Rewrite.CriticalPairs (StepRule allStepRules)
+open ComputationalPaths.Path.Rewriting (StepRule allStepRules CriticalPairCase)
 
 /-! ## Term Syntax -/
 

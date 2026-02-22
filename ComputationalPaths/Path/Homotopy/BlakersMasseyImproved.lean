@@ -24,6 +24,7 @@ Barratt-Whitehead lemma in the computational paths setting.
 import ComputationalPaths.Path.Homotopy.BlakersMassey
 import ComputationalPaths.Path.Homotopy.FreudenthalSuspension
 import ComputationalPaths.Path.Homotopy.HurewiczTheorem
+import ComputationalPaths.Path.Homotopy.SerreModC
 import ComputationalPaths.Path.Homotopy.WhiteheadProduct
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 

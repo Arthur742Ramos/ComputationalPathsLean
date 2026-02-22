@@ -65,7 +65,7 @@ variable {A : Type u} (M : MorseAlg A)
 As in other “deepened” files, we interpret each rule as a single computational
 `Path` step (one element in the core `steps` trace).
 -/
-inductive MorseStep : A → A → Type
+inductive MorseStep : A → A → Type u
   | flow_crit_fixed (p : A) : MorseStep (M.flow (M.crit p)) (M.crit p)
   | flow_idem_on_crit (p : A) : MorseStep (M.flow (M.flow (M.crit p))) (M.flow (M.crit p))
   | crit_idem (p : A) : MorseStep (M.crit (M.crit p)) (M.crit p)
@@ -139,7 +139,7 @@ end MorseStep
 
 section
 
-local notation \"⟦\" s \"⟧\" => MorseStep.toPath (M := M) s
+local notation "⟦" s "⟧" => MorseStep.toPath (M := M) s
 
 -- 1. Critical point is fixed by flow (named step)
 
@@ -237,7 +237,7 @@ noncomputable def cobord_id_path (p : A) : Path (M.cobord p M.base) p :=
 noncomputable def cobord_compose_then_id (p q : A) : Path (M.cobord p (M.cobord q M.base)) (M.cobord p q) :=
   Path.trans
     (cobord_assoc_path (M := M) p q M.base)
-    (Path.congrArg (fun x => M.cobord x M.base) (Path.symm (cobord_id_path (M := M) (M.cobord p q))))
+    (cobord_id_path (M := M) (M.cobord p q))
 
 -- 19. Euler -> Betti (step)
 
@@ -344,7 +344,7 @@ theorem bdry_squared_roundtrip (p : A) : M.base = M.base :=
   (Path.trans (bdry_squared_symm_path (M := M) p) (bdry_squared_path (M := M) p)).toEq
 
 /-- Attachment unit and its inverse compose to a loop at `p`. -/
-theorem attach_unit_roundtrip (p : A) : p = p :=
+theorem attach_unit_roundtrip (M : MorseAlg A) (p : A) : p = p :=
   (Path.trans (Path.symm (attach_unit_path (M := M) p)) (attach_unit_path (M := M) p)).toEq
 
 /-- Euler-to-critical witness composes with its inverse to a loop at `euler p`. -/

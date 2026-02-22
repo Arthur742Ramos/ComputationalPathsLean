@@ -32,7 +32,7 @@ structure VirtualFundamentalClassPathData (X : Type u) (V : Type v) where
 
 /-- Primitive normalization steps for virtual-class path witnesses. -/
 inductive VirtualFundamentalClassStep {V : Type v} :
-    {a b : V} → Path a b → Path a b → Prop
+    {a b : V} → Path a b → Path a b → Type v
   | contract_right {a b : V} (p : Path a b) :
       VirtualFundamentalClassStep (Path.trans p (Path.refl b)) p
   | contract_left {a b : V} (p : Path a b) :
@@ -40,10 +40,10 @@ inductive VirtualFundamentalClassStep {V : Type v} :
 
 /-- Primitive virtual-class steps induce `RwEq`. -/
 noncomputable def VirtualFundamentalClassStep.to_rweq {V : Type v} {a b : V} {p q : Path a b}
-    (h : VirtualFundamentalClassStep p q) : RwEq p q := by
-  cases h
-  · exact rweq_of_step (Path.Step.trans_refl_right _)
-  · exact rweq_of_step (Path.Step.trans_refl_left _)
+    (h : VirtualFundamentalClassStep p q) : RwEq p q :=
+  match p, q, h with
+  | _, _, .contract_right p => rweq_of_step (Step.trans_refl_right p)
+  | _, _, .contract_left p => rweq_of_step (Step.trans_refl_left p)
 
 namespace VirtualFundamentalClassPathData
 

@@ -70,7 +70,7 @@ end PathDeformation
 /-- Infinitesimal deformation: one rewrite step viewed as tangent data. -/
 structure InfinitesimalDeformation {A : Type u} {a b : A} (p : Path a b) where
   next : Path a b
-  tangent : Step p next
+  tangent : Path.Step p next
 
 namespace InfinitesimalDeformation
 
@@ -94,7 +94,7 @@ inductive StepSequence {A : Type u} {a b : A} :
     Path a b → Path a b → Type u where
   | nil (p : Path a b) : StepSequence p p
   | cons {p q r : Path a b} :
-      Step p q → StepSequence q r → StepSequence p r
+      Path.Step p q → StepSequence q r → StepSequence p r
 
 namespace StepSequence
 
@@ -143,14 +143,14 @@ structure CriticalPairAt {A : Type u} {a b : A} (p : Path a b) where
   caseTag : CriticalPairCase
   left : Path a b
   right : Path a b
-  leftStep : Step p left
-  rightStep : Step p right
+  leftStep : Path.Step p left
+  rightStep : Path.Step p right
 
 namespace CriticalPairAt
 
 noncomputable def Joinable {A : Type u} {a b : A} {p : Path a b}
-    (cp : CriticalPairAt p) : Prop :=
-  ∃ r : Path a b, RwEq cp.left r ∧ RwEq cp.right r
+    (cp : CriticalPairAt p) : Type u :=
+  Σ r : Path a b, RwEq cp.left r × RwEq cp.right r
 
 noncomputable def left_rweq {A : Type u} {a b : A} {p : Path a b}
     (cp : CriticalPairAt p) : RwEq p cp.left :=
@@ -164,7 +164,7 @@ end CriticalPairAt
 
 noncomputable def PathDeformation.ExtendableAlong
     {A : Type u} {a b : A} {p₀ : Path a b}
-    (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal) : Prop :=
+    (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal) : Type u :=
   cp.Joinable
 
 noncomputable def PathDeformation.extend_of_joinable
@@ -172,22 +172,21 @@ noncomputable def PathDeformation.extend_of_joinable
     (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal)
     (h : D.ExtendableAlong cp) :
     Σ r : Path a b, PathDeformation p₀ :=
-  ⟨Classical.choice (let ⟨r, _, _⟩ := h; ⟨r⟩),
-   D.extend (rweq_trans cp.left_rweq
-     (Classical.choice (let ⟨_, hLeft, _⟩ := h; ⟨hLeft⟩)))⟩
+  ⟨h.1,
+   D.extend (rweq_trans cp.left_rweq h.2.1)⟩
 
 /-- Obstruction: a non-joinable critical pair blocks extension. -/
 structure ExtensionObstruction {A : Type u} {a b : A} {p₀ : Path a b}
     (D : PathDeformation p₀) where
   critical : CriticalPairAt D.terminal
-  nonjoinable : ¬ D.ExtendableAlong critical
+  nonjoinable : D.ExtendableAlong critical → False
 
 namespace ExtensionObstruction
 
 theorem blocks_extension
     {A : Type u} {a b : A} {p₀ : Path a b}
     {D : PathDeformation p₀} (obs : ExtensionObstruction D) :
-    ¬ D.ExtendableAlong obs.critical :=
+    D.ExtendableAlong obs.critical → False :=
   obs.nonjoinable
 
 end ExtensionObstruction
