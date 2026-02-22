@@ -95,7 +95,7 @@ private theorem expr_wordProblem_eq {A : Type u} {a b : A}
   obtain ⟨r, hp, hq⟩ := h
   have h1 := PathExpr.rw_eq_source hp
   have h2 := PathExpr.rw_eq_source hq
-  exact h1.symm.trans h2
+  exact h1.trans h2.symm
 
 /-- Joinable expressions yield rewrite equality after evaluation. -/
 noncomputable def expr_wordProblem_sound {A : Type u} {a b : A}
@@ -103,6 +103,7 @@ noncomputable def expr_wordProblem_sound {A : Type u} {a b : A}
     (h : ExprWordProblem p q) :
     RwEq (PathExpr.eval p) (PathExpr.eval q) := by
   rw [expr_wordProblem_eq h]
+  exact RwEq.refl _
 
 /-! ## Word problem for groups via π₁ -/
 
