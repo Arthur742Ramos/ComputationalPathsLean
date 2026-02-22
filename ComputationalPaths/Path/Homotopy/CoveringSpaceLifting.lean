@@ -89,8 +89,7 @@ noncomputable def fiberTransportQuot {P : A → Type u} {a b : A} :
 @[simp] theorem fiberTransportQuot_refl {P : A → Type u} {a : A} (x : P a) :
     fiberTransportQuot (P := P) (a := a) (b := a)
         (PathRwQuot.refl (A := A) a) x = x := by
-  simpa [PathRwQuot.refl] using
-    (fiberTransportQuot_mk (P := P) (a := a) (b := a) (Path.refl a) x)
+  simp only [PathRwQuot.refl, fiberTransportQuot_mk, fiberTransport, Path.transport_refl]
 
 /-- Transport along a composite quotient path is successive transport. -/
 @[simp] theorem fiberTransportQuot_trans {P : A → Type u} {a b c : A}
