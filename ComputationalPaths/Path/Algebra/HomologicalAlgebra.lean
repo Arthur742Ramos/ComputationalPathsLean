@@ -241,17 +241,17 @@ theorem h2_identifies_three_boundaries {A : Type u} (x : ThreeCell A) :
 
 /-- Squier-FDT bridge: obstruction generators are finitely bounded. -/
 theorem h2_obstructions_finite_from_squier :
-    ComputationalPaths.Rewriting.HasFDT ComputationalPaths.Rewriting.computationalPathMonoid ∧
-      ∃ n : Nat, ComputationalPaths.Rewriting.homotopyBasis.length ≤ n := by
+    ComputationalPaths.Path.Rewriting.HasFDT ComputationalPaths.Path.Rewriting.computationalPathMonoid ∧
+      ∃ n : Nat, ComputationalPaths.Path.Rewriting.homotopyBasis.length ≤ n := by
   constructor
-  · exact ComputationalPaths.Rewriting.computationalPathMonoid_hasFDT
-  · exact ⟨ComputationalPaths.Rewriting.homotopyBasisUpperBound,
-      ComputationalPaths.Rewriting.homotopyBasis_finite_bound⟩
+  · exact ComputationalPaths.Path.Rewriting.computationalPathMonoid_hasFDT
+  · exact ⟨ComputationalPaths.Path.Rewriting.homotopyBasisUpperBound,
+      ComputationalPaths.Path.Rewriting.homotopyBasis_finite_bound⟩
 
 /-- Concrete bound extracted from the Squier package. -/
 theorem h2_obstruction_bound_eval :
-    ComputationalPaths.Rewriting.homotopyBasisUpperBound = 66 :=
-  ComputationalPaths.Rewriting.homotopyBasis_bound_eval
+    ComputationalPaths.Path.Rewriting.homotopyBasisUpperBound = 66 :=
+  ComputationalPaths.Path.Rewriting.homotopyBasis_bound_eval
 
 /-! ## Euler characteristic on path-level cell data -/
 
