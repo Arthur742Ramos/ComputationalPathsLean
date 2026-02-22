@@ -48,7 +48,7 @@ variable {A : Type u} {a : A}
     mul_right_inv := LoopQuot.comp_inv }
 
 /-- The loop group structure as a convenience abbreviation. -/
-@[simp] abbrev LoopGroup' (A : Type u) (a : A) : Algebra.StrictGroup (LoopQuot A a) :=
+@[simp] noncomputable abbrev LoopGroup' (A : Type u) (a : A) : Algebra.StrictGroup (LoopQuot A a) :=
   loopGroupStructure A a
 
 /-! ## Conjugation and Commutators -/

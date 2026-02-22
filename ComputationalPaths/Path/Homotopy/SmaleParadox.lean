@@ -31,7 +31,7 @@ homotopy, yielding a classification of immersions in terms of bundle data.
 - Eliashberg and Mishachev, "Introduction to the h-Principle"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 
 namespace ComputationalPaths
 namespace Path

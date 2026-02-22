@@ -64,7 +64,7 @@ section LongExactSequence
 
 variable {E : Type u} {B : Type v} (p : E → B) (e0 : E)
 
-abbrev fiberBase : Fib p (p e0) :=
+noncomputable abbrev fiberBase : Fib p (p e0) :=
   { point := e0, witness := Path.refl (p e0) }
 
 abbrev pi1F : Type (max u v) :=
@@ -181,7 +181,7 @@ noncomputable def projection1 : Fib1 (f := f) b → A :=
 abbrev Fib2 : Type (max u v) :=
   Fib (projection1 (f := f) (b := b)) a0
 
-abbrev fib2Base : Fib2 (f := f) b a0 :=
+noncomputable abbrev fib2Base : Fib2 (f := f) b a0 :=
   { point := fib1Base (f := f) (b := b) a0 lift0
     witness := Path.refl a0 }
 

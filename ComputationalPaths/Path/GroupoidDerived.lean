@@ -252,19 +252,19 @@ noncomputable def pathRwQuot_assoc_path {a b c d : A}
 /-! ## Concrete examples -/
 
 /-- The identity weak groupoid on `Nat`. -/
-example : WeakGroupoid Nat := WeakGroupoid.identity Nat
+noncomputable example : WeakGroupoid Nat := WeakGroupoid.identity Nat
 
 /-- The identity weak groupoid on `Bool`. -/
-example : WeakGroupoid Bool := WeakGroupoid.identity Bool
+noncomputable example : WeakGroupoid Bool := WeakGroupoid.identity Bool
 
 /-- The strict groupoid quotient on `Nat`. -/
-example : StrictGroupoid Nat := StrictGroupoid.quotient Nat
+noncomputable example : StrictGroupoid Nat := StrictGroupoid.quotient Nat
 
 /-- The `EqFunctor` induced by `Nat.succ`. -/
-example : EqFunctor Nat Nat := EqFunctor.ofFunction Nat.succ
+noncomputable example : EqFunctor Nat Nat := EqFunctor.ofFunction Nat.succ
 
 /-- The constant functor to `Bool.true`. -/
-example : EqFunctor Nat Bool := constFunctor Bool.true
+noncomputable example : EqFunctor Nat Bool := constFunctor Bool.true
 
 end GroupoidDerived
 end Path

@@ -11,7 +11,7 @@ monotonicity, continuity from below/above, null sets, and outer measures.
 - Billingsley, "Probability and Measure"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 
 namespace ComputationalPaths
 namespace Path

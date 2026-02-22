@@ -235,15 +235,15 @@ theorem app_refl_eq {α β : Type u} (f : α → β) (a : α) :
 /-! ## Concrete product/sigma examples -/
 
 /-- A concrete product path. -/
-example : Path ((1, 2) : Nat × Nat) (1, 2) :=
+noncomputable example : Path ((1, 2) : Nat × Nat) (1, 2) :=
   Path.prodMk (Path.refl 1) (Path.refl 2)
 
 /-- A concrete sigma path (dependent pair with constant family). -/
-example : Path (⟨0, 1⟩ : @Sigma Nat (fun _ => Nat)) (⟨0, 1⟩ : @Sigma Nat (fun _ => Nat)) :=
+noncomputable example : Path (⟨0, 1⟩ : @Sigma Nat (fun _ => Nat)) (⟨0, 1⟩ : @Sigma Nat (fun _ => Nat)) :=
   Path.refl (⟨0, 1⟩ : @Sigma Nat (fun _ => Nat))
 
 /-- A concrete sum path. -/
-example : Path (Sum.inl 42 : Nat ⊕ Bool) (Sum.inl 42) :=
+noncomputable example : Path (Sum.inl 42 : Nat ⊕ Bool) (Sum.inl 42) :=
   Path.inlCongr (Path.refl 42)
 
 /-- Projecting out of a concrete product path. -/

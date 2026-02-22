@@ -237,11 +237,11 @@ theorem mapRight_ofEq_toEq (K : BiContext A B C)
 /-! ## Concrete examples -/
 
 /-- A concrete bi-context map on Nat addition. -/
-example : Path (2 + 3) (2 + 3) :=
+noncomputable example : Path (2 + 3) (2 + 3) :=
   BiContext.mapLeft addContext (Path.refl 2) 3
 
 /-- A concrete bi-context map on multiplication. -/
-example : Path (2 * 3) (2 * 3) :=
+noncomputable example : Path (2 * 3) (2 * 3) :=
   BiContext.mapRight mulContext 2 (Path.refl 3)
 
 end BiContextDerived

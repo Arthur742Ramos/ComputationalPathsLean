@@ -12,7 +12,7 @@ expectation linearity, and law of total probability.
 - Billingsley, "Probability and Measure"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 
 namespace ComputationalPaths
 namespace Path

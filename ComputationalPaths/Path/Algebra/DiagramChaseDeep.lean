@@ -100,7 +100,7 @@ theorem path_length_trans (p : Path α a b) (q : Path α b c) :
 abbrev N := Nat
 
 -- Path builder helpers
-abbrev sp (name : String) (a b : N) : Path N a b := Path.single (Step.rule name a b)
+noncomputable abbrev sp (name : String) (a b : N) : Path N a b := Path.single (Step.rule name a b)
 abbrev refl_path (a : N) : Path N a a := Path.nil a
 
 -- ============================================================

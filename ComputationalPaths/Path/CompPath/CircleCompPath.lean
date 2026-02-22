@@ -201,7 +201,7 @@ noncomputable def circleCompPathPiOneEquivInt :
 abbrev Circle : Type u := CircleCompPath.{u}
 
 /-- Alias for the basepoint, matching the legacy name. -/
-@[simp] abbrev circleBase : Circle := circleCompPathBase
+@[simp] noncomputable abbrev circleBase : Circle := circleCompPathBase
 
 /-- Alias for the loop quotient, matching the legacy name. -/
 abbrev circlePiOne : Type u := circleCompPathPiOne

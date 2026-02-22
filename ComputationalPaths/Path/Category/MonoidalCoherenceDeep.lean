@@ -17,7 +17,7 @@ the same semantic equality — proved via correctness of normalization.
   computational paths"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 
 set_option linter.unusedSectionVars false
 set_option linter.unusedSimpArgs false

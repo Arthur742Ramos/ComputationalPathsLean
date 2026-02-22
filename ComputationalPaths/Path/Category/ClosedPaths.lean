@@ -19,7 +19,7 @@ exponential transpose, and cartesian closed structure.
 - de Queiroz et al., "Propositional equality, identity types, and direct computational paths"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 
 namespace ComputationalPaths
 namespace Path

@@ -27,7 +27,7 @@ universe u v w
 abbrev IdType {A : Type u} (a b : A) := Path a b
 
 /-- ap IS congrArg. -/
-abbrev ap {A : Type u} {B : Type v} (f : A → B) {a b : A}
+noncomputable abbrev ap {A : Type u} {B : Type v} (f : A → B) {a b : A}
     (p : Path a b) : Path (f a) (f b) := Path.congrArg f p
 
 /-! ## ap (congrArg) laws -/

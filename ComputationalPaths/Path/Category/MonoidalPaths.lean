@@ -19,7 +19,7 @@ and pentagon/triangle identities for the path tensor.
 - de Queiroz et al., "Propositional equality, identity types, and direct computational paths"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 
 namespace ComputationalPaths
 namespace Path

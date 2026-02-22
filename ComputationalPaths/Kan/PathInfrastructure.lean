@@ -25,7 +25,7 @@ variable (X : PathFunctor.{u, v} (A := A))
 abbrev LeftKanObj (b : B) : Type (max u v) :=
   pointwiseLeftKanObj J X b
 
-abbrev leftMap {b b' : B} (q : Path b b') :
+noncomputable abbrev leftMap {b b' : B} (q : Path b b') :
     LeftKanObj (J := J) (X := X) b → LeftKanObj (J := J) (X := X) b' :=
   pointwiseLeftKanMap (F := J) (G := X) (b := b) (b' := b') q
 
@@ -105,7 +105,7 @@ variable (X : PathFunctor.{u, v} (A := A))
 abbrev RightKanObj (b : B) : Type (max u v) :=
   pointwiseRightKanObj J X b
 
-abbrev rightMap {b b' : B} (q : Path b b') :
+noncomputable abbrev rightMap {b b' : B} (q : Path b b') :
     RightKanObj (J := J) (X := X) b → RightKanObj (J := J) (X := X) b' :=
   pointwiseRightKanMap (F := J) (G := X) (b := b) (b' := b') q
 

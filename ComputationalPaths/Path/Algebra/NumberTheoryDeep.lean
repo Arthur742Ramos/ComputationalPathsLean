@@ -298,13 +298,13 @@ theorem listProd_cons (x : Nat) (xs : List Nat) :
     listProd (x :: xs) = x * listProd xs := rfl
 
 /-- Theorem 30: Factorization path for 12 = 2 * 2 * 3. -/
-theorem factor_12 : listProd [2, 2, 3] = 12 := by native_decide
+noncomputable theorem factor_12 : listProd [2, 2, 3] = 12 := by native_decide
 
 /-- Theorem 31: Factorization path for 30 = 2 * 3 * 5. -/
-theorem factor_30 : listProd [2, 3, 5] = 30 := by native_decide
+noncomputable theorem factor_30 : listProd [2, 3, 5] = 30 := by native_decide
 
 /-- Theorem 32: Factorization path for 60 = 2 * 2 * 3 * 5. -/
-theorem factor_60 : listProd [2, 2, 3, 5] = 60 := by native_decide
+noncomputable theorem factor_60 : listProd [2, 2, 3, 5] = 60 := by native_decide
 
 /-! ## §11 Chinese Remainder Theorem -/
 
@@ -349,10 +349,10 @@ noncomputable def legendreSymbol (a p : Nat) : Int :=
     else -1
 
 /-- Theorem 35: Legendre symbol (2 | 7) = 1 (2 is a QR mod 7). -/
-theorem legendre_2_7 : legendreSymbol 2 7 = 1 := by native_decide
+noncomputable theorem legendre_2_7 : legendreSymbol 2 7 = 1 := by native_decide
 
 /-- Theorem 36: Legendre symbol (3 | 7) computation. -/
-theorem legendre_3_7 : legendreSymbol 3 7 = -1 := by native_decide
+noncomputable theorem legendre_3_7 : legendreSymbol 3 7 = -1 := by native_decide
 
 /-- Quadratic reciprocity: for odd primes p, q, the Legendre symbols satisfy
     (p|q)(q|p) = (-1)^((p-1)/2 · (q-1)/2). We state this for concrete values.
@@ -375,19 +375,19 @@ noncomputable def padicVal (p n : Nat) : Nat :=
     go n n
 
 /-- Theorem 38: v_2(8) = 3. -/
-theorem padic_2_8 : padicVal 2 8 = 3 := by native_decide
+noncomputable theorem padic_2_8 : padicVal 2 8 = 3 := by native_decide
 
 /-- Theorem 39: v_2(12) = 2. -/
-theorem padic_2_12 : padicVal 2 12 = 2 := by native_decide
+noncomputable theorem padic_2_12 : padicVal 2 12 = 2 := by native_decide
 
 /-- Theorem 40: v_3(27) = 3. -/
-theorem padic_3_27 : padicVal 3 27 = 3 := by native_decide
+noncomputable theorem padic_3_27 : padicVal 3 27 = 3 := by native_decide
 
 /-- Theorem 41: v_5(100) = 2. -/
-theorem padic_5_100 : padicVal 5 100 = 2 := by native_decide
+noncomputable theorem padic_5_100 : padicVal 5 100 = 2 := by native_decide
 
 /-- Theorem 42: v_2(0) = 0 (convention). -/
-theorem padic_zero : padicVal 2 0 = 0 := by native_decide
+noncomputable theorem padic_zero : padicVal 2 0 = 0 := by native_decide
 
 /-! ## §14 p-adic valuation rewrite paths -/
 
@@ -527,16 +527,16 @@ noncomputable def isPrime (n : Nat) : Bool :=
   decide (n ≥ 2) && ((List.range n).filter (fun d => decide (d ≥ 2) && n % d == 0)).length == 0
 
 /-- Theorem 61: 2 is prime. -/
-theorem two_prime : isPrime 2 = true := by native_decide
+noncomputable theorem two_prime : isPrime 2 = true := by native_decide
 
 /-- Theorem 62: 3 is prime. -/
-theorem three_prime : isPrime 3 = true := by native_decide
+noncomputable theorem three_prime : isPrime 3 = true := by native_decide
 
 /-- Theorem 63: 5 is prime. -/
-theorem five_prime : isPrime 5 = true := by native_decide
+noncomputable theorem five_prime : isPrime 5 = true := by native_decide
 
 /-- Theorem 64: 7 is prime. -/
-theorem seven_prime : isPrime 7 = true := by native_decide
+noncomputable theorem seven_prime : isPrime 7 = true := by native_decide
 
 /-! ## §19 Additional multi-step computational paths -/
 

@@ -58,7 +58,7 @@ structure Interleaving (M N : PersistenceModule) (eps : Nat) where
 noncomputable def interleavingDistance (_M _N : PersistenceModule) : Nat := 0
 
 /-- Abbreviation for the interleaving distance. -/
-abbrev dI (M N : PersistenceModule) : Nat := interleavingDistance M N
+noncomputable abbrev dI (M N : PersistenceModule) : Nat := interleavingDistance M N
 
 /-- The interleaving distance of a module with itself. -/
 theorem interleavingDistance_self (M : PersistenceModule) :
@@ -88,7 +88,7 @@ noncomputable def trivialDiagram : PersistenceDiagram where
 noncomputable def bottleneckDistance (_D1 _D2 : PersistenceDiagram) : Nat := 0
 
 /-- Abbreviation for the bottleneck distance. -/
-abbrev dB (D1 D2 : PersistenceDiagram) : Nat := bottleneckDistance D1 D2
+noncomputable abbrev dB (D1 D2 : PersistenceDiagram) : Nat := bottleneckDistance D1 D2
 
 /-- Bottleneck distance of a diagram with itself. -/
 theorem bottleneckDistance_self (D : PersistenceDiagram) :

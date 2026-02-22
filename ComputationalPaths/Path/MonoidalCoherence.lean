@@ -35,11 +35,11 @@ variable {a b c d e f' : A}
 /-! ## Monoidal Structure on Paths -/
 
 /-- Tensor product of composable paths (path concatenation). -/
-@[simp] abbrev tensorPath {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
+@[simp] noncomputable abbrev tensorPath {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
 /-- Unit for the path tensor (reflexive path). -/
-@[simp] abbrev unitPath (a : A) : Path a a :=
+@[simp] noncomputable abbrev unitPath (a : A) : Path a a :=
   Path.refl a
 
 /-- Associator for the path tensor. -/

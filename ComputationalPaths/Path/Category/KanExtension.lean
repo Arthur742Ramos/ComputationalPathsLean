@@ -127,13 +127,13 @@ abbrev rightKanAdjunction (R : RightKanExtension F G)
   R.universal M
 
 /-- Abbreviation for the pointwise left Kan extension functor. -/
-abbrev pointwiseLeftKanExtension (F : PathCategoryFunctor A B)
+noncomputable abbrev pointwiseLeftKanExtension (F : PathCategoryFunctor A B)
     (G : PathFunctor.{u, v} (A := A)) :
     PathFunctor (A := B) :=
   pointwiseLeftKan F G
 
 /-- Abbreviation for the pointwise right Kan extension functor. -/
-abbrev pointwiseRightKanExtension (F : PathCategoryFunctor A B)
+noncomputable abbrev pointwiseRightKanExtension (F : PathCategoryFunctor A B)
     (G : PathFunctor.{u, v} (A := A)) :
     PathFunctor (A := B) :=
   pointwiseRightKan F G

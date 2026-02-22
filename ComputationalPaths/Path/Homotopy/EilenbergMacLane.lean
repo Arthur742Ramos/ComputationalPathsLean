@@ -64,7 +64,7 @@ abbrev KOneHomotopy {G : Type u} (X Y : KOneSpace G) : Type u :=
   KSpaceHomotopy X Y
 
 /-- Any two K(G,1) spaces are equivalent at the level of π₁. -/
-abbrev kOneUniqueUpToHomotopy {G : Type u} (X Y : KOneSpace G) :
+noncomputable abbrev kOneUniqueUpToHomotopy {G : Type u} (X Y : KOneSpace G) :
     KOneHomotopy X Y :=
   kSpaceUniqueUpToHomotopy X Y
 

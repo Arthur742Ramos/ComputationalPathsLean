@@ -43,13 +43,13 @@ noncomputable def rightUnitorPath (f : Hom a b) : TwoCell (Path.trans f (Path.re
   rightUnitor f
 
 /-- Left route in Mac Lane's pentagon. -/
-abbrev pentagonLeftPath (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
+noncomputable abbrev pentagonLeftPath (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
     TwoCell (Path.trans (Path.trans (Path.trans f g) h) k)
       (Path.trans f (Path.trans g (Path.trans h k))) :=
   pentagonLeft f g h k
 
 /-- Right route in Mac Lane's pentagon. -/
-abbrev pentagonRightPath (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
+noncomputable abbrev pentagonRightPath (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
     TwoCell (Path.trans (Path.trans (Path.trans f g) h) k)
       (Path.trans f (Path.trans g (Path.trans h k))) :=
   pentagonRight f g h k
@@ -60,12 +60,12 @@ noncomputable def pentagonIdentity (f : Hom a b) (g : Hom b c) (h : Hom c d) (k 
   Derivation₃.step (MetaStep₃.pentagon f g h k)
 
 /-- Left route in the bicategorical triangle diagram. -/
-abbrev triangleLeftPath (f : Hom a b) (g : Hom b c) :
+noncomputable abbrev triangleLeftPath (f : Hom a b) (g : Hom b c) :
     TwoCell (Path.trans (Path.trans f (Path.refl b)) g) (Path.trans f g) :=
   triangleLeft f g
 
 /-- Right route in the bicategorical triangle diagram. -/
-abbrev triangleRightPath (f : Hom a b) (g : Hom b c) :
+noncomputable abbrev triangleRightPath (f : Hom a b) (g : Hom b c) :
     TwoCell (Path.trans (Path.trans f (Path.refl b)) g) (Path.trans f g) :=
   triangleRight f g
 

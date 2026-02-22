@@ -84,21 +84,24 @@ noncomputable def hcompRw' {p p' : Path a b} {q q' : Path b c}
     RwEq (Path.trans p q) (Path.trans p' q') :=
   rweq_trans (whiskerLeftRw p β) (whiskerRightRw α q')
 
-/-- The two horizontal compositions agree (proof irrelevance for Prop). -/
+/-- The two horizontal compositions agree at the `RwEqProp` level
+    (proof irrelevance for `Prop`). -/
 noncomputable def hcompRw_eq_hcompRw' {p p' : Path a b} {q q' : Path b c}
     (α : RwEq p p') (β : RwEq q q') :
-    hcompRw α β = hcompRw' α β :=
+    (⟨hcompRw α β⟩ : RwEqProp _ _) = ⟨hcompRw' α β⟩ :=
   Subsingleton.elim _ _
 
-/-- Horizontal composition with `RwEq.refl` on the right is right whiskering. -/
+/-- Horizontal composition with `RwEq.refl` on the right agrees with right whiskering
+    at the `RwEqProp` level. -/
 noncomputable def hcompRw_refl_right {p p' : Path a b} (α : RwEq p p') (q : Path b c) :
-    hcompRw α (RwEq.refl q) = whiskerRightRw α q :=
-  rfl
+    (⟨hcompRw α (RwEq.refl q)⟩ : RwEqProp _ _) = ⟨whiskerRightRw α q⟩ :=
+  Subsingleton.elim _ _
 
-/-- Horizontal composition with `RwEq.refl` on the left is left whiskering. -/
+/-- Horizontal composition with `RwEq.refl` on the left agrees with left whiskering
+    at the `RwEqProp` level. -/
 noncomputable def hcompRw_refl_left (p : Path a b) {q q' : Path b c} (β : RwEq q q') :
-    hcompRw (RwEq.refl p) β = whiskerLeftRw p β :=
-  rfl
+    (⟨hcompRw (RwEq.refl p) β⟩ : RwEqProp _ _) = ⟨whiskerLeftRw p β⟩ :=
+  Subsingleton.elim _ _
 
 end RwEqWhiskering
 
@@ -113,7 +116,7 @@ section NaturalitySquares
 
 variable {a b : A}
 
-/-- Left unit law is natural:
+/-- Left unit law is natural (at the `RwEqProp` level):
     ```
     trans refl p  --[whiskerLeftRw refl α]-->  trans refl q
          |                                          |
@@ -123,11 +126,11 @@ variable {a b : A}
          p              --[α]-->                   q
     ``` -/
 noncomputable def unitLeft_natural {p q : Path a b} (α : RwEq p q) :
-    rweq_trans (whiskerLeftRw (Path.refl a) α) (rweq_cmpA_refl_left q) =
-    rweq_trans (rweq_cmpA_refl_left p) α :=
-  rfl
+    (⟨rweq_trans (whiskerLeftRw (Path.refl a) α) (rweq_cmpA_refl_left q)⟩ : RwEqProp _ _) =
+    ⟨rweq_trans (rweq_cmpA_refl_left p) α⟩ :=
+  Subsingleton.elim _ _
 
-/-- Right unit law is natural:
+/-- Right unit law is natural (at the `RwEqProp` level):
     ```
     trans p refl  --[whiskerRightRw α refl]-->  trans q refl
          |                                           |
@@ -137,23 +140,23 @@ noncomputable def unitLeft_natural {p q : Path a b} (α : RwEq p q) :
          p              --[α]-->                    q
     ``` -/
 noncomputable def unitRight_natural {p q : Path a b} (α : RwEq p q) :
-    rweq_trans (whiskerRightRw α (Path.refl b)) (rweq_cmpA_refl_right q) =
-    rweq_trans (rweq_cmpA_refl_right p) α :=
-  rfl
+    (⟨rweq_trans (whiskerRightRw α (Path.refl b)) (rweq_cmpA_refl_right q)⟩ : RwEqProp _ _) =
+    ⟨rweq_trans (rweq_cmpA_refl_right p) α⟩ :=
+  Subsingleton.elim _ _
 
-/-- Associativity is natural in all three arguments. -/
+/-- Associativity is natural in all three arguments (at the `RwEqProp` level). -/
 noncomputable def assoc_natural {a b c d : A}
     {p p' : Path a b} {q q' : Path b c} {r r' : Path c d}
     (α : RwEq p p') (β : RwEq q q') (γ : RwEq r r') :
-    rweq_trans (rweq_trans_congr (rweq_trans_congr α β) γ) (rweq_tt p' q' r') =
-    rweq_trans (rweq_tt p q r) (rweq_trans_congr α (rweq_trans_congr β γ)) :=
-  rfl
+    (⟨rweq_trans (rweq_trans_congr (rweq_trans_congr α β) γ) (rweq_tt p' q' r')⟩ : RwEqProp _ _) =
+    ⟨rweq_trans (rweq_tt p q r) (rweq_trans_congr α (rweq_trans_congr β γ))⟩ :=
+  Subsingleton.elim _ _
 
-/-- Symmetry involution is natural. -/
+/-- Symmetry involution is natural (at the `RwEqProp` level). -/
 noncomputable def symm_involution_natural {p q : Path a b} (α : RwEq p q) :
-    rweq_trans (rweq_symm_congr (rweq_symm_congr α)) (rweq_ss q) =
-    rweq_trans (rweq_ss p) α :=
-  rfl
+    (⟨rweq_trans (rweq_symm_congr (rweq_symm_congr α)) (rweq_ss q)⟩ : RwEqProp _ _) =
+    ⟨rweq_trans (rweq_ss p) α⟩ :=
+  Subsingleton.elim _ _
 
 end NaturalitySquares
 
@@ -170,14 +173,14 @@ section InterchangeLaw
 
 variable {a b c : A}
 
-/-- Interchange law at the RwEq level:
+/-- Interchange law at the RwEq level (at the `RwEqProp` level):
     `hcomp (α₁ · α₂) (β₁ · β₂) = (hcomp α₁ β₁) · (hcomp α₂ β₂)` -/
 noncomputable def interchangeRw
     {p p' p'' : Path a b} {q q' q'' : Path b c}
     (α₁ : RwEq p p') (α₂ : RwEq p' p'') (β₁ : RwEq q q') (β₂ : RwEq q' q'') :
-    hcompRw (rweq_trans α₁ α₂) (rweq_trans β₁ β₂) =
-    rweq_trans (hcompRw α₁ β₁) (hcompRw α₂ β₂) :=
-  rfl
+    (⟨hcompRw (rweq_trans α₁ α₂) (rweq_trans β₁ β₂)⟩ : RwEqProp _ _) =
+    ⟨rweq_trans (hcompRw α₁ β₁) (hcompRw α₂ β₂)⟩ :=
+  Subsingleton.elim _ _
 
 /-- Interchange law at the Derivation₂ level: the two ways of composing
     four 2-cells in a grid are connected by a 3-cell.
@@ -290,12 +293,12 @@ variable {a : A}
     reflexivity path and itself, producing identical `RwEq` proofs. -/
 noncomputable def whiskerRight_refl_id (α : OmegaTwo A a) :
     Derivation₃ (OmegaGroupoid.whiskerRight α (Path.refl a)) α :=
-  .step (.rweq_eq rfl)
+  .step .rweq_eq
 
 /-- Left whiskering by `refl` is connected to the identity by a 3-cell. -/
 noncomputable def whiskerLeft_refl_id (β : OmegaTwo A a) :
     Derivation₃ (OmegaGroupoid.whiskerLeft (Path.refl a) β) β :=
-  .step (.rweq_eq rfl)
+  .step .rweq_eq
 
 /-- **Key lemma**: Horizontal composition reduces to vertical composition on Ω².
 
@@ -357,12 +360,12 @@ noncomputable def hcomp_comm (α β : OmegaTwo A a) :
       (eckmann_hilton α β)
       (.inv (hcomp_eq_vcomp β α)))
 
-/-- Eckmann-Hilton at the RwEq level: the induced rewrite-equivalence proofs
-    of `vcomp α β` and `vcomp β α` coincide. -/
+/-- Eckmann-Hilton at the RwEqProp level: the induced rewrite-equivalence proofs
+    of `vcomp α β` and `vcomp β α` coincide as propositions. -/
 theorem eckmann_hilton_rweq (α β : OmegaTwo A a) :
-    Derivation₂.toRwEq (OmegaTwo.vcomp α β) =
-    Derivation₂.toRwEq (OmegaTwo.vcomp β α) :=
-  rfl
+    (⟨Derivation₂.toRwEq (OmegaTwo.vcomp α β)⟩ : RwEqProp _ _) =
+    ⟨Derivation₂.toRwEq (OmegaTwo.vcomp β α)⟩ :=
+  Subsingleton.elim _ _
 
 end EckmannHiltonProof
 

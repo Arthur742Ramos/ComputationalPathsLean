@@ -20,7 +20,7 @@ All proofs are complete - no placeholders, no axiom.
 - Neisendorfer, "Localization and Completion in Homotopy Theory"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 import ComputationalPaths.Path.Homotopy.LocalizationHomotopy
 import ComputationalPaths.Path.Homotopy.ChromaticHomotopy
 

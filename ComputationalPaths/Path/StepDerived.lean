@@ -255,16 +255,16 @@ theorem rw_trans_right_of_rw (r : Path a b) {p q : Path b c}
 /-! ## Concrete examples -/
 
 /-- A concrete path on natural numbers: `0 = 0` witnessed by `refl`. -/
-example : Path (0 : Nat) 0 := Path.refl 0
+noncomputable example : Path (0 : Nat) 0 := Path.refl 0
 
 /-- The path `ofEq (Nat.add_zero 0)` from `0 + 0` to `0`. -/
-example : Path (0 + 0) 0 := Path.stepChain (Nat.add_zero 0)
+noncomputable example : Path (0 + 0) 0 := Path.stepChain (Nat.add_zero 0)
 
 /-- Symmetry of a concrete arithmetic identity. -/
-example : Path 0 (0 + 0) := Path.symm (Path.stepChain (Nat.add_zero 0))
+noncomputable example : Path 0 (0 + 0) := Path.symm (Path.stepChain (Nat.add_zero 0))
 
 /-- Composing two concrete arithmetic identities. -/
-example : Path (0 + 0 + 0) 0 :=
+noncomputable example : Path (0 + 0 + 0) 0 :=
   Path.trans
     (Path.stepChain (Nat.add_zero (0 + 0)))
     (Path.stepChain (Nat.add_zero 0))

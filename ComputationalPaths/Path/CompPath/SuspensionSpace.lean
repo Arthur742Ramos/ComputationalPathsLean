@@ -68,13 +68,13 @@ end SuspensionCompPath
 abbrev Susp (X : Type u) : Type u := SuspensionCompPath X
 
 /-- Alias for the north pole. -/
-abbrev suspNorth (X : Type u) : Susp X := SuspensionCompPath.north
+noncomputable abbrev suspNorth (X : Type u) : Susp X := SuspensionCompPath.north
 
 /-- Alias for the south pole. -/
-abbrev suspSouth (X : Type u) : Susp X := SuspensionCompPath.south
+noncomputable abbrev suspSouth (X : Type u) : Susp X := SuspensionCompPath.south
 
 /-- Alias for the meridian. -/
-abbrev suspMerid {X : Type u} (x : X) :
+noncomputable abbrev suspMerid {X : Type u} (x : X) :
     Path (suspNorth X) (suspSouth X) :=
   SuspensionCompPath.merid x
 

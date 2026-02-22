@@ -12,7 +12,7 @@ Zero `Path.mk [Step.mk _ _ h] h`.
 - Fulton & Harris, "Representation Theory"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 
 namespace ComputationalPaths
 namespace Path

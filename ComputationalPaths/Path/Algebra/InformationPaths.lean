@@ -12,7 +12,7 @@ channel capacity.
 - Shannon, "A Mathematical Theory of Communication"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 
 namespace ComputationalPaths
 namespace Path

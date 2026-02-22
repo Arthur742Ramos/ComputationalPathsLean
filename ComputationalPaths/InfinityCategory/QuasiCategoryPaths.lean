@@ -59,11 +59,11 @@ noncomputable def canonical (Obj : Type u) : QuasiPathComposition Obj where
   assoc_step := fun p q r => Path.Step.trans_assoc p q r
 
 /-- Every quasi-category inherits canonical composition on object paths. -/
-abbrev onObjects (C : Homotopy.QuasiCategory) : QuasiPathComposition C.obj :=
+noncomputable abbrev onObjects (C : Homotopy.QuasiCategory) : QuasiPathComposition C.obj :=
   canonical C.obj
 
 /-- Object-level composition in a quasi-category, tracked by computational paths. -/
-abbrev composeObjPaths (C : Homotopy.QuasiCategory)
+noncomputable abbrev composeObjPaths (C : Homotopy.QuasiCategory)
     {x y z : C.obj} (p : Path x y) (q : Path y z) : Path x z :=
   (onObjects C).compose p q
 

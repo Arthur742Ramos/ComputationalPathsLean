@@ -67,7 +67,7 @@ deriving DecidableEq, Repr
 noncomputable def triple345 : Triple := ⟨3, 4, 5⟩
 
 /-- 1. Verification: (3,4,5) is Pythagorean -/
-theorem triple345_pyth : isPythagorean triple345 = true := by native_decide
+noncomputable theorem triple345_pyth : isPythagorean triple345 = true := by native_decide
 
 /-- Pythagorean norm: x² + y² -/
 @[simp] noncomputable def pythNorm (t : Triple) : Nat := t.x * t.x + t.y * t.y
@@ -172,7 +172,7 @@ noncomputable def pell_trivial_path (d : Nat) : Path (pellLhs 1) (pellRhs d 0) :
   dioStep _ _ (pell_trivial d)
 
 /-- 13. Pell(2): (3,2) is a solution — 9 = 2*4 + 1 -/
-theorem pell2_solution : pellLhs 3 = pellRhs 2 2 := by native_decide
+noncomputable theorem pell2_solution : pellLhs 3 = pellRhs 2 2 := by native_decide
 
 noncomputable def pell2_path : Path (pellLhs 3) (pellRhs 2 2) :=
   dioStep _ _ pell2_solution
@@ -202,17 +202,17 @@ noncomputable def sumSq_zero_path (a : Nat) : Path (sumSq a 0) (a * a) :=
   dioStep _ _ (sumSq_zero_right a)
 
 /-- 17. 5 = 1² + 2² -/
-theorem five_sum_sq : sumSq 1 2 = 5 := by native_decide
+noncomputable theorem five_sum_sq : sumSq 1 2 = 5 := by native_decide
 
 noncomputable def five_sum_sq_path : Path (sumSq 1 2) 5 := dioStep _ _ five_sum_sq
 
 /-- 18. 25 = 3² + 4² -/
-theorem twentyfive_sum_sq : sumSq 3 4 = 25 := by native_decide
+noncomputable theorem twentyfive_sum_sq : sumSq 3 4 = 25 := by native_decide
 
 noncomputable def twentyfive_sum_sq_path : Path (sumSq 3 4) 25 := dioStep _ _ twentyfive_sum_sq
 
 /-- 19. Brahmagupta–Fibonacci identity (for specific small values) -/
-theorem brahmagupta_1221 : sumSq 1 2 * sumSq 2 1 = sumSq 4 3 := by native_decide
+noncomputable theorem brahmagupta_1221 : sumSq 1 2 * sumSq 2 1 = sumSq 4 3 := by native_decide
 
 noncomputable def brahmagupta_1221_path : Path (sumSq 1 2 * sumSq 2 1) (sumSq 4 3) :=
   dioStep _ _ brahmagupta_1221
@@ -334,13 +334,13 @@ noncomputable def linDio_coeff_zero_right_path (a x y : Nat) :
   dioStep _ _ (linDio_coeff_zero_right a x y)
 
 /-- 37. 13 = 2² + 3² -/
-theorem thirteen_sum_sq : sumSq 2 3 = 13 := by native_decide
+noncomputable theorem thirteen_sum_sq : sumSq 2 3 = 13 := by native_decide
 
 noncomputable def thirteen_sum_sq_path : Path (sumSq 2 3) 13 := dioStep _ _ thirteen_sum_sq
 
 /-- 38. Pythagorean: (5,12,13) -/
 noncomputable def triple51213 : Triple := ⟨5, 12, 13⟩
-theorem triple51213_pyth : isPythagorean triple51213 = true := by native_decide
+noncomputable theorem triple51213_pyth : isPythagorean triple51213 = true := by native_decide
 
 /-- 39. Chain: scale then swap -/
 theorem scale_swap_comm (k : Nat) (t : Triple) :
@@ -358,7 +358,7 @@ noncomputable def pellRhs_y0_path (d : Nat) : Path (pellRhs d 0) 1 :=
   dioStep _ _ (pellRhs_y0 d)
 
 /-- 41. Pell(5): (9,4) is solution — 81 = 5*16 + 1 -/
-theorem pell5_solution : pellLhs 9 = pellRhs 5 4 := by native_decide
+noncomputable theorem pell5_solution : pellLhs 9 = pellRhs 5 4 := by native_decide
 
 noncomputable def pell5_path : Path (pellLhs 9) (pellRhs 5 4) :=
   dioStep _ _ pell5_solution
@@ -412,6 +412,6 @@ noncomputable def pell2_dioph_chain : Path (DiophExpr.eval (.pellLhs 3)) (DiophE
 
 /-- 48. Pythagorean (8,15,17) -/
 noncomputable def triple81517 : Triple := ⟨8, 15, 17⟩
-theorem triple81517_pyth : isPythagorean triple81517 = true := by native_decide
+noncomputable theorem triple81517_pyth : isPythagorean triple81517 = true := by native_decide
 
 end ComputationalPaths.Path.NumberTheory.DiophantinePaths

@@ -20,7 +20,7 @@ would fail, but `Nat` addition is commutative).
   computational paths"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Basic
 
 set_option linter.unusedSectionVars false
 

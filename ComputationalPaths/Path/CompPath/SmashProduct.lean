@@ -29,11 +29,11 @@ universe u
 /-! ## Smash product aliases -/
 
 /-- Smash product of pointed types (alias of `SmashProduct.Smash`). -/
-abbrev Smash (X Y : PtdType.{u}) : PtdType.{u} :=
+noncomputable abbrev Smash (X Y : PtdType.{u}) : PtdType.{u} :=
   SmashProduct.Smash X Y
 
 /-- Canonical inclusion X × Y → X smash Y. -/
-abbrev smashMk (X Y : PtdType.{u}) (x : X.carrier) (y : Y.carrier) :
+noncomputable abbrev smashMk (X Y : PtdType.{u}) (x : X.carrier) (y : Y.carrier) :
     (Smash X Y).carrier :=
   SmashProduct.smashMk X Y x y
 

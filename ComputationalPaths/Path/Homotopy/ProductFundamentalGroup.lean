@@ -31,7 +31,7 @@ section ProductPaths
 variable {A : Type u} {B : Type u}
 
 /-- Combine paths in `A` and `B` to a path in `A × B`. -/
-@[simp] abbrev Path.prod {a a' : A} {b b' : B}
+@[simp] noncomputable abbrev Path.prod {a a' : A} {b b' : B}
     (p : Path a a') (q : Path b b') : Path (a, b) (a', b') :=
   Path.prodMk p q
 
