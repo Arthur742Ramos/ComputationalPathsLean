@@ -410,11 +410,13 @@ theorem join_refl_meet {A : Type u} {a b : A}
     (join_refl p).meet = p := by
   rfl
 
-/-- Symmetric join induces the symmetric RwEq. -/
-noncomputable def Join.symm_rweq {A : Type u} {a b : A}
+/-- Symmetric join induces the symmetric RwEq at the propositional level.
+    Since `RwEq` lives in `Type u`, definitional equality of witnesses cannot
+    be established; instead we record the `Nonempty`-level agreement. -/
+theorem Join.symm_rweq_prop {A : Type u} {a b : A}
     {p q : Path a b} (J : Join (A := A) (a := a) (b := b) p q) :
-    J.symm.rweq = rweq_symm J.rweq :=
-  ComputationalPaths.Path.rweq_proof_irrel _ _
+    (⟨J.symm.rweq⟩ : RwEqProp q p) = ⟨rweq_symm J.rweq⟩ :=
+  Subsingleton.elim _ _
 
 /-- Join quot_eq is transitive via Eq.trans. -/
 theorem Join.quot_eq_trans {A : Type u} {a b : A}
